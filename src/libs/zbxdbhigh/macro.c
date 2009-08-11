@@ -356,10 +356,10 @@ static void	zbxmacros_update_host(DB_MACRO_HOST *host)
 	DBfree_result(result);
 }
 
-static int	zbxmacros_get_value_tmpl(DB_MACROS *macros, zbx_uint64_t *hostids, int host_num,
+static int	zbxmacros_get_value_hosts(DB_MACROS *macros, zbx_uint64_t *hostids, int host_num,
 		const char *macro, char **replace_to, time_t tm)
 {
-	const char	*__function_name = "zbxmacros_get_value_tmpl";
+	const char	*__function_name = "zbxmacros_get_value_hosts";
 	int		index, i, ret = FAIL;
 	DB_MACRO_HOST	*host;
 	zbx_uint64_t	*tmplids = NULL;
@@ -371,7 +371,7 @@ static int	zbxmacros_get_value_tmpl(DB_MACROS *macros, zbx_uint64_t *hostids, in
 
 	for (i = 0; i < host_num; i++)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() templateid:" ZBX_FS_UI64, __function_name, hostids[i]);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() hostid:" ZBX_FS_UI64, __function_name, hostids[i]);
 
 		host = zbxmacros_get_host(macros, hostids[i]);
 		if (host->tm < tm)
@@ -393,7 +393,7 @@ static int	zbxmacros_get_value_tmpl(DB_MACROS *macros, zbx_uint64_t *hostids, in
 	}
 
 	if (FAIL == ret && 0 != tmpl_num)	/* recursion */
-		ret = zbxmacros_get_value_tmpl(macros, tmplids, tmpl_num, macro, replace_to, tm);
+		ret = zbxmacros_get_value_hosts(macros, tmplids, tmpl_num, macro, replace_to, tm);
 
 	zbx_free(tmplids);
 
@@ -441,50 +441,18 @@ static void	zbxmacros_get_value_global(DB_MACROS *macros, const char *macro, cha
 void	zbxmacros_get_value(DB_MACROS *macros, zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to)
 {
 	const char	*__function_name = "zbxmacros_get_value";
-	int		index, i;
 	time_t		tm;
-	DB_MACRO_HOST	*host;
-	zbx_uint64_t	*tmplids = NULL;
-	int		tmpl_alloc = ZBX_MACRO_ALLOC_STEP, tmpl_num = 0;
 
 	if (NULL == macros)
 		return;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() macro:'%s'", __function_name, macro);
 
-	tmplids = zbx_malloc(tmplids, sizeof(zbx_uint64_t) * tmpl_alloc);
 	tm = time(NULL);
 
-	for (i = 0; i < host_num; i++)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() hostid:" ZBX_FS_UI64, __function_name, hostids[i]);
+	if (FAIL == zbxmacros_get_value_hosts(macros, hostids, host_num, macro, replace_to, tm))
+		zbxmacros_get_value_global(macros, macro, replace_to, tm);
 
-		host = zbxmacros_get_host(macros, hostids[i]);
-		if (host->tm < tm)
-		{
-			zbxmacros_update_host(host);
-			host->tm = tm + ZBX_MACRO_UPDATE_INTERVAL;
-		}
-
-		index = zbxmacros_get_macro_nearestindex(host, macro);
-		if (index < host->num && 0 == strcmp(host->macro[index].macro, macro))
-		{
-			*replace_to = zbx_dsprintf(*replace_to, "%s", host->macro[index].value);
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() replace_to:'%s'", __function_name, *replace_to);
-			goto clean;
-		}
-
-		uint64_array_merge(&tmplids, &tmpl_alloc, &tmpl_num, host->tmplids, host->tmpl_num, ZBX_MACRO_ALLOC_STEP);
-	}
-
-	if (SUCCEED == zbxmacros_get_value_tmpl(macros, tmplids, tmpl_num, macro, replace_to, tm))
-		goto clean;
-
-	zbxmacros_get_value_global(macros, macro, replace_to, tm);
-clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-
-	zbx_free(tmplids);
 }
 
 /******************************************************************************
