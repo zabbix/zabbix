@@ -390,10 +390,7 @@ include_once('include/page_header.php');
 
 // sorting
 			order_page_result($hosts, getPageSortField('host'), getPageSortOrder());
-
-// PAGING UPPER
 			$paging = getPagingLine($hosts);
-			$export_wdgt->addItem($paging);
 //-------
 		
 			$count_chkbx = 0;
@@ -482,12 +479,6 @@ include_once('include/page_header.php');
 						$screens)*/
 					));
 			}
-
-// PAGING FOOTER
-			$table->addRow(new CCol($paging));
-//			$export_wdgt->addItem($paging);
-//---------
-
 // goBox
 			$goBox = new CComboBox('go');
 			$goBox->addItem('preview',S_PREVIEW);
@@ -498,8 +489,12 @@ include_once('include/page_header.php');
 			$goButton->setAttribute('id','goButton');
 			zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
 
-			$table->setFooter(new CCol(array($goBox, $goButton)));
+			$footer = get_table_header(new CCol(array($goBox, $goButton)));
 //----
+
+// PAGING FOOTER
+			$table = array($paging,$table,$paging,$footer);
+//---------
 
 			$form->addItem($table);
 

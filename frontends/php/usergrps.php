@@ -383,10 +383,7 @@ include_once('include/page_header.php');
 
 // sorting
 		order_page_result($usrgrps, getPageSortField('name'), getPageSortOrder());
-
-// PAGING UPPER
 		$paging = getPagingLine($usrgrps);
-		$usrgroup_wdgt->addItem($paging);
 //---------
 
 		foreach($usrgrps as $usrgrpid => $usrgrp){
@@ -436,11 +433,6 @@ include_once('include/page_header.php');
 			));
 		}
 
-// PAGING FOOTER
-		$table->addRow(new CCol($paging));
-//		$items_wdgt->addItem($paging);
-//---------
-
 // goBox
 		$goBox = new CComboBox('go');
 		$goBox->addItem('enable_status',S_ENABLE_SELECTED);
@@ -456,8 +448,12 @@ include_once('include/page_header.php');
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "group_groupid";');
 
-		$table->setFooter(new CCol(array($goBox, $goButton)));
-//------
+		$footer = get_table_header(new CCol(array($goBox, $goButton)));
+//----
+
+// PAGING FOOTER
+		$table = array($paging,$table,$paging,$footer);
+//---------
 
 		$form->addItem($table);
 		

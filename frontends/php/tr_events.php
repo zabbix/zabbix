@@ -94,7 +94,9 @@
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
 
+	$tr_events_wdgt->setClass('header');
 	$tr_events_wdgt->addHeader($text, $fs_icon);
+	
 //-------
 	$left_tab = new CTable();
 	$left_tab->setCellPadding(3);
@@ -106,6 +108,7 @@
 	$tr_dtl = new CWidget('hat_triggerdetails',
 							make_trigger_details($_REQUEST['triggerid'],$trigger_data) //null,
 						);
+	$tr_dtl->setClass('header');
 	$tr_dtl->addHeader(S_EVENT.SPACE.S_SOURCE.SPACE.S_DETAILS, SPACE);
 	$left_tab->addRow($tr_dtl);
 //----------------
@@ -115,6 +118,7 @@
 						make_event_details($_REQUEST['eventid'])//null,
 						);
 	$event_dtl->addHeader(S_EVENT_DETAILS, SPACE);
+	$event_dtl->setClass('header');
 	$left_tab->addRow($event_dtl);
 //----------------
 

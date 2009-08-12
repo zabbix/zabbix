@@ -864,14 +864,9 @@ echo SBR;
 
 		$itemids = array_keys($items);
 
-// sorting
-//COpt::profiling_start('ITEMS');		
+// sorting && paging
 		order_page_result($items, getPageSortField('description'), getPageSortOrder());
-//COpt::profiling_stop('ITEMS');
-
-// PAGING UPPER
 		$paging = getPagingLine($items);
-		$items_wdgt->addItem($paging);
 //---------
 
 // TABLE
@@ -1019,11 +1014,6 @@ echo SBR;
 				));
 		}
 
-// PAGING FOOTER
-		$table->addRow(new CCol($paging));
-//		$items_wdgt->addItem($paging);
-//---------
-
 //----- GO ------
 		$goBox = new CComboBox('go');
 		$goBox->addItem('activate',S_ACTIVATE_SELECTED);
@@ -1038,13 +1028,15 @@ echo SBR;
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "group_itemid";');
 
-		$table->setFooter(new CCol(array($goBox, $goButton)));
+		$footer = get_table_header(new CCol(array($goBox, $goButton)));
 //----
 
-		$form->addItem($table);
+// PAGING FOOTER
+		$table = array($paging,$table,$paging,$footer);
+//---------
 
+		$form->addItem($table);
 		$items_wdgt->addItem($form);
-		
 		$items_wdgt->show();
 	}
 ?>

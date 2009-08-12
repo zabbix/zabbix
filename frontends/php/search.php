@@ -85,7 +85,7 @@ include_once('include/page_header.php');
 	if(zbx_empty($search)){
 		$search = 'Search pattern is empty';
 	}
-
+	$search_wdgt->setClass('header');
 	$search_wdgt->addHeader(array(S_SEARCH_BIG.': ',bold($search)), SPACE);
 
 //-------------
@@ -108,9 +108,10 @@ include_once('include/page_header.php');
 				'pattern' => $search,
 				'extend_pattern' => true,
 				'limit' => $rows_per_page,
-				'order' => 'host',
 				);
 	$db_hosts = CHost::get($params);
+	order_result($db_hosts, 'host');
+	
 	$hosts = selectByPattern($db_hosts, 'host', $search, $rows_per_page);
 
 	$hostids = array_keys($hosts);
@@ -186,7 +187,9 @@ include_once('include/page_header.php');
 
 
 	$wdgt_hosts = new CWidget('search_hosts',$table);
+	$wdgt_hosts->setClass('header');
 	$wdgt_hosts->addHeader(S_HOSTS, SPACE);
+	
 	$left_tab->addRow($wdgt_hosts);
 //----------------
 
@@ -197,10 +200,10 @@ include_once('include/page_header.php');
 				'extendoutput' => 1,
 				'pattern' => $search,
 				'limit' => $rows_per_page,
-				'order' => 'name',
 				);
 
 	$db_hostGroups = CHostGroup::get($params);
+	order_result($db_hostGroups, 'name');
 	$hostGroups = selectByPattern($db_hostGroups, 'name', $search, $rows_per_page);
 
 	$params = array(
@@ -243,6 +246,7 @@ include_once('include/page_header.php');
 	$table->setFooter(new CCol(S_DISPLAYING.SPACE.$viewCount.SPACE.S_OF_SMALL.SPACE.$overalCount.SPACE.S_FOUND_SMALL));
 
 	$wdgt_hgroups = new CWidget('search_hostgroup',$table);
+	$wdgt_hgroups->setClass('header');
 	$wdgt_hgroups->addHeader(S_HOST_GROUPS, SPACE);
 	$right_tab->addRow($wdgt_hgroups);
 //----------------
@@ -259,6 +263,8 @@ include_once('include/page_header.php');
 					);
 
 		$db_templates = CTemplate::get($params);
+		order_result($db_templates, 'host');
+
 		$templates = selectByPattern($db_templates, 'host', $search, $rows_per_page);
 
 		$templateids = array_keys($templates);
@@ -311,6 +317,7 @@ include_once('include/page_header.php');
 
 
 		$wdgt_templates = new CWidget('search_templates',$table);
+		$wdgt_templates->setClass('header');
 		$wdgt_templates->addHeader(S_TEMPLATES, SPACE);
 		$right_tab->addRow($wdgt_templates);
 	}

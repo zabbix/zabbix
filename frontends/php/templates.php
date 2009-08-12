@@ -349,8 +349,21 @@ require_once('include/hosts.inc.php');
 /**********************************/
 /* --->>> TEMPLATE ACTIONS <<<--- */
 /**********************************/
+?>
+<?php
 	
-	
+	$params = array();
+	$options = array('only_current_node');
+	if(isset($_REQUEST['form']) || isset($_REQUEST['massupdate'])) array_push($options,'do_not_select_if_empty');
+
+	foreach($options as $option) $params[$option] = 1;
+	$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
+	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
+
+	validate_group($PAGE_GROUPS, $PAGE_HOSTS, false);
+
+	$available_groups = $PAGE_GROUPS['groupids'];
+	$available_hosts = $PAGE_HOSTS['hostids'];
 /****************************************/
 /* <<<--- TEMPLATE LIST AND FORM --->>> */
 /****************************************/
@@ -598,17 +611,13 @@ require_once('include/hosts.inc.php');
 // TEMPLATES window header
 		$template_wdgt = new CWidget();
 		
-		$selected_group = get_request('groupid', 0);
-		$options = array('editable' => 1, 'extendoutput' => 1);
-		$groups = CHostGroup::get($options);
-
 		$frmForm = new CForm();
 		$frmForm->setMethod('get');
 
 // combo for group selection
-		$cmbGroups = new CComboBox('groupid', $selected_group, 'javascript: submit();');
-		foreach($groups as $groupid => $group){
-			$cmbGroups->addItem($groupid, $group['name']);
+		$cmbGroups = new CComboBox('groupid', $PAGE_GROUPS['selected'], 'javascript: submit();');
+		foreach($PAGE_GROUPS['groups'] as $groupid => $group){
+			$cmbGroups->addItem($groupid, $group);
 		}
 		$frmForm->addItem(array(S_GROUP.SPACE, $cmbGroups));
 
@@ -632,8 +641,8 @@ require_once('include/hosts.inc.php');
 						'limit' => ($config['search_limit']+1)
 			);
 
-		if($selected_group > 0){
-			$options['groupids'] = $selected_group;
+		if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
+			$options['groupids'] = $PAGE_GROUPS['selected'];
 		}
 		
 		$templates = CTemplate::get($options);
@@ -651,11 +660,8 @@ require_once('include/hosts.inc.php');
 
 // sorting
 		order_page_result($templates, getPageSortField('host'), getPageSortOrder());
-
-// PAGING UPPER
 		$paging = getPagingLine($templates);
-		$template_wdgt->addItem($paging);
-
+//------
 		foreach($templates as $templateid => $template){
 			$templates_output = array();
 			if($template['proxy_hostid']){
@@ -699,7 +705,7 @@ require_once('include/hosts.inc.php');
 				switch($linked_to_host['status']){
 					case HOST_STATUS_NOT_MONITORED:
 						$style = 'on';
-						$url = 'hosts.php?form=update&hostid='.$linked_to_hostid.'&groupid='.$selected_group;
+						$url = 'hosts.php?form=update&hostid='.$linked_to_hostid.'&groupid='.$PAGE_GROUPS['selected'];
 					break;
 					case HOST_STATUS_TEMPLATE:
 						$style = 'unknown';
@@ -707,7 +713,7 @@ require_once('include/hosts.inc.php');
 					break;
 					default:
 						$style = null;
-						$url = 'hosts.php?form=update&hostid='.$linked_to_hostid.'&groupid='.$selected_group;
+						$url = 'hosts.php?form=update&hostid='.$linked_to_hostid.'&groupid='.$PAGE_GROUPS['selected'];
 					break;
 				}
 
@@ -724,12 +730,6 @@ require_once('include/hosts.inc.php');
 				(empty($linked_to_hosts_output) ? '-' : new CCol($linked_to_hosts_output,'wraptext'))
 			));
 		}
-// --->>> GENERATE OUTPUTS <<<---
-
-// PAGING FOOTER
-		$table->addRow(new CCol($paging));
-//		$items_wdgt->addItem($paging);
-//---------
 
 //----- GO ------
 		$goBox = new CComboBox('go');
@@ -741,8 +741,12 @@ require_once('include/hosts.inc.php');
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "templates";');
 
-		$table->setFooter(new CCol(array($goBox, $goButton)));
+		$footer = get_table_header(new CCol(array($goBox, $goButton)));
 //----
+
+// PAGING FOOTER
+		$table = array($paging,$table,$paging,$footer);
+//---------
 
 		$form->addItem($table);
 	

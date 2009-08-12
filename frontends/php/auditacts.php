@@ -212,14 +212,9 @@ include_once('include/page_header.php');
 			));
 
 
-// sorting
-//COpt::profiling_start('ITEMS');		
+// sorting && paging
 	order_page_result($alerts, getPageSortField('clock'), getPageSortOrder());
-//COpt::profiling_stop('ITEMS');
-
-// PAGING UPPER
 	$paging = getPagingLine($alerts);
-	$alerts_wdgt->addItem($paging);
 //---------
 
 	foreach($alerts as $num => $row){
@@ -265,9 +260,8 @@ include_once('include/page_header.php');
 	}
 	
 // PAGING FOOTER
-		$table->addRow(new CCol($paging));
-//		$items_wdgt->addItem($paging);
-//------------
+	$table = array($paging, $table, $paging);
+//---------
 
 	$alerts_wdgt->addItem($table);
 	$alerts_wdgt->show();
