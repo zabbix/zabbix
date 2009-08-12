@@ -108,6 +108,10 @@ img.borderless	{	border-width: 0px; vertical-align: bottom;	}
 	color: #000000;
 }
 
+.textblackwhite{
+	color: #000000;
+}
+
 .textwhite{
 	color: #FFFFFF;
 }

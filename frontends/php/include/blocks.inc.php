@@ -306,7 +306,7 @@ function make_system_summary($args = array()){
 
 						if($config['event_ack_enable']){
 							if($row_inf_event['acknowledged'] == 1){
-								$ack=new CLink(S_YES,'acknow.php?eventid='.$row_inf_event['eventid'],'action');
+								$ack=new CLink(S_YES,'acknow.php?eventid='.$row_inf_event['eventid'],'off');
 							}
 							else{
 								$ack= new CLink(S_NO,'acknow.php?eventid='.$row_inf_event['eventid'],'on');
@@ -396,27 +396,32 @@ function make_status_of_zbx(){
 			new CSpan($status['triggers_count_off'],'off'),']'
 		)
 	));
-/*	$table->addRow(array(S_NUMBER_OF_EVENTS,$status['events_count'],' - '));
-	$table->addRow(array(S_NUMBER_OF_ALERTS,$status['alerts_count'],' - '));*/
+/*
+	$table->addRow(array(S_NUMBER_OF_EVENTS,$status['events_count'],' - '));
+	$table->addRow(array(S_NUMBER_OF_ALERTS,$status['alerts_count'],' - '));
+*/
 
 //Log Out 10min
-	$usr_cnt = 0;
+	$sql = 'SELECT COUNT(*) as usr_cnt FROM users u WHERE '.DBin_node('u.userid');
+	$usr_cnt = DBfetch(DBselect($sql));
+
 	$online_cnt = 0;
-	$sql = 'SELECT DISTINCT u.userid, MAX(s.lastaccess) as lastaccess, MAX(u.autologout) as autologout, s.status '.
-			' FROM users u '.
-				' LEFT JOIN sessions s ON s.userid=u.userid AND s.status='.ZBX_SESSION_ACTIVE.
-			' WHERE '.DBin_node('u.userid').
-			' GROUP BY u.userid,s.status';
-	$db_users = DBSelect($sql);
-	while($user=DBFetch($db_users)){
+	$sql = 'SELECT DISTINCT s.userid, MAX(s.lastaccess) as lastaccess, MAX(u.autologout) as autologout, s.status '.
+			' FROM sessions s, users u '.
+			' WHERE '.DBin_node('s.userid').
+				' AND u.userid=s.userid '.
+				' AND s.status='.ZBX_SESSION_ACTIVE.
+			' GROUP BY s.userid,s.status';
+	$db_users = DBselect($sql);
+	while($user=DBfetch($db_users)){
 		$online_time = (($user['autologout'] == 0) || (ZBX_USER_ONLINE_TIME<$user['autologout']))?ZBX_USER_ONLINE_TIME:$user['autologout'];
 		if(!is_null($user['lastaccess']) && (($user['lastaccess']+$online_time)>=time()) && (ZBX_SESSION_ACTIVE == $user['status'])) $online_cnt++;
-		$usr_cnt++;
 	}
 
 	$table->addRow(array(S_NUMBER_OF_USERS,$usr_cnt,new CSpan($online_cnt,'green')));
 	$table->addRow(array(S_REQUIRED_SERVER_PERFORMANCE_NVPS,$status['qps_total'],' - '));
 	$table->setFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
+
 return $table;
 }
 
@@ -428,7 +433,9 @@ function make_latest_issues($params = array()){
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
 
-	$scripts_by_hosts = get_accessible_scripts_by_hosts($available_hosts);
+	$scripts_by_hosts = CScript::getScriptsByHosts($available_hosts);
+	
+
 	$config=select_config();
 
 	$sql_select = '';
@@ -516,7 +523,7 @@ function make_latest_issues($params = array()){
 					$ack_info = make_acktab_by_eventid($row_event['eventid']);
 					$ack_info->setAttribute('style','width: auto;');
 
-					$ack=new CLink(S_YES,'acknow.php?eventid='.$row_event['eventid'],'action');
+					$ack=new CLink(S_YES,'acknow.php?eventid='.$row_event['eventid'],'off');
 					$ack->setHint($ack_info);
 				}
 				else{
@@ -532,8 +539,8 @@ function make_latest_issues($params = array()){
 
 			$clock = new CLink(
 					zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),
-					'events.php?triggerid='.$row['triggerid'].'&source=0&show_unknown=1&nav_time='.$row_event['clock'],
-					'action');
+					'events.php?triggerid='.$row['triggerid'].'&source=0&show_unknown=1&nav_time='.$row_event['clock']
+					);
 
 			if($row_event['url'])
 				$description = new CLink($description, $row_event['url'], null, null, true);
@@ -727,10 +734,10 @@ function make_latest_data(){
 				$change=new CCol('-','center');
 			}
 			if(($db_item['value_type']==ITEM_VALUE_TYPE_FLOAT) ||($db_item['value_type']==ITEM_VALUE_TYPE_UINT64)){
-				$actions=new CLink(S_GRAPH,'history.php?action=showgraph&itemid='.$db_item['itemid'],'action');
+				$actions=new CLink(S_GRAPH,'history.php?action=showgraph&itemid='.$db_item['itemid']);
 			}
 			else{
-				$actions=new CLink(S_HISTORY,'history.php?action=showvalues&period=3600&itemid='.$db_item['itemid'],'action');
+				$actions=new CLink(S_HISTORY,'history.php?action=showvalues&period=3600&itemid='.$db_item['itemid']);
 			}
 			array_push($app_rows, new CRow(array(
 				is_show_all_nodes() ? SPACE : null,

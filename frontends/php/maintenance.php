@@ -87,7 +87,7 @@ include_once('include/page_header.php');
 		'form_refresh'=>array(T_ZBX_STR, O_OPT, NULL,	NULL,	NULL)
 	);
 	check_fields($fields);
-	validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
+	validate_sort_and_sortorder('name',ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go','none');
 ?>
@@ -346,8 +346,6 @@ include_once('include/page_header.php');
 	show_table_header(S_CONFIGURATION_OF_MAINTENANCE_PERIODS, $frmForm);
 ?>
 <?php
-	$row_count = 0;
-
 	if(isset($_REQUEST["form"])){
 		$frmMaintenance = new CForm('maintenance.php','post');
 		$frmMaintenance->setName(S_MAINTENANCE);
@@ -434,6 +432,8 @@ include_once('include/page_header.php');
 	else {
 		echo SBR;
 // Table HEADER
+		$maintenance_wdgt = new CWidget();
+
 		$form = new CForm();
 		$form->setMethod('get');
 
@@ -441,58 +441,27 @@ include_once('include/page_header.php');
 		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
 			$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
 		}
+		
 		$form->addItem(array(S_GROUP.SPACE,$cmbGroups));
 
 
-		$numrows = new CSpan(null,'info');
+		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
-		$header = get_table_header(array(S_MAINTENANCE_PERIODS,
-						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-						S_FOUND.': ',$numrows,)
-						);
-		show_table_header($header, $form);
+
+		$maintenance_wdgt->addHeader(S_MAINTENANCE_PERIODS_BIG, $form);
+		$maintenance_wdgt->addHeader($numrows);
 // ----
-		$available_maintenances = get_accessible_maintenance_by_user(PERM_READ_ONLY);
 
-		$sqls = array();
-
-		$config = select_config();
-
-		$maintenances = array();
-		$maintenanceids = array();
-		if($_REQUEST['groupid']>0){
-			$sqls[] = 'SELECT m.* '.
-				' FROM maintenances m, maintenances_groups mg '.
-				' WHERE '.DBin_node('m.maintenanceid').
-					' AND '.DBcondition('m.maintenanceid',$available_maintenances).
-					' AND mg.groupid='.$_REQUEST['groupid'].
-					' AND m.maintenanceid=mg.maintenanceid ';
-				' ORDER BY m.name';
-
-			$sqls[] = 'SELECT m.* '.
-				' FROM maintenances m, maintenances_hosts mh, hosts_groups hg '.
-				' WHERE '.DBin_node('m.maintenanceid').
-					' AND '.DBcondition('m.maintenanceid',$available_maintenances).
-					' AND hg.groupid='.$_REQUEST['groupid'].
-					' AND mh.hostid=hg.hostid '.
-					' AND m.maintenanceid=mh.maintenanceid ';
-				' ORDER BY m.name';			}
-		else if($config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_ALL){
-			$sqls[] = 'SELECT m.* '.
-				' FROM maintenances m '.
-				' WHERE '.DBin_node('m.maintenanceid').
-					' AND '.DBcondition('m.maintenanceid',$available_maintenances).
-				' ORDER BY m.name';
-		}
-
-		foreach($sqls as $num => $sql){
-			$db_maintenances = DBselect($sql);
-			while($maintenance = DBfetch($db_maintenances)){
-				$maintenances[$maintenance['maintenanceid']] = $maintenance;
-				$maintenanceids[$maintenance['maintenanceid']] = $maintenance['maintenanceid'];
-			}
-		}
-
+		$options = array(
+			'groupids' => $PAGE_GROUPS['selected'],
+			'extendoutput' => 1,
+			'editable' => 1,
+//			'sortfield' => getPageSortField('name'),
+//			'sortorder' => getPageSortOrder(),
+			'limit' => ($config['search_limit']+1)
+		);
+	
+		$maintenances = CMaintenance::get($options);
 
 		$form = new CForm(null,'post');
 		$form->setName('maintenances');
@@ -500,11 +469,19 @@ include_once('include/page_header.php');
 		$table = new CTableInfo();
 		$table->setHeader(array(
 			new CCheckBox('all_maintenances',NULL,"checkAll('".$form->GetName()."','all_maintenances','maintenanceids');"),
-			make_sorting_link(S_NAME,'m.name'),
-			S_TYPE,
-			S_STATUS,
+			make_sorting_header(S_NAME,'name'),
+			make_sorting_header(S_TYPE,'type'),
+			make_sorting_header(S_STATUS,'status'),
 			S_DESCRIPTION
 			));
+
+// sorting
+		order_page_result($maintenances, getPageSortField('name'), getPageSortOrder());
+
+// PAGING UPPER
+		$paging = getPagingLine($maintenances);
+		$maintenance_wdgt->addItem($paging);
+//---------
 
 		foreach($maintenances as $maintenanceid => $maintenance){
 
@@ -518,14 +495,19 @@ include_once('include/page_header.php');
 				$mnt_status,
 				$maintenance['description']
 				));
-			$row_count++;
 		}
 //			$table->setFooter(new CCol(new CButtonQMessage('delete_selected',S_DELETE_SELECTED,S_DELETE_SELECTED_USERS_Q)));
 
+// PAGING FOOTER
+		$table->addRow(new CCol($paging));
+//		$items_wdgt->addItem($paging);
+//---------
+
+// goBox
 		$goBox = new CComboBox('go');
 		$goBox->addItem('delete',S_DELETE_SELECTED);
 
-// goButton name is necessary!!!
+		// goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO.' (0)');
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "maintenanceids";');
@@ -534,12 +516,13 @@ include_once('include/page_header.php');
 
 		$form->addItem($table);
 
-		$form->show();
-
-		zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
+		$maintenance_wdgt->addItem($form);
+		$maintenance_wdgt->show();
 	}
 
+?>
+<?php
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
 
 ?>

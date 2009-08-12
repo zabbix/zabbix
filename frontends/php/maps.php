@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 	$page['title'] = "S_NETWORK_MAPS";
 	$page['file'] = 'maps.php';
 	$page['hist_arg'] = array('sysmapid');
-	$page['scripts'] = array('prototype.js','url.js');
+	$page['scripts'] = array('prototype.js');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -163,12 +163,12 @@ include_once('include/page_header.php');
 		if(infavorites('web.favorite.sysmapids',$_REQUEST['sysmapid'],'sysmapid')){
 			$icon = new CDiv(SPACE,'iconminus');
 			$icon->setAttribute('title',S_REMOVE_FROM.' '.S_FAVOURITES);
-			$icon->addAction('onclick',new CScript("javascript: rm4favorites('sysmapid','".$_REQUEST["sysmapid"]."',0);"));
+			$icon->addAction('onclick',new CJSscript("javascript: rm4favorites('sysmapid','".$_REQUEST["sysmapid"]."',0);"));
 		}
 		else{
 			$icon = new CDiv(SPACE,'iconplus');
 			$icon->setAttribute('title',S_ADD_TO.' '.S_FAVOURITES);
-			$icon->addAction('onclick',new CScript("javascript: add2favorites('sysmapid','".$_REQUEST["sysmapid"]."');"));
+			$icon->addAction('onclick',new CJSscript("javascript: add2favorites('sysmapid','".$_REQUEST["sysmapid"]."');"));
 		}
 		$icon->setAttribute('id','addrm_fav');
 
@@ -176,10 +176,10 @@ include_once('include/page_header.php');
 
 		$fs_icon = new CDiv(SPACE,'fullscreen');
 		$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-		$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+		$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
 	}
 
-	$map_wdgt->addHeader(S_NETWORK_MAPS_BIG,array($icon,$fs_icon));
+	$map_wdgt->addPageHeader(S_NETWORK_MAPS_BIG,array($icon,$fs_icon));
 
 	if($cmbMaps->itemsCount()>0){
 		$form->addItem($cmbMaps);
@@ -192,6 +192,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-include_once "include/page_footer.php";
+include_once('include/page_footer.php');
 
 ?>

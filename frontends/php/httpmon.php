@@ -80,7 +80,7 @@ include_once('include/page_header.php');
 //SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
 ?>
 <?php
-	$_REQUEST['applications'] = get_request('applications',get_profile('web.httpmon.applications',array(),PROFILE_TYPE_ARRAY_ID));
+	$_REQUEST['applications'] = get_request('applications',get_profile('web.httpmon.applications',array()));
 
 	if(isset($_REQUEST['open'])){
 		if(!isset($_REQUEST['applicationid'])){
@@ -117,9 +117,10 @@ include_once('include/page_header.php');
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
 
-	$httpmon_wdgt->addHeader(S_STATUS_OF_WEB_MONITORING_BIG, $fs_icon);
+	show_table_header(S_STATUS_OF_WEB_MONITORING_BIG, $fs_icon);
+	echo SBR;
 
 // 2nd header
 	$r_form = new CForm();
@@ -142,7 +143,8 @@ include_once('include/page_header.php');
 	$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
 	$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 
-	$httpmon_wdgt->addHeader(SPACE, $r_form);
+	$httpmon_wdgt->addHeader(S_WEB_CHECKS_BIG, $r_form);
+	$httpmon_wdgt->addItem(SPACE);
 //	show_table_header(S_STATUS_OF_WEB_MONITORING_BIG, $r_form);
 //-----------------
 
@@ -234,7 +236,7 @@ include_once('include/page_header.php');
 		if(!uint_in_array($db_app['applicationid'],$_REQUEST['applications']) && !isset($show_all_apps)) continue;
 
 		$name = array();
-		array_push($name, new CLink($httptest_data['name'],'httpdetails.php?httptestid='.$httptest_data['httptestid'],'action'));
+		array_push($name, new CLink($httptest_data['name'],'httpdetails.php?httptestid='.$httptest_data['httptestid']));
 
 		if(isset($httptest_data['lastcheck']))
 			$lastcheck = date(S_DATE_FORMAT_YMDHMS,$httptest_data['lastcheck']);

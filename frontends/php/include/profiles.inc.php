@@ -28,10 +28,13 @@ function get_profile($idx,$default_value=null,$idx2=0,$source=null,$nocache=fals
 	static $profiles;
 
 	if(!is_null($profiles) && !$nocache){
-//SDI($idx); SDII($profiles[$idx]);
 		if(isset($profiles[$idx]) && !empty($profiles[$idx])){
+//SDI($idx); SDII($profiles[$idx]);
 			if(!is_null($source))
 				return $profiles[$idx][$source];
+			else if(!isset($profiles[$idx][$idx2])){
+				return $default_value;
+			}
 			else
 				return $profiles[$idx][$idx2];
 		}
@@ -45,6 +48,7 @@ function get_profile($idx,$default_value=null,$idx2=0,$source=null,$nocache=fals
 		$sql = 'SELECT * '.
 				' FROM profiles '.
 				' WHERE userid='.$USER_DETAILS['userid'].
+					' AND '.DBin_node('profileid').
 				' ORDER BY profileid ASC';
 
 		$db_profiles = DBselect($sql);
@@ -78,53 +82,14 @@ function get_profile($idx,$default_value=null,$idx2=0,$source=null,$nocache=fals
 	if(isset($profiles[$idx]) && !empty($profiles[$idx])){
 		if(!is_null($source))
 			return $profiles[$idx][$source];
+		else if(!isset($profiles[$idx][$idx2])){
+			return $default_value;
+		}
 		else
 			return $profiles[$idx][$idx2];
 	}
 
 return $default_value;
-}
-
-// multi value
-function get_source_profile($idx,$default_value=array(),$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$source=null){
-	global $USER_DETAILS;
-
-	$result = array();
-
-	if($USER_DETAILS["alias"]!=ZBX_GUEST_USER){
-		$sql_cond = '';
-		if(profile_type($type,'id'))	$sql_cond.= ' AND '.DBin_node('value_id');
-		if(zbx_numeric($idx2)) 			$sql_cond.= ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
-		if(!is_null($source)) 			$sql_cond.= ' AND source='.zbx_dbstr($source);
-
-		$sql = 'SELECT value_id,value_int,value_str,source,type '.
-				' FROM profiles '.
-				' WHERE userid='.$USER_DETAILS["userid"].
-					' AND idx='.zbx_dbstr($idx).
-					$sql_cond.
-				' ORDER BY profileid ASC';
-
-		$db_profiles = DBselect($sql);
-		if($profile=DBfetch($db_profiles)){
-			if(profile_type($type,'unknown')) $type = $profile['type'];
-			$value_type = profile_field_by_type($type);
-
-			if(profile_type($type,'array')){
-				$result[] = array('value'=>$profile[$value_type], 'source'=>$profile['source']);
-
-				while($profile=DBfetch($db_profiles)){
-					$result[] = array('value'=>$profile[$value_type], 'source'=>$profile['source']);
-				}
-			}
-			else{
-				$result = array('value'=>$profile[$value_type], 'source'=>$profile['source']);
-			}
-
-		}
-	}
-	$result = count($result)?$result:$default_value;
-
-return $result;
 }
 
 //----------- ADD/EDIT USERPROFILE -------------
@@ -160,15 +125,9 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 		$result = DBend();
 	}
 	else{
-		$sql = 'SELECT profileid '.
-				' FROM profiles '.
-				' WHERE userid='.$USER_DETAILS['userid'].
-					' AND idx='.zbx_dbstr($idx).
-					$sql_cond;
+		$prof = get_profile($idx, false);
 
-		$row = DBfetch(DBselect($sql));
-
-		if(!$row){
+		if(!$prof){
 			$result = insert_profile($idx,$value,$type,$idx2,$source);
 		}
 		else{
@@ -196,7 +155,7 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 					' value_str='.zbx_dbstr($val['value_str']).','.
 					' type='.$type.','.
 					' source='.zbx_dbstr($src).
-				' WHERE userid='.$USER_DETAILS["userid"].
+				' WHERE userid='.$USER_DETAILS['userid'].
 					' AND idx='.zbx_dbstr($idx).
 					$sql_cond;
 			$result = DBexecute($sql);
@@ -435,6 +394,7 @@ function get_user_history(){
 
 	return $result;
 }
+
 function add_user_history($page){
 	global $USER_DETAILS;
 
@@ -458,8 +418,9 @@ function add_user_history($page){
 
 	if(isset($last_page['title']) && ($last_page['title'] == $title)){ //title is same
 		if($last_page['url'] != $url){ // title same, url isnt, change only url
-			$sql = 'UPDATE user_history SET url5='.zbx_dbstr($url).'
-					WHERE userid='.$USER_DETAILS['userid'];
+			$sql = 'UPDATE user_history '.
+					' SET url5='.zbx_dbstr($url).
+					' WHERE userid='.$USER_DETAILS['userid'];
 		}
 		else
 			return; // no need to change anything;
@@ -467,26 +428,56 @@ function add_user_history($page){
 	else{ // new page with new title is added
 		if(!$last_page){
 			$userhistoryid = get_dbid('user_history', 'userhistoryid');
-			$sql = 'INSERT INTO user_history (userhistoryid, userid, title5, url5)
-					VALUES("'.$userhistoryid.'", "'.$userid.'", '.zbx_dbstr($title).', '.zbx_dbstr($url).')';
+			$sql = 'INSERT INTO user_history (userhistoryid, userid, title5, url5)'.
+					' VALUES('.$userhistoryid.', '.$userid.', '.zbx_dbstr($title).', '.zbx_dbstr($url).')';
 		}
 		else{
-			$sql = 'UPDATE user_history SET title1=title2, url1=url2, title2=title3, url2=url3, title3=title4,
-					url3=url4, title4=title5, url4=url5, title5='.zbx_dbstr($title).', url5='.zbx_dbstr($url).'
-					WHERE userid='.$USER_DETAILS['userid'];
+			$sql = 'UPDATE user_history '.
+					' SET title1=title2, '.
+						' url1=url2, '.
+						' title2=title3, '.
+						' url2=url3, '.
+						' title3=title4, '.
+						' url3=url4, '.
+						' title4=title5, '.
+						' url4=url5, '.
+						' title5='.zbx_dbstr($title).', '.
+						' url5='.zbx_dbstr($url).
+					' WHERE userid='.$USER_DETAILS['userid'];
 		}
 	}
 	$result = DBexecute($sql);
 
-	return $result;
+return $result;
 }
 /********* END USER HISTORY **********/
 
 /********** USER FAVORITES ***********/
 // Author: Aly
-function get_favorites($favobj,$nodeid=null){
-	$fav = get_source_profile($favobj,array(),PROFILE_TYPE_ARRAY_ID);
-return $fav;
+function get_favorites($idx,$nodeid=null){
+	global $USER_DETAILS;
+
+	$result = array();
+	if($USER_DETAILS['alias']!=ZBX_GUEST_USER){
+		$sql = 'SELECT value_id,value_int,value_str,source,type '.
+				' FROM profiles '.
+				' WHERE userid='.$USER_DETAILS['userid'].
+					' AND idx='.zbx_dbstr($idx).
+				' ORDER BY profileid ASC';
+		$db_profiles = DBselect($sql);
+		if($profile=DBfetch($db_profiles)){
+			$value_type = profile_field_by_type($profile['type']);
+
+			$result[] = array('value'=>$profile[$value_type], 'source'=>$profile['source']);
+			while($profile=DBfetch($db_profiles)){
+				$result[] = array('value'=>$profile[$value_type], 'source'=>$profile['source']);
+			}
+		}
+	}
+	
+	$result = count($result)?$result:array();
+	
+return $result;
 }
 
 // Author: Aly

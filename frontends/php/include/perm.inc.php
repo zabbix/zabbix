@@ -180,7 +180,7 @@ function check_authentication($sessionid=null){
 			$incorrect_session = true;
 		}
 		else if($login['attempt_failed']){
-			error(new CScript(array(
+			error(new CJSscript(array(
 						bold($login['attempt_failed']),
 						' failed login attempts logged. Last failed attempt was from ',
 						bold($login['attempt_ip']),

@@ -19,25 +19,25 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/hosts.inc.php');
-	require_once('include/events.inc.php');
-	require_once('include/actions.inc.php');
-	require_once('include/discovery.inc.php');
-	require_once('include/html.inc.php');
+require_once('include/config.inc.php');
+require_once('include/hosts.inc.php');
+require_once('include/events.inc.php');
+require_once('include/actions.inc.php');
+require_once('include/discovery.inc.php');
+require_once('include/html.inc.php');
 
-	$page['title'] = "S_LATEST_EVENTS";
-	$page['file'] = 'events.php';
-	$page['hist_arg'] = array('groupid','hostid');
-	$page['scripts'] = array('calendar.js','menu_scripts.js','scriptaculous.js?load=effects');
+$page['title'] = "S_LATEST_EVENTS";
+$page['file'] = 'events.php';
+$page['hist_arg'] = array('groupid','hostid');
+$page['scripts'] = array('calendar.js','menu_scripts.js','scriptaculous.js?load=effects');
 
-	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-	if(PAGE_TYPE_HTML == $page['type']){
-		define('ZBX_PAGE_DO_REFRESH', 1);
-	}
+if(PAGE_TYPE_HTML == $page['type']){
+	define('ZBX_PAGE_DO_REFRESH', 1);
+}
 
-	include_once('include/page_header.php');
+include_once('include/page_header.php');
 
 ?>
 <?php
@@ -52,14 +52,8 @@
 		'groupid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
 		'hostid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
 		'triggerid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
-
-		'next_page'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
-		'prev_page'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
+		
 		'nav_time'=>		array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
-
-		'prev_clock'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	null,	NULL),
-		'curr_clock'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	null,	NULL),
-		'next_clock'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	null,	NULL),
 
 		'load'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
 		'fullscreen'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
@@ -68,7 +62,7 @@
 		'filter_rst'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
 		'filter_set'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
 
-		'show_unknown'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
+		'hide_unknown'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
 
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			'isset({favid})'),
@@ -96,21 +90,22 @@
 	if(isset($_REQUEST['filter_rst'])){
 		$_REQUEST['nav_time'] = time();
 		$_REQUEST['triggerid'] = 0;
-		$_REQUEST['show_unknown'] = 0;
+		$_REQUEST['hide_unknown'] = 0;
 	}
 
 	$_REQUEST['nav_time'] = get_request('nav_time',get_profile('web.events.filter.nav_time',time()));
 	$_REQUEST['triggerid'] = get_request('triggerid',get_profile('web.events.filter.triggerid',0));
-	$show_unknown = get_request('show_unknown',get_profile('web.events.filter.show_unknown',0));
+	$_REQUEST['hide_unknown'] = get_request('hide_unknown',get_profile('web.events.filter.hide_unknown',0));
+	$hide_unknown = $_REQUEST['hide_unknown'];
 
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
 		update_profile('web.events.filter.nav_time',$_REQUEST['nav_time'], PROFILE_TYPE_INT);
 		update_profile('web.events.filter.triggerid',$_REQUEST['triggerid']);
-		update_profile('web.events.filter.show_unknown',$show_unknown, PROFILE_TYPE_INT);
+		update_profile('web.events.filter.hide_unknown',$hide_unknown, PROFILE_TYPE_INT);
 	}
 // --------------
 
-	validate_sort_and_sortorder('e.clock',ZBX_SORT_DOWN);
+	validate_sort_and_sortorder('clock',ZBX_SORT_DOWN);
 
 	$source = get_request('source', EVENT_SOURCE_TRIGGERS);
 	update_profile('web.events.source',$source, PROFILE_TYPE_INT);
@@ -157,8 +152,6 @@
 	    $available_groups= $PAGE_GROUPS['groupids'];
 		$available_hosts = $PAGE_HOSTS['hostids'];
 
-		$available_triggers = get_accessible_triggers(PERM_READ_ONLY, $PAGE_HOSTS['hostids'], PERM_RES_DATA_ARRAY, get_current_nodeid());
-
 		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0) && !isset($available_triggers[$_REQUEST['triggerid']])){
 			unset($_REQUEST['triggerid']);
 		}
@@ -193,224 +186,136 @@
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
 
-	$events_wdgt->addHeader($text,array($r_form,SPACE.SPACE,$fs_icon));
+	$events_wdgt->addPageHeader($text,$fs_icon);
+
+	$numrows = new CDiv();
+	$numrows->setAttribute('name', 'numrows');
+
+	$events_wdgt->addHeader(S_EVENTS_BIG,$r_form);
+	$events_wdgt->addHeader($numrows);
 //-------------
-
-// Navigation initialization
-	$nav_time = get_request('nav_time', false);
-
-	$time_end = null;
-
-	$prev_clock = get_request('prev_clock', array());
-	$next_clock = get_request('next_clock', null);
-	$curr_clock = get_request('curr_clock', $nav_time);
-
-	$prev_page = get_request('prev_page', false);
-	$next_page = get_request('next_page', false);
-
-//SDI(array($prev_page, $next_page, $nav_time));
-//SDI(array($prev_clock, $curr_clock, $next_clock));
-	if($next_page){
-		$prev_clock[] = $curr_clock;
-		$time_end = $next_clock;
-	}
-	else if($prev_page){
-		$next_clock = $curr_clock;
-		$time_end = array_pop($prev_clock);
-	}
-	else if($nav_time){
-		$prev_clock = array();
-		$time_end = $nav_time;
-	}
-	else{
-		$time_end  = $curr_clock;
-	}
-
-	$curr_clock = $time_end;
-//SDI(array($prev_clock, $curr_clock, $next_clock, $time_end));
-// end of navigation initialization
-
-// -------------
-	$last_clock_tmp = null;
-	$last_clock = null;
-
-	$limit = $USER_DETAILS['rows_per_page'];
-	$col=0;
 
 	if($source == EVENT_SOURCE_DISCOVERY){
 		$last_clock = null;
 		$table = get_history_of_discovery_events($time_end, $limit, $last_clock);
-
-		$col = $table->getNumRows();
 	}
 	else{
-		$config = select_config();
+		$options = array(
+						'hostids' => $_REQUEST['hostid'],
+						'object' => EVENT_OBJECT_TRIGGER,
+						'time_from' => $_REQUEST['nav_time'],
+						'time_till' => null,
+						'extendoutput' => 1,
+						'select_hosts' => 1,
+						'select_triggers' => 1,
+						'select_items' => 1,
+						'sortfield' => 'clock',
+						'sortorder' => getPageSortOrder(),
+						'limit' => ($config['search_limit']+1)
+					);
 
-		$sql_from = $sql_cond = '';
+		if($hide_unknown) $options['hide_unknown'] = 1;
 
-		if($_REQUEST['hostid'] > 0){
-			$sql_cond = ' and h.hostid='.$_REQUEST['hostid'];
-		}
-		else if($_REQUEST['groupid'] > 0){
-			$sql_from = ', hosts_groups hg ';
-			$sql_cond = ' AND h.hostid=hg.hostid and hg.groupid='.$_REQUEST['groupid'];
-		}
-		else{
-			$sql_from = '';
-			$sql_cond = ' AND '.DBcondition('h.hostid',$available_hosts);
-		}
-
-		$sql_cond.=(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0))?(' AND t.triggerid='.$_REQUEST['triggerid'].' '):'';
-
-//---
-		$triggers = array();
-		$triggerids = array();
-
-		$sql = 'SELECT DISTINCT t.triggerid,t.priority,t.description,t.expression,h.host,t.type '.
-				' FROM triggers t, functions f, items i, hosts h '.$sql_from.
-				' WHERE '.DBcondition('t.triggerid', $available_triggers).
-					' AND t.triggerid=f.triggerid '.
-					' AND f.itemid=i.itemid '.
-					' AND i.hostid=h.hostid '.
-					' AND h.status='.HOST_STATUS_MONITORED.
-					$sql_cond;
-
-		$rez = DBselect($sql);
-		while($rowz = DBfetch($rez)){
-			$rowz['items'] = array();
-			$triggers[$rowz['triggerid']] = $rowz;
-			$triggerids[$rowz['triggerid']] = $rowz['triggerid'];
-		}
-
-		$sql = 'SELECT f.triggerid, i.* '.
-				' FROM functions f, items i '.
-				' WHERE '.DBcondition('f.triggerid',$triggerids).
-					' AND i.itemid=f.itemid';
-		$result = DBselect($sql);
-		while($row = DBfetch($result)){
-			$item['itemid'] = $row['itemid'];
-			$item['action'] = str_in_array($row['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))?'showgraph':'showvalues';
-			$item['description'] = item_description($row);
-
-			$triggers[$row['triggerid']]['items'][$row['itemid']] = $item;
-		}
-
-		$sql_cond=($show_unknown == 0)?(' AND e.value<>'.TRIGGER_VALUE_UNKNOWN.' '):('');
-		$sql_cond.=' AND e.clock<'.$time_end;
+		$events = CEvent::get($options);
 
 		$table = new CTableInfo(S_NO_EVENTS_FOUND);
 		$table->setHeader(array(
-				make_sorting_link(S_TIME,'clock'),
-				is_show_all_nodes() ? S_NODE : null,
-				$_REQUEST['hostid'] == 0 ? S_HOST : null,
-				make_sorting_link(S_DESCRIPTION,'desc'),
-				make_sorting_link(S_STATUS,'status'),
-				make_sorting_link(S_SEVERITY,'priority'),
+				make_sorting_header(S_TIME,'clock'),
+				is_show_all_nodes()?S_NODE:null,
+				($_REQUEST['hostid'] == 0)?S_HOST:null,
+				S_DESCRIPTION,
+				S_STATUS,
+				S_SEVERITY,
 				S_DURATION,
 				($config['event_ack_enable'])?S_ACK:NULL,
 				S_ACTIONS
 			));
+			
+// sorting
+Copt::profiling_start('order');
+		order_page_result($events, getPageSortField('eventid'), getPageSortOrder());
+Copt::profiling_stop('order');
 
-		if(!empty($triggers)){
-			$clock = array();
-			$events = array();
+// PAGING UPPER
+		$paging = getPagingLine($events);
+		$events_wdgt->addItem($paging);
+//------
 
-			$sql = 'SELECT e.eventid, e.objectid as triggerid, e.clock, e.value, e.acknowledged '.
-					' FROM events e '.
-					' WHERE '.DBcondition('e.objectid', $triggerids).
-						' AND (e.object+0)='.EVENT_OBJECT_TRIGGER.
-						$sql_cond.
-					' ORDER BY e.clock DESC';
-			$result = DBselect($sql, (0 == $show_unknown)?($limit*50):$limit);
-			while(($row=DBfetch($result)) && ($col < $limit)){
-				$row = array_merge($triggers[$row['triggerid']],$row);
-				if((0 == $show_unknown) && (!event_initial_time($row,$show_unknown))) continue;
+		foreach($events as $eventid => $event){
+			$trigger = $event['triggers'][$event['objectid']];
 
-				$row['desc'] = expand_trigger_description_by_data($row, ZBX_FLAG_EVENT);
+			$events[$eventid]['desc'] = expand_trigger_description_by_data($trigger, ZBX_FLAG_EVENT);
 
-				$row['duration'] = zbx_date2age($row['clock']);
-				if($next_event = get_next_event($row,$show_unknown)){
-					$row['duration'] = zbx_date2age($row['clock'],$next_event['clock']);
-				}
+			$event = $events[$eventid] += $trigger;
 
-				$row['value'] = new CCol(trigger_value2str($row['value']), get_trigger_value_style($row['value']));
-
-				$col++;
-
-				$clock[] = $row['clock'];
-				$events[] = $row;
+			$events[$eventid]['duration'] = zbx_date2age($event['clock']);
+			if($next_event = get_next_event($event,$hide_unknown)){
+				$events[$eventid]['duration'] = zbx_date2age($event['clock'],$next_event['clock']);
 			}
 
-			$last_clock = !empty($clock)?min($clock):null;
-			order_page_result($events, 'clock', ZBX_SORT_DOWN);
-
-			foreach($events as $num => $row){
-// Actions
-				$actions= get_event_actions_status($row['eventid']);
-//--------
-
-				if($config['event_ack_enable']){
-					if($row['acknowledged'] == 1){
-						$ack=new CLink(S_YES,'acknow.php?eventid='.$row['eventid'],'action');
-					}
-					else{
-						$ack= new CLink(S_NO,'acknow.php?eventid='.$row['eventid'],'on');
-					}
-				}
-
-				$tr_desc = new CSpan($row['desc'],'pointer');
-				$tr_desc->addAction('onclick',"create_mon_trigger_menu(event, ".
-										" new Array({'triggerid': '".$row['triggerid']."', 'lastchange': '".$row['clock']."'}),".
-										zbx_jsvalue($row['items']).");");
-
-				$table->addRow(array(
-					new CLink(date('Y.M.d H:i:s',$row['clock']),
-						'tr_events.php?triggerid='.$row['triggerid'].'&eventid='.$row['eventid'],
-						'action'
-						),
-					is_show_all_nodes() ? get_node_name_by_elid($row['triggerid']) : null,
-					$_REQUEST['hostid'] == 0 ? $row['host'] : null,
-					$tr_desc,
-					$row['value'],
-					new CCol(get_severity_description($row['priority']), get_severity_style($row['priority'],$row['value'])),
-					$row['duration'],
-					($config['event_ack_enable'])?$ack:NULL,
-					$actions
-				));
-			}
+			$events[$eventid]['value'] = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value']));
 		}
+
+		foreach($events as $eventid => $event){
+// Host
+			$host = array_pop($event['hosts']);
+
+// Trigger
+			$trigger = $event['triggers'][$event['objectid']];
+
+// Items
+			$items = array();
+			foreach($event['items'] as $itemid => $item){
+				$items[$itemid]['itemid'] = $item['itemid'];
+				$items[$itemid]['action'] = str_in_array($item['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))?'showgraph':'showvalues';
+				$items[$itemid]['description'] = item_description($item);
+			}
+
+// Actions
+			$actions = get_event_actions_status($event['eventid']);
+
+			if($config['event_ack_enable']){
+				if($event['acknowledged'] == 1){
+					$ack = new CLink(S_YES,'acknow.php?eventid='.$event['eventid']);
+				}
+				else{
+					$ack = new CLink(S_NO,'acknow.php?eventid='.$event['eventid'],'on');
+				}
+			}
+
+
+
+			$tr_desc = new CSpan($event['desc'],'pointer');
+			$tr_desc->addAction('onclick',"create_mon_trigger_menu(event, ".
+									" new Array({'triggerid': '".$trigger['triggerid']."', 'lastchange': '".$event['clock']."'}),".
+									zbx_jsvalue($items).");");
+
+			$table->addRow(array(
+				new CLink(date('Y.M.d H:i:s',$event['clock']),
+					'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
+					'action'
+					),
+				is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
+				$_REQUEST['hostid'] == 0 ? $host['host'] : null,
+				$tr_desc,
+				$event['value'],
+				new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'],$trigger['value'])),
+				$event['duration'],
+				($config['event_ack_enable'])?$ack:NULL,
+				$actions
+			));
+		}		
+
+// PAGING FOOTER
+		$table->addRow(new CCol($paging));
+//		$items_wdgt->addItem($paging);
+//---------
 	}
 
-// Navigation
-	$next_clock = $last_clock;
 
-	$navForm = new CForm('events.php');
-	$navForm->setMethod('get');
-
-	if(isset($_REQUEST['groupid']))
-		$navForm->addVar('groupid',$_REQUEST['groupid']);
-	if(isset($_REQUEST['hostid']))
-		$navForm->addVar('hostid',$_REQUEST['hostid']);
-
-	$navForm->addVar('fullscreen',$_REQUEST['fullscreen']);
-
-	$navForm->addVar('prev_clock',$prev_clock);
-	$navForm->addVar('curr_clock',$curr_clock);
-	$navForm->addVar('next_clock',$next_clock);
-//*
-	$prev_page = new CButton('prev_page','« '.S_BACK);
-	if(empty($prev_clock)) $prev_page->setAttribute('disabled','disabled');
-
-	$next_page = new CButton('next_page',S_NEXT.' »');
-	if($col < $limit) $next_page->setAttribute('disabled','disabled');
-//*/
-	$navForm->addItem(array($prev_page,SPACE,$next_page));
-
-	$navigation = $navForm;
-//------------
-
+	$events_wdgt->addItem($table);
 
 /************************* FILTER **************************/
 /***********************************************************/
@@ -422,7 +327,7 @@
 
 	$filterForm->addVar('nav_time',$_REQUEST['nav_time']);
 
-	$script = new CScript("javascript: if(CLNDR['nav_time'].clndr.setSDateFromOuterObj()){".
+	$script = new CJSscript("javascript: if(CLNDR['nav_time'].clndr.setSDateFromOuterObj()){".
 							"$('nav_time').value = parseInt(CLNDR['nav_time'].clndr.sdt.getTime()/1000); }"
 							);
 	$filterForm->addAction('onsubmit',$script);
@@ -444,7 +349,7 @@
 				);
 	zbx_add_post_js('create_calendar(null,["nav_day","nav_month","nav_year","nav_hour","nav_minute"],"nav_time");');
 
-	$filterForm->addRow(S_EVENTS_BEFORE,$nav_clndr);
+	$filterForm->addRow(S_EVENTS_SINCE,$nav_clndr);
 
 	if(EVENT_SOURCE_TRIGGERS == $source){
 
@@ -467,26 +372,23 @@
 
 		$filterForm->addRow($row);
 
-		$filterForm->addVar('show_unknown',$show_unknown);
+		$filterForm->addVar('hide_unknown',$hide_unknown);
 
-		$unkcbx = new CCheckBox('show_unk',$show_unknown,null,'1');
-		$unkcbx->setAction('javascript: create_var("'.$filterForm->GetName().'", "show_unknown", (this.checked?1:0), 0); ');
+		$unkcbx = new CCheckBox('hide_unk',$hide_unknown,null,'1');
+		$unkcbx->setAction('javascript: create_var("'.$filterForm->GetName().'", "hide_unknown", (this.checked?1:0), 0); ');
 
-		$filterForm->addRow(S_SHOW_UNKNOWN,$unkcbx);
+		$filterForm->addRow(S_HIDE_UNKNOWN,$unkcbx);
 	}
 
 	$reset = new CButton("filter_rst",S_RESET);
 	$reset->setType('button');
 	$reset->setAction('javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
 
-	$filterForm->addItemToBottomRow(new CButton("filter_set",S_FILTER));
+	$filterForm->addItemToBottomRow(new CButton('filter_set',S_FILTER));
 	$filterForm->addItemToBottomRow($reset);
 //-------
 
-	$nav = get_thin_table_header($navigation);
-
 	$events_wdgt->addFlicker($filterForm, get_profile('web.events.filter.state',0));
-	$events_wdgt->addItem(array($nav, $table, $nav));
 	$events_wdgt->show();
 
 	$jsmenu = new CPUMenu(null,170);
@@ -494,6 +396,6 @@
 ?>
 <?php
 
-include_once "include/page_footer.php";
+include_once('include/page_footer.php');
 
 ?>

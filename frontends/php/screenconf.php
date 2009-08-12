@@ -19,16 +19,16 @@
 **/
 ?>
 <?php
-	require_once 'include/config.inc.php';
-	require_once 'include/screens.inc.php';
-	require_once 'include/forms.inc.php';
-	require_once 'include/maps.inc.php';
+	require_once('include/config.inc.php');
+	require_once('include/screens.inc.php');
+	require_once('include/forms.inc.php');
+	require_once('include/maps.inc.php');
 
 	$page['title'] = 'S_SCREENS';
 	$page['file'] = 'screenconf.php';
 	$page['hist_arg'] = array('config');
 
-include_once 'include/page_header.php';
+include_once('include/page_header.php');
 
 ?>
 <?php
@@ -45,7 +45,7 @@ include_once 'include/page_header.php';
 		'vsize'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),	'(isset({config})&&({config}==0))&&isset({save})'),
 
 		'slideshowid'=>		array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,		'(isset({config})&&({config}==1))&&(isset({form})&&({form}=="update"))'),
-		'name'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,	'isset({save})'),
+		'name'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
 		'delay'=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(1,86400),'(isset({config})&&({config}==1))&&isset({save})'),
 
 		'steps'=>		array(null,	O_OPT,	null,	null,	null),
@@ -257,31 +257,31 @@ include_once 'include/page_header.php';
 	$form->SetMethod('get');
 
 	$cmbConfig = new CComboBox('config', $config, 'submit()');
-	$cmbConfig->AddItem(0, S_SCREENS);
-	$cmbConfig->AddItem(1, S_SLIDESHOWS);
+	$cmbConfig->addItem(0, S_SCREENS);
+	$cmbConfig->addItem(1, S_SLIDESHOWS);
 
-	$form->AddItem($cmbConfig);
-	$form->AddItem(new CButton("form", 0 == $config ? S_CREATE_SCREEN : S_SLIDESHOW));
+	$form->addItem($cmbConfig);
+	$form->addItem(new CButton("form", 0 == $config ? S_CREATE_SCREEN : S_SLIDESHOW));
 
 	show_table_header(0 == $config ? S_CONFIGURATION_OF_SCREENS_BIG : S_CONFIGURATION_OF_SLIDESHOWS_BIG, $form);
 	echo SBR;
 
 	if( 0 == $config ){
-		if(isset($_REQUEST["form"])){
+		if(isset($_REQUEST['form'])){
 			insert_screen_form();
 		}
 		else{
+			$screen_wdgt = new CWidget();
+
 			$form = new CForm();
 			$form->setName('frm_screens');
 
-			$numrows = new CSpan(null,'info');
+			$numrows = new CDiv();
 			$numrows->setAttribute('name','numrows');
-			$header = get_table_header(array(S_SCREENS_BIG,
-							new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-							S_FOUND.': ',$numrows,)
-							);
-			show_table_header($header);
 
+			$screen_wdgt->addHeader(S_SCREENS_BIG);
+//			$screen_wdgt->addHeader($numrows);
+		
 			$table = new CTableInfo(S_NO_SCREENS_DEFINED);
 			$table->SetHeader(array(
 				new CCheckBox('all_screens',NULL,"checkAll('".$form->getName()."','all_screens','screens');"),
@@ -289,36 +289,53 @@ include_once 'include/page_header.php';
 				make_sorting_link(S_DIMENSION_COLS_ROWS,'size'),
 				S_SCREEN));
 
-			$result=DBselect('SELECT s.screenid,s.name,s.hsize,s.vsize,(s.hsize*s.vsize) as s_size '.
-							' FROM screens s '.
-							' WHERE '.DBin_node('s.screenid').
-							order_by('s.name,s_size','s.screenid'));
+/* sorting
+			order_page_result($applications, getPageSortField('name'), getPageSortOrder());
+
+// PAGING UPPER
+			$paging = getPagingLine($applications);
+			$screen_wdgt->addItem($paging);
+//-------*/
+			$screen_wdgt->addItem(BR());
+		
+			$sql = 'SELECT s.screenid,s.name,s.hsize,s.vsize,(s.hsize*s.vsize) as s_size '.
+					' FROM screens s '.
+					' WHERE '.DBin_node('s.screenid').
+					order_by('s.name,s_size','s.screenid');
+			$result=DBselect($sql);
 			while($row=DBfetch($result)){
 
 				if(!screen_accessible($row["screenid"], PERM_READ_WRITE)) continue;
 
-				$table->AddRow(array(
+				$table->addRow(array(
 					new CCheckBox('screens['.$row['screenid'].']', NULL, NULL, $row['screenid']),
-					new CLink($row["name"],"?config=0&form=update&screenid=".$row["screenid"],
-						'action'),
+					new CLink($row["name"],"?config=0&form=update&screenid=".$row["screenid"]),
 					$row["hsize"]." x ".$row["vsize"],
 					new CLink(S_EDIT,"screenedit.php?screenid=".$row["screenid"])
 					));
 			}
 
-//----- GO ------
+// PAGING FOOTER
+//			$table->addRow(new CCol($paging));
+//			$screen_wdgt->addItem($paging);
+//---------
+
+//goBox
 			$goBox = new CComboBox('go');
 			$goBox->addItem('delete', S_DELETE_SELECTED);
 
-// goButton name is necessary!!!
+			// goButton name is necessary!!!
 			$goButton = new CButton('goButton',S_GO.' (0)');
 			$goButton->setAttribute('id','goButton');
 			zbx_add_post_js('chkbxRange.pageGoName = "screens";');
 
 			$table->setFooter(new CCol(array($goBox, $goButton)));
+//---------
 
 			$form->addItem($table);
-			$form->show();
+
+			$screen_wdgt->addItem($form);
+			$screen_wdgt->show();
 		}
 	}
 	else{
@@ -326,17 +343,16 @@ include_once 'include/page_header.php';
 			insert_slideshow_form();
 		}
 		else{
+			$screen_wdgt = new CWidget();
+			
 			$form = new CForm();
 			$form->setName('frm_shows');
 
-			$numrows = new CSpan(null,'info');
+			$numrows = new CDiv();
 			$numrows->setAttribute('name','numrows');
-			$header = get_table_header(array(S_SLIDESHOWS_BIG,
-							new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-							S_FOUND.': ',$numrows,)
-							);
-			show_table_header($header);
 
+			$screen_wdgt->addHeader(S_SLIDESHOWS_BIG);
+//			$screen_wdgt->addHeader($numrows);
 
 			$table = new CTableInfo(S_NO_SLIDESHOWS_DEFINED);
 			$table->SetHeader(array(
@@ -346,17 +362,26 @@ include_once 'include/page_header.php';
 				make_sorting_link(S_COUNT_OF_SLIDES,'cnt')
 				));
 
-			$db_slides = DBselect('SELECT s.slideshowid, s.name, s.delay, count(*) as cnt '.
-							' FROM slideshows s '.
-								' left join slides sl on sl.slideshowid=s.slideshowid '.
-							' WHERE '.DBin_node('s.slideshowid').
-							' GROUP BY s.slideshowid,s.name,s.delay '.
-							order_by('s.name,s.delay,cnt','s.slideshowid'));
+/* sorting
+			order_page_result($applications, getPageSortField('name'), getPageSortOrder());
 
+// PAGING UPPER
+			$paging = getPagingLine($applications);
+			$screen_wdgt->addItem($paging);
+//-------*/
+			$screen_wdgt->addItem(BR());
+			
+			$sql = 'SELECT s.slideshowid, s.name, s.delay, count(*) as cnt '.
+					' FROM slideshows s '.
+						' LEFT JOIN slides sl ON sl.slideshowid=s.slideshowid '.
+					' WHERE '.DBin_node('s.slideshowid').
+					' GROUP BY s.slideshowid,s.name,s.delay '.
+					order_by('s.name,s.delay,cnt','s.slideshowid');
+			$db_slides = DBselect($sql);
 			while($slide_data = DBfetch($db_slides)){
 				if(!slideshow_accessible($slide_data['slideshowid'], PERM_READ_WRITE)) continue;
 
-				$table->AddRow(array(
+				$table->addRow(array(
 					new CCheckBox('shows['.$slide_data['slideshowid'].']', NULL, NULL, $slide_data['slideshowid']),
 					new CLink($slide_data['name'],'?config=1&form=update&slideshowid='.$slide_data['slideshowid'],
 						'action'),
@@ -364,7 +389,12 @@ include_once 'include/page_header.php';
 					$slide_data['cnt']
 					));
 			}
-//----- GO ------
+// PAGING FOOTER
+//			$table->addRow(new CCol($paging));
+//			$screen_wdgt->addItem($paging);
+//---------
+
+// goBox
 			$goBox = new CComboBox('go');
 			$goBox->addItem('delete', S_DELETE_SELECTED);
 
@@ -374,15 +404,17 @@ include_once 'include/page_header.php';
 			zbx_add_post_js('chkbxRange.pageGoName = "shows";');
 
 			$table->setFooter(new CCol(array($goBox, $goButton)));
-
+//---------
 			$form->addItem($table);
-			$form->show();
+
+			$screen_wdgt->addItem($form);
+			$screen_wdgt->show();
 		}
 
 	}
-	if(isset($table)){
-		zbx_add_post_js('insert_in_element("numrows","'.$table->getNumRows().'");');
-	}
+?>
+<?php
 
-include_once "include/page_footer.php";
+include_once('include/page_footer.php');
+
 ?>

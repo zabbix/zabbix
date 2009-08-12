@@ -569,14 +569,13 @@ include_once('include/page_header.php');
 
 	$frmForm->addVar('groupid',get_request('groupid',0));
 	if(!isset($_REQUEST['form'])){
-		$frmForm->addItem(SPACE);
+//		$frmForm->addItem(SPACE);
 		$frmForm->addItem(new CButton('form',S_CREATE_HOST));
 	}
 
 	show_table_header(S_CONFIGURATION_OF_HOSTS, $frmForm);
 ?>
 <?php
-	$row_count = 0;
 
 	echo SBR;
 
@@ -587,6 +586,8 @@ include_once('include/page_header.php');
 		insert_host_form(false);
 	}
 	else{
+		$hosts_wdgt = new CWidget();
+		
 		$frmForm = new CForm();
 		$frmForm->setMethod('get');
 
@@ -599,14 +600,11 @@ include_once('include/page_header.php');
 
 		$frmForm->addItem(array(S_GROUP.SPACE,$cmbGroups));
 
-		$numrows = new CSpan(null,'info');
+		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
 
-		$header = get_table_header(array(S_HOSTS_BIG,
-						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-						S_FOUND.': ',$numrows,)
-						);
-		show_table_header($header, $frmForm);
+		$hosts_wdgt->addHeader(S_HOSTS_BIG, $frmForm);
+		$hosts_wdgt->addHeader($numrows);
 
 /* table HOSTS */
 		$options = array(
@@ -618,17 +616,17 @@ include_once('include/page_header.php');
 					'select_graphs' => 1,
 					'select_applications' => 1,
 					'editable' => 1,
-					'sortfield' => getPageSortField('host'),
-					'sortorder' => getPageSortOrder()
+//					'sortfield' => getPageSortField('host'),
+//					'sortorder' => getPageSortOrder(),
+					'limit' => ($config['search_limit']+1)
 				);
 
 		if($_REQUEST['groupid'] > 0){
 			$options['groupids'] = $PAGE_GROUPS['selected'];
 		}
 
-		$hosts = Chost::get($options);
-
-
+		$hosts = CHost::get($options);
+		
 		$form = new CForm();
 		$form->setName('hosts');
 		$form->addVar('config',get_request('config',0));
@@ -649,6 +647,14 @@ include_once('include/page_header.php');
 			S_AVAILABILITY,
 			S_ERROR
 		));
+		
+// sorting
+		order_page_result($hosts, getPageSortField('host'), getPageSortOrder());
+
+// PAGING UPPER
+		$paging = getPagingLine($hosts);
+		$hosts_wdgt->addItem($paging);
+//---------
 
 		foreach($hosts as $hostid => $row){
 			$description = array();
@@ -727,9 +733,13 @@ include_once('include/page_header.php');
 				$available,
 				$error
 			));
-
-			$row_count++;
 		}
+		
+// PAGING FOOTER
+		$table->addRow(new CCol($paging));
+//		$items_wdgt->addItem($paging);
+//---------
+
 //----- GO ------
 		$goBox = new CComboBox('go');
 		$goBox->addItem('massupdate',S_MASS_UPDATE);
@@ -745,11 +755,10 @@ include_once('include/page_header.php');
 		$table->setFooter(new CCol(array($goBox, $goButton)));
 //----
 		$form->addItem($table);
-		$form->show();
-
+		
+		$hosts_wdgt->addItem($form);
+		$hosts_wdgt->show();
 	}
-
-zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
 
 ?>
 <?php

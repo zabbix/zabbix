@@ -168,7 +168,7 @@ include_once('include/page_header.php');
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('description',ZBX_SORT_UP);
+	validate_sort_and_sortorder('description', ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go','none');
 ?>
@@ -320,7 +320,7 @@ include_once('include/page_header.php');
 			$item['applications'] = $applications;
 
 			if($new_appid){
-				$itemid=add_item($item);
+				$itemid = add_item($item);
 			}
 
 			$result = DBend($itemid);
@@ -666,8 +666,6 @@ include_once('include/page_header.php');
 	$form->setMethod('get');
 	$form->setName('hdrform');
 
-	$form->addVar('hostid',$hostid);
-
 // Config
 	$cmbConf = new CComboBox('config','items.php','javascript: submit()');
 	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');
@@ -681,6 +679,7 @@ include_once('include/page_header.php');
 	$form->addItem($cmbConf);
 	$form->addItem(array(SPACE, new CButton('form',S_CREATE_ITEM)));
 
+//$items_wdgt->addPageHeader(S_CONFIGURATION_OF_ITEMS_BIG, $form);
 	show_table_header(S_CONFIGURATION_OF_ITEMS_BIG, $form);
 
 echo SBR;
@@ -705,12 +704,12 @@ echo SBR;
 		$items_wdgt = new CWidget();
 
 // Items Header
-		$row_count = 0;
-		$numrows = new CSpan(null,'info');
+		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
-		$header = array(S_ITEMS_BIG,new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),S_FOUND.': ',$numrows);
 
-		$items_wdgt->addHeader($header, SPACE);
+		$items_wdgt->addHeader(S_ITEMS_BIG, SPACE);
+		$items_wdgt->addHeader($numrows, SPACE);
+		
 // ----------------
 
 // Items Filter
@@ -742,15 +741,12 @@ echo SBR;
 				' ('.count($header_host['applications']).')');
 
 			if($header_host['status'] == HOST_STATUS_TEMPLATE){
-				$status = S_TEMPLATE;
-
 				$tbl_header_host->addRow(array(
 					new CLink(bold(S_TEMPLATE_LIST), 'templates.php?templateid='.$header_host['hostid'].url_param('groupid')),
-					$applications,
 					$triggers,
 					$graphs,
-					array(bold(S_TEMPLATE.': '), $description),
-					array(bold(S_STATUS.': '), $status)
+					$applications,
+					array(bold(S_TEMPLATE.': '), $description)
 				));
 			}
 			else{
@@ -783,9 +779,9 @@ echo SBR;
 
 				$tbl_header_host->addRow(array(
 					new CLink(bold(S_HOST_LIST), 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid')),
-					$applications,
 					$triggers,
 					$graphs,
+					$applications,
 					array(bold(S_HOST.': '),$description),
 					array(bold(S_DNS.': '), $dns),
 					array(bold(S_IP.': '), $ip),
@@ -806,8 +802,8 @@ echo SBR;
 			'select_hosts' => 1,
 			'select_triggers' => 1,
 			'select_applications' => 1,
-			'sortfield' => getPageSortField('description'),
-			'sortorder' => getPageSortOrder(),
+//			'sortfield' => getPageSortField('description'),
+//			'sortorder' => getPageSortOrder(),
 			'limit' => ($config['search_limit']+1)
 		);
 
@@ -868,6 +864,15 @@ echo SBR;
 
 		$itemids = array_keys($items);
 
+// sorting
+//COpt::profiling_start('ITEMS');		
+		order_page_result($items, getPageSortField('description'), getPageSortOrder());
+//COpt::profiling_stop('ITEMS');
+
+// PAGING UPPER
+		$paging = getPagingLine($items);
+		$items_wdgt->addItem($paging);
+//---------
 
 // TABLE
 		$form = new CForm();
@@ -876,7 +881,8 @@ echo SBR;
 		$table  = new CTableInfo();
 		$table->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
-			$show_host?make_sorting_header(S_HOST,'host'):null,
+//			$show_host?make_sorting_header(S_HOST,'host'):null,
+			$show_host?S_HOST:null,
 			make_sorting_header(S_DESCRIPTION,'description'),
 			S_TRIGGERS,
 			make_sorting_header(S_KEY,'key_'),
@@ -887,8 +893,6 @@ echo SBR;
 			make_sorting_header(S_STATUS,'status'),
 			S_APPLICATIONS,
 			S_ERROR));
-
-		$sql = 'SELECT DISTINCT th.host as template_host,th.hostid as template_hostid, h.host, h.hostid, i.* ';
 
 		foreach($items as $itemid => $db_item){
 			$host = array_pop($db_item['hosts']);
@@ -1013,8 +1017,12 @@ echo SBR;
 				$applications,
 				$error
 				));
-			$row_count++;
 		}
+
+// PAGING FOOTER
+		$table->addRow(new CCol($paging));
+//		$items_wdgt->addItem($paging);
+//---------
 
 //----- GO ------
 		$goBox = new CComboBox('go');
@@ -1036,11 +1044,9 @@ echo SBR;
 		$form->addItem($table);
 
 		$items_wdgt->addItem($form);
+		
 		$items_wdgt->show();
 	}
-
-	if(isset($row_count))
-		zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
 ?>
 <?php
 

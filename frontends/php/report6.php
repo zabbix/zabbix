@@ -158,8 +158,9 @@ include_once('include/page_header.php');
 
 	$r_form->addItem(array(S_REPORTS.SPACE,$cnfCmb));
 
-	$rep6_wdgt->addHeader(S_BAR_REPORTS, $r_form);
-//	show_table_header(S_BAR_REPORTS, $r_form);
+	$rep6_wdgt->addPageHeader(S_BAR_REPORTS);
+	$rep6_wdgt->addHeader(S_REPORT_BIG, $r_form);
+	$rep6_wdgt->addItem(BR());
 //-------------
 
 	$rep_tab = new CTable();

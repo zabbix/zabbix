@@ -114,14 +114,14 @@ function check_permission_for_action_conditions($conditions){
 }
 
 function get_action_by_actionid($actionid){
-	$sql="select * from actions where actionid=$actionid";
+	$sql='select * from actions where actionid='.$actionid;
 	$result=DBselect($sql);
 
 	if($row=DBfetch($result)){
 		return	$row;
 	}
 	else{
-		error("No action with actionid=[$actionid]");
+		error('No action with actionid=['.$actionid.']');
 	}
 return	$result;
 }

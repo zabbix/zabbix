@@ -38,11 +38,16 @@ create/data/images/Workstation_small.png -text svneol=unset#unset
 create/data/recreate.sh -text
 docs/ZABBIX[!!-~]Manual[!!-~]v1.6[!!-~]rev[!!-~]17.pdf -text
 frontends/php/api/.htaccess -text
+frontends/php/api/classes/class.caction.php -text
+frontends/php/api/classes/class.calert.php -text
 frontends/php/api/classes/class.capplication.php -text
+frontends/php/api/classes/class.cevent.php -text
 frontends/php/api/classes/class.cgraph.php -text
 frontends/php/api/classes/class.chost.php -text
 frontends/php/api/classes/class.chostgroup.php -text
 frontends/php/api/classes/class.citem.php -text
+frontends/php/api/classes/class.cmaintenance.php -text
+frontends/php/api/classes/class.cscript.php -text
 frontends/php/api/classes/class.ctemplate.php -text
 frontends/php/api/classes/class.ctrigger.php -text
 frontends/php/api/classes/class.cuser.php -text
@@ -57,6 +62,8 @@ frontends/php/audio/trigger_on_average.wav -text
 frontends/php/audio/trigger_on_disaster.wav -text
 frontends/php/audio/trigger_on_high.wav -text
 frontends/php/audio/trigger_on_warning.wav -text
+frontends/php/auditacts.php -text
+frontends/php/auditlogs.php -text
 frontends/php/authentication.php -text
 frontends/php/chart6.php -text
 frontends/php/chart7.php -text
@@ -237,7 +244,6 @@ frontends/php/include/classes/class.cpassbox.php -text
 frontends/php/include/classes/class.cpie.php -text
 frontends/php/include/classes/class.cpumenu.php -text
 frontends/php/include/classes/class.crow.php -text
-frontends/php/include/classes/class.cscript.php -text
 frontends/php/include/classes/class.cserverinfo.php -text
 frontends/php/include/classes/class.cspan.php -text
 frontends/php/include/classes/class.ctable.php -text

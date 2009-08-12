@@ -19,14 +19,14 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/blocks.inc.php";
+	require_once('include/config.inc.php');
+	require_once('include/blocks.inc.php');
 
-	$page["title"] = "S_STATUS_OF_ZABBIX";
-	$page["file"] = "report1.php";
+	$page['title'] = "S_STATUS_OF_ZABBIX";
+	$page['file'] = 'report1.php';
 	$page['hist_arg'] = array();
 
-include_once "include/page_header.php";
+include_once('include/page_header.php');
 
 ?>
 <?php
@@ -36,13 +36,18 @@ include_once "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
-	show_table_header(S_STATUS_OF_ZABBIX_BIG);
+	$rprt_wdgt = new CWidget();
+	$rprt_wdgt->addPageHeader(S_STATUS_OF_ZABBIX_BIG);
 
-	$status = make_status_of_zbx();
-	$status->show();
+	$rprt_wdgt->addHeader(S_REPORT_BIG);
+	$rprt_wdgt->addItem(BR());
+	
+	$rprt_wdgt->addItem(make_status_of_zbx());
+	
+	$rprt_wdgt->show();
 ?>
 <?php
 
-include_once "include/page_footer.php";
+include_once('include/page_footer.php');
 
 ?>

@@ -183,8 +183,9 @@ $ZBX_MENU = array(
 				array('url'=>'scripts.php',
 						'label'=>S_SCRIPTS
 					),
-				array('url'=>'audit.php',
-						'label'=>S_AUDIT
+				array('url'=>'auditlogs.php',
+						'label'=>S_AUDIT,
+						'sub_pages'=>array('auditacts.php')
 					),
 				array('url'=>'queue.php',
 						'label'=>S_QUEUE

@@ -206,102 +206,11 @@ td.form_row_r_simple { /* right cell simple */
 }
 /*-------------- <SERVICES> -----------------*/
 
-table.formlongtable {
-	background-color: #FFFFFF;
-	color: #000000;
-	border: 0px solid #000000;
+table.formlongtable{
 	width: 99%;
 }
-
-table.formlongtable tr td {
-	padding-left: 5px;
-	padding-right: 5px;
-	color: #000000;
-    font-family:verdana, arial, helvetica, sans-serif;
-    font-size:10px;
-	border-width: 1px;
-	height: 24px;
-	white-space: nowrap;
-	word-spacing:	0px;
-}
-
-table.formlongtable tr.new {
-	text-decoration: none;
-	background-color: #E0F0E0;
-}
-
-table.formlongtable tr.edit {
-	text-decoration: none;
-	background-color: #F0F0E0;
-}
-
-table.formlongtable tr.form_odd_row td{
-	text-decoration: none;
-	background-color:#D8D8D8;
-}
-
-table.formlongtable tr.form_even_row td{
-	text-decoration: none;
-	background-color:#DFDFDF;
-}
-
-table.formlongtable tr td table.calendar tr td{ /* right cell */
-	padding-left: 1px;
-	padding-right: 1px;
-}
-
-table.formlongtable tr td.form_row_first{
-	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
-	color: #FFFFFF;
-        font-size:11px;
-	font-weight: bold;
-	border-top-style: solid;
-	border-left-style: solid;
-	border-right-style: solid;
-	border-bottom-style: solid;
-	border-color: #AAAAAA;
-	text-align: left;
-}
-table.formlongtable tr td.form_row_last {
-	color: #FFFFFF;
-	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
-	border-top-style: solid;
-	border-left-style: solid;
-	border-right-style: solid;
-	border-bottom-style: solid;
-	border-color: #AAAAAA;
-	text-align: right;
-}
-table.formlongtable tr td.form_row_l { /* left cell */
-	border-left-style:	solid;
-	border-top-style:	none;
-	border-right-style:	none;
-	border-bottom-style:	none;
-	border-color:	#AAAAAA;
-	text-align:	left;
-	white-space:	nowrap;
-	word-spacing:	0px;
-	width:		30%;
-}
-table.formlongtable tr td.form_row_c { /* center cell */
-	border-right-style: solid;
-	border-left-style: solid;
-	border-top-style: none;
-	border-bottom-style: none;
-	border-color: #AAAAAA;
-	color: inherit;
-	text-align: center;
-}
-table.formlongtable tr td.form_row_r { /* right cell */
-	border-right-style: solid;
-	border-top-style: none;
-	border-left-style: none;
-	border-bottom-style: none;
-	border-color: #AAAAAA;
-	text-align: left;
-}
-
 /*-------------- </SERVICES> -----------------*/
+
 /************ HISTORY LOG TABLE ***********/
 table.log_history_table {
 /*	background-color: #AAAAAA; */
@@ -632,15 +541,6 @@ table.header{
 	vertical-align: middle;
 }
 
-table.header tr td.header_c{
-	font-family:verdana, arial, helvetica, sans-serif;
-	font-size:10px;
-	height: 24px;
-	padding-left: 4px;
-	padding-right: 4px;
-	line-height: 20px;
-}
-
 table.header tr td.header_l{
 	background:none;
 	font-family:verdana, arial, helvetica, sans-serif;
@@ -650,16 +550,6 @@ table.header tr td.header_l{
 	padding-left: 5px;
 	border-width: 0px;
 }
-table.header tr td.header_r{
-	background:none;
-	font-family:verdana, arial, helvetica, sans-serif;
-	font-size:10px;
-	text-align: right;
-	height: 24px;
-	padding-right: 5px;
-	border-width: 0px;
-}
-
 table.header tr td.header_r{
 	background:none;
 	font-family:verdana, arial, helvetica, sans-serif;
@@ -1064,6 +954,7 @@ table.warning tr td.left{
 	word-spacing:	0px;
 	text-align: 	left;
 }
+
 table.warning tr td.right{
 	width:		100%;
 	padding-left:	5px;
@@ -1071,10 +962,12 @@ table.warning tr td.right{
 	text-align: 	right;
 	vertical-align:	text-top;
 }
+
 table.warning tr.center td.left{
 	vertical-align:	text-top;
 	padding-top: 0;
 }
+
 table.warning tr.center td.right{
 	padding: 	5px;
 	vertical-align:	middle;
@@ -1086,8 +979,7 @@ table.warning tr.center td.right{
 /*****************************************/
 
 /**************** SETUP WIZARD ***********/
-table.setup_wizard
-{
+table.setup_wizard{
 	width:		640px;
 	height:		480px;
 	border-spacing:	0px; /* cellspacing */
@@ -1097,65 +989,62 @@ table.setup_wizard
 	border-right:		2px #3F3F3F solid;
 	border-bottom:		2px #3F3F3F solid;
 }
-table.setup_wizard td
-{
+
+table.setup_wizard td{
 	padding-left:	0;
 	padding-right:	0;
 	padding-top: 	2px;
 	padding-bottom: 2px;
 }
 
-table.setup_wizard tr.header
-{
+table.setup_wizard tr.header{
 	height:		24px;
 	border:		1px black solid;
 	background-color: #F00000;
 	color: 		white;
 	font-weight:	bold;
 }
-table.setup_wizard tr.footer
-{
+
+table.setup_wizard tr.footer{
 	height:		34px;
 	border-top:	1px black dotted;
 }
 
-table.setup_wizard tr.footer input.button
-{
+table.setup_wizard tr.footer input.button{
 	height: 25px;
 }
 
-table.setup_wizard tr.title
-{
+table.setup_wizard tr.title{
 	height:		28px;
 }
-table.setup_wizard tr.title td
-{
+
+table.setup_wizard tr.title td{
 	font-size:	24px;
 	font-weight:	normal;
 }
-table.setup_wizard tr td.left
-{
+
+table.setup_wizard tr td.left{
 	padding-left: 	10px;
 	padding-right: 	5px;
 	white-space: 	nowrap;
 	word-spacing:	0px;
 	text-align: 	left;
 }
-table.setup_wizard tr td.right
-{
+
+table.setup_wizard tr td.right{
 	width:		100%;
 	padding-left:	5px;
 	padding-right:	10px;
 	text-align: 	right;
 	vertical-align:	text-top;
 }
-table.setup_wizard tr.center td.left
-{
+
+table.setup_wizard tr.center td.left{
 	vertical-align:	text-top;
 	padding-top: 0;
 }
-table.setup_wizard tr.center td.right
-{
+
+table.setup_wizard tr.center td.right{
 	padding: 	5px;
 	vertical-align:	middle;
 	text-align: 	center;
@@ -1164,28 +1053,24 @@ table.setup_wizard tr.center td.right
 	background-color: white;
 }
 
-table.setup_wizard ul li
-{
+table.setup_wizard ul li{
 	font-size:	14px;
 	font-weight:	normal;
 	color:		gray;
 	list-style-image: url('../images/general/inst_step.gif');
 }
 
-table.setup_wizard ul li.current
-{
+table.setup_wizard ul li.current{
 	color: black;
 	list-style-image: url('../images/general/inst_current.gif');
 }
 
-table.setup_wizard ul li.completed
-{
+table.setup_wizard ul li.completed{
 	color: black;
 	list-style-image: url('../images/general/inst_completed.gif');
 }
 
-table.setup_wizard div.licence
-{
+table.setup_wizard div.licence{
 	text-align: left;
 	height:	350px;
 	width:	100%;
@@ -1194,8 +1079,7 @@ table.setup_wizard div.licence
 	overflow: scroll;
 }
 
-table.setup_wizard div.text
-{
+table.setup_wizard div.text{
 	text-align: left;
 	vertical-align:	text-top;
 	height:	100%;
@@ -1310,8 +1194,7 @@ table.requirements tr td{
 table.infobox{
 	width: 100%;
 	margin-top: 4px;
-	margin-bottom: 4px;
-	border: 1px solid #777777;
+	border: 1px #3377AA solid;
 	background-color: #FFFFFF;
 }
 table.infobox tr td{
@@ -1331,3 +1214,73 @@ table.invisible tr td{
 	padding: 0px;
 }
 /********** </INVISIBLE> ************/
+
+/********** <PAGING> ************/
+table.paging{
+	width: 100%;
+	padding: 2px;
+}
+
+table.paging tr td{
+	border: 0px black solid;
+	width: 100%;
+	font-size: 11px;
+	line-height: 18px;
+	text-align: center;
+	vertical-align: middle;
+
+}
+/********** </PAGING> ************/
+
+/****** HEADER NEW *********/
+
+table.header_wide{
+	width: 100%;
+	color: #222222;
+	
+	border: 1px #3377AA solid;
+	vertical-align: middle;
+	background-color:#FFFFFF;
+}
+
+table.header_wide tr.first td.header_l{
+	font-family: arial, verdana, helvetica, sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+	
+	text-align: left;
+	height: 24px;
+	
+	padding-left: 5px;
+	color: #224488;
+}
+
+table.header_wide tr.first td.header_r{
+	background:none;
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
+	text-align: right;
+	height: 24px;
+	padding-right: 5px;
+	border-width: 0px;
+}
+
+table.header_wide tr.next td.header_l{
+	background:none;
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
+	text-align: left;
+	height: 20px;
+	padding-left: 5px;
+	border-width: 0px;
+}
+
+table.header_wide tr.next td.header_r{
+	background:none;
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
+	text-align: right;
+	height: 20px;
+	padding-right: 5px;
+	border-width: 0px;
+}

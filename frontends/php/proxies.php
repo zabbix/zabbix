@@ -19,24 +19,25 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/hosts.inc.php');
+require_once('include/config.inc.php');
+require_once('include/hosts.inc.php');
 
-	$page['title'] = "S_PROXIES";
-	$page['file'] = 'proxies.php';
-	$page['hist_arg'] = array('config');
-	// $page['scripts'] = array('menu_scripts.js','calendar.js');
+$page['title'] = "S_PROXIES";
+$page['file'] = 'proxies.php';
+$page['hist_arg'] = array('config');
+// $page['scripts'] = array('menu_scripts.js','calendar.js');
 
 include_once('include/page_header.php');
 
-	$_REQUEST['config'] = get_request('config','proxies.php');
+$_REQUEST['config'] = get_request('config','proxies.php');
 
-	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
+$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
+$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
 
-	if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0) && !isset($available_hosts[$_REQUEST['hostid']])) {
-		access_deny();
-	}
+
+if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0) && !isset($available_hosts[$_REQUEST['hostid']])) {
+	access_deny();
+}
 ?>
 <?php
 
@@ -171,6 +172,7 @@ include_once('include/page_header.php');
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,AVAILABLE_NOCACHE); /* update available_hosts after ACTIONS */
 ?>
 <?php
+	$proxies_wdgt = new CWidget();
 	$params = array();
 
 	$options = array('only_current_node', 'allow_all');
@@ -201,11 +203,9 @@ include_once('include/page_header.php');
 		$frmForm->addItem(new CButton('form',S_CREATE_PROXY));
 	}
 
-	show_table_header(S_CONFIGURATION_OF_PROXIES, $frmForm);
+	$proxies_wdgt->addPageHeader(S_CONFIGURATION_OF_PROXIES, $frmForm);
 
-	$row_count = 0;
 
-	echo SBR;
 	if(isset($_REQUEST["form"])){
 
 		global	$USER_DETAILS;
@@ -272,17 +272,16 @@ include_once('include/page_header.php');
 		}
 		$frmHostG->addItemToBottomRow(SPACE);
 		$frmHostG->addItemToBottomRow(new CButtonCancel(url_param("config")));
-		$frmHostG->show();
+		
+		$proxies_wdgt->addItem($frmHostG);
 	}
 	else {
 
-		$numrows = new CSpan(null,'info');
+		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
-		$header = get_table_header(array(S_PROXIES_BIG,
-						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-						S_FOUND.': ',$numrows)
-						);
-		show_table_header($header);
+
+		$proxies_wdgt->addHeader(S_PROXIES_BIG); 
+//		$proxies_wdgt->addHeader($numrows); 
 
 		$form = new CForm('proxies.php');
 		$form->setMethod('get');
@@ -299,6 +298,15 @@ include_once('include/page_header.php');
 				' # ',
 				S_MEMBERS
 			));
+
+// sorting
+//		order_page_result($proxies, getPageSortField('description'), getPageSortOrder());
+
+// PAGING UPPER
+		$paging = BR();
+//		$paging = getPagingLine($proxies);
+		$proxies_wdgt->addItem($paging);
+//---------
 
 		$sql = 'SELECT hostid,host,lastaccess '.
 				' FROM hosts'.
@@ -331,14 +339,17 @@ include_once('include/page_header.php');
 			$table->addRow(array(
 				new CCheckBox('hosts['.$db_proxy['hostid'].']', NULL, NULL, $db_proxy['hostid']),
 				new CLink($db_proxy['host'],
-							'proxies.php?form=update&hostid='.$db_proxy['hostid'].url_param('config'),
-							'action'),
+							'proxies.php?form=update&hostid='.$db_proxy['hostid'].url_param('config')),
 				$lastclock,
 				$count,
 				new CCol((empty($hosts)?'-':$hosts), 'wraptext')
 				));
-			$row_count++;
 		}
+
+// PAGING FOOTER
+		$table->addRow(new CCol($paging));
+//		$proxies_wdgt->addItem($paging);
+//---------
 
 //----- GO ------
 		$goBox = new CComboBox('go');
@@ -355,11 +366,13 @@ include_once('include/page_header.php');
 //----
 
 		$form->addItem($table);
-		$form->show();
-
-		zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
+		
+		$proxies_wdgt->addItem($form);
+		$proxies_wdgt->show();
 	}
+?>
+<?php
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
 
 ?>

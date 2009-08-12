@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,125 @@
 **/
 ?>
 <?php
+
+/************* PAGING *************/
+function getPagingLine(&$items, $autotrim=true){
+	global $USER_DETAILS;
+	$config = select_config();
+	
+	$search_limit = '';
+	if($config['search_limit'] < count($items)){
+		array_pop($items);
+		$search_limit = '+';
+	}
+
+	$start = get_request('start',0);
+	$rows_per_page = $USER_DETAILS['rows_per_page'];
+
+	$cnt_items = count($items);
+	$cnt_pages = ceil($cnt_items / $rows_per_page);
+
+	if($cnt_pages < 1) $cnt_pages = 1;
+		
+	$crnt_page = floor($start / $rows_per_page) + 1;
+	
+	if($autotrim){
+		$items = array_slice($items, $start, $rows_per_page, true);
+	}
+
+// Viewed pages (better to use not odd)
+	$view_pages = 11;
+
+	$endPage = $crnt_page + floor($view_pages/2);
+	if($endPage < $view_pages) $endPage = $view_pages;
+	if($endPage > $cnt_pages) $endPage = $cnt_pages;
+	
+	$startPage = ($endPage > $view_pages)?($endPage - $view_pages + 1):1;
+	
+// Page line
+	$pageline = array();
+	
+	$table = BR();
+	if($cnt_pages > 1){
+		if($startPage > 1){
+			$page = new CSpan('<< '.S_FIRST, 'darklink');
+			$page->setAttribute('onclick', 'javascript: openPage(0);');
+	
+			$pageline[] = $page;
+			$pageline[] = '&nbsp;&nbsp;';
+		}
+		
+		if($crnt_page > 1){
+			$page = new CSpan('< '.S_PREVIOUS, 'darklink');
+			$page->setAttribute('onclick', 'javascript: openPage('.(($crnt_page-2) * $rows_per_page).');');
+	
+			$pageline[] = $page;
+			$pageline[] = ' | ';
+		}
+		
+		for($p=$startPage; $p <= $cnt_pages; $p++){
+			if($p > $endPage)	break;
+			
+			if($p == $crnt_page){
+				$page = new CSpan($p, 'bold textcolorstyles');
+			}
+			else{
+				$page = new CSpan($p, 'darklink');
+				$page->setAttribute('onclick', 'javascript: openPage('.(($p-1) * $rows_per_page).');');
+			}
+	
+			$pageline[] = $page;
+			$pageline[] = ' | ';
+		}
+	
+		array_pop($pageline);
+		
+		if($crnt_page <  $cnt_pages){
+			$page = new CSpan(S_NEXT.' >', 'darklink');
+			$page->setAttribute('onclick', 'javascript: openPage('.($crnt_page * $rows_per_page).');');
+			
+			$pageline[] = ' | ';
+			$pageline[] = $page;
+		}
+		
+		if($p < $cnt_pages){
+			$page = new CSpan(S_LAST.' >>', 'darklink');
+			$page->setAttribute('onclick', 'javascript: openPage('.(($cnt_pages-1) * $rows_per_page).');');
+	
+			$pageline[] = '&nbsp;&nbsp;';
+			$pageline[] = $page;
+		}
+		
+		$table = new CTable(null, 'paging');
+		$table ->addRow(new CCol($pageline));
+	}	
+// Table view
+
+	$view_from_page = ($crnt_page-1) * $rows_per_page + 1;
+	
+	$view_till_page = $crnt_page * $rows_per_page;
+	if($view_till_page > $cnt_items) $view_till_page = $cnt_items;
+		
+	$page_view = array();
+	$page_view[] = S_DISPLAYING.SPACE;
+	if($cnt_items > 0){
+		$page_view[] = new CSpan($view_from_page,'info');
+		$page_view[] = SPACE.S_TO_SMALL.SPACE;
+	}
+	
+	$page_view[] = new CSpan($view_till_page,'info');
+	$page_view[] = SPACE.S_OF_SMALL.SPACE;
+	$page_view[] = new CSpan($cnt_items,'info');
+	$page_view[] = $search_limit;
+	$page_view[] = SPACE.S_FOUND_SMALL;
+	
+	$page_view = new CJSscript($page_view);
+	
+	zbx_add_post_js('insert_in_element("numrows",'.zbx_jsvalue($page_view->toString()).');');
+		
+return $table;
+}
+
 /************* DYNAMIC REFRESH *************/
 function add_doll_objects($ref_tab, $pmid='mainpage'){
 	$upd_script = array();
@@ -102,11 +221,11 @@ function inarr_isset($keys, $array=null){
 
 /************ COOKIES ************/
 /* function:
- *      get_cookie
+ *	get_cookie
  *
  * description:
- *      return cookie value by name,
- *      if cookie is not present return $default_value.
+ *	return cookie value by name,
+ *	if cookie is not present return $default_value.
  *
  * author: Eugene Grigorjev
  */
@@ -117,10 +236,10 @@ function get_cookie($name, $default_value=null){
 }
 
 /* function:
- *      zbx_setcookie
+ *	zbx_setcookie
  *
  * description:
- *      set cookies.
+ *	set cookies.
  *
  * author: Eugene Grigorjev
  */
@@ -130,10 +249,10 @@ function zbx_setcookie($name, $value, $time=null){
 }
 
 /* function:
- *      zbx_unsetcookie
+ *	zbx_unsetcookie
  *
  * description:
- *      unset and clear cookies.
+ *	unset and clear cookies.
  *
  * author: Aly
  */
@@ -165,14 +284,14 @@ function zbx_flush_post_cookies($unset=false){
 }
 
 /* function:
- *      zbx_set_post_cookie
+ *	zbx_set_post_cookie
  *
  * description:
- *      set cookies after authorisation.
- *      require calling 'zbx_flush_post_cookies' function
+ *	set cookies after authorisation.
+ *	require calling 'zbx_flush_post_cookies' function
  *	Called from:
- *         a) in 'include/page_header.php'
- *         b) from 'redirect()'
+ *	   a) in 'include/page_header.php'
+ *	   b) from 'redirect()'
  *
  * author: Eugene Grigorjev
  */
@@ -186,10 +305,10 @@ function zbx_set_post_cookie($name, $value, $time=null){
 
 /************* DATE *************/
 /* function:
- *      zbx_date2str
+ *	zbx_date2str
  *
  * description:
- *      Convert timestamp to string representation. Retun 'Never' if 0.
+ *	Convert timestamp to string representation. Retun 'Never' if 0.
  *
  * author: Alexei Vladishev
  */
@@ -198,10 +317,10 @@ function zbx_date2str($format, $timestamp){
 }
 
 /* function:
- *      zbx_date2age
+ *	zbx_date2age
  *
  * description:
- *      Calculate and convert timestamp to string representation.
+ *	Calculate and convert timestamp to string representation.
  *
  * author: Aly
  */
@@ -312,10 +431,10 @@ return $array;
 
 
 /* function:
- *      zbx_rksort
+ *	zbx_rksort
  *
  * description:
- *      Recursively sort an array by key
+ *	Recursively sort an array by key
  *
  * author: Eugene Grigorjev
  */
@@ -329,6 +448,41 @@ function zbx_rksort(&$array, $flags=NULL){
 	return $array;
 }
 
+
+function array_quicksort(&$data, $sortfield, $sortorder=ZBX_SORT_UP, $level=0){
+	$return = array();
+	$greater = array();
+	$less = array();
+	$pivotList = array();
+
+	if(count($data) < 2) return $data;
+	
+	foreach($data as $id => $row){
+		$pivot = $row;
+		$pivotid = $id;
+		break;
+	}
+	
+	foreach($data as $id => $row){
+		$value = '';
+		$compareValue = ''; 
+		
+		$value = $row[$sortfield];
+		$compareValue = $pivot[$sortfield];  
+	  
+		if ($value < $compareValue) $less[$id] = $row;
+		if ($value == $compareValue) $pivotList[$id] = $row;
+		if ($value > $compareValue) $greater[$id] = $row;
+	}
+	
+	$return += array_quicksort($less,$sortfield,$sortorder, $level+1);
+	$return += $pivotList;
+	$return += array_quicksort($greater,$sortfield,$sortorder, $level+1);
+	
+	if(($level == 0) && ($sortorder == ZBX_SORT_DOWN)) $return = array_reverse($return);
+
+return $return;
+}
 /************* END SORT *************/
 
 

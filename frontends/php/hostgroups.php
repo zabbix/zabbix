@@ -169,10 +169,11 @@ include_once('include/page_header.php');
 	if(!isset($_REQUEST['form'])){
 		$frmForm->addItem(new CButton('form', S_CREATE_GROUP));
 	}
+
 	show_table_header(S_CONFIGURATION_OF_GROUPS, $frmForm);
 
+	echo SBR;
 	if(isset($_REQUEST['form'])){
-		echo SBR;
 		global $USER_DETAILS;
 
 		$groupid = get_request('groupid', 0);
@@ -269,18 +270,26 @@ include_once('include/page_header.php');
 		$frmHostG->show();
 	}
 	else{
-		$config = select_config();
+		$groups_wdgt = new CWidget();
 
-		$numrows = new CSpan(null, 'info');
-		$numrows->setAttribute('name', 'numrows');
-		$header = get_table_header(array(
-						S_HOST_GROUPS_BIG,
-						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-						S_FOUND.': ',
-						$numrows
-		));
-		show_table_header($header);
+		$numrows = new CDiv();
+		$numrows->setAttribute('name','numrows');
 
+		$groups_wdgt->addHeader(S_HOST_GROUPS_BIG);
+		$groups_wdgt->addHeader($numrows);
+
+// Host Groups table
+		$options = array('editable' => 1,
+						'extendoutput' => 1,
+						'select_hosts' => 1,
+						'sortfield' => getPageSortField('name'),
+						'sortorder' => getPageSortOrder(),
+						'limit' => ($config['search_limit']+1)
+					);
+
+		$groups = CHostGroup::get($options);
+		
+		
 		$form = new CForm('hostgroups.php');
 		$form->setName('form_groups');
 
@@ -292,15 +301,14 @@ include_once('include/page_header.php');
 					S_MEMBERS
 				));
 
-		$options = array('order'=> 'name',
-						'editable' => 1,
-						'extendoutput' => 1,
-						'select_hosts' => 1,
-						'sortfield' => getPageSortField('name'),
-						'sortorder' => getPageSortOrder()
-					);
+// sorting
+		order_page_result($groups, getPageSortField('name'), getPageSortOrder());
 
-		$groups = CHostGroup::get($options);
+// PAGING UPPER
+		$paging = getPagingLine($groups);
+		$groups_wdgt->addItem($paging);
+//---------
+
 		foreach($groups as $groupid => $group){
 			$tpl_count = 0;
 			$host_count = 0;
@@ -352,7 +360,10 @@ include_once('include/page_header.php');
 			));
 		}
 
-		$row_count = $table->getNumRows();
+// PAGING FOOTER
+		$table->addRow(new CCol($paging));
+//		$items_wdgt->addItem($paging);
+//---------
 
 //----- GO ------
 		$goBox = new CComboBox('go');
@@ -369,9 +380,9 @@ include_once('include/page_header.php');
 //----
 
 		$form->addItem($table);
-		$form->show();
 
-		zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
+		$groups_wdgt->addItem($form);
+		$groups_wdgt->show();
 	}
 
 include_once('include/page_footer.php');

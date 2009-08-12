@@ -265,12 +265,12 @@ include_once('include/page_header.php');
 		if(infavorites('web.favorite.screenids',$elementid,'slideshowid')){
 			$icon = new CDiv(SPACE,'iconminus');
 			$icon->setAttribute('title',S_REMOVE_FROM.' '.S_FAVOURITES);
-			$icon->addAction('onclick',new CScript("javascript: rm4favorites('slideshowid','".$elementid."',0);"));
+			$icon->addAction('onclick',new CJSscript("javascript: rm4favorites('slideshowid','".$elementid."',0);"));
 		}
 		else{
 			$icon = new CDiv(SPACE,'iconplus');
 			$icon->setAttribute('title',S_ADD_TO.' '.S_FAVOURITES);
-			$icon->addAction('onclick',new CScript("javascript: add2favorites('slideshowid','".$elementid."');"));
+			$icon->addAction('onclick',new CJSscript("javascript: add2favorites('slideshowid','".$elementid."');"));
 		}
 		$icon->setAttribute('id','addrm_fav');
 
@@ -279,7 +279,7 @@ include_once('include/page_header.php');
 
 		$fs_icon = new CDiv(SPACE,'fullscreen');
 		$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-		$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+		$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
 	}
 
 	$menu = array();
@@ -333,7 +333,7 @@ include_once('include/page_header.php');
 		$element = new CSpan(S_LOADING_P,'textcolorstyles');
 	}
 
-	$slides_wdgt->addHeader($text, array($icon,$refresh_icon,$fs_icon));
+	$slides_wdgt->addPageHeader($text, array($icon,$refresh_icon,$fs_icon));
 	$slides_wdgt->addHeader($slide_name, $form);
 
 	$slides_wdgt->additem($element);
