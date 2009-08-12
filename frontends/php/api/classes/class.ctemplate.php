@@ -41,28 +41,30 @@ class CTemplate {
 			'limit' => null);
 
 		$def_options = array(
-			'nodeids'			=> 0,
-			'groupids'			=> 0,
-			'templateids'		=> 0,
-			'hostids'			=> 0,
-			'graphids'			=> 0,
-			'itemids'			=> 0,
-			'with_items'		=> 0,
-			'with_triggers'		=> 0,
-			'with_graphs'		=> 0,
-			'editable' 			=> 0,
-			'nopermissions'		=> 0,
+			'nodeids'					=> null,
+			'groupids'					=> null,
+			'templateids'				=> null,
+			'hostids'					=> null,
+			'graphids'					=> null,
+			'itemids'					=> null,
+			'with_items'				=> null,
+			'with_triggers'				=> null,
+			'with_graphs'				=> null,
+			'editable' 					=> null,
+			'nopermissions'				=> null,
 // OutPut
-			'extendoutput'		=> 0,
-			'select_hosts'		=> 0,
-			'select_templates'	=> 0,
-			'select_items'		=> 0,
-			'select_triggers'	=> 0,
-			'select_graphs'		=> 0,
-			'count'				=> 0,
-			'pattern'			=> '',
-			'order'				=> '',
-			'limit'				=> 0);
+			'extendoutput'				=> null,
+			'select_hosts'				=> null,
+			'select_templates'			=> null,
+			'select_items'				=> null,
+			'select_triggers'			=> null,
+			'select_graphs'				=> null,
+			'count'						=> null,
+			'pattern'					=> '',
+			'sortfield'					=> '',
+			'sortorder'					=> '',
+			'limit'						=> null
+		);
 
 		$options = array_merge($def_options, $options);
 
@@ -98,34 +100,39 @@ class CTemplate {
 		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
 
 // groupids
-		if($options['groupids'] != 0){
+		if(!is_null($options['groupids'])){
 			zbx_value2array($options['groupids']);
+			
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sql_parts['where']['hgh'] = 'hg.hostid=h.hostid';
 		}
 
 // templateids
-		if($options['templateids'] != 0){
+		if(!is_null($options['templateids'])){
 			zbx_value2array($options['templateids']);
+			
 			$sql_parts['where'][] = DBcondition('h.hostid', $options['templateids']);
 		}
 
 // hostids
-		if($options['hostids'] != 0){
+		if(!is_null($options['hostids'])){
 			zbx_value2array($options['hostids']);
+			
 			if($options['extendoutput']){
 				$sql_parts['select']['linked_hostid'] = 'ht.hostid as linked_hostid';
 			}
+			
 			$sql_parts['from']['ht'] = 'hosts_templates ht';
 			$sql_parts['where'][] = DBcondition('ht.hostid', $options['hostids']);
 			$sql_parts['where']['hht'] = 'h.hostid=ht.templateid';
 		}
 
 // itemids
-		if($options['itemids'] != 0){
+		if(!is_null($options['itemids'])){
 			zbx_value2array($options['itemids']);
-			if($options['extendoutput'] != 0){
+			
+			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['itemid'] = 'i.itemid';
 			}
 
@@ -135,11 +142,13 @@ class CTemplate {
 		}
 
 // graphids
-		if($options['graphids'] != 0){
+		if(!is_null($options['graphids'])){
 			zbx_value2array($options['graphids']);
-			if($options['extendoutput']){
+			
+			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['graphid'] = 'gi.graphid';
 			}
+			
 			$sql_parts['from']['gi'] = 'graphs_items gi';
 			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['where'][] = DBcondition('gi.graphid', $options['graphids']);
@@ -148,12 +157,12 @@ class CTemplate {
 		}
 
 // with_items
-		if($options['with_items'] != 0){
+		if(!is_null($options['with_items'])){
 			$sql_parts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid )';
 		}
 
 // with_triggers
-		if($options['with_triggers'] != 0){
+		if(!is_null($options['with_triggers'])){
 			$sql_parts['where'][] = 'EXISTS(
 					SELECT i.itemid
 					FROM items i, functions f, triggers t
@@ -163,7 +172,7 @@ class CTemplate {
 		}
 
 // with_graphs
-		if($options['with_graphs'] != 0){
+		if(!is_null($options['with_graphs'])){
 			$sql_parts['where'][] = 'EXISTS(
 					SELECT DISTINCT i.itemid
 					FROM items i, graphs_items gi
@@ -172,17 +181,13 @@ class CTemplate {
 		}
 
 // extendoutput
-		if($options['extendoutput'] != 0){
+		if(!is_null($options['extendoutput'])){
 			$sql_parts['select']['templates'] = 'h.*';
 		}
 
 // count
-		if($options['count'] != 0){
-			$options['select_hosts'] = 0;
-			$options['select_templates'] = 0;
-			$options['select_items'] = 0;
-			$options['select_triggers'] = 0;
-			$options['select_graphs'] = 0;
+		if(!is_null($options['count'])){
+			$options['sortfield'] = '';
 
 			$sql_parts['select']['templates'] = 'count(h.hostid) as rowscount';
 		}
@@ -193,11 +198,16 @@ class CTemplate {
 		}
 
 // order
-		// restrict not allowed columns for sorting
-		$options['order'] = in_array($options['order'], $sort_columns) ? $options['order'] : '';
-		if(!zbx_empty($options['order'])){
-			$sql_parts['order'][] = 'h.'.$options['order'];
-			if(!str_in_array('h.'.$options['order'], $sql_parts['select'])) $sql_parts['select'][] = 'h.'.$options['order'];
+// restrict not allowed columns for sorting
+		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
+		if(!zbx_empty($options['sortfield'])){
+			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
+
+			$sql_parts['order'][] = 'h.'.$options['sortfield'].' '.$sortorder;
+
+			if(!str_in_array('h.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('h.*', $sql_parts['select'])){
+				$sql_parts['select'][] = 'h.'.$options['sortfield'];
+			}
 		}
 
 // limit
@@ -236,7 +246,7 @@ class CTemplate {
 			else{
 				$templateids[$template['hostid']] = $template['hostid'];
 
-				if(!isset($options['extendoutput'])){
+				if(is_null($options['extendoutput'])){
 					$result[$template['hostid']] = $template['hostid'];
 				}
 				else{
@@ -303,8 +313,9 @@ class CTemplate {
 
 		}
 
-// Adding Objects
+		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
 
+// Adding Objects
 // Adding Templates
 		if($options['select_templates']){
 			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids);

@@ -19,15 +19,15 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/hosts.inc.php";
-	require_once "include/forms.inc.php";
+require_once('include/config.inc.php');
+require_once('include/hosts.inc.php');
+require_once('include/forms.inc.php');
 
-	$page["title"] = "S_HOST_PROFILES";
-	$page["file"] = "hostprofiles.php";
-	$page['hist_arg'] = array('groupid','hostid');
+$page['title'] = "S_HOST_PROFILES";
+$page['file'] = 'hostprofiles.php';
+$page['hist_arg'] = array('groupid','hostid');
 
-include_once "include/page_header.php";
+include_once('include/page_header.php');
 
 ?>
 <?php
@@ -37,13 +37,16 @@ include_once "include/page_header.php";
 		'hostid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
 		'prof_type'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	null,	NULL),
 	);
+	
 	check_fields($fields);
 	validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
-
+?>
+<?php
 	$reset_hostid = (isset($_REQUEST['hostid'])) ? false : true;
 
 	$params = array();
 	$options = array('allow_all_hosts','real_hosts');
+
 	if(!$ZBX_WITH_ALL_NODES)	array_push($options,'only_current_node');
 	foreach($options as $option) $params[$option] = 1;
 
@@ -51,27 +54,12 @@ include_once "include/page_header.php";
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
 	validate_group($PAGE_GROUPS, $PAGE_HOSTS, $reset_hostid);
 
+
+// Host profiles Table
+	$hostprof_wdgt = new CWidget();
+
 	$r_form = new CForm();
 	$r_form->setMethod('get');
-
-/// +++ create "Host Groups" combobox +++ ///
-	$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
-	$cmbGroups->addItem(0, S_ALL_S);
-
-	//select groups where hosts with profiles exists
-	$sql = 'SELECT hg.groupid, g.name '.
-			' FROM hosts_profiles p, hosts_profiles_ext pe, hosts_groups hg, groups g'.
-			' WHERE (hg.hostid=p.hostid OR hg.hostid=pe.hostid) '.
-				' AND g.groupid=hg.groupid '.
-				' AND '.DBcondition('hg.groupid', $PAGE_GROUPS['groupids']).
-			' GROUP BY hg.groupid';
-
-			$result = DBselect($sql);
-	while($row = DBfetch($result)) {
-		$cmbGroups->addItem($row['groupid'], get_node_name_by_elid($row['groupid']).$row['name']);
-	}
-	$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
-/// --- --- ///
 
 /// +++ find out what type of profile selected group hosts contains	+++ ///
 /// if they contain only one type profile, combobox with Profile types won't appear ///
@@ -115,21 +103,45 @@ include_once "include/page_header.php";
 	}
 /// --- --- ///
 
-	show_table_header(S_HOST_PROFILES_BIG, $r_form);
-?>
+	$hostprof_wdgt->addPageHeader(S_HOST_PROFILES_BIG, $r_form);
 
-<?php
 	if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0)){
 		echo SBR;
 
 		if($prof_type){
-			insert_host_profile_ext_form();
+			$hostprof_wdgt->addItem(insert_host_profile_ext_form());
 		}
 		else{
-			insert_host_profile_form();
+			$hostprof_wdgt->addItem(insert_host_profile_form());
 		}
 	}
 	else{
+
+		$r_form = new CForm();
+		$r_form->setMethod('get');
+	
+		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
+		$cmbGroups->addItem(0, S_ALL_S);
+	
+		$sql = 'SELECT hg.groupid, g.name '.
+				' FROM hosts_profiles p, hosts_profiles_ext pe, hosts_groups hg, groups g'.
+				' WHERE (hg.hostid=p.hostid OR hg.hostid=pe.hostid) '.
+					' AND g.groupid=hg.groupid '.
+					' AND '.DBcondition('hg.groupid', $PAGE_GROUPS['groupids']).
+				' GROUP BY hg.groupid';
+		$result = DBselect($sql);
+		while($row = DBfetch($result)) {
+			$cmbGroups->addItem($row['groupid'], get_node_name_by_elid($row['groupid']).$row['name']);
+		}
+	
+		$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
+	
+		$numrows = new CDiv();
+		$numrows->setAttribute('name','numrows');
+
+		$hostprof_wdgt->addHeader(S_HOSTS_BIG, $r_form);
+//		$hostprof_wdgt->addHeader($numrows);
+		
 		$table = new CTableInfo();
 		if($prof_type){
 			$table->setHeader(array(
@@ -146,6 +158,7 @@ include_once "include/page_header.php";
 			if($_REQUEST['groupid'] > 0){
 				$sql_where = ' AND hg.groupid='.$_REQUEST['groupid'];
 			}
+			
 			$sql='SELECT DISTINCT g.name, h.hostid,h.host,hpe.device_os_short,hpe.device_hw_arch,hpe.device_type,hpe.device_status'.
 				' FROM hosts h,hosts_profiles_ext hpe,hosts_groups hg,groups g '.
 				' WHERE h.hostid=hpe.hostid '.
@@ -156,14 +169,14 @@ include_once "include/page_header.php";
 				order_by('h.host,h.hostid,g.name,hpe.device_os_short,hpe.device_hw_arch,hpe.device_type,hpe.device_status');
 			$result=DBselect($sql);
 			while($row=DBfetch($result)){
-				$table->AddRow(array(
+				$table->addRow(array(
 					get_node_name_by_elid($row['hostid']),
-					new CLink($row["host"],"?hostid=".$row["hostid"].url_param("groupid").'&prof_type='.$prof_type,"action"),
-					($_REQUEST["groupid"] > 0)?null:$row["name"],
-					$row["device_os_short"],
-					$row["device_hw_arch"],
-					$row["device_type"],
-					$row["device_status"]
+					new CLink($row['host'],'?hostid='.$row['hostid'].url_param('groupid').'&prof_type='.$prof_type),
+					($_REQUEST['groupid'] > 0)?null:$row['name'],
+					$row['device_os_short'],
+					$row['device_hw_arch'],
+					$row['device_type'],
+					$row['device_status']
 				));
 			}
 
@@ -193,19 +206,25 @@ include_once "include/page_header.php";
 				order_by('h.host,h.hostid,p.name,p.os,p.serialno,p.tag,p.macaddress');
 			$result=DBselect($sql);
 			while($row=DBfetch($result)){
-				$table->AddRow(array(
+				$table->addRow(array(
 					get_node_name_by_elid($row['hostid']),
-					new CLink($row["host"],'?hostid='.$row['hostid'].url_param('groupid').'&prof_type='.$prof_type,"action"),
-					$row["name"],
-					$row["os"],
-					$row["serialno"],
-					$row["tag"],
-					$row["macaddress"]
+					new CLink($row['host'],'?hostid='.$row['hostid'].url_param('groupid').'&prof_type='.$prof_type),
+					$row['name'],
+					$row['os'],
+					$row['serialno'],
+					$row['tag'],
+					$row['macaddress']
 				));
 			}
 		}
-		$table->show();
+		
+		$hostprof_wdgt->addItem($table);
 	}
 
-include_once "include/page_footer.php";
+	$hostprof_wdgt->show();
+?>
+<?php
+
+include_once('include/page_footer.php');
+
 ?>

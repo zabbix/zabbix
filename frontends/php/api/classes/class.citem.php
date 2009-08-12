@@ -53,25 +53,25 @@ class CItem {
 			'limit' => null);
 
 		$def_options = array(
-			'nodeids'				=> 0,
-			'groupids'				=> 0,
-			'hostids'				=> 0,
-			'itemids'				=> 0,
-			'graphids'				=> 0,
-			'triggerids'			=> 0,
-			'applicationids'		=> 0,
-			'templated_items'		=> 0,
-			'editable'				=> 0,
-			'nopermissions'			=> 0,
+			'nodeids'				=> null,
+			'groupids'				=> null,
+			'hostids'				=> null,
+			'itemids'				=> null,
+			'graphids'				=> null,
+			'triggerids'			=> null,
+			'applicationids'		=> null,
+			'templated_items'		=> null,
+			'editable'				=> null,
+			'nopermissions'			=> null,
 // OutPut
-			'extendoutput'			=> 0,
-			'select_hosts'			=> 0,
-			'select_triggers'		=> 0,
-			'select_graphs'			=> 0,
-			'select_applications'	=> 0,
-			'count'					=> 0,
+			'extendoutput'			=> null,
+			'select_hosts'			=> null,
+			'select_triggers'		=> null,
+			'select_graphs'			=> null,
+			'select_applications'	=> null,
+			'count'					=> null,
 // filter
-			'filter'				=> 0,
+			'filter'				=> null,
 
 			'group'					=> null,
 			'host'					=> null,
@@ -91,8 +91,8 @@ class CItem {
 			'pattern'				=> null,
 			'sortfield'				=> '',
 			'sortorder'				=> '',
-			'limit'					=> 0,
-			'order'					=> '');
+			'limit'					=> null
+		);
 
 		$options = array_merge($def_options, $options);
 
@@ -128,10 +128,10 @@ class CItem {
 		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
 
 // groupids
-		if($options['groupids'] != 0){
+		if(!is_null($options['groupids'])){
 			zbx_value2array($options['groupids']);
 
-			if($options['extendoutput'] != 0){
+			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
 
@@ -141,10 +141,10 @@ class CItem {
 		}
 
 // hostids
-		if($options['hostids'] != 0){
+		if(!is_null($options['hostids'])){
 			zbx_value2array($options['hostids']);
 
-			if($options['extendoutput'] != 0){
+			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['hostid'] = 'i.hostid';
 			}
 
@@ -152,10 +152,10 @@ class CItem {
 		}
 
 // itemids
-		if($options['itemids'] != 0){
+		if(!is_null($options['itemids'])){
 			zbx_value2array($options['itemids']);
 
-			if($options['extendoutput'] != 0){
+			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['itemid'] = 'i.itemid';
 			}
 
@@ -163,10 +163,10 @@ class CItem {
 		}
 
 // triggerids
-		if($options['triggerids'] != 0){
+		if(!is_null($options['triggerids'])){
 			zbx_value2array($options['triggerids']);
 
-			if($options['extendoutput'] != 0){
+			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['triggerid'] = 'f.triggerid';
 			}
 
@@ -176,10 +176,10 @@ class CItem {
 		}
 
 // applicationids
-		if($options['applicationids'] != 0){
+		if(!is_null($options['applicationids'])){
 			zbx_value2array($options['applicationids']);
 
-			if($options['extendoutput'] != 0){
+			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['applicationid'] = 'a.applicationid';
 			}
 
@@ -189,10 +189,10 @@ class CItem {
 		}
 
 // graphids
-		if($options['graphids'] != 0){
+		if(!is_null($options['graphids'])){
 			zbx_value2array($options['graphids']);
 
-			if($options['extendoutput'] != 0){
+			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['graphid'] = 'gi.graphid';
 			}
 
@@ -202,30 +202,25 @@ class CItem {
 		}
 
 // templated_items
-		if($options['templated_items'] != 0){
+		if(!is_null($options['templated_items'])){
 			$sql_parts['where'][] = 'i.templateid<>0';
 		}
 
 // extendoutput
-		if($options['extendoutput'] != 0){
+		if(!is_null($options['extendoutput'])){
 			$sql_parts['select']['items'] = 'i.*';
 		}
 
-// count
-		if($options['count'] != 0){
-			$options['select_hosts'] = 0;
-			$options['select_triggers'] = 0;
-			$options['select_graphs'] = 0;
-			$options['sortfield'] = '';
-
-			$sql_parts['select'] = array('count(i.itemid) as rowscount');
+// pattern
+		if(!is_null($options['pattern'])){
+			$sql_parts['where'][] = ' UPPER(i.description) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
 		}
 
 // --- FILTER ---
-		if($options['filter'] != 0){
+		if(!is_null($options['filter'])){
 // group
 			if(!is_null($options['group'])){
-				if($options['extendoutput'] != 0){
+				if(!is_null($options['extendoutput'])){
 					$sql_parts['select']['name'] = 'g.name';
 				}
 
@@ -239,7 +234,7 @@ class CItem {
 
 // host
 			if(!is_null($options['host'])){
-				if($options['extendoutput'] != 0){
+				if(!is_null($options['extendoutput'])){
 					$sql_parts['select']['host'] = 'h.host';
 				}
 
@@ -250,7 +245,7 @@ class CItem {
 
 // application
 			if(!is_null($options['application'])){
-				if($options['extendoutput'] != 0){
+				if(!is_null($options['extendoutput'])){
 					$sql_parts['select']['application'] = 'a.name as application';
 				}
 
@@ -278,12 +273,12 @@ class CItem {
 			}
 
 // snmp oid
-			if(isset($_REQUEST['snmp_oid'])){
+			if(!is_null($options['snmp_oid'])){
 				$sql_parts['where'][] = 'i.snmp_oid='.zbx_dbstr($options['snmp_oid']);
 			}
 
 // snmp port
-			if(isset($_REQUEST['snmp_port'])){
+			if(!is_null($options['snmp_port'])){
 				$sql_parts['where'][] = 'i.snmp_port='.$options['snmp_port'];
 			}
 
@@ -307,15 +302,17 @@ class CItem {
 				$sql_parts['where'][] = 'i.history='.$options['history'];
 			}
 
-// pattern
-			if(!is_null($options['pattern'])){
-				$sql_parts['where'][] = ' UPPER(i.description) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
-			}
-
 // status
 			if(!is_null($options['status'])){
 				$sql_parts['where'][] = 'i.status='.$options['status'];
 			}
+		}
+
+// count
+		if(!is_null($options['count'])){
+			$options['sortfield'] = '';
+
+			$sql_parts['select'] = array('count(DISTINCT i.itemid) as rowscount');
 		}
 
 // order
@@ -334,9 +331,6 @@ class CItem {
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){
 			$sql_parts['limit'] = $options['limit'];
-		}
-		else if(!defined('ZBX_API_REQUEST')){
-			$sql_parts['limit'] = 1001;
 		}
 //----------
 
@@ -369,7 +363,7 @@ class CItem {
 			else{
 				$itemids[$item['itemid']] = $item['itemid'];
 
-				if($options['extendoutput'] == 0){
+				if(is_null($options['extendoutput'])){
 					$result[$item['itemid']] = $item['itemid'];
 				}
 				else{
@@ -430,8 +424,10 @@ class CItem {
 				}
 			}
 		}
-// Adding Objects
 
+		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
+
+// Adding Objects
 // Adding hosts
 		if($options['select_hosts']){
 			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids, 'nopermissions' => 1);

@@ -584,8 +584,16 @@ return false;
 
 
 /************************************************************************************/
-/*					Pages stuff					*/
+/*									Pages stuff										*/
 /************************************************************************************/
+function openPage(start){
+	var lnk = new Curl(location.href); 
+	lnk.setArgument('start', start);
+	location.href = lnk.getUrl();
+	
+return false;
+}
+
 function ScaleChartToParenElement(obj_name){
 	var obj = document.getElementsByName(obj_name);
 
@@ -597,7 +605,10 @@ function ScaleChartToParenElement(obj_name){
 }
 
 function insert_in_element(element_name, text){
-	var elems = document.getElementsByName(element_name);
+	if(IE8)
+		var elems = $$('div[name='+element_name+']');
+	else
+		var elems = document.getElementsByName(element_name);
 
 	for(var key=0; key < elems.length; key++){
 		if((typeof(elems[key]) != 'undefined') && !is_null(elems[key])){

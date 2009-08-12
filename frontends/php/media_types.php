@@ -19,15 +19,15 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/media.inc.php";
-	require_once "include/forms.inc.php";
+require_once('include/config.inc.php');
+require_once('include/media.inc.php');
+require_once('include/forms.inc.php');
 
-	$page["title"] = "S_MEDIA_TYPES";
-	$page["file"] = "media_types.php";
-	$page['hist_arg'] = array('form','mediatypeid');
+$page['title'] = "S_MEDIA_TYPES";
+$page['file'] = "media_types.php";
+$page['hist_arg'] = array('form','mediatypeid');
 
-include_once "include/page_header.php";
+include_once('include/page_header.php');
 
 ?>
 <?php
@@ -36,24 +36,24 @@ include_once "include/page_header.php";
 
 // media form
 		'media_types'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-		"mediatypeid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,'(isset({form})&&({form}=="update"))'),
-		"type"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN(implode(',',array(MEDIA_TYPE_EMAIL,MEDIA_TYPE_EXEC,MEDIA_TYPE_SMS,MEDIA_TYPE_JABBER))),'(isset({save}))'),
-		"description"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'(isset({save}))'),
-		"smtp_server"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_EMAIL.')&&isset({save})'),
-		"smtp_helo"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_EMAIL.')&&isset({save})'),
-		"smtp_email"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_EMAIL.')&&isset({save})'),
-		"exec_path"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_EXEC.')&&isset({save})'),
-		"gsm_modem"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_SMS.')&&isset({save})'),
-		"username"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'(isset({type})&&{type}=='.MEDIA_TYPE_JABBER.')&&isset({save})'),
-		"password"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_JABBER.')&&isset({save})'),
+		'mediatypeid'=>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,'(isset({form})&&({form}=="update"))'),
+		'type'=>		array(T_ZBX_INT, O_OPT,	NULL,	IN(implode(',',array(MEDIA_TYPE_EMAIL,MEDIA_TYPE_EXEC,MEDIA_TYPE_SMS,MEDIA_TYPE_JABBER))),'(isset({save}))'),
+		'description'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'(isset({save}))'),
+		'smtp_server'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_EMAIL.')&&isset({save})'),
+		'smtp_helo'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_EMAIL.')&&isset({save})'),
+		'smtp_email'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_EMAIL.')&&isset({save})'),
+		'exec_path'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_EXEC.')&&isset({save})'),
+		'gsm_modem'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_SMS.')&&isset({save})'),
+		'username'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'(isset({type})&&{type}=='.MEDIA_TYPE_JABBER.')&&isset({save})'),
+		'password'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,'isset({type})&&({type}=='.MEDIA_TYPE_JABBER.')&&isset({save})'),
 /* actions */
-		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
 /* other */
-		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
+		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
 
 	check_fields($fields);
@@ -65,14 +65,14 @@ include_once "include/page_header.php";
 	$_REQUEST['go'] = get_request('go', 'none');
 
 	$result = 0;
-	if(isset($_REQUEST["save"])){
-		if(isset($_REQUEST["mediatypeid"])){
+	if(isset($_REQUEST['save'])){
+		if(isset($_REQUEST['mediatypeid'])){
 /* UPDATE */
 /*			$action = AUDIT_ACTION_UPDATE;*/
-			$result=update_mediatype($_REQUEST["mediatypeid"],
-				$_REQUEST["type"],$_REQUEST["description"],get_request("smtp_server"),
-				get_request("smtp_helo"),get_request("smtp_email"),get_request("exec_path"),
-				get_request("gsm_modem"),get_request('username'),get_request('password'));
+			$result=update_mediatype($_REQUEST['mediatypeid'],
+				$_REQUEST['type'],$_REQUEST['description'],get_request('smtp_server'),
+				get_request('smtp_helo'),get_request('smtp_email'),get_request('exec_path'),
+				get_request('gsm_modem'),get_request('username'),get_request('password'));
 
 			show_messages($result, S_MEDIA_TYPE_UPDATED, S_MEDIA_TYPE_WAS_NOT_UPDATED);
 		}
@@ -80,28 +80,28 @@ include_once "include/page_header.php";
 /* ADD */
 /*			$action = AUDIT_ACTION_ADD;*/
 			$result=add_mediatype(
-				$_REQUEST["type"],$_REQUEST["description"],get_request("smtp_server"),
-				get_request("smtp_helo"),get_request("smtp_email"),get_request("exec_path"),
-				get_request("gsm_modem"),get_request('username'),get_request('password'));
+				$_REQUEST['type'],$_REQUEST['description'],get_request('smtp_server'),
+				get_request('smtp_helo'),get_request('smtp_email'),get_request('exec_path'),
+				get_request('gsm_modem'),get_request('username'),get_request('password'));
 
 			show_messages($result, S_ADDED_NEW_MEDIA_TYPE, S_NEW_MEDIA_TYPE_WAS_NOT_ADDED);
 		}
 		if($result){
 /*			add_audit($action,AUDIT_RESOURCE_MEDIA_TYPE,
-				"Media type [".$_REQUEST["description"]."]");
+				'Media type ['.$_REQUEST['description'].']');
 */
-			unset($_REQUEST["form"]);
+			unset($_REQUEST['form']);
 		}
 	}
-	elseif(isset($_REQUEST["delete"])&&isset($_REQUEST["mediatypeid"])){
-		$result=delete_mediatype($_REQUEST["mediatypeid"]);
+	elseif(isset($_REQUEST['delete'])&&isset($_REQUEST['mediatypeid'])){
+		$result=delete_mediatype($_REQUEST['mediatypeid']);
 		show_messages($result, S_MEDIA_TYPE_DELETED, S_MEDIA_TYPE_WAS_NOT_DELETED);
 		if($result)
 		{
 /*			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_MEDIA_TYPE,
-				"Media type [".$mediatype["description"]."]");
+				'Media type ['.$mediatype['description'].']');
 */
-			unset($_REQUEST["form"]);
+			unset($_REQUEST['form']);
 		}
 	}
 
@@ -117,38 +117,35 @@ include_once "include/page_header.php";
 		$result = DBend($result);
 
 		if($result){
-			unset($_REQUEST["form"]);
+			unset($_REQUEST['form']);
 		}
+
 		show_messages($result, S_MEDIA_TYPE_DELETED, S_MEDIA_TYPE_WAS_NOT_DELETED);
 	}
 ?>
 <?php
-
+	$medias_wdgt = new CWidget(); 
+	
 	$form = new CForm();
-	$form->SetMethod('get');
+	$form->setMethod('get');
 
-	$form->AddItem(new CButton("form",S_CREATE_MEDIA_TYPE));
-
-	if(isset($_REQUEST["form"])){
-		$header = get_table_header(S_CONFIGURATION_OF_MEDIA_TYPES_BIG);
-	}
-	else{
-		$numrows = new CSpan(null,'info');
-		$numrows->setAttribute('name','numrows');
-		$header = get_table_header(array(S_CONFIGURATION_OF_MEDIA_TYPES_BIG,
-					new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-					S_FOUND.': ',$numrows,)
-					);
-	}
-	show_table_header($header, $form);
+	$form->addItem(new CButton('form',S_CREATE_MEDIA_TYPE));
+	
+	$medias_wdgt->addPageHeader(S_CONFIGURATION_OF_MEDIA_TYPES_BIG, $form);
 
 ?>
 <?php
-	if(isset($_REQUEST["form"])){
-		echo SBR;
-		insert_media_type_form();
+	if(isset($_REQUEST['form'])){
+	
+		$medias_wdgt->addItem(insert_media_type_form());
 	}
 	else{
+		$numrows = new CDiv();
+		$numrows->setAttribute('name','numrows');
+
+		$medias_wdgt->addHeader(S_MEDIA_TYPES_BIG); 
+//		$medias_wdgt->addHeader($numrows); 
+
 		$form = new CForm();
 		$form->setName('frm_media_types');
 
@@ -160,28 +157,36 @@ include_once "include/page_header.php";
 			S_DETAILS
 		));
 
-		$result=DBselect('SELECT mt.* '.
-					' FROM media_type mt'.
-					' WHERE '.DBin_node('mt.mediatypeid').
-					order_by('mt.type,mt.description'));
-		while($row=DBfetch($result))
-		{
-			switch($row['type'])
-			{
+// sorting
+//		order_page_result($proxies, getPageSortField('description'), getPageSortOrder());
+
+// PAGING UPPER
+		$paging = BR();
+//		$paging = getPagingLine($proxies);
+		$medias_wdgt->addItem($paging);
+//---------
+
+		$sql = 'SELECT mt.* '.
+				' FROM media_type mt'.
+				' WHERE '.DBin_node('mt.mediatypeid').
+				order_by('mt.type,mt.description');
+		$result=DBselect($sql);
+		while($row=DBfetch($result)){
+			switch($row['type']){
 				case MEDIA_TYPE_EMAIL:
 					$details =
-						S_SMTP_SERVER.": '".$row['smtp_server']."', ".
-						S_SMTP_HELO.": '".$row['smtp_helo']."', ".
-						S_SMTP_EMAIL.": '".$row['smtp_email']."'";
+						S_SMTP_SERVER.': "'.$row['smtp_server'].'", '.
+						S_SMTP_HELO.': "'.$row['smtp_helo'].'", '.
+						S_SMTP_EMAIL.': "'.$row['smtp_email'].'"';
 					break;
 				case MEDIA_TYPE_EXEC:
-					$details = S_SCRIPT_NAME.": '".$row['exec_path']."'";
+					$details = S_SCRIPT_NAME.': "'.$row['exec_path'].'"';
 					break;
 				case MEDIA_TYPE_SMS:
-					$details = S_GSM_MODEM.": '".$row['gsm_modem']."'";
+					$details = S_GSM_MODEM.': "'.$row['gsm_modem'].'"';
 					break;
 				case MEDIA_TYPE_JABBER:
-					$details = S_JABBER_IDENTIFIER.": '".$row['username']."'";
+					$details = S_JABBER_IDENTIFIER.': "'.$row['username'].'"';
 					break;
 				default:
 					$details = '';
@@ -190,9 +195,14 @@ include_once "include/page_header.php";
 			$table->addRow(array(
 				new CCheckBox('media_types['.$row['mediatypeid'].']',NULL,NULL,$row['mediatypeid']),
 				media_type2str($row['type']),
-				new CLink($row["description"],"?&form=update&mediatypeid=".$row["mediatypeid"],'action'),
+				new CLink($row['description'],'?&form=update&mediatypeid='.$row['mediatypeid']),
 				$details));
 		}
+
+// PAGING FOOTER
+		$table->addRow(new CCol($paging));
+//		$items_wdgt->addItem($paging);
+//---------
 
 //----- GO ------
 		$goBox = new CComboBox('go');
@@ -206,15 +216,15 @@ include_once "include/page_header.php";
 		$table->setFooter(new CCol(array($goBox, $goButton)));
 
 		$form->addItem($table);
-		$form->show();
-		zbx_add_post_js('insert_in_element("numrows","'.$table->getNumRows().'");');
+
+		$medias_wdgt->addItem($form);
 	}
-
-
+	
+	$medias_wdgt->show();
 ?>
 
 <?php
 
-include_once "include/page_footer.php";
+include_once('include/page_footer.php');
 
 ?>

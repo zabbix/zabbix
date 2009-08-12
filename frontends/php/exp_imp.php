@@ -66,7 +66,7 @@ include_once('include/page_header.php');
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
+	validate_sort_and_sortorder('host',ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go','none');
 	$preview = ($_REQUEST['go'] == 'preview')?true:false;
@@ -278,7 +278,9 @@ include_once('include/page_header.php');
 			$table->showEnd();
 		}
 		else{
-	/* table HOSTS */
+/* table HOSTS */
+			$export_wdgt = new CWidget();	
+			
 			$form = new CForm(null,'post');
 			$form->setName('hosts');
 			$form->addVar('config',$config);
@@ -290,9 +292,13 @@ include_once('include/page_header.php');
 
 			$form->addItem(array(S_GROUP.SPACE, $cmbGroups));
 
-			show_table_header(S_HOSTS_BIG, $form);
+			$numrows = new CDiv();
+			$numrows->setAttribute('name','numrows');
 
-
+			$export_wdgt->addHeader(S_HOSTS_BIG, $form);
+			$export_wdgt->addHeader($numrows);
+			
+// export table
 			$form = new CForm(null,'post');
 			$form->setName('hosts_export');
 			$form->addVar('config',$config);
@@ -301,11 +307,11 @@ include_once('include/page_header.php');
 			$table = new CTableInfo(S_NO_HOSTS_DEFINED);
 			$table->setHeader(array(
 				new CCheckBox('all_hosts',true, "checkAll('".$form->getName()."','all_hosts','hosts');"),
-				make_sorting_link(S_NAME,'h.host'),
-				make_sorting_link(S_DNS,'h.dns'),
-				make_sorting_link(S_IP,'h.ip'),
-				make_sorting_link(S_PORT,'h.port'),
-				make_sorting_link(S_STATUS,'h.status'),
+				make_sorting_header(S_NAME,'host'),
+				make_sorting_header(S_DNS,'dns'),
+				make_sorting_header(S_IP,'ip'),
+				make_sorting_header(S_PORT,'port'),
+				make_sorting_header(S_STATUS,'status'),
 				array(	new CCheckBox("all_templates",true, "checkAll('".$form->getName()."','all_templates','templates');"),
 					S_TEMPLATES),
 				array(	new CCheckBox("all_items",true, "checkAll('".$form->getName()."','all_items','items');"),
@@ -382,6 +388,14 @@ include_once('include/page_header.php');
 				$hosts[$graphs['hostid']]['graphs_cnt'] = $graphs['cnt'];
 			}
 
+// sorting
+			order_page_result($hosts, getPageSortField('host'), getPageSortOrder());
+
+// PAGING UPPER
+			$paging = getPagingLine($hosts);
+			$export_wdgt->addItem($paging);
+//-------
+		
 			$count_chkbx = 0;
 			foreach($hosts as $hostid => $host){
 				$status = new CCol(host_status2str($host['status']),host_status2style($host['status']));
@@ -469,12 +483,17 @@ include_once('include/page_header.php');
 					));
 			}
 
-//----- GO ------
+// PAGING FOOTER
+			$table->addRow(new CCol($paging));
+//			$export_wdgt->addItem($paging);
+//---------
+
+// goBox
 			$goBox = new CComboBox('go');
 			$goBox->addItem('preview',S_PREVIEW);
 			$goBox->addItem('export',S_EXPORT);
 
-// goButton name is necessary!!!
+			// goButton name is necessary!!!
 			$goButton = new CButton('goButton',S_GO.' ('.$count_chkbx.')');
 			$goButton->setAttribute('id','goButton');
 			zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
@@ -483,10 +502,15 @@ include_once('include/page_header.php');
 //----
 
 			$form->addItem($table);
-			$form->show();
+
+			$export_wdgt->addItem($form);
+			$export_wdgt->show();
 		}
 	}
 
+?>
+<?php
 
-include_once "include/page_footer.php";
+include_once('include/page_footer.php');
+
 ?>

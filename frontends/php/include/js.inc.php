@@ -51,7 +51,7 @@ function zbx_add_post_js($script){
 
 function get_js_sizeable_graph($dom_graph_id,$url){
 
-return new CScript('
+return new CJSscript('
 	<script language="JavaScript" type="text/javascript">
 	<!--
 		A_SBOX["'.$dom_graph_id.'"] = new Object;
@@ -72,7 +72,7 @@ return new CScript('
 
 function get_dynamic_chart($dom_graph_id,$img_src,$width=0){
 	if(is_int($width) && $width > 0) $img_src.= url_param($width, false, 'width');
-	$result = new CScript('
+	$result = new CJSscript('
 		<script language="JavaScript" type="text/javascript">
 		<!--
 		var width = "'.((!(is_int($width) && $width > 0)) ? $width : '').'";

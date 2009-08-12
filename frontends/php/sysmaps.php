@@ -19,38 +19,41 @@
 **/
 ?>
 <?php
-	require_once 'include/config.inc.php';
-	require_once 'include/maps.inc.php';
-	require_once 'include/forms.inc.php';
+	require_once('include/config.inc.php');
+	require_once('include/maps.inc.php');
+	require_once('include/forms.inc.php');
 
 	$page['title'] = 'S_NETWORK_MAPS';
 	$page['file'] = 'sysmaps.php';
 	$page['hist_arg'] = array();
 
-include_once 'include/page_header.php';
+include_once('include/page_header.php');
 
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'maps'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+		'maps'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		'sysmapid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
-		'name'=>		array(T_ZBX_STR, O_OPT,	 NULL,	NOT_EMPTY,		'isset({save})'),
-		'width'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
-		'height'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
+		'name'=>			array(T_ZBX_STR, O_OPT,	 NULL,	NOT_EMPTY,		'isset({save})'),
+		'width'=>			array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
+		'height'=>			array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
 		'backgroundid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,			'isset({save})'),
 		'label_type'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,4),		'isset({save})'),
 		'label_location'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,3),		'isset({save})'),
+		
 /* Actions */
-		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS, NULL,	NULL),
-		'go'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
+		'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'delete'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS, NULL,	NULL),
+		'go'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
+		
 /* Form */
-		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		'form'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 
 	);
+
 	check_fields($fields);
 	validate_sort_and_sortorder('sm.name',ZBX_SORT_UP);
 
@@ -123,9 +126,9 @@ include_once 'include/page_header.php';
 ?>
 <?php
 	$form = new CForm();
-	$form->SetMethod('get');
+	$form->setMethod('get');
 
-	$form->AddItem(new CButton("form",S_CREATE_MAP));
+	$form->addItem(new CButton("form",S_CREATE_MAP));
 	show_table_header(S_CONFIGURATION_OF_NETWORK_MAPS, $form);
 	echo SBR;
 ?>
@@ -134,63 +137,77 @@ include_once 'include/page_header.php';
 		insert_map_form();
 	}
 	else{
+		$map_wdgt = new CWidget();
 
 		$form = new CForm();
 		$form->setName('frm_maps');
 
-		$numrows = new CSpan(null,'info');
+		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
-		$header = get_table_header(array(
-			S_MAPS_BIG,
-			new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-			S_FOUND.': ',$numrows));
 
-		show_table_header($header);
+		$map_wdgt->addHeader(S_MAPS_BIG);
+//		$map_wdgt->addHeader($numrows);
 
 		$table = new CTableInfo(S_NO_MAPS_DEFINED);
-		$table->SetHeader(array(
+		$table->setHeader(array(
 			new CCheckBox('all_maps',NULL,"checkAll('".$form->getName()."','all_maps','maps');"),
 			make_sorting_link(S_NAME,'sm.name'),
 			make_sorting_link(S_WIDTH,'sm.width'),
 			make_sorting_link(S_HEIGHT,'sm.height'),
 			S_MAP));
 
-		$result = DBselect('SELECT sm.sysmapid,sm.name,sm.width,sm.height '.
-						' FROM sysmaps sm'.
-						' WHERE '.DBin_node('sm.sysmapid').
-						order_by('sm.name,sm.width,sm.height','sm.sysmapid'));
+/* sorting
+		order_page_result($applications, getPageSortField('name'), getPageSortOrder());
 
+// PAGING UPPER
+		$paging = getPagingLine($applications);
+		$map_wdgt->addItem($paging);
+//-------*/
+		$map_wdgt->addItem(BR());
+
+		$sql = 'SELECT sm.sysmapid, sm.name, sm.width, sm.height '.
+				' FROM sysmaps sm '.
+				' WHERE '.DBin_node('sm.sysmapid').
+				order_by('sm.name,sm.width,sm.height','sm.sysmapid');
+		$result = DBselect($sql);
 		while($row=DBfetch($result)){
-			if(!sysmap_accessible($row["sysmapid"],PERM_READ_WRITE)) continue;
+			if(!sysmap_accessible($row['sysmapid'],PERM_READ_WRITE)) continue;
 
-			$table->AddRow(array(
+			$table->addRow(array(
 				new CCheckBox('maps['.$row['sysmapid'].']', NULL, NULL, $row['sysmapid']),
-				new CLink($row["name"], "sysmaps.php?form=update".
-					"&sysmapid=".$row["sysmapid"]."#form",'action'),
-				$row["width"],
-				$row["height"],
-				new CLink(S_EDIT,"sysmap.php?sysmapid=".$row["sysmapid"])
+				new CLink($row['name'], 'sysmaps.php?form=update&sysmapid='.$row['sysmapid'].'#form'),
+				$row['width'],
+				$row['height'],
+				new CLink(S_EDIT,'sysmap.php?sysmapid='.$row['sysmapid'])
 				));
 		}
 
-//----- GO ------
+// PAGING FOOTER
+//		$table->addRow(new CCol($paging));
+//		$map_wdgt->addItem($paging);
+//---------
+
+// goBox
 		$goBox = new CComboBox('go');
 		$goBox->addItem('delete', S_DELETE_SELECTED);
 
-// goButton name is necessary!!!
+		// goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO.' (0)');
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "maps";');
 
 		$table->setFooter(new CCol(array($goBox, $goButton)));
+//------
 
 		$form->addItem($table);
-		$form->show();
 
-		zbx_add_post_js('insert_in_element("numrows","'.$table->getNumRows().'");');
+		$map_wdgt->addItem($form);
+		$map_wdgt->show();
 	}
 
+?>
+<?php
 
-include_once "include/page_footer.php";
+include_once('include/page_footer.php');
 
 ?>

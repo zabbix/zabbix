@@ -96,7 +96,7 @@ include_once('include/page_header.php');
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('u.alias',ZBX_SORT_UP);
+	validate_sort_and_sortorder('name',ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go','none');
 ?>
@@ -351,19 +351,20 @@ include_once('include/page_header.php');
 		insert_usergroups_form();
 	}
 	else{
+		$usrgroup_wdgt = new CWidget();	
+		
+		$numrows = new CDiv();
+		$numrows->setAttribute('name','numrows');
 
-		$options = array('extendoutput' => 1, 'order' => 'name', 'select_users' => 1);
+		$usrgroup_wdgt->addHeader(S_USER_GROUPS_BIG);
+		$usrgroup_wdgt->addHeader($numrows);
+		
+// Groups table
+		$options = array('extendoutput' => 1,
+						 'select_users' => 1,
+						 'limit' => ($config['search_limit']+1)
+					);
 		$usrgrps = CUserGroup::get($options);
-
-		$numrows = count($usrgrps);
-		$header = get_table_header(array(
-			S_USER_GROUPS_BIG,
-			new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-			S_FOUND.': ',
-			new CSpan($numrows, 'info')
-		));
-		show_table_header($header);
-
 
 		$form = new CForm();
 		$form->setName('usrgrp_form');
@@ -371,7 +372,7 @@ include_once('include/page_header.php');
 		$table = new CTableInfo(S_NO_USER_GROUPS_DEFINED);
 		$table->setHeader(array(
 			new CCheckBox('all_groups',NULL, "checkAll('".$form->GetName()."','all_groups','group_groupid');"),
-			make_sorting_link(S_NAME,'ug.name'),
+			make_sorting_header(S_NAME,'name'),
 			'#',
 			S_MEMBERS,
 			S_USERS_STATUS,
@@ -379,6 +380,14 @@ include_once('include/page_header.php');
 			S_API_ACCESS,
 			S_DEBUG_MODE
 		));
+
+// sorting
+		order_page_result($usrgrps, getPageSortField('name'), getPageSortOrder());
+
+// PAGING UPPER
+		$paging = getPagingLine($usrgrps);
+		$usrgroup_wdgt->addItem($paging);
+//---------
 
 		foreach($usrgrps as $usrgrpid => $usrgrp){
 
@@ -409,7 +418,7 @@ include_once('include/page_header.php');
 
 			$users = array();
 			foreach($usrgrp['users'] as $userid => $user){
-				$users[] = new Clink($user['alias'],'usergrps.php?form=update&userid='.$userid);
+				$users[] = new Clink($user['alias'],'users.php?form=update&userid='.$userid);
 				$users[] = ', ';
 			}
 			array_pop($users);
@@ -427,7 +436,12 @@ include_once('include/page_header.php');
 			));
 		}
 
-/* <<<--- GO button --->>> */
+// PAGING FOOTER
+		$table->addRow(new CCol($paging));
+//		$items_wdgt->addItem($paging);
+//---------
+
+// goBox
 		$goBox = new CComboBox('go');
 		$goBox->addItem('enable_status',S_ENABLE_SELECTED);
 		$goBox->addItem('disable_status',S_DISABLE_SELECTED);
@@ -443,12 +457,16 @@ include_once('include/page_header.php');
 		zbx_add_post_js('chkbxRange.pageGoName = "group_groupid";');
 
 		$table->setFooter(new CCol(array($goBox, $goButton)));
-/* --->>> GO button <<<--- */
+//------
 
 		$form->addItem($table);
-		$form->show();
+		
+		$usrgroup_wdgt->addItem($form);
+		$usrgroup_wdgt->show();
 	}
+?>
+<?php
 
-include_once 'include/page_footer.php'
+include_once('include/page_footer.php');
 
 ?>

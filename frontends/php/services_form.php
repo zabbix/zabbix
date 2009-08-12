@@ -197,7 +197,7 @@ if(isset($_REQUEST['pservices'])){
 
 		$description = S_ROOT_SMALL;
 
-		$description = new CLink($description,'#','action');
+		$description = new CLink($description,'#');
 		$description->SetAction('javascript:
 				window.opener.document.forms[0].elements[\'parent_name\'].value = '.zbx_jsvalue(S_ROOT_SMALL).';
 				window.opener.document.forms[0].elements[\'parentname\'].value = '.zbx_jsvalue(S_ROOT_SMALL).';
@@ -234,8 +234,8 @@ if(isset($_REQUEST['pservices'])){
 
 		$description = $db_service_data["name"];
 
-		$description = new CLink($description,'#','action');
-		$description->SetAction('javascript:
+		$description = new CSpan($description,'link');
+		$description->setAction('javascript:
 						window.opener.document.forms[0].elements[\'parent_name\'].value = '.zbx_jsvalue($db_service_data["name"]).';
 						window.opener.document.forms[0].elements[\'parentname\'].value = '.zbx_jsvalue($db_service_data["name"]).';
 						window.opener.document.forms[0].elements[\'parentid\'].value = '.zbx_jsvalue($db_service_data["serviceid"]).';
@@ -308,7 +308,7 @@ if(isset($_REQUEST['cservices'])){
 			$trigger = expand_trigger_description($db_service_data["triggerid"]);
 		}
 
-		$description = new CLink($description,'#','action');
+		$description = new CLink($description,'#');
 		$description->SetAction('window.opener.add_child_service('.zbx_jsvalue($db_service_data["name"]).','.zbx_jsvalue($db_service_data["serviceid"]).','.zbx_jsvalue($trigger).','.zbx_jsvalue($db_service_data["triggerid"]).'); self.close(); return false;');
 
 		$table->AddRow(array(array($prefix,$description),algorithm2str($db_service_data["algorithm"]),$trigger));
@@ -331,8 +331,9 @@ if(isset($_REQUEST['cservices'])){
 //--------------------------------------------	<FORM>  --------------------------------------------
 if(isset($_REQUEST['sform'])){
 	$frmService = new CFormTable(S_SERVICE,'services_form.php','POST',null,'sform');
-	$frmService->SetHelp("web.services.service.php");
-	$frmService->SetTableClass('formlongtable');
+	$frmService->setHelp("web.services.service.php");
+	
+	$frmService->SetTableClass('formlongtable formtable');
 
 //service times
 	if(isset($_REQUEST["add_service_time"]) && isset($_REQUEST["new_service_time"])){
@@ -497,7 +498,7 @@ if(isset($_REQUEST['sform'])){
 		$prefix	 = null;
 		$trigger = '-';
 
-		$description = new CLink($child['name'],'services_form.php?sform=1&serviceid='.$child['serviceid'],'action');
+		$description = new CLink($child['name'],'services_form.php?sform=1&serviceid='.$child['serviceid']);
 
 		if(isset($child['triggerid']) && !empty($child['triggerid'])){
 			$trigger = expand_trigger_description($child['triggerid']);
@@ -620,7 +621,7 @@ if(isset($_REQUEST['sform'])){
 
 
 
-		$script = new CScript("javascript: if(CLNDR['downtime_since'].clndr.setSDateFromOuterObj()){".
+		$script = new CJSscript("javascript: if(CLNDR['downtime_since'].clndr.setSDateFromOuterObj()){".
 								"$('new_service_time[from]').value = parseInt(CLNDR['downtime_since'].clndr.sdt.getTime()/1000);}".
 							"if(CLNDR['downtime_till'].clndr.setSDateFromOuterObj()){".
 								"$('new_service_time[to]').value = parseInt(CLNDR['downtime_till'].clndr.sdt.getTime()/1000);}"

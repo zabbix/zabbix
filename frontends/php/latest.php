@@ -127,9 +127,9 @@ include_once 'include/page_header.php';
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
 
-	$latest_wdgt->addHeader(S_LATEST_DATA_BIG,$fs_icon);
+	$latest_wdgt->addPageHeader(S_LATEST_DATA_BIG,$fs_icon);
 
 // 2nd header
 	$r_form = new CForm();
@@ -154,7 +154,7 @@ include_once 'include/page_header.php';
 	$r_form->addItem(array(S_GROUP.SPACE,$cmbGroup));
 	$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 
-	$latest_wdgt->addHeader(SPACE,$r_form);
+	$latest_wdgt->addHeader(S_ITEMS_BIG,$r_form);
 //	show_table_header(S_LATEST_DATA_BIG,$r_form);
 //-------------
 
@@ -316,10 +316,10 @@ include_once 'include/page_header.php';
 		}
 
 		if(($db_item['value_type']==ITEM_VALUE_TYPE_FLOAT) || ($db_item['value_type']==ITEM_VALUE_TYPE_UINT64)){
-			$actions=new CLink(S_GRAPH,'history.php?action=showgraph&itemid='.$db_item['itemid'],'action');
+			$actions = new CLink(S_GRAPH,'history.php?action=showgraph&itemid='.$db_item['itemid']);
 		}
 		else{
-			$actions=new CLink(S_HISTORY,'history.php?action=showvalues&period=3600&itemid='.$db_item['itemid'],'action');
+			$actions = new CLink(S_HISTORY,'history.php?action=showvalues&period=3600&itemid='.$db_item['itemid']);
 		}
 
 		$item_status = $db_item['status']==3?'unknown': null;
@@ -448,10 +448,10 @@ include_once 'include/page_header.php';
 		}
 
 		if(($db_item['value_type']==ITEM_VALUE_TYPE_FLOAT) || ($db_item['value_type']==ITEM_VALUE_TYPE_UINT64)){
-			$actions=new CLink(S_GRAPH,'history.php?action=showgraph&itemid='.$db_item['itemid'],'action');
+			$actions=new CLink(S_GRAPH,'history.php?action=showgraph&itemid='.$db_item['itemid']);
 		}
 		else{
-			$actions=new CLink(S_HISTORY,'history.php?action=showvalues&period=3600&itemid='.$db_item['itemid'],'action');
+			$actions=new CLink(S_HISTORY,'history.php?action=showvalues&period=3600&itemid='.$db_item['itemid']);
 		}
 
 		array_push($app_rows, new CRow(array(

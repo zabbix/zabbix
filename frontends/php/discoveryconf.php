@@ -197,7 +197,13 @@ include_once('include/page_header.php');
 		insert_drule_form();
 	}
 	else{
-		show_table_header(S_DISCOVERY_BIG);
+		$dscry_wdgt = new CWidget();
+		
+		$numrows = new CDiv();
+		$numrows->setAttribute('name','numrows');
+
+		$dscry_wdgt->addHeader(S_DISCOVERY_BIG);
+//		$dscry_wdgt->addHeader($numrows);
 /* table */
 		$form = new CForm();
 		$form->setName('frmdrules');
@@ -211,11 +217,20 @@ include_once('include/page_header.php');
 			S_CHECKS,
 			S_STATUS));
 
-		$db_rules = DBselect('SELECT d.* '.
-						' FROM drules d'.
-						' WHERE '.DBin_node('druleid').
-						order_by('d.name,d.iprange,d.delay','d.druleid'));
+/* sorting
+		order_page_result($applications, getPageSortField('name'), getPageSortOrder());
 
+// PAGING UPPER
+		$paging = getPagingLine($applications);
+		$dscry_wdgt->addItem($paging);
+//-------*/
+		$dscry_wdgt->addItem(BR());
+		
+		$sql = 'SELECT d.* '.
+				' FROM drules d'.
+				' WHERE '.DBin_node('druleid').
+				order_by('d.name,d.iprange,d.delay','d.druleid');
+		$db_rules = DBselect($sql);
 		while($rule_data = DBfetch($db_rules)){
 			$cheks = array();
 			$db_checks = DBselect("select type from dchecks where druleid=".$rule_data["druleid"].
@@ -249,13 +264,18 @@ include_once('include/page_header.php');
 				));
 		}
 
-//----- GO ------
+// PAGING FOOTER
+//		$table->addRow(new CCol($paging));
+//		$dscry_wdgt->addItem($paging);
+//---------
+
+// gobox
 		$goBox = new CComboBox('go');
 		$goBox->addItem('activate',S_ENABLE_SELECTED);
 		$goBox->addItem('disable',S_DISABLE_SELECTED);
 		$goBox->addItem('delete',S_DELETE_SELECTED);
 
-// goButton name is necessary!!!
+		// goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO.' (0)');
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "g_druleid";');
@@ -264,11 +284,13 @@ include_once('include/page_header.php');
 //----
 
 		$form->addItem($tblDiscovery);
-		$form->Show();
+
+		$dscry_wdgt->addItem($form);
+		$dscry_wdgt->show();
 	}
 ?>
 <?php
 
-	include_once "include/page_footer.php";
+include_once('include/page_footer.php');
 
 ?>

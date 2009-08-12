@@ -112,7 +112,6 @@ include_once 'include/page_header.php';
 
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
-//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
 
 	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
 //SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
@@ -127,6 +126,7 @@ include_once 'include/page_header.php';
 	}
 	else{
 		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
+
 		if($PAGE_HOSTS['selected'] != 0)
 			$PAGE_HOSTS['hostids'] = $available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 		else
@@ -135,16 +135,7 @@ include_once 'include/page_header.php';
 
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY,$available_hosts);
 
-	$r_form = new CForm();
-	$r_form->setMethod('get');
-
-	$cmbConf = new CComboBox('config',$config,'submit()');
-	$cmbConf->addItem(0,S_BY_HOST);
-	$cmbConf->addItem(1,S_BY_TRIGGER_TEMPLATE);
-
-	$r_form->addItem(array(S_MODE.SPACE,$cmbConf,SPACE));
-
-	$rep2_wdgt->addHeader(S_AVAILABILITY_REPORT_BIG, $r_form);
+	$rep2_wdgt->addPageHeader(S_AVAILABILITY_REPORT_BIG);
 //	show_report2_header($config, $PAGE_GROUPS, $PAGE_HOSTS);
 
 	if(isset($_REQUEST['triggerid'])){
@@ -165,10 +156,10 @@ include_once 'include/page_header.php';
 
 	if(isset($_REQUEST['triggerid'])){
 		$rep2_wdgt->addHeader(array(
-									new CLink($trigger_data['host'],'?hostid='.$trigger_data['hostid']),
-									' : "',
-									expand_trigger_description_by_data($trigger_data),
-									'"'),
+									new CLink($trigger_data['host'],'?filter_groupid='.$_REQUEST['groupid'].'&filter_hostid='.$_REQUEST['hostid']),
+									' : ',
+									expand_trigger_description_by_data($trigger_data)
+								),
 								SPACE);
 
 		$table = new CTableInfo(null,'graph');
@@ -178,6 +169,18 @@ include_once 'include/page_header.php';
 		$rep2_wdgt->show();
 	}
 	else if(isset($_REQUEST['hostid'])){
+
+		$r_form = new CForm();
+		$r_form->setMethod('get');
+	
+		$cmbConf = new CComboBox('config',$config,'submit()');
+		$cmbConf->addItem(0,S_BY_HOST);
+		$cmbConf->addItem(1,S_BY_TRIGGER_TEMPLATE);
+	
+		$r_form->addItem($cmbConf);
+
+		$rep2_wdgt->addHeader(S_REPORT_BIG, array(S_MODE.SPACE,$r_form));
+		$rep2_wdgt->addItem(BR());
 
 // FILTER
 		$filterForm = get_report2_filter($config, $PAGE_GROUPS, $PAGE_HOSTS);
@@ -238,14 +241,12 @@ include_once 'include/page_header.php';
 			$true	= new CSpan(sprintf("%.4f%%",$availability['true']), 'on');
 			$false	= new CSpan(sprintf("%.4f%%",$availability['false']), 'off');
 			$unknown= new CSpan(sprintf("%.4f%%",$availability['unknown']), 'unknown');
-			$actions= new CLink(S_SHOW,'report2.php?hostid='.$_REQUEST['hostid'].'&triggerid='.$row['triggerid'],'action');
+			$actions= new CLink(S_SHOW,'report2.php?filter_groupid='.$_REQUEST['groupid'].'&filter_hostid='.$_REQUEST['hostid'].'&triggerid='.$row['triggerid']);
 
 			$table->addRow(array(
 				get_node_name_by_elid($row['hostid']),
 				(($_REQUEST['hostid'] == 0) || (1 == $config))?$row['host']:NULL,
-				new CLink(
-					expand_trigger_description_by_data($row),
-					'events.php?triggerid='.$row['triggerid'],'action'),
+				new CLink(expand_trigger_description_by_data($row),'events.php?triggerid='.$row['triggerid']),
 				$true,
 				$false,
 				$unknown,

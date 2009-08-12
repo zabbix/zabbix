@@ -143,7 +143,7 @@
 
 			return array(
 				new CTag('div', 'yes', (file_exists($LICENCE_FILE) ?
-					new CScript(nl2br(nbsp(htmlspecialchars(file_get_contents($LICENCE_FILE))))) :
+					new CJSscript(nl2br(nbsp(htmlspecialchars(file_get_contents($LICENCE_FILE))))) :
 					'Missing licence file. See GPL licence.')
 				, 'licence'),
 				BR(),
@@ -231,7 +231,7 @@
 				$this->get_test_result(
 					$final_result,
 					'PHP Databases support: ',
-					new CScript(implode(SBR, $ZBX_CONFIG['allowed_db'])),
+					new CJSscript(implode(SBR, $ZBX_CONFIG['allowed_db'])),
 					!isset($ZBX_CONFIG['allowed_db']['no']),
 					'Requires any database support [MySQL or PostgreSQL or Oracle]'));
 

@@ -81,7 +81,7 @@ include_once "include/page_header.php";
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->AddAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+	$fs_icon->AddAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
 
 	$icon_tab = new CTable();
 	$icon_tab->AddRow(array($fs_icon,SPACE,$text));

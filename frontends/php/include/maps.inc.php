@@ -715,7 +715,7 @@
 				$host = get_host_by_hostid($db_element["elementid"]);
 				if($host["status"] != HOST_STATUS_MONITORED)	continue;
 
-				$scripts_by_hosts = get_accessible_scripts_by_hosts(array($db_element["elementid"]));
+				$scripts_by_hosts = CScript::getScriptsByHosts(array($db_element["elementid"]));
 
 				if(empty($url))	$url='tr_status.php?hostid='.$db_element['elementid'].'&noactions=true&onlytrue=true&compact=true';
 

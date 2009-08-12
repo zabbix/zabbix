@@ -237,7 +237,7 @@ class CTree{
 
 		zbx_add_post_js($this->treename.' = new CTree("tree_'.$this->getUserAlias().'_'.$this->treename.'", '.$this->treename.'_tree);');
 
-	return new CScript($js);
+	return new CJSscript($js);
 	}
 
 	private function getImg($id,$img){

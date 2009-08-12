@@ -186,9 +186,9 @@ include_once "include/page_header.php";
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url->getUrl()."';"));
+	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url->getUrl()."';"));
 
-	$dashboard_wdgt->addHeader(S_DASHBOARD_BIG, $fs_icon);
+	$dashboard_wdgt->addPageHeader(S_DASHBOARD_BIG, $fs_icon);
 //-------------
 
 	$left_tab = new CTable();

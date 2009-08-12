@@ -105,7 +105,7 @@ include_once('include/page_header.php');
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('a.name',ZBX_SORT_UP);
+	validate_sort_and_sortorder('name',ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go','none');
 ?>
@@ -351,6 +351,8 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
+	$action_wdgt = new CWidget();
+
 /* header */
 	$form = new CForm();
 	$form->setMethod('get');
@@ -358,12 +360,13 @@ include_once('include/page_header.php');
 	$form->addVar('eventsource', $_REQUEST['eventsource']);
 	if(!isset($_REQUEST['form'])){
 		$form->addItem(new CButton('form',S_CREATE_ACTION));
-	} else {
+	} 
+	else {
 
 	}
 
-	show_table_header(S_CONFIGURATION_OF_ACTIONS_BIG, $form);
-	echo SBR;
+	$action_wdgt->addPageHeader(S_CONFIGURATION_OF_ACTIONS_BIG, $form);
+
 	if(isset($_REQUEST['form'])){
 /* form */
 //		insert_action_form();
@@ -457,10 +460,12 @@ include_once('include/page_header.php');
 		$frmAction->additem($outer_table);
 
 		show_messages();
-		$frmAction->Show();
+		
+		$action_wdgt->addItem($frmAction);
 //*/
 	}
 	else{
+
 		$form = new CForm();
 		$form->setMethod('get');
 
@@ -470,74 +475,94 @@ include_once('include/page_header.php');
 		$cmbSource->addItem(EVENT_SOURCE_AUTO_REGISTRATION,S_AUTO_REGISTRATION);
 		$form->addItem(array(S_EVENT_SOURCE, SPACE, $cmbSource));
 
-		$row_count = 0;
-		$numrows = new CSpan(null,'info');
+		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
-		$header = get_table_header(array(S_ACTIONS_BIG,
-						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-						S_FOUND.': ',$numrows,)
-						);
-		show_table_header($header, $form);
+
+		$action_wdgt->addHeader(S_ACTIONS_BIG, $form);
+		$action_wdgt->addHeader($numrows);
 
 		unset($form, $cmbSource);
-/* table */
+
+// table
 		$form = new CForm();
 		$form->setName('actions');
+
+		$options = array(
+				'extendoutput' => 1,
+				'eventsource' => $_REQUEST['eventsource'],
+				'select_conditions' => 1,
+				'select_operations' => 1,
+				'editable' => 1,
+//				'sortfield' => 'clock',
+//				'sortorder' => getPageSortOrder(),
+				'limit' => ($config['search_limit']+1)
+			);
+			
+		$actions = CAction::get($options);
 
 		$tblActions = new CTableInfo(S_NO_ACTIONS_DEFINED);
 		$tblActions->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->getName()."','all_items','g_actionid');"),
-			make_sorting_link(S_NAME,'a.name'),
+			make_sorting_header(S_NAME,'name'),
 			S_CONDITIONS,
 			S_OPERATIONS,
-			make_sorting_link(S_STATUS,'a.status')
-			));
+			make_sorting_header(S_STATUS,'status')
+		));
 
-		$db_actions = DBselect('SELECT a.* '.
-							' FROM actions a'.
-							' WHERE a.eventsource='.$_REQUEST['eventsource'].
-								' AND '.DBin_node('actionid').
-							order_by('a.name,a.status','a.actionid'));
-		while($action_data = DBfetch($db_actions)){
-			if(!action_accessible($action_data['actionid'], PERM_READ_WRITE)) continue;
+// sorting
+		order_page_result($actions, getPageSortField('name'), getPageSortOrder());
 
-			$conditions=array();
-			$db_conditions = DBselect('select * from conditions where actionid='.$action_data['actionid'].
-				' order by conditiontype,conditionid');
-			while($condition_data = DBfetch($db_conditions)){
+// PAGING UPPER
+		$paging = getPagingLine($actions);
+		$action_wdgt->addItem($paging);
+//-------
+
+		foreach($actions as $actionid => $action){
+
+			$conditions = array();
+
+// sorting
+			order_result($action['conditions'], 'conditiontype');
+			foreach($action['conditions'] as $conditionid => $condition){
 				array_push($conditions, array(get_condition_desc(
-							$condition_data['conditiontype'],
-							$condition_data['operator'],
-							$condition_data['value']),BR()));
+							$condition['conditiontype'],
+							$condition['operator'],
+							$condition['value']),BR()));
 			}
-			unset($db_conditions, $condition_data);
+			
 
 			$operations=array();
-			$db_operations = DBselect('select * from operations where actionid='.$action_data['actionid'].
-				' order by operationtype,operationid');
-			while($operation_data = DBfetch($db_operations))
-				array_push($operations,array(get_operation_desc(SHORT_DESCRITION, $operation_data),BR()));
 
-			if($action_data['status'] == ACTION_STATUS_DISABLED){
+// sorting
+			order_result($action['operations'], 'operationtype');
+			foreach($action['operations'] as $operationid => $operation){
+				array_push($operations,array(get_operation_desc(SHORT_DESCRITION, $operation),BR()));
+			}
+
+			if($action['status'] == ACTION_STATUS_DISABLED){
 				$status= new CLink(S_DISABLED,
-					'actionconf.php?group_enable=1&g_actionid%5B%5D='.$action_data['actionid'].url_param('eventsource'),
+					'actionconf.php?group_enable=1&g_actionid%5B%5D='.$action['actionid'].url_param('eventsource'),
 					'disabled');
 			}
 			else{
 				$status= new CLink(S_ENABLED,
-					'actionconf.php?group_disable=1&g_actionid%5B%5D='.$action_data['actionid'].url_param('eventsource'),
+					'actionconf.php?group_disable=1&g_actionid%5B%5D='.$action['actionid'].url_param('eventsource'),
 					'enabled');
 			}
 
 			$tblActions->addRow(array(
-				new CCheckBox('g_actionid['.$action_data['actionid'].']',null,null,$action_data['actionid']),
-				new CLink($action_data['name'],'actionconf.php?form=update&actionid='.$action_data['actionid']),
+				new CCheckBox('g_actionid['.$action['actionid'].']',null,null,$action['actionid']),
+				new CLink($action['name'],'actionconf.php?form=update&actionid='.$action['actionid']),
 				$conditions,
 				$operations,
 				$status
 				));
-			$row_count++;
 		}
+
+// PAGING FOOTER
+		$tblActions->addRow(new CCol($paging));
+//		$action_wdgt->addItem($paging);
+//---------
 
 //----- GO ------
 		$goBox = new CComboBox('go');
@@ -552,14 +577,16 @@ include_once('include/page_header.php');
 
 		$tblActions->setFooter(new CCol(array($goBox, $goButton)));
 //----
-
 		$form->addItem($tblActions);
-		$form->Show();
+
+		$action_wdgt->addItem($form);
 	}
-	if(isset($row_count))
-		zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
+	
+	$action_wdgt->show();
 
 ?>
 <?php
-	include_once "include/page_footer.php";
+
+include_once('include/page_footer.php');
+
 ?>

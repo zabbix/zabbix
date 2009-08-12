@@ -40,6 +40,8 @@ class CUser {
 		global $USER_DETAILS;
 
 		$result = array();
+		$user_type = $USER_DETAILS['type'];
+		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('userid', 'alias'); // allowed columns for sorting
 
@@ -52,32 +54,41 @@ class CUser {
 			'limit' => null);
 
 		$def_options = array(
-			'nodeids'					=> 0,
-			'usrgrpids'					=> 0,
-			'userids'					=> 0,
+			'nodeids'					=> null,
+			'usrgrpids'					=> null,
+			'userids'					=> null,
 			'type'						=> null,
 			'status'					=> null,
-			'with_gui_access'			=> 0,
-			'with_api_access'			=> 0,
+			'with_gui_access'			=> null,
+			'with_api_access'			=> null,
 // OutPut
-			'extendoutput'				=> 0,
-			'select_usrgrps'			=> 0,
-			'get_access'				=> 0,
-			'count'						=> 0,
+			'extendoutput'				=> null,
+			'select_usrgrps'			=> null,
+			'get_access'				=> null,
+			'count'						=> null,
 			'pattern'					=> '',
-			'order' 					=> '',
-			'limit'						=> 0
+			'sortfield'					=> '',
+			'sortorder'					=> '',
+			'limit'						=> null
 		);
 
 		$options = array_merge($def_options, $options);
+		
+// PERMISSION CHECK
+		if(USER_TYPE_SUPER_ADMIN == $user_type){
+			
+		}
+		else if($options['editable']){
+			return $result();
+		}
 
 // nodeids
 		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
 
 // usrgrpids
-		if($options['usrgrpids'] != 0){
+		if(!is_null($options['usrgrpids'])){
 			zbx_value2array($options['usrgrpids']);
-			if($options['extendoutput'] != 0){
+			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['usrgrpid'] = 'ug.usrgrpid';
 			}
 			$sql_parts['from']['ug'] = 'users_groups ug';
@@ -87,7 +98,7 @@ class CUser {
 		}
 
 // userids
-		if($options['userids'] != 0){
+		if(!is_null($options['userids'])){
 			zbx_value2array($options['userids']);
 			$sql_parts['where'][] = DBcondition('u.userid', $options['userids']);
 		}
@@ -102,22 +113,23 @@ class CUser {
 		}
 
 // with_gui_access
-		if($options['with_gui_access'] != 0){
+		if(!is_null($options['with_gui_access'])){
 			$sql_parts['where'][] = 'g.gui_access='.GROUP_GUI_ACCESS_ENABLED;
 		}
 // with_api_access
-		if($options['with_api_access'] != 0){
+		if(!is_null($options['with_api_access'])){
 			$sql_parts['where'][] = 'g.api_access='.GROUP_API_ACCESS_ENABLED;
 		}
 
 // extendoutput
-		if($options['extendoutput'] != 0){
+		if(!is_null($options['extendoutput'])){
 			$sql_parts['select']['usrgrp'] = 'u.*';
 		}
 
 // count
-		if($options['count'] != 0){
-			$options['select_usrgrps'] = 0;
+		if(!is_null($options['count'])){
+			$options['sortfield'] = '';
+
 			$sql_parts['select'] = array('count(u.userid) as rowscount');
 		}
 
@@ -127,12 +139,15 @@ class CUser {
 		}
 
 // order
-		// restrict not allowed columns for sorting
-		$options['order'] = str_in_array($options['order'], $sort_columns) ? $options['order'] : '';
-		if(!zbx_empty($options['order'])){
-			$sql_parts['order'][] = 'u.'.$options['order'];
-			if(!str_in_array('u.'.$options['order'], $sql_parts['select']) && $options['extendoutput'] == 0){
-				$sql_parts['select'][] = 'u.'.$options['order'];
+// restrict not allowed columns for sorting
+		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
+		if(!zbx_empty($options['sortfield'])){
+			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
+
+			$sql_parts['order'][] = 'u.'.$options['sortfield'].' '.$sortorder;
+
+			if(!str_in_array('u.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('u.*', $sql_parts['select'])){
+				$sql_parts['select'][] = 'u.'.$options['sortfield'];
 			}
 		}
 
@@ -170,7 +185,7 @@ class CUser {
 			else{
 				$userids[$user['userid']] = $user['userid'];
 
-				if($options['extendoutput'] == 0){
+				if(is_null($options['extendoutput'])){
 					$result[$user['userid']] = $user['userid'];
 				}
 				else{
@@ -195,27 +210,28 @@ class CUser {
 			}
 		}
 
-	if($options['get_access'] != 0){
-
-		foreach($result as $userid => $user){
-			$result[$userid] += array('api_access' => 0, 'gui_access' => 0, 'debug_mode' => 0, 'users_status' => 0);
+		if($options['get_access'] != 0){
+	
+			foreach($result as $userid => $user){
+				$result[$userid] += array('api_access' => 0, 'gui_access' => 0, 'debug_mode' => 0, 'users_status' => 0);
+			}
+	
+			$sql = 'SELECT ug.userid, MAX(g.api_access) as api_access,  MAX(g.gui_access) as gui_access,
+						MAX(g.debug_mode) as debug_mode, MAX(g.users_status) as users_status'.
+					' FROM usrgrp g, users_groups ug '.
+					' WHERE '.DBcondition('ug.userid', $userids).
+						' AND g.usrgrpid=ug.usrgrpid '.
+					' GROUP BY ug.userid';
+			$access = DBselect($sql);
+	
+			while($useracc = DBfetch($access)){
+				$result[$useracc['userid']] = array_merge($result[$useracc['userid']], $useracc);
+			}
 		}
 
-		$sql = 'SELECT ug.userid, MAX(g.api_access) as api_access,  MAX(g.gui_access) as gui_access,
-					MAX(g.debug_mode) as debug_mode, MAX(g.users_status) as users_status'.
-				' FROM usrgrp g, users_groups ug '.
-				' WHERE '.DBcondition('ug.userid', $userids).
-					' AND g.usrgrpid=ug.usrgrpid '.
-				' GROUP BY ug.userid';
-		$access = DBselect($sql);
-
-		while($useracc = DBfetch($access)){
-			$result[$useracc['userid']] = array_merge($result[$useracc['userid']], $useracc);
-		}
-	}
+		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
 
 // Adding Objects
-
 // Adding usegroups
 		if($options['select_usrgrps']){
 			$obj_params = array('extendoutput' => 1, 'userids' => $userids);

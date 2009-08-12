@@ -1,4 +1,24 @@
 <?php
+/*
+** ZABBIX
+** Copyright (C) 2000-2009 SIA Zabbix
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+**/
+?>
+<?php
 /**
  * File containing CTrigger class for API.
  * @package API
@@ -48,32 +68,43 @@ class CTrigger {
 
 		$sql_parts = array(
 			'select' => array('triggers' => 't.triggerid'),
-			'from' => array('triggers t'),
+			'from' => array('t' => 'triggers t'),
 			'where' => array(),
 			'order' => array(),
 			'limit' => null,
 			);
 
 		$def_options = array(
-			'nodeids'				=> 0,
-			'groupids'				=> 0,
-			'hostids'				=> 0,
-			'triggerids'			=> 0,
-			'itemids'				=> 0,
-			'applicationids'		=> 0,
+			'nodeids'				=> null,
+			'groupids'				=> null,
+			'hostids'				=> null,
+			'triggerids'			=> null,
+			'itemids'				=> null,
+			'applicationids'		=> null,
 			'status'				=> null,
 			'severity'				=> null,
-			'templated_triggers'	=> 0,
-			'editable'				=> 0,
-			'nopermissions'			=> 0,
+			'templated_triggers'	=> null,
+			'editable'				=> null,
+			'nopermissions'			=> null,
 // OutPut
-			'extendoutput'			=> 0,
-			'select_hosts'			=> 0,
-			'select_items'			=> 0,
-			'count'					=> 0,
+			'extendoutput'			=> null,
+			'select_hosts'			=> null,
+			'select_items'			=> null,
+			'count'					=> null,
+
+// filter
+			'filter'				=> null,
+			'group'					=> null,
+			'host'					=> null,
+			'only_true'				=> null,
+			'severity'				=> null,
+//
+
 			'pattern'				=> '',
-			'limit'					=> 0,
-			'order'					=> '');
+			'sortfield'				=> '',
+			'sortorder'				=> '',
+			'limit'					=> null
+		);
 
 		$options = array_merge($def_options, $options);
 
@@ -119,62 +150,72 @@ class CTrigger {
 		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
 
 // groupids
-		if($options['groupids'] != 0){
+		if(!is_null($options['groupids'])){
 			zbx_value2array($options['groupids']);
 
-			if($options['extendoutput'] != 0){
+			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
 
 			$sql_parts['from']['f'] = 'functions f';
 			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
-			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
-			$sql_parts['where'][] = 'hg.hostid=i.hostid';
-			$sql_parts['where'][] = 'f.triggerid=t.triggerid';
-			$sql_parts['where'][] = 'f.itemid=i.itemid';
+			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
+			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
+			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
+			$sql_parts['where']['hg'] = DBcondition('hg.groupid', $options['groupids']);
 		}
 
 // hostids
-		if($options['hostids'] != 0){
+		if(!is_null($options['hostids'])){
 			zbx_value2array($options['hostids']);
 
-			if($options['extendoutput'] != 0){
+			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['hostid'] = 'i.hostid';
 			}
 
 			$sql_parts['from']['f'] = 'functions f';
 			$sql_parts['from']['i'] = 'items i';
-			$sql_parts['where'][] = DBcondition('i.hostid', $options['hostids']);
+			$sql_parts['where']['i'] = DBcondition('i.hostid', $options['hostids']);
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 		}
 
 // triggerids
-		if($options['triggerids'] != 0){
+		if(!is_null($options['triggerids'])){
+			zbx_value2array($options['triggerids']);
+
 			$sql_parts['where'][] = DBcondition('t.triggerid', $options['triggerids']);
 		}
 
 // itemids
-		if($options['itemids'] != 0){
+		if(!is_null($options['itemids'])){
 			zbx_value2array($options['itemids']);
-			if($options['extendoutput'] != 0){
+
+			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['itemid'] = 'f.itemid';
 			}
+
 			$sql_parts['from']['f'] = 'functions f';
-			$sql_parts['where'][] = DBcondition('f.itemid', $options['itemids']);
+			$sql_parts['where']['f'] = DBcondition('f.itemid', $options['itemids']);
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
 		}
 
 // applicationids
-		if($options['applicationids'] != 0){
+		if(!is_null($options['applicationids'])){
+			zbx_value2array($options['applicationids']);
+
+			if(!is_null($options['extendoutput'])){
+				$sql_parts['select']['applicationid'] = 'a.applicationid';
+			}
+			
 			$sql_parts['from']['f'] = 'functions f';
 			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['from']['a'] = 'applications a';
-			$sql_parts['where'][] = DBcondition('a.applicationid', $options['applicationids']);
-			$sql_parts['where'][] = 'i.hostid=a.hostid';
-			$sql_parts['where'][] = 'f.triggerid=t.triggerid';
-			$sql_parts['where'][] = 'f.itemid=i.itemid';
+			$sql_parts['where']['a'] = DBcondition('a.applicationid', $options['applicationids']);
+			$sql_parts['where']['ia'] = 'i.hostid=a.hostid';
+			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
+			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 		}
 
 // status
@@ -188,18 +229,13 @@ class CTrigger {
 		}
 
 // templated_triggers
-		if($options['templated_triggers'] != 0){
+		if(!is_null($options['templated_triggers'])){
 			$sql_parts['where'][] = 't.templateid<>0';
 		}
 
 // extendoutput
-		if($options['extendoutput'] != 0){
+		if(!is_null($options['extendoutput'])){
 			$sql_parts['select']['triggers'] = 't.*';
-		}
-
-// count
-		if($options['count'] != 0){
-			$sql_parts['select']['triggers'] = 'count(t.triggerid) as rowscount';
 		}
 
 // pattern
@@ -207,13 +243,74 @@ class CTrigger {
 			$sql_parts['where'][] = ' UPPER(t.description) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
 		}
 
-// order
-		// restrict not allowed columns for sorting
-		$options['order'] = in_array($options['order'], $sort_columns) ? $options['order'] : '';
 
-		if(!zbx_empty($options['order'])){
-			$sql_parts['order'][] = 't.'.$options['order'];
-			if(!str_in_array('t.'.$options['order'], $sql_parts['select'])) $sql_parts['select'][] = 't.'.$options['order'];
+// --- FILTER ---
+		if(!is_null($options['filter'])){
+// group
+			if(!is_null($options['group'])){
+				if(!is_null($options['extendoutput'])){
+					$sql_parts['select']['name'] = 'g.name';
+				}
+	
+				$sql_parts['from']['f'] = 'functions f';
+				$sql_parts['from']['i'] = 'items i';
+				$sql_parts['from']['hg'] = 'hosts_groups hg';
+				$sql_parts['from']['g'] = 'groups g';
+				$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
+				$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
+				$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
+				$sql_parts['where']['ghg'] = 'g.groupid = hg.groupid';
+				$sql_parts['where'][] = ' UPPER(g.name)='.zbx_dbstr(strtoupper($options['group']));
+			}
+
+// host
+			if(!is_null($options['host'])){
+				if(!is_null($options['extendoutput'])){
+					$sql_parts['select']['host'] = 'h.host';
+				}
+
+				$sql_parts['from']['f'] = 'functions f';
+				$sql_parts['from']['i'] = 'items i';
+				$sql_parts['from']['h'] = 'hosts h';
+				$sql_parts['where']['i'] = DBcondition('i.hostid', $options['hostids']);
+				$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
+				$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
+				$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+				$sql_parts['where'][] = ' UPPER(h.host)='.zbx_dbstr(strtoupper($options['host']));
+			}
+
+// only_true
+			if(!is_null($options['only_true'])){
+			
+				$sql_parts['where'][] = '((t.value='.TRIGGER_VALUE_TRUE.')'.
+										' OR '.
+										'((t.value='.TRIGGER_VALUE_FALSE.') AND (('.time().'-t.lastchange)<'.TRIGGER_FALSE_PERIOD.')))';
+			}
+			
+// severity
+			if(!is_null($options['severity'])){
+				$sql_parts['where'][] = 't.priority>='.$options['severity'];
+			}
+		}
+
+// count
+		if(!is_null($options['count'])){
+			$options['sortfield'] = '';
+
+			$sql_parts['select'] = array('COUNT(DISTINCT t.triggerid) as rowscount');
+		}
+
+// order
+// restrict not allowed columns for sorting
+		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
+		if(!zbx_empty($options['sortfield'])){
+			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
+
+			$sql_parts['order'][] = 't.'.$options['sortfield'].' '.$sortorder;
+
+			if(!str_in_array('t.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('t.*', $sql_parts['select'])){
+				$sql_parts['select'][] = 't.'.$options['sortfield'];
+			}
 		}
 
 // limit
@@ -251,7 +348,7 @@ class CTrigger {
 			else{
 				$triggerids[$trigger['triggerid']] = $trigger['triggerid'];
 
-				if($options['extendoutput'] == 0){
+				if(is_null($options['extendoutput'])){
 					$result[$trigger['triggerid']] = $trigger['triggerid'];
 				}
 				else{
@@ -286,8 +383,9 @@ class CTrigger {
 			}
 		}
 
-// Adding Objects
+		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
 
+// Adding Objects
 // Adding hosts
 		if($options['select_hosts']){
 			$obj_params = array('templated_hosts' => 1, 'extendoutput' => 1, 'triggerids' => $triggerids, 'nopermissions' => 1);
@@ -456,10 +554,16 @@ class CTrigger {
 				break;
 			}
 
-			$result = add_trigger($trigger['expression'], $trigger['description'], $trigger['type'], $trigger['priority'],
-			$trigger['status'], $trigger['comments'], $trigger['url']);
-			if(!$result) break;
-			$triggerids[$result] = $result;
+			$triggerid = add_trigger($trigger['expression'], 
+									$trigger['description'], 
+									$trigger['type'], 
+									$trigger['priority'],
+									$trigger['status'], 
+									$trigger['comments'], 
+									$trigger['url']
+									);
+			if(!$triggerid) break;
+			$triggerids[$triggerid] = $triggerid;
 		}
 
 		$result = DBend($result);
@@ -495,7 +599,7 @@ class CTrigger {
 		$result = false;
 		$triggerids = array();
 		DBstart(false);
-		foreach($triggers as $trigger){
+		foreach($triggers as $num => $trigger){
 			$trigger_db_fields = self::getById($trigger);
 			if(!isset($trigger_db_fields)) {
 				$result = false;

@@ -137,9 +137,10 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
 
-	$over_wdgt->addHeader(S_OVERVIEW_BIG, array($fs_icon, $help));
+	show_table_header(S_OVERVIEW_BIG, array($fs_icon, $help));
+	echo SBR;
 
 // 2nd heder
 	$form_l = new CForm();
@@ -152,7 +153,8 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 
 	$form_l->additem(array(S_HOSTS_LOCATION.SPACE,$cmbStyle));
 
-	$over_wdgt->addHeader($form_l, $form);
+	$over_wdgt->addHeader(S_OVERVIEW_BIG, $form);
+	$over_wdgt->addHeader($form_l);
 
 //	show_table_header(S_OVERVIEW_BIG,$form);
 //-------------

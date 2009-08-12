@@ -22,6 +22,10 @@
 	color: #0088FF;
 }
 
+.textblackwhite{
+	color: #DADADA;
+}
+
 .pum_oheader {
 	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
 }
@@ -55,22 +59,10 @@ a.off:active 		{	color:#0088FF; }
 
 a.footer			{	color:#CCCCCC; }
 
-a.history:link		{	color:#28F;	}
-a.history:visited 	{	color:#28F;	}
-a.history:hover 	{	color:#2FF;	}
-a.history:active 	{	color:#28F;	}
-
-a.link:link			{	color:#EEE;	}
-a.link:visited 		{	color:#EEE;	}
-a.link:hover 		{	color:#0BF;	}
-a.link:active 		{	color:#0BF;	}
-
-
-a.styled:link		{	color:#0BF;	 }
-a.styled:visited 	{	color:#0BF;	 }
-a.styled:hover 		{	color:#0BF;	 }
-a.styled:active 	{	color:#0BF;	 }
-
+a.history:link		{	color:#2288FF;	}
+a.history:visited 	{	color:#2288FF;	}
+a.history:hover 	{	color:#22CCFF;	}
+a.history:active 	{	color:#22CCFF;	}
 
 /*////////////////	TABLES	////////////////////*/
 table{
@@ -196,7 +188,8 @@ table.menu tr td{
 }
 
 table.menu tr td.active{
-	background: #5C7099 url('../images/gradients/table_head_bb.gif') repeat-x top left;
+	border-color: #AAAAAA;
+	background: #333333 url('../images/gradients/table_head_bb.gif') repeat-x top left;
 }
 
 table.sub_menu tr{
@@ -260,6 +253,38 @@ table.screen_view{
 table.screen_view td{
 	background-color: #333333;
 }
+
+table.header_wide{
+	color: #DADADA;
+	
+	border: 1px #888888 solid;
+	background-color:#444444;
+}
+
+table.header_wide tr.first td.header_l{
+	color: #FFFFFF;
+}
+
+table.header_wide tr.first td.header_r{
+	color: #FFFFFF;
+}
+
+table.header_wide a:link		{	color:#2288FF;	 }
+table.header_wide a:visited 	{	color:#2288FF;	 }
+table.header_wide a:hover 		{	color:#22CCFF;	 }
+table.header_wide a:active 		{	color:#22CCFF;	 }
+
+table.infobox{
+	border: 1px #AAAAAA solid;
+	background-color:#444444;
+	
+	color: #DADADA;
+}
+
+table.infobox a:link		{	color:#2288FF;	 }
+table.infobox a:visited 	{	color:#2288FF;	 }
+table.infobox a:hover 		{	color:#22CCFF;	 }
+table.infobox a:active 		{	color:#22CCFF;	 }
 /*----------*/
 
 /*////////////////	DIVS	////////////////////*/
@@ -349,6 +374,17 @@ span.green{
 
 span.info{
 	color:	#0088FF;
+}
+
+.darklink{
+	color:#2288FF;
+	text-decoration: underline;
+}
+
+.darklink:hover{
+	color:#22CCFF;
+	cursor: pointer;
+	text-decoration: underline;
 }
 
 /*////////////////	FORMS	////////////////////*/

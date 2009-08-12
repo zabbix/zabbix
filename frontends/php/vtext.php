@@ -21,7 +21,7 @@
 <?php
 	define('ZBX_PAGE_NO_AUTHERIZATION', 1);
 
-	require_once "include/config.inc.php";
+	require_once('include/config.inc.php');
 
 	$page['file'] = 'vtext.php';
 	$page['type'] = PAGE_TYPE_IMAGE;
@@ -32,8 +32,8 @@ include_once "include/page_header.php";
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"text"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,		null),
-		"font"=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(1,5),	null),
+		'text'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,		null),
+		'font'=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(1,5),	null),
 	);
 
 	check_fields($fields);
@@ -43,22 +43,22 @@ include_once "include/page_header.php";
 	$text = get_request("text",' ');;
 	$font = get_request("font",3);
 
-	$width = ImageFontWidth($font) * strlen($text);
-	$height = ImageFontHeight($font);
+	$width = imagefontwidth($font) * strlen($text);
+	$height = imagefontheight($font);
 
 	$im = imagecreate($height,$width);
 
-	$backgroud_color = ImageColorAllocate($im,255,255,255);
-	$text_color = ImageColorAllocate($im,0,0,0);
+	$backgroud_color = imagecolorallocate($im,255,255,255);
+	$text_color = imagecolorallocate($im,0,0,0);
 
-	ImageStringUp($im,$font,0,$width-1,$text,$text_color);
+	imagestringup($im,$font,0,$width-1,$text,$text_color);
 	imagecolortransparent($im,$backgroud_color);
 
-	ImageOut($im);
-	ImageDestroy($im);
+	imageOut($im);
+	imagedestroy($im);
 ?>
 <?php
 
-include_once "include/page_footer.php";
+include_once('include/page_footer.php');
 
 ?>

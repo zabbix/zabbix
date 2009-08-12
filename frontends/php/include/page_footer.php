@@ -57,7 +57,7 @@
 			$table = new CTable(NULL,"page_footer");
 			$table->setCellSpacing(0);
 			$table->setCellPadding(1);
-			$table->AddRow(array(
+			$table->addRow(array(
 				new CCol(new CLink(
 					S_ZABBIX.SPACE.ZABBIX_VERSION.SPACE.S_COPYRIGHT_BY.SPACE.S_SIA_ZABBIX,
 					'http://www.zabbix.com', 'highlight', null, true),
@@ -67,12 +67,13 @@
 						new CSpan(($USER_DETAILS['userid'] == 0)?S_NOT_CONNECTED:S_CONNECTED_AS.SPACE."'".$USER_DETAILS['alias']."'".
 						(ZBX_DISTRIBUTED ? SPACE.S_FROM_SMALL.SPACE."'".$USER_DETAILS['node']['name']."'" : ''),'footer_sign')
 					),
-					"page_footer_r")
+					'page_footer_r')
 				));
-			$table->Show();
+			$table->show();
 		}
 
-COpt::profiling_stop("script");
+COpt::profiling_stop('script');
+COpt::show();
 
 print('<!--'."\n".'SELECTS: '.$DB['SELECT_COUNT']."\n".'EXECUTE: '.$DB['EXECUTE_COUNT']."\n".'TOTAL: '.($DB['EXECUTE_COUNT']+$DB['SELECT_COUNT'])."\n".'-->');
 
