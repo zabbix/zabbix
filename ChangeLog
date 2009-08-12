@@ -1,6 +1,5 @@
 Changes for 1.7.0
 
- - [DEV-416] some format and syntax fixes (Dmitry)
  - [DEV-325] new check for DNS `net.tcp.dns.query' wad added; added additional `type' parameter (Dmitry)
  - [DEV-416] new simple check `icmppingloss' added; ICMP ckecks now support additional parameters (Dmitry)
  - [DEV-9] added support of global, template and host level macros on the server side (Sasha)
