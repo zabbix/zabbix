@@ -50,24 +50,26 @@ class CGraph {
 			);
 
 		$def_options = array(
-			'nodeids' 			=> 0,
-			'groupids' 			=> 0,
-			'hostids' 			=> 0,
-			'graphids' 			=> 0,
-			'itemids' 			=> 0,
-			'type' 				=> 0,
-			'templated_graphs'	=> 0,
-			'editable'			=> 0,
-			'nopermission'		=> 0,
+			'nodeids' 				=> null,
+			'groupids' 				=> null,
+			'hostids' 				=> null,
+			'graphids' 				=> null,
+			'itemids' 				=> null,
+			'type' 					=> null,
+			'templated_graphs'		=> null,
+			'editable'				=> null,
+			'nopermission'			=> null,
 // output
-			'select_hosts'		=> 0,
-			'select_templates'	=> 0,
-			'select_items'		=> 0,
-			'extendoutput'		=> 0,
-			'count'				=> 0,
-			'pattern'			=> '',
-			'limit'				=> 0,
-			'order'				=> '');
+			'select_hosts'			=> null,
+			'select_templates'		=> null,
+			'select_items'			=> null,
+			'extendoutput'			=> null,
+			'count'					=> null,
+			'pattern'				=> '',
+			'sortfield'				=> '',
+			'sortorder'				=> '',
+			'limit'					=> null
+		);
 
 		$options = array_merge($def_options, $options);
 
@@ -113,10 +115,10 @@ class CGraph {
 		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
 
 // groupids
-		if($options['groupids'] != 0){
+		if(!is_null($options['groupids'])){
 			zbx_value2array($options['groupids']);
 
-			if($options['extendoutput'] != 0){
+			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
 
@@ -132,9 +134,9 @@ class CGraph {
 		}
 
 // hostids
-		if($options['hostids'] != 0){
+		if(!is_null($options['hostids'])){
 			zbx_value2array($options['hostids']);
-			if($options['extendoutput'] != 0){
+			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['hostid'] = 'i.hostid';
 			}
 
@@ -146,14 +148,14 @@ class CGraph {
 		}
 
 // graphids
-		if($options['graphids'] != 0){
+		if(!is_null($options['graphids'])){
 			$sql_parts['where'][] = DBcondition('g.graphid', $options['graphids']);
 		}
 
 // itemids
-		if($options['itemids'] != 0){
+		if(!is_null($options['itemids'])){
 			zbx_value2array($options['itemids']);
-			if($options['extendoutput'] != 0){
+			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['itemid'] = 'gi.itemid';
 			}
 			$sql_parts['from']['gi'] = 'graphs_items gi';
@@ -162,22 +164,22 @@ class CGraph {
 		}
 
 // type
-		if($options['type']  != 0){
+		if(!is_null($options['type'] )){
 			$sql_parts['where'][] = 'g.type='.$options['type'];
 		}
 
 // templated_graphs
-		if($options['templated_graphs'] != 0){
+		if(!is_null($options['templated_graphs'])){
 			$sql_parts['where'][] = 'g.templateid<>0';
 		}
 
 // extendoutput
-		if($options['extendoutput'] != 0){
+		if(!is_null($options['extendoutput'])){
 			$sql_parts['select']['graphs'] = 'g.*';
 		}
 
 // count
-		if($options['count'] != 0){
+		if(!is_null($options['count'])){
 			$sql_parts['select']['graphs'] = 'count(g.graphid) as count';
 		}
 
@@ -187,11 +189,17 @@ class CGraph {
 		}
 
 // order
-		// restrict not allowed columns for sorting
-		$options['order'] = in_array($options['order'], $sort_columns) ? $options['order'] : '';
-		if(!zbx_empty($options['order'])){
-			$sql_parts['order'][] = 'g.'.$options['order'];
-		}
+// restrict not allowed columns for sorting
+		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
+		if(!zbx_empty($options['sortfield'])){
+			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
+
+			$sql_parts['order'][] = 'g.'.$options['sortfield'].' '.$sortorder;
+
+			if(!str_in_array('g.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('g.*', $sql_parts['select'])){
+				$sql_parts['select'][] = 'g.'.$options['sortfield'];
+			}
+		}		
 
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){
@@ -226,7 +234,7 @@ class CGraph {
 			if($options['count'])
 				$result = $graph;
 			else{
-				if(!$options['extendoutput']){
+				if(is_null($options['extendoutput'])){
 					$result[$graph['graphid']] = $graph['graphid'];
 				}
 				else{
@@ -267,6 +275,8 @@ class CGraph {
 				}
 			}
 		}
+
+		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
 
 // Adding Hosts
 		if($options['select_hosts']){

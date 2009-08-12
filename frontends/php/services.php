@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2007 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,6 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
+?>
+<?php
 
 require_once('include/config.inc.php');
 require_once('include/services.inc.php');
@@ -24,11 +26,11 @@ require_once('include/triggers.inc.php');
 require_once('include/html.inc.php');
 
 $page["title"] = "S_CONFIGURATION_OF_IT_SERVICES";
-$page["file"] = "services.php";
+$page['file'] = 'services.php';
 $page['scripts'] = array('services.js');
 $page['hist_arg'] = array();
 
-include_once "include/page_header.php";
+include_once('include/page_header.php');
 
 
 //---------------------------------- CHECKS ------------------------------------
@@ -60,9 +62,10 @@ include_once "include/page_header.php";
 
 //--------------------------------------------------------------------------
 
-$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY);
+	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY);
 
-$query = 'SELECT DISTINCT s.serviceid, sl.servicedownid, sl_p.serviceupid as serviceupid, s.triggerid, '.
+	
+	$sql = 'SELECT DISTINCT s.serviceid, sl.servicedownid, sl_p.serviceupid as serviceupid, s.triggerid, '.
 		' s.name as caption, s.algorithm, t.description, t.expression, s.sortorder, sl.linkid, s.showsla, s.goodsla, s.status '.
 	' FROM services s '.
 		' LEFT JOIN triggers t ON s.triggerid = t.triggerid '.
@@ -71,11 +74,11 @@ $query = 'SELECT DISTINCT s.serviceid, sl.servicedownid, sl_p.serviceupid as ser
 	' WHERE '.DBin_node('s.serviceid').
 		' AND (t.triggerid IS NULL OR '.DBcondition('t.triggerid',$available_triggers).') '.
 	' ORDER BY s.sortorder, sl_p.serviceupid, s.serviceid';
+	
+	$result=DBSelect($sql);
 
-$result=DBSelect($query);
-
-$services = array();
-$row = array(
+	$services = array();
+	$row = array(
 				'id' =>	0,
 				'serviceid' => 0,
 				'serviceupid' => 0,
@@ -87,9 +90,9 @@ $row = array(
 				'linkid'=>''
 				);
 
-$services[0]=$row;
+	$services[0]=$row;
 
-while($row = DBFetch($result)){
+	while($row = DBFetch($result)){
 
 		$row['id'] = $row['serviceid'];
 
@@ -109,41 +112,46 @@ while($row = DBFetch($result)){
 
 		if(isset($row['servicedownid']))
 		$services[$row['serviceid']]['childs'][] = array('id' => $row['servicedownid'], 'soft' => 1, 'linkid' => $row['linkid']);
-}
+	}
 
-$treeServ=array();
-createServiceTree($services,$treeServ); //return into $treeServ parametr
+	$treeServ=array();
+	createServiceTree($services,$treeServ); //return into $treeServ parametr
+	
+	//permission issue
+	$treeServ = del_empty_nodes($treeServ);
+	//----
+	
+	if(isset($_REQUEST['msg']) && !empty($_REQUEST['msg'])){
+		show_messages(true,$_REQUEST['msg']);
+	}
+	
+	//show_table_header(S_IT_SERVICES_BIG);
+	
+	$tree = new CTree('service_conf_tree', $treeServ,array('caption' => bold(S_SERVICE),'algorithm' => bold(S_STATUS_CALCULATION), 'description' => bold(S_TRIGGER)));
+	
+	if($tree){
+		show_table_header(S_IT_SERVICES_BIG, SPACE);
+		
+		$serv_wdgt = new CWidget();
+		$serv_wdgt->addItem(BR());
+		$serv_wdgt->addItem($tree->getHTML());
+	
+		$serv_wdgt->show();
+	}
+	else {
+		error(S_CANT_FORMAT_TREE);
+	}
+	
+	
+	$tr_ov_menu[] = array('test1',	null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
+	$tr_ov_menu[] = array('test2',	null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
+	
+	$jsmenu = new CPUMenu($tr_ov_menu,170);
+	$jsmenu->InsertJavaScript();
 
-//permission issue
-$treeServ = del_empty_nodes($treeServ);
-//----
+?>
+<?php
 
-if(isset($_REQUEST['msg']) && !empty($_REQUEST['msg'])){
-	show_messages(true,$_REQUEST['msg']);
-}
+include_once('include/page_footer.php');
 
-//show_table_header(S_IT_SERVICES_BIG);
-
-$tree = new CTree('service_conf_tree', $treeServ,array('caption' => bold(S_SERVICE),'algorithm' => bold(S_STATUS_CALCULATION), 'description' => bold(S_TRIGGER)));
-
-if($tree){
-	$serv_wdgt = new CWidget();
-	$serv_wdgt->addHeader(S_IT_SERVICES_BIG, SPACE);
-	$serv_wdgt->addItem($tree->getHTML());
-
-	$serv_wdgt->show();
-}
-else {
-	error(S_CANT_FORMAT_TREE);
-}
-
-
-$tr_ov_menu[] = array('test1',	null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
-$tr_ov_menu[] = array('test2',	null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
-
-$jsmenu = new CPUMenu($tr_ov_menu,170);
-$jsmenu->InsertJavaScript();
-
-
-include_once "include/page_footer.php";
 ?>

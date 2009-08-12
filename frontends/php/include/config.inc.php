@@ -24,16 +24,22 @@ function TODO($msg) { echo 'TODO: '.$msg.SBR; }  // DEBUG INFO!!!
 function __autoload($class_name){
 	$class_name = strtolower($class_name);
 	$api = array(
+		'caction' => 1,
+		'calert' => 1,
 		'capplication' => 1,
-		'chostgroup' =>1,
-		'chost' => 1,
-		'ctemplate' => 1,
-		'cproxy' => null,
-		'citem' => 1,
-		'ctrigger' => 1,
+		'cevent' => 1,
 		'cgraph' => 1,
-		'cusergroup' => 1,
-		'cuser' => 1);
+		'chost' => 1,
+		'chostgroup' => 1,
+		'citem' => 1,
+		'cmaintenance' => 1,
+		'cproxy' => null,
+		'cscript' => 1,
+		'ctemplate' => 1,
+		'ctrigger' => 1,
+		'cuser' => 1,
+		'cusergroup' => 1
+	);
 
 	$rpc = array(
 		'cjsonrpc' =>1,
@@ -305,7 +311,7 @@ function __autoload($class_name){
 
 					if(isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)){
 						$msg_details = new CDiv(array(S_DETAILS),'pointer');
-						$msg_details->addAction('onclick',new CScript("javascript: ShowHide('msg_messages', IE?'block':'table');"));
+						$msg_details->addAction('onclick',new CJSscript("javascript: ShowHide('msg_messages', IE?'block':'table');"));
 						$msg_details->setAttribute('title',S_MAXIMIZE.'/'.S_MINIMIZE);
 						array_unshift($row, new CCol($msg_details,'clr'));
 					}
@@ -474,17 +480,23 @@ function __autoload($class_name){
 	function calc_trigger_hash(){
 
 		$priority = array(0=>0, 1=>0, 2=>0, 3=>0, 4=>0, 5=>0);
-		$triggerids="";
+		$triggerids='';
 
-	       	$result=DBselect('SELECT t.triggerid,t.priority from triggers t,hosts h,items i,functions f'.
-			'  WHERE t.value=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status=0');
-
+		$sql = 'SELECT t.triggerid, t.priority '.
+				' FROM triggers t '.
+				' WHERE t.value='.TRIGGER_VALUE_TRUE.
+					' AND '.DBin_node('t.triggerid').
+					' AND exists('.
+							'SELECT e.eventid '.
+							' FROM events e '.
+							' WHERE e.object='.EVENT_OBJECT_TRIGGER.
+								' AND e.objectid=t.triggerid '.
+								' AND e.acknowledged=0'.
+							')';
+       	$result=DBselect($sql);
 		while($row=DBfetch($result)){
-			$ack = get_last_event_by_triggerid($row["triggerid"]);
-			if($ack["acknowledged"] == 1) continue;
-
-			$triggerids="$triggerids,".$row["triggerid"];
-			$priority[$row["priority"]]++;
+			$triggerids = $triggerids.','.$row['triggerid'];
+			$priority[$row['priority']]++;
 		}
 
 		$md5sum=md5($triggerids);
@@ -691,19 +703,19 @@ function __autoload($class_name){
 		$row=DBfetch(DBselect($sql));
 		$status['triggers_count']=$row['cnt'];
 
-		$row=DBfetch(DBselect($sql.' and t.status=0'));
+		$row=DBfetch(DBselect($sql.' AND t.status=0'));
 		$status['triggers_count_enabled']=$row['cnt'];
 
-		$row=DBfetch(DBselect($sql.' and t.status=1'));
+		$row=DBfetch(DBselect($sql.' AND t.status=1'));
 		$status['triggers_count_disabled']=$row['cnt'];
 
-		$row=DBfetch(DBselect($sql.' and t.status=0 and t.value=0'));
+		$row=DBfetch(DBselect($sql.' AND t.status=0 AND t.value=0'));
 		$status['triggers_count_off']=$row['cnt'];
 
-		$row=DBfetch(DBselect($sql.' and t.status=0 and t.value=1'));
+		$row=DBfetch(DBselect($sql.' AND t.status=0 AND t.value=1'));
 		$status['triggers_count_on']=$row['cnt'];
 
-		$row=DBfetch(DBselect($sql.' and t.status=0 and t.value=2'));
+		$row=DBfetch(DBselect($sql.' AND t.status=0 AND t.value=2'));
 		$status['triggers_count_unknown']=$row['cnt'];
 
 // items
@@ -715,16 +727,16 @@ function __autoload($class_name){
 		$row=DBfetch(DBselect($sql));
 		$status['items_count']=$row['cnt'];
 
-		$row=DBfetch(DBselect($sql.' and i.status=0'));
+		$row=DBfetch(DBselect($sql.' AND i.status=0'));
 		$status['items_count_monitored']=$row['cnt'];
 
-		$row=DBfetch(DBselect($sql.' and i.status=1'));
+		$row=DBfetch(DBselect($sql.' AND i.status=1'));
 		$status['items_count_disabled']=$row['cnt'];
 
-		$row=DBfetch(DBselect($sql.' and i.status=3'));
+		$row=DBfetch(DBselect($sql.' AND i.status=3'));
 		$status['items_count_not_supported']=$row['cnt'];
 
-		$row=DBfetch(DBselect($sql.' and i.type=2'));
+		$row=DBfetch(DBselect($sql.' AND i.type=2'));
 		$status['items_count_trapper']=$row['cnt'];
 
 // hosts
@@ -1051,25 +1063,25 @@ function __autoload($class_name){
 	 *      validate_sort_and_sortorder
 	 *
 	 * description:
-	 *      Checking,setting and saving sort params
+	 *      Checking,setting AND saving sort params
 	 *
 	 * author: Aly
 	 */
 	function validate_sort_and_sortorder($sort=NULL,$sortorder=ZBX_SORT_UP){
 		global $page;
 
-		$_REQUEST['sort'] = get_request('sort',get_profile('web.'.$page["file"].'.sort',$sort));
-		$_REQUEST['sortorder'] = get_request('sortorder',get_profile('web.'.$page["file"].'.sortorder',$sortorder));
+		$_REQUEST['sort'] = get_request('sort',get_profile('web.'.$page['file'].'.sort',$sort));
+		$_REQUEST['sortorder'] = get_request('sortorder',get_profile('web.'.$page['file'].'.sortorder',$sortorder));
 
 		if(!is_null($_REQUEST['sort'])){
 			$_REQUEST['sort'] = eregi_replace('[^a-z\.\_]','',$_REQUEST['sort']);
-			update_profile('web.'.$page["file"].'.sort',		$_REQUEST['sort']);
+			update_profile('web.'.$page['file'].'.sort', $_REQUEST['sort'], PROFILE_TYPE_STR);
 		}
 
 		if(!str_in_array($_REQUEST['sortorder'],array(ZBX_SORT_DOWN,ZBX_SORT_UP)))
 			$_REQUEST['sortorder'] = ZBX_SORT_UP;
 
-		update_profile('web.'.$page["file"].'.sortorder',	$_REQUEST['sortorder']);
+		update_profile('web.'.$page['file'].'.sortorder', $_REQUEST['sortorder'], PROFILE_TYPE_STR);
 	}
 
 /* function:
@@ -1092,10 +1104,10 @@ function __autoload($class_name){
 		$url = $link->getUrl();
 
 		if(($page['type'] != PAGE_TYPE_HTML) && defined('ZBX_PAGE_MAIN_HAT')){
-			$script = new CScript("javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
+			$script = new CJSscript("javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
 		}
 		else{
-			$script = new CScript("javascript: redirect('".$url."');");
+			$script = new CJSscript("javascript: redirect('".$url."');");
 		}
 
 		$col = array(new CSpan($obj,'underline'));
@@ -1209,6 +1221,8 @@ function __autoload($class_name){
 		$sortorder = get_request('sortorder',get_profile('web.'.$page['file'].'.sortorder',$def_order));
 
 	return order_result($data, $sortfield, $sortorder);
+//		$data = array_quicksort($data, $sortfield, $sortorder);
+//	return true;
 	}
 
 	function order_by($def,$allways=''){

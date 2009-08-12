@@ -197,7 +197,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			if($USER_DETAILS['debug_mode'] == GROUP_DEBUG_MODE_ENABLED){
 
 				$debug = new CLink(S_DEBUG, '#debug', 'small_font', null, 'nosid');
-				$debug->setAttribute('onclick', "javascript: ShowHide('zbx_gebug_info');");
+				$debug->setAttribute('onclick', "javascript: ShowHide('zbx_gebug_info', 'block');");
 
 				array_push($page_header_r_col,$debug,'|');
 			}

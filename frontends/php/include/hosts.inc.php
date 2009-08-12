@@ -341,19 +341,19 @@ require_once('include/httptest.inc.php');
 	return	$hostid;
 	}
 
-	/*
-	 * Function: update_host
-	 *
-	 * Description:
-	 *     Update host
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *
-	 *     NOTE: templates = array(id => name, id2 => name2, ...)
-	 */
+/*
+ * Function: update_host
+ *
+ * Description:
+ *     Update host
+ *
+ * Author:
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments:
+ *
+ *     NOTE: templates = array(id => name, id2 => name2, ...)
+ */
 	function update_host($hostid,$host,$port,$status,$useip,$dns,$ip,$proxy_hostid,
 							$templates,$useipmi,$ipmi_ip,$ipmi_port,$ipmi_authtype,$ipmi_privilege,$ipmi_username,$ipmi_password,
 							$newgroup,$groups)
@@ -397,18 +397,18 @@ require_once('include/httptest.inc.php');
 	return $result;
 	}
 
-	/*
-	 * Function: unlink_template
-	 *
-	 * Description:
-	 *     Unlink elements from host by template
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments: !!! Don't forget sync code with C !!!
-	 *
-	 */
+/*
+ * Function: unlink_template
+ *
+ * Description:
+ *     Unlink elements from host by template
+ *
+ * Author:
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments: !!! Don't forget sync code with C !!!
+ *
+ */
 	function unlink_template($hostid, $templateids, $unlink_mode = true){
 		zbx_value2array($templateids);
 
@@ -417,18 +417,18 @@ require_once('include/httptest.inc.php');
 	return $result;
 	}
 
-	/*
-	 * Function: delete_template_elements
-	 *
-	 * Description:
-	 *     Delete all elements from host by template
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments: !!! Don't forget sync code with C !!!
-	 *
-	 */
+/*
+ * Function: delete_template_elements
+ *
+ * Description:
+ *     Delete all elements from host by template
+ *
+ * Author:
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments: !!! Don't forget sync code with C !!!
+ *
+ */
 	function delete_template_elements($hostid, $templateids = null, $unlink_mode = false){
 		zbx_value2array($templateids);
 
@@ -439,18 +439,18 @@ require_once('include/httptest.inc.php');
 	return true;
 	}
 
-	/*
-	 * Function: copy_template_elements
-	 *
-	 * Description:
-	 *     Copy all elements from template to host
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments: !!! Don't forget sync code with C !!!
-	 *
-	 */
+/*
+ * Function: copy_template_elements
+ *
+ * Description:
+ *     Copy all elements from template to host
+ *
+ * Author:
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments: !!! Don't forget sync code with C !!!
+ *
+ */
 	function copy_template_elements($hostid, $templateid = null, $copy_mode = false){
 		copy_template_applications($hostid, $templateid, $copy_mode);
 		copy_template_items($hostid, $templateid, $copy_mode);
@@ -458,18 +458,18 @@ require_once('include/httptest.inc.php');
 		copy_template_graphs($hostid, $templateid, $copy_mode);
 	}
 
-	/*
-	 * Function: sync_host_with_templates
-	 *
-	 * Description:
-	 *     Synchronize template elements with host
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments: !!! Don't forget sync code with C !!!
-	 *
-	 */
+/*
+ * Function: sync_host_with_templates
+ *
+ * Description:
+ *     Synchronize template elements with host
+ *
+ * Author:
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments: !!! Don't forget sync code with C !!!
+ *
+ */
 	function sync_host_with_templates($hostid, $templateid = null){
 		delete_template_elements($hostid, $templateid);
 		copy_template_elements($hostid, $templateid);
@@ -888,18 +888,20 @@ require_once('include/httptest.inc.php');
 			}
 		}
 
-/*		if(!empty($hosts)){
+/*
+		if(!empty($hosts)){
 			update_trigger_value_to_unknown_by_hostid($hosts);
-
+	
 			return	DBexecute('UPDATE hosts SET status='.$status.
 							' WHERE '.DBcondition('hostid',$hosts).
 								' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'
 						);
 		}
-		else{
+		else{z
 			return 1;
-		}*/
-		return $res;
+		}
+//*/
+	return $res;
 	}
 
 /*
@@ -953,24 +955,24 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 			);
 
 	$def_options = array(
-				'allow_all' =>					0,
-				'select_first_group'=>			0,
-				'select_first_group_if_empty'=>	0,
-				'do_not_select' =>				0,
-				'do_not_select_if_empty' =>		0,
-				'monitored_hosts' =>			0,
-				'templated_hosts' =>			0,
-				'real_hosts' =>					0,
-				'not_proxy_hosts' =>			0,
-				'with_items' =>					0,
-				'with_monitored_items' =>		0,
-				'with_historical_items'=>		0,
-				'with_triggers' =>				0,
-				'with_monitored_triggers'=>		0,
-				'with_httptests' =>				0,
-				'with_monitored_httptests'=>	0,
-				'with_graphs'=>					0,
-				'only_current_node' =>			0,
+				'allow_all' =>						0,
+				'select_first_group'=>				0,
+				'select_first_group_if_empty'=>		0,
+				'do_not_select' =>					0,
+				'do_not_select_if_empty' =>			0,
+				'monitored_hosts' =>				0,
+				'templated_hosts' =>				0,
+				'real_hosts' =>						0,
+				'not_proxy_hosts' =>				0,
+				'with_items' =>						0,
+				'with_monitored_items' =>			0,
+				'with_historical_items'=>			0,
+				'with_triggers' =>					0,
+				'with_monitored_triggers'=>			0,
+				'with_httptests' =>					0,
+				'with_monitored_httptests'=>		0,
+				'with_graphs'=>						0,
+				'only_current_node' =>				0
 			);
 	$def_options = array_merge($def_options, $options);
 
@@ -1176,6 +1178,7 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 			$_REQUEST['groupid'] = $result['selected'];
 		}
 	}
+
 return $result;
 }
 
@@ -1650,40 +1653,62 @@ return $result;
  * Comments: !!! Don't forget sync code with C !!!
  *
  */
-	function delete_application($applicationid){
-		$app = get_application_by_applicationid($applicationid);
-		$host = get_host_by_hostid($app["hostid"]);
-
-		// first delete child applications
-		$db_applications = DBselect("select applicationid from applications where templateid=$applicationid");
-		while($db_app = DBfetch($db_applications))
-		{// recursion
-			$result = delete_application($db_app["applicationid"]);
-			if(!$result)	return	$result;
+	function delete_application($applicationids){
+		$zbx_value2array($applicationids);
+		
+		$apps = array();
+		$sql = 'SELECT h.host, a.name '.
+				' FROM applications a, hosts h '.
+				' WHERE '.DBcondition('a.applicationid',$applicationids).
+					' AND h.hostid=a.hostid';
+		$res = DBselect($sql);
+		while($db_app = DBfetch($res)){
+			$apps[$db_app['applicationid']] = $db_app;
 		}
+		
 
-		if($info = DBfetch(DBselect('select name from httptest where applicationid='.$applicationid)))
-		{
-			info("Application '".$host["host"].":".$app["name"]."' used by scenario '".$info['name']."'");
+// first delete child applications
+		$tmp_appids = array();
+		$sql = 'SELECT a.applicationid '.
+				' FROM applications a '.
+				' WHERE '.DBcondition('a.templateid',$applicationids);
+		$db_applications = DBselect($sql);
+		while($db_app = DBfetch($db_applications)){
+			$tmp_appids[$db_app['applicationid']] = $db_app['applicationid'];
+		}
+		
+		if(!empty($tmp_appids)) delete_application($tmp_appids);			// recursion!!!
+
+		$sql = 'SELECT ht.name '.
+				' FROM httptest ht '.
+				' WHERE '.DBcondition('ht.applicationid',$applicationids);
+		$res = DBselect($sql);
+		if($info = DBfetch($res)){
+			info('Application "'.$host['host'].':'.$app['name'].'" used by scenario "'.$info['name'].'"');
 			return false;
 		}
 
-		if($info = DBfetch(DBselect('select i.itemid,i.key_,i.description from items_applications ia, items i '.
-			' where i.type='.ITEM_TYPE_HTTPTEST.' and i.itemid=ia.itemid and ia.applicationid='.$applicationid)))
-		{
-			info("Application '".$host["host"].":".$app["name"]."' used by item '".
-				item_description($info)."'");
+		$sql = 'SELECT i.itemid,i.key_,i.description '.
+				' FROM items_applications ia, items i '.
+				' WHERE i.type='.ITEM_TYPE_HTTPTEST.
+					' AND i.itemid=ia.itemid '.
+					' AND '.DBcondition('ia.applicationid',$applicationids);
+		$res = DBselect($sql);
+		if($info = DBfetch($res)){
+			info('Application "'.$host['host'].':'.$app['name'].'" used by item "'.item_description($info).'"');
 			return false;
 		}
 
-		$result = DBexecute("delete from items_applications where applicationid=$applicationid");
+		$result = DBexecute('DELETE FROM items_applications WHERE '.DBcondition('applicationid',$applicationids));
+		$result = DBexecute('DELETE FROM applications WHERE '.DBcondition('applicationid',$applicationids));
 
-		$result = DBexecute("delete from applications where applicationid=$applicationid");
-		if($result)
-		{
-			info("Application '".$host["host"].":".$app["name"]."' deleted");
+		if($result){
+			foreach($apps as $appid => $app){
+				info('Application "'.$app['host'].':'.$app['name'].'" deleted');
+			}
 		}
-		return $result;
+
+	return $result;
 	}
 
 	function get_application_by_applicationid($applicationid,$no_error_message=0){

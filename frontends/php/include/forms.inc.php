@@ -85,19 +85,19 @@
 
 			$up = null;
 			if($sid != $first){
-				$up = new CLink(S_UP,'#','action');
-				$up->OnClick("return create_var('".$form->GetName()."','move_up',".$sid.", true);");
+				$up = new CSpan(S_UP,'link');
+				$up->onClick("return create_var('".$form->GetName()."','move_up',".$sid.", true);");
 			}
 
 			$down = null;
 			if($sid != $last){
-				$down = new CLink(S_DOWN,'#','action');
-				$down->OnClick("return create_var('".$form->GetName()."','move_down',".$sid.", true);");
+				$down = new CSpan(S_DOWN,'link');
+				$down->onClick("return create_var('".$form->GetName()."','move_down',".$sid.", true);");
 			}
 
 			$screen_data = get_screen_by_screenid($s['screenid']);
-			$name = new CLink($screen_data['name'],'#','action');
-			$name->OnClick("return create_var('".$form->GetName()."','edit_step',".$sid.", true);");
+			$name = new CSpan($screen_data['name'],'link');
+			$name->onClick("return create_var('".$form->GetName()."','edit_step',".$sid.", true);");
 
 			$tblSteps->addRow(array(
 				array(new CCheckBox('sel_step[]',null,null,$sid), $name),
@@ -489,21 +489,19 @@
 			if(!isset($s['required']))	$s['required'] = '';
 
 			$up = null;
-			if($stepid != $first)
-			{
-				$up = new CLink(S_UP,'#','action');
-				$up->OnClick("return create_var('".$form->GetName()."','move_up',".$stepid.", true);");
+			if($stepid != $first){
+				$up = new CSpan(S_UP,'link');
+				$up->onClick("return create_var('".$form->GetName()."','move_up',".$stepid.", true);");
 			}
 
 			$down = null;
-			if($stepid != $last)
-			{
-				$down = new CLink(S_DOWN,'#','action');
-				$down->OnClick("return create_var('".$form->GetName()."','move_down',".$stepid.", true);");
+			if($stepid != $last){
+				$down = new CLink(S_DOWN,'link');
+				$down->onClick("return create_var('".$form->GetName()."','move_down',".$stepid.", true);");
 			}
 
-			$name = new CLink($s['name'],'#','action');
-			$name->OnClick('return PopUp("popup_httpstep.php?dstfrm='.$form->GetName().
+			$name = new CSpan($s['name'],'link');
+			$name->onClick('return PopUp("popup_httpstep.php?dstfrm='.$form->GetName().
 				'&list_name=steps&stepid='.$stepid.
 				url_param($s['name'],false,'name').
 				url_param($s['timeout'],false,'timeout').
@@ -680,9 +678,6 @@
 									'severity' => $db_media['severity'],
 									'active' => $db_media['active']);
 			}
-
-			$new_group_id	= 0;
-			$new_group_name = '';
 		}
 		else{
 			$alias		= get_request('alias','');
@@ -705,8 +700,6 @@
 			$user_groups		= get_request('user_groups',array());
 			$change_password	= get_request('change_password', null);
 			$user_medias		= get_request('user_medias', array());
-			$new_group_id		= get_request('new_group_id', 0);
-			$new_group_name		= get_request('new_group_name', '');
 		}
 
 		if($autologin || !isset($_REQUEST['autologout'])){
@@ -784,7 +777,7 @@
 				$frmUser->addRow(S_USER_TYPE, $cmbUserType);
 			}
 
-			$lstGroups = new CListBox('user_groups_to_del[]');
+			$lstGroups = new CListBox('user_groups_to_del[]', null, 10);
 			$lstGroups->attributes['style'] = 'width: 320px';
 
 			foreach($user_groups as $groupid => $group_name){
@@ -821,7 +814,7 @@
 
 		$chkbx_autologin = new CCheckBox("autologin",
 											$autologin,
-											new CScript("var autologout_visible = document.getElementById('autologout_visible');
+											new CJSscript("var autologout_visible = document.getElementById('autologout_visible');
 														var autologout = document.getElementById('autologout');
 														if (this.checked) {
 															if (autologout_visible.checked) {
@@ -836,7 +829,7 @@
 		$frmUser->AddRow(S_AUTO_LOGIN,	$chkbx_autologin);
 		$autologoutCheckBox = new CCheckBox('autologout_visible',
 											($autologout == 0) ? 'no' : 'yes',
-											new CScript("var autologout = document.getElementById('autologout');
+											new CJSscript("var autologout = document.getElementById('autologout');
 														if (this.checked) {
 															autologout.disabled = false;
 														} else {
@@ -904,8 +897,8 @@
 		if(0 == $profile){
 			$frmUser->addVar('perm_details', $perm_details);
 
-			$link = new CLink($perm_details ? S_HIDE : S_SHOW ,'#','action');
-			$link->OnClick("return create_var('".$frmUser->GetName()."','perm_details',".($perm_details ? 0 : 1).", true);");
+			$link = new CSpan($perm_details?S_HIDE:S_SHOW ,'link');
+			$link->onClick("return create_var('".$frmUser->GetName()."','perm_details',".($perm_details ? 0 : 1).", true);");
 			$resources_list = array(
 				S_RIGHTS_OF_RESOURCES,
 				SPACE.'(',$link,')'
@@ -1161,7 +1154,7 @@
 
 		$frmUserG->addVar('perm_details', $perm_details);
 
-		$link = new CLink($perm_details ? S_HIDE : S_SHOW ,'#','action');
+		$link = new CSpan($perm_details?S_HIDE:S_SHOW,'link');
 		$link->OnClick("return create_var('".$frmUserG->GetName()."','perm_details',".($perm_details ? 0 : 1).", true);");
 		$resources_list = array(
 			S_RIGHTS_OF_RESOURCES,
@@ -1450,7 +1443,7 @@
 				$host = $host_info['host'];
 			}
 			else{
-				$host = S_NOT_SELECTED;
+				$host = S_NOT_SELECTED_SMALL;
 			}
 		}
 
@@ -1544,7 +1537,7 @@
 			$frmItem->setTitle(S_ITEM." '$host:$description'");
 		}
 
-		$frmItem->addvar('hostid', $hostid);
+		$frmItem->addVar('hostid', $hostid);
 		$frmItem->addRow(S_HOST,array(
 			new CTextBox('host',$host,32,true),
 			new CButton("btn_host",S_SELECT,
@@ -1574,42 +1567,28 @@
 			$frmItem->addVar('snmpv3_authpassphrase',$snmpv3_authpassphrase);
 			$frmItem->addVar('snmpv3_privpassphrase',$snmpv3_privpassphrase);
 
-			$frmItem->addRow(S_SNMP_COMMUNITY, new CTextBox('snmp_community',$snmp_community,16,$limited));
 			$frmItem->addRow(S_SNMP_OID, new CTextBox('snmp_oid',$snmp_oid,40,$limited));
-			$frmItem->addRow(S_SNMP_PORT, new CNumericBox('snmp_port',$snmp_port,5,$limited));
+			$frmItem->addRow(S_SNMP_COMMUNITY, new CTextBox('snmp_community',$snmp_community,16));
+			$frmItem->addRow(S_SNMP_PORT, new CNumericBox('snmp_port',$snmp_port,5));
 		}
 		else if($type==ITEM_TYPE_SNMPV3){
 			$frmItem->addVar('snmp_community',$snmp_community);
 
 			$frmItem->addRow(S_SNMP_OID, new CTextBox('snmp_oid',$snmp_oid,40,$limited));
 
-			$frmItem->addRow(S_SNMPV3_SECURITY_NAME,
-				new CTextBox('snmpv3_securityname',$snmpv3_securityname,64,$limited));
+			$frmItem->addRow(S_SNMPV3_SECURITY_NAME, new CTextBox('snmpv3_securityname',$snmpv3_securityname,64));
 
-			if(isset($limited)){
-				$frmItem->addVar('snmpv3_securitylevel', $snmpv3_securitylevel);
-				switch($snmpv3_securitylevel){
-					case ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV:	$snmpv3_securitylevel='NoAuthPriv';	break;
-					case ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV:	$snmpv3_securitylevel = 'AuthNoPriv';	break;
-					case ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV:	$snmpv3_securitylevel = 'AuthPriv';	break;
-				}
-				$frmItem->addRow(S_SNMPV3_SECURITY_LEVEL,  new CTextBox('snmpv3_securitylevel_desc',
-					$snmpv3_securitylevel, $limited));
-			}
-			else{
-				$cmbSecLevel = new CComboBox('snmpv3_securitylevel',$snmpv3_securitylevel);
+			$cmbSecLevel = new CComboBox('snmpv3_securitylevel',$snmpv3_securitylevel);
 				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,'NoAuthPriv');
 				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,'AuthNoPriv');
 				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,'AuthPriv');
-				$frmItem->addRow(S_SNMPV3_SECURITY_LEVEL, $cmbSecLevel);
-			}
-			$frmItem->addRow(S_SNMPV3_AUTH_PASSPHRASE,
-				new CTextBox('snmpv3_authpassphrase',$snmpv3_authpassphrase,64,$limited));
+			$frmItem->addRow(S_SNMPV3_SECURITY_LEVEL, $cmbSecLevel);
 
-			$frmItem->addRow(S_SNMPV3_PRIV_PASSPHRASE,
-				new CTextBox('snmpv3_privpassphrase',$snmpv3_privpassphrase,64,$limited));
+			$frmItem->addRow(S_SNMPV3_AUTH_PASSPHRASE, new CTextBox('snmpv3_authpassphrase',$snmpv3_authpassphrase,64));
 
-			$frmItem->addRow(S_SNMP_PORT, new CNumericBox('snmp_port',$snmp_port,5,$limited));
+			$frmItem->addRow(S_SNMPV3_PRIV_PASSPHRASE, new CTextBox('snmpv3_privpassphrase',$snmpv3_privpassphrase,64));
+
+			$frmItem->addRow(S_SNMP_PORT, new CNumericBox('snmp_port',$snmp_port,5));
 		}
 		else{
 			$frmItem->addVar('snmp_community',$snmp_community);
@@ -1772,7 +1751,7 @@
 						);
 			}
 
-			$link = new CLink('throw map','config.php?config=6','action');
+			$link = new CLink('throw map','config.php?config=6');
 			$link->setAttribute('target','_blank');
 			$frmItem->addRow(array(S_SHOW_VALUE.SPACE,$link),$cmbMap);
 
@@ -2039,7 +2018,7 @@
 					get_node_name_by_elid($db_valuemap["valuemapid"]).$db_valuemap["name"]
 					);
 
-		$link = new CLink("throw map","config.php?config=6","action");
+		$link = new CLink("throw map","config.php?config=6");
 		$link->setAttribute("target","_blank");
 		$frmItem->addRow(array( new CVisibilityBox('valuemapid_visible', get_request('valuemapid_visible'), 'valuemapid', S_ORIGINAL),
 			S_SHOW_VALUE, SPACE, $link),$cmbMap);
@@ -2648,15 +2627,15 @@
 				else
 					$color = new CColorCell(null,$gitem['color']);
 
-				$do_up = new CLink(S_UP,'#','action');
-				$do_up->OnClick("return create_var('".$frmGraph->GetName()."','move_up',".$gid.", true);");
+				$do_up = new CSpan(S_UP,'link');
+				$do_up->onClick("return create_var('".$frmGraph->getName()."','move_up',".$gid.", true);");
 
-				$do_down = new CLink(S_DOWN,'#','action');
-				$do_down->OnClick("return create_var('".$frmGraph->GetName()."','move_down',".$gid.", true);");
+				$do_down = new CSpan(S_DOWN,'link');
+				$do_down->onClick("return create_var('".$frmGraph->getName()."','move_down',".$gid.", true);");
 
-				$description = new CLink($host['host'].': '.item_description($item),'#','action');
-				$description->OnClick(
-						'return PopUp("popup_gitem.php?list_name=items&dstfrm='.$frmGraph->GetName().
+				$description = new CSpan($host['host'].': '.item_description($item),'link');
+				$description->onClick(
+						'return PopUp("popup_gitem.php?list_name=items&dstfrm='.$frmGraph->getName().
 						url_param($only_hostid, false, 'only_hostid').
 						url_param($monitored_hosts, false, 'monitored_hosts').
 						url_param($graphtype, false, 'graphtype').
@@ -4524,41 +4503,41 @@
 
 	function insert_media_type_form(){
 
-		$type		= get_request("type",0);
-		$description	= get_request("description","");
-		$smtp_server	= get_request("smtp_server","localhost");
-		$smtp_helo	= get_request("smtp_helo","localhost");
-		$smtp_email	= get_request("smtp_email","zabbix@localhost");
-		$exec_path	= get_request("exec_path","");
-		$gsm_modem	= get_request("gsm_modem","/dev/ttyS0");
-		$username	= get_request("username","user@server");
-		$password	= get_request("password","");
+		$type		= get_request('type',0);
+		$description	= get_request('description','');
+		$smtp_server	= get_request('smtp_server','localhost');
+		$smtp_helo	= get_request('smtp_helo','localhost');
+		$smtp_email	= get_request('smtp_email','zabbix@localhost');
+		$exec_path	= get_request('exec_path','');
+		$gsm_modem	= get_request('gsm_modem','/dev/ttyS0');
+		$username	= get_request('username','user@server');
+		$password	= get_request('password','');
 
-		if(isset($_REQUEST["mediatypeid"]) && !isset($_REQUEST["form_refresh"])){
-			$result = DBselect("select * FROM media_type WHERE mediatypeid=".$_REQUEST["mediatypeid"]);
+		if(isset($_REQUEST['mediatypeid']) && !isset($_REQUEST['form_refresh'])){
+			$result = DBselect('select * FROM media_type WHERE mediatypeid='.$_REQUEST['mediatypeid']);
 
 			$row = DBfetch($result);
-			$mediatypeid	= $row["mediatypeid"];
-			$type		= get_request("type",$row["type"]);
-			$description	= $row["description"];
-			$smtp_server	= $row["smtp_server"];
-			$smtp_helo	= $row["smtp_helo"];
-			$smtp_email	= $row["smtp_email"];
-			$exec_path	= $row["exec_path"];
-			$gsm_modem	= $row["gsm_modem"];
-			$username	= $row["username"];
-			$password	= $row["passwd"];
+			$mediatypeid	= $row['mediatypeid'];
+			$type		= get_request('type',$row['type']);
+			$description	= $row['description'];
+			$smtp_server	= $row['smtp_server'];
+			$smtp_helo	= $row['smtp_helo'];
+			$smtp_email	= $row['smtp_email'];
+			$exec_path	= $row['exec_path'];
+			$gsm_modem	= $row['gsm_modem'];
+			$username	= $row['username'];
+			$password	= $row['passwd'];
 		}
 
 		$frmMeadia = new CFormTable(S_MEDIA);
-		$frmMeadia->SetHelp("web.config.medias.php");
+		$frmMeadia->SetHelp('web.config.medias.php');
 
-		if(isset($_REQUEST["mediatypeid"])){
-			$frmMeadia->addVar("mediatypeid",$_REQUEST["mediatypeid"]);
+		if(isset($_REQUEST['mediatypeid'])){
+			$frmMeadia->addVar('mediatypeid',$_REQUEST['mediatypeid']);
 		}
 
-		$frmMeadia->addRow(S_DESCRIPTION,new CTextBox("description",$description,30));
-		$cmbType = new CComboBox("type",$type,"submit()");
+		$frmMeadia->addRow(S_DESCRIPTION,new CTextBox('description',$description,30));
+		$cmbType = new CComboBox('type',$type,'submit()');
 		$cmbType->addItem(MEDIA_TYPE_EMAIL,S_EMAIL);
 		$cmbType->addItem(MEDIA_TYPE_JABBER,S_JABBER);
 		$cmbType->addItem(MEDIA_TYPE_SMS,S_SMS);
@@ -4567,30 +4546,31 @@
 
 		switch($type){
 		case MEDIA_TYPE_EMAIL:
-			$frmMeadia->addRow(S_SMTP_SERVER,new CTextBox("smtp_server",$smtp_server,30));
-			$frmMeadia->addRow(S_SMTP_HELO,new CTextBox("smtp_helo",$smtp_helo,30));
-			$frmMeadia->addRow(S_SMTP_EMAIL,new CTextBox("smtp_email",$smtp_email,30));
+			$frmMeadia->addRow(S_SMTP_SERVER,new CTextBox('smtp_server',$smtp_server,30));
+			$frmMeadia->addRow(S_SMTP_HELO,new CTextBox('smtp_helo',$smtp_helo,30));
+			$frmMeadia->addRow(S_SMTP_EMAIL,new CTextBox('smtp_email',$smtp_email,30));
 			break;
 		case MEDIA_TYPE_SMS:
-			$frmMeadia->addRow(S_GSM_MODEM,new CTextBox("gsm_modem",$gsm_modem,50));
+			$frmMeadia->addRow(S_GSM_MODEM,new CTextBox('gsm_modem',$gsm_modem,50));
 			break;
 		case MEDIA_TYPE_EXEC:
-			$frmMeadia->addRow(S_SCRIPT_NAME,new CTextBox("exec_path",$exec_path,50));
+			$frmMeadia->addRow(S_SCRIPT_NAME,new CTextBox('exec_path',$exec_path,50));
 			break;
 		case MEDIA_TYPE_JABBER:
-			$frmMeadia->addRow(S_JABBER_IDENTIFIER, new CTextBox("username",$username,30));
-			$frmMeadia->addRow(S_PASSWORD, new CPassBox("password",$password,30));
+			$frmMeadia->addRow(S_JABBER_IDENTIFIER, new CTextBox('username',$username,30));
+			$frmMeadia->addRow(S_PASSWORD, new CPassBox('password',$password,30));
 		}
 
-		$frmMeadia->addItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["mediatypeid"])){
+		$frmMeadia->addItemToBottomRow(new CButton('save',S_SAVE));
+		if(isset($_REQUEST['mediatypeid'])){
 			$frmMeadia->addItemToBottomRow(SPACE);
 			$frmMeadia->addItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_MEDIA,
-				url_param("form").url_param("mediatypeid")));
+				url_param('form').url_param('mediatypeid')));
 		}
 		$frmMeadia->addItemToBottomRow(SPACE);
 		$frmMeadia->addItemToBottomRow(new CButtonCancel());
-		$frmMeadia->show();
+
+	return $frmMeadia;
 	}
 
 	function insert_screen_form(){
@@ -4601,38 +4581,38 @@
 						' FROM screens g '.
 						' WHERE screenid='.$_REQUEST['screenid']);
 			$row=DBfetch($result);
-			$frm_title = S_SCREEN.' "'.$row["name"].'"';
+			$frm_title = S_SCREEN.' "'.$row['name'].'"';
 		}
-		if(isset($_REQUEST["screenid"]) && !isset($_REQUEST["form_refresh"])){
-			$name=$row["name"];
-			$hsize=$row["hsize"];
-			$vsize=$row["vsize"];
+		if(isset($_REQUEST['screenid']) && !isset($_REQUEST['form_refresh'])){
+			$name=$row['name'];
+			$hsize=$row['hsize'];
+			$vsize=$row['vsize'];
 		}
 		else{
-			$name=get_request("name","");
-			$hsize=get_request("hsize",1);
-			$vsize=get_request("bsize",1);
+			$name=get_request('name','');
+			$hsize=get_request('hsize',1);
+			$vsize=get_request('bsize',1);
 		}
 
-		$frmScr = new CFormTable($frm_title,"screenconf.php");
-		$frmScr->SetHelp("web.screenconf.screen.php");
+		$frmScr = new CFormTable($frm_title,'screenconf.php');
+		$frmScr->SetHelp('web.screenconf.screen.php');
 
 		$frmScr->addVar('config', 0);
 
-		if(isset($_REQUEST["screenid"])){
-			$frmScr->addVar("screenid",$_REQUEST["screenid"]);
+		if(isset($_REQUEST['screenid'])){
+			$frmScr->addVar('screenid',$_REQUEST['screenid']);
 		}
-		$frmScr->addRow(S_NAME, new CTextBox("name",$name,32));
-		$frmScr->addRow(S_COLUMNS, new CNumericBox("hsize",$hsize,3));
-		$frmScr->addRow(S_ROWS, new CNumericBox("vsize",$vsize,3));
+		$frmScr->addRow(S_NAME, new CTextBox('name',$name,32));
+		$frmScr->addRow(S_COLUMNS, new CNumericBox('hsize',$hsize,3));
+		$frmScr->addRow(S_ROWS, new CNumericBox('vsize',$vsize,3));
 
-		$frmScr->addItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["screenid"])){
+		$frmScr->addItemToBottomRow(new CButton('save',S_SAVE));
+		if(isset($_REQUEST['screenid'])){
 			/* $frmScr->addItemToBottomRow(SPACE);
 			$frmScr->addItemToBottomRow(new CButton('clone',S_CLONE)); !!! TODO */
 			$frmScr->addItemToBottomRow(SPACE);
 			$frmScr->addItemToBottomRow(new CButtonDelete(S_DELETE_SCREEN_Q,
-				url_param("form").url_param("screenid")));
+				url_param('form').url_param('screenid')));
 		}
 		$frmScr->addItemToBottomRow(SPACE);
 		$frmScr->addItemToBottomRow(new CButtonCancel());
@@ -4878,7 +4858,7 @@
 
 		$frmHost->addRow(array(
 					new CVisibilityBox('visible[useipmi]', isset($visible['useipmi']), 'useipmi', S_ORIGINAL), S_USEIPMI),
-					new CCheckBox("useipmi", $useipmi, "submit()")
+					new CCheckBox('useipmi', $useipmi, 'submit()')
 				);
 
 		if($useipmi == 'yes'){
@@ -4929,88 +4909,88 @@
 
 		$frmHost->addRow(array(
 					new CVisibilityBox('visible[useprofile]', isset($visible['useprofile']), 'useprofile', S_ORIGINAL),S_USE_PROFILE),
-					new CCheckBox("useprofile",$useprofile,"submit()")
+					new CCheckBox('useprofile',$useprofile,'submit()')
 				);
 
 // BEGIN: HOSTS PROFILE EXTENDED Section
 		$frmHost->addRow(array(
 			new CVisibilityBox('visible[useprofile_ext]', isset($visible['useprofile_ext']), 'useprofile_ext', S_ORIGINAL),S_USE_EXTENDED_PROFILE),
-			new CCheckBox("useprofile_ext",$useprofile_ext,"submit()")
+			new CCheckBox('useprofile_ext',$useprofile_ext,'submit()')
 		);
 // END:   HOSTS PROFILE EXTENDED Section
 
-		if($useprofile=="yes"){
+		if($useprofile=='yes'){
 			$frmHost->addRow(array(
 				new CVisibilityBox('visible[devicetype]', isset($visible['devicetype']), 'devicetype', S_ORIGINAL),S_DEVICE_TYPE),
-				new CTextBox("devicetype",$devicetype,61)
+				new CTextBox('devicetype',$devicetype,61)
 			);
 
 			$frmHost->addRow(array(
 				new CVisibilityBox('visible[name]', isset($visible['name']), 'name', S_ORIGINAL),S_NAME),
-				new CTextBox("name",$name,61)
+				new CTextBox('name',$name,61)
 			);
 
 			$frmHost->addRow(array(
 				new CVisibilityBox('visible[os]', isset($visible['os']), 'os', S_ORIGINAL),S_OS),
-				new CTextBox("os",$os,61)
+				new CTextBox('os',$os,61)
 			);
 
 			$frmHost->addRow(array(
 				new CVisibilityBox('visible[serialno]', isset($visible['serialno']), 'serialno', S_ORIGINAL),S_SERIALNO),
-				new CTextBox("serialno",$serialno,61)
+				new CTextBox('serialno',$serialno,61)
 			);
 
 			$frmHost->addRow(array(
 				new CVisibilityBox('visible[tag]', isset($visible['tag']), 'tag', S_ORIGINAL),S_TAG),
-				new CTextBox("tag",$tag,61)
+				new CTextBox('tag',$tag,61)
 			);
 
 			$frmHost->addRow(array(
 				new CVisibilityBox('visible[macaddress]', isset($visible['macaddress']), 'macaddress', S_ORIGINAL),S_MACADDRESS),
-				new CTextBox("macaddress",$macaddress,61)
+				new CTextBox('macaddress',$macaddress,61)
 			);
 
 			$frmHost->addRow(array(
 				new CVisibilityBox('visible[hardware]', isset($visible['hardware']), 'hardware', S_ORIGINAL),S_HARDWARE),
-				new CTextArea("hardware",$hardware,60,4)
+				new CTextArea('hardware',$hardware,60,4)
 			);
 
 			$frmHost->addRow(array(
 				new CVisibilityBox('visible[software]', isset($visible['software']), 'software', S_ORIGINAL),S_SOFTWARE),
-				new CTextArea("software",$software,60,4)
+				new CTextArea('software',$software,60,4)
 			);
 
 			$frmHost->addRow(array(
 				new CVisibilityBox('visible[contact]', isset($visible['contact']), 'contact', S_ORIGINAL),S_CONTACT),
-				new CTextArea("contact",$contact,60,4)
+				new CTextArea('contact',$contact,60,4)
 			);
 
 			$frmHost->addRow(array(
 				new CVisibilityBox('visible[location]', isset($visible['location']), 'location', S_ORIGINAL),S_LOCATION),
-				new CTextArea("location",$location,60,4)
+				new CTextArea('location',$location,60,4)
 			);
 
 			$frmHost->addRow(array(
 				new CVisibilityBox('visible[notes]', isset($visible['notes']), 'notes', S_ORIGINAL),S_NOTES),
-				new CTextArea("notes",$notes,60,4)
+				new CTextArea('notes',$notes,60,4)
 			);
 		}
 		else{
-			$frmHost->addVar("devicetype",	$devicetype);
-			$frmHost->addVar("name",	$name);
-			$frmHost->addVar("os",		$os);
-			$frmHost->addVar("serialno",	$serialno);
-			$frmHost->addVar("tag",		$tag);
-			$frmHost->addVar("macaddress",	$macaddress);
-			$frmHost->addVar("hardware",	$hardware);
-			$frmHost->addVar("software",	$software);
-			$frmHost->addVar("contact",	$contact);
-			$frmHost->addVar("location",	$location);
-			$frmHost->addVar("notes",	$notes);
+			$frmHost->addVar('devicetype',	$devicetype);
+			$frmHost->addVar('name',	$name);
+			$frmHost->addVar('os',		$os);
+			$frmHost->addVar('serialno',	$serialno);
+			$frmHost->addVar('tag',		$tag);
+			$frmHost->addVar('macaddress',	$macaddress);
+			$frmHost->addVar('hardware',	$hardware);
+			$frmHost->addVar('software',	$software);
+			$frmHost->addVar('contact',	$contact);
+			$frmHost->addVar('location',	$location);
+			$frmHost->addVar('notes',	$notes);
 		}
 
 // BEGIN: HOSTS PROFILE EXTENDED Section
-	if($useprofile_ext=="yes"){
+	if($useprofile_ext=='yes'){
 		foreach($ext_profiles_fields as $prof_field => $caption){
 			$frmHost->addRow(array(
 				new CVisibilityBox('visible['.$prof_field.']', isset($visible[$prof_field]), 'ext_host_profiles['.$prof_field.']', S_ORIGINAL),$caption),
@@ -5025,9 +5005,9 @@
 	}
 // END:   HOSTS PROFILE EXTENDED Section
 
-		$frmHost->addItemToBottomRow(new CButton("save",S_SAVE));
+		$frmHost->addItemToBottomRow(new CButton('save',S_SAVE));
 		$frmHost->addItemToBottomRow(SPACE);
-		$frmHost->addItemToBottomRow(new CButtonCancel(url_param("config").url_param('groupid')));
+		$frmHost->addItemToBottomRow(new CButtonCancel(url_param('config').url_param('groupid')));
 		$frmHost->show();
 	}
 
@@ -5730,7 +5710,7 @@
 		$frmHost->show();
 	}
 
-	# Insert host profile ReadOnly form
+// Insert host profile ReadOnly form
 	function insert_host_profile_form(){
 
 		$frmHostP = new CFormTable(S_HOST_PROFILE);
@@ -5757,7 +5737,7 @@
 			$frmHostP->addSpanRow("Profile for this host is missing","form_row_c");
 		}
 		$frmHostP->addItemToBottomRow(new CButtonCancel(url_param('groupid')));
-		$frmHostP->show();
+	return $frmHostP;
 	}
 
 // BEGIN: HOSTS PROFILE EXTENDED Section
@@ -5798,7 +5778,7 @@
 			$frmHostPA->addSpanRow('Extended Profile for this host is missing','form_row_c');
 		}
 		$frmHostPA->addItemToBottomRow(new CButtonCancel(url_param('groupid')));
-		$frmHostPA->show();
+	return $frmHostPA;
 	}
 // END:   HOSTS PROFILE EXTENDED Section
 

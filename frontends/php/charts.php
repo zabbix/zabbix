@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-	require_once 'include/config.inc.php';
-	require_once 'include/hosts.inc.php';
-	require_once 'include/graphs.inc.php';
+	require_once('include/config.inc.php');
+	require_once('include/hosts.inc.php');
+	require_once('include/graphs.inc.php');
 
 	$page['title'] = 'S_CUSTOM_GRAPHS';
 	$page['file'] = 'charts.php';
@@ -32,7 +32,7 @@
 
 //	define('ZBX_PAGE_DO_REFRESH', 1);
 
-include_once 'include/page_header.php';
+include_once('include/page_header.php');
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
@@ -139,7 +139,7 @@ include_once 'include/page_header.php';
 			update_profile('web.graph.stime',$_REQUEST['stime'], PROFILE_TYPE_STR, $_REQUEST['graphid']);
 
 		if($_REQUEST['period'] >= ZBX_MIN_PERIOD)
-			update_profile('web.graph.period',$_REQUEST['period'],PROFILE_TYPE_INT,$_REQUEST['graphid']);
+			update_profile('web.graph.period',$_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['graphid']);
 	}
 
 	update_profile('web.charts.graphid',$_REQUEST['graphid']);
@@ -295,7 +295,7 @@ include_once 'include/page_header.php';
 				</script>'."\n";
 		}
 
-		$table->addRow(new CScript($row));
+		$table->addRow(new CJSscript($row));
 	}
 
 	$icon = null;
@@ -305,12 +305,12 @@ include_once 'include/page_header.php';
 		if(infavorites('web.favorite.graphids',$_REQUEST['graphid'],'graphid')){
 			$icon = new CDiv(SPACE,'iconminus');
 			$icon->setAttribute('title',S_REMOVE_FROM.' '.S_FAVOURITES);
-			$icon->addAction('onclick',new CScript("javascript: rm4favorites('graphid','".$_REQUEST['graphid']."',0);"));
+			$icon->addAction('onclick',new CJSscript("javascript: rm4favorites('graphid','".$_REQUEST['graphid']."',0);"));
 		}
 		else{
 			$icon = new CDiv(SPACE,'iconplus');
 			$icon->setAttribute('title',S_ADD_TO.' '.S_FAVOURITES);
-			$icon->addAction('onclick',new CScript("javascript: add2favorites('graphid','".$_REQUEST['graphid']."');"));
+			$icon->addAction('onclick',new CJSscript("javascript: add2favorites('graphid','".$_REQUEST['graphid']."');"));
 		}
 		$icon->setAttribute('id','addrm_fav');
 
@@ -318,17 +318,18 @@ include_once 'include/page_header.php';
 
 		$fs_icon = new CDiv(SPACE,'fullscreen');
 		$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-		$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+		$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
 
 		$rst_icon = new CDiv(SPACE,'iconreset');
 		$rst_icon->setAttribute('title',S_RESET);
-		$rst_icon->addAction('onclick',new CScript("javascript: graphload(SCROLL_BAR.dom_graphs, ".(time()+100000000).", 3600, false);"));
+		$rst_icon->addAction('onclick',new CJSscript("javascript: graphload(SCROLL_BAR.dom_graphs, ".(time()+100000000).", 3600, false);"));
 
 	}
 
-	$charts_wdgt->addHeader(S_GRAPHS_BIG,array($icon,$rst_icon,$fs_icon));
-	$charts_wdgt->addHeader($h1,$r_form);
+	$charts_wdgt->addPageHeader(S_GRAPHS_BIG,array($icon,$rst_icon,$fs_icon));
 
+	$charts_wdgt->addHeader($h1,$r_form);
+	$charts_wdgt->addItem(BR());
 	$charts_wdgt->addItem($table);
 
 	$charts_wdgt->show();
@@ -362,6 +363,6 @@ include_once 'include/page_header.php';
 ?>
 <?php
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
 
 ?>

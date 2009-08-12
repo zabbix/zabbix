@@ -114,8 +114,9 @@ if(defined('USE_PROFILING')){
 	$var_list = array();
 
 	class COpt{
-		/* protected static $starttime[]=array(); */
-
+	/* protected static $starttime[]=array(); */
+	protected static $debug_info = array();
+	
 		protected  static function getmicrotime() {
 			if(defined('USE_TIME_PROF')) {
 				list($usec, $sec) = explode(' ',microtime());
@@ -212,18 +213,16 @@ if(defined('USE_PROFILING')){
 			$memory = COpt::getmemoryusage();
 
 			if(is_null($type)) $type='global';
-
-			$debug_str = '';
+			
+			$debug_str = '';			
 			$debug_str.= '<a name="debug"></a>';
 			$debug_str.= "******************* Stats for $type *************************".OBR;
 			if(defined('USE_TIME_PROF')){
 				$time = $endtime - $starttime[$type];
-				if($time < TOTAL_TIME)
-				{
+				if($time < TOTAL_TIME){
 					$debug_str.= 'Total time: '.round($time,6).OBR;
 				}
-				else
-				{
+				else{
 					$debug_str.= '<b>Total time: '.round($time,6).'</b>'.OBR;
 				}
 			}
@@ -243,7 +242,6 @@ if(defined('USE_PROFILING')){
 			}
 
 			if(defined('USE_COUNTER_PROF')){
-
 				if(isset($perf_counter[$type])){
 					ksort($perf_counter[$type]);
 					foreach($perf_counter[$type] as $name => $value){
@@ -263,12 +261,10 @@ if(defined('USE_PROFILING')){
 					for($i = $sqlmark[$type]; $i < $requests_cnt; $i++){
 						$time=$sqlrequests[$i][0];
 						$sql_time+=$time;
-						if($time < LONG_QUERY)
-						{
+						if($time < LONG_QUERY){
 							$debug_str.= 'Time:'.round($time,8).' SQL:&nbsp;'.$sqlrequests[$i][1].OBR;
 						}
-						else
-						{
+						else{
 							$debug_str.= '<b>Time:'.round($time,8).' LONG SQL:&nbsp;'.$sqlrequests[$i][1].'</b>'.OBR;
 						}
 					}
@@ -277,28 +273,31 @@ if(defined('USE_PROFILING')){
 					$debug_str.= 'SQL requests count: '.($sqlrequests - $sqlmark[$type]).OBR;
 				}
 
-				if($sql_time < QUERY_TOTAL_TIME)
-				{
+				if($sql_time < QUERY_TOTAL_TIME){
 					$debug_str.= 'Total time spent on SQL: '.round($sql_time,8).OBR;
 				}
-				else
-				{
+				else{
 					$debug_str.= '<b>Total time spent on SQL: '.round($sql_time,8).'</b>'.OBR;
 				}
 			}
 			$debug_str.= "******************** End of $type ***************************".OBR;
-
-// DEBUG of ZBX FrontEnd
-			$zbx_debug = new CWidget('debug_hat',new CSpan(new CScript($debug_str),'textcolorstyles'));
-			$zbx_debug->addHeader(S_DEBUG);
-
-			$debud = new CDiv(array(BR(),$zbx_debug));
-			$debud->setAttribute('id','zbx_gebug_info');
-			$debud->setAttribute('style','display: none;');
-			$debud->show();
+			
+			self::$debug_info[$type] = $debug_str;
+		}
+	
+		public static function show(){
+// DEBUG of ZBX FrontEnd	
+			$debug = new CDiv(null,'textcolorstyles');
+			$debug->setAttribute('id','zbx_gebug_info');
+			$debug->setAttribute('style','display: none; overflow: auto; width: 95%; border: 1px #777777 solid; margin: 4px; padding: 4px;');
+			
+			foreach(self::$debug_info as $type => $info){
+				$debug->addItem(array(BR(),new CJSscript($info),BR()));
+			}
+			
+			$debug->show();
 //----------------
 		}
-
 
 		public static function set_memory_limit($limit='256M'){
 			ini_set('memory_limit',$limit);
@@ -363,21 +362,15 @@ if(defined('USE_PROFILING')){
 	COpt::profiling_start('script');
 }
 else{
-	$static = null;
-	if(version_compare(phpversion(),'5.0','>='))
-		$static = 'static';
-
-	eval('
-	class COpt
-	{
-		'.$static.' function profiling_start($type=NULL) {}
-		'.$static.' function profiling_stop($type=NULL) {}
-		'.$static.' function savesqlrequest($sql) {}
-		'.$static.' function showmemoryusage($descr=null) {}
-		'.$static.' function compare_files_with_menu($menu=null) {}
-		'.$static.' function counter_up($type=NULL) {}
-	}'
-	);
+	class COpt{
+		static function profiling_start($type=NULL) {}
+		static function profiling_stop($type=NULL) {}
+		static function show() {}
+		static function savesqlrequest($sql) {}
+		static function showmemoryusage($descr=null) {}
+		static function compare_files_with_menu($menu=null) {}
+		static function counter_up($type=NULL) {}
+	}
 }
 
 ?>

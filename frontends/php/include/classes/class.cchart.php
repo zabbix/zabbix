@@ -205,7 +205,7 @@ class CChart extends CGraphDraw{
 		}
 		$intervalX = ($interval * $this->sizeX) / $this->period;
 
-		$offset = $interval - (($this->from_time+date('Z')) % $interval);
+		$offset = $interval - (($this->from_time+date('Z',$this->to_time)) % $interval);
 		$offsetX = ($offset * $this->sizeX) / $this->period;
 
 		$vline_count = floor(($this->period-$offset) / $interval);

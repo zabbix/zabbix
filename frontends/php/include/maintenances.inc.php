@@ -147,6 +147,7 @@ function delete_maintenance($maintenanceids){
 	DBexecute('DELETE FROM maintenances_hosts WHERE '.DBcondition('maintenanceid',$maintenanceids));
 	DBexecute('DELETE FROM maintenances_groups WHERE '.DBcondition('maintenanceid',$maintenanceids));
 	$result = DBexecute('DELETE FROM maintenances WHERE '.DBcondition('maintenanceid',$maintenanceids));
+
 return $result;
 }
 

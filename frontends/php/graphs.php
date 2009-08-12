@@ -416,6 +416,8 @@ include_once('include/page_header.php');
 	}
 	else {
 /* Table HEADER */
+		$graphs_wdgt = new CWidget();
+		
 		if(isset($_REQUEST['graphid']) && ($_REQUEST['graphid']==0)){
 			unset($_REQUEST['graphid']);
 		}
@@ -436,13 +438,11 @@ include_once('include/page_header.php');
 		$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
 		$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 
-		$numrows = new CSpan(null,'info');
+		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
-		$header = get_table_header(array(S_GRAPHS_BIG,
-						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-						S_FOUND.': ',$numrows,)
-						);
-		show_table_header($header, $r_form);
+
+		$graphs_wdgt->addHeader(S_GRAPHS_BIG, $r_form);
+		$graphs_wdgt->addHeader($numrows);
 
 // <<<--- SELECTED HOST HEADER INFORMATION --->>>
 		if($PAGE_HOSTS['selected'] > 0){
@@ -456,7 +456,8 @@ include_once('include/page_header.php');
 				'extendoutput' => 1,
 				'select_items' => 1,
 				'select_triggers' => 1,
-				'select_applications' =>1
+				'select_applications' =>1,
+				'limit' => ($config['search_limit']+1)
 			));
 			$header_host = array_pop($header_host);
 
@@ -481,11 +482,10 @@ include_once('include/page_header.php');
 
 				$tbl_header_host->addRow(array(
 					new CLink(bold(S_TEMPLATE_LIST), 'templates.php?templateid='.$header_host['hostid'].url_param('groupid')),
-					$applications,
 					$items,
 					$triggers,
-					array(bold(S_TEMPLATE.': '), $description),
-					array(bold(S_STATUS.': '), $status)
+					$applications,
+					array(bold(S_TEMPLATE.': '), $description)
 				));
 			}
 			else{
@@ -519,9 +519,9 @@ include_once('include/page_header.php');
 
 				$tbl_header_host->addRow(array(
 					new CLink(bold(S_HOST_LIST), 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid')),
-					$applications,
 					$items,
 					$triggers,
+					$applications,
 					array(bold(S_HOST.': '), $description),
 					array(bold(S_DNS.': '), $dns),
 					array(bold(S_IP.': '), $ip),
@@ -531,9 +531,11 @@ include_once('include/page_header.php');
 				));
 			}
 			$tbl_header_host->setClass('infobox');
-			$tbl_header_host->show();
+
+			$graphs_wdgt->addItem($tbl_header_host);
 		}
 // --->>> SELECTED HOST HEADER INFORMATION <<<---
+
 /* TABLE */
 		$form = new CForm();
 		$form->setName('graphs');
@@ -548,15 +550,27 @@ include_once('include/page_header.php');
 			S_HEIGHT,
 			make_sorting_header(S_GRAPH_TYPE,'graphtype')));
 
-		$options = array('editable' => 1, 'extendoutput' => 1, 'select_hosts' => 1);
+		$options = array('editable' => 1, 
+						'extendoutput' => 1, 
+						'select_hosts' => 1,
+						'limit' => ($config['search_limit']+1));
+
 		if($PAGE_HOSTS['selected'] > 0){
-			$options += array('hostids' => $PAGE_HOSTS['selected']);
+			$options['hostids'] = $PAGE_HOSTS['selected'];
 		}
 		else if($PAGE_GROUPS['selected'] > 0){
-			$options += array('groupids' => $PAGE_GROUPS['selected']);
+			$options['groupids'] = $PAGE_GROUPS['selected'];
 		}
+		
 		$graphs = CGraph::get($options);
 
+// sorting
+		order_page_result($graphs, getPageSortField('description'), getPageSortOrder());
+
+// PAGING UPPER
+		$paging = getPagingLine($graphs);
+		$graphs_wdgt->addItem($paging);
+//---------
 
 		foreach($graphs as $graphid => $graph){
 
@@ -573,7 +587,7 @@ include_once('include/page_header.php');
 			if($graph['templateid'] != 0){
 				$real_hosts = get_realhosts_by_graphid($graph['templateid']);
 				$real_host = DBfetch($real_hosts);
-				$name[] = new CLink($real_host['host'], 'graphs.php?'.'hostid='.$real_host['hostid'], 'action');
+				$name[] = new CLink($real_host['host'], 'graphs.php?'.'hostid='.$real_host['hostid'], 'unknown');
 				$name[] = ':';
 			}
 			$name[] = new CLink($graph['name'], 'graphs.php?graphid='.$graphid.'&form=update');
@@ -607,6 +621,11 @@ include_once('include/page_header.php');
 			));
 		}
 
+// PAGING FOOTER
+		$table->addRow(new CCol($paging));
+//		$items_wdgt->addItem($paging);
+//---------
+
 //----- GO ------
 		$goBox = new CComboBox('go');
 		$goBox->addItem('copy_to',S_COPY_SELECTED_TO);
@@ -621,8 +640,9 @@ include_once('include/page_header.php');
 //----
 
 		$form->addItem($table);
-		$form->show();
-		zbx_add_post_js('insert_in_element("numrows","'.$table->getNumRows().'");');
+
+		$graphs_wdgt->addItem($form);
+		$graphs_wdgt->show();
 	}
 
 include_once 'include/page_footer.php';

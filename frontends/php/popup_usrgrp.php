@@ -19,38 +19,38 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/users.inc.php";
+	require_once('include/config.inc.php');
+	require_once('include/users.inc.php');
 
-	$page["title"] = "S_GROUPS";
-	$page["file"] = "popup_usrgrp.php";
+	$page['title'] = "S_GROUPS";
+	$page['file'] = 'popup_usrgrp.php';
 
 	define('ZBX_PAGE_NO_MENU', 1);
 
-include_once "include/page_header.php";
+include_once('include/page_header.php');
 
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"dstfrm"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL),
-		"new_group"=>	array(T_ZBX_STR, O_OPT,P_SYS,	NOT_EMPTY,	NULL),
+		'dstfrm'=>		array(T_ZBX_STR, O_MAND,	P_SYS,	NOT_EMPTY,	NULL),
+		'new_groups'=>	array(T_ZBX_STR, O_OPT,		P_SYS,	NOT_EMPTY,	NULL),
 
-		"select"=>	array(T_ZBX_STR,	O_OPT,	P_SYS|P_ACT,	NULL,	NULL)
+		'select'=>		array(T_ZBX_STR, O_OPT,		P_SYS|P_ACT,	NULL,	NULL)
 	);
 
 	check_fields($fields);
 
-	$dstfrm		= get_request("dstfrm",		0);	// destination form
-	$new_group = get_request('new_group', array());
+// destination form
+	$dstfrm	= get_request('dstfrm',	0);
+	$new_groups = get_request('new_groups', array());
 ?>
 <?php
 	show_table_header(S_GROUPS);
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
-function add_var_to_opener_obj(obj,name,value)
-{
+function add_var_to_opener_obj(obj,name,value){
         new_variable = window.opener.document.createElement('input');
         new_variable.type = 'hidden';
         new_variable.name = name;
@@ -62,20 +62,17 @@ function add_var_to_opener_obj(obj,name,value)
 </script>
 <?php
 
-	if(isset($_REQUEST['select']) && count($new_group) > 0)
-	{
+	if(isset($_REQUEST['select']) && count($new_groups) > 0){
 ?>
 <script language="JavaScript" type="text/javascript">
 form = window.opener.document.forms['<?php echo $dstfrm; ?>'];
 <!--
 <?php
-		foreach($new_group as $id => $name)
-		{
-			echo 'add_var_to_opener_obj(form,"new_group['.$id.']","'.$name.'")'."\r";
+		foreach($new_groups as $id => $name){
+			echo 'add_var_to_opener_obj(form,"new_groups['.$id.']","'.$name.'")'."\r";
 		}
 ?>
-if(form)
-{
+if(form){
 	form.submit();
 	close_window();
 }
@@ -85,30 +82,30 @@ if(form)
 	}
 
 	$form = new CForm();
-	$form->AddVar('dstfrm', $dstfrm);
+	$form->addVar('dstfrm', $dstfrm);
 
-	$form->SetName('groups');
+	$form->setName('groups');
 
 	$table = new CTableInfo(S_NO_GROUPS_DEFINED);
 	$table->setHeader(array(
-		new CCheckBox("all_groups",NULL,"checkAll('".$form->getName()."','all_groups','new_group');"),
+		new CCheckBox("all_groups",NULL,"checkAll('".$form->getName()."','all_groups','new_groups');"),
 		S_NAME
 		));
 
 	$result = DBselect('select * from usrgrp where '.DBin_node('usrgrpid').' order by name');
 	while($row = DBfetch($result)){
 		$table->addRow(array(
-			new CCheckBox('new_group['.$row['usrgrpid'].']',isset($new_group[$row['usrgrpid']]),NULL,$row['name']),
+			new CCheckBox('new_groups['.$row['usrgrpid'].']',isset($new_groups[$row['usrgrpid']]),NULL,$row['name']),
 			$row['name']
 		));
 	}
-	$table->setFooter(new CButton('select', S_SELECT));
+	$table->setFooter(new CCol(new CButton('select', S_SELECT)));
 
 	$form->addItem($table);
 	$form->show();
 ?>
 <?php
 
-include_once "include/page_footer.php";
+include_once('include/page_footer.php');
 
 ?>

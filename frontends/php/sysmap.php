@@ -280,10 +280,7 @@ include_once('include/page_header.php');
 
 	/* draw row */
 			$table->addRow(array(
-				new CLink('link '.$i++,
-					'sysmap.php?sysmapid='.$_REQUEST['sysmapid'].
-					'&form=update&linkid='.$row['linkid'],
-					'action'),
+				new CLink('link '.$i++,'sysmap.php?sysmapid='.$_REQUEST['sysmapid'].'&form=update&linkid='.$row['linkid']),
 				$label1,
 				$label2,
 				$description

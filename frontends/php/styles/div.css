@@ -256,7 +256,6 @@ div.iconok{
 }
 
 div.iconok:hover{
-	cursor:pointer;
 }
 
 div.dbl_arrow_down{
@@ -329,6 +328,17 @@ div.icon_sortdown:hover{
 	text-decoration: underline;
 }
 
+.darklink{
+	color:#3C3089;
+	text-decoration: underline;
+}
+
+.darklink:hover{
+	color:#6C80B9;
+	cursor: pointer;
+	text-decoration: underline;
+}
+
 .underline{
 	text-decoration: underline;
 }
@@ -376,7 +386,8 @@ span.blue{
 
 span.info{
 	font-weight: bold;
-	color:#DDDDDD;
+	color: #444444;
+	font-size: 11px;
 }
 
 /*********** Node Tree ****************/

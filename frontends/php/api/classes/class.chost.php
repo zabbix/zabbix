@@ -10,37 +10,37 @@ class CHost {
 
 	public static $error;
 
-	/**
-	 * Get Host data
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $options
-	 * @param array $options['nodeids'] Node IDs
-	 * @param array $options['groupids'] HostGroup IDs
-	 * @param array $options['hostids'] Host IDs
-	 * @param boolean $options['monitored_hosts'] only monitored Hosts
-	 * @param boolean $options['templated_hosts'] include templates in result
-	 * @param boolean $options['with_items'] only with items
-	 * @param boolean $options['with_monitored_items'] only with monitored items
-	 * @param boolean $options['with_historical_items'] only with historical items
-	 * @param boolean $options['with_triggers'] only with triggers
-	 * @param boolean $options['with_monitored_triggers'] only with monitores triggers
-	 * @param boolean $options['with_httptests'] only with http tests
-	 * @param boolean $options['with_monitored_httptests'] only with monitores http tests
-	 * @param boolean $options['with_graphs'] only with graphs
-	 * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
-	 * @param int $options['extendoutput'] return all fields for Hosts
-	 * @param int $options['count'] count Hosts, returned column name is rowscount
-	 * @param string $options['pattern'] search hosts by pattern in host names
-	 * @param int $options['limit'] limit selection
-	 * @param string $options['order'] depricated parametr (for now)
-	 * @return array|boolean Host data as array or false if error
-	 */
+/**
+ * Get Host data
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $options
+ * @param array $options['nodeids'] Node IDs
+ * @param array $options['groupids'] HostGroup IDs
+ * @param array $options['hostids'] Host IDs
+ * @param boolean $options['monitored_hosts'] only monitored Hosts
+ * @param boolean $options['templated_hosts'] include templates in result
+ * @param boolean $options['with_items'] only with items
+ * @param boolean $options['with_monitored_items'] only with monitored items
+ * @param boolean $options['with_historical_items'] only with historical items
+ * @param boolean $options['with_triggers'] only with triggers
+ * @param boolean $options['with_monitored_triggers'] only with monitores triggers
+ * @param boolean $options['with_httptests'] only with http tests
+ * @param boolean $options['with_monitored_httptests'] only with monitores http tests
+ * @param boolean $options['with_graphs'] only with graphs
+ * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
+ * @param int $options['extendoutput'] return all fields for Hosts
+ * @param int $options['count'] count Hosts, returned column name is rowscount
+ * @param string $options['pattern'] search hosts by pattern in host names
+ * @param int $options['limit'] limit selection
+ * @param string $options['order'] depricated parametr (for now)
+ * @return array|boolean Host data as array or false if error
+ */
 	public static function get($options=array()){
 		global $USER_DETAILS;
 
@@ -59,39 +59,39 @@ class CHost {
 			'limit' => null);
 
 		$def_options = array(
-			'nodeids'					=> 0,
-			'groupids'					=> 0,
-			'hostids'					=> 0,
-			'templateids'				=> 0,
-			'itemids'					=> 0,
-			'triggerids'				=> 0,
-			'graphids'					=> 0,
-			'monitored_hosts'			=> 0,
-			'templated_hosts'			=> 0,
-			'with_items'				=> 0,
-			'with_monitored_items'		=> 0,
-			'with_historical_items'		=> 0,
-			'with_triggers'				=> 0,
-			'with_monitored_triggers'	=> 0,
-			'with_httptests'			=> 0,
-			'with_monitored_httptests'	=> 0,
-			'with_graphs'				=> 0,
-			'editable'					=> 0,
-			'nopermissions'				=> 0,
+			'nodeids'					=> null,
+			'groupids'					=> null,
+			'hostids'					=> null,
+			'templateids'				=> null,
+			'itemids'					=> null,
+			'triggerids'				=> null,
+			'graphids'					=> null,
+			'monitored_hosts'			=> null,
+			'templated_hosts'			=> null,
+			'with_items'				=> null,
+			'with_monitored_items'		=> null,
+			'with_historical_items'		=> null,
+			'with_triggers'				=> null,
+			'with_monitored_triggers'	=> null,
+			'with_httptests'			=> null,
+			'with_monitored_httptests'	=> null,
+			'with_graphs'				=> null,
+			'editable'					=> null,
+			'nopermissions'				=> null,
 // OutPut
-			'extendoutput'				=> 0,
-			'select_groups'				=> 0,
-			'select_templates'			=> 0,
-			'select_items'				=> 0,
-			'select_triggers'			=> 0,
-			'select_graphs'				=> 0,
-			'select_applications'		=> 0,
-			'count'						=> 0,
+			'extendoutput'				=> null,
+			'select_groups'				=> null,
+			'select_templates'			=> null,
+			'select_items'				=> null,
+			'select_triggers'			=> null,
+			'select_graphs'				=> null,
+			'select_applications'		=> null,
+			'count'						=> null,
 			'pattern'					=> '',
-			'extend_pattern'			=> 0,
+			'extend_pattern'			=> null,
 			'sortfield'					=> '',
 			'sortorder'					=> '',
-			'limit'						=> 0
+			'limit'						=> null
 		);
 
 		$options = array_merge($def_options, $options);
@@ -115,22 +115,22 @@ class CHost {
 			$sql_parts['where'][] = 'ug.userid='.$userid;
 			$sql_parts['where'][] = 'r.permission>='.$permission;
 			$sql_parts['where'][] = 'NOT EXISTS( '.
-								' SELECT hgg.groupid '.
-								' FROM hosts_groups hgg, rights rr, users_groups gg '.
-								' WHERE hgg.hostid=hg.hostid '.
-									' AND rr.id=hgg.groupid '.
-									' AND rr.groupid=gg.usrgrpid '.
-									' AND gg.userid='.$userid.
-									' AND rr.permission<'.$permission.')';
+									' SELECT hgg.groupid '.
+									' FROM hosts_groups hgg, rights rr, users_groups gg '.
+									' WHERE hgg.hostid=hg.hostid '.
+										' AND rr.id=hgg.groupid '.
+										' AND rr.groupid=gg.usrgrpid '.
+										' AND gg.userid='.$userid.
+										' AND rr.permission<'.$permission.')';
 		}
 
 // nodeids
 		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
 
 // groupids
-		if($options['groupids'] != 0){
+		if(!is_null($options['groupids'])){
 			zbx_value2array($options['groupids']);
-			if($options['extendoutput'] != 0){
+			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
@@ -139,15 +139,15 @@ class CHost {
 		}
 
 // hostids
-		if($options['hostids'] != 0){
+		if(!is_null($options['hostids'])){
 			zbx_value2array($options['hostids']);
 			$sql_parts['where'][] = DBcondition('h.hostid', $options['hostids']);
 		}
 
 // templateids
-		if($options['templateids'] != 0){
+		if(!is_null($options['templateids'])){
 			zbx_value2array($options['templateids']);
-			if($options['extendoutput'] != 0){
+			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['templateid'] = 'ht.templateid';
 			}
 
@@ -157,9 +157,9 @@ class CHost {
 		}
 
 // itemids
-		if($options['itemids'] != 0){
+		if(!is_null($options['itemids'])){
 			zbx_value2array($options['itemids']);
-			if($options['extendoutput'] != 0){
+			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['itemid'] = 'i.itemid';
 			}
 
@@ -169,9 +169,9 @@ class CHost {
 		}
 
 // triggerids
-		if($options['triggerids'] != 0){
+		if(!is_null($options['triggerids'])){
 			zbx_value2array($options['triggerids']);
-			if($options['extendoutput'] != 0){
+			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['triggerid'] = 'f.triggerid';
 			}
 
@@ -183,9 +183,9 @@ class CHost {
 		}
 
 // graphids
-		if($options['graphids'] != 0){
+		if(!is_null($options['graphids'])){
 			zbx_value2array($options['graphids']);
-			if($options['extendoutput'] != 0){
+			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['graphid'] = 'gi.graphid';
 			}
 
@@ -198,10 +198,10 @@ class CHost {
 		}
 
 // monitored_hosts, templated_hosts
-		if($options['monitored_hosts'] != 0){
+		if(!is_null($options['monitored_hosts'])){
 			$sql_parts['where'][] = 'h.status='.HOST_STATUS_MONITORED;
 		}
-		else if($options['templated_hosts'] != 0){
+		else if(!is_null($options['templated_hosts'])){
 			$sql_parts['where'][] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')';
 		}
 		else{
@@ -209,18 +209,18 @@ class CHost {
 		}
 
 // with_items, with_monitored_items, with_historical_items
-		if($options['with_items'] != 0){
+		if(!is_null($options['with_items'])){
 			$sql_parts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid )';
 		}
-		else if($options['with_monitored_items'] != 0){
+		else if(!is_null($options['with_monitored_items'])){
 			$sql_parts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid AND i.status='.ITEM_STATUS_ACTIVE.')';
 		}
-		else if($options['with_historical_items']){
+		else if(!is_null($options['with_historical_items'])){
 			$sql_parts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.') AND i.lastvalue IS NOT NULL)';
 		}
 
 // with_triggers, with_monitored_triggers
-		if($options['with_triggers'] != 0){
+		if(!is_null($options['with_triggers'])){
 			$sql_parts['where'][] = 'EXISTS( '.
 					' SELECT i.itemid '.
 					' FROM items i, functions f, triggers t '.
@@ -228,7 +228,7 @@ class CHost {
 						' AND i.itemid=f.itemid '.
 						' AND f.triggerid=t.triggerid)';
 		}
-		else if($options['with_monitored_triggers'] != 0){
+		else if(!is_null($options['with_monitored_triggers'])){
 			$sql_parts['where'][] = 'EXISTS( '.
 					' SELECT i.itemid '.
 					' FROM items i, functions f, triggers t '.
@@ -240,14 +240,14 @@ class CHost {
 		}
 
 // with_httptests, with_monitored_httptests
-		if($options['with_httptests'] != 0){
+		if(!is_null($options['with_httptests'])){
 			$sql_parts['where'][] = 'EXISTS( '.
 					' SELECT a.applicationid '.
 					' FROM applications a, httptest ht '.
 					' WHERE a.hostid=h.hostid '.
 						' AND ht.applicationid=a.applicationid)';
 		}
-		else if($options['with_monitored_httptests'] != 0){
+		else if(!is_null($options['with_monitored_httptests'])){
 			$sql_parts['where'][] = 'EXISTS( '.
 					' SELECT a.applicationid '.
 					' FROM applications a, httptest ht '.
@@ -257,7 +257,7 @@ class CHost {
 		}
 
 // with_graphs
-		if($options['with_graphs'] != 0){
+		if(!is_null($options['with_graphs'])){
 			$sql_parts['where'][] = 'EXISTS( '.
 					' SELECT DISTINCT i.itemid '.
 					' FROM items i, graphs_items gi '.
@@ -266,20 +266,15 @@ class CHost {
 		}
 
 // extendoutput
-		if($options['extendoutput'] != 0){
+		if(!is_null($options['extendoutput'])){
 			$sql_parts['select']['hosts'] = 'h.*';
 		}
 
 // count
-		if($options['count'] != 0){
-			$options['select_groups'] = 0;
-			$options['select_templates'] = 0;
-			$options['select_items'] = 0;
-			$options['select_triggers'] = 0;
-			$options['select_graphs'] = 0;
+		if(!is_null($options['count'])){
 			$options['sortfield'] = '';
 
-			$sql_parts['select'] = array('count(h.hostid) as rowscount');
+			$sql_parts['select'] = array('count(DISTINCT h.hostid) as rowscount');
 		}
 
 // pattern
@@ -344,7 +339,7 @@ class CHost {
 			else{
 				$hostids[$host['hostid']] = $host['hostid'];
 
-				if($options['extendoutput'] == 0){
+				if(is_null($options['extendoutput'])){
 					$result[$host['hostid']] = $host['hostid'];
 				}
 				else{
@@ -425,8 +420,9 @@ class CHost {
 			}
 		}
 
-// Adding Objects
+		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
 
+// Adding Objects
 // Adding Groups
 		if($options['select_groups']){
 			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);
@@ -502,19 +498,19 @@ class CHost {
 	return $result;
 	}
 
-	/**
-	 * Gets all Host data from DB by Host ID
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $host_data
-	 * @param string $host_data['hostid']
-	 * @return array|boolean Host data as array or false if error
-	 */
+/**
+ * Gets all Host data from DB by Host ID
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $host_data
+ * @param string $host_data['hostid']
+ * @return array|boolean Host data as array or false if error
+ */
 	public static function getById($host_data){
 		$sql = 'SELECT * FROM hosts WHERE hostid='.$host_data['hostid'];
 		$host = DBfetch(DBselect($sql));
@@ -528,19 +524,19 @@ class CHost {
 		}
 	}
 
-	/**
-	 * Get Host ID by Host name
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $host_data
-	 * @param string $host_data['host']
-	 * @return int|boolean
-	 */
+/**
+ * Get Host ID by Host name
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $host_data
+ * @param string $host_data['host']
+ * @return int|boolean
+ */
 	public static function getId($host_data){
 		$result = false;
 
@@ -558,33 +554,33 @@ class CHost {
 	return $result;
 	}
 
-	/**
-	 * Add Host
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $hosts multidimensional array with Hosts data
-	 * @param string $hosts['host'] Host name.
-	 * @param array $hosts['groupids'] HostGroup IDs add Host to.
-	 * @param int $hosts['port'] Port. OPTIONAL
-	 * @param int $hosts['status'] Host Status. OPTIONAL
-	 * @param int $hosts['useip'] Use IP. OPTIONAL
-	 * @param string $hosts['dns'] DNS. OPTIONAL
-	 * @param string $hosts['ip'] IP. OPTIONAL
-	 * @param int $hosts['proxy_hostid'] Proxy Host ID. OPTIONAL
-	 * @param int $hosts['useipmi'] Use IPMI. OPTIONAL
-	 * @param string $hosts['ipmi_ip'] IPMAI IP. OPTIONAL
-	 * @param int $hosts['ipmi_port'] IPMI port. OPTIONAL
-	 * @param int $hosts['ipmi_authtype'] IPMI authentication type. OPTIONAL
-	 * @param int $hosts['ipmi_privilege'] IPMI privilege. OPTIONAL
-	 * @param string $hosts['ipmi_username'] IPMI username. OPTIONAL
-	 * @param string $hosts['ipmi_password'] IPMI password. OPTIONAL
-	 * @return boolean
-	 */
+/**
+ * Add Host
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $hosts multidimensional array with Hosts data
+ * @param string $hosts['host'] Host name.
+ * @param array $hosts['groupids'] HostGroup IDs add Host to.
+ * @param int $hosts['port'] Port. OPTIONAL
+ * @param int $hosts['status'] Host Status. OPTIONAL
+ * @param int $hosts['useip'] Use IP. OPTIONAL
+ * @param string $hosts['dns'] DNS. OPTIONAL
+ * @param string $hosts['ip'] IP. OPTIONAL
+ * @param int $hosts['proxy_hostid'] Proxy Host ID. OPTIONAL
+ * @param int $hosts['useipmi'] Use IPMI. OPTIONAL
+ * @param string $hosts['ipmi_ip'] IPMAI IP. OPTIONAL
+ * @param int $hosts['ipmi_port'] IPMI port. OPTIONAL
+ * @param int $hosts['ipmi_authtype'] IPMI authentication type. OPTIONAL
+ * @param int $hosts['ipmi_privilege'] IPMI privilege. OPTIONAL
+ * @param string $hosts['ipmi_username'] IPMI username. OPTIONAL
+ * @param string $hosts['ipmi_password'] IPMI password. OPTIONAL
+ * @return boolean
+ */
 	public static function add($hosts){
 		$templates = null;
 		$newgroup = '';
@@ -595,7 +591,7 @@ class CHost {
 
 		DBstart(false);
 
-		foreach($hosts as $host){
+		foreach($hosts as $num => $host){
 
 			if(empty($host['groupids'])){
 				$result = false;
@@ -643,32 +639,32 @@ class CHost {
 		}
 	}
 
-	/**
-	 * Update Host
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $hosts multidimensional array with Hosts data
-	 * @param string $hosts['host'] Host name.
-	 * @param int $hosts['port'] Port. OPTIONAL
-	 * @param int $hosts['status'] Host Status. OPTIONAL
-	 * @param int $hosts['useip'] Use IP. OPTIONAL
-	 * @param string $hosts['dns'] DNS. OPTIONAL
-	 * @param string $hosts['ip'] IP. OPTIONAL
-	 * @param int $hosts['proxy_hostid'] Proxy Host ID. OPTIONAL
-	 * @param int $hosts['useipmi'] Use IPMI. OPTIONAL
-	 * @param string $hosts['ipmi_ip'] IPMAI IP. OPTIONAL
-	 * @param int $hosts['ipmi_port'] IPMI port. OPTIONAL
-	 * @param int $hosts['ipmi_authtype'] IPMI authentication type. OPTIONAL
-	 * @param int $hosts['ipmi_privilege'] IPMI privilege. OPTIONAL
-	 * @param string $hosts['ipmi_username'] IPMI username. OPTIONAL
-	 * @param string $hosts['ipmi_password'] IPMI password. OPTIONAL
-	 * @return boolean
-	 */
+/**
+ * Update Host
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $hosts multidimensional array with Hosts data
+ * @param string $hosts['host'] Host name.
+ * @param int $hosts['port'] Port. OPTIONAL
+ * @param int $hosts['status'] Host Status. OPTIONAL
+ * @param int $hosts['useip'] Use IP. OPTIONAL
+ * @param string $hosts['dns'] DNS. OPTIONAL
+ * @param string $hosts['ip'] IP. OPTIONAL
+ * @param int $hosts['proxy_hostid'] Proxy Host ID. OPTIONAL
+ * @param int $hosts['useipmi'] Use IPMI. OPTIONAL
+ * @param string $hosts['ipmi_ip'] IPMAI IP. OPTIONAL
+ * @param int $hosts['ipmi_port'] IPMI port. OPTIONAL
+ * @param int $hosts['ipmi_authtype'] IPMI authentication type. OPTIONAL
+ * @param int $hosts['ipmi_privilege'] IPMI privilege. OPTIONAL
+ * @param string $hosts['ipmi_username'] IPMI username. OPTIONAL
+ * @param string $hosts['ipmi_password'] IPMI password. OPTIONAL
+ * @return boolean
+ */
 	public static function update($hosts){
 		$templates = null;
 		$newgroup = '';
@@ -678,15 +674,11 @@ class CHost {
 		$result = false;
 
 		DBstart(false);
-		foreach($hosts as $host){
+		foreach($hosts as $num => $host){
 
-			$sql = 'SELECT DISTINCT * '.
-			' FROM hosts '.
-			' WHERE hostid='.$host['hostid'];
+			$host_db_fields = CHost::getById($host);
 
-			$host_db_fields = DBfetch(DBselect($sql));
-
-			if(!isset($host_db_fields)) {
+			if(!$host_db_fields){
 				$result = false;
 				break;
 			}
@@ -715,34 +707,34 @@ class CHost {
 		}
 	}
 
-	/**
-	 * Mass update hosts
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $hosts multidimensional array with Hosts data
-	 * @param array $hosts['hostids'] Host IDs to update
-	 * @param string $hosts['host'] Host name.
-	 * @param array $hosts['groupids'] HostGroup IDs add Host to.
-	 * @param int $hosts['port'] Port. OPTIONAL
-	 * @param int $hosts['status'] Host Status. OPTIONAL
-	 * @param int $hosts['useip'] Use IP. OPTIONAL
-	 * @param string $hosts['dns'] DNS. OPTIONAL
-	 * @param string $hosts['ip'] IP. OPTIONAL
-	 * @param int $hosts['proxy_hostid'] Proxy Host ID. OPTIONAL
-	 * @param int $hosts['useipmi'] Use IPMI. OPTIONAL
-	 * @param string $hosts['ipmi_ip'] IPMAI IP. OPTIONAL
-	 * @param int $hosts['ipmi_port'] IPMI port. OPTIONAL
-	 * @param int $hosts['ipmi_authtype'] IPMI authentication type. OPTIONAL
-	 * @param int $hosts['ipmi_privilege'] IPMI privilege. OPTIONAL
-	 * @param string $hosts['ipmi_username'] IPMI username. OPTIONAL
-	 * @param string $hosts['ipmi_password'] IPMI password. OPTIONAL
-	 * @return boolean
-	 */
+/**
+ * Mass update hosts
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $hosts multidimensional array with Hosts data
+ * @param array $hosts['hostids'] Host IDs to update
+ * @param string $hosts['host'] Host name.
+ * @param array $hosts['groupids'] HostGroup IDs add Host to.
+ * @param int $hosts['port'] Port. OPTIONAL
+ * @param int $hosts['status'] Host Status. OPTIONAL
+ * @param int $hosts['useip'] Use IP. OPTIONAL
+ * @param string $hosts['dns'] DNS. OPTIONAL
+ * @param string $hosts['ip'] IP. OPTIONAL
+ * @param int $hosts['proxy_hostid'] Proxy Host ID. OPTIONAL
+ * @param int $hosts['useipmi'] Use IPMI. OPTIONAL
+ * @param string $hosts['ipmi_ip'] IPMAI IP. OPTIONAL
+ * @param int $hosts['ipmi_port'] IPMI port. OPTIONAL
+ * @param int $hosts['ipmi_authtype'] IPMI authentication type. OPTIONAL
+ * @param int $hosts['ipmi_privilege'] IPMI privilege. OPTIONAL
+ * @param string $hosts['ipmi_username'] IPMI username. OPTIONAL
+ * @param string $hosts['ipmi_password'] IPMI password. OPTIONAL
+ * @return boolean
+ */
 	public static function massUpdate($hosts) {
 
 		$hostids = $hosts['hostids'];
@@ -775,18 +767,18 @@ class CHost {
 		}
 	}
 
-	/**
-	 * Delete Host
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param array $hostids
-	 * @return boolean
-	 */
+/**
+ * Delete Host
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $hostids
+ * @return boolean
+ */
 	public static function delete($hostids){
 		$result = delete_host($hostids, false);
 		if($result)

@@ -237,7 +237,7 @@
 			// If an unset variable used in expression, return FALSE
 			if(zbx_strstr($expression,'{'.$f.'}')&&!isset($_REQUEST[$f])){
 //SDI("Variable [$f] is not set. $expression is FALSE");
-//info("Variable [$f] is not set. $expression is FALSE");
+//info('Variable ['.$f.'] is not set. '.$expression.' is FALSE');
 //				return FALSE;
 			}
 //*/
@@ -325,11 +325,11 @@
 		if($type == T_ZBX_IP){
 			if( !validate_ip($var,$arr) ){
 				if($flags&P_SYS){
-					info("Critical error. Field [".$field."] is not IP");
+					info('Critical error. Field ['.$field.'] is not IP');
 					return ZBX_VALID_ERROR;
 				}
 				else{
-					info("Warning. Field [".$field."] is not IP");
+					info('Warning. Field ['.$field.'] is not IP');
 					return ZBX_VALID_WARNING;
 				}
 			}
@@ -339,11 +339,11 @@
 		if($type == T_ZBX_IP_RANGE){
 			if( !validate_ip_range($var) ){
 				if($flags&P_SYS){
-					info("Critical error. Field [".$field."] is not IP range");
+					info('Critical error. Field ['.$field.'] is not IP range');
 					return ZBX_VALID_ERROR;
 				}
 				else{
-					info("Warning. Field [".$field."] is not IP range");
+					info('Warning. Field ['.$field.'] is not IP range');
 					return ZBX_VALID_WARNING;
 				}
 			}
@@ -361,11 +361,11 @@
 		if($type == T_ZBX_INT_RANGE){
 			if( !is_int_range($var) ){
 				if($flags&P_SYS){
-					info("Critical error. Field [".$field."] is not integer range");
+					info('Critical error. Field ['.$field.'] is not integer range');
 					return ZBX_VALID_ERROR;
 				}
 				else{
-					info("Warning. Field [".$field."] is not integer range");
+					info('Warning. Field ['.$field.'] is not integer range');
 					return ZBX_VALID_WARNING;
 				}
 			}
@@ -374,44 +374,44 @@
 
 		if(($type == T_ZBX_INT) && !is_numeric($var)) {
 			if($flags&P_SYS){
-				info("Critical error. Field [".$field."] is not integer");
+				info('Critical error. Field ['.$field.'] is not integer');
 				return ZBX_VALID_ERROR;
 			}
 			else{
-				info("Warning. Field [".$field."] is not integer");
+				info('Warning. Field ['.$field.'] is not integer');
 				return ZBX_VALID_WARNING;
 			}
 		}
 
 		if(($type == T_ZBX_DBL) && !is_numeric($var)) {
 			if($flags&P_SYS){
-				info("Critical error. Field [".$field."] is not double");
+				info('Critical error. Field ['.$field.'] is not double');
 				return ZBX_VALID_ERROR;
 			}
 			else{
-				info("Warning. Field [".$field."] is not double");
+				info('Warning. Field ['.$field.'] is not double');
 				return ZBX_VALID_WARNING;
 			}
 		}
 
 		if(($type == T_ZBX_STR) && !is_string($var)) {
 			if($flags&P_SYS){
-				info("Critical error. Field [".$field."] is not string");
+				info('Critical error. Field ['.$field.'] is not string');
 				return ZBX_VALID_ERROR;
 			}
 			else{
-				info("Warning. Field [".$field."] is not string");
+				info('Warning. Field ['.$field.'] is not string');
 				return ZBX_VALID_WARNING;
 			}
 		}
 //*
 		if(($type == T_ZBX_STR) && !defined('ZBX_ALLOW_UNICODE') && (strlen($var) != zbx_strlen($var))){
 			if($flags&P_SYS){
-				info("Critical error. Field [".$field."] contains Multibyte chars");
+				info('Critical error. Field ['.$field.'] contains Multibyte chars');
 				return ZBX_VALID_ERROR;
 			}
 			else{
-				info("Warning. Field [".$field."] - multibyte chars are restricted");
+				info('Warning. Field ['.$field.'] - multibyte chars are restricted');
 				return ZBX_VALID_ERROR;
 			}
 		}
@@ -419,11 +419,11 @@
 		if(($type == T_ZBX_CLR) && !is_hex_color($var)) {
 			$var = 'FFFFFF';
 			if($flags&P_SYS){
-				info("Critical error. Field [".$field."] is not a colour");
+				info('Critical error. Field ['.$field.'] is not a colour');
 				return ZBX_VALID_ERROR;
 			}
 			else{
-				info("Warning. Field [".$field."] is not a colour");
+				info('Warning. Field ['.$field.'] is not a colour');
 				return ZBX_VALID_WARNING;
 			}
 		}
@@ -460,11 +460,11 @@
 		if($opt == O_MAND){
 			if(!isset($_REQUEST[$field])){
 				if($flags&P_SYS){
-					info("Critical error. Field [".$field."] is mandatory");
+					info('Critical error. Field ['.$field.'] is mandatory');
 					return ZBX_VALID_ERROR;
 				}
 				else{
-					info("Warning. Field [".$field."] is mandatory");
+					info('Warning. Field ['.$field.'] is mandatory');
 					return ZBX_VALID_WARNING;
 				}
 			}
@@ -476,11 +476,11 @@
 			unset_request($field,'O_NO');
 
 			if($flags&P_SYS){
-				info("Critical error. Field [".$field."] must be missing");
+				info('Critical error. Field ['.$field.'] must be missing');
 				return ZBX_VALID_ERROR;
 			}
 			else{
-				info("Warning. Field [".$field."] must be missing");
+				info('Warning. Field ['.$field.'] must be missing');
 				return ZBX_VALID_WARNING;
 			}
 		}
@@ -504,37 +504,39 @@
 		if($err != ZBX_VALID_OK)
 			return $err;
 
-		if(($exception==NULL)||($except==TRUE)){
-			if(!$validation)	$valid=TRUE;
-			else			$valid=calc_exp($fields,$field,$validation);
+		if(is_null($exception) || is_null($except)){
+			if(!$validation)	$valid = TRUE;
+			else			$valid = calc_exp($fields,$field,$validation);
 
 			if(!$valid){
 				if($flags&P_SYS){
-					info("Critical error. Incorrect value for [".$field."] = '".$_REQUEST[$field]."'");
+					info('Critical error. Incorrect value for ['.$field.'] = "'.$_REQUEST[$field].'"');
 					return ZBX_VALID_ERROR;
 				}
 				else{
-					info("Warning. Incorrect value for [".$field."]");
+					info('Warning. Incorrect value for ['.$field.']');
 					return ZBX_VALID_WARNING;
 				}
 			}
 		}
 
-
-		return ZBX_VALID_OK;
+	return ZBX_VALID_OK;
 	}
 
 //		VAR							TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	$system_fields=array(
-		'sid'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	HEX(), NULL),
+	$system_fields = array(
+		'sid'=>				array(T_ZBX_STR, O_OPT,	P_SYS,	HEX(),		NULL),
 //
-		'switch_node'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,NULL),
-		'triggers_hash'=>	array(T_ZBX_STR, O_OPT,	P_SYS,	NOT_EMPTY,NULL),
-		'print'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	IN('1'),NULL),
+		'switch_node'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
+		'triggers_hash'=>	array(T_ZBX_STR, O_OPT,	P_SYS,	NOT_EMPTY,	NULL),
+		'print'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	IN('1'),	NULL),
+		
+// paging
+		'start'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	NULL,		NULL),
 
 // table sorting
-		'sort'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,NULL),
-		'sortorder'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,NULL)
+		'sort'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,		NULL),
+		'sortorder'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,		NULL)
 	);
 
 	function invalid_url($msg=S_INVALID_URL_PARAMS){

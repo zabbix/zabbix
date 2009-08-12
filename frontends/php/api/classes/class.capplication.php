@@ -52,21 +52,21 @@ class CApplication {
 			'limit' => null);
 
 		$def_options = array(
-			'nodeids'				=> 0,
-			'hostids'				=> 0,
-			'itemids'				=> 0,
-			'applicationids'		=> 0,
-			'editable'				=> 0,
-			'nopermissions'			=> 0,
+			'nodeids'				=> null,
+			'hostids'				=> null,
+			'itemids'				=> null,
+			'applicationids'		=> null,
+			'editable'				=> null,
+			'nopermissions'			=> null,
 // OutPut
-			'extendoutput'			=> 0,
-			'select_items'			=> 0,
-			'count'					=> 0,
-			'pattern'				=> null,
+			'extendoutput'			=> null,
+			'select_items'			=> null,
+			'count'					=> null,
+			'pattern'				=> '',
 			'sortfield'				=> '',
 			'sortorder'				=> '',
-			'limit'					=> 0,
-			'order'					=> '');
+			'limit'					=> null
+		);
 
 		$options = array_merge($def_options, $options);
 
@@ -102,10 +102,10 @@ class CApplication {
 		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
 
 // hostids
-		if($options['hostids'] != 0){
+		if(!is_null($options['hostids'])){
 			zbx_value2array($options['hostids']);
 
-			if($options['extendoutput'] != 0){
+			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['hostid'] = 'a.hostid';
 			}
 
@@ -113,10 +113,10 @@ class CApplication {
 		}
 
 // itemids
-		if($options['itemids'] != 0){
+		if(!is_null($options['itemids'])){
 			zbx_value2array($options['itemids']);
 
-			if($options['extendoutput'] != 0){
+			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['itemid'] = 'ia.itemid';
 			}
 			$sql_parts['from']['ia'] = 'items_applications ia';
@@ -126,10 +126,10 @@ class CApplication {
 		}
 
 // applicationids
-		if($options['applicationids'] != 0){
+		if(!is_null($options['applicationids'])){
 			zbx_value2array($options['applicationids']);
 
-			if($options['extendoutput'] != 0){
+			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['applicationid'] = 'a.applicationid';
 			}
 			$sql_parts['where'][] = DBcondition('a.applicationid', $options['applicationids']);
@@ -137,16 +137,21 @@ class CApplication {
 		}
 
 // extendoutput
-		if($options['extendoutput'] != 0){
+		if(!is_null($options['extendoutput'])){
 			$sql_parts['select']['apps'] = 'a.*';
 		}
 
 // count
-		if($options['count'] != 0){
+		if(!is_null($options['count'])){
 			$options['select_items'] = 0;
 			$options['sortfield'] = '';
 
 			$sql_parts['select'] = array('count(a.applicationid) as rowscount');
+		}
+
+// pattern
+		if(!zbx_empty($options['pattern'])){
+			$sql_parts['where'][] = ' UPPER(a.name) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
 		}
 
 // order
@@ -165,9 +170,6 @@ class CApplication {
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){
 			$sql_parts['limit'] = $options['limit'];
-		}
-		else if(!defined('ZBX_API_REQUEST')){
-			$sql_parts['limit'] = 1001;
 		}
 //----------
 
@@ -200,7 +202,7 @@ class CApplication {
 			else{
 				$applicationids[$application['applicationid']] = $application['applicationid'];
 
-				if($options['extendoutput'] == 0){
+				if(is_null($options['extendoutput'])){
 					$result[$application['applicationid']] = $application['applicationid'];
 				}
 				else{
@@ -233,6 +235,9 @@ class CApplication {
 				}
 			}
 		}
+		
+		if(is_null($options['extendoutput'])) return $result;
+
 // Adding Objects
 // Adding items
 		if($options['select_items']){
@@ -290,8 +295,11 @@ class CApplication {
 	 */
 	public static function getId($app_data){
 
-		$sql = 'SELECT applicationid FROM applications WHERE hostid='.$app_data['hostid'].' AND name='.$app_data['name'];
-		$appid = DBselect($sql);
+		$sql = 'SELECT applicationid '.
+				' FROM applications '.
+				' WHERE hostid='.$app_data['hostid'].
+					' AND name='.$app_data['name'];
+		$appid = DBfetch(DBselect($sql));
 
 		$result = $appid ? true : false;
 		if($result)
@@ -377,11 +385,11 @@ class CApplication {
 	 * @since 1.8
 	 * @version 1
 	 *
-	 * @param _array $applications
+	 * @param _array $applicationids
 	 * @return boolean
 	 */
-	public static function delete($applications){
-		$result = delete_application($applications);
+	public static function delete($applicationids){
+		$result = delete_application($applicationids);
 		if($result)
 			return true;
 		else{

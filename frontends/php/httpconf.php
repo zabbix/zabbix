@@ -24,11 +24,11 @@
 	require_once('include/httptest.inc.php');
 	require_once('include/forms.inc.php');
 
-	$page['title'] = "S_CONFIGURATION_OF_WEB_MONITORING";
+	$page['title'] = S_CONFIGURATION_OF_WEB_MONITORING;
 	$page['file'] = 'httpconf.php';
 	$page['hist_arg'] = array('groupid','hostid');
 
-include_once 'include/page_header.php';
+include_once('include/page_header.php');
 
 ?>
 <?php
@@ -37,24 +37,24 @@ include_once 'include/page_header.php';
 	$fields=array(
 		'applications'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		'applicationid'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
-		'close'=>		array(T_ZBX_INT, O_OPT,	null,	IN('1'),	null),
-		'open'=>		array(T_ZBX_INT, O_OPT,	null,	IN('1'),	null),
+		'close'=>			array(T_ZBX_INT, O_OPT,	null,	IN('1'),	null),
+		'open'=>			array(T_ZBX_INT, O_OPT,	null,	IN('1'),	null),
 
-		'groupid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,null),
-		'hostid'=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,'isset({form})||isset({save})'),
+		'groupid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,null),
+		'hostid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,'isset({form})||isset({save})'),
 
 		'httptestid'=>	array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,'(isset({form})&&({form}=="update"))'),
 		'application'=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,'isset({save})'),
-		'name'=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY.KEY_PARAM(),'isset({save})'),
-		'delay'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,86400),'isset({save})'),
-		'status'=>	array(T_ZBX_INT, O_OPT,  null,  IN('0,1'),'isset({save})'),
-		'agent'=>	array(T_ZBX_STR, O_OPT,  null,	null,'isset({save})'),
-		'macros'=>	array(T_ZBX_STR, O_OPT,  null,	null,'isset({save})'),
-		'steps'=>	array(T_ZBX_STR, O_OPT,  null,	null,'isset({save})'),
+		'name'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY.KEY_PARAM(),'isset({save})'),
+		'delay'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,86400),'isset({save})'),
+		'status'=>		array(T_ZBX_INT, O_OPT,  null,  IN('0,1'),'isset({save})'),
+		'agent'=>		array(T_ZBX_STR, O_OPT,  null,	null,'isset({save})'),
+		'macros'=>		array(T_ZBX_STR, O_OPT,  null,	null,'isset({save})'),
+		'steps'=>		array(T_ZBX_STR, O_OPT,  null,	null,'isset({save})'),
 
 		'new_httpstep'=>	array(T_ZBX_STR, O_OPT,  null,	null,null),
 
-		'move_up'=>		array(T_ZBX_INT, O_OPT,  P_ACT,  BETWEEN(0,65534), null),
+		'move_up'=>			array(T_ZBX_INT, O_OPT,  P_ACT,  BETWEEN(0,65534), null),
 		'move_down'=>		array(T_ZBX_INT, O_OPT,  P_ACT,  BETWEEN(0,65534), null),
 
 		'sel_step'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65534), null),
@@ -64,7 +64,7 @@ include_once 'include/page_header.php';
 		'showdisabled'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	null),
 
 // Actions
-		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
+		'go'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
 
 // form
 		'clone'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -102,7 +102,7 @@ include_once 'include/page_header.php';
 	update_profile('web.httpconf.showdisabled',$showdisabled, PROFILE_TYPE_STR);
 ?>
 <?php
-	$_REQUEST['applications'] = get_request('applications',get_profile('web.httpconf.applications',array(),PROFILE_TYPE_ARRAY_ID));
+	$_REQUEST['applications'] = get_request('applications',get_profile('web.httpconf.applications',array()));
 
 	if(isset($_REQUEST['open'])){
 		if(!isset($_REQUEST['applicationid'])){
@@ -324,13 +324,10 @@ include_once 'include/page_header.php';
 	}
 	else {
 // Table HEADER
+		$http_wdgt = new CWidget();
+		
 		$form = new CForm();
 		$form->setMethod('get');
-
-		$form->addItem(array('[',
-			new CLink($showdisabled ? S_HIDE_DISABLED_SCENARIOS: S_SHOW_DISABLED_SCENARIOS,
-				'?showdisabled='.($showdisabled ? 0 : 1),NULL),
-			']', SPACE));
 
 		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
 		$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
@@ -345,7 +342,15 @@ include_once 'include/page_header.php';
 		$form->addItem(array(S_GROUP.SPACE,$cmbGroups));
 		$form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 
-		show_table_header(S_SCENARIOS_BIG, $form);
+		$numrows = new CDiv();
+		$numrows->setAttribute('name','numrows');
+
+		$http_wdgt->addHeader(S_SCENARIOS_BIG, $form);
+		
+		$link = array('[ ',
+				new CLink($showdisabled ? S_HIDE_DISABLED_SCENARIOS: S_SHOW_DISABLED_SCENARIOS,'?showdisabled='.($showdisabled ? 0 : 1),NULL),
+				' ]');
+		$http_wdgt->addHeader(SPACE, $link);
 
 // TABLE
 		$form = new CForm();
@@ -363,7 +368,7 @@ include_once 'include/page_header.php';
 		$table->setHeader(array(
 			new CCheckBox('all_httptests',null, "checkAll('".$form->getName()."','all_httptests','group_httptestid');"),
 			is_show_all_nodes() ? make_sorting_link(S_NODE,'h.hostid') : null,
-			$_REQUEST['hostid'] ==0 ? make_sorting_link(S_HOST,'h.host') : NULL,
+			($_REQUEST['hostid']==0) ? make_sorting_link(S_HOST,'h.host'):NULL,
 			array($link, SPACE, make_sorting_link(S_NAME,'wt.name')),
 			S_NUMBER_OF_STEPS,
 			S_UPDATE_INTERVAL,
@@ -373,6 +378,16 @@ include_once 'include/page_header.php';
 
 		$db_apps = array();
 		$db_appids = array();
+
+/* sorting
+		order_page_result($applications, getPageSortField('name'), getPageSortOrder());
+
+// PAGING UPPER
+		$paging = getPagingLine($applications);
+		$http_wdgt->addItem($paging);
+//-------*/
+		$http_wdgt->addItem(BR());
+
 
 		$sql_where = '';
 		if($_REQUEST['hostid']>0){
@@ -385,8 +400,6 @@ include_once 'include/page_header.php';
 					$sql_where.
 					' AND '.DBcondition('h.hostid',$available_hosts).
 				order_by('a.applicationid,h.host,h.hostid','a.name');
-
-	//SDI($sql);
 		$db_app_res = DBselect($sql);
 		while($db_app = DBfetch($db_app_res)){
 			$db_app['scenarios_cnt'] = 0;
@@ -406,7 +419,7 @@ include_once 'include/page_header.php';
 			' WHERE '.DBcondition('a.applicationid',$db_appids).
 				($showdisabled==0?' AND wt.status <> 1':'').
 			order_by('wt.name','h.host');
-	//SDI($sql);
+//SDI($sql);
 		$db_httptests_res = DBselect($sql);
 		while($httptest_data = DBfetch($db_httptests_res)){
 			$httptest_data['step_cout'] = null;
@@ -420,7 +433,7 @@ include_once 'include/page_header.php';
 				' FROM httpstep hs'.
 				' WHERE '.DBcondition('hs.httptestid',$db_httptestids).
 				' GROUP BY hs.httptestid';
-	//SDI($sql);
+//SDI($sql);
 		$httpstep_res = DBselect($sql);
 		while($step_cout = DBfetch($httpstep_res)){
 			$db_httptests[$step_cout['httptestid']]['step_cout'] = $step_cout['cnt'];
@@ -496,6 +509,11 @@ include_once 'include/page_header.php';
 				$table->addRow($row);
 		}
 
+// PAGING FOOTER
+//		$table->addRow(new CCol($paging));
+//		$http_wdgt->addItem($paging);
+//---------
+
 //----- GO ------
 		$goBox = new CComboBox('go');
 		$goBox->addItem('activate',S_ACTIVATE_SELECTED);
@@ -510,23 +528,14 @@ include_once 'include/page_header.php';
 
 		$table->setFooter(new CCol(array($goBox, $goButton)));
 //----
-
-		$footerButtons = array();
-		array_push($footerButtons, new CButtonQMessage('group_task',S_ACTIVATE_SELECTED,S_ACTIVATE_SELECTED_SCENARIOS_Q));
-		array_push($footerButtons, SPACE);
-		array_push($footerButtons, new CButtonQMessage('group_task',S_DISABLE_SELECTED,S_DISABLE_SELECTED_SCENARIOS_Q));
-		array_push($footerButtons, SPACE);
-		array_push($footerButtons, new CButtonQMessage('group_task',S_CLEAN_HISTORY_SELECTED_SCENARIOS,S_HISTORY_CLEANING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q));
-		array_push($footerButtons, SPACE);
-		array_push($footerButtons, new CButtonQMessage('group_task',S_DELETE_SELECTED,S_DELETE_SELECTED_SCENARIOS_Q));
-
-
 		$form->addItem($table);
-		$form->show();
+		
+		$http_wdgt->addItem($form);
+		$http_wdgt->show();
 	}
 ?>
 <?php
 
-include_once 'include/page_footer.php'
+include_once('include/page_footer.php');
 
 ?>

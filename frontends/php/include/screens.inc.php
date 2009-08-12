@@ -333,7 +333,7 @@
 					/* do not use break */
 				case ITEM_VALUE_TYPE_STR:
 					if($style){
-						$value = new CScript($row['value']);
+						$value = new CJSscript($row['value']);
 					}
 					else{
 						$value = nbsp(htmlspecialchars($row['value']));
@@ -342,7 +342,7 @@
 					break;
 				case ITEM_VALUE_TYPE_LOG:
 					if($style){
-						$value = new CScript($row['value']);
+						$value = new CJSscript($row['value']);
 					}
 					else{
 						$value = nbsp(htmlspecialchars($row['value']));

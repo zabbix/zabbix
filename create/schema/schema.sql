@@ -795,6 +795,7 @@ FIELD		|sessionid	|t_varchar(32)	|''	|NOT NULL	|0
 FIELD		|userid		|t_id		|'0'	|NOT NULL	|0			|users
 FIELD		|lastaccess	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
+INDEX		|1		|userid, status
 
 TABLE|sysmaps_links|linkid|ZBX_SYNC
 FIELD		|linkid		|t_id		|'0'	|NOT NULL	|0

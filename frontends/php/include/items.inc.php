@@ -161,7 +161,7 @@
 	return true;
 	}
 
-	# Delete Item definition from selected group
+// Delete Item definition from selected group
 	function delete_item_from_group($groupid,$itemid){
 		if(!isset($itemid)){
 			return 0;
@@ -324,10 +324,11 @@
 			}
 		}
 
-		$db_item = DBfetch(DBselect('SELECT itemid,hostid '.
-								' FROM items '.
-								' WHERE hostid='.$item['hostid'].
-									' AND key_='.zbx_dbstr($item['key_'])));
+		$sql = 'SELECT itemid,hostid '.
+				' FROM items '.
+				' WHERE hostid='.$item['hostid'].
+					' AND key_='.zbx_dbstr($item['key_']);
+		$db_item = DBfetch(DBselect($sql));
 		if($db_item && $item['templateid'] == 0){
 			error('An item with the Key ['.$item['key_'].'] already exists for host ['.$host['host'].']. The key must be unique.');
 			return FALSE;
@@ -526,7 +527,7 @@
 			return FALSE;
 		}
 
-		 // first update child items
+// first update child items
 		$db_tmp_items = DBselect('SELECT itemid, hostid FROM items WHERE templateid='.$itemid);
 		while($db_tmp_item = DBfetch($db_tmp_items)){
 			$child_item_params = $item_in_params;
@@ -639,17 +640,18 @@
 					'type'			=> array(),
 					'snmp_community'=>	array(),
 					'snmp_oid'		=> array(),
+					'snmp_community'	=> array('template' => 1),
+					'snmp_port'		=> array('template' => 1),
+					'snmpv3_securityname'	=> array('template' => 1),
+					'snmpv3_securitylevel'	=> array('template' => 1),
+					'snmpv3_authpassphrase'	=> array('template' => 1),
+					'snmpv3_privpassphrase'	=> array('template' => 1),
 					'value_type'		=> array(),
 					'data_type'		=> array(),
 					'trapper_hosts'		=> array(),
-					'snmp_port'		=> array(),
 					'units'			=> array(),
 					'multiplier'		=> array(),
 					'delta'			=> array('template' => 1 , 'httptest' => 1),
-					'snmpv3_securityname'	=> array(),
-					'snmpv3_securitylevel'	=> array(),
-					'snmpv3_authpassphrase'	=> array(),
-					'snmpv3_privpassphrase'	=> array(),
 					'formula'		=> array(),
 					'trends'		=> array('template' => 1 , 'httptest' => 1),
 					'logtimefmt'		=> array(),
@@ -1077,7 +1079,7 @@ COpt::profiling_start('prepare data');
 				' i.description, t.priority, i.valuemapid, t.value as tr_value, t.triggerid '.
 			' FROM hosts h, items i '.
 				' LEFT JOIN functions f on f.itemid=i.itemid '.
-				' LEFT JOIN triggers t on t.triggerid=f.triggerid '.
+				' LEFT JOIN triggers t on t.triggerid=f.triggerid and t.status='.TRIGGER_STATUS_ENABLED.
 			' WHERE '.DBcondition('h.hostid',$hostids).
 				' AND h.status='.HOST_STATUS_MONITORED.
 				' AND h.hostid=i.hostid '.
@@ -1086,15 +1088,15 @@ COpt::profiling_start('prepare data');
 
 		unset($items);
 		unset($hosts);
-		// get rid of warnings about $triggers undefined
+// get rid of warnings about $triggers undefined
 		$items = array();
 		while($row = DBfetch($result)){
 			$descr = item_description($row);
 			$row['host'] = get_node_name_by_elid($row['hostid']).$row['host'];
 			$hosts[strtolower($row['host'])] = $row['host'];
 
-			// A little tricky check for attempt to overwrite active trigger (value=1) with
-			// inactive or active trigger with lower priority.
+// A little tricky check for attempt to overwrite active trigger (value=1) with
+// inactive or active trigger with lower priority.
 			if (!isset($items[$descr][$row['host']]) ||
 				(
 					(($items[$descr][$row['host']]['tr_value'] == TRIGGER_VALUE_FALSE) && ($row['tr_value'] == TRIGGER_VALUE_TRUE)) ||
@@ -1163,11 +1165,11 @@ COpt::profiling_start('prepare table');
 		}
 COpt::profiling_stop('prepare table');
 
-		return $table;
+	return $table;
 	}
 
 	function get_item_data_overview_cells(&$table_row,&$ithosts,$hostname){
-		$css_class = NULL;
+		$css_class = '';
 		unset($it_ov_menu);
 
 		$value = '-';
@@ -1213,15 +1215,11 @@ COpt::profiling_stop('prepare table');
 		}
 
 //		if($value == '-')	$css_class = 'center';
-		$value_col = new CCol(array($value,$ack),$css_class);
+		$value_col = new CCol(array($value,$ack),$css_class.' link');
 
 		if(isset($it_ov_menu)){
 			$it_ov_menu  = new CPUMenu($it_ov_menu,170);
-			$value_col->OnClick($it_ov_menu->GetOnActionJS());
-			$value_col->setAttribute('style', 'cursor: pointer;');
-			$value_col->AddAction('onmouseover',
-				'this.old_border=this.style.border; this.style.border=\'1px dotted #0C0CF0\'');
-			$value_col->AddAction('onmouseout', 'this.style.border=this.old_border;');
+			$value_col->onClick($it_ov_menu->getOnActionJS());
 			unset($it_ov_menu);
 		}
 

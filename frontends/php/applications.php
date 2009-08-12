@@ -83,8 +83,9 @@ include_once('include/page_header.php');
 		'form'=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>array(T_ZBX_STR, O_OPT, NULL,	NULL,	NULL)
 	);
+
 	check_fields($fields);
-	validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
+	validate_sort_and_sortorder('name',ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go','none');
 ?>
@@ -286,12 +287,12 @@ include_once('include/page_header.php');
 				));
 		}
 
-		$frmApp->addItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["applicationid"])){
+		$frmApp->addItemToBottomRow(new CButton('save',S_SAVE));
+		if(isset($_REQUEST['applicationid'])){
 			$frmApp->addItemToBottomRow(SPACE);
-			$frmApp->addItemToBottomRow(new CButtonDelete("Delete this application?",
-					url_param("config").url_param("hostid").url_param('groupid').
-					url_param("form").url_param("applicationid")));
+			$frmApp->addItemToBottomRow(new CButtonDelete('Delete this application?',
+					url_param('config').url_param('hostid').url_param('groupid').
+					url_param('form').url_param('applicationid')));
 		}
 
 		$frmApp->addItemToBottomRow(SPACE);
@@ -300,16 +301,7 @@ include_once('include/page_header.php');
 		$frmApp->show();
 	}
 	else {
-
-		$options = array(
-			'hostids' => $PAGE_HOSTS['selected'],
-			'order' => 'name',
-			'select_items' => 1,
-			'extendoutput' => 1,
-			'sortfield' => getPageSortField('name'),
-			'sortorder' => getPageSortOrder()
-		);
-		$applications = CApplication::get($options);
+		$app_wdgt = new CWidget();
 
 		$form = new CForm();
 		$form->setMethod('get');
@@ -322,18 +314,29 @@ include_once('include/page_header.php');
 		foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
 			$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
 		}
+		
 		$form->addItem(array(S_GROUP.SPACE,$cmbGroups));
 		$form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 
-		$header = get_table_header(array(
-			S_APPLICATIONS_BIG,
-			new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-			S_FOUND.': ',
-			new CSpan(count($applications), 'info')
-		));
-		show_table_header($header, $form);
+		$numrows = new CDiv();
+		$numrows->setAttribute('name','numrows');
 
+		$app_wdgt->addHeader(S_APPLICATIONS_BIG, $form);
+		$app_wdgt->addHeader($numrows);
 
+// table applications 
+		$options = array(
+			'hostids' => $PAGE_HOSTS['selected'],
+			'select_items' => 1,
+			'extendoutput' => 1,
+			'editable' => 1,
+//			'sortfield' => getPageSortField('name'),
+//			'sortorder' => getPageSortOrder(),
+			'limit' => ($config['search_limit']+1)
+		);
+
+		$applications = CApplication::get($options);
+		
 		$form = new CForm();
 		$form->setName('applications');
 		$form->addVar('groupid', $PAGE_GROUPS['selected']);
@@ -341,10 +344,18 @@ include_once('include/page_header.php');
 
 		$table = new CTableInfo();
 		$table->setHeader(array(
-			new CCheckBox('all_applications',NULL,"checkAll('".$form->GetName()."','all_applications','applications');"),
+			new CCheckBox('all_applications',NULL,"checkAll('".$form->getName()."','all_applications','applications');"),
 			make_sorting_link(S_APPLICATION, 'name'),
 			S_SHOW
 		));
+
+// sorting
+		order_page_result($applications, getPageSortField('name'), getPageSortOrder());
+
+// PAGING UPPER
+		$paging = getPagingLine($applications);
+		$app_wdgt->addItem($paging);
+//---------
 
 		foreach($applications as $applicationid => $application){
 			if($application['templateid']==0){
@@ -365,6 +376,11 @@ include_once('include/page_header.php');
 				SPACE.'('.count($application['itemids']).')')
 			));
 		}
+		
+// PAGING FOOTER
+		$table->addRow(new CCol($paging));
+//		$app_wdgt->addItem($paging);
+//---------
 
 // goBox
 		$goBox = new CComboBox('go');
@@ -380,9 +396,13 @@ include_once('include/page_header.php');
 		$table->setFooter(new CCol(array($goBox, $goButton)));
 
 		$form->addItem($table);
-		$form->show();
+		
+		$app_wdgt->addItem($form);
+		$app_wdgt->show();
 	}
+?>
+<?php
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
 
 ?>

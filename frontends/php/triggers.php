@@ -170,6 +170,7 @@
 			}
 
 			DBstart();
+
 			$result = update_trigger($_REQUEST['triggerid'],
 				$_REQUEST['expression'],$_REQUEST['description'],$type,
 				$_REQUEST['priority'],$status,$_REQUEST['comments'],$_REQUEST['url'],
@@ -431,12 +432,11 @@
 	}
 	else{
 /* TABLE */
+		$triggers_wdgt = new CWidget();
+
+// Triggers Header
 		$r_form = new CForm();
 		$r_form->setMethod('get');
-		$r_form->addItem(array('[',
-			new CLink($showdisabled ? S_HIDE_DISABLED_TRIGGERS : S_SHOW_DISABLED_TRIGGERS,
-				'triggers.php?showdisabled='.($showdisabled ? 0 : 1),NULL),
-			']', SPACE));
 
 		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
 		$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
@@ -451,13 +451,15 @@
 		$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
 		$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 
-		$numrows = new CSpan(null,'info');
+		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
-		$header = get_table_header(array(S_TRIGGERS_BIG,
-						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-						S_FOUND.': ',$numrows,)
-						);
-		show_table_header($header, $r_form);
+
+		$tr_link = new CLink($showdisabled?S_HIDE_DISABLED_TRIGGERS : S_SHOW_DISABLED_TRIGGERS,'triggers.php?showdisabled='.($showdisabled?0:1));
+
+		$triggers_wdgt->addHeader(S_TRIGGERS_BIG, $r_form);
+		$triggers_wdgt->addHeader($numrows, array('[ ',$tr_link,' ]'));
+// ----------------
+
 
 // <<<--- SELECTED HOST HEADER INFORMATION --->>>
 		if($PAGE_HOSTS['selected'] > 0){
@@ -482,25 +484,30 @@
 			}
 			$description[] = $header_host['host'];
 
-			$items = array(new CLink(S_ITEMS, 'items.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']),
-				' ('.count($header_host['itemids']).')');
+			$items = array(
+						new CLink(S_ITEMS, 'items.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']),
+						' ('.count($header_host['itemids']).')'
+						);
 
-			$graphs = array(new CLink(S_GRAPHS, 'graphs.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']),
-				' ('.count($header_host['graphids']).')');
+			$graphs = array(
+						new CLink(S_GRAPHS, 'graphs.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']),
+						' ('.count($header_host['graphids']).')'
+						);
 
-			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']),
-				' ('.count($header_host['applications']).')');
+			$applications = array(
+						new CLink(S_APPLICATIONS, 'applications.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']),
+						' ('.count($header_host['applications']).')',
+						);
 
 			if($header_host['status'] == HOST_STATUS_TEMPLATE){
 				$status = S_TEMPLATE;
 
 				$tbl_header_host->addRow(array(
 					new CLink(bold(S_TEMPLATE_LIST), 'templates.php?templateid='.$header_host['hostid'].url_param('groupid')),
-					$applications,
 					$items,
 					$graphs,
-					array(bold(S_TEMPLATE.': '), $description),
-					array(bold(S_STATUS.': '), $status)
+					$applications,
+					array(bold(S_TEMPLATE.': '), $description)
 				));
 			}
 			else{
@@ -533,9 +540,9 @@
 
 				$tbl_header_host->addRow(array(
 					new CLink(bold(S_HOST_LIST), 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid')),
-					$applications,
 					$items,
 					$graphs,
+					$applications,
 					array(bold(S_HOST.': '), $description),
 					array(bold(S_DNS.': '), $dns),
 					array(bold(S_IP.': '), $ip),
@@ -544,7 +551,8 @@
 					array(bold(S_AVAILABILITY.': '), $available)));
 			}
 			$tbl_header_host->setClass('infobox');
-			$tbl_header_host->show();
+
+			$triggers_wdgt->addItem($tbl_header_host);
 		}
 // --->>> SELECTED HOST HEADER INFORMATION <<<---
 
@@ -558,7 +566,8 @@
 			new CCheckBox('all_triggers',NULL,"checkAll('".$form->getName()."','all_triggers','g_triggerid');"),
 			make_sorting_header(S_SEVERITY,'priority'),
 			make_sorting_header(S_STATUS,'status'),
-			($_REQUEST['hostid'] > 0)?NULL:make_sorting_header(S_HOST,'host'),
+			($_REQUEST['hostid'] > 0)?NULL:S_HOST,
+//			($_REQUEST['hostid'] > 0)?NULL:make_sorting_header(S_HOST,'host'),
 			make_sorting_header(S_NAME,'description'),
 			S_EXPRESSION,
 			S_ERROR));
@@ -567,23 +576,32 @@
 				'select_hosts' => 1,
 				'editable' => 1,
 				'extendoutput' => 1,
-				'sortfield' => getPageSortField('description'),
-				'sortorder' => getPageSortOrder()
+//				'sortfield' => getPageSortField('description'),
+//				'sortorder' => getPageSortOrder(),
+				'limit' => ($config['search_limit']+1)
 			);
 
 		if($showdisabled == 0){
 		    $options['status'] = TRIGGER_STATUS_ENABLED;
 		}
 
-		$options['hostids'] = $PAGE_HOSTS['hostids'];
+		$options['hostids'] = $PAGE_HOSTS['selected'];
 		$options['groupids'] = $PAGE_GROUPS['groupids'];
 
+// Triggers
 		$triggers = CTrigger::get($options);
+
+// sorting
+		order_page_result($triggers, getPageSortField('description'), getPageSortOrder());
+
+// PAGING UPPER
+		$paging = getPagingLine($triggers);
+		$triggers_wdgt->addItem($paging);
+//---------
 
 		foreach($triggers as $triggerid => $trigger){
 
 			$description = array();
-
 			if($trigger['templateid'] > 0){
 				$real_hosts = get_realhosts_by_triggerid($triggerid);
 				$real_host = DBfetch($real_hosts);
@@ -672,6 +690,12 @@
 
 		}
 
+// PAGING FOOTER
+		$table->addRow(new CCol($paging));
+//		$items_wdgt->addItem($paging);
+//---------
+
+
 //----- GO ------
 		$goBox = new CComboBox('go');
 		$goBox->addItem('activate',S_ACTIVATE_SELECTED);
@@ -687,11 +711,14 @@
 
 		$table->setFooter(new CCol(array($goBox, $goButton)));
 //----
-
+		
 		$form->addItem($table);
-		$form->show();
-		zbx_add_post_js('insert_in_element("numrows","'.$table->getNumRows().'");');
+		$triggers_wdgt->addItem($form);
+		$triggers_wdgt->show();
 	}
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>

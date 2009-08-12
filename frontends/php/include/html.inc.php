@@ -138,7 +138,7 @@
 		if(!is_null($state)){
 			$icon = new CDiv(SPACE, $state?'arrowup':'arrowdown');
 			$icon->setAttribute('id',$id.'_icon');
-			$icon->addAction('onclick',new CScript("javascript: change_hat_state(this,'".$id."');"));
+			$icon->addAction('onclick',new CJSscript("javascript: change_hat_state(this,'".$id."');"));
 			$icon->setAttribute('title',S_SHOW.'/'.S_HIDE);
 			$icons_row[] = $icon;
 		}
@@ -230,15 +230,32 @@
 			hide_form_items($col1);
 			hide_form_items($col2);
 		//if empty header than do not show it
-			if(($col1 == SPACE) && ($col2 == SPACE)) return new CScript('');
+			if(($col1 == SPACE) && ($col2 == SPACE)) return new CJSscript('');
 		}
 
+		$td_l = new CCol(SPACE);
+		$td_l->setAttribute('width','100%');
+
+		$right_row = array($td_l);
+
+		if(!is_null($col2)){
+			if(!is_array($col2)) $col2 = array($col2);
+
+			foreach($col2 as $num => $r_item)
+				$right_row[] = new CCol($r_item);
+		}
+
+		$right_tab = new CTable(null,'nowrap');
+		$right_tab->setAttribute('width','100%');
+
+		$right_tab->addRow($right_row, 'textblackwhite');
+		
 		$table = new CTable(NULL,'header');
 //		$table->setAttribute('border',0);
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);
 
-		$td_r = new CCol($col2,'header_r');
+		$td_r = new CCol($right_tab,'header_r');
 		$td_r->setAttribute('align','right');
 
 		$table->addRow(array(new CCol($col1,'header_l'), $td_r));

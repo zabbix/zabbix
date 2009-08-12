@@ -68,15 +68,9 @@ include_once('include/page_header.php');
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
 
-	$row_count = 0;
-	$numrows = new CSpan(null,'info');
-	$numrows->setAttribute('name','numrows');
-	$header = array(S_STATUS_OF_DISCOVERY_BIG,
-			new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-			S_FOUND.': ',$numrows);
-	$dscvry_wdgt->addHeader($header, $fs_icon);
+	$dscvry_wdgt->addPageHeader(S_STATUS_OF_DISCOVERY_BIG, $fs_icon);
 
 // 2nd header
 	$cmbDRules = new CComboBox('druleid',$druleid,'submit()');
@@ -95,7 +89,13 @@ include_once('include/page_header.php');
 	$r_form->addVar('fullscreen', $fullscreen);
 	$r_form->addItem(array(S_DISCOVERY_RULE.SPACE,$cmbDRules));
 
-	$dscvry_wdgt->addHeader(SPACE, $r_form);
+//	$dscvry_wdgt->addHeader(array(S_FOUND.': ',$numrows), $r_form);
+	
+	$numrows = new CDiv();
+	$numrows->setAttribute('name', 'numrows');
+
+	$dscvry_wdgt->addHeader(S_DISCOVERY_RULES_BIG,$r_form);
+//	$dscvry_wdgt->addHeader($numrows);
 //-------------
 
 
@@ -234,17 +234,14 @@ include_once('include/page_header.php');
 				$table_row[] = new CCol($hint, $class);
 			}
 			$table->addRow($table_row);
-			$row_count++;
 		}
 	}
-	if(isset($row_count))
-		zbx_add_post_js('insert_in_element("numrows","'.$row_count.'");');
 
 	$dscvry_wdgt->addItem($table);
 	$dscvry_wdgt->show();
 ?>
 <?php
 
-include_once "include/page_footer.php";
+include_once('include/page_footer.php');
 
 ?>

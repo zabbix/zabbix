@@ -23,8 +23,8 @@
 	require_once('include/triggers.inc.php');
 	require_once('include/services.inc.php');
 
-	$page["title"] = "S_IT_SERVICES";
-	$page["file"] = "srv_status.php";
+	$page['title'] = "S_IT_SERVICES";
+	$page['file'] = 'srv_status.php';
 	$page['scripts'] = array('services.js');
 	$page['hist_arg'] = array();
 
@@ -86,7 +86,7 @@ include_once "include/page_header.php";
 	if(isset($service) && isset($_REQUEST['showgraph'])){
 		$table  = new CTable(null,'chart');
 		$table->addRow(new CImg('chart5.php?serviceid='.$service['serviceid'].url_param('path')));
-		$table->Show();
+		$table->show();
 	}
 	else {
 		$periods = array(
@@ -162,7 +162,7 @@ include_once "include/page_header.php";
 
 			if(empty($row['serviceupid'])) $row['serviceupid']='0';
 			if(empty($row['description'])) $row['description']='None';
-			$row['graph'] = new CLink(S_SHOW,"srv_status.php?serviceid=".$row["serviceid"]."&showgraph=1".url_param('path'),"action");
+			$row['graph'] = new CLink(S_SHOW,"srv_status.php?serviceid=".$row["serviceid"]."&showgraph=1".url_param('path'));
 
 			if(isset($row["triggerid"]) && !empty($row["triggerid"])){
 
@@ -289,15 +289,18 @@ include_once "include/page_header.php";
 				$period_combo->addItem($key, $val);
 			}
 
-			$r_form->addItem(array(S_PERIOD, $period_combo));
+			$r_form->addItem(array(S_PERIOD.SPACE, $period_combo));
 
 			$url = '?period_start='.$period_start.'&fullscreen='.($_REQUEST['fullscreen']?'0':'1');
 			$fs_icon = new CDiv(SPACE, 'fullscreen');
 			$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-			$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
+			$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
 
 			$srv_wdgt = new CWidget('hat_services', $tree->getHTML());
-			$srv_wdgt->addHeader(S_IT_SERVICES_BIG, array($r_form, $fs_icon));
+			
+			$srv_wdgt->addPageHeader(S_IT_SERVICES_BIG, $fs_icon);
+			$srv_wdgt->addHeader(S_IT_SERVICES_BIG, $r_form);
+			
 			$srv_wdgt->show();
 		}
 		else {

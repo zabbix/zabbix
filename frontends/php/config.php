@@ -467,42 +467,42 @@
 
 ?>
 
-<?php
-
+<?php	
 	$form = new CForm('config.php');
-	$form->SetMethod('get');
+	$form->setMethod('get');
 	$cmbConfig = new CCombobox('config',$_REQUEST['config'],'submit()');
-//	$cmbConfig->AddItem(4,S_AUTOREGISTRATION);
-//	$cmbConfig->AddItem(2,S_ESCALATION_RULES);
-	$cmbConfig->AddItem(8,S_GUI);
-	$cmbConfig->AddItem(0,S_HOUSEKEEPER);
-	$cmbConfig->AddItem(3,S_IMAGES);
-	$cmbConfig->AddItem(10,S_REGULAR_EXPRESSIONS);
-//	$cmbConfig->AddItem(9,S_THEMES);
-	$cmbConfig->AddItem(6,S_VALUE_MAPPING);
-	$cmbConfig->AddItem(7,S_WORKING_TIME);
-	$cmbConfig->AddItem(5,S_OTHER);
-	$form->AddItem($cmbConfig);
-	switch($_REQUEST['config']){
-		case 3:
-			$form->AddItem(SPACE.'|'.SPACE);
-			$form->AddItem(new CButton('form',S_CREATE_IMAGE));
-			break;
-		case 6:
-			$form->AddItem(SPACE.'|'.SPACE);
-			$form->AddItem(new CButton('form',S_CREATE_VALUE_MAP));
-			break;
-		case 10:
-			if(!isset($_REQUEST['form'])){
-				$form->addItem(SPACE.'|'.SPACE);
-				$form->addItem(new CButton('form',S_NEW_REGULAR_EXPRESSION));
-			}
-			break;
-	}
+//	$cmbConfig->addItem(4,S_AUTOREGISTRATION);
+//	$cmbConfig->addItem(2,S_ESCALATION_RULES);
+	$cmbConfig->addItem(8,S_GUI);
+	$cmbConfig->addItem(0,S_HOUSEKEEPER);
+	$cmbConfig->addItem(3,S_IMAGES);
+	$cmbConfig->addItem(10,S_REGULAR_EXPRESSIONS);
+//	$cmbConfig->addItem(9,S_THEMES);
+	$cmbConfig->addItem(6,S_VALUE_MAPPING);
+	$cmbConfig->addItem(7,S_WORKING_TIME);
+	$cmbConfig->addItem(5,S_OTHER);
+	$form->addItem($cmbConfig);
 
+	if(!isset($_REQUEST['form'])){
+		switch($_REQUEST['config']){
+			case 3:
+				$form->addItem(new CButton('form',S_CREATE_IMAGE));
+				break;
+			case 6:
+				$form->addItem(new CButton('form',S_CREATE_VALUE_MAP));
+				break;
+			case 10:
+				$form->addItem(new CButton('form',S_NEW_REGULAR_EXPRESSION));
+				break;
+		}
+	}
+	
 	show_table_header(S_CONFIGURATION_OF_ZABBIX_BIG, $form);
+	print SBR;
 ?>
 <?php
+	$cnf_wdgt = new CWidget();
+	
 	if(isset($_REQUEST['config'])) {
 		$config = select_config(false);
 	}
@@ -511,10 +511,9 @@
 //  config = 0 // Housekeeper  //
 /////////////////////////////////
 	if($_REQUEST['config']==0){ //housekeeper
-		echo SBR;
 
 		$frmHouseKeep = new CFormTable(S_HOUSEKEEPER, "config.php");
-		$frmHouseKeep->SetHelp("web.config.housekeeper.php");
+		$frmHouseKeep->setHelp("web.config.housekeeper.php");
 		$frmHouseKeep->addVar("config", get_request("config", 0));
 
 		$frmHouseKeep->addRow(S_DO_NOT_KEEP_ACTIONS_OLDER_THAN,
@@ -523,16 +522,116 @@
 			new CNumericBox("event_history", $config["event_history"], 5));
 
 		$frmHouseKeep->addItemToBottomRow(new CButton("save", S_SAVE));
-		$frmHouseKeep->Show();
+		
+		$cnf_wdgt->addItem($frmHouseKeep);
+	}
+////////////////////////////
+//  config = 3 // Images  //
+////////////////////////////
+	elseif($_REQUEST["config"]==3){ // Images
+		if(isset($_REQUEST["form"])){
+			$frmImages = new CFormTable(S_IMAGE, 'config.php', 'post', 'multipart/form-data');
+			$frmImages->setHelp('web.config.images.php');
+			$frmImages->addVar('config', get_request('config',3));
+	
+			if(isset($_REQUEST['imageid'])){
+				$sql = 'SELECT imageid,imagetype,name '.
+						' FROM images '.
+						' WHERE imageid='.$_REQUEST['imageid'];
+				$result=DBselect($sql);
+				$row=DBfetch($result);
+
+				$frmImages->setTitle(S_IMAGE.' "'.$row['name'].'"');
+				$frmImages->addVar('imageid', $_REQUEST['imageid']);
+			}
+	
+			if(isset($_REQUEST['imageid']) && !isset($_REQUEST['form_refresh'])){
+				$name		= $row['name'];
+				$imagetype	= $row['imagetype'];
+				$imageid	= $row['imageid'];
+			}
+			else{
+				$name		= get_request('name','');
+				$imagetype	= get_request('imagetype',1);
+				$imageid	= get_request('imageid',0);
+			}
+	
+			$frmImages->addRow(S_NAME,new CTextBox('name',$name,64));
+	
+			$cmbImg = new CComboBox('imagetype',$imagetype);
+			$cmbImg->addItem(IMAGE_TYPE_ICON,S_ICON);
+			$cmbImg->addItem(IMAGE_TYPE_BACKGROUND,S_BACKGROUND);
+	
+			$frmImages->addRow(S_TYPE,$cmbImg);
+	
+			$frmImages->addRow(S_UPLOAD,new CFile('image'));
+	
+			if($imageid > 0){
+				$frmImages->addRow(S_IMAGE,new CLink(
+					new CImg('image.php?width=640&height=480&imageid='.$imageid,'no image',null),'image.php?imageid='.$row['imageid']));
+			}
+	
+			$frmImages->addItemToBottomRow(new CButton('save',S_SAVE));
+			if(isset($_REQUEST['imageid'])){
+				$frmImages->addItemToBottomRow(SPACE);
+				$frmImages->addItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_IMAGE,
+					url_param('form').url_param('config').url_param('imageid')));
+			}
+	
+			$frmImages->addItemToBottomRow(SPACE);
+			$frmImages->addItemToBottomRow(new CButtonCancel(url_param('config')));
+			
+			$cnf_wdgt->addItem($frmImages);
+		}
+		else{
+			$cnf_wdgt->addItem(BR());
+			
+			$imagetype = get_request('imagetype',IMAGE_TYPE_ICON);
+
+			$r_form = new CForm();
+
+			$cmbImg = new CComboBox('imagetype',$imagetype,'submit();');
+			$cmbImg->addItem(IMAGE_TYPE_ICON,S_ICON);
+			$cmbImg->addItem(IMAGE_TYPE_BACKGROUND,S_BACKGROUND);
+
+			$r_form->addItem(S_TYPE.SPACE);
+			$r_form->addItem($cmbImg);
+			
+			$cnf_wdgt->addHeader(S_IMAGES_BIG,$r_form);
+
+			$table = new CTableInfo(S_NO_IMAGES_DEFINED);
+			$table->setHeader(array(S_NAME,S_TYPE,S_IMAGE));
+
+			$result=DBselect('SELECT imageid,imagetype,name '.
+						' FROM images'.
+						' WHERE '.DBin_node('imageid').
+							' AND imagetype='.$imagetype.
+						' ORDER BY name');
+			while($row=DBfetch($result)){
+				if($row['imagetype'] == IMAGE_TYPE_ICON)	$imagetype=S_ICON;
+				else if($row['imagetype'] == IMAGE_TYPE_BACKGROUND)	$imagetype=S_BACKGROUND;
+				else				$imagetype=S_UNKNOWN;
+
+				$name = new CLink($row['name'],'config.php?form=update'.url_param('config').'&imageid='.$row['imageid']);
+
+				$table->addRow(array(
+					$name,
+					$imagetype,
+					$actions=new CLink(
+						new CImg('image.php?height=24&imageid='.$row['imageid'],'no image',NULL),'image.php?imageid='.$row['imageid'])
+					));
+			}
+			
+			$cnf_wdgt->addItem($table);
+		}
 	}
 //////////////////////////////////////
 //  config = 5 // Other Parameters  //
 //////////////////////////////////////
 	else if($_REQUEST['config']==5){ // Other parameters
-		echo SBR;
 
 		$frmOther = new CFormTable(S_OTHER_PARAMETERS, 'config.php');
-		$frmOther->SetHelp('web.config.other.php');
+		$frmOther->setHelp('web.config.other.php');
 		$frmOther->addVar('config',get_request('config', 5));
 
 		$frmOther->addRow(S_REFRESH_UNSUPPORTED_ITEMS,
@@ -560,170 +659,16 @@
 		$frmOther->addRow(S_USER_GROUP_FOR_DATABASE_DOWN_MESSAGE, $cmbUsrGrp);
 
 		$frmOther->addItemToBottomRow(new CButton('save', S_SAVE));
-		$frmOther->show();
-	}
-/////////////////////////////////
-//  config = 7 // Work Period  //
-/////////////////////////////////
-	else if($_REQUEST['config']==7){ //work period
-		echo SBR;
-
-		$frmHouseKeep = new CFormTable(S_WORKING_TIME, "config.php");
-		$frmHouseKeep->SetHelp("web.config.workperiod.php");
-		$frmHouseKeep->addVar("config",get_request("config", 7));
-
-		$frmHouseKeep->addRow(S_WORKING_TIME,
-			new CTextBox("work_period",$config["work_period"], 35));
-
-		$frmHouseKeep->addItemToBottomRow(new CButton("save", S_SAVE));
-		$frmHouseKeep->Show();
-
-	}
-/////////////////////////
-//  config = 8 // GUI  //
-/////////////////////////
-	else if($_REQUEST['config']==8){ // GUI
-		echo SBR;
-
-		$frmGUI = new CFormTable(S_GUI, "config.php");
-		$frmGUI->addVar("config",get_request("config",8));
-
-		$combo_theme = new CComboBox('default_theme',$config['default_theme']);
-		$combo_theme->addItem('css_ob.css',S_ORIGINAL_BLUE);
-		$combo_theme->addItem('css_bb.css',S_BLACK_AND_BLUE);
-
-		$exp_select = new CComboBox('event_ack_enable');
-		$exp_select->addItem(EVENT_ACK_ENABLED,S_ENABLED,$config['event_ack_enable']?'yes':'no');
-		$exp_select->addItem(EVENT_ACK_DISABLED,S_DISABLED,$config['event_ack_enable']?'no':'yes');
-
-		$combo_dd_first_entry = new CComboBox('dropdown_first_entry');
-		$combo_dd_first_entry->addItem(ZBX_DROPDOWN_FIRST_NONE, S_NONE, ($config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_NONE)?'yes':'no');
-		$combo_dd_first_entry->addItem(ZBX_DROPDOWN_FIRST_ALL, S_ALL_S, ($config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_ALL)?'yes':'no');
-		$combo_dd_first_entry->addItem(ZBX_DROPDOWN_FIRST_ZBX162, S_ZBX162_MODE, ($config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_ZBX162)?'yes':'no');
-
-		$check_dd_first_remember = new CCheckBox('dropdown_first_remember', $config['dropdown_first_remember'], null, 1);
-
-		$frmGUI->addRow(S_DEFAULT_THEME, $combo_theme);
-		$frmGUI->addRow(S_DROPDOWN_FIRST_ENTRY, array(
-			$combo_dd_first_entry,
-			$check_dd_first_remember,
-			S_DROPDOWN_REMEMBER_SELECTED
-			));
-
-		$frmGUI->addRow(S_SEARCH_LIMIT, new CTextBox('search_limit', $config['search_limit'], 5));
-		$frmGUI->addRow(S_MAX_IN_TABLE, new CTextBox('max_in_table', $config['max_in_table'], 5));
-		$frmGUI->addRow(S_EVENT_ACKNOWLEDGES,$exp_select);
-		$frmGUI->addRow(S_SHOW_EVENTS_NOT_OLDER.SPACE.'('.S_DAYS.')',
-			new CTextBox('event_expire',$config['event_expire'],5));
-		$frmGUI->addRow(S_MAX_COUNT_OF_EVENTS,
-			new CTextBox('event_show_max',$config['event_show_max'],5));
-		$frmGUI->addItemToBottomRow(new CButton("save",S_SAVE));
-		$frmGUI->Show();
-	}
-////////////////////////////
-//  config = 3 // Images  //
-////////////////////////////
-	elseif($_REQUEST["config"]==3){ // Images
-		echo SBR;
-		if(isset($_REQUEST["form"])){
-			$frmImages = new CFormTable(S_IMAGE, 'config.php', 'post', 'multipart/form-data');
-		$frmImages->SetHelp('web.config.images.php');
-		$frmImages->addVar('config', get_request('config',3));
-
-		if(isset($_REQUEST['imageid'])){
-			$result=DBselect('SELECT imageid,imagetype,name '.
-						' FROM images '.
-						' WHERE imageid='.$_REQUEST['imageid']);
-
-			$row=DBfetch($result);
-			$frmImages->SetTitle(S_IMAGE.' "'.$row['name'].'"');
-			$frmImages->addVar('imageid', $_REQUEST['imageid']);
-		}
-
-		if(isset($_REQUEST['imageid']) && !isset($_REQUEST['form_refresh'])){
-			$name		= $row['name'];
-			$imagetype	= $row['imagetype'];
-			$imageid	= $row['imageid'];
-		}
-		else{
-			$name		= get_request('name','');
-			$imagetype	= get_request('imagetype',1);
-			$imageid	= get_request('imageid',0);
-		}
-
-		$frmImages->addRow(S_NAME,new CTextBox('name',$name,64));
-
-		$cmbImg = new CComboBox('imagetype',$imagetype);
-		$cmbImg->addItem(IMAGE_TYPE_ICON,S_ICON);
-		$cmbImg->addItem(IMAGE_TYPE_BACKGROUND,S_BACKGROUND);
-
-		$frmImages->addRow(S_TYPE,$cmbImg);
-
-		$frmImages->addRow(S_UPLOAD,new CFile('image'));
-
-		if($imageid > 0){
-			$frmImages->addRow(S_IMAGE,new CLink(
-				new CImg('image.php?width=640&height=480&imageid='.$imageid,'no image',null),'image.php?imageid='.$row['imageid']));
-		}
-
-		$frmImages->addItemToBottomRow(new CButton('save',S_SAVE));
-		if(isset($_REQUEST['imageid'])){
-			$frmImages->addItemToBottomRow(SPACE);
-			$frmImages->addItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_IMAGE,
-				url_param('form').url_param('config').url_param('imageid')));
-		}
-
-		$frmImages->addItemToBottomRow(SPACE);
-		$frmImages->addItemToBottomRow(new CButtonCancel(url_param('config')));
-		$frmImages->Show();
-		}
-		else{
-			$imagetype = get_request('imagetype',IMAGE_TYPE_ICON);
-
-			$r_form = new CForm();
-
-			$cmbImg = new CComboBox('imagetype',$imagetype,'submit();');
-			$cmbImg->AddItem(IMAGE_TYPE_ICON,S_ICON);
-			$cmbImg->AddItem(IMAGE_TYPE_BACKGROUND,S_BACKGROUND);
-
-			$r_form->AddItem(S_TYPE.SPACE);
-			$r_form->AddItem($cmbImg);
-
-			show_table_header(S_IMAGES_BIG,$r_form);
-
-			$table = new CTableInfo(S_NO_IMAGES_DEFINED);
-			$table->setHeader(array(S_NAME,S_TYPE,S_IMAGE));
-
-			$result=DBselect('SELECT imageid,imagetype,name '.
-						' FROM images'.
-						' WHERE '.DBin_node('imageid').
-							' AND imagetype='.$imagetype.
-						' ORDER BY name');
-			while($row=DBfetch($result)){
-				if($row['imagetype'] == IMAGE_TYPE_ICON)	$imagetype=S_ICON;
-				else if($row['imagetype'] == IMAGE_TYPE_BACKGROUND)	$imagetype=S_BACKGROUND;
-				else				$imagetype=S_UNKNOWN;
-
-				$name = new CLink($row['name'],'config.php?form=update'.url_param('config').'&imageid='.$row['imageid']);
-
-				$table->addRow(array(
-					$name,
-					$imagetype,
-					$actions=new CLink(
-						new CImg('image.php?height=24&imageid='.$row['imageid'],'no image',NULL),'image.php?imageid='.$row['imageid'])
-					));
-			}
-			$table->show();
-		}
+		
+		$cnf_wdgt->addItem($frmOther);
 	}
 ///////////////////////////////////
 //  config = 6 // Value Mapping  //
 ///////////////////////////////////
 	elseif($_REQUEST['config']==6){ // Value Mapping
-		echo SBR;
 		if(isset($_REQUEST['form'])) {
 			$frmValmap = new CFormTable(S_VALUE_MAP);
-			$frmValmap->SetHelp("web.mapping.php");
+			$frmValmap->setHelp("web.mapping.php");
 			$frmValmap->addVar("config",get_request("config",6));
 
 			if(isset($_REQUEST["valuemapid"])){
@@ -733,7 +678,7 @@
 
 				$db_valuemap = DBfetch($db_valuemaps);
 
-				$frmValmap->SetTitle(S_VALUE_MAP.' "'.$db_valuemap["name"].'"');
+				$frmValmap->setTitle(S_VALUE_MAP.' "'.$db_valuemap["name"].'"');
 			}
 
 			if(isset($_REQUEST["valuemapid"]) && !isset($_REQUEST["form_refresh"])){
@@ -797,20 +742,24 @@
 			$frmValmap->addItemToBottomRow(SPACE);
 			$frmValmap->addItemToBottomRow(new CButtonCancel(url_param("config")));
 
-			$frmValmap->Show();
+			$cnf_wdgt->addItem($frmValmap);
 		}
 		else{
-			show_table_header(S_VALUE_MAPPING_BIG);
+			$cnf_wdgt->addItem(BR());
+
+			$cnf_wdgt->addHeader(S_VALUE_MAPPING_BIG);
 
 			$table = new CTableInfo();
-			$table->SetHeader(array(S_NAME, S_VALUE_MAP));
+			$table->setHeader(array(S_NAME, S_VALUE_MAP));
 
 			$db_valuemaps = DBselect('SELECT * FROM valuemaps WHERE '.DBin_node('valuemapid'));
 			while($db_valuemap = DBfetch($db_valuemaps)){
 				$mappings_row = array();
-				$db_maps = DBselect('SELECT * FROM mappings'.
-					' WHERE valuemapid='.$db_valuemap['valuemapid']);
-
+				
+				$sql = 'SELECT * '.
+						' FROM mappings'.
+						' WHERE valuemapid='.$db_valuemap['valuemapid'];
+				$db_maps = DBselect($sql);
 				while($db_map = DBfetch($db_maps)){
 					array_push($mappings_row,
 						$db_map['value'],
@@ -818,16 +767,71 @@
 						$db_map['newvalue'],
 						BR());
 				}
-				$table->AddRow(array(
-					new CLink($db_valuemap['name'],'config.php?form=update&'.
-						'valuemapid='.$db_valuemap['valuemapid'].url_param('config'),
-						'action'),
+				$table->addRow(array(
+					new CLink($db_valuemap['name'],'config.php?form=update&valuemapid='.$db_valuemap['valuemapid'].url_param('config')),
 					empty($mappings_row)?SPACE:$mappings_row
 				));
 			}
 
-			$table->Show();
+			$cnf_wdgt->addItem($table);
 		}
+	}
+/////////////////////////////////
+//  config = 7 // Work Period  //
+/////////////////////////////////
+	else if($_REQUEST['config']==7){ //work period
+
+		$frmHouseKeep = new CFormTable(S_WORKING_TIME, "config.php");
+		$frmHouseKeep->setHelp("web.config.workperiod.php");
+		$frmHouseKeep->addVar("config",get_request("config", 7));
+
+		$frmHouseKeep->addRow(S_WORKING_TIME,
+			new CTextBox("work_period",$config["work_period"], 35));
+
+		$frmHouseKeep->addItemToBottomRow(new CButton("save", S_SAVE));
+		
+		$cnf_wdgt->addItem($frmHouseKeep);
+	}
+/////////////////////////
+//  config = 8 // GUI  //
+/////////////////////////
+	else if($_REQUEST['config']==8){ // GUI
+
+		$frmGUI = new CFormTable(S_GUI, "config.php");
+		$frmGUI->addVar("config",get_request("config",8));
+
+		$combo_theme = new CComboBox('default_theme',$config['default_theme']);
+		$combo_theme->addItem('css_ob.css',S_ORIGINAL_BLUE);
+		$combo_theme->addItem('css_bb.css',S_BLACK_AND_BLUE);
+
+		$exp_select = new CComboBox('event_ack_enable');
+		$exp_select->addItem(EVENT_ACK_ENABLED,S_ENABLED,$config['event_ack_enable']?'yes':'no');
+		$exp_select->addItem(EVENT_ACK_DISABLED,S_DISABLED,$config['event_ack_enable']?'no':'yes');
+
+		$combo_dd_first_entry = new CComboBox('dropdown_first_entry');
+		$combo_dd_first_entry->addItem(ZBX_DROPDOWN_FIRST_NONE, S_NONE, ($config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_NONE)?'yes':'no');
+		$combo_dd_first_entry->addItem(ZBX_DROPDOWN_FIRST_ALL, S_ALL_S, ($config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_ALL)?'yes':'no');
+		$combo_dd_first_entry->addItem(ZBX_DROPDOWN_FIRST_ZBX162, S_ZBX162_MODE, ($config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_ZBX162)?'yes':'no');
+
+		$check_dd_first_remember = new CCheckBox('dropdown_first_remember', $config['dropdown_first_remember'], null, 1);
+
+		$frmGUI->addRow(S_DEFAULT_THEME, $combo_theme);
+		$frmGUI->addRow(S_DROPDOWN_FIRST_ENTRY, array(
+			$combo_dd_first_entry,
+			$check_dd_first_remember,
+			S_DROPDOWN_REMEMBER_SELECTED
+			));
+
+		$frmGUI->addRow(S_SEARCH_LIMIT, new CTextBox('search_limit', $config['search_limit'], 5));
+		$frmGUI->addRow(S_MAX_IN_TABLE, new CTextBox('max_in_table', $config['max_in_table'], 5));
+		$frmGUI->addRow(S_EVENT_ACKNOWLEDGES,$exp_select);
+		$frmGUI->addRow(S_SHOW_EVENTS_NOT_OLDER.SPACE.'('.S_DAYS.')',
+			new CTextBox('event_expire',$config['event_expire'],5));
+		$frmGUI->addRow(S_MAX_COUNT_OF_EVENTS,
+			new CTextBox('event_show_max',$config['event_show_max'],5));
+		$frmGUI->addItemToBottomRow(new CButton("save",S_SAVE));
+		
+		$cnf_wdgt->addItem($frmGUI);
 	}
 //////////////////////////////////////////
 //  config = 10 // Regular Expressions  //
@@ -895,18 +899,20 @@
 
 			$outer_table = new CTable();
 			$outer_table->setAttribute('border',0);
-			$outer_table->SetCellPadding(1);
-			$outer_table->SetCellSpacing(1);
-			$outer_table->AddRow(array($td_l,$td_r));
+			$outer_table->setCellPadding(1);
+			$outer_table->setCellSpacing(1);
+			$outer_table->addRow(array($td_l,$td_r));
 
-			$frmRegExp->Additem($outer_table);
+			$frmRegExp->additem($outer_table);
 
 			show_messages();
-			$frmRegExp->Show();
+			
+			$cnf_wdgt->addItem($frmRegExp);
 		}
 		else{
-			echo SBR;
-			show_table_header(S_REGULAR_EXPRESSIONS);
+			$cnf_wdgt->addItem(BR());
+
+			$cnf_wdgt->addHeader(S_REGULAR_EXPRESSIONS);
 // ----
 			$regexps = array();
 			$regexpids = array();
@@ -962,17 +968,18 @@
 					isset($expressions[$regexpid])?$expressions[$regexpid]:'-'
 					));
 			}
-//			$table->SetFooter(new CCol(new CButtonQMessage('delete_selected',S_DELETE_SELECTED,S_DELETE_SELECTED_USERS_Q)));
 
 			$table->setFooter(new CCol(array(
 				new CButtonQMessage('delete',S_DELETE_SELECTED,S_DELETE_SELECTED_REGULAR_EXPRESSIONS_Q)
 			)));
 
-			$form->AddItem($table);
+			$form->addItem($table);
 
-			$form->show();
+			$cnf_wdgt->addItem($form);
 		}
 	}
+	
+	$cnf_wdgt->show();
 ?>
 <?php
 

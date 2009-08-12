@@ -19,15 +19,16 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/nodes.inc.php');
+require_once('include/config.inc.php');
+require_once('include/nodes.inc.php');
 
-	$page['title'] = "S_NODES";
-	$page['file'] = 'nodes.php';
+$page['title'] = "S_NODES";
+$page['file'] = 'nodes.php';
+$page['hist_arg'] = array();
 
 include_once('include/page_header.php');
 
-	$_REQUEST['config'] = get_request('config','nodes.php');
+$_REQUEST['config'] = get_request('config','nodes.php');
 
 ?>
 <?php
@@ -112,6 +113,8 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
+	$nodes_wdgt = new CWidget();
+	
 	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST);
 
 	$frmForm = new CForm();
@@ -129,7 +132,7 @@ include_once('include/page_header.php');
 		$frmForm->addItem(new CButton('form',S_NEW_NODE));
 	}
 
-	show_table_header(S_CONFIGURATION_OF_NODES, $frmForm);
+	$nodes_wdgt->addPageHeader(S_CONFIGURATION_OF_NODES, $frmForm);
 
 	if(isset($_REQUEST['form'])){
 		global $ZBX_CURMASTERID;
@@ -147,7 +150,7 @@ include_once('include/page_header.php');
 		}
 
 		$frmNode= new CFormTable($frm_title);
-		$frmNode->SetHelp('node.php');
+		$frmNode->setHelp('node.php');
 
 		if(isset($_REQUEST['nodeid'])){
 			$frmNode->addVar('nodeid', $_REQUEST['nodeid']);
@@ -217,10 +220,11 @@ include_once('include/page_header.php');
 		}
 		$frmNode->addItemToBottomRow(SPACE);
 		$frmNode->addItemToBottomRow(new CButtonCancel(url_param('config')));
-		$frmNode->Show();
+		
+		$nodes_wdgt->addItem($frmNode);
 	}
 	else{
-		show_table_header(S_NODES_BIG);
+		$nodes_wdgt->addHeader(S_NODES_BIG);
 
 		$table=new CTableInfo(S_NO_NODES_DEFINED);
 		$table->SetHeader(array(
@@ -235,7 +239,6 @@ include_once('include/page_header.php');
 				' FROM nodes n'.
 				' WHERE '.DBcondition('n.nodeid',$available_nodes).
 				order_by('n.nodeid,n.name,n.nodetype,n.timezone,n.ip','n.masterid');
-
 		$db_nodes = DBselect($sql);
 		while($row=DBfetch($db_nodes)){
 
@@ -248,15 +251,20 @@ include_once('include/page_header.php');
 					get_node_path($row['masterid']),
 					new CLink(
 						($row['nodetype'] ? new CSpan($row['name'], 'bold') : $row['name']),
-						'?&form=update&nodeid='.$row['nodeid'],'action')),
+						'?&form=update&nodeid='.$row['nodeid'])),
 				$node_type == ZBX_NODE_LOCAL ? new CSpan($node_type_name, 'bold') : $node_type_name,
 				new CSpan('GMT'.sprintf('%+03d:00', $row['timezone']),	$row['nodetype'] ? 'bold' : null),
 				new CSpan($row['ip'].':'.$row['port'], 			$row['nodetype'] ? 'bold' : null)
 				));
 		}
-		$table->Show();
+		$nodes_wdgt->addItem($table);
 	}
+	
+	$nodes_wdgt->show();
 
-include_once 'include/page_footer.php';
+?>
+<?php
+
+include_once('include/page_footer.php');
 
 ?>

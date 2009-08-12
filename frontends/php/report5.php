@@ -39,6 +39,8 @@ include_once('include/page_header.php');
 	check_fields($fields);
 ?>
 <?php
+	$rprt_wdgt = new CWidget();
+	
 	$_REQUEST['period'] = get_request('period', 'day');
 	$admin_links = (($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN) || ($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN));
 
@@ -53,7 +55,10 @@ include_once('include/page_header.php');
 
 	$form->addItem($cmbPeriod);
 
-	show_table_header(S_TRIGGERS_TOP_100_BIG, $form);
+	$rprt_wdgt->addPageHeader(S_TRIGGERS_TOP_100_BIG);
+
+	$rprt_wdgt->addHeader(S_REPORT_BIG, $form);
+	$rprt_wdgt->addItem(BR());
 ?>
 <?php
 	$table = new CTableInfo();
@@ -75,7 +80,8 @@ include_once('include/page_header.php');
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
-	$scripts_by_hosts = get_accessible_scripts_by_hosts($available_hosts);
+	$scripts_by_hosts = CScript::getScriptsByHosts($available_hosts);
+	
 	$triggers = array();
 	$triggerids = array();
 	$sql = 'SELECT h.host, h.hostid, t.triggerid, t.description, t.expression, t.lastchange, t.priority, count(distinct e.eventid) as cnt_event '.
@@ -149,13 +155,15 @@ include_once('include/page_header.php');
 			$row['cnt_event'],
 		));
 	}
-	$table->show();
+
+	$rprt_wdgt->addItem($table);
+	$rprt_wdgt->show();
 
 	$jsmenu = new CPUMenu(null,170);
 	$jsmenu->InsertJavaScript();
 ?>
 <?php
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
 
 ?>

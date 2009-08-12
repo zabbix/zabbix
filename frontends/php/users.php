@@ -57,7 +57,7 @@ include_once('include/page_header.php');
 		'user_medias'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
 		'user_medias_to_del'=>	array(T_ZBX_STR, O_OPT,	null,	DB_ID,	null),
 
-		'new_group'=>		array(T_ZBX_STR, O_OPT,	null,	null,	null),
+		'new_groups'=>		array(T_ZBX_STR, O_OPT,	null,	null,	null),
 		'new_media'=>		array(T_ZBX_STR, O_OPT,	null,	null,	null),
 		'enable_media'=>	array(T_ZBX_INT, O_OPT,	null,	null,		null),
 		'disable_media'=>	array(T_ZBX_INT, O_OPT,null,	null,		null),
@@ -90,12 +90,20 @@ include_once('include/page_header.php');
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('u.alias',ZBX_SORT_UP);
+	validate_sort_and_sortorder('alias',ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go','none');
+
 ?>
 <?php
-	if(isset($_REQUEST['new_media'])){
+	if(isset($_REQUEST['new_groups'])){
+		$_REQUEST['new_groups'] = get_request('new_groups', array());
+		$_REQUEST['user_groups'] = get_request('user_groups', array());
+		
+		$_REQUEST['user_groups'] = array_merge($_REQUEST['user_groups'], $_REQUEST['new_groups']);
+		unset($_REQUEST['new_groups']);
+	}
+	else if(isset($_REQUEST['new_media'])){
 		$_REQUEST['user_medias'] = get_request('user_medias', array());
 		array_push($_REQUEST['user_medias'], $_REQUEST['new_media']);
 	}
@@ -290,17 +298,6 @@ include_once('include/page_header.php');
 
 	$frmForm->addItem($cmbConf);
 
-	$cmbUGrp = new CComboBox('filter_usrgrpid',$_REQUEST['filter_usrgrpid'],'submit()');
-	$cmbUGrp->addItem(0, S_ALL_S);
-
-	$options = array('extendoutput' => 1, 'order' => 'name');
-	$usrgrps = CUserGroup::get($options);
-	foreach($usrgrps as $usrgrpid => $usrgrp){
-		$cmbUGrp->addItem($usrgrpid, $usrgrp['name']);
-	}
-
-	$frmForm->addItem(array(SPACE.SPACE,S_USER_GROUP,$cmbUGrp));
-
 	$frmForm->addItem(SPACE.'|'.SPACE);
 	$frmForm->addItem($btnNew = new CButton('form',S_CREATE_USER));
 	show_table_header(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
@@ -311,34 +308,52 @@ include_once('include/page_header.php');
 		insert_user_form(get_request('userid',null));
 	}
 	else{
+		$user_wdgt = new CWidget();
+		
+		$form = new CForm();
+		$form->setMethod('get');
 
-		$options = array('extendoutput' => 1, 'order' => 'alias', 'select_usrgrps' => 1, 'get_access' => 1);
-		if($_REQUEST['filter_usrgrpid'] > 0){
-			$options += array('usrgrpids' => $_REQUEST['filter_usrgrpid']);
+		$cmbUGrp = new CComboBox('filter_usrgrpid',$_REQUEST['filter_usrgrpid'],'submit()');
+		$cmbUGrp->addItem(0, S_ALL_S);
+	
+		$options = array('extendoutput' => 1, 'order' => 'name');
+		$usrgrps = CUserGroup::get($options);
+		foreach($usrgrps as $usrgrpid => $usrgrp){
+			$cmbUGrp->addItem($usrgrpid, $usrgrp['name']);
 		}
+	
+		$form->addItem(array(S_USER_GROUP.SPACE,$cmbUGrp));
+
+		
+		$numrows = new CDiv();
+		$numrows->setAttribute('name','numrows');
+
+		$user_wdgt->addHeader(S_USERS_BIG, $form);
+		$user_wdgt->addHeader($numrows);
+
+// User table
+		$options = array('extendoutput' => 1, 
+						'select_usrgrps' => 1, 
+						'get_access' => 1,
+						'limit' => ($config['search_limit']+1)
+					);
+		if($_REQUEST['filter_usrgrpid'] > 0){
+			$options['usrgrpids'] = $_REQUEST['filter_usrgrpid'];
+		}
+
 		$users = CUser::get($options);
 		$userids = array_keys($users);
-
-		$numrows = count($users);
-
-		$header = get_table_header(array(
-			S_USERS_BIG,
-			new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-			S_FOUND.': ',
-			new CSpan($numrows,'info')
-		));
-		show_table_header($header);
 
 		$form = new CForm(null,'post');
 		$form->setName('users');
 
 		$table=new CTableInfo(S_NO_USERS_DEFINED);
 		$table->setHeader(array(
-			new CCheckBox('all_users',NULL,"checkAll('".$form->GetName()."','all_users','group_userid');"),
-			make_sorting_link(S_ALIAS,'u.alias'),
-			make_sorting_link(S_NAME,'u.name'),
-			make_sorting_link(S_SURNAME,'u.surname'),
-			make_sorting_link(S_USER_TYPE,'u.type'),
+			new CCheckBox('all_users',NULL,"checkAll('".$form->getName()."','all_users','group_userid');"),
+			make_sorting_header(S_ALIAS,'alias'),
+			make_sorting_header(S_NAME,'name'),
+			make_sorting_header(S_SURNAME,'surname'),
+			make_sorting_header(S_USER_TYPE,'type'),
 			S_GROUPS,
 			S_IS_ONLINE_Q,
 			S_GUI_ACCESS,
@@ -346,6 +361,14 @@ include_once('include/page_header.php');
 			S_DEBUG_MODE,
 			S_STATUS
 		));
+
+// sorting
+		order_page_result($users, getPageSortField('alias'), getPageSortOrder());
+
+// PAGING UPPER
+		$paging = getPagingLine($users);
+		$user_wdgt->addItem($paging);
+//---------
 
 		// set default lastaccess time to 0.
 		foreach($users as $userid => $user){
@@ -408,7 +431,12 @@ include_once('include/page_header.php');
 			));
 		}
 
-/* <<<--- GO button --->>> */
+// PAGING FOOTER
+		$table->addRow(new CCol($paging));
+//		$items_wdgt->addItem($paging);
+//---------
+
+// goBox
 		$goBox = new CComboBox('go');
 		$goBox->addItem('delete',S_DELETE_SELECTED);
 
@@ -418,11 +446,15 @@ include_once('include/page_header.php');
 		zbx_add_post_js('chkbxRange.pageGoName = "group_userid";');
 
 		$table->setFooter(new CCol(array($goBox, $goButton)));
-/* --->>> GO button <<<--- */
+//------
 
 		$form->addItem($table);
-		$form->show();
+		
+		$user_wdgt->addItem($form);
+		$user_wdgt->show();
 	}
+?>
+<?php
 
 include_once('include/page_footer.php');
 

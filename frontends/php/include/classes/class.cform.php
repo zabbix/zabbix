@@ -26,6 +26,8 @@ class CForm extends CTag{
 		$this->setAction($action);
 		$this->setEnctype($enctype);
 
+		$this->setAttribute('accept-charset','utf-8');
+
 		if(isset($_COOKIE['zbx_sessionid']))
 			$this->addVar('sid', substr($_COOKIE['zbx_sessionid'],16,16));
 	}

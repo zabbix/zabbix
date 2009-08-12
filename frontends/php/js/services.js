@@ -79,7 +79,6 @@ function add_child_service(name,serviceid,trigger,triggerid){
 
 	var url = document.createElement('a');
 	url.setAttribute('href','services_form.php?sform=1&serviceid='+serviceid);
-	url.setAttribute(classattr,'action');
 	url.appendChild(document.createTextNode(name));
 
 	var input = document.createElement('input');
