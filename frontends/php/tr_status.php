@@ -363,8 +363,12 @@ include_once('include/page_header.php');
 	);
 	
 // Filtering
-	if($_REQUEST['hostid'] > 0){
-		$options['hostids'] = $_REQUEST['hostid'];
+	if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
+		$options['hostids'] = $PAGE_HOSTS['selected'];
+	}
+		
+	if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
+		$options['groupids'] = $PAGE_GROUPS['selected'];
 	}
 	
 	if(!zbx_empty($_REQUEST['txt_select'])){
@@ -409,12 +413,9 @@ include_once('include/page_header.php');
 			break;
 	}
 
-// sorting
+// sorting && paging
 	order_page_result($triggers, getPageSortField('description'), getPageSortOrder());
-
-// PAGING UPPER
 	$paging = getPagingLine($triggers);
-	$trigg_wdgt->addItem($paging);
 //---------
 
 	foreach($triggers as $triggerid => $trigger){
@@ -625,12 +626,8 @@ include_once('include/page_header.php');
 		unset($trigger,$description, $actions);
 	}
 
-// PAGING FOOTER
-	$table->addRow(new CCol($paging));
-//	$items_wdgt->addItem($paging);
-//---------
-
 //----- GO ------
+	$footer = null;
 	if($config['event_ack_enable']){
 		$goBox = new CComboBox('go');
 		$goBox->addItem('bulkacknowledge',S_BULK_ACKNOWLEDGE);
@@ -640,9 +637,13 @@ include_once('include/page_header.php');
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "events";');
 
-		$table->setFooter(new CCol(array($goBox, $goButton)));
+		$footer = get_table_header(new CCol(array($goBox, $goButton)));
 	}
 //----
+
+// PAGING FOOTER
+		$table = array($paging,$table,$paging,$footer);
+//---------
 
 	$m_form->addItem($table);
 

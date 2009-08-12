@@ -326,15 +326,20 @@ include_once('include/page_header.php');
 
 // table applications 
 		$options = array(
-			'hostids' => $PAGE_HOSTS['selected'],
 			'select_items' => 1,
 			'extendoutput' => 1,
 			'editable' => 1,
-//			'sortfield' => getPageSortField('name'),
-//			'sortorder' => getPageSortOrder(),
 			'limit' => ($config['search_limit']+1)
 		);
 
+		if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
+			$options['hostids'] = $PAGE_HOSTS['selected'];
+		}
+			
+		if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
+			$options['groupids'] = $PAGE_GROUPS['selected'];
+		}
+		
 		$applications = CApplication::get($options);
 		
 		$form = new CForm();
@@ -351,10 +356,7 @@ include_once('include/page_header.php');
 
 // sorting
 		order_page_result($applications, getPageSortField('name'), getPageSortOrder());
-
-// PAGING UPPER
 		$paging = getPagingLine($applications);
-		$app_wdgt->addItem($paging);
 //---------
 
 		foreach($applications as $applicationid => $application){
@@ -376,11 +378,6 @@ include_once('include/page_header.php');
 				SPACE.'('.count($application['itemids']).')')
 			));
 		}
-		
-// PAGING FOOTER
-		$table->addRow(new CCol($paging));
-//		$app_wdgt->addItem($paging);
-//---------
 
 // goBox
 		$goBox = new CComboBox('go');
@@ -392,8 +389,13 @@ include_once('include/page_header.php');
 		$goButton = new CButton('goButton',S_GO.' (0)');
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "applications";');
+
+		$footer = get_table_header(new CCol(array($goBox, $goButton)));
 //----
-		$table->setFooter(new CCol(array($goBox, $goButton)));
+
+// PAGING FOOTER
+		$table = array($paging,$table,$paging,$footer);
+//---------
 
 		$form->addItem($table);
 		

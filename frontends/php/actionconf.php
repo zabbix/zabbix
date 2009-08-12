@@ -511,10 +511,7 @@ include_once('include/page_header.php');
 
 // sorting
 		order_page_result($actions, getPageSortField('name'), getPageSortOrder());
-
-// PAGING UPPER
 		$paging = getPagingLine($actions);
-		$action_wdgt->addItem($paging);
 //-------
 
 		foreach($actions as $actionid => $action){
@@ -575,10 +572,13 @@ include_once('include/page_header.php');
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "g_actionid";');
 
-		$tblActions->setFooter(new CCol(array($goBox, $goButton)));
+		$footer = get_table_header(new CCol(array($goBox, $goButton)));
 //----
-		$form->addItem($tblActions);
 
+// PAGING FOOTER
+		$tblActions = array($paging,$tblActions,$paging,$footer);
+//---------
+		$form->addItem($tblActions);
 		$action_wdgt->addItem($form);
 	}
 	

@@ -608,7 +608,6 @@ include_once('include/page_header.php');
 
 /* table HOSTS */
 		$options = array(
-					'hostids' => $PAGE_HOSTS['hostids'],
 					'extendoutput' => 1,
 					'select_templates' => 1,
 					'select_items' => 1,
@@ -621,7 +620,7 @@ include_once('include/page_header.php');
 					'limit' => ($config['search_limit']+1)
 				);
 
-		if($_REQUEST['groupid'] > 0){
+		if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
 			$options['groupids'] = $PAGE_GROUPS['selected'];
 		}
 
@@ -648,12 +647,9 @@ include_once('include/page_header.php');
 			S_ERROR
 		));
 		
-// sorting
+// sorting && paging
 		order_page_result($hosts, getPageSortField('host'), getPageSortOrder());
-
-// PAGING UPPER
 		$paging = getPagingLine($hosts);
-		$hosts_wdgt->addItem($paging);
 //---------
 
 		foreach($hosts as $hostid => $row){
@@ -734,11 +730,6 @@ include_once('include/page_header.php');
 				$error
 			));
 		}
-		
-// PAGING FOOTER
-		$table->addRow(new CCol($paging));
-//		$items_wdgt->addItem($paging);
-//---------
 
 //----- GO ------
 		$goBox = new CComboBox('go');
@@ -752,8 +743,13 @@ include_once('include/page_header.php');
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
 
-		$table->setFooter(new CCol(array($goBox, $goButton)));
+		$footer = get_table_header(new CCol(array($goBox, $goButton)));
 //----
+
+// PAGING FOOTER
+		$table = array($paging,$table,$paging,$footer);
+//---------
+
 		$form->addItem($table);
 		
 		$hosts_wdgt->addItem($form);

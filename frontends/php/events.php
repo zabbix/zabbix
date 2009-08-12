@@ -203,7 +203,6 @@ include_once('include/page_header.php');
 	}
 	else{
 		$options = array(
-						'hostids' => $_REQUEST['hostid'],
 						'object' => EVENT_OBJECT_TRIGGER,
 						'time_from' => $_REQUEST['nav_time'],
 						'time_till' => null,
@@ -216,6 +215,14 @@ include_once('include/page_header.php');
 						'limit' => ($config['search_limit']+1)
 					);
 
+		if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
+			$options['hostids'] = $PAGE_HOSTS['selected'];
+		}
+			
+		if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
+			$options['groupids'] = $PAGE_GROUPS['selected'];
+		}
+		
 		if($hide_unknown) $options['hide_unknown'] = 1;
 
 		$events = CEvent::get($options);
@@ -240,7 +247,6 @@ Copt::profiling_stop('order');
 
 // PAGING UPPER
 		$paging = getPagingLine($events);
-		$events_wdgt->addItem($paging);
 //------
 
 		foreach($events as $eventid => $event){
@@ -306,14 +312,12 @@ Copt::profiling_stop('order');
 				($config['event_ack_enable'])?$ack:NULL,
 				$actions
 			));
-		}		
+		}
 
 // PAGING FOOTER
-		$table->addRow(new CCol($paging));
-//		$items_wdgt->addItem($paging);
+		$table = array($paging, $table, $paging);
 //---------
 	}
-
 
 	$events_wdgt->addItem($table);
 
