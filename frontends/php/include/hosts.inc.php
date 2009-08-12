@@ -1468,8 +1468,12 @@ return $result;
 		$PAGE_GROUPS['selected'] = $_REQUEST['groupid'];
 		$PAGE_HOSTS['selected'] = $_REQUEST['hostid'];
 
+		if(($PAGE_GROUPS['selected'] == 0) && ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE) && $reset_host){
+			$PAGE_GROUPS['groupids'] = array();
+		}
+		
 		if(($PAGE_HOSTS['selected'] == 0) && ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE) && $reset_host){
-			$PAGE_HOSTS['hostids'] = array(0);
+			$PAGE_HOSTS['hostids'] = array();
 		}
 
 		if($PAGE_GROUPS['original'] > -1)
@@ -1496,18 +1500,30 @@ return $result;
  */
  	function validate_group(&$PAGE_GROUPS, &$PAGE_HOSTS, $reset_host=true){
 		global $page;
+		
+		$config = select_config();
+
+		$dd_first_entry = $config['dropdown_first_entry'];
+		if($dd_first_entry == ZBX_DROPDOWN_FIRST_ZBX162){
+			$dd_first_entry = ZBX_DROPDOWN_FIRST_ALL;
+		}
+
 		$group_var = 'web.latest.groupid';
 		$host_var = 'web.latest.hostid';
 
 		$_REQUEST['groupid']    = get_request('groupid', get_profile($group_var, -1));
 
 		if($_REQUEST['groupid'] < 0){
-			$PAGE_HOSTS['selected'] = $_REQUEST['groupid'] = 0;
+			$PAGE_GROUPS['selected'] = $_REQUEST['groupid'] = 0;
 			$PAGE_HOSTS['selected'] = $_REQUEST['hostid'] = 0;
 		}
 
 		if(!isset($_REQUEST['hostid']) || $reset_host){
 			$PAGE_HOSTS['selected'] = $_REQUEST['hostid'] = 0;
+		}
+
+		if(($PAGE_GROUPS['selected'] == 0) && ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE)){
+			$PAGE_GROUPS['groupids'] = array();
 		}
 
 		$PAGE_GROUPS['selected'] = $_REQUEST['groupid'];

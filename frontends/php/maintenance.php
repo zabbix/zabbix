@@ -453,13 +453,16 @@ include_once('include/page_header.php');
 // ----
 
 		$options = array(
-			'groupids' => $PAGE_GROUPS['selected'],
 			'extendoutput' => 1,
 			'editable' => 1,
 //			'sortfield' => getPageSortField('name'),
 //			'sortorder' => getPageSortOrder(),
 			'limit' => ($config['search_limit']+1)
 		);
+		
+		if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
+			$options['groupids'] = $PAGE_GROUPS['selected'];
+		}
 	
 		$maintenances = CMaintenance::get($options);
 

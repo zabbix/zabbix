@@ -585,18 +585,19 @@
 		    $options['status'] = TRIGGER_STATUS_ENABLED;
 		}
 
-		$options['hostids'] = $PAGE_HOSTS['selected'];
-		$options['groupids'] = $PAGE_GROUPS['groupids'];
-
+		if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
+			$options['hostids'] = $PAGE_HOSTS['selected'];
+		}
+			
+		if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
+			$options['groupids'] = $PAGE_GROUPS['selected'];
+		}
 // Triggers
 		$triggers = CTrigger::get($options);
 
-// sorting
+// sorting && paginf
 		order_page_result($triggers, getPageSortField('description'), getPageSortOrder());
-
-// PAGING UPPER
 		$paging = getPagingLine($triggers);
-		$triggers_wdgt->addItem($paging);
 //---------
 
 		foreach($triggers as $triggerid => $trigger){
@@ -690,12 +691,6 @@
 
 		}
 
-// PAGING FOOTER
-		$table->addRow(new CCol($paging));
-//		$items_wdgt->addItem($paging);
-//---------
-
-
 //----- GO ------
 		$goBox = new CComboBox('go');
 		$goBox->addItem('activate',S_ACTIVATE_SELECTED);
@@ -709,8 +704,12 @@
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "g_triggerid";');
 
-		$table->setFooter(new CCol(array($goBox, $goButton)));
+		$footer = get_table_header(new CCol(array($goBox, $goButton)));
 //----
+
+// PAGING FOOTER
+		$table = array($paging,$table,$paging,$footer);
+//---------
 		
 		$form->addItem($table);
 		$triggers_wdgt->addItem($form);

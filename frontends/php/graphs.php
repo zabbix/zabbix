@@ -450,7 +450,6 @@ include_once('include/page_header.php');
 			$tbl_header_host = new CTableInfo();
 
 			$header_host = CHost::get(array(
-				'hostids' => $PAGE_HOSTS['selected'],
 				'templated_hosts' => 1,
 				'nopermissions' => 1,
 				'extendoutput' => 1,
@@ -459,6 +458,15 @@ include_once('include/page_header.php');
 				'select_applications' =>1,
 				'limit' => ($config['search_limit']+1)
 			));
+			
+			if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
+				$options['hostids'] = $PAGE_HOSTS['selected'];
+			}
+				
+			if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
+				$options['groupids'] = $PAGE_GROUPS['selected'];
+			}
+			
 			$header_host = array_pop($header_host);
 
 			$description = array();
@@ -566,10 +574,7 @@ include_once('include/page_header.php');
 
 // sorting
 		order_page_result($graphs, getPageSortField('description'), getPageSortOrder());
-
-// PAGING UPPER
 		$paging = getPagingLine($graphs);
-		$graphs_wdgt->addItem($paging);
 //---------
 
 		foreach($graphs as $graphid => $graph){
@@ -621,11 +626,6 @@ include_once('include/page_header.php');
 			));
 		}
 
-// PAGING FOOTER
-		$table->addRow(new CCol($paging));
-//		$items_wdgt->addItem($paging);
-//---------
-
 //----- GO ------
 		$goBox = new CComboBox('go');
 		$goBox->addItem('copy_to',S_COPY_SELECTED_TO);
@@ -636,8 +636,12 @@ include_once('include/page_header.php');
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "group_graphid";');
 
-		$table->setFooter(new CCol(array($goBox, $goButton)));
+		$footer = get_table_header(new CCol(array($goBox, $goButton)));
 //----
+
+// PAGING FOOTER
+		$table = array($paging,$table,$paging,$footer);
+//---------
 
 		$form->addItem($table);
 

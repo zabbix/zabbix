@@ -294,14 +294,9 @@ include_once('include/page_header.php');
 		$actions[$row['auditid']] = $row;
 	}
 
-// sorting
-//COpt::profiling_start('ITEMS');		
+// sorting && paging
 	order_page_result($actions, getPageSortField('clock'), getPageSortOrder());
-//COpt::profiling_stop('ITEMS');
-
-// PAGING UPPER
 	$paging = getPagingLine($actions);
-	$audit_wdgt->addItem($paging);
 //---------
 
 	foreach($actions as $num => $row){
@@ -335,9 +330,8 @@ include_once('include/page_header.php');
 	}
 
 // PAGING FOOTER
-		$table->addRow(new CCol($paging));
-//		$items_wdgt->addItem($paging);
-//------------
+	$table = array($paging, $table, $paging);
+//---------
 
 	$audit_wdgt->addItem($table);
 	$audit_wdgt->show();
