@@ -491,7 +491,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		}
 		$elements=array();
 
-		$description = htmlentities(expand_trigger_description_by_data($row));
+		$description = htmlspecialchars(expand_trigger_description_by_data($row));
 
 		if(isset($_REQUEST["btnSelect"]) && '' != $txt_select && ((stristr($description, $txt_select)) == ($_REQUEST["btnSelect"]=="Inverse select"))) continue;
 
@@ -593,7 +593,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 				}
 			}
 
-			$description = htmlentities(expand_trigger_description_by_data(
+			$description = htmlspecialchars(expand_trigger_description_by_data(
 							array_merge($row, array("clock"=>$row_event["clock"]), array("ms"=>$row_event["ms"])),
 							ZBX_FLAG_EVENT));
 
