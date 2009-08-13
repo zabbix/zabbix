@@ -59,6 +59,7 @@ class CTemplate {
 			'select_items'				=> null,
 			'select_triggers'			=> null,
 			'select_graphs'				=> null,
+			'select_applications'		=> null,
 			'count'						=> null,
 			'pattern'					=> '',
 			'sortfield'					=> '',
@@ -207,7 +208,7 @@ class CTemplate {
 
 			if(!str_in_array('h.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('h.*', $sql_parts['select'])){
 				$sql_parts['select'][] = 'h.'.$options['sortfield'];
-			}
+		}
 		}
 
 // limit
@@ -276,7 +277,11 @@ class CTemplate {
 						$template['graphids'] = array();
 						$template['graphs'] = array();
 					}
-
+					if($options['select_applications'] && !isset($result[$template['hostid']]['applications'])){
+						$result[$template['hostid']]['applications'] = array();
+						$result[$template['hostid']]['applicationids'] = array();
+					}
+					
 					// groupids
 					if(isset($template['groupid'])){
 						if(!isset($result[$template['hostid']]['groupids']))
@@ -375,7 +380,18 @@ class CTemplate {
 				}
 			}
 		}
-
+// Adding applications
+		if($options['select_applications']){
+			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids);
+			$applications = Capplication::get($obj_params);
+			foreach($applications as $applicationid => $application){
+				foreach($application['hostids'] as $num => $hostid){
+					$result[$hostid]['applicationids'][$applicationid] = $applicationid;
+					$result[$hostid]['applications'][$applicationid] = $application;
+				}
+			}
+		}
+	
 	return $result;
 	}
 

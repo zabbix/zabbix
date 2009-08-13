@@ -37,6 +37,10 @@ td.right{
 	text-align: right;
 }
 
+td.top{
+	vertical-align: top;
+}
+
 /**************** PAGE TABLE ****************/
 /* page_header */
 table.page_header{
@@ -1196,11 +1200,32 @@ table.infobox{
 	margin-top: 4px;
 	border: 1px #3377AA solid;
 	background-color: #FFFFFF;
-}
-table.infobox tr td{
-	padding-left: 5px;
+	text-align: center;
 }
 /********** </INFOBOX> ************/
+
+/********** <FILTER> ************/
+table.filter{
+	width: 100%;
+	/*background-color: #F0F0F0;*/
+	background-color: #FFFFFF;
+	border-collapse: collapse;	
+}
+table.filter tr > td:first-child{
+	width: 1%;
+	white-space: nowrap;
+}
+
+table.filter tr td {
+	line-height: 22px;
+	height: 22px;
+	vertical-align: middle;
+	border: 1px dotted silver;
+	padding-left: 6px;	
+	padding-right: 4px;	
+}
+
+/********** </FILTER> ************/
 
 /********** <INVISIBLE> ************/
 table.invisible{
