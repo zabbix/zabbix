@@ -329,19 +329,18 @@ include_once "include/page_header.php";
 				}
 			}
 
-			$table->AddRow(array(
-				date("Y.M.d H:i:s",$row["clock"]),
-				is_show_subnodes() ? get_node_name_by_elid($row['triggerid']) : null,
-				$_REQUEST["hostid"] == 0 ? $row['host'] : null,
-				new CLink(
-					expand_trigger_description_by_data($row, ZBX_FLAG_EVENT),
-					"tr_events.php?triggerid=".$row["triggerid"].'&eventid='.$row['eventid'],
-					"action"
-					),
-				$value,
-				new CCol(get_severity_description($row["priority"]), get_severity_style($row["priority"],$row['value'])),
-				$duration,
-				($config['event_ack_enable'])?$ack:NULL
+			$table->AddRow(array( 
+					date("Y.M.d H:i:s",$row["clock"]), 
+					is_show_subnodes() ? get_node_name_by_elid($row['triggerid']) : null, 
+					$_REQUEST["hostid"] == 0 ? $row['host'] : null, 
+					new CLink(htmlentities(expand_trigger_description_by_data($row, ZBX_FLAG_EVENT)), 
+							"tr_events.php?triggerid=".$row["triggerid"].'&eventid='.$row['eventid'], 
+							"action" 
+							), 
+					$value, 
+					new CCol(get_severity_description($row["priority"]), get_severity_style($row["priority"],$row['value'])),
+					$duration,
+					($config['event_ack_enable'])?$ack:NULL
 			));
 				
 			$col++;

@@ -491,7 +491,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		}
 		$elements=array();
 
-		$description = expand_trigger_description($row['triggerid']);
+		$description = htmlentities(expand_trigger_description_by_data($row));
 
 		if(isset($_REQUEST["btnSelect"]) && '' != $txt_select && ((stristr($description, $txt_select)) == ($_REQUEST["btnSelect"]=="Inverse select"))) continue;
 
@@ -593,9 +593,9 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 				}
 			}
 
-			$description = expand_trigger_description_by_data(
-					array_merge($row, array("clock"=>$row_event["clock"]), array("ms"=>$row_event["ms"])),
-					ZBX_FLAG_EVENT);
+			$description = htmlentities(expand_trigger_description_by_data(
+							array_merge($row, array("clock"=>$row_event["clock"]), array("ms"=>$row_event["ms"])),
+							ZBX_FLAG_EVENT));
 
 			if($compact != 'true'){
 				$span = new CTag('cspan','yes');
