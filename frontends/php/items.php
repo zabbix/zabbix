@@ -145,34 +145,24 @@ include_once('include/page_header.php');
 		'filter_snmp_oid'=>			array(T_ZBX_STR, O_OPT,  null,  null,	null),
 		'filter_snmp_port'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	null),
 		'filter_value_type'=>		array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1,2,3,4'),null),
-		'filter_data_type'=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(-1,ITEM_DATA_TYPE_HEXADECIMAL),null),
+		'filter_data_type'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(-1,ITEM_DATA_TYPE_HEXADECIMAL),null),
 		'filter_delay'=>			array(T_ZBX_INT, O_OPT,  -1,  BETWEEN(0,86400),null),
 		'filter_history'=>			array(T_ZBX_INT, O_OPT,  -1,  BETWEEN(0,65535),null),
 		'filter_trends'=>			array(T_ZBX_INT, O_OPT,  -1,  BETWEEN(0,65535),null),
 		'filter_status'=>			array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1,3'),null),
-		'filter_belongs'=>			array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1'),null),
+		'filter_templated_items'=>			array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1'),null),
 		'filter_with_triggers'=>	array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1'),null),
 // subfilters
-		'subfilter_apps'=>				array(T_ZBX_STR, O_OPT,	 null,	DB_ID, null),
-		'subfilter_apps_rem'=>			array(T_ZBX_STR, O_OPT,	 null,	DB_ID, null),
+		'subfilter_apps'=>				array(T_ZBX_STR, O_OPT,	 null,	null, null),
 		'subfilter_types'=>				array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		'subfilter_types_rem'=>			array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		'subfilter_value_types'=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		'subfilter_value_types_rem'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		'subfilter_status'=>			array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		'subfilter_status_rem'=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		'subfilter_belongs'=>			array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		'subfilter_belongs_rem'=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'subfilter_templated_items'=>			array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		'subfilter_with_triggers'=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		'subfilter_with_triggers_rem'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		'subfilter_hosts'=>				array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		'subfilter_hosts_rem'=>			array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		'subfilter_interval'=>				array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		'subfilter_interval_rem'=>			array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		'subfilter_history'=>				array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		'subfilter_history_rem'=>			array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		'subfilter_trends'=>				array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		'subfilter_trends_rem'=>			array(T_ZBX_INT, O_OPT,	 null,	null, null),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
@@ -213,12 +203,12 @@ include_once('include/page_header.php');
 	$_REQUEST['filter_history']			= get_request('filter_history');
 	$_REQUEST['filter_trends']			= get_request('filter_trends');
 	$_REQUEST['filter_status']			= get_request('filter_status');
-	$_REQUEST['filter_belongs']			= get_request('filter_belongs', -1);
+	$_REQUEST['filter_templated_items']			= get_request('filter_templated_items', -1);
 	$_REQUEST['filter_with_triggers']	= get_request('filter_with_triggers', -1);
 	
 	/* SUBFILTERS { --->>> */
 	$subfilters = array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status',
-		'subfilter_belongs', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval', 'subfilter_history', 'subfilter_trends');
+		'subfilter_templated_items', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval', 'subfilter_history', 'subfilter_trends');
 
 	foreach($subfilters as $name){
 		if(isset($_REQUEST['reset_subfilters'])){
@@ -226,8 +216,6 @@ include_once('include/page_header.php');
 		}
 		else{
 			$_REQUEST[$name] = get_request($name, array());
-			$_REQUEST[$name.'_rem'] = get_request($name.'_rem', array());
-			$_REQUEST[$name] = array_diff($_REQUEST[$name], $_REQUEST[$name.'_rem']);
 		}
 	}
 	/* --->>> } SUBFILTERS */
@@ -719,7 +707,7 @@ include_once('include/page_header.php');
 		$items_wdgt->addHeader($numrows, SPACE);	
 // ----------------
 		
-/* Items Filter --->>> { */
+// Items Filter{ 
 		$options = array(
 			'filter' => 1,
 			'extendoutput' => 1,
@@ -781,14 +769,14 @@ include_once('include/page_header.php');
 		if(!zbx_empty($_REQUEST['filter_status']) && $_REQUEST['filter_status'] != -1)
 			$options['status'] = $_REQUEST['filter_status'];
 			
-		if(!zbx_empty($_REQUEST['filter_belongs']) && $_REQUEST['filter_belongs'] != -1)
-			$options['belongs'] = $_REQUEST['filter_belongs'];
+		if(!zbx_empty($_REQUEST['filter_templated_items']) && $_REQUEST['filter_templated_items'] != -1)
+			$options['templated_items'] = $_REQUEST['filter_templated_items'];
 			
 		if(!zbx_empty($_REQUEST['filter_with_triggers']) && $_REQUEST['filter_with_triggers'] != -1)
 			$options['with_triggers'] = $_REQUEST['filter_with_triggers'];
 
 		$afterFilter = count($options);
-/* --->>> } Items Filter */
+//} Items Filter
 
 		if($preFilter == $afterFilter)
 			$items = array();
@@ -796,7 +784,7 @@ include_once('include/page_header.php');
 			$items = CItem::get($options);
 		
 
-		// Header Host //
+// Header Host
 		if($hostid > 0){
 			$tbl_header_host = get_header_host_table($hostid, array('graphs', 'triggers', 'applications'));
 			$items_wdgt->addItem($tbl_header_host);
@@ -855,9 +843,9 @@ include_once('include/page_header.php');
 			$items[$itemid]['subfilters']['subfilter_status'] =
 				(empty($_REQUEST['subfilter_status']) || in_array($item['status'], $_REQUEST['subfilter_status']));
 				
-			$items[$itemid]['subfilters']['subfilter_belongs'] =
-				(empty($_REQUEST['subfilter_belongs']) || (($item['templateid'] == 0) && in_array(0, $_REQUEST['subfilter_belongs']))
-				|| (($item['templateid'] > 0) && in_array(1, $_REQUEST['subfilter_belongs'])));
+			$items[$itemid]['subfilters']['subfilter_templated_items'] =
+				(empty($_REQUEST['subfilter_templated_items']) || (($item['templateid'] == 0) && in_array(0, $_REQUEST['subfilter_templated_items']))
+				|| (($item['templateid'] > 0) && in_array(1, $_REQUEST['subfilter_templated_items'])));
 				
 			$items[$itemid]['subfilters']['subfilter_with_triggers'] =
 				(empty($_REQUEST['subfilter_with_triggers']) || ((count($item['triggerids']) == 0) && in_array(0, $_REQUEST['subfilter_with_triggers']))
@@ -872,24 +860,24 @@ include_once('include/page_header.php');
 			$items[$itemid]['subfilters']['subfilter_interval'] =
 				(empty($_REQUEST['subfilter_interval']) || in_array($item['delay'], $_REQUEST['subfilter_interval']));
 		}
-	/* --->>> } SET VALUES FOR SUBFILTERS */
+// } SET VALUES FOR SUBFILTERS
 
-	// Add filter form 
-	// !!! $items must contain all selected items with [subfilters] values !!!
-	$items_wdgt->addFlicker(get_item_filter_form($items), get_profile('web.items.filter.state', 0));
+// Add filter form 
+// !!! $items must contain all selected items with [subfilters] values !!!
+		$items_wdgt->addFlicker(get_item_filter_form($items), get_profile('web.items.filter.state', 0));
 	
-	/* Subfilter out items */
-	foreach($items as $itemid => $item){
-		foreach($item['subfilters'] as $subfilter => $value){
-			if(!$value) unset($items[$itemid]);
+// Subfilter out items
+		foreach($items as $itemid => $item){
+			foreach($item['subfilters'] as $subfilter => $value){
+				if(!$value) unset($items[$itemid]);
+			}
 		}
-	}
 
-	// sorting && paging
-	// !!! should go after we subfiltered out items !!! 
+// sorting && paging
+// !!! should go after we subfiltered out items !!! 
 			order_page_result($items, getPageSortField('description'), getPageSortOrder());
 			$paging = getPagingLine($items);
-	//---------
+//---------
 
 		foreach($items as $itemid => $item){
 			
@@ -1017,7 +1005,7 @@ include_once('include/page_header.php');
 		}
 		
 
-/* GO { --->>> */
+// }GO
 		$goBox = new CComboBox('go');
 		$goBox->addItem('activate',S_ACTIVATE_SELECTED);
 		$goBox->addItem('disable',S_DISABLE_SELECTED);
@@ -1026,13 +1014,13 @@ include_once('include/page_header.php');
 		$goBox->addItem('clean_history',S_CLEAN_HISTORY_SELECTED_ITEMS);
 		$goBox->addItem('delete',S_DELETE_SELECTED);
 
-		// goButton name is necessary!!!
+// goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO.' (0)');
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "group_itemid";');
 
 		$footer = get_table_header(new CCol(array($goBox, $goButton)));
-/* <<<--- } GO */
+// }GO
 
 // PAGING FOOTER
 		$table = array($paging,$table,$paging,$footer);
@@ -1042,6 +1030,8 @@ include_once('include/page_header.php');
 		$items_wdgt->addItem($form);
 		$items_wdgt->show();
 	}
+?>
+<?php
 
 include_once('include/page_footer.php');
 

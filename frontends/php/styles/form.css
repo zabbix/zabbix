@@ -10,7 +10,7 @@ select{
 	font-size: 10px;
 	border: 1px solid gray;
 	background-color: white;
-	margin: 2px;
+	margin: 1px;
 }
 .biginput:focus	{
 	border-color: black;
@@ -30,9 +30,8 @@ select{
 	font-size: 10px;
 	background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left;
 	border: 1px solid #808080;
-	height: 18px;
+	height: 16px;
 	padding: 0px 5px 0px 5px;
-	margin: 2px;
 	cursor: pointer;
 }
 

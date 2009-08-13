@@ -1217,9 +1217,9 @@ table.filter tr > td:first-child{
 }
 
 table.filter tr td {
-	line-height: 22px;
-	height: 22px;
-	vertical-align: middle;
+	line-height: 20px;
+	height: 26px;
+	vertical-align: bottom;
 	border: 1px dotted silver;
 	padding-left: 6px;	
 	padding-right: 4px;	
