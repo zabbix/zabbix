@@ -38,7 +38,7 @@ require_once('include/hosts.inc.php');
 		access_deny();
 	}
 	
-	if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0) && !isset($available_hosts[$_REQUEST['hostid']])) {
+	if(isset($_REQUEST['templateid']) && ($_REQUEST['templateid']>0) && !isset($available_hosts[$_REQUEST['templateid']])) {
 		access_deny();
 	}
 	
