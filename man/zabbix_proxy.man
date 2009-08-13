@@ -25,8 +25,8 @@ Output version information and exit.
 Default location of Zabbix Proxy configuration file.
 .SH "SEE ALSO"
 .BR zabbix_agentd (8),
-.BR zabbix_get (8)
-.BR zabbix_sender (8)
+.BR zabbix_get (8),
+.BR zabbix_sender (8),
 .BR zabbix_server (8)
 .SH AUTHOR
 Alexei Vladishev <alex@zabbix.com>

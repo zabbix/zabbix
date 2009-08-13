@@ -28,9 +28,9 @@ Output version information and exit.
 .I /etc/zabbix/zabbix_agentd.conf
 Default location of Zabbix Agent configuration file.
 .SH "SEE ALSO"
-.BR zabbix_get (8)
+.BR zabbix_get (8),
 .BR zabbix_proxy (8),
-.BR zabbix_sender (8)
+.BR zabbix_sender (8),
 .BR zabbix_server (8)
 .SH BUGS
 Note that
