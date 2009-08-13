@@ -355,6 +355,36 @@ span.divider{
 	font-weight: normal;
 }
 
+/********** <SUBFILTER BUTTONS> ************/
+span.enabled{
+	cursor: pointer;
+	text-decoration: none;
+	border-bottom: 1px dashed;
+}
+span.enabled:hover{
+	color:#44CC44;
+}
+span.disabled{
+	color:maroon;
+	cursor: pointer;
+	text-decoration: none;
+	border-bottom: 1px dashed;
+}
+span.disabled:hover{
+	color:#CC4444;
+}
+span.inactive{
+	color: #777777;
+}
+span.inactive:hover{
+
+	color: #999999;
+}
+span.active{
+	color: teal;
+}
+/********** </SUBFILTER BUTTONS> ************/
+
 /********** REQUIREMENTS TABLE *************/
 
 span.ok{
@@ -385,9 +415,21 @@ span.blue{
 }
 
 span.info{
-	font-weight: bold;
+ font-weight: bold;
 	color: #444444;
 	font-size: 11px;
+}
+
+.biglink{
+	font-weight: bold;
+	font-size: 13px;
+	color:#3C3089;
+	text-decoration: underline;
+}
+.biglink:hover{
+	color:#6C80B9;
+	cursor: pointer;
+	text-decoration: underline;
 }
 
 /*********** Node Tree ****************/

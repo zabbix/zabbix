@@ -870,6 +870,10 @@
 
 
 //	items.php
+	'S_BELONGS_TO' => 'Belongs to',
+	'S_WITH_TRIGGERS' => 'With triggers',
+	'S_WITHOUT_TRIGGERS' => 'Without triggers',
+	'S_TYPES' =>					'Types',
 	'S_NO_ITEMS_DEFINED'=>					'No items defined',
 	'S_NO_ITEM_DEFINED'=>					'No item defined',
 	'S_HISTORY_CLEANED'=>					'History cleaned',

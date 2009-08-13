@@ -31,15 +31,10 @@
 
 include_once('include/page_header.php');
 
-	$_REQUEST['config'] = get_request('config','itemts.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-//  NEW  templates.php; hosts.php; items.php; triggers.php; graphs.php; maintenances.php;
-// 	OLD  0 - hosts; 1 - groups; 2 - linkages; 3 - templates; 4 - applications; 5 - Proxies; 6 - maintenance
-		'config'=>					array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-
 		'type_visible'=>			array(T_ZBX_STR, O_OPT,  null, null,           null),
 		'community_visible'=>		array(T_ZBX_STR, O_OPT,  null, null,           null),
 		'securityname_visible'=>	array(T_ZBX_STR, O_OPT,  null, null,           null),
@@ -119,10 +114,8 @@ include_once('include/page_header.php');
 		'del_history'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'add_delay_flex'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'del_delay_flex'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-
 // Actions
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
-
 // form
 		'register'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -135,10 +128,8 @@ include_once('include/page_header.php');
 		'form'=>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		'massupdate'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	null,	null,	null),
-
 // filter
-		"filter_rst"=>				array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
-		"filter_set"=>				array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
+		'reset_subfilters'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	null),
 
 		'filter_group'=>			array(T_ZBX_STR, O_OPT,  null,	null,		null),
 		'filter_host'=>				array(T_ZBX_STR, O_OPT,  null,	null,		null),
@@ -159,12 +150,33 @@ include_once('include/page_header.php');
 		'filter_history'=>			array(T_ZBX_INT, O_OPT,  -1,  BETWEEN(0,65535),null),
 		'filter_trends'=>			array(T_ZBX_INT, O_OPT,  -1,  BETWEEN(0,65535),null),
 		'filter_status'=>			array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1,3'),null),
-
+		'filter_belongs'=>			array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1'),null),
+		'filter_with_triggers'=>	array(T_ZBX_INT, O_OPT,  null,  IN('-1,0,1'),null),
+// subfilters
+		'subfilter_apps'=>				array(T_ZBX_STR, O_OPT,	 null,	DB_ID, null),
+		'subfilter_apps_rem'=>			array(T_ZBX_STR, O_OPT,	 null,	DB_ID, null),
+		'subfilter_types'=>				array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'subfilter_types_rem'=>			array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'subfilter_value_types'=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'subfilter_value_types_rem'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'subfilter_status'=>			array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'subfilter_status_rem'=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'subfilter_belongs'=>			array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'subfilter_belongs_rem'=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'subfilter_with_triggers'=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'subfilter_with_triggers_rem'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'subfilter_hosts'=>				array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'subfilter_hosts_rem'=>			array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'subfilter_interval'=>				array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'subfilter_interval_rem'=>			array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'subfilter_history'=>				array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'subfilter_history_rem'=>			array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'subfilter_trends'=>				array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'subfilter_trends_rem'=>			array(T_ZBX_INT, O_OPT,	 null,	null, null),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})'),
-
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})')
 	);
 
 	check_fields($fields);
@@ -201,8 +213,24 @@ include_once('include/page_header.php');
 	$_REQUEST['filter_history']			= get_request('filter_history');
 	$_REQUEST['filter_trends']			= get_request('filter_trends');
 	$_REQUEST['filter_status']			= get_request('filter_status');
+	$_REQUEST['filter_belongs']			= get_request('filter_belongs', -1);
+	$_REQUEST['filter_with_triggers']	= get_request('filter_with_triggers', -1);
+	
+	/* SUBFILTERS { --->>> */
+	$subfilters = array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status',
+		'subfilter_belongs', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval', 'subfilter_history', 'subfilter_trends');
 
-// --------------
+	foreach($subfilters as $name){
+		if(isset($_REQUEST['reset_subfilters'])){
+			$_REQUEST[$name] = array();
+		}
+		else{
+			$_REQUEST[$name] = get_request($name, array());
+			$_REQUEST[$name.'_rem'] = get_request($name.'_rem', array());
+			$_REQUEST[$name] = array_diff($_REQUEST[$name], $_REQUEST[$name.'_rem']);
+		}
+	}
+	/* --->>> } SUBFILTERS */
 
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
 
@@ -627,47 +655,28 @@ include_once('include/page_header.php');
 		show_messages($result, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
 
 	}
+	
 ?>
 <?php
-	$show_host = true;
-	$hostid = get_request('hostid', 0);
 
 	if(!zbx_empty($_REQUEST['filter_host'])){
 		$hostid = CHost::getId(array('host' => $_REQUEST['filter_host']));
 	}
-
-	if($hostid > 0){
-		$show_host = false;
-		$header_host_opt = array(
-			'hostids' => $hostid,
-			'extendoutput' => 1,
-			'templated_hosts' => 1,
-			'select_groups' => 1,
-			'select_triggers' => 1,
-			'select_graphs' => 1,
-			'select_applications' => 1
-		);
-
-		$header_host = CHost::get($header_host_opt);
-		$header_host = array_pop($header_host);
-
-		$_REQUEST['filter_host'] = $header_host['host'];
-		if(empty($header_host['groups'])){
-			$_REQUEST['filter_group'] = '';
-		}
-		else{
-			$_REQUEST['filter_group'] = array_pop($header_host['groups']);
-			$_REQUEST['filter_group'] = $_REQUEST['filter_group']['name'];
+	else{
+		$hostid = get_request('hostid', 0);
+		if($hostid > 0){
+			$_REQUEST['filter_host'] = CHost::getById(array('hostid' => $hostid));
+			$_REQUEST['filter_host'] = $_REQUEST['filter_host']['host'];
 		}
 	}
-?>
-<?php
+
 	$form = new CForm();
 	$form->setMethod('get');
 	$form->setName('hdrform');
+	$form->addVar('hostid', $hostid);
 
 // Config
-	$cmbConf = new CComboBox('config','items.php','javascript: submit()');
+	$cmbConf = new CComboBox('config','items.php');
 	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('templates.php',S_TEMPLATES);
 		$cmbConf->addItem('hosts.php',S_HOSTS);
@@ -675,18 +684,15 @@ include_once('include/page_header.php');
 		$cmbConf->addItem('triggers.php',S_TRIGGERS);
 		$cmbConf->addItem('graphs.php',S_GRAPHS);
 		$cmbConf->addItem('applications.php',S_APPLICATIONS);
-
 	$form->addItem($cmbConf);
-	$form->addItem(array(SPACE, new CButton('form',S_CREATE_ITEM)));
+	$form->addItem(array(SPACE, new CButton('form', S_CREATE_ITEM)));
 
 //$items_wdgt->addPageHeader(S_CONFIGURATION_OF_ITEMS_BIG, $form);
 	show_table_header(S_CONFIGURATION_OF_ITEMS_BIG, $form);
-
-echo SBR;
+	echo SBR;
 
 	if(isset($_REQUEST['form'])){
-// FORM
-		if(str_in_array($_REQUEST['form'],array(S_CREATE_ITEM,'update','clone')) ||
+		if(str_in_array($_REQUEST['form'], array(S_CREATE_ITEM, 'update', 'clone')) ||
 			(($_REQUEST['form']=='mass_update') && isset($_REQUEST['group_itemid'])))
 		{
 			insert_item_form();
@@ -699,103 +705,21 @@ echo SBR;
 	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['group_itemid'])){
 		insert_copy_elements_to_forms('group_itemid');
 	}
-	else if (!isset($_REQUEST['form']) || !str_in_array($_REQUEST['form'],array(S_CREATE_ITEM,'update','clone'))) {
-
+	else{
+		
+		$show_host = true;
+		
 		$items_wdgt = new CWidget();
-
+		
 // Items Header
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
 
 		$items_wdgt->addHeader(S_ITEMS_BIG, SPACE);
-		$items_wdgt->addHeader($numrows, SPACE);
-		
+		$items_wdgt->addHeader($numrows, SPACE);	
 // ----------------
-
-// Items Filter
-		$items_wdgt->addFlicker(get_item_filter_form(), get_profile('web.items.filter.state',0));
-//-----
-
-		$show_host = true;
-		$show_applications = true;
-// <<<--- SELECTED HOST HEADER INFORMATION --->>>
-		if($hostid > 0){
-			$show_host = false;
-
-			$tbl_header_host = new CTable();
-
-			$header_groupid = array_pop($header_host['groupids']);
-
-			$description = array();
-			if($header_host['proxy_hostid']){
-				$proxy = get_host_by_hostid($header_host['proxy_hostid']);
-				$description[] = $proxy['host'].':';
-			}
-			$description[] = $header_host['host'];
-
-			$triggers = array(new CLink(S_TRIGGERS, 'triggers.php?groupid='.$header_groupid.'&hostid='.$header_host['hostid']),
-				' ('.count($header_host['triggerids']).')');
-			$graphs = array(new CLink(S_GRAPHS, 'graphs.php?groupid='.$header_groupid.'&hostid='.$header_host['hostid']),
-				' ('.count($header_host['graphids']).')');
-			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?groupid='.$header_groupid.'&hostid='.$header_host['hostid']),
-				' ('.count($header_host['applications']).')');
-
-			if($header_host['status'] == HOST_STATUS_TEMPLATE){
-				$tbl_header_host->addRow(array(
-					new CLink(bold(S_TEMPLATE_LIST), 'templates.php?templateid='.$header_host['hostid'].url_param('groupid')),
-					$triggers,
-					$graphs,
-					$applications,
-					array(bold(S_TEMPLATE.': '), $description)
-				));
-			}
-			else{
-				$dns = empty($header_host['dns']) ? '-' : $header_host['dns'];
-				$ip = empty($header_host['ip']) ? '-' : $header_host['ip'];
-				$port = empty($header_host['port']) ? '-' : $header_host['port'];
-				if(1 == $header_host['useip'])
-					$ip = bold($ip);
-				else
-					$dns = bold($dns);
-
-
-				switch($header_host['status']){
-					case HOST_STATUS_MONITORED:
-						$status=new CSpan(S_MONITORED, 'off');
-						break;
-					case HOST_STATUS_NOT_MONITORED:
-						$status=new CSpan(S_NOT_MONITORED, 'off');
-						break;
-					default:
-						$status=S_UNKNOWN;
-				}
-
-				if($header_host['available'] == HOST_AVAILABLE_TRUE)
-					$available=new CSpan(S_AVAILABLE,'off');
-				else if($header_host['available'] == HOST_AVAILABLE_FALSE)
-					$available=new CSpan(S_NOT_AVAILABLE,'on');
-				else if($header_host['available'] == HOST_AVAILABLE_UNKNOWN)
-					$available=new CSpan(S_UNKNOWN,'unknown');
-
-				$tbl_header_host->addRow(array(
-					new CLink(bold(S_HOST_LIST), 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid')),
-					$triggers,
-					$graphs,
-					$applications,
-					array(bold(S_HOST.': '),$description),
-					array(bold(S_DNS.': '), $dns),
-					array(bold(S_IP.': '), $ip),
-					array(bold(S_PORT.': '), $port),
-					array(bold(S_STATUS.': '), $status),
-					array(bold(S_AVAILABILITY.': '), $available)
-				));
-			}
-
-			$tbl_header_host->setClass('infobox');
-			$items_wdgt->addItem($tbl_header_host);
-		}
-// --->>> SELECTED HOST HEADER INFORMATION <<<---
-
+		
+/* Items Filter --->>> { */
 		$options = array(
 			'filter' => 1,
 			'extendoutput' => 1,
@@ -841,7 +765,10 @@ echo SBR;
 
 		if(!zbx_empty($_REQUEST['filter_value_type']) && $_REQUEST['filter_value_type'] != -1)
 			$options['valuetype'] = $_REQUEST['filter_value_type'];
-
+			
+		if(!zbx_empty($_REQUEST['filter_data_type']) && $_REQUEST['filter_data_type'] != -1)
+			$options['data_type'] = $_REQUEST['filter_data_type'];
+			
 		if(!zbx_empty($_REQUEST['filter_delay']))
 			$options['delay'] = $_REQUEST['filter_delay'];
 
@@ -853,27 +780,35 @@ echo SBR;
 
 		if(!zbx_empty($_REQUEST['filter_status']) && $_REQUEST['filter_status'] != -1)
 			$options['status'] = $_REQUEST['filter_status'];
+			
+		if(!zbx_empty($_REQUEST['filter_belongs']) && $_REQUEST['filter_belongs'] != -1)
+			$options['belongs'] = $_REQUEST['filter_belongs'];
+			
+		if(!zbx_empty($_REQUEST['filter_with_triggers']) && $_REQUEST['filter_with_triggers'] != -1)
+			$options['with_triggers'] = $_REQUEST['filter_with_triggers'];
 
 		$afterFilter = count($options);
-//--------------------------
+/* --->>> } Items Filter */
 
 		if($preFilter == $afterFilter)
 			$items = array();
 		else
 			$items = CItem::get($options);
+		
 
-		$itemids = array_keys($items);
+		// Header Host //
+		if($hostid > 0){
+			$tbl_header_host = get_header_host_table($hostid, array('graphs', 'triggers', 'applications'));
+			$items_wdgt->addItem($tbl_header_host);
+			$show_host = false;
+		}
 
-// sorting && paging
-		order_page_result($items, getPageSortField('description'), getPageSortOrder());
-		$paging = getPagingLine($items);
-//---------
 
-// TABLE
 		$form = new CForm();
 		$form->setName('items');
 
 		$table  = new CTableInfo();
+// Table Header //
 		$table->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
 //			$show_host?make_sorting_header(S_HOST,'host'):null,
@@ -887,61 +822,128 @@ echo SBR;
 			make_sorting_header(S_TYPE,'type'),
 			make_sorting_header(S_STATUS,'status'),
 			S_APPLICATIONS,
-			S_ERROR));
-
-		foreach($items as $itemid => $db_item){
-			$host = array_pop($db_item['hosts']);
-			$host = $host['host'];
-
-			$description = array();
-			$item_description = item_description($db_item);
-
-			if($db_item['templateid']){
-				$template_host = get_realhost_by_itemid($db_item['templateid']);
-				array_push($description,
-					new CLink($template_host['host'],'?'.
-						'hostid='.$template_host['hostid'],
-						'unknown'),
-					':');
-			}
-
-
-			array_push($description, new CLink(
-				item_description($db_item),
-				'?form=update&itemid='.$db_item['itemid']));
-
-			$status = new CCol(new CLink(item_status2str($db_item['status']),
-					'?group_itemid%5B%5D='.$db_item['itemid'].
-					'&go='.($db_item['status']?'activate':'disable'),
-					item_status2style($db_item['status'])));
-
-			if(!zbx_empty($db_item['error'])){
-				$error = new CDiv(SPACE,'iconerror');
-				$error->setHint($db_item['error'], '', 'on');
+			S_ERROR
+		));
+		
+/* SET VALUES FOR SUBFILTERS { --->>> */
+// if any of subfilters = false then item shouldnt be shown
+		foreach($items as $itemid => $item){
+			$items[$itemid]['subfilters'] = array();
+			
+			$items[$itemid]['subfilters']['subfilter_hosts'] = 
+				(empty($_REQUEST['subfilter_hosts']) || (boolean)array_intersect($_REQUEST['subfilter_hosts'], $item['hostids']));
+				
+			$items[$itemid]['subfilters']['subfilter_apps'] = false;
+			if(empty($_REQUEST['subfilter_apps'])){
+				$items[$itemid]['subfilters']['subfilter_apps'] = true;
 			}
 			else{
-				$error = new CDiv(SPACE,'iconok');
+				foreach($items[$itemid]['applications'] as $app){
+					if(in_array($app['name'], $_REQUEST['subfilter_apps'])){
+						$items[$itemid]['subfilters']['subfilter_apps'] = true;
+						break;
+					}
+				}
+			}
+				
+			$items[$itemid]['subfilters']['subfilter_types'] = 
+				(empty($_REQUEST['subfilter_types']) || in_array($item['type'], $_REQUEST['subfilter_types']));
+				
+			$items[$itemid]['subfilters']['subfilter_value_types'] =
+				(empty($_REQUEST['subfilter_value_types']) || in_array($item['value_type'], $_REQUEST['subfilter_value_types']));
+
+			$items[$itemid]['subfilters']['subfilter_status'] =
+				(empty($_REQUEST['subfilter_status']) || in_array($item['status'], $_REQUEST['subfilter_status']));
+				
+			$items[$itemid]['subfilters']['subfilter_belongs'] =
+				(empty($_REQUEST['subfilter_belongs']) || (($item['templateid'] == 0) && in_array(0, $_REQUEST['subfilter_belongs']))
+				|| (($item['templateid'] > 0) && in_array(1, $_REQUEST['subfilter_belongs'])));
+				
+			$items[$itemid]['subfilters']['subfilter_with_triggers'] =
+				(empty($_REQUEST['subfilter_with_triggers']) || ((count($item['triggerids']) == 0) && in_array(0, $_REQUEST['subfilter_with_triggers']))
+				|| ((count($item['triggerids']) > 0) && in_array(1, $_REQUEST['subfilter_with_triggers'])));
+				
+			$items[$itemid]['subfilters']['subfilter_history'] =
+				(empty($_REQUEST['subfilter_history']) || in_array($item['history'], $_REQUEST['subfilter_history']));
+				
+			$items[$itemid]['subfilters']['subfilter_trends'] =
+				(empty($_REQUEST['subfilter_trends']) || in_array($item['trends'], $_REQUEST['subfilter_trends']));
+				
+			$items[$itemid]['subfilters']['subfilter_interval'] =
+				(empty($_REQUEST['subfilter_interval']) || in_array($item['delay'], $_REQUEST['subfilter_interval']));
+		}
+	/* --->>> } SET VALUES FOR SUBFILTERS */
+
+	// Add filter form 
+	// !!! $items must contain all selected items with [subfilters] values !!!
+	$items_wdgt->addFlicker(get_item_filter_form($items), get_profile('web.items.filter.state', 0));
+	
+	/* Subfilter out items */
+	foreach($items as $itemid => $item){
+		foreach($item['subfilters'] as $subfilter => $value){
+			if(!$value) unset($items[$itemid]);
+		}
+	}
+
+	// sorting && paging
+	// !!! should go after we subfiltered out items !!! 
+			order_page_result($items, getPageSortField('description'), getPageSortOrder());
+			$paging = getPagingLine($items);
+	//---------
+
+		foreach($items as $itemid => $item){
+			
+			if($show_host){
+				$host = array_pop($item['hosts']);
+				$host = $host['host'];
+			}
+			else{
+				$host = null;
 			}
 
-			$applications = array();
-			foreach($db_item['applications'] as $appi => $app){
-				if(!empty($applications)) $applications[] = ', ';
-				$applications[] = $app['name'];
+			$description = array();
+			if($item['templateid']){
+				$template_host = get_realhost_by_itemid($item['templateid']);
+				$description[] = new CLink($template_host['host'],'?hostid='.$template_host['hostid'], 'unknown');
+				$description[] = ':';
+			}
+			$description[] = new CLink(item_description($item), '?form=update&itemid='.$itemid);
+
+			$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$itemid.'&go='.
+				($item['status']?'activate':'disable'), item_status2style($item['status'])));
+
+			
+			if(zbx_empty($item['error'])){
+				$error = new CDiv(SPACE, 'iconok');
+			}
+			else{
+				$error = new CDiv(SPACE, 'iconerror');
+				$error->setHint($item['error'], '', 'on');
 			}
 
-			if(empty($applications)) $applications = '-';
-			$applications = new CCol($applications, 'wraptext');
+			
+			if(empty($item['applications'])){
+				$applications = '-';
+			}
+			else{
+				$applications = array();
+				foreach($item['applications'] as $appid => $app){
+					$applications[] = $app['name'];
+				}
+				$applications = implode(', ', $applications);
+			}
 
 
 			$trigger_hint = new CTableInfo();
 			$trigger_hint->setHeader(array(
-							S_SEVERITY,
-							S_NAME,
-							S_EXPRESSION,
-							S_STATUS));
+				S_SEVERITY,
+				S_NAME,
+				S_EXPRESSION,
+				S_STATUS
+			));
 
 // TRIGGERS INFO
-			foreach($db_item['triggers'] as $triggerid => $trigger){
+			foreach($item['triggers'] as $triggerid => $trigger){
 				$tr_description = array();
 
 				if($trigger['templateid'] > 0){
@@ -966,55 +968,56 @@ echo SBR;
 				}
 
 				if($trigger['status'] == TRIGGER_STATUS_DISABLED){
-					$status = new CSpan(S_DISABLED, 'disabled');
+					$tstatus = new CSpan(S_DISABLED, 'disabled');
 				}
 				else if($trigger['status'] == TRIGGER_STATUS_UNKNOWN){
-					$status = new CSpan(S_UNKNOWN, 'unknown');
+					$tstatus = new CSpan(S_UNKNOWN, 'unknown');
 				}
 				else if($trigger['status'] == TRIGGER_STATUS_ENABLED){
-					$status = new CSpan(S_ENABLED, 'enabled');
+					$tstatus = new CSpan(S_ENABLED, 'enabled');
 				}
 
 				$trigger_hint->addRow(array(
 					$priority,
 					$tr_description,
 					explode_exp($trigger['expression'], 1),
-					$status,
+					$tstatus,
 				));
 			}
 
-			if(!empty($db_item['triggers'])){
+			if(!empty($item['triggers'])){
 				$trigger_info = new CSpan(S_TRIGGERS,'link');
 				$trigger_info->setHint($trigger_hint);
 				$trigger_info = array($trigger_info);
-				$trigger_info[] = ' ('.count($db_item['triggers']).')';
+				$trigger_info[] = ' ('.count($item['triggers']).')';
 
 				$trigger_hint = array();
 			}
 			else{
 				$trigger_info = array();
-				$trigger_info[] = new CLink(S_TRIGGERS, 'triggers.php?&hostid='.$db_item['hostid']);
-				$trigger_info[] = ' ('.count($db_item['triggers']).')';
+				$trigger_info[] = new CLink(S_TRIGGERS, 'triggers.php?&hostid='.$item['hostid']);
+				$trigger_info[] = ' ('.count($item['triggers']).')';
 			}
 //-------
 
 			$table->addRow(array(
-				new CCheckBox('group_itemid['.$db_item['itemid'].']',null,null,$db_item['itemid']),
-				$show_host?$host:null,
+				new CCheckBox('group_itemid['.$itemid.']',null,null,$itemid),
+				$host,
 				$description,
 				$trigger_info,
-				$db_item['key_'],
-				$db_item['delay'],
-				$db_item['history'],
-				$db_item['trends'],
-				item_type2str($db_item['type']),
+				$item['key_'],
+				$item['delay'],
+				$item['history'],
+				$item['trends'],
+				item_type2str($item['type']),
 				$status,
-				$applications,
+				new CCol($applications, 'wraptext'),
 				$error
-				));
+			));
 		}
+		
 
-//----- GO ------
+/* GO { --->>> */
 		$goBox = new CComboBox('go');
 		$goBox->addItem('activate',S_ACTIVATE_SELECTED);
 		$goBox->addItem('disable',S_DISABLE_SELECTED);
@@ -1023,13 +1026,13 @@ echo SBR;
 		$goBox->addItem('clean_history',S_CLEAN_HISTORY_SELECTED_ITEMS);
 		$goBox->addItem('delete',S_DELETE_SELECTED);
 
-// goButton name is necessary!!!
+		// goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO.' (0)');
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "group_itemid";');
 
 		$footer = get_table_header(new CCol(array($goBox, $goButton)));
-//----
+/* <<<--- } GO */
 
 // PAGING FOOTER
 		$table = array($paging,$table,$paging,$footer);
@@ -1039,8 +1042,6 @@ echo SBR;
 		$items_wdgt->addItem($form);
 		$items_wdgt->show();
 	}
-?>
-<?php
 
 include_once('include/page_footer.php');
 
