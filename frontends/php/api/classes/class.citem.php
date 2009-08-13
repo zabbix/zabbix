@@ -89,8 +89,6 @@ class CItem {
 			'status'				=> null,
 			'belongs'				=> null,
 			'with_triggers'			=> null,
-			
-
 //
 			'pattern'				=> null,
 			'sortfield'				=> '',
@@ -207,7 +205,10 @@ class CItem {
 
 // templated_items
 		if(!is_null($options['templated_items'])){
-			$sql_parts['where'][] = 'i.templateid<>0';
+			if($options['templated_items'] == 1)
+				$sql_parts['where'][] = 'i.templateid>0';
+			else
+				$sql_parts['where'][] = 'i.templateid=0';
 		}
 
 // extendoutput
@@ -315,13 +316,7 @@ class CItem {
 			if(!is_null($options['status'])){
 				$sql_parts['where'][] = 'i.status='.$options['status'];
 			}
-// belongs			
-			if(!is_null($options['belongs'])){
-				if($options['belongs'] == 1)
-					$sql_parts['where'][] = 'i.templateid>0';
-				else
-					$sql_parts['where'][] = 'i.templateid=0';
-			}
+
 // with_triggers			
 			if(!is_null($options['with_triggers'])){
 				if($options['with_triggers'] == 1)

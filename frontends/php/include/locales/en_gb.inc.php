@@ -870,7 +870,9 @@
 
 
 //	items.php
-	'S_BELONGS_TO' => 'Belongs to',
+
+	'S_TEMPLATED_ITEMS' => 'Templated items',
+	'S_NOT_TEMPLATED_ITEMS' => 'Not Templated items',
 	'S_WITH_TRIGGERS' => 'With triggers',
 	'S_WITHOUT_TRIGGERS' => 'Without triggers',
 	'S_TYPES' =>					'Types',

@@ -272,7 +272,12 @@ function create_var(form_name, var_name, var_val, subm){
 		objVar.setAttribute('id',	var_name);
 	}
 
-	objVar.value = var_val;
+	if(is_null(var_val)){
+		objVar.parentNode.removeChild(objVar);
+	}
+	else{
+		objVar.value = var_val;
+	}
 	
 	if(subm)
 		frmForm.submit();

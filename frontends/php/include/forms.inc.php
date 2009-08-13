@@ -1258,21 +1258,18 @@
 		$output = array();
 		foreach($data as $id => $elem){
 		
-			// subfilter is activated
+// subfilter is activated
 			if(in_array($id, $subfilter)){
 				$span = new CSpan($elem['name'].' ('.$elem['count'].')', 'enabled');
-				$script = '$("zbx_filter").insert("<input type=\"hidden\" name=\"'.$subfilter_name.'_rem['.$id.']\" value=\"'.$id.'\">");';
-				$script .= '$("zbx_filter").submit();';
-				
+				$script = "javascript: create_var('zbx_filter', '".$subfilter_name.'['.$id."]', null, true);";
 				$span->onClick($script);
 				$output[] = $span;
 			}
-			// subfilter isn't activated 
+// subfilter isn't activated 
 			else{
-				$script = '$("zbx_filter").insert("<input type=\"hidden\" name=\"'.$subfilter_name.'['.$id.']\" value=\"'.$id.'\">");';
-				$script .= '$("zbx_filter").submit();';
+				$script = "javascript: create_var('zbx_filter', '".$subfilter_name.'['.$id."]', '$id', true);";
 				
-				// subfilter has 0 items
+// subfilter has 0 items
 				if($elem['count'] == 0){
 					$span = new CSpan($elem['name'].' ('.$elem['count'].')', 'inactive');
 					$span->onClick($script);
@@ -1317,14 +1314,16 @@
 		$filter_history			= $_REQUEST['filter_history'];
 		$filter_trends			= $_REQUEST['filter_trends'];
 		$filter_status			= $_REQUEST['filter_status'];
-		$filter_belongs			= $_REQUEST['filter_belongs'];
+		$filter_templated_items			= $_REQUEST['filter_templated_items'];
 		$filter_with_triggers			= $_REQUEST['filter_with_triggers'];
+
+// subfilter
 		$subfilter_hosts = $_REQUEST['subfilter_hosts'];
 		$subfilter_apps = $_REQUEST['subfilter_apps'];
 		$subfilter_types = $_REQUEST['subfilter_types'];
 		$subfilter_value_types = $_REQUEST['subfilter_value_types'];
 		$subfilter_status = $_REQUEST['subfilter_status'];
-		$subfilter_belongs = $_REQUEST['subfilter_belongs'];
+		$subfilter_templated_items = $_REQUEST['subfilter_templated_items'];
 		$subfilter_with_triggers = $_REQUEST['subfilter_with_triggers'];
 		$subfilter_history = $_REQUEST['subfilter_history'];
 		$subfilter_trends = $_REQUEST['subfilter_trends'];
@@ -1341,13 +1340,13 @@
 		$form->addVar('subfilter_types', $subfilter_types);
 		$form->addVar('subfilter_value_types', $subfilter_value_types);
 		$form->addVar('subfilter_status', $subfilter_status);
-		$form->addVar('subfilter_belongs', $subfilter_belongs);
+		$form->addVar('subfilter_templated_items', $subfilter_templated_items);
 		$form->addVar('subfilter_with_triggers', $subfilter_with_triggers);
 		$form->addVar('subfilter_history', $subfilter_history);
 		$form->addVar('subfilter_trends', $subfilter_trends);
 		$form->addVar('subfilter_interval', $subfilter_interval);
 
-/* FORM FOR FILTER DISPLAY { --->>> */
+// FORM FOR FILTER DISPLAY {
 		$table = new CTable();
 		$table->setAttribute('style', 'border: 1px solid #777777; width: 100%; background-color: white;');
 		$table->setCellPadding(0);
@@ -1380,7 +1379,7 @@
 		$col_table2 = new CTable();
 		$col_table2->setClass('filter');
 
-		$cmbType = new CComboBox("filter_type", $filter_type, "javascript: $('zbx_filter').insert('<input type=\"hidden\" name=\"reset_subfilters\">'); $('zbx_filter').submit();");
+		$cmbType = new CComboBox("filter_type", $filter_type, "javascript: create_var('zbx_filter', 'reset_subfilters', '1', true); ");
 		$cmbType->addItem(-1, S_ALL_SMALL);
 		foreach(array(ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE,
 			ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_TRAPPER,
@@ -1413,7 +1412,7 @@
 // 3rd col
 		$col_table3 = new CTable();
 		$col_table3->setClass('filter');
-		$cmbValType = new CComboBox('filter_value_type', $filter_value_type, "javascript: $('zbx_filter').insert('<input type=\"hidden\" name=\"reset_subfilters\">'); $('zbx_filter').submit();");
+		$cmbValType = new CComboBox('filter_value_type', $filter_value_type, "javascript: create_var('zbx_filter', 'reset_subfilters', '1', true);");
 			$cmbValType->addItem(-1, S_ALL_SMALL);
 			$cmbValType->addItem(ITEM_VALUE_TYPE_UINT64, S_NUMERIC_UNSIGNED);
 			$cmbValType->addItem(ITEM_VALUE_TYPE_FLOAT, S_NUMERIC_FLOAT);
@@ -1445,10 +1444,10 @@
 		foreach(array(ITEM_STATUS_ACTIVE,ITEM_STATUS_DISABLED,ITEM_STATUS_NOTSUPPORTED) as $st)
 			$cmbStatus->addItem($st,item_status2str($st));
 
-		$cmbBelongs = new CComboBox('filter_belongs', $filter_belongs);
+		$cmbBelongs = new CComboBox('filter_templated_items', $filter_templated_items);
 		$cmbBelongs->addItem(-1, S_ALL_SMALL);
-		$cmbBelongs->addItem(1, S_TEMPLATE);
-		$cmbBelongs->addItem(0, S_HOST);
+		$cmbBelongs->addItem(1, S_TEMPLATED_ITEMS);
+		$cmbBelongs->addItem(0, S_NOT_TEMPLATED_ITEMS);
 		
 		$cmbWithTriggers = new CComboBox('filter_with_triggers', $filter_with_triggers);
 		$cmbWithTriggers->addItem(-1, S_ALL_SMALL);
@@ -1457,7 +1456,7 @@
 		
 		$col_table4->addRow(array(bold(S_STATUS.': '), $cmbStatus));
 		$col_table4->addRow(array(bold(S_TRIGGERS.': '), $cmbWithTriggers));
-		$col_table4->addRow(array(bold(S_BELONGS_TO.': '), $cmbBelongs));
+		$col_table4->addRow(array(bold(S_TEMPLATE.': '), $cmbBelongs));
 		
 		
 		$table->addRow(array(
@@ -1466,7 +1465,7 @@
 		$reset = new CSpan( S_RESET,'biglink');
 		$reset->onClick("javascript: clearAllForm('zbx_filter');");
 		$filter = new CSpan(S_FILTER,'biglink');
-		$filter->onClick("javascript: $('zbx_filter').insert('<input type=\"hidden\" name=\"reset_subfilters\">'); $('zbx_filter').submit();");
+		$filter->onClick("javascript: create_var('zbx_filter', 'reset_subfilters', '1', true);");
 		
 		$div_buttons = new CDiv(array($filter, SPACE, SPACE, SPACE, $reset));
 		$div_buttons->setAttribute('style', 'padding: 4px 0;');
@@ -1476,34 +1475,34 @@
 		$table->addRow($footer);
 		$form->addItem($table);
 
-/* --->>> } FORM FOR FILTER DISPLAY */
+// } FORM FOR FILTER DISPLAY
 		
-/* SUBFILTERS { --->>> */
+// SUBFILTERS {
 		$header = get_thin_table_header('Subfilter [affects only filtered data!]');
 		$form->addItem($header);
 		$table_subfilter = new Ctable();
 		$table_subfilter->setClass('filter');
 		
 		
-		// array contains subfilters and number of items in each
+// array contains subfilters and number of items in each
 		$item_params = array(
 			'hosts' => array(),
 			'applications' => array(),
 			'types' => array(),
 			'value_types' => array(),
 			'status' => array(),
-			'belongs' => array(),
+			'templated_items' => array(),
 			'with_triggers' => array(),
 			'history' => array(),
 			'trends' => array(),
 			'interval' => array()
 		);
 		
-		// generate array with values for subfilters of selected items
+// generate array with values for subfilters of selected items
 		foreach($items as $item){
 		
 			if(zbx_empty($filter_host)){
-				// hosts
+// hosts
 				$host = reset($item['hosts']);
 				if(!isset($item_params['hosts'][$host['hostid']])){
 					$item_params['hosts'][$host['hostid']] = array('name' => $host['host'], 'count' => 0);
@@ -1519,7 +1518,7 @@
 				}
 			}
 			
-			// applications
+// applications
 			foreach($item['applications'] as $appid => $app){
 				if(!isset($item_params['applications'][$app['name']])){
 					$item_params['applications'][$app['name']] = array('name' => $app['name'], 'count' => 0);
@@ -1532,7 +1531,7 @@
 			}
 			$sel_app = false;
 			if($show_item){
-				// if any of item applications are selected
+// if any of item applications are selected
 				foreach($item['applications'] as $app){
 					if(in_array($app['name'], $subfilter_apps)){
 						$sel_app = true;
@@ -1547,7 +1546,7 @@
 				}
 			}
 			
-			// types
+// types
 			if($filter_type == -1){
 				if(!isset($item_params['types'][$item['type']])){
 					$item_params['types'][$item['type']] = array('name' => item_type2str($item['type']), 'count' => 0);
@@ -1592,30 +1591,30 @@
 				}
 			}
 			
-			// belongs
-			if($filter_belongs == -1){
-				if(($item['templateid'] == 0) && !isset($item_params['belongs'][0])){
-					$item_params['belongs'][0] = array('name' => S_HOST, 'count' => 0);
+// template
+			if($filter_templated_items == -1){
+				if(($item['templateid'] == 0) && !isset($item_params['templated_items'][0])){
+					$item_params['templated_items'][0] = array('name' => S_NOT_TEMPLATED_ITEMS, 'count' => 0);
 				}
-				else if(($item['templateid'] > 0) && !isset($item_params['belongs'][1])){
-					$item_params['belongs'][1] = array('name' => S_TEMPLATE, 'count' => 0);
+				else if(($item['templateid'] > 0) && !isset($item_params['templated_items'][1])){
+					$item_params['templated_items'][1] = array('name' => S_TEMPLATED_ITEMS, 'count' => 0);
 				}
 				$show_item = true;
 				foreach($item['subfilters'] as $name => $value){
-					if($name == 'subfilter_belongs') continue;
+					if($name == 'subfilter_templated_items') continue;
 					$show_item &= $value;
 				}
 				if($show_item){
 					if($item['templateid'] == 0){
-						$item_params['belongs'][0]['count']++;
+						$item_params['templated_items'][0]['count']++;
 					}
 					else{
-						$item_params['belongs'][1]['count']++;
+						$item_params['templated_items'][1]['count']++;
 					}
 				}
 			}
 			
-			// with triggers
+// with triggers
 			if($filter_with_triggers == -1){
 				if((count($item['triggers']) == 0) && !isset($item_params['with_triggers'][0])){
 					$item_params['with_triggers'][0] = array('name' => S_WITHOUT_TRIGGERS, 'count' => 0);
@@ -1638,7 +1637,7 @@
 				}
 			}
 			
-			// trends
+// trends
 			if(zbx_empty($filter_trends)){
 				if(!isset($item_params['trends'][$item['trends']])){
 					$item_params['trends'][$item['trends']] = array('name' => $item['trends'], 'count' => 0);
@@ -1653,7 +1652,7 @@
 				}
 			}
 			
-			// history
+// history
 			if(zbx_empty($filter_history)){
 				if(!isset($item_params['history'][$item['history']])){
 					$item_params['history'][$item['history']] = array('name' => $item['history'], 'count' => 0);
@@ -1668,7 +1667,7 @@
 				}
 			}
 			
-			// interval
+// interval
 			if(zbx_empty($filter_delay) && ($filter_type != ITEM_TYPE_TRAPPER)){
 				if(!isset($item_params['interval'][$item['delay']])){
 					$item_params['interval'][$item['delay']] = array('name' => $item['delay'], 'count' => 0);
@@ -1684,7 +1683,7 @@
 			}
 		}
 
-		// output
+// output
 		if(zbx_empty($filter_host) && (count($item_params['hosts']) > 1)){
 			$hosts_output = prepare_subfilter_output($item_params['hosts'], $subfilter_hosts, 'subfilter_hosts');
 			$table_subfilter->addRow(array(S_HOSTS, $hosts_output));
@@ -1710,9 +1709,9 @@
 			$table_subfilter->addRow(array(S_STATUS, $status_output));
 		}
 		
-		if(($filter_belongs == -1) && (count($item_params['belongs']) > 1)){
-			$belongs_output = prepare_subfilter_output($item_params['belongs'], $subfilter_belongs, 'subfilter_belongs');
-			$table_subfilter->addRow(array(S_BELONGS_TO, $belongs_output));
+		if(($filter_templated_items == -1) && (count($item_params['templated_items']) > 1)){
+			$templated_items_output = prepare_subfilter_output($item_params['templated_items'], $subfilter_templated_items, 'subfilter_templated_items');
+			$table_subfilter->addRow(array(S_TEMPLATE, $templated_items_output));
 		}
 		
 		if(($filter_with_triggers == -1) && (count($item_params['with_triggers']) > 1)){
@@ -1734,7 +1733,7 @@
 			$interval_output = prepare_subfilter_output($item_params['interval'], $subfilter_interval, 'subfilter_interval');
 			$table_subfilter->addRow(array(S_INTERVAL, $interval_output));
 		}
-/* --->>> } SUBFILTERS */
+//} SUBFILTERS 
 		
 		$form->addItem($table_subfilter);
 		
