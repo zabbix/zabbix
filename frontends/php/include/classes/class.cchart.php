@@ -631,7 +631,16 @@ class CChart extends CGraphDraw{
 
 // Fixes graph out of bounds problem
 		if( (($y1 > ($this->sizeY+$this->shiftY)) && ($y2 > ($this->sizeY+$this->shiftY))) || (($y1 < $this->shiftY) && ($y2 < $this->shiftY)) ){
-			return true;
+			if($drawtype == GRAPH_ITEM_DRAWTYPE_FILLED_REGION){
+				if($y1 > ($this->sizeY+$this->shiftY)) $y1 = $this->sizeY+$this->shiftY;
+				if($y2 > ($this->sizeY+$this->shiftY)) $y2 = $this->sizeY+$this->shiftY;
+				
+				if($y1 < ($this->sizeY+$this->shiftY)) $y1 = $this->shiftY;
+				if($y2 < ($this->sizeY+$this->shiftY)) $y2 = $this->shiftY;
+			}
+			else{
+				return true;
+			}
 		}
 
 		$y_first = !(($y1 > ($this->sizeY+$this->shiftY)) || ($y1 < $this->shiftY));
