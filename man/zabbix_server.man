@@ -12,7 +12,7 @@ is a core daemon of Zabbix software.
 .IP "-c, --config config-file"
 Use the alternate system wide
 .I config-file
-instead  of
+instead of
 .I /etc/zabbix/zabbix_server.conf
 .
 .IP "-n, --new-nodeid nodeid"
@@ -27,7 +27,7 @@ Output version information and exit.
 Default location of Zabbix Server configuration file.
 .SH "SEE ALSO"
 .BR zabbix_agentd (8),
-.BR zabbix_get (8)
+.BR zabbix_get (8),
 .BR zabbix_proxy (8),
 .BR zabbix_sender (8)
 .SH AUTHOR
