@@ -556,10 +556,18 @@ class Chart extends Graph{
 		$y1_shift	= $zero - $shift_from/$unit2px;
 		$y2_shift	= $zero - $shift_to/$unit2px;//*/
 
-
 // Fixes graph out of bounds problem
 		if( (($y1 > ($this->sizeY+$this->shiftY)) && ($y2 > ($this->sizeY+$this->shiftY))) || (($y1 < $this->shiftY) && ($y2 < $this->shiftY)) ){
-			if($this->type != GRAPH_TYPE_STACKED) return true;
+			if($drawtype == GRAPH_ITEM_DRAWTYPE_FILLED_REGION){
+				if($y1 > ($this->sizeY+$this->shiftY)) $y1 = $this->sizeY+$this->shiftY;
+				if($y2 > ($this->sizeY+$this->shiftY)) $y2 = $this->sizeY+$this->shiftY;
+				
+				if($y1 < ($this->sizeY+$this->shiftY)) $y1 = $this->shiftY;
+				if($y2 < ($this->sizeY+$this->shiftY)) $y2 = $this->shiftY;
+			}
+			else{
+				return true;
+			}
 		}
 
 

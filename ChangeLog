@@ -1,5 +1,6 @@
 Changes for 1.6.6
 
+ - [ZBX-1014] fixed gaps on graph with fixed y axis (Artem)
  - [ZBX-1013] fixed evaluation of aggregate items for proxy hosts (Sasha)
  - [ZBX-1011] zabbix_sender will send data in blocks of 250 values per TCP connection (Sasha)
  - [DEV-417] added services[] metric for Windows agents (Sasha)
