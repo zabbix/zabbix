@@ -1,5 +1,6 @@
 Changes for 1.6.6
 
+ - [ZBX-1013] fixed evaluation of aggregate items for proxy hosts (Sasha)
  - [ZBX-1011] zabbix_sender will send data in blocks of 250 values per TCP connection (Sasha)
  - [DEV-417] added services[] metric for Windows agents (Sasha)
  - [ZBX-1005] fixed evaluations of functions diff, change and abschange for character items if received value more than 255 characters (Sasha)

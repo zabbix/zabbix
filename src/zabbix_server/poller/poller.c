@@ -382,7 +382,7 @@ static int get_values(int now, int *nextcheck)
 	default:	/* ZBX_POLLER_TYPE_NORMAL */
 		result = DBselect("select %s where i.nextcheck<=%d and h.hostid=i.hostid and h.status=%d and i.status in (%s)"
 				" and ((h.disable_until<=%d and h.errors_from=0 and i.type in (%d,%d,%d,%d)) or i.type in (%d,%d,%d,%d,%d))"
-				" and (h.proxy_hostid=0 or i.type in (%d))"
+				" and (h.proxy_hostid=0 or i.type in (%d,%d))"
 				" and " ZBX_SQL_MOD(i.itemid,%d) "=%d and i.key_ not in ('%s','%s','%s','%s')"
 				DB_NODE " order by i.nextcheck",
 				ZBX_SQL_ITEM_SELECT,
@@ -392,7 +392,7 @@ static int get_values(int now, int *nextcheck)
 				now,
 				ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3,
 				ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
-				ITEM_TYPE_INTERNAL,
+				ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE,
 				CONFIG_POLLER_FORKS,
 				poller_num-1,
 				SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY, SERVER_ZABBIXLOG_KEY,
