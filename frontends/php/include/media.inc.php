@@ -160,19 +160,22 @@
 			return 0;
 		}
 
-		$sql="select * from media_type where description=".zbx_dbstr($description);
+		$sql='SELECT * '.
+				' FROM media_type '.
+				' WHERE description='.zbx_dbstr($description).
+					' AND '.DBin_node('mediatypeid');
 		$result=DBexecute($sql);
-		if(DBfetch($result))
-		{
+		if(DBfetch($result)){
 			error("An action type with description '$description' already exists.");
 		}
-		else
-		{
+		else{
 			$mediatypeid=get_dbid("media_type","mediatypeid");
-			$sql="insert into media_type (mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,username,passwd) values ($mediatypeid,$type,".zbx_dbstr($description).",".zbx_dbstr($smtp_server).",".zbx_dbstr($smtp_helo).",".zbx_dbstr($smtp_email).",".zbx_dbstr($exec_path).",".zbx_dbstr($gsm_modem).",".zbx_dbstr($username).",".zbx_dbstr($password).")";
+			$sql='INSERT INTO media_type (mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,username,passwd) '.
+				" VALUES ($mediatypeid,$type,".zbx_dbstr($description).",".zbx_dbstr($smtp_server).",".
+							zbx_dbstr($smtp_helo).",".zbx_dbstr($smtp_email).",".zbx_dbstr($exec_path).",".
+							zbx_dbstr($gsm_modem).",".zbx_dbstr($username).",".zbx_dbstr($password).")";
 			$ret = DBexecute($sql);
-			if ($ret)
-			{
+			if($ret){
 				$ret = $mediatypeid;
 				add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MEDIA_TYPE, $mediatypeid, $description, NULL, NULL, NULL);
 			}
@@ -180,28 +183,29 @@
 		return $ret;
 	}
 
-	# Add Media definition
+// Add Media definition
 
-	function	add_media( $userid, $mediatypeid, $sendto, $severity, $active, $period)
-	{
-		if( !validate_period($period) )
-		{
+	function add_media( $userid, $mediatypeid, $sendto, $severity, $active, $period){
+		if(!validate_period($period)){
 			error("Icorrect time period");
 			return NULL;
 		}
 
 		$c=count($severity);
 		$s=0;
-		for($i=0;$i<$c;$i++)
-		{
+		for($i=0;$i<$c;$i++){
 			$s=$s|pow(2,(int)$severity[$i]);
 		}
+		
 		$mediaid=get_dbid("media","mediaid");
+		
 		$sql='INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period) '.
 				" VALUES ($mediaid,$userid,".$mediatypeid.','.zbx_dbstr($sendto).','.$active.','.$s.','.zbx_dbstr($period).')';
-		$ret = DBexecute($sql);
-		if($ret)	$ret = $mediaid;
-		return	$ret;
+		if($ret = DBexecute($sql)){
+			$ret = $mediaid;
+		}
+		
+	return	$ret;
 	}
 
 	# Update Media definition
