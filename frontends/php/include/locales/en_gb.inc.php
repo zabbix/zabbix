@@ -142,6 +142,8 @@
 	'S_POST'=>					'Post',
 	'S_REQUIRED'=>					'Required',
 	'S_STEP_OF_SCENARIO'=>				'Step of scenario',
+	'S_AUTHENTICATION'=>				'Authentication',
+	'S_BASIC_AUTHENTICATION'=>			'Basic authentication',
 
 //	exp_imp.php
 	'S_ELEMENT'=>				'Element',

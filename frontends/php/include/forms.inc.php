@@ -389,6 +389,10 @@
 		$agent		= get_request('agent', '');
 		$macros		= get_request('macros', array());
 		$steps		= get_request('steps', array());
+		
+		$authentication = get_request('authentication', HTTPTEST_AUTH_NONE); 
+		$http_user	= get_request('http_user', '');
+		$http_password 	= get_request('http_password', '');
 
 		if((isset($_REQUEST["httptestid"]) && !isset($_REQUEST["form_refresh"])) || isset($limited)){
 			$httptest_data = DBfetch(DBselect("SELECT wt.*, a.name as application ".
@@ -401,6 +405,10 @@
 			$status		= $httptest_data['status'];
 			$agent		= $httptest_data['agent'];
 			$macros		= $httptest_data['macros'];
+			
+			$authentication = $httptest_data['authentication'];
+			$http_user 	= $httptest_data['http_user'];
+			$http_password 	= $httptest_data['http_password'];
 
 			$steps		= array();
 			$db_steps = DBselect('SELECT * FROM httpstep WHERE httptestid='.$_REQUEST["httptestid"].' order by no');
@@ -420,6 +428,16 @@
 			));
 
 		$form->addRow(S_NAME, new CTextBox('name', $name, 40));
+		
+		$cmbAuth = new CComboBox('authentication',$authentication,'submit();');
+		$cmbAuth->AddItem(HTTPTEST_AUTH_NONE,S_NONE);
+		$cmbAuth->AddItem(HTTPTEST_AUTH_BASIC,S_BASIC_AUTHENTICATION);
+		
+		$form->AddRow(S_BASIC_AUTHENTICATION, $cmbAuth);
+		if($authentication == HTTPTEST_AUTH_BASIC){
+			$form->AddRow(S_USER, new CTextBox('http_user', $http_user, 32));
+			$form->AddRow(S_PASSWORD, new CTextBox('http_password', $http_password, 40));
+		}		
 
 		$form->addRow(S_UPDATE_INTERVAL_IN_SEC, new CNumericBox("delay",$delay,5));
 
