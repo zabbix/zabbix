@@ -87,9 +87,6 @@ include_once('include/page_header.php');
 	if(DBfetch($result)) $profile_types += 2;
 
 	switch($profile_types) {
-		case 1:
-			$prof_type = 0;
-		break;
 		case 2:
 			$prof_type = 1;
 		break;
@@ -100,6 +97,11 @@ include_once('include/page_header.php');
 			$cmbProf->additem(1, S_EXTENDED);
 			$r_form->addItem(array(SPACE.S_HOST_PROFILES.SPACE,$cmbProf));
 		break;
+		case 1:
+		default:
+			$prof_type = 0;
+		break;
+
 	}
 /// --- --- ///
 
