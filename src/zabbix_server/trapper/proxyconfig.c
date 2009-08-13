@@ -94,7 +94,7 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 				HOST_STATUS_MONITORED);
 	if (0 == strcmp(table->table, "items"))
 		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and t.status in (%d,%d)"
-				" and i.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
+				" and t.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
 				ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
 				ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE,
 				ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3,
