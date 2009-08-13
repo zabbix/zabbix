@@ -39,8 +39,8 @@ Display this help and exit.
 .IP "-V, --version"
 Output version information and exit.
 .SH "SEE ALSO"
-.BR zabbix_agentd (8)
-.BR zabbix_get (8)
+.BR zabbix_agentd (8),
+.BR zabbix_get (8),
 .BR zabbix_proxy (8),
 .BR zabbix_server (8)
 .SH AUTHOR
