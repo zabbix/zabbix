@@ -51,7 +51,10 @@ include_once('include/page_header.php');
 		'agent'=>		array(T_ZBX_STR, O_OPT,  null,	null,'isset({save})'),
 		'macros'=>		array(T_ZBX_STR, O_OPT,  null,	null,'isset({save})'),
 		'steps'=>		array(T_ZBX_STR, O_OPT,  null,	null,'isset({save})'),
-
+		'authentication'=>	array(T_ZBX_INT, O_OPT,  null,  IN('0,1'),'isset({save})'),
+		'http_user'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,'isset({save}) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.')'),
+		'http_password'=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,'isset({save}) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.')'),
+		
 		'new_httpstep'=>	array(T_ZBX_STR, O_OPT,  null,	null,null),
 
 		'move_up'=>			array(T_ZBX_INT, O_OPT,  P_ACT,  BETWEEN(0,65534), null),
@@ -182,11 +185,23 @@ include_once('include/page_header.php');
 		foreach($delay_flex as $val)
 			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
 		$db_delay_flex = trim($db_delay_flex,';');
-		// for future use */
+		// for future use */		
+		
+		if ($_REQUEST['authentication'] != HTTPTEST_AUTH_NONE)
+		{
+			$http_user = htmlspecialchars($_REQUEST['http_user']);
+			$http_password = htmlspecialchars($_REQUEST['http_password']);
+		}
+		else
+		{
+			$http_user = '';
+			$http_password = '';
+		}
 
 		if(isset($_REQUEST['httptestid'])){
 			$result = update_httptest($_REQUEST['httptestid'], $_REQUEST['hostid'], $_REQUEST['application'],
-				$_REQUEST['name'],$_REQUEST['delay'],$_REQUEST['status'],$_REQUEST['agent'],
+				$_REQUEST['name'],$_REQUEST['authentication'],$http_user,$http_password,
+				$_REQUEST['delay'],$_REQUEST['status'],$_REQUEST['agent'],
 				$_REQUEST['macros'],$_REQUEST['steps']);
 
 			$httptestid = $_REQUEST['httptestid'];
@@ -196,7 +211,8 @@ include_once('include/page_header.php');
 		}
 		else{
 			$httptestid = add_httptest($_REQUEST['hostid'],$_REQUEST['application'],
-				$_REQUEST['name'],$_REQUEST['delay'],$_REQUEST['status'],$_REQUEST['agent'],
+				$_REQUEST['name'],$_REQUEST['authentication'],$http_user,$http_password,
+				$_REQUEST['delay'],$_REQUEST['status'],$_REQUEST['agent'],
 				$_REQUEST['macros'],$_REQUEST['steps']);
 
 			$result = $httptestid;
