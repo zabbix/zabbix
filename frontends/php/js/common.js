@@ -24,9 +24,10 @@ var IE8 = (agt.indexOf("msie 8.0") != -1) && document.all && !OP;
 var IE7 = IE && !IE8 && document.all && !OP;
 var IE6 = (agt.indexOf("msie 6.0") != -1) && document.all && !OP;
 var CR = (agt.indexOf('chrome') != -1);
-var SF = (agt.indexOf("safari") != -1);
-var KQ = (agt.indexOf("khtml") != -1) && !SF;
-var GK = (agt.indexOf("gecko") != -1) && !KQ && !SF;
+var SF = (agt.indexOf("safari") != -1) && !CR;
+var WK = (agt.indexOf("applewebkit") != -1);
+var KQ = (agt.indexOf("khtml") != -1) && !WK;
+var GK = (agt.indexOf("gecko") != -1) && !KQ && !WK;
 var MC = (agt.indexOf('mac') != -1)
 
 function checkBrowser(){
@@ -37,6 +38,7 @@ function checkBrowser(){
  if(IE8) alert('IE8');
  if(CR) alert('Chrome');
  if(SF) alert('Safari');
+ if(WK) alert('Apple Webkit');
  if(KQ) alert('Konqueror');
  if(MC) alert('Mac');
  if(GK) alert('FireFox');
