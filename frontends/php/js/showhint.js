@@ -185,7 +185,7 @@ hide: function(boxid){
 		
 // Opera have problems with refreshing objects after removing
 		hint.style.display = 'none';
-		if(OP)
+		if(OP || WK)
 			setTimeout(function(){hint.parentNode.removeChild(hint);},200);
 		else
 			hint.parentNode.removeChild(hint);
