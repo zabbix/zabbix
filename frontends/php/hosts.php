@@ -61,7 +61,7 @@ include_once('include/page_header.php');
 		'applications'=>array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 
 // host
-		'groupid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,			'isset({form})&&({form}=="update")'),
+		'groupid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,			null),
 		'hostid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,			'isset({form})&&({form}=="update")'),
 		'host'=>	array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,		'isset({save})&&!isset({massupdate})'),
 		'proxy_hostid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,	'isset({save})&&!isset({massupdate})'),
@@ -759,6 +759,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
 
 ?>
