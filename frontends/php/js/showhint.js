@@ -27,7 +27,12 @@ createBox: function(obj, hint_text, width, className, byClick){
 	var boxid = 'hintbox_'+this.boxesCount;
 	
 	var box = document.createElement('div');
-	obj.parentNode.appendChild(box);
+	
+	var obj_tag = obj.nodeName.toLowerCase();
+	
+	if((obj_tag == 'td') || (obj_tag == 'div') || (obj_tag == 'body')) obj.appendChild(box);
+	else obj.parentNode.appendChild(box);
+	
 	box.setAttribute('id', boxid);
 	box.className = 'hintbox';
 	
