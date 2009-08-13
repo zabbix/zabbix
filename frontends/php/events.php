@@ -333,7 +333,7 @@ include_once "include/page_header.php";
 					date("Y.M.d H:i:s",$row["clock"]), 
 					is_show_subnodes() ? get_node_name_by_elid($row['triggerid']) : null, 
 					$_REQUEST["hostid"] == 0 ? $row['host'] : null, 
-					new CLink(htmlentities(expand_trigger_description_by_data($row, ZBX_FLAG_EVENT)), 
+					new CLink(htmlspecialchars(expand_trigger_description_by_data($row, ZBX_FLAG_EVENT)), 
 							"tr_events.php?triggerid=".$row["triggerid"].'&eventid='.$row['eventid'], 
 							"action" 
 							), 
