@@ -30,9 +30,8 @@ extern char	*CONFIG_FPING6_LOCATION;
 #endif /* HAVE_IPV6 */
 extern char	*CONFIG_TMPDIR;
 
-static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, 
-				int count, int interval, int size, int timeout, 
-				char *error, int max_error_len)
+static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout, 
+		char *error, int max_error_len)
 {
 	FILE		*f;
 	char		filename[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
