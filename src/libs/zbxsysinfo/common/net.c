@@ -181,118 +181,6 @@ int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	return ret;
 }
 
-int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#if !defined(_WINDOWS)
-#ifdef HAVE_RES_QUERY
-
-#if !defined(PACKETSZ)
-#	define PACKETSZ 512
-#endif /* PACKETSZ */
-
-#if !defined(C_IN)
-#	define C_IN	ns_c_in
-#endif /* C_IN */
-
-#if !defined(T_ANY)
-#	define T_ANY	ns_t_any
-#endif /* T_ANY */
-
-	int		res;
-	char		ip[MAX_STRING_LEN];
-	char		zone[MAX_STRING_LEN];
-#ifdef	PACKETSZ
-	unsigned char	respbuf[PACKETSZ];
-#else
-	unsigned char	respbuf[NS_PACKETSZ];
-#endif
-
-	assert(result);
-
-	init_result(result);
-
-	if (num_param(param) > 2)
-		return SYSINFO_RET_FAIL;
-
-	if (0 != get_param(param, 1, ip, MAX_STRING_LEN))
-               *ip = '\0';
-
-	/* default parameter */
-	if (*ip == '\0')
-		strscpy(ip, "127.0.0.1");
-
-	if (0 != get_param(param, 2, zone, MAX_STRING_LEN))
-		*zone = '\0';
-
-	/* default parameter */
-	if (*zone == '\0')
-		strscpy(zone, "localhost");
-
-	/*we do ignore the first parameter `ip' since there is such technical requirement*/
-	/*
-	res = inet_aton(ip, &in);
-	if(res != 1)
-	{
-		SET_UI64_RESULT(result,0);
-		return SYSINFO_RET_FAIL;
-	}
-	*/
-	
-	if (!(_res.options & RES_INIT))
-		res_init();
-
-	res = res_query(zone, C_IN, T_ANY, respbuf, sizeof(respbuf));
-
-	SET_UI64_RESULT(result, res != -1 ? 1 : 0);
-
-	return SYSINFO_RET_OK;
-#endif /* HAVE_RES_QUERY */
-
-	return SYSINFO_RET_FAIL;
-#endif /* not WINDOWS */
-}
-
-static char	*decode_type(int q_type)
-{
-	static char buf[16];
-	switch (q_type) {
-		case T_A:	return "A";	/* "address"; */
-		case T_NS:	return "NS";	/* "name server"; */
-		case T_MD:	return "MD";	/* "mail forwarder"; */
-		case T_MF:	return "MF";	/* "mail forwarder"; */
-		case T_CNAME:	return "CNAME";	/* "canonical name"; */
-		case T_SOA:	return "SOA";	/* "start of authority"; */
-		case T_MB:	return "MB";	/* "mailbox"; */
-		case T_MG:	return "MG";	/* "mail group member"; */
-		case T_MR:	return "MR";	/* "mail rename"; */
-		case T_NULL:	return "NULL";	/* "null"; */
-		case T_WKS:	return "WKS";	/* "well-known service"; */
-		case T_PTR:	return "PTR";	/* "domain name pointer"; */
-		case T_HINFO:	return "HINFO";	/* "host information"; */
-		case T_MINFO:	return "MINFO";	/* "mailbox information"; */
-		case T_MX:	return "MX";	/* "mail exchanger"; */
-		case T_TXT:	return "TXT";	/* "text"; */
-		default:
-			zbx_snprintf(buf, sizeof(buf), "T_%d", q_type);
-			return buf;
-	}
-}
-
-static char	*get_name(unsigned char *msg, unsigned char *msg_end, unsigned char **msg_ptr)
-{
-	int		res;
-	static char	buffer[MAX_STRING_LEN];
-
-	if ((res = dn_expand(msg, msg_end, *msg_ptr, buffer, sizeof(buffer))) < 0)
-		return NULL;
-
-	*msg_ptr += res;
-
-	return buffer;
-}
-
-int	CHECK_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
 #ifndef _WINDOWS
 #ifdef HAVE_RES_QUERY
 
@@ -349,6 +237,122 @@ int	CHECK_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 #	define T_TXT	ns_t_txt
 #endif	/* T_TXT */
 
+static char	*decode_type(int q_type)
+{
+	static char buf[16];
+	switch (q_type) {
+		case T_A:	return "A";	/* "address"; */
+		case T_NS:	return "NS";	/* "name server"; */
+		case T_MD:	return "MD";	/* "mail forwarder"; */
+		case T_MF:	return "MF";	/* "mail forwarder"; */
+		case T_CNAME:	return "CNAME";	/* "canonical name"; */
+		case T_SOA:	return "SOA";	/* "start of authority"; */
+		case T_MB:	return "MB";	/* "mailbox"; */
+		case T_MG:	return "MG";	/* "mail group member"; */
+		case T_MR:	return "MR";	/* "mail rename"; */
+		case T_NULL:	return "NULL";	/* "null"; */
+		case T_WKS:	return "WKS";	/* "well-known service"; */
+		case T_PTR:	return "PTR";	/* "domain name pointer"; */
+		case T_HINFO:	return "HINFO";	/* "host information"; */
+		case T_MINFO:	return "MINFO";	/* "mailbox information"; */
+		case T_MX:	return "MX";	/* "mail exchanger"; */
+		case T_TXT:	return "TXT";	/* "text"; */
+		default:
+			zbx_snprintf(buf, sizeof(buf), "T_%d", q_type);
+			return buf;
+	}
+}
+
+static char	*get_name(unsigned char *msg, unsigned char *msg_end, unsigned char **msg_ptr)
+{
+	int		res;
+	static char	buffer[MAX_STRING_LEN];
+
+	if ((res = dn_expand(msg, msg_end, *msg_ptr, buffer, sizeof(buffer))) < 0)
+		return NULL;
+
+	*msg_ptr += res;
+
+	return buffer;
+}
+
+#endif /* HAVE_RES_QUERY */
+#endif /* not _WINDOWS */
+
+int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+#if !defined(_WINDOWS)
+#ifdef HAVE_RES_QUERY
+	int		res;
+	char		ip[MAX_STRING_LEN];
+	char		zone[MAX_STRING_LEN];
+#if defined(NS_PACKETSZ)
+	char	respbuf[NS_PACKETSZ];
+#elif defined(PACKETSZ)
+	char	respbuf[PACKETSZ];
+#else
+	char	respbuf[512];
+#endif
+	struct	in_addr in;
+
+	/* extern char *h_errlist[]; */
+
+	assert(result);
+
+	init_result(result);
+
+	if (num_param(param) > 2)
+		return SYSINFO_RET_FAIL;	
+	
+	if(get_param(param, 1, ip, MAX_STRING_LEN) != 0)
+        {
+               ip[0] = '\0';
+        }
+
+	/* default parameter */		
+	if(ip[0] == '\0')
+	{
+		strscpy(ip, "127.0.0.1");
+	}	
+		
+	if(get_param(param, 2, zone, MAX_STRING_LEN) != 0)
+        {
+                zone[0] = '\0';
+        }
+
+	/* default parameter */		
+	if(zone[0] == '\0')
+	{
+		strscpy(zone, "localhost");
+	}
+	
+	res = inet_aton(ip, &in);
+	if(res != 1)
+	{
+		SET_UI64_RESULT(result,0);
+		return SYSINFO_RET_FAIL;
+	}
+	
+	if (!(_res.options & RES_INIT))
+		res_init();
+	
+	res = res_query(zone, C_IN, T_SOA, (unsigned char *)respbuf, sizeof(respbuf));
+
+	SET_UI64_RESULT(result, res != -1 ? 1 : 0);
+
+	return SYSINFO_RET_OK;
+#else /* HAVE_RES_QUERY is not defined */
+	return SYSINFO_RET_FAIL;
+#endif /* ifdef HAVE_RES_QUERY */
+#else /* _WINDOWS is defined */
+	return SYSINFO_RET_FAIL;
+#endif /* if !defined(_WINDOWS) */
+}
+
+int	CHECK_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+#ifndef _WINDOWS
+#ifdef HAVE_RES_QUERY
 	typedef struct resolv_querytype_s {
 		char	*name;
 		int	type;
@@ -374,10 +378,16 @@ int	CHECK_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		{"TXT", T_TXT},
 		{NULL}
 	};
-
+	
 	typedef union {
 		HEADER		h;
+#if defined(NS_PACKETSZ)
 		unsigned char	buffer[NS_PACKETSZ];
+#elif defined(PACKETSZ)
+		unsigned char	buffer[PACKETSZ];
+#else
+		unsigned char	buffer[512];
+#endif
 	} answer_t;
 
 	char		zone[MAX_STRING_LEN], tmp[MAX_STRING_LEN], *name,
@@ -611,9 +621,10 @@ int	CHECK_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	SET_TEXT_RESULT(result, strdup(buffer));
 
 	return SYSINFO_RET_OK;
-#else
+#else /* HAVE_RES_QUERY is not defined */
 	return SYSINFO_RET_FAIL;
-#endif /* not HAVE_RES_QUERY */
+#endif /* ifdef HAVE_RES_QUERY */
+#else /* _WINDOWS is defined */
 	return SYSINFO_RET_FAIL;
-#endif /* not WINDOWS */
+#endif /* ifndef _WINDOWS */
 }
