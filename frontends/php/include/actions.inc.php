@@ -1090,42 +1090,29 @@ return $table;
 
 // Author: Aly
 function get_action_msgs_for_event($eventid){
-	$hostids = array();
-	$sql = 'SELECT DISTINCT i.hostid '.
-			' FROM events e, functions f, items i '.
-			' WHERE e.eventid='.$eventid.
-				' AND e.object='.EVENT_SOURCE_TRIGGERS.
-				' AND f.triggerid=e.objectid '.
-				' AND i.itemid=f.itemid';
-	if($host = DBfetch(DBselect($sql,1))){
-		$hostids[$host['hostid']] = $host['hostid'];
-	}
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, $hostids);
-
+	
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$table->SetHeader(array(
-			is_show_all_nodes() ? make_sorting_link(S_NODES,'a.alertid') : null,
-			make_sorting_link(S_TIME,'a.clock'),
-			make_sorting_link(S_TYPE,'mt.description'),
-			make_sorting_link(S_STATUS,'a.status'),
-			make_sorting_link(S_RETRIES_LEFT,'a.retries'),
-			make_sorting_link(S_RECIPIENTS,'a.sendto'),
-			S_MESSAGE,
-			S_ERROR
-			));
+		is_show_all_nodes() ? make_sorting_link(S_NODES,'a.alertid') : null,
+		make_sorting_link(S_TIME,'a.clock'),
+		make_sorting_link(S_TYPE,'mt.description'),
+		make_sorting_link(S_STATUS,'a.status'),
+		make_sorting_link(S_RETRIES_LEFT,'a.retries'),
+		make_sorting_link(S_RECIPIENTS,'a.sendto'),
+		S_MESSAGE,
+		S_ERROR
+	));
 
-	$sql = 'SELECT DISTINCT a.alertid,a.clock,a.esc_step, mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error '.
-			' FROM events e,alerts a'.
-				' left join media_type mt on mt.mediatypeid=a.mediatypeid'.
-			' WHERE a.eventid='.$eventid.
-				' AND a.alerttype='.ALERT_TYPE_MESSAGE.
-				' AND e.eventid = a.eventid'.
-				' AND '.DBcondition('e.objectid',$available_triggers).
-				' AND '.DBin_node('a.alertid').
-			order_by('a.clock,a.alertid,mt.description,a.sendto,a.status,a.retries');
-	$result=DBselect($sql);
+	
+	$alerts = CAlert::get(array(
+		'evntids' => $eventid,
+		'alerttype' => ALERT_TYPE_MESSAGE,
+		'extendoutput' => 1,
+		'sortfield' => 'clock',
+		'select_mediatypes' => 1
+	));
 
-	while($row=DBfetch($result)){
+	foreach($alerts as $row){
 		$time=date(S_DATE_FORMAT_YMDHMS,$row["clock"]);
 		if($row['esc_step'] > 0){
 			$time = array(bold(S_STEP.': '),$row["esc_step"],br(),bold(S_TIME.': '),br(),$time);
@@ -1159,10 +1146,11 @@ function get_action_msgs_for_event($eventid){
 			$error=new CSpan($row["error"],"on");
 		}
 
+		$mediatype = reset($row['mediatypes']);
 		$table->addRow(array(
 			get_node_name_by_elid($row['alertid']),
 			new CCol($time, 'top'),
-			new CCol($row["description"], 'top'),
+			new CCol($mediatype['description'], 'top'),
 			new CCol($status, 'top'),
 			new CCol($retries, 'top'),
 			new CCol($sendto, 'top'),
@@ -1175,73 +1163,58 @@ return $table;
 
 // Author: Aly
 function get_action_cmds_for_event($eventid){
-	$hostids = array();
-
-	$sql = 'SELECT DISTINCT i.hostid '.
-			' FROM events e, functions f, items i '.
-			' WHERE e.eventid='.$eventid.
-				' AND e.object='.EVENT_SOURCE_TRIGGERS.
-				' AND f.triggerid=e.objectid '.
-				' AND i.itemid=f.itemid';
-	if($host = DBfetch(DBselect($sql,1))){
-		$hostids[$host['hostid']] = $host['hostid'];
-	}
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, $hostids);
 
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$table->SetHeader(array(
-			is_show_all_nodes()?S_NODES:null,
-			S_TIME,
-			S_STATUS,
-			S_COMMAND,
-			S_ERROR
-			));
+		is_show_all_nodes()?S_NODES:null,
+		S_TIME,
+		S_STATUS,
+		S_COMMAND,
+		S_ERROR
+	));
+	
 
-	$sql = 'SELECT DISTINCT a.alertid,a.clock,a.sendto,a.esc_step,a.subject,a.message,a.status,a.retries,a.error '.
-			' FROM events e,alerts a'.
-			' WHERE a.eventid='.$eventid.
-				' AND a.alerttype='.ALERT_TYPE_COMMAND.
-				' AND e.eventid = a.eventid'.
-				' AND '.DBcondition('e.objectid',$available_triggers).
-				' AND '.DBin_node('a.alertid').
-			order_by('a.clock,a.alertid,a.sendto,a.status,a.retries');
-	$result=DBselect($sql);
-
-	while($row=DBfetch($result)){
-		$time=date("Y.M.d H:i:s",$row["clock"]);
+	$alerts = CAlert::get(array(
+		'evntids' => $eventid,
+		'alerttype' => ALERT_TYPE_COMMAND,
+		'extendoutput' => 1,
+		'sortfield' => 'clock'		
+	));
+	
+	foreach($alerts as $row){
+		$time = date('Y.M.d H:i:s', $row['clock']);
 		if($row['esc_step'] > 0){
-			$time = array(bold(S_STEP.': '),$row["esc_step"],br(),bold(S_TIME.': '),br(),$time);
+			$time = array(bold(S_STEP.': '), $row['esc_step'], br(), bold(S_TIME.': '), br(), $time);
 		}
 
-		if($row["status"] == ALERT_STATUS_SENT){
-			$status=new CSpan(S_EXECUTED,"green");
-		}
-		else if($row["status"] == ALERT_STATUS_NOT_SENT){
-			$status=new CSpan(S_IN_PROGRESS,"orange");
-		}
-		else{
-			$status=new CSpan(S_NOT_SENT,"red");
+		switch($row['status']){
+			case ALERT_STATUS_SENT:
+				$status = new CSpan(S_EXECUTED, 'green');
+			break;
+			case ALERT_STATUS_NOT_SENT:
+				$status = new CSpan(S_IN_PROGRESS, 'orange');
+			break;
+			default:
+				$status = new CSpan(S_NOT_SENT, 'red');
+			break;
 		}
 
 		$message = array(bold(S_COMMAND.':'));
-		$msg = explode("\n",$row['message']);
+		$msg = explode('\n', $row['message']);
 		foreach($msg as $m){
 			array_push($message, BR(), $m);
 		}
 
-		if(empty($row["error"])){
-			$error=new CSpan(SPACE,"off");
-		}
-		else{
-			$error=new CSpan($row["error"],"on");
-		}
+		$error = empty($row['error']) ? new CSpan(SPACE, 'off') : new CSpan($row['error'], 'on');
+
 
 		$table->addRow(array(
 			get_node_name_by_elid($row['alertid']),
 			new CCol($time, 'top'),
 			new CCol($status, 'top'),
 			new CCol($message, 'wraptext top'),
-			new CCol($error, 'wraptext top')));
+			new CCol($error, 'wraptext top')
+		));
 	}
 
 return $table;

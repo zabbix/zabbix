@@ -270,37 +270,45 @@ return $table;
 function make_small_eventlist($eventid, $trigger_data){
 
 	$table = new CTableInfo();
-	$table->setHeader(array(S_TIME,S_STATUS,S_DURATION, S_AGE, S_ACK, S_ACTIONS));
+	$table->setHeader(array(S_TIME, S_STATUS, S_DURATION, S_AGE, S_ACK, S_ACTIONS));
 
 	$rows = array();
-	$count = 0;
+	$count = 1;
 
-	$sql = 'SELECT * '.
-			' FROM events '.
-			' WHERE eventid<='.$eventid.
-			' ORDER BY eventid DESC';
-	$result = DBselect($sql,100);
-	while(($row=DBfetch($result)) && ($count < 20)){
-
-		if(!empty($rows) && ($rows[$count]['value'] != $row['value'])){
+	$curevent = CEvent::get(array('eventids' => $eventid, 'extendoutput' => 1, 'editable' => 1));
+	$curevent = reset($curevent);
+	
+	$events = CEvent::get(array(
+		'time_till' => $curevent['clock'], 
+		'extendoutput' => 1, 
+		'limit' => 100, 
+		'sortfield' => 'eventid', 
+		'sortorder' => ZBX_SORT_DOWN
+	));
+		
+	foreach($events as $event){
+		if(!empty($rows) && ($rows[$count]['value'] != $event['value'])){
 			$count++;
 		}
-		else if(!empty($rows) &&
-				($rows[$count]['value'] == $row['value']) &&
-				($trigger_data['type'] == TRIGGER_MULT_EVENT_ENABLED) &&
-				($row['value'] == TRIGGER_VALUE_TRUE)
-				){
+		else if(
+			!empty($rows) &&
+			($rows[$count]['value'] == $event['value']) &&
+			($trigger_data['type'] == TRIGGER_MULT_EVENT_ENABLED) &&
+			($event['value'] == TRIGGER_VALUE_TRUE)
+		){
 			$count++;
 		}
-		$rows[$count] = $row;
+		$rows[$count] = $event;
+		
+		if($count == 20) break;
 	}
 
-	$clock=time();
+	$clock = time();
 
 	foreach($rows as $id => $row){
-		$lclock=$clock;
-		$clock=$row["clock"];
-		$duration = zbx_date2age($lclock,$clock);
+		$lclock = $clock;
+		$clock = $row["clock"];
+		$duration = zbx_date2age($lclock, $clock);
 
 		$value = new CCol(trigger_value2str($row['value']), get_trigger_value_style($row["value"]));
 
@@ -313,7 +321,7 @@ function make_small_eventlist($eventid, $trigger_data){
 			$ack=array(
 				new CLink(new CSpan(S_YES,'off'),'acknow.php?eventid='.$row['eventid']),
 				SPACE.'('.$rows.')'
-				);
+			);
 		}
 
 //actions
@@ -322,16 +330,16 @@ function make_small_eventlist($eventid, $trigger_data){
 
 		$table->AddRow(array(
 			new CLink(
-					date('Y.M.d H:i:s',$row['clock']),
-					"tr_events.php?triggerid=".$trigger_data['triggerid'].'&eventid='.$row['eventid'],
-					"action"
-					),
+				date('Y.M.d H:i:s',$row['clock']),
+				"tr_events.php?triggerid=".$trigger_data['triggerid'].'&eventid='.$row['eventid'],
+				"action"
+			),
 			$value,
 			$duration,
 			zbx_date2age($row['clock']),
 			$ack,
 			$actions
-			));
+		));
 	}
 return $table;
 }

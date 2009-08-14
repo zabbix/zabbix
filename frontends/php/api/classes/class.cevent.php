@@ -71,8 +71,8 @@ class CEvent {
 			'from' => array('events e'),
 			'where' => array(),
 			'order' => array(),
-			'limit' => null,
-			);
+			'limit' => null
+		);
 
 		$def_options = array(
 			'nodeids'				=> null,
