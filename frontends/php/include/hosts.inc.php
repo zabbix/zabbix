@@ -1670,7 +1670,7 @@ return $result;
  *
  */
 	function delete_application($applicationids){
-		$zbx_value2array($applicationids);
+		zbx_value2array($applicationids);
 		
 		$apps = array();
 		$sql = 'SELECT h.host, a.name '.

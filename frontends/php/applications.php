@@ -21,6 +21,7 @@
 <?php
 	require_once('include/config.inc.php');
 	require_once('include/hosts.inc.php');
+	require_once('include/forms.inc.php');
 
 	$page['title'] = "S_APPLICATIONS";
 	$page['file'] = 'applications.php';
@@ -324,6 +325,12 @@ include_once('include/page_header.php');
 		$app_wdgt->addHeader(S_APPLICATIONS_BIG, $form);
 		$app_wdgt->addHeader($numrows);
 
+// Header Host
+		if($PAGE_HOSTS['selected'] > 0){
+			$tbl_header_host = get_header_host_table($PAGE_HOSTS['selected'], array('items', 'triggers', 'graphs'));
+			$app_wdgt->addItem($tbl_header_host);
+		}
+		
 // table applications 
 		$options = array(
 			'select_items' => 1,

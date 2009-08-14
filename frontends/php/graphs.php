@@ -444,105 +444,11 @@ include_once('include/page_header.php');
 		$graphs_wdgt->addHeader(S_GRAPHS_BIG, $r_form);
 		$graphs_wdgt->addHeader($numrows);
 
-// <<<--- SELECTED HOST HEADER INFORMATION --->>>
+// Header Host
 		if($PAGE_HOSTS['selected'] > 0){
-
-			$tbl_header_host = new CTableInfo();
-
-			$header_host = CHost::get(array(
-				'templated_hosts' => 1,
-				'nopermissions' => 1,
-				'extendoutput' => 1,
-				'select_items' => 1,
-				'select_triggers' => 1,
-				'select_applications' =>1,
-				'limit' => ($config['search_limit']+1)
-			));
-			
-			if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
-				$options['hostids'] = $PAGE_HOSTS['selected'];
-			}
-				
-			if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
-				$options['groupids'] = $PAGE_GROUPS['selected'];
-			}
-			
-			$header_host = array_pop($header_host);
-
-			$description = array();
-			if($header_host['proxy_hostid']){
-				$proxy = get_host_by_hostid($header_host['proxy_hostid']);
-				$description[] = $proxy['host'].':';
-			}
-			$description[] = $header_host['host'];
-
-			$items = array(new CLink(S_ITEMS, 'items.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']),
-					' ('.count($header_host['itemids']).')');
-
-			$triggers = array(new CLink(S_TRIGGERS, 'triggers.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']),
-				' ('.count($header_host['triggerids']).')');
-
-			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$header_host['hostid']),
-				' ('.count($header_host['applications']).')');
-
-			if($header_host['status'] == HOST_STATUS_TEMPLATE){
-				$status = S_TEMPLATE;
-
-				$tbl_header_host->addRow(array(
-					new CLink(bold(S_TEMPLATE_LIST), 'templates.php?templateid='.$header_host['hostid'].url_param('groupid')),
-					$items,
-					$triggers,
-					$applications,
-					array(bold(S_TEMPLATE.': '), $description)
-				));
-			}
-			else{
-				$dns = empty($header_host['dns']) ? '-' : $header_host['dns'];
-				$ip = empty($header_host['ip']) ? '-' : $header_host['ip'];
-				$port = empty($header_host['port']) ? '-' : $header_host['port'];
-				if(1 == $header_host['useip'])
-					$ip = bold($ip);
-				else
-					$dns = bold($dns);
-
-
-				switch($header_host['status']){
-					case HOST_STATUS_MONITORED:
-						$status=new CSpan(S_MONITORED, 'off');
-						break;
-					case HOST_STATUS_NOT_MONITORED:
-						$status=new CSpan(S_NOT_MONITORED, 'off');
-						break;
-					default:
-						$status=S_UNKNOWN;
-				}
-
-				if($header_host['available'] == HOST_AVAILABLE_TRUE)
-					$available=new CSpan(S_AVAILABLE,'off');
-				else if($header_host['available'] == HOST_AVAILABLE_FALSE)
-					$available=new CSpan(S_NOT_AVAILABLE,'on');
-				else if($header_host['available'] == HOST_AVAILABLE_UNKNOWN)
-					$available=new CSpan(S_UNKNOWN,'unknown');
-
-
-				$tbl_header_host->addRow(array(
-					new CLink(bold(S_HOST_LIST), 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid')),
-					$items,
-					$triggers,
-					$applications,
-					array(bold(S_HOST.': '), $description),
-					array(bold(S_DNS.': '), $dns),
-					array(bold(S_IP.': '), $ip),
-					array(bold(S_PORT.': '), $port),
-					array(bold(S_STATUS.': '), $status),
-					array(bold(S_AVAILABILITY.': '), $available)
-				));
-			}
-			$tbl_header_host->setClass('infobox');
-
+			$tbl_header_host = get_header_host_table($PAGE_HOSTS['selected'], array('items', 'triggers', 'applications'));
 			$graphs_wdgt->addItem($tbl_header_host);
 		}
-// --->>> SELECTED HOST HEADER INFORMATION <<<---
 
 /* TABLE */
 		$form = new CForm();
