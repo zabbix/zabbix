@@ -686,8 +686,7 @@ include_once('include/page_header.php');
 			insert_item_form();
 		}
 	}
-
-	if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['group_itemid'])){
+	else if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['group_itemid'])){
 		insert_mass_update_item_form('group_itemid');
 	}
 	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['group_itemid'])){
@@ -786,7 +785,7 @@ include_once('include/page_header.php');
 
 // Header Host
 		if($hostid > 0){
-			$tbl_header_host = get_header_host_table($hostid, array('graphs', 'triggers', 'applications'));
+			$tbl_header_host = get_header_host_table($hostid, array('triggers', 'applications', 'graphs'));
 			$items_wdgt->addItem($tbl_header_host);
 			$show_host = false;
 		}
