@@ -503,7 +503,7 @@
 
 							$data['key_'] = $data['key'];
 							$data['hostid'] = $this->data[XML_TAG_HOST]['hostid'];
-							$data['applications'] = array_unique(array_merge($data['applications'],get_applications_by_itemid($item['itemid'])));
+							$data['applications'] = array_unique(zbx_array_merge($data['applications'],get_applications_by_itemid($item['itemid'])));
 							$data['templateid'] = $item['templateid'];
 
 							check_db_fields($item, $data);

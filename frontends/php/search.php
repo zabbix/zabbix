@@ -110,7 +110,7 @@ include_once('include/page_header.php');
 				'limit' => $rows_per_page,
 				);
 	$db_hosts = CHost::get($params);
-	order_result($db_hosts, 'host');
+	order_result($db_hosts, 'host', null, true);
 	
 	$hosts = selectByPattern($db_hosts, 'host', $search, $rows_per_page);
 
@@ -203,7 +203,7 @@ include_once('include/page_header.php');
 				);
 
 	$db_hostGroups = CHostGroup::get($params);
-	order_result($db_hostGroups, 'name');
+	order_result($db_hostGroups, 'name', null, true);
 	$hostGroups = selectByPattern($db_hostGroups, 'name', $search, $rows_per_page);
 
 	$params = array(
@@ -263,7 +263,7 @@ include_once('include/page_header.php');
 					);
 
 		$db_templates = CTemplate::get($params);
-		order_result($db_templates, 'host');
+		order_result($db_templates, 'host', null, true);
 
 		$templates = selectByPattern($db_templates, 'host', $search, $rows_per_page);
 

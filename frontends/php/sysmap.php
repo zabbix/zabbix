@@ -256,7 +256,7 @@ include_once('include/page_header.php');
 			$links[$linkid]['label2']=$labels[$row['selementid2']];
 		}
 
-		order_result($links, 'label1');
+		order_result($links, 'label1', null, true);
 
 		foreach($links as $linkid => $row){
 			$label1 = $row['label1'];

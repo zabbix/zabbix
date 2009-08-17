@@ -1845,7 +1845,7 @@ return $result;
 			}
 
 			if(!empty($templateids) && !empty($dep_templateids)) {
-				$tpls = array_merge($templateids, $dep_templateids);
+				$tpls = zbx_array_merge($templateids, $dep_templateids);
 				$sql = 'SELECT DISTINCT h.host, h.hostid, ht.templateid '.
 						' FROM hosts h, hosts_templates ht '.
 						' WHERE h.hostid=ht.hostid '.

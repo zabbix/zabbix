@@ -1199,10 +1199,13 @@ function __autoload($class_name){
 /*************** END PAGE SORTING ******************/
 
 /*************** RESULT SORTING ******************/
-	function order_result(&$data, $sortfield, $sortorder=ZBX_SORT_UP){
-		global $page;
-
+	function order_result(&$data, $sortfield, $sortorder=ZBX_SORT_UP, $preserve_keys=false){
 		if(empty($data)) return false;
+
+		if($preserve_keys == true){
+			array_quicksort($data, $sortfield, $sortorder);
+			return true;
+		}
 
 		foreach($data as $key => $rows){
 			if(!isset($rows[$sortfield])){
@@ -1228,9 +1231,7 @@ function __autoload($class_name){
 		$sortfield = get_request('sort',get_profile('web.'.$page['file'].'.sort',$def_field));
 		$sortorder = get_request('sortorder',get_profile('web.'.$page['file'].'.sortorder',$def_order));
 
-	return order_result($data, $sortfield, $sortorder);
-//		$data = array_quicksort($data, $sortfield, $sortorder);
-//	return true;
+	return order_result($data, $sortfield, $sortorder, true);
 	}
 
 	function order_by($def,$allways=''){

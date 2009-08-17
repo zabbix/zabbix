@@ -6621,7 +6621,7 @@
 		while($db_element = DBfetch($db_elements)){
 			$map_elements[$db_element['selementid']] = $db_element;
 		}
-		order_result($map_elements, 'label');
+		order_result($map_elements, 'label', null, true);
 
 		foreach($map_elements as $selementid => $db_selement){
 
