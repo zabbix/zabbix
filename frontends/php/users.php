@@ -100,7 +100,7 @@ include_once('include/page_header.php');
 		$_REQUEST['new_groups'] = get_request('new_groups', array());
 		$_REQUEST['user_groups'] = get_request('user_groups', array());
 		
-		$_REQUEST['user_groups'] = array_merge($_REQUEST['user_groups'], $_REQUEST['new_groups']);
+		$_REQUEST['user_groups'] += $_REQUEST['new_groups'];
 		unset($_REQUEST['new_groups']);
 	}
 	else if(isset($_REQUEST['new_media'])){

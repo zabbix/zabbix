@@ -20,10 +20,17 @@
 */
 
 var hintBox = {
-boxes:	{},	// array of dom Hint Boxes
-boxesCount: 0,			// unique box id
+boxes:				{},				// array of dom Hint Boxes
+boxesCount: 		0,				// unique box id
+
+
+debug_status: 		0,				// debug status: 0 - off, 1 - on, 2 - SDI;
+debug_info: 		'',				// debug string
+debug_prev:			'',				// don't log repeated fnc
 
 createBox: function(obj, hint_text, width, className, byClick){
+	this.debug('createBox');
+	
 	var boxid = 'hintbox_'+this.boxesCount;
 	
 	var box = document.createElement('div');
@@ -48,11 +55,10 @@ createBox: function(obj, hint_text, width, className, byClick){
 	if(byClick){
 		close_link = '<div class="link" '+
 						'style="text-align: right; backgground-color: #AAA; border-bottom: 1px #333 solid;" '+
-						'onclick="hintBox.hide(\''+boxid+'\');">Close</div>';
+						'onclick="javascript: hintBox.hide(event, \''+boxid+'\');">Close</div>';
 	}
 
 	box.innerHTML = close_link + hint_text;
-	
 	
 /*	
 	var box_close = document.createElement('div');
@@ -69,6 +75,10 @@ return box;
 },
 
 showOver: function(e, obj, hint_text, width, className){
+	this.debug('showOver');
+	
+	if (!e) var e = window.event;	
+	
 	var hintid = obj.getAttribute('hintid');
 	var hintbox = $(hintid);
 
@@ -86,6 +96,10 @@ showOver: function(e, obj, hint_text, width, className){
 },
 
 hideOut: function(e, obj){
+	this.debug('hideOut');
+	
+	if (!e) var e = window.event;	
+	
 	var hintid = obj.getAttribute('hintid');
 	var hintbox = $(hintid);
 
@@ -100,11 +114,16 @@ hideOut: function(e, obj){
 		obj.removeAttribute('hintid');
 		obj.removeAttribute('byclick');
 	
-		this.hide(hintid);
+		this.hide(e, hintid);
 	}
 },
 
 onClick: function(e, obj, hint_text, width, className){
+	this.debug('onClick');
+
+	if (!e) var e = window.event;
+	cancelEvent(e);
+	
 	var hintid = obj.getAttribute('hintid');
 	var hintbox = $(hintid);
 
@@ -115,7 +134,7 @@ onClick: function(e, obj, hint_text, width, className){
 	
 	if(!empty(hintid) && empty(byClick)){
 		obj.removeAttribute('hintid');
-		this.hide(hintid);
+		this.hide(e, hintid);
 		
 		var hintbox = this.createBox(obj, hint_text, width, className, true);
 		
@@ -128,7 +147,7 @@ onClick: function(e, obj, hint_text, width, className){
 		obj.removeAttribute('hintid');
 		hintbox.removeAttribute('byclick');
 		
-		this.hide(hintid);
+		this.hide(e, hintid);
 	}
 	else{
 		var hintbox = this.createBox(obj,hint_text, width, className, true);
@@ -141,6 +160,8 @@ onClick: function(e, obj, hint_text, width, className){
 },
 
 show: function(e, obj, hintbox){
+	this.debug('show');
+	
 	var hintid = hintbox.id;
 	var body_width = get_bodywidth();
 
@@ -178,26 +199,44 @@ show: function(e, obj, hintbox){
 	hintbox.style.top	= hintbox.y + 10 + parseInt(obj.offsetHeight/2) + 'px';
 },
 
-hide: function(boxid){
+hide: function(e, boxid){
+	this.debug('hide');
+	
+	if (!e) var e = window.event;	
+	cancelEvent(e);
+
 	var hint = $(boxid);
 	if(!is_null(hint)){
 		delete(this.boxes[boxid]);
 		
-// Opera have problems with refreshing objects after removing
 		hint.style.display = 'none';
-		if(OP || WK)
-			setTimeout(function(){hint.parentNode.removeChild(hint);},200);
-		else
-			hint.parentNode.removeChild(hint);
-//----
+		hint.remove();
 	}
 },
 
 hideAll: function(){
+	this.debug('hideAll');
+
 	for(var id in this.boxes){
 		if((typeof(this.boxes[id]) != 'undefined') && !empty(this.boxes[id])){
 			this.hide(id);
 		}
+	}
+},
+	
+debug: function(fnc_name, id){
+	if(this.debug_status){
+		var str = 'PMaster.'+fnc_name;
+		if(typeof(id) != 'undefined') str+= ' :'+id;
+
+		if(this.debug_prev == str) return true;
+
+		this.debug_info += str + '\n';
+		if(this.debug_status == 2){
+			SDI(str);
+		}
+		
+		this.debug_prev = str;
 	}
 }
 }

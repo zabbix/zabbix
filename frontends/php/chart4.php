@@ -129,36 +129,32 @@ include_once 'include/page_header.php';
 		DashedLine($im,$shiftX,$i+$shiftYup,$sizeX+$shiftX,$i+$shiftYup,$gray);
 	}
 
-	$j=0;
-	for($i=0;$i<=$sizeX;$i+=$sizeX/52){
+
+	for($i=0, $period_start = $start; $i <= $sizeX; $i += $sizeX/52){
 		DashedLine($im,$i+$shiftX,$shiftYup,$i+$shiftX,$sizeY+$shiftYup,$gray);
-		$period_start=$start+7*24*3600*$j;
 		imagestringup($im, 1,$i+$shiftX-4, $sizeY+$shiftYup+32, date('d.M',$period_start) , $black);
-		$j++;
+		
+		$period_start += 7*24*3600;
 	}
 
-	$maxY=100;
-	$tmp=max($true);
-	if($tmp>$maxY){
-		$maxY=$tmp;
-	}
-	$minY=0;
+	$maxY = max(max($true), 100);
+	$minY = 0;
 
 	$maxX=900;
 	$minX=0;
 
-	for($i=0;$i<$weeks;$i++){
-		$x1=(900/52)*$sizeX*($i-$minX)/($maxX-$minX);
+	for($i=1;$i<=$weeks;$i++){
+		$x1=(900/52)*$sizeX*($i-1-$minX)/($maxX-$minX);
 
 //		imagefilledrectangle($im,$x1+$shiftX,$shiftYup,$x1+$shiftX+8,$sizeY+$shiftYup,imagecolorallocate($im,0,0,0)); 	// WHITE
-
-		$yt=$sizeY*$true[$i]/100;
+		
+		$yt=$sizeY*$true[$i-1]/100;
 		if($yt > 0) imagefilledrectangle($im,$x1+$shiftX,$shiftYup,$x1+$shiftX+8,$yt+$shiftYup,imagecolorallocate($im,235,120,120));	// RED
 
-		$yu=(int)($sizeY*$unknown[$i]/100+0.5);
+		$yu=(int)($sizeY*$unknown[$i-1]/100+0.5);
 		if($yu > 0) imagefilledrectangle($im,$x1+$shiftX,$yt+$shiftYup,$x1+$shiftX+8,$yt+$yu+$shiftYup,imagecolorallocate($im,235,235,235)); 	// UNKNOWN
 
-		$yf=$sizeY*$false[$i]/100;
+		$yf=$sizeY*$false[$i-1]/100;
 		if($yf > 0) imagefilledrectangle($im,$x1+$shiftX,$yt+$yu+$shiftYup,$x1+$shiftX+8,$sizeY+$shiftYup,imagecolorallocate($im,120,235,120));  // GREEN
 
 //SDI($yt.'+'.$yf.'+'.$yu);
@@ -191,6 +187,6 @@ include_once 'include/page_header.php';
 ?>
 <?php
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
 
 ?>
