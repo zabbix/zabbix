@@ -689,7 +689,7 @@ require_once('include/hosts.inc.php');
 			$i = 0;
 			$linked_templates_output = array();
 
-			order_result($template['templates'], 'host');
+			order_result($template['templates'], 'host', null, true);
 			foreach($template['templates'] as $linked_templateid => $linked_template){
 				$i++;
 				if($i > $config['max_in_table']){
@@ -708,7 +708,7 @@ require_once('include/hosts.inc.php');
 			$i = 0;
 			$linked_to_hosts_output = array();
 
-			order_result($template['hosts'], 'host');
+			order_result($template['hosts'], 'host', null, true);
 			foreach($template['hosts'] as $linked_to_hostid => $linked_to_host){
 				$i++;
 				if($i > $config['max_in_table']){

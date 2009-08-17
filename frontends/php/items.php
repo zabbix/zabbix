@@ -782,7 +782,6 @@ include_once('include/page_header.php');
 		else
 			$items = CItem::get($options);
 		
-
 // Header Host
 		if($hostid > 0){
 			$tbl_header_host = get_header_host_table($hostid, array('triggers', 'applications', 'graphs'));
@@ -826,7 +825,7 @@ include_once('include/page_header.php');
 			}
 			else{
 				foreach($items[$itemid]['applications'] as $app){
-					if(in_array($app['name'], $_REQUEST['subfilter_apps'])){
+					if(str_in_array($app['name'], $_REQUEST['subfilter_apps'])){
 						$items[$itemid]['subfilters']['subfilter_apps'] = true;
 						break;
 					}
@@ -834,30 +833,30 @@ include_once('include/page_header.php');
 			}
 				
 			$items[$itemid]['subfilters']['subfilter_types'] = 
-				(empty($_REQUEST['subfilter_types']) || in_array($item['type'], $_REQUEST['subfilter_types']));
+				(empty($_REQUEST['subfilter_types']) || uint_in_array($item['type'], $_REQUEST['subfilter_types']));
 				
 			$items[$itemid]['subfilters']['subfilter_value_types'] =
-				(empty($_REQUEST['subfilter_value_types']) || in_array($item['value_type'], $_REQUEST['subfilter_value_types']));
+				(empty($_REQUEST['subfilter_value_types']) || uint_in_array($item['value_type'], $_REQUEST['subfilter_value_types']));
 
 			$items[$itemid]['subfilters']['subfilter_status'] =
-				(empty($_REQUEST['subfilter_status']) || in_array($item['status'], $_REQUEST['subfilter_status']));
+				(empty($_REQUEST['subfilter_status']) || uint_in_array($item['status'], $_REQUEST['subfilter_status']));
 				
 			$items[$itemid]['subfilters']['subfilter_templated_items'] =
-				(empty($_REQUEST['subfilter_templated_items']) || (($item['templateid'] == 0) && in_array(0, $_REQUEST['subfilter_templated_items']))
-				|| (($item['templateid'] > 0) && in_array(1, $_REQUEST['subfilter_templated_items'])));
+				(empty($_REQUEST['subfilter_templated_items']) || (($item['templateid'] == 0) && uint_in_array(0, $_REQUEST['subfilter_templated_items']))
+				|| (($item['templateid'] > 0) && uint_in_array(1, $_REQUEST['subfilter_templated_items'])));
 				
 			$items[$itemid]['subfilters']['subfilter_with_triggers'] =
-				(empty($_REQUEST['subfilter_with_triggers']) || ((count($item['triggerids']) == 0) && in_array(0, $_REQUEST['subfilter_with_triggers']))
-				|| ((count($item['triggerids']) > 0) && in_array(1, $_REQUEST['subfilter_with_triggers'])));
+				(empty($_REQUEST['subfilter_with_triggers']) || ((count($item['triggerids']) == 0) && uint_in_array(0, $_REQUEST['subfilter_with_triggers']))
+				|| ((count($item['triggerids']) > 0) && uint_in_array(1, $_REQUEST['subfilter_with_triggers'])));
 				
 			$items[$itemid]['subfilters']['subfilter_history'] =
-				(empty($_REQUEST['subfilter_history']) || in_array($item['history'], $_REQUEST['subfilter_history']));
+				(empty($_REQUEST['subfilter_history']) || uint_in_array($item['history'], $_REQUEST['subfilter_history']));
 				
 			$items[$itemid]['subfilters']['subfilter_trends'] =
-				(empty($_REQUEST['subfilter_trends']) || in_array($item['trends'], $_REQUEST['subfilter_trends']));
+				(empty($_REQUEST['subfilter_trends']) || uint_in_array($item['trends'], $_REQUEST['subfilter_trends']));
 				
 			$items[$itemid]['subfilters']['subfilter_interval'] =
-				(empty($_REQUEST['subfilter_interval']) || in_array($item['delay'], $_REQUEST['subfilter_interval']));
+				(empty($_REQUEST['subfilter_interval']) || uint_in_array($item['delay'], $_REQUEST['subfilter_interval']));
 		}
 // } SET VALUES FOR SUBFILTERS
 
@@ -874,8 +873,8 @@ include_once('include/page_header.php');
 
 // sorting && paging
 // !!! should go after we subfiltered out items !!! 
-			order_page_result($items, getPageSortField('description'), getPageSortOrder());
-			$paging = getPagingLine($items);
+		order_page_result($items, getPageSortField('description'), getPageSortOrder());
+		$paging = getPagingLine($items);
 //---------
 
 		foreach($items as $itemid => $item){
