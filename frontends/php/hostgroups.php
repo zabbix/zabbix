@@ -312,7 +312,7 @@ include_once('include/page_header.php');
 			$i = 0;
 			$hosts_output = array();
 
-			order_result($group['hosts'], 'host');
+			order_result($group['hosts'], 'host', null, true);
 			foreach($group['hosts'] as $hostid => $host){
 				$i++;
 

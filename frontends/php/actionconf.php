@@ -519,7 +519,7 @@ include_once('include/page_header.php');
 			$conditions = array();
 
 // sorting
-			order_result($action['conditions'], 'conditiontype');
+			order_result($action['conditions'], 'conditiontype', null, true);
 			foreach($action['conditions'] as $conditionid => $condition){
 				array_push($conditions, array(get_condition_desc(
 							$condition['conditiontype'],
@@ -531,7 +531,7 @@ include_once('include/page_header.php');
 			$operations=array();
 
 // sorting
-			order_result($action['operations'], 'operationtype');
+			order_result($action['operations'], 'operationtype', null, true);
 			foreach($action['operations'] as $operationid => $operation){
 				array_push($operations,array(get_operation_desc(SHORT_DESCRITION, $operation),BR()));
 			}

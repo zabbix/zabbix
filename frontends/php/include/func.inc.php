@@ -479,9 +479,26 @@ function array_quicksort(&$data, $sortfield, $sortorder=ZBX_SORT_UP, $level=0){
 	$return += $pivotList;
 	$return += array_quicksort($greater,$sortfield,$sortorder, $level+1);
 	
-	if(($level == 0) && ($sortorder == ZBX_SORT_DOWN)) $return = array_reverse($return);
+	if(($level == 0) && ($sortorder == ZBX_SORT_DOWN)) $return = array_reverse($return, true);
 
 return $return;
+}
+
+// This function will preserve keys!!!
+// author: Aly
+function zbx_array_merge(){
+	$args = func_get_args();
+	
+	$result = array();
+	foreach($args as &$array){
+		if(!is_array($array)) return false;
+
+		foreach($array as $key => $value){
+			$result[$key] = $value;
+		}
+	}
+
+return $result;
 }
 /************* END SORT *************/
 
