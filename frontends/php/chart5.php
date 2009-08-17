@@ -102,6 +102,8 @@ include_once 'include/page_header.php';
 	if($wday==0) $wday=7;
 	$start=$start-($wday-1)*24*3600;
 
+	$weeks = (int)(date('z')/7 +1);
+
 	for($i=0;$i<52;$i++){
 		if(($period_start=$start+7*24*3600*$i) > time())
 			break;
@@ -119,9 +121,11 @@ include_once 'include/page_header.php';
 		DashedLine($im,$shiftX,$i+$shiftYup,$sizeX+$shiftX,$i+$shiftYup,$gray);
 	}
 
-	for($i = 0, $period_start = $start; $i <= $sizeX; $i += $sizeX/52, $period_start += 7*24*3600){
+	for($i = 0, $period_start = $start; $i <= $sizeX; $i += $sizeX/52){
 		DashedLine($im,$i+$shiftX,$shiftYup,$i+$shiftX,$sizeY+$shiftYup,$gray);
 		imagestringup($im, 1,$i+$shiftX-4, $sizeY+$shiftYup+32, date('d.M',$period_start) , $black);
+		
+		$period_start += 7*24*3600;
 	}
 
 	$maxY = max(max($problem), 100);
@@ -130,7 +134,7 @@ include_once 'include/page_header.php';
 	$maxX = 900;
 	$minX = 0;
 
-	for($i=1;$i<=52;$i++){
+	for($i=1;$i<=$weeks;$i++){
 		if(!isset($ok[$i-1])) continue;
 		$x2=($sizeX/52)*($i-1-$minX)*$sizeX/($maxX-$minX);
 
