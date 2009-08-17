@@ -2330,12 +2330,12 @@ return $result;
 		$start_value = -1;
 
 		if(($period_start>0) && ($period_start < time())){
-			$sql='SELECT eventid, value '.
-					' FROM events '.
-					' WHERE objectid='.$triggerid.
-						' AND object='.EVENT_OBJECT_TRIGGER.
-						' AND clock<'.$period_start.
-					' ORDER BY eventid DESC';
+			$sql='SELECT e.eventid, e.value '.
+					' FROM events e '.
+					' WHERE e.objectid='.$triggerid.
+						' AND e.object='.EVENT_OBJECT_TRIGGER.
+						' AND e.clock<'.$period_start.
+					' ORDER BY e.clock, e.eventid DESC';
 			if($row = DBfetch(DBselect($sql,1))){
 				$start_value = $row['value'];
 				$min = $period_start;
@@ -2373,6 +2373,15 @@ return $result;
 			}
 		}
 
+		$state		= $start_value;//-1;
+		$true_time	= 0;
+		$false_time	= 0;
+		$unknown_time	= 0;
+		$time		= $min;
+		if(($period_start==0)&&($period_end==0)){
+			$max=time();
+		}
+		$rows=0;
 		$sql = 'SELECT eventid,clock,value '.
 				' FROM events '.
 				' WHERE objectid='.$triggerid.
@@ -2380,20 +2389,7 @@ return $result;
 					' AND clock>='.$min.
 					' AND clock<='.$max.
 				' ORDER BY clock ASC, eventid ASC';
-//				' ORDER BY eventid ASC';
 		$result=DBselect($sql);
-
-		$state		= $start_value;//-1;
-		$true_time	= 0;
-		$false_time	= 0;
-		$unknown_time	= 0;
-		$time		= $min;
-
-		if(($period_start==0)&&($period_end==0)){
-			$max=time();
-		}
-		$rows=0;
-
 		while($row=DBfetch($result)){
 			$clock=$row['clock'];
 			$value=$row['value'];
