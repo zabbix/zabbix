@@ -29,7 +29,6 @@ Specify source IP address.
 Specify metric name (key) we want to send.
 .IP "-o, --value value"
 Specify value of the key.
-Specify metric name (key) we want to retrieve.
 .IP "-i, --input-file input_file"
 Load values from input file. Each line of file contains space delimited: <hostname> <key> <value>.
 .IP "-v, --verbose"
