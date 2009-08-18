@@ -30,7 +30,7 @@ extern char	*CONFIG_FPING6_LOCATION;
 #endif /* HAVE_IPV6 */
 extern char	*CONFIG_TMPDIR;
 
-static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout, 
+static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout,
 		char *error, int max_error_len)
 {
 	FILE		*f;
@@ -46,7 +46,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 	assert(hosts);
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_ping() [hosts_count:%d]", hosts_count);
-		
+
 	i = zbx_snprintf(params, sizeof(params), "-q -C%d", count);
 	if (0 != interval)
 		i += zbx_snprintf(params + i, sizeof(params) - i, " -p%d", interval);
@@ -56,7 +56,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		i += zbx_snprintf(params + i, sizeof(params) - i, " -t%d", timeout);
 	if (NULL != CONFIG_SOURCE_IP)
 		i += zbx_snprintf(params + i, sizeof(/*source_ip*/params) - i, " -S%s ", CONFIG_SOURCE_IP);
-		
+
 	if (access(CONFIG_FPING_LOCATION, F_OK|X_OK) == -1)
 	{
 		zbx_snprintf(error, max_error_len, "%s: [%d] %s", CONFIG_FPING_LOCATION, errno, strerror(errno));
@@ -83,9 +83,9 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 			fping = CONFIG_FPING_LOCATION;
 		else
 			fping = CONFIG_FPING6_LOCATION;
-				
+
 		zbx_snprintf(tmp, sizeof(tmp), "%s %s 2>&1 <%s",
-				fping,				
+				fping,
 				params,
 				filename);
 	}
@@ -99,11 +99,11 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 				filename);
 #else /* HAVE_IPV6 */
 	zbx_snprintf(tmp, sizeof(tmp), "%s %s 2>&1 <%s",
-			CONFIG_FPING_LOCATION,			
+			CONFIG_FPING_LOCATION,
 			params,
 			filename);
-#endif /* HAVE_IPV6 */	
-	
+#endif /* HAVE_IPV6 */
+
 	if (NULL == (f = fopen(filename, "w"))) {
 		zbx_snprintf(error, max_error_len, "%s: [%d] %s", filename, errno, strerror(errno));
 		return NOTSUPPORTED;
@@ -135,7 +135,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 				tmp);
 
 		/* 12fc::21 : [0], 76 bytes, 0.39 ms (0.39 avg, 0% loss) */
-		
+
 		host = NULL;
 
 		if (NULL != (c = strchr(tmp, ' '))) {
@@ -150,12 +150,12 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 		if (NULL == host)
 			continue;
-		
+
 		if (NULL == (c = strstr(tmp, " : ")))
 			continue;
-			
+
 		c += 3;
-		
+
 		do {
 			if (NULL != (c2 = strchr(c, ' ')))
 				*c2 = '\0';

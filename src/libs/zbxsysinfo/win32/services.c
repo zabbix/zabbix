@@ -193,7 +193,7 @@ static int	check_service_state(SC_HANDLE h_srv, int service_state)
 			break;
 		}
 	}
-	
+
 	return FAIL;
 }
 

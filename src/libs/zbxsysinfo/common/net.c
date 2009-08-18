@@ -302,40 +302,40 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	init_result(result);
 
 	if (num_param(param) > 2)
-		return SYSINFO_RET_FAIL;	
-	
+		return SYSINFO_RET_FAIL;
+
 	if(get_param(param, 1, ip, MAX_STRING_LEN) != 0)
         {
                ip[0] = '\0';
         }
 
-	/* default parameter */		
+	/* default parameter */
 	if(ip[0] == '\0')
 	{
 		strscpy(ip, "127.0.0.1");
-	}	
-		
+	}
+
 	if(get_param(param, 2, zone, MAX_STRING_LEN) != 0)
         {
                 zone[0] = '\0';
         }
 
-	/* default parameter */		
+	/* default parameter */
 	if(zone[0] == '\0')
 	{
 		strscpy(zone, "localhost");
 	}
-	
+
 	res = inet_aton(ip, &in);
 	if(res != 1)
 	{
 		SET_UI64_RESULT(result,0);
 		return SYSINFO_RET_FAIL;
 	}
-	
+
 	if (!(_res.options & RES_INIT))
 		res_init();
-	
+
 	res = res_query(zone, C_IN, T_SOA, (unsigned char *)respbuf, sizeof(respbuf));
 
 	SET_UI64_RESULT(result, res != -1 ? 1 : 0);
@@ -378,7 +378,7 @@ int	CHECK_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		{"TXT", T_TXT},
 		{NULL}
 	};
-	
+
 	typedef union {
 		HEADER		h;
 #if defined(NS_PACKETSZ)
@@ -408,7 +408,7 @@ int	CHECK_DNS_QUERY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	if (num_param(param) > 3)
 		return SYSINFO_RET_FAIL;
- 
+
 	if (get_param(param, 2, zone, sizeof(zone)) != 0)
 		*zone = '\0';
 
