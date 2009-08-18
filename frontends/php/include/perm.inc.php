@@ -668,7 +668,7 @@ function get_accessible_nodes_by_user(&$user_data,$perm,$perm_res=null,$nodeid=n
 					}
 				}
 
-				$result[$nodeid] = array_merge($db_node,$node);
+				$result[$nodeid] = zbx_array_merge($db_node,$node);
 
 				break;
 			default:
@@ -895,7 +895,7 @@ function get_accessible_nodes_by_rights(&$rights,$user_type,$perm,$perm_res=null
 					}
 				}
 
-				$result[$nodeid] = array_merge($db_node,$node);
+				$result[$nodeid] = zbx_array_merge($db_node,$node);
 
 				break;
 			default:

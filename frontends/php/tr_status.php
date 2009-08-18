@@ -595,7 +595,7 @@ include_once('include/page_header.php');
 			}
 
 			$description = expand_trigger_description_by_data(
-					array_merge($trigger, array('clock'=>$row_event['clock'])),
+					zbx_array_merge($trigger, array('clock'=>$row_event['clock'])),
 					ZBX_FLAG_EVENT);
 
 			$font = new CTag('font','yes');

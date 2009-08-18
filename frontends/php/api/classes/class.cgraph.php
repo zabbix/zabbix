@@ -71,7 +71,7 @@ class CGraph {
 			'limit'					=> null
 		);
 
-		$options = array_merge($def_options, $options);
+		$options = zbx_array_merge($def_options, $options);
 
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){

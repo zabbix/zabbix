@@ -551,7 +551,7 @@
 
 		$err = ZBX_VALID_OK;
 
-		$fields = array_merge($fields, $system_fields);
+		$fields = zbx_array_merge($fields, $system_fields);
 
 		foreach($fields as $field => $checks){
 			$err |= check_field($fields, $field,$checks);
