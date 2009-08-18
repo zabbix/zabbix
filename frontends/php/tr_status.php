@@ -436,6 +436,7 @@ include_once('include/page_header.php');
 // Hosts
 		$hosts = array_pop($trigger['hosts']);
 		$trigger['hostid'] = $hosts['hostid'];
+		$trigger['host'] = $hosts['host'];
 
 // Items
 		$items = array();
@@ -449,6 +450,9 @@ include_once('include/page_header.php');
 
 		if(!zbx_empty($trigger['url'])){
 			$description = new CLink($description, $trigger['url'], null, null, true);
+		}
+		else{
+			$description = new CSpan($description, 'link');
 		}
 
 		if($_REQUEST['show_details']){
@@ -516,33 +520,34 @@ include_once('include/page_header.php');
 // JS menu
 		$host = null;
 		$tr_desc = $description;
-		if(zbx_empty($trigger['url'])){
-			if($_REQUEST['hostid'] < 1){
-				$menus = '';
+		
+		if($_REQUEST['hostid'] < 1){
+			$menus = '';
 
-				$host_nodeid = id2nodeid($trigger['hostid']);
-				foreach($scripts_by_hosts[$trigger['hostid']] as $id => $script){
-					$script_nodeid = id2nodeid($script['scriptid']);
-					if( (bccomp($host_nodeid ,$script_nodeid ) == 0))
-						$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$trigger['hostid']."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
-				}
-
-				$menus.= "[".zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
-				$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?hostid=".$trigger['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
-
-				$menus = rtrim($menus,',');
-				$menus="show_popup_menu(event,[[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180);";
-
-				$host = new CSpan($trigger['host'],'pointer');
-				$host->setAttribute('onclick','javascript: '.$menus);
+			$host_nodeid = id2nodeid($trigger['hostid']);
+			foreach($scripts_by_hosts[$trigger['hostid']] as $id => $script){
+				$script_nodeid = id2nodeid($script['scriptid']);
+				if( (bccomp($host_nodeid ,$script_nodeid ) == 0))
+					$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$trigger['hostid']."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 			}
 
+			$menus.= "[".zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
+			$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?hostid=".$trigger['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+
+			$menus = rtrim($menus,',');
+			$menus="show_popup_menu(event,[[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180);";
+
+			$host = new CSpan($trigger['host'],'link');
+			$host->setAttribute('onclick','javascript: '.$menus);
+		}
+
+		if(zbx_empty($trigger['url'])){
 			$tr_conf_link = 'null';
 			if($admin_links){
 				$tr_conf_link = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript: redirect('triggers.php?form=update&triggerid=".$trigger['triggerid']."&hostid=".$trigger['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 			}
 
-			$tr_desc = new CSpan($description,'link');
+			$tr_desc = new CSpan($description);
 			$tr_desc->addAction('onclick',"javascript: create_mon_trigger_menu(event, ".
 											" new Array({'triggerid': '".$trigger['triggerid'].
 													"', 'lastchange': '".$trigger['lastchange']."'}, ".$tr_conf_link."),".

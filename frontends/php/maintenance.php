@@ -478,12 +478,9 @@ include_once('include/page_header.php');
 			S_DESCRIPTION
 			));
 
-// sorting
+// sorting && paging
 		order_page_result($maintenances, getPageSortField('name'), getPageSortOrder());
-
-// PAGING UPPER
 		$paging = getPagingLine($maintenances);
-		$maintenance_wdgt->addItem($paging);
 //---------
 
 		foreach($maintenances as $maintenanceid => $maintenance){
@@ -499,12 +496,6 @@ include_once('include/page_header.php');
 				$maintenance['description']
 				));
 		}
-//			$table->setFooter(new CCol(new CButtonQMessage('delete_selected',S_DELETE_SELECTED,S_DELETE_SELECTED_USERS_Q)));
-
-// PAGING FOOTER
-		$table->addRow(new CCol($paging));
-//		$items_wdgt->addItem($paging);
-//---------
 
 // goBox
 		$goBox = new CComboBox('go');
@@ -514,8 +505,13 @@ include_once('include/page_header.php');
 		$goButton = new CButton('goButton',S_GO.' (0)');
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "maintenanceids";');
+
+		$footer = get_table_header(array($goBox, SPACE, $goButton));
 //----
-		$table->setFooter(new CCol(array($goBox, $goButton)));
+
+// PAGING FOOTER
+		$table = array($paging,$table,$paging,$footer);
+//---------
 
 		$form->addItem($table);
 

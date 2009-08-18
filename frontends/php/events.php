@@ -100,7 +100,7 @@ include_once('include/page_header.php');
 
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
 		update_profile('web.events.filter.nav_time',$_REQUEST['nav_time'], PROFILE_TYPE_INT);
-		update_profile('web.events.filter.triggerid',$_REQUEST['triggerid']);
+		update_profile('web.events.filter.triggerid',$_REQUEST['triggerid'], PROFILE_TYPE_ID);
 		update_profile('web.events.filter.hide_unknown',$hide_unknown, PROFILE_TYPE_INT);
 	}
 // --------------
@@ -152,8 +152,11 @@ include_once('include/page_header.php');
 	    $available_groups= $PAGE_GROUPS['groupids'];
 		$available_hosts = $PAGE_HOSTS['hostids'];
 
-		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0) && !isset($available_triggers[$_REQUEST['triggerid']])){
-			unset($_REQUEST['triggerid']);
+		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
+			$triggers = CTrigger::get(array( 'triggerids' => $_REQUEST['triggerid'] ));
+			if(empty($triggers)){
+				unset($_REQUEST['triggerid']);
+			}
 		}
 
 		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
@@ -222,6 +225,10 @@ include_once('include/page_header.php');
 		if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
 			$options['groupids'] = $PAGE_GROUPS['selected'];
 		}
+		
+		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
+			$options['triggerids'] = $_REQUEST['triggerid'];
+		}
 
 		if($hide_unknown) $options['hide_unknown'] = 1;
 
@@ -254,7 +261,8 @@ Copt::profiling_stop('order');
 
 			$events[$eventid]['desc'] = expand_trigger_description_by_data($trigger, ZBX_FLAG_EVENT);
 
-			$event = $events[$eventid] += $trigger;
+			$events[$eventid] += $trigger;
+			$event = $events[$eventid];
 
 			$events[$eventid]['duration'] = zbx_date2age($event['clock']);
 			if($next_event = get_next_event($event,$hide_unknown)){

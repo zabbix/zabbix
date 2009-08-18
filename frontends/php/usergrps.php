@@ -40,10 +40,9 @@ include_once('include/page_header.php');
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'config'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,		NULL),
-
 		'perm_details'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
-
 		'grpaction'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
+
 /* group */
 		'usrgrpid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'isset({grpaction})&&(isset({form})&&({form}=="update"))'),
 		'group_groupid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
@@ -340,9 +339,7 @@ include_once('include/page_header.php');
 		$cmbConf->addItem('usergrps.php',S_USER_GROUPS);
 		$cmbConf->addItem('users.php',S_USERS);
 
-	$frmForm->addItem($cmbConf);
-	$frmForm->addItem(SPACE.'|'.SPACE);
-	$frmForm->addItem($btnNew = new CButton('form', S_CREATE_GROUP));
+	$frmForm->addItem(array($cmbConf,SPACE,new CButton('form', S_CREATE_GROUP)));
 	show_table_header(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
 	echo SBR;
 
@@ -415,7 +412,7 @@ include_once('include/page_header.php');
 
 			$users = array();
 			foreach($usrgrp['users'] as $userid => $user){
-				$users[] = new Clink($user['alias'],'users.php?form=update&userid='.$userid);
+				$users[] = new CLink($user['alias'],'users.php?form=update&userid='.$userid);
 				$users[] = ', ';
 			}
 			array_pop($users);
@@ -448,7 +445,7 @@ include_once('include/page_header.php');
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "group_groupid";');
 
-		$footer = get_table_header(new CCol(array($goBox, $goButton)));
+		$footer = get_table_header(array($goBox, SPACE, $goButton));
 //----
 
 // PAGING FOOTER

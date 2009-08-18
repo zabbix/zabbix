@@ -99,7 +99,7 @@
 
 	if(isset($_REQUEST['triggerid']))
 		//if(!check_right_on_trigger_by_triggerid(PERM_READ_WRITE, $_REQUEST['triggerid']))
-		if(!in_array($_REQUEST['triggerid'], $available_triggers))
+		if(!isset($available_triggers[$_REQUEST['triggerid']]))
 			access_deny();
 //----
 
@@ -615,7 +615,7 @@
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "g_triggerid";');
 
-		$footer = get_table_header(new CCol(array($goBox, $goButton)));
+		$footer = get_table_header(array($goBox, SPACE, $goButton));
 //----
 
 // PAGING FOOTER

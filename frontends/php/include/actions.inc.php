@@ -1092,27 +1092,31 @@ return $table;
 function get_action_msgs_for_event($eventid){
 
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
-	$table->SetHeader(array(
-		is_show_all_nodes() ? make_sorting_link(S_NODES,'a.alertid') : null,
-		make_sorting_link(S_TIME,'a.clock'),
-		make_sorting_link(S_TYPE,'mt.description'),
-		make_sorting_link(S_STATUS,'a.status'),
-		make_sorting_link(S_RETRIES_LEFT,'a.retries'),
-		make_sorting_link(S_RECIPIENTS,'a.sendto'),
+	$table->setHeader(array(
+		is_show_all_nodes() ? S_NODES:null,
+		S_TIME,
+		S_TYPE,
+		S_STATUS,
+		S_RETRIES_LEFT,
+		S_RECIPIENTS,
 		S_MESSAGE,
 		S_ERROR
 	));
 
 
 	$alerts = CAlert::get(array(
-		'evntids' => $eventid,
+		'eventids' => $eventid,
 		'alerttype' => ALERT_TYPE_MESSAGE,
 		'extendoutput' => 1,
 		'sortfield' => 'clock',
+		'sortorder' => ZBX_SORT_DOWN,
 		'select_mediatypes' => 1
 	));
 
-	foreach($alerts as $row){
+	foreach($alerts as $alertid => $row){
+// mediatypes
+		$mediatype = array_pop($row['mediatypes']);
+		
 		$time=date(S_DATE_FORMAT_YMDHMS,$row["clock"]);
 		if($row['esc_step'] > 0){
 			$time = array(bold(S_STEP.': '),$row["esc_step"],br(),bold(S_TIME.': '),br(),$time);
@@ -1134,8 +1138,8 @@ function get_action_msgs_for_event($eventid){
 
 		$message = array(bold(S_SUBJECT.':'),br(),$row["subject"],br(),br(),bold(S_MESSAGE.':'));
 		$msg = explode("\n",$row['message']);
-		foreach($msg as $m)
-		{
+		
+		foreach($msg as $m){
 			array_push($message, BR(), $m);
 		}
 
@@ -1146,7 +1150,6 @@ function get_action_msgs_for_event($eventid){
 			$error=new CSpan($row["error"],"on");
 		}
 
-		$mediatype = reset($row['mediatypes']);
 		$table->addRow(array(
 			get_node_name_by_elid($row['alertid']),
 			new CCol($time, 'top'),
@@ -1165,7 +1168,7 @@ return $table;
 function get_action_cmds_for_event($eventid){
 
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
-	$table->SetHeader(array(
+	$table->setHeader(array(
 		is_show_all_nodes()?S_NODES:null,
 		S_TIME,
 		S_STATUS,
@@ -1175,13 +1178,14 @@ function get_action_cmds_for_event($eventid){
 
 
 	$alerts = CAlert::get(array(
-		'evntids' => $eventid,
+		'eventids' => $eventid,
 		'alerttype' => ALERT_TYPE_COMMAND,
 		'extendoutput' => 1,
-		'sortfield' => 'clock'
+		'sortfield' => 'clock',
+		'sortorder' => ZBX_SORT_DOWN
 	));
 
-	foreach($alerts as $row){
+	foreach($alerts as $alertid => $row){
 		$time = date('Y.M.d H:i:s', $row['clock']);
 		if($row['esc_step'] > 0){
 			$time = array(bold(S_STEP.': '), $row['esc_step'], br(), bold(S_TIME.': '), br(), $time);

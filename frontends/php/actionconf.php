@@ -509,7 +509,7 @@ include_once('include/page_header.php');
 			make_sorting_header(S_STATUS,'status')
 		));
 
-// sorting
+// sorting && paging
 		order_page_result($actions, getPageSortField('name'), getPageSortOrder());
 		$paging = getPagingLine($actions);
 //-------
@@ -556,11 +556,6 @@ include_once('include/page_header.php');
 				));
 		}
 
-// PAGING FOOTER
-		$tblActions->addRow(new CCol($paging));
-//		$action_wdgt->addItem($paging);
-//---------
-
 //----- GO ------
 		$goBox = new CComboBox('go');
 		$goBox->addItem('activate',S_ENABLE_SELECTED);
@@ -572,12 +567,13 @@ include_once('include/page_header.php');
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "g_actionid";');
 
-		$footer = get_table_header(new CCol(array($goBox, $goButton)));
+		$footer = get_table_header(array($goBox, SPACE, $goButton));
 //----
 
 // PAGING FOOTER
 		$tblActions = array($paging,$tblActions,$paging,$footer);
 //---------
+
 		$form->addItem($tblActions);
 		$action_wdgt->addItem($form);
 	}
