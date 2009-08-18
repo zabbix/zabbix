@@ -296,10 +296,7 @@ include_once('include/page_header.php');
 		$cmbConf->addItem('usergrps.php', S_USER_GROUPS);
 		$cmbConf->addItem('users.php', S_USERS);
 
-	$frmForm->addItem($cmbConf);
-
-	$frmForm->addItem(SPACE.'|'.SPACE);
-	$frmForm->addItem($btnNew = new CButton('form',S_CREATE_USER));
+	$frmForm->addItem(array($cmbConf,SPACE,new CButton('form',S_CREATE_USER)));
 	show_table_header(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
 	echo SBR;
 ?>
@@ -436,7 +433,7 @@ include_once('include/page_header.php');
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "group_userid";');
 
-		$footer = get_table_header(new CCol(array($goBox, $goButton)));
+		$footer = get_table_header(array($goBox, SPACE, $goButton));
 //----
 
 // PAGING FOOTER

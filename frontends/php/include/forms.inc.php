@@ -967,19 +967,19 @@
 		$frmUser->show();
 	}
 
-	# Insert form for User Groups
+// Insert form for User Groups
 	function insert_usergroups_form(){
 		global  $USER_DETAILS;
 
 		$config = select_config();
 
 		$frm_title = S_USER_GROUP;
-		if(isset($_REQUEST["usrgrpid"])){
-			$usrgrp		= get_group_by_usrgrpid($_REQUEST["usrgrpid"]);
+		if(isset($_REQUEST['usrgrpid'])){
+			$usrgrp		= get_group_by_usrgrpid($_REQUEST['usrgrpid']);
 			$frm_title	= S_USER_GROUP.' "'.$usrgrp['name'].'"';
 		}
 
-		if(isset($_REQUEST["usrgrpid"]) && !isset($_REQUEST["form_refresh"])){
+		if(isset($_REQUEST['usrgrpid']) && !isset($_REQUEST['form_refresh'])){
 			$name	= $usrgrp['name'];
 
 			$users_status = $usrgrp['users_status'];
@@ -996,14 +996,14 @@
 			$db_users=DBselect($sql);
 
 			while($db_user=DBfetch($db_users))
-				$group_users[$db_user["userid"]] = $db_user["userid"];
+				$group_users[$db_user['userid']] = $db_user['userid'];
 
 			$group_rights = array();
 			$sql = 'SELECT r.*, n.name as node_name, g.name as name '.
 					' FROM groups g '.
 						' LEFT JOIN rights r on r.id=g.groupid '.
 						' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('g.groupid').
-					' WHERE r.groupid='.$_REQUEST["usrgrpid"];
+					' WHERE r.groupid='.$_REQUEST['usrgrpid'];
 
 			$db_rights = DBselect($sql);
 			while($db_right = DBfetch($db_rights)){
@@ -1022,14 +1022,14 @@
 			$gui_access	= get_request('gui_access',GROUP_GUI_ACCESS_SYSTEM);
 			$api_access	= get_request('api_access',GROUP_API_ACCESS_DISABLED);
 			$debug_mode	= get_request('debug_mode',GROUP_DEBUG_MODE_DISABLED);
-			$group_users	= get_request("group_users",array());
-			$group_rights	= get_request("group_rights",array());
+			$group_users	= get_request('group_users',array());
+			$group_rights	= get_request('group_rights',array());
 		}
 		$perm_details = get_request('perm_details', 0);
 
 		ksort($group_rights);
 
-		$frmUserG = new CFormTable($frm_title,'users.php');
+		$frmUserG = new CFormTable($frm_title,'usergrps.php');
 		$frmUserG->SetHelp('web.users.groups.php');
 		$frmUserG->addVar('config',get_request('config',1));
 
@@ -4260,7 +4260,7 @@
 
 	function get_act_operations_form($action=null){
 		$tblOper = new CTableInfo(S_NO_OPERATIONS_DEFINED);
-		$tblOper->setAttribute('style','background-color: #CCC;');
+		$tblOper->setAttribute('style','background-color: #AAA;');
 
 		if(isset($_REQUEST['actionid']) && empty($action)){
 			$action = get_action_by_actionid($_REQUEST['actionid']);
@@ -4275,10 +4275,11 @@
 
 
 			/* prepate operations */
-			$db_operations = DBselect('SELECT * '.
-							' FROM operations'.
-							' WHERE actionid='.$_REQUEST['actionid'].
-							' ORDER BY esc_step_from,operationtype,object,operationid');
+			$sql = 'SELECT * '.
+					' FROM operations'.
+					' WHERE actionid='.$_REQUEST['actionid'].
+					' ORDER BY esc_step_from,operationtype,object,operationid';
+			$db_operations = DBselect($sql);
 
 			while($operation_data = DBfetch($db_operations)){
 				$operation_data = array(
@@ -4295,8 +4296,8 @@
 					'evaltype'	=>	$operation_data['evaltype']);
 
 				$operation_data['opconditions'] = array();
-				$sql = 'SELECT * FROM opconditions WHERE operationid='.$operation_data['operationid'];
 
+				$sql = 'SELECT * FROM opconditions WHERE operationid='.$operation_data['operationid'];
 				$db_opconds = DBselect($sql);
 				while($db_opcond = DBfetch($db_opconds)){
 
@@ -4304,7 +4305,6 @@
 				}
 
 				$sql = 'SELECT * from opmediatypes WHERE operationid='.$operation_data['operationid'];
-
 				$db_opmtypes = DBSelect($sql);
 				if($db_opmtype = DBfetch($db_opmtypes)){
 					$operation_data['mediatypeid'] = $db_opmtype['mediatypeid'];
@@ -4332,7 +4332,7 @@
 
 		array_multisort($esc_step_from, SORT_ASC, SORT_NUMERIC, $objects_tmp, SORT_DESC, $objectids_tmp, SORT_ASC, $operations);
 
-		$tblOper->SetHeader(array(
+		$tblOper->setHeader(array(
 				new CCheckBox('all_operations',null,'checkAll("'.S_ACTION.'","all_operations","g_operationid");'),
 				isset($_REQUEST['escalation'])?S_STEPS:null,
 				S_DETAILS,

@@ -709,6 +709,9 @@ implement: function(obj){
 	this.chkboxes[obj_name].push(obj);
 
 	addListener(obj, 'click', this.check.bindAsEventListener(this), false);
+	if(obj.checked){
+		this.setGo();
+	}
 },
 
 check: function(e){

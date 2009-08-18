@@ -467,9 +467,9 @@ function array_quicksort(&$data, $sortfield, $sortorder=ZBX_SORT_UP, $level=0){
 		$value = '';
 		$compareValue = '';
 
-		$value = $row[$sortfield];
-		$compareValue = $pivot[$sortfield];
-
+		$value = strtolower($row[$sortfield]);
+		$compareValue = strtolower($pivot[$sortfield]);
+	  
 		if ($value < $compareValue) $less[$id] = $row;
 		if ($value == $compareValue) $pivotList[$id] = $row;
 		if ($value > $compareValue) $greater[$id] = $row;

@@ -92,7 +92,6 @@ include_once('include/page_header.php');
 
 		$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
 		$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
-
 		validate_group($PAGE_GROUPS,$PAGE_HOSTS, false);
 
 		$available_hosts = $PAGE_HOSTS['hostids'];
@@ -110,10 +109,10 @@ include_once('include/page_header.php');
 		return $arr;
 		}
 
-		$hosts		= zbx_array_val_inc(array_flip(array_intersect(array_keys($hosts),	$available_hosts)));
+		$hosts		= zbx_array_val_inc(array_flip(array_intersect(array_keys($hosts),		$available_hosts)));
 		$templates	= zbx_array_val_inc(array_flip(array_intersect(array_keys($templates),	array_keys($hosts))));
-		$items		= zbx_array_val_inc(array_flip(array_intersect(array_keys($items),	array_keys($hosts))));
-		$graphs		= zbx_array_val_inc(array_flip(array_intersect(array_keys($graphs),	array_keys($hosts))));
+		$items		= zbx_array_val_inc(array_flip(array_intersect(array_keys($items),		array_keys($hosts))));
+		$graphs		= zbx_array_val_inc(array_flip(array_intersect(array_keys($graphs),		array_keys($hosts))));
 		$triggers	= zbx_array_val_inc(array_flip(array_intersect(array_keys($triggers),	array_keys($hosts))));
 
 		if(count($hosts)==0) $hosts[-1] = 1;
@@ -276,6 +275,8 @@ include_once('include/page_header.php');
 //----
 			$table->setFooter(new CCol($form));
 			$table->showEnd();
+			
+			zbx_add_post_js('chkbxRange.pageGoCount = 1;');
 		}
 		else{
 /* table HOSTS */
@@ -301,6 +302,7 @@ include_once('include/page_header.php');
 // export table
 			$form = new CForm(null,'post');
 			$form->setName('hosts_export');
+			$form->addVar('groupid',$PAGE_GROUPS['selected']);
 			$form->addVar('config',$config);
 			$form->addVar('update', true);
 
@@ -341,8 +343,7 @@ include_once('include/page_header.php');
 					' FROM hosts h '.$sql_from.
 					' WHERE '.DBcondition('h.hostid',$available_hosts).
 						$sql_where.
-						' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
-					order_by('h.host,h.dns,h.ip,h.port,h.status');
+						' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')';
 
 			$result=DBselect($sql);
 			while($host=DBfetch($result)){
@@ -472,12 +473,7 @@ include_once('include/page_header.php');
 					$item_cnt,
 					$trigger_cnt,
 					$graph_cnt
-					/*,
-					array(new CCheckBox('screens['.$row['hostid'].']',
-							isset($screens[$row['hostid']]) || !isset($update),
-							NULL,true),
-						$screens)*/
-					));
+				));
 			}
 // goBox
 			$goBox = new CComboBox('go');
@@ -489,7 +485,9 @@ include_once('include/page_header.php');
 			$goButton->setAttribute('id','goButton');
 			zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
 
-			$footer = get_table_header(new CCol(array($goBox, $goButton)));
+			$footer = get_table_header(array($goBox, $goButton));
+			
+			zbx_add_post_js('chkbxRange.pageGoCount = '.$count_chkbx.';');
 //----
 
 // PAGING FOOTER

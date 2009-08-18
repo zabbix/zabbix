@@ -1203,7 +1203,7 @@ function __autoload($class_name){
 		if(empty($data)) return false;
 
 		if($preserve_keys == true){
-			array_quicksort($data, $sortfield, $sortorder);
+			$data = array_quicksort($data, $sortfield, $sortorder);
 			return true;
 		}
 

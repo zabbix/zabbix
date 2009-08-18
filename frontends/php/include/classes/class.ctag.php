@@ -122,7 +122,8 @@ class CTag extends CObject{
 	public function getAttribute($name){
 		$ret = NULL;
 		if(isset($this->attributes[$name]))
-			$ret =& $this->attributes[$name];
+			$ret = $this->attributes[$name];
+
 	return $ret;
 	}
 
