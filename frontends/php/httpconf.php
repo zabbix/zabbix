@@ -320,7 +320,7 @@ include_once('include/page_header.php');
 			}
 		}
 	}
-	$_REQUEST['steps'] = array_merge(get_request('steps',array())); /* reinitialize keys */
+	$_REQUEST['steps'] = zbx_array_merge(get_request('steps',array())); /* reinitialize keys */
 
 	$form = new CForm();
 	$form->setMethod('get');

@@ -124,7 +124,7 @@ class CHostGroup {
 			'limit'						=> null
 		);
 
-		$options = array_merge($def_options, $params);
+		$options = zbx_array_merge($def_options, $params);
 
 
 // *** ????? *** //

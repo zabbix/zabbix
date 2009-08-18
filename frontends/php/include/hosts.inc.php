@@ -974,7 +974,7 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 				'with_graphs'=>						0,
 				'only_current_node' =>				0
 			);
-	$def_options = array_merge($def_options, $options);
+	$def_options = zbx_array_merge($def_options, $options);
 
 	$config = select_config();
 
@@ -1113,7 +1113,7 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 	foreach($sql as $key => $value){
 		zbx_value2array($value);
 
-		if(isset($def_sql[$key])) $def_sql[$key] = array_merge($def_sql[$key], $value);
+		if(isset($def_sql[$key])) $def_sql[$key] = zbx_array_merge($def_sql[$key], $value);
 		else $def_sql[$key] = $value;
 	}
 
@@ -1227,7 +1227,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 				'only_current_node' =>			0,
 			);
 
-	$def_options = array_merge($def_options, $options);
+	$def_options = zbx_array_merge($def_options, $options);
 
 	$config = select_config();
 
@@ -1347,7 +1347,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 	foreach($sql as $key => $value){
 		zbx_value2array($value);
 
-		if(isset($def_sql[$key])) $def_sql[$key] = array_merge($def_sql[$key], $value);
+		if(isset($def_sql[$key])) $def_sql[$key] = zbx_array_merge($def_sql[$key], $value);
 		else $def_sql[$key] = $value;
 	}
 

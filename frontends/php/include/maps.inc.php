@@ -554,8 +554,7 @@
 				$inf = get_info_by_selementid($db_subelement["selementid"]);
 
 				foreach($inf['triggers'] as $id => $triggerid)
-					if (!in_array($triggerid, $triggers))
-						array_push($triggers, $triggerid);
+					$triggers[$triggerid] = $triggerid;
 
 				$type = $inf['type'];
 
@@ -569,17 +568,17 @@
 			}
 
 			$count = count($triggers);
-			if ($count > 0)
-			{
+			if ($count > 0){
+			
 				$tr_info[TRIGGER_VALUE_TRUE]['count'] = $count;
 
-				if ($tr_info[TRIGGER_VALUE_TRUE]['count'] == 1)
-				{
+				if ($tr_info[TRIGGER_VALUE_TRUE]['count'] == 1){
+					$tr1 = reset($triggers);
 					$db_trigger = DBfetch(DBselect('SELECT DISTINCT t.triggerid,t.priority,t.value,t.description'.
 							',t.expression,h.host FROM triggers t, items i, functions f, hosts h'.
-							' WHERE t.triggerid='.$triggers[0].' AND h.hostid=i.hostid'.
+							' WHERE t.triggerid='.$tr1.' AND h.hostid=i.hostid'.
 							' AND i.itemid=f.itemid AND f.triggerid=t.triggerid'));
-					$tr_info[TRIGGER_VALUE_TRUE]['info'] =  expand_trigger_description_by_data($db_trigger);
+					$tr_info[TRIGGER_VALUE_TRUE]['info'] = expand_trigger_description_by_data($db_trigger);
 				}
 			}
 		}

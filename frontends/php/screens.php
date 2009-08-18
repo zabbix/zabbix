@@ -78,7 +78,7 @@ include_once('include/page_header.php');
 		if('hat' == $_REQUEST['favobj']){
 			update_profile('web.screens.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
-		if(in_array($_REQUEST['favobj'],array('screenid','slideshowid'))){
+		if(str_in_array($_REQUEST['favobj'],array('screenid','slideshowid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
 				$result = add2favorites('web.favorite.screenids',$_REQUEST['favid'],$_REQUEST['favobj']);

@@ -305,7 +305,7 @@
 		$sql_from = 'history';
 		$sql_from_num = '';
 		if(!empty($items_by_type[ITEM_VALUE_TYPE_FLOAT]) || !empty($items_by_type[ITEM_VALUE_TYPE_UINT64])) {
-			$itemids_numeric = array_merge($items_by_type[ITEM_VALUE_TYPE_FLOAT], $items_by_type[ITEM_VALUE_TYPE_UINT64]);
+			$itemids_numeric = zbx_array_merge($items_by_type[ITEM_VALUE_TYPE_FLOAT], $items_by_type[ITEM_VALUE_TYPE_UINT64]);
 			$sql = 'SELECT MAX(i.history) as history, MAX(i.trends) as trends FROM items i WHERE '.DBcondition('i.itemid', $itemids_numeric);
 
 			if($table_for_numeric = DBfetch(DBselect($sql))){

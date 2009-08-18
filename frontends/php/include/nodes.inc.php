@@ -123,7 +123,7 @@
 		$def_options = array(
 			'allow_all' => 0
 		);
-		$options = array_merge($def_options, $options);
+		$options = zbx_array_merge($def_options, $options);
 
 		$result = array('selected' => 0, 'nodes' => array(), 'nodeids' => array());
 

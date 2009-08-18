@@ -72,7 +72,7 @@ class CUser {
 			'limit'						=> null
 		);
 
-		$options = array_merge($def_options, $options);
+		$options = zbx_array_merge($def_options, $options);
 
 // PERMISSION CHECK
 		if(USER_TYPE_SUPER_ADMIN == $user_type){
@@ -225,7 +225,7 @@ class CUser {
 			$access = DBselect($sql);
 
 			while($useracc = DBfetch($access)){
-				$result[$useracc['userid']] = array_merge($result[$useracc['userid']], $useracc);
+				$result[$useracc['userid']] = zbx_array_merge($result[$useracc['userid']], $useracc);
 			}
 		}
 

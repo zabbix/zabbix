@@ -627,7 +627,7 @@ if($serviceid == 1 || $serviceid == 2){
 		$res =  DBSelect($query);
 		while($row = DBFetch($res)){
 			$childs[] = $row['servicedownid'];
-			$childs = array_merge($childs, get_service_childs($row['servicedownid']));
+			$childs = zbx_array_merge($childs, get_service_childs($row['servicedownid']));
 		}
 		return $childs;
 	}

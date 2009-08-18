@@ -260,9 +260,9 @@
 		switch($new_check_type){
 			case SVC_SNMPv1:
 			case SVC_SNMPv2:
-				$external_param = array_merge($external_param, array(BR(), S_SNMP_COMMUNITY, SPACE,
+				$external_param = zbx_array_merge($external_param, array(BR(), S_SNMP_COMMUNITY, SPACE,
 						new CTextBox('new_check_snmp_community', $new_check_snmp_community)));
-				$external_param = array_merge($external_param, array(BR(), S_SNMP_OID, SPACE,
+				$external_param = zbx_array_merge($external_param, array(BR(), S_SNMP_OID, SPACE,
 						new CTextBox('new_check_key', $new_check_key), BR()));
 				$form->addVar('new_check_snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV);
 				$form->addVar('new_check_snmpv3_securityname', '');
@@ -272,9 +272,9 @@
 			case SVC_SNMPv3:
 				$form->addVar('new_check_snmp_community', '');
 
-				$external_param = array_merge($external_param, array(BR(), S_SNMP_OID, SPACE,
+				$external_param = zbx_array_merge($external_param, array(BR(), S_SNMP_OID, SPACE,
 						new CTextBox('new_check_key', $new_check_key)));
-				$external_param = array_merge($external_param, array(BR(), S_SNMPV3_SECURITY_NAME, SPACE,
+				$external_param = zbx_array_merge($external_param, array(BR(), S_SNMPV3_SECURITY_NAME, SPACE,
 						new CTextBox('new_check_snmpv3_securityname', $new_check_snmpv3_securityname)));
 
 				$cmbSecLevel = new CComboBox('new_check_snmpv3_securitylevel', $new_check_snmpv3_securitylevel);
@@ -282,11 +282,11 @@
 				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,'AuthNoPriv');
 				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,'AuthPriv');
 
-				$external_param = array_merge($external_param, array(BR(), S_SNMPV3_SECURITY_LEVEL, SPACE,
+				$external_param = zbx_array_merge($external_param, array(BR(), S_SNMPV3_SECURITY_LEVEL, SPACE,
 						$cmbSecLevel));
-				$external_param = array_merge($external_param, array(BR(), S_SNMPV3_AUTH_PASSPHRASE, SPACE,
+				$external_param = zbx_array_merge($external_param, array(BR(), S_SNMPV3_AUTH_PASSPHRASE, SPACE,
 						new CTextBox('new_check_snmpv3_authpassphrase', $new_check_snmpv3_authpassphrase)));
-				$external_param = array_merge($external_param, array(BR(), S_SNMPV3_PRIV_PASSPHRASE, SPACE,
+				$external_param = zbx_array_merge($external_param, array(BR(), S_SNMPV3_PRIV_PASSPHRASE, SPACE,
 						new CTextBox('new_check_snmpv3_privpassphrase', $new_check_snmpv3_privpassphrase), BR()));
 				break;
 			case SVC_AGENT:
@@ -295,7 +295,7 @@
 				$form->addVar('new_check_snmpv3_securityname', '');
 				$form->addVar('new_check_snmpv3_authpassphrase', '');
 				$form->addVar('new_check_snmpv3_privpassphrase', '');
-				$external_param = array_merge($external_param, array(BR(), S_KEY, SPACE,
+				$external_param = zbx_array_merge($external_param, array(BR(), S_KEY, SPACE,
 						new CTextBox('new_check_key', $new_check_key), BR()));
 				break;
 			case SVC_ICMPPING:
@@ -1278,7 +1278,7 @@
 		foreach($data as $id => $elem){
 
 // subfilter is activated
-			if(in_array($id, $subfilter)){
+			if(str_in_array($id, $subfilter)){
 				$span = new CSpan($elem['name'].' ('.$elem['count'].')', 'enabled');
 				$script = "javascript: create_var('zbx_filter', '".$subfilter_name.'['.$id."]', null, true);";
 				$span->onClick($script);
@@ -1552,14 +1552,14 @@
 			if($show_item){
 // if any of item applications are selected
 				foreach($item['applications'] as $app){
-					if(in_array($app['name'], $subfilter_apps)){
+					if(str_in_array($app['name'], $subfilter_apps)){
 						$sel_app = true;
 						break;
 					}
 				}
 
 				foreach($item['applications'] as $app){
-					if(in_array($app['name'], $subfilter_apps) || !$sel_app){
+					if(str_in_array($app['name'], $subfilter_apps) || !$sel_app){
 						$item_params['applications'][$app['name']]['count']++;
 					}
 				}
@@ -1884,7 +1884,7 @@
 					}
 				}
 
-				$applications = array_unique(array_merge($applications, get_applications_by_itemid($_REQUEST['itemid'])));
+				$applications = array_unique(zbx_array_merge($applications, get_applications_by_itemid($_REQUEST['itemid'])));
 			}
 		}
 
@@ -7071,13 +7071,13 @@
 			'extendoutput' => 1,
 			'templated_hosts' => 1,
 		);
-		if(in_array('items', $elements))
+		if(str_in_array('items', $elements))
 			$header_host_opt['select_items'] = 1;
-		if(in_array('triggers', $elements))
+		if(str_in_array('triggers', $elements))
 			$header_host_opt['select_triggers'] = 1;
-		if(in_array('graphs', $elements))
+		if(str_in_array('graphs', $elements))
 			$header_host_opt['select_graphs'] = 1;
-		if(in_array('applications', $elements))
+		if(str_in_array('applications', $elements))
 			$header_host_opt['select_applications'] = 1;
 
 		$header_host = CHost::get($header_host_opt);
@@ -7091,19 +7091,19 @@
 		}
 		$description[] = $header_host['host'];
 
-		if(in_array('items', $elements)){
+		if(str_in_array('items', $elements)){
 			$items = array(new CLink(S_ITEMS, 'items.php?hostid='.$header_host['hostid']),
 				' ('.count($header_host['itemids']).')');
 		}
-		if(in_array('triggers', $elements)){
+		if(str_in_array('triggers', $elements)){
 			$triggers = array(new CLink(S_TRIGGERS, 'triggers.php?hostid='.$header_host['hostid']),
 				' ('.count($header_host['triggerids']).')');
 		}
-		if(in_array('graphs', $elements)){
+		if(str_in_array('graphs', $elements)){
 			$graphs = array(new CLink(S_GRAPHS, 'graphs.php?hostid='.$header_host['hostid']),
 				' ('.count($header_host['graphids']).')');
 		}
-		if(in_array('applications', $elements)){
+		if(str_in_array('applications', $elements)){
 			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?hostid='.$header_host['hostid']),
 				' ('.count($header_host['applications']).')');
 		}
@@ -7113,10 +7113,10 @@
 
 			$tbl_header_host->addRow(array(
 				new CLink(bold(S_TEMPLATE_LIST), 'templates.php?templateid='.$header_host['hostid'].url_param('groupid')),
-				(in_array('applications', $elements) ? $applications : null),
-				(in_array('items', $elements) ? $items : null),
-				(in_array('triggers', $elements) ? $triggers : null),
-				(in_array('graphs', $elements) ? $graphs : null),
+				(str_in_array('applications', $elements) ? $applications : null),
+				(str_in_array('items', $elements) ? $items : null),
+				(str_in_array('triggers', $elements) ? $triggers : null),
+				(str_in_array('graphs', $elements) ? $graphs : null),
 				array(bold(S_TEMPLATE.': '), $description)
 			));
 		}
@@ -7149,10 +7149,10 @@
 
 			$tbl_header_host->addRow(array(
 				new CLink(bold(S_HOST_LIST), 'hosts.php?hostid='.$header_host['hostid'].url_param('groupid')),
-				(in_array('applications', $elements) ? $applications : null),
-				(in_array('items', $elements) ? $items : null),
-				(in_array('triggers', $elements) ? $triggers : null),
-				(in_array('graphs', $elements) ? $graphs : null),
+				(str_in_array('applications', $elements) ? $applications : null),
+				(str_in_array('items', $elements) ? $items : null),
+				(str_in_array('triggers', $elements) ? $triggers : null),
+				(str_in_array('graphs', $elements) ? $graphs : null),
 				array(bold(S_HOST.': '),$description),
 				array(bold(S_DNS.': '), $dns),
 				array(bold(S_IP.': '), $ip),

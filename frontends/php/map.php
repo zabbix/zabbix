@@ -135,7 +135,7 @@ include_once 'include/page_header.php';
 		if(!empty($triggers)){
 			$max_severity=0;
 			foreach($triggers as $id => $link_trigger){
-				$triggers[$id] = array_merge($link_trigger,get_trigger_by_triggerid($link_trigger['triggerid']));
+				$triggers[$id] = zbx_array_merge($link_trigger,get_trigger_by_triggerid($link_trigger['triggerid']));
 				if($triggers[$id]['status'] == TRIGGER_STATUS_ENABLED && $triggers[$id]['value'] == TRIGGER_VALUE_TRUE){
 					if($triggers[$id]['severity'] >= $max_severity){
 						$drawtype = $triggers[$id]['drawtype'];

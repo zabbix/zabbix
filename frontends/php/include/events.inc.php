@@ -458,7 +458,7 @@ function get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0){
 
 		$value = new CCol(trigger_value2str($row['value']), get_trigger_value_style($row['value']));
 
-		$row = array_merge($triggers[$row['triggerid']],$row);
+		$row = zbx_array_merge($triggers[$row['triggerid']],$row);
 		if((1 == $hide_unknown) && (!event_initial_time($row,$hide_unknown))) continue;
 
 		$table->AddRow(array(
