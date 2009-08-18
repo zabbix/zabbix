@@ -684,7 +684,7 @@
 			$db_user_groups = DBselect($sql);
 
 			while($db_group = DBfetch($db_user_groups)){
-				$user_groups[$db_group['usrgrpid']] = $db_group['name'];
+				$user_groups[$db_group['usrgrpid']] = $db_group['usrgrpid'];
 			}
 
 			$db_medias = DBselect('SELECT m.* FROM media m WHERE m.userid='.$userid);
@@ -798,8 +798,9 @@
 			$lstGroups = new CListBox('user_groups_to_del[]', null, 10);
 			$lstGroups->attributes['style'] = 'width: 320px';
 
-			foreach($user_groups as $groupid => $group_name){
-				$lstGroups->addItem($groupid,	$group_name);
+			$groups = CUserGroup::get(array('usrgrpids' => $user_groups, 'extendoutput' => 1));
+			foreach($groups as $groupid => $group){
+				$lstGroups->addItem($groupid, $group['name']);
 			}
 
 			$frmUser->addRow(S_GROUPS,
@@ -924,7 +925,7 @@
 			$frmUser->addSpanRow($resources_list,'right_header');
 
 			if($perm_details){
-				$group_ids = array_keys($user_groups);
+				$group_ids = array_values($user_groups);
 				if(count($group_ids) == 0) $group_ids = array(-1);
 				$db_rights = DBselect('SELECT * FROM rights r WHERE '.DBcondition('r.groupid',$group_ids));
 
@@ -1767,7 +1768,13 @@
 		$frmItem->addVar('config',get_request('config', 0));
 		$frmItem->addVar('applications_visible',1);
 
-		$hostid				= get_request('hostid',		0);
+		$hostid				= get_request('hostid',		0);		
+		$form_hostid		= get_request('hostid',		0);	
+		
+		if($form_hostid != 0){
+			$hostid = $form_hostid;
+		}		
+		
 		$description		= get_request('description','');
 		$key				= get_request('key',		'');
 		$host				= get_request('host',		null);
@@ -1920,12 +1927,12 @@
 			$frmItem->setTitle(S_ITEM." '$host:$description'");
 		}
 
-		$frmItem->addVar('hostid', $hostid);
+		$frmItem->addVar('form_hostid', $hostid);
 		$frmItem->addRow(S_HOST,array(
 			new CTextBox('host',$host,32,true),
 			new CButton("btn_host",S_SELECT,
 				"return PopUp('popup.php?dstfrm=".$frmItem->getName().
-				"&dstfld1=host&dstfld2=hostid&srctbl=hosts&srcfld1=host&srcfld2=hostid',450,450);",
+				"&dstfld1=host&dstfld2=form_hostid&srctbl=hosts&srcfld1=host&srcfld2=hostid',450,450);",
 				'H')
 			));
 
@@ -2017,7 +2024,13 @@
 		}
 		else{
 			$cmbValType = new CComboBox('value_type',$value_type,'submit()');
-			$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UNSIGNED);			$cmbValType->AddItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);			$cmbValType->AddItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);			$cmbValType->AddItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);			$cmbValType->AddItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);		}
+			$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UNSIGNED);
+			$cmbValType->AddItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);
+			$cmbValType->AddItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);
+			$cmbValType->AddItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);
+			$cmbValType->AddItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);
+		}
+		
 		$frmItem->addRow(S_TYPE_OF_INFORMATION,$cmbValType);
 
 		if ($value_type == ITEM_VALUE_TYPE_UINT64) {
@@ -2224,8 +2237,8 @@
 		$frmItem->show();
 	}
 
-	function	insert_mass_update_item_form($elements_array_name){
-		global  $USER_DETAILS;
+	function insert_mass_update_item_form($elements_array_name){
+		global $USER_DETAILS;
 
 		$frmItem = new CFormTable(S_ITEM,null,'post');
 		$frmItem->SetHelp('web.items.item.php');
