@@ -58,7 +58,9 @@ include_once('include/page_header.php');
 		'applications_visible'=>	array(T_ZBX_STR, O_OPT,  null, null,           null),
 
 		'groupid'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			null),
-		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,			'isset({save})'),
+		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,			null),
+		'form_hostid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,			'isset({save})'),
+		
 
 		'add_groupid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({register})&&({register}=="go"))'),
 		'action'=>			array(T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY,		'(isset({register})&&({register}=="go"))'),
@@ -266,7 +268,7 @@ include_once('include/page_header.php');
 		$item = array(
 				'description'	=> get_request('description'),
 				'key_'			=> get_request('key'),
-				'hostid'		=> get_request('hostid'),
+				'hostid'		=> get_request('form_hostid'),
 				'delay'			=> get_request('delay'),
 				'history'		=> get_request('history'),
 				'status'		=> get_request('status'),
@@ -299,7 +301,7 @@ include_once('include/page_header.php');
 			$result = false;
 
 			if(!zbx_empty($_REQUEST['new_application'])){
-				if($new_appid = add_application($_REQUEST['new_application'],$_REQUEST['hostid']))
+				if($new_appid = add_application($_REQUEST['new_application'],$_REQUEST['form_hostid']))
 					$applications[$new_appid] = $new_appid;
 			}
 
@@ -329,7 +331,7 @@ include_once('include/page_header.php');
 			$new_appid = true;
 			$itemid = false;
 			if(!zbx_empty($_REQUEST['new_application'])){
-				if($new_appid = add_application($_REQUEST['new_application'],$_REQUEST['hostid']))
+				if($new_appid = add_application($_REQUEST['new_application'],$_REQUEST['form_hostid']))
 					$applications[$new_appid] = $new_appid;
 			}
 
@@ -647,15 +649,13 @@ include_once('include/page_header.php');
 ?>
 <?php
 
+	$hostid = get_request('form_hostid', get_request('hostid', 0));	
 	if(!zbx_empty($_REQUEST['filter_host'])){
 		$hostid = CHost::getId(array('host' => $_REQUEST['filter_host']));
 	}
-	else{
-		$hostid = get_request('hostid', 0);
-		if($hostid > 0){
-			$_REQUEST['filter_host'] = CHost::getById(array('hostid' => $hostid));
-			$_REQUEST['filter_host'] = $_REQUEST['filter_host']['host'];
-		}
+	else if($hostid > 0){
+		$_REQUEST['filter_host'] = CHost::getById(array('hostid' => $hostid));
+		$_REQUEST['filter_host'] = $_REQUEST['filter_host']['host'];
 	}
 
 	$form = new CForm();
@@ -1002,8 +1002,7 @@ include_once('include/page_header.php');
 			));
 		}
 
-
-// }GO
+// GO{
 		$goBox = new CComboBox('go');
 		$goBox->addItem('activate',S_ACTIVATE_SELECTED);
 		$goBox->addItem('disable',S_DISABLE_SELECTED);

@@ -194,7 +194,7 @@ private $zbx2json_error_list;
 
 	private function zbx2json_error($error){
 		foreach($this->zbx2json_errors as $json_error => $zbx_errors){
-			if(in_array($error, $zbx_errors))
+			if(str_in_array($error, $zbx_errors))
 				return $json_error;
 		}
 	}
