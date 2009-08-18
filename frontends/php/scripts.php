@@ -65,37 +65,37 @@ $_REQUEST['go'] = get_request('go','none');
 validate_sort_and_sortorder('name',ZBX_SORT_UP);
 
 ?>
-<?php	
+<?php
 	if(isset($_REQUEST['action'])){
-	
+
 		if(isset($_REQUEST['save'])){
-	
+
 			$cond = (isset($_REQUEST['scriptid']))?(' AND scriptid<>'.$_REQUEST['scriptid']):('');
 			$scripts = DBfetch(DBselect('SELECT count(scriptid) as cnt FROM scripts WHERE name='.zbx_dbstr($_REQUEST['name']).$cond.' and '.DBin_node('scriptid', get_current_nodeid(false)),1));
-	
+
 			if($scripts && $scripts['cnt']>0){
 				error(S_SCRIPT.SPACE.'['.htmlspecialchars($_REQUEST['name']).']'.SPACE.S_ALREADY_EXISTS_SMALL);
 				show_messages(null,S_ERROR,S_CANNOT_ADD_SCRIPT);
 			}
 			else{
-	
+
 				if(isset($_REQUEST['scriptid'])){
 					$result = update_script($_REQUEST['scriptid'],$_REQUEST['name'],$_REQUEST['command'],$_REQUEST['usrgrpid'],$_REQUEST['groupid'],$_REQUEST['access']);
-	
+
 					show_messages($result, S_SCRIPT_UPDATED, S_CANNOT_UPDATE_SCRIPT);
 					$scriptid = $_REQUEST['scriptid'];
 					$audit_acrion = AUDIT_ACTION_UPDATE;
 				}
 				else {
 					$result = add_script($_REQUEST['name'],$_REQUEST['command'],$_REQUEST['usrgrpid'],$_REQUEST['groupid'],$_REQUEST['access']);
-	
+
 					show_messages($result, S_SCRIPT_ADDED, S_CANNOT_ADD_SCRIPT);
 					$scriptid = $result;
 					$audit_acrion = AUDIT_ACTION_ADD;
 				}
-	
+
 				add_audit_if($result,$audit_acrion,AUDIT_RESOURCE_SCRIPT,' Name ['.$_REQUEST['name'].'] id ['.$scriptid.']');
-	
+
 				if($result){
 					unset($_REQUEST['action']);
 					unset($_REQUEST['form']);
@@ -105,15 +105,15 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 		}
 		else if(isset($_REQUEST['delete'])){
 			$scriptid = get_request('scriptid', 0);
-	
+
 			$result &= delete_script($scriptid);
-	
+
 			if($result){
 				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, S_SCRIPT.' ['.$scriptid.']');
 			}
-	
+
 			show_messages($result, S_SCRIPT_DELETED, S_CANNOT_DELETE_SCRIPT);
-	
+
 			if($result){
 				unset($_REQUEST['form']);
 				unset($_REQUEST['scriptid']);
@@ -122,18 +122,18 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 	// ------ GO -----
 		else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['scripts'])){
 			$scripts = $_REQUEST['scripts'];
-	
+
 			$result = true;
 			foreach($scripts as $scriptid){
 				$result &= delete_script($scriptid);
-	
+
 				if($result){
 					add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, S_SCRIPT.' ['.$scriptid.']');
 				}
 			}
-	
+
 			show_messages($result, S_SCRIPT_DELETED, S_CANNOT_DELETE_SCRIPT);
-	
+
 			if($result){
 				unset($_REQUEST['form']);
 				unset($_REQUEST['scriptid']);
@@ -144,103 +144,103 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 <?php
 
 	$scripts_wdgt = new CWidget();
-	
+
 	$frmForm = new CForm();
 	$frmForm->setMethod('get');
 	$frmForm->addItem(new CButton('form',S_CREATE_SCRIPT,"javascript: redirect('scripts.php?form=1');"));
 	$scripts_wdgt->addPageHeader(S_SCRIPTS_CONFIGURATION_BIG, $frmForm);
 
 	if(isset($_REQUEST['form'])){
-	
+
 		$frmScr = new CFormTable(S_SCRIPT,'scripts.php','POST',null,'form');
 		$frmScr->setAttribute('id','scripts');
-	
+
 		if(isset($_REQUEST['scriptid'])) $frmScr->addVar('scriptid',$_REQUEST['scriptid']);
-	
+
 		if(!isset($_REQUEST['scriptid']) || isset($_REQUEST['form_refresh'])){
 			$name = get_request('name','');
 			$command  = get_request('command','');
-	
+
 			$usrgrpid = get_request('usrgrpid',	0);
 			$groupid = get_request('groupid',	0);
-	
+
 			$access = get_request('access',	PERM_READ_ONLY);
 		}
 
 		if(isset($_REQUEST['scriptid']) && !isset($_REQUEST['form_refresh'])){
 			$frmScr->addVar('form_refresh',get_request('form_refresh',1));
-	
+
 			if($script = get_script_by_scriptid($_REQUEST['scriptid'])){
 				$name = $script['name'];
 				$command  = $script['command'];
-	
+
 				$usrgrpid = $script['usrgrpid'];
 				$groupid = $script['groupid'];
-	
+
 				$access = $script['host_access'];
 			}
 		}
-	
+
 		$frmScr->addRow(S_NAME,new CTextBox('name',$name,80));
 		$frmScr->addRow(S_COMMAND,new CTextBox('command',$command,80));
-	
+
 		$usr_groups = new CCombobox('usrgrpid',$usrgrpid);
 		$usr_groups->addItem(0,S_ALL_S);
-		
+
 		$usrgrps = CUserGroup::get(array('extendoutput'=>1, 'sortfield'=>'name'));
-		
+
 		foreach($usrgrps as $usrgrpid => $usr_group){
 			$usr_groups->addItem($usr_group['usrgrpid'],$usr_group['name']);
 		}
-	
+
 		$frmScr->addRow(S_USER_GROUPS,$usr_groups);
-	
+
 		$host_groups = new CCombobox('groupid',$groupid);
 		$host_groups->addItem(0,S_ALL_S);
-	
+
 		$groups = CHostGroup::get(array('extendoutput' => 1, 'sortfield'=>'name'));
 		foreach($groups as $groupid => $group){
 			$host_groups->addItem($groupid,$group['name']);
 		}
-			
+
 		$frmScr->addRow(S_HOST_GROUPS,$host_groups);
-	
+
 		$select_acc = new CCombobox('access',$access);
 		$select_acc->addItem(PERM_READ_ONLY,S_READ);
 		$select_acc->addItem(PERM_READ_WRITE,S_WRITE);
-	
+
 		$frmScr->addRow(S_REQUIRED_HOST.SPACE.S_PERMISSIONS_SMALL,$select_acc);
-	
+
 		$frmScr->addItemToBottomRow(new CButton('save',S_SAVE,"javascript: document.getElementById('scripts').action+='?action=1'; "));
 		$frmScr->addItemToBottomRow(SPACE);
-		
+
 		if(isset($_REQUEST['scriptid'])) {
 			$deleteButton = new CButtonDelete(S_DELETE_SCRIPTS_Q, '&action=1&scriptid='.$_REQUEST['scriptid']);
 			$frmScr->addItemToBottomRow($deleteButton);
 			$frmScr->addItemToBottomRow(SPACE);
 		}
-		
+
 		$frmScr->addItemToBottomRow(new CButtonCancel());
 		$scripts_wdgt->addItem($frmScr);
 	}
 	else {
-	
+
 		$form = new CForm();
 		$form->setName('scripts');
 		$form->setAttribute('id','scripts');
 		$form->addVar('action','1');
-	
+
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
-	
+
 		$scripts_wdgt->addHeader(S_SCRIPTS_BIG);
 		$scripts_wdgt->addHeader($numrows);
-	
-		$options = array('extendoutput' => 1, 
-						'editable' => 1, 
+
+		$options = array('extendoutput' => 1,
+						'editable' => 1,
 						'select_groups' => 1);
 		$scripts = CScript::get($options);
-	
+
 		$table=new CTableInfo(S_NO_SCRIPTS_DEFINED);
 		$table->setHeader(array(
 				new CCheckBox('all_scripts',null,"checkAll('".$form->getName()."','all_scripts','scripts');"),
@@ -251,7 +251,7 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 				S_HOST_ACCESS
 			)
 		);
-	
+
 // sorting
 		order_page_result($scripts, getPageSortField('name'), getPageSortOrder());
 
@@ -260,21 +260,21 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 		$scripts_wdgt->addItem($paging);
 //---------
 
-		foreach($scripts as $scriptid => $script){	
+		foreach($scripts as $scriptid => $script){
 			$user_group_name = S_ALL_S;
 
 			if($script['usrgrpid'] > 0){
 				$user_group = get_group_by_usrgrpid($script['usrgrpid']);
 				$user_group_name = $user_group['name'];
 			}
-	
+
 			$host_group_name = S_ALL_S;
 			if($script['groupid'] > 0){
 				$group = array_pop($script['groups']);
 				$host_group_name = $group['name'];
 			}
-	
-	
+
+
 			$table->addRow(array(
 					new CCheckBox('scripts['.$script['scriptid'].']','no',NULL,$script['scriptid']),
 					new CLink($script['name'],'scripts.php?form=1'.'&scriptid='.$script['scriptid'].'#form'),
@@ -284,7 +284,7 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 					((PERM_READ_WRITE == $script['host_access'])?S_WRITE:S_READ)
 				));
 		}
-	
+
 
 // PAGING FOOTER
 		$table->addRow(new CCol($paging));
@@ -294,19 +294,19 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 //----- GO ------
 		$goBox = new CComboBox('go');
 		$goBox->addItem('delete',S_DELETE_SELECTED);
-	
+
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO.' (0)');
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "scripts";');
-	
+
 		$table->setFooter(new CCol(array($goBox, $goButton)));
 //----
-	
+
 		$form->addItem($table);
 		$scripts_wdgt->addItem($table);
 	}
-	
+
 	$scripts_wdgt->show();
 
 ?>

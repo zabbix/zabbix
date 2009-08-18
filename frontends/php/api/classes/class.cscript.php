@@ -72,7 +72,7 @@ class Cscript {
 
 // editable + PERMISSION CHECK
 		if((USER_TYPE_SUPER_ADMIN == $user_type) && !is_null($options['editable'])){
-			
+
 		}
 		else if(!is_null($options['editable'])){
 			return $result();
@@ -82,11 +82,11 @@ class Cscript {
 			$sql_parts['from']['r'] = 'rights r';
 			$sql_parts['from']['ug'] = 'users_groups ug';
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
-			
+
 
 			$sql_parts['where'][] = 'hg.groupid=r.id';
 			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sql_parts['where'][] = 'ug.userid='.$userid;			
+			$sql_parts['where'][] = 'ug.userid='.$userid;
 			$sql_parts['where'][] = '(hg.groupid=s.groupid OR s.groupid=0)';
 			$sql_parts['where'][] = '(ug.usrgrpid=s.usrgrpid OR s.usrgrpid=0)';
 		}
@@ -144,7 +144,7 @@ class Cscript {
 		if(!zbx_empty($options['pattern'])){
 			$sql_parts['where'][] = ' UPPER(s.name) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
 		}
-	
+
 // order
 // restrict not allowed columns for sorting
 		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
@@ -204,7 +204,7 @@ class Cscript {
 						$result[$script['scriptid']]['groupids'] = array();
 						$result[$script['scriptid']]['groups'] = array();
 					}
-					
+
 					if($options['select_hosts'] && !isset($result[$script['scriptid']]['hostids'])){
 						$result[$script['scriptid']]['hostids'] = array();
 						$result[$script['scriptid']]['hosts'] = array();
@@ -217,7 +217,7 @@ class Cscript {
 
 						$result[$script['scriptid']]['groupids'][$script['groupid']] = $script['groupid'];
 					}
-					
+
 // hostids
 					if(isset($script['hostid'])){
 						if(!isset($result[$script['scriptid']]['hostids']))
@@ -233,43 +233,43 @@ class Cscript {
 		}
 
 		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
-		
+
 // Adding Objects
 // Adding groups
 		if($options['select_groups']){
 			foreach($result as $scriptid => $script){
 				$obj_params = array('extendoutput' => 1);
-				
+
 				if($script['host_access'] == PERM_READ_WRITE){
 					$obj_params['editable'] = 1;
 				}
-				
+
 				if($script['groupid'] > 0){
 					$obj_params['groupids'] = $script['groupid'];
 				}
-				
+
 				$groups = CHostGroup::get($obj_params);
-				
+
 				$result[$scriptid]['groups'] = $groups;
 				$result[$scriptid]['groupids'] = array_keys($groups);
-			}			
+			}
 		}
-		
+
 // Adding hosts
 		if($options['select_hosts']){
 			foreach($result as $scriptid => $script){
 				$obj_params = array('extendoutput' => 1);
-				
+
 				if($script['host_access'] == PERM_READ_WRITE){
 					$obj_params['editable'] = 1;
 				}
-				
+
 				if($script['groupid'] > 0){
 					$obj_params['groupids'] = $script['groupid'];
 				}
-				
+
 				$hosts = CHost::get($obj_params);
-				
+
 				$result[$scriptid]['hosts'] = $hosts;
 				$result[$scriptid]['hostids'] = array_keys($hosts);
 			}
@@ -365,11 +365,11 @@ class Cscript {
 				$error = 'Wrong fields for host [ '.$host['host'].' ]';
 				break;
 			}
-			
+
 			$result = add_script($script['name'],$script['command'],$script['usrgrpid'],$script['groupid'],$script['host_access']);
 			if(!$result) break;
 		}
-		
+
 		$result = DBend($result);
 
 		if($result)
@@ -400,20 +400,20 @@ class Cscript {
 
 		DBstart(false);
 		foreach($scripts as $num => $script){
-		
+
 			$script_db_fields = CHost::getById($script);
 
 			if(!$script_db_fields){
 				$result = false;
 				break;
 			}
-			
+
 			if(!check_db_fields($script_db_fields, $script)){
 				$result = false;
 				$error = 'Wrong fields for host [ '.$host['host'].' ]';
 				break;
 			}
-			
+
 			$result = update_script($script['scriptid'], $script['name'],$script['command'],$script['usrgrpid'],$script['groupid'],$script['host_access']);
 			if(!$result) break;
 		}
@@ -452,12 +452,12 @@ class Cscript {
 	public static function execute($scriptid,$hostid){
 		return execute_script($scriptid,$hostid);
 	}
-	
+
 	public static function getCommand($scriptid,$hostid){
 		return script_make_command($scriptid,$hostid);
 	}
-	
-	
+
+
 	public static function getScriptsByHosts($hostids){
 		global $USER_DETAILS;
 
@@ -465,10 +465,10 @@ class Cscript {
 
 		$obj_params = array('hostids' => $hostids);
 		$hosts_read_only  = CHost::get($obj_params);
-		
+
 		$obj_params = array('editable' => 1, 'hostids' => $hostids);
 		$hosts_read_write = CHost::get($obj_params);
-	
+
 		$scripts_by_host = array();
 
 // initialize array
@@ -494,7 +494,7 @@ class Cscript {
 				else
 					$add_to_hosts = $hosts_read_only;
 			}
-	
+
 			foreach($add_to_hosts as $id => $hostid){
 				$scripts_by_host[$hostid][] = $script;
 			}

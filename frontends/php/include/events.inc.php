@@ -109,7 +109,7 @@ function first_initial_eventid($row,$hide_unknown=0){
 
 		$row['eventid'] = $eventid;
 		$row['value'] = $events[0]['value'];
-		
+
 		return first_initial_eventid($row,$hide_unknown);			// recursion!!!
 	}
 	else if(!empty($events) && ($events[0]['value'] == $row['value'])){
@@ -219,7 +219,7 @@ function get_next_event($row,$hide_unknown=0){
 			' ORDER BY e.object, e.objectid, e.eventid';
 	}
 	$rez = DBfetch(DBselect($sql,1));
-	
+
 return $rez;
 }
 
@@ -277,15 +277,15 @@ function make_small_eventlist($eventid, $trigger_data){
 
 	$curevent = CEvent::get(array('eventids' => $eventid, 'extendoutput' => 1, 'editable' => 1));
 	$curevent = reset($curevent);
-	
+
 	$events = CEvent::get(array(
-		'time_till' => $curevent['clock'], 
-		'extendoutput' => 1, 
-		'limit' => 100, 
-		'sortfield' => 'eventid', 
+		'time_till' => $curevent['clock'],
+		'extendoutput' => 1,
+		'limit' => 100,
+		'sortfield' => 'eventid',
 		'sortorder' => ZBX_SORT_DOWN
 	));
-		
+
 	foreach($events as $event){
 		if(!empty($rows) && ($rows[$count]['value'] != $event['value'])){
 			$count++;
@@ -299,7 +299,7 @@ function make_small_eventlist($eventid, $trigger_data){
 			$count++;
 		}
 		$rows[$count] = $event;
-		
+
 		if($count == 20) break;
 	}
 

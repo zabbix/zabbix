@@ -249,7 +249,7 @@
 		$right_tab->setAttribute('width','100%');
 
 		$right_tab->addRow($right_row, 'textblackwhite');
-		
+
 		$table = new CTable(NULL,'header');
 //		$table->setAttribute('border',0);
 		$table->setCellSpacing(0);

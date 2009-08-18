@@ -389,8 +389,8 @@
 		$agent		= get_request('agent', '');
 		$macros		= get_request('macros', array());
 		$steps		= get_request('steps', array());
-		
-		$authentication = get_request('authentication', HTTPTEST_AUTH_NONE); 
+
+		$authentication = get_request('authentication', HTTPTEST_AUTH_NONE);
 		$http_user	= get_request('http_user', '');
 		$http_password 	= get_request('http_password', '');
 
@@ -405,7 +405,7 @@
 			$status		= $httptest_data['status'];
 			$agent		= $httptest_data['agent'];
 			$macros		= $httptest_data['macros'];
-			
+
 			$authentication = $httptest_data['authentication'];
 			$http_user 	= $httptest_data['http_user'];
 			$http_password 	= $httptest_data['http_password'];
@@ -428,16 +428,16 @@
 			));
 
 		$form->addRow(S_NAME, new CTextBox('name', $name, 40));
-		
+
 		$cmbAuth = new CComboBox('authentication',$authentication,'submit();');
 		$cmbAuth->AddItem(HTTPTEST_AUTH_NONE,S_NONE);
 		$cmbAuth->AddItem(HTTPTEST_AUTH_BASIC,S_BASIC_AUTHENTICATION);
-		
+
 		$form->AddRow(S_BASIC_AUTHENTICATION, $cmbAuth);
 		if($authentication == HTTPTEST_AUTH_BASIC){
 			$form->AddRow(S_USER, new CTextBox('http_user', $http_user, 32));
 			$form->AddRow(S_PASSWORD, new CTextBox('http_password', $http_password, 40));
-		}		
+		}
 
 		$form->addRow(S_UPDATE_INTERVAL_IN_SEC, new CNumericBox("delay",$delay,5));
 
@@ -1269,13 +1269,13 @@
 
 		return $table;
 	}
-	
+
 /* ITEMS FILTER functions { --->>> */
 	function prepare_subfilter_output($data, $subfilter, $subfilter_name){
-	
+
 		$output = array();
 		foreach($data as $id => $elem){
-		
+
 // subfilter is activated
 			if(in_array($id, $subfilter)){
 				$span = new CSpan($elem['name'].' ('.$elem['count'].')', 'enabled');
@@ -1283,10 +1283,10 @@
 				$span->onClick($script);
 				$output[] = $span;
 			}
-// subfilter isn't activated 
+// subfilter isn't activated
 			else{
 				$script = "javascript: create_var('zbx_filter', '".$subfilter_name.'['.$id."]', '$id', true);";
-				
+
 // subfilter has 0 items
 				if($elem['count'] == 0){
 					$span = new CSpan($elem['name'].' ('.$elem['count'].')', 'inactive');
@@ -1303,15 +1303,15 @@
 					}
 					$span = new CSpan($elem['name'], 'disabled');
 					$span->onClick($script);
-						
+
 					$output[] = $span;
 					$output[] = $nspan;
-				}				
+				}
 			}
 			$output[] = ' , ';
 		}
 		array_pop($output);
-		
+
 		return $output;
 	}
 
@@ -1352,7 +1352,7 @@
 		$form->setAttribute('id','zbx_filter');
 		$form->setMethod('get');
 		$form->addVar('filter_hostid',get_request('filter_hostid',get_request('hostid')));
-		
+
 		$form->addVar('subfilter_hosts', $subfilter_hosts);
 		$form->addVar('subfilter_apps', $subfilter_apps);
 		$form->addVar('subfilter_types', $subfilter_types);
@@ -1369,11 +1369,11 @@
 		$table->setAttribute('style', 'border: 1px solid #777777; width: 100%; background-color: white;');
 		$table->setCellPadding(0);
 		$table->setCellSpacing(0);
-		
+
 // 1st col
 		$col_table1 = new CTable();
 		$col_table1->setClass('filter');
-		$col_table1->addRow(array(bold(S_HOST_GROUP.': '), 
+		$col_table1->addRow(array(bold(S_HOST_GROUP.': '),
 				array(new CTextBox('filter_group', $filter_group, 20),
 					new CButton('btn_group', S_SELECT, 'return PopUp("popup.php?dstfrm='.$form->GetName().
 						'&dstfld1=filter_group&srctbl=host_group&srcfld1=name",450,450);', 'G'))
@@ -1388,9 +1388,9 @@
 					new CButton('btn_app', S_SELECT, 'return PopUp("popup.php?dstfrm='.$form->GetName().
 						'&dstfld1=filter_application&srctbl=applications&srcfld1=name",400,300,"application");', 'A'))
 		));
-		$col_table1->addRow(array(array(bold(S_DESCRIPTION),SPACE.S_LIKE_SMALL), 
+		$col_table1->addRow(array(array(bold(S_DESCRIPTION),SPACE.S_LIKE_SMALL),
 			new CTextBox("filter_description", $filter_description, 30)));
-		$col_table1->addRow(array(array(bold(S_KEY),SPACE.S_LIKE_SMALL), 
+		$col_table1->addRow(array(array(bold(S_KEY),SPACE.S_LIKE_SMALL),
 			new CTextBox("filter_key", $filter_key, 30)));
 
 // 2nd col
@@ -1404,7 +1404,7 @@
 			ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI) as $it)
 				$cmbType->addItem($it, item_type2str($it));
 		$col_table2->addRow(array(bold(S_TYPE.': '), $cmbType));
-		
+
 		if(($filter_type != ITEM_TYPE_TRAPPER) && ($filter_type != ITEM_TYPE_HTTPTEST)){
 			$col_table2->addRow(array(bold(S_UPDATE_INTERVAL_IN_SEC),
 				new CNumericBox('filter_delay', $filter_delay, 5, null, true)));
@@ -1412,7 +1412,7 @@
 		else{
 			$col_table2->addRow(SPACE, SPACE);
 		}
-		
+
 		if(uint_in_array($filter_type, array(ITEM_TYPE_SNMPV1,ITEM_TYPE_SNMPV2C,ITEM_TYPE_SNMPV3))){
 			$col_table2->addRow(array(array(bold(S_SNMP_COMMUNITY),SPACE.S_LIKE_SMALL),
 				new CTextBox("filter_snmp_community", $filter_snmp_community, 16)));
@@ -1426,7 +1426,7 @@
 			$col_table2->addRow(array(SPACE,SPACE));
 			$col_table2->addRow(array(SPACE,SPACE));
 		}
-		
+
 // 3rd col
 		$col_table3 = new CTable();
 		$col_table3->setClass('filter');
@@ -1453,10 +1453,10 @@
 		$col_table3->addRow(array(bold(S_KEEP_HISTORY_IN_DAYS.': '), new CNumericBox('filter_history',$filter_history,8,null,true)));
 		$col_table3->addRow(array(bold(S_KEEP_TRENDS_IN_DAYS.': '), new CNumericBox('filter_trends',$filter_trends,8,null,true)));
 
-// 4th col	
+// 4th col
 		$col_table4 = new CTable();
 		$col_table4->setClass('filter');
-		
+
 		$cmbStatus = new CComboBox('filter_status',$filter_status);
 		$cmbStatus->addItem(-1,S_ALL_SMALL);
 		foreach(array(ITEM_STATUS_ACTIVE,ITEM_STATUS_DISABLED,ITEM_STATUS_NOTSUPPORTED) as $st)
@@ -1466,42 +1466,42 @@
 		$cmbBelongs->addItem(-1, S_ALL_SMALL);
 		$cmbBelongs->addItem(1, S_TEMPLATED_ITEMS);
 		$cmbBelongs->addItem(0, S_NOT_TEMPLATED_ITEMS);
-		
+
 		$cmbWithTriggers = new CComboBox('filter_with_triggers', $filter_with_triggers);
 		$cmbWithTriggers->addItem(-1, S_ALL_SMALL);
 		$cmbWithTriggers->addItem(1, S_WITH_TRIGGERS);
 		$cmbWithTriggers->addItem(0, S_WITHOUT_TRIGGERS);
-		
+
 		$col_table4->addRow(array(bold(S_STATUS.': '), $cmbStatus));
 		$col_table4->addRow(array(bold(S_TRIGGERS.': '), $cmbWithTriggers));
 		$col_table4->addRow(array(bold(S_TEMPLATE.': '), $cmbBelongs));
-		
-		
+
+
 		$table->addRow(array(
 			new CCol($col_table1, 'top'), new CCol($col_table2, 'top'), new CCol($col_table3, 'top'), new CCol($col_table4, 'top')));
-		
+
 		$reset = new CSpan( S_RESET,'biglink');
 		$reset->onClick("javascript: clearAllForm('zbx_filter');");
 		$filter = new CSpan(S_FILTER,'biglink');
 		$filter->onClick("javascript: create_var('zbx_filter', 'reset_subfilters', '1', true);");
-		
+
 		$div_buttons = new CDiv(array($filter, SPACE, SPACE, SPACE, $reset));
 		$div_buttons->setAttribute('style', 'padding: 4px 0;');
 		$footer = new CCol($div_buttons, 'center');
 		$footer->setColSpan(4);
-		
+
 		$table->addRow($footer);
 		$form->addItem($table);
 
 // } FORM FOR FILTER DISPLAY
-		
+
 // SUBFILTERS {
 		$header = get_thin_table_header('Subfilter [affects only filtered data!]');
 		$form->addItem($header);
 		$table_subfilter = new Ctable();
 		$table_subfilter->setClass('filter');
-		
-		
+
+
 // array contains subfilters and number of items in each
 		$item_params = array(
 			'hosts' => array(),
@@ -1515,10 +1515,10 @@
 			'trends' => array(),
 			'interval' => array()
 		);
-		
+
 // generate array with values for subfilters of selected items
 		foreach($items as $item){
-		
+
 			if(zbx_empty($filter_host)){
 // hosts
 				$host = reset($item['hosts']);
@@ -1535,7 +1535,7 @@
 					$item_params['hosts'][$host['hostid']]['count']++;
 				}
 			}
-			
+
 // applications
 			foreach($item['applications'] as $appid => $app){
 				if(!isset($item_params['applications'][$app['name']])){
@@ -1556,14 +1556,14 @@
 						break;
 					}
 				}
-				
+
 				foreach($item['applications'] as $app){
 					if(in_array($app['name'], $subfilter_apps) || !$sel_app){
 						$item_params['applications'][$app['name']]['count']++;
 					}
 				}
 			}
-			
+
 // types
 			if($filter_type == -1){
 				if(!isset($item_params['types'][$item['type']])){
@@ -1578,7 +1578,7 @@
 					$item_params['types'][$item['type']]['count']++;
 				}
 			}
-			
+
 			// value types
 			if($filter_value_type == -1){
 				if(!isset($item_params['value_types'][$item['value_type']])){
@@ -1593,7 +1593,7 @@
 					$item_params['value_types'][$item['value_type']]['count']++;
 				}
 			}
-			
+
 			// status
 			if($filter_status == -1){
 				if(!isset($item_params['status'][$item['status']])){
@@ -1608,7 +1608,7 @@
 					$item_params['status'][$item['status']]['count']++;
 				}
 			}
-			
+
 // template
 			if($filter_templated_items == -1){
 				if(($item['templateid'] == 0) && !isset($item_params['templated_items'][0])){
@@ -1631,7 +1631,7 @@
 					}
 				}
 			}
-			
+
 // with triggers
 			if($filter_with_triggers == -1){
 				if((count($item['triggers']) == 0) && !isset($item_params['with_triggers'][0])){
@@ -1654,7 +1654,7 @@
 					}
 				}
 			}
-			
+
 // trends
 			if(zbx_empty($filter_trends)){
 				if(!isset($item_params['trends'][$item['trends']])){
@@ -1669,7 +1669,7 @@
 					$item_params['trends'][$item['trends']]['count']++;
 				}
 			}
-			
+
 // history
 			if(zbx_empty($filter_history)){
 				if(!isset($item_params['history'][$item['history']])){
@@ -1684,7 +1684,7 @@
 					$item_params['history'][$item['history']]['count']++;
 				}
 			}
-			
+
 // interval
 			if(zbx_empty($filter_delay) && ($filter_type != ITEM_TYPE_TRAPPER)){
 				if(!isset($item_params['interval'][$item['delay']])){
@@ -1706,55 +1706,55 @@
 			$hosts_output = prepare_subfilter_output($item_params['hosts'], $subfilter_hosts, 'subfilter_hosts');
 			$table_subfilter->addRow(array(S_HOSTS, $hosts_output));
 		}
-		
+
 		if(!empty($item_params['applications']) && (count($item_params['applications']) > 1)){
 			$application_output = prepare_subfilter_output($item_params['applications'], $subfilter_apps, 'subfilter_apps');
 			$table_subfilter->addRow(array(S_APPLICATIONS, $application_output));
 		}
-		
+
 		if(($filter_type == -1) && (count($item_params['types']) > 1)){
 			$type_output = prepare_subfilter_output($item_params['types'], $subfilter_types, 'subfilter_types');
 			$table_subfilter->addRow(array(S_TYPES, $type_output));
 		}
-		
+
 		if(($filter_value_type == -1) && (count($item_params['value_types']) > 1)){
 			$value_types_output = prepare_subfilter_output($item_params['value_types'], $subfilter_value_types, 'subfilter_value_types');
 			$table_subfilter->addRow(array(S_TYPE_OF_INFORMATION, $value_types_output));
 		}
-		
+
 		if(($filter_status == -1) && (count($item_params['status']) > 1)){
 			$status_output = prepare_subfilter_output($item_params['status'], $subfilter_status, 'subfilter_status');
 			$table_subfilter->addRow(array(S_STATUS, $status_output));
 		}
-		
+
 		if(($filter_templated_items == -1) && (count($item_params['templated_items']) > 1)){
 			$templated_items_output = prepare_subfilter_output($item_params['templated_items'], $subfilter_templated_items, 'subfilter_templated_items');
 			$table_subfilter->addRow(array(S_TEMPLATE, $templated_items_output));
 		}
-		
+
 		if(($filter_with_triggers == -1) && (count($item_params['with_triggers']) > 1)){
 			$with_triggers_output = prepare_subfilter_output($item_params['with_triggers'], $subfilter_with_triggers, 'subfilter_with_triggers');
 			$table_subfilter->addRow(array(S_WITH_TRIGGERS, $with_triggers_output));
 		}
-		
+
 		if(zbx_empty($filter_history) && (count($item_params['history']) > 1)){
 			$history_output = prepare_subfilter_output($item_params['history'], $subfilter_history, 'subfilter_history');
 			$table_subfilter->addRow(array(S_HISTORY, $history_output));
 		}
-		
+
 		if(zbx_empty($filter_trends) && (count($item_params['trends']) > 1)){
 			$trends_output = prepare_subfilter_output($item_params['trends'], $subfilter_trends, 'subfilter_trends');
 			$table_subfilter->addRow(array(S_TRENDS, $trends_output));
 		}
-	
+
 		if(zbx_empty($filter_delay) && ($filter_type != ITEM_TYPE_TRAPPER) && (count($item_params['interval']) > 1)){
 			$interval_output = prepare_subfilter_output($item_params['interval'], $subfilter_interval, 'subfilter_interval');
 			$table_subfilter->addRow(array(S_INTERVAL, $interval_output));
 		}
-//} SUBFILTERS 
-		
+//} SUBFILTERS
+
 		$form->addItem($table_subfilter);
-		
+
 	return $form;
 	}
 
@@ -7038,7 +7038,7 @@
 // end of condition list preparation
 	return $tblExpFooter;
 	}
-	
+
 	/**
 	* returns Ctable object with host header
 	*
@@ -7051,25 +7051,25 @@
 	* @param array $elemnts [items, triggers, graphs, applications]
 	* @return object
 	*/
-	
+
 	function get_header_host_table($hostid, $elements){
 		$header_host_opt = array(
 			'hostids' => $hostid,
 			'extendoutput' => 1,
 			'templated_hosts' => 1,
 		);
-		if(in_array('items', $elements)) 
+		if(in_array('items', $elements))
 			$header_host_opt['select_items'] = 1;
-		if(in_array('triggers', $elements)) 
+		if(in_array('triggers', $elements))
 			$header_host_opt['select_triggers'] = 1;
-		if(in_array('graphs', $elements)) 
+		if(in_array('graphs', $elements))
 			$header_host_opt['select_graphs'] = 1;
-		if(in_array('applications', $elements)) 
+		if(in_array('applications', $elements))
 			$header_host_opt['select_applications'] = 1;
-		
+
 		$header_host = CHost::get($header_host_opt);
 		$header_host = array_pop($header_host);
-		
+
 
 		$description = array();
 		if($header_host['proxy_hostid']){
@@ -7149,7 +7149,7 @@
 			));
 		}
 		$tbl_header_host->setClass('infobox');
-		
+
 		return $tbl_header_host;
 	}
 ?>

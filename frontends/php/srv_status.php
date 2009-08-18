@@ -297,10 +297,10 @@ include_once "include/page_header.php";
 			$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
 
 			$srv_wdgt = new CWidget('hat_services', $tree->getHTML());
-			
+
 			$srv_wdgt->addPageHeader(S_IT_SERVICES_BIG, $fs_icon);
 			$srv_wdgt->addHeader(S_IT_SERVICES_BIG, $r_form);
-			
+
 			$srv_wdgt->show();
 		}
 		else {

@@ -332,7 +332,7 @@ if(isset($_REQUEST['cservices'])){
 if(isset($_REQUEST['sform'])){
 	$frmService = new CFormTable(S_SERVICE,'services_form.php','POST',null,'sform');
 	$frmService->setHelp("web.services.service.php");
-	
+
 	$frmService->SetTableClass('formlongtable formtable');
 
 //service times

@@ -441,7 +441,7 @@ include_once('include/page_header.php');
 		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
 			$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
 		}
-		
+
 		$form->addItem(array(S_GROUP.SPACE,$cmbGroups));
 
 
@@ -459,11 +459,11 @@ include_once('include/page_header.php');
 //			'sortorder' => getPageSortOrder(),
 			'limit' => ($config['search_limit']+1)
 		);
-		
+
 		if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
 			$options['groupids'] = $PAGE_GROUPS['selected'];
 		}
-	
+
 		$maintenances = CMaintenance::get($options);
 
 		$form = new CForm(null,'post');

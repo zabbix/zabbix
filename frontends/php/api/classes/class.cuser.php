@@ -73,10 +73,10 @@ class CUser {
 		);
 
 		$options = array_merge($def_options, $options);
-		
+
 // PERMISSION CHECK
 		if(USER_TYPE_SUPER_ADMIN == $user_type){
-			
+
 		}
 		else if($options['editable']){
 			return $result();
@@ -211,11 +211,11 @@ class CUser {
 		}
 
 		if($options['get_access'] != 0){
-	
+
 			foreach($result as $userid => $user){
 				$result[$userid] += array('api_access' => 0, 'gui_access' => 0, 'debug_mode' => 0, 'users_status' => 0);
 			}
-	
+
 			$sql = 'SELECT ug.userid, MAX(g.api_access) as api_access,  MAX(g.gui_access) as gui_access,
 						MAX(g.debug_mode) as debug_mode, MAX(g.users_status) as users_status'.
 					' FROM usrgrp g, users_groups ug '.
@@ -223,7 +223,7 @@ class CUser {
 						' AND g.usrgrpid=ug.usrgrpid '.
 					' GROUP BY ug.userid';
 			$access = DBselect($sql);
-	
+
 			while($useracc = DBfetch($access)){
 				$result[$useracc['userid']] = array_merge($result[$useracc['userid']], $useracc);
 			}

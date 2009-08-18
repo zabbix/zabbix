@@ -201,7 +201,7 @@ class CAlert {
 			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['actionid'] = 'a.actionid';
 			}
-			
+
 			$sql_parts['where']['ae'] = 'a.eventid=e.eventid';
 			$sql_parts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
 			$sql_parts['where'][] = DBcondition('e.objectid', $options['triggerids']);
@@ -214,10 +214,10 @@ class CAlert {
 			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['actionid'] = 'a.actionid';
 			}
-			
+
 			$sql_parts['where'][] = DBcondition('a.actionid', $options['actionids']);
 		}
-		
+
 // userids
 		if(!is_null($options['userids'])){
 			zbx_value2array($options['userids']);
@@ -225,10 +225,10 @@ class CAlert {
 			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['userid'] = 'a.userid';
 			}
-			
+
 			$sql_parts['where'][] = DBcondition('a.userid', $options['userids']);
 		}
-		
+
 // mediatypeids
 		if(!is_null($options['mediatypeids'])){
 			zbx_value2array($options['mediatypeids']);
@@ -236,7 +236,7 @@ class CAlert {
 			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['mediatypeid'] = 'a.mediatypeid';
 			}
-			
+
 			$sql_parts['where'][] = DBcondition('a.mediatypeid', $options['mediatypeids']);
 		}
 
@@ -249,7 +249,7 @@ class CAlert {
 		if(!is_null($options['sendto'])){
 			$sql_parts['where'][] = 'a.sendto='.$options['sendto'];
 		}
-		
+
 // alerttype
 		if(!is_null($options['alerttype'])){
 			$sql_parts['where'][] = 'a.alerttype='.$options['alerttype'];
@@ -276,7 +276,7 @@ class CAlert {
 
 			$sql_parts['select'] = array('COUNT(DISTINCT a.alertid) as rowscount');
 		}
-		
+
 // order
 // restrict not allowed columns for sorting
 		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
@@ -363,7 +363,7 @@ class CAlert {
 
 						$result[$alert['alertid']]['mediatypeids'][$alert['mediatypeid']] = $alert['mediatypeid'];
 					}
-					
+
 					$result[$alert['alertid']] += $alert;
 				}
 			}
@@ -380,7 +380,7 @@ class CAlert {
 			$obj_params = array('extendoutput' => 1, 'userids' => $userids);
 			$users = CUser::get($obj_params);
 		}
-		
+
 // Adding MediaTypes
 		if($options['select_mediatypes']){
 			$sql = 'SELECT mt.* FROM media_type mt WHERE '.DBcondition('mt.mediatypeid', $mediatypeids);
@@ -389,13 +389,13 @@ class CAlert {
 				$mediatypes[$media['mediatypeid']] = $media;
 			}
 		}
-		
+
 		foreach($result as $alertid => $alert){
 			if(isset($mediatypes[$alert['mediatypeid']])){
 				$result[$alertid]['mediatypeids'][$alert['mediatypeid']] = $alert['mediatypeid'];
 				$result[$alertid]['mediatypes'][$alert['mediatypeid']] = $mediatypes[$alert['mediatypeid']];
 			}
-			
+
 			if(isset($users[$alert['userid']])){
 				$result[$alertid]['userids'][$alert['userid']] = $alert['userid'];
 				$result[$alertid]['users'][$alert['userid']] = $users[$alert['userid']];
@@ -488,7 +488,7 @@ class CAlert {
  */
 	public static function delete($alertids){
 		zbx_value2array($alertids);
-		
+
 		$sql = 'DELETE FROM alerts WHERE '.DBcondition('alertid', $alertids);
 		$result = DBexecute($sql);
 		if($result)

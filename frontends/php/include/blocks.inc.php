@@ -434,7 +434,7 @@ function make_latest_issues($params = array()){
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
 
 	$scripts_by_hosts = CScript::getScriptsByHosts($available_hosts);
-	
+
 
 	$config=select_config();
 

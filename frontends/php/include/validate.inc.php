@@ -530,7 +530,7 @@
 		'switch_node'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
 		'triggers_hash'=>	array(T_ZBX_STR, O_OPT,	P_SYS,	NOT_EMPTY,	NULL),
 		'print'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	IN('1'),	NULL),
-		
+
 // paging
 		'start'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	NULL,		NULL),
 

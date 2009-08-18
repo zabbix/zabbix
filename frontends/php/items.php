@@ -205,7 +205,7 @@ include_once('include/page_header.php');
 	$_REQUEST['filter_status']			= get_request('filter_status');
 	$_REQUEST['filter_templated_items']			= get_request('filter_templated_items', -1);
 	$_REQUEST['filter_with_triggers']	= get_request('filter_with_triggers', -1);
-	
+
 	/* SUBFILTERS { --->>> */
 	$subfilters = array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status',
 		'subfilter_templated_items', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval', 'subfilter_history', 'subfilter_trends');
@@ -643,7 +643,7 @@ include_once('include/page_header.php');
 		show_messages($result, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
 
 	}
-	
+
 ?>
 <?php
 
@@ -693,20 +693,20 @@ include_once('include/page_header.php');
 		insert_copy_elements_to_forms('group_itemid');
 	}
 	else{
-		
+
 		$show_host = true;
-		
+
 		$items_wdgt = new CWidget();
-		
+
 // Items Header
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
 
 		$items_wdgt->addHeader(S_ITEMS_BIG, SPACE);
-		$items_wdgt->addHeader($numrows, SPACE);	
+		$items_wdgt->addHeader($numrows, SPACE);
 // ----------------
-		
-// Items Filter{ 
+
+// Items Filter{
 		$options = array(
 			'filter' => 1,
 			'extendoutput' => 1,
@@ -752,10 +752,10 @@ include_once('include/page_header.php');
 
 		if(!zbx_empty($_REQUEST['filter_value_type']) && $_REQUEST['filter_value_type'] != -1)
 			$options['valuetype'] = $_REQUEST['filter_value_type'];
-			
+
 		if(!zbx_empty($_REQUEST['filter_data_type']) && $_REQUEST['filter_data_type'] != -1)
 			$options['data_type'] = $_REQUEST['filter_data_type'];
-			
+
 		if(!zbx_empty($_REQUEST['filter_delay']))
 			$options['delay'] = $_REQUEST['filter_delay'];
 
@@ -767,10 +767,10 @@ include_once('include/page_header.php');
 
 		if(!zbx_empty($_REQUEST['filter_status']) && $_REQUEST['filter_status'] != -1)
 			$options['status'] = $_REQUEST['filter_status'];
-			
+
 		if(!zbx_empty($_REQUEST['filter_templated_items']) && $_REQUEST['filter_templated_items'] != -1)
 			$options['templated_items'] = $_REQUEST['filter_templated_items'];
-			
+
 		if(!zbx_empty($_REQUEST['filter_with_triggers']) && $_REQUEST['filter_with_triggers'] != -1)
 			$options['with_triggers'] = $_REQUEST['filter_with_triggers'];
 
@@ -781,7 +781,7 @@ include_once('include/page_header.php');
 			$items = array();
 		else
 			$items = CItem::get($options);
-		
+
 // Header Host
 		if($hostid > 0){
 			$tbl_header_host = get_header_host_table($hostid, array('triggers', 'applications', 'graphs'));
@@ -810,15 +810,15 @@ include_once('include/page_header.php');
 			S_APPLICATIONS,
 			S_ERROR
 		));
-		
+
 /* SET VALUES FOR SUBFILTERS { --->>> */
 // if any of subfilters = false then item shouldnt be shown
 		foreach($items as $itemid => $item){
 			$items[$itemid]['subfilters'] = array();
-			
-			$items[$itemid]['subfilters']['subfilter_hosts'] = 
+
+			$items[$itemid]['subfilters']['subfilter_hosts'] =
 				(empty($_REQUEST['subfilter_hosts']) || (boolean)array_intersect($_REQUEST['subfilter_hosts'], $item['hostids']));
-				
+
 			$items[$itemid]['subfilters']['subfilter_apps'] = false;
 			if(empty($_REQUEST['subfilter_apps'])){
 				$items[$itemid]['subfilters']['subfilter_apps'] = true;
@@ -831,39 +831,39 @@ include_once('include/page_header.php');
 					}
 				}
 			}
-				
-			$items[$itemid]['subfilters']['subfilter_types'] = 
+
+			$items[$itemid]['subfilters']['subfilter_types'] =
 				(empty($_REQUEST['subfilter_types']) || uint_in_array($item['type'], $_REQUEST['subfilter_types']));
-				
+
 			$items[$itemid]['subfilters']['subfilter_value_types'] =
 				(empty($_REQUEST['subfilter_value_types']) || uint_in_array($item['value_type'], $_REQUEST['subfilter_value_types']));
 
 			$items[$itemid]['subfilters']['subfilter_status'] =
 				(empty($_REQUEST['subfilter_status']) || uint_in_array($item['status'], $_REQUEST['subfilter_status']));
-				
+
 			$items[$itemid]['subfilters']['subfilter_templated_items'] =
 				(empty($_REQUEST['subfilter_templated_items']) || (($item['templateid'] == 0) && uint_in_array(0, $_REQUEST['subfilter_templated_items']))
 				|| (($item['templateid'] > 0) && uint_in_array(1, $_REQUEST['subfilter_templated_items'])));
-				
+
 			$items[$itemid]['subfilters']['subfilter_with_triggers'] =
 				(empty($_REQUEST['subfilter_with_triggers']) || ((count($item['triggerids']) == 0) && uint_in_array(0, $_REQUEST['subfilter_with_triggers']))
 				|| ((count($item['triggerids']) > 0) && uint_in_array(1, $_REQUEST['subfilter_with_triggers'])));
-				
+
 			$items[$itemid]['subfilters']['subfilter_history'] =
 				(empty($_REQUEST['subfilter_history']) || uint_in_array($item['history'], $_REQUEST['subfilter_history']));
-				
+
 			$items[$itemid]['subfilters']['subfilter_trends'] =
 				(empty($_REQUEST['subfilter_trends']) || uint_in_array($item['trends'], $_REQUEST['subfilter_trends']));
-				
+
 			$items[$itemid]['subfilters']['subfilter_interval'] =
 				(empty($_REQUEST['subfilter_interval']) || uint_in_array($item['delay'], $_REQUEST['subfilter_interval']));
 		}
 // } SET VALUES FOR SUBFILTERS
 
-// Add filter form 
+// Add filter form
 // !!! $items must contain all selected items with [subfilters] values !!!
 		$items_wdgt->addFlicker(get_item_filter_form($items), get_profile('web.items.filter.state', 0));
-	
+
 // Subfilter out items
 		foreach($items as $itemid => $item){
 			foreach($item['subfilters'] as $subfilter => $value){
@@ -872,13 +872,13 @@ include_once('include/page_header.php');
 		}
 
 // sorting && paging
-// !!! should go after we subfiltered out items !!! 
+// !!! should go after we subfiltered out items !!!
 		order_page_result($items, getPageSortField('description'), getPageSortOrder());
 		$paging = getPagingLine($items);
 //---------
 
 		foreach($items as $itemid => $item){
-			
+
 			if($show_host){
 				$host = array_pop($item['hosts']);
 				$host = $host['host'];
@@ -898,7 +898,7 @@ include_once('include/page_header.php');
 			$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$itemid.'&go='.
 				($item['status']?'activate':'disable'), item_status2style($item['status'])));
 
-			
+
 			if(zbx_empty($item['error'])){
 				$error = new CDiv(SPACE, 'iconok');
 			}
@@ -907,7 +907,7 @@ include_once('include/page_header.php');
 				$error->setHint($item['error'], '', 'on');
 			}
 
-			
+
 			if(empty($item['applications'])){
 				$applications = '-';
 			}
@@ -1001,7 +1001,7 @@ include_once('include/page_header.php');
 				$error
 			));
 		}
-		
+
 
 // }GO
 		$goBox = new CComboBox('go');

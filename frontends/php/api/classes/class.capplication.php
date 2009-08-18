@@ -235,7 +235,7 @@ class CApplication {
 				}
 			}
 		}
-		
+
 		if(is_null($options['extendoutput'])) return $result;
 
 // Adding Objects

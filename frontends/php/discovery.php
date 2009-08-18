@@ -90,7 +90,7 @@ include_once('include/page_header.php');
 	$r_form->addItem(array(S_DISCOVERY_RULE.SPACE,$cmbDRules));
 
 //	$dscvry_wdgt->addHeader(array(S_FOUND.': ',$numrows), $r_form);
-	
+
 	$numrows = new CDiv();
 	$numrows->setAttribute('name', 'numrows');
 

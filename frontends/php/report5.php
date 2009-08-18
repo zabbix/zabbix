@@ -40,7 +40,7 @@ include_once('include/page_header.php');
 ?>
 <?php
 	$rprt_wdgt = new CWidget();
-	
+
 	$_REQUEST['period'] = get_request('period', 'day');
 	$admin_links = (($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN) || ($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN));
 
@@ -81,7 +81,7 @@ include_once('include/page_header.php');
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
 	$scripts_by_hosts = CScript::getScriptsByHosts($available_hosts);
-	
+
 	$triggers = array();
 	$triggerids = array();
 	$sql = 'SELECT h.host, h.hostid, t.triggerid, t.description, t.expression, t.lastchange, t.priority, count(distinct e.eventid) as cnt_event '.

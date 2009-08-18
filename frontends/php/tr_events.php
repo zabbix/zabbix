@@ -67,7 +67,7 @@
 	}
 //--------
 
-	
+
 	$trigger = CTrigger::get(array('triggerids' => $_REQUEST['triggerid'], 'extendoutput' => 1, 'select_hosts' => 1));
 	if(!$trigger){
 		access_deny();
@@ -76,14 +76,14 @@
 		$trigger = reset($trigger);
 		$trigger['host'] = reset($trigger['hosts']);
 		$trigger['host'] = $trigger['host']['host'];
-	}		
+	}
 
 	$trigger['exp_expr'] = explode_exp($trigger['expression'], 1);
 	$trigger['exp_desc'] = expand_trigger_description_by_data($trigger);
-	
+
 	$tr_event_wdgt = new CWidget();
 	$tr_event_wdgt->setClass('header');
-	
+
 // Main widget header
 	$text = array(S_EVENTS_BIG.': "'.$trigger['exp_desc'].'"');
 
@@ -176,7 +176,7 @@
 
 	$tr_event_wdgt->addItem($outer_table);
 	$tr_event_wdgt->show();
-	
+
 ?>
 <?php
 include_once('include/page_footer.php');

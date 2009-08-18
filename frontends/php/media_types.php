@@ -124,27 +124,27 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-	$medias_wdgt = new CWidget(); 
-	
+	$medias_wdgt = new CWidget();
+
 	$form = new CForm();
 	$form->setMethod('get');
 
 	$form->addItem(new CButton('form',S_CREATE_MEDIA_TYPE));
-	
+
 	$medias_wdgt->addPageHeader(S_CONFIGURATION_OF_MEDIA_TYPES_BIG, $form);
 
 ?>
 <?php
 	if(isset($_REQUEST['form'])){
-	
+
 		$medias_wdgt->addItem(insert_media_type_form());
 	}
 	else{
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
 
-		$medias_wdgt->addHeader(S_MEDIA_TYPES_BIG); 
-//		$medias_wdgt->addHeader($numrows); 
+		$medias_wdgt->addHeader(S_MEDIA_TYPES_BIG);
+//		$medias_wdgt->addHeader($numrows);
 
 		$form = new CForm();
 		$form->setName('frm_media_types');
@@ -219,7 +219,7 @@ include_once('include/page_header.php');
 
 		$medias_wdgt->addItem($form);
 	}
-	
+
 	$medias_wdgt->show();
 ?>
 

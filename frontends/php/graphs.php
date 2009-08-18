@@ -417,7 +417,7 @@ include_once('include/page_header.php');
 	else {
 /* Table HEADER */
 		$graphs_wdgt = new CWidget();
-		
+
 		if(isset($_REQUEST['graphid']) && ($_REQUEST['graphid']==0)){
 			unset($_REQUEST['graphid']);
 		}
@@ -464,8 +464,8 @@ include_once('include/page_header.php');
 			S_HEIGHT,
 			make_sorting_header(S_GRAPH_TYPE,'graphtype')));
 
-		$options = array('editable' => 1, 
-						'extendoutput' => 1, 
+		$options = array('editable' => 1,
+						'extendoutput' => 1,
 						'select_hosts' => 1,
 						'limit' => ($config['search_limit']+1));
 
@@ -475,7 +475,7 @@ include_once('include/page_header.php');
 		else if($PAGE_GROUPS['selected'] > 0){
 			$options['groupids'] = $PAGE_GROUPS['selected'];
 		}
-		
+
 		$graphs = CGraph::get($options);
 
 // sorting

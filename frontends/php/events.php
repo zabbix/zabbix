@@ -52,7 +52,7 @@ include_once('include/page_header.php');
 		'groupid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
 		'hostid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
 		'triggerid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
-		
+
 		'nav_time'=>		array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
 
 		'load'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
@@ -218,11 +218,11 @@ include_once('include/page_header.php');
 		if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
 			$options['hostids'] = $PAGE_HOSTS['selected'];
 		}
-			
+
 		if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
 			$options['groupids'] = $PAGE_GROUPS['selected'];
 		}
-		
+
 		if($hide_unknown) $options['hide_unknown'] = 1;
 
 		$events = CEvent::get($options);
@@ -239,7 +239,7 @@ include_once('include/page_header.php');
 				($config['event_ack_enable'])?S_ACK:NULL,
 				S_ACTIONS
 			));
-			
+
 // sorting
 Copt::profiling_start('order');
 		order_page_result($events, getPageSortField('eventid'), getPageSortOrder());

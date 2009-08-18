@@ -41,9 +41,9 @@ include_once('include/page_header.php');
 
 	$rprt_wdgt->addHeader(S_REPORT_BIG);
 	$rprt_wdgt->addItem(BR());
-	
+
 	$rprt_wdgt->addItem(make_status_of_zbx());
-	
+
 	$rprt_wdgt->show();
 ?>
 <?php

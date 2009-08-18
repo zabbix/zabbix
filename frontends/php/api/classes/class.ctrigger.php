@@ -208,7 +208,7 @@ class CTrigger {
 			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['applicationid'] = 'a.applicationid';
 			}
-			
+
 			$sql_parts['from']['f'] = 'functions f';
 			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['from']['a'] = 'applications a';
@@ -251,7 +251,7 @@ class CTrigger {
 				if(!is_null($options['extendoutput'])){
 					$sql_parts['select']['name'] = 'g.name';
 				}
-	
+
 				$sql_parts['from']['f'] = 'functions f';
 				$sql_parts['from']['i'] = 'items i';
 				$sql_parts['from']['hg'] = 'hosts_groups hg';
@@ -281,12 +281,12 @@ class CTrigger {
 
 // only_true
 			if(!is_null($options['only_true'])){
-			
+
 				$sql_parts['where'][] = '((t.value='.TRIGGER_VALUE_TRUE.')'.
 										' OR '.
 										'((t.value='.TRIGGER_VALUE_FALSE.') AND (('.time().'-t.lastchange)<'.TRIGGER_FALSE_PERIOD.')))';
 			}
-			
+
 // severity
 			if(!is_null($options['severity'])){
 				$sql_parts['where'][] = 't.priority>='.$options['severity'];
@@ -554,12 +554,12 @@ class CTrigger {
 				break;
 			}
 
-			$triggerid = add_trigger($trigger['expression'], 
-									$trigger['description'], 
-									$trigger['type'], 
+			$triggerid = add_trigger($trigger['expression'],
+									$trigger['description'],
+									$trigger['type'],
 									$trigger['priority'],
-									$trigger['status'], 
-									$trigger['comments'], 
+									$trigger['status'],
+									$trigger['comments'],
 									$trigger['url']
 									);
 			if(!$triggerid) break;
