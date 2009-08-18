@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,8 +68,8 @@ function add_var_to_opener_obj(obj,name,value){
 form = window.opener.document.forms['<?php echo $dstfrm; ?>'];
 <!--
 <?php
-		foreach($new_groups as $id => $name){
-			echo 'add_var_to_opener_obj(form,"new_groups['.$id.']","'.$name.'")'."\r";
+		foreach($new_groups as $id){
+			echo 'add_var_to_opener_obj(form,"new_groups['.$id.']","'.$id.'")'."\r";
 		}
 ?>
 if(form){
@@ -95,7 +95,7 @@ if(form){
 	$result = DBselect('select * from usrgrp where '.DBin_node('usrgrpid').' order by name');
 	while($row = DBfetch($result)){
 		$table->addRow(array(
-			new CCheckBox('new_groups['.$row['usrgrpid'].']',isset($new_groups[$row['usrgrpid']]),NULL,$row['name']),
+			new CCheckBox('new_groups['.$row['usrgrpid'].']',isset($new_groups[$row['usrgrpid']]),NULL,$row['usrgrpid']),
 			$row['name']
 		));
 	}

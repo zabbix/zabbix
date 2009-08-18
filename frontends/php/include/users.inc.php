@@ -107,7 +107,7 @@
 
 		if($result){
 //			$result = DBexecute('DELETE FROM users_groups WHERE userid='.$userid);
-			foreach($user['user_groups'] as $groupid => $group_pname){
+			foreach($user['user_groups'] as $groupid){
 				if(!$result) break;
 				$users_groups_id = get_dbid("users_groups","id");
 				$result = DBexecute('INSERT INTO users_groups (id,usrgrpid,userid)'.
@@ -180,7 +180,7 @@
 
 		if($result && !is_null($user['user_groups'])){
 			$result = DBexecute('DELETE FROM users_groups WHERE userid='.$userid);
-			foreach($user['user_groups'] as $groupid => $group_name){
+			foreach($user['user_groups'] as $groupid){
 				if(!$result) break;
 				$users_groups_id = get_dbid('users_groups', 'id');
 				$result = DBexecute('INSERT INTO users_groups (id, usrgrpid, userid)'.
