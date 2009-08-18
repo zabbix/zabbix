@@ -70,7 +70,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 	assert(value_ui64 || value_dbl);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_value()");
-	
+
 	if (0 != CONFIG_REFRESH_UNSUPPORTED)
 		zbx_snprintf(istatus, sizeof(istatus), "%d,%d",
 				ITEM_STATUS_ACTIVE,
@@ -86,11 +86,11 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 			CONFIG_PINGER_FORKS,
 			pinger_num - 1,
 			HOST_STATUS_MONITORED,
-			itemid,			
+			itemid,
 			istatus,
 			ITEM_TYPE_SIMPLE,
 			/*tp->time*/now,
-			HOST_MAINTENANCE_STATUS_OFF, 
+			HOST_MAINTENANCE_STATUS_OFF,
 			MAINTENANCE_TYPE_NORMAL,
 			DBnode_local("h.hostid"));
 
@@ -142,7 +142,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 				DCadd_nextcheck(&item, /*(time_t)tp->time*/now, 0, NULL);
 
 			free_result(&value);
-		}		
+		}
 	}
 	DBfree_result(result);
 }
@@ -168,12 +168,12 @@ static void process_values(icmpitem_t *items, int first_index, int last_index, Z
 	int 	i, h;
 	zbx_uint64_t	value_uint64;
 	double			value_dbl;
-	
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_values()");	
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_values()");
 
 	if (0 != CONFIG_DBSYNCER_FORKS)
 		DCinit_nextchecks();
-	
+
 	for (h = 0; h < hosts_count; h++)
 	{
 		if (ping_result == NOTSUPPORTED)
@@ -211,17 +211,17 @@ static void process_values(icmpitem_t *items, int first_index, int last_index, Z
 				}
 			}
 	}
-	
+
 	if (0 != CONFIG_DBSYNCER_FORKS)
 		DCflush_nextchecks();
 }
 
-static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *icmpping, char **addr, 
+static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *icmpping, char **addr,
 		int *count, int *interval, int *size, int *timeout, icmppingsec_type_t *type)
 {
 	char	cmd[MAX_STRING_LEN], params[MAX_STRING_LEN], buffer[MAX_STRING_LEN];
 	int	num_params;
-	
+
 	if (0 == parse_command(key, cmd, sizeof(cmd), params, sizeof(params)))
 		return NOTSUPPORTED;
 
@@ -326,7 +326,7 @@ static int	get_icmpping_nearestindex(icmpitem_t *items, int items_count, int cou
 	}
 }
 
-static void	add_icmpping_item(icmpitem_t **items, int *items_alloc, int *items_count, int count, int interval, 
+static void	add_icmpping_item(icmpitem_t **items, int *items_alloc, int *items_count, int count, int interval,
 		int size, int timeout, zbx_uint64_t itemid, char *addr, icmpping_t icmpping, icmppingsec_type_t type)
 {
 	int		index;
@@ -386,10 +386,10 @@ static void	get_pinger_hosts(icmpitem_t **items, int *items_alloc, int *items_co
 	int			count, interval, size, timeout;
 	icmpping_t		icmpping;
 	icmppingsec_type_t	type;
-	zbx_uint64_t		itemid;	
+	zbx_uint64_t		itemid;
 
 	memset(&item, '\0', sizeof(DB_ITEM));
-	
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In get_pinger_hosts()");
 
 	if (0 != CONFIG_REFRESH_UNSUPPORTED)
@@ -399,12 +399,12 @@ static void	get_pinger_hosts(icmpitem_t **items, int *items_alloc, int *items_co
 	else
 		zbx_snprintf(istatus, sizeof(istatus), "%d",
 				ITEM_STATUS_ACTIVE);
-				
+
 	result = DBselect("select i.itemid,i.key_,case when h.useip=1 then h.ip else h.dns end"
 			" from hosts h,items i where " ZBX_SQL_MOD(h.hostid,%d) "=%d"
 			" and i.hostid=h.hostid and h.proxy_hostid=0 and h.status=%d and i.key_ like '%s%%'"
 			" and i.type=%d and i.status in (%s) and i.nextcheck<=%d"
-			" and (h.maintenance_status=%d or h.maintenance_type=%d)" DB_NODE, 
+			" and (h.maintenance_status=%d or h.maintenance_type=%d)" DB_NODE,
 			CONFIG_PINGER_FORKS,
 			pinger_num - 1,
 			HOST_STATUS_MONITORED,
@@ -415,7 +415,7 @@ static void	get_pinger_hosts(icmpitem_t **items, int *items_alloc, int *items_co
 			HOST_MAINTENANCE_STATUS_OFF,
 			MAINTENANCE_TYPE_NORMAL,
 			DBnode_local("h.hostid"));
-			
+
 	while (NULL != (row = DBfetch(result))) {
 		itemid = zbx_atoui64(row[0]);
 
@@ -424,16 +424,16 @@ static void	get_pinger_hosts(icmpitem_t **items, int *items_alloc, int *items_co
 		else
 		{
 			item.itemid = itemid;
-			DBbegin();			
+			DBbegin();
 			DBupdate_item_status_to_notsupported(&item, now, NULL);
 			DBcommit();
 			memset(&item, '\0', sizeof(DB_ITEM));
 		}
 	}
-	
+
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of get_pinger_hosts():%d", *items_count);	
+	zabbix_log(LOG_LEVEL_DEBUG, "End of get_pinger_hosts():%d", *items_count);
 }
 
 /******************************************************************************
@@ -466,11 +466,11 @@ static int get_minnextcheck()
 				ITEM_STATUS_NOTSUPPORTED);
 	else
 		zbx_snprintf(istatus, sizeof(istatus), "%d",
-				ITEM_STATUS_ACTIVE);	
-	
+				ITEM_STATUS_ACTIVE);
+
 	result = DBselect("select count(*),min(i.nextcheck) from items i,hosts h where " ZBX_SQL_MOD(h.hostid,%d) "=%d"
 			" and h.status=%d and h.hostid=i.hostid and h.proxy_hostid=0 and i.key_ like '%s%%'"
-			" and i.type=%d and i.status in (%s) and (h.maintenance_status=%d or h.maintenance_type=%d)" DB_NODE, 
+			" and i.type=%d and i.status in (%s) and (h.maintenance_status=%d or h.maintenance_type=%d)" DB_NODE,
 			CONFIG_PINGER_FORKS,
 			pinger_num - 1,
 			HOST_STATUS_MONITORED,
@@ -526,7 +526,7 @@ static void	add_pinger_host(ZBX_FPING_HOST **hosts, int *hosts_alloc, int *hosts
 		if (0 == strcmp(addr, (*hosts)[i].addr))
 			return;
 
-	(*hosts_count)++;	
+	(*hosts_count)++;
 
 	if (*hosts_alloc < *hosts_count)
 	{
@@ -562,7 +562,7 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
 	static ZBX_FPING_HOST	*hosts = NULL;
 	static int		hosts_alloc = 4;
 	int			hosts_count = 0;
-	
+
 	/*struct timeb	tp;*/
 	int	now;
 
@@ -570,7 +570,7 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
 
 	if (NULL == hosts)
 		hosts = zbx_malloc(hosts, sizeof(ZBX_FPING_HOST) * hosts_alloc);
-	
+
 	for (i = 0; i < items_count; i++)
 	{
 		add_pinger_host(&hosts, &hosts_alloc, &hosts_count, items[i].addr);
@@ -610,19 +610,19 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
  *                                                                            *
  ******************************************************************************/
 void main_pinger_loop(zbx_process_t p, int num)
-{	
+{
 	int			now, nextcheck, sleeptime;
 	double			sec;
 	static icmpitem_t	*items = NULL;
 	static int		items_alloc = 4;
 	int			items_count = 0;
-	
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_pinger_loop(num:%d)",
 			num);
 
 	zbx_process = p;
-	pinger_num = num;	
-	
+	pinger_num = num;
+
 	if (NULL == items)
 		items = zbx_malloc(items, sizeof(icmpitem_t) * items_alloc);
 
@@ -634,10 +634,10 @@ void main_pinger_loop(zbx_process_t p, int num)
 	{
 		now = time(NULL);
 		sec = zbx_time();
-		
+
 		get_pinger_hosts(&items, &items_alloc, &items_count, now);
 		process_pinger_hosts(items, items_count);
-		
+
 		sec = zbx_time() - sec;
 
 		nextcheck = get_minnextcheck();
@@ -652,13 +652,13 @@ void main_pinger_loop(zbx_process_t p, int num)
 			else if (sleeptime > CONFIG_PINGER_FREQUENCY)
 				sleeptime = CONFIG_PINGER_FREQUENCY;
 		}
-		
+
 		zabbix_log(LOG_LEVEL_DEBUG, "Pinger spent " ZBX_FS_DBL " seconds while processing %d items."
 				" Nextcheck after %d sec.",
 				sec,
 				items_count,
 				sleeptime);
-				
+
 		free_hosts(&items, &items_count);
 
 		if (sleeptime > 0) {

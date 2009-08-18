@@ -683,7 +683,7 @@ void update_triggers_status_to_unknown(zbx_uint64_t hostid,int clock,char *reaso
 		hostid,
 		SERVER_STATUS_KEY,
 		SERVER_ICMPPING_KEY);
-		
+
 
 	while((row=DBfetch(result)))
 	{
@@ -1473,7 +1473,7 @@ int	DBget_queue_count(void)
 		now,
 		now,
 		SERVER_STATUS_KEY,
-		SERVER_ICMPPING_KEY,		
+		SERVER_ICMPPING_KEY,
 		SERVER_ZABBIXLOG_KEY);
 
 	row=DBfetch(result);
