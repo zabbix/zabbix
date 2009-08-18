@@ -467,7 +467,7 @@
 
 ?>
 
-<?php	
+<?php
 	$form = new CForm('config.php');
 	$form->setMethod('get');
 	$cmbConfig = new CCombobox('config',$_REQUEST['config'],'submit()');
@@ -496,13 +496,13 @@
 				break;
 		}
 	}
-	
+
 	show_table_header(S_CONFIGURATION_OF_ZABBIX_BIG, $form);
 	print SBR;
 ?>
 <?php
 	$cnf_wdgt = new CWidget();
-	
+
 	if(isset($_REQUEST['config'])) {
 		$config = select_config(false);
 	}
@@ -522,7 +522,7 @@
 			new CNumericBox("event_history", $config["event_history"], 5));
 
 		$frmHouseKeep->addItemToBottomRow(new CButton("save", S_SAVE));
-		
+
 		$cnf_wdgt->addItem($frmHouseKeep);
 	}
 ////////////////////////////
@@ -533,7 +533,7 @@
 			$frmImages = new CFormTable(S_IMAGE, 'config.php', 'post', 'multipart/form-data');
 			$frmImages->setHelp('web.config.images.php');
 			$frmImages->addVar('config', get_request('config',3));
-	
+
 			if(isset($_REQUEST['imageid'])){
 				$sql = 'SELECT imageid,imagetype,name '.
 						' FROM images '.
@@ -544,7 +544,7 @@
 				$frmImages->setTitle(S_IMAGE.' "'.$row['name'].'"');
 				$frmImages->addVar('imageid', $_REQUEST['imageid']);
 			}
-	
+
 			if(isset($_REQUEST['imageid']) && !isset($_REQUEST['form_refresh'])){
 				$name		= $row['name'];
 				$imagetype	= $row['imagetype'];
@@ -555,37 +555,37 @@
 				$imagetype	= get_request('imagetype',1);
 				$imageid	= get_request('imageid',0);
 			}
-	
+
 			$frmImages->addRow(S_NAME,new CTextBox('name',$name,64));
-	
+
 			$cmbImg = new CComboBox('imagetype',$imagetype);
 			$cmbImg->addItem(IMAGE_TYPE_ICON,S_ICON);
 			$cmbImg->addItem(IMAGE_TYPE_BACKGROUND,S_BACKGROUND);
-	
+
 			$frmImages->addRow(S_TYPE,$cmbImg);
-	
+
 			$frmImages->addRow(S_UPLOAD,new CFile('image'));
-	
+
 			if($imageid > 0){
 				$frmImages->addRow(S_IMAGE,new CLink(
 					new CImg('image.php?width=640&height=480&imageid='.$imageid,'no image',null),'image.php?imageid='.$row['imageid']));
 			}
-	
+
 			$frmImages->addItemToBottomRow(new CButton('save',S_SAVE));
 			if(isset($_REQUEST['imageid'])){
 				$frmImages->addItemToBottomRow(SPACE);
 				$frmImages->addItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_IMAGE,
 					url_param('form').url_param('config').url_param('imageid')));
 			}
-	
+
 			$frmImages->addItemToBottomRow(SPACE);
 			$frmImages->addItemToBottomRow(new CButtonCancel(url_param('config')));
-			
+
 			$cnf_wdgt->addItem($frmImages);
 		}
 		else{
 			$cnf_wdgt->addItem(BR());
-			
+
 			$imagetype = get_request('imagetype',IMAGE_TYPE_ICON);
 
 			$r_form = new CForm();
@@ -596,7 +596,7 @@
 
 			$r_form->addItem(S_TYPE.SPACE);
 			$r_form->addItem($cmbImg);
-			
+
 			$cnf_wdgt->addHeader(S_IMAGES_BIG,$r_form);
 
 			$table = new CTableInfo(S_NO_IMAGES_DEFINED);
@@ -621,7 +621,7 @@
 						new CImg('image.php?height=24&imageid='.$row['imageid'],'no image',NULL),'image.php?imageid='.$row['imageid'])
 					));
 			}
-			
+
 			$cnf_wdgt->addItem($table);
 		}
 	}
@@ -659,7 +659,7 @@
 		$frmOther->addRow(S_USER_GROUP_FOR_DATABASE_DOWN_MESSAGE, $cmbUsrGrp);
 
 		$frmOther->addItemToBottomRow(new CButton('save', S_SAVE));
-		
+
 		$cnf_wdgt->addItem($frmOther);
 	}
 ///////////////////////////////////
@@ -755,7 +755,7 @@
 			$db_valuemaps = DBselect('SELECT * FROM valuemaps WHERE '.DBin_node('valuemapid'));
 			while($db_valuemap = DBfetch($db_valuemaps)){
 				$mappings_row = array();
-				
+
 				$sql = 'SELECT * '.
 						' FROM mappings'.
 						' WHERE valuemapid='.$db_valuemap['valuemapid'];
@@ -789,7 +789,7 @@
 			new CTextBox("work_period",$config["work_period"], 35));
 
 		$frmHouseKeep->addItemToBottomRow(new CButton("save", S_SAVE));
-		
+
 		$cnf_wdgt->addItem($frmHouseKeep);
 	}
 /////////////////////////
@@ -830,7 +830,7 @@
 		$frmGUI->addRow(S_MAX_COUNT_OF_EVENTS,
 			new CTextBox('event_show_max',$config['event_show_max'],5));
 		$frmGUI->addItemToBottomRow(new CButton("save",S_SAVE));
-		
+
 		$cnf_wdgt->addItem($frmGUI);
 	}
 //////////////////////////////////////////
@@ -906,7 +906,7 @@
 			$frmRegExp->additem($outer_table);
 
 			show_messages();
-			
+
 			$cnf_wdgt->addItem($frmRegExp);
 		}
 		else{
@@ -978,7 +978,7 @@
 			$cnf_wdgt->addItem($form);
 		}
 	}
-	
+
 	$cnf_wdgt->show();
 ?>
 <?php

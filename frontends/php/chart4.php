@@ -133,7 +133,7 @@ include_once 'include/page_header.php';
 	for($i=0, $period_start = $start; $i <= $sizeX; $i += $sizeX/52){
 		DashedLine($im,$i+$shiftX,$shiftYup,$i+$shiftX,$sizeY+$shiftYup,$gray);
 		imagestringup($im, 1,$i+$shiftX-4, $sizeY+$shiftYup+32, date('d.M',$period_start) , $black);
-		
+
 		$period_start += 7*24*3600;
 	}
 
@@ -147,7 +147,7 @@ include_once 'include/page_header.php';
 		$x1=(900/52)*$sizeX*($i-1-$minX)/($maxX-$minX);
 
 //		imagefilledrectangle($im,$x1+$shiftX,$shiftYup,$x1+$shiftX+8,$sizeY+$shiftYup,imagecolorallocate($im,0,0,0)); 	// WHITE
-		
+
 		$yt=$sizeY*$true[$i-1]/100;
 		if($yt > 0) imagefilledrectangle($im,$x1+$shiftX,$shiftYup,$x1+$shiftX+8,$yt+$shiftYup,imagecolorallocate($im,235,120,120));	// RED
 

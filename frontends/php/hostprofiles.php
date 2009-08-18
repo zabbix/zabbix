@@ -37,7 +37,7 @@ include_once('include/page_header.php');
 		'hostid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
 		'prof_type'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	null,	NULL),
 	);
-	
+
 	check_fields($fields);
 	validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
 ?>
@@ -121,10 +121,10 @@ include_once('include/page_header.php');
 
 		$r_form = new CForm();
 		$r_form->setMethod('get');
-	
+
 		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
 		$cmbGroups->addItem(0, S_ALL_S);
-	
+
 		$sql = 'SELECT hg.groupid, g.name '.
 				' FROM hosts_profiles p, hosts_profiles_ext pe, hosts_groups hg, groups g'.
 				' WHERE (hg.hostid=p.hostid OR hg.hostid=pe.hostid) '.
@@ -135,15 +135,15 @@ include_once('include/page_header.php');
 		while($row = DBfetch($result)) {
 			$cmbGroups->addItem($row['groupid'], get_node_name_by_elid($row['groupid']).$row['name']);
 		}
-	
+
 		$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
-	
+
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
 
 		$hostprof_wdgt->addHeader(S_HOSTS_BIG, $r_form);
 //		$hostprof_wdgt->addHeader($numrows);
-		
+
 		$table = new CTableInfo();
 		if($prof_type){
 			$table->setHeader(array(
@@ -160,7 +160,7 @@ include_once('include/page_header.php');
 			if($_REQUEST['groupid'] > 0){
 				$sql_where = ' AND hg.groupid='.$_REQUEST['groupid'];
 			}
-			
+
 			$sql='SELECT DISTINCT g.name, h.hostid,h.host,hpe.device_os_short,hpe.device_hw_arch,hpe.device_type,hpe.device_status'.
 				' FROM hosts h,hosts_profiles_ext hpe,hosts_groups hg,groups g '.
 				' WHERE h.hostid=hpe.hostid '.
@@ -219,7 +219,7 @@ include_once('include/page_header.php');
 				));
 			}
 		}
-		
+
 		$hostprof_wdgt->addItem($table);
 	}
 

@@ -64,7 +64,7 @@ include_once('include/page_header.php');
 
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY);
 
-	
+
 	$sql = 'SELECT DISTINCT s.serviceid, sl.servicedownid, sl_p.serviceupid as serviceupid, s.triggerid, '.
 		' s.name as caption, s.algorithm, t.description, t.expression, s.sortorder, sl.linkid, s.showsla, s.goodsla, s.status '.
 	' FROM services s '.
@@ -74,7 +74,7 @@ include_once('include/page_header.php');
 	' WHERE '.DBin_node('s.serviceid').
 		' AND (t.triggerid IS NULL OR '.DBcondition('t.triggerid',$available_triggers).') '.
 	' ORDER BY s.sortorder, sl_p.serviceupid, s.serviceid';
-	
+
 	$result=DBSelect($sql);
 
 	$services = array();
@@ -116,36 +116,36 @@ include_once('include/page_header.php');
 
 	$treeServ=array();
 	createServiceTree($services,$treeServ); //return into $treeServ parametr
-	
+
 	//permission issue
 	$treeServ = del_empty_nodes($treeServ);
 	//----
-	
+
 	if(isset($_REQUEST['msg']) && !empty($_REQUEST['msg'])){
 		show_messages(true,$_REQUEST['msg']);
 	}
-	
+
 	//show_table_header(S_IT_SERVICES_BIG);
-	
+
 	$tree = new CTree('service_conf_tree', $treeServ,array('caption' => bold(S_SERVICE),'algorithm' => bold(S_STATUS_CALCULATION), 'description' => bold(S_TRIGGER)));
-	
+
 	if($tree){
 		show_table_header(S_IT_SERVICES_BIG, SPACE);
-		
+
 		$serv_wdgt = new CWidget();
 		$serv_wdgt->addItem(BR());
 		$serv_wdgt->addItem($tree->getHTML());
-	
+
 		$serv_wdgt->show();
 	}
 	else {
 		error(S_CANT_FORMAT_TREE);
 	}
-	
-	
+
+
 	$tr_ov_menu[] = array('test1',	null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
 	$tr_ov_menu[] = array('test2',	null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
-	
+
 	$jsmenu = new CPUMenu($tr_ov_menu,170);
 	$jsmenu->InsertJavaScript();
 

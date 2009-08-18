@@ -1104,7 +1104,7 @@ function __autoload($class_name){
 		else{
 			$url .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
 		}
-		
+
 		$link = new Curl($url);
 		$link->setArgument('sort', $tabfield);
 		$link->setArgument('sortorder', $sortorder);

@@ -23,7 +23,7 @@ return $result;
 
 function delete_script($scriptids){
 	zbx_value2array($scriptids);
-	
+
 	$sql = 'DELETE FROM scripts WHERE '.DBcondition('scriptid',$scriptids);
 	$result = DBexecute($sql);
 

@@ -279,8 +279,8 @@ include_once('include/page_header.php');
 		}
 		else{
 /* table HOSTS */
-			$export_wdgt = new CWidget();	
-			
+			$export_wdgt = new CWidget();
+
 			$form = new CForm(null,'post');
 			$form->setName('hosts');
 			$form->addVar('config',$config);
@@ -297,7 +297,7 @@ include_once('include/page_header.php');
 
 			$export_wdgt->addHeader(S_HOSTS_BIG, $form);
 			$export_wdgt->addHeader($numrows);
-			
+
 // export table
 			$form = new CForm(null,'post');
 			$form->setName('hosts_export');
@@ -392,7 +392,7 @@ include_once('include/page_header.php');
 			order_page_result($hosts, getPageSortField('host'), getPageSortOrder());
 			$paging = getPagingLine($hosts);
 //-------
-		
+
 			$count_chkbx = 0;
 			foreach($hosts as $hostid => $host){
 				$status = new CCol(host_status2str($host['status']),host_status2style($host['status']));

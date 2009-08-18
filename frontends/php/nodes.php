@@ -114,7 +114,7 @@ $_REQUEST['config'] = get_request('config','nodes.php');
 ?>
 <?php
 	$nodes_wdgt = new CWidget();
-	
+
 	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST);
 
 	$frmForm = new CForm();
@@ -220,7 +220,7 @@ $_REQUEST['config'] = get_request('config','nodes.php');
 		}
 		$frmNode->addItemToBottomRow(SPACE);
 		$frmNode->addItemToBottomRow(new CButtonCancel(url_param('config')));
-		
+
 		$nodes_wdgt->addItem($frmNode);
 	}
 	else{
@@ -259,7 +259,7 @@ $_REQUEST['config'] = get_request('config','nodes.php');
 		}
 		$nodes_wdgt->addItem($table);
 	}
-	
+
 	$nodes_wdgt->show();
 
 ?>

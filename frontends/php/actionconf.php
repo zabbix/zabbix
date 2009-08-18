@@ -360,7 +360,7 @@ include_once('include/page_header.php');
 	$form->addVar('eventsource', $_REQUEST['eventsource']);
 	if(!isset($_REQUEST['form'])){
 		$form->addItem(new CButton('form',S_CREATE_ACTION));
-	} 
+	}
 	else {
 
 	}
@@ -460,7 +460,7 @@ include_once('include/page_header.php');
 		$frmAction->additem($outer_table);
 
 		show_messages();
-		
+
 		$action_wdgt->addItem($frmAction);
 //*/
 	}
@@ -497,7 +497,7 @@ include_once('include/page_header.php');
 //				'sortorder' => getPageSortOrder(),
 				'limit' => ($config['search_limit']+1)
 			);
-			
+
 		$actions = CAction::get($options);
 
 		$tblActions = new CTableInfo(S_NO_ACTIONS_DEFINED);
@@ -526,7 +526,7 @@ include_once('include/page_header.php');
 							$condition['operator'],
 							$condition['value']),BR()));
 			}
-			
+
 
 			$operations=array();
 
@@ -581,7 +581,7 @@ include_once('include/page_header.php');
 		$form->addItem($tblActions);
 		$action_wdgt->addItem($form);
 	}
-	
+
 	$action_wdgt->show();
 
 ?>

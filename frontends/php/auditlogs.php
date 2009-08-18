@@ -124,7 +124,7 @@ include_once('include/page_header.php');
 	$frmForm->addItem($cmbConf);
 
 	$audit_wdgt->addPageHeader(S_AUDIT_LOGS_BIG,$frmForm);
-	
+
 	$numrows = new CDiv();
 	$numrows->setAttribute('name', 'numrows');
 

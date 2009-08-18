@@ -198,7 +198,7 @@ include_once('include/page_header.php');
 	}
 	else{
 		$dscry_wdgt = new CWidget();
-		
+
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
 
@@ -225,7 +225,7 @@ include_once('include/page_header.php');
 		$dscry_wdgt->addItem($paging);
 //-------*/
 		$dscry_wdgt->addItem(BR());
-		
+
 		$sql = 'SELECT d.* '.
 				' FROM drules d'.
 				' WHERE '.DBin_node('druleid').

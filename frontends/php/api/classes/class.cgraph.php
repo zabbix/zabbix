@@ -199,7 +199,7 @@ class CGraph {
 			if(!str_in_array('g.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('g.*', $sql_parts['select'])){
 				$sql_parts['select'][] = 'g.'.$options['sortfield'];
 			}
-		}		
+		}
 
 // limit
 		if(zbx_ctype_digit($options['limit']) && $options['limit']){

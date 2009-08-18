@@ -111,7 +111,7 @@ include_once('include/page_header.php');
 				);
 	$db_hosts = CHost::get($params);
 	order_result($db_hosts, 'host', null, true);
-	
+
 	$hosts = selectByPattern($db_hosts, 'host', $search, $rows_per_page);
 
 	$hostids = array_keys($hosts);
@@ -189,7 +189,7 @@ include_once('include/page_header.php');
 	$wdgt_hosts = new CWidget('search_hosts',$table);
 	$wdgt_hosts->setClass('header');
 	$wdgt_hosts->addHeader(S_HOSTS, SPACE);
-	
+
 	$left_tab->addRow($wdgt_hosts);
 //----------------
 

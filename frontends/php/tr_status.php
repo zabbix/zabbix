@@ -252,7 +252,7 @@ include_once('include/page_header.php');
 	$numrows = new CDiv();
 	$numrows->setAttribute('name','numrows');
 
-	$trigg_wdgt->addHeader(S_TRIGGERS_BIG, $r_form);	
+	$trigg_wdgt->addHeader(S_TRIGGERS_BIG, $r_form);
 	$trigg_wdgt->addHeader($numrows);
 
 /************************* FILTER **************************/
@@ -361,20 +361,20 @@ include_once('include/page_header.php');
 //		'sortorder' => getPageSortOrder(),
 		'limit' => ($config['search_limit']+1)
 	);
-	
+
 // Filtering
 	if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
 		$options['hostids'] = $PAGE_HOSTS['selected'];
 	}
-		
+
 	if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
 		$options['groupids'] = $PAGE_GROUPS['selected'];
 	}
-	
+
 	if(!zbx_empty($_REQUEST['txt_select'])){
 		$options['pattern'] = $_REQUEST['txt_select'];
 	}
-	
+
 	if($show_triggers == TRIGGERS_OPTION_ONLYTRUE){
 		$options['only_true'] = TRIGGER_VALUE_TRUE;
 	}
@@ -396,7 +396,7 @@ include_once('include/page_header.php');
 					'sortorder' => getPageSortOrder(),
 					'limit' => $config['event_show_max']*100
 				);
-	
+
 	switch($show_events){
 		case EVENTS_OPTION_ALL:
 			break;
@@ -425,7 +425,7 @@ include_once('include/page_header.php');
 			$events = CEvent::get($ev_options);
 		else
 			$events = array();
-			
+
 		$triggers[$triggerid]['events'] = $events;
 	}
 
@@ -519,29 +519,29 @@ include_once('include/page_header.php');
 		if(zbx_empty($trigger['url'])){
 			if($_REQUEST['hostid'] < 1){
 				$menus = '';
-	
+
 				$host_nodeid = id2nodeid($trigger['hostid']);
 				foreach($scripts_by_hosts[$trigger['hostid']] as $id => $script){
 					$script_nodeid = id2nodeid($script['scriptid']);
 					if( (bccomp($host_nodeid ,$script_nodeid ) == 0))
 						$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$trigger['hostid']."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 				}
-	
+
 				$menus.= "[".zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 				$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?hostid=".$trigger['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
-	
+
 				$menus = rtrim($menus,',');
 				$menus="show_popup_menu(event,[[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180);";
-	
+
 				$host = new CSpan($trigger['host'],'pointer');
 				$host->setAttribute('onclick','javascript: '.$menus);
 			}
-	
+
 			$tr_conf_link = 'null';
 			if($admin_links){
 				$tr_conf_link = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript: redirect('triggers.php?form=update&triggerid=".$trigger['triggerid']."&hostid=".$trigger['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 			}
-	
+
 			$tr_desc = new CSpan($description,'link');
 			$tr_desc->addAction('onclick',"javascript: create_mon_trigger_menu(event, ".
 											" new Array({'triggerid': '".$trigger['triggerid'].

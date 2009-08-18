@@ -281,7 +281,7 @@ include_once('include/page_header.php');
 
 			$screen_wdgt->addHeader(S_SCREENS_BIG);
 //			$screen_wdgt->addHeader($numrows);
-		
+
 			$table = new CTableInfo(S_NO_SCREENS_DEFINED);
 			$table->SetHeader(array(
 				new CCheckBox('all_screens',NULL,"checkAll('".$form->getName()."','all_screens','screens');"),
@@ -297,7 +297,7 @@ include_once('include/page_header.php');
 			$screen_wdgt->addItem($paging);
 //-------*/
 			$screen_wdgt->addItem(BR());
-		
+
 			$sql = 'SELECT s.screenid,s.name,s.hsize,s.vsize,(s.hsize*s.vsize) as s_size '.
 					' FROM screens s '.
 					' WHERE '.DBin_node('s.screenid').
@@ -344,7 +344,7 @@ include_once('include/page_header.php');
 		}
 		else{
 			$screen_wdgt = new CWidget();
-			
+
 			$form = new CForm();
 			$form->setName('frm_shows');
 
@@ -370,7 +370,7 @@ include_once('include/page_header.php');
 			$screen_wdgt->addItem($paging);
 //-------*/
 			$screen_wdgt->addItem(BR());
-			
+
 			$sql = 'SELECT s.slideshowid, s.name, s.delay, count(*) as cnt '.
 					' FROM slideshows s '.
 						' LEFT JOIN slides sl ON sl.slideshowid=s.slideshowid '.

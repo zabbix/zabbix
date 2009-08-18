@@ -44,7 +44,7 @@ private $items;
 		$this->flicker_state = 1;	// 0 - closed, 1 - opened
 
 		$this->css_class = is_null($this->state)?'header_wide':'header';
-		
+
 		$this->pageHeaders = null;
 		$this->headers = null;
 
@@ -53,12 +53,12 @@ private $items;
 
 		$this->addItem($body);
 	}
-	
+
 	public function setClass($class=null){
 		if(is_string($class))
 			$this->css_class = $class;
 	}
-	
+
 	public function addPageHeader($header, $headerright=SPACE){
 		zbx_value2array($headerright);
 
@@ -94,12 +94,12 @@ private $items;
 			$header_tab = $this->createPageHeader();
 			$widget->addRow(new CCol($header_tab));
 		}
-		
+
 		if(!empty($this->headers)){
 			$header_tab = $this->createHeader();
 			$widget->addRow($header_tab);
 		}
-		
+
 		if(is_null($this->state)){
 			$this->state = true;
 		}
@@ -160,16 +160,16 @@ private $items;
 
 	private function createPageHeader(){
 		$pageHeader = array();
-		
+
 		foreach($this->pageHeaders as $num => $header){
 			$pageHeader[] = $this->createPageHeaderRow($header['left'], $header['right']);
 		}
-		
+
 		$pageHeader[] = BR();
-		
+
 	return $pageHeader;
 	}
-	
+
 	private function createPageHeaderRow($col1, $col2=SPACE){
 		if(isset($_REQUEST['print'])){
 			hide_form_items($col1);
@@ -194,7 +194,7 @@ private $items;
 		$right_tab->setAttribute('width','100%');
 
 		$right_tab->addRow($right_row, 'textblackwhite');
-		
+
 		$table = new CTable(NULL,'header');
 //		$table->setAttribute('border',0);
 		$table->setCellSpacing(0);
@@ -210,7 +210,7 @@ private $items;
 
 	private function createHeader(){
 		$header = array_shift($this->headers);
-		
+
 
 		$td_l = new CCol(SPACE);
 		$td_l->setAttribute('width','100%');
@@ -234,26 +234,26 @@ private $items;
 		$right_tab->setAttribute('width','100%');
 
 		$right_tab->addRow($right_row, 'textblackwhite');
-		
+
 		$header['right'] = $right_tab;
-		
+
 		$header_tab = new CTable(null,$this->css_class);
 		$header_tab->setCellSpacing(0);
 		$header_tab->setCellPadding(1);
-		
+
 		if(!empty($this->flicker)){
 //			$header_tab->setAttribute('style','border-bottom: 0px;');
 		}
 
 		$header_tab->addRow($this->createHeaderRow($header['left'],$right_tab),'first');
-		
+
 		foreach($this->headers as $num => $header){
 			$header_tab->addRow($this->createHeaderRow($header['left'],$header['right']), 'next');
 		}
-		
+
 	return $header_tab;
 	}
-	
+
 	private function createHeaderRow($col1, $col2=SPACE){
 		if(isset($_REQUEST['print'])){
 			hide_form_items($col1);
@@ -264,7 +264,7 @@ private $items;
 
 		$td_r = new CCol($col2,'header_r');
 		$td_r->setAttribute('align','right');
-		
+
 		$row = array(new CCol($col1,'header_l'), $td_r);
 
 	return $row;

@@ -351,14 +351,14 @@ include_once('include/page_header.php');
 		insert_usergroups_form();
 	}
 	else{
-		$usrgroup_wdgt = new CWidget();	
-		
+		$usrgroup_wdgt = new CWidget();
+
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
 
 		$usrgroup_wdgt->addHeader(S_USER_GROUPS_BIG);
 		$usrgroup_wdgt->addHeader($numrows);
-		
+
 // Groups table
 		$options = array('extendoutput' => 1,
 						 'select_users' => 1,
@@ -456,7 +456,7 @@ include_once('include/page_header.php');
 //---------
 
 		$form->addItem($table);
-		
+
 		$usrgroup_wdgt->addItem($form);
 		$usrgroup_wdgt->show();
 	}

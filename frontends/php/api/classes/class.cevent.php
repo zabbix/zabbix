@@ -184,7 +184,7 @@ class CEvent {
 
 			$sql_parts['where'][] = DBcondition('e.eventid', $options['eventids']);
 		}
-		
+
 // triggerids
 		if(!is_null($options['triggerids']) && ($options['object'] == EVENT_OBJECT_TRIGGER)){
 			zbx_value2array($options['triggerids']);
@@ -197,7 +197,7 @@ class CEvent {
 		if(!is_null($options['acknowledged'])){
 			$sql_parts['where'][] = 'e.acknowledged='.($options['acknowledged']?1:0);
 		}
-		
+
 // hide_unknown
 		if(!is_null($options['hide_unknown'])){
 			$sql_parts['where'][] = 'e.value<>'.TRIGGER_VALUE_UNKNOWN;
@@ -212,11 +212,11 @@ class CEvent {
 		if(!is_null($options['time_till'])){
 			$sql_parts['where'][] = 'e.clock<'.$options['time_till'];
 		}
-		
+
 // value
 		if(!is_null($options['value'])){
 			zbx_value2array($options['value']);
-			
+
 			$sql_parts['where'][] = DBcondition('e.value', $options['value']);
 		}
 
@@ -280,7 +280,7 @@ class CEvent {
 				$result = $event;
 			else{
 				$eventids[$event['eventid']] = $event['eventid'];
-				
+
 				if($event['object'] == EVENT_OBJECT_TRIGGER)
 					$triggerids[$event['objectid']] = $event['objectid'];
 
@@ -294,7 +294,7 @@ class CEvent {
 						$result[$event['eventid']]['hostids'] = array();
 						$result[$event['eventid']]['hosts'] = array();
 					}
-					
+
 					if($options['select_triggers'] && !isset($result[$event['eventid']]['triggerids'])){
 						$result[$event['eventid']]['triggerids'] = array();
 						$result[$event['eventid']]['triggers'] = array();
@@ -315,7 +315,7 @@ class CEvent {
 						$result[$event['eventid']]['triggerids'][$event['triggerid']] = $event['triggerid'];
 						unset($event['triggerid']);
 					}
-					
+
 					// itemids
 					if(isset($event['itemid'])){
 						if(!isset($result[$event['eventid']]['itemids'])) $result[$event['eventid']]['itemids'] = array();
@@ -346,7 +346,7 @@ class CEvent {
 					$triggers[$triggerid]['hosts'][$hostid] = $host;
 				}
 			}
-			
+
 			foreach($result as $eventid => $event){
 				if(isset($triggers[$event['objectid']])){
 					$result[$eventid]['hostids'] = $triggers[$event['objectid']]['hostids'];
@@ -358,7 +358,7 @@ class CEvent {
 				}
 			}
 		}
-		
+
 // Adding triggers
 		if($options['select_triggers']){
 			$obj_params = array('extendoutput' => 1, 'triggerids' => $triggerids, 'nopermissions' => 1);
@@ -373,15 +373,15 @@ class CEvent {
 					$result[$eventid]['triggerids'] = array();
 					$result[$eventid]['triggers'] = array();
 				}
-			}			
+			}
 		}
-		
+
 // Adding items
 		if($options['select_items']){
 			$obj_params = array('extendoutput' => 1, 'triggerids' => $triggerids, 'nopermissions' => 1);
 			$db_items = CItem::get($obj_params);
 			$items = array();
-			
+
 			$items_evnt = array();
 			foreach($db_items as $itemid => $item){
 				foreach($item['triggerids'] as $num => $triggerid){
@@ -391,7 +391,7 @@ class CEvent {
 					$items[$triggerid]['items'][$itemid] = $item;
 				}
 			}
-			
+
 			foreach($result as $eventid => $event){
 				if(isset($items[$event['objectid']])){
 					$result[$eventid]['itemids'] = $items[$event['objectid']]['itemids'];
@@ -401,7 +401,7 @@ class CEvent {
 					$result[$eventid]['itemids'] = array();
 					$result[$eventid]['items'] = array();
 				}
-			}			
+			}
 		}
 
 	return $result;
@@ -421,7 +421,7 @@ class CEvent {
  * @return array|boolean array of event data || false if error
  */
 	public static function getById($event){
-		$sql = 
+		$sql =
 		$event =  get_event_by_eventid($event['eventid']);
 		$result = $event ? true : false;
 		if($result)
@@ -434,7 +434,7 @@ class CEvent {
 
 
 /**
- * Add events ( without alerts ) 
+ * Add events ( without alerts )
  *
  * {@source}
  * @access public
@@ -485,12 +485,12 @@ class CEvent {
 							')';
 			$result = DBexecute($sql);
 			if(!$result) break;
-			
+
 			$triggers[] = array('triggerid' => $event['objectid'], 'value'=> $event['value'], 'lastchange'=> $event['clock']);
 
 			$eventids[$eventid] = $eventid;
 		}
-		
+
 		if($result){
 			$result = CTrigger::update($triggers);
 		}

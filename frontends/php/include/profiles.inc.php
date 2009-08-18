@@ -474,9 +474,9 @@ function get_favorites($idx,$nodeid=null){
 			}
 		}
 	}
-	
+
 	$result = count($result)?$result:array();
-	
+
 return $result;
 }
 
