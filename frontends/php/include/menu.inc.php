@@ -323,7 +323,7 @@ function zbx_define_menu_restrictions(){
 
 	foreach($ZBX_MENU as $sid => $section){
 		foreach($section['pages'] as $pid => $menu_page) {
-			if (($menu_page['url'] == $page['file']) || (isset($menu_page['sub_pages']) && in_array($page['file'], $menu_page['sub_pages']))) {
+			if (($menu_page['url'] == $page['file']) || (isset($menu_page['sub_pages']) && str_in_array($page['file'], $menu_page['sub_pages']))) {
 				if(isset($section['forse_disable_all_nodes']) && !defined('ZBX_NOT_ALLOW_ALL_NODES')) {
 					define('ZBX_NOT_ALLOW_ALL_NODES', 1);
 				}

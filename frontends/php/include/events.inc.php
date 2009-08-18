@@ -275,46 +275,30 @@ function make_small_eventlist($eventid, $trigger_data){
 	$rows = array();
 	$count = 1;
 
-	$curevent = CEvent::get(array('eventids' => $eventid, 'extendoutput' => 1, 'editable' => 1));
+	$curevent = CEvent::get(array('eventids' => $eventid, 'extendoutput' => 1, 'select_triggers' => 1));
 	$curevent = reset($curevent);
 
 	$events = CEvent::get(array(
 		'time_till' => $curevent['clock'],
+		'triggerids' => $trigger_data['triggerid'],
 		'extendoutput' => 1,
-		'limit' => 100,
-		'sortfield' => 'eventid',
-		'sortorder' => ZBX_SORT_DOWN
+		'sortfield' => 'clock',
+		'sortorder' => ZBX_SORT_DOWN,
+		'limit' => 20
 	));
 
-	foreach($events as $event){
-		if(!empty($rows) && ($rows[$count]['value'] != $event['value'])){
-			$count++;
-		}
-		else if(
-			!empty($rows) &&
-			($rows[$count]['value'] == $event['value']) &&
-			($trigger_data['type'] == TRIGGER_MULT_EVENT_ENABLED) &&
-			($event['value'] == TRIGGER_VALUE_TRUE)
-		){
-			$count++;
-		}
-		$rows[$count] = $event;
+	$clock = $curevent['clock'];
 
-		if($count == 20) break;
-	}
-
-	$clock = time();
-
-	foreach($rows as $id => $row){
+	foreach($events as $eventid => $event){
 		$lclock = $clock;
-		$clock = $row["clock"];
+		$clock = $event['clock'];
 		$duration = zbx_date2age($lclock, $clock);
 
-		$value = new CCol(trigger_value2str($row['value']), get_trigger_value_style($row["value"]));
+		$value = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value']));
 
 		$ack = new CSpan(S_NO, 'on');
-		if(1 == $row['acknowledged']){
-			$db_acks = get_acknowledges_by_eventid($row['eventid']);
+		if(1 == $event['acknowledged']){
+			$db_acks = get_acknowledges_by_eventid($event['eventid']);
 			$rows=0;
 			while($a=DBfetch($db_acks))	$rows++;
 
@@ -325,18 +309,18 @@ function make_small_eventlist($eventid, $trigger_data){
 		}
 
 //actions
-		$actions= get_event_actions_stat_hints($row['eventid']);
+		$actions = get_event_actions_stat_hints($event['eventid']);
 //--------
 
-		$table->AddRow(array(
+		$table->addRow(array(
 			new CLink(
-				date('Y.M.d H:i:s',$row['clock']),
-				"tr_events.php?triggerid=".$trigger_data['triggerid'].'&eventid='.$row['eventid'],
-				"action"
+				date('Y.M.d H:i:s',$event['clock']),
+				'tr_events.php?triggerid='.$trigger_data['triggerid'].'&eventid='.$event['eventid'],
+				'action'
 			),
 			$value,
 			$duration,
-			zbx_date2age($row['clock']),
+			zbx_date2age($event['clock']),
 			$ack,
 			$actions
 		));

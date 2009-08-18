@@ -301,7 +301,7 @@ include_once('include/page_header.php');
 					S_MEMBERS
 				));
 
-// sorting
+// sorting && paging
 		order_page_result($groups, getPageSortField('name'), getPageSortOrder());
 		$paging = getPagingLine($groups);
 //---------
@@ -368,19 +368,21 @@ include_once('include/page_header.php');
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "groups";');
 
-		$footer = get_table_header(new CCol(array($goBox, $goButton)));
+		$footer = get_table_header(array($goBox, SPACE, $goButton));
 //----
 
 // PAGING FOOTER
 		$table = array($paging,$table,$paging,$footer);
 //---------
 
-
 		$form->addItem($table);
 
 		$groups_wdgt->addItem($form);
 		$groups_wdgt->show();
 	}
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>

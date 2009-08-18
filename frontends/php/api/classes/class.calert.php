@@ -207,6 +207,14 @@ class CAlert {
 			$sql_parts['where'][] = DBcondition('e.objectid', $options['triggerids']);
 		}
 
+// eventids
+		if(!is_null($options['eventids'])){
+			zbx_value2array($options['eventids']);
+
+			$sql_parts['where'][] = DBcondition('a.eventid', $options['eventids']);
+		}
+
+
 // actionids
 		if(!is_null($options['actionids'])){
 			zbx_value2array($options['actionids']);

@@ -208,9 +208,10 @@ hide: function(e, boxid){
 	var hint = $(boxid);
 	if(!is_null(hint)){
 		delete(this.boxes[boxid]);
-		
+
+// Opera refresh bug!
 		hint.style.display = 'none';
-		hint.remove();
+		if(OP) setTimeout(function(){hint.remove();}, 200);
 	}
 },
 

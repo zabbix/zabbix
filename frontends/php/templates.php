@@ -642,6 +642,7 @@ require_once('include/hosts.inc.php');
 						'select_applications' => 1,
 						'order' => 'host',
 						'limit' => ($config['search_limit']+1));
+
 		if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
 			$options['groupids'] = $PAGE_GROUPS['selected'];
 		}
@@ -677,13 +678,13 @@ require_once('include/hosts.inc.php');
 			}
 			$templates_output[] = new CLink($template['host'], 'templates.php?form=update&templateid='.$templateid.url_param('groupid'));
 
-			$applications = array(new CLink(S_APPLICATIONS,'applications.php?groupid='.$selected_group.'&hostid='.$templateid),
+			$applications = array(new CLink(S_APPLICATIONS,'applications.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$templateid),
 				' ('.count($template['applications']).')');
-			$items = array(new CLink(S_ITEMS,'items.php?groupid='.$selected_group.'&hostid='.$templateid),
+			$items = array(new CLink(S_ITEMS,'items.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$templateid),
 				' ('.count($template['itemids']).')');
-			$triggers = array(new CLink(S_TRIGGERS,'triggers.php?groupid='.$selected_group.'&hostid='.$templateid),
+			$triggers = array(new CLink(S_TRIGGERS,'triggers.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$templateid),
 				' ('.count($template['triggerids']).')');
-			$graphs = array(new CLink(S_GRAPHS,'graphs.php?groupid='.$selected_group.'&hostid='.$templateid),
+			$graphs = array(new CLink(S_GRAPHS,'graphs.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$templateid),
 				' ('.count($template['graphids']).')');
 
 			$i = 0;

@@ -240,7 +240,7 @@ class CLdap{
 		}
 
 // always add the default group to the list of groups
-		if(isset($conf['defaultgroup']) && !in_array($conf['defaultgroup'],$info['grps'])){
+		if(isset($conf['defaultgroup']) && !str_in_array($conf['defaultgroup'],$info['grps'])){
 			$info['grps'][] = $conf['defaultgroup'];
 		}
 
