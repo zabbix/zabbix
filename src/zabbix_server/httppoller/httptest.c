@@ -403,7 +403,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 				err_str = strdup(curl_easy_strerror(err));
 				lastfailedstep = httpstep.no;
 			}
-		}		
+		}
 		/*if( !err_str )*/
 		if( !err_str && httptest->authentication == HTTPTEST_AUTH_BASIC )
 		{
@@ -415,13 +415,13 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 				err_str = strdup(curl_easy_strerror(err));
 				lastfailedstep = httpstep.no;
 			}
-		}		
+		}
 		if( !err_str && httptest->authentication == HTTPTEST_AUTH_BASIC)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: Using basic authentication");
 
 			zbx_snprintf(auth, sizeof(auth), "%s:%s", httptest->http_user, httptest->http_password);
-			
+
 			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERPWD, auth)))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "Cannot set USERPWD [%s]",
@@ -429,7 +429,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 				err_str = strdup(curl_easy_strerror(err));
 				lastfailedstep = httpstep.no;
 			}
-		}		
+		}
 		if( !err_str )
 		{
 			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, httpstep.timeout)))
@@ -572,14 +572,14 @@ void process_httptests(zbx_process_t p, int now)
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_httptests()");
 
 	zbx_process	= p;
-	
+
 	result = DBselect("select httptestid,name,applicationid,nextcheck,status,delay,macros,agent,authentication,http_user,http_password"
 			" from httptest where status=%d and nextcheck<=%d and " ZBX_SQL_MOD(httptestid,%d) "=%d" DB_NODE,
 		HTTPTEST_STATUS_MONITORED,
 		now,
 		CONFIG_HTTPPOLLER_FORKS,
 		httppoller_num-1,
-		DBnode_local("httptestid"));	
+		DBnode_local("httptestid"));
 	while((row=DBfetch(result)))
 	{
 		ZBX_STR2UINT64(httptest.httptestid, row[0]);
