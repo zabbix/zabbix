@@ -469,7 +469,7 @@ class CBar extends CGraphDraw{
 							);
 				}
 			}
-			else if(in_array($this->type, array(GRAPH_TYPE_BAR, GRAPH_TYPE_BAR_STACKED))){
+			else if(uint_in_array($this->type, array(GRAPH_TYPE_BAR, GRAPH_TYPE_BAR_STACKED))){
 				if(GRAPH_YAXIS_SIDE_LEFT == $axis){
 					$shiftYBottom = $this->shiftY + $this->shiftYCaptionTop - 2; // -2 because of some mistake somewhere in calculations! FIX IT!
 					$str_pad = STR_PAD_RIGHT;
@@ -543,7 +543,7 @@ class CBar extends CGraphDraw{
 		set_image_header();
 		check_authorisation();
 
-		$this->column = in_array($this->type, array(GRAPH_TYPE_COLUMN, GRAPH_TYPE_COLUMN_STACKED));
+		$this->column = uint_in_array($this->type, array(GRAPH_TYPE_COLUMN, GRAPH_TYPE_COLUMN_STACKED));
 
 		$this->fullSizeX = $this->sizeX;
 		$this->fullSizeY = $this->sizeY;

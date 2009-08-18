@@ -91,7 +91,7 @@ require_once('include/hosts.inc.php');
 		}
 		else{
 			$unlink_templates = array_keys($_REQUEST['unlink_and_clear']);
-			$_REQUEST['clear_templates'] = array_merge($_REQUEST['clear_templates'],$unlink_templates);
+			$_REQUEST['clear_templates'] = zbx_array_merge($_REQUEST['clear_templates'],$unlink_templates);
 		}
 		foreach($unlink_templates as $id) unset($_REQUEST['templates'][$id]);
 	}

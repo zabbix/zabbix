@@ -248,7 +248,7 @@ include_once "include/page_header.php";
 			}
 
 			if(isset($services[$row['serviceid']])){
-				$services[$row['serviceid']] = array_merge($services[$row['serviceid']],$row);
+				$services[$row['serviceid']] = zbx_array_merge($services[$row['serviceid']],$row);
 			}
 			else {
 				$services[$row['serviceid']] = $row;

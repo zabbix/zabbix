@@ -2124,7 +2124,7 @@ return $result;
 		if($view_style == STYLE_TOP){
 			$header=array(new CCol(S_TRIGGERS,'center'));
 			foreach($hosts as $hostname){
-				$header=array_merge($header,array(new CImg('vtext.php?text='.$hostname)));
+				$header=zbx_array_merge($header,array(new CImg('vtext.php?text='.$hostname)));
 			}
 			$table->setHeader($header,'vertical_header');
 
@@ -2236,14 +2236,14 @@ return $result;
 				$tr_ov_menu[] = array(S_GRAPHS,	null, null,
 					array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
 					);
-				$tr_ov_menu = array_merge($tr_ov_menu, $item_menu['showgraph']);
+				$tr_ov_menu = zbx_array_merge($tr_ov_menu, $item_menu['showgraph']);
 			}
 
 			if(isset($item_menu['showlatest'])){
 				$tr_ov_menu[] = array(S_VALUES,	null, null,
 					array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
 					);
-				$tr_ov_menu = array_merge($tr_ov_menu, $item_menu['showlatest']);
+				$tr_ov_menu = zbx_array_merge($tr_ov_menu, $item_menu['showlatest']);
 			}
 
 			unset($item_menu);
@@ -2583,7 +2583,7 @@ return $result;
 			return false;
 		}
 		else{
-			$row = array_merge($row,$e_row);
+			$row = zbx_array_merge($row,$e_row);
 		}
 
 		if(($row['value']!=TRIGGER_VALUE_TRUE) && (!event_initial_time($row))){
@@ -2601,7 +2601,7 @@ return $result;
 				return false;
 			}
 			else{
-				$row = array_merge($row,$e_row);
+				$row = zbx_array_merge($row,$e_row);
 			}
 		}
 	return $row;

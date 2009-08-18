@@ -53,7 +53,7 @@ class CLdap{
 
 
 		if(is_array($arg)){
-			$this->cnf = array_merge($this->cnf,$arg);
+			$this->cnf = zbx_array_merge($this->cnf,$arg);
 		}
 
 		if(!function_exists('ldap_connect')) {
@@ -216,7 +216,7 @@ class CLdap{
 				$info[$localkey] = isset($user_result[$key])?$user_result[$key][0]:null;
 			}
 		}
-		$user_result = array_merge($info,$user_result);
+		$user_result = zbx_array_merge($info,$user_result);
 
 //get groups for given user if grouptree is given
 		if(isset($this->cnf['grouptree']) && isset($this->cnf['groupfilter'])) {

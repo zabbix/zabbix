@@ -80,7 +80,7 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['favobj'])){
 		$_REQUEST['pmasterid'] = get_request('pmasterid','mainpage');
 
-		if(in_array($_REQUEST['favobj'],array('screenid','slideshowid'))){
+		if(str_in_array($_REQUEST['favobj'],array('screenid','slideshowid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
 				$result = add2favorites('web.favorite.screenids',$_REQUEST['favid'],$_REQUEST['favobj']);

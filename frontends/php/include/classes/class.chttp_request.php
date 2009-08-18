@@ -25,7 +25,7 @@ class CHTTP_request{
 	function retrieve_headers($add_headers = false) {
 
 		if ($add_headers) {
-			$this->add_headers = array_merge($this->add_headers, $add_headers);
+			$this->add_headers = zbx_array_merge($this->add_headers, $add_headers);
 		}
 
 	if (isset($_SERVER['HTTP_METHOD'])) {

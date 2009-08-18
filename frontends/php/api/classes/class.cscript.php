@@ -68,7 +68,7 @@ class Cscript {
 			'limit'					=> null
 		);
 
-		$options = array_merge($def_options, $options);
+		$options = zbx_array_merge($def_options, $options);
 
 // editable + PERMISSION CHECK
 		if((USER_TYPE_SUPER_ADMIN == $user_type) && !is_null($options['editable'])){
