@@ -428,7 +428,7 @@ return ($time['mon'].'/'.$time['mday'].'/'.$time['year'].' '.$time['hours'].':'.
 			$unmarked_period_type = 'ut';
 		}
 
-// add periodical downtimes 
+// add periodical downtimes
 		$sql = 'SELECT ts_from,ts_to '.
 				' FROM services_times '.
 				' WHERE type='.SERVICE_TIME_TYPE_DOWNTIME.
@@ -438,7 +438,7 @@ return ($time['mon'].'/'.$time['mday'].'/'.$time['year'].' '.$time['hours'].':'.
 			expand_periodical_service_times($data,$period_start, $period_end,$db_time_row['ts_from'], $db_time_row['ts_to'],'dt');
 		}
 
-// add one-time downtimes 
+// add one-time downtimes
 		$sql = 'SELECT ts_from,ts_to '.
 				' FROM services_times '.
 				' WHERE type='.SERVICE_TIME_TYPE_ONETIME_DOWNTIME.
@@ -462,9 +462,9 @@ return ($time['mon'].'/'.$time['mday'].'/'.$time['year'].' '.$time['hours'].':'.
 				$data[$db_time_row['ts_to']]['dt_e'] = 1;
 		}
 		if(!isset($data[$period_end])) $data[$period_end] = array();
-		
+
 // sort by time stamp
-		ksort($data); 
+		ksort($data);
 /*
 		if($serviceid == 1 || $serviceid == 2){
 		print('<br>'.$serviceid.':<br>');

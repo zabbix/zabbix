@@ -103,7 +103,7 @@ class CTemplate {
 // groupids
 		if(!is_null($options['groupids'])){
 			zbx_value2array($options['groupids']);
-			
+
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sql_parts['where']['hgh'] = 'hg.hostid=h.hostid';
@@ -112,18 +112,18 @@ class CTemplate {
 // templateids
 		if(!is_null($options['templateids'])){
 			zbx_value2array($options['templateids']);
-			
+
 			$sql_parts['where'][] = DBcondition('h.hostid', $options['templateids']);
 		}
 
 // hostids
 		if(!is_null($options['hostids'])){
 			zbx_value2array($options['hostids']);
-			
+
 			if($options['extendoutput']){
 				$sql_parts['select']['linked_hostid'] = 'ht.hostid as linked_hostid';
 			}
-			
+
 			$sql_parts['from']['ht'] = 'hosts_templates ht';
 			$sql_parts['where'][] = DBcondition('ht.hostid', $options['hostids']);
 			$sql_parts['where']['hht'] = 'h.hostid=ht.templateid';
@@ -132,7 +132,7 @@ class CTemplate {
 // itemids
 		if(!is_null($options['itemids'])){
 			zbx_value2array($options['itemids']);
-			
+
 			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['itemid'] = 'i.itemid';
 			}
@@ -145,11 +145,11 @@ class CTemplate {
 // graphids
 		if(!is_null($options['graphids'])){
 			zbx_value2array($options['graphids']);
-			
+
 			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['graphid'] = 'gi.graphid';
 			}
-			
+
 			$sql_parts['from']['gi'] = 'graphs_items gi';
 			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['where'][] = DBcondition('gi.graphid', $options['graphids']);
@@ -281,7 +281,7 @@ class CTemplate {
 						$result[$template['hostid']]['applications'] = array();
 						$result[$template['hostid']]['applicationids'] = array();
 					}
-					
+
 					// groupids
 					if(isset($template['groupid'])){
 						if(!isset($result[$template['hostid']]['groupids']))
@@ -391,7 +391,7 @@ class CTemplate {
 				}
 			}
 		}
-	
+
 	return $result;
 	}
 

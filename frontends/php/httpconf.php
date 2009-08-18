@@ -54,7 +54,7 @@ include_once('include/page_header.php');
 		'authentication'=>	array(T_ZBX_INT, O_OPT,  null,  IN('0,1'),'isset({save})'),
 		'http_user'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,'isset({save}) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.')'),
 		'http_password'=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,'isset({save}) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.')'),
-		
+
 		'new_httpstep'=>	array(T_ZBX_STR, O_OPT,  null,	null,null),
 
 		'move_up'=>			array(T_ZBX_INT, O_OPT,  P_ACT,  BETWEEN(0,65534), null),
@@ -185,8 +185,8 @@ include_once('include/page_header.php');
 		foreach($delay_flex as $val)
 			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
 		$db_delay_flex = trim($db_delay_flex,';');
-		// for future use */		
-		
+		// for future use */
+
 		if ($_REQUEST['authentication'] != HTTPTEST_AUTH_NONE)
 		{
 			$http_user = htmlspecialchars($_REQUEST['http_user']);
@@ -341,7 +341,7 @@ include_once('include/page_header.php');
 	else {
 // Table HEADER
 		$http_wdgt = new CWidget();
-		
+
 		$form = new CForm();
 		$form->setMethod('get');
 
@@ -362,7 +362,7 @@ include_once('include/page_header.php');
 		$numrows->setAttribute('name','numrows');
 
 		$http_wdgt->addHeader(S_SCENARIOS_BIG, $form);
-		
+
 		$link = array('[ ',
 				new CLink($showdisabled ? S_HIDE_DISABLED_SCENARIOS: S_SHOW_DISABLED_SCENARIOS,'?showdisabled='.($showdisabled ? 0 : 1),NULL),
 				' ]');
@@ -545,7 +545,7 @@ include_once('include/page_header.php');
 		$table->setFooter(new CCol(array($goBox, $goButton)));
 //----
 		$form->addItem($table);
-		
+
 		$http_wdgt->addItem($form);
 		$http_wdgt->show();
 	}

@@ -124,7 +124,7 @@ include_once 'include/page_header.php';
 	for($i = 0, $period_start = $start; $i <= $sizeX; $i += $sizeX/52){
 		DashedLine($im,$i+$shiftX,$shiftYup,$i+$shiftX,$sizeY+$shiftYup,$gray);
 		imagestringup($im, 1,$i+$shiftX-4, $sizeY+$shiftYup+32, date('d.M',$period_start) , $black);
-		
+
 		$period_start += 7*24*3600;
 	}
 

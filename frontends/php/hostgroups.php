@@ -288,8 +288,8 @@ include_once('include/page_header.php');
 					);
 
 		$groups = CHostGroup::get($options);
-		
-		
+
+
 		$form = new CForm('hostgroups.php');
 		$form->setName('form_groups');
 

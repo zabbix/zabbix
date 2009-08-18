@@ -107,7 +107,7 @@ include_once('include/page_header.php');
 	$frmForm->addItem($cmbConf);
 
 	$alerts_wdgt->addPageHeader(S_AUDIT_ACTIONS_BIG,$frmForm);
-	
+
 	$numrows = new CDiv();
 	$numrows->setAttribute('name', 'numrows');
 
@@ -196,7 +196,7 @@ include_once('include/page_header.php');
 	if($_REQUEST['userid']){
 		$options['userids'] = $_REQUEST['userid'];
 	}
-	
+
 	$alerts = CAlert::get($options);
 
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
@@ -221,8 +221,8 @@ include_once('include/page_header.php');
 // users
 //		$user = array_pop($row['users']);
 // mediatypes
-		$mediatype = array_pop($row['mediatypes']);		
-		
+		$mediatype = array_pop($row['mediatypes']);
+
 		$time = date(S_DATE_FORMAT_YMDHMS,$row['clock']);
 
 		if($row['status'] == ALERT_STATUS_SENT){
@@ -258,7 +258,7 @@ include_once('include/page_header.php');
 			new CCol($message, 'top'),
 			new CCol($error, 'wraptext top')));
 	}
-	
+
 // PAGING FOOTER
 	$table = array($paging, $table, $paging);
 //---------

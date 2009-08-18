@@ -499,7 +499,7 @@
 		if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
 			$options['hostids'] = $PAGE_HOSTS['selected'];
 		}
-			
+
 		if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
 			$options['groupids'] = $PAGE_GROUPS['selected'];
 		}
@@ -621,7 +621,7 @@
 // PAGING FOOTER
 		$table = array($paging,$table,$paging,$footer);
 //---------
-		
+
 		$form->addItem($table);
 		$triggers_wdgt->addItem($form);
 		$triggers_wdgt->show();

@@ -891,7 +891,7 @@ require_once('include/httptest.inc.php');
 /*
 		if(!empty($hosts)){
 			update_trigger_value_to_unknown_by_hostid($hosts);
-	
+
 			return	DBexecute('UPDATE hosts SET status='.$status.
 							' WHERE '.DBcondition('hostid',$hosts).
 								' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'
@@ -1471,7 +1471,7 @@ return $result;
 		if(($PAGE_GROUPS['selected'] == 0) && ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE) && $reset_host){
 			$PAGE_GROUPS['groupids'] = array();
 		}
-		
+
 		if(($PAGE_HOSTS['selected'] == 0) && ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE) && $reset_host){
 			$PAGE_HOSTS['hostids'] = array();
 		}
@@ -1500,7 +1500,7 @@ return $result;
  */
  	function validate_group(&$PAGE_GROUPS, &$PAGE_HOSTS, $reset_host=true){
 		global $page;
-		
+
 		$config = select_config();
 
 		$dd_first_entry = $config['dropdown_first_entry'];
@@ -1671,7 +1671,7 @@ return $result;
  */
 	function delete_application($applicationids){
 		zbx_value2array($applicationids);
-		
+
 		$apps = array();
 		$sql = 'SELECT h.host, a.name '.
 				' FROM applications a, hosts h '.
@@ -1681,7 +1681,7 @@ return $result;
 		while($db_app = DBfetch($res)){
 			$apps[$db_app['applicationid']] = $db_app;
 		}
-		
+
 
 // first delete child applications
 		$tmp_appids = array();
@@ -1692,7 +1692,7 @@ return $result;
 		while($db_app = DBfetch($db_applications)){
 			$tmp_appids[$db_app['applicationid']] = $db_app['applicationid'];
 		}
-		
+
 		if(!empty($tmp_appids)) delete_application($tmp_appids);			// recursion!!!
 
 		$sql = 'SELECT ht.name '.

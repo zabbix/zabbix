@@ -268,8 +268,8 @@ include_once('include/page_header.php');
 	}
 
 	$screens_wdgt->addPageHeader(S_SCREENS_BIG,array($icon,$fs_icon));
-	
-	$screens_wdgt->addHeader($text,$form);	
+
+	$screens_wdgt->addHeader($text,$form);
 	$screens_wdgt->addItem($element);
 
 	$screens_wdgt->show();

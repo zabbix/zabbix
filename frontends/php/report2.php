@@ -172,11 +172,11 @@ include_once 'include/page_header.php';
 
 		$r_form = new CForm();
 		$r_form->setMethod('get');
-	
+
 		$cmbConf = new CComboBox('config',$config,'submit()');
 		$cmbConf->addItem(0,S_BY_HOST);
 		$cmbConf->addItem(1,S_BY_TRIGGER_TEMPLATE);
-	
+
 		$r_form->addItem($cmbConf);
 
 		$rep2_wdgt->addHeader(S_REPORT_BIG, array(S_MODE.SPACE,$r_form));

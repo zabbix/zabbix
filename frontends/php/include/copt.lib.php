@@ -116,7 +116,7 @@ if(defined('USE_PROFILING')){
 	class COpt{
 	/* protected static $starttime[]=array(); */
 	protected static $debug_info = array();
-	
+
 		protected  static function getmicrotime() {
 			if(defined('USE_TIME_PROF')) {
 				list($usec, $sec) = explode(' ',microtime());
@@ -213,8 +213,8 @@ if(defined('USE_PROFILING')){
 			$memory = COpt::getmemoryusage();
 
 			if(is_null($type)) $type='global';
-			
-			$debug_str = '';			
+
+			$debug_str = '';
 			$debug_str.= '<a name="debug"></a>';
 			$debug_str.= "******************* Stats for $type *************************".OBR;
 			if(defined('USE_TIME_PROF')){
@@ -281,20 +281,20 @@ if(defined('USE_PROFILING')){
 				}
 			}
 			$debug_str.= "******************** End of $type ***************************".OBR;
-			
+
 			self::$debug_info[$type] = $debug_str;
 		}
-	
+
 		public static function show(){
-// DEBUG of ZBX FrontEnd	
+// DEBUG of ZBX FrontEnd
 			$debug = new CDiv(null,'textcolorstyles');
 			$debug->setAttribute('id','zbx_gebug_info');
 			$debug->setAttribute('style','display: none; overflow: auto; width: 95%; border: 1px #777777 solid; margin: 4px; padding: 4px;');
-			
+
 			foreach(self::$debug_info as $type => $info){
 				$debug->addItem(array(BR(),new CJSscript($info),BR()));
 			}
-			
+
 			$debug->show();
 //----------------
 		}

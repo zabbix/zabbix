@@ -85,7 +85,7 @@ class CMaintenance {
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
 			$sql_parts['from']['r'] = 'rights r';
 			$sql_parts['from']['ug'] = 'users_groups ug';
-			
+
 			$sql_parts['where'][] = 'r.id=hg.groupid ';
 			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
 			$sql_parts['where'][] = 'ug.userid='.$userid;
@@ -127,7 +127,7 @@ class CMaintenance {
 			$sql_parts['where']['mmg'] = 'm.maintenanceid=mg.maintenanceid';
 			$sql_parts['where'][] = DBcondition('mg.groupid', $options['groupids']);
 		}
-		
+
 // hostids
 		if(!is_null($options['hostids'])){
 			zbx_value2array($options['hostids']);
@@ -148,7 +148,7 @@ class CMaintenance {
 			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['maintenanceid'] = 'm.maintenanceid';
 			}
-			
+
 			$sql_parts['where'][] = DBcondition('m.maintenanceid', $options['maintenanceids']);
 		}
 
@@ -163,7 +163,7 @@ class CMaintenance {
 
 			$sql_parts['select'] = array('count(m.maintenanceid) as rowscount');
 		}
-		
+
 // pattern
 		if(!zbx_empty($options['pattern'])){
 			$sql_parts['where'][] = ' UPPER(m.name) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
@@ -232,7 +232,7 @@ class CMaintenance {
 						$result[$maintenance['maintenanceid']]['groupids'][$maintenance['groupid']] = $maintenance['groupid'];
 						unset($maintenance['groupid']);
 					}
-					
+
 					// hostids
 					if(isset($maintenance['hostid'])){
 						if(!isset($result[$maintenance['maintenanceid']]['hostids']))
@@ -246,7 +246,7 @@ class CMaintenance {
 				}
 			}
 		}
-		
+
 		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
 
 

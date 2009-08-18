@@ -587,7 +587,7 @@ include_once('include/page_header.php');
 	}
 	else{
 		$hosts_wdgt = new CWidget();
-		
+
 		$frmForm = new CForm();
 		$frmForm->setMethod('get');
 
@@ -625,7 +625,7 @@ include_once('include/page_header.php');
 		}
 
 		$hosts = CHost::get($options);
-		
+
 		$form = new CForm();
 		$form->setName('hosts');
 		$form->addVar('config',get_request('config',0));
@@ -646,7 +646,7 @@ include_once('include/page_header.php');
 			S_AVAILABILITY,
 			S_ERROR
 		));
-		
+
 // sorting && paging
 		order_page_result($hosts, getPageSortField('host'), getPageSortOrder());
 		$paging = getPagingLine($hosts);
@@ -751,7 +751,7 @@ include_once('include/page_header.php');
 //---------
 
 		$form->addItem($table);
-		
+
 		$hosts_wdgt->addItem($form);
 		$hosts_wdgt->show();
 	}

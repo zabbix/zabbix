@@ -272,7 +272,7 @@ if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0) && !isset($available_ho
 		}
 		$frmHostG->addItemToBottomRow(SPACE);
 		$frmHostG->addItemToBottomRow(new CButtonCancel(url_param("config")));
-		
+
 		$proxies_wdgt->addItem($frmHostG);
 	}
 	else {
@@ -280,8 +280,8 @@ if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0) && !isset($available_ho
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
 
-		$proxies_wdgt->addHeader(S_PROXIES_BIG); 
-//		$proxies_wdgt->addHeader($numrows); 
+		$proxies_wdgt->addHeader(S_PROXIES_BIG);
+//		$proxies_wdgt->addHeader($numrows);
 
 		$form = new CForm('proxies.php');
 		$form->setMethod('get');
@@ -366,7 +366,7 @@ if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0) && !isset($available_ho
 //----
 
 		$form->addItem($table);
-		
+
 		$proxies_wdgt->addItem($form);
 		$proxies_wdgt->show();
 	}

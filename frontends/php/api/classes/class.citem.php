@@ -291,7 +291,7 @@ class CItem {
 			if(!is_null($options['valuetype'])){
 				$sql_parts['where'][] = 'i.value_type='.$options['valuetype'];
 			}
-			
+
 // datatype
 			if(!is_null($options['data_type'])){
 				$sql_parts['where'][] = 'i.data_type='.$options['data_type'];
@@ -317,14 +317,14 @@ class CItem {
 				$sql_parts['where'][] = 'i.status='.$options['status'];
 			}
 
-// with_triggers			
+// with_triggers
 			if(!is_null($options['with_triggers'])){
 				if($options['with_triggers'] == 1)
 					$sql_parts['where'][] = ' EXISTS ( SELECT functionid FROM functions ff WHERE ff.itemid=i.itemid )';
 				else
 					$sql_parts['where'][] = 'NOT EXISTS ( SELECT functionid FROM functions ff WHERE ff.itemid=i.itemid )';
 			}
-		}			
+		}
 
 // count
 		if(!is_null($options['count'])){

@@ -69,10 +69,10 @@ class CUserGroup {
 		);
 
 		$options = array_merge($def_options, $options);
-		
+
 // PERMISSION CHECK
 		if(USER_TYPE_SUPER_ADMIN == $user_type){
-			
+
 		}
 		else if($options['editable']){
 			return $result();
@@ -91,11 +91,11 @@ class CUserGroup {
 // userids
 		if(!is_null($options['userids'])){
 			zbx_value2array($options['userids']);
-			
+
 			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['userid'] = 'ug.userid';
 			}
-			
+
 			$sql_parts['from']['ug'] = 'users_groups ug';
 			$sql_parts['where'][] = DBcondition('ug.userid', $options['userids']);
 			$sql_parts['where']['gug'] = 'g.usrgrpid=ug.usrgrpid';

@@ -634,7 +634,7 @@ class CChart extends CGraphDraw{
 			if($drawtype == GRAPH_ITEM_DRAWTYPE_FILLED_REGION){
 				if($y1 > ($this->sizeY+$this->shiftY)) $y1 = $this->sizeY+$this->shiftY;
 				if($y2 > ($this->sizeY+$this->shiftY)) $y2 = $this->sizeY+$this->shiftY;
-				
+
 				if($y1 < ($this->sizeY+$this->shiftY)) $y1 = $this->shiftY;
 				if($y2 < ($this->sizeY+$this->shiftY)) $y2 = $this->shiftY;
 			}

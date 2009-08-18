@@ -127,8 +127,8 @@ class CAction {
 			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
 			$sql_parts['where'][] = 'ug.userid='.$userid;
 			$sql_parts['where'][] = 'r.permission>='.$permission;
-			
-			
+
+
 // condition hostgroup
 			$sql_parts['where'][] = '((c.conditiontype='.CONDITION_TYPE_HOST_GROUP.
 									' AND hg.groupid=c.value '.
@@ -225,7 +225,7 @@ class CAction {
 			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['actionid'] = 'a.actionid';
 			}
-			
+
 			$sql_parts['where']['ae'] = 'a.eventid=e.eventid';
 			$sql_parts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
 			$sql_parts['where'][] = DBcondition('e.objectid', $options['triggerids']);
@@ -238,10 +238,10 @@ class CAction {
 			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['actionid'] = 'a.actionid';
 			}
-			
+
 			$sql_parts['where'][] = DBcondition('a.actionid', $options['actionids']);
 		}
-		
+
 // userids
 		if(!is_null($options['userids'])){
 			zbx_value2array($options['userids']);
@@ -249,10 +249,10 @@ class CAction {
 			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['userid'] = 'a.userid';
 			}
-			
+
 			$sql_parts['where'][] = DBcondition('a.userid', $options['userids']);
 		}
-		
+
 // mediatypeids
 		if(!is_null($options['mediatypeids'])){
 			zbx_value2array($options['mediatypeids']);
@@ -260,7 +260,7 @@ class CAction {
 			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['mediatypeid'] = 'a.mediatypeid';
 			}
-			
+
 			$sql_parts['where'][] = DBcondition('a.mediatypeid', $options['mediatypeids']);
 		}
 
@@ -273,7 +273,7 @@ class CAction {
 		if(!is_null($options['evaltype'])){
 			$sql_parts['where'][] = 'a.evaltype='.$options['evaltype'];
 		}
-		
+
 // status
 		if(!is_null($options['status'])){
 			$sql_parts['where'][] = 'a.status='.$options['status'];
@@ -300,13 +300,13 @@ class CAction {
 
 			$sql_parts['select'] = array('COUNT(DISTINCT a.actionid) as rowscount');
 		}
-		
+
 // pattern
 		if(!zbx_empty($options['pattern'])){
 			$sql_parts['where'][] = ' UPPER(a.name) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
 		}
 
-		
+
 // order
 // restrict not allowed columns for sorting
 		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
@@ -363,7 +363,7 @@ class CAction {
 				}
 				else{
 					if(!isset($result[$action['actionid']])) $result[$action['actionid']]= array();
-					
+
 					$result[$action['actionid']] += $action;
 				}
 			}
@@ -393,7 +393,7 @@ class CAction {
 			while($operation = DBfetch($res)){
 				$operation['opconditions'] = array();
 				$operation['opconditionids'] = array();
-				
+
 				$operations[$operation['operationid']] = $operation;
 				$operationids[$operation['operationid']] = $operation['operationid'];
 			}
@@ -497,7 +497,7 @@ class CAction {
  */
 	public static function delete($actionids){
 		zbx_value2array($actionids);
-		
+
 		$sql = 'DELETE FROM actions WHERE '.DBcondition('actionid', $actionids);
 		$result = DBexecute($sql);
 		if($result)

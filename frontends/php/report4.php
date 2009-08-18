@@ -60,7 +60,7 @@ include_once('include/page_header.php');
 	$cmbMedia = new CComboBox('media_type', $media_type, 'submit();');
 	$cmbMedia->addItem(0,S_ALL_SMALL);
         $db_medias = DBselect('select * from media_type where '.DBin_node('mediatypeid').' order by description');
-		
+
 	while($media_data = DBfetch($db_medias)){
 		$cmbMedia->addItem($media_data['mediatypeid'], $media_data['description']);
 	}
@@ -169,7 +169,7 @@ include_once('include/page_header.php');
 		foreach($users as $userid => $alias){
 			$all = 0;
 			$cnt_by_type = array();
-			
+
 			foreach($media_types as $mediatypeid => $description){
 				$sql = 'SELECT count(*) as cnt '.
 						' FROM alerts a '.
@@ -180,7 +180,7 @@ include_once('include/page_header.php');
 				$cnt_data = DBfetch(DBselect($sql));
 				if(!$cnt_data)	$cnt_data = 0;
 				else		$cnt_data = $cnt_data['cnt'];
-				
+
 				array_push($cnt_by_type, $cnt_data);
 				$all += $cnt_data;
 			}

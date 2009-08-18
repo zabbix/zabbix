@@ -99,7 +99,7 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['new_groups'])){
 		$_REQUEST['new_groups'] = get_request('new_groups', array());
 		$_REQUEST['user_groups'] = get_request('user_groups', array());
-		
+
 		$_REQUEST['user_groups'] += $_REQUEST['new_groups'];
 		unset($_REQUEST['new_groups']);
 	}
@@ -309,22 +309,22 @@ include_once('include/page_header.php');
 	}
 	else{
 		$user_wdgt = new CWidget();
-		
+
 		$form = new CForm();
 		$form->setMethod('get');
 
 		$cmbUGrp = new CComboBox('filter_usrgrpid',$_REQUEST['filter_usrgrpid'],'submit()');
 		$cmbUGrp->addItem(0, S_ALL_S);
-	
+
 		$options = array('extendoutput' => 1, 'order' => 'name');
 		$usrgrps = CUserGroup::get($options);
 		foreach($usrgrps as $usrgrpid => $usrgrp){
 			$cmbUGrp->addItem($usrgrpid, $usrgrp['name']);
 		}
-	
+
 		$form->addItem(array(S_USER_GROUP.SPACE,$cmbUGrp));
 
-		
+
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
 
@@ -332,8 +332,8 @@ include_once('include/page_header.php');
 		$user_wdgt->addHeader($numrows);
 
 // User table
-		$options = array('extendoutput' => 1, 
-						'select_usrgrps' => 1, 
+		$options = array('extendoutput' => 1,
+						'select_usrgrps' => 1,
 						'get_access' => 1,
 						'limit' => ($config['search_limit']+1)
 					);
@@ -444,7 +444,7 @@ include_once('include/page_header.php');
 //---------
 
 		$form->addItem($table);
-		
+
 		$user_wdgt->addItem($form);
 		$user_wdgt->show();
 	}

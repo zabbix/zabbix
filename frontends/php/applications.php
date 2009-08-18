@@ -315,7 +315,7 @@ include_once('include/page_header.php');
 		foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
 			$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
 		}
-		
+
 		$form->addItem(array(S_GROUP.SPACE,$cmbGroups));
 		$form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 
@@ -330,8 +330,8 @@ include_once('include/page_header.php');
 			$tbl_header_host = get_header_host_table($PAGE_HOSTS['selected'], array('items', 'triggers', 'graphs'));
 			$app_wdgt->addItem($tbl_header_host);
 		}
-		
-// table applications 
+
+// table applications
 		$options = array(
 			'select_items' => 1,
 			'extendoutput' => 1,
@@ -342,13 +342,13 @@ include_once('include/page_header.php');
 		if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
 			$options['hostids'] = $PAGE_HOSTS['selected'];
 		}
-			
+
 		if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
 			$options['groupids'] = $PAGE_GROUPS['selected'];
 		}
-		
+
 		$applications = CApplication::get($options);
-		
+
 		$form = new CForm();
 		$form->setName('applications');
 		$form->addVar('groupid', $PAGE_GROUPS['selected']);
@@ -405,7 +405,7 @@ include_once('include/page_header.php');
 //---------
 
 		$form->addItem($table);
-		
+
 		$app_wdgt->addItem($form);
 		$app_wdgt->show();
 	}

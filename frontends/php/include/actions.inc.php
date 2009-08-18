@@ -1090,7 +1090,7 @@ return $table;
 
 // Author: Aly
 function get_action_msgs_for_event($eventid){
-	
+
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$table->SetHeader(array(
 		is_show_all_nodes() ? make_sorting_link(S_NODES,'a.alertid') : null,
@@ -1103,7 +1103,7 @@ function get_action_msgs_for_event($eventid){
 		S_ERROR
 	));
 
-	
+
 	$alerts = CAlert::get(array(
 		'evntids' => $eventid,
 		'alerttype' => ALERT_TYPE_MESSAGE,
@@ -1172,15 +1172,15 @@ function get_action_cmds_for_event($eventid){
 		S_COMMAND,
 		S_ERROR
 	));
-	
+
 
 	$alerts = CAlert::get(array(
 		'evntids' => $eventid,
 		'alerttype' => ALERT_TYPE_COMMAND,
 		'extendoutput' => 1,
-		'sortfield' => 'clock'		
+		'sortfield' => 'clock'
 	));
-	
+
 	foreach($alerts as $row){
 		$time = date('Y.M.d H:i:s', $row['clock']);
 		if($row['esc_step'] > 0){
