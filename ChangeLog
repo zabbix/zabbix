@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-137] add AIX initscript for agentd by Faustino Ramos (Richlv)
  - [DEV-420] auto-discovery of multiple-IP devices (Sasha)
  - [DEV-419] added support of Basic Authentication for Web monitoring (Dmitry)
  - [DEV-325] new check for DNS `net.tcp.dns.query' wad added; added additional `type' parameter (Dmitry)
