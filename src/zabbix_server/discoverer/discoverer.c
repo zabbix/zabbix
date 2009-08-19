@@ -86,8 +86,6 @@ static void	update_dservice(DB_DSERVICE *service)
 {
 	char	*value_esc;
 
-	assert(service);
-
 	value_esc = DBdyn_escape_string_len(service->value, DSERVICE_VALUE_LEN);
 
 	DBexecute("update dservices set status=%d,lastup=%d,lastdown=%d,value='%s' where dserviceid=" ZBX_FS_UI64,
@@ -96,6 +94,7 @@ static void	update_dservice(DB_DSERVICE *service)
 			service->lastdown,
 			value_esc,
 			service->dserviceid);
+
 	zbx_free(value_esc);
 }
 
@@ -118,13 +117,12 @@ static void	update_dservice_value(DB_DSERVICE *service)
 {
 	char	*value_esc;
 
-	assert(service);
-
 	value_esc = DBdyn_escape_string_len(service->value, DSERVICE_VALUE_LEN);
 
 	DBexecute("update dservices set value='%s' where dserviceid=" ZBX_FS_UI64,
 			value_esc,
 			service->dserviceid);
+
 	zbx_free(value_esc);
 }
 
@@ -145,13 +143,143 @@ static void	update_dservice_value(DB_DSERVICE *service)
  ******************************************************************************/
 static void	update_dhost(DB_DHOST *dhost)
 {
-	assert(dhost);
-
 	DBexecute("update dhosts set status=%d,lastup=%d,lastdown=%d where dhostid=" ZBX_FS_UI64,
 			dhost->status,
 			dhost->lastup,
 			dhost->lastdown,
 			dhost->dhostid);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: separate_host                                                    *
+ *                                                                            *
+ * Purpose: separate multiple-IP hosts                                        *
+ *                                                                            *
+ * Parameters: host ip address                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	separate_host(DB_DRULE *drule, DB_DHOST *dhost, const char *ip)
+{
+	const char	*__function_name = "separate_host";
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*ip_esc, *sql = NULL;
+	zbx_uint64_t	dhostid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s'", __function_name, ip);
+
+	ip_esc = DBdyn_escape_string_len(ip, DHOST_IP_LEN);
+	sql = zbx_dsprintf(sql,
+			"select dserviceid"
+			" from dservices"
+			" where dhostid=" ZBX_FS_UI64
+				" and ip<>'%s'",
+			dhost->dhostid,
+			ip_esc);
+
+	result = DBselectN(sql, 1);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		dhostid = DBget_maxid("dhosts", "dhostid");
+
+		DBexecute("insert into dhosts (dhostid,druleid)"
+				" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
+				dhostid,
+				drule->druleid);
+
+		DBexecute("update dservices"
+				" set dhostid=" ZBX_FS_UI64
+				" where dhostid=" ZBX_FS_UI64
+					" and ip='%s'",
+				dhostid,
+				dhost->dhostid,
+				ip_esc);
+
+		dhost->dhostid	= dhostid;
+		dhost->status	= DOBJECT_STATUS_DOWN;
+		dhost->lastup	= 0;
+		dhost->lastdown	= 0;
+	}
+	DBfree_result(result);
+
+	zbx_free(sql);
+	zbx_free(ip_esc);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: join_host                                                        *
+ *                                                                            *
+ * Purpose: join multiple-IP host by value                                    *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	join_host(DB_DRULE *drule, DB_DHOST *dhost, const char *value)
+{
+	const char	*__function_name = "join_host";
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*value_esc, *sql = NULL;
+	zbx_uint64_t	dhostid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() value:'%s'", __function_name, value);
+
+	value_esc = DBdyn_escape_string_len(value, DSERVICE_VALUE_LEN);
+	sql = zbx_dsprintf(sql,
+			"select dhostid"
+			" from dservices"
+			" where dcheckid=" ZBX_FS_UI64
+				" and value='%s'"
+			" order by dserviceid",
+			drule->unique_dcheckid,
+			value_esc);
+
+	result = DBselectN(sql, 1);
+
+	zbx_free(value_esc);
+	zbx_free(sql);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(dhostid, row[0]);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() new_dhostid:" ZBX_FS_UI64 " dhostid:" ZBX_FS_UI64,
+				__function_name, dhostid, dhost->dhostid);
+
+		if (dhost->dhostid != dhostid)
+		{
+			DBexecute("update dservices"
+					" set dhostid=" ZBX_FS_UI64
+					" where dhostid=" ZBX_FS_UI64,
+					dhostid,
+					dhost->dhostid);
+			DBexecute("delete from dhosts"
+					" where dhostid=" ZBX_FS_UI64,
+					dhost->dhostid);
+			dhost->dhostid = dhostid;
+
+		}
+	}
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -169,69 +297,130 @@ static void	update_dhost(DB_DHOST *dhost)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	register_service(DB_DSERVICE *service, const char *ip, int port, int status)
+static void	register_service(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, DB_DSERVICE *dservice,
+		const char *ip, int port, int status, int now)
 {
+	const char	*__function_name = "register_service";
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*key_esc;
+	char		*key_esc, *ip_esc;
+	zbx_uint64_t	dhostid;
 
-	assert(service);
-	assert(ip);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s' port:%d key:'%s'", __function_name, ip, port, dcheck->key_);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In register_service(ip:%s,port:%d,key:%s)",
-			ip,
-			port,
-			service->key_);
+	key_esc = DBdyn_escape_string_len(dcheck->key_, DSERVICE_KEY_LEN);
+	ip_esc = DBdyn_escape_string_len(ip, HOST_IP_LEN);
 
-	key_esc = DBdyn_escape_string_len(service->key_, DSERVICE_KEY_LEN);
+	result = DBselect(
+			"select dserviceid,dhostid,status,lastup,lastdown,value"
+			" from dservices"
+			" where dcheckid=" ZBX_FS_UI64
+				" and type=%d"
+				" and key_='%s'"
+				" and ip='%s'"
+				" and port=%d",
+			dcheck->dcheckid,
+			dcheck->type,
+			key_esc,
+			ip_esc,
+			port);
 
-	result = DBselect("select dserviceid,status,lastup,lastdown,value"
-			" from dservices where dhostid=" ZBX_FS_UI64 " and dcheckid=" ZBX_FS_UI64
-			" and type=%d and port=%d and key_='%s'",
-			service->dhostid,
-			service->dcheckid,
-			service->type,
-			port,
-			key_esc);
-
-	if (NULL == (row = DBfetch(result)) || DBis_null(row[0]) == SUCCEED)
+	if (NULL == (row = DBfetch(result)))
 	{
 		/* Add host only if service is up */
 		if (status == DOBJECT_STATUS_UP)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "New service discovered on port %d", port);
 
-			service->dserviceid	= DBget_maxid("dservices","dserviceid");
-			service->port		= port;
-			service->status		= DOBJECT_STATUS_DOWN;
+			dservice->dserviceid	= DBget_maxid("dservices", "dserviceid");
+			dservice->status	= DOBJECT_STATUS_DOWN;
 
-			DBexecute("insert into dservices (dserviceid,dhostid,dcheckid,type,port,status,key_)"
-					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,%d,'%s')",
-					service->dserviceid,
-					service->dhostid,
-					service->dcheckid,
-					service->type,
-					service->port,
-					service->status,
-					key_esc);
+			DBexecute("insert into dservices (dserviceid,dhostid,dcheckid,type,key_,ip,port,status)"
+					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s','%s',%d,%d)",
+					dservice->dserviceid,
+					dhost->dhostid,
+					dcheck->dcheckid,
+					dcheck->type,
+					key_esc,
+					ip_esc,
+					port,
+					dservice->status);
 		}
 	}
 	else
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Service is already in database");
 
-		service->dserviceid	= zbx_atoui64(row[0]);
-		service->port		= port;
-		service->status		= atoi(row[1]);
-		service->lastup		= atoi(row[2]);
-		service->lastdown	= atoi(row[3]);
-		strscpy(service->value, row[4]);
+		ZBX_STR2UINT64(dservice->dserviceid, row[0]);
+		ZBX_STR2UINT64(dhostid, row[1]);
+		dservice->status	= atoi(row[2]);
+		dservice->lastup	= atoi(row[3]);
+		dservice->lastdown	= atoi(row[4]);
+		strscpy(dservice->value, row[5]);
+
+		if (dhostid != dhost->dhostid)
+		{
+			DBexecute("update dservices"
+					" set dhostid=" ZBX_FS_UI64
+					" where dhostid=" ZBX_FS_UI64,
+					dhost->dhostid,
+					dhostid);
+			DBexecute("delete from dhosts"
+					" where dhostid=" ZBX_FS_UI64,
+					dhostid);
+		}
+
 	}
 	DBfree_result(result);
 
+	zbx_free(ip_esc);
 	zbx_free(key_esc);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End register_service()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+static DB_RESULT	get_dhost_by_ip(zbx_uint64_t druleid, const char *ip)
+{
+	DB_RESULT	result;
+	char		*ip_esc;
+
+	ip_esc = DBdyn_escape_string_len(ip, DHOST_IP_LEN);
+
+	result = DBselect(
+			"select dh.dhostid,dh.status,dh.lastup,dh.lastdown"
+			" from dhosts dh,dservices ds"
+			" where ds.dhostid=dh.dhostid"
+				" and dh.druleid=" ZBX_FS_UI64
+				" and ds.ip='%s'"
+			" order by dh.dhostid",
+			druleid,
+			ip_esc);
+
+	zbx_free(ip_esc);
+
+	return result;
+}
+
+static DB_RESULT	get_dhost_by_value(zbx_uint64_t dcheckid, const char *value)
+{
+	DB_RESULT	result;
+	char		*value_esc;
+
+	value_esc = DBdyn_escape_string_len(value, DSERVICE_VALUE_LEN);
+
+	result = DBselect(
+			"select dh.dhostid,dh.status,dh.lastup,dh.lastdown"
+			" from dhosts dh,dservices ds"
+			" where ds.dhostid=dh.dhostid"
+				" and ds.dcheckid=" ZBX_FS_UI64
+				" and ds.value='%s'"
+			" order by dh.dhostid",
+			dcheckid,
+			value_esc);
+
+	zbx_free(value_esc);
+
+	return result;
 }
 
 /******************************************************************************
@@ -249,56 +438,67 @@ static void	register_service(DB_DSERVICE *service, const char *ip, int port, int
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	register_host(DB_DHOST *dhost, const char *ip, int status)
+static void	register_host(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, const char *ip, int status, const char *value)
 {
+	const char	*__function_name = "register_host";
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*ip_esc;
 
-	assert(dhost);
-	assert(ip);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In register_host(ip:%s)",
-			ip);
+	if (drule->unique_dcheckid == dcheck->dcheckid)
+	{
+		result = get_dhost_by_value(dcheck->dcheckid, value);
 
-	ip_esc = DBdyn_escape_string_len(ip, DHOST_IP_LEN);
+		if (NULL == (row = DBfetch(result)))
+		{
+			DBfree_result(result);
 
-	result = DBselect("select dhostid,ip,status,lastup,lastdown from dhosts"
-			" where druleid=" ZBX_FS_UI64 " and ip='%s'" DB_NODE,
-			dhost->druleid,
-			ip_esc,
-			DBnode_local("dhostid"));
+			result = get_dhost_by_ip(drule->druleid, ip);
+			row = DBfetch(result);
+		}
+	}
+	else
+	{
+		result = get_dhost_by_ip(drule->druleid, ip);
+		row = DBfetch(result);
+	}
 
-	if (NULL == (row = DBfetch(result)) || DBis_null(row[0]) == SUCCEED) {
+	if (NULL == row)
+	{
 		/* Add host only if service is up */
-		if (status == DOBJECT_STATUS_UP) {
+		if (status == DOBJECT_STATUS_UP)
+		{
 			zabbix_log(LOG_LEVEL_DEBUG, "New host discovered at %s",
 					ip);
 
 			dhost->dhostid	= DBget_maxid("dhosts", "dhostid");
 			dhost->status	= DOBJECT_STATUS_DOWN;
-			strscpy(dhost->ip, ip);
+			dhost->lastup	= 0;
+			dhost->lastdown	= 0;
 
-			DBexecute("insert into dhosts (dhostid,druleid,ip) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')",
+			DBexecute("insert into dhosts (dhostid,druleid)"
+					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
 					dhost->dhostid,
-					dhost->druleid,
-					ip_esc);
+					drule->druleid);
 		}
-	} else {
+	}
+	else
+	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Host at %s is already in database",
 				ip);
 
-		dhost->dhostid	= zbx_atoui64(row[0]);
-		dhost->status	= atoi(row[2]);
-		dhost->lastup	= atoi(row[3]);
-		dhost->lastdown	= atoi(row[4]);
-		strscpy(dhost->ip, row[1]);
+		ZBX_STR2UINT64(dhost->dhostid, row[0]);
+		dhost->status	= atoi(row[1]);
+		dhost->lastup	= atoi(row[2]);
+		dhost->lastdown	= atoi(row[3]);
+
+		if (0 == drule->unique_dcheckid)
+			separate_host(drule, dhost, ip);
 	}
 	DBfree_result(result);
 
-	zbx_free(ip_esc);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End register_host()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -316,87 +516,40 @@ static void	register_host(DB_DHOST *dhost, const char *ip, int status)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void update_service_status(DB_DSERVICE *service, DB_DCHECK *check, int now, unsigned char *events)
+static void update_service_status(DB_DSERVICE *dservice, int status, const char *value, int now)
 {
-	assert(service);
-	assert(check);
-
-	*events = 0;
-
 	/* Update service status */
-	if (check->status == DOBJECT_STATUS_UP)
+	if (status == DOBJECT_STATUS_UP)
 	{
-		if (service->status == DOBJECT_STATUS_DOWN || service->lastup == 0)
+		if (dservice->status == DOBJECT_STATUS_DOWN || dservice->lastup == 0)
 		{
-			service->status		= check->status;
-			service->lastdown	= 0;
-			service->lastup		= now;
+			dservice->status	= status;
+			dservice->lastdown	= 0;
+			dservice->lastup	= now;
 
-			strcpy(service->value, check->value);
-			update_dservice(service);
-			*events |= 0x01;
+			strcpy(dservice->value, value);
+			update_dservice(dservice);
+			add_event(EVENT_OBJECT_DSERVICE, dservice->dserviceid, now, DOBJECT_STATUS_DISCOVER);
 		}
-		else if (0 != strcmp(service->value, check->value))
+		else if (0 != strcmp(dservice->value, value))
 		{
-			strcpy(service->value, check->value);
-			update_dservice_value(service);
+			strcpy(dservice->value, value);
+			update_dservice_value(dservice);
 		}
 	}
-	else
-	{ /* DOBJECT_STATUS_DOWN */
-		if (service->status == DOBJECT_STATUS_UP || service->lastdown == 0)
+	else	/* DOBJECT_STATUS_DOWN */
+	{
+		if (dservice->status == DOBJECT_STATUS_UP || dservice->lastdown == 0)
 		{
-			service->status		= check->status;
-			service->lastdown	= now;
-			service->lastup		= 0;
+			dservice->status	= status;
+			dservice->lastdown	= now;
+			dservice->lastup	= 0;
 
-			update_dservice(service);
-			*events |= 0x02;
+			update_dservice(dservice);
+			add_event(EVENT_OBJECT_DSERVICE, dservice->dserviceid, now, DOBJECT_STATUS_LOST);
 		}
 	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: update_host_status                                               *
- *                                                                            *
- * Purpose: update new host status                                            *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Aleksander Vladishev                                               *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static void update_host_status(DB_DHOST *dhost, int status, int now, unsigned char *events)
-{
-	assert(dhost);
-
-	*events = 0;
-
-	/* Update host status */
-	if (status == DOBJECT_STATUS_UP) {
-		if (dhost->status == DOBJECT_STATUS_DOWN || dhost->lastup == 0) {
-			dhost->status	= status;
-			dhost->lastdown	= 0;
-			dhost->lastup	= now;
-
-			update_dhost(dhost);
-			*events |= 0x01;
-		}
-	} else { /* DOBJECT_STATUS_DOWN */
-		if (dhost->status == DOBJECT_STATUS_UP || dhost->lastdown == 0) {
-			dhost->status	= status;
-			dhost->lastdown	= now;
-			dhost->lastup	= 0;
-
-			update_dhost(dhost);
-			*events |= 0x02;
-		}
-	}
+	add_event(EVENT_OBJECT_DSERVICE, dservice->dserviceid, now, status);
 }
 
 /******************************************************************************
@@ -414,56 +567,71 @@ static void update_host_status(DB_DHOST *dhost, int status, int now, unsigned ch
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void update_service(DB_DHOST *dhost, DB_DCHECK *check, char *ip, int port, int now)
+void	update_service(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, char *ip, int port, int status, const char *value, int now)
 {
-	unsigned char	events;
-	DB_DSERVICE	service;
+	const char	*__function_name = "update_service";
+	DB_DSERVICE	dservice;
 
-	assert(dhost);
-	assert(check);
-	assert(ip);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s' port:%d status:%d", __function_name, ip, port, status);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In update_service(ip:%s,port:%d,status:%s)",
-			ip,
-			port,
-			(check->status == DOBJECT_STATUS_UP ? "up" : "down"));
-
-	memset(&service, 0, sizeof(service));
-
-	DBbegin();
+	memset(&dservice, 0, sizeof(dservice));
 
 	/* Register host if is not registered yet */
-	if (dhost->dhostid == 0)
-		register_host(dhost, ip, check->status);
+	if (0 == dhost->dhostid)
+		register_host(drule, dcheck, dhost, ip, status, value);
 
+/*	if (0 != dhost->dhostid && dcheck->dcheckid == drule->unique_dcheckid)
+		join_host(drule, dhost, value);
+*/
 	/* Register service if is not registered yet */
-	if (dhost->dhostid > 0) {
-		service.dhostid = dhost->dhostid;
-		service.dcheckid = check->dcheckid;
-		service.type = check->type;
-		strscpy(service.key_, check->key_);
-		register_service(&service, ip, port, check->status);
-	}
+	if (0 != dhost->dhostid)
+		register_service(drule, dcheck, dhost, &dservice, ip, port, status, now);
 
 	/* Service wasn't registered because we do not add down service */
-	if (service.dserviceid == 0)
-	{
-		DBcommit();
-		return;
+	if (0 != dservice.dserviceid)
+		update_service_status(&dservice, status, value, now);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: update_host_status                                               *
+ *                                                                            *
+ * Purpose: update new host status                                            *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	update_host_status(DB_DHOST *dhost, int status, int now)
+{
+	/* Update host status */
+	if (status == DOBJECT_STATUS_UP) {
+		if (dhost->status == DOBJECT_STATUS_DOWN || dhost->lastup == 0) {
+			dhost->status	= status;
+			dhost->lastdown	= 0;
+			dhost->lastup	= now;
+
+			update_dhost(dhost);
+			add_event(EVENT_OBJECT_DHOST, dhost->dhostid, now, DOBJECT_STATUS_DISCOVER);
+		}
+	} else { /* DOBJECT_STATUS_DOWN */
+		if (dhost->status == DOBJECT_STATUS_UP || dhost->lastdown == 0) {
+			dhost->status	= status;
+			dhost->lastdown	= now;
+			dhost->lastup	= 0;
+
+			update_dhost(dhost);
+			add_event(EVENT_OBJECT_DHOST, dhost->dhostid, now, DOBJECT_STATUS_LOST);
+		}
 	}
-
-	update_service_status(&service, check, now, &events);
-
-	DBcommit();
-
-	/* Process events after DBcommit() for correct dusplay of notification macros */
-	if (events & 0x01)
-		add_event(EVENT_OBJECT_DSERVICE, service.dserviceid, now, DOBJECT_STATUS_DISCOVER);
-	if (events & 0x02)
-		add_event(EVENT_OBJECT_DSERVICE, service.dserviceid, now, DOBJECT_STATUS_LOST);
-	add_event(EVENT_OBJECT_DSERVICE, service.dserviceid, now, check->status);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End update_service()");
+	add_event(EVENT_OBJECT_DHOST, dhost->dhostid, now, status);
 }
 
 /******************************************************************************
@@ -481,41 +649,16 @@ void update_service(DB_DHOST *dhost, DB_DCHECK *check, char *ip, int port, int n
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void update_host(DB_DHOST *dhost, const char *ip, int status, int now)
+void	update_host(DB_DHOST *dhost, const char *ip, int status, int now)
 {
-	unsigned char	events;
-	DB_DSERVICE	service;
+	const char	*__function_name = "update_host";
 
-	assert(dhost);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In update_host()");
+	if (0 != dhost->dhostid)
+		update_host_status(dhost, status, now);
 
-	memset(&service, 0, sizeof(service));
-
-	DBbegin();
-
-	/* Register host if is not registered yet */
-	if (dhost->dhostid == 0)
-		register_host(dhost, ip, status);
-
-	if (dhost->dhostid == 0)
-	{
-		DBcommit();
-		return;
-	}
-
-	update_host_status(dhost, status, now, &events);
-
-	DBcommit();
-
-	/* Process events after DBcommit() for correct dusplay of notification macros */
-	if (events & 0x01)
-		add_event(EVENT_OBJECT_DHOST, dhost->dhostid, now, DOBJECT_STATUS_DISCOVER);
-	if (events & 0x02)
-		add_event(EVENT_OBJECT_DHOST, dhost->dhostid, now, DOBJECT_STATUS_LOST);
-	add_event(EVENT_OBJECT_DHOST, dhost->dhostid, now, status);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End update_service()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -533,34 +676,29 @@ void update_host(DB_DHOST *dhost, const char *ip, int status, int now)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void proxy_update_service(DB_DCHECK *check, char *ip, int port, int now)
+static void proxy_update_service(DB_DRULE *drule, DB_DCHECK *dcheck, char *ip, int port, int status, const char *value, int now)
 {
 	char	*ip_esc, *key_esc, *value_esc;
 
-	assert(check);
-	assert(ip);
-
 	ip_esc = DBdyn_escape_string_len(ip, PROXY_DHISTORY_IP_LEN);
-	key_esc = DBdyn_escape_string_len(check->key_, PROXY_DHISTORY_KEY_LEN);
-	value_esc = DBdyn_escape_string_len(check->value, PROXY_DHISTORY_VALUE_LEN);
+	key_esc = DBdyn_escape_string_len(dcheck->key_, PROXY_DHISTORY_KEY_LEN);
+	value_esc = DBdyn_escape_string_len(value, PROXY_DHISTORY_VALUE_LEN);
 
-	DBbegin();
 	DBexecute("insert into proxy_dhistory (clock,druleid,dcheckid,type,ip,port,key_,value,status)"
 			" values (%d," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,'%s',%d,'%s','%s',%d)",
 			now,
-			check->druleid,
-			check->dcheckid,
-			check->type,
+			drule->druleid,
+			dcheck->dcheckid,
+			dcheck->type,
 			ip_esc,
 			port,
 			key_esc,
 			value_esc,
-			check->status);
-	DBcommit();
+			status);
 
-	zbx_free(ip_esc);
-	zbx_free(key_esc);
 	zbx_free(value_esc);
+	zbx_free(key_esc);
+	zbx_free(ip_esc);
 }
 
 /******************************************************************************
@@ -578,22 +716,18 @@ static void proxy_update_service(DB_DCHECK *check, char *ip, int port, int now)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void proxy_update_host(zbx_uint64_t druleid, char *ip, int status, int now)
+static void proxy_update_host(DB_DRULE *drule, char *ip, int status, int now)
 {
 	char	*ip_esc;
 
-	assert(ip);
-
 	ip_esc = DBdyn_escape_string_len(ip, PROXY_DHISTORY_IP_LEN);
 
-	DBbegin();
 	DBexecute("insert into proxy_dhistory (clock,druleid,type,ip,status)"
 			" values (%d," ZBX_FS_UI64 ",-1,'%s',%d)",
 			now,
-			druleid,
+			drule->druleid,
 			ip_esc,
 			status);
-	DBcommit();
 
 	zbx_free(ip_esc);
 }
@@ -613,24 +747,22 @@ static void proxy_update_host(zbx_uint64_t druleid, char *ip, int status, int no
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int discover_service(DB_DCHECK *check, char *ip, int port)
+static int discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 {
 	const char	*__function_name = "discover_service";
 	int		ret = SUCCEED;
 	char		key[MAX_STRING_LEN], error[ITEM_ERROR_LEN_MAX];
 	const char	*service = NULL;
-	AGENT_RESULT 	value;
+	AGENT_RESULT 	result;
 	DB_ITEM		item;
 	ZBX_FPING_HOST	host;
 
-	assert(check);
-	assert(ip);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [ip:'%s' port:%d type:%d]", __function_name, ip, port, check->type);
+	init_result(&result);
+	*value = '\0';
 
-	init_result(&value);
-
-	switch (check->type) {
+	switch (dcheck->type) {
 		case SVC_SSH:	service = "ssh"; break;
 		case SVC_LDAP:	service = "ldap"; break;
 		case SVC_SMTP:	service = "smtp"; break;
@@ -654,7 +786,7 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 	if (ret == SUCCEED) {
 		alarm(10);
 
-		switch(check->type) {
+		switch(dcheck->type) {
 			/* Simple checks */
 			case SVC_SSH:
 			case SVC_LDAP:
@@ -667,11 +799,11 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 			case SVC_TCP:
 				zbx_snprintf(key, sizeof(key), "net.tcp.service[%s,%s,%d]", service, ip, port);
 
-				if (SUCCEED == process(key, 0, &value))
+				if (SUCCEED == process(key, 0, &result))
 				{
-					if (GET_UI64_RESULT(&value))
+					if (GET_UI64_RESULT(&result))
 					{
-						if (value.ui64 == 0)
+						if (result.ui64 == 0)
 							ret = FAIL;
 					}
 					else
@@ -686,7 +818,7 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 			case SVC_SNMPv2c:
 			case SVC_SNMPv3:
 				memset(&item, 0, sizeof(DB_ITEM));
-				item.key	= check->key_;
+				item.key	= dcheck->key_;
 				item.host_name	= ip;
 				item.host_ip	= ip;
 				item.host_dns	= ip;
@@ -695,27 +827,27 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 
 				item.value_type	= ITEM_VALUE_TYPE_STR;
 
-				switch (check->type) {
+				switch (dcheck->type) {
 				case SVC_SNMPv1:	item.type = ITEM_TYPE_SNMPv1; break;
 				case SVC_SNMPv2c:	item.type = ITEM_TYPE_SNMPv2c; break;
 				case SVC_SNMPv3:	item.type = ITEM_TYPE_SNMPv3; break;
 				default:		item.type = ITEM_TYPE_ZABBIX; break;
 				}
 
-				item.snmp_oid			= check->key_;
-				item.snmp_community		= check->snmp_community;
-				item.snmpv3_securityname	= check->snmpv3_securityname;
-				item.snmpv3_securitylevel	= check->snmpv3_securitylevel;
-				item.snmpv3_authpassphrase	= check->snmpv3_authpassphrase;
-				item.snmpv3_privpassphrase	= check->snmpv3_privpassphrase;
+				item.snmp_oid			= dcheck->key_;
+				item.snmp_community		= dcheck->snmp_community;
+				item.snmpv3_securityname	= dcheck->snmpv3_securityname;
+				item.snmpv3_securitylevel	= dcheck->snmpv3_securitylevel;
+				item.snmpv3_authpassphrase	= dcheck->snmpv3_authpassphrase;
+				item.snmpv3_privpassphrase	= dcheck->snmpv3_privpassphrase;
 				item.snmp_port			= port;
 
-				if (check->type == SVC_AGENT)
+				if (dcheck->type == SVC_AGENT)
 				{
-					if(SUCCEED == get_value_agent(&item, &value))
+					if(SUCCEED == get_value_agent(&item, &result))
 					{
-						if (GET_STR_RESULT(&value))
-							strscpy(check->value, value.str);
+						if (GET_STR_RESULT(&result))
+							strlcpy(value, result.str, DSERVICE_VALUE_LEN_MAX);
 						else
 							ret = FAIL;
 					}
@@ -725,10 +857,10 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 				else
 #ifdef HAVE_SNMP
 				{
-					if(SUCCEED == get_value_snmp(&item, &value))
+					if(SUCCEED == get_value_snmp(&item, &result))
 					{
-						if (GET_STR_RESULT(&value))
-							strscpy(check->value, value.str);
+						if (GET_STR_RESULT(&result))
+							strlcpy(value, result.str, DSERVICE_VALUE_LEN_MAX);
 						else
 							ret = FAIL;
 					}
@@ -739,31 +871,15 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 					ret = FAIL;
 #endif
 
-				if (FAIL == ret && GET_MSG_RESULT(&value))
+				if (FAIL == ret && GET_MSG_RESULT(&result))
 					zabbix_log(LOG_LEVEL_DEBUG, "Discovery: Item [%s] error: %s",
 							zbx_host_key_string_by_item(&item),
-							value.msg);
+							result.msg);
 				break;
 			case SVC_ICMPPING:
 				memset(&host, 0, sizeof(host));
-				/*
-				#define ZBX_FPING_HOST struct zbx_fping_host
-				ZBX_FPING_HOST
-				{
-					char		*addr;
-					double		min, avg, max;
-					int			rcv;
-				};
-				*/
-				zbx_malloc(host.addr, HOST_ADDR_LEN_MAX);
-				strscpy(host.addr, ip);
-				/*host.useip = 1;*/
+				host.addr = strdup(ip);
 
-				/*if (SUCCEED != do_ping(&host, 1, error, sizeof(error)) || 0 == host.alive)
-					ret = FAIL;*/
-
-				/*int	do_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int interval, int size, int timeout, char *error, int max_error_len);*/
-				/*`count is mandatory, `interval', `size', timeout' are not*/
 				if (SUCCEED != do_ping(&host, 1, 3, 0, 0, 0, error, sizeof(error)) || 0 == host.rcv)
 					ret = FAIL;
 
@@ -774,7 +890,7 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 		}
 		alarm(0);
 	}
-	free_result(&value);
+	free_result(&result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -796,23 +912,17 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void process_check(DB_DRULE *rule, DB_DHOST *dhost, int *host_status, DB_DCHECK *check, char *ip)
+static void process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, int *host_status, char *ip)
 {
-	int	port, first, last, now;
-	char	*curr_range, *next_range, *last_port;
+	const char	*__function_name = "process_check";
+	int		port, first, last, now;
+	char		*curr_range, *next_range, *last_port;
+	int		status;
+	char		value[DSERVICE_VALUE_LEN_MAX];
 
-	assert(rule);
-	assert(dhost);
-	assert(host_status);
-	assert(check);
-	assert(ip);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_check(ip:%s, ports:%s, type:%d)",
-			ip,
-			check->ports,
-			check->type);
-
-	for (curr_range = check->ports; curr_range; curr_range = next_range)
+	for (curr_range = dcheck->ports; curr_range; curr_range = next_range)
 	{	/* split by ',' */
 		if (NULL != (next_range = strchr(curr_range, ',')))
 			*next_range = '\0';
@@ -833,27 +943,93 @@ static void process_check(DB_DRULE *rule, DB_DHOST *dhost, int *host_status, DB_
 			next_range++;
 		}
 
-		for (port = first; port <= last; port++) {
-			check->status = (SUCCEED == discover_service(check, ip, port)) ? DOBJECT_STATUS_UP : DOBJECT_STATUS_DOWN;
+		for (port = first; port <= last; port++)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() port:%d", __function_name, port);
+
+			status = (SUCCEED == discover_service(dcheck, ip, port, value)) ? DOBJECT_STATUS_UP : DOBJECT_STATUS_DOWN;
 
 			/* Update host status */
-			if (*host_status == -1 || check->status == DOBJECT_STATUS_UP)
-				*host_status = check->status;
+			if (*host_status == -1 || status == DOBJECT_STATUS_UP)
+				*host_status = status;
 
 			now = time(NULL);
 
+			DBbegin();
 			switch (zbx_process) {
 			case ZBX_PROCESS_SERVER	:
-				update_service(dhost, check, ip, port, now);
+				update_service(drule, dcheck, dhost, ip, port, status, value, now);
 				break;
 			case ZBX_PROCESS_PROXY	:
-				proxy_update_service(check, ip, port, now);
+				proxy_update_service(drule, dcheck, ip, port, status, value, now);
 				break;
 			}
+			DBcommit();
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End process_check()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: process_checks                                                   *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	process_checks(DB_DRULE *drule, DB_DHOST *dhost, int *host_status, char *ip, int unique)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	DB_DCHECK	dcheck;
+	char		sql[MAX_STRING_LEN];
+	int		offset = 0;
+
+	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
+			"select dcheckid,type,key_,snmp_community,snmpv3_securityname,snmpv3_securitylevel,"
+				"snmpv3_authpassphrase,snmpv3_privpassphrase,ports"
+			" from dchecks"
+			" where druleid=" ZBX_FS_UI64,
+			drule->druleid);
+
+	if (drule->unique_dcheckid)
+	{
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
+				" and dcheckid%s" ZBX_FS_UI64,
+				unique ? "=" : "<>",
+				drule->unique_dcheckid);
+	}
+
+	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
+			" order by dcheckid");
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result))) {
+		memset(&dcheck, 0, sizeof(dcheck));
+
+		ZBX_STR2UINT64(dcheck.dcheckid, row[0]);
+		dcheck.type			= atoi(row[1]);
+		dcheck.key_			= row[2];
+		dcheck.snmp_community		= row[3];
+		dcheck.snmpv3_securityname	= row[4];
+		dcheck.snmpv3_securitylevel	= atoi(row[5]);
+		dcheck.snmpv3_authpassphrase	= row[6];
+		dcheck.snmpv3_privpassphrase	= row[7];
+		dcheck.ports			= row[8];
+
+		process_check(drule, &dcheck, dhost, host_status, ip);
+	}
+	DBfree_result(result);
 }
 
 /******************************************************************************
@@ -871,32 +1047,22 @@ static void process_check(DB_DRULE *rule, DB_DHOST *dhost, int *host_status, DB_
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void process_rule(DB_DRULE *rule)
+static void process_rule(DB_DRULE *drule)
 {
 	const char	*__function_name = "process_rule";
-	DB_RESULT	result;
-	DB_ROW		row;
-	DB_DCHECK	check;
 	DB_DHOST	dhost;
 	int		host_status, now;
-
-	char		ip[HOST_IP_LEN_MAX];
-	unsigned int	j[9], i;
-	unsigned int	first, last, mask, network, broadcast;
-
-	char		*curr_range, *next_range, *dash, *slash;
+	unsigned int	j[9], i, first, last, mask, network, broadcast;
+	char		ip[HOST_IP_LEN_MAX], *curr_range, *next_range, *dash, *slash;
 #if defined(HAVE_IPV6)
 	int		ipv6;
-/*	char		*colon, prefix[MAX_STRING_LEN];*/
 #endif
 
-	assert(rule);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rule:'%s' range:'%s'", __function_name,
+			drule->name,
+			drule->iprange);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() Rule:'%s' Range:'%s'", __function_name,
-			rule->name,
-			rule->iprange);
-
-	for (curr_range = rule->iprange; curr_range; curr_range = next_range)
+	for (curr_range = drule->iprange; curr_range; curr_range = next_range)
 	{ /* split by ',' */
 		if (NULL != (next_range = strchr(curr_range, ',')))
 			*next_range = '\0';
@@ -1052,7 +1218,6 @@ static void process_rule(DB_DRULE *rule)
 
 		for (i = first; i <= last; i++) {
 			memset(&dhost, 0, sizeof(dhost));
-			dhost.druleid	= rule->druleid;
 			host_status	= -1;
 
 			now = time(NULL);
@@ -1079,40 +1244,20 @@ static void process_rule(DB_DRULE *rule)
 
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() IP:'%s'", __function_name, ip);
 
-			result = DBselect("select dcheckid,type,key_,snmp_community,snmpv3_securityname,"
-					"snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,ports"
-					" from dchecks where druleid=" ZBX_FS_UI64,
-					rule->druleid);
+			if (drule->unique_dcheckid)
+				process_checks(drule, &dhost, &host_status, ip, 1);
+			process_checks(drule, &dhost, &host_status, ip, 0);
 
-			while (NULL != (row = DBfetch(result))) {
-				memset(&check, 0, sizeof(check));
-
-				ZBX_STR2UINT64(check.dcheckid,row[0]);
-				check.druleid			= rule->druleid;
-				check.type			= atoi(row[1]);
-				check.key_			= row[2];
-				check.snmp_community		= row[3];
-				check.snmpv3_securityname	= row[4];
-				check.snmpv3_securitylevel	= atoi(row[5]);
-				check.snmpv3_authpassphrase	= row[6];
-				check.snmpv3_privpassphrase	= row[7];
-				check.ports			= row[8];
-
-				process_check(rule, &dhost, &host_status, &check, ip);
-			}
-			DBfree_result(result);
-
+			DBbegin();
 			switch (zbx_process) {
 			case ZBX_PROCESS_SERVER	:
-				if (dhost.dhostid == 0)
-					break;
-
 				update_host(&dhost, ip, host_status, now);
 				break;
 			case ZBX_PROCESS_PROXY	:
-				proxy_update_host(rule->druleid, ip, host_status, now);
+				proxy_update_host(drule, ip, host_status, now);
 				break;
 			}
+			DBcommit();
 		}
 	}
 
@@ -1123,9 +1268,9 @@ static void process_discovery(int now)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_DRULE	rule;
+	DB_DRULE	drule;
 
-	result = DBselect("select druleid,iprange,delay,nextcheck,name,status from drules"
+	result = DBselect("select druleid,iprange,name,unique_dcheckid from drules"
 			" where proxy_hostid=0 and status=%d and (nextcheck<=%d or nextcheck>%d+delay)"
 			" and " ZBX_SQL_MOD(druleid,%d) "=%d" DB_NODE,
 			DRULE_STATUS_MONITORED,
@@ -1136,20 +1281,18 @@ static void process_discovery(int now)
 			DBnode_local("druleid"));
 
 	while (NULL != (row = DBfetch(result))) {
-		memset(&rule, 0, sizeof(DB_DRULE));
+		memset(&drule, 0, sizeof(drule));
 
-		ZBX_STR2UINT64(rule.druleid,row[0]);
-		rule.iprange 	= row[1];
-		rule.delay	= atoi(row[2]);
-		rule.nextcheck	= atoi(row[3]);
-		rule.name	= row[4];
-		rule.status	= atoi(row[5]);
+		ZBX_STR2UINT64(drule.druleid, row[0]);
+		drule.iprange 	= row[1];
+		drule.name	= row[2];
+		ZBX_STR2UINT64(drule.unique_dcheckid, row[3]);
 
-		process_rule(&rule);
+		process_rule(&drule);
 
-		DBexecute("update drules set nextcheck=%d where druleid=" ZBX_FS_UI64,
-				now + rule.delay,
-				rule.druleid);
+		DBexecute("update drules set nextcheck=%d+delay where druleid=" ZBX_FS_UI64,
+				now,
+				drule.druleid);
 	}
 	DBfree_result(result);
 }
@@ -1200,7 +1343,7 @@ void main_discoverer_loop(zbx_process_t p, int num)
 	int		now, nextcheck, sleeptime;
 	double		sec;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In main_discoverer_loop(num:%d)",
+	zabbix_log(LOG_LEVEL_DEBUG, "In main_discoverer_loop(num:%d)",
 			num);
 
         phan.sa_sigaction = child_signal_handler;

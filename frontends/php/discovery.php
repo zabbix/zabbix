@@ -151,43 +151,62 @@ include_once('include/page_header.php');
 	while($drule = DBfetch($db_drules)) {
 		$discovery_info = array();
 
-		$db_dhosts = DBselect('SELECT dh.dhostid,dh.druleid,dh.ip,dh.status,dh.lastup,dh.lastdown,h.host'.
-				' FROM dhosts dh'.
-				' LEFT JOIN hosts h ON h.ip=dh.ip and h.proxy_hostid='.$drule['proxy_hostid'].
-				' WHERE '.DBin_node('dh.dhostid').
-					' AND dh.druleid='.$drule['druleid'].
-				order_by('dh.ip','dh.dhostid,dh.status'));
+		$db_dhosts = DBselect('SELECT DISTINCT dhostid,druleid,status,lastup,lastdown'.
+				' FROM dhosts'.
+				' WHERE druleid='.$drule['druleid'].
+					' AND '.DBin_node('dhostid'));
 		while($dhost = DBfetch($db_dhosts)){
-			$class = 'enabled';
-			$time = 'lastup';
 			if(DHOST_STATUS_DISABLED == $dhost['status']){
-				$class = 'disabled';
-				$time = 'lastdown';
+				$hclass = 'disabled';
+				$htime = $dhost['lastdown'];
 			}
+			else{
+				$hclass = 'enabled';
+				$htime = $dhost['lastup'];
+			}
+			$htype = 'primary';
 
-			$discovery_info[$dhost['ip']] = array('class' => $class, 'host' => $dhost['host'],
-					'time' => $dhost[$time], 'druleid' => $dhost['druleid']);
+			$db_dhosts2 = DBselect('SELECT DISTINCT ds.ip'.
+					' FROM dservices ds'.
+					' WHERE ds.dhostid='.$dhost['dhostid'].
+					' ORDER BY ds.dserviceid');
+			while($dhost2 = DBfetch($db_dhosts2)){
+				$db_hosts = DBselect('SELECT host'.
+							' FROM hosts'.
+							' WHERE ip='.zbx_dbstr($dhost2['ip']).
+							' ORDER BY status', 1);
+				if ($host = DBfetch($db_hosts))
+					$host = $host['host'];
+				else
+					$host = '';
 
-			$db_dservices = DBselect('SELECT type,port,key_,status,lastup,lastdown FROM dservices '.
-					' WHERE dhostid='.$dhost['dhostid'].
-					' order by status,type,port');
-			while($dservice = DBfetch($db_dservices)){
-				$class = 'active';
-				$time = 'lastup';
+				$discovery_info[$dhost2['ip']] = array('type' => $htype, 'class' => $hclass, 'host' => $host,
+						'time' => $htime, 'druleid' => $dhost['druleid']);
+				$htype = 'slave';
+				$htime = 0;
 
-				if(DSVC_STATUS_DISABLED == $dservice['status']){
-					$class = 'inactive';
-					$time = 'lastdown';
+				$db_dservices = DBselect('SELECT type,port,key_,status,lastup,lastdown FROM dservices '.
+						' WHERE dhostid='.$dhost['dhostid'].
+							' AND ip='.zbx_dbstr($dhost2['ip']).
+						' order by status,type,port');
+				while($dservice = DBfetch($db_dservices)){
+					$class = 'active';
+					$time = 'lastup';
+
+					if(DSVC_STATUS_DISABLED == $dservice['status']){
+						$class = 'inactive';
+						$time = 'lastdown';
+					}
+
+					$service_name = discovery_check_type2str($dservice['type']).
+							discovery_port2str($dservice['type'], $dservice['port']).
+							(empty($dservice['key_']) ? '' : ':'.$dservice['key_']);
+
+					$discovery_info
+						[$dhost2['ip']]
+						['services']
+						[$service_name] = array('class' => $class, 'time' => $dservice[$time]);
 				}
-
-				$service_name = discovery_check_type2str($dservice['type']).
-						discovery_port2str($dservice['type'], $dservice['port']).
-						(empty($dservice['key_']) ? '' : ':'.$dservice['key_']);
-
-				$discovery_info
-					[$dhost['ip']]
-					['services']
-					[$service_name] = array('class' => $class, 'time' => $dservice[$time]);
 			}
 		}
 
@@ -202,7 +221,7 @@ include_once('include/page_header.php');
 		foreach($discovery_info as $ip => $h_data){
 			$table_row = array(
 				get_node_name_by_elid($h_data['druleid']),
-				new CSpan($ip, $h_data['class']),
+				$h_data['type'] == 'primary' ? new CSpan($ip, $h_data['class']) : new CSpan(SPACE.SPACE.$ip),
 				new CSpan(empty($h_data['host']) ? '-' : $h_data['host']),
 				new CSpan(($h_data['time'] == 0 ? '' : convert_units(time() - $h_data['time'], 'uptime')), $h_data['class'])
 				);

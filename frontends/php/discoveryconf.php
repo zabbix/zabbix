@@ -39,6 +39,7 @@ include_once('include/page_header.php');
 		'iprange'=>	array(T_ZBX_IP_RANGE, O_OPT,  null,	NOT_EMPTY,	'isset({save})'),
 		'delay'=>	array(T_ZBX_INT, O_OPT,	 null,	null, 		'isset({save})'),
 		'status'=>	array(T_ZBX_INT, O_OPT,	 null,	IN('0,1'), 	'isset({save})'),
+		'uniqueness_criteria'=>	array(T_ZBX_INT, O_OPT,  null, NULL,      'isset({save})'),
 
 		'g_druleid'=>	array(T_ZBX_INT, O_OPT,  null,	DB_ID,		null),
 
@@ -113,8 +114,9 @@ include_once('include/page_header.php');
 			$msg_ok = S_DISCOVERY_RULE_UPDATED;
 			$msg_fail = S_CANNOT_UPDATE_DISCOVERY_RULE;
 
-			$result = update_discovery_rule($_REQUEST["druleid"], $_REQUEST["proxy_hostid"], $_REQUEST['name'], $_REQUEST['iprange'],
-				$_REQUEST['delay'], $_REQUEST['status'], $_REQUEST['dchecks'], $_REQUEST['dchecks_deleted']);
+			$result = update_discovery_rule($_REQUEST["druleid"], $_REQUEST["proxy_hostid"], $_REQUEST['name'],
+				$_REQUEST['iprange'], $_REQUEST['delay'], $_REQUEST['status'], $_REQUEST['dchecks'],
+				$_REQUEST['uniqueness_criteria'], $_REQUEST['dchecks_deleted']);
 
 			$druleid = $_REQUEST["druleid"];
 		}
@@ -123,7 +125,7 @@ include_once('include/page_header.php');
 			$msg_fail = S_CANNOT_ADD_DISCOVERY_RULE;
 
 			$druleid = add_discovery_rule($_REQUEST["proxy_hostid"], $_REQUEST['name'], $_REQUEST['iprange'],
-				$_REQUEST['delay'], $_REQUEST['status'], $_REQUEST['dchecks']);
+				$_REQUEST['delay'], $_REQUEST['status'], $_REQUEST['dchecks'], $_REQUEST['uniqueness_criteria']);
 
 			$result = $druleid;
 		}
