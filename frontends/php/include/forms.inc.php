@@ -167,6 +167,8 @@
 			$form->addVar('druleid', $_REQUEST['druleid']);
 		}
 
+		$uniqueness_criteria = -1;
+
 		if(isset($_REQUEST['druleid']) && $rule_data && (!isset($_REQUEST["form_refresh"]) || isset($_REQUEST["register"]))){
 			$proxy_hostid	= $rule_data['proxy_hostid'];
 			$name		= $rule_data['name'];
@@ -181,13 +183,15 @@
 						' FROM dchecks'.
 						' WHERE druleid='.$_REQUEST['druleid']);
 			while($check_data = DBfetch($db_checks)){
-				$dchecks[] = array('dcheckid' => $check_data['dcheckid'], 'type' => $check_data['type'],
+				$count = array_push($dchecks, array('dcheckid' => $check_data['dcheckid'], 'type' => $check_data['type'],
 						'ports' => $check_data['ports'], 'key' => $check_data['key_'],
 						'snmp_community' => $check_data['snmp_community'],
 						'snmpv3_securityname' => $check_data['snmpv3_securityname'],
 						'snmpv3_securitylevel' => $check_data['snmpv3_securitylevel'],
 						'snmpv3_authpassphrase' => $check_data['snmpv3_authpassphrase'],
-						'snmpv3_privpassphrase' => $check_data['snmpv3_privpassphrase']);
+						'snmpv3_privpassphrase' => $check_data['snmpv3_privpassphrase']));
+				if ($check_data['dcheckid'] == $rule_data['unique_dcheckid'])
+					$uniqueness_criteria = $count - 1;
 			}
 			$dchecks_deleted = get_request('dchecks_deleted',array());
 		}
@@ -234,12 +238,17 @@
 		$form->addVar('dchecks', $dchecks);
 		$form->addVar('dchecks_deleted', $dchecks_deleted);
 
+		$cmbUniquenessCriteria = new CComboBox('uniqueness_criteria', $uniqueness_criteria);
+		$cmbUniquenessCriteria->addItem(-1, S_IP_ADDRESS);
 		foreach($dchecks as $id => $data){
+			$str = discovery_check2str($data['type'], $data['snmp_community'], $data['key'], $data['ports']);
 			$dchecks[$id] = array(
 				new CCheckBox('selected_checks[]',null,null,$id),
-				discovery_check2str($data['type'], $data['snmp_community'], $data['key'], $data['ports']),
+				$str,
 				BR()
 			);
+			if(in_array($data['type'], array(SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2, SVC_SNMPv3)))
+				$cmbUniquenessCriteria->addItem($id, $str);
 		}
 
 		if(count($dchecks)){
@@ -317,6 +326,8 @@
 			$external_param,
 			new CButton('add_check', S_ADD)
 		),'new');
+
+		$form->addRow(S_DEVICE_UNIQUENESS_CRITERIA, $cmbUniquenessCriteria);
 
 		$cmbStatus = new CComboBox("status", $status);
 		foreach(array(DRULE_STATUS_ACTIVE, DRULE_STATUS_DISABLED) as $st)

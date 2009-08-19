@@ -2444,7 +2444,7 @@ zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int nu
 			min, max);
 
 	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
-		id->lastid = min + 1;
+		id->lastid = min;
 	else
 		ZBX_STR2UINT64(id->lastid, row[0]);
 

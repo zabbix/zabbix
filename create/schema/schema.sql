@@ -42,6 +42,7 @@ FIELD		|iprange	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|nextcheck	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|unique_dcheckid|t_id		|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY	|dchecks
 
 TABLE|dchecks|dcheckid|ZBX_SYNC
 FIELD		|dcheckid	|t_id		|'0'	|NOT NULL	|0
@@ -59,11 +60,10 @@ INDEX		|1		|druleid
 TABLE|dhosts|dhostid|ZBX_SYNC
 FIELD		|dhostid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|druleid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|drules
-FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastup		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastdown	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-INDEX		|1		|druleid,ip
+INDEX		|1		|druleid
 
 TABLE|dservices|dserviceid|ZBX_SYNC
 FIELD		|dserviceid	|t_id		|'0'	|NOT NULL	|0
@@ -71,13 +71,14 @@ FIELD		|dhostid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|dhosts
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|key_		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|value		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|port		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastup		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastdown	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|dcheckid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|dchecks
-INDEX		|1		|dhostid,type,key_,port
-INDEX		|2		|dcheckid
+UNIQUE		|1		|dcheckid,type,key_,ip,port
+INDEX		|2		|dhostid
 
 TABLE|ids|nodeid,table_name,field_name|
 FIELD		|nodeid		|t_integer	|'0'	|NOT NULL	|0			|nodes
@@ -269,8 +270,8 @@ FIELD		|dcheckid	|t_id		|'0'	|NOT NULL	|0			|dchecks
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|0
 FIELD		|port		|t_integer	|'0'	|NOT NULL	|0
-FIELD		|key_		|t_varchar(255)	|'0'	|NOT NULL	|0
-FIELD		|value		|t_varchar(255)	|'0'	|NOT NULL	|0
+FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|clock
 

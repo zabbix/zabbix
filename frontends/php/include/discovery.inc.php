@@ -168,7 +168,7 @@
 		return $dcheckid;
 	}
 
-	function	add_discovery_rule($proxy_hostid, $name, $iprange, $delay, $status, $dchecks)
+	function	add_discovery_rule($proxy_hostid, $name, $iprange, $delay, $status, $dchecks, $uniqueness_criteria)
 	{
 		if( !validate_ip_range($iprange) )
 		{
@@ -181,12 +181,19 @@
 		$result = DBexecute('insert into drules (druleid,proxy_hostid,name,iprange,delay,status) '.
 			' values ('.$druleid.','.$proxy_hostid.','.zbx_dbstr($name).','.zbx_dbstr($iprange).','.$delay.','.$status.')');
 
-		if($result)
+		if($result && isset($dchecks))
 		{
-			if(isset($dchecks)) foreach($dchecks as $val)
-				add_discovery_check($druleid, $val['type'], $val['ports'], $val['key'], $val['snmp_community'],
-						$val['snmpv3_securityname'], $val['snmpv3_securitylevel'], $val['snmpv3_authpassphrase'],
-						$val['snmpv3_privpassphrase']);
+			$unique_dcheckid = 0;
+			foreach($dchecks as $id => $data){
+				$data['dcheckid'] = add_discovery_check($druleid, $data['type'], $data['ports'], $data['key'],
+						$data['snmp_community'], $data['snmpv3_securityname'], $data['snmpv3_securitylevel'],
+						$data['snmpv3_authpassphrase'], $data['snmpv3_privpassphrase']);
+				if ($uniqueness_criteria == $id && $data['dcheckid'])
+					$unique_dcheckid = $data['dcheckid'];
+			}
+			DBexecute('UPDATE drules'.
+					' SET unique_dcheckid='.$unique_dcheckid.
+					' WHERE druleid='.$druleid);
 
 			$result = $druleid;
 		}
@@ -194,7 +201,8 @@
 		return $result;
 	}
 
-	function	update_discovery_rule($druleid, $proxy_hostid, $name, $iprange, $delay, $status, $dchecks, $dchecks_deleted)
+	function	update_discovery_rule($druleid, $proxy_hostid, $name, $iprange, $delay, $status, $dchecks,
+			$uniqueness_criteria, $dchecks_deleted)
 	{
 		if( !validate_ip_range($iprange) )
 		{
@@ -206,15 +214,26 @@
 		$result = DBexecute('update drules set proxy_hostid='.$proxy_hostid.',name='.zbx_dbstr($name).',iprange='.zbx_dbstr($iprange).','.
 			'delay='.$delay.',status='.$status.' where druleid='.$druleid);
 
-		if($result)
+		if($result && isset($dchecks))
 		{
-			if(isset($dchecks)) foreach($dchecks as $val) if(!isset($val['dcheckid']))
-				add_discovery_check($druleid, $val['type'], $val['ports'], $val['key'], $val['snmp_community'],
-						$val['snmpv3_securityname'], $val['snmpv3_securitylevel'], $val['snmpv3_authpassphrase'],
-						$val['snmpv3_privpassphrase']);
-			if(isset($dchecks_deleted) && !empty($dchecks_deleted))
-				delete_discovery_check($dchecks_deleted);
+			$unique_dcheckid = 0;
+			foreach($dchecks as $id => $data){
+				if(!isset($data['dcheckid'])){
+					$data['dcheckid'] = add_discovery_check($druleid, $data['type'], $data['ports'], $data['key'],
+							$data['snmp_community'], $data['snmpv3_securityname'], $data['snmpv3_securitylevel'],
+							$data['snmpv3_authpassphrase'], $data['snmpv3_privpassphrase']);
+				}
+				if ($uniqueness_criteria == $id && $data['dcheckid'])
+					$unique_dcheckid = $data['dcheckid'];
+			}
+			DBexecute('UPDATE drules'.
+					' SET unique_dcheckid='.$unique_dcheckid.
+					' WHERE druleid='.$druleid);
 		}
+
+		if($result && isset($dchecks_deleted) && !empty($dchecks_deleted))
+			delete_discovery_check($dchecks_deleted);
+
 		return $result;
 	}
 

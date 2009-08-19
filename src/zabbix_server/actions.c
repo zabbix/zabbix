@@ -672,22 +672,21 @@ static int	check_discovery_condition(DB_EVENT *event, DB_CONDITION *condition)
 		if (event->object == EVENT_OBJECT_DHOST)
 		{
 			result = DBselect(
-					"select ip"
-					" from dhosts"
+					"select distinct ip"
+					" from dservices"
 					" where dhostid=" ZBX_FS_UI64,
 					event->objectid);
 		}
 		else
 		{
 			result = DBselect(
-					"select h.ip"
-					" from dhosts h,dservices s"
-					" where h.dhostid=s.dhostid"
-						" and s.dserviceid=" ZBX_FS_UI64,
+					"select ip"
+					" from dservices s"
+					" where dserviceid=" ZBX_FS_UI64,
 					event->objectid);
 		}
 
-		if (NULL != (row = DBfetch(result)))
+		while (NULL != (row = DBfetch(result)) && FAIL == ret)
 		{
 			switch (condition->operator)
 			{
