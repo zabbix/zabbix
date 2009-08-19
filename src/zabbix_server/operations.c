@@ -46,153 +46,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: send_to_user_medias                                              *
- *                                                                            *
- * Purpose: send notifications to user's media (email, sms, whatever)         *
- *                                                                            *
- * Parameters: trigger - trigger data                                         *
- *             action  - action data                                          *
- *             userid  - user id                                              *
- *                                                                            *
- * Return value: nothing                                                      *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments: Cannot use action->userid as it may also be groupid              *
- *                                                                            *
- ******************************************************************************/
-/*static	void	send_to_user_medias(DB_EVENT *event,DB_OPERATION *operation, zbx_uint64_t userid)
-{
-	DB_MEDIA media;
-	DB_RESULT result;
-	DB_ROW	row;
-
-	zabbix_log( LOG_LEVEL_DEBUG, "In send_to_user_medias(objectid:" ZBX_FS_UI64 ")",
-		event->objectid);
-
-	result = DBselect("select mediatypeid,sendto,active,severity,period from media where active=%d and userid=" ZBX_FS_UI64,
-		MEDIA_STATUS_ACTIVE,
-		userid);
-
-	while((row=DBfetch(result)))
-	{
-		ZBX_STR2UINT64(media.mediatypeid, row[0]);
-
-		media.sendto	= row[1];
-		media.active	= atoi(row[2]);
-		media.severity	= atoi(row[3]);
-		media.period	= row[4];
-
-		zabbix_log( LOG_LEVEL_DEBUG, "Trigger severity [%d] Media severity [%d] Period [%s]",
-			event->trigger_priority,
-			media.severity,
-			media.period);
-		if(((1<<event->trigger_priority)&media.severity)==0)
-		{
-			zabbix_log( LOG_LEVEL_DEBUG, "Won't send message (severity)");
-			continue;
-		}
-		if(check_time_period(media.period, (time_t)NULL) == 0)
-		{
-			zabbix_log( LOG_LEVEL_DEBUG, "Won't send message (period)");
-			continue;
-		}
-
-		DBadd_alert(operation->actionid, userid, event->eventid, media.mediatypeid,media.sendto,operation->shortdata,operation->longdata);
-	}
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End send_to_user_medias()");
-}
-*/
-/******************************************************************************
- *                                                                            *
- * Function: check_user_active                                                *
- *                                                                            *
- * Purpose: checks if user is in any users_disabled group                     *
- *                                                                            *
- * Parameters: userid - user id                                               *
- *                                                                            *
- * Return value: int SUCCEED / FAIL-if user disabled                          *
- *                                                                            *
- * Author: Aly                                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-/*int check_user_active(zbx_uint64_t userid){
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		rtrn = SUCCEED;
-
-	result = DBselect("SELECT COUNT(g.usrgrpid) FROM users_groups ug, usrgrp g WHERE ug.userid=" ZBX_FS_UI64 " AND g.usrgrpid=ug.usrgrpid AND g.users_status=%d", userid, GROUP_STATUS_DISABLED);
-
-	row = DBfetch(result);
-	if(row && (DBis_null(row[0])!=SUCCEED) && (atoi(row[0])>0))
-		rtrn=FAIL;
-
-	DBfree_result(result);
-
-return rtrn;
-}
-*/
-/******************************************************************************
- *                                                                            *
- * Function: op_notify_user                                                   *
- *                                                                            *
- * Purpose: send notifications to user or user group                          *
- *                                                                            *
- * Parameters: trigger - trigger data                                         *
- *             action  - action data                                          *
- *                                                                            *
- * Return value: nothing                                                      *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments: action->recipient specifies user or group                        *
- *                                                                            *
- ******************************************************************************/
-/*void	op_notify_user(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	userid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In send_to_user()");
-
-	if(operation->object == OPERATION_OBJECT_USER)
-	{
-		if(check_user_active(operation->objectid) == SUCCEED)
-		{
-			send_to_user_medias(event, operation, operation->objectid);
-		}
-	}
-	else if(operation->object == OPERATION_OBJECT_GROUP)
-	{
-		result = DBselect("select u.userid from users u, users_groups ug, usrgrp g where ug.usrgrpid=" ZBX_FS_UI64 " and ug.userid=u.userid and g.usrgrpid=ug.usrgrpid and g.users_status=%d",
-			operation->objectid,GROUP_STATUS_ACTIVE);
-		while((row=DBfetch(result)))
-		{
-			ZBX_STR2UINT64(userid, row[0]);
-			send_to_user_medias(event, operation, userid);
-		}
-		DBfree_result(result);
-	}
-	else
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "Unknown object type [%d] for operationid [" ZBX_FS_UI64 "]",
-			operation->object,
-			operation->operationid);
-		zabbix_syslog("Unknown object type [%d] for operationid [" ZBX_FS_UI64 "]",
-			operation->object,
-			operation->operationid);
-	}
-	zabbix_log(LOG_LEVEL_DEBUG, "End send_to_user()");
-}
-*/
-
-/******************************************************************************
- *                                                                            *
  * Function: run_remote_commands                                              *
  *                                                                            *
  * Purpose: run remote command on specific host                               *
@@ -451,13 +304,19 @@ static zbx_uint64_t	select_discovered_host(DB_EVENT *event)
 
 	switch (event->object) {
 	case EVENT_OBJECT_DHOST:
-		result = DBselect("select h.hostid from hosts h,dhosts dh"
-				" where dh.ip=h.ip and dh.dhostid=" ZBX_FS_UI64,
+		result = DBselect(
+				"select h.hostid"
+				" from hosts h,dservices ds"
+				" where ds.ip=h.ip"
+					" and ds.dhostid=" ZBX_FS_UI64,
 				event->objectid);
 		break;
 	case EVENT_OBJECT_DSERVICE:
-		result = DBselect("select h.hostid from hosts h,dhosts dh,dservices ds"
-				" where dh.ip=h.ip and ds.dhostid=dh.dhostid and ds.dserviceid =" ZBX_FS_UI64,
+		result = DBselect(
+				"select h.hostid"
+				" from hosts h,dservices ds"
+				" where ds.ip=h.ip"
+					" and ds.dserviceid =" ZBX_FS_UI64,
 				event->objectid);
 		break;
 	case EVENT_OBJECT_ZABBIX_ACTIVE:
@@ -567,13 +426,24 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 
 	switch (event->object) {
 	case EVENT_OBJECT_DHOST:
-		result = DBselect("select dr.proxy_hostid,dh.ip from drules dr,dhosts dh"
-				" where dh.druleid=dr.druleid and dh.dhostid=" ZBX_FS_UI64,
+		result = DBselect(
+				"select dr.proxy_hostid,ds.ip"
+				" from drules dr,dchecks dc,dservices ds"
+				" where dc.druleid=dr.druleid"
+					" and ds.dcheckid=dc.dcheckid"
+					" and ds.dhostid=" ZBX_FS_UI64
+				" order by ds.dserviceid",
 				event->objectid);
 		break;
 	case EVENT_OBJECT_DSERVICE:
-		result = DBselect("select dr.proxy_hostid,dh.ip from drules dr,dhosts dh,dservices ds"
-				" where dh.druleid=dr.druleid and ds.dhostid=dh.dhostid and ds.dserviceid =" ZBX_FS_UI64,
+		result = DBselect(
+				"select dr.proxy_hostid,ds.ip"
+				" from drules dr,dchecks dc,dservices ds,dservices ds1"
+				" where dc.druleid=dr.druleid"
+					" and ds.dcheckid=dc.dcheckid"
+					" and ds1.dcheckid=ds.dcheckid"
+					" and ds1.dserviceid=" ZBX_FS_UI64
+				" order by ds.dserviceid",
 				event->objectid);
 		break;
 	case EVENT_OBJECT_ZABBIX_ACTIVE:

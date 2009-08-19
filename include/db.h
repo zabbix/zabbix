@@ -240,16 +240,13 @@ DB_DRULE
 {
 	zbx_uint64_t	druleid;
 	char		*iprange;
-	int		delay;
-	int		nextcheck;
 	char		*name;
-	int		status;
+	zbx_uint64_t	unique_dcheckid;
 };
 
 DB_DCHECK
 {
 	zbx_uint64_t	dcheckid;
-	zbx_uint64_t	druleid;
 	int		type;
 	char		*ports;
 	char		*key_;
@@ -258,15 +255,11 @@ DB_DCHECK
 	int		snmpv3_securitylevel;
 	char		*snmpv3_authpassphrase;
 	char		*snmpv3_privpassphrase;
-	int		status;
-	char		value[DSERVICE_VALUE_LEN_MAX];
 };
 
 DB_DHOST
 {
 	zbx_uint64_t	dhostid;
-	zbx_uint64_t	druleid;
-	char		ip[HOST_IP_LEN_MAX];
 	int		status;
 	int		lastup;
 	int		lastdown;
@@ -275,15 +268,10 @@ DB_DHOST
 DB_DSERVICE
 {
 	zbx_uint64_t	dserviceid;
-	zbx_uint64_t	dhostid;
-	zbx_uint64_t	dcheckid;
-	int		type;
-	int		port;
 	int		status;
 	int		lastup;
 	int		lastdown;
 	char		value[DSERVICE_VALUE_LEN_MAX];
-	char		key_[ITEM_KEY_LEN_MAX];
 };
 
 DB_EVENT

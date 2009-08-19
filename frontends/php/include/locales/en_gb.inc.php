@@ -53,6 +53,7 @@
 	'S_DELETE_RULE_Q'=>			'Delete rule?',
 	'S_DISCOVERY_BY_PROXY'=>		'Discovery by proxy',
 	'S_NO_PROXY'=>				'(no proxy)',
+	'S_DEVICE_UNIQUENESS_CRITERIA'=>	'Device uniqueness criteria',
 
 	'S_EVENT_SOURCE'=>			'Event source',
 
