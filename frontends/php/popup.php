@@ -662,9 +662,6 @@ include_once('include/page_header.php');
 			insert_js_function('add_selected_values');
 			insert_js_function('check_all');
 			$header = array(new CCol(array(new CCheckBox("check", NULL, 'check_all("'.S_TRIGGERS.'", this.checked);'), S_NAME)), S_SEVERITY, S_STATUS);
-			$button = new CButton('select', S_SELECT, 'add_selected_values("'.S_TRIGGERS.'", "'.$dstfrm.'", "'.$dstfld1.'", "'.$dstact.'")');
-			$button->setType('button');
-			$table->setFooter(new CCol($button,'right'));
 		}
 		else {
 			insert_js_function('add_value');
@@ -736,6 +733,13 @@ include_once('include/page_header.php');
 			unset($description);
 			unset($status);
 		}
+		
+		if($multiselect){
+			$button = new CButton('select', S_SELECT, 'add_selected_values("'.S_TRIGGERS.'", "'.$dstfrm.'", "'.$dstfld1.'", "'.$dstact.'")');
+			$button->setType('button');
+			$table->setFooter(new CCol($button, 'right'));
+		}
+			
 		$form->addItem($table);
 		$form->show();
 	}

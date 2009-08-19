@@ -1780,7 +1780,7 @@
 		$frmItem->addVar('applications_visible',1);
 
 		$hostid				= get_request('hostid',		0);		
-		$form_hostid		= get_request('hostid',		0);	
+		$form_hostid		= get_request('form_hostid',0);	
 		
 		if($form_hostid != 0){
 			$hostid = $form_hostid;
