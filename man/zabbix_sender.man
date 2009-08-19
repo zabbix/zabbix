@@ -18,7 +18,6 @@ is a command line utility for sending data to a remote Zabbix Server.
 Specify agent configuration file for reading server details.
 .IP "-z, --zabbix-server server"
 Hostname or IP address of ZABBIX Server.
-Specify agent configuration file for reading server details.
 .IP "-p, --port port number"
 Specify port number of server trapper running on the server. Default is 10051.
 .IP "-s, --host host name"
