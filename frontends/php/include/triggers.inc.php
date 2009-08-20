@@ -39,9 +39,9 @@
 		if ( defined('TRIGGER_EXPRESSION_STRUCTURES_OK') ) return;
 		define('TRIGGER_EXPRESSION_STRUCTURES_OK', 1);
 
-		global $ZBX_TR_EXPR_ALLOWED_MACROS, $ZBX_TR_EXPR_REPLACE_TO, $ZBX_TR_EXPR_ALLOWED_FUNCTIONS;
+		global $ZBX_TR_EXPR_SIMPLE_MACROS, $ZBX_TR_EXPR_REPLACE_TO, $ZBX_TR_EXPR_ALLOWED_FUNCTIONS;
 
-		$ZBX_TR_EXPR_ALLOWED_MACROS['{TRIGGER.VALUE}'] = '{TRIGGER.VALUE}';
+		$ZBX_TR_EXPR_SIMPLE_MACROS['{TRIGGER.VALUE}'] = '{TRIGGER.VALUE}';
 
 		$ZBX_TR_EXPR_REPLACE_TO = 'zbx_expr_ok';
 
@@ -182,70 +182,9 @@
  *     returns string of accessible triggers
  *
  * Author:
- *     Aly
+ *     Aly mod by Vedmak
  *
  */
-/*	function get_accessible_triggers($perm,$hostids,$perm_res=null,$nodeid=null,$cache=1){
-		global $USER_DETAILS;
-		static $available_triggers;
-		zbx_value2array($hostids);
-
-		$result = array();
-		if(is_null($perm_res)) $perm_res = PERM_RES_IDS_ARRAY;
-		$nodeid_str =(is_array($nodeid))?implode('',$nodeid):strval($nodeid);
-		$hostid_str = implode('',$hostids);
-
-		$cache_hash = md5($perm.$perm_res.$nodeid_str.$hostid_str);
-		if($cache && isset($available_triggers[$cache_hash])){
-			return $available_triggers[$cache_hash];
-		}
-
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $perm, PERM_RES_IDS_ARRAY, $nodeid);
-
-		$denied_triggers = array();
-		$available_triggers = array();
-
-		$sql_where = '';
-		if(!empty($hostids)){
-			$sql_where.= ' AND '.DBcondition('i.hostid',$hostids);
-		}
-		$sql = 	'SELECT DISTINCT t.triggerid '.
-				' FROM triggers t, functions f, items i '.
-				' WHERE t.triggerid=f.triggerid '.
-					' AND f.itemid=i.itemid'.
-					' AND '.DBcondition('i.hostid',$available_hosts,true).
-					$sql_where;
-		$db_triggers = DBselect($sql);
-		while($trigger = DBfetch($db_triggers)){
-			$denied_triggers[] = $trigger['triggerid'];
-		}
-
-		if(!empty($denied_triggers)){
-			$sql_where.= ' AND '.DBcondition('t.triggerid',$denied_triggers,true);
-		}
-
-		$sql = 	'SELECT DISTINCT t.triggerid '.
-				' FROM triggers t, functions f, items i '.
-				' WHERE t.triggerid=f.triggerid '.
-					' AND f.itemid=i.itemid'.
-					$sql_where;
-		$db_triggers = DBselect($sql);
-		while($trigger = DBfetch($db_triggers)){
-			$result[$trigger['triggerid']] = $trigger['triggerid'];
-		}
-
-		if(PERM_RES_STRING_LINE == $perm_res){
-			if(count($result) == 0)
-				$result = '-1';
-			else
-				$result = implode(',',$result);
-		}
-
-		$available_triggers[$cache_hash] = $result;
-
-	return $result;
-	}
-*/
 function get_accessible_triggers($perm, $hostids, $perm_res=null, $nodeid=null, $cache=1){
 	global $USER_DETAILS;
 	static $available_triggers;
@@ -358,7 +297,7 @@ return $result;
  *     retrieve trigger's priority for services
  *
  * Author:
- *     Artem Suharev
+ *     Aly
  *
  * Comments:
  *
@@ -558,7 +497,7 @@ return $result;
  *
  */
 	function get_hosts_by_expression($expression){
-		global $ZBX_TR_EXPR_ALLOWED_MACROS, $ZBX_TR_EXPR_REPLACE_TO;
+		global $ZBX_TR_EXPR_SIMPLE_MACROS, $ZBX_TR_EXPR_REPLACE_TO;
 
 		$expr = $expression;
 
@@ -566,7 +505,7 @@ return $result;
 
 		/* Replace all {server:key.function(param)} and {MACRO} with '$ZBX_TR_EXPR_REPLACE_TO' */
 		while(ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT, $expr, $arr)){
-			if($arr[ZBX_EXPRESSION_MACRO_ID] && !isset($ZBX_TR_EXPR_ALLOWED_MACROS[$arr[ZBX_EXPRESSION_MACRO_ID]]) ){
+			if($arr[ZBX_EXPRESSION_MACRO_ID] && !isset($ZBX_TR_EXPR_SIMPLE_MACROS[$arr[ZBX_EXPRESSION_MACRO_ID]]) ){
 				$hosts = array('0');
 				break;
 			}
@@ -680,7 +619,7 @@ return $result;
  *
  */
 	function validate_expression($expression){
-		global $ZBX_TR_EXPR_ALLOWED_MACROS, $ZBX_TR_EXPR_REPLACE_TO, $ZBX_TR_EXPR_ALLOWED_FUNCTIONS;
+		global $ZBX_TR_EXPR_SIMPLE_MACROS, $ZBX_TR_EXPR_REPLACE_TO, $ZBX_TR_EXPR_ALLOWED_FUNCTIONS;
 
 		if( empty($expression) ){
 			error('Expression can\'t be empty');
@@ -689,20 +628,19 @@ return $result;
 		$expr = $expression;
 		$h_status = array();
 
-		/* Replace all {server:key.function(param)} and {MACRO} with '$ZBX_TR_EXPR_REPLACE_TO' */
+// Replace all {server:key.function(param)} and {MACRO} with '$ZBX_TR_EXPR_REPLACE_TO'
 		while(ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT, $expr, $arr)){
-
-			if($arr[ZBX_EXPRESSION_MACRO_ID] && !isset($ZBX_TR_EXPR_ALLOWED_MACROS[$arr[ZBX_EXPRESSION_MACRO_ID]]) ){
+			if($arr[ZBX_EXPRESSION_MACRO_ID] && !isset($ZBX_TR_EXPR_SIMPLE_MACROS[$arr[ZBX_EXPRESSION_MACRO_ID]]) ){
 				error('Unknown macro ['.$arr[ZBX_EXPRESSION_MACRO_ID].']');
 				return false;
 			}
 			else if( !$arr[ZBX_EXPRESSION_MACRO_ID] ) {
 				$host		= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_HOST_ID];
 				$key		= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_KEY_ID];
-				$function = &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_FUNCTION_NAME_ID];
+				$function 	= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_FUNCTION_NAME_ID];
 				$parameter	= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_FUNCTION_PARAM_ID];
 
-				/* Check host */
+// Check host
 				$sql = 'SELECT COUNT(*) as cnt,min(status) as status,min(hostid) as hostid '.
 						' FROM hosts h '.
 						' WHERE h.host='.zbx_dbstr($host).
@@ -721,7 +659,7 @@ return $result;
 
 				$h_status[$row['status']][$row['hostid']] = $row['cnt'];
 
-				/* Check key */
+// Check key
 				$sql = 'SELECT i.itemid,i.value_type '.
 						' FROM hosts h,items i '.
 						' WHERE h.host='.zbx_dbstr($host).
@@ -734,7 +672,7 @@ return $result;
 					return false;
 				}
 
-				/* Check function */
+// Check function
 				if(!isset($ZBX_TR_EXPR_ALLOWED_FUNCTIONS[$function]) ){
 					error('Unknown function ['.$function.']');
 					return false;
@@ -755,8 +693,7 @@ return $result;
 				if(!is_null($fnc_valid['args']) ){
 					$parameter = zbx_get_params($parameter);
 
-					if( !is_array($fnc_valid['args']) )
-						$fnc_valid['args'] = array($fnc_valid['args']);
+					if(!is_array($fnc_valid['args']))  $fnc_valid['args'] = array($fnc_valid['args']);
 
 					foreach($fnc_valid['args'] as $pid => $params){
 						if(!isset($parameter[$pid])){
@@ -769,14 +706,15 @@ return $result;
 							}
 						}
 
-						if( 'sec' == $params['type'] && (validate_float($parameter[$pid])!=0) ){
-							error('['.$parameter[$pid].'] is not a float for function ('.$function.')');
+						if(preg_match('/^'.ZBX_EREG_EXPRESSION_USER_MACROS.'$/', $parameter[$pid])) continue;
+						
+						if(('sec' == $params['type']) && (validate_float($parameter[$pid])!=0) ){
+							error('['.$parameter[$pid].'] is not a float or macro for function ('.$function.')');
 							return false;
 						}
 
-						if( 'sec_num' == $params['type']
-							&& (validate_ticks($parameter[$pid])!=0) ){
-							error('['.$parameter[$pid].'] is not a float or counter for function ('.$function.')');
+						if(('sec_num' == $params['type']) && (validate_ticks($parameter[$pid])!=0) ){
+							error('['.$parameter[$pid].'] is not a float or counter or macro for function ('.$function.')');
 							return false;
 						}
 					}
@@ -795,8 +733,22 @@ return $result;
 			return false;
 		}
 
-/* Replace all calculations and numbers with '$ZBX_TR_EXPR_REPLACE_TO' */
-		$expt_number = '('.$ZBX_TR_EXPR_REPLACE_TO.'|'.ZBX_EREG_NUMBER.')';
+// Replace all calculations and numbers with '$ZBX_TR_EXPR_REPLACE_TO'
+		$expt_number = '('.$ZBX_TR_EXPR_REPLACE_TO.'|'.ZBX_PREG_NUMBER.'|'.ZBX_PREG_EXPRESSION_USER_MACROS.')';
+
+		$expt_term = '((\('.$expt_number.'\))|('.$expt_number.'))';
+		$expr_format = '(('.$expt_term.ZBX_PREG_SPACES.ZBX_PREG_SIGN.ZBX_PREG_SPACES.$expt_term.')|(\('.$expt_term.'\)))';
+		$expr_full_format = '((\('.$expr_format.'\))|('.$expr_format.'))';
+
+		while($res = preg_match('/'.$expr_full_format.'(.*)$/u', $expr, $arr)){
+			$expr = substr($expr, 0, strpos($expr, $arr[1])).$ZBX_TR_EXPR_REPLACE_TO.$arr[58];
+		}
+
+
+/* OLD EREG 
+//Replace all calculations and numbers with '$ZBX_TR_EXPR_REPLACE_TO' 
+		$expt_number = '('.$ZBX_TR_EXPR_REPLACE_TO.'|'.ZBX_EREG_NUMBER.'|'.ZBX_EREG_EXPRESSION_USER_MACROS.')';
+
 		$expt_term = '((\('.$expt_number.'\))|('.$expt_number.'))';
 		$expr_format = '(('.$expt_term.ZBX_EREG_SPACES.ZBX_EREG_SIGN.ZBX_EREG_SPACES.$expt_term.')|(\('.$expt_term.'\)))';
 		$expr_full_format = '((\('.$expr_format.'\))|('.$expr_format.'))';
@@ -804,7 +756,7 @@ return $result;
 		while($res = ereg($expr_full_format.'([[:print:]]*)$', $expr, $arr)){
 			$expr = substr($expr, 0, strpos($expr, $arr[1])).$ZBX_TR_EXPR_REPLACE_TO.$arr[58];
 		}
-
+*/
 
 		if($ZBX_TR_EXPR_REPLACE_TO != $expr){
 			error('Incorrect trigger expression. ['.str_replace($ZBX_TR_EXPR_REPLACE_TO, ' ... ', $expr).']');
@@ -1001,6 +953,7 @@ return $result;
 //		echo "EXPRESSION:",$expression,"<Br>";
 
 		$functionid='';
+		$macros = '';
 		if(0 == $html){
 			$exp='';
 		}
@@ -1010,14 +963,30 @@ return $result;
 
 		$state='';
 		for($i=0,$max=strlen($expression); $i<$max; $i++){
-			if($expression[$i] == '{'){
+			if(($expression[$i] == '{') && ($expression[$i+1] == '$')){
+				$functionid='';
+				$macros='';
+				$state='MACROS';
+			}
+			else if($expression[$i] == '{'){
 				$functionid='';
 				$state='FUNCTIONID';
 				continue;
 			}
 
 			if($expression[$i] == '}'){
+				if($state == 'MACROS'){
+					if(0 == $html) $exp.= '}';
+					else array_push($exp, '}');
+				
+					$macro = CUserMacro::get(array('macos'=>$macros,'globalmacro'=>1, 'extendoutput'=>1));
+//SDI($value);
+					$macros = '';
+					continue;
+				}
+				
 				$state='';
+				
 				if($functionid=='TRIGGER.VALUE'){
 					if(0 == $html) $exp.='{'.$functionid.'}';
 					else array_push($exp,'{'.$functionid.'}');
@@ -1044,28 +1013,28 @@ return $result;
 				}
 				else{
 					if(1 == $html){
-						$font = new CTag('font','yes');
-						$font->setAttribute('color','#AA0000');
-						$font->addItem('*ERROR*');
-						array_push($exp,$font);
+						array_push($exp, new CSpan('*ERROR*', 'on'));
 					}
 					else{
 						$exp.= '*ERROR*';
 					}
-
 				}
 				continue;
 			}
+
 			if($state == 'FUNCTIONID'){
 				$functionid=$functionid.$expression[$i];
 				continue;
+			}
+			else if($state == 'MACROS'){
+				$macros=$macros.$expression[$i];
 			}
 
 			if(1 == $html) array_push($exp,$expression[$i]);
 			else $exp.=$expression[$i];
 		}
-#		echo "EXP:",$exp,"<Br>";
-		return $exp;
+
+	return $exp;
 	}
 
 	/*
@@ -1082,14 +1051,14 @@ return $result;
 	 *
 	 */
 	function implode_exp($expression, $triggerid){
-		global $ZBX_TR_EXPR_ALLOWED_MACROS, $ZBX_TR_EXPR_REPLACE_TO;
+		global $ZBX_TR_EXPR_SIMPLE_MACROS, $ZBX_TR_EXPR_REPLACE_TO;
 		$expr = $expression;
 		$short_exp = $expression;
 
 		/* Replace all {server:key.function(param)} and {MACRO} with '$ZBX_TR_EXPR_REPLACE_TO' */
 		/* build short expression {12}>10 */
 		while(ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT, $expr, $arr)){
-			if($arr[ZBX_EXPRESSION_MACRO_ID] && !isset($ZBX_TR_EXPR_ALLOWED_MACROS[$arr[ZBX_EXPRESSION_MACRO_ID]])){
+			if($arr[ZBX_EXPRESSION_MACRO_ID] && !isset($ZBX_TR_EXPR_SIMPLE_MACROS[$arr[ZBX_EXPRESSION_MACRO_ID]])){
 				error('[ie] Unknown macro ['.$arr[ZBX_EXPRESSION_MACRO_ID].']');
 				return false;
 			}
@@ -1098,15 +1067,15 @@ return $result;
 				$s_expr		= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID];
 				$host		= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_HOST_ID];
 				$key		= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_KEY_ID];
-				$function = &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_FUNCTION_NAME_ID];
+				$function 	= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_FUNCTION_NAME_ID];
 				$parameter	= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_FUNCTION_PARAM_ID];
 
-				$item_res = DBselect('SELECT i.itemid '.
-					' FROM items i,hosts h'.
-					' WHERE i.key_='.zbx_dbstr($key).
-						' AND h.host='.zbx_dbstr($host).
-						' AND h.hostid=i.hostid');
-
+				$sql = 'SELECT i.itemid '.
+						' FROM items i,hosts h'.
+						' WHERE i.key_='.zbx_dbstr($key).
+							' AND h.host='.zbx_dbstr($host).
+							' AND h.hostid=i.hostid';
+				$item_res = DBselect($sql);
 				while(($item = DBfetch($item_res)) && (!in_node($item['itemid']))){
 				}
 
@@ -1140,8 +1109,7 @@ return $result;
 						' WHERE '.DBcondition('triggerid',$triggerids));
 	}
 
-	# Update Trigger status
-
+// Update Trigger status
 	function update_trigger_status($triggerids,$status){
 		zbx_value2array($triggerids);
 
