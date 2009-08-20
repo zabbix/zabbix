@@ -59,6 +59,8 @@ char	CONFIG_LOG_UNRES_SYMB		= 0;
 int	CONFIG_BUFFER_SIZE		= 100;
 int	CONFIG_BUFFER_SEND		= 5;
 
+int	CONFIG_MAX_LINES_PER_SECOND	= 100;
+
 void    load_config()
 {
 	struct cfg_line cfg[]=
@@ -88,6 +90,7 @@ void    load_config()
 
 		{"StartAgents",		&CONFIG_ZABBIX_FORKS,		0,TYPE_INT,	PARM_OPT,	1,16},
 		{"RefreshActiveChecks",	&CONFIG_REFRESH_ACTIVE_CHECKS,	0,TYPE_INT,	PARM_OPT,60,3600},
+		{"MaxLinesPerSecond",	&CONFIG_MAX_LINES_PER_SECOND,	0,TYPE_INT,	PARM_OPT,1,1000},
 		{"AllowRoot",		&CONFIG_ALLOW_ROOT,		0,TYPE_INT,	PARM_OPT,0,1},
 
 		{"LogUnresolvedSymbols",&CONFIG_LOG_UNRES_SYMB,		0,	TYPE_STRING,PARM_OPT,0,1},
