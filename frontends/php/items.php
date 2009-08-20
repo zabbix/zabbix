@@ -205,7 +205,7 @@ include_once('include/page_header.php');
 	$_REQUEST['filter_history']			= get_request('filter_history');
 	$_REQUEST['filter_trends']			= get_request('filter_trends');
 	$_REQUEST['filter_status']			= get_request('filter_status');
-	$_REQUEST['filter_templated_items']			= get_request('filter_templated_items', -1);
+	$_REQUEST['filter_templated_items']	= get_request('filter_templated_items', -1);
 	$_REQUEST['filter_with_triggers']	= get_request('filter_with_triggers', -1);
 
 	/* SUBFILTERS { --->>> */
@@ -222,11 +222,13 @@ include_once('include/page_header.php');
 	}
 	/* --->>> } SUBFILTERS */
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
-
-	if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid'] > 0) && !isset($available_hosts[$_REQUEST['hostid']])){
-		unset($_REQUEST['hostid']);
+	if(isset($_REQUEST['hostid'])){
+		$ah = CHost::get(array('hostids' => $_REQUEST['hostid'], 'editable' => 1));
+		if(!$ah){
+			access_deny();
+		}
 	}
+
 ?>
 <?php
 	$result = 0;
