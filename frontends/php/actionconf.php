@@ -123,8 +123,11 @@ include_once('include/page_header.php');
 	}
 //--------
 
-	if(isset($_REQUEST['actionid']) && !action_accessible($_REQUEST['actionid'], PERM_READ_WRITE)){
-		access_deny();
+	if(isset($_REQUEST['actionid'])){
+		$aa = CAction::get(array('actionids' => $_REQUEST['actionid'], 'editable' => 1));
+		if(!$aa){
+			access_deny();
+		}
 	}
 ?>
 <?php

@@ -103,7 +103,7 @@ class CAction {
 			'limit'					=> null
 		);
 
-		$options = array_merge($def_options, $options);
+		$options = zbx_array_merge($def_options, $options);
 
 
 // editable + PERMISSION CHECK
@@ -117,59 +117,93 @@ class CAction {
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
 			$sql_parts['from']['c'] = 'conditions c';
-			$sql_parts['from']['f'] = 'functions f';
-			$sql_parts['from']['i'] = 'items i';
-			$sql_parts['from']['hg'] = 'hosts_groups hg';
-			$sql_parts['from']['r'] = 'rights r';
-			$sql_parts['from']['ug'] = 'users_groups ug';
-
-			$sql_parts['where'][] = 'r.id=hg.groupid ';
-			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sql_parts['where'][] = 'ug.userid='.$userid;
-			$sql_parts['where'][] = 'r.permission>='.$permission;
-
+			$sql_parts['where']['ac'] = 'a.actionid=c.actionid';
 
 // condition hostgroup
-			$sql_parts['where'][] = '((c.conditiontype='.CONDITION_TYPE_HOST_GROUP.
-									' AND hg.groupid=c.value '.
-									' AND NOT EXISTS( '.
-										' SELECT hgg.groupid '.
-											' FROM hosts_groups hgg, rights rr, users_groups ugg '.
-											' WHERE hgg.groupid=hg.groupid '.
-												' AND rr.id=hgg.groupid '.
-												' AND rr.groupid=ugg.usrgrpid '.
-												' AND ugg.userid='.$userid.
-												' AND rr.permission<'.$permission.'))'.
-// condition host or template
-								' OR '.
-								'((c.conditiontype='.CONDITION_TYPE_HOST.' OR c.conditiontype='.CONDITION_TYPE_HOST_TEMPLATE.') '.
-									' AND hg.hostid=c.value '.
-									' AND NOT EXISTS( '.
-										' SELECT hgg.groupid '.
-										' FROM hosts_groups hgg, rights rr, users_groups gg '.
-										' WHERE hgg.hostid=hg.hostid '.
-											' AND rr.id=hgg.groupid '.
-											' AND rr.groupid=gg.usrgrpid '.
-											' AND gg.userid='.$userid.
+			$sql_parts['where'][] = 
+				' NOT EXISTS('.
+					' SELECT cc.conditionid'.
+					' FROM conditions cc'.
+					' WHERE cc.conditiontype='.CONDITION_TYPE_HOST_GROUP.
+						' AND cc.actionid=c.actionid'.
+						' AND ('.
+							' NOT EXISTS('.
+							' SELECT rr.id'.
+							' FROM rights rr, users_groups ug'.
+							' WHERE rr.id=cc.value'.
+								' AND rr.groupid=ug.usrgrpid'.
+								' AND ug.userid='.$userid.
+								' AND rr.permission>='.$permission.')'.
+							' OR EXISTS('.
+							' SELECT rr.id'.
+							' FROM rights rr, users_groups ugg'.
+							' WHERE rr.id=cc.value'.
+								' AND rr.groupid=ugg.usrgrpid'.
+								' AND ugg.userid='.$userid.
+								' AND rr.permission<'.$permission.')'.
+							' )'.
+				' )';
+				
+// condition host or template				 
+			$sql_parts['where'][] = 
+				' NOT EXISTS('.
+					' SELECT cc.conditionid'.
+					' FROM conditions cc'.
+					' WHERE (cc.conditiontype='.CONDITION_TYPE_HOST.' OR cc.conditiontype='.CONDITION_TYPE_HOST_TEMPLATE.')'.
+						' AND cc.actionid=c.actionid'.
+						' AND ('.
+							' NOT EXISTS('.
+								' SELECT hgg.hostid'.
+								' FROM hosts_groups hgg, rights r,users_groups ug'.
+								' WHERE hgg.hostid=cc.value'.
+									' AND r.id=hgg.groupid'.
+									' AND ug.userid='.$userid.
+									' AND r.permission>='.$permission.
+									' AND r.groupid=ug.usrgrpid)'.
+							' OR EXISTS('.
+								' SELECT hgg.hostid'.
+									' FROM hosts_groups hgg, rights rr, users_groups gg'.
+									' WHERE hgg.hostid=cc.value'.
+										' AND rr.id=hgg.groupid'.
+										' AND rr.groupid=gg.usrgrpid'.
+										' AND gg.userid='.$userid.
+										' AND rr.permission<'.$permission.')'.
+							' )'.
+				' )';
+				
+// condition trigger				
+			$sql_parts['where'][] = 
+				' NOT EXISTS('.
+					' SELECT cc.conditionid'.
+					' FROM conditions cc'.
+					' WHERE cc.conditiontype='.CONDITION_TYPE_TRIGGER.
+						' AND cc.actionid=c.actionid'.
+						' AND ('.
+							' NOT EXISTS('.
+								' SELECT f.triggerid'.
+								' FROM functions f, items i,hosts_groups hg, rights r, users_groups ug'.
+								' WHERE ug.userid='.$userid.
+									' AND r.groupid=ug.usrgrpid'.
+									' AND r.permission>='.$permission.
+									' AND hg.groupid=r.id'.
+									' AND i.hostid=hg.hostid'.
+									' AND f.itemid=i.itemid'.
+									' AND f.triggerid=cc.value)'.
+							' OR EXISTS('.
+								' SELECT ff.functionid'.
+								' FROM functions ff, items ii'.
+								' WHERE ff.triggerid=cc.value'.
+									' AND ii.itemid=ff.itemid'.
+									' AND EXISTS('.
+										' SELECT hgg.groupid'.
+										' FROM hosts_groups hgg, rights rr, users_groups ugg'.
+										' WHERE hgg.hostid=ii.hostid'.
+											' AND rr.id=hgg.groupid'.
+											' AND rr.groupid=ugg.usrgrpid'.
+											' AND ugg.userid='.$userid.
 											' AND rr.permission<'.$permission.'))'.
-
-// condition trigger
-								' OR '.
-								'( c.conditiontype='.CONDITION_TYPE_TRIGGER.
-									' AND f.triggerid=c.value '.
-									' AND NOT EXISTS( '.
-										' SELECT ff.triggerid '.
-										' FROM functions ff, items ii '.
-										' WHERE ff.triggerid=f.triggerid '.
-											' AND ff.itemid=ii.itemid '.
-											' AND EXISTS( '.
-												' SELECT hgg.groupid '.
-												' FROM hosts_groups hgg, rights rr, users_groups gg '.
-												' WHERE hgg.hostid=ii.hostid '.
-													' AND rr.id=hgg.groupid '.
-													' AND rr.groupid=gg.usrgrpid '.
-													' AND gg.userid='.$userid.
-													' AND rr.permission<'.$permission.'))))';
+					  ' )'.
+				' )';
 		}
 
 // nodeids
@@ -352,6 +386,7 @@ class CAction {
 				$sql_order;
 		$db_res = DBselect($sql, $sql_limit);
 		while($action = DBfetch($db_res)){
+
 			if($options['count']){
 				$result = $action;
 			}
@@ -415,7 +450,7 @@ class CAction {
 	}
 
 /**
- * Add actions
+ * Gets all Action data from DB by Action ID
  *
  * {@source}
  * @access public
@@ -423,16 +458,42 @@ class CAction {
  * @since 1.8
  * @version 1
  *
- * @param _array $actions multidimensional array with actions data
- * @param array $actions[0,...]['expression']
- * @param array $actions[0,...]['description']
- * @param array $actions[0,...]['type'] OPTIONAL
- * @param array $actions[0,...]['priority'] OPTIONAL
- * @param array $actions[0,...]['status'] OPTIONAL
- * @param array $actions[0,...]['comments'] OPTIONAL
- * @param array $actions[0,...]['url'] OPTIONAL
- * @return boolean
+ * @param _array $action_data
+ * @param string $action_data['actionid']
+ * @return array|boolean
  */
+	public static function getById($action_data){
+		$sql = 'SELECT * FROM actions WHERE actionid='.$action_data['actionid'];
+		$action = DBfetch(DBselect($sql));
+
+		$result = $action ? true : false;
+		if($result)
+			return $action;
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'action with id: '.$action_data['actionid'].' doesn\'t exists.');
+			return false;
+		}
+	}
+	
+	/**
+	 * Add actions
+	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $actions multidimensional array with actions data
+	 * @param array $actions[0,...]['expression']
+	 * @param array $actions[0,...]['description']
+	 * @param array $actions[0,...]['type'] OPTIONAL
+	 * @param array $actions[0,...]['priority'] OPTIONAL
+	 * @param array $actions[0,...]['status'] OPTIONAL
+	 * @param array $actions[0,...]['comments'] OPTIONAL
+	 * @param array $actions[0,...]['url'] OPTIONAL
+	 * @return boolean
+	 */
 	public static function add($actions){
 
 		$actionids = array();
@@ -466,9 +527,9 @@ class CAction {
 			$sql = 'INSERT INTO actions '.
 					'(actionid, actionid, eventid, userid, mediatypeid, clock, sendto, subject, message, status, retries, error, nextcheck, esc_step, actiontype) '.
 					' VALUES ('.$actionid.','.$action['actionid'].','.$action['eventid'].','.$action['userid'].','.$action['mediatypeid'].','.
-								$action['clock'].','.zbx_dbstr($action['sentto']).','.zbx_dbstr($action['subject']).','.zbx_dbstr($action['message']).','.
-								$action['status'].','.$action['retries'].','.zbx_dbstr($action['error']).','.$action['nextcheck'].','.
-								$action['esc_step'].','.$action['actiontype'].' )';
+						$action['clock'].','.zbx_dbstr($action['sentto']).','.zbx_dbstr($action['subject']).','.zbx_dbstr($action['message']).','.
+						$action['status'].','.$action['retries'].','.zbx_dbstr($action['error']).','.$action['nextcheck'].','.
+						$action['esc_step'].','.$action['actiontype'].' )';
 			$result = DBexecute($sql);
 			if(!$result) break;
 			$actionids[$actionid] = $actionid;
@@ -482,7 +543,163 @@ class CAction {
 			return false;
 		}
 	}
+	
+	/**
+	 * Update actions
+	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $actions multidimensional array with actions data
+	 * @param array $actions[0,...]['actionid']
+	 * @param array $actions[0,...]['expression']
+	 * @param array $actions[0,...]['description']
+	 * @param array $actions[0,...]['type'] OPTIONAL
+	 * @param array $actions[0,...]['priority'] OPTIONAL
+	 * @param array $actions[0,...]['status'] OPTIONAL
+	 * @param array $actions[0,...]['comments'] OPTIONAL
+	 * @param array $actions[0,...]['url'] OPTIONAL
+	 * @return boolean
+	 */
+	public static function update($actions){
 
+		$result = true;
+		
+		DBstart(false);
+		foreach($actions as $action){
+			$action_db_fields = CAction::getById($action);
+
+			if(!$action_db_fields){
+				$result = false;
+				break;
+			}
+
+			if(!check_db_fields($action_db_fields, $action)){
+				$result = false;
+				break;
+			}
+
+			$result = update_action($action['actionid'], $action['name'], $action['eventsource'], $action['esc_period'], 
+				$action['def_shortdata'], $action['def_longdata'], $action['recovery_msg'], $action['r_shortdata'], 
+				$action['r_longdata'], $action['evaltype'], $action['status'], $action['conditions'], $action['operations']);
+			
+			if(!$result) break;
+		}
+
+		$result = DBend($result);
+		if($result)
+			return true;
+		else{
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			return false;
+		}
+	}
+
+	/**
+	 * add conditions
+	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $conditions multidimensional array with conditions data
+	 * @param array $conditions[0,...]['actionid']
+	 * @param array $conditions[0,...]['type']
+	 * @param array $conditions[0,...]['value'] 
+	 * @param array $conditions[0,...]['operator'] 
+	 * @return boolean
+	 */
+	public static function addConditions($conditions){
+		$result = true;
+		
+		if(!check_permission_for_action_conditions($conditions)){
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			return false;
+		}
+
+		foreach($conditions as $condition){
+			if( !validate_condition($condition['type'],$condition['value']) ){
+				self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+				return false;
+			}
+		}
+			
+		DBstart(false);
+		foreach($conditions as $condition){
+			
+			$result = add_action_condition($condition['actionid'], $condition);
+			if(!$result) break;
+		}
+		$result = DBend($result);
+		
+		if($result)
+			return true;
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			return false;
+		}
+	}
+	
+	/**
+	 * add operations
+	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $operations multidimensional array with operations data
+	 * @param array $operations[0,...]['actionid']
+	 * @param array $operations[0,...]['operationtype'] 
+	 * @param array $operations[0,...]['object']
+	 * @param array $operations[0,...]['objectid']
+	 * @param array $operations[0,...]['shortdata'] 
+	 * @param array $operations[0,...]['longdata'] 
+	 * @param array $operations[0,...]['esc_period']
+	 * @param array $operations[0,...]['esc_step_from']
+	 * @param array $operations[0,...]['esc_step_to'] 
+	 * @param array $operations[0,...]['default_msg'] 
+	 * @param array $operations[0,...]['evaltype']
+	 * @param array $operations[0,...]['mediatypeid'] 
+	 * @param array $operations[0,...]['opconditions']
+	 * @param array $operations[0,...]['opconditions']['conditiontype']
+	 * @param array $operations[0,...]['opconditions']['operator']
+	 * @param array $operations[0,...]['opconditions']['value']
+	 * @return boolean
+	 */
+	public static function addOperations($operations){
+	
+		$result = true;
+		
+		foreach($operations as $operation){
+			if(!validate_operation($operation)){
+				self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+				return false;
+			}
+		}
+	
+		DBstart(false);
+		foreach($operations as $operation){
+			$result = add_action_operation($operation['actionid'], $operation);
+			if(!$result) break;
+		}
+		$result = DBend($result);
+		
+		if($result)
+			return true;
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			return false;
+		}
+	}
+	
+	
 /**
  * Delete actions
  *

@@ -24,7 +24,7 @@
 	require_once('include/graphs.inc.php');
 	require_once('include/forms.inc.php');
 
-	$page['title'] = "S_CONFIGURATION_OF_GRAPHS";
+	$page['title'] = 'S_CONFIGURATION_OF_GRAPHS';
 	$page['file'] = 'graphs.php';
 	$page['hist_arg'] = array();
 	$page['scripts'] = array('graphs.js');
