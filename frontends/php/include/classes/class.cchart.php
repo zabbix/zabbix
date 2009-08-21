@@ -331,19 +331,21 @@ class CChart extends CGraphDraw{
 		$max = 3;
 		$cnt = 0;
 
-		$db_triggers = DBselect('SELECT distinct tr.triggerid,tr.expression,tr.priority '.
-						' FROM triggers tr,functions f,items i'.
-						' WHERE tr.triggerid=f.triggerid '.
-							" AND f.function IN ('last','min','avg','max') ".
-							' AND tr.status='.TRIGGER_STATUS_ENABLED.
-							' AND i.itemid=f.itemid '.
-							' AND f.itemid='.$this->items[0]['itemid'].
-						' ORDER BY tr.priority');
-
+		$sql = 'SELECT distinct tr.triggerid,tr.expression,tr.priority '.
+				' FROM triggers tr,functions f,items i'.
+				' WHERE tr.triggerid=f.triggerid '.
+					" AND f.function IN ('last','min','avg','max') ".
+					' AND tr.status='.TRIGGER_STATUS_ENABLED.
+					' AND i.itemid=f.itemid '.
+					' AND f.itemid='.$this->items[0]['itemid'].
+				' ORDER BY tr.priority';
+		$db_triggers = DBselect($sql);
 		while(($trigger = DBfetch($db_triggers)) && ($cnt < $max)){
 			$db_fnc_cnt = DBselect('SELECT count(*) as cnt FROM functions f WHERE f.triggerid='.$trigger['triggerid']);
 			$fnc_cnt = DBfetch($db_fnc_cnt);
 			if($fnc_cnt['cnt'] != 1) continue;
+
+			CUserMacro::resolveTrigger($trigger);
 
 			if(!eregi('\{([0-9]{1,})\}([\<\>\=]{1})([0-9\.]{1,})([K|M|G]{0,1})',$trigger['expression'],$arr))
 				continue;

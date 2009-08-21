@@ -459,7 +459,7 @@ include_once('include/page_header.php');
 			$font = new CTag('font','yes');
 			$font->setAttribute('color','#000');
 			$font->setAttribute('size','-2');
-			$font->addItem(explode_exp($trigger['expression'],1));
+			$font->addItem(explode_exp($trigger['expression'],1,false,true));
 			$description = array($description,BR(), $font);
 		}
 
