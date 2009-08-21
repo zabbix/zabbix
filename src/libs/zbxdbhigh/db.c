@@ -663,6 +663,18 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, const ch
 			ret = FAIL;
 		}
 	}
+	else if (new_value == TRIGGER_VALUE_UNKNOWN && 0 != strcmp(trigger->error, reason))
+	{
+		reason_esc = DBdyn_escape_string_len(reason, TRIGGER_ERROR_LEN);
+		DBexecute("update triggers"
+				" set lastchange=%d,"
+					"error='%s'"
+				" where triggerid=" ZBX_FS_UI64,
+				now,
+				reason_esc,
+				trigger->triggerid);
+		zbx_free(reason_esc);
+	}
 	else
 	{
 		ret = FAIL;
@@ -1764,11 +1776,11 @@ char*	DBdyn_escape_string_len(const char *src, int max_src_len)
 	return dst;
 }
 
-void	DBget_item_from_db(DB_ITEM *item, DB_ROW row, DB_MACROS *macros)
+void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 {
-	char		*s;
-	static char	*key = NULL;
-	static char	*ipmi_ip = NULL;
+	char			*s;
+	static char		*key = NULL;
+	static char		*ipmi_ip = NULL;
 
 	ZBX_STR2UINT64(item->itemid, row[0]);
 /*	item->itemid=atoi(row[0]); */
@@ -1908,12 +1920,12 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row, DB_MACROS *macros)
 		case ITEM_TYPE_SIMPLE:
 		case ITEM_TYPE_EXTERNAL:
 			key = zbx_dsprintf(key, "%s", item->key_orig);
-			substitute_simple_macros(NULL, NULL, item, NULL, macros, &key, MACRO_TYPE_ITEM_KEY);
+			substitute_simple_macros(NULL, NULL, item, NULL, &key, MACRO_TYPE_ITEM_KEY, NULL, 0);
 			item->key	= key;
 			break;
 		case ITEM_TYPE_IPMI:
 			ipmi_ip = zbx_dsprintf(ipmi_ip, "%s", item->ipmi_ip);
-			substitute_simple_macros(NULL, NULL, item, NULL, macros, &ipmi_ip, MACRO_TYPE_HOST_IPMI_IP);
+			substitute_simple_macros(NULL, NULL, item, NULL, &ipmi_ip, MACRO_TYPE_HOST_IPMI_IP, NULL, 0);
 			item->ipmi_ip	= ipmi_ip;
 			break;
 		default:

@@ -24,10 +24,10 @@
 /* time_t */
 #include <time.h>
 
+#include "zbxmacros.h"
 #include "common.h"
 #include "zbxdb.h"
 #include "dbschema.h"
-#include "zbxmacros.h"
 
 extern	char	*CONFIG_DBHOST;
 extern	char	*CONFIG_DBNAME;
@@ -452,6 +452,7 @@ DB_TRIGGER
 /*	int	prevvalue; */
 	int	priority;
 	int	type;
+	char	error[TRIGGER_ERROR_LEN_MAX];
 };
 
 DB_ACTION
@@ -637,7 +638,7 @@ void    DBescape_string(const char *from, char *to, int maxlen);
 char*   DBdyn_escape_string(const char *str);
 char*	DBdyn_escape_string_len(const char *src, int max_src_len);
 
-void    DBget_item_from_db(DB_ITEM *item, DB_ROW row, DB_MACROS *macros);
+void    DBget_item_from_db(DB_ITEM *item, DB_ROW row);
 
 zbx_uint64_t	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
 int	DBhost_exists(char *server);

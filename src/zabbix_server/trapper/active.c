@@ -219,7 +219,6 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ITEM		item;
-	DB_MACROS	*macros = NULL;
 	struct zbx_json	json;
 	int		res = FAIL;
 	zbx_uint64_t	hostid;
@@ -243,9 +242,6 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 
 	if (FAIL == get_hostid_by_host(host, &hostid, error, zbx_process))
 		goto error;
-
-	if (NULL == macros)
-		zbxmacros_init(&macros);
 
 	regexp = zbx_malloc(regexp, regexp_alloc);
 	sql = zbx_malloc(sql, sql_alloc);
@@ -278,7 +274,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		DBget_item_from_db(&item, row, macros);
+		DBget_item_from_db(&item, row);
 
 		zbx_json_addobject(&json, NULL);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY, item.key, ZBX_JSON_TYPE_STRING);

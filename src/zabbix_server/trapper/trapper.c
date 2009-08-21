@@ -206,7 +206,7 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result))) {
-		DBget_item_from_db(&item, row, NULL);
+		DBget_item_from_db(&item, row);
 
 		if (item.type == ITEM_TYPE_ZABBIX_ACTIVE && FAIL == zbx_tcp_check_security(sock, item.trapper_hosts, 1))
 			continue;

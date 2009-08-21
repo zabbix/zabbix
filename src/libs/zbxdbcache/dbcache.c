@@ -498,9 +498,14 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCmass_update_triggers()");
 
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 1024,
-			"select distinct t.triggerid,t.expression,t.description,t.url,t.comments,t.status,t.value,t.priority"
-			",t.type,f.itemid from triggers t,functions f,items i where i.status not in (%d) and i.itemid=f.itemid"
-			" and t.status=%d and f.triggerid=t.triggerid and f.itemid in (",
+			"select distinct t.triggerid,t.expression,t.description,t.url,"
+				"t.comments,t.status,t.value,t.priority,t.type,t.error,f.itemid"
+			" from triggers t,functions f,items i"
+			" where i.status not in (%d)"
+				" and i.itemid=f.itemid"
+				" and t.status=%d"
+				" and f.triggerid=t.triggerid"
+				" and f.itemid in (",
 			ITEM_STATUS_NOTSUPPORTED,
 			TRIGGER_STATUS_ENABLED);
 
@@ -526,7 +531,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		trigger.triggerid	= zbx_atoui64(row[0]);
+		ZBX_STR2UINT64(trigger.triggerid, row[0]);
 		strscpy(trigger.expression, row[1]);
 		strscpy(trigger.description, row[2]);
 		trigger.url		= row[3];
@@ -535,7 +540,8 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 		trigger.value		= atoi(row[6]);
 		trigger.priority	= atoi(row[7]);
 		trigger.type		= atoi(row[8]);
-		itemid			= zbx_atoui64(row[9]);
+		strscpy(trigger.error, row[9]);
+		ZBX_STR2UINT64(itemid, row[10]);
 
 		h = NULL;
 
@@ -553,7 +559,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 
 		exp = strdup(trigger.expression);
 
-		if (evaluate_expression(&exp_value, &exp, &trigger, error, sizeof(error)) != 0)
+		if (SUCCEED != evaluate_expression(&exp_value, &exp, &trigger, error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Expression [%s] for item [" ZBX_FS_UI64 "][%s] cannot be evaluated: %s",
 					trigger.expression,
@@ -566,7 +572,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 					zbx_host_key_string(itemid),
 					error);
 /*			We shouldn't update triggervalue if expressions failed */
-/*			DBupdate_trigger_value(&trigger, exp_value, time(NULL), error);*/
+			DBupdate_trigger_value(&trigger, TRIGGER_VALUE_UNKNOWN, h->clock, error);
 		}
 		else
 			DBupdate_trigger_value(&trigger, exp_value, h->clock, NULL);
@@ -630,7 +636,7 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		DBget_item_from_db(&item, row, NULL);
+		DBget_item_from_db(&item, row);
 
 		h = NULL;
 
@@ -955,7 +961,7 @@ static void DCmass_function_update(ZBX_DC_HISTORY *history, int history_num)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		DBget_item_from_db(&item, row, NULL);
+		DBget_item_from_db(&item, row);
 
 		h = NULL;
 
@@ -975,7 +981,7 @@ static void DCmass_function_update(ZBX_DC_HISTORY *history, int history_num)
 
 		function.function	= row[ZBX_SQL_ITEM_FIELDS_NUM];
 		function.parameter	= row[ZBX_SQL_ITEM_FIELDS_NUM + 1];
-		function.itemid		= zbx_atoui64(row[ZBX_SQL_ITEM_FIELDS_NUM + 2]);
+		ZBX_STR2UINT64(function.itemid, row[ZBX_SQL_ITEM_FIELDS_NUM + 2]);
 /*		It is not required to check lastvalue for NULL here */
 		lastvalue		= row[ZBX_SQL_ITEM_FIELDS_NUM + 3];
 

@@ -81,7 +81,7 @@ void __zbx_zabbix_syslog(const char *fmt, ...)
 
 	while((row=DBfetch(result)))
 	{
-		DBget_item_from_db(&item, row, NULL);
+		DBget_item_from_db(&item, row);
 
 		va_start(ap,fmt);
 		vsnprintf(value_str,sizeof(value_str),fmt,ap);
