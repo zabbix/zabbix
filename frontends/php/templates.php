@@ -57,6 +57,11 @@ require_once('include/hosts.inc.php');
 		'twb_groupid'		=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,		NULL),
 		'newgroup'		=> array(T_ZBX_STR, O_OPT,	NULL,			NULL,		NULL),
 
+		'rem_macros'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	'isset({del_macros})'),
+		'macros'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
+		'macro_name'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	'isset({add_macro})'),
+		'macro_value'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	'isset({add_macro})'),
+
 // actions
 		'go'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
 
@@ -69,6 +74,10 @@ require_once('include/hosts.inc.php');
 		'delete'		=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
 		'delete_and_clear'	=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
 		'cancel'		=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
+		
+		'add_macro' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
+		'del_macros' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
+
 // other
 		'form'			=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
 		'form_refresh'		=> array(T_ZBX_STR, O_OPT,	NULL,			NULL,		NULL)
@@ -83,6 +92,37 @@ require_once('include/hosts.inc.php');
 /**********************************/
 /* <<<--- TEMPLATE ACTIONS --->>> */
 /**********************************/
+/* REMOVE MACROS */
+	if(isset($_REQUEST['del_macros']) && isset($_REQUEST['rem_macros'])){
+		$rem_macros = get_request('rem_macros', array());
+		foreach($rem_macros as $name => $value)
+			unset($_REQUEST['macros'][$name]);
+	}
+/* ADD MACRO */
+	if(isset($_REQUEST['add_macro'])){
+		$macro_name = get_request('macro_name');
+		$macro_value = get_request('macro_value');
+		
+		$currentmacros = array_keys(get_request('macros', array()));
+		
+		if(!CUserMacro::validate($macro_name)){
+			error(S_WRONG_MACRO.' : '.$macro_name);
+			show_messages(false, '', S_MACROS);
+		}
+		else if(str_in_array($macro_name, $currentmacros)){
+			error(S_MACRO_EXISTS.' : '.$macro_name);
+			show_messages(false, '', S_MACROS);
+		}
+		else if(zbx_empty($macro_value)){
+			error(S_EMPTY_MACRO_VALUE);
+			show_messages(false, '', S_MACROS);
+		}
+		else{
+			$_REQUEST['macros'][$macro_name] = $macro_value;
+			unset($_REQUEST['macro_name']);
+			unset($_REQUEST['macro_value']);
+		}
+	}
 // unlink, unlink_and_clear
 	if((isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear']))){
 		$_REQUEST['clear_templates'] = get_request('clear_templates', array());
@@ -283,6 +323,24 @@ require_once('include/hosts.inc.php');
 		}
 // --->>> <<<---
 
+// MACROS {
+	if($result){
+//sdi($templateid);
+		$macros = get_request('macros', array());
+		$macrostoadd = array('hostid' => $templateid, 'macros' => array());
+		
+		foreach($macros as $macro => $value){
+			if(!CUserMacro::validate($macro)){
+				$result = false;
+				break;
+			}
+			$macrostoadd['macros'][] = array('macro' => $macro, 'value' => $value);
+		}
+		$result = CUserMacro::update($macrostoadd);
+		if(!$result) 
+			error('S_ERROR_ADDING_MACRO');
+	}
+// } MACROS
 		$result = DBend($result);
 
 		show_messages($result, $msg_ok, $msg_fail);
@@ -391,7 +449,7 @@ require_once('include/hosts.inc.php');
 	echo SBR;
 
 	if(isset($_REQUEST['form'])){
-// FORM 1 insert_template_form
+	
 		$templateid = get_request('templateid', 0);
 		$template_name = get_request('template_name', '');
 		$newgroup = get_request('newgroup', '');
@@ -411,12 +469,17 @@ require_once('include/hosts.inc.php');
 			$original_templates = array();
 		}
 
-		$frmHost = new CFormTable($frm_title, 'templates.php');
+		$frmHost = new CForm('templates.php', 'post');
 		$frmHost->setName('tpl_for');
+		
+		$frmHost->addVar('form', get_request('form', 1));
+		$from_rfr = get_request('form_refresh',0);
+		$frmHost->addVar('form_refresh', $from_rfr+1);
+		$frmHost->addVar('clear_templates',$clear_templates);
+		
 		if($templateid){
 			$frmHost->addVar('templateid', $templateid);
 		}
-
 
 		if(($templateid > 0) && !isset($_REQUEST['form_refresh'])){
 // get template groups from db
@@ -442,8 +505,10 @@ require_once('include/hosts.inc.php');
 		asort($templates);
 		$frmHost->addVar('clear_templates',$clear_templates);
 
+// TEMPLATE WIDGET {
+		$template_tbl = new CTableInfo();
 // FORM ITEM : Template name text box [  ]
-		$frmHost->addRow(S_NAME, new CTextBox('template_name', $template_name, 54));
+		$template_tbl->addRow(array(S_NAME, new CTextBox('template_name', $template_name, 54)));
 
 // FORM ITEM : Groups tween box [  ] [  ]
 // get all Groups
@@ -453,12 +518,11 @@ require_once('include/hosts.inc.php');
 		foreach($all_groups as $groupid => $group){
 			$group_tb->addItem($groupid, $group['name']);
 		}
-		$frmHost->addRow(S_GROUPS, $group_tb->get(S_IN.SPACE.S_GROUPS,S_OTHER.SPACE.S_GROUPS));
+		$template_tbl->addRow(array(S_GROUPS, $group_tb->get(S_IN.SPACE.S_GROUPS,S_OTHER.SPACE.S_GROUPS)));
 
 
 // FORM ITEM : new group text box [  ]
-		$frmHost->addRow(S_NEW_GROUP, new CTextBox('newgroup', $newgroup), 'new');
-
+		$template_tbl->addRow(array(S_NEW_GROUP, new CTextBox('newgroup', $newgroup)));
 
 // FORM ITEM : linked Hosts tween box [  ] [  ]
 		$options = array('editable' => 1, 'extendoutput' => 1, 'real_hosts' => 1);
@@ -472,7 +536,6 @@ require_once('include/hosts.inc.php');
 		foreach($twb_groups as $groupid => $group){
 			$cmbGroups->addItem($groupid, $group['name']);
 		}
-
 
 		$host_tb = new CTweenBox($frmHost, 'hosts', $hosts_linked_to, 25);
 
@@ -497,8 +560,7 @@ require_once('include/hosts.inc.php');
 			$host_tb->addItem($hostid, get_node_name_by_elid($hostid).$db_host['host']);
 		}
 
-		$frmHost->addRow(S_HOSTS, $host_tb->Get(S_HOSTS.SPACE.S_IN,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE,$cmbGroups)));
-
+		$template_tbl->addRow(array(S_HOSTS, $host_tb->Get(S_HOSTS.SPACE.S_IN,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE,$cmbGroups))));
 
 // FORM ITEM : linked Template table
 		$template_table = new CTable();
@@ -513,13 +575,13 @@ require_once('include/hosts.inc.php');
 			));
 		}
 
-		$frmHost->addRow(S_LINK_WITH_TEMPLATE, array(
+		$template_tbl->addRow(array(S_LINK_WITH_TEMPLATE, array(
 			$template_table,
 			new CButton('add_template', S_ADD,
 				"return PopUp('popup.php?dstfrm=".$frmHost->GetName().
 				"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
 				url_param($templates,false,'existed_templates')."',450,450)", 'T')
-		));
+		)));
 
 // <<<--- FULL CLONE --->>>
 		if($_REQUEST['form'] == 'full_clone'){
@@ -539,7 +601,7 @@ require_once('include/hosts.inc.php');
 					$items_lbx->addItem($titemid, $item_description);
 				}
 			}
-			$frmHost->addRow(S_ITEMS, $items_lbx);
+			$template_tbl->addRow(array(S_ITEMS, $items_lbx));
 
 
 // FORM ITEM : Template triggers
@@ -558,7 +620,7 @@ require_once('include/hosts.inc.php');
 					$trig_lbx->addItem($ttriggerid, $trigger_description);
 				}
 			}
-			$frmHost->addRow(S_TRIGGERS, $trig_lbx);
+			$template_tbl->addRow(array(S_TRIGGERS, $trig_lbx));
 
 
 // FORM ITEM : Host graphs
@@ -576,33 +638,91 @@ require_once('include/hosts.inc.php');
 					$graphs_lbx->addItem($tgraphid, $tgraph['name']);
 				}
 			}
-			$frmHost->addRow(S_GRAPHS, $graphs_lbx);
+			$template_tbl->addRow(array(S_GRAPHS, $graphs_lbx));
 		}
 // --->>> FULL CLONE <<<---
 
-
-		$frmHost->addItemToBottomRow(new CButton("save", S_SAVE));
-		if(($templateid > 0) && ($_REQUEST['form'] != 'full_clone') && ($_REQUEST['form'] != 'clone')){
-			$frmHost->addItemToBottomRow(SPACE);
-			$frmHost->addItemToBottomRow(new CButton("clone", S_CLONE));
-			$frmHost->addItemToBottomRow(SPACE);
-			$frmHost->addItemToBottomRow(new CButton("full_clone", S_FULL_CLONE));
-			$frmHost->addItemToBottomRow(SPACE);
-			$frmHost->addItemToBottomRow(
-				new CButtonDelete(S_DELETE_SELECTED_HOST_Q, url_param("form").url_param("templateid").url_param('groupid'))
+		$host_footer = array();
+		$host_footer[] = new CButton('save', S_SAVE);
+		if(($_REQUEST['hostid']>0) && ($_REQUEST['form'] != 'full_clone')){
+			array_push($host_footer, SPACE, new CButton("clone",S_CLONE), SPACE, new CButton("full_clone",S_FULL_CLONE), SPACE,
+				new CButtonDelete(S_DELETE_SELECTED_HOST_Q, url_param('form').url_param('hostid').url_param('groupid')),
+				SPACE, 
+				new CButtonQMessage('delete_and_clear', 'Delete AND clear', S_DELETE_SELECTED_HOSTS_Q, url_param('form').url_param('hostid').
+					url_param('groupid')
+				)
 			);
-			$frmHost->addItemToBottomRow(SPACE);
-			$frmHost->addItemToBottomRow(
-					new CButtonQMessage(
-						'delete_and_clear',
-						'Delete AND clear',
-						S_DELETE_SELECTED_HOSTS_Q,
-						url_param("form").url_param("templateid").url_param('groupid')
-					)
-				);
 		}
-		$frmHost->addItemToBottomRow(SPACE);
-		$frmHost->addItemToBottomRow(new CButtonCancel(url_param('groupid')));
+		array_push($host_footer, SPACE, new CButtonCancel(url_param('groupid')));
+		
+		$host_footer = new CCol($host_footer);
+		$host_footer->setColSpan(2);
+		$template_tbl->setFooter($host_footer);
+		$template_wdgt = new CWidget();
+		$template_wdgt->setClass('header');
+		$template_wdgt->addHeader($frm_title);
+		$template_wdgt->addItem($template_tbl);
+// } TEMPLATE WIDGET
+
+
+// MACROS WIDGET {
+		$macros = array();
+		if(isset($_REQUEST['form_refresh'])){
+			$macros = get_request('macros', array());
+		}
+		else if($_REQUEST['templateid'] > 0){
+			$macros_db = CUserMacro::get(array('extendoutput' => 1, 'hostids' => $_REQUEST['templateid']));
+			foreach($macros_db as $macro_db){
+				$macros[$macro_db['macro']] = $macro_db['value'];
+			}
+		}
+
+		$macro_tbl = new CTableInfo();
+
+		$macros_el = array();
+		foreach($macros as $macro => $value){
+			$macros_el[] = array(new CCheckBox("rem_macros[$macro]", 'no', null, $macro), $macro.SPACE.RARR.SPACE.$value);
+			$macros_el[] = BR();
+			$frmHost->addVar("macros[$macro]", $value);
+		}
+		$macros_el[] = empty($macros_el) ? S_NO_MACROS_DEFINED : new CButton('del_macros', S_DELETE_SELECTED);
+
+		
+		$macro_tbl->addRow(array(S_MACROS, $macros_el));
+		$macro_tbl->addRow(array(S_NEW_MACRO, array(
+			new CTextBox('macro_name', get_request('macro_name', ''), 10),
+			new CSpan(RARR, 'rarr'),
+			new CTextBox('macro_value', get_request('macro_value', ''), 10),
+			SPACE,
+			new CButton('add_macro', S_ADD)
+		)));
+
+		$macros_wdgt = new CWidget();
+		$macros_wdgt->setClass('header');
+		$macros_wdgt->addHeader(S_MACROS);
+		$macros_wdgt->addItem($macro_tbl);
+
+// } MACROS WIDGET 
+
+		$left_table = new CTable();
+		$left_table->setCellPadding(4);
+		$left_table->setCellSpacing(4);
+		$left_table->addRow($template_wdgt);
+		
+		$right_table = new CTable();
+		$right_table->setCellPadding(4);
+		$right_table->setCellSpacing(4);
+		$right_table->addRow($macros_wdgt);		
+		
+		$td_l = new CCol($left_table);
+		$td_l->setAttribute('valign','top');
+		$td_r = new CCol($right_table);
+		$td_r->setAttribute('valign','top');
+		
+		$outer_table = new CTable();
+		$outer_table->addRow(array($td_l, $td_r));
+
+		$frmHost->addItem($outer_table);
 		$frmHost->show();
 	}
 	else{

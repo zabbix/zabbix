@@ -5469,7 +5469,7 @@
 		$frm_title = S_HOST;
 
 		if($_REQUEST['hostid']>0){
-			$db_host=get_host_by_hostid($_REQUEST['hostid']);
+			$db_host = get_host_by_hostid($_REQUEST['hostid']);
 			$frm_title	.= SPACE.' ['.$db_host['host'].']';
 
 			$original_templates = get_templates_by_hostid($_REQUEST['hostid']);
@@ -5511,7 +5511,6 @@
 			$db_profile = DBfetch($db_profiles);
 			if($db_profile){
 				$useprofile = 'yes';
-
 
 				$devicetype	= $db_profile['devicetype'];
 				$name		= $db_profile['name'];
@@ -5610,17 +5609,23 @@
 		$clear_templates = array_intersect($clear_templates, array_keys($original_templates));
 		$clear_templates = array_diff($clear_templates,array_keys($templates));
 		asort($templates);
-
-		$frmHost = new CFormTable($frm_title,'hosts.php');
-		$frmHost->setHelp('web.hosts.host.php');
-		$frmHost->addVar('config',get_request('config',0));
-
+	
+		$frmHost = new CForm('hosts.php', 'post');
+		$frmHost->setName('web.hosts.host.php.');
+		//$frmHost->setHelp('web.hosts.host.php');
+		//$frmHost->addVar('config',get_request('config',0));
+		$frmHost->addVar('form', get_request('form', 1));
+		$from_rfr = get_request('form_refresh',0);
+		$frmHost->addVar('form_refresh', $from_rfr+1);
 		$frmHost->addVar('clear_templates',$clear_templates);
 
-		if($_REQUEST['hostid']>0)		$frmHost->addVar('hostid',$_REQUEST['hostid']);
-		if($_REQUEST['groupid']>0)		$frmHost->addVar('groupid',$_REQUEST['groupid']);
+// HOST WIDGET {	
+		$host_tbl = new CTableInfo();
+		
+		if($_REQUEST['hostid']>0) $frmHost->addVar('hostid', $_REQUEST['hostid']);
+		if($_REQUEST['groupid']>0) $frmHost->addVar('groupid', $_REQUEST['groupid']);
 
-		$frmHost->addRow(S_NAME,new CTextBox('host',$host,54));
+		$host_tbl->addRow(array(S_NAME, new CTextBox('host',$host,54)));
 
 		$grp_tb = new CTweenBox($frmHost,'groups',$groups,10);
 		$db_groups=DBselect('SELECT DISTINCT groupid,name '.
@@ -5632,25 +5637,25 @@
 			$grp_tb->addItem($db_group['groupid'],$db_group['name']);
 		}
 
-		$frmHost->addRow(S_GROUPS,$grp_tb->get(S_IN.SPACE.S_GROUPS,S_OTHER.SPACE.S_GROUPS));
+		$host_tbl->addRow(array(S_GROUPS,$grp_tb->get(S_IN.SPACE.S_GROUPS,S_OTHER.SPACE.S_GROUPS)));
 
-		$frmHost->addRow(S_NEW_GROUP,new CTextBox('newgroup',$newgroup),'new');
+		$host_tbl->addRow(array(S_NEW_GROUP, new CTextBox('newgroup',$newgroup)));
 
 // onchange does not work on some browsers: MacOS, KDE browser
-		$frmHost->addRow(S_DNS_NAME,new CTextBox('dns',$dns,'40'));
+		$host_tbl->addRow(array(S_DNS_NAME,new CTextBox('dns',$dns,'40')));
 		if(defined('ZBX_HAVE_IPV6')){
-			$frmHost->addRow(S_IP_ADDRESS,new CTextBox('ip',$ip,'39'));
+			$host_tbl->addRow(array(S_IP_ADDRESS,new CTextBox('ip',$ip,'39')));
 		}
 		else{
-			$frmHost->addRow(S_IP_ADDRESS,new CTextBox('ip',$ip,'15'));
+			$host_tbl->addRow(array(S_IP_ADDRESS,new CTextBox('ip',$ip,'15')));
 		}
 
 		$cmbConnectBy = new CComboBox('useip', $useip);
 		$cmbConnectBy->addItem(0, S_DNS_NAME);
 		$cmbConnectBy->addItem(1, S_IP_ADDRESS);
-		$frmHost->addRow(S_CONNECT_TO,$cmbConnectBy);
+		$host_tbl->addRow(array(S_CONNECT_TO,$cmbConnectBy));
 
-		$frmHost->AddRow(S_AGENT_PORT,new CNumericBox('port',$port,5));
+		$host_tbl->AddRow(array(S_AGENT_PORT,new CNumericBox('port',$port,5)));
 //Proxy
 		$cmbProxy = new CComboBox('proxy_hostid', $proxy_hostid);
 
@@ -5660,13 +5665,13 @@
 		while ($db_proxy = DBfetch($db_proxies))
 			$cmbProxy->addItem($db_proxy['hostid'], $db_proxy['host']);
 
-		$frmHost->addRow(S_MONITORED_BY_PROXY,$cmbProxy);
+		$host_tbl->addRow(array(S_MONITORED_BY_PROXY,$cmbProxy));
 //----------
 
 		$cmbStatus = new CComboBox('status',$status);
 		$cmbStatus->addItem(HOST_STATUS_MONITORED,	S_MONITORED);
 		$cmbStatus->addItem(HOST_STATUS_NOT_MONITORED,	S_NOT_MONITORED);
-		$frmHost->addRow(S_STATUS,$cmbStatus);
+		$host_tbl->addRow(array(S_STATUS,$cmbStatus));
 
 		$template_table = new CTable();
 		$template_table->SetCellPadding(0);
@@ -5682,19 +5687,19 @@
 				);
 		}
 
-		$frmHost->addRow(S_LINK_WITH_TEMPLATE, array($template_table,
+		$host_tbl->addRow(array(S_LINK_WITH_TEMPLATE, array($template_table,
 				new CButton('add_template',S_ADD,
 					"return PopUp('popup.php?dstfrm=".$frmHost->GetName().
 					"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
 					url_param($templates,false,'existed_templates')."',450,450)",
 					'T')
-				));
+				)));
 
-		$frmHost->addRow(S_USEIPMI, new CCheckBox('useipmi', $useipmi, 'submit()'));
+		$host_tbl->addRow(array(S_USEIPMI, new CCheckBox('useipmi', $useipmi, 'submit()')));
 
 		if($useipmi == 'yes'){
-			$frmHost->addRow(S_IPMI_IP_ADDRESS, new CTextBox('ipmi_ip', $ipmi_ip, defined('ZBX_HAVE_IPV6') ? 39 : 15));
-			$frmHost->addRow(S_IPMI_PORT, new CNumericBox('ipmi_port', $ipmi_port, 5));
+			$host_tbl->addRow(array(S_IPMI_IP_ADDRESS, new CTextBox('ipmi_ip', $ipmi_ip, defined('ZBX_HAVE_IPV6') ? 39 : 15)));
+			$host_tbl->addRow(array(S_IPMI_PORT, new CNumericBox('ipmi_port', $ipmi_port, 5)));
 
 			$cmbIPMIAuthtype = new CComboBox('ipmi_authtype', $ipmi_authtype);
 			$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_DEFAULT,	S_AUTHTYPE_DEFAULT);
@@ -5704,7 +5709,7 @@
 			$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_STRAIGHT,	S_AUTHTYPE_STRAIGHT);
 			$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_OEM,		S_AUTHTYPE_OEM);
 			$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_RMCP_PLUS,	S_AUTHTYPE_RMCP_PLUS);
-			$frmHost->addRow(S_IPMI_AUTHTYPE, $cmbIPMIAuthtype);
+			$host_tbl->addRow(array(S_IPMI_AUTHTYPE, $cmbIPMIAuthtype));
 
 			$cmbIPMIPrivilege = new CComboBox('ipmi_privilege', $ipmi_privilege);
 			$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_CALLBACK,	S_PRIVILEGE_CALLBACK);
@@ -5712,10 +5717,10 @@
 			$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_OPERATOR,	S_PRIVILEGE_OPERATOR);
 			$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_ADMIN,	S_PRIVILEGE_ADMIN);
 			$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_OEM,		S_PRIVILEGE_OEM);
-			$frmHost->addRow(S_IPMI_PRIVILEGE, $cmbIPMIPrivilege);
+			$host_tbl->addRow(array(S_IPMI_PRIVILEGE, $cmbIPMIPrivilege));
 
-			$frmHost->addRow(S_IPMI_USERNAME, new CTextBox('ipmi_username', $ipmi_username, 16));
-			$frmHost->addRow(S_IPMI_PASSWORD, new CTextBox('ipmi_password', $ipmi_password, 20));
+			$host_tbl->addRow(array(S_IPMI_USERNAME, new CTextBox('ipmi_username', $ipmi_username, 16)));
+			$host_tbl->addRow(array(S_IPMI_PASSWORD, new CTextBox('ipmi_password', $ipmi_password, 20)));
 		}
 		else{
 			$frmHost->addVar('ipmi_ip', $ipmi_ip);
@@ -5725,395 +5730,213 @@
 			$frmHost->addVar('ipmi_username', $ipmi_username);
 			$frmHost->addVar('ipmi_password', $ipmi_password);
 		}
+		
+		if($_REQUEST['form'] == 'full_clone'){
+// Host items
+			$items_lbx = new CListBox('items',null,8);
+			$items_lbx->setAttribute('disabled','disabled');
 
-		$frmHost->addRow(S_USE_PROFILE,new CCheckBox('useprofile',$useprofile,'submit()'));
-		$frmHost->addRow(S_USE_EXTENDED_PROFILE,new CCheckBox('useprofile_ext',$useprofile_ext,'submit()','yes'));
+			$sql = 'SELECT * '.
+					' FROM items '.
+					' WHERE hostid='.$_REQUEST['hostid'].
+						' AND templateid=0 '.
+					' ORDER BY description';
+			$host_items_res = DBselect($sql);
+			while($host_item = DBfetch($host_items_res)){
+				$item_description = item_description($host_item);
+				$items_lbx->addItem($host_item['itemid'],$item_description);
+			}
 
-		if($useprofile=='yes'){
-			$frmHost->addRow(S_DEVICE_TYPE,new CTextBox("devicetype",$devicetype,61));
-			$frmHost->addRow(S_NAME,new CTextBox("name",$name,61));
-			$frmHost->addRow(S_OS,new CTextBox("os",$os,61));
-			$frmHost->addRow(S_SERIALNO,new CTextBox("serialno",$serialno,61));
-			$frmHost->addRow(S_TAG,new CTextBox("tag",$tag,61));
-			$frmHost->addRow(S_MACADDRESS,new CTextBox("macaddress",$macaddress,61));
-			$frmHost->addRow(S_HARDWARE,new CTextArea("hardware",$hardware,60,4));
-			$frmHost->addRow(S_SOFTWARE,new CTextArea("software",$software,60,4));
-			$frmHost->addRow(S_CONTACT,new CTextArea("contact",$contact,60,4));
-			$frmHost->addRow(S_LOCATION,new CTextArea("location",$location,60,4));
-			$frmHost->addRow(S_NOTES,new CTextArea("notes",$notes,60,4));
+			if($items_lbx->ItemsCount() < 1) $items_lbx->setAttribute('style','width: 200px;');
+			$host_tbl->addRow(S_ITEMS, $items_lbx);
+
+// Host triggers
+			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array($_REQUEST['hostid']), PERM_RES_IDS_ARRAY);
+
+			$trig_lbx = new CListBox('triggers',null,8);
+			$trig_lbx->setAttribute('disabled','disabled');
+
+			$sql = 'SELECT DISTINCT t.* '.
+					' FROM triggers t, items i, functions f'.
+					' WHERE i.hostid='.$_REQUEST['hostid'].
+						' AND f.itemid=i.itemid '.
+						' AND t.triggerid=f.triggerid '.
+						' AND '.DBcondition('t.triggerid', $available_triggers).
+						' AND t.templateid=0 '.
+					' ORDER BY t.description';
+
+			$host_trig_res = DBselect($sql);
+			while($host_trig = DBfetch($host_trig_res)){
+				$trig_description = expand_trigger_description($host_trig["triggerid"]);
+				$trig_lbx->addItem($host_trig['triggerid'],$trig_description);
+			}
+
+			if($trig_lbx->ItemsCount() < 1) $trig_lbx->setAttribute('style','width: 200px;');
+			$host_tbl->addRow(S_TRIGGERS, $trig_lbx);
+
+// Host graphs
+			$available_graphs = get_accessible_graphs(PERM_READ_ONLY, array($_REQUEST['hostid']), PERM_RES_IDS_ARRAY);
+
+			$graphs_lbx = new CListBox('graphs',null,8);
+			$graphs_lbx->setAttribute('disabled','disabled');
+
+			$def_items = array();
+			$sql = 'SELECT DISTINCT g.* '.
+						' FROM graphs g, graphs_items gi,items i '.
+						' WHERE '.DBcondition('g.graphid',$available_graphs).
+							' AND gi.graphid=g.graphid '.
+							' AND g.templateid=0 '.
+							' AND i.itemid=gi.itemid '.
+							' AND i.hostid='.$_REQUEST['hostid'].
+						' ORDER BY g.name';
+
+			$host_graph_res = DBselect($sql);
+			while($host_graph = DBfetch($host_graph_res)){
+				$graphs_lbx->addItem($host_graph['graphid'],$host_graph['name']);
+			}
+
+			if($graphs_lbx->ItemsCount() < 1) $graphs_lbx->setAttribute('style','width: 200px;');
+
+			$host_tbl->addRow(S_GRAPHS, $graphs_lbx);
+		}
+		
+		$host_footer = array();
+		$host_footer[] = new CButton('save', S_SAVE);
+		if(($_REQUEST['hostid']>0) && ($_REQUEST['form'] != 'full_clone')){
+			array_push($host_footer, SPACE, new CButton('clone', S_CLONE), SPACE, new CButton('full_clone', S_FULL_CLONE), SPACE, 
+				new CButtonDelete(S_DELETE_SELECTED_HOST_Q, url_param('form').url_param('hostid').url_param('groupid')));
+		}
+		array_push($host_footer, SPACE, new CButtonCancel(url_param('groupid')));
+		
+		$host_footer = new CCol($host_footer);
+		$host_footer->setColSpan(2);
+		$host_tbl->setFooter($host_footer);
+		
+		$host_wdgt = new CWidget();
+		$host_wdgt->setClass('header');
+		$host_wdgt->addHeader($frm_title);
+		$host_wdgt->addItem($host_tbl);
+		
+// } HOST WIDGET
+
+// MACROS WIDGET {
+	$macros = array();
+	if(isset($_REQUEST['form_refresh'])){
+		$macros = get_request('macros', array());
+	}
+	else if($_REQUEST['hostid'] > 0){
+		$macros_db = CUserMacro::get(array('extendoutput' => 1, 'hostids' => $_REQUEST['hostid']));
+		foreach($macros_db as $macro_db){
+			$macros[$macro_db['macro']] = $macro_db['value'];
+		}
+	}
+
+		$macro_tbl = new CTableInfo();
+
+		$macros_el = array();
+		foreach($macros as $macro => $value){
+			$macros_el[] = array(new CCheckBox("rem_macros[$macro]", 'no', null, $macro), $macro.SPACE.RARR.SPACE.$value);
+			$macros_el[] = BR();
+			$frmHost->addVar("macros[$macro]", $value);
+		}
+		$macros_el[] = empty($macros_el) ? S_NO_MACROS_DEFINED : new CButton('del_macros', S_DELETE_SELECTED);
+
+		
+		$macro_tbl->addRow(array(S_MACROS, $macros_el));
+		$macro_tbl->addRow(array(S_NEW_MACRO, array(
+			new CTextBox('macro_name', get_request('macro_name', ''), 10),
+			new CSpan(RARR, 'rarr'),
+			new CTextBox('macro_value', get_request('macro_value', ''), 10),
+			SPACE,
+			new CButton('add_macro', S_ADD)
+		)));
+
+		$macros_wdgt = new CWidget();
+		$macros_wdgt->setClass('header');
+		$macros_wdgt->addHeader(S_MACROS);
+		$macros_wdgt->addItem($macro_tbl);
+
+// } MACROS WIDGET 
+
+
+// PROFILE WIDGET {
+		$profile_tbl = new CTableInfo();
+		$profile_tbl->addRow(array(S_USE_PROFILE,new CCheckBox('useprofile',$useprofile,'submit()')));
+
+		if($useprofile == 'yes'){
+			$profile_tbl->addRow(array(S_DEVICE_TYPE,new CTextBox('devicetype',$devicetype,61)));
+			$profile_tbl->addRow(array(S_NAME,new CTextBox('name',$name,61)));
+			$profile_tbl->addRow(array(S_OS,new CTextBox('os',$os,61)));
+			$profile_tbl->addRow(array(S_SERIALNO,new CTextBox('serialno',$serialno,61)));
+			$profile_tbl->addRow(array(S_TAG,new CTextBox('tag',$tag,61)));
+			$profile_tbl->addRow(array(S_MACADDRESS,new CTextBox('macaddress',$macaddress,61)));
+			$profile_tbl->addRow(array(S_HARDWARE,new CTextArea('hardware',$hardware,60,4)));
+			$profile_tbl->addRow(array(S_SOFTWARE,new CTextArea('software',$software,60,4)));
+			$profile_tbl->addRow(array(S_CONTACT,new CTextArea('contact',$contact,60,4)));
+			$profile_tbl->addRow(array(S_LOCATION,new CTextArea('location',$location,60,4)));
+			$profile_tbl->addRow(array(S_NOTES,new CTextArea('notes',$notes,60,4)));
 		}
 		else{
-			$frmHost->addVar("devicetype",	$devicetype);
-			$frmHost->addVar("name",	$name);
-			$frmHost->addVar("os",		$os);
-			$frmHost->addVar("serialno",	$serialno);
-			$frmHost->addVar("tag",		$tag);
-			$frmHost->addVar("macaddress",	$macaddress);
-			$frmHost->addVar("hardware",	$hardware);
-			$frmHost->addVar("software",	$software);
-			$frmHost->addVar("contact",	$contact);
-			$frmHost->addVar("location",	$location);
-			$frmHost->addVar("notes",	$notes);
+			$frmHost->addVar('devicetype', $devicetype);
+			$frmHost->addVar('name',$name);
+			$frmHost->addVar('os',$os);
+			$frmHost->addVar('serialno',$serialno);
+			$frmHost->addVar('tag',	$tag);
+			$frmHost->addVar('macaddress',$macaddress);
+			$frmHost->addVar('hardware',$hardware);
+			$frmHost->addVar('software',$software);
+			$frmHost->addVar('contact',$contact);
+			$frmHost->addVar('location',$location);
+			$frmHost->addVar('notes',$notes);
 		}
+		
+		$profile_wdgt = new CWidget();
+		$profile_wdgt->setClass('header');
+		$profile_wdgt->addHeader(S_PROFILE);
+		$profile_wdgt->addItem($profile_tbl);
+// } PROFILE WIDGET
 
-// 	BEGIN: HOSTS PROFILE EXTENDED Section
+// EXT PROFILE WIDGET {
+		$ext_profile_tbl = new CTableInfo();
+		$ext_profile_tbl->addRow(array(S_USE_EXTENDED_PROFILE,new CCheckBox('useprofile_ext',$useprofile_ext,'submit()','yes')));
+
 		foreach($ext_profiles_fields as $prof_field => $caption){
-			if($useprofile_ext=="yes"){
-				$frmHost->addRow($caption,new CTextBox('ext_host_profiles['.$prof_field.']',$ext_host_profiles[$prof_field],80));
+			if($useprofile_ext == 'yes'){
+				$ext_profile_tbl->addRow(array($caption,new CTextBox('ext_host_profiles['.$prof_field.']',$ext_host_profiles[$prof_field],40)));
 			}
 			else{
 				$frmHost->addVar('ext_host_profiles['.$prof_field.']',	$ext_host_profiles[$prof_field]);
 			}
 		}
-// 	END:   HOSTS PROFILE EXTENDED Section
-
-
-		if($_REQUEST['form'] == 'full_clone'){
-// Host items
-			$items_lbx = new CListBox('items',null,8);
-			$items_lbx->setAttribute('disabled','disabled');
-
-			$sql = 'SELECT * '.
-					' FROM items '.
-					' WHERE hostid='.$_REQUEST['hostid'].
-						' AND templateid=0 '.
-					' ORDER BY description';
-			$host_items_res = DBselect($sql);
-			while($host_item = DBfetch($host_items_res)){
-				$item_description = item_description($host_item);
-				$items_lbx->addItem($host_item['itemid'],$item_description);
-			}
-
-			if($items_lbx->ItemsCount() < 1) $items_lbx->setAttribute('style','width: 200px;');
-			$frmHost->addRow(S_ITEMS, $items_lbx);
-
-// Host triggers
-			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array($_REQUEST['hostid']), PERM_RES_IDS_ARRAY);
-
-			$trig_lbx = new CListBox('triggers',null,8);
-			$trig_lbx->setAttribute('disabled','disabled');
-
-			$sql = 'SELECT DISTINCT t.* '.
-					' FROM triggers t, items i, functions f'.
-					' WHERE i.hostid='.$_REQUEST['hostid'].
-						' AND f.itemid=i.itemid '.
-						' AND t.triggerid=f.triggerid '.
-						' AND '.DBcondition('t.triggerid', $available_triggers).
-						' AND t.templateid=0 '.
-					' ORDER BY t.description';
-
-			$host_trig_res = DBselect($sql);
-			while($host_trig = DBfetch($host_trig_res)){
-				$trig_description = expand_trigger_description($host_trig["triggerid"]);
-				$trig_lbx->addItem($host_trig['triggerid'],$trig_description);
-			}
-
-			if($trig_lbx->ItemsCount() < 1) $trig_lbx->setAttribute('style','width: 200px;');
-			$frmHost->addRow(S_TRIGGERS, $trig_lbx);
-
-// Host graphs
-			$available_graphs = get_accessible_graphs(PERM_READ_ONLY, array($_REQUEST['hostid']), PERM_RES_IDS_ARRAY);
-
-			$graphs_lbx = new CListBox('graphs',null,8);
-			$graphs_lbx->setAttribute('disabled','disabled');
-
-			$def_items = array();
-			$sql = 'SELECT DISTINCT g.* '.
-						' FROM graphs g, graphs_items gi,items i '.
-						' WHERE '.DBcondition('g.graphid',$available_graphs).
-							' AND gi.graphid=g.graphid '.
-							' AND g.templateid=0 '.
-							' AND i.itemid=gi.itemid '.
-							' AND i.hostid='.$_REQUEST['hostid'].
-						' ORDER BY g.name';
-
-			$host_graph_res = DBselect($sql);
-			while($host_graph = DBfetch($host_graph_res)){
-				$graphs_lbx->addItem($host_graph['graphid'],$host_graph['name']);
-			}
-
-			if($graphs_lbx->ItemsCount() < 1) $graphs_lbx->setAttribute('style','width: 200px;');
-
-			$frmHost->addRow(S_GRAPHS, $graphs_lbx);
-		}
-
-		$frmHost->addItemToBottomRow(new CButton("save",S_SAVE));
-		if(($_REQUEST['hostid']>0) && ($_REQUEST['form'] != 'full_clone')){
-			$frmHost->addItemToBottomRow(SPACE);
-			$frmHost->addItemToBottomRow(new CButton("clone",S_CLONE));
-			$frmHost->addItemToBottomRow(SPACE);
-			$frmHost->addItemToBottomRow(new CButton("full_clone",S_FULL_CLONE));
-
-			$frmHost->addItemToBottomRow(SPACE);
-			$frmHost->addItemToBottomRow(
-				new CButtonDelete(S_DELETE_SELECTED_HOST_Q,
-					url_param("form").url_param("config").url_param("hostid").
-					url_param('groupid')
-				));
-		}
-
-		$frmHost->addItemToBottomRow(SPACE);
-		$frmHost->addItemToBottomRow(new CButtonCancel(url_param("config").url_param('groupid')));
-		$frmHost->show();
-	}
-
-
-// Template form
-	function insert_template_form(){
-		global $USER_DETAILS;
-
-		$groups= get_request('groups',array());
-
-		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
-
-		$newgroup	= get_request('newgroup','');
-
-		$host 		= get_request('host',	'');
-		$port 		= get_request('port',	get_profile('HOST_PORT',10050));
-		$status		= get_request('status',	HOST_STATUS_MONITORED);
-		$useip		= get_request('useip',	0);
-		$dns		= get_request('dns',	'');
-		$ip		= get_request('ip',	'0.0.0.0');
-		$proxy_hostid	= get_request('proxy_hostid','');
-
-		$useipmi	= get_request('useipmi','no');
-		$ipmi_ip	= get_request('ipmi_ip','');
-		$ipmi_port	= get_request('ipmi_port',623);
-		$ipmi_authtype	= get_request('ipmi_authtype',-1);
-		$ipmi_privilege	= get_request('ipmi_privilege',2);
-		$ipmi_username	= get_request('ipmi_username','');
-		$ipmi_password	= get_request('ipmi_password','');
-
-		$useprofile = get_request('useprofile','no');
-
-		$devicetype	= get_request('devicetype','');
-		$name		= get_request('name','');
-		$os			= get_request('os','');
-		$serialno	= get_request('serialno','');
-		$tag		= get_request('tag','');
-		$macaddress	= get_request('macaddress','');
-		$hardware	= get_request('hardware','');
-		$software	= get_request('software','');
-		$contact	= get_request('contact','');
-		$location	= get_request('location','');
-		$notes		= get_request('notes','');
-
-		$templates		= get_request('templates',array());
-		$clear_templates	= get_request('clear_templates',array());
-
-		$frm_title =S_TEMPLATE;
-
-		if($_REQUEST['hostid']>0){
-			$db_host=get_host_by_hostid($_REQUEST['hostid']);
-			$frm_title	.= SPACE.' ['.$db_host['host'].']';
-
-			$original_templates = get_templates_by_hostid($_REQUEST['hostid']);
-		}
-		else{
-			$original_templates = array();
-		}
-
-		if(($_REQUEST['hostid']>0) && !isset($_REQUEST['form_refresh'])){
-			$proxy_hostid		= $db_host['proxy_hostid'];
-			$host			= $db_host['host'];
-			$port			= $db_host['port'];
-			$status			= $db_host['status'];
-			$useip			= $db_host['useip'];
-			$useipmi		= $db_host['useipmi'] ? 'yes' : 'no';
-			$ip			= $db_host['ip'];
-			$dns			= $db_host['dns'];
-			$ipmi_ip		= $db_host['ipmi_ip'];
-
-			$ipmi_port		= $db_host['ipmi_port'];
-			$ipmi_authtype		= $db_host['ipmi_authtype'];
-			$ipmi_privilege		= $db_host['ipmi_privilege'];
-			$ipmi_username		= $db_host['ipmi_username'];
-			$ipmi_password		= $db_host['ipmi_password'];
-
-// add groups
-			$db_groups=DBselect('SELECT DISTINCT groupid '.
-							' FROM hosts_groups '.
-							' WHERE hostid='.$_REQUEST['hostid'].
-								' AND '.DBcondition('groupid',$available_groups));
-			while($db_group=DBfetch($db_groups)){
-				if(uint_in_array($db_group['groupid'],$groups)) continue;
-				$groups[$db_group['groupid']] = $db_group['groupid'];
-			}
-
-			$templates = $original_templates;
-		}
-
-		$clear_templates = array_intersect($clear_templates, array_keys($original_templates));
-		$clear_templates = array_diff($clear_templates,array_keys($templates));
-		asort($templates);
-
-		$frmHost = new CFormTable($frm_title,'hosts.php');
-		$frmHost->setHelp('web.hosts.host.php');
-		$frmHost->addVar('config',get_request('config',0));
-
-		$frmHost->addVar('clear_templates',$clear_templates);
-
-		if($_REQUEST['hostid']>0)		$frmHost->addVar('hostid',$_REQUEST['hostid']);
-		if($_REQUEST['groupid']>0)		$frmHost->addVar('groupid',$_REQUEST['groupid']);
-
-		$frmHost->addRow(S_NAME,new CTextBox('host',$host,54));
-
-		$grp_tb = new CTweenBox($frmHost,'groups',$groups,10);
-		$db_groups=DBselect('SELECT DISTINCT groupid,name '.
-						' FROM groups '.
-						' WHERE '.DBcondition('groupid',$available_groups).
-						' ORDER BY name');
-
-		while($db_group=DBfetch($db_groups)){
-			$grp_tb->addItem($db_group['groupid'],$db_group['name']);
-		}
-
-		$frmHost->addRow(S_GROUPS,$grp_tb->get(S_IN.SPACE.S_GROUPS,S_OTHER.SPACE.S_GROUPS));
-
-		$frmHost->addRow(S_NEW_GROUP,new CTextBox('newgroup',$newgroup),'new');
-
-// onchange does not work on some browsers: MacOS, KDE browser
-		$frmHost->addVar('useip',0);
-		$frmHost->addVar('ip','0.0.0.0');
-		$frmHost->addVar('dns','');
-
-		$port = '10050';
-		$status = HOST_STATUS_TEMPLATE;
-
-		$frmHost->addVar('port',$port);
-		$frmHost->addVar('status',$status);
-
-		$template_table = new CTable();
-		$template_table->SetCellPadding(0);
-		$template_table->SetCellSpacing(0);
-
-		foreach($templates as $id => $temp_name){
-			$frmHost->addVar('templates['.$id.']',$temp_name);
-			$template_table->addRow(array(
-					$temp_name,
-					new CButton('unlink['.$id.']',S_UNLINK),
-					isset($original_templates[$id]) ? new CButton('unlink_and_clear['.$id.']',S_UNLINK_AND_CLEAR) : SPACE
-					)
-				);
-		}
-
-		$frmHost->addRow(S_LINK_WITH_TEMPLATE, array($template_table,
-				new CButton('add_template',S_ADD,
-					"return PopUp('popup.php?dstfrm=".$frmHost->GetName().
-					"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
-					url_param($templates,false,'existed_templates')."',450,450)",
-					'T')
-				));
-
-		$frmHost->addVar('useipmi', $useipmi);
-
-		$frmHost->addVar('ipmi_ip', $ipmi_ip);
-		$frmHost->addVar('ipmi_port', $ipmi_port);
-		$frmHost->addVar('ipmi_authtype', $ipmi_authtype);
-		$frmHost->addVar('ipmi_privilege', $ipmi_privilege);
-		$frmHost->addVar('ipmi_username', $ipmi_username);
-		$frmHost->addVar('ipmi_password', $ipmi_password);
-
-		$useprofile = 'no';
-		$frmHost->addVar('useprofile',$useprofile);
-		$useprofile_ext = 'no';
-		$frmHost->addVar('useprofile_ext',$useprofile_ext);
-
-		if($_REQUEST['form'] == 'full_clone'){
-// Host items
-			$items_lbx = new CListBox('items',null,8);
-			$items_lbx->setAttribute('disabled','disabled');
-
-			$sql = 'SELECT * '.
-					' FROM items '.
-					' WHERE hostid='.$_REQUEST['hostid'].
-						' AND templateid=0 '.
-					' ORDER BY description';
-			$host_items_res = DBselect($sql);
-			while($host_item = DBfetch($host_items_res)){
-				$item_description = item_description($host_item);
-				$items_lbx->addItem($host_item['itemid'],$item_description);
-			}
-
-			if($items_lbx->ItemsCount() < 1) $items_lbx->setAttribute('style','width: 200px;');
-			$frmHost->addRow(S_ITEMS, $items_lbx);
-
-// Host triggers
-			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array($_REQUEST['hostid']), PERM_RES_IDS_ARRAY);
-
-			$trig_lbx = new CListBox('triggers',null,8);
-			$trig_lbx->setAttribute('disabled','disabled');
-
-			$sql = 'SELECT DISTINCT t.* '.
-					' FROM triggers t, items i, functions f'.
-					' WHERE i.hostid='.$_REQUEST['hostid'].
-						' AND f.itemid=i.itemid '.
-						' AND t.triggerid=f.triggerid '.
-						' AND '.DBcondition('t.triggerid', $available_triggers).
-						' AND t.templateid=0 '.
-					' ORDER BY t.description';
-
-			$host_trig_res = DBselect($sql);
-			while($host_trig = DBfetch($host_trig_res)){
-				$trig_description = expand_trigger_description($host_trig["triggerid"]);
-				$trig_lbx->addItem($host_trig['triggerid'],$trig_description);
-			}
-
-			if($trig_lbx->ItemsCount() < 1) $trig_lbx->setAttribute('style','width: 200px;');
-			$frmHost->addRow(S_TRIGGERS, $trig_lbx);
-
-// Host graphs
-			$available_graphs = get_accessible_graphs(PERM_READ_ONLY, array($_REQUEST['hostid']), PERM_RES_IDS_ARRAY);
-
-			$graphs_lbx = new CListBox('graphs',null,8);
-			$graphs_lbx->setAttribute('disabled','disabled');
-
-			$def_items = array();
-			$sql = 'SELECT DISTINCT g.* '.
-						' FROM graphs g, graphs_items gi,items i '.
-						' WHERE '.DBcondition('g.graphid',$available_graphs).
-							' AND gi.graphid=g.graphid '.
-							' AND g.templateid=0 '.
-							' AND i.itemid=gi.itemid '.
-							' AND i.hostid='.$_REQUEST['hostid'].
-						' ORDER BY g.name';
-
-			$host_graph_res = DBselect($sql);
-			while($host_graph = DBfetch($host_graph_res)){
-				$graphs_lbx->addItem($host_graph['graphid'],$host_graph['name']);
-			}
-
-			if($graphs_lbx->ItemsCount() < 1) $graphs_lbx->setAttribute('style','width: 200px;');
-
-			$frmHost->addRow(S_GRAPHS, $graphs_lbx);
-		}
-
-		$frmHost->addItemToBottomRow(new CButton("save",S_SAVE));
-		if(($_REQUEST['hostid']>0) && ($_REQUEST['form'] != 'full_clone')){
-			$frmHost->addItemToBottomRow(SPACE);
-			$frmHost->addItemToBottomRow(new CButton("clone",S_CLONE));
-			$frmHost->addItemToBottomRow(SPACE);
-			$frmHost->addItemToBottomRow(new CButton("full_clone",S_FULL_CLONE));
-
-			$frmHost->addItemToBottomRow(SPACE);
-			$frmHost->addItemToBottomRow(
-				new CButtonDelete(S_DELETE_SELECTED_HOST_Q,
-					url_param("form").url_param("config").url_param("hostid").
-					url_param('groupid')
-				));
-
-			$frmHost->addItemToBottomRow(SPACE);
-			$frmHost->addItemToBottomRow(
-				new CButtonQMessage('delete_and_clear',
-					'Delete AND clear',
-					S_DELETE_SELECTED_HOSTS_Q,
-					url_param("form").url_param("config").url_param("hostid").
-					url_param('groupid')
-				)
-			);
-		}
-		$frmHost->addItemToBottomRow(SPACE);
-		$frmHost->addItemToBottomRow(new CButtonCancel(url_param("config").url_param('groupid')));
+		
+		$ext_profile_wdgt = new CWidget();
+		$ext_profile_wdgt->setClass('header');
+		$ext_profile_wdgt->addHeader(S_EXTENDED_HOST_PROFILE);
+		$ext_profile_wdgt->addItem($ext_profile_tbl);	
+// } EXT PROFILE WIDGET
+		
+		$left_table = new CTable();
+		$left_table->setCellPadding(4);
+		$left_table->setCellSpacing(4);
+		$left_table->addRow($host_wdgt);
+		
+		$right_table = new CTable();
+		$right_table->setCellPadding(4);
+		$right_table->setCellSpacing(4);
+		$right_table->addRow($macros_wdgt);
+		$right_table->addRow($profile_wdgt);
+		$right_table->addRow($ext_profile_wdgt);
+		
+		
+		$td_l = new CCol($left_table);
+		$td_l->setAttribute('valign','top');
+		$td_r = new CCol($right_table);
+		$td_r->setAttribute('valign','top');
+		
+		$outer_table = new CTable();
+		$outer_table->addRow(array($td_l, $td_r));
+
+		$frmHost->addItem($outer_table);
 		$frmHost->show();
 	}
 

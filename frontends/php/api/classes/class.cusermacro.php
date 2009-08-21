@@ -485,6 +485,118 @@ class CUserMacro {
 			return false;
 		}
 	}
+
+	
+/**
+ * Update host macros, replace all with new ones
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $macros
+ * @param string $macros['hostid']
+ * @param string $macros['macros'][0..]['macro']
+ * @param string $macros['macros'][0..]['value']
+ * @return array|boolean 
+ */
+	public static function update($macros){
+		$result = true;
+
+		DBstart(false);
+		
+		$sql = 'DELETE FROM hostmacro WHERE hostid='.$macros['hostid'];
+		DBexecute($sql);
+
+		foreach($macros['macros'] as $macro){
+			$hostmacroid = get_dbid('hostmacro', 'hostmacroid');
+			
+			$sql = 'INSERT INTO hostmacro (hostmacroid, hostid, macro, value) 
+				VALUES('.$hostmacroid.', '.$macros['hostid'].', '.zbx_dbstr($macro['macro']).', '.zbx_dbstr($macro['value']).')';
+			$result = DBExecute($sql);
+			
+			if(!$result) break;
+		}
+		DBend($result);	
+		
+		if($result)
+			return true;
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => '');
+			return false;
+		}
+	}
+
+/**
+ * Add global macros
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $macros
+
+ * @param string $macros[0..]['macro']
+ * @param string $macros[0..]['value']
+ * @return array|boolean 
+ */	
+	public static function addGlobal($macros){
+		$result = true;
+		DBstart(false);
+		foreach($macros as $macro){
+
+			$globalmacroid = get_dbid('globalmacro', 'globalmacroid');
+			
+			$sql = 'INSERT INTO globalmacro (globalmacroid, macro, value) 
+				VALUES('.$globalmacroid.', '.zbx_dbstr($macro['macro']).', '.zbx_dbstr($macro['value']).')';
+			$result = DBExecute($sql);
+			
+			if(!$result) break;
+		}
+		DBend($result);	
+		
+		if($result)
+			return true;
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => '');
+			return false;
+		}
+	}
+	
+/**
+ * Validates macros expression
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $macros array with macros expressions
+ * @return array|boolean 
+ */
+	public static function validate($macros){
+		zbx_value2array($macros);
+		$result = true;
+	
+		foreach($macros as $macro){
+			if(!preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $macro)){
+				$result = false;
+				break;
+			}
+		}
+		
+		if($result)
+			return true;
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => '');
+			return false;
+		}
+	}
 	
 /**
  * Gets all UserMacros data from DB by UserMacros ID
@@ -523,6 +635,7 @@ class CUserMacro {
  *
  * @param _array $macro_data
  * @param string $macro_data['macro']
+ * @param string $macro_data['hostid']
  * @return int|boolean
  */
 	public static function getHostMacroId($macro_data){
@@ -531,6 +644,7 @@ class CUserMacro {
 		$sql = 'SELECT hostmacroid '.
 				' FROM hostmacro '.
 				' WHERE macro='.zbx_dbstr($macro_data['macro']).
+					' AND hostid='.$macro_data['hostid'].
 					' AND '.DBin_node('hostmacroid', get_current_nodeid(false));
 		$res = DBselect($sql);
 		if($macroid = DBfetch($res))
