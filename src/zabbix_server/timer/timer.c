@@ -49,7 +49,7 @@ static void process_time_functions()
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		DBget_item_from_db(&item, row, NULL);
+		DBget_item_from_db(&item, row);
 
 		DBbegin();
 		update_functions(&item, (int)time(NULL));

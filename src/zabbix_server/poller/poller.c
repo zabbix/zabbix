@@ -155,7 +155,7 @@ static void update_key_status(zbx_uint64_t hostid, int host_status, time_t now)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		DBget_item_from_db(&item, row, NULL);
+		DBget_item_from_db(&item, row);
 
 /* Do not process new value for status, if previous status is the same */
 		update = (item.lastvalue_null == 1);
@@ -246,12 +246,7 @@ static int get_values(int now, int *nextcheck)
 
 	char		istatus[16];
 
-	static DB_MACROS	*macros = NULL;
-
 	zabbix_log( LOG_LEVEL_DEBUG, "In get_values()");
-
-	if (NULL == macros)
-		zbxmacros_init(&macros);
 
 	if (0 != CONFIG_DBSYNCER_FORKS)
 		DCinit_nextchecks();
@@ -353,11 +348,11 @@ static int get_values(int now, int *nextcheck)
 				DBfree_result(result2);
 				continue;
 			}
-			DBget_item_from_db(&item, row2, macros);
+			DBget_item_from_db(&item, row2);
 		}
 		else
 		{
-			DBget_item_from_db(&item, row, macros);
+			DBget_item_from_db(&item, row);
 			/* Skip unreachable hosts but do not break the loop. */
 			if(uint64_in_list(unreachable_hosts,item.hostid) == SUCCEED)
 			{
