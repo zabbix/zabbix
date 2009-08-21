@@ -673,6 +673,14 @@
 	'S_CONFIGURATION_OF_GROUPS' => 'CONFIGURATION OF HOST GROUPS',
 
 //	hosts.php
+	'S_MACROS'=> 'Macros',
+	'S_WRONG_MACRO' => 'Wrong macro',
+	'S_MACRO_EXISTS' => 'Macro already exists',
+	'S_NEW_MACRO' => 'New macro',
+	'S_EMPTY_MACRO_VALUE' => 'Empty macro value',
+	'S_NO_MACROS_DEFINED' => 'No macros defined',
+	'S_MACRO_ADDED' => 'Macro added',
+	'S_CANNOT_ADD_MACRO' => 'Cannot add macro',
 	'S_HOST_LIST' => 'Hosts list',
 	'S_IN'=>						'In',
 	'S_APPLICATION'=>					'Application',
