@@ -50,7 +50,8 @@
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_UINT64,
 				ITEM_VALUE_TYPE_STR,
-				ITEM_VALUE_TYPE_TEXT
+				ITEM_VALUE_TYPE_TEXT,
+				ITEM_VALUE_TYPE_LOG
 				)
 			);
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['avg']	= array('args' => array(	0 => array('type' => 'sec_num','mandat' => true) ),
@@ -70,16 +71,17 @@
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_UINT64,
 				ITEM_VALUE_TYPE_STR,
-				ITEM_VALUE_TYPE_TEXT
+				ITEM_VALUE_TYPE_TEXT,
+				ITEM_VALUE_TYPE_LOG
 				),
 			);
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['count']	= array('args' => array( 0 => array('type' => 'sec_num','mandat' => true), 1 => array('type' => 'str'), 1=>array('type' => 'str') ),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_UINT64,
-				ITEM_VALUE_TYPE_LOG,
 				ITEM_VALUE_TYPE_STR,
-				ITEM_VALUE_TYPE_TEXT
+				ITEM_VALUE_TYPE_TEXT,
+				ITEM_VALUE_TYPE_LOG
 				)
 			);
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['date']	= array('args' => null, 'item_types' => null );
@@ -91,7 +93,8 @@
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_UINT64,
 				ITEM_VALUE_TYPE_STR,
-				ITEM_VALUE_TYPE_TEXT
+				ITEM_VALUE_TYPE_TEXT,
+				ITEM_VALUE_TYPE_LOG
 				)
 			);
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['fuzzytime']	= array('args' => null,
@@ -103,8 +106,8 @@
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['iregexp']= array('args' => array( 0 => array('type' => 'str','mandat' => true) ),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_STR,
-				ITEM_VALUE_TYPE_LOG,
-				ITEM_VALUE_TYPE_TEXT
+				ITEM_VALUE_TYPE_TEXT,
+				ITEM_VALUE_TYPE_LOG
 				)
 			);
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['last']	= array('args' => null,
@@ -112,7 +115,8 @@
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_UINT64,
 				ITEM_VALUE_TYPE_STR,
-				ITEM_VALUE_TYPE_TEXT
+				ITEM_VALUE_TYPE_TEXT,
+				ITEM_VALUE_TYPE_LOG
 				)
 			);
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['max']	= array('args' => array( 0 => array('type' => 'sec_num','mandat' => true) ),
@@ -134,14 +138,15 @@
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_UINT64,
 				ITEM_VALUE_TYPE_STR,
-				ITEM_VALUE_TYPE_TEXT
+				ITEM_VALUE_TYPE_TEXT,
+				ITEM_VALUE_TYPE_LOG
 				)
 			);
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['str']	= array('args' => array( 0 => array('type' => 'str','mandat' => true) ),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_STR,
-				ITEM_VALUE_TYPE_LOG,
-				ITEM_VALUE_TYPE_TEXT
+				ITEM_VALUE_TYPE_TEXT,
+				ITEM_VALUE_TYPE_LOG
 				)
 			);
 
@@ -166,8 +171,8 @@
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['regexp']= array('args' => array( 0 => array('type' => 'str','mandat' => true) ),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_STR,
-				ITEM_VALUE_TYPE_LOG,
-				ITEM_VALUE_TYPE_TEXT
+				ITEM_VALUE_TYPE_TEXT,
+				ITEM_VALUE_TYPE_LOG
 				)
 			);
 		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['time']	= array('args' => null, 'item_types' => null );
