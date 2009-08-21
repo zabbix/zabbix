@@ -19,6 +19,7 @@
 
 #include "common.h"
 
+#include "zbxmacros.h"
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
