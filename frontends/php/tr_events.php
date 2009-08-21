@@ -78,7 +78,7 @@
 		$trigger['host'] = $trigger['host']['host'];
 	}
 
-	$trigger['exp_expr'] = explode_exp($trigger['expression'], 1);
+	$trigger['exp_expr'] = explode_exp($trigger['expression'], 1, false, true);
 	$trigger['exp_desc'] = expand_trigger_description_by_data($trigger);
 
 	$tr_event_wdgt = new CWidget();

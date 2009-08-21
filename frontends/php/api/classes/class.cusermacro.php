@@ -91,8 +91,6 @@ class CUserMacro {
 			'hostmacroids'				=> null,
 			'globalmacroids'			=> null,
 			'templateids'				=> null,
-			'itemids'					=> null,
-			'triggerids'				=> null,
 			'macros'					=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
@@ -198,32 +196,6 @@ class CUserMacro {
 			$sql_parts['where']['hht'] = 'hm.hostid=ht.macroid';
 		}
 
-// itemids
-		if(!is_null($options['itemids'])){
-			zbx_value2array($options['itemids']);
-			if(!is_null($options['extendoutput'])){
-				$sql_parts['select']['itemid'] = 'i.itemid';
-			}
-
-			$sql_parts['from']['i'] = 'items i';
-			$sql_parts['where'][] = DBcondition('i.itemid', $options['itemids']);
-			$sql_parts['where']['hi'] = 'hm.hostid=i.hostid';
-		}
-
-// triggerids
-		if(!is_null($options['triggerids'])){
-			zbx_value2array($options['triggerids']);
-			if(!is_null($options['extendoutput'])){
-				$sql_parts['select']['triggerid'] = 'f.triggerid';
-			}
-
-			$sql_parts['from']['f'] = 'functions f';
-			$sql_parts['from']['i'] = 'items i';
-			$sql_parts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
-			$sql_parts['where']['hi'] = 'hm.hostid=i.hostid';
-			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
-		}
-		
 // macros
 		if(!is_null($options['macros'])){
 			zbx_value2array($options['macros']);
@@ -690,90 +662,100 @@ class CUserMacro {
 
 	public static function getMacros($macros, $options){
 		zbx_value2array($macros);
-
-		$def_options = array(
-			'itemids' => null,
-			'triggerids' => null
-		);
-
+		
+		$def_options = array( 'itemid' => null, 'triggerid' => null);
 		$options = zbx_array_merge($def_options, $options);
 		
-		
+		$hmacro = array();
 		$obj_options = array(
-			'globalmacro' => 1,
-			'extendoutput' => 1,
-			'macros' => $macros
-			);
-		$globalMacros = SELF::get($obj_options);
-		
+				'extendoutput' => 1,
+				'globalmacro' => 1,
+				'nopermissions' => 1,
+				'macros' => $macros
+				);
+		$gmacros = self::get($obj_options);
+
 		$obj_options = array(
-			'extendoutput' => 1,
-			'macros' => $macros,
-			'itemids' => $options['itemids'],
-			'triggerids' => $options['triggerids'],
-			'with_hosts' => 1,
-			'with_templates' => 1
+			'nopermissions' => 1,
+			'itemids' => $options['itemid'],
+			'triggerids' => $options['triggerid'],
 			);
-		$hostMacros = SELF::get($obj_options);
-//-----
+		$hosts = CHost::get($obj_options);
 
-		$macros = array();
-		
-		foreach($globalMacros as $id => $macro){
-			$macros[$macro['macro']] = $macro['value'];
+		$hmacros = array();
+		while((count($hmacro) < count($macros)) && !empty($hosts)){
+			$obj_options = array(
+				'nopermissions' => 1,
+				'extendoutput' => 1,
+				'macros' => $macros,
+				'hostids' => $hosts,
+				);
+
+			$tmacros = self::get($obj_options);
+			$hmacros = zbx_array_merge($tmacros, $hmacros);		
+
+			$obj_options = array(
+				'nopermissions' => 1,
+				'hostids' => $hosts,
+				);
+			$hosts = CTemplate::get($obj_options);
 		}
 		
-		foreach($hostMacros as $id => $macro){
-			if(!empty($macro['templateids']))
-				$macros[$macro['macro']] = $macro['value'];
-		}
+		$macros = zbx_array_merge($gmacros + $hmacros);
 		
-		foreach($hostMacros as $id => $macro){
-			if(!empty($macro['hostids']))
-				$macros[$macro['macro']] = $macro['value'];
+		$result = array();
+		foreach($macros as $macroid => $macro){
+			$result[$macro['macro']] = $macro['value'];
 		}
 
-	return $macros;
+//SDII($result);
+
+	return $result;
 	}
 	
-	public static function resolveMacro($macro, $hostid = null){
-		$obj_options = array(
-			'globalmacro' => 1,
-			'extendoutput' => 1,
-			'hostids' => $hostid,
-			'templateids' => $hostid,
-			'macros' => $macro
-			);
-		$globalMacros = SELF::get($obj_options);
+	public static function resolveTrigger(&$triggers){
+		$single = false;
+		if(isset($triggers['triggerid'])){
+			$single = true;
+			$triggers = array($triggers);
+		}
 		
-		$obj_options = array(
-			'extendoutput' => 1,
-			'macros' => $macros,
-			'hostids' => $hostid,
-			'templateids' => $hostid,
-			'with_hosts' => 1,
-			'with_templates' => 1
-			);
-		$hostMacros = SELF::get($obj_options);
-//------
+		foreach($triggers as $num => $trigger){
+			if(!isset($trigger['triggerid']) || !isset($trigger['expression'])) continue;
 
-		$value = null;
-		
-		foreach($globalMacros as $id => $macro){
-			$value = $macro['value'];
+			if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $trigger['expression'], $arr)){
+				$macros = self::getMacros($arr[1], array('triggerid' => $trigger['triggerid']));
+
+				$search = array_keys($macros);
+				$values = array_values($macros);
+				$triggers[$num]['expression'] = str_replace($search, $values, $trigger['expression']);
+			}
 		}
 		
-		foreach($hostMacros as $id => $macro){
-			if(!empty($macro['templateids']))
-				$value = $macro['value'];
-		}
-		
-		foreach($hostMacros as $id => $macro){
-			if(!empty($macro['hostids']))
-				$value = $macro['value'];
+		if($single) $triggers = $triggers[0];
+	}
+	
+	
+	public static function resolveItem(&$items){
+		$single = false;
+		if(isset($items['itemid'])){
+			$single = true;
+			$items = array($items);
 		}
 
-	return $macros;
+		foreach($items as $num => $item){
+			if(!isset($item['itemid']) || !isset($item['key_'])) continue;
+			
+			if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $item['key_'], $arr)){
+				$macros = self::getMacros($arr[1], array('itemid' => $item['itemid']));
+
+				$search = array_keys($macros);
+				$values = array_values($macros);
+				$items[$num]['key_'] = str_replace($search, $values, $item['key_']);
+			}
+		}
+
+		if($single) $items = $items[0];
 	}
 	
 

@@ -949,9 +949,8 @@ return $result;
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function explode_exp ($expression, $html,$template=false){
+	function explode_exp($expression, $html,$template=false,$resolve_macro=false){
 //		echo "EXPRESSION:",$expression,"<Br>";
-
 		$functionid='';
 		$macros = '';
 		if(0 == $html){
@@ -960,7 +959,8 @@ return $result;
 		else{
 			$exp=array();
 		}
-
+		
+		$trigger=array();
 		$state='';
 		for($i=0,$max=strlen($expression); $i<$max; $i++){
 			if(($expression[$i] == '{') && ($expression[$i+1] == '$')){
@@ -976,12 +976,19 @@ return $result;
 
 			if($expression[$i] == '}'){
 				if($state == 'MACROS'){
-					if(0 == $html) $exp.= '}';
-					else array_push($exp, '}');
-				
-					$macro = CUserMacro::get(array('macos'=>$macros,'globalmacro'=>1, 'extendoutput'=>1));
-//SDI($value);
+					$macros.='}';
+					
+					if($resolve_macro){
+						$function_data['expression'] = $macros;
+						CUserMacro::resolveTrigger($function_data);
+						$macros = $function_data['expression'];
+					}
+
+					if(1 == $html) array_push($exp,$macros);
+					else $exp.=$macros;
+					
 					$macros = '';
+					$state = '';
 					continue;
 				}
 				
@@ -992,7 +999,7 @@ return $result;
 					else array_push($exp,'{'.$functionid.'}');
 				}
 				else if(is_numeric($functionid) &&
-					$function_data = DBfetch(DBselect('SELECT h.host,i.key_,f.function,f.parameter,i.itemid,i.value_type'.
+					$function_data = DBfetch(DBselect('SELECT h.host,i.itemid,i.key_,f.function,f.triggerid,f.parameter,i.itemid,i.value_type'.
 													' FROM items i,functions f,hosts h'.
 													' WHERE f.functionid='.$functionid.
 														' AND i.itemid=f.itemid '.
@@ -1001,6 +1008,16 @@ return $result;
 				{
 					if($template) $function_data['host'] = '{HOSTNAME}';
 
+					if($resolve_macro){
+						$trigger = $function_data;
+						CUserMacro::resolveItem($function_data);
+	
+						$function_data['expression'] = $function_data['parameter'];
+						CUserMacro::resolveTrigger($function_data);
+						$function_data['parameter'] = $function_data['expression'];					
+					}
+
+//SDII($function_data);
 					if($html == 0){
 						$exp.='{'.$function_data['host'].':'.$function_data['key_'].'.'.$function_data['function'].'('.$function_data['parameter'].')}';
 					}
@@ -1028,12 +1045,13 @@ return $result;
 			}
 			else if($state == 'MACROS'){
 				$macros=$macros.$expression[$i];
+				continue;
 			}
 
 			if(1 == $html) array_push($exp,$expression[$i]);
 			else $exp.=$expression[$i];
 		}
-
+//SDII($exp);
 	return $exp;
 	}
 
