@@ -36,7 +36,7 @@
 	$fields=array(
 //		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 
-		'config'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN('0,3,5,6,7,8,9,10'),	NULL),
+		'config'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN('0,3,5,6,7,8,9,10,11'),	NULL),
 
 // other form
 		'alert_history'=>		array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),	'isset({config})&&({config}==0)&&isset({save})'),
@@ -73,6 +73,14 @@
 		'dropdown_first_remember'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('0,1'),	NULL),
 		'max_in_table' => 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,99999),	'isset({config})&&({config}==8)&&isset({save})'),
 		'search_limit' => 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,99999),	'isset({config})&&({config}==8)&&isset({save})'),
+
+/* Macros */
+		'add_macro' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
+		'del_macros' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
+		'rem_macros'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	null),
+		'macros'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
+		'macro_name'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	'isset({add_macro})'),
+		'macro_value'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	'isset({add_macro})'),
 
 /* Themes */
 		'default_theme'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,			'isset({config})&&({config}==9)&&isset({save})'),
@@ -465,6 +473,40 @@
 		}
 	}
 
+	else if($_REQUEST['config'] == 11){
+	/* REMOVE MACROS */
+		if(isset($_REQUEST['del_macros']) && isset($_REQUEST['rem_macros'])){
+			$result = CUserMacro::deleteGlobalMacro($_REQUEST['rem_macros']);
+		}
+	/* ADD MACRO */
+		if(isset($_REQUEST['add_macro'])){
+			$result = true;
+			$macro_name = get_request('macro_name');
+			$macro_value = get_request('macro_value', null);
+			
+			if(!CUserMacro::validate($macro_name)){
+				error(S_WRONG_MACRO.' : '.$macro_name);
+				$result = false;
+			}
+			else if(zbx_empty($macro_value)){
+				error(S_EMPTY_MACRO_VALUE);
+				$result = false;
+			}
+			else if(CUserMacro::getGlobalMacroId(array('macro' => $macro_name))){
+				error(S_MACRO_EXISTS);
+				$result = false;
+			}
+			else{
+				$result = CUserMacro::addGlobal(array(array('macro' => $macro_name, 'value' => $macro_value)));
+			}
+			
+			if($result){
+				unset($_REQUEST['macro_name']);
+				unset($_REQUEST['macro_value']);
+			}
+			show_messages($result, S_MACRO_ADDED, S_CANNOT_ADD_MACRO);
+		}
+	}
 ?>
 
 <?php
@@ -478,9 +520,11 @@
 	$cmbConfig->addItem(3,S_IMAGES);
 	$cmbConfig->addItem(10,S_REGULAR_EXPRESSIONS);
 //	$cmbConfig->addItem(9,S_THEMES);
+	$cmbConfig->addItem(11,S_MACROS);
 	$cmbConfig->addItem(6,S_VALUE_MAPPING);
 	$cmbConfig->addItem(7,S_WORKING_TIME);
 	$cmbConfig->addItem(5,S_OTHER);
+	
 	$form->addItem($cmbConfig);
 
 	if(!isset($_REQUEST['form'])){
@@ -979,6 +1023,34 @@
 		}
 	}
 
+/////////////////////////////
+//  config = 11 // Macros  //
+/////////////////////////////
+	else if($_REQUEST['config']==11){ // Macros
+
+		$frmGUI = new CFormTable(S_MACROS, 'config.php');
+		$frmGUI->addVar('config', get_request('config', 11));
+		
+		$macros = CUserMacro::get(array('extendoutput' => 1, 'globalmacro' => 1));
+		$macros_el = array();
+		foreach($macros as $macroid => $macro){
+			$macros_el[] = array(new CCheckBox("rem_macros[$macroid]", 'no', null, $macroid), $macro['macro'].SPACE.RARR.SPACE.$macro['value']);
+			$macros_el[] = BR();
+		}
+		$macros_el[] = empty($macros_el) ? S_NO_MACROS_DEFINED : new CButton('del_macros', S_DELETE_SELECTED);
+
+		$frmGUI->addRow(S_MACROS, $macros_el);
+		$frmGUI->addRow(S_NEW_MACRO, array(
+			new CTextBox('macro_name', get_request('macro_name', ''), 10),
+			new CSpan(RARR, 'rarr'),
+			new CTextBox('macro_value', get_request('macro_value', ''), 10),
+			SPACE,
+			new CButton('add_macro', S_ADD)
+		));
+		
+		$cnf_wdgt->addItem($frmGUI);
+	}
+	
 	$cnf_wdgt->show();
 ?>
 <?php

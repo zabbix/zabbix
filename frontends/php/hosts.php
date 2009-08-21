@@ -98,6 +98,11 @@ include_once('include/page_header.php');
 
 		'useprofile_ext'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
 		'ext_host_profiles'=> 	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY,   NULL,   NULL),
+		
+		'rem_macros'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	'isset({del_macros})'),
+		'macros'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
+		'macro_name'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	'isset({add_macro})'),
+		'macro_value'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	'isset({add_macro})'),
 
 // mass update
 		'massupdate'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
@@ -118,7 +123,10 @@ include_once('include/page_header.php');
 		'full_clone'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete_and_clear'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'cancel'=>				array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		'cancel'=>				array(T_ZBX_STR, O_OPT, P_SYS,			NULL,	NULL),
+		'add_macro' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
+		'del_macros' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
+		
 
 /* other */
 		'form'=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
@@ -133,6 +141,37 @@ include_once('include/page_header.php');
 <?php
 
 /************ ACTIONS FOR HOSTS ****************/
+/* REMOVE MACROS */
+	if(isset($_REQUEST['del_macros']) && isset($_REQUEST['rem_macros'])){
+		$rem_macros = get_request('rem_macros', array());
+		foreach($rem_macros as $name => $value)
+			unset($_REQUEST['macros'][$name]);
+	}
+/* ADD MACRO */
+	if(isset($_REQUEST['add_macro'])){
+		$macro_name = get_request('macro_name');
+		$macro_value = get_request('macro_value', null);
+		
+		$currentmacros = array_keys(get_request('macros', array()));
+		
+		if(!CUserMacro::validate($macro_name)){
+			error(S_WRONG_MACRO.' : '.$macro_name);
+			show_messages(false, '', S_MACROS);
+		}
+		else if(zbx_empty($macro_value)){
+			error(S_EMPTY_MACRO_VALUE);
+			show_messages(false, '', S_MACROS);
+		}
+		else if(str_in_array($macro_name, $currentmacros)){
+			error(S_MACRO_EXISTS.' : '.$macro_name);
+			show_messages(false, '', S_MACROS);
+		}
+		else{
+			$_REQUEST['macros'][$macro_name] = $macro_value;
+			unset($_REQUEST['macro_name']);
+			unset($_REQUEST['macro_value']);			
+		}
+	}
 /* UNLINK HOST */
 	if((isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear']))){
 		$_REQUEST['clear_templates'] = get_request('clear_templates', array());
@@ -437,6 +476,28 @@ include_once('include/page_header.php');
 			$result = DBend($result);
 		}
 //-------------
+
+// MACROS {
+	if($result){
+		$macros = get_request('macros', array());
+		
+		$macrostoadd = array('hostid' => $hostid, 'macros' => array());
+		
+		foreach($macros as $macro => $value){
+			if(!CUserMacro::validate($macro)){
+				$result = false;
+				break;
+			}
+			$macrostoadd['macros'][] = array('macro' => $macro, 'value' => $value);
+		}
+
+		$result = CUserMacro::update($macrostoadd);
+		
+		if(!$result) 
+			error('S_ERROR_ADDING_MACRO');
+	}
+
+// } MACROS
 
 		show_messages($result, $msg_ok, $msg_fail);
 
