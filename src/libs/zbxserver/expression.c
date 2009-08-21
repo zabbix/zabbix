@@ -2247,8 +2247,6 @@ int	evaluate_expression(int *result,char **expression, DB_TRIGGER *trigger, char
 	DB_EVENT		event;
 	int			ret = FAIL;
 
-/*	if (0 == strcmp(*expression, "{200200000014218}<{$FS.PROC}"))
-		zabbix_set_log_level(LOG_LEVEL_DEBUG);*/
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, *expression);
 
 	/* Substitute macros first */
@@ -2281,6 +2279,6 @@ int	evaluate_expression(int *result,char **expression, DB_TRIGGER *trigger, char
 		error);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-/*		zabbix_set_log_level(LOG_LEVEL_CRIT);*/
+
 	return ret;
 }
