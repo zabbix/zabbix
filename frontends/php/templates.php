@@ -22,6 +22,7 @@
 
 require_once('include/config.inc.php');
 require_once('include/hosts.inc.php');
+require_once('include/forms.inc.php');
 
 	$page['title'] = "S_TEMPLATES";
 	$page['file'] = 'templates.php';
@@ -57,11 +58,13 @@ require_once('include/hosts.inc.php');
 		'twb_groupid'		=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,		NULL),
 		'newgroup'		=> array(T_ZBX_STR, O_OPT,	NULL,			NULL,		NULL),
 
-		'rem_macros'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	'isset({del_macros})'),
-		'macros'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
-		'macro_name'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	'isset({add_macro})'),
-		'macro_value'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	'isset({add_macro})'),
-
+		'macros_rem'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'macros'=>				array(T_ZBX_STR, O_OPT, P_SYS,			NULL,	NULL),
+		'macro_new'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	'isset({macro_add})'),
+		'value_new'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	'isset({macro_add})'),
+		'macro_add' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'macros_del' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		
 // actions
 		'go'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
 
@@ -75,8 +78,6 @@ require_once('include/hosts.inc.php');
 		'delete_and_clear'	=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
 		'cancel'		=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
 		
-		'add_macro' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
-		'del_macros' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
 
 // other
 		'form'			=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
@@ -93,37 +94,37 @@ require_once('include/hosts.inc.php');
 /* <<<--- TEMPLATE ACTIONS --->>> */
 /**********************************/
 /* REMOVE MACROS */
-	if(isset($_REQUEST['del_macros']) && isset($_REQUEST['rem_macros'])){
-		$rem_macros = get_request('rem_macros', array());
-		foreach($rem_macros as $name => $value)
-			unset($_REQUEST['macros'][$name]);
+	if(isset($_REQUEST['macros_del']) && isset($_REQUEST['macros_rem'])){
+		$macros_rem = get_request('macros_rem', array());
+		foreach($macros_rem as $macro)
+			unset($_REQUEST['macros'][$macro]);
 	}
 /* ADD MACRO */
-	if(isset($_REQUEST['add_macro'])){
-		$macro_name = get_request('macro_name');
-		$macro_value = get_request('macro_value');
+	if(isset($_REQUEST['macro_add'])){
+		$macro_new = get_request('macro_new');
+		$value_new = get_request('value_new', null);
 		
 		$currentmacros = array_keys(get_request('macros', array()));
 		
-		if(!CUserMacro::validate($macro_name)){
-			error(S_WRONG_MACRO.' : '.$macro_name);
+		if(!CUserMacro::validate($macro_new)){
+			error(S_WRONG_MACRO.' : '.$macro_new);
 			show_messages(false, '', S_MACROS);
 		}
-		else if(str_in_array($macro_name, $currentmacros)){
-			error(S_MACRO_EXISTS.' : '.$macro_name);
-			show_messages(false, '', S_MACROS);
-		}
-		else if(zbx_empty($macro_value)){
+		else if(zbx_empty($value_new)){
 			error(S_EMPTY_MACRO_VALUE);
 			show_messages(false, '', S_MACROS);
 		}
-		else{
-			$_REQUEST['macros'][$macro_name] = $macro_value;
-			unset($_REQUEST['macro_name']);
-			unset($_REQUEST['macro_value']);
+		else if(str_in_array($macro_new, $currentmacros)){
+			error(S_MACRO_EXISTS.' : '.$macro_new);
+			show_messages(false, '', S_MACROS);
 		}
-	}
-// unlink, unlink_and_clear
+		else{
+			$_REQUEST['macros'][$macro_new]['macro'] = $macro_new;
+			$_REQUEST['macros'][$macro_new]['value'] = $value_new;
+			unset($_REQUEST['macro_new']);
+			unset($_REQUEST['value_new']);			
+		}
+	}// unlink, unlink_and_clear
 	if((isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear']))){
 		$_REQUEST['clear_templates'] = get_request('clear_templates', array());
 		if(isset($_REQUEST['unlink'])){
@@ -325,18 +326,20 @@ require_once('include/hosts.inc.php');
 
 // MACROS {
 	if($result){
-//sdi($templateid);
 		$macros = get_request('macros', array());
+		
 		$macrostoadd = array('hostid' => $templateid, 'macros' => array());
 		
-		foreach($macros as $macro => $value){
-			if(!CUserMacro::validate($macro)){
+		foreach($macros as $macro){
+			if(!CUserMacro::validate($macro['macro'])){
 				$result = false;
 				break;
 			}
-			$macrostoadd['macros'][] = array('macro' => $macro, 'value' => $value);
+			$macrostoadd['macros'][] = $macro;
 		}
+
 		$result = CUserMacro::update($macrostoadd);
+		
 		if(!$result) 
 			error('S_ERROR_ADDING_MACRO');
 	}
@@ -666,42 +669,7 @@ require_once('include/hosts.inc.php');
 
 
 // MACROS WIDGET {
-		$macros = array();
-		if(isset($_REQUEST['form_refresh'])){
-			$macros = get_request('macros', array());
-		}
-		else if($_REQUEST['templateid'] > 0){
-			$macros_db = CUserMacro::get(array('extendoutput' => 1, 'hostids' => $_REQUEST['templateid']));
-			foreach($macros_db as $macro_db){
-				$macros[$macro_db['macro']] = $macro_db['value'];
-			}
-		}
-
-		$macro_tbl = new CTableInfo();
-
-		$macros_el = array();
-		foreach($macros as $macro => $value){
-			$macros_el[] = array(new CCheckBox("rem_macros[$macro]", 'no', null, $macro), $macro.SPACE.RARR.SPACE.$value);
-			$macros_el[] = BR();
-			$frmHost->addVar("macros[$macro]", $value);
-		}
-		$macros_el[] = empty($macros_el) ? S_NO_MACROS_DEFINED : new CButton('del_macros', S_DELETE_SELECTED);
-
-		
-		$macro_tbl->addRow(array(S_MACROS, $macros_el));
-		$macro_tbl->addRow(array(S_NEW_MACRO, array(
-			new CTextBox('macro_name', get_request('macro_name', ''), 10),
-			new CSpan(RARR, 'rarr'),
-			new CTextBox('macro_value', get_request('macro_value', ''), 10),
-			SPACE,
-			new CButton('add_macro', S_ADD)
-		)));
-
-		$macros_wdgt = new CWidget();
-		$macros_wdgt->setClass('header');
-		$macros_wdgt->addHeader(S_MACROS);
-		$macros_wdgt->addItem($macro_tbl);
-
+		$macros_wdgt = get_macros_widget($templateid);
 // } MACROS WIDGET 
 
 		$left_table = new CTable();
