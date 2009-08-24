@@ -25,7 +25,8 @@
 #include "zlog.h"
 
 /* Transaction level. Must be 1 for all queries. */
-int		txn_level = 0;
+int	txn_level = 0;
+int	txn_init = 0;
 
 #ifdef	HAVE_SQLITE3
 	int		sqlite_transaction_started = 0;
@@ -76,9 +77,8 @@ void	zbx_db_close(void)
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbsocket, int port)
 {
 	int	ret = ZBX_DB_OK;
-#ifdef	HAVE_SQLITE3
-	char	*p, *path;
-#endif /* HAVE_SQLITE3 */
+
+	txn_init = 1;
 
 #ifdef	HAVE_MYSQL
 	/* For MySQL >3.22.00 */
@@ -119,8 +119,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 			break;
 		}
 	}
-
-	return ret;
 #endif
 #ifdef	HAVE_POSTGRESQL
 	char		*cport = NULL;
@@ -161,8 +159,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		/* disable "nonstandard use of \' in a string literal" warning */
 		DBexecute("set escape_string_warning to off");
 	}
-
-	return ret;
 #endif
 #ifdef	HAVE_ORACLE
 	char	connect[MAX_STRING_LEN];
@@ -194,10 +190,10 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (ZBX_DB_OK == ret)
 		sqlo_autocommit_off(oracle);
-
-	return ret;
 #endif
 #ifdef	HAVE_SQLITE3
+	char	*p, *path;
+
 	/* check to see that the backend connection was successfully made */
 	if (SQLITE_OK != (ret = sqlite3_open(dbname, &conn))) {
 		zabbix_errlog(ERR_Z3001, dbname, 0, sqlite3_errmsg(conn));
@@ -220,9 +216,10 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	DBexecute("PRAGMA temp_store_directory = '%s'", path);
 
 	zbx_free(path);
+#endif
+	txn_init = 0;
 
 	return ret;
-#endif
 }
 
 void	zbx_db_init(char *host, char *user, char *password, char *dbname, char *dbsocket, int port)
@@ -296,7 +293,7 @@ static DB_RESULT __zbx_zbx_db_select(const char *fmt, ...)
  ******************************************************************************/
 void	zbx_db_begin(void)
 {
-	if(txn_level>0)
+	if (txn_level > 0)
 	{
 		zabbix_log( LOG_LEVEL_CRIT, "ERROR: nested transaction detected. Please report it to Zabbix Team.");
 		assert(0);
@@ -345,7 +342,7 @@ void	zbx_db_begin(void)
  ******************************************************************************/
 void zbx_db_commit(void)
 {
-	if(txn_level==0)
+	if (0 == txn_level)
 	{
 		zabbix_log( LOG_LEVEL_CRIT, "ERROR: commit without transaction. Please report it to Zabbix Team.");
 		assert(0);
@@ -396,7 +393,7 @@ void zbx_db_commit(void)
  ******************************************************************************/
 void zbx_db_rollback(void)
 {
-	if(txn_level==0)
+	if (0 == txn_level)
 	{
 		zabbix_log( LOG_LEVEL_CRIT, "ERROR: rollback without transaction. Please report it to Zabbix Team.");
 		assert(0);
@@ -456,7 +453,7 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 
 	sql = zbx_dvsprintf(sql, fmt, args);
 
-	if(txn_level==0)
+	if (0 == txn_init && 0 == txn_level)
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Query without transaction detected [%s]",
 			sql);
