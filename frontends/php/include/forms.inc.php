@@ -5748,7 +5748,7 @@
 			}
 
 			if($items_lbx->ItemsCount() < 1) $items_lbx->setAttribute('style','width: 200px;');
-			$host_tbl->addRow(S_ITEMS, $items_lbx);
+			$host_tbl->addRow(array(S_ITEMS, $items_lbx));
 
 // Host triggers
 			$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array($_REQUEST['hostid']), PERM_RES_IDS_ARRAY);
@@ -5772,7 +5772,7 @@
 			}
 
 			if($trig_lbx->ItemsCount() < 1) $trig_lbx->setAttribute('style','width: 200px;');
-			$host_tbl->addRow(S_TRIGGERS, $trig_lbx);
+			$host_tbl->addRow(array(S_TRIGGERS, $trig_lbx));
 
 // Host graphs
 			$available_graphs = get_accessible_graphs(PERM_READ_ONLY, array($_REQUEST['hostid']), PERM_RES_IDS_ARRAY);
@@ -5797,7 +5797,7 @@
 
 			if($graphs_lbx->ItemsCount() < 1) $graphs_lbx->setAttribute('style','width: 200px;');
 
-			$host_tbl->addRow(S_GRAPHS, $graphs_lbx);
+			$host_tbl->addRow(array(S_GRAPHS, $graphs_lbx));
 		}
 		
 		$host_footer = array();
@@ -5816,46 +5816,11 @@
 		$host_wdgt->setClass('header');
 		$host_wdgt->addHeader($frm_title);
 		$host_wdgt->addItem($host_tbl);
-		
 // } HOST WIDGET
 
+
 // MACROS WIDGET {
-	$macros = array();
-	if(isset($_REQUEST['form_refresh'])){
-		$macros = get_request('macros', array());
-	}
-	else if($_REQUEST['hostid'] > 0){
-		$macros_db = CUserMacro::get(array('extendoutput' => 1, 'hostids' => $_REQUEST['hostid']));
-		foreach($macros_db as $macro_db){
-			$macros[$macro_db['macro']] = $macro_db['value'];
-		}
-	}
-
-		$macro_tbl = new CTableInfo();
-
-		$macros_el = array();
-		foreach($macros as $macro => $value){
-			$macros_el[] = array(new CCheckBox("rem_macros[$macro]", 'no', null, $macro), $macro.SPACE.RARR.SPACE.$value);
-			$macros_el[] = BR();
-			$frmHost->addVar("macros[$macro]", $value);
-		}
-		$macros_el[] = empty($macros_el) ? S_NO_MACROS_DEFINED : new CButton('del_macros', S_DELETE_SELECTED);
-
-		
-		$macro_tbl->addRow(array(S_MACROS, $macros_el));
-		$macro_tbl->addRow(array(S_NEW_MACRO, array(
-			new CTextBox('macro_name', get_request('macro_name', ''), 10),
-			new CSpan(RARR, 'rarr'),
-			new CTextBox('macro_value', get_request('macro_value', ''), 10),
-			SPACE,
-			new CButton('add_macro', S_ADD)
-		)));
-
-		$macros_wdgt = new CWidget();
-		$macros_wdgt->setClass('header');
-		$macros_wdgt->addHeader(S_MACROS);
-		$macros_wdgt->addItem($macro_tbl);
-
+		$macros_wdgt = get_macros_widget($_REQUEST['hostid']);
 // } MACROS WIDGET 
 
 
@@ -6898,7 +6863,6 @@
 	* @param array $elemnts [items, triggers, graphs, applications]
 	* @return object
 	*/
-
 	function get_header_host_table($hostid, $elements){
 		$header_host_opt = array(
 			'hostids' => $hostid,
@@ -6998,5 +6962,61 @@
 		$tbl_header_host->setClass('infobox');
 
 		return $tbl_header_host;
+	}
+
+	
+	// if $hostid = null => global macro
+	function get_macros_widget($hostid = null){
+	
+		if(is_null($hostid)){
+			$macros = CUserMacro::get(array('extendoutput' => 1, 'globalmacro' => 1));
+		}
+		else if(isset($_REQUEST['form_refresh'])){ 
+			$macros = get_request('macros', array());
+		}	
+		else if($hostid > 0){
+			$macros = CUserMacro::get(array('extendoutput' => 1, 'hostids' => $hostid));
+		}
+		else{
+			$macros = array();
+		}
+	
+		$macros_tbl = new CTableInfo();
+		
+		$macros_list_tbl = new CTable(S_NO_MACROS_DEFINED);
+		foreach($macros as $macro){
+			$macros_list_tbl->addRow(array(
+				new CCheckBox("macros_rem[{$macro['macro']}]", 'no', null, $macro['macro']), 
+				array(
+					new CTextBox("macros[{$macro['macro']}][macro]", $macro['macro'], 20, true),
+					SPACE.RARR.SPACE,
+					new CTextBox("macros[{$macro['macro']}][value]", $macro['value'], 20, true))
+			));
+		}
+		
+		$delete_btn = new CButton('macros_del', S_DELETE_SELECTED);
+		if(count($macros) == 0){
+			$delete_btn->setAttribute('disabled', 'disabled');
+		}
+		
+		$macros_tbl->addRow(array(S_MACROS, $macros_list_tbl));
+		$macros_tbl->addRow(array(S_NEW_MACRO, array(
+			new CTextBox('macro_new', get_request('macro_new', ''), 10),
+			new CSpan(RARR, 'rarr'),
+			new CTextBox('value_new', get_request('value_new', ''), 10),
+			SPACE,
+			new CButton('macro_add', S_ADD),
+			SPACE, 
+			new CSpan('|', 'divider'),
+			SPACE,
+			$delete_btn
+		)));
+
+		$macros_wdgt = new CWidget();
+		$macros_wdgt->setClass('header');
+		$macros_wdgt->addHeader(S_MACROS);
+		$macros_wdgt->addItem($macros_tbl);
+		
+		return $macros_wdgt;
 	}
 ?>
