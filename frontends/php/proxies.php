@@ -274,6 +274,7 @@ if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0) && !isset($available_ho
 		$frmHostG->addItemToBottomRow(new CButtonCancel(url_param("config")));
 
 		$proxies_wdgt->addItem($frmHostG);
+		$proxies_wdgt->show();
 	}
 	else {
 
