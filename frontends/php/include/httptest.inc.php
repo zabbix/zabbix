@@ -346,6 +346,13 @@
 			delete_httpstep($httpstep_data['httpstepid']);
 		}
 		
+		$db_httptestitems = DBselect('select distinct httptestitemid, itemid from httptestitem where httptestid='.$httptestid);
+		while($httptestitem_data = DBfetch($db_httptestitems))
+		{
+			if(!DBexecute('delete from httptestitem where httptestitemid='.$httptestitem_data['httptestitemid'])) return false;
+			if(!delete_item($httptestitem_data['itemid'])) return false;
+		}
+		
 		if(!DBexecute('delete from httptest where httptestid='.$httptestid)) return false;
 		
 		info("Sceanrio '".$httptest["name"]."' deleted");
