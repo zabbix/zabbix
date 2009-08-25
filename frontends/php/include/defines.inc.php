@@ -559,7 +559,7 @@ else{
 	define('ZBX_EREG_SPACES', '([[:space:]]+){0,1}');
 	define('ZBX_EREG_MACRO_NAME', '([A-Z0-9._]+)');
 	define('ZBX_EREG_INTERNAL_NAMES', '([0-9a-zA-Z_.[:space:][.'.ZBX_EREG_MINUS_SYMB.'.]$]+)');
-	define('ZBX_EREG_KEY_NAME', '([0-9a-zA-Z_.,[.:.][:space:][.'.ZBX_EREG_MINUS_SYMB.'.]$]+)');
+	define('ZBX_EREG_KEY_NAME', '([0-9a-zA-Z_.,[.:.][:space:][.'.ZBX_EREG_MINUS_SYMB.'.]${}]+)');
 	define('ZBX_EREG_PARAMS', '([[:print:]]+){0,1}');
 	define('ZBX_EREG_SIGN', '([&|><=+*/#[.'.ZBX_EREG_MINUS_SYMB.'.]])');
 	define('ZBX_EREG_NUMBER', '([[.'.ZBX_EREG_MINUS_SYMB.'.]+]*[0-9]+[.]{0,1}[0-9]*[A-Z]{0,1})');
