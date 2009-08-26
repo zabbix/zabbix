@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [NTP-51] fixed deletion of httptests (Vedmak)
  - [NTP-47] added htmlentities check in monitoring triggers and events pages (Artem)
  - [NTP-48] fixed overview page item coloring with disabled triggers (Artem)
  - [NTP-44] fixed default graph item axis side on import (Artem)
