@@ -63,8 +63,8 @@ if(!isset($DB)){
 							$result = false;
 						}
 						else{
-							DBexecute('SET NAMES "latin1"');
-							DBexecute('SET CHARACTER SET "latin1"');
+							DBexecute('SET NAMES utf8');
+							DBexecute('SET CHARACTER SET utf8');
 						}
 					}
 					break;
