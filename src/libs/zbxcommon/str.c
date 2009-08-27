@@ -1835,3 +1835,69 @@ char	*zbx_dservice_type_string(zbx_dservice_type_t service)
 	default: return "unknown";
 	}
 }
+
+#ifdef _WINDOWS
+/* convert from Windows ANSI code page to unicode */
+LPTSTR	zbx_acp_to_unicode(LPCSTR acp_string)
+{
+	LPTSTR	wide_string = NULL;
+	int	wide_size;
+
+	wide_size = MultiByteToWideChar(CP_ACP, 0, acp_string, -1, NULL, 0);
+	wide_string = (LPTSTR)zbx_malloc(wide_string, (size_t)wide_size * sizeof(TCHAR));
+
+	/* convert from acp_string to wide_string */
+	MultiByteToWideChar(CP_ACP, 0, acp_string, -1, wide_string, wide_size);
+
+	return wide_string;
+}
+
+int	zbx_acp_to_unicode_static(LPCSTR acp_string, LPTSTR wide_string, int wide_size)
+{
+	/* convert from acp_string to wide_string */
+	if (0 == MultiByteToWideChar(CP_ACP, 0, acp_string, -1, wide_string, wide_size))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+/* convert from UTF-8 to unicode */
+LPTSTR	zbx_utf8_to_unicode(LPCSTR utf8_string)
+{
+	LPTSTR	wide_string = NULL;
+	int	wide_size;
+
+	wide_size = MultiByteToWideChar(CP_UTF8, 0, utf8_string, -1, NULL, 0);
+	wide_string = (LPTSTR)zbx_malloc(wide_string, (size_t)wide_size * sizeof(TCHAR));
+
+	/* convert from utf8_string to wide_string */
+	MultiByteToWideChar(CP_UTF8, 0, utf8_string, -1, wide_string, wide_size);
+
+	return wide_string;
+}
+
+/* convert from unicode to utf8 */
+LPSTR	zbx_unicode_to_utf8(LPCTSTR wide_string)
+{
+	LPSTR	utf8_string = NULL;
+	int	utf8_size;
+
+	utf8_size = WideCharToMultiByte(CP_UTF8, 0, wide_string, -1, NULL, 0, NULL, NULL);
+	utf8_string = (LPSTR)zbx_malloc(utf8_string, (size_t)utf8_size);
+
+	/* convert from wide_string to utf8_string */
+	WideCharToMultiByte(CP_UTF8, 0, wide_string, -1, utf8_string, utf8_size, NULL, NULL);
+
+	return utf8_string;
+}
+
+/* convert from unicode to utf8 */
+int	zbx_unicode_to_utf8_static(LPCTSTR wide_string, LPSTR utf8_string, int utf8_size)
+{
+	/* convert from wide_string to utf8_string */
+	if (0 == WideCharToMultiByte(CP_UTF8, 0, wide_string, -1, utf8_string, utf8_size, NULL, NULL))
+		return FAIL;
+
+	return SUCCEED;
+}
+#endif

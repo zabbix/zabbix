@@ -46,7 +46,7 @@ struct perfcounter
 {
 	struct perfcounter *next;
 	unsigned long	pdhIndex;
-	char		name[MAX_PERFCOUNTER_NAME_LEN];
+	TCHAR		name[MAX_PERFCOUNTER_NAME_LEN];
 	/* must be caracter array! if you want to rewrite */
 	/* to dinacal memory allocation CHECK for usage   */
 	/* of sizeof function                             */
@@ -56,7 +56,7 @@ typedef struct perfcounter PERFCOUNTER;
 
 extern PERFCOUNTER *PerfCounterList;
 
-char *GetCounterName(unsigned long index);
-int check_counter_path(char *counterPath);
+LPTSTR	GetCounterName(DWORD pdhIndex);
+int	check_counter_path(char *counterPath);
 
 #endif /* ZABBIX_PERFMON_H */

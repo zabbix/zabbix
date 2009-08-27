@@ -26,10 +26,10 @@
 #	define ZBX_MUTEX_ERROR		(0)
 #	define ZBX_MUTEX_OK		(1)
 
-#	define ZBX_MUTEX_NAME		char*
+#	define ZBX_MUTEX_NAME		wchar_t *
 
-#	define ZBX_MUTEX_LOG    	"ZBX_MUTEX_LOG"
-#	define ZBX_MUTEX_PERFSTAT  	"ZBX_MUTEX_PERFSTAT"
+#	define ZBX_MUTEX_LOG    	TEXT("ZBX_MUTEX_LOG")
+#	define ZBX_MUTEX_PERFSTAT  	TEXT("ZBX_MUTEX_PERFSTAT")
 
 #else /* not _WINDOWS */
 

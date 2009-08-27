@@ -30,7 +30,7 @@ extern ZBX_THREAD_HANDLE	*threads;
 
 void service_start(void);
 
-int ZabbixCreateService(char *execName);
+int ZabbixCreateService(const char *path, int multiple_agents);
 int ZabbixRemoveService(void);
 int ZabbixStartService(void);
 int ZabbixStopService(void);

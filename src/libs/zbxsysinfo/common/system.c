@@ -58,108 +58,100 @@ int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 {
 #if defined(_WINDOWS)
 	DWORD	dwSize;
-	char	*cpuType,
-
 		/* NOTE: The buffer size should be large enough to contain MAX_COMPUTERNAME_LENGTH + 1 characters.*/
-		computerName[MAX_COMPUTERNAME_LENGTH + 1],
-
-		osVersion[256],
-		buffer[MAX_STRING_LEN];
+	TCHAR	computerName[MAX_COMPUTERNAME_LENGTH + 1], osVersion[256], *cpuType, wide_buffer[MAX_STRING_LEN];
 	SYSTEM_INFO
 		sysInfo;
 	OSVERSIONINFO
 		versionInfo;
 
-	dwSize = sizeof(computerName);
-
-	if( 0 == GetComputerName(computerName,&dwSize))
-		computerName[0] = '\0';
+	dwSize = MAX_COMPUTERNAME_LENGTH;
+	if (0 == GetComputerName(computerName, &dwSize))
+		*computerName = '\0';
 
 	versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 	GetVersionEx(&versionInfo);
-	switch(versionInfo.dwPlatformId)
-	{
-		case VER_PLATFORM_WIN32_WINDOWS:
-			zbx_snprintf(
-				osVersion,
-				sizeof(osVersion),
-				"Windows %s-%s",
-				versionInfo.dwMinorVersion==0 ? "95" :
-					(versionInfo.dwMinorVersion==10 ? "98" :
-					(versionInfo.dwMinorVersion==90 ? "Me" : "Unknown")),
-				versionInfo.szCSDVersion);
+	switch (versionInfo.dwPlatformId) {
+	case VER_PLATFORM_WIN32_WINDOWS:
+		switch (versionInfo.dwMinorVersion) {
+		case 0:
+			zbx_wsnprintf(osVersion, sizeof(osVersion), TEXT("Windows 95-%s"), versionInfo.szCSDVersion);
 			break;
-		case VER_PLATFORM_WIN32_NT:
-			if (versionInfo.dwMajorVersion!=5)
-			{
-				zbx_snprintf(
-					osVersion,
-					sizeof(osVersion),
-					"Windows NT %d.%d %s",
-					versionInfo.dwMajorVersion,
-					versionInfo.dwMinorVersion,
-					versionInfo.szCSDVersion
-					);
-			}
-			else      /* Windows 2000, Windows XP or Windows Server 2003 */
-			{
-				zbx_snprintf(
-					osVersion,
-					sizeof(osVersion),
-					"Windows %s%s%s",
-					(versionInfo.dwMinorVersion == 0) ? "2000" :
-						((versionInfo.dwMinorVersion == 1) ? "XP" : "Server 2003"),
-					versionInfo.szCSDVersion[0]==0 ? "" : " ",
-					versionInfo.szCSDVersion);
-			}
+		case 10:
+			zbx_wsnprintf(osVersion, sizeof(osVersion), TEXT("Windows 98-%s"), versionInfo.szCSDVersion);
+			break;
+		case 90:
+			zbx_wsnprintf(osVersion, sizeof(osVersion), TEXT("Windows Me-%s"), versionInfo.szCSDVersion);
 			break;
 		default:
-			zbx_snprintf(osVersion, sizeof(osVersion), "Windows [Unknown Version]");
+			zbx_wsnprintf(osVersion, sizeof(osVersion), TEXT("Windows [Unknown Version]"));
+		}
+		break;
+	case VER_PLATFORM_WIN32_NT:
+		switch (versionInfo.dwMajorVersion) {
+		case 4:
+			zbx_wsnprintf(osVersion, sizeof(osVersion), TEXT("Windows NT 4.0 %s"), versionInfo.szCSDVersion);
 			break;
+		case 5:
+			switch (versionInfo.dwMinorVersion) {
+			case 1:
+				zbx_wsnprintf(osVersion, sizeof(osVersion), TEXT("Windows XP %s"), versionInfo.szCSDVersion);
+				break;
+			case 2:
+				zbx_wsnprintf(osVersion, sizeof(osVersion), TEXT("Windows Server 2003 %s"), versionInfo.szCSDVersion);
+				break;
+			default:
+				zbx_wsnprintf(osVersion, sizeof(osVersion), TEXT("Windows [Unknown Version]"));
+			}
+			break;
+		case 6:
+			zbx_wsnprintf(osVersion, sizeof(osVersion), TEXT("Windows Server 2008 %s"), versionInfo.szCSDVersion);
+			break;
+		default:
+			zbx_wsnprintf(osVersion, sizeof(osVersion), TEXT("Windows [Unknown Version]"));
+			break;
+		}
 	}
 
 	GetSystemInfo(&sysInfo);
 	switch(sysInfo.wProcessorArchitecture)
 	{
 		case PROCESSOR_ARCHITECTURE_INTEL:
-			cpuType="Intel IA-32";
+			cpuType=TEXT("Intel IA-32");
 			break;
 		case PROCESSOR_ARCHITECTURE_MIPS:
-			cpuType="MIPS";
+			cpuType=TEXT("MIPS");
 			break;
 		case PROCESSOR_ARCHITECTURE_ALPHA:
-			cpuType="Alpha";
+			cpuType=TEXT("Alpha");
 			break;
 		case PROCESSOR_ARCHITECTURE_PPC:
-			cpuType="PowerPC";
+			cpuType=TEXT("PowerPC");
 			break;
 		case PROCESSOR_ARCHITECTURE_IA64:
-			cpuType="Intel IA-64";
+			cpuType=TEXT("Intel IA-64");
 			break;
 		case PROCESSOR_ARCHITECTURE_IA32_ON_WIN64:
-			cpuType="IA-32 on IA-64";
+			cpuType=TEXT("IA-32 on IA-64");
 			break;
 		case PROCESSOR_ARCHITECTURE_AMD64:
-			cpuType="AMD-64";
+			cpuType=TEXT("AMD-64");
 			break;
 		default:
-			cpuType="unknown";
+			cpuType=TEXT("unknown");
 			break;
 	}
 
-	zbx_snprintf(
-		buffer,
-		sizeof(buffer),
-		"Windows %s %d.%d.%d %s %s",
+	zbx_wsnprintf(wide_buffer, sizeof(wide_buffer),
+		TEXT("Windows %s %d.%d.%d %s %s"),
 		computerName,
 		versionInfo.dwMajorVersion,
 		versionInfo.dwMinorVersion,
 		versionInfo.dwBuildNumber,
 		osVersion,
-		cpuType
-		);
+		cpuType);
 
-	SET_STR_RESULT(result, strdup(buffer));
+	SET_STR_RESULT(result, zbx_unicode_to_utf8(wide_buffer));
 
 	return SYSINFO_RET_OK;
 #else
@@ -174,17 +166,14 @@ int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 int	SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #if defined(_WINDOWS)
-	DWORD dwSize;
-
 	/* NOTE: The buffer size should be large enough to contain MAX_COMPUTERNAME_LENGTH + 1 characters.*/
-	char buffer[MAX_COMPUTERNAME_LENGTH + 1];
+	TCHAR	wide_buffer[MAX_COMPUTERNAME_LENGTH + 1];
+	DWORD	dwSize = MAX_COMPUTERNAME_LENGTH;
 
+	if (0 == GetComputerName(wide_buffer, &dwSize))
+		*wide_buffer = '\0';
 
-	dwSize = sizeof(buffer);
-	if( 0 == GetComputerName(buffer, &dwSize) )
-		buffer[0] = '\0';
-
-	SET_STR_RESULT(result, strdup(buffer));
+	SET_STR_RESULT(result, zbx_unicode_to_utf8(wide_buffer))
 
 	return SYSINFO_RET_OK;
 #else
