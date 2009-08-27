@@ -218,8 +218,10 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		zabbix_log(LOG_LEVEL_DEBUG, "Unable to create process: '%s' [%s]", command, strerror_from_system(GetLastError()));
 
 		ret = SYSINFO_RET_FAIL;
+		zbx_free(wcommand);
 		goto lbl_exit;
 	}
+	zbx_free(wcommand);
 	CloseHandle(hWrite);	hWrite = NULL;
 
 	/* Read process output */
@@ -325,7 +327,6 @@ lbl_exit:
 #endif /* _WINDOWS */
 
 	zbx_free(command)
-	zbx_free(wcommand);
 	zbx_free(cmd_result);
 
 	return ret;
