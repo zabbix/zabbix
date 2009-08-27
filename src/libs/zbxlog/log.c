@@ -84,7 +84,10 @@ void redirect_std(const char *filename)
 
 int zabbix_open_log(int type, int level, const char *filename)
 {
-	FILE *log_file = NULL;
+	FILE	*log_file = NULL;
+#if defined(_WINDOWS)
+	LPTSTR	wevent_source;
+#endif
 
 	log_level = level;
 
@@ -103,9 +106,9 @@ int zabbix_open_log(int type, int level, const char *filename)
 		log_type = LOG_TYPE_SYSLOG;
 
 #if defined(_WINDOWS)
-
-		system_log_handle = RegisterEventSource(NULL, ZABBIX_EVENT_SOURCE);
-
+		wevent_source = zbx_utf8_to_unicode(ZABBIX_EVENT_SOURCE);
+		system_log_handle = RegisterEventSource(NULL, wevent_source);
+		zbx_free(wevent_source);
 #else /* not _WINDOWS */
 
 		openlog("zabbix_suckerd", LOG_PID, LOG_USER);
@@ -235,8 +238,7 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
         struct _timeb current_time;
 
 	WORD	wType;
-	char	thread_id[20];
-	char	*(strings[]) = {thread_id, message, NULL};
+	wchar_t	thread_id[20], *strings[2];
 
 #else /* not _WINDOWS */
 	struct timeval	current_time;
@@ -326,9 +328,6 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 	if(LOG_TYPE_SYSLOG == log_type)
 	{
 #if defined(_WINDOWS)
-		memset(thread_id, 0, sizeof(thread_id));
-		zbx_snprintf(thread_id, sizeof(thread_id),"[%li]: ",zbx_get_thread_id());
-
 		switch(level)
 		{
 			case LOG_LEVEL_CRIT:
@@ -342,6 +341,12 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 				wType = EVENTLOG_INFORMATION_TYPE;
 				break;
 		}
+
+		zbx_wsnprintf(thread_id, sizeof(thread_id), TEXT("[%li]: "),
+				zbx_get_thread_id());
+		strings[0] = thread_id;
+		strings[1] = zbx_utf8_to_unicode(message);
+
 		ReportEvent(
 			system_log_handle,
 			wType,
@@ -352,6 +357,8 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 			0,
 			strings,
 			NULL);
+
+		zbx_free(strings[1]);
 
 #else /* not _WINDOWS */
 
@@ -389,29 +396,29 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 /*
  * Get system error string by call to FormatMessage
  */
-#define ZBX_MESSAGE_BUF_SIZE	1024
-
+ #define ZBX_MESSAGE_BUF_SIZE	1024
+ 
 char *strerror_from_system(unsigned long error)
 {
 #if defined(_WINDOWS)
 
-	static char buffer[ZBX_MESSAGE_BUF_SIZE];  /* !!! Attention static !!! not thread safely - Win32*/
-
-	memset(buffer, 0, sizeof(buffer));
-
-	if(FormatMessage(
-		FORMAT_MESSAGE_FROM_SYSTEM,
-		NULL,
-		error,
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		buffer,
-		sizeof(buffer),
-		NULL) == 0)
+	TCHAR		wide_string[ZBX_MESSAGE_BUF_SIZE];
+	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];  /* !!! Attention static !!! not thread safely - Win32*/
+	
+	if (0 == FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, error,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), wide_string, sizeof(wide_string), NULL))
 	{
-		zbx_snprintf(buffer, sizeof(buffer), "3. MSG 0x%08X - Unable to find message text [0x%X]", error , GetLastError());
+		zbx_snprintf(utf8_string, sizeof(utf8_string), "3. MSG 0x%08X - Unable to find message text [0x%X]",
+				error, GetLastError());
+		return utf8_string;
 	}
 
-	return buffer;
+	if (FAIL == zbx_unicode_to_utf8_static(wide_string, utf8_string, sizeof(utf8_string)))
+		*utf8_string = '\0';
+
+	zbx_rtrim(utf8_string, "\r\n ");
+
+	return utf8_string;
 
 #else /* not _WINDOWS */
 
@@ -424,34 +431,31 @@ char *strerror_from_system(unsigned long error)
  * Get system error string by call to FormatMessage
  */
 
-char *strerror_from_module(unsigned long error, const char *module)
-{
 #if defined(_WINDOWS)
+char *strerror_from_module(unsigned long error, LPCTSTR module)
+{
+	TCHAR		wide_string[ZBX_MESSAGE_BUF_SIZE];
+	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];  /* !!! Attention static !!! not thread safely - Win32*/
+	char		*strings[2];
+	HMODULE		hmodule;
 
-	static char buffer[ZBX_MESSAGE_BUF_SIZE]; /* !!! Attention static !!! not thread safely - Win32*/
-	char *strings[2];
+	memset(strings, 0, sizeof(char *) * 2);
+	*utf8_string = '\0';
+	hmodule = GetModuleHandle(module);
 
-	memset(strings,0,sizeof(char *)*2);
-	memset(buffer, 0, sizeof(buffer));
-
-	if (FormatMessage(
-		FORMAT_MESSAGE_FROM_HMODULE | FORMAT_MESSAGE_ARGUMENT_ARRAY,
-		module ? GetModuleHandle(module) : NULL,
-		error,
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), /* Default language */
-		(LPTSTR)buffer,
-		sizeof(buffer),
-		strings) == 0)
+	if (0 == FormatMessage(FORMAT_MESSAGE_FROM_HMODULE | FORMAT_MESSAGE_ARGUMENT_ARRAY, hmodule, error,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), wide_string, sizeof(wide_string), strings))
 	{
-		zbx_snprintf(buffer, sizeof(buffer), "3. MSG 0x%08X - Unable to find message text [%s]", error , strerror_from_system(GetLastError()));
+		zbx_snprintf(utf8_string, sizeof(utf8_string), "3. MSG 0x%08X - Unable to find message text [%s]",
+				error, strerror_from_system(GetLastError()));
+		return utf8_string;
 	}
 
-	return (char *)buffer;
+	if (FAIL == zbx_unicode_to_utf8_static(wide_string, utf8_string, sizeof(utf8_string)))
+		*utf8_string = '\0';
 
-#else /* not _WINDOWS */
+	zbx_rtrim(utf8_string, "\r\n ");
 
-	return strerror(errno);
-
-#endif /* _WINDOWS */
-
+	return utf8_string;
 }
+#endif /* _WINDOWS */

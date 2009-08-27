@@ -53,6 +53,7 @@ int	add_perf_counter(const char *name, const char *counterPath, int interval)
 	PERF_COUNTERS	*cptr;
 	PDH_STATUS	status;
 	char		*alias_name;
+	LPTSTR		wcounterPath;
 	int		result = FAIL;
 
 	assert(counterPath);
@@ -86,22 +87,27 @@ int	add_perf_counter(const char *name, const char *counterPath, int interval)
 							sizeof(PDH_RAW_COUNTER) * interval);
 			cptr->CurrentNum	= 1;
 
+			wcounterPath = zbx_utf8_to_unicode(cptr->counterPath);
+
 			/* Add user counters to query */
-			if (ERROR_SUCCESS != (status = PdhAddCounter(ppsd->pdh_query, cptr->counterPath, 0, &cptr->handle))) {
+			if (ERROR_SUCCESS != (status = PdhAddCounter(ppsd->pdh_query, wcounterPath, 0, &cptr->handle)))
+			{
 				cptr->status	= ITEM_STATUS_NOTSUPPORTED;
-				cptr->error	= zbx_dsprintf(cptr->error, "%s", strerror_from_module(status, "PDH.DLL"));
+				cptr->error	= zbx_dsprintf(cptr->error, "%s", strerror_from_module(status, L"PDH.DLL"));
 				zbx_rtrim(cptr->error, " \r\n");
 
 				zabbix_log( LOG_LEVEL_ERR, "Unable to add performance counter '%s' to query: %s",
 						cptr->counterPath,
 						cptr->error);
-			} else
+			}
+			else
 			{
 				cptr->status	= ITEM_STATUS_ACTIVE;
 				zabbix_log(LOG_LEVEL_DEBUG, "PerfCounter '%s' successfully added. Interval %d seconds",
 						cptr->counterPath, interval);
 			}
 
+			zbx_free(wcounterPath);
 			zbx_mutex_lock(&perfstat_access);
 
 			cptr->next		= ppsd->pPerfCounterList;
@@ -316,7 +322,7 @@ void	collect_perfstat()
 		return;
 
 	if (ERROR_SUCCESS != (status = PdhCollectQueryData(ppsd->pdh_query))) {
-		zabbix_log( LOG_LEVEL_ERR, "Call to PdhCollectQueryData() failed: %s", strerror_from_module(status,"PDH.DLL"));
+		zabbix_log( LOG_LEVEL_ERR, "Call to PdhCollectQueryData() failed: %s", strerror_from_module(status, L"PDH.DLL"));
 		return;
 	}
 

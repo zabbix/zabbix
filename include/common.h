@@ -126,8 +126,9 @@
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
-extern char ZABBIX_SERVICE_NAME[64];
-extern char ZABBIX_EVENT_SOURCE[64];
+#define	ZBX_SERVICE_NAME_LEN	64
+extern char ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN];
+extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #endif /* _WINDOWS */
 
 #if defined(_WINDOWS)
@@ -871,6 +872,15 @@ int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t v
 void	uint64_array_merge(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t *value, int value_num, int alloc_step);
 int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value);
 void	uint64_array_rm(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int rm_num);
+
+#ifdef _WINDOWS
+LPTSTR	zbx_acp_to_unicode(LPCSTR acp_string);
+int	zbx_acp_to_unicode_static(LPCSTR acp_string, LPTSTR wide_string, int wide_size);
+LPTSTR	zbx_utf8_to_unicode(LPCSTR utf8_string);
+LPSTR	zbx_unicode_to_utf8(LPCTSTR wide_string);
+int	zbx_unicode_to_utf8_static(LPCTSTR wide_string, LPSTR utf8_string, int utf8_size);
+int	_wis_uint(LPCTSTR wide_string);
+#endif
 
 int MAIN_ZABBIX_ENTRY(void);
 

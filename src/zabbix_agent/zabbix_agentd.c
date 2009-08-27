@@ -381,7 +381,7 @@ int	main(int argc, char **argv)
 	switch (t.task) {
 #if defined (_WINDOWS)
 		case ZBX_TASK_INSTALL_SERVICE:
-			exit(ZabbixCreateService(argv[0]));
+			exit(ZabbixCreateService(argv[0], (t.flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS)));
 			break;
 		case ZBX_TASK_UNINSTALL_SERVICE:
 			exit(ZabbixRemoveService());

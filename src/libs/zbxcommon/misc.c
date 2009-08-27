@@ -1193,6 +1193,24 @@ int	is_uint(char *c)
 	return SUCCEED;
 }
 
+#if defined(_WINDOWS)
+int	_wis_uint(const wchar_t *wide_string)
+{
+	if (L'\0' != *wide_string)
+		return FAIL;
+
+	while (L'\0' != *wide_string)
+	{
+		if (0 != iswalpha(*wide_string))
+			continue;
+
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: is_uint64                                                        *
