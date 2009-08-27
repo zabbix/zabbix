@@ -17,12 +17,11 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
+#if defined (_WINDOWS)
 #include "common.h"
 
 #include "log.h"
 #include "eventlog.h"
-
-#if defined (_WINDOWS)
 
 #define MAX_INSERT_STRS 64
 #define MAX_MSG_LENGTH 1024
@@ -229,19 +228,16 @@ out:
 
 	return ret;
 }
-#endif /* _WINDOWS */
 
 int process_eventlog(const char *source, long *lastlogsize, unsigned long *out_timestamp, char **out_source,
 		unsigned short *out_severity, char **out_message, unsigned long	*out_eventid)
 {
 	int		ret = FAIL;
-#if defined(_WINDOWS)
 	const char	*__function_name = "process_eventlog";
 	HANDLE		eventlog_handle;
 	long		FirstID, LastID;
 	register long	i;
 	LPTSTR		wsource;
-#endif
 
 	assert(lastlogsize);
 	assert(out_timestamp);
@@ -256,7 +252,6 @@ int process_eventlog(const char *source, long *lastlogsize, unsigned long *out_t
 	*out_message	= NULL;
 	*out_eventid	= 0;
 
-#if defined(_WINDOWS)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() source:'%s' lastlogsize:%ld",
 			__function_name, source, *lastlogsize);
@@ -294,10 +289,10 @@ int process_eventlog(const char *source, long *lastlogsize, unsigned long *out_t
 	else
 		zabbix_log(LOG_LEVEL_ERR, "Can't open eventlog '%s' [%s]",
 				source, strerror_from_system(GetLastError()));
-
+	
 	zbx_free(wsource);
-
-#endif /* _WINDOWS */
 
 	return ret;
 }
+#endif	/*if defined (_WINDOWS)*/
+
