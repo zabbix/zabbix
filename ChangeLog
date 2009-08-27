@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-423] added filtering of the Windows Event Log by Type, Source and Event ID on the agent side (Dmitry)
  - [DEV-9] added support of function macros (Sasha)
  - [DEV-422] updated the list of supported checks in the item configuration form (Dmitry)
  - [DEV-421] added additional parameter `maxlines' to `log[]' and `eventlog[]' checks (Dmitry)

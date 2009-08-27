@@ -643,11 +643,15 @@ static void	process_active_checks(char *server, unsigned short port)
 	char		params[MAX_STRING_LEN];
 	char		filename[MAX_STRING_LEN];
 	char		pattern[MAX_STRING_LEN];
-	
 	/*checks `log' and `eventlog' may contain parameter,*/
 	/*which overrides CONFIG_MAX_LINES_PER_SECOND*/
 	char		maxlines_persec_str[16];
-	int		maxlines_persec;	
+	int		maxlines_persec;
+	char		key_severity[MAX_STRING_LEN];
+	char		key_source[MAX_STRING_LEN];
+	char		key_logeventid[MAX_STRING_LEN];
+	char		str_severity[32];	/*for `regex_match_ex'*/
+	char		str_logeventid[8];	/*for `regex_match_ex'*/
 
 	AGENT_RESULT	result;
 
@@ -763,7 +767,7 @@ static void	process_active_checks(char *server, unsigned short port)
 					break;
 				}
 
-				if (num_param(params) > 3) {
+				if (num_param(params) > 6) {
 					ret = FAIL;
 					break;
 				}
@@ -776,7 +780,16 @@ static void	process_active_checks(char *server, unsigned short port)
 				if (get_param(params, 2, pattern, sizeof(pattern)) != 0)
 					*pattern = '\0';
 				
-				if (get_param(params, 3, maxlines_persec_str, sizeof(maxlines_persec_str)) != 0 ||
+				if (get_param(params, 3, key_severity, sizeof(key_severity)) != 0)
+					*key_severity = '\0';
+				
+				if (get_param(params, 4, key_source, sizeof(key_source)) != 0)
+					*key_source = '\0';
+					
+				if (get_param(params, 5, key_logeventid, sizeof(key_logeventid)) != 0)
+					*key_logeventid = '\0';
+					
+				if (get_param(params, 6, maxlines_persec_str, sizeof(maxlines_persec_str)) != 0 ||
 						*maxlines_persec_str == '\0')
 					maxlines_persec = CONFIG_MAX_LINES_PER_SECOND;
 				else if ((maxlines_persec = atoi(maxlines_persec_str)) < MIN_VALUE_LINES ||
@@ -784,17 +797,48 @@ static void	process_active_checks(char *server, unsigned short port)
 					ret = FAIL;
 					break;
 				}
-				
+
 				s_count = 0;
 				p_count = 0;
 				lastlogsize = active_metrics[i].lastlogsize;
+
 				while (SUCCEED == (ret = process_eventlog(filename, &lastlogsize,
 					&timestamp, &source, &severity, &value, &logeventid)))
 				{
 					if (!value) /* EOF */
 						break;
-
-					if (SUCCEED == regexp_match_ex(regexps, regexps_num, value, pattern, ZBX_CASE_SENSITIVE)) {
+					
+					switch ( severity )
+					{
+						case EVENTLOG_INFORMATION_TYPE:
+							severity = 1;
+							zbx_snprintf(str_severity, sizeof(str_severity), INFORMATION_TYPE);
+							break;
+						case EVENTLOG_WARNING_TYPE:
+							severity = 2;
+							zbx_snprintf(str_severity, sizeof(str_severity), WARNING_TYPE);
+							break;
+						case EVENTLOG_ERROR_TYPE:
+							severity = 4;
+							zbx_snprintf(str_severity, sizeof(str_severity), ERROR_TYPE);
+							break;
+						case EVENTLOG_AUDIT_FAILURE:
+							severity = 7;
+							zbx_snprintf(str_severity, sizeof(str_severity), AUDIT_FAILURE);
+							break;
+						case EVENTLOG_AUDIT_SUCCESS:
+							severity = 8;
+							zbx_snprintf(str_severity, sizeof(str_severity), AUDIT_SUCCESS);
+							break;
+					}
+					
+					zbx_snprintf(str_logeventid, sizeof(str_logeventid), "%li", logeventid);
+					
+					if (SUCCEED == regexp_match_ex(regexps, regexps_num, value, pattern, ZBX_CASE_SENSITIVE) &&
+						SUCCEED == regexp_match_ex(regexps, regexps_num, str_severity, key_severity, ZBX_IGNORE_CASE) &&
+						0 == strcmp( key_source, source ) &&
+						SUCCEED == regexp_match_ex(regexps, regexps_num, str_logeventid, key_logeventid, ZBX_CASE_SENSITIVE)
+					) {						
 						send_err = process_value(
 									server,
 									port,
