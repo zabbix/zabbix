@@ -36,6 +36,23 @@ extern int	CONFIG_MAX_LINES_PER_SECOND;
 #define	MIN_VALUE_LINES	1
 #define	MAX_VALUE_LINES	1000
 
+/*Windows event types for `eventlog' check*/
+#ifndef INFORMATION_TYPE
+#define INFORMATION_TYPE	"Information"
+#endif
+#ifndef WARNING_TYPE
+#define WARNING_TYPE		"Warning"
+#endif
+#ifndef ERROR_TYPE
+#define ERROR_TYPE		"Error"
+#endif
+#ifndef AUDIT_FAILURE
+#define AUDIT_FAILURE		"Failure Audit"
+#endif
+#ifndef AUDIT_SUCCESS
+#define AUDIT_SUCCESS		"Success Audit"
+#endif
+
 typedef struct zbx_active_metric_type
 {
 	char	*key, *key_orig;

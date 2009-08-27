@@ -310,15 +310,6 @@ int process_eventlog(
 			if (SUCCEED == zbx_get_eventlog_message(source, eventlog_handle, i, out_source, out_message,
 					out_severity, out_timestamp, out_eventid))
 			{
-				switch(*out_severity)
-				{
-					case EVENTLOG_ERROR_TYPE:		*out_severity = 4;	break;
-					case EVENTLOG_AUDIT_FAILURE:	*out_severity = 7;	break;
-					case EVENTLOG_AUDIT_SUCCESS:	*out_severity = 8;	break;
-					case EVENTLOG_INFORMATION_TYPE:	*out_severity = 1;	break;
-					case EVENTLOG_WARNING_TYPE:		*out_severity = 2;	break;
-				}
-
 				*lastlogsize = i;
 				break;
 			}
