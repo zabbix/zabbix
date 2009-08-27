@@ -24,7 +24,9 @@
 #include "log.h"
 #include "sysinfo.h"
 #include "logfiles.h"
+#if defined (_WINDOWS)
 #include "eventlog.h"
+#endif
 #include "comms.h"
 #include "threads.h"
 #include "zbxjson.h"
@@ -761,6 +763,9 @@ static void	process_active_checks(char *server, unsigned short port)
 		/* Special processing for eventlog */
 		else if(strncmp(active_metrics[i].key,"eventlog[",9) == 0)
 		{
+			ret = FAIL;
+			
+#if defined (_WINDOWS)
 			do{ /* simple try realization */
 				if (parse_command(active_metrics[i].key, NULL, 0, params, MAX_STRING_LEN) != 2) {
 					ret = FAIL;
@@ -873,7 +878,8 @@ static void	process_active_checks(char *server, unsigned short port)
 				break;
 				
 			}while(0); /* simple try realization NOTE: never loop */
-			/*here goes some code*/
+#endif	/* if defined (_WINDOWS) */
+			
 			if( FAIL == ret ) {
 				active_metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
 				zabbix_log( LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.",
