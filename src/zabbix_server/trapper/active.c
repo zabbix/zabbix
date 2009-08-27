@@ -195,6 +195,21 @@ out:
 	return res;
 }
 
+static	void	add_regexp_name(char ***regexp, int *regexp_alloc, int *regexp_num, const char *regexp_name)
+{
+	int i = 0;
+	for (; i < *regexp_num; i++)
+		if (0 == strcmp(*regexp[i], regexp_name))
+			return;
+	if (i == *regexp_num) {
+		if (*regexp_num == *regexp_alloc) {
+			*regexp_alloc += 32;
+			*regexp = zbx_realloc(*regexp, *regexp_alloc);
+		}
+		*regexp[*regexp_num++] = strdup(regexp_name);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: send_list_of_active_checks_json                                  *
@@ -215,8 +230,9 @@ out:
 int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp, zbx_process_t zbx_process)
 {
 	char		host[HOST_HOST_LEN_MAX], *name_esc, params[MAX_STRING_LEN],
-			pattern[MAX_STRING_LEN], tmp[32];
-	DB_RESULT	result;
+			pattern[MAX_STRING_LEN], tmp[32],
+			key_severity[MAX_STRING_LEN], key_logeventid[MAX_STRING_LEN];	
+	DB_RESULT	result;					
 	DB_ROW		row;
 	DB_ITEM		item;
 	struct zbx_json	json;
@@ -286,34 +302,48 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_LOGLASTSIZE, tmp, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json);
 
-		/* Special processing for log[] and eventlog[] items */
+		/* Special processing for log[] items */
+		do {	/* simple try realization */			
+			
+			/* log[filename,pattern,maxlinespersec] */
+			
+			if (0 != strncmp(item.key, "log[", 4))
+				break;
+				
+			if (2 != parse_command(item.key, NULL, 0, params, MAX_STRING_LEN))
+				break;
+				
+			/*dealing with `pattern' parameter*/						
+			if (0 == get_param(params, 2, pattern, sizeof(pattern)) &&
+				*pattern == '@')			
+					add_regexp_name(&regexp, &regexp_alloc, &regexp_num, pattern + 1);
+		} while (0);	/* simple try realization */
+		
+		/* Special processing for eventlog[] items */
 		do {	/* simple try realization */
-			if (0 != strncmp(item.key, "log[", 4) && 0 != strncmp(item.key, "eventlog[", 9))
+			
+			/* eventlog[filename,pattern,severity,source,logeventid,maxlinespersec] */
+			
+			if (0 != strncmp(item.key, "eventlog[", 9))
 				break;
 
 			if (2 != parse_command(item.key, NULL, 0, params, MAX_STRING_LEN))
-				break;;
-
-			if (0 != get_param(params, 2, pattern, sizeof(pattern)))
 				break;
-
-			if (*pattern != '@')
-				break;
-
-			for (n = 0; n < regexp_num; n++)
-				if (0 == strcmp(regexp[n], pattern + 1))
-					break;
-
-			if (n != regexp_num)
-				break;
-
-			if (regexp_num == regexp_alloc)
-			{
-				regexp_alloc += 32;
-				regexp = zbx_realloc(regexp, regexp_alloc);
-			}
-
-			regexp[regexp_num++] = strdup(pattern + 1);
+			
+			/*dealing with `pattern' parameter*/						
+			if (0 == get_param(params, 2, pattern, sizeof(pattern)) &&
+				*pattern == '@')			
+					add_regexp_name(&regexp, &regexp_alloc, &regexp_num, pattern + 1);
+			
+			/*dealing with `severity' parameter*/					
+			if (0 == get_param(params, 3, key_severity, sizeof(key_severity)) &&
+				*key_severity == '@')
+					add_regexp_name(&regexp, &regexp_alloc, &regexp_num, key_severity + 1);
+			
+			/*dealing with `logeventid' parameter*/			
+			if (0 == get_param(params, 5, key_logeventid, sizeof(key_logeventid)) &&
+				*key_logeventid == '@')
+					add_regexp_name(&regexp, &regexp_alloc, &regexp_num, key_logeventid + 1);
 		} while (0);	/* simple try realization */
 	}
 	zbx_json_close(&json);
