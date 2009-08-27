@@ -47,7 +47,6 @@ ZBX_COLLECTOR_DATA *collector = NULL;
 		exit(1);						\
 	}
 
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_get_cpu_num                                                  *

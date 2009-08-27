@@ -49,7 +49,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 {
 #ifdef _WINDOWS
 	PDH_STATUS			status;
-	char				cpu[16], counter_path[PDH_MAX_COUNTER_PATH];
+	TCHAR				cpu[8], counter_path[PDH_MAX_COUNTER_PATH];
 	PDH_COUNTER_PATH_ELEMENTS	cpe;
 	int				i;
 	DWORD				dwSize;
@@ -57,8 +57,8 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	zabbix_log(LOG_LEVEL_DEBUG, "In init_cpu_collector()");
 
 	if (ERROR_SUCCESS != (status = PdhOpenQuery(NULL, 0, &pcpus->pdh_query))) {
-		zabbix_log( LOG_LEVEL_ERR, "Call to PdhOpenQuery() failed: %s",
-				strerror_from_module(status, "PDH.DLL"));
+		zabbix_log(LOG_LEVEL_ERR, "Call to PdhOpenQuery() failed: %s",
+				strerror_from_module(status, TEXT("PDH.DLL")));
 		return 1;
 	}
 
@@ -71,31 +71,31 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 
 	for(i = 0 /* 0 : _Total; >0 : cpu */; i <= pcpus->count; i++) {
 		if (i == 0)
-			zbx_strlcpy(cpu, "_Total", sizeof(cpu));
+			zbx_wsnprintf(cpu, sizeof(cpu), TEXT("_Total"));
 		else
-			_itoa_s(i - 1, cpu, sizeof(cpu), 10);
+			_itow_s(i - 1, cpu, sizeof(cpu), 10);
 
-		dwSize = sizeof(counter_path);
+		dwSize = PDH_MAX_COUNTER_PATH;
 		if (ERROR_SUCCESS != (status = PdhMakeCounterPath(&cpe, counter_path, &dwSize, 0)))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Call to PdhMakeCounterPath() failed: %s",
-					strerror_from_module(status, "PDH.DLL"));
+					strerror_from_module(status, TEXT("PDH.DLL")));
 			return 1;
 		}
 
 		if (ERROR_SUCCESS != (status = PdhAddCounter(pcpus->pdh_query, counter_path, 0,
 				&pcpus->cpu[i].usage_couter)))
 		{
-			zabbix_log( LOG_LEVEL_ERR, "Unable to add performance counter \"%s\" to query: %s",
-					counter_path, strerror_from_module(status, "PDH.DLL"));
+			zabbix_log(LOG_LEVEL_ERR, "Unable to add performance counter to query: %s",
+					strerror_from_module(status, TEXT("PDH.DLL")));
 			return 2;
 		}
 	}
 
 	if (ERROR_SUCCESS != (status = PdhCollectQueryData(pcpus->pdh_query)))
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Call to PdhCollectQueryData() failed: %s",
-				strerror_from_module(status, "PDH.DLL"));
+		zabbix_log(LOG_LEVEL_ERR, "Call to PdhCollectQueryData() failed: %s",
+				strerror_from_module(status, TEXT("PDH.DLL")));
 		return 3;
 	}
 
@@ -108,19 +108,19 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	cpe.szInstanceName = NULL;
 	cpe.szCounterName = GetCounterName(PCI_PROCESSOR_QUEUE_LENGTH);
 
-	dwSize = sizeof(counter_path);
+	dwSize = PDH_MAX_COUNTER_PATH;
 	if (ERROR_SUCCESS != (status = PdhMakeCounterPath(&cpe, counter_path, &dwSize, 0)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Call to PdhMakeCounterPath() failed: %s",
-				strerror_from_module(status, "PDH.DLL"));
+				strerror_from_module(status, TEXT("PDH.DLL")));
 		return 1;
 	}
 
 	/* Prepare for CPU execution queue usage collection */
 	if (ERROR_SUCCESS != (status = PdhAddCounter(pcpus->pdh_query, counter_path, 0, &pcpus->queue_counter)))
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Unable to add performance counter \"%s\" to query: %s",
-				counter_path, strerror_from_module(status, "PDH.DLL"));
+		zabbix_log(LOG_LEVEL_ERR, "Unable to add performance counter to query: %s",
+				strerror_from_module(status, TEXT("PDH.DLL")));
 		return 2;
 	}
 #endif /* _WINDOWS */
@@ -567,7 +567,8 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 
 	if ((status = PdhCollectQueryData(pcpus->pdh_query)) != ERROR_SUCCESS)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Call to PdhCollectQueryData() failed: %s", strerror_from_module(status,"PDH.DLL"));
+		zabbix_log(LOG_LEVEL_ERR, "Call to PdhCollectQueryData() failed: %s",
+				strerror_from_module(status, TEXT("PDH.DLL")));
 		return;
 	}
 

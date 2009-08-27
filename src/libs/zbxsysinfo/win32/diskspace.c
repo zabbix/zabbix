@@ -18,68 +18,44 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
-
 
 int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+	char		path[MAX_PATH], mode[20];
+	LPTSTR		wpath;
+	ULARGE_INTEGER	freeBytes, totalBytes;
 
-	char
-		path[MAX_PATH],
-		mode[20];
+	if (num_param(param) > 2)
+		return SYSINFO_RET_FAIL;
 
-	ULARGE_INTEGER freeBytes,totalBytes;
+	if (0 != get_param(param, 1, path, MAX_PATH))
+		return SYSINFO_RET_FAIL;
 
-	if(num_param(param) > 2)
+	if (0 != get_param(param, 2, mode, sizeof(mode)))
+		*mode = '\0';
+
+	wpath = zbx_utf8_to_unicode(path);
+	if (0 == GetDiskFreeSpaceEx(wpath, &freeBytes, &totalBytes, NULL))
 	{
+		zbx_free(wpath);
 		return SYSINFO_RET_FAIL;
 	}
+	zbx_free(wpath);
 
-	if(get_param(param, 1, path, MAX_PATH) != 0)
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	if(get_param(param, 2, mode, sizeof(mode)) != 0)
-	{
-		mode[0] = '\0';
-	}
-	if(mode[0] == '\0')
-	{
-		/* default parameter */
-		zbx_snprintf(mode, sizeof(mode), "total");
-	}
-
-	if (!GetDiskFreeSpaceEx(path, &freeBytes, &totalBytes, NULL))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	if (strcmp(mode,"free") == 0)
-	{
-		SET_UI64_RESULT(result, freeBytes.QuadPart);
-	}
-	else if (strcmp(mode,"used") == 0)
-	{
-		SET_UI64_RESULT(result, totalBytes.QuadPart - freeBytes.QuadPart);
-	}
-	else if (strcmp(mode,"total") == 0)
-	{
-		SET_UI64_RESULT(result, totalBytes.QuadPart);
-	}
-	else if (strcmp(mode,"pfree") == 0)
-	{
-		SET_UI64_RESULT(result, (double)(__int64)freeBytes.QuadPart * 100. / (double)(__int64)totalBytes.QuadPart);
-	}
-	else if (strcmp(mode,"pused") == 0)
-	{
-		SET_UI64_RESULT(result, (double)((__int64)totalBytes.QuadPart-(__int64)freeBytes.QuadPart) * 100. / (double)(__int64)totalBytes.QuadPart);
-	}
+	if ('\0' == *mode || 0 == strcmp(mode, "total"))	/* default parameter */
+		SET_UI64_RESULT(result, totalBytes.QuadPart)
+	else if (0 == strcmp(mode, "free"))
+		SET_UI64_RESULT(result, freeBytes.QuadPart)
+	else if (0 == strcmp(mode, "used"))
+		SET_UI64_RESULT(result, totalBytes.QuadPart - freeBytes.QuadPart)
+	else if (0 == strcmp(mode, "pfree"))
+		SET_DBL_RESULT(result, (double)(__int64)freeBytes.QuadPart * 100. / (double)(__int64)totalBytes.QuadPart)
+	else if (0 == strcmp(mode, "pused"))
+		SET_DBL_RESULT(result, (double)((__int64)totalBytes.QuadPart - (__int64)freeBytes.QuadPart) * 100. /
+				(double)(__int64)totalBytes.QuadPart)
 	else
-	{
 		return SYSINFO_RET_FAIL;
-	}
 
 	return SYSINFO_RET_OK;
 }

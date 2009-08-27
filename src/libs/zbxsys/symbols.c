@@ -43,7 +43,7 @@ void import_symbols(void)
 {
 	HMODULE hModule;
 
-	if(NULL != (hModule = GetModuleHandle("USER32.DLL")) )
+	if(NULL != (hModule = GetModuleHandle(TEXT("USER32.DLL"))) )
 	{
 		zbx_GetGuiResources = (DWORD (__stdcall *)(HANDLE,DWORD))GetProcAddressAndLog(hModule,"GetGuiResources");
 	}
@@ -52,7 +52,7 @@ void import_symbols(void)
 		zabbix_log( LOG_LEVEL_DEBUG, "Unable to get handle to USER32.DLL");
 	}
 
-	if(NULL != (hModule=GetModuleHandle("KERNEL32.DLL")) )
+	if(NULL != (hModule=GetModuleHandle(TEXT("KERNEL32.DLL"))) )
 	{
 		zbx_GetProcessIoCounters = (BOOL (__stdcall *)(HANDLE,PIO_COUNTERS))GetProcAddressAndLog(hModule,"GetProcessIoCounters");
 		zbx_GlobalMemoryStatusEx = (BOOL (__stdcall *)(LPMEMORYSTATUSEX))GetProcAddressAndLog(hModule,"GlobalMemoryStatusEx");
@@ -62,7 +62,7 @@ void import_symbols(void)
 		zabbix_log( LOG_LEVEL_DEBUG, "Unable to get handle to KERNEL32.DLL");
 	}
 
-	if(NULL != (hModule=GetModuleHandle("PSAPI.DLL")) )
+	if(NULL != (hModule=GetModuleHandle(TEXT("PSAPI.DLL"))) )
 	{
 		zbx_GetPerformanceInfo = (BOOL (__stdcall *)(PPERFORMANCE_INFORMATION,DWORD))GetProcAddressAndLog(hModule,"GetPerformanceInfo");
 	}

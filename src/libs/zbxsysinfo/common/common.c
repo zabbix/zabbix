@@ -163,6 +163,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	PROCESS_INFORMATION pi = {0};
 	SECURITY_ATTRIBUTES sa;
 	HANDLE hWrite=NULL, hRead=NULL;
+	LPTSTR	wcommand;
 
 #else /* not _WINDOWS */
 
@@ -209,8 +210,10 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	command = zbx_dsprintf(command, "cmd /C \"%s\"", param);
 
+	wcommand = zbx_utf8_to_unicode(command);
+
 	/* Create new process */
-	if (!CreateProcess(NULL,command,NULL,NULL,TRUE,0,NULL,NULL,&si,&pi))
+	if (!CreateProcess(NULL,wcommand,NULL,NULL,TRUE,0,NULL,NULL,&si,&pi))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Unable to create process: '%s' [%s]", command, strerror_from_system(GetLastError()));
 
@@ -322,6 +325,7 @@ lbl_exit:
 #endif /* _WINDOWS */
 
 	zbx_free(command)
+	zbx_free(wcommand);
 	zbx_free(cmd_result);
 
 	return ret;
@@ -358,6 +362,8 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	PROCESS_INFORMATION  pi;
 
 	char	full_command[MAX_STRING_LEN];
+	LPTSTR	wcommand;
+	int	ret = SYSINFO_RET_FAIL;
 #else /* not _WINDOWS */
 	pid_t	pid;
 #endif
@@ -402,9 +408,11 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Execute command '%s'",full_command);
 
+	wcommand = zbx_utf8_to_unicode(full_command);
+
 	if(!CreateProcess(
 		NULL,	/* No module name (use command line) */
-		full_command,/* Name of app to launch */
+		wcommand,/* Name of app to launch */
 		NULL,	/* Default process security attributes */
 		NULL,	/* Default thread security attributes */
 		FALSE,	/* Don't inherit handles from the parent */
@@ -414,8 +422,16 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		&si,	/* Startup Information */
 		&pi))	/* Process information stored upon return */
 	{
-		return SYSINFO_RET_FAIL;
+		goto lbl_exit;
 	}
+
+	ret = SYSINFO_RET_OK;
+
+	SET_UI64_RESULT(result, 1);
+lbl_exit:
+	zbx_free(wcommand);
+
+	return ret;
 
 #else /* not _WINDOWS */
 
@@ -459,9 +475,8 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		break;
 	}
 
-#endif /* _WINDOWS */
-
 	SET_UI64_RESULT(result, 1);
 
 	return SYSINFO_RET_OK;
+#endif /* _WINDOWS */
 }
