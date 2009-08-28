@@ -193,7 +193,7 @@ require_once('include/forms.inc.php');
 			}
 		}
 
-// <<<--- CREATE|UPDATE TEMPLATE WITH GROUPS ANT LINKED TEMPLATES --->>>
+// <<<--- CREATE|UPDATE TEMPLATE WITH GROUPS AND LINKED TEMPLATES --->>>
 		if($templateid){
 			if(isset($_REQUEST['clear_templates'])) {
 				foreach($_REQUEST['clear_templates'] as $id){
@@ -492,6 +492,7 @@ require_once('include/forms.inc.php');
 // get template hosts from db
 			$params = array('templateids' => $templateid,
 							'editable' => 1,
+							'templated_hosts' => 1,
 							'order' => 'host');
 			$hosts_linked_to = CHost::get($params);
 
@@ -528,7 +529,7 @@ require_once('include/forms.inc.php');
 		$template_tbl->addRow(array(S_NEW_GROUP, new CTextBox('newgroup', $newgroup)));
 
 // FORM ITEM : linked Hosts tween box [  ] [  ]
-		$options = array('editable' => 1, 'extendoutput' => 1, 'real_hosts' => 1);
+		$options = array('editable' => 1, 'extendoutput' => 1);
 		$twb_groups = CHostGroup::get($options);
 		$twb_groupid = get_request('twb_groupid', 0);
 		if($twb_groupid == 0){
@@ -545,6 +546,7 @@ require_once('include/forms.inc.php');
 // get hosts from selected twb_groupid combo
 		$params = array('groupids'=>$twb_groupid,
 						'order'=>'host',
+						'templated_hosts' => 1,
 						'editable' => 1,
 						'extendoutput' => 1);
 		$db_hosts = CHost::get($params);
@@ -556,6 +558,7 @@ require_once('include/forms.inc.php');
 // select selected hosts and add them
 		$params = array('hostids' => $hosts_linked_to,
 						'order' => 'host',
+						'templated_hosts' => 1,
 						'editable' => 1,
 						'extendoutput' => 1);
 		$db_hosts = CHost::get($params);
@@ -563,7 +566,7 @@ require_once('include/forms.inc.php');
 			$host_tb->addItem($hostid, get_node_name_by_elid($hostid).$db_host['host']);
 		}
 
-		$template_tbl->addRow(array(S_HOSTS, $host_tb->Get(S_HOSTS.SPACE.S_IN,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE,$cmbGroups))));
+		$template_tbl->addRow(array(S_HOSTS.'|'.S_TEMPLATES, $host_tb->Get(S_IN,array(S_OTHER.SPACE.'|'.SPACE.S_GROUP.SPACE,$cmbGroups))));
 
 // FORM ITEM : linked Template table
 		$template_table = new CTable();
