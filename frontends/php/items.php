@@ -222,8 +222,8 @@ include_once('include/page_header.php');
 	}
 	/* --->>> } SUBFILTERS */
 
-	if(isset($_REQUEST['hostid'])){
-		$ah = CHost::get(array('hostids' => $_REQUEST['hostid'], 'editable' => 1));
+	if(isset($_REQUEST['hostid']) && $_REQUEST['hostid'] > 0){
+		$ah = CHost::get(array('hostids' => $_REQUEST['hostid'], 'editable' => 1, 'templated_hosts' => 1));
 		if(!$ah){
 			access_deny();
 		}
