@@ -805,7 +805,7 @@ setGo: function(){
 		var countChecked = 0;
 
 		if(typeof(this.chkboxes[this.pageGoName]) == 'undefined'){
-			alert('CheckBoxes with name '+this.pageGoName+' doesn\'t exist');
+//			alert('CheckBoxes with name '+this.pageGoName+' doesn\'t exist');
 			return false;
 		}
 
