@@ -650,7 +650,7 @@ static void	process_active_checks(char *server, unsigned short port)
 	unsigned long	timestamp, logeventid;
 	unsigned short	severity;
 	char		key_severity[MAX_STRING_LEN], str_severity[32]/*for `regex_match_ex'*/;
-	char		key_source[HISTORY_LOG_SOURCE_LEN_MAX], *source = NULL;
+	char		key_source[MAX_STRING_LEN], *source = NULL;
 	char		key_logeventid[MAX_STRING_LEN], str_logeventid[8]/*for `regex_match_ex'*/;
 	unsigned int	codepage;
 #endif
