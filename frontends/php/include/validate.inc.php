@@ -257,6 +257,7 @@
 
 	function calc_exp($fields,$field,$expression){
 //SDI("$field - expression: ".$expression);
+
 		if(zbx_strstr($expression,'{}') && !isset($_REQUEST[$field]))
 			return FALSE;
 
@@ -450,8 +451,10 @@
 
 //echo "Field: $field<br>";
 
-		if($exception==NULL)	$except=FALSE;
-		else			$except=calc_exp($fields,$field,$exception);
+		if($exception==NULL)
+			$except=FALSE;
+		else
+			$except=calc_exp($fields,$field,$exception);
 
 		if($opt == O_MAND &&	$except)	$opt = O_NO;
 		else if($opt == O_OPT && $except)	$opt = O_MAND;
@@ -504,7 +507,10 @@
 		if($err != ZBX_VALID_OK)
 			return $err;
 
-		if(is_null($exception) || is_null($except)){
+//sdi($field. '| exception ='.$exception.' | except ='.$except.' | validation= '.$validation);
+
+		if(is_null($exception) || ($except == true)){
+
 			if(!$validation)	$valid = TRUE;
 			else			$valid = calc_exp($fields,$field,$validation);
 
