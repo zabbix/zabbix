@@ -637,10 +637,7 @@ static void	process_active_checks(char *server, unsigned short port)
 	register int	i, s_count, p_count;
 	char		**pvalue;
 	int		now, send_err = SUCCEED, ret;
-	unsigned long	timestamp, logeventid;
-	char		*source = NULL;
 	char		*value = NULL;
-	unsigned short	severity;
 	long		lastlogsize;
 	char		params[MAX_STRING_LEN];
 	char		filename[MAX_STRING_LEN];
@@ -649,11 +646,15 @@ static void	process_active_checks(char *server, unsigned short port)
 	/*which overrides CONFIG_MAX_LINES_PER_SECOND*/
 	char		maxlines_persec_str[16];
 	int		maxlines_persec;
-	char		key_severity[MAX_STRING_LEN];
-	char		key_source[MAX_STRING_LEN];
-	char		key_logeventid[MAX_STRING_LEN];
-	char		str_severity[32];	/*for `regex_match_ex'*/
-	char		str_logeventid[8];	/*for `regex_match_ex'*/
+#ifdef	_WINDOWS
+	unsigned long	timestamp, logeventid;
+	unsigned short	severity;
+	char		key_severity[MAX_STRING_LEN], str_severity[32]/*for `regex_match_ex'*/;
+	char		key_source[HISTORY_LOG_SOURCE_LEN_MAX], *source = NULL;
+	char		key_logeventid[MAX_STRING_LEN], str_logeventid[8]/*for `regex_match_ex'*/;
+	unsigned int	codepage;
+#endif
+	char		encoding[32];
 
 	AGENT_RESULT	result;
 
@@ -663,44 +664,46 @@ static void	process_active_checks(char *server, unsigned short port)
 
 	now = (int)time(NULL);
 
-	for(i=0; NULL != active_metrics[i].key && SUCCEED == send_err; i++)
+	for (i = 0; NULL != active_metrics[i].key && SUCCEED == send_err; i++)
 	{
-		if(active_metrics[i].nextcheck > now)			continue;
-		if(active_metrics[i].status != ITEM_STATUS_ACTIVE)	continue;
+		if (active_metrics[i].nextcheck > now)
+			continue;
+
+		if (active_metrics[i].status != ITEM_STATUS_ACTIVE)
+			continue;
 
 		/* Special processing for log files */
-		if(strncmp(active_metrics[i].key,"log[",4) == 0)
+		if (0 == strncmp(active_metrics[i].key, "log[", 4))
 		{
-			do{ /* simple try realization */
-				if (parse_command(active_metrics[i].key, NULL, 0, params, MAX_STRING_LEN) != 2) {
-					ret = FAIL;
-					break;				
-				}
-				
-				if (num_param( params ) > 3) {
-					ret = FAIL;
-					break;
-				}
+			ret = FAIL;
 
-				if (get_param(params, 1, filename, sizeof(filename)) != 0) {
-					ret = FAIL;
+			do { /* simple try realization */
+				if (parse_command(active_metrics[i].key, NULL, 0, params, MAX_STRING_LEN) != 2)
+					break;				
+
+				if (num_param( params ) > 4)
 					break;
-				}
+
+				if (get_param(params, 1, filename, sizeof(filename)) != 0)
+					break;
 
 				if (get_param(params, 2, pattern, sizeof(pattern)) != 0)
 					*pattern = '\0';
-				
-				if (get_param(params, 3, maxlines_persec_str, sizeof(maxlines_persec_str)) != 0 ||
+
+				if (get_param(params, 3, encoding, sizeof(encoding)) != 0)
+					*encoding = '\0';
+#ifdef _WINDOWS
+				if (FAIL == get_codepage(encoding, &codepage))
+					break;
+#endif
+				if (get_param(params, 4, maxlines_persec_str, sizeof(maxlines_persec_str)) != 0 ||
 						*maxlines_persec_str == '\0')
 					maxlines_persec = CONFIG_MAX_LINES_PER_SECOND;
 				else if ((maxlines_persec = atoi(maxlines_persec_str)) < MIN_VALUE_LINES ||
-						maxlines_persec > MAX_VALUE_LINES) {
-						ret = FAIL;
-						break;
-				}
-				
-				s_count = 0;
-				p_count = 0;
+						maxlines_persec > MAX_VALUE_LINES)
+					break;
+
+				s_count = p_count = 0;
 				lastlogsize = active_metrics[i].lastlogsize;
 				while (SUCCEED == (ret = process_log(filename, &lastlogsize, &value))) {
 					if (!value) /* EOF */
@@ -731,15 +734,14 @@ static void	process_active_checks(char *server, unsigned short port)
 						lastlogsize = active_metrics[i].lastlogsize;
 
 					/* Do not flood ZABBIX server if file grows too fast */					
-					if (s_count >= (maxlines_persec * active_metrics[i].refresh))	break;
+					if (s_count >= (maxlines_persec * active_metrics[i].refresh))
+						break;
 
 					/* Do not flood local system if file grows too fast */					
-					if (p_count >= (4 * maxlines_persec * active_metrics[i].refresh))	break;					
+					if (p_count >= (4 * maxlines_persec * active_metrics[i].refresh))
+						break;					
 				} //while processing a log
-
-				break;
-
-			}while(0); /* simple try realization */
+			} while(0); /* simple try realization */
 		
 			if( FAIL == ret ) {
 				active_metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
@@ -840,10 +842,12 @@ static void	process_active_checks(char *server, unsigned short port)
 					zbx_snprintf(str_logeventid, sizeof(str_logeventid), "%li", logeventid);
 					
 					if (SUCCEED == regexp_match_ex(regexps, regexps_num, value, pattern, ZBX_CASE_SENSITIVE) &&
-						SUCCEED == regexp_match_ex(regexps, regexps_num, str_severity, key_severity, ZBX_IGNORE_CASE) &&
-						0 == strcmp( key_source, source ) &&
-						SUCCEED == regexp_match_ex(regexps, regexps_num, str_logeventid, key_logeventid, ZBX_CASE_SENSITIVE)
-					) {						
+							SUCCEED == regexp_match_ex(regexps, regexps_num, str_severity,
+									key_severity, ZBX_IGNORE_CASE) &&
+							0 == strcmp(key_source, source) &&
+							SUCCEED == regexp_match_ex(regexps, regexps_num, str_logeventid,
+									key_logeventid, ZBX_CASE_SENSITIVE))
+					{						
 						send_err = process_value(
 									server,
 									port,
