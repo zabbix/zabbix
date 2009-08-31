@@ -73,6 +73,7 @@ include_once('include/page_header.php');
 
 		'newgroup'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
 		'templates'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	NULL),
+		'templates_rem'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
 		'clear_templates'=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,	NULL),
 
 		'useipmi'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,				NULL),
@@ -150,7 +151,7 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['macro_add'])){
 		$macro_new = get_request('macro_new');
 		$value_new = get_request('value_new', null);
-		
+
 		$currentmacros = array_keys(get_request('macros', array()));
 		
 		if(!CUserMacro::validate($macro_new)){
@@ -173,15 +174,13 @@ include_once('include/page_header.php');
 		}
 	}
 /* UNLINK HOST */
-	if((isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear']))){
+	if(isset($_REQUEST['templates_rem']) && (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear']))){
 		$_REQUEST['clear_templates'] = get_request('clear_templates', array());
-		if(isset($_REQUEST['unlink'])){
-			$unlink_templates = array_keys($_REQUEST['unlink']);
+		$unlink_templates = array_keys($_REQUEST['templates_rem']);
+		if(isset($_REQUEST['unlink_and_clear'])){
+			$_REQUEST['clear_templates'] = zbx_array_merge($_REQUEST['clear_templates'], $unlink_templates);
 		}
-		else{
-			$unlink_templates = array_keys($_REQUEST['unlink_and_clear']);
-			$_REQUEST['clear_templates'] = zbx_array_merge($_REQUEST['clear_templates'],$unlink_templates);
-		}
+
 		foreach($unlink_templates as $id)
 			unset($_REQUEST['templates'][$id]);
 	}
