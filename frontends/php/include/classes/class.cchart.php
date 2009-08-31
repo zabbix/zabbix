@@ -263,7 +263,7 @@ class CChart extends CGraphDraw{
 // End
 		imagestringup($this->im,
 							1,
-							$this->sizeX+3,
+							$this->sizeX+$this->shiftXleft-3,
 							$this->sizeY+$this->shiftY+57,
 							date('m.d H:i',$this->to_time),
 							$this->getColor('Dark Red No Alpha')
@@ -299,6 +299,7 @@ class CChart extends CGraphDraw{
 			$this->to_time=$now-3600*$this->from;
 			$this->from_time=$this->to_time-$this->period;
 		}
+
 		$from = $this->from_time;
 		$max_time = $this->to_time;
 

@@ -310,7 +310,7 @@
 					$result |= (bool) $newtrigid;
 				}
 
-				replace_triggers_depenedencies($new_triggerids);
+//				replace_triggers_depenedencies($new_triggerids);
 			}
 
 			$result = DBend($result);
