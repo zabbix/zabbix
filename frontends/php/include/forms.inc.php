@@ -2252,17 +2252,13 @@
 		global $USER_DETAILS;
 
 		$frmItem = new CFormTable(S_ITEM,null,'post');
-		$frmItem->SetHelp('web.items.item.php');
-		$frmItem->SetTitle(S_MASS_UPDATE);
+		$frmItem->setHelp('web.items.item.php');
+		$frmItem->setTitle(S_MASS_UPDATE);
 
-		$frmItem->addVar('form_mass_update',1);
+		$frmItem->addVar('massupdate',1);
 
 		$frmItem->addVar('group_itemid',get_request('group_itemid',array()));
 		$frmItem->addVar('config',get_request('config',0));
-		if($_REQUEST['groupid']>0)
-			$frmItem->addVar('groupid',$_REQUEST['groupid']);
-
-		$frmItem->addVar('hostid',$_REQUEST['hostid']);
 
 		$description	= get_request('description'	,'');
 		$key		= get_request('key'		,'');
@@ -2434,11 +2430,17 @@
 			S_ORIGINAL), S_ALLOWED_HOSTS), new CTextBox('trapper_hosts',$trapper_hosts,40));
 
 		$cmbApps = new CListBox('applications[]',$applications,6);
-		$cmbApps->addItem(0,"-".S_NONE."-");
-		$db_applications = DBselect("SELECT DISTINCT applicationid,name FROM applications".
-			" WHERE hostid=".$_REQUEST['hostid']." order by name");
-		while($db_app = DBfetch($db_applications)){
-			$cmbApps->addItem($db_app["applicationid"],$db_app["name"]);
+		$cmbApps->addItem(0,'-'.S_NONE.'-');
+		
+		if(isset($_REQUEST['hostid'])){
+			$sql = 'SELECT applicationid,name '.
+				' FROM applications '.
+				' WHERE hostid='.$_REQUEST['hostid'].
+				' ORDER BY name';
+			$db_applications = DBselect($sql);
+			while($db_app = DBfetch($db_applications)){
+				$cmbApps->addItem($db_app["applicationid"],$db_app["name"]);
+			}
 		}
 		$frmItem->addRow(array( new CVisibilityBox('applications_visible', get_request('applications_visible'), 'applications[]',
 			S_ORIGINAL), S_APPLICATIONS),$cmbApps);
@@ -5673,28 +5675,6 @@
 		$cmbStatus->addItem(HOST_STATUS_NOT_MONITORED,	S_NOT_MONITORED);
 		$host_tbl->addRow(array(S_STATUS,$cmbStatus));
 
-		$template_table = new CTable();
-		$template_table->SetCellPadding(0);
-		$template_table->SetCellSpacing(0);
-
-		foreach($templates as $id => $temp_name){
-			$frmHost->addVar('templates['.$id.']',$temp_name);
-			$template_table->addRow(array(
-					$temp_name,
-					new CButton('unlink['.$id.']',S_UNLINK),
-					isset($original_templates[$id]) ? new CButton('unlink_and_clear['.$id.']',S_UNLINK_AND_CLEAR) : SPACE
-					)
-				);
-		}
-
-		$host_tbl->addRow(array(S_LINK_WITH_TEMPLATE, array($template_table,
-				new CButton('add_template',S_ADD,
-					"return PopUp('popup.php?dstfrm=".$frmHost->GetName().
-					"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
-					url_param($templates,false,'existed_templates')."',450,450)",
-					'T')
-				)));
-
 		$host_tbl->addRow(array(S_USEIPMI, new CCheckBox('useipmi', $useipmi, 'submit()')));
 
 		if($useipmi == 'yes'){
@@ -5818,6 +5798,44 @@
 		$host_wdgt->addItem($host_tbl);
 // } HOST WIDGET
 
+// TEMPLATES{
+		$template_tbl = new CTableInfo();
+		
+		$template_list_tbl = new CTable(S_NO_TEMPLATES_LINKED);
+
+		foreach($templates as $id => $temp_name){
+			$frmHost->addVar('templates['.$id.']',$temp_name);
+			$template_list_tbl->addRow(	array(
+					new CCheckBox('templates_rem['.$id.']', 'no', null, $id), 
+					$temp_name
+					)
+			);
+		}
+
+		$template_tbl->addRow($template_list_tbl);
+		
+		$footer = new CCol(array(
+			new CButton('add_template',S_ADD,
+					"return PopUp('popup.php?dstfrm=".$frmHost->getName().
+					"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
+					url_param($templates,false,'existed_templates')."',450,450)",
+					'T'),
+			SPACE,
+			new CButton('unlink',S_UNLINK),
+			SPACE,
+			new CButton('unlink_and_clear',S_UNLINK_AND_CLEAR)
+		));
+//		$footer->setAttribute('colspan', 2);
+		
+		$template_tbl->setFooter($footer);
+
+		$template_wdgt = new CWidget();
+		$template_wdgt->setClass('header');
+		$template_wdgt->addHeader(S_LINKED_TEMPLATES);
+		$template_wdgt->addItem($template_tbl);
+		
+// } TEMPLATES
+
 
 // MACROS WIDGET {
 		$macros_wdgt = get_macros_widget($_REQUEST['hostid']);
@@ -5888,6 +5906,7 @@
 		$right_table = new CTable();
 		$right_table->setCellPadding(4);
 		$right_table->setCellSpacing(4);
+		$right_table->addRow($template_wdgt);
 		$right_table->addRow($macros_wdgt);
 		$right_table->addRow($profile_wdgt);
 		$right_table->addRow($ext_profile_wdgt);
@@ -6851,18 +6870,18 @@
 	return $tblExpFooter;
 	}
 
-	/**
-	* returns Ctable object with host header
-	*
-	* {@source}
-	* @access public
-	* @static
-	* @version 1
-	*
-	* @param string $hostid
-	* @param array $elemnts [items, triggers, graphs, applications]
-	* @return object
-	*/
+/**
+* returns Ctable object with host header
+*
+* {@source}
+* @access public
+* @static
+* @version 1
+*
+* @param string $hostid
+* @param array $elemnts [items, triggers, graphs, applications]
+* @return object
+*/
 	function get_header_host_table($hostid, $elements){
 		$header_host_opt = array(
 			'hostids' => $hostid,
@@ -6965,7 +6984,7 @@
 	}
 
 	
-	// if $hostid = null => global macro
+// if $hostid = null => global macro
 	function get_macros_widget($hostid = null){
 	
 		if(is_null($hostid)){
@@ -6984,33 +7003,37 @@
 		$macros_tbl = new CTableInfo();
 		
 		$macros_list_tbl = new CTable(S_NO_MACROS_DEFINED);
-		foreach($macros as $macro){
+		foreach($macros as $macroid => $macro){
+			$macros_list_tbl->addItem(new CVar('macros['.$macro['macro'].']',$macro));
 			$macros_list_tbl->addRow(array(
 				new CCheckBox("macros_rem[{$macro['macro']}]", 'no', null, $macro['macro']), 
-				array(
-					new CTextBox("macros[{$macro['macro']}][macro]", $macro['macro'], 20, true),
-					SPACE.RARR.SPACE,
-					new CTextBox("macros[{$macro['macro']}][value]", $macro['value'], 20, true))
+				$macro['macro'],
+				SPACE.RARR.SPACE,
+				$macro['value']
 			));
 		}
 		
+		$add_macro = array(
+			S_NEW,
+			new CTextBox('macro_new', get_request('macro_new', ''), 10),
+			SPACE.RARR.SPACE,
+			new CTextBox('value_new', get_request('value_new', ''), 10)
+		);
+		
+		$macros_list_tbl->addRow($add_macro);
+
+
 		$delete_btn = new CButton('macros_del', S_DELETE_SELECTED);
 		if(count($macros) == 0){
 			$delete_btn->setAttribute('disabled', 'disabled');
 		}
 		
-		$macros_tbl->addRow(array(S_MACROS, $macros_list_tbl));
-		$macros_tbl->addRow(array(S_NEW_MACRO, array(
-			new CTextBox('macro_new', get_request('macro_new', ''), 10),
-			new CSpan(RARR, 'rarr'),
-			new CTextBox('value_new', get_request('value_new', ''), 10),
-			SPACE,
-			new CButton('macro_add', S_ADD),
-			SPACE, 
-			new CSpan('|', 'divider'),
-			SPACE,
-			$delete_btn
-		)));
+		$macros_tbl->addRow($macros_list_tbl);
+		
+		$footer = new CCol(array(new CButton('macro_add', S_ADD), SPACE, $delete_btn));
+		$footer->setAttribute('colspan', 1);
+		
+		$macros_tbl->setFooter($footer);
 
 		$macros_wdgt = new CWidget();
 		$macros_wdgt->setClass('header');

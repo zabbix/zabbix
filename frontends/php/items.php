@@ -379,6 +379,7 @@ include_once('include/page_header.php');
 
 	}
 	else if(isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])){
+
 		$delay_flex = get_request('delay_flex',array());
 		$db_delay_flex = '';
 		foreach($delay_flex as $val)
@@ -428,7 +429,7 @@ include_once('include/page_header.php');
 		$result = DBend($result);
 
 		show_messages($result, S_ITEMS_UPDATED);
-		unset($_REQUEST['group_itemid'], $_REQUEST['massupdate'], $_REQUEST['update']);
+		unset($_REQUEST['group_itemid'], $_REQUEST['massupdate'], $_REQUEST['update'], $_REQUEST['form']);
 	}
 	else if(isset($_REQUEST['register'])){
 
@@ -650,7 +651,6 @@ include_once('include/page_header.php');
 
 ?>
 <?php
-
 	$hostid = get_request('form_hostid', get_request('hostid', 0));	
 	if(!zbx_empty($_REQUEST['filter_host'])){
 		$hostid = CHost::getId(array('host' => $_REQUEST['filter_host']));

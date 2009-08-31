@@ -1055,11 +1055,9 @@
 			new CTextBox('value_new', get_request('value_new', ''), 10),
 			SPACE,
 			new CButton('macro_add', S_ADD),
-			SPACE, 
-			new CSpan('|', 'divider'),
-			SPACE,
-			$delete_btn
 		));
+		
+		$frmGUI->addItemToBottomRow($delete_btn);
 		
 		$cnf_wdgt->addItem($frmGUI);
 		
@@ -1069,6 +1067,6 @@
 ?>
 <?php
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
 
 ?>
