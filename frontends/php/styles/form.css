@@ -31,8 +31,9 @@ select{
 	background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left;
 	border: 1px solid #808080;
 	height: 16px;
-	padding: 0px 5px 0px 5px;
+	padding:0px 4px 0px 4px;
 	cursor: pointer;
+	margin-left: 4px;
 }
 
 .button:hover{

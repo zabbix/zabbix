@@ -166,20 +166,12 @@ class CItem {
 		if(!is_null($options['hostids'])){
 			zbx_value2array($options['hostids']);
 
-			if(!is_null($options['extendoutput'])){
-				$sql_parts['select']['hostid'] = 'i.hostid';
-			}
-
 			$sql_parts['where'][] = DBcondition('i.hostid', $options['hostids']);
 		}
 
 // itemids
 		if(!is_null($options['itemids'])){
 			zbx_value2array($options['itemids']);
-
-			if(!is_null($options['extendoutput'])){
-				$sql_parts['select']['itemid'] = 'i.itemid';
-			}
 
 			$sql_parts['where'][] = DBcondition('i.itemid', $options['itemids']);
 		}

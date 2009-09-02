@@ -445,7 +445,7 @@ include_once('include/page_header.php');
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "group_groupid";');
 
-		$footer = get_table_header(array($goBox, SPACE, $goButton));
+		$footer = get_table_header(array($goBox, $goButton));
 //----
 
 // PAGING FOOTER

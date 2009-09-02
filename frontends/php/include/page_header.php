@@ -270,8 +270,9 @@ COpt::compare_files_with_menu($ZBX_MENU);
 				foreach($available_nodes as $num => $node) {
 					$checked = uint_in_array($node['nodeid'], $ZBX_VIEWED_NODES['nodeids']);
 					$combo_select_node = new CCheckbox('selected_nodes['.$node['nodeid'].']', $checked, null, $node['nodeid']);
+					$combo_select_node->setAttribute('style','margin: 1px 4px 2px 4px;');
 
-					// If not exist parent for node, link it to root (0)
+// If not exist parent for node, link it to root (0)
 					if(!isset($available_nodes[$node['masterid']])) $node['masterid'] = 0;
 
 					$node_tree[$node['nodeid']] = array(
@@ -298,7 +299,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 
 
 				if(!is_null($combo_node_list))
-					$node_form->addItem(array(new CSpan(S_CURRENT_NODE,'textcolorstyles'), $combo_node_list));
+					$node_form->addItem(array(new CSpan(S_CURRENT_NODE.SPACE,'textcolorstyles'), $combo_node_list));
 				$node_form->addItem($button_show_tree);
 				$node_form->addItem($div_node_tree);
 				unset($combo_node_list);
