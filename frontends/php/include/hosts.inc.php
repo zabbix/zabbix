@@ -1401,69 +1401,86 @@ return $result;
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *       If applicationid is NULL add application, in other cases update
 	 */
-	function db_save_application($name,$hostid,$applicationid=null,$templateid=0){
+	function db_save_application($name, $hostid, $applicationid=null, $templateid=0){
 		if(!is_string($name)){
-			error("Incorrect parameters for 'db_save_application'");
+			error('Incorrect parameters for "db_save_application"');
 			return false;
 		}
-
-		if(is_null($applicationid))
-			$result = DBselect('SELECT * FROM applications WHERE name='.zbx_dbstr($name).' AND hostid='.$hostid);
-		else
-			$result = DBselect('SELECT * '.
-						' FROM applications '.
-						' WHERE name='.zbx_dbstr($name).
-							' AND hostid='.$hostid.
-							' AND applicationid<>'.$applicationid);
-
-		$db_app = DBfetch($result);
-		if($db_app && $templateid==0){
-			error('Application "'.$name.'" already exists');
-			return false;
-		}
-
-		if($db_app && $applicationid!=null){ // delete old application with same name
-			delete_application($db_app["applicationid"]);
-		}
-
-		if($db_app && $applicationid==null){ // if found application with same name update them, adding not needed
-			$applicationid = $db_app["applicationid"];
-		}
-
+		
+		
 		$host = get_host_by_hostid($hostid);
+		
+		$hostids = array();
+		$db_hosts = get_hosts_by_templateid($host['hostid']);
+		while($db_host = DBfetch($db_hosts)){
+			$hostids[] = $db_host['hostid'];
+		}
+		$sql = 'SELECT applicationid 
+			FROM applications 
+			WHERE name='.zbx_dbstr($name).' 
+				AND '.DBcondition('hostid', $hostids);
+		$lower_app = DBfetch(DBselect($sql));
+		if($lower_app){
+			error("Application '$name' already exist in linked hosts");
+			return false;
+		}
+		
+		
+		$sql = 'SELECT applicationid 
+			FROM applications 
+			WHERE name='.zbx_dbstr($name).' 
+				AND hostid='.$hostid;
+		if(!is_null($applicationid)){
+			$sql .= ' AND applicationid<>'.$applicationid;
+		}
+		$db_app = DBfetch(DBselect($sql));
+
+		if($db_app && $templateid == 0){
+			error("Application '$name' already exists");
+			return false;
+		}
+
+		if($db_app && !is_null($applicationid)){ // delete old application with same name
+			delete_application($db_app['applicationid']);
+		}
+
+		if($db_app && is_null($applicationid)){ // if found application with same name update them, adding not needed
+			$applicationid = $db_app['applicationid'];
+		}
+		
 
 		if(is_null($applicationid)){
-			$applicationid_new = get_dbid('applications','applicationid');
+			$applicationid_new = get_dbid('applications', 'applicationid');
 
-			$sql = 'INSERT INTO applications (applicationid,name,hostid,templateid) '.
-					" VALUES ($applicationid_new,".zbx_dbstr($name).",$hostid,$templateid)";
+			$sql = 'INSERT INTO applications (applicationid, name, hostid, templateid) '.
+				" VALUES ($applicationid_new, ".zbx_dbstr($name).", $hostid, $templateid)";
 			if($result = DBexecute($sql)){
-				info("Added new application ".$host["host"].":$name");
+				info("Added new application {$host['host']}:$name");
 			}
 		}
 		else{
 			$old_app = get_application_by_applicationid($applicationid);
-			if($result = DBexecute('UPDATE applications '.
-								' SET name='.zbx_dbstr($name).',hostid='.$hostid.',templateid='.$templateid.
-                                ' WHERE applicationid='.$applicationid))
-					info("Updated application ".$host["host"].":".$old_app["name"]);
+			$result = DBexecute('UPDATE applications SET name='.zbx_dbstr($name).', hostid='.$hostid.', templateid='.$templateid.
+				' WHERE applicationid='.$applicationid);
+			if($result)
+				info("Updated application {$host['host']}:{$old_app['name']}");
 		}
 
-		if(!$result)	return $result;
+		if(!$result) return $result;
 
 		if(is_null($applicationid)){// create application for childs
 			$applicationid = $applicationid_new;
 
 			$db_childs = get_hosts_by_templateid($hostid);
 			while($db_child = DBfetch($db_childs)){// recursion
-				$result = add_application($name,$db_child["hostid"],$applicationid);
+				$result = add_application($name, $db_child['hostid'], $applicationid);
 				if(!$result) break;
 			}
 		}
 		else{
 			$db_applications = get_applications_by_templateid($applicationid);
 			while($db_app = DBfetch($db_applications)){// recursion
-				$result = update_application($db_app["applicationid"],$name,$db_app["hostid"],$applicationid);
+				$result = update_application($db_app['applicationid'], $name, $db_app['hostid'], $applicationid);
 				if(!$result) break;
 			}
 		}
