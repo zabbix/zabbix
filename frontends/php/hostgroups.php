@@ -295,7 +295,7 @@ include_once('include/page_header.php');
 
 		$table = new CTableInfo(S_NO_HOST_GROUPS_DEFINED);
 		$table->setHeader(array(
-					new CCheckBox('all_groups', NULL, "checkAll('".$form->GetName()."','all_groups','groups');"),
+					new CCheckBox('all_groups', NULL, "checkAll('".$form->getName()."','all_groups','groups');"),
 					make_sorting_header(S_NAME,'name'),
 					' # ',
 					S_MEMBERS
@@ -368,7 +368,7 @@ include_once('include/page_header.php');
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "groups";');
 
-		$footer = get_table_header(array($goBox, SPACE, $goButton));
+		$footer = get_table_header(array($goBox, $goButton));
 //----
 
 // PAGING FOOTER

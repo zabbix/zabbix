@@ -818,9 +818,9 @@ setGo: function(){
 
 				if(box.checked){
 					if(!is_null(crow)){
-						var oldClass = crow.getAttribute('oldClass');
-						if(is_null(oldClass))
-							crow.setAttribute('oldClass',crow.className);
+						var origClass = crow.getAttribute('origClass');
+						if(is_null(origClass))
+							crow.setAttribute('origClass',crow.className);
 							
 						crow.className = 'selected';
 					}
@@ -829,11 +829,11 @@ setGo: function(){
 				}
 				else{
 					if(!is_null(crow)){
-						var oldClass = crow.getAttribute('oldClass');
+						var origClass = crow.getAttribute('origClass');
 
-						if(!is_null(oldClass)){
-							crow.className = oldClass;
-							crow.removeAttribute('oldClass');
+						if(!is_null(origClass)){
+							crow.className = origClass;
+							crow.removeAttribute('origClass');
 						}
 					}
 				}

@@ -47,9 +47,10 @@
 			}
 		}
 
+		$post_script.= 'chkbxRange.init();';
 		$post_script.='}'."\n";
 //		$post_script.= 'try{ chkbxRange.init(); } catch(e){ throw("Checkbox extension failed!");}';
-		$post_script.= 'chkbxRange.init();';
+
 
 		insert_js($post_script);
 
