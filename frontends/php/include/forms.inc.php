@@ -269,10 +269,11 @@
 		switch($new_check_type){
 			case SVC_SNMPv1:
 			case SVC_SNMPv2:
-				$external_param = zbx_array_merge($external_param, array(BR(), S_SNMP_COMMUNITY, SPACE,
+				$external_param = array_merge($external_param, array(BR(), S_SNMP_COMMUNITY, SPACE,
 						new CTextBox('new_check_snmp_community', $new_check_snmp_community)));
-				$external_param = zbx_array_merge($external_param, array(BR(), S_SNMP_OID, SPACE,
+				$external_param = array_merge($external_param, array(BR(), S_SNMP_OID, SPACE,
 						new CTextBox('new_check_key', $new_check_key), BR()));
+
 				$form->addVar('new_check_snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV);
 				$form->addVar('new_check_snmpv3_securityname', '');
 				$form->addVar('new_check_snmpv3_authpassphrase', '');
@@ -281,9 +282,9 @@
 			case SVC_SNMPv3:
 				$form->addVar('new_check_snmp_community', '');
 
-				$external_param = zbx_array_merge($external_param, array(BR(), S_SNMP_OID, SPACE,
+				$external_param = array_merge($external_param, array(BR(), S_SNMP_OID, SPACE,
 						new CTextBox('new_check_key', $new_check_key)));
-				$external_param = zbx_array_merge($external_param, array(BR(), S_SNMPV3_SECURITY_NAME, SPACE,
+				$external_param = array_merge($external_param, array(BR(), S_SNMPV3_SECURITY_NAME, SPACE,
 						new CTextBox('new_check_snmpv3_securityname', $new_check_snmpv3_securityname)));
 
 				$cmbSecLevel = new CComboBox('new_check_snmpv3_securitylevel', $new_check_snmpv3_securitylevel);
@@ -291,11 +292,11 @@
 				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,'AuthNoPriv');
 				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,'AuthPriv');
 
-				$external_param = zbx_array_merge($external_param, array(BR(), S_SNMPV3_SECURITY_LEVEL, SPACE,
+				$external_param = array_merge($external_param, array(BR(), S_SNMPV3_SECURITY_LEVEL, SPACE,
 						$cmbSecLevel));
-				$external_param = zbx_array_merge($external_param, array(BR(), S_SNMPV3_AUTH_PASSPHRASE, SPACE,
+				$external_param = array_merge($external_param, array(BR(), S_SNMPV3_AUTH_PASSPHRASE, SPACE,
 						new CTextBox('new_check_snmpv3_authpassphrase', $new_check_snmpv3_authpassphrase)));
-				$external_param = zbx_array_merge($external_param, array(BR(), S_SNMPV3_PRIV_PASSPHRASE, SPACE,
+				$external_param = array_merge($external_param, array(BR(), S_SNMPV3_PRIV_PASSPHRASE, SPACE,
 						new CTextBox('new_check_snmpv3_privpassphrase', $new_check_snmpv3_privpassphrase), BR()));
 				break;
 			case SVC_AGENT:
@@ -304,7 +305,7 @@
 				$form->addVar('new_check_snmpv3_securityname', '');
 				$form->addVar('new_check_snmpv3_authpassphrase', '');
 				$form->addVar('new_check_snmpv3_privpassphrase', '');
-				$external_param = zbx_array_merge($external_param, array(BR(), S_KEY, SPACE,
+				$external_param = array_merge($external_param, array(BR(), S_KEY, SPACE,
 						new CTextBox('new_check_key', $new_check_key), BR()));
 				break;
 			case SVC_ICMPPING:
