@@ -89,8 +89,11 @@ class CTable extends CTag{
 			$item = new CRow($item,$rowClass);
 		}
 		if(!isset($item->attributes['class'])){
-			$item->setClass(($this->rownum % 2)?$this->oddRowClass:$this->evenRowClass);
+			$class = ($this->rownum % 2)?$this->oddRowClass:$this->evenRowClass;
+			$item->setClass($class);
+			$item->setAttribute('origClass', $class);
 		}
+
 	return $item;
 	}
 

@@ -615,7 +615,7 @@
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "g_triggerid";');
 
-		$footer = get_table_header(array($goBox, SPACE, $goButton));
+		$footer = get_table_header(array($goBox, $goButton));
 //----
 
 // PAGING FOOTER

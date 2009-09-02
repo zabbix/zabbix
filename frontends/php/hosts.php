@@ -628,7 +628,6 @@ include_once('include/page_header.php');
 
 	$frmForm->addVar('groupid',get_request('groupid',0));
 	if(!isset($_REQUEST['form'])){
-//		$frmForm->addItem(SPACE);
 		$frmForm->addItem(new CButton('form',S_CREATE_HOST));
 	}
 
@@ -802,7 +801,7 @@ include_once('include/page_header.php');
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
 
-		$footer = get_table_header(array($goBox, SPACE, $goButton));
+		$footer = get_table_header(array($goBox, $goButton));
 //----
 
 // PAGING FOOTER
