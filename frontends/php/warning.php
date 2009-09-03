@@ -55,8 +55,6 @@ include_once('include/page_header.php');
 
 unset($USER_DETAILS);
 
-	insert_showhint_javascript();
-
 	$table = new CTable(null, 'warning');
 	$table->setAlign('center');
 	$table->setAttribute('style','width: 480px; margin-top: 100px;');

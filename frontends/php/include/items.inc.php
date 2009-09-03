@@ -1132,7 +1132,7 @@ COpt::profiling_start('prepare table');
 		if($view_style == STYLE_TOP){
 			$header=array(new CCol(S_ITEMS,'center'));
 			foreach($hosts as $hostname){
-				$header=zbx_array_merge($header,array(new CImg('vtext.php?text='.$hostname)));
+				$header = array_merge($header,array(new CImg('vtext.php?text='.$hostname)));
 			}
 
 			$table->SetHeader($header,'vertical_header');
@@ -1149,7 +1149,7 @@ COpt::profiling_start('prepare table');
 		else{
 			$header=array(new CCol(S_HOSTS,'center'));
 			foreach($items as $descr => $ithosts){
-				$header=zbx_array_merge($header,array(new CImg('vtext.php?text='.$descr)));
+				$header = array_merge($header,array(new CImg('vtext.php?text='.$descr)));
 			}
 
 			$table->SetHeader($header,'vertical_header');
@@ -1196,7 +1196,7 @@ COpt::profiling_stop('prepare table');
 			switch($ithosts[$hostname]['value_type']){
 				case ITEM_VALUE_TYPE_UINT64:
 				case ITEM_VALUE_TYPE_FLOAT:
-					$it_ov_menu = zbx_array_merge(array(
+					$it_ov_menu = array_merge(array(
 						/* name, url, (target [tw], statusbar [sb]), css, submenu */
 						array(S_GRAPHS, null,  null,
 							array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))

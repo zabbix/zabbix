@@ -23,12 +23,12 @@ var IE = (agt.indexOf("msie") != -1) && document.all && !OP;
 var IE8 = (agt.indexOf("msie 8.0") != -1) && document.all && !OP;
 var IE7 = IE && !IE8 && document.all && !OP;
 var IE6 = (agt.indexOf("msie 6.0") != -1) && document.all && !OP;
-var CR = (agt.indexOf('chrome') != -1);
+var CR = (agt.indexOf("chrome") != -1);
 var SF = (agt.indexOf("safari") != -1) && !CR;
 var WK = (agt.indexOf("applewebkit") != -1);
 var KQ = (agt.indexOf("khtml") != -1) && !WK;
 var GK = (agt.indexOf("gecko") != -1) && !KQ && !WK;
-var MC = (agt.indexOf('mac') != -1)
+var MC = (agt.indexOf("mac") != -1)
 
 function checkBrowser(){
  if(OP) alert('Opera');
@@ -108,26 +108,27 @@ function SDI(msg){
 //		new Draggable(div_help,{});
 	}
 	
+	var pre = document.createElement('pre');
+	pre.appendChild(document.createTextNode(msg));
+	
 	div_help.appendChild(document.createTextNode("DEBUG INFO: "));
 	div_help.appendChild(document.createElement("br"));
-	div_help.appendChild(document.createTextNode(msg));
+	div_help.appendChild(pre);
 	div_help.appendChild(document.createElement("br"));
 	div_help.appendChild(document.createElement("br"));
 }
-
-/*
-function SDI(msg){
-	alert("DEBUG INFO: " + msg);
-}
-//*/
 
 function SDJ(obj){
 	var debug = '';
-	for(var key in obj) {
+//	debug = obj.toSource();
+//	SDI(debug);
+//return null;
+
+	for(var key in obj){
 		var value = obj[key];
-		debug+=key+': '+value+'\n';
+		debug+=key+': '+value+'  key: '+typeof(key)+'\n';
 	}
-	SDI('\n'+debug);
+	SDI(debug);
 }
 
 /// Alpha-Betic sorting
@@ -630,261 +631,190 @@ function insert_sizeable_graph(graph_id,url){
 	document.write('<img id="'+graph_id+'" src="'+url+'" alt="graph" /><br />');
 }
 
+
 /************************************************************************************/
-/*				MAIN MENU stuff						*/
+/*										IE 6 FIXES 									*/
 /************************************************************************************/
-// Author: Aly
 
-var MMenu = {
-menus:			{'empty': 0, 'view': 0, 'cm': 0, 'reports': 0, 'config': 0, 'admin': 0},
-def_label:		null,
-sub_active: 	false,
-timeout_reset:	null,
-timeout_change:	null,
-
-mouseOver: function(show_label){
-	clearTimeout(this.timeout_reset);
-	this.timeout_change = setTimeout('MMenu.showSubMenu("'+show_label+'")', 200);
-},
-
-submenu_mouseOver: function(){
-	clearTimeout(this.timeout_reset);
-	clearTimeout(this.timeout_change);
-},
-
-mouseOut: function(){
-	clearTimeout(this.timeout_change);
-	this.timeout_reset = setTimeout('MMenu.showSubMenu("'+this.def_label+'")', 2500);
-},
-
-showSubMenu: function(show_label){
-	var menu_div  = $('sub_'+show_label);
-	if(!is_null(menu_div)){
-		$(show_label).className = 'active';
-		menu_div.show();
-		for(var key in this.menus){
-			if(key == show_label) continue;
-
-			var menu_cell = $(key);
-			if(!is_null(menu_cell)) menu_cell.className = '';
-
-			var sub_menu_cell = $('sub_'+key);
-			if(!is_null(sub_menu_cell)) sub_menu_cell.hide();
-		}
-	}
-}
+function hidePopupDiv(iFrameID){
+	if(!IE6) return;
+	$(iFrameID).hide();
 }
 
+function showPopupDiv(divID,iFrameID){
+	if(!IE6) return;
 
-/************************************************************************************/
-/*			Automatic checkbox range selection 				*/
-/************************************************************************************/
-// Author: Aly
+	var iFrame = $(iFrameID);
+	var divPopup = $(divID);
 
-var chkbxRange = {
-startbox:			null,			// start checkbox obj
-startbox_name: 		null,			// start checkbox name
-chkboxes:			new Array(),	// ckbx list
-pageGoName:			null,			// wich checkboxes should be counted by Go button
-pageGoCount:		0,				// selected checkboxes
-
-init: function(){
-	var chk_bx = document.getElementsByTagName('input');
-
-	for(var i=0; i < chk_bx.length; i++){
-		if((typeof(chk_bx[i]) != 'undefined') && (chk_bx[i].type.toLowerCase() == 'checkbox')){
-			this.implement(chk_bx[i]);
-		}
+	if(is_null(iFrame)){
+		var iFrame = document.createElement('iframe');
+		document.body.appendChild(iFrame);
+		
+		//Match IFrame position with divPopup
+		iFrame.setAttribute('id',iFrameID);
+		iFrame.style.position='absolute';
 	}
 	
-	var goButton = $('goButton');
-	if(!is_null(goButton))
-		addListener(goButton, 'click', this.submitGo.bindAsEventListener(this), false);
-},
-
-implement: function(obj){
-	var obj_name = obj.name.split('[')[0];
-
-	if(typeof(this.chkboxes[obj_name]) == 'undefined') this.chkboxes[obj_name] = new Array();
-	this.chkboxes[obj_name].push(obj);
-
-	addListener(obj, 'click', this.check.bindAsEventListener(this), false);
-	if(obj.checked){
-		this.setGo();
-	}
-},
-
-check: function(e){
-	var e = e || window.event;
-	var obj = eventTarget(e);
-
-	if((typeof(obj) == 'undefined') || (obj.type.toLowerCase() != 'checkbox')){
-		return true;
+	if(divPopup.style.display == 'none'){
+		iFrame.style.display = 'none';
+		return;
 	}
 
-	this.setGo();
+	//Increase default zIndex of div by 1, so that DIV appears before IFrame
+	divPopup.style.zIndex=divPopup.style.zIndex+1;
+//	iFrame.style.zIndex = 1;
 
-	if(!(e.ctrlKey || e.shiftKey)) return true;
 
-	var obj_name = obj.name.split('[')[0];
+	iFrame.style.display = 'block';
+	iFrame.style.left = divPopup.offsetLeft + 'px';
+	iFrame.style.top = divPopup.offsetTop + 'px';
+	iFrame.style.width = divPopup.offsetWidth + 'px';
+	iFrame.style.height = divPopup.offsetHeight + 'px';
+}
 
-	if(!is_null(this.startbox) && (this.startbox_name == obj_name) && (obj.name != this.startbox.name)){
-		var chkbx_list = this.chkboxes[obj_name];
-		var flag = false;
 
-		for(var i=0; i < chkbx_list.length; i++){
-			if(typeof(chkbx_list[i]) !='undefined'){
-//alert(obj.name+' == '+chkbx_list[i].name);
-				if(flag){
-					chkbx_list[i].checked = this.startbox.checked;
-				}
+/************************************************************************************/
+/*								ZABBIX AJAX REQUESTS 								*/
+/************************************************************************************/
 
-				if(obj.name == chkbx_list[i].name) break;
-				if(this.startbox.name == chkbx_list[i].name) flag = true;
-			}
-		}
-
-		if(flag){
-			this.startbox = null;
-			this.startbox_name = null;
-
-			this.setGo();
-			return true;
-		}
-		else{
-			for(var i=chkbx_list.length-1; i >= 0; i--){
-				if(typeof(chkbx_list[i]) !='undefined'){
-//alert(obj.name+' == '+chkbx_list[i].name);
-					if(flag){
-						chkbx_list[i].checked = this.startbox.checked;
-					}
-
-					if(obj.name == chkbx_list[i].name){
-						this.startbox = null;
-						this.startbox_name = null;
-
-						this.setGo();
-						return true;
-					}
-
-					if(this.startbox.name == chkbx_list[i].name) flag = true;
-				}
-			}
-		}
-
-	}
-	else{
-		if(!is_null(this.startbox)) this.startbox.checked = !this.startbox.checked;
-
-		this.startbox = obj;
-		this.startbox_name = obj_name;
-	}
-
-	this.setGo();
-},
-
-checkAll: function(name, value){
-	if(typeof(this.chkboxes[name]) == 'undefined') return false;
-
-	var chk_bx = this.chkboxes[name];
-	for(var i=0; i < chk_bx.length; i++){
-		if((typeof(chk_bx[i]) !='undefined') && (chk_bx[i].disabled != true)){
-			var box = chk_bx[i];
-			var obj_name = chk_bx[i].name.split('[')[0];
-
-			if(obj_name == name){
-				chk_bx[i].checked = value;
-			}
-
-		}
-	}
-},
-
-setGo: function(){
-	if(!is_null(this.pageGoName)){
-		var countChecked = 0;
-
-		if(typeof(this.chkboxes[this.pageGoName]) == 'undefined'){
-//			alert('CheckBoxes with name '+this.pageGoName+' doesn\'t exist');
-			return false;
-		}
-
-		var chk_bx = this.chkboxes[this.pageGoName];
-		for(var i=0; i < chk_bx.length; i++){
-			if(typeof(chk_bx[i]) !='undefined'){
-				var box = chk_bx[i];
-				var obj_name = box.name.split('[')[0];
-				var crow = getParent(box,'tr');
-
-				if(box.checked){
-					if(!is_null(crow)){
-						var origClass = crow.getAttribute('origClass');
-						if(is_null(origClass))
-							crow.setAttribute('origClass',crow.className);
-							
-						crow.className = 'selected';
-					}
-					
-					if(obj_name == this.pageGoName) countChecked++;
-				}
-				else{
-					if(!is_null(crow)){
-						var origClass = crow.getAttribute('origClass');
-
-						if(!is_null(origClass)){
-							crow.className = origClass;
-							crow.removeAttribute('origClass');
-						}
-					}
-				}
-
-			}
-		}
-
-		var tmp_val = $('goButton').value.split(' ');
-		$('goButton').value = tmp_val[0]+' ('+countChecked+')';
-
-		this.pageGoCount = countChecked;
-	}
-	else{
-//		alert('Not isset pageGoName')
-	}
-},
-
-submitGo: function(e){
-	var e = e || window.event;
-	if(this.pageGoCount > 0){
-		return true;
-	}
-	else{
-		alert('No elements selected!');
-		Event.stop(e);
+function add2favorites(favobj,favid){
+	if('undefined' == typeof(Ajax)){
+		throw("Prototype.js lib is required!");
 		return false;
 	}
-}
-}
 
-/************************************************************************************/
-/*			Replace Standart Blink functionality				*/
-/************************************************************************************/
-// Author: Aly
-var blink = {
-	blinkobjs: new Array(),
-
-	init: function(){
-		this.blinkobjs = document.getElementsByName("blink");
-		if(this.blinkobjs.length > 0) this.view();
-	},
-	hide: function(){
-		for(var id=0; id<this.blinkobjs.length; id++){
-			this.blinkobjs[id].style.visibility = 'hidden';
-		}
-		setTimeout('blink.view()',500);
-	},
-	view: function(){
-		for(var id=0; id<this.blinkobjs.length; id++){
-			this.blinkobjs[id].style.visibility = 'visible'
-		}
-		setTimeout('blink.hide()',1000);
+	if(typeof(favobj) == 'undefined'){
+		var fav_form = document.getElementById('fav_form');
+		if(!fav_form) throw "Object not found.";
+		
+		var favobj = fav_form.favobj.value;
+		var favid = fav_form.favid.value;
 	}
+	
+	if((typeof(favid) == 'undefined') || empty(favid)) return;
+	
+	var params = {
+		'favobj': 	favobj,
+		'favid': 	favid,
+		'action':	'add'
+	}
+	
+	send_params(params);
+//	json.onetime('dashboard.php?output=json&'+Object.toQueryString(params));
+}
+
+function change_flicker_state(divid){
+	deselectAll(); 
+	var eff_time = 500;
+	
+	var switchArrows = function(){
+		switchElementsClass($("flicker_icon_l"),"dbl_arrow_up","dbl_arrow_down");
+		switchElementsClass($("flicker_icon_r"),"dbl_arrow_up","dbl_arrow_down");
+	}
+	
+	var filter_state = showHideEffect(divid,'slide', eff_time, switchArrows);
+	
+
+	if(false === filter_state) return false;
+
+	var params = {
+		'favobj': 	'filter',
+		'favid': 	divid,
+		'state':	filter_state
+	}
+	
+	send_params(params);	
+}
+
+function change_hat_state(icon, divid){
+	deselectAll(); 
+	
+	var eff_time = 500;
+	
+	var switchIcon = function(){
+		switchElementsClass(icon,"arrowup","arrowdown");
+	}
+
+//	var hat_state = ShowHide(divid);	
+	var hat_state = showHideEffect(divid, 'slide', eff_time, switchIcon);	
+
+	if(false === hat_state) return false;
+	
+	var params = {
+		'favobj': 	'hat',
+		'favid': 	divid,
+		'state':	hat_state
+	}
+	
+	send_params(params);
+}
+
+function rm4favorites(favobj,favid,menu_rowid){
+//	alert(favobj+','+favid+','+menu_rowid);
+	if('undefined' == typeof(Ajax)){
+		throw("Prototype.js lib is required!");
+		return false;
+	}
+
+	if((typeof(favobj) == 'undefined') || (typeof(favid) == 'undefined')) 
+		throw "No agruments sent to function [rm4favorites()].";
+
+	var params = {
+		'favobj': 	favobj,
+		'favid': 	favid,
+		'favcnt':	menu_rowid,
+		'action':	'remove'
+	}
+
+	send_params(params);
+//	json.onetime('dashboard.php?output=json&'+Object.toQueryString(params));
+}
+
+function send_params(params){
+	if(typeof(params) == 'undefined') var params = new Array();
+
+	var url = new Curl(location.href);
+	url.setQuery('?output=ajax');
+
+	new Ajax.Request(url.getUrl(),
+					{
+						'method': 'post',
+						'parameters':params,
+						'onSuccess': function(resp){ },
+//						'onSuccess': function(resp){ SDI(resp.responseText); },
+						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
+					}
+	);
+}
+
+
+function setRefreshRate(pmasterid,dollid,interval,params){
+	if(typeof(Ajax) == 'undefined'){
+		throw("Prototype.js lib is required!");
+		return false;
+	}
+	
+	if((typeof(params) == 'undefined') || is_null(params))  var params = new Array();
+	params['favobj'] = 		'set_rf_rate';
+	params['pmasterid'] = 	pmasterid;
+	params['favid'] = 		dollid;
+	params['favcnt'] = 		interval;
+
+	send_params(params);
+}
+
+function switch_mute(icon){
+	deselectAll(); 
+	var sound_state = switchElementsClass(icon,"iconmute","iconsound");
+
+	if(false === sound_state) return false;
+	sound_state = (sound_state == "iconmute")?1:0;
+
+	var params = {
+		'favobj': 	'sound',
+		'state':	sound_state
+	}
+	
+	send_params(params);
 }

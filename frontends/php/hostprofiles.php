@@ -125,12 +125,11 @@ include_once('include/page_header.php');
 		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
 		$cmbGroups->addItem(0, S_ALL_S);
 
-		$sql = 'SELECT hg.groupid, g.name '.
+		$sql = 'SELECT DISTINCT hg.groupid, g.name '.
 				' FROM hosts_profiles p, hosts_profiles_ext pe, hosts_groups hg, groups g'.
 				' WHERE (hg.hostid=p.hostid OR hg.hostid=pe.hostid) '.
 					' AND g.groupid=hg.groupid '.
-					' AND '.DBcondition('hg.groupid', $PAGE_GROUPS['groupids']).
-				' GROUP BY hg.groupid';
+					' AND '.DBcondition('hg.groupid', $PAGE_GROUPS['groupids']);
 		$result = DBselect($sql);
 		while($row = DBfetch($result)) {
 			$cmbGroups->addItem($row['groupid'], get_node_name_by_elid($row['groupid']).$row['name']);

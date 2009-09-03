@@ -10,7 +10,10 @@ select{
 	font-size: 10px;
 	border: 1px solid gray;
 	background-color: white;
-	margin: 1px;
+	padding: 0px 1px 0px 0px;
+	margin-top: 1px;
+	margin-left: 2px;
+	vertical-align: top;
 }
 .biginput:focus	{
 	border-color: black;
@@ -31,9 +34,11 @@ select{
 	background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left;
 	border: 1px solid #808080;
 	height: 16px;
-	padding:0px 4px 0px 4px;
+	padding: 0px 4px 2px 4px;
 	cursor: pointer;
+	margin-top: 1px;
 	margin-left: 4px;
+	vertical-align: top;
 }
 
 .button:hover{
@@ -54,11 +59,17 @@ table.thin_header .button{
 table.thin_header .biginput{
 	font-size: 9px;
 	height: 10px;
-	margin: 0px;
+	padding: 0px 1px 2px 1px;
+	margin-top: 1px;
+	margin-left: 2px;
+	vertical-align: top;
 }
 
 form.thin .biginput{
 	font-size: 9px;
 	height: 10px;
-	margin: 0px;
+	padding: 0px 1px 2px 1px;
+	margin-top: 1px;
+	margin-left: 2px;
+	vertical-align: top;
 }
