@@ -313,9 +313,7 @@ function make_system_summary($args = array()){
 							}
 						}
 
-						$description = expand_trigger_description_by_data(
-								zbx_array_merge($row_inf, array('clock'=>$row_inf_event['clock'])),
-								ZBX_FLAG_EVENT);
+						$description = expand_trigger_description_by_data(zbx_array_merge($row_inf, array('clock'=>$row_inf_event['clock'])), ZBX_FLAG_EVENT);
 
 //actions
 						$actions= get_event_actions_status($row_inf_event['eventid']);

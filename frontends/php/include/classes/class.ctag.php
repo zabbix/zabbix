@@ -153,8 +153,6 @@ class CTag extends CObject{
 	public function setHint($text, $width='', $class='', $byclick=true){
 		if(empty($text)) return false;
 
-		insert_showhint_javascript();
-
 		$text = unpack_object($text);
 
 		$this->addAction('onmouseover',	"javascript: hintBox.showOver(event,this,'".$text."','".$width."','".$class."');");

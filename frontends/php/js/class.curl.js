@@ -18,67 +18,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/ 
 
-// Title: cookies class
-// Description: to manipulate cookies on client side
-// Author: Aly
-var cookie ={
-cookies: new Array(),
-
-init: function () {
-	var allCookies = document.cookie.split('; ');
-	for (var i=0;i<allCookies.length;i++) {
-		var cookiePair = allCookies[i].split('=');
-		this.cookies[cookiePair[0]] = cookiePair[1];
-	}
-},
-
-create: function (name,value,days) {
-	if(days) {
-		var date = new Date();
-		date.setTime(date.getTime()+(days*24*60*60*1000));
-		var expires = "; expires="+date.toGMTString();
-	}else{ 
-		var expires = "";
-	}
-	
-	document.cookie = name+"="+value+expires+"; path=/";
-	this.cookies[name] = value;
-},
-
-read : function(name){
-	if(typeof(this.cookies[name]) != 'undefined'){
-		return this.cookies[name];
-	} else {
-		var nameEQ = name + "=";
-		var ca = document.cookie.split(';');
-		for(var i=0;i < ca.length;i++) {
-			var c = ca[i];
-			while (c.charAt(0)==' ') c = c.substring(1,c.length);
-			if(c.indexOf(nameEQ) == 0)	return this.cookies[name] = c.substring(nameEQ.length,c.length);
-		}
-	}
-	return null;
-},
-
-printall: function() {
-	var allCookies = document.cookie.split('; ');
-	for (var i=0;i<allCookies.length;i++) {
-		var cookiePair = allCookies[i].split('=');
-		
-		alert("[" + cookiePair[0] + "] is " + cookiePair[1]); // assumes print is already defined
-	}
-},
-
-erase: function (name) {
-	this.create(name,'',-1);
-	this.cookies[name] = undefined;
-}
-}
-
-cookie.init();
-
-
-// Title: url manipulation class
+/************************************************************************************/
+/*								URL MANIPULATION CLASS 								*/
+/************************************************************************************/
 // Author: Aly
 var Curl = Class.create();
 
@@ -96,6 +38,7 @@ query:		'',
 args:  null,
 
 initialize: function(url){
+	var url = url || location.href;
 	this.url=unescape(url);
 	this.args = {};
 	
@@ -142,7 +85,7 @@ initialize: function(url){
 			}
 		}
 		this.file=this.url.substring(protocolSepIndex+3);
-		this.file=this.file.substring(this.file.indexOf('/'));
+		this.file=this.file.substring(this.file.indexOf('/')+1);
 		
 		if(this.file == this.host) this.file = '';
 	}
@@ -152,18 +95,19 @@ initialize: function(url){
 	
 	if(this.file.indexOf('?')>=0) this.file=this.file.substring(0, this.file.indexOf('?'));
 
-	var refSepIndex=url.indexOf('#');
+	var refSepIndex=this.url.indexOf('#');
 	if(refSepIndex>=0){
 		this.file=this.file.substring(0,refSepIndex);
 		this.reference=this.url.substring(this.url.indexOf('#'));
 	}
+
 	this.path=this.file;
 	if(this.query.length>0) this.file+='?'+this.query;
 	if(this.reference.length>0) this.file+='#'+this.reference;
 	if(this.query.length > 0)	this.formatArguments();
 
 	var sid = cookie.read('zbx_sessionid');
-	this.setArgument('sid', sid.substring(16));
+	if(!is_null(sid)) this.setArgument('sid', sid.substring(16));
 },
 
 
@@ -218,7 +162,7 @@ getUrl: function(){
 	url +=  encodeURI((this.password.length > 0)?(':'+this.password):'');
 	url +=  (this.host.length > 0)?(this.host):'';
 	url +=  (this.port.length > 0)?(':'+this.port):'';
-	url +=  encodeURI((this.path.length > 0)?(this.path):'');
+	url +=  encodeURI((this.path.length > 0)?('/'+this.path):'');
 	url +=  encodeURI((this.query.length > 0)?('?'+this.query):'');
 	url +=  encodeURI((this.reference.length > 0)?('#'+this.reference):'');
 //	alert(url.getProtocol()+' : '+url.getHost()+' : '+url.getPort()+' : '+url.getPath()+' : '+url.getQuery());

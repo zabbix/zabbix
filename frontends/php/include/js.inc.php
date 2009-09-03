@@ -207,14 +207,6 @@ function insert_javascript_for_tweenbox(){
 	insert_js($js);
 }
 
-function insert_showhint_javascript(){
-	global $page;
-	if(defined('SHOW_HINT_SCRIPT_INSERTTED') || (PAGE_TYPE_HTML != $page['type'])) return;
-	define('SHOW_HINT_SCRIPT_INSERTTED', 1);
-
-	echo '<script type="text/javascript" src="js/showhint.js"></script>';
-}
-
 function insert_javascript_for_visibilitybox(){
 	if(defined('CVISIBILITYBOX_JAVASCRIPT_INSERTED')) return;
 	define('CVISIBILITYBOX_JAVASCRIPT_INSERTED', 1);

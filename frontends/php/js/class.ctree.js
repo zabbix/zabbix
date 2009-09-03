@@ -47,7 +47,8 @@ getNodeStatus : function(id){
 		} else {
 			return 'open';
 		}
-	} catch(e){
+	} 
+	catch(e){
 		return 'close';
 	}
 },
@@ -56,7 +57,8 @@ ChangeNodeStatus : function(id){
 	try{
 		if(this.treenode[id].status == 'close'){
 			this.treenode[id].status = 'open';
-		} else {
+		} 
+		else {
 			this.treenode[id].status = 'close';
 		}
 		var cookie_str='';
@@ -68,7 +70,8 @@ ChangeNodeStatus : function(id){
 			}
 		}
 		cookie.create(this.tree_name,cookie_str);
-	} catch(e){
+	} 
+	catch(e){
 		IE?(alert(e.description)):(alert(e));
 	}
 },
@@ -86,7 +89,8 @@ closeSNodeX : function(id,img){
 			img.src = 'images/general/tree/plus.gif';
 		}
 		this.ChangeNodeStatus(id);
-	} catch(e){
+	} 
+	catch(e){
 		throw('JSTree ERROR [closeSNodeX]: '+e);
 		return;
 	}
@@ -103,7 +107,8 @@ OpenNode : function(nodelist){
 				}
 			}
 		}
-	} catch(e){
+	} 
+	catch(e){
 		throw('JSTree ERROR [OpenNode]: '+e);
 	}
 },
@@ -119,7 +124,8 @@ CloseNode : function(nodelist){
 				}
 			}
 		}
-	} catch(e){ 
+	} 
+	catch(e){ 
 		throw('JSTree ERROR [CloseNode]: '+e);
 	}
 },
@@ -135,7 +141,8 @@ onStartOpen : function(nodes){
 					var nodelist = this.treenode[nodes[i]].nodelist.split(',');
 					this.OpenNode(nodelist);
 				}
-			} catch(e){
+			} 
+			catch(e){
 				cookie.erase(this.tree_name);
 				throw('JSTree ERROR [OnStartOpen]: '+e);
 			}
@@ -151,24 +158,28 @@ onStartSetStatus : function(id){
 		img.src = 'images/general/tree/minus.gif';
 		
 		this.treenode[id].status = 'open';
-	} catch(e){
+	} 
+	catch(e){
 		throw('JSTree ERROR [OnStartSetStatus]: '+e);
 	}
 },
 
 checkParent : function(id){
 	try{
-		
 		if(id == '0'){
 			return true;
-		} else if(typeof(this.treenode[id]) == 'undefined'){
+		} 
+		else if(typeof(this.treenode[id]) == 'undefined'){
 			return false;
-		} else if(this.treenode[id].status != 'open'){
+		}
+		else if(this.treenode[id].status != 'open'){
 			return false;
-		} else {
+		} 
+		else {
 			return this.checkParent(this.treenode[id].parentid);
 		}
-	} catch(e){
+	} 
+	catch(e){
 		throw('JSTree ERROR [checkPparent]: '+e);
 	}
 }
