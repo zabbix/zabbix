@@ -1482,7 +1482,6 @@
 	'S_SCREEN_REFRESH'=>				'Refresh (in seconds)',
 	'S_CREATE_USER'=>				'Create User',
 	'S_CREATE_GROUP'=>				'Create Group',
-	'S_DELETE_SELECTED_USERS_Q'=>			'Delete selected users?',
 	'S_NO_ACCESSIBLE_RESOURCES'=>			'No accessible resources',
 	'S_ADD_TO'=>					'Add to',
 	'S_REMOVE_FROM'=>				'Remove from',
