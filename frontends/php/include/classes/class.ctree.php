@@ -217,7 +217,7 @@ class CTree{
 
 	public function createJS(){
 
-		$js = '<script src="js/tree.js" type="text/javascript"></script>'."\n".
+		$js = '<script src="js/class.ctree.js" type="text/javascript"></script>'."\n".
 				'<script type="text/javascript">  var '.$this->treename.'_tree = new Array(0);';
 
 		foreach($this->tree as $id => $rows){

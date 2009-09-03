@@ -34,8 +34,6 @@
 	}
 
 	function media_severity2str($severity){
-
-		insert_showhint_javascript();
 		$mapping = array(
 			0 => array('letter' => 'N', 'style' => (($severity & 1)  ? 'enabled' : NULL)),
 			1 => array('letter' => 'I', 'style' => (($severity & 2)  ? 'enabled' : NULL)),

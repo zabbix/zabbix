@@ -71,8 +71,8 @@ include_once('include/page_header.php');
 			));
 
 	switch($_REQUEST['period']){
-		case 'week':	$time_dif=7*86400;	break;
-		case 'month':	$time_dif=30*86400;	break;
+		case 'week':	$time_dif=7*86400;		break;
+		case 'month':	$time_dif=30*86400;		break;
 		case 'year':	$time_dif=365*86400;	break;
 		case 'day':
 		default:	$time_dif=86400;	break;
@@ -84,7 +84,8 @@ include_once('include/page_header.php');
 
 	$triggers = array();
 	$triggerids = array();
-	$sql = 'SELECT h.host, h.hostid, t.triggerid, t.description, t.expression, t.lastchange, t.priority, count(distinct e.eventid) as cnt_event '.
+	$sql = 'SELECT h.host, MAX(h.hostid) as hostid, t.triggerid, t.description, t.expression, '.
+				' MAX(t.lastchange) as lastchange, t.priority, count(distinct e.eventid) as cnt_event '.
 			' FROM hosts h, triggers t, functions f, items i, events e'.
 			' WHERE h.hostid = i.hostid '.
 				' and i.itemid = f.itemid '.

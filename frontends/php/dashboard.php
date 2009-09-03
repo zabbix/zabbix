@@ -30,7 +30,7 @@ require_once('include/blocks.inc.php');
 $page["title"] = "S_DASHBOARD";
 $page['file'] = 'dashboard.php';
 $page['hist_arg'] = array();
-$page['scripts'] = array('pmaster.js','menu_scripts.js','showhint.js','scriptaculous.js?load=effects');
+$page['scripts'] = array('pmaster.js','menu_scripts.js','scriptaculous.js?load=effects');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 

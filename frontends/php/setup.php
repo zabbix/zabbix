@@ -125,8 +125,6 @@ include_once('include/page_header.php');
 			show_error_message($_REQUEST['message']);
 	}
 
-	insert_showhint_javascript();
-
 	echo SBR;
 	$ZBX_SETUP_WIZARD->show();
 
