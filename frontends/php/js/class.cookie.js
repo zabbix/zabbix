@@ -103,7 +103,7 @@ createJSON: function(name,value,days){
 	for(var key in value){
 		if(!empty(value[key])) value_array.push(value[key]);
 	}
-	
+
 	this.createArray(name,value_array,days);
 },
 
