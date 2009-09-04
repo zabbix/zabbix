@@ -1,3 +1,7 @@
+Changes gor 1.6.7
+
+ - [ZBX-861] fixed problem with disappearing nodes in frontend (Artem)
+
 Changes for 1.6.6
 
  - [ZBX-1024] added check for same application name in linked hosts (Vedmak)

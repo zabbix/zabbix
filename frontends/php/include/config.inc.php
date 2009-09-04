@@ -551,14 +551,21 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		if($level > 32) return array();
 
 		$result = array();
-		$result[$parentid] = $tree[$parentid];
-		foreach($tree as $id => $child){
-			if($child[$parent_field] == $parentid){
+		if(isset($tree[$parentid])){
+			$result[$parentid] = $tree[$parentid];
+		}
+
+		$tree_ids = array_keys($tree);
+		
+		foreach($tree_ids as $key => $id){
+			$child = $tree[$id];
+			if(bccomp($child[$parent_field],$parentid) == 0){
 				$result[$id] = $child;
 				$childs = get_tree_by_parentid($id,$tree,$parent_field, $level); // RECURSION !!!
 				$result += $childs;
 			}
 		}
+
 	return $result;
 	}
 
