@@ -652,7 +652,6 @@ static void	process_active_checks(char *server, unsigned short port)
 	char		key_severity[MAX_STRING_LEN], str_severity[32]/*for `regex_match_ex'*/;
 	char		key_source[MAX_STRING_LEN], *source = NULL;
 	char		key_logeventid[MAX_STRING_LEN], str_logeventid[8]/*for `regex_match_ex'*/;
-	unsigned int	codepage;
 #endif
 	char		encoding[32];
 
@@ -692,10 +691,8 @@ static void	process_active_checks(char *server, unsigned short port)
 
 				if (get_param(params, 3, encoding, sizeof(encoding)) != 0)
 					*encoding = '\0';
-#ifdef _WINDOWS
-				if (FAIL == get_codepage(encoding, &codepage))
-					break;
-#endif
+				zbx_strupper(encoding);
+
 				if (get_param(params, 4, maxlines_persec_str, sizeof(maxlines_persec_str)) != 0 ||
 						*maxlines_persec_str == '\0')
 					maxlines_persec = CONFIG_MAX_LINES_PER_SECOND;
@@ -705,7 +702,7 @@ static void	process_active_checks(char *server, unsigned short port)
 
 				s_count = p_count = 0;
 				lastlogsize = active_metrics[i].lastlogsize;
-				while (SUCCEED == (ret = process_log(filename, &lastlogsize, &value))) {
+				while (SUCCEED == (ret = process_log(filename, &lastlogsize, &value, encoding))) {
 					if (!value) /* EOF */
 						break;
 
@@ -786,16 +783,16 @@ static void	process_active_checks(char *server, unsigned short port)
 
 				if (get_param(params, 2, pattern, sizeof(pattern)) != 0)
 					*pattern = '\0';
-				
+
 				if (get_param(params, 3, key_severity, sizeof(key_severity)) != 0)
 					*key_severity = '\0';
-				
+
 				if (get_param(params, 4, key_source, sizeof(key_source)) != 0)
 					*key_source = '\0';
-					
+
 				if (get_param(params, 5, key_logeventid, sizeof(key_logeventid)) != 0)
 					*key_logeventid = '\0';
-					
+
 				if (get_param(params, 6, maxlines_persec_str, sizeof(maxlines_persec_str)) != 0 ||
 						*maxlines_persec_str == '\0')
 					maxlines_persec = CONFIG_MAX_LINES_PER_SECOND;

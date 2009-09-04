@@ -386,4 +386,8 @@
 #	include <sys/ucontext.h>
 #endif
 
+#ifdef HAVE_ICONV
+#	include <iconv.h>
+#endif
+
 #endif

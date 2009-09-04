@@ -1073,6 +1073,16 @@ fi
 CFLAGS="${CFLAGS} ${LDAP_CPPFLAGS}"
 LDFLAGS="${LDFLAGS} ${LDAP_LDFLAGS}"
 
+found_iconv="no"
+dnl Check for libiconv [by default - skip]
+LIBICONV_CHECK_CONFIG([no])
+if test "x$found_iconv" != "xyes"; then
+	AC_MSG_ERROR([Unable to find iconv.h "${found_iconv}"])
+fi
+CFLAGS="${CFLAGS} ${ICONV_CFLAGS}"
+LDFLAGS="${LDFLAGS} ${ICONV_LDFLAGS}"
+LIBS="${LIBS} ${ICONV_LIBS}"
+
 found_openipmi="no"
 dnl Check for libOpenIPMI [by default - skip]
 LIBOPENIPMI_CHECK_CONFIG([no])
