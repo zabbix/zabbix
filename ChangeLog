@@ -100,6 +100,10 @@ Changes for 1.7.0
  - [DEV-247] added enhancement to the Graph function (Artem)
  - [DEV-233,DEV-237] added support of scheduled maintenance periods (Artem,Sasha)
 
+Changes gor 1.6.7
+
+ - [ZBX-861] fixed problem with disappearing nodes in frontend (Artem)
+
 Changes for 1.6.6
 
  - [ZBX-1013] fixed evaluation of aggregate items for proxy hosts (Sasha)
