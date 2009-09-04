@@ -85,7 +85,7 @@ initialize: function(url){
 			}
 		}
 		this.file=this.url.substring(protocolSepIndex+3);
-		this.file=this.file.substring(this.file.indexOf('/')+1);
+		this.file=this.file.substring(this.file.indexOf('/'));
 		
 		if(this.file == this.host) this.file = '';
 	}
@@ -162,7 +162,7 @@ getUrl: function(){
 	url +=  encodeURI((this.password.length > 0)?(':'+this.password):'');
 	url +=  (this.host.length > 0)?(this.host):'';
 	url +=  (this.port.length > 0)?(':'+this.port):'';
-	url +=  encodeURI((this.path.length > 0)?('/'+this.path):'');
+	url +=  encodeURI((this.path.length > 0)?(this.path):'');
 	url +=  encodeURI((this.query.length > 0)?('?'+this.query):'');
 	url +=  encodeURI((this.reference.length > 0)?('#'+this.reference):'');
 //	alert(url.getProtocol()+' : '+url.getHost()+' : '+url.getPort()+' : '+url.getPath()+' : '+url.getQuery());
