@@ -166,7 +166,7 @@ include_once "include/page_header.php";
             ),
         'iregexp'   => array(
             'description'   => S_FNC_DESCRIPTION_IREGEXP,
-            'value_types'   => array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG),
+            'value_types'   => array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT),
             'operators' => $limited_operators,
             'params'    => $param1_regexp
             ),

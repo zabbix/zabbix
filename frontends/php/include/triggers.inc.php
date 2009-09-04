@@ -600,12 +600,10 @@
     function    analyze_expression($expression)
     {
 		global $ZBX_TR_EXPR_ALLOWED_MACROS, $ZBX_TR_EXPR_REPLACE_TO, $ZBX_TR_EXPR_ALLOWED_FUNCTIONS;
-
 		if (empty($expression)) return array('', null, null);
 
 		$temp = array();
 		$expr = $expression;
-
 		/* Replace all {server:key.function(param)} and {MACRO} with '$ZBX_TR_EXPR_REPLACE_TO' */
 		while (mb_ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT_MB, $expr, $arr))
 		{
@@ -625,8 +623,8 @@
 
 		/* Replace all '$ZBX_TR_EXPR_REPLACE_TO $ZBX_EREG_SIGN $ZBX_EREG_NUMBER' number with '$expr_full_replace_to' */
 		$expr_full_replace_to = $ZBX_TR_EXPR_REPLACE_TO . '_full';
-        $expr_full_token = '^([[:print:]]*)(' . $ZBX_TR_EXPR_REPLACE_TO .
-            ZBX_EREG_SPACES . ZBX_EREG_SIGN . ZBX_EREG_SPACES . ZBX_EREG_NUMBER . ')([[:print:]]*)$';
+        $expr_full_token = '^([[:print:]]*?)([\(]{0,2}' . $ZBX_TR_EXPR_REPLACE_TO .
+            ZBX_EREG_SPACES . '[\)]?' . ZBX_EREG_SIGN . ZBX_EREG_SPACES . ZBX_EREG_NUMBER . '[\)]?)([[:print:]]*)$';
         while (mb_ereg($expr_full_token, $expr, $arr))
         {
             array_push($temp, array('sign' => $arr[4], 'value' => $arr[6]));
@@ -2586,7 +2584,8 @@
 					$complite_expr.=' & ';
 				}
 			}
-			$expr = '&'.$expression['value'];
+			//$expr = '&'.$expression['value'];
+			$expr = '&'.$expression['view'];
 			$expr = preg_replace('/\s+(\&|\|){1,2}\s+/U','$1',$expr);
 			
 			$expr_array = array();
@@ -2594,7 +2593,7 @@
 			$sub_expr = '';
 
 			$multi = preg_match("/.+(\&|\|).+/", $expr);
-
+			
 			while(mb_eregi($ZBX_EREG_EXPESSION_FUNC_FORMAT, $expr, $arr)){
 				$arr[4] = strtolower($arr[4]);
 

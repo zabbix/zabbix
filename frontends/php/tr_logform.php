@@ -305,7 +305,8 @@ if(isset($_REQUEST['sform'])){
 					' FROM functions as f, triggers as t, items as i '.
 					' WHERE t.triggerid='.$_REQUEST['triggerid'].
 						' AND i.itemid=f.itemid AND f.triggerid = t.triggerid '.
-						' AND i.value_type='.ITEM_VALUE_TYPE_LOG.
+						' AND (i.value_type='.ITEM_VALUE_TYPE_LOG.
+						' OR i.value_type='.ITEM_VALUE_TYPE_TEXT.')'.
 						' AND i.key_ LIKE ("'.$matchkey.'")';
 					  
 		$res = DBselect($sql);
