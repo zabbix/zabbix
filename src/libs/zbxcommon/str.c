@@ -1901,3 +1901,53 @@ int	zbx_unicode_to_utf8_static(LPCTSTR wide_string, LPSTR utf8_string, int utf8_
 	return SUCCEED;
 }
 #endif
+
+void	zbx_strupper(char *str)
+{
+	for (; '\0' != *str; str++)
+		*str = toupper((int)*str);
+}
+
+#ifdef HAVE_ICONV
+#include "log.h"
+char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
+{
+	iconv_t		cd;
+	size_t		in_size_left, out_size_left, sz, out_alloc = 0;
+	const char	to_code[] = "UTF-8";
+	char		*out = NULL, *p;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In convert_to_utf8() in_size:%d encoding:'%s => %s'", (int)in_size, encoding, to_code);
+	out_alloc = in_size + 1;
+	p = out = zbx_malloc(out, out_alloc);
+
+	if (*encoding == '\0' || (iconv_t)-1 == (cd = iconv_open(to_code, encoding)))
+	{
+		memcpy(out, in, in_size);
+		out[in_size] = '\0';
+		return out;
+	}
+
+	in_size_left = in_size;
+	out_size_left = out_alloc - 1;
+		
+	while ((size_t)(-1) == iconv(cd, &in, &in_size_left, &p, &out_size_left))
+	{
+		if (E2BIG != errno)
+			break;
+
+		sz = (size_t)(p - out);
+		out_alloc += in_size;
+		out_size_left += in_size;
+		p = out = zbx_realloc(out, out_alloc);
+		p += sz;
+	}
+
+	*p = '\0';
+	zabbix_log(LOG_LEVEL_DEBUG, "End if convert_to_utf8() len:%d out:'%s'", (int)(p - out), out);
+
+	iconv_close(cd);
+
+	return out;
+}
+#endif	/* HAVE_ICONV */

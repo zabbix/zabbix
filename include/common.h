@@ -881,6 +881,10 @@ LPSTR	zbx_unicode_to_utf8(LPCTSTR wide_string);
 int	zbx_unicode_to_utf8_static(LPCTSTR wide_string, LPSTR utf8_string, int utf8_size);
 int	_wis_uint(LPCTSTR wide_string);
 #endif
+void	zbx_strupper(char *str);
+#ifdef HAVE_ICONV
+char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
+#endif	/* HAVE_ICONV */
 
 int MAIN_ZABBIX_ENTRY(void);
 
