@@ -799,7 +799,7 @@ static void	zbx_free_numbers(char ***numbers, int count)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: !!! Don't forget sync code with PHP !!!                          *
- *           replcae ONLY $1-9 macros NOT {HOSTNAME}                          *
+ *           replace ONLY $1-9 macros NOT {HOSTNAME}                          *
  *                                                                            *
  ******************************************************************************/
 static void	expand_trigger_description_constants(
