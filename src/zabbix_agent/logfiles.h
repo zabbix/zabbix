@@ -20,10 +20,6 @@
 #ifndef ZABBIX_LOGFILES_H
 #define ZABBIX_LOGFILES_H
 
-int   process_log(
-	char *filename,
-	long *lastlogsize,
-	char **value
-	);
+int	process_log(char *filename, long *lastlogsize, char **value, const char *encoding);
 
 #endif
