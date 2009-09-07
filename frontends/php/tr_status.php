@@ -353,6 +353,7 @@ include_once('include/page_header.php');
 		));
 
 	$options = array(
+		'status' => TRIGGER_STATUS_ENABLED,
 		'filter' => 1,
 		'extendoutput' => 1,
 		'select_hosts' => 1,
@@ -366,8 +367,10 @@ include_once('include/page_header.php');
 	if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
 		$options['hostids'] = $PAGE_HOSTS['selected'];
 	}
-
-	if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
+	else if(!empty($PAGE_HOSTS['hostids'])){
+		$options['hostids'] = $PAGE_HOSTS['hostids'];
+	}
+	else if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
 		$options['groupids'] = $PAGE_GROUPS['selected'];
 	}
 
@@ -525,10 +528,12 @@ include_once('include/page_header.php');
 			$menus = '';
 
 			$host_nodeid = id2nodeid($trigger['hostid']);
-			foreach($scripts_by_hosts[$trigger['hostid']] as $id => $script){
-				$script_nodeid = id2nodeid($script['scriptid']);
-				if( (bccomp($host_nodeid ,$script_nodeid ) == 0))
-					$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$trigger['hostid']."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+			if(isset($scripts_by_hosts[$trigger['hostid']])){
+				foreach($scripts_by_hosts[$trigger['hostid']] as $id => $script){
+					$script_nodeid = id2nodeid($script['scriptid']);
+					if( (bccomp($host_nodeid ,$script_nodeid ) == 0))
+						$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$trigger['hostid']."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+				}
 			}
 
 			$menus.= "[".zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
