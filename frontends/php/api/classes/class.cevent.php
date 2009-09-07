@@ -81,7 +81,8 @@ class CEvent {
 			'triggerids'			=> null,
 			'eventids'				=> null,
 			'editable'				=> null,
-			'object'				=> EVENT_OBJECT_TRIGGER,
+			'object'				=> null,
+			'source'				=> null,
 			'acknowledged'			=> null,
 
 // filter
@@ -109,10 +110,14 @@ class CEvent {
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
 		}
-
+		
+		if(is_null($options['source']) && is_null($options['object'])){
+			$options['object'] = EVENT_OBJECT_TRIGGER;
+		}
+		
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
-		else if($options['object'] == EVENT_OBJECT_TRIGGER){
+		else if(($options['object'] == EVENT_OBJECT_TRIGGER) || ($options['source'] == EVENT_SOURCE_TRIGGER)){
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
 			$sql_parts['from']['f'] = 'functions f';
@@ -193,6 +198,16 @@ class CEvent {
 			$sql_parts['where'][] = DBcondition('e.objectid', $options['triggerids']);
 		}
 
+// source
+		if(!is_null($options['source'])){
+			$sql_parts['where'][] = 'e.source='.$options['source'];
+		}
+		
+// object
+		if(!is_null($options['object'])){
+			$sql_parts['where'][] = 'e.object='.$options['object'];
+		}
+		
 // acknowledged
 		if(!is_null($options['acknowledged'])){
 			$sql_parts['where'][] = 'e.acknowledged='.($options['acknowledged']?1:0);

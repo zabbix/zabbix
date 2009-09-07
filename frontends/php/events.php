@@ -201,12 +201,104 @@ include_once('include/page_header.php');
 //-------------
 
 	if($source == EVENT_SOURCE_DISCOVERY){
-		$last_clock = null;
-		$table = get_history_of_discovery_events($time_end, $limit, $last_clock);
+		$options = array(
+						'source' => EVENT_SOURCE_DISCOVERY,
+						'time_from' => $_REQUEST['nav_time'],
+						'time_till' => null,
+						'extendoutput' => 1,
+						'select_hosts' => 1,
+						'select_triggers' => 1,
+						'select_items' => 1,
+						'sortfield' => 'clock',
+						'sortorder' => getPageSortOrder(),
+						'limit' => ($config['search_limit']+1)
+					);
+
+		$dsc_events = CEvent::get($options);
+		
+// PAGING UPPER && SORTING
+		order_page_result($dsc_events, 'clock', ZBX_SORT_DOWN);
+		$paging = getPagingLine($dsc_events);
+//------
+
+		$objectids = array();
+		foreach($dsc_events as $eventid => $event_data){
+			$objectids[$event_data['objectid']] = $event_data['objectid'];
+		}
+		
+// OBJECT DHOST
+		$dhosts = array();
+		$sql = 'SELECT s.dserviceid, s.ip '.
+				' FROM dservices s '.
+				' WHERE '.DBcondition('s.dhostid', $objectids);
+		$res = DBselect($sql);
+		while($dservices = DBfetch($res)){
+			$dhosts[$dservices['dserviceid']] = $dservices;
+		}
+
+// OBJECT DSERVICE
+		$dservices = array();
+		$sql = 'SELECT s.dserviceid,s.ip,s.type,s.port '.
+				' FROM dservices s '.
+				' WHERE '.DBcondition('s.dserviceid', $objectids);
+		$res = DBselect($sql);
+		while($dservices = DBfetch($res)){
+			$dservices[$dservices['dserviceid']] = $dservices;
+		}
+
+
+// TABLE
+		$table = new CTableInfo(S_NO_EVENTS_FOUND);
+		$table->setHeader(array(
+				make_sorting_header(S_TIME, 'clock'), 
+				S_IP, 
+				S_DESCRIPTION, 
+				S_STATUS));
+
+		foreach($dsc_events as $num => $event_data){
+			switch($event_data['object']){
+				case EVENT_OBJECT_DHOST:
+					if(isset($dhosts[$event_data['objectid']])){
+						$event_data['object_data'] = $dhosts[$event_data['objectid']];
+					}
+					else{
+						$event_data['object_data']['ip'] = S_UNKNOWN;
+					}
+					$event_data['description'] = SPACE;
+					break;
+				case EVENT_OBJECT_DSERVICE:
+					if(isset($dservices[$event_data['objectid']])){
+						$event_data['object_data'] = $dservices[$event_data['objectid']];
+					}
+					else{
+						$event_data['object_data']['ip'] = S_UNKNOWN;
+						$event_data['object_data']['type'] = S_UNKNOWN;
+						$event_data['object_data']['port'] = S_UNKNOWN;
+					}
+	
+					$event_data['description'] = S_SERVICE.': '.discovery_check_type2str($event_data['object_data']['type']).'; '.
+												S_PORT.': '.$event_data['object_data']['port'];
+					break;
+				default:
+					continue;
+			}
+	
+			if(!isset($event_data['object_data'])) continue;
+			
+			$value = new CCol(trigger_value2str($event_data['value']), get_trigger_value_style($event_data['value']));
+	
+			$table->addRow(array(
+				date('Y.M.d H:i:s',$event_data['clock']),
+				$event_data['object_data']['ip'],
+				$event_data['description'],
+				$value));
+		}
+
+		$table = array($paging, $table, $paging);
 	}
 	else{
 		$options = array(
-						'object' => EVENT_OBJECT_TRIGGER,
+						'object' => EVENT_OBJECT_TRIGGERS,
 						'time_from' => $_REQUEST['nav_time'],
 						'time_till' => null,
 						'extendoutput' => 1,
@@ -221,8 +313,10 @@ include_once('include/page_header.php');
 		if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
 			$options['hostids'] = $PAGE_HOSTS['selected'];
 		}
-
-		if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
+		else if(!empty($PAGE_HOSTS['hostids'])){
+			$options['hostids'] = $PAGE_HOSTS['hostids'];
+		}
+		else if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
 			$options['groupids'] = $PAGE_GROUPS['selected'];
 		}
 		
