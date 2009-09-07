@@ -243,7 +243,7 @@ include_once('include/page_header.php');
 
 			$status = new CCol(new CLink(discovery_status2str($rule_data["status"]),
 				'?g_druleid%5B%5D='.$rule_data['druleid'].
-				(($rule_data["status"] == DRULE_STATUS_ACTIVE)?'&group_disable=1':'&group_enable=1'),
+				(($rule_data["status"] == DRULE_STATUS_ACTIVE)?'&go=disable':'&go=activate'),
 				discovery_status2style($rule_data["status"])));
 
 			$description = array();
