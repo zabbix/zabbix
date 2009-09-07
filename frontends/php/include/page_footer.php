@@ -39,12 +39,17 @@
 
 	$post_script = '';
 	if($page['type'] == PAGE_TYPE_HTML){
+		$post_script.= 'var page_refresh = null;'."\n";
 		$post_script.= 'function zbxCallPostScripts(){'."\n";
 
 		if(isset($ZBX_PAGE_POST_JS)){
 			foreach($ZBX_PAGE_POST_JS as $num => $script){
 				$post_script.=$script."\n";
 			}
+		}
+
+		if(defined('ZBX_PAGE_DO_REFRESH') && $USER_DETAILS['refresh']){
+			$post_script.= 'PageRefresh.init('.($USER_DETAILS['refresh']*1000).');'."\n";
 		}
 
 		$post_script.= 'cookie.init();'."\n";

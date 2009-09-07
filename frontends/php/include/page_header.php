@@ -108,15 +108,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <title><?php echo $page_title; ?></title>
-<?php
-	if(defined('ZBX_PAGE_DO_REFRESH') && $USER_DETAILS["refresh"]) {
-		echo '<meta http-equiv="refresh" content="'.$USER_DETAILS["refresh"].'" />';
-	}
-?>
-
-<meta name="Author" content="ZABBIX SIA" />
-<link rel="stylesheet" type="text/css" href="css.css" />
-
+	<meta name="Author" content="ZABBIX SIA" />
+	<link rel="stylesheet" type="text/css" href="css.css" />
 <?php
 	if(isset($DB['DB']) && !is_null($DB['DB'])){
 		$css = false;
