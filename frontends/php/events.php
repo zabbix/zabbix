@@ -242,10 +242,9 @@ include_once('include/page_header.php');
 				' FROM dservices s '.
 				' WHERE '.DBcondition('s.dserviceid', $objectids);
 		$res = DBselect($sql);
-		while($dservices = DBfetch($res)){
-			$dservices[$dservices['dserviceid']] = $dservices;
+		while($dservice = DBfetch($res)){
+			$dservices[$dservice['dserviceid']] = $dservice;
 		}
-
 
 // TABLE
 		$table = new CTableInfo(S_NO_EVENTS_FOUND);
@@ -298,7 +297,7 @@ include_once('include/page_header.php');
 	}
 	else{
 		$options = array(
-						'object' => EVENT_OBJECT_TRIGGERS,
+						'object' => EVENT_OBJECT_TRIGGER,
 						'time_from' => $_REQUEST['nav_time'],
 						'time_till' => null,
 						'extendoutput' => 1,
