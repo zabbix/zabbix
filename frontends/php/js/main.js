@@ -19,6 +19,38 @@
 **/ 
 
 /************************************************************************************/
+/*								PAGE REFRESH										*/
+/************************************************************************************/
+// Author: Aly
+var PageRefresh = {
+delay:			null,	// refresh timeout
+delayLeft:		null,	// left till refresh
+timeout:		null,	// link to timeout
+
+init: function(time){
+	this.delay = time;
+	this.delayLeft = this.delay;
+	this.start();
+},
+
+check: function(){
+	this.delayLeft -= 1000;
+	if(this.delayLeft < 0)
+		location.reload();
+	else
+		this.timeout = setTimeout('PageRefresh.check()', 1000);
+},
+
+start: function(){
+	this.timeout = setTimeout('PageRefresh.check()', 1000);
+},
+
+stop: function(){
+	clearTimeout(this.timeout);	
+}
+}
+
+/************************************************************************************/
 /*								MAIN MENU stuff										*/
 /************************************************************************************/
 // Author: Aly
@@ -33,16 +65,19 @@ timeout_change:	null,
 mouseOver: function(show_label){
 	clearTimeout(this.timeout_reset);
 	this.timeout_change = setTimeout('MMenu.showSubMenu("'+show_label+'")', 200);
+	PageRefresh.stop();
 },
 
 submenu_mouseOver: function(){
 	clearTimeout(this.timeout_reset);
 	clearTimeout(this.timeout_change);
+	PageRefresh.stop();
 },
 
 mouseOut: function(){
 	clearTimeout(this.timeout_change);
 	this.timeout_reset = setTimeout('MMenu.showSubMenu("'+this.def_label+'")', 2500);
+	PageRefresh.start();
 },
 
 showSubMenu: function(show_label){
@@ -122,6 +157,8 @@ check: function(e){
 	var e = e || window.event;
 	var obj = eventTarget(e);
 
+	PageRefresh.stop();
+	
 	if((typeof(obj) == 'undefined') || (obj.type.toLowerCase() != 'checkbox')){
 		return true;
 	}
