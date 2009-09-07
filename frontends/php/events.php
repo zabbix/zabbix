@@ -228,12 +228,12 @@ include_once('include/page_header.php');
 		
 // OBJECT DHOST
 		$dhosts = array();
-		$sql = 'SELECT s.dserviceid, s.ip '.
+		$sql = 'SELECT s.dserviceid, s.dhostid, s.ip '.
 				' FROM dservices s '.
 				' WHERE '.DBcondition('s.dhostid', $objectids);
 		$res = DBselect($sql);
 		while($dservices = DBfetch($res)){
-			$dhosts[$dservices['dserviceid']] = $dservices;
+			$dhosts[$dservices['dhostid']] = $dservices;
 		}
 
 // OBJECT DSERVICE
