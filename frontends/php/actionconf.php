@@ -541,12 +541,12 @@ include_once('include/page_header.php');
 
 			if($action['status'] == ACTION_STATUS_DISABLED){
 				$status= new CLink(S_DISABLED,
-					'actionconf.php?group_enable=1&g_actionid%5B%5D='.$action['actionid'].url_param('eventsource'),
+					'actionconf.php?go=activate&g_actionid%5B%5D='.$action['actionid'].url_param('eventsource'),
 					'disabled');
 			}
 			else{
 				$status= new CLink(S_ENABLED,
-					'actionconf.php?group_disable=1&g_actionid%5B%5D='.$action['actionid'].url_param('eventsource'),
+					'actionconf.php?go=disable=1&g_actionid%5B%5D='.$action['actionid'].url_param('eventsource'),
 					'enabled');
 			}
 
