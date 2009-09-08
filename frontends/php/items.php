@@ -809,7 +809,7 @@ include_once "include/page_header.php";
 					' FROM functions as f, triggers as t, items as i '.
 					' WHERE f.itemid='.$db_item["itemid"].
 					  ' AND i.itemid=f.itemid AND t.triggerid = f.triggerid '.
-					  ' AND (i.value_type=2  || i.value_type=4) AND i.key_ LIKE \''.$dbkey[$ltype].'\' '.
+					  ' AND i.value_type IN (1, 2, 4) AND i.key_ LIKE \''.$dbkey[$ltype].'\' '.
 					' GROUP BY t.triggerid');
 					
 				$triggers_flag = false;
