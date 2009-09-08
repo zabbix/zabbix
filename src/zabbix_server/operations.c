@@ -441,7 +441,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 				" from drules dr,dchecks dc,dservices ds,dservices ds1"
 				" where dc.druleid=dr.druleid"
 					" and ds.dcheckid=dc.dcheckid"
-					" and ds1.dcheckid=ds.dcheckid"
+					" and ds1.dhostid=ds.dhostid"
 					" and ds1.dserviceid=" ZBX_FS_UI64
 				" order by ds.dserviceid",
 				event->objectid);
