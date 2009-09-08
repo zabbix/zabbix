@@ -34,6 +34,8 @@ init: function(time){
 },
 
 check: function(){
+	if(is_null(this.delay)) return false;
+
 	this.delayLeft -= 1000;
 	if(this.delayLeft < 0)
 		location.reload();
@@ -42,6 +44,8 @@ check: function(){
 },
 
 start: function(){
+	if(is_null(this.delay)) return false;
+	
 	this.timeout = setTimeout('PageRefresh.check()', 1000);
 },
 
