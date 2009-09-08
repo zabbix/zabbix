@@ -1594,7 +1594,7 @@ return $result;
 
 		$db_deps = DBselect('SELECT * FROM trigger_depends WHERE triggerid_down='.$triggerid);
 		while($db_dep = DBfetch($db_deps))
-				$result[] = $db_dep['triggerid_up'];
+			$result[] = $db_dep['triggerid_up'];
 
 	return $result;
 	}

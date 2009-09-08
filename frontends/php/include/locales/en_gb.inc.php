@@ -674,6 +674,7 @@
 
 //	hosts.php
 	'S_MACROS'=> 'Macros',
+	'S_MACRO'=> 'Macro',
 	'S_WRONG_MACRO' => 'Wrong macro',
 	'S_MACRO_EXISTS' => 'Macro already exists',
 	'S_NEW_MACRO' => 'New macro',
