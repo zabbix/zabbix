@@ -338,7 +338,7 @@
 		zbx_value2array($usrgrpids);
 
 		$users = get_userid_by_usrgrpid($usrgrpids);
-		$result=(!uint_in_array($USER_DETAILS['userid'],$users));
+		$result=(!isset($users[$USER_DETAILS['userid']]));
 
 	return $result;
 	}

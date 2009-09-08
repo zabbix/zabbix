@@ -152,7 +152,7 @@
 
 		$switch_node = get_request('switch_node', get_profile('web.nodes.switch_node', -1));
 
-		if(!isset($available_nodes[$switch_node]) || !uint_in_array($switch_node, $selected_nodeids)) { //check switch_node
+		if(!isset($available_nodes[$switch_node]) || !isset($selected_nodeids[$switch_node])) { //check switch_node
 			$switch_node = 0;
 		}
 
