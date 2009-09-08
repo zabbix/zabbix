@@ -259,6 +259,28 @@ include_once('include/page_header.php');
 		unset($_REQUEST['form']);
 	}
 // ----- GO -----
+	else if(($_REQUEST['go'] == 'unblock') && isset($_REQUEST['group_userid'])){
+		$result = false;
+		
+		$group_userid = get_request('group_userid', array());
+		
+		DBstart();
+		$result = unblock_user_login($group_userid);
+		$result = DBend($result);
+		
+		if($result){
+			$options = array('userids'=>$group_userid, 
+							'extendoutput' => 1);
+			$users = CUser::get($options);
+			foreach($users as $userid => $user){
+				info('User '.$user['alias'].' unblocked');
+				add_audit(AUDIT_ACTION_UPDATE,	AUDIT_RESOURCE_USER,
+							'Unblocked user alias ['.$user['alias'].'] name ['.$user['name'].'] surname ['.$user['surname'].']');
+			}
+		}
+		
+		show_messages($result, S_USERS_UNBLOCKED,S_CANNOT_UNBLOCK_USERS);
+	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_userid'])){
 		$result = false;
 
@@ -268,7 +290,7 @@ include_once('include/page_header.php');
 		foreach($group_userid as $userid){
 			if(!($user_data = get_user_by_userid($userid))) continue;
 
-			$result |= delete_user($userid);
+			$result |= (bool) delete_user($userid);
 
 			if($result){
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER,
@@ -353,6 +375,7 @@ include_once('include/page_header.php');
 			make_sorting_header(S_USER_TYPE,'type'),
 			S_GROUPS,
 			S_IS_ONLINE_Q,
+			S_LOGIN,
 			S_GUI_ACCESS,
 			S_API_ACCESS,
 			S_DEBUG_MODE,
@@ -382,9 +405,8 @@ include_once('include/page_header.php');
 		foreach($users as $userid => $user){
 			$session = $usessions[$userid];
 
-			// Online time
-			$online_time = (($user['autologout'] == 0) || (ZBX_USER_ONLINE_TIME<$user['autologout']))
-				? ZBX_USER_ONLINE_TIME : $user['autologout'];
+// Online time
+			$online_time = (($user['autologout'] == 0) || (ZBX_USER_ONLINE_TIME<$user['autologout']))?ZBX_USER_ONLINE_TIME:$user['autologout'];
 			if($session['lastaccess']){
 				$online = (($session['lastaccess'] + $online_time) >= time())
 					? new CCol(S_YES.' ('.date('r', $session['lastaccess']).')', 'enabled')
@@ -394,16 +416,20 @@ include_once('include/page_header.php');
 				$online = new CCol(S_NO, 'disabled');
 			}
 
+// Blocked
+			if($user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS)
+				$blocked = new CLink(S_BLOCKED, 'users.php?go=unblock&group_userid%5B%5D='.$userid, 'on');
+			else
+				$blocked = new CSpan(S_OK, 'green');
 
-			// UserGroups
+// UserGroups
 			$users_groups = array();
 			foreach($user['usrgrps'] as $usrgrpid => $usrgrp){
 				$users_groups[] = new CLink($usrgrp['name'],'usergrps.php?form=update&usrgrpid='.$usrgrpid);
 				$users_groups[] = BR();
 			}
 			array_pop($users_groups);
-
-
+			
 			$gui_access = user_auth_type2str($user['gui_access']);
 			$gui_access = new CSpan($gui_access, ($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED) ? 'orange' : 'green');
 			$users_status = ($user['users_status'] == 1) ? new CSpan(S_DISABLED, 'red') : new CSpan(S_ENABLED, 'green');
@@ -418,6 +444,7 @@ include_once('include/page_header.php');
 				user_type2str($user['type']),
 				$users_groups,
 				$online,
+				$blocked,
 				$gui_access,
 				$api_access,
 				$debug_mode,
@@ -426,6 +453,7 @@ include_once('include/page_header.php');
 		}
 // goBox
 		$goBox = new CComboBox('go');
+		$goBox->addItem('unblock',S_UNBLOCK_SELECTED);
 		$goBox->addItem('delete',S_DELETE_SELECTED);
 
 		// goButton name is necessary!!!
