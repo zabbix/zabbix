@@ -757,9 +757,16 @@ function zbx_str_revert(&$str){
 return $result;
 }
 
+
 function uint_in_array($needle,$haystack){
+// :REMOVE:
+	if(!empty($haystack) && !isset($haystack[0])){
+		info('uint_in_array: possible pasted associated array');
+	}
+//----
 	foreach($haystack as $id => $value)
 		if(bccomp($needle,$value) == 0) return true;
+
 return false;
 }
 

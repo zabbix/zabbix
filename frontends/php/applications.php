@@ -143,13 +143,15 @@ include_once('include/page_header.php');
 		$result = true;
 
 		$applications = get_request('applications',array());
-		$db_applications = DBselect('SELECT applicationid, name, hostid '.
-								' FROM applications '.
-								' WHERE '.DBin_node('applicationid'));
-
+		
 		DBstart();
+		$sql = 'SELECT a.applicationid, a.name, a.hostid '.
+				' FROM applications a'.
+				' WHERE '.DBin_node('a.applicationid').
+					' AND '.DBcondition('a.applicationid', $applications);
+		$db_applications = DBselect($sql);
 		while($db_app = DBfetch($db_applications)){
-			if(!uint_in_array($db_app['applicationid'],$applications))	continue;
+			if(!isset($applications[$db_app['applicationid']]))	continue;
 
 			$result &= delete_application($db_app['applicationid']);
 

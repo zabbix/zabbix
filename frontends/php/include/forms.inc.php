@@ -2500,6 +2500,19 @@
 					BR()
 				));
 			}
+			
+			$templates = CTemplate::get($options);
+			foreach($templates as $templateid => $template){
+				array_push($target_list,array(
+					new CCheckBox('copy_targetid['.$templateid.']',
+						uint_in_array($templateid, $copy_targetid),
+						null,
+						$templateid),
+					SPACE,
+					$template['host'],
+					BR()
+				));
+			}
 		}
 		else{
 			foreach($groups as $groupid => $group){
@@ -5499,14 +5512,9 @@
 			$ipmi_password		= $db_host['ipmi_password'];
 
 // add groups
-			$db_groups=DBselect('SELECT DISTINCT groupid '.
-							' FROM hosts_groups '.
-							' WHERE hostid='.$_REQUEST['hostid'].
-								' AND '.DBcondition('groupid',$available_groups));
-			while($db_group=DBfetch($db_groups)){
-				if(uint_in_array($db_group['groupid'],$groups)) continue;
-				$groups[$db_group['groupid']] = $db_group['groupid'];
-			}
+			$options = array( 'groupids' => $groups, 'hostids'=>$_REQUEST['hostid']);
+			$groups= CHostGroup::get($options);
+
 // read profile
 			$db_profiles = DBselect('SELECT * FROM hosts_profiles WHERE hostid='.$_REQUEST['hostid']);
 
