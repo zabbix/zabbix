@@ -39,7 +39,8 @@ function __autoload($class_name){
 		'ctrigger' => 1,
 		'cuser' => 1,
 		'cusergroup' => 1,
-		'cusermacro' => 1
+		'cusermacro' => 1,
+		'cgraphitem' => 1
 	);
 
 	$rpc = array(

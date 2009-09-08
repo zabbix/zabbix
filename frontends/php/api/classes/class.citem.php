@@ -194,12 +194,12 @@ class CItem {
 			zbx_value2array($options['applicationids']);
 
 			if(!is_null($options['extendoutput'])){
-				$sql_parts['select']['applicationid'] = 'a.applicationid';
+				$sql_parts['select']['applicationid'] = 'ia.applicationid';
 			}
 
-			$sql_parts['from'][] = 'applications a';
-			$sql_parts['where'][] = DBcondition('a.applicationid', $options['applicationids']);
-			$sql_parts['where']['ia'] = 'i.hostid=a.hostid';
+			$sql_parts['from']['ia'] = 'items_applications ia';					
+			$sql_parts['where'][] = DBcondition('ia.applicationid', $options['applicationids']);
+			$sql_parts['where']['ia'] = 'ia.itemid=i.itemid';
 		}
 
 // graphids
@@ -555,48 +555,37 @@ class CItem {
 	 * @static
 	 * @param array $item_data
 	 * @param array $item_data['key_']
-	 * @param array $item_data['host']
-	 * @param array $item_data['hostid'] OPTIONAL
+	 * @param array $item_data['host'] ALTERNATIVE
+	 * @param array $item_data['hostid'] ALTERNATIVE
 	 * @return int|boolean
 	 */
 	public static function getId($item_data){
-
-		if(isset($item_data['host'])) {
-			$host = $item_data['host'];
+		if(isset($item_data['hostid'])){
+			$hostid = $item_data['hostid'];
 		}
-		else {
-			$host = CHost::getById(array('hostid' => $item_data['hostid']));
-			$host = $host['host'];
+		else{
+			if(!isset($item_data['host'])){
+				self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Item doesn\'t exists.');
+				return false;
+			}
+			$hostid = CHost::getId(array('host' => $item_data['host']));
 		}
-
-		$item = get_item_by_key($item_data['key_'], $host);
-
-		$result = $item ? true : false;
+		
+		$sql = 'SELECT DISTINCT i.itemid'.
+			' FROM items i'.
+			' WHERE i.key_='.zbx_dbstr($item_data['key_']).
+				' AND i.hostid='.$hostid;
+				
+		$itemid = DBfetch(DBselect($sql));
+		
+		$result = $itemid ? $itemid['itemid'] : false;
 		if($result)
-			return $item['itemid'];
+			return $result;
 		else{
 			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Item doesn\'t exists.');
 			return false;
 		}
 	}
-
- 	// /**
-	 // * Get itemid by host.hostid and item.key
-	 // *
-	 // * @static
-	 // * @param string $hostid
-	 // * @param string $itemkey
-	 // * @return int|boolean
-	 // */
-	// public static function getIdByHostId($item_data$hostid, $itemkey){
-
-		// $sql = 'SELECT DISTINCT i.itemid '.
-				// ' FROM items i '.
-				// ' WHERE i.hostid='.$hostid.' AND i.key_='.zbx_dbstr($itemkey);
-		// $item = DBfetch(DBselect($sql));
-
-		// return $item ? $item['itemid'] : false;
-	// }
 
 	/**
 	 * Add item

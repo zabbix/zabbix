@@ -80,6 +80,7 @@ class CTemplate {
 			'select_triggers'			=> null,
 			'select_graphs'				=> null,
 			'select_applications'		=> null,
+			'select_macros'				=> null,
 			'count'						=> null,
 			'pattern'					=> '',
 			'sortfield'					=> '',
@@ -298,8 +299,12 @@ class CTemplate {
 						$template['graphs'] = array();
 					}
 					if($options['select_applications'] && !isset($result[$template['hostid']]['applications'])){
-						$result[$template['hostid']]['applications'] = array();
-						$result[$template['hostid']]['applicationids'] = array();
+						$template['applications'] = array();
+						$template['applicationids'] = array();
+					}
+					if($options['select_macros'] && !isset($result[$host['hostid']]['macroids'])){
+						$template['macros'] = array();
+						$template['macroids'] = array();
 					}
 
 					// groupids
@@ -411,7 +416,19 @@ class CTemplate {
 				}
 			}
 		}
-
+		
+// Adding macros
+		if($options['select_macros']){
+			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);
+			$macros = CUserMacro::get($obj_params);
+			foreach($macros as $macroid => $macro){
+				foreach($macro['hostids'] as $num => $hostid){
+					$result[$hostid]['macroids'][$macroid] = $macroid;
+					$result[$hostid]['macros'][$macroid] = $macro;
+				}
+			}
+		}
+		
 	return $result;
 	}
 

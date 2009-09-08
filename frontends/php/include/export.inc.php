@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,55 +17,62 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-
-	require_once "include/defines.inc.php";
 ?>
 <?php
-	global $ZBX_EXPORT_MAP;
 
-	$ZBX_EXPORT_MAP = array(
+class zbxXML{
+
+	private static $ZBX_EXPORT_MAP = array(
 		XML_TAG_HOST => array(
-			'attributes'	=> array(
-				'host'		=> 'name'),
-			'elements'	=> array(
-				'proxy'		=> '',
-				'useip'		=> '',
-				'dns'		=> '',
-				'ip'		=> '',
-				'port'		=> '',
-				'status'	=> '')
+			'attributes' => array(
+				'host' 				=> 'name'
 			),
+			'elements' => array(
+				'proxy'				=> '',
+				'useip'				=> '',
+				'dns'				=> '',
+				'ip'				=> '',
+				'port'				=> '',
+				'status'			=> ''
+			)
+		),
+		XML_TAG_MACRO => array(
+			'attributes' => array(),
+			'elements' => array(
+				'value' 			=> '',
+				'macro' 			=> 'name'
+			)
+		),
 		XML_TAG_HOSTPROFILE => array(
-			'attributes'	=> array(),
-			'elements'	=> array(
-				'devicetype'	=> '',
-				'name'		=> '',
-				'os'		=> '',
-				'serialno'	=> '',
-				'tag'		=> '',
-				'macaddress'	=> '',
-				'hardware'	=> '',
-				'software'	=> '',
-				'contact'	=> '',
-				'location'	=> '',
-				'notes'		=> '')
-			),
+			'attributes' => array(),
+			'elements' => array(
+				'devicetype'		=> '',
+				'name'				=> '',
+				'os'				=> '',
+				'serialno'			=> '',
+				'tag'				=> '',
+				'macaddress'		=> '',
+				'hardware'			=> '',
+				'software'			=> '',
+				'contact'			=> '',
+				'location'			=> '',
+				'notes'				=> ''
+			)
+		),
 		XML_TAG_HOSTPROFILE_EXT => array(
-			'attributes'		=> array(),
-			'elements'		=> array(
+			'attributes' => array(),
+			'elements' => array(
 				'device_alias'		=> '',
 				'device_type'		=> '',
 				'device_chassis'	=> '',
-				'device_os'		=> '',
+				'device_os'			=> '',
 				'device_os_short'	=> '',
-
 				'device_hw_arch'	=> '',
 				'device_serial'		=> '',
 				'device_model'		=> '',
 				'device_tag'		=> '',
 				'device_vendor'		=> '',
 				'device_contract'	=> '',
-
 				'device_who'		=> '',
 				'device_status'		=> '',
 				'device_app_01'		=> '',
@@ -81,9 +88,9 @@
 				'device_hardware'	=> '',
 				'device_software'	=> '',
 				'ip_subnet_mask'	=> '',
-				'ip_router'		=> '',
+				'ip_router'			=> '',
 				'ip_macaddress'		=> '',
-				'oob_ip'		=> '',
+				'oob_ip'			=> '',
 				'oob_subnet_mask'	=> '',
 				'oob_router'		=> '',
 				'date_hw_buy'		=> '',
@@ -93,11 +100,11 @@
 				'site_street_1'		=> '',
 				'site_street_2'		=> '',
 				'site_street_3'		=> '',
-				'site_city'		=> '',
+				'site_city'			=> '',
 				'site_state'		=> '',
 				'site_country'		=> '',
-				'site_zip'		=> '',
-				'site_rack'		=> '',
+				'site_zip'			=> '',
+				'site_rack'			=> '',
 				'site_notes'		=> '',
 				'poc_1_name'		=> '',
 				'poc_1_email'		=> '',
@@ -112,530 +119,574 @@
 				'poc_2_phone_2'		=> '',
 				'poc_2_cell'		=> '',
 				'poc_2_screen'		=> '',
-				'poc_2_notes'		=> '')
-			),
+				'poc_2_notes'		=> ''
+			)
+		),
 		XML_TAG_DEPENDENCY => array(
-			'attributes'	=> array(
-				'dependency'	=> 'description'),
-			'elements'	=> array(
-				'depends'	=> '')
-			),
+			'attributes' => array(
+				'host_trigger'		=> 'description'),
+			'elements' => array(
+				'depends'			=> '' 
+			)
+		),
 		XML_TAG_ITEM => array(
-			'attributes'	=> array(
-				'type'			=> '',
-				'key_'			=> 'key',
-				'value_type'		=> ''),
-			'elements'		=> array(
+			'attributes' => array(
+				'type'				=> '',
+				'key_'				=> 'key',
+				'value_type'		=> ''
+			),
+			'elements' => array(
 				'description'		=> '',
 				'ipmi_sensor'		=> '',
-				'delay'			=> '',
-				'history'		=> '',
-				'trends'		=> '',
-				'status'		=> '',
-				'data_type'		=> '',
-				'units'			=> '',
+				'delay'				=> '',
+				'history'			=> '',
+				'trends'			=> '',
+				'status'			=> '',
+				'data_type'			=> '',
+				'units'				=> '',
 				'multiplier'		=> '',
-				'delta'			=> '',
-				'formula'		=> '',
+				'delta'				=> '',
+				'formula'			=> '',
 				'lastlogsize'		=> '',
 				'logtimefmt'		=> '',
 				'delay_flex'		=> '',
-				'params'		=> '',
+				'params'			=> '',
 				'trapper_hosts'		=> '',
 				'snmp_community'	=> '',
-				'snmp_oid'		=> '',
-				'snmp_port'		=> '',
+				'snmp_oid'			=> '',
+				'snmp_port'			=> '',
 				'snmpv3_securityname'	=> '',
 				'snmpv3_securitylevel'	=> '',
 				'snmpv3_authpassphrase'	=> '',
-				'snmpv3_privpassphrase'	=> '')
-			),
+				'snmpv3_privpassphrase'	=> ''
+			)
+		),
 		XML_TAG_TRIGGER => array(
-			'attributes'	=> array(),
-			'elements'	=> array(
+			'attributes' => array(),
+			'elements' => array(
 				'description'		=> '',
-				'type'			=> '',
+				'type'				=> '',
 				'expression'		=> '',
-				'url'			=> '',
-				'status'		=> '',
-				'priority'		=> '',
-				'comments'		=> '')
-			),
+				'url'				=> '',
+				'status'			=> '',
+				'priority'			=> '',
+				'comments'			=> ''
+			)
+		),
 		XML_TAG_GRAPH => array(
-			'attributes'	=> array(
-				'name'			=> '',
-				'width'			=> '',
-				'height'		=> ''),
-			'elements'	=> array(
-				'ymin_type'		=> '',
-				'ymax_type'		=> '',
+			'attributes' => array(
+				'name'				=> '',
+				'width'				=> '',
+				'height'			=> ''
+			),
+			'elements' => array(
+				'ymin_type'			=> '',
+				'ymax_type'			=> '',
 				'ymin_item_key'		=> '',
 				'ymax_item_key'		=> '',
 				'show_work_period'	=> '',
 				'show_triggers'		=> '',
-				'graphtype'		=> '',
-				'yaxismin'		=> '',
-				'yaxismax'		=> '',
+				'graphtype'			=> '',
+				'yaxismin'			=> '',
+				'yaxismax'			=> '',
 				'show_legend'		=> '',
-				'show_3d'		=> '',
+				'show_3d'			=> '',
 				'percent_left'		=> '',
-				'percent_right'		=> '')
-			),
-		XML_TAG_GRAPH_ELEMENT => array(
-			'attributes'	=> array(
-				'item'		=> ''),
-			'elements'	=> array(
-				'drawtype'	=> '',
-				'sortorder'	=> '',
-				'color'		=> '',
-				'yaxisside'	=> '',
-				'calc_fnc'	=> '',
-				'type'		=> '',
-				'periods_cnt'	=> '')
+				'percent_right'		=> ''
 			)
-		);
+		),
+		XML_TAG_GRAPH_ELEMENT => array(
+			'attributes' => array(
+				'host_key_'			=> 'item'
+			),
+			'elements' => array(
+				'drawtype'			=> '',
+				'sortorder'			=> '',
+				'color'				=> '',
+				'yaxisside'			=> '',
+				'calc_fnc'			=> '',
+				'type'				=> '',
+				'periods_cnt'		=> ''
+			)
+		)
+	);
 
-	function zbx_xmlwriter_open_memory(){
-		return array('tabs' => 0, 'tag'=>array());
+	private static function space2tab($matches){
+		return str_repeat("\t", strlen($matches[0]) / 2 );
 	}
-
-	function zbx_xmlwriter_set_indent($mem, $val){
-		return true;
-	}
-
-	function zbx_xmlwriter_start_document(&$mem, $ver){
-		echo '<?xml version="'.$ver.'"?';
-		return true;
-	}
-
-	function zbx_xmlwriter_start_element(&$mem, $tag){
-		array_push($mem['tag'], $tag);
-		echo '>'."\n".str_repeat("\t",$mem['tabs']).'<'.$tag;
-		$mem['tabs']++;
-		return true;
-	}
-
-	function zbx_xmlwriter_write_attribute(&$mem, $name, $val){
-		echo ' '.$name.'="'.htmlspecialchars($val).'"';
-		return true;
-	}
-
-	function zbx_xmlwriter_end_element(&$mem){
-		$teg = array_pop($mem['tag']);
-		$mem['tabs']--;
-		echo '>'."\n".str_repeat("\t",$mem['tabs']).'</'.$teg;
-	}
-
-	function zbx_xmlwriter_output_memory(&$mem, $val){
-/* NOTE: use this function only in the end of xml file creation */
-		echo '>'."\n";
-	}
-
-	function zbx_xmlwriter_write_element(&$mem, $name, $val){
-		echo '>'."\n".str_repeat("\t",$mem['tabs']).'<'.$name.'>'.htmlspecialchars($val).'</'.$name;
-	}
-
-	class CZabbixXMLExport{
-		function CZabbixXMLExport(){}
-
-		function export_item(&$memory, $itemid){
-			global $ZBX_EXPORT_MAP;
-
-			$data = DBfetch(DBselect('select * from items where itemid='.$itemid));
-			if(!$data) return false;
-
-			zbx_xmlwriter_start_element ($memory,XML_TAG_ITEM);
-
-			$map =& $ZBX_EXPORT_MAP[XML_TAG_ITEM];
-
-			foreach($map['attributes'] as $db_name => $xml_name){
-				if(empty($xml_name)) $xml_name = $db_name;
-				zbx_xmlwriter_write_attribute($memory, $xml_name, $data[$db_name]);
-			}
-
-			foreach($map['elements'] as $db_name => $xml_name){
-				if(!isset($data[$db_name])) continue;
-				if(empty($xml_name)) $xml_name = $db_name;
-				zbx_xmlwriter_write_element ($memory, $xml_name, $data[$db_name]);
-			}
-
-			if( !empty($data['valuemapid']) && $valuemap = DBfetch(DBselect('select name from valuemaps where valuemapid='.$data['valuemapid']))){
-				zbx_xmlwriter_write_element($memory, 'valuemap', $valuemap['name']);
-			}
-
-			$db_applications=DBselect('SELECT DISTINCT a.name '.
-						' FROM applications a,items_applications ia '.
-						' WHERE ia.applicationid=a.applicationid and ia.itemid='.$itemid);
-			if($application = DBfetch($db_applications)){
-				zbx_xmlwriter_start_element ($memory,XML_TAG_APPLICATIONS);
-				do{
-					zbx_xmlwriter_write_element ($memory, XML_TAG_APPLICATION, $application['name']);
-				} while($application = DBfetch($db_applications));
-				zbx_xmlwriter_end_element($memory); // XML_TAG_APPLICATIONS
-			}
-
-			zbx_xmlwriter_end_element($memory); // XML_TAG_ITEM
+	
+	public static function arrayToXML($array, $root = 'root', $xml = null){
+	
+		if($xml == null){
+			$xml = simplexml_load_string("<?xml version='1.0' encoding='utf-8'?><$root />");
 		}
-
-
-		function export_trigger(&$memory, $triggerid){
-			global $ZBX_EXPORT_MAP;
-
-			$data = DBfetch(DBselect('select * from triggers where triggerid='.$triggerid));
-			if(!$data) return false;
-
-			$data['expression'] = explode_exp($data["expression"],0,true);
-
-			zbx_xmlwriter_start_element ($memory,XML_TAG_TRIGGER);
-
-			$map =& $ZBX_EXPORT_MAP[XML_TAG_TRIGGER];
-
-			foreach($map['attributes'] as $db_name => $xml_name){
-				if(empty($xml_name)) $xml_name = $db_name;
-				zbx_xmlwriter_write_attribute($memory, $xml_name, $data[$db_name]);
+		
+ 		foreach($array as $key => $value){
+		
+			if(is_numeric($key)){
+				$key = 'node_'. $key;
 			}
-
-			foreach($map['elements'] as $db_name => $xml_name){
-				if(!isset($data[$db_name])) continue;
-				if(empty($xml_name)) $xml_name = $db_name;
-
-				zbx_xmlwriter_write_element ($memory, $xml_name, $data[$db_name]);
+			if(is_array($value)){
+				$node = $xml->addChild($key);
+				self::toXml($value, $root, $node);
 			}
-			zbx_xmlwriter_end_element($memory); // XML_TAG_TRIGGER
+			else{
+				$value = htmlentities($value);
+				$xml->addChild($key, $value);
+			}
 		}
+		
+		$doc = new DOMDocument();
+		$doc->preserveWhiteSpace = false;
+		$doc->loadXML($xml->asXML());
+		$doc->formatOutput = true;
 
-		function export_graph_element(&$memory, $gitemid){
-			global $ZBX_EXPORT_MAP;
-
-			$sql = 'select gi.*,i.key_,h.host '.
-					' from graphs_items gi, items i, hosts h'.
-					' where h.hostid=i.hostid '.
-						' and i.itemid=gi.itemid '.
-						' and gi.gitemid='.$gitemid;
-
-			$data = DBfetch(DBselect($sql));
-			if(!$data) return false;
-
-			$data['item'] = $data['host'].':'.$data['key_'];
-
-			zbx_xmlwriter_start_element ($memory,XML_TAG_GRAPH_ELEMENT);
-
-			$map =& $ZBX_EXPORT_MAP[XML_TAG_GRAPH_ELEMENT];
-
-			foreach($map['attributes'] as $db_name => $xml_name){
-				if(empty($xml_name)) $xml_name = $db_name;
-				zbx_xmlwriter_write_attribute($memory, $xml_name, $data[$db_name]);
-			}
-
-			foreach($map['elements'] as $db_name => $xml_name){
-				if(!isset($data[$db_name])) continue;
-				if(empty($xml_name)) $xml_name = $db_name;
-				zbx_xmlwriter_write_element ($memory, $xml_name, $data[$db_name]);
-			}
-			zbx_xmlwriter_end_element($memory); // XML_TAG_GRAPH_ELEMENT
+		return preg_replace_callback('/^( {2,})/m', 'self::callback', $doc->saveXML());
+	}
+	
+	private static function addChildData($node, $child_name, $data){
+		$child_node = $node->addChild($child_name);
+		
+		foreach(self::$ZBX_EXPORT_MAP[$child_name]['attributes'] as $attr => $name){
+			if($name == '') $name = $attr;
+			$child_node->addAttribute($name, $data[$attr]);			
 		}
-
-		function export_graph(&$memory, $graphid){
-			global $ZBX_EXPORT_MAP;
-
-			$data = DBfetch(DBselect('select * from graphs where graphid='.$graphid));
-			if(!$data) return false;
-
-			$data['ymin_item_key'] = '';
-			$data['ymax_item_key'] = '';
-			if(($data['ymin_itemid'] > 0) || ($data['ymax_itemid'] > 0)){
-				$sql_where = '';
-				if($data['ymin_itemid'] > 0){
-					$sql_where.= ' i.itemid='.$data['ymin_itemid'];
-				}
-				if($data['ymax_itemid'] > 0){
-					$sql_where.= (zbx_empty($sql_where)?'':' OR ').' i.itemid='.$data['ymax_itemid'];
-				}
-				$sql_where = ' AND ('.$sql_where.')';
-
-				$sql = 'SELECT DISTINCT h.host, itemid, i.key_ '.
-						' FROM items i, hosts h '.
-						' WHERE h.hostid=i.hostid '.
-							$sql_where;
-				$item_res = DBselect($sql);
-				while($item = DBfetch($item_res)){
-					if($data['ymin_itemid'] == $item['itemid']){
-						$data['ymin_item_key'] = $item['host'].':'.$item['key_'];
-					}
-
-					if($data['ymax_itemid']  == $item['itemid']){
-						$data['ymax_item_key'] = $item['host'].':'.$item['key_'];
+		foreach(self::$ZBX_EXPORT_MAP[$child_name]['elements'] as $el => $name){
+			if($name == '') $name = $el;
+			$child_node->addChild($name, $data[$el]);			
+		}
+		
+		return $child_node;
+	}
+	
+	public static function export($data){
+		
+		$xml = simplexml_load_string("<?xml version='1.0' encoding='utf-8'?><zabbix_export />");
+		$xml->addAttribute('version', '1.0'); 
+		$xml->addAttribute('date', date('d.m.y'));
+		$xml->addAttribute('time', date('H.i'));
+		
+		$hosts_node = $xml->addChild(XML_TAG_HOSTS);
+		foreach($data['hosts'] as $host){
+// HOST
+			$host_node = self::addChildData($hosts_node, XML_TAG_HOST, $host);
+// HOST PROFILE	
+			self::addChildData($host_node, XML_TAG_HOSTPROFILE, $host['profile']);
+			self::addChildData($host_node, XML_TAG_HOSTPROFILE_EXT, $host['profile_ext']);
+// GROUPS
+			if(isset($data['hosts_groups'])){
+				$groups_node = $host_node->addChild(XML_TAG_GROUPS);
+				foreach($data['hosts_groups'] as $group){
+					if(isset($group['hostids'][$host['hostid']])){
+						$groups_node->addChild(XML_TAG_GROUP, $group['name']);
 					}
 				}
 			}
-
-			zbx_xmlwriter_start_element ($memory,XML_TAG_GRAPH);
-
-			$map =& $ZBX_EXPORT_MAP[XML_TAG_GRAPH];
-
-			foreach($map['attributes'] as $db_name => $xml_name){
-				if(empty($xml_name)) $xml_name = $db_name;
-				zbx_xmlwriter_write_attribute($memory, $xml_name, $data[$db_name]);
-			}
-
-			foreach($map['elements'] as $db_name => $xml_name){
-				if(!isset($data[$db_name])) continue;
-				if(empty($xml_name)) $xml_name = $db_name;
-				zbx_xmlwriter_write_element ($memory, $xml_name, $data[$db_name]);
-			}
-
-			zbx_xmlwriter_start_element ($memory,XML_TAG_GRAPH_ELEMENTS);
-
-			$db_elements = DBselect('select gitemid from graphs_items where graphid='.$graphid);
-			while($element = DBfetch($db_elements)){
-				$this->export_graph_element($memory, $element['gitemid']);
-			}
-
-			zbx_xmlwriter_end_element($memory); // XML_TAG_GRAPH_ELEMENTS
-			zbx_xmlwriter_end_element($memory); // XML_TAG_GRAPH
-		}
-
-		function export_host(&$memory, $hostid, $export_templates, $export_items, $export_triggers, $export_graphs){
-			global $ZBX_EXPORT_MAP;
-
-			$data = DBfetch(DBselect('SELECT * FROM hosts WHERE hostid='.$hostid));
-			if(!$data){
-				return false;
-			}
-			else if($data['proxy_hostid'] > 0){
-				if($proxy = DBfetch(DBselect('SELECT host FROM hosts WHERE hostid='.$data['proxy_hostid'].' AND status='.HOST_STATUS_PROXY))){
-					$data['proxy'] = $proxy['host'];
-				}
-				else{
-					$data['proxy'] = '';
-				}
-			}
-
-			zbx_xmlwriter_start_element ($memory,XML_TAG_HOST);
-
-			$map =& $ZBX_EXPORT_MAP[XML_TAG_HOST];
-
-			foreach($map['attributes'] as $db_name => $xml_name){
-				if(empty($xml_name)) $xml_name = $db_name;
-				zbx_xmlwriter_write_attribute($memory, $xml_name, $data[$db_name]);
-			}
-
-			foreach($map['elements'] as $db_name => $xml_name){
-				if(!isset($data[$db_name])) continue;
-				if(empty($xml_name)) $xml_name = $db_name;
-				zbx_xmlwriter_write_element ($memory, $xml_name, $data[$db_name]);
-			}
-
-			$sql = 'SELECT g.name '.
-					' FROM groups g, hosts_groups hg '.
-					' WHERE g.groupid=hg.groupid '.
-						' AND hg.hostid='.$hostid;
-			if($db_groups = DBselect($sql)){
-				zbx_xmlwriter_start_element ($memory,XML_TAG_GROUPS);
-
-				while($group = DBfetch($db_groups)){
-					zbx_xmlwriter_write_element ($memory, XML_TAG_GROUP, $group['name']);
-				}
-
-				zbx_xmlwriter_end_element($memory); // XML_TAG_GROUP
-			}
-// based on mod by scricca
-			$data = DBfetch(DBselect('SELECT hp.* FROM hosts_profiles hp WHERE hp.hostid='.$hostid));
-			if($data){
-				zbx_xmlwriter_start_element ($memory,XML_TAG_HOSTPROFILE);
-
-				$map =& $ZBX_EXPORT_MAP[XML_TAG_HOSTPROFILE];
-
-				foreach($map['attributes'] as $db_name => $xml_name){
-					if(empty($xml_name)) $xml_name = $db_name;
-					zbx_xmlwriter_write_attribute($memory, $xml_name, $data[$db_name]);
-				}
-
-				foreach($map['elements'] as $db_name => $xml_name){
-					if(empty($data[$db_name])) continue;
-					if(empty($xml_name)) $xml_name = $db_name;
-					zbx_xmlwriter_write_element($memory, $xml_name, $data[$db_name]);
-				}
-
-				zbx_xmlwriter_end_element($memory); // XML_TAG_HOSTPROFILE
-			}
-//--
-
-// Extended profiles
-			$data = DBfetch(DBselect('SELECT hpe.* FROM hosts_profiles_ext hpe WHERE hpe.hostid='.$hostid));
-			if($data){
-				zbx_xmlwriter_start_element($memory,XML_TAG_HOSTPROFILE_EXT);
-
-				$map =& $ZBX_EXPORT_MAP[XML_TAG_HOSTPROFILE_EXT];
-
-				foreach($map['attributes'] as $db_name => $xml_name){
-					if(empty($xml_name)) $xml_name = $db_name;
-					zbx_xmlwriter_write_attribute($memory, $xml_name, $data[$db_name]);
-				}
-
-				foreach($map['elements'] as $db_name => $xml_name){
-					if(empty($data[$db_name])) continue;
-					if(empty($xml_name)) $xml_name = $db_name;
-					zbx_xmlwriter_write_element($memory, $xml_name, $data[$db_name]);
-				}
-
-				zbx_xmlwriter_end_element($memory); // XML_TAG_HOSTPROFILE_EXT
-			}
-//--
-
-			if($export_templates){
-				$sql = 'SELECT t.host '.
-					' FROM hosts t, hosts_templates ht '.
-					' WHERE t.hostid=ht.templateid '.
-						' AND ht.hostid='.$hostid;
-
-				if($db_templates = DBselect($sql)){
-					zbx_xmlwriter_start_element ($memory,XML_TAG_TEMPLATES);
-
-					while($template = DBfetch($db_templates)){
-						zbx_xmlwriter_write_element ($memory, XML_TAG_TEMPLATE, $template['host']);
+// TRIGGERS
+			if(isset($data['triggers'])){
+				$triggers_node = $host_node->addChild(XML_TAG_TRIGGERS);
+				foreach($data['triggers'] as $trigger){
+					if(isset($trigger['hostids'][$host['hostid']])){
+						self::addChildData($triggers_node, XML_TAG_TRIGGER, $trigger);
 					}
 				}
-
-				zbx_xmlwriter_end_element($memory); // XML_TAG_TEMPLATES
 			}
-
-			if($export_items){
-				zbx_xmlwriter_start_element ($memory,XML_TAG_ITEMS);
-
-				$db_items=DBselect('select itemid from items where hostid='.$hostid);
-				while($item_id = DBfetch($db_items)){
-					$this->export_item($memory, $item_id['itemid']);
-				}
-
-				zbx_xmlwriter_end_element($memory); // XML_TAG_ITEMS
-			}
-
-			if($export_triggers){
-				zbx_xmlwriter_start_element ($memory,XML_TAG_TRIGGERS);
-
-				$db_triggers = DBselect('select f.triggerid, i.hostid, count(distinct i.hostid) as cnt '.
-					' from functions f, items i '.
-					' where f.itemid=i.itemid '.
-					' group by f.triggerid, i.hostid');
-				while($trigger = DBfetch($db_triggers)){
-					if((bccomp($trigger['hostid'] , $hostid) != 0) || $trigger['cnt']!=1) continue;
-					$this->export_trigger($memory, $trigger['triggerid']);
-				}
-
-				zbx_xmlwriter_end_element($memory); // XML_TAG_TRIGGERS
-			}
-
-			if($export_graphs){
-				zbx_xmlwriter_start_element ($memory, XML_TAG_GRAPHS);
-
-				$db_graphs = DBselect('select gi.graphid, i.hostid, count(distinct i.hostid) as cnt '.
-					' from graphs_items gi, items i '.
-					' where gi.itemid=i.itemid '.
-					' group by gi.graphid, i.hostid');
-				while($graph = DBfetch($db_graphs)){
-					if((bccomp($graph['hostid'] , $hostid) != 0) || $graph['cnt']!=1) continue;
-					$this->export_graph($memory, $graph['graphid']);
-				}
-
-				zbx_xmlwriter_end_element($memory); // XML_TAG_GRAPHS
-			}
-			/* export screens */
-			zbx_xmlwriter_end_element($memory); // XML_TAG_HOST
-			return true;
-		}
-
-		function export_dependency(&$memory, $triggerid, $host, $description){
-			global $ZBX_EXPORT_MAP;
-			if(!$triggerid) return false;
-
-			$data['dependency'] = $host.':'.$description;
-
-			zbx_xmlwriter_start_element ($memory,XML_TAG_DEPENDENCY);
-
-			$map =& $ZBX_EXPORT_MAP[XML_TAG_DEPENDENCY];
-
-			foreach($map['attributes'] as $db_name => $xml_name){
-				if(empty($xml_name)) $xml_name = $db_name;
-				zbx_xmlwriter_write_attribute($memory, $xml_name, $data[$db_name]);
-			}
-
-			$sql = 'SELECT t.triggerid, t.description, h.host'.
-					' FROM trigger_depends td, triggers t, items i, hosts h, functions f '.
-					' WHERE td.triggerid_down='.$triggerid.
-						' AND t.triggerid=td.triggerid_up '.
-						' AND f.triggerid=t.triggerid '.
-						' AND i.itemid=f.itemid '.
-						' AND h.hostid=i.hostid '.
-					' GROUP BY t.triggerid, t.description';
-
-			$res = DBselect($sql);
-			while($data = DBfetch($res)){
-				$data['depends'] = $data['host'].':'.$data['description'];
-				foreach($map['elements'] as $db_name => $xml_name){
-					if(!isset($data[$db_name])) continue;
-					if(empty($xml_name)) $xml_name = $db_name;
-					zbx_xmlwriter_write_element ($memory, $xml_name, $data[$db_name]);
-				}
-			}
-//--
-			/* export screens */
-			zbx_xmlwriter_end_element($memory); // XML_TAG_DEPENDENCY
-			return true;
-		}
-
-		function Export(&$hosts, &$templates, &$items, &$triggers, &$graphs){
-
-			$memory = zbx_xmlwriter_open_memory();
-			zbx_xmlwriter_set_indent($memory, true);
-			zbx_xmlwriter_start_document($memory,'1.0');
-			zbx_xmlwriter_start_element ($memory,XML_TAG_ZABBIX_EXPORT);
-			zbx_xmlwriter_write_attribute($memory, 'version', '1.0');
-			zbx_xmlwriter_write_attribute($memory, 'date', date('d.m.y'));
-			zbx_xmlwriter_write_attribute($memory, 'time', date('H.i'));
-
-				zbx_xmlwriter_start_element ($memory,XML_TAG_HOSTS);
-				foreach($hosts as $hostid => $val){
-					$this->export_host(
-						$memory,
-						$hostid,
-						isset($templates[$hostid]),
-						isset($items[$hostid]),
-						isset($triggers[$hostid]),
-						isset($graphs[$hostid])
-						);
-				}
-				zbx_xmlwriter_end_element($memory); // XML_TAG_HOSTS
-
-				if(!empty($triggers)){
-
-					zbx_xmlwriter_start_element ($memory,XML_TAG_DEPENDENCIES);
-					foreach($triggers as $hostid => $val){
-
-						$sql = 'SELECT h.host, t.description, t.triggerid '.
-								' FROM trigger_depends td, triggers t, functions f, items i, hosts h '.
-								' WHERE h.hostid='.$hostid.
-									' AND i.hostid=h.hostid '.
-									' AND f.itemid=i.itemid '.
-									' AND t.triggerid=f.triggerid '.
-									' AND td.triggerid_down=t.triggerid '.
-								' GROUP BY t.triggerid, t.description';
-
-						$dependent_triggers = DBselect($sql);
-						while($deps = DBfetch($dependent_triggers)){
-							$this->export_dependency(
-								$memory,
-								$deps['triggerid'],
-								$deps['host'],
-								$deps['description']
-								);
+// ITEMS
+			if(isset($data['items'])){
+				$items_node = $host_node->addChild(XML_TAG_ITEMS);
+				foreach($data['items'] as $item){
+					if(isset($item['hostids'][$host['hostid']])){
+						$item_node = self::addChildData($items_node, XML_TAG_ITEM, $item);
+//sdi('Item: '. date('H i s u'));
+						if(isset($data['items_applications'])){
+							$applications_node = $item_node->addChild(XML_TAG_APPLICATIONS);
+							foreach($data['items_applications'] as $application){
+								if(isset($application['itemids'][$item['itemid']])){
+									$applications_node->addChild(XML_TAG_APPLICATION, $application['name']);
+								}
+							}
 						}
 					}
-					zbx_xmlwriter_end_element($memory); // XML_TAG_DEPENDENCIES
+				}
+			}
+// TEMPLATES
+			if(isset($data['templates'])){
+				$templates_node = $host_node->addChild(XML_TAG_TEMPLATES);
+				foreach($data['templates'] as $template){
+					if(isset($template['hostids'][$host['hostid']])){
+						$templates_node->addChild(XML_TAG_TEMPLATE, $template['host']);
+					}
+				}
+			}
+			
+// GRAPHS
+			
+			if(isset($data['graphs'])){
+				$graphs_node = $host_node->addChild(XML_TAG_GRAPHS);
+				foreach($data['graphs'] as $graph){
+					if(isset($graph['hostids'][$host['hostid']])){
+						$graph_node = self::addChildData($graphs_node, XML_TAG_GRAPH, $graph);
+						
+						if(isset($data['graphs_items'])){
+							$graph_elements_node = $graph_node->addChild(XML_TAG_GRAPH_ELEMENTS);
+							foreach($data['graphs_items'] as $gitem){
+								if(isset($gitem['graphids'][$graph['graphid']])){
+									self::addChildData($graph_elements_node, XML_TAG_GRAPH_ELEMENT, $gitem);
+								}
+							}
+						}
+					}
+				}
+			}
+			
+// MACROS
+			if(isset($data['macros'])){
+				$macros_node = $host_node->addChild(XML_TAG_MACROS);
+				foreach($data['macros'] as $macro){
+					if(isset($macro['hostids'][$host['hostid']])){
+						self::addChildData($macros_node, XML_TAG_MACRO, $macro);
+					}
+				}
+			}
+
+		}
+// DEPENDENCIES
+			if(isset($data['dependencies'])){
+				$dependencies_node = $xml->addChild(XML_TAG_DEPENDENCIES);
+				foreach($data['dependencies'] as $dep_data){
+					$dependeny_node = $dependencies_node->addChild(XML_TAG_DEPENDENCY);
+					$dependeny_node->addAttribute('description', $dep_data['trigger']['host_description']);
+					foreach($dep_data['depends_on'] as $dep_trigger){
+						$dependeny_node->addChild('depends', $dep_trigger['host_description']);
+					};
+				}
+			}
+			
+		$doc = new DOMDocument();
+		$doc->preserveWhiteSpace = false;
+		$doc->loadXML($xml->asXML());
+		$doc->formatOutput = true;
+
+		return preg_replace_callback('/^( {2,})/m', array('self', 'space2tab'), $doc->saveXML());
+	}
+	
+	private static function mapXML2arr($xml, $tag){
+	
+		$array = array();
+		foreach(self::$ZBX_EXPORT_MAP[$tag]['attributes'] as $attr => $value){
+			if($value == '') $value = $attr;
+			$array[$attr] = (string) $xml[$value];
+		}
+		foreach(self::$ZBX_EXPORT_MAP[$tag]['elements'] as $el => $value){
+			if($value == '') $value = $el;
+			$array[$el] = (string) $xml->$value;
+		}
+		
+		return $array;		
+	}
+	
+	public static function import($rules, $file){
+	
+		$xml = simplexml_load_file($file);
+		if(!$xml) return false;
+		
+		$triggers_for_dependencies = array();
+		
+		if(isset($rules['host']['exist']) || isset($rules['host']['missed'])){
+			$hosts = $xml->xpath('hosts/host');
+			
+			foreach($hosts as $host){
+			
+// IMPORT RULES
+			$host_db = self::mapXML2arr($host, XML_TAG_HOST);
+			$current_hostid = CHost::getId(array('host' => $host_db['host']));
+
+			if(!$current_hostid && !isset($rules['host']['missed'])) continue; // break if update nonexist
+			if($current_hostid && !isset($rules['host']['exist'])) continue; // break if not update exist
+				
+				
+// HOST GROUPS
+				$groups = $host->xpath('groups/group');
+				$host_groupids = array();
+				$new_groupids = array();
+				
+				if(empty($groups)){
+					$current_groupid = CHostGroup::getId(array('name' => ZBX_DEFAULT_IMPORT_HOST_GROUP));
+					if($current_groupid){
+						$host_groupids[] = $current_groupid;
+					}
+					else{
+						$host_groupids = CHostGroup::add(array(ZBX_DEFAULT_IMPORT_HOST_GROUP));
+					}
+				}
+				else{
+					$groups_to_add = array();
+					foreach($groups as $group){
+						$group_name = (string) $group;
+						$current_groupid = CHostGroup::getId(array('name' => $group_name)); 
+//sdi('group: '.$group_name.' | GroupID: '. $current_groupid);	
+						if(!$current_groupid){
+							$groups_to_add[] = $group_name;
+						}
+						else{
+							$host_groupids[] = $current_groupid;
+						}
+					}
+					$new_groupids = CHostGroup::add($groups_to_add);
+				}
+				if($new_groupids)
+					$host_groupids = array_merge($new_groupids, $host_groupids);
+				else
+					$new_groupids = array();
+				
+// HOSTS
+//sdi('Host: '.$host_db['host'].' | HostID: '. $current_hostid);	
+				if($current_hostid && isset($rules['host']['exist'])){
+					$host_db['hostid'] = $current_hostid;
+					CHost::update(array($host_db));
+					CHostGroup::addGroupsToHost(array('hostid' => $current_hostid, 'groupids' => $new_groupids));
+				}
+				if(!$current_hostid && isset($rules['host']['missed'])){
+					$host_db['groupids'] = $host_groupids;
+					$current_hostid = CHost::add(array($host_db));
+					$current_hostid = reset($current_hostid);
+				}
+				
+// HOST PROFILES
+				$profile = $host->xpath('host_profile');
+				$profile = $profile[0];
+
+				delete_host_profile($current_hostid);
+				add_host_profile($current_hostid,
+					(string) $profile->devicetype,
+					(string) $profile->name,
+					(string) $profile->os,
+					(string) $profile->serialno,
+					(string) $profile->tag,
+					(string) $profile->macaddress,
+					(string) $profile->hardware,
+					(string) $profile->software,
+					(string) $profile->contact,
+					(string) $profile->location,
+					(string) $profile->notes
+				);
+					
+				$profile_ext = $host->xpath('host_profiles_ext');
+				$profile_ext = $profile_ext[0];
+				$profile_ext_db = self::mapXML2arr($profile_ext, XML_TAG_HOSTPROFILE_EXT);
+				delete_host_profile_ext($current_hostid);
+				add_host_profile_ext($current_hostid, $profile_ext_db);
+				
+// MACROS
+				$macros = $host->xpath('macros/macro');
+				if(!empty($macros)){
+					$macros_to_add = array();
+					$macros_to_add['macros'] = array();
+					$macros_to_upd = array();
+					$macros_to_upd['macros'] = array();
+					foreach($macros as $macro){
+						$macro_db = self::mapXML2arr($macro, XML_TAG_MACRO);
+						$current_macroid = CUserMacro::getHostMacroId(array('macro' => $macro_db['macro'], 'hostid' => $current_hostid));
+
+						$macros_to_upd['hostid'] = $macros_to_add['hostid'] = $current_hostid;
+						if($current_macroid){
+							$macros_to_upd['macros'][] = $macro_db;
+						}
+						else{
+							$macros_to_add['macros'][] =  $macro_db;
+						}
+					}
+//sdii($macros_to_upd);
+
+					CUserMacro::add($macros_to_add);
+					CUserMacro::updateValue($macros_to_upd);
+				}
+// ITEMS
+				if(isset($rules['item']['exist']) || isset($rules['item']['missed'])){
+					$items = $host->xpath('items/item');
+					
+					$items_to_add = array();
+					$items_to_upd = array();
+					foreach($items as $item){	
+						$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
+						$current_itemid = CItem::getId(array('key_' => $item_db['key_'], 'host' => $host_db['host']));
+// sdii(array('key_' => $item_db['key_'], 'host' => $host_db['host']));						
+						if(!$current_itemid && !isset($rules['item']['missed'])) continue; // break if update nonexist
+						if($current_itemid && !isset($rules['item']['exist'])) continue; // break if not update exist
+			
+					
+						$applications = $item->xpath('applications/application');
+						$item_applicationids = array(); 
+						$new_applicationids = array();
+						if(!empty($applications)){
+							$applications_to_add = array();
+							
+							foreach($applications as $application){
+								$application_name = (string) $application;
+								$current_applicationid = CApplication::getId(array('name' => $application_name, 'hostid' => $current_hostid));
+//sdi('application: '.$application.' | applicationID: '. $current_applicationid);												
+								if(!$current_groupid){
+									$applications_to_add[] = array('name' => $application_name, 'hostid' => $current_hostid);
+								}
+								else{
+									$item_applicationids[] = $current_applicationid;
+								}
+							}
+							if(!empty($applications_to_add))
+								$new_applicationids = CApplication::add($applications_to_add);
+						}
+
+						$item_db['applications'] = zbx_array_merge($item_applicationids, $new_applicationids);
+
+//sdi('item: '.$item.' | itemID: '. $current_itemid);							
+						if($current_itemid && isset($rules['item']['exist'])){
+							$item_db['itemid'] = $current_itemid;
+							$items_to_upd[] = $item_db;
+						}
+						if(!$current_itemid && isset($rules['item']['missed'])){
+							$item_db['hostid'] = $current_hostid;
+							$items_to_add[] = $item_db;
+						}
+					}
+// sdii($items_to_upd);
+//sdii($items_to_add);
+					CItem::add($items_to_add);
+					CItem::update($items_to_upd);
+				}
+// TRIGGERS
+				
+				if(isset($rules['trigger']['exist']) || isset($rules['trigger']['missed'])){
+					$triggers = $host->xpath('triggers/trigger');
+ 					
+					$added_triggers = array();
+					$triggers_to_add = array();
+					$triggers_to_upd = array();
+					foreach($triggers as $trigger){		
+						$trigger_db = self::mapXML2arr($trigger, XML_TAG_TRIGGER);			
+						$current_triggerid = CTrigger::getId(array('description' => $trigger_db['description'], 'host' => $host_db['host'], 'expression' => $trigger_db['expression']));
+ // sdi('trigger: '.$trigger_db['description'].' | triggerID: '. $current_triggerid);	
+// sdi(isset($rules['trigger']['missed']));						
+						if(!$current_triggerid && !isset($rules['trigger']['missed'])) continue; // break if update nonexist
+						if($current_triggerid && !isset($rules['trigger']['exist'])) continue; // break if not update exist
+						
+						
+						
+						if($current_triggerid && isset($rules['trigger']['exist'])){
+							$trigger_db['triggerid'] = $current_triggerid;
+							$triggers_for_dependencies[$current_triggerid] = $current_triggerid;
+							$triggers_to_upd[] = $trigger_db;
+						}
+						if(!$current_triggerid && isset($rules['trigger']['missed'])){
+							$trigger_db['hostid'] = $current_hostid;
+							$triggers_to_add[] = $trigger_db;
+						}
+					}
+// sdii($triggers_to_add);
+// sdii($triggers_to_upd);
+					$added_triggers = CTrigger::add($triggers_to_add);
+					CTrigger::update($triggers_to_upd);
+					
+					$triggers_for_dependencies = array_merge($triggers_for_dependencies, $added_triggers);
+				}
+				
+// TEMPLATES
+				if(isset($rules['template']['exist'])){
+					$templates = $host->xpath('templates/template');
+					$host_templates = CTemplate::get(array('hostids' => $current_hostid));
+					$host_templateids = array_flip(array_keys($host_templates));
+					
+					$templates_to_upd = array();
+					foreach($templates as $template){
+						$current_templateid = CTemplate::getId(array('name' => (string) $template));
+						
+						if(!$current_templateid && !isset($rules['template']['missed'])) continue; // break if update nonexist
+						if($current_templateid && !isset($rules['template']['exist'])) continue; // break if not update exist
+						
+//sdi('template: '.$template.' | TemplateID: '. $current_templateid);
+						if($current_templateid && !isset($host_templateids[$current_templateid])){
+							$templates_to_upd[] = $current_templateid;
+						}
+					}
+					CTemplate::linkTemplates(array('hostid' => $current_hostid, 'templateids' => $templates_to_upd));
 				}
 
-			zbx_xmlwriter_end_element($memory); // XML_TAG_ZABBIX_EXPORT
-			die(zbx_xmlwriter_output_memory($memory,true));
+// GRAPHS
+				if(isset($rules['graph']['exist']) || isset($rules['graph']['missed'])){
+					$graphs = $host->xpath('graphs/graph');
+					
+					foreach($graphs as $graph){					
+						$graph_db = self::mapXML2arr($graph, XML_TAG_GRAPH);
+						$current_graphid = CGraph::getId(array('name' => $graph_db['name'], 'hostid' => $current_hostid));
+	
+						if(!$current_graphid && !isset($rules['graph']['missed'])) continue; // break if update nonexist
+						if($current_graphid && !isset($rules['graph']['exist'])) continue; // break if not update exist
+//sdi('graph: '.$graph_db['name'].' | graphID: '. $current_graphid);						
+						if($current_graphid){ // if exists, delete graph to add then new
+							CGraph::delete(array('graphid' => $current_graphid));
+						}
+//sdii($graph_db);
+						$current_graphid = CGraph::add(array($graph_db));
+						$current_graphid = reset($current_graphid);
+//sdii($current_graphid);						
+						$gitems = $graph->xpath('graph_elements/graph_element');
+						$gitems_to_add = array();
+						$gitems_to_add['items'] = array();
+						foreach($gitems as $gitem){
+							$gitem_db = self::mapXML2arr($gitem, XML_TAG_GRAPH_ELEMENT);
+							
+							$data = explode(':', $gitem_db['host_key_']);
+							$gitem_host = array_shift($data);
+							$gitem_key = implode(':', $data);
+					
+							
+//sdi('gitem_host: '.$gitem_host.' | gitem_key: '. $gitem_key);
+
+							$itemid = CItem::getId(array('host' => $gitem_host, 'key_' => $gitem_key));
+							if($itemid){ // if item exists, add graph item to graph
+								$gitem_db['itemid'] = $itemid;
+								$gitems_to_add['items'][] = $gitem_db;
+							}
+							$gitems_to_add['graphid'] = $current_graphid;
+
+						}
+//sdii($gitems_to_add);
+						CGraph::addItems($gitems_to_add);
+					}
+				}				
+				
+				
+			}
+			
+// DEPENDENCIES
+			$dependencies = $xml->xpath('dependencies/dependency');
+			if(!empty($dependencies)){
+				foreach($dependencies as $dependency){
+					$triggers_to_add_dep = array();
+					
+					$current_triggerid = get_trigger_by_description($dependency['description']);
+
+//sdi('<b><u>Trigger Description: </u></b>'.$dependency['description'].' | <b>Current_triggerid: </b>'. $current_triggerid['triggerid']);
+					if($current_triggerid && isset($triggers_for_dependencies[$current_triggerid['triggerid']])){
+						foreach($dependency as $depends_on){
+							$depends_triggerid = get_trigger_by_description( (string) $depends_on);;
+//sdi('<b>depends on description: </b>'.$depends_on.' | <b>depends_triggerid: </b>'. $depends_triggerid['triggerid']);
+							if($depends_triggerid['triggerid']){
+								$triggers_to_add_dep[] = $depends_triggerid['triggerid'];
+								//CTrigger::addDependency(array('triggerid' => $current_triggerid['triggerid'], 'depends_on_triggerid' => $depends_triggerid['triggerid']));
+							}
+						}
+						update_trigger($current_triggerid['triggerid'],null,null,null,null,null,null,null,$triggers_to_add_dep,null);
+					}
+					
+				}
+			}
+				
+				
+				
 		}
-	}
+		
+		
+	}	
+}
+
 ?>

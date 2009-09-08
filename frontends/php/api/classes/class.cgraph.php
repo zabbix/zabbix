@@ -83,6 +83,7 @@ class CGraph {
 			'select_hosts'			=> null,
 			'select_templates'		=> null,
 			'select_items'			=> null,
+			'select_graph_items'			=> null,
 			'extendoutput'			=> null,
 			'count'					=> null,
 			'pattern'				=> '',
@@ -267,6 +268,10 @@ class CGraph {
 						$result[$graph['graphid']]['hostids'] = array();
 						$result[$graph['graphid']]['hosts'] = array();
 					}
+					if($options['select_graph_items'] && !isset($result[$graph['graphid']]['gitemids'])){
+						$result[$graph['graphid']]['gitemids'] = array();
+						$result[$graph['graphid']]['gitems'] = array();
+					}
 					if($options['select_templates'] && !isset($result[$graph['graphid']]['templateids'])){
 						$result[$graph['graphid']]['templateids'] = array();
 						$result[$graph['graphid']]['templates'] = array();
@@ -297,7 +302,20 @@ class CGraph {
 		}
 
 		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
+		
 
+// Adding GraphItems
+		if($options['select_graph_items']){
+			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1);
+			$gitems = CGraphItem::get($obj_params);
+			foreach($gitems as $gitemid => $gitem){
+				foreach($gitem['graphids'] as $num => $graphid){
+					$result[$graphid]['gitemids'][$gitemid] = $gitemid;
+					$result[$graphid]['gitems'][$gitemid] = $gitem;
+				}
+			}
+		}
+		
 // Adding Hosts
 		if($options['select_hosts']){
 			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1);
@@ -378,10 +396,13 @@ class CGraph {
 	public static function getId($graph_data){
 		$result = false;
 
-		$sql = 'SELECT g.graphid '.
-				' FROM graphs g '.
-				' WHERE g.name='.zbx_dbstr($graph_data['name']).
-					' AND '.DBin_node('graphid', get_current_nodeid(false));
+		
+		$sql = 'SELECT DISTINCT g.graphid'.
+				' FROM graphs g, graphs_items gi, items i'.
+				' WHERE g.graphid=gi.graphid '.
+					' AND gi.itemid=i.itemid'.
+					' AND g.name='.zbx_dbstr($graph_data['name']).
+					' AND i.hostid='.$graph_data['hostid'];
 		$db_res = DBselect($sql);
 		if($graph = DBfetch($db_res))
 			$result = $graph['graphid'];

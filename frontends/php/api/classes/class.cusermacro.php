@@ -460,6 +460,49 @@ class CUserMacro {
 
 	
 /**
+ * add Host Macro
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $macros
+ * @param string $macros['hostid']
+ * @param string $macros['macros'][0..]['macro']
+ * @param string $macros['macros'][0..]['value']
+ * @return array|boolean 
+ */
+	public static function add($macros){
+		$result = true;
+	
+		$hostid = $macros['hostid'];
+		DBstart(false);
+		
+		foreach($macros['macros'] as $macro){
+			$macroid = self::getHostMacroID(array('hostid' => $hostid, 'macro' => $macro['macro']));
+			if(!$macroid){
+				$hostmacroid = get_dbid('hostmacro', 'hostmacroid');
+				
+				$sql = 'INSERT INTO hostmacro (hostmacroid, hostid, macro, value) 
+					VALUES('.$hostmacroid.', '.$hostid.', '.zbx_dbstr($macro['macro']).', '.zbx_dbstr($macro['value']).')';
+				$result = DBExecute($sql);
+				
+				if(!$result) break;
+			}
+		}
+		DBend($result);	
+		
+		if($result)
+			return true;
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => '');
+			return false;
+		}
+	}
+	
+/**
  * Update host macros, replace all with new ones
  *
  * {@source}
@@ -501,6 +544,44 @@ class CUserMacro {
 		}
 	}
 
+	/**
+ * Update macros values
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $macros
+ * @param string $macros['hostid']
+ * @param string $macros['macros'][0..]['macro']
+ * @param string $macros['macros'][0..]['value']
+ * @return array|boolean 
+ */
+	public static function updateValue($macros){
+		$result = true;
+
+		DBstart(false);
+
+		foreach($macros['macros'] as $macro){
+			
+			$sql = 'UPDATE hostmacro SET value='.zbx_dbstr($macro['value']).
+				'WHERE hostid='.$macros['hostid'].' AND macro='.zbx_dbstr($macro['macro']);
+			$result = DBExecute($sql);
+			
+			if(!$result) break;
+		}
+		DBend($result);	
+		
+		if($result)
+			return true;
+		else{
+			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => '');
+			return false;
+		}
+	}
+	
 /**
  * Add global macros
  *
