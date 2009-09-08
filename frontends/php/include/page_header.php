@@ -260,7 +260,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 				$node_tree[0] = array('id' => 0, 'caption' => S_ALL_S, 'combo_select_node' => $combo_check_all, 'parentid' => 0); //root
 
 				foreach($available_nodes as $num => $node) {
-					$checked = uint_in_array($node['nodeid'], $ZBX_VIEWED_NODES['nodeids']);
+					$checked = isset($ZBX_VIEWED_NODES['nodeids'][$node['nodeid']]);
 					$combo_select_node = new CCheckbox('selected_nodes['.$node['nodeid'].']', $checked, null, $node['nodeid']);
 					$combo_select_node->setAttribute('style','margin: 1px 4px 2px 4px;');
 

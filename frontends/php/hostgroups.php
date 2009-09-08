@@ -119,11 +119,15 @@ include_once('include/page_header.php');
 			$result = true;
 
 			$groups = get_request('groups', array());
-			$db_groups = DBselect('select groupid, name from groups where '.DBin_node('groupid'));
-
+			
 			DBstart();
+			$sql = 'SELECT g.groupid, g.name '.
+					' FROM groups g '.
+					' WHERE '.DBin_node('g.groupid').
+						' AND '.DBcondition('g.groupid', $groups);
+			$db_groups = DBselect($sql);
 			while($db_group=DBfetch($db_groups)){
-				if(!uint_in_array($db_group['groupid'],$groups)) continue;
+				if(!isset($groups[$db_group['groupid']])) continue;
 
 /*				if(!$group = get_hostgroup_by_groupid($db_group['groupid'])) continue;*/
 				$result &= delete_host_group($db_group['groupid']);
@@ -141,15 +145,16 @@ include_once('include/page_header.php');
 		$status = ($_REQUEST['go'] == 'activate')?HOST_STATUS_MONITORED:HOST_STATUS_NOT_MONITORED;
 		$groups = get_request('groups',array());
 
-		$db_hosts=DBselect('select h.hostid, hg.groupid '.
-			' from hosts_groups hg, hosts h'.
-			' where h.hostid=hg.hostid '.
-				' and h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-				' and '.DBin_node('h.hostid'));
-
 		DBstart();
+		$sql = 'SELECT h.hostid, hg.groupid '.
+				' FROM hosts_groups hg, hosts h '.
+				' WHERE '.DBin_node('h.hostid').
+					' AND '.DBcondition('g.groupid', $groups).
+					' AND h.hostid=hg.hostid '.
+					' AND h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
+		$db_groups = DBselect($sql);		
 		while($db_host=DBfetch($db_hosts)){
-			if(!uint_in_array($db_host['groupid'],$groups)) continue;
+			if(!isset($groups[$db_host['groupid']])) continue;
 			$host=get_host_by_hostid($db_host['hostid']);
 
 			$result &= update_host_status($db_host['hostid'],$status);

@@ -1167,7 +1167,7 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 	else{
 		if($config['dropdown_first_remember']){
 			if($_REQUEST['groupid'] == -1) $_REQUEST['groupid'] = is_null($profile_groupid)?'0':$profile_groupid;
-			if(uint_in_array($_REQUEST['groupid'], $groupids)){
+			if(isset($groupids[$_REQUEST['groupid']])){
 				$result['selected'] = $_REQUEST['groupid'];
 			}
 			else{
@@ -1403,7 +1403,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 		if($config['dropdown_first_remember']){
 			if($_REQUEST['hostid'] == -1) $_REQUEST['hostid'] = is_null($profile_hostid)?'0':$profile_hostid;
 
-			if(uint_in_array($_REQUEST['hostid'], $hostids)){
+			if(isset($hostids[$_REQUEST['hostid']])){
 				$result['selected'] = $_REQUEST['hostid'];
 			}
 			else{
