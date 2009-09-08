@@ -203,6 +203,14 @@
 		return $result;
 	}
 
+	function unblock_user_login($userids){
+		zbx_value2array($userids);
+		
+		$sql = 'UPDATE users SET attempt_failed=0 WHERE '.DBcondition('userid', $userids);
+		$result = DBexecute($sql);
+		
+	return $result;
+	}
 
 // Update User definition
 	function update_user_profile($userid, $passwd,$url, $autologin, $autologout, $lang, $theme, $refresh, $user_medias){
@@ -212,32 +220,33 @@
 			access_deny();
 		}
 
-		DBbegin();
-		$result = DBexecute('update users set '.
-						' url='.zbx_dbstr($url).
-						' ,autologin='.$autologin.
-						' ,autologout='.$autologout.
-						' ,lang='.zbx_dbstr($lang).
-						' ,theme='.zbx_dbstr($theme).
-						(isset($passwd) ? (' ,passwd='.zbx_dbstr(md5($passwd))) : '').
-						' ,refresh='.$refresh.
-					' where userid='.$userid);
+		$sql = 'UPDATE users SET '.
+					' url='.zbx_dbstr($url).','.
+					' autologin='.$autologin.','.
+					' autologout='.$autologout.','.
+					' lang='.zbx_dbstr($lang).','.
+					' theme='.zbx_dbstr($theme).','.
+					(isset($passwd)?(' passwd='.zbx_dbstr(md5($passwd)).',') : '').
+					' refresh='.$refresh.
+				' WHERE userid='.$userid;
+				
+		$result = DBexecute($sql);
 
-		$result = DBexecute('delete from media where userid='.$userid);
-			foreach($user_medias as $mediaid => $media_data)
-			{
+		$result = DBexecute('DELEET FROM media WHERE userid='.$userid);
+			foreach($user_medias as $mediaid => $media_data){
 				$mediaid = get_dbid("media","mediaid");
-				$result = DBexecute('insert into media (mediaid,userid,mediatypeid,sendto,active,severity,period)'.
-					' values ('.$mediaid.','.$userid.','.$media_data['mediatypeid'].','.
-					zbx_dbstr($media_data['sendto']).','.$media_data['active'].','.$media_data['severity'].','.
-					zbx_dbstr($media_data['period']).')');
-
+				
+				$sql = 'INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period)'.
+						' VALUES ('.$mediaid.','.$userid.','.$media_data['mediatypeid'].','.
+								zbx_dbstr($media_data['sendto']).','.$media_data['active'].','.$media_data['severity'].','.
+								zbx_dbstr($media_data['period']).')';
+								
+				$result = DBexecute($sql);
 				if(!$result) break;
 			}
 	}
 
-	# Delete User definition
-
+// Delete User definition
 	function delete_user($userid){
 		global $USER_DETAILS;
 

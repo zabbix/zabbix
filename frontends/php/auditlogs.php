@@ -31,10 +31,6 @@ require_once('include/users.inc.php');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-	if(PAGE_TYPE_HTML == $page['type']){
-		define('ZBX_PAGE_DO_REFRESH', 1);
-	}
-
 	$_REQUEST['config'] = get_request('config','auditlogs.php');
 
 include_once('include/page_header.php');
