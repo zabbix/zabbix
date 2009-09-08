@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-420] fixed "Add host" operation for auto-discovered devices (Sasha)
  - [DEV-423] added filtering of the Windows Event Log by Type, Source and Event ID on the server side (Dmitry)
  - [DEV-423] added filtering of the Windows Event Log by Type, Source and Event ID on the agent side (Dmitry)
  - [DEV-9] added support of function macros (Sasha)
