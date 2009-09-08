@@ -670,9 +670,12 @@ else{
 
 	define('ZBX_HAVE_IPV6', 1);
 
-	define('XML_TAG_ZABBIX_EXPORT',		'zabbix_export');
-	define('XML_TAG_HOSTS',			'hosts');
-	define('XML_TAG_HOST',			'host');
+// XML EXPORT|IMPORT TAGS
+	define('XML_TAG_MACROS', 'macros');
+	define('XML_TAG_MACRO', 'macro');
+	define('XML_TAG_ZABBIX_EXPORT', 'zabbix_export');
+	define('XML_TAG_HOSTS', 'hosts');
+	define('XML_TAG_HOST', 'host');
 	define('XML_TAG_HOSTPROFILE',		'host_profile');
 	define('XML_TAG_HOSTPROFILE_EXT',	'host_profiles_ext');
 	define('XML_TAG_GROUPS',		'groups');
@@ -696,6 +699,8 @@ else{
 	define('XML_TAG_DEPENDENCIES',		'dependencies');
 	define('XML_TAG_DEPENDENCY',		'dependency');
 	define('XML_TAG_DEPENDS',		'depends');
+	
+	define('ZBX_DEFAULT_IMPORT_HOST_GROUP', 'Imported hosts');
 
 // API errors //
 	define('ZBX_API_ERROR_NO_HOST', 1);

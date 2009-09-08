@@ -124,7 +124,6 @@ class CApplication {
 // hostids
 		if(!is_null($options['hostids'])){
 			zbx_value2array($options['hostids']);
-
 			if(!is_null($options['extendoutput'])){
 				$sql_parts['select']['hostid'] = 'a.hostid';
 			}
@@ -235,7 +234,7 @@ class CApplication {
 					}
 
 					// hostids
-					if(isset($application['hostid'])){
+					if(isset($application['hostid']) && !is_null($options['hostids'])){
 						if(!isset($result[$application['applicationid']]['hostids']))
 							$result[$application['applicationid']]['hostids'] = array();
 
@@ -318,7 +317,7 @@ class CApplication {
 		$sql = 'SELECT applicationid '.
 				' FROM applications '.
 				' WHERE hostid='.$app_data['hostid'].
-					' AND name='.$app_data['name'];
+					' AND name='.zbx_dbstr($app_data['name']);
 		$appid = DBfetch(DBselect($sql));
 
 		$result = $appid ? true : false;
@@ -347,16 +346,18 @@ class CApplication {
 	public static function add($applications){
 
 		$result = false;
+		$applicationids = array();
 
 		DBstart(false);
 		foreach($applications as $application){
-			$result = add_application($applications['name'], $applications['hostid']);
+			$result = add_application($application['name'], $application['hostid']);
 			if(!$result) break;
+			$applicationids[$result] = $result;
 		}
 		$result = DBend($result);
 
 		if($result)
-			return true;
+			return $applicationids;
 		else{
 			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;

@@ -106,6 +106,8 @@ class CHost {
 			'select_triggers'			=> null,
 			'select_graphs'				=> null,
 			'select_applications'		=> null,
+			'select_macros'				=> null,
+			'select_profile'			=> null,
 			'count'						=> null,
 			'pattern'					=> '',
 			'extend_pattern'			=> null,
@@ -379,6 +381,10 @@ class CHost {
 						$result[$host['hostid']]['itemids'] = array();
 						$result[$host['hostid']]['items'] = array();
 					}
+					if($options['select_profile'] && !isset($result[$host['hostid']]['profile'])){
+						$result[$host['hostid']]['profile'] = array();
+						$result[$host['hostid']]['profile_ext'] = array();
+					}
 
 					if($options['select_triggers'] && !isset($result[$host['hostid']]['triggerids'])){
 						$result[$host['hostid']]['triggerids'] = array();
@@ -392,6 +398,10 @@ class CHost {
 					if($options['select_applications'] && !isset($result[$host['hostid']]['applications'])){
 						$result[$host['hostid']]['applications'] = array();
 						$result[$host['hostid']]['applicationids'] = array();
+					}
+					if($options['select_macros'] && !isset($result[$host['hostid']]['macroids'])){
+						$result[$host['hostid']]['macros'] = array();
+						$result[$host['hostid']]['macroids'] = array();
 					}
 
 					// groupids
@@ -454,7 +464,25 @@ class CHost {
 				}
 			}
 		}
-
+		
+// Adding Profiles
+		if($options['select_profile']){
+			$sql = 'SELECT hp.*
+				FROM hosts_profiles hp
+				WHERE '.DBcondition('hp.hostid', $hostids);
+			$db_profile = DBselect($sql);
+			while($profile = DBfetch($db_profile))
+				$result[$profile['hostid']]['profile'] = $profile;
+			
+			
+			$sql = 'SELECT hpe.*
+				FROM hosts_profiles hpe
+				WHERE '.DBcondition('hpe.hostid', $hostids);
+			$db_profile_ext = DBselect($sql);
+			while($profile_ext = DBfetch($db_profile_ext))
+				$result[$profile_ext['hostid']]['profile_ext'] = $profile_ext;
+		}
+		
 // Adding Templates
 		if($options['select_templates']){
 			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);
@@ -506,11 +534,23 @@ class CHost {
 // Adding applications
 		if($options['select_applications']){
 			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);
-			$applications = Capplication::get($obj_params);
+			$applications = CApplication::get($obj_params);
 			foreach($applications as $applicationid => $application){
 				foreach($application['hostids'] as $num => $hostid){
 					$result[$hostid]['applicationids'][$applicationid] = $applicationid;
 					$result[$hostid]['applications'][$applicationid] = $application;
+				}
+			}
+		}
+		
+// Adding macros
+		if($options['select_macros']){
+			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);
+			$macros = CUserMacro::get($obj_params);
+			foreach($macros as $macroid => $macro){
+				foreach($macro['hostids'] as $num => $hostid){
+					$result[$hostid]['macroids'][$macroid] = $macroid;
+					$result[$hostid]['macros'][$macroid] = $macro;
 				}
 			}
 		}

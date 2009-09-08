@@ -90,7 +90,9 @@ class CTrigger {
 			'extendoutput'			=> null,
 			'select_hosts'			=> null,
 			'select_items'			=> null,
+			'select_dependencies'	=> null,
 			'count'					=> null,
+			'expand_data'			=> null,
 
 // filter
 			'filter'				=> null,
@@ -237,6 +239,17 @@ class CTrigger {
 		if(!is_null($options['extendoutput'])){
 			$sql_parts['select']['triggers'] = 't.*';
 		}
+		
+// expand_data
+		if(!is_null($options['expand_data'])){
+			$sql_parts['select']['host'] = 'h.host';
+			$sql_parts['from']['f'] = 'functions f';
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['from']['h'] = 'hosts h';
+			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
+			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
+			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+		}
 
 // pattern
 		if(!zbx_empty($options['pattern'])){
@@ -362,6 +375,9 @@ class CTrigger {
 						$result[$trigger['triggerid']]['itemids'] = array();
 						$result[$trigger['triggerid']]['items'] = array();
 					}
+					if($options['select_dependencies'] && !isset($result[$trigger['dependencies']]['itemids'])){
+						$result[$trigger['triggerid']]['dependencies'] = array();
+					}
 
 					// hostids
 					if(isset($trigger['hostid'])){
@@ -386,6 +402,31 @@ class CTrigger {
 		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
 
 // Adding Objects
+// Adding trigger dependencies
+		if($options['select_dependencies']){
+			$deps = array();
+			$depids = array();
+			$sql = 'SELECT triggerid_up, triggerid_down FROM trigger_depends WHERE '.DBcondition('triggerid_down', $triggerids);
+			$db_deps = DBselect($sql);
+			
+			while($db_dep = DBfetch($db_deps)){
+				if(!isset($deps[$db_dep['triggerid_down']])) $deps[$db_dep['triggerid_down']] = array();
+				$deps[$db_dep['triggerid_down']][$db_dep['triggerid_up']] = $db_dep['triggerid_up'];
+				$depids[] = $db_dep['triggerid_up'];
+			}
+			
+			$obj_params = array('triggerids' => $depids, 'extendoutput' => 1, 'expand_data' => 1);
+			$allowed = CTrigger::get($obj_params); //allowed triggerids
+			
+			foreach($deps as $triggerid => $deptriggers){
+				foreach($deptriggers as $deptriggerid){
+					if(isset($allowed[$deptriggerid]))
+						$result[$triggerid]['dependencies'][$deptriggerid] = $allowed[$deptriggerid];
+				}
+			}
+		}
+
+
 // Adding hosts
 		if($options['select_hosts']){
 			$obj_params = array('templated_hosts' => 1, 'extendoutput' => 1, 'triggerids' => $triggerids, 'nopermissions' => 1);
@@ -459,7 +500,7 @@ class CTrigger {
 
 		$sql_where = '';
 		$sql_from = '';
-		if(isset($trigger['hostid']) && isset($trigger['host'])) {
+		if(isset($trigger['hostid']) && isset($trigger['host'])){
 			$sql_where .= ''.
 					' i.hostid='.$trigger['hostid'].
 					' AND f.itemid=i.itemid '.
@@ -469,14 +510,14 @@ class CTrigger {
 			$sql_from .= ', functions f, items i, hosts h ';
 		}
 		else{
-			if(isset($trigger['hostid'])) {
+			if(isset($trigger['hostid'])){
 				$sql_where .= ''.
 					' i.hostid='.$trigger['hostid'].
 					' AND f.itemid=i.itemid '.
 					' AND f.triggerid=t.triggerid';
 				$sql_from .= ', functions f, items i';
 			}
-			if(isset($trigger['host'])) {
+			if(isset($trigger['host'])){
 				$sql_where .= ''.
 					' f.itemid=i.itemid '.
 					' AND f.triggerid=t.triggerid'.
@@ -491,7 +532,8 @@ class CTrigger {
 
 		$sql = 'SELECT DISTINCT t.triggerid, t.expression '.
 				' FROM triggers t'.$sql_from.
-				' WHERE '.$sql_where;
+				' WHERE '.$sql_where.
+					' AND '.DBin_node('t.triggerid', get_current_nodeid(false));
 		if($db_triggers = DBselect($sql)){
 			$result = true;
 			$triggerid = null;
@@ -537,7 +579,7 @@ class CTrigger {
 		$triggerids = array();
 		DBstart(false);
 
-		$result = false;
+		$result = true;
 		foreach($triggers as $trigger){
 			$trigger_db_fields = array(
 				'expression'	=> null,
@@ -562,7 +604,10 @@ class CTrigger {
 									$trigger['comments'],
 									$trigger['url']
 									);
-			if(!$triggerid) break;
+			if(!$triggerid){
+				$result = false;
+				break;
+			}
 			$triggerids[$triggerid] = $triggerid;
 		}
 
@@ -612,7 +657,7 @@ class CTrigger {
 				break;
 			}
 
-			$trigger['expression'] = explode_exp($trigger['expression'], false);
+			//$trigger['expression'] = explode_exp($trigger['expression'], false);
 			$result = update_trigger($trigger['triggerid'], $trigger['expression'], $trigger['description'], $trigger['type'],
 				$trigger['priority'], $trigger['status'], $trigger['comments'], $trigger['url']);
 			if(!$result) break;
@@ -667,11 +712,14 @@ class CTrigger {
 	public static function addDependency($triggers_data){
 		$result = insert_dependency($triggers_data['triggerid'], $triggers_data['depends_on_triggerid']);
 		if($result)
-			return $groupids;
+			return true;
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
+
+	
+	
 }
 ?>
