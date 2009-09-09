@@ -238,7 +238,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 
 	//SDI($USER_DETAILS);
 	$page_exists = false;
-	$deny = !defined('ZBX_PAGE_NO_AUTHERIZATION');
+	$deny = !defined('ZBX_PAGE_NO_AUTHORIZATION');
 
 	foreach($ZBX_MENU as $label => $menu){
 // Check to show menu or not

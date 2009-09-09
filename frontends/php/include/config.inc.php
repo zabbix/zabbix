@@ -130,7 +130,7 @@ function __autoload($class_name){
 			$_REQUEST['message'] = $error;
 
 			define('ZBX_DISTRIBUTED', false);
-			define('ZBX_PAGE_NO_AUTHERIZATION', true);
+			define('ZBX_PAGE_NO_AUTHORIZATION', true);
 
 			$show_warning = true;
 		}
@@ -160,12 +160,12 @@ function __autoload($class_name){
 
 		require_once('include/db.inc.php');
 
-		define('ZBX_PAGE_NO_AUTHERIZATION', true);
+		define('ZBX_PAGE_NO_AUTHORIZATION', true);
 		define('ZBX_DISTRIBUTED', false);
 		$show_setup = true;
 	}
 
-	if(!defined('ZBX_PAGE_NO_AUTHERIZATION')){
+	if(!defined('ZBX_PAGE_NO_AUTHORIZATION')){
 		check_authorisation();
 
 		if(file_exists('include/locales/'.$USER_DETAILS['lang'].'.inc.php')){

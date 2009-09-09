@@ -37,7 +37,7 @@
 
 		$ZBX_WITH_ALL_NODES = !defined('ZBX_NOT_ALLOW_ALL_NODES');
 
-		if(!defined('ZBX_PAGE_NO_AUTHERIZATION') && ZBX_DISTRIBUTED) {
+		if(!defined('ZBX_PAGE_NO_AUTHORIZATION') && ZBX_DISTRIBUTED) {
 
 			if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN) {
 				$sql = 'SELECT DISTINCT n.nodeid,n.name,n.masterid FROM nodes n ';
