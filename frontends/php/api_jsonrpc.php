@@ -19,16 +19,16 @@
 **/
 ?>
 <?php
-define('ZBX_PAGE_NO_AUTHERIZATION', 1);
+define('ZBX_PAGE_NO_AUTHORIZATION', 1);
 require_once('include/config.inc.php');
 define('ZBX_API_REQUEST', PAGE_TYPE_JSON_RPC);
 
 $allowed_content = array(
 				'application/json-rpc'		=> 'json-rpc',
-				'application/json'		=> 'json-rpc',
+				'application/json'			=> 'json-rpc',
 				'application/jsonrequest'	=> 'json-rpc',
 //				'application/xml-rpc'		=> 'xml-rpc',
-//				'application/xml'		=> 'xml-rpc',
+//				'application/xml'			=> 'xml-rpc',
 //				'application/xmlrequest'	=> 'xml-rpc'
 				);
 ?>
