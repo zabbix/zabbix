@@ -299,7 +299,7 @@ else
 		$form = new CForm(null, 'post');
 		$form->setName('export_hosts_frm');
 	
-		$groups = CHostGroup::get(array('extendoutput' => 1));
+		$groups = CHostGroup::get(array('extendoutput' => 1, 'sortfield' => 'name'));
 		
 		$cmbGroups = new CComboBox('groupid', $selected_groupid, 'javascript: submit();');
 		$cmbGroups->addItem(0, S_ALL_S);
