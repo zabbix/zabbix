@@ -210,7 +210,7 @@ class CGraphItem {
 						unset($gitem['graphid']);
 					}
 					// itemids
-					if(isset($gitem['itemid']) && !is_null($params['itemids'])){
+					if(isset($gitem['itemid']) && !is_null($options['itemids'])){
 						if(!isset($result[$gitem['gitemid']]['itemid'])) $result[$gitem['gitemid']]['itemid'] = array();
 
 						$result[$gitem['gitemid']]['itemids'][$gitem['itemid']] = $gitem['itemid'];

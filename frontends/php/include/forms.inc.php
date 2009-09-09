@@ -383,15 +383,15 @@
 	function insert_httptest_form(){
 
 		$form = new CFormTable(S_SCENARIO, null, 'post');
-		$form->SetHelp("web.webmon.httpconf.php");
+		$form->setName('form_scenario');
 
-		if($_REQUEST['groupid']>0)
-			$form->addVar('groupid',$_REQUEST['groupid']);
+		if($_REQUEST['groupid'] > 0)
+			$form->addVar('groupid', $_REQUEST['groupid']);
 
-		$form->addVar('hostid',$_REQUEST['hostid']);
+		$form->addVar('hostid', $_REQUEST['hostid']);
 
-		if(isset($_REQUEST["httptestid"])){
-			$form->addVar("httptestid",$_REQUEST["httptestid"]);
+		if(isset($_REQUEST['httptestid'])){
+			$form->addVar('httptestid', $_REQUEST['httptestid']);
 		}
 
 		$name		= get_request('name', '');
@@ -506,7 +506,7 @@
 		$form->addRow(S_VARIABLES, new CTextArea('macros', $macros, 84, 5));
 
 		$tblSteps = new CTableInfo();
-		$tblSteps->SetHeader(array(S_NAME,S_TIMEOUT,S_URL,S_REQUIRED,S_STATUS,SPACE));
+		$tblSteps->SetHeader(array(S_NAME,S_TIMEOUT,S_URL,S_REQUIRED,S_STATUS,S_SORT));
 		if(count($steps) > 0){
 			$first = min(array_keys($steps));
 			$last = max(array_keys($steps));
@@ -2776,92 +2776,78 @@
 
 	function insert_graph_form(){
 
-		$frmGraph = new CFormTable(S_GRAPH,null,'post');
+		$frmGraph = new CFormTable(S_GRAPH, null, 'post');
 		$frmGraph->SetName('frm_graph');
-		$frmGraph->SetHelp("web.graphs.graph.php");
-		$frmGraph->SetMethod('post');
+		//$frmGraph->SetHelp("web.graphs.graph.php");
 
 		$items = get_request('items', array());
 
 		if(isset($_REQUEST['graphid'])){
-			$frmGraph->addVar('graphid',$_REQUEST['graphid']);
-
-			$result=DBselect('SELECT * FROM graphs WHERE graphid='.$_REQUEST['graphid']);
-			$row=DBfetch($result);
+			$frmGraph->addVar('graphid', $_REQUEST['graphid']);
+			$row = CGraph::getById(array('graphid' => $_REQUEST['graphid']));
 			$frmGraph->SetTitle(S_GRAPH.' "'.$row['name'].'"');
 		}
 
 		if(isset($_REQUEST['graphid']) && !isset($_REQUEST['form_refresh'])){
-			$name		=$row['name'];
-			$width		=$row['width'];
-			$height		=$row['height'];
-			$ymin_type	=$row["ymin_type"];
-			$ymax_type	=$row["ymax_type"];
-
-			$yaxismin	=$row['yaxismin'];
-			$yaxismax	=$row['yaxismax'];
-
-			$ymin_itemid	=	$row["ymin_itemid"];
-			$ymax_itemid	=	$row["ymax_itemid"];
-
+			$name = $row['name'];
+			$width = $row['width'];
+			$height = $row['height'];
+			$ymin_type = $row["ymin_type"];
+			$ymax_type = $row["ymax_type"];
+			$yaxismin = $row['yaxismin'];
+			$yaxismax = $row['yaxismax'];
+			$ymin_itemid = $row["ymin_itemid"];
+			$ymax_itemid = $row["ymax_itemid"];
 			$showworkperiod = $row['show_work_period'];
-			$showtriggers	= $row['show_triggers'];
-			$graphtype	= $row['graphtype'];
-			$legend		= $row['show_legend'];
-			$graph3d	= $row['show_3d'];
-
-			$percent_left	= $row['percent_left'];
-			$percent_right	= $row['percent_right'];
-
-
-			$db_items = DBselect('SELECT * FROM graphs_items WHERE graphid='.$_REQUEST['graphid']);
-			while($item = DBfetch($db_items)){
-				array_push($items,
-					array(
-						'itemid'	=> $item['itemid'],
-						'drawtype'	=> $item['drawtype'],
-						'sortorder'	=> $item['sortorder'],
-						'color'		=> $item['color'],
-						'yaxisside'	=> $item['yaxisside'],
-						'calc_fnc'	=> $item['calc_fnc'],
-						'type'		=> $item['type'],
-						'periods_cnt'	=> $item['periods_cnt']
-					));
+			$showtriggers = $row['show_triggers'];
+			$graphtype = $row['graphtype'];
+			$legend = $row['show_legend'];
+			$graph3d = $row['show_3d'];
+			$percent_left = $row['percent_left'];
+			$percent_right = $row['percent_right'];
+			
+			$db_items = CGraphItem::get(array('graphids' => $_REQUEST['graphid'], 'sortfield' => 'sortorder', 'extendoutput' => 1));
+			foreach($db_items as $item){
+				$items[] = array(
+					'itemid' => $item['itemid'],
+					'drawtype' => $item['drawtype'],
+					'sortorder' => $item['sortorder'],
+					'color' => $item['color'],
+					'yaxisside' => $item['yaxisside'],
+					'calc_fnc' => $item['calc_fnc'],
+					'type' => $item['type'],
+					'periods_cnt' => $item['periods_cnt']
+				);
 			}
 		}
-		else {
-			$name		= get_request('name'		,'');
-			$graphtype	= get_request('graphtype'	,GRAPH_TYPE_NORMAL);
+		else{
+			$name = get_request('name', '');
+			$graphtype = get_request('graphtype', GRAPH_TYPE_NORMAL);
 
 			if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
-				$width		= get_request('width'		,400);
-				$height		= get_request('height'		,300);
+				$width = get_request('width', 400);
+				$height = get_request('height', 300);
 			}
-			else {
-				$width		= get_request('width'		,900);
-				$height		= get_request('height'		,200);
+			else{
+				$width = get_request('width', 900);
+				$height = get_request('height', 200);
 			}
-
-			$ymin_type	= get_request("ymin_type"	,GRAPH_YAXIS_TYPE_CALCULATED);
-			$ymax_type	= get_request("ymax_type"	,GRAPH_YAXIS_TYPE_CALCULATED);
-
-			$yaxismin	= get_request("yaxismin"	,0.00);
-			$yaxismax	= get_request("yaxismax"	,100.00);
-
-			$ymin_itemid	= get_request("ymin_itemid"	,0);
-			$ymax_itemid	= get_request("ymax_itemid"	,0);
-
-			$showworkperiod = get_request('showworkperiod'	,0);
-			$showtriggers	= get_request('showtriggers'	,0);
-			$legend		= get_request('legend'	,0);
-			$graph3d	= get_request('graph3d'	,0);
-
+			$ymin_type = get_request('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED);
+			$ymax_type = get_request('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED);
+			$yaxismin = get_request('yaxismin', 0.00);
+			$yaxismax = get_request('yaxismax', 100.00);
+			$ymin_itemid = get_request('ymin_itemid', 0);
+			$ymax_itemid	= get_request('ymax_itemid', 0);
+			$showworkperiod = get_request('showworkperiod', 0);
+			$showtriggers	= get_request('showtriggers', 0);
+			$legend = get_request('legend' ,0);
+			$graph3d	= get_request('graph3d', 0);
 			$visible = get_request('visible');
 			$percent_left  = 0;
 			$percent_right = 0;
 
-			if(isset($visible['percent_left']))	$percent_left  = get_request('percent_left', 0);
-			if(isset($visible['percent_right']))	$percent_right = get_request('percent_right', 0);
+			if(isset($visible['percent_left'])) $percent_left = get_request('percent_left', 0);
+			if(isset($visible['percent_right'])) $percent_right = get_request('percent_right', 0);
 		}
 
 		/* reinit $_REQUEST */
@@ -2890,37 +2876,42 @@
 
 		if($graphtype != GRAPH_TYPE_NORMAL){
 			foreach($items as $gid => $gitem){
-				if($gitem['type'] != GRAPH_ITEM_AGGREGATED) continue;
-				unset($items[$gid]);
+				if($gitem['type'] == GRAPH_ITEM_AGGREGATED) 
+					unset($items[$gid]);
 			}
 		}
-
-		asort_by_key($items, 'sortorder');
+		
+		array_merge($items);
+		foreach($items as $key => $item){
+			$items[$key]['sortorder'] = $key;
+			//asort_by_key($items, 'sortorder');
+		}
+		
 
 		$group_gid = get_request('group_gid', array());
 
-		$frmGraph->addVar('ymin_itemid',$ymin_itemid);
-		$frmGraph->addVar('ymax_itemid',$ymax_itemid);
+		$frmGraph->addVar('ymin_itemid', $ymin_itemid);
+		$frmGraph->addVar('ymax_itemid', $ymax_itemid);
 
-		$frmGraph->addRow(S_NAME,new CTextBox('name',$name,32));
+		$frmGraph->addRow(S_NAME, new CTextBox('name', $name, 32));
 
-		$g_width = new CNumericBox('width',$width,5);
-		$g_width->setAttribute('onblur','javascript: submit();');
-		$frmGraph->addRow(S_WIDTH,$g_width);
+		$g_width = new CNumericBox('width', $width, 5);
+		$g_width->setAttribute('onblur', 'javascript: submit();');
+		$frmGraph->addRow(S_WIDTH, $g_width);
 
-		$g_height = new CNumericBox('height',$height,5);
+		$g_height = new CNumericBox('height', $height, 5);
 		$g_height->setAttribute('onblur','javascript: submit();');
-		$frmGraph->addRow(S_HEIGHT,$g_height);
+		$frmGraph->addRow(S_HEIGHT, $g_height);
 
-		$cmbGType = new CComboBox('graphtype',$graphtype,'graphs.submit(this)');
-		$cmbGType->addItem(GRAPH_TYPE_NORMAL,S_NORMAL);
-		$cmbGType->addItem(GRAPH_TYPE_STACKED,S_STACKED);
-		$cmbGType->addItem(GRAPH_TYPE_PIE,S_PIE);
-		$cmbGType->addItem(GRAPH_TYPE_EXPLODED,S_EXPLODED);
+		$cmbGType = new CComboBox('graphtype', $graphtype, 'graphs.submit(this)');
+		$cmbGType->addItem(GRAPH_TYPE_NORMAL, S_NORMAL);
+		$cmbGType->addItem(GRAPH_TYPE_STACKED, S_STACKED);
+		$cmbGType->addItem(GRAPH_TYPE_PIE, S_PIE);
+		$cmbGType->addItem(GRAPH_TYPE_EXPLODED, S_EXPLODED);
 
 		zbx_add_post_js('graphs.graphtype = '.$graphtype.";\n");
 
-		$frmGraph->addRow(S_GRAPH_TYPE,$cmbGType);
+		$frmGraph->addRow(S_GRAPH_TYPE, $cmbGType);
 
 		if(($graphtype == GRAPH_TYPE_NORMAL) || ($graphtype == GRAPH_TYPE_STACKED)){
 			$frmGraph->addRow(S_SHOW_WORKING_TIME,new CCheckBox('showworkperiod',$showworkperiod,null,1));
@@ -2981,7 +2972,7 @@
 													"&srcfld2=description',0,0,'zbx_popup_item');");
 			}
 			else{
-				$frmGraph->addVar('yaxismin',$yaxismin);
+				$frmGraph->addVar('yaxismin', $yaxismin);
 			}
 
 			$frmGraph->addRow(S_YAXIS_MIN_VALUE, $yaxis_min);
@@ -3035,42 +3026,62 @@
 		if(count($items)){
 			$frmGraph->addVar('items', $items);
 
+			$keys = array_keys($items);
+			$first = reset($keys);
+			$last = end($keys);
+	
 			$items_table = new CTableInfo();
 			foreach($items as $gid => $gitem){
-				if($graphtype == GRAPH_TYPE_STACKED && $gitem['type'] == GRAPH_ITEM_AGGREGATED) continue;
+				//if($graphtype == GRAPH_TYPE_STACKED && $gitem['type'] == GRAPH_ITEM_AGGREGATED) continue;
 
 				$host = get_host_by_itemid($gitem['itemid']);
 				$item = get_item_by_itemid($gitem['itemid']);
 
-				if($host['status'] == HOST_STATUS_TEMPLATE) $only_hostid = $host['hostid'];
-				else $monitored_hosts = 1;
+				if($host['status'] == HOST_STATUS_TEMPLATE)
+					$only_hostid = $host['hostid'];
+				else 
+					$monitored_hosts = 1;
 
 				if($gitem['type'] == GRAPH_ITEM_AGGREGATED)
 					$color = '-';
 				else
 					$color = new CColorCell(null,$gitem['color']);
 
-				$do_up = new CSpan(S_UP,'link');
-				$do_up->onClick("return create_var('".$frmGraph->getName()."','move_up',".$gid.", true);");
 
-				$do_down = new CSpan(S_DOWN,'link');
-				$do_down->onClick("return create_var('".$frmGraph->getName()."','move_down',".$gid.", true);");
+				if($gid == $first){
+					$do_up = null;
+				}
+				else{
+					$do_up = new CSpan(S_UP,'link');
+					$do_up->onClick("return create_var('".$frmGraph->getName()."','move_up',".$gid.", true);");
+				}					
 
+				if($gid == $last){
+					$do_down = null;
+				}
+				else{
+					$do_down = new CSpan(S_DOWN,'link');
+					$do_down->onClick("return create_var('".$frmGraph->getName()."','move_down',".$gid.", true);");
+				}
+				
+					
+				
 				$description = new CSpan($host['host'].': '.item_description($item),'link');
 				$description->onClick(
-						'return PopUp("popup_gitem.php?list_name=items&dstfrm='.$frmGraph->getName().
-						url_param($only_hostid, false, 'only_hostid').
-						url_param($monitored_hosts, false, 'monitored_hosts').
-						url_param($graphtype, false, 'graphtype').
-						url_param($gitem, false).
-						url_param($gid,false,'gid').
-						url_param(get_request('graphid',0),false,'graphid').
-						'",550,400,"graph_item_form");');
+					'return PopUp("popup_gitem.php?list_name=items&dstfrm='.$frmGraph->getName().
+					url_param($only_hostid, false, 'only_hostid').
+					url_param($monitored_hosts, false, 'monitored_hosts').
+					url_param($graphtype, false, 'graphtype').
+					url_param($gitem, false).
+					url_param($gid,false,'gid').
+					url_param(get_request('graphid',0),false,'graphid').
+					'",550,400,"graph_item_form");'
+				);
 
 				if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
 					$items_table->addRow(array(
 							new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
-							$gitem['sortorder'],
+//							$gitem['sortorder'],
 							$description,
 							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
 							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
@@ -3081,13 +3092,13 @@
 				else{
 					$items_table->addRow(array(
 							new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
-							$gitem['sortorder'],
+//							$gitem['sortorder'],
 							$description,
 							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
 							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
 							graph_item_drawtype2str($gitem["drawtype"],$gitem["type"]),
 							$color,
-							array( $do_up, SPACE."|".SPACE, $do_down )
+							array( $do_up, ((!is_null($do_up) && !is_null($do_down)) ? SPACE."|".SPACE : ''), $do_down )
 						));
 				}
 			}
