@@ -185,8 +185,8 @@
 				$final_result,
 				'PHP version: ',
 				phpversion(),
-				version_compare(phpversion(), '5.1.0', '>='),
-				'Minimal version of PHP is 5.1.0'));
+				version_compare(phpversion(), '5.2.0', '>='),
+				'Minimal version of PHP is 5.2.0'));
 
 			$memory_limit = str2mem(ini_get('memory_limit'));
 			$table->addRow($this->get_test_result(
