@@ -48,7 +48,7 @@ static int    zbx_open_eventlog(LPCTSTR wsource, HANDLE *eventlog_handle, long *
 
 	/* Get path to eventlog */
 	zbx_wsnprintf(reg_path, MAX_PATH, EVENTLOG_REG_PATH TEXT("%s"), wsource);
-	
+
 	if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, reg_path, 0, KEY_READ, &hk))
 		goto out;
 
@@ -196,7 +196,7 @@ retry:
 		}
 		pFile = pNextFile;
 	}
-	
+
 	zbx_free(buf);
 
 	if (SUCCEED != err)
@@ -289,7 +289,7 @@ int process_eventlog(const char *source, long *lastlogsize, unsigned long *out_t
 	else
 		zabbix_log(LOG_LEVEL_ERR, "Can't open eventlog '%s' [%s]",
 				source, strerror_from_system(GetLastError()));
-	
+
 	zbx_free(wsource);
 
 	return ret;

@@ -1930,7 +1930,7 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 
 	in_size_left = in_size;
 	out_size_left = out_alloc - 1;
-		
+
 	while ((size_t)(-1) == iconv(cd, &in, &in_size_left, &p, &out_size_left))
 	{
 		if (E2BIG != errno)

@@ -231,8 +231,8 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 {
 	char		host[HOST_HOST_LEN_MAX], *name_esc, params[MAX_STRING_LEN],
 			pattern[MAX_STRING_LEN], tmp[32],
-			key_severity[MAX_STRING_LEN], key_logeventid[MAX_STRING_LEN];	
-	DB_RESULT	result;					
+			key_severity[MAX_STRING_LEN], key_logeventid[MAX_STRING_LEN];
+	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ITEM		item;
 	struct zbx_json	json;
@@ -303,44 +303,44 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		zbx_json_close(&json);
 
 		/* Special processing for log[] items */
-		do {	/* simple try realization */			
-			
+		do {	/* simple try realization */
+
 			/* log[filename,pattern,maxlinespersec] */
-			
+
 			if (0 != strncmp(item.key, "log[", 4))
 				break;
-				
+
 			if (2 != parse_command(item.key, NULL, 0, params, MAX_STRING_LEN))
 				break;
-				
-			/*dealing with `pattern' parameter*/						
+
+			/*dealing with `pattern' parameter*/
 			if (0 == get_param(params, 2, pattern, sizeof(pattern)) &&
-				*pattern == '@')			
+				*pattern == '@')
 					add_regexp_name(&regexp, &regexp_alloc, &regexp_num, pattern + 1);
 		} while (0);	/* simple try realization */
-		
+
 		/* Special processing for eventlog[] items */
 		do {	/* simple try realization */
-			
+
 			/* eventlog[filename,pattern,severity,source,logeventid,maxlinespersec] */
-			
+
 			if (0 != strncmp(item.key, "eventlog[", 9))
 				break;
 
 			if (2 != parse_command(item.key, NULL, 0, params, MAX_STRING_LEN))
 				break;
-			
-			/*dealing with `pattern' parameter*/						
+
+			/*dealing with `pattern' parameter*/
 			if (0 == get_param(params, 2, pattern, sizeof(pattern)) &&
-				*pattern == '@')			
+				*pattern == '@')
 					add_regexp_name(&regexp, &regexp_alloc, &regexp_num, pattern + 1);
-			
-			/*dealing with `severity' parameter*/					
+
+			/*dealing with `severity' parameter*/
 			if (0 == get_param(params, 3, key_severity, sizeof(key_severity)) &&
 				*key_severity == '@')
 					add_regexp_name(&regexp, &regexp_alloc, &regexp_num, key_severity + 1);
-			
-			/*dealing with `logeventid' parameter*/			
+
+			/*dealing with `logeventid' parameter*/
 			if (0 == get_param(params, 5, key_logeventid, sizeof(key_logeventid)) &&
 				*key_logeventid == '@')
 					add_regexp_name(&regexp, &regexp_alloc, &regexp_num, key_logeventid + 1);

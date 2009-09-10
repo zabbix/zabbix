@@ -397,14 +397,14 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
  * Get system error string by call to FormatMessage
  */
  #define ZBX_MESSAGE_BUF_SIZE	1024
- 
+
 char *strerror_from_system(unsigned long error)
 {
 #if defined(_WINDOWS)
 
 	TCHAR		wide_string[ZBX_MESSAGE_BUF_SIZE];
 	static char	utf8_string[ZBX_MESSAGE_BUF_SIZE];  /* !!! Attention static !!! not thread safely - Win32*/
-	
+
 	if (0 == FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, error,
 			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), wide_string, sizeof(wide_string), NULL))
 	{
