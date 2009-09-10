@@ -129,7 +129,7 @@ void service_start(void)
 {
 	int				ret;
 	static SERVICE_TABLE_ENTRY	serviceTable[2];
-	
+
 	serviceTable[0].lpServiceName = zbx_utf8_to_unicode(ZABBIX_SERVICE_NAME);
 	serviceTable[0].lpServiceProc = (LPSERVICE_MAIN_FUNCTION)ServiceEntry;
 	serviceTable[1].lpServiceName = NULL;
@@ -229,7 +229,7 @@ static int	svc_install_event_source(const char *path)
 	DWORD	dwTypes = EVENTLOG_ERROR_TYPE | EVENTLOG_WARNING_TYPE | EVENTLOG_INFORMATION_TYPE;
 	TCHAR	execName[MAX_PATH];
 	TCHAR	regkey[256], *wevent_source;
-	
+
 	svc_get_fullpath(path, execName, MAX_PATH);
 
 	wevent_source = zbx_utf8_to_unicode(ZABBIX_EVENT_SOURCE);
@@ -266,7 +266,7 @@ int	ZabbixCreateService(const char *path, int multiple_agents)
 	LPTSTR			wservice_name;
 	DWORD			code;
 	int			ret = FAIL;
-	
+
 	if (FAIL == svc_OpenSCManager(&mgr))
 		return ret;
 
@@ -298,7 +298,7 @@ int	ZabbixCreateService(const char *path, int multiple_agents)
 			CloseServiceHandle(service);
 		}
 	}
-	
+
 	zbx_free(wservice_name);
 
 	CloseServiceHandle(mgr);
