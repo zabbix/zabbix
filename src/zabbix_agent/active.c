@@ -159,7 +159,7 @@ static int	parse_list_of_checks(char *str)
 {
 	const char		*p;
 	char			name[MAX_STRING_LEN], key_orig[MAX_STRING_LEN], expression[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
-				exp_delimiter;	
+				exp_delimiter;
 	int			delay, lastlogsize, expression_type, case_sensitive;
 	struct zbx_json_parse	jp;
 	struct zbx_json_parse	jp_data, jp_row;
@@ -658,7 +658,7 @@ static void	process_active_checks(char *server, unsigned short port)
 	AGENT_RESULT	result;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_active_checks('%s',%u)",server, port);
-		
+
 	init_result(&result);
 
 	now = (int)time(NULL);
@@ -678,7 +678,7 @@ static void	process_active_checks(char *server, unsigned short port)
 
 			do { /* simple try realization */
 				if (parse_command(active_metrics[i].key, NULL, 0, params, MAX_STRING_LEN) != 2)
-					break;				
+					break;
 
 				if (num_param( params ) > 4)
 					break;
@@ -730,16 +730,16 @@ static void	process_active_checks(char *server, unsigned short port)
 					else
 						lastlogsize = active_metrics[i].lastlogsize;
 
-					/* Do not flood ZABBIX server if file grows too fast */					
+					/* Do not flood ZABBIX server if file grows too fast */
 					if (s_count >= (maxlines_persec * active_metrics[i].refresh))
 						break;
 
-					/* Do not flood local system if file grows too fast */					
+					/* Do not flood local system if file grows too fast */
 					if (p_count >= (4 * maxlines_persec * active_metrics[i].refresh))
-						break;					
+						break;
 				} //while processing a log
 			} while(0); /* simple try realization */
-		
+
 			if( FAIL == ret ) {
 				active_metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
 				zabbix_log( LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.",
@@ -763,7 +763,7 @@ static void	process_active_checks(char *server, unsigned short port)
 		else if(strncmp(active_metrics[i].key,"eventlog[",9) == 0)
 		{
 			ret = FAIL;
-			
+
 #if defined (_WINDOWS)
 			do{ /* simple try realization */
 				if (parse_command(active_metrics[i].key, NULL, 0, params, MAX_STRING_LEN) != 2) {
@@ -811,7 +811,7 @@ static void	process_active_checks(char *server, unsigned short port)
 				{
 					if (!value) /* EOF */
 						break;
-					
+
 					switch ( severity )
 					{
 						case EVENTLOG_INFORMATION_TYPE:
@@ -835,16 +835,16 @@ static void	process_active_checks(char *server, unsigned short port)
 							zbx_snprintf(str_severity, sizeof(str_severity), AUDIT_SUCCESS);
 							break;
 					}
-					
+
 					zbx_snprintf(str_logeventid, sizeof(str_logeventid), "%li", logeventid);
-					
+
 					if (SUCCEED == regexp_match_ex(regexps, regexps_num, value, pattern, ZBX_CASE_SENSITIVE) &&
 							SUCCEED == regexp_match_ex(regexps, regexps_num, str_severity,
 									key_severity, ZBX_IGNORE_CASE) &&
 							0 == strcmp(key_source, source) &&
 							SUCCEED == regexp_match_ex(regexps, regexps_num, str_logeventid,
 									key_logeventid, ZBX_CASE_SENSITIVE))
-					{						
+					{
 						send_err = process_value(
 									server,
 									port,
@@ -869,18 +869,18 @@ static void	process_active_checks(char *server, unsigned short port)
 					else
 						lastlogsize = active_metrics[i].lastlogsize;
 
-					/* Do not flood ZABBIX server if file grows too fast */					
+					/* Do not flood ZABBIX server if file grows too fast */
 					if (s_count >= (maxlines_persec * active_metrics[i].refresh))	break;
 
-					/* Do not flood local system if file grows too fast */					
+					/* Do not flood local system if file grows too fast */
 					if (p_count >= (4 * maxlines_persec * active_metrics[i].refresh))	break;
 				} //while processing an eventlog
-				
+
 				break;
-				
+
 			}while(0); /* simple try realization NOTE: never loop */
 #endif	/* if defined (_WINDOWS) */
-			
+
 			if( FAIL == ret ) {
 				active_metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
 				zabbix_log( LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.",
