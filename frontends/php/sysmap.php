@@ -297,7 +297,7 @@ include_once('include/page_header.php');
 
 	$table = new CTable(NULL,'map');
 	if(isset($_REQUEST['sysmapid'])){
-		$linkMap = new CMap('links'.$_REQUEST['sysmapid'].'_'.rand(0,100000));
+		$linkMap = new CAreaMap('links'.$_REQUEST['sysmapid'].'_'.rand(0,100000));
 
 		$db_elements = DBselect('select * from sysmaps_elements where sysmapid='.$_REQUEST['sysmapid']);
 		while($db_element = DBfetch($db_elements)){
