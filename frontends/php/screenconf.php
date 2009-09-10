@@ -298,6 +298,9 @@ include_once('include/page_header.php');
 //-------*/
 			$screen_wdgt->addItem(BR());
 
+
+
+/* ---*** old variant of getting graphs ***----------/
 			$sql = 'SELECT s.screenid,s.name,s.hsize,s.vsize,(s.hsize*s.vsize) as s_size '.
 					' FROM screens s '.
 					' WHERE '.DBin_node('s.screenid').
@@ -314,6 +317,17 @@ include_once('include/page_header.php');
 					new CLink(S_EDIT,"screenedit.php?screenid=".$row["screenid"])
 					));
 			}
+/* ---*** new variant with API ***----------*/
+			$screens = CScreen::get(array('editable' => 1, 'extendoutput' => 1, 'sortfield' => 'name'));
+			foreach($screens as $screenid => $screen){
+				$table->addRow(array(
+					new CCheckBox('screens['.$screenid.']', NULL, NULL, $screenid),
+					new CLink($screen["name"],"?config=0&form=update&screenid=".$screenid),
+					$screen["hsize"]." x ".$screen["vsize"],
+					new CLink(S_EDIT,"screenedit.php?screenid=".$screenid)
+				));
+			}
+
 
 // PAGING FOOTER
 //			$table->addRow(new CCol($paging));

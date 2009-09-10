@@ -40,6 +40,8 @@ function __autoload($class_name){
 		'cuser' => 1,
 		'cusergroup' => 1,
 		'cusermacro' => 1,
+		'cscreen' => 1,
+		'cmap' => 1,
 		'cgraphitem' => 1
 	);
 
