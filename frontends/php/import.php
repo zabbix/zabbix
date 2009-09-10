@@ -26,8 +26,8 @@
 	$page['title'] = 'S_EXPORT_IMPORT';
 	$page['file'] = 'import.php';
 	$page['hist_arg'] = array();
-	
-	
+
+
 include_once('include/page_header.php');
 
 	$fields=array(
@@ -52,12 +52,12 @@ include_once('include/page_header.php');
 		}
 	}
 
-	if(isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])){		
+	if(isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])){
 		require_once('include/export.inc.php');
 		zbxXML::import($rules, $_FILES['import_file']['tmp_name']);
 	}
 
-	
+
 	$header_form = new CForm();
 	$header_form->setMethod('get');
 	$cmbConf = new CComboBox('config', 'import.php');
@@ -67,8 +67,8 @@ include_once('include/page_header.php');
 	$header_form->addItem($cmbConf);
 
 	show_table_header(S_IMPORT_BIG, $header_form);
-	
-	
+
+
 	$form = new CFormTable(S_IMPORT, null, 'post', 'multipart/form-data');
 	$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
 
@@ -91,8 +91,8 @@ include_once('include/page_header.php');
 
 	$form->addItemToBottomRow(new CButton('import', S_IMPORT));
 	$form->Show();
-	
-	
+
+
 include_once('include/page_footer.php');
 
 ?>

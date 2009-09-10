@@ -569,7 +569,7 @@
 
 			$count = count($triggers);
 			if ($count > 0){
-			
+
 				$tr_info[TRIGGER_VALUE_TRUE]['count'] = $count;
 
 				if ($tr_info[TRIGGER_VALUE_TRUE]['count'] == 1){

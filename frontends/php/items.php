@@ -60,7 +60,7 @@ include_once('include/page_header.php');
 		'groupid'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			null),
 		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,			null),
 		'form_hostid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,			'isset({save})'),
-		
+
 
 		'add_groupid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({register})&&({register}=="go"))'),
 		'action'=>			array(T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY,		'(isset({register})&&({register}=="go"))'),
@@ -651,7 +651,7 @@ include_once('include/page_header.php');
 
 ?>
 <?php
-	$hostid = get_request('form_hostid', get_request('hostid', 0));	
+	$hostid = get_request('form_hostid', get_request('hostid', 0));
 	if(!zbx_empty($_REQUEST['filter_host'])){
 		$hostid = CHost::getId(array('host' => $_REQUEST['filter_host']));
 	}

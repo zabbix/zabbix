@@ -318,7 +318,7 @@ public static $result;
 			self::$result = array_shift(CTrigger::$error);
 		}
 	}
-	
+
 // GRAPH
 	private static function graph($action, $params){
 

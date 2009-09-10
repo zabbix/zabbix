@@ -1415,6 +1415,6 @@
 	'S_CANT_FORMAT_TREE'=>			'ツリーをフォーマットできません',
 	'S_UNSUPPORTED_FILE_FORMAT'=>			'サポートされていないファイルフォーマットです',
 	'S_UNSUPPORTED_VERSION_OF_IMPORTED_DATA'=>			'サポートされていないインポートデータのバージョンです',
-	
+
 	);
 ?>

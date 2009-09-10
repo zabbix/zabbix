@@ -261,15 +261,15 @@ include_once('include/page_header.php');
 // ----- GO -----
 	else if(($_REQUEST['go'] == 'unblock') && isset($_REQUEST['group_userid'])){
 		$result = false;
-		
+
 		$group_userid = get_request('group_userid', array());
-		
+
 		DBstart();
 		$result = unblock_user_login($group_userid);
 		$result = DBend($result);
-		
+
 		if($result){
-			$options = array('userids'=>$group_userid, 
+			$options = array('userids'=>$group_userid,
 							'extendoutput' => 1);
 			$users = CUser::get($options);
 			foreach($users as $userid => $user){
@@ -278,7 +278,7 @@ include_once('include/page_header.php');
 							'Unblocked user alias ['.$user['alias'].'] name ['.$user['name'].'] surname ['.$user['surname'].']');
 			}
 		}
-		
+
 		show_messages($result, S_USERS_UNBLOCKED,S_CANNOT_UNBLOCK_USERS);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_userid'])){
@@ -429,7 +429,7 @@ include_once('include/page_header.php');
 				$users_groups[] = BR();
 			}
 			array_pop($users_groups);
-			
+
 			$gui_access = user_auth_type2str($user['gui_access']);
 			$gui_access = new CSpan($gui_access, ($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED) ? 'orange' : 'green');
 			$users_status = ($user['users_status'] == 1) ? new CSpan(S_DISABLED, 'red') : new CSpan(S_ENABLED, 'green');

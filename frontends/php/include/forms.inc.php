@@ -1780,13 +1780,13 @@
 		$frmItem->addVar('config',get_request('config', 0));
 		$frmItem->addVar('applications_visible',1);
 
-		$hostid				= get_request('hostid',		0);		
-		$form_hostid		= get_request('form_hostid',0);	
-		
+		$hostid				= get_request('hostid',		0);
+		$form_hostid		= get_request('form_hostid',0);
+
 		if($form_hostid != 0){
 			$hostid = $form_hostid;
-		}		
-		
+		}
+
 		$description		= get_request('description','');
 		$key				= get_request('key',		'');
 		$host				= get_request('host',		null);
@@ -2042,7 +2042,7 @@
 			$cmbValType->AddItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);
 			$cmbValType->AddItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);
 		}
-		
+
 		$frmItem->addRow(S_TYPE_OF_INFORMATION,$cmbValType);
 
 		if ($value_type == ITEM_VALUE_TYPE_UINT64) {
@@ -2432,7 +2432,7 @@
 
 		$cmbApps = new CListBox('applications[]',$applications,6);
 		$cmbApps->addItem(0,'-'.S_NONE.'-');
-		
+
 		if(isset($_REQUEST['hostid'])){
 			$sql = 'SELECT applicationid,name '.
 				' FROM applications '.
@@ -2500,7 +2500,7 @@
 					BR()
 				));
 			}
-			
+
 			$templates = CTemplate::get($options);
 			foreach($templates as $templateid => $template){
 				array_push($target_list,array(
@@ -2805,7 +2805,7 @@
 			$graph3d = $row['show_3d'];
 			$percent_left = $row['percent_left'];
 			$percent_right = $row['percent_right'];
-			
+
 			$db_items = CGraphItem::get(array('graphids' => $_REQUEST['graphid'], 'sortfield' => 'sortorder', 'extendoutput' => 1));
 			foreach($db_items as $item){
 				$items[] = array(
@@ -2876,17 +2876,17 @@
 
 		if($graphtype != GRAPH_TYPE_NORMAL){
 			foreach($items as $gid => $gitem){
-				if($gitem['type'] == GRAPH_ITEM_AGGREGATED) 
+				if($gitem['type'] == GRAPH_ITEM_AGGREGATED)
 					unset($items[$gid]);
 			}
 		}
-		
+
 		array_merge($items);
 		foreach($items as $key => $item){
 			$items[$key]['sortorder'] = $key;
 			//asort_by_key($items, 'sortorder');
 		}
-		
+
 
 		$group_gid = get_request('group_gid', array());
 
@@ -3029,7 +3029,7 @@
 			$keys = array_keys($items);
 			$first = reset($keys);
 			$last = end($keys);
-	
+
 			$items_table = new CTableInfo();
 			foreach($items as $gid => $gitem){
 				//if($graphtype == GRAPH_TYPE_STACKED && $gitem['type'] == GRAPH_ITEM_AGGREGATED) continue;
@@ -3039,7 +3039,7 @@
 
 				if($host['status'] == HOST_STATUS_TEMPLATE)
 					$only_hostid = $host['hostid'];
-				else 
+				else
 					$monitored_hosts = 1;
 
 				if($gitem['type'] == GRAPH_ITEM_AGGREGATED)
@@ -3054,7 +3054,7 @@
 				else{
 					$do_up = new CSpan(S_UP,'link');
 					$do_up->onClick("return create_var('".$frmGraph->getName()."','move_up',".$gid.", true);");
-				}					
+				}
 
 				if($gid == $last){
 					$do_down = null;
@@ -3063,9 +3063,9 @@
 					$do_down = new CSpan(S_DOWN,'link');
 					$do_down->onClick("return create_var('".$frmGraph->getName()."','move_down',".$gid.", true);");
 				}
-				
-					
-				
+
+
+
 				$description = new CSpan($host['host'].': '.item_description($item),'link');
 				$description->onClick(
 					'return PopUp("popup_gitem.php?list_name=items&dstfrm='.$frmGraph->getName().
@@ -5631,7 +5631,7 @@
 		$clear_templates = array_intersect($clear_templates, array_keys($original_templates));
 		$clear_templates = array_diff($clear_templates,array_keys($templates));
 		asort($templates);
-	
+
 		$frmHost = new CForm('hosts.php', 'post');
 		$frmHost->setName('web.hosts.host.php.');
 		//$frmHost->setHelp('web.hosts.host.php');
@@ -5641,9 +5641,9 @@
 		$frmHost->addVar('form_refresh', $from_rfr+1);
 		$frmHost->addVar('clear_templates',$clear_templates);
 
-// HOST WIDGET {	
+// HOST WIDGET {
 		$host_tbl = new CTableInfo();
-		
+
 		if($_REQUEST['hostid']>0) $frmHost->addVar('hostid', $_REQUEST['hostid']);
 		if($_REQUEST['groupid']>0) $frmHost->addVar('groupid', $_REQUEST['groupid']);
 
@@ -5730,7 +5730,7 @@
 			$frmHost->addVar('ipmi_username', $ipmi_username);
 			$frmHost->addVar('ipmi_password', $ipmi_password);
 		}
-		
+
 		if($_REQUEST['form'] == 'full_clone'){
 // Host items
 			$items_lbx = new CListBox('items',null,8);
@@ -5799,19 +5799,19 @@
 
 			$host_tbl->addRow(array(S_GRAPHS, $graphs_lbx));
 		}
-		
+
 		$host_footer = array();
 		$host_footer[] = new CButton('save', S_SAVE);
 		if(($_REQUEST['hostid']>0) && ($_REQUEST['form'] != 'full_clone')){
-			array_push($host_footer, SPACE, new CButton('clone', S_CLONE), SPACE, new CButton('full_clone', S_FULL_CLONE), SPACE, 
+			array_push($host_footer, SPACE, new CButton('clone', S_CLONE), SPACE, new CButton('full_clone', S_FULL_CLONE), SPACE,
 				new CButtonDelete(S_DELETE_SELECTED_HOST_Q, url_param('form').url_param('hostid').url_param('groupid')));
 		}
 		array_push($host_footer, SPACE, new CButtonCancel(url_param('groupid')));
-		
+
 		$host_footer = new CCol($host_footer);
 		$host_footer->setColSpan(2);
 		$host_tbl->setFooter($host_footer);
-		
+
 		$host_wdgt = new CWidget();
 		$host_wdgt->setClass('header');
 		$host_wdgt->addHeader($frm_title);
@@ -5820,20 +5820,20 @@
 
 // TEMPLATES{
 		$template_tbl = new CTableInfo();
-		
+
 		$template_list_tbl = new CTable(S_NO_TEMPLATES_LINKED);
 
 		foreach($templates as $id => $temp_name){
 			$frmHost->addVar('templates['.$id.']',$temp_name);
 			$template_list_tbl->addRow(	array(
-					new CCheckBox('templates_rem['.$id.']', 'no', null, $id), 
+					new CCheckBox('templates_rem['.$id.']', 'no', null, $id),
 					$temp_name
 					)
 			);
 		}
 
 		$template_tbl->addRow($template_list_tbl);
-		
+
 		$footer = new CCol(array(
 			new CButton('add_template',S_ADD,
 					"return PopUp('popup.php?dstfrm=".$frmHost->getName().
@@ -5846,20 +5846,20 @@
 			new CButton('unlink_and_clear',S_UNLINK_AND_CLEAR)
 		));
 //		$footer->setAttribute('colspan', 2);
-		
+
 		$template_tbl->setFooter($footer);
 
 		$template_wdgt = new CWidget();
 		$template_wdgt->setClass('header');
 		$template_wdgt->addHeader(S_LINKED_TEMPLATES);
 		$template_wdgt->addItem($template_tbl);
-		
+
 // } TEMPLATES
 
 
 // MACROS WIDGET {
 		$macros_wdgt = get_macros_widget($_REQUEST['hostid']);
-// } MACROS WIDGET 
+// } MACROS WIDGET
 
 
 // PROFILE WIDGET {
@@ -5892,7 +5892,7 @@
 			$frmHost->addVar('location',$location);
 			$frmHost->addVar('notes',$notes);
 		}
-		
+
 		$profile_wdgt = new CWidget();
 		$profile_wdgt->setClass('header');
 		$profile_wdgt->addHeader(S_PROFILE);
@@ -5911,18 +5911,18 @@
 				$frmHost->addVar('ext_host_profiles['.$prof_field.']',	$ext_host_profiles[$prof_field]);
 			}
 		}
-		
+
 		$ext_profile_wdgt = new CWidget();
 		$ext_profile_wdgt->setClass('header');
 		$ext_profile_wdgt->addHeader(S_EXTENDED_HOST_PROFILE);
-		$ext_profile_wdgt->addItem($ext_profile_tbl);	
+		$ext_profile_wdgt->addItem($ext_profile_tbl);
 // } EXT PROFILE WIDGET
-		
+
 		$left_table = new CTable();
 		$left_table->setCellPadding(4);
 		$left_table->setCellSpacing(4);
 		$left_table->addRow($host_wdgt);
-		
+
 		$right_table = new CTable();
 		$right_table->setCellPadding(4);
 		$right_table->setCellSpacing(4);
@@ -5930,13 +5930,13 @@
 		$right_table->addRow($macros_wdgt);
 		$right_table->addRow($profile_wdgt);
 		$right_table->addRow($ext_profile_wdgt);
-		
-		
+
+
 		$td_l = new CCol($left_table);
 		$td_l->setAttribute('valign','top');
 		$td_r = new CCol($right_table);
 		$td_r->setAttribute('valign','top');
-		
+
 		$outer_table = new CTable();
 		$outer_table->addRow(array($td_l, $td_r));
 
@@ -7003,43 +7003,43 @@
 		return $tbl_header_host;
 	}
 
-	
+
 // if $hostid = null => global macro
 	function get_macros_widget($hostid = null){
-	
+
 		if(is_null($hostid)){
 			$macros = CUserMacro::get(array('extendoutput' => 1, 'globalmacro' => 1));
 		}
-		else if(isset($_REQUEST['form_refresh'])){ 
+		else if(isset($_REQUEST['form_refresh'])){
 			$macros = get_request('macros', array());
-		}	
+		}
 		else if($hostid > 0){
 			$macros = CUserMacro::get(array('extendoutput' => 1, 'hostids' => $hostid));
 		}
 		else{
 			$macros = array();
 		}
-	
+
 		$macros_tbl = new CTableInfo();
-		
+
 		$macros_list_tbl = new CTable(S_NO_MACROS_DEFINED);
 		foreach($macros as $macroid => $macro){
 			$macros_list_tbl->addItem(new CVar('macros['.$macro['macro'].']',$macro));
 			$macros_list_tbl->addRow(array(
-				new CCheckBox("macros_rem[{$macro['macro']}]", 'no', null, $macro['macro']), 
+				new CCheckBox("macros_rem[{$macro['macro']}]", 'no', null, $macro['macro']),
 				$macro['macro'],
 				SPACE.RARR.SPACE,
 				$macro['value']
 			));
 		}
-		
+
 		$add_macro = array(
 			S_NEW,
 			new CTextBox('macro_new', get_request('macro_new', ''), 10),
 			SPACE.RARR.SPACE,
 			new CTextBox('value_new', get_request('value_new', ''), 10)
 		);
-		
+
 		$macros_list_tbl->addRow($add_macro);
 
 
@@ -7047,19 +7047,19 @@
 		if(count($macros) == 0){
 			$delete_btn->setAttribute('disabled', 'disabled');
 		}
-		
+
 		$macros_tbl->addRow($macros_list_tbl);
-		
+
 		$footer = new CCol(array(new CButton('macro_add', S_ADD), SPACE, $delete_btn));
 		$footer->setAttribute('colspan', 1);
-		
+
 		$macros_tbl->setFooter($footer);
 
 		$macros_wdgt = new CWidget();
 		$macros_wdgt->setClass('header');
 		$macros_wdgt->addHeader(S_MACROS);
 		$macros_wdgt->addItem($macros_tbl);
-		
+
 		return $macros_wdgt;
 	}
 ?>
