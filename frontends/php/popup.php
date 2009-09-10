@@ -733,13 +733,13 @@ include_once('include/page_header.php');
 			unset($description);
 			unset($status);
 		}
-		
+
 		if($multiselect){
 			$button = new CButton('select', S_SELECT, 'add_selected_values("'.S_TRIGGERS.'", "'.$dstfrm.'", "'.$dstfld1.'", "'.$dstact.'")');
 			$button->setType('button');
 			$table->setFooter(new CCol($button, 'right'));
 		}
-			
+
 		$form->addItem($table);
 		$form->show();
 	}

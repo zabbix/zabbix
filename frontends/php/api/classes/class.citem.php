@@ -197,7 +197,7 @@ class CItem {
 				$sql_parts['select']['applicationid'] = 'ia.applicationid';
 			}
 
-			$sql_parts['from']['ia'] = 'items_applications ia';					
+			$sql_parts['from']['ia'] = 'items_applications ia';
 			$sql_parts['where'][] = DBcondition('ia.applicationid', $options['applicationids']);
 			$sql_parts['where']['ia'] = 'ia.itemid=i.itemid';
 		}
@@ -570,14 +570,14 @@ class CItem {
 			}
 			$hostid = CHost::getId(array('host' => $item_data['host']));
 		}
-		
+
 		$sql = 'SELECT DISTINCT i.itemid'.
 			' FROM items i'.
 			' WHERE i.key_='.zbx_dbstr($item_data['key_']).
 				' AND i.hostid='.$hostid;
-				
+
 		$itemid = DBfetch(DBselect($sql));
-		
+
 		$result = $itemid ? $itemid['itemid'] : false;
 		if($result)
 			return $result;

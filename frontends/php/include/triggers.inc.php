@@ -712,7 +712,7 @@ return $result;
 						}
 
 						if(preg_match('/^'.ZBX_EREG_EXPRESSION_USER_MACROS.'$/', $parameter[$pid])) continue;
-						
+
 						if(('sec' == $params['type']) && (validate_float($parameter[$pid])!=0) ){
 							error('['.$parameter[$pid].'] is not a float or macro for function ('.$function.')');
 							return false;
@@ -750,8 +750,8 @@ return $result;
 		}
 
 
-/* OLD EREG 
-//Replace all calculations and numbers with '$ZBX_TR_EXPR_REPLACE_TO' 
+/* OLD EREG
+//Replace all calculations and numbers with '$ZBX_TR_EXPR_REPLACE_TO'
 		$expt_number = '('.$ZBX_TR_EXPR_REPLACE_TO.'|'.ZBX_EREG_NUMBER.'|'.ZBX_EREG_EXPRESSION_USER_MACROS.')';
 
 		$expt_term = '((\('.$expt_number.'\))|('.$expt_number.'))';
@@ -964,7 +964,7 @@ return $result;
 		else{
 			$exp=array();
 		}
-		
+
 		$trigger=array();
 		$state='';
 		for($i=0,$max=strlen($expression); $i<$max; $i++){
@@ -982,7 +982,7 @@ return $result;
 			if($expression[$i] == '}'){
 				if($state == 'MACROS'){
 					$macros.='}';
-					
+
 					if($resolve_macro){
 						$function_data['expression'] = $macros;
 						CUserMacro::resolveTrigger($function_data);
@@ -991,14 +991,14 @@ return $result;
 
 					if(1 == $html) array_push($exp,$macros);
 					else $exp.=$macros;
-					
+
 					$macros = '';
 					$state = '';
 					continue;
 				}
-				
+
 				$state='';
-				
+
 				if($functionid=='TRIGGER.VALUE'){
 					if(0 == $html) $exp.='{'.$functionid.'}';
 					else array_push($exp,'{'.$functionid.'}');
@@ -1016,10 +1016,10 @@ return $result;
 					if($resolve_macro){
 						$trigger = $function_data;
 						CUserMacro::resolveItem($function_data);
-	
+
 						$function_data['expression'] = $function_data['parameter'];
 						CUserMacro::resolveTrigger($function_data);
-						$function_data['parameter'] = $function_data['expression'];					
+						$function_data['parameter'] = $function_data['expression'];
 					}
 
 //SDII($function_data);

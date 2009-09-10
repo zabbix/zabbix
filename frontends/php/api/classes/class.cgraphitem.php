@@ -258,7 +258,7 @@ class CGraphItem {
 	 */
 	public static function getId($gitem_data){
 		$result = false;
-		
+
 		$sql = 'SELECT gi.gitemid '.
 				' FROM graphs_items gi '.
 				' WHERE gi.itemid='.$gitem_data['itemid'].

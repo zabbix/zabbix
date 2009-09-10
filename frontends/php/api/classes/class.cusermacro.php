@@ -76,7 +76,7 @@ class CUserMacro {
 			'where' => array(),
 			'order' => array(),
 			'limit' => null);
-			
+
 		$sql_parts_global = array(
 			'select' => array('macros' => 'gm.globalmacroid'),
 			'from' => array('globalmacro gm'),
@@ -140,7 +140,7 @@ class CUserMacro {
 
 // nodeids
 		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
-		
+
 // Global Macro
 		if(!is_null($options['globalmacro'])){
 			$options['groupids'] = null;
@@ -148,7 +148,7 @@ class CUserMacro {
 			$options['triggerids'] = null;
 			$options['hostids'] = null;
 			$options['itemids'] = null;
-			
+
 			$options['select_groups'] = null;
 			$options['select_templates'] = null;
 			$options['select_hosts'] = null;
@@ -159,7 +159,7 @@ class CUserMacro {
 			zbx_value2array($options['globalmacroids']);
 			$sql_parts_global['where'][] = DBcondition('gm.globalmacroid', $options['globalmacroids']);
 		}
-		
+
 // hostmacroids
 		if(!is_null($options['hostmacroids'])){
 			zbx_value2array($options['hostmacroids']);
@@ -183,7 +183,7 @@ class CUserMacro {
 			zbx_value2array($options['hostids']);
 			$sql_parts['where'][] = DBcondition('hm.hostid', $options['hostids']);
 		}
-		
+
 // templateids
 		if(!is_null($options['templateids'])){
 			zbx_value2array($options['templateids']);
@@ -240,7 +240,7 @@ class CUserMacro {
 			if(!str_in_array('hm.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('hm.*', $sql_parts['select'])){
 				$sql_parts['select'][] = 'hm.'.$options['sortfield'];
 			}
-			
+
 			if(!str_in_array('gm.'.$options['sortfield'], $sql_parts_global['select']) && !str_in_array('gm.*', $sql_parts_global['select'])){
 				$sql_parts_global['select'][] = 'gm.'.$options['sortfield'];
 			}
@@ -252,14 +252,14 @@ class CUserMacro {
 			$sql_parts_global['limit'] = $options['limit'];
 		}
 //-------
-	
+
 // init GLOBALS
 		if(!is_null($options['globalmacro'])){
 			$sql_parts_global['select'] = array_unique($sql_parts_global['select']);
 			$sql_parts_global['from'] = array_unique($sql_parts_global['from']);
 			$sql_parts_global['where'] = array_unique($sql_parts_global['where']);
 			$sql_parts_global['order'] = array_unique($sql_parts_global['order']);
-	
+
 			$sql_select = '';
 			$sql_from = '';
 			$sql_where = '';
@@ -269,7 +269,7 @@ class CUserMacro {
 			if(!empty($sql_parts_global['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts_global['where']);
 			if(!empty($sql_parts_global['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts_global['order']);
 			$sql_limit = $sql_parts_global['limit'];
-	
+
 			$sql = 'SELECT '.$sql_select.'
 					FROM '.$sql_from.'
 					WHERE '.DBin_node('gm.globalmacroid', $nodeids).
@@ -281,13 +281,13 @@ class CUserMacro {
 					$result = $macro;
 				else{
 					$globalmacroids[$macro['globalmacroid']] = $macro['globalmacroid'];
-	
+
 					if(is_null($options['extendoutput'])){
 						$result[$macro['globalmacroid']] = $macro['globalmacroid'];
 					}
 					else{
 						if(!isset($result[$macro['globalmacroid']])) $result[$macro['globalmacroid']]= array();
-	
+
 						$result[$macro['globalmacroid']] += $macro;
 					}
 				}
@@ -301,7 +301,7 @@ class CUserMacro {
 			$sql_parts['from'] = array_unique($sql_parts['from']);
 			$sql_parts['where'] = array_unique($sql_parts['where']);
 			$sql_parts['order'] = array_unique($sql_parts['order']);
-	
+
 			$sql_select = '';
 			$sql_from = '';
 			$sql_where = '';
@@ -311,7 +311,7 @@ class CUserMacro {
 			if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
 			if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 			$sql_limit = $sql_parts['limit'];
-	
+
 			$sql = 'SELECT '.$sql_select.'
 					FROM '.$sql_from.'
 					WHERE '.DBin_node('hm.hostmacroid', $nodeids).
@@ -323,36 +323,36 @@ class CUserMacro {
 					$result = $macro;
 				else{
 					$hostmacroids[$macro['hostmacroid']] = $macro['hostmacroid'];
-	
+
 					if(is_null($options['extendoutput'])){
 						$result[$macro['hostmacroid']] = $macro['hostmacroid'];
 					}
 					else{
 						$hostids[$macro['hostid']] = $macro['hostid'];
-						
+
 						if(!isset($result[$macro['hostmacroid']])) $result[$macro['hostmacroid']]= array();
-	
+
 						if($options['select_groups'] && !isset($result[$macro['hostmacroid']]['groupids'])){
 							$result[$macro['hostmacroid']]['groupids'] = array();
 							$result[$macro['hostmacroid']]['groups'] = array();
 						}
-	
+
 						if($options['select_templates'] && !isset($result[$macro['hostmacroid']]['templateids'])){
 							$result[$macro['hostmacroid']]['templateids'] = array();
 							$result[$macro['hostmacroid']]['templates'] = array();
 						}
-	
+
 						if($options['select_hosts'] && !isset($result[$macro['hostmacroid']]['hostids'])){
 							$result[$macro['hostmacroid']]['hostids'] = array();
 							$result[$macro['hostmacroid']]['hosts'] = array();
 						}
-	
-	
+
+
 						// groupids
 						if(isset($macro['groupid'])){
 							if(!isset($result[$macro['hostmacroid']]['groupids']))
 								$result[$macro['hostmacroid']]['groupids'] = array();
-	
+
 							$result[$macro['hostmacroid']]['groupids'][$macro['groupid']] = $macro['groupid'];
 							unset($macro['groupid']);
 						}
@@ -360,7 +360,7 @@ class CUserMacro {
 						if(isset($macro['templateid'])){
 							if(!isset($result[$macro['hostmacroid']]['templateids']))
 								$result[$macro['hostmacroid']]['templateids'] = array();
-	
+
 							$result[$macro['hostmacroid']]['templateids'][$macro['templateid']] = $macro['templateid'];
 							unset($macro['templateid']);
 						}
@@ -368,11 +368,11 @@ class CUserMacro {
 						if(isset($macro['hostid'])){
 							if(!isset($result[$macro['hostmacroid']]['hostids']))
 								$result[$macro['hostmacroid']]['hostids'] = array();
-	
+
 							$result[$macro['hostmacroid']]['hostids'][$macro['hostid']] = $macro['hostid'];
 							unset($macro['hostid']);
 						}
-	
+
 						$result[$macro['hostmacroid']] += $macro;
 					}
 				}
@@ -397,7 +397,7 @@ class CUserMacro {
 				}
 			}
 		}
-		
+
 // Adding Templates
 		if($options['select_templates']){
 			$obj_params = array('extendoutput' => 1, 'templateids' => $hostids);
@@ -458,7 +458,7 @@ class CUserMacro {
 		}
 	}
 
-	
+
 /**
  * add Host Macro
  *
@@ -472,28 +472,28 @@ class CUserMacro {
  * @param string $macros['hostid']
  * @param string $macros['macros'][0..]['macro']
  * @param string $macros['macros'][0..]['value']
- * @return array|boolean 
+ * @return array|boolean
  */
 	public static function add($macros){
 		$result = true;
-	
+
 		$hostid = $macros['hostid'];
 		DBstart(false);
-		
+
 		foreach($macros['macros'] as $macro){
 			$macroid = self::getHostMacroID(array('hostid' => $hostid, 'macro' => $macro['macro']));
 			if(!$macroid){
 				$hostmacroid = get_dbid('hostmacro', 'hostmacroid');
-				
-				$sql = 'INSERT INTO hostmacro (hostmacroid, hostid, macro, value) 
+
+				$sql = 'INSERT INTO hostmacro (hostmacroid, hostid, macro, value)
 					VALUES('.$hostmacroid.', '.$hostid.', '.zbx_dbstr($macro['macro']).', '.zbx_dbstr($macro['value']).')';
 				$result = DBExecute($sql);
-				
+
 				if(!$result) break;
 			}
 		}
-		DBend($result);	
-		
+		DBend($result);
+
 		if($result)
 			return true;
 		else{
@@ -501,7 +501,7 @@ class CUserMacro {
 			return false;
 		}
 	}
-	
+
 /**
  * Update host macros, replace all with new ones
  *
@@ -515,27 +515,27 @@ class CUserMacro {
  * @param string $macros['hostid']
  * @param string $macros['macros'][0..]['macro']
  * @param string $macros['macros'][0..]['value']
- * @return array|boolean 
+ * @return array|boolean
  */
 	public static function update($macros){
 		$result = true;
 
 		DBstart(false);
-		
+
 		$sql = 'DELETE FROM hostmacro WHERE hostid='.$macros['hostid'];
 		DBexecute($sql);
 
 		foreach($macros['macros'] as $macro){
 			$hostmacroid = get_dbid('hostmacro', 'hostmacroid');
-			
-			$sql = 'INSERT INTO hostmacro (hostmacroid, hostid, macro, value) 
+
+			$sql = 'INSERT INTO hostmacro (hostmacroid, hostid, macro, value)
 				VALUES('.$hostmacroid.', '.$macros['hostid'].', '.zbx_dbstr($macro['macro']).', '.zbx_dbstr($macro['value']).')';
 			$result = DBExecute($sql);
-			
+
 			if(!$result) break;
 		}
-		DBend($result);	
-		
+		DBend($result);
+
 		if($result)
 			return true;
 		else{
@@ -557,7 +557,7 @@ class CUserMacro {
  * @param string $macros['hostid']
  * @param string $macros['macros'][0..]['macro']
  * @param string $macros['macros'][0..]['value']
- * @return array|boolean 
+ * @return array|boolean
  */
 	public static function updateValue($macros){
 		$result = true;
@@ -565,15 +565,15 @@ class CUserMacro {
 		DBstart(false);
 
 		foreach($macros['macros'] as $macro){
-			
+
 			$sql = 'UPDATE hostmacro SET value='.zbx_dbstr($macro['value']).
 				'WHERE hostid='.$macros['hostid'].' AND macro='.zbx_dbstr($macro['macro']);
 			$result = DBExecute($sql);
-			
+
 			if(!$result) break;
 		}
-		DBend($result);	
-		
+		DBend($result);
+
 		if($result)
 			return true;
 		else{
@@ -581,7 +581,7 @@ class CUserMacro {
 			return false;
 		}
 	}
-	
+
 /**
  * Add global macros
  *
@@ -595,23 +595,23 @@ class CUserMacro {
 
  * @param string $macros[0..]['macro']
  * @param string $macros[0..]['value']
- * @return array|boolean 
- */	
+ * @return array|boolean
+ */
 	public static function addGlobal($macros){
 		$result = true;
 		DBstart(false);
 		foreach($macros as $macro){
 
 			$globalmacroid = get_dbid('globalmacro', 'globalmacroid');
-			
-			$sql = 'INSERT INTO globalmacro (globalmacroid, macro, value) 
+
+			$sql = 'INSERT INTO globalmacro (globalmacroid, macro, value)
 				VALUES('.$globalmacroid.', '.zbx_dbstr($macro['macro']).', '.zbx_dbstr($macro['value']).')';
 			$result = DBExecute($sql);
-			
+
 			if(!$result) break;
 		}
-		DBend($result);	
-		
+		DBend($result);
+
 		if($result)
 			return true;
 		else{
@@ -619,7 +619,7 @@ class CUserMacro {
 			return false;
 		}
 	}
-	
+
 /**
  * Validates macros expression
  *
@@ -630,19 +630,19 @@ class CUserMacro {
  * @version 1
  *
  * @param _array $macros array with macros expressions
- * @return array|boolean 
+ * @return array|boolean
  */
 	public static function validate($macros){
 		zbx_value2array($macros);
 		$result = true;
-	
+
 		foreach($macros as $macro){
 			if(!preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $macro)){
 				$result = false;
 				break;
 			}
 		}
-		
+
 		if($result)
 			return true;
 		else{
@@ -650,7 +650,7 @@ class CUserMacro {
 			return false;
 		}
 	}
-	
+
 /**
  * Gets all UserMacros data from DB by UserMacros ID
  *
@@ -743,10 +743,10 @@ class CUserMacro {
 
 	public static function getMacros($macros, $options){
 		zbx_value2array($macros);
-		
+
 		$def_options = array( 'itemid' => null, 'triggerid' => null);
 		$options = zbx_array_merge($def_options, $options);
-		
+
 		$hmacro = array();
 		$obj_options = array(
 				'extendoutput' => 1,
@@ -773,7 +773,7 @@ class CUserMacro {
 				);
 
 			$tmacros = self::get($obj_options);
-			$hmacros = zbx_array_merge($tmacros, $hmacros);		
+			$hmacros = zbx_array_merge($tmacros, $hmacros);
 
 			$obj_options = array(
 				'nopermissions' => 1,
@@ -781,9 +781,9 @@ class CUserMacro {
 				);
 			$hosts = CTemplate::get($obj_options);
 		}
-		
+
 		$macros = zbx_array_merge($gmacros + $hmacros);
-		
+
 		$result = array();
 		foreach($macros as $macroid => $macro){
 			$result[$macro['macro']] = $macro['value'];
@@ -793,14 +793,14 @@ class CUserMacro {
 
 	return $result;
 	}
-	
+
 	public static function resolveTrigger(&$triggers){
 		$single = false;
 		if(isset($triggers['triggerid'])){
 			$single = true;
 			$triggers = array($triggers);
 		}
-		
+
 		foreach($triggers as $num => $trigger){
 			if(!isset($trigger['triggerid']) || !isset($trigger['expression'])) continue;
 
@@ -812,11 +812,11 @@ class CUserMacro {
 				$triggers[$num]['expression'] = str_replace($search, $values, $trigger['expression']);
 			}
 		}
-		
+
 		if($single) $triggers = $triggers[0];
 	}
-	
-	
+
+
 	public static function resolveItem(&$items){
 		$single = false;
 		if(isset($items['itemid'])){
@@ -826,7 +826,7 @@ class CUserMacro {
 
 		foreach($items as $num => $item){
 			if(!isset($item['itemid']) || !isset($item['key_'])) continue;
-			
+
 			if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $item['key_'], $arr)){
 				$macros = self::getMacros($arr[1], array('itemid' => $item['itemid']));
 
@@ -838,7 +838,7 @@ class CUserMacro {
 
 		if($single) $items = $items[0];
 	}
-	
+
 
 /**
  * Delete UserMacros
@@ -854,7 +854,7 @@ class CUserMacro {
  */
 	public static function deleteHostMacro($hostmacroids){
 		zbx_value2array($hostmacroids);
-		
+
 		$sql = 'DELETE FROM hostmacro WHERE '.DBcondition('hostmacroid', $hostmacroids);
 		$result = DBexecute($sql);
 		if($result)
@@ -864,7 +864,7 @@ class CUserMacro {
 			return false;
 		}
 	}
-	
+
 /**
  * Delete UserMacros
  *
@@ -879,7 +879,7 @@ class CUserMacro {
  */
 	public static function deleteGlobalMacro($globalmacroids){
 		zbx_value2array($globalmacroids);
-		
+
 		$sql = 'DELETE FROM globalmacro WHERE '.DBcondition('globalmacroid', $globalmacroids);
 		$result = DBexecute($sql);
 		if($result)

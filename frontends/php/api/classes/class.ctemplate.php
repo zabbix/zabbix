@@ -416,7 +416,7 @@ class CTemplate {
 				}
 			}
 		}
-		
+
 // Adding macros
 		if($options['select_macros']){
 			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);
@@ -428,7 +428,7 @@ class CTemplate {
 				}
 			}
 		}
-		
+
 	return $result;
 	}
 

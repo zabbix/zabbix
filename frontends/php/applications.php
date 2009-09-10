@@ -143,7 +143,7 @@ include_once('include/page_header.php');
 		$result = true;
 
 		$applications = get_request('applications',array());
-		
+
 		DBstart();
 		$sql = 'SELECT a.applicationid, a.name, a.hostid '.
 				' FROM applications a'.

@@ -239,7 +239,7 @@ class CTrigger {
 		if(!is_null($options['extendoutput'])){
 			$sql_parts['select']['triggers'] = 't.*';
 		}
-		
+
 // expand_data
 		if(!is_null($options['expand_data'])){
 			$sql_parts['select']['host'] = 'h.host';
@@ -408,16 +408,16 @@ class CTrigger {
 			$depids = array();
 			$sql = 'SELECT triggerid_up, triggerid_down FROM trigger_depends WHERE '.DBcondition('triggerid_down', $triggerids);
 			$db_deps = DBselect($sql);
-			
+
 			while($db_dep = DBfetch($db_deps)){
 				if(!isset($deps[$db_dep['triggerid_down']])) $deps[$db_dep['triggerid_down']] = array();
 				$deps[$db_dep['triggerid_down']][$db_dep['triggerid_up']] = $db_dep['triggerid_up'];
 				$depids[] = $db_dep['triggerid_up'];
 			}
-			
+
 			$obj_params = array('triggerids' => $depids, 'extendoutput' => 1, 'expand_data' => 1);
 			$allowed = CTrigger::get($obj_params); //allowed triggerids
-			
+
 			foreach($deps as $triggerid => $deptriggers){
 				foreach($deptriggers as $deptriggerid){
 					if(isset($allowed[$deptriggerid]))
@@ -719,7 +719,7 @@ class CTrigger {
 		}
 	}
 
-	
-	
+
+
 }
 ?>

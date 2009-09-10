@@ -205,10 +205,10 @@
 
 	function unblock_user_login($userids){
 		zbx_value2array($userids);
-		
+
 		$sql = 'UPDATE users SET attempt_failed=0 WHERE '.DBcondition('userid', $userids);
 		$result = DBexecute($sql);
-		
+
 	return $result;
 	}
 
@@ -229,18 +229,18 @@
 					(isset($passwd)?(' passwd='.zbx_dbstr(md5($passwd)).',') : '').
 					' refresh='.$refresh.
 				' WHERE userid='.$userid;
-				
+
 		$result = DBexecute($sql);
 
 		$result = DBexecute('DELEET FROM media WHERE userid='.$userid);
 			foreach($user_medias as $mediaid => $media_data){
 				$mediaid = get_dbid("media","mediaid");
-				
+
 				$sql = 'INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period)'.
 						' VALUES ('.$mediaid.','.$userid.','.$media_data['mediatypeid'].','.
 								zbx_dbstr($media_data['sendto']).','.$media_data['active'].','.$media_data['severity'].','.
 								zbx_dbstr($media_data['period']).')';
-								
+
 				$result = DBexecute($sql);
 				if(!$result) break;
 			}

@@ -523,7 +523,7 @@ include_once('include/page_header.php');
 // JS menu
 		$host = null;
 		$tr_desc = $description;
-		
+
 		if($_REQUEST['hostid'] < 1){
 			$menus = '';
 

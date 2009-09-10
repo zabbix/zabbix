@@ -1116,7 +1116,7 @@ function get_action_msgs_for_event($eventid){
 	foreach($alerts as $alertid => $row){
 // mediatypes
 		$mediatype = array_pop($row['mediatypes']);
-		
+
 		$time=date(S_DATE_FORMAT_YMDHMS,$row["clock"]);
 		if($row['esc_step'] > 0){
 			$time = array(bold(S_STEP.': '),$row["esc_step"],br(),bold(S_TIME.': '),br(),$time);
@@ -1138,7 +1138,7 @@ function get_action_msgs_for_event($eventid){
 
 		$message = array(bold(S_SUBJECT.':'),br(),$row["subject"],br(),br(),bold(S_MESSAGE.':'));
 		$msg = explode("\n",$row['message']);
-		
+
 		foreach($msg as $m){
 			array_push($message, BR(), $m);
 		}

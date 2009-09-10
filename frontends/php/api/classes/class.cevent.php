@@ -110,11 +110,11 @@ class CEvent {
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
 		}
-		
+
 		if(is_null($options['source']) && is_null($options['object'])){
 			$options['object'] = EVENT_OBJECT_TRIGGER;
 		}
-		
+
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
 		else if(($options['object'] == EVENT_OBJECT_TRIGGER) || ($options['source'] == EVENT_SOURCE_TRIGGER)){
@@ -202,12 +202,12 @@ class CEvent {
 		if(!is_null($options['source'])){
 			$sql_parts['where'][] = 'e.source='.$options['source'];
 		}
-		
+
 // object
 		if(!is_null($options['object'])){
 			$sql_parts['where'][] = 'e.object='.$options['object'];
 		}
-		
+
 // acknowledged
 		if(!is_null($options['acknowledged'])){
 			$sql_parts['where'][] = 'e.acknowledged='.($options['acknowledged']?1:0);

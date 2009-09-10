@@ -564,7 +564,7 @@ else{
 	define('ZBX_EREG_SIGN', '([&|><=+*/#[.'.ZBX_EREG_MINUS_SYMB.'.]])');
 	define('ZBX_EREG_NUMBER', '([[.'.ZBX_EREG_MINUS_SYMB.'.]+]*[0-9]+[.]{0,1}[0-9]*[A-Z]{0,1})');
 
-// Character '-' must be last in the list of symbols, otherwise it won't be accepted 
+// Character '-' must be last in the list of symbols, otherwise it won't be accepted
 	define('ZBX_EREG_DNS_FORMAT', '([0-9a-zA-Z\_\.\$[.'.ZBX_EREG_MINUS_SYMB.'.]]+)');
 	define('ZBX_EREG_HOST_FORMAT', ZBX_EREG_INTERNAL_NAMES);
 
@@ -611,7 +611,7 @@ else{
 
 	define('ZBX_PREG_NODE_FORMAT', ZBX_PREG_INTERNAL_NAMES);
 	define('ZBX_PREG_ITEM_KEY_FORMAT', '('.ZBX_PREG_KEY_NAME.'(\['.ZBX_PREG_PARAMS.'\]){0,1})');
-	
+
 	define('ZBX_PREG_FUNCTION_FORMAT', '('.ZBX_PREG_INTERNAL_NAMES.'(\('.ZBX_PREG_PARAMS.'\)))');
 
 	define('ZBX_PREG_SIMPLE_EXPRESSION_FORMAT','(\{'.ZBX_PREG_HOST_FORMAT.'\:'.ZBX_PREG_ITEM_KEY_FORMAT.'\.'.ZBX_PREG_FUNCTION_FORMAT.'\})');
@@ -699,7 +699,7 @@ else{
 	define('XML_TAG_DEPENDENCIES',		'dependencies');
 	define('XML_TAG_DEPENDENCY',		'dependency');
 	define('XML_TAG_DEPENDS',		'depends');
-	
+
 	define('ZBX_DEFAULT_IMPORT_HOST_GROUP', 'Imported hosts');
 
 // API errors //
