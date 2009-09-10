@@ -305,7 +305,7 @@ class CUser {
 	 * @static
 	 * @param _array $user
 	 * @param array $user['user']
-	 * @return boolean host data as array or false if error
+	 * @return boolean
 	 */
 	public static function apiAccess($user){
 		$sql = 'SELECT min(g.api_access) as access
