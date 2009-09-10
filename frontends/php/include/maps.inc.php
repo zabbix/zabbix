@@ -702,7 +702,7 @@
          *
          */
 	function get_action_map_by_sysmapid($sysmapid){
-		$action_map = new CMap("links$sysmapid");
+		$action_map = new CAreaMap("links$sysmapid");
 
 		$db_elements=DBselect('SELECT * FROM sysmaps_elements WHERE sysmapid='.$sysmapid);
 		while($db_element = DBfetch($db_elements)){

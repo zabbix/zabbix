@@ -209,6 +209,7 @@ frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/import.php -text
 frontends/php/include/blocks.inc.php -text
 frontends/php/include/classes/class.carea.php -text
+frontends/php/include/classes/class.careamap.php -text
 frontends/php/include/classes/class.cbar.php -text
 frontends/php/include/classes/class.cbutton.php -text
 frontends/php/include/classes/class.cbuttoncancel.php -text
@@ -243,7 +244,6 @@ frontends/php/include/classes/class.clink.php -text
 frontends/php/include/classes/class.clist.php -text
 frontends/php/include/classes/class.clistbox.php -text
 frontends/php/include/classes/class.clistitem.php -text
-frontends/php/include/classes/class.cmap.php -text
 frontends/php/include/classes/class.cnumericbox.php -text
 frontends/php/include/classes/class.cobject.php -text
 frontends/php/include/classes/class.cparam.php -text

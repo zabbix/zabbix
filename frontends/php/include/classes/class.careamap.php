@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-class CMap extends CTag{
+class CAreaMap extends CTag{
 /* public */
 	public function __construct($name=''){
 		parent::__construct('map','yes');

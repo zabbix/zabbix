@@ -218,8 +218,7 @@ class CScreen{
 			
 				$allowed_graphs = CGraph::get(array('graphids' => $graphs_to_check, 'editable' => isset($options['editable'])));
 				$allowed_items = CItem::get(array('itemids' => $items_to_check, 'editable' => isset($options['editable'])));
-				$allowed_maps = CMap::get(array('sysmapids' => $maps_to_check, 'editable' => isset($options['editable'])));
-		
+				$allowed_maps = CMap::get(array('sysmapids' => $maps_to_check, 'editable' => isset($options['editable'])));	
 				$allowed_screens = CScreen::get(array('screenids' => $screens_to_check, 'editable' => isset($options['editable'])));
 					
 				$restr_graphs = array_diff($graphs_to_check, $allowed_graphs); 
@@ -227,7 +226,7 @@ class CScreen{
 				$restr_maps = array_diff($maps_to_check, $allowed_maps); 
 				$restr_screens = array_diff($screens_to_check, $allowed_screens); 
 				
-					
+				
 				foreach($restr_graphs as $resourceid){
 					foreach($screens_items as $screen_itemid => $screen_item){
 						if(($screen_item['resourceid'] == $resourceid) && ($screen_item['resourcetype'] == SCREEN_RESOURCE_GRAPH)){
