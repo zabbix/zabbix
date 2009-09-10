@@ -1416,6 +1416,6 @@
 	'S_CANT_FORMAT_TREE'=>			'Не удается построить дерево',
 	'S_UNSUPPORTED_FILE_FORMAT'=>			'Неподдерживаемый формат файла',
 	'S_UNSUPPORTED_VERSION_OF_IMPORTED_DATA'=>			'Неподдерживаемая версия импортируемых данных'
-	
+
 	);
 ?>

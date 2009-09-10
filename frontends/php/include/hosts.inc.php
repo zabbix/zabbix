@@ -1557,29 +1557,29 @@ return $result;
 			error('Incorrect parameters for "db_save_application"');
 			return false;
 		}
-		
-		
+
+
 		$host = get_host_by_hostid($hostid);
-		
+
 		$hostids = array();
 		$db_hosts = get_hosts_by_templateid($host['hostid']);
 		while($db_host = DBfetch($db_hosts)){
 			$hostids[] = $db_host['hostid'];
 		}
-		$sql = 'SELECT applicationid 
-			FROM applications 
-			WHERE name='.zbx_dbstr($name).' 
+		$sql = 'SELECT applicationid
+			FROM applications
+			WHERE name='.zbx_dbstr($name).'
 				AND '.DBcondition('hostid', $hostids);
 		$lower_app = DBfetch(DBselect($sql));
 		if($lower_app){
 			error("Application '$name' already exist in linked hosts");
 			return false;
 		}
-		
-		
-		$sql = 'SELECT applicationid 
-			FROM applications 
-			WHERE name='.zbx_dbstr($name).' 
+
+
+		$sql = 'SELECT applicationid
+			FROM applications
+			WHERE name='.zbx_dbstr($name).'
 				AND hostid='.$hostid;
 		if(!is_null($applicationid)){
 			$sql .= ' AND applicationid<>'.$applicationid;
@@ -1598,7 +1598,7 @@ return $result;
 		if($db_app && is_null($applicationid)){ // if found application with same name update them, adding not needed
 			$applicationid = $db_app['applicationid'];
 		}
-		
+
 
 		if(is_null($applicationid)){
 			$applicationid_new = get_dbid('applications', 'applicationid');

@@ -464,7 +464,7 @@ class CHost {
 				}
 			}
 		}
-		
+
 // Adding Profiles
 		if($options['select_profile']){
 			$sql = 'SELECT hp.*
@@ -473,8 +473,8 @@ class CHost {
 			$db_profile = DBselect($sql);
 			while($profile = DBfetch($db_profile))
 				$result[$profile['hostid']]['profile'] = $profile;
-			
-			
+
+
 			$sql = 'SELECT hpe.*
 				FROM hosts_profiles hpe
 				WHERE '.DBcondition('hpe.hostid', $hostids);
@@ -482,7 +482,7 @@ class CHost {
 			while($profile_ext = DBfetch($db_profile_ext))
 				$result[$profile_ext['hostid']]['profile_ext'] = $profile_ext;
 		}
-		
+
 // Adding Templates
 		if($options['select_templates']){
 			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);
@@ -542,7 +542,7 @@ class CHost {
 				}
 			}
 		}
-		
+
 // Adding macros
 		if($options['select_macros']){
 			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);

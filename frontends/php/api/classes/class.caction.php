@@ -120,7 +120,7 @@ class CAction {
 			$sql_parts['where']['ac'] = 'a.actionid=c.actionid';
 
 // condition hostgroup
-			$sql_parts['where'][] = 
+			$sql_parts['where'][] =
 				' NOT EXISTS('.
 					' SELECT cc.conditionid'.
 					' FROM conditions cc'.
@@ -143,9 +143,9 @@ class CAction {
 								' AND rr.permission<'.$permission.')'.
 							' )'.
 				' )';
-				
-// condition host or template				 
-			$sql_parts['where'][] = 
+
+// condition host or template
+			$sql_parts['where'][] =
 				' NOT EXISTS('.
 					' SELECT cc.conditionid'.
 					' FROM conditions cc'.
@@ -170,9 +170,9 @@ class CAction {
 										' AND rr.permission<'.$permission.')'.
 							' )'.
 				' )';
-				
-// condition trigger				
-			$sql_parts['where'][] = 
+
+// condition trigger
+			$sql_parts['where'][] =
 				' NOT EXISTS('.
 					' SELECT cc.conditionid'.
 					' FROM conditions cc'.
@@ -474,7 +474,7 @@ class CAction {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Add actions
 	 *
@@ -543,7 +543,7 @@ class CAction {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Update actions
 	 *
@@ -567,7 +567,7 @@ class CAction {
 	public static function update($actions){
 
 		$result = true;
-		
+
 		DBstart(false);
 		foreach($actions as $action){
 			$action_db_fields = CAction::getById($action);
@@ -582,10 +582,10 @@ class CAction {
 				break;
 			}
 
-			$result = update_action($action['actionid'], $action['name'], $action['eventsource'], $action['esc_period'], 
-				$action['def_shortdata'], $action['def_longdata'], $action['recovery_msg'], $action['r_shortdata'], 
+			$result = update_action($action['actionid'], $action['name'], $action['eventsource'], $action['esc_period'],
+				$action['def_shortdata'], $action['def_longdata'], $action['recovery_msg'], $action['r_shortdata'],
 				$action['r_longdata'], $action['evaltype'], $action['status'], $action['conditions'], $action['operations']);
-			
+
 			if(!$result) break;
 		}
 
@@ -610,13 +610,13 @@ class CAction {
 	 * @param _array $conditions multidimensional array with conditions data
 	 * @param array $conditions[0,...]['actionid']
 	 * @param array $conditions[0,...]['type']
-	 * @param array $conditions[0,...]['value'] 
-	 * @param array $conditions[0,...]['operator'] 
+	 * @param array $conditions[0,...]['value']
+	 * @param array $conditions[0,...]['operator']
 	 * @return boolean
 	 */
 	public static function addConditions($conditions){
 		$result = true;
-		
+
 		if(!check_permission_for_action_conditions($conditions)){
 			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
@@ -628,15 +628,15 @@ class CAction {
 				return false;
 			}
 		}
-			
+
 		DBstart(false);
 		foreach($conditions as $condition){
-			
+
 			$result = add_action_condition($condition['actionid'], $condition);
 			if(!$result) break;
 		}
 		$result = DBend($result);
-		
+
 		if($result)
 			return true;
 		else{
@@ -644,7 +644,7 @@ class CAction {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * add operations
 	 *
@@ -656,17 +656,17 @@ class CAction {
 	 *
 	 * @param _array $operations multidimensional array with operations data
 	 * @param array $operations[0,...]['actionid']
-	 * @param array $operations[0,...]['operationtype'] 
+	 * @param array $operations[0,...]['operationtype']
 	 * @param array $operations[0,...]['object']
 	 * @param array $operations[0,...]['objectid']
-	 * @param array $operations[0,...]['shortdata'] 
-	 * @param array $operations[0,...]['longdata'] 
+	 * @param array $operations[0,...]['shortdata']
+	 * @param array $operations[0,...]['longdata']
 	 * @param array $operations[0,...]['esc_period']
 	 * @param array $operations[0,...]['esc_step_from']
-	 * @param array $operations[0,...]['esc_step_to'] 
-	 * @param array $operations[0,...]['default_msg'] 
+	 * @param array $operations[0,...]['esc_step_to']
+	 * @param array $operations[0,...]['default_msg']
 	 * @param array $operations[0,...]['evaltype']
-	 * @param array $operations[0,...]['mediatypeid'] 
+	 * @param array $operations[0,...]['mediatypeid']
 	 * @param array $operations[0,...]['opconditions']
 	 * @param array $operations[0,...]['opconditions']['conditiontype']
 	 * @param array $operations[0,...]['opconditions']['operator']
@@ -674,23 +674,23 @@ class CAction {
 	 * @return boolean
 	 */
 	public static function addOperations($operations){
-	
+
 		$result = true;
-		
+
 		foreach($operations as $operation){
 			if(!validate_operation($operation)){
 				self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 				return false;
 			}
 		}
-	
+
 		DBstart(false);
 		foreach($operations as $operation){
 			$result = add_action_operation($operation['actionid'], $operation);
 			if(!$result) break;
 		}
 		$result = DBend($result);
-		
+
 		if($result)
 			return true;
 		else{
@@ -698,8 +698,8 @@ class CAction {
 			return false;
 		}
 	}
-	
-	
+
+
 /**
  * Delete actions
  *

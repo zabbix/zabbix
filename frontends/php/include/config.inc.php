@@ -469,7 +469,7 @@ function __autoload($class_name){
 		}
 
 		$tree_ids = array_keys($tree);
-		
+
 		foreach($tree_ids as $key => $id){
 			$child = $tree[$id];
 			if(bccomp($child[$parent_field],$parentid) == 0){

@@ -88,14 +88,14 @@ define("USE_MEM_PROF",1);
 			'select_profile' => 1
 		);
 		$hosts = CHost::get($params);
-		
+
 /* SELECT HOST GROUPS */
 		$params = array(
 			'hostids' => $hostids,
 			'extendoutput' => 1
 		);
 		$groups = CHostGroup::get($params);
-		
+
 /* SELECT GRAPHS */
 		$params = array(
 			'hostids' => zbx_uint_array_intersect($hostids, $hostids_graphs),
@@ -145,7 +145,7 @@ define("USE_MEM_PROF",1);
 		);
 		$applications = Capplication::get($params);
 //sdii($applications);
-		
+
 /* SELECT TRIGGERS */
 		$params = array(
 			'hostids' => zbx_uint_array_intersect($hostids, $hostids_triggers),
@@ -157,7 +157,7 @@ define("USE_MEM_PROF",1);
 		foreach($triggers as $triggerid => $trigger){
 			$triggers[$triggerid]['expression'] = explode_exp($trigger['expression'], false);
 		}
-		
+
 /* SELECT TRIGGER DEPENDENCIES */
 		$dependencies = array();
 		foreach($triggers as $trigger){
@@ -184,22 +184,22 @@ define("USE_MEM_PROF",1);
 			// if(!uint_in_array($hostid, $hostids_triggers)) unset($hosts[$hostid]['triggers']);
 		// }
 		$data = array(
-			'hosts' => $hosts, 
-			'items' => $items, 
-			'items_applications' => $applications, 
+			'hosts' => $hosts,
+			'items' => $items,
+			'items_applications' => $applications,
 			'graphs' => $graphs,
-			'graphs_items' => $gitems, 
-			'templates' => $templates, 
+			'graphs_items' => $gitems,
+			'templates' => $templates,
 			'macros' => $macros,
 			'hosts_groups' => $groups,
 			'triggers' => $triggers,
 			'dependencies' => $dependencies
 		);
-		
-		$xml = zbxXML::export($data);
-		
 
-		
+		$xml = zbxXML::export($data);
+
+
+
 if(pr_true){
 COpt::profiling_stop();
 die(COpt::show());
@@ -208,8 +208,8 @@ else
 		die($xml);
 
 	}
-	
-	
+
+
 	$form = new CForm();
 	$form->setMethod('get');
 	$cmbConf = new CComboBox('config', 'export.php');
@@ -217,15 +217,15 @@ else
 		$cmbConf->addItem('export.php',S_EXPORT);
 		$cmbConf->addItem('import.php',S_IMPORT);
 	$form->addItem($cmbConf);
-	
+
 	show_table_header(S_EXPORT_BIG, $form);
 	echo SBR;
-	
+
 	if($preview){
-		
+
 		$table = new CTableInfo(S_NO_DATA_FOR_EXPORT);
 		$table->setHeader(array(S_HOST, S_ELEMENTS));
-				
+
 		$params = array(
 			'hostids' => $hostids,
 			'templated_hosts' => 1,
@@ -236,10 +236,10 @@ else
 			'select_graphs' => 1
 		);
 		$hosts_all = CHost::get($params);
-		
-		foreach($hosts_all as $hostid => $host){		
+
+		foreach($hosts_all as $hostid => $host){
 			$el_table = new CTableInfo(S_ONLY_HOST_INFO);
-			
+
 			foreach($host['templates'] as $template){
 				if(isset($hostids_templates[$hostid])){
 					$el_table->addRow(array(S_TEMPLATE, $template['host']));
@@ -259,10 +259,10 @@ else
 				if(isset($hostids_graphs[$hostid])){
 					$el_table->addRow(array(S_GRAPH, $graph['name']));
 				}
-			}			
+			}
 			$table->addRow(array(new CCol($host['host'], 'top'), $el_table));
 		}
-		
+
 
 		$form = new CForm(null, 'post');
 		$form->setName('hosts');
@@ -283,7 +283,7 @@ else
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton', S_GO);
 		$goButton->setAttribute('id','goButton');
-		
+
 		$form->addItem(array($goBox, $goButton));
 // } GO box
 		$table->setFooter(new CCol($form));
@@ -291,16 +291,16 @@ else
 		zbx_add_post_js('chkbxRange.pageGoCount = 1;');
 	}
 	else{
-	
+
 		$export_wdgt = new CWidget();
 		$selected_groupid = get_request('groupid', 0);
 
 // Page header {
 		$form = new CForm(null, 'post');
 		$form->setName('export_hosts_frm');
-	
+
 		$groups = CHostGroup::get(array('extendoutput' => 1, 'sortfield' => 'name'));
-		
+
 		$cmbGroups = new CComboBox('groupid', $selected_groupid, 'javascript: submit();');
 		$cmbGroups->addItem(0, S_ALL_S);
 		foreach($groups as $groupid => $group){
@@ -319,7 +319,7 @@ else
 		$form = new CForm(null, 'post');
 		$form->setName('hosts_export');
 		$form->addVar('groupid', $selected_groupid);
-		
+
 		$table = new CTableInfo(S_NO_HOSTS_DEFINED);
 		$table->setHeader(array(
 			new CCheckBox('all_hosts', true, "checkAll('".$form->getName()."','all_hosts','hosts');"),
@@ -366,7 +366,7 @@ else
 			$item_cnt = ($cnt > 0)
 				? array(new CCheckBox('items['.$hostid.']', (isset($hostids_items[$hostid]) || !isset($update)), NULL, $hostid), $cnt)
 				: '-';
-				
+
 			$cnt = count($host['triggerids']);
 			$trigger_cnt = ($cnt > 0)
 				? array(new CCheckBox('triggers['.$hostid.']', (isset($hostids_triggers[$hostid]) || !isset($update)), NULL, $hostid), $cnt)
@@ -376,7 +376,7 @@ else
 			$graph_cnt = ($cnt > 0)
 				? array(new CCheckBox('graphs['.$hostid.']', (isset($hostids_graphs[$hostid]) || !isset($update)), NULL, $hostid), $cnt)
 				: '-';
-			
+
 			if($host['status'] == HOST_STATUS_TEMPLATE){
 				$ip = $dns = $port = '-';
 			}
@@ -403,7 +403,7 @@ else
 				$graph_cnt
 			));
 		}
-		
+
 // goBox {
 		$goBox = new CComboBox('go');
 		$goBox->addItem('preview', S_PREVIEW);
@@ -415,7 +415,7 @@ else
 		zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
 
 		$footer = get_table_header(array($goBox, $goButton));
-		
+
 		zbx_add_post_js('chkbxRange.pageGoCount = '.$count_chkbx.';');
 // } goBox
 
@@ -424,7 +424,7 @@ else
 		$export_wdgt->addItem($form);
 		$export_wdgt->show();
 	}
-	
+
 
 include_once('include/page_footer.php');
 

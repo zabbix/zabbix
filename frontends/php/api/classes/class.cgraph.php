@@ -302,7 +302,7 @@ class CGraph {
 		}
 
 		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
-		
+
 
 // Adding GraphItems
 		if($options['select_graph_items']){
@@ -315,7 +315,7 @@ class CGraph {
 				}
 			}
 		}
-		
+
 // Adding Hosts
 		if($options['select_hosts']){
 			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1);
@@ -396,7 +396,7 @@ class CGraph {
 	public static function getId($graph_data){
 		$result = false;
 
-		
+
 		$sql = 'SELECT DISTINCT g.graphid'.
 				' FROM graphs g, graphs_items gi, items i'.
 				' WHERE g.graphid=gi.graphid '.

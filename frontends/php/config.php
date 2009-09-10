@@ -483,7 +483,7 @@
 			$result = true;
 			$macro_new = get_request('macro_new');
 			$value_new = get_request('value_new', null);
-			
+
 			if(!CUserMacro::validate($macro_new)){
 				error(S_WRONG_MACRO.' : '.$macro_new);
 				$result = false;
@@ -499,7 +499,7 @@
 			else{
 				$result = CUserMacro::addGlobal(array(array('macro' => $macro_new, 'value' => $value_new)));
 			}
-			
+
 			if($result){
 				unset($_REQUEST['macro_new']);
 				unset($_REQUEST['value_new']);
@@ -524,7 +524,7 @@
 	$cmbConfig->addItem(6,S_VALUE_MAPPING);
 	$cmbConfig->addItem(7,S_WORKING_TIME);
 	$cmbConfig->addItem(5,S_OTHER);
-	
+
 	$form->addItem($cmbConfig);
 
 	if(!isset($_REQUEST['form'])){
@@ -1029,20 +1029,20 @@
 	else if($_REQUEST['config']==11){ // Macros
 		$frmGUI = new CFormTable(S_MACROS, 'config.php');
 		$frmGUI->addVar('config', get_request('config', 11));
-		
+
 		$macros = CUserMacro::get(array('extendoutput' => 1, 'globalmacro' => 1));
-		
+
 		$macros_list_tbl = new CTable(S_NO_MACROS_DEFINED);
 		foreach($macros as $macro){
 			$macros_list_tbl->addRow(array(
-				new CCheckBox("macros_rem[{$macro['globalmacroid']}]", 'no', null, $macro['globalmacroid']), 
+				new CCheckBox("macros_rem[{$macro['globalmacroid']}]", 'no', null, $macro['globalmacroid']),
 				array(
 					new CTextBox("macros[{$macro['macro']}][macro]", $macro['macro'], 20, true),
 					SPACE.RARR.SPACE,
 					new CTextBox("macros[{$macro['macro']}][value]", $macro['value'], 20, true))
 			));
 		}
-		
+
 		$delete_btn = new CButton('macros_del', S_DELETE_SELECTED);
 		if(count($macros) == 0){
 			$delete_btn->setAttribute('disabled', 'disabled');
@@ -1056,13 +1056,13 @@
 			SPACE,
 			new CButton('macro_add', S_ADD),
 		));
-		
+
 		$frmGUI->addItemToBottomRow($delete_btn);
-		
+
 		$cnf_wdgt->addItem($frmGUI);
-		
+
 	}
-	
+
 	$cnf_wdgt->show();
 ?>
 <?php

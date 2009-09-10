@@ -64,7 +64,7 @@ require_once('include/forms.inc.php');
 		'value_new'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	'isset({macro_add})'),
 		'macro_add' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'macros_del' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		
+
 // actions
 		'go'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
 
@@ -77,7 +77,7 @@ require_once('include/forms.inc.php');
 		'delete'		=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
 		'delete_and_clear'	=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
 		'cancel'		=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
-		
+
 
 // other
 		'form'			=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
@@ -103,9 +103,9 @@ require_once('include/forms.inc.php');
 	if(isset($_REQUEST['macro_add'])){
 		$macro_new = get_request('macro_new');
 		$value_new = get_request('value_new', null);
-		
+
 		$currentmacros = array_keys(get_request('macros', array()));
-		
+
 		if(!CUserMacro::validate($macro_new)){
 			error(S_WRONG_MACRO.' : '.$macro_new);
 			show_messages(false, '', S_MACROS);
@@ -122,7 +122,7 @@ require_once('include/forms.inc.php');
 			$_REQUEST['macros'][$macro_new]['macro'] = $macro_new;
 			$_REQUEST['macros'][$macro_new]['value'] = $value_new;
 			unset($_REQUEST['macro_new']);
-			unset($_REQUEST['value_new']);			
+			unset($_REQUEST['value_new']);
 		}
 	}// unlink, unlink_and_clear
 	if((isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear']))){
@@ -327,9 +327,9 @@ require_once('include/forms.inc.php');
 // MACROS {
 	if($result){
 		$macros = get_request('macros', array());
-		
+
 		$macrostoadd = array('hostid' => $templateid, 'macros' => array());
-		
+
 		foreach($macros as $macro){
 			if(!CUserMacro::validate($macro['macro'])){
 				$result = false;
@@ -339,8 +339,8 @@ require_once('include/forms.inc.php');
 		}
 
 		$result = CUserMacro::update($macrostoadd);
-		
-		if(!$result) 
+
+		if(!$result)
 			error('S_ERROR_ADDING_MACRO');
 	}
 // } MACROS
@@ -452,7 +452,7 @@ require_once('include/forms.inc.php');
 	echo SBR;
 
 	if(isset($_REQUEST['form'])){
-	
+
 		$templateid = get_request('templateid', 0);
 		$template_name = get_request('template_name', '');
 		$newgroup = get_request('newgroup', '');
@@ -474,12 +474,12 @@ require_once('include/forms.inc.php');
 
 		$frmHost = new CForm('templates.php', 'post');
 		$frmHost->setName('tpl_for');
-		
+
 		$frmHost->addVar('form', get_request('form', 1));
 		$from_rfr = get_request('form_refresh',0);
 		$frmHost->addVar('form_refresh', $from_rfr+1);
 		$frmHost->addVar('clear_templates',$clear_templates);
-		
+
 		if($templateid){
 			$frmHost->addVar('templateid', $templateid);
 		}
@@ -653,14 +653,14 @@ require_once('include/forms.inc.php');
 		if(($_REQUEST['hostid']>0) && ($_REQUEST['form'] != 'full_clone')){
 			array_push($host_footer, SPACE, new CButton("clone",S_CLONE), SPACE, new CButton("full_clone",S_FULL_CLONE), SPACE,
 				new CButtonDelete(S_DELETE_SELECTED_HOST_Q, url_param('form').url_param('hostid').url_param('groupid')),
-				SPACE, 
+				SPACE,
 				new CButtonQMessage('delete_and_clear', 'Delete AND clear', S_DELETE_SELECTED_HOSTS_Q, url_param('form').url_param('hostid').
 					url_param('groupid')
 				)
 			);
 		}
 		array_push($host_footer, SPACE, new CButtonCancel(url_param('groupid')));
-		
+
 		$host_footer = new CCol($host_footer);
 		$host_footer->setColSpan(2);
 		$template_tbl->setFooter($host_footer);
@@ -673,23 +673,23 @@ require_once('include/forms.inc.php');
 
 // MACROS WIDGET {
 		$macros_wdgt = get_macros_widget($templateid);
-// } MACROS WIDGET 
+// } MACROS WIDGET
 
 		$left_table = new CTable();
 		$left_table->setCellPadding(4);
 		$left_table->setCellSpacing(4);
 		$left_table->addRow($template_wdgt);
-		
+
 		$right_table = new CTable();
 		$right_table->setCellPadding(4);
 		$right_table->setCellSpacing(4);
-		$right_table->addRow($macros_wdgt);		
-		
+		$right_table->addRow($macros_wdgt);
+
 		$td_l = new CCol($left_table);
 		$td_l->setAttribute('valign','top');
 		$td_r = new CCol($right_table);
 		$td_r->setAttribute('valign','top');
-		
+
 		$outer_table = new CTable();
 		$outer_table->addRow(array($td_l, $td_r));
 

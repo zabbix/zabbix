@@ -119,7 +119,7 @@ include_once('include/page_header.php');
 			$result = true;
 
 			$groups = get_request('groups', array());
-			
+
 			DBstart();
 			$sql = 'SELECT g.groupid, g.name '.
 					' FROM groups g '.
@@ -152,7 +152,7 @@ include_once('include/page_header.php');
 					' AND '.DBcondition('g.groupid', $groups).
 					' AND h.hostid=hg.hostid '.
 					' AND h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
-		$db_groups = DBselect($sql);		
+		$db_groups = DBselect($sql);
 		while($db_host=DBfetch($db_hosts)){
 			if(!isset($groups[$db_host['groupid']])) continue;
 			$host=get_host_by_hostid($db_host['hostid']);
