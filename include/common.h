@@ -890,7 +890,7 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 int	__zbx_stat(const char *path, struct stat *buf);
 int	__zbx_open(const char *pathname, int flags);
 #endif	/* _WINDOWS && _UNICODE */
-int	zbx_read(int fd, void *buf, size_t count, const char *encoding);
+int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 
 int MAIN_ZABBIX_ENTRY(void);
 

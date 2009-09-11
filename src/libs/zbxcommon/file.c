@@ -52,14 +52,11 @@ int	__zbx_open(const char *pathname, int flags)
  * On success, the  number of bytes read is returned (zero indicates end of file).
  * On error, -1 is returned, and errno is set appropriately.
  */
- #include "log.h"
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 {
 	size_t		i, szbyte;
 	const char	*cr, *lf;
 	int		nbytes;	
-
-	zabbix_log(LOG_LEVEL_DEBUG, "zbx_read() BEFORE:%d", (int)lseek(fd, 0, SEEK_CUR));
 
 	if ((nbytes = (int)read(fd, buf, count)) <= 0)
 		return nbytes;
@@ -101,25 +98,13 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 
 	for (i = 0; i + szbyte <= (size_t)nbytes; i += szbyte)
 	{
-//		{
-//			size_t j;
-//			for (j = 0; j < szbyte; j++)
-//				zabbix_log(LOG_LEVEL_DEBUG, "zbx_read() [%d]%d", i + j, (int)(unsigned char)buf[i + j]);
-//		}
 		if (0 == memcmp(&buf[i], lf, szbyte))	/* LF (Unix) */
 			break;
 
 		if (0 == memcmp(&buf[i], cr, szbyte))	/* CR (Mac) */
 		{
 			if (i + szbyte < (size_t)nbytes && 0 == memcmp(&buf[i + szbyte], lf, szbyte))	/* CR+LF (Windows) */
-//			{
 				i += szbyte;
-//				{
-//					size_t j;
-//					for (j = 0; j < szbyte; j++)
-//						zabbix_log(LOG_LEVEL_DEBUG, "zbx_read() [%d]%d", i + j, (int)(unsigned char)buf[i + j]);
-//				}
-//			}
 			break;
 		}
 	}
@@ -127,8 +112,6 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 
 	lseek(fd, i - nbytes, SEEK_CUR);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "zbx_read() AFTER:%d size:%d", (int)lseek(fd, 0, SEEK_CUR), (int)i);
-//	zabbix_log(LOG_LEVEL_DEBUG, "zbx_read() [%d] %.*s", i, i, buf);
-//
 	return i;
 }
+
