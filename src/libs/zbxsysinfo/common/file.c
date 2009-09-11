@@ -333,7 +333,6 @@ static u_long crctab[] = {
 int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char			filename[MAX_STRING_LEN];
-	register u_char	*p;
 	register int		i, nr;
 	/* AV Crashed under 64 platforms. Must be 32 bit!
 	 * register u_long crc, len; */
