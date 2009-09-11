@@ -19,10 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
-#include "log.h"
-
 #include "md5.h"
-
 #include "file.h"
 
 int	VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -35,15 +32,14 @@ int	VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	init_result(result);
 
 	if (num_param(param) > 1)
-	return SYSINFO_RET_FAIL;
-
-	if (0 != get_param(param, 1, filename, MAX_STRING_LEN))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != stat(filename, &buf))
+	if (0 != get_param(param, 1, filename, sizeof(filename)))
 		return SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, ZBX_FS_UI64, buf.st_size);
+	if (0 != zbx_stat(filename, &buf))
+		return SYSINFO_RET_FAIL;
+
 	SET_UI64_RESULT(result, buf.st_size);
 
 	return SYSINFO_RET_OK;
@@ -52,53 +48,40 @@ int	VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 int	VFS_FILE_TIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct stat	buf;
-	char		filename[MAX_STRING_LEN];
-	char		type[MAX_STRING_LEN];
-	int		ret = SYSINFO_RET_FAIL;
+	char		filename[MAX_STRING_LEN], type[8];
 
 	assert(result);
 
 	init_result(result);
 
-	if(num_param(param) > 2)
-	{
+	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
-	{
+	if (0 != get_param(param, 1, filename, sizeof(filename)))
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 2, type, MAX_STRING_LEN) != 0)
-	{
-		type[0] = '\0';
-	}
+	if (0 != get_param(param, 2, type, sizeof(type)))
+		*type = '\0';
 
-	if(type[0] == '\0')
-	{
-		strscpy(type, "modify");
-	}
+	if (0 != zbx_stat(filename, &buf))
+		return SYSINFO_RET_FAIL;
 
-	if(stat(filename,&buf) == 0)
+	if ('\0' == *type || 0 == strcmp(type, "modify"))	/* default parameter */
 	{
-		if(strcmp(type,"modify") == 0)
-		{
-			SET_UI64_RESULT(result, buf.st_mtime);
-			ret = SYSINFO_RET_OK;
-		}
-		else if(strcmp(type,"access") == 0)
-		{
-			SET_UI64_RESULT(result, buf.st_atime);
-			ret = SYSINFO_RET_OK;
-		}
-		else if(strcmp(type,"change") == 0)
-		{
-			SET_UI64_RESULT(result, buf.st_ctime);
-			ret = SYSINFO_RET_OK;
-		}
+		SET_UI64_RESULT(result, buf.st_mtime);
 	}
-	return	ret;
+	else if (0 == strcmp(type, "access"))
+	{
+		SET_UI64_RESULT(result, buf.st_atime);
+	}
+	else if (0 == strcmp(type, "change"))
+	{
+		SET_UI64_RESULT(result, buf.st_ctime);
+	}
+	else
+		return SYSINFO_RET_FAIL;
+
+	return	SYSINFO_RET_OK;
 }
 
 int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -118,223 +101,172 @@ int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	SET_UI64_RESULT(result, 0);
 
-	if (0 == stat(filename, &buf))	/* File exists */
+	if (0 == zbx_stat(filename, &buf))	/* File exists */
 		if (S_ISREG(buf.st_mode))	/* Regular file */
 			SET_UI64_RESULT(result, 1);
 
 	return SYSINFO_RET_OK;
 }
 
-/* #include<malloc.h> */
-
 int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	filename[MAX_STRING_LEN];
-	char	regexp[MAX_STRING_LEN];
-	FILE	*f = NULL;
-	int	len;
-	char	tmp[MAX_STRING_LEN];
-	char	*c;
-
-	char	*buf = NULL;
+	char	filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
+	char	buf[MAX_BUF_LEN], *utf8;
+	int	f, nbytes, len;
 
 	assert(result);
 
 	init_result(result);
 
-	memset(tmp,0,MAX_STRING_LEN);
-
-	if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
-	{
+	if (num_param(param) > 3)
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 2, regexp, MAX_STRING_LEN) != 0)
-	{
+	if (0 != get_param(param, 1, filename, sizeof(filename)))
 		return SYSINFO_RET_FAIL;
-	}
 
-
-	if(NULL == (f = fopen(filename,"r")))
-	{
+	if (0 != get_param(param, 2, regexp, sizeof(regexp)))
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(NULL == (buf = (char*)calloc((size_t)MAX_FILE_LEN, 1)))
+	if (0 != get_param(param, 3, encoding, sizeof(encoding)))
+		*encoding = '\0';
+
+	zbx_strupper(encoding);
+
+	if (-1 == (f = zbx_open(filename, O_RDONLY)))
+		return SYSINFO_RET_FAIL;
+
+	while (0 < (nbytes = zbx_read(f, buf, sizeof(buf), encoding)))
 	{
-		goto lbl_fail;
+		utf8 = convert_to_utf8(buf, nbytes, encoding);
+		if (NULL != zbx_regexp_match(utf8, regexp, &len))
+		{
+			zbx_rtrim(utf8, "\r\n ");
+			SET_STR_RESULT(result, utf8);
+			break;
+		}
+		zbx_free(utf8);
 	}
 
-	if(0 == fread(buf, 1, MAX_FILE_LEN-1, f))
-	{
-		goto lbl_fail;
-	}
-	buf[MAX_FILE_LEN-1] = 0;
+ 	close(f);
 
- 	zbx_fclose(f);
-
-	c = zbx_regexp_match(buf, regexp, &len);
-
-	if(c == NULL)
-	{
-		tmp[0]=0;
-	}
-	else
-	{
-		zbx_strlcpy(tmp,c,len+1);
-	}
-
-	SET_STR_RESULT(result, strdup(tmp));
-
-	zbx_free(buf);
+	if (-1 == nbytes)	/* error occurred */
+		return	SYSINFO_RET_FAIL;
+	
+	if (0 == nbytes)	/* EOF */
+		SET_STR_RESULT(result, strdup(""));
 
 	return	SYSINFO_RET_OK;
-
-lbl_fail:
-
-	zbx_free(buf);
-	zbx_fclose(f);
-
-	return	SYSINFO_RET_FAIL;
 }
 
 int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	filename[MAX_STRING_LEN];
-	char	regexp[MAX_STRING_LEN];
-	FILE	*f = NULL;
-	int	len;
-	char	*c;
-
-	char	*buf = NULL;
+	char	filename[MAX_STRING_LEN], regexp[MAX_STRING_LEN], encoding[32];
+	char	buf[MAX_BUF_LEN], *utf8;
+	int	f, nbytes, len, res;
 
 	assert(result);
 
 	init_result(result);
 
-	if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
-	{
+	if (num_param(param) > 3)
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 2, regexp, MAX_STRING_LEN) != 0)
-	{
+	if (0 != get_param(param, 1, filename, sizeof(filename)))
 		return SYSINFO_RET_FAIL;
-	}
 
-
-	if(NULL == (f = fopen(filename,"r")))
-	{
+	if (0 != get_param(param, 2, regexp, sizeof(regexp)))
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(NULL == (buf = (char*)calloc((size_t)MAX_FILE_LEN, 1)))
+	if (0 != get_param(param, 3, encoding, sizeof(encoding)))
+		*encoding = '\0';
+
+	zbx_strupper(encoding);
+
+	if (-1 == (f = zbx_open(filename, O_RDONLY)))
+		return SYSINFO_RET_FAIL;
+
+	res = 0;
+
+	while (0 == res && 0 < (nbytes = zbx_read(f, buf, sizeof(buf), encoding)))
 	{
-		goto lbl_fail;
+		utf8 = convert_to_utf8(buf, nbytes, encoding);
+		if (NULL != zbx_regexp_match(utf8, regexp, &len))
+			res = 1;
+		zbx_free(utf8);
 	}
 
-	if(0 == fread(buf, 1, MAX_FILE_LEN-1, f))
-	{
-		goto lbl_fail;
-	}
-	buf[MAX_FILE_LEN-1] = 0;
+ 	close(f);
 
-	zbx_fclose(f);
-
-	c = zbx_regexp_match(buf, regexp, &len);
-
-	if(c == NULL)
-	{
-		SET_UI64_RESULT(result, 0);
-	}
-	else
-	{
-		SET_UI64_RESULT(result, 1);
-	}
-
-	zbx_free(buf);
+	if (-1 == nbytes)	/* error occurred */
+		return	SYSINFO_RET_FAIL;
+	
+	SET_UI64_RESULT(result, res);
 
 	return	SYSINFO_RET_OK;
-
-lbl_fail:
-
-	zbx_free(buf);
-	zbx_fclose(f);
-
-	return	SYSINFO_RET_FAIL;
 }
 
 /* MD5 sum calculation */
-
 int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	FILE	*file = NULL;
-	int	i;
-	size_t	nr;
+	char		filename[MAX_STRING_LEN];
+	int		f, i, nbytes;
 	struct stat	buf_stat;
-
-	md5_state_t state;
-	u_char	buf[16 * 1024];
-
-	unsigned char	hashText[MD5_DIGEST_SIZE*2+1];
+	md5_state_t	state;
+	u_char		buf[16 * 1024];
+	char		*hashText = NULL;
+	size_t		sz;
 	md5_byte_t	hash[MD5_DIGEST_SIZE];
-
-	char filename[MAX_STRING_LEN];
 
 	assert(result);
 
 	init_result(result);
 
-	if(num_param(param) > 1)
-	{
+	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
-	{
+	if (0 != get_param(param, 1, filename, sizeof(filename)))
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(stat(filename,&buf_stat) != 0)
-	{
-		/* Cannot stat() file */
-		return	SYSINFO_RET_FAIL;
-	}
+	if (0 != zbx_stat(filename, &buf_stat))
+		return	SYSINFO_RET_FAIL;	/* Cannot stat() file */
 
-	if(buf_stat.st_size > 64*1024*1024)
-	{
-		/* Will not calculate MD5 for files larger than 64M */
-		return	SYSINFO_RET_FAIL;
-	}
+	if (buf_stat.st_size > 64 * 1024 * 1024)
+		return	SYSINFO_RET_FAIL;	/* Will not calculate MD5 for files larger than 64M */
 
-	if(NULL == (file = fopen(filename,"rb")))
-	{
-		return	SYSINFO_RET_FAIL;
-	}
+	if (-1 == (f = zbx_open(filename, O_RDONLY)))
+		return SYSINFO_RET_FAIL;
 
 	md5_init(&state);
-	while ((nr = fread(buf, 1, (size_t)sizeof(buf), file)) > 0)
+
+	while ((nbytes = (int)read(f, buf, sizeof(buf))) > 0)
 	{
-		md5_append(&state,(const md5_byte_t *)buf, (int)nr);
+		md5_append(&state, (const md5_byte_t *)buf, nbytes);
 	}
+
 	md5_finish(&state, hash);
 
-	zbx_fclose(file);
+	close(f);
 
-/* Convert MD5 hash to text form */
-	for(i=0;i<MD5_DIGEST_SIZE;i++)
+	if (nbytes < 0)
+		return	SYSINFO_RET_FAIL;
+
+	/* Convert MD5 hash to text form */
+	sz = MD5_DIGEST_SIZE * 2 + 1;
+	hashText = zbx_malloc(hashText, sz);
+
+	for (i = 0; i < MD5_DIGEST_SIZE; i++)
 	{
-		zbx_snprintf((char *)&hashText[i<<1], sizeof(hashText) - (i<<1), "%02x",hash[i]);
+		zbx_snprintf(&hashText[i << 1], sz - (i << 1), "%02x", hash[i]);
 	}
 
-	SET_STR_RESULT(result, strdup((char*)hashText));
+	SET_STR_RESULT(result, hashText);
 
 	return SYSINFO_RET_OK;
-
 }
 
-/* Code for cksum is based on code from cksum.c */
-
+/*
+ * Code for cksum is based on code from cksum.c
+ */
 static u_long crctab[] = {
 	0x0,
 	0x04c11db7, 0x09823b6e, 0x0d4326d9, 0x130476dc, 0x17c56b6b,
@@ -398,63 +330,48 @@ static u_long crctab[] = {
  * and a location to store the crc.  Both routines return 0 on success and 1
  * on failure.  Errno is set on failure.
  */
-
 int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	register u_char *p;
-	register int nr;
-
-/*	AV Crashed under 64 platforms. Must be 32 bit! */
-/*	register u_long crc, len;*/
-	register uint32_t crc, len;
-
-	u_char buf[16 * 1024];
-	u_long cval, clen;
-	FILE	*f;
-	char	filename[MAX_STRING_LEN];
+	char			filename[MAX_STRING_LEN];
+	register u_char	*p;
+	register int		i, nr;
+	/* AV Crashed under 64 platforms. Must be 32 bit!
+	 * register u_long crc, len; */
+	register uint32_t	crc, len;
+	u_char			buf[16 * 1024];
+	u_long			cval;
+	int			f;
 
 	assert(result);
 
 	init_result(result);
 
-	if(num_param(param) > 1)
-	{
+	if (num_param(param) > 1)
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
-	{
+	if (0 != get_param(param, 1, filename, sizeof(filename)))
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(NULL == (f = fopen(filename,"rb")))
-	{
-		return	SYSINFO_RET_FAIL;
-	}
-
-#define	COMPUTE(var, ch)	(var) = (var) << 8 ^ crctab[(var) >> 24 ^ (ch)]
+	if (-1 == (f = zbx_open(filename, O_RDONLY)))
+		return SYSINFO_RET_FAIL;
 
 	crc = len = 0;
-	while ((nr = (int)fread(buf, 1, sizeof(buf), f)) > 0)
+
+	while ((nr = (int)read(f, buf, sizeof(buf))) > 0)
 	{
-		for( len += nr, p = buf; nr--; ++p)
-		{
-			COMPUTE(crc, *p);
-		}
+		len += nr;
+		for (i = 0; i < nr; i++)
+			crc = (crc << 8) ^ crctab[((crc >> 24) ^ buf[i]) & 0xff];
 	}
-	zbx_fclose(f);
+
+	close(f);
 
 	if (nr < 0)
-	{
-		return	SYSINFO_RET_FAIL;
-	}
-
-	clen = len;
+		return SYSINFO_RET_FAIL;
 
 	/* Include the length of the file. */
-	for (; len != 0; len >>= 8) {
-		COMPUTE(crc, len & 0xff);
-	}
+	for (; len != 0; len >>= 8)
+		crc = (crc << 8) ^ crctab[((crc >> 24) ^ len) & 0xff];
 
 	cval = ~crc;
 
