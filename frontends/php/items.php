@@ -654,6 +654,7 @@ include_once('include/page_header.php');
 	$hostid = get_request('form_hostid', get_request('hostid', 0));
 	if(!zbx_empty($_REQUEST['filter_host'])){
 		$hostid = CHost::getId(array('host' => $_REQUEST['filter_host']));
+		$hostid = $hostid ? $hostid : 0;	
 	}
 	else if($hostid > 0){
 		$_REQUEST['filter_host'] = CHost::getById(array('hostid' => $hostid));

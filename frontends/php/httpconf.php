@@ -486,7 +486,7 @@ include_once('include/page_header.php');
 				new CRow(array(
 					$chkBox,
 					is_show_all_nodes()?SPACE:NULL,
-					($_REQUEST['hostid']>0)?NULL:SPACE,
+					($_REQUEST['hostid']>0) ? null : $db_app['host'],
 					array(str_repeat(SPACE,4), $name),
 					$step_cout,
 					$httptest_data['delay'],
@@ -515,7 +515,6 @@ include_once('include/page_header.php');
 
 			$table->addRow(array(
 					get_node_name_by_elid($db_app['applicationid']),
-					($_REQUEST['hostid'] > 0)?NULL:$db_app['host'],
 					$col
 				));
 
