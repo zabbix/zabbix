@@ -75,7 +75,7 @@ include_once('include/page_header.php');
 	$table = new CTable();
 	$table->setHeader(array(S_ELEMENT, S_UPDATE.SPACE.S_EXISTING, S_ADD.SPACE.S_MISSING), 'bold');
 
-	$titles = array('host' => S_HOST, 'template' => S_TEMPLATE, 'item' => S_ITEM, 'trigger' => S_TRIGGER, 'graph' => S_GRAPH);
+	$titles = array('host' => S_HOST, 'template' => S_TEMPLATE_LINKAGE, 'item' => S_ITEM, 'trigger' => S_TRIGGER, 'graph' => S_GRAPH);
 	foreach($titles as $key => $title){
 		$cbExist = new CCheckBox('rules['.$key.'][exist]', isset($rules[$key]['exist']));
 

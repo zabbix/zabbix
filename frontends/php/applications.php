@@ -383,7 +383,7 @@ include_once('include/page_header.php');
 			$table->addRow(array(
 				new CCheckBox('applications['.$applicationid.']',NULL,NULL,$applicationid),
 				$name,
-				array(new CLink(S_ITEMS,'items.php?hostid='.$PAGE_HOSTS['selected']),
+				array(new CLink(S_ITEMS,'items.php?hostid='.$PAGE_HOSTS['selected'].'&filter_application='.$application['name']),
 				SPACE.'('.count($application['itemids']).')')
 			));
 		}
