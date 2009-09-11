@@ -10,6 +10,7 @@ libzbxcommon_a_SOURCES = \
 	str.c \
 	time.c \
 	zbxgetopt.c \
-	alias.c
+	alias.c \
+	file.c
 
 EXTRA_DIST = gnuregex.c

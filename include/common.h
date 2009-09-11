@@ -882,9 +882,15 @@ int	zbx_unicode_to_utf8_static(LPCTSTR wide_string, LPSTR utf8_string, int utf8_
 int	_wis_uint(LPCTSTR wide_string);
 #endif
 void	zbx_strupper(char *str);
-#ifdef HAVE_ICONV
+#if defined(_WINDOWS) || defined(HAVE_ICONV)
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
+
+#if defined(_WINDOWS) && defined(_UNICODE)
+int	__zbx_stat(const char *path, struct stat *buf);
+int	__zbx_open(const char *pathname, int flags);
+#endif	/* _WINDOWS && _UNICODE */
+int	zbx_read(int fd, void *buf, size_t count, const char *encoding);
 
 int MAIN_ZABBIX_ENTRY(void);
 
