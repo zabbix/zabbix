@@ -32,6 +32,7 @@ include_once('include/page_header.php');
 
 	$fields=array(
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+		'groupid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,			null),
 		'rules' =>			array(T_ZBX_STR, O_OPT,	null,	DB_ID,		null),
 		'form_refresh' =>	array(T_ZBX_INT, O_OPT,	null,	null,		null),
 // Actions
@@ -57,15 +58,14 @@ include_once('include/page_header.php');
 		zbxXML::import($rules, $_FILES['import_file']['tmp_name']);
 	}
 
-
 	$header_form = new CForm();
 	$header_form->setMethod('get');
-	$cmbConf = new CComboBox('config', 'import.php');
-	$cmbConf->setAttribute('onchange', 'javascript: redirect(this.options[this.selectedIndex].value);');
+	
+	$cmbConf = new CComboBox('config', 'import.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('export.php', S_EXPORT);
 		$cmbConf->addItem('import.php', S_IMPORT);
 	$header_form->addItem($cmbConf);
-
+	$header_form->addVar('groupid', get_request('groupid', 0));
 	show_table_header(S_IMPORT_BIG, $header_form);
 
 

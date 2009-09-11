@@ -265,49 +265,47 @@
 		if(isset($_REQUEST['type_changed'])){
 			$new_check_ports = svc_default_port($new_check_type);
 		}
-		$external_param = array();
+		
+		
+		$external_param = new CTable();
+		
+		if($new_check_type != SVC_ICMPPING){
+			$external_param->addRow(array(S_PORTS_SMALL, new CTextBox('new_check_ports', $new_check_ports, 20)));
+		}	
 		switch($new_check_type){
 			case SVC_SNMPv1:
 			case SVC_SNMPv2:
-				$external_param = array_merge($external_param, array(BR(), S_SNMP_COMMUNITY, SPACE,
-						new CTextBox('new_check_snmp_community', $new_check_snmp_community)));
-				$external_param = array_merge($external_param, array(BR(), S_SNMP_OID, SPACE,
-						new CTextBox('new_check_key', $new_check_key), BR()));
+				$external_param->addRow(array(S_SNMP_COMMUNITY, new CTextBox('new_check_snmp_community', $new_check_snmp_community)));
+				$external_param->addRow(array(S_SNMP_OID, new CTextBox('new_check_key', $new_check_key)));
 
 				$form->addVar('new_check_snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV);
 				$form->addVar('new_check_snmpv3_securityname', '');
 				$form->addVar('new_check_snmpv3_authpassphrase', '');
 				$form->addVar('new_check_snmpv3_privpassphrase', '');
-				break;
+			break;
 			case SVC_SNMPv3:
 				$form->addVar('new_check_snmp_community', '');
 
-				$external_param = array_merge($external_param, array(BR(), S_SNMP_OID, SPACE,
-						new CTextBox('new_check_key', $new_check_key)));
-				$external_param = array_merge($external_param, array(BR(), S_SNMPV3_SECURITY_NAME, SPACE,
-						new CTextBox('new_check_snmpv3_securityname', $new_check_snmpv3_securityname)));
+				$external_param->addRow(array(S_SNMP_OID, new CTextBox('new_check_key', $new_check_key)));
+				$external_param->addRow(array(S_SNMPV3_SECURITY_NAME, new CTextBox('new_check_snmpv3_securityname', $new_check_snmpv3_securityname)));
 
 				$cmbSecLevel = new CComboBox('new_check_snmpv3_securitylevel', $new_check_snmpv3_securitylevel);
 				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,'NoAuthPriv');
 				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,'AuthNoPriv');
 				$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,'AuthPriv');
 
-				$external_param = array_merge($external_param, array(BR(), S_SNMPV3_SECURITY_LEVEL, SPACE,
-						$cmbSecLevel));
-				$external_param = array_merge($external_param, array(BR(), S_SNMPV3_AUTH_PASSPHRASE, SPACE,
-						new CTextBox('new_check_snmpv3_authpassphrase', $new_check_snmpv3_authpassphrase)));
-				$external_param = array_merge($external_param, array(BR(), S_SNMPV3_PRIV_PASSPHRASE, SPACE,
-						new CTextBox('new_check_snmpv3_privpassphrase', $new_check_snmpv3_privpassphrase), BR()));
-				break;
+				$external_param->addRow(array(S_SNMPV3_SECURITY_LEVEL, $cmbSecLevel));
+				$external_param->addRow(array(S_SNMPV3_AUTH_PASSPHRASE, new CTextBox('new_check_snmpv3_authpassphrase', $new_check_snmpv3_authpassphrase)));
+				$external_param->addRow(array(S_SNMPV3_PRIV_PASSPHRASE, new CTextBox('new_check_snmpv3_privpassphrase', $new_check_snmpv3_privpassphrase), BR()));
+			break;
 			case SVC_AGENT:
 				$form->addVar('new_check_snmp_community', '');
 				$form->addVar('new_check_snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV);
 				$form->addVar('new_check_snmpv3_securityname', '');
 				$form->addVar('new_check_snmpv3_authpassphrase', '');
 				$form->addVar('new_check_snmpv3_privpassphrase', '');
-				$external_param = array_merge($external_param, array(BR(), S_KEY, SPACE,
-						new CTextBox('new_check_key', $new_check_key), BR()));
-				break;
+				$external_param->addRow(array(S_KEY, new CTextBox('new_check_key', $new_check_key), BR()));
+			break;
 			case SVC_ICMPPING:
 				$form->addVar('new_check_ports', '0');
 			default:
@@ -319,13 +317,13 @@
 				$form->addVar('new_check_snmpv3_privpassphrase', '');
 		}
 
-		$ports_box = $new_check_type == SVC_ICMPPING ? NULL : array(S_PORTS_SMALL, SPACE,
-				new CTextBox('new_check_ports', $new_check_ports, 20));
+		
+				
+		if($external_param->getNumRows() == 0) $external_param = null;
 		$form->addRow(S_NEW_CHECK, array(
 			$cmbChkType, SPACE,
-			$ports_box,
-			$external_param,
-			new CButton('add_check', S_ADD)
+			new CButton('add_check', S_ADD),
+			$external_param	
 		),'new');
 
 		$form->addRow(S_DEVICE_UNIQUENESS_CRITERIA, $cmbUniquenessCriteria);
