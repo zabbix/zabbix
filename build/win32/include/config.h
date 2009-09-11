@@ -55,5 +55,8 @@
 /* Define to 1 if you have the <signal.h> header file. */
 #define HAVE_SIGNAL_H
 
-#define _UNICODE
-#define UNICODE
+/* Define to 1 if you have the <io.h> header file. */
+#define HAVE_IO_H
+
+/* Define to 1 if you have the <fcntl.h> header file. */
+#define HAVE_FCNTL_H

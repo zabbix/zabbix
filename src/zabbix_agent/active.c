@@ -54,7 +54,7 @@ static void	disable_all_metrics()
 {
 	int	i;
 
- 	zabbix_log(LOG_LEVEL_DEBUG, "In disable_all_metrics()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In disable_all_metrics()");
 
 	for (i = 0; NULL != active_metrics[i].key; i++)
 		active_metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
@@ -631,7 +631,6 @@ static int	process_value(
 	return ret;
 }
 
-
 static void	process_active_checks(char *server, unsigned short port)
 {
 	register int	i, s_count, p_count;
@@ -691,6 +690,7 @@ static void	process_active_checks(char *server, unsigned short port)
 
 				if (get_param(params, 3, encoding, sizeof(encoding)) != 0)
 					*encoding = '\0';
+
 				zbx_strupper(encoding);
 
 				if (get_param(params, 4, maxlines_persec_str, sizeof(maxlines_persec_str)) != 0 ||
@@ -702,6 +702,7 @@ static void	process_active_checks(char *server, unsigned short port)
 
 				s_count = p_count = 0;
 				lastlogsize = active_metrics[i].lastlogsize;
+
 				while (SUCCEED == (ret = process_log(filename, &lastlogsize, &value, encoding))) {
 					if (!value) /* EOF */
 						break;
@@ -740,7 +741,7 @@ static void	process_active_checks(char *server, unsigned short port)
 				} //while processing a log
 			} while(0); /* simple try realization */
 
-			if( FAIL == ret ) {
+			if (FAIL == ret) {
 				active_metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
 				zabbix_log( LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.",
 					active_metrics[i].key);
@@ -870,10 +871,12 @@ static void	process_active_checks(char *server, unsigned short port)
 						lastlogsize = active_metrics[i].lastlogsize;
 
 					/* Do not flood ZABBIX server if file grows too fast */
-					if (s_count >= (maxlines_persec * active_metrics[i].refresh))	break;
+					if (s_count >= (maxlines_persec * active_metrics[i].refresh))
+						break;
 
 					/* Do not flood local system if file grows too fast */
-					if (p_count >= (4 * maxlines_persec * active_metrics[i].refresh))	break;
+					if (p_count >= (4 * maxlines_persec * active_metrics[i].refresh))
+						break;
 				} //while processing an eventlog
 
 				break;
@@ -949,9 +952,9 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	char	*p = NULL;
 
 #if defined(ZABBIX_DAEMON)
-        phan.sa_sigaction = child_signal_handler;
+	phan.sa_sigaction = child_signal_handler;
 	sigemptyset(&phan.sa_mask);
-        phan.sa_flags = SA_SIGINFO;
+	phan.sa_flags = SA_SIGINFO;
 	sigaction(SIGALRM, &phan, NULL);
 #endif /* ZABBIX_DAEMON */
 
@@ -995,7 +998,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 			process_active_checks(activechk_args.host, activechk_args.port);
 			nextcheck = get_min_nextcheck();
-			if(FAIL == nextcheck)	nextcheck = (int)time(NULL) + 60;
+			if(FAIL == nextcheck)
+				nextcheck = (int)time(NULL) + 60;
 		}
 		else
 		{

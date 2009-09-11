@@ -6,9 +6,9 @@ MC = mc.exe
 MT = mt.exe
 MESSAGES_H = messages.h
 INCS = /I .\ /I ..\include /I ..\..\..\include /I ..\..\..\src\zabbix_sender
-CFLAGS = $(INCS) /O2 /Ob1 /GF /FD /EHsc /MT /Gy /W3 /c /TC /D _WINDOWS /D _CONSOLE /D _MBCS /D NDEBUG /D WIN32 /D HAVE_WINLDAP_H /D HAVE_ASSERT_H /D ZABBIX_SERVICE /D WITH_COMMON_METRICS /D WITH_SPECIFIC_METRICS /D WITH_SIMPLE_METRICS /D "_VC80_UPGRADE=0x0600"
+CFLAGS = $(INCS) /O2 /Ob1 /GF /FD /EHsc /MT /Gy /W3 /c /TC /D _WINDOWS /D _CONSOLE /D UNICODE /D _UNICODE /D NDEBUG /D WIN32 /D HAVE_WINLDAP_H /D HAVE_ASSERT_H /D ZABBIX_SERVICE /D WITH_COMMON_METRICS /D WITH_SPECIFIC_METRICS /D WITH_SIMPLE_METRICS /D "_VC80_UPGRADE=0x0600"
 RESOURCE_H  = resource.res
-OBJS  = ..\..\..\src\libs\zbxcommon\alias.o ..\..\..\src\libs\zbxcommon\comms.o ..\..\..\src\libs\zbxcommon\gnuregex.o ..\..\..\src\libs\zbxcommon\misc.o ..\..\..\src\libs\zbxcommon\regexp.o ..\..\..\src\libs\zbxcommon\str.o ..\..\..\src\libs\zbxcommon\xml.o ..\..\..\src\libs\zbxcommon\zbxgetopt.o ..\..\..\src\libs\zbxcomms\comms.o ..\..\..\src\libs\zbxconf\cfg.o ..\..\..\src\libs\zbxcrypto\base64.o ..\..\..\src\libs\zbxjson\json.o ..\..\..\src\libs\zbxlog\log.o ..\..\..\src\libs\zbxsys\mutexs.o ..\..\..\src\libs\zbxsys\symbols.o ..\..\..\src\libs\zbxsys\threads.o ..\..\..\src\zabbix_sender\zabbix_sender.o
+OBJS  = ..\..\..\src\libs\zbxcommon\alias.o ..\..\..\src\libs\zbxcommon\comms.o ..\..\..\src\libs\zbxcommon\gnuregex.o ..\..\..\src\libs\zbxcommon\misc.o ..\..\..\src\libs\zbxcommon\regexp.o ..\..\..\src\libs\zbxcommon\str.o ..\..\..\src\libs\zbxcommon\xml.o ..\..\..\src\libs\zbxcommon\zbxgetopt.o ..\..\..\src\libs\zbxcommon\file.o ..\..\..\src\libs\zbxcomms\comms.o ..\..\..\src\libs\zbxconf\cfg.o ..\..\..\src\libs\zbxcrypto\base64.o ..\..\..\src\libs\zbxjson\json.o ..\..\..\src\libs\zbxlog\log.o ..\..\..\src\libs\zbxsys\mutexs.o ..\..\..\src\libs\zbxsys\symbols.o ..\..\..\src\libs\zbxsys\threads.o ..\..\..\src\zabbix_sender\zabbix_sender.o
 LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib
 LFLAGS = /INCREMENTAL:NO /MANIFEST /MANIFESTFILE:"zabbix_sender.exe.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /PDB:"zabbix_sender.pdb" /SUBSYSTEM:CONSOLE /DYNAMICBASE:NO /MACHINE:X86
 
@@ -47,6 +47,9 @@ $(MESSAGES_H): messages.mc
 
 ..\..\..\src\libs\zbxcommon\zbxgetopt.o: ..\..\..\src\libs\zbxcommon\zbxgetopt.c
 	$(CC) ..\..\..\src\libs\zbxcommon\zbxgetopt.c /Fo"..\..\..\src\libs\zbxcommon\zbxgetopt.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxcommon\file.o: ..\..\..\src\libs\zbxcommon\file.c
+	$(CC) ..\..\..\src\libs\zbxcommon\file.c /Fo"..\..\..\src\libs\zbxcommon\file.o" $(CFLAGS)
 
 ..\..\..\src\libs\zbxcomms\comms.o: ..\..\..\src\libs\zbxcomms\comms.c
 	$(CC) ..\..\..\src\libs\zbxcomms\comms.c /Fo"..\..\..\src\libs\zbxcomms\comms.o" $(CFLAGS)

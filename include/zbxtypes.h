@@ -25,6 +25,14 @@
 
 #if defined(_WINDOWS)
 
+#ifdef _UNICODE
+#	define zbx_stat(path, buf)		__zbx_stat(path, buf)
+#	define zbx_open(pathname, flags)	__zbx_open(pathname, flags | O_BINARY)
+#else
+#	define zbx_stat(path, buf)		_stat64(path, buf)
+#	define zbx_open(pathname, flags)	open(pathname, flags | O_BINARY)
+#endif
+
 #ifdef UNICODE
 #	include <strsafe.h>
 #	define	zbx_wsnprintf StringCchPrintf
@@ -62,6 +70,9 @@
 #endif /* uint32_t */
 
 #else /* _WINDOWS */
+
+#	define zbx_stat(path, buf)		stat(path, buf)
+#	define zbx_open(pathname, flags)	open(pathname, flags)
 
 #	ifndef __UINT64_C
 #		ifdef UINT64_C

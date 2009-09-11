@@ -18,67 +18,8 @@
 **/
 
 #include "common.h"
-
-#include "log.h"
 #include "logfiles.h"
-
-static size_t	get_line(char *buffer, size_t size, long *lastlogsize, const char *encoding)
-{
-	size_t		i, szbyte;
-	const char	*cr, *lf;
-
-	if (0 == strcmp(encoding, "UNICODE") || 0 == strcmp(encoding, "UNICODELITTLE") ||
-			0 == strcmp(encoding, "UTF-16") || 0 == strcmp(encoding, "UTF-16LE") ||
-			0 == strcmp(encoding, "UTF16") || 0 == strcmp(encoding, "UTF16LE"))
-	{
-		cr = "\r\0";
-		lf = "\n\0";
-		szbyte = 2;
-	}
-	else if (0 == strcmp(encoding, "UNICODEBIG") ||
-			0 == strcmp(encoding, "UTF-16BE") || 0 == strcmp(encoding, "UTF16BE"))
-	{
-		cr = "\0\r";
-		lf = "\0\n";
-		szbyte = 2;
-	}
-	else if (0 == strcmp(encoding, "UTF-32") || 0 == strcmp(encoding, "UTF-32LE") ||
-			0 == strcmp(encoding, "UTF32") || 0 == strcmp(encoding, "UTF32LE"))
-	{
-		cr = "\r\0\0\0";
-		lf = "\n\0\0\0";
-		szbyte = 4;
-	}
-	else if (0 == strcmp(encoding, "UTF-32BE") || 0 == strcmp(encoding, "UTF32BE"))
-	{
-		cr = "\0\0\0\r";
-		lf = "\0\0\0\n";
-		szbyte = 4;
-	}
-	else
-	{
-		cr = "\r";
-		lf = "\n";
-		szbyte = 1;
-	}
-
-	for (i = 0; i < size; i += szbyte)
-	{
-		*lastlogsize += szbyte;
-
-		if (0 == memcmp(&buffer[i], lf, szbyte))	/* LF (Unix) */
-			break;
-
-		if (0 == memcmp(&buffer[i], cr, szbyte))	/* CR (Mac) */
-		{
-			if (i + szbyte < size && 0 == memcmp(&buffer[i + szbyte], lf, szbyte))	/* CR+LF (Windows) */
-				*lastlogsize += szbyte;
-			break;
-		}
-	}
-
-	return i;
-}
+#include "log.h"
 
 /******************************************************************************
  *                                                                            *
@@ -107,6 +48,7 @@ int	process_log(char *filename, long *lastlogsize, char **value, const char *enc
 	struct stat	buf;
 	int		nbytes, ret = FAIL;
 	char		buffer[MAX_BUF_LEN];
+
 	assert(filename);
 	assert(lastlogsize);
 	assert(value);
@@ -115,7 +57,7 @@ int	process_log(char *filename, long *lastlogsize, char **value, const char *enc
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_log() filename:'%s' lastlogsize:%li", filename, *lastlogsize);
 
 	/* Handling of file shrinking */
-	if (0 != stat(filename, &buf))
+	if (0 != zbx_stat(filename, &buf))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot open [%s] [%s]", filename, strerror(errno));
 		return ret;
@@ -124,7 +66,7 @@ int	process_log(char *filename, long *lastlogsize, char **value, const char *enc
 	if (buf.st_size < *lastlogsize)
 		*lastlogsize = 0;
 
-	if (-1 == (f = open(filename, O_RDONLY)))
+	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot open [%s] [%s]", filename, strerror(errno));
 		return ret;
@@ -132,18 +74,18 @@ int	process_log(char *filename, long *lastlogsize, char **value, const char *enc
 
 	if ((off_t)-1 != lseek(f, (off_t)*lastlogsize, SEEK_SET))
 	{
-		if (-1 != (nbytes = read(f, buffer, sizeof(buffer))))
+		if (-1 != (nbytes = zbx_read(f, buffer, sizeof(buffer), encoding)))
 		{
 			if (0 != nbytes)
 			{
-				nbytes = get_line(buffer, nbytes, lastlogsize, encoding);
-
+				*lastlogsize += nbytes;
 				*value = convert_to_utf8(buffer, nbytes, encoding);
+				zbx_rtrim(*value, "\r\n ");
 			}
 			ret = SUCCEED;
 		}
 		else
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot open [%s] [%s]", filename, strerror(errno));
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot read from [%s] [%s]", filename, strerror(errno));
 	}
 	else
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot set position to [%li] for [%s] [%s]", *lastlogsize, filename, strerror(errno));
