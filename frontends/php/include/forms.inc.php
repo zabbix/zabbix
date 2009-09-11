@@ -5447,7 +5447,7 @@
 	function insert_host_form(){
 		global $USER_DETAILS;
 
-		$groups= get_request('groups',array());
+		$host_groups = get_request('groups', array());
 
 		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
 
@@ -5521,8 +5521,8 @@
 			$ipmi_password		= $db_host['ipmi_password'];
 
 // add groups
-			$options = array( 'groupids' => $groups, 'hostids'=>$_REQUEST['hostid']);
-			$groups= CHostGroup::get($options);
+			$options = array('hostids' => $_REQUEST['hostid']);
+			$host_groups = CHostGroup::get($options);
 
 // read profile
 			$db_profiles = DBselect('SELECT * FROM hosts_profiles WHERE hostid='.$_REQUEST['hostid']);
@@ -5647,14 +5647,11 @@
 
 		$host_tbl->addRow(array(S_NAME, new CTextBox('host',$host,54)));
 
-		$grp_tb = new CTweenBox($frmHost,'groups',$groups,10);
-		$db_groups=DBselect('SELECT DISTINCT groupid,name '.
-						' FROM groups '.
-						' WHERE '.DBcondition('groupid',$available_groups).
-						' ORDER BY name');
-
-		while($db_group=DBfetch($db_groups)){
-			$grp_tb->addItem($db_group['groupid'],$db_group['name']);
+		$grp_tb = new CTweenBox($frmHost, 'groups', $host_groups, 10);
+		
+		$all_groups = CHostGroup::get(array('editable' => 1, 'extendoutput' => 1));
+		foreach($all_groups as $group){
+			$grp_tb->addItem($group['groupid'], $group['name']);
 		}
 
 		$host_tbl->addRow(array(S_GROUPS,$grp_tb->get(S_IN.SPACE.S_GROUPS,S_OTHER.SPACE.S_GROUPS)));

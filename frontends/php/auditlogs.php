@@ -31,15 +31,11 @@ require_once('include/users.inc.php');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-	$_REQUEST['config'] = get_request('config','auditlogs.php');
-
 include_once('include/page_header.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'config'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-
 // actions
 		'groupid'=>			array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,	NULL),
 		'hostid'=>			array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,	NULL),
@@ -140,7 +136,6 @@ include_once('include/page_header.php');
 	$filterForm->addAction('onsubmit',$script);
 
 	$filterForm->addVar('nav_time',($_REQUEST['nav_time']>0)?$_REQUEST['nav_time']:'');
-	$filterForm->addVar('config',$_REQUEST['config']);
 
 	$filterForm->addVar('userid',$_REQUEST['userid']);
 
@@ -151,12 +146,12 @@ include_once('include/page_header.php');
 		$user = array('alias' => '');
 	}
 	$row = new CRow(array(
-					new CCol(($config==1)?S_RECIPIENT:S_USER,'form_row_l'),
-					new CCol(array(
-								new CTextBox("user",$user['alias'],32,'yes'),
-								new CButton("btn1",S_SELECT,"return PopUp('popup.php?"."dstfrm=".$filterForm->GetName()."&dstfld1=userid&dstfld2=user"."&srctbl=users&srcfld1=userid&srcfld2=alias&real_hosts=1');",'T')
-							),'form_row_r')
-						));
+		new CCol(S_USER,'form_row_l'),
+		new CCol(array(
+			new CTextBox("user",$user['alias'],32,'yes'),
+			new CButton("btn1",S_SELECT,"return PopUp('popup.php?"."dstfrm=".$filterForm->GetName()."&dstfld1=userid&dstfld2=user"."&srctbl=users&srcfld1=userid&srcfld2=alias&real_hosts=1');",'T')
+		),'form_row_r')
+	));
 
 	$filterForm->addRow($row);
 
@@ -211,14 +206,14 @@ include_once('include/page_header.php');
 	$clndr_icon->setAttribute('style','vertical-align: middle;');
 
 	$nav_clndr =  array(
-						new CNumericBox('nav_day',(($_REQUEST['nav_time']>0)?date('d',$_REQUEST['nav_time']):''),2),
-						new CNumericBox('nav_month',(($_REQUEST['nav_time']>0)?date('m',$_REQUEST['nav_time']):''),2),
-						new CNumericBox('nav_year',(($_REQUEST['nav_time']>0)?date('Y',$_REQUEST['nav_time']):''),4),
-						new CNumericBox('nav_hour',(($_REQUEST['nav_time']>0)?date('H',$_REQUEST['nav_time']):''),2),
-						':',
-						new CNumericBox('nav_minute',(($_REQUEST['nav_time']>0)?date('i',$_REQUEST['nav_time']):''),2),
-					$clndr_icon
-				);
+		new CNumericBox('nav_day',(($_REQUEST['nav_time']>0)?date('d',$_REQUEST['nav_time']):''),2),
+		new CNumericBox('nav_month',(($_REQUEST['nav_time']>0)?date('m',$_REQUEST['nav_time']):''),2),
+		new CNumericBox('nav_year',(($_REQUEST['nav_time']>0)?date('Y',$_REQUEST['nav_time']):''),4),
+		new CNumericBox('nav_hour',(($_REQUEST['nav_time']>0)?date('H',$_REQUEST['nav_time']):''),2),
+		':',
+		new CNumericBox('nav_minute',(($_REQUEST['nav_time']>0)?date('i',$_REQUEST['nav_time']):''),2),
+		$clndr_icon
+	);
 
 	$filterForm->addRow(S_ACTIONS_SINCE,$nav_clndr);
 
@@ -244,10 +239,10 @@ include_once('include/page_header.php');
 	if($_REQUEST['userid'])
 		$sql_cond.=' AND a.userid='.$_REQUEST['userid'].' ';
 
-	if(($_REQUEST['action']>-1) && ($config == 0))
+	if(($_REQUEST['action']>-1))
 		$sql_cond.=' AND a.action='.$_REQUEST['action'].' ';
 
-	if(($_REQUEST['resourcetype']>-1) && ($config == 0))
+	if(($_REQUEST['resourcetype']>-1))
 		$sql_cond.=' AND a.resourcetype='.$_REQUEST['resourcetype'].' ';
 
 	$sql_cond.=' AND a.clock>'.$nav_time;
