@@ -232,11 +232,12 @@
 			if(!is_null($val = get_request('discovery_groupid'))){
 				$val = CHostGroup::get(array('groupids' => $val, 'editable' => 1));
 				if(!empty($val)){
+
 					$val = array_pop($val);
 					$msg[] = S_GROUP_FOR_DISCOVERED_HOSTS.' ['.$val['name'].']';
 
 					setHostGroupInternal($orig_config['discovery_groupid'], ZBX_NOT_INTERNAL_GROUP);
-					setHostGroupInternal($val['groupid'], ZBX_INTERNAL_GROUP);
+					setHostGroupInternal($val, ZBX_INTERNAL_GROUP);
 				}
 			}
 			if(!is_null($val = get_request('alert_usrgrpid'))){
@@ -547,7 +548,7 @@
 <?php
 	$cnf_wdgt = new CWidget();
 
-	if(isset($_REQUEST['config'])) {
+	if(isset($_REQUEST['config'])){
 		$config = select_config(false);
 	}
 
@@ -681,9 +682,8 @@
 		$frmOther->addRow(S_REFRESH_UNSUPPORTED_ITEMS,
 			new CNumericBox('refresh_unsupported', $config['refresh_unsupported'], 5));
 
-
 		$cmbGrp = new CComboBox('discovery_groupid', $config['discovery_groupid']);
-		$groups = CHostGroup::get(array('order'=>'name', 'editable' => 1));
+		$groups = CHostGroup::get(array('sortfield'=>'name', 'editable' => 1, 'extendoutput' => 1));
 		foreach($groups as $groupid => $group){
 			$cmbGrp->addItem($groupid, $group['name']);
 		}

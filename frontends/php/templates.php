@@ -433,8 +433,7 @@ require_once('include/forms.inc.php');
 	$frmForm->setMethod('get');
 	$frmForm->addVar('groupid', get_request('groupid',0));
 
-	$cmbConf = new CComboBox('config', 'templates.php');
-	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');
+	$cmbConf = new CComboBox('config', 'templates.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 	$cmbConf->addItem('templates.php',S_TEMPLATES);
 	$cmbConf->addItem('hosts.php',S_HOSTS);
 	$cmbConf->addItem('items.php',S_ITEMS);

@@ -74,12 +74,6 @@ include_once('include/page_header.php');
 
 	if($EXPORT_DATA){
 
-define('pr_true', 0);
-
-if(pr_true)
-COpt::profiling_start();
-
-define("USE_MEM_PROF",1);
 /* SELECT HOSTS */
 		$params = array(
 			'hostids' => $hostids,
@@ -198,22 +192,13 @@ define("USE_MEM_PROF",1);
 
 		$xml = zbxXML::export($data);
 
-
-
-if(pr_true){
-COpt::profiling_stop();
-die(COpt::show());
-}
-else
 		die($xml);
-
 	}
-
 
 	$form = new CForm();
 	$form->setMethod('get');
-	$cmbConf = new CComboBox('config', 'export.php');
-	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');
+	$form->addVar('groupid', get_request('groupid', 0));
+	$cmbConf = new CComboBox('config', 'export.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('export.php',S_EXPORT);
 		$cmbConf->addItem('import.php',S_IMPORT);
 	$form->addItem($cmbConf);
@@ -322,7 +307,7 @@ else
 
 		$table = new CTableInfo(S_NO_HOSTS_DEFINED);
 		$table->setHeader(array(
-			new CCheckBox('all_hosts', true, "checkAll('".$form->getName()."','all_hosts','hosts');"),
+			new CCheckBox('all_hosts', false, "checkAll('".$form->getName()."','all_hosts','hosts');"),
 			make_sorting_header(S_NAME, 'host'),
 			make_sorting_header(S_DNS, 'dns'),
 			make_sorting_header(S_IP, 'ip'),
@@ -387,7 +372,7 @@ else
 				$port = empty($host['port']) ? '-' : $host['port'];
 			}
 
-			$checked = (isset($hostids[$hostid]) || !isset($update));
+			$checked = (isset($hostids[$hostid]));
 			if($checked) $count_chkbx++;
 
 			$table->addRow(array(
