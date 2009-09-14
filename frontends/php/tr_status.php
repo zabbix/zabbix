@@ -358,6 +358,7 @@ include_once('include/page_header.php');
 		'extendoutput' => 1,
 		'select_hosts' => 1,
 		'select_items' => 1,
+		'not_templated_triggers' => 1,
 //		'sortfield' => getPageSortField('description'),
 //		'sortorder' => getPageSortOrder(),
 		'limit' => ($config['search_limit']+1)

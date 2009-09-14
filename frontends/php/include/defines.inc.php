@@ -597,6 +597,8 @@ else{
 //-------
 
 // PREG
+	define('ZBX_PREG_PRINT_UTF', '([^\x00-\x1F]*)');
+	
 	define('ZBX_PREG_SPACES', '(\s+){0,1}');
 	define('ZBX_PREG_MACRO_NAME', '([A-Z0-9._]+)');
 	define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_. -$]+)');
@@ -610,9 +612,9 @@ else{
 	define('ZBX_PREG_HOST_FORMAT', ZBX_PREG_INTERNAL_NAMES);
 
 	define('ZBX_PREG_NODE_FORMAT', ZBX_PREG_INTERNAL_NAMES);
-	define('ZBX_PREG_ITEM_KEY_FORMAT', '('.ZBX_PREG_KEY_NAME.'(\['.ZBX_PREG_PARAMS.'\]){0,1})');
+	define('ZBX_PREG_ITEM_KEY_FORMAT', '('.ZBX_PREG_KEY_NAME.'(\['.ZBX_PREG_PRINT_UTF.'\]){0,1})');
 
-	define('ZBX_PREG_FUNCTION_FORMAT', '('.ZBX_PREG_INTERNAL_NAMES.'(\('.ZBX_PREG_PARAMS.'\)))');
+	define('ZBX_PREG_FUNCTION_FORMAT', '('.ZBX_PREG_INTERNAL_NAMES.'(\('.ZBX_PREG_PRINT_UTF.'\)))');
 
 	define('ZBX_PREG_SIMPLE_EXPRESSION_FORMAT','(\{'.ZBX_PREG_HOST_FORMAT.'\:'.ZBX_PREG_ITEM_KEY_FORMAT.'\.'.ZBX_PREG_FUNCTION_FORMAT.'\})');
 //	define('ZBX_PREG_MACRO_NAME_FORMAT', '(\{[A-Z\.]+\})');

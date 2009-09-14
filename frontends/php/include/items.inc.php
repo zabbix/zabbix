@@ -256,7 +256,7 @@
 		if(($i = array_search(0,$item['applications'])) !== FALSE)
 			unset($item['applications'][$i]);
 
-		if( !eregi('^'.ZBX_EREG_ITEM_KEY_FORMAT.'$', $item['key_']) ){
+		if( !preg_match('/^'.ZBX_PREG_ITEM_KEY_FORMAT.'$/u', $item['key_']) ){
 			error("Incorrect key format 'key_name[param1,param2,...]'");
 			return false;
 		}
@@ -486,7 +486,7 @@
 		if(($i = array_search(0,$item['applications'])) !== FALSE)
 			unset($item['applications'][$i]);
 
-		if( !eregi('^'.ZBX_EREG_ITEM_KEY_FORMAT.'$', $item['key_']) ){
+		if( !preg_match('/^'.ZBX_PREG_ITEM_KEY_FORMAT.'$/u', $item['key_']) ){
 			error("Incorrect key format 'key_name[param1,param2,...]'");
 			return false;
 		}
