@@ -420,7 +420,9 @@ int main(int argc, char **argv)
 
 	if( INPUT_FILE )
 	{
-		if (NULL == (in = fopen(INPUT_FILE, "r")) )
+		if (strcmp(INPUT_FILE, "-") == 0)
+			in = stdin;
+		else if (NULL == (in = fopen(INPUT_FILE, "r")) )
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot open [%s] [%s]", INPUT_FILE, strerror(errno));
 			ret = FAIL;
@@ -482,7 +484,8 @@ int main(int argc, char **argv)
 		if (0 != buffer_count)
 			ret = zbx_thread_wait(zbx_thread_start(send_value, &sentdval_args));
 
-		fclose(in);
+		if (in != stdin)
+			fclose(in);
 	}
 	else
 	{
