@@ -84,6 +84,7 @@ class CTrigger {
 			'status'				=> null,
 			'severity'				=> null,
 			'templated_triggers'	=> null,
+			'not_templated_triggers'	=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
 // OutPut
@@ -235,6 +236,12 @@ class CTrigger {
 			$sql_parts['where'][] = 't.templateid<>0';
 		}
 
+// not_templated_triggers
+		if(!is_null($options['not_templated_triggers'])){
+			$sql_parts['where'][] = 't.templateid=0';
+		}
+
+		
 // extendoutput
 		if(!is_null($options['extendoutput'])){
 			$sql_parts['select']['triggers'] = 't.*';
