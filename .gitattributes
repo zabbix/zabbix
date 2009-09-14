@@ -334,6 +334,7 @@ include/zbxicmpping.h -text
 include/zbxjson.h -text
 include/zbxmacros.h -text
 include/zbxodbc.h -text
+m4/ax_lib_oracle_oci.m4 -text
 m4/iconv.m4 -text
 m4/libiodbc.m4 -text
 m4/libunixodbc.m4 -text

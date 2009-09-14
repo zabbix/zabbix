@@ -66,6 +66,7 @@ void    DBconnect(int flag)
 {
 	int	err;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "Connect to the database");
 	do {
 		err = zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBSOCKET, CONFIG_DBPORT);
 
@@ -1173,30 +1174,24 @@ int	DBadd_history_str(zbx_uint64_t itemid, char *value, int clock)
 int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock)
 {
 #ifdef HAVE_ORACLE
-	char		sql[MAX_STRING_LEN];
+	OCILobLocator *lob_loc;
+   
+	char	sql[MAX_STRING_LEN];
 	int		value_esc_max_len;
-	int		ret = FAIL;
-#endif
+	int		err = OCI_SUCCESS;
+	OCIBind *bndhp = NULL;
+	ub4  	amtp = 0;
+	OCIStmt *stmthp = NULL;
+#endif /* HAVE_ORACLE */
 	char		*value_esc;
 	zbx_uint64_t	id;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In add_history_text()");
 
 #ifdef HAVE_ORACLE
-	sqlo_lob_desc_t		loblp;		/* the lob locator */
-	sqlo_stmt_handle_t	sth = 0;
-
-	sqlo_autocommit_off(oracle);
-
 	value_esc = DBdyn_escape_string(value);
 	value_esc_max_len = strlen(value_esc);
-
-	/* allocate the lob descriptor */
-	if(sqlo_alloc_lob_desc(oracle, &loblp) < 0)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG,"CLOB allocating failed:%s", sqlo_geterror(oracle));
-		goto lbl_exit;
-	}
+	amtp = (ub4)value_esc_max_len;
 
 	id = DBget_maxid("history_text", "id");
 	zbx_snprintf(sql, sizeof(sql), "insert into history_text (id,clock,itemid,value)"
@@ -1207,55 +1202,61 @@ int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"Query:%s", sql);
 
-	/* parse the statement */
-	sth = sqlo_prepare(oracle, sql);
-	if(sth < 0)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG,"Query prepearing failed:%s", sqlo_geterror(oracle));
-		goto lbl_exit;
+	/* Allocate locator resources */
+	err = OCIDescriptorAlloc((dvoid *) oracle.envhp, 
+		(dvoid **) &lob_loc, (ub4)OCI_DTYPE_LOB, 
+		(size_t) 0, (dvoid **) 0);
+
+	if (OCI_SUCCESS == err) {
+		/* Allocate statement  */
+		err = OCIHandleAlloc( (dvoid *) oracle.envhp, (dvoid **) &stmthp,
+			OCI_HTYPE_STMT, (size_t) 0, (dvoid **) 0);
 	}
 
-	/* bind input variables. Note: we bind the lob descriptor here */
-	if(SQLO_SUCCESS != sqlo_bind_by_pos(sth, 1, SQLOT_CLOB, &loblp, 0, NULL, 0))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG,"CLOB binding failed:%s", sqlo_geterror(oracle));
-		goto lbl_exit_loblp;
+	if (OCI_SUCCESS == err) {
+		/* Prepare the SQL statement handle */
+		err = OCIStmtPrepare(stmthp, oracle.errhp, (text *)sql, (ub4) 
+			strlen(sql),
+			(ub4) OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT);
 	}
 
-	/* execute the statement */
-	if(sqlo_execute(sth, 1) != SQLO_SUCCESS)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG,"Query failed:%s", sqlo_geterror(oracle));
-		goto lbl_exit_loblp;
+	if (OCI_SUCCESS == err) {
+		/* Binds the bind positions */
+		err = OCIBindByPos(stmthp, &bndhp, oracle.errhp, (ub4) 1,
+			(dvoid *) &lob_loc, (sb4) 0,  SQLT_CLOB,
+			(dvoid *) 0, (ub2 *)0, (ub2 *)0,
+			(ub4) 0, (ub4 *) 0, (ub4) OCI_DEFAULT);
 	}
 
-	/* write the lob */
-	ret = sqlo_lob_write_buffer(oracle, loblp, value_esc_max_len, value_esc, value_esc_max_len, SQLO_ONE_PIECE);
-	if(ret < 0)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG,"CLOB writing failed:%s", sqlo_geterror(oracle) );
-		goto lbl_exit_loblp;
+	if (OCI_SUCCESS == err) {
+		/* Execute the SQL statement */
+		err = OCIStmtExecute(oracle.svchp, stmthp, oracle.errhp, (ub4) 1, (ub4) 0,
+			(CONST OCISnapshot*) 0, (OCISnapshot*) 0,  
+			(ub4) OCI_DEFAULT);
 	}
 
-	/* committing */
-	if(sqlo_commit(oracle) < 0)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG,"Committing failed:%s", sqlo_geterror(oracle) );
+	if (OCI_SUCCESS == err) {
+		/* Write data in ti the LOB locator */
+		err = OCILobWrite(oracle.svchp, oracle.errhp, lob_loc, (ub4 *)&amtp, 1, 
+			(dvoid*) value_esc, (ub4)value_esc_max_len, OCI_ONE_PIECE, NULL,
+			NULL, 0, (ub1) SQLCS_IMPLICIT);
 	}
 
-	ret = SUCCEED;
+	if (OCI_SUCCESS == err) {
+		/* Commit db changes */
+		(void) OCITransCommit (oracle.svchp, oracle.errhp, OCI_DEFAULT);
+	}
 
-lbl_exit_loblp:
-	sqlo_free_lob_desc(oracle, &loblp);
+	if (OCI_SUCCESS == err) {
+		/* Free LOB resources*/
+		(void) OCIDescriptorFree((dvoid *) lob_loc, (ub4) OCI_DTYPE_LOB);
+	}
 
-lbl_exit:
-	if(sth >= 0)	sqlo_close(sth);
-	zbx_free(value_esc);
-
-	sqlo_autocommit_on(oracle);
-
-	return ret;
-
+	if (stmthp)
+	{
+		(void) OCIHandleFree((dvoid *) stmthp, OCI_HTYPE_STMT);
+		stmthp = NULL;
+	}
 #else /* HAVE_ORACLE */
 	value_esc = DBdyn_escape_string(value);
 
@@ -1270,7 +1271,6 @@ lbl_exit:
 
 	zbx_free(value_esc);
 #endif
-
 	return SUCCEED;
 }
 
@@ -2270,7 +2270,7 @@ void	DBadd_condition_alloc(char **sql, int *sql_alloc, int *sql_offset, const ch
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, 2, ")");
 }
 
-static char	string[640];
+static char	buf_string[640];
 
 /******************************************************************************
  *                                                                            *
@@ -2297,13 +2297,13 @@ char	*zbx_host_key_string(zbx_uint64_t itemid)
 			itemid);
 
 	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
-		zbx_snprintf(string, sizeof(string), "%s:%s", row[1], row[2]);
+		zbx_snprintf(buf_string, sizeof(buf_string), "%s:%s", row[1], row[2]);
 	else
-		zbx_snprintf(string, sizeof(string), "???");
+		zbx_snprintf(buf_string, sizeof(buf_string), "???");
 
 	DBfree_result(result);
 
-	return string;
+	return buf_string;
 }
 
 /******************************************************************************
@@ -2323,9 +2323,9 @@ char	*zbx_host_key_string(zbx_uint64_t itemid)
  ******************************************************************************/
 char	*zbx_host_key_string_by_item(DB_ITEM *item)
 {
-	zbx_snprintf(string, sizeof(string), "%s:%s", item->host_name, item->key);
+	zbx_snprintf(buf_string, sizeof(buf_string), "%s:%s", item->host_name, item->key);
 
-	return string;
+	return buf_string;
 }
 
 /******************************************************************************
@@ -2353,17 +2353,17 @@ char	*zbx_user_string(zbx_uint64_t userid)
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		zbx_snprintf(string, sizeof(string), "%s %s (%s)",
+		zbx_snprintf(buf_string, sizeof(buf_string), "%s %s (%s)",
 				row[0],
 				row[1],
 				row[2]);
 	}
 	else
-		zbx_snprintf(string, sizeof(string), "unknown");
+		zbx_snprintf(buf_string, sizeof(buf_string), "unknown");
 
 	DBfree_result(result);
 
-	return string;
+	return buf_string;
 }
 
 
@@ -2394,13 +2394,13 @@ char	*zbx_host_key_function_string(zbx_uint64_t functionid)
 			functionid);
 
 	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
-		zbx_snprintf(string, sizeof(string), "%s:%s.%s(%s)", row[1], row[2], row[3], row[4]);
+		zbx_snprintf(buf_string, sizeof(buf_string), "%s:%s.%s(%s)", row[1], row[2], row[3], row[4]);
 	else
-		zbx_snprintf(string, sizeof(string), "???");
+		zbx_snprintf(buf_string, sizeof(buf_string), "???");
 
 	DBfree_result(result);
 
-	return string;
+	return buf_string;
 }
 
 double	DBmultiply_value_float(DB_ITEM *item, double value)

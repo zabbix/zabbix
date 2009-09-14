@@ -17,7 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
 #ifndef ZABBIX_ZBXDB_H
 #define ZABBIX_ZBXDB_H
 
@@ -38,8 +37,14 @@ extern MYSQL	*conn;
 #endif /* HAVE_MYSQL */
 
 #ifdef HAVE_ORACLE
-#	include "sqlora.h"
-extern sqlo_db_handle_t oracle;
+#	include "oci.h"
+typedef struct zbx_oracle_db_handle_s {
+	OCIEnv *envhp;
+	OCIError *errhp;
+	OCISvcCtx *svchp;
+} zbx_oracle_db_handle_t;
+
+extern zbx_oracle_db_handle_t oracle;
 #endif /* HAVE_ORACLE */
 
 #ifdef HAVE_POSTGRESQL
@@ -109,9 +114,19 @@ void	PG_DBfree_result(DB_RESULT result);
 #endif
 
 #ifdef HAVE_ORACLE
-	#define	DB_RESULT	sqlo_stmt_handle_t
-	#define	DBfree_result	sqlo_close
+	#define	DB_RESULT ZBX_OCI_DB_RESULT*
+	#define	DBfree_result OCI_DBfree_result
 	#define DB_ROW		char **
+
+	typedef struct zbx_oci_db_result_s
+	{
+		OCIStmt	*stmthp;
+		int 	ncolumn;
+		DB_ROW	values;
+	} ZBX_OCI_DB_RESULT;
+
+	void	OCI_DBfree_result(DB_RESULT result);
+	char*	zbx_oci_error(sword status);
 #endif
 
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbsocket, int port);
