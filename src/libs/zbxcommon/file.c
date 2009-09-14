@@ -113,7 +113,7 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 	}
 	i += szbyte;
 
-	lseek(fd, offset + i, SEEK_CUR);
+	lseek(fd, offset + i, SEEK_SET);
 
 	return i;
 }

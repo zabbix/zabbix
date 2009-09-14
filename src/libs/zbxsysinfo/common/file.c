@@ -81,7 +81,7 @@ int	VFS_FILE_TIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	else
 		return SYSINFO_RET_FAIL;
 
-	return	SYSINFO_RET_OK;
+	return SYSINFO_RET_OK;
 }
 
 int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -150,12 +150,12 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
  	close(f);
 
 	if (-1 == nbytes)	/* error occurred */
-		return	SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
 	
 	if (0 == nbytes)	/* EOF */
-		SET_STR_RESULT(result, strdup(""));
+		SET_STR_RESULT(result, strdup("EOF"));
 
-	return	SYSINFO_RET_OK;
+	return SYSINFO_RET_OK;
 }
 
 int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -198,11 +198,11 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
  	close(f);
 
 	if (-1 == nbytes)	/* error occurred */
-		return	SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
 	
 	SET_UI64_RESULT(result, res);
 
-	return	SYSINFO_RET_OK;
+	return SYSINFO_RET_OK;
 }
 
 /* MD5 sum calculation */
@@ -228,10 +228,10 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return SYSINFO_RET_FAIL;
 
 	if (0 != zbx_stat(filename, &buf_stat))
-		return	SYSINFO_RET_FAIL;	/* Cannot stat() file */
+		return SYSINFO_RET_FAIL;	/* Cannot stat() file */
 
 	if (buf_stat.st_size > 64 * 1024 * 1024)
-		return	SYSINFO_RET_FAIL;	/* Will not calculate MD5 for files larger than 64M */
+		return SYSINFO_RET_FAIL;	/* Will not calculate MD5 for files larger than 64M */
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 		return SYSINFO_RET_FAIL;
@@ -248,7 +248,7 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	close(f);
 
 	if (nbytes < 0)
-		return	SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
 
 	/* Convert MD5 hash to text form */
 	sz = MD5_DIGEST_SIZE * 2 + 1;
@@ -376,5 +376,5 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	SET_UI64_RESULT(result, cval);
 
-	return	SYSINFO_RET_OK;
+	return SYSINFO_RET_OK;
 }
