@@ -57,6 +57,9 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 	size_t		i, szbyte;
 	const char	*cr, *lf;
 	int		nbytes;	
+	off_t		offset;
+
+	offset = lseek(fd, 0, SEEK_CUR);
 
 	if ((nbytes = (int)read(fd, buf, count)) <= 0)
 		return nbytes;
@@ -110,7 +113,7 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 	}
 	i += szbyte;
 
-	lseek(fd, i - nbytes, SEEK_CUR);
+	lseek(fd, offset + i, SEEK_CUR);
 
 	return i;
 }
