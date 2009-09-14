@@ -781,7 +781,7 @@ static int discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 					if(SUCCEED == get_value_agent(&item, &result))
 					{
 						if (GET_STR_RESULT(&result))
-							strlcpy(value, result.str, DSERVICE_VALUE_LEN_MAX);
+							zbx_strlcpy(value, result.str, DSERVICE_VALUE_LEN_MAX);
 						else
 							ret = FAIL;
 					}
@@ -794,7 +794,7 @@ static int discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 					if(SUCCEED == get_value_snmp(&item, &result))
 					{
 						if (GET_STR_RESULT(&result))
-							strlcpy(value, result.str, DSERVICE_VALUE_LEN_MAX);
+							zbx_strlcpy(value, result.str, DSERVICE_VALUE_LEN_MAX);
 						else
 							ret = FAIL;
 					}
