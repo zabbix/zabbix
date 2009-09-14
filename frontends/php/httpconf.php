@@ -45,7 +45,7 @@ include_once('include/page_header.php');
 
 		'httptestid'=>	array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,'(isset({form})&&({form}=="update"))'),
 		'application'=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,'isset({save})'),
-		'name'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY.KEY_PARAM(),'isset({save})'),
+		'name'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,'isset({save})'),
 		'delay'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,86400),'isset({save})'),
 		'status'=>		array(T_ZBX_INT, O_OPT,  null,  IN('0,1'),'isset({save})'),
 		'agent'=>		array(T_ZBX_STR, O_OPT,  null,	null,'isset({save})'),

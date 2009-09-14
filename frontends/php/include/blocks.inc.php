@@ -467,7 +467,7 @@ function make_latest_issues($params = array()){
 		S_ACTIONS
 		));
 
-	$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.value,h.host,h.hostid '.$sql_select.
+	$sql = 'SELECT DISTINCT t.triggerid,t.type,t.status,t.description,t.expression,t.priority,t.lastchange,t.value,h.host,h.hostid '.$sql_select.
 				' FROM triggers t,hosts h,items i,functions f,hosts_groups hg '.$sql_from.
 				' WHERE f.itemid=i.itemid '.
 					' AND h.hostid=i.hostid '.

@@ -291,7 +291,6 @@ include_once('include/page_header.php');
 						'sortorder' => getPageSortOrder(),
 						'limit' => ($config['search_limit']+1)
 					);
-
 		$groups = CHostGroup::get($options);
 
 
@@ -343,6 +342,7 @@ include_once('include/page_header.php');
 				}
 				$hosts_output[] = new CLink($host['host'], $url, $style);
 				$hosts_output[] = ', ';
+				
 			}
 			array_pop($hosts_output);
 

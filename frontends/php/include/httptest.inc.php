@@ -176,8 +176,8 @@
 		$history = 30; // TODO !!! Allow user to set this parameter
 		$trends = 90; // TODO !!! Allow user to set this parameter
 
-		if(!eregi('^([0-9a-zA-Z\_\.[.-.]\$ ]+)$', $name)) {
-			error("Scenario name should contain '0-9a-zA-Z_.$ '- characters only");
+		if(!preg_match('/^'.ZBX_PREG_PRINT_UTF.'$/u', $name)) {
+			error("Only characters are allowed");
 			return false;
 		}
 
@@ -203,7 +203,7 @@
 					' authentication='.$authentication.','.' http_user='.zbx_dbstr($http_user).','.' http_password='.zbx_dbstr($http_password).','.
 					' delay='.$delay.','.' status='.$status.', agent='.zbx_dbstr($agent).', macros='.zbx_dbstr($macros).','.
 					' error='.zbx_dbstr('').', curstate='.HTTPTEST_STATE_UNKNOWN.
-				' where httptestid='.$httptestid);
+				' where httptestid='.$httptestid);				
 		}
 		else{
 			$httptestid = get_dbid("httptest","httptestid");
