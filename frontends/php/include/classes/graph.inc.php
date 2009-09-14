@@ -1200,7 +1200,12 @@
 				for($i=0;$i<=6;$i++)
 				{
 					$str = str_pad(convert_units($this->sizeY*$i/6*($maxY-$minY)/$this->sizeY+$minY,$units),10," ", STR_PAD_LEFT);
-					ImageString($this->im, 1, 5, $this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, $str, $this->GetColor("Dark Red No Alpha"));
+					ImageStringTTF($this->im, 1, 
+					5, 
+					$this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, 
+					$str, 
+					$this->GetColor("Dark Red No Alpha"));
+					//ImageString($this->im, 1, 5, $this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, $str, $this->GetColor("Dark Red No Alpha"));
 				}
 			}
 		}
@@ -1223,7 +1228,13 @@
 				for($i=0;$i<=6;$i++)
 				{
 					$str = str_pad(convert_units($this->sizeY*$i/6*($maxY-$minY)/$this->sizeY+$minY,$units),10," ");
-					ImageString($this->im, 1, $this->sizeX+$this->shiftXleft+2, $this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, $str, $this->GetColor("Dark Red No Alpha"));
+					
+					ImageStringTTF($this->im, 1, 
+					$this->sizeX+$this->shiftXleft+2, 
+					$this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, 
+					$str, 
+					$this->GetColor("Dark Red No Alpha"));
+					//ImageString($this->im, 1, $this->sizeX+$this->shiftXleft+2, $this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, $str, $this->GetColor("Dark Red No Alpha"));
 				}
 			}
 		}
