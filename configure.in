@@ -32,6 +32,7 @@ AC_CANONICAL_HOST
 
 dnl Checks for programs.
 AC_PROG_CC
+AM_PROG_CC_C_O
 dnl AC_PROG_RANLIB
 dnl AM_PROG_LIBTOOL
 
