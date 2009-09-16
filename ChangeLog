@@ -1,5 +1,6 @@
 Changes gor 1.6.7
 
+ - [ZBX-982] fixed message when can't delete application with web items (Vedmak)
  - [ZBX-861] fixed problem with disappearing nodes in frontend (Artem)
 
 Changes for 1.6.6

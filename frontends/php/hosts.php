@@ -830,7 +830,7 @@ include_once('include/page_header.php');
 			}
 			$result = DBend($result);
 			
-			show_messages(true, S_APPLICATION_DELETED, NULL);
+			show_messages($result, S_APPLICATION_DELETED, S_CANNOT_DELETE_APPLICATION);
 		}
 		unset($_REQUEST['delete']);
 	}
