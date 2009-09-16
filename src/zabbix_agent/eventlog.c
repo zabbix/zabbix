@@ -295,4 +295,3 @@ int process_eventlog(const char *source, long *lastlogsize, unsigned long *out_t
 	return ret;
 }
 #endif	/*if defined (_WINDOWS)*/
-
