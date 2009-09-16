@@ -80,6 +80,7 @@ class CApplication {
 			'nopermissions'			=> null,
 // OutPut
 			'extendoutput'			=> null,
+			'expand_data'			=> null,
 			'select_items'			=> null,
 			'count'					=> null,
 			'pattern'				=> '',
@@ -130,7 +131,12 @@ class CApplication {
 
 			$sql_parts['where'][] = DBcondition('a.hostid', $options['hostids']);
 		}
-
+// expand_data
+		if(!is_null($options['expand_data'])){
+			$sql_parts['select']['host'] = 'h.host';
+			$sql_parts['from']['h'] = 'hosts h';
+			$sql_parts['where']['ah'] = 'a.hostid=h.hostid';
+		}
 // itemids
 		if(!is_null($options['itemids'])){
 			zbx_value2array($options['itemids']);

@@ -1712,12 +1712,12 @@ return $result;
 
 		if(!empty($tmp_appids)) delete_application($tmp_appids);			// recursion!!!
 
-		$sql = 'SELECT ht.name '.
+		$sql = 'SELECT ht.name, ht.applicationid '.
 				' FROM httptest ht '.
 				' WHERE '.DBcondition('ht.applicationid',$applicationids);
 		$res = DBselect($sql);
 		if($info = DBfetch($res)){
-			info('Application "'.$host['host'].':'.$app['name'].'" used by scenario "'.$info['name'].'"');
+			info('Application "'.$apps[$info['applicationid']]['host'].':'.$apps[$info['applicationid']]['name'].'" used by scenario "'.$info['name'].'"');
 			return false;
 		}
 
