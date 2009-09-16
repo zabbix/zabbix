@@ -1160,13 +1160,15 @@
 
 
 // Text Image
+// $y - lower left baseline coord.
 	function imageStringTTF($image, $fontsize, $angle, $x, $y, $color, $string){
+		$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
 
-		$ar = imagettfbbox($fontSize, 0, ZBX_GRAPH_FONT_NAME, $string);
-		$y += abs($ar[1] - $ar[7]);
-
-		imagettftext($image, $fontSize, 0, $x, $y, $color, ZBX_GRAPH_FONT_NAME, $string);
-
-	return $ar;
+		//$ar = imagettfbbox($fontsize, $angle, $ttf, $string);
+		//$y += abs($ar[1] - $ar[7]);
+		
+		imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
+		return true;
 	}
+ 
 ?>
