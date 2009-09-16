@@ -72,7 +72,7 @@ class CBar extends CGraphDraw{
 		$fontnum = ($this->sizeX < 500)?2:4;
 
 		$x=$this->fullSizeX/2-imagefontwidth($fontnum)*strlen($str)/2;
-		imagestring($this->im, $fontnum,$x,1, $str , $this->GetColor('Dark Red No Alpha'));
+		imageStringTTF($this->im, 10, 0, $x, 13, $this->GetColor('Dark Red No Alpha'), $str);
 	}
 
 	public function setGridStep($step,$axis=GRAPH_YAXIS_SIDE_LEFT){
@@ -393,13 +393,10 @@ class CBar extends CGraphDraw{
 				$caption = $this->periodCaption[$key];
 				$caption = str_pad($caption,$this->maxCaption,' ', STR_PAD_LEFT);
 
-				imagestringup($this->im,
-							1,
-							$i*($this->seriesWidth+$this->seriesDistance)+$this->shiftXleft+$this->shiftXCaptionLeft+round($this->seriesWidth/2),
-							$this->sizeY+$this->shiftY+$this->shiftYCaptionBottom,
-							$caption,
-							$this->getColor('Black No Alpha')
-					);
+				imageStringTTF($this->im, 10, 0, 
+				$i*($this->seriesWidth+$this->seriesDistance)+$this->shiftXleft+$this->shiftXCaptionLeft+round($this->seriesWidth/2), 
+				$this->sizeY+$this->shiftY+$this->shiftYCaptionBottom, $this->getColor('Black No Alpha'), $caption);
+				
 				$i++;
 			}
 
@@ -423,13 +420,11 @@ class CBar extends CGraphDraw{
 				$caption = $this->periodCaption[$key];
 				$caption = str_pad($caption,$this->maxCaption,' ', STR_PAD_LEFT);
 
-				imagestring($this->im,
-							1,
-							$this->shiftXleft,
-							($this->sizeY + $this->shiftY+$this->shiftYCaptionTop) - ($i*($this->seriesWidth+$this->seriesDistance)+$this->seriesDistance+round($this->seriesWidth/2)),
-							$caption,
-							$this->getColor('Black No Alpha')
-					);
+				imageStringTTF($this->im, 10, 0, 
+				$this->shiftXleft, 
+				($this->sizeY + $this->shiftY+$this->shiftYCaptionTop) - ($i*($this->seriesWidth+$this->seriesDistance)+$this->seriesDistance+round($this->seriesWidth/2)),
+				$this->getColor('Black No Alpha'), $caption);
+				
 				$i++;
 			}
 		}
@@ -460,13 +455,11 @@ class CBar extends CGraphDraw{
 
 				for($i=0;$i<=$hstr_count;$i++){
 					$str = str_pad(convert_units(($this->sizeY*$i/$hstr_count*($max-$min)/$this->sizeY+$min),$this->units[$axis]),14,' ', $str_pad);
-					imagestring($this->im,
-								1,
-								$shiftXLeft,
-								$this->sizeY-$this->sizeY*$i/$hstr_count-4+$this->shiftY+$this->shiftYCaptionTop,
-								$str,
-								$this->getColor('Dark Red No Alpha')
-							);
+					imageStringTTF($this->im, 7, 0, 
+						$shiftXLeft, 
+						$this->sizeY - $this->sizeY * $i / $hstr_count + 2 + $this->shiftY + $this->shiftYCaptionTop,
+						$this->getColor('Dark Red No Alpha'), 
+						$str);
 				}
 			}
 			else if(uint_in_array($this->type, array(GRAPH_TYPE_BAR, GRAPH_TYPE_BAR_STACKED))){
@@ -482,31 +475,35 @@ class CBar extends CGraphDraw{
 				for($i=0;$i<=$hstr_count;$i++){
 					$str = str_pad(convert_units(($this->sizeX*$i/$hstr_count*($max-$min)/$this->sizeX+$min),$this->units[$axis]),14,' ', $str_pad);
 
-					imagestringup($this->im,
-								1,
-								$this->shiftXleft + ($this->sizeX*$i/$hstr_count-4)+$this->shiftXCaptionLeft,
-								$shiftYBottom,
-								$str,
-								$this->getColor('Dark Red No Alpha')
-							);
+					imageStringTTF($this->im, 7, 0, 
+						$this->shiftXleft + ($this->sizeX*$i/$hstr_count-4) + $this->shiftXCaptionLeft, 
+						$shiftYBottom,
+						$this->getColor('Dark Red No Alpha'), 
+						$str);
 				}
 			}
 		}
 
 		if(!is_null($this->xLabel)){
-			imagestring($this->im, 2,
-				$this->shiftXleft + ($this->sizeX/2) - 20,
-				$this->fullSizeY-14,
-				$this->xLabel,
-				$this->getColor('Black No Alpha'));
+			imageStringTTF($this->im, 13, 0, 
+				$this->shiftXleft + ($this->sizeX/2) - 20, 
+				$this->fullSizeY-12,
+				$this->getColor('Black No Alpha'), 
+				$this->xLabel);
 		}
 
 		if(!is_null($this->yLabel)){
-			imagestringup($this->im, 2,
-				0,
+			imageStringTTF($this->im, 13, 90, 
+				20, 
 				$this->shiftY + ($this->sizeY/2) + 20,
-				$this->yLabel,
-				$this->getColor('Black No Alpha'));
+				$this->getColor('Black No Alpha'), 
+				$this->yLabel);
+
+			// imagestringup($this->im, 2,
+				// 0,
+				// $this->shiftY + ($this->sizeY/2) + 20,
+				// $this->yLabel,
+				// $this->getColor('Black No Alpha'));
 		}
 	}
 
@@ -517,7 +514,6 @@ class CBar extends CGraphDraw{
 		$shiftX = $this->fullSizeX - $this->shiftlegendright;
 
 		$count = 0;
-
 		foreach($this->series as $key => $serie){
 			foreach($serie as $num => $value){
 				$caption = $this->seriesLegend[$num];
@@ -526,12 +522,12 @@ class CBar extends CGraphDraw{
 				imagefilledrectangle($this->im, $shiftX, $shiftY+12*$count, $shiftX+5, $shiftY+5+12*$count, $color);
 				imagerectangle($this->im,$shiftX, $shiftY+12*$count, $shiftX+5, $shiftY+5+12*$count, $this->getColor('Black No Alpha'));
 
-				imagestring($this->im, 2,
-					$shiftX+9,
-					$shiftY-5+12*$count,
-					$caption,
-					$this->getColor('Black No Alpha'));
-
+				$r = imageStringTTF($this->im, 9, 0, 
+					$shiftX+9, 
+					$shiftY-5+12*$count+12,
+					$this->getColor('Black No Alpha'), 
+					$caption);
+				
 				$count++;
 			}
 			break;  //!!!!
