@@ -41,13 +41,14 @@ include_once('include/page_header.php');
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
+
 		'actionid'=>		array(T_ZBX_INT, O_OPT, P_SYS, DB_ID, null),
-		'name'=>		array(T_ZBX_STR, O_OPT,	 null, NOT_EMPTY, 'isset({save})'),
+		'name'=>			array(T_ZBX_STR, O_OPT,	 null, NOT_EMPTY, 'isset({save})'),
 		'eventsource'=>		array(T_ZBX_INT, O_MAND, null, IN(array(EVENT_SOURCE_TRIGGERS,EVENT_SOURCE_DISCOVERY,EVENT_SOURCE_AUTO_REGISTRATION)),	null),
 		'evaltype'=>		array(T_ZBX_INT, O_OPT, null, IN(array(ACTION_EVAL_TYPE_AND_OR,ACTION_EVAL_TYPE_AND,ACTION_EVAL_TYPE_OR)),	'isset({save})'),
 		'esc_period'=>		array(T_ZBX_INT, O_OPT, null, BETWEEN(60,999999), 'isset({save})&&isset({escalation})'),
-		'escalation'=>		array(T_ZBX_INT, O_OPT, null, IN("0,1"),		null),
-		'status'=>		array(T_ZBX_INT, O_OPT,		null, IN(array(ACTION_STATUS_ENABLED,ACTION_STATUS_DISABLED)), 'isset({save})'),
+		'escalation'=>		array(T_ZBX_INT, O_OPT, null, IN("0,1"), null),
+		'status'=>			array(T_ZBX_INT, O_OPT, null, IN(array(ACTION_STATUS_ENABLED,ACTION_STATUS_DISABLED)), 'isset({save})'),
 		'def_shortdata'=>	array(T_ZBX_STR, O_OPT,	null, null, 'isset({save})'),
 		'def_longdata'=>	array(T_ZBX_STR, O_OPT,	null, null, 'isset({save})'),
 		'recovery_msg'=>	array(T_ZBX_INT, O_OPT,	null, null, null),
@@ -56,11 +57,11 @@ include_once('include/page_header.php');
 		'g_actionid'=>		array(T_ZBX_INT, O_OPT,	null, DB_ID, null),
 		'conditions'=>		array(null, O_OPT, null, null, null),
 		'g_conditionid'=>	array(null, O_OPT, null, null, null),
-		'new_condition'=>	array(null, O_OPT, null,	null, 'isset({add_condition})'),
+		'new_condition'=>	array(null, O_OPT, null, null, 'isset({add_condition})'),
 		'operations'=>		array(null, O_OPT, null, null, 'isset({save})'),
 		'g_operationid'=>	array(null, O_OPT, null, null, null),
-		'edit_operationid'=>	array(null, O_OPT, P_ACT,	DB_ID,	null),
-		'new_operation'=>	array(null, O_OPT,  null,	null,	'isset({add_operation})'),
+		'edit_operationid'=>	array(null, O_OPT, P_ACT, DB_ID, null),
+		'new_operation'=>	array(null, O_OPT, null, null, 'isset({add_operation})'),
 		'opconditions'=>		array(null, O_OPT, null, null, null),
 		'g_opconditionid'=>	array(null, O_OPT, null, null, null),
 		'new_opcondition'=>	array(null,	O_OPT,  null,	null,	'isset({add_opcondition})'),

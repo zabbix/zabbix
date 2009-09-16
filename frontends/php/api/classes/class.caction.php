@@ -399,6 +399,11 @@ class CAction {
 				else{
 					if(!isset($result[$action['actionid']])) $result[$action['actionid']]= array();
 
+					if($options['select_conditions'] && !isset($result[$action['actionid']]['conditionids'])){
+						$result[$action['actionid']]['conditionids'] = array();
+						$result[$action['actionid']]['conditions'] = array();
+					}
+					
 					$result[$action['actionid']] += $action;
 				}
 			}
