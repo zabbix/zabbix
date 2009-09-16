@@ -117,12 +117,9 @@ class CGraphDraw{
 		}
 	}
 
-
-
 	public function setPeriod($period){
 		$this->period=$period;
 	}
-
 
 	public function setSTime($stime){
 		if($stime>200000000000 && $stime<220000000000){
@@ -176,18 +173,18 @@ class CGraphDraw{
 			$this->shiftY-1,
 			$this->sizeX+$this->shiftXleft+$this->shiftXCaption-1,
 			$this->sizeY+$this->shiftY+1,
-			$this->GetColor('Black No Alpha')
+			$this->getColor('Black No Alpha')
 			);
 	}
 
 	public function drawRectangle(){
 		imagefilledrectangle($this->im,0,0,
 			$this->fullSizeX,$this->fullSizeY,
-			$this->GetColor('White'));
+			$this->getColor('E3E3E3', 0));
 
 
 		if($this->border==1){
-			imagerectangle($this->im,0,0,$this->fullSizeX-1,$this->fullSizeY-1,$this->GetColor('Black No Alpha'));
+			imagerectangle($this->im,0,0,$this->fullSizeX-1,$this->fullSizeY-1,$this->getColor('Black No Alpha'));
 		}
 	}
 
@@ -241,9 +238,8 @@ class CGraphDraw{
 		$this->header=$header;
 	}
 
-
 	public function drawLogo(){
-		imagestringup($this->im,0,$this->fullSizeX-10,$this->fullSizeY-50, 'http://www.zabbix.com', $this->GetColor('Gray'));
+		imagestringup($this->im,0,$this->fullSizeX-10,$this->fullSizeY-50, 'http://www.zabbix.com', $this->getColor('Gray'));
 	}
 
 	public function getColor($color,$alfa=50){
