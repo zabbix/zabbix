@@ -124,7 +124,7 @@ include_once('include/page_header.php');
 				$host = get_host_by_hostid($app['hostid']);
 
 				DBstart();
-				$result=delete_application($_REQUEST['applicationid']);
+				$result = delete_application($_REQUEST['applicationid']);
 				$result = DBend($result);
 			}
 			show_messages($result, S_APPLICATION_DELETED, S_CANNOT_DELETE_APPLICATION);
@@ -162,7 +162,7 @@ include_once('include/page_header.php');
 		}
 		$result = DBend($result);
 
-		show_messages(true, S_APPLICATION_DELETED, NULL);
+		show_messages($result, S_APPLICATION_DELETED, S_CANNOT_DELETE_APPLICATION);
 	}
 	else if(str_in_array($_REQUEST['go'], array('activate','disable'))){
 /* group operations */
@@ -338,6 +338,7 @@ include_once('include/page_header.php');
 			'select_items' => 1,
 			'extendoutput' => 1,
 			'editable' => 1,
+			'expand_data' => 1,
 			'limit' => ($config['search_limit']+1)
 		);
 
@@ -359,6 +360,7 @@ include_once('include/page_header.php');
 		$table = new CTableInfo();
 		$table->setHeader(array(
 			new CCheckBox('all_applications',NULL,"checkAll('".$form->getName()."','all_applications','applications');"),
+			(($PAGE_HOSTS['selected'] > 0) ? null : S_HOST),
 			make_sorting_link(S_APPLICATION, 'name'),
 			S_SHOW
 		));
@@ -382,6 +384,7 @@ include_once('include/page_header.php');
 			}
 			$table->addRow(array(
 				new CCheckBox('applications['.$applicationid.']',NULL,NULL,$applicationid),
+				(($PAGE_HOSTS['selected'] > 0) ? null : $application['host']),
 				$name,
 				array(new CLink(S_ITEMS,'items.php?hostid='.$PAGE_HOSTS['selected'].'&filter_application='.$application['name']),
 				SPACE.'('.count($application['itemids']).')')
@@ -411,8 +414,6 @@ include_once('include/page_header.php');
 		$app_wdgt->addItem($form);
 		$app_wdgt->show();
 	}
-?>
-<?php
 
 include_once('include/page_footer.php');
 
