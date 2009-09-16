@@ -173,7 +173,7 @@ class CChart extends CGraphDraw{
 					$i*($this->sizeY/($hline_count+1))+$this->shiftY,
 					$this->sizeX+$this->shiftXleft,
 					$i*($this->sizeY/($hline_count+1))+$this->shiftY,
-					$this->GetColor('Gray')
+					$this->getColor('CCCCCC')
 				);
 		}
 
@@ -226,7 +226,7 @@ class CChart extends CGraphDraw{
 						$this->shiftY,
 						$i*$intervalX+$this->shiftXleft+$offsetX,
 						$this->sizeY+$this->shiftY,
-						$this->getColor('Gray')
+						$this->getColor('CCCCCC')
 				);
 		}
 
@@ -235,7 +235,7 @@ class CChart extends CGraphDraw{
 			$new_day=date('d',$this->from_time+$i*$interval+$offset);
 			if($old_day != $new_day){
 				$old_day=$new_day;
-				$date_format = 'm.d H:i';
+				$date_format = 'd.m H:i';
 				$color = 'Dark Red No Alpha';
 			}
 			else{
@@ -257,7 +257,7 @@ class CChart extends CGraphDraw{
 
 							$this->shiftXleft-3,
 							$this->sizeY+$this->shiftY+57,
-							date('m.d H:i',$this->from_time),
+							date('d.m H:i',$this->from_time),
 							$this->getColor('Dark Red No Alpha')
 					);
 // End
@@ -265,7 +265,7 @@ class CChart extends CGraphDraw{
 							1,
 							$this->sizeX+$this->shiftXleft-3,
 							$this->sizeY+$this->shiftY+57,
-							date('m.d H:i',$this->to_time),
+							date('d.m H:i',$this->to_time),
 							$this->getColor('Dark Red No Alpha')
 					);
 	}
@@ -286,7 +286,7 @@ class CChart extends CGraphDraw{
 		imagefilledrectangle($this->im,
 			$this->shiftXleft+1,
 			$this->shiftY,
-			$this->sizeX+$this->shiftXleft,
+			$this->sizeX+$this->shiftXleft-2,	// -2 border
 			$this->sizeY+$this->shiftY,
 			$this->getColor('Not Work Period'));
 
@@ -316,7 +316,7 @@ class CChart extends CGraphDraw{
 				$this->im,
 				$x1,
 				$this->shiftY,
-				$x2,
+				$x2-2,		// -2 border
 				$this->sizeY+$this->shiftY,
 				$this->getColor('White'));
 
@@ -448,18 +448,19 @@ class CChart extends CGraphDraw{
 			}
 
 			imagefilledrectangle($this->im,
-							$this->shiftXleft,
-							$this->sizeY+$this->shiftY+62+12*$i,
+							$this->shiftXleft - 5,
+							$this->sizeY+$this->shiftY+62+12*$i - 3,
 							$this->shiftXleft+5,
-							$this->sizeY+$this->shiftY+5+62+12*$i,
+							$this->sizeY+$this->shiftY+7+62+12*$i,
 							$color
 						);
+
 			imagerectangle($this->im,
-							$this->shiftXleft,
-							$this->sizeY+$this->shiftY+62+12*$i,
+							$this->shiftXleft - 5,
+							$this->sizeY+$this->shiftY+62+12*$i - 3,
 							$this->shiftXleft+5,
-							$this->sizeY+$this->shiftY+5+62+12*$i,
-							$this->getColor('Black No Alpha')
+							$this->sizeY+$this->shiftY+7+62+12*$i,
+							$this->getColor('White')
 						);
 
 			imageStringTTF($this->im,
@@ -1323,7 +1324,7 @@ class CChart extends CGraphDraw{
 				$str = str_pad(convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units),10,' ');
 					
 				imageStringTTF($this->im, 
-					9,
+					7,
 					0,
 					$this->sizeX+$this->shiftXleft+2,
 					$this->sizeY-$this->sizeY*$i/$hstr_count+2+$this->shiftY, 
