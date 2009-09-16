@@ -234,7 +234,7 @@ class CGraphDraw{
 			$fontnum = 4;
 		}
 		$x=$this->fullSizeX/2-imagefontwidth($fontnum)*strlen($str)/2;
-		imagestring($this->im, $fontnum,$x,1, $str , $this->GetColor('Dark Red No Alpha'));
+		imageStringTTF($this->im, 10,0,$x,13, $this->getColor('Dark Red No Alpha'), $str);
 	}
 
 	public function setHeader($header){

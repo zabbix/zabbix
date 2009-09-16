@@ -20,7 +20,6 @@
 ?>
 <?php
 // TODO !!! Correct the help links !!! TODO
-
 	require_once('include/users.inc.php');
 
 	function insert_slideshow_form(){
