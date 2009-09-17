@@ -2346,9 +2346,9 @@
 								$status_bar = S_SHOW_VALUES_OF_ITEM.' \''.$description.'\'';
 								break;
 						}
-						
-						if(strlen($description) > 25) $description = substr($description,0,22).'...';
 
+						if(mb_strlen($description, S_HTML_CHARSET) > 25) $description = mb_substr($description,0,22, S_HTML_CHARSET).'...';
+						
 						$item_menu[$action][] = array(
 							$description, null,
 							new CScript("function(){ PopUp('history.php?action=".$action.'&itemid='.$item_data['itemid']."&period=3600');}"));
@@ -2356,8 +2356,7 @@
 					if(isset($item_menu['showgraph']))
 					{
 						$tr_ov_menu[] = array(S_GRAPHS,	null, null,
-							array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
-							);
+							array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
 						$tr_ov_menu = array_merge($tr_ov_menu, $item_menu['showgraph']);
 					}
 					if(isset($item_menu['showlatest']))
