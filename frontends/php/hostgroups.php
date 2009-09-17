@@ -346,7 +346,7 @@ include_once('include/page_header.php');
 			}
 			array_pop($hosts_output);
 
-			foreach($group['hosts'] as $hostid => $host){
+			foreach($group['hosts'] as $host){
 				$host['status'] == HOST_STATUS_TEMPLATE ? $tpl_count++ : $host_count++;
 			}
 

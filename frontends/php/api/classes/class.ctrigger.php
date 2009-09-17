@@ -100,7 +100,7 @@ class CTrigger {
 			'group'					=> null,
 			'host'					=> null,
 			'only_true'				=> null,
-			'severity'				=> null,
+			'min_severity'			=> null,
 //
 
 			'pattern'				=> '',
@@ -307,9 +307,9 @@ class CTrigger {
 										'((t.value='.TRIGGER_VALUE_FALSE.') AND (('.time().'-t.lastchange)<'.TRIGGER_FALSE_PERIOD.')))';
 			}
 
-// severity
-			if(!is_null($options['severity'])){
-				$sql_parts['where'][] = 't.priority>='.$options['severity'];
+// min_severity
+			if(!is_null($options['min_severity'])){
+				$sql_parts['where'][] = 't.priority>='.$options['min_severity'];
 			}
 		}
 

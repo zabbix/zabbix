@@ -677,6 +677,8 @@
 	'S_MACROS'=>					'Macros',
 	'S_MACRO'=>					'Macro',
 	'S_WRONG_MACRO'=>				'Wrong macro',
+	'S_MACRO_TOO_LONG'=>			'Macros name is too long, should not exceed 64 chars.',
+	'S_MACRO_VALUE_TOO_LONG'=>		'Macros value is too long, should not exceed 255 chars.',
 	'S_MACRO_EXISTS'=>				'Macro already exists',
 	'S_NEW_MACRO'=>					'New macro',
 	'S_EMPTY_MACRO_VALUE'=>				'Empty macro value',

@@ -55,6 +55,7 @@ function create_mon_trigger_menu(e, args, items){
 								['Events','events.php?triggerid='+args[0].triggerid+'&nav_time='+args[0].lastchange,null]);
 
 	if((args.length > 1) && !is_null(args[1])) tr_menu.push(args[1]);
+	if((args.length > 1) && !is_null(args[2])) tr_menu.push(args[2]);
 
 	tr_menu.push(['Simple graphs',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}]);
 
