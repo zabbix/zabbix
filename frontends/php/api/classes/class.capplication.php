@@ -73,6 +73,7 @@ class CApplication {
 
 		$def_options = array(
 			'nodeids'				=> null,
+			'groupids'				=> null,
 			'hostids'				=> null,
 			'itemids'				=> null,
 			'applicationids'		=> null,
@@ -121,7 +122,16 @@ class CApplication {
 
 // nodeids
 		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
-
+// groupids
+		if(!is_null($options['groupids'])){
+			zbx_value2array($options['groupids']);
+			if(!is_null($options['extendoutput'])){
+				$sql_parts['select']['groupid'] = 'hg.groupid';
+			}
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['where']['ahg'] = 'a.hostid=hg.hostid';
+			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
+		}
 // hostids
 		if(!is_null($options['hostids'])){
 			zbx_value2array($options['hostids']);

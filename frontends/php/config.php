@@ -497,6 +497,14 @@
 				error(S_MACRO_EXISTS);
 				$result = false;
 			}
+			else if(strlen($macro_new) > 64){
+				error(S_MACRO_TOO_LONG.' : '.$macro_new);
+				$result = false;
+			}
+			else if(strlen($value_new) > 255){
+				error(S_MACRO_VALUE_TOO_LONG.' : '.$value_new);
+				$result = false;
+			}
 			else{
 				$result = CUserMacro::addGlobal(array(array('macro' => $macro_new, 'value' => $value_new)));
 			}
