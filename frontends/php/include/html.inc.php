@@ -233,7 +233,7 @@
 			if(($col1 == SPACE) && ($col2 == SPACE)) return new CJSscript('');
 		}
 
-		$td_l = new CCol(SPACE);
+		$td_l = new CCol(SPACE,'header_r');
 		$td_l->setAttribute('width','100%');
 
 		$right_row = array($td_l);
@@ -242,13 +242,13 @@
 			if(!is_array($col2)) $col2 = array($col2);
 
 			foreach($col2 as $num => $r_item)
-				$right_row[] = new CCol($r_item);
+				$right_row[] = new CCol($r_item,'header_r');
 		}
 
 		$right_tab = new CTable(null,'nowrap');
 		$right_tab->setAttribute('width','100%');
 
-		$right_tab->addRow($right_row, 'textblackwhite');
+		$right_tab->addRow($right_row);
 
 		$table = new CTable(NULL,'header');
 //		$table->setAttribute('border',0);

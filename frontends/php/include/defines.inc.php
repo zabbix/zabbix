@@ -43,7 +43,7 @@
 	define('ZBX_PERIOD_DEFAULT', 				ZBX_MIN_PERIOD);
 
 	define('ZBX_FONTPATH', realpath('fonts'));				// where to search for font  (GD > 2.0.18)
-	define('ZBX_GRAPH_FONT_NAME', 'FreeSans');	// font file name
+	define('ZBX_GRAPH_FONT_NAME', 'DejaVuSans');	// font file name
 /* END OF USERS DEFINES */
 
 	define('ZBX_AUTH_INTERNAL',	0);
