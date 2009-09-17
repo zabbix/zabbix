@@ -281,7 +281,7 @@ static void	process_maintenance()
 	time_t				now, db_active_since, maintenance_from;
 	zbx_timeperiod_type_t		db_timeperiod_type;
 	int				db_every, db_month, db_dayofweek, db_day, db_start_time,
-					db_period, db_date, db_maintenance_type;
+					db_period, db_start_date, db_maintenance_type;
 	static zbx_host_maintenance_t	*hm = NULL;
 	static int			hm_alloc = 4;
 	int				hm_count = 0;
@@ -302,7 +302,7 @@ static void	process_maintenance()
 
 	result = DBselect(
 			"select m.maintenanceid,m.maintenance_type,m.active_since,tp.timeperiod_type,tp.every,"
-				"tp.month,tp.dayofweek,tp.day,tp.start_time,tp.period,tp.date "
+				"tp.month,tp.dayofweek,tp.day,tp.start_time,tp.period,tp.start_date "
 			"from maintenances m,maintenances_windows mw,timeperiods tp "
 			"where m.maintenanceid=mw.maintenanceid and "
 				"mw.timeperiodid=tp.timeperiodid and "
@@ -321,13 +321,13 @@ static void	process_maintenance()
 		db_day			= atoi(row[7]);
 		db_start_time		= atoi(row[8]);
 		db_period		= atoi(row[9]);
-		db_date			= atoi(row[10]);
+		db_start_date		= atoi(row[10]);
 
 		switch (db_timeperiod_type) {
 		case TIMEPERIOD_TYPE_ONETIME:
-			if (db_date > now || now > db_date + db_period)
+			if (db_start_date > now || now > db_start_date + db_period)
 				continue;
-			maintenance_from = db_date;
+			maintenance_from = db_start_date;
 			break;
 		case TIMEPERIOD_TYPE_DAILY:
 			day = now - (int)db_active_since;

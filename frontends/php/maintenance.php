@@ -259,7 +259,7 @@ include_once('include/page_header.php');
 		else if(($new_timeperiod['hour'] > 23) || ($new_timeperiod['minute'] > 59)){
 			info(S_INCORRECT_MAINTENANCE_PERIOD);
 		}
-		else if(($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) && ($new_timeperiod['date'] < 1)){
+		else if(($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) && ($new_timeperiod['start_date'] < 1)){
 			info(S_INCORRECT_MAINTENANCE_PERIOD);
 		}
 		else if(($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_DAILY) && ($new_timeperiod['every'] < 1)){
