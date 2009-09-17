@@ -191,7 +191,7 @@ function add_timeperiod($timeperiod = array()){
 						'day' =>	0,
 						'start_time' =>	0,
 						'period' =>	3600,
-						'date' =>	time()
+						'start_date' =>	time()
 					);
 
 	if(!check_db_fields($db_fields, $timeperiod)){
@@ -201,7 +201,7 @@ function add_timeperiod($timeperiod = array()){
 
 	$timeperiodid = get_dbid('timeperiods','timeperiodid');
 
-	$result = DBexecute('INSERT INTO timeperiods (timeperiodid,timeperiod_type,every,month,dayofweek,day,start_time,period,date) '.
+	$result = DBexecute('INSERT INTO timeperiods (timeperiodid,timeperiod_type,every,month,dayofweek,day,start_time,period,start_date) '.
 				' VALUES ('.$timeperiodid.','.
 						$timeperiod['timeperiod_type'].','.
 						$timeperiod['every'].','.
@@ -210,7 +210,7 @@ function add_timeperiod($timeperiod = array()){
 						$timeperiod['day'].','.
 						$timeperiod['start_time'].','.
 						$timeperiod['period'].','.
-						$timeperiod['date'].')');
+						$timeperiod['start_date'].')');
 
 return $result?$timeperiodid:false;
 }
@@ -301,7 +301,7 @@ function shedule2str($timeperiod){
 	$str = 'At '.$timeperiod['hour'].':'.$timeperiod['minute'].' on ';
 
 	if($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME){
-		$str= 'At '.date('H',$timeperiod['date']).':'.date('i',$timeperiod['date']).' on '.date(S_DATE_FORMAT_YMD,$timeperiod['date']);
+		$str= 'At '.date('H',$timeperiod['start_date']).':'.date('i',$timeperiod['start_date']).' on '.date(S_DATE_FORMAT_YMD,$timeperiod['start_date']);
 	}
 	else if($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_DAILY){
 		$str.= 'every '.(($timeperiod['every']>1)?$timeperiod['every'].' days':'day');

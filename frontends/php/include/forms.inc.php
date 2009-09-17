@@ -3458,13 +3458,13 @@
 
 			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][timeperiod_type]',	$timeperiod['timeperiod_type']));
 
-			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][every]',				$timeperiod['every']));
-			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][month]',				$timeperiod['month']));
-			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][dayofweek]',			$timeperiod['dayofweek']));
-			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][day]',				$timeperiod['day']));
-			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][start_time]',		$timeperiod['start_time']));
-			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][date]',				$timeperiod['date']));
-			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][period]',			$timeperiod['period']));
+			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][every]',		$timeperiod['every']));
+			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][month]',		$timeperiod['month']));
+			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][dayofweek]',		$timeperiod['dayofweek']));
+			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][day]',		$timeperiod['day']));
+			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][start_time]',	$timeperiod['start_time']));
+			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][start_date]',	$timeperiod['start_date']));
+			$tblPeriod->addItem(new Cvar('timeperiods['.$id.'][period]',		$timeperiod['period']));
 		}
 		unset($timeperiods);
 
@@ -3508,7 +3508,7 @@
 		if(!isset($new_timeperiod['day']))			$new_timeperiod['day']			= 1;
 		if(!isset($new_timeperiod['hour']))			$new_timeperiod['hour']			= 12;
 		if(!isset($new_timeperiod['minute']))			$new_timeperiod['minute']		= 0;
-		if(!isset($new_timeperiod['date']))			$new_timeperiod['date']			= 0;
+		if(!isset($new_timeperiod['start_date']))		$new_timeperiod['start_date']		= 0;
 
 		if(!isset($new_timeperiod['period_days']))		$new_timeperiod['period_days']		= 0;
 		if(!isset($new_timeperiod['period_hours']))		$new_timeperiod['period_hours']		= 1;
@@ -3605,7 +3605,7 @@
 			$tblPeriod->addItem(new Cvar('new_timeperiod[month]',bindec($bit_month)));
 
 			$tblPeriod->addItem(new Cvar('new_timeperiod[day]',$new_timeperiod['day']));
-			$tblPeriod->addItem(new Cvar('new_timeperiod[date]',$new_timeperiod['date']));
+			$tblPeriod->addItem(new Cvar('new_timeperiod[start_date]',$new_timeperiod['start_date']));
 			$tblPeriod->addItem(new Cvar('new_timeperiod[month_date_type]',$new_timeperiod['month_date_type']));
 
 			$tblPeriod->addRow(array(S_EVERY_DAY_S,		new CNumericBox('new_timeperiod[every]', $new_timeperiod['every'], 3)));
@@ -3613,7 +3613,7 @@
 		else if($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_WEEKLY){
 			$tblPeriod->addItem(new Cvar('new_timeperiod[month]',bindec($bit_month)));
 			$tblPeriod->addItem(new Cvar('new_timeperiod[day]',$new_timeperiod['day']));
-			$tblPeriod->addItem(new Cvar('new_timeperiod[date]',$new_timeperiod['date']));
+			$tblPeriod->addItem(new Cvar('new_timeperiod[start_date]',$new_timeperiod['start_date']));
 			$tblPeriod->addItem(new Cvar('new_timeperiod[month_date_type]',$new_timeperiod['month_date_type']));
 
 			$tblPeriod->addRow(array(S_EVERY_WEEK_S,	new CNumericBox('new_timeperiod[every]', $new_timeperiod['every'], 2)));
@@ -3631,7 +3631,7 @@
 
 		}
 		else if($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY){
-			$tblPeriod->addItem(new Cvar('new_timeperiod[date]',$new_timeperiod['date']));
+			$tblPeriod->addItem(new Cvar('new_timeperiod[start_date]',$new_timeperiod['start_date']));
 
 			$tabMonths = new CTable();
 			$tabMonths->addRow(array(
@@ -3735,7 +3735,7 @@
 			$tblPeriod->addItem(new Cvar('new_timeperiod[month_date_type]',$new_timeperiod['month_date_type']));
 
 /***********************************************************/
-			$tblPeriod->addItem(new Cvar('new_timeperiod[date]',$new_timeperiod['date']));
+			$tblPeriod->addItem(new Cvar('new_timeperiod[start_date]',$new_timeperiod['start_date']));
 
 			$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
 
@@ -3752,22 +3752,22 @@
 			$filtertimetab->SetCellSpacing(0);
 
 			$filtertimetab->addRow(array(
-									new CNumericBox('new_timeperiod_day',(($new_timeperiod['date']>0)?date('d',$new_timeperiod['date']):''),2),
-									'/',
-									new CNumericBox('new_timeperiod_month',(($new_timeperiod['date']>0)?date('m',$new_timeperiod['date']):''),2),
-									'/',
-									new CNumericBox('new_timeperiod_year',(($new_timeperiod['date']>0)?date('Y',$new_timeperiod['date']):''),4),
-									SPACE,
-									new CNumericBox('new_timeperiod_hour',(($new_timeperiod['date']>0)?date('H',$new_timeperiod['date']):''),2),
-									':',
-									new CNumericBox('new_timeperiod_minute',(($new_timeperiod['date']>0)?date('i',$new_timeperiod['date']):''),2),
-									$clndr_icon
-							));
+					new CNumericBox('new_timeperiod_day',(($new_timeperiod['start_date']>0)?date('d',$new_timeperiod['start_date']):''),2),
+					'/',
+					new CNumericBox('new_timeperiod_month',(($new_timeperiod['start_date']>0)?date('m',$new_timeperiod['start_date']):''),2),
+					'/',
+					new CNumericBox('new_timeperiod_year',(($new_timeperiod['start_date']>0)?date('Y',$new_timeperiod['start_date']):''),4),
+					SPACE,
+					new CNumericBox('new_timeperiod_hour',(($new_timeperiod['start_date']>0)?date('H',$new_timeperiod['start_date']):''),2),
+					':',
+					new CNumericBox('new_timeperiod_minute',(($new_timeperiod['start_date']>0)?date('i',$new_timeperiod['start_date']):''),2),
+					$clndr_icon
+					));
 
 			zbx_add_post_js('create_calendar(null,'.
 							'["new_timeperiod_day","new_timeperiod_month","new_timeperiod_year","new_timeperiod_hour","new_timeperiod_minute"],'.
 							'"new_timeperiod_date",'.
-							'"new_timeperiod[date]");');
+							'"new_timeperiod[start_date]");');
 
 			$clndr_icon->addAction('onclick','javascript: '.
 												'var pos = getPosition(this); '.

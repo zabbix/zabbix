@@ -942,7 +942,7 @@ FIELD		|dayofweek	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|day		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|start_time	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|period		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|date		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|start_date	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 
 TABLE|regexps|regexpid|ZBX_SYNC
 FIELD		|regexpid	|t_id		|'0'	|NOT NULL	|0
