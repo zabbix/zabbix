@@ -28,7 +28,6 @@
 	define('TRIGGERS_OPTION_DISABLED',			0);	// reserved
 	define('TRIGGERS_OPTION_ONLYTRUE',			1);	// use 0 to disable
 	define('TRIGGERS_OPTION_ALL',				2);	// use 0 to disable
-	define('TRIGGERS_OPTION_NOFALSEFORB',		0);	// use 0 to disable
 
 	define('TRIGGER_FALSE_PERIOD', 				300);	// 30min,  0 - disable
 	define('TRIGGER_BLINK_PERIOD',				120);	// 30min,  0 - disable
@@ -38,7 +37,6 @@
 	define('EVENTS_OPTION_ALL',					2);	// use 0 to disable
 	define('EVENTS_OPTION_NOT_ACK',				3);	// use 0 to disable
 	define('EVENTS_OPTION_ONLYTRUE_NOTACK',		4);	// use 0 to disable
-	define('EVENTS_OPTION_NOFALSEFORB',			5);	//  reserved for TRIGGERS_OPTION_NOFALSEFORB, to disable set TRIGGERS_OPTION_NOFALSEFORB to 0
 
 	define('ZBX_MIN_PERIOD',					3600);				// ~1 hour
 	define('ZBX_MAX_PERIOD', 					12*31*24*3600);		// ~1 year

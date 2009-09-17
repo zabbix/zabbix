@@ -27,7 +27,7 @@ class CNumericBox extends CTextBox{
 
 		$this->addAction('onkeypress',
 			' var c = (window.event) ? event.keyCode : event.which;'.
-			' if(event.ctrlKey || c <= 31 || (c >= 48 && c <= 57)) return true; else return false; ');
+			' if(event.ctrlKey || c <= 31 || (c >= 48 && c <= 57) || (c >= 37 && c <= 40) || c==46) return true; else return false; ');
 
 		$this->addAction('onchange',
 				($allowempty ? ' if(this.value.length==0 || this.value==null) this.value = \'\'; else ' : '').

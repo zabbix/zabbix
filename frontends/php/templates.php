@@ -118,6 +118,14 @@ require_once('include/forms.inc.php');
 			error(S_MACRO_EXISTS.' : '.$macro_new);
 			show_messages(false, '', S_MACROS);
 		}
+		else if(strlen($macro_new) > 64){
+			error(S_MACRO_TOO_LONG.' : '.$macro_new);
+			show_messages(false, '', S_MACROS);
+		}
+		else if(strlen($value_new) > 255){
+			error(S_MACRO_VALUE_TOO_LONG.' : '.$value_new);
+			show_messages(false, '', S_MACROS);
+		}
 		else{
 			$_REQUEST['macros'][$macro_new]['macro'] = $macro_new;
 			$_REQUEST['macros'][$macro_new]['value'] = $value_new;
