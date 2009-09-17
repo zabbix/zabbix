@@ -1219,6 +1219,8 @@ static int	DBget_item_lastvalue_by_triggerid(zbx_uint64_t triggerid, char **last
 
 				if (SUCCEED != replace_value_by_map(tmp, valuemapid))
 					add_value_suffix(tmp, sizeof(tmp), row[3], value_type);
+				if (ITEM_VALUE_TYPE_FLOAT == value_type)
+					del_zeroes(tmp);
 
 				*lastvalue = zbx_dsprintf(*lastvalue, "%s", tmp);
 				break;
@@ -1256,7 +1258,7 @@ static int	DBget_item_value_by_triggerid(zbx_uint64_t triggerid, char **value, i
 	DB_ROW		h_row;
 	char		expression[TRIGGER_EXPRESSION_LEN_MAX];
 	zbx_uint64_t	functionid;
-	int		ret = FAIL;
+	int		value_type, ret = FAIL;
 	char		tmp[MAX_STRING_LEN], *table;
 
 	if (FAIL == DBget_trigger_expression_by_triggerid(triggerid, expression, sizeof(expression)))
@@ -1271,7 +1273,9 @@ static int	DBget_item_value_by_triggerid(zbx_uint64_t triggerid, char **value, i
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		switch (atoi(row[1])) {
+		value_type = atoi(row[1]);
+
+		switch (value_type) {
 			case ITEM_VALUE_TYPE_FLOAT:	table = "history"; break;
 			case ITEM_VALUE_TYPE_UINT64:	table = "history_uint"; break;
 			case ITEM_VALUE_TYPE_TEXT:	table = "history_text"; break;
@@ -1285,6 +1289,8 @@ static int	DBget_item_value_by_triggerid(zbx_uint64_t triggerid, char **value, i
 		h_result = DBselectN(tmp, 1);
 		if (NULL != (h_row = DBfetch(h_result)))
 		{
+			if (ITEM_VALUE_TYPE_FLOAT == value_type)
+				del_zeroes(h_row[0]);
 			*value = zbx_dsprintf(*value, "%s", h_row[0]);
 			ret = SUCCEED;
 		}
