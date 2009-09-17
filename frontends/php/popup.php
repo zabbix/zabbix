@@ -438,20 +438,19 @@ include_once('include/page_header.php');
 
 		$templates = get_request('templates', array());
 		$templates = $templates + $existed_templates;
-
 		if(!validate_templates(array_keys($templates))){
 			show_error_message('Conflict between selected templates');
 		}
 		else if(isset($_REQUEST['select'])){
 			$new_templates = array_diff($templates, $existed_templates);
 			if(count($new_templates) > 0) {
+				$script = '';
 				foreach($new_templates as $id => $name){
-					$script = 'add_variable(null,"templates['.$id.']","'.$name.'","'.$dstfrm.'",window.opener.document);'."\n";
-					$script.= 'var form = window.opener.document.forms["'.$dstfrm.'"];'.
-						        ' if(form) form.submit();'.
-								' close_window();';
+					$script .= 'add_variable(null,"templates['.$id.']","'.$name.'","'.$dstfrm.'",window.opener.document);'."\n";	
 				}
-
+				$script.= 'var form = window.opener.document.forms["'.$dstfrm.'"];'.
+					' if(form) form.submit();'.
+					' close_window();';
 				insert_js($script);
 			} // if count new_templates > 0
 
