@@ -3242,14 +3242,6 @@
 						'"mntc_active_till",'.
 						'"active_till");');
 
-		zbx_add_post_js('addListener($("hat_maintenance_icon"),'.
-									'"click",'.
-									'CLNDR["mntc_active_since"].clndr.clndrhide.bindAsEventListener(CLNDR["mntc_active_since"].clndr));');
-
-		zbx_add_post_js('addListener($("hat_maintenance_icon"),'.
-									'"click",'.
-									'CLNDR["mntc_active_till"].clndr.clndrhide.bindAsEventListener(CLNDR["mntc_active_till"].clndr));');
-
 		$tblMntc->addRow(array(S_ACTIVE_TILL, $filtertimetab));
 //-------
 
@@ -3433,7 +3425,7 @@
 			$timeperiods = get_request('timeperiods', array());
 		}
 
-		$tblPeriod->SetHeader(array(
+		$tblPeriod->setHeader(array(
 				new CCheckBox('all_periods',null,'checkAll("'.S_PERIOD.'","all_periods","g_timeperiodid");'),
 				S_PERIOD_TYPE,
 				S_SCHEDULE,
@@ -3748,8 +3740,8 @@
 			$filtertimetab = new CTable(null,'calendar');
 			$filtertimetab->setAttribute('width','10%');
 
-			$filtertimetab->SetCellPadding(0);
-			$filtertimetab->SetCellSpacing(0);
+			$filtertimetab->setCellPadding(0);
+			$filtertimetab->setCellSpacing(0);
 
 			$filtertimetab->addRow(array(
 					new CNumericBox('new_timeperiod_day',(($new_timeperiod['start_date']>0)?date('d',$new_timeperiod['start_date']):''),2),
