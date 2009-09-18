@@ -421,10 +421,8 @@ int	zbx_tcp_connect(zbx_sock_t *s,
 
 	zbx_tcp_clean(s);
 
-	if (NULL == (hp = zbx_gethost(ip))) {
-		zbx_set_tcp_strerror("Cannot resolve [%s]", ip);
-		return	FAIL;
-	}
+	if (NULL == (hp = zbx_gethost(ip)))
+		return FAIL;
 
 	servaddr_in.sin_family		= AF_INET;
 	servaddr_in.sin_addr.s_addr	= ((struct in_addr *)(hp->h_addr))->s_addr;
@@ -432,7 +430,7 @@ int	zbx_tcp_connect(zbx_sock_t *s,
 
 	if (ZBX_SOCK_ERROR == (s->socket = socket(AF_INET,SOCK_STREAM,0))) {
 		zbx_set_tcp_strerror("Cannot create socket [%s:%d] [%s]", ip, port ,strerror_from_system(zbx_sock_last_error()));
-		return	FAIL;
+		return FAIL;
 	}
 
 	if (NULL != source_ip)
