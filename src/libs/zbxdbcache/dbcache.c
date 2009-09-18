@@ -601,7 +601,7 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ITEM		item;
-	char		*value_esc;
+	char		*value_esc, *message = NULL;
 	int		sql_offset = 0, i;
 	ZBX_DC_HISTORY	*h;
 	zbx_uint64_t	*ids = NULL;
@@ -614,15 +614,14 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 	for (i = 0; i < history_num; i++)
 		uint64_array_add(&ids, &ids_alloc, &ids_num, history[i].itemid, 64);
 
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 1024,
-			"select %s where h.hostid = i.hostid and",
-			ZBX_SQL_ITEM_SELECT,
-			TRIGGER_STATUS_ENABLED);
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
+			"select itemid,status,lastclock,prevorgvalue,delta,multiplier,formula,history,trends"
+			" from items"
+			" where");
 
-	DBadd_condition_alloc(&sql, &sql_allocated, &sql_offset, "i.itemid", ids, ids_num);
+	DBadd_condition_alloc(&sql, &sql_allocated, &sql_offset, "itemid", ids, ids_num);
 
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32,
-			" order by i.itemid");
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 20, " order by itemid");
 
 	zbx_free(ids);
 
@@ -636,7 +635,7 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		DBget_item_from_db(&item, row);
+		ZBX_STR2UINT64(item.itemid, row[0]);
 
 		h = NULL;
 
@@ -651,6 +650,31 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 
 		if (NULL == h)
 			continue;
+
+		item.status	= atoi(row[1]);
+		if (SUCCEED != DBis_null(row[2]))
+			item.lastclock	= atoi(row[2]);
+		else
+			item.lastclock	= 0;
+		if (SUCCEED != DBis_null(row[3]))
+		{
+			item.prevorgvalue_null	= 0;
+			switch (h->value_type) {
+			case ITEM_VALUE_TYPE_FLOAT:
+				item.prevorgvalue_dbl = atof(row[3]);
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				ZBX_STR2UINT64(item.prevorgvalue_uint64, row[3]);
+				break;
+			}
+		}
+		else
+			item.prevorgvalue_null = 1;
+		item.delta	= atoi(row[4]);
+		item.multiplier	= atoi(row[5]);
+		item.formula	= row[6];
+		item.history	= atoi(row[7]);
+		item.trends	= atoi(row[8]);
 
 		if (zbx_process == ZBX_PROCESS_PROXY)
 		{
@@ -785,12 +809,11 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 		/* Update item status if required */
 		if (item.status == ITEM_STATUS_NOTSUPPORTED)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Parameter [%s] became supported by agent on host [%s]",
-					item.key,
-					item.host_name);
-			zabbix_syslog("Parameter [%s] became supported by agent on host [%s]",
-					item.key,
-					item.host_name);
+			message = zbx_dsprintf(message, "Parameter [" ZBX_FS_UI64 "][%s] became supported by agent",
+					item.itemid, zbx_host_key_string(item.itemid));
+			zabbix_log(LOG_LEVEL_WARNING, "%s", message);
+			zabbix_syslog("%s", message);
+			zbx_free(message);
 
 			item.status = ITEM_STATUS_ACTIVE;
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32, ",status=%d,error=''",
