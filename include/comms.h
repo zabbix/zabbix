@@ -32,9 +32,6 @@ typedef enum {
 	typedef int ZBX_SOCKET;
 #endif /* SOCKET || _WINDOWS */
 
-
-typedef struct sockaddr_in ZBX_SOCKADDR;
-
 typedef enum
 {
 	ZBX_BUF_TYPE_STAT = 0,
