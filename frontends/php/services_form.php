@@ -138,7 +138,7 @@ if(isset($_REQUEST['saction'])){
 
 		$result = DBend()?$result:false;
 
-		if(isset($serrvice['serviceid'])){
+		if(isset($service['serviceid'])){
 			show_messages($result, S_SERVICE_UPDATED, S_CANNOT_UPDATE_SERVICE);
 			$serviceid = $service["serviceid"];
 			$audit_acrion = AUDIT_ACTION_UPDATE;

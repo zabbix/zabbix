@@ -31,15 +31,12 @@
 
 include_once('include/page_header.php');
 
-	$_REQUEST['config'] = get_request('config','graphs.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields = array(
 //  NEW  templates.php; hosts.php; items.php; triggers.php; graphs.php; maintenances.php;
 // 	OLD  0 - hosts; 1 - groups; 2 - linkages; 3 - templates; 4 - applications; 5 - Proxies; 6 - maintenance
-		'config'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-
 		'groupid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	NULL),
 		'hostid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	NULL),
 
@@ -53,9 +50,7 @@ include_once('include/page_header.php');
 
 		'ymin_type'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1,2'),		null),
 		'ymax_type'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1,2'),		null),
-
 		'graphtype'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1,2,3'),		'isset({save})'),
-
 		'yaxismin'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	null,	'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
 		'yaxismax'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	null,	'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
 		'graph3d'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
@@ -63,7 +58,6 @@ include_once('include/page_header.php');
 		"ymin_itemid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	'isset({save})&&isset({ymin_type})&&({ymin_type}==3)'),		"ymax_itemid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	'isset({save})&&isset({ymax_type})&&({ymax_type}==3)'),				'percent_left'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(0,100),	null),
 		'percent_right'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(0,100),	null),
 		'visible'=>			array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),	null),
-
 		'items'=>		array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
 		'new_graph_item'=>	array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
 		'group_gid'=>		array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
@@ -76,10 +70,8 @@ include_once('include/page_header.php');
 		'group_graphid'=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID, NULL),
 		'copy_targetid'=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID, NULL),
 		'filter_groupid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, 'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
-
 // Actions
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
-
 // form
 		'add_item'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete_item'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -89,16 +81,15 @@ include_once('include/page_header.php');
 		'copy'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-
 /* other */
 		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('name',ZBX_SORT_UP);
+	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
-	$_REQUEST['go'] = get_request('go','none');
+	$_REQUEST['go'] = get_request('go', 'none');
 ?>
 <?php
 
@@ -107,10 +98,7 @@ include_once('include/page_header.php');
 	$_REQUEST['graph3d'] = get_request('graph3d', 0);
 	$_REQUEST['legend'] = get_request('legend', 0);
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
 	$available_hosts_all_nodes = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,get_current_nodeid(true));
-
-// OPTIMAZE
 	$available_graphs = CGraph::get(array('nodeids'=>get_current_nodeid(true), 'editable'=>1));
 
 // ---- <ACTIONS> ----
@@ -137,7 +125,7 @@ include_once('include/page_header.php');
 			}
 		}
 
-		if(count($items) <= 0){
+		if(empty($items)){
 			info(S_REQUIRED_ITEMS_FOR_GRAPH);
 			$result = false;
 		}
@@ -268,7 +256,7 @@ include_once('include/page_header.php');
 //------ GO -------
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_graphid'])){
 		$group_graphid = $_REQUEST['group_graphid'];
-		$group_graphid = zbx_uint_array_intersect($group_graphid,$available_graphs);
+		$group_graphid = zbx_uint_array_intersect($group_graphid, $available_graphs);
 		$result = false;
 
 		DBstart();
@@ -285,7 +273,6 @@ include_once('include/page_header.php');
 
 		show_messages($result, S_GRAPHS_DELETED, S_CANNOT_DELETE_GRAPHS);
 	}
-
 	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['copy'])&&isset($_REQUEST['group_graphid'])){
 		if(isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])){
 			if(0 == $_REQUEST['copy_type']){ /* hosts */
@@ -361,8 +348,8 @@ include_once('include/page_header.php');
 		}
 	}
 
-	$params=array();
-	$options = array('only_current_node','not_proxy_hosts');
+	$params = array();
+	$options = array('only_current_node', 'not_proxy_hosts');
 	foreach($options as $option) $params[$option] = 1;
 
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
@@ -464,11 +451,11 @@ include_once('include/page_header.php');
 			S_HEIGHT,
 			make_sorting_header(S_GRAPH_TYPE,'graphtype')));
 
-		$options = array('editable' => 1,
-						'extendoutput' => 1,
-						'select_hosts' => 1,
-						'limit' => ($config['search_limit']+1));
-
+		$options = array(
+			'editable' => 1,
+			'extendoutput' => 1,
+			'select_hosts' => 1,
+			'limit' => ($config['search_limit']+1));
 		if($PAGE_HOSTS['selected'] > 0){
 			$options['hostids'] = $PAGE_HOSTS['selected'];
 		}
@@ -478,6 +465,25 @@ include_once('include/page_header.php');
 
 		$graphs = CGraph::get($options);
 
+// Change graphtype from numbers to names, for correct sorting
+		foreach($graphs as $graphid => $graph){
+			switch($graph['graphtype']){
+				case GRAPH_TYPE_STACKED:
+					$graphtype = S_STACKED;
+				break;
+				case GRAPH_TYPE_PIE:
+					$graphtype = S_PIE;
+				break;
+				case GRAPH_TYPE_EXPLODED:
+					$graphtype = S_EXPLODED;
+				break;
+				default:
+					$graphtype = S_NORMAL;
+				break;
+			}
+			$graphs[$graphid]['graphtype'] = $graphtype;
+		}
+		
 // sorting
 		order_page_result($graphs, getPageSortField('description'), getPageSortOrder());
 		$paging = getPagingLine($graphs);
@@ -507,28 +513,13 @@ include_once('include/page_header.php');
 			$chkBox = new CCheckBox('group_graphid['.$graphid.']', NULL, NULL, $graphid);
 			if($graph['templateid'] > 0) $chkBox->setEnabled(false);
 
-			switch($graph['graphtype']){
-				case GRAPH_TYPE_STACKED:
-					$graphtype = S_STACKED;
-				break;
-				case GRAPH_TYPE_PIE:
-					$graphtype = S_PIE;
-				break;
-				case GRAPH_TYPE_EXPLODED:
-					$graphtype = S_EXPLODED;
-				break;
-				default:
-					$graphtype = S_NORMAL;
-				break;
-			}
-
 			$table->addRow(array(
 				$chkBox,
 				$host_list,
 				$name,
 				$graph['width'],
 				$graph['height'],
-				$graphtype
+				$graph['graphtype']
 			));
 		}
 
@@ -546,15 +537,13 @@ include_once('include/page_header.php');
 //----
 
 // PAGING FOOTER
-		$table = array($paging,$table,$paging,$footer);
+		$table = array($paging, $table, $paging, $footer);
 //---------
 
 		$form->addItem($table);
-
 		$graphs_wdgt->addItem($form);
 		$graphs_wdgt->show();
 	}
 
 include_once 'include/page_footer.php';
-
 ?>

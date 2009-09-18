@@ -3809,7 +3809,7 @@
 //			$tblPeriod->addRow(array(S_AT.SPACE.'('.S_HOUR.':'.S_MINUTE.')', $tabTime));
 
 		$td = new CCol(array(
-			new CButton('add_timeperiod', S_SAVE),
+			new CButton('add_timeperiod', S_ADD),
 			SPACE,
 			new CButton('cancel_new_timeperiod',S_CANCEL)
 			));
