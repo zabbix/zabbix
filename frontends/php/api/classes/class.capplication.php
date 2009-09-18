@@ -135,9 +135,6 @@ class CApplication {
 // hostids
 		if(!is_null($options['hostids'])){
 			zbx_value2array($options['hostids']);
-			if(!is_null($options['extendoutput'])){
-				$sql_parts['select']['hostid'] = 'a.hostid';
-			}
 
 			$sql_parts['where'][] = DBcondition('a.hostid', $options['hostids']);
 		}
