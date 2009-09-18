@@ -45,12 +45,18 @@
 #	define ZBX_TCP_ERROR	-1
 #	define ZBX_SOCK_ERROR	-1
 
-#	define	zbx_sock_close(s)		if( ZBX_SOCK_ERROR != (s) ) close(s)
-#	define  zbx_sock_last_error()	errno
+#	define zbx_sock_close(s)	if( ZBX_SOCK_ERROR != (s) ) close(s)
+#	define zbx_sock_last_error()	errno
 
 #	define ZBX_SOCK_ERR_TIMEDOUT	EINTR
 
 #endif /* _WINDOWS */
+
+#if defined(HAVE_IPV6)
+#	define ZBX_SOCKADDR struct sockaddr_storage
+#else
+#	define ZBX_SOCKADDR struct sockaddr_in
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -326,7 +332,7 @@ int	zbx_tcp_connect(zbx_sock_t *s,
 	int	ret = FAIL;
 	struct	addrinfo *ai = NULL, hints;
 	struct	addrinfo *ai_bind = NULL;
-	char	service[MAX_STRING_LEN];
+	char	service[8];
 
 	ZBX_TCP_START();
 
@@ -780,7 +786,7 @@ out:
 #if defined(HAVE_IPV6)
 int	zbx_tcp_accept(zbx_sock_t *s)
 {
-	struct sockaddr_storage	serv_addr;
+	ZBX_SOCKADDR		serv_addr;
 	fd_set			sock_set;
 	ZBX_SOCKET		accepted_socket;
 	socklen_t		nlen;
@@ -1042,15 +1048,9 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags)
 
 char	*get_ip_by_socket(zbx_sock_t *s)
 {
-#if defined(HAVE_IPV6)
-	struct		sockaddr_storage sa;
-#else
 	ZBX_SOCKADDR	sa;
-#endif
 	socklen_t	sz;
 	static char	buffer[64];
-
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_ip_by_socket()");
 
 	*buffer = '\0';
 
@@ -1101,14 +1101,13 @@ int	zbx_tcp_check_security(
 	)
 {
 #if defined(HAVE_IPV6)
-	struct		sockaddr_storage name;
 	struct		addrinfo hints, *ai = NULL;
 #else
-	ZBX_SOCKADDR	name;
 	struct		hostent *hp;
 	char		*sip;
 	int		i[4], j[4];
 #endif
+	ZBX_SOCKADDR	name;
 	socklen_t	nlen;
 
 	char	tmp[MAX_STRING_LEN],
@@ -1116,8 +1115,6 @@ int	zbx_tcp_check_security(
 		*start = NULL,
 		*end = NULL,
 		c = '\0';
-
-	zabbix_log( LOG_LEVEL_DEBUG, "In check_security()");
 
 	if( (1 == allow_if_empty) && ( !ip_list || !*ip_list ) )
 	{
