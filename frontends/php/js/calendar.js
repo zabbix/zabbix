@@ -27,6 +27,7 @@
 var CLNDR = new Array();			// calendar obj reference
 
 function create_calendar(time, objects, id, utime_field_id){
+
 	id = id || CLNDR.length;
 	if('undefined' == typeof(utime_field_id)) utime_field_id = null;
 	
@@ -75,7 +76,6 @@ visible: 0,				//GMenu style state
 monthname: new Array('January','February','March','April','May','June','July','August','September','October','November','December'), // months
 
 initialize: function(stime, objects, utime_field_id){
-	
 	if(!(this.status=this.checkOuterObj(objects))){
 		throw 'Calendar: constructor expects second parameter to be list of DOM nodes [d,M,Y,H,i].';
 		return false;
