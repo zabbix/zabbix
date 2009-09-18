@@ -795,6 +795,7 @@ include_once('include/page_header.php');
 
 		$form = new CForm();
 		$form->setName('items');
+		$form->addVar('hostid', $hostid);
 
 		$table  = new CTableInfo();
 // Table Header //

@@ -23,15 +23,14 @@
 	require_once('include/triggers.inc.php');
 	require_once('include/services.inc.php');
 
-	$page['title'] = "S_IT_SERVICES";
+	$page['title'] = 'S_IT_SERVICES';
 	$page['file'] = 'srv_status.php';
 	$page['scripts'] = array('services.js');
 	$page['hist_arg'] = array();
 
 	define('ZBX_PAGE_DO_REFRESH', 1);
 
-include_once "include/page_header.php";
-
+include_once 'include/page_header.php';
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -88,7 +87,7 @@ include_once "include/page_header.php";
 		$table->addRow(new CImg('chart5.php?serviceid='.$service['serviceid'].url_param('path')));
 		$table->show();
 	}
-	else {
+	else{
 		$periods = array(
 			'today' => S_TODAY,
 			'week' => S_THIS_WEEK,
@@ -104,16 +103,16 @@ include_once "include/page_header.php";
 
 		switch($period_start){
 			case 'today':
-				$period_start_sec = mktime(0, 0, 0, date('n'), date('j'), date('Y'));
+				$period_start_sec = time() - mktime(0, 0, 0, date('n'), date('j'), date('Y'));
 			break;
 			case 'week':
-				$period_start_sec = strtotime('last sunday');
+				$period_start_sec = time() - strtotime('last sunday');
 			break;
 			case 'month':
-				$period_start_sec = mktime(0, 0, 0, date('n'), 1, date('Y'));
+				$period_start_sec = time() - mktime(0, 0, 0, date('n'), 1, date('Y'));
 			break;
 			case 'year':
-				$period_start_sec = mktime(0, 0, 0, 1, 1, date('Y'));
+				$period_start_sec = time() - mktime(0, 0, 0, 1, 1, date('Y'));
 			break;
 			case 24:
 			case 24*7:
@@ -121,9 +120,6 @@ include_once "include/page_header.php";
 			case 24*365:
 				$period_start_sec = $period_start * 3600;
 			break;
-			default:
-				$period_start = 24*7;
-				$period_start_sec = $period_start * 3600;
 		}
 
 		$query = 'SELECT DISTINCT s.serviceid, sl.servicedownid, sl_p.serviceupid as serviceupid, s.triggerid, '.
@@ -140,20 +136,20 @@ include_once "include/page_header.php";
 
 		$services = array();
 		$row = array(
-						'id' => 0,
-						'serviceid' => 0,
-						'serviceupid' => 0,
-						'caption' => S_ROOT_SMALL,
-						'status' => SPACE,
-						'reason' => SPACE,
-						'sla' => SPACE,
-						'sla2' => SPACE,
-						'graph' => SPACE,
-						'linkid'=>''
-						);
+			'id' => 0,
+			'serviceid' => 0,
+			'serviceupid' => 0,
+			'caption' => S_ROOT_SMALL,
+			'status' => SPACE,
+			'reason' => SPACE,
+			'sla' => SPACE,
+			'sla2' => SPACE,
+			'graph' => SPACE,
+			'linkid'=>''
+		);
 
-		$services[0]=$row;
-		$now=time();
+		$services[0] = $row;
+		$now = time();
 
 		while($row = DBFetch($result)){
 			$row['id'] = $row['serviceid'];
@@ -162,7 +158,7 @@ include_once "include/page_header.php";
 
 			if(empty($row['serviceupid'])) $row['serviceupid']='0';
 			if(empty($row['description'])) $row['description']='None';
-			$row['graph'] = new CLink(S_SHOW,"srv_status.php?serviceid=".$row["serviceid"]."&showgraph=1".url_param('path'));
+			$row['graph'] = new CLink(S_SHOW,'srv_status.php?serviceid='.$row['serviceid'].'&showgraph=1'.url_param('path'));
 
 			if(isset($row["triggerid"]) && !empty($row["triggerid"])){
 
@@ -210,7 +206,6 @@ include_once "include/page_header.php";
 				$sizeX_red = $sizeX*$p/20;
 				$sizeX_green = $sizeX - $sizeX_red;
 
-//*
 				$sla_tab = new CTable(null,'invisible');
 
 				$chart1 = null;
@@ -250,7 +245,7 @@ include_once "include/page_header.php";
 			if(isset($services[$row['serviceid']])){
 				$services[$row['serviceid']] = zbx_array_merge($services[$row['serviceid']],$row);
 			}
-			else {
+			else{
 				$services[$row['serviceid']] = $row;
 			}
 
@@ -262,7 +257,7 @@ include_once "include/page_header.php";
 		}
 
 		$treeServ = array();
-		createShowServiceTree($services,$treeServ);	//return into $treeServ parametr
+		createShowServiceTree($services, $treeServ);	//return into $treeServ parametr
 
 		//permission issue
 		$treeServ = del_empty_nodes($treeServ);
@@ -307,9 +302,7 @@ include_once "include/page_header.php";
 			error('Can not format Tree. Check logik structure in service links');
 		}
 	}
-?>
-<?php
+
 
 include_once('include/page_footer.php');
-
 ?>

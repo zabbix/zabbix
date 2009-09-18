@@ -77,7 +77,6 @@ frontends/php/conf/maintenance.inc.php -text
 frontends/php/dashboard.php -text
 frontends/php/export.php -text
 frontends/php/fonts/DejaVuSans.ttf -text
-frontends/php/fonts/FreeSans.ttf -text
 frontends/php/fonts/kochi-gothic-subst.ttf -text
 frontends/php/fonts/kochi-mincho-subst.ttf -text
 frontends/php/hostgroups.php -text

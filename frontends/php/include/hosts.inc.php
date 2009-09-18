@@ -2076,7 +2076,7 @@ return $result;
 				' WHERE hostgroupid>0 '.
 				$sql_where.
 				' GROUP BY hg.hostid '.
-				' HAVING grp_count > 1';
+				' HAVING count(hg.groupid) > 1';
 		$res = DBselect($sql);
 		while($host = DBfetch($res)){
 			$unlnk_hostids[$host['hostid']] = $host['hostid'];
