@@ -679,12 +679,10 @@ int	DBsync_host_with_templates(
 int	DBdelete_host(
 		zbx_uint64_t hostid
 	);
-void	DBupdate_services_rec(
-		zbx_uint64_t serviceid
-	);
 void	DBupdate_services(
 		zbx_uint64_t triggerid,
-		int status
+		int status,
+		int clock
 	);
 
 /* History related functions */
