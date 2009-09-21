@@ -334,7 +334,7 @@ class CPie extends CGraphDraw{
 			ImageFilledRectangle($this->im,$this->shiftXleft,$this->sizeY+$shiftY+12*$i,$this->shiftXleft+5,$this->sizeY+$shiftY+5+12*$i,$color);
 			ImageRectangle($this->im,$this->shiftXleft,$this->sizeY+$shiftY+12*$i,$this->shiftXleft+5,$this->sizeY+$shiftY+5+12*$i,$this->GetColor('Black No Alpha'));
 
-			imageStringTTF($this->im, 9, 0, $this->shiftXleft+9,$this->sizeY+$shiftY-5+12*$i+12,
+			imagetext($this->im, 2, 0, $this->shiftXleft+9,$this->sizeY+$shiftY-5+12*$i,
 				$this->GetColor('Black No Alpha'), $str);
 			
 
@@ -344,7 +344,7 @@ class CPie extends CGraphDraw{
 			ImageFilledRectangle($this->im,$shiftX,$this->shiftY+10+5+12*$i,$shiftX+5,$this->shiftY+10+10+12*$i,$color);
 			ImageRectangle($this->im,$shiftX,$this->shiftY+10+5+12*$i,$shiftX+5,$this->shiftY+10+10+12*$i,$this->GetColor('Black No Alpha'));
 
-			imageStringTTF($this->im, 9, 0, $shiftX+9, $this->shiftY+10+12*$i+12,
+			imagetext($this->im, 2, 0, $shiftX+9, $this->shiftY+10+12*$i,
 				$this->GetColor('Black No Alpha'), $strvalue);
 		}
 

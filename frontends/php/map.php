@@ -97,7 +97,7 @@ include_once 'include/page_header.php';
 	}
 	else{
 		$x=imagesx($im)/2-ImageFontWidth(4)*strlen($name)/2;
-		imageStringTTF($im, 12, 0, $x, 12, $darkred, $name);
+		imagetext($im, 5, 0, $x, 1, $darkred, $name);
 	}
 	unset($db_image);
 
@@ -232,7 +232,7 @@ include_once 'include/page_header.php';
 				$x_label = $x + ImageSX($img);
 
 			ImageFilledRectangle($im, $x_label - 2, $y, $x_label + $w_label, $y + $h, $white);
-			imageStringTTF($im, 10, 0, $x_label, $y+12, $num == $cnt ? $color : $label_color, $str);
+			imagetext($im, 3, 0, $x_label, $y, $num == $cnt ? $color : $label_color, $str);
 
 			$y += $h;
 		}

@@ -368,7 +368,7 @@ class CUser {
 		if($user = DBfetch(DBselect($sql)))
 			$result = $user['userid'];
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Host with name: "'.$user_data['alias'].'" doesn\'t exists.');
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'User with name: "'.$user_data['alias'].'" doesn\'t exists.');
 		}
 
 	return $result;
@@ -522,7 +522,7 @@ class CUser {
 	}
 
 	/**
-	 * Add Medias for User
+	 * Update Medias for User
 	 *
 	 * {@source}
 	 * @access public

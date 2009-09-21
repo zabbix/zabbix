@@ -188,7 +188,6 @@ require_once('include/forms.inc.php');
 			$templateid = null;
 		}
 
-
 		DBstart();
 
 // CREATE NEW GROUP
@@ -214,17 +213,17 @@ require_once('include/forms.inc.php');
 			$msg_ok 	= S_TEMPLATE_UPDATED;
 			$msg_fail 	= S_CANNOT_UPDATE_TEMPLATE;
 		}
-		else {
+		else{
 			if($result = CTemplate::add(array(array('host' => $template_name, 'groupids' => $groups)))){
 				$templateid = reset($result);
 			}
 			else{
+				error(CTemplate::$error['data']);
 				$result = false;
 			}
 			$msg_ok 	= S_TEMPLATE_ADDED;
 			$msg_fail 	= S_CANNOT_ADD_TEMPLATE;
 		}
-
 		if($result){
 			$original_templates = get_templates_by_hostid($templateid);
 			$original_templates = array_keys($original_templates);
@@ -232,7 +231,6 @@ require_once('include/forms.inc.php');
 			$result &= CTemplate::linkTemplates(array('hostid' => $templateid, 'templateids' => $templates_to_link));
 		}
 // --->>> <<<---
-
 // <<<--- FULL_CLONE --->>>
 		if(!zbx_empty($templateid) && $templateid && $clone_templateid && ($_REQUEST['form'] == 'full_clone')){
 // Host applications
@@ -289,11 +287,9 @@ require_once('include/forms.inc.php');
 			}
 		}
 // --->>> <<<---
-
 // <<<--- LINK/UNLINK HOSTS --->>>
 		if($result){
 			$hosts = array_intersect($hosts, $available_hosts);
-
 //-- unlink --
 			$linked_hosts = array();
 			$db_childs = get_hosts_by_templateid($templateid);
@@ -331,26 +327,25 @@ require_once('include/forms.inc.php');
 			}
 		}
 // --->>> <<<---
-
 // MACROS {
-	if($result){
-		$macros = get_request('macros', array());
+		if($result){
+			$macros = get_request('macros', array());
 
-		$macrostoadd = array('hostid' => $templateid, 'macros' => array());
+			$macrostoadd = array('hostid' => $templateid, 'macros' => array());
 
-		foreach($macros as $macro){
-			if(!CUserMacro::validate($macro['macro'])){
-				$result = false;
-				break;
+			foreach($macros as $macro){
+				if(!CUserMacro::validate($macro['macro'])){
+					$result = false;
+					break;
+				}
+				$macrostoadd['macros'][] = $macro;
 			}
-			$macrostoadd['macros'][] = $macro;
+
+			$result = CUserMacro::update($macrostoadd);
+
+			if(!$result)
+				error('S_ERROR_ADDING_MACRO');
 		}
-
-		$result = CUserMacro::update($macrostoadd);
-
-		if(!$result)
-			error('S_ERROR_ADDING_MACRO');
-	}
 // } MACROS
 		$result = DBend($result);
 

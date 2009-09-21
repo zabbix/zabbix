@@ -154,12 +154,12 @@ include_once 'include/page_header.php';
 
 	imagefilledrectangle($im,$shiftX,$sizeY+$shiftYup+39+15*0,$shiftX+5,$sizeY+$shiftYup+35+9+15*0,imagecolorallocate($im,120,235,120));
 	imagerectangle($im,$shiftX,$sizeY+$shiftYup+39+15*0,$shiftX+5,$sizeY+$shiftYup+35+9+15*0,$black);
-	imageStringTTF($im, 9, 0, $shiftX+9, $sizeY+$shiftYup+15*0+35+11, $black, 'OK (%)');
+	imagetext($im, 2, 0, $shiftX+9, $sizeY+$shiftYup+15*0+35, $black, 'OK (%)');
 	//imagestring($im, 2,$shiftX+9,$sizeY+$shiftYup+15*0+35, 'OK (%)', $black);
 
 	imagefilledrectangle($im,$shiftX,$sizeY+$shiftYup+39+15*1,$shiftX+5,$sizeY+$shiftYup+35+9+15*1,$darkred);
 	imagerectangle($im,$shiftX,$sizeY+$shiftYup+39+15*1,$shiftX+5,$sizeY+$shiftYup+15+9+35*1,$black);
-	imageStringTTF($im, 9, 0, $shiftX+9, $sizeY+$shiftYup+15*1+35+11, $black, 'PROBLEMS (%)');
+	imagetext($im, 2, 0, $shiftX+9, $sizeY+$shiftYup+15*1+35, $black, 'PROBLEMS (%)');
 	//imagestring($im, 2,$shiftX+9,$sizeY+$shiftYup+15*1+35, 'PROBLEMS (%)', $black);
 
 	imagestringup($im,0,imagesx($im)-10,imagesy($im)-50, 'http://www.zabbix.com', $gray);
