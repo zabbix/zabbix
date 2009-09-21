@@ -619,6 +619,7 @@
 		$expr = $expression;
 		$h_status = array();
 
+		$item_count = 0;
 		/* Replace all {server:key.function(param)} and {MACRO} with '$ZBX_TR_EXPR_REPLACE_TO' */
 		while(ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT, $expr, $arr)){
 
@@ -711,15 +712,16 @@
 						}
 					}
 				}
+				$item_count++;
 			}
-			else{
-				error('An item key must be used in trigger expression');
-				return false;
-			}
-
 			$expr = $arr[ZBX_EXPRESSION_LEFT_ID].$ZBX_TR_EXPR_REPLACE_TO.$arr[ZBX_EXPRESSION_RIGHT_ID];
 		}
-
+		
+		if($item_count == 0){
+			error('An item key must be used in trigger expression');
+			return false;
+		}
+		
 		if ( isset($h_status[HOST_STATUS_TEMPLATE]) && ( count($h_status) > 1 || count($h_status[HOST_STATUS_TEMPLATE]) > 1 )){
 			error('Incorrect trigger expression. You can not use template hosts in mixed expressions.');
 			return false;
