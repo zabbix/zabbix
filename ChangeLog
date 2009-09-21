@@ -103,13 +103,15 @@ Changes for 1.7.0
  - [DEV-247] added enhancement to the Graph function (Artem)
  - [DEV-233,DEV-237] added support of scheduled maintenance periods (Artem,Sasha)
 
-Changes gor 1.6.7
+Changes for 1.6.7
 
  - [ZBX-982] fixed message when can't delete application with web items (Vedmak)
  - [ZBX-861] fixed problem with disappearing nodes in frontend (Artem)
 
 Changes for 1.6.6
 
+ - [ZBX-1024] added check for same application name in linked hosts (Vedmak)
+ - [ZBX-1014] fixed gaps on graph with fixed y axis (Artem)
  - [ZBX-1013] fixed evaluation of aggregate items for proxy hosts (Sasha)
  - [ZBX-1011] zabbix_sender will send data in blocks of 250 values per TCP connection (Sasha)
  - [DEV-417] added services[] metric for Windows agents (Sasha)
@@ -618,7 +620,7 @@ Changes for 1.4.7:
  - [ZBX-619] fixed agent crash for system.uptime under Solaris 2.5.1 (Sasha)
  - [ZBX-610] fixed memory leak in external checks (Sasha)
  - [ZBX-604] fixed compilation problems under AIX 2.5.1 (Sasha)
- - [ZBX-602] fixed possible incorrect trigger evaluation if value sotred as "delta" (Sasha)
+ - [ZBX-602] fixed possible incorrect trigger evaluation if value stored as "delta" (Sasha)
  - [ZBX-450] fixed showing status of items in maps for non English locale (Sasha)
  - [ZBX-432] set trigger value to unknown if changed item status (Sasha)
  - [DEV-198] improved displaying of disabled items in the maps (Sasha)
