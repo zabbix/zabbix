@@ -96,7 +96,7 @@ static int get_minnextcheck(int now)
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-void main_httppoller_loop(zbx_process_t p, int num)
+void main_httppoller_loop(int num)
 {
 	int	now;
 	int	nextcheck,sleeptime;
@@ -113,7 +113,7 @@ void main_httppoller_loop(zbx_process_t p, int num)
 		zbx_setproctitle("http poller [getting values]");
 
 		now=time(NULL);
-		process_httptests(p, now);
+		process_httptests(now);
 
 		zabbix_log( LOG_LEVEL_DEBUG, "Spent %d seconds while processing HTTP tests",
 			(int)time(NULL)-now);

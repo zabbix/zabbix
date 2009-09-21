@@ -31,7 +31,6 @@
 
 #ifdef	HAVE_LIBCURL
 
-static zbx_process_t	zbx_process;
 static S_ZBX_HTTPPAGE	page;
 
 /******************************************************************************
@@ -86,20 +85,7 @@ static int process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 
 	now = time(NULL);
 
-	if (0 == CONFIG_DBSYNCER_FORKS)
-		DBbegin();
-
-	switch (zbx_process) {
-	case ZBX_PROCESS_SERVER:
-		process_new_value(&item, value, now);
-		break;
-	case ZBX_PROCESS_PROXY:
-		proxy_process_new_value(&item, value, now);
-		break;
-	}
-
-	if (0 == CONFIG_DBSYNCER_FORKS)
-		DBcommit();
+	dc_add_history(&item, value, now);
 
 	DBfree_result(result);
 
@@ -560,7 +546,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
  * Comments: always SUCCEED                                                   *
  *                                                                            *
  ******************************************************************************/
-void process_httptests(zbx_process_t p, int now)
+void process_httptests(int now)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -570,8 +556,6 @@ void process_httptests(zbx_process_t p, int now)
 	INIT_CHECK_MEMORY();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_httptests()");
-
-	zbx_process	= p;
 
 	result = DBselect("select httptestid,name,applicationid,nextcheck,status,delay,macros,agent,authentication,http_user,http_password"
 			" from httptest where status=%d and nextcheck<=%d and " ZBX_SQL_MOD(httptestid,%d) "=%d" DB_NODE,

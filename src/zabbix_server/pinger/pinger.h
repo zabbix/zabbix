@@ -25,6 +25,6 @@
 extern	int	CONFIG_PINGER_FORKS;
 extern	int	CONFIG_PINGER_FREQUENCY;
 
-void	main_pinger_loop(zbx_process_t p, int num);
+void	main_pinger_loop(int num);
 
 #endif
