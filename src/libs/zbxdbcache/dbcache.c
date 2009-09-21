@@ -2265,8 +2265,7 @@ void	init_database_cache(zbx_process_t p)
 	ZBX_GET_SHM_DBCACHE_KEY(shm_key);
 
 	sz = sizeof(ZBX_DC_IDS);
-	if (0 != CONFIG_DBSYNCER_FORKS)
-		sz += sizeof(ZBX_DC_CACHE);
+	sz += sizeof(ZBX_DC_CACHE);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In init_database_cache() size:%d", (int)sz);
 
@@ -2296,16 +2295,14 @@ void	init_database_cache(zbx_process_t p)
 		exit(FAIL);
 	}
 
-	if (0 != CONFIG_DBSYNCER_FORKS)
-	{
-		cache = ptr;
-		cache->history_first = 0;
-		cache->history_num = 0;
-		cache->trends_num = 0;
-		cache->last_text = cache->text;
+	cache = ptr;
+	cache->history_first = 0;
+	cache->history_num = 0;
+	cache->trends_num = 0;
+	cache->last_text = cache->text;
 
-		ptr += sizeof(ZBX_DC_CACHE);
-	}
+	ptr += sizeof(ZBX_DC_CACHE);
+
 	ids = ptr;
 	memset(ids, 0, sizeof(ZBX_DC_IDS));
 
@@ -2361,8 +2358,7 @@ void	free_database_cache()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In free_database_cache()");
 
-	if (0 != CONFIG_DBSYNCER_FORKS)
-		DCsync_all();
+	DCsync_all();
 
 	LOCK_CACHE;
 	LOCK_CACHE_IDS;
@@ -2370,8 +2366,7 @@ void	free_database_cache()
 	ZBX_GET_SHM_DBCACHE_KEY(shm_key);
 
 	sz = sizeof(ZBX_DC_IDS);
-	if (0 != CONFIG_DBSYNCER_FORKS)
-		sz += sizeof(ZBX_DC_CACHE);
+	sz += sizeof(ZBX_DC_CACHE);
 
 	shm_id = shmget(shm_key, sz, 0);
 

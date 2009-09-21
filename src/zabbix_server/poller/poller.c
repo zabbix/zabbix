@@ -166,14 +166,7 @@ static void update_key_status(zbx_uint64_t hostid, int host_status, time_t now)
 			init_result(&agent);
 			SET_UI64_RESULT(&agent, host_status);
 
-			switch (zbx_process) {
-			case ZBX_PROCESS_SERVER:
-				process_new_value(&item, &agent, now);
-				break;
-			case ZBX_PROCESS_PROXY:
-				proxy_process_new_value(&item, &agent, now);
-				break;
-			}
+			dc_add_history(&item, &agent, now);
 
 			free_result(&agent);
 		}
@@ -248,8 +241,7 @@ static int get_values(int now, int *nextcheck)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In get_values()");
 
-	if (0 != CONFIG_DBSYNCER_FORKS)
-		DCinit_nextchecks();
+	DCinit_nextchecks();
 
 	now = time(NULL);
 	*nextcheck = FAIL;
@@ -403,23 +395,9 @@ static int get_values(int now, int *nextcheck)
 				}
 			}
 
-			if (0 == CONFIG_DBSYNCER_FORKS)
-				DBbegin();
+			dc_add_history(&item, &agent, now);
 
-			switch (zbx_process) {
-			case ZBX_PROCESS_SERVER:
-				process_new_value(&item, &agent, now);
-				break;
-			case ZBX_PROCESS_PROXY:
-				proxy_process_new_value(&item, &agent, now);
-				break;
-			}
-
-			if (0 == CONFIG_DBSYNCER_FORKS)
-				DBcommit();
-
-			if (0 != CONFIG_DBSYNCER_FORKS)
-				DCadd_nextcheck(&item, now, 0, NULL);
+			DCadd_nextcheck(&item, now, 0, NULL);
 
 			if (poller_type == ZBX_POLLER_TYPE_NORMAL || poller_type == ZBX_POLLER_TYPE_IPMI)
 				if (*nextcheck == FAIL || (item.nextcheck != 0 && *nextcheck > item.nextcheck))
@@ -438,16 +416,7 @@ static int get_values(int now, int *nextcheck)
 						item.host_name);
 			}
 
-			if (0 == CONFIG_DBSYNCER_FORKS)
-			{
-				DBbegin();
-
-				DBupdate_item_status_to_notsupported(&item, now, agent.msg);
-
-				DBcommit();
-			}
-			else
-				DCadd_nextcheck(&item, now, 0, agent.msg);
+			DCadd_nextcheck(&item, now, 0, agent.msg);
 
 			if (poller_type == ZBX_POLLER_TYPE_UNREACHABLE)
 				if (*nextcheck == FAIL || (item.nextcheck != 0 && *nextcheck > item.nextcheck))
@@ -556,8 +525,7 @@ static int get_values(int now, int *nextcheck)
 
 	DBfree_result(result);
 
-	if (0 != CONFIG_DBSYNCER_FORKS)
-		DCflush_nextchecks();
+	DCflush_nextchecks();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End get_values()");
 

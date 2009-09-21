@@ -30,8 +30,7 @@
 #include "pinger.h"
 #include "dbcache.h"
 
-static zbx_process_t	zbx_process;
-static int		pinger_num;
+static int	pinger_num;
 
 /*some defines so the `fping' and `fping6' could successfully process pings*/
 #define 	MIN_COUNT		1
@@ -99,16 +98,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 
 		if (ping_result == NOTSUPPORTED)
 		{
-			if (0 == CONFIG_DBSYNCER_FORKS)
-			{
-				DBbegin();
-
-				DBupdate_item_status_to_notsupported(&item, /*tp->time*/now, error);
-
-				DBcommit();
-			}
-			else
-				DCadd_nextcheck(&item, /*(time_t)tp->time*/now, 0, error);
+			DCadd_nextcheck(&item, /*(time_t)tp->time*/now, 0, error);
 		}
 		else
 		{
@@ -123,23 +113,9 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 				SET_DBL_RESULT(&value, *value_dbl);
 			}
 
-			if (0 == CONFIG_DBSYNCER_FORKS)
-				DBbegin();
+			dc_add_history(&item, &value, /*(time_t)tp->time*/now);
 
-			switch (zbx_process) {
-			case ZBX_PROCESS_SERVER:
-				process_new_value(&item, &value, /*(time_t)tp->time*/now);
-				break;
-			case ZBX_PROCESS_PROXY:
-				proxy_process_new_value(&item, &value, /*(time_t)tp->time*/now);
-				break;
-			}
-
-			if (0 == CONFIG_DBSYNCER_FORKS)
-				DBcommit();
-
-			if (0 != CONFIG_DBSYNCER_FORKS)
-				DCadd_nextcheck(&item, /*(time_t)tp->time*/now, 0, NULL);
+			DCadd_nextcheck(&item, /*(time_t)tp->time*/now, 0, NULL);
 
 			free_result(&value);
 		}
@@ -171,8 +147,7 @@ static void process_values(icmpitem_t *items, int first_index, int last_index, Z
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_values()");
 
-	if (0 != CONFIG_DBSYNCER_FORKS)
-		DCinit_nextchecks();
+	DCinit_nextchecks();
 
 	for (h = 0; h < hosts_count; h++)
 	{
@@ -212,8 +187,7 @@ static void process_values(icmpitem_t *items, int first_index, int last_index, Z
 			}
 	}
 
-	if (0 != CONFIG_DBSYNCER_FORKS)
-		DCflush_nextchecks();
+	DCflush_nextchecks();
 }
 
 static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *icmpping, char **addr,
@@ -609,7 +583,7 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count)
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-void main_pinger_loop(zbx_process_t p, int num)
+void main_pinger_loop(int num)
 {
 	int			now, nextcheck, sleeptime;
 	double			sec;
@@ -620,7 +594,6 @@ void main_pinger_loop(zbx_process_t p, int num)
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_pinger_loop(num:%d)",
 			num);
 
-	zbx_process = p;
 	pinger_num = num;
 
 	if (NULL == items)
