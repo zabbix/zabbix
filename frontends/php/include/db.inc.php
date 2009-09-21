@@ -286,6 +286,10 @@ if(!isset($DB)){
 
 				if($DB['STRICT']) info('POSSIBLE ERROR: Used incorrect logic in database processing, transaction not started!');
 			}
+			
+		if(!is_null($result)) 
+			$DB['TRANSACTION_STATE'] = $result && $DB['TRANSACTION_STATE'];
+		
 		return $DB['TRANSACTION_STATE'];
 		}
 

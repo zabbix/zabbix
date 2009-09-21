@@ -1171,4 +1171,60 @@
 		return true;
 	}
  
+ 
+	function imagetext($image, $fontsize, $angle, $x, $y, $color, $string){
+		$gdinfo = gd_info();
+		
+		if($gdinfo['FreeType Support']){
+		
+			$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
+			
+			switch($fontsize){
+				case 1:
+					$fontsize = 8;
+					$y_inc = 9;
+				break;
+				case 2:
+					$fontsize = 9;
+					$y_inc = 12;
+				break;
+				case 3:
+					$fontsize = 10;
+					$y_inc = 12;
+				break;
+				case 4:
+					$fontsize = 11;
+					$y_inc = 13;
+				break;
+				case 5:
+					$fontsize = 12;
+					$y_inc = 14;
+				break;
+				default:
+					$fontsize = 7;
+					$y_inc = 8;
+				break;
+			}
+			if($angle == 90){
+				$x += $y_inc;
+			}
+			else{
+				$y += $y_inc;
+			}
+			return imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
+			
+		}
+		else{
+			if($angle > 0){
+			
+				return imagestringup($image, $fontsize, $x, $y, $string, $color);
+				
+			}
+			else{
+			
+				return imagestring($image, $fontsize, $x, $y, $string, $color);
+			
+			}
+		}	
+	}
 ?>
