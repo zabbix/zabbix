@@ -258,20 +258,7 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 
 					if (SUCCEED == set_result_type(&agent, item.value_type, item.data_type, values[i].value))
 					{
-						if (0 == CONFIG_DBSYNCER_FORKS)
-							DBbegin();
-
-						switch (zbx_process) {
-						case ZBX_PROCESS_SERVER:
-							process_new_value(&item, &agent, values[i].clock);
-							break;
-						case ZBX_PROCESS_PROXY:
-							proxy_process_new_value(&item, &agent, values[i].clock);
-							break;
-						}
-
-						if (0 == CONFIG_DBSYNCER_FORKS)
-							DBcommit();
+						dc_add_history(&item, &agent, values[i].clock);
 
 						if (NULL != processed)
 							(*processed)++;

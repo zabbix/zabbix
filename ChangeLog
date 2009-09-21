@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-411] database cache is permanently enabled (Sasha)
  - [ZBX-482] fix incorrect MySQL userparameter keys in template (Richlv)
  - [ZBX-298] fix missing item parameter descriptions and examples; unify active/passive item descriptions (Richlv)
  - [DEV-420] fixed "Add host" operation for auto-discovered devices (Sasha)

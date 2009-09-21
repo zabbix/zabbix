@@ -22,6 +22,6 @@
 
 extern  int     CONFIG_HTTPPOLLER_FORKS;
 
-void	main_httppoller_loop(zbx_process_t p, int num);
+void	main_httppoller_loop(int num);
 
 #endif
