@@ -88,7 +88,7 @@ void __zbx_zabbix_syslog(const char *fmt, ...)
 		init_result(&agent);
 		SET_STR_RESULT(&agent, strdup(value_str));
 
-		process_new_value(&item, &agent, now);
+		dc_add_history(&item, &agent, now);
 
 		free_result(&agent);
 	}

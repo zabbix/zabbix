@@ -37,7 +37,6 @@
 int	evaluate_function(char *value, DB_ITEM *item, const char *function, char *parameters, time_t now);
 void    update_triggers (zbx_uint64_t itemid);
 void	update_functions(DB_ITEM *item, time_t now);
-#define process_new_value(item, value, now)	dc_add_history(item, value, now)
 void	dc_add_history(DB_ITEM *item, AGENT_RESULT *value, int now);
 
 int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, DB_ESCALATION *escalation,
