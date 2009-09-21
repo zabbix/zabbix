@@ -528,7 +528,7 @@ class CTemplate {
 
 			if(empty($template['groupids'])){
 				$result = false;
-				$error = 'No groups for host [ '.$template['host'].' ]';
+				$error = 'No groups for template [ '.$template['host'].' ]';
 				break;
 			}
 
@@ -565,7 +565,7 @@ class CTemplate {
 		if($result)
 			return $templateids;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
 			return $result;
 		}
 	}
@@ -749,7 +749,7 @@ class CTemplate {
 	 * @return boolean
 	 */
 	public static function linkTemplates($data){
-		$result = false;
+		$result = true;
 		$error = '';
 
 		$hostid = $data['hostid'];
@@ -762,8 +762,7 @@ class CTemplate {
 			if(!$result = DBexecute('INSERT INTO hosts_templates VALUES ('.$hosttemplateid.','.$hostid.','.$templateid.')'))
 				break;
 		}
-
-		if($result) {
+		if($result){
 			foreach($templateids as $templateid){
 				$result = sync_host_with_templates($hostid, $templateid);
 				if(!$result) break;

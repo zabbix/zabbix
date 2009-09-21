@@ -72,7 +72,7 @@ class CBar extends CGraphDraw{
 		$fontnum = ($this->sizeX < 500)?2:4;
 
 		$x=$this->fullSizeX/2-imagefontwidth($fontnum)*strlen($str)/2;
-		imageStringTTF($this->im, 10, 0, $x, 13, $this->GetColor('Dark Red No Alpha'), $str);
+		imagetext($this->im, 4, 0, $x, 1, $this->GetColor('Dark Red No Alpha'), $str);
 	}
 
 	public function setGridStep($step,$axis=GRAPH_YAXIS_SIDE_LEFT){
@@ -393,7 +393,7 @@ class CBar extends CGraphDraw{
 				$caption = $this->periodCaption[$key];
 				$caption = str_pad($caption,$this->maxCaption,' ', STR_PAD_LEFT);
 
-				imageStringTTF($this->im, 10, 0, 
+				imagetext($this->im, 2, 0, 
 				$i*($this->seriesWidth+$this->seriesDistance)+$this->shiftXleft+$this->shiftXCaptionLeft+round($this->seriesWidth/2), 
 				$this->sizeY+$this->shiftY+$this->shiftYCaptionBottom, $this->getColor('Black No Alpha'), $caption);
 				
@@ -420,7 +420,7 @@ class CBar extends CGraphDraw{
 				$caption = $this->periodCaption[$key];
 				$caption = str_pad($caption,$this->maxCaption,' ', STR_PAD_LEFT);
 
-				imageStringTTF($this->im, 10, 0, 
+				imagetext($this->im, 2, 0, 
 				$this->shiftXleft, 
 				($this->sizeY + $this->shiftY+$this->shiftYCaptionTop) - ($i*($this->seriesWidth+$this->seriesDistance)+$this->seriesDistance+round($this->seriesWidth/2)),
 				$this->getColor('Black No Alpha'), $caption);
@@ -455,9 +455,9 @@ class CBar extends CGraphDraw{
 
 				for($i=0;$i<=$hstr_count;$i++){
 					$str = str_pad(convert_units(($this->sizeY*$i/$hstr_count*($max-$min)/$this->sizeY+$min),$this->units[$axis]),14,' ', $str_pad);
-					imageStringTTF($this->im, 7, 0, 
+					imagetext($this->im, 0, 0, 
 						$shiftXLeft, 
-						$this->sizeY - $this->sizeY * $i / $hstr_count + 2 + $this->shiftY + $this->shiftYCaptionTop,
+						$this->sizeY - $this->sizeY * $i / $hstr_count -4 + $this->shiftY + $this->shiftYCaptionTop,
 						$this->getColor('Dark Red No Alpha'), 
 						$str);
 				}
@@ -475,7 +475,7 @@ class CBar extends CGraphDraw{
 				for($i=0;$i<=$hstr_count;$i++){
 					$str = str_pad(convert_units(($this->sizeX*$i/$hstr_count*($max-$min)/$this->sizeX+$min),$this->units[$axis]),14,' ', $str_pad);
 
-					imageStringTTF($this->im, 7, 0, 
+					imagetext($this->im, 0, 0, 
 						$this->shiftXleft + ($this->sizeX*$i/$hstr_count-4) + $this->shiftXCaptionLeft, 
 						$shiftYBottom,
 						$this->getColor('Dark Red No Alpha'), 
@@ -485,16 +485,16 @@ class CBar extends CGraphDraw{
 		}
 
 		if(!is_null($this->xLabel)){
-			imageStringTTF($this->im, 13, 0, 
+			imagetext($this->im, 4, 0, 
 				$this->shiftXleft + ($this->sizeX/2) - 20, 
-				$this->fullSizeY-12,
+				$this->fullSizeY-36,
 				$this->getColor('Black No Alpha'), 
 				$this->xLabel);
 		}
 
 		if(!is_null($this->yLabel)){
-			imageStringTTF($this->im, 13, 90, 
-				20, 
+			imagetext($this->im, 4, 90, 
+				10, 
 				$this->shiftY + ($this->sizeY/2) + 20,
 				$this->getColor('Black No Alpha'), 
 				$this->yLabel);
@@ -522,9 +522,9 @@ class CBar extends CGraphDraw{
 				imagefilledrectangle($this->im, $shiftX, $shiftY+12*$count, $shiftX+5, $shiftY+5+12*$count, $color);
 				imagerectangle($this->im,$shiftX, $shiftY+12*$count, $shiftX+5, $shiftY+5+12*$count, $this->getColor('Black No Alpha'));
 
-				$r = imageStringTTF($this->im, 9, 0, 
+				$r = imagetext($this->im, 2, 0, 
 					$shiftX+9, 
-					$shiftY-5+12*$count+12,
+					$shiftY-5+12*$count,
 					$this->getColor('Black No Alpha'), 
 					$caption);
 				

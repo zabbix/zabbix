@@ -463,11 +463,11 @@ class CChart extends CGraphDraw{
 							$this->getColor('White')
 						);
 
-			imageStringTTF($this->im,
-				9,
+			imagetext($this->im,
+				2,
 				0,
 				$this->shiftXleft+9,
-				$this->sizeY+$this->shiftY+(62-5)+12*$i+12, 
+				$this->sizeY+$this->shiftY+(62-5)+12*$i, 
 				$this->getColor('Black No Alpha'), 
 				$str
 			);
@@ -492,11 +492,11 @@ class CChart extends CGraphDraw{
 				6,
 				$this->getColor('Black No Alpha'));
 
-			imageStringTTF($this->im, 
-				9,
+			imagetext($this->im, 
+				2,
 				0,
 				$this->shiftXleft+9,
-				$this->sizeY+$this->shiftY+(62-5)+12*$i+12, 
+				$this->sizeY+$this->shiftY+(62-5)+12*$i, 
 				$this->getColor('Black No Alpha'), 
 				$trigger['description']
 			);
@@ -537,11 +537,11 @@ class CChart extends CGraphDraw{
 							$this->getColor('Black No Alpha')
 						);
 					
-					imageStringTTF($this->im, 
-						9,
+					imagetext($this->im, 
+						2,
 						0,
 						$this->shiftXleft+9,
-						$this->sizeY+$this->shiftY+(62-5)+12*$i+12, 
+						$this->sizeY+$this->shiftY+(62-5)+12*$i, 
 						$this->getColor('Black No Alpha'), 
 						sprintf($str,$percentile['percent'],convert_units($percentile['value'],$units[$side]))
 					);
@@ -1284,11 +1284,11 @@ class CChart extends CGraphDraw{
 				$str = str_pad(convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units),10,' ', STR_PAD_LEFT);
 				
 				
-				imageStringTTF($this->im, 
-					7,
+				imagetext($this->im, 
+					0,
 					0,
 					5,
-					$this->sizeY-$this->sizeY*$i/$hstr_count+2+$this->shiftY, 
+					$this->sizeY-$this->sizeY*$i/$hstr_count-4+$this->shiftY, 
 					$this->getColor('Dark Red No Alpha'), 
 					$str
 				);
@@ -1323,11 +1323,11 @@ class CChart extends CGraphDraw{
 			for($i=0;$i<=$hstr_count;$i++){
 				$str = str_pad(convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units),10,' ');
 					
-				imageStringTTF($this->im, 
-					7,
+				imagetext($this->im, 
+					0,
 					0,
 					$this->sizeX+$this->shiftXleft+2,
-					$this->sizeY-$this->sizeY*$i/$hstr_count+2+$this->shiftY, 
+					$this->sizeY-$this->sizeY*$i/$hstr_count-4+$this->shiftY, 
 					$this->getColor('Dark Red No Alpha'), 
 					$str
 				);
