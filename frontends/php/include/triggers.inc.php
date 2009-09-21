@@ -633,13 +633,14 @@ return $result;
 		$expr = $expression;
 		$h_status = array();
 
+		$item_count = 0;
 // Replace all {server:key.function(param)} and {MACRO} with '$ZBX_TR_EXPR_REPLACE_TO'
 		while(ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT, $expr, $arr)){
 			if($arr[ZBX_EXPRESSION_MACRO_ID] && !isset($ZBX_TR_EXPR_SIMPLE_MACROS[$arr[ZBX_EXPRESSION_MACRO_ID]]) ){
 				error('Unknown macro ['.$arr[ZBX_EXPRESSION_MACRO_ID].']');
 				return false;
 			}
-			else if( !$arr[ZBX_EXPRESSION_MACRO_ID] ) {
+			else if(!$arr[ZBX_EXPRESSION_MACRO_ID]){
 				$host		= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_HOST_ID];
 				$key		= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_KEY_ID];
 				$function 	= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_FUNCTION_NAME_ID];
@@ -672,13 +673,13 @@ return $result;
 							' AND h.hostid=i.hostid '.
 							' AND '.DBin_node('h.hostid', get_current_nodeid(false));
 
-				if(!$item = DBfetch(DBselect($sql)) ){
+				if(!$item = DBfetch(DBselect($sql))){
 					error('No such monitored parameter ('.$key.') for host ('.$host.')');
 					return false;
 				}
 
 // Check function
-				if(!isset($ZBX_TR_EXPR_ALLOWED_FUNCTIONS[$function]) ){
+				if(!isset($ZBX_TR_EXPR_ALLOWED_FUNCTIONS[$function])){
 					error('Unknown function ['.$function.']');
 					return false;
 				}
@@ -724,13 +725,15 @@ return $result;
 						}
 					}
 				}
+				$item_count++;
 			}
-			else{
-				error('An item key must be used in trigger expression');
-				return false;
-			}
-
+			
 			$expr = $arr[ZBX_EXPRESSION_LEFT_ID].$ZBX_TR_EXPR_REPLACE_TO.$arr[ZBX_EXPRESSION_RIGHT_ID];
+		}
+		
+		if($item_count == 0){
+			error('An item key must be used in trigger expression');
+			return false;
 		}
 
 		if ( isset($h_status[HOST_STATUS_TEMPLATE]) && ( count($h_status) > 1 || count($h_status[HOST_STATUS_TEMPLATE]) > 1 )){
@@ -744,11 +747,9 @@ return $result;
 		$expt_term = '((\('.$expt_number.'\))|('.$expt_number.'))';
 		$expr_format = '(('.$expt_term.ZBX_PREG_SPACES.ZBX_PREG_SIGN.ZBX_PREG_SPACES.$expt_term.')|(\('.$expt_term.'\)))';
 		$expr_full_format = '((\('.$expr_format.'\))|('.$expr_format.'))';
-
 		while($res = preg_match('/'.$expr_full_format.'(.*)$/u', $expr, $arr)){
-			$expr = substr($expr, 0, strpos($expr, $arr[1])).$ZBX_TR_EXPR_REPLACE_TO.$arr[58];
+			$expr = substr($expr, 0, strpos($expr, $arr[1])).$ZBX_TR_EXPR_REPLACE_TO.$arr[82];
 		}
-
 
 /* OLD EREG
 //Replace all calculations and numbers with '$ZBX_TR_EXPR_REPLACE_TO'
