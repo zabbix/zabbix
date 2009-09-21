@@ -330,9 +330,7 @@ static int	DBget_service_status(
  *           !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-void	DBupdate_services_rec(
-		zbx_uint64_t serviceid
-	)
+static void	DBupdate_services_rec(zbx_uint64_t serviceid, int clock)
 {
 	int	status;
 	zbx_uint64_t	serviceupid;
@@ -357,7 +355,7 @@ void	DBupdate_services_rec(
 		{
 			status = DBget_service_status(serviceupid, algorithm, 0);
 
-			DBadd_service_alarm(serviceupid,status,time(NULL));
+			DBadd_service_alarm(serviceupid, status, clock);
 			DBexecute("update services set status=%d where serviceid=" ZBX_FS_UI64,
 				status,
 				serviceupid);
@@ -378,7 +376,7 @@ void	DBupdate_services_rec(
 	while((row=DBfetch(result)))
 	{
 		ZBX_STR2UINT64(serviceupid,row[0]);
-		DBupdate_services_rec(serviceupid);
+		DBupdate_services_rec(serviceupid, clock);
 	}
 	DBfree_result(result);
 }
@@ -408,9 +406,11 @@ static void DBupdate_services_status_all(void)
 		serviceid = 0,
 		triggerid = 0;
 
-	int	status = 0;
+	int	status = 0, clock;
 
 	DBclear_parents_from_trigger(0);
+
+	clock = time(NULL);
 
 	result = DBselect("SELECT s.serviceid,s.algorithm,s.triggerid "
 			" FROM services AS s "
@@ -427,7 +427,7 @@ static void DBupdate_services_status_all(void)
 			status,
 			serviceid);
 
-		DBadd_service_alarm(serviceid, status, time(NULL));
+		DBadd_service_alarm(serviceid, status, clock);
 	}
 	DBfree_result(result);
 
@@ -439,7 +439,7 @@ static void DBupdate_services_status_all(void)
 	while( (rows = DBfetch(result)) )
 	{
 		ZBX_STR2UINT64(serviceid, rows[0]);
-		DBupdate_services_rec(serviceid);
+		DBupdate_services_rec(serviceid, clock);
 	}
 	DBfree_result(result);
 }
@@ -460,10 +460,7 @@ static void DBupdate_services_status_all(void)
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-void	DBupdate_services(
-		zbx_uint64_t triggerid,
-		int status
-	)
+void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -480,8 +477,8 @@ void	DBupdate_services(
 				status,
 				serviceid);
 
-		DBadd_service_alarm(serviceid, status, time(NULL));
-		DBupdate_services_rec(serviceid);
+		DBadd_service_alarm(serviceid, status, clock);
+		DBupdate_services_rec(serviceid, clock);
 	}
 
 	DBfree_result(result);
