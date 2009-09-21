@@ -2347,7 +2347,7 @@
 								break;
 						}
 
-						if(mb_strlen($description, S_HTML_CHARSET) > 25) $description = mb_substr($description,0,22, S_HTML_CHARSET).'...';
+						if(mb_strlen($description, S_HTML_CHARSET) > 15) $description = mb_substr($description,0,12, S_HTML_CHARSET).'...';
 						
 						$item_menu[$action][] = array(
 							$description, null,
@@ -2378,7 +2378,7 @@
 
 				if(isset($tr_ov_menu))
 				{
-					$tr_ov_menu  = new CPUMenu($tr_ov_menu,170);
+					$tr_ov_menu  = new CPUMenu($tr_ov_menu, 200);
 					$status_col->OnClick($tr_ov_menu->GetOnActionJS());
 					$status_col->AddAction('onmouseover',
 						'this.old_border=this.style.border; this.style.border=\'1px dotted #0C0CF0\'');
