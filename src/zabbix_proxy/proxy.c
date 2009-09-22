@@ -274,7 +274,7 @@ void	init_config(void)
 	}
 	if(APP_PID_FILE == NULL)
 	{
-		APP_PID_FILE=strdup("/tmp/zabbix_server.pid");
+		APP_PID_FILE=strdup("/tmp/zabbix_proxy.pid");
 	}
 	if(CONFIG_ALERT_SCRIPTS_PATH == NULL)
 	{
