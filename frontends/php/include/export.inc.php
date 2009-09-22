@@ -375,11 +375,17 @@ class zbxXML{
 		$array = array();
 		foreach(self::$ZBX_EXPORT_MAP[$tag]['attributes'] as $attr => $value){
 			if($value == '') $value = $attr;
-			$array[$attr] = (string) $xml[$value];
+			
+			if(!empty($xml[$value])){
+				$array[$attr] = (string) $xml[$value];
+			}
 		}
 		foreach(self::$ZBX_EXPORT_MAP[$tag]['elements'] as $el => $value){
 			if($value == '') $value = $el;
-			$array[$el] = (string) $xml->$value;
+			
+			if(!empty($xml->$value)){
+				$array[$el] = (string) $xml->$value;
+			}
 		}
 
 		return $array;
@@ -454,28 +460,32 @@ class zbxXML{
 
 // HOST PROFILES
 				$profile = $host->xpath('host_profile');
-				$profile = $profile[0];
+				if($profile){
+					$profile = $profile[0];
 
-				delete_host_profile($current_hostid);
-				add_host_profile($current_hostid,
-					(string) $profile->devicetype,
-					(string) $profile->name,
-					(string) $profile->os,
-					(string) $profile->serialno,
-					(string) $profile->tag,
-					(string) $profile->macaddress,
-					(string) $profile->hardware,
-					(string) $profile->software,
-					(string) $profile->contact,
-					(string) $profile->location,
-					(string) $profile->notes
-				);
+					delete_host_profile($current_hostid);
+					add_host_profile($current_hostid,
+						(string) $profile->devicetype,
+						(string) $profile->name,
+						(string) $profile->os,
+						(string) $profile->serialno,
+						(string) $profile->tag,
+						(string) $profile->macaddress,
+						(string) $profile->hardware,
+						(string) $profile->software,
+						(string) $profile->contact,
+						(string) $profile->location,
+						(string) $profile->notes
+					);
+				}
 
 				$profile_ext = $host->xpath('host_profiles_ext');
-				$profile_ext = $profile_ext[0];
-				$profile_ext_db = self::mapXML2arr($profile_ext, XML_TAG_HOSTPROFILE_EXT);
-				delete_host_profile_ext($current_hostid);
-				add_host_profile_ext($current_hostid, $profile_ext_db);
+				if($profile_ext){
+					$profile_ext = $profile_ext[0];
+					$profile_ext_db = self::mapXML2arr($profile_ext, XML_TAG_HOSTPROFILE_EXT);
+					delete_host_profile_ext($current_hostid);
+					add_host_profile_ext($current_hostid, $profile_ext_db);
+				}
 
 // MACROS
 				$macros = $host->xpath('macros/macro');
@@ -548,8 +558,8 @@ class zbxXML{
 							$items_to_add[] = $item_db;
 						}
 					}
-// sdii($items_to_upd);
-//sdii($items_to_add);
+ // sdii($items_to_upd);
+ //sdii($items_to_add);
 					CItem::add($items_to_add);
 					CItem::update($items_to_upd);
 				}
@@ -636,6 +646,9 @@ class zbxXML{
 
 							$data = explode(':', $gitem_db['host_key_']);
 							$gitem_host = array_shift($data);
+							if($gitem_host == '{HOSTNAME}'){
+								$gitem_host = $host_db['host'];
+							}
 							$gitem_key = implode(':', $data);
 
 
@@ -687,6 +700,7 @@ class zbxXML{
 
 
 	}
+
 }
 
 ?>
