@@ -1368,7 +1368,7 @@
 					else
 					{
 						$link = new CLink($function_data["host"].":".$function_data["key_"],
-							'history.php?action='.( $function_data["value_type"] ==0 ? 'showvalues' : 'showgraph').
+							'history.php?action='.( in_array($function_data["value_type"], array(1, 2, 4)) ? 'showvalues' : 'showgraph').
 							'&itemid='.$function_data['itemid']);
 					
 						$exp .= '{'.$link->ToString().'.'.bold($function_data["function"].'(').$function_data["parameter"].bold(')').'}';
