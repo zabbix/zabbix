@@ -600,12 +600,10 @@
     function    analyze_expression($expression)
     {
 		global $ZBX_TR_EXPR_ALLOWED_MACROS, $ZBX_TR_EXPR_REPLACE_TO, $ZBX_TR_EXPR_ALLOWED_FUNCTIONS;
-
 		if (empty($expression)) return array('', null, null);
 
 		$temp = array();
 		$expr = $expression;
-
 		/* Replace all {server:key.function(param)} and {MACRO} with '$ZBX_TR_EXPR_REPLACE_TO' */
 		while (mb_ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT_MB, $expr, $arr))
 		{
@@ -625,8 +623,8 @@
 
 		/* Replace all '$ZBX_TR_EXPR_REPLACE_TO $ZBX_EREG_SIGN $ZBX_EREG_NUMBER' number with '$expr_full_replace_to' */
 		$expr_full_replace_to = $ZBX_TR_EXPR_REPLACE_TO . '_full';
-        $expr_full_token = '^([[:print:]]*)(' . $ZBX_TR_EXPR_REPLACE_TO .
-            ZBX_EREG_SPACES . ZBX_EREG_SIGN . ZBX_EREG_SPACES . ZBX_EREG_NUMBER . ')([[:print:]]*)$';
+        $expr_full_token = '^([[:print:]]*?)([\(]{0,2}' . $ZBX_TR_EXPR_REPLACE_TO .
+            ZBX_EREG_SPACES . '[\)]?' . ZBX_EREG_SIGN . ZBX_EREG_SPACES . ZBX_EREG_NUMBER . '[\)]?)([[:print:]]*)$';
         while (mb_ereg($expr_full_token, $expr, $arr))
         {
             array_push($temp, array('sign' => $arr[4], 'value' => $arr[6]));
@@ -2348,9 +2346,9 @@
 								$status_bar = S_SHOW_VALUES_OF_ITEM.' \''.$description.'\'';
 								break;
 						}
-						
-						if(strlen($description) > 25) $description = substr($description,0,22).'...';
 
+						if(mb_strlen($description, S_HTML_CHARSET) > 15) $description = mb_substr($description,0,12, S_HTML_CHARSET).'...';
+						
 						$item_menu[$action][] = array(
 							$description, null,
 							new CScript("function(){ PopUp('history.php?action=".$action.'&itemid='.$item_data['itemid']."&period=3600');}"));
@@ -2358,8 +2356,7 @@
 					if(isset($item_menu['showgraph']))
 					{
 						$tr_ov_menu[] = array(S_GRAPHS,	null, null,
-							array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
-							);
+							array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
 						$tr_ov_menu = array_merge($tr_ov_menu, $item_menu['showgraph']);
 					}
 					if(isset($item_menu['showlatest']))
@@ -2381,7 +2378,7 @@
 
 				if(isset($tr_ov_menu))
 				{
-					$tr_ov_menu  = new CPUMenu($tr_ov_menu,170);
+					$tr_ov_menu  = new CPUMenu($tr_ov_menu, 200);
 					$status_col->OnClick($tr_ov_menu->GetOnActionJS());
 					$status_col->AddAction('onmouseover',
 						'this.old_border=this.style.border; this.style.border=\'1px dotted #0C0CF0\'');
@@ -2586,7 +2583,8 @@
 					$complite_expr.=' & ';
 				}
 			}
-			$expr = '&'.$expression['value'];
+			//$expr = '&'.$expression['value'];
+			$expr = '&'.$expression['view'];
 			$expr = preg_replace('/\s+(\&|\|){1,2}\s+/U','$1',$expr);
 			
 			$expr_array = array();
@@ -2594,7 +2592,7 @@
 			$sub_expr = '';
 
 			$multi = preg_match("/.+(\&|\|).+/", $expr);
-
+			
 			while(mb_eregi($ZBX_EREG_EXPESSION_FUNC_FORMAT, $expr, $arr)){
 				$arr[4] = strtolower($arr[4]);
 

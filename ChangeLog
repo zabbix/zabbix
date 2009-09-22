@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [NTP-30] fixed processing of multi byte strings for item.lastvalue field (sasha)
  - [NTP-49] trigger functions str, regexp and iregexp now supports text items (Sasha)
  - [NTP-51] fixed deletion of httptests (Vedmak)
  - [NTP-47] added htmlentities check in monitoring triggers and events pages (Artem)

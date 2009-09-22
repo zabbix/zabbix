@@ -600,7 +600,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now, int ms)
  ******************************************************************************/
 static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 {
-	char		*value_esc;
+	char		*value_esc, encoding[16];
 	zbx_uint64_t	value_uint64;
 	double		value_double;
 
@@ -767,14 +767,41 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 		if (NULL == GET_STR_RESULT(value))
 			break;
 
+		*encoding = '\0';
+		get_key_param(item->key, 3, encoding, sizeof(encoding));
+
 		value_esc = DBdyn_escape_string(value->str);
-		DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d,lastlogsize=%d"
-				" where itemid=" ZBX_FS_UI64,
-				item->nextcheck,
-				value_esc,
-				(int)now,
-				item->lastlogsize,
-				item->itemid);
+		if (0 == strcmp(encoding, "sjis") || 0 == strcmp(encoding, "cp932") ||
+				0 == strcmp(encoding, "ujis") || 0 == strcmp(encoding, "eucjpms"))
+		{
+			DBexecute("update items"
+					" set nextcheck=%d,"
+						"prevvalue=lastvalue,"
+						"lastvalue=cast(_%s'%s' as char character set utf8),"
+						"lastclock=%d,"
+						"lastlogsize=%d"
+					" where itemid=" ZBX_FS_UI64,
+					item->nextcheck,
+					encoding, value_esc,
+					(int)now,
+					item->lastlogsize,
+					item->itemid);
+		}
+		else
+		{
+			DBexecute("update items"
+					" set nextcheck=%d,"
+						"prevvalue=lastvalue,"
+						"lastvalue='%s',"
+						"lastclock=%d,"
+						"lastlogsize=%d"
+					" where itemid=" ZBX_FS_UI64,
+					item->nextcheck,
+					value_esc,
+					(int)now,
+					item->lastlogsize,
+					item->itemid);
+		}
 		zbx_free(value_esc);
 		break;
 	}
