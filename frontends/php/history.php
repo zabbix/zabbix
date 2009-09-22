@@ -36,7 +36,6 @@
 	}
 
 include_once "include/page_header.php";
-	
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -151,6 +150,7 @@ include_once "include/page_header.php";
 		if($item_type == ITEM_VALUE_TYPE_LOG)
 		{
 			$l_header = new CForm();
+			$l_header->setMethod('get');
 			$l_header->SetName("loglist");
 			$l_header->AddVar("action",$_REQUEST["action"]);
 			$l_header->AddVar("from",$_REQUEST["from"]);
