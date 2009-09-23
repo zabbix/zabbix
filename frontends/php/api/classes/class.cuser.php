@@ -77,12 +77,14 @@ class CUser {
 			'nodeids'					=> null,
 			'usrgrpids'					=> null,
 			'userids'					=> null,
+			'users' 					=> null,
 			'type'						=> null,
 			'status'					=> null,
 			'with_gui_access'			=> null,
 			'with_api_access'			=> null,
 // OutPut
 			'extendoutput'				=> null,
+			'editable'					=> null,
 			'select_usrgrps'			=> null,
 			'get_access'				=> null,
 			'count'						=> null,
@@ -121,6 +123,12 @@ class CUser {
 		if(!is_null($options['userids'])){
 			zbx_value2array($options['userids']);
 			$sql_parts['where'][] = DBcondition('u.userid', $options['userids']);
+		}
+		
+// users
+		if(!is_null($options['users'])){
+			zbx_value2array($options['users']);
+			$sql_parts['where'][] = DBcondition('u.alias', $options['users'], false, true);
 		}
 
 // type
@@ -230,8 +238,10 @@ class CUser {
 			}
 		}
 
-		if($options['get_access'] != 0){
+		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
 
+		
+		if($options['get_access'] != 0){
 			foreach($result as $userid => $user){
 				$result[$userid] += array('api_access' => 0, 'gui_access' => 0, 'debug_mode' => 0, 'users_status' => 0);
 			}
@@ -248,9 +258,6 @@ class CUser {
 				$result[$useracc['userid']] = zbx_array_merge($result[$useracc['userid']], $useracc);
 			}
 		}
-
-		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
-
 // Adding Objects
 // Adding usegroups
 		if($options['select_usrgrps']){
@@ -272,7 +279,7 @@ class CUser {
 	 *
 	 * @static
 	 * @param _array $user
-	 * @param array $user['login']
+	 * @param array $user['user']
 	 * @param array $user['password']
 	 * @return string session ID
 	 */
@@ -297,27 +304,6 @@ class CUser {
 	 */
 	public static function checkAuth($session){
 		return check_authentication($session['sessionid']);
-	}
-
-	/**
-	 * get API Access status
-	 *
-	 * @static
-	 * @param _array $user
-	 * @param array $user['user']
-	 * @return boolean
-	 */
-	public static function apiAccess($user){
-		$sql = 'SELECT min(g.api_access) as access
-				FROM usrgrp g, users_groups ug, users u
-				WHERE ug.usrgrpid=g.usrgrpid
-					AND u.userid=ug.userid
-					AND u.alias='.zbx_dbstr($user['user']).
-					' AND '.DBin_node('u.userid', get_current_nodeid(false)).
-				' GROUP BY u.userid';
-
-		$access = DBfetch(DBselect($sql));
-		return $access['access'] ? true : false;
 	}
 
 	/**

@@ -39,9 +39,24 @@ public static $result;
 		list($resource, $action) = explode('.',$method);
 // Authentication
 
-		if(is_null($sessionid) && (($resource != 'user') || ($action != 'authenticate')  || !CUser::apiAccess($params))){
+		if(($resource == 'user') && ($action == 'authenticate')){
+			$user = CUser::get(array('users' => $params['user'], 'extendoutput' => 1, 'get_access' => 1));
+			$user = reset($user);
+			if(!$user['api_access']){
+				self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'No API access');
+				return self::$result;
+			}
+		}
+		
+		if(is_null($sessionid) && (($resource != 'user') || ($action != 'authenticate'))){
 			self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
 			return self::$result;
+		}
+		else if(!is_null($sessionid)){
+			if(!CUser::checkAuth(array('sessionid' => $sessionid))){
+				self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
+				return self::$result;
+			}
 		}
 		
 		$class_name = 'C'.$resource; 
@@ -51,34 +66,7 @@ public static $result;
 		}
 		
 		call_user_func(array('self', $resource), $action, $params);
-/*		
-		switch($resource){
-			case 'user':
-				self::user($action, $params);
-				break;
-			case 'hostgroup':
-				self::hostgroup($action, $params);
-				break;
-			case 'template':
-				self::template($action, $params);
-				break;
-			case 'host':
-				self::host($action, $params);
-				break;
-			case 'item':
-				self::item($action, $params);
-				break;
-			case 'trigger':
-				self::trigger($action, $params);
-				break;
-			case 'graph':
-				self::graph($action, $params);
-				break;
-			default:
-				self::$result = array('error'=>ZBX_API_ERROR_PARAMETERS);
-			break;
-		}
-*/
+
 	return self::$result;
 	}
 

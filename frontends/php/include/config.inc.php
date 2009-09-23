@@ -71,7 +71,8 @@ function __autoload($class_name){
 
 	require_once('include/nodes.inc.php');
 	require_once('include/hosts.inc.php');
-
+	
+	require_once('include/users.inc.php');
 // GLOBALS
 	global $USER_DETAILS, $USER_RIGHTS;
 
