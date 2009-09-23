@@ -375,15 +375,15 @@ class zbxXML{
 		$array = array();
 		foreach(self::$ZBX_EXPORT_MAP[$tag]['attributes'] as $attr => $value){
 			if($value == '') $value = $attr;
-			
-			if(!empty($xml[$value])){
+
+			if(!(((string) $xml[$value]) == '')){
 				$array[$attr] = (string) $xml[$value];
 			}
 		}
 		foreach(self::$ZBX_EXPORT_MAP[$tag]['elements'] as $el => $value){
 			if($value == '') $value = $el;
-			
-			if(!empty($xml->$value)){
+
+			if(!(((string) $xml->$value) == '')){
 				$array[$el] = (string) $xml->$value;
 			}
 		}
@@ -573,8 +573,9 @@ class zbxXML{
 					$triggers_to_upd = array();
 					foreach($triggers as $trigger){
 						$trigger_db = self::mapXML2arr($trigger, XML_TAG_TRIGGER);
+						$trigger_db['expression'] = str_replace('{{HOSTNAME}:', '{'.$host_db['host'].':', $trigger_db['expression']);
 						$current_triggerid = CTrigger::getId(array('description' => $trigger_db['description'], 'host' => $host_db['host'], 'expression' => $trigger_db['expression']));
- // sdi('trigger: '.$trigger_db['description'].' | triggerID: '. $current_triggerid);
+// sdi('trigger: '.$trigger_db['description'].' | triggerID: '. $current_triggerid);
 // sdi(isset($rules['trigger']['missed']));
 						if(!$current_triggerid && !isset($rules['trigger']['missed'])) continue; // break if update nonexist
 						if($current_triggerid && !isset($rules['trigger']['exist'])) continue; // break if not update exist
@@ -593,7 +594,9 @@ class zbxXML{
 					}
 // sdii($triggers_to_add);
 // sdii($triggers_to_upd);
-					$added_triggers = CTrigger::add($triggers_to_add);
+					$add_result = CTrigger::add($triggers_to_add);
+					if($add_result !== false) $added_triggers = $add_result;
+					
 					CTrigger::update($triggers_to_upd);
 
 					$triggers_for_dependencies = array_merge($triggers_for_dependencies, $added_triggers);

@@ -40,6 +40,8 @@ public static $result;
 // Authentication
 
 		if(($resource == 'user') && ($action == 'authenticate')){
+			$sessionid = null;
+			
 			$user = CUser::get(array('users' => $params['user'], 'extendoutput' => 1, 'get_access' => 1));
 			$user = reset($user);
 			if(!$user['api_access']){
@@ -48,11 +50,11 @@ public static $result;
 			}
 		}
 		
-		if(is_null($sessionid) && (($resource != 'user') || ($action != 'authenticate'))){
+		if(empty($sessionid) && (($resource != 'user') || ($action != 'authenticate'))){
 			self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
 			return self::$result;
 		}
-		else if(!is_null($sessionid)){
+		else if(!empty($sessionid)){
 			if(!CUser::checkAuth(array('sessionid' => $sessionid))){
 				self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
 				return self::$result;
@@ -79,7 +81,6 @@ public static $result;
 			default:
 			$result = call_user_func(array('CUser', $action), $params);
 		}
-		
 		if($result !== false)
 			self::$result = array('result' => $result);
 		else
