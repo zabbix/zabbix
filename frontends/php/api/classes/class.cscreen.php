@@ -179,8 +179,8 @@ class CScreen{
 				}
 			}
 		}
-		
-		
+
+
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){}
 		else{
 			if(!empty($result)){
@@ -189,13 +189,13 @@ class CScreen{
 				$maps_to_check = array();
 				$screens_to_check = array();
 				$screens_items = array();
-				
+
 				$db_sitems = DBselect('SELECT * FROM screens_items WHERE '.DBcondition('screenid', $screenids));
 				while($sitem = DBfetch($db_sitems)){
 					$screens_items[$sitem['screenitemid']] = $sitem;
-						
+
 					if($sitem['resourceid'] == 0) continue;
-					
+
 					switch($sitem['resourcetype']){
 						case SCREEN_RESOURCE_GRAPH:
 							$graphs_to_check[] = $sitem['resourceid'];
@@ -215,18 +215,18 @@ class CScreen{
 	// sdii($items_to_check);
 	// sdii($maps_to_check);
 	// sdii($screens_to_check);
-			
+
 				$allowed_graphs = CGraph::get(array('graphids' => $graphs_to_check, 'editable' => isset($options['editable'])));
 				$allowed_items = CItem::get(array('itemids' => $items_to_check, 'editable' => isset($options['editable'])));
-				$allowed_maps = CMap::get(array('sysmapids' => $maps_to_check, 'editable' => isset($options['editable'])));	
+				$allowed_maps = CMap::get(array('sysmapids' => $maps_to_check, 'editable' => isset($options['editable'])));
 				$allowed_screens = CScreen::get(array('screenids' => $screens_to_check, 'editable' => isset($options['editable'])));
-					
-				$restr_graphs = array_diff($graphs_to_check, $allowed_graphs); 
-				$restr_items = array_diff($items_to_check, $allowed_items); 
-				$restr_maps = array_diff($maps_to_check, $allowed_maps); 
-				$restr_screens = array_diff($screens_to_check, $allowed_screens); 
-				
-				
+
+				$restr_graphs = array_diff($graphs_to_check, $allowed_graphs);
+				$restr_items = array_diff($items_to_check, $allowed_items);
+				$restr_maps = array_diff($maps_to_check, $allowed_maps);
+				$restr_screens = array_diff($screens_to_check, $allowed_screens);
+
+
 				foreach($restr_graphs as $resourceid){
 					foreach($screens_items as $screen_itemid => $screen_item){
 						if(($screen_item['resourceid'] == $resourceid) && ($screen_item['resourcetype'] == SCREEN_RESOURCE_GRAPH)){
@@ -261,11 +261,11 @@ class CScreen{
 				}
 			}
 		}
-		
-		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
-		
 
-// Adding Items		
+		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
+
+
+// Adding Items
 		if($options['select_items']){
 			if(!isset($screens_items)){
 				$db_sitems = DBselect('SELECT * FROM screens_items WHERE '.DBcondition('screenid', $screenids));
@@ -322,7 +322,7 @@ class CScreen{
  * @since 1.8
  * @version 1
  *
- * @param _array $screens 
+ * @param _array $screens
  * @param string $screens['name']
  * @param array $screens['hsize']
  * @param int $screens['vsize']
@@ -354,8 +354,8 @@ class CScreen{
 				" VALUES ($screenid, ".zbx_dbstr($screen['name']). ", {$screen['hsize']}, {$screen['vsize']})";
 			$result = DBexecute($sql);
 
-			if(!$result) break;			
-			
+			if(!$result) break;
+
 			$result_ids[$screenid] = $screenid;
 		}
 		$result = DBend($result);
@@ -386,7 +386,7 @@ class CScreen{
  * @return boolean
  */
 	public static function update($screens){
-	
+
 		$result = false;
 
 		DBstart(false);
@@ -403,7 +403,7 @@ class CScreen{
 				$result = false;
 				break;
 			}
-			
+
 			$sql = 'UPDATE screens SET name='.zbx_dbstr($name).", hsize={$screen['hsize']}, vsize={$screen['vsize']}
 				WHERE screenid={$screen['screenid']}";
 			$result = DBexecute($sql);
@@ -436,7 +436,7 @@ class CScreen{
  */
 	public static function delete($screenids){
 		$result = true;
-		
+
 		DBstart(false);
 		foreach($screenids as $screenid){
 			$result = DBexecute('DELETE FROM screens_items WHERE screenid='.$screenid);
@@ -447,7 +447,7 @@ class CScreen{
 			if(!$result) break;
 		}
 		$result = DBend($result);
-		
+
 		if($result)
 			return true;
 		else{
@@ -482,14 +482,14 @@ class CScreen{
  * @param int $screen_items['url']
  * @param int $screen_items['dynamic']
  * @return boolean
- */	
+ */
 	public static function setItems($screen_items){
-	
+
 		$result = true;
-		
+
 		DBstart(false);
 		foreach($screen_items as $screen_item){
-		
+
 			extract($screen_item);
 			$sql="DELETE FROM screens_items WHERE screenid=$screenid AND x=$x AND y=$y";
 			DBexecute($sql);
@@ -506,7 +506,7 @@ class CScreen{
 			if(!$result) break;
 		}
 		$result = DBend($result);
-		
+
 		if($result)
 			return true;
 		else{
@@ -514,7 +514,7 @@ class CScreen{
 			return false;
 		}
 	}
-	
+
 /**
  * delete ScreenItem
  *
@@ -526,17 +526,17 @@ class CScreen{
  *
  * @param array $screen_itemids
  * @return boolean
- */	
+ */
 	public static function deleteItems($screen_itemids){
 		$result = true;
-		
+
 		DBstart(false);
 		foreach($screen_items as $screen_itemid){
 			$sql='DELETE FROM screens_items WHERE screenitemid='.$screen_itemid;
 			if(!$result) break;
 		}
 		$result = DBend($result);
-		
+
 		if($result)
 			return true;
 		else{
@@ -544,6 +544,6 @@ class CScreen{
 			return false;
 		}
 	}
-	
+
 }
 ?>
