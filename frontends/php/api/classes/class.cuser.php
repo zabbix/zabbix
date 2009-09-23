@@ -125,7 +125,7 @@ class CUser {
 			zbx_value2array($options['userids']);
 			$sql_parts['where'][] = DBcondition('u.userid', $options['userids']);
 		}
-		
+
 // users
 		if(!is_null($options['users'])){
 			zbx_value2array($options['users']);
@@ -241,7 +241,7 @@ class CUser {
 
 		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
 
-		
+
 		if($options['get_access'] != 0){
 			foreach($result as $userid => $user){
 				$result[$userid] += array('api_access' => 0, 'gui_access' => 0, 'debug_mode' => 0, 'users_status' => 0);
@@ -478,7 +478,7 @@ class CUser {
 	 * @param string $media_data['address']
 	 * @param int $media_data['severity']
 	 * @param int $media_data['active']
-	 * @param string $media_data['period']	 
+	 * @param string $media_data['period']
 	 * @return boolean
 	 */
 	public static function addMedia($media_data){
