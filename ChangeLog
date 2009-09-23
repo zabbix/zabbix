@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [ZBX-1050] fixed possible windows agent crash while processing big eventlog records (Sasha)
  - [NTP-59] fixed wrong history links in latest data (Vedmak)
  - [NTP-56] fixed bug with refresh when 2+ log files added in monitoring->latest data (Vedmak)
  - [NTP-30] fixed processing of multi byte strings for item.lastvalue field (sasha)

@@ -24,7 +24,7 @@
 
 #if defined (_WINDOWS)
 
-#define MAX_INSERT_STRS 64
+#define MAX_INSERT_STRS 100
 #define MAX_MSG_LENGTH 1024
 
 #define EVENTLOG_REG_PATH "SYSTEM\\CurrentControlSet\\Services\\EventLog"
