@@ -120,4 +120,6 @@ void	DCflush_nextchecks();
 
 zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int num);
 
+int	DCget_item_lastclock(zbx_uint64_t itemid);
+
 #endif

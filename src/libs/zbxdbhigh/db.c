@@ -1447,41 +1447,59 @@ int	DBget_trends_count(void)
 
 int	DBget_queue_count(void)
 {
-	int	res;
+	int		res = 0, now;
 	DB_RESULT	result;
 	DB_ROW		row;
-	int	now;
+	zbx_uint64_t	itemid;
+	int		item_type, delay, nextcheck;
+	char		*delay_flex;
+	time_t		lastclock;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_queue_count()");
 
-	now=time(NULL);
-/*	zbx_snprintf(sql,sizeof(sql),"select count(*) from items i,hosts h where i.status=%d and i.type not in (%d) and h.status=%d and i.hostid=h.hostid and i.nextcheck<%d and i.key_<>'status'", ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, HOST_STATUS_MONITORED, now);*/
-	result = DBselect("select count(*) from items i,hosts h where i.status=%d and i.type not in (%d) and ((h.status=%d and h.available!=%d) or (h.status=%d and h.available=%d and h.disable_until<=%d)) and i.hostid=h.hostid and i.nextcheck<%d and i.key_ not in ('%s','%s','%s','%s')",
-		ITEM_STATUS_ACTIVE,
-		ITEM_TYPE_TRAPPER,
-		HOST_STATUS_MONITORED,
-		HOST_AVAILABLE_FALSE,
-		HOST_STATUS_MONITORED,
-		HOST_AVAILABLE_FALSE,
-		now,
-		now,
-		SERVER_STATUS_KEY,
-		SERVER_ICMPPING_KEY,
-		SERVER_ICMPPINGSEC_KEY,
-		SERVER_ZABBIXLOG_KEY);
+	now = time(NULL);
 
-	row=DBfetch(result);
+	result = DBselect(
+			"select i.itemid,i.type,i.delay,i.delay_flex,i.lastclock,h.proxy_hostid "
+			" from items i,hosts h"
+			" where i.hostid=h.hostid"
+				" and h.proxy_hostid=0"
+				" and i.status=%d"
+				" and i.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)"
+				" and ((h.status=%d and h.available!=%d)"
+					" or (h.status=%d and h.available=%d and h.disable_until<=%d))"
+				" and not i.key_ like '%s' and not i.key_ like '%s%%' and not i.key_ like '%s'"
+				" and i.value_type not in (%d)"
+				DB_NODE,
+			ITEM_STATUS_ACTIVE,
+			ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3,
+				ITEM_TYPE_IPMI, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE,
+				ITEM_TYPE_EXTERNAL,
+			HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE,
+			HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, now,
+			SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ZABBIXLOG_KEY,
+			ITEM_VALUE_TYPE_LOG,
+			DBnode_local("i.itemid"));
 
-	if(!row || DBis_null(row[0])==SUCCEED)
+	while (NULL != (row = DBfetch(result)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query");
-		zabbix_syslog("Cannot execute query");
-		DBfree_result(result);
-		return 0;
+		ZBX_STR2UINT64(itemid, row[0]);
+		item_type	= atoi(row[1]);
+		delay		= atoi(row[2]);
+		delay_flex	= row[3];
+		if (FAIL == (lastclock = DCget_item_lastclock(itemid)))
+		{
+			if (SUCCEED == DBis_null(row[4]))
+				lastclock = 0;
+			else
+				lastclock = (time_t)atoi(row[4]);
+		}
+
+		nextcheck = calculate_item_nextcheck(itemid, item_type, delay, delay_flex, lastclock);
+
+		if (now > nextcheck)
+			res++;
 	}
-
-	res  = atoi(row[0]);
-
 	DBfree_result(result);
 
 	return res;

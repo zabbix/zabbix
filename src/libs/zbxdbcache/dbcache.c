@@ -2432,3 +2432,43 @@ zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int nu
 
 	return nextid;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_item_lastclock                                             *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: last clock or FAIL if item not found in dbcache              *
+ *                                                                            *
+ * Author: Alekasander Vladishev                                              *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	DCget_item_lastclock(zbx_uint64_t itemid)
+{
+	int	i, index;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In DCvacuum_text()");
+
+	LOCK_CACHE;
+
+	for (i = 0; i < cache->history_num; i++)
+	{
+		index = (cache->history_first + i) % ZBX_HISTORY_SIZE;
+		if (cache->history[index].itemid == itemid)
+		{
+			UNLOCK_CACHE;
+
+			return cache->history[index].clock;
+		}
+	}
+
+	UNLOCK_CACHE;
+
+	return FAIL;
+}
+
