@@ -184,9 +184,9 @@ class CMap{
 				}
 			}
 		}
-		
 
-		
+
+
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){}
 		else{
 			if(!empty($result)){
@@ -195,12 +195,12 @@ class CMap{
 				$triggers_to_check = array();
 				$host_groups_to_check = array();
 				$map_elements = array();
-				
+
 				$db_elements = DBselect('SELECT * FROM sysmaps_elements WHERE '.DBcondition('sysmapid', $sysmapids));
 
 				while($element = DBfetch($db_elements)){
 					$map_elements[$element['elementid']] = $element['elementid'];
-				
+
 					switch($element['elementtype']){
 						case SYSMAP_ELEMENT_TYPE_HOST:
 							$hosts_to_check[] = $element['elementid'];
@@ -220,18 +220,18 @@ class CMap{
 // sdi($maps_to_check);
 // sdi($triggers_to_check);
 // sdi($host_groups_to_check);
-			
+
 				$allowed_hosts = CHost::get(array('hostids' => $hosts_to_check, 'editable' => isset($options['editable'])));
 				$allowed_maps = CMap::get(array('sysmapids' => $maps_to_check, 'editable' => isset($options['editable'])));
 
 				$allowed_triggers = CTrigger::get(array('triggerids' => $triggers_to_check, 'editable' => isset($options['editable'])));
 				$allowed_host_groups = CHostGroup::get(array('groupids' => $host_groups_to_check, 'editable' => isset($options['editable'])));
-					
-				$restr_hosts = array_diff($hosts_to_check, $allowed_hosts); 
-				$restr_maps = array_diff($maps_to_check, $allowed_maps); 
-				$restr_triggers = array_diff($triggers_to_check, $allowed_triggers); 
-				$restr_host_groups = array_diff($host_groups_to_check, $allowed_host_groups); 
-				
+
+				$restr_hosts = array_diff($hosts_to_check, $allowed_hosts);
+				$restr_maps = array_diff($maps_to_check, $allowed_maps);
+				$restr_triggers = array_diff($triggers_to_check, $allowed_triggers);
+				$restr_host_groups = array_diff($host_groups_to_check, $allowed_host_groups);
+
 				foreach($restr_hosts as $elementid){
 					foreach($map_elements as $map_elementid => $map_element){
 						if(($map_element['elementid'] == $elementid) && ($map_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)){
@@ -266,11 +266,11 @@ class CMap{
 				}
 			}
 		}
-		
-		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
-		
 
-// Adding Elements	
+		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
+
+
+// Adding Elements
 		if($options['select_elements']){
 			if(!isset($map_elements)){
 				$db_elements = DBselect('SELECT * FROM sysmaps_elements WHERE '.DBcondition('screenid', $sysmapids));
@@ -327,7 +327,7 @@ class CMap{
  * @since 1.8
  * @version 1
  *
- * @param _array $maps 
+ * @param _array $maps
  * @param string $maps['name']
  * @param array $maps['width']
  * @param int $maps['height']
@@ -345,7 +345,7 @@ class CMap{
 		foreach($maps as $map){
 
 			extract($map);
-			
+
 			$map_db_fields = array(
 				'name' => null,
 				'width' => 3,
@@ -364,11 +364,11 @@ class CMap{
 			$sysmapid = get_dbid('sysmaps', 'sysmapid');
 			$sql = "INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location)".
 				" VALUES ($sysmapid,".zbx_dbstr($name).", $width, $height, $backgroundid, $label_type, $label_location)";
-			
+
 			$result = DBexecute($sql);
-			
-			if(!$result) break;			
-			
+
+			if(!$result) break;
+
 			$result_ids[$sysmapid] = $sysmapid;
 		}
 		$result = DBend($result);
@@ -402,14 +402,14 @@ class CMap{
  * @return boolean
  */
 	public static function update($maps){
-	
+
 		$result = false;
 
 		DBstart(false);
 		foreach($maps as $map){
 
 			extract($map);
-			
+
 			$map_db_fields = CMap::getById($map['sysmapid']);
 
 			if(!$map_db_fields){
@@ -421,7 +421,7 @@ class CMap{
 				$result = false;
 				break;
 			}
-			
+
 			$sql = 'UPDATE sysmaps SET name='.zbx_dbstr($name).", width=$width, height=$height, backgroundid=$backgroundid,".
 				" label_type=$label_type, label_location=$label_location WHERE sysmapid=$sysmapid";
 			$result = DBexecute($sql);
@@ -453,26 +453,26 @@ class CMap{
  * @return boolean
  */
 	public static function delete($sysmapids){
-		$result = true;		
-		
+		$result = true;
+
 		DBstart(false);
 		foreach($sysmapids as $sysmapid){
 			$result = delete_sysmaps_elements_with_sysmapid($sysmapids);
-			
+
 			$res = DBselect('SELECT linkid FROM sysmaps_links WHERE '.DBcondition('sysmapid', $sysmapids));
 			while($rows = DBfetch($res)){
 				$result &= delete_link($rows['linkid']);
 			}
-		
+
 			$result &= DBexecute('DELETE FROM sysmaps_elements WHERE '.DBcondition('sysmapid',$sysmapids));
 			$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.sysmapids' AND source='sysmapid' AND ".DBcondition('value_id', $sysmapids));
 			$result &= DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid', $sysmapids).' AND resourcetype='.SCREEN_RESOURCE_MAP);
 			$result &= DBexecute('DELETE FROM sysmaps WHERE '.DBcondition('sysmapid', $sysmapids));
-		
+
 			if(!$result) break;
 		}
 		$result = DBend($result);
-		
+
 		if($result)
 			return true;
 		else{

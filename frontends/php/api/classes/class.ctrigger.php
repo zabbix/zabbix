@@ -241,7 +241,7 @@ class CTrigger {
 			$sql_parts['where'][] = 't.templateid=0';
 		}
 
-		
+
 // extendoutput
 		if(!is_null($options['extendoutput'])){
 			$sql_parts['select']['triggers'] = 't.*';

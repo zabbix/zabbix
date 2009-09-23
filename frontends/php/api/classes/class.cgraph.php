@@ -456,7 +456,7 @@ class CGraph {
 				$error = 'Missing items for graph "'.$graph['name'].'"';
 				break;
 			}
-			
+
 			$graph_db_fields = array(
 				'name'			=> null,
 				'width'			=> 900,
@@ -476,17 +476,17 @@ class CGraph {
 				'percent_right'		=> 0,
 				'templateid'		=> 0,
 			);
-			
-			
+
+
 
 			if(!check_db_fields($graph_db_fields, $graph)){
 				$result = false;
 				$error = 'Wrong fields for graph [ '.$graph['name'].' ]';
 				break;
 			}
-			
+
 			foreach($graph['gitems'] as $id => $gitem){
-			
+
 				$gitem_db_fields = array(
 					'itemid' => null,
 					'color' => 009600,
@@ -497,7 +497,7 @@ class CGraph {
 					'type' => 0,
 					'periods_cnt' => 5
 				);
-				
+
 				if(!check_db_fields($gitem_db_fields, $gitem)){
 					$result = false;
 					$error = 'Wrong fields for items';
@@ -509,11 +509,11 @@ class CGraph {
 			$result = add_graph_with_items($graph['name'],$graph['width'],$graph['height'],$graph['ymin_type'],$graph['ymax_type'],$graph['yaxismin'],
 				$graph['yaxismax'],$graph['ymin_itemid'],$graph['ymax_itemid'],$graph['showworkperiod'],$graph['showtriggers'],$graph['graphtype'],
 				$graph['legend'],$graph['graph3d'],$graph['percent_left'],$graph['percent_right'],$graph['gitems'],$graph['templateid']);
-			
-			
+
+
 			if(!$result) break;
 			$result_ids[$result] = $result;
-			
+
 		}
 		$result = DBend($result);
 
