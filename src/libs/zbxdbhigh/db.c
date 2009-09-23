@@ -1506,7 +1506,13 @@ int	DBget_queue_count(void)
 		item_type	= atoi(row[1]);
 		delay		= atoi(row[2]);
 		delay_flex	= row[3];
-		lastclock	= (time_t)atoi(row[4]);
+		if (FAIL == (lastclock = DCget_item_lastclock(itemid)))
+		{
+			if (SUCCEED == DBis_null(row[4]))
+				lastclock = 0;
+			else
+				lastclock = (time_t)atoi(row[4]);
+		}
 
 		nextcheck = calculate_item_nextcheck(itemid, item_type, delay, delay_flex, lastclock);
 
