@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-phpinfo();
+
 class czbxrpc{
 public static $result;
 

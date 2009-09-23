@@ -451,6 +451,12 @@ class CGraph {
 
 		foreach($graphs as $graph){
 
+			if(!is_array($graph['gitems']) || empty($graph['gitems'])){
+				$result = false;
+				$error = 'Missing items for graph "'.$graph['name'].'"';
+				break;
+			}
+			
 			$graph_db_fields = array(
 				'name'			=> null,
 				'width'			=> 900,
@@ -470,18 +476,44 @@ class CGraph {
 				'percent_right'		=> 0,
 				'templateid'		=> 0,
 			);
+			
+			
 
 			if(!check_db_fields($graph_db_fields, $graph)){
 				$result = false;
 				$error = 'Wrong fields for graph [ '.$graph['name'].' ]';
 				break;
 			}
+			
+			foreach($graph['gitems'] as $id => $gitem){
+			
+				$gitem_db_fields = array(
+					'itemid' => null,
+					'color' => 009600,
+					'drawtype' => 0,
+					'sortorder' => 0,
+					'yaxisside' => 1,
+					'calc_fnc' => 2,
+					'type' => 0,
+					'periods_cnt' => 5
+				);
+				
+				if(!check_db_fields($gitem_db_fields, $gitem)){
+					$result = false;
+					$error = 'Wrong fields for items';
+					break 2;
+				}
+				$graph['gitems'][$id] = $gitem;
+			}
 
-			$result = add_graph($graph['name'],$graph['width'],$graph['height'],$graph['ymin_type'],$graph['ymax_type'],$graph['yaxismin'],
+			$result = add_graph_with_items($graph['name'],$graph['width'],$graph['height'],$graph['ymin_type'],$graph['ymax_type'],$graph['yaxismin'],
 				$graph['yaxismax'],$graph['ymin_itemid'],$graph['ymax_itemid'],$graph['showworkperiod'],$graph['showtriggers'],$graph['graphtype'],
-				$graph['legend'],$graph['graph3d'],$graph['percent_left'],$graph['percent_right'],$graph['templateid']);
+				$graph['legend'],$graph['graph3d'],$graph['percent_left'],$graph['percent_right'],$graph['gitems'],$graph['templateid']);
+			
+			
 			if(!$result) break;
 			$result_ids[$result] = $result;
+			
 		}
 		$result = DBend($result);
 
@@ -652,7 +684,7 @@ class CGraph {
 
 		foreach($items as $item){
 			$result = add_item_to_graph($graphid,$item['itemid'],$item['color'],$item['drawtype'],$item['sortorder'],$item['yaxisside'],
-						$item['calc_fnc'],$item['type'],$item['periods_cnt']);
+				$item['calc_fnc'],$item['type'],$item['periods_cnt']);
 			if(!$result) return false;
 		}
 
