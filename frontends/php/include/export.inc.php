@@ -624,6 +624,7 @@ class zbxXML{
 				if(isset($rules['graph']['exist']) || isset($rules['graph']['missed'])){
 					$graphs = $host->xpath('graphs/graph');
 
+					$graphs_to_add = array();
 					foreach($graphs as $graph){
 						$graph_db = self::mapXML2arr($graph, XML_TAG_GRAPH);
 						$current_graphid = CGraph::getId(array('name' => $graph_db['name'], 'hostid' => $current_hostid));
@@ -635,12 +636,9 @@ class zbxXML{
 							CGraph::delete(array('graphid' => $current_graphid));
 						}
 //sdii($graph_db);
-						$current_graphid = CGraph::add(array($graph_db));
-						$current_graphid = reset($current_graphid);
-//sdii($current_graphid);
 						$gitems = $graph->xpath('graph_elements/graph_element');
+
 						$gitems_to_add = array();
-						$gitems_to_add['items'] = array();
 						foreach($gitems as $gitem){
 							$gitem_db = self::mapXML2arr($gitem, XML_TAG_GRAPH_ELEMENT);
 
@@ -657,13 +655,12 @@ class zbxXML{
 							$itemid = CItem::getId(array('host' => $gitem_host, 'key_' => $gitem_key));
 							if($itemid){ // if item exists, add graph item to graph
 								$gitem_db['itemid'] = $itemid;
-								$gitems_to_add['items'][] = $gitem_db;
+								$graph_db['gitems'][$itemid] = $gitem_db;
 							}
-							$gitems_to_add['graphid'] = $current_graphid;
-
+							$graphs_to_add[] = $graph_db;
 						}
-//sdii($gitems_to_add);
-						CGraph::addItems($gitems_to_add);
+//sdii($gitems_to_add);	
+						CGraph::add($graphs_to_add);
 					}
 				}
 
