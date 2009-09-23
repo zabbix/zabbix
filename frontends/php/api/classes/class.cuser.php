@@ -259,7 +259,7 @@ class CUser {
 			}
 		}
 // Adding Objects
-// Adding usegroups
+// Adding usergroups
 		if($options['select_usrgrps']){
 			$obj_params = array('extendoutput' => 1, 'userids' => $userids);
 			$usrgrps = CUserGroup::get($obj_params);
