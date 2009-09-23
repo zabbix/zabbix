@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [ZBX-596] fixed support of IPV6 under Windows 2000 (Sasha)
  - [ZBX-1046] add DBPort description; note that socket is used for MySQL if DBHost is localhost (Richlv)
  - [DEV-411] database cache is permanently enabled (Sasha)
  - [ZBX-482] fix incorrect MySQL userparameter keys in template (Richlv)

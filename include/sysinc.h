@@ -41,6 +41,10 @@
 #	include <ws2tcpip.h>
 #endif
 
+#ifdef HAVE_WSPIAPI_H
+#	include "Wspiapi.h"
+#endif
+
 #ifdef HAVE_WINDOWS_H
 #	include <windows.h>
 #endif
