@@ -107,6 +107,7 @@ Changes for 1.7.0
 
 Changes for 1.6.7
 
+ - [ZBX-991] fixed processing of zabbix[queue] internal check (Sasha)
  - [ZBX-596] fixed support of IPV6 under Windows 2000 (Sasha)
  - [ZBX-982] fixed message when can't delete application with web items (Vedmak)
  - [ZBX-861] fixed problem with disappearing nodes in frontend (Artem)
