@@ -39,22 +39,23 @@ class CUser {
 	 * @since 1.8
 	 * @version 1
 	 *
-	 * @param _array $options
+	 * @param _array $options Parameters
 	 * @param array $options['nodeids'] Node IDs
 	 * @param array $options['usrgrpids'] UserGroup IDs
 	 * @param array $options['userids'] User IDs
-	 * @param boolean $options['type']
-	 * @param boolean $options['status']
-	 * @param boolean $options['with_gui_access']
-	 * @param boolean $options['with_api_access']
-	 * @param boolean $options['select_usrgrps']
-	 * @param boolean $options['get_access']
-	 * @param int $options['extendoutput']
-	 * @param int $options['count']
-	 * @param string $options['pattern']
-	 * @param int $options['limit'] limit selection
-	 * @param string $options['order']
-	 * @return array
+	 * @param boolean $options['type'] Type
+	 * @param boolean $options['status'] Status
+	 * @param boolean $options['with_gui_access'] Only with GUI access
+	 * @param boolean $options['with_api_access'] Only with API access
+	 * @param boolean $options['select_usrgrps'] Get UsrGroups for each User
+	 * @param boolean $options['get_access'] Get access info for each user
+	 * @param boolean $options['extendoutput'] Get all information, not only User IDs
+	 * @param boolean $options['count'] Get count of Users
+	 * @param string $options['pattern'] Pattern
+	 * @param int $options['limit'] Limit
+	 * @param string $options['sortfield'] Sort filed
+	 * @param string $options['sortorder'] Sort order
+	 * @return array Users data
 	 */
 	public static function get($options=array()){
 		global $USER_DETAILS;
@@ -277,29 +278,41 @@ class CUser {
 	/**
 	 * Authenticate user
 	 *
+	 * {@source}
+	 * @access public
 	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
 	 * @param _array $user
-	 * @param array $user['user']
-	 * @param array $user['password']
+	 * @param array $user['user'] User alias
+	 * @param array $user['password'] User password
 	 * @return string session ID
 	 */
 	public static function authenticate($user){
 
 		$login = user_login($user['user'], $user['password'], ZBX_AUTH_INTERNAL);
+
 		if($login){
 			return $login;
 		}
 		else{
 			self::$error = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Given login or password is incorrect.');
+			return false;
 		}
 	}
 
 	/**
-	 * Check if session ID authenticated
+	 * Check if session ID is authenticated
 	 *
+	 * {@source}
+	 * @access public
 	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
 	 * @param _array $session
-	 * @param array $session['sessionid']
+	 * @param array $session['sessionid'] Session ID
 	 * @return boolean
 	 */
 	public static function checkAuth($session){
@@ -309,14 +322,14 @@ class CUser {
 	/**
 	 * Gets all User data from DB by User ID
 	 *
-	 * <code>
-	 * $user_data = array(
-	 * 	*string 'userid' => 'User ID'
-	 * )
-	 * </code>
-	 *
+	 * {@source}
+	 * @access public
 	 * @static
-	 * @param array $user_data
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $user_data
+	 * @param array $user_data['userid'] User ID
 	 * @return array|boolean User data as array or false if error
 	 */
 	public static function getById($user_data){
@@ -333,14 +346,14 @@ class CUser {
 	/**
 	 * Get User ID by User alias
 	 *
-	 * <code>
-	 * $user_data = array(
-	 * 	*string 'alias' => 'User alias'
-	 * );
-	 * </code>
-	 *
+	 * {@source}
+	 * @access public
 	 * @static
-	 * @param array $user_data
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $user_data
+	 * @param array $user_data['alias'] User alias
 	 * @return string|boolean
 	 */
 	public static function getId($user_data){
@@ -363,8 +376,13 @@ class CUser {
 	/**
 	 * Add Users
 	 *
+	 * {@source}
+	 * @access public
 	 * @static
-	 * @param array $users multidimensional array with Users data
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $users multidimensional array with Users data
 	 * @param string $users['name']
 	 * @param string $users['surname']
 	 * @param array $users['alias']
@@ -410,7 +428,21 @@ class CUser {
 	 * @since 1.8
 	 * @version 1
 	 *
-	 * @param array $users multidimensional array with Users data
+	 * @param _array $users multidimensional array with Users data
+	 * @param string $users['userid']
+	 * @param string $users['name']
+	 * @param string $users['surname']
+	 * @param array $users['alias']
+	 * @param string $users['passwd']
+	 * @param string $users['url']
+	 * @param int $users['autologin']
+	 * @param int $users['autologout']
+	 * @param string $users['lang']
+	 * @param string $users['theme']
+	 * @param int $users['refresh']
+	 * @param int $users['rows_per_page']
+	 * @param int $users['type']
+	 * @param array $users['user_medias']
 	 * @return boolean
 	 */
 	public static function update($users){
@@ -441,20 +473,12 @@ class CUser {
 	 * @since 1.8
 	 * @version 1
 	 *
-	 * <code>
-	 * $media_data = array(
-	 * 	*string 'userid => 'User ID',
-	 * 	array 'medias' => array(
-	 * 		string 'mediatypeid' => 'media type ID',
-	 * 		string 'sendto' => 'address',
-	 * 		int 'severity' => 'severity',
-	 * 		int 'active' => 'active',
-	 * 		string 'period' => 'period',
-	 * 		)
-	 * );
-	 * </code>
-	 *
 	 * @param array $media_data
+	 * @param string $media_data['mediatypeid']
+	 * @param string $media_data['address']
+	 * @param int $media_data['severity']
+	 * @param int $media_data['active']
+	 * @param string $media_data['period']	 
 	 * @return boolean
 	 */
 	public static function addMedia($media_data){
@@ -484,14 +508,9 @@ class CUser {
 	 * @since 1.8
 	 * @version 1
 	 *
-	 * <code>
-	 * $media_data = array(
-	 * 	*string 'userid => 'User ID',
-	 * 	array 'mediaids' => array('Media ID', 'Media ID', ...)
-	 * );
-	 * </code>
-	 *
 	 * @param array $media_data
+	 * @param string $media_data['userid']
+	 * @param array $media_data['mediaids']
 	 * @return boolean
 	 */
 	public static function deleteMedia($media_data){
@@ -516,21 +535,15 @@ class CUser {
 	 * @since 1.8
 	 * @version 1
 	 *
-	 * <code>
-	 * $media_data = array(
-	 * 	*string 'userid => 'User ID',
-	 * 	array 'medias' => array(
-	 * 		string 'mediaid' => 'Medi ID',
-	 * 		string 'mediatypeid' => 'media type ID',
-	 * 		string 'sendto' => 'address',
-	 * 		int 'severity' => 'severity',
-	 * 		int 'active' => 'active',
-	 * 		string 'period' => 'period',
-	 * 		)
-	 * );
-	 * </code>
-	 *
 	 * @param array $media_data
+	 * @param string $media_data['userid']
+	 * @param array $media_data['medias']
+	 * @param array $media_data['medias']['mediaid']
+	 * @param string $media_data['medias']['mediatypeid']
+	 * @param string $media_data['medias']['sendto']
+	 * @param int $media_data['medias']['severity']
+	 * @param int $media_data['medias']['active']
+	 * @param string $media_data['medias']['period']
 	 * @return boolean
 	 */
 	public static function updateMedia($media_data){
