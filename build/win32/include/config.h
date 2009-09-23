@@ -10,6 +10,9 @@
 /* Define to 1 if you have the <ws2tcpip.h> header file. */
 #define HAVE_WS2TCPIP_H
 
+/* Define to 1 if you have the <wspiapi.h> header file. */
+#define HAVE_WSPIAPI_H
+
 /* Define to 1 if you have the <conio.h> header file. */
 #define HAVE_CONIO_H 1
 
