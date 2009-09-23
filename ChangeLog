@@ -1,5 +1,6 @@
 Changes for 1.6.7
 
+ - [ZBX-1050] fixed possible windows agent crash while processing big eventlog records (Sasha)
  - [ZBX-991] fixed processing of zabbix[queue] internal check (Sasha)
  - [ZBX-596] fixed support of IPV6 under Windows 2000 (Sasha)
  - [ZBX-1027] fixed that item key must be used in each subexpression of trigger expression (Vedmak)
