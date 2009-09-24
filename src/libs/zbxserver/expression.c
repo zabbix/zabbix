@@ -894,6 +894,59 @@ static int	get_host_profile_value_by_triggerid(zbx_uint64_t triggerid, char **re
 
 /******************************************************************************
  *                                                                            *
+ * Function: item_description                                                 *
+ *                                                                            *
+ * Purpose: substitute key parameters in the item description string          *
+ *          with real values                                                  *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	item_description(char **data, const char *key)
+{
+	char	*p, *m, *str_out = NULL, params[MAX_STRING_LEN], param[MAX_STRING_LEN];
+
+	if (2 /* key with parameters */ != parse_command(key, NULL, 0, params, sizeof(params)))
+		return;
+
+	p = *data;
+	while (NULL != (m = strchr(p, '$')))
+	{
+		*m = '\0';
+		str_out = zbx_strdcat(str_out, p);
+		*m++ = '$';
+
+		if (*m >= '1' && *m <= '9')
+		{
+			if (0 != get_param(params, *m - '0', param, sizeof(param)))
+				*param = '\0';
+
+			str_out = zbx_strdcat(str_out, param);
+			p = m + 1;
+		}
+		else
+		{
+			str_out = zbx_strdcat(str_out, "$");
+			p = m;
+		}
+	}
+
+	if (NULL != str_out)
+	{
+		str_out = zbx_strdcat(str_out, p);
+		zbx_free(*data);
+		*data = str_out;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBget_trigger_value_by_triggerid                                 *
  *                                                                            *
  * Purpose: retrieve trigger value by functionid and field name               *
@@ -910,27 +963,63 @@ static int	get_host_profile_value_by_triggerid(zbx_uint64_t triggerid, char **re
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_trigger_value_by_triggerid(zbx_uint64_t triggerid, char **replace_to, int N_functionid, const char *fieldname)
+#define ZBX_REQUEST_HOST_NAME		0
+#define ZBX_REQUEST_HOST_IPADDRESS	1
+#define ZBX_REQUEST_HOST_DNS		2
+#define ZBX_REQUEST_HOST_CONN		3
+#define ZBX_REQUEST_ITEM_NAME		4
+#define ZBX_REQUEST_ITEM_KEY		5
+static int	DBget_trigger_value_by_triggerid(zbx_uint64_t triggerid, char **replace_to, int N_functionid, int request)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
+	DB_ITEM		item;
 	char		expression[TRIGGER_EXPRESSION_LEN_MAX];
 	zbx_uint64_t	functionid;
 	int		ret = FAIL;
 
 	if (FAIL == DBget_trigger_expression_by_triggerid(triggerid, expression, sizeof(expression)))
-		return FAIL;
+		return ret;
 
 	if (FAIL == trigger_get_N_functionid(expression, N_functionid, &functionid))
-		return FAIL;
+		return ret;
 
-	result = DBselect("select %s from hosts h,items i,functions f"
-			" where h.hostid=i.hostid and i.itemid=f.itemid and f.functionid=" ZBX_FS_UI64,
-			fieldname, functionid);
+	result = DBselect(
+			"select %s,functions f"
+			" where h.hostid=i.hostid"
+				" and i.itemid=f.itemid"
+				" and f.functionid=" ZBX_FS_UI64,
+			ZBX_SQL_ITEM_SELECT,
+			functionid);
 
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+	if (NULL != (row = DBfetch(result)))
 	{
-		*replace_to = zbx_dsprintf(*replace_to, "%s", row[0]);
+		DBget_item_from_db(&item, row);
+
+		switch (request) {
+		case ZBX_REQUEST_HOST_NAME:
+			*replace_to = zbx_dsprintf(*replace_to, "%s", item.host_name);
+			break;
+		case ZBX_REQUEST_HOST_IPADDRESS:
+			*replace_to = zbx_dsprintf(*replace_to, "%s", item.host_ip);
+			break;
+		case ZBX_REQUEST_HOST_DNS:
+			*replace_to = zbx_dsprintf(*replace_to, "%s", item.host_dns);
+			break;
+		case ZBX_REQUEST_HOST_CONN:
+			*replace_to = zbx_dsprintf(*replace_to, "%s", item.useip == 1 ? item.host_ip : item.host_dns);
+			break;
+		case ZBX_REQUEST_ITEM_NAME:
+			*replace_to = zbx_dsprintf(*replace_to, "%s", item.description);
+			item_description(replace_to, item.key);
+			break;
+		case ZBX_REQUEST_ITEM_KEY:
+			*replace_to = zbx_dsprintf(*replace_to, "%s", item.key);
+			break;
+		default:
+			return ret;
+		}
+
 		ret = SUCCEED;
 	}
 
@@ -1768,18 +1857,23 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 				else if (0 == strcmp(m, MVAR_PROFILE_NOTES))
 					ret = get_host_profile_value_by_triggerid(event->objectid, &replace_to, N_functionid, "notes");
 				else if (0 == strcmp(m, MVAR_HOSTNAME))
-					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid, "h.host");
+					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid,
+							ZBX_REQUEST_HOST_NAME);
 				else if (0 == strcmp(m, MVAR_ITEM_NAME))
-					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid, "i.description");
+					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid,
+							ZBX_REQUEST_ITEM_NAME);
 				else if (0 == strcmp(m, MVAR_TRIGGER_KEY))
-					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid, "i.key_");
+					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid,
+							ZBX_REQUEST_ITEM_KEY);
 				else if (0 == strcmp(m, MVAR_IPADDRESS))
-					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid, "h.ip");
+					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid,
+							ZBX_REQUEST_HOST_IPADDRESS);
 				else if (0 == strcmp(m, MVAR_HOST_DNS))
-					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid, "h.dns");
+					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid,
+							ZBX_REQUEST_HOST_DNS);
 				else if (0 == strcmp(m, MVAR_HOST_CONN))
 					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid,
-							"case when h.useip=1 then h.ip else h.dns end");
+							ZBX_REQUEST_HOST_CONN);
 				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
 					ret = DBget_item_lastvalue_by_triggerid(event->objectid, &replace_to, N_functionid);
 				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
@@ -1934,7 +2028,8 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 			if (EVENT_SOURCE_TRIGGERS == event->source)
 			{
 				if (0 == strcmp(m, MVAR_HOSTNAME))
-					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid, "h.host");
+					ret = DBget_trigger_value_by_triggerid(event->objectid, &replace_to, N_functionid,
+							ZBX_REQUEST_HOST_NAME);
 				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
 					ret = DBget_item_lastvalue_by_triggerid(event->objectid, &replace_to, N_functionid);
 				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
