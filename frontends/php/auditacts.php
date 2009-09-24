@@ -39,14 +39,11 @@ include_once('include/page_header.php');
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'config'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-
 // filter
 		'filter_rst'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
 		'filter_set'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
-
-		'userid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
+		'alias'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
 		'nav_time'=>		array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
-
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
@@ -72,18 +69,17 @@ include_once('include/page_header.php');
 
 /* FILTER */
 	if(isset($_REQUEST['filter_rst'])){
-		$_REQUEST['userid'] = 0;
+		$_REQUEST['alias'] = '';
 		$_REQUEST['nav_time'] = time();
 	}
 
-	$_REQUEST['userid'] = get_request('userid',get_profile('web.auditacts.filter.userid',0));
+	$_REQUEST['alias'] = get_request('alias',get_profile('web.auditacts.filter.alias', ''));
 	$_REQUEST['nav_time'] = get_request('nav_time',get_profile('web.auditacts.filter.nav_time',time()));
 
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
-		update_profile('web.auditacts.filter.userid',$_REQUEST['userid']);
+		update_profile('web.auditacts.filter.alias',$_REQUEST['alias']);
 		update_profile('web.auditacts.filter.nav_time',$_REQUEST['nav_time'], PROFILE_TYPE_INT);
 	}
-
 	$nav_time = $_REQUEST['nav_time'];
 // -------------
 
@@ -95,7 +91,7 @@ include_once('include/page_header.php');
 	$frmForm = new CForm();
 	$frmForm->setMethod('get');
 
-	$cmbConf = new CComboBox('config','auditacts.php','javascript: submit()');
+	$cmbConf = new CComboBox('config','auditacts.php');
 	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('auditlogs.php',S_LOGS);
 		$cmbConf->addItem('auditacts.php',S_ACTIONS);
@@ -123,21 +119,12 @@ include_once('include/page_header.php');
 	$filterForm->addAction('onsubmit',$script);
 
 	$filterForm->addVar('nav_time',($_REQUEST['nav_time']>0)?$_REQUEST['nav_time']:'');
-	$filterForm->addVar('config',$_REQUEST['config']);
-	$filterForm->addVar('userid',$_REQUEST['userid']);
-
-	if(isset($_REQUEST['userid']) && ($_REQUEST['userid']>0)){
-		$user = get_user_by_userid($_REQUEST['userid']);
-	}
-	else{
-		$user = array('alias' => '');
-	}
 
 	$row = new CRow(array(
 					new CCol(S_RECIPIENT,'form_row_l'),
 					new CCol(array(
-								new CTextBox("user",$user['alias'],32,'yes'),
-								new CButton("btn1",S_SELECT,"return PopUp('popup.php?"."dstfrm=".$filterForm->getName()."&dstfld1=userid&dstfld2=user"."&srctbl=users&srcfld1=userid&srcfld2=alias&real_hosts=1');",'T')
+								new CTextBox("alias",$_REQUEST['alias'],32),
+								new CButton("btn1",S_SELECT,"return PopUp('popup.php?"."dstfrm=".$filterForm->getName()."&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1');",'T')
 							),'form_row_r')
 						));
 
@@ -167,32 +154,32 @@ include_once('include/page_header.php');
 				'"click",CLNDR[\'audit_since\'].clndr.clndrhide.bindAsEventListener(CLNDR[\'audit_since\'].clndr));');
 
 //*/
-	$reset = new CButton('filter_rst',S_RESET);
+	$reset = new CButton('filter_rst', S_RESET);
 	$reset->setType('button');
 	$reset->setAction('javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
 
-	$filterForm->addItemToBottomRow(new CButton("filter_set",S_FILTER));
+	$filterForm->addItemToBottomRow(new CButton("filter_set", S_FILTER));
 	$filterForm->addItemToBottomRow($reset);
 
 	$alerts_wdgt->addFlicker($filterForm, get_profile('web.auditacts.filter.state',1));
 //-------
 
 	$options = array(
-				'alerttype' => ALERT_TYPE_MESSAGE,
-				'extendoutput' => 1,
+		'alerttype' => ALERT_TYPE_MESSAGE,
+		'extendoutput' => 1,
 //				'select_users' => 1,
-				'select_mediatypes' => 1,
-				'time_from' => $nav_time,
-				'sortfield' => 'clock',
-				'sortorder' => getPageSortOrder(),
-				'limit' => ($config['search_limit']+1)
-			);
+		'select_mediatypes' => 1,
+		'time_from' => $nav_time,
+		'sortfield' => 'clock',
+		'sortorder' => getPageSortOrder(),
+		'limit' => ($config['search_limit']+1)
+	);
 
 
-	if($_REQUEST['userid']){
-		$options['userids'] = $_REQUEST['userid'];
+	if($_REQUEST['alias']){
+		$userid = CUser::getId(array('alias' => $_REQUEST['alias']));
+		$options['userids'] = $userid;
 	}
-
 	$alerts = CAlert::get($options);
 
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
@@ -266,5 +253,4 @@ include_once('include/page_header.php');
 <?php
 
 include_once('include/page_footer.php');
-
 ?>
