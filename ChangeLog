@@ -1,5 +1,6 @@
 Changes for 1.6.7
 
+ - [ZBX-1032] fixed security vulnerability in processing of net.tcp.listen under FreeBSD and Solaris agents (Sasha)
  - [ZBX-1050] fixed possible windows agent crash while processing big eventlog records (Sasha)
  - [ZBX-991] fixed processing of zabbix[queue] internal check (Sasha)
  - [ZBX-596] fixed support of IPV6 under Windows 2000 (Sasha)
