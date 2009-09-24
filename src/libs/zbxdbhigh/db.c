@@ -1933,22 +1933,15 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 	item->lastlogsize		= atoi(row[49]);
 	item->data_type			= atoi(row[50]);
 
-	switch (item->type) {
-		case ITEM_TYPE_ZABBIX:
-		case ITEM_TYPE_ZABBIX_ACTIVE:
-		case ITEM_TYPE_SIMPLE:
-		case ITEM_TYPE_EXTERNAL:
-			key = zbx_dsprintf(key, "%s", item->key_orig);
-			substitute_simple_macros(NULL, NULL, item, NULL, &key, MACRO_TYPE_ITEM_KEY, NULL, 0);
-			item->key	= key;
-			break;
-		case ITEM_TYPE_IPMI:
-			ipmi_ip = zbx_dsprintf(ipmi_ip, "%s", item->ipmi_ip);
-			substitute_simple_macros(NULL, NULL, item, NULL, &ipmi_ip, MACRO_TYPE_HOST_IPMI_IP, NULL, 0);
-			item->ipmi_ip	= ipmi_ip;
-			break;
-		default:
-			/* nothing */;
+	key = zbx_dsprintf(key, "%s", item->key_orig);
+	substitute_simple_macros(NULL, NULL, item, NULL, &key, MACRO_TYPE_ITEM_KEY, NULL, 0);
+	item->key	= key;
+
+	if (ITEM_TYPE_IPMI == item->type)
+	{
+		ipmi_ip = zbx_dsprintf(ipmi_ip, "%s", item->ipmi_ip);
+		substitute_simple_macros(NULL, NULL, item, NULL, &ipmi_ip, MACRO_TYPE_HOST_IPMI_IP, NULL, 0);
+		item->ipmi_ip	= ipmi_ip;
 	}
 }
 
