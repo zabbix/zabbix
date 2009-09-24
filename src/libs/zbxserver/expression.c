@@ -999,30 +999,32 @@ static int	DBget_trigger_value_by_triggerid(zbx_uint64_t triggerid, char **repla
 		switch (request) {
 		case ZBX_REQUEST_HOST_NAME:
 			*replace_to = zbx_dsprintf(*replace_to, "%s", item.host_name);
+			ret = SUCCEED;
 			break;
 		case ZBX_REQUEST_HOST_IPADDRESS:
 			*replace_to = zbx_dsprintf(*replace_to, "%s", item.host_ip);
+			ret = SUCCEED;
 			break;
 		case ZBX_REQUEST_HOST_DNS:
 			*replace_to = zbx_dsprintf(*replace_to, "%s", item.host_dns);
+			ret = SUCCEED;
 			break;
 		case ZBX_REQUEST_HOST_CONN:
-			*replace_to = zbx_dsprintf(*replace_to, "%s", item.useip == 1 ? item.host_ip : item.host_dns);
+			*replace_to = zbx_dsprintf(*replace_to, "%s",
+					item.useip == 1 ? item.host_ip : item.host_dns);
+			ret = SUCCEED;
 			break;
 		case ZBX_REQUEST_ITEM_NAME:
 			*replace_to = zbx_dsprintf(*replace_to, "%s", item.description);
 			item_description(replace_to, item.key);
+			ret = SUCCEED;
 			break;
 		case ZBX_REQUEST_ITEM_KEY:
 			*replace_to = zbx_dsprintf(*replace_to, "%s", item.key);
+			ret = SUCCEED;
 			break;
-		default:
-			return ret;
 		}
-
-		ret = SUCCEED;
 	}
-
 	DBfree_result(result);
 
 	return ret;
