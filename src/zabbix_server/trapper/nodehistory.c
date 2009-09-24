@@ -54,13 +54,14 @@ int	send_history_last_id(zbx_sock_t *sock, const char *data)
 	DB_RESULT	result;
 	DB_ROW		row;
 	const char	*r;
-	char		tablename[MAX_STRING_LEN], fieldname[MAX_STRING_LEN];
+	const ZBX_TABLE	*table;
+	const ZBX_FIELD *field;
 	int		buffer_offset;
 	int		sender_nodeid, nodeid, res;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In send_list_of_history_ids()");
 
-	buffer_allocated = 256;
+	buffer_allocated = 320;
 	buffer = zbx_malloc(buffer, buffer_allocated);
 
 	r = data;
@@ -72,36 +73,40 @@ int	send_history_last_id(zbx_sock_t *sock, const char *data)
 		goto error;
 
 	zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER); /* sender_nodeid */
-	sender_nodeid=atoi(buffer);
+	sender_nodeid = atoi(buffer);
 	if (NULL == r)
 		goto error;
 
 	zbx_get_next_field(&r, &buffer, &buffer_allocated, '\n'); /* nodeid */
-	nodeid=atoi(buffer);
+	nodeid = atoi(buffer);
 	if (NULL == r)
 		goto error;
 
 	zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER); /* table name */
-	zbx_strlcpy(tablename, buffer, sizeof(tablename));
+	if (NULL == (table = DBget_table(buffer)))
+		goto error;
 
 	if (NULL == r)
 		goto error;
 
 	zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER); /* field name */
-	zbx_strlcpy(fieldname, buffer, sizeof(fieldname));
+	if (NULL == (field = DBget_field(table, buffer)))
+		goto error;
 
 	buffer_offset= 0;
-	zbx_snprintf_alloc(&buffer, &buffer_allocated, &buffer_offset, 256, "select MAX(%s) "
-		"from %s where 1=1" DB_NODE,
-		fieldname,
-		tablename,
-		DBnode(fieldname, nodeid));
+	zbx_snprintf_alloc(&buffer, &buffer_allocated, &buffer_offset, 320,
+			"select max(%s)"
+			" from %s"
+			" where 1=1" DB_NODE,
+			field->name,
+			table->table,
+			DBnode(field->name, nodeid));
 
 	buffer_offset= 0;
 	result = DBselect("%s", buffer);
 	if (NULL != (row = DBfetch(result)))
-		zbx_snprintf_alloc(&buffer, &buffer_allocated, &buffer_offset, 128, "%s",
-			SUCCEED == DBis_null(row[0]) ? "0" : row[0]);
+		zbx_snprintf_alloc(&buffer, &buffer_allocated, &buffer_offset, 32, "%s",
+				SUCCEED == DBis_null(row[0]) ? "0" : row[0]);
 	DBfree_result(result);
 
 	if (buffer_offset == 0)
@@ -113,10 +118,10 @@ int	send_history_last_id(zbx_sock_t *sock, const char *data)
 
 	zbx_free(buffer);
 
-	return  res;
+	return res;
 error:
 	buffer_offset= 0;
-	zbx_snprintf_alloc(&buffer, &buffer_allocated, &buffer_offset, 128, "FAIL");
+	zbx_snprintf_alloc(&buffer, &buffer_allocated, &buffer_offset, 8, "FAIL");
 
 	alarm(CONFIG_TIMEOUT);
 	res = send_data_to_node(sender_nodeid, sock, buffer);
