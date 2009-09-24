@@ -24,7 +24,7 @@ require_once('include/audit.inc.php');
 require_once('include/actions.inc.php');
 require_once('include/users.inc.php');
 
-	$page['title'] = "S_AUDIT";
+	$page['title'] = 'S_AUDIT';
 	$page['file'] = 'auditlogs.php';
 	$page['hist_arg'] = array();
 	$page['scripts'] = array('calendar.js','scriptaculous.js?load=effects');
@@ -39,17 +39,13 @@ include_once('include/page_header.php');
 // actions
 		'groupid'=>			array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,	NULL),
 		'hostid'=>			array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,	NULL),
-
 // filter
 		'action'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(-1,6),	NULL),
 		'resourcetype'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(-1,28),	NULL),
 		'filter_rst'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
 		'filter_set'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
-
-		'userid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
-
+		'alias' =>			array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
 		'nav_time'=>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
-
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
@@ -74,25 +70,23 @@ include_once('include/page_header.php');
 
 /* FILTER */
 	if(isset($_REQUEST['filter_rst'])){
-		$_REQUEST['userid'] = 0;
+		$_REQUEST['alias'] = '';
 		$_REQUEST['action'] = -1;
 		$_REQUEST['resourcetype'] = -1;
-
 		$_REQUEST['nav_time'] = time();
 	}
 
-	$_REQUEST['userid'] = get_request('userid',get_profile('web.auditlogs.filter.userid',0));
-	$_REQUEST['action'] = get_request('action',get_profile('web.auditlogs.filter.action',-1));
-	$_REQUEST['resourcetype'] = get_request('resourcetype',get_profile('web.auditlogs.filter.resourcetype',-1));
-
-	$_REQUEST['nav_time'] = get_request('nav_time',get_profile('web.auditlogs.filter.nav_time',time()));
+	$_REQUEST['alias'] = get_request('alias', get_profile('web.auditlogs.filter.alias', ''));
+	$_REQUEST['action'] = get_request('action', get_profile('web.auditlogs.filter.action',-1));
+	$_REQUEST['resourcetype'] = get_request('resourcetype', get_profile('web.auditlogs.filter.resourcetype',-1));
+	$_REQUEST['nav_time'] = get_request('nav_time', get_profile('web.auditlogs.filter.nav_time',time()));
 
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
-		update_profile('web.auditlogs.filter.userid',$_REQUEST['userid']);
-		update_profile('web.auditlogs.filter.action',$_REQUEST['action'], PROFILE_TYPE_INT);
-		update_profile('web.auditlogs.filter.resourcetype',$_REQUEST['resourcetype'], PROFILE_TYPE_INT);
+		update_profile('web.auditlogs.filter.alias', $_REQUEST['alias']);
+		update_profile('web.auditlogs.filter.action', $_REQUEST['action'], PROFILE_TYPE_INT);
+		update_profile('web.auditlogs.filter.resourcetype', $_REQUEST['resourcetype'], PROFILE_TYPE_INT);
 
-		update_profile('web.auditlogs.filter.nav_time',$_REQUEST['nav_time'], PROFILE_TYPE_INT);
+		update_profile('web.auditlogs.filter.nav_time', $_REQUEST['nav_time'], PROFILE_TYPE_INT);
 	}
 // --------------
 
@@ -108,11 +102,10 @@ include_once('include/page_header.php');
 	$frmForm = new CForm();
 	$frmForm->setMethod('get');
 
-	$cmbConf = new CComboBox('config','auditlogs.php','javascript: submit()');
-	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');
-		$cmbConf->addItem('auditlogs.php',S_LOGS);
-		$cmbConf->addItem('auditacts.php',S_ACTIONS);
-
+	$cmbConf = new CComboBox('config', 'auditlogs.php');
+	$cmbConf->setAttribute('onchange', 'javascript: redirect(this.options[this.selectedIndex].value);');
+		$cmbConf->addItem('auditlogs.php', S_LOGS);
+		$cmbConf->addItem('auditacts.php', S_ACTIONS);
 	$frmForm->addItem($cmbConf);
 
 	$audit_wdgt->addPageHeader(S_AUDIT_LOGS_BIG,$frmForm);
@@ -128,28 +121,19 @@ include_once('include/page_header.php');
 /***********************************************************/
 
 	$filterForm = new CFormTable();
-	$filterForm->setAttribute('name','zbx_filter');
-	$filterForm->setAttribute('id','zbx_filter');
+	$filterForm->setAttribute('name', 'zbx_filter');
+	$filterForm->setAttribute('id', 'zbx_filter');
 
 	$script = new CJSscript("javascript: if(CLNDR['audit_since'].clndr.setSDateFromOuterObj()){".
 							"$('nav_time').value = parseInt(CLNDR['audit_since'].clndr.sdt.getTime()/1000);}");
-	$filterForm->addAction('onsubmit',$script);
-
-	$filterForm->addVar('nav_time',($_REQUEST['nav_time']>0)?$_REQUEST['nav_time']:'');
-
-	$filterForm->addVar('userid',$_REQUEST['userid']);
-
-	if(isset($_REQUEST['userid']) && ($_REQUEST['userid']>0)){
-		$user = get_user_by_userid($_REQUEST['userid']);
-	}
-	else{
-		$user = array('alias' => '');
-	}
+	$filterForm->addAction('onsubmit', $script);
+	$filterForm->addVar('nav_time', ($_REQUEST['nav_time']>0)?$_REQUEST['nav_time']:'');
+	
 	$row = new CRow(array(
 		new CCol(S_USER,'form_row_l'),
 		new CCol(array(
-			new CTextBox("user",$user['alias'],32,'yes'),
-			new CButton("btn1",S_SELECT,"return PopUp('popup.php?"."dstfrm=".$filterForm->GetName()."&dstfld1=userid&dstfld2=user"."&srctbl=users&srcfld1=userid&srcfld2=alias&real_hosts=1');",'T')
+			new CTextBox('alias', $_REQUEST['alias'], 32),
+			new CButton('btn1', S_SELECT,"return PopUp('popup.php?"."dstfrm=".$filterForm->GetName()."&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1');",'T')
 		),'form_row_r')
 	));
 
@@ -236,8 +220,8 @@ include_once('include/page_header.php');
 //-------
 
 	$sql_cond = '';
-	if($_REQUEST['userid'])
-		$sql_cond.=' AND a.userid='.$_REQUEST['userid'].' ';
+	if($_REQUEST['alias'])
+		$sql_cond.=' AND u.alias='.zbx_dbstr($_REQUEST['alias']);
 
 	if(($_REQUEST['action']>-1))
 		$sql_cond.=' AND a.action='.$_REQUEST['action'].' ';
@@ -260,7 +244,7 @@ include_once('include/page_header.php');
 			S_DESCRIPTION,
 			S_DETAILS));
 
-	$sql = 'SELECT a.auditid,a.clock,u.alias,a.ip,a.resourcetype,a.action,a.resourceid,a.resourcename,a.details '.
+	$sql = 'SELECT a.auditid, a.clock, u.alias, a.ip, a.resourcetype, a.action, a.resourceid, a.resourcename, a.details '.
 					' FROM auditlog a, users u '.
 					' WHERE u.userid=a.userid '.
 						$sql_cond.
@@ -330,5 +314,4 @@ include_once('include/page_header.php');
 <?php
 
 include_once('include/page_footer.php');
-
 ?>

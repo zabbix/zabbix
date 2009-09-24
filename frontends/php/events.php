@@ -263,7 +263,7 @@ include_once('include/page_header.php');
 					else{
 						$event_data['object_data']['ip'] = S_UNKNOWN;
 					}
-					$event_data['description'] = SPACE;
+					$event_data['description'] = S_HOST;
 					break;
 				case EVENT_OBJECT_DSERVICE:
 					if(isset($dservices[$event_data['objectid']])){
