@@ -323,7 +323,7 @@ int	node_process_command(zbx_sock_t *sock, const char *data)
 	zbx_get_next_field(&r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER); /* NodeID */
 	nodeid = atoi(tmp);
 	zbx_get_next_field(&r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER); /* hostid */
-	hostid = zbx_atoui64(tmp);
+	ZBX_STR2UINT64(hostid, tmp);
 	zbx_get_next_field(&r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
 
 	if (nodeid == CONFIG_NODEID) {
