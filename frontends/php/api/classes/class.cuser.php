@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with Users
  */
-class CUser {
+class CUser{
 
 	public static $error;
 
@@ -294,10 +294,11 @@ class CUser {
 		$login = user_login($user['user'], $user['password'], ZBX_AUTH_INTERNAL);
 
 		if($login){
+			self::checkAuth($login);
 			return $login;
 		}
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Given login or password is incorrect.');
+			self::$error = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => $_REQUEST['message']);
 			return false;
 		}
 	}
@@ -396,6 +397,11 @@ class CUser {
 	 * @param int $users['rows_per_page']
 	 * @param int $users['type']
 	 * @param array $users['user_medias']
+	 * @param string $users['user_medias']['mediatypeid']
+	 * @param string $users['user_medias']['address']
+	 * @param int $users['user_medias']['severity']
+	 * @param int $users['user_medias']['active']
+	 * @param string $users['user_medias']['period']
 	 * @return boolean
 	 */
 	public static function add($users){
@@ -443,6 +449,11 @@ class CUser {
 	 * @param int $users['rows_per_page']
 	 * @param int $users['type']
 	 * @param array $users['user_medias']
+	 * @param string $users['user_medias']['mediatypeid']
+	 * @param string $users['user_medias']['address']
+	 * @param int $users['user_medias']['severity']
+	 * @param int $users['user_medias']['active']
+	 * @param string $users['user_medias']['period']
 	 * @return boolean
 	 */
 	public static function update($users){
