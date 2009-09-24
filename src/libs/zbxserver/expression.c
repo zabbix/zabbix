@@ -228,6 +228,59 @@ static int	DBget_item_lastvalue_by_functionid(zbx_uint64_t functionid, char **la
 
 /******************************************************************************
  *                                                                            *
+ * Function: item_description                                                 *
+ *                                                                            *
+ * Purpose: substitute key parameters in the item description string          *
+ *          with real values                                                  *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	item_description(char **data, const char *key)
+{
+	char	*p, *m, *str_out = NULL, params[MAX_STRING_LEN], param[MAX_STRING_LEN];
+
+	if (2 /* key with parameters */ != parse_command(key, NULL, 0, params, sizeof(params)))
+		return;
+
+	p = *data;
+	while (NULL != (m = strchr(p, '$')))
+	{
+		*m = '\0';
+		str_out = zbx_strdcat(str_out, p);
+		*m++ = '$';
+
+		if (*m >= '1' && *m <= '9')
+		{
+			if (0 != get_param(params, *m - '0', param, sizeof(param)))
+				*param = '\0';
+
+			str_out = zbx_strdcat(str_out, param);
+			p = m + 1;
+		}
+		else
+		{
+			str_out = zbx_strdcat(str_out, "$");
+			p = m;
+		}
+	}
+
+	if (NULL != str_out)
+	{
+		str_out = zbx_strdcat(str_out, p);
+		zbx_free(*data);
+		*data = str_out;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBget_trigger_value_by_functionid                                *
  *                                                                            *
  * Purpose: retrive trigger value by functionid and field name                *
@@ -244,30 +297,53 @@ static int	DBget_item_lastvalue_by_functionid(zbx_uint64_t functionid, char **la
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_trigger_value_by_functionid(zbx_uint64_t functionid, char **value, const char *fieldname)
+#define ZBX_REQUEST_HOST_NAME		0
+#define ZBX_REQUEST_HOST_IPADDRESS	1
+#define ZBX_REQUEST_ITEM_NAME		4
+#define ZBX_REQUEST_ITEM_KEY		5
+static int	DBget_trigger_value_by_functionid(zbx_uint64_t functionid, char **replace_to, int request)
 {
 	const char	*__function_name = "DBget_trigger_value_by_functionid";
 	DB_RESULT	result;
 	DB_ROW		row;
+	DB_ITEM		item;
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() functionid:" ZBX_FS_UI64, __function_name, functionid);
 
-	result = DBselect("select %s from hosts h,items i,functions f"
-			" where h.hostid=i.hostid and i.itemid=f.itemid and f.functionid=" ZBX_FS_UI64,
-			fieldname, functionid);
+	result = DBselect(
+			"select %s,functions f"
+			" where h.hostid=i.hostid"
+				" and i.itemid=f.itemid"
+				" and f.functionid=" ZBX_FS_UI64,
+			ZBX_SQL_ITEM_SELECT,
+			functionid);
 
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+	if (NULL != (row = DBfetch(result)))
 	{
-		*value = zbx_dsprintf(*value, "%s", row[0]);
-		ret = SUCCEED;
+		DBget_item_from_db(&item, row);
+
+		switch (request) {
+		case ZBX_REQUEST_HOST_NAME:
+			*replace_to = zbx_dsprintf(*replace_to, "%s", item.host_name);
+			ret = SUCCEED;
+			break;
+		case ZBX_REQUEST_HOST_IPADDRESS:
+			*replace_to = zbx_dsprintf(*replace_to, "%s", item.host_ip);
+			ret = SUCCEED;
+			break;
+		case ZBX_REQUEST_ITEM_NAME:
+			*replace_to = zbx_dsprintf(*replace_to, "%s", item.description);
+			item_description(replace_to, item.key);
+			ret = SUCCEED;
+			break;
+		case ZBX_REQUEST_ITEM_KEY:
+			*replace_to = zbx_dsprintf(*replace_to, "%s", item.key);
+			ret = SUCCEED;
+			break;
+		}
 	}
-
 	DBfree_result(result);
-
-	if (NULL != *value)
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() %s:'%s'", __function_name, fieldname, *value);
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -1214,7 +1290,8 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 			if (SUCCEED == ret)
 				ret = trigger_get_N_functionid(expression, 1, &functionid);
 			if (SUCCEED == ret)
-				ret = DBget_trigger_value_by_functionid(functionid, &replace_to, "h.host");
+				ret = DBget_trigger_value_by_functionid(functionid, &replace_to,
+						ZBX_REQUEST_HOST_NAME);
 			if (FAIL == ret)
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "No %s in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
@@ -1231,7 +1308,8 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 			if (SUCCEED == ret)
 				ret = trigger_get_N_functionid(expression, 1, &functionid);
 			if (SUCCEED == ret)
-				ret = DBget_trigger_value_by_functionid(functionid, &replace_to, "i.description");
+				ret = DBget_trigger_value_by_functionid(functionid, &replace_to,
+						ZBX_REQUEST_ITEM_NAME);
 			if (FAIL == ret)
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "No %s in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
@@ -1265,7 +1343,8 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 			if (SUCCEED == ret)
 				ret = trigger_get_N_functionid(expression, 1, &functionid);
 			if (SUCCEED == ret)
-				ret = DBget_trigger_value_by_functionid(functionid, &replace_to, "i.key_");
+				ret = DBget_trigger_value_by_functionid(functionid, &replace_to,
+						ZBX_REQUEST_ITEM_KEY);
 			if (FAIL == ret)
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "No %s in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
@@ -1282,7 +1361,8 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 			if (SUCCEED == ret)
 				ret = trigger_get_N_functionid(expression, 1, &functionid);
 			if (SUCCEED == ret)
-				ret = DBget_trigger_value_by_functionid(functionid, &replace_to, "h.ip");
+				ret = DBget_trigger_value_by_functionid(functionid, &replace_to,
+						ZBX_REQUEST_HOST_IPADDRESS);
 			if (FAIL == ret)
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "No %s in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
