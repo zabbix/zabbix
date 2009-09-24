@@ -627,7 +627,14 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 			(CONST OCISnapshot *) NULL, (OCISnapshot *) NULL, OCI_COMMIT_ON_SUCCESS);
 
 		if (err != 1)
-			err = OCI_SUCCESS;
+		{
+			ub4 nrows = 0;
+
+			err = OCIAttrGet((void *)stmthp, OCI_HTYPE_STMT, (ub4 *)&nrows,
+					  (ub4 *)0, OCI_ATTR_ROW_COUNT, oracle.errhp);
+
+			ret = nrows;
+		}
 	}
 
 	if (err != OCI_SUCCESS) {
