@@ -58,7 +58,7 @@ class CHost {
  * @param int $options['count'] count Hosts, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in host names
  * @param int $options['limit'] limit selection
- * @param string $options['order'] depricated parametr (for now)
+ * @param string $options['order'] deprecated parameter (for now)
  * @return array|boolean Host data as array or false if error
  */
 	public static function get($options=array()){
