@@ -118,8 +118,9 @@ $fields=array(
 		}
 		else {
 
-			$userid = $USER_DETAILS['userid'];
+			
 			$user = array();
+			$user['userid'] = $USER_DETAILS['userid'];
 //			$user['name'] = $USER_DETAILS['name'];
 //			$user['surname'] = $USER_DETAILS['surname'];
 			$user['alias'] = $USER_DETAILS['alias'];
@@ -136,9 +137,10 @@ $fields=array(
 			$user['user_medias'] = get_request('user_medias');
 
 			DBstart();
-			$result = update_user($userid, $user);
+			$result = CUser::update(array($user));
 			$result = DBend($result);
-
+			
+			if(!$result) error(CUser::$error['data']);
 			show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 
 			if($result)

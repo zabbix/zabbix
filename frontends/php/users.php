@@ -164,10 +164,12 @@ include_once('include/page_header.php');
 
 			if(isset($_REQUEST['userid'])){
 				$action = AUDIT_ACTION_UPDATE;
-
+				$user['userid'] = $_REQUEST['userid'];
+				
 				DBstart();
-				$result = update_user($_REQUEST['userid'], $user);
+				$result = CUser::update(array($user));
 				$result = DBend($result);
+				if(!$result) error(CUser::$error['data']);
 
 				show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 			}
@@ -175,9 +177,10 @@ include_once('include/page_header.php');
 				$action = AUDIT_ACTION_ADD;
 
 				DBstart();
-				$result = add_user($user);
+				$result = CUser::add(array($user));
 				$result = DBend($result);
-
+				
+				if(!$result) error(CUser::$error['data']);
 				show_messages($result, S_USER_ADDED, S_CANNOT_ADD_USER);
 			}
 			if($result){
@@ -203,7 +206,7 @@ include_once('include/page_header.php');
 
 	}
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['userid'])){
-		$user=get_user_by_userid($_REQUEST['userid']);
+		$user=CUser::getById(array('userid' => $_REQUEST['userid']));
 
 		DBstart();
 		$result = delete_user($_REQUEST['userid']);
@@ -220,7 +223,7 @@ include_once('include/page_header.php');
 	}
 // Add USER to GROUP
 	else if(isset($_REQUEST['grpaction'])&&isset($_REQUEST['usrgrpid'])&&isset($_REQUEST['userid'])&&($_REQUEST['grpaction']==1)){
-		$user=get_user_by_userid($_REQUEST['userid']);
+		$user=CUser::getById(array('userid' => $_REQUEST['userid']));
 		$group=get_group_by_usrgrpid($_REQUEST['usrgrpid']);
 
 		DBstart();
@@ -240,7 +243,7 @@ include_once('include/page_header.php');
 	}
 // Remove USER from GROUP
 	else if(isset($_REQUEST['grpaction'])&&isset($_REQUEST['usrgrpid'])&&isset($_REQUEST['userid'])&&($_REQUEST['grpaction']==0)){
-		$user=get_user_by_userid($_REQUEST['userid']);
+		$user=CUser::getById(array('userid' => $_REQUEST['userid']));
 		$group=get_group_by_usrgrpid($_REQUEST['usrgrpid']);
 
 		DBstart();
@@ -288,7 +291,7 @@ include_once('include/page_header.php');
 
 		DBstart();
 		foreach($group_userid as $userid){
-			if(!($user_data = get_user_by_userid($userid))) continue;
+			if(!($user_data = CUser::getById(array('userid' => $_REQUEST['userid'])))) continue;
 
 			$result |= (bool) delete_user($userid);
 

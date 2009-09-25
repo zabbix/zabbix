@@ -334,12 +334,13 @@ class CUser{
 	 * @return array|boolean User data as array or false if error
 	 */
 	public static function getById($user_data){
-		$user = get_user_by_userid($user_data['userid']);
+	
+		$user = DBfetch(DBselect('SELECT * FROM users WHERE userid='.$user_data['userid']));
 
 		if($user)
 			return $user;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'User with id: '.$user_data['userid'].' doesn\'t exists.');
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => "No user with id [ {$user_data['userid']} ]");
 			return false;
 		}
 	}
@@ -402,22 +403,107 @@ class CUser{
 	 * @param int $users['user_medias']['severity']
 	 * @param int $users['user_medias']['active']
 	 * @param string $users['user_medias']['period']
-	 * @return boolean
+	 * @return array|boolean
 	 */
 	public static function add($users){
+		global $USER_DETAILS;
 		$error = 'Unknown ZABBIX internal error';
 		$result = false;
-
+		$resultids = array();
+		
 		DBstart(false);
 
-		foreach($users as $user){
-			$result = add_user($user);
+		foreach($users as $user){		
+		
+// copy from frontend {	
+			if($USER_DETAILS['type'] != USER_TYPE_SUPER_ADMIN){
+				$error = 'Insufficient permissions';
+				$result = false;
+				break;
+			}
+
+			$sql = 'SELECT * '.
+					' FROM users '.
+					' WHERE alias='.zbx_dbstr($user['alias']).
+						' AND '.DBin_node('userid', get_current_nodeid(false));
+			if(DBfetch(DBselect($sql))){
+				$error = "User [ {$user['alias']} ] already exists";
+				$result = false;
+				break;
+			}
+
+			$user_db_fields = array(
+				'name' => 'ZABBIX',
+				'surname' => 'USER',
+				'alias' => null,
+				'passwd' => 'zabbix',
+				'url' => '',
+				'autologin' => 0,
+				'autologout' => 900,
+				'lang' => 'en_gb',
+				'theme' => 'default.css',
+				'refresh' => 30,
+				'rows_per_page' => 50,
+				'type' => USER_TYPE_ZABBIX_USER,
+				'user_groups' => array(),
+				'user_medias' => array(),
+			);
+
+			if(!check_db_fields($user_db_fields, $user)){
+				$error = 'Incorrect parameters pasted to method [ user.add ]';
+				$result = false;
+				break;
+			}
+
+			$userid = get_dbid('users', 'userid');
+
+			$result = DBexecute('INSERT INTO users (userid,name,surname,alias,passwd,url,autologin,autologout,lang,theme,refresh,rows_per_page,type) VALUES ('.
+				$userid.','.
+				zbx_dbstr($user['name']).','.
+				zbx_dbstr($user['surname']).','.
+				zbx_dbstr($user['alias']).','.
+				zbx_dbstr(md5($user['passwd'])).','.
+				zbx_dbstr($user['url']).','.
+				$user['autologin'].','.
+				$user['autologout'].','.
+				zbx_dbstr($user['lang']).','.
+				zbx_dbstr($user['theme']).','.
+				$user['refresh'].','.
+				$user['rows_per_page'].','.
+				$user['type'].
+				')');
+
+			if($result){
+	//			$result = DBexecute('DELETE FROM users_groups WHERE userid='.$userid);
+				foreach($user['user_groups'] as $groupid){
+					if(!$result) break;
+					$users_groups_id = get_dbid("users_groups","id");
+					$result = DBexecute('INSERT INTO users_groups (id,usrgrpid,userid)'.
+						'values('.$users_groups_id.','.$groupid.','.$userid.')');
+				}
+			}
+
+			if($result){
+	//			$result = DBexecute('DELETE FROM media WHERE userid='.$userid);
+				foreach($user['user_medias'] as $mediaid => $media_data){
+					if(!$result) break;
+					$mediaid = get_dbid("media","mediaid");
+					$result = DBexecute('INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period)'.
+						' VALUES ('.$mediaid.','.$userid.','.$media_data['mediatypeid'].','.
+						zbx_dbstr($media_data['sendto']).','.$media_data['active'].','.$media_data['severity'].','.
+						zbx_dbstr($media_data['period']).')');
+				}
+			}
+
+// } copy from frontend
+
+			$resultids[$userid] = $userid;
 			if(!$result) break;
 		}
 		$result = DBend($result);
 
 		if($result){
-			return true;
+			return $resultids;
 		}
 		else{
 			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
@@ -458,10 +544,83 @@ class CUser{
 	 */
 	public static function update($users){
 		$result = false;
-
+		$error = 'Unknown ZABBIX internal error';
+		
 		DBstart(false);
 		foreach($users as $user){
-			$result = update_user($user['userid'], $user);
+			$userid = $user['userid'];
+			
+// copy from frontend {		
+			$result = true;
+
+			$sql = 'SELECT DISTINCT * '.
+				' FROM users '.
+				' WHERE ( alias='.zbx_dbstr($user['alias']).' OR userid='.$userid.' ) '.
+					' AND '.DBin_node('userid', id2nodeid($userid));
+
+			$db_users = DBselect($sql);
+			while($db_user = DBfetch($db_users)){
+				if($db_user['userid'] != $userid){
+					$error = "User [ {$user['alias']} ] already exists";
+					$result = false;
+					break;
+				}
+				$user_db_fields = $db_user;
+			}
+
+			if(!isset($user_db_fields)) {
+				return false;
+			}
+
+			if(isset($user['passwd'])) {
+				$user['passwd'] = md5($user['passwd']);
+			}
+
+			if(!check_db_fields($user_db_fields, $user)){
+				$error = 'Incorrect parameters pasted to method [ user.update ]';
+				$result = false;
+				break;
+			}
+
+			$sql = 'UPDATE users SET '.
+					' name='.zbx_dbstr($user['name']).
+					' ,surname='.zbx_dbstr($user['surname']).
+					' ,alias='.zbx_dbstr($user['alias']).
+					' ,passwd='.zbx_dbstr($user['passwd']).
+					' ,url='.zbx_dbstr($user['url']).
+					' ,autologin='.$user['autologin'].
+					' ,autologout='.$user['autologout'].
+					' ,lang='.zbx_dbstr($user['lang']).
+					' ,theme='.zbx_dbstr($user['theme']).
+					' ,refresh='.$user['refresh'].
+					' ,rows_per_page='.$user['rows_per_page'].
+					' ,type='.$user['type'].
+					' WHERE userid='.$userid;
+			$result = DBexecute($sql);
+
+			if($result && !is_null($user['user_groups'])){
+				$result = DBexecute('DELETE FROM users_groups WHERE userid='.$userid);
+				foreach($user['user_groups'] as $groupid){
+					if(!$result) break;
+					$users_groups_id = get_dbid('users_groups', 'id');
+					$result = DBexecute('INSERT INTO users_groups (id, usrgrpid, userid)'.
+						'values('.$users_groups_id.','.$groupid.','.$userid.')');
+				}
+			}
+
+			if($result && !is_null($user['user_medias'])){
+				$result = DBexecute('DELETE FROM media WHERE userid='.$userid);
+				foreach($user['user_medias'] as $mediaid => $media_data){
+					if(!$result) break;
+					$mediaid = get_dbid('media', 'mediaid');
+					$result = DBexecute('INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period)'.
+						' values ('.$mediaid.','.$userid.','.$media_data['mediatypeid'].','.
+						zbx_dbstr($media_data['sendto']).','.$media_data['active'].','.$media_data['severity'].','.
+						zbx_dbstr($media_data['period']).')');
+				}
+			}
+
+// } copy from frontend		
 			if(!$result) break;
 		}
 		$result = DBend($result);
@@ -470,7 +629,7 @@ class CUser{
 			return true;
 		}
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
 			return false;
 		}
 	}
