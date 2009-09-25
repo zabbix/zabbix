@@ -511,7 +511,7 @@ function get_operation_desc($type=SHORT_DESCRITION, $data){
 				case OPERATION_TYPE_MESSAGE:
 					switch($data['object']){
 						case OPERATION_OBJECT_USER:
-							$obj_data = get_user_by_userid($data['objectid']);
+							$obj_data = CUser::getById(array('userid' => $data['objectid']));
 							$obj_data = S_USER.' "'.$obj_data['alias'].'"';
 							break;
 						case OPERATION_OBJECT_GROUP:
@@ -914,7 +914,7 @@ function validate_operation($operation){
 		case OPERATION_TYPE_MESSAGE:
 			switch($operation['object']){
 				case OPERATION_OBJECT_USER:
-					if( !get_user_by_userid($operation['objectid']) ){
+					if( !CUser::getById(array('userid' => $operation['objectid'])) ){
 						error(S_INCORRECT_USER);
 						return false;
 					}

@@ -442,7 +442,7 @@ class CAction {
 			$res = DBselect($sql);
 			while($opcondition = DBfetch($res)){
 				$operations[$opcondition['operationid']]['opconditions'][$opcondition['opconditionid']] = $opcondition;
-				$operationids[$opcondition['operationid']]['opconditionids'][$opcondition['opconditionid']] = $opcondition['opconditionid'];
+				$operations[$opcondition['operationid']]['opconditionids'][$opcondition['opconditionid']] = $opcondition['opconditionid'];
 			}
 
 			foreach($operations as $operationd => $operation){

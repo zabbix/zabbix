@@ -661,7 +661,7 @@
 		if(isset($userid)){
 /*			if(bccomp($userid,$USER_DETAILS['userid'])==0) $profile = 1;*/
 
-			$user=get_user_by_userid($userid);
+			$user=CUser::getById(array('userid' => $userid));
 			$frm_title = S_USER.' "'.$user['alias'].'"';
 		}
 
@@ -4545,7 +4545,7 @@
 				else{
 					$object_srctbl = 'users';
 					$object_srcfld1 = 'userid';
-					$object_name = get_user_by_userid($new_operation['objectid']);
+					$object_name = CUser::getById(array('userid' => $new_operation['objectid']));
 					$display_name = 'alias';
 				}
 
