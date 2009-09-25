@@ -681,6 +681,16 @@ return "$s $u$units";
 
 
 /************* ZBX MISC *************/
+function zbx_avg($values){
+	zbx_value2array($values);
+	
+	$sum = 0;
+	foreach($values as $num => $value){
+		$sum += $value;
+	}
+
+return ($sum / count($values));
+}
 
 // accepts parametr as integer either
 function zbx_ctype_digit($x){
@@ -714,6 +724,7 @@ function zbx_strlen(&$str){
 	for($i=0; $i < $strlen; $i++){
 		if(((ord($str[$i]) & $fbin) && (ord($str[$i]) & $sbin)) || !(ord($str[$i]) & $fbin)) $reallen++;
 	}
+
 return $reallen;
 }
 

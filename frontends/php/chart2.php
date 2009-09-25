@@ -78,7 +78,7 @@ include_once('include/page_header.php');
 	if(id2nodeid($db_data['hostid']) != get_current_nodeid()){
 		$chart_header = get_node_name_by_elid($db_data['hostid'], true);
 	}
-	$chart_header.= $db_data['host'].':'.$db_data['name'];
+	$chart_header.= $db_data['host'].': '.$db_data['name'];
 	$graph->setHeader($chart_header);
 
 	if(isset($_REQUEST['period']))		$graph->SetPeriod($_REQUEST['period']);
@@ -112,11 +112,11 @@ include_once('include/page_header.php');
 	$graph->setLeftPercentage($db_data['percent_left']);
 	$graph->setRightPercentage($db_data['percent_right']);
 
-	$result = DBselect('SELECT gi.* '.
-		' FROM graphs_items gi '.
-		' WHERE gi.graphid='.$db_data['graphid'].
-		' ORDER BY gi.sortorder, gi.itemid DESC');
-
+	$sql = 'SELECT gi.* '.
+			' FROM graphs_items gi '.
+			' WHERE gi.graphid='.$db_data['graphid'].
+			' ORDER BY gi.sortorder, gi.itemid DESC';
+	$result = DBselect($sql);
 	while($db_data=DBfetch($result)){
 		$graph->addItem(
 			$db_data['itemid'],

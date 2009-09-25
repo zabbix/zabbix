@@ -129,7 +129,7 @@ include_once 'include/page_header.php';
 		$color		= get_request("color", 		'009900');
 		$drawtype	= get_request("drawtype",	0);
 		$sortorder	= get_request("sortorder",	0);
-		$yaxisside	= get_request("yaxisside",	1);
+		$yaxisside	= get_request("yaxisside",	0);
 		$calc_fnc	= get_request("calc_fnc",	2);
 		$type		= get_request("type",		0);
 		$periods_cnt	= get_request("periods_cnt",	5);
@@ -241,8 +241,8 @@ include_once 'include/page_header.php';
 
 		if(($graphtype == GRAPH_TYPE_NORMAL) || ($graphtype == GRAPH_TYPE_STACKED)){
 			$cmbYax = new CComboBox('yaxisside',$yaxisside);
-			$cmbYax->addItem(GRAPH_YAXIS_SIDE_RIGHT, S_RIGHT);
 			$cmbYax->addItem(GRAPH_YAXIS_SIDE_LEFT,	S_LEFT);
+			$cmbYax->addItem(GRAPH_YAXIS_SIDE_RIGHT, S_RIGHT);
 			$frmGItem->addRow(S_YAXIS_SIDE, $cmbYax);
 		}
 
@@ -258,6 +258,6 @@ include_once 'include/page_header.php';
 ?>
 <?php
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
 
 ?>

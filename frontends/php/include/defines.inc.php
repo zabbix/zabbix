@@ -40,7 +40,7 @@
 
 	define('ZBX_MIN_PERIOD',					3600);				// ~1 hour
 	define('ZBX_MAX_PERIOD', 					12*31*24*3600);		// ~1 year
-	define('ZBX_PERIOD_DEFAULT', 				ZBX_MIN_PERIOD);
+	define('ZBX_PERIOD_DEFAULT', 				86400);
 
 	define('ZBX_FONTPATH', realpath('fonts'));				// where to search for font  (GD > 2.0.18)
 	define('ZBX_GRAPH_FONT_NAME', 'DejaVuSans');	// font file name

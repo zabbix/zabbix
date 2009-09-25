@@ -404,11 +404,11 @@ class zbxXML{
 			foreach($hosts as $host){
 
 // IMPORT RULES
-			$host_db = self::mapXML2arr($host, XML_TAG_HOST);
-			$current_hostid = CHost::getId(array('host' => $host_db['host']));
+				$host_db = self::mapXML2arr($host, XML_TAG_HOST);
+				$current_hostid = CHost::getId(array('host' => $host_db['host']));
 
-			if(!$current_hostid && !isset($rules['host']['missed'])) continue; // break if update nonexist
-			if($current_hostid && !isset($rules['host']['exist'])) continue; // break if not update exist
+				if(!$current_hostid && !isset($rules['host']['missed'])) continue; // break if update nonexist
+				if($current_hostid && !isset($rules['host']['exist'])) continue; // break if not update exist
 
 
 // HOST GROUPS
@@ -440,6 +440,7 @@ class zbxXML{
 					}
 					$new_groupids = CHostGroup::add($groups_to_add);
 				}
+
 				if($new_groupids)
 					$host_groupids = array_merge($new_groupids, $host_groupids);
 				else
@@ -452,6 +453,7 @@ class zbxXML{
 					CHost::update(array($host_db));
 					CHostGroup::addGroupsToHost(array('hostid' => $current_hostid, 'groupids' => $new_groupids));
 				}
+
 				if(!$current_hostid && isset($rules['host']['missed'])){
 					$host_db['groupids'] = $host_groupids;
 					$current_hostid = CHost::add(array($host_db));

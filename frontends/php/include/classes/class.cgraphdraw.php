@@ -58,7 +58,7 @@ class CGraphDraw{
 		$this->shiftXleft=10;
 		$this->shiftXright=60;
 		$this->shiftXCaption=0;
-		$this->shiftY=17;
+		$this->shiftY=36;
 		$this->border=1;
 		$this->num=0;
 		$this->type = $type;			// graph type
@@ -167,6 +167,17 @@ class CGraphDraw{
 	return 0;
 	}
 
+	public function drawRectangle($bgcolor='F6F6F6', $bordercolor='aaaaaa'){
+		imagefilledrectangle($this->im,0,0,
+			$this->fullSizeX,$this->fullSizeY,
+			$this->getColor($bgcolor, 0));
+
+
+		if($this->border==1){
+			imagerectangle($this->im,0,0,$this->fullSizeX-1,$this->fullSizeY-1, $this->getColor($bordercolor, 0)); 
+		}
+	}
+
 	public function drawSmallRectangle(){
 		dashedrectangle($this->im,
 			$this->shiftXleft+$this->shiftXCaption-1,
@@ -176,18 +187,7 @@ class CGraphDraw{
 			$this->getColor('Black No Alpha')
 			);
 	}
-
-	public function drawRectangle(){
-		imagefilledrectangle($this->im,0,0,
-			$this->fullSizeX,$this->fullSizeY,
-			$this->getColor('E3E3E3', 0));
-
-
-		if($this->border==1){
-			imagerectangle($this->im,0,0,$this->fullSizeX-1,$this->fullSizeY-1,$this->getColor('Black No Alpha'));
-		}
-	}
-
+	
 	public function period2str($period){
 		$second = 1; $minute=$second * 60; $hour=$minute*60; $day=$hour*24;
 		$str = ' ( ';
@@ -214,28 +214,29 @@ class CGraphDraw{
 	return $str;
 	}
 
-	public function drawHeader(){
+	public function drawHeader($color = '222222'){
 		if(!isset($this->header)){
-			$str=$this->items[0]['host'].':'.$this->items[0]['description'];
+			$str=$this->items[0]['host'].': '.$this->items[0]['description'];
 		}
 		else{
 			$str=$this->header;
 		}
-
-		$str=$str.$this->period2str($this->period);
+		
+//		$str.=$this->period2str($this->period);
 
 		if($this->sizeX < 500){
-			$fontnum = 2;
+			$fontnum = 8;
 		}
 		else{
-			$fontnum = 4;
+			$fontnum = 11;
 		}
+
 		$x=$this->fullSizeX/2-imagefontwidth($fontnum)*strlen($str)/2;
-		imagetext($this->im, 4, 0, $x, 0, $this->getColor('Dark Red No Alpha'), $str);
+		imagetext($this->im, $fontnum, 0, $x, 24, $this->getColor($color, 0), $str);
 	}
 
 	public function setHeader($header){
-		$this->header=$header;
+		$this->header = $header;
 	}
 
 	public function drawLogo(){
