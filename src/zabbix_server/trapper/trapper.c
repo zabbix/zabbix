@@ -152,6 +152,8 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 	int		sql_offset = 0, i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_mass_data()");
+	
+	DCinit_nextchecks();
 
 	if (NULL == sql)
 		sql = zbx_malloc(sql, sql_allocated);
@@ -230,8 +232,10 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 							item.host_name);
 					zabbix_syslog("Active parameter [%s] is not supported by agent on host [%s]",
 							item.key_orig,
-							item.host_name);
-
+							item.host_name);					
+					
+					DCadd_nextcheck(&item, (time_t)values[i].clock, (time_t)0, values[i].value);
+					
 					if (NULL != processed)
 						(*processed)++;
 				}
@@ -276,6 +280,10 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 		}
 	}
 	DBfree_result(result);
+	
+	DCflush_nextchecks();
+		
+	zabbix_log(LOG_LEVEL_DEBUG, "End process_mass_data()");
 }
 
 /******************************************************************************

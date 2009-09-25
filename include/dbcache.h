@@ -147,6 +147,7 @@ void	free_database_cache(void);
 void	DCinit_nextchecks();
 void	DCadd_nextcheck(DB_ITEM *item, time_t now, time_t timediff, const char *error_msg);
 void	DCflush_nextchecks();
+void	DCrelease_nextchecks();
 void	DCget_stats(ZBX_DC_STATS *stats);
 
 zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int num);
