@@ -380,11 +380,12 @@ createBox: function(obj, hint_text, width, className, byClick){
 	var box = document.createElement('div');
 	
 	var obj_tag = obj.nodeName.toLowerCase();
-	
+
 	if((obj_tag == 'td') || (obj_tag == 'div') || (obj_tag == 'body')) obj.appendChild(box);
 	else obj.parentNode.appendChild(box);
 	
 	box.setAttribute('id', boxid);
+	box.style.visibility = 'hidden';
 	box.className = 'hintbox';
 	
 	if(!empty(className)){
@@ -508,10 +509,11 @@ show: function(e, obj, hintbox){
 	
 	var hintid = hintbox.id;
 	var body_width = get_bodywidth();
-
-	var pos = getPosition(obj);
-	var cursor = get_cursor_position(e);
 	
+//	pos = getPosition(obj);
+// this.debug('body width: ' + body_width);
+// this.debug('position.top: ' + pos.top);
+
 // by Object
 /*
 	if(parseInt(pos.left+obj.offsetWidth+4+hintbox.offsetWidth) > body_width){
@@ -524,23 +526,27 @@ show: function(e, obj, hintbox){
 	}
 	hintbox.x	= pos.left;
 //*/
-// by Cursor
-//*
-	if(parseInt(cursor.x+10+hintbox.offsetWidth) > body_width){
-		cursor.x-=parseInt(hintbox.offsetWidth);
-		cursor.x-=10;
-		cursor.x=(cursor.x < 0)?0:cursor.x;
+	
+	posit = $(obj).positionedOffset();
+	cumoff = $(obj).cumulativeOffset();
+	if(parseInt(cumoff.left+10+hintbox.offsetWidth) > body_width){
+		posit.left-=parseInt(hintbox.offsetWidth);
+		posit.left-=10;
+		//posit.left=(pos.left < 0)?0:posit.left;
 	}
 	else{
-		cursor.x+=10;
-	}
-	hintbox.x	= cursor.x;
-//*/
-
-	hintbox.y	= pos.top;
-
+		posit.left+=10;
+	}	
+	hintbox.x	= posit.left;
+	hintbox.y	= posit.top;
 	hintbox.style.left = hintbox.x + 'px';
 	hintbox.style.top	= hintbox.y + 10 + parseInt(obj.offsetHeight/2) + 'px';
+	hintbox.style.visibility = 'visible';
+	hintbox.style.zIndex = '999';
+	
+// IE6 z-index bug
+	//showPopupDiv(hintid, 'frame_'+hintid);
+	
 },
 
 hide: function(e, boxid){
@@ -552,10 +558,14 @@ hide: function(e, boxid){
 	var hint = $(boxid);
 	if(!is_null(hint)){
 		delete(this.boxes[boxid]);
-
+		
+		//hidePopupDiv('frame_'+hint.id);
 // Opera refresh bug!
 		hint.style.display = 'none';
+		//hintbox.setAttribute('byclick', 'true');
 		if(OP) setTimeout(function(){hint.remove();}, 200);
+		else hint.remove();
+		
 	}
 },
 
