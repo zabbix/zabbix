@@ -2531,3 +2531,33 @@ void	DBproxy_register_host(const char *host)
 
 	zbx_free(host_esc);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBexecute_overflowed_sql                                         *
+ *                                                                            *
+ * Purpose: execute a set of SQL statements IF it is big enough               *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Dmitry Borovikov                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset)
+{
+	if (*sql_offset > ZBX_MAX_SQL_SIZE)
+	{
+#ifdef HAVE_ORACLE
+		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 8, "end;\n");
+#endif
+		DBexecute("%s", *sql);
+		*sql_offset = 0;
+#ifdef HAVE_ORACLE
+		zbx_snprintf_alloc(sql, sql_allocated, sql_offset, 8, "begin\n");
+#endif
+	}
+}
