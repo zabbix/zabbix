@@ -106,14 +106,14 @@ ZBX_TABLE	tables[]={
 	"t_time"	=>	"number(10)",
 	"t_serial"	=>	"number(20)",
 	"t_double"	=>	"number(20,4)",
-	"t_varchar"	=>	"varchar2",
-	"t_char"	=>	"varchar2",
+	"t_varchar"	=>	"nvarchar2",
+	"t_char"	=>	"nvarchar2",
 	"t_image"	=>	"blob",
-	"t_history_log"	=>	"clob",
-	"t_history_text"=>	"clob",
-	"t_blob"	=>	"varchar2(2048)",
-	"t_item_param"	=>	"varchar2(2048)",
-	"t_cksum_text"	=>	"clob"  
+	"t_history_log"	=>	"nclob",
+	"t_history_text"=>	"nclob",
+	"t_blob"	=>	"nvarchar2(2048)",
+	"t_item_param"	=>	"nvarchar2(2048)",
+	"t_cksum_text"	=>	"nclob"  
 );
 
 %postgresql=("t_bigint"	=>	"bigint",
@@ -267,7 +267,7 @@ sub process_field
 		}
 
 		# Special processing for Oracle "default 'ZZZ' not null" -> "default 'ZZZ'. NULL=='' in Oracle!"
-		if(($output{"database"} eq "oracle") && (0==index($type_2,"varchar2")))
+		if(($output{"database"} eq "oracle") && ((0==index($type_2,"nvarchar2")) || (0==index($type_2,"nclob"))))
 		{
 		#	$default="DEFAULT NULL";
 			$null="";
