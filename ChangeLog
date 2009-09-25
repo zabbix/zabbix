@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [DEV-310] improvements in graph visualisation and time line scrolling (Artem)
  - [DEV-357] modified oracle schema for support of Unicode (Sasha)
  - [ZBX-1046] add DBPort description; note that socket is used for MySQL if DBHost is localhost (Richlv)
  - [DEV-411] database cache is permanently enabled (Sasha)

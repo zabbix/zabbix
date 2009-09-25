@@ -24,7 +24,7 @@
 
 	function insert_slideshow_form(){
 		$form = new CFormTable(S_SLIDESHOW, null, 'post');
-		$form->SetHelp('config_advanced.php');
+		$form->setHelp('config_advanced.php');
 
 		$form->addVar('config', 1);
 
@@ -160,7 +160,7 @@
 		}
 
 		$form = new CFormTable($frm_title, null, 'post');
-		$form->SetHelp("web.discovery.rule.php");
+		$form->setHelp("web.discovery.rule.php");
 
 		if(isset($_REQUEST['druleid'])){
 			$form->addVar('druleid', $_REQUEST['druleid']);
@@ -349,7 +349,7 @@
 	function	insert_httpstep_form()
 	{
 		$form = new CFormTable(S_STEP_OF_SCENARIO, null, 'post');
-		$form->SetHelp("web.webmon.httpconf.php");
+		$form->setHelp("web.webmon.httpconf.php");
 
 		$form->addVar('dstfrm', get_request('dstfrm', null));
 		$form->addVar('stepid', get_request('stepid', null));
@@ -503,7 +503,7 @@
 		$form->addRow(S_VARIABLES, new CTextArea('macros', $macros, 84, 5));
 
 		$tblSteps = new CTableInfo();
-		$tblSteps->SetHeader(array(S_NAME,S_TIMEOUT,S_URL,S_REQUIRED,S_STATUS,S_SORT));
+		$tblSteps->setHeader(array(S_NAME,S_TIMEOUT,S_URL,S_REQUIRED,S_STATUS,S_SORT));
 		if(count($steps) > 0){
 			$first = min(array_keys($steps));
 			$last = max(array_keys($steps));
@@ -540,7 +540,7 @@
 
 			if(strlen($s['url']) > 70){
 				$url = new CTag('span','yes', substr($s['url'],0,35).SPACE.'...'.SPACE.substr($s['url'],strlen($s['url'])-25,25));
-				$url->SetHint($s['url']);
+				$url->setHint($s['url']);
 			}
 			else{
 				$url = $s['url'];
@@ -588,7 +588,7 @@
 
 		$form = new CFormTable(S_CONFIGURATION_OF_ZABBIX_DATABASE, null, 'post');
 
-		$form->SetHelp("install_source_web.php");
+		$form->setHelp("install_source_web.php");
 		$cmbType = new CComboBox('type', $type);
 		$cmbType->addItem('MYSQL',	S_MYSQL);
 		$cmbType->addItem('POSTGRESQL',	S_POSTGRESQL);
@@ -629,7 +629,7 @@
 		}
 
 		$frmMsg= new CFormTable($title.' "'.$USER_DETAILS["alias"].'"');
-		$frmMsg->SetHelp("manual.php");
+		$frmMsg->setHelp("manual.php");
 
 		if($bulk) $frmMsg->addVar('bulkacknowledge',1);
 
@@ -753,8 +753,8 @@
 		}
 
 		$frmUser = new CFormTable($frm_title);
-		$frmUser->SetName('user_form');
-		$frmUser->SetHelp('web.users.php');
+		$frmUser->setName('user_form');
+		$frmUser->setHelp('web.users.php');
 		$frmUser->addVar('config',get_request('config',0));
 
 		if(isset($userid))	$frmUser->addVar('userid',$userid);
@@ -1039,7 +1039,7 @@
 		ksort($group_rights);
 
 		$frmUserG = new CFormTable($frm_title,'usergrps.php');
-		$frmUserG->SetHelp('web.users.groups.php');
+		$frmUserG->setHelp('web.users.groups.php');
 		$frmUserG->addVar('config',get_request('config',1));
 
 		if(isset($_REQUEST['usrgrpid'])){
@@ -1161,7 +1161,7 @@
 			else if($element_data['permission'] == PERM_READ_WRITE)	$lstWrite->addItem($name, $name);
 		}
 
-		$table_Rights->SetHeader(array(S_READ_WRITE, S_READ_ONLY, S_DENY),'header');
+		$table_Rights->setHeader(array(S_READ_WRITE, S_READ_ONLY, S_DENY),'header');
 		$table_Rights->addRow(array(new CCol($lstWrite,'read_write'), new CCol($lstRead,'read_only'), new CCol($lstDeny,'deny')));
 		$table_Rights->addRow(array(
 			array(new CButton('add_read_write',S_ADD,
@@ -1209,7 +1209,7 @@
 		global $ZBX_LOCALNODEID;
 
 		$table = new CTable('S_NO_ACCESSIBLE_RESOURCES', 'right_table');
-		$table->SetHeader(array(SPACE, S_READ_WRITE, S_READ_ONLY, S_DENY),'header');
+		$table->setHeader(array(SPACE, S_READ_WRITE, S_READ_ONLY, S_DENY),'header');
 
 		if(ZBX_DISTRIBUTED){
 			$lst['node']['label']		= S_NODES;
@@ -2463,7 +2463,7 @@
 		}
 
 		$frmCopy = new CFormTable(count($group_itemid).' '.S_X_ELEMENTS_COPY_TO_DOT_DOT_DOT,null,'post',null,'go');
-		$frmCopy->SetHelp('web.items.copyto.php');
+		$frmCopy->setHelp('web.items.copyto.php');
 		$frmCopy->addVar($elements_array_name, $group_itemid);
 
 		$cmbCopyType = new CComboBox('copy_type',$copy_type,'submit()');
@@ -2621,7 +2621,7 @@
 		global $USER_DETAILS;
 
 		$frmTrig = new CFormTable(S_TRIGGER,'triggers.php');
-		$frmTrig->SetHelp('config_triggers.php');
+		$frmTrig->setHelp('config_triggers.php');
 
 		if(isset($_REQUEST['hostid'])){
 			$frmTrig->addVar('hostid',$_REQUEST['hostid']);
@@ -2636,7 +2636,7 @@
 			$frmTrig->addVar('triggerid',$_REQUEST['triggerid']);
 			$trigger=get_trigger_by_triggerid($_REQUEST['triggerid']);
 
-			$frmTrig->SetTitle(S_TRIGGER.' "'.htmlspecialchars($trigger['description']).'"');
+			$frmTrig->setTitle(S_TRIGGER.' "'.htmlspecialchars($trigger['description']).'"');
 
 			$limited = $trigger['templateid'] ? 'yes' : null;
 		}
@@ -2762,7 +2762,7 @@
 				' AND i.hostid=h.hostid '));
 
 		$frmComent = new CFormTable(S_COMMENTS." for ".$trigger['host']." : \"".expand_trigger_description_by_data($trigger).'"');
-		$frmComent->SetHelp("web.tr_comments.comments.php");
+		$frmComent->setHelp("web.tr_comments.comments.php");
 		$frmComent->addVar("triggerid",$triggerid);
 		$frmComent->addRow(S_COMMENTS,new CTextArea("comments",$trigger["comments"],100,25));
 		$frmComent->addItemToBottomRow(new CButton("save",S_SAVE));
@@ -2774,15 +2774,15 @@
 	function insert_graph_form(){
 
 		$frmGraph = new CFormTable(S_GRAPH, null, 'post');
-		$frmGraph->SetName('frm_graph');
-		//$frmGraph->SetHelp("web.graphs.graph.php");
+		$frmGraph->setName('frm_graph');
+		//$frmGraph->setHelp("web.graphs.graph.php");
 
 		$items = get_request('items', array());
 
 		if(isset($_REQUEST['graphid'])){
 			$frmGraph->addVar('graphid', $_REQUEST['graphid']);
 			$row = CGraph::getById(array('graphid' => $_REQUEST['graphid']));
-			$frmGraph->SetTitle(S_GRAPH.' "'.$row['name'].'"');
+			$frmGraph->setTitle(S_GRAPH.' "'.$row['name'].'"');
 		}
 
 		if(isset($_REQUEST['graphid']) && !isset($_REQUEST['form_refresh'])){
@@ -2922,14 +2922,14 @@
 				$pr_left_chkbx = new CCheckBox('visible[percent_left]',1,"javascript: ShowHide('percent_left');",1);
 				if($percent_left == 0){
 					$pr_left_input->setAttribute('style','display: none;');
-					$pr_left_chkbx->SetChecked(0);
+					$pr_left_chkbx->setChecked(0);
 				}
 
 				$pr_right_input = new CTextBox('percent_right',$percent_right,'5');
 				$pr_right_chkbx = new CCheckBox('visible[percent_right]',1,"javascript: ShowHide('percent_right');",1);
 				if($percent_right == 0){
 					$pr_right_input->setAttribute('style','display: none;');
-					$pr_right_chkbx->SetChecked(0);
+					$pr_right_chkbx->setChecked(0);
 				}
 
 				$frmGraph->addRow(S_PERCENTILE_LINE.' ('.S_LEFT.')',array($pr_left_chkbx,$pr_left_input));
@@ -3190,8 +3190,8 @@
 		$filtertimetab = new CTable(null,'calendar');
 		$filtertimetab->setAttribute('width','10%');
 
-		$filtertimetab->SetCellPadding(0);
-		$filtertimetab->SetCellSpacing(0);
+		$filtertimetab->setCellPadding(0);
+		$filtertimetab->setCellSpacing(0);
 
 		$filtertimetab->addRow(array(
 								new CNumericBox('mntc_since_day',(($active_since>0)?date('d',$active_since):''),2),
@@ -3222,8 +3222,8 @@
 		$filtertimetab = new CTable(null,'calendar');
 		$filtertimetab->setAttribute('width','10%');
 
-		$filtertimetab->SetCellPadding(0);
-		$filtertimetab->SetCellSpacing(0);
+		$filtertimetab->setCellPadding(0);
+		$filtertimetab->setCellSpacing(0);
 
 		$filtertimetab->addRow(array(
 								new CNumericBox('mntc_till_day',(($active_till>0)?date('d',$active_till):''),2),
@@ -3266,7 +3266,7 @@
 		$td->addItem(SPACE);
 		$td->addItem(new CButtonCancel(url_param("maintenanceid")));
 
-		$tblMaintenance->SetFooter($td);
+		$tblMaintenance->setFooter($td);
 	return $tblMaintenance;
 	}
 
@@ -3476,7 +3476,7 @@
 		$td->setAttribute('style','text-align: right;');
 
 
-		$tblPeriodFooter->SetFooter($td);
+		$tblPeriodFooter->setFooter($td);
 // end of condition list preparation
 	return array($tblPeriod,$tblPeriodFooter);
 	}
@@ -3817,7 +3817,7 @@
 		$td->setAttribute('colspan','3');
 		$td->setAttribute('style','text-align: right;');
 
-		$tblPeriod->SetFooter($td);
+		$tblPeriod->setFooter($td);
 
 	return $tblPeriod;
 	}
@@ -3935,7 +3935,7 @@
 		$td->addItem(SPACE);
 		$td->addItem(new CButtonCancel(url_param("actiontype")));
 
-		$tblAction->SetFooter($td);
+		$tblAction->setFooter($td);
 	return $tblAction;
 	}
 
@@ -4054,7 +4054,7 @@
 		$td->setAttribute('colspan','2');
 		$td->setAttribute('style','text-align: right;');
 
-		$tblConditions->SetFooter($td);
+		$tblConditions->setFooter($td);
 		unset($grouped_conditions,$cond_el,$cond_buttons);
 // end of CONDITION LIST
 	return $tblConditions;
@@ -4279,7 +4279,7 @@
 		$td->setAttribute('colspan','3');
 		$td->setAttribute('style','text-align: right;');
 
-		$tblConditions->SetFooter($td);
+		$tblConditions->setFooter($td);
 		unset($grouped_conditions,$cond_el,$cond_buttons);
 // end of NEW CONDITION
 	return $tblConditions;
@@ -4379,7 +4379,7 @@
 			if(!isset($val['mediatypeid'])) $val['mediatypeid'] = 0;
 
 			$oper_details = new CSpan(get_operation_desc(SHORT_DESCRITION, $val));
-			$oper_details->SetHint(nl2br(get_operation_desc(LONG_DESCRITION, $val)));
+			$oper_details->setHint(nl2br(get_operation_desc(LONG_DESCRITION, $val)));
 
 			$esc_steps_txt = null;
 			$esc_period_txt = null;
@@ -4441,7 +4441,7 @@
 		$td->setAttribute('style','text-align: right;');
 
 
-		$tblOperFooter->SetFooter($td);
+		$tblOperFooter->setFooter($td);
 // end of condition list preparation
 	return array($tblOper,$tblOperFooter);
 	}
@@ -4848,7 +4848,7 @@
 		$td->setAttribute('colspan','3');
 		$td->setAttribute('style','text-align: right;');
 
-		$tblOper->SetFooter($td);
+		$tblOper->setFooter($td);
 
 	return $tblOper;
 	}
@@ -4918,7 +4918,7 @@
 		$td->setAttribute('colspan','3');
 		$td->setAttribute('style','text-align: right;');
 
-		$tblConditions->SetFooter($td);
+		$tblConditions->setFooter($td);
 		unset($grouped_conditions,$cond_el,$cond_buttons);
 // end of NEW CONDITION
 	return $tblConditions;
@@ -4953,7 +4953,7 @@
 		}
 
 		$frmMeadia = new CFormTable(S_MEDIA);
-		$frmMeadia->SetHelp('web.config.medias.php');
+		$frmMeadia->setHelp('web.config.medias.php');
 
 		if(isset($_REQUEST['mediatypeid'])){
 			$frmMeadia->addVar('mediatypeid',$_REQUEST['mediatypeid']);
@@ -5018,7 +5018,7 @@
 		}
 
 		$frmScr = new CFormTable($frm_title,'screenconf.php');
-		$frmScr->SetHelp('web.screenconf.screen.php');
+		$frmScr->setHelp('web.screenconf.screen.php');
 
 		$frmScr->addVar('config', 0);
 
@@ -5165,7 +5165,7 @@
 		asort($templates);
 
 		$frmHost = new CFormTable($frm_title,'hosts.php');
-		$frmHost->SetHelp('web.hosts.host.php');
+		$frmHost->setHelp('web.hosts.host.php');
 		$frmHost->addVar('config',get_request('config',0));
 		$frmHost->addVar('massupdate',get_request('massupdate',1));
 
@@ -5254,8 +5254,8 @@
 		$template_table->setAttribute('name','template_table');
 		$template_table->setAttribute('id','template_table');
 
-		$template_table->SetCellPadding(0);
-		$template_table->SetCellSpacing(0);
+		$template_table->setCellPadding(0);
+		$template_table->setCellSpacing(0);
 
 //		$template_table->setAttribute('style','border: 1px black solid;');
 
@@ -5934,7 +5934,7 @@
 	function insert_host_profile_form(){
 
 		$frmHostP = new CFormTable(S_HOST_PROFILE);
-		$frmHostP->SetHelp("web.host_profile.php");
+		$frmHostP->setHelp("web.host_profile.php");
 
 		$table_titles = array(
 				'devicetype' => S_DEVICE_TYPE, 'name' => S_NAME, 'os' => S_OS, 'serialno' => S_SERIALNO,
@@ -5964,7 +5964,7 @@
 	function insert_host_profile_ext_form(){
 
 		$frmHostPA = new CFormTable(S_EXTENDED_HOST_PROFILE);
-		$frmHostPA->SetHelp('web.host_profile_alt.php');
+		$frmHostPA->setHelp('web.host_profile_alt.php');
 
 		$table_titles = array(
 				'device_alias' => S_DEVICE_ALIAS, 'device_type' => S_DEVICE_TYPE, 'device_chassis' => S_DEVICE_CHASSIS, 'device_os' => S_DEVICE_OS,
@@ -6130,7 +6130,7 @@
 
 
 		$frmMap = new CFormTable($frm_title,"sysmaps.php");
-		$frmMap->SetHelp("web.sysmaps.map.php");
+		$frmMap->setHelp("web.sysmaps.map.php");
 
 		if(isset($_REQUEST["sysmapid"]))
 			$frmMap->addVar("sysmapid",$_REQUEST["sysmapid"]);
@@ -6187,14 +6187,14 @@
 		global $USER_DETAILS;
 
 		$frmEl = new CFormTable('New map element','sysmap.php');
-		$frmEl->SetHelp('web.sysmap.host.php');
+		$frmEl->setHelp('web.sysmap.host.php');
 		$frmEl->addVar('sysmapid',$_REQUEST['sysmapid']);
 
 		if(isset($_REQUEST['selementid'])){
 			$frmEl->addVar('selementid',$_REQUEST['selementid']);
 
 			$element = get_sysmaps_element_by_selementid($_REQUEST['selementid']);
-			$frmEl->SetTitle('Map element "'.$element['label'].'"');
+			$frmEl->setTitle('Map element "'.$element['label'].'"');
 		}
 
 		if(isset($_REQUEST['selementid']) && !isset($_REQUEST['form_refresh'])){
@@ -6507,7 +6507,7 @@
 
 		$table = new CTable();
 
-		$table->SetClass('tableinfo');
+		$table->setClass('tableinfo');
 		$table->setOddRowClass('even_row');
 		$table->setEvenRowClass('even_row');
 		$table->attributes['cellpadding'] = 3;
@@ -6560,7 +6560,7 @@
 			"javascript: remove_childs('".$frmCnct->GetName()."','triggers','tr');",
 			'T');
 
-		$btnadd->SetType('button');
+		$btnadd->setType('button');
 
 		$frmCnct->addRow(S_LINK_STATUS_INDICATORS,array($table, BR(), $btnadd, $btnRemove));
 
@@ -6743,7 +6743,7 @@
 		$td->addItem(SPACE);
 		$td->addItem(new CButtonCancel(url_param("regexpid")));
 
-		$tblFoot->SetFooter($td);
+		$tblFoot->setFooter($td);
 
 	return array($tblRE,$tblFoot);
 	}
@@ -6809,7 +6809,7 @@
 		$td->setAttribute('style','text-align: right;');
 
 
-		$tblExp->SetFooter($td);
+		$tblExp->setFooter($td);
 
 	return $tblExp;
 	}

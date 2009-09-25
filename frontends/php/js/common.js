@@ -65,7 +65,9 @@ return false;
 }
 
 function is_number(obj){
-	return (typeof(obj) === 'number');
+	if(isNaN(obj)) return false;
+	if(typeof(obj) === 'number') return true;
+return false;
 }
 
 function is_string(obj){
@@ -86,7 +88,7 @@ function SDI(msg){
 		doc_body.appendChild(div_help);
 		
 		div_help.setAttribute('id','div_help');
-		div_help.setAttribute('style','position: absolute; right: 10px; top: 100px; border: 1px red solid; width: 500px; height: 400px; background-color: white; overflow: auto; z-index: 20;');
+		div_help.setAttribute('style','position: absolute; right: 10px; top: 10px; border: 1px red solid; width: 500px; height: 400px; background-color: white; font-size: 12px; overflow: auto; z-index: 20;');
 		
 //		new Draggable(div_help,{});
 	}
@@ -101,6 +103,7 @@ function SDI(msg){
 	div_help.appendChild(document.createElement("br"));
 	
 	div_help.scrollTop = div_help.scrollHeight;
+
 }
 
 function SDJ(obj){
@@ -293,6 +296,44 @@ function eventTarget(e){
 	if (targ.nodeType == 3) targ = targ.parentNode;
 
 return targ;
+}
+
+function getDimensions(obj, trueSide){
+	obj = $(obj);
+	
+	if(typeof(trueSide) == 'undefined') trueSide = false;
+	
+	var dim = {
+		'left':		0,
+		'top':		0,
+		'right':	0,
+		'bottom':	0,
+		'width':	0,
+		'height':	0
+	}
+
+	if(!is_null(obj) && (typeof(obj.offsetParent) != 'undefined')){
+		var dim = {
+			'left':		parseInt(obj.style.left,10),
+			'top':		parseInt(obj.style.top,10),
+			'right':	parseInt(obj.style.right,10),
+			'bottom':	parseInt(obj.style.bottom,10),
+			'width':	parseInt(obj.style.width,10),
+			'height':	parseInt(obj.style.height,10)
+		}
+
+		if(!is_number(dim.top)) dim.top = parseInt(obj.offsetTop,10);
+		if(!is_number(dim.left)) dim.left = parseInt(obj.offsetLeft,10);
+		if(!is_number(dim.width)) dim.width = parseInt(obj.offsetWidth,10);
+		if(!is_number(dim.height)) dim.height = parseInt(obj.offsetHeight,10);
+		
+		if(!trueSide){
+			dim.right = dim.left + dim.width;
+			dim.bottom = dim.top + dim.height;
+		}
+	}
+	
+return dim;
 }
 
 function getParent(obj, name){
@@ -649,7 +690,7 @@ function showPopupDiv(divID,iFrameID){
 	}
 
 //Increase default zIndex of div by 1, so that DIV appears before IFrame
-	divPopup.style.zIndex = divPopup.style.zIndex+1;
+	divPopup.style.zIndex=divPopup.style.zIndex+1;
 //	iFrame.style.zIndex = 1;
 
 
@@ -701,8 +742,9 @@ function change_flicker_state(divid){
 		switchElementsClass($("flicker_icon_r"),"dbl_arrow_up","dbl_arrow_down");
 	}
 	
-	var filter_state = showHideEffect(divid,'slide', eff_time, switchArrows);
-	
+	var filter_state = ShowHide(divid);	
+	switchArrows();
+//	var filter_state = showHideEffect(divid,'slide', eff_time, switchArrows);
 
 	if(false === filter_state) return false;
 
@@ -724,8 +766,9 @@ function change_hat_state(icon, divid){
 		switchElementsClass(icon,"arrowup","arrowdown");
 	}
 
-//	var hat_state = ShowHide(divid);	
-	var hat_state = showHideEffect(divid, 'slide', eff_time, switchIcon);	
+	var hat_state = ShowHide(divid);
+	switchIcon();
+//	var hat_state = showHideEffect(divid, 'slide', eff_time, switchIcon);	
 
 	if(false === hat_state) return false;
 	

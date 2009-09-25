@@ -30,14 +30,16 @@ class CChart extends CGraphDraw{
 
 		$this->triggers = array();
 
-		$this->ymin_type=GRAPH_YAXIS_TYPE_CALCULATED;
-		$this->ymax_type=GRAPH_YAXIS_TYPE_CALCULATED;
+		$this->ymin_type = GRAPH_YAXIS_TYPE_CALCULATED;
+		$this->ymax_type = GRAPH_YAXIS_TYPE_CALCULATED;
 
 		$this->yaxisright=0;
 		$this->yaxisleft=0;
 
 		$this->ymin_itemid = 0;
 		$this->ymax_itemid = 0;
+		
+		$this->legendOffsetY = 100;
 
 		$this->percentile = array(
 				'left' => array(
@@ -57,24 +59,94 @@ class CChart extends CGraphDraw{
 		$this->zero = array();
 		$this->graphorientation = '';
 
-		$this->gridLinesCount = NULL;		// How many grids to draw
-		$this->gridPixels = 40;		// optimal grid size
+		$this->grid = array();				// vertical & horizontal grids params
+		
+		$this->gridLinesCount = array();	// How many grids to draw
+		$this->gridPixels = 30;				// optimal grid size
+		
+		$this->graphtheme = array(
+			'description' => 'default',
+			'frontendtheme' => 'default.css',
+			'textcolor' => '202020',
+			'highlightcolor' => 'aa4444',
+			'backgroundcolor' => 'f0f0f0',
+			'graphcolor' => 'ffffff',
+			'graphbordercolor' => '333333',
+			'gridcolor' => 'cccccc',
+			'maingridcolor' => 'aaaaaa',
+			'gridbordercolor' => '000000',
+			'noneworktimecolor' => 'eaeaea',
+			'leftpercentilecolor' => '00AA00',
+			'righttpercentilecolor' => 'AA0000',
+			'legendview' => '1',
+			'gridview' => '1'
+		);
+		
+		$this->applyGraphTheme();
+	}
+
+/********************************************************************************************************/
+// PRE CONFIG:	ADD / SET / APPLY
+/********************************************************************************************************/
+
+	public function applyGraphTheme($description=null){
+		global $USER_DETAILS;
+
+		if(!is_null($description)){
+			$sql_where = ' AND gt.description='.zbx_dbstr($description);
+		}
+		else{
+			$config=select_config();
+			if(isset($config['default_theme']) && file_exists('styles/'.$config['default_theme'])){
+				$css = $config['default_theme'];
+			}
+	
+			if(isset($USER_DETAILS['theme']) && ($USER_DETAILS['theme']!=ZBX_DEFAULT_CSS) && ($USER_DETAILS['alias']!=ZBX_GUEST_USER)){
+				if(file_exists('styles/'.$USER_DETAILS['theme'])){
+					$css = $USER_DETAILS['theme'];
+				}
+			}
+			
+			$sql_where = ' AND gt.theme='.zbx_dbstr($css);
+		}
+		
+		$sql = 'SELECT gt.* '.
+				' FROM graph_theme gt '.
+				' WHERE '.DBin_node('gt.graphthemeid').
+				$sql_where;
+//SDI($sql);
+		$res = DBselect($sql);
+		if($theme = DBfetch($res)){
+			$this->graphtheme = $theme;
+		}
 	}
 
 	public function updateShifts(){
 		if( ($this->yaxisleft == 1) && ($this->yaxisright == 1)){
-			$this->shiftXleft = 60;
-			$this->shiftXright = 60;
+			$this->shiftXleft = 90;
+			$this->shiftXright = 100;
 		}
 		else if($this->yaxisleft == 1){
-			$this->shiftXleft = 60;
+			$this->shiftXleft = 90;
 			$this->shiftXright = 20;
 		}
 		else if($this->yaxisright == 1){
-			$this->shiftXleft = 10;
-			$this->shiftXright = 60;
+			$this->shiftXleft = 20;
+			$this->shiftXright = 100;
 		}
 //			$this->sizeX = $this->sizeX - $this->shiftXleft-$this->shiftXright;
+	}
+	
+	public function getShifts(){
+		$shifts = array();
+		$shifts['shiftXleft'] = $this->shiftXleft;
+		$shifts['shiftXright'] = $this->shiftXright;
+		$shifts['shiftY'] = $this->shiftY;
+		
+		$shifts['height'] = $this->sizeY;
+		$shifts['width'] = $this->sizeX;
+		
+	return $shifts;
 	}
 
 	public function showWorkPeriod($value){
@@ -85,7 +157,7 @@ class CChart extends CGraphDraw{
 		$this->m_showTriggers = ($value==1)?1:0;
 	}
 
-	public function addItem($itemid, $axis=GRAPH_YAXIS_SIDE_RIGHT, $calc_fnc=CALC_FNC_AVG,
+	public function addItem($itemid, $axis=GRAPH_YAXIS_SIDE_LEFT, $calc_fnc=CALC_FNC_AVG,
 				$color=null, $drawtype=null, $type=null, $periods_cnt=null){
 		if($this->type == GRAPH_TYPE_STACKED /* stacked graph */)
 			$drawtype = GRAPH_ITEM_DRAWTYPE_FILLED_REGION;
@@ -164,165 +236,240 @@ class CChart extends CGraphDraw{
 		$this->percentile['right']['percent'] = $percentile;
 	}
 
-	function drawGrid(){
-		$this->drawSmallRectangle();
-		$hline_count = round($this->sizeY / $this->gridPixels);
-		for($i=1;$i<=$hline_count;$i++){
-			dashedline($this->im,
-					$this->shiftXleft,
-					$i*($this->sizeY/($hline_count+1))+$this->shiftY,
-					$this->sizeX+$this->shiftXleft,
-					$i*($this->sizeY/($hline_count+1))+$this->shiftY,
-					$this->getColor('CCCCCC')
-				);
-		}
+	protected function selectData(){
 
-// align to the closest human time interval
-		$raw_time_interval = ($this->gridPixels*$this->period)/$this->sizeX;
-		$intervals = array(
-			60,		// 1 minute
-			300,	// 5 minutes
-			900,	// 15 minutes
-			1800,	// 30 minutes
-			3600,	// 1 hour
-			10800,	// 3 hours
-			21600,	// 6 hours
-			43200,	// 12 hours
-			86400,	// 1 day
-			604800,	// 1 week
-		);
+		$this->data = array();
 
-		$dist = 604800; //def week;
-		$interval = 0;
+		$now = time(NULL);
 
-		foreach($intervals as $num => $i){
-			$t = abs($i-$raw_time_interval);
-
-			if($t<$dist){
-				$dist = $t;
-				$interval = $i;
-			}
-		}
-		$intervalX = ($interval * $this->sizeX) / $this->period;
-
-		$offset = $interval - (($this->from_time+date('Z',$this->to_time)) % $interval);
-		$offsetX = ($offset * $this->sizeX) / $this->period;
-
-		$vline_count = floor(($this->period-$offset) / $interval);
-
-		$start_i = 0;
-		if($offsetX < 10){
-			$vline_count--;
-			$start_i++;
-		}
-
-		if(($this->sizeX - ($offsetX + ($vline_count*$intervalX))) < 10){
-			$vline_count--;
-		}
-
-		for($i=$start_i;$i<=$vline_count;$i++){
-			dashedline($this->im,
-						$i*$intervalX+$this->shiftXleft+$offsetX,
-						$this->shiftY,
-						$i*$intervalX+$this->shiftXleft+$offsetX,
-						$this->sizeY+$this->shiftY,
-						$this->getColor('CCCCCC')
-				);
-		}
-
-		$old_day=date('d',$this->from_time);
-		for($i=$start_i;$i<=$vline_count;$i++){
-			$new_day=date('d',$this->from_time+$i*$interval+$offset);
-			if($old_day != $new_day){
-				$old_day=$new_day;
-				$date_format = 'd.m H:i';
-				$color = 'Dark Red No Alpha';
-			}
-			else{
-				$date_format = '      H:i';
-				$color = 'Black No Alpha';
-			}
-
-			imagestringup($this->im,
-								1,
-								$i*$intervalX+$this->shiftXleft-3+$offsetX,
-								$this->sizeY+$this->shiftY+57,
-								date($date_format,$this->from_time+$offset+$i*$interval),
-								$this->getColor($color)
-						);
-		}
-// Start
-		imagestringup($this->im,
-							1,
-
-							$this->shiftXleft-3,
-							$this->sizeY+$this->shiftY+57,
-							date('d.m H:i',$this->from_time),
-							$this->getColor('Dark Red No Alpha')
-					);
-// End
-		imagestringup($this->im,
-							1,
-							$this->sizeX+$this->shiftXleft-3,
-							$this->sizeY+$this->shiftY+57,
-							date('d.m H:i',$this->to_time),
-							$this->getColor('Dark Red No Alpha')
-					);
-	}
-
-	protected function drawWorkPeriod(){
-		if($this->m_showWorkPeriod != 1) return;
-		if($this->period > 2678400) return; // > 31*24*3600 (month)
-
-		$db_work_period = DBselect('SELECT work_period FROM config');
-		$work_period = DBfetch($db_work_period);
-		if(!$work_period)
-			return;
-
-		$periods = parse_period($work_period['work_period']);
-		if(!$periods)
-			return;
-
-		imagefilledrectangle($this->im,
-			$this->shiftXleft+1,
-			$this->shiftY,
-			$this->sizeX+$this->shiftXleft-2,	// -2 border
-			$this->sizeY+$this->shiftY,
-			$this->getColor('Not Work Period'));
-
-		$now = time();
 		if(isset($this->stime)){
-			$this->from_time=$this->stime;
-			$this->to_time=$this->stime+$this->period;
+			$this->from_time	= $this->stime; // + timeZone offset
+			$this->to_time		= $this->stime + $this->period; // + timeZone offset
 		}
 		else{
-			$this->to_time=$now-3600*$this->from;
-			$this->from_time=$this->to_time-$this->period;
+			$this->to_time		= $now - 3600 * $this->from;
+			$this->from_time	= $this->to_time - $this->period; // + timeZone offset
 		}
 
-		$from = $this->from_time;
-		$max_time = $this->to_time;
+		$p = $this->to_time - $this->from_time;		// graph size in time
+		$z = $p - $this->from_time % $p;			// graphsize - mod(from_time,p) for Oracle...
+		$x = $this->sizeX;							// graph size in px
 
-		$start = find_period_start($periods,$from);
-		$end = -1;
-		while($start < $max_time && $start > 0){
-			$end = find_period_end($periods,$start,$max_time);
+		for($i=0; $i < $this->num; $i++){
 
-			$x1 = round((($start-$from)*$this->sizeX)/$this->period) + $this->shiftXleft;
-			$x2 = round((($end-$from)*$this->sizeX)/$this->period) + $this->shiftXleft;
+			$real_item = get_item_by_itemid($this->items[$i]['itemid']);
 
-			//draw rectangle
-			imagefilledrectangle(
-				$this->im,
-				$x1,
-				$this->shiftY,
-				$x2-2,		// -2 border
-				$this->sizeY+$this->shiftY,
-				$this->getColor('White'));
+			if(!isset($this->axis_valuetype[$this->items[$i]['axisside']])){
+				$this->axis_valuetype[$this->items[$i]['axisside']] = $real_item['value_type'];
+			}
+			else if($this->axis_valuetype[$this->items[$i]['axisside']] != $real_item['value_type']){
+				$this->axis_valuetype[$this->items[$i]['axisside']] = ITEM_VALUE_TYPE_FLOAT;
+			}
 
-			$start = find_period_start($periods,$end);
+			$type = $this->items[$i]['calc_type'];
+			if($type == GRAPH_ITEM_AGGREGATED) {
+				/* skip current period */
+				$from_time	= $this->from_time - $this->period * $this->items[$i]['periods_cnt'];
+				$to_time	= $this->from_time;
+			}
+			else {
+				$from_time	= $this->from_time;
+				$to_time	= $this->to_time;
+			}
+
+			$calc_field = 'round('.$x.'*(mod('.zbx_dbcast_2bigint('clock').'+'.$z.','.$p.'))/('.$p.'),0)';  /* required for 'group by' support of Oracle */
+
+			$sql_arr = array();
+
+			if((($real_item['history']*86400) > (time()-($this->from_time+$this->period/2))) &&			// should pick data from history or trends
+				(($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)))		// is reasonable to take data from history?
+			{
+				$this->dataFrom = 'history';
+				array_push($sql_arr,
+					'SELECT itemid,'.$calc_field.' as i,'.
+						' count(*) as count,avg(value) as avg,min(value) as min,'.
+						' max(value) as max,max(clock) as clock'.
+					' FROM history '.
+					' WHERE itemid='.$this->items[$i]['itemid'].
+						' AND clock>='.$from_time.
+						' AND clock<='.$to_time.
+					' GROUP BY itemid,'.$calc_field
+					,
+
+					'SELECT itemid,'.$calc_field.' as i,'.
+						' count(*) as count,avg(value) as avg,min(value) as min,'.
+						' max(value) as max,max(clock) as clock'.
+					' FROM history_uint '.
+					' WHERE itemid='.$this->items[$i]['itemid'].
+						' AND clock>='.$from_time.
+						' AND clock<='.$to_time.
+					' GROUP BY itemid,'.$calc_field
+					);
+			}
+			else{
+				$this->dataFrom = 'trends';
+				array_push($sql_arr,
+					'SELECT itemid,'.$calc_field.' as i,'.
+						' sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
+						' max(value_max) as max,max(clock) as clock'.
+					' FROM trends '.
+					' WHERE itemid='.$this->items[$i]['itemid'].
+						' AND clock>='.$from_time.
+						' AND clock<='.$to_time.
+					' GROUP BY itemid,'.$calc_field
+					,
+
+					'SELECT itemid,'.$calc_field.' as i,'.
+						' sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
+						' max(value_max) as max,max(clock) as clock'.
+					' FROM trends_uint '.
+					' WHERE itemid='.$this->items[$i]['itemid'].
+						' AND clock>='.$from_time.
+						' AND clock<='.$to_time.
+					' GROUP BY itemid,'.$calc_field
+					);
+
+				$this->items[$i]['delay'] = max($this->items[$i]['delay'],3600);
+			}
+//SDI($sql_arr);
+			$curr_data = &$this->data[$this->items[$i]['itemid']][$type];
+			$curr_data->count = NULL;
+			$curr_data->min = NULL;
+			$curr_data->max = NULL;
+			$curr_data->avg = NULL;
+			$curr_data->clock = NULL;
+
+			foreach($sql_arr as $sql){
+				$result=DBselect($sql);
+
+				while($row=DBfetch($result)){
+					$idx=$row['i']-1;
+					if($idx<0) continue;
+/* --------------------------------------------------
+	We are taking graph on 1px more than we need,
+	and here we are skiping first px, because of MOD (in SELECT),
+	it combines prelast point (it would be last point if not that 1px in begining)
+	and first point, but we still losing prelast point :(
+	but now we've got the first point.
+--------------------------------------------------*/
+
+					$curr_data->count[$idx]	= $row['count'];
+					$curr_data->min[$idx]	= $row['min'];
+					$curr_data->max[$idx]	= $row['max'];
+					$curr_data->avg[$idx]	= $row['avg'];
+					$curr_data->clock[$idx]	= $row['clock'];
+					$curr_data->shift_min[$idx] = 0;
+					$curr_data->shift_max[$idx] = 0;
+					$curr_data->shift_avg[$idx] = 0;
+
+					if($this->type == GRAPH_TYPE_STACKED){
+						$this->CheckGraphOrientation($curr_data->min[$idx]);
+					}
+				}
+				unset($row);
+			}
+			/* calculate missed points */
+			$first_idx = 0;
+			/*
+				first_idx - last existed point
+				ci - current index
+				cj - count of missed in onetime
+				dx - offset to first value (count to last existed point)
+			//*/
+
+			for($ci = 0, $cj=0; $ci < $this->sizeX; $ci++){
+				if(!isset($curr_data->count[$ci]) || $curr_data->count[$ci] == 0){
+					$curr_data->count[$ci] = 0;
+					$curr_data->shift_min[$ci] = 0;
+					$curr_data->shift_max[$ci] = 0;
+					$curr_data->shift_avg[$ci] = 0;
+					$cj++;
+				}
+				else if($cj > 0){
+					$dx = $cj + 1;
+
+					$first_idx = $ci - $dx;
+
+					if($first_idx < 0)	$first_idx = $ci; // if no data FROM start of graph get current data as first data
+
+					for(;$cj > 0; $cj--){
+						if(($dx < ($this->sizeX/20)) && ($this->type == GRAPH_TYPE_STACKED)){
+							$curr_data->count[$ci - ($dx - $cj)] = 1;
+						}
+
+						foreach(array('clock','min','max','avg') as $var_name){
+							$var = &$curr_data->$var_name;
+
+							if($first_idx == $ci && $var_name == 'clock'){
+								$var[$ci - ($dx - $cj)] = $var[$first_idx] - (($p / $this->sizeX) * ($dx - $cj));
+								continue;
+							}
+
+							$dy = $var[$ci] - $var[$first_idx];
+							$var[$ci - ($dx - $cj)] = $var[$first_idx] + ($cj * $dy) / $dx;
+						}
+					}
+				}
+			}
+
+			if($cj > 0 && $ci > $cj){
+				$dx = $cj + 1;
+
+				$first_idx = $ci - $dx;
+
+				for(;$cj > 0; $cj--){
+
+//					if($dx < ($this->sizeX/20))			//($this->type == GRAPH_TYPE_STACKED)
+//						$curr_data->count[$first_idx + ($dx - $cj)] = 1;
+
+					foreach(array('clock','min','max','avg') as $var_name){
+						$var = &$curr_data->$var_name;
+
+						if( $var_name == 'clock'){
+							$var[$first_idx + ($dx - $cj)] = $var[$first_idx] + (($p / $this->sizeX) * ($dx - $cj));
+							continue;
+						}
+						$var[$first_idx + ($dx - $cj)] = $var[$first_idx];
+					}
+				}
+			}
+			/* end of missed points calculation */
 		}
+
+		/* calculte shift for stacked graphs */
+
+		if($this->type == GRAPH_TYPE_STACKED){
+			for($i=1; $i<$this->num; $i++){
+				$curr_data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];
+
+				if(!isset($curr_data))	continue;
+
+				for($j = $i-1; $j >= 0; $j--){
+					if($this->items[$j]['axisside'] != $this->items[$i]['axisside']) continue;
+
+					$prev_data = &$this->data[$this->items[$j]['itemid']][$this->items[$j]['calc_type']];
+
+					if(!isset($prev_data))	continue;
+
+					for($ci = 0; $ci < $this->sizeX; $ci++){
+						foreach(array('min','max','avg') as $var_name){
+							$shift_var_name	= 'shift_'.$var_name;
+							$curr_shift	= &$curr_data->$shift_var_name;
+							$curr_var	= &$curr_data->$var_name;
+							$prev_shift	= &$prev_data->$shift_var_name;
+							$prev_var	= &$prev_data->$var_name;
+							$curr_shift[$ci] = $prev_var[$ci] + $prev_shift[$ci];
+						}
+					}
+					break;
+				}
+			}
+		}
+		/* end calculation of stacked graphs */
 	}
+/********************************************************************************************************/
+// CALCULATIONS
+/********************************************************************************************************/
 
 	protected function calcTriggers(){
 		$this->triggers = array();
@@ -374,336 +521,6 @@ class CChart extends CGraphDraw{
 			++$cnt;
 		}
 
-	}
-
-	protected function drawTriggers(){
-		if($this->m_showTriggers != 1) return;
-		if($this->num != 1) return; // skip multiple graphs
-
-		foreach($this->triggers as $trigger){
-			dashedline(
-				$this->im,
-				$this->shiftXleft,
-				$trigger['y'],
-				$this->sizeX+$this->shiftXleft,
-				$trigger['y'],
-				$this->getColor($trigger['color']));
-		}
-	}
-
-	protected function drawLegend(){
-		$max_host_len=0;
-		$max_desc_len=0;
-		for($i=0;$i<$this->num;$i++){
-			if(strlen($this->items[$i]['host'])>$max_host_len)		$max_host_len=strlen($this->items[$i]['host']);
-			if(strlen($this->items[$i]['description'])>$max_desc_len)	$max_desc_len=strlen($this->items[$i]['description']);
-		}
-
-		$units = array(
-					'left'=>0,
-					'right'=>0
-				);
-
-		$i = ($this->type == GRAPH_TYPE_STACKED)?($this->num-1):0;
-//		for($i=0;$i<$this->num;$i++){
-		while(($i>=0) && ($i<$this->num)){
-//SDI($i);
-			if($this->items[$i]['calc_type'] == GRAPH_ITEM_AGGREGATED){
-				$fnc_name = 'agr('.$this->items[$i]['periods_cnt'].')';
-				$color = $this->getColor('HistoryMinMax');
-			}
-			else{
-				$color = $this->getColor($this->items[$i]['color'], GRAPH_STACKED_ALFA);
-				switch($this->items[$i]['calc_fnc']){
-					case CALC_FNC_MIN:	$fnc_name = 'min';	break;
-					case CALC_FNC_MAX:	$fnc_name = 'max';	break;
-					case CALC_FNC_ALL:	$fnc_name = 'all';	break;
-					case CALC_FNC_AVG:
-					default:		$fnc_name = 'avg';
-				}
-			}
-
-			$data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];
-			if(isset($data)&&isset($data->min)){
-				if($this->items[$i]['axisside'] == GRAPH_YAXIS_SIDE_LEFT){
-					$units['left'] = $this->items[$i]['units'];
-				}
-				else{
-					$units['right'] = $this->items[$i]['units'];
-				}
-
-				$str=sprintf('%s: %s [%s] [min:%s max:%s last:%s]',
-					str_pad($this->items[$i]['host'],$max_host_len,' '),
-					str_pad($this->items[$i]['description'],$max_desc_len,' '),
-					$fnc_name,
-					convert_units(min($data->min),$this->items[$i]['units']),
-					convert_units(max($data->max),$this->items[$i]['units']),
-					convert_units($this->getLastValue($i),$this->items[$i]['units'])
-					);
-			}
-			else{
-				$str=sprintf('%s: %s [ no data ]',
-					str_pad($this->items[$i]['host'],$max_host_len,' '),
-					str_pad($this->items[$i]['description'],$max_desc_len,' '));
-			}
-
-			imagefilledrectangle($this->im,
-							$this->shiftXleft - 5,
-							$this->sizeY+$this->shiftY+62+12*$i - 3,
-							$this->shiftXleft+5,
-							$this->sizeY+$this->shiftY+7+62+12*$i,
-							$color
-						);
-
-			imagerectangle($this->im,
-							$this->shiftXleft - 5,
-							$this->sizeY+$this->shiftY+62+12*$i - 3,
-							$this->shiftXleft+5,
-							$this->sizeY+$this->shiftY+7+62+12*$i,
-							$this->getColor('White')
-						);
-
-			imagetext($this->im,
-				2,
-				0,
-				$this->shiftXleft+9,
-				$this->sizeY+$this->shiftY+(62-5)+12*$i, 
-				$this->getColor('Black No Alpha'), 
-				$str
-			);
-				
-			$i +=($this->type == GRAPH_TYPE_STACKED)?-1:1;
-		}
-
-		if($this->sizeY < 120) return;
-
-		foreach($this->triggers as $trigger){
-			imagefilledellipse($this->im,
-				$this->shiftXleft + 2,
-				$this->sizeY+$this->shiftY+2+62+12*$i,
-				6,
-				6,
-				$this->getColor($trigger['color']));
-
-			imageellipse($this->im,
-				$this->shiftXleft + 2,
-				$this->sizeY+$this->shiftY+2+62+12*$i,
-				6,
-				6,
-				$this->getColor('Black No Alpha'));
-
-			imagetext($this->im, 
-				2,
-				0,
-				$this->shiftXleft+9,
-				$this->sizeY+$this->shiftY+(62-5)+12*$i, 
-				$this->getColor('Black No Alpha'), 
-				$trigger['description']
-			);
-			
-			++$i;
-		}
-
-// Draw percentile
-		if($this->type == GRAPH_TYPE_NORMAL){
-			$color = 'FF0000';
-			foreach($this->percentile as $side => $percentile){
-				if(($percentile['percent']>0) && $percentile['value']){
-					$str = '%sth percentile: %s';
-					if(($this->percentile['left']['percent']>0) && $this->percentile['left']['value'] &&
-						($this->percentile['right']['percent']>0) && $this->percentile['right']['value'])
-					{
-//						$str.=' ['.(($side=='left')?S_LEFT:S_RIGHT).']';
-						$str.=' ['.$side.']';
-					}
-
- 					imagefilledpolygon($this->im,
-							array(
-								$this->shiftXleft+2,$this->sizeY+$this->shiftY+61+12*$i,
-								$this->shiftXleft-2,$this->sizeY+$this->shiftY+67+12*$i,
-								$this->shiftXleft+6,$this->sizeY+$this->shiftY+67+12*$i,
-							),
-							3,
-							$this->getColor($color)
-						);
-
-					imagepolygon($this->im,
-							array(
-								$this->shiftXleft+2,$this->sizeY+$this->shiftY+61+12*$i,
-								$this->shiftXleft-2,$this->sizeY+$this->shiftY+67+12*$i,
-								$this->shiftXleft+6,$this->sizeY+$this->shiftY+67+12*$i,
-							),
-							3,
-							$this->getColor('Black No Alpha')
-						);
-					
-					imagetext($this->im, 
-						2,
-						0,
-						$this->shiftXleft+9,
-						$this->sizeY+$this->shiftY+(62-5)+12*$i, 
-						$this->getColor('Black No Alpha'), 
-						sprintf($str,$percentile['percent'],convert_units($percentile['value'],$units[$side]))
-					);
-					// imagestring(
-						// $this->im,
-						// 2,
-						// $this->shiftXleft+9,
-						// $this->sizeY+$this->shiftY+(62-5)+12*$i,
-						// sprintf($str,$percentile['percent'],convert_units($percentile['value'],$units[$side])),
-						// $this->getColor('Black No Alpha'));
-
-					$i++;
-					$color = '00AA00';
-				}
-			}
-		}
-	}
-
-	protected function drawElement(&$data, $from, $to, $minX, $maxX, $minY, $maxY, $drawtype, $max_color, $avg_color, $min_color, $minmax_color,$calc_fnc, $axisside){
-		if(!isset($data->max[$from]) || !isset($data->max[$to])) return;
-
-		$oxy = $this->oxy[$axisside];
-		$zero = $this->zero[$axisside];
-		$unit2px = $this->unit2px[$axisside];
-//SDI($oxy);
-		$shift_min_from = $shift_min_to = 0;
-		$shift_max_from = $shift_max_to = 0;
-		$shift_avg_from = $shift_avg_to = 0;
-
-		if(isset($data->shift_min[$from]))	$shift_min_from = $data->shift_min[$from];
-		if(isset($data->shift_min[$to]))	$shift_min_to = $data->shift_min[$to];
-
-		if(isset($data->shift_max[$from]))	$shift_max_from = $data->shift_max[$from];
-		if(isset($data->shift_max[$to]))	$shift_max_to = $data->shift_max[$to];
-
-		if(isset($data->shift_avg[$from]))	$shift_avg_from = $data->shift_avg[$from];
-		if(isset($data->shift_avg[$to]))	$shift_avg_to = $data->shift_avg[$to];
-/**/
-		$min_from	= $data->min[$from]	+ $shift_min_from;
-		$min_to		= $data->min[$to]	+ $shift_min_to;
-
-		$max_from	= $data->max[$from]	+ $shift_max_from;
-		$max_to		= $data->max[$to]	+ $shift_max_to;
-
-		$avg_from	= $data->avg[$from]	+ $shift_avg_from;
-		$avg_to		= $data->avg[$to]	+ $shift_avg_to;
-
-		$x1 = $from + $this->shiftXleft - 1;
-		$x2 = $to + $this->shiftXleft;
-
-
-		$y1min = $zero - ($min_from-$oxy)/$unit2px;
-		$y2min = $zero - ($min_to-$oxy)/$unit2px;
-//SDI(array($y1min,$zero,$min_from,$oxy,$unit2px));
-		$y1max = $zero - ($max_from-$oxy)/$unit2px;
-		$y2max = $zero - ($max_to-$oxy)/$unit2px;
-
-		$y1avg = $zero - ($avg_from-$oxy)/$unit2px;
-		$y2avg = $zero - ($avg_to-$oxy)/$unit2px;		//*/
-
-		switch($calc_fnc){
-			case CALC_FNC_MAX:
-				$y1 = $y1max;
-				$y2 = $y2max;
-				$shift_from	= $shift_max_from;
-				$shift_to	= $shift_max_to;
-				break;
-			case CALC_FNC_MIN:
-				$y1 = $y1min;
-				$y2 = $y2min;
-				$shift_from	= $shift_min_from;
-				$shift_to	= $shift_min_to;
-				break;
-			case CALC_FNC_ALL:
-				$a[0] = $x1;		$a[1] = $y1max;
-				$a[2] = $x1;		$a[3] = $y1min;
-				$a[4] = $x2;		$a[5] = $y2min;
-				$a[6] = $x2;		$a[7] = $y2max;
-//SDI('2: '.$x2.' - '.$x1.' : '.$y2min.' - '.$y1min);
-				imagefilledpolygon($this->im,$a,4,$minmax_color);
-				imageline($this->im,$x1,$y1max,$x2,$y2max,$max_color);
-				imageline($this->im,$x1,$y1min,$x2,$y2min,$min_color);
-
-				/* don't use break, avg must be drawed in this statement */
-				// break;
-			case CALC_FNC_AVG:
-				/* don't use break, avg must be drawed in this statement */
-				// break;
-			default:
-				$y1 = $y1avg;
-				$y2 = $y2avg;
-				$shift_from	= $shift_avg_from ;
-				$shift_to	= $shift_avg_to;
-		}
-
-		$shift_from -= ($shift_from != 0)?($oxy):(0);
-		$shift_to -= ($shift_to != 0)?($oxy):(0);
-
-		$y1_shift	= $zero - $shift_from/$unit2px;
-		$y2_shift	= $zero - $shift_to/$unit2px;//*/
-
-
-// Fixes graph out of bounds problem
-		if( (($y1 > ($this->sizeY+$this->shiftY)) && ($y2 > ($this->sizeY+$this->shiftY))) || (($y1 < $this->shiftY) && ($y2 < $this->shiftY)) ){
-			if($drawtype == GRAPH_ITEM_DRAWTYPE_FILLED_REGION){
-				if($y1 > ($this->sizeY+$this->shiftY)) $y1 = $this->sizeY+$this->shiftY;
-				if($y2 > ($this->sizeY+$this->shiftY)) $y2 = $this->sizeY+$this->shiftY;
-
-				if($y1 < ($this->sizeY+$this->shiftY)) $y1 = $this->shiftY;
-				if($y2 < ($this->sizeY+$this->shiftY)) $y2 = $this->shiftY;
-			}
-			else{
-				return true;
-			}
-		}
-
-		$y_first = !(($y1 > ($this->sizeY+$this->shiftY)) || ($y1 < $this->shiftY));
-		$y_second = !(($y2 > ($this->sizeY+$this->shiftY)) || ($y2 < $this->shiftY));
-
-		if(!$y_first){
-			$y1 = ($y1 > ($this->sizeY+$this->shiftY))?($this->sizeY+$this->shiftY):$this->shiftY;
-		}
-		else if(!$y_second){
-			$y2 = ($y2 > ($this->sizeY+$this->shiftY))?($this->sizeY+$this->shiftY):$this->shiftY;
-		}
-//--------
-
-		/* draw main line */
-		switch($drawtype){
-			case GRAPH_ITEM_DRAWTYPE_BOLD_LINE:
-				imageline($this->im,$x1,$y1+1,$x2,$y2+1,$avg_color);
-				// break; /* don't use break, must be drawed line also */
-			case GRAPH_ITEM_DRAWTYPE_LINE:
-//SDI(array($this->im,$x1,$y1,$x2,$y2,$avg_color));
-				imageline($this->im,$x1,$y1,$x2,$y2,$avg_color);
-				break;
-			case GRAPH_ITEM_DRAWTYPE_FILLED_REGION:
-				$a[0] = $x1;		$a[1] = $y1;
-				$a[2] = $x1;		$a[3] = $y1_shift;
-				$a[4] = $x2;		$a[5] = $y2_shift;
-				$a[6] = $x2;		$a[7] = $y2;
-//SDI($a);
-				imagefilledpolygon($this->im,$a,4,$avg_color);
-//				imageline($this->im,$x1,$y1,$x2,$y2,$this->getShadow('333333',50));
-				break;
-			case GRAPH_ITEM_DRAWTYPE_DOT:
-				imagefilledrectangle($this->im,$x1-1,$y1-1,$x1+1,$y1+1,$avg_color);
-				imagefilledrectangle($this->im,$x2-1,$y2-1,$x2+1,$y2+1,$avg_color);
-				break;
-			case GRAPH_ITEM_DRAWTYPE_DASHED_LINE:
-				if( function_exists('imagesetstyle') ){
-
-					/* Use imagesetstyle+imageline instead of bugged imagedashedline */
-					$style = array($avg_color, $avg_color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
-					imagesetstyle($this->im, $style);
-					imageline($this->im,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
-				}
-				else{
-					imagedashedline($this->im,$x1,$y1,$x2,$y2,$avg_color);
-				}
-				break;
-		}
 	}
 
 //Calculates percentages for left & right y axis
@@ -956,7 +773,6 @@ class CChart extends CGraphDraw{
 	}
 
 	protected function correctMinMax(){
-		$this->gridLinesCount = round($this->sizeY/$this->gridPixels) + 1;
 
 		$sides = array(GRAPH_YAXIS_SIDE_LEFT,GRAPH_YAXIS_SIDE_RIGHT);
 		foreach($sides as $side){
@@ -966,57 +782,51 @@ class CChart extends CGraphDraw{
 			$tmp_maxY = $this->m_maxY[$side];
 			$tmp_minY = $this->m_minY[$side];
 
-			if($this->axis_valuetype[$side] == ITEM_VALUE_TYPE_UINT64){
+			$this->m_maxY[$side] = ceil($this->m_maxY[$side]);
+			$this->m_minY[$side] = floor($this->m_minY[$side]);
+			
+// gridLines
+			$this->gridLinesCount[$side] = round($this->sizeY/$this->gridPixels);
+			$diff = abs($this->m_minY[$side] - $this->m_maxY[$side]);
+			if($diff < $this->gridLinesCount[$side]) 
+				$this->gridLinesCount[$side] = abs($this->m_minY[$side] - $this->m_maxY[$side]);
+				
+			if($this->gridLinesCount[$side] < 1 ) $this->gridLinesCount[$side] = 1;
+			
+//SDI($this->gridLinesCount[$side]);
+//----------
 
-				$this->m_maxY[$side] = round($this->m_maxY[$side]);
-				$this->m_minY[$side] = floor($this->m_minY[$side]);
 
-				$value_delta = round($this->m_maxY[$side] - $this->m_minY[$side]);
+//SDI($this->m_minY[$side].' - '.$this->m_maxY[$side]);
+			$value_delta = round($this->m_maxY[$side] - $this->m_minY[$side]);
 
-				$step = floor((($value_delta/$this->gridLinesCount) + 1));	// round to top
-				$value_delta2 = $step * $this->gridLinesCount;
+//			$step = floor((($value_delta/$this->gridLinesCount[$side]) + 1));	// round to top
+			$step = ceil($value_delta/$this->gridLinesCount[$side]);	// round to top
+			$value_delta2 = $step * $this->gridLinesCount[$side];
 //SDI($value_delta.' <> '.$value_delta2);
-				$first_delta = round(($value_delta2-$value_delta)/2);
-				$second_delta = ($value_delta2-$value_delta) - $first_delta;
+
+			$first_delta = round(($value_delta2-$value_delta)/2);
+			$second_delta = ($value_delta2-$value_delta) - $first_delta;
 
 //SDI($this->m_maxY[$side].' : '.$first_delta.' --- '.$this->m_minY[$side].' : '.$second_delta);
-				if($this->m_minY[$side] >= 0){
-					if($this->m_minY[$side] < $second_delta){
-						$first_delta += $second_delta - $this->m_minY[$side];
-						$second_delta = $this->m_minY[$side];
-					}
+			if($this->m_minY[$side] >= 0){
+				if($this->m_minY[$side] < $second_delta){
+					$first_delta += $second_delta - $this->m_minY[$side];
+					$second_delta = $this->m_minY[$side];
 				}
-				else if(($this->m_maxY[$side] <= 0)){
-					if($this->m_maxY[$side] > $first_delta){
-						$second_delta += $first_delta - $this->m_maxY[$side];
-						$first_delta = $this->m_maxY[$side];
-					}
-				}
-
-				$this->m_maxY[$side] += $first_delta;
-				$this->m_minY[$side] -= ($value_delta2-$value_delta) - $first_delta;
-
 			}
-			else if($this->axis_valuetype[$side] == ITEM_VALUE_TYPE_FLOAT){
-//*
-				if($this->m_maxY[$side]>0){
-
-					$this->m_maxY[$side] = round($this->m_maxY[$side],1) + round($this->m_maxY[$side],1)*0.2 + 0.05;
+			else if(($this->m_maxY[$side] <= 0)){
+				if($this->m_maxY[$side] > $first_delta){
+					$second_delta += $first_delta - $this->m_maxY[$side];
+					$first_delta = $this->m_maxY[$side];
 				}
-				else if($this->m_maxY[$side]<0){
-					$this->m_maxY[$side] = round($this->m_maxY[$side],1) - round($this->m_maxY[$side],1)*0.2 + 0.05;
-				}
-
-				if($this->m_minY[$side]>0){
-					$this->m_minY[$side] = $this->m_minY[$side] - ($this->m_minY[$side] * 0.2) - 0.05;
-				}
-				else if($this->m_minY[$side]<0){
-					$this->m_minY[$side] = $this->m_minY[$side] + ($this->m_minY[$side] * 0.2) - 0.05;
-				}
-
-				$this->m_minY[$side] = round($this->m_minY[$side],1);
-//*/
 			}
+
+			$this->m_maxY[$side] += $first_delta;
+			$this->m_minY[$side] -= ($value_delta2-$value_delta) - $first_delta;
+			
+//SDI($this->m_minY[$side].' - '.$this->m_maxY[$side]);
+//---------
 
 			if($this->ymax_type == GRAPH_YAXIS_TYPE_FIXED){
 				$this->m_maxY[$side] = $this->yaxismax;
@@ -1033,241 +843,380 @@ class CChart extends CGraphDraw{
 			}
 		}
 	}
+	
+	private function calcTimeInterval(){
+		$this->grid['horizontal'] = array('sub' => array(), 'main' => array());
 
+// align to the closest human time interval
+		$raw_time_interval = ($this->gridPixels*$this->period)/$this->sizeX;
+		$intervals = array(
+			array('main'=> 600,'sub' => 60),				// 1 minute
+			array('main'=> 3600,'sub' => 300),				// 5 minutes
+			array('main'=> 3600,'sub' => 900),				// 15 minutes
+			array('main'=> 3600,'sub' => 1800),				// 30 minutes
+			array('main'=> 86400,'sub' => 3600),			// 1 hour
+			array('main'=> 86400,'sub' => 10800),			// 3 hours
+			array('main'=> 86400,'sub' => 21600),			// 6 hours
+			array('main'=> 86400,'sub' => 43200),			// 12 hours
+			array('main'=> 604800,'sub' => 86400),			// 1 day
+			array('main'=> 1209600,'sub' => 604800),		// 1 week
+			array('main'=> 1209600,'sub' => 1209600)		// 2 weeks
+		);
 
-	protected function selectData(){
+		$dist = 604800; //def week;
+		$sub_interval = 0;
+		$main_interval = 0;
+		
+		foreach($intervals as $num => $int){
+			$t = abs($int['sub']-$raw_time_interval);
 
-		$this->data = array();
+			if($t<$dist){
+				$dist = $t;
+				$sub_interval = $int['sub'];
+				
+				$main_interval = $int['main'];
+			}
+		}
+//------
 
-		$now = time(NULL);
+// Sub		
+		$intervalX = ($sub_interval * $this->sizeX) / $this->period;
 
-		if(isset($this->stime)){
-			$this->from_time	= $this->stime;
-			$this->to_time		= $this->stime + $this->period;
+		if($sub_interval > 86400){
+			$offset = (8 - date('w',$this->from_time)) * 86400;
+			$next = $this->from_time + $offset;
+			
+			$offset = mktime(0, 0, 0, date('m', $next), date('d', $next), date('Y', $next)) - $this->from_time;
+			$offsetX = $offset * ($this->sizeX / $this->period);
 		}
 		else{
-			$this->to_time		= $now - 3600 * $this->from;
-			$this->from_time	= $this->to_time - $this->period;
+			$offset = $sub_interval - (($this->from_time + date('Z', $this->from_time)) % $sub_interval);
+			$offsetX = ($offset * $this->sizeX) / $this->period;
 		}
 
-		$p = $this->to_time - $this->from_time;		// graph size in time
-		$z = $p - $this->from_time % $p;			// graphsize - mod(from_time,p) for Oracle...
-		$x = $this->sizeX;							// graph size in px
+		$vline_count = floor(($this->period-$offset) / $sub_interval);
 
-		for($i=0; $i < $this->num; $i++){
+		$start_i = 0;
+		if($offsetX < 12) $start_i++;
 
-			$real_item = get_item_by_itemid($this->items[$i]['itemid']);
-
-			if(!isset($this->axis_valuetype[$this->items[$i]['axisside']])){
-				$this->axis_valuetype[$this->items[$i]['axisside']] = $real_item['value_type'];
-			}
-			else if($this->axis_valuetype[$this->items[$i]['axisside']] != $real_item['value_type']){
-				$this->axis_valuetype[$this->items[$i]['axisside']] = ITEM_VALUE_TYPE_FLOAT;
-			}
-
-			$type = $this->items[$i]['calc_type'];
-			if($type == GRAPH_ITEM_AGGREGATED) {
-				/* skip current period */
-				$from_time	= $this->from_time - $this->period * $this->items[$i]['periods_cnt'];
-				$to_time	= $this->from_time;
-			}
-			else {
-				$from_time	= $this->from_time;
-				$to_time	= $this->to_time;
-			}
-
-			$calc_field = 'round('.$x.'*(mod('.zbx_dbcast_2bigint('clock').'+'.$z.','.$p.'))/('.$p.'),0)';  /* required for 'group by' support of Oracle */
-
-			$sql_arr = array();
-
-			if((($real_item['history']*86400) > (time()-($this->from_time+$this->period/2))) &&			// should pick data from history or trends
-				(($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)))		// is reasonable to take data from history?
-			{
-				$this->dataFrom = 'history';
-				array_push($sql_arr,
-					'SELECT itemid,'.$calc_field.' as i,'.
-						' count(*) as count,avg(value) as avg,min(value) as min,'.
-						' max(value) as max,max(clock) as clock'.
-					' FROM history '.
-					' WHERE itemid='.$this->items[$i]['itemid'].
-						' AND clock>='.$from_time.
-						' AND clock<='.$to_time.
-					' GROUP BY itemid,'.$calc_field
-					,
-
-					'SELECT itemid,'.$calc_field.' as i,'.
-						' count(*) as count,avg(value) as avg,min(value) as min,'.
-						' max(value) as max,max(clock) as clock'.
-					' FROM history_uint '.
-					' WHERE itemid='.$this->items[$i]['itemid'].
-						' AND clock>='.$from_time.
-						' AND clock<='.$to_time.
-					' GROUP BY itemid,'.$calc_field
-					);
-			}
-			else{
-				$this->dataFrom = 'trends';
-				array_push($sql_arr,
-					'SELECT itemid,'.$calc_field.' as i,'.
-						' sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
-						' max(value_max) as max,max(clock) as clock'.
-					' FROM trends '.
-					' WHERE itemid='.$this->items[$i]['itemid'].
-						' AND clock>='.$from_time.
-						' AND clock<='.$to_time.
-					' GROUP BY itemid,'.$calc_field
-					,
-
-					'SELECT itemid,'.$calc_field.' as i,'.
-						' sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
-						' max(value_max) as max,max(clock) as clock'.
-					' FROM trends_uint '.
-					' WHERE itemid='.$this->items[$i]['itemid'].
-						' AND clock>='.$from_time.
-						' AND clock<='.$to_time.
-					' GROUP BY itemid,'.$calc_field
-					);
-
-				$this->items[$i]['delay'] = max($this->items[$i]['delay'],3600);
-			}
-//SDI($sql_arr);
-			$curr_data = &$this->data[$this->items[$i]['itemid']][$type];
-			$curr_data->count = NULL;
-			$curr_data->min = NULL;
-			$curr_data->max = NULL;
-			$curr_data->avg = NULL;
-			$curr_data->clock = NULL;
-
-			foreach($sql_arr as $sql){
-				$result=DBselect($sql);
-
-				while($row=DBfetch($result)){
-					$idx=$row['i']-1;
-					if($idx<0) continue;
-/* --------------------------------------------------
-	We are taking graph on 1px more than we need,
-	and here we are skiping first px, because of MOD (in SELECT),
-	it combines prelast point (it would be last point if not that 1px in begining)
-	and first point, but we still losing prelast point :(
-	but now we've got the first point.
---------------------------------------------------*/
-
-					$curr_data->count[$idx]	= $row['count'];
-					$curr_data->min[$idx]	= $row['min'];
-					$curr_data->max[$idx]	= $row['max'];
-					$curr_data->avg[$idx]	= $row['avg'];
-					$curr_data->clock[$idx]	= $row['clock'];
-					$curr_data->shift_min[$idx] = 0;
-					$curr_data->shift_max[$idx] = 0;
-					$curr_data->shift_avg[$idx] = 0;
-
-					if($this->type == GRAPH_TYPE_STACKED){
-						$this->CheckGraphOrientation($curr_data->min[$idx]);
-					}
-				}
-				unset($row);
-			}
-			/* calculate missed points */
-			$first_idx = 0;
-			/*
-				first_idx - last existed point
-				ci - current index
-				cj - count of missed in onetime
-				dx - offset to first value (count to last existed point)
-			//*/
-
-			for($ci = 0, $cj=0; $ci < $this->sizeX; $ci++){
-				if(!isset($curr_data->count[$ci]) || $curr_data->count[$ci] == 0){
-					$curr_data->count[$ci] = 0;
-					$curr_data->shift_min[$ci] = 0;
-					$curr_data->shift_max[$ci] = 0;
-					$curr_data->shift_avg[$ci] = 0;
-					$cj++;
-				}
-				else if($cj > 0){
-					$dx = $cj + 1;
-
-					$first_idx = $ci - $dx;
-
-					if($first_idx < 0)	$first_idx = $ci; // if no data FROM start of graph get current data as first data
-
-					for(;$cj > 0; $cj--){
-						if(($dx < ($this->sizeX/20)) && ($this->type == GRAPH_TYPE_STACKED)){
-							$curr_data->count[$ci - ($dx - $cj)] = 1;
-						}
-
-						foreach(array('clock','min','max','avg') as $var_name){
-							$var = &$curr_data->$var_name;
-
-							if($first_idx == $ci && $var_name == 'clock'){
-								$var[$ci - ($dx - $cj)] = $var[$first_idx] - (($p / $this->sizeX) * ($dx - $cj));
-								continue;
-							}
-
-							$dy = $var[$ci] - $var[$first_idx];
-							$var[$ci - ($dx - $cj)] = $var[$first_idx] + ($cj * $dy) / $dx;
-						}
-					}
-				}
-			}
-
-			if($cj > 0 && $ci > $cj){
-				$dx = $cj + 1;
-
-				$first_idx = $ci - $dx;
-
-				for(;$cj > 0; $cj--){
-
-//					if($dx < ($this->sizeX/20))			//($this->type == GRAPH_TYPE_STACKED)
-//						$curr_data->count[$first_idx + ($dx - $cj)] = 1;
-
-					foreach(array('clock','min','max','avg') as $var_name){
-						$var = &$curr_data->$var_name;
-
-						if( $var_name == 'clock'){
-							$var[$first_idx + ($dx - $cj)] = $var[$first_idx] + (($p / $this->sizeX) * ($dx - $cj));
-							continue;
-						}
-						$var[$first_idx + ($dx - $cj)] = $var[$first_idx];
-					}
-				}
-			}
-			/* end of missed points calculation */
+		while(($this->sizeX - ($offsetX + ($vline_count*$intervalX))) < 12){
+			$vline_count--;
 		}
 
-		/* calculte shift for stacked graphs */
+//SDI($this->from_time);
+		$sub = &$this->grid['horizontal']['sub'];
+		$sub['interval'] = $sub_interval;
+		$sub['linecount'] = $vline_count;
+		$sub['intervalx'] = $intervalX;
+		$sub['offset'] = $offset;
+		$sub['offsetx'] = $offsetX;
+		$sub['start'] = $start_i;
+//-----
 
-		if($this->type == GRAPH_TYPE_STACKED){
-			for($i=1; $i<$this->num; $i++){
-				$curr_data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];
-
-				if(!isset($curr_data))	continue;
-
-				for($j = $i-1; $j >= 0; $j--){
-					if($this->items[$j]['axisside'] != $this->items[$i]['axisside']) continue;
-
-					$prev_data = &$this->data[$this->items[$j]['itemid']][$this->items[$j]['calc_type']];
-
-					if(!isset($prev_data))	continue;
-
-					for($ci = 0; $ci < $this->sizeX; $ci++){
-						foreach(array('min','max','avg') as $var_name){
-							$shift_var_name	= 'shift_'.$var_name;
-							$curr_shift	= &$curr_data->$shift_var_name;
-							$curr_var	= &$curr_data->$var_name;
-							$prev_shift	= &$prev_data->$shift_var_name;
-							$prev_var	= &$prev_data->$var_name;
-							$curr_shift[$ci] = $prev_var[$ci] + $prev_shift[$ci];
-						}
-					}
-					break;
-				}
-			}
+// Main
+		$intervalX = ($main_interval * $this->sizeX) / $this->period;
+		
+		if($main_interval > 86400){
+			$offset = (8 - date('w',$this->from_time)) * 86400;
+			$next = $this->from_time + $offset;
+			
+			$offset = mktime(0, 0, 0, date('m', $next), date('d', $next), date('Y', $next)) - $this->from_time;
+			$offsetX = $offset * ($this->sizeX / $this->period);
 		}
-		/* end calculation of stacked graphs */
+		else{
+			$offset = $main_interval - (($this->from_time + (date('Z', $this->from_time))) % $main_interval);
+			$offsetX = $offset * ($this->sizeX / $this->period);
+		}
+		
+		$vline_count = floor(($this->period-$offset) / $main_interval);
+
+		$start_i = 0;
+		if($offsetX < 12) $start_i++;
+		
+		while(($this->sizeX - ($offsetX + ($vline_count*$intervalX))) < 12){
+			$vline_count--;
+		}
+
+		$main = &$this->grid['horizontal']['main'];
+		$main['interval'] = $main_interval;
+		$main['linecount'] = $vline_count;
+		$main['intervalx'] = $intervalX;
+		$main['offset'] = $offset;
+		$main['offsetx'] = $offsetX;
+		$main['start'] = $start_i;
+//----
 	}
 
-	protected function drawLeftSide(){
+
+/********************************************************************************************************/
+// DRAW ELEMENTS				 			
+/********************************************************************************************************/
+	public function drawXYAxisScale(){
+		dashedrectangle($this->im,
+			$this->shiftXleft+$this->shiftXCaption-1,
+			$this->shiftY-1,
+			$this->sizeX+$this->shiftXleft+$this->shiftXCaption,
+			$this->sizeY+$this->shiftY+1,
+			$this->getColor($this->graphtheme['gridcolor'], 0)
+			);
+			
+		if($this->yaxisleft){
+			imageline($this->im,
+				$this->shiftXleft+$this->shiftXCaption-1,
+				$this->shiftY-5,
+				$this->shiftXleft+$this->shiftXCaption-1,
+				$this->sizeY+$this->shiftY+4,
+				$this->getColor($this->graphtheme['gridbordercolor'], 0)
+				);
+				
+			imagefilledpolygon($this->im,
+					array(
+						$this->shiftXleft+$this->shiftXCaption-4, $this->shiftY-5,
+						$this->shiftXleft+$this->shiftXCaption+2, $this->shiftY-5,
+						$this->shiftXleft+$this->shiftXCaption-1, $this->shiftY-10,
+					),
+					3,
+					$this->getColor('White')
+				);
+				
+			imagepolygon($this->im,
+					array(
+						$this->shiftXleft+$this->shiftXCaption-4, $this->shiftY-5,
+						$this->shiftXleft+$this->shiftXCaption+2, $this->shiftY-5,
+						$this->shiftXleft+$this->shiftXCaption-1, $this->shiftY-10,
+					),
+					3,
+					$this->getColor($this->graphtheme['gridbordercolor'], 0)
+				);
+		}
+		
+		if($this->yaxisright){
+			if($this->yaxisleft) $color = $this->getColor($this->graphtheme['maingridcolor'], 0);
+			else $color = $this->getColor($this->graphtheme['gridbordercolor'], 0);
+			
+			imageline($this->im,
+				$this->sizeX+$this->shiftXleft+$this->shiftXCaption,
+				$this->shiftY-5,
+				$this->sizeX+$this->shiftXleft+$this->shiftXCaption,
+				$this->sizeY+$this->shiftY+4,
+				$color
+				);
+				
+			imagefilledpolygon($this->im,
+					array(
+						$this->sizeX+$this->shiftXleft+$this->shiftXCaption-3, $this->shiftY-5,
+						$this->sizeX+$this->shiftXleft+$this->shiftXCaption+3, $this->shiftY-5,
+						$this->sizeX+$this->shiftXleft+$this->shiftXCaption, $this->shiftY-10,
+					),
+					3,
+					$this->getColor('White')
+				);
+				
+			imagepolygon($this->im,
+					array(
+						$this->sizeX+$this->shiftXleft+$this->shiftXCaption-3, $this->shiftY-5,
+						$this->sizeX+$this->shiftXleft+$this->shiftXCaption+3, $this->shiftY-5,
+						$this->sizeX+$this->shiftXleft+$this->shiftXCaption, $this->shiftY-10,
+					),
+					3,
+					$color
+				);
+		}
+		
+		imageline($this->im,
+			$this->shiftXleft+$this->shiftXCaption-4,
+			$this->sizeY+$this->shiftY+1,
+			$this->sizeX+$this->shiftXleft+$this->shiftXCaption+5,
+			$this->sizeY+$this->shiftY+1,
+			$this->getColor($this->graphtheme['gridbordercolor'], 0)
+			);
+			
+		imagefilledpolygon($this->im,
+				array(
+					$this->sizeX+$this->shiftXleft+$this->shiftXCaption+5, $this->sizeY+$this->shiftY-2,
+					$this->sizeX+$this->shiftXleft+$this->shiftXCaption+5, $this->sizeY+$this->shiftY+4,
+					$this->sizeX+$this->shiftXleft+$this->shiftXCaption+10, $this->sizeY+$this->shiftY+1,
+				),
+				3,
+				$this->getColor('White')
+			);
+			
+		imagepolygon($this->im,
+				array(
+					$this->sizeX+$this->shiftXleft+$this->shiftXCaption+5, $this->sizeY+$this->shiftY-2,
+					$this->sizeX+$this->shiftXleft+$this->shiftXCaption+5, $this->sizeY+$this->shiftY+4,
+					$this->sizeX+$this->shiftXleft+$this->shiftXCaption+10, $this->sizeY+$this->shiftY+1,
+				),
+				3,
+				$this->getColor($this->graphtheme['gridbordercolor'], 0)
+			);
+	}
+
+// Vertical grid
+	private function drawVerticalGrid(){
+		$hline_count = round($this->sizeY / $this->gridPixels);
+		
+		if($this->yaxisleft)
+			$tmp_hlines = $this->gridLinesCount[GRAPH_YAXIS_SIDE_LEFT];
+		else
+			$tmp_hlines = $this->gridLinesCount[GRAPH_YAXIS_SIDE_RIGHT];
+		
+		if($tmp_hlines < $hline_count) 
+			$hline_count = $tmp_hlines * 2 - 1;
+		else
+			$hline_count = $tmp_hlines - 1;
+
+
+		for($i=1; $i<=$hline_count; $i++){
+			dashedline($this->im,
+					$this->shiftXleft,
+					$i*($this->sizeY/($hline_count+1))+$this->shiftY,
+					$this->sizeX+$this->shiftXleft,
+					$i*($this->sizeY/($hline_count+1))+$this->shiftY,
+					$this->getColor($this->graphtheme['maingridcolor'],0)
+				);
+		}
+	}
+	
+	private function drawTimeGrid(){
+		$this->calctimeInterval();
+		$this->drawSubTimeGrid();
+		$this->drawMainTimeGrid();
+	}
+	
+	private function drawSubTimeGrid(){
+		$main_interval = $this->grid['horizontal']['main']['interval'];
+		$main_intervalX = $this->grid['horizontal']['main']['intervalx'];
+		$main_offset = $this->grid['horizontal']['main']['offset'];
+		$main_offsetX = $this->grid['horizontal']['main']['offsetx'];
+		
+		$sub = &$this->grid['horizontal']['sub'];
+		$interval = $sub['interval'];
+		$vline_count = $sub['linecount'];
+		$intervalX = $sub['intervalx'];
+		
+		$offset = $sub['offset'];
+		$offsetX = $sub['offsetx'];
+		$start_i = $sub['start'];
+		
+		if($interval == $main_interval) return;
+
+		$test_dims = imageTextSize(7, 90, 'WWW');		
+		for($i=$start_i; $i<=$vline_count; $i++){
+			$new_time = $this->from_time+$i*$interval+$offset;
+			$new_pos = $i*$intervalX+$offsetX;
+
+			if(($interval == 86400) && date('N',$new_time) == 1) continue;
+			else if((($i*$interval+$offset) % $main_interval) == $main_offset) continue;
+
+			dashedline($this->im,
+					$this->shiftXleft+$new_pos,
+					$this->shiftY,
+					$this->shiftXleft+$new_pos,
+					$this->sizeY+$this->shiftY,
+					$this->getColor($this->graphtheme['gridcolor'], 0)
+			);
+			
+			if($main_intervalX < floor(($main_interval/$interval)*$intervalX)) continue;
+			else if($main_intervalX < (ceil($main_interval/$interval + 1)*$test_dims['width'])) continue;
+			
+			if($interval == 86400) $date_format = 'D';
+			else if($interval > 86400) $date_format = 'd.m';
+			else if($interval < 86400) $date_format = 'H:i';
+
+			$str = date($date_format, $new_time);
+			$dims = imageTextSize(7, 90, $str);
+
+			imageText($this->im, 
+						7, 
+						90,
+						$this->shiftXleft+$new_pos+round($dims['width']/2),
+						$this->sizeY+$this->shiftY+$dims['height']+4,
+						$this->getColor($this->graphtheme['textcolor'],0),
+						$str
+			);
+
+		}
+	}
+
+	private function drawMainTimeGrid(){
+		$main = &$this->grid['horizontal']['main'];
+		$interval = $main['interval'];
+		$vline_count = $main['linecount'];
+		$intervalX = $main['intervalx'];
+		$offset = $main['offset'];
+		$offsetX = $main['offsetx'];
+		$start_i = $main['start'];
+		
+		$old_day=date('d',$this->from_time);
+		for($i=$start_i; $i<=$vline_count; $i++){
+			$new_time = $this->from_time+$i*$interval+$offset;
+			
+			$new_day=date('d', $new_time);
+			if($old_day != $new_day){
+				$old_day=$new_day;
+
+				if($interval > 86400) $date_format = 'd.m';
+				else if(date('Hi', $new_time) == 0) $date_format = 'd.m';
+				else $date_format = 'd.m H:i';
+				
+				$color = $this->graphtheme['highlightcolor'];
+			}
+			else{
+				$date_format = 'H:i';
+				$color = $this->graphtheme['highlightcolor'];
+			}
+
+
+			$str = date($date_format, $new_time);
+			$dims = imageTextSize(8, 90, $str);
+
+			imageText($this->im, 
+						8, 
+						90,
+						$i*$intervalX+$this->shiftXleft+$offsetX+round($dims['width']/2),
+						$this->sizeY+$this->shiftY+$dims['height']+4,
+						$this->getColor($color,0),
+						$str
+			);
+
+			imageline($this->im,
+					$i*$intervalX+$this->shiftXleft+$offsetX,
+					$this->shiftY,
+					$i*$intervalX+$this->shiftXleft+$offsetX,
+					$this->sizeY+$this->shiftY,
+					$this->getColor($this->graphtheme['maingridcolor'], 0)
+			);
+		}
+
+
+// First && Last
+// Start
+		$str = date('d.m H:i',$this->from_time);
+		$dims = imageTextSize(8, 90, $str);
+		imageText($this->im, 
+					8, 
+					90,
+					$this->shiftXleft + round($dims['width']/2),
+					$this->sizeY+$this->shiftY + $dims['height'] + 4,
+					$this->getColor($this->graphtheme['highlightcolor'], 0),
+					$str
+			);
+
+// End
+		$str = date('d.m H:i',$this->to_time);
+		$dims = imageTextSize(8, 90, $str);
+		imageText($this->im, 
+					8, 
+					90,
+					$this->sizeX+$this->shiftXleft + round($dims['width']/2),
+					$this->sizeY+$this->shiftY + $dims['height'] + 4,
+					$this->getColor($this->graphtheme['highlightcolor'], 0),
+					$str
+			);
+	}
+	
+	private function drawLeftSide(){
 		if($this->yaxisleft == 1){
 			$minY = $this->m_minY[GRAPH_YAXIS_SIDE_LEFT];
 			$maxY = $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT];
@@ -1279,24 +1228,23 @@ class CChart extends CGraphDraw{
 				}
 			}
 
-			$hstr_count = $this->gridLinesCount;
-			for($i=0;$i<=$hstr_count;$i++){
-				$str = str_pad(convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units),10,' ', STR_PAD_LEFT);
-				
-				
-				imagetext($this->im, 
+			$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_LEFT];
+			for($i=0; $i<=$hstr_count; $i++){
+			
+				$str = convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units);
+				$dims = imageTextSize(7, 0, $str);
+
+				imageText($this->im, 
+					7,
 					0,
-					0,
-					5,
-					$this->sizeY-$this->sizeY*$i/$hstr_count-4+$this->shiftY, 
-					$this->getColor('Dark Red No Alpha'), 
+					$this->shiftXleft - $dims['width'] - 10,
+					$this->sizeY-$this->sizeY*$i/$hstr_count+$this->shiftY + 3, 
+					$this->getColor($this->graphtheme['textcolor'], 0), 
 					$str
 				);
 			}
 
-			if(($this->zero[GRAPH_YAXIS_SIDE_LEFT] != $this->sizeY+$this->shiftY) &&
-				($this->zero[GRAPH_YAXIS_SIDE_LEFT] != $this->shiftY))
-			{
+			if(($this->zero[GRAPH_YAXIS_SIDE_LEFT] != ($this->sizeY+$this->shiftY)) && ($this->zero[GRAPH_YAXIS_SIDE_LEFT] != $this->shiftY)){
 				imageline($this->im,
 							$this->shiftXleft,
 							$this->zero[GRAPH_YAXIS_SIDE_LEFT],
@@ -1308,7 +1256,7 @@ class CChart extends CGraphDraw{
 		}
 	}
 
-	protected function drawRightSide(){
+	private function drawRightSide(){
 		if($this->yaxisright == 1){
 			$minY = $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT];
 			$maxY = $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT];
@@ -1319,16 +1267,16 @@ class CChart extends CGraphDraw{
 					break;
 				}
 			}
-			$hstr_count = $this->gridLinesCount;
+
+			$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_RIGHT];
 			for($i=0;$i<=$hstr_count;$i++){
-				$str = str_pad(convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units),10,' ');
-					
-				imagetext($this->im, 
+				$str = convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units);
+				imageText($this->im, 
+					7,
 					0,
-					0,
-					$this->sizeX+$this->shiftXleft+2,
-					$this->sizeY-$this->sizeY*$i/$hstr_count-4+$this->shiftY, 
-					$this->getColor('Dark Red No Alpha'), 
+					$this->sizeX+$this->shiftXleft+12,
+					$this->sizeY-$this->sizeY*$i/$hstr_count+$this->shiftY + 3, 
+					$this->getColor($this->graphtheme['textcolor'], 0), 
 					$str
 				);
 			}
@@ -1346,22 +1294,85 @@ class CChart extends CGraphDraw{
 			}
 		}
 	}
+	
+	protected function drawWorkPeriod(){
+		imagefilledrectangle($this->im,
+			$this->shiftXleft+1,
+			$this->shiftY,
+			$this->sizeX+$this->shiftXleft-2,	// -2 border
+			$this->sizeY+$this->shiftY,
+			$this->getColor($this->graphtheme['graphcolor'], 0));
+			
+		if($this->m_showWorkPeriod != 1) return;
+		if($this->period > 2678400) return; // > 31*24*3600 (month)
+
+		$db_work_period = DBselect('SELECT work_period FROM config');
+		$work_period = DBfetch($db_work_period);
+		if(!$work_period) return;
+
+		$periods = parse_period($work_period['work_period']);
+		if(!$periods) return;
+
+		imagefilledrectangle($this->im,
+			$this->shiftXleft+1,
+			$this->shiftY,
+			$this->sizeX+$this->shiftXleft-2,	// -2 border
+			$this->sizeY+$this->shiftY,
+			$this->getColor($this->graphtheme['noneworktimecolor'], 0));
+
+		$now = time();
+		if(isset($this->stime)){
+			$this->from_time=$this->stime;
+			$this->to_time=$this->stime+$this->period;
+		}
+		else{
+			$this->to_time=$now-3600*$this->from;
+			$this->from_time=$this->to_time-$this->period;
+		}
+
+		$from = $this->from_time;
+		$max_time = $this->to_time;
+
+		$start = find_period_start($periods,$from);
+		$end = -1;
+		while($start < $max_time && $start > 0){
+			$end = find_period_end($periods,$start,$max_time);
+
+			$x1 = round((($start-$from)*$this->sizeX)/$this->period) + $this->shiftXleft;
+			$x2 = ceil((($end-$from)*$this->sizeX)/$this->period) + $this->shiftXleft;
+
+			//draw rectangle
+			imagefilledrectangle(
+				$this->im,
+				$x1,
+				$this->shiftY,
+				$x2-2,		// -2 border
+				$this->sizeY+$this->shiftY,
+				$this->getColor($this->graphtheme['graphcolor'], 0));
+
+			$start = find_period_start($periods,$end);
+		}
+	}
+	
 
 	protected function drawPercentile(){
 		if($this->type != GRAPH_TYPE_NORMAL){
 			return ;
 		}
 
-		$color = 'FF0000';
 		foreach($this->percentile as $side => $percentile){
 			if(($percentile['percent']>0) && $percentile['value']){
 				if($side == 'left'){
 					$minY = $this->m_minY[GRAPH_YAXIS_SIDE_LEFT];
 					$maxY = $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT];
+					
+					$color = $this->graphtheme['leftpercentilecolor'];
 				}
 				else{
 					$minY = $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT];
 					$maxY = $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT];
+					
+					$color = $this->graphtheme['rightpercentilecolor'];
 				}
 
 				$y = $this->sizeY - (($percentile['value']-$minY) / ($maxY-$minY)) * $this->sizeY + $this->shiftY;
@@ -1372,11 +1383,323 @@ class CChart extends CGraphDraw{
 					$this->sizeX+$this->shiftXleft,
 					$y,
 					$this->getColor($color));
-
-				$color = '00AA00';
 			}
 		}
 	}
+
+	protected function drawTriggers(){
+		if($this->m_showTriggers != 1) return;
+		if($this->num != 1) return; // skip multiple graphs
+
+		foreach($this->triggers as $trigger){
+			dashedline(
+				$this->im,
+				$this->shiftXleft,
+				$trigger['y'],
+				$this->sizeX+$this->shiftXleft,
+				$trigger['y'],
+				$this->getColor($trigger['color']));
+		}
+	}
+
+	
+	protected function drawLegend(){
+		$leftXShift = 20;
+		
+		$units = array('left'=>0, 'right'=>0 );
+				
+		$legend = new CImageTextTable($this->im, $leftXShift+10, $this->sizeY+$this->shiftY+$this->legendOffsetY);
+		$legend->color = $this->getColor($this->graphtheme['textcolor'], 0);
+		$legend->rowheight = 14;
+
+		$row = array(
+				array('text' => ''),
+				array('text' => ''),
+				array('text' => 'Last', 'align'=> 1, 'fontsize' => 9),
+				array('text' => 'Min', 'align'=> 1, 'fontsize' => 9),
+				array('text' => 'Avg', 'align'=> 1, 'fontsize' => 9),
+				array('text' => 'Max', 'align'=> 1, 'fontsize' => 9)
+			);
+
+		$legend->addRow($row);
+		$colNum = $legend->getNumRows();
+		
+		$i = ($this->type == GRAPH_TYPE_STACKED)?($this->num-1):0;
+		while(($i>=0) && ($i<$this->num)){
+			$row = array();	
+
+			if($this->items[$i]['calc_type'] == GRAPH_ITEM_AGGREGATED){
+				$fnc_name = 'agr('.$this->items[$i]['periods_cnt'].')';
+				$color = $this->getColor('HistoryMinMax');
+			}
+			else{
+				$color = $this->getColor($this->items[$i]['color'], GRAPH_STACKED_ALFA);
+				switch($this->items[$i]['calc_fnc']){
+					case CALC_FNC_MIN:	$fnc_name = 'min';	break;
+					case CALC_FNC_MAX:	$fnc_name = 'max';	break;
+					case CALC_FNC_ALL:	$fnc_name = 'all';	break;
+					case CALC_FNC_AVG:
+					default:		$fnc_name = 'avg';
+				}
+			}
+
+			$data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];
+			if(isset($data) && isset($data->min)){
+				if($this->items[$i]['axisside'] == GRAPH_YAXIS_SIDE_LEFT)
+					$units['left'] = $this->items[$i]['units'];
+				else
+					$units['right'] = $this->items[$i]['units'];
+
+				$legend->addCell($colNum, array('text' => $this->items[$i]['host'].': '.$this->items[$i]['description']));
+				$legend->addCell($colNum, array('text' => '['.$fnc_name.']'));
+				$legend->addCell($colNum, array('text' => convert_units($this->getLastValue($i),$this->items[$i]['units']), 'align'=> 2));
+				$legend->addCell($colNum, array('text' => convert_units(min($data->min),$this->items[$i]['units']), 'align'=> 2));
+				$legend->addCell($colNum, array('text' => convert_units(zbx_avg($data->avg),$this->items[$i]['units']), 'align'=> 2));
+				$legend->addCell($colNum, array('text' => convert_units(max($data->max),$this->items[$i]['units']), 'align'=> 2));
+			}
+			else{
+				$legend->addCell($colNum,array('text' => $this->items[$i]['host'].': '.$this->items[$i]['description']));
+				$legend->addCell($colNum,array('text' => '[ no data ]'));
+			}
+			
+			imagefilledrectangle($this->im,
+							$leftXShift - 5,
+							$this->sizeY+$this->shiftY+14*$colNum+$this->legendOffsetY-10,
+							$leftXShift + 5,
+							$this->sizeY+$this->shiftY+14*$colNum+$this->legendOffsetY,
+							$color
+						);
+
+			imagerectangle($this->im,
+							$leftXShift - 5,
+							$this->sizeY+$this->shiftY+14*$colNum+$this->legendOffsetY-10,
+							$leftXShift + 5,
+							$this->sizeY+$this->shiftY+14*$colNum+$this->legendOffsetY,
+							$this->getColor('Black')
+						);
+
+			$colNum++;
+			
+			if($this->type == GRAPH_TYPE_STACKED) $i--;
+			else $i++;
+		}
+
+		if($this->sizeY < 100){
+			$legend->draw();
+			return ;
+		}
+
+// Draw percentile
+		if($this->type == GRAPH_TYPE_NORMAL){
+			foreach($this->percentile as $side => $percentile){
+				if(($percentile['percent']>0) && $percentile['value']){
+					
+					$str = '%sth percentile: %s';
+					$percentile['percent'] = (float) $percentile['percent'];
+					$legend->addCell($colNum,array('text' => $percentile['percent'].'th percentile: '.convert_units($percentile['value'],$units[$side]).'  ('.$side.')'));
+					if($side == 'left'){
+						$color = $this->graphtheme['leftpercentilecolor'];
+					}
+					else{
+						$color = $this->graphtheme['rightpercentilecolor'];
+					}
+					
+ 					imagefilledpolygon($this->im,
+							array(
+								$leftXShift+5,$this->sizeY+$this->shiftY+14*$colNum+$this->legendOffsetY,
+								$leftXShift-5,$this->sizeY+$this->shiftY+14*$colNum+$this->legendOffsetY,
+								$leftXShift,$this->sizeY+$this->shiftY+14*$colNum+$this->legendOffsetY - 10,
+							),
+							3,
+							$this->getColor($color)
+						);
+
+					imagepolygon($this->im,
+							array(
+								$leftXShift+5,$this->sizeY+$this->shiftY+14*$colNum+$this->legendOffsetY,
+								$leftXShift-5,$this->sizeY+$this->shiftY+14*$colNum+$this->legendOffsetY,
+								$leftXShift,$this->sizeY+$this->shiftY+14*$colNum+$this->legendOffsetY - 10,
+							),
+							3,
+							$this->getColor('Black No Alpha')
+						);
+					
+					
+
+					$colNum++;
+				}
+			}
+		}
+		
+// Draw triggers
+		foreach($this->triggers as $trigger){
+			imagefilledellipse($this->im,
+				$leftXShift,
+				$this->sizeY+$this->shiftY+12*$colNum+$this->legendOffsetY,
+				10,
+				10,
+				$this->getColor($trigger['color']));
+
+			imageellipse($this->im,
+				$leftXShift,
+				$this->sizeY+$this->shiftY+12*$colNum+$this->legendOffsetY,
+				10,
+				10,
+				$this->getColor('Black No Alpha'));
+
+			$legend->addCell($colNum,array('text' => $trigger['description']));
+			$colNum++;
+		}
+		
+		$legend->draw();
+	}
+
+	protected function drawElement(&$data, $from, $to, $minX, $maxX, $minY, $maxY, $drawtype, $max_color, $avg_color, $min_color, $minmax_color,$calc_fnc, $axisside){
+		if(!isset($data->max[$from]) || !isset($data->max[$to])) return;
+
+		$oxy = $this->oxy[$axisside];
+		$zero = $this->zero[$axisside];
+		$unit2px = $this->unit2px[$axisside];
+//SDI($oxy);
+		$shift_min_from = $shift_min_to = 0;
+		$shift_max_from = $shift_max_to = 0;
+		$shift_avg_from = $shift_avg_to = 0;
+
+		if(isset($data->shift_min[$from]))	$shift_min_from = $data->shift_min[$from];
+		if(isset($data->shift_min[$to]))	$shift_min_to = $data->shift_min[$to];
+
+		if(isset($data->shift_max[$from]))	$shift_max_from = $data->shift_max[$from];
+		if(isset($data->shift_max[$to]))	$shift_max_to = $data->shift_max[$to];
+
+		if(isset($data->shift_avg[$from]))	$shift_avg_from = $data->shift_avg[$from];
+		if(isset($data->shift_avg[$to]))	$shift_avg_to = $data->shift_avg[$to];
+/**/
+		$min_from	= $data->min[$from]	+ $shift_min_from;
+		$min_to		= $data->min[$to]	+ $shift_min_to;
+
+		$max_from	= $data->max[$from]	+ $shift_max_from;
+		$max_to		= $data->max[$to]	+ $shift_max_to;
+
+		$avg_from	= $data->avg[$from]	+ $shift_avg_from;
+		$avg_to		= $data->avg[$to]	+ $shift_avg_to;
+
+		$x1 = $from + $this->shiftXleft - 1;
+		$x2 = $to + $this->shiftXleft;
+
+
+		$y1min = $zero - ($min_from-$oxy)/$unit2px;
+		$y2min = $zero - ($min_to-$oxy)/$unit2px;
+//SDI(array($y1min,$zero,$min_from,$oxy,$unit2px));
+		$y1max = $zero - ($max_from-$oxy)/$unit2px;
+		$y2max = $zero - ($max_to-$oxy)/$unit2px;
+
+		$y1avg = $zero - ($avg_from-$oxy)/$unit2px;
+		$y2avg = $zero - ($avg_to-$oxy)/$unit2px;		//*/
+
+		switch($calc_fnc){
+			case CALC_FNC_MAX:
+				$y1 = $y1max;
+				$y2 = $y2max;
+				$shift_from	= $shift_max_from;
+				$shift_to	= $shift_max_to;
+				break;
+			case CALC_FNC_MIN:
+				$y1 = $y1min;
+				$y2 = $y2min;
+				$shift_from	= $shift_min_from;
+				$shift_to	= $shift_min_to;
+				break;
+			case CALC_FNC_ALL:
+				$a[0] = $x1;		$a[1] = $y1max;
+				$a[2] = $x1;		$a[3] = $y1min;
+				$a[4] = $x2;		$a[5] = $y2min;
+				$a[6] = $x2;		$a[7] = $y2max;
+//SDI('2: '.$x2.' - '.$x1.' : '.$y2min.' - '.$y1min);
+				imagefilledpolygon($this->im,$a,4,$minmax_color);
+				imageline($this->im,$x1,$y1max,$x2,$y2max,$max_color);
+				imageline($this->im,$x1,$y1min,$x2,$y2min,$min_color);
+
+				/* don't use break, avg must be drawed in this statement */
+				// break;
+			case CALC_FNC_AVG:
+				/* don't use break, avg must be drawed in this statement */
+				// break;
+			default:
+				$y1 = $y1avg;
+				$y2 = $y2avg;
+				$shift_from	= $shift_avg_from ;
+				$shift_to	= $shift_avg_to;
+		}
+
+		$shift_from -= ($shift_from != 0)?($oxy):(0);
+		$shift_to -= ($shift_to != 0)?($oxy):(0);
+
+		$y1_shift	= $zero - $shift_from/$unit2px;
+		$y2_shift	= $zero - $shift_to/$unit2px;//*/
+
+
+// Fixes graph out of bounds problem
+		if( (($y1 > ($this->sizeY+$this->shiftY)) && ($y2 > ($this->sizeY+$this->shiftY))) || (($y1 < $this->shiftY) && ($y2 < $this->shiftY)) ){
+			if($drawtype == GRAPH_ITEM_DRAWTYPE_FILLED_REGION){
+				if($y1 > ($this->sizeY+$this->shiftY)) $y1 = $this->sizeY+$this->shiftY;
+				if($y2 > ($this->sizeY+$this->shiftY)) $y2 = $this->sizeY+$this->shiftY;
+
+				if($y1 < ($this->sizeY+$this->shiftY)) $y1 = $this->shiftY;
+				if($y2 < ($this->sizeY+$this->shiftY)) $y2 = $this->shiftY;
+			}
+			else{
+				return true;
+			}
+		}
+
+		$y_first = !(($y1 > ($this->sizeY+$this->shiftY)) || ($y1 < $this->shiftY));
+		$y_second = !(($y2 > ($this->sizeY+$this->shiftY)) || ($y2 < $this->shiftY));
+
+		if(!$y_first){
+			$y1 = ($y1 > ($this->sizeY+$this->shiftY))?($this->sizeY+$this->shiftY):$this->shiftY;
+		}
+		else if(!$y_second){
+			$y2 = ($y2 > ($this->sizeY+$this->shiftY))?($this->sizeY+$this->shiftY):$this->shiftY;
+		}
+//--------
+
+		/* draw main line */
+		switch($drawtype){
+			case GRAPH_ITEM_DRAWTYPE_BOLD_LINE:
+				imageline($this->im,$x1,$y1+1,$x2,$y2+1,$avg_color);
+				// break; /* don't use break, must be drawed line also */
+			case GRAPH_ITEM_DRAWTYPE_LINE:
+//SDI(array($this->im,$x1,$y1,$x2,$y2,$avg_color));
+				imageline($this->im,$x1,$y1,$x2,$y2,$avg_color);
+				break;
+			case GRAPH_ITEM_DRAWTYPE_FILLED_REGION:
+				$a[0] = $x1;		$a[1] = $y1;
+				$a[2] = $x1;		$a[3] = $y1_shift;
+				$a[4] = $x2;		$a[5] = $y2_shift;
+				$a[6] = $x2;		$a[7] = $y2;
+//SDI($a);
+				imagefilledpolygon($this->im,$a,4,$avg_color);
+//				imageline($this->im,$x1,$y1,$x2,$y2,$this->getShadow('333333',50));
+				break;
+			case GRAPH_ITEM_DRAWTYPE_DOT:
+				imagefilledrectangle($this->im,$x1-1,$y1-1,$x1+1,$y1+1,$avg_color);
+				imagefilledrectangle($this->im,$x2-1,$y2-1,$x2+1,$y2+1,$avg_color);
+				break;
+			case GRAPH_ITEM_DRAWTYPE_DASHED_LINE:
+				if( function_exists('imagesetstyle') ){
+
+					/* Use imagesetstyle+imageline instead of bugged imagedashedline */
+					$style = array($avg_color, $avg_color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
+					imagesetstyle($this->im, $style);
+					imageline($this->im,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
+				}
+				else{
+					imagedashedline($this->im,$x1,$y1,$x2,$y2,$avg_color);
+				}
+				break;
+		}
+	}
+
 
 	public function draw(){
 		$start_time=getmicrotime();
@@ -1400,12 +1723,12 @@ class CChart extends CGraphDraw{
 		$this->calcPercentile();
 
 		$this->fullSizeX = $this->sizeX+$this->shiftXleft+$this->shiftXright+1;
-		$this->fullSizeY = $this->sizeY+$this->shiftY+62;
-		$this->fullSizeY += 12*($this->num+(($this->sizeY < 120)?0:count($this->triggers)))+8;
+		$this->fullSizeY = $this->sizeY+$this->shiftY+$this->legendOffsetY;
+		$this->fullSizeY += 14*($this->num+1+(($this->sizeY < 120)?0:count($this->triggers)))+8;
 
 		foreach($this->percentile as $side => $percentile){
 			if(($percentile['percent']>0) && $percentile['value']){
-				$this->fullSizeY += 12;
+				$this->fullSizeY += 14;
 			}
 		}
 
@@ -1416,15 +1739,19 @@ class CChart extends CGraphDraw{
 
 
 		$this->initColors();
-		$this->drawRectangle();
-		$this->drawHeader();
+		$this->drawRectangle($this->graphtheme['backgroundcolor'], $this->graphtheme['graphbordercolor']);
+		$this->drawHeader($this->graphtheme['textcolor']);
 
 		if($this->num==0){
 //				$this->noDataFound();
 		}
 
 		$this->drawWorkPeriod();
-		$this->drawGrid();
+// grid
+		$this->drawTimeGrid();
+		$this->drawVerticalGrid();
+		$this->drawXYAxisScale($this->graphtheme['gridbordercolor']);
+//-----
 
 		$maxX = $this->sizeX;
 
@@ -1511,6 +1838,7 @@ class CChart extends CGraphDraw{
 
 		$this->drawLeftSide();
 		$this->drawRightSide();
+
 		$this->drawTriggers();
 		$this->drawPercentile();
 
@@ -1520,7 +1848,7 @@ class CChart extends CGraphDraw{
 
 		$end_time=getmicrotime();
 		$str=sprintf('%0.2f',(getmicrotime()-$start_time));
-		imagestring($this->im, 0,$this->fullSizeX-160,$this->fullSizeY-12,'Generated in '.$str.' sec ('.$this->dataFrom.')', $this->getColor('Gray'));
+		imagestring($this->im, 0,$this->fullSizeX-210,$this->fullSizeY-12,'Data from '.$this->dataFrom.'. Generated in '.$str.' sec', $this->getColor('Gray'));
 
 		unset($this->items, $this->data);
 

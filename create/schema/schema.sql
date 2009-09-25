@@ -484,6 +484,27 @@ FIELD		|periods_cnt	|t_integer	|'5'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|itemid
 INDEX		|2		|graphid
 
+TABLE|graph_theme|graphthemeid|0
+FIELD		|graphthemeid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|description	|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|theme		|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|backgroundcolor|t_varchar(6)	|'F0F0F0'|NOT NULL	|0
+FIELD		|graphcolor	|t_varchar(6)	|'FFFFFF'|NOT NULL	|0
+FIELD		|graphbordercolor|t_varchar(6)	|'222222'|NOT NULL	|0
+FIELD		|gridcolor	|t_varchar(6)	|'CCCCCC'|NOT NULL	|0
+FIELD		|maingridcolor	|t_varchar(6)	|'AAAAAA'|NOT NULL	|0
+FIELD		|gridbordercolor|t_varchar(6)	|'000000'|NOT NULL	|0
+FIELD		|textcolor	|t_varchar(6)	|'202020'|NOT NULL	|0
+FIELD		|highlightcolor	|t_varchar(6)	|'AA4444'|NOT NULL	|0
+FIELD		|leftpercentilecolor|t_varchar(6)|'11CC11'|NOT NULL	|0
+FIELD		|rightpercentilecolor|t_varchar(6)|'CC1111'|NOT NULL	|0
+FIELD		|noneworktimecolor|t_varchar(6)	|'CCCCCC'|NOT NULL	|0
+FIELD		|gridview	|t_integer	|1	|NOT NULL	|0
+FIELD		|legendview	|t_integer	|1	|NOT NULL	|0
+INDEX		|1		|description
+INDEX		|2		|theme
+
+
 TABLE|groups|groupid|ZBX_SYNC
 FIELD		|groupid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
