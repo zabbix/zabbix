@@ -291,7 +291,7 @@ include_once('include/page_header.php');
 
 		DBstart();
 		foreach($group_userid as $userid){
-			if(!($user_data = CUser::getById(array('userid' => $_REQUEST['userid'])))) continue;
+			if(!($user_data = CUser::getById(array('userid' => $userid)))) continue;
 
 			$result |= (bool) delete_user($userid);
 
