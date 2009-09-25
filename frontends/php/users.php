@@ -28,7 +28,7 @@
 
 	$page['title'] = 'S_USERS';
 	$page['file'] = 'users.php';
-	$page['hist_arg'] = array('config');
+	$page['hist_arg'] = array();
 	$page['scripts'] = array('menu_scripts.js');
 
 include_once('include/page_header.php');
@@ -37,19 +37,16 @@ include_once('include/page_header.php');
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'config'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,		NULL),
 		'perm_details'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
 /* user */
 		'userid'=>			array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,'(isset({form})&&({form}=="update"))'),
 		'group_userid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
 		'filter_usrgrpid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
-
 		'alias'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
 		'name'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
 		'surname'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
-
 		'password1'=>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})&&(isset({form})&&({form}!="update"))&&isset({change_password})'),
-		"password2"=>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})&&(isset({form})&&({form}!="update"))&&isset({change_password})'),
+		'password2'=>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})&&(isset({form})&&({form}!="update"))&&isset({change_password})'),
 
 		'user_type'=>			array(T_ZBX_INT, O_OPT,	null,	IN('1,2,3'),	'isset({save})'),
 		'user_groups'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),//'isset({save})'),
@@ -70,18 +67,14 @@ include_once('include/page_header.php');
 		'rows_per_page'=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,1000),'isset({save})'),
 // Actions
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
-
 // form
 		'register'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"add permission","delete permission"'), null),
-
 		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'delete_selected'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'del_user_group'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'del_user_media'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-
 		'del_group_user'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-
 		'change_password'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'cancel'=>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 /* other */
@@ -93,7 +86,7 @@ include_once('include/page_header.php');
 	validate_sort_and_sortorder('alias',ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go','none');
-
+	
 ?>
 <?php
 	if(isset($_REQUEST['new_groups'])){
@@ -208,10 +201,9 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['userid'])){
 		$user=CUser::getById(array('userid' => $_REQUEST['userid']));
 
-		DBstart();
-		$result = delete_user($_REQUEST['userid']);
-		$result = DBend($result);
-
+		$result = CUser::delete(array($_REQUEST['userid']));
+		if(!$result) error(CUser::$error['data']);
+		
 		show_messages($result, S_USER_DELETED, S_CANNOT_DELETE_USER);
 		if($result){
 			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER,
@@ -224,7 +216,7 @@ include_once('include/page_header.php');
 // Add USER to GROUP
 	else if(isset($_REQUEST['grpaction'])&&isset($_REQUEST['usrgrpid'])&&isset($_REQUEST['userid'])&&($_REQUEST['grpaction']==1)){
 		$user=CUser::getById(array('userid' => $_REQUEST['userid']));
-		$group=get_group_by_usrgrpid($_REQUEST['usrgrpid']);
+		$group=CUserGroup::getById(array('usrgrpid' => $_REQUEST['usrgrpid']));
 
 		DBstart();
 		$result = add_user_to_group($_REQUEST['userid'],$_REQUEST['usrgrpid']);
@@ -244,7 +236,7 @@ include_once('include/page_header.php');
 // Remove USER from GROUP
 	else if(isset($_REQUEST['grpaction'])&&isset($_REQUEST['usrgrpid'])&&isset($_REQUEST['userid'])&&($_REQUEST['grpaction']==0)){
 		$user=CUser::getById(array('userid' => $_REQUEST['userid']));
-		$group=get_group_by_usrgrpid($_REQUEST['usrgrpid']);
+		$group=CUserGroup::getById(array('usrgrpid' => $_REQUEST['usrgrpid']));
 
 		DBstart();
 		$result = remove_user_from_group($_REQUEST['userid'],$_REQUEST['usrgrpid']);
@@ -293,8 +285,9 @@ include_once('include/page_header.php');
 		foreach($group_userid as $userid){
 			if(!($user_data = CUser::getById(array('userid' => $userid)))) continue;
 
-			$result |= (bool) delete_user($userid);
-
+			$result |= (bool) CUser::delete(array($userid));
+			if(!$result) error(CUser::$error['data']);
+			
 			if($result){
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER,
 					'User alias ['.$user_data['alias'].'] name ['.$user_data['name'].'] surname ['.
@@ -308,24 +301,21 @@ include_once('include/page_header.php');
 
 ?>
 <?php
-
 	$_REQUEST['filter_usrgrpid'] = get_request('filter_usrgrpid',get_profile('web.users.filter.usrgrpid',0));
 	update_profile('web.users.filter.usrgrpid', $_REQUEST['filter_usrgrpid'], PROFILE_TYPE_ID);
 
 	$frmForm = new CForm();
 	$frmForm->setMethod('get');
-
-// Config
-	$cmbConf = new CComboBox('config', 'users.php', 'javascript: submit()');
+	$cmbConf = new CComboBox('config', 'users.php');
 	$cmbConf->setAttribute('onchange', 'javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('usergrps.php', S_USER_GROUPS);
 		$cmbConf->addItem('users.php', S_USERS);
-
 	$frmForm->addItem(array($cmbConf,SPACE,new CButton('form',S_CREATE_USER)));
+	
 	show_table_header(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
 	echo SBR;
-?>
-<?php
+
+	
 	if(isset($_REQUEST['form'])){
 		insert_user_form(get_request('userid',null));
 	}
@@ -476,9 +466,7 @@ include_once('include/page_header.php');
 		$user_wdgt->addItem($form);
 		$user_wdgt->show();
 	}
-?>
-<?php
+	
 
 include_once('include/page_footer.php');
-
 ?>

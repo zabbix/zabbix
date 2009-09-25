@@ -748,19 +748,38 @@ class CUser{
 	 * @return boolean
 	 */
 	public static function delete($userids){
-		$result = false;
+		global $USER_DETAILS;
+		
+		$result = true;
+		$error = 'Unknown ZABBIX internal error';
 
-		DBstart(false);
-		foreach($userids as $userid){
-			$result = delete_user($userid);
-			if(!$resukt) break;
+		if(DBfetch(DBselect('SELECT * FROM users WHERE '.DBcondition('userid', $userids).' AND alias='.zbx_dbstr(ZBX_GUEST_USER)))){
+			$error = S_CANNOT_DELETE_USER.'[ '.ZBX_GUEST_USER.' ]';
+			$result = false;
 		}
-		DBend($result);
+
+		
+		if(uint_in_array($USER_DETAILS['userid'], $userids)){
+			$error = S_USER_CANNOT_DELETE_ITSELF;
+			$result = false;
+		}
+		
+		if($result){
+			DBstart(false);
+			
+			$result &= DBexecute('DELETE FROM operations WHERE '.OPERATION_OBJECT_USER.' AND '.DBcondition('objectid', $userids));
+			$result &= DBexecute('DELETE FROM media WHERE '.DBcondition('userid', $userids));
+			$result &= DBexecute('DELETE FROM profiles WHERE '.DBcondition('userid', $userids));
+			$result &= DBexecute('DELETE FROM users_groups WHERE '.DBcondition('userid', $userids));
+			$result &= DBexecute('DELETE FROM users WHERE '.DBcondition('userid', $userids));
+			
+			$result = DBend($result);
+		}
 
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
 			return false;
 		}
 	}

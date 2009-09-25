@@ -356,31 +356,32 @@ span.divider{
 }
 
 /********** <SUBFILTER BUTTONS> ************/
-span.enabled{
+span.subfilter_enabled{
+	color: #00AA00;
 	cursor: pointer;
 	text-decoration: none;
 	border-bottom: 1px dashed;
 }
-span.enabled:hover{
+span.subfilter_enabled:hover{
 	color:#44CC44;
 }
-span.disabled{
+span.subfilter_disabled{
 	color:maroon;
 	cursor: pointer;
 	text-decoration: none;
 	border-bottom: 1px dashed;
 }
-span.disabled:hover{
+span.subfilter_disabled:hover{
 	color:#CC4444;
 }
-span.inactive{
+span.subfilter_inactive{
 	color: #777777;
 }
-span.inactive:hover{
+span.subfilter_inactive:hover{
 
 	color: #999999;
 }
-span.active{
+span.subfilter_active{
 	color: teal;
 }
 /********** </SUBFILTER BUTTONS> ************/

@@ -160,7 +160,7 @@ include_once('include/page_header.php');
 		}
 	}
 	else if(isset($_REQUEST['delete'])){
-		$group = get_group_by_usrgrpid($_REQUEST['usrgrpid']);
+		$group = CUserGroup::getById(array('usrgrpid' => $_REQUEST['usrgrpid']));
 
 		DBstart();
 		$result = delete_user_group($_REQUEST['usrgrpid']);
