@@ -47,7 +47,8 @@
 	}
 
 
-// Add User definition
+// MOVED TO API {
+/*
 	function add_user($user){
 		global $USER_DETAILS;
 
@@ -129,6 +130,9 @@
 
 		return $result;
 	}
+*/
+// } MOVED TO API
+ 
 
 // Update User definition
 	function update_user($userid, $user) {
@@ -276,14 +280,16 @@
 		return $result;
 	}
 
-
+// MOVED TO API {
+/*
 	function get_user_by_userid($userid){
 		if($row = DBfetch(DBselect('SELECT * FROM users WHERE userid='.$userid))){
 			return	$row;
 		}
-		/* error("No user with id [$userid]"); */
 	return	false;
 	}
+*/ 
+// } MOVED TO API
 
 	function get_userid_by_usrgrpid($usrgrpids){
 		zbx_value2array($usrgrpids);
