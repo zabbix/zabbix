@@ -1157,74 +1157,78 @@
 
 	return $result;
 	}
-
-
-// Text Image
-// $y - lower left baseline coord.
-	function imageStringTTF($image, $fontsize, $angle, $x, $y, $color, $string){
-		$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
-
-		//$ar = imagettfbbox($fontsize, $angle, $ttf, $string);
-		//$y += abs($ar[1] - $ar[7]);
-		
-		imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
-		return true;
-	}
- 
- 
-	function imagetext($image, $fontsize, $angle, $x, $y, $color, $string){
+	
+	function imageText($image, $fontsize, $angle, $x, $y, $color, $string){
 		$gdinfo = gd_info();
 		
-		if($gdinfo['FreeType Support']){
-		
+		if($gdinfo['FreeType Support'] && function_exists('imagettftext')){
 			$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
-			
+/*
+			$ar = imagettfbbox($fontsize, $angle, $ttf, $string);
+			if(!$angle)	imagerectangle($image, $x, $y, $x+abs($ar[0] - $ar[4]), $y-abs($ar[1] - $ar[5]), $color);
+			else imagerectangle($image, $x, $y, $x-abs($ar[0] - $ar[4]), $y-abs($ar[1] - $ar[5]), $color);
+//*/	
+			imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
+		}
+		else{
+			$dims = imagetextsize($string);
 			switch($fontsize){
-				case 1:
-					$fontsize = 8;
-					$y_inc = 9;
-				break;
-				case 2:
-					$fontsize = 9;
-					$y_inc = 12;
-				break;
-				case 3:
-					$fontsize = 10;
-					$y_inc = 12;
-				break;
-				case 4:
-					$fontsize = 11;
-					$y_inc = 13;
-				break;
-				case 5:
-					$fontsize = 12;
-					$y_inc = 14;
-				break;
-				default:
-					$fontsize = 7;
-					$y_inc = 8;
-				break;
+				case 6: $fontsize = 1; break;
+				case 7: $fontsize = 2; break;
+				case 8: $fontsize = 3; break;
+				case 9:	$fontsize = 4; break;
+				case 10: $fontsize = 4; break;
+				case 11: $fontsize = 5; break;
+				case 12: $fontsize = 5; break;
+				default: $fontsize = 2; break;
 			}
-			if($angle == 90){
-				$x += $y_inc;
-			}
-			else{
-				$y += $y_inc;
-			}
-			return imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
+
+			if($angle) $x -= $dims['height'];
+			else $y -= $dims['height'];
+			
+			if($angle > 0)	return imagestringup($image, $fontsize, $x, $y, $string, $color);
+			return imagestring($image, $fontsize, $x, $y, $string, $color);
+		}
+
+	return true;
+	}
+
+	function imageTextSize($fontsize, $angle, $string){
+		$gdinfo = gd_info();
+
+		$result = array();
+		if($gdinfo['FreeType Support'] && function_exists('imagettfbbox')){
+			$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
+
+
+			$ar = imagettfbbox($fontsize, $angle, $ttf, $string);
+
+//			$result['height'] = abs($ar[1] - $ar[7]);
+//			$result['width'] = abs($ar[0] - $ar[2]);
+			
+			$result['height'] = abs($ar[1] - $ar[5]);
+			$result['width'] = abs($ar[0] - $ar[4]);
 			
 		}
 		else{
-			if($angle > 0){
-			
-				return imagestringup($image, $fontsize, $x, $y, $string, $color);
-				
+			switch($fontsize){
+				case 6: $width = 2; $height = 8; break;
+				case 7: $width = 3; $height = 10; break;
+				case 8: $width = 4; $height = 12; break;
+				case 9:	$width = 5;	$height = 13; break;
+				case 10: $width = 6; $height = 13; break;
+				case 11: $width = 7; $height = 14; break;
+				case 12: $width = 8; $height = 14; break;
+				default:
+					$fontsize = 2;
+					$height = 10;
+				break;
 			}
-			else{
 			
-				return imagestring($image, $fontsize, $x, $y, $string, $color);
-			
-			}
-		}	
+			$result['height'] = $height;
+			$result['width'] = strlen($string) * $width;
+		}
+	
+	return $result;
 	}
 ?>

@@ -368,6 +368,13 @@ div#scrolltabright{
 	color: #0CF;
 }
 
+div#selection_box{
+	filter:alpha(opacity=60);
+	opacity:.60;
+	background-color:#6666FF;
+}
+
+
 span.green{
 	color:	#0088FF;
 }

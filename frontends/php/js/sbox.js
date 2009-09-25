@@ -23,18 +23,40 @@
 
 <!--
 
-var A_SBOX = new Array();		//selection box obj reference
+var A_SBOX = {};		//selection box obj reference
 
-function sbox_init(stime, period){
+function sbox_init(sbid, timeline, obj, width, height){
+	if(is_null(sbid)){
+		var sbid = A_SBOX.length;
+	}
 	
-	period = period || 3600;
-	if(period < 3600) period = 3600;
-	
-	var dt = new Date;
-	stime = stime || (parseInt(dt.getTime()/1000 - period));
+	if(is_null(timeline)){
+		throw "Parametrs haven't been sent properly";
+		return false;
+	}
 
-	var s_box = new sbox(parseInt(stime),parseInt(period));
-return s_box;
+	var obj = $(obj);
+	A_SBOX[sbid].sbox = new sbox(sbid, timeline, obj, width, height);
+	
+// Listeners
+	addListener(window,'resize',moveSBoxes);
+	
+	if(IE6){
+		obj.attachEvent('onmousedown',A_SBOX[sbid].sbox.mousedown.bindAsEventListener(A_SBOX[sbid].sbox));
+		obj.onmousemove = A_SBOX[sbid].sbox.mousemove.bind(A_SBOX[sbid].sbox);
+	}
+	else{
+		addListener(A_SBOX[sbid].sbox.dom_obj,'mousedown',A_SBOX[sbid].sbox.mousedown.bindAsEventListener(A_SBOX[sbid].sbox),false);
+		addListener(document,'mousemove',A_SBOX[sbid].sbox.mousemove.bindAsEventListener(A_SBOX[sbid].sbox),false);
+	}
+	
+	addListener(document,'mouseup',A_SBOX[sbid].sbox.mouseup.bindAsEventListener(A_SBOX[sbid].sbox),true);
+	
+	if(KQ){
+		setTimeout('A_SBOX['+sbid+'].sbox.moveSBoxByObj('+sbid+');',500);
+	}
+
+return A_SBOX[sbid].sbox;
 }
 
 
@@ -43,15 +65,15 @@ var sbox = Class.create();
 sbox.prototype = {
 sbox_id:			'',				// id to create references in array to self
 
-mouse_event:		null,			// json object wheres defined needed event params
-start_event:		null,			// copy of mouse_event when box created
+mouse_event:		new Object,		// json object wheres defined needed event params
+start_event:		new Object,		// copy of mouse_event when box created
 
 stime:				0,				//	new start time
 period:				0,				//	new period
 
-obj:				null,			// objects params
+obj:				new Object,		// objects params
 dom_obj:			null,			// selection div html obj
-box:				'',				// object params
+box:				new Object,		// object params
 dom_box:			null,			// selection box html obj
 dom_period_span:	null,			// period container html obj
 
@@ -64,33 +86,48 @@ debug_info: 		'',				// debug string
 debug_prev:			'',				// don't log repeated fnc
 
 
-initialize: function(stime, period){
-	
-	this.sbox_id = A_SBOX.length || 0;
-	
-	this.mouse_event = new Object;
-	this.start_event = new Object;
-	this.obj = new Object;
-	this.box = new Object;
-	
-	this.obj.stime = stime;
-	this.obj.period = period;
-	this.box.width = 0;
+initialize: function(sbid, timelineid, obj, width, height){
+	this.sbox_id = sbid;
+	this.debug('initialize');
 
+// Checks
+	if(is_null(obj)) throw('Failed to initialize Selection Box with given Object');
+	if(!isset(timelineid,ZBX_TIMELINES)) throw('Failed to initialize Selection Box with given TimeLine');
+
+	if(empty(this.dom_obj)){
+		this.grphobj = obj;
+		this.dom_obj = create_box_on_obj(obj, width, height);
+		this.moveSBoxByObj();
+	}
+//--
+
+// Variable initialization
+	this.timeline = ZBX_TIMELINES[timelineid];		
+	
+	this.obj.width = width;
+	this.obj.height = height;
+	
+	this.box.width = 0;
+//--	
 	this.mouse_event.mousedown = false;	
 },
 
 onselect: function(){
-	this.px2time = this.obj.period/this.obj.width;
+	this.debug('onselect');
 
-	this.stime = Math.round(this.box.left * this.px2time + this.obj.stime);
-	this.period = this.calcperiod();
+	this.px2time = this.timeline.period() / this.obj.width;
+	var userstarttime = (this.timeline.usertime() - this.timeline.period()) + Math.round(this.box.left * this.px2time);
+//alert(userstarttime+' : '+Math.round(this.box.left * this.px2time)+' - '+this.box.left);
+	var new_period = this.calcperiod();
+	
+	this.timeline.period(new_period);
+	this.timeline.usertime(userstarttime + new_period);
 
 //SDI(this.stime+' : '+this.period);
-	this.sboxload();
+	this.onchange(this.sbox_id, this.timeline.timelineid, true);
 },
 
-sboxload: function(){			// bind any func to this
+onchange: function(){			// bind any func to this
 	
 },
 
@@ -104,7 +141,7 @@ mousedown: function(e){
 		
 		this.optimize_event(e);
 
-		this.deselectall();
+		deselectAll();
 		
 		if(IE){
 			var posxy = getPosition(this.dom_obj);
@@ -117,7 +154,7 @@ mousedown: function(e){
 },
 
 mousemove: function(e){
-	this.debug('mousemove',this.sbox_id);
+//	this.debug('mousemove',this.sbox_id);
 
 	e = e || window.event;
 	cancelEvent(e);
@@ -129,7 +166,7 @@ mousemove: function(e){
 },
 
 mouseup: function(e){
-	this.debug('mouseup',this.sbox_id);
+//	this.debug('mouseup',this.sbox_id);
 	
 	e = e || window.event;
 
@@ -143,6 +180,8 @@ mouseup: function(e){
 },
 
 create_box: function(){
+	this.debug('create_box');
+	
 	if(!$('selection_box')){
 		this.dom_box = document.createElement('div');
 		this.dom_obj.appendChild(this.dom_box);
@@ -155,7 +194,7 @@ create_box: function(){
 		
 		var top = (this.mouse_event.top-this.obj.top);
 		var left = (this.mouse_event.left-this.obj.left);
-		
+
 		top = 0;
 		
 		this.dom_box.setAttribute('id','selection_box');
@@ -170,9 +209,9 @@ create_box: function(){
 		this.box.top = top;
 		this.box.left = left;
 		
-		var height = this.obj.height;
-		this.dom_box.style.height = height+'px';
-		this.box.height = height;
+		var dims = getDimensions(this.dom_obj);
+		this.dom_box.style.height = dims.height+'px';
+		this.box.height = dims.height;
 	
 		if(IE){
 			this.dom_box.onmousemove = this.mousemove.bind(this);
@@ -197,9 +236,10 @@ resizebox: function(){
 //		this.box.height = height;
 
 // 		fix wrong selection box
-		if (this.mouse_event.left > (this.obj.width + this.obj.left)) {
+		if(this.mouse_event.left > (this.obj.width + this.obj.left)) {
 			this.moveright(this.obj.width - (this.start_event.left - this.obj.left));
-		} else if (this.mouse_event.left < this.obj.left) {
+		} 
+		else if(this.mouse_event.left < this.obj.left) {
 			this.moveleft(0, this.start_event.left - this.obj.left);
 		}
 		
@@ -218,6 +258,8 @@ resizebox: function(){
 },
 
 moveleft: function(left, width){
+	this.debug('moveleft');
+	
 	//this.box.left = this.mouse_event.left - this.obj.left;
 	this.box.left = left;
 	this.dom_box.style.left = this.box.left+'px';
@@ -227,6 +269,8 @@ moveleft: function(left, width){
 },
 
 moveright: function(width){
+	this.debug('moveright');
+	
 	this.box.left = (this.start_event.left - this.obj.left);
 	this.dom_box.style.left = this.box.left+'px';
 	
@@ -235,12 +279,23 @@ moveright: function(width){
 },
 
 calcperiod: function(){
-	this.px2time = this.obj.period/this.obj.width;
+	this.debug('clacperiod');
+
+	if(this.box.width >= this.obj.width){
+		var new_period = this.timeline.period();
+	}
+	else{
+		this.px2time = this.timeline.period()/this.obj.width;
+		var new_period = Math.round(this.box.width * this.px2time);
 //SDI('CALCP: '+this.box.width+' * '+this.px2time);
-return	Math.round(this.box.width * this.px2time);
+	}
+
+return	new_period;
 },
 
 FormatStampbyDHM: function(timestamp){
+	this.debug('FormatStampbyDHM');
+	
 	timestamp = timestamp || 0;
 	var days = 	parseInt(timestamp/86400);
 	var hours =  parseInt((timestamp - days*86400)/3600);
@@ -253,6 +308,8 @@ return str;
 },
 
 validateW: function(w){
+	this.debug('validateW');
+//SDI(this.start_event.left+' - '+this.obj.left+' - '+w+' > '+this.obj.width)
 	if(((this.start_event.left-this.obj.left)+w)>this.obj.width) 
 		w = 0;//this.obj.width - (this.start_event.left - this.obj.left) ;
 
@@ -263,6 +320,8 @@ return w;
 },
 
 validateH: function(h){
+	this.debug('validateH');
+	
 	if(h<=0) h=1;
 	if(((this.start_event.top-this.obj.top)+h)>this.obj.height) 
 		h = this.obj.height - this.start_event.top;
@@ -272,18 +331,7 @@ return h;
 moveSBoxByObj: function(){
 	this.debug('moveSBoxByObj',this.sbox_id);
 	
-	if(arguments.length < 1) throw('ERROR: SBOX [moveSBoxByObj]: expecting arguments.');
-
-	var p_obj = arguments[arguments.length-1];
-	p_obj = $(p_obj);
-	
-	if(is_null(p_obj) || ('undefined' == typeof(p_obj.nodeName))){
-//		alert(arguments[arguments.length-1]);
-//		throw('ERROR: SBOX [moveSBoxByObj]: object not found.');
-		return false;
-	}
-
-	var posxy = getPosition(p_obj);
+	var posxy = getPosition(this.grphobj);
 
 	this.dom_obj.style.top = (posxy.top+A_SBOX[this.sbox_id].shiftT)+'px';
 	this.dom_obj.style.left = (posxy.left+A_SBOX[this.sbox_id].shiftL-1)+'px';	
@@ -294,9 +342,9 @@ moveSBoxByObj: function(){
 	this.obj.left = parseInt(posxy.left);
 },
 
-
-
 optimize_event: function(e){
+	this.debug('optimize_event');
+	
 	if (e.pageX || e.pageY) {
 		this.mouse_event.left = e.pageX;
 		this.mouse_event.top = e.pageY;
@@ -308,16 +356,6 @@ optimize_event: function(e){
 	
 	this.mouse_event.left = parseInt(this.mouse_event.left);
 	this.mouse_event.top = parseInt(this.mouse_event.top);
-},
-
-deselectall: function(){
-	if(IE){
-		document.selection.empty();
-	}
-	else if(!KQ){	
-		var sel = window.getSelection();
-		sel.removeAllRanges();
-	}	
 },
 
 clear_params: function(){
@@ -351,21 +389,22 @@ debug: function(fnc_name, id){
 }
 }
 
-function create_box_on_obj(obj_ref){
-	if((typeof(obj_ref) == 'undefined')) throw('Reference Object sent to SBOX is not defined');
-	
+function create_box_on_obj(obj, width, height){
+	var parent = obj.parentNode;
+
 	var div = document.createElement('div');
-	obj_ref.appendChild(div);
-	
-	div = $(div);
+	parent.appendChild(div);
+
 	div.className = 'box_on';
+	div.style.height = (height+1) + 'px';
+	div.style.width = (width+1) + 'px';
 	
 return div;
 }
 
 function moveSBoxes(){
 	for(var key in A_SBOX){
-		if(typeof(A_SBOX[key].sbox) != 'undefined')
-			A_SBOX[key].sbox.moveSBoxByObj(key);
+		if(!empty(A_SBOX[key]) && isset('sbox', A_SBOX[key]))
+			A_SBOX[key].sbox.moveSBoxByObj();
 	}
 }

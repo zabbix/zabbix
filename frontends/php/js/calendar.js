@@ -26,18 +26,20 @@
 
 var CLNDR = new Array();			// calendar obj reference
 
-function create_calendar(time, objects, id, utime_field_id){
-
+function create_calendar(time, timeobjects, id, utime_field_id){
 	id = id || CLNDR.length;
 	if('undefined' == typeof(utime_field_id)) utime_field_id = null;
 	
 	CLNDR[id] = new Object;
-	CLNDR[id].clndr = new calendar(time, objects, utime_field_id);
+	CLNDR[id].clndr = new calendar(id, time, timeobjects, utime_field_id);
+	
+return CLNDR[id];
 }
 
 var calendar = Class.create();
 
 calendar.prototype = {
+id:	null,				//Personal ID
 dt: new Date(),			//Date object on load time
 cdt: new Date(),		//Date object of current(viewed) date
 sdt: new Date(),		//Date object of a selected date
@@ -68,21 +70,24 @@ clndr_yeardown: null,			//html bttn obj
 
 clndr_utime_field: null,		//html obj where unix date representation is saved
 
-objects: new Array(),			// object list where will be saved date
-status: false,					// status of objects
+timeobjects: new Array(),		// object list where will be saved date
+status: false,					// status of timeobjects
 
 visible: 0,				//GMenu style state
 
 monthname: new Array('January','February','March','April','May','June','July','August','September','October','November','December'), // months
 
-initialize: function(stime, objects, utime_field_id){
-	if(!(this.status=this.checkOuterObj(objects))){
+initialize: function(id, stime, timeobjects, utime_field_id){
+	this.id = id;
+	this.timeobjects = new Array();
+
+	if(!(this.status=this.checkOuterObj(timeobjects))){
 		throw 'Calendar: constructor expects second parameter to be list of DOM nodes [d,M,Y,H,i].';
 		return false;
 	}
 	
 	this.calendarcreate();
-	
+
 	addListener(this.clndr_monthdown,'click',this.monthdown.bindAsEventListener(this));
 	addListener(this.clndr_monthup,'click',this.monthup.bindAsEventListener(this));
 	
@@ -92,9 +97,9 @@ initialize: function(stime, objects, utime_field_id){
 	addListener(this.clndr_hour,'blur',this.sethour.bindAsEventListener(this));	
 	addListener(this.clndr_minute,'blur',this.setminute.bindAsEventListener(this));		
 
-	for(var i=0; i < this.objects.length; i++){
-		if((typeof(this.objects[i]) != 'undefined') && !empty(this.objects[i])){
-			addListener(this.objects[i], 'change', this.setSDateFromOuterObj.bindAsEventListener(this));
+	for(var i=0; i < this.timeobjects.length; i++){
+		if((typeof(this.timeobjects[i]) != 'undefined') && !empty(this.timeobjects[i])){
+			addListener(this.timeobjects[i], 'change', this.setSDateFromOuterObj.bindAsEventListener(this));
 		}
 	}
 
@@ -117,9 +122,15 @@ initialize: function(stime, objects, utime_field_id){
 	}
 },
 
-ondateselected: function(){		// place any function;
+ondateselected: function(){
 	this.setDateToOuterObj();
 	this.clndrhide();
+
+	this.onselect(this.sdt.getTime());
+},
+
+onselect: function(time){		// place any function;
+
 },
 
 clndrhide: function(e){
@@ -156,24 +167,20 @@ clndrshow: function(top,left){
 	}
 },
 
-checkOuterObj: function(objects){
-	if(('undefined' != typeof(objects)) && !empty(objects)){
-		if(is_array(objects)){
-			this.objects = objects;			
-		}
-		else{
-			this.objects.push(objects);
-		}
+checkOuterObj: function(timeobjects){
+	if(('undefined' != typeof(timeobjects)) && !empty(timeobjects)){
+		if(is_array(timeobjects)) this.timeobjects = timeobjects;
+		else this.timeobjects.push(timeobjects);
 	}
 	else{
 		return false;
 	}
-	
-	for(var i=0; i < this.objects.length; i++){
-		if(('undefined' != this.objects[i]) && !empty(this.objects[i])){
-			this.objects[i] = $(this.objects[i]);
 
-			if(empty(this.objects[i]))
+	for(var i=0; i < this.timeobjects.length; i++){
+		if(('undefined' != this.timeobjects[i]) && !empty(this.timeobjects[i])){
+			this.timeobjects[i] = $(this.timeobjects[i]);
+
+			if(empty(this.timeobjects[i]))
 				return false;
 		}
 	}
@@ -181,22 +188,37 @@ return true;
 },
 
 setSDateFromOuterObj: function(){
-	switch(this.objects.length){
+	switch(this.timeobjects.length){
 		case 1:
 			var val = null;
 			var result = false;
 			
-			if(this.objects[0].tagName.toLowerCase() == 'input'){
-				val = this.objects[0].value;
+			if(this.timeobjects[0].tagName.toLowerCase() == 'input'){
+				val = this.timeobjects[0].value;
 			}
 			else{
-				val = (IE)?this.objects[0].innerText:this.objects[0].textContent;
+				val = (IE)?this.timeobjects[0].innerText:this.timeobjects[0].textContent;
 			}
 
 			if(is_string(val)){
-				val = val.split('/');
-				if(val.length == 3){
-					result = this.setSDateDMY(val[0],val[1],val[2]);
+				var datetime = val.split(' ');
+				
+				var date = datetime[0].split('.');
+				var time = new Array();
+				if(datetime.length > 1)	var time = datetime[1].split(':');
+				
+				
+				if(date.length == 3){
+					result = this.setSDateDMY(date[0],date[1],date[2]);
+					if(time.length == 2){
+						if((time[0] > -1) && (time[0] < 24)){
+							this.sdt.setHours(time[0]);
+						}
+
+						if((time[1] > -1) && (time[1] < 60)){
+							this.sdt.setMinutes(time[1]);
+						}
+					}
 				}
 			}
 			
@@ -210,13 +232,13 @@ setSDateFromOuterObj: function(){
 			var val = new Array();
 			var result = true;
 			
-			for(var i=0; i < this.objects.length; i++){
-				if(('undefined' != this.objects[i]) && !empty(this.objects[i])){
-					if(this.objects[i].tagName.toLowerCase() == 'input'){
-						val[i] = this.objects[i].value;
+			for(var i=0; i < this.timeobjects.length; i++){
+				if(('undefined' != this.timeobjects[i]) && !empty(this.timeobjects[i])){
+					if(this.timeobjects[i].tagName.toLowerCase() == 'input'){
+						val[i] = this.timeobjects[i].value;
 					}
 					else{
-						val[i] = (IE)?this.objects[i].innerText:this.objects[i].textContent;
+						val[i] = (IE)?this.timeobjects[i].innerText:this.timeobjects[i].textContent;
 					}
 				}
 				else{
@@ -303,72 +325,71 @@ return result;
 },
 
 setDateToOuterObj: function(){
-	switch(this.objects.length){
+	switch(this.timeobjects.length){
 		case 1:
-						
-			if(this.objects[0].tagName.toLowerCase() == 'input'){
-				this.objects[0].value = this.sdt.getDate()+'/'+(this.sdt.getMonth()+1)+'/'+this.sdt.getFullYear();
+			var timestring = this.sdt.getDate()+'.'+(this.sdt.getMonth()+1)+'.'+this.sdt.getFullYear()+' '+this.sdt.getHours()+':'+this.sdt.getMinutes();
+
+			if(this.timeobjects[0].tagName.toLowerCase() == 'input'){
+				this.timeobjects[0].value = timestring;
 			}
 			else{
-				if(IE)
-					this.objects[0].innerText =  this.sdt.getDate()+'/'+(this.sdt.getMonth()+1)+'/'+this.sdt.getFullYear();
-				else
-					this.objects[0].textContent = this.sdt.getDate()+'/'+(this.sdt.getMonth()+1)+'/'+this.sdt.getFullYear();
+				if(IE) this.timeobjects[0].innerText =  timestring;
+				else this.timeobjects[0].textContent = timestring;
 			}
 			break;
 		case 3:
 		case 5:
 // Day		
-			if(this.objects[0].tagName.toLowerCase() == 'input'){
-				this.objects[0].value = this.sdt.getDate();
+			if(this.timeobjects[0].tagName.toLowerCase() == 'input'){
+				this.timeobjects[0].value = this.sdt.getDate();
 			}
 			else{
 				if(IE)
-					this.objects[0].innerText = this.sdt.getDate();
+					this.timeobjects[0].innerText = this.sdt.getDate();
 				else
-					this.objects[0].textContent = this.sdt.getDate();
+					this.timeobjects[0].textContent = this.sdt.getDate();
 			}
 // Month	
-			if(this.objects[1].tagName.toLowerCase() == 'input'){
-				this.objects[1].value = this.sdt.getMonth()+1;
+			if(this.timeobjects[1].tagName.toLowerCase() == 'input'){
+				this.timeobjects[1].value = this.sdt.getMonth()+1;
 			}
 			else{
 				if(IE)
-					this.objects[1].innerText = this.sdt.getMonth()+1;
+					this.timeobjects[1].innerText = this.sdt.getMonth()+1;
 				else
-					this.objects[1].textContent = this.sdt.getMonth()+1;
+					this.timeobjects[1].textContent = this.sdt.getMonth()+1;
 			}
 // Year
-			if(this.objects[2].tagName.toLowerCase() == 'input'){
-				this.objects[2].value = this.sdt.getFullYear();
+			if(this.timeobjects[2].tagName.toLowerCase() == 'input'){
+				this.timeobjects[2].value = this.sdt.getFullYear();
 			}
 			else{
 				if(IE)
-					this.objects[2].innerText = this.sdt.getFullYear();
+					this.timeobjects[2].innerText = this.sdt.getFullYear();
 				else
-					this.objects[2].textContent = this.sdt.getFullYear();
+					this.timeobjects[2].textContent = this.sdt.getFullYear();
 			}
 			
-			if(this.objects.length > 4){
+			if(this.timeobjects.length > 4){
 // Hour
-				if(this.objects[3].tagName.toLowerCase() == 'input'){
-					this.objects[3].value = this.sdt.getHours();
+				if(this.timeobjects[3].tagName.toLowerCase() == 'input'){
+					this.timeobjects[3].value = this.sdt.getHours();
 				}
 				else{
 					if(IE)
-						this.objects[3].innerText = this.sdt.getHours();
+						this.timeobjects[3].innerText = this.sdt.getHours();
 					else
-						this.objects[3].textContent = this.sdt.getHours();
+						this.timeobjects[3].textContent = this.sdt.getHours();
 				}
 // Minute		
-				if(this.objects[4].tagName.toLowerCase() == 'input'){
-					this.objects[4].value = this.sdt.getMinutes();
+				if(this.timeobjects[4].tagName.toLowerCase() == 'input'){
+					this.timeobjects[4].value = this.sdt.getMinutes();
 				}
 				else{
 					if(IE)
-						this.objects[4].innerText = this.sdt.getMinutes();
+						this.timeobjects[4].innerText = this.sdt.getMinutes();
 					else
-						this.objects[4].textContent = this.sdt.getMinutes();
+						this.timeobjects[4].textContent = this.sdt.getMinutes();
 				}
 			}				
 			break;

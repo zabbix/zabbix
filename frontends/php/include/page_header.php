@@ -123,10 +123,10 @@
 				$css = $USER_DETAILS['theme'];
 			}
 		}
-
+		
 		if($css){
 			echo '<link rel="stylesheet" type="text/css" href="styles/'.$css.'" />'."\n";
-			$ico = ereg_replace('.*(\_[a-z]+).*',"\\1",$css);
+			$ico = preg_replace('/^[^_\.a-z]+$/','',$css);
 			if(file_exists('images/general/zabbix'.$ico.'.ico'))
 				echo '<link rel="shortcut icon" href="images/general/zabbix'.$ico.'.ico" />';
 			else

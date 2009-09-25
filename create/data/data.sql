@@ -12282,6 +12282,13 @@ INSERT INTO graphs_items VALUES (795,384,22149,0,0,'FF00FF',1,2,0,5);
 INSERT INTO graphs_items VALUES (796,385,22137,0,0,'009900',1,2,0,5);
 
 --
+-- Dumping data for table graph_theme
+--
+
+INSERT INTO graph_theme VALUES (1,'Original Blue','css_ob.css','F0F0F0','FFFFFF','333333','CCCCCC','AAAAAA','000000','222222','AA4444','11CC11','CC1111','FFFFFF',1,1);
+INSERT INTO graph_theme VALUES (2,'Black & Blue','css_bb.css','333333','0A0A0A','888888','222222','4F4F4F','EFEFEF','0088FF','CC4444','1111FF','FF1111','1F1F1F',1,1);
+
+--
 -- Dumping data for table `screens`
 --
 

@@ -25,8 +25,8 @@
 
 	$page['title'] = 'S_CUSTOM_GRAPHS';
 	$page['file'] = 'charts.php';
-	$page['hist_arg'] = array('hostid','grouid','graphid','period','dec','inc','left','right','stime');
-	$page['scripts'] = array('gmenu.js','scrollbar.js','sbox.js','sbinit.js');
+	$page['hist_arg'] = array('hostid','grouid','graphid','period','stime');
+	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','timeline.js','calendar.js','scrollbar.js','sbox.js','sbinit.js');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -254,16 +254,16 @@ include_once('include/page_header.php');
 			$yaxis = ($graph['yaxissidel'] == $yaxis)?($yaxis):(2);
 		}
 		if($yaxis == 2){
-			$shiftXleft = 60;
-			$shiftXright = 60;
+			$shiftXleft = 90;
+			$shiftXright = 100;
 		}
 		else if($yaxis == 0){
-			$shiftXleft = 60;
+			$shiftXleft = 90;
 			$shiftXright = 20;
 		}
 		else{
-			$shiftXleft = 10;
-			$shiftXright = 60;
+			$shiftXleft = 20;
+			$shiftXright = 100;
 		}
 //-------------
 
@@ -281,7 +281,7 @@ include_once('include/page_header.php');
 			$row = 	"\n".'<script language="javascript" type="text/javascript">
 				<!--
 				A_SBOX["'.$dom_graph_id.'"] = new Object;
-				A_SBOX["'.$dom_graph_id.'"].shiftT = 17;
+				A_SBOX["'.$dom_graph_id.'"].shiftT = 35;
 				A_SBOX["'.$dom_graph_id.'"].shiftL = '.$shiftXleft.';
 
 				var ZBX_G_WIDTH = get_bodywidth();
@@ -344,22 +344,28 @@ include_once('include/page_header.php');
 			$bstime = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
 		}
 
-		$script = 'scrollinit(0,'.$effectiveperiod.','.$stime.',0,'.$bstime.'); showgraphmenu("graph");';
+		$script = 'var tline = create_timeline("'.$dom_graph_id.'",'.$effectiveperiod.', '.$stime.', '.($bstime + $effectiveperiod).');'."\n".
+					'var scrl = scrollCreate("'.$dom_graph_id.'", null, tline.timelineid);'."\n";
+
+//		$script = 'scrollinit(0,'.$effectiveperiod.','.$stime.',0,'.$bstime.'); showgraphmenu("graph");';
 
 		if(($graphtype == GRAPH_TYPE_NORMAL) || ($graphtype == GRAPH_TYPE_STACKED)){
-			$script.= 'graph_zoom_init("'.$dom_graph_id.'",'.$bstime.','.$effectiveperiod.',ZBX_G_WIDTH,'.$graph_height.',true);';
+//			$script.= 'graph_zoom_init("'.$dom_graph_id.'",'.$bstime.','.$effectiveperiod.',ZBX_G_WIDTH,'.$graph_height.',true);';
+			$script.= 'var sbox = sbox_init("'.$dom_graph_id.'", tline.timelineid, "'.$dom_graph_id.'", ZBX_G_WIDTH, '.$graph_height.');'."\n";
 		}
+		$script.= '	addListener("'.$dom_graph_id.'","load",function(){ZBX_SCROLLBARS[scrl.scrollbarid].disabled=0;});'."\n".
+					'scrl.onchange = graphload; '."\n".
+					'sbox.onchange = graphload; ';
 
 		zbx_add_post_js($script);
 
-		$scroll_div = new CDiv();
-		$scroll_div->setAttribute('id','scroll_cntnr');
-		$scroll_div->setAttribute('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
-		$scroll_div->show();
 //		navigation_bar('charts.php',array('groupid','hostid','graphid'));
 //-------------
 	}
 
+	$scroll_div = new CDiv();
+	$scroll_div->setAttribute('id','scrollbar_cntr');
+	$scroll_div->show();
 ?>
 <?php
 
