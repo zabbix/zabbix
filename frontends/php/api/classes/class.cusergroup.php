@@ -251,22 +251,18 @@ class CUserGroup {
 	 * @since 1.8
 	 * @version 1
 	 *
-	 * <code>
-	 * $user_data = array(
-	 * 	*string 'usrgrpid' => 'UserGroup ID'
-	 * )
-	 * </code>
-	 *
-	 * @param array $user_data
+	 * @param _array $group_data
+	 * @param array $group_data['usrgrpid'] UserGroup ID
 	 * @return array|boolean user data as array or false if error
 	 */
 	public static function getById($group_data){
-		$group = get_group_by_usrgrpid($group_data['usrgrpid']);
+	
+		$group = DBfetch(DBselect('SELECT * FROM usrgrp WHERE usrgrpid='.$group_data['usrgrpid']));
 
 		if($group)
 			return $group;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'User with id: '.$group_data['usrgrpid'].' doesn\'t exists.');
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'UserGroup with id: '.$group_data['usrgrpid'].' doesn\'t exists.');
 			return false;
 		}
 	}

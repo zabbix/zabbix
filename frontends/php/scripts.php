@@ -264,7 +264,7 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 			$user_group_name = S_ALL_S;
 
 			if($script['usrgrpid'] > 0){
-				$user_group = get_group_by_usrgrpid($script['usrgrpid']);
+				$user_group = CUserGroup::getById(array('usrgrpid' => $script['usrgrpid']));
 				$user_group_name = $user_group['name'];
 			}
 

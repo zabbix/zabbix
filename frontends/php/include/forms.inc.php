@@ -984,7 +984,7 @@
 
 		$frm_title = S_USER_GROUP;
 		if(isset($_REQUEST['usrgrpid'])){
-			$usrgrp		= get_group_by_usrgrpid($_REQUEST['usrgrpid']);
+			$usrgrp		= CUserGroup::getById(array('usrgrpid' => $_REQUEST['usrgrpid']));
 			$frm_title	= S_USER_GROUP.' "'.$usrgrp['name'].'"';
 		}
 
@@ -1288,7 +1288,7 @@
 
 // subfilter is activated
 			if(str_in_array($id, $subfilter)){
-				$span = new CSpan($elem['name'].' ('.$elem['count'].')', 'enabled');
+				$span = new CSpan($elem['name'].' ('.$elem['count'].')', 'subfilter_enabled');
 				$script = "javascript: create_var('zbx_filter', '".$subfilter_name.'['.$id."]', null, true);";
 				$span->onClick($script);
 				$output[] = $span;
@@ -1299,19 +1299,19 @@
 
 // subfilter has 0 items
 				if($elem['count'] == 0){
-					$span = new CSpan($elem['name'].' ('.$elem['count'].')', 'inactive');
+					$span = new CSpan($elem['name'].' ('.$elem['count'].')', 'subfilter_inactive');
 					$span->onClick($script);
 					$output[] = $span;
 				}
 				else{
 					// this level has no active subfilters
 					if(empty($subfilter)){
-						$nspan = new CSpan(' ('.$elem['count'].')', 'active');
+						$nspan = new CSpan(' ('.$elem['count'].')', 'subfilter_active');
 					}
 					else{
-						$nspan = new CSpan(' (+'.$elem['count'].')', 'active');
+						$nspan = new CSpan(' (+'.$elem['count'].')', 'subfilter_active');
 					}
-					$span = new CSpan($elem['name'], 'disabled');
+					$span = new CSpan($elem['name'], 'subfilter_disabled');
 					$span->onClick($script);
 
 					$output[] = $span;
@@ -4539,7 +4539,7 @@
 				if( $new_operation['object'] == OPERATION_OBJECT_GROUP){
 					$object_srctbl = 'usrgrp';
 					$object_srcfld1 = 'usrgrpid';
-					$object_name = get_group_by_usrgrpid($new_operation['objectid']);
+					$object_name = CUserGroup::getById(array('usrgrpid' => $new_operation['objectid']));
 					$display_name = 'name';
 				}
 				else{

@@ -515,7 +515,7 @@ function get_operation_desc($type=SHORT_DESCRITION, $data){
 							$obj_data = S_USER.' "'.$obj_data['alias'].'"';
 							break;
 						case OPERATION_OBJECT_GROUP:
-							$obj_data = get_group_by_usrgrpid($data['objectid']);
+							$obj_data = CUserGroup::getById(array('usrgrpid' => $data['objectid']));
 							$obj_data = S_GROUP.' "'.$obj_data['name'].'"';
 							break;
 					}
@@ -920,7 +920,7 @@ function validate_operation($operation){
 					}
 					break;
 				case OPERATION_OBJECT_GROUP:
-					if( !get_group_by_usrgrpid($operation['objectid']) ){
+					if( !CUserGroup::getById(array('usrgrpid' => $operation['objectid']))){
 						error(S_INCORRECT_GROUP);
 						return false;
 					}

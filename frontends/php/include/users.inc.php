@@ -47,166 +47,6 @@
 	}
 
 
-// MOVED TO API {
-/*
-	function add_user($user){
-		global $USER_DETAILS;
-
-		if($USER_DETAILS['type'] != USER_TYPE_SUPER_ADMIN){
-			error("Insufficient permissions");
-			return false;
-		}
-
-		$sql = 'SELECT * '.
-				' FROM users '.
-				' WHERE alias='.zbx_dbstr($user['alias']).
-					' AND '.DBin_node('userid', get_current_nodeid(false));
-		if(DBfetch(DBselect($sql))){
-			error('User "'.$user['alias'].'" already exists');
-			return false;
-		}
-
-		$user_db_fields = array(
-			'name' => 'ZABBIX',
-			'surname' => 'USER',
-			'alias' => null,
-			'passwd' => 'zabbix',
-			'url' => '',
-			'autologin' => 0,
-			'autologout' => 900,
-			'lang' => 'en_gb',
-			'theme' => 'default.css',
-			'refresh' => 30,
-			'rows_per_page' => 50,
-			'type' => USER_TYPE_ZABBIX_USER,
-			'user_groups' => array(),
-			'user_medias' => array(),
-		);
-
-		if(!check_db_fields($user_db_fields, $user)){
-			error('Incorrect arguments pasted to function [add_user]');
-			return false;
-		}
-
-		$userid = get_dbid('users', 'userid');
-
-		$result = DBexecute('INSERT INTO users (userid,name,surname,alias,passwd,url,autologin,autologout,lang,theme,refresh,rows_per_page,type) VALUES ('.
-			$userid.','.
-			zbx_dbstr($user['name']).','.
-			zbx_dbstr($user['surname']).','.
-			zbx_dbstr($user['alias']).','.
-			zbx_dbstr(md5($user['passwd'])).','.
-			zbx_dbstr($user['url']).','.
-			$user['autologin'].','.
-			$user['autologout'].','.
-			zbx_dbstr($user['lang']).','.
-			zbx_dbstr($user['theme']).','.
-			$user['refresh'].','.
-			$user['rows_per_page'].','.
-			$user['type'].
-			')');
-
-		if($result){
-//			$result = DBexecute('DELETE FROM users_groups WHERE userid='.$userid);
-			foreach($user['user_groups'] as $groupid){
-				if(!$result) break;
-				$users_groups_id = get_dbid("users_groups","id");
-				$result = DBexecute('INSERT INTO users_groups (id,usrgrpid,userid)'.
-					'values('.$users_groups_id.','.$groupid.','.$userid.')');
-			}
-		}
-
-		if($result) {
-//			$result = DBexecute('DELETE FROM media WHERE userid='.$userid);
-			foreach($user['user_medias'] as $mediaid => $media_data){
-				if(!$result) break;
-				$mediaid = get_dbid("media","mediaid");
-				$result = DBexecute('INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period)'.
-					' VALUES ('.$mediaid.','.$userid.','.$media_data['mediatypeid'].','.
-					zbx_dbstr($media_data['sendto']).','.$media_data['active'].','.$media_data['severity'].','.
-					zbx_dbstr($media_data['period']).')');
-			}
-		}
-
-		return $result;
-	}
-*/
-// } MOVED TO API
- 
-
-// Update User definition
-	function update_user($userid, $user) {
-
-		$result = true;
-
-		$sql = 'SELECT DISTINCT * '.
-			' FROM users '.
-			' WHERE ( alias='.zbx_dbstr($user['alias']).' OR userid='.$userid.' ) '.
-				' AND '.DBin_node('userid', id2nodeid($userid));
-
-		$db_users = DBselect($sql);
-		while($db_user = DBfetch($db_users)){
-			if($db_user['userid'] != $userid){
-				error('User '.$user['alias'].' already exists');
-				return false;
-			}
-			$user_db_fields = $db_user;
-		}
-
-		if(!isset($user_db_fields)) {
-			return false;
-		}
-
-		if(isset($user['passwd'])) {
-			$user['passwd'] = md5($user['passwd']);
-		}
-
-		if(!check_db_fields($user_db_fields, $user)){
-			error('Incorrect arguments pasted to function [update_user]');
-			return false;
-		}
-
-		$sql = 'UPDATE users SET '.
-				' name='.zbx_dbstr($user['name']).
-				' ,surname='.zbx_dbstr($user['surname']).
-				' ,alias='.zbx_dbstr($user['alias']).
-				' ,passwd='.zbx_dbstr($user['passwd']).
-				' ,url='.zbx_dbstr($user['url']).
-				' ,autologin='.$user['autologin'].
-				' ,autologout='.$user['autologout'].
-				' ,lang='.zbx_dbstr($user['lang']).
-				' ,theme='.zbx_dbstr($user['theme']).
-				' ,refresh='.$user['refresh'].
-				' ,rows_per_page='.$user['rows_per_page'].
-				' ,type='.$user['type'].
-				' WHERE userid='.$userid;
-		$result = DBexecute($sql);
-
-		if($result && !is_null($user['user_groups'])){
-			$result = DBexecute('DELETE FROM users_groups WHERE userid='.$userid);
-			foreach($user['user_groups'] as $groupid){
-				if(!$result) break;
-				$users_groups_id = get_dbid('users_groups', 'id');
-				$result = DBexecute('INSERT INTO users_groups (id, usrgrpid, userid)'.
-					'values('.$users_groups_id.','.$groupid.','.$userid.')');
-			}
-		}
-
-		if($result && !is_null($user['user_medias'])){
-			$result = DBexecute('DELETE FROM media WHERE userid='.$userid);
-			foreach($user['user_medias'] as $mediaid => $media_data) {
-				if(!$result) break;
-				$mediaid = get_dbid('media', 'mediaid');
-				$result = DBexecute('INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period)'.
-					' values ('.$mediaid.','.$userid.','.$media_data['mediatypeid'].','.
-					zbx_dbstr($media_data['sendto']).','.$media_data['active'].','.$media_data['severity'].','.
-					zbx_dbstr($media_data['period']).')');
-			}
-		}
-
-		return $result;
-	}
-
 	function unblock_user_login($userids){
 		zbx_value2array($userids);
 
@@ -250,46 +90,6 @@
 			}
 	}
 
-// Delete User definition
-	function delete_user($userid){
-		global $USER_DETAILS;
-
-		if(DBfetch(DBselect('SELECT * FROM users WHERE userid='.$userid.' AND alias='.zbx_dbstr(ZBX_GUEST_USER)))){
-			error(S_CANNOT_DELETE_USER.SPACE."'".ZBX_GUEST_USER."'");
-			return	false;
-		}
-
-		if(bccomp($USER_DETAILS['userid'],$userid) == 0){
-			error(S_USER_CANNOT_DELETE_ITSELF);
-			return false;
-		}
-
-		DBexecute('delete from operations where object='.OPERATION_OBJECT_USER.' and objectid='.$userid);
-
-		$result = DBexecute('delete from media where userid='.$userid);
-		if(!$result) return $result;
-
-		$result = DBexecute('delete from profiles where userid='.$userid);
-		if(!$result) return $result;
-
-		$result = DBexecute('delete from users_groups where userid='.$userid);
-		if(!$result) return $result;
-
-		$result = DBexecute('delete from users where userid='.$userid);
-
-		return $result;
-	}
-
-// MOVED TO API {
-/*
-	function get_user_by_userid($userid){
-		if($row = DBfetch(DBselect('SELECT * FROM users WHERE userid='.$userid))){
-			return	$row;
-		}
-	return	false;
-	}
-*/ 
-// } MOVED TO API
 
 	function get_userid_by_usrgrpid($usrgrpids){
 		zbx_value2array($usrgrpids);
@@ -356,7 +156,7 @@
 		global $USER_DETAILS;
 
 		$result = true;
-		$group = get_group_by_usrgrpid($usrgrpid);
+		$group = CUserGroup::getById(array('usrgrpid' => $usrgrpid));
 
 		if(($group['gui_access'] == GROUP_GUI_ACCESS_DISABLED) || ($group['users_status'] == GROUP_STATUS_DISABLED)){
 			$result=(bccomp($USER_DETAILS['userid'],$userid)!=0);
@@ -472,15 +272,6 @@
 
 	return $result;
 	}
-
-	function get_group_by_usrgrpid($usrgrpid){
-		if($row = DBfetch(DBselect("select * from usrgrp where usrgrpid=".$usrgrpid))){
-			return $row;
-		}
-		/* error("No user groups with id [$usrgrpid]"); */
-	return  FALSE;
-	}
-
 
 	function change_group_status($usrgrpids,$users_status){
 		zbx_value2array($usrgrpids);
