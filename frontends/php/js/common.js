@@ -99,6 +99,8 @@ function SDI(msg){
 	div_help.appendChild(pre);
 	div_help.appendChild(document.createElement("br"));
 	div_help.appendChild(document.createElement("br"));
+	
+	div_help.scrollTop = div_help.scrollHeight;
 }
 
 function SDJ(obj){
@@ -621,7 +623,9 @@ function insert_sizeable_graph(graph_id,url){
 
 function hidePopupDiv(iFrameID){
 	if(!IE6) return;
+
 	$(iFrameID).hide();
+	$(iFrameID).remove();
 }
 
 function showPopupDiv(divID,iFrameID){
@@ -644,14 +648,15 @@ function showPopupDiv(divID,iFrameID){
 		return;
 	}
 
-	//Increase default zIndex of div by 1, so that DIV appears before IFrame
-	divPopup.style.zIndex=divPopup.style.zIndex+1;
+//Increase default zIndex of div by 1, so that DIV appears before IFrame
+	divPopup.style.zIndex = divPopup.style.zIndex+1;
 //	iFrame.style.zIndex = 1;
 
 
+	var divCumOff = $(divID).cumulativeOffset();
 	iFrame.style.display = 'block';
-	iFrame.style.left = divPopup.offsetLeft + 'px';
-	iFrame.style.top = divPopup.offsetTop + 'px';
+	iFrame.style.left = divCumOff.left + 'px';
+	iFrame.style.top = divCumOff.top + 'px';
 	iFrame.style.width = divPopup.offsetWidth + 'px';
 	iFrame.style.height = divPopup.offsetHeight + 'px';
 }

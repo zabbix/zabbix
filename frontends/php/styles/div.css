@@ -53,7 +53,7 @@ div.zbx_search{
 
 div.hintbox {
 	top: 0;
-	z-index: 100;
+	z-index: 1000;
 	position: absolute;
 	background-color: #FFFFE0;
 	padding: 2px;
