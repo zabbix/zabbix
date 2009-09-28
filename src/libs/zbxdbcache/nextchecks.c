@@ -52,6 +52,34 @@ void	DCinit_nextchecks()
 	nextcheck_num = 0;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DCrelease_nextchecks                                             *
+ *                                                                            *
+ * Purpose: free memory allocated for `error_msg'es                           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Dmitry Borovikov                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCrelease_nextchecks()
+{
+	int	i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In DCrelease_nextchecks()");
+
+	for (i = 0; i < nextcheck_num; i++)
+	{
+		if (nextchecks[i].error_msg != NULL)
+			zbx_free(nextchecks[i].error_msg);
+	}
+}
+
 static int	DCget_nextcheck_nearestindex(zbx_uint64_t itemid)
 {
 	int			first_index, last_index, index;
@@ -179,37 +207,30 @@ void	DCflush_nextchecks()
 	char		*error_msg_esc = NULL;
 	
 	char		*sql_select = NULL;
-	int		sql_select_offset = 0;
-	int		sql_select_allocated = 4096;
+	int		sql_select_offset = 0, sql_select_allocated = 512;
 	
-	/*a crutch for the function `DBadd_condition_alloc'*/
-	zbx_uint64_t	*items_notsupported_ids = NULL;
-	int		items_notsupported_ids_allocated = 32;
-	int		items_notsupported_ids_num = 0;
+	/* a crutch for the function `DBadd_condition_alloc' */
+	zbx_uint64_t	*ids = NULL;
+	int		ids_allocated = 32, ids_num = 0;
 	
 	struct event_objectid_clock 	*events = NULL;
-	int		events_num = 0;
-	int		events_allocated = 32;
+	int		events_num = 0, events_allocated = 32;
 		
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCflush_nextchecks()");
+
 	if (nextcheck_num == 0)
 		return;
 
-	sql = 
-		zbx_malloc(sql, sql_allocated);
-	sql_select = 
-		zbx_malloc(sql_select, sql_select_allocated);
-	events =
-		zbx_malloc(events, events_allocated * sizeof(struct event_objectid_clock));
-	items_notsupported_ids = 
-		zbx_malloc(items_notsupported_ids, items_notsupported_ids_allocated * sizeof(zbx_uint64_t));
+	sql = zbx_malloc(sql, sql_allocated);
+	ids = zbx_malloc(ids, ids_allocated * sizeof(zbx_uint64_t));
 	
 	DBbegin();
 	
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
 #endif
-	/*dealing with items*/
+
+	/* dealing with items */
 	for (i = 0; i < nextcheck_num; i++)
 	{
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 64,
@@ -217,9 +238,10 @@ void	DCflush_nextchecks()
 				(int)nextchecks[i].nextcheck);
 
 		if (NULL != nextchecks[i].error_msg)
-		{			
-			uint64_array_add(&items_notsupported_ids, &items_notsupported_ids_allocated,
-					&items_notsupported_ids_num, nextchecks[i].itemid, 64);
+		{
+			/* array of not supported items */
+			uint64_array_add(&ids, &ids_allocated, &ids_num, nextchecks[i].itemid, 64);
+
 			error_msg_esc = DBdyn_escape_string_len(nextchecks[i].error_msg, ITEM_ERROR_LEN);
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 
 					64 + strlen(error_msg_esc),
@@ -233,123 +255,108 @@ void	DCflush_nextchecks()
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 64,
 				" where itemid=" ZBX_FS_UI64 ";\n",
 				nextchecks[i].itemid);
-		
+
 		DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
 	}
 				
-	/*dealing with notsupported items*/
-	if (items_notsupported_ids_num > 0) 
+	/* dealing with notsupported items */
+	if (ids_num > 0)
 	{
-		/*preparing triggers*/
+		sql_select = zbx_malloc(sql_select, sql_select_allocated);
+		events = zbx_malloc(events, events_allocated * sizeof(struct event_objectid_clock));
+
+		/* preparing triggers */
 		zbx_snprintf_alloc(&sql_select, &sql_select_allocated, &sql_select_offset, 256,
-				"select t.triggerid, i.itemid "
-				"from triggers t, functions f, items i "
-				"where t.triggerid=f.triggerid "
-					"and f.itemid=i.itemid "
-					"and t.status in (%d) "
-					"and t.value not in (%d) "
-					"and",
+				"select t.triggerid,i.itemid"
+				" from triggers t,functions f,items i"
+				" where t.triggerid=f.triggerid"
+					" and f.itemid=i.itemid"
+					" and t.status in (%d)"
+					" and t.value not in (%d)"
+					" and",
 				TRIGGER_STATUS_ENABLED,
 				TRIGGER_VALUE_UNKNOWN);
 		DBadd_condition_alloc(&sql_select, &sql_select_allocated, &sql_select_offset,
-				"i.itemid", items_notsupported_ids, items_notsupported_ids_num);
+				"i.itemid", ids, ids_num);
 		result = DBselect("%s", sql_select);
-		
-		/*proccessing triggers*/
+
+		zbx_free(sql_select);
+
+		/* proccessing triggers */
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(triggerid, row[0]);
 			ZBX_STR2UINT64(itemid, row[1]);
-					
+
 			for (i = 0; i < nextcheck_num; i++)
 				if (nextchecks[i].itemid == itemid)
-					break;/*index `i' will surely contain neccessary itemid*/
+					break;	/* index `i' will surely contain neccessary itemid */
+
 			if (i >= nextcheck_num)
 			{
-				/*this branch can never be reached*/
+				/* this branch can never be reached */
 				zabbix_log(LOG_LEVEL_ERR, "Item [" ZBX_FS_UI64 "] was not found in `nextchecks' items list.", itemid);
 				continue;
 			}
-			error_msg_esc = DBdyn_escape_string_len(nextchecks[i].error_msg, ITEM_ERROR_LEN);		
+
+			error_msg_esc = DBdyn_escape_string_len(nextchecks[i].error_msg, ITEM_ERROR_LEN);
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128 + strlen(error_msg_esc),
-					"update triggers set value=%d, lastchange=%d, error='%s' where triggerid=" ZBX_FS_UI64";\n",
+					"update triggers set value=%d,lastchange=%d,error='%s' where triggerid=" ZBX_FS_UI64";\n",
 							TRIGGER_VALUE_UNKNOWN,
 							nextchecks[i].now,
 							error_msg_esc,
 							triggerid);
 			zbx_free(error_msg_esc);
-			
+
 			if (events_num == events_allocated)
 			{
-				events_allocated = events_allocated * 2;
+				events_allocated += 32;
 				events = zbx_realloc(events, events_allocated * sizeof(struct event_objectid_clock));
 			}
 			events[events_num].objectid = triggerid;
 			events[events_num].clock = nextchecks[i].now;
 			events_num = events_num + 1;
-			
+
 			DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
-		}/*while (NULL != (row = DBfetch(result))) dealing with triggers*/
-		
-		/*dealing with events*/
+		}	/* while (NULL != (row = DBfetch(result))) dealing with triggers */
+		DBfree_result(result);
+
+		/* dealing with events */
 		if (events_num > 0)
-			events_maxid = DBget_maxid_num("events", "eventid", events_num);			
+			events_maxid = DBget_maxid_num("events", "eventid", events_num);
+
 		for (i = 0; i < events_num; i++)
 		{
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 256,
-					"insert into events (eventid, source, object, objectid, clock, value) "
-					"values (" ZBX_FS_UI64 ", %d, %d, " ZBX_FS_UI64 ", %d, %d);\n",
+					"insert into events (eventid,source,object,objectid,clock,value) "
+					"values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d);\n",
 					events_maxid,
 					EVENT_SOURCE_TRIGGERS,
 					EVENT_OBJECT_TRIGGER,
 					events[i].objectid,
 					events[i].clock,
 					TRIGGER_VALUE_UNKNOWN);
-			events_maxid = events_maxid + 1;
+			events_maxid++;
+
 			DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
 		}
-		
-#ifdef HAVE_ORACLE
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
-#endif
-		zbx_free(sql_select);
-		DBfree_result(result);
-		
-	}/*if (items_not_supported_ids_num > 0)*/
-	
-	if (sql_offset > 16)/* In ORACLE always present begin..end; */
-		DBexecute("%s", sql);	
-	zbx_free(sql);
-	zbx_free(sql_select);
-	zbx_free(events);
-	zbx_free(items_notsupported_ids);
-	DCrelease_nextchecks();
-	DBcommit();
-	zabbix_log(LOG_LEVEL_DEBUG, "End of DCflush_nextchecks()");
-}
 
-/******************************************************************************
- *                                                                            *
- * Function: DCrelease_nextchecks                                             *
- *                                                                            *
- * Purpose: free memory allocated for `error_msg'es                           *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Dmitry Borovikov                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
- void DCrelease_nextchecks()
-{
-	int i;
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCrelease_nextchecks()");
-	for (i = 0; i < nextcheck_num; i++)
-	{
-		if (nextchecks[i].error_msg != NULL)
-			zbx_free(nextchecks[i].error_msg);
+		zbx_free(events);
 	}
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
+#endif
+
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+		DBexecute("%s", sql);
+
+	zbx_free(sql);
+	zbx_free(ids);
+
+	DCrelease_nextchecks();
+
+	DBcommit();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of DCflush_nextchecks()");
 }
