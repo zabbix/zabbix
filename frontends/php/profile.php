@@ -118,7 +118,7 @@ $fields=array(
 		}
 		else {
 
-			
+
 			$user = array();
 			$user['userid'] = $USER_DETAILS['userid'];
 //			$user['name'] = $USER_DETAILS['name'];
@@ -139,7 +139,7 @@ $fields=array(
 			DBstart();
 			$result = CUser::update(array($user));
 			$result = DBend($result);
-			
+
 			if(!$result) error(CUser::$error['data']);
 			show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 

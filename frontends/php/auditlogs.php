@@ -128,7 +128,7 @@ include_once('include/page_header.php');
 							"$('nav_time').value = parseInt(CLNDR['audit_since'].clndr.sdt.getTime()/1000);}");
 	$filterForm->addAction('onsubmit', $script);
 	$filterForm->addVar('nav_time', ($_REQUEST['nav_time']>0)?$_REQUEST['nav_time']:'');
-	
+
 	$row = new CRow(array(
 		new CCol(S_USER,'form_row_l'),
 		new CCol(array(

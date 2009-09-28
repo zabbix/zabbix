@@ -264,13 +264,13 @@
 		if(isset($_REQUEST['type_changed'])){
 			$new_check_ports = svc_default_port($new_check_type);
 		}
-		
-		
+
+
 		$external_param = new CTable();
-		
+
 		if($new_check_type != SVC_ICMPPING){
 			$external_param->addRow(array(S_PORTS_SMALL, new CTextBox('new_check_ports', $new_check_ports, 20)));
-		}	
+		}
 		switch($new_check_type){
 			case SVC_SNMPv1:
 			case SVC_SNMPv2:
@@ -316,13 +316,13 @@
 				$form->addVar('new_check_snmpv3_privpassphrase', '');
 		}
 
-		
-				
+
+
 		if($external_param->getNumRows() == 0) $external_param = null;
 		$form->addRow(S_NEW_CHECK, array(
 			$cmbChkType, SPACE,
 			new CButton('add_check', S_ADD),
-			$external_param	
+			$external_param
 		),'new');
 
 		$form->addRow(S_DEVICE_UNIQUENESS_CRITERIA, $cmbUniquenessCriteria);
@@ -5639,7 +5639,7 @@
 		$host_tbl->addRow(array(S_NAME, new CTextBox('host',$host,54)));
 
 		$grp_tb = new CTweenBox($frmHost, 'groups', $host_groups, 10);
-		
+
 		$all_groups = CHostGroup::get(array('editable' => 1, 'extendoutput' => 1));
 		foreach($all_groups as $group){
 			$grp_tb->addItem($group['groupid'], $group['name']);

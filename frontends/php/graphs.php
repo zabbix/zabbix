@@ -483,7 +483,7 @@ include_once('include/page_header.php');
 			}
 			$graphs[$graphid]['graphtype'] = $graphtype;
 		}
-		
+
 // sorting
 		order_page_result($graphs, getPageSortField('description'), getPageSortOrder());
 		$paging = getPagingLine($graphs);

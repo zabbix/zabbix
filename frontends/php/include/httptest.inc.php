@@ -203,7 +203,7 @@
 					' authentication='.$authentication.','.' http_user='.zbx_dbstr($http_user).','.' http_password='.zbx_dbstr($http_password).','.
 					' delay='.$delay.','.' status='.$status.', agent='.zbx_dbstr($agent).', macros='.zbx_dbstr($macros).','.
 					' error='.zbx_dbstr('').', curstate='.HTTPTEST_STATE_UNKNOWN.
-				' where httptestid='.$httptestid);				
+				' where httptestid='.$httptestid);
 		}
 		else{
 			$httptestid = get_dbid("httptest","httptestid");
