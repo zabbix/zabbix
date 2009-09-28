@@ -334,7 +334,7 @@ class CUser{
 	 * @return array|boolean User data as array or false if error
 	 */
 	public static function getById($user_data){
-	
+
 		$user = DBfetch(DBselect('SELECT * FROM users WHERE userid='.$user_data['userid']));
 
 		if($user)
@@ -410,12 +410,12 @@ class CUser{
 		$error = 'Unknown ZABBIX internal error';
 		$result = false;
 		$resultids = array();
-		
+
 		DBstart(false);
 
-		foreach($users as $user){		
-		
-// copy from frontend {	
+		foreach($users as $user){
+
+// copy from frontend {
 			if($USER_DETAILS['type'] != USER_TYPE_SUPER_ADMIN){
 				$error = 'Insufficient permissions';
 				$result = false;
@@ -545,12 +545,12 @@ class CUser{
 	public static function update($users){
 		$result = false;
 		$error = 'Unknown ZABBIX internal error';
-		
+
 		DBstart(false);
 		foreach($users as $user){
 			$userid = $user['userid'];
-			
-// copy from frontend {		
+
+// copy from frontend {
 			$result = true;
 
 			$sql = 'SELECT DISTINCT * '.
@@ -620,7 +620,7 @@ class CUser{
 				}
 			}
 
-// } copy from frontend		
+// } copy from frontend
 			if(!$result) break;
 		}
 		$result = DBend($result);
@@ -749,7 +749,7 @@ class CUser{
 	 */
 	public static function delete($userids){
 		global $USER_DETAILS;
-		
+
 		$result = true;
 		$error = 'Unknown ZABBIX internal error';
 
@@ -758,21 +758,21 @@ class CUser{
 			$result = false;
 		}
 
-		
+
 		if(uint_in_array($USER_DETAILS['userid'], $userids)){
 			$error = S_USER_CANNOT_DELETE_ITSELF;
 			$result = false;
 		}
-		
+
 		if($result){
 			DBstart(false);
-			
+
 			$result &= DBexecute('DELETE FROM operations WHERE '.OPERATION_OBJECT_USER.' AND '.DBcondition('objectid', $userids));
 			$result &= DBexecute('DELETE FROM media WHERE '.DBcondition('userid', $userids));
 			$result &= DBexecute('DELETE FROM profiles WHERE '.DBcondition('userid', $userids));
 			$result &= DBexecute('DELETE FROM users_groups WHERE '.DBcondition('userid', $userids));
 			$result &= DBexecute('DELETE FROM users WHERE '.DBcondition('userid', $userids));
-			
+
 			$result = DBend($result);
 		}
 

@@ -445,7 +445,7 @@ class CHostGroup {
 	}
 
 	/**
-	 * Update HostGruop
+	 * Update HostGroup
 	 *
 	 * Updates existing HostGroups, changing names. Input parameter is array with following structure :
 	 *
