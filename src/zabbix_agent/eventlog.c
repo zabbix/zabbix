@@ -283,13 +283,13 @@ int process_eventlog(
 
 	if (source && source[0] && SUCCEED == zbx_open_eventlog(source,&eventlog_handle,&LastID /* number */, &FirstID /* oldest */))
 	{
-		LastID += FirstID; 
+		LastID += FirstID;
 
 		if(*lastlogsize > LastID)
 			*lastlogsize = FirstID;
 		else if((*lastlogsize) >= FirstID)
 			FirstID = (*lastlogsize)+1;
-		
+			
 		for (i = FirstID; i < LastID; i++)
 		{
 			if( 0 == zbx_get_eventlog_message(

@@ -670,7 +670,11 @@ static void	process_active_checks(char *server, unsigned short port)
 				lastlogsize = active_metrics[i].lastlogsize;
 				while (SUCCEED == (ret = process_log(filename, &lastlogsize, &value))) {
 					if (!value) /* EOF */
+					{
+						/*the file could become empty, must save `lastlogsize'*/
+						active_metrics[i].lastlogsize = lastlogsize;
 						break;
+					}
 
 					if ('\0' == *pattern || NULL != zbx_regexp_match(value, pattern, NULL)) {
 						send_err = process_value(
@@ -746,7 +750,11 @@ static void	process_active_checks(char *server, unsigned short port)
 					&timestamp, &source, &severity, &value)))
 				{
 					if (!value) /* EOF */
+					{
+						/*the eventlog could become empty, must save `lastlogsize'*/
+						active_metrics[i].lastlogsize = lastlogsize;
 						break;
+					}
 
 					if ('\0' == *pattern || NULL != zbx_regexp_match(value, pattern, NULL)) {
 						send_err = process_value(

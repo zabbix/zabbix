@@ -1,5 +1,6 @@
 Changes for 1.6.7
 
+ - [ZBX-1054] fixed processing of logs and eventlogs which become empty only on the agent side (Dmitry)
  - [ZBX-1055] fixed DBexecute function result with PostreSQL (Sasha)
  - [ZBX-778] added support of $1..$9 macros in the {ITEM.NAME} macro in notifications (Sasha) 
  - [ZBX-1031] fixed security vulnerability in server, allowing remote unauthenticated users to execute arbitrary SQL queries. Thanks to Nicob (Sasha)
