@@ -252,9 +252,9 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 			(size_t) 0, (dvoid **) 0);
 
 		/* get the session */
-		err = OCILogon2(oracle.envhp, oracle.errhp, &oracle.svchp, 
-				(text *)user, (ub4)strlen(user), 
-				(text *)password, (ub4)strlen(password), 
+		err = OCILogon2(oracle.envhp, oracle.errhp, &oracle.svchp,
+				(text *)user, (ub4)strlen(user),
+				(text *)password, (ub4)strlen(password),
 				(text *)connect, (ub4)strlen(connect),
 				OCI_DEFAULT);
 		if (OCI_SUCCESS != err) {
@@ -750,11 +750,11 @@ void	OCI_DBfree_result(DB_RESULT result)
 		zbx_free (result->values);
 		result->values = NULL;
 	}
-	
+
 	if (result->stmthp)
 		(void) OCIHandleFree((dvoid *) result->stmthp, OCI_HTYPE_STMT);
 
-	zbx_free (result);	
+	zbx_free (result);
 }
 #endif
 
@@ -818,7 +818,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 		return NULL;
 	}
 
-	return result->values;    
+	return result->values;
 
 #endif /* HAVE_ORACLE */
 #ifdef HAVE_SQLITE3
@@ -1002,8 +1002,8 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 
 		if (err == OCI_SUCCESS) {
 			/* represent any data as characters */
-			err = OCIDefineByPos(result->stmthp, &defnp, oracle.errhp, counter, 
-				(dvoid *) result->values[counter - 1], col_width, SQLT_STR, 
+			err = OCIDefineByPos(result->stmthp, &defnp, oracle.errhp, counter,
+				(dvoid *) result->values[counter - 1], col_width, SQLT_STR,
 				(dvoid *) 0, (ub2 *)0, (ub2 *)0, OCI_DEFAULT);
 		}
 

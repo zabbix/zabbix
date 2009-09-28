@@ -155,7 +155,7 @@ void	DCadd_nextcheck(DB_ITEM *item, time_t now, time_t timediff, const char *err
 		else
 			return;
 	}
-	
+
 	if (nextcheck_allocated == nextcheck_num)
 	{
 		nextcheck_allocated *= 2;
@@ -198,24 +198,24 @@ void	DCflush_nextchecks()
 {
 	int		i, sql_offset = 0, sql_allocated = 4096;
 	char		*sql = NULL;
-	
+
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	triggerid;
 	zbx_uint64_t	itemid;
 	zbx_uint64_t	events_maxid = 0;
 	char		*error_msg_esc = NULL;
-	
+
 	char		*sql_select = NULL;
 	int		sql_select_offset = 0, sql_select_allocated = 512;
-	
+
 	/* a crutch for the function `DBadd_condition_alloc' */
 	zbx_uint64_t	*ids = NULL;
 	int		ids_allocated = 32, ids_num = 0;
-	
+
 	struct event_objectid_clock 	*events = NULL;
 	int		events_num = 0, events_allocated = 32;
-		
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCflush_nextchecks()");
 
 	if (nextcheck_num == 0)
@@ -223,9 +223,9 @@ void	DCflush_nextchecks()
 
 	sql = zbx_malloc(sql, sql_allocated);
 	ids = zbx_malloc(ids, ids_allocated * sizeof(zbx_uint64_t));
-	
+
 	DBbegin();
-	
+
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
 #endif
@@ -243,7 +243,7 @@ void	DCflush_nextchecks()
 			uint64_array_add(&ids, &ids_allocated, &ids_num, nextchecks[i].itemid, 64);
 
 			error_msg_esc = DBdyn_escape_string_len(nextchecks[i].error_msg, ITEM_ERROR_LEN);
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset,
 					64 + strlen(error_msg_esc),
 					",status=%d,lastclock=%d,error='%s'",
 					ITEM_STATUS_NOTSUPPORTED,
@@ -258,7 +258,7 @@ void	DCflush_nextchecks()
 
 		DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
 	}
-				
+
 	/* dealing with notsupported items */
 	if (ids_num > 0)
 	{

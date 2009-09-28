@@ -151,7 +151,7 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	if (-1 == nbytes)	/* error occurred */
 		return SYSINFO_RET_FAIL;
-	
+
 	if (0 == nbytes)	/* EOF */
 		SET_STR_RESULT(result, strdup("EOF"));
 
@@ -199,7 +199,7 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	if (-1 == nbytes)	/* error occurred */
 		return SYSINFO_RET_FAIL;
-	
+
 	SET_UI64_RESULT(result, res);
 
 	return SYSINFO_RET_OK;

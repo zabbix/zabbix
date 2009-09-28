@@ -1175,7 +1175,7 @@ int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock)
 {
 #ifdef HAVE_ORACLE
 	OCILobLocator *lob_loc;
-   
+
 	char	sql[MAX_STRING_LEN];
 	int		value_esc_max_len;
 	int		err = OCI_SUCCESS;
@@ -1203,8 +1203,8 @@ int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock)
 	zabbix_log(LOG_LEVEL_DEBUG,"Query:%s", sql);
 
 	/* Allocate locator resources */
-	err = OCIDescriptorAlloc((dvoid *) oracle.envhp, 
-		(dvoid **) &lob_loc, (ub4)OCI_DTYPE_LOB, 
+	err = OCIDescriptorAlloc((dvoid *) oracle.envhp,
+		(dvoid **) &lob_loc, (ub4)OCI_DTYPE_LOB,
 		(size_t) 0, (dvoid **) 0);
 
 	if (OCI_SUCCESS == err) {
@@ -1215,7 +1215,7 @@ int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock)
 
 	if (OCI_SUCCESS == err) {
 		/* Prepare the SQL statement handle */
-		err = OCIStmtPrepare(stmthp, oracle.errhp, (text *)sql, (ub4) 
+		err = OCIStmtPrepare(stmthp, oracle.errhp, (text *)sql, (ub4)
 			strlen(sql),
 			(ub4) OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT);
 	}
@@ -1231,13 +1231,13 @@ int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock)
 	if (OCI_SUCCESS == err) {
 		/* Execute the SQL statement */
 		err = OCIStmtExecute(oracle.svchp, stmthp, oracle.errhp, (ub4) 1, (ub4) 0,
-			(CONST OCISnapshot*) 0, (OCISnapshot*) 0,  
+			(CONST OCISnapshot*) 0, (OCISnapshot*) 0,
 			(ub4) OCI_DEFAULT);
 	}
 
 	if (OCI_SUCCESS == err) {
 		/* Write data in ti the LOB locator */
-		err = OCILobWrite(oracle.svchp, oracle.errhp, lob_loc, (ub4 *)&amtp, 1, 
+		err = OCILobWrite(oracle.svchp, oracle.errhp, lob_loc, (ub4 *)&amtp, 1,
 			(dvoid*) value_esc, (ub4)value_esc_max_len, OCI_ONE_PIECE, NULL,
 			NULL, 0, (ub1) SQLCS_IMPLICIT);
 	}
