@@ -340,7 +340,7 @@ function make_popup_eventlist($eventid, $trigger_type) {
 			' WHERE eventid<='.$eventid.
 			' ORDER BY eventid DESC';
 	$db_events = DBselect($sql, 20);
-	
+
 	$count = 0;
 	while($event = DBfetch($db_events)){
 		if(!empty($event_list) && ($event_list[$count]['value'] != $event['value'])) {

@@ -36,15 +36,15 @@ private $numrows;
 
 public function __construct($image, $x, $y){
 	$this->image = $image;
-	
+
 	$this->fontsize = 8;
 	$this->rowheight = 0;
 	$this->color = 0;
 	$this->align = 0;
-	
+
 	$this->x = $x;
 	$this->y = $y;
-	
+
 	$this->table = array();
 	$this->numrows = 0;
 }
@@ -58,7 +58,7 @@ public function addCell($numrow, $cell){
 	if($numrow >= $this->numrows){
 		$numrow = $this->numrows;
 		$this->numrows++;
-		
+
 		$this->table[$numrow] = array();
 	}
 
@@ -72,11 +72,11 @@ public function addRow($row){
 
 public function draw(){
 	$this->calcRows();
-	
+
 	$coly = $this->y;
 	foreach($this->table as $numRow => $row){
 		$rowx = $this->x;
-		
+
 		foreach($row as $numCol => $col){
 			$text_color = (isset($col['color']))?$col['color']:$this->color;
 //SDI($text_color);
@@ -103,26 +103,26 @@ private function calcRows(){
 
 	$rowHeight = 0;
 	$colWidth = array();
-	
-	foreach($this->table as $y => $row){		
+
+	foreach($this->table as $y => $row){
 		foreach($row as $x => $col){
 			if(!isset($col['fontsize'])) $col['fontsize'] = $this->fontsize;
 			$this->table[$y][$x]['fontsize'] = $col['fontsize'];
 
 			$dims = imageTextSize($col['fontsize'], 0, $col['text']);
 			$this->table[$y][$x]['size'] = $dims;
-			
+
 			$rowHeight = ($dims['height'] > $rowHeight)?$dims['height']:$rowHeight;
-			
+
 			if(!isset($colWidth[$x])) $colWidth[$x] = $dims['width'];
 			else if($dims['width'] > $colWidth[$x]) $colWidth[$x] = $dims['width'];
 		}
 	}
-	
+
 	if($rowHeight < $this->rowheight) $rowHeight = $this->rowheight;
 	else $this->rowheight = $rowHeight;
 
-	foreach($this->table as $y => $row){		
+	foreach($this->table as $y => $row){
 		foreach($row as $x => $col){
 			$this->table[$y][$x]['height'] = $rowHeight;
 			$this->table[$y][$x]['width'] = $colWidth[$x];

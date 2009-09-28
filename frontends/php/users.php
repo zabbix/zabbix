@@ -86,7 +86,7 @@ include_once('include/page_header.php');
 	validate_sort_and_sortorder('alias',ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go','none');
-	
+
 ?>
 <?php
 	if(isset($_REQUEST['new_groups'])){
@@ -158,7 +158,7 @@ include_once('include/page_header.php');
 			if(isset($_REQUEST['userid'])){
 				$action = AUDIT_ACTION_UPDATE;
 				$user['userid'] = $_REQUEST['userid'];
-				
+
 				DBstart();
 				$result = CUser::update(array($user));
 				$result = DBend($result);
@@ -172,7 +172,7 @@ include_once('include/page_header.php');
 				DBstart();
 				$result = CUser::add(array($user));
 				$result = DBend($result);
-				
+
 				if(!$result) error(CUser::$error['data']);
 				show_messages($result, S_USER_ADDED, S_CANNOT_ADD_USER);
 			}
@@ -203,7 +203,7 @@ include_once('include/page_header.php');
 
 		$result = CUser::delete(array($_REQUEST['userid']));
 		if(!$result) error(CUser::$error['data']);
-		
+
 		show_messages($result, S_USER_DELETED, S_CANNOT_DELETE_USER);
 		if($result){
 			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER,
@@ -287,7 +287,7 @@ include_once('include/page_header.php');
 
 			$result |= (bool) CUser::delete(array($userid));
 			if(!$result) error(CUser::$error['data']);
-			
+
 			if($result){
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER,
 					'User alias ['.$user_data['alias'].'] name ['.$user_data['name'].'] surname ['.
@@ -311,11 +311,11 @@ include_once('include/page_header.php');
 		$cmbConf->addItem('usergrps.php', S_USER_GROUPS);
 		$cmbConf->addItem('users.php', S_USERS);
 	$frmForm->addItem(array($cmbConf,SPACE,new CButton('form',S_CREATE_USER)));
-	
+
 	show_table_header(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
 	echo SBR;
 
-	
+
 	if(isset($_REQUEST['form'])){
 		insert_user_form(get_request('userid',null));
 	}
@@ -466,7 +466,7 @@ include_once('include/page_header.php');
 		$user_wdgt->addItem($form);
 		$user_wdgt->show();
 	}
-	
+
 
 include_once('include/page_footer.php');
 ?>

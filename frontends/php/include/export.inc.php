@@ -598,7 +598,7 @@ class zbxXML{
 // sdii($triggers_to_upd);
 					$add_result = CTrigger::add($triggers_to_add);
 					if($add_result !== false) $added_triggers = $add_result;
-					
+
 					CTrigger::update($triggers_to_upd);
 
 					$triggers_for_dependencies = array_merge($triggers_for_dependencies, $added_triggers);
@@ -664,7 +664,7 @@ class zbxXML{
 							}
 							$graphs_to_add[] = $graph_db;
 						}
-//sdii($gitems_to_add);	
+//sdii($gitems_to_add);
 						CGraph::add($graphs_to_add);
 					}
 				}

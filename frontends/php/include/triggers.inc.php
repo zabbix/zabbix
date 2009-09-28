@@ -727,10 +727,10 @@ return $result;
 				}
 				$item_count++;
 			}
-			
+
 			$expr = $arr[ZBX_EXPRESSION_LEFT_ID].$ZBX_TR_EXPR_REPLACE_TO.$arr[ZBX_EXPRESSION_RIGHT_ID];
 		}
-		
+
 		if($item_count == 0){
 			error('An item key must be used in trigger expression');
 			return false;

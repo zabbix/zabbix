@@ -60,7 +60,7 @@ include_once('include/page_header.php');
 
 	$header_form = new CForm();
 	$header_form->setMethod('get');
-	
+
 	$cmbConf = new CComboBox('config', 'import.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('export.php', S_EXPORT);
 		$cmbConf->addItem('import.php', S_IMPORT);

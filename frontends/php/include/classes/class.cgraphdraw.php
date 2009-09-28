@@ -174,7 +174,7 @@ class CGraphDraw{
 
 
 		if($this->border==1){
-			imagerectangle($this->im,0,0,$this->fullSizeX-1,$this->fullSizeY-1, $this->getColor($bordercolor, 0)); 
+			imagerectangle($this->im,0,0,$this->fullSizeX-1,$this->fullSizeY-1, $this->getColor($bordercolor, 0));
 		}
 	}
 
@@ -187,7 +187,7 @@ class CGraphDraw{
 			$this->getColor('Black No Alpha')
 			);
 	}
-	
+
 	public function period2str($period){
 		$second = 1; $minute=$second * 60; $hour=$minute*60; $day=$hour*24;
 		$str = ' ( ';
@@ -221,7 +221,7 @@ class CGraphDraw{
 		else{
 			$str=$this->header;
 		}
-		
+
 //		$str.=$this->period2str($this->period);
 
 		if($this->sizeX < 500){
