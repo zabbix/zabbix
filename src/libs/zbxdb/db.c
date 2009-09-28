@@ -499,7 +499,7 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 
 	if(ret == ZBX_DB_OK)
 	{
-		ret = PQntuples(result);
+		ret = atoi(PQcmdTuples(result));
 	}
 	PQclear(result);
 #endif
