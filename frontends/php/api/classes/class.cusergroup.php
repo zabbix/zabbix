@@ -256,7 +256,7 @@ class CUserGroup {
 	 * @return array|boolean user data as array or false if error
 	 */
 	public static function getById($group_data){
-	
+
 		$group = DBfetch(DBselect('SELECT * FROM usrgrp WHERE usrgrpid='.$group_data['usrgrpid']));
 
 		if($group)
