@@ -41,7 +41,7 @@ public static $result;
 
 		if(($resource == 'user') && ($action == 'authenticate')){
 			$sessionid = null;
-			
+
 			$user = CUser::get(array('users' => $params['user'], 'extendoutput' => 1, 'get_access' => 1));
 			$user = reset($user);
 			if(!$user['api_access']){
@@ -49,7 +49,7 @@ public static $result;
 				return self::$result;
 			}
 		}
-		
+
 		if(empty($sessionid) && (($resource != 'user') || ($action != 'authenticate'))){
 			self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
 			return self::$result;
@@ -60,13 +60,13 @@ public static $result;
 				return self::$result;
 			}
 		}
-		
-		$class_name = 'C'.$resource; 
+
+		$class_name = 'C'.$resource;
 		if(!method_exists($class_name, $action)){
 			self::$result = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Action does not exists');
 			return self::$result;
 		}
-		
+
 		call_user_func(array('self', $resource), $action, $params);
 
 	return self::$result;
@@ -74,9 +74,9 @@ public static $result;
 
 // USER
 	private static function user($action, $params){
-	
+
 		CUser::$error = array();
-		
+
 		switch($action){
 			default:
 			$result = call_user_func(array('CUser', $action), $params);
@@ -96,7 +96,7 @@ public static $result;
 			default:
 			$result = call_user_func(array('CHostGroup', $action), $params);
 		}
-		
+
 		if($result !== false)
 			self::$result = array('result' => $result);
 		else
@@ -112,7 +112,7 @@ public static $result;
 			default:
 			$result = call_user_func(array('CTemplate', $action), $params);
 		}
-		
+
 		if($result !== false)
 			self::$result = array('result' => $result);
 		else
@@ -128,7 +128,7 @@ public static $result;
 			default:
 			$result = call_user_func(array('CHost', $action), $params);
 		}
-		
+
 		if($result !== false)
 			self::$result = array('result' => $result);
 		else
@@ -144,7 +144,7 @@ public static $result;
 			default:
 			$result = call_user_func(array('CItem', $action), $params);
 		}
-		
+
 		if($result !== false)
 			self::$result = array('result' => $result);
 		else
@@ -160,7 +160,7 @@ public static $result;
 			default:
 			$result = call_user_func(array('CTrigger', $action), $params);
 		}
-		
+
 		if($result !== false)
 			self::$result = array('result' => $result);
 		else
@@ -176,7 +176,7 @@ public static $result;
 			default:
 			$result = call_user_func(array('CGraph', $action), $params);
 		}
-		
+
 		if($result !== false)
 			self::$result = array('result' => $result);
 		else
