@@ -312,7 +312,7 @@ include_once('include/page_header.php');
 		S_COMMENTS
 	));
 
-	
+
 	$options = array(
 		'status' => TRIGGER_STATUS_ENABLED,
 		'filter' => 1,
@@ -344,16 +344,16 @@ include_once('include/page_header.php');
 	}
 
 	$triggers = CTrigger::get($options);
-	
+
 // sorting && paging
 	order_page_result($triggers, getPageSortField('description'), getPageSortOrder());
 	$paging = getPagingLine($triggers);
 //---------
-	
-	
+
+
 	if($show_events != EVENTS_OPTION_NOEVENT){
 		$triggerids = array_keys($triggers);
-		
+
 		$ev_options = array(
 			'triggerids' => $triggerids,
 			'object' => EVENT_OBJECT_TRIGGER,
@@ -379,20 +379,20 @@ include_once('include/page_header.php');
 		}
 
 		$events = CEvent::get($ev_options);
-		
+
 		foreach($events as $eventid => $event){
 			if(!isset($triggers[$event['objectid']]['events']))
 				$triggers[$event['objectid']]['events'] = array();
-				
-			$triggers[$event['objectid']]['events'][$eventid] = $event;		
+
+			$triggers[$event['objectid']]['events'][$eventid] = $event;
 		}
-		
+
 	}
 
 	foreach($triggers as $triggerid => $trigger){
 		if(!isset($trigger['events']))
 			$trigger['events'] = array();
-			
+
 		$elements = array();
 		$description = expand_trigger_description($trigger['triggerid']);
 
@@ -474,7 +474,7 @@ include_once('include/page_header.php');
 		$hosts = array_pop($trigger['hosts']);
 		$trigger['hostid'] = $hosts['hostid'];
 		$trigger['host'] = $hosts['host'];
-		
+
 		if($_REQUEST['hostid'] < 1){
 
 			$menus = '';
@@ -500,18 +500,18 @@ include_once('include/page_header.php');
 
 		$menu_trigger_conf = 'null';
 		if($admin_links){
-			$menu_trigger_conf = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript: redirect('triggers.php?form=update&triggerid=".$trigger['triggerid']."&hostid=".$trigger['hostid']."')\", 
+			$menu_trigger_conf = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript: redirect('triggers.php?form=update&triggerid=".$trigger['triggerid']."&hostid=".$trigger['hostid']."')\",
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
 
 		$menu_trigger_url = 'null';
 		if(!zbx_empty($trigger['url'])){
-			$menu_trigger_url = "['".S_URL."',\"javascript: window.location.href='".$trigger['url']."'\", 
+			$menu_trigger_url = "['".S_URL."',\"javascript: window.location.href='".$trigger['url']."'\",
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
-		
+
 		$tr_desc = new CSpan($description);
-		$tr_desc->addAction('onclick', 
+		$tr_desc->addAction('onclick',
 			"javascript: create_mon_trigger_menu(event, new Array({'triggerid': '".$trigger['triggerid'].
 				"', 'lastchange': '".$trigger['lastchange']."'}, ".$menu_trigger_conf.", ".$menu_trigger_url."),".
 			zbx_jsvalue($trigger['items']).");"
@@ -585,7 +585,7 @@ include_once('include/page_header.php');
 				($config['event_ack_enable'])?(new CCol($ack,'center')):NULL,
 				new CLink(($trigger['comments'] == '') ? S_ADD : S_SHOW,'tr_comments.php?triggerid='.$trigger['triggerid'])
 			));
-			
+
 			$event_limit++;
 			if($event_limit >= $config['event_show_max']) break;
 		}

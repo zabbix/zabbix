@@ -446,7 +446,7 @@ include_once('include/page_header.php');
 			if(count($new_templates) > 0) {
 				$script = '';
 				foreach($new_templates as $id => $name){
-					$script .= 'add_variable(null,"templates['.$id.']","'.$name.'","'.$dstfrm.'",window.opener.document);'."\n";	
+					$script .= 'add_variable(null,"templates['.$id.']","'.$name.'","'.$dstfrm.'",window.opener.document);'."\n";
 				}
 				$script.= 'var form = window.opener.document.forms["'.$dstfrm.'"];'.
 					' if(form) form.submit();'.

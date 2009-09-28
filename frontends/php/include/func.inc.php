@@ -683,7 +683,7 @@ return "$s $u$units";
 /************* ZBX MISC *************/
 function zbx_avg($values){
 	zbx_value2array($values);
-	
+
 	$sum = 0;
 	foreach($values as $num => $value){
 		$sum += $value;

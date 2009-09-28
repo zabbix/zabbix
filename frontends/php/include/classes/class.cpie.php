@@ -336,7 +336,7 @@ class CPie extends CGraphDraw{
 
 			imagetext($this->im, 2, 0, $this->shiftXleft+9,$this->sizeY+$shiftY-5+12*$i,
 				$this->GetColor('Black No Alpha'), $str);
-			
+
 
 			$shiftX = $this->fullSizeX - $this->shiftlegendright - $this->shiftXright + 10;
 	//		SDI($shiftX.','.$this->sizeX);

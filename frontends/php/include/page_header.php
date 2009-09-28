@@ -123,7 +123,7 @@
 				$css = $USER_DETAILS['theme'];
 			}
 		}
-		
+
 		if($css){
 			echo '<link rel="stylesheet" type="text/css" href="styles/'.$css.'" />'."\n";
 			$ico = preg_replace('/^[^_\.a-z]+$/','',$css);

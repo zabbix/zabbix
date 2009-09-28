@@ -70,7 +70,7 @@ function user_login($name, $passwd, $auth_type){
 		}
 
 		DBexecute('UPDATE users SET attempt_clock=' . time() . ' WHERE alias='.zbx_dbstr($name));
-		
+
 		switch(get_user_auth($login['userid'])){
 			case GROUP_GUI_ACCESS_INTERNAL:
 				$auth_type = ZBX_AUTH_INTERNAL;
@@ -125,7 +125,7 @@ function user_login($name, $passwd, $auth_type){
 
 
 		$USER_DETAILS = $user;
-		$login = $sessionid;		
+		$login = $sessionid;
 	}
 	else{
 		$user = NULL;

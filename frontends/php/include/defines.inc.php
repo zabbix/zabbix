@@ -596,7 +596,7 @@ else{
 
 // PREG
 	define('ZBX_PREG_PRINT_UTF', '([^\x00-\x1F]*)');
-	
+
 	define('ZBX_PREG_SPACES', '(\s+){0,1}');
 	define('ZBX_PREG_MACRO_NAME', '([A-Z0-9._]+)');
 	define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_. -$]+)');

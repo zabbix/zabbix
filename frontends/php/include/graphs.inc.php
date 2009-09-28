@@ -1157,17 +1157,17 @@
 
 	return $result;
 	}
-	
+
 	function imageText($image, $fontsize, $angle, $x, $y, $color, $string){
 		$gdinfo = gd_info();
-		
+
 		if($gdinfo['FreeType Support'] && function_exists('imagettftext')){
 			$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
 /*
 			$ar = imagettfbbox($fontsize, $angle, $ttf, $string);
 			if(!$angle)	imagerectangle($image, $x, $y, $x+abs($ar[0] - $ar[4]), $y-abs($ar[1] - $ar[5]), $color);
 			else imagerectangle($image, $x, $y, $x-abs($ar[0] - $ar[4]), $y-abs($ar[1] - $ar[5]), $color);
-//*/	
+//*/
 			imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
 		}
 		else{
@@ -1185,7 +1185,7 @@
 
 			if($angle) $x -= $dims['height'];
 			else $y -= $dims['height'];
-			
+
 			if($angle > 0)	return imagestringup($image, $fontsize, $x, $y, $string, $color);
 			return imagestring($image, $fontsize, $x, $y, $string, $color);
 		}
@@ -1205,10 +1205,10 @@
 
 //			$result['height'] = abs($ar[1] - $ar[7]);
 //			$result['width'] = abs($ar[0] - $ar[2]);
-			
+
 			$result['height'] = abs($ar[1] - $ar[5]);
 			$result['width'] = abs($ar[0] - $ar[4]);
-			
+
 		}
 		else{
 			switch($fontsize){
@@ -1224,11 +1224,11 @@
 					$height = 10;
 				break;
 			}
-			
+
 			$result['height'] = $height;
 			$result['width'] = strlen($string) * $width;
 		}
-	
+
 	return $result;
 	}
 ?>
