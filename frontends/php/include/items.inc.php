@@ -292,7 +292,7 @@
 				$g=$arr[10];
 			}
 			else{
-				error('Key does not match grpfunc["group","key","itemfunc","numeric param")');
+				error('Key does not match grpfunc["group","key","itemfunc","numeric param"]');
 				return FALSE;
 			}
 		}
