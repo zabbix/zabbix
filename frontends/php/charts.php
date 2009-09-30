@@ -254,11 +254,11 @@ include_once('include/page_header.php');
 			$yaxis = ($graph['yaxissidel'] == $yaxis)?($yaxis):(2);
 		}
 		if($yaxis == 2){
-			$shiftXleft = 90;
+			$shiftXleft = 100;
 			$shiftXright = 100;
 		}
 		else if($yaxis == 0){
-			$shiftXleft = 90;
+			$shiftXleft = 100;
 			$shiftXright = 20;
 		}
 		else{

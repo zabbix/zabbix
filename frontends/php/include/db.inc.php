@@ -223,12 +223,10 @@ if(!isset($DB)){
 		$fl = explode(";\n", implode("\n",$fl));
 		unset($fl[count($fl)-1]);
 
-		foreach($fl as $sql)
-		{
+		foreach($fl as $sql){
 			if(empty($sql)) continue;
 
-			if(!DBexecute($sql,0))
-			{
+			if(!DBexecute($sql,0)){
 				$error = '';
 				return false;
 			}
@@ -244,7 +242,7 @@ if(!isset($DB)){
 		$DB['TRANSACTIONS']++;
 
 		if($DB['TRANSACTIONS']>1){
-			if($DB['STRICT']) info('POSSIBLE ERROR: Used incorrect logic in database processing, started subtransaction!');
+			info('POSSIBLE ERROR: Used incorrect logic in database processing, started subtransaction!');
 		return $DB['TRANSACTION_STATE'];
 		}
 
@@ -283,8 +281,7 @@ if(!isset($DB)){
 			if($DB['TRANSACTIONS'] < 1){
 				$DB['TRANSACTIONS'] = 0;
 				$DB['TRANSACTION_STATE'] = false;
-
-				if($DB['STRICT']) info('POSSIBLE ERROR: Used incorrect logic in database processing, transaction not started!');
+				info('POSSIBLE ERROR: Used incorrect logic in database processing, transaction not started!');
 			}
 
 		if(!is_null($result))
@@ -365,22 +362,21 @@ if(!isset($DB)){
 
 	return $result;
 	}
+	
+/* NOTE:
+	LIMIT and OFFSET records
 
+	Example: select 6-15 row.
 
-	/* NOTE:
-		LIMIT and OFFSET records
-
-		Example: select 6-15 row.
-
-		MySQL:
-			SELECT a FROM tbl LIMIT 5,10
-			SELECT a FROM tbl LIMIT 10 OFFSET 5
-		PostgreSQL:
-			SELECT a FROM tbl LIMIT 10 OFFSET 5
-		Oracle:
-			SELECT a FROM tbe WHERE ROWNUM < 15 // ONLY < 15
-			SELECT * FROM (SELECT ROWNUM as RN, * FROM tbl) WHERE RN BETWEEN 6 AND 15
-	*/
+	MySQL:
+		SELECT a FROM tbl LIMIT 5,10
+		SELECT a FROM tbl LIMIT 10 OFFSET 5
+	PostgreSQL:
+		SELECT a FROM tbl LIMIT 10 OFFSET 5
+	Oracle:
+		SELECT a FROM tbe WHERE ROWNUM < 15 // ONLY < 15
+		SELECT * FROM (SELECT ROWNUM as RN, * FROM tbl) WHERE RN BETWEEN 6 AND 15
+//*/
 
 	function &DBselect($query, $limit='NO', $offset=0){
 		global $DB;
@@ -396,6 +392,7 @@ if(!isset($DB)){
 					if(zbx_numeric($limit)){
 						$query .= ' LIMIT '.intval($limit).' OFFSET '.intval($offset);
 					}
+
 					$result=mysql_query($query,$DB['DB']);
 					if(!$result){
 						error('Error in query ['.$query.'] ['.mysql_error().']');
@@ -405,6 +402,7 @@ if(!isset($DB)){
 					if(zbx_numeric($limit)){
 						$query .= ' LIMIT '.intval($limit).' OFFSET '.intval($offset);
 					}
+
 					$result = pg_query($DB['DB'],$query);
 					if(!$result){
 						error('Error in query ['.$query.'] ['.pg_last_error().']');
@@ -412,9 +410,10 @@ if(!isset($DB)){
 					break;
 				case 'ORACLE':
 					if(zbx_numeric($limit)){
-//						$query = 'select * from ('.$query.') where rownum<='.intval($limit);
-						$query = 'select * from ('.$query.') where rownum between '.intval($offset).' and '.intval($limit);
+						$till = $offset + $limit;
+						$query = 'SELECT * FROM ('.$query.') WHERE rownum BETWEEN '.intval($offset).' AND '.intval($till);
 					}
+
 					$result = DBexecute($query);
 					if(!$result){
 						$e = ocierror($result);
@@ -484,7 +483,9 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 					}
 					break;
 				case 'POSTGRESQL':
-					if(!($result = pg_query($DB['DB'],$query))){
+					$result = (bool) pg_query($DB['DB'],$query);
+
+					if(!$result){
 						error('Error in query ['.$query.'] ['.pg_last_error().']');
 					}
 					break;
@@ -685,6 +686,11 @@ else {
 	}
 
 	function get_dbid($table,$field){
+// PGSQL on transaction failure on all queries returns false..
+		global $DB;
+		if(($DB['TYPE'] == 'POSTGRESQL') && $DB['TRANSACTIONS'] && !$DB['TRANSACTION_STATE']) return 1;
+//------
+
 		$nodeid = get_current_nodeid(false);
 
 		$found = false;
@@ -693,35 +699,32 @@ else {
 
 			$min=bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000'));
 			$max=bcadd(bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000')),'99999999999');
-			$row = DBfetch(DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid ." AND table_name='$table' AND field_name='$field'"));
+			$row = DBfetch(DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid .' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field)));
 			if(!$row){
 				$row=DBfetch(DBselect('SELECT max('.$field.') AS id FROM '.$table.' WHERE '.$field.'>='.$min.' AND '.$field.'<='.$max));
-				if(!$row || is_null($row["id"])){
-
-					DBexecute('INSERT INTO ids (nodeid,table_name,field_name,nextid) '.
-						" VALUES ($nodeid,'$table','$field',$min)");
+				if(!$row || is_null($row['id'])){
+					DBexecute("INSERT INTO ids (nodeid,table_name,field_name,nextid) VALUES ($nodeid,'$table','$field',$min)");
 				}
 				else{
-					/*
-					$ret1 = $row["id"];
+/*					$ret1 = $row["id"];
 					if($ret1 >= $max) {
 						"Maximum number of id's was exceeded"
 					}
-					*/
+//*/
 
-					DBexecute("INSERT INTO ids (nodeid,table_name,field_name,nextid) VALUES ($nodeid,'$table','$field',".$row["id"].')');
+					DBexecute("INSERT INTO ids (nodeid,table_name,field_name,nextid) VALUES ($nodeid,'$table','$field',".$row['id'].')');
 				}
 				continue;
 			}
 			else{
-				$ret1 = $row["nextid"];
+				$ret1 = $row['nextid'];
 				if((bccomp($ret1,$min) < 0) || !(bccomp($ret1,$max) < 0)) {
-					DBexecute("DELETE FROM ids WHERE nodeid=$nodeid AND table_name='$table' AND field_name='$field'");
+					DBexecute('DELETE FROM ids WHERE nodeid='.$nodeid.' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field));
 					continue;
 				}
 
-				DBexecute("UPDATE ids SET nextid=nextid+1 WHERE nodeid=$nodeid AND table_name='$table' AND field_name='$field'");
-				$row = DBfetch(DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid." AND table_name='$table' AND field_name='$field'"));
+				DBexecute('UPDATE ids SET nextid=nextid+1 WHERE nodeid='.$nodeid.' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field));
+				$row = DBfetch(DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid.' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field)));
 				if(!$row || is_null($row["nextid"])){
 					/* Should never be here */
 					continue;

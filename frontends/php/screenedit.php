@@ -29,7 +29,7 @@
 	$page['title'] = "S_CONFIGURATION_OF_SCREENS";
 	$page['file'] = 'screenedit.php';
 	$page['hist_arg'] = array('screenid');
-	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','cscreen.js');
+	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.cscreen.js');
 
 include_once('include/page_header.php');
 
@@ -42,7 +42,8 @@ include_once('include/page_header.php');
 
 		'screenitemid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))&&(!isset({x})||!isset({y}))'),
 		'resourcetype'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,15),	'isset({save})'),
-		'resourceid'=>	array(T_ZBX_INT, O_OPT,  null,  DB_ID,			'isset({save})'),
+		'caption'=>		array(T_ZBX_STR, O_OPT,  null,  null,	null),
+		'resourceid'=>	array(T_ZBX_INT, O_OPT,  null,  DB_ID.'(!isset({caption}) || ({}!=0))', 	'isset({save})'),
 		'width'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	null),
 		'height'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	null),
 		'colspan'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
@@ -91,7 +92,7 @@ include_once('include/page_header.php');
 
 			DBstart();
 			if(isset($_REQUEST['screenitemid'])){
-				$result=update_screen_item($_REQUEST['screenitemid'],
+				$result = update_screen_item($_REQUEST['screenitemid'],
 					$_REQUEST['resourcetype'],$_REQUEST['resourceid'],$_REQUEST['width'],
 					$_REQUEST['height'],$_REQUEST['colspan'],$_REQUEST['rowspan'],
 					$_REQUEST['elements'],$_REQUEST['valign'],

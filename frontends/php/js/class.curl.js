@@ -98,12 +98,11 @@ initialize: function(url){
 	var refSepIndex=this.url.indexOf('#');
 	if(refSepIndex>=0){
 		this.file=this.file.substring(0,refSepIndex);
-		this.reference=this.url.substring(this.url.indexOf('#'));
+		this.reference=this.url.substring(refSepIndex+1);
 	}
 
 	this.path=this.file;
 	if(this.query.length>0) this.file+='?'+this.query;
-	if(this.reference.length>0) this.file+='#'+this.reference;
 	if(this.query.length > 0)	this.formatArguments();
 
 	var sid = cookie.read('zbx_sessionid');

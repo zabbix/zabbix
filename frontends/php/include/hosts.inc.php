@@ -1245,8 +1245,27 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 		else $nodeid = get_current_nodeid(false);
 	}
 
-	//$nodeid = is_null($nodeid)?get_current_nodeid($opt):$nodeid;
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY,$nodeid,AVAILABLE_NOCACHE);
+//$nodeid = is_null($nodeid)?get_current_nodeid($opt):$nodeid;
+//$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY,$nodeid,AVAILABLE_NOCACHE);
+
+	if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+			$def_sql['from']['hg'] = 'hosts_groups hg';
+			$def_sql['from']['r'] = 'rights r';
+			$def_sql['from']['ug'] = 'users_groups ug';
+			$def_sql['where']['hgh'] = 'hg.hostid=h.hostid';
+			$def_sql['where'][] = 'r.id=hg.groupid ';
+			$def_sql['where'][] = 'r.groupid=ug.usrgrpid';
+			$def_sql['where'][] = 'ug.userid='.$userid;
+			$def_sql['where'][] = 'r.permission>='.$permission;
+			$def_sql['where'][] = 'NOT EXISTS( '.
+									' SELECT hgg.groupid '.
+									' FROM hosts_groups hgg, rights rr, users_groups gg '.
+									' WHERE hgg.hostid=hg.hostid '.
+										' AND rr.id=hgg.groupid '.
+										' AND rr.groupid=gg.usrgrpid '.
+										' AND gg.userid='.$userid.
+										' AND rr.permission<'.$permission.')';
+	}
 
 // nodes
 	if(ZBX_DISTRIBUTED){
@@ -1345,7 +1364,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 
 	$sql = 'SELECT DISTINCT '.$sql_select.
 			' FROM '.$sql_from.
-			' WHERE '.DBcondition('h.hostid',$available_hosts).
+			' WHERE '.DBin_node('h.hostid', $nodeid).
 				$sql_where.
 			' ORDER BY '.$sql_order;
 	$res = DBselect($sql);

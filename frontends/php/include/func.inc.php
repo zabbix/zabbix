@@ -455,12 +455,16 @@ function array_quicksort(&$data, $sortfield, $sortorder=ZBX_SORT_UP, $level=0){
 	$less = array();
 	$pivotList = array();
 
-	if(count($data) < 2) return $data;
-
-	foreach($data as $id => $row){
-		$pivot = $row;
-		$pivotid = $id;
-		break;
+	$data_len = count($data);
+	if($data_len < 2) return $data;
+	else if($data_len > 10){
+		$middle = array_slice($data, round($data_len/2), 1, true);
+		$pivot = reset($middle);
+		$pivotid = key($middle);
+	}
+	else{
+		$pivot = reset($data);
+		$pivotid = key($data);
 	}
 
 	foreach($data as $id => $row){
@@ -470,9 +474,9 @@ function array_quicksort(&$data, $sortfield, $sortorder=ZBX_SORT_UP, $level=0){
 		$value = strtolower($row[$sortfield]);
 		$compareValue = strtolower($pivot[$sortfield]);
 
-		if ($value < $compareValue) $less[$id] = $row;
-		if ($value == $compareValue) $pivotList[$id] = $row;
-		if ($value > $compareValue) $greater[$id] = $row;
+		if($value < $compareValue) $less[$id] = $row;
+		if($value == $compareValue) $pivotList[$id] = $row;
+		if($value > $compareValue) $greater[$id] = $row;
 	}
 
 	$return += array_quicksort($less,$sortfield,$sortorder, $level+1);

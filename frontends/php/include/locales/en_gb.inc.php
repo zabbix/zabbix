@@ -1405,6 +1405,7 @@
 	'S_SHOW_UNACKNOWLEDGED'=>		'Show unacknowledged',
 	'S_SHOW_PROBLEM_UNACKNOWLEDGED'=>	'Show problem-unacknowledged',
 	'S_NOT_ACKNOWLEDGED'=>			'Not acknowledged',
+	'S_SHOW_LAST'=>				'Show last',
 	'S_SHOW_DETAILS'=>			'Show details',
 	'S_SELECT'=>				'Select',
 	'S_TRIGGERS_BIG'=>			'TRIGGERS',
