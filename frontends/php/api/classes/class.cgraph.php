@@ -445,7 +445,7 @@ class CGraph {
 
 		$error = 'Unknown ZABBIX internal error';
 		$result_ids = array();
-		$result = false;
+		$result = true;
 
 		DBstart(false);
 

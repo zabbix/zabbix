@@ -639,7 +639,7 @@ class CItem {
 		$itemids = array();
 		DBstart(false);
 
-		$result = false;
+		$result = true;
 		foreach($items as $item){
 			$result = add_item($item);
 			if(!$result) break;
@@ -671,7 +671,7 @@ class CItem {
 	 */
 	public static function update($items){
 
-		$result = false;
+		$result = true;
 		$itemids = array();
 		DBstart(false);
 		foreach($items as $item){

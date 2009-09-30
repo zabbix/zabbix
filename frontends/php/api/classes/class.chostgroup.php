@@ -32,7 +32,7 @@ class CHostGroup {
 	public static $error;
 
 	/**
-	 * Gets all HostGroup data from DB by HostGroup ID
+	 * Get HostGroup by ID
 	 *
 	 * {@source}
 	 * @access public
@@ -43,23 +43,22 @@ class CHostGroup {
 	 * @static
 	 * @param _array $group_data
 	 * @param array $group_data['groupid']
-	 * @return array|boolean HostGroup data as array or false if error
+	 * @return array|boolean
 	 */
 	public static function getById($group_data){
-		$sql = 'SELECT * FROM groups WHERE groupid='.$group_data['groupid'];
+		$sql = "SELECT * FROM groups WHERE groupid={$group_data['groupid']}";
 		$group = DBfetch(DBselect($sql));
 
-		$result = $group ? true : false;
-		if($result)
+		if($group)
 			return $group;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Host group with id: '.$group_data['groupid'].' doesn\'t exists.');
-			return $result;
+			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'HostGroup with ID: '.$group_data['groupid'].' does not exists');
+			return false;
 		}
 	}
 
 	/**
-	 * Get HostGroup ID by HostGroup name
+	 * Get HostGroup ID by name
 	 *
 	 * {@source}
 	 * @access public
@@ -76,12 +75,11 @@ class CHostGroup {
 		$sql = 'SELECT groupid FROM groups WHERE name='.zbx_dbstr($group_data['name']).' AND '.DBin_node('groupid', get_current_nodeid(false));
 		$groupid = DBfetch(DBselect($sql));
 
-		$result = $groupid ? true : false;
-		if($result)
+		if($groupid)
 			return $groupid['groupid'];
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Host group with name: '.$group_data['name'].' doesn\'t exists.');
-			return $result;
+			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'HostGroup with name [ '.$group_data['name'].' ] does not exists');
+			return false;
 		}
 	}
 
@@ -425,21 +423,43 @@ class CHostGroup {
 	 * @return boolean
 	 */
 	public static function add($groups){
-		DBstart(false);
+	
 		$groupids = array();
-
-		$result = false;
+		$result = true;
+		
+		DBstart(false);
 		foreach($groups as $group){
-			$result = db_save_group($group);
-			if(!$result) break;
-			$groupids[$result] = $result;
-		}
+		
+			if(!is_string($group)){
+				$error = "HostGroup name must be a string [ $group ]";
+				$result = false;
+				break;
+			}
 
+			$group_exist = CHostGroup::getId(array('name' => $group));
+			if($group_exist != false){
+				$error = "HostGroup [ $group ] already exists";
+				$result = false;
+				break;
+			}
+
+			$groupid = get_dbid('groups', 'groupid');
+			$sql = 'INSERT INTO groups (groupid, name, internal) VALUES ('.$groupid.', '.zbx_dbstr($group).', '.ZBX_NOT_INTERNAL_GROUP.')';
+			$result = DBexecute($sql);
+			if(!$result){
+				$error = 'Database error';
+				$result = false;
+				break;
+			}
+			
+			$groupids[$groupid] = $groupid;
+		}
 		$result = DBend($result);
+		
 		if($result)
 			return $groupids;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
 			return false;
 		}
 	}
@@ -462,21 +482,34 @@ class CHostGroup {
 	 * @return boolean
 	 */
 	public static function update($groups){
+		
+		$result = true;
+		
 		DBstart(false);
-		$groupids = array();
-
-		$result = false;
 		foreach($groups as $group){
-			$result = db_save_group($group['name'], $group['groupid']);
-			if(!$result) break;
-			$groupids[$result] = $result;
-		}
+		
+			$group_exist = CHostGroup::getId(array('name' => $group['name']));
+			if($group_exist && ($group_exist != $group['name'])){
+				$error = "HostGroup [ $group ] already exists";
+				$result = false;
+				break;
+			}
 
+			$sql = 'UPDATE groups SET name='.zbx_dbstr($group['name'])." WHERE groupid={$group['groupid']}";
+			$result = DBexecute($sql);
+			if(!$result){
+				$error = 'Database error';
+				$result = false;
+				break;
+			}
+			
+		}
 		$result = DBend($result);
+
 		if($result)
-			return $groupids;
+			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
 			return false;
 		}
 	}
@@ -519,11 +552,26 @@ class CHostGroup {
 	 */
 	public static function addHosts($data){
 
-		$result =  add_host_to_group($data['hostids'], $data['groupid']);
+		$result = true;
+		$error = 'Internal ZABBIX error';
+		
+		DBstart(false);
+		foreach($data['hostids'] as $hostid){
+			$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
+			$result = DBexecute("INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES ($hostgroupid, $hostid, {$data['groupid']})");
+			if(!$result){
+				$error = 'Database error';
+				$result = false;
+				break;
+			}
+		}
+
+		$result = DBend($result);
+		
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
 			return false;
 		}
 	}
@@ -539,24 +587,22 @@ class CHostGroup {
 	 *
 	 * @static
 	 * @param array $data
+	 * @param array $data['groupids']
+	 * @param array $data['hostids']
 	 * @return boolean
 	 */
 	public static function removeHosts($data){
-		$groupid = $data['groupid'];
-		$hostids = $data['hostids'];
-
-		DBstart(false);
-		foreach($hostids as $key => $hostid){
-			$result = delete_host_from_group($hostid, $groupid);
-			if(!$result) break;
-		}
-
+		DBstart(false);	
+		
+		$sql = 'DELETE FROM hosts_groups WHERE '.DBcondition('hostid', $data['hostids']).' AND '.DBcondition('groupid', $data['groupids']);
+		$result = DBexecute($sql);
+		
 		$result = DBend($result);
 
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Database error');
 			return false;
 		}
 	}
@@ -578,7 +624,7 @@ class CHostGroup {
 	public static function addGroupsToHost($data){
 		$hostid = $data['hostid'];
 		$groupids = $data['groupids'];
-		$result = false;
+		$result = true;
 
 		DBstart(false);
 		foreach($groupids as $key => $groupid) {
