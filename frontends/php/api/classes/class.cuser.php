@@ -31,7 +31,15 @@ class CUser{
 	public static $error;
 
 	/**
-	 * Get Users
+	 * Get Users data
+	 *
+	 * First part of parameters are filters which limits the output result set, these filters are set only if appropriate parameter is set.
+	 * For example if "type" is set, then method returns only users of given type.
+	 * Second part of parameters extends result data, adding data about others objects that are related to objects we get.
+	 * For example if "select_usrgrps" parameter is set, resulting objects will have additional property 'usrgrps' containing object with 
+	 * data about User UserGroups.
+	 * Third part of parameters affect output. For example "sortfield" will be set to 'alias', result will be sorted by User alias.
+	 * All Parameters are optional!
 	 *
 	 * {@source}
 	 * @access public
@@ -39,23 +47,23 @@ class CUser{
 	 * @since 1.8
 	 * @version 1
 	 *
-	 * @param _array $options Parameters
-	 * @param array $options['nodeids'] Node IDs
-	 * @param array $options['usrgrpids'] UserGroup IDs
-	 * @param array $options['userids'] User IDs
-	 * @param boolean $options['type'] Type
-	 * @param boolean $options['status'] Status
-	 * @param boolean $options['with_gui_access'] Only with GUI access
-	 * @param boolean $options['with_api_access'] Only with API access
-	 * @param boolean $options['select_usrgrps'] Get UsrGroups for each User
-	 * @param boolean $options['get_access'] Get access info for each user
-	 * @param boolean $options['extendoutput'] Get all information, not only User IDs
-	 * @param boolean $options['count'] Get count of Users
-	 * @param string $options['pattern'] Pattern
-	 * @param int $options['limit'] Limit
-	 * @param string $options['sortfield'] Sort filed
-	 * @param string $options['sortorder'] Sort order
-	 * @return array Users data
+	 * @param _array $options 
+	 * @param array $options['nodeids'] filter by Node IDs
+	 * @param array $options['usrgrpids'] filter by UserGroup IDs
+	 * @param array $options['userids'] filter by User IDs
+	 * @param boolean $options['type'] filter by User type [ USER_TYPE_ZABBIX_USER: 1, USER_TYPE_ZABBIX_ADMIN: 2, USER_TYPE_SUPER_ADMIN: 3 ]
+	 * @param boolean $options['status'] filter by User status [ 0, 1 ]
+	 * @param boolean $options['with_gui_access'] filter only with GUI access
+	 * @param boolean $options['with_api_access'] filter only with API access
+	 * @param boolean $options['select_usrgrps'] extend with UserGroups data for each User
+	 * @param boolean $options['get_access'] extend with access data for each User
+	 * @param boolean $options['extendoutput'] output only User IDs if not set.
+	 * @param boolean $options['count'] output only count of objects in result. ( ruselt returned in property 'rowscount' )
+	 * @param string $options['pattern'] filter by Host name containing only give pattern
+	 * @param int $options['limit'] output will be limited to given number
+	 * @param string $options['sortfield'] output will be sorted by given property [ 'userid', 'alias' ]
+	 * @param string $options['sortorder'] output will be sorted in given order [ 'ASC', 'DESC' ]
+	 * @return array 
 	 */
 	public static function get($options=array()){
 		global $USER_DETAILS;
@@ -276,7 +284,7 @@ class CUser{
 	}
 
 	/**
-	 * Authenticate user
+	 * Authenticate user 
 	 *
 	 * {@source}
 	 * @access public
@@ -321,7 +329,7 @@ class CUser{
 	}
 
 	/**
-	 * Gets all User data from DB by User ID
+	 * Get User data by User ID
 	 *
 	 * {@source}
 	 * @access public

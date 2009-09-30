@@ -55,7 +55,10 @@ include_once('include/page_header.php');
 
 	if(isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])){
 		require_once('include/export.inc.php');
-		zbxXML::import($rules, $_FILES['import_file']['tmp_name']);
+		DBstart();
+		$result = zbxXML::import($rules, $_FILES['import_file']['tmp_name']);
+		$result = DBend($result);
+		show_messages($result, S_IMPORTED.SPACE.S_SUCCESSEFULLY_SMALL, S_IMPORT.SPACE.S_FAILED_SMALL);
 	}
 
 	$header_form = new CForm();
