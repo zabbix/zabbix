@@ -1973,7 +1973,7 @@
 			switch($trhosts[$hostname]['value']){
 				case TRIGGER_VALUE_TRUE:
 					$css_class = get_severity_style($trhosts[$hostname]['priority']);
-					if( ($ack = get_last_event_by_triggerid($trhosts[$hostname]['triggerid'])) )
+					if($ack = get_last_event_by_triggerid($trhosts[$hostname]['triggerid']))
 						$ack_menu = array(S_ACKNOWLEDGE, 'acknow.php?eventid='.$ack['eventid'], array('tw'=>'_blank'));
 
 					if ( 1 == $ack['acknowledged'] )
@@ -1991,18 +1991,18 @@
 
 			$style = 'cursor: pointer; ';
 
-			if((time(NULL)-$trhosts[$hostname]['lastchange'])<300)
+			if((time()-$trhosts[$hostname]['lastchange'])<300)
 				$style .= 'background-image: url(images/gradients/blink1.gif); '.
 					'background-position: top left; '.
 					'background-repeat: repeat;';
-			else if((time(NULL)-$trhosts[$hostname]['lastchange'])<900)
+			else if((time()-$trhosts[$hostname]['lastchange'])<900)
 				$style .= 'background-image: url(images/gradients/blink2.gif); '.
 					'background-position: top left; '.
 					'background-repeat: repeat;';
 
 			unset($item_menu);
 			$tr_ov_menu = array(
-				/* name, url, (target [tw], statusbar [sb]), css, submenu */
+// name, url, (target [tw], statusbar [sb]), css, submenu
 				array(S_TRIGGER, null,  null,
 					array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
 					),
@@ -2039,6 +2039,7 @@
 					'history.php?action='.$action.'&itemid='.$item_data['itemid'].'&period=3600',
 					 array('tw'=>'', 'sb'=>$status_bar));
 			}
+
 			if(isset($item_menu['showgraph'])){
 				$tr_ov_menu[] = array(S_GRAPHS,	null, null,
 					array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
@@ -2119,6 +2120,7 @@
 			$status_col->AddAction('onmouseout', 'this.style.border=this.old_border;');
 		}
 		array_push($table_row,$status_col);
+		
 	return $table_row;
 	}
 

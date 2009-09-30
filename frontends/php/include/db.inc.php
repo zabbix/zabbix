@@ -230,7 +230,7 @@ if(!isset($DB)){
 		$DB['TRANSACTIONS']++;
 
 		if($DB['TRANSACTIONS']>1){
-			info('POSSIBLE ERROR: Used incorect logic in database processing, started subtransaction!');
+			info('POSSIBLE ERROR: Used incorrect logic in database processing, started subtransaction!');
 		return $DB['TRANSACTION_STATE'];
 		}
 
@@ -269,7 +269,7 @@ if(!isset($DB)){
 			if($DB['TRANSACTIONS'] < 1){
 				$DB['TRANSACTIONS'] = 0;
 				$DB['TRANSACTION_STATE'] = false;
-				info('POSSIBLE ERROR: Used incorect logic in database processing, transaction not started!');
+				info('POSSIBLE ERROR: Used incorrect logic in database processing, transaction not started!');
 			}
 		return $DB['TRANSACTION_STATE'];
 		}
@@ -462,7 +462,9 @@ if(!isset($DB)){
 					}
 					break;
 				case 'POSTGRESQL':
-					if(!($result = pg_query($DB['DB'],$query))){
+					$result = (bool) pg_query($DB['DB'],$query);
+
+					if(!$result){
 						error('Error in query ['.$query.'] ['.pg_last_error().']');
 					}
 					break;
@@ -661,6 +663,11 @@ else {
 	}
 
 	function get_dbid($table,$field){
+// PGSQL on transaction failure on all queries returns false..
+		global $DB
+		if(($DB['TYPE'] == 'POSTGRESQL') && $DB['TRANSACTIONS'] && !$DB['TRANSACTION_STATE']) return 1;
+//------
+
 		$nodeid = get_current_nodeid(false);
 
 		$found = false;
