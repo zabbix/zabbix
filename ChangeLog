@@ -1,5 +1,6 @@
 Changes for 1.6.7
 
+ - [ZBX-948] fixed not working keyboard keys in numericboxes for Opera (Vedmak)
  - [ZBX-915] fixed pgsql cycling on transaction failure (Artem)
  - [ZBX-985] fixed pgsql return value (Artem)
  - [ZBX-1035] fixed possibility to import graphs to host we dont have permissions (Vedmak)

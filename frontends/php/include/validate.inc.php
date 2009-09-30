@@ -434,9 +434,11 @@
 			}
 			else if($flags&P_ACT){
 				if(!isset($_REQUEST['sid'])){
+					info('Operation cannot be performed due to unauthorized request');
 					return ZBX_VALID_ERROR;
 				}
 				else if(isset($_COOKIE['zbx_sessionid']) && ($_REQUEST['sid'] != substr($_COOKIE['zbx_sessionid'],16,16))){
+					info('Operation cannot be performed due to unauthorized request');
 					return ZBX_VALID_ERROR;
 				}
 			}

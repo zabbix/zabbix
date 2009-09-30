@@ -1206,7 +1206,7 @@
 	'S_DEPENDS_ON'=>			'Depends on',
 	'S_DEPENDENT'=>				'Dependent',
 	'S_URL'=>				'URL',
-	'S_INVALID_URL_PARAMS'=>		'Invalid URL parameters',
+	'S_INVALID_URL_PARAMS'=>		'ZABBIX has recieved an incorrect request',
 	'S_CREATE_TRIGGER'=>			'Create Trigger',
 	'S_INSERT'=>				'Insert',
 	'S_SECONDS'=>				'Seconds',
