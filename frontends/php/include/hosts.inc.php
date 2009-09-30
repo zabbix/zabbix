@@ -25,28 +25,6 @@ require_once('include/items.inc.php');
 require_once('include/httptest.inc.php');
 
 /* HOST GROUP functions */
-	function add_host_to_group($hostids, $groupid){
-		zbx_value2array($hostids);
-
-		$result = true;
-		foreach($hostids as $key => $hostid) {
-			$hostgroupid = get_dbid("hosts_groups","hostgroupid");
-			$result = DBexecute("insert into hosts_groups (hostgroupid,hostid,groupid) values ($hostgroupid,$hostid,$groupid)");
-			if(!$result)
-				return $result;
-		}
-
-	return $result;
-	}
-
-	function delete_host_from_group($hostid, $groupid){
-		if(!is_numeric($hostid) || !is_numeric($groupid)){
-			error("incorrect parameters for 'add_host_to_group' [hostid:".$hostid."][groupid:".$groupid."]");
-			return false;
-		}
-
-	return DBexecute('delete from hosts_groups where hostid='.$hostid.' and groupid='.$groupid);
-	}
 
 /*
  * Function: db_save_group
@@ -59,7 +37,7 @@ require_once('include/httptest.inc.php');
  *
  * Comments:
  *
- */
+ *
 	function db_save_group($name,$groupid=null){
 		if(!is_string($name)){
 			error("incorrect parameters for 'db_save_group'");
@@ -102,6 +80,7 @@ require_once('include/httptest.inc.php');
 			return $result;
 		}
 	}
+/**/
 
 	function update_host_groups_by_groupid($groupid,$hosts=array()){
 		$grp_hosts = CHost::get(array('groupids'=>$groupid, 'editable'=>1));
@@ -123,7 +102,7 @@ require_once('include/httptest.inc.php');
 		}
 
 		$result = DBexecute('DELETE FROM hosts_groups WHERE groupid='.$groupid);
-		$result = add_host_to_group($hosts, $groupid);
+		$result = CHostGroup::addHosts(array('hostids' => $hosts, 'groupid' => $groupid));
 
 	return $result;
 	}
@@ -136,10 +115,9 @@ require_once('include/httptest.inc.php');
 		}
 
 		DBexecute('DELETE FROM hosts_groups WHERE hostid='.$hostid);
-		foreach($groups as $num => $groupid){
-			$result = add_host_to_group($hostid, $groupid);
+		foreach($groups as $groupid){
+			$result = CHostGroup::addHosts(array('hostids' => array($hostid), 'groupid' => $groupid));
 		}
-
 	return $result;
 	}
 
@@ -152,19 +130,19 @@ require_once('include/httptest.inc.php');
 	}
 
 	function add_host_group($name,$hosts=array()){
-		$groupid = db_save_group($name);
-		if(!$groupid)
-			return	$groupid;
-
+		$groupids = CHostGroup::add(array($name));
+		if(!$groupids) return $groupids;
+		
+		$groupid = reset($groupids);
 		update_host_groups_by_groupid($groupid,$hosts);
 
 	return $groupid;
 	}
 
 	function update_host_group($groupid,$name,$hosts){
-		$result = db_save_group($name,$groupid);
+		$result = CHostGroup::update(array(array('name' => $name, 'groupid' => $groupid)));
 		if(!$result)
-			return	$result;
+			return $result;
 
 		$result = update_host_groups_by_groupid($groupid,$hosts);
 
@@ -330,8 +308,8 @@ require_once('include/httptest.inc.php');
 			info('Added new host ['.$host.']');
 
 		if(!zbx_empty($newgroup)){
-			if(!$newgroupid = add_host_group($newgroup)) return false;
-			$groups[$newgroupid] = $newgroupid;
+			if(!$newgroupid = CHostGroup::add(array($newgroup))) return false;
+			$groups[$newgroupid] = reset($newgroupid);
 		}
 
 		if(!update_host_groups($hostid, $groups)) return false;
@@ -384,8 +362,8 @@ require_once('include/httptest.inc.php');
 			return $result;
 
 		if(!zbx_empty($newgroup)){
-			if(!$newgroupid = add_host_group($newgroup)) return false;
-			$groups[$newgroupid] = $newgroupid;
+			if(!$newgroupid = CHostGroup::add(array($newgroup))) return false;
+			$groups[$newgroupid] = reset($newgroupid);
 		}
 
 		$result = update_host_groups($hostid, $groups);

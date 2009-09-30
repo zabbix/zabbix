@@ -55,10 +55,20 @@ class CHost {
  * @param boolean $options['with_graphs'] only with graphs
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
  * @param int $options['extendoutput'] return all fields for Hosts
+ * @param boolean $options['select_groups'] select HostGroups
+ * @param boolean $options['select_templates'] select Templates
+ * @param boolean $options['select_items'] select Items
+ * @param boolean $options['select_triggers'] select Triggers
+ * @param boolean $options['select_graphs'] select Graphs
+ * @param boolean $options['select_applications'] select Applications
+ * @param boolean $options['select_macros'] select Macros
+ * @param boolean $options['select_profile'] select Profile
  * @param int $options['count'] count Hosts, returned column name is rowscount
- * @param string $options['pattern'] search hosts by pattern in host names
+ * @param string $options['pattern'] search hosts by pattern in Host name
+ * @param string $options['extend_pattern'] search hosts by pattern in Host name, ip and DNS
  * @param int $options['limit'] limit selection
- * @param string $options['order'] deprecated parameter (for now)
+ * @param string $options['sortfield'] field to sort by
+ * @param string $options['sortorder'] sort order
  * @return array|boolean Host data as array or false if error
  */
 	public static function get($options=array()){
@@ -575,11 +585,10 @@ class CHost {
 		$sql = 'SELECT * FROM hosts WHERE hostid='.$host_data['hostid'];
 		$host = DBfetch(DBselect($sql));
 
-		$result = $host ? true : false;
-		if($result)
+		if($host)
 			return $host;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Host with id: '.$host_data['hostid'].' doesn\'t exists.');
+			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Host with ID [ '.$host_data['hostid'].' ] does not exists');
 			return false;
 		}
 	}
@@ -598,20 +607,17 @@ class CHost {
  * @return int|boolean
  */
 	public static function getId($host_data){
-		$result = false;
-
 		$sql = 'SELECT hostid '.
 				' FROM hosts '.
 				' WHERE host='.zbx_dbstr($host_data['host']).
 					' AND '.DBin_node('hostid', get_current_nodeid(false));
 		$res = DBselect($sql);
 		if($hostid = DBfetch($res))
-			$result = $hostid['hostid'];
+			return $hostid['hostid'];
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Host with name: "'.$host_data['host'].'" doesn\'t exists.');
+			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Host with name: "'.$host_data['host'].'" does not exists.');
+			return false;
 		}
-
-	return $result;
 	}
 
 /**

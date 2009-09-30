@@ -648,7 +648,7 @@ class CTrigger {
 	 */
 	public static function update($triggers){
 
-		$result = false;
+		$result = true;
 		$triggerids = array();
 		DBstart(false);
 		foreach($triggers as $num => $trigger){
