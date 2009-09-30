@@ -62,7 +62,7 @@ class CChart extends CGraphDraw{
 		$this->grid = array();				// vertical & horizontal grids params
 
 		$this->gridLinesCount = array();	// How many grids to draw
-		$this->gridPixels = 30;				// optimal grid size
+		$this->gridPixels = 25;				// optimal grid size
 
 		$this->graphtheme = array(
 			'description' => 'default',
@@ -123,11 +123,11 @@ class CChart extends CGraphDraw{
 
 	public function updateShifts(){
 		if( ($this->yaxisleft == 1) && ($this->yaxisright == 1)){
-			$this->shiftXleft = 90;
+			$this->shiftXleft = 100;
 			$this->shiftXright = 100;
 		}
 		else if($this->yaxisleft == 1){
-			$this->shiftXleft = 90;
+			$this->shiftXleft = 100;
 			$this->shiftXright = 20;
 		}
 		else if($this->yaxisright == 1){
