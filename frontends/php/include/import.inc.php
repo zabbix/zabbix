@@ -544,14 +544,12 @@
 							info('Trigger ['.$data['description'].'] skipped - user rule for host');
 							break; // case
 						}
-						if(zbx_strstr($data['expression'],'{HOSTNAME}')){
-
+						
 // remember skipped triggers for dependencies
-							$this->data[XML_TAG_DEPENDENCIES]['skip'][] = $this->data[XML_TAG_HOST]['name'].':'.$data['description'];
-
-							error('Trigger ['.$data['description'].'] skipped - missing host');
-							break; // case
-						}
+						$this->data[XML_TAG_DEPENDENCIES]['skip'][] = $this->data[XML_TAG_HOST]['name'].':'.$data['description'];
+						error('Trigger ['.$data['description'].'] skipped - missing host');
+						break; // case
+						
 					}
 					else{
 						$data['expression'] = str_replace('{{HOSTNAME}:','{'.$this->data[XML_TAG_HOST]['name'].':',$data['expression']);
@@ -640,12 +638,9 @@
 							info('Graph ['.$data['name'].'] skipped - user rule for host');
 							break; // case
 						}
-						foreach($data['items'] as $id)
-
-						if(zbx_strstr($data['name'],'{HOSTNAME}')){
-							error('Graph ['.$data['name'].'] skipped - missing host');
-							break; // case
-						}
+									
+						error('Graph ['.$data['name'].'] skipped - missing host');
+						break; // case
 					}
 					else{
 						if($graph = DBfetch(DBselect('SELECT DISTINCT g.graphid, g.templateid'.
