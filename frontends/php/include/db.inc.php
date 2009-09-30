@@ -664,7 +664,7 @@ else {
 
 	function get_dbid($table,$field){
 // PGSQL on transaction failure on all queries returns false..
-		global $DB
+		global $DB;
 		if(($DB['TYPE'] == 'POSTGRESQL') && $DB['TRANSACTIONS'] && !$DB['TRANSACTION_STATE']) return 1;
 //------
 
