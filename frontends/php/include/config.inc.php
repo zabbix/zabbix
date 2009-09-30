@@ -140,7 +140,7 @@ function __autoload($class_name){
 		else{
 			global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID;
 
-			/* Init LOCAL NODE ID */
+// Init LOCAL NODE ID
 			if($local_node_data = DBfetch(DBselect('SELECT * FROM nodes WHERE nodetype=1 ORDER BY nodeid'))){
 				$ZBX_LOCALNODEID = $local_node_data['nodeid'];
 				$ZBX_LOCMASTERID = $local_node_data['masterid'];

@@ -1,5 +1,7 @@
 Changes for 1.7.0
 
+ - [ZBX-899] added "Show last" to "Status of triggers" events filter (Artem)
+ - [ZBX-924] added check for not empty resource (Artem)
  - [DEV-310] improvements in graph visualisation and time line scrolling (Artem)
  - [DEV-357] modified oracle schema for support of Unicode (Sasha)
  - [ZBX-1046] add DBPort description; note that socket is used for MySQL if DBHost is localhost (Richlv)
@@ -109,6 +111,8 @@ Changes for 1.7.0
 
 Changes for 1.6.7
 
+ - [ZBX-915] fixed pgsql cycling on transaction failure (Artem)
+ - [ZBX-985] fixed pgsql return value (Artem)
  - [ZBX-1035] fixed possibility to import graphs to host we dont have permissions (Vedmak)
  - [ZBX-1062] deny creation of log and eventlog items with non log type of information (Vedmak)
  - [DEV-137] fix incorrect key syntax error message (Richlv)
