@@ -260,6 +260,11 @@
 			return FALSE;
 		}
 
+		if(preg_match('/^log|eventlog\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
+			error('Value type must be Log for log key');
+			return FALSE;		
+		}
+		
 		if($item['value_type'] == ITEM_VALUE_TYPE_STR){
 			$item['delta']=0;
 		}
@@ -475,6 +480,11 @@
 			$item['delta']=0;
 		}
 
+		if(preg_match('/^log|eventlog\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
+			error('Value type must be Log for log and eventlog keys');
+			return FALSE;		
+		}
+		
 		$db_item = DBfetch(DBselect('SELECT itemid FROM items WHERE hostid='.$item['hostid'].' and itemid<>'.$itemid.' and key_='.zbx_dbstr($item['key_'])));
 		if($db_item && $item['templateid'] == 0){
 			error('An item with the same Key already exists for host '.$host['host'].'. The key must be unique.');

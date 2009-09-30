@@ -1,5 +1,6 @@
 Changes for 1.6.7
 
+ - [ZBX-1062] deny creation of log and eventlog items with non log type of information (Vedmak)
  - [DEV-137] fix incorrect key syntax error message (Richlv)
  - [ZBX-1054] fixed processing of logs and eventlogs which become empty only on the agent side (Dmitry)
  - [ZBX-1055] fixed DBexecute function result with PostreSQL (Sasha)
