@@ -67,7 +67,7 @@
 			$this->AddOption('Style', 'text-align: right;');
 			$this->AddAction('onkeypress',
 				' var c = (window.event) ? event.keyCode : event.which;'.
-				' if(event.ctrlKey || c <= 31 || (c >= 48 && c <= 57) || (c >= 37 && c <= 40) || c==46) return true; else return false; ');
+				' if(event.ctrlKey || c <= 31 || (c >= 48 && c <= 57) || (c >= 37 && c <= 40) || c==46 || c=35 || c=36) return true; else return false; ');
 			$this->AddAction('onchange',
 					($allowempty ? ' if(this.value.length==0 || this.value==null) this.value = \'\'; else ' : '').
 					' if(isNaN(parseInt(this.value,10))) this.value = 0; '.
