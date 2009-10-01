@@ -500,7 +500,7 @@ class CChart extends CGraphDraw{
 			if($val <= $minY || $val >= $maxY)	continue;
 
 			if($trigger['priority'] == 5)		$color = 'Priority Disaster';
-			elseif($trigger['priority'] == 4)	$color = 'Priority Hight';
+			elseif($trigger['priority'] == 4)	$color = 'Priority High';
 			elseif($trigger['priority'] == 3)	$color = 'Priority Average';
 			else 					$color = 'Priority';
 
