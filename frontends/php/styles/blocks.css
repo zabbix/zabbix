@@ -1,7 +1,7 @@
 /* CSS Document */
 /*
 ** ZABBIX
-** Copyright (C) 2000-2007 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -118,7 +118,7 @@ div.scrollbar .sublevel{
 
 div.scrollbar .sublevel .bg{
 	height: 27px;
-	background-image: url(../images/general/bar2/bg.png);
+	background-image: url(../images/general/bar/bg.png);
 	background-repeat:repeat-x;
 }
 
@@ -126,7 +126,7 @@ div.scrollbar .sublevel .left{
 	float: left;
 	width: 17px;
 	height: 27px;
-	background-image: url(../images/general/bar2/left.png);
+	background-image: url(../images/general/bar/left.png);
 	cursor: pointer;
 }
 
@@ -134,7 +134,7 @@ div.scrollbar .sublevel .right{
 	float: right;
 	width: 17px;
 	height: 27px;
-	background-image: url(../images/general/bar2/right.png);
+	background-image: url(../images/general/bar/right.png);
 	cursor: pointer;
 }
 
@@ -162,12 +162,12 @@ div.scrollbar .overlevel .bar .icon{
 	position: relative;
 	height: 25px;
 	
-	background-image: url(../images/general/bar2/bar_bg.png);
+	background-image: url(../images/general/bar/bar_bg.png);
 	background-repeat:repeat-x;
 }
 
 div.scrollbar .overlevel .bar .icon .center{
-	background-image: url(../images/general/bar2/bar_middle.png);
+	background-image: url(../images/general/bar/bar_middle.png);
 	background-position:center;
 	background-repeat:no-repeat;
 
@@ -194,7 +194,7 @@ div.scrollbar .overlevel .left_arr{
 	width: 9px;
 	height: 13px;
 
-	background-image: url(../images/general/bar2/left_arr.png);
+	background-image: url(../images/general/bar/left_arr.png);
 	
 	z-index: 1000;
 	cursor:e-resize;
@@ -207,7 +207,7 @@ div.scrollbar .overlevel .right_arr{
 	width: 9px;
 	height: 13px;
 
-	background-image: url(../images/general/bar2/right_arr.png);
+	background-image: url(../images/general/bar/right_arr.png);
 	
 	z-index: 1000;
 	cursor:e-resize;

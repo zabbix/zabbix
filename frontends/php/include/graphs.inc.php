@@ -351,12 +351,7 @@
 
 // Show History Graph
 	function show_history($itemid,$from,$stime,$period){
-		//$till=date(S_DATE_FORMAT_YMDHMS,time(NULL)-$from*3600);
-
-		//show_table_header(S_TILL.SPACE.$till.' ( '.zbx_date2age($stime,$stime+$period).' )');
-
 		$td = new CCol(get_js_sizeable_graph('graph','chart.php?itemid='.$itemid.
-				url_param($from,false,'from').
 				url_param($stime,false,'stime').
 				url_param($period,false,'period')));
 		$td->setAttribute('align','center');
@@ -376,7 +371,7 @@
 	}
 
 	function get_graphitem_by_gitemid($gitemid){
-		$result=DBselect("SELECT * FROM graphs_items WHERE gitemid=$gitemid");
+		$result=DBselect('SELECT * FROM graphs_items WHERE gitemid='.$gitemid);
 		$row=DBfetch($result);
 		if($row){
 			return	$row;

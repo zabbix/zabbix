@@ -55,8 +55,8 @@ class CGraphDraw{
 		$this->from=0;
 		$this->sizeX=900;				// default graph size X
 		$this->sizeY=200;				// default graph size Y
-		$this->shiftXleft=10;
-		$this->shiftXright=60;
+		$this->shiftXleft=100;
+		$this->shiftXright=50;
 		$this->shiftXCaption=0;
 		$this->shiftY=36;
 		$this->border=1;

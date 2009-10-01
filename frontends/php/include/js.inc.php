@@ -55,14 +55,14 @@ return new CJSscript('
 	<script language="JavaScript" type="text/javascript">
 	<!--
 		A_SBOX["'.$dom_graph_id.'"] = new Object;
-		A_SBOX["'.$dom_graph_id.'"].shiftT = 17;
-		A_SBOX["'.$dom_graph_id.'"].shiftL = 10;
+		A_SBOX["'.$dom_graph_id.'"].shiftT = 36;
+		A_SBOX["'.$dom_graph_id.'"].shiftL = 100;
 
 		var ZBX_G_WIDTH;
 		if(window.innerWidth) ZBX_G_WIDTH=window.innerWidth;
 		else ZBX_G_WIDTH=document.body.clientWidth;
 
-		ZBX_G_WIDTH-= 80;
+		ZBX_G_WIDTH-= 160;
 
 		insert_sizeable_graph('.zbx_jsvalue($dom_graph_id).','.zbx_jsvalue($url).');
 	-->
