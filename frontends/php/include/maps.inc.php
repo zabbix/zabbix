@@ -120,19 +120,19 @@
 		if($row){
 			return	$row;
 		}
-		error("No system map with sysmapid=[".$sysmapid."]");
+		error('No system map with sysmapid=['.$sysmapid.']');
 		return false;
 	}
 
 	function get_sysmaps_element_by_selementid($selementid){
-		$sql="select * FROM sysmaps_elements WHERE selementid=$selementid";
+		$sql='select * FROM sysmaps_elements WHERE selementid='.$selementid;
 		$result=DBselect($sql);
 		$row=DBfetch($result);
 		if($row){
 			return	$row;
 		}
 		else{
-			error("No sysmap element with selementid=[$selementid]");
+			error('No sysmap element with selementid=['.$selementid.']');
 		}
 	return	$result;
 	}
@@ -140,11 +140,10 @@
 // Add System Map
 
 	function add_sysmap($name,$width,$height,$backgroundid,$label_type,$label_location){
-		$sysmapid=get_dbid("sysmaps","sysmapid");
+		$sysmapid=get_dbid('sysmaps','sysmapid');
 
-		$result=DBexecute("insert into sysmaps (sysmapid,name,width,height,backgroundid,label_type,label_location)".
-			" values ($sysmapid,".zbx_dbstr($name).",$width,$height,".$backgroundid.",$label_type,
-			$label_location)");
+		$result=DBexecute('insert into sysmaps (sysmapid,name,width,height,backgroundid,label_type,label_location)'.
+			" values ($sysmapid,".zbx_dbstr($name).",$width,$height,".$backgroundid.",$label_type,$label_location)");
 
 		if(!$result)
 			return $result;
@@ -155,7 +154,7 @@
 // Update System Map
 
 	function update_sysmap($sysmapid,$name,$width,$height,$backgroundid,$label_type,$label_location){
-		return	DBexecute("update sysmaps set name=".zbx_dbstr($name).",width=$width,height=$height,".
+		return	DBexecute('update sysmaps set name='.zbx_dbstr($name).",width=$width,height=$height,".
 			"backgroundid=".$backgroundid.",label_type=$label_type,".
 			"label_location=$label_location WHERE sysmapid=$sysmapid");
 	}
@@ -691,79 +690,79 @@
 	return $out;
 	}
 
-        /*
-         * Function: get_action_map_by_sysmapid
-         *
-         * Description:
-         *     Retrive action for map element
-         *
-         * Author:
-         *     Eugene Grigorjev
-         *
-         */
+/*
+ * Function: get_action_map_by_sysmapid
+ *
+ * Description:
+ *     Retrive action for map element
+ *
+ * Author:
+ *     Eugene Grigorjev
+ *
+ */
 	function get_action_map_by_sysmapid($sysmapid){
-		$action_map = new CAreaMap("links$sysmapid");
+		$action_map = new CAreaMap('links'.$sysmapid);
 
-		$db_elements=DBselect('SELECT * FROM sysmaps_elements WHERE sysmapid='.$sysmapid);
+		$sql = 'SELECT * FROM sysmaps_elements WHERE sysmapid='.$sysmapid;
+		$db_elements = DBselect($sql);
 		while($db_element = DBfetch($db_elements)){
-			$url	= $db_element["url"];
-			$alt	= "Label: ".$db_element["label"];
+			$url = $db_element['url'];
+			$alt = 'Label: '.$db_element['label'];
 			$scripts_by_hosts = null;
 
-			if($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST){
-				$host = get_host_by_hostid($db_element["elementid"]);
-				if($host["status"] != HOST_STATUS_MONITORED)	continue;
+			if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
+				$host = get_host_by_hostid($db_element['elementid']);
+				if($host['status'] != HOST_STATUS_MONITORED)	continue;
 
-				$scripts_by_hosts = CScript::getScriptsByHosts(array($db_element["elementid"]));
+				$scripts_by_hosts = CScript::getScriptsByHosts(array($db_element['elementid']));
 
 				if(empty($url))	$url='tr_status.php?hostid='.$db_element['elementid'].'&noactions=true&onlytrue=true&compact=true';
 
-				$alt = "Host: ".$host["host"]." ".$alt;
+				$alt = 'Host: '.$host['host'].' '.$alt;
 			}
-			else if($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_MAP){
-				$map = get_sysmap_by_sysmapid($db_element["elementid"]);
+			else if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP){
+				$map = get_sysmap_by_sysmapid($db_element['elementid']);
 
 				if(empty($url))
-					$url="maps.php?sysmapid=".$db_element["elementid"];
+					$url='maps.php?sysmapid='.$db_element['elementid'];
 
-				$alt = "Host: ".$map["name"]." ".$alt;
+				$alt = 'Host: '.$map['name'].' '.$alt;
 			}
-			elseif($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_TRIGGER)
-			{
-				if(empty($url) && $db_element["elementid"]!=0)
-					$url="events.php?triggerid=".$db_element["elementid"];
+			else if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER){
+				if(empty($url) && $db_element['elementid']!=0)
+					$url='events.php?triggerid='.$db_element['elementid'];
 			}
-			else if($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST_GROUP){
-				if(empty($url) && $db_element["elementid"]!=0)
-					$url="events.php?hostid=0&groupid=".$db_element["elementid"];
+			else if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP){
+				if(empty($url) && $db_element['elementid']!=0)
+					$url='events.php?hostid=0&groupid='.$db_element['elementid'];
 			}
 
 			if(empty($url))	continue;
 
-			$back = get_png_by_selementid($db_element["selementid"]);
+			$back = get_png_by_selementid($db_element['selementid']);
 			if(!$back)	continue;
 
-			$x1_		= $db_element["x"];
-			$y1_		= $db_element["y"];
-			$x2_		= $db_element["x"] + imagesx($back);
-			$y2_		= $db_element["y"] + imagesy($back);
+			$x1_ = $db_element['x'];
+			$y1_ = $db_element['y'];
+			$x2_ = $db_element['x'] + imagesx($back);
+			$y2_ = $db_element['y'] + imagesy($back);
 
 			$r_area = new CArea(array($x1_,$y1_,$x2_,$y2_),$url,$alt,'rect');
 			if(!empty($scripts_by_hosts)){
 				$menus = '';
 
-				$host_nodeid = id2nodeid($db_element["elementid"]);
-				foreach($scripts_by_hosts[$db_element["elementid"]] as $id => $script){
+				$host_nodeid = id2nodeid($db_element['elementid']);
+				foreach($scripts_by_hosts[$db_element['elementid']] as $id => $script){
 					$script_nodeid = id2nodeid($script['scriptid']);
 					if( (bccomp($host_nodeid ,$script_nodeid ) == 0))
 						$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$db_element["elementid"]."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 				}
 
-				$menus.= "[".zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
+				$menus.= '['.zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 
 				$menus.= "['".S_STATUS_OF_TRIGGERS."',\"javascript: redirect('tr_status.php?groupid=0&hostid=".$db_element['elementid']."&noactions=true&onlytrue=true&compact=true');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 
-				if(!empty($db_element["url"])){
+				if(!empty($db_element['url'])){
 					$menus.= "['".S_MAP.SPACE.S_URL."',\"javascript: location.replace('".$url."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 				}
 
@@ -780,62 +779,56 @@
 		return $action_map;
 	}
 
-	function	get_icon_center_by_selementid($selementid)
-	{
+	function get_icon_center_by_selementid($selementid){
 		$element = get_sysmaps_element_by_selementid($selementid);
-		$x = $element["x"];
-		$y = $element["y"];
+		$x = $element['x'];
+		$y = $element['y'];
 
 		$image = get_png_by_selementid($selementid);
-		if($image)
-		{
+		if($image){
 			$x += imagesx($image) / 2;
 			$y += imagesy($image) / 2;
 		}
 
-		return array($x, $y);
+	return array($x, $y);
 	}
 
-	function	MyDrawLine($image,$x1,$y1,$x2,$y2,$color,$drawtype)
-	{
-		if($drawtype == MAP_LINK_DRAWTYPE_BOLD_LINE)
-		{
-			ImageLine($image,$x1,$y1,$x2,$y2,$color);
-			if(abs($x1-$x2) < abs($y1-$y2))
-			{
-				$x1++;		$x2++;
+	function MyDrawLine($image,$x1,$y1,$x2,$y2,$color,$drawtype){
+		if($drawtype == MAP_LINK_DRAWTYPE_BOLD_LINE){
+			imageline($image,$x1,$y1,$x2,$y2,$color);
+			if(abs($x1-$x2) < abs($y1-$y2)){
+				$x1++;
+				$x2++;
 			}
-			else
-			{
-				$y1++;		$y2++;
+			else{
+				$y1++;
+				$y2++;
 			}
-			ImageLine($image,$x1,$y1,$x2,$y2,$color);
+			
+			imageline($image,$x1,$y1,$x2,$y2,$color);
 		}
-		else if($drawtype == MAP_LINK_DRAWTYPE_DASHED_LINE)
-		{
-			if(function_exists("imagesetstyle"))
-			{ /* Use ImageSetStyle+ImageLIne instead of bugged ImageDashedLine */
+		else if($drawtype == MAP_LINK_DRAWTYPE_DASHED_LINE){
+			if(function_exists('imagesetstyle')){ 
+/* Use imagesetstyle+imageline instead of bugged ImageDashedLine */
 				$style = array(
 					$color, $color, $color, $color,
 					IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT
 					);
-				ImageSetStyle($image, $style);
-				ImageLine($image,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
+					
+				imagesetstyle($image, $style);
+				imageline($image,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
 			}
-			else
-			{
+			else{
 				ImageDashedLine($image,$x1,$y1,$x2,$y2,$color);
 			}
 		}
-		else if ( $drawtype == MAP_LINK_DRAWTYPE_DOT && function_exists("imagesetstyle"))
-		{
+		else if($drawtype == MAP_LINK_DRAWTYPE_DOT && function_exists('imagesetstyle')){
 			$style = array($color,IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
-			ImageSetStyle($image, $style);
-			ImageLine($image,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
+			imagesetstyle($image, $style);
+			imageline($image,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
 		}
-		else
-		{
-			ImageLine($image,$x1,$y1,$x2,$y2,$color);
+		else{
+			imageline($image,$x1,$y1,$x2,$y2,$color);
 		}
 	}
 
@@ -848,7 +841,7 @@
 			);
 
 
-	return ImageColorAllocate($im,$RGB[0],$RGB[1],$RGB[2]);
+	return imagecolorallocate($im,$RGB[0],$RGB[1],$RGB[2]);
 	}
 
 	/*
@@ -863,13 +856,10 @@
 	 *     Aleksander Vladishev
 	 *
 	 */
-	function expand_map_element_label_by_data($db_element)
-	{
+	function expand_map_element_label_by_data($db_element){
 		$label = $db_element['label'];
 
-		if (zbx_strstr($label, '{HOSTNAME}') || zbx_strstr($label, '{HOST.DNS}') ||
-				zbx_strstr($label, '{IPADDRESS}') || zbx_strstr($label, '{HOST.CONN}'))
-		{
+		if(zbx_strstr($label, '{HOSTNAME}') || zbx_strstr($label, '{HOST.DNS}') || zbx_strstr($label, '{IPADDRESS}') || zbx_strstr($label, '{HOST.CONN}')){
 			if ($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)
 				$sql = 'select * from hosts where hostid='.$db_element['elementid'];
 			else if ($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)
@@ -879,49 +869,33 @@
 				return $label;
 
 			$db_hosts = DBselect($sql);
-			if ($db_host = DBfetch($db_hosts))
-			{
-				if (zbx_strstr($label, '{HOSTNAME}'))
-				{
-					$label = str_replace('{HOSTNAME}',
-							$db_host['host'],
-							$label);
+			if ($db_host = DBfetch($db_hosts)){
+				if(zbx_strstr($label, '{HOSTNAME}')){
+					$label = str_replace('{HOSTNAME}', $db_host['host'], $label);
 				}
 
-				if (zbx_strstr($label, '{HOST.DNS}'))
-				{
-					$label = str_replace('{HOST.DNS}',
-							$db_host['dns'],
-							$label);
+				if(zbx_strstr($label, '{HOST.DNS}')){
+					$label = str_replace('{HOST.DNS}', $db_host['dns'], $label);
 				}
 
-				if (zbx_strstr($label, '{IPADDRESS}'))
-				{
-					$label = str_replace('{IPADDRESS}',
-							$db_host['ip'],
-							$label);
+				if(zbx_strstr($label, '{IPADDRESS}')){
+					$label = str_replace('{IPADDRESS}', $db_host['ip'], $label);
 				}
 
-				if (zbx_strstr($label, '{HOST.CONN}'))
-				{
-					$label = str_replace('{HOST.CONN}',
-							$db_host['useip'] ? $db_host['ip'] : $db_host['dns'],
-							$label);
+				if(zbx_strstr($label, '{HOST.CONN}')){
+					$label = str_replace('{HOST.CONN}', $db_host['useip'] ? $db_host['ip'] : $db_host['dns'], $label);
 				}
 			}
 		}
 
-		while (FALSE !== ($pos = strpos($label, '{')))
-		{
+		while(FALSE !== ($pos = strpos($label, '{'))){
 			$expr = substr($label, $pos);
 
-			if (FALSE === ($pos = strpos($expr, '}')))
-				break;
+			if(FALSE === ($pos = strpos($expr, '}'))) break;
 
 			$expr = substr($expr, 1, $pos - 1);
 
-			if (FALSE === ($pos = strpos($expr, ':')))
-			{
+			if(FALSE === ($pos = strpos($expr, ':'))){
 				$label = str_replace('{'.$expr.'}', '???', $label);
 				continue;
 			}
@@ -929,8 +903,7 @@
 			$host = substr($expr, 0, $pos);
 			$key = substr($expr, $pos + 1);
 
-			if (FALSE === ($pos = strrpos($key, '.')))
-			{
+			if(FALSE === ($pos = strrpos($key, '.'))){
 				$label = str_replace('{'.$expr.'}', '???', $label);
 				continue;
 			}
@@ -938,8 +911,7 @@
 			$function = substr($key, $pos + 1);
 			$key = substr($key, 0, $pos);
 
-			if (FALSE === ($pos = strpos($function, '(')))
-			{
+			if(FALSE === ($pos = strpos($function, '('))){
 				$label = str_replace('{'.$expr.'}', '???', $label);
 				continue;
 			}
@@ -947,19 +919,20 @@
 			$parameter = substr($function, $pos + 1);
 			$function = substr($function, 0, $pos);
 
-			if (FALSE === ($pos = strrpos($parameter, ')')))
-			{
+			if(FALSE === ($pos = strrpos($parameter, ')'))){
 				$label = str_replace('{'.$expr.'}', '???', $label);
 				continue;
 			}
 
 			$parameter = substr($parameter, 0, $pos);
 
-			$sql = 'select itemid,value_type,units from items i,hosts h where i.hostid=h.hostid and h.host='.zbx_dbstr($host).
-					' and i.key_='.zbx_dbstr($key);
+			$sql = 'SELECT itemid,value_type,units '.
+					' FROM items i,hosts h '.
+					' WHERE i.hostid=h.hostid '.
+						' AND h.host='.zbx_dbstr($host).
+						' AND i.key_='.zbx_dbstr($key);
 			$db_items = DBselect($sql);
-			if (NULL == ($db_item = DBfetch($db_items)))
-			{
+			if(NULL == ($db_item = DBfetch($db_items))){
 				$label = str_replace('{'.$expr.'}', '???', $label);
 				continue;
 			}
@@ -986,15 +959,13 @@
 					$order_field = 'clock';
 			}
 
-			if (0 == strcmp($function, 'last'))
-			{
+			if(0 == strcmp($function, 'last')){
 				$sql = 'select value from '.$history_table.' where itemid='.$db_item['itemid'].' order by '.$order_field.' desc';
 
 				$result = DBselect($sql, 1);
-				if (NULL == ($row = DBfetch($result)))
+				if(NULL == ($row = DBfetch($result)))
 					$label = str_replace('{'.$expr.'}', '('.S_NO_DATA_SMALL.')', $label);
-				else
-				{
+				else{
 					switch($db_item['value_type']){
 						case ITEM_VALUE_TYPE_FLOAT:
 						case ITEM_VALUE_TYPE_UINT64:
@@ -1007,10 +978,8 @@
 					$label = str_replace('{'.$expr.'}', $value, $label);
 				}
 			}
-			else if (0 == strcmp($function, 'min') || 0 == strcmp($function, 'max') || 0 == strcmp($function, 'avg'))
-			{
-				if ($db_item['value_type'] != ITEM_VALUE_TYPE_FLOAT && $db_item['value_type'] != ITEM_VALUE_TYPE_UINT64)
-				{
+			else if (0 == strcmp($function, 'min') || 0 == strcmp($function, 'max') || 0 == strcmp($function, 'avg')){
+				if ($db_item['value_type'] != ITEM_VALUE_TYPE_FLOAT && $db_item['value_type'] != ITEM_VALUE_TYPE_UINT64){
 					$label = str_replace('{'.$expr.'}', '???', $label);
 					continue;
 				}
@@ -1024,8 +993,7 @@
 				else
 					$label = str_replace('{'.$expr.'}', convert_units($row['value'], $db_item['units']), $label);
 			}
-			else
-			{
+			else{
 				$label = str_replace('{'.$expr.'}', '???', $label);
 				continue;
 			}

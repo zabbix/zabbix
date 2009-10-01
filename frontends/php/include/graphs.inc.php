@@ -1160,14 +1160,15 @@
 			$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
 /*
 			$ar = imagettfbbox($fontsize, $angle, $ttf, $string);
-			if(!$angle)	imagerectangle($image, $x, $y, $x+abs($ar[0] - $ar[4]), $y-abs($ar[1] - $ar[5]), $color);
-			else imagerectangle($image, $x, $y, $x-abs($ar[0] - $ar[4]), $y-abs($ar[1] - $ar[5]), $color);
+			if(!$angle)	imagerectangle($image, $x, $y+$ar[1], $x+abs($ar[0] - $ar[4]), $y+$ar[5], $color);
+			else imagerectangle($image, $x, $y+$ar[1], $x-abs($ar[0] - $ar[4]), $y+$ar[5], $color);
 //*/
 			imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
 		}
 		else{
 			$dims = imagetextsize($string);
 			switch($fontsize){
+				case 5: $fontsize = 1; break;
 				case 6: $fontsize = 1; break;
 				case 7: $fontsize = 2; break;
 				case 8: $fontsize = 3; break;
@@ -1207,21 +1208,19 @@
 		}
 		else{
 			switch($fontsize){
-				case 6: $width = 2; $height = 8; break;
-				case 7: $width = 3; $height = 10; break;
-				case 8: $width = 4; $height = 12; break;
-				case 9:	$width = 5;	$height = 13; break;
-				case 10: $width = 6; $height = 13; break;
-				case 11: $width = 7; $height = 14; break;
-				case 12: $width = 8; $height = 14; break;
-				default:
-					$fontsize = 2;
-					$height = 10;
-				break;
+				case 5: $fontsize = 1; break;
+				case 6: $fontsize = 1; break;
+				case 7: $fontsize = 2; break;
+				case 8: $fontsize = 3; break;
+				case 9:	$fontsize = 4; break;
+				case 10: $fontsize = 4; break;
+				case 11: $fontsize = 5; break;
+				case 12: $fontsize = 5; break;
+				default: $fontsize = 2; break;
 			}
 
-			$result['height'] = $height;
-			$result['width'] = strlen($string) * $width;
+			$result['height'] = imagefontheight($fontsize);
+			$result['width'] = imagefontwidth($fontsize) * strlen($string);
 		}
 
 	return $result;

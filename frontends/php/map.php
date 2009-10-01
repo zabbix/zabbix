@@ -109,7 +109,8 @@ include_once 'include/page_header.php';
 
 		for($x=$grid;$x<$width;$x+=$grid){
 			MyDrawLine($im,$x,0,$x,$height,$black, MAP_LINK_DRAWTYPE_DASHED_LINE);
-			imagestring($im, 2, $x+2,2, $x , $black);
+			imageText($im, 8, 0, $x+2, 2, $black,$x);
+//			imagestring($im, 2, $x+2,2, $x , $black);
 		}
 		for($y=$grid;$y<$height;$y+=$grid){
 			MyDrawLine($im,0,$y,$width,$y,$black, MAP_LINK_DRAWTYPE_DASHED_LINE);
@@ -205,12 +206,12 @@ include_once 'include/page_header.php';
 		$cnt = count($strings);
 		$num = 0;
 
-		$x = $db_element["x"];
-		$y = $db_element["y"];
+		$x = $db_element['x'];
+		$y = $db_element['y'];
 		$h = ImageFontHeight(2);
 
-		$x_info = $db_element["x"];
-		$y_info = $db_element["y"];
+		$x_info = $db_element['x'];
+		$y_info = $db_element['y'];
 
 		if ($label_location == MAP_LABEL_LOC_TOP)
 			$y -= $h * $cnt;
@@ -219,22 +220,23 @@ include_once 'include/page_header.php';
 		else	/* MAP_LABEL_LOC_BOTTOM */
 			$y += ImageSY($img);
 
-		foreach ($strings as $str)
-		{
+		foreach ($strings as $str){
 			$num++;
-			$w_label = ImageFontWidth(2) * strlen($str);
+			$dims = imageTextSize(8,0,$str);
 
 			if ($label_location == MAP_LABEL_LOC_TOP || $label_location == MAP_LABEL_LOC_BOTTOM)
-				$x_label = $x + ImageSX($img) / 2 - $w_label / 2;
+				$x_label = $x + imagesx($img) / 2 - $dims['width'] / 2;
 			else if ($label_location == MAP_LABEL_LOC_LEFT)
-				$x_label = $x - $w_label;
+				$x_label = $x - $dims['width'];
 			else	/* MAP_LABEL_LOC_RIGHT */
-				$x_label = $x + ImageSX($img);
+				$x_label = $x + imagesx($img);
 
-			ImageFilledRectangle($im, $x_label - 2, $y, $x_label + $w_label, $y + $h, $white);
-			imagetext($im, 3, 0, $x_label, $y, $num == $cnt ? $color : $label_color, $str);
+			
 
-			$y += $h;
+			imagefilledrectangle($im, $x_label - 2, $y+$dims['height'], $x_label + $dims['width'], $y + $h, $white);
+			imagetext($im, 8, 0, $x_label, $y+$dims['height'], ($num == $cnt)?$color:$label_color, $str);
+
+			$y += $dims['height']+4;
 		}
 	}
 
