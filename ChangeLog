@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [ZBX-1068] fix typos related to height/high (Richlv)
  - [ZBX-899] added "Show last" to "Status of triggers" events filter (Artem)
  - [ZBX-924] added check for not empty resource (Artem)
  - [DEV-310] improvements in graph visualisation and time line scrolling (Artem)
