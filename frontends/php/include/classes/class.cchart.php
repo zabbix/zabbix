@@ -1688,9 +1688,42 @@ class CChart extends CGraphDraw{
 					imagedashedline($this->im,$x1,$y1,$x2,$y2,$avg_color);
 				}
 				break;
+			case GRAPH_ITEM_DRAWTYPE_GRADIENT_LINE:
+				$height = $this->sizeY + $this->shiftY;
+				
+				ImageLine($this->im, $x1, $y1, $x2, $y2, $avg_color);  //draw the initial line
+				ImageLine($this->im, $x1, $y1-1, $x2, $y2-1, $avg_color);
+				
+				$bitmask = 255;
+				$blue = $avg_color&$bitmask;
+				// $blue_diff = 255 - $blue;
+				$bitmask = $bitmask<<8;
+				$green = ($avg_color&$bitmask)>>8;
+				// $green_diff = 255 - $green;
+				$bitmask = $bitmask<<8;
+				$red = ($avg_color&$bitmask)>>16;
+				// $red_diff = 255 - $red;
+				
+				$maxAlpha = 100;
+				$alphaRatio = $maxAlpha / ($height);
+	
+				$diffX = $x1 - $x2;
+//sdi('x1: '.$x1.'  x2: '.$x2);
+				for($i=0; $i<=$diffX; $i++){
+				
+					$Yincr = abs($y2 - $y1) / $diffX;
+					$gy = ($y1 > $y2) ? ($y2 + $Yincr*$i) : ($y2 - $Yincr*$i);
+					$steps = $this->sizeY + $this->shiftY - $gy + 1;
+					
+					for($j=0; $j<$steps; $j++){				
+						$alpha = 127 - (127 - ($alphaRatio * ($gy + $j)));
+						$color = imagecolorexactalpha($this->im, $red, $green, $blue, $alpha);
+						imagesetpixel($this->im, $x2 + $i, $gy + $j, $color);
+					}
+				}
+			break;
 		}
 	}
-
 
 	public function draw(){
 		$start_time=getmicrotime();
@@ -1838,11 +1871,11 @@ class CChart extends CGraphDraw{
 			}
 		}
 
-// grid
+//* grid
 		$this->drawTimeGrid();
 		$this->drawVerticalGrid();
 		$this->drawXYAxisScale($this->graphtheme['gridbordercolor']);
-//-----
+//-----*/
 
 		$this->drawLeftSide();
 		$this->drawRightSide();

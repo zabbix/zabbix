@@ -61,7 +61,8 @@
 				GRAPH_ITEM_DRAWTYPE_FILLED_REGION,
 				GRAPH_ITEM_DRAWTYPE_BOLD_LINE,
 				GRAPH_ITEM_DRAWTYPE_DOT,
-				GRAPH_ITEM_DRAWTYPE_DASHED_LINE
+				GRAPH_ITEM_DRAWTYPE_DASHED_LINE,
+				GRAPH_ITEM_DRAWTYPE_GRADIENT_LINE
 			);
 	}
 
@@ -84,6 +85,7 @@
 			case GRAPH_ITEM_DRAWTYPE_BOLD_LINE:		$drawtype = S_BOLD_LINE;	break;
 			case GRAPH_ITEM_DRAWTYPE_DOT:			$drawtype = S_DOT;		break;
 			case GRAPH_ITEM_DRAWTYPE_DASHED_LINE:		$drawtype = S_DASHED_LINE;	break;
+			case GRAPH_ITEM_DRAWTYPE_GRADIENT_LINE:	$drawtype = S_GRADIENT_LINE;  break;
 			default: $drawtype = S_UNKNOWN;		break;
 		}
 	return $drawtype;
