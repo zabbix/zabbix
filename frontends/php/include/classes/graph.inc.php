@@ -43,7 +43,7 @@ define('GRAPH_TYPE_3D_EXPLODED', 5);
 
 define('GRAPH_3D_ANGLE', 70);
 
-define('GRAPH_STACKED_ALFA',	15);	//0..100 transperancy
+define('GRAPH_STACKED_ALFA',	15);	//0..100 transparency
 
 define('GRAPH_ZERO_LINE_COLOR_LEFT', 'AAAAAA');
 define('GRAPH_ZERO_LINE_COLOR_RIGHT', '888888');
