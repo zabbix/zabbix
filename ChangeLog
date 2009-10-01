@@ -1,5 +1,6 @@
 Changes for 1.6.7
 
+ - [ZBX-1068] fix typos related to height/high (Richlv)
  - [ZBX-948] fixed not working keyboard keys in numericboxes for Opera (Vedmak)
  - [ZBX-915] fixed pgsql cycling on transaction failure (Artem)
  - [ZBX-985] fixed pgsql return value (Artem)

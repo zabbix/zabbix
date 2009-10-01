@@ -128,7 +128,7 @@ class Graph{
 			'ValueMin'		=> array(100,255,100,50),
 
 			'Priority Disaster'	=> array(255,0,0),
-			'Priority Hight'	=> array(255,100,100),
+			'Priority High'		=> array(255,100,100),
 			'Priority Average'	=> array(221,120,120),
 			'Priority'		=> array(100,100,100),
 			'Not Work Period'	=> array(230,230,230),
@@ -328,7 +328,7 @@ class Graph{
 			@imagecreatetruecolor(1,1)
 		)
 		{
-				return imagecolorexactalpha($this->im,$RGB[0],$RGB[1],$RGB[2],$alfa);
+			return imagecolorexactalpha($this->im,$RGB[0],$RGB[1],$RGB[2],$alfa);
 		}
 
 		return imagecolorallocate($this->im,$RGB[0],$RGB[1],$RGB[2]);

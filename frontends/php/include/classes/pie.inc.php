@@ -257,7 +257,7 @@ function SwitchPieExploded($type){
 return $this->type;
 }
 
-function calc3dhight($height){
+function calc3dheight($height){
 	$this->graphheight3d = (int) ($height/20);
 }
 
@@ -536,7 +536,7 @@ function Draw(){
 	$this->sizeX = min($this->sizeX,$this->sizeY);
 	$this->sizeY = min($this->sizeX,$this->sizeY);
 
-	$this->calc3dhight($this->sizeY);
+	$this->calc3dheight($this->sizeY);
 
 	$this->exploderad = (int) $this->sizeX / 100;
 	$this->exploderad3d = (int) $this->sizeX / 60;
