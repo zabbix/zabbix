@@ -246,7 +246,7 @@ include_once('include/page_header.php');
 				' WHERE g.graphid='.$_REQUEST['graphid'].
 					' AND gi.graphid=g.graphid ';
 
-		$res = Dbselect($sql);
+		$res = DBselect($sql);
 		while($graph=DBfetch($res)){
 			$graphtype = $graph['graphtype'];
 			$graph_height = $graph['height'];
@@ -259,10 +259,10 @@ include_once('include/page_header.php');
 		}
 		else if($yaxis == 0){
 			$shiftXleft = 100;
-			$shiftXright = 20;
+			$shiftXright = 50;
 		}
 		else{
-			$shiftXleft = 20;
+			$shiftXleft = 50;
 			$shiftXright = 100;
 		}
 //-------------

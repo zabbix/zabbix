@@ -26,7 +26,7 @@
 	$page["file"]	= "history.php";
 	$page["title"]	= "S_HISTORY";
 	$page['hist_arg'] = array('itemid', 'hostid','grouid','graphid','period','dec','inc','left','right','stime');
-	$page['scripts'] = array('gmenu.js','scrollbar.js','sbox.js','sbinit.js');
+	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','timeline.js','calendar.js','scrollbar.js','sbox.js','sbinit.js');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -327,7 +327,7 @@ include_once "include/page_header.php";
 			$limit = 500;
 		}
 		else if($_REQUEST['action']=='showvalues'){
-			$cond_clock = " and h.clock>$time and h.clock<$till";
+			$cond_clock = ' and h.clock>'.$time.' and h.clock<'.$till;
 		}
 
 		if($item_type==ITEM_VALUE_TYPE_LOG){
@@ -540,6 +540,40 @@ COpt::profiling_stop('history');
 
 		if(str_in_array($_REQUEST['action'],array('showvalues','showgraph'))){
 
+
+// NAV BAR
+			$stime = get_min_itemclock_by_itemid($_REQUEST['itemid']);
+			$stime = (is_null($stime))?0:$stime;
+			$bstime = time()-$effectiveperiod;
+			if(isset($_REQUEST['stime'])){
+				$bstime = $_REQUEST['stime'];
+				$bstime = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
+			}
+	
+			$script = 'var tline = create_timeline("graph",'.$effectiveperiod.', '.$stime.', '.($bstime + $effectiveperiod).');'."\n";
+						
+
+			if(isset($dom_graph_id)){
+				$script.= 'var scrl = scrollCreate("graph", null, tline.timelineid);'."\n";
+				$script.= 'var sbox = sbox_init("graph", tline.timelineid, "graph", ZBX_G_WIDTH, 200);'."\n";
+			}
+			else{
+				$script.= 'var scrl = scrollCreate("graph", (document.body.clientWidth - 30), tline.timelineid);'."\n";
+			}
+
+			$script.= '	addListener("graph","load",function(){ZBX_SCROLLBARS[scrl.scrollbarid].disabled=0;});'."\n".
+						'scrl.onchange = graphload; '."\n".
+						'sbox.onchange = graphload; ';
+	
+			zbx_add_post_js($script);
+//-------------
+
+			$scroll_div = new CDiv();
+			$scroll_div->setAttribute('id','scrollbar_cntr');
+			$scroll_div->setAttribute('style','margin-left: 1px; ');
+			$scroll_div->show();
+
+/*
 			$stime = get_min_itemclock_by_itemid($_REQUEST['itemid']);
 			$stime = (is_null($stime))?0:$stime;
 			$bstime = time()-$effectiveperiod;
@@ -556,10 +590,12 @@ COpt::profiling_stop('history');
 			zbx_add_post_js($script);
 
 			$scroll_div = new CDiv();
-			$scroll_div->setAttribute('id','scroll_cntnr');
+			$scroll_div->setAttribute('id','scrollbar_cntnr');
 			$scroll_div->setAttribute('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
 			$scroll_div->show();
-	//		navigation_bar("history.php",$to_save_request);
+
+//*/
+//			navigation_bar("history.php",$to_save_request);
 		}
 	}
 ?>
