@@ -31,6 +31,62 @@ class CPie extends CGraphDraw{
 		$this->graphheight3d = 12;
 		$this->shiftlegendright = 17*7 + 7 + 10; // count of static chars * px/char + for color rectangle + space
 		$this->drawlegendallow = 1;
+		
+		$this->graphtheme = array(
+			'description' => 'default',
+			'frontendtheme' => 'default.css',
+			'textcolor' => '202020',
+			'highlightcolor' => 'aa4444',
+			'backgroundcolor' => 'f0f0f0',
+			'graphcolor' => 'ffffff',
+			'graphbordercolor' => '333333',
+			'gridcolor' => 'cccccc',
+			'maingridcolor' => 'aaaaaa',
+			'gridbordercolor' => '000000',
+			'noneworktimecolor' => 'eaeaea',
+			'leftpercentilecolor' => '00AA00',
+			'righttpercentilecolor' => 'AA0000',
+			'legendview' => '1',
+			'gridview' => '1'
+		);
+
+		$this->applyGraphTheme();
+	}
+	
+/********************************************************************************************************/
+// PRE CONFIG:	ADD / SET / APPLY
+/********************************************************************************************************/
+
+	public function applyGraphTheme($description=null){
+		global $USER_DETAILS;
+
+		if(!is_null($description)){
+			$sql_where = ' AND gt.description='.zbx_dbstr($description);
+		}
+		else{
+			$config=select_config();
+			if(isset($config['default_theme']) && file_exists('styles/'.$config['default_theme'])){
+				$css = $config['default_theme'];
+			}
+
+			if(isset($USER_DETAILS['theme']) && ($USER_DETAILS['theme']!=ZBX_DEFAULT_CSS) && ($USER_DETAILS['alias']!=ZBX_GUEST_USER)){
+				if(file_exists('styles/'.$USER_DETAILS['theme'])){
+					$css = $USER_DETAILS['theme'];
+				}
+			}
+
+			$sql_where = ' AND gt.theme='.zbx_dbstr($css);
+		}
+
+		$sql = 'SELECT gt.* '.
+				' FROM graph_theme gt '.
+				' WHERE '.DBin_node('gt.graphthemeid').
+				$sql_where;
+//SDI($sql);
+		$res = DBselect($sql);
+		if($theme = DBfetch($res)){
+			$this->graphtheme = $theme;
+		}
 	}
 
 	public function switchlegend($type=false){
@@ -179,6 +235,7 @@ class CPie extends CGraphDraw{
 			if((($real_item['history']*86400) > (time()-($from_time+$this->period/2))) &&				// should pick data from history or trends
 				(($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)))		// is reasonable to take data from history?
 			{
+				$this->dataFrom = 'history';
 				array_push($sql_arr,
 					'SELECT h.itemid, '.
 						' avg(h.value) AS avg,min(h.value) AS min, '.
@@ -203,6 +260,7 @@ class CPie extends CGraphDraw{
 					);
 			}
 			else{
+				$this->dataFrom = 'trends';
 				array_push($sql_arr,
 					'SELECT t.itemid, '.
 						' avg(t.value_avg) AS avg,min(t.value_min) AS min,'.
@@ -292,7 +350,7 @@ class CPie extends CGraphDraw{
 
 		for($i=0;$i<$this->num;$i++){
 
-			$color = $this->GetColor($this->items[$i]['color']);
+			$color = $this->getColor($this->items[$i]['color'], 0);
 			$data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];
 
 			switch($this->items[$i]['calc_fnc']){
@@ -315,7 +373,8 @@ class CPie extends CGraphDraw{
 			}
 
 			$proc = ($datavalue * 100)/ $this->sum;
-	//		convert_units($datavalue,$this->items[$i]["units"]),
+
+//			convert_units($datavalue,$this->items[$i]["units"]),
 			if(isset($data) && isset($datavalue)){
 				$strvalue = sprintf(S_VALUE.': %s ('.((round($proc)!=$proc)?'%0.2f':'%s')."%s)",convert_units($datavalue,$this->items[$i]["units"]),$proc,'%');
 
@@ -331,21 +390,60 @@ class CPie extends CGraphDraw{
 					str_pad($this->items[$i]['description'],$max_desc_len,' '));
 			}
 
-			ImageFilledRectangle($this->im,$this->shiftXleft,$this->sizeY+$shiftY+12*$i,$this->shiftXleft+5,$this->sizeY+$shiftY+5+12*$i,$color);
-			ImageRectangle($this->im,$this->shiftXleft,$this->sizeY+$shiftY+12*$i,$this->shiftXleft+5,$this->sizeY+$shiftY+5+12*$i,$this->GetColor('Black No Alpha'));
 
-			imagetext($this->im, 2, 0, $this->shiftXleft+9,$this->sizeY+$shiftY-5+12*$i,
-				$this->GetColor('Black No Alpha'), $str);
+			imagefilledrectangle($this->im,
+							$this->shiftXleft,
+							$this->sizeY+$shiftY+14*$i -5,
+							$this->shiftXleft+10,
+							$this->sizeY+$shiftY+5+14*$i,
+							$color);
+							
+			imagerectangle($this->im,
+							$this->shiftXleft,
+							$this->sizeY+$shiftY+14*$i - 5,
+							$this->shiftXleft+10,
+							$this->sizeY+$shiftY+5+14*$i,
+							$this->getColor('Black No Alpha')
+						);
+
+			$dims = imageTextSize(8, 0, $str);
+			imageText($this->im, 
+						8, 
+						0, 
+						$this->shiftXleft+15,
+						$this->sizeY+$shiftY+14*$i+5, 
+						$this->getColor($this->graphtheme['textcolor'],0), 
+						$str
+					);
 
 
 			$shiftX = $this->fullSizeX - $this->shiftlegendright - $this->shiftXright + 10;
 	//		SDI($shiftX.','.$this->sizeX);
 
-			ImageFilledRectangle($this->im,$shiftX,$this->shiftY+10+5+12*$i,$shiftX+5,$this->shiftY+10+10+12*$i,$color);
-			ImageRectangle($this->im,$shiftX,$this->shiftY+10+5+12*$i,$shiftX+5,$this->shiftY+10+10+12*$i,$this->GetColor('Black No Alpha'));
+			imagefilledrectangle($this->im,
+						$shiftX-10,
+						$this->shiftY+10+14*$i,
+						$shiftX,
+						$this->shiftY+10+10+14*$i,
+						$color
+					);
+						
+			imagerectangle($this->im,
+						$shiftX-10,
+						$this->shiftY+10+14*$i,
+						$shiftX,
+						$this->shiftY+10+10+14*$i,
+						$this->GetColor('Black No Alpha')
+					);
 
-			imagetext($this->im, 2, 0, $shiftX+9, $this->shiftY+10+12*$i,
-				$this->GetColor('Black No Alpha'), $strvalue);
+			imagetext($this->im, 
+						8, 
+						0, 
+						$shiftX+5, 
+						$this->shiftY+10+14*$i+10,
+						$this->getColor($this->graphtheme['textcolor'],0), 
+						$strvalue
+				);
 		}
 
 		if($this->sizeY < 120) return;
@@ -502,9 +600,9 @@ class CPie extends CGraphDraw{
 
 		$this->selectData();
 
-		$this->shiftY = 20;
+		$this->shiftY = 30;
 		$this->shiftYLegend = 20;
-		$this->shiftXleft = 10;
+		$this->shiftXleft = 30;
 		$this->shiftXright = 0;
 
 		$this->fullSizeX = $this->sizeX;
@@ -521,7 +619,7 @@ class CPie extends CGraphDraw{
 			$this->sizeY -= ($this->shiftY*2);
 		}
 
-	//	SDI($this->sizeX.','.$this->sizeY);
+//	SDI($this->sizeX.','.$this->sizeY);
 
 		$this->sizeX = min($this->sizeX,$this->sizeY);
 		$this->sizeY = min($this->sizeX,$this->sizeY);
@@ -538,12 +636,12 @@ class CPie extends CGraphDraw{
 
 
 		$this->initColors();
-		$this->drawRectangle();
-		$this->drawHeader();
+		$this->drawRectangle($this->graphtheme['backgroundcolor'], $this->graphtheme['graphbordercolor']);
+		$this->drawHeader($this->graphtheme['textcolor']);
 
 		$maxX = $this->sizeX;
 
-		// For each metric
+// For each metric
 		for($item = 0; $item < $this->num; $item++){
 			$minY = $this->m_minY[$this->items[$item]['axisside']];
 			$maxY = $this->m_maxY[$this->items[$item]['axisside']];
@@ -593,13 +691,11 @@ class CPie extends CGraphDraw{
 		}
 
 		$this->drawLogo();
-
 		if($this->drawlegendallow == 1)	$this->drawLegend();
 
-		$end_time=getmicrotime();
 		$str=sprintf("%0.2f",(getmicrotime()-$start_time));
-		ImageString($this->im, 0,$this->fullSizeX-120,$this->fullSizeY-12,"Generated in $str sec", $this->GetColor('Gray'));
-
+		imagestring($this->im, 0,$this->fullSizeX-210,$this->fullSizeY-12,'Data from '.$this->dataFrom.'. Generated in '.$str.' sec', $this->getColor('Gray'));
+		
 		unset($this->items, $this->data);
 
 		ImageOut($this->im);

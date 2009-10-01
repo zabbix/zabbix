@@ -1168,21 +1168,30 @@
 			imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
 		}
 		else{
-			$dims = imagetextsize($string);
+			$dims = imageTextSize($fontsize, $angle, $string);
+
 			switch($fontsize){
 				case 5: $fontsize = 1; break;
 				case 6: $fontsize = 1; break;
 				case 7: $fontsize = 2; break;
-				case 8: $fontsize = 3; break;
-				case 9:	$fontsize = 4; break;
-				case 10: $fontsize = 4; break;
-				case 11: $fontsize = 5; break;
-				case 12: $fontsize = 5; break;
+				case 8: $fontsize = 2; break;
+				case 9:	$fontsize = 3; break;
+				case 10: $fontsize = 3; break;
+				case 11: $fontsize = 4; break;
+				case 12: $fontsize = 4; break;
+				case 13: $fontsize = 5; break;
+				case 14: $fontsize = 5; break;
 				default: $fontsize = 2; break;
 			}
 
-			if($angle) $x -= $dims['height'];
-			else $y -= $dims['height'];
+//SDI($dims);
+			if($angle){
+				$x -= $dims['width'];
+				$y += 2;
+			}
+			else{
+				$y -= $dims['height'] - 2;
+			}
 
 			if($angle > 0)	return imagestringup($image, $fontsize, $x, $y, $string, $color);
 			return imagestring($image, $fontsize, $x, $y, $string, $color);
@@ -1198,31 +1207,34 @@
 		if($gdinfo['FreeType Support'] && function_exists('imagettfbbox')){
 			$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
 
-
 			$ar = imagettfbbox($fontsize, $angle, $ttf, $string);
-
-//			$result['height'] = abs($ar[1] - $ar[7]);
-//			$result['width'] = abs($ar[0] - $ar[2]);
 
 			$result['height'] = abs($ar[1] - $ar[5]);
 			$result['width'] = abs($ar[0] - $ar[4]);
-
 		}
 		else{
 			switch($fontsize){
 				case 5: $fontsize = 1; break;
 				case 6: $fontsize = 1; break;
 				case 7: $fontsize = 2; break;
-				case 8: $fontsize = 3; break;
-				case 9:	$fontsize = 4; break;
-				case 10: $fontsize = 4; break;
-				case 11: $fontsize = 5; break;
-				case 12: $fontsize = 5; break;
+				case 8: $fontsize = 2; break;
+				case 9:	$fontsize = 3; break;
+				case 10: $fontsize = 3; break;
+				case 11: $fontsize = 4; break;
+				case 12: $fontsize = 4; break;
+				case 13: $fontsize = 5; break;
+				case 14: $fontsize = 5; break;
 				default: $fontsize = 2; break;
 			}
 
-			$result['height'] = imagefontheight($fontsize);
-			$result['width'] = imagefontwidth($fontsize) * strlen($string);
+			if($angle){
+				$result['width'] = imagefontheight($fontsize);
+				$result['height'] = imagefontwidth($fontsize) * strlen($string);
+			}
+			else{
+				$result['height'] = imagefontheight($fontsize);
+				$result['width'] = imagefontwidth($fontsize) * strlen($string);
+			}
 		}
 
 	return $result;

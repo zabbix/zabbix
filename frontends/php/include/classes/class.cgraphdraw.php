@@ -224,12 +224,8 @@ class CGraphDraw{
 
 //		$str.=$this->period2str($this->period);
 
-		if($this->sizeX < 500){
-			$fontnum = 8;
-		}
-		else{
-			$fontnum = 11;
-		}
+		$fontnum = 11;
+		if(($this->sizeX < 500) && ($this->type == GRAPH_TYPE_NORMAL || $this->type == GRAPH_TYPE_BAR)) $fontnum = 8;
 
 		$x=$this->fullSizeX/2-imagefontwidth($fontnum)*strlen($str)/2;
 		imagetext($this->im, $fontnum, 0, $x, 24, $this->getColor($color, 0), $str);
