@@ -1223,13 +1223,13 @@ class CChart extends CGraphDraw{
 			for($i=0; $i<=$hstr_count; $i++){
 
 				$str = convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units);
-				$dims = imageTextSize(7, 0, $str);
+				$dims = imageTextSize(8, 0, $str);
 
 				imageText($this->im,
-					7,
+					8,
 					0,
 					$this->shiftXleft - $dims['width'] - 10,
-					$this->sizeY-$this->sizeY*$i/$hstr_count+$this->shiftY + 3,
+					$this->sizeY-$this->sizeY*$i/$hstr_count+$this->shiftY + 4,
 					$this->getColor($this->graphtheme['textcolor'], 0),
 					$str
 				);
@@ -1263,10 +1263,10 @@ class CChart extends CGraphDraw{
 			for($i=0;$i<=$hstr_count;$i++){
 				$str = convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units);
 				imageText($this->im,
-					7,
+					8,
 					0,
 					$this->sizeX+$this->shiftXleft+12,
-					$this->sizeY-$this->sizeY*$i/$hstr_count+$this->shiftY + 3,
+					$this->sizeY-$this->sizeY*$i/$hstr_count+$this->shiftY + 4,
 					$this->getColor($this->graphtheme['textcolor'], 0),
 					$str
 				);
@@ -1402,14 +1402,15 @@ class CChart extends CGraphDraw{
 		$legend = new CImageTextTable($this->im, $leftXShift+10, $this->sizeY+$this->shiftY+$this->legendOffsetY);
 		$legend->color = $this->getColor($this->graphtheme['textcolor'], 0);
 		$legend->rowheight = 14;
+		$legend->fontsize = 9;
 
 		$row = array(
 				array('text' => ''),
 				array('text' => ''),
-				array('text' => 'Last', 'align'=> 1, 'fontsize' => 9),
-				array('text' => 'Min', 'align'=> 1, 'fontsize' => 9),
-				array('text' => 'Avg', 'align'=> 1, 'fontsize' => 9),
-				array('text' => 'Max', 'align'=> 1, 'fontsize' => 9)
+				array('text' => 'Last', 'align'=> 1, 'fontsize' => 10),
+				array('text' => 'Min', 'align'=> 1, 'fontsize' => 10),
+				array('text' => 'Avg', 'align'=> 1, 'fontsize' => 10),
+				array('text' => 'Max', 'align'=> 1, 'fontsize' => 10)
 			);
 
 		$legend->addRow($row);
