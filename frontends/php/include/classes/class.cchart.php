@@ -57,7 +57,10 @@ class CChart extends CGraphDraw{
 		$this->m_showTriggers = 1;
 
 		$this->zero = array();
-		$this->graphorientation = '';
+		$this->graphOrientation = array(
+				GRAPH_YAXIS_SIDE_LEFT=>'', 
+				GRAPH_YAXIS_SIDE_RIGHT=>''
+			);
 
 		$this->grid = array();				// vertical & horizontal grids params
 
@@ -128,10 +131,10 @@ class CChart extends CGraphDraw{
 		}
 		else if($this->yaxisleft == 1){
 			$this->shiftXleft = 100;
-			$this->shiftXright = 20;
+			$this->shiftXright = 50;
 		}
 		else if($this->yaxisright == 1){
-			$this->shiftXleft = 20;
+			$this->shiftXleft = 50;
 			$this->shiftXright = 100;
 		}
 //			$this->sizeX = $this->sizeX - $this->shiftXleft-$this->shiftXright;
@@ -184,24 +187,14 @@ class CChart extends CGraphDraw{
 		$this->num++;
 	}
 
-	public function checkGraphOrientation($value){
-
-		if(!empty($this->graphorientation)){
-			if(($this->graphorientation == '+') && ($value<0)){
-//					Error();
-			}
-			else if(($this->graphorientation == '-') && ($value>0)){
-//					Error();
-			}
+	public function setGraphOrientation($value, $axisside){
+		if($value < 0){
+			$this->graphOrientation[$axisside] = '-';
 		}
-		else {
-			if($value < 0){
-				$this->graphorientation = '-';
-			}
-			else if($value > 0){
-				$this->graphorientation = '+';
-			}
+		else if(zbx_empty($this->graphOrientation[$axisside]) && ($value > 0)){
+			$this->graphOrientation[$axisside] = '+';
 		}
+	return $this->graphOrientation[$axisside];
 	}
 
 	public function setYMinAxisType($yaxistype){
@@ -361,11 +354,9 @@ class CChart extends CGraphDraw{
 					$curr_data->shift_min[$idx] = 0;
 					$curr_data->shift_max[$idx] = 0;
 					$curr_data->shift_avg[$idx] = 0;
-
-					if($this->type == GRAPH_TYPE_STACKED){
-						$this->CheckGraphOrientation($curr_data->min[$idx]);
-					}
 				}
+				
+				$this->setGraphOrientation(min($curr_data->min), $this->items[$i]['axisside']);
 				unset($row);
 			}
 			/* calculate missed points */
@@ -1180,7 +1171,7 @@ class CChart extends CGraphDraw{
 						$str
 			);
 
-			imageline($this->im,
+			dashedline($this->im,
 					$i*$intervalX+$this->shiftXleft+$offsetX,
 					$this->shiftY,
 					$i*$intervalX+$this->shiftXleft+$offsetX,
@@ -1715,6 +1706,17 @@ class CChart extends CGraphDraw{
 		$this->m_maxY[GRAPH_YAXIS_SIDE_LEFT]	= $this->calculateMaxY(GRAPH_YAXIS_SIDE_LEFT);
 		$this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT]	= $this->calculateMaxY(GRAPH_YAXIS_SIDE_RIGHT);
 
+		if($this->m_minY[GRAPH_YAXIS_SIDE_LEFT] == $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT]){
+			if($this->graphOrientation[GRAPH_YAXIS_SIDE_LEFT] == '-') $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] = 0;
+			else $this->m_minY[GRAPH_YAXIS_SIDE_LEFT] = 0;
+		}
+		
+		if($this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] == $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT]){
+			if($this->graphOrientation[GRAPH_YAXIS_SIDE_RIGHT] == '-') $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] = 0;
+			else $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] = 0;
+		}
+
+
 		$this->correctMinMax();
 
 		$this->updateShifts();
@@ -1747,11 +1749,11 @@ class CChart extends CGraphDraw{
 		}
 
 		$this->drawWorkPeriod();
-// grid
+/*/ grid
 		$this->drawTimeGrid();
 		$this->drawVerticalGrid();
 		$this->drawXYAxisScale($this->graphtheme['gridbordercolor']);
-//-----
+//-----*/
 
 		$maxX = $this->sizeX;
 
@@ -1835,6 +1837,12 @@ class CChart extends CGraphDraw{
 				$j = $i;
 			}
 		}
+
+// grid
+		$this->drawTimeGrid();
+		$this->drawVerticalGrid();
+		$this->drawXYAxisScale($this->graphtheme['gridbordercolor']);
+//-----
 
 		$this->drawLeftSide();
 		$this->drawRightSide();
