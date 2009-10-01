@@ -345,6 +345,7 @@
 	'S_BOLD_LINE'=>				'Bold line',
 	'S_DOT'=>				'Dot',
 	'S_DASHED_LINE'=>			'Dashed line',
+	'S_GRADIENT_LINE' =>	'Gradient line',
 
 //	charts.php
 	'S_CUSTOM_GRAPHS'=>			'Custom graphs',
