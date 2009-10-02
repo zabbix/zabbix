@@ -319,14 +319,10 @@ include_once('include/page_header.php');
 			array(new CCheckBox('all_graphs', true, 'checkAll("'.$form->getName().'","all_graphs","graphs");'), S_GRAPHS)
 		));
 
-
+// get hosts
 		$params = array(
 			'templated_hosts' => 1,
 			'extendoutput' => 1,
-			'select_templates' => 1,
-			'select_items' => 1,
-			'select_triggers' => 1,
-			'select_graphs' => 1
 		);
 		if($selected_groupid > 0){
 			$params += array('groupids' => $selected_groupid);
@@ -337,29 +333,39 @@ include_once('include/page_header.php');
 		order_page_result($hosts_all, getPageSortField('host'), getPageSortOrder());
 		$paging = getPagingLine($hosts_all);
 //-------
-
+	
 		$count_chkbx = 0;
 		foreach($hosts_all as $hostid => $host){
 			$status = new CCol(host_status2str($host['status']), host_status2style($host['status']));
 
-			$cnt = count($host['templateids']);
-			$template_cnt = ($cnt > 0)
-				? array(new CCheckBox('templates['.$hostid.']', (isset($hostids_templates[$hostid]) || !isset($update)), NULL, $hostid), $cnt)
+			$params = array('hostids' => $hostid, 'count' => 1);
+// get item count
+			$item_cnt = CItem::get($params);
+			$item_cnt = $item_cnt['rowscount'];
+// get template count
+			$template_cnt = CTemplate::get($params);
+			$template_cnt = $template_cnt['rowscount'];
+// get trigger count
+			$trigger_cnt = CTrigger::get($params);
+			$trigger_cnt = $trigger_cnt['rowscount'];
+// get graph count
+			$graph_cnt = CGraph::get($params);
+			$graph_cnt = $graph_cnt['rowscount'];
+		
+			$template_cnt = ($template_cnt > 0)
+				? array(new CCheckBox('templates['.$hostid.']', (isset($hostids_templates[$hostid]) || !isset($update)), NULL, $hostid), $template_cnt)
 				: '-';
 
-			$cnt = count($host['itemids']);
-			$item_cnt = ($cnt > 0)
-				? array(new CCheckBox('items['.$hostid.']', (isset($hostids_items[$hostid]) || !isset($update)), NULL, $hostid), $cnt)
+			$item_cnt = ($item_cnt > 0)
+				? array(new CCheckBox('items['.$hostid.']', (isset($hostids_items[$hostid]) || !isset($update)), NULL, $hostid), $item_cnt)
 				: '-';
 
-			$cnt = count($host['triggerids']);
-			$trigger_cnt = ($cnt > 0)
-				? array(new CCheckBox('triggers['.$hostid.']', (isset($hostids_triggers[$hostid]) || !isset($update)), NULL, $hostid), $cnt)
+			$trigger_cnt = ($trigger_cnt > 0)
+				? array(new CCheckBox('triggers['.$hostid.']', (isset($hostids_triggers[$hostid]) || !isset($update)), NULL, $hostid), $trigger_cnt)
 				: '-';
 
-			$cnt = count($host['graphids']);
-			$graph_cnt = ($cnt > 0)
-				? array(new CCheckBox('graphs['.$hostid.']', (isset($hostids_graphs[$hostid]) || !isset($update)), NULL, $hostid), $cnt)
+			$graph_cnt = ($graph_cnt > 0)
+				? array(new CCheckBox('graphs['.$hostid.']', (isset($hostids_graphs[$hostid]) || !isset($update)), NULL, $hostid), $graph_cnt)
 				: '-';
 
 			if($host['status'] == HOST_STATUS_TEMPLATE){
@@ -412,5 +418,4 @@ include_once('include/page_header.php');
 
 
 include_once('include/page_footer.php');
-
 ?>
