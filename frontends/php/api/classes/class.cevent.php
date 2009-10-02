@@ -220,12 +220,12 @@ class CEvent {
 
 // time_from
 		if(!is_null($options['time_from'])){
-			$sql_parts['where'][] = 'e.clock>'.$options['time_from'];
+			$sql_parts['where'][] = 'e.clock>='.$options['time_from'];
 		}
 
 // time_till
 		if(!is_null($options['time_till'])){
-			$sql_parts['where'][] = 'e.clock<'.$options['time_till'];
+			$sql_parts['where'][] = 'e.clock<='.$options['time_till'];
 		}
 
 // value
