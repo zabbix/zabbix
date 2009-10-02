@@ -1690,7 +1690,6 @@ class CChart extends CGraphDraw{
 				}
 				break;
 			case GRAPH_ITEM_DRAWTYPE_GRADIENT_LINE:
-				$height = $this->sizeY + $this->shiftY;
 				
 				ImageLine($this->im, $x1, $y1, $x2, $y2, $avg_color);  //draw the initial line
 				ImageLine($this->im, $x1, $y1-1, $x2, $y2-1, $avg_color);
@@ -1705,8 +1704,9 @@ class CChart extends CGraphDraw{
 				$red = ($avg_color&$bitmask)>>16;
 				// $red_diff = 255 - $red;
 				
-				$maxAlpha = 100;
-				$alphaRatio = $maxAlpha / ($height);
+				$maxAlpha = 110;
+				$startAlpha = 50;
+				$alphaRatio = $maxAlpha / ($this->sizeY - $startAlpha);
 	
 				$diffX = $x1 - $x2;
 //sdi('x1: '.$x1.'  x2: '.$x2);
@@ -1716,8 +1716,14 @@ class CChart extends CGraphDraw{
 					$gy = ($y1 > $y2) ? ($y2 + $Yincr*$i) : ($y2 - $Yincr*$i);
 					$steps = $this->sizeY + $this->shiftY - $gy + 1;
 					
-					for($j=0; $j<$steps; $j++){				
-						$alpha = 127 - (127 - ($alphaRatio * ($gy + $j)));
+					for($j=0; $j<$steps; $j++){
+						if(($gy + $j) < ($this->shiftY + $startAlpha)){
+							$alpha = 0;
+						}
+						else{
+							$alpha = 127 - abs(127 - ($alphaRatio * ($gy + $j - $this->shiftY - $startAlpha)));
+						}
+						
 						$color = imagecolorexactalpha($this->im, $red, $green, $blue, $alpha);
 						imagesetpixel($this->im, $x2 + $i, $gy + $j, $color);
 					}
