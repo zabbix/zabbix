@@ -201,7 +201,7 @@ class CGraph {
 
 // count
 		if(!is_null($options['count'])){
-			$sql_parts['select']['graphs'] = 'count(g.graphid) as count';
+			$sql_parts['select']['graphs'] = 'count(g.graphid) as rowscount';
 		}
 
 // pattern

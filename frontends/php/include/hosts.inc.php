@@ -309,7 +309,7 @@ require_once('include/httptest.inc.php');
 
 		if(!zbx_empty($newgroup)){
 			if(!$newgroupid = CHostGroup::add(array($newgroup))) return false;
-			$groups[$newgroupid] = reset($newgroupid);
+			$groups[] = reset($newgroupid);
 		}
 
 		if(!update_host_groups($hostid, $groups)) return false;
