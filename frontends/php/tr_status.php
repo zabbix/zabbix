@@ -514,7 +514,7 @@ include_once('include/page_header.php');
 // We add 1 to event start url, so events would show it
 		$clock = new CLink(
 			zbx_date2str(S_DATE_FORMAT_YMDHMS, $trigger['lastchange']),
-			'events.php?triggerid='.$trigger['triggerid'].'&nav_time='.($trigger['lastchange']+1)
+			'events.php?triggerid='.$trigger['triggerid'].'&nav_time='.$trigger['lastchange']
 		);
 //--
 
