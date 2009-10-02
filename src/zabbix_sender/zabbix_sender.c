@@ -30,7 +30,7 @@ char *progname = NULL;
 
 char title_message[] = "ZABBIX Sender";
 
-char usage_message[] = "[-Vhv] {[-zpsI] -ko | [-zpI] -i <file>} [-c <file>]";
+char usage_message[] = "[-Vhv] {[-zpsI] -ko | [-zpI] -T -i <file>} [-c <file>]";
 
 #ifdef HAVE_GETOPT_LONG
 char *help_message[] = {
@@ -47,6 +47,8 @@ char *help_message[] = {
 	"",
 	"  -i --input-file <input_file>         Load values from input file",
 	"                                       Each line of file contains space delimited: <hostname> <key> <value>",
+	"  -T --with-timestamps                 Each line of file contains space delimited: <hostname> <key> <timestamp> <value>",
+	"                                       This can be used with --input-file option",
 	"",
 	"  -v --verbose                         Verbose mode, -vv for more details",
 	"",
@@ -69,7 +71,9 @@ char *help_message[] = {
 	"  -o <Key value>               Specify value of the key.",
 	"",
 	"  -i <Input file>              Load values from input file.",
-	"                               Each line of file contains: <zabbix_server> <hostname> <port> <key> <value>.",
+	"                               Each line of file contains space delimited: <hostname> <key> <value>.",
+	"  -T                           Each line of file contains space delimited: <hostname> <key> <timestamp> <value>",
+	"                               This can be used with -i option",
 	"",
 	"  -v                           Verbose mode",
 	"",
@@ -94,6 +98,7 @@ static struct zbx_option longopts[] =
 	{"key",			1,	NULL,	'k'},
 	{"value",		1,	NULL,	'o'},
 	{"input-file",		1,	NULL,	'i'},
+	{"with-timestamps",	0,	NULL,	'T'},
 	{"verbose",        	0,      NULL,	'v'},
 	{"help",        	0,      NULL,	'h'},
 	{"version",     	0,      NULL,	'V'},
@@ -102,13 +107,14 @@ static struct zbx_option longopts[] =
 
 /* short options */
 
-static char     shortopts[] = "c:I:z:p:s:k:o:i:vhV";
+static char     shortopts[] = "c:I:z:p:s:k:o:Ti:vhV";
 
 /* end of COMMAND LINE OPTIONS*/
 
 static int	CONFIG_LOG_LEVEL = LOG_LEVEL_CRIT;
 
 static char*	INPUT_FILE = NULL;
+static int	WITH_TIMESTAMPS = 0;
 
 static char*	CONFIG_SOURCE_IP = NULL;
 static char*	ZABBIX_SERVER = NULL;
@@ -348,6 +354,9 @@ static zbx_task_t parse_commandline(int argc, char **argv)
 			case 'i':
 				INPUT_FILE = strdup(zbx_optarg);
 				break;
+			case 'T':
+				WITH_TIMESTAMPS = 1;
+				break;
 			case 'v':
 				if(CONFIG_LOG_LEVEL == LOG_LEVEL_WARNING)
 					CONFIG_LOG_LEVEL = LOG_LEVEL_DEBUG;
@@ -374,11 +383,11 @@ int main(int argc, char **argv)
 #define VALUES_MAX	250
 	FILE	*in;
 
-	char	in_line[MAX_STRING_LEN],
-		*s,
+	char	in_line[MAX_BUF_LEN],
 		*hostname,
 		*key,
-		*key_value;
+		*key_value,
+		*clock;
 
 	int	task = ZBX_TASK_START,
 		total_count = 0,
@@ -441,27 +450,34 @@ int main(int argc, char **argv)
 
 			*key++ = '\0';
 
-			if (NULL == (key_value = strchr(key, ' ')))
+			if (1 == WITH_TIMESTAMPS)
+			{
+				if (NULL == (clock = strchr(key, ' ')))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "[line %d] 'Timestamp' required", total_count);
+					continue;
+				}
+			}
+			else
+				clock = key;
+
+			*clock++ = '\0';
+
+			if (NULL == (key_value = strchr(clock, ' ')))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "[line %d] 'Key value' required", total_count);
 				continue;
 			}
-
 			*key_value++ = '\0';
 
-			for (s = key_value; s && *s; s++)
-			{
-				if(*s == '\r' || *s == '\n' )
-				{
-					*s = '\0';
-					break;
-				}
-			}
+			zbx_rtrim(key_value, "\r\n");
 
 			zbx_json_addobject(&sentdval_args.json, NULL);
 			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_HOST, hostname, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_KEY, key, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_VALUE, key_value, ZBX_JSON_TYPE_STRING);
+			if (1 == WITH_TIMESTAMPS)
+				zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, atoi(clock));
 			zbx_json_close(&sentdval_args.json);
 
 			succeed_count++;
@@ -469,6 +485,11 @@ int main(int argc, char **argv)
 
 			if (VALUES_MAX == buffer_count)
 			{
+				zbx_json_close(&sentdval_args.json);
+
+				if (1 == WITH_TIMESTAMPS)
+					zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
+
 				ret = zbx_thread_wait(zbx_thread_start(send_value, &sentdval_args));
 
 				buffer_count = 0;
@@ -478,9 +499,15 @@ int main(int argc, char **argv)
 				zbx_json_addarray(&sentdval_args.json, ZBX_PROTO_TAG_DATA);
 			}
 		}
+		zbx_json_close(&sentdval_args.json);
 
 		if (0 != buffer_count)
+		{
+			if (1 == WITH_TIMESTAMPS)
+				zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
+
 			ret = zbx_thread_wait(zbx_thread_start(send_value, &sentdval_args));
+		}
 
 		fclose(in);
 	}

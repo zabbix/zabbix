@@ -1,5 +1,6 @@
 Changes for 1.6.7
 
+ - [DEV-426] added new command line parameter '-T' for zabbix_sender (Sasha)
  - [ZBX-1068] fix typos related to height/high (Richlv)
  - [ZBX-948] fixed not working keyboard keys in numericboxes for Opera (Vedmak)
  - [ZBX-915] fixed pgsql cycling on transaction failure (Artem)
