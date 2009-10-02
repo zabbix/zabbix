@@ -1097,8 +1097,15 @@ class CChart extends CGraphDraw{
 			$new_time = $this->from_time+$i*$interval+$offset;
 			$new_pos = $i*$intervalX+$offsetX;
 
-			if(($interval == 86400) && date('N',$new_time) == 1) continue;
-			else if((($i*$interval+$offset) % $main_interval) == $main_offset) continue;
+//			if(($interval == 86400) && date('N',$new_time) == 1) continue;
+// if we step to main_time
+			if(($i*$interval % $main_interval + $offset) == $main_offset) continue;			
+/*
+SDI(($i*$interval % $main_interval + $offset).' == '.$main_offset);
+SDI(($interval*$i+$offset).' : '.$interval.' - '.$main_interval);
+SDI($offset.' : '.$main_offset);
+SDI('======================================');
+//*/
 
 			dashedline($this->im,
 					$this->shiftXleft+$new_pos,
