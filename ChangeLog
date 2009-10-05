@@ -1,6 +1,6 @@
 Changes for 1.6.7
 
- - [ZBX-820] fixed updating downstream item applications when upstrim application is updated without changing applications (Vedmak)
+ - [ZBX-820] fixed updating downstream item applications when upstream item is updated without changing applications (Vedmak)
  - [DEV-426] added new command line parameter '-T' for zabbix_sender (Sasha)
  - [ZBX-1068] fix typos related to height/high (Richlv)
  - [ZBX-948] fixed not working keyboard keys in numericboxes for Opera (Vedmak)
