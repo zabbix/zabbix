@@ -1175,7 +1175,9 @@ return $result;
 function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sql=array()){
 	global $USER_DETAILS;
 	global $page;
-
+	
+	$userid = $USER_DETAILS['userid'];
+	
 	$def_sql = array(
 				'select' =>	array('h.hostid','h.host'),
 				'from' =>	array('hosts h'),
@@ -1256,7 +1258,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 			$def_sql['where'][] = 'r.id=hg.groupid ';
 			$def_sql['where'][] = 'r.groupid=ug.usrgrpid';
 			$def_sql['where'][] = 'ug.userid='.$userid;
-			$def_sql['where'][] = 'r.permission>='.$permission;
+			$def_sql['where'][] = 'r.permission>='.$perm;
 			$def_sql['where'][] = 'NOT EXISTS( '.
 									' SELECT hgg.groupid '.
 									' FROM hosts_groups hgg, rights rr, users_groups gg '.
@@ -1264,7 +1266,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 										' AND rr.id=hgg.groupid '.
 										' AND rr.groupid=gg.usrgrpid '.
 										' AND gg.userid='.$userid.
-										' AND rr.permission<'.$permission.')';
+										' AND rr.permission<'.$perm.')';
 	}
 
 // nodes

@@ -84,7 +84,8 @@ class CEvent {
 			'object'				=> null,
 			'source'				=> null,
 			'acknowledged'			=> null,
-
+			'nopermissions'			=> null,
+			
 // filter
 			'hide_unknown'			=> null,
 			'acknowledged'			=> null,
