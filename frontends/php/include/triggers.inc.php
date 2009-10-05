@@ -2415,7 +2415,7 @@
 					' WHERE e.objectid='.$triggerid.
 						' AND e.object='.EVENT_OBJECT_TRIGGER.
 						' AND e.clock<'.$period_start.
-					' ORDER BY e.clock, e.eventid DESC';
+					' ORDER BY e.clock desc, e.eventid DESC';
 			if($row = DBfetch(DBselect($sql,1))){
 				$start_value = $row['value'];
 				$min = $period_start;
