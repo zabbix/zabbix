@@ -382,6 +382,8 @@ include_once 'include/page_header.php';
 					$applications[$new_appid] = $new_appid;
 			}
 			
+			if((count($applications) == 1) && in_array(0, $applications))
+				$applications = array();
 			$item['applications'] = $applications;
 			
 			$db_item = get_item_by_itemid_limited($_REQUEST['itemid']);
