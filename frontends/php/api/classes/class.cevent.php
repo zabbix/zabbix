@@ -290,6 +290,7 @@ class CEvent {
 				' WHERE '.DBin_node('e.eventid', $nodeids).
 					$sql_where.
 				$sql_order;
+//sdi($sql);
 		$db_res = DBselect($sql, $sql_limit);
 		while($event = DBfetch($db_res)){
 			if($options['count'])

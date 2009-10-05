@@ -2330,13 +2330,13 @@ return $result;
 					' WHERE e.objectid='.$triggerid.
 						' AND e.object='.EVENT_OBJECT_TRIGGER.
 						' AND e.clock<'.$period_start.
-					' ORDER BY e.clock, e.eventid DESC';
+					' ORDER BY e.eventid DESC';
 			if($row = DBfetch(DBselect($sql,1))){
 				$start_value = $row['value'];
 				$min = $period_start;
 			}
 		}
-//SDI('ST: '.$start_value);
+
 		$sql='SELECT COUNT(*) as cnt, MIN(clock) as minn, MAX(clock) as maxx '.
 				' FROM events '.
 				' WHERE objectid='.$triggerid.
