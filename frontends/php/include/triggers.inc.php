@@ -2406,136 +2406,137 @@
 		return	$item;
 	}
 
-	function	calculate_availability($triggerid,$period_start,$period_end)
-	{
-		$sql='select count(*) as cnt,min(clock) as minn,max(clock) as maxx from events '.
-			' where objectid='.$triggerid.' and object='.EVENT_OBJECT_TRIGGER;
+	function calculate_availability($triggerid,$period_start,$period_end){
+		$start_value = -1;
+		
+		if(($period_start>0) && ($period_start < time())){
+			$sql='SELECT e.eventid, e.value '.
+					' FROM events e '.
+					' WHERE e.objectid='.$triggerid.
+						' AND e.object='.EVENT_OBJECT_TRIGGER.
+						' AND e.clock<'.$period_start.
+					' ORDER BY e.clock, e.eventid DESC';
+			if($row = DBfetch(DBselect($sql,1))){
+				$start_value = $row['value'];
+				$min = $period_start;
+			}
+		}
+//SDI('ST: '.$start_value);
+		$sql='SELECT COUNT(*) as cnt, MIN(clock) as minn, MAX(clock) as maxx '.
+				' FROM events '.
+				' WHERE objectid='.$triggerid.
+					' AND object='.EVENT_OBJECT_TRIGGER;
 
-		if($period_start!=0)	$sql .= ' and clock>='.$period_start;
-		if($period_end!=0)	$sql .= ' and clock<='.$period_end;
+		if($period_start!=0)	$sql .= ' AND clock>='.$period_start;
+		if($period_end!=0)		$sql .= ' AND clock<='.$period_end;
+//SDI($sql);
 
 		$row=DBfetch(DBselect($sql));
-		if($row["cnt"]>0)
-		{
-			$min=$row["minn"];
-			$max=$row["maxx"];
+		if($row['cnt']>0){
+			if(!isset($min)) $min=$row['minn'];
+
+			$max=$row['maxx'];
 		}
-		else
-		{
-			if(($period_start==0)&&($period_end==0))
-			{
+		else{
+			if(($period_start==0)&&($period_end==0)){
 				$max=time();
 				$min=$max-24*3600;
 			}
-			else
-			{
-				$ret["true_time"]	= 0;
-				$ret["false_time"]	= 0;
-				$ret["unknown_time"]	= 0;
-				$ret["true"]		= 0;
-				$ret["false"]		= 0;
-				$ret["unknown"]		= 100;
+			else{
+				$ret['true_time']		= 0;
+				$ret['false_time']		= 0;
+				$ret['unknown_time']	= 0;
+				$ret['true']		= (TRIGGER_VALUE_TRUE==$start_value)?100:0;
+				$ret['false']		= (TRIGGER_VALUE_FALSE==$start_value)?100:0;
+				$ret['unknown']		= (TRIGGER_VALUE_UNKNOWN==$start_value)?100:0;
 				return $ret;
 			}
 		}
 
-		$result=DBselect('select clock,value from events where objectid='.$triggerid.' and object='.EVENT_OBJECT_TRIGGER
-			.' and clock>='.$min.' and clock<='.$max);
-
-		$state		= -1;
+		$state		= $start_value;//-1;
 		$true_time	= 0;
 		$false_time	= 0;
 		$unknown_time	= 0;
 		$time		= $min;
-
-		if(($period_start==0)&&($period_end==0))
-		{
-			$max=time();
+		if(($period_start==0)&&($period_end==0)){
+			$max = time();
 		}
+		if($period_end == 0){
+			$period_end = $max;
+		}
+			
 		$rows=0;
-		while($row=DBfetch($result))
-		{
-			$clock=$row["clock"];
-			$value=$row["value"];
+		$sql = 'SELECT eventid,clock,value '.
+				' FROM events '.
+				' WHERE objectid='.$triggerid.
+					' AND object='.EVENT_OBJECT_TRIGGER.
+					' AND clock>='.$min.
+					' AND clock<='.$max.
+				' ORDER BY clock ASC, eventid ASC';
+		$result=DBselect($sql);
+		while($row=DBfetch($result)){
+			$clock=$row['clock'];
+			$value=$row['value'];
 
 			$diff=$clock-$time;
-
+//if($diff < 0) SDI($row);
 			$time=$clock;
 
-			if($state==-1)
-			{
+			if($state==-1){
 				$state=$value;
-				if($state == 0)
-				{
+				if($state == 0){
 					$false_time+=$diff;
 				}
-				if($state == 1)
-				{
+				if($state == 1){
 					$true_time+=$diff;
 				}
-				if($state == 2)
-				{
+				if($state == 2){
 					$unknown_time+=$diff;
 				}
 			}
-			else if($state==0)
-			{
+			else if($state==0){
 				$false_time+=$diff;
 				$state=$value;
 			}
-			else if($state==1)
-			{
+			else if($state==1){
 				$true_time+=$diff;
 				$state=$value;
 			}
-			else if($state==2)
-			{
+			else if($state==2){
 				$unknown_time+=$diff;
 				$state=$value;
 			}
 			$rows++;
 		}
 
-		if($rows==0)
-		{
+		if($rows==0){
 			$trigger = get_trigger_by_triggerid($triggerid);
 			$state = $trigger['value'];
 		}
-		
-		if($state==0)
-		{
-			$false_time=$false_time+$max-$time;
-		}
-		elseif($state==1)
-		{
-			$true_time=$true_time+$max-$time;
-		}
-		elseif($state==3)
-		{
-			$unknown_time=$unknown_time+$max-$time;
-		}
 
+		if($state==TRIGGER_VALUE_FALSE) $false_time=$false_time+$period_end-$time;
+		else if($state==TRIGGER_VALUE_TRUE) $true_time=$true_time+$period_end-$time;
+		else if($state==TRIGGER_VALUE_UNKNOWN) $unknown_time=$unknown_time+$period_end-$time;
 		$total_time=$true_time+$false_time+$unknown_time;
 
-		if($total_time==0)
-		{
-			$ret["true_time"]	= 0;
-			$ret["false_time"]	= 0;
-			$ret["unknown_time"]	= 0;
-			$ret["true"]		= 0;
-			$ret["false"]		= 0;
-			$ret["unknown"]		= 100;
+		if($total_time==0){
+			$ret['true_time']	= 0;
+			$ret['false_time']	= 0;
+			$ret['unknown_time']	= 0;
+			$ret['true']		= 0;
+			$ret['false']		= 0;
+			$ret['unknown']		= 100;
 		}
-		else
-		{
-			$ret["true_time"]	= $true_time;
-			$ret["false_time"]	= $false_time;
-			$ret["unknown_time"]	= $unknown_time;
-			$ret["true"]		= (100*$true_time)/$total_time;
-			$ret["false"]		= (100*$false_time)/$total_time;
-			$ret["unknown"]		= (100*$unknown_time)/$total_time;
+		else{
+			$ret['true_time']	= $true_time;
+			$ret['false_time']	= $false_time;
+			$ret['unknown_time']	= $unknown_time;
+			$ret['true']		= (100*$true_time)/$total_time;
+			$ret['false']		= (100*$false_time)/$total_time;
+			$ret['unknown']		= (100*$unknown_time)/$total_time;
 		}
-		return $ret;
+
+	return $ret;
 	}
 	
 	function construct_expression($itemid,$expressions){
