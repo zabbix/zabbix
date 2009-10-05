@@ -2323,7 +2323,7 @@ return $result;
 
 	function calculate_availability($triggerid,$period_start,$period_end){
 		$start_value = -1;
-
+		
 		if(($period_start>0) && ($period_start < time())){
 			$sql='SELECT e.eventid, e.value '.
 					' FROM events e '.
@@ -2374,8 +2374,12 @@ return $result;
 		$unknown_time	= 0;
 		$time		= $min;
 		if(($period_start==0)&&($period_end==0)){
-			$max=time();
+			$max = time();
 		}
+		if($period_end == 0){
+			$period_end = $max;
+		}
+			
 		$rows=0;
 		$sql = 'SELECT eventid,clock,value '.
 				' FROM events '.
@@ -2425,15 +2429,9 @@ return $result;
 			$state = $trigger['value'];
 		}
 
-		if($state==0){
-			$false_time=$false_time+$max-$time;
-		}
-		else if($state==1){
-			$true_time=$true_time+$max-$time;
-		}
-		else if($state==3){
-			$unknown_time=$unknown_time+$max-$time;
-		}
+		if($state==TRIGGER_VALUE_FALSE) $false_time=$false_time+$period_end-$time;
+		else if($state==TRIGGER_VALUE_TRUE) $true_time=$true_time+$period_end-$time;
+		else if($state==TRIGGER_VALUE_UNKNOWN) $unknown_time=$unknown_time+$period_end-$time;
 		$total_time=$true_time+$false_time+$unknown_time;
 
 		if($total_time==0){

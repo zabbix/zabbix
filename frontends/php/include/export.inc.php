@@ -395,8 +395,33 @@ class zbxXML{
 
 		$result = true;
 		
-		$xml = simplexml_load_file($file);
-		if(!$xml) return false;
+		libxml_use_internal_errors(true);
+		$xml = @simplexml_load_file($file);
+		
+		if(!$xml){
+		
+			foreach(libxml_get_errors() as $error){
+				$text = '';
+			
+				switch($error->level){
+					case LIBXML_ERR_WARNING:
+						$text .= "Warning $error->code: ";
+					break;
+					case LIBXML_ERR_ERROR:
+						$text .= "Error $error->code: ";
+					break;
+					case LIBXML_ERR_FATAL:
+						$text .= "Fatal Error $error->code: ";
+					break;
+				}
+				
+				$text .= trim($error->message) . " [ File: $error->file | Line: $error->line | Column: $error->column ]";					
+				error($text);
+			}
+			
+			libxml_clear_errors();
+			return false;
+		}
 
 		$triggers_for_dependencies = array();
 
