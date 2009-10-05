@@ -5,7 +5,7 @@ Changes for 1.6.7
  - [ZBX-948] fixed not working keyboard keys in numericboxes for Opera (Vedmak)
  - [ZBX-915] fixed pgsql cycling on transaction failure (Artem)
  - [ZBX-985] fixed pgsql return value (Artem)
- - [ZBX-1035] fixed possibility to import graphs to host we dont have permissions (Vedmak)
+ - [ZBX-1035] fixed possibility to import graphs to host we don't have permissions (Vedmak)
  - [ZBX-1062] deny creation of log and eventlog items with non log type of information (Vedmak)
  - [DEV-137] fix incorrect key syntax error message (Richlv)
  - [ZBX-1054] fixed processing of logs and eventlogs which become empty only on the agent side (Dmitry)
