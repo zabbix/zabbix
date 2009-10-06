@@ -424,7 +424,7 @@ include_once('include/page_header.php');
 				'delay_flex'		=> $db_delay_flex,
 				'params'			=> null,
 				'ipmi_sensor'		=> get_request('ipmi_sensor'),
-				'applications'		=> get_request('applications',array()),
+				'applications'		=> get_request('applications',null),
 				'data_type'		=> get_request('data_type'));
 
 		DBstart();
