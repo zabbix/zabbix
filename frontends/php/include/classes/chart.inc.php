@@ -599,8 +599,9 @@ class Chart extends Graph{
 				$a[6] = $x2;		$a[7] = $y2;
 
 //					SDI($a);
-
-				imagefilledpolygon($this->im,$a,4,$avg_color);
+				if(($y1 != $y1_shift) || ($y2 != $y2_shift)){
+					imagefilledpolygon($this->im,$a,4,$avg_color);
+				}
 				break;
 			case GRAPH_ITEM_DRAWTYPE_DOT:
 				imagefilledrectangle($this->im,$x1-1,$y1-1,$x1+1,$y1+1,$avg_color);
