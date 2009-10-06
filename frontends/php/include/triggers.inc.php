@@ -625,12 +625,13 @@
 		$expr_full_replace_to = $ZBX_TR_EXPR_REPLACE_TO . '_full';
         $expr_full_token = '^([[:print:]]*?)([\(]{0,2}' . $ZBX_TR_EXPR_REPLACE_TO .
             ZBX_EREG_SPACES . '[\)]?' . ZBX_EREG_SIGN . ZBX_EREG_SPACES . ZBX_EREG_NUMBER . '[\)]?)([[:print:]]*)$';
+			
         while (mb_ereg($expr_full_token, $expr, $arr))
         {
             array_push($temp, array('sign' => $arr[4], 'value' => $arr[6]));
             $expr = $arr[1] . $expr_full_replace_to . $arr[7];
         }
-
+		
         /* outline */
         $outline = $expr;
         $mark = ord('A');
@@ -650,10 +651,9 @@
         for ($i = 0, $size = $mark - ord('A'); $i < $size; ++$i)
         {
             $map[chr($i + ord('A'))] = array('expression'   => $temp[$size - $i - 1],
-                                             'sign'         => $temp[$size * 2 - $i - 1]['sign'],
-                                             'value'        => $temp[$size * 2 - $i - 1]['value']);
+                                             'sign'         => $temp[$size + $i]['sign'],
+                                             'value'        => $temp[$size + $i]['value']);
         }
-
         return array($outline, $root, $map);
     }
 
