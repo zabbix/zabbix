@@ -113,7 +113,7 @@
 		
 		
 		$visible = get_request('visible', array());
-		$dependencies = get_request('dependencies',array());
+		$_REQUEST['dependencies'] = get_request('dependencies',array());
 		
 		$triggers = $_REQUEST['g_triggerid'];
 		$triggers = array_intersect($triggers, $available_triggers);
