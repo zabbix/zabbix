@@ -479,13 +479,12 @@
 		'snmpv3_securityname','snmpv3_securitylevel','snmpv3_authpassphrase','snmpv3_privpassphrase',
 		'formula','trends','logtimefmt','valuemapid','delay_flex','params','ipmi_sensor','applications','templateid');
 //*/
-//sdii($item['applications']);
-		$upd_app = !is_null($item['applications']);
-// sdi($upd_app);		
+		$upd_app = ((isset($item['applications'])) && !is_null($item['applications']));
 		$item_in_params = $item;
 
 		$item_data = get_item_by_itemid_limited($itemid);
 		$item_data['applications'] = get_applications_by_itemid($itemid);
+		
 
 		if(!check_db_fields($item_data, $item)){
 			error('Incorrect arguments pasted to function [update_item]');
@@ -583,12 +582,10 @@
 
 
 		if($upd_app){
-			if(isset($_REQUEST['applications_visible'])){
-				$result = DBexecute('DELETE FROM items_applications WHERE itemid='.$itemid);
-				foreach($item['applications'] as $appid){
-					$itemappid=get_dbid('items_applications','itemappid');
-					DBexecute('INSERT INTO items_applications (itemappid,itemid,applicationid) VALUES ('.$itemappid.','.$itemid.','.$appid.')');
-				}
+			$result = DBexecute('DELETE FROM items_applications WHERE itemid='.$itemid);
+			foreach($item['applications'] as $appid){
+				$itemappid=get_dbid('items_applications','itemappid');
+				DBexecute('INSERT INTO items_applications (itemappid,itemid,applicationid) VALUES ('.$itemappid.','.$itemid.','.$appid.')');
 			}
 		}
 

@@ -1775,7 +1775,6 @@
 		$frmItem = new CFormTable(S_ITEM, 'items.php', 'post');
 		$frmItem->setHelp('web.items.item.php');
 		$frmItem->addVar('config',get_request('config', 0));
-		$frmItem->addVar('applications_visible',1);
 
 		$hostid				= get_request('hostid',		0);
 		$form_hostid		= get_request('form_hostid',0);
