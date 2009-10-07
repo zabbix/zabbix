@@ -23,12 +23,11 @@
 	require_once('include/graphs.inc.php');
 	require_once('include/screens.inc.php');
 	require_once('include/blocks.inc.php');
-	require_once('include/nodes.inc.php');
 
 	$page['title'] = "S_CUSTOM_SCREENS";
 	$page['file'] = 'screens.php';
 	$page['hist_arg'] = array('config','elementid');
-	$page['scripts'] = array('gmenu.js','scrollbar.js','sbox.js','sbinit.js'); //do not change order!!!
+	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','timeline.js','calendar.js','scrollbar.js','sbox.js','sbinit.js');
 
 	$_REQUEST['config'] = get_request('config',0);
 	if($_REQUEST['config'] == 1) redirect('slides.php');
@@ -224,20 +223,31 @@ include_once('include/page_header.php');
 		$_REQUEST['elementid'] = $elementid;
 
 		if( 2 != $_REQUEST['fullscreen'] ){
-
-			$stime = time() - (31536000); // ~1year
-			$bstime = time()-$effectiveperiod;
-
+// NAV BAR	
+			$timeline = array(); 
+			$timeline['period'] = $effectiveperiod;
+			$timeline['starttime'] = time() - ZBX_MAX_PERIOD;
+	
 			if(isset($_REQUEST['stime'])){
 				$bstime = $_REQUEST['stime'];
-				$bstime = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
+				$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
+				$timeline['usertime'] += $timeline['period'];
 			}
 
- 			$script = 	'scrollinit(0,'.$effectiveperiod.','.$stime.',0,'.$bstime.');
-						 showgraphmenu("iframe");';
-
-			zbx_add_post_js($script);
-//			navigation_bar('screens.php',array('config','elementid'));
+			$dom_graph_id = 'screen_scroll';
+			$objData = array(
+				'id' => $dom_graph_id,
+				'domid' => $dom_graph_id,
+				'loadSBox' => 0,
+				'loadImage' => 0,
+				'loadScroll' => 1,
+				'scrollWidthByImage' => 0,
+				'dynamic' => 0,
+				'mainObject' => 1
+			);
+						
+			zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
+			zbx_add_post_js('timeControl.processObjects();');
 		}
 	}
 	else{
@@ -275,7 +285,7 @@ include_once('include/page_header.php');
 	$screens_wdgt->show();
 
 	$scroll_div = new CDiv();
-	$scroll_div->setAttribute('id','scroll_cntnr');
+	$scroll_div->setAttribute('id','scrollbar_cntr');
 	$scroll_div->setAttribute('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
 	$scroll_div->show();
 
@@ -284,6 +294,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
 
 ?>

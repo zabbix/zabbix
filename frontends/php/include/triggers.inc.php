@@ -2399,15 +2399,9 @@ return $result;
 
 			if($state==-1){
 				$state=$value;
-				if($state == 0){
-					$false_time+=$diff;
-				}
-				if($state == 1){
-					$true_time+=$diff;
-				}
-				if($state == 2){
-					$unknown_time+=$diff;
-				}
+				if($state == 0) $false_time+=$diff;
+				if($state == 1)	$true_time+=$diff;
+				if($state == 2)	$unknown_time+=$diff;
 			}
 			else if($state==0){
 				$false_time+=$diff;
@@ -2434,7 +2428,7 @@ return $result;
 		else if($state==TRIGGER_VALUE_UNKNOWN) $unknown_time=$unknown_time+$period_end-$time;
 		$total_time=$true_time+$false_time+$unknown_time;
 
-		if($total_time==0){
+		if($total_time == 0){
 			$ret['true_time']	= 0;
 			$ret['false_time']	= 0;
 			$ret['unknown_time']	= 0;
@@ -2454,18 +2448,18 @@ return $result;
 	return $ret;
 	}
 
-	/*
-	 * Function: trigger_depenent_rec
-	 *
-	 * Description:
-	 *     check if trigger depends on other triggers having status TRUE
-	 *
-	 * Author:
-	 *     Alexei Vladishev
-	 *
-	 * Comments: Recursive function
-	 *
-	 */
+/*
+ * Function: trigger_depenent_rec
+ *
+ * Description:
+ *     check if trigger depends on other triggers having status TRUE
+ *
+ * Author:
+ *     Alexei Vladishev
+ *
+ * Comments: Recursive function
+ *
+ */
 	function trigger_dependent_rec($triggerid,&$level){
 		$ret = FALSE;
 
@@ -2490,18 +2484,18 @@ return $result;
 	return $ret;
 	}
 
-	/*
-	 * Function: trigger_depenent
-	 *
-	 * Description:
-	 *     check if trigger depends on other triggers having status TRUE
-	 *
-	 * Author:
-	 *     Alexei Vladishev
-	 *
-	 * Comments:
-	 *
-	 */
+/*
+ * Function: trigger_depenent
+ *
+ * Description:
+ *     check if trigger depends on other triggers having status TRUE
+ *
+ * Author:
+ *     Alexei Vladishev
+ *
+ * Comments:
+ *
+ */
 	function trigger_dependent($triggerid){
 		$level = 0;
 		return trigger_dependent_rec($triggerid, $level);

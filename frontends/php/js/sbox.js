@@ -23,40 +23,39 @@
 
 <!--
 
-var A_SBOX = {};		//selection box obj reference
+var ZBX_SBOX = {};		//selection box obj reference
 
-function sbox_init(sbid, timeline, obj, width, height){
-	if(is_null(sbid)){
-		var sbid = A_SBOX.length;
-	}
+function sbox_init(sbid, timeline, domobjectid){
+	if(!isset(domobjectid, ZBX_SBOX)) throw('TimeControl: SBOX is not defined for object "'+domobjectid+'"');
+	if(is_null(timeline)) throw("Parametrs haven't been sent properly");
 	
-	if(is_null(timeline)){
-		throw "Parametrs haven't been sent properly";
-		return false;
-	}
+	if(is_null(sbid))	var sbid = ZBX_SBOX.length;
+	
+	var dims = getDimensions(domobjectid);
+	var width = dims.width - (ZBX_SBOX[domobjectid].shiftL + ZBX_SBOX[domobjectid].shiftR);
 
-	var obj = $(obj);
-	A_SBOX[sbid].sbox = new sbox(sbid, timeline, obj, width, height);
+	var obj = $(domobjectid);
+	ZBX_SBOX[sbid].sbox = new sbox(sbid, timeline, obj, width, ZBX_SBOX[sbid].height);
 	
 // Listeners
 	addListener(window,'resize',moveSBoxes);
 	
 	if(IE6){
-		obj.attachEvent('onmousedown',A_SBOX[sbid].sbox.mousedown.bindAsEventListener(A_SBOX[sbid].sbox));
-		obj.onmousemove = A_SBOX[sbid].sbox.mousemove.bind(A_SBOX[sbid].sbox);
+		obj.attachEvent('onmousedown',ZBX_SBOX[sbid].sbox.mousedown.bindAsEventListener(ZBX_SBOX[sbid].sbox));
+		obj.onmousemove = ZBX_SBOX[sbid].sbox.mousemove.bind(ZBX_SBOX[sbid].sbox);
 	}
 	else{
-		addListener(A_SBOX[sbid].sbox.dom_obj,'mousedown',A_SBOX[sbid].sbox.mousedown.bindAsEventListener(A_SBOX[sbid].sbox),false);
-		addListener(document,'mousemove',A_SBOX[sbid].sbox.mousemove.bindAsEventListener(A_SBOX[sbid].sbox),false);
+		addListener(ZBX_SBOX[sbid].sbox.dom_obj,'mousedown',ZBX_SBOX[sbid].sbox.mousedown.bindAsEventListener(ZBX_SBOX[sbid].sbox),false);
+		addListener(document,'mousemove',ZBX_SBOX[sbid].sbox.mousemove.bindAsEventListener(ZBX_SBOX[sbid].sbox),false);
 	}
 	
-	addListener(document,'mouseup',A_SBOX[sbid].sbox.mouseup.bindAsEventListener(A_SBOX[sbid].sbox),true);
+	addListener(document,'mouseup',ZBX_SBOX[sbid].sbox.mouseup.bindAsEventListener(ZBX_SBOX[sbid].sbox),true);
 	
 	if(KQ){
-		setTimeout('A_SBOX['+sbid+'].sbox.moveSBoxByObj('+sbid+');',500);
+		setTimeout('ZBX_SBOX['+sbid+'].sbox.moveSBoxByObj('+sbid+');',500);
 	}
 
-return A_SBOX[sbid].sbox;
+return ZBX_SBOX[sbid].sbox;
 }
 
 
@@ -333,8 +332,8 @@ moveSBoxByObj: function(){
 	
 	var posxy = getPosition(this.grphobj);
 
-	this.dom_obj.style.top = (posxy.top+A_SBOX[this.sbox_id].shiftT)+'px';
-	this.dom_obj.style.left = (posxy.left+A_SBOX[this.sbox_id].shiftL-1)+'px';	
+	this.dom_obj.style.top = (posxy.top+ZBX_SBOX[this.sbox_id].shiftT)+'px';
+	this.dom_obj.style.left = (posxy.left+ZBX_SBOX[this.sbox_id].shiftL-1)+'px';	
 
 	posxy = getPosition(this.dom_obj);
 
@@ -403,8 +402,8 @@ return div;
 }
 
 function moveSBoxes(){
-	for(var key in A_SBOX){
-		if(!empty(A_SBOX[key]) && isset('sbox', A_SBOX[key]))
-			A_SBOX[key].sbox.moveSBoxByObj();
+	for(var key in ZBX_SBOX){
+		if(!empty(ZBX_SBOX[key]) && isset('sbox', ZBX_SBOX[key]))
+			ZBX_SBOX[key].sbox.moveSBoxByObj();
 	}
 }

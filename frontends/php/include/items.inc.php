@@ -493,8 +493,7 @@
 
 		$host = get_host_by_hostid($item['hostid']);
 
-		if(($i = array_search(0,$item['applications'])) !== FALSE)
-			unset($item['applications'][$i]);
+		if(($i = array_search(0,$item['applications'])) !== FALSE) unset($item['applications'][$i]);
 
 		if( !preg_match('/^'.ZBX_PREG_ITEM_KEY_FORMAT.'$/u', $item['key_']) ){
 			error("Incorrect key format 'key_name[param1,param2,...]'");
@@ -532,7 +531,7 @@
 			return FALSE;		
 		}
 		
-		if ($item['value_type'] != ITEM_VALUE_TYPE_UINT64) {
+		if($item['value_type'] != ITEM_VALUE_TYPE_UINT64) {
 			$item['data_type'] = 0;
 		}
 
@@ -638,18 +637,18 @@
 	return $result;
 	}
 
-	/*
-	 * Function: smart_update_item
-	 *
-	 * Description:
-	 *     Update specified fields of item
-	 *
-	 * Author:
-	 *     Aly
-	 *
-	 * Comments:
-	 *
-	 */
+/*
+ * Function: smart_update_item
+ *
+ * Description:
+ *     Update specified fields of item
+ *
+ * Author:
+ *     Aly
+ *
+ * Comments:
+ *
+ */
 	function smart_update_item($itemid, $item=array()){
 		$item_data = get_item_by_itemid_limited($itemid);
 

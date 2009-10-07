@@ -320,6 +320,7 @@ onSuccess: function(resp){
 		return false;
 	}
 	else{
+//alert(resp.responseText);
 		this._domobj.update(resp.responseText);
 	}
 //SDI(resp.responseText);

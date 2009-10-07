@@ -37,16 +37,6 @@ div.scrollbar .info{
 	vertical-align:bottom;
 }
 
-div.scrollbar .info .gmenu{
-	height: 12px;
-	width: 16px;
-	float: left;
-	margin: 1px;
-	margin-right: 5px;
-	background-image: url(../images/general/calendar/cal.gif);
-	background-repeat:no-repeat;
-}
-
 div.scrollbar .info .zoom{
 	float: left;
 	border: 0px #FF00FF solid;
