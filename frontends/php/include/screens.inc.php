@@ -20,6 +20,7 @@
 
 	require_once('include/events.inc.php');
 	require_once('include/actions.inc.php');
+	require_once('include/js.inc.php');
 
 ?>
 <?php
@@ -251,6 +252,7 @@
 		$i = 0;
 		foreach($slides as $slide){
 			$slideid = get_dbid('slides','slideid');
+			if(!isset($slide['delay'])) $slide['delay'] = $delay;
 			$result = DBexecute('INSERT INTO slides (slideid,slideshowid,screenid,step,delay) '.
 				' VALUES ('.$slideid.','.$slideshowid.','.$slide['screenid'].','.($i++).','.$slide['delay'].')');
 			if(!$result){
@@ -306,19 +308,17 @@
 				break;
 		}
 
-		$sql='SELECT h.clock,h.value,i.valuemapid '.
-			' FROM '.$history_table.' h, items i '.
-			' WHERE h.itemid=i.itemid '.
-				' AND i.itemid='.$itemid.
-			' ORDER BY h.'.$order_field.' DESC';
-
-		$result=DBselect($sql,$elements);
-
 		$host = get_host_by_itemid($itemid);
 
 		$table = new CTableInfo();
 		$table->setHeader(array(S_TIMESTAMP,$host['host'].': '.item_description($item)));
 
+		$sql='SELECT h.clock,h.value,i.valuemapid '.
+				' FROM '.$history_table.' h, items i '.
+				' WHERE h.itemid=i.itemid '.
+					' AND i.itemid='.$itemid.
+				' ORDER BY h.'.$order_field.' DESC';
+		$result=DBselect($sql,$elements);
 		while($row=DBfetch($result)){
 			switch($item['value_type']){
 				case ITEM_VALUE_TYPE_TEXT:
@@ -357,9 +357,13 @@
 			if($row['valuemapid'] > 0)
 				$value = replace_value_by_map($value, $row['valuemapid']);
 
-			$table->AddRow(array(date(S_DATE_FORMAT_YMDHMS,$row['clock']),	$value));
+			$pre = new CTag('pre', true);
+			$pre->addItem($value);
+
+			$table->addRow(array(date(S_DATE_FORMAT_YMDHMS,$row['clock']),	$pre));
 		}
-		return $table;
+		
+	return $table;
 	}
 
 /*
@@ -912,44 +916,27 @@
 					$item_form = true;
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_GRAPH) ){
-					if($editmode == 0)
-						$action = 'charts.php?graphid='.$resourceid.url_param('period').url_param('stime');
-
-					$graphid = null;
-					$graphtype = GRAPH_TYPE_NORMAL;
-					$yaxis = 0;
+					if($editmode == 0)	$action = 'charts.php?graphid='.$resourceid.url_param('period').url_param('stime');
 
 // GRAPH & ZOOM features
-					$sql = 'SELECT MAX(g.graphid) as graphid, MAX(g.graphtype) as graphtype, MIN(gi.yaxisside) as yaxissidel, MAX(gi.yaxisside) as yaxissider,'.
-								' MAX(g.show_legend) as legend, MAX(g.show_3d) as show3d '.
-							' FROM graphs g, graphs_items gi '.
-							' WHERE g.graphid='.$resourceid.
-								' AND gi.graphid=g.graphid ';
+					$dom_graph_id = 'graph_'.$screenitemid.'_'.$resourceid;
+					$containerid = 'graph_cont_'.$screenitemid.'_'.$resourceid;
+					$graphDims = getGraphDims($resourceid);
+					
+					$graphDims['height'] = $height;
+					$graphDims['width'] = $width;
 
+					$sql = 'SELECT g.graphid, g.show_legend as legend, g.show_3d as show3d '.
+							' FROM graphs g '.
+							' WHERE g.graphid='.$resourceid;
 					$res = DBselect($sql);
-					while($graph=DBfetch($res)){
+					if($graph=DBfetch($res)){
 						$graphid = $graph['graphid'];
-						$graphtype = $graph['graphtype'];
-						$yaxis = $graph['yaxissider'];
-						$yaxis = ($graph['yaxissidel'] == $yaxis)?($yaxis):(2);
-
 						$legend = $graph['legend'];
 						$graph3d = $graph['show3d'];
-					}
-
-					if($yaxis == 2){
-						$shiftXleft = 60;
-						$shiftXright = 60;
-					}
-					else if($yaxis == 0){
-						$shiftXleft = 60;
-						$shiftXright = 20;
-					}
-					else{
-						$shiftXleft = 10;
-						$shiftXright = 60;
-					}
+					}					
 //-------------
+
 // Host feature
 					if(($dynamic == SCREEN_DYNAMIC_ITEM) && isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0)){
 						$def_items = array();
@@ -959,74 +946,117 @@
 						}
 
 						$url='';
-						if($new_items = get_same_graphitems_for_host($def_items, $_REQUEST['hostid'])){
+						if($new_items = get_same_graphitems_for_host($def_items, $_REQUEST['hostid'], false)){
 							$url.= make_url_from_gitems($new_items);
 						}
 
 						$url= make_url_from_graphid($resourceid,false).$url;
 					}
 //-------------
+					
+					if(($graphDims['graphtype'] == GRAPH_TYPE_PIE) || ($graphDims['graphtype'] == GRAPH_TYPE_EXPLODED)){
+						$src = 'chart6.php?graphid='.$resourceid.url_param('stime').'&period='.$effectiveperiod;			
+					}
+					else{
+						$src = 'chart2.php?graphid='.$resourceid.url_param('stime').'&period='.$effectiveperiod;
+					}
+					
+					
+					$objData = array(
+						'id' => $dom_graph_id,
+						'domid' => $dom_graph_id,
+						'containerid' => $containerid,
+						'objDims' => $graphDims,
+						'loadSBox' => 0,
+						'loadImage' => 1,
+						'loadScroll' => 0,
+						'dynamic' => 0
+					);
+
 					$default = false;
-					if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
+					if(($graphDims['graphtype'] == GRAPH_TYPE_PIE) || ($graphDims['graphtype'] == GRAPH_TYPE_EXPLODED)){
 						if(($dynamic==SCREEN_SIMPLE_ITEM) || empty($url)){
 							$url='chart6.php?graphid='.$resourceid;
 							$default = true;
 						}
 
-						$g_img = new CImg($url.'&width='.$width.
-											'&height='.$height.
-											'&period='.$effectiveperiod.
-											url_param('stime').
-											'&legend='.$legend.
-											'&graph3d='.$graph3d);
+						$timeline = array();
+						$timeline['period'] = $effectiveperiod;
+						$timeline['starttime'] = get_min_itemclock_by_graphid($resourceid);
 
+						if(isset($_REQUEST['stime'])){
+							$bstime = $_REQUEST['stime'];
+							$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
+							$timeline['usertime'] += $timeline['period'];
+						}
+						
+						$src = $url.'&width='.$width.'&height='.$height.'&legend='.$legend.'&graph3d='.$graph3d;
+						
+						$objData['src'] = $src;
+						
 					}
-					else {
+					else{
 						if(($dynamic==SCREEN_SIMPLE_ITEM) || empty($url)){
 							$url='chart2.php?graphid='.$resourceid;
 							$default = true;
 						}
 
-						$dom_graph_id = 'graph_'.$screenitemid.'_'.$resourceid;
-						$g_img = new CImg($url.'&width='.$width.'&height='.$height.'&period='.$effectiveperiod.url_param('stime'));
-						$g_img->setAttribute('id',$dom_graph_id);
-
+						$src = $url.'&width='.$width.'&height='.$height.'&period='.$effectiveperiod.url_param('stime');
+						
+						$timeline = array();
 						if(!is_null($graphid) && ($editmode != 1)){
-							insert_js('	A_SBOX["'.$dom_graph_id.'"] = new Object;'.
-										'A_SBOX["'.$dom_graph_id.'"].shiftT = 17;'.
-										'A_SBOX["'.$dom_graph_id.'"].shiftL = '.$shiftXleft.';'
-									);
+							$timeline['period'] = $effectiveperiod;
+							$timeline['starttime'] = time() - ZBX_MAX_PERIOD; //get_min_itemclock_by_graphid($graphid);
 
 							if(isset($_REQUEST['stime'])){
-								$stime = $_REQUEST['stime'];
-								$stime = mktime(substr($stime,8,2),substr($stime,10,2),0,substr($stime,4,2),substr($stime,6,2),substr($stime,0,4));
+								$bstime = $_REQUEST['stime'];
+								$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
+								$timeline['usertime'] += $timeline['period'];
 							}
-							else{
-								$stime = 'null';
-							}
-
-							global $page;
-							if($page['type'] == PAGE_TYPE_HTML){
-								zbx_add_post_js('graph_zoom_init("'.$dom_graph_id.'",'.$stime.','.$effectiveperiod.','.$width.','.$height.', false);');
-							}
-							else{
-								$g_img->setAttribute('onload','javascript: graph_zoom_init("'.$dom_graph_id.'",'.$stime.','.$effectiveperiod.','.$width.','.$height.', false);');
-//								insert_js('graph_zoom_init("'.$dom_graph_id.'",'.$stime.','.$effectiveperiod.','.$width.','.$height.', false);');
-							}
+									
+							$objData['loadSBox'] = 1;
+//							zbx_add_post_js('graph_zoom_init("'.$dom_graph_id.'",'.$stime.','.$effectiveperiod.','.$width.','.$height.', false);');
 						}
+						
+						$objData['src'] = $src;
 					}
-
-					if($default && ($editmode == 0)){
-						$item = new CLink($g_img, $action);
+								
+					if($default){
+						$item = new CLink(null, $action);
+						$item->setAttribute('id', $containerid);
 					}
 					else{
-						$item = &$g_img;
+						$item = new CDiv();
+						$item->setAttribute('id', $containerid);
 					}
+					
+//					zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
+					insert_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
+
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_SIMPLE_GRAPH) ){
-					if($editmode == 0)
-						$action = "history.php?action=showgraph&itemid=$resourceid".
-                                                        url_param("period").url_param("inc").url_param("dec");
+					if($editmode == 0) $action = 'history.php?action=showgraph&itemid='.$resourceid.url_param('period').url_param('stime');
+
+					$dom_graph_id = 'graph_'.$screenitemid.'_'.$resourceid;
+					$containerid = 'graph_cont_'.$screenitemid.'_'.$resourceid;
+
+					$graphDims['graphHeight'] = 200;
+					$graphDims['shiftXleft'] = 100;
+					$graphDims['shiftXright'] = 50;
+					$graphDims['graphtype'] = 0;					
+					$graphDims['height'] = $height;
+					$graphDims['width'] = $width;
+					
+					$objData = array(
+						'id' => $dom_graph_id,
+						'domid' => $dom_graph_id,
+						'containerid' => $containerid,
+						'objDims' => $graphDims,
+						'loadSBox' => 1,
+						'loadImage' => 1,
+						'loadScroll' => 0,
+						'dynamic' => 0
+					);
 
 // Host feature
 					if(($dynamic == SCREEN_DYNAMIC_ITEM) && isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0)){
@@ -1038,11 +1068,32 @@
 						}
 					}
 //-------------
-					$url = (empty($resourceid))?'chart3.php?':"chart.php?itemid=$resourceid&";
-					$item = new CLink(
-						new CImg($url."width=$width&height=$height"."&period=$effectiveperiod".url_param("stime")),
-						$action
-						);
+					
+					$timeline = array();
+					$timeline['starttime'] = time() - ZBX_MAX_PERIOD;
+					
+					if(!zbx_empty($resourceid) && ($editmode != 1)){
+						$timeline['period'] = $effectiveperiod;
+
+						if(isset($_REQUEST['stime'])){
+							$bstime = $_REQUEST['stime'];
+							$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
+							$timeline['usertime'] += $timeline['period'];
+						}
+								
+						$objData['loadSBox'] = 1;
+					}
+
+					$src = (zbx_empty($resourceid))?'chart3.php?':'chart.php?itemid='.$resourceid.'&';
+					$src.= $url.'width='.$width.'&height='.$height;
+
+					$objData['src'] = $src;
+
+					$item = new CLink(null, $action);
+					$item->setAttribute('id', $containerid);
+					
+//					zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');					
+					insert_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');					
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_MAP) ){
 

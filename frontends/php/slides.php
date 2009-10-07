@@ -23,12 +23,11 @@
 	require_once('include/graphs.inc.php');
 	require_once('include/screens.inc.php');
 	require_once('include/blocks.inc.php');
-	require_once('include/nodes.inc.php');
 
 	$page['title'] = "S_CUSTOM_SCREENS";
 	$page['file'] = 'slides.php';
 	$page['hist_arg'] = array('config','elementid');
-	$page['scripts'] = array('gmenu.js','scrollbar.js','sbox.js','sbinit.js','pmaster.js','menu_scripts.js'); //do not change order!!!
+	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','pmaster.js','menu_scripts.js','timeline.js','calendar.js','scrollbar.js','sbox.js','sbinit.js');
 
 	$config = $_REQUEST['config'] = get_request('config', 1);
 	if($_REQUEST['config'] == 0) redirect('screens.php');
@@ -115,6 +114,7 @@ include_once('include/page_header.php');
 
 						$element = get_slideshow($elementid, $step, $effectiveperiod);
 						$element->show();
+						insert_js('timeControl.processObjects();');
 					}
 
 					break;
@@ -128,18 +128,18 @@ include_once('include/page_header.php');
 				update_profile('web.slides.rf_rate.'.$_REQUEST['favid'],$_REQUEST['favcnt'], PROFILE_TYPE_INT, $elementid);
 				$_REQUEST['favcnt'] = get_profile('web.slides.rf_rate.'.$_REQUEST['favid'],30,null,$elementid);
 
-				$script = get_update_doll_script('mainpage', $_REQUEST['favid'], 'frequency', $_REQUEST['favcnt']);
+				$script = get_update_doll_script('mainpage', $_REQUEST['favid'], 'frequency', $_REQUEST['favcnt'])."\n";
 //				$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'url', 'slides.php?elementid='.$elementid.'&output=html'.url_param('stime').url_param('period'));
-				$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'stopDoll');
-				$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'startDoll');
-				print $script;
+				$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'stopDoll')."\n";
+				$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'startDoll')."\n";
+				print $script."\n";
 
 				$menu = array();
 				$submenu = array();
 
 				make_refresh_menu('mainpage', $_REQUEST['favid'],$_REQUEST['favcnt'],array('elementid'=> $elementid),$menu,$submenu);
 
-				print 'page_menu["menu_'.$_REQUEST['favid'].'"] = '.zbx_jsvalue($menu['menu_'.$_REQUEST['favid']]).';';
+				print('page_menu["menu_'.$_REQUEST['favid'].'"] = '.zbx_jsvalue($menu['menu_'.$_REQUEST['favid']]).';');
 			}
 		}
 	}
@@ -317,6 +317,35 @@ include_once('include/page_header.php');
 	if(isset($elementid)){
 		$effectiveperiod = navigation_bar_calc();
 		if( 2 != $_REQUEST['fullscreen'] ){
+// NAV BAR
+//*
+			$timeline = array(); 
+			$timeline['period'] = $effectiveperiod;
+			$timeline['starttime'] = time() - ZBX_MAX_PERIOD;
+	
+			if(isset($_REQUEST['stime'])){
+				$bstime = $_REQUEST['stime'];
+				$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
+				$timeline['usertime'] += $timeline['period'];
+			}
+
+			$dom_graph_id = 'iframe';
+			$objData = array(
+				'id' => $dom_graph_id,
+				'domid' => $dom_graph_id,
+				'loadSBox' => 0,
+				'loadImage' => 0,
+				'loadScroll' => 1,
+				'scrollWidthByImage' => 0,
+				'dynamic' => 0,
+				'mainObject' => 1
+			);
+						
+			zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
+			zbx_add_post_js('timeControl.processObjects();');
+
+//*/
+/*
 			$stime = time() - 31536000; // ~1year
 			$bstime = time()-$effectiveperiod;
 
@@ -326,6 +355,7 @@ include_once('include/page_header.php');
 			}
 
 			zbx_add_post_js('onload_update_scroll("iframe",0,'.$effectiveperiod.','.$stime.',0,'.$bstime.');');
+//*/
 		}
 		$element = get_slideshow($elementid, 0, $effectiveperiod);
 	}
@@ -336,14 +366,14 @@ include_once('include/page_header.php');
 	$slides_wdgt->addPageHeader($text, array($icon,$refresh_icon,$fs_icon));
 	$slides_wdgt->addHeader($slide_name, $form);
 
-	$slides_wdgt->additem($element);
+	$slides_wdgt->addItem($element);
 
 	$tab->addRow($slides_wdgt,'center');
 
 	$tab->show();
 
 	$scroll_div = new CDiv();
-	$scroll_div->setAttribute('id','scroll_cntnr');
+	$scroll_div->setAttribute('id','scrollbar_cntr');
 	$scroll_div->setAttribute('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
 	$scroll_div->show();
 

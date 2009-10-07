@@ -22,14 +22,13 @@
 	require_once('include/config.inc.php');
 	require_once('include/screens.inc.php');
 	require_once('include/forms.inc.php');
-	require_once('include/nodes.inc.php');
 	require_once('include/blocks.inc.php');
-
 
 	$page['title'] = "S_CONFIGURATION_OF_SCREENS";
 	$page['file'] = 'screenedit.php';
 	$page['hist_arg'] = array('screenid');
-	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.cscreen.js');
+//	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.cscreen.js');
+	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.cscreen.js','timeline.js','calendar.js','scrollbar.js','sbox.js','sbinit.js');
 
 include_once('include/page_header.php');
 
@@ -213,10 +212,10 @@ include_once('include/page_header.php');
 
 		if($_REQUEST['screenid'] > 0){
 			$table = get_screen($_REQUEST['screenid'], 1);
-			$table->Show();
+			$table->show();
 			zbx_add_post_js('init_screen("'.$_REQUEST['screenid'].'","iframe","'.$_REQUEST['screenid'].'");');
+			zbx_add_post_js('timeControl.processObjects();');
 		}
-
 	}
 ?>
 <?php

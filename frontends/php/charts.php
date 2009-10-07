@@ -237,65 +237,25 @@ include_once('include/page_header.php');
 //	$table->setAttribute('border',1);
 
 	if($_REQUEST['graphid'] > 0){
-		$graphtype = GRAPH_TYPE_NORMAL;
-		$yaxis = 0;
-
-// ZOOM featers
-		$sql = 'SELECT MAX(g.graphtype) as graphtype, MIN(gi.yaxisside) as yaxissidel, MAX(gi.yaxisside) as yaxissider, MAX(g.height) as height'.
-				' FROM graphs g, graphs_items gi '.
-				' WHERE g.graphid='.$_REQUEST['graphid'].
-					' AND gi.graphid=g.graphid ';
-
-		$res = DBselect($sql);
-		while($graph=DBfetch($res)){
-			$graphtype = $graph['graphtype'];
-			$graph_height = $graph['height'];
-			$yaxis = $graph['yaxissider'];
-			$yaxis = ($graph['yaxissidel'] == $yaxis)?($yaxis):(2);
-		}
-		if($yaxis == 2){
-			$shiftXleft = 100;
-			$shiftXright = 100;
-		}
-		else if($yaxis == 0){
-			$shiftXleft = 100;
-			$shiftXright = 50;
-		}
-		else{
-			$shiftXleft = 50;
-			$shiftXright = 100;
-		}
-//-------------
-
 		$dom_graph_id = 'graph';
+		$graphDims = getGraphDims($_REQUEST['graphid']);
 
-		if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
-			$row = 	"\n".'<script language="javascript" type="text/javascript">
-				<!--
-				document.write(\'<img id="'.$dom_graph_id.'" src="chart6.php?graphid='.$_REQUEST['graphid'].url_param('stime').
-				'&period='.$effectiveperiod.'" /><br />\');
-				-->
-				</script>'."\n";
+		if(($graphDims['graphtype'] == GRAPH_TYPE_PIE) || ($graphDims['graphtype'] == GRAPH_TYPE_EXPLODED)){
+			$loadSBox = 0;
+			$scrollWidthByImage = 0;
+			$containerid = 'graph_cont1';
+			$src = 'chart6.php?graphid='.$_REQUEST['graphid'];
 		}
 		else{
-			$row = 	"\n".'<script language="javascript" type="text/javascript">
-				<!--
-				A_SBOX["'.$dom_graph_id.'"] = new Object;
-				A_SBOX["'.$dom_graph_id.'"].shiftT = 35;
-				A_SBOX["'.$dom_graph_id.'"].shiftL = '.$shiftXleft.';
-
-				var ZBX_G_WIDTH = get_bodywidth();
-				if(!is_number(ZBX_G_WIDTH)) ZBX_G_WIDTH = 900;
-
-				ZBX_G_WIDTH-= parseInt('.($shiftXleft+$shiftXright).'+parseInt((SF)?27:27));
-
-				document.write(\'<img id="'.$dom_graph_id.'" src="chart2.php?graphid='.$_REQUEST['graphid'].url_param('stime').
-				'&period='.$effectiveperiod.'&width=\'+ZBX_G_WIDTH+\'" /><br />\');
-				-->
-				</script>'."\n";
+			$loadSBox = 1;
+			$scrollWidthByImage = 1;
+			$containerid = 'graph_cont1';
+			$src = 'chart2.php?graphid='.$_REQUEST['graphid'];
 		}
 
-		$table->addRow(new CJSscript($row));
+		$graph_cont = new CCol();
+		$graph_cont->setAttribute('id', $containerid);
+		$table->addRow($graph_cont);
 	}
 
 	$icon = null;
@@ -335,31 +295,32 @@ include_once('include/page_header.php');
 	$charts_wdgt->show();
 
 	if($_REQUEST['graphid'] > 0){
-// NAV BAR
-		$stime = get_min_itemclock_by_graphid($_REQUEST['graphid']);
-		$stime = (is_null($stime))?0:$stime;
-		$bstime = time()-$effectiveperiod;
+// NAV BAR	
+		$timeline = array(); 
+		$timeline['period'] = $effectiveperiod;
+		$timeline['starttime'] = get_min_itemclock_by_graphid($_REQUEST['graphid']);
+
 		if(isset($_REQUEST['stime'])){
 			$bstime = $_REQUEST['stime'];
-			$bstime = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
+			$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
+			$timeline['usertime'] += $timeline['period'];
 		}
-
-		$script = 'var tline = create_timeline("'.$dom_graph_id.'",'.$effectiveperiod.', '.$stime.', '.($bstime + $effectiveperiod).');'."\n".
-					'var scrl = scrollCreate("'.$dom_graph_id.'", null, tline.timelineid);'."\n";
-
-//		$script = 'scrollinit(0,'.$effectiveperiod.','.$stime.',0,'.$bstime.'); showgraphmenu("graph");';
-
-		if(($graphtype == GRAPH_TYPE_NORMAL) || ($graphtype == GRAPH_TYPE_STACKED)){
-//			$script.= 'graph_zoom_init("'.$dom_graph_id.'",'.$bstime.','.$effectiveperiod.',ZBX_G_WIDTH,'.$graph_height.',true);';
-			$script.= 'var sbox = sbox_init("'.$dom_graph_id.'", tline.timelineid, "'.$dom_graph_id.'", ZBX_G_WIDTH, '.$graph_height.');'."\n";
-		}
-		$script.= '	addListener("'.$dom_graph_id.'","load",function(){ZBX_SCROLLBARS[scrl.scrollbarid].disabled=0;});'."\n".
-					'scrl.onchange = graphload; '."\n".
-					'sbox.onchange = graphload; ';
-
-		zbx_add_post_js($script);
-
-//		navigation_bar('charts.php',array('groupid','hostid','graphid'));
+		
+		$objData = array(
+			'id' => $dom_graph_id,
+			'domid' => $dom_graph_id,
+			'containerid' => $containerid,
+			'src' => $src,
+			'objDims' => $graphDims,
+			'loadSBox' => $loadSBox,
+			'loadImage' => 1,
+			'loadScroll' => 1,
+			'scrollWidthByImage' => $scrollWidthByImage,
+			'dynamic' => 1
+		);
+					
+		zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
+		zbx_add_post_js('timeControl.processObjects();');
 //-------------
 	}
 

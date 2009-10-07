@@ -37,7 +37,10 @@ function scrollCreate(sbid, w, timelineid){
 	
 	if(is_null(w)){
 		var dims = getDimensions(sbid);
-		w = dims.width;
+		if($(sbid).nodeName.toLowerCase() == 'img')
+			w = dims.width + 5;
+		else 
+			w = dims.width - 5;
 	}
 	
 	if(w < 600) w = 600;
@@ -1106,8 +1109,12 @@ setZoomLinksStyle: function(){
 },
 
 scrollcreate: function(w){
-	var scr_cntr = $('scrollbar_cntr');
+	var scr_cntr = $('scrollbar_cntr');	
 	if(is_null(scr_cntr)) throw('ERROR: SCROLL [scrollcreate]: scroll container node is not found!');
+	
+	scr_cntr.style.paddingRight = '2px';
+	scr_cntr.style.paddingLeft = '2px';
+	scr_cntr.style.backgroundColor = '#DDDDDD';
 
 	this.dom.scrollbar = document.createElement('div');
 	scr_cntr.appendChild(this.dom.scrollbar);

@@ -114,6 +114,41 @@
 		}
 	return $calc_fnc;
 	}
+	
+	function getGraphDims($graphid){
+// ZOOM featers
+		$graphDims = array();
+		
+		$sql = 'SELECT MAX(g.graphtype) as graphtype, MIN(gi.yaxisside) as yaxissidel, MAX(gi.yaxisside) as yaxissider, MAX(g.height) as height'.
+				' FROM graphs g, graphs_items gi '.
+				' WHERE g.graphid='.$graphid.
+					' AND gi.graphid=g.graphid ';
+		$res = DBselect($sql);
+		if($graph=DBfetch($res)){
+			$graphDims['graphtype'] = $graph['graphtype'];
+			$graphDims['graphHeight'] = $graph['height'];
+			$yaxis = $graph['yaxissider'];
+			$yaxis = ($graph['yaxissidel'] == $yaxis)?($yaxis):(2);
+			
+			$graphDims['yaxis'] = $yaxis;
+		}
+
+		if($yaxis == 2){
+			$graphDims['shiftXleft'] = 100;
+			$graphDims['shiftXright'] = 100;
+		}
+		else if($yaxis == 0){
+			$graphDims['shiftXleft'] = 100;
+			$graphDims['shiftXright'] = 50;
+		}
+		else{
+			$graphDims['shiftXleft'] = 50;
+			$graphDims['shiftXright'] = 100;
+		}
+//-------------
+
+	return $graphDims;
+	}
 
 	function get_graph_by_gitemid($gitemid){
 		$db_graphs = DBselect('SELECT distinct g.* '.
@@ -315,6 +350,7 @@
 				$result = time() - (86400 * max($table_for_numeric['history'],$table_for_numeric['trends']));
 			}
 		}
+
 		foreach($items_by_type as $type => $items) {
 			if(empty($items)) continue;
 			switch($type) {
@@ -336,6 +372,7 @@
 				default:
 					$sql_from = 'history';
 			}
+
 			foreach($items as $itemid) {
 				$sql = 'SELECT ht.clock '.
 						' FROM '.$sql_from.' ht '.
@@ -349,27 +386,6 @@
 		$result = is_null($min)?$result:$min;
 
 	return $result;
-	}
-
-// Show History Graph
-	function show_history($itemid,$from,$stime,$period){
-		$td = new CCol(get_js_sizeable_graph('graph','chart.php?itemid='.$itemid.
-				url_param($stime,false,'stime').
-				url_param($period,false,'period')));
-		$td->setAttribute('align','center');
-
-		$tr = new CRow($td);
-		$tr->setAttribute('bgcolor','#dddddd');
-
-		$table = new CTable();
-		$table->setAttribute('width','100%');
-		$table->setAttribute('bgcolor','#cccccc');
-		$table->setAttribute('cellspacing','1');
-		$table->setAttribute('cellpadding','3');
-
-		$table->addRow($tr);
-
-		$table->show();
 	}
 
 	function get_graphitem_by_gitemid($gitemid){
@@ -774,7 +790,7 @@
  * Comments: !!! Don't forget sync code with C !!!
  *
  */
-	function	cmp_graphitems(&$gitem1, &$gitem2){
+	function cmp_graphitems(&$gitem1, &$gitem2){
 		if($gitem1["drawtype"]	!= $gitem2["drawtype"])		return 1;
 		if($gitem1["sortorder"]	!= $gitem2["sortorder"])	return 2;
 		if($gitem1["color"]	!= $gitem2["color"])		return 3;
@@ -800,8 +816,7 @@
  * Comments: !!! Don't forget sync code with C !!!
  *
  */
-	function	add_item_to_graph($graphid,$itemid,$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$type,$periods_cnt)
-	{
+	function add_item_to_graph($graphid,$itemid,$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$type,$periods_cnt){
 		$gitemid = get_dbid('graphs_items','gitemid');
 
 		$result = DBexecute('insert into graphs_items'.

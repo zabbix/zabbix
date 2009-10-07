@@ -90,7 +90,7 @@ function SDI(msg){
 		div_help.setAttribute('id','div_help');
 		div_help.setAttribute('style','position: absolute; right: 10px; top: 10px; border: 1px red solid; width: 500px; height: 400px; background-color: white; font-size: 12px; overflow: auto; z-index: 20;');
 		
-//		new Draggable(div_help,{});
+		new Draggable(div_help,{});
 	}
 	
 	var pre = document.createElement('pre');
@@ -120,16 +120,15 @@ function SDJ(obj){
 }
 
 /// Alpha-Betic sorting
-
 function addListener(element, eventname, expression, bubbling){
 	bubbling = bubbling || false;
 
 	element = $(element);
-	if(window.addEventListener){
+	if(element.addEventListener){
 		element.addEventListener(eventname, expression, bubbling);
 		return true;
 	} 
-	else if(window.attachEvent){
+	else if(element.attachEvent){
 		element.attachEvent('on'+eventname, expression);
 		return true;
 	} 
@@ -490,11 +489,12 @@ function redirect(uri) {
 function removeListener(element, eventname, expression, bubbling){
 	bubbling = bubbling || false;
 
-	if(window.removeEventListener){
+	element = $(element);
+	if(element.removeEventListener){
 		element.removeEventListener(eventname, expression, bubbling);
 		return true;
 	} 
-	else if(window.detachEvent){
+	else if(element.detachEvent){
 		element.detachEvent('on'+eventname, expression);
 		return true;
 	} 
