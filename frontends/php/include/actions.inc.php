@@ -961,10 +961,11 @@ return true;
 }
 
 function validate_commands($commands){
-	$cmd_list = split("\n",$commands);
+	$cmd_list = explode("\n",$commands);
 	foreach($cmd_list as $cmd){
 		$cmd = trim($cmd, "\x00..\x1F");
-		if(!ereg("^(({HOSTNAME})|".ZBX_EREG_INTERNAL_NAMES.")(:|#)[[:print:]]*$",$cmd,$cmd_items)){
+//		if(!ereg("^(({HOSTNAME})|".ZBX_EREG_INTERNAL_NAMES.")(:|#)[[:print:]]*$",$cmd,$cmd_items)){
+		if(!preg_match("/^(({HOSTNAME})|".ZBX_PREG_INTERNAL_NAMES.")(:|#)[".ZBX_PREG_PRINT."]*$/", $cmd, $cmd_items)){
 			error("Incorrect command: '$cmd'");
 			return FALSE;
 		}

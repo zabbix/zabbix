@@ -486,8 +486,8 @@ class CChart extends CGraphDraw{
 
 			CUserMacro::resolveTrigger($trigger);
 
-			if(!eregi('\{([0-9]{1,})\}([\<\>\=]{1})([0-9\.]{1,})([K|M|G]{0,1})',$trigger['expression'],$arr))
-				continue;
+//			if(!eregi('\{([0-9]{1,})\}([\<\>\=]{1})([0-9\.]{1,})([K|M|G]{0,1})',$trigger['expression'],$arr)) continue;
+			if(!preg_match('/\{([0-9]{1,})\}([\<\>\=]{1})([0-9\.]{1,})([K|M|G]{0,1})/i', $trigger['expression'], $arr)) continue;
 
 			$val = $arr[3];
 			if(strcasecmp($arr[4],'K') == 0)	$val *= 1024;

@@ -165,7 +165,7 @@ include_once('include/page_header.php');
 	$show_events = $_REQUEST['show_events'];
 	$show_severity = $_REQUEST['show_severity'];
 // --------------
-	validate_sort_and_sortorder('t.lastchange', ZBX_SORT_DOWN);
+	validate_sort_and_sortorder('lastchange', ZBX_SORT_DOWN);
 
 	$params = array();
 	$options = array('allow_all_hosts', 'monitored_hosts', 'with_monitored_items');

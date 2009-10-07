@@ -519,10 +519,11 @@ function __autoload($class_name){
 	function parse_period($str){
 		$out = NULL;
 		$str = trim($str,';');
-		$periods = split(';',$str);
+		$periods = explode(';',$str);
 		foreach($periods as $preiod){
-			if(!ereg('^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$', $preiod, $arr))
-				return NULL;
+//			if(!ereg('^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$', $preiod, $arr)) return NULL;
+			if(!preg_match('/^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$/', $preiod, $arr)) return NULL;
+			
 			for($i = $arr[1]; $i <= $arr[2]; $i++){
 				if(!isset($out[$i])) $out[$i] = array();
 				array_push($out[$i],
@@ -628,11 +629,11 @@ function __autoload($class_name){
 	function validate_period(&$str){
 		$str = trim($str,';');
 		$out = "";
-		$periods = split(';',$str);
+		$periods = explode(';',$str);
 		foreach($periods as $preiod){
 			// arr[idx]   1       2         3             4            5            6
-			if(!ereg('^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$', $preiod, $arr))
-				return false;
+//			if(!ereg('^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$', $preiod, $arr)) return false;
+			if(!preg_match('/^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$/', $preiod, $arr)) return false;
 
 			if($arr[1] > $arr[2]) // check week day
 				return false;
@@ -654,7 +655,8 @@ function __autoload($class_name){
 
 	function validate_float($str){
 //		echo "Validating float:$str<br>";
-		if (eregi('^[ ]*([0-9]+)((\.)?)([0-9]*[KMG]{0,1})[ ]*$', $str, $arr)) {
+//		if (eregi('^[ ]*([0-9]+)((\.)?)([0-9]*[KMG]{0,1})[ ]*$', $str, $arr)) {
+		if(preg_match('/^[ ]*([0-9]+)((\.)?)([0-9]*[KMG]{0,1})[ ]*$/i', $str, $arr)) {
 			return 0;
 		}
 		else{
@@ -665,7 +667,8 @@ function __autoload($class_name){
 // Check if str has format #<float> or <float>
 	function validate_ticks($str){
 //		echo "Validating float:$str<br>";
-		if (eregi('^[ ]*#([0-9]+)((\.)?)([0-9]*)[ ]*$', $str, $arr)) {
+//		if (eregi('^[ ]*#([0-9]+)((\.)?)([0-9]*)[ ]*$', $str, $arr)) {
+		if (preg_match('/^[ ]*#([0-9]+)((\.)?)([0-9]*)[ ]*$/i', $str, $arr)) {
 			return 0;
 		}
 		else return validate_float($str);
@@ -680,10 +683,10 @@ function __autoload($class_name){
 	 *                                                                            *
 	 ******************************************************************************/
 	function reset_items_nextcheck($triggerid){
-		$sql="SELECT itemid from functions WHERE triggerid=$triggerid";
+		$sql='SELECT itemid from functions WHERE triggerid='.$triggerid;
 		$result=DBselect($sql);
 		while($row=DBfetch($result)){
-			$sql="update items set nextcheck=0 WHERE itemid=".$row["itemid"];
+			$sql='UPDATE items SET nextcheck=0 WHERE itemid='.$row['itemid'];
 			DBexecute($sql);
 		}
 	}
@@ -1083,7 +1086,8 @@ function __autoload($class_name){
 		$_REQUEST['sortorder'] = get_request('sortorder',get_profile('web.'.$page['file'].'.sortorder',$sortorder));
 
 		if(!is_null($_REQUEST['sort'])){
-			$_REQUEST['sort'] = eregi_replace('[^a-z\.\_]','',$_REQUEST['sort']);
+//			$_REQUEST['sort'] = eregi_replace('[^a-z\.\_]','',$_REQUEST['sort']);
+			$_REQUEST['sort'] = preg_replace('/[^a-z\.\_]/i','',$_REQUEST['sort']);
 			update_profile('web.'.$page['file'].'.sort', $_REQUEST['sort'], PROFILE_TYPE_STR);
 		}
 

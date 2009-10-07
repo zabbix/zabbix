@@ -947,9 +947,7 @@ class CJSON{
 	protected function _exception($code, $info = array()){
 		$class = get_class($this);
 
-		SDI( array($class,
-			$code,
-			(array) $info));
+		SDI(array($class, $code, (array) $info));
 	}
 
 

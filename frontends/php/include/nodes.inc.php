@@ -214,8 +214,9 @@
 	function add_node($new_nodeid,$name,$timezone,$ip,$port,$slave_history,$slave_trends,$node_type){
 		global $ZBX_CURMASTERID;
 
-		if(!eregi('^'.ZBX_EREG_NODE_FORMAT.'$', $name) ){
-			error("Incorrect characters used for Node name");
+//		if(!eregi('^'.ZBX_EREG_NODE_FORMAT.'$', $name) ){
+		if(!preg_match('/^'.ZBX_PREG_NODE_FORMAT.'$/i', $name) ){
+			error('Incorrect characters used for Node name');
 			return false;
 		}
 
@@ -261,8 +262,9 @@
 	}
 
 	function update_node($nodeid,$new_nodeid,$name,$timezone,$ip,$port,$slave_history,$slave_trends){
-		if( !eregi('^'.ZBX_EREG_NODE_FORMAT.'$', $name) ){
-			error("Incorrect characters used for Node name");
+//		if( !eregi('^'.ZBX_EREG_NODE_FORMAT.'$', $name) ){
+		if(!preg_match('/^'.ZBX_PREG_NODE_FORMAT.'$/i', $name)){
+			error('Incorrect characters used for Node name');
 			return false;
 		}
 

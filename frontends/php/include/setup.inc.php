@@ -431,7 +431,8 @@
 			$table->addRow(array(new CCol('Database port:','header'),	$this->getConfig('DB_PORT',		'0')));
 			$table->addRow(array(new CCol('Database name:','header'),	$this->getConfig('DB_DATABASE',		'unknown')));
 			$table->addRow(array(new CCol('Database user:','header'),	$this->getConfig('DB_USER',		'unknown')));
-			$table->addRow(array(new CCol('Database password:','header'),	ereg_replace('.','*',$this->getConfig('DB_PASSWORD',	'unknown'))));
+//			$table->addRow(array(new CCol('Database password:','header'),	ereg_replace('.','*',$this->getConfig('DB_PASSWORD',	'unknown'))));
+			$table->addRow(array(new CCol('Database password:','header'),	preg_replace('/./','*',$this->getConfig('DB_PASSWORD',	'unknown'))));
 			/* $table->addRow(array(new CCol('Distributed monitoring','header'),	$this->getConfig('distributed', null) ? 'Enabled' : 'Disabled')); */
 
 			if($this->getConfig('distributed', null)){

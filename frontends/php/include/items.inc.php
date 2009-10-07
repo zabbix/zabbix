@@ -306,8 +306,8 @@
 
 		if($item['type'] == ITEM_TYPE_AGGREGATE){
 			/* grpfunc['group','key','itemfunc','numeric param'] */
-//			if(eregi('^((.)*)(\(\'((.)*)\'\,\'((.)*)\'\,\'((.)*)\'\,\'([0-9]+)\'\))$', $key, $arr))
-			if(eregi('^((.)*)(\[\"((.)*)\"\,\"((.)*)\"\,\"((.)*)\"\,\"([0-9]+)\"\])$', $item['key_'], $arr)){
+//			if(eregi('^((.)*)(\[\"((.)*)\"\,\"((.)*)\"\,\"((.)*)\"\,\"([0-9]+)\"\])$', $item['key_'], $arr)){
+			if(preg_match('/^((.)*)(\[\"((.)*)\"\,\"((.)*)\"\,\"((.)*)\"\,\"([0-9]+)\"\])$/i', $item['key_'], $arr)){
 				$g=$arr[1];
 				if(!str_in_array($g,array("grpmax","grpmin","grpsum","grpavg"))){
 					error("Group function [$g] is not one of [grpmax,grpmin,grpsum,grpavg]");
@@ -1018,8 +1018,11 @@
 		$param="";
 
 		$num--;
-
-		if(ereg('^'.ZBX_EREG_ITEM_KEY_FORMAT.'$', $key, $arr)){
+//SDI(ZBX_KEY_PARAM_ID);
+//		if(ereg('^'.ZBX_EREG_ITEM_KEY_FORMAT.'$', $key, $arr)){
+		if(preg_match('/^'.ZBX_PREG_ITEM_KEY_FORMAT.'$/', $key, $arr)){
+			if(!isset($arr[ZBX_KEY_PARAM_ID]))  $arr[ZBX_KEY_PARAM_ID] = false;
+			
 			$params = zbx_get_params($arr[ZBX_KEY_PARAM_ID]);
 
 			if(isset($params[$num])){

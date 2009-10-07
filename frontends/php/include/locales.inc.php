@@ -41,12 +41,7 @@ function mbstrings_available(){
 		function_exists('mb_strlen') &&
 		function_exists('mb_strtoupper') &&
 		function_exists('mb_strpos') &&
-		function_exists('mb_substr') &&
-		function_exists('mb_ereg') &&
-		function_exists('mb_eregi') &&
-		function_exists('mb_ereg_replace') &&
-		function_exists('mb_eregi_replace') &&
-		function_exists('mb_split');
+		function_exists('mb_substr');
 /* This function is supported by PHP5 only
 		function_exists('mb_stristr') &&
 		function_exists('mb_strstr') &&
