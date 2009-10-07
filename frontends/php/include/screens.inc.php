@@ -375,10 +375,12 @@
 					break;
 			}
 
-			if($row['valuemapid'] > 0)
-				$value = replace_value_by_map($value, $row['valuemapid']);
+			if($row['valuemapid'] > 0) $value = replace_value_by_map($value, $row['valuemapid']);
+			
+			$pre = new CTag('pre', true);
+			$pre->addItem($value);
 
-			$table->AddRow(array(date(S_DATE_FORMAT_YMDHMS,$row['clock']),	$value));
+			$table->addRow(array(date(S_DATE_FORMAT_YMDHMS,$row['clock']),	$pre));
 		}
 		return $table;
 	}
