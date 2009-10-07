@@ -6663,9 +6663,11 @@
 
 				if(uint_in_array($expression['expression_type'], array(EXPRESSION_TYPE_TRUE,EXPRESSION_TYPE_FALSE))){
 					if($expression['case_sensitive'])
-						$results[$id] = ereg($paterns[0],$test_string);
+//						$results[$id] = ereg($paterns[0],$test_string);
+						$results[$id] = preg_match('/'.$paterns[0].'/',$test_string);
 					else
-						$results[$id] = eregi($paterns[0],$test_string);
+//						$results[$id] = eregi($paterns[0],$test_string);
+						$results[$id] = preg_match('/'.$paterns[0].'/i',$test_string);
 
 					if($expression['expression_type'] == EXPRESSION_TYPE_TRUE)
 						$final_result &= $results[$id];

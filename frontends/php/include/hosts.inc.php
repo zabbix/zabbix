@@ -204,12 +204,14 @@ require_once('include/httptest.inc.php');
 				return false;
 		}
 
-		if(!eregi('^'.ZBX_EREG_HOST_FORMAT.'$', $host)){
+//		if(!eregi('^'.ZBX_EREG_HOST_FORMAT.'$', $host)){
+		if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host)){
 			error('Incorrect characters used for Hostname');
 			return false;
 		}
 
- 		if(!empty($dns) && !eregi('^'.ZBX_EREG_DNS_FORMAT.'$', $dns)){
+// 		if(!empty($dns) && !eregi('^'.ZBX_EREG_DNS_FORMAT.'$', $dns)){
+ 		if(!empty($dns) && !preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/i', $dns)){
 			error('Incorrect characters used for DNS');
 			return false;
 		}

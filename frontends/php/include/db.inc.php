@@ -567,7 +567,8 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 /* string value prepearing */
 if(isset($DB['TYPE']) && $DB['TYPE'] == 'ORACLE') {
 	function zbx_dbstr($var)	{
-		return "'".ereg_replace('\'','\'\'',$var)."'";
+//		return "'".ereg_replace('\'','\'\'',$var)."'";
+		return "'".preg_replace('/\'/','\'\'',$var)."'";
 	}
 
 	function zbx_dbcast_2bigint($field){
@@ -653,7 +654,8 @@ else {
 			$nodes = implode(',', $nodes);
 		}
 		else if(is_string($nodes)){
-			if ( !eregi('([0-9\,]+)', $nodes ) )
+//			if ( !eregi('([0-9\,]+)', $nodes ) )
+			if(!preg_match('/^([0-9,]+)$/', $nodes))
 				fatal_error('Incorrect "nodes" for "DBin_node". Passed ['.$nodes.']');
 		}
 		else if(!zbx_numeric($nodes)){
@@ -673,7 +675,8 @@ else {
 			$nodes = array($nodes);
 		}
 		else if(is_string($nodes)){
-			if(!eregi('([0-9\,]+)',$nodes))
+//			if(!eregi('([0-9\,]+)',$nodes))
+			if(!preg_match('/^([0-9,]+)$/', $nodes))
 				fatal_error('Incorrect "nodes" for "in_node". Passed ['.$nodes.']');
 
 			$nodes = explode(',', $nodes);

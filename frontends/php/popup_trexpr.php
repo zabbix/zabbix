@@ -145,25 +145,25 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 
-	if(isset($_REQUEST['expression']))
-	{
-
-		if( ($res = ereg(
-			'^'.ZBX_EREG_SIMPLE_EXPRESSION_FORMAT.'(['.implode('',array_keys($operators)).'])'.'([[:print:]]{1,})',
-			$_REQUEST['expression'],
-			$expr_res))
-		)
-		{
-			$itemid = DBfetch(DBselect('select i.itemid from items i, hosts h '.
-					' where i.hostid=h.hostid and h.host='.zbx_dbstr($expr_res[ZBX_SIMPLE_EXPRESSION_HOST_ID]).
-					' and i.key_='.zbx_dbstr($expr_res[ZBX_SIMPLE_EXPRESSION_KEY_ID])));
+	if(isset($_REQUEST['expression'])){
+//		if(($res = ereg('^'.ZBX_EREG_SIMPLE_EXPRESSION_FORMAT.'(['.implode('',array_keys($operators)).'])'.'([[:print:]]{1,})',$_REQUEST['expression'],$expr_res))){
+		$res = preg_match('/^'.ZBX_PREG_SIMPLE_EXPRESSION_FORMAT.'(['.implode('',array_keys($operators)).'])'.'(['.ZBX_PREG_PRINT.']{1,})/',
+						$_REQUEST['expression'],
+						$expr_res);
+		if($res){
+			$sql = 'SELECT i.itemid '.
+					' FROM items i, hosts h '.
+					' WHERE i.hostid=h.hostid '.
+						' AND h.host='.zbx_dbstr($expr_res[ZBX_SIMPLE_EXPRESSION_HOST_ID]).
+						' AND i.key_='.zbx_dbstr($expr_res[ZBX_SIMPLE_EXPRESSION_KEY_ID]);
+						
+			$itemid = DBfetch(DBselect($sql));
 
 			$_REQUEST['itemid'] = $itemid['itemid'];
 
 			$_REQUEST['paramtype'] = PARAM_TYPE_SECONDS;
 			$_REQUEST['param'] = $expr_res[ZBX_SIMPLE_EXPRESSION_FUNCTION_PARAM_ID];
-			if($_REQUEST['param'][0] == '#')
-			{
+			if($_REQUEST['param'][0] == '#'){
 				$_REQUEST['paramtype'] = PARAM_TYPE_COUNTS;
 				$_REQUEST['param'] = ltrim($_REQUEST['param'],'#');
 			}
@@ -199,7 +199,8 @@ include_once "include/page_header.php";
 	}
 
 	$expr_type	= get_request("expr_type",	'last[=]');
-	if(eregi('^([a-z]{1,})\[(['.implode('',array_keys($operators)).'])\]$',$expr_type,$expr_res)){
+//	if(eregi('^([a-z]{1,})\[(['.implode('',array_keys($operators)).'])\]$',$expr_type,$expr_res)){
+	if(preg_match('/^([a-z]{1,})\[(['.implode('',array_keys($operators)).'])\]$/i',$expr_type,$expr_res)){
 		$function = $expr_res[1];
 		$operator = $expr_res[2];
 
@@ -218,14 +219,11 @@ include_once "include/page_header.php";
 	$paramtype	= get_request('paramtype',	PARAM_TYPE_SECONDS);
 	$value		= get_request('value',		0);
 
-	if( !is_array($param) )
-	{
-		if( isset($functions[$function]['params']) )
-		{
-			$param = split(',', $param, count($functions[$function]['params']));
+	if( !is_array($param) ){
+		if(isset($functions[$function]['params'])){
+			$param = explode(',', $param, count($functions[$function]['params']));
 		}
-		else
-		{
+		else{
 			$param = array($param);
 		}
 	}
