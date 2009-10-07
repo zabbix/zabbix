@@ -20,18 +20,18 @@
 ?>
 <?php
 
-	/*
-	 * Function: item_type2str
-	 *
-	 * Description:
-	 *     Represent integer value of item type as string
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *
-	 */
+/*
+ * Function: item_type2str
+ *
+ * Description:
+ *     Represent integer value of item type as string
+ *
+ * Author:
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments:
+ *
+ */
 	function item_type2str($type){
 		switch($type){
 			case ITEM_TYPE_ZABBIX:		$type = S_ZABBIX_AGENT;			break;
@@ -259,7 +259,7 @@
 		if(($i = array_search(0,$item['applications'])) !== FALSE)
 			unset($item['applications'][$i]);
 
-		if( !preg_match('/^'.ZBX_PREG_ITEM_KEY_FORMAT.'$/u', $item['key_']) ){
+		if(!preg_match('/^'.ZBX_PREG_ITEM_KEY_FORMAT.'$/u', $item['key_']) ){
 			error("Incorrect key format 'key_name[param1,param2,...]'");
 			return false;
 		}

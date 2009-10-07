@@ -603,7 +603,7 @@ else{
 	define('ZBX_PREG_MACRO_NAME', '([A-Z0-9._]+)');
 	define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_. -$]+)');
 	define('ZBX_PREG_KEY_NAME', '([0-9a-zA-Z_.,: -$]+)');
-	define('ZBX_PREG_PARAMS', '('.ZBX_PREG_PRINT.'+){0,1}');
+	define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+){0,1}');
 	define('ZBX_PREG_SIGN', '([&|><=+*\/#-])');
 	define('ZBX_PREG_NUMBER', '([-+]?[0-9]+[.]{0,1}[0-9]*[A-Z]{0,1})');
 //----
