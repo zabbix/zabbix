@@ -322,9 +322,9 @@ include_once('include/page_header.php');
 			foreach($screens as $screenid => $screen){
 				$table->addRow(array(
 					new CCheckBox('screens['.$screenid.']', NULL, NULL, $screenid),
-					new CLink($screen["name"],"?config=0&form=update&screenid=".$screenid),
-					$screen["hsize"]." x ".$screen["vsize"],
-					new CLink(S_EDIT,"screenedit.php?screenid=".$screenid)
+					new CLink($screen["name"],'screenedit.php?screenid='.$screenid),
+					$screen['hsize'].' x '.$screen['vsize'],
+					new CLink(S_EDIT,'?config=0&form=update&screenid='.$screenid)
 				));
 			}
 

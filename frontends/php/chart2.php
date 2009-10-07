@@ -81,10 +81,9 @@ include_once('include/page_header.php');
 	$chart_header.= $db_data['host'].': '.$db_data['name'];
 	$graph->setHeader($chart_header);
 
-	if(isset($_REQUEST['period']))		$graph->SetPeriod($_REQUEST['period']);
-	if(isset($_REQUEST['from']))		$graph->SetFrom($_REQUEST['from']);
-	if(isset($_REQUEST['stime']))		$graph->SetSTime($_REQUEST['stime']);
-	if(isset($_REQUEST['border']))		$graph->SetBorder(0);
+	if(isset($_REQUEST['period']))		$graph->setPeriod($_REQUEST['period']);
+	if(isset($_REQUEST['stime']))		$graph->setSTime($_REQUEST['stime']);
+	if(isset($_REQUEST['border']))		$graph->setBorder(0);
 
 	$width = get_request('width', 0);
 

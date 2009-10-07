@@ -175,10 +175,10 @@ include_once('include/page_header.php');
 
 			$table->addRow(array(
 				new CCheckBox('maps['.$row['sysmapid'].']', NULL, NULL, $row['sysmapid']),
-				new CLink($row['name'], 'sysmaps.php?form=update&sysmapid='.$row['sysmapid'].'#form'),
+				new CLink($row['name'], 'sysmap.php?sysmapid='.$row['sysmapid']),
 				$row['width'],
 				$row['height'],
-				new CLink(S_EDIT,'sysmap.php?sysmapid='.$row['sysmapid'])
+				new CLink(S_EDIT, 'sysmaps.php?form=update&sysmapid='.$row['sysmapid'].'#form')
 				));
 		}
 

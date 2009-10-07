@@ -262,7 +262,14 @@ include_once "include/page_header.php";
 
 	if($_REQUEST['action']=='showgraph' && ($item_type != ITEM_VALUE_TYPE_LOG)){
 		$dom_graph_id = 'graph';
-		show_history($_REQUEST['itemid'],$_REQUEST['from'],$bstime,$effectiveperiod);
+		$containerid = 'graph_cont1';
+		$src = 'chart.php?itemid='.$_REQUEST['itemid'];
+				
+		$table = new CTableInfo('...','chart');
+		$graph_cont = new CCol();
+		$graph_cont->setAttribute('id', $containerid);
+		$table->addRow($graph_cont);
+		$table->show();
 	}
 	else if($_REQUEST['action']=='showvalues' || $_REQUEST['action']=='showlatest'){
 
@@ -537,65 +544,71 @@ COpt::profiling_stop('history');
 	}
 
 	if(!isset($_REQUEST['plaintext'])){
-
 		if(str_in_array($_REQUEST['action'],array('showvalues','showgraph'))){
-
-
-// NAV BAR
-			$stime = get_min_itemclock_by_itemid($_REQUEST['itemid']);
-			$stime = (is_null($stime))?0:$stime;
-			$bstime = time()-$effectiveperiod;
+			$graphDims['graphHeight'] = 200;
+			$graphDims['shiftXleft'] = 100;
+			$graphDims['shiftXright'] = 50;
+			$graphDims['graphtype'] = 0;
+	
+// NAV BAR	
+			$timeline = array(); 
+			$timeline['period'] = $effectiveperiod;
+			$timeline['starttime'] = get_min_itemclock_by_itemid($_REQUEST['itemid']);
+			$timeline['usertime'] = null;
+	
 			if(isset($_REQUEST['stime'])){
 				$bstime = $_REQUEST['stime'];
-				$bstime = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
-			}
-	
-			$script = 'var tline = create_timeline("graph",'.$effectiveperiod.', '.$stime.', '.($bstime + $effectiveperiod).');'."\n";
-						
 
+				$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
+				$timeline['usertime'] += $timeline['period'];
+			}
+			
+			$objData = array();
+			
 			if(isset($dom_graph_id)){
-				$script.= 'var scrl = scrollCreate("graph", null, tline.timelineid);'."\n";
-				$script.= 'var sbox = sbox_init("graph", tline.timelineid, "graph", ZBX_G_WIDTH, 200);'."\n";
+				$objData['id'] = $dom_graph_id;
+				$objData['domid'] = $dom_graph_id;
+				$objData['containerid'] = $containerid;
+				$objData['src'] = $src;
+				$objData['objDims'] = $graphDims;
+				$objData['loadSBox'] = 1;
+				$objData['loadImage'] = 1;
+				$objData['loadScroll'] = 1;
+				$objData['scrollWidthByImage'] = 1;
+				$objData['dynamic'] = 1;				
 			}
 			else{
-				$script.= 'var scrl = scrollCreate("graph", (document.body.clientWidth - 30), tline.timelineid);'."\n";
+				$dom_graph_id = 'graph';
+
+				$objData['id'] = $dom_graph_id;
+				$objData['domid'] = $dom_graph_id;
+				$objData['loadSBox'] = 0;
+				$objData['loadImage'] = 0;
+				$objData['loadScroll'] = 1;
+				$objData['dynamic'] = 0;
+				$objData['mainObject'] = 1;
 			}
 
-			$script.= '	addListener("graph","load",function(){ZBX_SCROLLBARS[scrl.scrollbarid].disabled=0;});'."\n".
-						'scrl.onchange = graphload; '."\n".
-						'sbox.onchange = graphload; ';
-	
-			zbx_add_post_js($script);
+						
+			zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
+			zbx_add_post_js('timeControl.processObjects();');
+
+/*
+			if(isset($dom_graph_id)){
+				zbx_add_post_js('addGraph("'.$containerid.'", "'.$dom_graph_id.'","'.$src.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($graphDims).','.$loadSBox.');');
+			}
+			else{
+				$script = 'var tline = create_timeline("graph",'.$timeline['period'].', '.$timeline['starttime'].','.$timeline['usertime'].');'."\n";
+				$script.= 'var scrl = scrollCreate("graph", (document.body.clientWidth - 30), tline.timelineid);'."\n";
+				$script.= 'scrl.onchange = graphUpdate; '."\n";
+				zbx_add_post_js($script);
+			}
+//*/
 //-------------
 
 			$scroll_div = new CDiv();
 			$scroll_div->setAttribute('id','scrollbar_cntr');
-			$scroll_div->setAttribute('style','margin-left: 1px; ');
 			$scroll_div->show();
-
-/*
-			$stime = get_min_itemclock_by_itemid($_REQUEST['itemid']);
-			$stime = (is_null($stime))?0:$stime;
-			$bstime = time()-$effectiveperiod;
-
-			if(isset($_REQUEST['stime'])){
-				$bstime = $_REQUEST['stime'];
-				$bstime = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
-			}
-
- 			$script = 'scrollinit(0,'.$effectiveperiod.','.$stime.',0,'.$bstime.'); showgraphmenu("graph");';
-			if(isset($dom_graph_id))
-				$script.='graph_zoom_init("'.$dom_graph_id.'",'.$bstime.','.$effectiveperiod.',ZBX_G_WIDTH, 200, true);';
-
-			zbx_add_post_js($script);
-
-			$scroll_div = new CDiv();
-			$scroll_div->setAttribute('id','scrollbar_cntnr');
-			$scroll_div->setAttribute('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
-			$scroll_div->show();
-
-//*/
-//			navigation_bar("history.php",$to_save_request);
 		}
 	}
 ?>

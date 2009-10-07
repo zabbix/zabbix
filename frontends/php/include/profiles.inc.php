@@ -78,15 +78,14 @@ function get_profile($idx,$default_value=null,$idx2=0,$source=null,$nocache=fals
 
 		}
 	}
-
+	
 	if(isset($profiles[$idx]) && !empty($profiles[$idx])){
 		if(!is_null($source))
 			return $profiles[$idx][$source];
-		else if(!isset($profiles[$idx][$idx2])){
-			return $default_value;
-		}
-		else
+		else if(isset($profiles[$idx][$idx2]))
 			return $profiles[$idx][$idx2];
+		else
+			return $default_value;
 	}
 
 return $default_value;
@@ -125,9 +124,9 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 		$result = DBend();
 	}
 	else{
-		$prof = get_profile($idx, false);
+		$prof = get_profile($idx, false, is_null($idx2)?0:$idx2);
 
-		if(!$prof){
+		if($prof === false){
 			$result = insert_profile($idx,$value,$type,$idx2,$source);
 		}
 		else{
