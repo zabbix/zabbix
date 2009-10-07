@@ -387,7 +387,7 @@ include_once('include/page_header.php');
 	$jsmenu->InsertJavaScript();
 ?>
 <?php
-
+echo SBR;
 include_once('include/page_footer.php');
 
 ?>

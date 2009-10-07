@@ -51,7 +51,8 @@
 			return false;
 		}
 
-		if(!eregi('^([0-9a-zA-Z\_\.[.-.]\$ ]+)$', $name)){
+//		if(!eregi('^([0-9a-zA-Z\_\.[.-.]\$ ]+)$', $name)){
+		if(!preg_match('/^([0-9a-z\_\.[.-.]\$ ]+)$/i', $name)){
 			error("Scenario step name should contain '0-9a-zA-Z_ .$'- characters only");
 			return false;
 		}

@@ -509,7 +509,8 @@ return $result;
 		$hosts = array();
 
 		/* Replace all {server:key.function(param)} and {MACRO} with '$ZBX_TR_EXPR_REPLACE_TO' */
-		while(ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT, $expr, $arr)){
+//		while(ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT, $expr, $arr)){
+		while(preg_match('/'.ZBX_PREG_EXPRESSION_TOKEN_FORMAT.'/', $expr, $arr)){
 			if($arr[ZBX_EXPRESSION_MACRO_ID] && !isset($ZBX_TR_EXPR_SIMPLE_MACROS[$arr[ZBX_EXPRESSION_MACRO_ID]]) ){
 				$hosts = array('0');
 				break;
@@ -635,7 +636,8 @@ return $result;
 
 		$item_count = 0;
 // Replace all {server:key.function(param)} and {MACRO} with '$ZBX_TR_EXPR_REPLACE_TO'
-		while(ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT, $expr, $arr)){
+//		while(ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT, $expr, $arr)){
+		while(preg_match('/'.ZBX_PREG_EXPRESSION_TOKEN_FORMAT.'/', $expr, $arr)){
 			if($arr[ZBX_EXPRESSION_MACRO_ID] && !isset($ZBX_TR_EXPR_SIMPLE_MACROS[$arr[ZBX_EXPRESSION_MACRO_ID]]) ){
 				error('Unknown macro ['.$arr[ZBX_EXPRESSION_MACRO_ID].']');
 				return false;
@@ -712,7 +714,7 @@ return $result;
 							}
 						}
 
-						if(preg_match('/^'.ZBX_EREG_EXPRESSION_USER_MACROS.'$/', $parameter[$pid])) continue;
+						if(preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $parameter[$pid])) continue;
 
 						if(('sec' == $params['type']) && (validate_float($parameter[$pid])!=0) ){
 							error('['.$parameter[$pid].'] is not a float or macro for function ('.$function.')');
@@ -1079,9 +1081,10 @@ return $result;
 		$expr = $expression;
 		$short_exp = $expression;
 
-		/* Replace all {server:key.function(param)} and {MACRO} with '$ZBX_TR_EXPR_REPLACE_TO' */
-		/* build short expression {12}>10 */
-		while(ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT, $expr, $arr)){
+/* Replace all {server:key.function(param)} and {MACRO} with '$ZBX_TR_EXPR_REPLACE_TO' */
+/* build short expression {12}>10 */
+//		while(ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT, $expr, $arr)){
+		while(preg_match('/'.ZBX_PREG_EXPRESSION_TOKEN_FORMAT.'/', $expr, $arr)){
 			if($arr[ZBX_EXPRESSION_MACRO_ID] && !isset($ZBX_TR_EXPR_SIMPLE_MACROS[$arr[ZBX_EXPRESSION_MACRO_ID]])){
 				error('[ie] Unknown macro ['.$arr[ZBX_EXPRESSION_MACRO_ID].']');
 				return false;
@@ -1166,10 +1169,12 @@ return $result;
 	 */
 	function extract_numbers($str){
 		$numbers = array();
-		while ( ereg(ZBX_EREG_NUMBER.'([[:print:]]*)', $str, $arr) ) {
+//		while ( ereg(ZBX_EREG_NUMBER.'([[:print:]]*)', $str, $arr) ) {
+		while(preg_match('/'.ZBX_PREG_NUMBER.'(['.ZBX_PREG_PRINT.']*)/', $str, $arr)){
 			$numbers[] = $arr[1];
 			$str = $arr[2];
 		}
+
 	return $numbers;
 	}
 
@@ -1188,7 +1193,9 @@ return $result;
 	 */
 	function expand_trigger_description_constants($description, $row){
 		if($row && isset($row['expression'])){
-			$numbers = extract_numbers(ereg_replace('(\{[0-9]+\})', 'function', $row['expression']));
+//			$numbers = extract_numbers(ereg_replace('(\{[0-9]+\})', 'function', $row['expression']));
+			$numbers = extract_numbers(preg_replace('/(\{[0-9]+\})/', 'function', $row['expression']));
+			
 			$description = $row['description'];
 
 			for ( $i = 0; $i < 9; $i++ ){
@@ -2516,8 +2523,9 @@ return $result;
 	function trigger_get_N_functionid($expression, $function){
 		$result = NULL;
 
-		$arr=split('[\{\}]',$expression);
-		$num=1;
+//		$arr=split('[\{\}]',$expression);
+		$arr = preg_split('/[\{\}]/', $expression);
+		$num = 1;
 		foreach($arr as $id){
 			if(is_numeric($id)){
 				if($num == $function){
@@ -2527,7 +2535,8 @@ return $result;
 				$num++;
 			}
 		}
-		return $result;
+
+	return $result;
 	}
 
 	/*

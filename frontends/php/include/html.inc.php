@@ -182,9 +182,11 @@
 			}
 		}
 		else if(is_object($obj)){
-			if(str_in_array(strtolower(get_class($obj)),array('cform','ccheckbox','cselect','cbutton','cbuttonqmessage','cbuttondelete','cbuttoncancel'))){
+			$formObjects = array('cform','ccheckbox','cselect','cbutton','cbuttonqmessage','cbuttondelete','cbuttoncancel');
+			if(is_object($obj) && str_in_array(strtolower(get_class($obj)), $formObjects)){
 				$obj=SPACE;
 			}
+
 			if(isset($obj->items) && !empty($obj->items)){
 				foreach($obj->items as $id => $item){
 					hide_form_items($obj->items[$id]); 		// Recursion

@@ -85,9 +85,9 @@ function execute_script($scriptid,$hostid){
 	}
 
 	if($res){
-		list($flag,$msg)=split("\255",$res);
-		$message['flag']=$flag;
-		$message['message']=$msg;
+		list($flag,$msg) = explode("\255",$res);
+		$message['flag'] = $flag;
+		$message['message'] = $msg;
 	}
 	else{
 		$message['flag']=-1;
