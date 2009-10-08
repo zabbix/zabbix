@@ -507,29 +507,44 @@ COpt::profiling_start('history');
 						$row['value'] = '';
 				}
 
-				if($row['valuemapid'] > 0)
-					$value = replace_value_by_map($row['value'], $row['valuemapid']);
-				else
-					$value = $row['value'];
-
-				$new_row = array(date('Y.M.d H:i:s',$row['clock']));
-				if(str_in_array($item_type,array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))){
-					array_push($new_row,$value);
-				}
-				else{
-					$pre = new CTag('pre','yes');
-					$pre->addItem($value);
-
-					array_push($new_row,$pre);
-				}
-
-				if(!isset($_REQUEST['plaintext'])){
-					$table->ShowRow($new_row);
-				}
-				else{
+				
+				if(isset($_REQUEST['plaintext'])){
+					if(str_in_array($item_type, array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))){
+						sscanf($row['value'], '%f', $value);					
+					}
+					else{
+						$value = $row['value'];
+					}
 					echo date('Y-m-d H:i:s',$row['clock']);
-					echo "\t".$row['clock']."\t".htmlspecialchars($row['value'])."\n";
+					echo "\t".$row['clock']."\t".htmlspecialchars($value)."\n";
 				}
+				else{
+					$new_row = array(date('Y.M.d H:i:s', $row['clock']));
+					
+					$value_numeric = str_in_array($item_type, array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64));
+					
+					if($row['valuemapid'] > 0){
+						$value = replace_value_by_map($row['value'], $row['valuemapid']);
+						$value_mapped = true;
+					}
+					else{
+						$value = $row['value'];
+						$value_mapped = false;
+					}
+					
+					if($value_numeric && !$value_mapped){
+						sscanf($row['value'], '%f', $value);
+					}
+					else if(($value_mapped && !$value_numeric) || (!$value_mapped && !$value_numeric)){
+						$pre = new CTag('pre','yes');
+						$pre->addItem($value);
+						$value = $pre;
+					}
+					
+					array_push($new_row, $value);
+					
+					$table->ShowRow($new_row);
+				}	
 			}
 
 			if(!isset($_REQUEST['plaintext'])){
