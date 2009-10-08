@@ -755,6 +755,7 @@ FIELD		|value_str	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|source		|t_varchar(96)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|userid,idx,idx2
+INDEX		|2		|userid,profileid
 
 TABLE|rights|rightid|ZBX_SYNC
 FIELD		|rightid	|t_id		|'0'	|NOT NULL	|0

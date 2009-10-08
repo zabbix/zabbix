@@ -49,7 +49,7 @@ function get_profile($idx,$default_value=null,$idx2=0,$source=null,$nocache=fals
 				' FROM profiles '.
 				' WHERE userid='.$USER_DETAILS['userid'].
 					' AND '.DBin_node('profileid').
-				' ORDER BY profileid ASC';
+				' ORDER BY userid ASC, profileid ASC';
 		$db_profiles = DBselect($sql);
 		while($profile=DBfetch($db_profiles)){
 			if(!isset($profiles[$profile['idx']])) $profiles[$profile['idx']] = array();
