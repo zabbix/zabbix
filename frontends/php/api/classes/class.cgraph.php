@@ -77,6 +77,7 @@ class CGraph {
 			'itemids' 				=> null,
 			'type' 					=> null,
 			'templated_graphs'		=> null,
+			'not_templated_graphs'	=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
 // output
@@ -192,6 +193,9 @@ class CGraph {
 // templated_graphs
 		if(!is_null($options['templated_graphs'])){
 			$sql_parts['where'][] = 'g.templateid<>0';
+		}
+		else if(!is_null($options['not_templated_graphs'])){
+			$sql_parts['where'][] = 'g.templateid=0';
 		}
 
 // extendoutput

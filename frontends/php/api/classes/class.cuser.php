@@ -493,7 +493,7 @@ class CUser{
 
 			if($result){
 	//			$result = DBexecute('DELETE FROM media WHERE userid='.$userid);
-				foreach($user['user_medias'] as $mediaid => $media_data){
+				foreach($user['user_medias'] as $media_data){
 					if(!$result) break;
 					$mediaid = get_dbid("media","mediaid");
 					$result = DBexecute('INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period)'.
@@ -618,7 +618,7 @@ class CUser{
 
 			if($result && !is_null($user['user_medias'])){
 				$result = DBexecute('DELETE FROM media WHERE userid='.$userid);
-				foreach($user['user_medias'] as $mediaid => $media_data){
+				foreach($user['user_medias'] as $media_data){
 					if(!$result) break;
 					$mediaid = get_dbid('media', 'mediaid');
 					$result = DBexecute('INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period)'.
@@ -652,24 +652,27 @@ class CUser{
 	 * @version 1
 	 *
 	 * @param array $media_data
-	 * @param string $media_data['mediatypeid']
-	 * @param string $media_data['address']
-	 * @param int $media_data['severity']
-	 * @param int $media_data['active']
-	 * @param string $media_data['period']
+	 * @param string $media_data['userid']
+	 * @param string $media_data['medias']['mediatypeid']
+	 * @param string $media_data['medias']['address']
+	 * @param int $media_data['medias']['severity']
+	 * @param int $media_data['medias']['active']
+	 * @param string $media_data['medias']['period']
 	 * @return boolean
 	 */
 	public static function addMedia($media_data){
-		$result = false;
+		$result = true;
+		$mediaids = array();
 		$userid = $media_data['userid'];
 
 		foreach($media_data['medias'] as $media){
 			$result = add_media( $userid, $media['mediatypeid'], $media['sendto'], $media['severity'], $media['active'], $media['period']);
 			if(!$result) break;
+			$mediaids[$result] = $result;
 		}
 
 		if($result){
-			return true;
+			return $mediaids;
 		}
 		else{
 			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');

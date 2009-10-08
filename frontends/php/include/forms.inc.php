@@ -5165,7 +5165,6 @@
 
 		$frmHost = new CFormTable($frm_title,'hosts.php');
 		$frmHost->setHelp('web.hosts.host.php');
-		$frmHost->addVar('config',get_request('config',0));
 		$frmHost->addVar('massupdate',get_request('massupdate',1));
 
 		$hosts = $_REQUEST['hosts'];
@@ -5473,6 +5472,7 @@
 		$location	= get_request('location','');
 		$notes		= get_request('notes','');
 
+		$_REQUEST['hostid'] = get_request('hostid', 0);
 // BEGIN: HOSTS PROFILE EXTENDED Section
 		$useprofile_ext		= get_request('useprofile_ext','no');
 		$ext_host_profiles	= get_request('ext_host_profiles',array());
