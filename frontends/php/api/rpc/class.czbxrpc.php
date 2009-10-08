@@ -30,6 +30,7 @@ public static $result;
 		$notifications = array(
 			'host.delete_all'=>1	// example!
 		);
+
 		if(is_null($params) && !isset($notifications[$method])){
 			self::$result = array('error'=>ZBX_API_ERROR_PARAMETERS);
 			return self::$result;
@@ -44,7 +45,7 @@ public static $result;
 
 			$user = CUser::get(array('users' => $params['user'], 'extendoutput' => 1, 'get_access' => 1));
 			$user = reset($user);
-			if(!$user['api_access']){
+			if($user['api_access'] != GROUP_API_ACCESS_ENABLED){
 				self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'No API access');
 				return self::$result;
 			}
@@ -68,6 +69,11 @@ public static $result;
 		}
 
 		call_user_func(array('self', $resource), $action, $params);
+		
+		if(self::$result !== false)
+			self::$result = array('result' => self::$result);
+		else
+			self::$result = reset(CZBXAPI::$error);
 
 	return self::$result;
 	}
@@ -81,10 +87,8 @@ public static $result;
 			default:
 			$result = call_user_func(array('CUser', $action), $params);
 		}
-		if($result !== false)
-			self::$result = array('result' => $result);
-		else
-			self::$result = CUser::$error;
+		
+		self::$result = $result;
 	}
 
 // HOST GROUP
@@ -97,10 +101,7 @@ public static $result;
 			$result = call_user_func(array('CHostGroup', $action), $params);
 		}
 
-		if($result !== false)
-			self::$result = array('result' => $result);
-		else
-			self::$result = CUser::$error;
+		self::$result = $result;
 	}
 
 // TEMPLATE
@@ -113,10 +114,7 @@ public static $result;
 			$result = call_user_func(array('CTemplate', $action), $params);
 		}
 
-		if($result !== false)
-			self::$result = array('result' => $result);
-		else
-			self::$result = CUser::$error;
+		self::$result = $result;
 	}
 
 // HOST
@@ -129,10 +127,7 @@ public static $result;
 			$result = call_user_func(array('CHost', $action), $params);
 		}
 
-		if($result !== false)
-			self::$result = array('result' => $result);
-		else
-			self::$result = CUser::$error;
+		self::$result = $result;
 	}
 
 // ITEM
@@ -145,10 +140,7 @@ public static $result;
 			$result = call_user_func(array('CItem', $action), $params);
 		}
 
-		if($result !== false)
-			self::$result = array('result' => $result);
-		else
-			self::$result = CUser::$error;
+		self::$result = $result;
 	}
 
 // TRIGGER
@@ -161,10 +153,7 @@ public static $result;
 			$result = call_user_func(array('CTrigger', $action), $params);
 		}
 
-		if($result !== false)
-			self::$result = array('result' => $result);
-		else
-			self::$result = CUser::$error;
+		self::$result = $result;
 	}
 
 // GRAPH
@@ -177,11 +166,7 @@ public static $result;
 			$result = call_user_func(array('CGraph', $action), $params);
 		}
 
-		if($result !== false)
-			self::$result = array('result' => $result);
-		else
-			self::$result = CUser::$error;
+		self::$result = $result;
 	}
-
 }
 ?>

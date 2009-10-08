@@ -109,8 +109,8 @@ private $zbx2json_error_list;
 			}
 			else{
 				$result['data'] = isset($result['data'])?$result['data']:null;
-				$error = $this->zbx2json_error($result['error']);
-				$this->json_error($call['id'], $error, $result['data']);
+				$errno = $this->zbx2json_error($result['error']);
+				$this->json_error($call['id'], $errno, $result['data']);
 			}
 		}
 	}

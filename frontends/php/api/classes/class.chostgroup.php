@@ -27,24 +27,21 @@
  * Class containing methods for operations with HostGroups
  *
  */
-class CHostGroup {
-
-	public static $error;
-
-	/**
-	 * Get HostGroup by ID
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @static
-	 * @param _array $group_data
-	 * @param array $group_data['groupid']
-	 * @return array|boolean
-	 */
+class CHostGroup extends CZBXAPI{
+/**
+ * Get HostGroup by ID
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @static
+ * @param _array $group_data
+ * @param array $group_data['groupid']
+ * @return array|boolean
+ */
 	public static function getById($group_data){
 		$sql = "SELECT * FROM groups WHERE groupid={$group_data['groupid']}";
 		$group = DBfetch(DBselect($sql));
@@ -52,7 +49,7 @@ class CHostGroup {
 		if($group)
 			return $group;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'HostGroup with ID: '.$group_data['groupid'].' does not exists');
+			self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'HostGroup with ID: '.$group_data['groupid'].' does not exists');
 			return false;
 		}
 	}
@@ -78,7 +75,7 @@ class CHostGroup {
 		if($groupid)
 			return $groupid['groupid'];
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'HostGroup with name [ '.$group_data['name'].' ] does not exists');
+			self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'HostGroup with name [ '.$group_data['name'].' ] does not exists');
 			return false;
 		}
 	}
@@ -427,7 +424,7 @@ class CHostGroup {
 		$groupids = array();
 		$result = true;
 		
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($groups as $group){
 		
 			if(!is_string($group)){
@@ -454,12 +451,12 @@ class CHostGroup {
 			
 			$groupids[$groupid] = $groupid;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 		
 		if($result)
 			return $groupids;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
 			return false;
 		}
 	}
@@ -485,7 +482,7 @@ class CHostGroup {
 		
 		$result = true;
 		
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($groups as $group){
 		
 			$group_exist = CHostGroup::getId(array('name' => $group['name']));
@@ -504,12 +501,12 @@ class CHostGroup {
 			}
 			
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
 			return false;
 		}
 	}
@@ -532,7 +529,7 @@ class CHostGroup {
 		if($result)
 			return $groupids;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
@@ -555,7 +552,7 @@ class CHostGroup {
 		$result = true;
 		$error = 'Internal ZABBIX error';
 		
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($data['hostids'] as $hostid){
 			$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
 			$result = DBexecute("INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES ($hostgroupid, $hostid, {$data['groupid']})");
@@ -566,12 +563,12 @@ class CHostGroup {
 			}
 		}
 
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 		
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
 			return false;
 		}
 	}
@@ -592,17 +589,17 @@ class CHostGroup {
 	 * @return boolean
 	 */
 	public static function removeHosts($data){
-		DBstart(false);	
+		self::BeginTransaction(__METHOD__);	
 		
 		$sql = 'DELETE FROM hosts_groups WHERE '.DBcondition('hostid', $data['hostids']).' AND '.DBcondition('groupid', $data['groupids']);
 		$result = DBexecute($sql);
 		
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Database error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Database error');
 			return false;
 		}
 	}
@@ -626,19 +623,19 @@ class CHostGroup {
 		$groupids = $data['groupids'];
 		$result = true;
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($groupids as $key => $groupid) {
 			$hostgroupid = get_dbid("hosts_groups","hostgroupid");
 			$result = DBexecute("insert into hosts_groups (hostgroupid,hostid,groupid) values ($hostgroupid, $hostid, $groupid)");
 			if(!$result)
 				return $result;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
@@ -664,7 +661,7 @@ class CHostGroup {
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}

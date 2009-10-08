@@ -26,10 +26,7 @@
 /**
  * Class containing methods for operations with UserMacro
  */
-class CUserMacro {
-
-	public static $error;
-
+class CUserMacro extends CZBXAPI{
 /**
  * Get UserMacros data
  *
@@ -453,7 +450,7 @@ class CUserMacro {
 		if($result)
 			return $macro;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'HostMacro with id: '.$macro_data['macroid'].' doesn\'t exists.');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'HostMacro with id: '.$macro_data['macroid'].' doesn\'t exists.');
 			return false;
 		}
 	}
@@ -478,7 +475,7 @@ class CUserMacro {
 		$result = true;
 
 		$hostid = $macros['hostid'];
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 
 		foreach($macros['macros'] as $macro){
 			$macroid = self::getHostMacroID(array('hostid' => $hostid, 'macro' => $macro['macro']));
@@ -492,12 +489,13 @@ class CUserMacro {
 				if(!$result) break;
 			}
 		}
-		DBend($result);
+
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => '');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
 			return false;
 		}
 	}
@@ -520,7 +518,8 @@ class CUserMacro {
 	public static function update($macros){
 		$result = true;
 
-		DBstart(false);
+//		self::BeginTransaction(__METHOD__);
+		self::BeginTransaction(__CLASS__);
 
 		$sql = 'DELETE FROM hostmacro WHERE hostid='.$macros['hostid'];
 		DBexecute($sql);
@@ -534,12 +533,14 @@ class CUserMacro {
 
 			if(!$result) break;
 		}
-		DBend($result);
+
+//		$result = self::EndTransaction($result, __METHOD__);		
+		$result = self::EndTransaction($result);
 
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => '');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
 			return false;
 		}
 	}
@@ -562,7 +563,7 @@ class CUserMacro {
 	public static function updateValue($macros){
 		$result = true;
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 
 		foreach($macros['macros'] as $macro){
 
@@ -572,12 +573,13 @@ class CUserMacro {
 
 			if(!$result) break;
 		}
-		DBend($result);
+
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => '');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
 			return false;
 		}
 	}
@@ -599,23 +601,24 @@ class CUserMacro {
  */
 	public static function addGlobal($macros){
 		$result = true;
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($macros as $macro){
 
 			$globalmacroid = get_dbid('globalmacro', 'globalmacroid');
 
-			$sql = 'INSERT INTO globalmacro (globalmacroid, macro, value)
-				VALUES('.$globalmacroid.', '.zbx_dbstr($macro['macro']).', '.zbx_dbstr($macro['value']).')';
+			$sql = 'INSERT INTO globalmacro (globalmacroid, macro, value) '.
+					' VALUES('.$globalmacroid.', '.zbx_dbstr($macro['macro']).', '.zbx_dbstr($macro['value']).')';
 			$result = DBExecute($sql);
 
 			if(!$result) break;
 		}
-		DBend($result);
+
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => '');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
 			return false;
 		}
 	}
@@ -646,7 +649,7 @@ class CUserMacro {
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => '');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
 			return false;
 		}
 	}
@@ -672,7 +675,7 @@ class CUserMacro {
 		if($result)
 			return $macro;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'GlobalMacro with id: '.$macro_data['macroid'].' doesn\'t exists.');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'GlobalMacro with id: '.$macro_data['macroid'].' doesn\'t exists.');
 			return false;
 		}
 	}
@@ -703,7 +706,7 @@ class CUserMacro {
 		if($macroid = DBfetch($res))
 			$result = $macroid['hostmacroid'];
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'HostMacros with name: "'.$macro_data['macro'].'" doesn\'t exists.');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'HostMacros with name: "'.$macro_data['macro'].'" doesn\'t exists.');
 		}
 
 	return $result;
@@ -734,7 +737,7 @@ class CUserMacro {
 		if($macroid = DBfetch($res))
 			$result = $macroid['globalmacroid'];
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'GlobalMacros with name: "'.$macro_data['macro'].'" doesn\'t exists.');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'GlobalMacros with name: "'.$macro_data['macro'].'" doesn\'t exists.');
 		}
 
 	return $result;
@@ -860,7 +863,7 @@ class CUserMacro {
 		if($result)
 			return $hostmacroids;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
 			return false;
 		}
 	}
@@ -885,7 +888,7 @@ class CUserMacro {
 		if($result)
 			return $globalmacroids;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
 			return false;
 		}
 	}

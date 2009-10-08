@@ -708,58 +708,29 @@ class CChart extends CGraphDraw{
 
 			}
 		}
-/*
-		if(isset($maxY)&&($maxY>0)){
-
-//				$exp = round(log10($maxY));
-//				$mant = $maxY/pow(10,$exp);
-
-//				$mant=((round(($mant*11)/6)-1)*6)/10;
-//				$maxY = $mant*pow(10,$exp);
-
-			$maxY = round($maxY,1);// + round($maxY,1)*0.2 + 0.05;
-		}
-		else if(isset($maxY)&&($maxY<0)){
-			$maxY = round($maxY,1);// - round($maxY,1)*0.2 + 0.05;
-		}
-		else {
-			$maxY=0.3;
-		}
-//*/
 	return $maxY;
 	}
 
 	protected function calcZero(){
 		$left = GRAPH_YAXIS_SIDE_LEFT;
 		$right = GRAPH_YAXIS_SIDE_RIGHT;
+		$sides = array(GRAPH_YAXIS_SIDE_LEFT. GRAPH_YAXIS_SIDE_RIGHT);
+		
+		foreach($sides as $num => $side){
+			$this->unit2px[$side] = ($this->m_maxY[$side] - $this->m_minY[$side])/$this->sizeY;
 
-		$this->unit2px[$right] = ($this->m_maxY[$right] - $this->m_minY[$right])/$this->sizeY;
-		$this->unit2px[$left] = ($this->m_maxY[$left] - $this->m_minY[$left])/$this->sizeY;
-
-		if($this->m_minY[$right]>0){
-			$this->zero[$right] = $this->sizeY+$this->shiftY;
-			$this->oxy[$right] = min($this->m_minY[$right],$this->m_maxY[$right]);
-		}
-		else if($this->m_maxY[$right]<0) {
-			$this->zero[$right] = $this->shiftY;
-			$this->oxy[$right] = max($this->m_minY[$right],$this->m_maxY[$right]);
-		}
-		else{
-			$this->zero[$right] = $this->sizeY+$this->shiftY - (int)abs($this->m_minY[$right]/$this->unit2px[$right]);
-			$this->oxy[$right] = 0;
-		}
-
-		if($this->m_minY[$left]>0){
-			$this->zero[$left] = $this->sizeY+$this->shiftY;
-			$this->oxy[$left] = min($this->m_minY[$left],$this->m_maxY[$left]);
-		}
-		else if($this->m_maxY[$left]<0){
-			$this->zero[$left] = $this->shiftY;
-			$this->oxy[$left] = max($this->m_minY[$left],$this->m_maxY[$left]);
-		}
-		else{
-			$this->zero[$left] = $this->sizeY+$this->shiftY - (int)abs($this->m_minY[$left]/$this->unit2px[$left]);
-			$this->oxy[$left] = 0;
+			if($this->m_minY[$side]>0){
+				$this->zero[$side] = $this->sizeY+$this->shiftY;
+				$this->oxy[$side] = min($this->m_minY[$side],$this->m_maxY[$side]);
+			}
+			else if($this->m_maxY[$side]<0) {
+				$this->zero[$side] = $this->shiftY;
+				$this->oxy[$side] = max($this->m_minY[$side],$this->m_maxY[$side]);
+			}
+			else{
+				$this->zero[$side] = $this->sizeY+$this->shiftY - (int)abs($this->m_minY[$side]/$this->unit2px[$side]);
+				$this->oxy[$side] = 0;
+			}
 		}
 	}
 
@@ -1762,7 +1733,6 @@ SDI('======================================');
 			if($this->graphOrientation[GRAPH_YAXIS_SIDE_RIGHT] == '-') $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] = 0;
 			else $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] = 0;
 		}
-
 
 		$this->correctMinMax();
 

@@ -29,11 +29,18 @@
 		define ('PAGE_HEADER_LOADED', 1);
 	}
 
-	//------------------------------------- <HISTORY> ---------------------------------------
+//------------------------------------- <HISTORY> ---------------------------------------
 	if(isset($page['hist_arg']) && ($USER_DETAILS['alias'] != ZBX_GUEST_USER) && ($page['type'] == PAGE_TYPE_HTML) && !defined('ZBX_PAGE_NO_MENU')){
 		add_user_history($page);
 	}
-	//------------------------------------- </HISTORY> --------------------------------------
+//------------------------------------- </HISTORY> --------------------------------------
+
+// END Transactions if havn't been -----------------
+	if(isset($DB) && $DB['TRANSACTIONS'] != 0){
+		error('Transaction have not been closed. Aborting..');
+		DBend(false);
+	}
+//--------------------------------------------------
 
 	show_messages();
 

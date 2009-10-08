@@ -27,34 +27,31 @@
  * Class containing methods for operations with maintenances
  *
  */
-class CMaintenance {
-
-	public static $error;
-
-	/**
-	 * Get maintenances data
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param array $options
-	 * @param array $options['itemids']
-	 * @param array $options['hostids']
-	 * @param array $options['groupids']
-	 * @param array $options['triggerids']
-	 * @param array $options['maintenanceids']
-	 * @param boolean $options['status']
-	 * @param boolean $options['templated_items']
-	 * @param boolean $options['editable']
-	 * @param boolean $options['count']
-	 * @param string $options['pattern']
-	 * @param int $options['limit']
-	 * @param string $options['order']
-	 * @return array|int item data as array or false if error
-	 */
+class CMaintenance extends CZBXAPI{
+/**
+ * Get maintenances data
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $options
+ * @param array $options['itemids']
+ * @param array $options['hostids']
+ * @param array $options['groupids']
+ * @param array $options['triggerids']
+ * @param array $options['maintenanceids']
+ * @param boolean $options['status']
+ * @param boolean $options['templated_items']
+ * @param boolean $options['editable']
+ * @param boolean $options['count']
+ * @param string $options['pattern']
+ * @param int $options['limit']
+ * @param string $options['order']
+ * @return array|int item data as array or false if error
+ */
 	public static function get($options=array()){
 		global $USER_DETAILS;
 
@@ -292,7 +289,7 @@ class CMaintenance {
 		if($result)
 			return $maintenance;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Maintenance with id: '.$maintenance['maintenanceid'].' does not exists.');
+			self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Maintenance with id: '.$maintenance['maintenanceid'].' does not exists.');
 			return false;
 		}
 	}
@@ -320,7 +317,7 @@ class CMaintenance {
 		if($result)
 			return $maintenance['maintenanceid'];
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Maintenance does not exists.');
+			self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Maintenance does not exists.');
 			return false;
 		}
 	}
@@ -343,17 +340,17 @@ class CMaintenance {
 
 		$result = false;
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($maintenances as $num => $maintenance){
 			$result = add_maintenance($maintenance);
 			if(!$result) break;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
@@ -376,17 +373,17 @@ class CMaintenance {
 
 		$result = false;
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($maintenances as $num => $maintenance){
 			$result = update_maintenance($maintenance['maintenanceid'], $maintenance);
 			if(!$result) break;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
@@ -409,7 +406,7 @@ class CMaintenance {
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}

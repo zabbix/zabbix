@@ -24,6 +24,7 @@ function TODO($msg) { echo 'TODO: '.$msg.SBR; }  // DEBUG INFO!!!
 function __autoload($class_name){
 	$class_name = strtolower($class_name);
 	$api = array(
+		'czbxapi' => 1,
 		'caction' => 1,
 		'calert' => 1,
 		'capplication' => 1,
