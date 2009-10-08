@@ -27,35 +27,32 @@
  * Class containing methods for operations with events
  *
  */
-class CEvent {
-
-	public static $error = array();
-
-	/**
-	 * Get events data
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $options
-	 * @param array $options['itemids']
-	 * @param array $options['hostids']
-	 * @param array $options['groupids']
-	 * @param array $options['eventids']
-	 * @param array $options['applicationids']
-	 * @param array $options['status']
-	 * @param array $options['templated_items']
-	 * @param array $options['editable']
-	 * @param array $options['extendoutput']
-	 * @param array $options['count']
-	 * @param array $options['pattern']
-	 * @param array $options['limit']
-	 * @param array $options['order']
-	 * @return array|int item data as array or false if error
-	 */
+class CEvent extends CZBXAPI{
+/**
+ * Get events data
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $options
+ * @param array $options['itemids']
+ * @param array $options['hostids']
+ * @param array $options['groupids']
+ * @param array $options['eventids']
+ * @param array $options['applicationids']
+ * @param array $options['status']
+ * @param array $options['templated_items']
+ * @param array $options['editable']
+ * @param array $options['extendoutput']
+ * @param array $options['count']
+ * @param array $options['pattern']
+ * @param array $options['limit']
+ * @param array $options['order']
+ * @return array|int item data as array or false if error
+ */
 	public static function get($options=array()){
 		global $USER_DETAILS;
 
@@ -472,7 +469,7 @@ class CEvent {
 
 		$eventids = array();
 		$triggers = array();
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 
 		$result = false;
 		foreach($events as $num => $event){
@@ -512,7 +509,7 @@ class CEvent {
 			$result = CTrigger::update($triggers);
 		}
 
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 		if($result)
 			return $eventids;
 		else{

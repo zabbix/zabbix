@@ -26,10 +26,7 @@
 /**
  * Class containing methods for operations with Maps
  */
-class CMap{
-
-	public static $error;
-
+class CMap extends CZBXAPI{
 /**
  * Get Map data
  *
@@ -312,7 +309,7 @@ class CMap{
 		if($result)
 			return $map;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'map with id: '.$map_data['screenid'].' doesn\'t exists.');
+			self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'map with id: '.$map_data['screenid'].' doesn\'t exists.');
 			return false;
 		}
 	}
@@ -341,7 +338,7 @@ class CMap{
 		$result_ids = array();
 		$result = false;
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($maps as $map){
 
 			extract($map);
@@ -371,13 +368,13 @@ class CMap{
 
 			$result_ids[$sysmapid] = $sysmapid;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
 			return $result_ids;
 		}
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);//'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);//'Internal zabbix error');
 			return false;
 		}
 	}
@@ -405,7 +402,7 @@ class CMap{
 
 		$result = false;
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($maps as $map){
 
 			extract($map);
@@ -428,13 +425,13 @@ class CMap{
 
 			if(!$result) break;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
 			return true;
 		}
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
@@ -455,7 +452,7 @@ class CMap{
 	public static function delete($sysmapids){
 		$result = true;
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($sysmapids as $sysmapid){
 			$result = delete_sysmaps_elements_with_sysmapid($sysmapids);
 
@@ -471,12 +468,12 @@ class CMap{
 
 			if(!$result) break;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}

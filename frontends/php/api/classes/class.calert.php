@@ -27,35 +27,32 @@
  * Class containing methods for operations with Alerts
  *
  */
-class CAlert {
-
-	public static $error = array();
-
-	/**
-	 * Get Alerts data
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $options
-	 * @param array $options['itemids']
-	 * @param array $options['hostids']
-	 * @param array $options['groupids']
-	 * @param array $options['alertids']
-	 * @param array $options['applicationids']
-	 * @param array $options['status']
-	 * @param array $options['templated_items']
-	 * @param array $options['editable']
-	 * @param array $options['extendoutput']
-	 * @param array $options['count']
-	 * @param array $options['pattern']
-	 * @param array $options['limit']
-	 * @param array $options['order']
-	 * @return array|int item data as array or false if error
-	 */
+class CAlert extends CZBXAPI{
+/**
+ * Get Alerts data
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $options
+ * @param array $options['itemids']
+ * @param array $options['hostids']
+ * @param array $options['groupids']
+ * @param array $options['alertids']
+ * @param array $options['applicationids']
+ * @param array $options['status']
+ * @param array $options['templated_items']
+ * @param array $options['editable']
+ * @param array $options['extendoutput']
+ * @param array $options['count']
+ * @param array $options['pattern']
+ * @param array $options['limit']
+ * @param array $options['order']
+ * @return array|int item data as array or false if error
+ */
 	public static function get($options=array()){
 		global $USER_DETAILS;
 
@@ -435,7 +432,7 @@ class CAlert {
 	public static function add($alerts){
 
 		$alertids = array();
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 
 		$result = false;
 		foreach($alerts as $num => $alert){
@@ -473,7 +470,7 @@ class CAlert {
 			$alertids[$alertid] = $alertid;
 		}
 
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 		if($result)
 			return $alertids;
 		else{

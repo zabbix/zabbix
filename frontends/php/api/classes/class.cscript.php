@@ -27,34 +27,31 @@
  * Class containing methods for operations with Scripts
  *
  */
-class Cscript {
-
-	public static $error;
-
-	/**
-	 * Get Scripts data
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param array $options
-	 * @param array $options['itemids']
-	 * @param array $options['hostids']
-	 * @param array $options['groupids']
-	 * @param array $options['triggerids']
-	 * @param array $options['scriptids']
-	 * @param boolean $options['status']
-	 * @param boolean $options['templated_items']
-	 * @param boolean $options['editable']
-	 * @param boolean $options['count']
-	 * @param string $options['pattern']
-	 * @param int $options['limit']
-	 * @param string $options['order']
-	 * @return array|int item data as array or false if error
-	 */
+class Cscript extends CZBXAPI{
+/**
+ * Get Scripts data
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $options
+ * @param array $options['itemids']
+ * @param array $options['hostids']
+ * @param array $options['groupids']
+ * @param array $options['triggerids']
+ * @param array $options['scriptids']
+ * @param boolean $options['status']
+ * @param boolean $options['templated_items']
+ * @param boolean $options['editable']
+ * @param boolean $options['count']
+ * @param string $options['pattern']
+ * @param int $options['limit']
+ * @param string $options['order']
+ * @return array|int item data as array or false if error
+ */
 	public static function get($options=array()){
 		global $USER_DETAILS;
 
@@ -317,7 +314,7 @@ class Cscript {
 		if($result)
 			return $item;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Script with id: '.$script['scriptid'].' doesn\'t exists.');
+			self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Script with id: '.$script['scriptid'].' doesn\'t exists.');
 			return false;
 		}
 	}
@@ -347,7 +344,7 @@ class Cscript {
 		if($result)
 			return $script['scriptid'];
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Script doesn\'t exists.');
+			self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Script doesn\'t exists.');
 			return false;
 		}
 	}
@@ -370,7 +367,7 @@ class Cscript {
 
 		$result = false;
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($scripts as $num => $script){
 			$script_db_fields = array(
 				'name' => null,
@@ -390,12 +387,12 @@ class Cscript {
 			if(!$result) break;
 		}
 
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
@@ -418,7 +415,7 @@ class Cscript {
 
 		$result = false;
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($scripts as $num => $script){
 
 			$script_db_fields = CHost::getById($script);
@@ -437,12 +434,12 @@ class Cscript {
 			$result = update_script($script['scriptid'], $script['name'],$script['command'],$script['usrgrpid'],$script['groupid'],$script['host_access']);
 			if(!$result) break;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
@@ -464,7 +461,7 @@ class Cscript {
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}

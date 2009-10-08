@@ -26,17 +26,14 @@
 /**
  * Class containing methods for operations with GraphItems
  */
-class CGraphItem {
-
-	public static $error;
-
-	/**
-	* Get GraphItems data
-	*
-	* @static
-	* @param array $options
-	* @return array|boolean
-	*/
+class CGraphItem extends CZBXAPI{
+/**
+* Get GraphItems data
+*
+* @static
+* @param array $options
+* @return array|boolean
+*/
 	public static function get($options = array()){
 		global $USER_DETAILS;
 
@@ -242,7 +239,7 @@ class CGraphItem {
 		if($result)
 			return $graph;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Graph with id: '.$gitem_data['gitemid'].' doesn\'t exists.');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Graph with id: '.$gitem_data['gitemid'].' doesn\'t exists.');
 			return false;
 		}
 	}
@@ -267,7 +264,7 @@ class CGraphItem {
 		if($graph = DBfetch($db_res))
 			$result = $graph['graphid'];
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Host with name: "'.$graph_data['name'].'" doesn\'t exists.');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Host with name: "'.$graph_data['name'].'" doesn\'t exists.');
 		}
 
 	return $result;

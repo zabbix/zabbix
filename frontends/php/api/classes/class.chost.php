@@ -26,10 +26,7 @@
 /**
  * Class containing methods for operations with Hosts
  */
-class CHost {
-
-	public static $error;
-
+class CHost extends CZBXAPI{
 /**
  * Get Host data
  *
@@ -588,7 +585,7 @@ class CHost {
 		if($host)
 			return $host;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Host with ID [ '.$host_data['hostid'].' ] does not exists');
+			self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Host with ID [ '.$host_data['hostid'].' ] does not exists');
 			return false;
 		}
 	}
@@ -615,7 +612,7 @@ class CHost {
 		if($hostid = DBfetch($res))
 			return $hostid['hostid'];
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Host with name: "'.$host_data['host'].'" does not exists.');
+			self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Host with name: "'.$host_data['host'].'" does not exists.');
 			return false;
 		}
 	}
@@ -651,11 +648,11 @@ class CHost {
 		$templates = null;
 		$newgroup = '';
 
-		$error = 'Unknown ZABBIX internal error';
+		$error = 'Unknown ZABBIX internal error [CHost]';
 		$result_ids = array();
 		$result = false;
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 
 		foreach($hosts as $num => $host){
 
@@ -700,7 +697,7 @@ class CHost {
 			return $result_ids;
 		}
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);//'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
 			return false;
 		}
 	}
@@ -739,7 +736,9 @@ class CHost {
 
 		$result = false;
 
-		DBstart(false);
+//		self::BeginTransaction(__METHOD__);
+		self::BeginTransaction(__METHOD__);
+		
 		foreach($hosts as $num => $host){
 
 			$host_db_fields = CHost::getById($host);
@@ -762,13 +761,16 @@ class CHost {
 			if(!$result) break;
 			$hostids[$result] = $result;
 		}
-		$result = DBend($result);
+		
+//		$result = DBend($result);		
+		$result = $this->EndTransaction($result);
+
 
 		if($result){
 			return $hostids;
 		}
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
 			return false;
 		}
 	}
@@ -828,7 +830,7 @@ class CHost {
 			return $hostids;
 		}
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
 			return false;
 		}
 	}
@@ -850,7 +852,7 @@ class CHost {
 		if($result)
 			return $hostids;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
 			return false;
 		}
 	}

@@ -26,34 +26,31 @@
 /**
  * Class containing methods for operations with UserGroups.
  */
-class CUserGroup {
-
-	public static $error;
-
-	/**
-	 * Get UserGroups
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $options
-	 * @param array $options['nodeids'] Node IDs
-	 * @param array $options['usrgrpids'] UserGroup IDs
-	 * @param array $options['userids'] User IDs
-	 * @param boolean $options['status']
-	 * @param boolean $options['with_gui_access']
-	 * @param boolean $options['with_api_access']
-	 * @param boolean $options['select_users']
-	 * @param int $options['extendoutput']
-	 * @param int $options['count']
-	 * @param string $options['pattern']
-	 * @param int $options['limit'] limit selection
-	 * @param string $options['order']
-	 * @return array
-	 */
+class CUserGroup extends CZBXAPI{
+/**
+ * Get UserGroups
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $options
+ * @param array $options['nodeids'] Node IDs
+ * @param array $options['usrgrpids'] UserGroup IDs
+ * @param array $options['userids'] User IDs
+ * @param boolean $options['status']
+ * @param boolean $options['with_gui_access']
+ * @param boolean $options['with_api_access']
+ * @param boolean $options['select_users']
+ * @param int $options['extendoutput']
+ * @param int $options['count']
+ * @param string $options['pattern']
+ * @param int $options['limit'] limit selection
+ * @param string $options['order']
+ * @return array
+ */
 	public static function get($options=array()){
 		global $USER_DETAILS;
 
@@ -242,19 +239,19 @@ class CUserGroup {
 	return $result;
 	}
 
-	/**
-	 * Gets all UserGroup data from DB by usrgrpid.
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $group_data
-	 * @param array $group_data['usrgrpid'] UserGroup ID
-	 * @return array|boolean user data as array or false if error
-	 */
+/**
+ * Gets all UserGroup data from DB by usrgrpid.
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $group_data
+ * @param array $group_data['usrgrpid'] UserGroup ID
+ * @return array|boolean user data as array or false if error
+ */
 	public static function getById($group_data){
 
 		$group = DBfetch(DBselect('SELECT * FROM usrgrp WHERE usrgrpid='.$group_data['usrgrpid']));
@@ -262,29 +259,29 @@ class CUserGroup {
 		if($group)
 			return $group;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'UserGroup with id: '.$group_data['usrgrpid'].' doesn\'t exists.');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'UserGroup with id: '.$group_data['usrgrpid'].' doesn\'t exists.');
 			return false;
 		}
 	}
 
-	/**
-	 * Get UserGroup ID by UserGroup name.
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * <code>
-	 * $group_data = array(
-	 * 	*string 'name' => 'UserGroup name'
-	 * );
-	 * </code>
-	 *
-	 * @param array $group_data
-	 * @return string|boolean
-	 */
+/**
+ * Get UserGroup ID by UserGroup name.
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * <code>
+ * $group_data = array(
+ * 	*string 'name' => 'UserGroup name'
+ * );
+ * </code>
+ *
+ * @param array $group_data
+ * @return string|boolean
+ */
 	public static function getId($group_data){
 		$result = false;
 
@@ -296,7 +293,7 @@ class CUserGroup {
 		if($group = DBfetch(DBselect($sql)))
 			$result = $group['usrgrpid'];
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Host with name: "'.$user_data['alias'].'" doesn\'t exists.');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Host with name: "'.$user_data['alias'].'" doesn\'t exists.');
 		}
 
 	return $result;
@@ -327,7 +324,7 @@ class CUserGroup {
 		$error = 'Unknown ZABBIX internal error';
 		$result = false;
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 
 		foreach($groups as $group){
 
@@ -347,13 +344,13 @@ class CUserGroup {
 			$result = add_user_group($group['name'], $group['users_status'], $group['gui_access'], $group['api_access']);
 			if(!$result) break;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
 			return true;
 		}
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
 			return false;
 		}
 	}
@@ -373,7 +370,7 @@ class CUserGroup {
 	public static function update($groups){
 		$result = false;
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($groups as $group){
 			$group_db_fields = self::getById(array('usrgrpid' => $group['usrgrpid']));
 
@@ -389,13 +386,13 @@ class CUserGroup {
 			$result = update_user_group($group['usrgrpid'], $group['name'],$group['users_status'], $group['gui_access'],$group['api_access']);
 			if(!$result) break;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
 			return true;
 		}
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
@@ -424,7 +421,7 @@ class CUserGroup {
 
 		$usrgrpid = $rights['usrgrpid'];
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		$result=DBexecute("DELETE FROM rights WHERE groupid=".$usrgrpid);
 
 		foreach($rights['rights'] as $right){
@@ -434,11 +431,11 @@ class CUserGroup {
 			if(!$result) break;
 		}
 
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
@@ -467,7 +464,7 @@ class CUserGroup {
 
 		$usrgrpid = $rights['usrgrpid'];
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 
 		foreach($rights['rights'] as $right){
 			$sql = 'SELECT rightid, permission FROM rights WHERE groupid='.$usrgrpid.' AND id='.$right['id'];
@@ -487,12 +484,12 @@ class CUserGroup {
 			if(!$result) break;
 		}
 
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
@@ -519,17 +516,17 @@ class CUserGroup {
 	public static function addUsers($data){
 		$result = false;
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($data['userids'] as $userid){
 			$result = add_user_to_group($userid, $data['usrgrpid']);
 			if(!$result) break;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
@@ -556,17 +553,17 @@ class CUserGroup {
 	public static function removeUsers($data){
 		$result = false;
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($data['userids'] as $userid){
 			$result = remove_user_from_group($userid, $data['usrgrpid']);
 			if(!$result) break;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
@@ -586,17 +583,18 @@ class CUserGroup {
 	public static function delete($groupids){
 		$result = false;
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($groupids as $groupid){
 			$result = delete_user_group($groupid);
 			if(!$resukt) break;
 		}
-		DBend($result);
+		
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}

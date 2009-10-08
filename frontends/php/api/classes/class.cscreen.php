@@ -26,10 +26,7 @@
 /**
  * Class containing methods for operations with Screens
  */
-class CScreen{
-
-	public static $error;
-
+class CScreen extends CZBXAPI{
 /**
  * Get Screen data
  *
@@ -307,7 +304,7 @@ class CScreen{
 		if($result)
 			return $screen;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'screen with id: '.$screen_data['screenid'].' doesn\'t exists.');
+			self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'screen with id: '.$screen_data['screenid'].' doesn\'t exists.');
 			return false;
 		}
 	}
@@ -334,7 +331,7 @@ class CScreen{
 		$result_ids = array();
 		$result = false;
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($screens as $screen){
 
 			$screen_db_fields = array(
@@ -358,13 +355,13 @@ class CScreen{
 
 			$result_ids[$screenid] = $screenid;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
 			return $result_ids;
 		}
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);//'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);//'Internal zabbix error');
 			return false;
 		}
 	}
@@ -389,7 +386,7 @@ class CScreen{
 
 		$result = false;
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($screens as $screen){
 
 			$screen_db_fields = CScreen::getById($screen['screenid']);
@@ -410,13 +407,13 @@ class CScreen{
 
 			if(!$result) break;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
 			return true;
 		}
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
@@ -437,7 +434,7 @@ class CScreen{
 	public static function delete($screenids){
 		$result = true;
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($screenids as $screenid){
 			$result = DBexecute('DELETE FROM screens_items WHERE screenid='.$screenid);
 			$result &= DBexecute('DELETE FROM screens_items WHERE resourceid='.$screenid.' AND resourcetype='.SCREEN_RESOURCE_SCREEN);
@@ -446,12 +443,12 @@ class CScreen{
 			$result &= DBexecute('DELETE FROM screens WHERE screenid='.$screenid);
 			if(!$result) break;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
@@ -487,7 +484,7 @@ class CScreen{
 
 		$result = true;
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($screen_items as $screen_item){
 
 			extract($screen_item);
@@ -505,12 +502,12 @@ class CScreen{
 
 			if(!$result) break;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
@@ -530,17 +527,17 @@ class CScreen{
 	public static function deleteItems($screen_itemids){
 		$result = true;
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($screen_items as $screen_itemid){
 			$sql='DELETE FROM screens_items WHERE screenitemid='.$screen_itemid;
 			if(!$result) break;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}

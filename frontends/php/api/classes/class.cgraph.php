@@ -26,31 +26,28 @@
 /**
  * Class containing methods for operations with graphs
  */
-class CGraph {
-
-	public static $error;
-
-	/**
-	* Get graph data
-	*
-	* <code>
-	* $options = array(
-	*	array 'graphids'				=> array(graphid1, graphid2, ...),
-	*	array 'itemids'					=> array(itemid1, itemid2, ...),
-	*	array 'hostids'					=> array(hostid1, hostid2, ...),
-	*	int 'type'					=> 'graph type, chart/pie'
-	*	boolean 'templated_graphs'			=> 'only templated graphs',
-	*	int 'count'					=> 'count',
-	*	string 'pattern'				=> 'search hosts by pattern in graph names',
-	*	integer 'limit'					=> 'limit selection',
-	*	string 'order'					=> 'depricated parameter (for now)'
-	* );
-	* </code>
-	*
-	* @static
-	* @param array $options
-	* @return array|boolean host data as array or false if error
-	*/
+class CGraph extends CZBXAPI{
+/**
+* Get graph data
+*
+* <code>
+* $options = array(
+*	array 'graphids'				=> array(graphid1, graphid2, ...),
+*	array 'itemids'					=> array(itemid1, itemid2, ...),
+*	array 'hostids'					=> array(hostid1, hostid2, ...),
+*	int 'type'					=> 'graph type, chart/pie'
+*	boolean 'templated_graphs'			=> 'only templated graphs',
+*	int 'count'					=> 'count',
+*	string 'pattern'				=> 'search hosts by pattern in graph names',
+*	integer 'limit'					=> 'limit selection',
+*	string 'order'					=> 'depricated parameter (for now)'
+* );
+* </code>
+*
+* @static
+* @param array $options
+* @return array|boolean host data as array or false if error
+*/
 	public static function get($options=array()){
 		global $USER_DETAILS;
 
@@ -379,7 +376,7 @@ class CGraph {
 		if($result)
 			return $graph;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Graph with id: '.$graph_data['graphid'].' doesn\'t exists.');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Graph with id: '.$graph_data['graphid'].' doesn\'t exists.');
 			return false;
 		}
 	}
@@ -411,7 +408,7 @@ class CGraph {
 		if($graph = DBfetch($db_res))
 			$result = $graph['graphid'];
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Host with name: "'.$graph_data['name'].'" doesn\'t exists.');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Host with name: "'.$graph_data['name'].'" doesn\'t exists.');
 		}
 
 	return $result;
@@ -451,7 +448,7 @@ class CGraph {
 		$result_ids = array();
 		$result = true;
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 
 		foreach($graphs as $graph){
 
@@ -519,13 +516,13 @@ class CGraph {
 			$result_ids[$result] = $result;
 
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
 			return $result_ids;
 		}
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);//'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);//'Internal zabbix error');
 			return false;
 		}
 	}
@@ -542,7 +539,7 @@ class CGraph {
 		$result_ids = array();
 		$result = false;
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($graphs as $graph){
 
 			$host_db_fields = self::getById(array('graphid' => $graph['graphid']));
@@ -563,13 +560,13 @@ class CGraph {
 			if(!$result) break;
 			$result_ids[$graph['graphid']] = $result;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
 			return $result_ids;
 		}
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
@@ -624,7 +621,7 @@ class CGraph {
 			);
 
 			if(!check_db_fields($graph_db_fields, $item)){
-				self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Wrong fields for item [ '.$item['itemid'].' ]');
+				self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Wrong fields for item [ '.$item['itemid'].' ]');
 				return false;
 			}
 			$items[$item['itemid']] = $item;
@@ -634,7 +631,7 @@ class CGraph {
 		// check if graph is templated graph, then items cannot be added
 		$graph = CGraph::getById(array('graphid' => $graphid));
 		if($graph['templateid'] != 0){
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Cannot edit templated graph : '.$graph['name']);
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Cannot edit templated graph : '.$graph['name']);
 			return false;
 		}
 
@@ -650,21 +647,21 @@ class CGraph {
 
 			$host_count = DBfetch(DBselect($sql));
 			if ($host_count['count']){
-				self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'You must use items only from host : '.$host['host'].' for template graph : '.$graph['name']);
+				self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'You must use items only from host : '.$host['host'].' for template graph : '.$graph['name']);
 				return false;
 			}
 			$tpl_graph = true;
 		}
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		$result = self::addItems_rec($graphid, $items, $tpl_graph);
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
 			return $result;
 		}
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);//'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);//'Internal zabbix error');
 			return false;
 		}
 	}
@@ -681,7 +678,7 @@ class CGraph {
 			$tmp_hosts = get_hosts_by_graphid($graphid);
 			$graph_host = DBfetch($tmp_hosts);
 			if(!$items = get_same_graphitems_for_host($items, $graph_host['hostid'])){
-				self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Can not update graph "'.$chd_graph['name'].'" for host "'.$graph_host['host'].'"');
+				self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Can not update graph "'.$chd_graph['name'].'" for host "'.$graph_host['host'].'"');
 				return false;
 			}
 		}
@@ -713,7 +710,7 @@ class CGraph {
 			// check if graph is templated graph, then items cannot be deleted
 			$graph = CGraph::getById(array('graphid' => $graphid));
 			if($graph['templateid'] != 0){
-				self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Cannot edit templated graph : '.$graph['name']);
+				self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Cannot edit templated graph : '.$graph['name']);
 				return false;
 			}
 		}
@@ -759,7 +756,7 @@ class CGraph {
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
