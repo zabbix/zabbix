@@ -415,7 +415,7 @@ class zbxXML{
 					break;
 				}
 				
-				$text .= trim($error->message) . " [ File: $error->file | Line: $error->line | Column: $error->column ]";					
+				$text .= trim($error->message) . " [ Line: $error->line | Column: $error->column ]";					
 				error($text);
 			}
 			
