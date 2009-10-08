@@ -1,4 +1,5 @@
 <?php
+ini_set('max_execution_time', 10);
 /*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
@@ -468,6 +469,7 @@ include_once('include/page_header.php');
 			unset($_REQUEST['form']);
 			unset($_REQUEST['hostid']);
 		}
+
 		unset($_REQUEST['save']);
 	}
 

@@ -27,35 +27,32 @@
  * Class containing methods for operations with Items
  *
  */
-class CItem {
-
-	public static $error;
-
-	/**
-	 * Get items data
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @static
-	 * @param array $options
-	 * @param array $options['itemids']
-	 * @param array $options['hostids']
-	 * @param array $options['groupids']
-	 * @param array $options['triggerids']
-	 * @param array $options['applicationids']
-	 * @param boolean $options['status']
-	 * @param boolean $options['templated_items']
-	 * @param boolean $options['editable']
-	 * @param boolean $options['count']
-	 * @param string $options['pattern']
-	 * @param int $options['limit']
-	 * @param string $options['order']
-	 * @return array|int item data as array or false if error
-	 */
+class CItem extends CZBXAPI{
+/**
+ * Get items data
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @static
+ * @param array $options
+ * @param array $options['itemids']
+ * @param array $options['hostids']
+ * @param array $options['groupids']
+ * @param array $options['triggerids']
+ * @param array $options['applicationids']
+ * @param boolean $options['status']
+ * @param boolean $options['templated_items']
+ * @param boolean $options['editable']
+ * @param boolean $options['count']
+ * @param string $options['pattern']
+ * @param int $options['limit']
+ * @param string $options['order']
+ * @return array|int item data as array or false if error
+ */
 	public static function get($options=array()){
 		global $USER_DETAILS;
 
@@ -538,7 +535,7 @@ class CItem {
 		if($result)
 			return $item;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Item with id: '.$itemid.' doesn\'t exists.');
+			self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Item with id: '.$itemid.' doesn\'t exists.');
 			return false;
 		}
 	}
@@ -565,7 +562,7 @@ class CItem {
 		}
 		else{
 			if(!isset($item_data['host'])){
-				self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Item doesn\'t exists.');
+				self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Item doesn\'t exists.');
 				return false;
 			}
 			$hostid = CHost::getId(array('host' => $item_data['host']));
@@ -582,7 +579,7 @@ class CItem {
 		if($result)
 			return $result;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Item doesn\'t exists.');
+			self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Item doesn\'t exists.');
 			return false;
 		}
 	}
@@ -637,7 +634,7 @@ class CItem {
 	 */
 	public static function add($items){
 		$itemids = array();
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 
 		$result = true;
 		foreach($items as $item){
@@ -646,12 +643,12 @@ class CItem {
 			$itemids['result'] = $result;
 		}
 
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return $itemids;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
@@ -673,18 +670,18 @@ class CItem {
 
 		$result = true;
 		$itemids = array();
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($items as $item){
 			$result = update_item($item['itemid'], $item);
 			if(!$result) break;
 			$itemids[$result] = $result;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return $itemids;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
@@ -707,7 +704,7 @@ class CItem {
 		if($result)
 			return $itemids;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}

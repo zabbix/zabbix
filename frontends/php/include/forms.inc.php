@@ -7022,9 +7022,9 @@
 
 		$add_macro = array(
 			S_NEW,
-			new CTextBox('macro_new', get_request('macro_new', ''), 10),
+			new CTextBox('macro_new', get_request('macro_new', ''), 20),
 			SPACE.RARR.SPACE,
-			new CTextBox('value_new', get_request('value_new', ''), 10)
+			new CTextBox('value_new', get_request('value_new', ''), 20)
 		);
 
 		$macros_list_tbl->addRow($add_macro);

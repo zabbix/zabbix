@@ -27,35 +27,32 @@
  * Class containing methods for operations with Actions
  *
  */
-class CAction {
-
-	public static $error = array();
-
-	/**
-	 * Get Actions data
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $options
-	 * @param array $options['itemids']
-	 * @param array $options['hostids']
-	 * @param array $options['groupids']
-	 * @param array $options['actionids']
-	 * @param array $options['applicationids']
-	 * @param array $options['status']
-	 * @param array $options['templated_items']
-	 * @param array $options['editable']
-	 * @param array $options['extendoutput']
-	 * @param array $options['count']
-	 * @param array $options['pattern']
-	 * @param array $options['limit']
-	 * @param array $options['order']
-	 * @return array|int item data as array or false if error
-	 */
+class CAction extends CZBXAPI{
+/**
+ * Get Actions data
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $options
+ * @param array $options['itemids']
+ * @param array $options['hostids']
+ * @param array $options['groupids']
+ * @param array $options['actionids']
+ * @param array $options['applicationids']
+ * @param array $options['status']
+ * @param array $options['templated_items']
+ * @param array $options['editable']
+ * @param array $options['extendoutput']
+ * @param array $options['count']
+ * @param array $options['pattern']
+ * @param array $options['limit']
+ * @param array $options['order']
+ * @return array|int item data as array or false if error
+ */
 	public static function get($options=array()){
 		global $USER_DETAILS;
 
@@ -475,7 +472,7 @@ class CAction {
 		if($result)
 			return $action;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'action with id: '.$action_data['actionid'].' doesn\'t exists.');
+			self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'action with id: '.$action_data['actionid'].' doesn\'t exists.');
 			return false;
 		}
 	}
@@ -502,7 +499,7 @@ class CAction {
 	public static function add($actions){
 
 		$actionids = array();
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 
 		$result = false;
 		foreach($actions as $num => $action){
@@ -540,7 +537,7 @@ class CAction {
 			$actionids[$actionid] = $actionid;
 		}
 
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 		if($result)
 			return $actionids;
 		else{
@@ -573,7 +570,7 @@ class CAction {
 
 		$result = true;
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($actions as $action){
 			$action_db_fields = CAction::getById($action);
 
@@ -594,7 +591,7 @@ class CAction {
 			if(!$result) break;
 		}
 
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 		if($result)
 			return true;
 		else{
@@ -623,29 +620,29 @@ class CAction {
 		$result = true;
 
 		if(!check_permission_for_action_conditions($conditions)){
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 
 		foreach($conditions as $condition){
 			if( !validate_condition($condition['type'],$condition['value']) ){
-				self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+				self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 				return false;
 			}
 		}
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($conditions as $condition){
 
 			$result = add_action_condition($condition['actionid'], $condition);
 			if(!$result) break;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
@@ -684,22 +681,22 @@ class CAction {
 
 		foreach($operations as $operation){
 			if(!validate_operation($operation)){
-				self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+				self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 				return false;
 			}
 		}
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($operations as $operation){
 			$result = add_action_operation($operation['actionid'], $operation);
 			if(!$result) break;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}

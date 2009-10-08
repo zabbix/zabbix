@@ -474,6 +474,7 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 		if( isset($DB['DB']) && !empty($DB['DB']) ){
 			$DB['EXECUTE_COUNT']++;	// WRONG FOR ORACLE!!
 //SDI('SQL xec: '.$query);
+
 			switch($DB['TYPE']){
 				case 'MYSQL':
 					$result=mysql_query($query,$DB['DB']);

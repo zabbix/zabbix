@@ -27,7 +27,7 @@
  * Class containing methods for operations with Triggers
  *
  */
-class CTrigger {
+class CTrigger extends CZBXAPI{
 
 	public static $error = array();
 
@@ -584,7 +584,7 @@ class CTrigger {
 	public static function add($triggers){
 
 		$triggerids = array();
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 
 		$result = true;
 		foreach($triggers as $trigger){
@@ -618,7 +618,7 @@ class CTrigger {
 			$triggerids[$triggerid] = $triggerid;
 		}
 
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 		if($result)
 			return $triggerids;
 		else{
@@ -650,7 +650,7 @@ class CTrigger {
 
 		$result = true;
 		$triggerids = array();
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($triggers as $num => $trigger){
 			$trigger_db_fields = self::getById($trigger);
 			if(!isset($trigger_db_fields)) {
@@ -670,7 +670,7 @@ class CTrigger {
 			if(!$result) break;
 			$triggerids[$result] = $result;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return $triggerids;

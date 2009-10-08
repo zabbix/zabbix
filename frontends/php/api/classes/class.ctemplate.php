@@ -27,23 +27,20 @@
  * Class containing methods for operations with Templates
  *
  */
-class CTemplate {
-
-	public static $error;
-
-	/**
-	 * Get Template data
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @static
-	 * @param array $options
-	 * @return array|boolean Template data as array or false if error
-	 */
+class CTemplate extends CZBXAPI{
+/**
+ * Get Template data
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @static
+ * @param array $options
+ * @return array|boolean Template data as array or false if error
+ */
 	public static function get($options = array()) {
 		global $USER_DETAILS;
 
@@ -454,7 +451,7 @@ class CTemplate {
 		if($result)
 			return $template;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
@@ -483,7 +480,7 @@ class CTemplate {
 		if($result)
 			return $templateid['hostid'];
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
@@ -523,7 +520,7 @@ class CTemplate {
 
 		$result = false;
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($templates as $template){
 
 			if(empty($template['groupids'])){
@@ -560,12 +557,12 @@ class CTemplate {
 			if(!$result) break;
 			$templateids[$result] = $result;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return $templateids;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
 			return $result;
 		}
 	}
@@ -590,7 +587,7 @@ class CTemplate {
 		$templateids = array();
 		$result = false;
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($templates as $template){
 
 			$sql = 'SELECT DISTINCT * '.
@@ -618,12 +615,12 @@ class CTemplate {
 			if(!$result) break;
 			$templateids[$result] = $result;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return $templateids;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 
@@ -646,7 +643,7 @@ class CTemplate {
 		if($result)
 			return $templateids;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
@@ -672,7 +669,7 @@ class CTemplate {
 
 		$templateid = $data['templateid'];
 		$hostids = $data['hostids'];
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 
 		foreach($hostids as $hostid){
 			$hosttemplateid = get_dbid('hosts_templates', 'hosttemplateid');
@@ -691,12 +688,12 @@ class CTemplate {
 				}
 			}
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
 			return false;
 		}
 	}
@@ -729,7 +726,7 @@ class CTemplate {
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
 			return false;
 		}
 	}
@@ -755,7 +752,7 @@ class CTemplate {
 		$hostid = $data['hostid'];
 		$templateids = $data['templateids'];
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 
 		foreach($templateids as $templateid){
 			$hosttemplateid = get_dbid('hosts_templates', 'hosttemplateid');
@@ -768,12 +765,12 @@ class CTemplate {
 				if(!$result) break;
 			}
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
 			return false;
 		}
 	}
@@ -804,7 +801,7 @@ class CTemplate {
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
 			return false;
 		}
 	}

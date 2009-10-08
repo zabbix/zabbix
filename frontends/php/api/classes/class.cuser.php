@@ -26,45 +26,42 @@
 /**
  * Class containing methods for operations with Users
  */
-class CUser{
-
-	public static $error;
-
-	/**
-	 * Get Users data
-	 *
-	 * First part of parameters are filters which limits the output result set, these filters are set only if appropriate parameter is set.
-	 * For example if "type" is set, then method returns only users of given type.
-	 * Second part of parameters extends result data, adding data about others objects that are related to objects we get.
-	 * For example if "select_usrgrps" parameter is set, resulting objects will have additional property 'usrgrps' containing object with 
-	 * data about User UserGroups.
-	 * Third part of parameters affect output. For example "sortfield" will be set to 'alias', result will be sorted by User alias.
-	 * All Parameters are optional!
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $options 
-	 * @param array $options['nodeids'] filter by Node IDs
-	 * @param array $options['usrgrpids'] filter by UserGroup IDs
-	 * @param array $options['userids'] filter by User IDs
-	 * @param boolean $options['type'] filter by User type [ USER_TYPE_ZABBIX_USER: 1, USER_TYPE_ZABBIX_ADMIN: 2, USER_TYPE_SUPER_ADMIN: 3 ]
-	 * @param boolean $options['status'] filter by User status [ 0, 1 ]
-	 * @param boolean $options['with_gui_access'] filter only with GUI access
-	 * @param boolean $options['with_api_access'] filter only with API access
-	 * @param boolean $options['select_usrgrps'] extend with UserGroups data for each User
-	 * @param boolean $options['get_access'] extend with access data for each User
-	 * @param boolean $options['extendoutput'] output only User IDs if not set.
-	 * @param boolean $options['count'] output only count of objects in result. ( ruselt returned in property 'rowscount' )
-	 * @param string $options['pattern'] filter by Host name containing only give pattern
-	 * @param int $options['limit'] output will be limited to given number
-	 * @param string $options['sortfield'] output will be sorted by given property [ 'userid', 'alias' ]
-	 * @param string $options['sortorder'] output will be sorted in given order [ 'ASC', 'DESC' ]
-	 * @return array 
-	 */
+class CUser extends CZBXAPI{
+/**
+ * Get Users data
+ *
+ * First part of parameters are filters which limits the output result set, these filters are set only if appropriate parameter is set.
+ * For example if "type" is set, then method returns only users of given type.
+ * Second part of parameters extends result data, adding data about others objects that are related to objects we get.
+ * For example if "select_usrgrps" parameter is set, resulting objects will have additional property 'usrgrps' containing object with 
+ * data about User UserGroups.
+ * Third part of parameters affect output. For example "sortfield" will be set to 'alias', result will be sorted by User alias.
+ * All Parameters are optional!
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $options 
+ * @param array $options['nodeids'] filter by Node IDs
+ * @param array $options['usrgrpids'] filter by UserGroup IDs
+ * @param array $options['userids'] filter by User IDs
+ * @param boolean $options['type'] filter by User type [ USER_TYPE_ZABBIX_USER: 1, USER_TYPE_ZABBIX_ADMIN: 2, USER_TYPE_SUPER_ADMIN: 3 ]
+ * @param boolean $options['status'] filter by User status [ 0, 1 ]
+ * @param boolean $options['with_gui_access'] filter only with GUI access
+ * @param boolean $options['with_api_access'] filter only with API access
+ * @param boolean $options['select_usrgrps'] extend with UserGroups data for each User
+ * @param boolean $options['get_access'] extend with access data for each User
+ * @param boolean $options['extendoutput'] output only User IDs if not set.
+ * @param boolean $options['count'] output only count of objects in result. ( ruselt returned in property 'rowscount' )
+ * @param string $options['pattern'] filter by Host name containing only give pattern
+ * @param int $options['limit'] output will be limited to given number
+ * @param string $options['sortfield'] output will be sorted by given property [ 'userid', 'alias' ]
+ * @param string $options['sortorder'] output will be sorted in given order [ 'ASC', 'DESC' ]
+ * @return array 
+ */
 	public static function get($options=array()){
 		global $USER_DETAILS;
 
@@ -262,7 +259,6 @@ class CUser{
 						' AND g.usrgrpid=ug.usrgrpid '.
 					' GROUP BY ug.userid';
 			$access = DBselect($sql);
-
 			while($useracc = DBfetch($access)){
 				$result[$useracc['userid']] = zbx_array_merge($result[$useracc['userid']], $useracc);
 			}
@@ -306,7 +302,7 @@ class CUser{
 			return $login;
 		}
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => $_REQUEST['message']);
+			self::$error[] = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => $_REQUEST['message']);
 			return false;
 		}
 	}
@@ -348,7 +344,7 @@ class CUser{
 		if($user)
 			return $user;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => "No user with id [ {$user_data['userid']} ]");
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'No user with id ['.$user_data['userid'].']');
 			return false;
 		}
 	}
@@ -377,7 +373,7 @@ class CUser{
 		if($user = DBfetch(DBselect($sql)))
 			$result = $user['userid'];
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'User with name: "'.$user_data['alias'].'" doesn\'t exists.');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'User with name: ['.$user_data['alias'].'] doesn\'t exists.');
 		}
 
 	return $result;
@@ -419,7 +415,7 @@ class CUser{
 		$result = false;
 		$resultids = array();
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 
 		foreach($users as $user){
 
@@ -508,13 +504,13 @@ class CUser{
 			$resultids[$userid] = $userid;
 			if(!$result) break;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
 			return $resultids;
 		}
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
 			return false;
 		}
 	}
@@ -554,7 +550,7 @@ class CUser{
 		$result = false;
 		$error = 'Unknown ZABBIX internal error';
 
-		DBstart(false);
+		self::BeginTransaction(__METHOD__);
 		foreach($users as $user){
 			$userid = $user['userid'];
 
@@ -631,13 +627,13 @@ class CUser{
 // } copy from frontend
 			if(!$result) break;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
 			return true;
 		}
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
 			return false;
 		}
 	}
@@ -675,7 +671,7 @@ class CUser{
 			return $mediaids;
 		}
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
@@ -702,7 +698,7 @@ class CUser{
 			return true;
 		}
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
@@ -740,7 +736,7 @@ class CUser{
 			return true;
 		}
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 
@@ -762,7 +758,7 @@ class CUser{
 		global $USER_DETAILS;
 
 		$result = true;
-		$error = 'Unknown ZABBIX internal error';
+		$error = 'Unknown ZABBIX internal error [CUser]';
 
 		if(DBfetch(DBselect('SELECT * FROM users WHERE '.DBcondition('userid', $userids).' AND alias='.zbx_dbstr(ZBX_GUEST_USER)))){
 			$error = S_CANNOT_DELETE_USER.'[ '.ZBX_GUEST_USER.' ]';
@@ -776,7 +772,7 @@ class CUser{
 		}
 
 		if($result){
-			DBstart(false);
+			self::BeginTransaction(__METHOD__);
 
 			$result &= DBexecute('DELETE FROM operations WHERE '.OPERATION_OBJECT_USER.' AND '.DBcondition('objectid', $userids));
 			$result &= DBexecute('DELETE FROM media WHERE '.DBcondition('userid', $userids));
@@ -784,13 +780,13 @@ class CUser{
 			$result &= DBexecute('DELETE FROM users_groups WHERE '.DBcondition('userid', $userids));
 			$result &= DBexecute('DELETE FROM users WHERE '.DBcondition('userid', $userids));
 
-			$result = DBend($result);
+			$result = self::EndTransaction($result, __METHOD__);
 		}
 
 		if($result)
 			return true;
 		else{
-			self::$error = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
 			return false;
 		}
 	}
