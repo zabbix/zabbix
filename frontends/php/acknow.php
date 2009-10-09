@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 	require_once('include/triggers.inc.php');
 	require_once('include/forms.inc.php');
 
-	$page['title']	= "S_ACKNOWLEDGES";
+	$page['title']	= 'S_ACKNOWLEDGES';
 	$page['file']	= 'acknow.php';
 	$page['hist_arg'] = array('eventid');
 
@@ -32,7 +32,7 @@ include_once('include/page_header.php');
 
 ?>
 <?php
-	$_REQUEST['go'] = get_request('go','none');
+	$_REQUEST['go'] = get_request('go', 'none');
 	$bulk = ($_REQUEST['go'] == 'bulkacknowledge');
 
 //		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -40,18 +40,14 @@ include_once('include/page_header.php');
 		'eventid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,				null),
 		'events'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,				null),
 		'message'=>		array(T_ZBX_STR, O_OPT,	NULL,	$bulk ? NULL : NOT_EMPTY,	'isset({save})||isset({saveandreturn})'),
-
 // Actions
 		'go'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
-
 // form
 		'saveandreturn' =>	array(T_ZBX_STR,O_OPT,	P_ACT|P_SYS, NULL,	NULL),
 		'save'=>			array(T_ZBX_STR,O_OPT,	P_ACT|P_SYS, NULL,	NULL),
 		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null)
 	);
 	check_fields($fields);
-
-	$_REQUEST['go'] = get_request('go','none');
 
 	if(!isset($_REQUEST['events']) && !isset($_REQUEST['eventid'])){
 		show_message(S_NO_EVENTS_TO_ACKNOWLEDGE);
@@ -162,7 +158,7 @@ include_once('include/page_header.php');
 			$db_user = CUser::getById(array('userid' => $db_ack['userid']));
 			$table->addRow(array(
 				new CCol($db_user['alias'],'user'),
-				new CCol(date('d-m-Y h:i:s A',$db_ack['clock']),'time')),
+				new CCol(date(S_DATE_FORMAT_YMDHMS,$db_ack['clock']),'time')),
 				'title');
 
 			$msgCol = new CCol(zbx_nl2br($db_ack['message']));
@@ -177,10 +173,7 @@ include_once('include/page_header.php');
 	}
 
 	insert_new_message_form($events,$bulk);
-?>
 
-<?php
-
+	
 include_once('include/page_footer.php');
-
 ?>

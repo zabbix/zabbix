@@ -293,7 +293,7 @@ include_once('include/page_header.php');
 		}
 
 		$table->addRow(array(
-			date('Y.M.d H:i:s',$row['clock']),
+			date(S_DATE_FORMAT_YMDHMS,$row['clock']),
 			$row['alias'],
 			$row['ip'],
 			$row['resourcetype'],
