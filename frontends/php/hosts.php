@@ -574,8 +574,7 @@ include_once('include/page_header.php');
 <?php
 
 	$frmForm = new CForm();
-	$cmbConf = new CComboBox('config', 'hosts.php');
-	$cmbConf->setAttribute('onchange', 'javascript: redirect(this.options[this.selectedIndex].value);');
+	$cmbConf = new CComboBox('config', 'hosts.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('templates.php', S_TEMPLATES);
 		$cmbConf->addItem('hosts.php', S_HOSTS);
 		$cmbConf->addItem('items.php', S_ITEMS);
@@ -610,6 +609,7 @@ include_once('include/page_header.php');
 		$groups = CHostGroup::get(array('editable' => 1, 'extendoutput' => 1));
 		order_result($groups, 'name');
 		$cmbGroups = new CComboBox('groupid', $groupid_selected, 'javascript: submit();');
+		$cmbGroups->addItem(0, S_ALL_SMALL);
 		foreach($groups as $group){
 			$cmbGroups->addItem($group['groupid'], get_node_name_by_elid($group['groupid']).$group['name']);
 		}
@@ -670,9 +670,9 @@ include_once('include/page_header.php');
 			'nopermissions' => 1
 		);
 		$hosts = CHost::get($options);
-		order_page_result($hosts, $sortfield, $sortorder);
+		order_result($hosts, $sortfield, $sortorder);
 		
-		foreach($hosts as $hostid => $host){
+		foreach($hosts as $host){
 			
 			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?groupid='.$groupid_selected.'&hostid='.$host['hostid']),
 				' ('.count($host['applications']).')');
