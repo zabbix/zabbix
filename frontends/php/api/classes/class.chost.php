@@ -762,8 +762,8 @@ class CHost extends CZBXAPI{
 			$hostids[$result] = $result;
 		}
 		
-//		$result = DBend($result);		
-		$result = $this->EndTransaction($result);
+//		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 
 		if($result){
