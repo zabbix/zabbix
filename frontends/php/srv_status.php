@@ -38,7 +38,7 @@ include_once "include/page_header.php";
 	$fields=array(
 		'serviceid'=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,			NULL),
 		'showgraph'=>		array(T_ZBX_INT, O_OPT,	P_SYS,			IN('1'),		'isset({serviceid})'),
-		'period_start'=>	array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,	NULL),
+		'period'=>	array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,	NULL),
 // ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	IN('"hat"'),		NULL),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
@@ -87,7 +87,7 @@ include_once "include/page_header.php";
 		$table->AddRow(new CImg('chart5.php?serviceid='.$service['serviceid'].url_param('path')));
 		$table->Show();
 	} 
-	else {
+	else{
 		$periods = array(
 			'today' => S_TODAY,
 			'week' => S_THIS_WEEK,
@@ -99,29 +99,28 @@ include_once "include/page_header.php";
 			24*365 => S_LAST_365_DAYS,
 		);
 	
-		$period_start = get_request('period_start', 7*24);
+		$period = get_request('period', 7*24);
+		$period_end = time();
 		
-		switch($period_start){
+		switch($period){
 			case 'today':
-				$period_start_sec = mktime(0, 0, 0, date('n'), date('j'), date('Y'));
+				$period_start = mktime(0, 0, 0, date('n'), date('j'), date('Y'));
 			break;
 			case 'week':
-				$period_start_sec = strtotime('last sunday');
+				$period_start = strtotime('last sunday');
 			break;
 			case 'month':
-				$period_start_sec = mktime(0, 0, 0, date('n'), 1, date('Y'));
+				$period_start = mktime(0, 0, 0, date('n'), 1, date('Y'));
 			break;
 			case 'year':
-				$period_start_sec = mktime(0, 0, 0, 1, 1, date('Y'));
+				$period_start = mktime(0, 0, 0, 1, 1, date('Y'));
 			break;
 			case 24:
 			case 24*7:
 			case 24*30:
 			case 24*365:
-				$period_start_sec = $period_start * 3600;
+				$period_start = $period_end - ($period * 3600);
 			break;
-			default:
-				$period_start_sec = 24 * 7 * 3600;
 		}
 		
 		$query = 'SELECT DISTINCT s.serviceid, sl.servicedownid, sl_p.serviceupid as serviceupid, s.triggerid, '.
@@ -151,7 +150,6 @@ include_once "include/page_header.php";
 						);
 		
 		$services[0]=$row;
-		$now=time();
 		
 		while($row = DBFetch($result)){
 			$row['id'] = $row['serviceid'];
@@ -194,11 +192,8 @@ include_once "include/page_header.php";
 			}
 			
 			if($row["showsla"]==1){
-				$now = time(null);
-				$start = $now - $period_start_sec;
-				$end = $now;
-				
-				$stat = calculate_service_availability($row["serviceid"], $start, $end);
+			
+				$stat = calculate_service_availability($row["serviceid"], $period_start, $period_end);
 				$p = min($stat['problem'], 20);
 				$sla_style = $row['goodsla'] > $stat['ok'] ? 'red' : 'green';  
 				
@@ -251,7 +246,7 @@ include_once "include/page_header.php";
 		$tree = new CTree($treeServ,array('caption' => bold(S_SERVICE),
 						'status' => bold(S_STATUS), 
 						'reason' => bold(S_REASON),
-						'sla' => bold('SLA ('.$periods[$period_start].')'),
+						'sla' => bold('SLA ('.$periods[$period].')'),
 						'sla2' => bold(nbsp(S_SLA)),
 						'graph' => bold(S_GRAPH)));
 		
@@ -261,7 +256,7 @@ include_once "include/page_header.php";
 			$r_form->setClass('nowrap');
 			$r_form->setMethod('get');	
 			$r_form->addOption('name', 'period_choice');
-			$period_combo = new CComboBox('period_start', $period_start, 'javascript: submit();');
+			$period_combo = new CComboBox('period', $period, 'javascript: submit();');
 			foreach($periods as $key => $val){
 				$period_combo->AddItem($key, $val);
 			}
