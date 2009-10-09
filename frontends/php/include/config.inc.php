@@ -431,22 +431,28 @@ function __autoload($class_name){
 		show_messages(FALSE,'',$msg);
 	}
 
-	function info($msg){
+	function info($msgs){
 		global $ZBX_MESSAGES;
+		zbx_value2array($msgs);
 
 		if(is_null($ZBX_MESSAGES))
 			$ZBX_MESSAGES = array();
 
-		array_push($ZBX_MESSAGES, array('type' => 'info', 'message' => $msg));
+		foreach($msgs as $msg){
+			array_push($ZBX_MESSAGES, array('type' => 'info', 'message' => $msg));
+		}
 	}
 
-	function error($msg){
+	function error($msgs){
 		global $ZBX_MESSAGES;
+		zbx_value2array($msgs);
 
 		if(is_null($ZBX_MESSAGES))
 			$ZBX_MESSAGES = array();
-
-		array_push($ZBX_MESSAGES, array('type' => 'error', 'message' => $msg));
+		
+		foreach($msgs as $msg){
+			array_push($ZBX_MESSAGES, array('type' => 'error', 'message' => $msg));
+		}
 	}
 
 	function clear_messages(){
@@ -1221,16 +1227,16 @@ function __autoload($class_name){
 			return true;
 		}
 
+		$tmp = array();
 		foreach($data as $key => $rows){
 			if(!isset($rows[$sortfield])){
 //				info('Sorting failed ["'.$sortfield.'","'.$sortorder.'"]');
 				return false;
 			}
-
 			$tmp[$key] = strtolower($rows[$sortfield]);
 		}
 
-		$sortorder = ($sortorder == 'ASC')?SORT_ASC:SORT_DESC;
+		$sortorder = ($sortorder == 'ASC') ? SORT_ASC : SORT_DESC;
 
 		array_multisort($tmp, $sortorder, $data);
 
