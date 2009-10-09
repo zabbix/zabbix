@@ -23,7 +23,7 @@
 
 	$TRANSLATION=array(
 
-	'S_DATE_FORMAT_YMDHMS'=>		'd M H:i:s',
+	'S_DATE_FORMAT_YMDHMS'=>		'd M Y H:i:s',
 	'S_HTML_CHARSET'=>			'UTF-8',
 
 	'S_ACTIVATE_SELECTED'=>			'Activate selected',
