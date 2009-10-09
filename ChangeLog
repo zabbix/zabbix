@@ -113,6 +113,9 @@ Changes for 1.7.0
 
 Changes for 1.6.7
 
+ - [ZBX-1076] fixed IT services periods (Vedmak)
+ - [ZBX-1019] fixed stacked graph displays 0 value (Vedmak)
+ - [ZBX-1040] fixed error when massupdate triggers with empty dependency (Vedmak)
  - [ZBX-820] fixed updating downstream item applications when upstream item is updated without changing applications (Vedmak)
  - [DEV-426] added new command line parameter '-T' for zabbix_sender (Sasha)
  - [ZBX-1068] fix typos related to height/high (Richlv)
