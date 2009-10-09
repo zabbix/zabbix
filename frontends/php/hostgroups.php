@@ -102,17 +102,15 @@ include_once('include/page_header.php');
 		unset($_REQUEST['save']);
 	}
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['groupid'])){
-			$result = false;
+		$result = false;
+		DBstart();
+		$result = delete_host_group($_REQUEST['groupid']);
+		$result = DBend($result);
 
-				DBstart();
-				$result = delete_host_group($_REQUEST['groupid']);
-				$result = DBend($result);
-
-			unset($_REQUEST['form']);
-
-			show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
-			unset($_REQUEST['groupid']);
-		}
+		unset($_REQUEST['form']);
+		show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
+		unset($_REQUEST['groupid']);
+	}
 // --------- GO  ----------
 	else if($_REQUEST['go'] == 'delete'){
 /* group operations */
@@ -168,16 +166,17 @@ include_once('include/page_header.php');
 	}
 /*** --->>> ACTIONS <<<--- ***/
 
-	$frmForm = new CForm();
-	$frmForm->setMethod('get');
-
-	if(!isset($_REQUEST['form'])){
+	if(isset($_REQUEST['form'])){
+		$frmForm = null;
+	}
+	else{
+		$frmForm = new CForm();
 		$frmForm->addItem(new CButton('form', S_CREATE_GROUP));
 	}
-
 	show_table_header(S_CONFIGURATION_OF_GROUPS, $frmForm);
 
 	echo SBR;
+	
 	if(isset($_REQUEST['form'])){
 		global $USER_DETAILS;
 
@@ -284,40 +283,51 @@ include_once('include/page_header.php');
 		$groups_wdgt->addHeader($numrows);
 
 // Host Groups table
-		$options = array('editable' => 1,
-						'extendoutput' => 1,
-						'select_hosts' => 1,
-						'sortfield' => getPageSortField('name'),
-						'sortorder' => getPageSortOrder(),
-						'limit' => ($config['search_limit']+1)
-					);
-		$groups = CHostGroup::get($options);
-
-
 		$form = new CForm('hostgroups.php');
 		$form->setName('form_groups');
 
 		$table = new CTableInfo(S_NO_HOST_GROUPS_DEFINED);
 		$table->setHeader(array(
-					new CCheckBox('all_groups', NULL, "checkAll('".$form->getName()."','all_groups','groups');"),
-					make_sorting_header(S_NAME,'name'),
-					' # ',
-					S_MEMBERS
-				));
+			new CCheckBox('all_groups', NULL, "checkAll('".$form->getName()."','all_groups','groups');"),
+			make_sorting_header(S_NAME, 'name'),
+			' # ',
+			S_MEMBERS
+		));
 
-// sorting && paging
-		order_page_result($groups, getPageSortField('name'), getPageSortOrder());
+
+// sorting && paging		
+		$options = array(
+			'editable' => 1,
+			'extendoutput' => 1,
+			// 'sortfield' => getPageSortField('name'),
+			// 'sortorder' => getPageSortOrder(),
+			'limit' => ($config['search_limit']+1)
+		);
+		$groups = CHostGroup::get($options);
+		
+		$sortfield = getPageSortField('name');
+		$sortorder =  getPageSortOrder();
+		order_page_result($groups, $sortfield, $sortorder);
 		$paging = getPagingLine($groups);
+		
+		$options = array(
+			'groupids' => array_keys($groups),
+			'extendoutput' => 1,
+			'select_hosts' => 1,
+			'nopermissions' => 1
+		);
+		$groups = CHostGroup::get($options);
+		order_result($groups, $sortfield, $sortorder);
 //---------
 
-		foreach($groups as $groupid => $group){
+		foreach($groups as $group){
 			$tpl_count = 0;
 			$host_count = 0;
 			$i = 0;
 			$hosts_output = array();
 
-			order_result($group['hosts'], 'host', null, true);
-			foreach($group['hosts'] as $hostid => $host){
+			order_result($group['hosts'], 'host');
+			foreach($group['hosts'] as $host){
 				$i++;
 
 				if($i > $config['max_in_table']){
@@ -329,15 +339,15 @@ include_once('include/page_header.php');
 				switch($host['status']){
 					case HOST_STATUS_NOT_MONITORED:
 						$style = 'on';
-						$url = 'hosts.php?form=update&hostid='.$hostid.'&groupid='.$groupid;
+						$url = 'hosts.php?form=update&hostid='.$host['hostid'].'&groupid='.$group['groupid'];
 					break;
 					case HOST_STATUS_TEMPLATE:
 						$style = 'unknown';
-						$url = 'templates.php?form=update&templateid='.$hostid.'&groupid='.$groupid;
+						$url = 'templates.php?form=update&templateid='.$host['hostid'].'&groupid='.$group['groupid'];
 					break;
 					default:
 						$style = null;
-						$url = 'hosts.php?form=update&hostid='.$hostid.'&groupid='.$groupid;
+						$url = 'hosts.php?form=update&hostid='.$host['hostid'].'&groupid='.$group['groupid'];
 					break;
 				}
 				$hosts_output[] = new CLink($host['host'], $url, $style);
@@ -351,12 +361,12 @@ include_once('include/page_header.php');
 			}
 
 			$table->addRow(array(
-				new CCheckBox('groups['.$groupid.']', NULL, NULL, $groupid),
-				new CLink($group['name'], 'hostgroups.php?form=update&groupid='.$groupid),
+				new CCheckBox('groups['.$group['groupid'].']', NULL, NULL, $group['groupid']),
+				new CLink($group['name'], 'hostgroups.php?form=update&groupid='.$group['groupid']),
 				array(
-					array(new CLink(S_HOSTS, 'hosts.php?groupid='.$groupid),' ('.$host_count.')'),
+					array(new CLink(S_HOSTS, 'hosts.php?groupid='.$group['groupid']),' ('.$host_count.')'),
 					BR(),
-					array(new CLink(S_TEMPLATES, 'templates.php?groupid='.$groupid, 'unknown'), ' ('.$tpl_count.')'),
+					array(new CLink(S_TEMPLATES, 'templates.php?groupid='.$group['groupid'], 'unknown'), ' ('.$tpl_count.')'),
 				),
 				new CCol((empty($hosts_output) ? '-' : $hosts_output), 'wraptext')
 			));
@@ -385,9 +395,6 @@ include_once('include/page_header.php');
 		$groups_wdgt->addItem($form);
 		$groups_wdgt->show();
 	}
-?>
-<?php
-
+	
 include_once('include/page_footer.php');
-
 ?>

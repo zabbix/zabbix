@@ -24,30 +24,27 @@ require_once('include/config.inc.php');
 require_once('include/hosts.inc.php');
 require_once('include/forms.inc.php');
 
-	$page['title'] = "S_TEMPLATES";
+	$page['title'] = 'S_TEMPLATES';
 	$page['file'] = 'templates.php';
-	$page['hist_arg'] = array('groupid', 'config');
+	$page['hist_arg'] = array('groupid');
 
 	include_once('include/page_header.php');
 
-	$_REQUEST['config'] = get_request('config','hosts.php');
-
-	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
-
-	if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0) && !isset($available_groups[$_REQUEST['groupid']])){
-	access_deny();
+	//$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
+	if(get_request('groupid', 0) > 0){
+		$groupids = CHostGroup::get(array('groupids' => $_REQUEST['groupid'], 'editable' => 1));
+		if(empty($groupids)) access_deny();
 	}
-
-	if(isset($_REQUEST['templateid']) && ($_REQUEST['templateid']>0) && !isset($available_hosts[$_REQUEST['templateid']])) {
-	access_deny();
-}
-
-
+	
+	//$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
+	$available_hosts = CTemplate::get(array('editable' => 1));
+	if((get_request('templateid', 0) > 0) && !isset($available_hosts[$_REQUEST['templateid']])) {
+		access_deny();
+	}
+	
+	
 //		VAR						TYPE		OPTIONAL FLAGS			VALIDATION	EXCEPTION
 	$fields=array(
-		'config'			=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
-
 		'hosts'			=> array(T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID, 		NULL),
 		'groups'		=> array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID, 		NULL),
 		'clear_templates'	=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID, 		NULL),
@@ -64,10 +61,9 @@ require_once('include/forms.inc.php');
 		'value_new'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	'isset({macro_add})'),
 		'macro_add' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'macros_del' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-
 // actions
 		'go'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
-
+		'change_group' => 		array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),
 //form
 		'unlink'		=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
 		'unlink_and_clear'	=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
@@ -77,8 +73,6 @@ require_once('include/forms.inc.php');
 		'delete'		=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
 		'delete_and_clear'	=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
 		'cancel'		=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
-
-
 // other
 		'form'			=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
 		'form_refresh'		=> array(T_ZBX_STR, O_OPT,	NULL,			NULL,		NULL)
@@ -93,13 +87,13 @@ require_once('include/forms.inc.php');
 /**********************************/
 /* <<<--- TEMPLATE ACTIONS --->>> */
 /**********************************/
-/* REMOVE MACROS */
+// REMOVE MACROS
 	if(isset($_REQUEST['macros_del']) && isset($_REQUEST['macros_rem'])){
 		$macros_rem = get_request('macros_rem', array());
 		foreach($macros_rem as $macro)
 			unset($_REQUEST['macros'][$macro]);
 	}
-/* ADD MACRO */
+// ADD MACRO
 	if(isset($_REQUEST['macro_add'])){
 		$macro_new = get_request('macro_new');
 		$value_new = get_request('value_new', null);
@@ -132,7 +126,8 @@ require_once('include/forms.inc.php');
 			unset($_REQUEST['macro_new']);
 			unset($_REQUEST['value_new']);
 		}
-	}// unlink, unlink_and_clear
+	}
+// unlink, unlink_and_clear
 	if((isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear']))){
 		$_REQUEST['clear_templates'] = get_request('clear_templates', array());
 		if(isset($_REQUEST['unlink'])){
@@ -169,13 +164,10 @@ require_once('include/forms.inc.php');
 
 		$result = true;
 
-
 		if(count($groups) > 0){
-			$accessible_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
-			foreach($groups as $gid){
-				if(isset($accessible_groups[$gid])) continue;
-				access_deny();
-			}
+			$g1 = count($groups);
+			$groups = CHostGroup::get(array('groupids' => $groups, 'editable' => 1));
+			if(count($groups) != $g1) access_deny();
 		}
 		else{
 			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
@@ -365,25 +357,22 @@ require_once('include/forms.inc.php');
 			$unlink_mode =  true;
 		}
 
-
-		$host=get_host_by_hostid($_REQUEST['templateid']);
+		//$host = get_host_by_hostid($_REQUEST['templateid']);
 
 		DBstart();
 		$result = delete_host($_REQUEST['templateid'], $unlink_mode);
-		$result=DBend($result);
+		$result = DBend($result);
 
 		show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
 		if($result){
 /*				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,'Host ['.$host['host'].']');*/
-
 			unset($_REQUEST['form']);
 			unset($_REQUEST['templateid']);
 		}
-
 		unset($_REQUEST['delete']);
 	}
 // ---------- GO ---------
-	else if(str_in_array($_REQUEST['go'],array('delete','delete_and_clear')) && isset($_REQUEST['templates'])){
+	else if(str_in_array($_REQUEST['go'],array('delete', 'delete_and_clear')) && isset($_REQUEST['templates'])){
 		$unlink_mode = false;
 		if(isset($_REQUEST['delete'])){
 			$unlink_mode =  true;
@@ -397,10 +386,10 @@ require_once('include/forms.inc.php');
 				' WHERE '.DBin_node('hostid').
 					' AND '.DBcondition('hostid',$hosts).
 					' AND '.DBcondition('hostid',$available_hosts);
-		$db_hosts=DBselect($sql);
+		$db_hosts = DBselect($sql);
 
 		DBstart();
-		while($db_host=DBfetch($db_hosts)){
+		while($db_host = DBfetch($db_hosts)){
 			$del_hosts[$db_host['hostid']] = $db_host['hostid'];
 	/*				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,'Host ['.$db_host['host'].']');*/
 		}
@@ -426,24 +415,25 @@ require_once('include/forms.inc.php');
 
 	validate_group($PAGE_GROUPS, $PAGE_HOSTS, false);
 
-	$available_groups = $PAGE_GROUPS['groupids'];
-	$available_hosts = $PAGE_HOSTS['hostids'];
-/****************************************/
-/* <<<--- TEMPLATE LIST AND FORM --->>> */
-/****************************************/
 
+	if(isset($_REQUEST['groupid'])){
+		$groupid_selected = $_REQUEST['groupid'];
+		if(isset($_REQUEST['change_group']))
+			update_profile('web.'.$page['menu'].'.groupid', $_REQUEST['groupid'], PROFILE_TYPE_ID);
+	}
+	else{
+		$_REQUEST['groupid'] = $groupid_selected = get_profile('web.'.$page['menu'].'.groupid');
+	}
+	
 	$frmForm = new CForm();
 	$frmForm->setMethod('get');
-	$frmForm->addVar('groupid', get_request('groupid',0));
-
 	$cmbConf = new CComboBox('config', 'templates.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
-	$cmbConf->addItem('templates.php',S_TEMPLATES);
-	$cmbConf->addItem('hosts.php',S_HOSTS);
-	$cmbConf->addItem('items.php',S_ITEMS);
-	$cmbConf->addItem('triggers.php',S_TRIGGERS);
-	$cmbConf->addItem('graphs.php',S_GRAPHS);
-	$cmbConf->addItem('applications.php',S_APPLICATIONS);
-
+		$cmbConf->addItem('templates.php', S_TEMPLATES);
+		$cmbConf->addItem('hosts.php', S_HOSTS);
+		$cmbConf->addItem('items.php', S_ITEMS);
+		$cmbConf->addItem('triggers.php', S_TRIGGERS);
+		$cmbConf->addItem('graphs.php', S_GRAPHS);
+		$cmbConf->addItem('applications.php', S_APPLICATIONS);
 	$frmForm->addItem($cmbConf);
 
 	if(!isset($_REQUEST['form'])){
@@ -652,11 +642,11 @@ require_once('include/forms.inc.php');
 
 		$host_footer = array();
 		$host_footer[] = new CButton('save', S_SAVE);
-		if(($_REQUEST['hostid']>0) && ($_REQUEST['form'] != 'full_clone')){
-			array_push($host_footer, SPACE, new CButton("clone",S_CLONE), SPACE, new CButton("full_clone",S_FULL_CLONE), SPACE,
-				new CButtonDelete(S_DELETE_SELECTED_HOST_Q, url_param('form').url_param('hostid').url_param('groupid')),
+		if(($templateid > 0) && ($_REQUEST['form'] != 'full_clone')){
+			array_push($host_footer, SPACE, new CButton("clone", S_CLONE), SPACE, new CButton("full_clone", S_FULL_CLONE), SPACE,
+				new CButtonDelete(S_DELETE_SELECTED_HOST_Q, url_param('form').url_param('templateid').url_param('groupid')),
 				SPACE,
-				new CButtonQMessage('delete_and_clear', 'Delete AND clear', S_DELETE_SELECTED_HOSTS_Q, url_param('form').url_param('hostid').
+				new CButtonQMessage('delete_and_clear', 'Delete AND clear', S_DELETE_SELECTED_HOSTS_Q, url_param('form').url_param('templateid').
 					url_param('groupid')
 				)
 			);
@@ -700,16 +690,19 @@ require_once('include/forms.inc.php');
 	}
 	else{
 // TABLE WITH TEMPLATES
-
 		$template_wdgt = new CWidget();
 
 		$frmForm = new CForm();
 		$frmForm->setMethod('get');
+		$frmForm->addVar('change_group', 1);
 
 // combo for group selection
-		$cmbGroups = new CComboBox('groupid', $PAGE_GROUPS['selected'], 'javascript: submit();');
-		foreach($PAGE_GROUPS['groups'] as $groupid => $group){
-			$cmbGroups->addItem($groupid, $group);
+		$groups = CHostGroup::get(array('editable' => 1, 'extendoutput' => 1));
+		order_result($groups, 'name');
+		$cmbGroups = new CComboBox('groupid', $groupid_selected, 'javascript: submit();');
+		$cmbGroups->addItem(0, S_ALL_SMALL);
+		foreach($groups as $group){
+			$cmbGroups->addItem($group['groupid'], get_node_name_by_elid($group['groupid']).$group['name']);
 		}
 		$frmForm->addItem(array(S_GROUP.SPACE, $cmbGroups));
 
@@ -721,35 +714,13 @@ require_once('include/forms.inc.php');
 		$template_wdgt->addHeader($numrows);
 //------
 
-
-		$config = select_config();
-
-// get templates
-		$options = array('editable' => 1,
-						'extendoutput' => 1,
-						'select_templates' => 1,
-						'select_hosts' => 1,
-						'select_triggers' => 1,
-						'select_items' => 1,
-						'select_graphs' => 1,
-						'select_applications' => 1,
-						'order' => 'host',
-						'limit' => ($config['search_limit']+1));
-
-		if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
-			$options['groupids'] = $PAGE_GROUPS['selected'];
-		}
-
-		$templates = CTemplate::get($options);
-//-----
-
 		$form = new CForm();
 		$form->setName('templates');
 
 		$table = new CTableInfo(S_NO_HOSTS_DEFINED);
 		$table->setHeader(array(
 			new CCheckBox('all_templates', NULL, "checkAll('".$form->getName()."', 'all_templates', 'templates');"),
-			make_sorting_header(S_TEMPLATES,'host'),
+			make_sorting_header(S_TEMPLATES, 'host'),
 			S_APPLICATIONS,
 			S_ITEMS,
 			S_TRIGGERS,
@@ -757,34 +728,60 @@ require_once('include/forms.inc.php');
 			S_LINKED_TEMPLATES,
 			S_LINKED_TO
 		));
+		
+		//$config = select_config();
+// get templates
+		$options = array(
+			'extendoutput' => 1,
+			'editable' => 1,
+			'limit' => ($config['search_limit']+1)
+		);
+		if($groupid_selected > 0){
+			$options['groupids'] = $groupid_selected;
+		}
+		$templates = CTemplate::get($options);
 
-// sorting && paging
-		order_page_result($templates, getPageSortField('host'), getPageSortOrder());
+		$sortfield = getPageSortField('host');
+		$sortorder = getPageSortOrder();
+		order_page_result($templates, $sortfield, $sortorder);
 		$paging = getPagingLine($templates);
-//------
 
-		foreach($templates as $templateid => $template){
+		$options = array(
+			'templateids' => array_keys($templates),
+			'extendoutput' => 1,
+			'select_hosts' => 1,
+			'select_templates' => 1,
+			'select_items' => 1,
+			'select_triggers' => 1,
+			'select_graphs' => 1,
+			'select_applications' => 1,
+			'nopermissions' => 1
+		);
+		$templates = CTemplate::get($options);
+		order_result($templates, $sortfield, $sortorder);
+//-----		
+		
+		foreach($templates as $template){
 			$templates_output = array();
 			if($template['proxy_hostid']){
 				$proxy = get_host_by_hostid($template['proxy_hostid']);
 				$templates_output[] = $proxy['host'].':';
 			}
-			$templates_output[] = new CLink($template['host'], 'templates.php?form=update&templateid='.$templateid.url_param('groupid'));
+			$templates_output[] = new CLink($template['host'], 'templates.php?form=update&templateid='.$template['hostid'].url_param('groupid'));
 
-			$applications = array(new CLink(S_APPLICATIONS,'applications.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$templateid),
+			$applications = array(new CLink(S_APPLICATIONS,'applications.php?groupid='.$groupid_selected.'&hostid='.$template['hostid']),
 				' ('.count($template['applications']).')');
-			$items = array(new CLink(S_ITEMS,'items.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$templateid),
+			$items = array(new CLink(S_ITEMS,'items.php?groupid='.$groupid_selected.'&hostid='.$template['hostid']),
 				' ('.count($template['itemids']).')');
-			$triggers = array(new CLink(S_TRIGGERS,'triggers.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$templateid),
+			$triggers = array(new CLink(S_TRIGGERS,'triggers.php?groupid='.$groupid_selected.'&hostid='.$template['hostid']),
 				' ('.count($template['triggerids']).')');
-			$graphs = array(new CLink(S_GRAPHS,'graphs.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$templateid),
+			$graphs = array(new CLink(S_GRAPHS,'graphs.php?groupid='.$groupid_selected.'&hostid='.$template['hostid']),
 				' ('.count($template['graphids']).')');
 
 			$i = 0;
 			$linked_templates_output = array();
-
-			order_result($template['templates'], 'host', null, true);
-			foreach($template['templates'] as $linked_templateid => $linked_template){
+			order_result($template['templates'], 'host');
+			foreach($template['templates'] as $linked_template){
 				$i++;
 				if($i > $config['max_in_table']){
 					$linked_templates_output[] = '...';
@@ -792,7 +789,7 @@ require_once('include/forms.inc.php');
 					break;
 				}
 
-				$url = 'templates.php?form=update&templateid='.$linked_templateid.url_param('groupid');
+				$url = 'templates.php?form=update&templateid='.$linked_template['hostid'].url_param('groupid');
 				$linked_templates_output[] = new CLink($linked_template['host'], $url, 'unknown');
 				$linked_templates_output[] = ', ';
 			}
@@ -801,9 +798,8 @@ require_once('include/forms.inc.php');
 
 			$i = 0;
 			$linked_to_hosts_output = array();
-
-			order_result($template['hosts'], 'host', null, true);
-			foreach($template['hosts'] as $linked_to_hostid => $linked_to_host){
+			order_result($template['hosts'], 'host');
+			foreach($template['hosts'] as $linked_to_host){
 				$i++;
 				if($i > $config['max_in_table']){
 					$linked_to_hosts_output[] = '...';
@@ -814,15 +810,15 @@ require_once('include/forms.inc.php');
 				switch($linked_to_host['status']){
 					case HOST_STATUS_NOT_MONITORED:
 						$style = 'on';
-						$url = 'hosts.php?form=update&hostid='.$linked_to_hostid.'&groupid='.$PAGE_GROUPS['selected'];
+						$url = 'hosts.php?form=update&hostid='.$linked_to_host['hostid'].'&groupid='.$groupid_selected;
 					break;
 					case HOST_STATUS_TEMPLATE:
 						$style = 'unknown';
-						$url = 'templates.php?form=update&templateid='.$linked_to_hostid;
+						$url = 'templates.php?form=update&templateid='.$linked_to_host['hostid'];
 					break;
 					default:
 						$style = null;
-						$url = 'hosts.php?form=update&hostid='.$linked_to_hostid.'&groupid='.$PAGE_GROUPS['selected'];
+						$url = 'hosts.php?form=update&hostid='.$linked_to_host['hostid'].'&groupid='.$groupid_selected;
 					break;
 				}
 
@@ -833,7 +829,7 @@ require_once('include/forms.inc.php');
 
 
 			$table->addRow(array(
-				new CCheckBox('templates['.$templateid.']', NULL, NULL, $templateid),
+				new CCheckBox('templates['.$template['hostid'].']', NULL, NULL, $template['hostid']),
 				$templates_output,
 				$applications,
 				$items,
@@ -843,14 +839,13 @@ require_once('include/forms.inc.php');
 				(empty($linked_to_hosts_output) ? '-' : new CCol($linked_to_hosts_output,'wraptext'))
 			));
 		}
-// }GENERATE OUTPUTS
 
 // GO{
 		$goBox = new CComboBox('go');
 		$goBox->addItem('delete',S_DELETE_SELECTED);
 		$goBox->addItem('delete_and_clear',S_DELETE_SELECTED_WITH_LINKED_ELEMENTS);
 
-		// goButton name is necessary!!!
+// goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO.' (0)');
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "templates";');
@@ -867,12 +862,6 @@ require_once('include/forms.inc.php');
 		$template_wdgt->addItem($form);
 		$template_wdgt->show();
 	}
-//**********************************************
-// }TEMPLATE LIST AND FORM
-//**********************************************
-?>
-<?php
 
 include_once('include/page_footer.php');
-
 ?>

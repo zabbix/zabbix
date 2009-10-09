@@ -515,7 +515,7 @@ class CTemplate extends CZBXAPI{
 		$tpls = null;
 		$newgroup = '';
 		$status = 3;
-
+		$error = 'Internal Zabbix eror';
 		$templateids = array();
 
 		$result = false;
