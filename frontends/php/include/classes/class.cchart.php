@@ -710,11 +710,11 @@ class CChart extends CGraphDraw{
 		}
 	return $maxY;
 	}
-
+	
 	protected function calcZero(){
 		$left = GRAPH_YAXIS_SIDE_LEFT;
 		$right = GRAPH_YAXIS_SIDE_RIGHT;
-		$sides = array(GRAPH_YAXIS_SIDE_LEFT. GRAPH_YAXIS_SIDE_RIGHT);
+		$sides = array(GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT);
 		
 		foreach($sides as $num => $side){
 			$this->unit2px[$side] = ($this->m_maxY[$side] - $this->m_minY[$side])/$this->sizeY;

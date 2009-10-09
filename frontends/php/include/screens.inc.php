@@ -336,8 +336,8 @@
 						$value = new CJSscript($row['value']);
 					}
 					else{
-						$value = nbsp(htmlspecialchars($row['value']));
-						$value = zbx_nl2br($value);
+						$value = htmlspecialchars($row['value']);
+//						$value = zbx_nl2br($value);
 					}
 					break;
 				case ITEM_VALUE_TYPE_LOG:
@@ -345,8 +345,8 @@
 						$value = new CJSscript($row['value']);
 					}
 					else{
-						$value = nbsp(htmlspecialchars($row['value']));
-						$value = zbx_nl2br($value);
+						$value = htmlspecialchars($row['value']);
+//						$value = zbx_nl2br($value);
 					}
 					break;
 				default:
