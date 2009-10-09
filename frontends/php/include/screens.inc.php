@@ -923,7 +923,7 @@
 					$containerid = 'graph_cont_'.$screenitemid.'_'.$resourceid;
 					$graphDims = getGraphDims($resourceid);
 					
-					$graphDims['height'] = $height;
+					$graphDims['graphHeight'] = $height;
 					$graphDims['width'] = $width;
 
 					$sql = 'SELECT g.graphid, g.show_legend as legend, g.show_3d as show3d '.
@@ -1044,7 +1044,7 @@
 					$graphDims['shiftXleft'] = 100;
 					$graphDims['shiftXright'] = 50;
 					$graphDims['graphtype'] = 0;					
-					$graphDims['height'] = $height;
+					$graphDims['graphHeight'] = $height;
 					$graphDims['width'] = $width;
 					
 					$objData = array(
