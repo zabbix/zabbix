@@ -451,7 +451,7 @@ class zbxXML{
 					else{
 						$host_groupids = CHostGroup::add(array(ZBX_DEFAULT_IMPORT_HOST_GROUP));
 						if($host_groupids === false){
-							error(CHostGroup::error);
+							error(CHostGroup::resetErrors());
 							$result = false;
 							break;
 						}
@@ -473,7 +473,7 @@ class zbxXML{
 					
 					$new_groupids = CHostGroup::add($groups_to_add);
 					if($new_groupids === false){
-						error(CHostGroup::error);
+						error(CHostGroup::resetErrors());
 						$result = false;
 						break;
 					}
@@ -490,13 +490,13 @@ class zbxXML{
 					$host_db['hostid'] = $current_hostid;
 					$r = CHost::update(array($host_db));
 					if($r === false){
-						error(CHost::error);
+						error(CHost::resetErrors());
 						$result = false;
 						break;
 					}
 					$r = CHostGroup::addGroupsToHost(array('hostid' => $current_hostid, 'groupids' => $new_groupids));
 					if($r === false){
-						error(CHostGroup::error);
+						error(CHostGroup::resetErrors());
 						$result = false;
 						break;
 					}
@@ -560,13 +560,13 @@ class zbxXML{
 
 					$r = CUserMacro::add($macros_to_add);
 					if($r === false){
-						error(CUserMacro::error);
+						error(CUserMacro::resetErrors());
 						$result = false;
 						break;
 					}
 					$r = CUserMacro::updateValue($macros_to_upd);
 					if($r === false){
-						error(CUserMacro::error);
+						error(CUserMacro::resetErrors());
 						$result = false;
 						break;
 					}
@@ -605,7 +605,7 @@ class zbxXML{
 							if(!empty($applications_to_add)){
 								$new_applicationids = CApplication::add($applications_to_add);
 								if($new_applicationids === false){
-									error(CApplication::error);
+									error(CApplication::resetErrors());
 									$result = false;
 									break 2;
 								}
@@ -628,13 +628,13 @@ class zbxXML{
 // sdii($items_to_add);
 					$r = CItem::add($items_to_add);
 					if($r === false){
-						error(CItem::error);
+						error(CItem::resetErrors());
 						$result = false;
 						break;
 					}
 					$r = CItem::update($items_to_upd);
 					if($r === false){
-						error(CItem::error);
+						error(CItem::resetErrors());
 						$result = false;
 						break;
 					}
@@ -672,14 +672,14 @@ class zbxXML{
 //  sdii($triggers_to_upd);
 					$added_triggers = CTrigger::add($triggers_to_add);
 					if($added_triggers === false){
-						error(CTrigger::error);
+						error(CTrigger::resetErrors());
 						$result = false;
 						break;
 					}
 					
 					$r = CTrigger::update($triggers_to_upd);
 					if($r === false){
-						error(CTrigger::error);
+						error(CTrigger::resetErrors());
 						$result = false;
 						break;
 					}
@@ -707,7 +707,7 @@ class zbxXML{
 					}
 					$r = CTemplate::linkTemplates(array('hostid' => $current_hostid, 'templateids' => $templates_to_upd));
 					if($r === false){
-						error(CTemplate::error);
+						error(CTemplate::resetErrors());
 						$result = false;
 						break;
 					}
@@ -757,7 +757,7 @@ class zbxXML{
 //sdii($graphs_to_add);
 					$r = CGraph::add($graphs_to_add);
 					if($r === false){
-						error(CGraph::error);
+						error(CGraph::resetErrors());
 						$result = false;
 						break;
 					}

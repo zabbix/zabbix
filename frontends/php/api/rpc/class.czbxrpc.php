@@ -168,5 +168,148 @@ public static $result;
 
 		self::$result = $result;
 	}
+	
+// ACTION
+	private static function action($action, $params){
+
+		CAction::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CAction', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+	
+// ALERT
+	private static function alert($action, $params){
+
+		CAlert::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CAlert', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+	
+// APPLICATION
+	private static function application($action, $params){
+
+		CAapplication::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CAapplication', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+	
+// EVENT
+	private static function event($action, $params){
+
+		CEvent::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CEvent', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+
+// GRAPHITEM
+	private static function graphitem($action, $params){
+
+		CGraphItem::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CGraphItem', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+
+// MAINTENANCE
+	private static function maintenance($action, $params){
+
+		CMaintenance::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CMaintenance', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+	
+// MAP
+	private static function map($action, $params){
+
+		CMap::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CMap', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+	
+// SCREEN
+	private static function screen($action, $params){
+
+		CScreen::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CScreen', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+	
+// SCRIPT
+	private static function script($action, $params){
+
+		CScript::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CScript', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+	
+// USERGROUP
+	private static function usergroup($action, $params){
+
+		CUserGroup::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CUserGroup', $action), $params);
+		}
+
+		self::$result = $result;
+	}
+	
+// USERMACRO
+	private static function usermacro($action, $params){
+
+		CUserMacro::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CUserMacro', $action), $params);
+		}
+
+		self::$result = $result;
+	}
 }
 ?>
