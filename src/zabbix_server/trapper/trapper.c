@@ -22,7 +22,6 @@
 #include "cfg.h"
 #include "comms.h"
 #include "pid.h"
-#include "db.h"
 #include "log.h"
 #include "zlog.h"
 #include "zbxjson.h"
@@ -139,147 +138,70 @@ static void	calc_timestamp(char *line,int *timestamp, char *format)
  * Comments: for trapper server process                                       *
  *                                                                            *
  ******************************************************************************/
-static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALUE *values, int value_num,
-		int *processed, time_t proxy_timediff)
+static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALUE *values,
+		int value_num, int *processed, time_t proxy_timediff)
 {
 	AGENT_RESULT	agent;
-	DB_RESULT	result;
-	DB_ROW		row;
-	DB_ITEM		item;
-	char		host_esc[MAX_STRING_LEN], key_esc[MAX_STRING_LEN];
-	static char	*sql = NULL;
-	static int	sql_allocated = 65536;
-	int		sql_offset = 0, i;
+	DC_ITEM		item;
+	int		i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_mass_data()");
 
 	DCinit_nextchecks();
 
-	if (NULL == sql)
-		sql = zbx_malloc(sql, sql_allocated);
-
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 2048,
-			"select %s where h.hostid=i.hostid and h.proxy_hostid=" ZBX_FS_UI64
-			" and h.status=%d and i.status in (%d,%d)",
-			ZBX_SQL_ITEM_SELECT,
-			proxy_hostid,
-			HOST_STATUS_MONITORED,
-			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED);
-
-	if (proxy_hostid == 0)
-	{
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 64,
-				" and i.type in (%d,%d)",
-				ITEM_TYPE_TRAPPER,
-				ITEM_TYPE_ZABBIX_ACTIVE);
-	}
-	else
-	{
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 64,
-				" and i.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
-				ITEM_TYPE_ZABBIX,
-				ITEM_TYPE_SNMPv1,
-				ITEM_TYPE_TRAPPER,
-				ITEM_TYPE_SIMPLE,
-				ITEM_TYPE_SNMPv2c,
-				ITEM_TYPE_SNMPv3,
-				ITEM_TYPE_ZABBIX_ACTIVE,
-				ITEM_TYPE_HTTPTEST,
-				ITEM_TYPE_EXTERNAL,
-				ITEM_TYPE_IPMI);
-	}
-
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, " and (");
-
 	for (i = 0; i < value_num; i++)
 	{
-		DBescape_string(values[i].host_name, host_esc, sizeof(host_esc));
-		DBescape_string(values[i].key, key_esc, sizeof(key_esc));
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-				"(h.host='%s' and i.key_='%s') or ",
-				host_esc,
-				key_esc);
-	}
-
-	sql_offset -= 4;
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, ")" DB_NODE,
-			DBnode_local("h.hostid"));
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result))) {
-		DBget_item_from_db(&item, row);
-
-		if (item.type == ITEM_TYPE_ZABBIX_ACTIVE && FAIL == zbx_tcp_check_security(sock, item.trapper_hosts, 1))
+		if (SUCCEED != DCconfig_get_item_by_key(&item, proxy_hostid, values[i].host_name, values[i].key))
 			continue;
 
-		if (item.maintenance_status == HOST_MAINTENANCE_STATUS_ON && item.maintenance_type == MAINTENANCE_TYPE_NODATA &&
-				item.maintenance_from <= values[i].clock)
+		if (item.host.maintenance_status == HOST_MAINTENANCE_STATUS_ON &&
+				item.host.maintenance_type == MAINTENANCE_TYPE_NODATA &&
+				item.host.maintenance_from <= values[i].clock)
 			continue;
 
-		for (i = 0; i < value_num; i++)
+		if (item.type != ITEM_TYPE_TRAPPER && item.type != ITEM_TYPE_ZABBIX_ACTIVE)
+			if (0 != proxy_hostid && (item.type == ITEM_TYPE_INTERNAL ||
+						item.type == ITEM_TYPE_AGGREGATE ||
+						item.type == ITEM_TYPE_DB_MONITOR))
+				continue;
+
+		if (item.type == ITEM_TYPE_ZABBIX_ACTIVE &&
+				FAIL == zbx_tcp_check_security(sock, item.trapper_hosts, 1))
+			continue;
+
+		if (0 == strcmp(values[i].value, "ZBX_NOTSUPPORTED"))
 		{
-			if (0 == strcmp(item.host_name, values[i].host_name) && 0 == strcmp(item.key_orig, values[i].key)) {
-/*				zabbix_log(LOG_LEVEL_DEBUG, "Processing [%s@%s: \"%s\"]",
-						item.key,
-						item.host_name,
-						values[i].value);*/
+			DCadd_nextcheck(&item, (time_t)values[i].clock, values[i].value);
+			DCconfig_update_item(item.itemid, ITEM_STATUS_NOTSUPPORTED, values[i].clock);
 
-				if (0 == strcmp(values[i].value, "ZBX_NOTSUPPORTED"))
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "Active parameter [%s] is not supported by agent on host [%s]",
-							item.key_orig,
-							item.host_name);
-					zabbix_syslog("Active parameter [%s] is not supported by agent on host [%s]",
-							item.key_orig,
-							item.host_name);
-
-					DCadd_nextcheck(&item, (time_t)values[i].clock, (time_t)0, values[i].value);
-
-					if (NULL != processed)
-						(*processed)++;
-				}
-				else
-				{
-					if (0 == strncmp(item.key, "log[", 4) || 0 == strncmp(item.key, "eventlog[", 9))
-					{
-						item.lastlogsize = values[i].lastlogsize;
-						item.timestamp = values[i].timestamp;
-
-						calc_timestamp(values[i].value, &item.timestamp, item.logtimefmt);
-
-						item.eventlog_severity = values[i].severity;
-						item.eventlog_source = values[i].source;
-						item.logeventid = values[i].logeventid;
-
-/*						zabbix_log(LOG_LEVEL_DEBUG, "Value [%s] Lastlogsize [%s] Timestamp [%s]",
-								values[i].value,
-								item.lastlogsize,
-								item.timestamp);*/
-					}
-
-					init_result(&agent);
-
-					if (SUCCEED == set_result_type(&agent, item.value_type, item.data_type, values[i].value))
-					{
-						dc_add_history(&item, &agent, values[i].clock);
-
-						if (NULL != processed)
-							(*processed)++;
-					}
-					else
-					{
-						if (GET_MSG_RESULT(&agent))
-							zabbix_log(LOG_LEVEL_WARNING, "Item [%s] error: %s",
-									zbx_host_key_string_by_item(&item),
-									agent.msg);
-					}
-					free_result(&agent);
-			 	}
-			}
+			if (NULL != processed)
+				(*processed)++;
 		}
+		else
+		{
+			init_result(&agent);
+
+			if (SUCCEED == set_result_type(&agent, item.value_type, item.data_type, values[i].value))
+			{
+				if (ITEM_VALUE_TYPE_LOG == item.value_type)
+					calc_timestamp(values[i].value, &values[i].timestamp, item.logtimefmt);
+
+				dc_add_history(item.itemid, item.value_type, &agent, values[i].clock,
+						values[i].timestamp, values[i].source, values[i].severity,
+						values[i].logeventid, values[i].lastlogsize);
+
+				if (NULL != processed)
+					(*processed)++;
+			}
+			else
+			{
+				if (GET_MSG_RESULT(&agent))
+					zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
+							item.host.host, item.key_orig, agent.msg);
+			}
+			free_result(&agent);
+	 	}
 	}
-	DBfree_result(result);
 
 	DCflush_nextchecks();
 
@@ -693,10 +615,6 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 			zbx_strlcpy(av.key, pl, sizeof(av.key));
 			*pr = ':';
 
-			av.value	= pr + 1;
-			av.lastlogsize	= 0;
-			av.timestamp	= 0;
-			av.source	= NULL;
 			av.severity	= 0;
 		}
 

@@ -198,9 +198,10 @@ void	update_triggers(zbx_uint64_t itemid)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	dc_add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
+void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, AGENT_RESULT *value, int now,
+		int timestamp, char *source, int severity, int logeventid, int lastlogsize)
 {
-	if (value->type & AR_UINT64)
+/*	if (value->type & AR_UINT64)
 		zabbix_log(LOG_LEVEL_DEBUG, "In dc_add_history(itemid:" ZBX_FS_UI64 ",key:\"%s\",value_type:%d,UINT64:"ZBX_FS_UI64")",
 			item->itemid,
 			item->key,
@@ -223,34 +224,34 @@ void	dc_add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 			item->itemid,
 			item->key,
 			item->value_type,
-			value->text);
+			value->text);*/
 
-	switch (item->value_type) {
+	switch (value_type) {
 		case ITEM_VALUE_TYPE_FLOAT:
 			if (GET_DBL_RESULT(value))
-				DCadd_history(item->itemid, value->dbl, now);
+				DCadd_history(itemid, value->dbl, now);
 			break;
 		case ITEM_VALUE_TYPE_STR:
 			if (GET_STR_RESULT(value))
-				DCadd_history_str(item->itemid, value->str, now);
+				DCadd_history_str(itemid, value->str, now);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			if (GET_STR_RESULT(value))
-				DCadd_history_log(item->itemid, value->str, now, item->timestamp, item->eventlog_source,
-						item->eventlog_severity, item->logeventid, item->lastlogsize);
+				DCadd_history_log(itemid, value->str, now, timestamp, source, severity,
+						logeventid, lastlogsize);
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			if (GET_UI64_RESULT(value))
-				DCadd_history_uint(item->itemid, value->ui64, now);
+				DCadd_history_uint(itemid, value->ui64, now);
 			break;
 		case ITEM_VALUE_TYPE_TEXT:
 			if (GET_TEXT_RESULT(value))
-				DCadd_history_text(item->itemid, value->text, now);
+				DCadd_history_text(itemid, value->text, now);
 			break;
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "Unknown value type [%d] for itemid [" ZBX_FS_UI64 "]",
-				item->value_type,
-				item->itemid);
+				value_type,
+				itemid);
 	}
-	zabbix_log( LOG_LEVEL_DEBUG, "End of dc_add_history");
+/*	zabbix_log( LOG_LEVEL_DEBUG, "End of dc_add_history");*/
 }

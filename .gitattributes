@@ -360,6 +360,7 @@ src/libs/zbxcommon/file.c -text
 src/libs/zbxcommon/time.c -text
 src/libs/zbxdbcache/Makefile.am -text
 src/libs/zbxdbcache/dbcache.c -text
+src/libs/zbxdbcache/dbconfig.c -text
 src/libs/zbxdbcache/nextchecks.c -text
 src/libs/zbxdbhigh/macro.c -text
 src/libs/zbxicmpping/Makefile.am -text
@@ -391,6 +392,9 @@ src/zabbix_proxy/proxyconfig/proxyconfig.h -text
 src/zabbix_proxy/servercomms.c -text
 src/zabbix_proxy/servercomms.h -text
 src/zabbix_proxy/zlog.c -text
+src/zabbix_server/dbconfig/Makefile.am -text
+src/zabbix_server/dbconfig/dbconfig.c -text
+src/zabbix_server/dbconfig/dbconfig.h -text
 src/zabbix_server/dbsyncer/Makefile.am -text
 src/zabbix_server/dbsyncer/dbsyncer.c -text
 src/zabbix_server/dbsyncer/dbsyncer.h -text

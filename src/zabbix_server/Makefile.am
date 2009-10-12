@@ -3,6 +3,7 @@
 SUBDIRS = \
 	alerter \
 	dbsyncer \
+	dbconfig \
 	discoverer \
 	housekeeper \
 	httppoller \
@@ -31,6 +32,7 @@ endif
 zabbix_server_LDADD = \
 	alerter/libzbxalerter.a \
 	dbsyncer/libzbxdbsyncer.a \
+	dbconfig/libzbxdbconfig.a \
 	discoverer/libzbxdiscoverer.a \
 	pinger/libzbxpinger.a \
 	poller/libzbxpoller.a \

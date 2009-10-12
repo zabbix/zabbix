@@ -1759,7 +1759,7 @@ static const char	*ex_suffix[EX_SUFFIX_NUM] = {"}", "1}", "2}", "3}", "4}", "5}"
  *           {TRIGGER.NAME}, {TRIGGER.KEY}, {TRIGGER.SEVERITY}                *
  *                                                                            *
  ******************************************************************************/
-int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, DB_ESCALATION *escalation,
+int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, DC_ITEM *dc_item, DB_ESCALATION *escalation,
 		char **data, int macro_type, char *error, int maxerrlen)
 {
 	char		*p, *bl, *br, c, *str_out = NULL, *replace_to = NULL, sql[64];
@@ -1831,7 +1831,7 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 				{
 					replace_to = zbx_dsprintf(replace_to, "%s", event->trigger_description);
 					/* Why it was here? *//* For substituting macros in trigger description :) */
-					substitute_simple_macros(event, action, item, escalation, &replace_to,
+					substitute_simple_macros(event, action, item, dc_item, escalation, &replace_to,
 							MACRO_TYPE_TRIGGER_DESCRIPTION, error, maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_COMMENT))
@@ -2054,16 +2054,33 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 		}
 		else if (macro_type & (MACRO_TYPE_ITEM_KEY | MACRO_TYPE_HOST_IPMI_IP))
 		{
-			if (0 == strcmp(m, MVAR_HOSTNAME))
-				replace_to = zbx_dsprintf(replace_to, "%s", item->host_name);
-			else if (0 == strcmp(m, MVAR_IPADDRESS))
-				replace_to = zbx_dsprintf(replace_to, "%s", item->host_ip);
-			else if (0 == strcmp(m, MVAR_HOST_DNS))
-				replace_to = zbx_dsprintf(replace_to, "%s", item->host_dns);
-			else if (0 == strcmp(m, MVAR_HOST_CONN))
-				replace_to = zbx_dsprintf(replace_to, "%s", item->useip ? item->host_ip : item->host_dns);
-			else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
-				zbxmacros_get_value(macros, &item->hostid, 1, m, &replace_to);
+			if (NULL != item)
+			{
+				if (0 == strcmp(m, MVAR_HOSTNAME))
+					replace_to = zbx_dsprintf(replace_to, "%s", item->host_name);
+				else if (0 == strcmp(m, MVAR_IPADDRESS))
+					replace_to = zbx_dsprintf(replace_to, "%s", item->host_ip);
+				else if	(0 == strcmp(m, MVAR_HOST_DNS))
+					replace_to = zbx_dsprintf(replace_to, "%s", item->host_dns);
+				else if (0 == strcmp(m, MVAR_HOST_CONN))
+					replace_to = zbx_dsprintf(replace_to, "%s", item->useip ? item->host_ip : item->host_dns);
+				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+					zbxmacros_get_value(macros, &item->hostid, 1, m, &replace_to);
+			}
+			else if (NULL != dc_item)
+			{
+				if (0 == strcmp(m, MVAR_HOSTNAME))
+					replace_to = zbx_dsprintf(replace_to, "%s", dc_item->host.host);
+				else if (0 == strcmp(m, MVAR_IPADDRESS))
+					replace_to = zbx_dsprintf(replace_to, "%s", dc_item->host.ip);
+				else if	(0 == strcmp(m, MVAR_HOST_DNS))
+					replace_to = zbx_dsprintf(replace_to, "%s", dc_item->host.dns);
+				else if (0 == strcmp(m, MVAR_HOST_CONN))
+					replace_to = zbx_dsprintf(replace_to, "%s",
+							dc_item->host.useip ? dc_item->host.ip : dc_item->host.dns);
+				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+					zbxmacros_get_value(macros, &dc_item->host.hostid, 1, m, &replace_to);
+			}
 		}
 		else if (macro_type & MACRO_TYPE_FUNCTION_PARAMETER)
 		{
@@ -2151,7 +2168,7 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, DB_ESCALATION *escala
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_macros(data:\"%s\")",
 			*data);
 
-	substitute_simple_macros(event, NULL, NULL, escalation, data, MACRO_TYPE_MESSAGE, NULL, 0);
+	substitute_simple_macros(event, NULL, NULL, NULL, escalation, data, MACRO_TYPE_MESSAGE, NULL, 0);
 
 	pl = *data;
 	while((pr = strchr(pl, '{')))
@@ -2359,7 +2376,7 @@ int	evaluate_expression(int *result,char **expression, DB_TRIGGER *trigger, char
 	event.objectid = trigger->triggerid;
 	event.value = trigger->value;
 
-	if (SUCCEED == substitute_simple_macros(&event, NULL, NULL, NULL, expression, MACRO_TYPE_TRIGGER_EXPRESSION,
+	if (SUCCEED == substitute_simple_macros(&event, NULL, NULL, NULL, NULL, expression, MACRO_TYPE_TRIGGER_EXPRESSION,
 			error, maxerrlen))
 	{
 		/* Evaluate expression */

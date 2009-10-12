@@ -864,14 +864,14 @@ out:
 	return h;
 }
 
-int	get_value_ipmi(DB_ITEM *item, AGENT_RESULT *value)
+int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value)
 {
 	zbx_ipmi_host_t		*h;
 	zbx_ipmi_sensor_t	*s;
 	zbx_ipmi_control_t	*c = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In get_value_ipmi(key:%s)",
-			item->key);
+			item->key_orig);
 
 	if (NULL == os_hnd)
 	{
@@ -880,8 +880,8 @@ int	get_value_ipmi(DB_ITEM *item, AGENT_RESULT *value)
 		return NOTSUPPORTED;
 	}
 
-	h = init_ipmi_host(item->ipmi_ip, item->ipmi_port, item->ipmi_authtype,
-			item->ipmi_privilege, item->ipmi_username, item->ipmi_password);
+	h = init_ipmi_host(item->host.ipmi_ip, item->host.ipmi_port, item->host.ipmi_authtype,
+			item->host.ipmi_privilege, item->host.ipmi_username, item->host.ipmi_password);
 
 	if (0 == h->domain_up) {
 		if (NULL != h->err)
@@ -927,9 +927,10 @@ int	get_value_ipmi(DB_ITEM *item, AGENT_RESULT *value)
 	return h->ret;
 }
 
-int	parse_ipmi_command(char *command, char **c_name, int *val)
+/* function 'parse_ipmi_command' require 'c_name' with size 'ITEM_IPMI_SENSOR_LEN_MAX' */
+int	parse_ipmi_command(char *command, char *c_name, int *val)
 {
-	char	*p;
+	char	*p, *ipmi_command;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In parse_ipmi_command(%s)", command);
 
@@ -940,7 +941,7 @@ int	parse_ipmi_command(char *command, char **c_name, int *val)
 	while (*p == ' ' && *p != '\0')
 		p++;
 
-	*c_name = p;
+	ipmi_command = p;
 	*val = 1;
 
 	if (NULL != (p = strchr(p, ' ')))
@@ -962,11 +963,12 @@ int	parse_ipmi_command(char *command, char **c_name, int *val)
 			return FAIL;
 		}
 	}
+	zbx_strlcpy(c_name, ipmi_command, ITEM_IPMI_SENSOR_LEN_MAX);
 
 	return SUCCEED;
 }
 
-int	set_ipmi_control_value(DB_ITEM *item, int value, char *error, size_t error_max_len)
+int	set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t error_max_len)
 {
 	zbx_ipmi_host_t		*h;
 	zbx_ipmi_control_t	*c;
@@ -981,8 +983,8 @@ int	set_ipmi_control_value(DB_ITEM *item, int value, char *error, size_t error_m
 		return NOTSUPPORTED;
 	}
 
-	h = init_ipmi_host(item->useip ? item->host_ip : item->host_dns, item->ipmi_port,
-			item->ipmi_authtype, item->ipmi_privilege, item->ipmi_username, item->ipmi_password);
+	h = init_ipmi_host(item->host.useip ? item->host.ip : item->host.dns, item->host.ipmi_port,
+			item->host.ipmi_authtype, item->host.ipmi_privilege, item->host.ipmi_username, item->host.ipmi_password);
 
 	if (0 == h->domain_up) {
 		if (NULL != h->err)

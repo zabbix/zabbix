@@ -4,4 +4,5 @@ noinst_LIBRARIES = libzbxdbcache.a
 
 libzbxdbcache_a_SOURCES = \
 	dbcache.c \
-	nextchecks.c
+	nextchecks.c \
+	dbconfig.c

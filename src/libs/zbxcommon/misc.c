@@ -316,7 +316,7 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char
 	time_t	next;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In calculate_item_nextcheck (" ZBX_FS_UI64 ",%d,\"%s\",%d)",
-			itemid, delay, delay_flex, now);
+			itemid, delay, NULL == delay_flex ? "" : delay_flex, now);
 
 	if (0 == delay)
 	{
@@ -1408,24 +1408,16 @@ int	uint64_in_list(char *list, zbx_uint64_t value)
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: get_nearestindex                                                 *
- *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alekasander Vladishev                                              *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static int	get_nearestindex(zbx_uint64_t *values, int num, zbx_uint64_t value)
+/*
+ * Get nearest index of sorted elements in array.
+ *     p - pointer to array of elements
+ *     sz - size of one element in array
+ *     num - number of elements
+ */
+int	get_nearestindex(void *p, size_t sz, int num, zbx_uint64_t id)
 {
-	int	first_index, last_index, index;
+	int		first_index, last_index, index;
+	zbx_uint64_t	element_id;
 
 	if (num == 0)
 		return 0;
@@ -1436,15 +1428,16 @@ static int	get_nearestindex(zbx_uint64_t *values, int num, zbx_uint64_t value)
 	{
 		index = first_index + (last_index - first_index) / 2;
 
-		if (values[index] == value)
+		element_id = *(zbx_uint64_t *)(p + index * sz);
+		if (element_id == id)
 			return index;
 		else if (last_index == first_index)
 		{
-			if (values[index] < value)
+			if (element_id < id)
 				index++;
 			return index;
 		}
-		else if (values[index] < value)
+		else if (element_id < id)
 			first_index = index + 1;
 		else
 			last_index = index;
@@ -1470,7 +1463,7 @@ int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t v
 {
 	int	index;
 
-	index = get_nearestindex(*values, *num, value);
+	index = get_nearestindex(*values, sizeof(zbx_uint64_t), *num, value);
 	if (index < (*num) && (*values)[index] == value)
 		return index;
 
@@ -1530,7 +1523,7 @@ int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value)
 {
 	int	index;
 
-	index = get_nearestindex(values, num, value);
+	index = get_nearestindex(values, sizeof(zbx_uint64_t), num, value);
 	if (index < num && values[index] == value)
 		return SUCCEED;
 
@@ -1558,7 +1551,7 @@ void	uint64_array_rm(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, in
 
 	for (rindex = 0; rindex < rm_num; rindex++)
 	{
-		index = get_nearestindex(values, *num, rm_values[rindex]);
+		index = get_nearestindex(values, sizeof(zbx_uint64_t), *num, rm_values[rindex]);
 		if (index == *num || values[index] != rm_values[rindex])
 			continue;
 

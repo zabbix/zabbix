@@ -129,9 +129,9 @@ typedef enum {
 #define HOST_ADDR_LEN_MAX		HOST_ADDR_LEN+1
 #define HOST_ERROR_LEN			128
 #define HOST_ERROR_LEN_MAX		HOST_ERROR_LEN+1
-#define HOST_IPMI_USERNAME_LEN		128
+#define HOST_IPMI_USERNAME_LEN		16
 #define HOST_IPMI_USERNAME_LEN_MAX	HOST_IPMI_USERNAME_LEN+1
-#define HOST_IPMI_PASSWORD_LEN		128
+#define HOST_IPMI_PASSWORD_LEN		20
 #define HOST_IPMI_PASSWORD_LEN_MAX	HOST_IPMI_PASSWORD_LEN+1
 
 #define ITEM_KEY_LEN			255
@@ -162,6 +162,10 @@ typedef enum {
 #define ITEM_LOGTIMEFMT_LEN_MAX		ITEM_LOGTIMEFMT_LEN+1
 #define ITEM_DELAY_FLEX_LEN		255
 #define ITEM_DELAY_FLEX_LEN_MAX		ITEM_DELAY_FLEX_LEN+1
+#define ITEM_IPMI_SENSOR_LEN		128
+#define ITEM_IPMI_SENSOR_LEN_MAX	ITEM_IPMI_SENSOR_LEN+1
+#define ITEM_PARAMS_LEN			2048
+#define ITEM_PARAMS_LEN_MAX		ITEM_PARAMS_LEN+1
 
 #define FUNCTION_LASTVALUE_LEN		255
 #define FUNCTION_LASTVALUE_LEN_MAX	FUNCTION_LASTVALUE_LEN+1
@@ -612,8 +616,6 @@ const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
 zbx_uint64_t	DBget_maxid_num(char *table, char *field, int num);
 
 int     DBget_function_result(char **result,char *functionid, char *error, int maxerrlen);
-void	DBupdate_host_availability(DB_ITEM *item, int available, int clock, const char *error);
-void	DBproxy_update_host_availability(DB_ITEM *item, int available, int clock);
 int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
 int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock);
 int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t eventid, zbx_uint64_t userid, zbx_uint64_t mediatypeid, char *sendto, char *subject, char *message);

@@ -21,10 +21,9 @@
 #define ZABBIX_CHECKS_SIMPLE_H
 
 #include "common.h"
-#include "db.h"
-#include "log.h"
+#include "dbcache.h"
 #include "sysinfo.h"
 
-extern	int	get_value_simple(DB_ITEM *item, AGENT_RESULT *result);
+int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result);
 
 #endif

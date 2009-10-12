@@ -2426,7 +2426,7 @@ static int	DBupdate_item(
 
 				DBexecute(
 					"update items set description='%s',key_='%s',"
-					"hostid=" ZBX_FS_UI64 ",delay=%i,history=%i,nextcheck=0,status=%i,type=%i,"
+					"hostid=" ZBX_FS_UI64 ",delay=%i,history=%i,status=%i,type=%i,"
 					"snmp_community='%s',snmp_oid='%s',"
 					"value_type=%i,trapper_hosts='%s',"
 					"snmp_port=%i,units='%s',multiplier=%i,delta=%i,"
