@@ -688,7 +688,7 @@ static int discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 	char		key[MAX_STRING_LEN], error[ITEM_ERROR_LEN_MAX];
 	const char	*service = NULL;
 	AGENT_RESULT 	result;
-	DB_ITEM		item;
+	DC_ITEM		item;
 	ZBX_FPING_HOST	host;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -751,13 +751,12 @@ static int discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 			case SVC_SNMPv1:
 			case SVC_SNMPv2c:
 			case SVC_SNMPv3:
-				memset(&item, 0, sizeof(DB_ITEM));
-				item.key	= dcheck->key_;
-				item.host_name	= ip;
-				item.host_ip	= ip;
-				item.host_dns	= ip;
-				item.useip	= 1;
-				item.port	= port;
+				memset(&item, 0, sizeof(DC_ITEM));
+				zbx_strlcpy(item.key_orig, dcheck->key_, sizeof(item.key_orig));
+				item.key = item.key_orig;
+				zbx_strlcpy(item.host.ip, ip, sizeof(item.host.ip));
+				item.host.useip	= 1;
+				item.host.port	= port;
 
 				item.value_type	= ITEM_VALUE_TYPE_STR;
 
@@ -767,14 +766,6 @@ static int discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 				case SVC_SNMPv3:	item.type = ITEM_TYPE_SNMPv3; break;
 				default:		item.type = ITEM_TYPE_ZABBIX; break;
 				}
-
-				item.snmp_oid			= dcheck->key_;
-				item.snmp_community		= dcheck->snmp_community;
-				item.snmpv3_securityname	= dcheck->snmpv3_securityname;
-				item.snmpv3_securitylevel	= dcheck->snmpv3_securitylevel;
-				item.snmpv3_authpassphrase	= dcheck->snmpv3_authpassphrase;
-				item.snmpv3_privpassphrase	= dcheck->snmpv3_privpassphrase;
-				item.snmp_port			= port;
 
 				if (dcheck->type == SVC_AGENT)
 				{
@@ -791,6 +782,18 @@ static int discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 				else
 #ifdef HAVE_SNMP
 				{
+					zbx_strlcpy(item.snmp_oid, dcheck->key_, sizeof(item.snmp_oid));
+					zbx_strlcpy(item.snmp_community, dcheck->snmp_community,
+							sizeof(item.snmp_community));
+					zbx_strlcpy(item.snmpv3_securityname, dcheck->snmpv3_securityname,
+							sizeof(item.snmpv3_securityname));
+					item.snmpv3_securitylevel	= dcheck->snmpv3_securitylevel;
+					zbx_strlcpy(item.snmpv3_authpassphrase, dcheck->snmpv3_authpassphrase,
+							sizeof(item.snmpv3_authpassphrase));
+					zbx_strlcpy(item.snmpv3_privpassphrase, dcheck->snmpv3_privpassphrase,
+							sizeof(item.snmpv3_privpassphrase));
+					item.snmp_port			= port;
+
 					if(SUCCEED == get_value_snmp(&item, &result))
 					{
 						if (GET_STR_RESULT(&result))
@@ -807,8 +810,7 @@ static int discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 
 				if (FAIL == ret && GET_MSG_RESULT(&result))
 					zabbix_log(LOG_LEVEL_DEBUG, "Discovery: Item [%s] error: %s",
-							zbx_host_key_string_by_item(&item),
-							result.msg);
+							item.key, result.msg);
 				break;
 			case SVC_ICMPPING:
 				memset(&host, 0, sizeof(host));

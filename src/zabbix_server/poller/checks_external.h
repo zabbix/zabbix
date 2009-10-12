@@ -20,11 +20,11 @@
 #ifndef ZABBIX_CHECKS_EXTERNAL_H
 #define ZABBIX_CHECKS_EXTERNAL_H
 
-#include "db.h"
+#include "dbcache.h"
 #include "sysinfo.h"
 
 extern  char	*CONFIG_EXTERNALSCRIPTS;
 
-extern  int     get_value_external(DB_ITEM *item, AGENT_RESULT *result);
+int     get_value_external(DC_ITEM *item, AGENT_RESULT *result);
 
 #endif

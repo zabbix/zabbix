@@ -239,7 +239,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	get_value_aggregate(DB_ITEM *item, AGENT_RESULT *result)
+int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 {
 	char	function_grp[MAX_STRING_LEN];
 	char	key[MAX_STRING_LEN];
@@ -252,8 +252,8 @@ int	get_value_aggregate(DB_ITEM *item, AGENT_RESULT *result)
 	int	ret = SUCCEED;
 
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_aggregate([%s])",
-		item->key);
+	zabbix_log(LOG_LEVEL_DEBUG, "In get_value_aggregate() key:'%s'",
+			item->key_orig);
 
 	init_result(result);
 
@@ -355,7 +355,7 @@ int	get_value_aggregate(DB_ITEM *item, AGENT_RESULT *result)
 	}
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Evaluating aggregate[%s] grpfunc[%s] group[%s] itemkey[%s] itemfunc [%s] parameter [%s]",
-		item->key,
+		item->key_orig,
 		function_grp,
 		group,
 		itemkey,

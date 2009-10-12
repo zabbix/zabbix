@@ -684,39 +684,6 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, const ch
 	return ret;
 }
 
-void update_triggers_status_to_unknown(zbx_uint64_t hostid,int clock,char *reason)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	DB_TRIGGER	trigger;
-
-	zabbix_log(LOG_LEVEL_DEBUG,"In update_triggers_status_to_unknown()");
-
-	result = DBselect("select distinct t.triggerid,t.expression,t.description,t.status,t.priority,t.value,t.url,t.comments from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.hostid=" ZBX_FS_UI64 " and not i.key_ like '%s' and not i.key_ like '%s%%'",
-		hostid,
-		SERVER_STATUS_KEY,
-		SERVER_ICMPPING_KEY);
-
-
-	while((row=DBfetch(result)))
-	{
-		ZBX_STR2UINT64(trigger.triggerid,row[0]);
-		strscpy(trigger.expression,row[1]);
-		strscpy(trigger.description,row[2]);
-		trigger.status		= atoi(row[3]);
-		trigger.priority	= atoi(row[4]);
-		trigger.value		= atoi(row[5]);
-		trigger.url		= row[6];
-		trigger.comments	= row[7];
-		DBupdate_trigger_value(&trigger,TRIGGER_VALUE_UNKNOWN,clock,reason);
-	}
-
-	DBfree_result(result);
-	zabbix_log(LOG_LEVEL_DEBUG,"End of update_triggers_status_to_unknown()");
-
-	return;
-}
-
 void  DBdelete_service(zbx_uint64_t serviceid)
 {
 	DBexecute("delete from services_links where servicedownid=" ZBX_FS_UI64 " or serviceupid=" ZBX_FS_UI64,
@@ -829,120 +796,6 @@ void DBupdate_triggers_status_after_restart(void)
 	return;
 }
 
-void DBupdate_host_availability(DB_ITEM *item, int available, int clock, const char *error)
-{
-	char	*error_esc, error_msg[MAX_STRING_LEN];
-	int	log_level = LOG_LEVEL_WARNING;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In update_host_availability()");
-
-	if (item->host_available == available)
-	{
-		if (available == HOST_AVAILABLE_FALSE)
-		{
-			error_esc = DBdyn_escape_string_len(error, HOST_ERROR_LEN);
-			DBexecute("update hosts set error='%s',disable_until=%d where hostid=" ZBX_FS_UI64,
-					error_esc,
-					clock + CONFIG_UNAVAILABLE_DELAY,
-					item->hostid);
-			zbx_free(error_esc);
-		}
-		return;
-	}
-
-	item->host_available = available;
-
-	if (available == HOST_AVAILABLE_TRUE)
-	{
-		zbx_snprintf(error_msg, sizeof(error_msg), "Enabling host [%s]",
-				item->host_name);
-
-		DBexecute("update hosts set available=%d,error='',errors_from=0 where hostid=" ZBX_FS_UI64,
-				available,
-				item->hostid);
-		item->host_errors_from = 0;
-	}
-	else if (available == HOST_AVAILABLE_FALSE)
-	{
-		zbx_snprintf(error_msg, sizeof(error_msg), "Host [%s] will be checked after %d seconds",
-				item->host_name,
-				CONFIG_UNAVAILABLE_DELAY);
-
-		error_esc = DBdyn_escape_string_len(error, HOST_ERROR_LEN);
-		DBexecute("update hosts set available=%d,error='%s',disable_until=%d where hostid=" ZBX_FS_UI64,
-				available,
-				error_esc,
-				clock + CONFIG_UNAVAILABLE_DELAY,
-				item->hostid);
-		zbx_free(error_esc);
-
-		update_triggers_status_to_unknown(item->hostid, clock, "Host is unavailable.");
-	}
-	else
-	{
-		log_level = LOG_LEVEL_ERR;
-		zbx_snprintf(error_msg, sizeof(error_msg), "Unknown host availability [%d] for host [%s]",
-				available,
-				item->host_name);
-	}
-
-	zabbix_log(log_level, "%s", error_msg);
-	zabbix_syslog("%s", error_msg);
-}
-
-void	DBproxy_update_host_availability(DB_ITEM *item, int available, int clock)
-{
-	char	error_msg[MAX_STRING_LEN];
-	int	log_level = LOG_LEVEL_WARNING;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In DBproxy_update_host_availability()");
-
-	if (item->host_available == available)
-	{
-		if (available == HOST_AVAILABLE_FALSE)
-		{
-			DBexecute("update hosts set disable_until=%d where hostid=" ZBX_FS_UI64,
-					clock + CONFIG_UNAVAILABLE_DELAY,
-					item->hostid);
-		}
-		return;
-	}
-
-	item->host_available = available;
-
-	if (available == HOST_AVAILABLE_TRUE)
-	{
-		zbx_snprintf(error_msg, sizeof(error_msg), "Enabling host [%s]",
-				item->host_name);
-
-		DBexecute("update hosts set available=%d,errors_from=0 where hostid=" ZBX_FS_UI64,
-				available,
-				item->hostid);
-		item->host_errors_from = 0;
-	}
-	else if (available == HOST_AVAILABLE_FALSE)
-	{
-		zbx_snprintf(error_msg, sizeof(error_msg), "Host [%s] will be checked after %d seconds",
-				item->host_name,
-				CONFIG_UNAVAILABLE_DELAY);
-
-		DBexecute("update hosts set available=%d,disable_until=%d where hostid=" ZBX_FS_UI64,
-				available,
-				clock + CONFIG_UNAVAILABLE_DELAY,
-				item->hostid);
-	}
-	else
-	{
-		log_level = LOG_LEVEL_ERR;
-		zbx_snprintf(error_msg, sizeof(error_msg), "Unknown host availability [%d] for host [%s]",
-				available,
-				item->host_name);
-	}
-
-	zabbix_log(log_level, "%s", error_msg);
-	zabbix_syslog("%s", error_msg);
-}
-
 int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error)
 {
 	char		*error_esc;
@@ -953,7 +806,7 @@ int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *e
 	zabbix_log(LOG_LEVEL_DEBUG, "In DBupdate_item_status_to_notsupported()");
 
 	item->status	= ITEM_STATUS_NOTSUPPORTED;
-	item->nextcheck	= clock + CONFIG_REFRESH_UNSUPPORTED;
+	item->nextcheck = clock + CONFIG_REFRESH_UNSUPPORTED;
 
 	error_esc = DBdyn_escape_string_len(error, ITEM_ERROR_LEN);
 	DBexecute("update items set status=%d,lastclock=%d,nextcheck=%d,error='%s' where itemid=" ZBX_FS_UI64,
@@ -1934,13 +1787,13 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 	item->data_type			= atoi(row[50]);
 
 	key = zbx_dsprintf(key, "%s", item->key_orig);
-	substitute_simple_macros(NULL, NULL, item, NULL, &key, MACRO_TYPE_ITEM_KEY, NULL, 0);
+	substitute_simple_macros(NULL, NULL, item, NULL, NULL, &key, MACRO_TYPE_ITEM_KEY, NULL, 0);
 	item->key	= key;
 
 	if (ITEM_TYPE_IPMI == item->type)
 	{
 		ipmi_ip = zbx_dsprintf(ipmi_ip, "%s", item->ipmi_ip);
-		substitute_simple_macros(NULL, NULL, item, NULL, &ipmi_ip, MACRO_TYPE_HOST_IPMI_IP, NULL, 0);
+		substitute_simple_macros(NULL, NULL, item, NULL, NULL, &ipmi_ip, MACRO_TYPE_HOST_IPMI_IP, NULL, 0);
 		item->ipmi_ip	= ipmi_ip;
 	}
 }

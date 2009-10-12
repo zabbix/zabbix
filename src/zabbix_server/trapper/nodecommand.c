@@ -64,8 +64,8 @@ static void	execute_script(zbx_uint64_t hostid, char *command, char **result, in
 	FILE		*f;
 #ifdef HAVE_OPENIPMI
 	DB_RESULT	db_result;
-	DB_ROW		db_row;
-	DB_ITEM		item;
+	DB_ROW		row;
+	DC_ITEM		item;
 	int		ret, val;
 #endif
 
@@ -78,27 +78,37 @@ static void	execute_script(zbx_uint64_t hostid, char *command, char **result, in
 #ifdef HAVE_OPENIPMI
 	if (0 == strncmp(p, "IPMI", 4))
 	{
-		db_result = DBselect("select distinct host,ip,useip,port,dns,useipmi,ipmi_port,ipmi_authtype,"
-				"ipmi_privilege,ipmi_username,ipmi_password from hosts where hostid=" ZBX_FS_UI64 DB_NODE,
+		db_result = DBselect(
+				"select hostid,host,useip,ip,dns,port,useipmi,ipmi_ip,ipmi_port,ipmi_authtype,"
+					"ipmi_privilege,ipmi_username,ipmi_password"
+				" from hosts"
+				" where hostid=" ZBX_FS_UI64
+					DB_NODE,
 				hostid,
 				DBnode_local("hostid"));
 
-		if (NULL != (db_row = DBfetch(db_result)))
+		if (NULL != (row = DBfetch(db_result)))
 		{
-			item.host_name		= db_row[0];
-			item.host_ip		= db_row[1];
-			item.useip		= atoi(db_row[2]);
-			item.port		= atoi(db_row[3]);
-			item.host_dns		= db_row[4];
+			memset(&item, 0, sizeof(item));
 
-			item.useipmi		= atoi(db_row[5]);
-			item.ipmi_port		= atoi(db_row[6]);
-			item.ipmi_authtype	= atoi(db_row[7]);
-			item.ipmi_privilege	= atoi(db_row[8]);
-			item.ipmi_username	= db_row[9];
-			item.ipmi_password	= db_row[10];
+			ZBX_STR2UINT64(item.host.hostid, row[0]);
+			zbx_strlcpy(item.host.host, row[1], sizeof(item.host.host));
+			item.host.useip = (unsigned char)atoi(row[2]);
+			zbx_strlcpy(item.host.ip, row[3], sizeof(item.host.ip));
+			zbx_strlcpy(item.host.dns, row[4], sizeof(item.host.dns));
+			item.host.port = (unsigned short)atoi(row[5]);
 
-			if (SUCCEED == (ret = parse_ipmi_command(p, &item.ipmi_sensor, &val)))
+			if (1 == atoi(row[6]))
+			{
+				zbx_strlcpy(item.host.ipmi_ip_orig, row[7], sizeof(item.host.ipmi_ip));
+				item.host.ipmi_port = (unsigned short)atoi(row[8]);
+				item.host.ipmi_authtype = atoi(row[9]);
+				item.host.ipmi_privilege = atoi(row[10]);
+				zbx_strlcpy(item.host.ipmi_username, row[11], sizeof(item.host.ipmi_username));
+				zbx_strlcpy(item.host.ipmi_password, row[12], sizeof(item.host.ipmi_password));
+			}
+
+			if (SUCCEED == (ret = parse_ipmi_command(p, item.ipmi_sensor, &val)))
 			{
 				if (SUCCEED == (ret = set_ipmi_control_value(&item, val, buffer, sizeof(buffer))))
 				{

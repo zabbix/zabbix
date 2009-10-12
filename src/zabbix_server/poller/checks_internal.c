@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "checks_internal.h"
+#include "log.h"
 
 /******************************************************************************
  *                                                                            *
@@ -37,7 +38,7 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	get_value_internal(DB_ITEM *item, AGENT_RESULT *result)
+int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 {
 	zbx_uint64_t	i;
 	char		tmp[MAX_STRING_LEN], params[MAX_STRING_LEN],
@@ -46,7 +47,7 @@ int	get_value_internal(DB_ITEM *item, AGENT_RESULT *result)
 
 	init_result(result);
 
-	if (0 != strncmp(item->key,"zabbix[",7))
+	if (0 != strncmp(item->key, "zabbix[", 7))
 		goto not_supported;
 
 	if (parse_command(item->key, NULL, 0, params, sizeof(params)) != 2)
@@ -161,7 +162,7 @@ int	get_value_internal(DB_ITEM *item, AGENT_RESULT *result)
 	return SUCCEED;
 not_supported:
 	zbx_snprintf(tmp, sizeof(tmp), "Internal check [%s] is not supported",
-			item->key);
+			item->key_orig);
 	zabbix_log(LOG_LEVEL_WARNING, "%s",
 			tmp);
 
