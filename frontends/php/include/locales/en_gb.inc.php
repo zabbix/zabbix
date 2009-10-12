@@ -207,6 +207,7 @@
 	'S_CANNOT_ADD_COMMENT'=>		'Cannot add comment',
 	'S_ALARM_ACKNOWLEDGES_BIG'=>		'ALARM ACKNOWLEDGES',
 	'S_ACKNOWLEDGE_ADDED'=>			'Acknowledge added',
+	'S_CANNOT_ACKNOWLEDGE_EVENT' =>	'Cannot acknowledge event',
 	'S_SYS_BULK_ACKNOWLEDGE'=>		'----[BULK ACKNOWLEDGE]----',
 	'S_BULK_ACKNOWLEDGE'=>			'Bulk acknowledge',
 

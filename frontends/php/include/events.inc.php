@@ -303,7 +303,7 @@ function make_small_eventlist($eventid, $trigger_data){
 			while($a=DBfetch($db_acks))	$rows++;
 
 			$ack=array(
-				new CLink(new CSpan(S_YES,'off'),'acknow.php?eventid='.$row['eventid']),
+				new CLink(new CSpan(S_YES,'off'),'acknow.php?eventid='.$event['eventid']),
 				SPACE.'('.$rows.')'
 			);
 		}
