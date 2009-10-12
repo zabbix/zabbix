@@ -66,6 +66,7 @@ class CChart extends CGraphDraw{
 
 		$this->gridLinesCount = array();	// How many grids to draw
 		$this->gridPixels = 25;				// optimal grid size
+		$this->gridPixelsVert = 40;			// 
 
 		$this->graphtheme = array(
 			'description' => 'default',
@@ -248,9 +249,13 @@ class CChart extends CGraphDraw{
 		$z = $p - $this->from_time % $p;			// graphsize - mod(from_time,p) for Oracle...
 		$x = $this->sizeX;							// graph size in px
 
+		$this->itemsHost = null;
 		for($i=0; $i < $this->num; $i++){
 
 			$real_item = get_item_by_itemid($this->items[$i]['itemid']);
+			if(is_null($this->itemsHost)) $this->itemsHost = $real_item['hostid'];
+			else if($this->itemsHost != $real_item['hostid']) $this->itemsHost = false;
+			
 
 			if(!isset($this->axis_valuetype[$this->items[$i]['axisside']])){
 				$this->axis_valuetype[$this->items[$i]['axisside']] = $real_item['value_type'];
@@ -734,6 +739,77 @@ class CChart extends CGraphDraw{
 		}
 	}
 
+	protected function calcMinMaxInterval(){
+// INIT intervals
+		$intervals = array();
+		foreach(array(1,2,3,4) as $num){
+			$dec = pow(0.1, $num);
+			foreach(array(1,2,5) as $n => $int) $intervals[] = $int * $dec;
+		}
+		foreach(array(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14) as $num){
+			$dec = bcpow(10, $num);
+			foreach(array(1,2,5) as $n => $int)	$intervals[] = bcmul($int, $dec);
+		}
+//------
+
+// SIDES
+		$side = GRAPH_YAXIS_SIDE_LEFT;
+		$other_side = GRAPH_YAXIS_SIDE_RIGHT;		
+		if(!isset($this->axis_valuetype[GRAPH_YAXIS_SIDE_LEFT])){
+			$side = GRAPH_YAXIS_SIDE_RIGHT;
+			$other_side = GRAPH_YAXIS_SIDE_LEFT;
+		}
+//------
+
+// CALC interval
+		$col_interval = ($this->gridPixelsVert*($this->m_maxY[$side] - $this->m_minY[$side]))/$this->sizeY;
+		$max = $this->m_maxY[$side];
+
+		$dist = bcmul(5, bcpow(10, 14));
+		$interval = 0;
+		foreach($intervals as $num => $int){
+			$t = abs($int - $col_interval);
+
+			if($t<$dist){
+				$dist = $t;
+				$interval = $int;
+			}
+		}
+//------
+
+// correctin MIN & MAX
+		$this->m_minY[$side] = floor($this->m_minY[$side] / $interval) * $interval;
+		$this->m_maxY[$side] = ceil($this->m_maxY[$side] / $interval) * $interval;
+//--------------------
+
+//SDI($this->m_minY[$side].' - '.$this->m_maxY[$side].' : '.$interval);
+
+		$this->gridLinesCount[$side] = floor(($this->m_maxY[$side] - $this->m_minY[$side]) / $interval);
+		$this->m_maxY[$side] = $this->m_minY[$side] + $interval * $this->gridLinesCount[$side];
+		$intervalX = ($interval * $this->sizeY) / ($this->m_maxY[$side] - $this->m_minY[$side]);
+		
+		if(isset($this->axis_valuetype[$other_side])){
+			$dist = ($this->m_maxY[$other_side] - $this->m_minY[$other_side]);
+			$interval = 0;
+			foreach($intervals as $num => $int){
+				if($dist < bcmul($this->gridLinesCount[$side],$int)){
+					$interval = $int;
+					break;
+				}
+			}
+			
+// correctin MIN & MAX
+			$this->m_minY[$other_side] = floor($this->m_minY[$other_side] / $interval) * $interval;
+			$this->m_maxY[$other_side] = ceil($this->m_maxY[$other_side] / $interval) * $interval;			
+//--------------------
+
+			$this->gridLinesCount[$other_side] = $this->gridLinesCount[$side];
+			$this->m_maxY[$other_side] = $this->m_minY[$other_side] + $interval * $this->gridLinesCount[$other_side];
+			
+//SDI($this->m_minY[$other_side].' - '.$this->m_maxY[$other_side].' : '.$interval);
+		}
+	}
+
 	protected function correctMinMax(){
 
 		$sides = array(GRAPH_YAXIS_SIDE_LEFT,GRAPH_YAXIS_SIDE_RIGHT);
@@ -953,8 +1029,7 @@ class CChart extends CGraphDraw{
 		}
 
 		if($this->yaxisright){
-			if($this->yaxisleft) $color = $this->getColor($this->graphtheme['maingridcolor'], 0);
-			else $color = $this->getColor($this->graphtheme['gridbordercolor'], 0);
+			$color = $this->getColor($this->graphtheme['gridbordercolor'], 0);
 
 			imageline($this->im,
 				$this->sizeX+$this->shiftXleft+$this->shiftXCaption,
@@ -1419,8 +1494,11 @@ SDI('======================================');
 					$units['left'] = $this->items[$i]['units'];
 				else
 					$units['right'] = $this->items[$i]['units'];
-
-				$legend->addCell($colNum, array('text' => $this->items[$i]['host'].': '.$this->items[$i]['description']));
+				
+				if($this->itemsHost) $item_caption = $this->items[$i]['description'];
+				else $item_caption = $this->items[$i]['host'].': '.$this->items[$i]['description'];
+				
+				$legend->addCell($colNum, array('text' => $item_caption));
 				$legend->addCell($colNum, array('text' => '['.$fnc_name.']'));
 				$legend->addCell($colNum, array('text' => convert_units($this->getLastValue($i),$this->items[$i]['units']), 'align'=> 2));
 				$legend->addCell($colNum, array('text' => convert_units(min($data->min),$this->items[$i]['units']), 'align'=> 2));
@@ -1723,7 +1801,7 @@ SDI('======================================');
 		$this->m_minY[GRAPH_YAXIS_SIDE_RIGHT]	= $this->calculateMinY(GRAPH_YAXIS_SIDE_RIGHT);
 		$this->m_maxY[GRAPH_YAXIS_SIDE_LEFT]	= $this->calculateMaxY(GRAPH_YAXIS_SIDE_LEFT);
 		$this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT]	= $this->calculateMaxY(GRAPH_YAXIS_SIDE_RIGHT);
-
+//*
 		if($this->m_minY[GRAPH_YAXIS_SIDE_LEFT] == $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT]){
 			if($this->graphOrientation[GRAPH_YAXIS_SIDE_LEFT] == '-') $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] = 0;
 			else $this->m_minY[GRAPH_YAXIS_SIDE_LEFT] = 0;
@@ -1733,8 +1811,9 @@ SDI('======================================');
 			if($this->graphOrientation[GRAPH_YAXIS_SIDE_RIGHT] == '-') $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] = 0;
 			else $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] = 0;
 		}
+//*/
 
-		$this->correctMinMax();
+		$this->calcMinMaxInterval();
 
 		$this->updateShifts();
 		$this->calcTriggers();
