@@ -780,22 +780,22 @@ function __autoload($class_name){
 // users
 		$row=DBfetch(DBselect('SELECT COUNT(userid) as cnt FROM users'));
 		$status['users_count']=$row['cnt'];
-
-		$status['users_online']=0;
-		$sql = 'SELECT DISTINCT s.userid '.
+		
+		
+		$status['users_online'] = 0;
+		$sql = 'SELECT DISTINCT s.userid, MAX(s.lastaccess) as lastaccess, MAX(u.autologout) as autologout, s.status '.
 				' FROM sessions s, users u '.
-				' WHERE u.userid=s.userid '.
-					' AND u.autologout>0 '.
-					' AND (s.lastaccess+u.autologout)>'.time();
-		$result=DBselect($sql);
-		while(DBfetch($result))		$status['users_online']++;
-
-		$result=DBselect('SELECT DISTINCT s.userid '.
-						' FROM sessions s, users u '.
-						' WHERE u.userid=s.userid '.
-							' AND u.autologout=0');
-		while(DBfetch($result))		$status['users_online']++;
-
+				' WHERE '.DBin_node('s.userid').
+					' AND u.userid=s.userid '.
+					' AND s.status='.ZBX_SESSION_ACTIVE.
+				' GROUP BY s.userid,s.status';
+		$db_users = DBselect($sql);
+		while($user=DBfetch($db_users)){
+			$online_time = (($user['autologout'] == 0) || (ZBX_USER_ONLINE_TIME<$user['autologout'])) ? ZBX_USER_ONLINE_TIME : $user['autologout'];
+			if(!is_null($user['lastaccess']) && (($user['lastaccess']+$online_time)>=time()) && (ZBX_SESSION_ACTIVE == $user['status'])) $status['users_online']++;
+		}
+		
+		
 		/* Comments: !!! Don't forget sync code with C !!! */
 		$result=DBselect('SELECT i.type, i.delay, count(*),count(*)/i.delay as qps '.
 							' FROM items i,hosts h '.
