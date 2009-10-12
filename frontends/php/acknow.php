@@ -49,6 +49,13 @@ include_once('include/page_header.php');
 	);
 	check_fields($fields);
 
+	if(isset($_REQUEST['cancel'])){
+		$last_page = $USER_DETAILS['last_page'];
+		$url = $last_page ? new CUrl($last_page['url']) : new CUrl('tr_status.php?hostid='.get_profile('web.tr_status.hostid', 0));
+		redirect($url->getUrl());
+		exit;
+	}
+	
 	if(!isset($_REQUEST['events']) && !isset($_REQUEST['eventid'])){
 		show_message(S_NO_EVENTS_TO_ACKNOWLEDGE);
 		include_once('include/page_footer.php');
@@ -64,100 +71,97 @@ include_once('include/page_header.php');
 //$bulk = (count($events) > 1);
 ?>
 <?php
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY, get_current_nodeid());
+	// $available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY, get_current_nodeid());
 
-	$db_data = DBfetch(DBselect('SELECT COUNT(DISTINCT  e.eventid) as cnt'.
-			' FROM events e'.
-			' WHERE '.DBcondition('e.eventid',$events).
-				' AND '.DBcondition('e.objectid',$available_triggers).
-				' AND e.object='.EVENT_OBJECT_TRIGGER.
-				' AND '.DBin_node('e.eventid')
-			));
+	// $db_data = DBfetch(DBselect('SELECT COUNT(DISTINCT  e.eventid) as cnt'.
+			// ' FROM events e'.
+			// ' WHERE '.DBcondition('e.eventid',$events).
+				// ' AND '.DBcondition('e.objectid',$available_triggers).
+				// ' AND e.object='.EVENT_OBJECT_TRIGGER.
+				// ' AND '.DBin_node('e.eventid')
+			// ));
 
-	if($db_data['cnt'] != count($events)){
-		access_deny();
+	// if($db_data['cnt'] != count($events)){
+		// access_deny();
+	// }
+
+	// $db_data = DBfetch(DBselect('SELECT DISTINCT  e.*,t.triggerid,t.expression,t.description,t.expression,h.host,h.hostid '.
+		// ' FROM hosts h, items i, functions f, events e, triggers t'.
+		// ' WHERE h.hostid=i.hostid '.
+			// ' AND i.itemid=f.itemid '.
+			// ' AND f.triggerid=t.triggerid '.
+			// ' AND '.DBcondition('e.eventid',$events).
+			// ' AND e.object='.EVENT_OBJECT_TRIGGER.
+			// ' AND e.objectid=t.triggerid '.
+			// ' AND '.DBcondition('t.triggerid',$available_triggers).
+			// ' AND '.DBin_node('e.eventid')
+		// ));
+
+	$events = CEvent::get(array('eventids' => $events, 'extendoutput' => 1, 'select_triggers' => 1));
+	if(!$bulk){
+		$event = reset($events);
+		$event_trigger = reset($event['triggers']);
+		$event_acknowledged = $event['acknowledged'];
 	}
-
-	$db_data = DBfetch(DBselect('SELECT DISTINCT  e.*,t.triggerid,t.expression,t.description,t.expression,h.host,h.hostid '.
-		' FROM hosts h, items i, functions f, events e, triggers t'.
-		' WHERE h.hostid=i.hostid '.
-			' AND i.itemid=f.itemid '.
-			' AND f.triggerid=t.triggerid '.
-			' AND '.DBcondition('e.eventid',$events).
-			' AND e.object='.EVENT_OBJECT_TRIGGER.
-			' AND e.objectid=t.triggerid '.
-			' AND '.DBcondition('t.triggerid',$available_triggers).
-			' AND '.DBin_node('e.eventid')
-		));
-
+	
 	if(isset($_REQUEST['save']) && !$bulk){
-		$result = add_acknowledge_coment(
-			$db_data['eventid'],
-			$USER_DETAILS['userid'],
-			$_REQUEST['message']);
+	
+		$result = add_acknowledge_coment($event['eventid'], $USER_DETAILS['userid'], $_REQUEST['message']);
+		show_messages($result, S_EVENT_ACKNOWLEDGED, S_CANNOT_ACKNOWLEDGE_EVENT);
 
-		show_messages($result, S_COMMENT_ADDED, S_CANNOT_ADD_COMMENT);
-
-		if($result){
-			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_TRIGGER, S_ACKNOWLEDGE_ADDED.
-				' ['.expand_trigger_description_by_data($db_data).']'.
+ 		if($result){
+			$event_acknowledged = true;
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, S_ACKNOWLEDGE_ADDED.
+				' ['.expand_trigger_description_by_data($event_trigger).']'.
 				' ['.$_REQUEST["message"].']');
 		}
-	}
+ 	}
 	else if(isset($_REQUEST['saveandreturn'])){
 		$result = true;
-		if($bulk) {
-			$_REQUEST['message'] .= ($_REQUEST['message'] != ''? "\n\r" : '').S_SYS_BULK_ACKNOWLEDGE;
+		if($bulk){
+			$_REQUEST['message'] .= ($_REQUEST['message'] == '' ? '' : "\n\r") . S_SYS_BULK_ACKNOWLEDGE;
 		}
 
-		foreach($events as $id => $eventid){
-			$result &= add_acknowledge_coment(
-						$eventid,
-						$USER_DETAILS['userid'],
-						$_REQUEST['message']);
+		foreach($events as $event){
+			$result &= add_acknowledge_coment($event['eventid'], $USER_DETAILS['userid'], $_REQUEST['message']);
 		}
 
 		if($result){
-			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_TRIGGER, S_ACKNOWLEDGE_ADDED.
-				' ['.($bulk)?' BULK ACKNOWLEDGE ':(expand_trigger_description_by_data($db_data)).']'.
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, S_ACKNOWLEDGE_ADDED.
+				' ['.($bulk) ? ' BULK ACKNOWLEDGE ' : (expand_trigger_description_by_data($event_trigger)).']'.
 				' ['.$_REQUEST['message'].']');
 		}
-
+ 
 		$last_page = $USER_DETAILS['last_page'];
 
 		if(!$last_page){
-			$last_page['url']='tr_status.php?hostid='.get_profile('web.tr_status.hostid',0);
+			$url = new CUrl('tr_status.php?hostid='.get_profile('web.tr_status.hostid', 0));
+//			$last_page['url']='tr_status.php?hostid='.get_profile('web.tr_status.hostid', 0);
+		}
+		else{
+			$url = new CUrl($last_page['url']);
 		}
 
-		redirect($last_page['url']);
-		exit;
-	}
-	else if(isset($_REQUEST['cancel'])){
-		$last_page = $USER_DETAILS['last_page'];;
-
-		if(!$last_page){
-			$last_page['url']='tr_status.php?hostid='.get_profile('web.tr_status.hostid',0);
-		}
-
-		redirect($last_page['url']);
+		redirect($url->getUrl());
 		exit;
 	}
 ?>
 <?php
-	$msg=($bulk)?(' BULK ACKNOWLEDGE '):(array('"'.expand_trigger_description_by_data($db_data).'"',BR(),explode_exp($db_data["expression"],1)));
-	show_table_header(array(S_ALARM_ACKNOWLEDGES_BIG,' : ',$msg));
+	$msg = $bulk ? ' BULK ACKNOWLEDGE ' : array('"'.expand_trigger_description_by_data($event_trigger).'"',BR(),explode_exp($event_trigger['expression'],1));
+	show_table_header(array(S_ALARM_ACKNOWLEDGES_BIG, ' : ', $msg));
 
 	echo SBR;
+	
 	if(!$bulk){
-		$table = new CTable(NULL,'ack_msgs');
+		$table = new CTable(NULL, 'ack_msgs');
 		$table->setAlign('center');
 
-		$db_acks = get_acknowledges_by_eventid($db_data['eventid']);
+		$db_acks = get_acknowledges_by_eventid($event['eventid']);
 		while($db_ack = DBfetch($db_acks)){
 
 			$db_user = CUser::getById(array('userid' => $db_ack['userid']));
 			$table->addRow(array(
-				new CCol($db_user['alias'],'user'),
+				new CCol($db_user['alias'], 'user'),
 				new CCol(date(S_DATE_FORMAT_YMDHMS,$db_ack['clock']),'time')),
 				'title');
 
@@ -172,7 +176,40 @@ include_once('include/page_header.php');
 		}
 	}
 
-	insert_new_message_form($events,$bulk);
+	if($bulk){
+		$title = S_ACKNOWLEDGE_ALARM_BY;
+		$btn_txt2 = S_ACKNOWLEDGE.' '.S_AND_SYMB.' '.S_RETURN;
+	}
+	else{
+		if($event_acknowledged){
+			$title = S_ADD_COMMENT_BY;
+			$btn_txt = S_SAVE;
+			$btn_txt2 = S_SAVE.' '.S_AND_SYMB.' '.S_RETURN;
+		}
+		else{
+			$title = S_ACKNOWLEDGE_ALARM_BY;
+			$btn_txt = S_ACKNOWLEDGE;
+			$btn_txt2 = S_ACKNOWLEDGE.' '.S_AND_SYMB.' '.S_RETURN;
+		}
+	}
+
+	$frmMsg = new CFormTable($title.' "'.$USER_DETAILS['alias'].'"');
+//		$frmMsg->setHelp("manual.php");
+
+	foreach($events as $event){
+		$frmMsg->addVar('events['.$event['eventid'].']', $event['eventid']);
+	}
+
+	$frmMsg->addRow(S_MESSAGE, new CTextArea('message', '', 80, 6));
+	$frmMsg->addItemToBottomRow(new CButton('saveandreturn', $btn_txt2));
+	isset($btn_txt) ? $frmMsg->addItemToBottomRow(new CButton('save', $btn_txt)) : '';
+	$frmMsg->addItemToBottomRow(new CButtonCancel(url_param('eventid')));
+
+	$frmMsg->show(false);
+
+	SetFocus($frmMsg->GetName(),'message');
+
+	$frmMsg->Destroy();
 
 	
 include_once('include/page_footer.php');

@@ -24,7 +24,7 @@
 	require_once('include/httptest.inc.php');
 	require_once('include/forms.inc.php');
 
-	$page['title'] = S_CONFIGURATION_OF_WEB_MONITORING;
+	$page['title'] = 'S_CONFIGURATION_OF_WEB_MONITORING';
 	$page['file'] = 'httpconf.php';
 	$page['hist_arg'] = array('groupid','hostid');
 

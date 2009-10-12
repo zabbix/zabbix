@@ -547,7 +547,7 @@ include_once('include/page_header.php');
 							new CLink(S_SHOW,'acknow.php?eventid='.$row_event['eventid']),')');
 					}
 					else{
-						$ack= new CLink(S_NOT_ACKNOWLEDGED,'acknow.php?eventid='.$row_event['eventid'],'on');
+						$ack = new CLink(S_NOT_ACKNOWLEDGED, 'acknow.php?eventid='.$row_event['eventid'], 'on');
 					}
 				}
 	
