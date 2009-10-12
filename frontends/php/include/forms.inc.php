@@ -605,16 +605,15 @@
 		$form->show();
 	}
 
-	function insert_new_message_form($events,$bulk){
+	/* function insert_new_message_form($events, $bulk){
 		global $USER_DETAILS;
-
 
 		if($bulk){
 			$title = S_ACKNOWLEDGE_ALARM_BY;
 			$btn_txt2 = S_ACKNOWLEDGE.' '.S_AND_SYMB.' '.S_RETURN;
 		}
 		else{
-			$temp=get_acknowledges_by_eventid(get_request('eventid',0));
+			$temp = get_acknowledges_by_eventid(get_request('eventid', 0));
 
 			if(!DBfetch($temp)){
 				$title = S_ACKNOWLEDGE_ALARM_BY;
@@ -628,19 +627,19 @@
 			}
 		}
 
-		$frmMsg= new CFormTable($title.' "'.$USER_DETAILS["alias"].'"');
-		$frmMsg->setHelp("manual.php");
+		$frmMsg = new CFormTable($title.' "'.$USER_DETAILS["alias"].'"');
+//		$frmMsg->setHelp("manual.php");
 
-		if($bulk) $frmMsg->addVar('bulkacknowledge',1);
+		if($bulk) $frmMsg->addVar('bulkacknowledge', 1);
 
 		foreach($events as $id => $eventid){
-			$frmMsg->addVar('events['.$eventid.']',$eventid);
+			$frmMsg->addVar('events['.$eventid.']', $eventid);
 		}
 
-		$frmMsg->addRow(S_MESSAGE, new CTextArea("message","",80,6));
+		$frmMsg->addRow(S_MESSAGE, new CTextArea('message', '', 80, 6));
 
-		$frmMsg->addItemToBottomRow(new CButton("saveandreturn",$btn_txt2));
-		(isset($btn_txt))?($frmMsg->addItemToBottomRow(new CButton("save",$btn_txt))):('');
+		$frmMsg->addItemToBottomRow(new CButton('saveandreturn', $btn_txt2));
+		isset($btn_txt) ? $frmMsg->addItemToBottomRow(new CButton('save', $btn_txt)) : '';
 		$frmMsg->addItemToBottomRow(new CButtonCancel(url_param('eventid')));
 
 		$frmMsg->show(false);
@@ -648,7 +647,7 @@
 		SetFocus($frmMsg->GetName(),'message');
 
 		$frmMsg->Destroy();
-	}
+	} */
 
 // Insert form for User
 	function insert_user_form($userid,$profile=0){

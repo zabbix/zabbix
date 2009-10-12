@@ -377,7 +377,7 @@ function get_user_history(){
 	$history = DBfetch(DBSelect($sql));
 
 	if($history)
-		$USER_DETAILS['last_page'] = array('title' => $history['title5'], 'url' => $history['url5']);
+		$USER_DETAILS['last_page'] = array('title' => $history['title4'], 'url' => $history['url4']);
 	else
 		$USER_DETAILS['last_page'] = false;
 
@@ -397,7 +397,6 @@ function add_user_history($page){
 	global $USER_DETAILS;
 
 	$userid = $USER_DETAILS['userid'];
-	$last_page = $USER_DETAILS['last_page'] ? $USER_DETAILS['last_page'] : false;
 	$title = $page['title'];
 
 	if(isset($page['hist_arg']) && is_array($page['hist_arg'])){
@@ -413,18 +412,21 @@ function add_user_history($page){
 		$url = $page['file'];
 	}
 
-
-	if(isset($last_page['title']) && ($last_page['title'] == $title)){ //title is same
-		if($last_page['url'] != $url){ // title same, url isnt, change only url
+	$sql = 'SELECT title5, url5
+			FROM user_history WHERE userid='.$userid;
+	$history5 = DBfetch(DBSelect($sql));
+	
+	if($history5 && ($history5['title5'] == $title)){ //title is same
+		if($history5['url5'] != $url){ // title same, url isnt, change only url
 			$sql = 'UPDATE user_history '.
 					' SET url5='.zbx_dbstr($url).
-					' WHERE userid='.$USER_DETAILS['userid'];
+					' WHERE userid='.$userid;
 		}
 		else
 			return; // no need to change anything;
 	}
 	else{ // new page with new title is added
-		if(!$last_page){
+		if(!$USER_DETAILS['last_page']){
 			$userhistoryid = get_dbid('user_history', 'userhistoryid');
 			$sql = 'INSERT INTO user_history (userhistoryid, userid, title5, url5)'.
 					' VALUES('.$userhistoryid.', '.$userid.', '.zbx_dbstr($title).', '.zbx_dbstr($url).')';
@@ -441,7 +443,7 @@ function add_user_history($page){
 						' url4=url5, '.
 						' title5='.zbx_dbstr($title).', '.
 						' url5='.zbx_dbstr($url).
-					' WHERE userid='.$USER_DETAILS['userid'];
+					' WHERE userid='.$userid;
 		}
 	}
 	$result = DBexecute($sql);
