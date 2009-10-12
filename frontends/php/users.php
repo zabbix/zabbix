@@ -162,7 +162,7 @@ include_once('include/page_header.php');
 				DBstart();
 				$result = CUser::update(array($user));
 				$result = DBend($result);
-				if(!$result) error(CUser::$error['data']);
+				if(!$result) error(CUser::resetErrors());
 
 				show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 			}
@@ -173,7 +173,7 @@ include_once('include/page_header.php');
 				$result = CUser::add(array($user));
 				$result = DBend($result);
 
-				if(!$result) error(CUser::$error['data']);
+				if(!$result) error(CUser::resetErrors());
 				show_messages($result, S_USER_ADDED, S_CANNOT_ADD_USER);
 			}
 			if($result){
@@ -202,7 +202,7 @@ include_once('include/page_header.php');
 		$user=CUser::getById(array('userid' => $_REQUEST['userid']));
 
 		$result = CUser::delete(array($_REQUEST['userid']));
-		if(!$result) error(CUser::$error['data']);
+		if(!$result) error(CUser::resetErrors());
 
 		show_messages($result, S_USER_DELETED, S_CANNOT_DELETE_USER);
 		if($result){
@@ -286,7 +286,7 @@ include_once('include/page_header.php');
 			if(!($user_data = CUser::getById(array('userid' => $userid)))) continue;
 
 			$result |= (bool) CUser::delete(array($userid));
-			if(!$result) error(CUser::$error['data']);
+			if(!$result) error(CUser::resetErrors());
 
 			if($result){
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER,

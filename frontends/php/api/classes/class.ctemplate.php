@@ -357,7 +357,7 @@ class CTemplate extends CZBXAPI{
 
 // Adding Hosts
 		if($options['select_hosts']){
-			$obj_params = array('extendoutput' => 1, 'templateids' => $templateids);
+			$obj_params = array('extendoutput' => 1, 'templateids' => $templateids, 'templated_hosts' => 1);
 			$hosts = CHost::get($obj_params);
 			foreach($hosts as $hostid => $host){
 				foreach($host['templateids'] as $num => $templateid){
