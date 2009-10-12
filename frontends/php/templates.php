@@ -63,7 +63,6 @@ require_once('include/forms.inc.php');
 		'macros_del' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 // actions
 		'go'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
-		'change_group' => 		array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),
 //form
 		'unlink'		=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
 		'unlink_and_clear'	=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
@@ -210,7 +209,7 @@ require_once('include/forms.inc.php');
 				$templateid = reset($result);
 			}
 			else{
-				error(CTemplate::$error['data']);
+				error(CTemplate::resetErrors());
 				$result = false;
 			}
 			$msg_ok 	= S_TEMPLATE_ADDED;
@@ -281,7 +280,7 @@ require_once('include/forms.inc.php');
 // --->>> <<<---
 // <<<--- LINK/UNLINK HOSTS --->>>
 		if($result){
-			$hosts = array_intersect($hosts, $available_hosts);
+			$hosts = CHost::get(array('hostids' => $hosts, 'editable' => 1, 'templated_hosts' => 1));
 //-- unlink --
 			$linked_hosts = array();
 			$db_childs = get_hosts_by_templateid($templateid);
@@ -322,7 +321,6 @@ require_once('include/forms.inc.php');
 // MACROS {
 		if($result){
 			$macros = get_request('macros', array());
-
 			$macrostoadd = array('hostid' => $templateid, 'macros' => array());
 
 			foreach($macros as $macro){
@@ -372,28 +370,26 @@ require_once('include/forms.inc.php');
 		unset($_REQUEST['delete']);
 	}
 // ---------- GO ---------
-	else if(str_in_array($_REQUEST['go'],array('delete', 'delete_and_clear')) && isset($_REQUEST['templates'])){
+	else if(str_in_array($_REQUEST['go'], array('delete', 'delete_and_clear')) && isset($_REQUEST['templates'])){
 		$unlink_mode = false;
 		if(isset($_REQUEST['delete'])){
-			$unlink_mode =  true;
+			$unlink_mode = true;
 		}
 
 		$result = true;
-		$hosts = get_request('templates',array());
-		$del_hosts = array();
-		$sql = 'SELECT host,hostid '.
-				' FROM hosts '.
-				' WHERE '.DBin_node('hostid').
-					' AND '.DBcondition('hostid',$hosts).
-					' AND '.DBcondition('hostid',$available_hosts);
-		$db_hosts = DBselect($sql);
+		$templates = get_request('templates', array());
+		$del_hosts = CTemplate::get(array('templateids' => $templates, 'editable' => 1));
+		// $sql = 'SELECT host, hostid '.
+				// ' FROM hosts '.
+				// ' WHERE '.DBin_node('hostid').
+					// ' AND '.DBcondition('hostid', $hosts).
+					// ' AND '.DBcondition('hostid', $available_hosts);
+		// $db_hosts = DBselect($sql);
 
 		DBstart();
-		while($db_host = DBfetch($db_hosts)){
-			$del_hosts[$db_host['hostid']] = $db_host['hostid'];
-	/*				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,'Host ['.$db_host['host'].']');*/
-		}
-
+		// foreach($del_hosts as $del_host){
+			// add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$del_host['host'].']');
+		// }
 		$result = delete_host($del_hosts, $unlink_mode);
 		$result = DBend($result);
 
@@ -418,8 +414,7 @@ require_once('include/forms.inc.php');
 
 	if(isset($_REQUEST['groupid'])){
 		$groupid_selected = $_REQUEST['groupid'];
-		if(isset($_REQUEST['change_group']))
-			update_profile('web.'.$page['menu'].'.groupid', $_REQUEST['groupid'], PROFILE_TYPE_ID);
+		update_profile('web.'.$page['menu'].'.groupid', $_REQUEST['groupid'], PROFILE_TYPE_ID);
 	}
 	else{
 		$_REQUEST['groupid'] = $groupid_selected = get_profile('web.'.$page['menu'].'.groupid');
@@ -453,10 +448,10 @@ require_once('include/forms.inc.php');
 
 		$frm_title = S_TEMPLATE;
 
-		if($templateid>0){
-			$db_host=get_host_by_hostid($templateid);
+		if($templateid > 0){
+			$db_host = get_host_by_hostid($templateid);
 			$template_name = $db_host['host'];
-			$frm_title	.= SPACE.' ['.$template_name.']';
+			$frm_title .= SPACE.' ['.$template_name.']';
 
 			$original_templates = get_templates_by_hostid($templateid);
 		}
@@ -464,13 +459,14 @@ require_once('include/forms.inc.php');
 			$original_templates = array();
 		}
 
-		$frmHost = new CForm('templates.php', 'post');
+		$frmHost = new CForm('templates.php');
 		$frmHost->setName('tpl_for');
 
 		$frmHost->addVar('form', get_request('form', 1));
-		$from_rfr = get_request('form_refresh',0);
+		$from_rfr = get_request('form_refresh', 0);
 		$frmHost->addVar('form_refresh', $from_rfr+1);
-		$frmHost->addVar('clear_templates',$clear_templates);
+		$frmHost->addVar('clear_templates', $clear_templates);
+		$frmHost->addVar('groupid', $_REQUEST['groupid']);
 
 		if($templateid){
 			$frmHost->addVar('templateid', $templateid);
@@ -483,11 +479,9 @@ require_once('include/forms.inc.php');
 
 // get template hosts from db
 			$params = array('templateids' => $templateid,
-							'editable' => 1,
-							'templated_hosts' => 1,
-							'order' => 'host');
+				'editable' => 1,
+				'templated_hosts' => 1);
 			$hosts_linked_to = CHost::get($params);
-
 
 			$templates = $original_templates;
 		}
@@ -498,8 +492,8 @@ require_once('include/forms.inc.php');
 
 		$clear_templates = array_intersect($clear_templates, array_keys($original_templates));
 		$clear_templates = array_diff($clear_templates, array_keys($templates));
-		asort($templates);
-		$frmHost->addVar('clear_templates',$clear_templates);
+		natcasesort($templates);
+		$frmHost->addVar('clear_templates', $clear_templates);
 
 // TEMPLATE WIDGET {
 		$template_tbl = new CTableInfo();
@@ -511,8 +505,9 @@ require_once('include/forms.inc.php');
 		$group_tb = new CTweenBox($frmHost, 'groups', $groups, 10);
 		$options = array('editable' => 1, 'extendoutput' => 1);
 		$all_groups = CHostGroup::get($options);
-		foreach($all_groups as $groupid => $group){
-			$group_tb->addItem($groupid, $group['name']);
+		order_result($all_groups, 'name');
+		foreach($all_groups as $group){
+			$group_tb->addItem($group['groupid'], $group['name']);
 		}
 		$template_tbl->addRow(array(S_GROUPS, $group_tb->get(S_IN.SPACE.S_GROUPS,S_OTHER.SPACE.S_GROUPS)));
 
@@ -521,44 +516,46 @@ require_once('include/forms.inc.php');
 		$template_tbl->addRow(array(S_NEW_GROUP, new CTextBox('newgroup', $newgroup)));
 
 // FORM ITEM : linked Hosts tween box [  ] [  ]
-		$options = array('editable' => 1, 'extendoutput' => 1);
-		$twb_groups = CHostGroup::get($options);
+		// $options = array('editable' => 1, 'extendoutput' => 1);
+		// $twb_groups = CHostGroup::get($options);
 		$twb_groupid = get_request('twb_groupid', 0);
 		if($twb_groupid == 0){
-			$gr = reset($twb_groups);
+			$gr = reset($all_groups);
 			$twb_groupid = $gr['groupid'];
 		}
 		$cmbGroups = new CComboBox('twb_groupid', $twb_groupid, 'submit()');
-		foreach($twb_groups as $groupid => $group){
-			$cmbGroups->addItem($groupid, $group['name']);
+		foreach($all_groups as $group){
+			$cmbGroups->addItem($group['groupid'], $group['name']);
 		}
 
 		$host_tb = new CTweenBox($frmHost, 'hosts', $hosts_linked_to, 25);
 
 // get hosts from selected twb_groupid combo
-		$params = array('groupids'=>$twb_groupid,
-						'order'=>'host',
-						'templated_hosts' => 1,
-						'editable' => 1,
-						'extendoutput' => 1);
+		$params = array(
+			'groupids' => $twb_groupid,
+			'templated_hosts' => 1,
+			'editable' => 1,
+			'extendoutput' => 1);
 		$db_hosts = CHost::get($params);
-		foreach($db_hosts as $db_hostid => $db_host){
-			if(!isset($hosts_linked_to[$db_hostid])) // add all except selected hosts
-			$host_tb->addItem($db_hostid, get_node_name_by_elid($db_hostid).$db_host['host']);
+		order_result($db_hosts, 'host');
+		foreach($db_hosts as $db_host){
+			if(!isset($hosts_linked_to[$db_host['hostid']])) // add all except selected hosts
+			$host_tb->addItem($db_host['hostid'], $db_host['host']);
 		}
 
 // select selected hosts and add them
-		$params = array('hostids' => $hosts_linked_to,
-						'order' => 'host',
-						'templated_hosts' => 1,
-						'editable' => 1,
-						'extendoutput' => 1);
+		$params = array(
+			'hostids' => $hosts_linked_to,
+			'templated_hosts' => 1,
+			'editable' => 1,
+			'extendoutput' => 1);
 		$db_hosts = CHost::get($params);
-		foreach($db_hosts as $hostid => $db_host){
-			$host_tb->addItem($hostid, get_node_name_by_elid($hostid).$db_host['host']);
+		order_result($db_hosts, 'host');
+		foreach($db_hosts as $db_host){
+			$host_tb->addItem($db_host['hostid'], $db_host['host']);
 		}
 
-		$template_tbl->addRow(array(S_HOSTS.'|'.S_TEMPLATES, $host_tb->Get(S_IN,array(S_OTHER.SPACE.'|'.SPACE.S_GROUP.SPACE,$cmbGroups))));
+		$template_tbl->addRow(array(S_HOSTS.'|'.S_TEMPLATES, $host_tb->Get(S_IN, array(S_OTHER.SPACE.'|'.SPACE.S_GROUP.SPACE,$cmbGroups))));
 
 // FORM ITEM : linked Template table
 		$template_table = new CTable();
@@ -643,13 +640,15 @@ require_once('include/forms.inc.php');
 		$host_footer = array();
 		$host_footer[] = new CButton('save', S_SAVE);
 		if(($templateid > 0) && ($_REQUEST['form'] != 'full_clone')){
-			array_push($host_footer, SPACE, new CButton("clone", S_CLONE), SPACE, new CButton("full_clone", S_FULL_CLONE), SPACE,
-				new CButtonDelete(S_DELETE_SELECTED_HOST_Q, url_param('form').url_param('templateid').url_param('groupid')),
-				SPACE,
-				new CButtonQMessage('delete_and_clear', 'Delete AND clear', S_DELETE_SELECTED_HOSTS_Q, url_param('form').url_param('templateid').
-					url_param('groupid')
-				)
-			);
+			$host_footer[] = SPACE;
+			$host_footer[] = new CButton('clone', S_CLONE);
+			$host_footer[] = SPACE;
+			$host_footer[] = new CButton('full_clone', S_FULL_CLONE);
+			$host_footer[] = SPACE;
+			$host_footer[] = new CButtonDelete(S_DELETE_SELECTED_HOST_Q, url_param('form').url_param('templateid').url_param('groupid'));
+			$host_footer[] = SPACE;
+			$host_footer[] = new CButtonQMessage('delete_and_clear', 'Delete AND clear', S_DELETE_SELECTED_HOSTS_Q, url_param('form').
+				url_param('templateid').url_param('groupid'));
 		}
 		array_push($host_footer, SPACE, new CButtonCancel(url_param('groupid')));
 
@@ -694,7 +693,6 @@ require_once('include/forms.inc.php');
 
 		$frmForm = new CForm();
 		$frmForm->setMethod('get');
-		$frmForm->addVar('change_group', 1);
 
 // combo for group selection
 		$groups = CHostGroup::get(array('editable' => 1, 'extendoutput' => 1));

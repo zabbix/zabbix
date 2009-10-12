@@ -87,4 +87,21 @@ private static $transaction = array('counter' => 0);
 	return $result;
 	}
 
+	public static function clearErrors(){
+		self::$error = array();
+	}
+	
+	public static function getErrorMessages(){
+		$return = array();
+		foreach(self::$error as $error){
+			$return[] = $error['data'];		
+		}		
+		return $return;
+	}
+	
+	public static function resetErrors(){
+		$errors = self::getErrorMessages();
+		self::clearErrors();
+		return $errors;
+	}
 }

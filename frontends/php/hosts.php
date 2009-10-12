@@ -104,7 +104,6 @@ include_once('include/page_header.php');
 		'visible'=>			array(T_ZBX_STR, O_OPT,	null, 	null,	null),
 // actions
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
-		'change_group' => 		array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),
 // form
 		'add_to_group'=>		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT, DB_ID, NULL),
 		'delete_from_group'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT, DB_ID, NULL),
@@ -563,8 +562,7 @@ include_once('include/page_header.php');
 	
 	if(isset($_REQUEST['groupid'])){
 		$groupid_selected = $_REQUEST['groupid'];
-		if(isset($_REQUEST['change_group']))
-			update_profile('web.'.$page['menu'].'.groupid', $_REQUEST['groupid'], PROFILE_TYPE_ID);
+		update_profile('web.'.$page['menu'].'.groupid', $_REQUEST['groupid'], PROFILE_TYPE_ID);
 	}
 	else{
 		$_REQUEST['groupid'] = $groupid_selected = get_profile('web.'.$page['menu'].'.groupid');
@@ -603,7 +601,6 @@ include_once('include/page_header.php');
 
 		$frmForm = new CForm();
 		$frmForm->setMethod('get');
-		$frmForm->addVar('change_group', 1);
 
 		$groups = CHostGroup::get(array('editable' => 1, 'extendoutput' => 1));
 		order_result($groups, 'name');
