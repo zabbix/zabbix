@@ -1,5 +1,4 @@
 <?php
-ini_set('max_execution_time', 10);
 /*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
