@@ -17,20 +17,10 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
-#include <stdio.h>
-#include <string.h>
-#include <stdarg.h>
-#include <syslog.h>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-
-#include <time.h>
-
 #include "common.h"
+#include "sysinfo.h"
 #include "log.h"
+#include "dbcache.h"
 #include "zbxserver.h"
 
 #include "zlog.h"
@@ -52,49 +42,36 @@
  ******************************************************************************/
 void __zbx_zabbix_syslog(const char *fmt, ...)
 {
+	const char	*__function_name = "zabbix_log";
 	va_list		ap;
 	char		value_str[MAX_STRING_LEN];
-
-	DB_ITEM		item;
-	DB_RESULT	result;
-	DB_ROW		row;
+	DC_ITEM		*items = NULL;
+	int		i, num, now;
 	AGENT_RESULT	agent;
-	time_t		now;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In zabbix_log()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/* This is made to disable writing to database for watchdog */
-	if(CONFIG_ENABLE_LOG == 0)	return;
+	if (CONFIG_ENABLE_LOG == 0)
+		return;
 
-	result = DBselect("select %s where h.hostid=i.hostid and h.status=%d and i.status=%d"
-			" and h.proxy_hostid=0 and i.key_='%s' and i.value_type=%d"
-			" and (h.maintenance_status=%d or h.maintenance_type=%d)" DB_NODE,
-			ZBX_SQL_ITEM_SELECT,
-			ITEM_STATUS_ACTIVE,
-			HOST_STATUS_MONITORED,
-			SERVER_ZABBIXLOG_KEY,
-			ITEM_VALUE_TYPE_STR,
-			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
-			DBnode_local("h.hostid"));
+	init_result(&agent);
 
-	now = time(NULL);
+	now = (int)time(NULL);
 
-	while((row=DBfetch(result)))
-	{
-		DBget_item_from_db(&item, row);
+	va_start(ap,fmt);
+	vsnprintf(value_str, sizeof(value_str), fmt, ap);
+	value_str[MAX_STRING_LEN - 1] = '\0';
+	va_end(ap);
 
-		va_start(ap,fmt);
-		vsnprintf(value_str,sizeof(value_str),fmt,ap);
-		value_str[MAX_STRING_LEN-1]=0;
-		va_end(ap);
+	SET_STR_RESULT(&agent, strdup(value_str));
 
-		init_result(&agent);
-		SET_STR_RESULT(&agent, strdup(value_str));
+	num = DCconfig_get_items(0, SERVER_ZABBIXLOG_KEY, &items);
+	for (i = 0; i < num; i++)
+		dc_add_history(items[i].itemid, items[i].value_type, &agent, now, 0, NULL, 0, 0, 0);
 
-		dc_add_history(&item, &agent, now);
+	zbx_free(items);
+	free_result(&agent);
 
-		free_result(&agent);
-	}
-
-	DBfree_result(result);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

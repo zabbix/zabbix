@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2007 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,13 +17,11 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#ifndef ZABBIX_PINGER_H
-#define ZABBIX_PINGER_H
+#ifndef ZABBIX_DBCONFIG_H
+#define ZABBIX_DBCONFIG_H
 
-#include "common.h"
+extern int	CONFIG_DBCONFIG_FREQUENCY;
 
-extern	int	CONFIG_PINGER_FORKS;
-
-void	main_pinger_loop(int num);
+int	main_dbconfig_loop();
 
 #endif

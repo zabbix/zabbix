@@ -39,10 +39,10 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int     get_value_external(DB_ITEM *item, AGENT_RESULT *result)
+int     get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 {
 	FILE*	fp;
-	char	scriptname[MAX_STRING_LEN];
+	char	*conn, scriptname[MAX_STRING_LEN];
 	char	key[MAX_STRING_LEN];
 	char	params[MAX_STRING_LEN];
 	char	error[MAX_STRING_LEN];
@@ -53,7 +53,9 @@ int     get_value_external(DB_ITEM *item, AGENT_RESULT *result)
 
 	int	ret = SUCCEED;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_external([%s])",item->key);
+	zabbix_log(LOG_LEVEL_DEBUG, "In get_value_external() key:'%s'", item->key_orig);
+
+	conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
 
 	init_result(result);
 
@@ -91,8 +93,7 @@ int     get_value_external(DB_ITEM *item, AGENT_RESULT *result)
 	zbx_snprintf(cmd, MAX_STRING_LEN-1, "%s/%s %s %s",
 		CONFIG_EXTERNALSCRIPTS,
 		scriptname,
-/*		item->host_name,*/
-		item->useip == 1 ? item->host_ip : item->host_dns,
+		conn,
 		params);
 	zabbix_log( LOG_LEVEL_DEBUG, "%s", cmd );
 	if (NULL == (fp = popen(cmd, "r")))

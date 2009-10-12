@@ -378,7 +378,9 @@ typedef enum
 /* Special item key used for ICMP pings */
 #define SERVER_ICMPPING_KEY	"icmpping"
 /* Special item key used for ICMP ping latency */
-/*#define SERVER_ICMPPINGSEC_KEY	"icmppingsec"*/	/*not used, since using `SERVER_ICMPPING_KEY' with `like'(SQL)*/
+#define SERVER_ICMPPINGSEC_KEY	"icmppingsec"
+/* Special item key used for ICMP ping loss packages */
+#define SERVER_ICMPPINGLOSS_KEY	"icmppingloss"
 /* Special item key used for internal ZABBIX log */
 #define SERVER_ZABBIXLOG_KEY	"zabbix[log]"
 
@@ -627,6 +629,7 @@ const char *zbx_permission_string(int perm);
 #define	ZBX_POLLER_TYPE_NORMAL		0
 #define	ZBX_POLLER_TYPE_UNREACHABLE	1
 #define	ZBX_POLLER_TYPE_IPMI		2
+#define	ZBX_POLLER_TYPE_PINGER		3
 
 #define	POLLER_TIMEOUT	5
 /* Do not perform more than this number of checks during unavailability period */
@@ -868,6 +871,7 @@ char	*zbx_time2str(time_t time);
 /* Return the needle in the haystack (or NULL). */
 char	*zbx_strcasestr(const char *haystack, const char *needle);
 
+int	get_nearestindex(void *p, size_t sz, int num, zbx_uint64_t id);
 int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t value, int alloc_step);
 void	uint64_array_merge(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t *value, int value_num, int alloc_step);
 int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value);

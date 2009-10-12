@@ -24,14 +24,14 @@
 
 #ifdef HAVE_OPENIPMI
 
-#include "db.h"
+#include "dbcache.h"
 #include "sysinfo.h"
 
 int	init_ipmi_handler();
 int	free_ipmi_handler();
-int	get_value_ipmi(DB_ITEM *item, AGENT_RESULT *value);
-int	parse_ipmi_command(char *command, char **c_name, int *val);
-int	set_ipmi_control_value(DB_ITEM *item, int value, char *error, size_t error_max_len);
+int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value);
+int	parse_ipmi_command(char *command, char *c_name, int *val);
+int	set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t error_max_len);
 
 #endif	/* HAVE_OPENIPMI */
 #endif	/* ZABBIX_CHECKS_IPMI_H */

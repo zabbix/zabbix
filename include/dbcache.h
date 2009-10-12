@@ -21,6 +21,8 @@
 #ifndef ZABBIX_DBCACHE_H
 #define ZABBIX_DBCACHE_H
 
+#include "db.h"
+
 #define ZBX_DC_CACHE struct zbx_dc_cache_type
 #define ZBX_DC_STATS struct zbx_dc_stats_type
 #define ZBX_DC_HISTORY struct zbx_dc_history_type
@@ -39,7 +41,19 @@
 #define ZBX_SYNC_PARTIAL	0
 #define	ZBX_SYNC_FULL		1
 
-extern char *CONFIG_FILE;
+#define DC_ITEM struct dc_item
+#define DC_HOST struct dc_host
+
+extern char	*CONFIG_FILE;
+extern int	CONFIG_DBCONFIG_SIZE;
+extern int	CONFIG_POLLER_FORKS;
+extern int	CONFIG_IPMIPOLLER_FORKS;
+extern int	CONFIG_UNREACHABLE_POLLER_FORKS;
+extern int	CONFIG_PINGER_FORKS;
+extern int	CONFIG_REFRESH_UNSUPPORTED;
+extern int	CONFIG_UNAVAILABLE_DELAY;
+extern int	CONFIG_UNREACHABLE_PERIOD;
+extern int	CONFIG_UNREACHABLE_DELAY;
 
 typedef union{
 	double		value_float;
@@ -62,7 +76,7 @@ ZBX_DC_HISTORY
 {
 	zbx_uint64_t	itemid;
 	int		clock;
-	int		value_type;
+	unsigned char	value_type;
 	history_value_t	value_orig;
 	history_value_t	value;
 	int		value_null;
@@ -81,7 +95,7 @@ ZBX_DC_TREND
 	zbx_uint64_t	itemid;
 	int		clock;
 	int		num;
-	int		value_type;
+	unsigned char	value_type;
 	history_value_t	value_min;
 	history_value_t	value_avg;
 	history_value_t	value_max;
@@ -129,9 +143,66 @@ ZBX_DC_CACHE
 ZBX_DC_NEXTCHECK
 {
 	zbx_uint64_t	itemid;
-	time_t		now, nextcheck;
+	time_t		now;/*, nextcheck;*/
 	/* for not supported items */
 	char		*error_msg;
+};
+
+DC_HOST
+{
+	zbx_uint64_t	hostid;
+	zbx_uint64_t	proxy_hostid;
+	char		host[HOST_HOST_LEN_MAX];
+	unsigned char	useip;
+	char		ip[HOST_IP_LEN_MAX];
+	char		dns[HOST_DNS_LEN_MAX];
+	unsigned short	port;
+	int		status;
+	int		maintenance_status;
+	int		maintenance_type;
+	int		maintenance_from;
+	int		errors_from;
+	unsigned char	available;
+	int		disable_until;
+	int		snmp_errors_from;
+	unsigned char	snmp_available;
+	int		snmp_disable_until;
+	int		ipmi_errors_from;
+	unsigned char	ipmi_available;
+	int		ipmi_disable_until;
+	char		ipmi_ip_orig[HOST_ADDR_LEN_MAX];
+	char		*ipmi_ip;
+	unsigned short	ipmi_port;
+	int		ipmi_authtype;
+	int		ipmi_privilege;
+	char		ipmi_username[HOST_IPMI_USERNAME_LEN_MAX];
+	char		ipmi_password[HOST_IPMI_PASSWORD_LEN_MAX];
+};
+
+DC_ITEM
+{
+	DC_HOST		host;
+	zbx_uint64_t	itemid;
+	unsigned char 	type;
+	unsigned char	data_type;
+	unsigned char	value_type;
+	char		key_orig[ITEM_KEY_LEN_MAX];
+	char		*key;
+	int		delay;
+	int		nextcheck;
+	unsigned char	status;
+	char		trapper_hosts[ITEM_TRAPPER_HOSTS_LEN_MAX];
+	char		logtimefmt[ITEM_LOGTIMEFMT_LEN_MAX];
+	char		snmp_community[ITEM_SNMP_COMMUNITY_LEN_MAX];
+	char		snmp_oid[ITEM_SNMP_OID_LEN_MAX];
+	unsigned short	snmp_port;
+	char		snmpv3_securityname[ITEM_SNMPV3_SECURITYNAME_LEN_MAX];
+	int		snmpv3_securitylevel;
+	char		snmpv3_authpassphrase[ITEM_SNMPV3_AUTHPASSPHRASE_LEN_MAX];
+	char		snmpv3_privpassphrase[ITEM_SNMPV3_PRIVPASSPHRASE_LEN_MAX];
+	char		ipmi_sensor[ITEM_IPMI_SENSOR_LEN_MAX];
+	char		params[ITEM_PARAMS_LEN_MAX];
+	char		delay_flex[ITEM_DELAY_FLEX_LEN_MAX];
 };
 
 void	DCadd_history(zbx_uint64_t itemid, double value_orig, int clock);
@@ -145,12 +216,27 @@ void	init_database_cache(zbx_process_t p);
 void	free_database_cache(void);
 
 void	DCinit_nextchecks();
-void	DCadd_nextcheck(DB_ITEM *item, time_t now, time_t timediff, const char *error_msg);
+void	DCadd_nextcheck(DC_ITEM *item, time_t now, const char *error_msg);
 void	DCflush_nextchecks();
 void	DCget_stats(ZBX_DC_STATS *stats);
 
 zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int num);
 
 int	DCget_item_lastclock(zbx_uint64_t itemid);
+
+void	DCsync_confguration();
+void	init_configuration_cache();
+void	free_configuration_cache();
+
+int	DCconfig_get_item_by_key(DC_ITEM *item, zbx_uint64_t proxy_hostid, const char *hostname, const char *key);
+int	DCconfig_get_item_by_itemid(DC_ITEM *item, zbx_uint64_t itemid);
+int	DCconfig_get_poller_items(unsigned char poller_type, unsigned char poller_num, int now,
+		DC_ITEM *items, int max_items);
+int	DCconfig_get_poller_nextcheck(unsigned char poller_type, unsigned char poller_num, int now);
+int	DCconfig_get_items(zbx_uint64_t hostid, const char *key, DC_ITEM **items);
+
+void	DCconfig_update_item(zbx_uint64_t itemid, unsigned char status, int now);
+int	DCconfig_activate_host(DC_ITEM *item);
+int	DCconfig_deactivate_host(DC_ITEM *item, int now);
 
 #endif

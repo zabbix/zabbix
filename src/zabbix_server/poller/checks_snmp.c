@@ -218,11 +218,11 @@ end:
  *                                                                            *
  * Return value: -                                                            *
  ******************************************************************************/
-static struct snmp_session	*snmp_open_session(DB_ITEM *item, char *err)
+static struct snmp_session	*snmp_open_session(DC_ITEM *item, char *err)
 {
 	const char		*__function_name = "snmp_open_session";
 	struct snmp_session	session, *ss;
-	char			*host, addr[64];
+	char			addr[128], *conn;
 #ifdef HAVE_IPV6
 	int			family;
 #endif	/* HAVE_IPV6 */
@@ -240,18 +240,18 @@ static struct snmp_session	*snmp_open_session(DB_ITEM *item, char *err)
 	else
 		/* this should never happen */;
 
-	host = (item->useip == 1) ? item->host_ip : item->host_dns;
+	conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
 
 #ifdef HAVE_IPV6
-	if (SUCCEED != get_address_family(host, &family, err, MAX_STRING_LEN))
+	if (SUCCEED != get_address_family(conn, &family, err, MAX_STRING_LEN))
 		return NULL;
 
 	if (family == PF_INET)
-		zbx_snprintf(addr, sizeof(addr), "%s:%d", host, item->snmp_port);
+		zbx_snprintf(addr, sizeof(addr), "%s:%d", conn, item->snmp_port);
 	else
-		zbx_snprintf(addr, sizeof(addr), "udp6:[%s]:%d", host, item->snmp_port);
+		zbx_snprintf(addr, sizeof(addr), "udp6:[%s]:%d", conn, item->snmp_port);
 #else
-	zbx_snprintf(addr, sizeof(addr), "%s:%d", host, item->snmp_port);
+	zbx_snprintf(addr, sizeof(addr), "%s:%d", conn, item->snmp_port);
 #endif	/* HAVE_IPV6 */
 	session.peername = addr;
 	session.remote_port = item->snmp_port;
@@ -384,7 +384,7 @@ static void	snmp_close_session(struct snmp_session *session)
  *                NETWORK_ERROR - recoverable network error                   *
  *                SUCCEED - success, variable 'idx' contains index having     *
  *                          value 'value'                                     */
-static int snmp_get_index(struct snmp_session *ss, DB_ITEM * item, char *OID, char *value, int *idx, char *err, int bulk)
+static int snmp_get_index(struct snmp_session *ss, DC_ITEM * item, char *OID, char *value, int *idx, char *err, int bulk)
 {
 	const char *__function_name = "snmp_get_index";
 	struct snmp_pdu *pdu;
@@ -395,7 +395,7 @@ static int snmp_get_index(struct snmp_session *ss, DB_ITEM * item, char *OID, ch
 	size_t anOID_len = MAX_OID_LEN;
 	size_t rootOID_len = MAX_OID_LEN;
 
-	char temp[MAX_STRING_LEN];
+	char temp[MAX_STRING_LEN], *conn;
 	char strval[MAX_STRING_LEN];
 	struct variable_list *vars;
 
@@ -499,9 +499,9 @@ static int snmp_get_index(struct snmp_session *ss, DB_ITEM * item, char *OID, ch
 			}
 			else if(status == STAT_TIMEOUT)
 			{
+				conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
 				zbx_snprintf(err, MAX_STRING_LEN, "Timeout while connecting to [%s:%d]",
-						(item->useip == 1) ? item->host_ip : item->host_dns,
-						item->snmp_port);
+						conn, item->snmp_port);
 				running = 0;
 				ret = NETWORK_ERROR;
 			}
@@ -528,11 +528,11 @@ static int snmp_get_index(struct snmp_session *ss, DB_ITEM * item, char *OID, ch
 }
 
 
-int	get_snmp(struct snmp_session *ss, DB_ITEM *item, char *snmp_oid, AGENT_RESULT *value)
+int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGENT_RESULT *value)
 {
 	const char		*__function_name = "get_snmp";
 	struct snmp_pdu		*pdu, *response;
-	char			temp[MAX_STRING_LEN], *ptemp;
+	char			temp[MAX_STRING_LEN], *ptemp, *conn;
 	oid			anOID[MAX_OID_LEN];
 	size_t			anOID_len = MAX_OID_LEN;
 	struct variable_list	*vars;
@@ -647,9 +647,9 @@ int	get_snmp(struct snmp_session *ss, DB_ITEM *item, char *snmp_oid, AGENT_RESUL
 		}
 		else if(status == STAT_TIMEOUT)
 		{
+			conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
 			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Timeout while connecting to [%s:%d]",
-						(item->useip == 1) ? item->host_ip : item->host_dns,
-						item->snmp_port));
+					conn, item->snmp_port));
 			ret = NETWORK_ERROR;
 		}
 		else
@@ -747,7 +747,7 @@ static ZBX_MIB_NORM mibs[]=
 			buf);
 }
 
-int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
+int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 {
 	const char		*__function_name = "get_value_snmp";
 	struct snmp_session	*ss;
@@ -762,12 +762,11 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 	char	*pl;
 	int	num;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(key:%s,oid:%s)",
-			__function_name,
-			item->key,
-			item->snmp_oid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' oid:'%s'",
+			__function_name, item->key_orig, item->snmp_oid);
 
-	assert(item->type == ITEM_TYPE_SNMPv1 || item->type == ITEM_TYPE_SNMPv2c || item->type == ITEM_TYPE_SNMPv3);
+	assert(item->type == ITEM_TYPE_SNMPv1 || item->type == ITEM_TYPE_SNMPv2c ||
+			item->type == ITEM_TYPE_SNMPv3);
 
 	if (NULL == (ss = snmp_open_session(item, err)))
 	{

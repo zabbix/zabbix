@@ -80,36 +80,6 @@ static void	DCrelease_nextchecks()
 	}
 }
 
-static int	DCget_nextcheck_nearestindex(zbx_uint64_t itemid)
-{
-	int			first_index, last_index, index;
-	ZBX_DC_NEXTCHECK	*nc;
-
-	if (nextcheck_num == 0)
-		return 0;
-
-	first_index = 0;
-	last_index = nextcheck_num - 1;
-	while (1)
-	{
-		index = first_index + (last_index - first_index) / 2;
-
-		nc = &nextchecks[index];
-		if (nc->itemid == itemid)
-			return index;
-		else if (last_index == first_index)
-		{
-			if (nc->itemid < itemid)
-				index++;
-			return index;
-		}
-		else if (nc->itemid < itemid)
-			first_index = index + 1;
-		else
-			last_index = index;
-	}
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: DCadd_nextcheck                                                  *
@@ -125,25 +95,19 @@ static int	DCget_nextcheck_nearestindex(zbx_uint64_t itemid)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	DCadd_nextcheck(DB_ITEM *item, time_t now, time_t timediff, const char *error_msg)
+void	DCadd_nextcheck(DC_ITEM *item, time_t now, const char *error_msg)
 {
 	int	i;
 	size_t	sz;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCadd_nextcheck()");
 
-	if (NULL != error_msg)
-	{
-		item->status = ITEM_STATUS_NOTSUPPORTED;
-		item->nextcheck = now + CONFIG_REFRESH_UNSUPPORTED;
-	}
-	else
-		item->nextcheck = calculate_item_nextcheck(item->itemid, item->type, item->delay,
-				item->delay_flex, now - timediff) + timediff;
+	if (NULL == error_msg)
+		return;
 
 	sz = sizeof(ZBX_DC_NEXTCHECK);
 
-	i = DCget_nextcheck_nearestindex(item->itemid);
+	i = get_nearestindex(nextchecks, sizeof(ZBX_DC_NEXTCHECK), nextcheck_num, item->itemid);
 	if (i < nextcheck_num && nextchecks[i].itemid == item->itemid)	/* item exists? */
 	{
 		if (nextchecks[i].now < now)
@@ -158,7 +122,7 @@ void	DCadd_nextcheck(DB_ITEM *item, time_t now, time_t timediff, const char *err
 
 	if (nextcheck_allocated == nextcheck_num)
 	{
-		nextcheck_allocated *= 2;
+		nextcheck_allocated += 64;
 		nextchecks = zbx_realloc(nextchecks, nextcheck_allocated * sz);
 	}
 
@@ -167,7 +131,6 @@ void	DCadd_nextcheck(DB_ITEM *item, time_t now, time_t timediff, const char *err
 
 	nextchecks[i].itemid = item->itemid;
 	nextchecks[i].now = now;
-	nextchecks[i].nextcheck = item->nextcheck;
 	nextchecks[i].error_msg = (NULL != error_msg) ? strdup(error_msg) : NULL;
 
 	nextcheck_num ++;
@@ -233,28 +196,19 @@ void	DCflush_nextchecks()
 	/* dealing with items */
 	for (i = 0; i < nextcheck_num; i++)
 	{
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 64,
-				"update items set nextcheck=%d",
-				(int)nextchecks[i].nextcheck);
+		if (NULL == nextchecks[i].error_msg)
+			continue;
 
-		if (NULL != nextchecks[i].error_msg)
-		{
-			/* array of not supported items */
-			uint64_array_add(&ids, &ids_allocated, &ids_num, nextchecks[i].itemid, 64);
+		uint64_array_add(&ids, &ids_allocated, &ids_num, nextchecks[i].itemid, 64);
 
-			error_msg_esc = DBdyn_escape_string_len(nextchecks[i].error_msg, ITEM_ERROR_LEN);
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset,
-					64 + strlen(error_msg_esc),
-					",status=%d,lastclock=%d,error='%s'",
-					ITEM_STATUS_NOTSUPPORTED,
-					(int)nextchecks[i].now,
-					error_msg_esc);
-			zbx_free(error_msg_esc);
-		}
-
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 64,
-				" where itemid=" ZBX_FS_UI64 ";\n",
+		error_msg_esc = DBdyn_escape_string_len(nextchecks[i].error_msg, ITEM_ERROR_LEN);
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128 + strlen(error_msg_esc),
+				"update items set status=%d,lastclock=%d,error='%s' where itemid=" ZBX_FS_UI64 ";\n",
+				ITEM_STATUS_NOTSUPPORTED,
+				(int)nextchecks[i].now,
+				error_msg_esc,
 				nextchecks[i].itemid);
+		zbx_free(error_msg_esc);
 
 		DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
 	}
@@ -299,7 +253,7 @@ void	DCflush_nextchecks()
 				continue;
 			}
 
-			error_msg_esc = DBdyn_escape_string_len(nextchecks[i].error_msg, ITEM_ERROR_LEN);
+			error_msg_esc = DBdyn_escape_string_len(nextchecks[i].error_msg, TRIGGER_ERROR_LEN);
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128 + strlen(error_msg_esc),
 					"update triggers set value=%d,lastchange=%d,error='%s' where triggerid=" ZBX_FS_UI64";\n",
 							TRIGGER_VALUE_UNKNOWN,
@@ -315,7 +269,7 @@ void	DCflush_nextchecks()
 			}
 			events[events_num].objectid = triggerid;
 			events[events_num].clock = nextchecks[i].now;
-			events_num = events_num + 1;
+			events_num++;
 
 			DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
 		}	/* while (NULL != (row = DBfetch(result))) dealing with triggers */

@@ -55,17 +55,23 @@ static int process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_ITEM		item;
-	time_t		now;
+	unsigned char	value_type;
 
 	INIT_CHECK_MEMORY();
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_value(itemid:" ZBX_FS_UI64 ")",
 			itemid);
 
-	result = DBselect("select %s where h.status=%d and h.hostid=i.hostid and i.status=%d and i.type=%d and i.itemid=" ZBX_FS_UI64
-			" and (h.maintenance_status=%d or h.maintenance_type=%d)" DB_NODE,
-			ZBX_SQL_ITEM_SELECT,
+	result = DBselect(
+			"select i.itemid,i.value_type"
+			" from items i,hosts h"
+			" where h.hostid=i.hostid"
+				" and h.status=%d"
+				" and i.status=%d"
+				" and i.type=%d"
+				" and i.itemid=" ZBX_FS_UI64
+				" and (h.maintenance_status=%d or h.maintenance_type=%d)"
+				DB_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
 			ITEM_TYPE_HTTPTEST,
@@ -81,11 +87,9 @@ static int process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 		return  FAIL;
 	}
 
-	DBget_item_from_db(&item, row);
+	value_type = (unsigned char)atoi(row[1]);
 
-	now = time(NULL);
-
-	dc_add_history(&item, value, now);
+	dc_add_history(itemid, value_type, value, time(NULL), 0, NULL, 0, 0, 0);
 
 	DBfree_result(result);
 

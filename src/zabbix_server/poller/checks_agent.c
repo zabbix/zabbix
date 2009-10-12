@@ -42,21 +42,18 @@
  * Comments: error will contain error message                                 *
  *                                                                            *
  ******************************************************************************/
-int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
+int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 {
+	const char	*__function_name = "get_value_agent";
 	zbx_sock_t	s;
-	char		*addr, *buf, buffer[MAX_STRING_LEN];
+	char		*buf, buffer[MAX_STRING_LEN], *conn;
 	int		ret = SUCCEED;
 
-	init_result(result);
+	conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s'",
+			__function_name, item->host.host, conn, item->key_orig);
 
-	addr = (item->useip == 1) ? item->host_ip : item->host_dns;
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_agent(host:%s,addr:%s,key:%s)",
-			item->host_name,
-			addr,
-			item->key);
-
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, addr, item->port, 0)))
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, conn, item->host.port, 0)))
 	{
 		zbx_snprintf(buffer, sizeof(buffer), "%s\n", item->key);
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", buffer);
@@ -87,8 +84,9 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 		}
 		else if ('\0' == *buf)	/* The section should be improved */
 		{
-			zbx_snprintf(buffer, sizeof(buffer), "Got empty string from [%s]. Assuming that agent dropped connection because of access permissions",
-					item->useip ? item->host_ip : item->host_dns);
+			zbx_snprintf(buffer, sizeof(buffer), "Got empty string from [%s]."
+					" Assuming that agent dropped connection because of access permissions",
+					conn);
 			SET_MSG_RESULT(result, strdup(buffer));
 			ret = NETWORK_ERROR;
 		}

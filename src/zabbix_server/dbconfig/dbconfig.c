@@ -18,60 +18,56 @@
 **/
 
 #include "common.h"
-#include "sysinfo.h"
-#include "log.h"
-#include "dbcache.h"
-#include "zbxserver.h"
 
+#include "db.h"
+#include "log.h"
 #include "zlog.h"
+#include "threads.h"
+
+#include "dbconfig.h"
+#include "dbcache.h"
 
 /******************************************************************************
  *                                                                            *
- * Function: zabbix_syslog                                                    *
+ * Function: main_dbconfig_loop                                               *
  *                                                                            *
- * Purpose: save internal warning or error message in item zabbix[log]        *
+ * Purpose: periodically synchronises database data with memory cache         *
  *                                                                            *
- * Parameters: va_list arguments                                              *
+ * Parameters:                                                                *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Aleksander Vladishev                                               *
  *                                                                            *
- * Comments: do nothing if no zabbix[log] items                               *
+ * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-void __zbx_zabbix_syslog(const char *fmt, ...)
+int	main_dbconfig_loop()
 {
-	const char	*__function_name = "zabbix_log";
-	va_list		ap;
-	char		value_str[MAX_STRING_LEN];
-	DC_ITEM		*items = NULL;
-	int		i, num, now;
-	AGENT_RESULT	agent;
+	double	sec;
+//zabbix_set_log_level(LOG_LEVEL_DEBUG);
+	zabbix_log(LOG_LEVEL_DEBUG, "In main_dbconfig_loop()");
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zbx_setproctitle("db config [connecting to the database]");
 
-	/* This is made to disable writing to database for watchdog */
-	if (CONFIG_ENABLE_LOG == 0)
-		return;
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	init_result(&agent);
+	for (;;) {
+		zabbix_log(LOG_LEVEL_DEBUG, "Syncing ...");
 
-	now = (int)time(NULL);
+		sec = zbx_time();
+		DCsync_confguration();
+		sec = zbx_time() - sec;
 
-	va_start(ap,fmt);
-	vsnprintf(value_str, sizeof(value_str), fmt, ap);
-	value_str[MAX_STRING_LEN - 1] = '\0';
-	va_end(ap);
+		zabbix_log(LOG_LEVEL_DEBUG, "DB config spent " ZBX_FS_DBL " second while processing configuration data. "
+				"Nextsync after %d sec.",
+				sec,
+				CONFIG_DBCONFIG_FREQUENCY);
 
-	SET_STR_RESULT(&agent, strdup(value_str));
+		zbx_setproctitle("db config [sleeping for %d seconds]",
+				CONFIG_DBCONFIG_FREQUENCY);
 
-	num = DCconfig_get_items(0, SERVER_ZABBIXLOG_KEY, &items);
-	for (i = 0; i < num; i++)
-		dc_add_history(items[i].itemid, items[i].value_type, &agent, now, 0, NULL, 0, 0, 0);
-
-	zbx_free(items);
-	free_result(&agent);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+		sleep(CONFIG_DBCONFIG_FREQUENCY);
+	}
+	DBclose();
 }

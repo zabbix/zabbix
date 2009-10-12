@@ -125,7 +125,7 @@ static char* get_param_value(char* params, const char* param_name)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	get_value_db(DB_ITEM *item, AGENT_RESULT *result)
+int	get_value_db(DC_ITEM *item, AGENT_RESULT *result)
 {
 #ifdef HAVE_ODBC
 	ZBX_ODBC_DBH	dbh;
@@ -142,7 +142,7 @@ int	get_value_db(DB_ITEM *item, AGENT_RESULT *result)
 
 	init_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In database monitor: %s", item->key);
+	zabbix_log(LOG_LEVEL_DEBUG, "In database monitor: %s", item->key_orig);
 
 #ifdef HAVE_ODBC
 
