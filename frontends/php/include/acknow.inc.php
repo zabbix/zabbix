@@ -64,7 +64,7 @@ function make_acktab_by_eventid($eventid){
 	while($ack = DBfetch($acks)){
 		$user = get_user_by_userid($ack['userid']);
 		$table->AddRow(array(
-			date('d-m-Y h:i:s A',$ack['clock']),
+			date(S_DATE_FORMAT_YMDHMS,$ack['clock']),
 			$user['alias'],
 			new CCol(zbx_nl2br($ack['message']),'wraptext')
 		));
