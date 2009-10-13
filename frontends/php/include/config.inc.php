@@ -1219,10 +1219,27 @@ function __autoload($class_name){
 /*************** END PAGE SORTING ******************/
 
 /*************** RESULT SORTING ******************/
+
 	function order_result(&$data, $sortfield, $sortorder=ZBX_SORT_UP, $preserve_keys=false){
+// TODO if works ok, remove commented part and last argument
 		if(empty($data)) return false;
 
-		if($preserve_keys == true){
+		$sort = array();
+		foreach($data as $key => $arr){
+			$sort[$key] = $arr[$sortfield];
+		}
+		natcasesort($sort);
+		
+		if($sortorder != ZBX_SORT_UP)
+			$sort = array_reverse($sort, true);
+			
+		$tmp = $data;
+		$data = array();
+		foreach($sort as $key => $val){
+			$data[$key] = $tmp[$key];
+		}
+			
+/* 		if($preserve_keys == true){
 			$data = array_quicksort($data, $sortfield, $sortorder);
 			return true;
 		}
@@ -1239,7 +1256,7 @@ function __autoload($class_name){
 		$sortorder = ($sortorder == 'ASC') ? SORT_ASC : SORT_DESC;
 
 		array_multisort($tmp, $sortorder, $data);
-
+ */
 	return true;
 	}
 

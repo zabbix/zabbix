@@ -5617,7 +5617,7 @@
 
 		$clear_templates = array_intersect($clear_templates, array_keys($original_templates));
 		$clear_templates = array_diff($clear_templates,array_keys($templates));
-		asort($templates);
+		natcasesort($templates);
 
 		$frmHost = new CForm('hosts.php', 'post');
 		$frmHost->setName('web.hosts.host.php.');
@@ -5639,6 +5639,7 @@
 		$grp_tb = new CTweenBox($frmHost, 'groups', $host_groups, 10);
 
 		$all_groups = CHostGroup::get(array('editable' => 1, 'extendoutput' => 1));
+		order_result($all_groups, 'name');
 		foreach($all_groups as $group){
 			$grp_tb->addItem($group['groupid'], $group['name']);
 		}

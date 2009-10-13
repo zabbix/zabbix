@@ -882,11 +882,11 @@ include_once('include/page_header.php');
 
 // sorting && paging
 // !!! should go after we subfiltered out items !!!
-		order_page_result($items, getPageSortField('description'), getPageSortOrder());
+		order_result($items, getPageSortField('description'), getPageSortOrder());
 		$paging = getPagingLine($items);
 //---------
 
-		foreach($items as $itemid => $item){
+		foreach($items as $item){
 
 			if($show_host){
 				$host = array_pop($item['hosts']);
@@ -902,9 +902,9 @@ include_once('include/page_header.php');
 				$description[] = new CLink($template_host['host'],'?hostid='.$template_host['hostid'], 'unknown');
 				$description[] = ':';
 			}
-			$description[] = new CLink(item_description($item), '?form=update&itemid='.$itemid);
+			$description[] = new CLink(item_description($item), '?form=update&itemid='.$item['itemid']);
 
-			$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$itemid.'&go='.
+			$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].'&go='.
 				($item['status']?'activate':'disable'), item_status2style($item['status'])));
 
 
@@ -996,7 +996,7 @@ include_once('include/page_header.php');
 //-------
 
 			$table->addRow(array(
-				new CCheckBox('group_itemid['.$itemid.']',null,null,$itemid),
+				new CCheckBox('group_itemid['.$item['itemid'].']',null,null,$item['itemid']),
 				$host,
 				$description,
 				$trigger_info,
