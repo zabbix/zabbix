@@ -71,12 +71,12 @@ FIELD		|dhostid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|dhosts
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|key_		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|value		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|port		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastup		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastdown	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|dcheckid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|dchecks
+FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|ZBX_SYNC
 UNIQUE		|1		|dcheckid,type,key_,ip,port
 INDEX		|2		|dhostid
 
@@ -266,13 +266,13 @@ TABLE|proxy_dhistory|id|0
 FIELD		|id		|t_serial	|	|NOT NULL	|0
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|druleid	|t_id		|'0'	|NOT NULL	|0			|drules
-FIELD		|dcheckid	|t_id		|'0'	|NOT NULL	|0			|dchecks
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|0
 FIELD		|port		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|dcheckid	|t_id		|'0'	|NOT NULL	|0			|dchecks
 INDEX		|1		|clock
 
 TABLE|events|eventid|ZBX_HISTORY
@@ -454,12 +454,8 @@ FIELD		|graphid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|width		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|height		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|ymin_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|ymax_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|yaxismin	|t_double	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|yaxismax	|t_double	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|ymin_itemid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|items
-FIELD		|ymax_itemid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|items
 FIELD		|templateid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|graphs
 FIELD		|show_work_period|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|show_triggers	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
@@ -468,6 +464,10 @@ FIELD		|show_legend	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|show_3d	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|percent_left	|t_double	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|percent_right	|t_double	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|ymin_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|ymax_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|ymin_itemid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|items
+FIELD		|ymax_itemid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|items
 INDEX		|graphs_1	|name
 
 TABLE|graphs_items|gitemid|ZBX_SYNC
@@ -570,8 +570,8 @@ TABLE|hosts_groups|hostgroupid|ZBX_SYNC
 FIELD		|hostgroupid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|hostid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|hosts
 FIELD		|groupid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|groups
-INDEX		|groups_1	|hostid,groupid
-INDEX		|groups_2	|groupid
+INDEX		|1	|hostid,groupid
+INDEX		|2	|groupid
 
 TABLE|hosts_profiles|hostid|ZBX_SYNC
 FIELD		|hostid		|t_id		|'0'	|NOT NULL	|0			|hosts
@@ -914,8 +914,8 @@ TABLE|usrgrp|usrgrpid|ZBX_SYNC
 FIELD		|usrgrpid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|gui_access	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|api_access	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|users_status	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|api_access	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|debug_mode	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|name
 
