@@ -19,12 +19,12 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/items.inc.php";
-	require_once "include/graphs.inc.php";
+	require_once('include/config.inc.php');
+	require_once('include/items.inc.php');
+	require_once('include/graphs.inc.php');
 
-	$page["file"]	= "history.php";
-	$page["title"]	= "S_HISTORY";
+	$page['file']	= 'history.php';
+	$page['title']	= "S_HISTORY";
 	$page['hist_arg'] = array('itemid', 'hostid','grouid','graphid','period','dec','inc','left','right','stime');
 	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','timeline.js','calendar.js','scrollbar.js','sbox.js','sbinit.js');
 
@@ -37,44 +37,44 @@
 		define('ZBX_PAGE_DO_REFRESH', 1);
 	}
 
-include_once "include/page_header.php";
+include_once('include/page_header.php');
 
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"itemid"=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	'!isset({favobj})'),
+		'itemid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	'!isset({favobj})'),
 
-		"from"=>	array(T_ZBX_INT, O_OPT,	 null,	'{}>=0', null),
-		"period"=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		"dec"=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		"inc"=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		"left"=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		"right"=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		"stime"=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
+		'from'=>	array(T_ZBX_INT, O_OPT,	 null,	'{}>=0', null),
+		'period'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'dec'=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'inc'=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'left'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'right'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'stime'=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
 
-		"filter_task"=>	array(T_ZBX_STR, O_OPT,	 null,
+		'filter_task'=>	array(T_ZBX_STR, O_OPT,	 null,
 			IN(FILTER_TAST_SHOW.','.FILTER_TAST_HIDE.','.FILTER_TAST_MARK.','.FILTER_TAST_INVERT_MARK), null),
-		"filter"=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
-		"mark_color"=>	array(T_ZBX_STR, O_OPT,	 null,	IN(MARK_COLOR_RED.','.MARK_COLOR_GREEN.','.MARK_COLOR_BLUE), null),
+		'filter'=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
+		'mark_color'=>	array(T_ZBX_STR, O_OPT,	 null,	IN(MARK_COLOR_RED.','.MARK_COLOR_GREEN.','.MARK_COLOR_BLUE), null),
 
-		"cmbloglist"=>	array(T_ZBX_INT, O_OPT,	 null,	DB_ID, null),
+		'cmbloglist'=>	array(T_ZBX_INT, O_OPT,	 null,	DB_ID, null),
 
-		"plaintext"=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
-		"action"=>	array(T_ZBX_STR, O_OPT,	 null,	IN('"showgraph","showvalues","showlatest","add","remove"'), null),
+		'plaintext'=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
+		'action'=>	array(T_ZBX_STR, O_OPT,	 null,	IN('"showgraph","showvalues","showlatest","add","remove"'), null),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 
 /* actions */
-		"remove_log"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"reset"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'remove_log'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'reset'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 /* other */
-		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		"form_copy_to"=>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	null,	null,	null),
-		"fullscreen"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	null,	null)
+		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'form_copy_to'=>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	null,	null,	null),
+		'fullscreen'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	null,	null)
 	);
 
 	check_fields($fields);
@@ -109,7 +109,7 @@ include_once "include/page_header.php";
 		exit();
 	}
 
-	$_REQUEST["action"] = get_request("action", "showgraph");
+	$_REQUEST['action'] = get_request('action', 'showgraph');
 
 /*** Prepare page header - start ***/
 	if(is_array($_REQUEST['itemid'])){

@@ -161,8 +161,7 @@ class CChart extends CGraphDraw{
 		$this->m_showTriggers = ($value==1)?1:0;
 	}
 
-	public function addItem($itemid, $axis=GRAPH_YAXIS_SIDE_LEFT, $calc_fnc=CALC_FNC_AVG,
-				$color=null, $drawtype=null, $type=null, $periods_cnt=null){
+	public function addItem($itemid, $axis=GRAPH_YAXIS_SIDE_LEFT, $calc_fnc=CALC_FNC_AVG, $color=null, $drawtype=null, $type=null, $periods_cnt=null){
 		if($this->type == GRAPH_TYPE_STACKED /* stacked graph */)
 			$drawtype = GRAPH_ITEM_DRAWTYPE_FILLED_REGION;
 
@@ -173,7 +172,7 @@ class CChart extends CGraphDraw{
 		$this->items[$this->num]['host'] = $host['host'];
 		$this->items[$this->num]['color'] = is_null($color) ? 'Dark Green' : $color;
 		$this->items[$this->num]['drawtype'] = is_null($drawtype) ? GRAPH_ITEM_DRAWTYPE_LINE : $drawtype;
-		$this->items[$this->num]['axisside'] = is_null($axis) ? GRAPH_YAXIS_SIDE_RIGHT : $axis;
+		$this->items[$this->num]['axisside'] = is_null($axis) ? GRAPH_YAXIS_SIDE_LEFT : $axis;
 		$this->items[$this->num]['calc_fnc'] = is_null($calc_fnc) ? CALC_FNC_AVG : $calc_fnc;
 		$this->items[$this->num]['calc_type'] = is_null($type) ? GRAPH_ITEM_SIMPLE : $type;
 		$this->items[$this->num]['periods_cnt'] = is_null($periods_cnt) ? 0 : $periods_cnt;

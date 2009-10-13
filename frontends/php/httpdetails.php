@@ -19,35 +19,35 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/hosts.inc.php";
-	require_once "include/httptest.inc.php";
-	require_once "include/forms.inc.php";
+	require_once('include/config.inc.php');
+	require_once('include/hosts.inc.php');
+	require_once('include/httptest.inc.php');
+	require_once('include/forms.inc.php');
 
-	$page["title"] = "S_DETAILS_OF_SCENARIO";
-	$page["file"] = "httpdetails.php";
+	$page['title'] = "S_DETAILS_OF_SCENARIO";
+	$page['file'] = "httpdetails.php";
 	$page['hist_arg'] = array('hostid','grouid','graphid','period','stime');
-	$page['scripts'] = array('gmenu.js','scrollbar.js','sbox.js','sbinit.js');
+	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','timeline.js','calendar.js','scrollbar.js','sbox.js','sbinit.js');
 
 	define('ZBX_PAGE_DO_REFRESH', 1);
 
-include_once "include/page_header.php";
+include_once('include/page_header.php');
 
 ?>
 <?php
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"from"=>	array(T_ZBX_INT, O_OPT,	 null,	'{}>=0', null),
-		"period"=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		"stime"=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
+		'from'=>	array(T_ZBX_INT, O_OPT,	 null,	'{}>=0', null),
+		'period'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'stime'=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
 
-		"reset"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'reset'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 
-		"httptestid"=>	array(T_ZBX_INT, O_MAND,	null,	DB_ID,		null),
+		'httptestid'=>	array(T_ZBX_INT, O_MAND,	null,	DB_ID,		null),
 
-		"groupid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
-		"hostid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
+		'groupid'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
+		'hostid'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 
 		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
 //ajax
@@ -74,6 +74,9 @@ include_once "include/page_header.php";
 	navigation_bar_calc();
 ?>
 <?php
+	$details_wdgt = new CWidget();
+	$details_wdgt->setClass('header');	
+	
 // Header
 	$text = array(S_DETAILS_OF_SCENARIO_BIG.' / ',bold($httptest_data['name']),' ['.date(S_DATE_FORMAT_YMDHMS,$httptest_data['lastcheck']).']');
 
@@ -81,20 +84,15 @@ include_once "include/page_header.php";
 
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
-	$fs_icon->AddAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
+	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
 
-	$icon_tab = new CTable();
-	$icon_tab->AddRow(array($fs_icon,SPACE,$text));
 
-	$text = $icon_tab;
-
-	show_table_header($text,new CLink(S_CANCEL,'httpmon.php'.url_param('groupid').url_param('hostid')));
-
+	$details_wdgt->addHeader($text, $fs_icon);
 //-------------
 
 // TABLE
-	$table  = new CTableInfo();
-	$table->SetHeader(array(S_STEP, S_SPEED, S_RESPONSE_TIME, S_RESPONSE_CODE, S_STATUS));
+	$table = new CTableInfo();
+	$table->setHeader(array(S_STEP, S_SPEED, S_RESPONSE_TIME, S_RESPONSE_CODE, S_STATUS));
 
 	$items = array();
 	$total_data = array( HTTPSTEP_ITEM_TYPE_IN => null, HTTPSTEP_ITEM_TYPE_TIME => null );
@@ -102,20 +100,21 @@ include_once "include/page_header.php";
 	$color = array(
 		'current' => 0,
 		0  => array('next' => '1'),
-		1  => array('color' => 'Red', 		'next' => '2'),
+		1  => array('color' => 'Red', 			'next' => '2'),
 		2  => array('color' => 'Dark Green',	'next' => '3'),
-		3  => array('color' => 'Blue', 		'next' => '4'),
+		3  => array('color' => 'Blue', 			'next' => '4'),
 		4  => array('color' => 'Dark Yellow', 	'next' => '5'),
-		5  => array('color' => 'Cyan', 		'next' => '6'),
-		6  => array('color' => 'Gray',		'next' => '7'),
-		7  => array('color' => 'Dark Red',	'next' => '8'),
-		8  => array('color' => 'Green',		'next' => '9'),
+		5  => array('color' => 'Cyan', 			'next' => '6'),
+		6  => array('color' => 'Gray',			'next' => '7'),
+		7  => array('color' => 'Dark Red',		'next' => '8'),
+		8  => array('color' => 'Green',			'next' => '9'),
 		9  => array('color' => 'Dark Blue', 	'next' => '10'),
-		10 => array('color' => 'Yellow', 	'next' => '11'),
-		11 => array('color' => 'Black',	 	'next' => '1')
+		10 => array('color' => 'Yellow', 		'next' => '11'),
+		11 => array('color' => 'Black',	 		'next' => '1')
 		);
 
-	$db_httpsteps = DBselect('select * from httpstep where httptestid='.$httptest_data['httptestid'].' order by no');
+	$sql = 'SELECT * FROM httpstep WHERE httptestid='.$httptest_data['httptestid'].' ORDER BY no';
+	$db_httpsteps = DBselect($sql);
 	while($httpstep_data = DBfetch($db_httpsteps)){
 		$status['msg'] = S_OK_BIG;
 		$status['style'] = 'enabled';
@@ -179,7 +178,7 @@ include_once "include/page_header.php";
 				'sortorder' => 'no');
 		}
 
-		$table->AddRow(array(
+		$table->addRow(array(
 			$httpstep_data['name'],
 			format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]),
 			format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]),
@@ -204,7 +203,7 @@ include_once "include/page_header.php";
 		$status['style'] = 'disabled';
 	}
 
-	$table->AddRow(array(
+	$table->addRow(array(
 		new CCol(S_TOTAL_BIG, 'bold'),
 		new CCol(SPACE, 'bold'),
 		new CCol(format_lastvalue($total_data[HTTPSTEP_ITEM_TYPE_TIME]), 'bold'),
@@ -212,68 +211,121 @@ include_once "include/page_header.php";
 		new CCol(new CSpan($status['msg'], $status['style']), 'bold')
 		));
 
-	$table->Show();
-
+	$details_wdgt->addItem($table);
+	$details_wdgt->show();
+	
 	echo SBR;
 
-	if( isset($_REQUEST['period']) && $_REQUEST['period'] != ZBX_MIN_PERIOD ) {
+
+	if(isset($_REQUEST['period']) && $_REQUEST['period'] != ZBX_MIN_PERIOD ) {
 		update_profile('web.httptest.period', $_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['httptestid']);
 	}
 	$_REQUEST['period'] = get_profile('web.httptest.period', ZBX_PERIOD_DEFAULT, $_REQUEST['httptestid']);
 
-	show_table_header(array(S_HISTORY.' "',
-						bold($httptest_data['name']),
-						'"')
-					);
+	show_table_header(array(S_HISTORY.' "',bold($httptest_data['name']),'"'));
+	
 	$form = new CTableInfo();
 	$form->setAttribute('id','graph');
-	$form->AddRow(array(bold(S_SPEED) , new CCol(
-		get_dynamic_chart('graph_1','chart3.php?'.url_param('period').url_param('from').
+
+	$graph_cont = new CCol();
+	$graph_cont->setAttribute('id', 'graph_1');
+	$form->addRow(array(bold(S_SPEED), $graph_cont));
+	
+	$graph_cont = new CCol();
+	$graph_cont->setAttribute('id', 'graph_2');
+	$form->addRow(array(bold(S_RESPONSE_TIME), $graph_cont));
+	
+	$form->show();
+	
+// NAV BAR	
+	$timeline = array(); 
+	$timeline['period'] = get_request('period',ZBX_PERIOD_DEFAULT);
+	$timeline['starttime'] = get_min_itemclock_by_itemid($items[HTTPSTEP_ITEM_TYPE_IN][0]['itemid']);
+
+	if(isset($_REQUEST['stime'])){
+		$bstime = $_REQUEST['stime'];
+		$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
+		$timeline['usertime'] += $timeline['period'];
+	}
+	
+	$containerid = 'graph_1';
+	$dom_graph_id = 'graph_in';
+	
+	$graphDims = array();
+	$graphDims['width'] = -120;
+	$graphDims['graphHeight'] = 150;
+	$graphDims['shiftXleft'] = 100;
+	$graphDims['shiftXright'] = 50;
+	$graphDims['graphtype'] = GRAPH_TYPE_STACKED;
+	
+	$src = 'chart3.php?'.url_param('period').
 			url_param($httptest_data['name'], false,'name').
-			url_param(150, false,'height').
+			url_param(150, false, 'height').
 			url_param(get_request('stime',0), false,'stime').
 			url_param($items[HTTPSTEP_ITEM_TYPE_IN], false, 'items').
-			url_param(GRAPH_TYPE_STACKED, false, 'graphtype'),'-128')
-		, 'center')));
+			url_param(GRAPH_TYPE_STACKED, false, 'graphtype');
 
-	$form->AddRow(array(bold(S_RESPONSE_TIME) , new CCol(
-		get_dynamic_chart('graph_2','chart3.php?'.url_param('period').url_param('from').
+	$objData = array(
+		'id' => $dom_graph_id,
+		'domid' => $dom_graph_id,
+		'containerid' => $containerid,
+		'src' => $src,
+		'objDims' => $graphDims,
+		'loadSBox' => 1,
+		'loadImage' => 1,
+		'loadScroll' => 0,
+		'dynamic' => 1,
+		'mainObject' => 1
+	);
+					
+	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
+	
+	$containerid = 'graph_2';
+	$dom_graph_id = 'graph_time';
+	$src ='chart3.php?'.url_param('period').url_param('from').
 			url_param($httptest_data['name'], false,'name').
 			url_param(150, false,'height').
 			url_param(get_request('stime',0), false,'stime').
 			url_param($items[HTTPSTEP_ITEM_TYPE_TIME], false, 'items').
-			url_param(GRAPH_TYPE_STACKED, false, 'graphtype'),'-128')
-		,'center')));
+			url_param(GRAPH_TYPE_STACKED, false, 'graphtype');
 
-	$form->Show();
-
-
-	$period = get_request('period',3600);
-//SDI(get_min_itemclock_by_itemid($items[HTTPSTEP_ITEM_TYPE_IN][0]['itemid']));
-	$mstime = min(get_min_itemclock_by_itemid($items[HTTPSTEP_ITEM_TYPE_IN][0]['itemid']),get_min_itemclock_by_itemid($items[HTTPSTEP_ITEM_TYPE_TIME][0]['itemid']));
-	$stime = ($mstime)?$mstime:0;
-	$bstime = time()-$period;
-
-	if(isset($_REQUEST['stime'])){
-		$bstime = $_REQUEST['stime'];
-		$bstime = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
-	}
-	$script = 	'scrollinit(0,'.$period.','.$stime.',0,'.$bstime.');
-				showgraphmenu("graph");
-				graph_zoom_init("graph_1",'.$bstime.','.$period.',ZBX_G_WIDTH, 150, false);
-				graph_zoom_init("graph_2",'.$bstime.','.$period.',ZBX_G_WIDTH, 150, false);';
-
-	zbx_add_post_js($script);
+	$objData = array(
+		'id' => $dom_graph_id,
+		'domid' => $dom_graph_id,
+		'containerid' => $containerid,
+		'src' => $src,
+		'objDims' => $graphDims,
+		'loadSBox' => 1,
+		'loadImage' => 1,
+		'loadScroll' => 0,
+		'dynamic' => 1,
+		'mainObject' => 1
+	);
+					
+	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
+//-------------
 
 	$scroll_div = new CDiv();
-	$scroll_div->setAttribute('id','scroll_cntnr');
-	$scroll_div->setAttribute('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
+	$scroll_div->setAttribute('id','scrollbar_cntr');
 	$scroll_div->show();
-
-//	navigation_bar("#", array('httptestid'));
+	
+	$dom_graph_id = 'none';
+	$objData = array(
+		'id' => $dom_graph_id,
+		'domid' => $dom_graph_id,
+		'loadSBox' => 0,
+		'loadImage' => 0,
+		'loadScroll' => 1,
+		'scrollWidthByImage' => 0,
+		'dynamic' => 1,
+		'mainObject' => 1
+	);
+				
+	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
+	zbx_add_post_js('timeControl.processObjects();');
 ?>
 <?php
 
-include_once "include/page_footer.php"
+include_once('include/page_footer.php');
 
 ?>
