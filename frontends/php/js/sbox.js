@@ -35,27 +35,17 @@ function sbox_init(sbid, timeline, domobjectid){
 	var width = dims.width - (ZBX_SBOX[domobjectid].shiftL + ZBX_SBOX[domobjectid].shiftR);
 
 	var obj = $(domobjectid);
-	ZBX_SBOX[sbid].sbox = new sbox(sbid, timeline, obj, width, ZBX_SBOX[sbid].height);
+	var box = new sbox(sbid, timeline, obj, width, ZBX_SBOX[sbid].height);
+	
 	
 // Listeners
 	addListener(window,'resize',moveSBoxes);
+		
+	if(KQ) setTimeout('ZBX_SBOX['+sbid+'].sbox.moveSBoxByObj('+sbid+');',500);
 	
-	if(IE6){
-		obj.attachEvent('onmousedown',ZBX_SBOX[sbid].sbox.mousedown.bindAsEventListener(ZBX_SBOX[sbid].sbox));
-		obj.onmousemove = ZBX_SBOX[sbid].sbox.mousemove.bind(ZBX_SBOX[sbid].sbox);
-	}
-	else{
-		addListener(ZBX_SBOX[sbid].sbox.dom_obj,'mousedown',ZBX_SBOX[sbid].sbox.mousedown.bindAsEventListener(ZBX_SBOX[sbid].sbox),false);
-		addListener(document,'mousemove',ZBX_SBOX[sbid].sbox.mousemove.bindAsEventListener(ZBX_SBOX[sbid].sbox),false);
-	}
-	
-	addListener(document,'mouseup',ZBX_SBOX[sbid].sbox.mouseup.bindAsEventListener(ZBX_SBOX[sbid].sbox),true);
-	
-	if(KQ){
-		setTimeout('ZBX_SBOX['+sbid+'].sbox.moveSBoxByObj('+sbid+');',500);
-	}
+	ZBX_SBOX[sbid].sbox = box;
 
-return ZBX_SBOX[sbid].sbox;
+return box;
 }
 
 
@@ -107,8 +97,22 @@ initialize: function(sbid, timelineid, obj, width, height){
 	this.obj.height = height;
 	
 	this.box.width = 0;
-//--	
-	this.mouse_event.mousedown = false;	
+//--
+
+// Listeners
+	if(IE6){
+		obj.attachEvent('onmousedown', this.mousedown.bindAsEventListener(this));
+		obj.onmousemove = this.mousemove.bindAsEventListener(this);
+	}
+	else{
+		addListener(this.dom_obj, 'mousedown', this.mousedown.bindAsEventListener(this),false);
+		addListener(document, 'mousemove', this.mousemove.bindAsEventListener(this),false);
+	}
+	
+	addListener(document,'mouseup',this.mouseup.bindAsEventListener(this),true);
+//---------
+
+	ZBX_SBOX[this.sbox_id].mousedown = false;	
 },
 
 onselect: function(){
@@ -132,11 +136,14 @@ onchange: function(){			// bind any func to this
 
 mousedown: function(e){
 	this.debug('mousedown',this.sbox_id);
-	
-	e = e || window.event;
-	cancelEvent(e);
 
-	if(this.mouse_event.mousedown == false){
+	e = e || window.event;
+	if(e.which && (e.which != 1)) return false;
+	else if (e.button && (e.button != 1)) return false;
+
+	cancelEvent(e);
+	
+	if(ZBX_SBOX[this.sbox_id].mousedown == false){
 		
 		this.optimize_event(e);
 
@@ -148,32 +155,30 @@ mousedown: function(e){
 		}
 		
 		this.create_box();
-		this.mouse_event.mousedown = true;
+		ZBX_SBOX[this.sbox_id].mousedown = true;
 	}
 },
 
 mousemove: function(e){
-//	this.debug('mousemove',this.sbox_id);
+	this.debug('mousemove',this.sbox_id);
 
 	e = e || window.event;
-	cancelEvent(e);
-
-	if(this.mouse_event.mousedown == true){
+//	cancelEvent(e);
+	if(ZBX_SBOX[this.sbox_id].mousedown == true){
 		this.optimize_event(e);
 		this.resizebox();
 	}
 },
 
 mouseup: function(e){
-//	this.debug('mouseup',this.sbox_id);
-	
-	e = e || window.event;
+	this.debug('mouseup',this.sbox_id);
 
-	if(this.mouse_event.mousedown == true){
+	e = e || window.event;
+	if(ZBX_SBOX[this.sbox_id].mousedown == true){
 		this.onselect();
 
 		this.clear_params();
-		this.mouse_event.mousedown = false;
+		ZBX_SBOX[this.sbox_id].mousedown = false;
 	}
 
 },
@@ -212,22 +217,19 @@ create_box: function(){
 		this.dom_box.style.height = dims.height+'px';
 		this.box.height = dims.height;
 	
-		if(IE){
-			this.dom_box.onmousemove = this.mousemove.bind(this);
-		}
-		else{
-			this.dom_box.addEventListener('mousemove',this.mousemove.bindAsEventListener(this),true);
-		}
+		addListener(this.dom_box, 'mousemove', this.mousemove.bindAsEventListener(this));
 	
 		this.start_event.top = this.mouse_event.top;
 		this.start_event.left = this.mouse_event.left;
 	}
+
+	ZBX_SBOX[this.sbox_id].mousedown = false;	
 },
 
 resizebox: function(){
 	this.debug('resizebox',this.sbox_id);
 	
-	if(this.mouse_event.mousedown == true){
+	if(ZBX_SBOX[this.sbox_id].mousedown == true){
 		
 //		var height = this.validateH(this.mouse_event.top - this.start_event.top);
 //		height = this.obj.height;
@@ -252,7 +254,9 @@ resizebox: function(){
 		}
 
 		this.period = this.calcperiod();
-		this.dom_period_span.innerHTML = this.FormatStampbyDHM(this.period)+((this.period<3600)?' [min 1h]':'');
+		
+		if(!is_null(this.dom_box)) 
+			this.dom_period_span.innerHTML = this.FormatStampbyDHM(this.period)+((this.period<3600)?' [min 1h]':'');
 	}
 },
 
@@ -261,24 +265,24 @@ moveleft: function(left, width){
 	
 	//this.box.left = this.mouse_event.left - this.obj.left;
 	this.box.left = left;
-	this.dom_box.style.left = this.box.left+'px';
+	if(!is_null(this.dom_box)) this.dom_box.style.left = this.box.left+'px';
 
 	this.box.width = Math.abs(width);
-	this.dom_box.style.width = this.box.width+'px';
+	if(!is_null(this.dom_box)) this.dom_box.style.width = this.box.width+'px';
 },
 
 moveright: function(width){
 	this.debug('moveright');
 	
 	this.box.left = (this.start_event.left - this.obj.left);
-	this.dom_box.style.left = this.box.left+'px';
+	if(!is_null(this.dom_box)) this.dom_box.style.left = this.box.left+'px';
 	
-	this.dom_box.style.width = width+'px';
+	if(!is_null(this.dom_box)) this.dom_box.style.width = width+'px';
 	this.box.width = width;
 },
 
 calcperiod: function(){
-	this.debug('clacperiod');
+	this.debug('calcperiod');
 
 	if(this.box.width >= this.obj.width){
 		var new_period = this.timeline.period();
@@ -360,7 +364,8 @@ optimize_event: function(e){
 clear_params: function(){
 	this.debug('clear_params',this.sbox_id);
 
-	this.dom_obj.removeChild(this.dom_box);
+	if(!is_null(this.dom_box)) 
+		this.dom_obj.removeChild(this.dom_box);
 	
 	this.mouse_event = new Object;
 	this.start_event = new Object;
@@ -373,7 +378,7 @@ clear_params: function(){
 
 debug: function(fnc_name, id){
 	if(this.debug_status){
-		var str = 'SBox.'+fnc_name;
+		var str = 'SBox['+this.sbox_id+'].'+fnc_name;
 		if(typeof(id) != 'undefined') str+= ' :'+id;
 
 		if(this.debug_prev == str) return true;
