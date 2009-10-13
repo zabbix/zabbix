@@ -213,7 +213,7 @@ objectUpdate: function(id, timelineid){
 			}
 		}
 		else{
-			this.loadDynamic(obj.domid, url_stime, period);zl
+			this.loadDynamic(obj.domid, url_stime, period);
 			
 			if(isset(id, ZBX_SCROLLBARS)){
 				ZBX_SCROLLBARS[id].setBarPosition();

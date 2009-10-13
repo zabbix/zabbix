@@ -106,10 +106,10 @@ initialize: function(sbid, timelineid, obj, width, height){
 	}
 	else{
 		addListener(this.dom_obj, 'mousedown', this.mousedown.bindAsEventListener(this),false);
-		addListener(document, 'mousemove', this.mousemove.bindAsEventListener(this),false);
+		addListener(document, 'mousemove', this.mousemove.bindAsEventListener(this),true);
 	}
 	
-	addListener(document,'mouseup',this.mouseup.bindAsEventListener(this),true);
+	addListener(document, 'mouseup', this.mouseup.bindAsEventListener(this),true);
 //---------
 
 	ZBX_SBOX[this.sbox_id].mousedown = false;	
@@ -180,7 +180,6 @@ mouseup: function(e){
 		this.clear_params();
 		ZBX_SBOX[this.sbox_id].mousedown = false;
 	}
-
 },
 
 create_box: function(){
