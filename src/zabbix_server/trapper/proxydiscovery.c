@@ -143,7 +143,7 @@ int	process_discovery_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
 				last_druleid = drule.druleid;
 			}
 
-			if ('\0' == last_ip || 0 != strcmp(ip, last_ip))
+			if ('\0' == *last_ip || 0 != strcmp(ip, last_ip))
 			{
 				memset(&dhost, 0, sizeof(dhost));
 				zbx_strlcpy(last_ip, ip, HOST_IP_LEN_MAX);
