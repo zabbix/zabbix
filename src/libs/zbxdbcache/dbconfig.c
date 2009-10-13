@@ -1161,7 +1161,6 @@ static void	DCremove_item(int index)
 
 	dc_item = &config->items[index];
 	DCupdate_idxitem01(index, &dc_item->hostid, dc_item->key, NULL, NULL);
-
 	DCupdate_idxitem02(index, &dc_item->poller_type, &dc_item->poller_num, &dc_item->nextcheck, NULL, NULL, NULL);
 
 	/* update records in 'idxitem01' index */
@@ -1709,7 +1708,7 @@ void	DCsync_confguration()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() time:" ZBX_FS_DBL "sec. pfree:" ZBX_FS_DBL "%%",
 			__function_name, sec,
-			100 * config->free_mem / (double)CONFIG_DBCONFIG_SIZE);
+			100 * ((double)config->free_mem / CONFIG_DBCONFIG_SIZE));
 }
 
 /******************************************************************************
@@ -2598,20 +2597,20 @@ void	DCconfig_update_item(zbx_uint64_t itemid, unsigned char status, int now)
 	if (dc_item->itemid != itemid)
 		goto unlock;
 
-	dc_item->status = status;
-	dc_nextcheck = dc_item->nextcheck;
-
-	if (ITEM_STATUS_NOTSUPPORTED == dc_item->status)
-		dc_item->nextcheck = now + CONFIG_REFRESH_UNSUPPORTED;
+	if (ITEM_STATUS_NOTSUPPORTED == status)
+		dc_nextcheck = now + CONFIG_REFRESH_UNSUPPORTED;
 	else
 	{
 		dc_flexitem = DCget_dc_flexitem(itemid);;
-		dc_item->nextcheck = calculate_item_nextcheck(dc_item->itemid, dc_item->type,
-					dc_item->delay, dc_flexitem ? dc_flexitem->delay_flex : NULL, now);
+		dc_nextcheck = calculate_item_nextcheck(dc_item->itemid, dc_item->type,
+				dc_item->delay, dc_flexitem ? dc_flexitem->delay_flex : NULL, now);
 	}
 
-	DCupdate_idxitem02(index, &dc_item->poller_type, &dc_item->poller_num, &dc_nextcheck,
-			&dc_item->poller_type, &dc_item->poller_num, &dc_item->nextcheck);
+	DCupdate_idxitem02(index, &dc_item->poller_type, &dc_item->poller_num, &dc_item->nextcheck,
+			&dc_item->poller_type, &dc_item->poller_num, &dc_nextcheck);
+
+	dc_item->nextcheck = dc_nextcheck;
+	dc_item->status = status;
 unlock:
 	UNLOCK_CACHE;
 }
