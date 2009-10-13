@@ -731,7 +731,7 @@ include_once('include/page_header.php');
 					$templates[] = $template['host'];
 				}
 				order_result($templates, 'host');
-				$templates = implode(' ,', $templates);
+				$templates = implode(', ', $templates);
 			}
 
 			$table->addRow(array(
