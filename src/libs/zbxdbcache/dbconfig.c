@@ -187,10 +187,17 @@ static ZBX_MUTEX	config_lock;
  * Returns type and number of poller for item
  * (for normal or IPMI pollers)
  */
-static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigned char item_type,
-		char *key, unsigned char *poller_type, unsigned char *poller_num)
+static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t hostid, zbx_uint64_t proxy_hostid,
+		unsigned char item_type, char *key, unsigned char *poller_type, unsigned char *poller_num)
 {
 	char	*p;
+
+	if (0 != proxy_hostid)
+	{
+		*poller_type = (unsigned char)255;
+		*poller_num = (unsigned char)255;
+		return;
+	}
 
 	switch (item_type) {
 	case ITEM_TYPE_SIMPLE:
@@ -244,10 +251,10 @@ static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigned ch
  *
  * errors - [IN] (errors_from || snmp_errors_from || ipmi_errors_from)
  */
-static void	poller_by_host(zbx_uint64_t hostid, int errors, unsigned char *poller_type,
-		unsigned char *poller_num)
+static void	poller_by_host(zbx_uint64_t hostid, zbx_uint64_t proxy_hostid, int errors,
+		unsigned char *poller_type, unsigned char *poller_num)
 {
-	if (0 != errors && 0 != CONFIG_UNREACHABLE_POLLER_FORKS)
+	if (0 != errors && 0 == proxy_hostid && 0 != CONFIG_UNREACHABLE_POLLER_FORKS)
 	{
 		*poller_type = (unsigned char)ZBX_POLLER_TYPE_UNREACHABLE;
 		*poller_num = (unsigned char)(hostid % CONFIG_UNREACHABLE_POLLER_FORKS);
@@ -1258,7 +1265,7 @@ static void	DCremove_host(int index)
 		memmove(&config->hosts[index], &config->hosts[index + 1], sz);
 }
 
-static void	DCremove_ipmi(int index)
+static void	DCremove_ipmihost(int index)
 {
 	size_t	sz;
 
@@ -1279,7 +1286,7 @@ static void	DCsync_items()
 	ZBX_DC_TRAPITEM	*trapitem;
 	ZBX_DC_LOGITEM	*logitem;
 	ZBX_DC_DBITEM	*dbitem;
-	zbx_uint64_t	itemid, hostid;
+	zbx_uint64_t	itemid, hostid, proxy_hostid;
 	int		i, new, delay;
 	unsigned char	poller_type, poller_num, type;
 	char		*key;
@@ -1297,7 +1304,7 @@ static void	DCsync_items()
 	now = time(NULL);
 
 	result = DBselect(
-			"select i.itemid,i.hostid,i.type,i.data_type,i.value_type,i.key_,"
+			"select i.itemid,i.hostid,h.proxy_hostid,i.type,i.data_type,i.value_type,i.key_,"
 				"i.snmp_community,i.snmp_oid,i.snmp_port,i.snmpv3_securityname,"
 				"i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,"
 				"i.ipmi_sensor,i.delay,i.delay_flex,i.trapper_hosts,i.logtimefmt,i.params,i.status"
@@ -1305,7 +1312,8 @@ static void	DCsync_items()
 			" where i.hostid=h.hostid"
 				" and h.status in (%d)"
 				" and i.status in (%d,%d)"
-				DB_NODE,
+				DB_NODE
+			" order by i.itemid",
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
 			DBnode_local("i.itemid"));
@@ -1315,9 +1323,10 @@ static void	DCsync_items()
 	{
 		ZBX_STR2UINT64(itemid, row[0]);
 		ZBX_STR2UINT64(hostid, row[1]);
-		type = (unsigned char)atoi(row[2]);
-		key = row[5];
-		delay = atoi(row[14]);
+		ZBX_STR2UINT64(proxy_hostid, row[2]);
+		type = (unsigned char)atoi(row[3]);
+		key = row[6];
+		delay = atoi(row[15]);
 
 		/* array of selected items */
 		uint64_array_add(&ids, &ids_allocated, &ids_num, itemid, ITEM_ALLOC_STEP);
@@ -1332,13 +1341,13 @@ static void	DCsync_items()
 
 		item = &config->items[i];
 
-		poller_by_item(itemid, hostid, type, key, &poller_type, &poller_num);
+		poller_by_item(itemid, hostid, proxy_hostid, type, key, &poller_type, &poller_num);
 
 		if (new)
 		{
 			item->itemid = itemid;
-			item->status = (unsigned char)atoi(row[19]);
-			item->nextcheck = calculate_item_nextcheck(itemid, type, delay, row[15], now);
+			item->status = (unsigned char)atoi(row[20]);
+			item->nextcheck = calculate_item_nextcheck(itemid, type, delay, row[16], now);
 
 			DCupdate_idxitem01(i, NULL, NULL, &hostid, key);
 			DCupdate_idxitem02(i, NULL, NULL, NULL, &poller_type, &poller_num, &item->nextcheck);
@@ -1354,8 +1363,8 @@ static void	DCsync_items()
 		item->poller_type = poller_type;
 		item->poller_num = poller_num;
 		item->type = type;
-		item->data_type = (unsigned char)atoi(row[3]);
-		item->value_type = (unsigned char)atoi(row[4]);
+		item->data_type = (unsigned char)atoi(row[4]);
+		item->value_type = (unsigned char)atoi(row[5]);
 		zbx_strlcpy(item->key, key, sizeof(item->key));
 		item->delay = delay;
 
@@ -1372,16 +1381,16 @@ static void	DCsync_items()
 			snmpitem = &config->snmpitems[i];
 
 			snmpitem->itemid = itemid;
-			zbx_strlcpy(snmpitem->snmp_community, row[6],
+			zbx_strlcpy(snmpitem->snmp_community, row[7],
 					sizeof(snmpitem->snmp_community));
-			zbx_strlcpy(snmpitem->snmp_oid, row[7], sizeof(snmpitem->snmp_oid));
-			snmpitem->snmp_port = (unsigned short)atoi(row[8]);
-			zbx_strlcpy(snmpitem->snmpv3_securityname, row[9],
+			zbx_strlcpy(snmpitem->snmp_oid, row[8], sizeof(snmpitem->snmp_oid));
+			snmpitem->snmp_port = (unsigned short)atoi(row[9]);
+			zbx_strlcpy(snmpitem->snmpv3_securityname, row[10],
 					sizeof(snmpitem->snmpv3_securityname));
-			snmpitem->snmpv3_securitylevel = atoi(row[10]);
-			zbx_strlcpy(snmpitem->snmpv3_authpassphrase, row[11],
+			snmpitem->snmpv3_securitylevel = atoi(row[11]);
+			zbx_strlcpy(snmpitem->snmpv3_authpassphrase, row[12],
 					sizeof(snmpitem->snmpv3_authpassphrase));
-			zbx_strlcpy(snmpitem->snmpv3_privpassphrase, row[12],
+			zbx_strlcpy(snmpitem->snmpv3_privpassphrase, row[13],
 					sizeof(snmpitem->snmpv3_privpassphrase));
 			break;
 		default:
@@ -1401,7 +1410,7 @@ static void	DCsync_items()
 			ipmiitem = &config->ipmiitems[i];
 
 			ipmiitem->itemid = itemid;
-			zbx_strlcpy(ipmiitem->ipmi_sensor, row[13],
+			zbx_strlcpy(ipmiitem->ipmi_sensor, row[14],
 					sizeof(ipmiitem->ipmi_sensor));
 			break;
 		default:
@@ -1414,7 +1423,7 @@ static void	DCsync_items()
 		i = get_nearestindex(config->flexitems, sizeof(ZBX_DC_FLEXITEM),
 				config->flexitems_num, itemid);
 
-		if (SUCCEED != DBis_null(row[15]) && '\0' != *row[15])
+		if (SUCCEED != DBis_null(row[16]) && '\0' != *row[16])
 		{
 			if (i == config->flexitems_num || config->flexitems[i].itemid != itemid)
 				DCallocate_flexitem(i);
@@ -1422,7 +1431,7 @@ static void	DCsync_items()
 			flexitem = &config->flexitems[i];
 
 			flexitem->itemid = itemid;
-			zbx_strlcpy(flexitem->delay_flex, row[15],
+			zbx_strlcpy(flexitem->delay_flex, row[16],
 					sizeof(flexitem->delay_flex));
 		}
 		else
@@ -1436,7 +1445,7 @@ static void	DCsync_items()
 		i = get_nearestindex(config->trapitems, sizeof(ZBX_DC_TRAPITEM),
 				config->trapitems_num, itemid);
 
-		if (ITEM_TYPE_TRAPPER == item->type && SUCCEED != DBis_null(row[16]) && '\0' != *row[16])
+		if (ITEM_TYPE_TRAPPER == item->type && SUCCEED != DBis_null(row[17]) && '\0' != *row[17])
 		{
 			if (i == config->trapitems_num || config->trapitems[i].itemid != itemid)
 				DCallocate_trapitem(i);
@@ -1444,7 +1453,7 @@ static void	DCsync_items()
 			trapitem = &config->trapitems[i];
 
 			trapitem->itemid = itemid;
-			zbx_strlcpy(trapitem->trapper_hosts, row[16],
+			zbx_strlcpy(trapitem->trapper_hosts, row[17],
 					sizeof(trapitem->trapper_hosts));
 		}
 		else
@@ -1458,7 +1467,7 @@ static void	DCsync_items()
 		i = get_nearestindex(config->logitems, sizeof(ZBX_DC_LOGITEM),
 				config->logitems_num, itemid);
 
-		if (ITEM_VALUE_TYPE_LOG == item->value_type && SUCCEED != DBis_null(row[17]) && '\0' != *row[17])
+		if (ITEM_VALUE_TYPE_LOG == item->value_type && SUCCEED != DBis_null(row[18]) && '\0' != *row[18])
 		{
 			if (i == config->logitems_num || config->logitems[i].itemid != itemid)
 				DCallocate_logitem(i);
@@ -1466,7 +1475,7 @@ static void	DCsync_items()
 			logitem = &config->logitems[i];
 
 			logitem->itemid = itemid;
-			zbx_strlcpy(logitem->logtimefmt, row[17],
+			zbx_strlcpy(logitem->logtimefmt, row[18],
 					sizeof(logitem->logtimefmt));
 		}
 		else
@@ -1480,7 +1489,7 @@ static void	DCsync_items()
 		i = get_nearestindex(config->dbitems, sizeof(ZBX_DC_LOGITEM),
 				config->dbitems_num, itemid);
 
-		if (ITEM_TYPE_DB_MONITOR == item->type && SUCCEED != DBis_null(row[18]) && '\0' != *row[18])
+		if (ITEM_TYPE_DB_MONITOR == item->type && SUCCEED != DBis_null(row[19]) && '\0' != *row[19])
 		{
 			if (i == config->dbitems_num || config->dbitems[i].itemid != itemid)
 				DCallocate_dbitem(i);
@@ -1488,7 +1497,7 @@ static void	DCsync_items()
 			dbitem = &config->dbitems[i];
 
 			dbitem->itemid = itemid;
-			zbx_strlcpy(dbitem->params, row[18], ITEM_PARAMS_LEN_MAX);
+			zbx_strlcpy(dbitem->params, row[19], ITEM_PARAMS_LEN_MAX);
 		}
 		else
 		{
@@ -1570,7 +1579,8 @@ static void	DCsync_hosts()
 				"snmp_disable_until,ipmi_errors_from,ipmi_available,ipmi_disable_until"
 			" from hosts"
 			" where status in (%d)"
-				DB_NODE,
+				DB_NODE
+			" order by hostid",
 			HOST_STATUS_MONITORED,
 			DBnode_local("hostid"));
 
@@ -1596,7 +1606,7 @@ static void	DCsync_hosts()
 
 		host = &config->hosts[i];
 
-		poller_by_host(hostid, errors_from || snmp_errors_from || ipmi_errors_from,
+		poller_by_host(hostid, proxy_hostid, errors_from || snmp_errors_from || ipmi_errors_from,
 				&poller_type, &poller_num);
 
 		if (new)
@@ -1656,7 +1666,7 @@ static void	DCsync_hosts()
 		{
 			/* remove ipmi connection parameters for hosts without ipmi */
 			if (i < config->ipmihosts_num && config->ipmihosts[i].hostid == hostid)
-				DCremove_ipmi(i);
+				DCremove_ipmihost(i);
 		}
 	}
 
@@ -1668,7 +1678,7 @@ static void	DCsync_hosts()
 	/* remove ipmi connection parameters for deleted or disabled hosts from buffer */
 	for (i = 0; i < config->ipmihosts_num; i++)
 		if (FAIL == uint64_array_exists(ids, ids_num, config->ipmihosts[i].hostid))
-			DCremove_ipmi(i--);
+			DCremove_ipmihost(i--);
 
 	UNLOCK_CACHE;
 
@@ -1707,8 +1717,7 @@ void	DCsync_confguration()
 	sec = zbx_time() - sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() time:" ZBX_FS_DBL "sec. pfree:" ZBX_FS_DBL "%%",
-			__function_name, sec,
-			100 * ((double)config->free_mem / CONFIG_DBCONFIG_SIZE));
+			__function_name, sec, 100 * ((double)config->free_mem / CONFIG_DBCONFIG_SIZE));
 }
 
 /******************************************************************************
@@ -2208,9 +2217,6 @@ static int	DCconfig_get_normal_poller_items(unsigned char poller_type, unsigned 
 		if (NULL == (dc_host = DCget_dc_host(dc_item->hostid)))
 			continue;
 
-		if (0 != dc_host->proxy_hostid)
-			continue;
-
 		if (HOST_MAINTENANCE_STATUS_OFF != dc_host->maintenance_status ||
 				MAINTENANCE_TYPE_NORMAL != dc_host->maintenance_type)
 			continue;
@@ -2288,9 +2294,6 @@ static int	DCconfig_get_unreachable_poller_items(unsigned char poller_type, unsi
 		dc_host = &config->hosts[config->idxhost02[i]];
 		if (dc_host->poller_type != poller_type || dc_host->poller_num != poller_num)
 			break;
-
-		if (0 != dc_host->proxy_hostid)
-			continue;
 
 		if (HOST_MAINTENANCE_STATUS_OFF != dc_host->maintenance_status ||
 				MAINTENANCE_TYPE_NORMAL != dc_host->maintenance_type)
@@ -2467,9 +2470,6 @@ int	DCconfig_get_poller_nextcheck(unsigned char poller_type, unsigned char polle
 			continue;
 
 		if (NULL == (dc_host = DCget_dc_host(dc_item->hostid)))
-			continue;
-
-		if (0 != dc_host->proxy_hostid)
 			continue;
 
 		switch (dc_item->type) {
@@ -2669,8 +2669,9 @@ int	DCconfig_activate_host(DC_ITEM *item)
 	dc_poller_type = dc_host->poller_type;
 	dc_poller_num = dc_host->poller_num;
 
-	poller_by_host(dc_host->hostid, dc_host->errors_from || dc_host->snmp_errors_from ||
-			dc_host->ipmi_errors_from, &dc_host->poller_type, &dc_host->poller_num);
+	poller_by_host(dc_host->hostid, dc_host->proxy_hostid, dc_host->errors_from ||
+			dc_host->snmp_errors_from || dc_host->ipmi_errors_from,
+			&dc_host->poller_type, &dc_host->poller_num);
 
 	DCupdate_idxhost02(index, &dc_poller_type, &dc_poller_num,
 			&dc_host->poller_type, &dc_host->poller_num);
@@ -2754,14 +2755,15 @@ int	DCconfig_deactivate_host(DC_ITEM *item, int now)
 		}
 	}
 
-	dc_poller_type = dc_host->poller_type;
-	dc_poller_num = dc_host->poller_num;
+	poller_by_host(dc_host->hostid, dc_host->proxy_hostid, dc_host->errors_from ||
+			dc_host->snmp_errors_from || dc_host->ipmi_errors_from,
+			&dc_poller_type, &dc_poller_num);
 
-	poller_by_host(dc_host->hostid, dc_host->errors_from || dc_host->snmp_errors_from ||
-			dc_host->ipmi_errors_from, &dc_host->poller_type, &dc_host->poller_num);
+	DCupdate_idxhost02(index, &dc_host->poller_type, &dc_host->poller_num,
+			&dc_poller_type, &dc_poller_num);
 
-	DCupdate_idxhost02(index, &dc_poller_type, &dc_poller_num,
-			&dc_host->poller_type, &dc_host->poller_num);
+	dc_host->poller_type = dc_poller_type;
+	dc_host->poller_num = dc_poller_num;
 
 	res = SUCCEED;
 unlock:

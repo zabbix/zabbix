@@ -533,8 +533,7 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 
 	if (0 == txn_init && 0 == txn_level)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Query without transaction detected [%s]",
-			sql);
+		zabbix_log(LOG_LEVEL_DEBUG, "Query without transaction detected [%s]", sql);
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "Query [txnlev:%d] [%s]", txn_level, sql);
 #ifdef	HAVE_MYSQL
