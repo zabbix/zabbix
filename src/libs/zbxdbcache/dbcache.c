@@ -605,10 +605,11 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 	int		sql_offset = 0, i;
 	ZBX_DC_HISTORY	*h;
 	zbx_uint64_t	*ids = NULL;
-	int		ids_alloc = 1024, ids_num = 0;
+	int		ids_alloc, ids_num = 0;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In DCmass_update_item()");
 
+	ids_alloc = history_num;
 	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
 
 	for (i = 0; i < history_num; i++)
@@ -853,11 +854,12 @@ static void	DCmass_proxy_update_item(ZBX_DC_HISTORY *history, int history_num)
 {
 	int		sql_offset = 0, i, j;
 	zbx_uint64_t	*ids = NULL;
-	int		ids_alloc = 1024, ids_num = 0;
+	int		ids_alloc, ids_num = 0;
 	int		lastlogsize;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCmass_proxy_update_item()");
 
+	ids_alloc = history_num;
 	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
 
 	for (i = 0; i < history_num; i++)
