@@ -69,40 +69,6 @@ return new CJSscript('
 	</script>');
 }
 
-
-function get_dynamic_chart($dom_graph_id,$img_src,$width=0){
-	if(is_int($width) && $width > 0) $img_src.= url_param($width, false, 'width');
-	$result = new CJSscript('
-		<script language="JavaScript" type="text/javascript">
-		<!--
-		var width = "'.((!(is_int($width) && $width > 0)) ? $width : '').'";
-		var img_src = "'.$img_src.'";
-
-		A_SBOX["'.$dom_graph_id.'"] = new Object;
-		A_SBOX["'.$dom_graph_id.'"].shiftT = 17;
-		A_SBOX["'.$dom_graph_id.'"].shiftL = 10;
-
-		var ZBX_G_WIDTH;
-
-		if(width!=""){
-			if(window.innerWidth) ZBX_G_WIDTH=window.innerWidth;
-			else ZBX_G_WIDTH=document.body.clientWidth;
-
-			ZBX_G_WIDTH-= 80;
-
-			ZBX_G_WIDTH+= parseInt(width);
-			width = "&width=" + ZBX_G_WIDTH;
-		}
-		else{
-			ZBX_G_WIDTH = '.$width.';
-		}
-
-		document.write(\'<img src="\'+img_src + width +\'" alt="chart" id="'.$dom_graph_id.'" />\');
-		-->
-		</script>');
-return $result;
-}
-
 function inseret_javascript_for_editable_combobox(){
 	if(defined('EDITABLE_COMBOBOX_SCRIPT_INSERTTED')) return;
 	define('EDITABLE_COMBOBOX_SCRIPT_INSERTTED', 1);

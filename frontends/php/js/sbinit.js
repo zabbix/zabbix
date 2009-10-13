@@ -81,11 +81,12 @@ processObjects: function(){
 		
 		var obj = this.objectList[key];
 
-		if(!isset('width', obj.objDims) && isset('shiftXleft', obj.objDims) && isset('shiftXright', obj.objDims)){
+		if((!isset('width', obj.objDims) || (obj.objDims.width < 0)) && isset('shiftXleft', obj.objDims) && isset('shiftXright', obj.objDims)){
 			var g_width = get_bodywidth();	
 			if(!is_number(g_width)) g_width = 1000;
-
-			obj.objDims.width = g_width - (parseInt(obj.objDims.shiftXleft) + parseInt(obj.objDims.shiftXright) + 27);
+			
+			if(!isset('width', obj.objDims)) obj.objDims.width = 0;
+			obj.objDims.width += g_width - (parseInt(obj.objDims.shiftXleft) + parseInt(obj.objDims.shiftXright) + 27);
 		}
 		
 		if(isset('graphtype', obj.objDims) && (obj.objDims.graphtype < 2)){
@@ -123,13 +124,13 @@ addImage: function(objid){
 
 
 	if(obj.loadScroll){
-		this.scroll_listener = this.addScroll.bindAsEventListener(this, obj.domid);
-		addListener(g_img, 'load', this.scroll_listener);
+		obj.scroll_listener = this.addScroll.bindAsEventListener(this, obj.domid);
+		addListener(g_img, 'load', obj.scroll_listener);
 	}
 
 	if(obj.loadSBox){
-		this.sbox_listener = this.addSBox.bindAsEventListener(this, obj.domid);
-		addListener(g_img, 'load', this.sbox_listener);		
+		obj.sbox_listener = this.addSBox.bindAsEventListener(this, obj.domid);
+		addListener(g_img, 'load', obj.sbox_listener);
 
 		addListener(g_img, 'load', moveSBoxes);
 	}
@@ -143,7 +144,7 @@ addSBox: function(e, objid){
 	var obj = this.objectList[objid];
 
 	var g_img = $(obj.domid);
-	if(!is_null(g_img)) removeListener(g_img, 'load', this.sbox_listener);
+	if(!is_null(g_img)) removeListener(g_img, 'load', obj.sbox_listener);
 	
 	ZBX_SBOX[obj.domid] = new Object;
 	ZBX_SBOX[obj.domid].shiftT = 35;
@@ -162,7 +163,7 @@ addScroll: function(e, objid){
 	var obj = this.objectList[objid];
 //SDJ(this.objectList);
 	var g_img = $(obj.domid);
-	if(!is_null(g_img)) removeListener(g_img, 'load', this.scroll_listener);
+	if(!is_null(g_img)) removeListener(g_img, 'load', obj.scroll_listener);
 	
 	var g_width = null;
 	if(obj.scrollWidthByImage == 0){
@@ -181,39 +182,46 @@ addScroll: function(e, objid){
 
 objectUpdate: function(id, timelineid){
 	this.debug('objectUpdate', id);
-	
+
 	if(!isset(id, this.objectList)) throw('timeControl: Object is not declared "'+graphid+'"');
 	
 	var obj = this.objectList[id];
-	
-	if(isset(id, ZBX_SCROLLBARS)){
-		ZBX_SCROLLBARS[id].setBarPosition();
-		ZBX_SCROLLBARS[id].setGhostByBar();
-		ZBX_SCROLLBARS[id].setTabInfo();
-		if(!is_null($(obj.domid))) ZBX_SCROLLBARS[id].disabled = 1;
-	}
-	
-	
+		
 	var usertime = ZBX_TIMELINES[timelineid].usertime();
 	var period = ZBX_TIMELINES[timelineid].period();
 	
 	var date = datetoarray(usertime - period);
 	var url_stime = ''+date[2]+date[1]+date[0]+date[3]+date[4];
 	
-
 	if(obj.dynamic){
 		if(obj.mainObject){
 			for(var key in this.objectList){
 				if(empty(this.objectList[key])) continue;
+
 				if(this.objectList[key].dynamic){
 					this.objectList[key].timeline.period(period);
 					this.objectList[key].timeline.usertime(usertime);
 					this.loadDynamic(this.objectList[key].domid, url_stime, period);
+					
+					if(isset(key, ZBX_SCROLLBARS)){
+						ZBX_SCROLLBARS[key].setBarPosition();
+						ZBX_SCROLLBARS[key].setGhostByBar();
+						ZBX_SCROLLBARS[key].setTabInfo();
+						if(!is_null($(obj.domid))) ZBX_SCROLLBARS[key].disabled = 1;
+					}
 				}
 			}
 		}
 		else{
-			this.loadDynamic(obj.domid, url_stime, period);
+			this.loadDynamic(obj.domid, url_stime, period);zl
+			
+			if(isset(id, ZBX_SCROLLBARS)){
+				ZBX_SCROLLBARS[id].setBarPosition();
+				ZBX_SCROLLBARS[id].setGhostByBar();
+				ZBX_SCROLLBARS[id].setTabInfo();
+				if(!is_null($(obj.domid))) ZBX_SCROLLBARS[id].disabled = 1;
+			}
+
 		}
 	}
 	
