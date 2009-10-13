@@ -44,7 +44,7 @@
 					"(",new CLink("refresh now","http://".$_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"],"action"),")")));
 			$this->AddRow(S_NUMBER_OF_USERS_SHORT.": ".$status["users_count"]."(".$status["users_online"].")");
 			$this->AddRow(new CCol(array("Logged in as ", new CLink($USER_DETAILS["alias"],"profile.php","action"))));
-			$this->AddRow(new CCol(array(new CLink("ZABBIX server","http://www.zabbix.com","action")," is ",$server)),"status");
+			$this->AddRow(new CCol(array(new CLink("ZABBIX server","report1.php","action")," is ",$server)),"status");
 			//$this->AddRow(S_VALUES_STORED.": ".$status["history_count"]);
 			//$this->AddRow(S_TRENDS_STORED.": ".$status["trends_count"]);
 			$this->AddRow(new CCol(array(S_NUMBER_OF_HOSTS_SHORT.": ".$status["hosts_count"]."(",

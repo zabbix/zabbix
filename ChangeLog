@@ -1,5 +1,6 @@
 Changes for 1.6.7
 
+ - [ZBX-1078] changed link in server info screen element (Vedmak)
  - [ZBX-1076] fixed IT services periods (Vedmak)
  - [ZBX-1019] fixed stacked graph displays 0 value (Vedmak)
  - [ZBX-1040] fixed error when massupdate triggers with empty dependency (Vedmak)
