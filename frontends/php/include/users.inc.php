@@ -19,6 +19,15 @@
 **/
 ?>
 <?php
+	function get_user_detail($param){
+		global $USER_DETAILS;
+		
+		$result = null;
+		if(isset($USER_DETAILS[$param])) $result = $USER_DETAILS[$param];
+
+	return $USER_DETAILS[$param];
+	}
+
 	function user_type2str($user_type_int){
 		$str_user_type[USER_TYPE_ZABBIX_USER]	= S_ZABBIX_USER;
 		$str_user_type[USER_TYPE_ZABBIX_ADMIN]	= S_ZABBIX_ADMIN;

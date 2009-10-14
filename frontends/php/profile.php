@@ -41,12 +41,12 @@ include_once 'include/page_header.php';
 $fields=array(
 	'password1'=>		array(T_ZBX_STR, O_OPT,	null, null, 'isset({save})&&isset({form})&&({form}!="update")&&isset({change_password})'),
 	'password2'=>		array(T_ZBX_STR, O_OPT,	null, null, 'isset({save})&&isset({form})&&({form}!="update")&&isset({change_password})'),
-	'lang'=>		array(T_ZBX_STR, O_OPT,	null, NOT_EMPTY, 'isset({save})'),
-	'theme'=>		array(T_ZBX_STR, O_OPT,	null, NOT_EMPTY, 'isset({save})'),
+	'lang'=>			array(T_ZBX_STR, O_OPT,	null, NOT_EMPTY, 'isset({save})'),
+	'theme'=>			array(T_ZBX_STR, O_OPT,	null, NOT_EMPTY, 'isset({save})'),
 	'autologin'=>		array(T_ZBX_INT, O_OPT,	null, IN('0,1'), null),
 	'autologout'=>		array(T_ZBX_INT, O_OPT,	null, BETWEEN(90,10000), null),
-	'url'=>			array(T_ZBX_STR, O_OPT,	null, null, 'isset({save})'),
-	'refresh'=>		array(T_ZBX_INT, O_OPT,	null, BETWEEN(0,3600), 'isset({save})'),
+	'url'=>				array(T_ZBX_STR, O_OPT,	null, null, 'isset({save})'),
+	'refresh'=>			array(T_ZBX_INT, O_OPT,	null, BETWEEN(0,3600), 'isset({save})'),
 	'rows_per_page'=>	array(T_ZBX_INT, O_OPT,	null, BETWEEN(1,1000), 'isset({save})'),
 	'change_password'=>	array(T_ZBX_STR, O_OPT,	null, null, null),
 	'user_medias'=>		array(T_ZBX_STR, O_OPT,	null, NOT_EMPTY, null),
@@ -55,11 +55,11 @@ $fields=array(
 	'enable_media'=>	array(T_ZBX_INT, O_OPT,	null, null, null),
 	'disable_media'=>	array(T_ZBX_INT, O_OPT,	null, null, null),
 /* actions */
-	'save'=>		array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null, null),
-	'cancel'=>		array(T_ZBX_STR, O_OPT,	P_SYS, null, null),
+	'save'=>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null, null),
+	'cancel'=>			array(T_ZBX_STR, O_OPT,	P_SYS, null, null),
 	'del_user_media'=>	array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null, null),
 /* other */
-	'form'=>		array(T_ZBX_STR, O_OPT,	P_SYS, null, null),
+	'form'=>			array(T_ZBX_STR, O_OPT,	P_SYS, null, null),
 	'form_refresh'=>	array(T_ZBX_STR, O_OPT,	null, null, null)
 );
 

@@ -515,37 +515,37 @@ class CUser extends CZBXAPI{
 		}
 	}
 
-	/**
-	 * Update Users
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $users multidimensional array with Users data
-	 * @param string $users['userid']
-	 * @param string $users['name']
-	 * @param string $users['surname']
-	 * @param array $users['alias']
-	 * @param string $users['passwd']
-	 * @param string $users['url']
-	 * @param int $users['autologin']
-	 * @param int $users['autologout']
-	 * @param string $users['lang']
-	 * @param string $users['theme']
-	 * @param int $users['refresh']
-	 * @param int $users['rows_per_page']
-	 * @param int $users['type']
-	 * @param array $users['user_medias']
-	 * @param string $users['user_medias']['mediatypeid']
-	 * @param string $users['user_medias']['address']
-	 * @param int $users['user_medias']['severity']
-	 * @param int $users['user_medias']['active']
-	 * @param string $users['user_medias']['period']
-	 * @return boolean
-	 */
+/**
+ * Update Users
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $users multidimensional array with Users data
+ * @param string $users['userid']
+ * @param string $users['name']
+ * @param string $users['surname']
+ * @param array $users['alias']
+ * @param string $users['passwd']
+ * @param string $users['url']
+ * @param int $users['autologin']
+ * @param int $users['autologout']
+ * @param string $users['lang']
+ * @param string $users['theme']
+ * @param int $users['refresh']
+ * @param int $users['rows_per_page']
+ * @param int $users['type']
+ * @param array $users['user_medias']
+ * @param string $users['user_medias']['mediatypeid']
+ * @param string $users['user_medias']['address']
+ * @param int $users['user_medias']['severity']
+ * @param int $users['user_medias']['active']
+ * @param string $users['user_medias']['period']
+ * @return boolean
+ */
 	public static function update($users){
 		$result = false;
 		$error = 'Unknown ZABBIX internal error';
@@ -565,7 +565,7 @@ class CUser extends CZBXAPI{
 			$db_users = DBselect($sql);
 			while($db_user = DBfetch($db_users)){
 				if($db_user['userid'] != $userid){
-					$error = "User [ {$user['alias']} ] already exists";
+					$error = 'User [ '.$user['alias'].' ] already exists';
 					$result = false;
 					break;
 				}
@@ -603,12 +603,26 @@ class CUser extends CZBXAPI{
 			$result = DBexecute($sql);
 
 			if($result && !is_null($user['user_groups'])){
-				$result = DBexecute('DELETE FROM users_groups WHERE userid='.$userid);
-				foreach($user['user_groups'] as $groupid){
+				DBexecute('DELETE FROM users_groups WHERE userid='.$userid);
+
+				$user['user_groups'] = cusergroup::get(array('usrgrpids' => $user['user_groups'], 'extendoutput' => 1));
+				foreach($user['user_groups'] as $groupid => $group){
 					if(!$result) break;
+
+					if($group['gui_access'] == GROUP_GUI_ACCESS_DISABLED){
+						$error = 'User cannot restrict access to GUI to him self. Group "'.$group['name'].'"';
+						$result = false;
+						continue;
+					}
+
+					if($group['users_status'] == GROUP_STATUS_DISABLED){
+						$error = 'User cannot disable him self. Group "'.$group['name'].'"';
+						$result = false;
+						continue;
+					}
+
 					$users_groups_id = get_dbid('users_groups', 'id');
-					$result = DBexecute('INSERT INTO users_groups (id, usrgrpid, userid)'.
-						'values('.$users_groups_id.','.$groupid.','.$userid.')');
+					$result = DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES ('.$users_groups_id.','.$groupid.','.$userid.')');
 				}
 			}
 
@@ -618,9 +632,9 @@ class CUser extends CZBXAPI{
 					if(!$result) break;
 					$mediaid = get_dbid('media', 'mediaid');
 					$result = DBexecute('INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period)'.
-						' values ('.$mediaid.','.$userid.','.$media_data['mediatypeid'].','.
-						zbx_dbstr($media_data['sendto']).','.$media_data['active'].','.$media_data['severity'].','.
-						zbx_dbstr($media_data['period']).')');
+						' VALUES ('.$mediaid.','.$userid.','.$media_data['mediatypeid'].','.
+							zbx_dbstr($media_data['sendto']).','.$media_data['active'].','.$media_data['severity'].','.
+							zbx_dbstr($media_data['period']).')');
 				}
 			}
 
@@ -638,24 +652,24 @@ class CUser extends CZBXAPI{
 		}
 	}
 
-	/**
-	 * Add Medias for User
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param array $media_data
-	 * @param string $media_data['userid']
-	 * @param string $media_data['medias']['mediatypeid']
-	 * @param string $media_data['medias']['address']
-	 * @param int $media_data['medias']['severity']
-	 * @param int $media_data['medias']['active']
-	 * @param string $media_data['medias']['period']
-	 * @return boolean
-	 */
+/**
+ * Add Medias for User
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $media_data
+ * @param string $media_data['userid']
+ * @param string $media_data['medias']['mediatypeid']
+ * @param string $media_data['medias']['address']
+ * @param int $media_data['medias']['severity']
+ * @param int $media_data['medias']['active']
+ * @param string $media_data['medias']['period']
+ * @return boolean
+ */
 	public static function addMedia($media_data){
 		$result = true;
 		$mediaids = array();
@@ -676,20 +690,20 @@ class CUser extends CZBXAPI{
 		}
 	}
 
-	/**
-	 * Delete User Medias
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param array $media_data
-	 * @param string $media_data['userid']
-	 * @param array $media_data['mediaids']
-	 * @return boolean
-	 */
+/**
+ * Delete User Medias
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $media_data
+ * @param string $media_data['userid']
+ * @param array $media_data['mediaids']
+ * @return boolean
+ */
 	public static function deleteMedia($media_data){
 		$sql = 'DELETE FROM media WHERE userid='.$media_data['userid'].' AND '.DBcondition('mediaid', $media_data['mediaids']);
 		$result = DBexecute($sql);
@@ -703,26 +717,26 @@ class CUser extends CZBXAPI{
 		}
 	}
 
-	/**
-	 * Update Medias for User
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param array $media_data
-	 * @param string $media_data['userid']
-	 * @param array $media_data['medias']
-	 * @param array $media_data['medias']['mediaid']
-	 * @param string $media_data['medias']['mediatypeid']
-	 * @param string $media_data['medias']['sendto']
-	 * @param int $media_data['medias']['severity']
-	 * @param int $media_data['medias']['active']
-	 * @param string $media_data['medias']['period']
-	 * @return boolean
-	 */
+/**
+ * Update Medias for User
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $media_data
+ * @param string $media_data['userid']
+ * @param array $media_data['medias']
+ * @param array $media_data['medias']['mediaid']
+ * @param string $media_data['medias']['mediatypeid']
+ * @param string $media_data['medias']['sendto']
+ * @param int $media_data['medias']['severity']
+ * @param int $media_data['medias']['active']
+ * @param string $media_data['medias']['period']
+ * @return boolean
+ */
 	public static function updateMedia($media_data){
 		$result = false;
 		$userid = $media_data['userid'];
@@ -742,18 +756,18 @@ class CUser extends CZBXAPI{
 
 	}
 
-	/**
-	 * Delete Users
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param array $userids
-	 * @return boolean
-	 */
+/**
+ * Delete Users
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $userids
+ * @return boolean
+ */
 	public static function delete($userids){
 		global $USER_DETAILS;
 

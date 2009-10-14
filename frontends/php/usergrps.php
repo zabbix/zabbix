@@ -402,7 +402,7 @@ include_once('include/page_header.php');
 
 				$users_status = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED)
 					? new CLink(S_ENABLED, 'usergrps.php?go=disable_status&usrgrpid='.$usrgrpid, 'enabled')
-					: new CLink(S_DISABLED, 'usergrps.php?go=disable_debug&usrgrpid='.$usrgrpid, 'disabled');
+					: new CLink(S_DISABLED, 'usergrps.php?go=enable_status&usrgrpid='.$usrgrpid, 'disabled');
 			}
 			else{
 				$gui_access = new CSpan($gui_access, ($usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED)?'orange':'green');
