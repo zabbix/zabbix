@@ -114,11 +114,11 @@
 		}
 	return $calc_fnc;
 	}
-	
+
 	function getGraphDims($graphid){
 // ZOOM featers
 		$graphDims = array();
-		
+
 		$sql = 'SELECT MAX(g.graphtype) as graphtype, MIN(gi.yaxisside) as yaxissidel, MAX(gi.yaxisside) as yaxissider, MAX(g.height) as height'.
 				' FROM graphs g, graphs_items gi '.
 				' WHERE g.graphid='.$graphid.
@@ -129,7 +129,7 @@
 			$graphDims['graphHeight'] = $graph['height'];
 			$yaxis = $graph['yaxissider'];
 			$yaxis = ($graph['yaxissidel'] == $yaxis)?($yaxis):(2);
-			
+
 			$graphDims['yaxis'] = $yaxis;
 		}
 

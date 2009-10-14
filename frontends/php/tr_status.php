@@ -259,7 +259,7 @@ include_once('include/page_header.php');
 	if(EVENTS_OPTION_ONLYTRUE_NOTACK && $config['event_ack_enable']){
 		$ev_select->addItem(EVENTS_OPTION_ONLYTRUE_NOTACK, S_SHOW_PROBLEM_UNACKNOWLEDGED.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')');
 	}
-	
+
 	if(EVENTS_OPTION_EVENT_LAST && $config['event_ack_enable']){
 		$ev_select->addItem(EVENTS_OPTION_EVENT_LAST,S_SHOW_LAST);
 	}
@@ -537,7 +537,7 @@ include_once('include/page_header.php');
 
 			foreach($events as $eventid => $row_event){
 				$value = new CSpan(trigger_value2str($row_event['value']), get_trigger_value_style($row_event['value']));
-	
+
 				if($config['event_ack_enable']){
 					if($row_event['acknowledged'] == 1){
 						$acks_cnt = DBfetch(DBselect('SELECT COUNT(*) as cnt FROM acknowledges WHERE eventid='.$row_event['eventid']));
@@ -550,23 +550,23 @@ include_once('include/page_header.php');
 						$ack = new CLink(S_NOT_ACKNOWLEDGED, 'acknow.php?eventid='.$row_event['eventid'], 'on');
 					}
 				}
-	
+
 				$description = $trigger['desc'];
 //				expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock'=>$row_event['clock'])),ZBX_FLAG_EVENT);
-	
+
 				$font = new CTag('font','yes');
 				$font->setAttribute('color','#808080');
 				$font->addItem(array('&nbsp;-&nbsp;',$description));
 				$description = $font;
-	
+
 				$description = new CCol($description);
 				$description->setAttribute('style','white-space: normal; width: 90%;');
-	
+
 				$clock = new CLink(
 					zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),
 					'tr_events.php?triggerid='.$trigger['triggerid'].'&eventid='.$row_event['eventid']
 				);
-	
+
 				$table->addRow(array(
 					($config['event_ack_enable'])?(($row_event['acknowledged'] == 1)?(SPACE):(new CCheckBox('events['.$row_event['eventid'].']', 'no',NULL,$row_event['eventid']))):NULL,
 					new CCol(
@@ -580,9 +580,9 @@ include_once('include/page_header.php');
 					$description,
 					($config['event_ack_enable'])?(new CCol($ack,'center')):NULL,
 					new CLink(($trigger['comments'] == '') ? S_ADD : S_SHOW,'tr_comments.php?triggerid='.$trigger['triggerid'])
-				));	
+				));
 			}
-			
+
 		}
 		unset($trigger, $description, $actions);
 	}

@@ -21,7 +21,7 @@
 <?php
 
 class CZBXAPI{
-public static $error = array(); 
+public static $error = array();
 private static $transaction = array('counter' => 0);
 
 	protected static function BeginTransaction($caller = 'CZBXAPI'){
@@ -29,7 +29,7 @@ private static $transaction = array('counter' => 0);
 
 		if(!isset(self::$transaction[$caller])) self::$transaction[$caller] = 0;
 		self::$transaction[$caller]++;
-	
+
 //SDII(self::$transaction);
 		if(self::$transaction['counter'] > 0){
 			self::$transaction['counter']++;
@@ -47,58 +47,58 @@ private static $transaction = array('counter' => 0);
 		}
 
 //SDII(self::$transaction);
-	
+
 	return true;
 	}
 
 	protected static function EndTransaction($result = true, $caller = 'CZBXAPI'){
 		$result = $result;
-		
+
 		if(!isset(self::$transaction[$caller])){
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL,
 									'data' => 'Trying to end not started transaction from: '.$caller
 									);
 		}
 		else if((self::$transaction['owner'] == $caller) && (self::$transaction[$caller] == 1)){
 			if(self::$transaction['counter'] > 1){
-				self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 
+				self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL,
 										'data' => 'Ending transaction regardless to opened logical subtransactions: '.$caller
 										);
 			}
-			
+
 			unset(self::$transaction['owner']);
 			self::$transaction[$caller] = 0;
 			self::$transaction['counter'] = 0;
-			
+
 			$result = DBend($result);
 		}
 		else{
 			if(self::$transaction[$caller] > 0) self::$transaction[$caller]--;
-			else self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 
+			else self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL,
 										'data' => 'Attempt to close not started transaction from: '.$caller
 										);
-			
+
 			if(self::$transaction['counter'] > 0) self::$transaction['counter']--;
-			else self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 
+			else self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL,
 										'data' => 'Count of opened transaction is not equal to attempts to close them. Attemp from: '.$caller
 										);
 		}
-	
+
 	return $result;
 	}
 
 	public static function clearErrors(){
 		self::$error = array();
 	}
-	
+
 	public static function getErrorMessages(){
 		$return = array();
 		foreach(self::$error as $error){
-			$return[] = $error['data'];		
-		}		
+			$return[] = $error['data'];
+		}
 		return $return;
 	}
-	
+
 	public static function resetErrors(){
 		$errors = self::getErrorMessages();
 		self::clearErrors();

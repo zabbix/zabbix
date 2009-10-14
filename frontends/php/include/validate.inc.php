@@ -109,7 +109,7 @@
 		$full = "/^($pattern1)$|^($pattern2)$|^($pattern3)$|^($pattern4)$|^($pattern5)$|^($pattern6)$|^($pattern7)$|^($pattern8)$|^($pattern9)$|^($pattern10)$/";
 
 		if(!preg_match($full, $str)) return false;
-		
+
 	return true;
 	}
 
@@ -136,7 +136,7 @@
 			if(!preg_match('/^([0-9]{1,2})/$', $parts[1])) return false;
 
 			sscanf($parts[1], "%d", $mask);
-			
+
 			if( $mask > 32 ) return false;
 		}
 		else if( defined('ZBX_HAVE_IPV6') && validate_ipv6($parts[0], $arr) ){
@@ -174,7 +174,7 @@
 
 				sscanf($ip_parts[3], "%d", $from_value);
 				sscanf($parts[1], "%d", $to_value);
-				
+
 				if(($to_value > 255) || ($from_value > $to_value)) return false;
 			}
 		}
@@ -218,7 +218,7 @@
 		foreach(explode(',',$str) as $port_range){
 			$port_range = explode('-', $port_range);
 			if(count($port_range) > 2) return false;
-			
+
 			foreach($port_range as $port){
 				if( !is_numeric($port) || $port > 65535 || $port < 0 )
 					return false;

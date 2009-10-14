@@ -194,14 +194,14 @@ include_once('include/page_header.php');
 			access_deny();
 		}
 	}
-	
+
 	$hostid = get_request('hostid', 0);
 	if($hostid > 0){
 		$_REQUEST['filter_host'] = CHost::getById(array('hostid' => $hostid));
 		$_REQUEST['filter_host'] = $_REQUEST['filter_host']['host'];
 		$_REQUEST['filter_set'] = 1;
 	}
-	
+
 /* FILTER */
 	if(isset($_REQUEST['filter_set'])){
 		$_REQUEST['filter_group'] = get_request('filter_group');
@@ -221,7 +221,7 @@ include_once('include/page_header.php');
 		$_REQUEST['filter_status'] = get_request('filter_status');
 		$_REQUEST['filter_templated_items'] = get_request('filter_templated_items', -1);
 		$_REQUEST['filter_with_triggers'] = get_request('filter_with_triggers', -1);
-		
+
 		update_profile('web.items.filter_group', $_REQUEST['filter_group'], PROFILE_TYPE_STR);
 		update_profile('web.items.filter_host', $_REQUEST['filter_host'], PROFILE_TYPE_STR);
 		update_profile('web.items.filter_application', $_REQUEST['filter_application'], PROFILE_TYPE_STR);
@@ -259,12 +259,12 @@ include_once('include/page_header.php');
 		$_REQUEST['filter_templated_items'] = get_profile('web.items.filter_templated_items', -1);
 		$_REQUEST['filter_with_triggers'] = get_profile('web.items.filter_with_triggers', -1);
 	}
-	
+
 	if(isset($_REQUEST['filter_host']) && !zbx_empty($_REQUEST['filter_host'])){
 		$hostid = CHost::getId(array('host' => $_REQUEST['filter_host']));
 		$hostid = $hostid ? $hostid : 0;
 	}
-	
+
 	/* SUBFILTERS { --->>> */
 	$subfilters = array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status',
 		'subfilter_templated_items', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval', 'subfilter_history', 'subfilter_trends');
@@ -363,7 +363,7 @@ include_once('include/page_header.php');
 
 			$db_item = get_item_by_itemid_limited($_REQUEST['itemid']);
 			$db_item['applications'] = get_applications_by_itemid($_REQUEST['itemid']);
-			
+
 // sdii($item['applications']);
 // sdii($db_item['applications']);
 
@@ -1056,7 +1056,7 @@ include_once('include/page_header.php');
 		$items_wdgt->addItem($form);
 		$items_wdgt->show();
 	}
-	
+
 
 include_once('include/page_footer.php');
 ?>

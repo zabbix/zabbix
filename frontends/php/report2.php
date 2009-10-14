@@ -214,7 +214,7 @@ include_once 'include/page_header.php';
 				' AND t.triggerid=f.triggerid '.
 				' AND t.status='.TRIGGER_STATUS_ENABLED.
 				$sql_where.
-			' ORDER BY h.host, t.description';		
+			' ORDER BY h.host, t.description';
 		$result = DBselect($sql);
 
 		$table = new CTableInfo();

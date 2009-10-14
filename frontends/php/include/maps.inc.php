@@ -804,17 +804,17 @@
 				$y1++;
 				$y2++;
 			}
-			
+
 			imageline($image,$x1,$y1,$x2,$y2,$color);
 		}
 		else if($drawtype == MAP_LINK_DRAWTYPE_DASHED_LINE){
-			if(function_exists('imagesetstyle')){ 
+			if(function_exists('imagesetstyle')){
 /* Use imagesetstyle+imageline instead of bugged ImageDashedLine */
 				$style = array(
 					$color, $color, $color, $color,
 					IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT
 					);
-					
+
 				imagesetstyle($image, $style);
 				imageline($image,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
 			}

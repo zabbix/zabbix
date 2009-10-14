@@ -65,7 +65,7 @@ class CBar extends CGraphDraw{
 		$this->column = null;
 
 		$this->units = array(GRAPH_YAXIS_SIDE_LEFT=>'', GRAPH_YAXIS_SIDE_RIGHT=>'');	// Units for values
-		
+
 		$this->graphtheme = array(
 			'description' => 'default',
 			'frontendtheme' => 'default.css',
@@ -83,7 +83,7 @@ class CBar extends CGraphDraw{
 			'legendview' => '1',
 			'gridview' => '1'
 		);
-		
+
 		$this->applyGraphTheme();
 	}
 
@@ -122,7 +122,7 @@ class CBar extends CGraphDraw{
 			$this->graphtheme = $theme;
 		}
 	}
-	
+
 	public function drawHeader(){
 		$str=$this->header;
 		$fontnum = ($this->sizeX < 500)?2:4;

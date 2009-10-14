@@ -77,7 +77,7 @@ function get_profile($idx,$default_value=null,$idx2=0,$source=null,$nocache=fals
 
 		}
 	}
-	
+
 	if(isset($profiles[$idx]) && !empty($profiles[$idx])){
 		if(!is_null($source))
 			return $profiles[$idx][$source];
@@ -415,7 +415,7 @@ function add_user_history($page){
 	$sql = 'SELECT title5, url5
 			FROM user_history WHERE userid='.$userid;
 	$history5 = DBfetch(DBSelect($sql));
-	
+
 	if($history5 && ($history5['title5'] == $title)){ //title is same
 		if($history5['url5'] != $url){ // title same, url isnt, change only url
 			$sql = 'UPDATE user_history '.

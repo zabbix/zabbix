@@ -362,7 +362,7 @@
 
 			$table->addRow(array(date(S_DATE_FORMAT_YMDHMS,$row['clock']),	$pre));
 		}
-		
+
 	return $table;
 	}
 
@@ -922,7 +922,7 @@
 					$dom_graph_id = 'graph_'.$screenitemid.'_'.$resourceid;
 					$containerid = 'graph_cont_'.$screenitemid.'_'.$resourceid;
 					$graphDims = getGraphDims($resourceid);
-					
+
 					$graphDims['graphHeight'] = $height;
 					$graphDims['width'] = $width;
 
@@ -934,7 +934,7 @@
 						$graphid = $graph['graphid'];
 						$legend = $graph['legend'];
 						$graph3d = $graph['show3d'];
-					}					
+					}
 //-------------
 
 // Host feature
@@ -953,15 +953,15 @@
 						$url= make_url_from_graphid($resourceid,false).$url;
 					}
 //-------------
-					
+
 					if(($graphDims['graphtype'] == GRAPH_TYPE_PIE) || ($graphDims['graphtype'] == GRAPH_TYPE_EXPLODED)){
-						$src = 'chart6.php?graphid='.$resourceid.url_param('stime').'&period='.$effectiveperiod;			
+						$src = 'chart6.php?graphid='.$resourceid.url_param('stime').'&period='.$effectiveperiod;
 					}
 					else{
 						$src = 'chart2.php?graphid='.$resourceid.url_param('stime').'&period='.$effectiveperiod;
 					}
-					
-					
+
+
 					$objData = array(
 						'id' => $dom_graph_id,
 						'domid' => $dom_graph_id,
@@ -989,11 +989,11 @@
 							$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
 							$timeline['usertime'] += $timeline['period'];
 						}
-						
+
 						$src = $url.'&width='.$width.'&height='.$height.'&legend='.$legend.'&graph3d='.$graph3d;
-						
+
 						$objData['src'] = $src;
-						
+
 					}
 					else{
 						if(($dynamic==SCREEN_SIMPLE_ITEM) || empty($url)){
@@ -1002,7 +1002,7 @@
 						}
 
 						$src = $url.'&width='.$width.'&height='.$height.'&period='.$effectiveperiod.url_param('stime');
-						
+
 						$timeline = array();
 						if(!is_null($graphid) && ($editmode != 1)){
 							$timeline['period'] = $effectiveperiod;
@@ -1013,14 +1013,14 @@
 								$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
 								$timeline['usertime'] += $timeline['period'];
 							}
-									
+
 							$objData['loadSBox'] = 1;
 //							zbx_add_post_js('graph_zoom_init("'.$dom_graph_id.'",'.$stime.','.$effectiveperiod.','.$width.','.$height.', false);');
 						}
-						
+
 						$objData['src'] = $src;
 					}
-								
+
 					if($default){
 						$item = new CLink(null, $action);
 						$item->setAttribute('id', $containerid);
@@ -1029,7 +1029,7 @@
 						$item = new CDiv();
 						$item->setAttribute('id', $containerid);
 					}
-					
+
 //					zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 					insert_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 
@@ -1043,10 +1043,10 @@
 					$graphDims['graphHeight'] = 200;
 					$graphDims['shiftXleft'] = 100;
 					$graphDims['shiftXright'] = 50;
-					$graphDims['graphtype'] = 0;					
+					$graphDims['graphtype'] = 0;
 					$graphDims['graphHeight'] = $height;
 					$graphDims['width'] = $width;
-					
+
 					$objData = array(
 						'id' => $dom_graph_id,
 						'domid' => $dom_graph_id,
@@ -1068,10 +1068,10 @@
 						}
 					}
 //-------------
-					
+
 					$timeline = array();
 					$timeline['starttime'] = time() - ZBX_MAX_PERIOD;
-					
+
 					if(!zbx_empty($resourceid) && ($editmode != 1)){
 						$timeline['period'] = $effectiveperiod;
 
@@ -1080,7 +1080,7 @@
 							$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
 							$timeline['usertime'] += $timeline['period'];
 						}
-								
+
 						$objData['loadSBox'] = 1;
 					}
 
@@ -1091,9 +1091,9 @@
 
 					$item = new CLink(null, $action);
 					$item->setAttribute('id', $containerid);
-					
-//					zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');					
-					insert_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');					
+
+//					zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
+					insert_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_MAP) ){
 

@@ -333,7 +333,7 @@ include_once('include/page_header.php');
 		order_page_result($hosts_all, getPageSortField('host'), getPageSortOrder());
 		$paging = getPagingLine($hosts_all);
 //-------
-	
+
 		$count_chkbx = 0;
 		foreach($hosts_all as $hostid => $host){
 			$status = new CCol(host_status2str($host['status']), host_status2style($host['status']));
@@ -351,7 +351,7 @@ include_once('include/page_header.php');
 // get graph count
 			$graph_cnt = CGraph::get($params);
 			$graph_cnt = $graph_cnt['rowscount'];
-		
+
 			$template_cnt = ($template_cnt > 0)
 				? array(new CCheckBox('templates['.$hostid.']', (isset($hostids_templates[$hostid]) || !isset($update)), NULL, $hostid), $template_cnt)
 				: '-';

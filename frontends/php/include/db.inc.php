@@ -362,7 +362,7 @@ if(!isset($DB)){
 
 	return $result;
 	}
-	
+
 /* NOTE:
 	LIMIT and OFFSET records
 

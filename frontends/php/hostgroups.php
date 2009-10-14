@@ -176,7 +176,7 @@ include_once('include/page_header.php');
 	show_table_header(S_CONFIGURATION_OF_GROUPS, $frmForm);
 
 	echo SBR;
-	
+
 	if(isset($_REQUEST['form'])){
 		global $USER_DETAILS;
 
@@ -295,7 +295,7 @@ include_once('include/page_header.php');
 		));
 
 
-// sorting && paging		
+// sorting && paging
 		$options = array(
 			'editable' => 1,
 			'extendoutput' => 1,
@@ -304,12 +304,12 @@ include_once('include/page_header.php');
 			'limit' => ($config['search_limit']+1)
 		);
 		$groups = CHostGroup::get($options);
-		
+
 		$sortfield = getPageSortField('name');
 		$sortorder =  getPageSortOrder();
 		order_page_result($groups, $sortfield, $sortorder);
 		$paging = getPagingLine($groups);
-		
+
 		$options = array(
 			'groupids' => array_keys($groups),
 			'extendoutput' => 1,
@@ -395,6 +395,6 @@ include_once('include/page_header.php');
 		$groups_wdgt->addItem($form);
 		$groups_wdgt->show();
 	}
-	
+
 include_once('include/page_footer.php');
 ?>

@@ -55,7 +55,7 @@ include_once('include/page_header.php');
 		redirect($url->getUrl());
 		exit;
 	}
-	
+
 	if(!isset($_REQUEST['events']) && !isset($_REQUEST['eventid'])){
 		show_message(S_NO_EVENTS_TO_ACKNOWLEDGE);
 		include_once('include/page_footer.php');
@@ -103,9 +103,9 @@ include_once('include/page_header.php');
 		$event_trigger = reset($event['triggers']);
 		$event_acknowledged = $event['acknowledged'];
 	}
-	
+
 	if(isset($_REQUEST['save']) && !$bulk){
-	
+
 		$result = add_acknowledge_coment($event['eventid'], $USER_DETAILS['userid'], $_REQUEST['message']);
 		show_messages($result, S_EVENT_ACKNOWLEDGED, S_CANNOT_ACKNOWLEDGE_EVENT);
 
@@ -131,7 +131,7 @@ include_once('include/page_header.php');
 				' ['.($bulk) ? ' BULK ACKNOWLEDGE ' : (expand_trigger_description_by_data($event_trigger)).']'.
 				' ['.$_REQUEST['message'].']');
 		}
- 
+
 		$last_page = $USER_DETAILS['last_page'];
 
 		if(!$last_page){
@@ -151,7 +151,7 @@ include_once('include/page_header.php');
 	show_table_header(array(S_ALARM_ACKNOWLEDGES_BIG, ' : ', $msg));
 
 	echo SBR;
-	
+
 	if(!$bulk){
 		$table = new CTable(NULL, 'ack_msgs');
 		$table->setAlign('center');
@@ -211,6 +211,6 @@ include_once('include/page_header.php');
 
 	$frmMsg->Destroy();
 
-	
+
 include_once('include/page_footer.php');
 ?>

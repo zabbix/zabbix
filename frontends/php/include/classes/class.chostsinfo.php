@@ -92,11 +92,11 @@ class CHostsInfo extends CTable{
 		$node = get_node_by_nodeid($this->nodeid);
 		$header_str = S_HOSTS_INFO.SPACE;
 
-		
+
 		if($node > 0) $header_str.= '('.$node['name'].')'.SPACE;
-		
-		
-		
+
+
+
 		if(remove_nodes_from_id($this->groupid)>0){
 			$group = get_hostgroup_by_groupid($this->groupid);
 			$header_str.= S_GROUP.SPACE.'&quot;'.$group['name'].'&quot;';

@@ -449,7 +449,7 @@ function __autoload($class_name){
 
 		if(is_null($ZBX_MESSAGES))
 			$ZBX_MESSAGES = array();
-		
+
 		foreach($msgs as $msg){
 			array_push($ZBX_MESSAGES, array('type' => 'error', 'message' => $msg));
 		}
@@ -530,7 +530,7 @@ function __autoload($class_name){
 		foreach($periods as $preiod){
 //			if(!ereg('^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$', $preiod, $arr)) return NULL;
 			if(!preg_match('/^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$/', $preiod, $arr)) return NULL;
-			
+
 			for($i = $arr[1]; $i <= $arr[2]; $i++){
 				if(!isset($out[$i])) $out[$i] = array();
 				array_push($out[$i],
@@ -780,8 +780,8 @@ function __autoload($class_name){
 // users
 		$row=DBfetch(DBselect('SELECT COUNT(userid) as cnt FROM users'));
 		$status['users_count']=$row['cnt'];
-		
-		
+
+
 		$status['users_online'] = 0;
 		$sql = 'SELECT DISTINCT s.userid, MAX(s.lastaccess) as lastaccess, MAX(u.autologout) as autologout, s.status '.
 				' FROM sessions s, users u '.
@@ -794,8 +794,8 @@ function __autoload($class_name){
 			$online_time = (($user['autologout'] == 0) || (ZBX_USER_ONLINE_TIME<$user['autologout'])) ? ZBX_USER_ONLINE_TIME : $user['autologout'];
 			if(!is_null($user['lastaccess']) && (($user['lastaccess']+$online_time)>=time()) && (ZBX_SESSION_ACTIVE == $user['status'])) $status['users_online']++;
 		}
-		
-		
+
+
 		/* Comments: !!! Don't forget sync code with C !!! */
 		$result=DBselect('SELECT i.type, i.delay, count(*),count(*)/i.delay as qps '.
 							' FROM items i,hosts h '.
@@ -1229,16 +1229,16 @@ function __autoload($class_name){
 			$sort[$key] = $arr[$sortfield];
 		}
 		natcasesort($sort);
-		
+
 		if($sortorder != ZBX_SORT_UP)
 			$sort = array_reverse($sort, true);
-			
+
 		$tmp = $data;
 		$data = array();
 		foreach($sort as $key => $val){
 			$data[$key] = $tmp[$key];
 		}
-			
+
 /* 		if($preserve_keys == true){
 			$data = array_quicksort($data, $sortfield, $sortorder);
 			return true;

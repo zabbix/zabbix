@@ -115,7 +115,7 @@
 	}
 
 	function update_image($imageid,$name,$imagetype,$file){
-		if(is_null($file)){ 
+		if(is_null($file)){
 // only update parameters
 			return	DBexecute('UPDATE images '.
 							' SET name='.zbx_dbstr($name).',imagetype='.zbx_dbstr($imagetype).

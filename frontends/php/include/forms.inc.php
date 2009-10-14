@@ -5807,7 +5807,7 @@
 		$template_tbl = new CTableInfo(S_NO_TEMPLATES_LINKED, 'tablestripped');
 		$template_tbl->setOddRowClass('form_odd_row');
 		$template_tbl->setEvenRowClass('form_even_row');
-		
+
 		foreach($templates as $id => $temp_name){
 			$frmHost->addVar('templates['.$id.']',$temp_name);
 			$template_tbl->addRow(	array(
@@ -5849,7 +5849,7 @@
 		$profile_tbl = new CTable('', 'tablestripped');
 		$profile_tbl->setOddRowClass('form_odd_row');
 		$profile_tbl->setEvenRowClass('form_even_row');
-		
+
 		$profile_tbl->addRow(array(S_USE_PROFILE,new CCheckBox('useprofile',$useprofile,'submit()')));
 
 		if($useprofile == 'yes'){
@@ -7013,7 +7013,7 @@
 		$macros_tbl = new CTable('', 'tablestripped');
 		$macros_tbl->setOddRowClass('form_odd_row');
 		$macros_tbl->setEvenRowClass('form_even_row');
-		
+
 		foreach($macros as $macroid => $macro){
 			$macros_tbl->addItem(new CVar('macros['.$macro['macro'].']', $macro));
 			$macros_tbl->addRow(array(

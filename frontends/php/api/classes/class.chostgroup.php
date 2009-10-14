@@ -420,13 +420,13 @@ class CHostGroup extends CZBXAPI{
 	 * @return boolean
 	 */
 	public static function add($groups){
-	
+
 		$groupids = array();
 		$result = true;
-		
+
 		self::BeginTransaction(__METHOD__);
 		foreach($groups as $group){
-		
+
 			if(!is_string($group)){
 				$error = "HostGroup name must be a string [ $group ]";
 				$result = false;
@@ -448,11 +448,11 @@ class CHostGroup extends CZBXAPI{
 				$result = false;
 				break;
 			}
-			
+
 			$groupids[$groupid] = $groupid;
 		}
 		$result = self::EndTransaction($result, __METHOD__);
-		
+
 		if($result)
 			return $groupids;
 		else{
@@ -479,12 +479,12 @@ class CHostGroup extends CZBXAPI{
 	 * @return boolean
 	 */
 	public static function update($groups){
-		
+
 		$result = true;
-		
+
 		self::BeginTransaction(__METHOD__);
 		foreach($groups as $group){
-		
+
 			$group_exist = CHostGroup::getId(array('name' => $group['name']));
 			if($group_exist && ($group_exist != $group['name'])){
 				$error = "HostGroup [ $group ] already exists";
@@ -499,7 +499,7 @@ class CHostGroup extends CZBXAPI{
 				$result = false;
 				break;
 			}
-			
+
 		}
 		$result = self::EndTransaction($result, __METHOD__);
 
@@ -551,7 +551,7 @@ class CHostGroup extends CZBXAPI{
 
 		$result = true;
 		$error = 'Internal ZABBIX error';
-		
+
 		self::BeginTransaction(__METHOD__);
 		foreach($data['hostids'] as $hostid){
 			$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
@@ -564,7 +564,7 @@ class CHostGroup extends CZBXAPI{
 		}
 
 		$result = self::EndTransaction($result, __METHOD__);
-		
+
 		if($result)
 			return true;
 		else{
@@ -589,11 +589,11 @@ class CHostGroup extends CZBXAPI{
 	 * @return boolean
 	 */
 	public static function removeHosts($data){
-		self::BeginTransaction(__METHOD__);	
-		
+		self::BeginTransaction(__METHOD__);
+
 		$sql = 'DELETE FROM hosts_groups WHERE '.DBcondition('hostid', $data['hostids']).' AND '.DBcondition('groupid', $data['groupids']);
 		$result = DBexecute($sql);
-		
+
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)

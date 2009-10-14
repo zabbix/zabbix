@@ -158,7 +158,7 @@ include_once('include/page_header.php');
 			if(isset($_REQUEST['userid'])){
 				$action = AUDIT_ACTION_UPDATE;
 				$user['userid'] = $_REQUEST['userid'];
-				
+
 				DBstart();
 				$result = CUser::update(array($user));
 				$result = DBend($result);

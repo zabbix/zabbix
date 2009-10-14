@@ -132,9 +132,9 @@ require_once('include/httptest.inc.php');
 	function add_host_group($name, $hosts=array()){
 		$groupids = CHostGroup::add(array($name));
 		if(!$groupids) return $groupids;
-		
+
 		add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, reset($groupids), $name, 'groups', NULL, NULL);
-		
+
 		$groupid = reset($groupids);
 		info('Added host group ['.$name.']');
 		update_host_groups_by_groupid($groupid,$hosts);
@@ -1186,9 +1186,9 @@ return $result;
 function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sql=array()){
 	global $USER_DETAILS;
 	global $page;
-	
+
 	$userid = $USER_DETAILS['userid'];
-	
+
 	$def_sql = array(
 				'select' =>	array('h.hostid','h.host'),
 				'from' =>	array('hosts h'),
