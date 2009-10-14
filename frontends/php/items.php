@@ -188,6 +188,20 @@ include_once('include/page_header.php');
 	}
 //--------
 
+	if(isset($_REQUEST['hostid']) && $_REQUEST['hostid'] > 0){
+		$ah = CHost::get(array('hostids' => $_REQUEST['hostid'], 'editable' => 1, 'templated_hosts' => 1));
+		if(!$ah){
+			access_deny();
+		}
+	}
+	
+	$hostid = get_request('hostid', 0);
+	if($hostid > 0){
+		$_REQUEST['filter_host'] = CHost::getById(array('hostid' => $hostid));
+		$_REQUEST['filter_host'] = $_REQUEST['filter_host']['host'];
+		$_REQUEST['filter_set'] = 1;
+	}
+	
 /* FILTER */
 	if(isset($_REQUEST['filter_set'])){
 		$_REQUEST['filter_group'] = get_request('filter_group');
@@ -246,6 +260,10 @@ include_once('include/page_header.php');
 		$_REQUEST['filter_with_triggers'] = get_profile('web.items.filter_with_triggers', -1);
 	}
 	
+	if(isset($_REQUEST['filter_host']) && !zbx_empty($_REQUEST['filter_host'])){
+		$hostid = CHost::getId(array('host' => $_REQUEST['filter_host']));
+		$hostid = $hostid ? $hostid : 0;
+	}
 	
 	/* SUBFILTERS { --->>> */
 	$subfilters = array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status',
@@ -260,13 +278,6 @@ include_once('include/page_header.php');
 		}
 	}
 	/* --->>> } SUBFILTERS */
-
-	if(isset($_REQUEST['hostid']) && $_REQUEST['hostid'] > 0){
-		$ah = CHost::get(array('hostids' => $_REQUEST['hostid'], 'editable' => 1, 'templated_hosts' => 1));
-		if(!$ah){
-			access_deny();
-		}
-	}
 
 ?>
 <?php
@@ -694,20 +705,12 @@ include_once('include/page_header.php');
 
 ?>
 <?php
-	$hostid = get_request('form_hostid', get_request('hostid', 0));
-	if(!zbx_empty($_REQUEST['filter_host'])){
-		$hostid = CHost::getId(array('host' => $_REQUEST['filter_host']));
-		$hostid = $hostid ? $hostid : 0;
-	}
-	else if($hostid > 0){
-		$_REQUEST['filter_host'] = CHost::getById(array('hostid' => $hostid));
-		$_REQUEST['filter_host'] = $_REQUEST['filter_host']['host'];
-	}
 
 	$form = new CForm();
 	$form->setMethod('get');
 	$form->setName('hdrform');
-	$form->addVar('hostid', $hostid);
+	if(!isset($_REQUEST['form']))
+		$form->addVar('form_hostid', $hostid);
 
 // Config
 	$cmbConf = new CComboBox('config', 'items.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
@@ -818,7 +821,6 @@ include_once('include/page_header.php');
 
 		$form = new CForm();
 		$form->setName('items');
-		$form->addVar('hostid', $hostid);
 
 		$table  = new CTableInfo();
 // Table Header //
