@@ -298,7 +298,7 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, int now, char
 static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 {
 	char		sql[MAX_STRING_LEN], *error_esc, error_msg[MAX_STRING_LEN];
-	int		offset = 0, *errors_from, *disable_until; 
+	int		offset = 0, *errors_from, *disable_until;
 	unsigned char	*available;
 	const char	*fld_errors_from, *fld_available, *fld_disable_until, *type;
 
