@@ -332,7 +332,7 @@ include_once('include/page_header.php');
 			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))) access_deny();
 		}
 
-		
+
 		$clone_hostid = false;
 		if($_REQUEST['form'] == 'full_clone'){
 			$clone_hostid = $_REQUEST['hostid'];
@@ -341,16 +341,16 @@ include_once('include/page_header.php');
 
 // START SAVE TRANSACTION {{{
 		DBstart();
-		
+
 		if(isset($_REQUEST['hostid'])){
-		
-			$result = true;	
+
+			$result = true;
 			if(isset($_REQUEST['clear_templates'])){
 				foreach($_REQUEST['clear_templates'] as $id){
 					$result &= unlink_template($_REQUEST['hostid'], $id, false);
 				}
 			}
-			
+
 			if($result){
 				$result = update_host($_REQUEST['hostid'],
 					$_REQUEST['host'],$_REQUEST['port'],$_REQUEST['status'],$useip,$_REQUEST['dns'],
@@ -416,7 +416,7 @@ include_once('include/page_header.php');
 			if(isset($_REQUEST['hostid'])){
 				delete_host_profile($hostid);
 			}
-				
+
 			if(get_request('useprofile', 'no') == 'yes'){
 				$result = add_host_profile($hostid,
 					$_REQUEST['devicetype'],$_REQUEST['name'],$_REQUEST['os'],
@@ -431,7 +431,7 @@ include_once('include/page_header.php');
 			if(isset($_REQUEST['hostid'])){
 				delete_host_profile_ext($hostid);
 			}
-			
+
 			$ext_host_profiles = get_request('ext_host_profiles', array());
 			if((get_request('useprofile_ext', 'no') == 'yes') && !empty($ext_host_profiles)){
 				$result = add_host_profile_ext($hostid, $ext_host_profiles);
@@ -452,7 +452,7 @@ include_once('include/page_header.php');
 				$macrostoadd['macros'][] = $macro;
 			}
 			$result = CUserMacro::update($macrostoadd);
-			
+
 			if(!$result)
 				error('S_ERROR_ADDING_MACRO');
 		}
@@ -460,7 +460,7 @@ include_once('include/page_header.php');
 
 // }}} START SAVE TRANSACTION
 		$result	= DBend($result);
-		
+
 		show_messages($result, $msg_ok, $msg_fail);
 
 		if($result){
@@ -479,7 +479,7 @@ include_once('include/page_header.php');
 		$result = DBend($result);
 
 		show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
-		
+
 		if($result){
 			unset($_REQUEST['form']);
 			unset($_REQUEST['hostid']);
@@ -503,7 +503,7 @@ include_once('include/page_header.php');
 	else if($_REQUEST['go'] == 'delete'){
 		$hosts = get_request('hosts', array());
 		$del_hosts = array();
-		
+
 		$sql = 'SELECT host, hostid '.
 				' FROM hosts '.
 				' WHERE '.DBin_node('hostid').
@@ -523,11 +523,11 @@ include_once('include/page_header.php');
 	}
 // ACTIVATE/DISABLE HOSTS
 	else if(str_in_array($_REQUEST['go'], array('activate', 'disable'))){
-	
+
 		$status = ($_REQUEST['go'] == 'activate') ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
 		$hosts = get_request('hosts', array());
 		$act_hosts = array();
-		
+
 		$sql = 'SELECT host, hostid, status '.
 				' FROM hosts '.
 				' WHERE '.DBin_node('hostid').
@@ -538,7 +538,7 @@ include_once('include/page_header.php');
 		while($db_host = DBfetch($db_hosts)){
 			$act_hosts[$db_host['hostid']] = $db_host['hostid'];
 		}
-		
+
 		DBstart();
 		$result = update_host_status($act_hosts, $status);
 		$result = DBend($result);
@@ -559,7 +559,7 @@ include_once('include/page_header.php');
 
 	// $available_groups = $PAGE_GROUPS['groupids'];
 	// $available_hosts = $PAGE_HOSTS['hostids'];
-	
+
 	if(isset($_REQUEST['groupid'])){
 		$groupid_selected = $_REQUEST['groupid'];
 		update_profile('web.'.$page['menu'].'.groupid', $_REQUEST['groupid'], PROFILE_TYPE_ID);
@@ -667,9 +667,9 @@ include_once('include/page_header.php');
 		);
 		$hosts = CHost::get($options);
 		order_result($hosts, $sortfield, $sortorder);
-		
+
 		foreach($hosts as $host){
-			
+
 			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?groupid='.$groupid_selected.'&hostid='.$host['hostid']),
 				' ('.count($host['applications']).')');
 			$items = array(new CLink(S_ITEMS, 'items.php?filter_set=1&hostid='.$host['hostid']),
@@ -713,7 +713,7 @@ include_once('include/page_header.php');
 					$available = new CCol(S_UNKNOWN, 'unknown');
 				break;
 			}
-				
+
 			if(!zbx_empty($host['error'])){
 				$error = new CDiv(SPACE, 'iconerror');
 				$error->setHint($host['error'], '', 'on');

@@ -21,7 +21,7 @@
 <?php
 	function get_user_detail($param){
 		global $USER_DETAILS;
-		
+
 		$result = null;
 		if(isset($USER_DETAILS[$param])) $result = $USER_DETAILS[$param];
 

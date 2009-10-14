@@ -394,15 +394,15 @@ class zbxXML{
 	public static function import($rules, $file){
 
 		$result = true;
-		
+
 		libxml_use_internal_errors(true);
 		$xml = @simplexml_load_file($file);
-		
+
 		if(!$xml){
-		
+
 			foreach(libxml_get_errors() as $error){
 				$text = '';
-			
+
 				switch($error->level){
 					case LIBXML_ERR_WARNING:
 						$text .= "Warning $error->code: ";
@@ -414,11 +414,11 @@ class zbxXML{
 						$text .= "Fatal Error $error->code: ";
 					break;
 				}
-				
-				$text .= trim($error->message) . " [ Line: $error->line | Column: $error->column ]";					
+
+				$text .= trim($error->message) . " [ Line: $error->line | Column: $error->column ]";
 				error($text);
 			}
-			
+
 			libxml_clear_errors();
 			return false;
 		}
@@ -470,7 +470,7 @@ class zbxXML{
 							$host_groupids[] = $current_groupid;
 						}
 					}
-					
+
 					$new_groupids = CHostGroup::add($groups_to_add);
 					if($new_groupids === false){
 						error(CHostGroup::resetErrors());
@@ -676,7 +676,7 @@ class zbxXML{
 						$result = false;
 						break;
 					}
-					
+
 					$r = CTrigger::update($triggers_to_upd);
 					if($r === false){
 						error(CTrigger::resetErrors());
@@ -749,7 +749,7 @@ class zbxXML{
 							if($itemid){ // if item exists, add graph item to graph
 								$gitem_db['itemid'] = $itemid;
 								$graph_db['gitems'][$itemid] = $gitem_db;
-							}	
+							}
 						}
 
 						$graphs_to_add[] = $graph_db;
@@ -791,7 +791,7 @@ class zbxXML{
 					}
 				}
 			}
-			
+
 			if(!$result) return false;
 			else return true;
 		}

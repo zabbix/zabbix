@@ -35,14 +35,14 @@ require_once('include/forms.inc.php');
 		$groupids = CHostGroup::get(array('groupids' => $_REQUEST['groupid'], 'editable' => 1));
 		if(empty($groupids)) access_deny();
 	}
-	
+
 	//$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
 	$available_hosts = CTemplate::get(array('editable' => 1));
 	if((get_request('templateid', 0) > 0) && !isset($available_hosts[$_REQUEST['templateid']])) {
 		access_deny();
 	}
-	
-	
+
+
 //		VAR						TYPE		OPTIONAL FLAGS			VALIDATION	EXCEPTION
 	$fields=array(
 		'hosts'			=> array(T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID, 		NULL),
@@ -419,7 +419,7 @@ require_once('include/forms.inc.php');
 	else{
 		$_REQUEST['groupid'] = $groupid_selected = get_profile('web.'.$page['menu'].'.groupid');
 	}
-	
+
 	$frmForm = new CForm();
 	$frmForm->setMethod('get');
 	$cmbConf = new CComboBox('config', 'templates.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
@@ -728,7 +728,7 @@ require_once('include/forms.inc.php');
 			S_LINKED_TEMPLATES,
 			S_LINKED_TO
 		));
-		
+
 		//$config = select_config();
 // get templates
 		$options = array(
@@ -759,8 +759,8 @@ require_once('include/forms.inc.php');
 		);
 		$templates = CTemplate::get($options);
 		order_result($templates, $sortfield, $sortorder);
-//-----		
-		
+//-----
+
 		foreach($templates as $template){
 			$templates_output = array();
 			if($template['proxy_hostid']){

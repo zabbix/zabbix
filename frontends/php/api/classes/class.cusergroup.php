@@ -588,7 +588,7 @@ class CUserGroup extends CZBXAPI{
 			$result = delete_user_group($groupid);
 			if(!$resukt) break;
 		}
-		
+
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)

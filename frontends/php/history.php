@@ -264,7 +264,7 @@ include_once('include/page_header.php');
 		$dom_graph_id = 'graph';
 		$containerid = 'graph_cont1';
 		$src = 'chart.php?itemid='.$_REQUEST['itemid'];
-				
+
 		$table = new CTableInfo('...','chart');
 		$graph_cont = new CCol();
 		$graph_cont->setAttribute('id', $containerid);
@@ -507,10 +507,10 @@ COpt::profiling_start('history');
 						$row['value'] = '';
 				}
 
-				
+
 				if(isset($_REQUEST['plaintext'])){
 					if(str_in_array($item_type, array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))){
-						sscanf($row['value'], '%f', $value);					
+						sscanf($row['value'], '%f', $value);
 					}
 					else{
 						$value = $row['value'];
@@ -520,9 +520,9 @@ COpt::profiling_start('history');
 				}
 				else{
 					$new_row = array(date('Y.M.d H:i:s', $row['clock']));
-					
+
 					$value_numeric = str_in_array($item_type, array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64));
-					
+
 					if($row['valuemapid'] > 0){
 						$value = replace_value_by_map($row['value'], $row['valuemapid']);
 						$value_mapped = true;
@@ -531,7 +531,7 @@ COpt::profiling_start('history');
 						$value = $row['value'];
 						$value_mapped = false;
 					}
-					
+
 					if($value_numeric && !$value_mapped){
 						sscanf($row['value'], '%f', $value);
 					}
@@ -540,11 +540,11 @@ COpt::profiling_start('history');
 						$pre->addItem($value);
 						$value = $pre;
 					}
-					
+
 					array_push($new_row, $value);
-					
+
 					$table->ShowRow($new_row);
-				}	
+				}
 			}
 
 			if(!isset($_REQUEST['plaintext'])){
@@ -564,22 +564,22 @@ COpt::profiling_stop('history');
 			$graphDims['shiftXleft'] = 100;
 			$graphDims['shiftXright'] = 50;
 			$graphDims['graphtype'] = 0;
-	
-// NAV BAR	
-			$timeline = array(); 
+
+// NAV BAR
+			$timeline = array();
 			$timeline['period'] = $effectiveperiod;
 			$timeline['starttime'] = get_min_itemclock_by_itemid($_REQUEST['itemid']);
 			$timeline['usertime'] = null;
-	
+
 			if(isset($_REQUEST['stime'])){
 				$bstime = $_REQUEST['stime'];
 
 				$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
 				$timeline['usertime'] += $timeline['period'];
 			}
-			
+
 			$objData = array();
-			
+
 			if(isset($dom_graph_id)){
 				$objData['id'] = $dom_graph_id;
 				$objData['domid'] = $dom_graph_id;
@@ -590,7 +590,7 @@ COpt::profiling_stop('history');
 				$objData['loadImage'] = 1;
 				$objData['loadScroll'] = 1;
 				$objData['scrollWidthByImage'] = 1;
-				$objData['dynamic'] = 1;				
+				$objData['dynamic'] = 1;
 			}
 			else{
 				$dom_graph_id = 'graph';
@@ -604,7 +604,7 @@ COpt::profiling_stop('history');
 				$objData['mainObject'] = 1;
 			}
 
-						
+
 			zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 			zbx_add_post_js('timeControl.processObjects();');
 

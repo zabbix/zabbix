@@ -69,7 +69,7 @@ public static $result;
 		}
 
 		call_user_func(array('self', $resource), $action, $params);
-		
+
 		if(self::$result !== false)
 			self::$result = array('result' => self::$result);
 		else
@@ -87,7 +87,7 @@ public static $result;
 			default:
 			$result = call_user_func(array('CUser', $action), $params);
 		}
-		
+
 		self::$result = $result;
 	}
 
@@ -168,7 +168,7 @@ public static $result;
 
 		self::$result = $result;
 	}
-	
+
 // ACTION
 	private static function action($action, $params){
 
@@ -181,7 +181,7 @@ public static $result;
 
 		self::$result = $result;
 	}
-	
+
 // ALERT
 	private static function alert($action, $params){
 
@@ -194,7 +194,7 @@ public static $result;
 
 		self::$result = $result;
 	}
-	
+
 // APPLICATION
 	private static function application($action, $params){
 
@@ -207,7 +207,7 @@ public static $result;
 
 		self::$result = $result;
 	}
-	
+
 // EVENT
 	private static function event($action, $params){
 
@@ -246,7 +246,7 @@ public static $result;
 
 		self::$result = $result;
 	}
-	
+
 // MAP
 	private static function map($action, $params){
 
@@ -259,7 +259,7 @@ public static $result;
 
 		self::$result = $result;
 	}
-	
+
 // SCREEN
 	private static function screen($action, $params){
 
@@ -272,7 +272,7 @@ public static $result;
 
 		self::$result = $result;
 	}
-	
+
 // SCRIPT
 	private static function script($action, $params){
 
@@ -285,7 +285,7 @@ public static $result;
 
 		self::$result = $result;
 	}
-	
+
 // USERGROUP
 	private static function usergroup($action, $params){
 
@@ -298,7 +298,7 @@ public static $result;
 
 		self::$result = $result;
 	}
-	
+
 // USERMACRO
 	private static function usermacro($action, $params){
 

@@ -738,7 +738,7 @@ class CHost extends CZBXAPI{
 
 //		self::BeginTransaction(__METHOD__);
 		self::BeginTransaction(__METHOD__);
-		
+
 		foreach($hosts as $num => $host){
 
 			$host_db_fields = CHost::getById($host);
@@ -761,7 +761,7 @@ class CHost extends CZBXAPI{
 			if(!$result) break;
 			$hostids[$result] = $result;
 		}
-		
+
 //		$result = DBend($result);
 		$result = self::EndTransaction($result, __METHOD__);
 

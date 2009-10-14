@@ -223,11 +223,11 @@ include_once('include/page_header.php');
 		$_REQUEST['elementid'] = $elementid;
 
 		if( 2 != $_REQUEST['fullscreen'] ){
-// NAV BAR	
-			$timeline = array(); 
+// NAV BAR
+			$timeline = array();
 			$timeline['period'] = $effectiveperiod;
 			$timeline['starttime'] = time() - ZBX_MAX_PERIOD;
-	
+
 			if(isset($_REQUEST['stime'])){
 				$bstime = $_REQUEST['stime'];
 				$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
@@ -245,7 +245,7 @@ include_once('include/page_header.php');
 				'dynamic' => 0,
 				'mainObject' => 1
 			);
-						
+
 			zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 			zbx_add_post_js('timeControl.processObjects();');
 		}

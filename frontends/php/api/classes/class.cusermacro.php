@@ -534,7 +534,7 @@ class CUserMacro extends CZBXAPI{
 			if(!$result) break;
 		}
 
-//		$result = self::EndTransaction($result, __METHOD__);		
+//		$result = self::EndTransaction($result, __METHOD__);
 		$result = self::EndTransaction($result);
 
 		if($result)

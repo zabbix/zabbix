@@ -58,7 +58,7 @@ class CChart extends CGraphDraw{
 
 		$this->zero = array();
 		$this->graphOrientation = array(
-				GRAPH_YAXIS_SIDE_LEFT=>'', 
+				GRAPH_YAXIS_SIDE_LEFT=>'',
 				GRAPH_YAXIS_SIDE_RIGHT=>''
 			);
 
@@ -66,7 +66,7 @@ class CChart extends CGraphDraw{
 
 		$this->gridLinesCount = array();	// How many grids to draw
 		$this->gridPixels = 25;				// optimal grid size
-		$this->gridPixelsVert = 40;			// 
+		$this->gridPixelsVert = 40;			//
 
 		$this->graphtheme = array(
 			'description' => 'default',
@@ -254,7 +254,7 @@ class CChart extends CGraphDraw{
 			$real_item = get_item_by_itemid($this->items[$i]['itemid']);
 			if(is_null($this->itemsHost)) $this->itemsHost = $real_item['hostid'];
 			else if($this->itemsHost != $real_item['hostid']) $this->itemsHost = false;
-			
+
 
 			if(!isset($this->axis_valuetype[$this->items[$i]['axisside']])){
 				$this->axis_valuetype[$this->items[$i]['axisside']] = $real_item['value_type'];
@@ -721,12 +721,12 @@ class CChart extends CGraphDraw{
 		}
 	return $maxY;
 	}
-	
+
 	protected function calcZero(){
 		$left = GRAPH_YAXIS_SIDE_LEFT;
 		$right = GRAPH_YAXIS_SIDE_RIGHT;
 		$sides = array(GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT);
-		
+
 		foreach($sides as $num => $side){
 			$this->unit2px[$side] = ($this->m_maxY[$side] - $this->m_minY[$side])/$this->sizeY;
 			if($this->unit2px[$side] == 0) $this->unit2px[$side] = 1;
@@ -761,7 +761,7 @@ class CChart extends CGraphDraw{
 
 // SIDES
 		$side = GRAPH_YAXIS_SIDE_LEFT;
-		$other_side = GRAPH_YAXIS_SIDE_RIGHT;		
+		$other_side = GRAPH_YAXIS_SIDE_RIGHT;
 		if(!isset($this->axis_valuetype[GRAPH_YAXIS_SIDE_LEFT])){
 			$side = GRAPH_YAXIS_SIDE_RIGHT;
 			$other_side = GRAPH_YAXIS_SIDE_LEFT;
@@ -797,9 +797,9 @@ class CChart extends CGraphDraw{
 // division by zero
 		$diff_val = ($this->m_maxY[$side] - $this->m_minY[$side]);
 		if($diff_val == 0) $diff_val = 1;
-		
+
 		$intervalX = ($interval * $this->sizeY) / $diff_val;
-		
+
 		if(isset($this->axis_valuetype[$other_side])){
 			$dist = ($this->m_maxY[$other_side] - $this->m_minY[$other_side]);
 			$interval = 0;
@@ -809,22 +809,22 @@ class CChart extends CGraphDraw{
 					break;
 				}
 			}
-			
+
 // correctin MIN & MAX
 			$this->m_minY[$other_side] = floor($this->m_minY[$other_side] / $interval) * $interval;
-			$this->m_maxY[$other_side] = ceil($this->m_maxY[$other_side] / $interval) * $interval;			
+			$this->m_maxY[$other_side] = ceil($this->m_maxY[$other_side] / $interval) * $interval;
 //--------------------
 
 			$this->gridLinesCount[$other_side] = $this->gridLinesCount[$side];
 			$this->m_maxY[$other_side] = $this->m_minY[$other_side] + $interval * $this->gridLinesCount[$other_side];
-			
+
 //SDI($this->m_minY[$other_side].' - '.$this->m_maxY[$other_side].' : '.$interval);
 		}
-		
+
 		$sides = array(GRAPH_YAXIS_SIDE_LEFT,GRAPH_YAXIS_SIDE_RIGHT);
 		foreach($sides as $side){
 			if(!isset($this->axis_valuetype[$side])) continue;
-			
+
 			if($this->ymax_type == GRAPH_YAXIS_TYPE_FIXED){
 				$this->m_maxY[$side] = $this->yaxismax;
 			}
@@ -1104,7 +1104,7 @@ class CChart extends CGraphDraw{
 
 			if(($interval == 86400) && date('N',$new_time) == 1) continue;
 // if we step to main_time
-			else if(($i*$interval % $main_interval + $offset) == $main_offset) continue;			
+			else if(($i*$interval % $main_interval + $offset) == $main_offset) continue;
 /*
 SDI(($i*$interval % $main_interval + $offset).' == '.$main_offset);
 SDI(($interval*$i+$offset).' : '.$interval.' - '.$main_interval);
@@ -1232,7 +1232,7 @@ SDI('======================================');
 			}
 
 			$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_LEFT];
-			for($i=0; $i<=$hstr_count; $i++){			
+			for($i=0; $i<=$hstr_count; $i++){
 // division by zero
 				$hstr_count = ($hstr_count == 0)?1:$hstr_count;
 
@@ -1455,10 +1455,10 @@ SDI('======================================');
 					$units['left'] = $this->items[$i]['units'];
 				else
 					$units['right'] = $this->items[$i]['units'];
-				
+
 				if($this->itemsHost) $item_caption = $this->items[$i]['description'];
 				else $item_caption = $this->items[$i]['host'].': '.$this->items[$i]['description'];
-				
+
 				$legend->addCell($colNum, array('text' => $item_caption));
 				$legend->addCell($colNum, array('text' => '['.$fnc_name.']'));
 				$legend->addCell($colNum, array('text' => convert_units($this->getLastValue($i),$this->items[$i]['units']), 'align'=> 2));
@@ -1707,10 +1707,10 @@ SDI('======================================');
 				}
 				break;
 			case GRAPH_ITEM_DRAWTYPE_GRADIENT_LINE:
-				
+
 				ImageLine($this->im, $x1, $y1, $x2, $y2, $avg_color);  //draw the initial line
 				ImageLine($this->im, $x1, $y1-1, $x2, $y2-1, $avg_color);
-				
+
 				$bitmask = 255;
 				$blue = $avg_color&$bitmask;
 				// $blue_diff = 255 - $blue;
@@ -1720,19 +1720,19 @@ SDI('======================================');
 				$bitmask = $bitmask<<8;
 				$red = ($avg_color&$bitmask)>>16;
 				// $red_diff = 255 - $red;
-				
+
 				$maxAlpha = 110;
 				$startAlpha = 50;
 				$alphaRatio = $maxAlpha / ($this->sizeY - $startAlpha);
-	
+
 				$diffX = $x1 - $x2;
 //sdi('x1: '.$x1.'  x2: '.$x2);
-				for($i=0; $i<=$diffX; $i++){				
+				for($i=0; $i<=$diffX; $i++){
 					$Yincr = ($diffX > 0)?(abs($y2 - $y1) / $diffX):0;
 
 					$gy = ($y1 > $y2) ? ($y2 + $Yincr*$i) : ($y2 - $Yincr*$i);
 					$steps = $this->sizeY + $this->shiftY - $gy + 1;
-					
+
 					for($j=0; $j<$steps; $j++){
 						if(($gy + $j) < ($this->shiftY + $startAlpha)){
 							$alpha = 0;
@@ -1740,7 +1740,7 @@ SDI('======================================');
 						else{
 							$alpha = 127 - abs(127 - ($alphaRatio * ($gy + $j - $this->shiftY - $startAlpha)));
 						}
-						
+
 						$color = imagecolorexactalpha($this->im, $red, $green, $blue, $alpha);
 						imagesetpixel($this->im, $x2 + $i, $gy + $j, $color);
 					}
@@ -1767,7 +1767,7 @@ SDI('======================================');
 			if($this->graphOrientation[GRAPH_YAXIS_SIDE_LEFT] == '-') $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] = 0;
 			else $this->m_minY[GRAPH_YAXIS_SIDE_LEFT] = 0;
 		}
-		
+
 		if($this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] == $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT]){
 			if($this->graphOrientation[GRAPH_YAXIS_SIDE_RIGHT] == '-') $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] = 0;
 			else $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] = 0;
@@ -1913,7 +1913,7 @@ SDI('======================================');
 
 //debug info
 //		show_messages();
-		
+
 		ImageOut($this->im);
 	}
 }

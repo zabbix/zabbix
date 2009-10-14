@@ -109,7 +109,7 @@ include_once('include/page_header.php');
 
 	$source = get_request('source', EVENT_SOURCE_TRIGGERS);
 	update_profile('web.events.source',$source, PROFILE_TYPE_INT);
-	
+
 ?>
 <?php
 	$source = get_request('source', EVENT_SOURCE_TRIGGERS);
