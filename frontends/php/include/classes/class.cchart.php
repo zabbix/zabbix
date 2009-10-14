@@ -329,12 +329,20 @@ class CChart extends CGraphDraw{
 				$this->items[$i]['delay'] = max($this->items[$i]['delay'],3600);
 			}
 //SDI($sql_arr);
+
+			if(!isset($this->data[$this->items[$i]['itemid']]))
+				$this->data[$this->items[$i]['itemid']] = array();
+
+			if(!isset($this->data[$this->items[$i]['itemid']][$type]))
+				$this->data[$this->items[$i]['itemid']][$type] = array();
+
 			$curr_data = &$this->data[$this->items[$i]['itemid']][$type];
-			$curr_data->count = NULL;
-			$curr_data->min = NULL;
-			$curr_data->max = NULL;
-			$curr_data->avg = NULL;
-			$curr_data->clock = NULL;
+
+			$curr_data['count'] = NULL;
+			$curr_data['min'] = NULL;
+			$curr_data['max'] = NULL;
+			$curr_data['avg'] = NULL;
+			$curr_data['clock'] = NULL;
 
 			foreach($sql_arr as $sql){
 				$result=DBselect($sql);
@@ -350,17 +358,18 @@ class CChart extends CGraphDraw{
 	but now we've got the first point.
 --------------------------------------------------*/
 
-					$curr_data->count[$idx]	= $row['count'];
-					$curr_data->min[$idx]	= $row['min'];
-					$curr_data->max[$idx]	= $row['max'];
-					$curr_data->avg[$idx]	= $row['avg'];
-					$curr_data->clock[$idx]	= $row['clock'];
-					$curr_data->shift_min[$idx] = 0;
-					$curr_data->shift_max[$idx] = 0;
-					$curr_data->shift_avg[$idx] = 0;
+					$curr_data['count'][$idx]	= $row['count'];
+					$curr_data['min'][$idx]	= $row['min'];
+					$curr_data['max'][$idx]	= $row['max'];
+					$curr_data['avg'][$idx]	= $row['avg'];
+					$curr_data['clock'][$idx]	= $row['clock'];
+					$curr_data['shift_min'][$idx] = 0;
+					$curr_data['shift_max'][$idx] = 0;
+					$curr_data['shift_avg'][$idx] = 0;
 				}
-				
-				$this->setGraphOrientation(min($curr_data->min), $this->items[$i]['axisside']);
+
+				$loc_min = is_array($curr_data['min'])?min($curr_data['min']):null;
+				$this->setGraphOrientation($loc_min, $this->items[$i]['axisside']);
 				unset($row);
 			}
 			/* calculate missed points */
@@ -373,11 +382,11 @@ class CChart extends CGraphDraw{
 			//*/
 
 			for($ci = 0, $cj=0; $ci < $this->sizeX; $ci++){
-				if(!isset($curr_data->count[$ci]) || $curr_data->count[$ci] == 0){
-					$curr_data->count[$ci] = 0;
-					$curr_data->shift_min[$ci] = 0;
-					$curr_data->shift_max[$ci] = 0;
-					$curr_data->shift_avg[$ci] = 0;
+				if(!isset($curr_data['count'][$ci]) || $curr_data['count'][$ci] == 0){
+					$curr_data['count'][$ci] = 0;
+					$curr_data['shift_min'][$ci] = 0;
+					$curr_data['shift_max'][$ci] = 0;
+					$curr_data['shift_avg'][$ci] = 0;
 					$cj++;
 				}
 				else if($cj > 0){
@@ -389,11 +398,11 @@ class CChart extends CGraphDraw{
 
 					for(;$cj > 0; $cj--){
 						if(($dx < ($this->sizeX/20)) && ($this->type == GRAPH_TYPE_STACKED)){
-							$curr_data->count[$ci - ($dx - $cj)] = 1;
+							$curr_data['count'][$ci - ($dx - $cj)] = 1;
 						}
 
 						foreach(array('clock','min','max','avg') as $var_name){
-							$var = &$curr_data->$var_name;
+							$var = &$curr_data[$var_name];
 
 							if($first_idx == $ci && $var_name == 'clock'){
 								$var[$ci - ($dx - $cj)] = $var[$first_idx] - (($p / $this->sizeX) * ($dx - $cj));
@@ -415,10 +424,10 @@ class CChart extends CGraphDraw{
 				for(;$cj > 0; $cj--){
 
 //					if($dx < ($this->sizeX/20))			//($this->type == GRAPH_TYPE_STACKED)
-//						$curr_data->count[$first_idx + ($dx - $cj)] = 1;
+//						$curr_data['count'][$first_idx + ($dx - $cj)] = 1;
 
 					foreach(array('clock','min','max','avg') as $var_name){
-						$var = &$curr_data->$var_name;
+						$var = &$curr_data[$var_name];
 
 						if( $var_name == 'clock'){
 							$var[$first_idx + ($dx - $cj)] = $var[$first_idx] + (($p / $this->sizeX) * ($dx - $cj));
@@ -449,10 +458,10 @@ class CChart extends CGraphDraw{
 					for($ci = 0; $ci < $this->sizeX; $ci++){
 						foreach(array('min','max','avg') as $var_name){
 							$shift_var_name	= 'shift_'.$var_name;
-							$curr_shift	= &$curr_data->$shift_var_name;
-							$curr_var	= &$curr_data->$var_name;
-							$prev_shift	= &$prev_data->$shift_var_name;
-							$prev_var	= &$prev_data->$var_name;
+							$curr_shift	= &$curr_data[$shift_var_name];
+							$curr_var	= &$curr_data[$var_name];
+							$prev_shift	= &$prev_data[$shift_var_name];
+							$prev_var	= &$prev_data[$var_name];
 							$curr_shift[$ci] = $prev_var[$ci] + $prev_shift[$ci];
 						}
 					}
@@ -538,11 +547,11 @@ class CChart extends CGraphDraw{
 			if(!isset($data))	continue;
 // For each X
 			for($i = 0; $i < $maxX; $i++){  // new point
-				if(($data->count[$i] == 0) && ($i != ($maxX-1))) continue;
+				if(($data['count'][$i] == 0) && ($i != ($maxX-1))) continue;
 
-				$min = $data->min[$i];
-				$max = $data->max[$i];
-				$avg = $data->avg[$i];
+				$min = $data['min'][$i];
+				$max = $data['max'][$i];
+				$avg = $data['avg'][$i];
 
 				switch($this->items[$item]['calc_fnc']){
 					case CALC_FNC_MAX:
@@ -580,20 +589,18 @@ class CChart extends CGraphDraw{
 
 // Calculation of minimum Y axis
 	protected function calculateMinY($side){
-		if($this->ymin_type==GRAPH_YAXIS_TYPE_FIXED){
+		if($this->ymin_type == GRAPH_YAXIS_TYPE_FIXED){
 			return $this->yaxismin;
 		}
-		else if($this->ymin_type==GRAPH_YAXIS_TYPE_ITEM_VALUE){
+		else if($this->ymin_type == GRAPH_YAXIS_TYPE_ITEM_VALUE){
 			$item = get_item_by_itemid($this->ymin_itemid);
 			if($item && isset($item['lastvalue']) && !is_null($item['lastvalue']))
 				return $item['lastvalue'];
 		}
 
-		unset($minY);
-		for($i=0;$i<$this->num;$i++){
-
-			if($this->items[$i]['axisside'] != $side)
-				continue;
+		$minY = null;
+		for($i=0; $i<$this->num; $i++){
+			if($this->items[$i]['axisside'] != $side) continue;
 
 			foreach(array(GRAPH_ITEM_SIMPLE, GRAPH_ITEM_AGGREGATED) as $type){
 
@@ -612,17 +619,17 @@ class CChart extends CGraphDraw{
 				switch($calc_fnc){
 					case CALC_FNC_ALL:	/* use min */
 					case CALC_FNC_MIN:
-						$val = $data->min;
-						$shift_val = $data->shift_min;
+						$val = $data['min'];
+						$shift_val = $data['shift_min'];
 						break;
 					case CALC_FNC_MAX:
-						$val = $data->max;
-						$shift_val = $data->shift_max;
+						$val = $data['max'];
+						$shift_val = $data['shift_max'];
 						break;
 					case CALC_FNC_AVG:
 					default:
-						$val = $data->avg;
-						$shift_val = $data->shift_avg;
+						$val = $data['avg'];
+						$shift_val = $data['shift_avg'];
 				}
 
 				if(!isset($val)) continue;
@@ -663,7 +670,7 @@ class CChart extends CGraphDraw{
 			}
 		}
 
-		unset($maxY);
+		$maxY = null;
 		for($i=0;$i<$this->num;$i++){
 			if($this->items[$i]['axisside'] != $side)
 				continue;
@@ -684,17 +691,17 @@ class CChart extends CGraphDraw{
 				switch($calc_fnc){
 					case CALC_FNC_ALL:	/* use max */
 					case CALC_FNC_MAX:
-						$val = $data->max;
-						$shift_val = $data->shift_max;
+						$val = $data['max'];
+						$shift_val = $data['shift_max'];
 						break;
 					case CALC_FNC_MIN:
-						$val = $data->min;
-						$shift_val = $data->shift_min;
+						$val = $data['min'];
+						$shift_val = $data['shift_min'];
 						break;
 					case CALC_FNC_AVG:
 					default:
-						$val = $data->avg;
-						$shift_val = $data->shift_avg;
+						$val = $data['avg'];
+						$shift_val = $data['shift_avg'];
 				}
 
 				if(!isset($val)) continue;
@@ -722,6 +729,7 @@ class CChart extends CGraphDraw{
 		
 		foreach($sides as $num => $side){
 			$this->unit2px[$side] = ($this->m_maxY[$side] - $this->m_minY[$side])/$this->sizeY;
+			if($this->unit2px[$side] == 0) $this->unit2px[$side] = 1;
 
 			if($this->m_minY[$side]>0){
 				$this->zero[$side] = $this->sizeY+$this->shiftY;
@@ -783,9 +791,14 @@ class CChart extends CGraphDraw{
 
 //SDI($this->m_minY[$side].' - '.$this->m_maxY[$side].' : '.$interval);
 
-		$this->gridLinesCount[$side] = floor(($this->m_maxY[$side] - $this->m_minY[$side]) / $interval);
+		$this->gridLinesCount[$side] = ceil(($this->m_maxY[$side] - $this->m_minY[$side]) / $interval);
 		$this->m_maxY[$side] = $this->m_minY[$side] + $interval * $this->gridLinesCount[$side];
-		$intervalX = ($interval * $this->sizeY) / ($this->m_maxY[$side] - $this->m_minY[$side]);
+
+// division by zero
+		$diff_val = ($this->m_maxY[$side] - $this->m_minY[$side]);
+		if($diff_val == 0) $diff_val = 1;
+		
+		$intervalX = ($interval * $this->sizeY) / $diff_val;
 		
 		if(isset($this->axis_valuetype[$other_side])){
 			$dist = ($this->m_maxY[$other_side] - $this->m_minY[$other_side]);
@@ -807,64 +820,11 @@ class CChart extends CGraphDraw{
 			
 //SDI($this->m_minY[$other_side].' - '.$this->m_maxY[$other_side].' : '.$interval);
 		}
-	}
-
-	protected function correctMinMax(){
-
+		
 		$sides = array(GRAPH_YAXIS_SIDE_LEFT,GRAPH_YAXIS_SIDE_RIGHT);
 		foreach($sides as $side){
-//SDI($side);
 			if(!isset($this->axis_valuetype[$side])) continue;
-
-			$tmp_maxY = $this->m_maxY[$side];
-			$tmp_minY = $this->m_minY[$side];
-
-			$this->m_maxY[$side] = ceil($this->m_maxY[$side]);
-			$this->m_minY[$side] = floor($this->m_minY[$side]);
-
-// gridLines
-			$this->gridLinesCount[$side] = round($this->sizeY/$this->gridPixels);
-			$diff = abs($this->m_minY[$side] - $this->m_maxY[$side]);
-			if($diff < $this->gridLinesCount[$side])
-				$this->gridLinesCount[$side] = abs($this->m_minY[$side] - $this->m_maxY[$side]);
-
-			if($this->gridLinesCount[$side] < 1 ) $this->gridLinesCount[$side] = 1;
-
-//SDI($this->gridLinesCount[$side]);
-//----------
-
-
-//SDI($this->m_minY[$side].' - '.$this->m_maxY[$side]);
-			$value_delta = round($this->m_maxY[$side] - $this->m_minY[$side]);
-
-//			$step = floor((($value_delta/$this->gridLinesCount[$side]) + 1));	// round to top
-			$step = ceil($value_delta/$this->gridLinesCount[$side]);	// round to top
-			$value_delta2 = $step * $this->gridLinesCount[$side];
-//SDI($value_delta.' <> '.$value_delta2);
-
-			$first_delta = round(($value_delta2-$value_delta)/2);
-			$second_delta = ($value_delta2-$value_delta) - $first_delta;
-
-//SDI($this->m_maxY[$side].' : '.$first_delta.' --- '.$this->m_minY[$side].' : '.$second_delta);
-			if($this->m_minY[$side] >= 0){
-				if($this->m_minY[$side] < $second_delta){
-					$first_delta += $second_delta - $this->m_minY[$side];
-					$second_delta = $this->m_minY[$side];
-				}
-			}
-			else if(($this->m_maxY[$side] <= 0)){
-				if($this->m_maxY[$side] > $first_delta){
-					$second_delta += $first_delta - $this->m_maxY[$side];
-					$first_delta = $this->m_maxY[$side];
-				}
-			}
-
-			$this->m_maxY[$side] += $first_delta;
-			$this->m_minY[$side] -= ($value_delta2-$value_delta) - $first_delta;
-
-//SDI($this->m_minY[$side].' - '.$this->m_maxY[$side]);
-//---------
-
+			
 			if($this->ymax_type == GRAPH_YAXIS_TYPE_FIXED){
 				$this->m_maxY[$side] = $this->yaxismax;
 			}
@@ -1272,7 +1232,9 @@ SDI('======================================');
 			}
 
 			$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_LEFT];
-			for($i=0; $i<=$hstr_count; $i++){
+			for($i=0; $i<=$hstr_count; $i++){			
+// division by zero
+				$hstr_count = ($hstr_count == 0)?1:$hstr_count;
 
 				$str = convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units);
 				$dims = imageTextSize(8, 0, $str);
@@ -1488,7 +1450,7 @@ SDI('======================================');
 			}
 
 			$data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];
-			if(isset($data) && isset($data->min)){
+			if(isset($data) && isset($data['min'])){
 				if($this->items[$i]['axisside'] == GRAPH_YAXIS_SIDE_LEFT)
 					$units['left'] = $this->items[$i]['units'];
 				else
@@ -1500,9 +1462,9 @@ SDI('======================================');
 				$legend->addCell($colNum, array('text' => $item_caption));
 				$legend->addCell($colNum, array('text' => '['.$fnc_name.']'));
 				$legend->addCell($colNum, array('text' => convert_units($this->getLastValue($i),$this->items[$i]['units']), 'align'=> 2));
-				$legend->addCell($colNum, array('text' => convert_units(min($data->min),$this->items[$i]['units']), 'align'=> 2));
-				$legend->addCell($colNum, array('text' => convert_units(zbx_avg($data->avg),$this->items[$i]['units']), 'align'=> 2));
-				$legend->addCell($colNum, array('text' => convert_units(max($data->max),$this->items[$i]['units']), 'align'=> 2));
+				$legend->addCell($colNum, array('text' => convert_units(min($data['min']),$this->items[$i]['units']), 'align'=> 2));
+				$legend->addCell($colNum, array('text' => convert_units(zbx_avg($data['avg']),$this->items[$i]['units']), 'align'=> 2));
+				$legend->addCell($colNum, array('text' => convert_units(max($data['max']),$this->items[$i]['units']), 'align'=> 2));
 			}
 			else{
 				$legend->addCell($colNum,array('text' => $this->items[$i]['host'].': '.$this->items[$i]['description']));
@@ -1602,7 +1564,7 @@ SDI('======================================');
 	}
 
 	protected function drawElement(&$data, $from, $to, $minX, $maxX, $minY, $maxY, $drawtype, $max_color, $avg_color, $min_color, $minmax_color,$calc_fnc, $axisside){
-		if(!isset($data->max[$from]) || !isset($data->max[$to])) return;
+		if(!isset($data['max'][$from]) || !isset($data['max'][$to])) return;
 
 		$oxy = $this->oxy[$axisside];
 		$zero = $this->zero[$axisside];
@@ -1612,23 +1574,23 @@ SDI('======================================');
 		$shift_max_from = $shift_max_to = 0;
 		$shift_avg_from = $shift_avg_to = 0;
 
-		if(isset($data->shift_min[$from]))	$shift_min_from = $data->shift_min[$from];
-		if(isset($data->shift_min[$to]))	$shift_min_to = $data->shift_min[$to];
+		if(isset($data['shift_min'][$from]))	$shift_min_from = $data['shift_min'][$from];
+		if(isset($data['shift_min'][$to]))	$shift_min_to = $data['shift_min'][$to];
 
-		if(isset($data->shift_max[$from]))	$shift_max_from = $data->shift_max[$from];
-		if(isset($data->shift_max[$to]))	$shift_max_to = $data->shift_max[$to];
+		if(isset($data['shift_max'][$from]))	$shift_max_from = $data['shift_max'][$from];
+		if(isset($data['shift_max'][$to]))	$shift_max_to = $data['shift_max'][$to];
 
-		if(isset($data->shift_avg[$from]))	$shift_avg_from = $data->shift_avg[$from];
-		if(isset($data->shift_avg[$to]))	$shift_avg_to = $data->shift_avg[$to];
+		if(isset($data['shift_avg'][$from]))	$shift_avg_from = $data['shift_avg'][$from];
+		if(isset($data['shift_avg'][$to]))	$shift_avg_to = $data['shift_avg'][$to];
 /**/
-		$min_from	= $data->min[$from]	+ $shift_min_from;
-		$min_to		= $data->min[$to]	+ $shift_min_to;
+		$min_from	= $data['min'][$from]	+ $shift_min_from;
+		$min_to		= $data['min'][$to]	+ $shift_min_to;
 
-		$max_from	= $data->max[$from]	+ $shift_max_from;
-		$max_to		= $data->max[$to]	+ $shift_max_to;
+		$max_from	= $data['max'][$from]	+ $shift_max_from;
+		$max_to		= $data['max'][$to]	+ $shift_max_to;
 
-		$avg_from	= $data->avg[$from]	+ $shift_avg_from;
-		$avg_to		= $data->avg[$to]	+ $shift_avg_to;
+		$avg_from	= $data['avg'][$from]	+ $shift_avg_from;
+		$avg_to		= $data['avg'][$to]	+ $shift_avg_to;
 
 		$x1 = $from + $this->shiftXleft - 1;
 		$x2 = $to + $this->shiftXleft;
@@ -1765,9 +1727,9 @@ SDI('======================================');
 	
 				$diffX = $x1 - $x2;
 //sdi('x1: '.$x1.'  x2: '.$x2);
-				for($i=0; $i<=$diffX; $i++){
-				
-					$Yincr = abs($y2 - $y1) / $diffX;
+				for($i=0; $i<=$diffX; $i++){				
+					$Yincr = ($diffX > 0)?(abs($y2 - $y1) / $diffX):0;
+
 					$gy = ($y1 > $y2) ? ($y2 + $Yincr*$i) : ($y2 - $Yincr*$i);
 					$steps = $this->sizeY + $this->shiftY - $gy + 1;
 					
@@ -1894,9 +1856,9 @@ SDI('======================================');
 
 // For each X
 			for($i = 1, $j = 0; $i < $maxX; $i++){  // new point
-				if(($data->count[$i] == 0) && ($i != ($maxX-1))) continue;
+				if(($data['count'][$i] == 0) && ($i != ($maxX-1))) continue;
 
-				$diff	= abs($data->clock[$i] - $data->clock[$j]);
+				$diff	= abs($data['clock'][$i] - $data['clock'][$j]);
 				$cell	= ($this->to_time - $this->from_time)/$this->sizeX;
 				$delay	= $this->items[$item]['delay'];
 
@@ -1933,12 +1895,6 @@ SDI('======================================');
 			}
 		}
 
-/* grid
-		$this->drawTimeGrid();
-		$this->drawVerticalGrid();
-		$this->drawXYAxisScale($this->graphtheme['gridbordercolor']);
-//-----*/
-
 		$this->drawLeftSide();
 		$this->drawRightSide();
 
@@ -1955,6 +1911,9 @@ SDI('======================================');
 
 		unset($this->items, $this->data);
 
+//debug info
+//		show_messages();
+		
 		ImageOut($this->im);
 	}
 }
