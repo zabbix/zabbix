@@ -315,7 +315,16 @@ static int	DCget_idxhost02_nearestindex(unsigned char poller_type, unsigned char
 
 		dc_host = &config->hosts[config->idxhost02[index]];
 		if (dc_host->poller_type == poller_type && dc_host->poller_num == poller_num)
+		{
+			while (index > 0)
+			{
+				dc_host = &config->hosts[config->idxhost02[index - 1]];
+				if (dc_host->poller_type != poller_type || dc_host->poller_num != poller_num)
+					break;
+				index--;
+			}
 			return index;
+		}
 		else if (last_index == first_index)
 		{
 			if (dc_host->poller_type < poller_type ||
