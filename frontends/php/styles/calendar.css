@@ -6,6 +6,7 @@ div.calendar{
 	top: 10px;
 	right: 30px;
 	border: 1px blue solid;
+	z-index: 100;
 }
 
 div.calendardays{
