@@ -1195,7 +1195,7 @@ return $result;
 		if($row && isset($row['expression'])){
 //			$numbers = extract_numbers(ereg_replace('(\{[0-9]+\})', 'function', $row['expression']));
 			$numbers = extract_numbers(preg_replace('/(\{[0-9]+\})/', 'function', $row['expression']));
-			
+
 			$description = $row['description'];
 
 			for ( $i = 0; $i < 9; $i++ ){
@@ -2312,7 +2312,7 @@ return $result;
 			$status_col->addAction('onmouseout', 'this.style.border=this.old_border;');
 		}
 		array_push($table_row,$status_col);
-		
+
 	return $table_row;
 	}
 
@@ -2330,7 +2330,7 @@ return $result;
 
 	function calculate_availability($triggerid,$period_start,$period_end){
 		$start_value = -1;
-		
+
 		if(($period_start>0) && ($period_start < time())){
 			$sql='SELECT e.eventid, e.value '.
 					' FROM events e '.
@@ -2386,7 +2386,7 @@ return $result;
 		if($period_end == 0){
 			$period_end = $max;
 		}
-			
+
 		$rows=0;
 		$sql = 'SELECT eventid,clock,value '.
 				' FROM events '.

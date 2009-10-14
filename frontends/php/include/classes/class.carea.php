@@ -52,7 +52,7 @@ class CArea extends CTag{
 	}
 
 	public function setHref($value){
-		
+
 		if(!is_string($value)) return $this->error('Incorrect value for setHref ['.$value.']');
 		$this->setAttribute('href',$value);
 	}

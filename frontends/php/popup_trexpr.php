@@ -156,7 +156,7 @@ include_once "include/page_header.php";
 					' WHERE i.hostid=h.hostid '.
 						' AND h.host='.zbx_dbstr($expr_res[ZBX_SIMPLE_EXPRESSION_HOST_ID]).
 						' AND i.key_='.zbx_dbstr($expr_res[ZBX_SIMPLE_EXPRESSION_KEY_ID]);
-						
+
 			$itemid = DBfetch(DBselect($sql));
 
 			$_REQUEST['itemid'] = $itemid['itemid'];

@@ -295,8 +295,8 @@ include_once('include/page_header.php');
 	$charts_wdgt->show();
 
 	if($_REQUEST['graphid'] > 0){
-// NAV BAR	
-		$timeline = array(); 
+// NAV BAR
+		$timeline = array();
 		$timeline['period'] = $effectiveperiod;
 		$timeline['starttime'] = get_min_itemclock_by_graphid($_REQUEST['graphid']);
 
@@ -305,7 +305,7 @@ include_once('include/page_header.php');
 			$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
 			$timeline['usertime'] += $timeline['period'];
 		}
-		
+
 		$objData = array(
 			'id' => $dom_graph_id,
 			'domid' => $dom_graph_id,
@@ -318,7 +318,7 @@ include_once('include/page_header.php');
 			'scrollWidthByImage' => $scrollWidthByImage,
 			'dynamic' => 1
 		);
-					
+
 		zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 		zbx_add_post_js('timeControl.processObjects();');
 //-------------

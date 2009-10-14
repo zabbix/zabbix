@@ -31,7 +31,7 @@ class CPie extends CGraphDraw{
 		$this->graphheight3d = 12;
 		$this->shiftlegendright = 17*7 + 7 + 10; // count of static chars * px/char + for color rectangle + space
 		$this->drawlegendallow = 1;
-		
+
 		$this->graphtheme = array(
 			'description' => 'default',
 			'frontendtheme' => 'default.css',
@@ -52,7 +52,7 @@ class CPie extends CGraphDraw{
 
 		$this->applyGraphTheme();
 	}
-	
+
 /********************************************************************************************************/
 // PRE CONFIG:	ADD / SET / APPLY
 /********************************************************************************************************/
@@ -397,7 +397,7 @@ class CPie extends CGraphDraw{
 							$this->shiftXleft+10,
 							$this->sizeY+$shiftY+5+14*$i,
 							$color);
-							
+
 			imagerectangle($this->im,
 							$this->shiftXleft,
 							$this->sizeY+$shiftY+14*$i - 5,
@@ -407,12 +407,12 @@ class CPie extends CGraphDraw{
 						);
 
 			$dims = imageTextSize(8, 0, $str);
-			imageText($this->im, 
-						8, 
-						0, 
+			imageText($this->im,
+						8,
+						0,
 						$this->shiftXleft+15,
-						$this->sizeY+$shiftY+14*$i+5, 
-						$this->getColor($this->graphtheme['textcolor'],0), 
+						$this->sizeY+$shiftY+14*$i+5,
+						$this->getColor($this->graphtheme['textcolor'],0),
 						$str
 					);
 
@@ -427,7 +427,7 @@ class CPie extends CGraphDraw{
 						$this->shiftY+10+10+14*$i,
 						$color
 					);
-						
+
 			imagerectangle($this->im,
 						$shiftX-10,
 						$this->shiftY+10+14*$i,
@@ -436,12 +436,12 @@ class CPie extends CGraphDraw{
 						$this->GetColor('Black No Alpha')
 					);
 
-			imagetext($this->im, 
-						8, 
-						0, 
-						$shiftX+5, 
+			imagetext($this->im,
+						8,
+						0,
+						$shiftX+5,
 						$this->shiftY+10+14*$i+10,
-						$this->getColor($this->graphtheme['textcolor'],0), 
+						$this->getColor($this->graphtheme['textcolor'],0),
 						$strvalue
 				);
 		}
@@ -695,7 +695,7 @@ class CPie extends CGraphDraw{
 
 		$str=sprintf("%0.2f",(getmicrotime()-$start_time));
 		imagestring($this->im, 0,$this->fullSizeX-210,$this->fullSizeY-12,'Data from '.$this->dataFrom.'. Generated in '.$str.' sec', $this->getColor('Gray'));
-		
+
 		unset($this->items, $this->data);
 
 		ImageOut($this->im);

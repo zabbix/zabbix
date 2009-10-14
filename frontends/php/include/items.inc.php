@@ -288,9 +288,9 @@
 
 		if(preg_match('/^log|eventlog\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
 			error('Value type must be Log for log key');
-			return FALSE;		
+			return FALSE;
 		}
-		
+
 		if($item['value_type'] == ITEM_VALUE_TYPE_STR){
 			$item['delta']=0;
 		}
@@ -484,7 +484,7 @@
 
 		$item_data = get_item_by_itemid_limited($itemid);
 		$item_data['applications'] = get_applications_by_itemid($itemid);
-		
+
 
 		if(!check_db_fields($item_data, $item)){
 			error('Incorrect arguments pasted to function [update_item]');
@@ -528,9 +528,9 @@
 
 		if(preg_match('/^log|eventlog\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
 			error('Value type must be Log for log key');
-			return FALSE;		
+			return FALSE;
 		}
-		
+
 		if($item['value_type'] != ITEM_VALUE_TYPE_UINT64) {
 			$item['data_type'] = 0;
 		}
@@ -548,7 +548,7 @@
 
 			$child_item_params['hostid'] = $db_tmp_item['hostid'];
 			$child_item_params['templateid'] = $itemid;
-			
+
 			if($upd_app){
 				$child_item_params['applications'] = get_same_applications_for_host($item['applications'], $db_tmp_item['hostid']);
 			}
@@ -561,7 +561,7 @@
 				return false;
 			}
 
-			
+
 			$result = update_item($db_tmp_item['itemid'], $child_item_params);		// recursion!!!
 
 			if(!$result)
@@ -1022,7 +1022,7 @@
 //		if(ereg('^'.ZBX_EREG_ITEM_KEY_FORMAT.'$', $key, $arr)){
 		if(preg_match('/^'.ZBX_PREG_ITEM_KEY_FORMAT.'$/', $key, $arr)){
 			if(!isset($arr[ZBX_KEY_PARAM_ID]))  $arr[ZBX_KEY_PARAM_ID] = false;
-			
+
 			$params = zbx_get_params($arr[ZBX_KEY_PARAM_ID]);
 
 			if(isset($params[$num])){

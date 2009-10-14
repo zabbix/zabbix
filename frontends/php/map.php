@@ -193,7 +193,7 @@ include_once('include/page_header.php');
 			if( $label_type==MAP_LABEL_TYPE_IP )
 				$label_line=$host['ip'];
 		}
-		
+
 		if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE){
 			$label_line = expand_map_element_label_by_data($db_element);
 		}

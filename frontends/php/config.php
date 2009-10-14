@@ -136,7 +136,7 @@
 				if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))){
 					access_deny();
 				}
-				
+
 				DBstart();
 				$result = add_image($_REQUEST['name'], $_REQUEST['imagetype'], $file);
 				$result = DBend($result);
@@ -159,7 +159,7 @@
 			DBstart();
 			$result = delete_image($_REQUEST['imageid']);
 			$result = DBend($result);
-			
+
 			show_messages($result, S_IMAGE_DELETED, S_CANNOT_DELETE_IMAGE);
 			if($result){
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_IMAGE,'Image ['.$image['name'].'] deleted');

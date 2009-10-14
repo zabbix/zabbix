@@ -33,7 +33,7 @@ class CUser extends CZBXAPI{
  * First part of parameters are filters which limits the output result set, these filters are set only if appropriate parameter is set.
  * For example if "type" is set, then method returns only users of given type.
  * Second part of parameters extends result data, adding data about others objects that are related to objects we get.
- * For example if "select_usrgrps" parameter is set, resulting objects will have additional property 'usrgrps' containing object with 
+ * For example if "select_usrgrps" parameter is set, resulting objects will have additional property 'usrgrps' containing object with
  * data about User UserGroups.
  * Third part of parameters affect output. For example "sortfield" will be set to 'alias', result will be sorted by User alias.
  * All Parameters are optional!
@@ -44,7 +44,7 @@ class CUser extends CZBXAPI{
  * @since 1.8
  * @version 1
  *
- * @param _array $options 
+ * @param _array $options
  * @param array $options['nodeids'] filter by Node IDs
  * @param array $options['usrgrpids'] filter by UserGroup IDs
  * @param array $options['userids'] filter by User IDs
@@ -60,7 +60,7 @@ class CUser extends CZBXAPI{
  * @param int $options['limit'] output will be limited to given number
  * @param string $options['sortfield'] output will be sorted by given property [ 'userid', 'alias' ]
  * @param string $options['sortorder'] output will be sorted in given order [ 'ASC', 'DESC' ]
- * @return array 
+ * @return array
  */
 	public static function get($options=array()){
 		global $USER_DETAILS;
@@ -280,7 +280,7 @@ class CUser extends CZBXAPI{
 	}
 
 	/**
-	 * Authenticate user 
+	 * Authenticate user
 	 *
 	 * {@source}
 	 * @access public

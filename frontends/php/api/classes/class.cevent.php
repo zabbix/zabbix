@@ -82,7 +82,7 @@ class CEvent extends CZBXAPI{
 			'source'				=> null,
 			'acknowledged'			=> null,
 			'nopermissions'			=> null,
-			
+
 // filter
 			'hide_unknown'			=> null,
 			'acknowledged'			=> null,

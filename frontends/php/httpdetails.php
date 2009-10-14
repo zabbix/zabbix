@@ -75,8 +75,8 @@ include_once('include/page_header.php');
 ?>
 <?php
 	$details_wdgt = new CWidget();
-	$details_wdgt->setClass('header');	
-	
+	$details_wdgt->setClass('header');
+
 // Header
 	$text = array(S_DETAILS_OF_SCENARIO_BIG.' / ',bold($httptest_data['name']),' ['.date(S_DATE_FORMAT_YMDHMS,$httptest_data['lastcheck']).']');
 
@@ -213,7 +213,7 @@ include_once('include/page_header.php');
 
 	$details_wdgt->addItem($table);
 	$details_wdgt->show();
-	
+
 	echo SBR;
 
 
@@ -223,22 +223,22 @@ include_once('include/page_header.php');
 	$_REQUEST['period'] = get_profile('web.httptest.period', ZBX_PERIOD_DEFAULT, $_REQUEST['httptestid']);
 
 	show_table_header(array(S_HISTORY.' "',bold($httptest_data['name']),'"'));
-	
+
 	$form = new CTableInfo();
 	$form->setAttribute('id','graph');
 
 	$graph_cont = new CCol();
 	$graph_cont->setAttribute('id', 'graph_1');
 	$form->addRow(array(bold(S_SPEED), $graph_cont));
-	
+
 	$graph_cont = new CCol();
 	$graph_cont->setAttribute('id', 'graph_2');
 	$form->addRow(array(bold(S_RESPONSE_TIME), $graph_cont));
-	
+
 	$form->show();
-	
-// NAV BAR	
-	$timeline = array(); 
+
+// NAV BAR
+	$timeline = array();
 	$timeline['period'] = get_request('period',ZBX_PERIOD_DEFAULT);
 	$timeline['starttime'] = get_min_itemclock_by_itemid($items[HTTPSTEP_ITEM_TYPE_IN][0]['itemid']);
 
@@ -247,17 +247,17 @@ include_once('include/page_header.php');
 		$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
 		$timeline['usertime'] += $timeline['period'];
 	}
-	
+
 	$containerid = 'graph_1';
 	$dom_graph_id = 'graph_in';
-	
+
 	$graphDims = array();
 	$graphDims['width'] = -120;
 	$graphDims['graphHeight'] = 150;
 	$graphDims['shiftXleft'] = 100;
 	$graphDims['shiftXright'] = 50;
 	$graphDims['graphtype'] = GRAPH_TYPE_STACKED;
-	
+
 	$src = 'chart3.php?'.url_param('period').
 			url_param($httptest_data['name'], false,'name').
 			url_param(150, false, 'height').
@@ -277,9 +277,9 @@ include_once('include/page_header.php');
 		'dynamic' => 1,
 		'mainObject' => 1
 	);
-					
+
 	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
-	
+
 	$containerid = 'graph_2';
 	$dom_graph_id = 'graph_time';
 	$src ='chart3.php?'.url_param('period').url_param('from').
@@ -301,14 +301,14 @@ include_once('include/page_header.php');
 		'dynamic' => 1,
 		'mainObject' => 1
 	);
-					
+
 	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 //-------------
 
 	$scroll_div = new CDiv();
 	$scroll_div->setAttribute('id','scrollbar_cntr');
 	$scroll_div->show();
-	
+
 	$dom_graph_id = 'none';
 	$objData = array(
 		'id' => $dom_graph_id,
@@ -320,7 +320,7 @@ include_once('include/page_header.php');
 		'dynamic' => 1,
 		'mainObject' => 1
 	);
-				
+
 	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 	zbx_add_post_js('timeControl.processObjects();');
 ?>
