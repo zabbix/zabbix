@@ -174,7 +174,7 @@ addScroll: function(e, objid){
 	var scrl = scrollCreate(obj.domid, g_width, obj.timeline.timelineid);
 	scrl.onchange = this.objectUpdate.bind(this);
 	
-	if(obj.dynamic && !is_null($(obj.domid))){
+	if(obj.dynamic && !is_null($(g_img))){
 		addListener(obj.domid, 'load', function(){ZBX_SCROLLBARS[scrl.scrollbarid].disabled=0;});
 	}
 //SDI('scrollCreate');
@@ -195,6 +195,7 @@ objectUpdate: function(id, timelineid){
 	
 	if(obj.dynamic){
 		if(obj.mainObject){
+
 			for(var key in this.objectList){
 				if(empty(this.objectList[key])) continue;
 
@@ -207,7 +208,7 @@ objectUpdate: function(id, timelineid){
 						ZBX_SCROLLBARS[key].setBarPosition();
 						ZBX_SCROLLBARS[key].setGhostByBar();
 						ZBX_SCROLLBARS[key].setTabInfo();
-						if(!is_null($(obj.domid))) ZBX_SCROLLBARS[key].disabled = 1;
+						if(this.objectList[key].loadImage && !is_null($(obj.domid))) ZBX_SCROLLBARS[key].disabled = 1;
 					}
 				}
 			}
