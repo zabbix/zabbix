@@ -672,7 +672,7 @@ include_once('include/page_header.php');
 			
 			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?groupid='.$groupid_selected.'&hostid='.$host['hostid']),
 				' ('.count($host['applications']).')');
-			$items = array(new CLink(S_ITEMS, 'items.php?groupid='.$groupid_selected.'&hostid='.$host['hostid']),
+			$items = array(new CLink(S_ITEMS, 'items.php?filter_set=1&hostid='.$host['hostid']),
 				' ('.count($host['itemids']).')');
 			$triggers = array(new CLink(S_TRIGGERS, 'triggers.php?groupid='.$groupid_selected.'&hostid='.$host['hostid']),
 				' ('.count($host['triggerids']).')');
