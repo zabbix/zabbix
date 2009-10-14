@@ -565,7 +565,7 @@ include_once('include/page_header.php');
 		update_profile('web.'.$page['menu'].'.groupid', $_REQUEST['groupid'], PROFILE_TYPE_ID);
 	}
 	else{
-		$_REQUEST['groupid'] = $groupid_selected = get_profile('web.'.$page['menu'].'.groupid');
+		$_REQUEST['groupid'] = $groupid_selected = get_profile('web.'.$page['menu'].'.groupid', 0);
 	}
 ?>
 <?php
