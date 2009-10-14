@@ -1428,7 +1428,7 @@ int	get_nearestindex(void *p, size_t sz, int num, zbx_uint64_t id)
 	{
 		index = first_index + (last_index - first_index) / 2;
 
-		element_id = *(zbx_uint64_t *)(p + index * sz);
+		element_id = *(zbx_uint64_t *)((char *)p + index * sz);
 		if (element_id == id)
 			return index;
 		else if (last_index == first_index)
