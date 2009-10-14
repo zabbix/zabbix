@@ -496,7 +496,9 @@ require_once('include/forms.inc.php');
 		$frmHost->addVar('clear_templates', $clear_templates);
 
 // TEMPLATE WIDGET {
-		$template_tbl = new CTableInfo();
+		$template_tbl = new CTable('', 'tablestripped');
+		$template_tbl->setOddRowClass('form_odd_row');
+		$template_tbl->setEvenRowClass('form_even_row');
 // FORM ITEM : Template name text box [  ]
 		$template_tbl->addRow(array(S_NAME, new CTextBox('template_name', $template_name, 54)));
 
