@@ -299,27 +299,27 @@ class CUserGroup extends CZBXAPI{
 	return $result;
 	}
 
-	/**
-	 * Create UserGroups.
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * <code>
-	 * $groups = array( array(
-	 * 	*string 'name' 				=> null,
-	 * 	string 'users_status' 		=> GROUP_STATUS_DISABLED,
-	 * 	string 'gui_access' 		=> 0,
-	 * 	string 'api_access' 		=> 0
-	 * ));
-	 * </code>
-	 *
-	 * @param array $groups multidimensional array with UserGroups data
-	 * @return boolean
-	 */
+/**
+ * Create UserGroups.
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * <code>
+ * $groups = array( array(
+ * 	*string 'name' 				=> null,
+ * 	string 'users_status' 		=> GROUP_STATUS_DISABLED,
+ * 	string 'gui_access' 		=> 0,
+ * 	string 'api_access' 		=> 0
+ * ));
+ * </code>
+ *
+ * @param array $groups multidimensional array with UserGroups data
+ * @return boolean
+ */
 	public static function add($groups){
 		$error = 'Unknown ZABBIX internal error';
 		$result = false;
@@ -355,18 +355,18 @@ class CUserGroup extends CZBXAPI{
 		}
 	}
 
-	/**
-	 * Update UserGroups.
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param array $groups multidimensional array with UserGroups data
-	 * @return boolean
-	 */
+/**
+ * Update UserGroups.
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $groups multidimensional array with UserGroups data
+ * @return boolean
+ */
 	public static function update($groups){
 		$result = false;
 
@@ -397,25 +397,25 @@ class CUserGroup extends CZBXAPI{
 		}
 	}
 
-	/**
-	 * Update UserGroup rights to HostGroups.
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * <code>
-	 * $rights = array(
-	 * 	*string 'groupid' => 'UserGroup ID',
-	 * 	array 'rights' => array( array('id' => 'HostGroup ID', 'permission' => 'permission'), ..)
-	 * )
-	 * </code>
-	 *
-	 * @param array $rights multidimensional array with rights data
-	 * @return boolean
-	 */
+/**
+ * Update UserGroup rights to HostGroups.
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * <code>
+ * $rights = array(
+ * 	*string 'groupid' => 'UserGroup ID',
+ * 	array 'rights' => array( array('id' => 'HostGroup ID', 'permission' => 'permission'), ..)
+ * )
+ * </code>
+ *
+ * @param array $rights multidimensional array with rights data
+ * @return boolean
+ */
 	public static function updateRights($rights){
 		$result = false;
 
@@ -440,25 +440,25 @@ class CUserGroup extends CZBXAPI{
 		}
 	}
 
-	/**
-	 * Add rights for UserGroup to HostGroups. Existing rights are updated, new ones added.
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * <code>
-	 * $rights = array(
-	 * 	*string 'groupid' => 'UserGroup ID',
-	 * 	array 'rights' => array( array('id' => 'HostGroup ID', 'permission' => 'permission'), ..)
-	 * )
-	 * </code>
-	 *
-	 * @param array $rights multidimensional array with rights data
-	 * @return boolean
-	 */
+/**
+ * Add rights for UserGroup to HostGroups. Existing rights are updated, new ones added.
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * <code>
+ * $rights = array(
+ * 	*string 'groupid' => 'UserGroup ID',
+ * 	array 'rights' => array( array('id' => 'HostGroup ID', 'permission' => 'permission'), ..)
+ * )
+ * </code>
+ *
+ * @param array $rights multidimensional array with rights data
+ * @return boolean
+ */
 	public static function addRights($rights){
 		$result = false;
 
@@ -494,25 +494,25 @@ class CUserGroup extends CZBXAPI{
 		}
 	}
 
-	/**
-	 * Add Users to UserGroup.
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * <code>
-	 * $data = array(
-	 * 	*string 'usrgrpid' => 'UserGroup ID',
-	 * 	*array 'userids' => ('User ID', 'User ID', ...)
-	 * )
-	 * </code>
-	 *
-	 * @param array $data
-	 * @return boolean
-	 */
+/**
+ * Add Users to UserGroup.
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * <code>
+ * $data = array(
+ * 	*string 'usrgrpid' => 'UserGroup ID',
+ * 	*array 'userids' => ('User ID', 'User ID', ...)
+ * )
+ * </code>
+ *
+ * @param array $data
+ * @return boolean
+ */
 	public static function addUsers($data){
 		$result = false;
 
@@ -531,25 +531,25 @@ class CUserGroup extends CZBXAPI{
 		}
 	}
 
-	/**
-	 * Remove users from UserGroup.
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * <code>
-	 * $data = array(
-	 * 	*string 'usrgrpid' => 'UserGroup ID',
-	 * 	*array 'userids' => ('User ID', 'User ID', ...)
-	 * )
-	 * </code>
-	 *
-	 * @param array $data
-	 * @return boolean
-	 */
+/**
+ * Remove users from UserGroup.
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * <code>
+ * $data = array(
+ * 	*string 'usrgrpid' => 'UserGroup ID',
+ * 	*array 'userids' => ('User ID', 'User ID', ...)
+ * )
+ * </code>
+ *
+ * @param array $data
+ * @return boolean
+ */
 	public static function removeUsers($data){
 		$result = false;
 
@@ -568,18 +568,18 @@ class CUserGroup extends CZBXAPI{
 		}
 	}
 
-	/**
-	 * Delete UserGroups.
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param array $groupids
-	 * @return boolean
-	 */
+/**
+ * Delete UserGroups.
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $groupids
+ * @return boolean
+ */
 	public static function delete($groupids){
 		$result = false;
 

@@ -19,14 +19,14 @@
 **/
 ?>
 <?php
-	require_once 'include/config.inc.php';
-	require_once 'include/maps.inc.php';
+	require_once('include/config.inc.php');
+	require_once('include/maps.inc.php');
 
 	$page['title'] = "S_MAP";
 	$page['file'] = 'map.php';
 	$page['type'] = PAGE_TYPE_IMAGE;
 
-include_once 'include/page_header.php';
+include_once('include/page_header.php');
 
 ?>
 <?php
@@ -45,7 +45,7 @@ include_once 'include/page_header.php';
 	}
 
 	if(!$map = get_sysmap_by_sysmapid($_REQUEST['sysmapid'])){
-		include_once 'include/page_footer.php';
+		include_once('include/page_footer.php');
 	}
 
 	$name		= $map['name'];
@@ -101,13 +101,13 @@ include_once 'include/page_header.php';
 	}
 	unset($db_image);
 
-	$str=date('m.d.Y H:i:s',time(NULL));
+	$str = date('m.d.Y H:i:s',time(NULL));
 	imagestring($im, 0,imagesx($im)-120,imagesy($im)-12,$str, $gray);
 
 	if(!isset($_REQUEST['noedit'])){
 		$grid = 50;
 
-		for($x=$grid;$x<$width;$x+=$grid){
+		for($x=$grid; $x<$width; $x+=$grid){
 			MyDrawLine($im,$x,0,$x,$height,$black, MAP_LINK_DRAWTYPE_DASHED_LINE);
 			imageText($im, 8, 0, $x+2, 2, $black,$x);
 //			imagestring($im, 2, $x+2,2, $x , $black);
@@ -124,11 +124,11 @@ include_once 'include/page_header.php';
 
 	$links = DBselect('select * from sysmaps_links where sysmapid='.$_REQUEST['sysmapid']);
 	while($link = DBfetch($links)){
-		list($x1, $y1) = get_icon_center_by_selementid($link["selementid1"]);
-		list($x2, $y2) = get_icon_center_by_selementid($link["selementid2"]);
+		list($x1, $y1) = get_icon_center_by_selementid($link['selementid1']);
+		list($x2, $y2) = get_icon_center_by_selementid($link['selementid2']);
 
-		$drawtype = $link["drawtype"];
-		$color = convertColor($im,$link["color"]);
+		$drawtype = $link['drawtype'];
+		$color = convertColor($im,$link['color']);
 
 		$triggers = get_link_triggers($link['linkid']);
 
@@ -193,14 +193,14 @@ include_once 'include/page_header.php';
 			if( $label_type==MAP_LABEL_TYPE_IP )
 				$label_line=$host['ip'];
 		}
-		if($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_IMAGE)
-		{
+		
+		if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE){
 			$label_line = expand_map_element_label_by_data($db_element);
 		}
 
 		if($label_line=='' && $info_line=='')	continue;
 
-		$label_line = str_replace("\r", "", $label_line);
+		$label_line = str_replace("\r", '', $label_line);
 		$strings = explode("\n", $label_line);
 		array_push($strings, $info_line);
 		$cnt = count($strings);
@@ -213,14 +213,14 @@ include_once 'include/page_header.php';
 		$x_info = $db_element['x'];
 		$y_info = $db_element['y'];
 
-		if ($label_location == MAP_LABEL_LOC_TOP)
+		if($label_location == MAP_LABEL_LOC_TOP)
 			$y -= $h * $cnt;
 		else if ($label_location == MAP_LABEL_LOC_LEFT || $label_location == MAP_LABEL_LOC_RIGHT)
-			$y += ImageSY($img) / 2 - $h * $cnt / 2;
+			$y += imagesy($img) / 2 - $h * $cnt / 2;
 		else	/* MAP_LABEL_LOC_BOTTOM */
-			$y += ImageSY($img);
+			$y += imagesy($img);
 
-		foreach ($strings as $str){
+		foreach($strings as $str){
 			$num++;
 			$dims = imageTextSize(8,0,$str);
 
@@ -231,9 +231,8 @@ include_once 'include/page_header.php';
 			else	/* MAP_LABEL_LOC_RIGHT */
 				$x_label = $x + imagesx($img);
 
-			
 
-			imagefilledrectangle($im, $x_label - 2, $y+$dims['height'], $x_label + $dims['width'], $y + $h, $white);
+			imagefilledrectangle($im, $x_label-1, $y+$dims['height']+1, $x_label + $dims['width']+1, $y - 1, $white);
 			imagetext($im, 8, 0, $x_label, $y+$dims['height'], ($num == $cnt)?$color:$label_color, $str);
 
 			$y += $dims['height']+4;

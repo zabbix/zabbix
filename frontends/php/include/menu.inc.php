@@ -120,11 +120,6 @@ $ZBX_MENU = array(
 			'forse_disable_all_nodes'=> true,
 			'pages'=>array(
 				array(
-						'url'=>'config.php',
-						'label'=>S_GENERAL,
-						'sub_pages'=>array('image.php')
-					),
-				array(
 						'url'=>'hostgroups.php',
 						'label'=>S_HOST_GROUPS
 					),
@@ -169,6 +164,11 @@ $ZBX_MENU = array(
 			'default_page_id'	=> 1,
 			'forse_disable_all_nodes'=> true,
 			'pages'=>array(
+				array(
+						'url'=>'config.php',
+						'label'=>S_GENERAL,
+						'sub_pages'=>array('image.php')
+					),
 				array('url'=>'nodes.php',
 						'label'=>S_DM,
 						'sub_pages'=>array('proxies.php')
