@@ -386,7 +386,7 @@ include_once('include/page_header.php');
 				new CCheckBox('applications['.$applicationid.']',NULL,NULL,$applicationid),
 				(($PAGE_HOSTS['selected'] > 0) ? null : $application['host']),
 				$name,
-				array(new CLink(S_ITEMS,'items.php?hostid='.$PAGE_HOSTS['selected'].'&filter_application='.$application['name']),
+				array(new CLink(S_ITEMS,'items.php?hostid='.$PAGE_HOSTS['selected'].'&filter_set=1&filter_application='.$application['name']),
 				SPACE.'('.count($application['itemids']).')')
 			));
 		}

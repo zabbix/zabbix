@@ -1406,7 +1406,7 @@
 		$col_table2 = new CTable();
 		$col_table2->setClass('filter');
 
-		$cmbType = new CComboBox("filter_type", $filter_type, "javascript: create_var('zbx_filter', 'reset_subfilters', '1', true); ");
+		$cmbType = new CComboBox("filter_type", $filter_type, "javascript: create_var('zbx_filter', 'filter_set', '1', true); ");
 		$cmbType->addItem(-1, S_ALL_SMALL);
 		foreach(array(ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE,
 			ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_TRAPPER,
@@ -1439,7 +1439,7 @@
 // 3rd col
 		$col_table3 = new CTable();
 		$col_table3->setClass('filter');
-		$cmbValType = new CComboBox('filter_value_type', $filter_value_type, "javascript: create_var('zbx_filter', 'reset_subfilters', '1', true);");
+		$cmbValType = new CComboBox('filter_value_type', $filter_value_type, "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
 			$cmbValType->addItem(-1, S_ALL_SMALL);
 			$cmbValType->addItem(ITEM_VALUE_TYPE_UINT64, S_NUMERIC_UNSIGNED);
 			$cmbValType->addItem(ITEM_VALUE_TYPE_FLOAT, S_NUMERIC_FLOAT);
@@ -1492,7 +1492,7 @@
 		$reset = new CSpan( S_RESET,'biglink');
 		$reset->onClick("javascript: clearAllForm('zbx_filter');");
 		$filter = new CSpan(S_FILTER,'biglink');
-		$filter->onClick("javascript: create_var('zbx_filter', 'reset_subfilters', '1', true);");
+		$filter->onClick("javascript: create_var('zbx_filter', 'filter_set', '1', true);");
 
 		$div_buttons = new CDiv(array($filter, SPACE, SPACE, SPACE, $reset));
 		$div_buttons->setAttribute('style', 'padding: 4px 0;');
@@ -5629,7 +5629,9 @@
 		$frmHost->addVar('clear_templates',$clear_templates);
 
 // HOST WIDGET {
-		$host_tbl = new CTableInfo();
+		$host_tbl = new CTable('', 'tablestripped');
+		$host_tbl->setOddRowClass('form_odd_row');
+		$host_tbl->setEvenRowClass('form_even_row');
 
 		if($_REQUEST['hostid']>0) $frmHost->addVar('hostid', $_REQUEST['hostid']);
 		if($_REQUEST['groupid']>0) $frmHost->addVar('groupid', $_REQUEST['groupid']);
@@ -5662,7 +5664,7 @@
 		$cmbConnectBy->addItem(1, S_IP_ADDRESS);
 		$host_tbl->addRow(array(S_CONNECT_TO,$cmbConnectBy));
 
-		$host_tbl->AddRow(array(S_AGENT_PORT,new CNumericBox('port',$port,5)));
+		$host_tbl->addRow(array(S_AGENT_PORT,new CNumericBox('port',$port,5)));
 //Proxy
 		$cmbProxy = new CComboBox('proxy_hostid', $proxy_hostid);
 
@@ -5804,20 +5806,18 @@
 // } HOST WIDGET
 
 // TEMPLATES{
-		$template_tbl = new CTableInfo();
-
-		$template_list_tbl = new CTable(S_NO_TEMPLATES_LINKED);
-
+		$template_tbl = new CTableInfo(S_NO_TEMPLATES_LINKED, 'tablestripped');
+		$template_tbl->setOddRowClass('form_odd_row');
+		$template_tbl->setEvenRowClass('form_even_row');
+		
 		foreach($templates as $id => $temp_name){
 			$frmHost->addVar('templates['.$id.']',$temp_name);
-			$template_list_tbl->addRow(	array(
+			$template_tbl->addRow(	array(
 					new CCheckBox('templates_rem['.$id.']', 'no', null, $id),
 					$temp_name
 					)
 			);
 		}
-
-		$template_tbl->addRow($template_list_tbl);
 
 		$footer = new CCol(array(
 			new CButton('add_template',S_ADD,
@@ -5826,11 +5826,11 @@
 					url_param($templates,false,'existed_templates')."',450,450)",
 					'T'),
 			SPACE,
-			new CButton('unlink',S_UNLINK),
+			new CButton('unlink', S_UNLINK),
 			SPACE,
-			new CButton('unlink_and_clear',S_UNLINK_AND_CLEAR)
+			new CButton('unlink_and_clear', S_UNLINK_AND_CLEAR)
 		));
-//		$footer->setAttribute('colspan', 2);
+		$footer->setColSpan(2);
 
 		$template_tbl->setFooter($footer);
 
@@ -5848,7 +5848,10 @@
 
 
 // PROFILE WIDGET {
-		$profile_tbl = new CTableInfo();
+		$profile_tbl = new CTable('', 'tablestripped');
+		$profile_tbl->setOddRowClass('form_odd_row');
+		$profile_tbl->setEvenRowClass('form_even_row');
+		
 		$profile_tbl->addRow(array(S_USE_PROFILE,new CCheckBox('useprofile',$useprofile,'submit()')));
 
 		if($useprofile == 'yes'){
@@ -5885,7 +5888,9 @@
 // } PROFILE WIDGET
 
 // EXT PROFILE WIDGET {
-		$ext_profile_tbl = new CTableInfo();
+		$ext_profile_tbl = new CTable('', 'tablestripped');
+		$ext_profile_tbl->setOddRowClass('form_odd_row');
+		$ext_profile_tbl->setEvenRowClass('form_even_row');
 		$ext_profile_tbl->addRow(array(S_USE_EXTENDED_PROFILE,new CCheckBox('useprofile_ext',$useprofile_ext,'submit()','yes')));
 
 		foreach($ext_profiles_fields as $prof_field => $caption){
@@ -7007,12 +7012,13 @@
 			$macros = array();
 		}
 
-		$macros_tbl = new CTableInfo();
-
-		$macros_list_tbl = new CTable(S_NO_MACROS_DEFINED);
+		$macros_tbl = new CTable('', 'tablestripped');
+		$macros_tbl->setOddRowClass('form_odd_row');
+		$macros_tbl->setEvenRowClass('form_even_row');
+		
 		foreach($macros as $macroid => $macro){
-			$macros_list_tbl->addItem(new CVar('macros['.$macro['macro'].']',$macro));
-			$macros_list_tbl->addRow(array(
+			$macros_tbl->addItem(new CVar('macros['.$macro['macro'].']', $macro));
+			$macros_tbl->addRow(array(
 				new CCheckBox("macros_rem[{$macro['macro']}]", 'no', null, $macro['macro']),
 				$macro['macro'],
 				SPACE.RARR.SPACE,
@@ -7027,7 +7033,7 @@
 			new CTextBox('value_new', get_request('value_new', ''), 20)
 		);
 
-		$macros_list_tbl->addRow($add_macro);
+		$macros_tbl->addRow($add_macro);
 
 
 		$delete_btn = new CButton('macros_del', S_DELETE_SELECTED);
@@ -7035,10 +7041,8 @@
 			$delete_btn->setAttribute('disabled', 'disabled');
 		}
 
-		$macros_tbl->addRow($macros_list_tbl);
-
 		$footer = new CCol(array(new CButton('macro_add', S_ADD), SPACE, $delete_btn));
-		$footer->setAttribute('colspan', 1);
+		$footer->setColSpan(4);
 
 		$macros_tbl->setFooter($footer);
 
