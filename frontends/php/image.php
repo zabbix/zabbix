@@ -19,22 +19,22 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/images.inc.php";
+	require_once('include/config.inc.php');
+	require_once('include/images.inc.php');
 
 	$page['file']	= 'image.php';
 	$page['title']	= 'S_IMAGE';
 	$page['type']	= PAGE_TYPE_IMAGE;
 
-include_once "include/page_header.php";
+include_once('include/page_header.php');
 
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"imageid"=>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,	NULL),
-		"width"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(1,2000),	NULL),
-		"height"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(1,2000),	NULL),
+		'imageid'=>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,	NULL),
+		'width'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(1,2000),	NULL),
+		'height'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(1,2000),	NULL),
 	);
 	check_fields($fields);
 ?>
@@ -42,7 +42,7 @@ include_once "include/page_header.php";
 
 	$resize = 0;
 
-	if(isset($_REQUEST["width"]) || isset($_REQUEST["height"])){
+	if(isset($_REQUEST['width']) || isset($_REQUEST['height'])){
 		$resize = 1;
 		$th_width = get_request('width',0);
 		$th_height = get_request('height',0);
@@ -50,7 +50,7 @@ include_once "include/page_header.php";
 
 	if(!($row = get_image_by_imageid($_REQUEST['imageid']))){
 		error('Incorrect image index');
-		include_once "include/page_footer.php";
+		include_once('include/page_footer.php');
 	}
 
 	$source = imagecreatefromstring($row['image']);
