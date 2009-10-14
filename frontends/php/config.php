@@ -118,24 +118,28 @@
 
 	$result = 0;
 	if($_REQUEST['config']==3){
-/* IMAGES ACTIONS */
+// IMAGES ACTIONS
 		if(isset($_REQUEST['save'])){
 			$file = isset($_FILES['image']) && $_FILES['image']['name'] != '' ? $_FILES['image'] : NULL;
 			if(isset($_REQUEST['imageid'])){
-	/* UPDATE */
-				$result=update_image($_REQUEST['imageid'],$_REQUEST['name'],
-					$_REQUEST['imagetype'],$file);
+// UPDATE
+				DBstart();
+				$result = update_image($_REQUEST['imageid'],$_REQUEST['name'],$_REQUEST['imagetype'],$file);
+				$result = DBend($result);
 
 				$msg_ok = S_IMAGE_UPDATED;
 				$msg_fail = S_CANNOT_UPDATE_IMAGE;
 				$audit_action = 'Image ['.$_REQUEST['name'].'] updated';
 			}
 			else {
-	/* ADD */
+// ADD
 				if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))){
 					access_deny();
 				}
-				$result=add_image($_REQUEST['name'],$_REQUEST['imagetype'],$file);
+				
+				DBstart();
+				$result = add_image($_REQUEST['name'], $_REQUEST['imagetype'], $file);
+				$result = DBend($result);
 
 				$msg_ok = S_IMAGE_ADDED;
 				$msg_fail = S_CANNOT_ADD_IMAGE;
@@ -149,12 +153,14 @@
 			}
 		}
 		else if(isset($_REQUEST['delete'])&&isset($_REQUEST['imageid'])) {
-	/* DELETE */
+// DELETE
 			$image = get_image_by_imageid($_REQUEST['imageid']);
 
-			$result=delete_image($_REQUEST['imageid']);
+			DBstart();
+			$result = delete_image($_REQUEST['imageid']);
+			$result = DBend($result);
+			
 			show_messages($result, S_IMAGE_DELETED, S_CANNOT_DELETE_IMAGE);
-
 			if($result){
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_IMAGE,'Image ['.$image['name'].'] deleted');
 				unset($_REQUEST['form']);
