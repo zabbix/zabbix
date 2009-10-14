@@ -1775,7 +1775,6 @@
 		$frmItem->setHelp('web.items.item.php');
 		$frmItem->addVar('config',get_request('config', 0));
 
-		$hostid				= get_request('hostid',		0);
 		$form_hostid		= get_request('form_hostid',0);
 
 		if($form_hostid != 0){
@@ -1937,7 +1936,7 @@
 		$frmItem->addVar('form_hostid', $hostid);
 		$frmItem->addRow(S_HOST,array(
 			new CTextBox('host',$host,32,true),
-			new CButton("btn_host",S_SELECT,
+			new CButton('btn_host', S_SELECT,
 				"return PopUp('popup.php?dstfrm=".$frmItem->getName().
 				"&dstfld1=host&dstfld2=form_hostid&srctbl=hosts&srcfld1=host&srcfld2=hostid',450,450);",
 				'H')
@@ -2205,14 +2204,13 @@
 				array_push($frmRow,
 					SPACE,
 					new CButtonDelete('Delete selected item?',
-						url_param('form').url_param('groupid').url_param('hostid').url_param('config').
-						url_param('itemid'))
+						url_param('form').url_param('groupid').url_param('itemid'))
 				);
 			}
 		}
 		array_push($frmRow,
 			SPACE,
-			new CButtonCancel(url_param('groupid').url_param('hostid').url_param('config')));
+			new CButtonCancel(url_param('groupid')));
 
 		$frmItem->addSpanRow($frmRow,'form_row_last');
 
@@ -5537,7 +5535,7 @@
 // BEGIN: HOSTS PROFILE EXTENDED Section
 			$useprofile_ext = 'no';
 
-			$db_profiles_alt = DBselect('SELECT * FROM hosts_profiles_ext		 WHERE hostid='.$_REQUEST['hostid']);
+			$db_profiles_alt = DBselect('SELECT * FROM hosts_profiles_ext WHERE hostid='.$_REQUEST['hostid']);
 			if($ext_host_profiles = DBfetch($db_profiles_alt)){
 				$useprofile_ext = 'yes';
 			}
@@ -5633,7 +5631,7 @@
 		$host_tbl->setOddRowClass('form_odd_row');
 		$host_tbl->setEvenRowClass('form_even_row');
 
-		if($_REQUEST['hostid']>0) $frmHost->addVar('hostid', $_REQUEST['hostid']);
+//		if($_REQUEST['hostid']>0) $frmHost->addVar('hostid', $_REQUEST['hostid']);
 		if($_REQUEST['groupid']>0) $frmHost->addVar('groupid', $_REQUEST['groupid']);
 
 		$host_tbl->addRow(array(S_NAME, new CTextBox('host',$host,54)));
