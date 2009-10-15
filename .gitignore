@@ -191,4 +191,4 @@ src/zabbix_server/watchdog/Makefile
 src/zabbix_server/watchdog/Makefile.in
 upgrades/Makefile
 upgrades/Makefile.in
-/zabbix-1.7.tar.gz
+/zabbix-*.tar.gz
