@@ -1,5 +1,6 @@
 Changes for 1.7.0
 
+ - [ZBX-1071] move Zabbix client utilities from sbin to bin (Richlv)
  - [DEV-333] added configuration data cache module (Sasha)
  - [DEV-427] frontend is PHP 5.3.0 compatible (Aly)
  - [ZBX-1034] fixed maps tooltip url view (Aly)
