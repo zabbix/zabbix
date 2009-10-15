@@ -229,7 +229,7 @@
 				$masterid = 0;
 				$nodetype = 0;
 				if($ZBX_CURMASTERID){
-					error('Master node already exist');
+					error('Master node already exists');
 					return false;
 				}
 				break;
@@ -244,7 +244,7 @@
 		}
 
 		if(DBfetch(DBselect('select nodeid from nodes where nodeid='.$new_nodeid))){
-			error('Node with same ID already exist.');
+			error('Node with same ID already exists');
 			return false;
 		}
 
@@ -255,7 +255,7 @@
 
 		if($result && $node_type == ZBX_NODE_MASTER){
 			DBexecute('update nodes set masterid='.$new_nodeid.' where nodeid='.get_current_nodeid(false));
-			$ZBX_CURMASTERID = $new_nodeid; /* applay Master node for this script */
+			$ZBX_CURMASTERID = $new_nodeid; /* apply Master node for this script */
 		}
 
 	return ($result ? $new_nodeid : $result);
