@@ -154,13 +154,13 @@ class CGraphDraw{
 	public function getLastValue($num){
 		$data = &$this->data[$this->items[$num]['itemid']][$this->items[$num]['calc_type']];
 		if(isset($data)) for($i=$this->sizeX-1;$i>=0;$i--){
-			if(isset($data->count[$i]) && ($data->count[$i] > 0)){
+			if(isset($data['count'][$i]) && ($data['count'][$i] > 0)){
 				switch($this->items[$num]['calc_fnc']){
-					case CALC_FNC_MIN:	return	$data->min[$i];
-					case CALC_FNC_MAX:	return	$data->max[$i];
+					case CALC_FNC_MIN:	return	$data['min'][$i];
+					case CALC_FNC_MAX:	return	$data['max'][$i];
 					case CALC_FNC_ALL:	/* use avg */
 					case CALC_FNC_AVG:
-					default:		return	$data->avg[$i];
+					default:		return	$data['avg'][$i];
 				}
 			}
 		}
