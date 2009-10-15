@@ -54,9 +54,9 @@ include_once('include/page_header.php');
 		'groupids'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		'applications'=>array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 // host
-		'groupid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,			null),
-		'hostid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,			'isset({form})&&({form}=="update")'),
-		'host'=>	array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,		'isset({save})&&!isset({massupdate})'),
+		'groupid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,			null),
+		'hostid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,			'isset({form})&&({form}=="update")'),
+		'host'=>		array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,		'isset({save})&&!isset({massupdate})'),
 		'proxy_hostid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,	'isset({save})&&!isset({massupdate})'),
 		'dns'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({save})&&!isset({massupdate})'),
 		'useip'=>		array(T_ZBX_STR, O_OPT, NULL,	IN('0,1'),	'isset({save})&&!isset({massupdate})'),
