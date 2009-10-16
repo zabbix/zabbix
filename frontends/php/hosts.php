@@ -245,9 +245,8 @@ include_once('include/page_header.php');
 
 			if($result && isset($visible['useprofile'])){
 
-				$host_profile=DBfetch(DBselect('SELECT * FROM hosts_profiles WHERE hostid='.$hostid));
-				$host_profile_fields = array('devicetype', 'name', 'os', 'serialno', 'tag',
-					'macaddress', 'hardware', 'software', 'contact', 'location', 'notes');
+				$host_profile = DBfetch(DBselect('SELECT * FROM hosts_profiles WHERE hostid='.$hostid));
+				$host_profile_fields = array('devicetype', 'name', 'os', 'serialno', 'tag','macaddress', 'hardware', 'software', 'contact', 'location', 'notes');
 
 				delete_host_profile($hostid);
 
