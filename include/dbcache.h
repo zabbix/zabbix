@@ -103,13 +103,6 @@ ZBX_DC_TREND
 
 ZBX_DC_STATS
 {
-	zbx_uint64_t	buffer_history_counter;	/* Total number of record added to the history buffer */
-	zbx_uint64_t	buffer_history_total;	/* ZBX_HISTORY_SIZE */
-	zbx_uint64_t	buffer_history_used;
-	zbx_uint64_t	buffer_history_free;
-	zbx_uint64_t	buffer_trend_total;	/* ZBX_TREND_SIZE */
-	zbx_uint64_t	buffer_trend_used;
-	zbx_uint64_t	buffer_trend_free;
 	zbx_uint64_t	buffer_history_num_float;	/* Number of floats in the buffer */
 	zbx_uint64_t	buffer_history_num_uint;
 	zbx_uint64_t	buffer_history_num_str;
@@ -225,7 +218,15 @@ void	DCflush_nextchecks();
 #define ZBX_STATS_HISTORY_STR_COUNTER	3
 #define ZBX_STATS_HISTORY_LOG_COUNTER	4
 #define ZBX_STATS_HISTORY_TEXT_COUNTER	5
-zbx_uint64_t	DCget_stats(int request);
+#define ZBX_STATS_HISTORY_TOTAL		6
+#define ZBX_STATS_HISTORY_USED		7
+#define ZBX_STATS_HISTORY_FREE		8
+#define ZBX_STATS_HISTORY_PFREE		9
+#define ZBX_STATS_TREND_TOTAL		10
+#define ZBX_STATS_TREND_USED		11
+#define ZBX_STATS_TREND_FREE		12
+#define ZBX_STATS_TREND_PFREE		13
+void	*DCget_stats(int request);
 
 zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int num);
 
