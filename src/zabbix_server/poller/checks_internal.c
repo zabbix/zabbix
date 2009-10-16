@@ -20,6 +20,7 @@
 #include "common.h"
 #include "checks_internal.h"
 #include "log.h"
+#include "dbcache.h"
 
 /******************************************************************************
  *                                                                            *
@@ -42,7 +43,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 {
 	zbx_uint64_t	i;
 	char		tmp[MAX_STRING_LEN], params[MAX_STRING_LEN],
-			hostname[HOST_HOST_LEN_MAX];
+			tmp1[HOST_HOST_LEN_MAX];
 	int		nparams;
 
 	init_result(result);
@@ -142,19 +143,50 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if (3 != nparams)
 			goto not_supported;
 
-		if (get_param(params, 2, hostname, sizeof(hostname)) != 0)
+		if (get_param(params, 2, tmp1, sizeof(tmp1)) != 0)
 			goto not_supported;
 
 		if (0 != get_param(params, 3, tmp, sizeof(tmp)))
 			goto not_supported;
 
 		if (0 == strcmp(tmp, "lastaccess")) {
-			if (FAIL == (i = DBget_proxy_lastaccess(hostname)))
+			if (FAIL == (i = DBget_proxy_lastaccess(tmp1)))
 				goto not_supported;
 		} else
 			goto not_supported;
 
 		SET_UI64_RESULT(result, i);
+	}
+	else if (0 == strcmp(tmp, "wcache"))
+	{
+		if (nparams > 3)
+			goto not_supported;
+
+		if (get_param(params, 2, tmp, sizeof(tmp)) != 0)
+			goto not_supported;
+
+		if (get_param(params, 3, tmp1, sizeof(tmp1)) != 0)
+			*tmp1 = '\0';
+
+		if (0 == strcmp(tmp, "values"))
+		{
+			if ('\0' == *tmp1 || 0 == strcmp(tmp1, "all"))
+				SET_UI64_RESULT(result, DCget_stats(ZBX_STATS_HISTORY_COUNTER))
+			else if (0 == strcmp(tmp1, "float"))
+				SET_UI64_RESULT(result, DCget_stats(ZBX_STATS_HISTORY_FLOAT_COUNTER))
+			else if (0 == strcmp(tmp1, "uint"))
+				SET_UI64_RESULT(result, DCget_stats(ZBX_STATS_HISTORY_UINT_COUNTER))
+			else if (0 == strcmp(tmp1, "str"))
+				SET_UI64_RESULT(result, DCget_stats(ZBX_STATS_HISTORY_STR_COUNTER))
+			else if (0 == strcmp(tmp1, "log"))
+				SET_UI64_RESULT(result, DCget_stats(ZBX_STATS_HISTORY_LOG_COUNTER))
+			else if (0 == strcmp(tmp1, "text"))
+				SET_UI64_RESULT(result, DCget_stats(ZBX_STATS_HISTORY_TEXT_COUNTER))
+			else
+				goto not_supported;
+		}
+		else
+			goto not_supported;
 	}
 	else
 		goto not_supported;
