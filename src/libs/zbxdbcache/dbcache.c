@@ -68,17 +68,57 @@ extern int		CONFIG_DBSYNCER_FREQUENCY;
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	DCget_stats(int request)
+void	*DCget_stats(int request)
 {
+	static zbx_uint64_t	value_uint;
+	static double		value_double;
+
 	switch (request)
 	{
-	case ZBX_STATS_HISTORY_COUNTER:		return cache->stats.history_counter;
-	case ZBX_STATS_HISTORY_FLOAT_COUNTER:	return cache->stats.history_float_counter;
-	case ZBX_STATS_HISTORY_UINT_COUNTER:	return cache->stats.history_uint_counter;
-	case ZBX_STATS_HISTORY_STR_COUNTER:	return cache->stats.history_str_counter;
-	case ZBX_STATS_HISTORY_LOG_COUNTER:	return cache->stats.history_log_counter;
-	case ZBX_STATS_HISTORY_TEXT_COUNTER:	return cache->stats.history_text_counter;
-	default:				return 0;
+	case ZBX_STATS_HISTORY_COUNTER:
+		value_uint = cache->stats.history_counter;
+		return &value_uint;
+	case ZBX_STATS_HISTORY_FLOAT_COUNTER:
+		value_uint = cache->stats.history_float_counter;
+		return &value_uint;
+	case ZBX_STATS_HISTORY_UINT_COUNTER:
+		value_uint = cache->stats.history_uint_counter;
+		return &value_uint;
+	case ZBX_STATS_HISTORY_STR_COUNTER:
+		value_uint = cache->stats.history_str_counter;
+		return &value_uint;
+	case ZBX_STATS_HISTORY_LOG_COUNTER:
+		value_uint = cache->stats.history_log_counter;
+		return &value_uint;
+	case ZBX_STATS_HISTORY_TEXT_COUNTER:
+		value_uint = cache->stats.history_text_counter;
+		return &value_uint;
+	case ZBX_STATS_HISTORY_TOTAL:
+		value_uint = ZBX_HISTORY_SIZE;
+		return &value_uint;
+	case ZBX_STATS_HISTORY_USED:
+		value_uint = cache->history_num;
+		return &value_uint;
+	case ZBX_STATS_HISTORY_FREE:
+		value_uint = ZBX_HISTORY_SIZE - cache->history_num;
+		return &value_uint;
+	case ZBX_STATS_HISTORY_PFREE:
+		value_double = 100 * ((double)(ZBX_HISTORY_SIZE - cache->history_num) / ZBX_HISTORY_SIZE);
+		return &value_double;
+	case ZBX_STATS_TREND_TOTAL:
+		value_uint = ZBX_TREND_SIZE;
+		return &value_uint;
+	case ZBX_STATS_TREND_USED:
+		value_uint = cache->trends_num;
+		return &value_uint;
+	case ZBX_STATS_TREND_FREE:
+		value_uint = ZBX_TREND_SIZE - cache->trends_num;
+		return &value_uint;
+	case ZBX_STATS_TREND_PFREE:
+		value_double = 100 * ((double)(ZBX_TREND_SIZE - cache->trends_num) / ZBX_TREND_SIZE);
+		return &value_double;
+	default:
+		return NULL;
 	}
 }
 
