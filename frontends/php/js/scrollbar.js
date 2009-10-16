@@ -427,7 +427,9 @@ calendarShowLeft: function(){
 
 	var pos = getPosition(this.dom.info_left); 
 	pos.top-=204; 
-	pos.left-=102; 
+	pos.left-=142; 
+	
+	if(CR) pos.top-=20;
 	this.clndrLeft.clndr.clndrshow(pos.top,pos.left);
 },
 
@@ -438,7 +440,9 @@ calendarShowRight: function(){
 
 	var pos = getPosition(this.dom.info_right); 
 	pos.top-=204; 
-	pos.left-=58; 
+	pos.left-=78; 
+	
+	if(CR) pos.top-=20;
 	this.clndrRight.clndr.clndrshow(pos.top,pos.left);
 },
 
