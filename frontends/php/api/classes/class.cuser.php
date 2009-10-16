@@ -157,7 +157,7 @@ class CUser extends CZBXAPI{
 
 // extendoutput
 		if(!is_null($options['extendoutput'])){
-			$sql_parts['select']['usrgrp'] = 'u.*';
+			$sql_parts['select']['users'] = 'u.*';
 		}
 
 // count

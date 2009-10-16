@@ -95,7 +95,7 @@ dom:{
 	'nav_links': null,				// dom object
 	'nav_linklist': new Array(),	// dom object
 	'period_state': null,			// dom object
-	'info_period': null,			// dom object period info
+	'info_period': null				// dom object period info
 },
 
 // params
