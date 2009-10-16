@@ -39,7 +39,8 @@
 #	include "cfg.h"
 #	include "threads.h"
 
-	static int	ZBX_SEM_LIST_ID = -1;
+	static int		ZBX_SEM_LIST_ID = -1;
+	static unsigned char	mutexes = 0;
 
 #endif /* not _WINDOWS */
 
@@ -175,6 +176,7 @@ lbl_create:
 lbl_return:
 
 	*mutex = name;
+	mutexes++;
 
 #endif /* _WINDOWS */
 
@@ -302,7 +304,8 @@ int zbx_mutex_destroy(ZBX_MUTEX *mutex)
 
 #else /* not _WINDOWS */
 
-	semctl(ZBX_SEM_LIST_ID, 0, IPC_RMID, 0);
+	if (0 == --mutexes)
+		semctl(ZBX_SEM_LIST_ID, 0, IPC_RMID, 0);
 
 #endif /* _WINDOWS */
 
