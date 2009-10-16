@@ -1389,7 +1389,6 @@ static void	DCsync_items()
 		if (new)
 		{
 			item->itemid = itemid;
-			item->status = (unsigned char)atoi(row[20]);
 			item->nextcheck = calculate_item_nextcheck(itemid, type, delay, row[16], now);
 
 			DCupdate_idxitem01(i, NULL, NULL, &hostid, key);
@@ -1406,6 +1405,7 @@ static void	DCsync_items()
 		item->poller_type = poller_type;
 		item->poller_num = poller_num;
 		item->type = type;
+		item->status = (unsigned char)atoi(row[20]);
 		item->data_type = (unsigned char)atoi(row[4]);
 		item->value_type = (unsigned char)atoi(row[5]);
 		zbx_strlcpy(item->key, key, sizeof(item->key));
