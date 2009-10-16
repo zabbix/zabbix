@@ -527,7 +527,14 @@ if(!isset($DB)){
 				if(ocifetchinto($cursor, $row, (OCI_ASSOC+OCI_RETURN_NULLS))){
 					$result = array();
 					foreach($row as $key => $value){
-						$result[strtolower($key)] = (str_in_array(strtolower(ocicolumntype($cursor,$key)),array('varchar','varchar2','blob','clob')) && is_null($value))?'':$value;
+						$field_type = strtolower(oci_field_type($cursor,$key));
+						$value = (str_in_array($field_type,array('varchar','varchar2','blob','clob')) && is_null($value))?'':$value;
+						
+						if(is_object($value) && (stristr($field_type, 'lob') !== false)){
+							$value = $value->load();
+						}
+						
+						$result[strtolower($key)] = $value;
 					}
 				}
 				break;
