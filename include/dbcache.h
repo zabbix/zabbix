@@ -218,7 +218,14 @@ void	free_database_cache(void);
 void	DCinit_nextchecks();
 void	DCadd_nextcheck(DC_ITEM *item, time_t now, const char *error_msg);
 void	DCflush_nextchecks();
-void	DCget_stats(ZBX_DC_STATS *stats);
+
+#define ZBX_STATS_HISTORY_COUNTER	0
+#define ZBX_STATS_HISTORY_FLOAT_COUNTER	1
+#define ZBX_STATS_HISTORY_UINT_COUNTER	2
+#define ZBX_STATS_HISTORY_STR_COUNTER	3
+#define ZBX_STATS_HISTORY_LOG_COUNTER	4
+#define ZBX_STATS_HISTORY_TEXT_COUNTER	5
+zbx_uint64_t	DCget_stats(int request);
 
 zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int num);
 

@@ -216,13 +216,10 @@ static void	activate_host(DC_ITEM *item, int now)
 		return;
 	}
 
-	if (0 == *errors_from)
+	if (0 == *errors_from && HOST_AVAILABLE_TRUE == *available)
 		return;
 
 	if (SUCCEED != DCconfig_activate_host(item))
-		return;
-
-	if (0 == *errors_from)	/* host already enabled by other poller */
 		return;
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "update hosts set ");

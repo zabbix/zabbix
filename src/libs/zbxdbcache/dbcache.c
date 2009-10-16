@@ -68,9 +68,18 @@ extern int		CONFIG_DBSYNCER_FREQUENCY;
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	DCget_stats(ZBX_DC_STATS *stats)
+zbx_uint64_t	DCget_stats(int request)
 {
-	memcpy(stats, &cache->stats, sizeof(ZBX_DC_STATS));
+	switch (request)
+	{
+	case ZBX_STATS_HISTORY_COUNTER:		return cache->stats.history_counter;
+	case ZBX_STATS_HISTORY_FLOAT_COUNTER:	return cache->stats.history_float_counter;
+	case ZBX_STATS_HISTORY_UINT_COUNTER:	return cache->stats.history_uint_counter;
+	case ZBX_STATS_HISTORY_STR_COUNTER:	return cache->stats.history_str_counter;
+	case ZBX_STATS_HISTORY_LOG_COUNTER:	return cache->stats.history_log_counter;
+	case ZBX_STATS_HISTORY_TEXT_COUNTER:	return cache->stats.history_text_counter;
+	default:				return 0;
+	}
 }
 
 /******************************************************************************
@@ -931,30 +940,38 @@ static void DCmass_function_update(ZBX_DC_HISTORY *history, int history_num)
 	char		*lastvalue;
 	char		value[MAX_STRING_LEN], *value_esc, *function_esc, *parameter_esc;
 	int		sql_offset = 0, i;
+	zbx_uint64_t	*ids = NULL;
+	int		ids_alloc, ids_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCmass_function_update()");
 
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 1024,
-			"select distinct %s,f.function,f.parameter,f.itemid,f.lastvalue from %s,functions f,triggers t"
-			" where f.itemid=i.itemid and h.hostid=i.hostid and f.triggerid=t.triggerid and t.status in (%d)"
-			" and f.itemid in (",
-			ZBX_SQL_ITEM_FIELDS,
-			ZBX_SQL_ITEM_TABLES,
-			TRIGGER_STATUS_ENABLED);
+	ids_alloc = history_num;
+	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
 
 	for (i = 0; i < history_num; i++)
 	{
 		history[i].functions = 0;
 		if (0 == history[i].value_null)
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32, ZBX_FS_UI64 ",",
-					history[i].itemid);
+			uint64_array_add(&ids, &ids_alloc, &ids_num, history[i].itemid, 64);
 	}
 
-	if (sql[sql_offset - 1] == ',')
+	if (0 == ids_num)
 	{
-		sql_offset--;
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32, ")");
+		zbx_free(ids);
+		return;
 	}
+
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 1024,
+			"select distinct %s,f.function,f.parameter,f.itemid,f.lastvalue from %s,functions f,triggers t"
+			" where f.itemid=i.itemid and h.hostid=i.hostid and f.triggerid=t.triggerid and t.status in (%d)"
+			" and",
+			ZBX_SQL_ITEM_FIELDS,
+			ZBX_SQL_ITEM_TABLES,
+			TRIGGER_STATUS_ENABLED);
+
+	DBadd_condition_alloc(&sql, &sql_allocated, &sql_offset, "f.itemid", ids, ids_num);
+
+	zbx_free(ids);
 
 	result = DBselect("%s", sql);
 
@@ -2046,6 +2063,9 @@ void	DCadd_history(zbx_uint64_t itemid, double value_orig, int clock)
 	history->keep_history		= 0;
 	history->keep_trends		= 0;
 
+	cache->stats.history_counter++;
+	cache->stats.history_float_counter++;
+
 	UNLOCK_CACHE;
 }
 
@@ -2080,6 +2100,9 @@ void	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value_orig, int clock)
 	history->value_null			= 0;
 	history->keep_history			= 0;
 	history->keep_trends			= 0;
+
+	cache->stats.history_counter++;
+	cache->stats.history_uint_counter++;
 
 	UNLOCK_CACHE;
 }
@@ -2121,6 +2144,9 @@ void	DCadd_history_str(zbx_uint64_t itemid, char *value_orig, int clock)
 	history->keep_history		= 0;
 	history->keep_trends		= 0;
 
+	cache->stats.history_counter++;
+	cache->stats.history_str_counter++;
+
 	UNLOCK_CACHE;
 }
 
@@ -2160,6 +2186,9 @@ void	DCadd_history_text(zbx_uint64_t itemid, char *value_orig, int clock)
 	cache->last_text		+= len;
 	history->keep_history		= 0;
 	history->keep_trends		= 0;
+
+	cache->stats.history_counter++;
+	cache->stats.history_text_counter++;
 
 	UNLOCK_CACHE;
 }
@@ -2216,6 +2245,9 @@ void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, int tim
 	history->lastlogsize		= lastlogsize;
 	history->keep_history		= 0;
 	history->keep_trends		= 0;
+
+	cache->stats.history_counter++;
+	cache->stats.history_log_counter++;
 
 	UNLOCK_CACHE;
 }
@@ -2287,6 +2319,7 @@ void	init_database_cache(zbx_process_t p)
 
 	ids = ptr;
 	memset(ids, 0, sizeof(ZBX_DC_IDS));
+	memset(&cache->stats, 0, sizeof(ZBX_DC_STATS));
 
 	if (NULL == sql)
 		sql = zbx_malloc(sql, sql_allocated);
