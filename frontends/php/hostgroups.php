@@ -49,7 +49,7 @@ include_once('include/page_header.php');
 /* group */
 		'groupid'=>				array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,		'(isset({form})&&({form}=="update"))'),
 		'gname'=>				array(T_ZBX_STR, O_OPT,	NULL,		NOT_EMPTY,	'isset({save})'),
-		'twb_groupid'		=> array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID,		NULL),
+		'twb_groupid'=> 		array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID,		NULL),
 /* actions */
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 // form

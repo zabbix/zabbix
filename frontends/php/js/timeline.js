@@ -27,6 +27,7 @@ _endtime: null,					// timeline end time (right, now)
 
 _usertime: null,				// selected end time (bar, user selection)
 _period: null,					// selected period
+_now: false,					// state if time is set to NOW
 
 minperiod: 3600,				// minimal allowed period
 
@@ -49,23 +50,31 @@ initialize: function(id, period, starttime, usertime, endtime){
 	this.period(period);
 },
 
-now: function(){
+timeNow: function(){
 	var tmp_date = new Date();
 return parseInt(tmp_date.getTime()/1000);
 },
 
 setNow: function(){
-	var end = this.now();
+	var end = this.timeNow();
 	
 	this._endtime = end;
 	this._usertime = end;
+	
+	this.now();
+},
+
+now: function(){
+	this._now = ((this._usertime+60) > this._endtime);
+
+return this._now;
 },
 
 
 period: function(period){
 	this.debug('period');
 
-	if('undefined'==typeof(period)) return this._period;
+	if('undefined' == typeof(period)) return this._period;
 
 	if((this._usertime - period) < this._starttime)  period = this._usertime - this._starttime;
 	
@@ -80,12 +89,14 @@ return this._period;
 usertime: function(usertime){
 	this.debug('usertime');
 	
-	if('undefined'==typeof(usertime)) return this._usertime;
+	if('undefined' == typeof(usertime)) return this._usertime;
 
 	if((usertime + this.minperiod) < this._starttime) usertime = this._starttime + this.minperiod;
 	if(usertime > this._endtime) usertime = this._endtime;
 
 	this._usertime = usertime;
+	
+	this.now();
 	
 return this._usertime;
 },
