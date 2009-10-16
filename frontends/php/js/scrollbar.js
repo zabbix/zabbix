@@ -886,7 +886,7 @@ setTabInfo: function(){
 	var date = datetoarray(usertime);
 	var right_info = date[0]+'.'+date[1]+'.'+date[2]+' '+date[3]+':'+date[4];//+':'+date[5];
 
-	if(this.timeline.usertime() == this.timeline.endtime()){
+	if(this.timeline.now()){
 		right_info += '  (now!)  ';
 	}
 	
