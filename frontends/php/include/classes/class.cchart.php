@@ -67,64 +67,11 @@ class CChart extends CGraphDraw{
 		$this->gridLinesCount = array();	// How many grids to draw
 		$this->gridPixels = 25;				// optimal grid size
 		$this->gridPixelsVert = 40;			//
-
-		$this->graphtheme = array(
-			'description' => 'default',
-			'frontendtheme' => 'default.css',
-			'textcolor' => '202020',
-			'highlightcolor' => 'aa4444',
-			'backgroundcolor' => 'f0f0f0',
-			'graphcolor' => 'ffffff',
-			'graphbordercolor' => '333333',
-			'gridcolor' => 'cccccc',
-			'maingridcolor' => 'aaaaaa',
-			'gridbordercolor' => '000000',
-			'noneworktimecolor' => 'eaeaea',
-			'leftpercentilecolor' => '00AA00',
-			'righttpercentilecolor' => 'AA0000',
-			'legendview' => '1',
-			'gridview' => '1'
-		);
-
-		$this->applyGraphTheme();
 	}
 
 /********************************************************************************************************/
 // PRE CONFIG:	ADD / SET / APPLY
 /********************************************************************************************************/
-
-	public function applyGraphTheme($description=null){
-		global $USER_DETAILS;
-
-		if(!is_null($description)){
-			$sql_where = ' AND gt.description='.zbx_dbstr($description);
-		}
-		else{
-			$config=select_config();
-			if(isset($config['default_theme']) && file_exists('styles/'.$config['default_theme'])){
-				$css = $config['default_theme'];
-			}
-
-			if(isset($USER_DETAILS['theme']) && ($USER_DETAILS['theme']!=ZBX_DEFAULT_CSS) && ($USER_DETAILS['alias']!=ZBX_GUEST_USER)){
-				if(file_exists('styles/'.$USER_DETAILS['theme'])){
-					$css = $USER_DETAILS['theme'];
-				}
-			}
-
-			$sql_where = ' AND gt.theme='.zbx_dbstr($css);
-		}
-
-		$sql = 'SELECT gt.* '.
-				' FROM graph_theme gt '.
-				' WHERE '.DBin_node('gt.graphthemeid').
-				$sql_where;
-//SDI($sql);
-		$res = DBselect($sql);
-		if($theme = DBfetch($res)){
-			$this->graphtheme = $theme;
-		}
-	}
-
 	public function updateShifts(){
 		if( ($this->yaxisleft == 1) && ($this->yaxisright == 1)){
 			$this->shiftXleft = 100;
@@ -1798,8 +1745,8 @@ SDI('======================================');
 
 
 		$this->initColors();
-		$this->drawRectangle($this->graphtheme['backgroundcolor'], $this->graphtheme['graphbordercolor']);
-		$this->drawHeader($this->graphtheme['textcolor']);
+		$this->drawRectangle();
+		$this->drawHeader();
 
 		if($this->num==0){
 //				$this->noDataFound();

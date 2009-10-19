@@ -31,63 +31,11 @@ class CPie extends CGraphDraw{
 		$this->graphheight3d = 12;
 		$this->shiftlegendright = 17*7 + 7 + 10; // count of static chars * px/char + for color rectangle + space
 		$this->drawlegendallow = 1;
-
-		$this->graphtheme = array(
-			'description' => 'default',
-			'frontendtheme' => 'default.css',
-			'textcolor' => '202020',
-			'highlightcolor' => 'aa4444',
-			'backgroundcolor' => 'f0f0f0',
-			'graphcolor' => 'ffffff',
-			'graphbordercolor' => '333333',
-			'gridcolor' => 'cccccc',
-			'maingridcolor' => 'aaaaaa',
-			'gridbordercolor' => '000000',
-			'noneworktimecolor' => 'eaeaea',
-			'leftpercentilecolor' => '00AA00',
-			'righttpercentilecolor' => 'AA0000',
-			'legendview' => '1',
-			'gridview' => '1'
-		);
-
-		$this->applyGraphTheme();
 	}
 
 /********************************************************************************************************/
 // PRE CONFIG:	ADD / SET / APPLY
 /********************************************************************************************************/
-
-	public function applyGraphTheme($description=null){
-		global $USER_DETAILS;
-
-		if(!is_null($description)){
-			$sql_where = ' AND gt.description='.zbx_dbstr($description);
-		}
-		else{
-			$config=select_config();
-			if(isset($config['default_theme']) && file_exists('styles/'.$config['default_theme'])){
-				$css = $config['default_theme'];
-			}
-
-			if(isset($USER_DETAILS['theme']) && ($USER_DETAILS['theme']!=ZBX_DEFAULT_CSS) && ($USER_DETAILS['alias']!=ZBX_GUEST_USER)){
-				if(file_exists('styles/'.$USER_DETAILS['theme'])){
-					$css = $USER_DETAILS['theme'];
-				}
-			}
-
-			$sql_where = ' AND gt.theme='.zbx_dbstr($css);
-		}
-
-		$sql = 'SELECT gt.* '.
-				' FROM graph_theme gt '.
-				' WHERE '.DBin_node('gt.graphthemeid').
-				$sql_where;
-//SDI($sql);
-		$res = DBselect($sql);
-		if($theme = DBfetch($res)){
-			$this->graphtheme = $theme;
-		}
-	}
 
 	public function switchlegend($type=false){
 		if($type && is_numeric($type)){
@@ -636,8 +584,8 @@ class CPie extends CGraphDraw{
 
 
 		$this->initColors();
-		$this->drawRectangle($this->graphtheme['backgroundcolor'], $this->graphtheme['graphbordercolor']);
-		$this->drawHeader($this->graphtheme['textcolor']);
+		$this->drawRectangle();
+		$this->drawHeader();
 
 		$maxX = $this->sizeX;
 
