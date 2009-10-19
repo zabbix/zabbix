@@ -25,7 +25,7 @@ class CBar extends CGraphDraw{
 		parent::__construct($type);
 
 		$this->background = false;
-		$this->opacity = 30;			// bar/column opacity
+		$this->opacity = 15;			// bar/column opacity
 		$this->sum = false;
 
 		$this->shiftlegendright = 0;	// count of static chars * px/char + for color rectangle + space
@@ -42,6 +42,7 @@ class CBar extends CGraphDraw{
 		$this->columnWidth = 10;					// bar/column width per serie
 		$this->seriesWidth = 10;					// overal per serie bar/column width
 		$this->seriesDistance = 10;
+		$this->shiftY=46;
 
 		$this->axisSideLeft = false;				// Do values for axis left/top persist
 		$this->axisSideRight = false;				// Do values for axis right/bottom persist
@@ -56,7 +57,7 @@ class CBar extends CGraphDraw{
 		$this->maxValue = array(GRAPH_YAXIS_SIDE_LEFT=>null, GRAPH_YAXIS_SIDE_RIGHT=>null);
 
 		$this->gridLinesCount = NULL;				// How many grids to draw
-		$this->gridPixels = 40;						// optimal grid size
+		$this->gridPixels = 30;						// optimal grid size
 		$this->gridStep = array(GRAPH_YAXIS_SIDE_LEFT=>null, GRAPH_YAXIS_SIDE_RIGHT=>null);		// set value
 
 		$this->side_values = array(GRAPH_YAXIS_SIDE_LEFT=>ITEM_VALUE_TYPE_UINT64,
@@ -65,72 +66,11 @@ class CBar extends CGraphDraw{
 		$this->column = null;
 
 		$this->units = array(GRAPH_YAXIS_SIDE_LEFT=>'', GRAPH_YAXIS_SIDE_RIGHT=>'');	// Units for values
-
-		$this->graphtheme = array(
-			'description' => 'default',
-			'frontendtheme' => 'default.css',
-			'textcolor' => '202020',
-			'highlightcolor' => 'aa4444',
-			'backgroundcolor' => 'f0f0f0',
-			'graphcolor' => 'ffffff',
-			'graphbordercolor' => '333333',
-			'gridcolor' => 'cccccc',
-			'maingridcolor' => 'aaaaaa',
-			'gridbordercolor' => '000000',
-			'noneworktimecolor' => 'eaeaea',
-			'leftpercentilecolor' => '00AA00',
-			'righttpercentilecolor' => 'AA0000',
-			'legendview' => '1',
-			'gridview' => '1'
-		);
-
-		$this->applyGraphTheme();
 	}
 
 /********************************************************************************************************/
 // PRE CONFIG:	ADD / SET / APPLY
 /********************************************************************************************************/
-
-	public function applyGraphTheme($description=null){
-		global $USER_DETAILS;
-
-		if(!is_null($description)){
-			$sql_where = ' AND gt.description='.zbx_dbstr($description);
-		}
-		else{
-			$config=select_config();
-			if(isset($config['default_theme']) && file_exists('styles/'.$config['default_theme'])){
-				$css = $config['default_theme'];
-			}
-
-			if(isset($USER_DETAILS['theme']) && ($USER_DETAILS['theme']!=ZBX_DEFAULT_CSS) && ($USER_DETAILS['alias']!=ZBX_GUEST_USER)){
-				if(file_exists('styles/'.$USER_DETAILS['theme'])){
-					$css = $USER_DETAILS['theme'];
-				}
-			}
-
-			$sql_where = ' AND gt.theme='.zbx_dbstr($css);
-		}
-
-		$sql = 'SELECT gt.* '.
-				' FROM graph_theme gt '.
-				' WHERE '.DBin_node('gt.graphthemeid').
-				$sql_where;
-//SDI($sql);
-		$res = DBselect($sql);
-		if($theme = DBfetch($res)){
-			$this->graphtheme = $theme;
-		}
-	}
-
-	public function drawHeader(){
-		$str=$this->header;
-		$fontnum = ($this->sizeX < 500)?2:4;
-
-		$x=$this->fullSizeX/2-imagefontwidth($fontnum)*strlen($str)/2;
-		imagetext($this->im, 12, 0, $x, 1, $this->getColor($this->graphtheme['tectcolor'], 0), $str);
-	}
-
 	public function setGridStep($step,$axis=GRAPH_YAXIS_SIDE_LEFT){
 		$this->gridStep[$axis] = $step;
 	}
@@ -183,13 +123,14 @@ class CBar extends CGraphDraw{
 	}
 
 	public function setPeriodCaption($periodCaption){
+		
 		foreach($periodCaption as $key => $value){
 			$this->periodCaption[$key] = $value;
 
-			$tmp = zbx_strlen($value);
-			if($tmp > $this->maxCaption) $this->maxCaption = $tmp;
+			$tmp = imageTextSize(8,0,$value);
+			if($tmp['width'] > $this->maxCaption) $this->maxCaption = $tmp['width'];
 		}
-		$this->shiftCaption = round($this->maxCaption * 5.7);
+		$this->shiftCaption = $this->maxCaption;
 	}
 
 	public function setSeriesLegend($seriesLegend){
@@ -216,15 +157,15 @@ class CBar extends CGraphDraw{
 		}
 
 		if($this->column){
-			$this->shiftXCaptionLeft = ($this->axisSideLeft)?74:0;
-			$this->shiftXCaptionRight = ($this->axisSideRight)?74:0;
+			$this->shiftXCaptionLeft = ($this->axisSideLeft)?100:50;
+			$this->shiftXCaptionRight = ($this->axisSideRight)?100:50;
 
 			$this->shiftYCaptionTop = 0;
-			$this->shiftYCaptionBottom = $this->shiftCaption;;
+			$this->shiftYCaptionBottom = $this->shiftCaption;
 		}
 		else{
-			$this->shiftYCaptionTop = ($this->axisSideLeft)?74:0;
-			$this->shiftYCaptionBottom = ($this->axisSideRight)?74:0;
+			$this->shiftYCaptionTop = ($this->axisSideLeft)?100:50;
+			$this->shiftYCaptionBottom = ($this->axisSideRight)?100:50;
 
 			$this->shiftXCaptionLeft = $this->shiftCaption;
 			$this->shiftXCaptionRight = 0;
@@ -418,12 +359,76 @@ class CBar extends CGraphDraw{
 	//									DRAW									*
 	//***************************************************************************
 	public function drawSmallRectangle(){
+		imagefilledrectangle($this->im,
+			$this->shiftXleft+$this->shiftXCaptionLeft-1,
+			$this->shiftY-1+$this->shiftYCaptionTop,
+			$this->sizeX+$this->shiftXleft+$this->shiftXCaptionLeft-1,
+			$this->sizeY+$this->shiftY+1+$this->shiftYCaptionTop,
+			$this->getColor($this->graphtheme['graphcolor'], 0)
+			);
+
 		dashedrectangle($this->im,
 			$this->shiftXleft+$this->shiftXCaptionLeft-1,
 			$this->shiftY-1+$this->shiftYCaptionTop,
 			$this->sizeX+$this->shiftXleft+$this->shiftXCaptionLeft-1,
 			$this->sizeY+$this->shiftY+1+$this->shiftYCaptionTop,
-			$this->getColor('Black No Alpha')
+			$this->getColor($this->graphtheme['gridcolor'], 0)
+			);
+			
+		imageline($this->im,
+			$this->shiftXleft+$this->shiftXCaptionLeft-1,
+			$this->shiftY-5,
+			$this->shiftXleft+$this->shiftXCaptionLeft-1,
+			$this->sizeY+$this->shiftY+4,
+			$this->getColor($this->graphtheme['gridbordercolor'], 0)
+			);
+
+		imagefilledpolygon($this->im,
+				array(
+					$this->shiftXleft+$this->shiftXCaptionLeft-4, $this->shiftY-5,
+					$this->shiftXleft+$this->shiftXCaptionLeft+2, $this->shiftY-5,
+					$this->shiftXleft+$this->shiftXCaptionLeft-1, $this->shiftY-10,
+				),
+				3,
+				$this->getColor('White')
+			);
+
+		imagepolygon($this->im,
+				array(
+					$this->shiftXleft+$this->shiftXCaptionLeft-4, $this->shiftY-5,
+					$this->shiftXleft+$this->shiftXCaptionLeft+2, $this->shiftY-5,
+					$this->shiftXleft+$this->shiftXCaptionLeft-1, $this->shiftY-10,
+				),
+				3,
+				$this->getColor($this->graphtheme['gridbordercolor'], 0)
+			);
+			
+		imageline($this->im,
+			$this->shiftXleft+$this->shiftXCaptionLeft-4,
+			$this->sizeY+$this->shiftY+1,
+			$this->sizeX+$this->shiftXleft+$this->shiftXCaptionLeft+5,
+			$this->sizeY+$this->shiftY+1,
+			$this->getColor($this->graphtheme['gridbordercolor'], 0)
+			);
+
+		imagefilledpolygon($this->im,
+				array(
+					$this->sizeX+$this->shiftXleft+$this->shiftXCaptionLeft+5, $this->sizeY+$this->shiftY-2,
+					$this->sizeX+$this->shiftXleft+$this->shiftXCaptionLeft+5, $this->sizeY+$this->shiftY+4,
+					$this->sizeX+$this->shiftXleft+$this->shiftXCaptionLeft+10, $this->sizeY+$this->shiftY+1,
+				),
+				3,
+				$this->getColor('White')
+			);
+
+		imagepolygon($this->im,
+				array(
+					$this->sizeX+$this->shiftXleft+$this->shiftXCaptionLeft+5, $this->sizeY+$this->shiftY-2,
+					$this->sizeX+$this->shiftXleft+$this->shiftXCaptionLeft+5, $this->sizeY+$this->shiftY+4,
+					$this->sizeX+$this->shiftXleft+$this->shiftXCaptionLeft+10, $this->sizeY+$this->shiftY+1,
+				),
+				3,
+				$this->getColor($this->graphtheme['gridbordercolor'], 0)
 			);
 	}
 
@@ -447,11 +452,13 @@ class CBar extends CGraphDraw{
 
 			foreach($this->series as $key => $serie){
 				$caption = $this->periodCaption[$key];
-				$caption = str_pad($caption,$this->maxCaption,' ', STR_PAD_LEFT);
 
-				imagetext($this->im, 2, 0,
-				$i*($this->seriesWidth+$this->seriesDistance)+$this->shiftXleft+$this->shiftXCaptionLeft+round($this->seriesWidth/2),
-				$this->sizeY+$this->shiftY+$this->shiftYCaptionBottom, $this->getColor('Black No Alpha'), $caption);
+				$dims = imageTextSize(9,0,$caption);
+				imageText($this->im, 9, 0,
+							$i*($this->seriesWidth+$this->seriesDistance)+$this->shiftXleft+$this->shiftXCaptionLeft+round($this->seriesWidth/2)-($dims['width']/2),
+							$this->sizeY+$this->shiftY+20, 
+							$this->getColor($this->graphtheme['textcolor'], 0), 
+							$caption);
 
 				$i++;
 			}
@@ -476,10 +483,11 @@ class CBar extends CGraphDraw{
 				$caption = $this->periodCaption[$key];
 				$caption = str_pad($caption,$this->maxCaption,' ', STR_PAD_LEFT);
 
-				imagetext($this->im, 2, 0,
-				$this->shiftXleft,
-				($this->sizeY + $this->shiftY+$this->shiftYCaptionTop) - ($i*($this->seriesWidth+$this->seriesDistance)+$this->seriesDistance+round($this->seriesWidth/2)),
-				$this->getColor('Black No Alpha'), $caption);
+				imageText($this->im, 8, 0,
+					$this->shiftXleft,
+					($this->sizeY + $this->shiftY+$this->shiftYCaptionTop) - ($i*($this->seriesWidth+$this->seriesDistance)+$this->seriesDistance+round($this->seriesWidth/2)),
+					$this->getColor($this->graphtheme['textcolor'], 0), 
+					$caption);
 
 				$i++;
 			}
@@ -502,57 +510,68 @@ class CBar extends CGraphDraw{
 			if($this->column){
 				if(GRAPH_YAXIS_SIDE_LEFT == $axis){
 					$shiftXLeft = $this->shiftXleft;
-					$str_pad = STR_PAD_LEFT;
 				}
 				else{
 					$shiftXLeft = $this->shiftXleft+$this->sizeX+$this->shiftXCaptionLeft+2;	// +2 because of some mistake somewhere in calculations! FIX IT!
-					$str_pad = STR_PAD_RIGHT;
 				}
 
 				for($i=0;$i<=$hstr_count;$i++){
-					$str = str_pad(convert_units(($this->sizeY*$i/$hstr_count*($max-$min)/$this->sizeY+$min),$this->units[$axis]),14,' ', $str_pad);
-					imagetext($this->im, 0, 0,
-						$shiftXLeft,
-						$this->sizeY - $this->sizeY * $i / $hstr_count -4 + $this->shiftY + $this->shiftYCaptionTop,
-						$this->getColor('Dark Red No Alpha'),
+					$str = convert_units(($this->sizeY*$i/$hstr_count*($max-$min)/$this->sizeY+$min),$this->units[$axis]);
+					
+					$sideShift = 0;
+					if(GRAPH_YAXIS_SIDE_LEFT == $axis){
+						$dims = imageTextSize(8,0,$str);	
+						$sideShift = $dims['width'];
+					}
+					
+					imagetext($this->im, 8, 0,
+						$this->shiftXleft+$this->shiftXCaptionLeft - $sideShift - 10,
+						$this->sizeY - $this->sizeY * $i / $hstr_count + $this->shiftY + $this->shiftYCaptionTop + 6,
+						$this->getColor($this->graphtheme['textcolor'], 0),
 						$str);
 				}
 			}
 			else if(uint_in_array($this->type, array(GRAPH_TYPE_BAR, GRAPH_TYPE_BAR_STACKED))){
 				if(GRAPH_YAXIS_SIDE_LEFT == $axis){
 					$shiftYBottom = $this->shiftY + $this->shiftYCaptionTop - 2; // -2 because of some mistake somewhere in calculations! FIX IT!
-					$str_pad = STR_PAD_RIGHT;
 				}
 				else{
 					$shiftYBottom = $this->shiftY + $this->sizeY + $this->shiftYCaptionTop + $this->shiftYCaptionBottom;
-					$str_pad = STR_PAD_LEFT;
 				}
 
 				for($i=0;$i<=$hstr_count;$i++){
-					$str = str_pad(convert_units(($this->sizeX*$i/$hstr_count*($max-$min)/$this->sizeX+$min),$this->units[$axis]),14,' ', $str_pad);
+					$str = convert_units(($this->sizeX*$i/$hstr_count*($max-$min)/$this->sizeX+$min),$this->units[$axis]);
+					
+					$sideShift = 0;
+					if(GRAPH_YAXIS_SIDE_LEFT == $axis){
+						$dims = imageTextSize(8,90,$str);	
+						$sideShift = $dims['height'];
+					}
 
-					imagetext($this->im, 0, 0,
+					imageText($this->im, 8, 90,
 						$this->shiftXleft + ($this->sizeX*$i/$hstr_count-4) + $this->shiftXCaptionLeft,
-						$shiftYBottom,
-						$this->getColor('Dark Red No Alpha'),
+						$shiftYBottom - $sideShift,
+						$this->getColor($this->graphtheme['textcolor'], 0),
 						$str);
 				}
 			}
 		}
 
 		if(!is_null($this->xLabel)){
-			imagetext($this->im, 4, 0,
-				$this->shiftXleft + ($this->sizeX/2) - 20,
-				$this->fullSizeY-36,
-				$this->getColor('Black No Alpha'),
+			$dims = imageTextSize(10, 0, $this->xLabel);
+			imageText($this->im, 10, 0,
+				$this->shiftXCaptionLeft + $this->shiftXleft + ($this->sizeX/2) - ($dims['width']/2),
+				$this->fullSizeY - 10 - $dims['height'],
+				$this->getColor($this->graphtheme['textcolor'], 0),
 				$this->xLabel);
 		}
 
 		if(!is_null($this->yLabel)){
-			imagetext($this->im, 4, 90,
-				10,
-				$this->shiftY + ($this->sizeY/2) + 20,
-				$this->getColor('Black No Alpha'),
+			$dims = imageTextSize(10, 90, $this->yLabel);
+			imageText($this->im, 10, 90,
+				$this->shiftXleft + $dims['width'],
+				$this->shiftY + ($this->sizeY/2) + ($dims['height']/2),
+				$this->getColor($this->graphtheme['textcolor'], 0),
 				$this->yLabel);
 
 			// imagestringup($this->im, 2,
@@ -567,21 +586,35 @@ class CBar extends CGraphDraw{
 		if(!$this->drawlegendallow) return;
 
 		$shiftY = $this->shiftY;
-		$shiftX = $this->fullSizeX - $this->shiftlegendright;
+		$shiftX = $this->fullSizeX - $this->shiftlegendright - $this->shiftXright;
 
 		$count = 0;
 		foreach($this->series as $key => $serie){
 			foreach($serie as $num => $value){
 				$caption = $this->seriesLegend[$num];
-				$color = $this->getColor($this->seriesColor[$num]);
+				$color = $this->getColor($this->seriesColor[$num],0);
 
-				imagefilledrectangle($this->im, $shiftX, $shiftY+12*$count, $shiftX+5, $shiftY+5+12*$count, $color);
-				imagerectangle($this->im,$shiftX, $shiftY+12*$count, $shiftX+5, $shiftY+5+12*$count, $this->getColor('Black No Alpha'));
+				imagefilledrectangle($this->im, 
+								$shiftX-5, 
+								$shiftY+14*$count-5, 
+								$shiftX+5, 
+								$shiftY+5+14*$count, 
+								$color);
+								
+				imagerectangle($this->im,
+								$shiftX-5, 
+								$shiftY+14*$count-5, 
+								$shiftX+5, 
+								$shiftY+5+14*$count, 
+								$this->getColor('Black No Alpha')
+							);
 
-				$r = imagetext($this->im, 2, 0,
-					$shiftX+9,
-					$shiftY-5+12*$count,
-					$this->getColor('Black No Alpha'),
+
+				$dims = imageTextSize(8, 0, $caption);
+				imageText($this->im, 8, 0,
+					$shiftX+10,
+					$shiftY-5+14*$count+10,
+					$this->getColor($this->graphtheme['textcolor'], 0),
 					$caption);
 
 				$count++;

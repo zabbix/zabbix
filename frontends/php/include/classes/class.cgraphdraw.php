@@ -64,6 +64,59 @@ class CGraphDraw{
 		$this->type = $type;			// graph type
 
 		$this->axis_valuetype = array();		// overal items type (int/float)
+
+		$this->graphtheme = array(
+			'description' => 'default',
+			'frontendtheme' => 'default.css',
+			'textcolor' => '202020',
+			'highlightcolor' => 'aa4444',
+			'backgroundcolor' => 'f0f0f0',
+			'graphcolor' => 'ffffff',
+			'graphbordercolor' => '333333',
+			'gridcolor' => 'cccccc',
+			'maingridcolor' => 'aaaaaa',
+			'gridbordercolor' => '000000',
+			'noneworktimecolor' => 'eaeaea',
+			'leftpercentilecolor' => '00AA00',
+			'righttpercentilecolor' => 'AA0000',
+			'legendview' => '1',
+			'gridview' => '1'
+		);
+
+		$this->applyGraphTheme();
+	}
+	
+
+	public function applyGraphTheme($description=null){
+		global $USER_DETAILS;
+
+		if(!is_null($description)){
+			$sql_where = ' AND gt.description='.zbx_dbstr($description);
+		}
+		else{
+			$config=select_config();
+			if(isset($config['default_theme']) && file_exists('styles/'.$config['default_theme'])){
+				$css = $config['default_theme'];
+			}
+
+			if(isset($USER_DETAILS['theme']) && ($USER_DETAILS['theme']!=ZBX_DEFAULT_CSS) && ($USER_DETAILS['alias']!=ZBX_GUEST_USER)){
+				if(file_exists('styles/'.$USER_DETAILS['theme'])){
+					$css = $USER_DETAILS['theme'];
+				}
+			}
+
+			$sql_where = ' AND gt.theme='.zbx_dbstr($css);
+		}
+
+		$sql = 'SELECT gt.* '.
+				' FROM graph_theme gt '.
+				' WHERE '.DBin_node('gt.graphthemeid').
+				$sql_where;
+//SDI($sql);
+		$res = DBselect($sql);
+		if($theme = DBfetch($res)){
+			$this->graphtheme = $theme;
+		}
 	}
 
 
@@ -167,14 +220,14 @@ class CGraphDraw{
 	return 0;
 	}
 
-	public function drawRectangle($bgcolor='F6F6F6', $bordercolor='aaaaaa'){
+	public function drawRectangle(){
 		imagefilledrectangle($this->im,0,0,
 			$this->fullSizeX,$this->fullSizeY,
-			$this->getColor($bgcolor, 0));
+			$this->getColor($this->graphtheme['backgroundcolor'], 0));
 
 
 		if($this->border==1){
-			imagerectangle($this->im,0,0,$this->fullSizeX-1,$this->fullSizeY-1, $this->getColor($bordercolor, 0));
+			imagerectangle($this->im,0,0,$this->fullSizeX-1,$this->fullSizeY-1, $this->getColor($this->graphtheme['graphbordercolor'], 0));
 		}
 	}
 
@@ -214,7 +267,7 @@ class CGraphDraw{
 	return $str;
 	}
 
-	public function drawHeader($color = '222222'){
+	public function drawHeader(){
 		if(!isset($this->header)){
 			$str=$this->items[0]['host'].': '.$this->items[0]['description'];
 		}
@@ -228,7 +281,7 @@ class CGraphDraw{
 		if(($this->sizeX < 500) && ($this->type == GRAPH_TYPE_NORMAL || $this->type == GRAPH_TYPE_BAR)) $fontnum = 8;
 
 		$x=$this->fullSizeX/2-imagefontwidth($fontnum)*strlen($str)/2;
-		imagetext($this->im, $fontnum, 0, $x, 24, $this->getColor($color, 0), $str);
+		imagetext($this->im, $fontnum, 0, $x, 24, $this->getColor($this->graphtheme['textcolor'], 0), $str);
 	}
 
 	public function setHeader($header){
