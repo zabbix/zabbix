@@ -85,6 +85,7 @@ if(isset($_REQUEST['save_trigger'])){
 	show_messages();
 	
 	$expression = construct_expression($_REQUEST['itemid'],get_request('expressions',array()));
+
 	if($expression){
 
 		if(!check_right_on_trigger_by_expression(PERM_READ_WRITE, $expression)) access_deny();
@@ -325,7 +326,7 @@ if(isset($_REQUEST['sform'])){
 		$expr_v = $expression;
 		$expression = preg_replace($functionid,$functions,$expression);
 		$expr_incase = $expression;
-
+//sdi('<pre>'.print_r($expr_incase,true).'</pre>');
 		$expression = preg_replace("/\(\(\((.+?)\)\) &/i", "(($1) &", $expression);
 		$expression = preg_replace("/\(\(\((.+?)\)\)$/i", "(($1)", $expression);
 
@@ -334,16 +335,28 @@ if(isset($_REQUEST['sform'])){
 
 		$expression = split(" [&|] ",$expression);
 		$expr_v = split(" [&|] ",$expr_v);
+		
+//$expression = array('(({H1:log[C:\TEMP\test2.log,error OR info].regexp(aaa)})#0&({H1:log[C:\TEMP\test2.log,error OR info].regexp(bbb)})#0) & (({H1:log[C:\TEMP\test2.log,error OR info].regexp(ccc)})=0)');
+
+//sdi('<pre>'.print_r($expression,true).'</pre>');
 
 		foreach($expression as $id => $expr){
 			$expr = preg_replace("/^\((.*)\)$/u","$1",$expr);
-			$value = preg_replace("/\((.*)\)[=|#]0/U","$1",$expr);
+			
+			if(preg_match("/\([regexp|iregexp].+\)[=|#]0/U",$expr, $rr)){
+//sdi('<pre>'.print_r($rr,true).'</pre>');
+				$value = preg_replace("/(\(([regexp|iregexp].*)\)[=|#]0)/U","$2",$expr);
+			}
+			$value = preg_replace("/([=|#]0)/","",$expr);
+			
+//sdi('<pre>'.print_r($value,true).'</pre>');
 			$value = preg_replace("/^\((.*)\)$/u","$1",$value);
 
 			$expressions[$id]['value']=trim($value);
 			$expressions[$id]['type']=(strpos($expr,'#0',strlen($expr)-3) === false)?(REGEXP_EXCLUDE):(REGEXP_INCLUDE);
 		}
-		
+//sdi('<pre>'.print_r($expressions,true).'</pre>');	
+	
 		foreach($expr_v as $id => $expr) {
 			$expr = preg_replace("/^\((.*)\)$/u","$1",$expr);
 			$value = preg_replace("/\((.*)\)[=|#]0/U","$1",$expr);
@@ -359,6 +372,8 @@ if(isset($_REQUEST['sform'])){
 			  $value = str_replace('|', ' OR ', $value);
 			}
 			$value = preg_replace($functionid,$functions,$value);
+			$value = preg_replace("/([=|#]0)/","",$value);
+			
 			$expressions[$id]['view'] = trim($value);
 		}
 	}
@@ -373,6 +388,8 @@ if(isset($_REQUEST['sform'])){
 	}
 	$keys = get_request('keys',array());
 	
+//sdi('<pre>'.print_r($expressions, true).'</pre>');	
+
 	$frmTRLog->AddRow(S_DESCRIPTION,new CTextBox('description',$description,80));
 
 	$item = '';
@@ -451,6 +468,7 @@ if(isset($_REQUEST['sform'])){
 
 	$bExprResult = true;
 
+
 	if(isset($_REQUEST['triggerid']) && !isset($_REQUEST['save_trigger']) && !validate_expression(construct_expression($itemid,$expressions)) && !isset($_REQUEST['form_refresh'])){
 		unset($expressions);
 		$expressions[0]['value'] = $expr_incase;
@@ -458,6 +476,7 @@ if(isset($_REQUEST['sform'])){
 		$expressions[0]['view'] = $expr_incase;
 		$bExprResult = false;
 	}
+//sdi('<pre>'.print_r($expressions,true).'</pre>');
 	foreach($expressions as $id => $expr){
 
 		$imgup = new CImg('images/general/arrowup.gif','up',12,14);

@@ -1,5 +1,7 @@
 Changes for 1.0.0
 
+ - [NTP-72] fixed wrong trigger expression generation for log items (Vedmak)
+ - [NTP-68] fixed trigger values change creating expression via trigger wizard (Vedmak)
  - [ZBX-1032] fixed security vulnerability in processing of net.tcp.listen under FreeBSD and Solaris agents (Sasha)
  - [ZBX-1050] fixed possible windows agent crash while processing big eventlog records (Sasha)
  - [NTP-59] fixed wrong history links in latest data (Vedmak)

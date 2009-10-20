@@ -2540,8 +2540,7 @@
 	}
 	
 	function construct_expression($itemid,$expressions){
-		$complite_expr='';
-
+		$complite_expr='';	
 		
 		$item = get_item_by_itemid($itemid);
 		$host = get_host_by_itemid($itemid);
@@ -2562,6 +2561,9 @@
 
 		foreach($expressions as $id => $expression){
 
+			$expression['value'] = preg_replace('/\s+(AND){1,2}\s+/U', '&', $expression['value']);
+			$expression['value'] = preg_replace('/\s+(OR){1,2}\s+/U', '|', $expression['value']);
+//sdi('<pre>'.print_r($expression['value'],true).'</pre>');			
 			$pastcexpor = $cexpor;
 			if($expression['type'] == REGEXP_INCLUDE){
 				if(!empty($complite_expr)) {
@@ -2584,10 +2586,11 @@
 					$complite_expr.=' & ';
 				}
 			}
-			//$expr = '&'.$expression['value'];
-			$expr = '&'.$expression['view'];
-			$expr = preg_replace('/\s+(\&|\|){1,2}\s+/U','$1',$expr);
 			
+			$expr = '&'.$expression['value'];
+			//$expr = '&'.$expression['view'];
+			$expr = preg_replace('/\s+(\&|\|){1,2}\s+/U','$1',$expr);
+
 			$expr_array = array();
 			$sub_expr_count=0;
 			$sub_expr = '';
