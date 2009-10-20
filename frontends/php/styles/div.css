@@ -440,4 +440,5 @@ div #div_node_tree {
 	position: absolute;
 	border: 2px solid black;
 	right: 0px;
+	z-index: 200;
 }
