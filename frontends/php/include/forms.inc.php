@@ -5624,14 +5624,14 @@
 		$frmHost->addVar('form', get_request('form', 1));
 		$from_rfr = get_request('form_refresh',0);
 		$frmHost->addVar('form_refresh', $from_rfr+1);
-		$frmHost->addVar('clear_templates',$clear_templates);
+		$frmHost->addVar('clear_templates', $clear_templates);
 
 // HOST WIDGET {
 		$host_tbl = new CTable('', 'tablestripped');
 		$host_tbl->setOddRowClass('form_odd_row');
 		$host_tbl->setEvenRowClass('form_even_row');
 
-//		if($_REQUEST['hostid']>0) $frmHost->addVar('hostid', $_REQUEST['hostid']);
+		if($_REQUEST['hostid']>0) $frmHost->addVar('hostid', $_REQUEST['hostid']);
 		if($_REQUEST['groupid']>0) $frmHost->addVar('groupid', $_REQUEST['groupid']);
 
 		$host_tbl->addRow(array(S_NAME, new CTextBox('host',$host,54)));
