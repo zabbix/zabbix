@@ -309,18 +309,25 @@ include_once('include/page_header.php');
 						'limit' => ($config['search_limit']+1)
 					);
 
+		$trigOpt = array();
 		if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
-			$options['hostids'] = $PAGE_HOSTS['selected'];
+			$trigOpt['hostids'] = $PAGE_HOSTS['selected'];
 		}
 		else if(!empty($PAGE_HOSTS['hostids'])){
-			$options['hostids'] = $PAGE_HOSTS['hostids'];
+			$trigOpt['hostids'] = $PAGE_HOSTS['hostids'];
 		}
 		else if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
-			$options['groupids'] = $PAGE_GROUPS['selected'];
+			$trigOpt['groupids'] = $PAGE_GROUPS['selected'];
 		}
 
 		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
-			$options['triggerids'] = $_REQUEST['triggerid'];
+			$trigOpt['triggerids'] = $_REQUEST['triggerid'];
+		}
+
+		if(!empty($trigOpt)){
+			$triggers = CTrigger::get($trigOpt);
+			$triggerids = array_keys($triggers);
+			$options['triggerids'] = array_keys($triggers);
 		}
 
 		if($hide_unknown) $options['hide_unknown'] = 1;
