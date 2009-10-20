@@ -191,10 +191,10 @@ objectUpdate: function(id, timelineid){
 	var period = ZBX_TIMELINES[timelineid].period();
 	var now = ZBX_TIMELINES[timelineid].now()
 	
+	if(now) usertime += 86400*31;
+	
 	var date = datetoarray(usertime - period);
 	var url_stime = ''+date[2]+date[1]+date[0]+date[3]+date[4];
-	
-	if(now) url_stime = null;
 	
 	if(obj.dynamic){
 		if(obj.mainObject){
