@@ -116,6 +116,16 @@ class CEvent extends CZBXAPI{
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
 		else if(($options['object'] == EVENT_OBJECT_TRIGGER) || ($options['source'] == EVENT_SOURCE_TRIGGER)){
+		
+			$triggers = CTrigger::get();
+			$triggerids = array_keys($triggers);
+			
+			if(!is_null($options['triggerids']))
+				$options['triggerids'] = array_intersect($options['triggerids'], $triggerids);
+			else
+				$options['triggerids'] = $triggerids;
+			
+/*
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
 			$sql_parts['from']['f'] = 'functions f';
@@ -144,12 +154,16 @@ class CEvent extends CZBXAPI{
 														' AND rr.groupid=gg.usrgrpid '.
 														' AND gg.userid='.$userid.
 														' AND rr.permission<'.$permission.'))';
+//*/
 		}
 
 // nodeids
 		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
 
+// Permission hack
+
 // groupids
+
 		if(!is_null($options['groupids'])){
 			zbx_value2array($options['groupids']);
 
@@ -192,7 +206,7 @@ class CEvent extends CZBXAPI{
 		if(!is_null($options['triggerids']) && ($options['object'] == EVENT_OBJECT_TRIGGER)){
 			zbx_value2array($options['triggerids']);
 
-			$sql_parts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
+			$sql_parts['where']['e'] = '(e.object-0)='.EVENT_OBJECT_TRIGGER;
 			$sql_parts['where'][] = DBcondition('e.objectid', $options['triggerids']);
 		}
 
@@ -287,7 +301,6 @@ class CEvent extends CZBXAPI{
 				' WHERE '.DBin_node('e.eventid', $nodeids).
 					$sql_where.
 				$sql_order;
-//sdi($sql);
 		$db_res = DBselect($sql, $sql_limit);
 		while($event = DBfetch($db_res)){
 			if($options['count'])
