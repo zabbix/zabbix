@@ -483,11 +483,11 @@ class CHostGroup extends CZBXAPI{
 		$result = true;
 
 		self::BeginTransaction(__METHOD__);
-		foreach($groups as $group){
+		foreach($groups as $num => $group){
 
 			$group_exist = CHostGroup::getId(array('name' => $group['name']));
-			if($group_exist && ($group_exist != $group['name'])){
-				$error = "HostGroup [ $group ] already exists";
+			if($group_exist && ($group_exist != $group['groupid'])){
+				$error = 'HostGroup [ '.$group['name'].' ] already exists';
 				$result = false;
 				break;
 			}
