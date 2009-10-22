@@ -53,7 +53,7 @@ if(!isset($DB)){
 				case 'MYSQL':
 					$mysql_server = $DB['SERVER'].( !empty($DB['PORT']) ? ':'.$DB['PORT'] : '');
 
-					if (!$DB['DB']= mysql_pconnect($mysql_server,$DB['USER'],$DB['PASSWORD'])){
+					if (!$DB['DB']= mysql_connect($mysql_server,$DB['USER'],$DB['PASSWORD'])){
 						$error = 'Error connecting to database ['.mysql_error().']';
 						$result = false;
 					}

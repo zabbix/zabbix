@@ -35,8 +35,6 @@
 			if($DB['TYPE'] == "ORACLE"){
 				if(!isset($row['image']))
 					return 0;
-
-				$row['image'] = $row['image']->load();
 			}
 			else if($DB['TYPE'] == "POSTGRESQL"){
 				$row['image'] = pg_unescape_bytea($row['image']);

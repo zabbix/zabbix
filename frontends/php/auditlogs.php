@@ -27,7 +27,7 @@ require_once('include/users.inc.php');
 	$page['title'] = 'S_AUDIT';
 	$page['file'] = 'auditlogs.php';
 	$page['hist_arg'] = array();
-	$page['scripts'] = array('calendar.js','scriptaculous.js?load=effects');
+	$page['scripts'] = array('class.calendar.js','scriptaculous.js?load=effects');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 

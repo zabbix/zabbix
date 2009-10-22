@@ -28,7 +28,7 @@
 	$page['file'] = 'screenedit.php';
 	$page['hist_arg'] = array('screenid');
 //	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.cscreen.js');
-	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.cscreen.js','timeline.js','calendar.js','scrollbar.js','sbox.js','sbinit.js');
+	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.cscreen.js','timeline.js','class.calendar.js','scrollbar.js','sbox.js','sbinit.js');
 
 include_once('include/page_header.php');
 

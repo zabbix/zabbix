@@ -895,7 +895,7 @@
 				$media_url = '?dstfrm='.$frmUser->GetName().
 								'&media='.$id.
 								'&mediatypeid='.$one_media['mediatypeid'].
-								'&sendto='.$one_media['sendto'].
+								'&sendto='.urlencode($one_media['sendto']).
 								'&period='.$one_media['period'].
 								'&severity='.$one_media['severity'].
 								'&active='.$one_media['active'];

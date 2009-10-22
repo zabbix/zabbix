@@ -323,10 +323,7 @@
 			switch($item['value_type']){
 				case ITEM_VALUE_TYPE_TEXT:
 					if($DB['TYPE'] == 'ORACLE'){
-						if(isset($row['value'])){
-							$row['value'] = $row['value']->load();
-						}
-						else{
+						if(!isset($row['value'])){
 							$row['value'] = '';
 						}
 					}

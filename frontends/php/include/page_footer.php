@@ -36,7 +36,7 @@
 //------------------------------------- </HISTORY> --------------------------------------
 
 // END Transactions if havn't been -----------------
-	if(isset($DB) && $DB['TRANSACTIONS'] != 0){
+	if(isset($DB) && isset($DB['TRANSACTIONS']) && ($DB['TRANSACTIONS'] != 0)){
 		error('Transaction have not been closed. Aborting..');
 		DBend(false);
 	}
