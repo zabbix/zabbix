@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [NTP-66] fixed illegal values in eventlog fields for non eventlog items (Sasha)
  - [NTP-72] fixed wrong trigger expression generation for log items (Vedmak)
  - [NTP-68] fixed trigger values change creating expression via trigger wizard (Vedmak)
  - [ZBX-1032] fixed security vulnerability in processing of net.tcp.listen under FreeBSD and Solaris agents (Sasha)
