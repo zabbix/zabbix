@@ -278,7 +278,7 @@ frontends/php/include/menu.inc.php -text
 frontends/php/include/regexp.inc.php -text
 frontends/php/include/reports.inc.php -text
 frontends/php/include/scripts.inc.php -text
-frontends/php/js/calendar.js -text
+frontends/php/js/class.calendar.js -text
 frontends/php/js/class.cookie.js -text
 frontends/php/js/class.cscreen.js -text
 frontends/php/js/class.ctree.js -text

@@ -26,7 +26,7 @@
 	$page['file']	= 'history.php';
 	$page['title']	= "S_HISTORY";
 	$page['hist_arg'] = array('itemid', 'hostid','grouid','graphid','period','dec','inc','left','right','stime');
-	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','timeline.js','calendar.js','scrollbar.js','sbox.js','sbinit.js');
+	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','timeline.js','class.calendar.js','scrollbar.js','sbox.js','sbinit.js');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -500,9 +500,7 @@ COpt::profiling_start('history');
 			while($row=DBfetch($result)){
 
 				if($DB['TYPE'] == 'ORACLE' && $item_type == ITEM_VALUE_TYPE_TEXT){
-					if(isset($row['value']))
-						$row['value'] = $row['value']->load();
-					else
+					if(!isset($row['value']))
 						$row['value'] = '';
 				}
 

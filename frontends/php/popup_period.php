@@ -26,7 +26,7 @@
 
 	$page['title'] = "S_PERIOD";
 	$page['file'] = 'popup_period.php';
-	$page['scripts'] = array('calendar.js');
+	$page['scripts'] = array('class.calendar.js');
 
 	define('ZBX_PAGE_NO_MENU', 1);
 

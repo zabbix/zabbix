@@ -446,14 +446,23 @@ include_once('include/page_header.php');
 		}
 // goBox
 		$goBox = new CComboBox('go');
-		$goBox->addItem('unblock',S_UNBLOCK_SELECTED);
-		$goBox->addItem('delete',S_DELETE_SELECTED);
 
-		// goButton name is necessary!!!
+		$goOption = new CComboItem('unblock',S_UNBLOCK_SELECTED);
+		$goOption->setAttribute('confirm','Unblock selected users?');
+		$goBox->addItem($goOption);	
+//		$goBox->addItem('unblock',S_UNBLOCK_SELECTED);
+		
+		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
+		$goOption->setAttribute('confirm','Delete selected users?');
+		$goBox->addItem($goOption);	
+//		$goBox->addItem('delete',S_DELETE_SELECTED);
+
+
+// goButton name is necessary!!!
 		$goButton = new CButton('goButton', S_GO.' (0)');
 		$goButton->setAttribute('id','goButton');
+		
 		zbx_add_post_js('chkbxRange.pageGoName = "group_userid";');
-
 		$footer = get_table_header(array($goBox, $goButton));
 //----
 

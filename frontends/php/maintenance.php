@@ -27,7 +27,7 @@
 	$page['title'] = 'S_MAINTENANCE';
 	$page['file'] = 'maintenance.php';
 	$page['hist_arg'] = array('groupid','hostid');
-	$page['scripts'] = array('menu_scripts.js','calendar.js');
+	$page['scripts'] = array('menu_scripts.js','class.calendar.js');
 
 include_once('include/page_header.php');
 
