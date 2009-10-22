@@ -27,7 +27,7 @@
 	$page['title'] = "S_CUSTOM_SCREENS";
 	$page['file'] = 'screens.php';
 	$page['hist_arg'] = array('config','elementid');
-	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','timeline.js','calendar.js','scrollbar.js','sbox.js','sbinit.js');
+	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','timeline.js','class.calendar.js','scrollbar.js','sbox.js','sbinit.js');
 
 	$_REQUEST['config'] = get_request('config',0);
 	if($_REQUEST['config'] == 1) redirect('slides.php');

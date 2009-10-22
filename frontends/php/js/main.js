@@ -314,8 +314,20 @@ setGo: function(){
 
 submitGo: function(e){
 	var e = e || window.event;
+
 	if(this.pageGoCount > 0){
 		var goButton = $('goButton');
+		
+		var goSelect = $('go');
+		var confrimText = goSelect.options[goSelect.selectedIndex].getAttribute('confirm');
+		if(is_null(confrimText) || !confrimText){
+			confrimText = 'Continue with "'+goSelect.options[goSelect.selectedIndex].text+'"?';
+		}
+		
+		if(!Confirm(confrimText)){ 
+			Event.stop(e);
+			return false;
+		}
 		
 		var form = getParent(goButton, 'form');
 		for(var key in this.selected_ids){

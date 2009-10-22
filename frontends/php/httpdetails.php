@@ -27,7 +27,7 @@
 	$page['title'] = "S_DETAILS_OF_SCENARIO";
 	$page['file'] = "httpdetails.php";
 	$page['hist_arg'] = array('hostid','grouid','graphid','period','stime');
-	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','timeline.js','calendar.js','scrollbar.js','sbox.js','sbinit.js');
+	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','timeline.js','class.calendar.js','scrollbar.js','sbox.js','sbinit.js');
 
 	define('ZBX_PAGE_DO_REFRESH', 1);
 

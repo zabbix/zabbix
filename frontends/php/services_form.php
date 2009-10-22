@@ -26,7 +26,7 @@
 
 	$page["title"] = "S_IT_SERVICES";
 	$page["file"] = "services_form.php";
-	$page['scripts'] = array('services.js','calendar.js');
+	$page['scripts'] = array('services.js','class.calendar.js');
 
 	define('ZBX_PAGE_NO_MENU', 1);
 
