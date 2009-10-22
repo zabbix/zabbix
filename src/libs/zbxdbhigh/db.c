@@ -1752,6 +1752,11 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 	item->maintenance_status	= atoi(row[37]);
 	item->maintenance_type		= atoi(row[38]);
 	item->maintenance_from		= atoi(row[39]);
+
+	item->eventlog_source	= NULL;
+	item->timestamp		= 0;
+	item->eventlog_severity	= 0;
+	item->lastlogsize	= 0;
 }
 
 /*
