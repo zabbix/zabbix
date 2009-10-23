@@ -34,7 +34,6 @@ include_once('include/page_header.php');
 	$fields=array(
 		'graphid'=>		array(T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,		null),
 		'period'=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	BETWEEN(ZBX_MIN_PERIOD,ZBX_MAX_PERIOD),	null),
-		'from'=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	null,		null),
 		'stime'=>		array(T_ZBX_STR, O_OPT,		P_SYS,		null,		null),
 		'border'=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	IN('0,1'),	null),
 		'width'=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	'{}>0',		null),
@@ -56,8 +55,12 @@ include_once('include/page_header.php');
 
 	$effectiveperiod = navigation_bar_calc();
 
-	if(($_REQUEST['graphid']>0) && ($_REQUEST['period'] >= ZBX_MIN_PERIOD)){
-		update_profile('web.graph.period',$_REQUEST['period'],PROFILE_TYPE_INT,$_REQUEST['graphid']);
+	if($_REQUEST['graphid']>0){
+		if($_REQUEST['period'] >= ZBX_MIN_PERIOD)
+			update_profile('web.graph.period',$_REQUEST['period'],PROFILE_TYPE_INT,$_REQUEST['graphid']);
+		
+		if(isset($_REQUEST['stime']))
+			update_profile('web.graph.stime',$_REQUEST['stime'], PROFILE_TYPE_STR, $_REQUEST['graphid']);
 	}
 
 	update_profile('web.charts.graphid',$_REQUEST['graphid']);

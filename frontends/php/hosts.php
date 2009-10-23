@@ -753,12 +753,21 @@ include_once('include/page_header.php');
 //----- GO ------
 		$goBox = new CComboBox('go');
 		$goBox->addItem('massupdate',S_MASS_UPDATE);
-		$goBox->addItem('activate',S_ACTIVATE_SELECTED);
-		$goBox->addItem('disable',S_DISABLE_SELECTED);
-		$goBox->addItem('delete',S_DELETE_SELECTED);
+		
+		$goOption = new CComboItem('activate',S_ACTIVATE_SELECTED);
+		$goOption->setAttribute('confirm','Enable selected host?');
+		$goBox->addItem($goOption);	
+		
+		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
+		$goOption->setAttribute('confirm','Disable selected hosts?');
+		$goBox->addItem($goOption);	
+		
+		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
+		$goOption->setAttribute('confirm','Delete selected hosts?');
+		$goBox->addItem($goOption);	
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton', S_GO.' (0)');
+		$goButton = new CButton('goButton', S_GO);
 		$goButton->setAttribute('id', 'goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
 

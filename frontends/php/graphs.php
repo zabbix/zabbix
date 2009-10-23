@@ -525,11 +525,14 @@ include_once('include/page_header.php');
 
 //----- GO ------
 		$goBox = new CComboBox('go');
-		$goBox->addItem('copy_to',S_COPY_SELECTED_TO);
-		$goBox->addItem('delete',S_DELETE_SELECTED);
+		$goBox->addItem(('copy_to',S_COPY_SELECTED_TO);
+		
+		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
+		$goOption->setAttribute('confirm','Delete selected graphs?');
+		$goBox->addItem($goOption);	
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO.' (0)');
+		$goButton = new CButton('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "group_graphid";');
 
