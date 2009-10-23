@@ -1,7 +1,10 @@
-Changes for 1.7.0
+Changes for 1.7.1
 
  - [DEV-339] added internal check zabbix[wcache,*] for cache module (Sasha)
  - [ZBX-1071] move Zabbix client utilities from sbin to bin (Richlv)
+
+Changes for 1.7.0
+
  - [DEV-333] added configuration data cache module (Sasha)
  - [DEV-427] frontend is PHP 5.3.0 compatible (Aly)
  - [ZBX-1034] fixed maps tooltip url view (Aly)
