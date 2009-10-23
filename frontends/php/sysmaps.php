@@ -189,10 +189,12 @@ include_once('include/page_header.php');
 
 // goBox
 		$goBox = new CComboBox('go');
-		$goBox->addItem('delete', S_DELETE_SELECTED);
+		$goOption = new CComboItem('delete', S_DELETE_SELECTED);
+		$goOption->setAttribute('confirm','Delete selected maps?');
+		$goBox->addItem($goOption);	
 
-		// goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO.' (0)');
+// goButton name is necessary!!!
+		$goButton = new CButton('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "maps";');
 

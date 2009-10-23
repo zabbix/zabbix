@@ -459,7 +459,7 @@ include_once('include/page_header.php');
 
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton', S_GO.' (0)');
+		$goButton = new CButton('goButton', S_GO);
 		$goButton->setAttribute('id','goButton');
 		
 		zbx_add_post_js('chkbxRange.pageGoName = "group_userid";');

@@ -336,10 +336,12 @@ include_once('include/page_header.php');
 
 //goBox
 			$goBox = new CComboBox('go');
-			$goBox->addItem('delete', S_DELETE_SELECTED);
+			$goOption = new CComboItem('delete', S_DELETE_SELECTED);
+			$goOption->setAttribute('confirm','Delete selected screens?');
+			$goBox->addItem($goOption);	
 
 			// goButton name is necessary!!!
-			$goButton = new CButton('goButton',S_GO.' (0)');
+			$goButton = new CButton('goButton',S_GO);
 			$goButton->setAttribute('id','goButton');
 			zbx_add_post_js('chkbxRange.pageGoName = "screens";');
 
@@ -410,10 +412,12 @@ include_once('include/page_header.php');
 
 // goBox
 			$goBox = new CComboBox('go');
-			$goBox->addItem('delete', S_DELETE_SELECTED);
+			$goOption = new CComboItem('delete', S_DELETE_SELECTED);
+			$goOption->setAttribute('confirm','Delete selected slides?');
+			$goBox->addItem($goOption);	
 
 // goButton name is necessary!!!
-			$goButton = new CButton('goButton',S_GO.' (0)');
+			$goButton = new CButton('goButton',S_GO);
 			$goButton->setAttribute('id','goButton');
 			zbx_add_post_js('chkbxRange.pageGoName = "shows";');
 
