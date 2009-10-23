@@ -842,11 +842,17 @@ require_once('include/forms.inc.php');
 
 // GO{
 		$goBox = new CComboBox('go');
-		$goBox->addItem('delete',S_DELETE_SELECTED);
-		$goBox->addItem('delete_and_clear',S_DELETE_SELECTED_WITH_LINKED_ELEMENTS);
+
+		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
+		$goOption->setAttribute('confirm','Delete selected templates?');
+		$goBox->addItem($goOption);	
+		
+		$goOption = new CComboItem('delete_and_clear',S_DELETE_SELECTED_WITH_LINKED_ELEMENTS);
+		$goOption->setAttribute('confirm','Warning: this will delete selected templates and clear all linked hosts?');
+		$goBox->addItem($goOption);	
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO.' (0)');
+		$goButton = new CButton('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "templates";');
 

@@ -374,12 +374,20 @@ include_once('include/page_header.php');
 
 //----- GO ------
 		$goBox = new CComboBox('go');
-		$goBox->addItem('activate',S_ACTIVATE_SELECTED);
-		$goBox->addItem('disable',S_DISABLE_SELECTED);
-		$goBox->addItem('delete',S_DELETE_SELECTED);
+		$goOption = new CComboItem('activate',S_ACTIVATE_SELECTED);
+		$goOption->setAttribute('confirm','Enable selected Host Groups?');
+		$goBox->addItem($goOption);	
+		
+		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
+		$goOption->setAttribute('confirm','Disable selected Host Groups?');
+		$goBox->addItem($goOption);	
+
+		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
+		$goOption->setAttribute('confirm','Delete selected Host Groups?');
+		$goBox->addItem($goOption);	
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO.' (0)');
+		$goButton = new CButton('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "groups";');
 
@@ -395,6 +403,9 @@ include_once('include/page_header.php');
 		$groups_wdgt->addItem($form);
 		$groups_wdgt->show();
 	}
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>

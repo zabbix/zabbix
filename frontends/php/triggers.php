@@ -604,14 +604,28 @@
 
 //----- GO ------
 		$goBox = new CComboBox('go');
-		$goBox->addItem('activate',S_ACTIVATE_SELECTED);
-		$goBox->addItem('disable',S_DISABLE_SELECTED);
-		$goBox->addItem('massupdate',S_MASS_UPDATE);
-		$goBox->addItem('copy_to',S_COPY_SELECTED_TO);
-		$goBox->addItem('delete',S_DELETE_SELECTED);
+		$goOption = new CComboItem('activate',S_ACTIVATE_SELECTED);
+		$goOption->setAttribute('confirm','Enable selected triggers?');
+		$goBox->addItem($goOption);	
+
+		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
+		$goOption->setAttribute('confirm','Disable selected triggers?');
+		$goBox->addItem($goOption);	
+
+		$goOption = new CComboItem('massupdate',S_MASS_UPDATE);
+		$goOption->setAttribute('confirm','Mass update selected triggers?');
+		$goBox->addItem($goOption);	
+
+		$goOption = new CComboItem('copy_to',S_COPY_SELECTED_TO);
+		$goOption->setAttribute('confirm','Copy selected triggers?');
+		$goBox->addItem($goOption);	
+
+		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
+		$goOption->setAttribute('confirm','Delete selected triggerers?');
+		$goBox->addItem($goOption);	
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO.' (0)');
+		$goButton = new CButton('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "g_triggerid";');
 
