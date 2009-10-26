@@ -20,7 +20,6 @@
 #include "common.h"
 #include "db.h"
 #include "log.h"
-#include "../events.h"
 
 #include "active.h"
 
@@ -153,8 +152,9 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request, zbx_process_t zb
 
 	if (0 != CONFIG_REFRESH_UNSUPPORTED) {
 		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, 256,
-				" and (i.status=%d or (i.status=%d and i.nextcheck<=%d))",
-				ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED, time(NULL));
+				" and (i.status=%d or (i.status=%d and i.lastclock+%d<=%d))",
+				ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
+				CONFIG_REFRESH_UNSUPPORTED, time(NULL));
 	} else {
 		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, 256,
 				" and i.status=%d",
@@ -274,8 +274,9 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 			hostid);
 
 	if (0 != CONFIG_REFRESH_UNSUPPORTED)
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256, " and (i.status=%d or (i.status=%d and i.nextcheck<=%d))",
-				ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED, time(NULL));
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256, " and (i.status=%d or (i.status=%d and i.lastclock+%d<=%d))",
+				ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
+				CONFIG_REFRESH_UNSUPPORTED, time(NULL));
 	else
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256, " and i.status=%d",
 				ITEM_STATUS_ACTIVE);

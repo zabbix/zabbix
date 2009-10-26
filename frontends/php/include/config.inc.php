@@ -690,12 +690,12 @@ function __autoload($class_name){
 	 *                                                                            *
 	 ******************************************************************************/
 	function reset_items_nextcheck($triggerid){
-		$sql='SELECT itemid from functions WHERE triggerid='.$triggerid;
+/*		$sql='SELECT itemid from functions WHERE triggerid='.$triggerid;
 		$result=DBselect($sql);
 		while($row=DBfetch($result)){
 			$sql='UPDATE items SET nextcheck=0 WHERE itemid='.$row['itemid'];
 			DBexecute($sql);
-		}
+		}*/
 	}
 
 	function get_status(){

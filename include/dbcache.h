@@ -179,8 +179,7 @@ DC_ITEM
 	unsigned char 	type;
 	unsigned char	data_type;
 	unsigned char	value_type;
-	char		key_orig[ITEM_KEY_LEN_MAX];
-	char		*key;
+	char		key_orig[ITEM_KEY_LEN_MAX], *key;
 	int		delay;
 	int		nextcheck;
 	unsigned char	status;
@@ -194,8 +193,13 @@ DC_ITEM
 	char		snmpv3_authpassphrase[ITEM_SNMPV3_AUTHPASSPHRASE_LEN_MAX];
 	char		snmpv3_privpassphrase[ITEM_SNMPV3_PRIVPASSPHRASE_LEN_MAX];
 	char		ipmi_sensor[ITEM_IPMI_SENSOR_LEN_MAX];
-	char		params[ITEM_PARAMS_LEN_MAX];
+	char		params_orig[ITEM_PARAMS_LEN_MAX], *params;
 	char		delay_flex[ITEM_DELAY_FLEX_LEN_MAX];
+	unsigned char	authtype;
+	char		username_orig[ITEM_USERNAME_LEN_MAX], *username;
+	char		publickey_orig[ITEM_PUBLICKEY_LEN_MAX], *publickey;
+	char		privatekey_orig[ITEM_PRIVATEKEY_LEN_MAX], *privatekey;
+	char		password_orig[ITEM_PASSWORD_LEN_MAX], *password;
 };
 
 void	DCadd_history(zbx_uint64_t itemid, double value_orig, int clock);

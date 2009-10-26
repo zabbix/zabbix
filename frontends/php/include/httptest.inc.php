@@ -130,6 +130,11 @@
 				'formula'			=> 0,
 				'logtimefmt'		=> '',
 				'delay_flex'		=> '',
+				'authtype'		=> 0,
+				'username'		=> '',
+				'password'		=> '',
+				'publickey'		=> '',
+				'privatekey'		=> '',
 				'params'			=> '',
 				'ipmi_sensor'		=> '',
 				'applications'		=> array($applicationid));
@@ -302,6 +307,11 @@
 					'formula'			=> 0,
 					'logtimefmt'		=> '',
 					'delay_flex'		=> '',
+					'authtype'		=> 0,
+					'username'		=> '',
+					'password'		=> '',
+					'publickey'		=> '',
+					'privatekey'		=> '',
 					'params'			=> '',
 					'ipmi_sensor'		=> '',
 					'applications'		=> array($applicationid));

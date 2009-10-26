@@ -79,13 +79,20 @@ include_once('include/page_header.php');
 		'type'=>			array(T_ZBX_INT, O_OPT,  null,
 				IN(array(-1,ITEM_TYPE_ZABBIX,ITEM_TYPE_SNMPV1,ITEM_TYPE_TRAPPER,ITEM_TYPE_SIMPLE,
 					ITEM_TYPE_SNMPV2C,ITEM_TYPE_INTERNAL,ITEM_TYPE_SNMPV3,ITEM_TYPE_ZABBIX_ACTIVE,
-					ITEM_TYPE_AGGREGATE,ITEM_TYPE_HTTPTEST,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR,ITEM_TYPE_IPMI)),'isset({save})'),
+					ITEM_TYPE_AGGREGATE,ITEM_TYPE_HTTPTEST,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR,
+					ITEM_TYPE_IPMI,ITEM_TYPE_SSH)),'isset({save})'),
 		'trends'=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),		'isset({save})'),
 		'value_type'=>		array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2,3,4'),	'isset({save})'),
 		'data_type'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(ITEM_DATA_TYPE_DECIMAL,ITEM_DATA_TYPE_HEXADECIMAL),
 					'isset({save})&&(isset({value_type})&&({value_type}=='.ITEM_VALUE_TYPE_UINT64.'))'),
 		'valuemapid'=>		array(T_ZBX_INT, O_OPT,	 null,	DB_ID,				'isset({save})'),
-		'params'=>			array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
+		'authtype'=>		array(T_ZBX_INT, O_OPT,  NULL,	IN(ITEM_AUTHTYPE_PASSWORD.','.ITEM_AUTHTYPE_PUBLICKEY),
+					'isset({save})'),
+		'username'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,	'isset({save})'),
+		'password'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,	'isset({save})'),
+		'publickey'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,	'isset({save})'),
+		'privatekey'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,	'isset({save})'),
+		'params'=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,	'isset({save})'),
 
 		'snmp_community'=>	array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,			'isset({save})&&isset({type})&&'.IN('1,4','type')),
 		'snmp_oid'=>		array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,			'isset({save})&&isset({type})&&'.IN('1,4,6','type')),
@@ -140,7 +147,8 @@ include_once('include/page_header.php');
 		'filter_type'=>				array(T_ZBX_INT, O_OPT,  null,
 				IN(array(-1,ITEM_TYPE_ZABBIX,ITEM_TYPE_SNMPV1,ITEM_TYPE_TRAPPER,ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_SNMPV2C,ITEM_TYPE_INTERNAL,ITEM_TYPE_SNMPV3,ITEM_TYPE_ZABBIX_ACTIVE,
-				ITEM_TYPE_AGGREGATE,ITEM_TYPE_HTTPTEST,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR,ITEM_TYPE_IPMI)),null),
+				ITEM_TYPE_AGGREGATE,ITEM_TYPE_HTTPTEST,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR,
+				ITEM_TYPE_IPMI,ITEM_TYPE_SSH)),null),
 		'filter_key'=>				array(T_ZBX_STR, O_OPT,  null,  null,		null),
 		'filter_snmp_community'=>	array(T_ZBX_STR, O_OPT,  null,  null,	null),
 		'filter_snmp_oid'=>			array(T_ZBX_STR, O_OPT,  null,  null,	null),
@@ -342,6 +350,11 @@ include_once('include/page_header.php');
 				'logtimefmt'		=> get_request('logtimefmt'),
 				'valuemapid'		=> get_request('valuemapid'),
 				'delay_flex'		=> $db_delay_flex,
+				'authtype'		=> get_request('authtype'),
+				'username'		=> get_request('username'),
+				'password'		=> get_request('password'),
+				'publickey'		=> get_request('publickey'),
+				'privatekey'		=> get_request('privatekey'),
 				'params'			=> get_request('params'),
 				'ipmi_sensor'		=> get_request('ipmi_sensor'),
 				'data_type'		=> get_request('data_type'));
@@ -422,7 +435,7 @@ include_once('include/page_header.php');
 		}
 
 		if($result){
-			DBexecute('UPDATE items SET nextcheck=0,lastvalue=null,lastclock=null,prevvalue=null '.
+			DBexecute('UPDATE items SET lastvalue=null,lastclock=null,prevvalue=null '.
 				' WHERE itemid='.$_REQUEST['itemid']);
 
 			$host = get_host_by_hostid($_REQUEST['hostid']);
@@ -472,6 +485,11 @@ include_once('include/page_header.php');
 				'logtimefmt'		=> get_request('logtimefmt'),
 				'valuemapid'		=> get_request('valuemapid'),
 				'delay_flex'		=> $db_delay_flex,
+				'authtype'		=> get_request('authtype'),
+				'username'		=> get_request('username'),
+				'password'		=> get_request('password'),
+				'publickey'		=> get_request('publickey'),
+				'privatekey'		=> get_request('privatekey'),
 				'params'			=> null,
 				'ipmi_sensor'		=> get_request('ipmi_sensor'),
 				'applications'		=> get_request('applications',null),
@@ -514,6 +532,11 @@ include_once('include/page_header.php');
 					'logtimefmt'		=> get_request('logtimefmt'),
 					'valuemapid'		=> get_request('valuemapid'),
 //					'delay_flex'		=> $db_delay_flex,
+					'authtype'		=> get_request('authtype'),
+					'username'		=> get_request('username'),
+					'password'		=> get_request('password'),
+					'publickey'		=> get_request('publickey'),
+					'privatekey'		=> get_request('privatekey'),
 					'params'			=> get_request('params'),
 					'ipmi_sensor'		=> get_request('ipmi_sensor'),
 //					'applications'		=> $applications
