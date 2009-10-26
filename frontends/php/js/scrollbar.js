@@ -487,9 +487,9 @@ setCalendarRight: function(time){
 	}
 	else{
 // dynamic
+		var startusertime = this.timeline.usertime() - this.timeline.period();
 		this.timeline.usertime(time);
 		
-		var startusertime = this.timeline.usertime() - this.timeline.period();
 		var new_period = this.timeline.usertime() - startusertime;
 		this.timeline.period(new_period);
 	}	
