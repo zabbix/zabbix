@@ -18,6 +18,8 @@
 **/
 
 #include "checks_ssh.h"
+
+#ifdef HAVE_SSH2
 #include "comms.h"
 #include "log.h"
 
@@ -351,3 +353,4 @@ int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 
 	return ssh_run(item, result, encoding);
 }
+#endif	/* HAVE_SSH2 */

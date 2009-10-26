@@ -36,7 +36,9 @@
 #include "checks_snmp.h"
 #include "checks_ipmi.h"
 #include "checks_db.h"
+#ifdef HAVE_SSH2
 #include "checks_ssh.h"
+#endif	/* HAVE_SSH2 */
 
 #define MAX_ITEMS	64
 
@@ -136,9 +138,14 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			}
 			break;
 		case ITEM_TYPE_SSH:
+#ifdef HAVE_SSH2
 			alarm(CONFIG_TIMEOUT);
 			res = get_value_ssh(item, result);
 			alarm(0);
+#else
+			SET_MSG_RESULT(result, strdup("Support of SSH parameters was not compiled in"));
+			res = NOTSUPPORTED;
+#endif	/* HAVE_SSH2 */
 
 			if (SUCCEED != res && GET_MSG_RESULT(result))
 			{
