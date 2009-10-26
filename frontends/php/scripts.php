@@ -226,7 +226,7 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 	else {
 
 		$form = new CForm();
-		$form->setName('scripts');
+		$form->setName('frm_scripts');
 		$form->setAttribute('id','scripts');
 		$form->addVar('action','1');
 
@@ -241,7 +241,7 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 						'select_groups' => 1);
 		$scripts = CScript::get($options);
 
-		$table=new CTableInfo(S_NO_SCRIPTS_DEFINED);
+		$table = new CTableInfo(S_NO_SCRIPTS_DEFINED);
 		$table->setHeader(array(
 				new CCheckBox('all_scripts',null,"checkAll('".$form->getName()."','all_scripts','scripts');"),
 				make_sorting_header(S_NAME,'name'),
@@ -293,10 +293,12 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 
 //----- GO ------
 		$goBox = new CComboBox('go');
-		$goBox->addItem('delete',S_DELETE_SELECTED);
+		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
+		$goOption->setAttribute('confirm','Delete selected scripts?');
+		$goBox->addItem($goOption);	
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO.' (0)');
+		$goButton = new CButton('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "scripts";');
 
@@ -304,7 +306,7 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 //----
 
 		$form->addItem($table);
-		$scripts_wdgt->addItem($table);
+		$scripts_wdgt->addItem($form);
 	}
 
 	$scripts_wdgt->show();
