@@ -166,10 +166,11 @@ include_once('include/page_header.php');
 			}
 			$htype = 'primary';
 
-			$db_dhosts2 = DBselect('SELECT DISTINCT ds.ip'.
+			$sql = 'SELECT DISTINCT ds.ip, ds.dserviceid'.
 					' FROM dservices ds'.
 					' WHERE ds.dhostid='.$dhost['dhostid'].
-					' ORDER BY ds.dserviceid');
+					' ORDER BY ds.dserviceid';
+			$db_dhosts2 = DBselect($sql);
 			while($dhost2 = DBfetch($db_dhosts2)){
 				$db_hosts = DBselect('SELECT host'.
 							' FROM hosts'.
