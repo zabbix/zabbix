@@ -19,40 +19,40 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/triggers.inc.php";
-	require_once "include/forms.inc.php";
+	require_once('include/config.inc.php');
+	require_once('include/triggers.inc.php');
+	require_once('include/forms.inc.php');
 
-	$dstfrm		= get_request("dstfrm",		0);	// destination form
+	$dstfrm		= get_request('dstfrm',		0);	// destination form
 
-	$page["title"] = "S_STEP_OF_SCENARIO";
-	$page["file"] = "popup_httpstep.php";
+	$page['title'] = "S_STEP_OF_SCENARIO";
+	$page['file'] = 'popup_httpstep.php';
 
 	define('ZBX_PAGE_NO_MENU', 1);
 
-include_once "include/page_header.php";
+include_once('include/page_header.php');
 
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"dstfrm"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,		null),
+		'dstfrm'=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,		null),
 
-		"stepid"=>		array(T_ZBX_INT, O_OPT,  P_SYS,	BETWEEN(0,65535),	null),
-		"list_name"=>	array(T_ZBX_STR, O_OPT,  P_SYS,	NOT_EMPTY,		'isset({save})&&isset({stepid})'),
+		'stepid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	BETWEEN(0,65535),	null),
+		'list_name'=>	array(T_ZBX_STR, O_OPT,  P_SYS,	NOT_EMPTY,		'isset({save})&&isset({stepid})'),
 
-		"name"=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY.KEY_PARAM(),'isset({save})'),
-		"url"=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
-		"posts"=>	array(T_ZBX_STR, O_OPT,  null,	null,			'isset({save})'),
-		"timeout"=>	array(T_ZBX_INT, O_OPT,  null,	BETWEEN(0,65535),	'isset({save})'),
-		"required"=>	array(T_ZBX_STR, O_OPT,  null,	null,			'isset({save})'),
-		"status_codes"=>array(T_ZBX_INT_RANGE, O_OPT,  null,	null,		'isset({save})'),
+		'name'=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY.KEY_PARAM(),'isset({save})'),
+		'url'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
+		'posts'=>	array(T_ZBX_STR, O_OPT,  null,	null,			'isset({save})'),
+		'timeout'=>	array(T_ZBX_INT, O_OPT,  null,	BETWEEN(0,65535),	'isset({save})'),
+		'required'=>	array(T_ZBX_STR, O_OPT,  null,	null,			'isset({save})'),
+		'status_codes'=>array(T_ZBX_INT_RANGE, O_OPT,  null,	null,		'isset({save})'),
 
-		"add"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"save"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'add'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'save'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 
-		"form"=>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		"form_refresh"=>array(T_ZBX_STR, O_OPT, null,	null,	null)
+		'form'=>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'form_refresh'=>array(T_ZBX_STR, O_OPT, null,	null,	null)
 	);
 
 	check_fields($fields);
@@ -60,8 +60,7 @@ include_once "include/page_header.php";
 <script language="JavaScript" type="text/javascript">
 <!--
 
-function add_var_to_opener_obj(obj,name,value)
-{
+function add_var_to_opener_obj(obj,name,value){
         new_variable = window.opener.document.createElement('input');
         new_variable.type = 'hidden';
         new_variable.name = name;
@@ -79,14 +78,12 @@ function add_var_to_opener_obj(obj,name,value)
 <script language="JavaScript" type="text/javascript">
 <!--
 
-function add_httpstep(formname,name,timeout,url,posts,required,status_codes)
-{
+function add_httpstep(formname,name,timeout,url,posts,required,status_codes){
         var form = window.opener.document.forms[formname];
 
-        if(!form)
-        {
-                close_window();
-		return false;
+        if(!form){
+			close_window();
+			return false;
         }
 
 	add_var_to_opener_obj(form,'new_httpstep[name]',name);
@@ -102,13 +99,13 @@ function add_httpstep(formname,name,timeout,url,posts,required,status_codes)
 }
 
 <?php
-		echo "add_httpstep(".
-			zbx_jsvalue($_REQUEST['dstfrm']).",".
-			zbx_jsvalue($_REQUEST['name']).",".
-			zbx_jsvalue($_REQUEST['timeout']).",".
-			zbx_jsvalue($_REQUEST['url']).",".
-			zbx_jsvalue($_REQUEST['posts']).",".
-			zbx_jsvalue($_REQUEST['required']).",".
+		echo 'add_httpstep('.
+			zbx_jsvalue($_REQUEST['dstfrm']).','.
+			zbx_jsvalue($_REQUEST['name']).','.
+			zbx_jsvalue($_REQUEST['timeout']).','.
+			zbx_jsvalue($_REQUEST['url']).','.
+			zbx_jsvalue($_REQUEST['posts']).','.
+			zbx_jsvalue($_REQUEST['required']).','.
 			zbx_jsvalue($_REQUEST['status_codes']).");\n";
 ?>
 -->
@@ -143,15 +140,15 @@ return true;
 }
 
 <?php
-		echo "update_httpstep(".
-			zbx_jsvalue($_REQUEST['dstfrm']).",".
-			zbx_jsvalue($_REQUEST['list_name']).",".
-			zbx_jsvalue($_REQUEST['stepid']).",".
-			zbx_jsvalue($_REQUEST['name']).",".
-			zbx_jsvalue($_REQUEST['timeout']).",".
-			zbx_jsvalue($_REQUEST['url']).",".
-			zbx_jsvalue($_REQUEST['posts']).",".
-			zbx_jsvalue($_REQUEST['required']).",".
+		echo 'update_httpstep('.
+			zbx_jsvalue($_REQUEST['dstfrm']).','.
+			zbx_jsvalue($_REQUEST['list_name']).','.
+			zbx_jsvalue($_REQUEST['stepid']).','.
+			zbx_jsvalue($_REQUEST['name']).','.
+			zbx_jsvalue($_REQUEST['timeout']).','.
+			zbx_jsvalue($_REQUEST['url']).','.
+			zbx_jsvalue($_REQUEST['posts']).','.
+			zbx_jsvalue($_REQUEST['required']).','.
 			zbx_jsvalue($_REQUEST['status_codes']).");\n";
 ?>
 -->
@@ -170,6 +167,6 @@ return true;
 ?>
 <?php
 
-include_once "include/page_footer.php";
+include_once('include/page_footer.php');
 
 ?>

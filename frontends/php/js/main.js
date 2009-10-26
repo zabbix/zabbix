@@ -319,12 +319,12 @@ submitGo: function(e){
 		var goButton = $('goButton');
 		
 		var goSelect = $('go');
-		var confrimText = goSelect.options[goSelect.selectedIndex].getAttribute('confirm');
-		if(is_null(confrimText) || !confrimText){
-			confrimText = 'Continue with "'+goSelect.options[goSelect.selectedIndex].text+'"?';
+		var confirmText = goSelect.options[goSelect.selectedIndex].getAttribute('confirm');
+		if(is_null(confirmText) || !confirmText){
+//			confirmText = 'Continue with "'+goSelect.options[goSelect.selectedIndex].text+'"?';
 		}
 		
-		if(!Confirm(confrimText)){ 
+		if(!Confirm(confirmText)){ 
 			Event.stop(e);
 			return false;
 		}

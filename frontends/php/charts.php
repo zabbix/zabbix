@@ -93,7 +93,7 @@ include_once('include/page_header.php');
 	$_REQUEST['graphid'] = get_request('graphid', get_profile('web.charts.graphid', 0));
 	if(!in_node($_REQUEST['graphid'])) $_REQUEST['graphid'] = 0;
 
-//	$_REQUEST['stime'] =	get_request('stime',get_profile('web.graph.stime', null, $_REQUEST['graphid']));
+	$_REQUEST['stime'] =	get_request('stime',get_profile('web.graph.stime', null, $_REQUEST['graphid']));
 	$_REQUEST['period'] =	get_request('period',get_profile('web.graph.period', ZBX_PERIOD_DEFAULT, $_REQUEST['graphid']));
 
 	$effectiveperiod = navigation_bar_calc();
