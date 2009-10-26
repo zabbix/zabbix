@@ -1221,7 +1221,7 @@ function __autoload($class_name){
 /*************** RESULT SORTING ******************/
 
 	function order_result(&$data, $sortfield, $sortorder=ZBX_SORT_UP, $preserve_keys=false){
-// TODO if works ok, remove commented part and last argument
+// TODO: if works ok, remove commented part and last argument
 		if(empty($data)) return false;
 
 		$sort = array();

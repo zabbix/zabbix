@@ -379,7 +379,7 @@ include_once('include/page_header.php');
 		));
 
 // sorting
-		order_page_result($usrgrps, getPageSortField('name'), getPageSortOrder());
+		order_page_result($usrgrps, 'name');
 		$paging = getPagingLine($usrgrps);
 //---------
 

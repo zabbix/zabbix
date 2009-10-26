@@ -349,7 +349,7 @@ include_once('include/page_header.php');
 
 // sorting
 Copt::profiling_start('order');
-		order_page_result($events, getPageSortField('eventid'), getPageSortOrder());
+		order_page_result($events, 'eventid');
 Copt::profiling_stop('order');
 
 // PAGING UPPER

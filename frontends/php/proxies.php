@@ -301,7 +301,7 @@ if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0) && !isset($available_ho
 			));
 
 // sorting
-//		order_page_result($proxies, getPageSortField('description'), getPageSortOrder());
+//		order_page_result($proxies, 'description');
 
 // PAGING UPPER
 		$paging = BR();

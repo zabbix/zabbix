@@ -485,7 +485,7 @@ include_once('include/page_header.php');
 		}
 
 // sorting
-		order_page_result($graphs, getPageSortField('description'), getPageSortOrder());
+		order_page_result($graphs, 'description');
 		$paging = getPagingLine($graphs);
 //---------
 

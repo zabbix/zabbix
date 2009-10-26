@@ -507,7 +507,7 @@
 		$triggers = CTrigger::get($options);
 
 // sorting && paginf
-		order_page_result($triggers, getPageSortField('description'), getPageSortOrder());
+		order_page_result($triggers, 'description');
 		$paging = getPagingLine($triggers);
 //---------
 

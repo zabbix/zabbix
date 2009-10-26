@@ -196,7 +196,7 @@ include_once('include/page_header.php');
 
 
 // sorting && paging
-	order_page_result($alerts, getPageSortField('clock'), getPageSortOrder());
+	order_page_result($alerts, 'clock');
 	$paging = getPagingLine($alerts);
 //---------
 

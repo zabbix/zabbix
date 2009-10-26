@@ -34,7 +34,7 @@ else{
 
 if(!defined('ZBX_ALLOW_UNICODE')) define('ZBX_ALLOW_UNICODE',1);
 
-include_once "include/page_header.php";
+include_once('include/page_header.php');
 
 //---------------------------------- CHECKS ------------------------------------
 

@@ -902,7 +902,7 @@ include_once('include/page_header.php');
 
 // sorting && paging
 // !!! should go after we subfiltered out items !!!
-		order_result($items, getPageSortField('description'), getPageSortOrder());
+		order_page_result($items, 'description');
 		$paging = getPagingLine($items);
 //---------
 
