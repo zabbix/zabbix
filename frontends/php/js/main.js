@@ -110,7 +110,7 @@ showSubMenu: function(show_label){
 var chkbxRange = {
 startbox:			null,			// start checkbox obj
 startbox_name: 		null,			// start checkbox name
-chkboxes:			new Array(),	// ckbx list
+chkboxes:			{},				// ckbx list
 pageGoName:			null,			// wich checkboxes should be counted by Go button
 pageGoCount:		0,				// selected checkboxes
 selected_ids:		{},	// ids of selected checkboxes
@@ -166,10 +166,12 @@ check: function(e){
 	if((typeof(obj) == 'undefined') || (obj.type.toLowerCase() != 'checkbox')){
 		return true;
 	}
-
+	
 	this.setGo();
 
 	if(!(e.ctrlKey || e.shiftKey)) return true;
+	if(obj.name.indexOf('all_') > -1) return true;
+
 
 	var obj_name = obj.name.split('[')[0];
 
@@ -219,7 +221,7 @@ check: function(e){
 
 	}
 	else{
-		if(!is_null(this.startbox)) this.startbox.checked = !this.startbox.checked;
+		if(!is_null(this.startbox)) this.startbox.checked = this.startbox.checked?false:true;
 
 		this.startbox = obj;
 		this.startbox_name = obj_name;
