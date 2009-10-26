@@ -64,7 +64,7 @@
 
 	function KEY_PARAM($var=NULL){
 //		return 'ereg(\'^([0-9a-zA-Z\_\.[.'.ZBX_EREG_MINUS_SYMB.'.]\$ ]+)$\',{'.$var.'})&&';
-		return 'preg_match("/^([0-9a-zA-Z_\.-\$ ]+)$/",{'.$var.'})&&';
+		return 'preg_match("/^([0-9a-zA-Z_\.\-\$ ]+)$/",{'.$var.'})&&';
 	}
 
 	function validate_ipv4($str,&$arr){
@@ -133,7 +133,7 @@
 			$ip_parts = explode('.', $parts[0]);
 
 //			if( !ereg('^[0-9]{1,2}$', $parts[1])) return false;
-			if(!preg_match('/^([0-9]{1,2})/$', $parts[1])) return false;
+			if(!preg_match('/^([0-9]{1,2})$/', $parts[1])) return false;
 
 			sscanf($parts[1], "%d", $mask);
 

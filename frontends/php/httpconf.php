@@ -43,9 +43,9 @@ include_once('include/page_header.php');
 		'groupid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,null),
 		'hostid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,'isset({form})||isset({save})'),
 
-		'httptestid'=>	array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,'(isset({form})&&({form}=="update"))'),
-		'application'=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,'isset({save})'),
-		'name'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,'isset({save})'),
+		'httptestid'=>	array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID, '(isset({form})&&({form}=="update"))'),
+		'application'=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY, 'isset({save})'),
+		'name'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY, 'isset({save})'),
 		'delay'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,86400),'isset({save})'),
 		'status'=>		array(T_ZBX_INT, O_OPT,  null,  IN('0,1'),'isset({save})'),
 		'agent'=>		array(T_ZBX_STR, O_OPT,  null,	null,'isset({save})'),
@@ -531,10 +531,21 @@ include_once('include/page_header.php');
 
 //----- GO ------
 		$goBox = new CComboBox('go');
-		$goBox->addItem('activate',S_ACTIVATE_SELECTED);
-		$goBox->addItem('disable',S_DISABLE_SELECTED);
-		$goBox->addItem('clean_history',S_CLEAN_HISTORY_SELECTED_ITEMS);
-		$goBox->addItem('delete',S_DELETE_SELECTED);
+		$goOption = new CComboItem('activate',S_ACTIVATE_SELECTED);
+		$goOption->setAttribute('confirm','Enable selected WEB scenarios?');
+		$goBox->addItem($goOption);	
+		
+		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
+		$goOption->setAttribute('confirm','Disable selected WEB scenarios?');
+		$goBox->addItem($goOption);	
+		
+		$goOption = new CComboItem('clean_history',S_CLEAN_HISTORY_SELECTED_ITEMS);
+		$goOption->setAttribute('confirm','Delete history of selected WEB scenarios?');
+		$goBox->addItem($goOption);	
+		
+		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
+		$goOption->setAttribute('confirm','Delete selected WEB scenarios?');
+		$goBox->addItem($goOption);	
 
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO.' (0)');
