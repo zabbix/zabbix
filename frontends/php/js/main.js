@@ -320,11 +320,11 @@ submitGo: function(e){
 		
 		var goSelect = $('go');
 		var confirmText = goSelect.options[goSelect.selectedIndex].getAttribute('confirm');
+
 		if(is_null(confirmText) || !confirmText){
 //			confirmText = 'Continue with "'+goSelect.options[goSelect.selectedIndex].text+'"?';
 		}
-		
-		if(!Confirm(confirmText)){ 
+		else if(!Confirm(confirmText)){ 
 			Event.stop(e);
 			return false;
 		}
