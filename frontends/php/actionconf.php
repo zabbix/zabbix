@@ -205,6 +205,8 @@ include_once('include/page_header.php');
 	else if(inarr_isset(array('add_condition','new_condition'))){
 		$new_condition = $_REQUEST['new_condition'];
 
+		if(!isset($new_condition['value'])) $new_condition['value'] = '';
+		
 		if( validate_condition($new_condition['type'],$new_condition['value']) ){
 			$_REQUEST['conditions'] = get_request('conditions',array());
 			if(!str_in_array($new_condition,$_REQUEST['conditions']))
