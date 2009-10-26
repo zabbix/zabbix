@@ -330,7 +330,7 @@ include_once('include/page_header.php');
 		$hosts_all = CHost::get($params);
 
 // sorting
-		order_page_result($hosts_all, getPageSortField('host'), getPageSortOrder());
+		order_page_result($hosts_all, 'host');
 		$paging = getPagingLine($hosts_all);
 //-------
 

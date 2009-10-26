@@ -741,10 +741,10 @@ require_once('include/forms.inc.php');
 		}
 		$templates = CTemplate::get($options);
 
-		$sortfield = getPageSortField('host');
-		$sortorder = getPageSortOrder();
-		order_page_result($templates, $sortfield, $sortorder);
+// sorting && paging
+		order_page_result($templates, 'host');
 		$paging = getPagingLine($templates);
+//--------
 
 		$options = array(
 			'templateids' => array_keys($templates),

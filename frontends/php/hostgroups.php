@@ -294,21 +294,17 @@ include_once('include/page_header.php');
 			S_MEMBERS
 		));
 
-
-// sorting && paging
 		$options = array(
 			'editable' => 1,
 			'extendoutput' => 1,
-			// 'sortfield' => getPageSortField('name'),
-			// 'sortorder' => getPageSortOrder(),
 			'limit' => ($config['search_limit']+1)
 		);
 		$groups = CHostGroup::get($options);
 
-		$sortfield = getPageSortField('name');
-		$sortorder =  getPageSortOrder();
-		order_page_result($groups, $sortfield, $sortorder);
+// sorting && paging
+		order_page_result($groups, 'name');
 		$paging = getPagingLine($groups);
+//-----
 
 		$options = array(
 			'groupids' => array_keys($groups),
@@ -316,8 +312,10 @@ include_once('include/page_header.php');
 			'select_hosts' => 1,
 			'nopermissions' => 1
 		);
+		
+// sorting && paging
 		$groups = CHostGroup::get($options);
-		order_result($groups, $sortfield, $sortorder);
+		order_result($groups, 'name');
 //---------
 
 		foreach($groups as $group){

@@ -396,7 +396,7 @@ include_once('include/page_header.php');
 		$db_appids = array();
 
 /* sorting
-		order_page_result($applications, getPageSortField('name'), getPageSortOrder());
+		order_page_result($applications, 'name');
 
 // PAGING UPPER
 		$paging = getPagingLine($applications);

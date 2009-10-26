@@ -479,7 +479,7 @@ include_once('include/page_header.php');
 			));
 
 // sorting && paging
-		order_page_result($maintenances, getPageSortField('name'), getPageSortOrder());
+		order_page_result($maintenances, 'name');
 		$paging = getPagingLine($maintenances);
 //---------
 

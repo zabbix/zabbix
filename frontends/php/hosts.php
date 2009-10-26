@@ -646,11 +646,9 @@ include_once('include/page_header.php');
 			$options['groupids'] = $groupid_selected;
 		}
 		$hosts = CHost::get($options);
-// sorting && paging
 
-		$sortfield = getPageSortField('host');
-		$sortorder = getPageSortOrder();
-		order_page_result($hosts, $sortfield, $sortorder);
+// sorting && paging
+		order_page_result($hosts, 'host');
 		$paging = getPagingLine($hosts);
 //---------
 
@@ -665,7 +663,7 @@ include_once('include/page_header.php');
 			'nopermissions' => 1
 		);
 		$hosts = CHost::get($options);
-		order_result($hosts, $sortfield, $sortorder);
+		order_result($hosts, 'host');
 
 		foreach($hosts as $host){
 
