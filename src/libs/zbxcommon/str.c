@@ -2087,3 +2087,20 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	return out;
 }
 #endif	/* HAVE_ICONV */
+
+void	win2unix_eol(char *text)
+{
+	size_t	i, sz;
+
+	sz = strlen(text);
+
+	for (i = 0; i < sz; i++)
+	{
+		if (text[i] == '\r' && text[i + 1] == '\n')	/* CR+LF (Windows) */
+		{
+			text[i] = '\n';	/* LF (Unix) */
+			sz--;
+			memmove(&text[i + 1], &text[i + 2], (sz - i) * sizeof(char));
+		}
+	}
+}

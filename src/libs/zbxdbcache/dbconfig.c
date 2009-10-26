@@ -46,6 +46,7 @@
 #define TRAPITEM_ALLOC_STEP	64
 #define LOGITEM_ALLOC_STEP	64
 #define DBITEM_ALLOC_STEP	64
+#define SSHITEM_ALLOC_STEP	64
 
 #define ZBX_DC_CONFIG struct zbx_dc_config
 #define ZBX_DC_HOST struct zbx_dc_host
@@ -57,6 +58,7 @@
 #define ZBX_DC_TRAPITEM struct zbx_dc_trapitem
 #define ZBX_DC_LOGITEM struct zbx_dc_logitem
 #define ZBX_DC_DBITEM struct zbx_dc_dbitem
+#define ZBX_DC_SSHITEM struct zbx_dc_sshitem
 
 ZBX_DC_ITEM
 {
@@ -115,6 +117,17 @@ ZBX_DC_DBITEM
 	char		params[ITEM_PARAMS_LEN_MAX];
 };
 
+ZBX_DC_SSHITEM
+{
+	zbx_uint64_t	itemid;
+	unsigned char	authtype;
+	char		username[ITEM_USERNAME_LEN_MAX];
+	char		publickey[ITEM_PUBLICKEY_LEN_MAX];
+	char		privatekey[ITEM_PRIVATEKEY_LEN_MAX];
+	char		password[ITEM_PASSWORD_LEN_MAX];
+	char		params[ITEM_PARAMS_LEN_MAX];
+};
+
 ZBX_DC_HOST
 {
 	zbx_uint64_t	hostid;
@@ -157,10 +170,10 @@ ZBX_DC_CONFIG
 {
 	int		items_alloc, snmpitems_alloc, ipmiitems_alloc,
 			flexitems_alloc, trapitems_alloc, logitems_alloc,
-			dbitems_alloc, hosts_alloc, ipmihosts_alloc;
+			dbitems_alloc, sshitems_alloc, hosts_alloc, ipmihosts_alloc;
 	int		items_num, snmpitems_num, ipmiitems_num,
 			flexitems_num, trapitems_num, logitems_num,
-			dbitems_num, hosts_num, ipmihosts_num;
+			dbitems_num, sshitems_num, hosts_num, ipmihosts_num;
 	int		idxitem01_alloc, idxitem02_alloc,
 			idxhost01_alloc, idxhost02_alloc;
 	int		idxitem01_num, idxitem02_num,
@@ -172,6 +185,7 @@ ZBX_DC_CONFIG
 	ZBX_DC_TRAPITEM	*trapitems;
 	ZBX_DC_LOGITEM	*logitems;
 	ZBX_DC_DBITEM	*dbitems;
+	ZBX_DC_SSHITEM	*sshitems;
 	int		*idxitem01;	/* hostid,key */
 	int		*idxitem02;	/* poller_type,poller_num,nextcheck */
 	ZBX_DC_HOST	*hosts;
@@ -229,6 +243,7 @@ static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t hostid, zbx_uint64_
 	case ITEM_TYPE_AGGREGATE:
 	case ITEM_TYPE_EXTERNAL:
 	case ITEM_TYPE_DB_MONITOR:
+	case ITEM_TYPE_SSH:
 		if (0 == CONFIG_POLLER_FORKS)
 			break;
 		*poller_type = (unsigned char)ZBX_POLLER_TYPE_NORMAL;
@@ -830,6 +845,10 @@ static void	DCallocate_item(int index)
 		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
 		config->idxitem01 = (int *)dst;
 
+		dst = (void *)config->sshitems + sz;
+		memmove(dst, config->sshitems, sizeof(ZBX_DC_SSHITEM) * config->sshitems_num);
+		config->sshitems = (ZBX_DC_SSHITEM *)dst;
+
 		dst = (void *)config->dbitems + sz;
 		memmove(dst, config->dbitems, sizeof(ZBX_DC_DBITEM) * config->dbitems_num);
 		config->dbitems = (ZBX_DC_DBITEM *)dst;
@@ -909,6 +928,10 @@ static void	DCallocate_snmpitem(int index)
 		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
 		config->idxitem01 = (int *)dst;
 
+		dst = (void *)config->sshitems + sz;
+		memmove(dst, config->sshitems, sizeof(ZBX_DC_SSHITEM) * config->sshitems_num);
+		config->sshitems = (ZBX_DC_SSHITEM *)dst;
+
 		dst = (void *)config->dbitems + sz;
 		memmove(dst, config->dbitems, sizeof(ZBX_DC_DBITEM) * config->dbitems_num);
 		config->dbitems = (ZBX_DC_DBITEM *)dst;
@@ -973,6 +996,10 @@ static void	DCallocate_ipmiitem(int index)
 		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
 		config->idxitem01 = (int *)dst;
 
+		dst = (void *)config->sshitems + sz;
+		memmove(dst, config->sshitems, sizeof(ZBX_DC_SSHITEM) * config->sshitems_num);
+		config->sshitems = (ZBX_DC_SSHITEM *)dst;
+
 		dst = (void *)config->dbitems + sz;
 		memmove(dst, config->dbitems, sizeof(ZBX_DC_DBITEM) * config->dbitems_num);
 		config->dbitems = (ZBX_DC_DBITEM *)dst;
@@ -1033,6 +1060,10 @@ static void	DCallocate_flexitem(int index)
 		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
 		config->idxitem01 = (int *)dst;
 
+		dst = (void *)config->sshitems + sz;
+		memmove(dst, config->sshitems, sizeof(ZBX_DC_SSHITEM) * config->sshitems_num);
+		config->sshitems = (ZBX_DC_SSHITEM *)dst;
+
 		dst = (void *)config->dbitems + sz;
 		memmove(dst, config->dbitems, sizeof(ZBX_DC_DBITEM) * config->dbitems_num);
 		config->dbitems = (ZBX_DC_DBITEM *)dst;
@@ -1089,6 +1120,10 @@ static void	DCallocate_trapitem(int index)
 		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
 		config->idxitem01 = (int *)dst;
 
+		dst = (void *)config->sshitems + sz;
+		memmove(dst, config->sshitems, sizeof(ZBX_DC_SSHITEM) * config->sshitems_num);
+		config->sshitems = (ZBX_DC_SSHITEM *)dst;
+
 		dst = (void *)config->dbitems + sz;
 		memmove(dst, config->dbitems, sizeof(ZBX_DC_DBITEM) * config->dbitems_num);
 		config->dbitems = (ZBX_DC_DBITEM *)dst;
@@ -1141,6 +1176,10 @@ static void	DCallocate_logitem(int index)
 		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
 		config->idxitem01 = (int *)dst;
 
+		dst = (void *)config->sshitems + sz;
+		memmove(dst, config->sshitems, sizeof(ZBX_DC_SSHITEM) * config->sshitems_num);
+		config->sshitems = (ZBX_DC_SSHITEM *)dst;
+
 		dst = (void *)config->dbitems + sz;
 		memmove(dst, config->dbitems, sizeof(ZBX_DC_DBITEM) * config->dbitems_num);
 		config->dbitems = (ZBX_DC_DBITEM *)dst;
@@ -1188,6 +1227,10 @@ static void	DCallocate_dbitem(int index)
 		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
 		config->idxitem01 = (int *)dst;
 
+		dst = (void *)config->sshitems + sz;
+		memmove(dst, config->sshitems, sizeof(ZBX_DC_SSHITEM) * config->sshitems_num);
+		config->sshitems = (ZBX_DC_SSHITEM *)dst;
+
 		config->dbitems_alloc += DBITEM_ALLOC_STEP;
 		config->free_mem -= sz;
 	}
@@ -1195,6 +1238,50 @@ static void	DCallocate_dbitem(int index)
 	if (0 != (sz = sizeof(ZBX_DC_DBITEM) * (config->dbitems_num - index)))
 		memmove(&config->dbitems[index + 1], &config->dbitems[index], sz);
 	config->dbitems_num++;
+}
+
+static void	DCallocate_sshitem(int index)
+{
+	size_t	sz;
+	void	*dst;
+
+	if (config->sshitems_num == config->sshitems_alloc)
+	{
+		sz = sizeof(ZBX_DC_SSHITEM) * SSHITEM_ALLOC_STEP;
+
+		DCcheck_freemem(sz);
+
+		dst = (void *)config->idxhost02 + sz;
+		memmove(dst, config->idxhost02, sizeof(int) * config->idxhost02_num);
+		config->idxhost02 = (int *)dst;
+
+		dst = (void *)config->idxhost01 + sz;
+		memmove(dst, config->idxhost01, sizeof(int) * config->idxhost01_num);
+		config->idxhost01 = (int *)dst;
+
+		dst = (void *)config->ipmihosts + sz;
+		memmove(dst, config->ipmihosts, sizeof(ZBX_DC_IPMIHOST) * config->ipmihosts_num);
+		config->ipmihosts = (ZBX_DC_IPMIHOST *)dst;
+
+		dst = (void *)config->hosts + sz;
+		memmove(dst, config->hosts, sizeof(ZBX_DC_HOST) * config->hosts_num);
+		config->hosts = (ZBX_DC_HOST *)dst;
+
+		dst = (void *)config->idxitem02 + sz;
+		memmove(dst, config->idxitem02, sizeof(int) * config->idxitem02_num);
+		config->idxitem02 = (int *)dst;
+
+		dst = (void *)config->idxitem01 + sz;
+		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
+		config->idxitem01 = (int *)dst;
+
+		config->sshitems_alloc += SSHITEM_ALLOC_STEP;
+		config->free_mem -= sz;
+	}
+
+	if (0 != (sz = sizeof(ZBX_DC_SSHITEM) * (config->sshitems_num - index)))
+		memmove(&config->sshitems[index + 1], &config->sshitems[index], sz);
+	config->sshitems_num++;
 }
 
 static void	DCallocate_host(int index)
@@ -1329,6 +1416,7 @@ static void	DCsync_items()
 	ZBX_DC_TRAPITEM	*trapitem;
 	ZBX_DC_LOGITEM	*logitem;
 	ZBX_DC_DBITEM	*dbitem;
+	ZBX_DC_SSHITEM	*sshitem;
 	zbx_uint64_t	itemid, hostid, proxy_hostid;
 	int		i, new, delay;
 	unsigned char	poller_type, poller_num, type;
@@ -1350,7 +1438,8 @@ static void	DCsync_items()
 			"select i.itemid,i.hostid,h.proxy_hostid,i.type,i.data_type,i.value_type,i.key_,"
 				"i.snmp_community,i.snmp_oid,i.snmp_port,i.snmpv3_securityname,"
 				"i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,"
-				"i.ipmi_sensor,i.delay,i.delay_flex,i.trapper_hosts,i.logtimefmt,i.params,i.status"
+				"i.ipmi_sensor,i.delay,i.delay_flex,i.trapper_hosts,i.logtimefmt,i.params,"
+				"i.status,i.authtype,i.username,i.password,i.publickey,i.privatekey"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.status in (%d)"
@@ -1548,6 +1637,32 @@ static void	DCsync_items()
 			if (i < config->dbitems_num && config->dbitems[i].itemid == itemid)
 				DCremove_element(config->dbitems, &config->dbitems_num, sizeof(ZBX_DC_DBITEM), i);
 		}
+
+		/* SSH items */
+		i = get_nearestindex(config->sshitems, sizeof(ZBX_DC_LOGITEM),
+				config->sshitems_num, itemid);
+
+		if (ITEM_TYPE_SSH == item->type)
+		{
+			if (i == config->sshitems_num || config->sshitems[i].itemid != itemid)
+				DCallocate_sshitem(i);
+
+			sshitem = &config->sshitems[i];
+
+			sshitem->itemid = itemid;
+			sshitem->authtype = (unsigned short)atoi(row[21]);
+			zbx_strlcpy(sshitem->username, row[22], sizeof(sshitem->username));
+			zbx_strlcpy(sshitem->publickey, row[24], sizeof(sshitem->publickey));
+			zbx_strlcpy(sshitem->privatekey, row[25], sizeof(sshitem->privatekey));
+			zbx_strlcpy(sshitem->password, row[23], sizeof(sshitem->password));
+			zbx_strlcpy(sshitem->params, row[19], sizeof(sshitem->params));
+		}
+		else
+		{
+			/* remove SSH item parameters */
+			if (i < config->sshitems_num && config->sshitems[i].itemid == itemid)
+				DCremove_element(config->sshitems, &config->sshitems_num, sizeof(ZBX_DC_SSHITEM), i);
+		}
 	}
 
 	/* remove deleted or disabled items from buffer */
@@ -1584,6 +1699,11 @@ static void	DCsync_items()
 	for (i = 0; i < config->dbitems_num; i++)
 		if (FAIL == uint64_array_exists(ids, ids_num, config->dbitems[i].itemid))
 			DCremove_element(config->dbitems, &config->dbitems_num, sizeof(ZBX_DC_DBITEM), i--);
+
+	/* remove deleted or disabled SSH items from buffer */
+	for (i = 0; i < config->sshitems_num; i++)
+		if (FAIL == uint64_array_exists(ids, ids_num, config->sshitems[i].itemid))
+			DCremove_element(config->sshitems, &config->sshitems_num, sizeof(ZBX_DC_SSHITEM), i--);
 
 	UNLOCK_CACHE;
 
@@ -1835,6 +1955,7 @@ void	init_configuration_cache()
 	config->trapitems = ptr + sz;
 	config->logitems = ptr + sz;
 	config->dbitems = ptr + sz;
+	config->sshitems = ptr + sz;
 	config->idxitem01 = ptr + sz;	/* hostid,key */
 	config->idxitem02 = ptr + sz;	/* poller_type,poller_num,nextcheck */
 	config->hosts = ptr + sz;
@@ -2044,6 +2165,7 @@ static void	DCget_item(DC_ITEM *dst_item, ZBX_DC_ITEM *src_item)
 	ZBX_DC_IPMIITEM	*ipmiitem;
 	ZBX_DC_DBITEM	*dbitem;
 	ZBX_DC_FLEXITEM	*dc_flexitem;
+	ZBX_DC_SSHITEM	*sshitem;
 
 	dst_item->itemid = src_item->itemid;
 	dst_item->type = src_item->type;
@@ -2114,7 +2236,27 @@ static void	DCget_item(DC_ITEM *dst_item, ZBX_DC_ITEM *src_item)
 		if (index < config->dbitems_num && config->dbitems[index].itemid == src_item->itemid)
 		{
 			dbitem = &config->dbitems[index];
-			zbx_strlcpy(dst_item->params, dbitem->params, ITEM_PARAMS_LEN_MAX);
+			zbx_strlcpy(dst_item->params_orig, dbitem->params, sizeof(dst_item->params_orig));
+			dst_item->params = NULL;
+		}
+		break;
+	case ITEM_TYPE_SSH:
+		index = get_nearestindex(config->sshitems, sizeof(ZBX_DC_SSHITEM),
+				config->sshitems_num, src_item->itemid);
+		if (index < config->sshitems_num && config->sshitems[index].itemid == src_item->itemid)
+		{
+			sshitem = &config->sshitems[index];
+			dst_item->authtype = sshitem->authtype;
+			memcpy(dst_item->username_orig, sshitem->username, sizeof(dst_item->username_orig));
+			memcpy(dst_item->publickey_orig, sshitem->publickey, sizeof(dst_item->publickey_orig));
+			memcpy(dst_item->privatekey_orig, sshitem->privatekey, sizeof(dst_item->privatekey_orig));
+			memcpy(dst_item->password_orig, sshitem->password, sizeof(dst_item->password_orig));
+			memcpy(dst_item->params_orig, sshitem->params, sizeof(dst_item->params_orig));
+			dst_item->username = NULL;
+			dst_item->publickey = NULL;
+			dst_item->privatekey = NULL;
+			dst_item->password = NULL;
+			dst_item->params = NULL;
 		}
 		break;
 	default:

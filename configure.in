@@ -1056,6 +1056,22 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 
 	PROXY_LDFLAGS="${PROXY_LDFLAGS} ${SNMP_LDFLAGS}"
 
+	dnl Check for LIBSSH2 [by default - skip]
+	LIBSSH2_CHECK_CONFIG([no])
+	if test "x$want_ssh2" = "xyes"; then
+		if test "x$found_ssh2" != "xyes"; then
+			AC_MSG_ERROR([SSH2 library not found])
+		else
+			have_ssh2="yes"
+		fi
+	fi
+	CFLAGS="${CFLAGS} ${SSH2_CFLAGS}"
+	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${SSH2_LDFLAGS}"
+	SERVER_LIBS="${SERVER_LIBS} ${SSH2_LIBS}"
+
+	PROXY_LDFLAGS="${PROXY_LDFLAGS} ${SSH2_LDFLAGS}"
+	PROXY_LIBS="${PROXY_LIBS} ${SSH2_LIBS}"
+
 	AC_SUBST(SERVER_LDFLAGS)
 	AC_SUBST(SERVER_LIBS)
 

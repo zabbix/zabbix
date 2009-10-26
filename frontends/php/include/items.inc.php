@@ -47,6 +47,7 @@
 			case ITEM_TYPE_EXTERNAL:	$type = S_EXTERNAL_CHECK;		break;
 			case ITEM_TYPE_DB_MONITOR:	$type = S_ZABBIX_DATABASE_MONITOR;	break;
 			case ITEM_TYPE_IPMI:		$type = S_IPMI_AGENT;			break;
+			case ITEM_TYPE_SSH:		$type = S_SSH_AGENT;			break;
 			default:$type = S_UNKNOWN;			break;
 		}
 	return $type;
@@ -241,6 +242,11 @@
 				'logtimefmt'		=> '',
 				'valuemapid'		=> 0,
 				'delay_flex'		=> '',
+				'authtype'		=> 0,
+				'username'		=> '',
+				'password'		=> '',
+				'publickey'		=> '',
+				'privatekey'		=> '',
 				'params'		=> '',
 				'ipmi_sensor'		=> '',
 				'applications'		=> array(),
@@ -353,20 +359,23 @@
 		// first add mother item
 		$itemid=get_dbid('items','itemid');
 		$result=DBexecute('INSERT INTO items '.
-				' (itemid,description,key_,hostid,delay,history,nextcheck,status,type,'.
+				' (itemid,description,key_,hostid,delay,history,status,type,'.
 					'snmp_community,snmp_oid,value_type,data_type,trapper_hosts,'.
 					'snmp_port,units,multiplier,'.
 					'delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,'.
 					'snmpv3_privpassphrase,formula,trends,logtimefmt,valuemapid,'.
-					'delay_flex,params,ipmi_sensor,templateid)'.
+					'delay_flex,params,ipmi_sensor,templateid,authtype,username,password,publickey,privatekey)'.
 			' VALUES ('.$itemid.','.zbx_dbstr($item['description']).','.zbx_dbstr($item['key_']).','.$item['hostid'].','.
-						$item['delay'].','.$item['history'].',0,'.$item['status'].','.$item['type'].','.
+						$item['delay'].','.$item['history'].','.$item['status'].','.$item['type'].','.
 						zbx_dbstr($item['snmp_community']).','.zbx_dbstr($item['snmp_oid']).','.$item['value_type'].','.$item['data_type'].','.
 						zbx_dbstr($item['trapper_hosts']).','.$item['snmp_port'].','.zbx_dbstr($item['units']).','.$item['multiplier'].','.
 						$item['delta'].','.zbx_dbstr($item['snmpv3_securityname']).','.$item['snmpv3_securitylevel'].','.
 						zbx_dbstr($item['snmpv3_authpassphrase']).','.zbx_dbstr($item['snmpv3_privpassphrase']).','.
 						zbx_dbstr($item['formula']).','.$item['trends'].','.zbx_dbstr($item['logtimefmt']).','.$item['valuemapid'].','.
-						zbx_dbstr($item['delay_flex']).','.zbx_dbstr($item['params']).','.zbx_dbstr($item['ipmi_sensor']).','.$item['templateid'].')'
+						zbx_dbstr($item['delay_flex']).','.zbx_dbstr($item['params']).','.
+						zbx_dbstr($item['ipmi_sensor']).','.$item['templateid'].','.$item['authtype'].','.
+						zbx_dbstr($item['username']).','.zbx_dbstr($item['password']).','.
+						zbx_dbstr($item['publickey']).','.zbx_dbstr($item['privatekey']).')'
 			);
 
 		if ($result)
@@ -438,7 +447,7 @@
 			if($status != $old_status){
 /*				unset($itemids[$row['itemid']]);*/
 				if ($status==ITEM_STATUS_ACTIVE)
-					$sql='UPDATE items SET status='.$status.",error='',nextcheck=0 ".
+					$sql='UPDATE items SET status='.$status.",error='' ".
 						' WHERE itemid='.$row['itemid'];
 				else
 					$sql='UPDATE items SET status='.$status.
@@ -620,7 +629,11 @@
 				'params='.zbx_dbstr($item['params']).','.
 				'ipmi_sensor='.zbx_dbstr($item['ipmi_sensor']).','.
 				'templateid='.$item['templateid'].','.
-				'nextcheck=0 '.
+				'authtype='.$item['authtype'].','.
+				'username='.zbx_dbstr($item['username']).','.
+				'password='.zbx_dbstr($item['password']).','.
+				'publickey='.zbx_dbstr($item['publickey']).','.
+				'privatekey='.zbx_dbstr($item['privatekey']).
 			' WHERE itemid='.$itemid);
 
 		if ($result){
@@ -678,7 +691,12 @@
 					'trends'		=> array('template' => 1 , 'httptest' => 1),
 					'logtimefmt'		=> array(),
 					'valuemapid'		=> array('httptest' => 1),
-					'params'		=> array(),
+					'authtype'		=> array('template' => 1),
+					'username'		=> array('template' => 1),
+					'password'		=> array('template' => 1),
+					'publickey'		=> array('template' => 1),
+					'privatekey'		=> array('template' => 1),
+					'params'		=> array('template' => 1),
 					'delay_flex'		=> array('template' => 1),
 					'ipmi_sensor'		=> array());
 
@@ -867,7 +885,8 @@
 		$sql = 'SELECT itemid,description,key_,hostid,delay,history,status,type,'.
 					'snmp_community,snmp_oid,value_type,data_type,trapper_hosts,snmp_port,units,multiplier,delta,'.
 					'snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,'.
-					'formula,trends,logtimefmt,valuemapid,delay_flex,params,ipmi_sensor,templateid '.
+					'formula,trends,logtimefmt,valuemapid,delay_flex,params,ipmi_sensor,templateid,'.
+					'authtype,username,password,publickey,privatekey '.
 			' FROM items '.
 			' WHERE itemid='.$itemid;
 		$row = DBfetch(DBselect($sql));

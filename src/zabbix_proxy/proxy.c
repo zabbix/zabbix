@@ -164,6 +164,8 @@ int	CONFIG_NODEID			= -1;
 int	CONFIG_MASTER_NODEID		= 0;
 int	CONFIG_NODE_NOHISTORY		= 0;
 
+char	*CONFIG_SSH_KEY_LOCATION	= NULL;
+
 /* Global variable to control if we should write warnings to log[] */
 int	CONFIG_ENABLE_LOG		= 1;
 
@@ -249,6 +251,7 @@ void	init_config(void)
 		{"DBPassword",&CONFIG_DBPASSWORD,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBSocket",&CONFIG_DBSOCKET,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBPort",&CONFIG_DBPORT,0,TYPE_INT,PARM_OPT,1024,65535},
+		{"SSHKeyLocation",&CONFIG_SSH_KEY_LOCATION,0,TYPE_STRING,PARM_OPT,0,0},
 		{0}
 	};
 

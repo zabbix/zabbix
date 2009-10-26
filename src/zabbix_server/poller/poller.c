@@ -36,6 +36,7 @@
 #include "checks_snmp.h"
 #include "checks_ipmi.h"
 #include "checks_db.h"
+#include "checks_ssh.h"
 
 #define MAX_ITEMS	64
 
@@ -128,7 +129,20 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 
 			if (SUCCEED != res && GET_MSG_RESULT(result))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "Item [%s] error: %s",
+				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
+						item->host.host, item->key_orig, result->msg);
+				zabbix_syslog("Item [%s:%s] error: %s",
+						item->host.host, item->key_orig, result->msg);
+			}
+			break;
+		case ITEM_TYPE_SSH:
+			alarm(CONFIG_TIMEOUT);
+			res = get_value_ssh(item, result);
+			alarm(0);
+
+			if (SUCCEED != res && GET_MSG_RESULT(result))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
 						item->host.host, item->key_orig, result->msg);
 				zabbix_syslog("Item [%s:%s] error: %s",
 						item->host.host, item->key_orig, result->msg);
@@ -431,7 +445,9 @@ static int	get_values(int now)
 	static int	ids_alloc = 1, snmpids_alloc = 1, ipmiids_alloc = 1;
 	int		ids_num = 0, snmpids_num = 0, ipmiids_num = 0;
 
-	static char	*key = NULL, *ipmi_ip = NULL;
+	static char	*key = NULL, *ipmi_ip = NULL, *params = NULL,
+			*username = NULL, *publickey = NULL, *privatekey = NULL,
+			*password = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -454,13 +470,47 @@ static int	get_values(int now)
 				&key, MACRO_TYPE_ITEM_KEY, NULL, 0);
 		items[i].key = key;
 
-		if (ITEM_TYPE_IPMI == items[i].type)
-		{
+		switch (items[i].type) {
+		case ITEM_TYPE_IPMI:
 			zbx_free(ipmi_ip);
 			ipmi_ip = strdup(items[i].host.ipmi_ip_orig);
 			substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
 					&ipmi_ip, MACRO_TYPE_HOST_IPMI_IP, NULL, 0);
 			items[i].host.ipmi_ip = ipmi_ip;
+			break;
+		case ITEM_TYPE_DB_MONITOR:
+			items[i].params = items[i].params_orig;
+			break;
+		case ITEM_TYPE_SSH:
+			zbx_free(username);
+			zbx_free(publickey);
+			zbx_free(privatekey);
+			zbx_free(password);
+			zbx_free(params);
+
+			username = strdup(items[i].username_orig);
+			publickey = strdup(items[i].publickey_orig);
+			privatekey = strdup(items[i].privatekey_orig);
+			password = strdup(items[i].password_orig);
+			params = strdup(items[i].params_orig);
+
+			substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+					&username, MACRO_TYPE_ITEM_USERNAME, NULL, 0);
+			substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+					&publickey, MACRO_TYPE_ITEM_PUBLICKEY, NULL, 0);
+			substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+					&privatekey, MACRO_TYPE_ITEM_PRIVATEKEY, NULL, 0);
+			substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+					&password, MACRO_TYPE_ITEM_PASSWORD, NULL, 0);
+			substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+					&params, MACRO_TYPE_ITEM_SCRIPT, NULL, 0);
+
+			items[i].username = username;
+			items[i].publickey = publickey;
+			items[i].privatekey = privatekey;
+			items[i].password = password;
+			items[i].params = params;
+			break;
 		}
 
 		/* Skip unreachable hosts but do not break the loop. */
@@ -601,10 +651,8 @@ void main_poller_loop(zbx_process_t p, int type, int num)
 				sleeptime = POLLER_DELAY;
 		}
 
-//zabbix_set_log_level(LOG_LEVEL_DEBUG);
 		zabbix_log(LOG_LEVEL_DEBUG, "Poller #%d spent " ZBX_FS_DBL " seconds while updating %3d values."
 				" Sleeping for %d seconds", poller_num, sec, processed, sleeptime);
-//zabbix_set_log_level(LOG_LEVEL_WARNING);
 
 		if (sleeptime > 0)
 		{
