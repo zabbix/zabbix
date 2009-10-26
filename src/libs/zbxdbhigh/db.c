@@ -1756,7 +1756,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 	item->eventlog_source	= NULL;
 	item->timestamp		= 0;
 	item->eventlog_severity	= 0;
-	item->lastlogsize	= 0;
+	item->lastlogsize	= atoi(row[40]);
 }
 
 /*
