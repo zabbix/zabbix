@@ -774,7 +774,7 @@ return $result;
 
 
 function uint_in_array($needle,$haystack){
-// :REMOVE:
+//TODO: REMOVE
 	if(!empty($haystack) && !isset($haystack[0])){
 		info('uint_in_array: possible pasted associated array');
 	}

@@ -220,7 +220,7 @@ include_once('include/page_header.php');
 			S_STATUS));
 
 /* sorting
-		order_page_result($applications, getPageSortField('name'), getPageSortOrder());
+		order_page_result($applications, 'name');
 
 // PAGING UPPER
 		$paging = getPagingLine($applications);

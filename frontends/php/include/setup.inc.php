@@ -255,6 +255,15 @@
 					$bcmath_fnc_exist,
 					'Requires bcmath module [configure PHP with --enable-bcmath]'));
 
+// MultiByte String support
+			$mbstrings_fnc_exist = mbstrings_available();
+			$table->addRow(
+				$this->get_test_result(
+					$final_result,
+					'PHP MB string support:',
+					$mbstrings_fnc_exist ? 'yes' : 'no',
+					$mbstrings_fnc_exist,
+					'Requires mb string module [configure PHP with --enable-mbstring]'));
 
 //* Check sockets lib
 			$sockets_fnc_exist = function_exists('socket_create');

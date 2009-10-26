@@ -199,7 +199,7 @@ include_once('include/page_header.php');
 				$sql_from = ', hosts_groups hg ';
 				$sql_where = ' and h.hostid=hg.hostid AND hg.groupid='.$_REQUEST['groupid'];
 			}
-			$sql='SELECT h.hostid,h.host,p.name,p.os,p.serialno,p.tag,p.macaddress'.
+			$sql='SELECT h.hostid,h.host,p.name,p.os,p.serialno,p.tag,p.macaddress '.
 				' FROM hosts h,hosts_profiles p '.$sql_from.
 				' WHERE h.hostid=p.hostid'.
 					' and '.DBcondition('h.hostid',$PAGE_HOSTS['hostids']).

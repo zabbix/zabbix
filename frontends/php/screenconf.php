@@ -290,7 +290,7 @@ include_once('include/page_header.php');
 				S_SCREEN));
 
 /* sorting
-			order_page_result($applications, getPageSortField('name'), getPageSortOrder());
+			order_page_result($applications, 'name');
 
 // PAGING UPPER
 			$paging = getPagingLine($applications);
@@ -379,7 +379,7 @@ include_once('include/page_header.php');
 				));
 
 /* sorting
-			order_page_result($applications, getPageSortField('name'), getPageSortOrder());
+			order_page_result($applications, 'name');
 
 // PAGING UPPER
 			$paging = getPagingLine($applications);

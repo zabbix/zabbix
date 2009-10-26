@@ -253,7 +253,7 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 		);
 
 // sorting
-		order_page_result($scripts, getPageSortField('name'), getPageSortOrder());
+		order_page_result($scripts, 'name');
 
 // PAGING UPPER
 		$paging = getPagingLine($scripts);

@@ -234,7 +234,7 @@
 	function get_link_triggers($linkid){
 		$triggers = array();
 
-		$sql = "SELECT * FROM sysmaps_link_triggers WHERE linkid=$linkid";
+		$sql = 'SELECT * FROM sysmaps_link_triggers WHERE linkid='.$linkid;
 		$res = DBselect($sql);
 
 		while($rows = DBfetch($res)){
@@ -543,12 +543,13 @@
 				} while ($trigger = DBfetch($db_triggers));
 			}
 		}
-		else if($el_type==SYSMAP_ELEMENT_TYPE_MAP)
-		{
+		else if($el_type==SYSMAP_ELEMENT_TYPE_MAP){
 			$triggers = array();
 
-			$db_subelements = DBselect("select selementid FROM sysmaps_elements".
-				" WHERE sysmapid=".$db_element["elementid"]);
+			$sql = 'SELECT selementid '.
+					' FROM sysmaps_elements '.
+					' WHERE sysmapid='.$db_element['elementid'];
+			$db_subelements = DBselect($sql);
 			while($db_subelement = DBfetch($db_subelements)){ // recursion
 				$inf = get_info_by_selementid($db_subelement["selementid"]);
 
@@ -573,58 +574,53 @@
 
 				if ($tr_info[TRIGGER_VALUE_TRUE]['count'] == 1){
 					$tr1 = reset($triggers);
-					$db_trigger = DBfetch(DBselect('SELECT DISTINCT t.triggerid,t.priority,t.value,t.description'.
-							',t.expression,h.host FROM triggers t, items i, functions f, hosts h'.
-							' WHERE t.triggerid='.$tr1.' AND h.hostid=i.hostid'.
-							' AND i.itemid=f.itemid AND f.triggerid=t.triggerid'));
+					$sql = 'SELECT DISTINCT t.triggerid,t.priority,t.value,t.description,t.expression,h.host '.
+							' FROM triggers t, items i, functions f, hosts h'.
+							' WHERE t.triggerid='.$tr1.
+								' AND h.hostid=i.hostid'.
+								' AND i.itemid=f.itemid '.
+								' AND f.triggerid=t.triggerid';
+					$db_trigger = DBfetch(DBselect($sql));
 					$tr_info[TRIGGER_VALUE_TRUE]['info'] = expand_trigger_description_by_data($db_trigger);
 				}
 			}
 		}
 
-		if ($el_type == SYSMAP_ELEMENT_TYPE_HOST)
-		{
+		if($el_type == SYSMAP_ELEMENT_TYPE_HOST){
 			$host = get_host_by_hostid($db_element["elementid"]);
 			$el_name = $host['host'];
 
-			if( $host["status"] == HOST_STATUS_TEMPLATE)
-			{
+			if( $host["status"] == HOST_STATUS_TEMPLATE){
 				$tr_info[TRIGGER_VALUE_UNKNOWN]['count']	= 0;
 				$tr_info[TRIGGER_VALUE_UNKNOWN]['priority']	= 0;
 				$tr_info[TRIGGER_VALUE_UNKNOWN]['info']		= 'template';
 			}
-			else if ($host["status"] == HOST_STATUS_NOT_MONITORED)
-			{
+			else if ($host["status"] == HOST_STATUS_NOT_MONITORED){
 				$tr_info[TRIGGER_VALUE_UNKNOWN]['count']	= 0;
 				$tr_info[TRIGGER_VALUE_UNKNOWN]['priority']	= 0;
 				$out['disabled'] = 1;
 			}
-			else if (!isset($tr_info[TRIGGER_VALUE_FALSE]))
-			{
+			else if (!isset($tr_info[TRIGGER_VALUE_FALSE])){
 				$tr_info[TRIGGER_VALUE_FALSE]['count']		= 0;
 				$tr_info[TRIGGER_VALUE_FALSE]['priority']	= 0;
 				$tr_info[TRIGGER_VALUE_FALSE]['info']		= 'OK';
 			}
 		}
-		else if ($el_type == SYSMAP_ELEMENT_TYPE_HOST_GROUP)
-		{
+		else if($el_type == SYSMAP_ELEMENT_TYPE_HOST_GROUP){
 			$group = get_hostgroup_by_groupid($db_element["elementid"]);
 			$el_name = $group['name'];
 
-			if (!isset($tr_info[TRIGGER_VALUE_FALSE]))
-			{
+			if(!isset($tr_info[TRIGGER_VALUE_FALSE])){
 				$tr_info[TRIGGER_VALUE_FALSE]['count']		= 0;
 				$tr_info[TRIGGER_VALUE_FALSE]['priority']	= 0;
 				$tr_info[TRIGGER_VALUE_FALSE]['info']		= 'OK';
 			}
 		}
-		else if ($el_type == SYSMAP_ELEMENT_TYPE_MAP)
-		{
+		else if($el_type == SYSMAP_ELEMENT_TYPE_MAP){
 			$db_map = DBfetch(DBselect('select name FROM sysmaps WHERE sysmapid='.$db_element["elementid"]));
 			$el_name = $db_map['name'];
 
-			if (!isset($tr_info[TRIGGER_VALUE_FALSE]))
-			{
+			if(!isset($tr_info[TRIGGER_VALUE_FALSE])){
 				$tr_info[TRIGGER_VALUE_FALSE]['count']		= 0;
 				$tr_info[TRIGGER_VALUE_FALSE]['priority']	= 0;
 				$tr_info[TRIGGER_VALUE_FALSE]['info']		= 'OK';
@@ -677,9 +673,8 @@
 			$out['iconid'] = $db_element['iconid_off'];
 		}
 
-		// No label for Images
-		if ($el_type == SYSMAP_ELEMENT_TYPE_IMAGE)
-		{
+// No label for Images
+		if($el_type == SYSMAP_ELEMENT_TYPE_IMAGE){
 			$out['info'] = '';
 		}
 

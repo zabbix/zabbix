@@ -31,7 +31,7 @@
 
 		if(DBfetch(DBselect('SELECT screenid FROM screens WHERE screenid='.$screenid.' AND '.DBin_node('screenid', get_current_nodeid($perm))))){
 			$result = true;
-			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY,get_current_nodeid(true));
+//			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY,get_current_nodeid(true));
 
 			$db_result = DBselect('SELECT * FROM screens_items WHERE screenid='.$screenid);
 			while(($ac_data = DBfetch($db_result)) && $result){
@@ -39,22 +39,32 @@
 
 				switch($ac_data['resourcetype']){
 					case SCREEN_RESOURCE_GRAPH:
-						$graphids = get_accessible_graphs($perm,array(),null,get_current_nodeid(true));
+						if(!isset($graphids)){
+							$options = array();
+							$options['nodeids'] = get_current_nodeid(true);
+
+							if($perm == PERM_READ_WRITE) $options['editable'] = 1;
+							$graphids = CGraph::get($options);
+
+//							$graphids = get_accessible_graphs($perm,array(),null,get_current_nodeid(true));
+						}
+												
 						$result &= isset($graphids[$ac_data['resourceid']]);
 					break;
 					case SCREEN_RESOURCE_SIMPLE_GRAPH:
 						// break; /* use same processing as items */
 					case SCREEN_RESOURCE_PLAIN_TEXT:
 						if(!isset($itemid))
-							$itemid = array($ac_data['resourceid']);
-						else if(!is_array($itemid))
-							$itemid = array($itemid);
+							$itemid = $ac_data['resourceid'];
 
-						if(DBfetch(DBselect('SELECT itemid '.
-										' FROM items '.
-										' WHERE '.DBcondition('itemid',$itemid).
-											' AND '.DBcondition('hostid',$available_hosts,true))))
-						{
+						$options = array();
+						$options['count'] = 1;
+						$options['itemids'] = $itemid;
+						$options['nodeids'] = get_current_nodeid(true);
+						if($perm == PERM_READ_WRITE) $options['editable'] = 1;
+						
+						$items = CItem::get($options);
+						if($items['rowscount'] == 0){
 							$result = false;
 						}
 
@@ -64,7 +74,7 @@
 						$result &= sysmap_accessible($ac_data['resourceid'], PERM_READ_ONLY);
 						break;
 					case SCREEN_RESOURCE_SCREEN:
-						$result &= screen_accessible($ac_data['resourceid'],PERM_READ_ONLY);
+						$result &= screen_accessible($ac_data['resourceid'], PERM_READ_ONLY);
 						break;
 					case SCREEN_RESOURCE_SERVER_INFO:
 					case SCREEN_RESOURCE_HOSTS_INFO:
@@ -490,11 +500,11 @@
 
 			$form->addVar('resourceid',$id);
 
-			$textfield = new Ctextbox('caption',$caption,75,'yes');
-			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=graphs&srcfld1=graphid&srcfld2=name',800,450);");
+			$textfield = new CTextbox('caption',$caption,75,'yes');
+			$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=graphs&srcfld1=graphid&srcfld2=name',800,450);");
 			$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
-			$form->AddRow(S_GRAPH_NAME,array($textfield,SPACE,$selectbtn));
+			$form->addRow(S_GRAPH_NAME,array($textfield,SPACE,$selectbtn));
 
 		}
 		else if($resourcetype == SCREEN_RESOURCE_SIMPLE_GRAPH){
@@ -1049,7 +1059,7 @@
 						'domid' => $dom_graph_id,
 						'containerid' => $containerid,
 						'objDims' => $graphDims,
-						'loadSBox' => 1,
+						'loadSBox' => 0,
 						'loadImage' => 1,
 						'loadScroll' => 0,
 						'dynamic' => 0

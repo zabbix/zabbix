@@ -158,7 +158,7 @@ include_once('include/page_header.php');
 		));
 
 // sorting
-//		order_page_result($proxies, getPageSortField('description'), getPageSortOrder());
+//		order_page_result($proxies, 'description');
 
 // PAGING UPPER
 		$paging = BR();

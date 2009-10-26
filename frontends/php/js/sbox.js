@@ -1,7 +1,7 @@
 // JavaScript Document
 /*
 ** ZABBIX
-** Copyright (C) 2000-2007 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -144,9 +144,7 @@ mousedown: function(e){
 	cancelEvent(e);
 	
 	if(ZBX_SBOX[this.sbox_id].mousedown == false){
-		
 		this.optimize_event(e);
-
 		deselectAll();
 		
 		if(IE){
@@ -160,7 +158,7 @@ mousedown: function(e){
 },
 
 mousemove: function(e){
-	this.debug('mousemove',this.sbox_id);
+//	this.debug('mousemove',this.sbox_id);
 
 	e = e || window.event;
 //	cancelEvent(e);
@@ -176,7 +174,7 @@ mouseup: function(e){
 	e = e || window.event;
 	if(ZBX_SBOX[this.sbox_id].mousedown == true){
 		this.onselect();
-
+		cancelEvent(e);
 		this.clear_params();
 		ZBX_SBOX[this.sbox_id].mousedown = false;
 	}
@@ -195,9 +193,11 @@ create_box: function(){
 		
 		this.dom_period_span.innerHTML = this.period;
 		
-		var top = (this.mouse_event.top-this.obj.top);
-		var left = (this.mouse_event.left-this.obj.left);
+		var dims = getDimensions(this.dom_obj);
 
+		this.obj = dims;
+		var top = (this.mouse_event.top - this.obj.top);
+		var left = (this.mouse_event.left - this.obj.left - 1);
 		top = 0;
 		
 		this.dom_box.setAttribute('id','selection_box');

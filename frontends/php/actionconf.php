@@ -500,7 +500,7 @@ include_once('include/page_header.php');
 		));
 
 // sorting && paging
-		order_page_result($actions, getPageSortField('name'), getPageSortOrder());
+		order_page_result($actions, 'name');
 		$paging = getPagingLine($actions);
 //-------
 
