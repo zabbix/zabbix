@@ -525,7 +525,7 @@ include_once('include/page_header.php');
 
 //----- GO ------
 		$goBox = new CComboBox('go');
-		$goBox->addItem(('copy_to',S_COPY_SELECTED_TO);
+		$goBox->addItem('copy_to',S_COPY_SELECTED_TO);
 		
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
 		$goOption->setAttribute('confirm','Delete selected graphs?');
