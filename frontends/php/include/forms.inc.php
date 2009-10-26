@@ -6422,6 +6422,7 @@
 		$frmCnct->addVar('sysmapid',$_REQUEST['sysmapid']);
 
 		if(isset($_REQUEST['linkid']) && !isset($_REQUEST['form_refresh'])){
+			$frmCnct->setTitle('Edit connector');
 			$frmCnct->addVar('linkid',$_REQUEST['linkid']);
 
 			$db_links = DBselect('SELECT * FROM sysmaps_links WHERE linkid='.$_REQUEST['linkid']);
