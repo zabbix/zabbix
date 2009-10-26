@@ -184,8 +184,15 @@ typedef enum
 	ITEM_TYPE_HTTPTEST,
 	ITEM_TYPE_EXTERNAL,
 	ITEM_TYPE_DB_MONITOR,
-	ITEM_TYPE_IPMI
+	ITEM_TYPE_IPMI,
+	ITEM_TYPE_SSH
 } zbx_item_type_t;
+
+typedef enum
+{
+	ITEM_AUTHTYPE_PASSWORD = 0,
+	ITEM_AUTHTYPE_PUBLICKEY
+} zbx_item_authtype_t;
 
 /* Event sources */
 typedef enum
@@ -906,3 +913,4 @@ zbx_uint64_t	zbx_htole_uint64(
 		zbx_uint64_t	data
 	);
 #endif
+void	win2unix_eol(char *text);

@@ -394,6 +394,10 @@
 #	include <iconv.h>
 #endif
 
+#ifdef HAVE_SSH2
+#	include <libssh2.h>
+#endif
+
 #ifdef HAVE_IO_H
 #	include <io.h>
 #endif

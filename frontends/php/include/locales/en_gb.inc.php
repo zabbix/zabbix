@@ -922,6 +922,7 @@
 	'S_ZABBIX_INTERNAL'=>					'ZABBIX internal',
 	'S_ZABBIX_DATABASE_MONITOR'=>				'Database monitor',
 	'S_IPMI_AGENT'=>					'IPMI agent',
+	'S_SSH_AGENT'=>						'SSH agent',
 	'S_ZABBIX_AGGREGATE'=>					'ZABBIX aggregate',
 	'S_EXTERNAL_CHECK'=>					'External check',
 	'S_WEB_MONITORING'=>					'Web monitoring',
@@ -988,6 +989,13 @@
 	'S_IPMI_SENSOR'=>					'IPMI sensor',
 	'S_TEMPLATED_ITEM'=>					'Templated item',
 	'S_WEB_ITEM'=>						'Web item',
+	'S_EXECUTED_SCRIPT'=>					'Executed script',
+	'S_USER_NAME'=>						'User name',
+	'S_PUBLIC_KEY_FILE'=>					'Public key file',
+	'S_PRIVATE_KEY_FILE'=>					'Private key file',
+	'S_PUBLIC_KEY'=>					'Public key',
+	'S_AUTHENTICATION_METHOD'=>				'Authentication method',
+	'S_PASSPHRASE'=>					'Passphrase',
 
 //	events.php
 	'S_EVENT'=>				'Event',

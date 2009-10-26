@@ -166,6 +166,14 @@ typedef enum {
 #define ITEM_IPMI_SENSOR_LEN_MAX	ITEM_IPMI_SENSOR_LEN+1
 #define ITEM_PARAMS_LEN			2048
 #define ITEM_PARAMS_LEN_MAX		ITEM_PARAMS_LEN+1
+#define ITEM_USERNAME_LEN		64
+#define ITEM_USERNAME_LEN_MAX		ITEM_USERNAME_LEN+1
+#define ITEM_PASSWORD_LEN		64
+#define ITEM_PASSWORD_LEN_MAX		ITEM_PASSWORD_LEN+1
+#define ITEM_PUBLICKEY_LEN		64
+#define ITEM_PUBLICKEY_LEN_MAX		ITEM_PUBLICKEY_LEN+1
+#define ITEM_PRIVATEKEY_LEN		64
+#define ITEM_PRIVATEKEY_LEN_MAX		ITEM_PRIVATEKEY_LEN+1
 
 #define FUNCTION_LASTVALUE_LEN		255
 #define FUNCTION_LASTVALUE_LEN_MAX	FUNCTION_LASTVALUE_LEN+1
@@ -233,9 +241,9 @@ typedef enum {
 #define HTTPSTEP_REQUIRED_LEN		255
 #define HTTPSTEP_REQUIRED_LEN_MAX	HTTPSTEP_REQUIRED_LEN+1
 
-#define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.errors_from,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,h.available,i.status,i.trapper_hosts,i.logtimefmt,i.valuemapid,i.delay_flex,h.dns,i.params,i.trends,h.useipmi,h.ipmi_port,h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password,i.ipmi_sensor,h.maintenance_status,h.maintenance_type,h.maintenance_from,i.lastlogsize,i.data_type,h.ipmi_ip"
-#define ZBX_SQL_ITEM_TABLES	"hosts h, items i"
-#define ZBX_SQL_ITEM_FIELDS_NUM	52
+#define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.type,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,i.value_type,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.formula,i.status,i.valuemapid,h.dns,i.trends,i.lastlogsize,i.data_type"
+#define ZBX_SQL_ITEM_TABLES	"hosts h,items i"
+#define ZBX_SQL_ITEM_FIELDS_NUM	26
 #define ZBX_SQL_ITEM_SELECT	ZBX_SQL_ITEM_FIELDS " from " ZBX_SQL_ITEM_TABLES
 
 #define ZBX_MAX_SQL_LEN			65535
@@ -344,14 +352,7 @@ DB_ITEM
 	char	*host_name;
 	char	*host_ip;
 	char	*host_dns;
-	int	host_status;
-	int	host_available;
-	int	host_errors_from;
 	int	useip;
-	char	*snmp_community;
-	char	*snmp_oid;
-	int	snmp_port;
-	char	*trapper_hosts;
 	int     port;
 	int     delay;
 	int     history;
@@ -370,41 +371,15 @@ DB_ITEM
 	zbx_uint64_t	prevvalue_uint64;
 	int     prevvalue_null;
 	time_t  lastcheck;
-	time_t	nextcheck;
 	zbx_item_value_type_t	value_type;
 	int	delta;
 	int	multiplier;
 	char	*units;
 
-	char	*snmpv3_securityname;
-	int	snmpv3_securitylevel;
-	char	*snmpv3_authpassphrase;
-	char	*snmpv3_privpassphrase;
-
 	char	*formula;
 	int	lastlogsize;
-	int	timestamp;
-	int	eventlog_severity;
-	char	*eventlog_source;
-	int	logeventid;
 
-	char	*logtimefmt;
 	zbx_uint64_t	valuemapid;
-	char	*delay_flex;
-	char	*params;
-
-	int	useipmi;
-	char	*ipmi_ip;
-	int	ipmi_port;
-	int	ipmi_authtype;
-	int	ipmi_privilege;
-	char	*ipmi_username;
-	char	*ipmi_password;
-	char	*ipmi_sensor;
-
-	int	maintenance_status;
-	int	maintenance_type;
-	int	maintenance_from;
 };
 
 DB_FUNCTION
@@ -690,21 +665,6 @@ void	DBupdate_services(
 /* History related functions */
 int	DBadd_trend(zbx_uint64_t itemid, double value, int clock);
 int	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
-
-int	DBadd_history(zbx_uint64_t itemid, double value, int clock);
-int	DBadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity,
-		int logeventid, int lastlogsize);
-int	DBadd_history_str(zbx_uint64_t itemid, char *value, int clock);
-int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock);
-int	DBadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
-
-void	DBproxy_add_history(zbx_uint64_t itemid, double value, int clock);
-void	DBproxy_add_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
-void	DBproxy_add_history_str(zbx_uint64_t itemid, char *value, int clock);
-void	DBproxy_add_history_text(zbx_uint64_t itemid, char *value, int clock);
-void	DBproxy_add_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity,
-		int logeventid, int lastlogsize);
-
 
 void	DBadd_condition_alloc(char **sql, int *sql_alloc, int *sql_offset, const char *fieldname, const zbx_uint64_t *values, const int num);
 char	*zbx_host_key_string(zbx_uint64_t itemid);

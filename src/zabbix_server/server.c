@@ -161,6 +161,8 @@ int	CONFIG_MASTER_NODEID		= 0;
 int	CONFIG_NODE_NOEVENTS		= 0;
 int	CONFIG_NODE_NOHISTORY		= 0;
 
+char	*CONFIG_SSH_KEY_LOCATION	= NULL;
+
 /* Global variable to control if we should write warnings to log[] */
 int	CONFIG_ENABLE_LOG		= 1;
 
@@ -235,6 +237,7 @@ void	init_config(void)
 		{"NodeID",&CONFIG_NODEID,0,TYPE_INT,PARM_OPT,0,65535},
 		{"NodeNoEvents",&CONFIG_NODE_NOEVENTS,0,TYPE_INT,PARM_OPT,0,1},
 		{"NodeNoHistory",&CONFIG_NODE_NOHISTORY,0,TYPE_INT,PARM_OPT,0,1},
+		{"SSHKeyLocation",&CONFIG_SSH_KEY_LOCATION,0,TYPE_STRING,PARM_OPT,0,0},
 		{0}
 	};
 

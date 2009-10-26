@@ -2082,6 +2082,12 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 					zbxmacros_get_value(macros, &dc_item->host.hostid, 1, m, &replace_to);
 			}
 		}
+		else if (macro_type & (MACRO_TYPE_ITEM_USERNAME | MACRO_TYPE_ITEM_PUBLICKEY |
+				MACRO_TYPE_ITEM_PRIVATEKEY | MACRO_TYPE_ITEM_PASSWORD | MACRO_TYPE_ITEM_SCRIPT))
+		{
+			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+				zbxmacros_get_value(macros, &dc_item->host.hostid, 1, m, &replace_to);
+		}
 		else if (macro_type & MACRO_TYPE_FUNCTION_PARAMETER)
 		{
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */

@@ -1410,7 +1410,8 @@
 		$cmbType->addItem(-1, S_ALL_SMALL);
 		foreach(array(ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE,
 			ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_TRAPPER,
-			ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI) as $it)
+			ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_HTTPTEST,
+			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH) as $it)
 				$cmbType->addItem($it, item_type2str($it));
 		$col_table2->addRow(array(bold(S_TYPE.': '), $cmbType));
 
@@ -1796,10 +1797,7 @@
 		$trapper_hosts		= get_request('trapper_hosts'	,'');
 		$units				= get_request('units',		'');
 		$valuemapid			= get_request('valuemapid',	0);
-		$params				= get_request('params',		'DSN=<database source name>\n'.
-														'user=<user name>\n'.
-														'password=<password>\n'.
-														'sql=<query>');
+		$params				= get_request('params',		'');
 		$multiplier			= get_request('multiplier',	0);
 		$delta				= get_request('delta',		0);
 		$trends				= get_request('trends',		365);
@@ -1814,6 +1812,12 @@
 
 		$ipmi_sensor		= get_request('ipmi_sensor'		,'');
 
+		$authtype		= get_request('authtype'		,0);
+		$username		= get_request('username'		,'');
+		$password		= get_request('password'		,'');
+		$publickey		= get_request('publickey'		,'');
+		$privatekey		= get_request('privatekey'		,'');
+
 		$formula	= get_request('formula'		,'1');
 		$logtimefmt	= get_request('logtimefmt'	,'');
 
@@ -1821,8 +1825,20 @@
 
 		$limited	= null;
 
-		if(zbx_empty($key) && ($type == ITEM_TYPE_DB_MONITOR))
-			$key = 'db.odbc.select[<unique short description>]';
+		switch ($type) {
+		case ITEM_TYPE_DB_MONITOR:
+			if (zbx_empty($key) || $key == 'ssh.run[<unique short description>,<ip>,<port>]')
+				$key = 'db.odbc.select[<unique short description>]';
+			if (zbx_empty($params))
+				$params = "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>";
+			break;
+		case ITEM_TYPE_SSH:
+			if (zbx_empty($key) || $key == 'db.odbc.select[<unique short description>]')
+				$key = 'ssh.run[<unique short description>,<ip>,<port>]';
+			if (0 == strncmp($params, "DSN=<database source name>", 26))
+				$params = '';
+			break;
+		}
 
 		if(isset($_REQUEST['itemid'])){
 			$frmItem->addVar('itemid',$_REQUEST['itemid']);
@@ -1866,6 +1882,12 @@
 			$snmpv3_privpassphrase	= $item_data['snmpv3_privpassphrase'];
 
 			$ipmi_sensor		= $item_data['ipmi_sensor'];
+
+			$authtype		= $item_data['authtype'];
+			$username		= $item_data['username'];
+			$password		= $item_data['password'];
+			$publickey		= $item_data['publickey'];
+			$privatekey		= $item_data['privatekey'];
 
 			$formula	= $item_data['formula'];
 			$logtimefmt	= $item_data['logtimefmt'];
@@ -1952,7 +1974,8 @@
 			$cmbType = new CComboBox('type',$type,'submit()');
 			foreach(array(ITEM_TYPE_ZABBIX,ITEM_TYPE_ZABBIX_ACTIVE,ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_SNMPV1,ITEM_TYPE_SNMPV2C,ITEM_TYPE_SNMPV3,ITEM_TYPE_TRAPPER,
-				ITEM_TYPE_INTERNAL,ITEM_TYPE_AGGREGATE,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR,ITEM_TYPE_IPMI) as $it)
+				ITEM_TYPE_INTERNAL,ITEM_TYPE_AGGREGATE,ITEM_TYPE_EXTERNAL,
+				ITEM_TYPE_DB_MONITOR,ITEM_TYPE_IPMI,ITEM_TYPE_SSH) as $it)
 					$cmbType->addItem($it,item_type2str($it));
 			$frmItem->addRow(S_TYPE, $cmbType);
 		}
@@ -2017,11 +2040,35 @@
 
 		$frmItem->addRow(S_KEY, array(new CTextBox('key',$key,40,$limited), $btnSelect));
 
-		if( ITEM_TYPE_DB_MONITOR == $type ){
-			$frmItem->addRow(S_PARAMS, new CTextArea('params',$params,60,4));
+		if (ITEM_TYPE_SSH == $type) {
+			$cmbAuthType = new CComboBox('authtype',$authtype,'submit()');
+				$cmbAuthType->addItem(ITEM_AUTHTYPE_PASSWORD,S_PASSWORD);
+				$cmbAuthType->addItem(ITEM_AUTHTYPE_PUBLICKEY,S_PUBLIC_KEY);
+			$frmItem->addRow(S_AUTHENTICATION_METHOD, $cmbAuthType);
+			$frmItem->addRow(S_USER_NAME, new CTextBox('username',$username,16));
+			if ($authtype == ITEM_AUTHTYPE_PASSWORD) {
+				$frmItem->addVar('publickey',$publickey);
+				$frmItem->addVar('privatekey',$privatekey);
+				$frmItem->addRow(S_PASSWORD, new CTextBox('password',$password,16));
+			}
+			else {
+				$frmItem->addRow(S_PUBLIC_KEY_FILE, new CTextBox('publickey',$publickey,16));
+				$frmItem->addRow(S_PRIVATE_KEY_FILE, new CTextBox('privatekey',$privatekey,16));
+				$frmItem->addRow(S_PASSPHRASE, new CTextBox('password',$password,16));
+			}
+			$frmItem->addRow(S_EXECUTED_SCRIPT, new CTextArea('params',$params,60,4));
 		}
 		else{
-			$frmItem->addVar('params',$params);
+			$frmItem->addVar('authtype',$authtype);
+			$frmItem->addVar('username',$username);
+			$frmItem->addVar('publickey',$publickey);
+			$frmItem->addVar('privatekey',$privatekey);
+			$frmItem->addVar('password',$password);
+
+			if (ITEM_TYPE_DB_MONITOR == $type)
+				$frmItem->addRow(S_PARAMS, new CTextArea('params',$params,60,4));
+			else
+				$frmItem->addVar('params',$params);
 		}
 
 		if(isset($limited)){

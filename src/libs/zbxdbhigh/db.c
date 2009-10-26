@@ -796,57 +796,6 @@ void DBupdate_triggers_status_after_restart(void)
 	return;
 }
 
-int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error)
-{
-	char		*error_esc;
-	DB_RESULT	result;
-	DB_ROW		row;
-	DB_TRIGGER	trigger;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In DBupdate_item_status_to_notsupported()");
-
-	item->status	= ITEM_STATUS_NOTSUPPORTED;
-	item->nextcheck = clock + CONFIG_REFRESH_UNSUPPORTED;
-
-	error_esc = DBdyn_escape_string_len(error, ITEM_ERROR_LEN);
-	DBexecute("update items set status=%d,lastclock=%d,nextcheck=%d,error='%s' where itemid=" ZBX_FS_UI64,
-			item->status,
-			clock,
-			item->nextcheck,
-			error_esc,
-			item->itemid);
-	zbx_free(error_esc);
-
-	result = DBselect("select t.triggerid,t.expression,t.description,t.url,t.comments,t.status,t.value,t.priority"
-			" from triggers t,functions f,items i"
-			" where t.triggerid=f.triggerid"
-				" and f.itemid=i.itemid"
-				" and t.status in (%d)"
-				" and t.value not in (%d)"
-				" and i.itemid=" ZBX_FS_UI64,
-		TRIGGER_STATUS_ENABLED,
-		TRIGGER_VALUE_UNKNOWN,
-		item->itemid);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		trigger.triggerid	= zbx_atoui64(row[0]);
-		strscpy(trigger.expression, row[1]);
-		strscpy(trigger.description, row[2]);
-		trigger.url		= row[3];
-		trigger.comments	= row[4];
-		trigger.status		= atoi(row[5]);
-		trigger.value		= atoi(row[6]);
-		trigger.priority	= atoi(row[7]);
-
-		DBupdate_trigger_value(&trigger, TRIGGER_VALUE_UNKNOWN, clock, error);
-	}
-
-	DBfree_result(result);
-
-	return SUCCEED;
-}
-
 int	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
 {
 	DB_RESULT	result;
@@ -949,207 +898,6 @@ int	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
 	}
 
 	DBfree_result(result);
-
-	return SUCCEED;
-}
-
-int	DBadd_history(zbx_uint64_t itemid, double value, int clock)
-{
-	zabbix_log(LOG_LEVEL_DEBUG,"In add_history()");
-
-	DBexecute("insert into history (clock,itemid,value) values (%d," ZBX_FS_UI64 "," ZBX_FS_DBL ")",
-			clock,
-			itemid,
-			value);
-
-	DBadd_trend(itemid, value, clock);
-
-	if ((CONFIG_NODE_NOHISTORY == 0) && (CONFIG_MASTER_NODEID > 0))
-	{
-		DBexecute("insert into history_sync (nodeid,clock,itemid,value) values (%d,%d," ZBX_FS_UI64 "," ZBX_FS_DBL ")",
-				get_nodeid_by_id(itemid),
-				clock,
-				itemid,
-				value);
-	}
-
-	return SUCCEED;
-}
-
-int	DBadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
-{
-	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_uint()");
-
-	DBexecute("insert into history_uint (clock,itemid,value) values (%d," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
-			clock,
-			itemid,
-			value);
-
-	DBadd_trend_uint(itemid, value, clock);
-
-	if ((CONFIG_NODE_NOHISTORY == 0) && (CONFIG_MASTER_NODEID > 0))
-	{
-		DBexecute("insert into history_uint_sync (nodeid,clock,itemid,value) values (%d,%d," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
-				get_nodeid_by_id(itemid),
-				clock,
-				itemid,
-				value);
-	}
-
-	return SUCCEED;
-}
-
-int	DBadd_history_str(zbx_uint64_t itemid, char *value, int clock)
-{
-	char	*value_esc;
-
-	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_str()");
-
-	value_esc = DBdyn_escape_string_len(value, HISTORY_STR_VALUE_LEN);
-	DBexecute("insert into history_str (clock,itemid,value) values (%d," ZBX_FS_UI64 ",'%s')",
-			clock,
-			itemid,
-			value_esc);
-
-	if ((CONFIG_NODE_NOHISTORY == 0) && (CONFIG_MASTER_NODEID > 0))
-	{
-		DBexecute("insert into history_str_sync (nodeid,clock,itemid,value) values (%d,%d," ZBX_FS_UI64 ",'%s')",
-				get_nodeid_by_id(itemid),
-				clock,
-				itemid,
-				value_esc);
-	}
-	zbx_free(value_esc);
-
-	return SUCCEED;
-}
-
-int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock)
-{
-#ifdef HAVE_ORACLE
-	OCILobLocator *lob_loc;
-
-	char	sql[MAX_STRING_LEN];
-	int		value_esc_max_len;
-	int		err = OCI_SUCCESS;
-	OCIBind *bndhp = NULL;
-	ub4  	amtp = 0;
-	OCIStmt *stmthp = NULL;
-#endif /* HAVE_ORACLE */
-	char		*value_esc;
-	zbx_uint64_t	id;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In add_history_text()");
-
-#ifdef HAVE_ORACLE
-	value_esc = DBdyn_escape_string(value);
-	value_esc_max_len = strlen(value_esc);
-	amtp = (ub4)value_esc_max_len;
-
-	id = DBget_maxid("history_text", "id");
-	zbx_snprintf(sql, sizeof(sql), "insert into history_text (id,clock,itemid,value)"
-			" values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ", EMPTY_CLOB()) returning value into :1",
-			id,
-			clock,
-			itemid);
-
-	zabbix_log(LOG_LEVEL_DEBUG,"Query:%s", sql);
-
-	/* Allocate locator resources */
-	err = OCIDescriptorAlloc((dvoid *) oracle.envhp,
-		(dvoid **) &lob_loc, (ub4)OCI_DTYPE_LOB,
-		(size_t) 0, (dvoid **) 0);
-
-	if (OCI_SUCCESS == err) {
-		/* Allocate statement  */
-		err = OCIHandleAlloc( (dvoid *) oracle.envhp, (dvoid **) &stmthp,
-			OCI_HTYPE_STMT, (size_t) 0, (dvoid **) 0);
-	}
-
-	if (OCI_SUCCESS == err) {
-		/* Prepare the SQL statement handle */
-		err = OCIStmtPrepare(stmthp, oracle.errhp, (text *)sql, (ub4)
-			strlen(sql),
-			(ub4) OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT);
-	}
-
-	if (OCI_SUCCESS == err) {
-		/* Binds the bind positions */
-		err = OCIBindByPos(stmthp, &bndhp, oracle.errhp, (ub4) 1,
-			(dvoid *) &lob_loc, (sb4) 0,  SQLT_CLOB,
-			(dvoid *) 0, (ub2 *)0, (ub2 *)0,
-			(ub4) 0, (ub4 *) 0, (ub4) OCI_DEFAULT);
-	}
-
-	if (OCI_SUCCESS == err) {
-		/* Execute the SQL statement */
-		err = OCIStmtExecute(oracle.svchp, stmthp, oracle.errhp, (ub4) 1, (ub4) 0,
-			(CONST OCISnapshot*) 0, (OCISnapshot*) 0,
-			(ub4) OCI_DEFAULT);
-	}
-
-	if (OCI_SUCCESS == err) {
-		/* Write data in ti the LOB locator */
-		err = OCILobWrite(oracle.svchp, oracle.errhp, lob_loc, (ub4 *)&amtp, 1,
-			(dvoid*) value_esc, (ub4)value_esc_max_len, OCI_ONE_PIECE, NULL,
-			NULL, 0, (ub1) SQLCS_IMPLICIT);
-	}
-
-	if (OCI_SUCCESS == err) {
-		/* Commit db changes */
-		(void) OCITransCommit (oracle.svchp, oracle.errhp, OCI_DEFAULT);
-	}
-
-	if (OCI_SUCCESS == err) {
-		/* Free LOB resources*/
-		(void) OCIDescriptorFree((dvoid *) lob_loc, (ub4) OCI_DTYPE_LOB);
-	}
-
-	if (stmthp)
-	{
-		(void) OCIHandleFree((dvoid *) stmthp, OCI_HTYPE_STMT);
-		stmthp = NULL;
-	}
-#else /* HAVE_ORACLE */
-	value_esc = DBdyn_escape_string(value);
-
-	id = DBget_maxid("history_text", "id");
-
-	DBexecute("insert into history_text (id,clock,itemid,value)"
-			" values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",'%s')",
-			id,
-			clock,
-			itemid,
-			value_esc);
-
-	zbx_free(value_esc);
-#endif
-	return SUCCEED;
-}
-
-int	DBadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity,
-		int logeventid, int lastlogsize)
-{
-	char		*value_esc, *source_esc;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In add_history_log()");
-
-	value_esc = DBdyn_escape_string(value);
-	source_esc = DBdyn_escape_string_len(source, HISTORY_LOG_SOURCE_LEN);
-
-	DBexecute("insert into history_log (id,clock,itemid,timestamp,value,source,severity,logeventid)"
-			" values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d,'%s','%s',%d,%d)",
-			DBget_maxid("history_log", "id"),
-			clock,
-			itemid,
-			timestamp,
-			value_esc,
-			source_esc,
-			severity,
-			logeventid);
-
-	zbx_free(source_esc);
-	zbx_free(value_esc);
 
 	return SUCCEED;
 }
@@ -1337,7 +1085,7 @@ int	DBget_queue_count(void)
 			" where i.hostid=h.hostid"
 				" and h.proxy_hostid=0"
 				" and i.status=%d"
-				" and i.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)"
+				" and i.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)"
 				" and ((h.status=%d and h.available!=%d)"
 					" or (h.status=%d and h.available=%d and h.disable_until<=%d))"
 				" and not i.key_ like '%s' and not i.key_ like '%s%%' and not i.key_ like '%s'"
@@ -1346,7 +1094,7 @@ int	DBget_queue_count(void)
 			ITEM_STATUS_ACTIVE,
 			ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3,
 				ITEM_TYPE_IPMI, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE,
-				ITEM_TYPE_EXTERNAL,
+				ITEM_TYPE_EXTERNAL, ITEM_TYPE_SSH,
 			HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE,
 			HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, now,
 			SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ZABBIXLOG_KEY,
@@ -1650,152 +1398,97 @@ char*	DBdyn_escape_string_len(const char *src, int max_src_len)
 
 void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 {
-	char			*s;
-	static char		*key = NULL;
-	static char		*ipmi_ip = NULL;
+	static char	*key = NULL;
 
 	ZBX_STR2UINT64(item->itemid, row[0]);
-/*	item->itemid=atoi(row[0]); */
-	item->key	= row[1];
-	item->key_orig=row[1];
-	item->host_name=row[2];
-	item->port=atoi(row[3]);
-	item->delay=atoi(row[4]);
-	item->description=row[5];
-	item->nextcheck=atoi(row[6]);
-	item->type=atoi(row[7]);
-	item->snmp_community=row[8];
-	item->snmp_oid=row[9];
-	item->useip=atoi(row[10]);
-	item->host_ip=row[11];
-	item->history=atoi(row[12]);
-	item->trends=atoi(row[38]);
-	item->value_type=atoi(row[17]);
+	item->key			= row[1];
+	item->key_orig			= row[1];
+	item->host_name			= row[2];
+	item->port			= atoi(row[3]);
+	item->delay			= atoi(row[4]);
+	item->description		= row[5];
+	item->type			= atoi(row[6]);
+	item->useip			= atoi(row[7]);
+	item->host_ip			= row[8];
+	item->history			= atoi(row[9]);
+	item->trends			= atoi(row[23]);
+	item->value_type		= atoi(row[13]);
 
-	s=row[13];
-	if(DBis_null(s)==SUCCEED)
-	{
-		item->lastvalue_null=1;
-	}
+	if (SUCCEED == DBis_null(row[10]))
+		item->lastvalue_null = 1;
 	else
 	{
-		item->lastvalue_null=0;
-		switch(item->value_type) {
-			case ITEM_VALUE_TYPE_FLOAT:
-				item->lastvalue_dbl=atof(s);
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				ZBX_STR2UINT64(item->lastvalue_uint64,s);
-				break;
-			default:
-				item->lastvalue_str=s;
-				break;
+		item->lastvalue_null = 0;
+		switch (item->value_type) {
+		case ITEM_VALUE_TYPE_FLOAT:
+			item->lastvalue_dbl = atof(row[10]);
+			break;
+		case ITEM_VALUE_TYPE_UINT64:
+			ZBX_STR2UINT64(item->lastvalue_uint64, row[10]);
+			break;
+		default:
+			item->lastvalue_str = row[10];
+			break;
 		}
 	}
-	s=row[14];
-	if(DBis_null(s)==SUCCEED)
-	{
-		item->prevvalue_null=1;
-	}
+
+	if (SUCCEED == DBis_null(row[11]))
+		item->prevvalue_null = 1;
 	else
 	{
-		item->prevvalue_null=0;
-		switch(item->value_type) {
-			case ITEM_VALUE_TYPE_FLOAT:
-				item->prevvalue_dbl=atof(s);
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				ZBX_STR2UINT64(item->prevvalue_uint64,s);
-				break;
-			default:
-				item->prevvalue_str=s;
-				break;
+		item->prevvalue_null = 0;
+		switch (item->value_type) {
+		case ITEM_VALUE_TYPE_FLOAT:
+			item->prevvalue_dbl = atof(row[11]);
+			break;
+		case ITEM_VALUE_TYPE_UINT64:
+			ZBX_STR2UINT64(item->prevvalue_uint64, row[11]);
+			break;
+		default:
+			item->prevvalue_str = row[11];
+			break;
 		}
 	}
-	ZBX_STR2UINT64(item->hostid, row[15]);
-	item->host_status=atoi(row[16]);
 
-	item->host_errors_from=atoi(row[18]);
-	item->snmp_port=atoi(row[19]);
-	item->delta=atoi(row[20]);
+	ZBX_STR2UINT64(item->hostid, row[12]);
+	item->delta			= atoi(row[14]);
 
-	s=row[21];
-	if(DBis_null(s)==SUCCEED)
-	{
-		item->prevorgvalue_null=1;
-	}
+	if (SUCCEED == DBis_null(row[15]))
+		item->prevorgvalue_null = 1;
 	else
 	{
-		item->prevorgvalue_null=0;
-		switch(item->value_type) {
-			case ITEM_VALUE_TYPE_FLOAT:
-				item->prevorgvalue_dbl=atof(s);
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				ZBX_STR2UINT64(item->prevorgvalue_uint64,s);
-				break;
-			default:
-				item->prevorgvalue_str=s;
-				break;
+		item->prevorgvalue_null = 0;
+		switch (item->value_type) {
+		case ITEM_VALUE_TYPE_FLOAT:
+			item->prevorgvalue_dbl = atof(row[15]);
+			break;
+		case ITEM_VALUE_TYPE_UINT64:
+			ZBX_STR2UINT64(item->prevorgvalue_uint64, row[15]);
+			break;
+		default:
+			item->prevorgvalue_str = row[15];
+			break;
 		}
 	}
-	s = row[22];
-	if(DBis_null(s)==SUCCEED)
-	{
-		item->lastclock=0;
-	}
+
+	if (SUCCEED == DBis_null(row[16]))
+		item->lastclock = 0;
 	else
-	{
-		item->lastclock=atoi(s);
-	}
+		item->lastclock = atoi(row[16]);
 
-	item->units			= row[23];
-	item->multiplier		= atoi(row[24]);
-	item->snmpv3_securityname	= row[25];
-	item->snmpv3_securitylevel	= atoi(row[26]);
-	item->snmpv3_authpassphrase	= row[27];
-	item->snmpv3_privpassphrase	= row[28];
-	item->formula		= row[29];
-	item->host_available	= atoi(row[30]);
-	item->status		= atoi(row[31]);
-	item->trapper_hosts	= row[32];
-	item->logtimefmt	= row[33];
-	ZBX_STR2UINT64(item->valuemapid, row[34]);
-	item->delay_flex	= row[35];
-	item->host_dns		= row[36];
-	item->params		= row[37];		/* !!! WHAT about CLOB??? */
+	item->units			= row[17];
+	item->multiplier		= atoi(row[18]);
+	item->formula			= row[19];
+	item->status			= atoi(row[20]);
+	ZBX_STR2UINT64(item->valuemapid, row[21]);
+	item->host_dns			= row[22];
 
-	item->eventlog_source	= NULL;
-	item->timestamp		= 0;
-	item->eventlog_severity	= 0;
-	item->logeventid	= 0;
-
-	item->useipmi		= atoi(row[39]);
-	item->ipmi_ip		= row[51];
-	item->ipmi_port		= atoi(row[40]);
-	item->ipmi_authtype	= atoi(row[41]);
-	item->ipmi_privilege	= atoi(row[42]);
-	item->ipmi_username	= row[43];
-	item->ipmi_password	= row[44];
-	item->ipmi_sensor	= row[45];
-
-	item->maintenance_status	= atoi(row[46]);
-	item->maintenance_type		= atoi(row[47]);
-	item->maintenance_from		= atoi(row[48]);
-
-	item->lastlogsize		= atoi(row[49]);
-	item->data_type			= atoi(row[50]);
+	item->lastlogsize		= atoi(row[24]);
+	item->data_type			= atoi(row[25]);
 
 	key = zbx_dsprintf(key, "%s", item->key_orig);
 	substitute_simple_macros(NULL, NULL, item, NULL, NULL, &key, MACRO_TYPE_ITEM_KEY, NULL, 0);
-	item->key	= key;
-
-	if (ITEM_TYPE_IPMI == item->type)
-	{
-		ipmi_ip = zbx_dsprintf(ipmi_ip, "%s", item->ipmi_ip);
-		substitute_simple_macros(NULL, NULL, item, NULL, NULL, &ipmi_ip, MACRO_TYPE_HOST_IPMI_IP, NULL, 0);
-		item->ipmi_ip	= ipmi_ip;
-	}
+	item->key = key;
 }
 
 /*
@@ -2022,82 +1715,6 @@ zbx_uint64_t DBget_maxid_num(char *tablename, char *fieldname, int num)
 	}
 
 	return ret;*/
-}
-
-void	DBproxy_add_history(zbx_uint64_t itemid, double value, int clock)
-{
-	zabbix_log(LOG_LEVEL_DEBUG, "In proxy_add_history()");
-
-	DBexecute("insert into proxy_history (itemid,clock,value) values (" ZBX_FS_UI64 ",%d,'" ZBX_FS_DBL "')",
-			itemid,
-			clock,
-			value);
-}
-
-void	DBproxy_add_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
-{
-	zabbix_log(LOG_LEVEL_DEBUG, "In proxy_add_history_uint()");
-
-	DBexecute("insert into proxy_history (itemid,clock,value) values (" ZBX_FS_UI64 ",%d,'" ZBX_FS_UI64 "')",
-			itemid,
-			clock,
-			value);
-}
-
-void	DBproxy_add_history_str(zbx_uint64_t itemid, char *value, int clock)
-{
-	char	*value_esc;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In proxy_add_history_str()");
-
-	value_esc = DBdyn_escape_string(value);
-
-	DBexecute("insert into proxy_history (itemid,clock,value) values (" ZBX_FS_UI64 ",%d,'%s')",
-			itemid,
-			clock,
-			value_esc);
-
-	zbx_free(value_esc);
-}
-
-void	DBproxy_add_history_text(zbx_uint64_t itemid, char *value, int clock)
-{
-	char	*value_esc;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In proxy_add_history_text()");
-
-	value_esc = DBdyn_escape_string(value);
-
-	DBexecute("insert into proxy_history (itemid,clock,value) values (" ZBX_FS_UI64 ",%d,'%s')",
-			itemid,
-			clock,
-			value_esc);
-
-	zbx_free(value_esc);
-}
-
-void	DBproxy_add_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity,
-		int logeventid, int lastlogsize)
-{
-	char		*source_esc, *value_esc;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In proxy_add_history_log()");
-
-	source_esc = DBdyn_escape_string_len(source, HISTORY_LOG_SOURCE_LEN);
-	value_esc = DBdyn_escape_string(value);
-
-	DBexecute("insert into proxy_history (itemid,clock,timestamp,source,severity,value,logeventid)"
-			" values (" ZBX_FS_UI64 ",%d,%d,'%s',%d,'%s',%d)",
-			itemid,
-			clock,
-			timestamp,
-			source_esc,
-			severity,
-			value_esc,
-			logeventid);
-
-	zbx_free(value_esc);
-	zbx_free(source_esc);
 }
 
 void	DBadd_condition_alloc(char **sql, int *sql_alloc, int *sql_offset, const char *fieldname, const zbx_uint64_t *values, const int num)
