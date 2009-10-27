@@ -769,7 +769,7 @@ static void	process_active_checks(char *server, unsigned short port)
 		{
 			ret = FAIL;
 
-#if defined (_WINDOWS)
+#if defined(_WINDOWS)
 			do{ /* simple try realization */
 				if (parse_command(active_metrics[i].key, NULL, 0, params, MAX_STRING_LEN) != 2) {
 					ret = FAIL;
@@ -845,12 +845,12 @@ static void	process_active_checks(char *server, unsigned short port)
 							break;
 					}
 
-					zbx_snprintf(str_logeventid, sizeof(str_logeventid), "%li", logeventid);
+					zbx_snprintf(str_logeventid, sizeof(str_logeventid), "%lu", logeventid);
 
 					if (SUCCEED == regexp_match_ex(regexps, regexps_num, value, pattern, ZBX_CASE_SENSITIVE) &&
 							SUCCEED == regexp_match_ex(regexps, regexps_num, str_severity,
 									key_severity, ZBX_IGNORE_CASE) &&
-							0 == strcmp(key_source, source) &&
+							(('\0' == *key_source) ? 1 : (0 == strcmp(key_source, source))) &&
 							SUCCEED == regexp_match_ex(regexps, regexps_num, str_logeventid,
 									key_logeventid, ZBX_CASE_SENSITIVE))
 					{
