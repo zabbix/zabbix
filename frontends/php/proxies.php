@@ -25,7 +25,7 @@ require_once('include/hosts.inc.php');
 $page['title'] = "S_PROXIES";
 $page['file'] = 'proxies.php';
 $page['hist_arg'] = array('config');
-// $page['scripts'] = array('menu_scripts.js','class.calendar.js');
+$page['scripts'] = array();
 
 include_once('include/page_header.php');
 

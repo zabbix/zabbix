@@ -1598,6 +1598,12 @@
 	'S_DISCOVERY_RULES_BIG'=>		'DISCOVERY RULES',
 	'S_DISCOVERY_CHECKS_BIG'=>		'DISCOVERY CHECKS',
 
+//	tr_logform.php
+	'S_INCLUDE'=>		'Include',
+	'S_EXCLUDE'=>		'Exclude',
+	'S_KEYWORD'=>		'Keyword',
+	'S_POSITION'=>		'Position',
+	
 //	Menu
 
 	'S_HELP'=>				'Help',

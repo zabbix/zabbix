@@ -29,7 +29,7 @@
 	$page['title'] = 'S_USER_GROUPS';
 	$page['file'] = 'usergrps.php';
 	$page['hist_arg'] = array('config');
-	$page['scripts'] = array('menu_scripts.js');
+	$page['scripts'] = array();
 
 include_once('include/page_header.php');
 

@@ -27,7 +27,7 @@ require_once('include/html.inc.php');
 
 $page["title"] = "S_CONFIGURATION_OF_IT_SERVICES";
 $page['file'] = 'services.php';
-$page['scripts'] = array('services.js');
+$page['scripts'] = array();
 $page['hist_arg'] = array();
 
 include_once('include/page_header.php');

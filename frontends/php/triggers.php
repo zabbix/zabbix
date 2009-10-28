@@ -19,18 +19,18 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/hosts.inc.php');
-	require_once('include/triggers.inc.php');
-	require_once('include/forms.inc.php');
+require_once('include/config.inc.php');
+require_once('include/hosts.inc.php');
+require_once('include/triggers.inc.php');
+require_once('include/forms.inc.php');
 
-	$page['title'] = "S_CONFIGURATION_OF_TRIGGERS";
-	$page["file"] = "triggers.php";
-	$page['hist_arg'] = array('hostid','groupid');
+$page['title'] = "S_CONFIGURATION_OF_TRIGGERS";
+$page['file'] = 'triggers.php';
+$page['hist_arg'] = array('hostid','groupid');
 
-	include_once('include/page_header.php');
+include_once('include/page_header.php');
 
-	$_REQUEST['config'] = get_request('config', 'triggers.php');
+$_REQUEST['config'] = get_request('config', 'triggers.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -523,7 +523,7 @@
 
 			$description[] = new CLink(expand_trigger_description($triggerid), 'triggers.php?form=update&triggerid='.$triggerid);
 
-// <<<--- add dependencies --->>>
+//add dependencies{
 			$deps = get_trigger_dependencies_by_triggerid($triggerid);
 			if(count($deps) > 0){
 				$description[] = array(BR(), bold(S_DEPENDS_ON.' : '));
@@ -541,7 +541,7 @@
 					$description[] = expand_trigger_description($dep_triggerid);
 				}
 			}
-// --->>> add dependencies <<<---
+// } add dependencies
 
 			if($trigger['status'] != TRIGGER_STATUS_UNKNOWN) $trigger['error'] = '';
 
