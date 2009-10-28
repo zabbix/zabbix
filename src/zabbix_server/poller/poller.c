@@ -452,25 +452,30 @@ static int get_values(int now, int *nextcheck)
 
 		if (res == SUCCEED)
 		{
-			if (HOST_AVAILABLE_TRUE != item.host_available)
+			if (item.type == ITEM_TYPE_ZABBIX || item.type == ITEM_TYPE_SNMPv1 ||
+					item.type == ITEM_TYPE_SNMPv2c || item.type == ITEM_TYPE_SNMPv3 ||
+					item.type == ITEM_TYPE_IPMI)
 			{
-				DBbegin();
-		
-				enable_host(&item, now);
-				stop = 1;
+				if (HOST_AVAILABLE_TRUE != item.host_available)
+				{
+					DBbegin();
 
-				DBcommit();
-			}
+					enable_host(&item, now);
+					stop = 1;
 
-			if (item.host_errors_from != 0)
-			{
-				DBbegin();
-		
-				DBexecute("update hosts set errors_from=0 where hostid=" ZBX_FS_UI64,
-						item.hostid);
-				stop = 1;
+					DBcommit();
+				}
 
-				DBcommit();
+				if (item.host_errors_from != 0)
+				{
+					DBbegin();
+
+					DBexecute("update hosts set errors_from=0 where hostid=" ZBX_FS_UI64,
+							item.hostid);
+					stop = 1;
+
+					DBcommit();
+				}
 			}
 
 			if (0 == CONFIG_DBSYNCER_FORKS)
@@ -523,13 +528,29 @@ static int get_values(int now, int *nextcheck)
 				if (*nextcheck == FAIL || (item.nextcheck != 0 && *nextcheck > item.nextcheck))
 					*nextcheck = item.nextcheck;
 
-			if (HOST_AVAILABLE_TRUE != item.host_available) {
-				DBbegin();
-		
-				enable_host(&item, now);
-				stop = 1;
+			if (item.type == ITEM_TYPE_ZABBIX || item.type == ITEM_TYPE_SNMPv1 ||
+					item.type == ITEM_TYPE_SNMPv2c || item.type == ITEM_TYPE_SNMPv3 ||
+					item.type == ITEM_TYPE_IPMI)
+			{
+				if (HOST_AVAILABLE_TRUE != item.host_available) {
+					DBbegin();
 
-				DBcommit();
+					enable_host(&item, now);
+					stop = 1;
+
+					DBcommit();
+				}
+
+				if (item.host_errors_from != 0)
+				{
+					DBbegin();
+
+					DBexecute("update hosts set errors_from=0 where hostid=" ZBX_FS_UI64,
+							item.hostid);
+					stop = 1;
+
+					DBcommit();
+				}
 			}
 		}
 		else if (res == NETWORK_ERROR)
