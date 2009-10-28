@@ -29,7 +29,7 @@ require_once('include/html.inc.php');
 $page['title'] = "S_LATEST_EVENTS";
 $page['file'] = 'events.php';
 $page['hist_arg'] = array('groupid','hostid');
-$page['scripts'] = array('class.calendar.js','menu_scripts.js','scriptaculous.js?load=effects');
+$page['scripts'] = array('class.calendar.js','scriptaculous.js?load=effects');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 

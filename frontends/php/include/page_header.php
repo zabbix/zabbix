@@ -143,6 +143,7 @@
 <script type="text/javascript" src="js/class.cookie.js"></script>
 <script type="text/javascript" src="js/class.curl.js"></script>
 <script type="text/javascript" src="js/main.js"></script>
+<script type="text/javascript" src="js/functions.js"></script>
 <?php
 	if(isset($page['scripts']) && is_array($page['scripts'])){
 		foreach($page['scripts'] as $id => $script){

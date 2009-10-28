@@ -26,7 +26,7 @@
 	$page['title'] = 'S_CUSTOM_GRAPHS';
 	$page['file'] = 'charts.php';
 	$page['hist_arg'] = array('hostid','grouid','graphid','period','stime');
-	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','timeline.js','class.calendar.js','scrollbar.js','sbox.js','sbinit.js');
+	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.calendar.js','gtlc.js');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 

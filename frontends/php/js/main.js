@@ -610,20 +610,57 @@ debug: function(fnc_name, id){
 }
 }
 
+/************************************************************************************/
+/*								COLOR PICKER FUNCTIONS 								*/
+/************************************************************************************/
+function hide_color_picker(){
+	if(!color_picker) return;
 
-/************************************************************************************/
-/*								GRAPH RELATED STUFF 								*/
-/************************************************************************************/
-var graphs = {
-graphtype : 0,
-	
-submit : function(obj){
-	if(obj.name == 'graphtype'){
-		if(((obj.selectedIndex > 1) && (this.graphtype < 2)) || ((obj.selectedIndex < 2) && (this.graphtype > 1))){
-			var refr = document.getElementsByName('form_refresh');
-			refr[0].value = 0;
-		} 
-	}
-	document.getElementsByName('frm_graph')[0].submit();
+	color_picker.style.visibility="hidden"
+	color_picker.style.left	= "-" + ((color_picker.style.width) ? color_picker.style.width : 100) + "px";
+
+	curr_lbl = null;
+	curr_txt = null;
 }
+
+function show_color_picker(name){
+	if(!color_picker) return;
+
+	curr_lbl = document.getElementById("lbl_" + name);
+	curr_txt = document.getElementById(name);
+	
+	var pos = getPosition(curr_lbl);
+
+	color_picker.x	= pos.left;
+	color_picker.y	= pos.top;
+
+	color_picker.style.left	= color_picker.x + "px";
+	color_picker.style.top	= color_picker.y + "px";
+
+	color_picker.style.visibility = "visible";
+}
+
+function create_color_picker(){
+	if(color_picker) return;
+
+	color_picker = document.createElement("div");
+	color_picker.setAttribute("id", "color_picker");
+	color_picker.innerHTML = color_table;
+	document.body.appendChild(color_picker);
+
+	hide_color_picker();
+}
+
+function set_color(color){
+	if(curr_lbl)	curr_lbl.style.background = curr_lbl.style.color = "#" + color;
+	if(curr_txt)	curr_txt.value = color;
+
+	hide_color_picker();
+}
+
+function set_color_by_name(name, color){
+	curr_lbl = document.getElementById("lbl_" + name);
+	curr_txt = document.getElementById(name);
+	
+	set_color(color);
 }

@@ -85,19 +85,23 @@ private $items;
 	}
 
 	public function get(){
-		$widget = new CTable();
-		$widget->setAttribute('width','100%');
-		$widget->setCellPadding(0);
-		$widget->setCellSpacing(0);
+//		$widget = new CTable();
+//		$widget->setAttribute('width','100%');
+//		$widget->setCellPadding(0);
+//		$widget->setCellSpacing(0);
+		
+		$widget = array();
 
 		if(!empty($this->pageHeaders)){
 			$header_tab = $this->createPageHeader();
-			$widget->addRow(new CCol($header_tab));
+//			$widget->addRow(new CCol($header_tab));
+			$widget[] = $header_tab;
 		}
 
 		if(!empty($this->headers)){
 			$header_tab = $this->createHeader();
-			$widget->addRow($header_tab);
+//			$widget->addRow($header_tab);
+			$widget[] = $header_tab;
 		}
 
 		if(is_null($this->state)){
@@ -137,15 +141,19 @@ private $items;
 
 			$flicker_tab->addRow($div);
 
-			$widget->addRow($flicker_tab);
+//			$widget->addRow($flicker_tab);
+			$widget[] = $flicker_tab;
 		}
 
 		$div = new CDiv($this->body);
 		$div->setAttribute('id',$this->domid);
+//		$div->setAttribute('style','width: 1180px; overflow: auto;');
 
 		if(!$this->state) $div->setAttribute('style','display: none;');
 
-		$widget->addRow($div);
+//		$widget->addRow($div);
+		$widget[] = $div;
+		
 	return $widget;
 	}
 
@@ -155,7 +163,9 @@ private $items;
 
 	public function toString(){
 		$tab = $this->get();
-	return $tab->toString();
+		
+//	return $tab->toString();
+	return unpack_object($tab);
 	}
 
 	private function createPageHeader(){

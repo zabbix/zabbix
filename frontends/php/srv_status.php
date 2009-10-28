@@ -19,18 +19,18 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/triggers.inc.php');
-	require_once('include/services.inc.php');
+require_once('include/config.inc.php');
+require_once('include/triggers.inc.php');
+require_once('include/services.inc.php');
 
-	$page['title'] = 'S_IT_SERVICES';
-	$page['file'] = 'srv_status.php';
-	$page['scripts'] = array('services.js');
-	$page['hist_arg'] = array();
+$page['title'] = 'S_IT_SERVICES';
+$page['file'] = 'srv_status.php';
+$page['scripts'] = array();
+$page['hist_arg'] = array();
 
-	define('ZBX_PAGE_DO_REFRESH', 1);
+define('ZBX_PAGE_DO_REFRESH', 1);
 
-include_once 'include/page_header.php';
+include_once('include/page_header.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
