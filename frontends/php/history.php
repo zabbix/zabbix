@@ -26,7 +26,7 @@
 	$page['file']	= 'history.php';
 	$page['title']	= "S_HISTORY";
 	$page['hist_arg'] = array('itemid', 'hostid','grouid','graphid','period','dec','inc','left','right','stime');
-	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','timeline.js','class.calendar.js','scrollbar.js','sbox.js','sbinit.js');
+	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.calendar.js','gtlc.js');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 

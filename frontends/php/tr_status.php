@@ -28,7 +28,7 @@
 
 	$page['file'] = 'tr_status.php';
 	$page['title'] = 'S_STATUS_OF_TRIGGERS';
-	$page['scripts'] = array('menu_scripts.js', 'scriptaculous.js?load=effects');
+	$page['scripts'] = array('scriptaculous.js?load=effects');
 	$page['hist_arg'] = array('groupid', 'hostid');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);

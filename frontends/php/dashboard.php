@@ -27,10 +27,10 @@ require_once('include/discovery.inc.php');
 require_once('include/html.inc.php');
 require_once('include/blocks.inc.php');
 
-$page["title"] = "S_DASHBOARD";
+$page['title'] = "S_DASHBOARD";
 $page['file'] = 'dashboard.php';
 $page['hist_arg'] = array();
-$page['scripts'] = array('pmaster.js','menu_scripts.js','scriptaculous.js?load=effects');
+$page['scripts'] = array('class.pmaster.js','scriptaculous.js?load=effects');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 

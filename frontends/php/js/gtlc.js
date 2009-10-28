@@ -1,7 +1,6 @@
-// JavaScript Document
 /*
 ** ZABBIX
-** Copyright (C) 2000-2007 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,11 +17,453 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **
 */
+<!--
+/************************************************************************************/
+// GRAPHS TIMELINE CONTROLS (GTLC)
+// author: Aly
+/************************************************************************************/
+
+/************************************************************************************/
+// Title: graph magic initialization
+// Author: Aly
+/************************************************************************************/
+
+//timeControl.addObject(id, time, objData)
+
+var timeControl = {
+objectList: {},				// objects needs to be controled
+
+// DEBUG
+debug_status: 	0,			// debug status: 0 - off, 1 - on, 2 - SDI;
+debug_info: 	'',			// debug string
+debug_prev:		'',			// don't log repeated fnc
+
+addObject: function(id, time, objData){
+	this.debug('addObject', id);
+
+	this.objectList[id] = {
+		'processed': 0,
+		'id': id,
+		'containerid': null,
+		'domid': id,
+		'time': {},
+		'objDims': {},
+		'src': location.href,
+		'dynamic': 1,
+		'loadSBox': 0,
+		'loadImage': 0,
+		'loadScroll': 1,
+		'scrollWidthByImage': 0,
+		'mainObject': 0			// object on changing will reflect on all others
+	}
+
+	for(key in this.objectList[id]){
+		if(isset(key, objData)) this.objectList[id][key] = objData[key];
+	}
+	
+	var now = new Date();
+	now = parseInt(now.getTime() / 1000);
+	if(!isset('period', time))		time.period = 3600;
+	if(!isset('endtime', time))		time.endtime = now;
+	if(!isset('starttime', time))	time.starttime = time.endtime - 3*time.period;
+	if(!isset('usertime', time))	time.usertime = time.endtime;
+	
+	this.objectList[id].time = time;
+	this.objectList[id].timeline = create_timeline(this.objectList[id].id, 
+									  parseInt(time.period), 
+									  parseInt(time.starttime), 
+									  parseInt(time.usertime), 
+									  parseInt(time.endtime));
+	
+},
+
+processObjects: function(){
+	this.debug('processObjects');
+	
+	for(var key in this.objectList){
+		if(empty(this.objectList[key])) continue;
+
+		if(this.objectList[key].processed == 1) continue;
+		else this.objectList[key].processed= 1;
+		
+		var obj = this.objectList[key];
+
+		if((!isset('width', obj.objDims) || (obj.objDims.width < 0)) && isset('shiftXleft', obj.objDims) && isset('shiftXright', obj.objDims)){
+			var g_width = get_bodywidth();	
+			if(!is_number(g_width)) g_width = 1000;
+			
+			if(!isset('width', obj.objDims)) obj.objDims.width = 0;
+			obj.objDims.width += g_width - (parseInt(obj.objDims.shiftXleft) + parseInt(obj.objDims.shiftXright) + 27);
+		}
+		
+		if(isset('graphtype', obj.objDims) && (obj.objDims.graphtype < 2)){
+			var g_url = new Curl(obj.src);
+			g_url.setArgument('width', obj.objDims.width);
+			
+			var date = datetoarray(obj.time.usertime - obj.time.period);
+			var url_stime = ''+date[2]+date[1]+date[0]+date[3]+date[4];
+			
+			g_url.setArgument('period', obj.time.period);
+			g_url.setArgument('stime', url_stime);
+
+			obj.src = g_url.getUrl();
+		}
+
+		if(obj.loadImage) this.addImage(obj.id);
+		else if(obj.loadScroll) this.addScroll(null,obj.id);
+
+//		addListener(g_img, 'load', function(){addTimeControl(domobjectid, time, loadSBox); })
+//		g_img.onload = function(){ addTimeControl(key); };		
+	}	
+},
+
+addImage: function(objid){
+	this.debug('addImage', objid);
+	
+	var obj = this.objectList[objid];
+	
+	var g_img = document.createElement('img');
+	$(obj.containerid).appendChild(g_img);
+
+	g_img.className = 'borderless';
+	g_img.setAttribute('id', obj.domid);
+	g_img.setAttribute('src', obj.src);
+
+
+	if(obj.loadScroll){
+		obj.scroll_listener = this.addScroll.bindAsEventListener(this, obj.domid);
+		addListener(g_img, 'load', obj.scroll_listener);
+	}
+
+	if(obj.loadSBox){
+		obj.sbox_listener = this.addSBox.bindAsEventListener(this, obj.domid);
+		addListener(g_img, 'load', obj.sbox_listener);
+
+		addListener(g_img, 'load', moveSBoxes);
+	}
+
+	
+},
+
+addSBox: function(e, objid){
+	this.debug('addSBox', objid);
+
+	var obj = this.objectList[objid];
+
+	var g_img = $(obj.domid);
+	if(!is_null(g_img)) removeListener(g_img, 'load', obj.sbox_listener);
+	
+	ZBX_SBOX[obj.domid] = new Object;
+	ZBX_SBOX[obj.domid].shiftT = 35;
+	ZBX_SBOX[obj.domid].shiftL = parseInt(obj.objDims.shiftXleft);
+	ZBX_SBOX[obj.domid].shiftR = parseInt(obj.objDims.shiftXright);
+	ZBX_SBOX[obj.domid].height = parseInt(obj.objDims.graphHeight);
+	ZBX_SBOX[obj.domid].width = parseInt(obj.objDims.width);
+	
+	var sbox = sbox_init(obj.domid, obj.timeline.timelineid, obj.domid);
+	sbox.onchange = this.objectUpdate.bind(this);
+},
+
+addScroll: function(e, objid){
+	this.debug('addScroll', objid);
+	
+	var obj = this.objectList[objid];
+//SDJ(this.objectList);
+	var g_img = $(obj.domid);
+	if(!is_null(g_img)) removeListener(g_img, 'load', obj.scroll_listener);
+	
+	var g_width = null;
+	if(obj.scrollWidthByImage == 0){
+		g_width = get_bodywidth() - 25;	
+		if(!is_number(g_width)) g_width = 900;
+	}
+	
+	var scrl = scrollCreate(obj.domid, g_width, obj.timeline.timelineid);
+	scrl.onchange = this.objectUpdate.bind(this);
+	
+	if(obj.dynamic && !is_null($(g_img))){
+		addListener(obj.domid, 'load', function(){ZBX_SCROLLBARS[scrl.scrollbarid].disabled=0;});
+	}
+//SDI('scrollCreate');
+},
+
+objectUpdate: function(id, timelineid){
+	this.debug('objectUpdate', id);
+
+	if(!isset(id, this.objectList)) throw('timeControl: Object is not declared "'+graphid+'"');
+	
+	var obj = this.objectList[id];
+		
+	var usertime = ZBX_TIMELINES[timelineid].usertime();
+	var period = ZBX_TIMELINES[timelineid].period();
+	var now = ZBX_TIMELINES[timelineid].now()
+	
+	if(now) usertime += 86400*31;
+	
+	var date = datetoarray(usertime - period);
+	var url_stime = ''+date[2]+date[1]+date[0]+date[3]+date[4];
+	
+	if(obj.dynamic){
+		if(obj.mainObject){
+
+			for(var key in this.objectList){
+				if(empty(this.objectList[key])) continue;
+
+				if(this.objectList[key].dynamic){
+					this.objectList[key].timeline.period(period);
+					this.objectList[key].timeline.usertime(usertime);
+					this.loadDynamic(this.objectList[key].domid, url_stime, period);
+					
+					if(isset(key, ZBX_SCROLLBARS)){
+						ZBX_SCROLLBARS[key].setBarPosition();
+						ZBX_SCROLLBARS[key].setGhostByBar();
+						ZBX_SCROLLBARS[key].setTabInfo();
+						if(this.objectList[key].loadImage && !is_null($(obj.domid))) ZBX_SCROLLBARS[key].disabled = 1;
+					}
+				}
+			}
+		}
+		else{
+			this.loadDynamic(obj.domid, url_stime, period);
+			
+			if(isset(id, ZBX_SCROLLBARS)){
+				ZBX_SCROLLBARS[id].setBarPosition();
+				ZBX_SCROLLBARS[id].setGhostByBar();
+				ZBX_SCROLLBARS[id].setTabInfo();
+				if(!is_null($(obj.domid))) ZBX_SCROLLBARS[id].disabled = 1;
+			}
+
+		}
+	}
+	
+	if(!obj.dynamic){
+		url = new Curl(location.href);
+		url.setArgument('stime', url_stime);
+		url.setArgument('period', period);
+		url.unsetArgument('output');
+
+//	alert(uri.getUrl());
+		location.href = url.getUrl();
+	}
+},
+
+loadDynamic: function(id, stime, period){
+	this.debug('loadDynamic', id);
+	
+	var obj = this.objectList[id];
+	
+	var dom_object = $(obj.domid);
+	if(!is_null(dom_object) && (dom_object.nodeName.toLowerCase() == 'img')){
+		url = new Curl(obj.src);
+		url.setArgument('stime', stime);
+		url.setArgument('period', period);
+
+		dom_object.src = url.getUrl();
+	}
+},
+
+debug: function(fnc_name, id){
+	if(this.debug_status){
+		var str = 'timeLine.'+fnc_name;
+		if(typeof(id) != 'undefined') str+= ' :'+id;
+
+		if(this.debug_prev == str) return true;
+
+		this.debug_info += str + '\n';
+		if(this.debug_status == 2){
+			SDI(str);
+		}
+		
+		this.debug_prev = str;
+	}
+}
+}
+
+function datetoarray(unixtime){
+
+	var date = new Date();
+	date.setTime(unixtime*1000);
+	
+	var thedate = new Array();
+	thedate[0] = date.getDate();
+	thedate[1] = date.getMonth()+1;
+	thedate[2] = date.getFullYear();
+	thedate[3] = date.getHours();
+	thedate[4] = date.getMinutes();
+	thedate[5] = date.getSeconds();
+		
+	for(i = 0; i < thedate.length; i++){
+		if((thedate[i]+'').length < 2) thedate[i] = '0'+thedate[i];
+	}
+return thedate;
+}
+
+function onload_update_scroll(id,w,period,stime,timel,bar_stime){
+	var obj = $(id);
+	if((typeof(obj) == 'undefined') || is_null(obj)){
+		setTimeout('onload_update_scroll("'+id+'",'+w+','+period+','+stime+','+timel+','+bar_stime+');',1000);
+		return;
+	}
+
+//	eval('var fnc = function(){ onload_update_scroll("'+id+'",'+w+','+period+','+stime+','+timel+','+bar_stime+');}');
+	scrollinit(w,period,stime,timel,bar_stime);
+	if(!is_null($('scroll')) && showgraphmenu){
+		showgraphmenu(id);
+	}
+//	addListener(window,'resize', fnc );
+}
+
+
+/************************************************************************************/
+// Title: TimeLine COntrol CORE
+// Author: Aly
+/************************************************************************************/
+
+var ZBX_TIMELINES = {};
+
+function create_timeline(tlid, period, starttime, usertime, endtime){
+	if(is_null(tlid)){
+		var tlid = ZBX_TIMELINES.length;
+	}
+	
+	var now = new Date();
+	now = parseInt(now.getTime() / 1000);
+
+	if('undefined' == typeof(usertime)) usertime = now;
+	if('undefined' == typeof(endtime)) endtime = now;
+	
+	ZBX_TIMELINES[tlid] = new CTimeLine(tlid, period, starttime, usertime, endtime);
+	
+return ZBX_TIMELINES[tlid];
+}
+
+var CTimeLine = Class.create();
+
+CTimeLine.prototype = {
+timelineid: null,			// own id in array
+
+_starttime: null,				// timeline start time (left, past)
+_endtime: null,					// timeline end time (right, now)
+
+_usertime: null,				// selected end time (bar, user selection)
+_period: null,					// selected period
+_now: false,					// state if time is set to NOW
+
+minperiod: 3600,				// minimal allowed period
+
+// DEBUG
+debug_status: 	1,			// debug status: 0 - off, 1 - on, 2 - SDI;
+debug_info: 	'',			// debug string
+debug_prev:		'',			// don't log repeated fnc
+
+initialize: function(id, period, starttime, usertime, endtime){
+	this.debug('initialize', id);
+	
+	this.timelineid = id;
+
+	if((endtime - starttime) < (3*this.minperiod)) starttime = endtime - (3*this.minperiod);
+	
+	this.starttime(starttime);
+	this.endtime(endtime);
+
+	this.usertime(usertime);
+	this.period(period);
+},
+
+timeNow: function(){
+	var tmp_date = new Date();
+return parseInt(tmp_date.getTime()/1000);
+},
+
+setNow: function(){
+	var end = this.timeNow();
+	
+	this._endtime = end;
+	this._usertime = end;
+	
+	this.now();
+},
+
+now: function(){
+	this._now = ((this._usertime+60) > this._endtime);
+
+return this._now;
+},
+
+
+period: function(period){
+	this.debug('period');
+
+	if('undefined' == typeof(period)) return this._period;
+
+	if((this._usertime - period) < this._starttime)  period = this._usertime - this._starttime;
+	
+//	if((this._usertime - this.period() + period) > this._endtime) period = this._period + this._endtime - this._usertime;
+	if(period < this.minperiod) period = this.minperiod;
+	
+	this._period = period;
+
+return this._period;
+},
+
+usertime: function(usertime){
+	this.debug('usertime');
+	
+	if('undefined' == typeof(usertime)) return this._usertime;
+
+	if((usertime + this.minperiod) < this._starttime) usertime = this._starttime + this.minperiod;
+	if(usertime > this._endtime) usertime = this._endtime;
+
+	this._usertime = usertime;
+	
+	this.now();
+	
+return this._usertime;
+},
+
+starttime: function(starttime){
+	this.debug('starttime');
+
+	if('undefined'==typeof(starttime)) return this._starttime;
+	
+	this._starttime = starttime;
+
+return this._starttime;
+},
+
+endtime: function(endtime){
+	this.debug('endtime');
+	
+	if('undefined'==typeof(endtime)) return this._endtime;
+	
+	if(endtime < (this._starttime+this._period*3)) endtime = this._starttime+this._period*3;
+
+	this._endtime = endtime;
+
+return this._endtime;
+},
+
+debug: function(fnc_name, id){
+	if(this.debug_status){
+		var str = 'CTimeLine['+this.timelineid+'].'+fnc_name;
+		if(typeof(id) != 'undefined') str+= ' :'+id;
+
+		if(this.debug_prev == str) return true;
+
+		this.debug_info += str + '\n';
+		if(this.debug_status == 2){
+			SDI(str);
+		}
+		
+		this.debug_prev = str;
+	}
+}
+}
+
+/************************************************************************************/
 // Title: graph scrolling
 // Author: Aly
-
-<!--
-
+/************************************************************************************/
 var ZBX_SCROLLBARS = {};
 
 function scrollCreate(sbid, w, timelineid){
@@ -1443,5 +1884,399 @@ debug: function(fnc_name, id){
 		this.debug_prev = str;
 	}
 }
+}
+
+
+/************************************************************************************/
+// Title: selection box uppon graphs
+// Author: Aly
+/************************************************************************************/
+var ZBX_SBOX = {};		//selection box obj reference
+
+function sbox_init(sbid, timeline, domobjectid){
+	if(!isset(domobjectid, ZBX_SBOX)) throw('TimeControl: SBOX is not defined for object "'+domobjectid+'"');
+	if(is_null(timeline)) throw("Parametrs haven't been sent properly");
+	
+	if(is_null(sbid))	var sbid = ZBX_SBOX.length;
+	
+	var dims = getDimensions(domobjectid);
+	var width = dims.width - (ZBX_SBOX[domobjectid].shiftL + ZBX_SBOX[domobjectid].shiftR);
+
+	var obj = $(domobjectid);
+	var box = new sbox(sbid, timeline, obj, width, ZBX_SBOX[sbid].height);
+	
+	
+// Listeners
+	addListener(window,'resize',moveSBoxes);
+		
+	if(KQ) setTimeout('ZBX_SBOX['+sbid+'].sbox.moveSBoxByObj('+sbid+');',500);
+	
+	ZBX_SBOX[sbid].sbox = box;
+
+return box;
+}
+
+
+var sbox = Class.create();
+
+sbox.prototype = {
+sbox_id:			'',				// id to create references in array to self
+
+mouse_event:		new Object,		// json object wheres defined needed event params
+start_event:		new Object,		// copy of mouse_event when box created
+
+stime:				0,				//	new start time
+period:				0,				//	new period
+
+obj:				new Object,		// objects params
+dom_obj:			null,			// selection div html obj
+box:				new Object,		// object params
+dom_box:			null,			// selection box html obj
+dom_period_span:	null,			// period container html obj
+
+px2time:			null,			// seconds in 1px
+
+dynamic:			'',				// how page updates, all page/graph only update
+
+debug_status: 		0,				// debug status: 0 - off, 1 - on, 2 - SDI;
+debug_info: 		'',				// debug string
+debug_prev:			'',				// don't log repeated fnc
+
+
+initialize: function(sbid, timelineid, obj, width, height){
+	this.sbox_id = sbid;
+	this.debug('initialize');
+
+// Checks
+	if(is_null(obj)) throw('Failed to initialize Selection Box with given Object');
+	if(!isset(timelineid,ZBX_TIMELINES)) throw('Failed to initialize Selection Box with given TimeLine');
+
+	if(empty(this.dom_obj)){
+		this.grphobj = obj;
+		this.dom_obj = create_box_on_obj(obj, width, height);
+		this.moveSBoxByObj();
+	}
+//--
+
+// Variable initialization
+	this.timeline = ZBX_TIMELINES[timelineid];		
+	
+	this.obj.width = width;
+	this.obj.height = height;
+	
+	this.box.width = 0;
+//--
+
+// Listeners
+	if(IE6){
+		obj.attachEvent('onmousedown', this.mousedown.bindAsEventListener(this));
+		obj.onmousemove = this.mousemove.bindAsEventListener(this);
+	}
+	else{
+		addListener(this.dom_obj, 'mousedown', this.mousedown.bindAsEventListener(this),false);
+		addListener(document, 'mousemove', this.mousemove.bindAsEventListener(this),true);
+	}
+	
+	addListener(document, 'mouseup', this.mouseup.bindAsEventListener(this),true);
+//---------
+
+	ZBX_SBOX[this.sbox_id].mousedown = false;	
+},
+
+onselect: function(){
+	this.debug('onselect');
+
+	this.px2time = this.timeline.period() / this.obj.width;
+	var userstarttime = (this.timeline.usertime() - this.timeline.period()) + Math.round(this.box.left * this.px2time);
+//alert(userstarttime+' : '+Math.round(this.box.left * this.px2time)+' - '+this.box.left);
+	var new_period = this.calcperiod();
+	
+	this.timeline.period(new_period);
+	this.timeline.usertime(userstarttime + new_period);
+
+//SDI(this.stime+' : '+this.period);
+	this.onchange(this.sbox_id, this.timeline.timelineid, true);
+},
+
+onchange: function(){			// bind any func to this
+	
+},
+
+mousedown: function(e){
+	this.debug('mousedown',this.sbox_id);
+
+	e = e || window.event;
+	if(e.which && (e.which != 1)) return false;
+	else if (e.button && (e.button != 1)) return false;
+
+	cancelEvent(e);
+	
+	if(ZBX_SBOX[this.sbox_id].mousedown == false){
+		this.optimize_event(e);
+		deselectAll();
+		
+		if(IE){
+			var posxy = getPosition(this.dom_obj);
+			if((this.mouse_event.left < posxy.left) || (this.mouse_event.left > (posxy.left+this.dom_obj.offsetWidth))) return false;
+		}
+		
+		this.create_box();
+		ZBX_SBOX[this.sbox_id].mousedown = true;
+	}
+},
+
+mousemove: function(e){
+//	this.debug('mousemove',this.sbox_id);
+
+	e = e || window.event;
+//	cancelEvent(e);
+	if(ZBX_SBOX[this.sbox_id].mousedown == true){
+		this.optimize_event(e);
+		this.resizebox();
+	}
+},
+
+mouseup: function(e){
+	this.debug('mouseup',this.sbox_id);
+
+	e = e || window.event;
+	if(ZBX_SBOX[this.sbox_id].mousedown == true){
+		this.onselect();
+		cancelEvent(e);
+		this.clear_params();
+		ZBX_SBOX[this.sbox_id].mousedown = false;
+	}
+},
+
+create_box: function(){
+	this.debug('create_box');
+	
+	if(!$('selection_box')){
+		this.dom_box = document.createElement('div');
+		this.dom_obj.appendChild(this.dom_box);
+		
+		this.dom_period_span = document.createElement('span');
+		this.dom_box.appendChild(this.dom_period_span);
+		this.dom_period_span.setAttribute('id','period_span');
+		
+		this.dom_period_span.innerHTML = this.period;
+		
+		var dims = getDimensions(this.dom_obj);
+
+		this.obj = dims;
+		var top = (this.mouse_event.top - this.obj.top);
+		var left = (this.mouse_event.left - this.obj.left - 1);
+		top = 0;
+		
+		this.dom_box.setAttribute('id','selection_box');
+		if(IE){
+			this.dom_box.style.top = top+'px'; 
+			this.dom_box.style.left= left+'px';
+		}
+		else{
+			this.dom_box.setAttribute('style', 'top: '+top+'px; left: '+left+'px;');
+		}
+	
+		this.box.top = top;
+		this.box.left = left;
+		
+		var dims = getDimensions(this.dom_obj);
+		this.dom_box.style.height = dims.height+'px';
+		this.box.height = dims.height;
+	
+		addListener(this.dom_box, 'mousemove', this.mousemove.bindAsEventListener(this));
+	
+		this.start_event.top = this.mouse_event.top;
+		this.start_event.left = this.mouse_event.left;
+	}
+
+	ZBX_SBOX[this.sbox_id].mousedown = false;	
+},
+
+resizebox: function(){
+	this.debug('resizebox',this.sbox_id);
+	
+	if(ZBX_SBOX[this.sbox_id].mousedown == true){
+		
+//		var height = this.validateH(this.mouse_event.top - this.start_event.top);
+//		height = this.obj.height;
+//		this.dom_box.style.height = height+'px';
+//		this.box.height = height;
+
+// 		fix wrong selection box
+		if(this.mouse_event.left > (this.obj.width + this.obj.left)) {
+			this.moveright(this.obj.width - (this.start_event.left - this.obj.left));
+		} 
+		else if(this.mouse_event.left < this.obj.left) {
+			this.moveleft(0, this.start_event.left - this.obj.left);
+		}
+		
+		var width = this.validateW(this.mouse_event.left - this.start_event.left);
+		
+		if(width>0){
+			this.moveright(width);
+		}
+		else if(width<0){
+			this.moveleft(this.mouse_event.left - this.obj.left, width);
+		}
+
+		this.period = this.calcperiod();
+		
+		if(!is_null(this.dom_box)) 
+			this.dom_period_span.innerHTML = this.FormatStampbyDHM(this.period)+((this.period<3600)?' [min 1h]':'');
+	}
+},
+
+moveleft: function(left, width){
+	this.debug('moveleft');
+	
+	//this.box.left = this.mouse_event.left - this.obj.left;
+	this.box.left = left;
+	if(!is_null(this.dom_box)) this.dom_box.style.left = this.box.left+'px';
+
+	this.box.width = Math.abs(width);
+	if(!is_null(this.dom_box)) this.dom_box.style.width = this.box.width+'px';
+},
+
+moveright: function(width){
+	this.debug('moveright');
+	
+	this.box.left = (this.start_event.left - this.obj.left);
+	if(!is_null(this.dom_box)) this.dom_box.style.left = this.box.left+'px';
+	
+	if(!is_null(this.dom_box)) this.dom_box.style.width = width+'px';
+	this.box.width = width;
+},
+
+calcperiod: function(){
+	this.debug('calcperiod');
+
+	if(this.box.width >= this.obj.width){
+		var new_period = this.timeline.period();
+	}
+	else{
+		this.px2time = this.timeline.period()/this.obj.width;
+		var new_period = Math.round(this.box.width * this.px2time);
+//SDI('CALCP: '+this.box.width+' * '+this.px2time);
+	}
+
+return	new_period;
+},
+
+FormatStampbyDHM: function(timestamp){
+	this.debug('FormatStampbyDHM');
+	
+	timestamp = timestamp || 0;
+	var days = 	parseInt(timestamp/86400);
+	var hours =  parseInt((timestamp - days*86400)/3600);
+	var minutes = parseInt((timestamp -days*86400 - hours*3600)/60);
+
+	var str = (days==0)?(''):(days+'d ');
+	str+=hours+'h '+minutes+'m ';
+	
+return str;
+},
+
+validateW: function(w){
+	this.debug('validateW');
+//SDI(this.start_event.left+' - '+this.obj.left+' - '+w+' > '+this.obj.width)
+	if(((this.start_event.left-this.obj.left)+w)>this.obj.width) 
+		w = 0;//this.obj.width - (this.start_event.left - this.obj.left) ;
+
+	if(this.mouse_event.left < this.obj.left) 
+		w = 0;//(this.start_event.left - this.obj.left);
+	
+return w;
+},
+
+validateH: function(h){
+	this.debug('validateH');
+	
+	if(h<=0) h=1;
+	if(((this.start_event.top-this.obj.top)+h)>this.obj.height) 
+		h = this.obj.height - this.start_event.top;
+return h;
+},
+
+moveSBoxByObj: function(){
+	this.debug('moveSBoxByObj',this.sbox_id);
+	
+	var posxy = getPosition(this.grphobj);
+
+	this.dom_obj.style.top = (posxy.top+ZBX_SBOX[this.sbox_id].shiftT)+'px';
+	this.dom_obj.style.left = (posxy.left+ZBX_SBOX[this.sbox_id].shiftL-1)+'px';	
+
+	posxy = getPosition(this.dom_obj);
+
+	this.obj.top = parseInt(posxy.top); 
+	this.obj.left = parseInt(posxy.left);
+},
+
+optimize_event: function(e){
+	this.debug('optimize_event');
+	
+	if (e.pageX || e.pageY) {
+		this.mouse_event.left = e.pageX;
+		this.mouse_event.top = e.pageY;
+	}
+	else if (e.clientX || e.clientY) {
+		this.mouse_event.left = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+		this.mouse_event.top = e.clientY + document.body.scrollTop	+ document.documentElement.scrollTop;
+	}
+	
+	this.mouse_event.left = parseInt(this.mouse_event.left);
+	this.mouse_event.top = parseInt(this.mouse_event.top);
+},
+
+clear_params: function(){
+	this.debug('clear_params',this.sbox_id);
+
+	if(!is_null(this.dom_box)) 
+		this.dom_obj.removeChild(this.dom_box);
+	
+	this.mouse_event = new Object;
+	this.start_event = new Object;
+	
+	this.dom_box = '';
+	
+	this.box = new Object;
+	this.box.width = 0;
+},
+
+debug: function(fnc_name, id){
+	if(this.debug_status){
+		var str = 'SBox['+this.sbox_id+'].'+fnc_name;
+		if(typeof(id) != 'undefined') str+= ' :'+id;
+
+		if(this.debug_prev == str) return true;
+
+		this.debug_info += str + '\n';
+		if(this.debug_status == 2){
+			SDI(str);
+		}
+		
+		this.debug_prev = str;
+	}
+}
+}
+
+function create_box_on_obj(obj, width, height){
+	var parent = obj.parentNode;
+
+	var div = document.createElement('div');
+	parent.appendChild(div);
+
+	div.className = 'box_on';
+	div.style.height = (height+1) + 'px';
+	div.style.width = (width+1) + 'px';
+	
+return div;
+}
+
+function moveSBoxes(){
+	for(var key in ZBX_SBOX){
+		if(!empty(ZBX_SBOX[key]) && isset('sbox', ZBX_SBOX[key]))
+			ZBX_SBOX[key].sbox.moveSBoxByObj();
+	}
 }
 -->

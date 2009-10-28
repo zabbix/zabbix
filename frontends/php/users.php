@@ -29,7 +29,7 @@
 	$page['title'] = 'S_USERS';
 	$page['file'] = 'users.php';
 	$page['hist_arg'] = array();
-	$page['scripts'] = array('menu_scripts.js');
+	$page['scripts'] = array();
 
 include_once('include/page_header.php');
 

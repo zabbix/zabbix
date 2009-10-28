@@ -553,53 +553,11 @@
 // affects multibyte strings [in mb_ereg char "-" must be backslashed]!!!
 if((ini_get('mbstring.func_overload') > 5)){
 	define('ZBX_MBSTRINGS_OVERLOADED',1);
-	define('ZBX_EREG_MINUS_SYMB','\-');
-}
-else{
-	define('ZBX_EREG_MINUS_SYMB','-');
 }
 
-// EREG
-	define('ZBX_EREG_SPACES', '([[:space:]]+){0,1}');
-	define('ZBX_EREG_MACRO_NAME', '([A-Z0-9._]+)');
-	define('ZBX_EREG_INTERNAL_NAMES', '([0-9a-zA-Z_.[:space:][.'.ZBX_EREG_MINUS_SYMB.'.]$]+)');
-	define('ZBX_EREG_KEY_NAME', '([0-9a-zA-Z_.,[.:.][:space:][.'.ZBX_EREG_MINUS_SYMB.'.]${}]+)');
-	define('ZBX_EREG_PARAMS', '([[:print:]]+){0,1}');
-	define('ZBX_EREG_SIGN', '([&|><=+*/#[.'.ZBX_EREG_MINUS_SYMB.'.]])');
-	define('ZBX_EREG_NUMBER', '([[.'.ZBX_EREG_MINUS_SYMB.'.]+]*[0-9]+[.]{0,1}[0-9]*[A-Z]{0,1})');
-
-// Character '-' must be last in the list of symbols, otherwise it won't be accepted
-	define('ZBX_EREG_DNS_FORMAT', '([0-9a-zA-Z\_\.\$[.'.ZBX_EREG_MINUS_SYMB.'.]]+)');
-	define('ZBX_EREG_HOST_FORMAT', ZBX_EREG_INTERNAL_NAMES);
-
-	define('ZBX_EREG_NODE_FORMAT', ZBX_EREG_INTERNAL_NAMES);
-	define('ZBX_EREG_ITEM_KEY_FORMAT', '('.ZBX_EREG_KEY_NAME.'(\['.ZBX_EREG_PARAMS.'\]){0,1})');
-	define('ZBX_KEY_ID', 1);
-	define('ZBX_KEY_NAME_ID', 2);
-	define('ZBX_KEY_PARAM_ID', 4);
-	define('ZBX_EREG_FUNCTION_FORMAT', '('.ZBX_EREG_INTERNAL_NAMES.'(\('.ZBX_EREG_PARAMS.'\)))');
-
-	define('ZBX_EREG_SIMPLE_EXPRESSION_FORMAT','(\{'.ZBX_EREG_HOST_FORMAT.'\:'.ZBX_EREG_ITEM_KEY_FORMAT.'\.'.ZBX_EREG_FUNCTION_FORMAT.'\})');
-//	define('ZBX_EREG_MACRO_NAME_FORMAT', '(\{[A-Z\.]+\})');
-	define('ZBX_EREG_EXPRESSION_SIMPLE_MACROS', '(\{TRIGGER.VALUE\})');
-	define('ZBX_EREG_EXPRESSION_USER_MACROS', '(\{\$'.ZBX_EREG_MACRO_NAME.'\})');
-
-	define('ZBX_SIMPLE_EXPRESSION_HOST_ID', 2);
-	define('ZBX_SIMPLE_EXPRESSION_KEY_ID', 2 + ZBX_KEY_ID);
-	define('ZBX_SIMPLE_EXPRESSION_KEY_NAME_ID', 2 + ZBX_KEY_NAME_ID);
-	define('ZBX_SIMPLE_EXPRESSION_KEY_PARAM_ID', 2 + ZBX_KEY_PARAM_ID);
-	define('ZBX_SIMPLE_EXPRESSION_FUNCTION_ID', 7);
-	define('ZBX_SIMPLE_EXPRESSION_FUNCTION_NAME_ID', 8);
-	define('ZBX_SIMPLE_EXPRESSION_FUNCTION_PARAM_ID', 10);
-
-	define('ZBX_EREG_EXPRESSION_TOKEN_FORMAT', '^([[:print:]]*)('.ZBX_EREG_SIMPLE_EXPRESSION_FORMAT.'|'.ZBX_EREG_EXPRESSION_SIMPLE_MACROS.')([[:print:]]*)$');
-
-	define('ZBX_EXPRESSION_LEFT_ID', 1);
-	define('ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID', 2);
-	define('ZBX_EXPRESSION_MACRO_ID', 13);
-	define('ZBX_EXPRESSION_RIGHT_ID', 14);
-//-------
-
+	define('REGEXP_INCLUDE',0);
+	define('REGEXP_EXCLUDE',1);
+	
 // PREG
 	define('ZBX_PREG_PRINT', '^\x00-\x1F');
 
@@ -610,7 +568,7 @@ else{
 	define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+){0,1}');
 	define('ZBX_PREG_SIGN', '([&|><=+*\/#\-])');
 	define('ZBX_PREG_NUMBER', '([\-+]?[0-9]+[.]{0,1}[0-9]*[A-Z]{0,1})');
-//----
+//--
 
 	define('ZBX_PREG_DNS_FORMAT', '([0-9a-zA-Z_\.\-$]+)');
 	define('ZBX_PREG_HOST_FORMAT', ZBX_PREG_INTERNAL_NAMES);
@@ -626,24 +584,26 @@ else{
 	define('ZBX_PREG_EXPRESSION_USER_MACROS', '(\{\$'.ZBX_PREG_MACRO_NAME.'\})');
 
 	define('ZBX_PREG_EXPRESSION_TOKEN_FORMAT', '^(['.ZBX_PREG_PRINT.']*)('.ZBX_PREG_SIMPLE_EXPRESSION_FORMAT.'|'.ZBX_PREG_EXPRESSION_SIMPLE_MACROS.')(['.ZBX_PREG_PRINT.']*)$');
-
-
-	define('ZBX_PREG_KEY_ID', 1);
-	define('ZBX_PREG_KEY_NAME_ID', 2);
-	define('ZBX_PREG_KEY_PARAM_ID', 4);
-	define('ZBX_PREG_SIMPLE_EXPRESSION_HOST_ID', 2);
-	define('ZBX_PREG_SIMPLE_EXPRESSION_KEY_ID', 2 + ZBX_PREG_KEY_ID);
-	define('ZBX_PREG_SIMPLE_EXPRESSION_KEY_NAME_ID', 2 + ZBX_PREG_KEY_NAME_ID);
-	define('ZBX_PREG_SIMPLE_EXPRESSION_KEY_PARAM_ID', 2 + ZBX_PREG_KEY_PARAM_ID);
-	define('ZBX_PREG_SIMPLE_EXPRESSION_FUNCTION_ID', 7);
-	define('ZBX_PREG_SIMPLE_EXPRESSION_FUNCTION_NAME_ID', 8);
-	define('ZBX_PREG_SIMPLE_EXPRESSION_FUNCTION_PARAM_ID', 10);
-
-	define('ZBX_PREG_EXPRESSION_LEFT_ID', 1);
-	define('ZBX_PREG_EXPRESSION_SIMPLE_EXPRESSION_ID', 2);
-	define('ZBX_PREG_EXPRESSION_MACRO_ID', 13);
-	define('ZBX_PREG_EXPRESSION_RIGHT_ID', 14);
 //-------
+
+// REGEXP IDS
+	define('ZBX_KEY_ID', 1);
+	define('ZBX_KEY_NAME_ID', 2);
+	define('ZBX_KEY_PARAM_ID', 4);
+
+	define('ZBX_SIMPLE_EXPRESSION_HOST_ID', 2);
+	define('ZBX_SIMPLE_EXPRESSION_KEY_ID', 2 + ZBX_KEY_ID);
+	define('ZBX_SIMPLE_EXPRESSION_KEY_NAME_ID', 2 + ZBX_KEY_NAME_ID);
+	define('ZBX_SIMPLE_EXPRESSION_KEY_PARAM_ID', 2 + ZBX_KEY_PARAM_ID);
+	define('ZBX_SIMPLE_EXPRESSION_FUNCTION_ID', 7);
+	define('ZBX_SIMPLE_EXPRESSION_FUNCTION_NAME_ID', 8);
+	define('ZBX_SIMPLE_EXPRESSION_FUNCTION_PARAM_ID', 10);
+
+	define('ZBX_EXPRESSION_LEFT_ID', 1);
+	define('ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID', 2);
+	define('ZBX_EXPRESSION_MACRO_ID', 13);
+	define('ZBX_EXPRESSION_RIGHT_ID', 14);
+//--------
 
 	define('ZBX_HISTORY_COUNT',5);
 

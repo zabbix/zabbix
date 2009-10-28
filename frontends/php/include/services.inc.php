@@ -642,7 +642,9 @@ if($serviceid == 1 || $serviceid == 2){
 	//---------------------------- if not leaf -----------------------------
 		$rows['parentid'] = $parentid;
 		if($soft == 0){
-			$rows['caption'] = new CLink($rows['caption'],'#',null,'javascript: call_menu(event, '.zbx_jsvalue($rows['serviceid']).','.zbx_jsvalue($rows['caption']).'); return false;');
+			$caption_tmp = $rows['caption'];
+			$rows['caption'] = new CSpan($rows['caption'],'link');
+			$rows['caption']->setAttribute('onclick','javascript: call_menu(event, '.zbx_jsvalue($rows['serviceid']).','.zbx_jsvalue($caption_tmp).');');
 
 			$temp[$rows['serviceid']]=$rows;
 
