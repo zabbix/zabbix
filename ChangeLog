@@ -1,5 +1,6 @@
 Changes for 1.6.7
 
+ - [ZBX-1051] fixed processing of active checks list on the agent side. Symptom: 'Can't open JSON object' message (Sasha)
  - [ZBX-641] fixed oracle OCI-Lob parse (Aly)
  - [ZBX-1078] changed link in server info screen element (Vedmak)
  - [ZBX-1076] fixed IT services periods (Vedmak)

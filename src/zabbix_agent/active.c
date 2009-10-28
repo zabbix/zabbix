@@ -193,14 +193,13 @@ static int	parse_list_of_checks(char *str)
 
 	if (SUCCEED == ret && SUCCEED != zbx_json_open(str, &jp))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Can't open jason object");
+		zabbix_log(LOG_LEVEL_WARNING, "%s", zbx_json_strerror());
 		ret = FAIL;
 	}
 
 	if (SUCCEED == ret && SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, result, sizeof(result)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s",
-			zbx_json_strerror());
+		zabbix_log(LOG_LEVEL_WARNING, "%s", zbx_json_strerror());
 		ret = FAIL;
 	}
 
@@ -296,44 +295,38 @@ static int	parse_list_of_checks(char *str)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	refresh_active_checks(
-	const char		*host, 
-	unsigned short	port
-	)
+static int	refresh_active_checks(const char *host, unsigned short port)
 {
-
 	zbx_sock_t	s;
+	char		*buf;
+	int		ret;
+	struct zbx_json	json;
 
-	char	*buf;
-
-	int	ret;
-
-	struct zbx_json json;
-
-	zabbix_log( LOG_LEVEL_DEBUG, "refresh_active_checks('%s',%u)", host, port);
+	zabbix_log(LOG_LEVEL_DEBUG, "refresh_active_checks('%s',%u)", host, port);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, CONFIG_TIMEOUT))) {
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, CONFIG_TIMEOUT)))
+	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", json.buffer);
 
 		if( SUCCEED == (ret = zbx_tcp_send(&s, json.buffer)) )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Before read");
-			ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE);
+
+			if (SUCCEED == (ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE)))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "Got [%s]", buf);
+				parse_list_of_checks(buf);
+			}
 		}
 		zbx_tcp_close(&s);
 	}
 
-	if (SUCCEED == ret)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Got [%s]", buf);
-		parse_list_of_checks(buf);
-	}
-	else
+	if (SUCCEED != ret)
 		zabbix_log(LOG_LEVEL_DEBUG, "Get active checks error: %s", zbx_tcp_strerror());
 
 	zbx_json_free(&json);
