@@ -562,6 +562,8 @@ class CHost extends CZBXAPI{
 			}
 		}
 
+//		zbx_valueTo($result,array('array'=>1));
+		
 	return $result;
 	}
 
