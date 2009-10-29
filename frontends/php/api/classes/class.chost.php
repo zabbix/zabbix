@@ -663,6 +663,8 @@ class CHost extends CZBXAPI{
 				$error = 'No groups for host [ '.$host['host'].' ]';
 				break;
 			}
+			
+			zbx_valueTo($host['groupids'], array('array' => 1));
 
 			$host_db_fields = array(
 				'host' => null,
@@ -679,6 +681,7 @@ class CHost extends CZBXAPI{
 				'ipmi_privilege' => 0,
 				'ipmi_username' => '',
 				'ipmi_password' => '',
+				'groupids' => array()
 			);
 
 			if(!check_db_fields($host_db_fields, $host)){
@@ -686,6 +689,8 @@ class CHost extends CZBXAPI{
 				$error = 'Wrong fields for host [ '.$host['host'].' ]';
 				break;
 			}
+			
+			
 
 			$result = add_host($host['host'], $host['port'], $host['status'], $host['useip'], $host['dns'], $host['ip'],
 				$host['proxy_hostid'], $templates, $host['useipmi'], $host['ipmi_ip'], $host['ipmi_port'], $host['ipmi_authtype'],
@@ -738,7 +743,6 @@ class CHost extends CZBXAPI{
 
 		$result = false;
 
-//		self::BeginTransaction(__METHOD__);
 		self::BeginTransaction(__METHOD__);
 
 		foreach($hosts as $num => $host){
