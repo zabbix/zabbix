@@ -240,7 +240,7 @@ div.iconreset:hover{
 div.iconerror{
 	height: 14px;
 	width: 14px;
-	background-image: url('../images/general/error.png');
+	background-image: url('../images/general/error_icon.png');
 	background-repeat:no-repeat;
 }
 
@@ -251,7 +251,7 @@ div.iconerror:hover{
 div.iconok{
 	height: 14px;
 	width: 14px;
-	background-image: url('../images/general/ok.png');
+	background-image: url('../images/general/ok_icon.png');
 	background-repeat:no-repeat;
 }
 

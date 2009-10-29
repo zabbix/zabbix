@@ -515,20 +515,20 @@ class CItem extends CZBXAPI{
 	return $result;
 	}
 
-	/**
-	 * Gets all item data from DB by itemid
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @static
-	 * @param int $item_data
-	 * @param int $item_data['itemid']
-	 * @return array|boolean item data || false if error
-	 */
+/**
+ * Gets all item data from DB by itemid
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @static
+ * @param int $item_data
+ * @param int $item_data['itemid']
+ * @return array|boolean item data || false if error
+ */
 	public static function getById($item_data){
 		$item = get_item_by_itemid($item_data['itemid']);
 		$result = $item ? true : false;
@@ -540,22 +540,22 @@ class CItem extends CZBXAPI{
 		}
 	}
 
-	/**
-	 * Get itemid by host.name and item.key
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @static
-	 * @param array $item_data
-	 * @param array $item_data['key_']
-	 * @param array $item_data['host'] ALTERNATIVE
-	 * @param array $item_data['hostid'] ALTERNATIVE
-	 * @return int|boolean
-	 */
+/**
+ * Get itemid by host.name and item.key
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @static
+ * @param array $item_data
+ * @param array $item_data['key_']
+ * @param array $item_data['host'] ALTERNATIVE
+ * @param array $item_data['hostid'] ALTERNATIVE
+ * @return int|boolean
+ */
 	public static function getId($item_data){
 		if(isset($item_data['hostid'])){
 			$hostid = $item_data['hostid'];
@@ -584,54 +584,54 @@ class CItem extends CZBXAPI{
 		}
 	}
 
-	/**
-	 * Add item
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * Input array $items has following structure and default values :
-	 * <code>
-	 * array( array(
-	 * *'description'			=> *,
-	 * *'key_'				=> *,
-	 * *'hostid'				=> *,
-	 * 'delay'				=> 60,
-	 * 'history'				=> 7,
-	 * 'status'				=> ITEM_STATUS_ACTIVE,
-	 * 'type'				=> ITEM_TYPE_ZABBIX,
-	 * 'snmp_community'			=> '',
-	 * 'snmp_oid'				=> '',
-	 * 'value_type'				=> ITEM_VALUE_TYPE_STR,
-	 * 'data_type'				=> ITEM_DATA_TYPE_DECIMAL,
-	 * 'trapper_hosts'			=> 'localhost',
-	 * 'snmp_port'				=> 161,
-	 * 'units'				=> '',
-	 * 'multiplier'				=> 0,
-	 * 'delta'				=> 0,
-	 * 'snmpv3_securityname'		=> '',
-	 * 'snmpv3_securitylevel'		=> 0,
-	 * 'snmpv3_authpassphrase'		=> '',
-	 * 'snmpv3_privpassphrase'		=> '',
-	 * 'formula'				=> 0,
-	 * 'trends'				=> 365,
-	 * 'logtimefmt'				=> '',
-	 * 'valuemapid'				=> 0,
-	 * 'delay_flex'				=> '',
-	 * 'params'				=> '',
-	 * 'ipmi_sensor'			=> '',
-	 * 'applications'			=> array(),
-	 * 'templateid'				=> 0
-	 * ), ...);
-	 * </code>
-	 *
-	 * @static
-	 * @param array $items multidimensional array with items data
-	 * @return array|boolean
-	 */
+/**
+ * Add item
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * Input array $items has following structure and default values :
+ * <code>
+ * array( array(
+ * *'description'			=> *,
+ * *'key_'				=> *,
+ * *'hostid'				=> *,
+ * 'delay'				=> 60,
+ * 'history'				=> 7,
+ * 'status'				=> ITEM_STATUS_ACTIVE,
+ * 'type'				=> ITEM_TYPE_ZABBIX,
+ * 'snmp_community'			=> '',
+ * 'snmp_oid'				=> '',
+ * 'value_type'				=> ITEM_VALUE_TYPE_STR,
+ * 'data_type'				=> ITEM_DATA_TYPE_DECIMAL,
+ * 'trapper_hosts'			=> 'localhost',
+ * 'snmp_port'				=> 161,
+ * 'units'				=> '',
+ * 'multiplier'				=> 0,
+ * 'delta'				=> 0,
+ * 'snmpv3_securityname'		=> '',
+ * 'snmpv3_securitylevel'		=> 0,
+ * 'snmpv3_authpassphrase'		=> '',
+ * 'snmpv3_privpassphrase'		=> '',
+ * 'formula'				=> 0,
+ * 'trends'				=> 365,
+ * 'logtimefmt'				=> '',
+ * 'valuemapid'				=> 0,
+ * 'delay_flex'				=> '',
+ * 'params'				=> '',
+ * 'ipmi_sensor'			=> '',
+ * 'applications'			=> array(),
+ * 'templateid'				=> 0
+ * ), ...);
+ * </code>
+ *
+ * @static
+ * @param array $items multidimensional array with items data
+ * @return array|boolean
+ */
 	public static function add($items){
 		$itemids = array();
 		self::BeginTransaction(__METHOD__);
@@ -653,19 +653,19 @@ class CItem extends CZBXAPI{
 		}
 	}
 
-	/**
-	 * Update item
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @static
-	 * @param array $items multidimensional array with items data
-	 * @return boolean
-	 */
+/**
+ * Update item
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @static
+ * @param array $items multidimensional array with items data
+ * @return boolean
+ */
 	public static function update($items){
 
 		$result = true;
@@ -686,19 +686,19 @@ class CItem extends CZBXAPI{
 		}
 	}
 
-	/**
-	 * Delete items
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @static
-	 * @param array $itemids
-	 * @return array|boolean
-	 */
+/**
+ * Delete items
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @static
+ * @param array $itemids
+ * @return array|boolean
+ */
 	public static function delete($itemids){
 		$result = delete_item($itemids);
 		if($result)

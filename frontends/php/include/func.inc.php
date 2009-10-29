@@ -828,6 +828,139 @@ function zbx_value2array(&$values){
 		$values = $tmp;
 	}
 }
+
+// fuunction: zbx_valueTo
+// author: Aly
+function zbx_valueTo(&$value, $options){
+	if(is_null($value)) return false;
+	
+// object or array of objects to hash
+	if(isset($options['hash']) && isset($options['field'])){
+		if(!is_array($value)){
+			$value = array($value => $value);
+		}
+		else if(isset($value[$options['field']])){
+			$value = array($value[$options['field']] => $value);
+		}
+		else{
+			$result = array();
+
+			foreach($value as $key => $val){
+				if(!is_array($val)){
+					$result[$val] = $val;
+				}
+				else if(isset($val[$options['field']])){
+					$result[$val[$options['field']]] = $val;
+				}
+				else{
+					$value = null;
+					return false;
+				}
+			}
+		}
+
+	return true;
+	}
+	
+// Value or Array to Object or Array of objects
+	if(isset($options['object']) && isset($options['field'])){
+		if(!is_array($value)){
+			$value = array($options['field'] => $value);
+		}
+		else if(!isset($value[$options['field']])){
+			foreach($value as $key => $val){
+				if(!is_array($val)){
+					$value[$key] = array($options['field'] => $val);
+				}
+				else if(!isset($val[$options['field']])){
+					$value = null;
+					return false;
+				}
+			}
+		}
+
+		if($options['array']){
+			if(!is_array($value)) $value = array($value);
+			else if(!zbx_ctype_digit(key($value))) $value = array($value);
+		}
+	return true;
+	}
+
+// value or objects field or array of object to array 
+	if(isset($options['array']) && isset($options['field'])){
+		if(!is_array($value)){
+			$value = array($value);
+		}
+		else if(isset($value[$options['field']])){
+			$value = array($value[$options['field']]);
+		}
+		else{
+			foreach($value as $key => $val){
+				if(!is_array($val)){
+					//$value[$key] = $val;
+				}
+				else if(isset($val[$options['field']])){
+					$value[$key] = $val[$options['field']];
+				}
+				else{
+					$value = null;
+					return false;
+				}
+			}
+		}
+	return true;
+	}
+	
+// to array
+	if(isset($options['array'])){
+		if(!is_array($value)){
+			$value = array($value);
+		}
+		else if(zbx_ctype_digit(key($value))){
+			if(is_string(key($value))){
+				$new_value = array();
+				foreach($value as $key => $val){
+					$new_value[] = $val;
+				}
+				$value = $new_value;
+				unset($new_value);
+			}
+		}
+		else{ 
+			$value = array($value);
+		}
+	
+	return true;
+	}
+	
+// object field or array of objects to value
+	if(isset($options['field'])){
+		if(!is_array($value)){
+//			$value = $value;
+		}
+		else if(isset($value[$options['field']])){
+			$value = $value[$options['field']];
+		}
+		else{
+			$first = reset($value);
+
+			if(!is_array($first)){
+				$value = $first;
+			}
+			else if(isset($first[$options['field']])){
+				$value = $first[$options['field']];
+			}
+			else{
+				$value = null;
+				return false;
+			}
+		}
+		
+	return true;
+	}
+
+return false;
+}
 /************* END ZBX MISC *************/
 
 ?>

@@ -15,6 +15,12 @@ create/schema/oracle.sql
 create/schema/postgresql.sql
 create/schema/sqlite.sql
 /depcomp
+frontends/php/conf/zabbix.conf.php
+frontends/php/conf/zabbix.conf.php.bckp
+frontends/php/images/general/*.db
+frontends/php/images/general/bar/*.db
+frontends/php/images/general/bttn/*.db
+frontends/php/images/general/tree/*.db
 include/config.h
 include/config.h.in
 include/stamp-h1
