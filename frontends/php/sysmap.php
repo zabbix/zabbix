@@ -23,7 +23,7 @@
 	require_once('include/maps.inc.php');
 	require_once('include/forms.inc.php');
 
-	$page['title'] = "S_CONFIGURATION_OF_NETWORK_MAPS";
+	$page['title'] = 'S_CONFIGURATION_OF_NETWORK_MAPS';
 	$page['file'] = 'sysmap.php';
 	$page['hist_arg'] = array('sysmapid');
 
