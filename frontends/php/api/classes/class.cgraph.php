@@ -748,15 +748,26 @@ class CGraph extends CZBXAPI{
 	 * Delete graphs
 	 *
 	 * @static
-	 * @param array $graphids
+	 * @param _array $graphids
+	 * @param array $graphids['graphids']
 	 * @return boolean
 	 */
 	public static function delete($graphids){
-		$result = delete_graph($graphids);
+		$graphids = isset($graphids['graphids']) ? $graphids['graphids'] : array();
+		zbx_value2array($graphids);
+		
+		if(!empty($graphids)){
+			$result = delete_graph($graphids);
+		}
+		else{
+			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ graphids ]');
+			$result = false;
+		}
+		
 		if($result)
 			return true;
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::setError(__METHOD__);
 			return false;
 		}
 	}

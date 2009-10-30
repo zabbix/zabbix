@@ -447,33 +447,43 @@ class CMap extends CZBXAPI{
  * @version 1
  *
  * @param array $sysmapids
+ * @param array $sysmapids['sysmapids']
  * @return boolean
  */
 	public static function delete($sysmapids){
 		$result = true;
 
-		self::BeginTransaction(__METHOD__);
-		foreach($sysmapids as $sysmapid){
-			$result = delete_sysmaps_elements_with_sysmapid($sysmapids);
+		$sysmapids = isset($sysmapids['sysmapids']) ? $sysmapids['sysmapids'] : array();
+		zbx_value2array($sysmapids);
+		
+		if(!empty($sysmapids)){
+			self::BeginTransaction(__METHOD__);
+			foreach($sysmapids as $sysmapid){
+				$result &= delete_sysmaps_elements_with_sysmapid($sysmapids);
 
-			$res = DBselect('SELECT linkid FROM sysmaps_links WHERE '.DBcondition('sysmapid', $sysmapids));
-			while($rows = DBfetch($res)){
-				$result &= delete_link($rows['linkid']);
+				$res = DBselect('SELECT linkid FROM sysmaps_links WHERE '.DBcondition('sysmapid', $sysmapids));
+				while($rows = DBfetch($res)){
+					$result &= delete_link($rows['linkid']);
+				}
+
+				$result &= DBexecute('DELETE FROM sysmaps_elements WHERE '.DBcondition('sysmapid',$sysmapids));
+				$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.sysmapids' AND source='sysmapid' AND ".DBcondition('value_id', $sysmapids));
+				$result &= DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid', $sysmapids).' AND resourcetype='.SCREEN_RESOURCE_MAP);
+				$result &= DBexecute('DELETE FROM sysmaps WHERE '.DBcondition('sysmapid', $sysmapids));
+
+				if(!$result) break;
 			}
-
-			$result &= DBexecute('DELETE FROM sysmaps_elements WHERE '.DBcondition('sysmapid',$sysmapids));
-			$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.sysmapids' AND source='sysmapid' AND ".DBcondition('value_id', $sysmapids));
-			$result &= DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid', $sysmapids).' AND resourcetype='.SCREEN_RESOURCE_MAP);
-			$result &= DBexecute('DELETE FROM sysmaps WHERE '.DBcondition('sysmapid', $sysmapids));
-
-			if(!$result) break;
+			$result = self::EndTransaction($result, __METHOD__);
 		}
-		$result = self::EndTransaction($result, __METHOD__);
-
+		else{
+			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ sysmapids ]');
+			$result = false;
+		}
+		
 		if($result)
 			return true;
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::setError(__METHOD__);
 			return false;
 		}
 	}

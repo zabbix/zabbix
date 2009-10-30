@@ -483,7 +483,7 @@
 	else if($_REQUEST['config'] == 11){ // Macros
 	/* REMOVE MACROS */
 		if(isset($_REQUEST['macros_del']) && isset($_REQUEST['macros_rem'])){
-			$result = CUserMacro::deleteGlobalMacro($_REQUEST['macros_rem']);
+			$result = CUserMacro::deleteGlobalMacro(array('globalmacroids' => $_REQUEST['macros_rem']));
 		}
 	/* ADD MACRO */
 		if(isset($_REQUEST['macro_add'])){

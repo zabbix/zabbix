@@ -578,23 +578,31 @@ class CUserGroup extends CZBXAPI{
  * @version 1
  *
  * @param array $groupids
+ * @param array $groupids['usrgrpids']
  * @return boolean
  */
-	public static function delete($groupids){
+	public static function delete($usrgrpids){
 		$result = false;
+		$usrgrpids = isset($usrgrpids['usrgrpids']) ? $usrgrpids['usrgrpids'] : array();
+		$usrgrpids = zbx_value2array($usrgrpids);
 
-		self::BeginTransaction(__METHOD__);
-		foreach($groupids as $groupid){
-			$result = delete_user_group($groupid);
-			if(!$resukt) break;
+		if(!empty($usrgrpids)){
+			self::BeginTransaction(__METHOD__);
+			foreach($usrgrpids as $groupid){
+				$result = delete_user_group($groupid);
+				if(!$result) break;
+			}
+			$result = self::EndTransaction($result, __METHOD__);
 		}
-
-		$result = self::EndTransaction($result, __METHOD__);
+		else{
+			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ usrgrpids ]');
+			$result = false;
+		}
 
 		if($result)
 			return true;
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::setError(__METHOD__);
 			return false;
 		}
 	}

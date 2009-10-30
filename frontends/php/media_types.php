@@ -106,22 +106,29 @@ include_once('include/page_header.php');
 	}
 
 	else if($_REQUEST['go'] == 'delete'){
-		$result = true;
+		$go_result = true;
 		$media_types = get_request('media_types', array());
 
 		DBstart();
 		foreach($media_types as $media_typeid){
-			$result &= delete_mediatype($media_typeid);
-			if(!$result) break;
+			$go_result &= delete_mediatype($media_typeid);
+			if(!$go_result) break;
 		}
-		$result = DBend($result);
+		$go_result = DBend($go_result);
 
-		if($result){
+		if($go_result){
 			unset($_REQUEST['form']);
 		}
 
-		show_messages($result, S_MEDIA_TYPE_DELETED, S_MEDIA_TYPE_WAS_NOT_DELETED);
+		show_messages($go_result, S_MEDIA_TYPE_DELETED, S_MEDIA_TYPE_WAS_NOT_DELETED);
 	}
+
+	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
+		$url = new CUrl();
+		$path = $url->getPath();
+		insert_js('cookie.eraseArray("'.$path.'")');
+	}
+	
 ?>
 <?php
 	$medias_wdgt = new CWidget();

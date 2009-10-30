@@ -429,26 +429,37 @@ class CScreen extends CZBXAPI{
  * @version 1
  *
  * @param array $screenids
+ * @param array $screenids['screenids']
  * @return boolean
  */
 	public static function delete($screenids){
 		$result = true;
-
-		self::BeginTransaction(__METHOD__);
-		foreach($screenids as $screenid){
-			$result = DBexecute('DELETE FROM screens_items WHERE screenid='.$screenid);
-			$result &= DBexecute('DELETE FROM screens_items WHERE resourceid='.$screenid.' AND resourcetype='.SCREEN_RESOURCE_SCREEN);
-			$result &= DBexecute('DELETE FROM slides WHERE screenid='.$screenid);
-			$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.screenids' AND source='screenid' AND value_id=$screenid");
-			$result &= DBexecute('DELETE FROM screens WHERE screenid='.$screenid);
-			if(!$result) break;
+		$screenids = isset($screenids['screenids']) ? $screenids['screenids'] : array();
+		zbx_value2array($screenids);
+		
+		if(!empty($screenids)){
+			self::BeginTransaction(__METHOD__);
+			foreach($screenids as $screenid){
+				$result = DBexecute('DELETE FROM screens_items WHERE screenid='.$screenid);
+				$result &= DBexecute('DELETE FROM screens_items WHERE resourceid='.$screenid.' AND resourcetype='.SCREEN_RESOURCE_SCREEN);
+				$result &= DBexecute('DELETE FROM slides WHERE screenid='.$screenid);
+				$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.screenids' AND source='screenid' AND value_id=$screenid");
+				$result &= DBexecute('DELETE FROM screens WHERE screenid='.$screenid);
+				if(!$result) break;
+			}
+			$result = self::EndTransaction($result, __METHOD__);
 		}
-		$result = self::EndTransaction($result, __METHOD__);
+		else{
+			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ screenids ]');
+			$result = false;
+		}
+
+		
 
 		if($result)
 			return true;
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::setError(__METHOD__);
 			return false;
 		}
 	}

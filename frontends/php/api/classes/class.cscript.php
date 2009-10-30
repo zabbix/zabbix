@@ -454,14 +454,25 @@ class Cscript extends CZBXAPI{
  * @version 1
  *
  * @param _array $scriptids
+ * @param array $scriptids
  * @return boolean
  */
 	public static function delete($scriptids){
-		$result = delete_script($scriptids);
+		$scriptids = isset($scriptids['scriptids']) ? $scriptids['scriptids'] : array();
+		zbx_value2array($scriptids);
+		
+		if(!empty($scriptids)){
+			$result = delete_script($scriptids);
+		}
+		else{
+			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ scriptids ]');
+			$result = false;
+		}
+
 		if($result)
 			return true;
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::setError(__METHOD__);
 			return false;
 		}
 	}

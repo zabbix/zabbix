@@ -75,7 +75,7 @@ private $zbx2json_error_list;
 			return false;
 		}
 
-		if(!isset($call['params']) && !is_array($call['params'])){
+		if(isset($call['params']) && !is_array($call['params'])){
 			$this->json_error($call['id'], '-32602', 'JSON-rpc params is not an Array.');
 			return false;
 		}
@@ -188,7 +188,7 @@ private $zbx2json_error_list;
 		$this->zbx2json_errors = array(
 			'-32601' => array(ZBX_API_ERROR_NO_METHOD),
 			'-32602' => array(ZBX_API_ERROR_PARAMETERS, ZBX_API_ERROR_NO_AUTH),
-			'-32500' => array(ZBX_API_ERROR_NO_HOST, ZBX_API_ERROR_INTERNAL)
+			'-32500' => array(ZBX_API_ERROR_PERMISSIONS, ZBX_API_ERROR_INTERNAL)
 		);
 	}
 

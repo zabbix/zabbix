@@ -114,7 +114,7 @@ include_once('include/page_header.php');
 // --------- GO  ----------
 	else if($_REQUEST['go'] == 'delete'){
 /* group operations */
-			$result = true;
+			$go_result = true;
 
 			$groups = get_request('groups', array());
 
@@ -128,44 +128,41 @@ include_once('include/page_header.php');
 				if(!isset($groups[$db_group['groupid']])) continue;
 
 /*				if(!$group = get_hostgroup_by_groupid($db_group['groupid'])) continue;*/
-				$result &= delete_host_group($db_group['groupid']);
+				$go_result &= delete_host_group($db_group['groupid']);
 
 /*				if($result){
 					add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST_GROUP,
 					S_HOST_GROUP.' ['.$group['name'].' ] ['.$group['groupid'].']');
 				}*/
 			}
-			$result = DBend($result);
-			show_messages(true, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
+			$go_result = DBend($go_result);
+			show_messages($go_result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
 		}
-	else if(str_in_array($_REQUEST['go'], array('activate','disable'))){
-		$result = true;
-		$status = ($_REQUEST['go'] == 'activate')?HOST_STATUS_MONITORED:HOST_STATUS_NOT_MONITORED;
-		$groups = get_request('groups',array());
+	else if(str_in_array($_REQUEST['go'], array('activate', 'disable'))){
+	
+		$status = ($_REQUEST['go'] == 'activate') ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
+		$groups = get_request('groups', array());
+		if(!empty($groups)){
+			DBstart();
+			$hostids = CHost::get(array('groupids' => $groups, 'editable' => 1));
 
-		DBstart();
-		$sql = 'SELECT h.hostid, hg.groupid '.
-				' FROM hosts_groups hg, hosts h '.
-				' WHERE '.DBin_node('h.hostid').
-					' AND '.DBcondition('g.groupid', $groups).
-					' AND h.hostid=hg.hostid '.
-					' AND h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
-		$db_groups = DBselect($sql);
-		while($db_host=DBfetch($db_hosts)){
-			if(!isset($groups[$db_host['groupid']])) continue;
-			$host=get_host_by_hostid($db_host['hostid']);
-
-			$result &= update_host_status($db_host['hostid'],$status);
-/*			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,
-				'Old status ['.$host['status'].'] '.'New status ['.$status.']');*/
+			$go_result = CHost::massUpdate(array('hostids' => $hostids, 'status' => $status));
+			if(!$go_result)
+				error(CHost::resetErrors());
+				
+			$go_result = DBend($go_result);
+			
+			show_messages($go_result, S_HOST_STATUS_UPDATED, S_CANNOT_UPDATE_HOST);
 		}
-		$result = DBend($result);
-		show_messages($result, S_HOST_STATUS_UPDATED, S_CANNOT_UPDATE_HOST);
-
-		unset($_REQUEST['activate']);
 	}
-/*** --->>> ACTIONS <<<--- ***/
+	
+	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
+		$url = new CUrl();
+		$path = $url->getPath();
+		insert_js('cookie.eraseArray("'.$path.'")');
+	}
 
+	
 	if(isset($_REQUEST['form'])){
 		$frmForm = null;
 	}
@@ -294,15 +291,18 @@ include_once('include/page_header.php');
 			S_MEMBERS
 		));
 
+		$sortfield = getPageSortField('name');
+		$sortorder =  getPageSortOrder();
 		$options = array(
 			'editable' => 1,
 			'extendoutput' => 1,
+			'sortfield' => $sortfield,
+			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
 		$groups = CHostGroup::get($options);
 
-// sorting && paging
-		order_page_result($groups, 'name');
+		order_page_result($groups, $sortfield, $sortorder);
 		$paging = getPagingLine($groups);
 //-----
 
@@ -393,7 +393,7 @@ include_once('include/page_header.php');
 //----
 
 // PAGING FOOTER
-		$table = array($paging,$table,$paging,$footer);
+		$table = array($paging, $table, $paging, $footer);
 //---------
 
 		$form->addItem($table);
@@ -405,5 +405,4 @@ include_once('include/page_header.php');
 <?php
 
 include_once('include/page_footer.php');
-
 ?>

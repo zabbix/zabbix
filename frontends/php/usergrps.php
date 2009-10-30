@@ -191,17 +191,17 @@ include_once('include/page_header.php');
 
 		if(!empty($groups)){
 			DBstart();
-			$result = delete_user_group($groupids,$_REQUEST['set_gui_access']);
-			$result = DBend($result);
+			$go_result = delete_user_group($groupids,$_REQUEST['set_gui_access']);
+			$go_result = DBend($go_result);
 
-			if($result){
+			if($go_result){
 				$audit_action = ($_REQUEST['set_gui_access'] == GROUP_GUI_ACCESS_DISABLED)?AUDIT_ACTION_DISABLE:AUDIT_ACTION_UPDATE;
 				foreach($groups as $groupid => $group){
 					add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER_GROUP,'Group name ['.$group['name'].']');
 				}
 			}
 
-			show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
+			show_messages($go_result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
 		}
 	}
 	else if($_REQUEST['go'] == 'set_gui_access'){
@@ -220,17 +220,17 @@ include_once('include/page_header.php');
 
 		if(!empty($groups)){
 			DBstart();
-			$result = change_group_gui_access($groupids,$_REQUEST['set_gui_access']);
-			$result = DBend($result);
+			$go_result = change_group_gui_access($groupids,$_REQUEST['set_gui_access']);
+			$go_result = DBend($go_result);
 
-			if($result){
+			if($go_result){
 				$audit_action = ($_REQUEST['set_gui_access'] == GROUP_GUI_ACCESS_DISABLED)?AUDIT_ACTION_DISABLE:AUDIT_ACTION_ENABLE;
 				foreach($groups as $groupid => $group){
 					add_audit($audit_action,AUDIT_RESOURCE_USER_GROUP,'GUI access for group name ['.$group['name'].']');
 				}
 			}
 
-			show_messages($result, S_GUI_ACCESS_UPDATED, S_CANNOT_UPDATE_GUI_ACCESS);
+			show_messages($go_result, S_GUI_ACCESS_UPDATED, S_CANNOT_UPDATE_GUI_ACCESS);
 		}
 	}
 	else if(str_in_array($_REQUEST['go'], array('enable_api', 'disable_api'))){
@@ -251,17 +251,17 @@ include_once('include/page_header.php');
 
 		if(!empty($groups)){
 			DBstart();
-			$result = change_group_api_access($groupids,$set_api_access);
-			$result = DBend($result);
+			$go_result = change_group_api_access($groupids,$set_api_access);
+			$go_result = DBend($go_result);
 
-			if($result){
+			if($go_result){
 				$audit_action = ($set_api_access == GROUP_API_ACCESS_DISABLED)?AUDIT_ACTION_DISABLE:AUDIT_ACTION_ENABLE;
 				foreach($groups as $groupid => $group){
 					add_audit($audit_action,AUDIT_RESOURCE_USER_GROUP,'API access for group name ['.$group['name'].']');
 				}
 			}
 
-			show_messages($result, S_API_ACCESS_UPDATED, S_CANNOT_UPDATE_API_ACCESS);
+			show_messages($go_result, S_API_ACCESS_UPDATED, S_CANNOT_UPDATE_API_ACCESS);
 		}
 	}
 	else if(str_in_array($_REQUEST['go'], array('enable_debug', 'disable_debug'))){
@@ -282,10 +282,10 @@ include_once('include/page_header.php');
 
 		if(!empty($groups)){
 			DBstart();
-			$result = change_group_debug_mode($groupids,$set_debug_mode);
-			$result = DBend($result);
+			$go_result = change_group_debug_mode($groupids,$set_debug_mode);
+			$go_result = DBend($go_result);
 
-			if($result){
+			if($go_result){
 				$audit_action = ($set_debug_mode == GROUP_DEBUG_MODE_DISABLED)?AUDIT_ACTION_DISABLE:AUDIT_ACTION_ENABLE;
 
 				foreach($groups as $groupid => $group){
@@ -293,7 +293,7 @@ include_once('include/page_header.php');
 				}
 			}
 
-			show_messages($result, S_DEBUG_MODE_UPDATED, S_CANNOT_UPDATE_DEBUG_MODE);
+			show_messages($go_result, S_DEBUG_MODE_UPDATED, S_CANNOT_UPDATE_DEBUG_MODE);
 		}
 	}
 	else if(str_in_array($_REQUEST['go'], array('enable_status', 'disable_status'))){
@@ -314,18 +314,24 @@ include_once('include/page_header.php');
 
 		if(!empty($groups)){
 			DBstart();
-			$result = change_group_status($groupids,$set_users_status);
-			$result = DBend($result);
+			$go_result = change_group_status($groupids,$set_users_status);
+			$go_result = DBend($go_result);
 
-			if($result){
+			if($go_result){
 				$audit_action = ($set_users_status == GROUP_STATUS_ENABLED)?AUDIT_ACTION_ENABLE:AUDIT_ACTION_DISABLE;
 				foreach($groups as $groupid => $group){
 					add_audit($audit_action,AUDIT_RESOURCE_USER_GROUP,'User status for group name ['.$group['name'].']');
 				}
 			}
 
-			show_messages($result, S_USERS_STATUS_UPDATED, S_CANNOT_UPDATE_USERS_STATUS);
+			show_messages($go_result, S_USERS_STATUS_UPDATED, S_CANNOT_UPDATE_USERS_STATUS);
 		}
+	}
+
+	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
+		$url = new CUrl();
+		$path = $url->getPath();
+		insert_js('cookie.eraseArray("'.$path.'")');
 	}
 ?>
 <?php

@@ -40,6 +40,8 @@ init: function(){
 		}
 		else{
 			this.cookies[cookiePair[0]] = cookiePair[1];
+//SDI(cookiePair[0] + ' ' + cookiePair[1]);
+			
 		}
 	}
 },
@@ -167,5 +169,15 @@ printall: function(){
 erase: function(name){
 	this.create(name,'',-1);
 	this.cookies[name] = undefined;
+},
+
+eraseArray: function(name){
+	var part_count = parseInt(this.read('cb_'+name+'_parts'), 10);
+	if(!is_null(part_count)){
+		for(var i = 0; i < part_count; i++){
+			this.erase('cb_'+name+'_'+i);
+		}
+		this.erase('cb_'+name+'_parts');
+	}
 }
 }

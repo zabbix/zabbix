@@ -123,21 +123,27 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 		else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['scripts'])){
 			$scripts = $_REQUEST['scripts'];
 
-			$result = true;
+			$go_result = true;
 			foreach($scripts as $scriptid){
-				$result &= delete_script($scriptid);
+				$go_result &= delete_script($scriptid);
 
-				if($result){
+				if($go_result){
 					add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, S_SCRIPT.' ['.$scriptid.']');
 				}
 			}
 
-			show_messages($result, S_SCRIPT_DELETED, S_CANNOT_DELETE_SCRIPT);
+			show_messages($go_result, S_SCRIPT_DELETED, S_CANNOT_DELETE_SCRIPT);
 
-			if($result){
+			if($go_result){
 				unset($_REQUEST['form']);
 				unset($_REQUEST['scriptid']);
 			}
+		}
+		
+		if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
+			$url = new CUrl();
+			$path = $url->getPath();
+			insert_js('cookie.eraseArray("'.$path.'")');
 		}
 	}
 ?>

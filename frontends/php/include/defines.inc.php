@@ -20,6 +20,7 @@
 ?>
 <?php
 	define('ZABBIX_VERSION','1.7.1');
+	define('ZABBIX_API_VERSION','1.7.1');
 /* USER DEFINES */
 
 	define('ZBX_LOGIN_ATTEMPTS',				5);
@@ -672,6 +673,7 @@ if((ini_get('mbstring.func_overload') > 5)){
 	define('ZBX_API_ERROR_NO_HOST', 1);
 	define('ZBX_API_ERROR_INTERNAL', 111);
 	define('ZBX_API_ERROR_PARAMETERS', 100);
+	define('ZBX_API_ERROR_PERMISSIONS', 120);
 	define('ZBX_API_ERROR_NO_AUTH', 200);
 	define('ZBX_API_ERROR_NO_METHOD', 300);
 	//define('ZBX_API_ERROR_PARAMETERS', 100);

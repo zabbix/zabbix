@@ -231,14 +231,14 @@ include_once('include/page_header.php');
 	}
 // -------- GO ---------
 	else if(($_REQUEST['go'] == 'activate') && isset($_REQUEST['group_httptestid'])){
-		$result = false;
+		$go_result = false;
 
 		$group_httptestid = $_REQUEST['group_httptestid'];
 		foreach($group_httptestid as $id){
 			if(!($httptest_data = get_httptest_by_httptestid($id)))	continue;
 
 			if(activate_httptest($id)){
-				$result = true;
+				$go_result = true;
 
 				$host = get_host_by_applicationid($httptest_data['applicationid']);
 
@@ -247,17 +247,17 @@ include_once('include/page_header.php');
 					S_SCENARIO_ACTIVATED);
 			}
 		}
-		show_messages($result, S_SCENARIO_ACTIVATED, null);
+		show_messages($go_result, S_SCENARIO_ACTIVATED, null);
 	}
 	else if(($_REQUEST['go'] == 'disable') && isset($_REQUEST['group_httptestid'])){
-		$result = false;
+		$go_result = false;
 
 		$group_httptestid = $_REQUEST['group_httptestid'];
 		foreach($group_httptestid as $id){
 			if(!($httptest_data = get_httptest_by_httptestid($id)))	continue;
 
 			if(disable_httptest($id)){
-				$result = true;
+				$go_result = true;
 
 				$host = get_host_by_applicationid($httptest_data['applicationid']);
 
@@ -266,17 +266,17 @@ include_once('include/page_header.php');
 					S_SCENARIO_DISABLED);
 			}
 		}
-		show_messages($result, S_SCENARIO_DISABLED, null);
+		show_messages($go_result, S_SCENARIO_DISABLED, null);
 	}
 	else if(($_REQUEST['go'] == 'clean_history') && isset($_REQUEST['group_httptestid'])){
-		$result = false;
+		$go_result = false;
 
 		$group_httptestid = $_REQUEST['group_httptestid'];
 		foreach($group_httptestid as $id){
 			if(!($httptest_data = get_httptest_by_httptestid($id)))	continue;
 
 			if(delete_history_by_httptestid($id)){
-				$result = true;
+				$go_result = true;
 				DBexecute('update httptest set nextcheck=0'.
 					/* ',lastvalue=null,lastclock=null,prevvalue=null'. // for future use */
 					' where httptestid='.$id);
@@ -288,17 +288,17 @@ include_once('include/page_header.php');
 					S_HISTORY_CLEANED);
 			}
 		}
-		show_messages($result, S_HISTORY_CLEANED, $result);
+		show_messages($go_result, S_HISTORY_CLEANED, $go_result);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_httptestid'])){
-		$result = false;
+		$go_result = false;
 
 		$group_httptestid = $_REQUEST['group_httptestid'];
 		foreach($group_httptestid as $id){
 			if(!($httptest_data = get_httptest_by_httptestid($id)))	continue;
 			/* if($httptest_data['templateid']<>0)	continue; // for future use */
 			if(delete_httptest($id)){
-				$result = true;
+				$go_result = true;
 
 				$host = get_host_by_applicationid($httptest_data['applicationid']);
 
@@ -306,8 +306,15 @@ include_once('include/page_header.php');
 					S_SCENARIO.' ['.$httptest_data['name'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].']');
 			}
 		}
-		show_messages($result, S_SCENARIO_DELETED, null);
+		show_messages($go_result, S_SCENARIO_DELETED, null);
 	}
+
+	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
+		$url = new CUrl();
+		$path = $url->getPath();
+		insert_js('cookie.eraseArray("'.$path.'")');
+	}
+	
 ?>
 <?php
 	/* make steps with unique names */
