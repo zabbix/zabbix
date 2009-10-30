@@ -404,7 +404,6 @@ class zbxXML{
 		$xml = @simplexml_load_file($file);
 
 		if(!$xml){
-
 			foreach(libxml_get_errors() as $error){
 				$text = '';
 
@@ -475,12 +474,14 @@ class zbxXML{
 							$host_groupids[] = $current_groupid;
 						}
 					}
-
-					$new_groupids = CHostGroup::add($groups_to_add);
-					if($new_groupids === false){
-						error(CHostGroup::resetErrors());
-						$result = false;
-						break;
+					if(!empty($groups_to_add)){
+						$new_groupids = CHostGroup::add($groups_to_add);
+					
+						if($new_groupids === false){
+							error(CHostGroup::resetErrors());
+							$result = false;
+							break;
+						}
 					}
 				}
 
@@ -499,11 +500,13 @@ class zbxXML{
 						$result = false;
 						break;
 					}
-					$r = CHostGroup::addGroupsToHost(array('hostid' => $current_hostid, 'groupids' => $new_groupids));
-					if($r === false){
-						error(CHostGroup::resetErrors());
-						$result = false;
-						break;
+					if(!empty($new_groupids)){
+						$r = CHostGroup::addHosts(array('hostids' => $current_hostid, 'groupids' => $new_groupids));
+						if($r === false){
+							error(CHostGroup::resetErrors());
+							$result = false;
+							break;
+						}
 					}
 				}
 
@@ -644,6 +647,7 @@ class zbxXML{
 						break;
 					}
 				}
+
 // TRIGGERS
 
 				if(isset($rules['trigger']['exist']) || isset($rules['trigger']['missed'])){
@@ -673,25 +677,28 @@ class zbxXML{
 							$triggers_to_add[] = $trigger_db;
 						}
 					}
- // sdii($triggers_to_add);
-//  sdii($triggers_to_upd);
-					$added_triggers = CTrigger::add($triggers_to_add);
-					if($added_triggers === false){
-						error(CTrigger::resetErrors());
-						$result = false;
-						break;
+// sdii($triggers_to_add);
+// sdii($triggers_to_upd);
+					if(!empty($triggers_to_add)){
+						$added_triggers = CTrigger::add($triggers_to_add);
+						if($added_triggers === false){
+							error(CTrigger::resetErrors());
+							$result = false;
+							break;
+						}
 					}
 
-					$r = CTrigger::update($triggers_to_upd);
-					if($r === false){
-						error(CTrigger::resetErrors());
-						$result = false;
-						break;
+					if(!empty($triggers_to_upd)){
+						$r = CTrigger::update($triggers_to_upd);
+						if($r === false){
+							error(CTrigger::resetErrors());
+							$result = false;
+							break;
+						}
 					}
 
 					$triggers_for_dependencies = array_merge($triggers_for_dependencies, $added_triggers);
 				}
-
 // TEMPLATES
 				if(isset($rules['template']['exist'])){
 					$templates = $host->xpath('templates/template');

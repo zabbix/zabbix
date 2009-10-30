@@ -772,8 +772,9 @@ class CTemplate extends CZBXAPI{
 		}
 		if($result){
 			foreach($templateids as $templateid){
-				$result = sync_host_with_templates($hostid, $templateid);
-				if(!$result) break;
+//				$result = sync_host_with_templates($hostid, $templateid);
+				sync_host_with_templates($hostid, $templateid);
+//				if(!$result) break;
 			}
 		}
 		$result = self::EndTransaction($result, __METHOD__);
