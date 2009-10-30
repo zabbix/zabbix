@@ -458,7 +458,7 @@ static void	DCcheck_freemem(size_t sz)
 {
 	if (config->free_mem < sz)
 	{
-		zbx_error("Configuration buffer is too small");
+		zbx_error("Configuration buffer is too small. Please increase ConfigSize parameter.");
 		exit(FAIL);
 	}
 }
@@ -1913,9 +1913,11 @@ void	init_configuration_cache()
 
 	ZBX_GET_SHM_DBCONFIG_KEY(shm_key);
 
-	if (CONFIG_DBCONFIG_SIZE < sizeof(ZBX_DC_CONFIG))
+	sz = sizeof(ZBX_DC_CONFIG);
+
+	if (CONFIG_DBCONFIG_SIZE < sz)
 	{
-		zbx_error("Configuration buffer is too small");
+		zbx_error("Configuration buffer is too small. Please increase ConfigSize parameter.");
 		exit(FAIL);
 	}
 
@@ -1943,10 +1945,8 @@ void	init_configuration_cache()
 	}
 
 	config = ptr;
-	memset(config, 0, sizeof(ZBX_DC_CONFIG));
-	config->free_mem = CONFIG_DBCONFIG_SIZE;
-
-	sz = sizeof(ZBX_DC_CONFIG);
+	memset(config, 0, sz);
+	config->free_mem = CONFIG_DBCONFIG_SIZE - sz;
 
 	config->items = ptr + sz;
 	config->snmpitems = ptr + sz;
@@ -1962,8 +1962,6 @@ void	init_configuration_cache()
 	config->ipmihosts = ptr + sz;
 	config->idxhost01 = ptr + sz;	/* proxy_hostid,host */
 	config->idxhost02 = ptr + sz;	/* poller_type,poller_num */
-
-	config->free_mem -= sz;
 }
 
 /******************************************************************************
