@@ -324,16 +324,21 @@ include_once('include/page_header.php');
 
 		DBstart();
 		foreach($_REQUEST['g_triggerid'] as $id => $triggerid){
-			$row = DBfetch(DBselect('SELECT triggerid,templateid FROM triggers t WHERE t.triggerid='.$triggerid));
+			$row = DBfetch(DBselect('SELECT triggerid,templateid, description FROM triggers t WHERE t.triggerid='.$triggerid));
+			$description = expand_trigger_description($triggerid);
 			if($row['templateid'] <> 0){
 				unset($_REQUEST['g_triggerid'][$id]);
+				error("Cannot delete trigger [ $description ] (Templated trigger)");
 				continue;
 			}
-			$description = expand_trigger_description($triggerid);
+			
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $triggerid, $description, NULL, NULL, NULL);
 		}
-		$go_result = delete_trigger($_REQUEST['g_triggerid']);
-
+		
+		$go_result = !empty($_REQUEST['g_triggerid']);
+		if($go_result){
+			$go_result = delete_trigger($_REQUEST['g_triggerid']);
+		}
 		$go_result = DBend($go_result);
 		show_messages($go_result, S_TRIGGERS_DELETED, S_CANNOT_DELETE_TRIGGERS);
 	}
@@ -428,7 +433,6 @@ include_once('include/page_header.php');
 		insert_mass_update_trigger_form();
 	}
 	else if(isset($_REQUEST['form'])){
-/* FORM */
 		insert_trigger_form();
 	}
 	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['g_triggerid'])){
