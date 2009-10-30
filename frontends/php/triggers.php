@@ -24,21 +24,16 @@ require_once('include/hosts.inc.php');
 require_once('include/triggers.inc.php');
 require_once('include/forms.inc.php');
 
-$page['title'] = "S_CONFIGURATION_OF_TRIGGERS";
+$page['title'] = 'S_CONFIGURATION_OF_TRIGGERS';
 $page['file'] = 'triggers.php';
 $page['hist_arg'] = array('hostid','groupid');
 
 include_once('include/page_header.php');
 
-$_REQUEST['config'] = get_request('config', 'triggers.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-//  NEW  templates.php; hosts.php; items.php; triggers.php; graphs.php; maintenances.php;
-// 	OLD  0 - hosts; 1 - groups; 2 - linkages; 3 - templates; 4 - applications; 5 - Proxies; 6 - maintenance
-		'config'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-
 		'groupid'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID, null),
 		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID, null),
 
@@ -147,6 +142,9 @@ $_REQUEST['config'] = get_request('config', 'triggers.php');
 		if($result){
 			unset($_REQUEST['massupdate']);
 			unset($_REQUEST['form']);
+			$url = new CUrl();
+			$path = $url->getPath();
+			insert_js('cookie.eraseArray("'.$path.'")');
 		}
 	}
 	else if(isset($_REQUEST['save'])){
@@ -244,7 +242,7 @@ $_REQUEST['config'] = get_request('config', 'triggers.php');
 		}
 	}
 // ------- GO ---------
-	else if(str_in_array($_REQUEST['go'], array('activate','disable')) && isset($_REQUEST['g_triggerid'])){
+	else if(str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_triggerid'])){
 
 		$_REQUEST['g_triggerid'] = array_intersect($_REQUEST['g_triggerid'],$available_triggers);
 
@@ -267,17 +265,17 @@ $_REQUEST['config'] = get_request('config', 'triggers.php');
 		}
 
 		DBstart();
-		$result = update_trigger_status($_REQUEST['g_triggerid'],$status);
+		$go_result = update_trigger_status($_REQUEST['g_triggerid'],$status);
 
-		if($result){
+		if($go_result){
 			foreach($_REQUEST['g_triggerid'] as $id => $triggerid){
 				$serv_status = (isset($_REQUEST['group_enable'])) ? get_service_status_of_trigger($triggerid) : 0;
 				update_services($triggerid, $serv_status); // updating status to all services by the dependency
 				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, $triggerid, $triggers[$triggerid]['description'], 'triggers', $status_old, $status_new);
 			}
 		}
-		$result = DBend($result);
-		show_messages($result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
+		$go_result = DBend($go_result);
+		show_messages($go_result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
 
 	}
 	else if(isset($_REQUEST['copy']) && isset($_REQUEST['g_triggerid']) && ($_REQUEST['go'] == 'copy_to')){
@@ -298,7 +296,7 @@ $_REQUEST['config'] = get_request('config', 'triggers.php');
 				}
 			}
 
-			$result = false;
+			$go_result = false;
 			$new_triggerids = array();
 
 			DBstart();
@@ -307,19 +305,19 @@ $_REQUEST['config'] = get_request('config', 'triggers.php');
 					$newtrigid = copy_trigger_to_host($trigger_id, $host_id, true);
 
 					$new_triggerids[$trigger_id] = $newtrigid;
-					$result |= (bool) $newtrigid;
+					$go_result |= (bool) $newtrigid;
 				}
 
 //				replace_triggers_depenedencies($new_triggerids);
 			}
 
-			$result = DBend($result);
-			$_REQUEST['go'] = 'none';
+			$go_result = DBend($go_result);
+			$_REQUEST['go'] = 'none2';
 		}
 		else{
 			error('No target selection.');
 		}
-		show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
+		show_messages($go_result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['g_triggerid'])){
 		$_REQUEST['g_triggerid'] = array_intersect($_REQUEST['g_triggerid'],$available_triggers);
@@ -334,11 +332,18 @@ $_REQUEST['config'] = get_request('config', 'triggers.php');
 			$description = expand_trigger_description($triggerid);
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $triggerid, $description, NULL, NULL, NULL);
 		}
-		$result = delete_trigger($_REQUEST['g_triggerid']);
+		$go_result = delete_trigger($_REQUEST['g_triggerid']);
 
-		$result = DBend($result);
-		show_messages($result, S_TRIGGERS_DELETED, S_CANNOT_DELETE_TRIGGERS);
+		$go_result = DBend($go_result);
+		show_messages($go_result, S_TRIGGERS_DELETED, S_CANNOT_DELETE_TRIGGERS);
 	}
+	
+	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
+		$url = new CUrl();
+		$path = $url->getPath();
+		insert_js('cookie.eraseArray("'.$path.'")');
+	}
+	
 ?>
 <?php
 	if(isset($_REQUEST['hostid']) && !isset($_REQUEST['groupid']) && !isset($_REQUEST['triggerid'])){
@@ -402,8 +407,7 @@ $_REQUEST['config'] = get_request('config', 'triggers.php');
 	$form->setMethod('get');
 
 // Config
-	$cmbConf = new CComboBox('config','triggers.php','javascript: submit()');
-	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');
+	$cmbConf = new CComboBox('config','triggers.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('templates.php',S_TEMPLATES);
 		$cmbConf->addItem('hosts.php',S_HOSTS);
 		$cmbConf->addItem('items.php',S_ITEMS);

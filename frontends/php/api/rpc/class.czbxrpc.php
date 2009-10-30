@@ -21,47 +21,62 @@
 <?php
 
 class czbxrpc{
-public static $result;
+	public static $result;
 
 	public static function call($method, $params, $sessionid=null){
+		global $USER_DETAILS;
+		
 		$process = true;
 
 // List of methods without params
 		$notifications = array(
-			'host.delete_all'=>1	// example!
+			'apiinfo.version' => 1
 		);
 
 		if(is_null($params) && !isset($notifications[$method])){
-			self::$result = array('error'=>ZBX_API_ERROR_PARAMETERS);
+			self::$result = array('error' => ZBX_API_ERROR_PARAMETERS);
 			return self::$result;
 		}
 //-----
 
-		list($resource, $action) = explode('.',$method);
-// Authentication
+		list($resource, $action) = explode('.', $method);
+		
+		$without_auth = array('apiinfo.version'); // list of methods which does not require athentication
+		
+		if(!str_in_array($method, $without_auth)){
+// Authentication {{{
+			if(($resource == 'user') && ($action == 'authenticate')){
+				$sessionid = null;
 
-		if(($resource == 'user') && ($action == 'authenticate')){
-			$sessionid = null;
-
-			$user = CUser::get(array('users' => $params['user'], 'extendoutput' => 1, 'get_access' => 1));
-			$user = reset($user);
-			if($user['api_access'] != GROUP_API_ACCESS_ENABLED){
-				self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'No API access');
-				return self::$result;
+				$user = CUser::get(array('users' => $params['user'], 'extendoutput' => 1, 'get_access' => 1));
+				$user = reset($user);
+				if($user['api_access'] != GROUP_API_ACCESS_ENABLED){
+					self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'No API access');
+					return self::$result;
+				}
 			}
-		}
 
-		if(empty($sessionid) && (($resource != 'user') || ($action != 'authenticate'))){
-			self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
-			return self::$result;
-		}
-		else if(!empty($sessionid)){
-			if(!CUser::checkAuth(array('sessionid' => $sessionid))){
+			if(empty($sessionid) && (($resource != 'user') || ($action != 'authenticate'))){
 				self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
 				return self::$result;
 			}
+			else if(!empty($sessionid)){
+				if(!CUser::checkAuth(array('sessionid' => $sessionid))){
+					self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
+					return self::$result;
+				}
+				
+				$user = CUser::get(array('userids' => $USER_DETAILS['userid'], 'extendoutput' => 1, 'get_access' => 1));
+				$user = reset($user);
+				if($user['api_access'] != GROUP_API_ACCESS_ENABLED){
+					self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'No API access');
+					return self::$result;
+				}
+			}
+// }}} Authentication
 		}
-
+		
+		
 		$class_name = 'C'.$resource;
 		if(!method_exists($class_name, $action)){
 			self::$result = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Action does not exists');
@@ -78,6 +93,18 @@ public static $result;
 	return self::$result;
 	}
 
+// APIINFO
+	private static function apiinfo($action, $params){
+
+		CAPIInfo::$error = array();
+
+		switch($action){
+			default:
+			$result = call_user_func(array('CAPIInfo', $action), $params);
+		}
+
+		self::$result = $result;
+	}
 // USER
 	private static function user($action, $params){
 

@@ -852,18 +852,29 @@ class CUserMacro extends CZBXAPI{
  * @since 1.8
  * @version 1
  *
- * @param array $macroids
+ * @param array $hostmacroids
+ * @param array $hostmacroids['hostmacroids']
  * @return boolean
  */
 	public static function deleteHostMacro($hostmacroids){
+	
+		$hostmacroids = isset($hostmacroids['hostmacroids']) ? $hostmacroids['hostmacroids'] : array();
 		zbx_value2array($hostmacroids);
+		
+		if(!empty($hostmacroids)){
+			$sql = 'DELETE FROM hostmacro WHERE '.DBcondition('hostmacroid', $hostmacroids);
+			$result = DBexecute($sql);
+		}
+		else{
+			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ hostmacroids ]');
+			$result = false;
+		}
 
-		$sql = 'DELETE FROM hostmacro WHERE '.DBcondition('hostmacroid', $hostmacroids);
-		$result = DBexecute($sql);
+		
 		if($result)
 			return $hostmacroids;
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
+			self::setError(__METHOD__);
 			return false;
 		}
 	}
@@ -877,18 +888,27 @@ class CUserMacro extends CZBXAPI{
  * @since 1.8
  * @version 1
  *
- * @param array $macroids
+ * @param array $globalmacroids
+ * @param array $globalmacroids['globalmacroids']
  * @return boolean
  */
 	public static function deleteGlobalMacro($globalmacroids){
+		$globalmacroids = isset($globalmacroids['globalmacroids']) ? $globalmacroids['globalmacroids'] : array();
 		zbx_value2array($globalmacroids);
+		
+		if(!empty($globalmacroids)){
+			$sql = 'DELETE FROM globalmacro WHERE '.DBcondition('globalmacroid', $globalmacroids);
+			$result = DBexecute($sql);
+		}
+		else{
+			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ globalmacroids ]');
+			$result = false;
+		}
 
-		$sql = 'DELETE FROM globalmacro WHERE '.DBcondition('globalmacroid', $globalmacroids);
-		$result = DBexecute($sql);
 		if($result)
 			return $globalmacroids;
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
+			self::setError(__METHOD__);
 			return false;
 		}
 	}

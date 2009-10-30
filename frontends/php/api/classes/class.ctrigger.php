@@ -462,18 +462,18 @@ class CTrigger extends CZBXAPI{
 	}
 
 /**
- * Gets all trigger data from DB by Trigger ID
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $trigger
- * @param array $trigger['triggerid']
- * @return array|boolean array of trigger data || false if error
- */
+	 * Gets all trigger data from DB by Trigger ID
+	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $trigger
+	 * @param array $trigger['triggerid']
+	 * @return array|boolean array of trigger data || false if error
+	 *
 	public static function getById($trigger){
 		$trigger =  get_trigger_by_triggerid($trigger['triggerid']);
 		$result = $trigger ? true : false;
@@ -484,22 +484,23 @@ class CTrigger extends CZBXAPI{
 
 		return $result;
 	}
+*/
 
 /**
- * Get triggerid by host.host and trigger.expression
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
+	 * Get triggerid by host.host and trigger.expression
+	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
  * @param _array $triggers multidimensional array with trigger objects
  * @param array $triggers[0,...]['expression']
  * @param array $triggers[0,...]['host']
  * @param array $triggers[0,...]['hostid'] OPTIONAL
  * @param array $triggers[0,...]['description'] OPTIONAL
- */
+	 */
 	public static function getId($triggers){
 		zbx_valueTo($triggers, array('array' => 1));
 
@@ -507,10 +508,10 @@ class CTrigger extends CZBXAPI{
 
 		$triggerids = array();
 		foreach($triggers as $num => $trigger){
-			$sql_where = '';
-			$sql_from = '';
+		$sql_where = '';
+		$sql_from = '';
 			if(isset($trigger['hostid']) || isset($trigger['host'])){
-				$sql_from .= ', functions f, items i, hosts h ';
+			$sql_from .= ', functions f, items i, hosts h ';
 
 				$sql_where .= ' f.itemid=i.itemid '.
 					' AND f.triggerid=t.triggerid'.
@@ -523,26 +524,26 @@ class CTrigger extends CZBXAPI{
 					$sql_where .= ' AND h.host='.zbx_dbstr($trigger['host']);
 			}
 
-			if(isset($trigger['description'])) {
-				$sql_where .= ' AND t.description='.zbx_dbstr($trigger['description']);
-			}
+		if(isset($trigger['description'])) {
+			$sql_where .= ' AND t.description='.zbx_dbstr($trigger['description']);
+		}
 
-			$sql = 'SELECT DISTINCT t.triggerid, t.expression '.
-					' FROM triggers t'.$sql_from.
-					' WHERE '.$sql_where.
-						' AND '.DBin_node('t.triggerid', get_current_nodeid(false));
-			if($db_triggers = DBselect($sql)){
-				$result = true;
-				$triggerid = null;
+		$sql = 'SELECT DISTINCT t.triggerid, t.expression '.
+				' FROM triggers t'.$sql_from.
+				' WHERE '.$sql_where.
+					' AND '.DBin_node('t.triggerid', get_current_nodeid(false));
+		if($db_triggers = DBselect($sql)){
+			$result = true;
+			$triggerid = null;
 
-				while($tmp_trigger = DBfetch($db_triggers)) {
-					$tmp_exp = explode_exp($tmp_trigger['expression'], false);
-					if(strcmp($tmp_exp, $trigger['expression']) == 0) {
+			while($tmp_trigger = DBfetch($db_triggers)) {
+				$tmp_exp = explode_exp($tmp_trigger['expression'], false);
+				if(strcmp($tmp_exp, $trigger['expression']) == 0) {
 						$triggerids[] = array_merge($trigger, $tmp_trigger);
-						break;
-					}
+					break;
 				}
 			}
+		}
 		}
 
 		if($result)
@@ -554,25 +555,25 @@ class CTrigger extends CZBXAPI{
 	}
 
 /**
- * Add triggers
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $triggers multidimensional array with triggers data
- * @param array $triggers[0,...]['expression']
- * @param array $triggers[0,...]['description']
- * @param array $triggers[0,...]['type'] OPTIONAL
- * @param array $triggers[0,...]['priority'] OPTIONAL
- * @param array $triggers[0,...]['status'] OPTIONAL
- * @param array $triggers[0,...]['comments'] OPTIONAL
- * @param array $triggers[0,...]['url'] OPTIONAL
+	 * Add triggers
+	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $triggers multidimensional array with triggers data
+	 * @param array $triggers[0,...]['expression']
+	 * @param array $triggers[0,...]['description']
+	 * @param array $triggers[0,...]['type'] OPTIONAL
+	 * @param array $triggers[0,...]['priority'] OPTIONAL
+	 * @param array $triggers[0,...]['status'] OPTIONAL
+	 * @param array $triggers[0,...]['comments'] OPTIONAL
+	 * @param array $triggers[0,...]['url'] OPTIONAL
  * @param array $triggers[0,...]['templateid'] OPTIONAL
- * @return boolean
- */
+	 * @return boolean
+	 */
 	public static function add($triggers){
 		zbx_valueTo($triggers, array('array'=>1));
 		
@@ -607,7 +608,7 @@ class CTrigger extends CZBXAPI{
 									$trigger['url'],
 									null,
 									$trigger['templateid']
-								);
+									);
 								
 			if(!$triggerid){
 				$result = false;
@@ -627,25 +628,25 @@ class CTrigger extends CZBXAPI{
 	}
 
 /**
- * Update triggers
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $triggers multidimensional array with triggers data
- * @param array $triggers[0,...]['expression']
- * @param array $triggers[0,...]['description'] OPTIONAL
- * @param array $triggers[0,...]['type'] OPTIONAL
- * @param array $triggers[0,...]['priority'] OPTIONAL
- * @param array $triggers[0,...]['status'] OPTIONAL
- * @param array $triggers[0,...]['comments'] OPTIONAL
- * @param array $triggers[0,...]['url'] OPTIONAL
+	 * Update triggers
+	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $triggers multidimensional array with triggers data
+	 * @param array $triggers[0,...]['expression']
+	 * @param array $triggers[0,...]['description'] OPTIONAL
+	 * @param array $triggers[0,...]['type'] OPTIONAL
+	 * @param array $triggers[0,...]['priority'] OPTIONAL
+	 * @param array $triggers[0,...]['status'] OPTIONAL
+	 * @param array $triggers[0,...]['comments'] OPTIONAL
+	 * @param array $triggers[0,...]['url'] OPTIONAL
  * @param array $triggers[0,...]['templateid'] OPTIONAL
- * @return boolean
- */
+	 * @return boolean
+	 */
 	public static function update($triggers){
 		zbx_valueTo($triggers, array('array'=>1));
 		
@@ -701,6 +702,7 @@ class CTrigger extends CZBXAPI{
  *
  * @param _array $triggers multidimensional array with trigger objects
  * @param array $triggers[0,...]['triggerid']
+ * @param _array $triggerids['triggerids']
  * @return boolean
  */
 	public static function delete($triggers){
@@ -711,29 +713,36 @@ class CTrigger extends CZBXAPI{
 			$triggerids[] = $trigger['triggerid'];
 		}
 		
-		$result = delete_trigger($triggerids);
+		if(!empty($triggerids)){
+			$result = delete_trigger($triggerids);
+		}
+		else{
+			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ triggerids ]');
+			$result = false;
+		}
+		
 		if($result)
 			return $result;
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::setError(__METHOD__);
 			return false;
 		}
 	}
 
 /**
- * Add dependency for trigger
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $triggers_data
- * @param array $triggers_data['triggerid]
- * @param array $triggers_data['depends_on_triggerid']
- * @return boolean
- */
+	 * Add dependency for trigger
+	 *
+	 * {@source}
+	 * @access public
+	 * @static
+	 * @since 1.8
+	 * @version 1
+	 *
+	 * @param _array $triggers_data
+	 * @param array $triggers_data['triggerid]
+	 * @param array $triggers_data['depends_on_triggerid']
+	 * @return boolean
+	 */
 	public static function addDependency($triggers_data){
 		zbx_valueTo($triggers_data, array('array' => 1));
 		

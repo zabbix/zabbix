@@ -731,7 +731,7 @@ class zbxXML{
 						if($current_graphid && !isset($rules['graph']['exist'])) continue; // break if not update exist
 //sdi('graph: '.$graph_db['name'].' | graphID: '. $current_graphid);
 						if($current_graphid){ // if exists, delete graph to add then new
-							CGraph::delete(array('graphid' => $current_graphid));
+							CGraph::delete(array('graphids' => $current_graphid));
 						}
 //sdii($graph_db);
 						$gitems = $graph->xpath('graph_elements/graph_element');

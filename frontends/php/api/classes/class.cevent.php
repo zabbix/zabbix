@@ -541,17 +541,26 @@ class CEvent extends CZBXAPI{
  * @version 1
  *
  * @param _array $eventids
+ * @param array $eventids['eventids']
  * @return boolean
  */
 	public static function delete($eventids){
+		$eventids = isset($eventids['eventids']) ? $eventids['eventids'] : array();
 		zbx_value2array($eventids);
-		$sql = 'DELETE FROM events WHERE '.DBcondition('eventid', $eventids);
-		$result = DBexecute($sql);
+		
+		if(!empty($eventids)){
+			$sql = 'DELETE FROM events WHERE '.DBcondition('eventid', $eventids);
+			$result = DBexecute($sql);
+		}
+		else{
+			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ eventids ]');
+			$result = false;
+		}
 
 		if($result)
 			return true;
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::setError(__METHOD__);
 			return false;
 		}
 	}

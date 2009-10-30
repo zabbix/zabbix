@@ -127,20 +127,20 @@ include_once('include/page_header.php');
 			unset($_REQUEST["form"]);
 		}
 		else if($_REQUEST['go'] == 'delete'){
-			$result = true;
+			$go_result = true;
 			$screens = get_request('screens', array());
 
 			DBstart();
 			foreach($screens as $screenid){
-				$result &= delete_screen($screenid);
-				if(!$result) break;
+				$go_result &= delete_screen($screenid);
+				if(!$go_result) break;
 			}
-			$result = DBend($result);
+			$go_result = DBend($go_result);
 
-			if($result){
+			if($go_result){
 				unset($_REQUEST["form"]);
 			}
-			show_messages($result, S_SCREEN_DELETED, S_CANNOT_DELETE_SCREEN);
+			show_messages($go_result, S_SCREEN_DELETED, S_CANNOT_DELETE_SCREEN);
 		}
 	}
 	else{
@@ -235,21 +235,27 @@ include_once('include/page_header.php');
 			unset($_REQUEST["form"]);
 		}
 		else if($_REQUEST['go'] == 'delete'){
-			$result = true;
+			$go_result = true;
 			$shows = get_request('shows', array());
 
 			DBstart();
 			foreach($shows as $showid){
-				$result &= delete_slideshow($showid);
-				if(!$result) break;
+				$go_result &= delete_slideshow($showid);
+				if(!$go_result) break;
 			}
-			$result = DBend($result);
+			$go_result = DBend($go_result);
 
-			if($result){
+			if($go_result){
 				unset($_REQUEST["form"]);
 			}
-			show_messages($result, S_SLIDESHOW_DELETED, S_CANNOT_DELETE_SLIDESHOW);
+			show_messages($go_result, S_SLIDESHOW_DELETED, S_CANNOT_DELETE_SLIDESHOW);
 		}
+	}
+	
+	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
+		$url = new CUrl();
+		$path = $url->getPath();
+		insert_js('cookie.eraseArray("'.$path.'")');
 	}
 ?>
 <?php

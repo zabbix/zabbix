@@ -200,7 +200,7 @@ require_once('include/forms.inc.php');
 			}
 
 			$result = CTemplate::update(array(array('hostid' => $templateid, 'host' => $template_name)));
-			$result &= CHostGroup::updateGroupsToHost(array('hostid' => $templateid, 'groupids' => $groups));
+			$result &= CHostGroup::updateHosts(array('hostids' => $templateid, 'groupids' => $groups));
 			$msg_ok 	= S_TEMPLATE_UPDATED;
 			$msg_fail 	= S_CANNOT_UPDATE_TEMPLATE;
 		}
@@ -376,7 +376,7 @@ require_once('include/forms.inc.php');
 			$unlink_mode = true;
 		}
 
-		$result = true;
+		$go_result = true;
 		$templates = get_request('templates', array());
 		$del_hosts = CTemplate::get(array('templateids' => $templates, 'editable' => 1));
 		// $sql = 'SELECT host, hostid '.
@@ -390,26 +390,19 @@ require_once('include/forms.inc.php');
 		// foreach($del_hosts as $del_host){
 			// add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$del_host['host'].']');
 		// }
-		$result = delete_host($del_hosts, $unlink_mode);
-		$result = DBend($result);
+		$go_result = delete_host($del_hosts, $unlink_mode);
+		$go_result = DBend($go_result);
 
-		show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
+		show_messages($go_result, S_TEMPLATE_DELETED, S_CANNOT_DELETE_TEMPLATE);
 	}
-/**********************************/
-/* --->>> TEMPLATE ACTIONS <<<--- */
-/**********************************/
+	
+	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
+		$url = new CUrl();
+		$path = $url->getPath();
+		insert_js('cookie.eraseArray("'.$path.'")');
+	}
 ?>
 <?php
-
-	$params = array();
-	$options = array('only_current_node');
-	if(isset($_REQUEST['form']) || isset($_REQUEST['massupdate'])) array_push($options,'do_not_select_if_empty');
-
-	foreach($options as $option) $params[$option] = 1;
-	$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
-	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
-
-	validate_group($PAGE_GROUPS, $PAGE_HOSTS, false);
 
 
 	if(isset($_REQUEST['groupid'])){
@@ -421,7 +414,6 @@ require_once('include/forms.inc.php');
 	}
 
 	$frmForm = new CForm();
-	$frmForm->setMethod('get');
 	$cmbConf = new CComboBox('config', 'templates.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('templates.php', S_TEMPLATES);
 		$cmbConf->addItem('hosts.php', S_HOSTS);
@@ -731,9 +723,14 @@ require_once('include/forms.inc.php');
 
 		//$config = select_config();
 // get templates
+
+		$sortfield = getPageSortField('host');
+		$sortorder = getPageSortOrder();
 		$options = array(
 			'extendoutput' => 1,
 			'editable' => 1,
+			'sortfield' => $sortfield,
+			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
 		if($groupid_selected > 0){
@@ -741,8 +738,7 @@ require_once('include/forms.inc.php');
 		}
 		$templates = CTemplate::get($options);
 
-// sorting && paging
-		order_page_result($templates, 'host');
+		order_page_result($templates, $sortfield, $sortorder);
 		$paging = getPagingLine($templates);
 //--------
 

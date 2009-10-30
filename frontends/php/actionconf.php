@@ -304,16 +304,16 @@ include_once('include/page_header.php');
 					' WHERE '.DBin_node('a.actionid',$nodes).
 						' AND '.DBcondition('a.actionid', $_REQUEST['g_actionid']);
 
-		$result=DBselect($sql);
-		while($row=DBfetch($result)){
+		$go_result=DBselect($sql);
+		while($row=DBfetch($go_result)){
 			$res = update_action_status($row['actionid'],$status);
 			if($res)
 				$actionids[] = $row['actionid'];
 		}
-		$result = DBend($res);
+		$go_result = DBend($res);
 
-		if($result && isset($res)){
-			show_messages($result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
+		if($go_result && isset($res)){
+			show_messages($go_result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',',$actionids).'] '.$status_name);
 		}
 	}
@@ -328,19 +328,26 @@ include_once('include/page_header.php');
 					' WHERE '.DBin_node('a.actionid',$nodes).
 						' AND '.DBcondition('a.actionid', $_REQUEST['g_actionid']);
 
-		$result=DBselect($sql);
-		while($row=DBfetch($result)){
+		$go_result=DBselect($sql);
+		while($row=DBfetch($go_result)){
 			$del_res = delete_action($row['actionid']);
 			if($del_res)
 				$actionids[] = $row['actionid'];
 		}
-		$result = DBend();
+		$go_result = DBend();
 
-		if($result && isset($del_res)){
+		if($go_result && isset($del_res)){
 			show_messages(TRUE, S_ACTIONS_DELETED, S_CANNOT_DELETE_ACTIONS);
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',',$actionids).'] deleted');
 		}
 	}
+
+	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
+		$url = new CUrl();
+		$path = $url->getPath();
+		insert_js('cookie.eraseArray("'.$path.'")');
+	}
+	
 ?>
 <?php
 	$action_wdgt = new CWidget();

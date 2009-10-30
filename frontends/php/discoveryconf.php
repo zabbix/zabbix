@@ -23,7 +23,7 @@
 	require_once('include/forms.inc.php');
 	require_once('include/discovery.inc.php');
 
-	$page['title']	= "S_CONFIGURATION_OF_DISCOVERY";
+	$page['title']	= 'S_CONFIGURATION_OF_DISCOVERY';
 	$page['file']	= 'discoveryconf.php';
 	$page['hist_arg'] = array('');
 
@@ -161,28 +161,35 @@ include_once('include/page_header.php');
 	else if(str_in_array($_REQUEST['go'], array('activate','disable')) && isset($_REQUEST['g_druleid'])){
 		$status = ($_REQUEST['go'] == 'activate')?DRULE_STATUS_ACTIVE:DRULE_STATUS_DISABLED;
 
-		$result = false;
+		$go_result = false;
 		foreach($_REQUEST['g_druleid'] as $drid){
 			if(set_discovery_rule_status($drid,$status)){
 				$rule_data = get_discovery_rule_by_druleid($drid);
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_DISCOVERY_RULE,
 					'['.$drid.'] '.$rule_data['name']);
-				$result = true;
+				$go_result = true;
 			}
 		}
-		show_messages($result,S_DISCOVERY_RULES_UPDATED);
+		show_messages($go_result,S_DISCOVERY_RULES_UPDATED);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['g_druleid'])){
-		$result = false;
+		$go_result = false;
 		foreach($_REQUEST['g_druleid'] as $drid){
 			if(delete_discovery_rule($drid)){
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_DISCOVERY_RULE,
 					'['.$drid.']');
-				$result = true;
+				$go_result = true;
 			}
 		}
-		show_messages($result,S_DISCOVERY_RULES_DELETED);
+		show_messages($go_result,S_DISCOVERY_RULES_DELETED);
 	}
+
+	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
+		$url = new CUrl();
+		$path = $url->getPath();
+		insert_js('cookie.eraseArray("'.$path.'")');
+	}
+	
 ?>
 <?php
 /* header */

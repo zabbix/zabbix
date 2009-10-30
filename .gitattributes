@@ -40,6 +40,7 @@ docs/ZABBIX[!!-~]Manual[!!-~]v1.6[!!-~]rev[!!-~]17.pdf -text
 frontends/php/api/.htaccess -text
 frontends/php/api/classes/class.caction.php -text
 frontends/php/api/classes/class.calert.php -text
+frontends/php/api/classes/class.capiinfo.php -text
 frontends/php/api/classes/class.capplication.php -text
 frontends/php/api/classes/class.cevent.php -text
 frontends/php/api/classes/class.cgraph.php -text

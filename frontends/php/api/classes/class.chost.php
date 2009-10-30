@@ -95,6 +95,7 @@ class CHost extends CZBXAPI{
 			'graphids'					=> null,
 			'monitored_hosts'			=> null,
 			'templated_hosts'			=> null,
+			'proxy_hosts'				=> null,
 			'with_items'				=> null,
 			'with_monitored_items'		=> null,
 			'with_historical_items'		=> null,
@@ -232,6 +233,9 @@ class CHost extends CZBXAPI{
 		}
 		else if(!is_null($options['templated_hosts'])){
 			$sql_parts['where'][] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')';
+		}
+		else if(!is_null($options['proxy_hosts'])){
+			$sql_parts['where'][] = 'h.status IN ('.HOST_STATUS_PROXY.')';
 		}
 		else{
 			$sql_parts['where'][] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
@@ -810,33 +814,42 @@ class CHost extends CZBXAPI{
  * @return boolean
  */
 	public static function massUpdate($hosts) {
-
-		$hostids = $hosts['hostids'];
-		$sql = 'UPDATE hosts SET '.
-			(isset($hosts['proxy_hostid']) ? ',proxy_hostid='.$hosts['proxy_hostid'] : '').
-			(isset($hosts['host']) ? ',host='.zbx_dbstr($hosts['host']) : '').
-			(isset($hosts['port']) ? ',port='.$hosts['port'] : '').
-			(isset($hosts['status']) ? ',status='.$hosts['status'] : '').
-			(isset($hosts['useip']) ? ',useip='.$hosts['useip'] : '').
-			(isset($hosts['dns']) ? ',dns='.zbx_dbstr($hosts['dns']) : '').
-			(isset($hosts['ip']) ? ',ip='.zbx_dbstr($hosts['ip']) : '').
-			(isset($hosts['useipmi']) ? ',useipmi='.$hosts['useipmi'] : '').
-			(isset($hosts['ipmi_port']) ? ',ipmi_port='.$hosts['ipmi_port'] : '').
-			(isset($hosts['ipmi_authtype']) ? ',ipmi_authtype='.$hosts['ipmi_authtype'] : '').
-			(isset($hosts['ipmi_privilege']) ? ',ipmi_privilege='.$hosts['ipmi_privilege'] : '').
-			(isset($hosts['ipmi_username']) ? ',ipmi_username='.zbx_dbstr($hosts['ipmi_username']) : '').
-			(isset($hosts['ipmi_password']) ? ',ipmi_password='.zbx_dbstr($hosts['ipmi_password']) : '').
-			(isset($hosts['ipmi_ip']) ? ',ipmi_ip='.zbx_dbstr($hosts['ipmi_ip']) : '').
-			' WHERE '.DBcondition('hostid', $hostids);
-
-		substr_replace($sql, '', strpos(',', $sql), 1);
-
-		$result = DBexecute($sql);
+	
+		$hostids = isset($hosts['hostids']) ? $hosts['hostids'] : array();
+		zbx_value2array($hostids);
+		
+		if(empty($hostids)){
+			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ hostids ]');
+			return false;
+		}
+		else{
+			$sql = 'UPDATE hosts SET '.
+				(isset($hosts['proxy_hostid']) ? ',proxy_hostid='.$hosts['proxy_hostid'] : '').
+				(isset($hosts['host']) ? ',host='.zbx_dbstr($hosts['host']) : '').
+				(isset($hosts['port']) ? ',port='.$hosts['port'] : '').
+				(isset($hosts['status']) ? ',status='.$hosts['status'] : '').
+				(isset($hosts['useip']) ? ',useip='.$hosts['useip'] : '').
+				(isset($hosts['dns']) ? ',dns='.zbx_dbstr($hosts['dns']) : '').
+				(isset($hosts['ip']) ? ',ip='.zbx_dbstr($hosts['ip']) : '').
+				(isset($hosts['useipmi']) ? ',useipmi='.$hosts['useipmi'] : '').
+				(isset($hosts['ipmi_port']) ? ',ipmi_port='.$hosts['ipmi_port'] : '').
+				(isset($hosts['ipmi_authtype']) ? ',ipmi_authtype='.$hosts['ipmi_authtype'] : '').
+				(isset($hosts['ipmi_privilege']) ? ',ipmi_privilege='.$hosts['ipmi_privilege'] : '').
+				(isset($hosts['ipmi_username']) ? ',ipmi_username='.zbx_dbstr($hosts['ipmi_username']) : '').
+				(isset($hosts['ipmi_password']) ? ',ipmi_password='.zbx_dbstr($hosts['ipmi_password']) : '').
+				(isset($hosts['ipmi_ip']) ? ',ipmi_ip='.zbx_dbstr($hosts['ipmi_ip']) : '').
+				' WHERE '.DBcondition('hostid', $hostids);
+			
+			$sql = substr_replace($sql, '', strpos($sql, ','), 1);
+			
+			$result = DBexecute($sql);
+		}
+		
 		if($result){
 			return $hostids;
 		}
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
+			self::setError(__METHOD__);
 			return false;
 		}
 	}
@@ -850,15 +863,29 @@ class CHost extends CZBXAPI{
  * @since 1.8
  * @version 1
  *
- * @param array $hostids
- * @return boolean
+ * @param array $hosts
+ * @param array $hosts[0, ...]['hostid'] Host ID to delete
+ * @return array|boolean
  */
-	public static function delete($hostids){
-		$result = delete_host($hostids, false);
+	public static function delete($hosts){
+		
+		$hostids = array();
+		foreach($hosts as $host){
+			$hostids[] = $host['hostid'];
+		}
+
+		if(!empty($hostids)){
+			$result = delete_host($hostids, false);
+		}
+		else{
+			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter');
+			$result = false;
+		}
+		
 		if($result)
 			return $hostids;
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
+			self::setError(__METHOD__);
 			return false;
 		}
 	}

@@ -1851,7 +1851,8 @@
 
 		if(is_null($host)){
 			if($hostid > 0){
-				$host_info = CHost::getById(array('hostid'=>$hostid));
+				$host_info = CHost::get(array('hostids' => $hostid, 'extendoutput' => 1));
+				$host_info = reset($host_info);
 				$host = $host_info['host'];
 			}
 			else{
@@ -5089,11 +5090,11 @@
 	function insert_mass_update_host_form(){//$elements_array_name){
 		global $USER_DETAILS;
 
-		$visible = get_request('visible',array());
+		$visible = get_request('visible', array());
 
-		$groups= get_request('groups',array());
+		$groups = get_request('groups', array());
 
-		$newgroup	= get_request('newgroup','');
+		$newgroup = get_request('newgroup', '');
 
 		$host 		= get_request('host',	'');
 		$port 		= get_request('port',	get_profile('HOST_PORT',10050));
@@ -5209,7 +5210,7 @@
 
 		$frmHost = new CFormTable($frm_title,'hosts.php');
 		$frmHost->setHelp('web.hosts.host.php');
-		$frmHost->addVar('massupdate',get_request('massupdate',1));
+		$frmHost->addVar('go', 'massupdate');
 
 		$hosts = $_REQUEST['hosts'];
 		foreach($hosts as $id => $hostid){

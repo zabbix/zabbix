@@ -205,7 +205,8 @@ include_once('include/page_header.php');
 
 	$hostid = get_request('hostid', 0);
 	if($hostid > 0){
-		$_REQUEST['filter_host'] = CHost::getById(array('hostid' => $hostid));
+		$_REQUEST['filter_host'] = CHost::get(array('hostids' => $hostid, 'extendoutput' => 1, 'templated_hosts' => 1));
+		$_REQUEST['filter_host'] = reset($_REQUEST['filter_host']);
 		$_REQUEST['filter_host'] = $_REQUEST['filter_host']['host'];
 		$_REQUEST['filter_set'] = 1;
 	}
@@ -503,6 +504,9 @@ include_once('include/page_header.php');
 
 		show_messages($result, S_ITEMS_UPDATED);
 		unset($_REQUEST['group_itemid'], $_REQUEST['massupdate'], $_REQUEST['update'], $_REQUEST['form']);
+		$url = new CUrl();
+		$path = $url->getPath();
+		insert_js('cookie.eraseArray("'.$path.'")');
 	}
 	else if(isset($_REQUEST['register'])){
 
@@ -612,27 +616,25 @@ include_once('include/page_header.php');
 // ----- GO -----
 	else if(($_REQUEST['go'] == 'activate') && isset($_REQUEST['group_itemid'])){
 		global $USER_DETAILS;
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE);
 
 		$group_itemid = $_REQUEST['group_itemid'];
 
 		DBstart();
-		$result = activate_item($group_itemid);
-		$result = DBend($result);
-		show_messages($result, S_ITEMS_ACTIVATED, null);
+		$go_result = activate_item($group_itemid);
+		$go_result = DBend($go_result);
+		show_messages($go_result, S_ITEMS_ACTIVATED, null);
 	}
 	else if(($_REQUEST['go'] == 'disable') && isset($_REQUEST['group_itemid'])){
 		global $USER_DETAILS;
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE);
 
 		$group_itemid = $_REQUEST['group_itemid'];
 
 		DBstart();
-		$result = disable_item($group_itemid);
-		$result = DBend($result);
-		show_messages($result, S_ITEMS_DISABLED, null);
+		$go_result = disable_item($group_itemid);
+		$go_result = DBend($go_result);
+		show_messages($go_result, S_ITEMS_DISABLED, null);
 	}
-	else if(isset($_REQUEST['copy'])&&isset($_REQUEST['group_itemid']) && ($_REQUEST['go'] == 'copy_to')){
+	else if(isset($_REQUEST['copy']) && isset($_REQUEST['group_itemid']) && ($_REQUEST['go'] == 'copy_to')){
 		if(isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])){
 			if(0 == $_REQUEST['copy_type']){ /* hosts */
 				$hosts_ids = $_REQUEST['copy_targetid'];
@@ -650,16 +652,16 @@ include_once('include/page_header.php');
 				}
 			}
 
-			$result = false;
+			$go_result = false;
 			DBstart();
 			foreach($_REQUEST['group_itemid'] as $item_id)
 				foreach($hosts_ids as $host_id){
-					$result |= copy_item_to_host($item_id, $host_id, true);
+					$go_result |= copy_item_to_host($item_id, $host_id, true);
 				}
 
-			$result = DBend($result);
-			show_messages($result, S_ITEMS_COPIED, S_CANNOT_COPY_ITEMS);
-			$_REQUEST['go'] = 'none';
+			$go_result = DBend($go_result);
+			show_messages($go_result, S_ITEMS_COPIED, S_CANNOT_COPY_ITEMS);
+			$_REQUEST['go'] = 'none2';
 		}
 		else{
 			error('No target selection.');
@@ -667,7 +669,7 @@ include_once('include/page_header.php');
 		show_messages();
 	}
 	else if(($_REQUEST['go'] == 'clean_history') && isset($_REQUEST['group_itemid'])){
-		$result = false;
+		$go_result = false;
 		$group_itemid = $_REQUEST['group_itemid'];
 
 		DBstart();
@@ -675,7 +677,7 @@ include_once('include/page_header.php');
 			if(!$item = get_item_by_itemid($id))	continue;
 
 			$cur_result = delete_history_by_itemid($id);
-			$result |= $cur_result;
+			$go_result |= $cur_result;
 
 			if($cur_result){
 				DBexecute('update items set nextcheck=0,lastvalue=null,lastclock=null,prevvalue=null where itemid='.$id);
@@ -685,13 +687,13 @@ include_once('include/page_header.php');
 					S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].'] '.S_HISTORY_CLEANED);
 			}
 		}
-		$result = DBend($result);
-		show_messages($result, S_HISTORY_CLEANED, $result);
+		$go_result = DBend($go_result);
+		show_messages($go_result, S_HISTORY_CLEANED, $go_result);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_itemid'])){
 		global $USER_DETAILS;
 
-		$result = true;
+		$go_result = true;
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE);
 
 		$group_itemid = $_REQUEST['group_itemid'];
@@ -717,15 +719,20 @@ include_once('include/page_header.php');
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$item['itemid'].'] '.S_HOST.' ['.$item['host'].']');
 		}
 
-		$result &= !empty($group_itemid);
-		if($result) {
+		$go_result &= !empty($group_itemid);
+		if($go_result) {
 			DBstart();
-			$result = delete_item($group_itemid);
-			$result = DBend($result);
+			$go_result = delete_item($group_itemid);
+			$go_result = DBend($go_result);
 		}
-		show_messages($result, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
+		show_messages($go_result, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
 	}
 
+	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
+		$url = new CUrl();
+		$path = $url->getPath();
+		insert_js('cookie.eraseArray("'.$path.'")');
+	}
 ?>
 <?php
 

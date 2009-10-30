@@ -636,14 +636,25 @@ class CTemplate extends CZBXAPI{
 	 * @version 1
 	 *
 	 * @param array $templateids
+	 * @param array $templateids['templateids']
 	 * @return boolean
 	 */
 	public static function delete($templateids){
-		$result = delete_host($templateids, false);
+		$templateids = isset($templateids['templateids']) ? $templateids['templateids'] : array();
+		zbx_value2array($templateids);
+		
+		if(!empty($templateids)){
+			$result = delete_host($templateids, false);
+		}
+		else{
+			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ templateids ]');
+			$result = false;
+		}
+		
 		if($result)
 			return $templateids;
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::setError(__METHOD__);
 			return false;
 		}
 	}

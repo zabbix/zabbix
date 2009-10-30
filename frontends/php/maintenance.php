@@ -178,11 +178,11 @@ include_once('include/page_header.php');
 		}
 
 		DBstart();
-		$result = delete_maintenance($maintenanceids);
-		$result = DBend($result);
+		$go_result = delete_maintenance($maintenanceids);
+		$go_result = DBend($go_result);
 
-		show_messages($result,S_MAINTENANCE_DELETED,S_CANNOT_DELETE_MAINTENANCE);
-		if($result){
+		show_messages($go_result,S_MAINTENANCE_DELETED,S_CANNOT_DELETE_MAINTENANCE);
+		if($go_result){
 			foreach($maintenances as $maintenanceid => $maintenance){
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_MAINTENANCE,'Id ['.$maintenanceid.'] '.S_NAME.' ['.$maintenance['name'].']');
 			}
@@ -322,7 +322,12 @@ include_once('include/page_header.php');
 		}
 	}
 
-
+	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
+		$url = new CUrl();
+		$path = $url->getPath();
+		insert_js('cookie.eraseArray("'.$path.'")');
+	}
+	
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,AVAILABLE_NOCACHE); /* update available_hosts after ACTIONS */
 
 

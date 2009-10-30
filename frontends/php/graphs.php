@@ -257,7 +257,7 @@ include_once('include/page_header.php');
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_graphid'])){
 		$group_graphid = $_REQUEST['group_graphid'];
 		$group_graphid = zbx_uint_array_intersect($group_graphid, $available_graphs);
-		$result = false;
+		$go_result = false;
 
 		DBstart();
 		foreach($group_graphid as $id => $graphid){
@@ -266,12 +266,12 @@ include_once('include/page_header.php');
 			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH,'Graph ['.$graph['name'].']');
 		}
 		if(!empty($group_graphid)){
-			$result = delete_graph($group_graphid);
+			$go_result = delete_graph($group_graphid);
 		}
 
-		$result = DBend($result);
+		$go_result = DBend($go_result);
 
-		show_messages($result, S_GRAPHS_DELETED, S_CANNOT_DELETE_GRAPHS);
+		show_messages($go_result, S_GRAPHS_DELETED, S_CANNOT_DELETE_GRAPHS);
 	}
 	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['copy'])&&isset($_REQUEST['group_graphid'])){
 		if(isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])){
@@ -296,13 +296,19 @@ include_once('include/page_header.php');
 				foreach($hosts_ids as $host_id){
 					copy_graph_to_host($graph_id, $host_id, true);
 				}
-			$result = DBend();
-			$_REQUEST['go'] = 'none';
+			$go_result = DBend();
+			$_REQUEST['go'] = 'none2';
 		}
 		else{
 			error('No target selection.');
 		}
 		show_messages();
+	}
+	
+	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
+		$url = new CUrl();
+		$path = $url->getPath();
+		insert_js('cookie.eraseArray("'.$path.'")');
 	}
 // ----</ACTIONS>----
 ?>

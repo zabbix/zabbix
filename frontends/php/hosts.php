@@ -54,15 +54,15 @@ include_once('include/page_header.php');
 		'groupids'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		'applications'=>array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 // host
-		'groupid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,			null),
-		'hostid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,			'isset({form})&&({form}=="update")'),
-		'host'=>		array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,		'isset({save})&&!isset({massupdate})'),
-		'proxy_hostid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,	'isset({save})&&!isset({massupdate})'),
-		'dns'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({save})&&!isset({massupdate})'),
-		'useip'=>		array(T_ZBX_STR, O_OPT, NULL,	IN('0,1'),	'isset({save})&&!isset({massupdate})'),
-		'ip'=>			array(T_ZBX_IP, O_OPT, NULL,	NULL,		'isset({save})&&!isset({massupdate})'),
-		'port'=>		array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,65535),	'isset({save})&&!isset({massupdate})'),
-		'status'=>		array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1,3'),		'isset({save})&&!isset({massupdate})'),
+		'groupid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,			null),
+		'hostid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,			'isset({form})&&({form}=="update")'),
+		'host'=>	array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,		'isset({save})&&isset({go})&&({go}!="massupdate")'),
+		'proxy_hostid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,	'isset({save})&&isset({go})&&({go}!="massupdate")'),
+		'dns'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({save})&&isset({go})&&({go}!="massupdate")'),
+		'useip'=>		array(T_ZBX_STR, O_OPT, NULL,	IN('0,1'),	'isset({save})&&isset({go})&&({go}!="massupdate")'),
+		'ip'=>			array(T_ZBX_IP, O_OPT, NULL,	NULL,		'isset({save})&&isset({go})&&({go}!="massupdate")'),
+		'port'=>		array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,65535),	'isset({save})&&isset({go})&&({go}!="massupdate")'),
+		'status'=>		array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1,3'),		'isset({save})&&isset({go})&&({go}!="massupdate")'),
 
 		'newgroup'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
 		'templates'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	NULL),
@@ -70,25 +70,25 @@ include_once('include/page_header.php');
 		'clear_templates'=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,	NULL),
 
 		'useipmi'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,				NULL),
-		'ipmi_ip'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,				'isset({useipmi})&&!isset({massupdate})'),
-		'ipmi_port'=>		array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,65535),	'isset({useipmi})&&!isset({massupdate})'),
-		'ipmi_authtype'=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(-1,6),		'isset({useipmi})&&!isset({massupdate})'),
-		'ipmi_privilege'=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(1,5),		'isset({useipmi})&&!isset({massupdate})'),
-		'ipmi_username'=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,				'isset({useipmi})&&!isset({massupdate})'),
-		'ipmi_password'=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,				'isset({useipmi})&&!isset({massupdate})'),
+		'ipmi_ip'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,				'isset({useipmi})&&isset({go})&&({go}!="massupdate")'),
+		'ipmi_port'=>		array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,65535),	'isset({useipmi})&&isset({go})&&({go}!="massupdate")'),
+		'ipmi_authtype'=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(-1,6),		'isset({useipmi})&&isset({go})&&({go}!="massupdate")'),
+		'ipmi_privilege'=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(1,5),		'isset({useipmi})&&isset({go})&&({go}!="massupdate")'),
+		'ipmi_username'=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,				'isset({useipmi})&&isset({go})&&({go}!="massupdate")'),
+		'ipmi_password'=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,				'isset({useipmi})&&isset({go})&&({go}!="massupdate")'),
 
 		'useprofile'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
-		'devicetype'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),
-		'name'=>			array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),
-		'os'=>				array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),
-		'serialno'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),
-		'tag'=>				array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),
-		'macaddress'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),
-		'hardware'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),
-		'software'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),
-		'contact'=>			array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),
-		'location'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),
-		'notes'=>			array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&!isset({massupdate})'),
+		'devicetype'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'name'=>			array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'os'=>				array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'serialno'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'tag'=>				array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'macaddress'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'hardware'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'software'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'contact'=>			array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'location'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'notes'=>			array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
 
 		'useprofile_ext'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
 		'ext_host_profiles'=> 	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY,   NULL,   NULL),
@@ -121,7 +121,8 @@ include_once('include/page_header.php');
 
 	check_fields($fields);
 	validate_sort_and_sortorder('host', ZBX_SORT_UP);
-	$_REQUEST['go'] = get_request('go', 'none');
+	
+	$_REQUEST['go'] = get_request('go', null);
 ?>
 <?php
 
@@ -187,7 +188,7 @@ include_once('include/page_header.php');
 		$_REQUEST['form'] = 'full_clone';
 	}
 /* HOST MASS UPDATE */
-	else if(isset($_REQUEST['massupdate']) && isset($_REQUEST['save'])){
+	else if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['save'])){
 		$hosts = get_request('hosts', array());
 		$visible = get_request('visible', array());
 		$_REQUEST['groups'] = get_request('groups', array());
@@ -203,8 +204,21 @@ include_once('include/page_header.php');
 		}
 
 		$result = true;
-
+		
 		DBstart();
+		
+		// if(isset($visible['groups'])){
+			// $groupids = get_request('groups', array());
+			// CHostGroup::updateHosts(array('hostids' => $hostids, 'groupids' => $groupids));
+		// }
+		
+		// if(isset($visible['newgroup'])){
+			// $newgroup = get_request('newgroup', '');
+			// $newgroupid = CHostGroup::add(array('name' => $newgroup));
+			// $newgroupid = reset($newgroupid);
+			// CHostGroup::addHosts(array('hostids' => $hostids, 'groupids' => $newgroupid));
+		// }		
+		
 		foreach($hosts as $id => $hostid){
 
 			$db_host = get_host_by_hostid($hostid);
@@ -310,6 +324,10 @@ include_once('include/page_header.php');
 			unset($_REQUEST['massupdate']);
 			unset($_REQUEST['form']);
 			unset($_REQUEST['hosts']);
+			
+			$url = new CUrl();
+			$path = $url->getPath();
+			insert_js('cookie.eraseArray("'.$path.'")');
 		}
 
 		unset($_REQUEST['save']);
@@ -501,24 +519,28 @@ include_once('include/page_header.php');
 // DELETE HOST
 	else if($_REQUEST['go'] == 'delete'){
 		$hosts = get_request('hosts', array());
-		$del_hosts = array();
+		// $del_hosts = array();
 
-		$sql = 'SELECT host, hostid '.
-				' FROM hosts '.
-				' WHERE '.DBin_node('hostid').
-					' AND '.DBcondition('hostid', $hosts).
-					' AND '.DBcondition('hostid', $available_hosts);
-		$db_hosts = DBselect($sql);
+		// $sql = 'SELECT host, hostid '.
+				// ' FROM hosts '.
+				// ' WHERE '.DBin_node('hostid').
+					// ' AND '.DBcondition('hostid', $hosts).
+					// ' AND '.DBcondition('hostid', $available_hosts);
+		// $db_hosts = DBselect($sql);
 
-		DBstart();
-		while($db_host = DBfetch($db_hosts)){
-			$del_hosts[$db_host['hostid']] = $db_host['hostid'];
+		// DBstart();
+		// while($db_host = DBfetch($db_hosts)){
+			// $del_hosts[$db_host['hostid']] = $db_host['hostid'];
 //				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$db_host['host'].']');
+		// }
+		
+		zbx_valueTo($hosts, array('object' => 1, 'field' => 'hostid'));
+		$go_result = CHost::delete($hosts);
+		if(!$go_result){
+			error(CHost::resetErrors());
 		}
-		$result = delete_host($del_hosts);
-		$result = DBend($result);
-
-		show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
+		// $go_result = DBend($go_result);
+		show_messages($go_result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
 	}
 // ACTIVATE/DISABLE HOSTS
 	else if(str_in_array($_REQUEST['go'], array('activate', 'disable'))){
@@ -539,11 +561,19 @@ include_once('include/page_header.php');
 		}
 
 		DBstart();
-		$result = update_host_status($act_hosts, $status);
-		$result = DBend($result);
-
-		show_messages($result, S_HOST_STATUS_UPDATED, S_CANNOT_UPDATE_HOST);
+		$go_result = update_host_status($act_hosts, $status);
+		$go_result = DBend($go_result);
+			
+		show_messages($go_result, S_HOST_STATUS_UPDATED, S_CANNOT_UPDATE_HOST);
 	}
+
+	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
+		$url = new CUrl();
+		$path = $url->getPath();
+		insert_js('cookie.eraseArray("'.$path.'")');
+	}
+
+	
 ?>
 <?php
 	// $params = array();
@@ -637,9 +667,14 @@ include_once('include/page_header.php');
 			S_ERROR
 		));
 
+		
+		$sortfield = getPageSortField('host');
+		$sortorder = getPageSortOrder();
 		$options = array(
 			'extendoutput' => 1,
 			'editable' => 1,
+			'sortfield' => $sortfield,
+			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
 		if($groupid_selected > 0){
@@ -648,7 +683,7 @@ include_once('include/page_header.php');
 		$hosts = CHost::get($options);
 
 // sorting && paging
-		order_page_result($hosts, 'host');
+		order_page_result($hosts, $sortfield, $sortorder);
 		$paging = getPagingLine($hosts);
 //---------
 
@@ -678,7 +713,8 @@ include_once('include/page_header.php');
 
 			$description = array();
 			if($host['proxy_hostid']){
-				$proxy = CHost::getById(array('hostid' => $host['proxy_hostid']));
+				$proxy = CHost::get(array('hostids' => $host['proxy_hostid'], 'extendoutput' => 1, 'nopermissions' => 1, 'proxy_hosts' => 1));
+				$proxy = reset($proxy);
 				$description[] = $proxy['host'] . ':';
 			}
 			$description[] = new CLink($host['host'], 'hosts.php?form=update&hostid='.$host['hostid'].url_param('groupid'));
