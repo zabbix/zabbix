@@ -27,7 +27,7 @@ require_once('include/users.inc.php');
 	$page['title'] = "S_AUDIT";
 	$page['file'] = 'auditacts.php';
 	$page['hist_arg'] = array();
-	$page['scripts'] = array('calendar.js','scriptaculous.js?load=effects');
+	$page['scripts'] = array('class.calendar.js','scriptaculous.js?load=effects');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -222,7 +222,8 @@ include_once('include/page_header.php');
 		}
 		$sendto=$row['sendto'];
 
-		$message = array(bold(S_SUBJECT.': '),br(),$row['subject'],br(),br(),bold(S_MESSAGE.': '),br(),$row['message']);
+		$message = new CCol(array(bold(S_SUBJECT.': '), br(), $row['subject'], br(), br(), bold(S_MESSAGE.': '), br(), $row['message']), 'top');
+		$message->addStyle('white-space: normal;');
 
 		if(empty($row['error'])){
 			$error=new CSpan(SPACE,'off');
@@ -238,7 +239,7 @@ include_once('include/page_header.php');
 			new CCol($status, 'top'),
 			new CCol($retries, 'top'),
 			new CCol($sendto, 'top'),
-			new CCol($message, 'top'),
+			$message,
 			new CCol($error, 'wraptext top')));
 	}
 
