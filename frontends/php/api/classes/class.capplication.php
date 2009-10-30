@@ -417,14 +417,25 @@ class CApplication extends CZBXAPI{
  * @version 1
  *
  * @param _array $applicationids
+ * @param array $applicationids['applicationids']
  * @return boolean
  */
 	public static function delete($applicationids){
-		$result = delete_application($applicationids);
+		$applicationids = isset($applicationids['applicationids']) ? $applicationids['applicationids'] : array();
+		zbx_value2array($applicationids);
+		
+		if(!empty($applicationids)){
+			$result = delete_application($applicationids);
+		}
+		else{
+			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ applicationids ]');
+			$result = false;
+		}
+		
 		if($result)
 			return true;
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::setError(__METHOD__);
 			return false;
 		}
 	}

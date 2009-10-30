@@ -766,22 +766,29 @@ class CUser extends CZBXAPI{
  * @version 1
  *
  * @param array $userids
+ * @param array $userids['userids']
  * @return boolean
  */
 	public static function delete($userids){
 		global $USER_DETAILS;
 
 		$result = true;
-		$error = 'Unknown ZABBIX internal error [CUser]';
+		$userids = isset($userids['userids']) ? $userids['userids'] : array();
+		zbx_value2array($userids);
+		
 
+		if(empty($userids)){
+			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ userids ]');
+			$result = false;
+		}
+		
 		if(DBfetch(DBselect('SELECT * FROM users WHERE '.DBcondition('userid', $userids).' AND alias='.zbx_dbstr(ZBX_GUEST_USER)))){
-			$error = S_CANNOT_DELETE_USER.'[ '.ZBX_GUEST_USER.' ]';
+		self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, S_CANNOT_DELETE_USER.'[ '.ZBX_GUEST_USER.' ]');
 			$result = false;
 		}
 
-
 		if(uint_in_array($USER_DETAILS['userid'], $userids)){
-			$error = S_USER_CANNOT_DELETE_ITSELF;
+		self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, S_USER_CANNOT_DELETE_ITSELF);
 			$result = false;
 		}
 
@@ -800,7 +807,7 @@ class CUser extends CZBXAPI{
 		if($result)
 			return true;
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
+			self::setError(__METHOD__);
 			return false;
 		}
 	}

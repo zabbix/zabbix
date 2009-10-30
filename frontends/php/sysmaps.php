@@ -108,21 +108,28 @@ include_once('include/page_header.php');
 		}
 	}
 	else if($_REQUEST['go'] == 'delete'){
-		$result = true;
+		$go_result = true;
 		$maps = get_request('maps', array());
 
 		DBstart();
 		foreach($maps as $mapid){
-			$result &= delete_sysmap($mapid);
-			if(!$result) break;
+			$go_result &= delete_sysmap($mapid);
+			if(!$go_result) break;
 		}
-		$result = DBend($result);
+		$go_result = DBend($go_result);
 
-		if($result){
+		if($go_result){
 			unset($_REQUEST["form"]);
 		}
-		show_messages($result, S_MAP_DELETED, S_CANNOT_DELETE_MAP);
+		show_messages($go_result, S_MAP_DELETED, S_CANNOT_DELETE_MAP);
 	}
+
+	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
+		$url = new CUrl();
+		$path = $url->getPath();
+		insert_js('cookie.eraseArray("'.$path.'")');
+	}
+	
 ?>
 <?php
 	$form = new CForm();

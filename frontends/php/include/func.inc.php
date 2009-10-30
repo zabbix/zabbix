@@ -879,7 +879,7 @@ function zbx_valueTo(&$value, $options){
 			}
 		}
 
-		if($options['array']){
+		if(isset($options['array'])){
 			if(!is_array($value)) $value = array($value);
 			else if(!zbx_ctype_digit(key($value))) $value = array($value);
 		}

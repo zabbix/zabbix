@@ -26,62 +26,6 @@ require_once('include/httptest.inc.php');
 
 /* HOST GROUP functions */
 
-/*
- * Function: db_save_group
- *
- * Description:
- *     Add new or update host group
- *
- * Author:
- *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments:
- *
- *
-	function db_save_group($name,$groupid=null){
-		if(!is_string($name)){
-			error("incorrect parameters for 'db_save_group'");
-			return false;
-		}
-
-		$sql_where = '';
-		if(!is_null($groupid))
-			$sql_where.= ' AND groupid<>'.$groupid;
-
-		$sql = 'SELECT * '.
-				' FROM groups '.
-				' WHERE '.DBin_node('groupid').
-					' AND name='.zbx_dbstr($name).
-					$sql_where;
-		$result = DBselect($sql);
-		if(DBfetch($result)){
-			error("Group '$name' already exists");
-			return false;
-		}
-
-		if(is_null($groupid)){
-			$groupid=get_dbid('groups','groupid');
-			$result = DBexecute('INSERT INTO groups (groupid,name,internal) '.
-								" VALUES ($groupid,".zbx_dbstr($name).",".ZBX_NOT_INTERNAL_GROUP.')');
-			if($result){
-				$result = $groupid;
-				add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $groupid, $name, 'groups', NULL, NULL);
-			}
-			return $result;
-
-		}
-		else{
-			$hostgroup_old = get_hostgroup_by_groupid($groupid);
-			$result = DBexecute("update groups set name=".zbx_dbstr($name)." where groupid=$groupid");
-			if($result){
-				$hostgroup_new = get_hostgroup_by_groupid($groupid);
-				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST_GROUP, $groupid, $hostgroup_old['name'], 'groups', $hostgroup_old, $hostgroup_new);
-			}
-			return $result;
-		}
-	}
-/**/
-
 	function update_host_groups_by_groupid($groupid,$hosts=array()){
 		$grp_hosts = CHost::get(array('groupids'=>$groupid, 'editable'=>1));
 		$grp_hostids = array_keys($grp_hosts);
@@ -100,9 +44,8 @@ require_once('include/httptest.inc.php');
 
 			return false;
 		}
-
 		$result = DBexecute('DELETE FROM hosts_groups WHERE groupid='.$groupid);
-		$result = CHostGroup::addHosts(array('hostids' => $hosts, 'groupid' => $groupid));
+		$result = CHostGroup::addHosts(array('hostids' => $hosts, 'groupids' => $groupid));
 
 	return $result;
 	}
@@ -113,10 +56,9 @@ require_once('include/httptest.inc.php');
 			error('Host "'.$host['host'].'" can not exist without group');
 			return false;
 		}
-
 		DBexecute('DELETE FROM hosts_groups WHERE hostid='.$hostid);
 		foreach($groups as $groupid){
-			$result = CHostGroup::addHosts(array('hostids' => array($hostid), 'groupid' => $groupid));
+			$result = CHostGroup::addHosts(array('hostids' => array($hostid), 'groupids' => $groupid));
 		}
 	return $result;
 	}
@@ -145,8 +87,10 @@ require_once('include/httptest.inc.php');
 	function update_host_group($groupid,$name,$hosts){
 		$hostgroup_old = get_hostgroup_by_groupid($groupid);
 		$result = CHostGroup::update(array(array('name' => $name, 'groupid' => $groupid)));
-		if(!$result)
+		if(!$result){
+			error(CHostGroup::resetErrors());
 			return $result;
+		}
 
 		$hostgroup_new = get_hostgroup_by_groupid($groupid);
 		add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST_GROUP, $groupid, $hostgroup_old['name'], 'groups', $hostgroup_old, $hostgroup_new);

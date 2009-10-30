@@ -23,14 +23,12 @@
 	require_once('include/hosts.inc.php');
 	require_once('include/forms.inc.php');
 
-	$page['title'] = "S_APPLICATIONS";
+	$page['title'] = 'S_APPLICATIONS';
 	$page['file'] = 'applications.php';
-	$page['hist_arg'] = array('groupid','config','hostid');
+	$page['hist_arg'] = array('groupid', 'hostid');
 	$page['scripts'] = array();
 
 include_once('include/page_header.php');
-
-	$_REQUEST['config'] = get_request('config','applications.php');
 
 	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
@@ -49,10 +47,6 @@ include_once('include/page_header.php');
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		// 0 - hosts; 1 - groups; 2 - linkages; 3 - templates; 4 - applications; 5 - Proxies; 6 - maintenance
-		'config'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,	NULL),
-
-//ARRAYS
 		'hosts'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		'groups'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		'hostids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
@@ -86,9 +80,9 @@ include_once('include/page_header.php');
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('name',ZBX_SORT_UP);
+	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
-	$_REQUEST['go'] = get_request('go','none');
+	$_REQUEST['go'] = get_request('go', 'none');
 ?>
 <?php
 
@@ -140,7 +134,7 @@ include_once('include/page_header.php');
 // -------- GO ---------------
 	else if($_REQUEST['go'] == 'delete'){
 /* group operations */
-		$result = true;
+		$go_result = true;
 
 		$applications = get_request('applications',array());
 
@@ -153,20 +147,20 @@ include_once('include/page_header.php');
 		while($db_app = DBfetch($db_applications)){
 			if(!isset($applications[$db_app['applicationid']]))	continue;
 
-			$result &= delete_application($db_app['applicationid']);
+			$go_result &= delete_application($db_app['applicationid']);
 
-			if($result){
+			if($go_result){
 				$host = get_host_by_hostid($db_app['hostid']);
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_APPLICATION,'Application ['.$db_app['name'].'] from host ['.$host['host'].']');
 			}
 		}
-		$result = DBend($result);
+		$go_result = DBend($go_result);
 
-		show_messages($result, S_APPLICATION_DELETED, S_CANNOT_DELETE_APPLICATION);
+		show_messages($go_result, S_APPLICATION_DELETED, S_CANNOT_DELETE_APPLICATION);
 	}
 	else if(str_in_array($_REQUEST['go'], array('activate','disable'))){
 /* group operations */
-		$result = true;
+		$go_result = true;
 		$applications = get_request('applications',array());
 
 		DBstart();
@@ -182,20 +176,26 @@ include_once('include/page_header.php');
 			$res_items = DBselect($sql);
 			while($item=DBfetch($res_items)){
 				if($_REQUEST['go'] == 'activate'){
-					$result&=activate_item($item['itemid']);
+					$go_result&=activate_item($item['itemid']);
 				}
 				else{
-					$result&=disable_item($item['itemid']);
+					$go_result&=disable_item($item['itemid']);
 				}
 			}
 		}
-		$result = DBend($result);
+		$go_result = DBend($go_result);
 		if($_REQUEST['go'] == 'activate')
-			show_messages($result, S_ITEMS_ACTIVATED, null);
+			show_messages($go_result, S_ITEMS_ACTIVATED, null);
 		else
-			show_messages($result, S_ITEMS_DISABLED, null);
+			show_messages($go_result, S_ITEMS_DISABLED, null);
 	}
 
+	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
+		$url = new CUrl();
+		$path = $url->getPath();
+		insert_js('cookie.eraseArray("'.$path.'")');
+	}
+	
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,AVAILABLE_NOCACHE); /* update available_hosts after ACTIONS */
 ?>
 <?php
@@ -220,8 +220,7 @@ include_once('include/page_header.php');
 	$frmForm->setMethod('get');
 
 // Config
-	$cmbConf = new CComboBox('config','applications.php','javascript: submit()');
-	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');
+	$cmbConf = new CComboBox('config', 'applications.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('templates.php',S_TEMPLATES);
 		$cmbConf->addItem('hosts.php',S_HOSTS);
 		$cmbConf->addItem('items.php',S_ITEMS);

@@ -201,7 +201,7 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['userid'])){
 		$user=CUser::getById(array('userid' => $_REQUEST['userid']));
 
-		$result = CUser::delete(array($_REQUEST['userid']));
+		$result = CUser::delete(array('userids' => $_REQUEST['userid']));
 		if(!$result) error(CUser::resetErrors());
 
 		show_messages($result, S_USER_DELETED, S_CANNOT_DELETE_USER);
@@ -255,15 +255,15 @@ include_once('include/page_header.php');
 	}
 // ----- GO -----
 	else if(($_REQUEST['go'] == 'unblock') && isset($_REQUEST['group_userid'])){
-		$result = false;
+		$go_result = false;
 
 		$group_userid = get_request('group_userid', array());
 
 		DBstart();
-		$result = unblock_user_login($group_userid);
-		$result = DBend($result);
+		$go_result = unblock_user_login($group_userid);
+		$go_result = DBend($go_result);
 
-		if($result){
+		if($go_result){
 			$options = array('userids'=>$group_userid,
 							'extendoutput' => 1);
 			$users = CUser::get($options);
@@ -274,10 +274,10 @@ include_once('include/page_header.php');
 			}
 		}
 
-		show_messages($result, S_USERS_UNBLOCKED,S_CANNOT_UNBLOCK_USERS);
+		show_messages($go_result, S_USERS_UNBLOCKED,S_CANNOT_UNBLOCK_USERS);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_userid'])){
-		$result = false;
+		$go_result = false;
 
 		$group_userid = get_request('group_userid', array());
 
@@ -285,20 +285,26 @@ include_once('include/page_header.php');
 		foreach($group_userid as $userid){
 			if(!($user_data = CUser::getById(array('userid' => $userid)))) continue;
 
-			$result |= (bool) CUser::delete(array($userid));
-			if(!$result) error(CUser::resetErrors());
+			$go_result |= (bool) CUser::delete(array('userids' => $userid));
+			if(!$go_result) error(CUser::resetErrors());
 
-			if($result){
+			if($go_result){
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER,
 					'User alias ['.$user_data['alias'].'] name ['.$user_data['name'].'] surname ['.
 					$user_data['surname'].']');
 			}
 		}
 
-		$result = DBend($result);
-		show_messages($result, S_USER_DELETED,S_CANNOT_DELETE_USER);
+		$go_result = DBend($go_result);
+		show_messages($go_result, S_USER_DELETED,S_CANNOT_DELETE_USER);
 	}
 
+	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
+		$url = new CUrl();
+		$path = $url->getPath();
+		insert_js('cookie.eraseArray("'.$path.'")');
+	}
+	
 ?>
 <?php
 	$_REQUEST['filter_usrgrpid'] = get_request('filter_usrgrpid',get_profile('web.users.filter.usrgrpid',0));

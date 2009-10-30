@@ -793,6 +793,8 @@
 	'S_CANNOT_UPDATE_TEMPLATE'=>		'Cannot update template',
 	'S_LINKED_TEMPLATES'=>			'Linked templates',
 	'S_LINKED_TO'=>				'Linked to',
+	'S_TEMPLATE_DELETED'=>				'Template deleted',
+	'S_CANNOT_DELETE_TEMPLATE'=>			'Cannot delete template',
 
 //	Host profiles
 	'S_HOST_PROFILE'=>			'Host profile',

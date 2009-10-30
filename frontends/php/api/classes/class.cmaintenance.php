@@ -398,15 +398,25 @@ class CMaintenance extends CZBXAPI{
 	 * @version 1
 	 *
 	 * @param _array $maintenanceids
+	 * @param _array $maintenanceids['maintenanceids']
 	 * @return boolean
 	 */
 	public static function delete($maintenanceids){
-
-		$result = delete_maintenance($maintenanceids);
+		$maintenanceids = isset($maintenanceids['maintenanceids']) ? $maintenanceids['maintenanceids'] : array();
+		zbx_value2array($maintenanceids);
+		
+		if(!empty($maintenanceids)){
+			$result = delete_maintenance($maintenanceids);
+		}
+		else{
+			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ maintenanceids ]');
+			$result = false;
+		}
+		
 		if($result)
 			return true;
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::setError(__METHOD__);
 			return false;
 		}
 	}

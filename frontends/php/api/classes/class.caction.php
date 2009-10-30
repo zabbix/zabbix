@@ -711,17 +711,26 @@ class CAction extends CZBXAPI{
  * @version 1
  *
  * @param _array $actionids
+ * @param array $actionids['actionids']
  * @return boolean
  */
 	public static function delete($actionids){
+		$actionids = isset($actionids['actionids']) ? $actionids['actionids'] : array();
 		zbx_value2array($actionids);
-
-		$sql = 'DELETE FROM actions WHERE '.DBcondition('actionid', $actionids);
-		$result = DBexecute($sql);
-		if($result)
-			return $result;
+		
+		if(!empty($actionids)){
+			$sql = 'DELETE FROM actions WHERE '.DBcondition('actionid', $actionids);
+			$result = DBexecute($sql);
+		}
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ actionids ]');
+			$result = false;
+		}
+
+		if($result)
+			return true;
+		else{
+			self::setError(__METHOD__);
 			return false;
 		}
 	}
