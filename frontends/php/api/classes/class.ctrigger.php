@@ -555,25 +555,25 @@ class CTrigger extends CZBXAPI{
 	}
 
 /**
-	 * Add triggers
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $triggers multidimensional array with triggers data
-	 * @param array $triggers[0,...]['expression']
-	 * @param array $triggers[0,...]['description']
-	 * @param array $triggers[0,...]['type'] OPTIONAL
-	 * @param array $triggers[0,...]['priority'] OPTIONAL
-	 * @param array $triggers[0,...]['status'] OPTIONAL
-	 * @param array $triggers[0,...]['comments'] OPTIONAL
-	 * @param array $triggers[0,...]['url'] OPTIONAL
+ * Add triggers
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $triggers multidimensional array with triggers data
+ * @param array $triggers[0,...]['expression']
+ * @param array $triggers[0,...]['description']
+ * @param array $triggers[0,...]['type'] OPTIONAL
+ * @param array $triggers[0,...]['priority'] OPTIONAL
+ * @param array $triggers[0,...]['status'] OPTIONAL
+ * @param array $triggers[0,...]['comments'] OPTIONAL
+ * @param array $triggers[0,...]['url'] OPTIONAL
  * @param array $triggers[0,...]['templateid'] OPTIONAL
-	 * @return boolean
-	 */
+ * @return boolean
+ */
 	public static function add($triggers){
 		zbx_valueTo($triggers, array('array'=>1));
 		
@@ -594,23 +594,25 @@ class CTrigger extends CZBXAPI{
 			);
 
 			if(!check_db_fields($trigger_db_fields, $trigger)){
+				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Wrong field for trigger');
 				$result = false;
 				break;
 			}
 
 			$new_trigger = array();
-			$new_trigger['triggerid'] = add_trigger($trigger['expression'],
-									$trigger['description'],
-									$trigger['type'],
-									$trigger['priority'],
-									$trigger['status'],
-									$trigger['comments'],
-									$trigger['url'],
-									null,
-									$trigger['templateid']
-									);
-								
-			if(!$triggerid){
+			$new_trigger['triggerid'] = add_trigger(
+				$trigger['expression'],
+				$trigger['description'],
+				$trigger['type'],
+				$trigger['priority'],
+				$trigger['status'],
+				$trigger['comments'],
+				$trigger['url'],
+				array(),
+				$trigger['templateid']
+			);
+
+			if(!$new_trigger['triggerid']){
 				$result = false;
 				break;
 			}
@@ -622,7 +624,7 @@ class CTrigger extends CZBXAPI{
 		if($result)
 			return $triggerids;
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::setError(__METHOD__);
 			return false;
 		}
 	}
