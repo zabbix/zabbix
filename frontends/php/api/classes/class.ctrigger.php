@@ -487,20 +487,20 @@ class CTrigger extends CZBXAPI{
 */
 
 /**
-	 * Get triggerid by host.host and trigger.expression
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
+ * Get triggerid by host.host and trigger.expression
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
  * @param _array $triggers multidimensional array with trigger objects
  * @param array $triggers[0,...]['expression']
  * @param array $triggers[0,...]['host']
  * @param array $triggers[0,...]['hostid'] OPTIONAL
  * @param array $triggers[0,...]['description'] OPTIONAL
-	 */
+ */
 	public static function getId($triggers){
 		zbx_valueTo($triggers, array('array' => 1));
 
@@ -508,10 +508,11 @@ class CTrigger extends CZBXAPI{
 
 		$triggerids = array();
 		foreach($triggers as $num => $trigger){
-		$sql_where = '';
-		$sql_from = '';
+			$sql_where = '';
+			$sql_from = '';
+			
 			if(isset($trigger['hostid']) || isset($trigger['host'])){
-			$sql_from .= ', functions f, items i, hosts h ';
+				$sql_from .= ', functions f, items i, hosts h ';
 
 				$sql_where .= ' f.itemid=i.itemid '.
 					' AND f.triggerid=t.triggerid'.
@@ -524,26 +525,25 @@ class CTrigger extends CZBXAPI{
 					$sql_where .= ' AND h.host='.zbx_dbstr($trigger['host']);
 			}
 
-		if(isset($trigger['description'])) {
-			$sql_where .= ' AND t.description='.zbx_dbstr($trigger['description']);
-		}
+			if(isset($trigger['description'])) {
+				$sql_where .= ' AND t.description='.zbx_dbstr($trigger['description']);
+			}
 
-		$sql = 'SELECT DISTINCT t.triggerid, t.expression '.
-				' FROM triggers t'.$sql_from.
-				' WHERE '.$sql_where.
-					' AND '.DBin_node('t.triggerid', get_current_nodeid(false));
-		if($db_triggers = DBselect($sql)){
-			$result = true;
-			$triggerid = null;
+			$sql = 'SELECT DISTINCT t.triggerid, t.expression '.
+					' FROM triggers t'.$sql_from.
+					' WHERE '.$sql_where.
+						' AND '.DBin_node('t.triggerid', get_current_nodeid(false));
+			if($db_triggers = DBselect($sql)){
+				$result = true;
 
-			while($tmp_trigger = DBfetch($db_triggers)) {
-				$tmp_exp = explode_exp($tmp_trigger['expression'], false);
-				if(strcmp($tmp_exp, $trigger['expression']) == 0) {
-						$triggerids[] = array_merge($trigger, $tmp_trigger);
-					break;
+				while($tmp_trigger = DBfetch($db_triggers)) {
+					$tmp_exp = explode_exp($tmp_trigger['expression'], false);
+					if(strcmp($tmp_exp, $trigger['expression']) == 0) {
+						$triggerids[] = array_merge($tmp_trigger, $trigger);
+						break;
+					}
 				}
 			}
-		}
 		}
 
 		if($result)
@@ -657,7 +657,8 @@ class CTrigger extends CZBXAPI{
 
 		self::BeginTransaction(__METHOD__);		
 		foreach($triggers as $num => $trigger){
-			$trigger_db_fields = self::getById($trigger);
+			$trigger_db_fields = self::get(array('triggerids' => $trigger['triggerid'], 'extendoutput' => 1, 'editable' => 1));
+			$trigger_db_fields = reset($trigger_db_fields);
 			if(!isset($trigger_db_fields)) {
 				$result = false;
 				break;
@@ -678,7 +679,7 @@ class CTrigger extends CZBXAPI{
 									$trigger['status'], 
 									$trigger['comments'], 
 									$trigger['url'],
-									null,
+									array(),
 									$trigger['templateid']);
 			if(!$result) break;
 			$triggerids[$trigger['triggerid']] = $result;
