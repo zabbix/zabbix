@@ -5857,26 +5857,25 @@
 		$template_tbl->setEvenRowClass('form_even_row');
 
 		foreach($templates as $id => $temp_name){
-			$frmHost->addVar('templates['.$id.']',$temp_name);
-			$template_tbl->addRow(	array(
-					new CCheckBox('templates_rem['.$id.']', 'no', null, $id),
-					$temp_name
-					)
+			$frmHost->addVar('templates['.$id.']', $temp_name);
+			$template_tbl->addRow(new CCol(array(
+				new CCheckBox('templates_rem['.$id.']', 'no', null, $id),
+				$temp_name))
 			);
 		}
 
 		$footer = new CCol(array(
-			new CButton('add_template',S_ADD,
-					"return PopUp('popup.php?dstfrm=".$frmHost->getName().
-					"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
-					url_param($templates,false,'existed_templates')."',450,450)",
-					'T'),
+			new CButton('add_template', S_ADD,
+				"return PopUp('popup.php?dstfrm=".$frmHost->getName().
+				"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
+				url_param($templates,false,'existed_templates')."',450,450)",
+				'T'),
 			SPACE,
 			new CButton('unlink', S_UNLINK),
 			SPACE,
 			new CButton('unlink_and_clear', S_UNLINK_AND_CLEAR)
 		));
-		$footer->setColSpan(2);
+		//$footer->setColSpan(2);
 
 		$template_tbl->setFooter($footer);
 
