@@ -222,8 +222,7 @@ include_once('include/page_header.php');
 		}
 		$sendto=$row['sendto'];
 
-		$message = new CCol(array(bold(S_SUBJECT.': '), br(), $row['subject'], br(), br(), bold(S_MESSAGE.': '), br(), $row['message']), 'top');
-		$message->addStyle('white-space: normal;');
+		$message = array(bold(S_SUBJECT.': '), br(), $row['subject'], br(), br(), bold(S_MESSAGE.': '), br(), $row['message']);
 
 		if(empty($row['error'])){
 			$error=new CSpan(SPACE,'off');
@@ -239,7 +238,7 @@ include_once('include/page_header.php');
 			new CCol($status, 'top'),
 			new CCol($retries, 'top'),
 			new CCol($sendto, 'top'),
-			$message,
+			new CCol($message, 'wraptext top'),
 			new CCol($error, 'wraptext top')));
 	}
 
