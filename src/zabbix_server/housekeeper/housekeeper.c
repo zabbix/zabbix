@@ -214,7 +214,7 @@ static int delete_history(char *table, zbx_uint64_t itemid, int keep_history, in
 	DB_ROW          row;
 	int             min_clock;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In delete_history(%s," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d)",
+	zabbix_log( LOG_LEVEL_DEBUG, "In delete_history(%s," ZBX_FS_UI64 ",%d,%d)",
 		table,
 		itemid,
 		keep_history,
