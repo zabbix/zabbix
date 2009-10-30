@@ -19,7 +19,6 @@
 **/
 ?>
 <?php
-
 require_once('include/config.inc.php');
 require_once('include/hosts.inc.php');
 require_once('include/forms.inc.php');
@@ -45,42 +44,42 @@ require_once('include/forms.inc.php');
 
 //		VAR						TYPE		OPTIONAL FLAGS			VALIDATION	EXCEPTION
 	$fields=array(
-		'hosts'			=> array(T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID, 		NULL),
-		'groups'		=> array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID, 		NULL),
+		'hosts'				=> array(T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID, 		NULL),
+		'groups'			=> array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID, 		NULL),
 		'clear_templates'	=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID, 		NULL),
-		'templates'		=> array(T_ZBX_STR, O_OPT,	NULL,			NULL,		NULL),
+		'templates'			=> array(T_ZBX_STR, O_OPT,	NULL,			NULL,		NULL),
 		'templateid'		=> array(T_ZBX_INT,	O_OPT,	P_SYS,		DB_ID,		'isset({form})&&({form}=="update")'),
 		'template_name'		=> array(T_ZBX_STR,	O_OPT,	NOT_EMPTY,	NULL,		'isset({save})'),
-		'groupid'		=> array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID,		NULL),
+		'groupid'			=> array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID,		NULL),
 		'twb_groupid'		=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,		NULL),
-		'newgroup'		=> array(T_ZBX_STR, O_OPT,	NULL,			NULL,		NULL),
+		'newgroup'			=> array(T_ZBX_STR, O_OPT,	NULL,			NULL,		NULL),
 
-		'macros_rem'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'macros'=>				array(T_ZBX_STR, O_OPT, P_SYS,			NULL,	NULL),
-		'macro_new'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	'isset({macro_add})'),
-		'value_new'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	'isset({macro_add})'),
-		'macro_add' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'macros_del' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'macros_rem'		=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'macros'			=> array(T_ZBX_STR, O_OPT, P_SYS,			NULL,	NULL),
+		'macro_new'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	'isset({macro_add})'),
+		'value_new'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	'isset({macro_add})'),
+		'macro_add'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'macros_del'		=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 // actions
-		'go'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
+		'go'				=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
 //form
-		'unlink'		=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
+		'unlink'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
 		'unlink_and_clear'	=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
-		'save'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
-		'clone'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
+		'save'				=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
+		'clone'				=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
 		'full_clone'		=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
-		'delete'		=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
+		'delete'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
 		'delete_and_clear'	=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
-		'cancel'		=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
+		'cancel'			=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
 // other
-		'form'			=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
+		'form'				=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
 		'form_refresh'		=> array(T_ZBX_STR, O_OPT,	NULL,			NULL,		NULL)
 	);
-
 	check_fields($fields);
-	validate_sort_and_sortorder('host',ZBX_SORT_UP);
+	
+	validate_sort_and_sortorder('host', ZBX_SORT_UP);
 
-	$_REQUEST['go'] = get_request('go','none');
+	$_REQUEST['go'] = get_request('go', 'none');
 ?>
 <?php
 /**********************************/
@@ -138,18 +137,15 @@ require_once('include/forms.inc.php');
 		}
 		foreach($unlink_templates as $id) unset($_REQUEST['templates'][$id]);
 	}
-
 // clone
 	else if(isset($_REQUEST['clone']) && isset($_REQUEST['templateid'])){
 		unset($_REQUEST['templateid']);
 		$_REQUEST['form'] = 'clone';
 	}
-
 // full_clone
 	else if(isset($_REQUEST['full_clone']) && isset($_REQUEST['templateid'])){
 		$_REQUEST['form'] = 'full_clone';
 	}
-
 // save
 	else if(isset($_REQUEST['save'])){
 
@@ -190,7 +186,6 @@ require_once('include/forms.inc.php');
 				$result = false;
 			}
 		}
-
 // <<<--- CREATE|UPDATE TEMPLATE WITH GROUPS AND LINKED TEMPLATES --->>>
 		if($templateid){
 			if(isset($_REQUEST['clear_templates'])) {
@@ -198,7 +193,6 @@ require_once('include/forms.inc.php');
 					$result &= unlink_template($_REQUEST['templateid'], $id, false);
 				}
 			}
-
 			$result = CTemplate::update(array(array('hostid' => $templateid, 'host' => $template_name)));
 			$result &= CHostGroup::updateHosts(array('hostids' => $templateid, 'groupids' => $groups));
 			$msg_ok 	= S_TEMPLATE_UPDATED;
@@ -276,6 +270,7 @@ require_once('include/forms.inc.php');
 			while($db_graph = DBfetch($res)){
 				$result &= copy_graph_to_host($db_graph['graphid'], $templateid, true);
 			}
+			
 		}
 // --->>> <<<---
 // <<<--- LINK/UNLINK HOSTS --->>>
@@ -347,7 +342,6 @@ require_once('include/forms.inc.php');
 		}
 		unset($_REQUEST['save']);
 	}
-
 // delete, delete_and_clear
 	else if((isset($_REQUEST['delete']) || isset($_REQUEST['delete_and_clear'])) && isset($_REQUEST['templateid'])){
 		$unlink_mode = false;
@@ -395,7 +389,7 @@ require_once('include/forms.inc.php');
 
 		show_messages($go_result, S_TEMPLATE_DELETED, S_CANNOT_DELETE_TEMPLATE);
 	}
-	
+
 	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
 		$url = new CUrl();
 		$path = $url->getPath();
