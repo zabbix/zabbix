@@ -618,7 +618,7 @@ class CHost extends CZBXAPI{
 		if($hostid = DBfetch($res))
 			return $hostid['hostid'];
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Host with name: "'.$host_data['host'].'" does not exists.');
+			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Host with name [ '.$host_data['host'].' ] does not exists.');
 			return false;
 		}
 	}
@@ -654,7 +654,6 @@ class CHost extends CZBXAPI{
 		$templates = null;
 		$newgroup = '';
 
-		$error = 'Unknown ZABBIX internal error [CHost]';
 		$result_ids = array();
 		$result = false;
 
@@ -664,7 +663,7 @@ class CHost extends CZBXAPI{
 
 			if(empty($host['groupids'])){
 				$result = false;
-				$error = 'No groups for host [ '.$host['host'].' ]';
+				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'No groups for host [ '.$host['host'].' ]');
 				break;
 			}
 			
@@ -690,7 +689,7 @@ class CHost extends CZBXAPI{
 
 			if(!check_db_fields($host_db_fields, $host)){
 				$result = false;
-				$error = 'Wrong fields for host [ '.$host['host'].' ]';
+				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Wrong fields for host [ '.$host['host'].' ]');
 				break;
 			}
 			
@@ -702,13 +701,13 @@ class CHost extends CZBXAPI{
 			if(!$result) break;
 			$result_ids[$result] = $result;
 		}
-		$result = DBend($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
 			return $result_ids;
 		}
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
+			self::setError(__METHOD__);
 			return false;
 		}
 	}
@@ -780,7 +779,7 @@ class CHost extends CZBXAPI{
 			return $hostids;
 		}
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
+			self::setError(__METHOD__);
 			return false;
 		}
 	}
