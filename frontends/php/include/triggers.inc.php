@@ -951,30 +951,30 @@ return $result;
 
 
 	function construct_expression($itemid,$expressions){
-		$complite_expr='';	
-		
+		$complite_expr='';
+
 		$item = get_item_by_itemid($itemid);
 		$host = get_host_by_itemid($itemid);
-		
+
 		$prefix = $host['host'].':'.$item['key_'].'.';
 
 		if(empty($expressions)){
 			error('Expression can\'t be empty');
 		}
 		$functions = array('regexp'=>1,'iregexp'=>1);
-			
+
 //		$ZBX_EREG_EXPESSION_FUNC_FORMAT = '^([[:print:]]*)([&|]{1})(([a-zA-Z_.$]{6,7})(\\(([[:print:]]+){0,1}\\)))([[:print:]]*)$';
 		$ZBX_PREG_EXPESSION_FUNC_FORMAT = '^(['.ZBX_PREG_PRINT.']*)([&|]{1})(([a-zA-Z_.\$]{6,7})(\\((['.ZBX_PREG_PRINT.']+){0,1}\\)))(['.ZBX_PREG_PRINT.']*)$';
 
 		$expr_array = array();
-		
+
 		$cexpor = 0;
 		$startpos = -1;
 
 		foreach($expressions as $id => $expression){
 			$expression['value'] = preg_replace('/\s+(AND){1,2}\s+/U', '&', $expression['value']);
 			$expression['value'] = preg_replace('/\s+(OR){1,2}\s+/U', '|', $expression['value']);
-//sdi('<pre>'.print_r($expression['value'],true).'</pre>');			
+//sdi('<pre>'.print_r($expression['value'],true).'</pre>');
 			$pastcexpor = $cexpor;
 			if($expression['type'] == REGEXP_INCLUDE){
 				if(!empty($complite_expr)) {
@@ -998,7 +998,7 @@ return $result;
 					$complite_expr.=' & ';
 				}
 			}
-			
+
 			$expr = '&'.$expression['value'];
 			//$expr = '&'.$expression['view'];
 			$expr = preg_replace('/\s+(\&|\|){1,2}\s+/U','$1',$expr);
@@ -1024,19 +1024,19 @@ return $result;
 				$sub_expr_count++;
 				$expr = $arr[1];
 			}
-			
+
 			if(empty($expr_array)){
 				error('Incorrect trigger expression. ['.$expression['value'].']');
 				return false;
 			}
-			
+
 			$expr_array[$sub_expr_count-1]['eq'] = '';
-	
-			$sub_eq = '';	
+
+			$sub_eq = '';
 			if($multi > 0){
 				$sub_eq = $eq_global;
 			}
-			
+
 			foreach($expr_array as $id => $expr){
 				if($multi > 0){
 					$sub_expr = $expr['eq'].'({'.$prefix.$expr['regexp'].'})'.$sub_eq.$sub_expr;

@@ -404,7 +404,7 @@ class CMaintenance extends CZBXAPI{
 	public static function delete($maintenanceids){
 		$maintenanceids = isset($maintenanceids['maintenanceids']) ? $maintenanceids['maintenanceids'] : array();
 		zbx_value2array($maintenanceids);
-		
+
 		if(!empty($maintenanceids)){
 			$result = delete_maintenance($maintenanceids);
 		}
@@ -412,7 +412,7 @@ class CMaintenance extends CZBXAPI{
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ maintenanceids ]');
 			$result = false;
 		}
-		
+
 		if($result)
 			return true;
 		else{

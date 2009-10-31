@@ -759,7 +759,7 @@ if(isset($_REQUEST['sform'])){
 	$cb = new CButton('cancel',S_CANCEL);
 	$cb->setType('button');
 	$cb->setAction('javascript: self.close();');
-	
+
 	$frmService->addItemToBottomRow($cb);
 	$frmService->show();
 }

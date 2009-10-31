@@ -476,7 +476,7 @@ class zbxXML{
 					}
 					if(!empty($groups_to_add)){
 						$new_groupids = CHostGroup::add($groups_to_add);
-					
+
 						if($new_groupids === false){
 							error(CHostGroup::resetErrors());
 							$result = false;
@@ -659,11 +659,11 @@ class zbxXML{
 					foreach($triggers as $trigger){
 						$trigger_db = self::mapXML2arr($trigger, XML_TAG_TRIGGER);
 						$trigger_db['expression'] = str_replace('{{HOSTNAME}:', '{'.$host_db['host'].':', $trigger_db['expression']);
-						
+
 						$current_triggerid = CTrigger::getId(array('description' => $trigger_db['description'], 'host' => $host_db['host'], 'expression' => $trigger_db['expression']));
 						$current_triggerid = reset($current_triggerid);
 						$current_triggerid = $current_triggerid ? $current_triggerid['triggerid'] : false;
-						
+
 // sdi('trigger: '.$trigger_db['description'].' | triggerID: '. $current_triggerid);
 // sdi(isset($rules['trigger']['missed']));
 						if(!$current_triggerid && !isset($rules['trigger']['missed'])) continue; // break if update nonexist

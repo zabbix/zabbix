@@ -558,7 +558,7 @@ if((ini_get('mbstring.func_overload') > 5)){
 
 	define('REGEXP_INCLUDE',0);
 	define('REGEXP_EXCLUDE',1);
-	
+
 // PREG
 	define('ZBX_PREG_PRINT', '^\x00-\x1F');
 

@@ -495,7 +495,7 @@ class CAlert extends CZBXAPI{
 	public static function delete($alertids){
 		$alertids = isset($alertids['alertids']) ? $alertids['alertids'] : array();
 		zbx_value2array($alertids);
-		
+
 		if(!empty($alertids)){
 			$sql = 'DELETE FROM alerts WHERE '.DBcondition('alertid', $alertids);
 			$result = DBexecute($sql);
@@ -504,7 +504,7 @@ class CAlert extends CZBXAPI{
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ alertids ]');
 			$result = false;
 		}
-		
+
 		if($result)
 			return $result;
 		else{

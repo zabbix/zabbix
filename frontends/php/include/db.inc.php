@@ -552,11 +552,11 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 					foreach($row as $key => $value){
 						$field_type = strtolower(oci_field_type($cursor,$key));
 						$value = (str_in_array($field_type,array('varchar','varchar2','blob','clob')) && is_null($value))?'':$value;
-						
+
 						if(is_object($value) && (stristr($field_type, 'lob') !== false)){
 							$value = $value->load();
 						}
-						
+
 						$result[strtolower($key)] = $value;
 					}
 				}

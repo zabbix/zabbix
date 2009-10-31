@@ -89,7 +89,7 @@ private $items;
 //		$widget->setAttribute('width','100%');
 //		$widget->setCellPadding(0);
 //		$widget->setCellSpacing(0);
-		
+
 		$widget = array();
 
 		if(!empty($this->pageHeaders)){
@@ -153,7 +153,7 @@ private $items;
 
 //		$widget->addRow($div);
 		$widget[] = $div;
-		
+
 	return $widget;
 	}
 
@@ -163,7 +163,7 @@ private $items;
 
 	public function toString(){
 		$tab = $this->get();
-		
+
 //	return $tab->toString();
 	return unpack_object($tab);
 	}

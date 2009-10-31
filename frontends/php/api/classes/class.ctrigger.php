@@ -510,7 +510,7 @@ class CTrigger extends CZBXAPI{
 		foreach($triggers as $num => $trigger){
 			$sql_where = '';
 			$sql_from = '';
-			
+
 			if(isset($trigger['hostid']) || isset($trigger['host'])){
 				$sql_from .= ', functions f, items i, hosts h ';
 
@@ -576,7 +576,7 @@ class CTrigger extends CZBXAPI{
  */
 	public static function add($triggers){
 		zbx_valueTo($triggers, array('array'=>1));
-		
+
 		$result = true;
 		$triggerids = array();
 		self::BeginTransaction(__METHOD__);
@@ -651,11 +651,11 @@ class CTrigger extends CZBXAPI{
 	 */
 	public static function update($triggers){
 		zbx_valueTo($triggers, array('array'=>1));
-		
+
 		$result = true;
 		$triggerids = array();
 
-		self::BeginTransaction(__METHOD__);		
+		self::BeginTransaction(__METHOD__);
 		foreach($triggers as $num => $trigger){
 			$trigger_db_fields = self::get(array('triggerids' => $trigger['triggerid'], 'extendoutput' => 1, 'editable' => 1));
 			$trigger_db_fields = reset($trigger_db_fields);
@@ -671,13 +671,13 @@ class CTrigger extends CZBXAPI{
 			}
 
 			//$trigger['expression'] = explode_exp($trigger['expression'], false);
-			$result = update_trigger($trigger['triggerid'], 
-									$trigger['expression'], 
-									$trigger['description'], 
+			$result = update_trigger($trigger['triggerid'],
+									$trigger['expression'],
+									$trigger['description'],
 									$trigger['type'],
-									$trigger['priority'], 
-									$trigger['status'], 
-									$trigger['comments'], 
+									$trigger['priority'],
+									$trigger['status'],
+									$trigger['comments'],
 									$trigger['url'],
 									array(),
 									$trigger['templateid']);
@@ -715,7 +715,7 @@ class CTrigger extends CZBXAPI{
 		foreach($triggers as $num => $trigger){
 			$triggerids[] = $trigger['triggerid'];
 		}
-		
+
 		if(!empty($triggerids)){
 			$result = delete_trigger($triggerids);
 		}
@@ -723,7 +723,7 @@ class CTrigger extends CZBXAPI{
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ triggerids ]');
 			$result = false;
 		}
-		
+
 		if($result)
 			return $result;
 		else{
@@ -748,9 +748,9 @@ class CTrigger extends CZBXAPI{
 	 */
 	public static function addDependency($triggers_data){
 		zbx_valueTo($triggers_data, array('array' => 1));
-		
+
 		$result = true;
-		
+
 		self::BeginTransaction(__METHOD__);
 
 		foreach($triggers_data as $num => $dep){
@@ -758,7 +758,7 @@ class CTrigger extends CZBXAPI{
 		}
 
 		$result = self::EndTransaction($result, __METHOD__);
-		
+
 		if($result)
 			return true;
 		else{
@@ -766,7 +766,7 @@ class CTrigger extends CZBXAPI{
 			return false;
 		}
 	}
-	
+
 /**
  * Delete trigger dependencis
  *
@@ -787,9 +787,9 @@ class CTrigger extends CZBXAPI{
 		foreach($triggers as $num => $trigger){
 			$triggerids[] = $trigger['triggerid'];
 		}
-		
+
 		self::BeginTransaction(__METHOD__);
-		
+
 		$result = delete_dependencies_by_triggerid($triggerids);
 
 		$result = self::EndTransaction($result, __METHOD__);

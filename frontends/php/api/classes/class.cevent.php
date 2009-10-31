@@ -116,15 +116,15 @@ class CEvent extends CZBXAPI{
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
 		else if(($options['object'] == EVENT_OBJECT_TRIGGER) || ($options['source'] == EVENT_SOURCE_TRIGGER)){
-		
+
 			$triggers = CTrigger::get();
 			$triggerids = array_keys($triggers);
-			
+
 			if(!is_null($options['triggerids']))
 				$options['triggerids'] = array_intersect($options['triggerids'], $triggerids);
 			else
 				$options['triggerids'] = $triggerids;
-			
+
 /*
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
@@ -547,7 +547,7 @@ class CEvent extends CZBXAPI{
 	public static function delete($eventids){
 		$eventids = isset($eventids['eventids']) ? $eventids['eventids'] : array();
 		zbx_value2array($eventids);
-		
+
 		if(!empty($eventids)){
 			$sql = 'DELETE FROM events WHERE '.DBcondition('eventid', $eventids);
 			$result = DBexecute($sql);

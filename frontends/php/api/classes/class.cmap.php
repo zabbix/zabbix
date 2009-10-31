@@ -455,7 +455,7 @@ class CMap extends CZBXAPI{
 
 		$sysmapids = isset($sysmapids['sysmapids']) ? $sysmapids['sysmapids'] : array();
 		zbx_value2array($sysmapids);
-		
+
 		if(!empty($sysmapids)){
 			self::BeginTransaction(__METHOD__);
 			foreach($sysmapids as $sysmapid){
@@ -479,7 +479,7 @@ class CMap extends CZBXAPI{
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ sysmapids ]');
 			$result = false;
 		}
-		
+
 		if($result)
 			return true;
 		else{
