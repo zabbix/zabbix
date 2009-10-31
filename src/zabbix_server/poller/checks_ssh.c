@@ -115,7 +115,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	}
 
 	/* At this point we havn't authenticated. The first thing to do is check
-	 * the hostkey's fingerprint against our known hosts Your app may have it
+	 * the hostkey's fingerprint against our known hosts. Your app may have it
 	 * hard coded, may go to a file, may present it to the user, that's your
 	 * call
 	 */
@@ -264,7 +264,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 		else
 			break;
 	}
-	
+
 	buffer[bytecount] = '\0';
 	SET_STR_RESULT(result, convert_to_utf8(buffer, bytecount, encoding));
 
