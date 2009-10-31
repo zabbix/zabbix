@@ -85,7 +85,7 @@ class CGraphDraw{
 
 		$this->applyGraphTheme();
 	}
-	
+
 
 	public function applyGraphTheme($description=null){
 		global $USER_DETAILS;

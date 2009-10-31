@@ -304,7 +304,7 @@ include_once('include/page_header.php');
 		$path = $url->getPath();
 		insert_js('cookie.eraseArray("'.$path.'")');
 	}
-	
+
 ?>
 <?php
 	$_REQUEST['filter_usrgrpid'] = get_request('filter_usrgrpid',get_profile('web.users.filter.usrgrpid',0));
@@ -455,19 +455,19 @@ include_once('include/page_header.php');
 
 		$goOption = new CComboItem('unblock',S_UNBLOCK_SELECTED);
 		$goOption->setAttribute('confirm','Unblock selected users?');
-		$goBox->addItem($goOption);	
+		$goBox->addItem($goOption);
 //		$goBox->addItem('unblock',S_UNBLOCK_SELECTED);
-		
+
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
 		$goOption->setAttribute('confirm','Delete selected users?');
-		$goBox->addItem($goOption);	
+		$goBox->addItem($goOption);
 //		$goBox->addItem('delete',S_DELETE_SELECTED);
 
 
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton', S_GO);
 		$goButton->setAttribute('id','goButton');
-		
+
 		zbx_add_post_js('chkbxRange.pageGoName = "group_userid";');
 		$footer = get_table_header(array($goBox, $goButton));
 //----

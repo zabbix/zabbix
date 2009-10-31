@@ -696,7 +696,7 @@ class CItem extends CZBXAPI{
 	public static function delete($itemids){
 		$itemids = isset($itemids['itemids']) ? $itemids['itemids'] : array();
 		zbx_value2array($itemids);
-		
+
 		if(!empty($itemids)){
 			$result = delete_item($itemids);
 		}

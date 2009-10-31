@@ -857,10 +857,10 @@ class CUserMacro extends CZBXAPI{
  * @return boolean
  */
 	public static function deleteHostMacro($hostmacroids){
-	
+
 		$hostmacroids = isset($hostmacroids['hostmacroids']) ? $hostmacroids['hostmacroids'] : array();
 		zbx_value2array($hostmacroids);
-		
+
 		if(!empty($hostmacroids)){
 			$sql = 'DELETE FROM hostmacro WHERE '.DBcondition('hostmacroid', $hostmacroids);
 			$result = DBexecute($sql);
@@ -870,7 +870,7 @@ class CUserMacro extends CZBXAPI{
 			$result = false;
 		}
 
-		
+
 		if($result)
 			return $hostmacroids;
 		else{
@@ -895,7 +895,7 @@ class CUserMacro extends CZBXAPI{
 	public static function deleteGlobalMacro($globalmacroids){
 		$globalmacroids = isset($globalmacroids['globalmacroids']) ? $globalmacroids['globalmacroids'] : array();
 		zbx_value2array($globalmacroids);
-		
+
 		if(!empty($globalmacroids)){
 			$sql = 'DELETE FROM globalmacro WHERE '.DBcondition('globalmacroid', $globalmacroids);
 			$result = DBexecute($sql);

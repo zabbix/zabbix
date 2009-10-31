@@ -76,7 +76,7 @@ require_once('include/forms.inc.php');
 		'form_refresh'		=> array(T_ZBX_STR, O_OPT,	NULL,			NULL,		NULL)
 	);
 	check_fields($fields);
-	
+
 	validate_sort_and_sortorder('host', ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go', 'none');
@@ -270,7 +270,7 @@ require_once('include/forms.inc.php');
 			while($db_graph = DBfetch($res)){
 				$result &= copy_graph_to_host($db_graph['graphid'], $templateid, true);
 			}
-			
+
 		}
 // --->>> <<<---
 // <<<--- LINK/UNLINK HOSTS --->>>
@@ -835,11 +835,11 @@ require_once('include/forms.inc.php');
 
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
 		$goOption->setAttribute('confirm','Delete selected templates?');
-		$goBox->addItem($goOption);	
-		
+		$goBox->addItem($goOption);
+
 		$goOption = new CComboItem('delete_and_clear',S_DELETE_SELECTED_WITH_LINKED_ELEMENTS);
 		$goOption->setAttribute('confirm','Warning: this will delete selected templates and clear all linked hosts?');
-		$goBox->addItem($goOption);	
+		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO);

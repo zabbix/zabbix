@@ -58,7 +58,7 @@ include_once('include/page_header.php');
 	if($_REQUEST['graphid']>0){
 		if($_REQUEST['period'] >= ZBX_MIN_PERIOD)
 			update_profile('web.graph.period',$_REQUEST['period'],PROFILE_TYPE_INT,$_REQUEST['graphid']);
-		
+
 		if(isset($_REQUEST['stime'])){
 			update_profile('web.graph.stime',$_REQUEST['stime'], PROFILE_TYPE_STR, $_REQUEST['graphid']);
 		}

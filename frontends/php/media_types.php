@@ -128,7 +128,7 @@ include_once('include/page_header.php');
 		$path = $url->getPath();
 		insert_js('cookie.eraseArray("'.$path.'")');
 	}
-	
+
 ?>
 <?php
 	$medias_wdgt = new CWidget();

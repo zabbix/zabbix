@@ -43,19 +43,19 @@ class CHostGroup extends CZBXAPI{
  *
 	public static function getById($data){
 		global $USER_DETAILS;
-		
+
 		if(!isset($data['groupid']) || empty($data['groupid'])){
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ groupid ]');
 			return false;
 		}
-		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){	
+		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			$cnt = self::get(array('groupids' => $data['groupid'], 'count' => 1));
 			if($cnt['rowscount'] != 1){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, "You have no rights for HostGroup [ {$data['groupid']} ]");
 				return false;
 			}
 		}
-		
+
 		$sql = "SELECT * FROM groups WHERE groupid={$data['groupid']}";
 		$group = DBfetch(DBselect($sql));
 
@@ -68,7 +68,7 @@ class CHostGroup extends CZBXAPI{
 	}
 */
 
-	
+
 	/**
 	 * Get HostGroup ID by name
 	 *
@@ -84,23 +84,23 @@ class CHostGroup extends CZBXAPI{
 	 */
 	public static function getId($data){
 		global $USER_DETAILS;
-		
+
 		if(!isset($data['name']) || empty($data['name'])){
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ name ]');
 			return false;
 		}
-		
+
 		$sql = 'SELECT groupid FROM groups WHERE name='.zbx_dbstr($data['name']).' AND '.DBin_node('groupid', get_current_nodeid(false));
 		$groupid = DBfetch(DBselect($sql));
 
-		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){	
+		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			$cnt = self::get(array('groupids' => $groupid, 'count' => 1));
 			if($cnt['rowscount'] != 1){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, "You have no rights for HostGroup [ $groupid ]");
 				return false;
 			}
 		}
-		
+
 		if($groupid)
 			return $groupid['groupid'];
 		else{
@@ -449,12 +449,12 @@ class CHostGroup extends CZBXAPI{
 	 */
 	public static function add($groups){
 		global $USER_DETAILS;
-		
+
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only SuperAdmins can create HostGroups');
 			return false;
 		}
-		
+
 		$groupids = array();
 		if(empty($groups)){
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter');
@@ -470,7 +470,7 @@ class CHostGroup extends CZBXAPI{
 				break;
 			}
 			$group = $group['name'];
-			
+
 			$group_exist = CHostGroup::getId(array('name' => $group));
 			if($group_exist != false){
 				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, "HostGroup [ $group ] already exists");
@@ -513,22 +513,22 @@ class CHostGroup extends CZBXAPI{
 	 */
 	public static function update($groups){
 		global $USER_DETAILS;
-		
+
 		$result = true;
 
 		if(empty($groups)){
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter');
 			return false;
 		}
-		
-		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){	
+
+		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			$toCheck = array();
 			foreach($groups as $group){
 				if(!isset($group['groupid']) || empty($group['groupid'])){
 					self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ groupid ]');
 					return false;
 				}
-				$toCheck[] = $group['groupid'];		
+				$toCheck[] = $group['groupid'];
 			}
 			$cnt = self::get(array('groupids' => $toCheck, 'count' => 1, 'editable' => 1));
 			if($cnt['rowscount'] != count($toCheck)){
@@ -536,8 +536,8 @@ class CHostGroup extends CZBXAPI{
 				return false;
 			}
 		}
-		
-		
+
+
 		self::BeginTransaction(__METHOD__);
 		foreach($groups as $num => $group){
 
@@ -580,18 +580,18 @@ class CHostGroup extends CZBXAPI{
 	 */
 	public static function delete($groups){
 		global $USER_DETAILS;
-		
+
 		$groupids = array();
 		foreach($groups as $group){
 			$groupids[] = $group['groupid'];
 		}
-		
+
 		if(empty($groupids)){
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter');
 			return false;
 		}
-			
-		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){	
+
+		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			$cnt = self::get(array('groupids' => $groupids, 'count' => 1, 'editable' => 1));
 			if($cnt['rowscount'] != count($groupids)){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
@@ -599,8 +599,8 @@ class CHostGroup extends CZBXAPI{
 			}
 		}
 
-/* 
-// TODO: PEREDELATJ iz frontenda -> 		
+/*
+// TODO: PEREDELATJ iz frontenda ->
 		$dlt_groupids = getDeletableHostGroups($groupids);
 		if(count($groupids) != count($dlt_groupids)){
 			foreach($groupids as $groupid){
@@ -614,10 +614,10 @@ class CHostGroup extends CZBXAPI{
 			}
 			return false;
 		}
-		
-		
-		self::BeginTransaction(__METHOD__);	
-		
+
+
+		self::BeginTransaction(__METHOD__);
+
 // delete sysmap element
 		if(!delete_sysmaps_elements_with_groupid($groupids))
 			return false;
@@ -667,7 +667,7 @@ class CHostGroup extends CZBXAPI{
 
 		DBexecute('DELETE FROM hosts_groups WHERE '.DBcondition('groupid',$groupids));
 
-		foreach ($groupids as $id) {	// The section should be improved 
+		foreach ($groupids as $id) {	// The section should be improved
 			$hostgroup_old = get_hostgroup_by_groupid($id);
 			$result = DBexecute('DELETE FROM groups WHERE groupid='.$id);
 			if ($result)
@@ -679,7 +679,7 @@ class CHostGroup extends CZBXAPI{
 */
 		$result = delete_host_group($groupids);
 //		$result = self::EndTransaction($result, __METHOD__);
-		
+
 		if($result)
 			return true;
 		else{
@@ -704,7 +704,7 @@ class CHostGroup extends CZBXAPI{
 	 */
 	public static function addHosts($data){
 		global $USER_DETAILS;
-		
+
 		if(!isset($data['groupids']) || empty($data['groupids'])){
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ groupids ]');
 			return false;
@@ -719,7 +719,7 @@ class CHostGroup extends CZBXAPI{
 		zbx_value2array($groupids);
 		zbx_value2array($hostids);
 
-		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){	
+		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			$cnt = self::get(array('groupids' => $groupids, 'count' => 1, 'editable' => 1));
 			if($cnt['rowscount'] != count($groupids)){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
@@ -731,18 +731,18 @@ class CHostGroup extends CZBXAPI{
 				return false;
 			}
 		}
-		
+
 		self::BeginTransaction(__METHOD__);
 		$sql = 'SELECT hostid, groupid FROM hosts_groups WHERE '.DBcondition('hostid', $hostids).' AND '.DBcondition('groupid', $groupids);
 		$linked_db = DBexecute($sql);
 		while($pair = DBfetch($linked_db)){
-			$linked[$pair['groupid']] = array($pair['hostid'] => $pair['hostid']);		
+			$linked[$pair['groupid']] = array($pair['hostid'] => $pair['hostid']);
 		}
 
 		foreach($groupids as $groupid){
 			foreach($hostids as $hostid){
 				if(isset($linked[$groupid]) && isset($linked[$groupid][$hostid])) continue;
-				
+
 				$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
 				$result = DBexecute("INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES ($hostgroupid, $hostid, $groupid)");
 				if(!$result){
@@ -776,7 +776,7 @@ class CHostGroup extends CZBXAPI{
 	 */
 	public static function removeHosts($data){
 		global $USER_DETAILS;
-		
+
 		self::BeginTransaction(__METHOD__);
 
 		if(!isset($data['groupids']) || empty($data['groupids'])){
@@ -787,13 +787,13 @@ class CHostGroup extends CZBXAPI{
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ hostids ]');
 			return false;
 		}
-		
+
 		$groupids = $data['groupids'];
 		$hostids = $data['hostids'];
 		zbx_value2array($groupids);
 		zbx_value2array($hostids);
-		
-		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){	
+
+		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			$cnt = self::get(array('groupids' => $groupids, 'count' => 1, 'editable' => 1));
 			if($cnt['rowscount'] != count($groupids)){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
@@ -805,15 +805,15 @@ class CHostGroup extends CZBXAPI{
 				return false;
 			}
 		}
-		
+
 		$unlinkable = getUnlinkableHosts($groupids, $hostids);
 		if(count($hostids) != count($unlinkable)){
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'One of the Hosts is left without Hostgroup');
 			return false;
 		}
-		
+
 		self::BeginTransaction(__METHOD__);
-		
+
 		$sql = 'DELETE FROM hosts_groups WHERE '.DBcondition('hostid', $data['hostids']).' AND '.DBcondition('groupid', $data['groupids']);
 		$result = DBexecute($sql);
 
@@ -843,7 +843,7 @@ class CHostGroup extends CZBXAPI{
 	 */
 	public static function updateHosts($data){
 		global $USER_DETAILS;
-		
+
 		if(!isset($data['groupids']) || empty($data['groupids'])){
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ groupids ]');
 			return false;
@@ -852,13 +852,13 @@ class CHostGroup extends CZBXAPI{
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ hostids ]');
 			return false;
 		}
-		
+
 		$groupids = $data['groupids'];
 		$hostids = $data['hostids'];
 		zbx_value2array($groupids);
 		zbx_value2array($hostids);
-		
-		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){	
+
+		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			$cnt = self::get(array('groupids' => $groupids, 'count' => 1, 'editable' => 1));
 			if($cnt['rowscount'] != count($groupids)){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
@@ -870,13 +870,13 @@ class CHostGroup extends CZBXAPI{
 				return false;
 			}
 		}
-		
+
 		self::BeginTransaction(__METHOD__);
 		$sql = 'DELETE FROM hosts_groups WHERE '.DBcondition('hostid', $hostids).' AND '.DBcondition('groupid', $groupids);
 		$result = DBexecute($sql);
 		self::addHosts($data);
 		$result = self::EndTransaction($result, __METHOD__);
-		
+
 		if($result)
 			return true;
 		else{
@@ -884,7 +884,7 @@ class CHostGroup extends CZBXAPI{
 			return false;
 		}
 	}
-	
+
 }
 
 ?>

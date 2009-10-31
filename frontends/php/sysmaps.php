@@ -129,7 +129,7 @@ include_once('include/page_header.php');
 		$path = $url->getPath();
 		insert_js('cookie.eraseArray("'.$path.'")');
 	}
-	
+
 ?>
 <?php
 	$form = new CForm();
@@ -198,7 +198,7 @@ include_once('include/page_header.php');
 		$goBox = new CComboBox('go');
 		$goOption = new CComboItem('delete', S_DELETE_SELECTED);
 		$goOption->setAttribute('confirm','Delete selected maps?');
-		$goBox->addItem($goOption);	
+		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO);

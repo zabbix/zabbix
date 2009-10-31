@@ -48,7 +48,7 @@
 
 //							$graphids = get_accessible_graphs($perm,array(),null,get_current_nodeid(true));
 						}
-												
+
 						$result &= isset($graphids[$ac_data['resourceid']]);
 					break;
 					case SCREEN_RESOURCE_SIMPLE_GRAPH:
@@ -62,7 +62,7 @@
 						$options['itemids'] = $itemid;
 						$options['nodeids'] = get_current_nodeid(true);
 						if($perm == PERM_READ_WRITE) $options['editable'] = 1;
-						
+
 						$items = CItem::get($options);
 						if($items['rowscount'] == 0){
 							$result = false;

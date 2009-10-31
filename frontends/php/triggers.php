@@ -331,10 +331,10 @@ include_once('include/page_header.php');
 				error("Cannot delete trigger [ $description ] (Templated trigger)");
 				continue;
 			}
-			
+
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $triggerid, $description, NULL, NULL, NULL);
 		}
-		
+
 		$go_result = !empty($_REQUEST['g_triggerid']);
 		if($go_result){
 			$go_result = delete_trigger($_REQUEST['g_triggerid']);
@@ -342,13 +342,13 @@ include_once('include/page_header.php');
 		$go_result = DBend($go_result);
 		show_messages($go_result, S_TRIGGERS_DELETED, S_CANNOT_DELETE_TRIGGERS);
 	}
-	
+
 	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
 		$url = new CUrl();
 		$path = $url->getPath();
 		insert_js('cookie.eraseArray("'.$path.'")');
 	}
-	
+
 ?>
 <?php
 	if(isset($_REQUEST['hostid']) && !isset($_REQUEST['groupid']) && !isset($_REQUEST['triggerid'])){
@@ -614,23 +614,23 @@ include_once('include/page_header.php');
 		$goBox = new CComboBox('go');
 		$goOption = new CComboItem('activate',S_ACTIVATE_SELECTED);
 		$goOption->setAttribute('confirm','Enable selected triggers?');
-		$goBox->addItem($goOption);	
+		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
 		$goOption->setAttribute('confirm','Disable selected triggers?');
-		$goBox->addItem($goOption);	
+		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('massupdate',S_MASS_UPDATE);
 		$goOption->setAttribute('confirm','Mass update selected triggers?');
-		$goBox->addItem($goOption);	
+		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('copy_to',S_COPY_SELECTED_TO);
 		$goOption->setAttribute('confirm','Copy selected triggers?');
-		$goBox->addItem($goOption);	
+		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
 		$goOption->setAttribute('confirm','Delete selected triggerers?');
-		$goBox->addItem($goOption);	
+		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO);
