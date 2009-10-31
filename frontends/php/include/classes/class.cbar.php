@@ -123,7 +123,7 @@ class CBar extends CGraphDraw{
 	}
 
 	public function setPeriodCaption($periodCaption){
-		
+
 		foreach($periodCaption as $key => $value){
 			$this->periodCaption[$key] = $value;
 
@@ -374,7 +374,7 @@ class CBar extends CGraphDraw{
 			$this->sizeY+$this->shiftY+1+$this->shiftYCaptionTop,
 			$this->getColor($this->graphtheme['gridcolor'], 0)
 			);
-			
+
 		imageline($this->im,
 			$this->shiftXleft+$this->shiftXCaptionLeft-1,
 			$this->shiftY-5,
@@ -402,7 +402,7 @@ class CBar extends CGraphDraw{
 				3,
 				$this->getColor($this->graphtheme['gridbordercolor'], 0)
 			);
-			
+
 		imageline($this->im,
 			$this->shiftXleft+$this->shiftXCaptionLeft-4,
 			$this->sizeY+$this->shiftY+1,
@@ -456,8 +456,8 @@ class CBar extends CGraphDraw{
 				$dims = imageTextSize(9,0,$caption);
 				imageText($this->im, 9, 0,
 							$i*($this->seriesWidth+$this->seriesDistance)+$this->shiftXleft+$this->shiftXCaptionLeft+round($this->seriesWidth/2)-($dims['width']/2),
-							$this->sizeY+$this->shiftY+20, 
-							$this->getColor($this->graphtheme['textcolor'], 0), 
+							$this->sizeY+$this->shiftY+20,
+							$this->getColor($this->graphtheme['textcolor'], 0),
 							$caption);
 
 				$i++;
@@ -486,7 +486,7 @@ class CBar extends CGraphDraw{
 				imageText($this->im, 8, 0,
 					$this->shiftXleft,
 					($this->sizeY + $this->shiftY+$this->shiftYCaptionTop) - ($i*($this->seriesWidth+$this->seriesDistance)+$this->seriesDistance+round($this->seriesWidth/2)),
-					$this->getColor($this->graphtheme['textcolor'], 0), 
+					$this->getColor($this->graphtheme['textcolor'], 0),
 					$caption);
 
 				$i++;
@@ -517,13 +517,13 @@ class CBar extends CGraphDraw{
 
 				for($i=0;$i<=$hstr_count;$i++){
 					$str = convert_units(($this->sizeY*$i/$hstr_count*($max-$min)/$this->sizeY+$min),$this->units[$axis]);
-					
+
 					$sideShift = 0;
 					if(GRAPH_YAXIS_SIDE_LEFT == $axis){
-						$dims = imageTextSize(8,0,$str);	
+						$dims = imageTextSize(8,0,$str);
 						$sideShift = $dims['width'];
 					}
-					
+
 					imagetext($this->im, 8, 0,
 						$this->shiftXleft+$this->shiftXCaptionLeft - $sideShift - 10,
 						$this->sizeY - $this->sizeY * $i / $hstr_count + $this->shiftY + $this->shiftYCaptionTop + 6,
@@ -541,10 +541,10 @@ class CBar extends CGraphDraw{
 
 				for($i=0;$i<=$hstr_count;$i++){
 					$str = convert_units(($this->sizeX*$i/$hstr_count*($max-$min)/$this->sizeX+$min),$this->units[$axis]);
-					
+
 					$sideShift = 0;
 					if(GRAPH_YAXIS_SIDE_LEFT == $axis){
-						$dims = imageTextSize(8,90,$str);	
+						$dims = imageTextSize(8,90,$str);
 						$sideShift = $dims['height'];
 					}
 
@@ -594,18 +594,18 @@ class CBar extends CGraphDraw{
 				$caption = $this->seriesLegend[$num];
 				$color = $this->getColor($this->seriesColor[$num],0);
 
-				imagefilledrectangle($this->im, 
-								$shiftX-5, 
-								$shiftY+14*$count-5, 
-								$shiftX+5, 
-								$shiftY+5+14*$count, 
+				imagefilledrectangle($this->im,
+								$shiftX-5,
+								$shiftY+14*$count-5,
+								$shiftX+5,
+								$shiftY+5+14*$count,
 								$color);
-								
+
 				imagerectangle($this->im,
-								$shiftX-5, 
-								$shiftY+14*$count-5, 
-								$shiftX+5, 
-								$shiftY+5+14*$count, 
+								$shiftX-5,
+								$shiftY+14*$count-5,
+								$shiftX+5,
+								$shiftY+5+14*$count,
 								$this->getColor('Black No Alpha')
 							);
 

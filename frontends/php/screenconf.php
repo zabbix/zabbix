@@ -251,7 +251,7 @@ include_once('include/page_header.php');
 			show_messages($go_result, S_SLIDESHOW_DELETED, S_CANNOT_DELETE_SLIDESHOW);
 		}
 	}
-	
+
 	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
 		$url = new CUrl();
 		$path = $url->getPath();
@@ -344,7 +344,7 @@ include_once('include/page_header.php');
 			$goBox = new CComboBox('go');
 			$goOption = new CComboItem('delete', S_DELETE_SELECTED);
 			$goOption->setAttribute('confirm','Delete selected screens?');
-			$goBox->addItem($goOption);	
+			$goBox->addItem($goOption);
 
 			// goButton name is necessary!!!
 			$goButton = new CButton('goButton',S_GO);
@@ -420,7 +420,7 @@ include_once('include/page_header.php');
 			$goBox = new CComboBox('go');
 			$goOption = new CComboItem('delete', S_DELETE_SELECTED);
 			$goOption->setAttribute('confirm','Delete selected slides?');
-			$goBox->addItem($goOption);	
+			$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
 			$goButton = new CButton('goButton',S_GO);

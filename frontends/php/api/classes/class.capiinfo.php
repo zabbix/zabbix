@@ -36,7 +36,7 @@ class CAPIInfo extends CZBXAPI{
  * @since 1.8
  * @version 1
  *
- * @return string 
+ * @return string
  */
 	public static function version(){
 		return ZABBIX_API_VERSION;

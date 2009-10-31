@@ -206,7 +206,7 @@ include_once('include/page_header.php');
 		$new_condition = $_REQUEST['new_condition'];
 
 		if(!isset($new_condition['value'])) $new_condition['value'] = '';
-		
+
 		if( validate_condition($new_condition['type'],$new_condition['value']) ){
 			$_REQUEST['conditions'] = get_request('conditions',array());
 			if(!str_in_array($new_condition,$_REQUEST['conditions']))
@@ -347,7 +347,7 @@ include_once('include/page_header.php');
 		$path = $url->getPath();
 		insert_js('cookie.eraseArray("'.$path.'")');
 	}
-	
+
 ?>
 <?php
 	$action_wdgt = new CWidget();
@@ -559,15 +559,15 @@ include_once('include/page_header.php');
 		$goBox = new CComboBox('go');
 		$goOption = new CComboItem('activate',S_ENABLE_SELECTED);
 		$goOption->setAttribute('confirm','Enable selected actions?');
-		$goBox->addItem($goOption);	
-		
+		$goBox->addItem($goOption);
+
 		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
 		$goOption->setAttribute('confirm','Disable selected actions?');
-		$goBox->addItem($goOption);	
-		
+		$goBox->addItem($goOption);
+
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
 		$goOption->setAttribute('confirm','Delete selected actions?');
-		$goBox->addItem($goOption);	
+		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO);

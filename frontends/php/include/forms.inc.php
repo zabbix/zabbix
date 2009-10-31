@@ -6580,7 +6580,7 @@
 			$colorbox->setAttribute('style','text-decoration: none; outline-color: black; outline-style: solid; outline-width: 1px; background-color: #'.$trigger['color'].';');
 
 			$link_desc = new CSpan($trigger['description'], 'link');
-			$link_desc->setAttribute('onclick', 
+			$link_desc->setAttribute('onclick',
 				"javascript: openWinCentered('popup_link_tr.php?form=1&dstfrm=".$frmCnct->GetName()
 				."&triggerid=".$trigger['triggerid'].'&drawtype='.$trigger['drawtype'].'&color='.$trigger['color']
 				."','ZBX_Link_Indicator',560,260,'scrollbars=1, toolbar=0, menubar=0, resizable=0');");

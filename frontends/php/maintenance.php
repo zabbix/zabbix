@@ -327,7 +327,7 @@ include_once('include/page_header.php');
 		$path = $url->getPath();
 		insert_js('cookie.eraseArray("'.$path.'")');
 	}
-	
+
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,AVAILABLE_NOCACHE); /* update available_hosts after ACTIONS */
 
 
@@ -506,7 +506,7 @@ include_once('include/page_header.php');
 		$goBox = new CComboBox('go');
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
 		$goOption->setAttribute('confirm','Delete selected maintenance periods?');
-		$goBox->addItem($goOption);	
+		$goBox->addItem($goOption);
 
 		// goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO.' (0)');

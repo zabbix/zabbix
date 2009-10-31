@@ -441,31 +441,31 @@ include_once('include/page_header.php');
 
 		$goOption = new CComboItem('enable_status',S_ENABLE_SELECTED);
 		$goOption->setAttribute('confirm','Enable selected groups?');
-		$goBox->addItem($goOption);	
-		
+		$goBox->addItem($goOption);
+
 		$goOption = new CComboItem('disable_status',S_DISABLE_SELECTED);
 		$goOption->setAttribute('confirm','Disable selected groups?');
-		$goBox->addItem($goOption);	
-		
+		$goBox->addItem($goOption);
+
 		$goOption = new CComboItem('enable_api',S_ENABLE_API);
 		$goOption->setAttribute('confirm','Enable API access in selected groups?');
-		$goBox->addItem($goOption);	
-		
+		$goBox->addItem($goOption);
+
 		$goOption = new CComboItem('disable_api',S_DISABLE_API);
 		$goOption->setAttribute('confirm','Disable API access in selected groups?');
-		$goBox->addItem($goOption);	
-		
+		$goBox->addItem($goOption);
+
 		$goOption = new CComboItem('enable_debug',S_ENABLE_DEBUG);
 		$goOption->setAttribute('confirm','Enable debug mode in selected groups?');
-		$goBox->addItem($goOption);	
-		
+		$goBox->addItem($goOption);
+
 		$goOption = new CComboItem('disable_debug',S_DISABLE_DEBUG);
 		$goOption->setAttribute('confirm','Disable debug mode in selected groups?');
-		$goBox->addItem($goOption);	
-		
+		$goBox->addItem($goOption);
+
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
 		$goOption->setAttribute('confirm','Delete selected groups?');
-		$goBox->addItem($goOption);	
+		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO);

@@ -775,13 +775,13 @@ class CUser extends CZBXAPI{
 		$result = true;
 		$userids = isset($userids['userids']) ? $userids['userids'] : array();
 		zbx_value2array($userids);
-		
+
 
 		if(empty($userids)){
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ userids ]');
 			$result = false;
 		}
-		
+
 		if(DBfetch(DBselect('SELECT * FROM users WHERE '.DBcondition('userid', $userids).' AND alias='.zbx_dbstr(ZBX_GUEST_USER)))){
 		self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, S_CANNOT_DELETE_USER.'[ '.ZBX_GUEST_USER.' ]');
 			$result = false;

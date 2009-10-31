@@ -460,7 +460,7 @@ class Cscript extends CZBXAPI{
 	public static function delete($scriptids){
 		$scriptids = isset($scriptids['scriptids']) ? $scriptids['scriptids'] : array();
 		zbx_value2array($scriptids);
-		
+
 		if(!empty($scriptids)){
 			$result = delete_script($scriptids);
 		}

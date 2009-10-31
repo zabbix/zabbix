@@ -121,7 +121,7 @@ include_once('include/page_header.php');
 
 	check_fields($fields);
 	validate_sort_and_sortorder('host', ZBX_SORT_UP);
-	
+
 	$_REQUEST['go'] = get_request('go', null);
 ?>
 <?php
@@ -204,21 +204,21 @@ include_once('include/page_header.php');
 		}
 
 		$result = true;
-		
+
 		DBstart();
-		
+
 		// if(isset($visible['groups'])){
 			// $groupids = get_request('groups', array());
 			// CHostGroup::updateHosts(array('hostids' => $hostids, 'groupids' => $groupids));
 		// }
-		
+
 		// if(isset($visible['newgroup'])){
 			// $newgroup = get_request('newgroup', '');
 			// $newgroupid = CHostGroup::add(array('name' => $newgroup));
 			// $newgroupid = reset($newgroupid);
 			// CHostGroup::addHosts(array('hostids' => $hostids, 'groupids' => $newgroupid));
-		// }		
-		
+		// }
+
 		foreach($hosts as $id => $hostid){
 
 			$db_host = get_host_by_hostid($hostid);
@@ -324,7 +324,7 @@ include_once('include/page_header.php');
 			unset($_REQUEST['massupdate']);
 			unset($_REQUEST['form']);
 			unset($_REQUEST['hosts']);
-			
+
 			$url = new CUrl();
 			$path = $url->getPath();
 			insert_js('cookie.eraseArray("'.$path.'")');
@@ -533,7 +533,7 @@ include_once('include/page_header.php');
 			// $del_hosts[$db_host['hostid']] = $db_host['hostid'];
 //				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$db_host['host'].']');
 		// }
-		
+
 		zbx_valueTo($hosts, array('object' => 1, 'field' => 'hostid'));
 		$go_result = CHost::delete($hosts);
 		if(!$go_result){
@@ -563,7 +563,7 @@ include_once('include/page_header.php');
 		DBstart();
 		$go_result = update_host_status($act_hosts, $status);
 		$go_result = DBend($go_result);
-			
+
 		show_messages($go_result, S_HOST_STATUS_UPDATED, S_CANNOT_UPDATE_HOST);
 	}
 
@@ -573,7 +573,7 @@ include_once('include/page_header.php');
 		insert_js('cookie.eraseArray("'.$path.'")');
 	}
 
-	
+
 ?>
 <?php
 	// $params = array();
@@ -667,7 +667,7 @@ include_once('include/page_header.php');
 			S_ERROR
 		));
 
-		
+
 		$sortfield = getPageSortField('host');
 		$sortorder = getPageSortOrder();
 		$options = array(
@@ -787,18 +787,18 @@ include_once('include/page_header.php');
 //----- GO ------
 		$goBox = new CComboBox('go');
 		$goBox->addItem('massupdate',S_MASS_UPDATE);
-		
+
 		$goOption = new CComboItem('activate',S_ACTIVATE_SELECTED);
 		$goOption->setAttribute('confirm','Enable selected host?');
-		$goBox->addItem($goOption);	
-		
+		$goBox->addItem($goOption);
+
 		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
 		$goOption->setAttribute('confirm','Disable selected hosts?');
-		$goBox->addItem($goOption);	
-		
+		$goBox->addItem($goOption);
+
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
 		$goOption->setAttribute('confirm','Delete selected hosts?');
-		$goBox->addItem($goOption);	
+		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton', S_GO);

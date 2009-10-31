@@ -717,7 +717,7 @@ class CAction extends CZBXAPI{
 	public static function delete($actionids){
 		$actionids = isset($actionids['actionids']) ? $actionids['actionids'] : array();
 		zbx_value2array($actionids);
-		
+
 		if(!empty($actionids)){
 			$sql = 'DELETE FROM actions WHERE '.DBcondition('actionid', $actionids);
 			$result = DBexecute($sql);

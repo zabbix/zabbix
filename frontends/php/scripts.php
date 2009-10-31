@@ -139,7 +139,7 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 				unset($_REQUEST['scriptid']);
 			}
 		}
-		
+
 		if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
 			$url = new CUrl();
 			$path = $url->getPath();
@@ -301,7 +301,7 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 		$goBox = new CComboBox('go');
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
 		$goOption->setAttribute('confirm','Delete selected scripts?');
-		$goBox->addItem($goOption);	
+		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO);

@@ -207,7 +207,7 @@
 	'S_CANNOT_ADD_COMMENT'=>		'Cannot add comment',
 	'S_ALARM_ACKNOWLEDGES_BIG'=>		'ALARM ACKNOWLEDGES',
 	'S_ACKNOWLEDGE_ADDED'=>			'Acknowledge added',
-	'S_CANNOT_ACKNOWLEDGE_EVENT' =>	'Cannot acknowledge event',
+	'S_CANNOT_ACKNOWLEDGE_EVENT'=>		'Cannot acknowledge event',
 	'S_SYS_BULK_ACKNOWLEDGE'=>		'----[BULK ACKNOWLEDGE]----',
 	'S_BULK_ACKNOWLEDGE'=>			'Bulk acknowledge',
 
@@ -346,7 +346,7 @@
 	'S_BOLD_LINE'=>				'Bold line',
 	'S_DOT'=>				'Dot',
 	'S_DASHED_LINE'=>			'Dashed line',
-	'S_GRADIENT_LINE' =>	'Gradient line',
+	'S_GRADIENT_LINE'=>			'Gradient line',
 
 //	charts.php
 	'S_CUSTOM_GRAPHS'=>			'Custom graphs',
@@ -742,7 +742,7 @@
 	'S_UNKNOWN'=>					'Unknown',
 	'S_GROUPS'=>					'Groups',
 	'S_MINUS_ALL_GROUPS_MINUS'=>			' - all groups - ',
-	'S_ALL_GROUPS' =>				'All groups',
+	'S_ALL_GROUPS'=>				'All groups',
 	'S_NO_GROUPS_DEFINED'=>				'No groups defined',
 	'S_FOR_GROUP_SMALL'=>				'for group',
 	'S_NEW_GROUP'=>					'New group',
@@ -793,8 +793,8 @@
 	'S_CANNOT_UPDATE_TEMPLATE'=>		'Cannot update template',
 	'S_LINKED_TEMPLATES'=>			'Linked templates',
 	'S_LINKED_TO'=>				'Linked to',
-	'S_TEMPLATE_DELETED'=>				'Template deleted',
-	'S_CANNOT_DELETE_TEMPLATE'=>			'Cannot delete template',
+	'S_TEMPLATE_DELETED'=>			'Template deleted',
+	'S_CANNOT_DELETE_TEMPLATE'=>		'Cannot delete template',
 
 //	Host profiles
 	'S_HOST_PROFILE'=>			'Host profile',
@@ -1605,7 +1605,7 @@
 	'S_EXCLUDE'=>		'Exclude',
 	'S_KEYWORD'=>		'Keyword',
 	'S_POSITION'=>		'Position',
-	
+
 //	Menu
 
 	'S_HELP'=>				'Help',

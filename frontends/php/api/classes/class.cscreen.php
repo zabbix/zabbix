@@ -436,7 +436,7 @@ class CScreen extends CZBXAPI{
 		$result = true;
 		$screenids = isset($screenids['screenids']) ? $screenids['screenids'] : array();
 		zbx_value2array($screenids);
-		
+
 		if(!empty($screenids)){
 			self::BeginTransaction(__METHOD__);
 			foreach($screenids as $screenid){
@@ -454,7 +454,7 @@ class CScreen extends CZBXAPI{
 			$result = false;
 		}
 
-		
+
 
 		if($result)
 			return true;

@@ -567,7 +567,7 @@ class CHost extends CZBXAPI{
 		}
 
 //		zbx_valueTo($result,array('array'=>1));
-		
+
 	return $result;
 	}
 
@@ -666,7 +666,7 @@ class CHost extends CZBXAPI{
 				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'No groups for host [ '.$host['host'].' ]');
 				break;
 			}
-			
+
 			zbx_valueTo($host['groupids'], array('array' => 1));
 
 			$host_db_fields = array(
@@ -692,8 +692,8 @@ class CHost extends CZBXAPI{
 				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Wrong fields for host [ '.$host['host'].' ]');
 				break;
 			}
-			
-			
+
+
 
 			$result = add_host($host['host'], $host['port'], $host['status'], $host['useip'], $host['dns'], $host['ip'],
 				$host['proxy_hostid'], $templates, $host['useipmi'], $host['ipmi_ip'], $host['ipmi_port'], $host['ipmi_authtype'],
@@ -813,10 +813,10 @@ class CHost extends CZBXAPI{
  * @return boolean
  */
 	public static function massUpdate($hosts) {
-	
+
 		$hostids = isset($hosts['hostids']) ? $hosts['hostids'] : array();
 		zbx_value2array($hostids);
-		
+
 		if(empty($hostids)){
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ hostids ]');
 			return false;
@@ -838,12 +838,12 @@ class CHost extends CZBXAPI{
 				(isset($hosts['ipmi_password']) ? ',ipmi_password='.zbx_dbstr($hosts['ipmi_password']) : '').
 				(isset($hosts['ipmi_ip']) ? ',ipmi_ip='.zbx_dbstr($hosts['ipmi_ip']) : '').
 				' WHERE '.DBcondition('hostid', $hostids);
-			
+
 			$sql = substr_replace($sql, '', strpos($sql, ','), 1);
-			
+
 			$result = DBexecute($sql);
 		}
-		
+
 		if($result){
 			return $hostids;
 		}
@@ -867,7 +867,7 @@ class CHost extends CZBXAPI{
  * @return array|boolean
  */
 	public static function delete($hosts){
-		
+
 		$hostids = array();
 		foreach($hosts as $host){
 			$hostids[] = $host['hostid'];
@@ -880,7 +880,7 @@ class CHost extends CZBXAPI{
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter');
 			$result = false;
 		}
-		
+
 		if($result)
 			return $hostids;
 		else{

@@ -642,7 +642,7 @@ class CTemplate extends CZBXAPI{
 	public static function delete($templateids){
 		$templateids = isset($templateids['templateids']) ? $templateids['templateids'] : array();
 		zbx_value2array($templateids);
-		
+
 		if(!empty($templateids)){
 			$result = delete_host($templateids, false);
 		}
@@ -650,7 +650,7 @@ class CTemplate extends CZBXAPI{
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ templateids ]');
 			$result = false;
 		}
-		
+
 		if($result)
 			return $templateids;
 		else{

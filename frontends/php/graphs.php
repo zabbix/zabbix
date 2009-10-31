@@ -304,7 +304,7 @@ include_once('include/page_header.php');
 		}
 		show_messages();
 	}
-	
+
 	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
 		$url = new CUrl();
 		$path = $url->getPath();
@@ -532,10 +532,10 @@ include_once('include/page_header.php');
 //----- GO ------
 		$goBox = new CComboBox('go');
 		$goBox->addItem('copy_to',S_COPY_SELECTED_TO);
-		
+
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
 		$goOption->setAttribute('confirm','Delete selected graphs?');
-		$goBox->addItem($goOption);	
+		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO);

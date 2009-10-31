@@ -833,7 +833,7 @@ function zbx_value2array(&$values){
 // author: Aly
 function zbx_valueTo(&$value, $options){
 	if(is_null($value)) return false;
-	
+
 // object or array of objects to hash
 	if(isset($options['hash']) && isset($options['field'])){
 		if(!is_array($value)){
@@ -861,7 +861,7 @@ function zbx_valueTo(&$value, $options){
 
 	return true;
 	}
-	
+
 // Value or Array to Object or Array of objects
 	if(isset($options['object']) && isset($options['field'])){
 		if(!is_array($value)){
@@ -886,7 +886,7 @@ function zbx_valueTo(&$value, $options){
 	return true;
 	}
 
-// value or objects field or array of object to array 
+// value or objects field or array of object to array
 	if(isset($options['array']) && isset($options['field'])){
 		if(!is_array($value)){
 			$value = array($value);
@@ -910,7 +910,7 @@ function zbx_valueTo(&$value, $options){
 		}
 	return true;
 	}
-	
+
 // to array
 	if(isset($options['array'])){
 		if(!is_array($value)){
@@ -926,13 +926,13 @@ function zbx_valueTo(&$value, $options){
 				unset($new_value);
 			}
 		}
-		else{ 
+		else{
 			$value = array($value);
 		}
-	
+
 	return true;
 	}
-	
+
 // object field or array of objects to value
 	if(isset($options['field'])){
 		if(!is_array($value)){
@@ -955,7 +955,7 @@ function zbx_valueTo(&$value, $options){
 				return false;
 			}
 		}
-		
+
 	return true;
 	}
 
