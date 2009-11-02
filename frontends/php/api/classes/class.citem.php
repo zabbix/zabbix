@@ -634,8 +634,8 @@ class CItem extends CZBXAPI{
 
 		$result = true;
 		foreach($items as $item){
-			
-///////////////
+
+/*//////////////
 			$item_db_fields = array(
 				'description'		=> null,
 				'key_'			=> null,
@@ -763,8 +763,9 @@ class CItem extends CZBXAPI{
 					$g = $arr[10];
 				}
 				else{
-					error('Key does not match grpfunc["group","key","itemfunc","numeric param"]');
-					return FALSE;
+					self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Key does not match grpfunc["group", "key", "itemfunc", "numeric param"]');
+					$result = false;
+					break;
 				}
 			}
 
@@ -831,6 +832,7 @@ class CItem extends CZBXAPI{
 
 				$result = add_item($item);
 				if(!$result) break;
+
 			}
 
 			if($result)
@@ -839,10 +841,9 @@ class CItem extends CZBXAPI{
 			if($item['templateid'] == 0){
 				delete_item($itemid);
 			}
-		
-		
-		
-///////////////
+			
+*///////////////
+			$result = add_item($item);
 			if(!$result) break;
 			$itemids['result'] = $result;
 		}
