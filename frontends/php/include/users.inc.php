@@ -109,7 +109,7 @@
 				' FROM users u,users_groups ug '.
 				' WHERE u.userid=ug.userid '.
 					' AND '.DBcondition('ug.usrgrpid',$usrgrpids).
-					' AND '.DBin_node('ug.usrgrpid', get_current_nodeid(false));
+					' AND '.DBin_node('ug.usrgrpid', false);
 		$res = DBselect($sql);
 		while($user = DBFetch($res)){
 			$userids[$user['userid']] = $user['userid'];
@@ -221,7 +221,7 @@
 				' FROM usrgrp '.
 				' WHERE name='.zbx_dbstr($name).
 					' AND usrgrpid<>'.$usrgrpid.
-					' AND '.DBin_node('usrgrpid', get_current_nodeid(false));
+					' AND '.DBin_node('usrgrpid', false);
 		if(DBfetch(DBselect($sql))){
 			error("Group '$name' already exists");
 			return 0;

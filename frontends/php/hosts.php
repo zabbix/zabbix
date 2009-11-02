@@ -427,6 +427,7 @@ include_once('include/page_header.php');
 			$_REQUEST['hostid'] = $clone_hostid;
 		}
 
+//HOSTS PROFILE Section
 		if($result){
 			update_profile('HOST_PORT', $_REQUEST['port'], PROFILE_TYPE_INT);
 

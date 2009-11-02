@@ -104,9 +104,9 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 
 	$sql_cond = '';
 // dirty fix, but havn't figureout something better
-	if($idx != 'web.nodes.switch_node') $sql_cond.= ' AND '.DBin_node('profileid');
+	if($idx != 'web.nodes.switch_node') $sql_cond.= ' AND '.DBin_node('profileid', false);
 // ---
-	if(zbx_numeric($idx2)) 	$sql_cond.= ' AND idx2='.$idx2.' AND '.DBin_node('idx2');
+	if(zbx_numeric($idx2)) 	$sql_cond.= ' AND idx2='.$idx2.' AND '.DBin_node('idx2', false);
 
 
 	if(profile_type($type,'array')){
@@ -361,7 +361,7 @@ function update_config($configs){
 		return NULL;
 	}
 
-return	DBexecute('update config set '.implode(',',$update).' where '.DBin_node('configid', get_current_nodeid(false)));
+return	DBexecute('update config set '.implode(',',$update).' where '.DBin_node('configid', false));
 }
 /************ END CONFIG **************/
 

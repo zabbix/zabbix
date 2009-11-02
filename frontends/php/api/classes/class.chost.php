@@ -487,7 +487,7 @@ class CHost extends CZBXAPI{
 
 
 			$sql = 'SELECT hpe.*
-				FROM hosts_profiles hpe
+				FROM hosts_profiles_ext hpe
 				WHERE '.DBcondition('hpe.hostid', $hostids);
 			$db_profile_ext = DBselect($sql);
 			while($profile_ext = DBfetch($db_profile_ext))
@@ -613,7 +613,7 @@ class CHost extends CZBXAPI{
 		$sql = 'SELECT hostid '.
 				' FROM hosts '.
 				' WHERE host='.zbx_dbstr($host_data['host']).
-					' AND '.DBin_node('hostid', get_current_nodeid(false));
+					' AND '.DBin_node('hostid', false);
 		$res = DBselect($sql);
 		if($hostid = DBfetch($res))
 			return $hostid['hostid'];
