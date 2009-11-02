@@ -47,7 +47,6 @@ class czbxrpc{
 // Authentication {{{
 			if(($resource == 'user') && ($action == 'authenticate')){
 				$sessionid = null;
-
 				$user = CUser::get(array('users' => $params['user'], 'extendoutput' => 1, 'get_access' => 1));
 				$user = reset($user);
 				if($user['api_access'] != GROUP_API_ACCESS_ENABLED){

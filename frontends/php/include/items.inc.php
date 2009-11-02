@@ -1081,8 +1081,8 @@
 	}
 
 	function item_description($item){
-		$descr=$item['description'];
-		$key=expand_item_key_by_data($item);
+		$descr = $item['description'];
+		$key = expand_item_key_by_data($item);
 
 		for($i=9;$i>0;$i--){
 			$descr=str_replace("$$i",get_n_param($key,$i),$descr);

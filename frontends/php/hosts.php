@@ -633,6 +633,7 @@ include_once('include/page_header.php');
 
 		$groups = CHostGroup::get(array('editable' => 1, 'extendoutput' => 1));
 		order_result($groups, 'name');
+
 		$cmbGroups = new CComboBox('groupid', $groupid_selected, 'javascript: submit();');
 		$cmbGroups->addItem(0, S_ALL_SMALL);
 		foreach($groups as $group){
@@ -677,13 +678,14 @@ include_once('include/page_header.php');
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
+
 		if($groupid_selected > 0){
 			$options['groupids'] = $groupid_selected;
 		}
 		$hosts = CHost::get($options);
 
 // sorting && paging
-		order_page_result($hosts, $sortfield, $sortorder);
+		order_result($hosts, $sortfield, $sortorder);
 		$paging = getPagingLine($hosts);
 //---------
 
@@ -698,7 +700,10 @@ include_once('include/page_header.php');
 			'nopermissions' => 1
 		);
 		$hosts = CHost::get($options);
-		order_result($hosts, 'host');
+
+// sorting && paging
+		order_result($hosts, $sortfield, $sortorder);
+//---------
 
 		foreach($hosts as $host){
 
