@@ -1118,15 +1118,8 @@ function __autoload($class_name){
 
 		$sortorder = (($_REQUEST['sort'] == $tabfield) && ($_REQUEST['sortorder'] == ZBX_SORT_UP))?ZBX_SORT_DOWN:ZBX_SORT_UP;
 
-		$url = 'http://';
-		if($_SERVER["SERVER_PORT"] != "80") {
-			$url .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
-		}
-		else{
-			$url .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
-		}
-
 		$link = new Curl($url);
+		if(empty($url)) $link->formatGetArguments();
 		$link->setArgument('sort', $tabfield);
 		$link->setArgument('sortorder', $sortorder);
 
