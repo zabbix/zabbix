@@ -298,7 +298,7 @@ fail:
 }
 
 static int	telnet_execute(int socket_fd, const char *command,
-		AGENT_RESULT *result)
+		AGENT_RESULT *result, const char *encoding)
 {
 	const char	*__function_name = "telnet_execute";
 	char	buf[MAX_BUF_LEN];
@@ -336,7 +336,7 @@ static int	telnet_execute(int socket_fd, const char *command,
 		offset--;
 	buf[offset] = '\0';
 
-	SET_STR_RESULT(result, strdup(buf));
+	SET_STR_RESULT(result, convert_to_utf8(buf, offset, encoding));
 
 	ret = SUCCEED;
 fail:
@@ -372,7 +372,7 @@ static int	telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	if (FAIL == telnet_login(s.socket, item->username, item->password, result))
 		goto tcp_close;
 
-	if (FAIL == telnet_execute(s.socket, item->params, result))
+	if (FAIL == telnet_execute(s.socket, item->params, result, encoding))
 		goto tcp_close;
 
 	ret = SUCCEED;
