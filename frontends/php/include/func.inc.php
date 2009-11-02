@@ -776,7 +776,7 @@ return $result;
 function uint_in_array($needle,$haystack){
 //TODO: REMOVE
 	if(!empty($haystack) && !isset($haystack[0])){
-		info('uint_in_array: possible pasted associated array');
+//		info('uint_in_array: possible pasted associated array');
 	}
 //----
 	foreach($haystack as $id => $value)
@@ -881,7 +881,7 @@ function zbx_valueTo(&$value, $options){
 
 		if(isset($options['array'])){
 			if(!is_array($value)) $value = array($value);
-			else if(!zbx_ctype_digit(key($value))) $value = array($value);
+			else if(!empty($value) && !zbx_ctype_digit(key($value))) $value = array($value);
 		}
 	return true;
 	}
@@ -926,7 +926,7 @@ function zbx_valueTo(&$value, $options){
 				unset($new_value);
 			}
 		}
-		else{
+		else if(!empty($value)){ 
 			$value = array($value);
 		}
 
