@@ -39,6 +39,7 @@
 #ifdef HAVE_SSH2
 #include "checks_ssh.h"
 #endif	/* HAVE_SSH2 */
+#include "checks_telnet.h"
 
 #define MAX_ITEMS	64
 
@@ -146,6 +147,19 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			SET_MSG_RESULT(result, strdup("Support of SSH parameters was not compiled in"));
 			res = NOTSUPPORTED;
 #endif	/* HAVE_SSH2 */
+
+			if (SUCCEED != res && GET_MSG_RESULT(result))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
+						item->host.host, item->key_orig, result->msg);
+				zabbix_syslog("Item [%s:%s] error: %s",
+						item->host.host, item->key_orig, result->msg);
+			}
+			break;
+		case ITEM_TYPE_TELNET:
+			alarm(CONFIG_TIMEOUT);
+			res = get_value_telnet(item, result);
+			alarm(0);
 
 			if (SUCCEED != res && GET_MSG_RESULT(result))
 			{
@@ -515,6 +529,26 @@ static int	get_values(int now)
 			items[i].username = username;
 			items[i].publickey = publickey;
 			items[i].privatekey = privatekey;
+			items[i].password = password;
+			items[i].params = params;
+			break;
+		case ITEM_TYPE_TELNET:
+			zbx_free(username);
+			zbx_free(password);
+			zbx_free(params);
+
+			username = strdup(items[i].username_orig);
+			password = strdup(items[i].password_orig);
+			params = strdup(items[i].params_orig);
+
+			substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+					&username, MACRO_TYPE_ITEM_USERNAME, NULL, 0);
+			substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+					&password, MACRO_TYPE_ITEM_PASSWORD, NULL, 0);
+			substitute_simple_macros(NULL, NULL, NULL, &items[i], NULL,
+					&params, MACRO_TYPE_ITEM_SCRIPT, NULL, 0);
+
+			items[i].username = username;
 			items[i].password = password;
 			items[i].params = params;
 			break;

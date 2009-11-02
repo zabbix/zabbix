@@ -47,6 +47,7 @@
 #define LOGITEM_ALLOC_STEP	64
 #define DBITEM_ALLOC_STEP	64
 #define SSHITEM_ALLOC_STEP	64
+#define TELNETITEM_ALLOC_STEP	64
 
 #define ZBX_DC_CONFIG struct zbx_dc_config
 #define ZBX_DC_HOST struct zbx_dc_host
@@ -59,6 +60,7 @@
 #define ZBX_DC_LOGITEM struct zbx_dc_logitem
 #define ZBX_DC_DBITEM struct zbx_dc_dbitem
 #define ZBX_DC_SSHITEM struct zbx_dc_sshitem
+#define ZBX_DC_TELNETITEM struct zbx_dc_telnetitem
 
 ZBX_DC_ITEM
 {
@@ -128,6 +130,14 @@ ZBX_DC_SSHITEM
 	char		params[ITEM_PARAMS_LEN_MAX];
 };
 
+ZBX_DC_TELNETITEM
+{
+	zbx_uint64_t	itemid;
+	char		username[ITEM_USERNAME_LEN_MAX];
+	char		password[ITEM_PASSWORD_LEN_MAX];
+	char		params[ITEM_PARAMS_LEN_MAX];
+};
+
 ZBX_DC_HOST
 {
 	zbx_uint64_t	hostid;
@@ -170,10 +180,12 @@ ZBX_DC_CONFIG
 {
 	int		items_alloc, snmpitems_alloc, ipmiitems_alloc,
 			flexitems_alloc, trapitems_alloc, logitems_alloc,
-			dbitems_alloc, sshitems_alloc, hosts_alloc, ipmihosts_alloc;
+			dbitems_alloc, sshitems_alloc, telnetitems_alloc,
+			hosts_alloc, ipmihosts_alloc;
 	int		items_num, snmpitems_num, ipmiitems_num,
 			flexitems_num, trapitems_num, logitems_num,
-			dbitems_num, sshitems_num, hosts_num, ipmihosts_num;
+			dbitems_num, sshitems_num, telnetitems_num,
+			hosts_num, ipmihosts_num;
 	int		idxitem01_alloc, idxitem02_alloc,
 			idxhost01_alloc, idxhost02_alloc;
 	int		idxitem01_num, idxitem02_num,
@@ -186,6 +198,7 @@ ZBX_DC_CONFIG
 	ZBX_DC_LOGITEM	*logitems;
 	ZBX_DC_DBITEM	*dbitems;
 	ZBX_DC_SSHITEM	*sshitems;
+	ZBX_DC_TELNETITEM	*telnetitems;
 	int		*idxitem01;	/* hostid,key */
 	int		*idxitem02;	/* poller_type,poller_num,nextcheck */
 	ZBX_DC_HOST	*hosts;
@@ -244,6 +257,7 @@ static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t hostid, zbx_uint64_
 	case ITEM_TYPE_EXTERNAL:
 	case ITEM_TYPE_DB_MONITOR:
 	case ITEM_TYPE_SSH:
+	case ITEM_TYPE_TELNET:
 		if (0 == CONFIG_POLLER_FORKS)
 			break;
 		*poller_type = (unsigned char)ZBX_POLLER_TYPE_NORMAL;
@@ -845,6 +859,10 @@ static void	DCallocate_item(int index)
 		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
 		config->idxitem01 = (int *)dst;
 
+		dst = (void *)config->telnetitems + sz;
+		memmove(dst, config->telnetitems, sizeof(ZBX_DC_TELNETITEM) * config->telnetitems_num);
+		config->telnetitems = (ZBX_DC_TELNETITEM *)dst;
+
 		dst = (void *)config->sshitems + sz;
 		memmove(dst, config->sshitems, sizeof(ZBX_DC_SSHITEM) * config->sshitems_num);
 		config->sshitems = (ZBX_DC_SSHITEM *)dst;
@@ -928,6 +946,10 @@ static void	DCallocate_snmpitem(int index)
 		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
 		config->idxitem01 = (int *)dst;
 
+		dst = (void *)config->telnetitems + sz;
+		memmove(dst, config->telnetitems, sizeof(ZBX_DC_TELNETITEM) * config->telnetitems_num);
+		config->telnetitems = (ZBX_DC_TELNETITEM *)dst;
+
 		dst = (void *)config->sshitems + sz;
 		memmove(dst, config->sshitems, sizeof(ZBX_DC_SSHITEM) * config->sshitems_num);
 		config->sshitems = (ZBX_DC_SSHITEM *)dst;
@@ -996,6 +1018,10 @@ static void	DCallocate_ipmiitem(int index)
 		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
 		config->idxitem01 = (int *)dst;
 
+		dst = (void *)config->telnetitems + sz;
+		memmove(dst, config->telnetitems, sizeof(ZBX_DC_TELNETITEM) * config->telnetitems_num);
+		config->telnetitems = (ZBX_DC_TELNETITEM *)dst;
+
 		dst = (void *)config->sshitems + sz;
 		memmove(dst, config->sshitems, sizeof(ZBX_DC_SSHITEM) * config->sshitems_num);
 		config->sshitems = (ZBX_DC_SSHITEM *)dst;
@@ -1060,6 +1086,10 @@ static void	DCallocate_flexitem(int index)
 		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
 		config->idxitem01 = (int *)dst;
 
+		dst = (void *)config->telnetitems + sz;
+		memmove(dst, config->telnetitems, sizeof(ZBX_DC_TELNETITEM) * config->telnetitems_num);
+		config->telnetitems = (ZBX_DC_TELNETITEM *)dst;
+
 		dst = (void *)config->sshitems + sz;
 		memmove(dst, config->sshitems, sizeof(ZBX_DC_SSHITEM) * config->sshitems_num);
 		config->sshitems = (ZBX_DC_SSHITEM *)dst;
@@ -1120,6 +1150,10 @@ static void	DCallocate_trapitem(int index)
 		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
 		config->idxitem01 = (int *)dst;
 
+		dst = (void *)config->telnetitems + sz;
+		memmove(dst, config->telnetitems, sizeof(ZBX_DC_TELNETITEM) * config->telnetitems_num);
+		config->telnetitems = (ZBX_DC_TELNETITEM *)dst;
+
 		dst = (void *)config->sshitems + sz;
 		memmove(dst, config->sshitems, sizeof(ZBX_DC_SSHITEM) * config->sshitems_num);
 		config->sshitems = (ZBX_DC_SSHITEM *)dst;
@@ -1176,6 +1210,10 @@ static void	DCallocate_logitem(int index)
 		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
 		config->idxitem01 = (int *)dst;
 
+		dst = (void *)config->telnetitems + sz;
+		memmove(dst, config->telnetitems, sizeof(ZBX_DC_TELNETITEM) * config->telnetitems_num);
+		config->telnetitems = (ZBX_DC_TELNETITEM *)dst;
+
 		dst = (void *)config->sshitems + sz;
 		memmove(dst, config->sshitems, sizeof(ZBX_DC_SSHITEM) * config->sshitems_num);
 		config->sshitems = (ZBX_DC_SSHITEM *)dst;
@@ -1227,6 +1265,10 @@ static void	DCallocate_dbitem(int index)
 		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
 		config->idxitem01 = (int *)dst;
 
+		dst = (void *)config->telnetitems + sz;
+		memmove(dst, config->telnetitems, sizeof(ZBX_DC_TELNETITEM) * config->telnetitems_num);
+		config->telnetitems = (ZBX_DC_TELNETITEM *)dst;
+
 		dst = (void *)config->sshitems + sz;
 		memmove(dst, config->sshitems, sizeof(ZBX_DC_SSHITEM) * config->sshitems_num);
 		config->sshitems = (ZBX_DC_SSHITEM *)dst;
@@ -1275,6 +1317,10 @@ static void	DCallocate_sshitem(int index)
 		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
 		config->idxitem01 = (int *)dst;
 
+		dst = (void *)config->telnetitems + sz;
+		memmove(dst, config->telnetitems, sizeof(ZBX_DC_TELNETITEM) * config->telnetitems_num);
+		config->telnetitems = (ZBX_DC_TELNETITEM *)dst;
+
 		config->sshitems_alloc += SSHITEM_ALLOC_STEP;
 		config->free_mem -= sz;
 	}
@@ -1282,6 +1328,50 @@ static void	DCallocate_sshitem(int index)
 	if (0 != (sz = sizeof(ZBX_DC_SSHITEM) * (config->sshitems_num - index)))
 		memmove(&config->sshitems[index + 1], &config->sshitems[index], sz);
 	config->sshitems_num++;
+}
+
+static void	DCallocate_telnetitem(int index)
+{
+	size_t	sz;
+	void	*dst;
+
+	if (config->telnetitems_num == config->telnetitems_alloc)
+	{
+		sz = sizeof(ZBX_DC_TELNETITEM) * TELNETITEM_ALLOC_STEP;
+
+		DCcheck_freemem(sz);
+
+		dst = (void *)config->idxhost02 + sz;
+		memmove(dst, config->idxhost02, sizeof(int) * config->idxhost02_num);
+		config->idxhost02 = (int *)dst;
+
+		dst = (void *)config->idxhost01 + sz;
+		memmove(dst, config->idxhost01, sizeof(int) * config->idxhost01_num);
+		config->idxhost01 = (int *)dst;
+
+		dst = (void *)config->ipmihosts + sz;
+		memmove(dst, config->ipmihosts, sizeof(ZBX_DC_IPMIHOST) * config->ipmihosts_num);
+		config->ipmihosts = (ZBX_DC_IPMIHOST *)dst;
+
+		dst = (void *)config->hosts + sz;
+		memmove(dst, config->hosts, sizeof(ZBX_DC_HOST) * config->hosts_num);
+		config->hosts = (ZBX_DC_HOST *)dst;
+
+		dst = (void *)config->idxitem02 + sz;
+		memmove(dst, config->idxitem02, sizeof(int) * config->idxitem02_num);
+		config->idxitem02 = (int *)dst;
+
+		dst = (void *)config->idxitem01 + sz;
+		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
+		config->idxitem01 = (int *)dst;
+
+		config->telnetitems_alloc += TELNETITEM_ALLOC_STEP;
+		config->free_mem -= sz;
+	}
+
+	if (0 != (sz = sizeof(ZBX_DC_TELNETITEM) * (config->telnetitems_num - index)))
+		memmove(&config->telnetitems[index + 1], &config->telnetitems[index], sz);
+	config->telnetitems_num++;
 }
 
 static void	DCallocate_host(int index)
@@ -1417,6 +1507,7 @@ static void	DCsync_items()
 	ZBX_DC_LOGITEM	*logitem;
 	ZBX_DC_DBITEM	*dbitem;
 	ZBX_DC_SSHITEM	*sshitem;
+	ZBX_DC_TELNETITEM	*telnetitem;
 	zbx_uint64_t	itemid, hostid, proxy_hostid;
 	int		i, new, delay;
 	unsigned char	poller_type, poller_num, type;
@@ -1639,7 +1730,7 @@ static void	DCsync_items()
 		}
 
 		/* SSH items */
-		i = get_nearestindex(config->sshitems, sizeof(ZBX_DC_LOGITEM),
+		i = get_nearestindex(config->sshitems, sizeof(ZBX_DC_SSHITEM),
 				config->sshitems_num, itemid);
 
 		if (ITEM_TYPE_SSH == item->type)
@@ -1662,6 +1753,29 @@ static void	DCsync_items()
 			/* remove SSH item parameters */
 			if (i < config->sshitems_num && config->sshitems[i].itemid == itemid)
 				DCremove_element(config->sshitems, &config->sshitems_num, sizeof(ZBX_DC_SSHITEM), i);
+		}
+
+		/* TELNET items */
+		i = get_nearestindex(config->telnetitems, sizeof(ZBX_DC_TELNETITEM),
+				config->telnetitems_num, itemid);
+
+		if (ITEM_TYPE_TELNET == item->type)
+		{
+			if (i == config->telnetitems_num || config->telnetitems[i].itemid != itemid)
+				DCallocate_telnetitem(i);
+
+			telnetitem = &config->telnetitems[i];
+
+			telnetitem->itemid = itemid;
+			zbx_strlcpy(telnetitem->username, row[22], sizeof(telnetitem->username));
+			zbx_strlcpy(telnetitem->password, row[23], sizeof(telnetitem->password));
+			zbx_strlcpy(telnetitem->params, row[19], sizeof(telnetitem->params));
+		}
+		else
+		{
+			/* remove TELNET item parameters */
+			if (i < config->telnetitems_num && config->telnetitems[i].itemid == itemid)
+				DCremove_element(config->telnetitems, &config->telnetitems_num, sizeof(ZBX_DC_TELNETITEM), i);
 		}
 	}
 
@@ -1704,6 +1818,11 @@ static void	DCsync_items()
 	for (i = 0; i < config->sshitems_num; i++)
 		if (FAIL == uint64_array_exists(ids, ids_num, config->sshitems[i].itemid))
 			DCremove_element(config->sshitems, &config->sshitems_num, sizeof(ZBX_DC_SSHITEM), i--);
+
+	/* remove deleted or disabled TELNET items from buffer */
+	for (i = 0; i < config->telnetitems_num; i++)
+		if (FAIL == uint64_array_exists(ids, ids_num, config->telnetitems[i].itemid))
+			DCremove_element(config->telnetitems, &config->telnetitems_num, sizeof(ZBX_DC_TELNETITEM), i--);
 
 	UNLOCK_CACHE;
 
@@ -1956,6 +2075,7 @@ void	init_configuration_cache()
 	config->logitems = ptr + sz;
 	config->dbitems = ptr + sz;
 	config->sshitems = ptr + sz;
+	config->telnetitems = ptr + sz;
 	config->idxitem01 = ptr + sz;	/* hostid,key */
 	config->idxitem02 = ptr + sz;	/* poller_type,poller_num,nextcheck */
 	config->hosts = ptr + sz;
@@ -2164,6 +2284,7 @@ static void	DCget_item(DC_ITEM *dst_item, ZBX_DC_ITEM *src_item)
 	ZBX_DC_DBITEM	*dbitem;
 	ZBX_DC_FLEXITEM	*dc_flexitem;
 	ZBX_DC_SSHITEM	*sshitem;
+	ZBX_DC_TELNETITEM	*telnetitem;
 
 	dst_item->itemid = src_item->itemid;
 	dst_item->type = src_item->type;
@@ -2253,6 +2374,20 @@ static void	DCget_item(DC_ITEM *dst_item, ZBX_DC_ITEM *src_item)
 			dst_item->username = NULL;
 			dst_item->publickey = NULL;
 			dst_item->privatekey = NULL;
+			dst_item->password = NULL;
+			dst_item->params = NULL;
+		}
+		break;
+	case ITEM_TYPE_TELNET:
+		index = get_nearestindex(config->telnetitems, sizeof(ZBX_DC_TELNETITEM),
+				config->telnetitems_num, src_item->itemid);
+		if (index < config->telnetitems_num && config->telnetitems[index].itemid == src_item->itemid)
+		{
+			telnetitem = &config->telnetitems[index];
+			memcpy(dst_item->username_orig, telnetitem->username, sizeof(dst_item->username_orig));
+			memcpy(dst_item->password_orig, telnetitem->password, sizeof(dst_item->password_orig));
+			memcpy(dst_item->params_orig, telnetitem->params, sizeof(dst_item->params_orig));
+			dst_item->username = NULL;
 			dst_item->password = NULL;
 			dst_item->params = NULL;
 		}

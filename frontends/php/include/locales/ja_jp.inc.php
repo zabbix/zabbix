@@ -815,6 +815,7 @@
 	'S_ZABBIX_DATABASE_MONITOR'=>			'データベースモニタ',
 	'S_IPMI_AGENT'=>			'IPMIエージェント',
 	'S_SSH_AGENT'=>				'SSHエージェント',
+	'S_TELNET_AGENT'=>			'TELNETエージェント',
 	'S_ZABBIX_AGGREGATE'=>			'ZABBIXアグリゲート',
 	'S_EXTERNAL_CHECK'=>			'外部チェック',
 	'S_WEB_MONITORING'=>			'ウェブ監視',
