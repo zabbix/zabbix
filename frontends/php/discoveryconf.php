@@ -60,10 +60,8 @@ include_once('include/page_header.php');
 		'new_check_snmpv3_privpassphrase'=>	array(T_ZBX_STR, O_OPT,  null,  null,		'isset({add_check})'),
 
 		'type_changed'=>	array(T_ZBX_INT, O_OPT, null, IN(1), null),
-
 // Actions
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
-
 // form
 		'add_check'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'delete_ckecks'=> 	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -196,20 +194,19 @@ include_once('include/page_header.php');
 	$form = new CForm();
 	$form->setMethod('get');
 
-	if(!isset($_REQUEST["form"]))
+	if(!isset($_REQUEST['form']))
 		$form->addItem(new CButton('form', S_CREATE_RULE));
 	show_table_header(S_CONFIGURATION_OF_DISCOVERY_BIG, $form);
 	echo SBR;
 
-	if(isset($_REQUEST["form"])){
-/* form */
+	if(isset($_REQUEST['form'])){
 		insert_drule_form();
 	}
 	else{
 		$dscry_wdgt = new CWidget();
 
 		$numrows = new CDiv();
-		$numrows->setAttribute('name','numrows');
+		$numrows->setAttribute('name', 'numrows');
 
 		$dscry_wdgt->addHeader(S_DISCOVERY_BIG);
 //		$dscry_wdgt->addHeader($numrows);
@@ -220,9 +217,9 @@ include_once('include/page_header.php');
 		$tblDiscovery = new CTableInfo(S_NO_DISCOVERY_RULES_DEFINED);
 		$tblDiscovery->setHeader(array(
 			new CCheckBox('all_drules',null,"checkAll('".$form->GetName()."','all_drules','g_druleid');"),
-			make_sorting_link(S_NAME,'d.name'),
-			make_sorting_link(S_IP_RANGE,'d.iprange'),
-			make_sorting_link(S_DELAY,'d.delay'),
+			make_sorting_header(S_NAME,'d.name'),
+			make_sorting_header(S_IP_RANGE,'d.iprange'),
+			make_sorting_header(S_DELAY,'d.delay'),
 			S_CHECKS,
 			S_STATUS));
 
@@ -270,7 +267,7 @@ include_once('include/page_header.php');
 				$rule_data['delay'],
 				implode(',', $cheks),
 				$status
-				));
+			));
 		}
 
 // PAGING FOOTER
@@ -305,9 +302,7 @@ include_once('include/page_header.php');
 		$dscry_wdgt->addItem($form);
 		$dscry_wdgt->show();
 	}
-?>
-<?php
 
+	
 include_once('include/page_footer.php');
-
 ?>

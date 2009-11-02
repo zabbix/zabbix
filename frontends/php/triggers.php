@@ -491,31 +491,31 @@ include_once('include/page_header.php');
 			S_EXPRESSION,
 			S_ERROR));
 
+		$sortfield = getPageSortField('description');
+		$sortorder = getPageSortOrder();
 		$options = array(
-				'select_hosts' => 1,
-				'editable' => 1,
-				'extendoutput' => 1,
-//				'sortfield' => getPageSortField('description'),
-//				'sortorder' => getPageSortOrder(),
-				'limit' => ($config['search_limit']+1)
-			);
+			'select_hosts' => 1,
+			'editable' => 1,
+			'extendoutput' => 1,
+			'sortfield' => $sortfield,
+			'sortorder' => $sortorder,
+			'limit' => ($config['search_limit']+1)
+		);
 
 		if($showdisabled == 0){
 		    $options['status'] = TRIGGER_STATUS_ENABLED;
 		}
-
 		if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
 			$options['hostids'] = $PAGE_HOSTS['selected'];
 		}
-
 		if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
 			$options['groupids'] = $PAGE_GROUPS['selected'];
 		}
-// Triggers
+
 		$triggers = CTrigger::get($options);
 
 // sorting && paginf
-		order_page_result($triggers, 'description');
+		order_result($triggers, $sortfield, $sortorder);
 		$paging = getPagingLine($triggers);
 //---------
 

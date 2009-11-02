@@ -446,8 +446,7 @@ include_once('include/page_header.php');
 		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
 			$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
 		}
-
-		$form->addItem(array(S_GROUP.SPACE,$cmbGroups));
+		$form->addItem(array(S_GROUP.SPACE, $cmbGroups));
 
 
 		$numrows = new CDiv();
@@ -457,11 +456,13 @@ include_once('include/page_header.php');
 		$maintenance_wdgt->addHeader($numrows);
 // ----
 
+		$sortfield = getPageSortField('name');
+		$sortorder = getPageSortOrder();
 		$options = array(
 			'extendoutput' => 1,
 			'editable' => 1,
-//			'sortfield' => getPageSortField('name'),
-//			'sortorder' => getPageSortOrder(),
+			'sortfield' => $sortfield,
+			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
 
@@ -484,7 +485,7 @@ include_once('include/page_header.php');
 			));
 
 // sorting && paging
-		order_page_result($maintenances, 'name');
+		order_result($maintenances, $sortfield, $sortorder);
 		$paging = getPagingLine($maintenances);
 //---------
 

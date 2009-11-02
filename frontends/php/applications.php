@@ -55,16 +55,13 @@ include_once('include/page_header.php');
 
 		'hostid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID, NULL),
 		'groupid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-
 // application
 		'applicationid'=>	array(T_ZBX_INT,O_OPT,	P_SYS,	DB_ID,		'isset({form})&&({form}=="update")'),
 		'appname'=>			array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'isset({save})'),
 		'apphostid'=>		array(T_ZBX_INT, O_OPT, NULL,	DB_ID.'{}>0',	'isset({save})'),
 		'apptemplateid'=>	array(T_ZBX_INT,O_OPT,	NULL,	DB_ID,	NULL),
-
 // actions
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
-
 // form
 		'add_to_group'=>		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT, DB_ID, NULL),
 		'delete_from_group'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT, DB_ID, NULL),
@@ -73,7 +70,6 @@ include_once('include/page_header.php');
 		'clone'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'cancel'=>				array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-
 /* other */
 		'form'=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>array(T_ZBX_STR, O_OPT, NULL,	NULL,	NULL)
@@ -333,11 +329,15 @@ include_once('include/page_header.php');
 		}
 
 // table applications
+		$sortfield = getPageSortField('name');
+		$sortorder = getPageSortOrder();
 		$options = array(
 			'select_items' => 1,
 			'extendoutput' => 1,
 			'editable' => 1,
 			'expand_data' => 1,
+			'sortfield' => $sortfield,
+			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
 
@@ -360,12 +360,12 @@ include_once('include/page_header.php');
 		$table->setHeader(array(
 			new CCheckBox('all_applications',NULL,"checkAll('".$form->getName()."','all_applications','applications');"),
 			(($PAGE_HOSTS['selected'] > 0) ? null : S_HOST),
-			make_sorting_link(S_APPLICATION, 'name'),
+			make_sorting_header(S_APPLICATION, 'name'),
 			S_SHOW
 		));
 
 // sorting
-		order_page_result($applications, 'name');
+		order_result($applications, $sortfield, $sortorder);
 		$paging = getPagingLine($applications);
 //---------
 
@@ -415,5 +415,4 @@ include_once('include/page_header.php');
 	}
 
 include_once('include/page_footer.php');
-
 ?>
