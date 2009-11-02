@@ -155,7 +155,7 @@ getArguments: function(){
 
 getUrl: function(){
 	this.formatQuery();
-	
+
 	var url = (this.protocol.length > 0)?(this.protocol+'://'):'';
 	url +=  encodeURI((this.username.length > 0)?(this.username):'');
 	url +=  encodeURI((this.password.length > 0)?(':'+this.password):'');
@@ -164,7 +164,7 @@ getUrl: function(){
 	url +=  encodeURI((this.path.length > 0)?(this.path):'');
 	url +=  encodeURI((this.query.length > 0)?('?'+this.query):'');
 	url +=  encodeURI((this.reference.length > 0)?('#'+this.reference):'');
-//	alert(url.getProtocol()+' : '+url.getHost()+' : '+url.getPort()+' : '+url.getPath()+' : '+url.getQuery());
+//alert(url);
 return url;
 },
 

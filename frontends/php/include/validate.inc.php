@@ -20,6 +20,8 @@
 ?>
 <?php
 	function unset_request($key,$requester='unknown'){
+		unset($_GET[$key]);
+		unset($_POST[$key]);
 		unset($_REQUEST[$key]);
 	}
 
