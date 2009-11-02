@@ -155,7 +155,7 @@ getArguments: function(){
 
 getUrl: function(){
 	this.formatQuery();
-
+ 
 	var url = (this.protocol.length > 0)?(this.protocol+'://'):'';
 	url +=  encodeURI((this.username.length > 0)?(this.username):'');
 	url +=  encodeURI((this.password.length > 0)?(':'+this.password):'');
