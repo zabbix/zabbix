@@ -185,7 +185,8 @@ typedef enum
 	ITEM_TYPE_EXTERNAL,
 	ITEM_TYPE_DB_MONITOR,
 	ITEM_TYPE_IPMI,
-	ITEM_TYPE_SSH
+	ITEM_TYPE_SSH,
+	ITEM_TYPE_TELNET
 } zbx_item_type_t;
 
 typedef enum

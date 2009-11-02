@@ -229,6 +229,7 @@
 	define('ITEM_TYPE_DB_MONITOR',11);
 	define('ITEM_TYPE_IPMI',12);
 	define('ITEM_TYPE_SSH',13);
+	define('ITEM_TYPE_TELNET',14);
 
 	define('ITEM_VALUE_TYPE_FLOAT',0);
 	define('ITEM_VALUE_TYPE_STR',1);
