@@ -19,23 +19,18 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/nodes.inc.php');
+	require_once('include/config.inc.php');
+	require_once('include/nodes.inc.php');
 
-$page['title'] = "S_NODES";
-$page['file'] = 'nodes.php';
-$page['hist_arg'] = array();
+	$page['title'] = 'S_NODES';
+	$page['file'] = 'nodes.php';
+	$page['hist_arg'] = array();
 
-include_once('include/page_header.php');
-
-$_REQUEST['config'] = get_request('config','nodes.php');
-
+	include_once('include/page_header.php');
 ?>
 <?php
 	$fields=array(
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-		'config'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-
 // media form
 		'nodeid'=>			array(T_ZBX_INT, O_NO,	null,	DB_ID,			'(isset({form})&&({form}=="update"))'),
 
@@ -48,7 +43,6 @@ $_REQUEST['config'] = get_request('config','nodes.php');
 		'port'=>			array(T_ZBX_INT, O_OPT,	null,	BETWEEN(1,65535),	'isset({save})'),
 		'slave_history'=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535),	'isset({save})'),
 		'slave_trends'=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535),	'isset({save})'),
-
 /* actions */
 		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -113,27 +107,31 @@ $_REQUEST['config'] = get_request('config','nodes.php');
 	}
 ?>
 <?php
+	
 	$nodes_wdgt = new CWidget();
 
 	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST);
 
 	$frmForm = new CForm();
 	$frmForm->setMethod('get');
-
-// Config
-	$cmbConf = new CComboBox('config','nodes.php','javascript: submit()');
-	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');
-		$cmbConf->addItem('nodes.php',S_NODES);
-		$cmbConf->addItem('proxies.php',S_PROXIES);
-
+	$cmbConf = new CComboBox('config', 'nodes.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
+		$cmbConf->addItem('nodes.php', S_NODES);
+		$cmbConf->addItem('proxies.php', S_PROXIES);
 	$frmForm->addItem($cmbConf);
 
-	if(!isset($_REQUEST['form'])){
-		$frmForm->addItem(new CButton('form',S_NEW_NODE));
+	if(!isset($_REQUEST['form']) && ZBX_DISTRIBUTED){
+		$frmForm->addItem(new CButton('form', S_NEW_NODE));
 	}
 
 	$nodes_wdgt->addPageHeader(S_CONFIGURATION_OF_NODES, $frmForm);
 
+	if(ZBX_DISTRIBUTED){
+		$message = S_NO_NODES_DEFINED;
+	}
+	else{
+		$message = S_NOT_DM_SETUP;
+	}
+	
 	if(isset($_REQUEST['form'])){
 		global $ZBX_CURMASTERID;
 
@@ -226,13 +224,13 @@ $_REQUEST['config'] = get_request('config','nodes.php');
 	else{
 		$nodes_wdgt->addHeader(S_NODES_BIG);
 
-		$table=new CTableInfo(S_NO_NODES_DEFINED);
+		$table=new CTableInfo($message);
 		$table->SetHeader(array(
-			make_sorting_link(S_ID,'n.nodeid'),
-			make_sorting_link(S_NAME,'n.name'),
-			make_sorting_link(S_TYPE,'n.nodetype'),
-			make_sorting_link(S_TIME_ZONE,'n.timezone'),
-			make_sorting_link(S_IP.':'.S_PORT,'n.ip')
+			make_sorting_header(S_ID,'n.nodeid'),
+			make_sorting_header(S_NAME,'n.name'),
+			make_sorting_header(S_TYPE,'n.nodetype'),
+			make_sorting_header(S_TIME_ZONE,'n.timezone'),
+			make_sorting_header(S_IP.':'.S_PORT,'n.ip')
 		));
 
 		$sql = 'SELECT n.* '.
@@ -254,7 +252,7 @@ $_REQUEST['config'] = get_request('config','nodes.php');
 						'?&form=update&nodeid='.$row['nodeid'])),
 				$node_type == ZBX_NODE_LOCAL ? new CSpan($node_type_name, 'bold') : $node_type_name,
 				new CSpan('GMT'.sprintf('%+03d:00', $row['timezone']),	$row['nodetype'] ? 'bold' : null),
-				new CSpan($row['ip'].':'.$row['port'], 			$row['nodetype'] ? 'bold' : null)
+				new CSpan($row['ip'].':'.$row['port'], $row['nodetype'] ? 'bold' : null)
 				));
 		}
 		$nodes_wdgt->addItem($table);
@@ -262,9 +260,6 @@ $_REQUEST['config'] = get_request('config','nodes.php');
 
 	$nodes_wdgt->show();
 
-?>
-<?php
 
 include_once('include/page_footer.php');
-
 ?>
