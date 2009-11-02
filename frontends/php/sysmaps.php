@@ -41,17 +41,14 @@ include_once('include/page_header.php');
 		'backgroundid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,			'isset({save})'),
 		'label_type'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,4),		'isset({save})'),
 		'label_location'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,3),		'isset({save})'),
-
 /* Actions */
 		'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS, NULL,	NULL),
 		'go'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
-
 /* Form */
 		'form'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
-
 	);
 
 	check_fields($fields);
@@ -135,7 +132,7 @@ include_once('include/page_header.php');
 	$form = new CForm();
 	$form->setMethod('get');
 
-	$form->addItem(new CButton("form",S_CREATE_MAP));
+	$form->addItem(new CButton('form', S_CREATE_MAP));
 	show_table_header(S_CONFIGURATION_OF_NETWORK_MAPS, $form);
 	echo SBR;
 ?>
@@ -158,9 +155,9 @@ include_once('include/page_header.php');
 		$table = new CTableInfo(S_NO_MAPS_DEFINED);
 		$table->setHeader(array(
 			new CCheckBox('all_maps',NULL,"checkAll('".$form->getName()."','all_maps','maps');"),
-			make_sorting_link(S_NAME,'sm.name'),
-			make_sorting_link(S_WIDTH,'sm.width'),
-			make_sorting_link(S_HEIGHT,'sm.height'),
+			make_sorting_header(S_NAME,'sm.name'),
+			make_sorting_header(S_WIDTH,'sm.width'),
+			make_sorting_header(S_HEIGHT,'sm.height'),
 			S_MAP));
 
 /* sorting
@@ -214,9 +211,6 @@ include_once('include/page_header.php');
 		$map_wdgt->show();
 	}
 
-?>
-<?php
 
 include_once('include/page_footer.php');
-
 ?>

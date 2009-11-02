@@ -732,7 +732,7 @@ require_once('include/forms.inc.php');
 		}
 		$templates = CTemplate::get($options);
 
-		order_page_result($templates, $sortfield, $sortorder);
+		order_result($templates, $sortfield, $sortorder);
 		$paging = getPagingLine($templates);
 //--------
 
@@ -748,7 +748,7 @@ require_once('include/forms.inc.php');
 			'nopermissions' => 1
 		);
 		$templates = CTemplate::get($options);
-		order_page_result($templates, 'host');
+		order_result($templates, $sortfield, $sortorder);
 //-----
 
 		foreach($templates as $template){

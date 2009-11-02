@@ -785,12 +785,16 @@ include_once('include/page_header.php');
 // ----------------
 
 // Items Filter{
+		$sortfield = getPageSortField('description');
+		$sortorder = getPageSortOrder();
 		$options = array(
 			'filter' => 1,
 			'extendoutput' => 1,
 			'select_hosts' => 1,
 			'select_triggers' => 1,
 			'select_applications' => 1,
+			'sortfield' => $sortfield,
+			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
 
@@ -932,7 +936,7 @@ include_once('include/page_header.php');
 
 // sorting && paging
 // !!! should go after we subfiltered out items !!!
-		order_page_result($items, 'description');
+		order_result($items, $sortfield, $sortorder);
 		$paging = getPagingLine($items);
 //---------
 

@@ -457,10 +457,15 @@ include_once('include/page_header.php');
 			S_HEIGHT,
 			make_sorting_header(S_GRAPH_TYPE,'graphtype')));
 
+			
+		$sortfield = getPageSortField('description');
+		$sortorder = getPageSortOrder();
 		$options = array(
 			'editable' => 1,
 			'extendoutput' => 1,
 			'select_hosts' => 1,
+			'sortfield' => $sortfield,
+			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1));
 		if($PAGE_HOSTS['selected'] > 0){
 			$options['hostids'] = $PAGE_HOSTS['selected'];
@@ -491,7 +496,7 @@ include_once('include/page_header.php');
 		}
 
 // sorting
-		order_page_result($graphs, 'description');
+		order_result($graphs, $sortfield, $sortorder);
 		$paging = getPagingLine($graphs);
 //---------
 

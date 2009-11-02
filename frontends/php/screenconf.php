@@ -272,7 +272,7 @@ include_once('include/page_header.php');
 	show_table_header(0 == $config ? S_CONFIGURATION_OF_SCREENS_BIG : S_CONFIGURATION_OF_SLIDESHOWS_BIG, $form);
 	echo SBR;
 
-	if( 0 == $config ){
+	if(0 == $config){
 		if(isset($_REQUEST['form'])){
 			insert_screen_form();
 		}
@@ -283,77 +283,56 @@ include_once('include/page_header.php');
 			$form->setName('frm_screens');
 
 			$numrows = new CDiv();
-			$numrows->setAttribute('name','numrows');
+			$numrows->setAttribute('name', 'numrows');
 
 			$screen_wdgt->addHeader(S_SCREENS_BIG);
-//			$screen_wdgt->addHeader($numrows);
+			$screen_wdgt->addHeader($numrows);
 
 			$table = new CTableInfo(S_NO_SCREENS_DEFINED);
 			$table->SetHeader(array(
-				new CCheckBox('all_screens',NULL,"checkAll('".$form->getName()."','all_screens','screens');"),
-				make_sorting_link(S_NAME,'s.name'),
-				make_sorting_link(S_DIMENSION_COLS_ROWS,'size'),
-				S_SCREEN));
-
-/* sorting
-			order_page_result($applications, 'name');
-
-// PAGING UPPER
-			$paging = getPagingLine($applications);
-			$screen_wdgt->addItem($paging);
-//-------*/
-			$screen_wdgt->addItem(BR());
-
-
-
-/* ---*** old variant of getting graphs ***----------/
-			$sql = 'SELECT s.screenid,s.name,s.hsize,s.vsize,(s.hsize*s.vsize) as s_size '.
-					' FROM screens s '.
-					' WHERE '.DBin_node('s.screenid').
-					order_by('s.name,s_size','s.screenid');
-			$result=DBselect($sql);
-			while($row=DBfetch($result)){
-
-				if(!screen_accessible($row["screenid"], PERM_READ_WRITE)) continue;
-
+				new CCheckBox('all_screens', NULL, "checkAll('".$form->getName()."','all_screens','screens');"),
+				make_sorting_header(S_NAME, 'name'),
+				S_DIMENSION_COLS_ROWS,
+				S_SCREEN)
+			);
+			
+			$sortfield = getPageSortField('name');
+			$sortorder = getPageSortOrder();
+			$options = array(
+				'editable' => 1, 
+				'extendoutput' => 1, 
+				'sortfield' => $sortfield,
+				'sortorder' => $sortorder,
+				'limit' => ($config['search_limit']+1)
+			);
+			$screens = CScreen::get($options);
+			
+			order_result($screens, $sortfield, $sortorder);
+			$paging = getPagingLine($screens);
+			
+			foreach($screens as $screen){
 				$table->addRow(array(
-					new CCheckBox('screens['.$row['screenid'].']', NULL, NULL, $row['screenid']),
-					new CLink($row["name"],"?config=0&form=update&screenid=".$row["screenid"]),
-					$row["hsize"]." x ".$row["vsize"],
-					new CLink(S_EDIT,"screenedit.php?screenid=".$row["screenid"])
-					));
-			}
-/* ---*** new variant with API ***----------*/
-			$screens = CScreen::get(array('editable' => 1, 'extendoutput' => 1, 'sortfield' => 'name'));
-			foreach($screens as $screenid => $screen){
-				$table->addRow(array(
-					new CCheckBox('screens['.$screenid.']', NULL, NULL, $screenid),
-					new CLink($screen["name"],'screenedit.php?screenid='.$screenid),
+					new CCheckBox('screens['.$screen['screenid'].']', NULL, NULL, $screen['screenid']),
+					new CLink($screen["name"],'screenedit.php?screenid='.$screen['screenid']),
 					$screen['hsize'].' x '.$screen['vsize'],
-					new CLink(S_EDIT,'?config=0&form=update&screenid='.$screenid)
+					new CLink(S_EDIT,'?config=0&form=update&screenid='.$screen['screenid'])
 				));
 			}
-
-
-// PAGING FOOTER
-//			$table->addRow(new CCol($paging));
-//			$screen_wdgt->addItem($paging);
-//---------
 
 //goBox
 			$goBox = new CComboBox('go');
 			$goOption = new CComboItem('delete', S_DELETE_SELECTED);
-			$goOption->setAttribute('confirm','Delete selected screens?');
+			$goOption->setAttribute('confirm', 'Delete selected screens?');
 			$goBox->addItem($goOption);
 
 			// goButton name is necessary!!!
-			$goButton = new CButton('goButton',S_GO);
-			$goButton->setAttribute('id','goButton');
+			$goButton = new CButton('goButton', S_GO);
+			$goButton->setAttribute('id', 'goButton');
 			zbx_add_post_js('chkbxRange.pageGoName = "screens";');
-
-			$table->setFooter(new CCol(array($goBox, $goButton)));
 //---------
-
+			$footer = get_table_header(array($goBox, $goButton));
+			
+			$table = array($paging, $table, $paging, $footer);
 			$form->addItem($table);
 
 			$screen_wdgt->addItem($form);
@@ -379,9 +358,9 @@ include_once('include/page_header.php');
 			$table = new CTableInfo(S_NO_SLIDESHOWS_DEFINED);
 			$table->SetHeader(array(
 				new CCheckBox('all_shows',NULL,"checkAll('".$form->getName()."','all_shows','shows');"),
-				make_sorting_link(S_NAME,'s.name'),
-				make_sorting_link(S_DELAY,'s.delay'),
-				make_sorting_link(S_COUNT_OF_SLIDES,'cnt')
+				make_sorting_header(S_NAME,'s.name'),
+				make_sorting_header(S_DELAY,'s.delay'),
+				make_sorting_header(S_COUNT_OF_SLIDES,'cnt')
 				));
 
 /* sorting
@@ -436,9 +415,6 @@ include_once('include/page_header.php');
 		}
 
 	}
-?>
-<?php
 
 include_once('include/page_footer.php');
-
 ?>

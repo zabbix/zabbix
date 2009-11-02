@@ -475,7 +475,7 @@ include_once('include/page_header.php');
 		$form->addItem(array(S_EVENT_SOURCE, SPACE, $cmbSource));
 
 		$numrows = new CDiv();
-		$numrows->setAttribute('name','numrows');
+		$numrows->setAttribute('name', 'numrows');
 
 		$action_wdgt->addHeader(S_ACTIONS_BIG, $form);
 		$action_wdgt->addHeader($numrows);
@@ -486,30 +486,31 @@ include_once('include/page_header.php');
 		$form = new CForm();
 		$form->setName('actions');
 
+		$sortfield = getPageSortField('name');
+		$sortorder = getPageSortOrder();
 		$options = array(
-				'extendoutput' => 1,
-				'eventsource' => $_REQUEST['eventsource'],
-				'select_conditions' => 1,
-				'select_operations' => 1,
-				'editable' => 1,
-//				'sortfield' => 'clock',
-//				'sortorder' => getPageSortOrder(),
-				'limit' => ($config['search_limit']+1)
-			);
-
+			'extendoutput' => 1,
+			'eventsource' => $_REQUEST['eventsource'],
+			'select_conditions' => 1,
+			'select_operations' => 1,
+			'editable' => 1,
+			'sortfield' => $sortfield,
+			'sortorder' => $sortorder,
+			'limit' => ($config['search_limit']+1)
+		);
 		$actions = CAction::get($options);
 
 		$tblActions = new CTableInfo(S_NO_ACTIONS_DEFINED);
 		$tblActions->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->getName()."','all_items','g_actionid');"),
-			make_sorting_header(S_NAME,'name'),
+			make_sorting_header(S_NAME, 'name'),
 			S_CONDITIONS,
 			S_OPERATIONS,
-			make_sorting_header(S_STATUS,'status')
+			make_sorting_header(S_STATUS, 'status')
 		));
 
 // sorting && paging
-		order_page_result($actions, 'name');
+		order_result($actions, $sortfield, $sortorder);
 		$paging = getPagingLine($actions);
 //-------
 
