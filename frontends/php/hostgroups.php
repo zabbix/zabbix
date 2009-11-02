@@ -302,7 +302,7 @@ include_once('include/page_header.php');
 		);
 		$groups = CHostGroup::get($options);
 
-		order_page_result($groups, $sortfield, $sortorder);
+		order_result($groups, $sortfield, $sortorder);
 		$paging = getPagingLine($groups);
 //-----
 
@@ -315,7 +315,7 @@ include_once('include/page_header.php');
 
 // sorting && paging
 		$groups = CHostGroup::get($options);
-		order_result($groups, 'name');
+		order_result($groups, $sortfield, $sortorder);
 //---------
 
 		foreach($groups as $group){
@@ -401,8 +401,6 @@ include_once('include/page_header.php');
 		$groups_wdgt->addItem($form);
 		$groups_wdgt->show();
 	}
-?>
-<?php
 
 include_once('include/page_footer.php');
 ?>
