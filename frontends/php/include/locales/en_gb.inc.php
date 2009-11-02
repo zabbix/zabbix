@@ -477,6 +477,7 @@
 	'S_GROUP_FOR_DISCOVERED_HOSTS'=>		'Group for discovered hosts',
 
 //	nodes.php
+	'S_NOT_DM_SETUP' => 'Your setup is not configured for distributed monitoring',
 	'S_CONFIGURATION_OF_NODES'=>		'CONFIGURATION OF NODES',
 	'S_DM'=>				'DM',	// Distributed Monitoring
 	'S_NODE'=>				'Node',
