@@ -287,8 +287,10 @@ div.box_on{
 	position: absolute;
 	z-index:2;
 	border: 0px red solid;
-/*	background-color:#FF0000;
-	opacity:.40;
+/*
+	background-color:#FF0000;
+	opacity:.01;
+	filter:alpha(opacity=01);
 /**/
 }
 

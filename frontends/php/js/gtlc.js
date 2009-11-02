@@ -1968,7 +1968,7 @@ initialize: function(sbid, timelineid, obj, width, height){
 //--
 
 // Listeners
-	if(IE6){
+	if(IE){
 		obj.attachEvent('onmousedown', this.mousedown.bindAsEventListener(this));
 		obj.onmousemove = this.mousemove.bindAsEventListener(this);
 	}
@@ -2026,10 +2026,12 @@ mousedown: function(e){
 },
 
 mousemove: function(e){
-//	this.debug('mousemove',this.sbox_id);
+	this.debug('mousemove',this.sbox_id);
 
 	e = e || window.event;
-//	cancelEvent(e);
+	
+	if(IE || OP) cancelEvent(e);
+
 	if(ZBX_SBOX[this.sbox_id].mousedown == true){
 		this.optimize_event(e);
 		this.resizebox();
