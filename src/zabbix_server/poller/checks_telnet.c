@@ -169,6 +169,9 @@ static void	unix_eol(char *buf, size_t *offset)
 {
 	size_t	i, sz;
 
+	if (*offset == 0)
+		return;
+
 	sz = *offset - 1;
 
 	for (i = 0; i < *offset - 1; i++)
