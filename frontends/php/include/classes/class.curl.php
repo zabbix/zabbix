@@ -119,9 +119,6 @@ class Curl{
 		}
 		else{
 			$this->file = $this->url;
-
-			if($_SERVER['SERVER_PORT'] != 80)
-				$this->port = $_SERVER['SERVER_PORT'];
 		}
 
 		$tmp_pos = strpos($this->file,'?');
