@@ -70,6 +70,7 @@ include_once "include/page_header.php";
 			ITEM_TYPE_SNMPV3,
 			ITEM_TYPE_IPMI,
 			ITEM_TYPE_SSH,
+			ITEM_TYPE_TELNET,
 			ITEM_TYPE_SIMPLE,
 			ITEM_TYPE_INTERNAL,
 			ITEM_TYPE_AGGREGATE,

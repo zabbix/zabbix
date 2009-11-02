@@ -404,6 +404,8 @@ src/zabbix_server/poller/checks_ipmi.c -text
 src/zabbix_server/poller/checks_ipmi.h -text
 src/zabbix_server/poller/checks_ssh.c -text
 src/zabbix_server/poller/checks_ssh.h -text
+src/zabbix_server/poller/checks_telnet.c -text
+src/zabbix_server/poller/checks_telnet.h -text
 src/zabbix_server/trapper/nodecommand.c -text
 src/zabbix_server/trapper/nodecommand.h -text
 src/zabbix_server/trapper/proxyautoreg.c -text

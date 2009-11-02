@@ -926,6 +926,7 @@
 	'S_ZABBIX_DATABASE_MONITOR'=>				'Database monitor',
 	'S_IPMI_AGENT'=>					'IPMI agent',
 	'S_SSH_AGENT'=>						'SSH agent',
+	'S_TELNET_AGENT'=>					'TELNET agent',
 	'S_ZABBIX_AGGREGATE'=>					'ZABBIX aggregate',
 	'S_EXTERNAL_CHECK'=>					'External check',
 	'S_WEB_MONITORING'=>					'Web monitoring',

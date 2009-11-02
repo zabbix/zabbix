@@ -815,6 +815,7 @@
 	'S_ZABBIX_DATABASE_MONITOR'=>			'Монитор баз данных',
 	'S_IPMI_AGENT'=>			'IPMI агент',
 	'S_SSH_AGENT'=>				'SSH агент',
+	'S_TELNET_AGENT'=>			'TELNET агент',
 	'S_ZABBIX_AGGREGATE'=>			'ZABBIX aggregate',
 	'S_EXTERNAL_CHECK'=>			'Внешняя проверка',
 	'S_WEB_MONITORING'=>			'Веб мониторинг',

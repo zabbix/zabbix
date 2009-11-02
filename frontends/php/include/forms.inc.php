@@ -1411,7 +1411,7 @@
 		foreach(array(ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE,
 			ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_TRAPPER,
 			ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_HTTPTEST,
-			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH) as $it)
+			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET) as $it)
 				$cmbType->addItem($it, item_type2str($it));
 		$col_table2->addRow(array(bold(S_TYPE.': '), $cmbType));
 
@@ -1827,14 +1827,23 @@
 
 		switch ($type) {
 		case ITEM_TYPE_DB_MONITOR:
-			if (zbx_empty($key) || $key == 'ssh.run[<unique short description>,<ip>,<port>]')
+			if (zbx_empty($key) || $key == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]' ||
+					$key == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]')
 				$key = 'db.odbc.select[<unique short description>]';
 			if (zbx_empty($params))
 				$params = "DSN=<database source name>\nuser=<user name>\npassword=<password>\nsql=<query>";
 			break;
 		case ITEM_TYPE_SSH:
-			if (zbx_empty($key) || $key == 'db.odbc.select[<unique short description>]')
-				$key = 'ssh.run[<unique short description>,<ip>,<port>]';
+			if (zbx_empty($key) || $key == 'db.odbc.select[<unique short description>]' ||
+					$key == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]')
+				$key = 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]';
+			if (0 == strncmp($params, "DSN=<database source name>", 26))
+				$params = '';
+			break;
+		case ITEM_TYPE_TELNET:
+			if (zbx_empty($key) || $key == 'db.odbc.select[<unique short description>]' ||
+					$key == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]')
+				$key = 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]';
 			if (0 == strncmp($params, "DSN=<database source name>", 26))
 				$params = '';
 			break;
@@ -1976,7 +1985,7 @@
 			foreach(array(ITEM_TYPE_ZABBIX,ITEM_TYPE_ZABBIX_ACTIVE,ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_SNMPV1,ITEM_TYPE_SNMPV2C,ITEM_TYPE_SNMPV3,ITEM_TYPE_TRAPPER,
 				ITEM_TYPE_INTERNAL,ITEM_TYPE_AGGREGATE,ITEM_TYPE_EXTERNAL,
-				ITEM_TYPE_DB_MONITOR,ITEM_TYPE_IPMI,ITEM_TYPE_SSH) as $it)
+				ITEM_TYPE_DB_MONITOR,ITEM_TYPE_IPMI,ITEM_TYPE_SSH,ITEM_TYPE_TELNET) as $it)
 					$cmbType->addItem($it,item_type2str($it));
 			$frmItem->addRow(S_TYPE, $cmbType);
 		}
@@ -2057,6 +2066,14 @@
 				$frmItem->addRow(S_PRIVATE_KEY_FILE, new CTextBox('privatekey',$privatekey,16));
 				$frmItem->addRow(S_PASSPHRASE, new CTextBox('password',$password,16));
 			}
+			$frmItem->addRow(S_EXECUTED_SCRIPT, new CTextArea('params',$params,60,4));
+		}
+		else if (ITEM_TYPE_TELNET == $type) {
+			$frmItem->addVar('authtype',$authtype);
+			$frmItem->addRow(S_USER_NAME, new CTextBox('username',$username,16));
+			$frmItem->addVar('publickey',$publickey);
+			$frmItem->addVar('privatekey',$privatekey);
+			$frmItem->addRow(S_PASSWORD, new CTextBox('password',$password,16));
 			$frmItem->addRow(S_EXECUTED_SCRIPT, new CTextArea('params',$params,60,4));
 		}
 		else{

@@ -48,6 +48,7 @@
 			case ITEM_TYPE_DB_MONITOR:	$type = S_ZABBIX_DATABASE_MONITOR;	break;
 			case ITEM_TYPE_IPMI:		$type = S_IPMI_AGENT;			break;
 			case ITEM_TYPE_SSH:		$type = S_SSH_AGENT;			break;
+			case ITEM_TYPE_TELNET:		$type = S_TELNET_AGENT;			break;
 			default:$type = S_UNKNOWN;			break;
 		}
 	return $type;
