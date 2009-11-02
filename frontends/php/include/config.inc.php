@@ -1220,6 +1220,7 @@ function __autoload($class_name){
 
 		$sort = array();
 		foreach($data as $key => $arr){
+			if(!isset($arr[$sortfield])) return false;
 			$sort[$key] = $arr[$sortfield];
 		}
 		natcasesort($sort);

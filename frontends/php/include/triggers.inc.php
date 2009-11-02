@@ -525,7 +525,7 @@ return $result;
 
 		$sql = 'SELECT DISTINCT * '.
 				' FROM hosts '.
-				' WHERE '.DBin_node('hostid', get_current_nodeid(false)).
+				' WHERE '.DBin_node('hostid', false).
 					' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
 					' AND host IN ('.implode(',',$hosts).')';
 
@@ -652,7 +652,7 @@ return $result;
 				$sql = 'SELECT COUNT(*) as cnt,min(status) as status,min(hostid) as hostid '.
 						' FROM hosts h '.
 						' WHERE h.host='.zbx_dbstr($host).
-							' AND '.DBin_node('h.hostid', get_current_nodeid(false)).
+							' AND '.DBin_node('h.hostid', false).
 							' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') ';
 
 				$row=DBfetch(DBselect($sql));
@@ -673,7 +673,7 @@ return $result;
 						' WHERE h.host='.zbx_dbstr($host).
 							' AND i.key_='.zbx_dbstr($key).
 							' AND h.hostid=i.hostid '.
-							' AND '.DBin_node('h.hostid', get_current_nodeid(false));
+							' AND '.DBin_node('h.hostid', false);
 
 				if(!$item = DBfetch(DBselect($sql))){
 					error('No such monitored parameter ('.$key.') for host ('.$host.')');

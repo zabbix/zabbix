@@ -90,7 +90,7 @@ class CHostGroup extends CZBXAPI{
 			return false;
 		}
 
-		$sql = 'SELECT groupid FROM groups WHERE name='.zbx_dbstr($data['name']).' AND '.DBin_node('groupid', get_current_nodeid(false));
+		$sql = 'SELECT groupid FROM groups WHERE name='.zbx_dbstr($data['name']).' AND '.DBin_node('groupid', false);
 		$groupid = DBfetch(DBselect($sql));
 
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){

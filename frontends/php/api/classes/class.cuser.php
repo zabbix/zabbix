@@ -368,7 +368,7 @@ class CUser extends CZBXAPI{
 		$sql = 'SELECT u.userid '.
 				' FROM users u '.
 				' WHERE u.alias='.zbx_dbstr($user_data['alias']).
-					' AND '.DBin_node('u.userid', get_current_nodeid(false));
+					' AND '.DBin_node('u.userid', false);
 
 		if($user = DBfetch(DBselect($sql)))
 			$result = $user['userid'];
@@ -429,7 +429,7 @@ class CUser extends CZBXAPI{
 			$sql = 'SELECT * '.
 					' FROM users '.
 					' WHERE alias='.zbx_dbstr($user['alias']).
-						' AND '.DBin_node('userid', get_current_nodeid(false));
+						' AND '.DBin_node('userid', false);
 			if(DBfetch(DBselect($sql))){
 				$error = "User [ {$user['alias']} ] already exists";
 				$result = false;
