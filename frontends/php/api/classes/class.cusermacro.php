@@ -701,7 +701,7 @@ class CUserMacro extends CZBXAPI{
 				' FROM hostmacro '.
 				' WHERE macro='.zbx_dbstr($macro_data['macro']).
 					' AND hostid='.$macro_data['hostid'].
-					' AND '.DBin_node('hostmacroid', get_current_nodeid(false));
+					' AND '.DBin_node('hostmacroid', false);
 		$res = DBselect($sql);
 		if($macroid = DBfetch($res))
 			$result = $macroid['hostmacroid'];
@@ -732,7 +732,7 @@ class CUserMacro extends CZBXAPI{
 		$sql = 'SELECT globalmacroid '.
 				' FROM globalmacro '.
 				' WHERE macro='.zbx_dbstr($macro_data['macro']).
-					' AND '.DBin_node('globalmacroid', get_current_nodeid(false));
+					' AND '.DBin_node('globalmacroid', false);
 		$res = DBselect($sql);
 		if($macroid = DBfetch($res))
 			$result = $macroid['globalmacroid'];

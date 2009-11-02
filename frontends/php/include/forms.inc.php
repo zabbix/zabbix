@@ -6022,7 +6022,7 @@
 		else{
 			$frmHostP->addSpanRow("Profile for this host is missing","form_row_c");
 		}
-		$frmHostP->addItemToBottomRow(new CButtonCancel(url_param('groupid')));
+		$frmHostP->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param('prof_type')));
 	return $frmHostP;
 	}
 
@@ -6063,7 +6063,7 @@
 		else{
 			$frmHostPA->addSpanRow('Extended Profile for this host is missing','form_row_c');
 		}
-		$frmHostPA->addItemToBottomRow(new CButtonCancel(url_param('groupid')));
+		$frmHostPA->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param('prof_type')));
 	return $frmHostPA;
 	}
 // END:   HOSTS PROFILE EXTENDED Section

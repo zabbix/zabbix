@@ -113,7 +113,7 @@
 								' AND h.hostid=i.hostid '.
 								' AND i.itemid=f.itemid '.
 								' AND f.triggerid=t.triggerid '.
-								' AND '.DBin_node('t.triggerid', get_current_nodeid(false))
+								' AND '.DBin_node('t.triggerid', false)
 							);
 
 		while($row=DBfetch($result)){

@@ -531,7 +531,7 @@ class CTrigger extends CZBXAPI{
 			$sql = 'SELECT DISTINCT t.triggerid, t.expression '.
 					' FROM triggers t'.$sql_from.
 					' WHERE '.$sql_where.
-						' AND '.DBin_node('t.triggerid', get_current_nodeid(false));
+						' AND '.DBin_node('t.triggerid', false);
 			if($db_triggers = DBselect($sql)){
 				$result = true;
 

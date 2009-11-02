@@ -288,7 +288,7 @@ class CUserGroup extends CZBXAPI{
 		$sql = 'SELECT g.usrgrpid '.
 				' FROM usrgrp g '.
 				' WHERE g.name='.zbx_dbstr($group_data['name']).
-					' AND '.DBin_node('g.usrgrpid', get_current_nodeid(false));
+					' AND '.DBin_node('g.usrgrpid', false);
 
 		if($group = DBfetch(DBselect($sql)))
 			$result = $group['usrgrpid'];

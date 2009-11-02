@@ -473,7 +473,7 @@ class CTemplate extends CZBXAPI{
 		$sql = 'SELECT hostid FROM hosts '.
 			' WHERE host='.zbx_dbstr($template_data['name']).
 				' AND status=3 '.
-				' AND '.DBin_node('hostid', get_current_nodeid(false));
+				' AND '.DBin_node('hostid', false);
 		$templateid = DBfetch(DBselect($sql));
 
 		$result = $templateid ? true : false;
