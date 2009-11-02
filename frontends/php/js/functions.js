@@ -311,10 +311,11 @@ function closeform(page){
 	var msg="";
 	try{
 		msg = (IE)?(document.getElementsByTagName('p')[0].innerText):(document.getElementsByTagName('p')[0].textContent);
+		opener.location.replace(page+'?msg='+encodeURI(msg));
 	} catch(e){
 		alert(e);
 	}
-	opener.location.replace(page+'?msg='+encodeURI(msg));
+
 	self.close();
 }
 

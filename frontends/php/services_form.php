@@ -167,8 +167,8 @@ if(isset($_REQUEST['saction'])){
 		show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 	}
 	if($result){
-		zbx_add_post_js('closeform('services.php');');
-		include_once 'include/page_footer.php';
+		zbx_add_post_js("closeform('services.php');");
+		include_once('include/page_footer.php');
 	}
 }
 //-------------------------------------------- </ACTIONS> --------------------------------------------
@@ -180,12 +180,12 @@ if(isset($_REQUEST['pservices'])){
 	show_table_header(S_IT_SERVICES_BIG);
 
 	$form = new CForm();
-	$form->SetName('services');
+	$form->setName('services');
 
 	if(isset($service)) $form->addVar('serviceid', $service['serviceid']);
 
 	$table = new CTableInfo();
-	$table->SetHeader(array(
+	$table->setHeader(array(
 		S_SERVICE,
 		S_STATUS_CALCULATION,
 		S_TRIGGER
@@ -198,7 +198,7 @@ if(isset($_REQUEST['pservices'])){
 		$description = S_ROOT_SMALL;
 
 		$description = new CLink($description,'#');
-		$description->SetAction('javascript:
+		$description->setAction('javascript:
 				window.opener.document.forms[0].elements[\'parent_name\'].value = '.zbx_jsvalue(S_ROOT_SMALL).';
 				window.opener.document.forms[0].elements[\'parentname\'].value = '.zbx_jsvalue(S_ROOT_SMALL).';
 				window.opener.document.forms[0].elements[\'parentid\'].value = '.zbx_jsvalue(0).';
@@ -249,13 +249,13 @@ if(isset($_REQUEST['pservices'])){
 	}
 
 	$cb = new CButton('cancel',S_CANCEL);
-	$cb->SetType('button');
-	$cb->SetAction('javascript: self.close();');
+	$cb->setType('button');
+	$cb->setAction('javascript: self.close();');
 
 	$td = new CCol($cb);
 	$td->setAttribute('style','text-align:right;');
 
-	$table->SetFooter($td);
+	$table->setFooter($td);
 	$form->addItem($table);
 	$form->Show();
 }
@@ -269,12 +269,12 @@ if(isset($_REQUEST['cservices'])){
 	show_table_header(S_IT_SERVICES_BIG);
 
 	$form = new CForm();
-	$form->SetName('services');
+	$form->setName('services');
 
 	if(isset($service)) $form->addVar('serviceid', $service['serviceid']);
 
 	$table = new CTableInfo();
-	$table->SetHeader(array(S_SERVICE,S_STATUS_CALCULATION,S_TRIGGER));
+	$table->setHeader(array(S_SERVICE,S_STATUS_CALCULATION,S_TRIGGER));
 
 	if(isset($service)){
 		$childs = get_service_childs($service['serviceid'],1);
@@ -309,19 +309,19 @@ if(isset($_REQUEST['cservices'])){
 		}
 
 		$description = new CLink($description,'#');
-		$description->SetAction('window.opener.add_child_service('.zbx_jsvalue($db_service_data['name']).','.zbx_jsvalue($db_service_data['serviceid']).','.zbx_jsvalue($trigger).','.zbx_jsvalue($db_service_data['triggerid']).'); self.close(); return false;');
+		$description->setAction('window.opener.add_child_service('.zbx_jsvalue($db_service_data['name']).','.zbx_jsvalue($db_service_data['serviceid']).','.zbx_jsvalue($trigger).','.zbx_jsvalue($db_service_data['triggerid']).'); self.close(); return false;');
 
 		$table->addRow(array(array($prefix,$description),algorithm2str($db_service_data['algorithm']),$trigger));
 	}
 
 	$cb = new CButton('cancel',S_CANCEL);
-	$cb->SetType('button');
-	$cb->SetAction('javascript: self.close();');
+	$cb->setType('button');
+	$cb->setAction('javascript: self.close();');
 
 	$td = new CCol($cb);
 	$td->setAttribute('style','text-align:right;');
 
-	$table->SetFooter($td);
+	$table->setFooter($td);
 	$form->addItem($table);
 	$form->Show();
 
@@ -370,7 +370,7 @@ if(isset($_REQUEST['sform'])){
 //----------
 
 	if(isset($service['serviceid'])){
-		$frmService->SetTitle(S_SERVICE.' "'.$service['name'].'"');
+		$frmService->setTitle(S_SERVICE.' "'.$service['name'].'"');
 	}
 
 	if(isset($service['serviceid']) && !isset($_REQUEST['form_refresh'])){
@@ -472,8 +472,8 @@ if(isset($_REQUEST['sform'])){
 	$frmService->addVar('parentid',$parentid);
 
 	$cb = new CButton('select_parent',S_CHANGE);
-	$cb->SetType('button');
-	$cb->SetAction("javascript: openWinCentered('services_form.php?pservices=1".url_param('serviceid')."','ZBX_Services_List',740,420,'scrollbars=1, toolbar=0, menubar=0, resizable=1, dialog=0');");
+	$cb->setType('button');
+	$cb->setAction("javascript: openWinCentered('services_form.php?pservices=1".url_param('serviceid')."','ZBX_Services_List',740,420,'scrollbars=1, toolbar=0, menubar=0, resizable=1, dialog=0');");
 
 	$frmService->addRow('Parent Service',array($ctb,$cb));
 //----------
@@ -639,11 +639,11 @@ if(isset($_REQUEST['sform'])){
 		$filtertimetab = new CTable(null,'calendar');
 		$filtertimetab->setAttribute('width','10%');
 
-		$filtertimetab->SetCellPadding(0);
-		$filtertimetab->SetCellSpacing(0);
+		$filtertimetab->setCellPadding(0);
+		$filtertimetab->setCellSpacing(0);
 
 		$td_tmp = new CCol(new CTextBox('new_service_time[note]','<short description>',40));
-		$td_tmp->SetColSpan(10);
+		$td_tmp->setColSpan(10);
 		$filtertimetab->addRow(array(S_NOTE, $td_tmp));
 
 		$filtertimetab->addRow(array(
