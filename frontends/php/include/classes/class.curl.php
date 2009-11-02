@@ -50,7 +50,9 @@ class Curl{
 
 		if(empty($url)){
 			$this->formatArguments();
-			$this->url = $url = 'http://'.$_SERVER['SERVER_NAME'].$_SERVER['SCRIPT_NAME'].'?'.$this->getQuery();
+
+			$protcol = (strpos(strtolower($_SERVER['SERVER_PROTOCOL']), 'shttp') !== false)?'shttp':'http';
+			$this->url = $url = $protcol.'://'.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'].$_SERVER['SCRIPT_NAME'].'?'.$this->getQuery();
 		}
 		else{
 			$this->url=urldecode($url);
@@ -103,9 +105,10 @@ class Curl{
 			}
 			else{
 				$portColonIndex=strpos($this->host,':');
+
 				if($portColonIndex!==false){
-					$this->host=zbx_substring($this->host,0,$portColonIndex);
 					$this->port=substr($this->host,$portColonIndex+1);
+					$this->host=zbx_substring($this->host,0,$portColonIndex);
 				}
 			}
 
@@ -116,6 +119,9 @@ class Curl{
 		}
 		else{
 			$this->file = $this->url;
+
+			if($_SERVER['SERVER_PORT'] != 80)
+				$this->port = $_SERVER['SERVER_PORT'];
 		}
 
 		$tmp_pos = strpos($this->file,'?');
@@ -141,6 +147,11 @@ class Curl{
 			if(!is_null($value)) $query.= $key.'='.$value.'&';
 		}
 		$this->query = rtrim($query,'&');
+	}
+
+	public function formatGetArguments(){
+		$this->arguments = $_GET;
+		$this->formatQuery();
 	}
 
 	public function formatArguments($query=null){
