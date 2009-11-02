@@ -100,7 +100,7 @@ lbl_ret:
 
 
 /*
- *  0- NOT OK
+ *  0 - NOT OK
  *  1 - OK
  * */
 static int	check_ssh(const char *host, unsigned short port, int *value_int)
