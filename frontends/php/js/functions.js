@@ -64,19 +64,21 @@ function call_ins_macro_menu(ev){
 }
 
 function call_triggerlog_menu(evnt,id,name,ltype,menu_options){
- 	var tname = 'Create Log Trigger';	
+ 	var tname = 'Create Log Trigger';
+
 	if(typeof(menu_options) != 'undefined'){
 		show_popup_menu(evnt,
 					[
 						[name,null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],
-						['Create Log Trigger',null, function(){ openWinCentered('tr_logform.php?sform=1&itemid='+id+'&ltype='+ltype,'TriggerLog',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');},{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
+						['Create Log Trigger', "javascript: openWinCentered('tr_logform.php?sform=1&itemid="+id+"&ltype="+ltype+"','TriggerLog',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');",{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
 						menu_options
 					],240);
-	} else {
+	}
+	else {
 		show_popup_menu(evnt,
 					[
 						[name,null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],
-						['Create Log Trigger',null,function(){ openWinCentered('tr_logform.php?sform=1&itemid='+id+'&ltype='+ltype,'ServiceForm',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');}, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]
+						['Create Log Trigger', "javascript: openWinCentered('tr_logform.php?sform=1&itemid="+id+"&ltype="+ltype+"','ServiceForm',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');", {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]
 					],140);
 	}
 return false;

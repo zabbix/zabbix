@@ -126,7 +126,7 @@ $ZBX_MENU = array(
 				array(
 						'url'=>'hosts.php',
 						'label'=>S_HOSTS,
-						'sub_pages'=>array('items.php','triggers.php','graphs.php','templates.php','applications.php','tr_logform.php','popup_trexpr.php','popup_gitem.php')
+						'sub_pages'=>array('items.php','triggers.php','graphs.php','templates.php','applications.php','tr_logform.php','tr_testexpr.php','popup_trexpr.php','popup_gitem.php')
 					),
 				array(
 						'url'=>'maintenance.php',

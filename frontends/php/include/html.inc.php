@@ -19,6 +19,23 @@
 **/
 ?>
 <?php
+	function italic($str){
+		if(is_array($str)){
+			foreach($str as $key => $val)
+				if(is_string($val)){
+					$em = new CTag('em','yes');
+					$em->addItem($val);
+					$str[$key] = $em;
+				}
+		}
+		else if(is_string($str)) {
+			$em = new CTag('em','yes','');
+			$em->addItem($str);
+			$str = $em;
+		}
+	return $str;
+	}
+
 	function bold($str){
 		if(is_array($str)){
 			foreach($str as $key => $val)
