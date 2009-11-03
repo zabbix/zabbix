@@ -180,40 +180,39 @@ include_once('include/page_header.php');
 		$groupid = get_request('groupid', 0);
 		$hosts = get_request('hosts', array());
 
+		$group_name = get_request('gname', '');
 		$frm_title = S_HOST_GROUP;
-		if($groupid > 0){
-			$group = get_hostgroup_by_groupid($_REQUEST['groupid']);
-			$name = $group['name'];
+		if($groupid > 0){	
+			$group = get_hostgroup_by_groupid($groupid);
 			$frm_title .= ' ['.$group['name'].']';
-		}
-		else{
-			$name = '';
-		}
-
-		$frmHostG = new CFormTable($frm_title, 'hostgroups.php');
-		$frmHostG->setName('hg_form');
-		$frmHostG->addRow(S_GROUP_NAME, new CTextBox('gname', $name, 48));
-
-		if($groupid > 0){
-			$frmHostG->addVar('groupid',$_REQUEST['groupid']);
+			
 // if first time select all hosts for group from db
 			if(!isset($_REQUEST['form_refresh'])){
-				$params = array('groupids' => $groupid,
-								'editable' => 1,
-								'sortfield' => 'host',
-								'templated_hosts' => 1);
+				$group_name = $group['name'];
+				
+				$params = array(
+					'groupids' => $groupid,
+					'editable' => 1,
+					'sortfield' => 'host',
+					'templated_hosts' => 1);
 				$db_hosts = CHost::get($params);
 				foreach($db_hosts as $hostid => $db_host){
 					$hosts[$hostid] = $hostid;
 				}
 			}
 		}
+		
+		$frmHostG = new CFormTable($frm_title, 'hostgroups.php');
+		$frmHostG->setName('hg_form');
+		$frmHostG->addVar('groupid', $groupid);
+		$frmHostG->addRow(S_GROUP_NAME, new CTextBox('gname', $group_name, 48));
 
 // select all possible groups
-		$params = array('not_proxy_host' => 1,
-						'sortfield' => 'name',
-						'editable' => 1,
-						'extendoutput' => 1);
+		$params = array(
+			'not_proxy_host' => 1,
+			'sortfield' => 'name',
+			'editable' => 1,
+			'extendoutput' => 1);
 		$db_groups = CHostGroup::get($params);
 		$twb_groupid = get_request('twb_groupid', 0);
 		if($twb_groupid == 0){
@@ -221,18 +220,19 @@ include_once('include/page_header.php');
 			$twb_groupid = $gr['groupid'];
 		}
 		$cmbGroups = new CComboBox('twb_groupid', $twb_groupid, 'submit()');
-		foreach($db_groups as $groupid => $row){
-			$cmbGroups->addItem($groupid, $row['name']);
+		foreach($db_groups as $row){
+			$cmbGroups->addItem($row['groupid'], $row['name']);
 		}
 
 		$cmbHosts = new CTweenBox($frmHostG, 'hosts', $hosts, 25);
 
 // get hosts from selected twb_groupid combo
-		$params = array('groupids'=>$twb_groupid,
-						'templated_hosts'=>1,
-						'sortfield'=>'host',
-						'editable' => 1,
-						'extendoutput' => 1);
+		$params = array(
+			'groupids' => $twb_groupid,
+			'templated_hosts' => 1,
+			'sortfield' => 'host',
+			'editable' => 1,
+			'extendoutput' => 1);
 		$db_hosts = CHost::get($params);
 		foreach($db_hosts as $hostid => $db_host){
 // add all except selected hosts
@@ -241,11 +241,12 @@ include_once('include/page_header.php');
 		}
 
 // select selected hosts and add them
-		$params = array('hostids' => $hosts,
-						'templated_hosts' =>1 ,
-						'sortfield' => 'host',
-						'editable' => 1,
-						'extendoutput' => 1);
+		$params = array(
+			'hostids' => $hosts,
+			'templated_hosts' =>1 ,
+			'sortfield' => 'host',
+			'editable' => 1,
+			'extendoutput' => 1);
 		$db_hosts = CHost::get($params);
 		foreach($db_hosts as $hostid => $db_host){
 			$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$db_host['host']);
@@ -254,15 +255,15 @@ include_once('include/page_header.php');
 		$frmHostG->addRow(S_HOSTS, $cmbHosts->Get(S_HOSTS.SPACE.S_IN,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE, $cmbGroups)));
 
 		$frmHostG->addItemToBottomRow(new CButton('save',S_SAVE));
-		if($groupid>0){
+		if($groupid > 0){
 			$frmHostG->addItemToBottomRow(SPACE);
 			$frmHostG->addItemToBottomRow(new CButton('clone',S_CLONE));
 			$frmHostG->addItemToBottomRow(SPACE);
 
-			$dltButton = new CButtonDelete('Delete selected group?', url_param('form').url_param('config').url_param('groupid'));
+			$dltButton = new CButtonDelete('Delete selected group?', url_param('form').url_param('groupid'));
 			$dlt_groups = getDeletableHostGroups($_REQUEST['groupid']);
 
-			if(empty($dlt_groups)) $dltButton->setAttribute('disabled','disabled');
+			if(empty($dlt_groups)) $dltButton->setAttribute('disabled', 'disabled');
 
 			$frmHostG->addItemToBottomRow($dltButton);
 		}
