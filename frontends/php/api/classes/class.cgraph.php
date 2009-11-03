@@ -40,7 +40,7 @@ class CGraph extends CZBXAPI{
 *	int 'count'					=> 'count',
 *	string 'pattern'				=> 'search hosts by pattern in graph names',
 *	integer 'limit'					=> 'limit selection',
-*	string 'order'					=> 'depricated parameter (for now)'
+*	string 'order'					=> 'deprecated parameter (for now)'
 * );
 * </code>
 *
