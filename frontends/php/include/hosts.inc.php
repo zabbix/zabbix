@@ -72,14 +72,18 @@ require_once('include/httptest.inc.php');
 	}
 
 	function add_host_group($name, $hosts=array()){
-		$groupids = CHostGroup::add(array($name));
-		if(!$groupids) return $groupids;
+		$groupids = CHostGroup::add(array('name' => $name));
+		if(!$groupids){
+			error(CHostGroup::resetErrors());
+			return false;
+		}
 
 		add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, reset($groupids), $name, 'groups', NULL, NULL);
 
 		$groupid = reset($groupids);
 		info('Added host group ['.$name.']');
-		update_host_groups_by_groupid($groupid,$hosts);
+		if(!empty($hosts))
+			update_host_groups_by_groupid($groupid,$hosts);
 
 	return $groupid;
 	}
@@ -87,6 +91,7 @@ require_once('include/httptest.inc.php');
 	function update_host_group($groupid,$name,$hosts){
 		$hostgroup_old = get_hostgroup_by_groupid($groupid);
 		$result = CHostGroup::update(array(array('name' => $name, 'groupid' => $groupid)));
+
 		if(!$result){
 			error(CHostGroup::resetErrors());
 			return $result;
@@ -95,8 +100,9 @@ require_once('include/httptest.inc.php');
 		$hostgroup_new = get_hostgroup_by_groupid($groupid);
 		add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST_GROUP, $groupid, $hostgroup_old['name'], 'groups', $hostgroup_old, $hostgroup_new);
 		info('Updated host group ['.$name.']');
-		$result = update_host_groups_by_groupid($groupid,$hosts);
-
+		if(!empty($hosts))
+			$result = update_host_groups_by_groupid($groupid,$hosts);
+			
 	return $result;
 	}
 
