@@ -304,14 +304,13 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num)
 					trend->itemid,
 					trend->clock);
 
-			(*trends_num)--;
-			memmove(&trends[i], &trends[i + 1], (*trends_num - i) * sizeof(ZBX_DC_TREND));
+			trend->itemid = 0;
 
 			DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
 		}
 
 		for (i = 0; i < *trends_num; i++)
-			if (clock == trends[i].clock && value_type == trends[i].value_type)
+			if (0 != trends[i].itemid && clock == trends[i].clock && value_type == trends[i].value_type)
 			{
 				trend = &trends[i];
 				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -324,9 +323,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num)
 						trend->value_avg.value_float,
 						trend->value_max.value_float);
 
-				(*trends_num)--;
-				memmove(&trends[i], &trends[i + 1], (*trends_num - i) * sizeof(ZBX_DC_TREND));
-				i--;
+				trend->itemid = 0;
 
 				DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
 			}
@@ -377,14 +374,13 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num)
 					trend->itemid,
 					trend->clock);
 
-			(*trends_num)--;
-			memmove(&trends[i], &trends[i + 1], (*trends_num - i) * sizeof(ZBX_DC_TREND));
+			trend->itemid = 0;
 
 			DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
 		}
 
 		for (i = 0; i < *trends_num; i++)
-			if (clock == trends[i].clock && value_type == trends[i].value_type)
+			if (0 != trends[i].itemid && clock == trends[i].clock && value_type == trends[i].value_type)
 			{
 				trend = &trends[i];
 				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -397,9 +393,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num)
 						trend->value_avg.value_uint64,
 						trend->value_max.value_uint64);
 
-				(*trends_num)--;
-				memmove(&trends[i], &trends[i + 1], (*trends_num - i) * sizeof(ZBX_DC_TREND));
-				i--;
+				trend->itemid = 0;
 
 				DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
 			}
@@ -412,6 +406,12 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num)
 
 	if (sql_offset > 16) /* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
+
+	/* clean trends */
+	for (i = 0, num = 0; i < *trends_num; i++)
+		if (0 != trends[i].itemid)
+			memcpy(&trends[num++], &trends[i], sizeof(ZBX_DC_TREND));
+	*trends_num = num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
