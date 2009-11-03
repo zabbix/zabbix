@@ -40,22 +40,22 @@ class CUserMacro extends CZBXAPI{
  * @param array $options['nodeids'] Node IDs
  * @param array $options['groupids'] UserMacrosGroup IDs
  * @param array $options['macroids'] UserMacros IDs
- * @param boolean $options['monitored_macros'] only monitored UserMacross
+ * @param boolean $options['monitored_macros'] only monitored UserMacros
  * @param boolean $options['templated_macros'] include templates in result
  * @param boolean $options['with_items'] only with items
  * @param boolean $options['with_monitored_items'] only with monitored items
  * @param boolean $options['with_historical_items'] only with historical items
  * @param boolean $options['with_triggers'] only with triggers
- * @param boolean $options['with_monitored_triggers'] only with monitores triggers
+ * @param boolean $options['with_monitored_triggers'] only with monitored triggers
  * @param boolean $options['with_httptests'] only with http tests
- * @param boolean $options['with_monitored_httptests'] only with monitores http tests
+ * @param boolean $options['with_monitored_httptests'] only with monitored http tests
  * @param boolean $options['with_graphs'] only with graphs
  * @param boolean $options['editable'] only with read-write permission. Ignored for SuperAdmins
- * @param int $options['extendoutput'] return all fields for UserMacross
- * @param int $options['count'] count UserMacross, returned column name is rowscount
+ * @param int $options['extendoutput'] return all fields for UserMacros
+ * @param int $options['count'] count UserMacros, returned column name is rowscount
  * @param string $options['pattern'] search macros by pattern in macro names
  * @param int $options['limit'] limit selection
- * @param string $options['order'] depricated parametr (for now)
+ * @param string $options['order'] deprecated parameter (for now)
  * @return array|boolean UserMacros data as array or false if error
  */
 	public static function get($options=array()){
