@@ -450,6 +450,8 @@ class CHostGroup extends CZBXAPI{
 	public static function add($groups){
 		global $USER_DETAILS;
 
+		zbx_valueTo($groups, array('array' =>1));
+		
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only SuperAdmins can create HostGroups');
 			return false;
@@ -460,11 +462,9 @@ class CHostGroup extends CZBXAPI{
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter');
 			return false;
 		}
-
 		self::BeginTransaction(__METHOD__);
-		foreach($groups as $group){
-
-			if(!isset($group['name']) || empty($group['name'])){
+		foreach($groups as $num => $group){
+			if(!is_array($group) || !isset($group['name']) || empty($group['name'])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ name ]');
 				$result = false;
 				break;
