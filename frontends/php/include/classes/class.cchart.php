@@ -1397,15 +1397,15 @@ SDI('======================================');
 			}
 
 			$data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];
+			
+			if($this->itemsHost) $item_caption = $this->items[$i]['description'];
+			else $item_caption = $this->items[$i]['host'].': '.$this->items[$i]['description'];
+				
 			if(isset($data) && isset($data['min'])){
 				if($this->items[$i]['axisside'] == GRAPH_YAXIS_SIDE_LEFT)
 					$units['left'] = $this->items[$i]['units'];
 				else
 					$units['right'] = $this->items[$i]['units'];
-
-				if($this->itemsHost) $item_caption = $this->items[$i]['description'];
-				else $item_caption = $this->items[$i]['host'].': '.$this->items[$i]['description'];
-
 				$legend->addCell($colNum, array('text' => $item_caption));
 				$legend->addCell($colNum, array('text' => '['.$fnc_name.']'));
 				$legend->addCell($colNum, array('text' => convert_units($this->getLastValue($i),$this->items[$i]['units']), 'align'=> 2));
@@ -1414,7 +1414,8 @@ SDI('======================================');
 				$legend->addCell($colNum, array('text' => convert_units(max($data['max']),$this->items[$i]['units']), 'align'=> 2));
 			}
 			else{
-				$legend->addCell($colNum,array('text' => $this->items[$i]['host'].': '.$this->items[$i]['description']));
+				$legend->addCell($colNum,array('text' => $item_caption));
+//				$legend->addCell($colNum,array('text' => $this->items[$i]['host'].': '.$this->items[$i]['description']));
 				$legend->addCell($colNum,array('text' => '[ no data ]'));
 			}
 
