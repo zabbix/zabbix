@@ -52,7 +52,7 @@
 		}
 
 //		if(!eregi('^([0-9a-zA-Z\_\.[.-.]\$ ]+)$', $name)){
-		if(!preg_match('/^([0-9a-z\_\.[.-.]\$ ]+)$/i', $name)){
+		if(!preg_match('/^([0-9a-z_\.\-\$\s]+)$/i', $name)){
 			error("Scenario step name should contain '0-9a-zA-Z_ .$'- characters only");
 			return false;
 		}
@@ -178,11 +178,11 @@
 		return $httpstepid;
 	}
 
-	function	db_save_httptest($httptestid, $hostid, $application, $name, $authentication, $http_user, $http_password, $delay, $status, $agent, $macros, $steps){
+	function db_save_httptest($httptestid, $hostid, $application, $name, $authentication, $http_user, $http_password, $delay, $status, $agent, $macros, $steps){
 		$history = 30; // TODO !!! Allow user to set this parameter
 		$trends = 90; // TODO !!! Allow user to set this parameter
 
-		if(!preg_match('/^'.ZBX_PREG_PRINT_UTF.'$/u', $name)) {
+		if(!preg_match('/^(['.ZBX_PREG_PRINT.'])+$/u', $name)) {
 			error("Only characters are allowed");
 			return false;
 		}
