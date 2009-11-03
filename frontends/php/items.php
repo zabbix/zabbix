@@ -769,7 +769,13 @@ include_once('include/page_header.php');
 		insert_copy_elements_to_forms('group_itemid');
 	}
 	else{
-
+		$logtype['log']=0;
+		$logtype['eventlog']=1;
+		$logtype['snmptraps']=2;
+		$dbkey[0]='log[%';
+		$dbkey[1]='eventlog[%';
+		$dbkey[2]='snmptraps';
+	
 		$show_host = true;
 
 		$items_wdgt = new CWidget();
@@ -858,7 +864,7 @@ include_once('include/page_header.php');
 // Table Header //
 		$table->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
-//			$show_host?make_sorting_header(S_HOST,'host'):null,
+			S_LOG,
 			$show_host?S_HOST:null,
 			make_sorting_header(S_DESCRIPTION,'description'),
 			S_TRIGGERS,
@@ -938,7 +944,7 @@ include_once('include/page_header.php');
 		$paging = getPagingLine($items);
 //---------
 
-		foreach($items as $item){
+		foreach($items as $num => $item){
 
 			if($show_host){
 				$host = array_pop($item['hosts']);
@@ -954,7 +960,8 @@ include_once('include/page_header.php');
 				$description[] = new CLink($template_host['host'],'?hostid='.$template_host['hostid'], 'unknown');
 				$description[] = ':';
 			}
-			$description[] = new CLink(item_description($item), '?form=update&itemid='.$item['itemid']);
+			$item['description_expanded'] = item_description($item);
+			$description[] = new CLink($item['description_expanded'], '?form=update&itemid='.$item['itemid']);
 
 			$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].'&go='.
 				($item['status']?'activate':'disable'), item_status2style($item['status'])));
@@ -990,7 +997,8 @@ include_once('include/page_header.php');
 			));
 
 // TRIGGERS INFO
-			foreach($item['triggers'] as $triggerid => $trigger){
+			foreach($item['triggers'] as $num => &$trigger){
+				$triggerid = $trigger['triggerid'];
 				$tr_description = array();
 
 				if($trigger['templateid'] > 0){
@@ -1000,7 +1008,8 @@ include_once('include/page_header.php');
 					$tr_description[] = ':';
 				}
 
-				$tr_description[] = new CLink(expand_trigger_description($triggerid), 'triggers.php?form=update&triggerid='.$triggerid);
+				$trigger['description_expanded'] = expand_trigger_description($triggerid);
+				$tr_description[] = new CLink($trigger['description_expanded'], 'triggers.php?form=update&triggerid='.$triggerid);
 
 				if($trigger['status'] != TRIGGER_STATUS_UNKNOWN) $trigger['error'] = '';
 
@@ -1047,8 +1056,42 @@ include_once('include/page_header.php');
 			}
 //-------
 
+			if(preg_match('/^(log\[.*\]|eventlog\[.*\]|snmptraps).*$/',$item['key_'],$matchkeys)){
+				preg_match('/(log|eventlog|snmptraps)/', $matchkeys[0], $matchkey);
+				$ltype = $logtype[$matchkey[1]];
+				
+				$triggers_flag = false;
+				$triggers=",Array('Edit Trigger',null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']}\n";
+				
+				foreach($item['triggers'] as $num => $trigger){
+					$triggers .= ',["'.$trigger['description_expanded'].'",'.
+										zbx_jsvalue("javascript: openWinCentered('tr_logform.php?sform=1&itemid=".$item['itemid'].
+																"&triggerid=".$trigger['triggerid'].
+																"&ltype=".$ltype."','TriggerLog',760,540,".
+																"'titlebar=no, resizable=yes, scrollbars=yes');").']';
+					$triggers_flag = true;
+				}
+				
+				if($triggers_flag){
+					$triggers = rtrim($triggers,',').')';
+				}
+				else{
+					$triggers = '';
+				}
+
+				$menuicon = new CDiv(SPACE,'iconmenu');
+				$menuicon->setAttribute('onclick','javascript: call_triggerlog_menu(event, '.
+														zbx_jsvalue($item['itemid']).','.
+														zbx_jsvalue($item['description_expanded']).','.
+														$ltype.$triggers.');');
+			} 
+			else {
+				$menuicon = SPACE;
+			}
+
 			$table->addRow(array(
 				new CCheckBox('group_itemid['.$item['itemid'].']',null,null,$item['itemid']),
+				$menuicon,
 				$host,
 				$description,
 				$trigger_info,
@@ -1105,7 +1148,13 @@ include_once('include/page_header.php');
 		$items_wdgt->addItem($form);
 		$items_wdgt->show();
 	}
+	
+	$jsmenu = new CPUMenu(null,200);
+	$jsmenu->InsertJavaScript();
+?>
+<?php
 
+include_once('include/page_footer.php');
 
 include_once('include/page_footer.php');
 ?>

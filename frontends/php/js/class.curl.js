@@ -39,9 +39,10 @@ args:  null,
 
 initialize: function(url){
 	var url = url || location.href;
-	this.url=unescape(url);
-	this.args = {};
 	
+	this.url = decodeURI(url);
+	this.args = {};
+
 	this.query=(this.url.indexOf('?')>=0)?this.url.substring(this.url.indexOf('?')+1):'';
 	if(this.query.indexOf('#')>=0) this.query=this.query.substring(0,this.query.indexOf('#'));
 	

@@ -439,13 +439,13 @@
 		$form->addRow(S_NAME, new CTextBox('name', $name, 40));
 
 		$cmbAuth = new CComboBox('authentication',$authentication,'submit();');
-		$cmbAuth->AddItem(HTTPTEST_AUTH_NONE,S_NONE);
-		$cmbAuth->AddItem(HTTPTEST_AUTH_BASIC,S_BASIC_AUTHENTICATION);
+		$cmbAuth->addItem(HTTPTEST_AUTH_NONE,S_NONE);
+		$cmbAuth->addItem(HTTPTEST_AUTH_BASIC,S_BASIC_AUTHENTICATION);
 
-		$form->AddRow(S_BASIC_AUTHENTICATION, $cmbAuth);
+		$form->addRow(S_BASIC_AUTHENTICATION, $cmbAuth);
 		if($authentication == HTTPTEST_AUTH_BASIC){
-			$form->AddRow(S_USER, new CTextBox('http_user', $http_user, 32));
-			$form->AddRow(S_PASSWORD, new CTextBox('http_password', $http_password, 40));
+			$form->addRow(S_USER, new CTextBox('http_user', $http_user, 32));
+			$form->addRow(S_PASSWORD, new CTextBox('http_password', $http_password, 40));
 		}
 
 		$form->addRow(S_UPDATE_INTERVAL_IN_SEC, new CNumericBox("delay",$delay,5));
@@ -578,8 +578,7 @@
 		$form->show();
 	}
 
-	function insert_configuration_form($file)
-	{
+	function insert_configuration_form($file){
 		$type		= get_request('type',		'MYSQL');
 		$server		= get_request('server',		'localhost');
 		$database	= get_request('database',	'zabbix');
@@ -604,50 +603,6 @@
 
 		$form->show();
 	}
-
-	/* function insert_new_message_form($events, $bulk){
-		global $USER_DETAILS;
-
-		if($bulk){
-			$title = S_ACKNOWLEDGE_ALARM_BY;
-			$btn_txt2 = S_ACKNOWLEDGE.' '.S_AND_SYMB.' '.S_RETURN;
-		}
-		else{
-			$temp = get_acknowledges_by_eventid(get_request('eventid', 0));
-
-			if(!DBfetch($temp)){
-				$title = S_ACKNOWLEDGE_ALARM_BY;
-				$btn_txt = S_ACKNOWLEDGE;
-				$btn_txt2 = S_ACKNOWLEDGE.' '.S_AND_SYMB.' '.S_RETURN;
-			}
-			else{
-				$title = S_ADD_COMMENT_BY;
-				$btn_txt = S_SAVE;
-				$btn_txt2 = S_SAVE.' '.S_AND_SYMB.' '.S_RETURN;
-			}
-		}
-
-		$frmMsg = new CFormTable($title.' "'.$USER_DETAILS["alias"].'"');
-//		$frmMsg->setHelp("manual.php");
-
-		if($bulk) $frmMsg->addVar('bulkacknowledge', 1);
-
-		foreach($events as $id => $eventid){
-			$frmMsg->addVar('events['.$eventid.']', $eventid);
-		}
-
-		$frmMsg->addRow(S_MESSAGE, new CTextArea('message', '', 80, 6));
-
-		$frmMsg->addItemToBottomRow(new CButton('saveandreturn', $btn_txt2));
-		isset($btn_txt) ? $frmMsg->addItemToBottomRow(new CButton('save', $btn_txt)) : '';
-		$frmMsg->addItemToBottomRow(new CButtonCancel(url_param('eventid')));
-
-		$frmMsg->show(false);
-
-		SetFocus($frmMsg->GetName(),'message');
-
-		$frmMsg->Destroy();
-	} */
 
 // Insert form for User
 	function insert_user_form($userid,$profile=0){
@@ -853,7 +808,7 @@
 															autologout_visible.disabled = false;
 														}"), 1);
 		$chkbx_autologin->setAttribute('autocomplete','off');
-		$frmUser->AddRow(S_AUTO_LOGIN,	$chkbx_autologin);
+		$frmUser->addRow(S_AUTO_LOGIN,	$chkbx_autologin);
 		$autologoutCheckBox = new CCheckBox('autologout_visible',
 											($autologout == 0) ? 'no' : 'yes',
 											new CJSscript("var autologout = document.getElementById('autologout');
@@ -872,11 +827,11 @@
 			$autologoutCheckBox->setAttribute('disabled','disabled');
 		}
 
-		$frmUser->AddRow(S_AUTO_LOGOUT, array($autologoutCheckBox, $autologoutTextBox));
-		$frmUser->AddRow(S_SCREEN_REFRESH,	new CNumericBox('refresh',$refresh,4));
+		$frmUser->addRow(S_AUTO_LOGOUT, array($autologoutCheckBox, $autologoutTextBox));
+		$frmUser->addRow(S_SCREEN_REFRESH,	new CNumericBox('refresh',$refresh,4));
 
-		$frmUser->AddRow(S_ROWS_PER_PAGE,	new CNumericBox('rows_per_page',$rows_per_page,3));
-		$frmUser->AddRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));
+		$frmUser->addRow(S_ROWS_PER_PAGE,	new CNumericBox('rows_per_page',$rows_per_page,3));
+		$frmUser->addRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));
 
 //view Media Settings for users above "User" +++
 		if(uint_in_array($USER_DETAILS['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN))) {
@@ -977,8 +932,6 @@
 
 // Insert form for User Groups
 	function insert_usergroups_form(){
-		global  $USER_DETAILS;
-
 		$config = select_config();
 
 		$frm_title = S_USER_GROUP;
@@ -2086,11 +2039,11 @@
 		}
 		else{
 			$cmbValType = new CComboBox('value_type',$value_type,'submit()');
-			$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UNSIGNED);
-			$cmbValType->AddItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);
-			$cmbValType->AddItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);
-			$cmbValType->AddItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);
-			$cmbValType->AddItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);
+			$cmbValType->addItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UNSIGNED);
+			$cmbValType->addItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);
+			$cmbValType->addItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);
+			$cmbValType->addItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);
+			$cmbValType->addItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);
 		}
 
 		$frmItem->addRow(S_TYPE_OF_INFORMATION,$cmbValType);
@@ -2402,7 +2355,7 @@
 			new CNumericBox('snmp_port',$snmp_port,5));
 
 		$cmbValType = new CComboBox('value_type',$value_type);
-		$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UNSIGNED);		$cmbValType->AddItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);		$cmbValType->AddItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);		$cmbValType->AddItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);		$cmbValType->AddItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);		$frmItem->AddRow(array( new CVisibilityBox('value_type_visible', get_request('value_type_visible'), 'value_type', S_ORIGINAL),			S_TYPE_OF_INFORMATION), $cmbValType);
+		$cmbValType->addItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UNSIGNED);		$cmbValType->addItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);		$cmbValType->addItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);		$cmbValType->addItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);		$cmbValType->addItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);		$frmItem->addRow(array( new CVisibilityBox('value_type_visible', get_request('value_type_visible'), 'value_type', S_ORIGINAL),			S_TYPE_OF_INFORMATION), $cmbValType);
 
 		$cmbDataType = new CComboBox('data_type',$data_type);
 		$cmbDataType->addItem(ITEM_DATA_TYPE_DECIMAL,		item_data_type2str(ITEM_DATA_TYPE_DECIMAL));
@@ -2594,8 +2547,6 @@
 
 // TRIGGERS
 	function insert_mass_update_trigger_form(){//$elements_array_name){
-		global $USER_DETAILS;
-
 		$visible = get_request('visible',array());
 
 		$priority 		= get_request('priority',	'');
@@ -2669,9 +2620,6 @@
 
 // Insert form for Trigger
 	function insert_trigger_form(){
-
-		global $USER_DETAILS;
-
 		$frmTrig = new CFormTable(S_TRIGGER,'triggers.php');
 		$frmTrig->setHelp('config_triggers.php');
 
@@ -2701,6 +2649,9 @@
 		$comments		= get_request('comments'	,'');
 		$url			= get_request('url'		,'');
 
+		$expr_temp  = get_request('expr_temp','');
+		$input_method = get_request('input_method',IM_TREE);
+
 		if((isset($_REQUEST['triggerid']) && !isset($_REQUEST['form_refresh']))  || isset($limited)){
 			$description	= $trigger['description'];
 			$expression	= explode_exp($trigger['expression'],0);
@@ -2725,17 +2676,119 @@
 		}
 
 		$frmTrig->addRow(S_NAME, new CTextBox('description',$description,90, $limited));
-		$frmTrig->addRow(S_EXPRESSION, array(
-				new CTextBox('expression',$expression,75, $limited),
-				($limited ? null : new CButton('insert',S_INSERT,
-					"return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->GetName().
-								'&dstfld1=expression'.
-								'&srctbl=expression'.
-								'&srcfld1=expression'.
-								"&expression=' + escape(getSelectedText(this.form.elements['expression']".
-							')),700,200);'))
-			));
-	/* dependencies */
+		
+		if($input_method == IM_TREE){
+			$alz = analyze_expression($expression);
+			if($alz !== false){
+				list($outline, $node, $map) = $alz;
+				if(isset($_REQUEST['expr_action']) && $node != null){
+					
+					$new_expr = remake_expression($node, $_REQUEST['expr_target'], $_REQUEST['expr_action'], $expr_temp, $map);
+					if($new_expr !== false){
+						$expression = $new_expr;
+						list($outline, $node, $map) = analyze_expression($expression);
+						$expr_temp = '';
+					}
+					else{
+						show_messages();
+					}
+				}
+		
+				$tree = array();
+				create_node_list($node, $tree);
+		
+				$frmTrig->addVar('expression',$expression);
+				$exprfname = 'expr_temp';
+				$exprtxt = new CTextBox($exprfname,$expr_temp,65,'yes');
+				$macrobtn = new CButton('insert_macro', S_INSERT_MACRO, 'return call_ins_macro_menu(event);');
+				$exprparam = "this.form.elements['$exprfname'].value";
+			}
+			else{
+				$input_method = IM_FORCED;
+			}
+		}
+		
+		if($input_method != IM_TREE){
+			$exprfname = 'expression';
+			$exprtxt = new CTextBox($exprfname,$expression,75,$limited);
+			$exprparam = "getSelectedText(this.form.elements['$exprfname'])";
+		}
+		
+		$row = array($exprtxt,
+					 new CButton('insert',$input_method == IM_TREE ? S_EDIT : S_SELECT,
+								 "return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->GetName().
+								 "&dstfld1=${exprfname}&srctbl=expression".
+								 "&srcfld1=expression&expression=' + escape($exprparam),800,200);"));
+		
+		if(isset($macrobtn)) array_push($row, $macrobtn);
+		if($input_method == IM_TREE){
+			array_push($row, BR());
+			if(empty($outline)){
+				array_push($row, new CButton('add_expression', S_ADD, ""));
+			}
+			else{
+				array_push($row, new CButton('and_expression', S_AND_BIG, ""));
+				array_push($row, new CButton('or_expression', S_OR_BIG, ""));
+				array_push($row, new CButton('replace_expression', S_REPLACE, ""));
+			}
+		}
+		$frmTrig->addVar('input_method', $input_method);
+		$frmTrig->addVar('toggle_input_method', '');
+		$exprtitle = array(S_EXPRESSION);
+
+		if($input_method != IM_FORCED){
+			$btn_im = new CSpan(S_TOGGLE_INPUT_METHOD,'link');
+			$btn_im->setAttribute('onclick','javascript: '.
+								"document.getElementById('toggle_input_method').value=1;".
+								"document.getElementById('input_method').value=".(($input_method==IM_TREE)?IM_ESTABLISHED:IM_TREE).';'.
+								"document.forms['".$frmTrig->getName()."'].submit();");
+
+			$exprtitle[] = array(SPACE, '(', $btn_im, ')');
+		}
+		
+		$frmTrig->addRow($exprtitle, $row);
+		
+		if($input_method == IM_TREE){
+			$exp_table = new CTable();
+			$exp_table->setClass('tableinfo');
+			$exp_table->setAttribute('id','exp_list');
+			$exp_table->setOddRowClass('even_row');
+			$exp_table->setEvenRowClass('even_row');
+			
+			$exp_table->setHeader(array(S_TARGET, S_EXPRESSION, S_DELETE));
+		
+			if($node != null){
+				$exprs = make_disp_tree($tree, $map, true);
+				foreach($exprs as $i => $e){
+					$tgt_chk = new CCheckbox('expr_target', ($i==0)?'yes':'no', 'check_target(this);', $e['id']);
+					$del_url = new CLink(S_DELETE,'#','action',
+										 'javascript: if(confirm("Delete expression?")) { delete_expression('.
+										 $e['id'] .'); document.forms["config_triggers.php"].submit(); } return false;');
+					$row = new CRow(array($tgt_chk, $e['expr'], $del_url));
+					$exp_table->addRow($row);
+				}
+			}
+			else{
+				$outline = '';
+			}
+		
+			$frmTrig->addVar('remove_expression', '');
+		
+			$btn_test = new CButton('test_expression', S_TEST,
+									"openWinCentered(".
+									"'tr_testexpr.php?expression=' + encodeURIComponent(this.form.elements['expression'].value)".
+									",'ExpressionTest'".
+									",750,600".
+									",'titlebar=no, resizable=yes, scrollbars=yes');".
+									"return false;");
+			if (empty($outline)) $btn_test->setAttribute('disabled', 'yes');
+			$frmTrig->addRow(SPACE, array($outline,
+										  BR(),BR(),
+										  $exp_table,
+										  $btn_test));
+		}
+
+// dependencies
 		foreach($dependencies as $val){
 			array_push($dep_el,
 				array(
@@ -2802,6 +2855,9 @@
 		$frmTrig->addItemToBottomRow(SPACE);
 		$frmTrig->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param("hostid")));
 		$frmTrig->show();
+		
+		$jsmenu = new CPUMenu(null,170);
+		$jsmenu->InsertJavaScript();
 	}
 
 	function insert_trigger_comment_form($triggerid){
