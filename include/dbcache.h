@@ -189,7 +189,7 @@ DC_ITEM
 	char		snmp_oid[ITEM_SNMP_OID_LEN_MAX];
 	unsigned short	snmp_port;
 	char		snmpv3_securityname[ITEM_SNMPV3_SECURITYNAME_LEN_MAX];
-	int		snmpv3_securitylevel;
+	unsigned char	snmpv3_securitylevel;
 	char		snmpv3_authpassphrase[ITEM_SNMPV3_AUTHPASSPHRASE_LEN_MAX];
 	char		snmpv3_privpassphrase[ITEM_SNMPV3_PRIVPASSPHRASE_LEN_MAX];
 	char		ipmi_sensor[ITEM_IPMI_SENSOR_LEN_MAX];
