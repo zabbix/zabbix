@@ -25,7 +25,7 @@
 var Curl = Class.create();
 
 Curl.prototype = {
-url: 		'',		//	actually, it's depricated/private variable 
+url: 		'',		//	actually, it's deprecated/private variable 
 port:		 -1,
 host: 		'',
 protocol: 	'',
