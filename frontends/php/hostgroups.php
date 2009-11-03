@@ -75,8 +75,8 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['save'])){
 		$hosts = get_request('hosts', array());
 		$hosts = array_intersect($available_hosts, $hosts);
+		
 		if(isset($_REQUEST['groupid'])){
-
 			DBstart();
 			$result = update_host_group($_REQUEST['groupid'], $_REQUEST['gname'], $hosts);
 			$result = DBend($result);
@@ -204,7 +204,8 @@ include_once('include/page_header.php');
 		
 		$frmHostG = new CFormTable($frm_title, 'hostgroups.php');
 		$frmHostG->setName('hg_form');
-		$frmHostG->addVar('groupid', $groupid);
+		if($groupid > 0)
+			$frmHostG->addVar('groupid', $groupid);
 		$frmHostG->addRow(S_GROUP_NAME, new CTextBox('gname', $group_name, 48));
 
 // select all possible groups
