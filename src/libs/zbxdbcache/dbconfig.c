@@ -84,7 +84,7 @@ ZBX_DC_SNMPITEM
 	char		snmp_oid[ITEM_SNMP_OID_LEN_MAX];
 	unsigned short	snmp_port;
 	char		snmpv3_securityname[ITEM_SNMPV3_SECURITYNAME_LEN_MAX];
-	int		snmpv3_securitylevel;
+	unsigned char	snmpv3_securitylevel;
 	char		snmpv3_authpassphrase[ITEM_SNMPV3_AUTHPASSPHRASE_LEN_MAX];
 	char		snmpv3_privpassphrase[ITEM_SNMPV3_PRIVPASSPHRASE_LEN_MAX];
 };
@@ -1610,7 +1610,7 @@ static void	DCsync_items()
 			snmpitem->snmp_port = (unsigned short)atoi(row[9]);
 			zbx_strlcpy(snmpitem->snmpv3_securityname, row[10],
 					sizeof(snmpitem->snmpv3_securityname));
-			snmpitem->snmpv3_securitylevel = atoi(row[11]);
+			snmpitem->snmpv3_securitylevel = (unsigned char)atoi(row[11]);
 			zbx_strlcpy(snmpitem->snmpv3_authpassphrase, row[12],
 					sizeof(snmpitem->snmpv3_authpassphrase));
 			zbx_strlcpy(snmpitem->snmpv3_privpassphrase, row[13],

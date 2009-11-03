@@ -201,7 +201,7 @@ static ZBX_DC_TREND	*DCget_trend(zbx_uint64_t itemid)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCflush_trend                                                    *
+ * Function: DCflush_trends                                                   *
  *                                                                            *
  * Purpose: flush trend to the database                                       *
  *                                                                            *
@@ -214,91 +214,107 @@ static ZBX_DC_TREND	*DCget_trend(zbx_uint64_t itemid)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	DCflush_trend(ZBX_DC_TREND *trend, int *sql_offset)
+static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num)
 {
+	const char	*__function_name = "DCflush_trends";
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		num;
+	int		num, i, clock, sql_offset = 0;
 	history_value_t	value_min, value_avg, value_max;
+	unsigned char	value_type;
+	zbx_uint64_t	*ids = NULL, itemid;
+	int		ids_alloc, ids_num = 0;
+	ZBX_DC_TREND	*trend;
 
-	switch (trend->value_type)
-	{
-		case ITEM_VALUE_TYPE_FLOAT:
-			result = DBselect("select num,value_min,value_avg,value_max from trends"
-					" where itemid=" ZBX_FS_UI64 " and clock=%d",
-					trend->itemid,
-					trend->clock);
-			break;
-		case ITEM_VALUE_TYPE_UINT64:
-			result = DBselect("select num,value_min,value_avg,value_max from trends_uint"
-					" where itemid=" ZBX_FS_UI64 " and clock=%d",
-					trend->itemid,
-					trend->clock);
-			break;
-		default:
-			zabbix_log(LOG_LEVEL_CRIT, "Invalid value type for trends.");
-			exit(-1);
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trends_num:%d",
+			__function_name, *trends_num);
 
-	if (NULL != (row = DBfetch(result)))
+	clock = trends[0].clock;
+	value_type = trends[0].value_type;
+
+	ids_alloc = *trends_num;
+	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
+
+	for (i = 0; i < *trends_num; i++)
+		if (clock == trends[i].clock && value_type == trends[i].value_type)
+			uint64_array_add(&ids, &ids_alloc, &ids_num, trends[i].itemid, 64);
+
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
+			"select itemid,num,value_min,value_avg,value_max"
+			" from %s"
+			" where clock=%d and",
+			value_type == ITEM_VALUE_TYPE_FLOAT ? "trends" : "trends_uint",
+			clock);
+
+	DBadd_condition_alloc(&sql, &sql_allocated, &sql_offset, "itemid", ids, ids_num);
+
+	zbx_free(ids);
+
+	result = DBselect("%s", sql);
+
+	sql_offset = 0;
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
+#endif
+
+	if (value_type == ITEM_VALUE_TYPE_FLOAT)
 	{
-		num = atoi(row[0]);
-		switch (trend->value_type)
+		while (NULL != (row = DBfetch(result)))
 		{
-			case ITEM_VALUE_TYPE_FLOAT:
-				value_min.value_float = atof(row[1]);
-				value_avg.value_float = atof(row[2]);
-				value_max.value_float = atof(row[3]);
+			ZBX_STR2UINT64(itemid, row[0]);
 
-				if (value_min.value_float < trend->value_min.value_float)
-					trend->value_min.value_float = value_min.value_float;
-				if (value_max.value_float > trend->value_max.value_float)
-					trend->value_max.value_float = value_max.value_float;
-				trend->value_avg.value_float = (trend->num * trend->value_avg.value_float
-						+ num * value_avg.value_float) / (trend->num + num);
-				trend->num += num;
+			trend = NULL;
 
-				zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 512,
-						"update trends set num=%d,value_min=" ZBX_FS_DBL ",value_avg=" ZBX_FS_DBL
-						",value_max=" ZBX_FS_DBL " where itemid=" ZBX_FS_UI64 " and clock=%d;\n",
-						trend->num,
-						trend->value_min.value_float,
-						trend->value_avg.value_float,
-						trend->value_max.value_float,
-						trend->itemid,
-						trend->clock);
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				ZBX_STR2UINT64(value_min.value_uint64, row[1]);
-				ZBX_STR2UINT64(value_avg.value_uint64, row[2]);
-				ZBX_STR2UINT64(value_max.value_uint64, row[3]);
+			for (i = 0; i < *trends_num; i++)
+				if (itemid == trends[i].itemid && clock == trends[i].clock &&
+						value_type == trends[i].value_type)
+				{
+					trend = &trends[i];
+					break;
+				}
 
-				if (value_min.value_uint64 < trend->value_min.value_uint64)
-					trend->value_min.value_uint64 = value_min.value_uint64;
-				if (value_max.value_uint64 > trend->value_max.value_uint64)
-					trend->value_max.value_uint64 = value_max.value_uint64;
-				trend->value_avg.value_uint64 = (trend->num * trend->value_avg.value_uint64
-						+ num * value_avg.value_uint64) / (trend->num + num);
-				trend->num += num;
+			if (NULL == trend)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "WARNING: Trend with itemid:" ZBX_FS_UI64 " not found", itemid);
+				continue;
+			}
 
-				zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 512,
-						"update trends_uint set num=%d,value_min=" ZBX_FS_UI64 ",value_avg=" ZBX_FS_UI64
-						",value_max=" ZBX_FS_UI64 " where itemid=" ZBX_FS_UI64 " and clock=%d;\n",
-						trend->num,
-						trend->value_min.value_uint64,
-						trend->value_avg.value_uint64,
-						trend->value_max.value_uint64,
-						trend->itemid,
-						trend->clock);
-				break;
+			num = atoi(row[1]);
+
+			value_min.value_float = atof(row[2]);
+			value_avg.value_float = atof(row[3]);
+			value_max.value_float = atof(row[4]);
+
+			if (value_min.value_float < trend->value_min.value_float)
+				trend->value_min.value_float = value_min.value_float;
+			if (value_max.value_float > trend->value_max.value_float)
+				trend->value_max.value_float = value_max.value_float;
+			trend->value_avg.value_float = (trend->num * trend->value_avg.value_float
+					+ num * value_avg.value_float) / (trend->num + num);
+			trend->num += num;
+
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+					"update trends set num=%d,value_min=" ZBX_FS_DBL ",value_avg=" ZBX_FS_DBL
+					",value_max=" ZBX_FS_DBL " where itemid=" ZBX_FS_UI64 " and clock=%d;\n",
+					trend->num,
+					trend->value_min.value_float,
+					trend->value_avg.value_float,
+					trend->value_max.value_float,
+					trend->itemid,
+					trend->clock);
+
+			(*trends_num)--;
+			memmove(&trends[i], &trends[i + 1], (*trends_num - i) * sizeof(ZBX_DC_TREND));
+
+			DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
 		}
-	}
-	else
-	{
-		switch (trend->value_type)
-		{
-			case ITEM_VALUE_TYPE_FLOAT:
-				zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 512,
+
+		for (i = 0; i < *trends_num; i++)
+			if (clock == trends[i].clock && value_type == trends[i].value_type)
+			{
+				trend = &trends[i];
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 						"insert into trends (itemid,clock,num,value_min,value_avg,value_max)"
 						" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_DBL "," ZBX_FS_DBL "," ZBX_FS_DBL ");\n",
 						trend->itemid,
@@ -307,9 +323,71 @@ static void	DCflush_trend(ZBX_DC_TREND *trend, int *sql_offset)
 						trend->value_min.value_float,
 						trend->value_avg.value_float,
 						trend->value_max.value_float);
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 512,
+
+				(*trends_num)--;
+				memmove(&trends[i], &trends[i + 1], (*trends_num - i) * sizeof(ZBX_DC_TREND));
+				i--;
+
+				DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
+			}
+	}
+	else
+	{
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(itemid, row[0]);
+
+			trend = NULL;
+
+			for (i = 0; i < *trends_num; i++)
+				if (itemid == trends[i].itemid && clock == trends[i].clock &&
+						value_type == trends[i].value_type)
+				{
+					trend = &trends[i];
+					break;
+				}
+
+			if (NULL == trend)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "WARNING: Trend with itemid:" ZBX_FS_UI64 " not found", itemid);
+				continue;
+			}
+
+			num = atoi(row[1]);
+
+			ZBX_STR2UINT64(value_min.value_uint64, row[2]);
+			ZBX_STR2UINT64(value_avg.value_uint64, row[3]);
+			ZBX_STR2UINT64(value_max.value_uint64, row[4]);
+
+			if (value_min.value_uint64 < trend->value_min.value_uint64)
+				trend->value_min.value_uint64 = value_min.value_uint64;
+			if (value_max.value_uint64 > trend->value_max.value_uint64)
+				trend->value_max.value_uint64 = value_max.value_uint64;
+			trend->value_avg.value_uint64 = (trend->num * trend->value_avg.value_uint64
+					+ num * value_avg.value_uint64) / (trend->num + num);
+			trend->num += num;
+
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+					"update trends_uint set num=%d,value_min=" ZBX_FS_UI64 ",value_avg=" ZBX_FS_UI64
+					",value_max=" ZBX_FS_UI64 " where itemid=" ZBX_FS_UI64 " and clock=%d;\n",
+					trend->num,
+					trend->value_min.value_uint64,
+					trend->value_avg.value_uint64,
+					trend->value_max.value_uint64,
+					trend->itemid,
+					trend->clock);
+
+			(*trends_num)--;
+			memmove(&trends[i], &trends[i + 1], (*trends_num - i) * sizeof(ZBX_DC_TREND));
+
+			DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
+		}
+
+		for (i = 0; i < *trends_num; i++)
+			if (clock == trends[i].clock && value_type == trends[i].value_type)
+			{
+				trend = &trends[i];
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 						"insert into trends_uint (itemid,clock,num,value_min,value_avg,value_max)"
 						" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ");\n",
 						trend->itemid,
@@ -318,10 +396,51 @@ static void	DCflush_trend(ZBX_DC_TREND *trend, int *sql_offset)
 						trend->value_min.value_uint64,
 						trend->value_avg.value_uint64,
 						trend->value_max.value_uint64);
-				break;
-		}
+
+				(*trends_num)--;
+				memmove(&trends[i], &trends[i + 1], (*trends_num - i) * sizeof(ZBX_DC_TREND));
+				i--;
+
+				DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
+			}
 	}
 	DBfree_result(result);
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
+#endif
+
+	if (sql_offset > 16) /* In ORACLE always present begin..end; */
+		DBexecute("%s", sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCflush_trend                                                    *
+ *                                                                            *
+ * Purpose: move trend to the array of trends for flushing to DB              *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCflush_trend(ZBX_DC_TREND *trend, ZBX_DC_TREND **trends, int *trends_alloc, int *trends_num)
+{
+	if (*trends_num == *trends_alloc)
+	{
+		*trends_alloc += 256;
+		*trends = zbx_realloc(*trends, *trends_alloc * sizeof(ZBX_DC_TREND));
+	}
+
+	memcpy(&(*trends)[*trends_num], trend, sizeof(ZBX_DC_TREND));
+	(*trends_num)++;
 
 	trend->clock = 0;
 	trend->num = 0;
@@ -345,66 +464,53 @@ static void	DCflush_trend(ZBX_DC_TREND *trend, int *sql_offset)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	DCadd_trend(ZBX_DC_HISTORY *history, int *sql_offset)
+static void	DCadd_trend(ZBX_DC_HISTORY *history, ZBX_DC_TREND **trends, int *trends_alloc, int *trends_num)
 {
 	ZBX_DC_TREND	*trend = NULL, trend_static;
+	size_t		sz;
 	int		hour;
 
+	sz = sizeof(ZBX_DC_TREND);
 	hour = history->clock - history->clock % 3600;
 
-	if (NULL != (trend = DCget_trend(history->itemid)))
+	if (NULL == (trend = DCget_trend(history->itemid)))
 	{
-		if (trend->num > 0 && (trend->clock != hour || trend->value_type != history->value_type))
-			DCflush_trend(trend, sql_offset);
-
-		trend->value_type	= history->value_type;
-		trend->clock		= hour;
-
-		switch (trend->value_type)
-		{
-			case ITEM_VALUE_TYPE_FLOAT:
-				if (trend->num == 0 || history->value.value_float < trend->value_min.value_float)
-					trend->value_min.value_float = history->value.value_float;
-				if (trend->num == 0 || history->value.value_float > trend->value_max.value_float)
-					trend->value_max.value_float = history->value.value_float;
-				trend->value_avg.value_float = (trend->num * trend->value_avg.value_float
-						+ history->value.value_float) / (trend->num + 1);
-				trend->num++;
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				if (trend->num == 0 || history->value.value_uint64 < trend->value_min.value_uint64)
-					trend->value_min.value_uint64 = history->value.value_uint64;
-				if (trend->num == 0 || history->value.value_uint64 > trend->value_max.value_uint64)
-					trend->value_max.value_uint64 = history->value.value_uint64;
-				trend->value_avg.value_uint64 = (trend->num * trend->value_avg.value_uint64
-						+ history->value.value_uint64) / (trend->num + 1);
-				trend->num++;
-				break;
-		}
+		trend = &trend_static;
+		memset(trend, 0, sz);
+		trend->itemid = history->itemid;
 	}
-	else
+
+	if (trend->num > 0 && (trend->clock != hour || trend->value_type != history->value_type))
+		DCflush_trend(trend, trends, trends_alloc, trends_num);
+
+	trend->value_type = history->value_type;
+	trend->clock = hour;
+
+	switch (trend->value_type)
+	{
+		case ITEM_VALUE_TYPE_FLOAT:
+			if (trend->num == 0 || history->value.value_float < trend->value_min.value_float)
+				trend->value_min.value_float = history->value.value_float;
+			if (trend->num == 0 || history->value.value_float > trend->value_max.value_float)
+				trend->value_max.value_float = history->value.value_float;
+			trend->value_avg.value_float = (trend->num * trend->value_avg.value_float
+				+ history->value.value_float) / (trend->num + 1);
+			break;
+		case ITEM_VALUE_TYPE_UINT64:
+			if (trend->num == 0 || history->value.value_uint64 < trend->value_min.value_uint64)
+				trend->value_min.value_uint64 = history->value.value_uint64;
+			if (trend->num == 0 || history->value.value_uint64 > trend->value_max.value_uint64)
+				trend->value_max.value_uint64 = history->value.value_uint64;
+			trend->value_avg.value_uint64 = (trend->num * trend->value_avg.value_uint64
+				+ history->value.value_uint64) / (trend->num + 1);
+			break;
+	}
+	trend->num++;
+
+	if (trend == &trend_static)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Insufficient space for trends. Flushing to disk.");
-
-		trend_static.itemid = history->itemid;
-		trend_static.clock = hour;
-		trend_static.value_type = history->value_type;
-		trend_static.num = 1;
-		switch (trend_static.value_type)
-		{
-			case ITEM_VALUE_TYPE_FLOAT:
-				trend_static.value_min.value_float = history->value.value_float;
-				trend_static.value_avg.value_float = history->value.value_float;
-				trend_static.value_max.value_float = history->value.value_float;
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				trend_static.value_min.value_uint64 = history->value.value_uint64;
-				trend_static.value_avg.value_uint64 = history->value.value_uint64;
-				trend_static.value_max.value_uint64 = history->value.value_uint64;
-				break;
-		}
-
-		DCflush_trend(trend, sql_offset);
+		DCflush_trend(trend, trends, trends_alloc, trends_num);
 	}
 }
 
@@ -426,13 +532,10 @@ static void	DCadd_trend(ZBX_DC_HISTORY *history, int *sql_offset)
  ******************************************************************************/
 static void	DCmass_update_trends(ZBX_DC_HISTORY *history, int history_num)
 {
-	int	sql_offset = 0, i;
+	ZBX_DC_TREND	*trends = NULL;
+	int		trends_alloc = 0, trends_num = 0, i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCmass_update_trends()");
-
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
-#endif
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -445,15 +548,13 @@ static void	DCmass_update_trends(ZBX_DC_HISTORY *history, int history_num)
 		if (0 != history[i].value_null)
 			continue;
 
-		DCadd_trend(&history[i], &sql_offset);
+		DCadd_trend(&history[i], &trends, &trends_alloc, &trends_num);
 	}
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
-#endif
+	while (trends_num > 0)
+		DCflush_trends(trends, &trends_num);
 
-	if (sql_offset > 16) /* In ORACLE always present begin..end; */
-		DBexecute("%s", sql);
+	zbx_free(trends);
 }
 
 /******************************************************************************
@@ -471,49 +572,25 @@ static void	DCmass_update_trends(ZBX_DC_HISTORY *history, int history_num)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	DCsync_trends()
+static void	DCsync_trends()
 {
-	int	sql_offset = 0, i;
-	time_t now = 0;
+	const char	*__function_name = "DCsync_trends";
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_trends(trends_num: %d)",
-			cache->trends_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trends_num:%d",
+			__function_name, cache->trends_num);
 
 	zabbix_log(LOG_LEVEL_WARNING, "Syncing trends data...");
-	now = time(NULL);
 
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
-#endif
-
-	for (i = 0; i < cache->trends_num; i++)
-	{
-		DCflush_trend(&cache->trends[i], &sql_offset);
-
-		if (time(NULL) - now >= 10)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Syncing trends data..." ZBX_FS_DBL "%%",
-					(double)i / cache->trends_num * 100);
-			now = time(NULL);
-		}
-	}
-
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
-#endif
-
-	if (sql_offset > 16) /* In ORACLE always present begin..end; */
+	while (cache->trends_num > 0)
 	{
 		DBbegin();
-		DBexecute("%s", sql);
+		DCflush_trends(cache->trends, &cache->trends_num);
 		DBcommit();
 	}
 
-	cache->trends_num = 0;
-
 	zabbix_log(LOG_LEVEL_WARNING, "Syncing trends data...done.");
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of DCsync_trends()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
