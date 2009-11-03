@@ -1774,13 +1774,8 @@
 
 		$frmItem = new CFormTable(S_ITEM, 'items.php', 'post');
 		$frmItem->setHelp('web.items.item.php');
-		$frmItem->addVar('config',get_request('config', 0));
 
-		$form_hostid		= get_request('form_hostid',0);
-
-		if($form_hostid != 0){
-			$hostid = $form_hostid;
-		}
+		$hostid = get_request('form_hostid', 0);
 
 		$description		= get_request('description','');
 		$key				= get_request('key',		'');
@@ -1789,7 +1784,7 @@
 		$history			= get_request('history',	90);
 		$status				= get_request('status',		0);
 		$type				= get_request('type',		0);
-		$snmp_community		= get_request('snmp_community'	,'public');
+		$snmp_community		= get_request('snmp_community' ,'public');
 		$snmp_oid			= get_request('snmp_oid',	'interfaces.ifTable.ifEntry.ifInOctets.1');
 		$snmp_port			= get_request('snmp_port',	161);
 		$value_type			= get_request('value_type',	ITEM_VALUE_TYPE_UINT64);
@@ -1809,9 +1804,7 @@
 		$snmpv3_securitylevel	= get_request('snmpv3_securitylevel'	,0);
 		$snmpv3_authpassphrase	= get_request('snmpv3_authpassphrase'	,'');
 		$snmpv3_privpassphrase	= get_request('snmpv3_privpassphrase'	,'');
-
 		$ipmi_sensor		= get_request('ipmi_sensor'		,'');
-
 		$authtype		= get_request('authtype'		,0);
 		$username		= get_request('username'		,'');
 		$password		= get_request('password'		,'');
@@ -1821,9 +1814,9 @@
 		$formula	= get_request('formula'		,'1');
 		$logtimefmt	= get_request('logtimefmt'	,'');
 
-		$add_groupid	= get_request('add_groupid'	,get_request('groupid',0));
+		$add_groupid	= get_request('add_groupid', get_request('groupid', 0));
 
-		$limited	= null;
+		$limited = null;
 
 		switch ($type) {
 		case ITEM_TYPE_DB_MONITOR:
@@ -1850,17 +1843,15 @@
 		}
 
 		if(isset($_REQUEST['itemid'])){
-			$frmItem->addVar('itemid',$_REQUEST['itemid']);
-
+			$frmItem->addVar('itemid', $_REQUEST['itemid']);
 			$item_data = CItem::getById(array('itemid' => $_REQUEST['itemid']));
-
-			$hostid	= $item_data['hostid'];
-			$limited = (($item_data['templateid'] == 0)  && ($item_data['type'] != ITEM_TYPE_HTTPTEST))?null:'yes';
+			$hostid	= ($hostid > 0) ? $hostid : $item_data['hostid'];
+			$limited = (($item_data['templateid'] == 0)  && ($item_data['type'] != ITEM_TYPE_HTTPTEST)) ? null : 'yes';
 		}
 
 		if(is_null($host)){
 			if($hostid > 0){
-				$host_info = CHost::get(array('hostids' => $hostid, 'extendoutput' => 1));
+				$host_info = CHost::get(array('hostids' => $hostid, 'extendoutput' => 1, 'templated_hosts' => 1));
 				$host_info = reset($host_info);
 				$host = $host_info['host'];
 			}

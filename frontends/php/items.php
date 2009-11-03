@@ -439,8 +439,7 @@ include_once('include/page_header.php');
 			DBexecute('UPDATE items SET lastvalue=null,lastclock=null,prevvalue=null '.
 				' WHERE itemid='.$_REQUEST['itemid']);
 
-			$host = get_host_by_hostid($_REQUEST['hostid']);
-
+			$host = get_host_by_hostid($item['hostid']);
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
 				S_ITEM.' ['.$item['key_'].'] ['.$_REQUEST['itemid'].'] '.S_HOST.' ['.$host['host'].'] '.S_HISTORY_CLEANED);
 		}
@@ -736,8 +735,7 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-	$form = new CForm();
-	$form->setMethod('get');
+	$form = new CForm(null, 'get');
 	$form->setName('hdrform');
 	if(!isset($_REQUEST['form']))
 		$form->addVar('form_hostid', $hostid);
@@ -778,7 +776,7 @@ include_once('include/page_header.php');
 
 // Items Header
 		$numrows = new CDiv();
-		$numrows->setAttribute('name','numrows');
+		$numrows->setAttribute('name', 'numrows');
 
 		$items_wdgt->addHeader(S_ITEMS_BIG, SPACE);
 		$items_wdgt->addHeader($numrows, SPACE);
