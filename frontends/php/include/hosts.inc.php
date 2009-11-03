@@ -267,7 +267,7 @@ require_once('include/httptest.inc.php');
 			info('Added new host ['.$host.']');
 
 		if(!zbx_empty($newgroup)){
-			if(!$newgroupid = CHostGroup::add(array($newgroup))) return false;
+			if(!$newgroupid = CHostGroup::add(array('name' => $newgroup))) return false;
 			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, reset($newgroupid), $newgroup, 'groups', NULL, NULL);
 			info('Added host group ['.$newgroup.']');
 			$groups[] = reset($newgroupid);
@@ -323,7 +323,7 @@ require_once('include/httptest.inc.php');
 			return $result;
 
 		if(!zbx_empty($newgroup)){
-			if(!$newgroupid = CHostGroup::add(array($newgroup))) return false;
+			if(!$newgroupid = CHostGroup::add(array('name' => $newgroup))) return false;
 			$groups[$newgroupid] = reset($newgroupid);
 		}
 

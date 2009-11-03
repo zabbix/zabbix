@@ -179,7 +179,7 @@ require_once('include/forms.inc.php');
 
 // CREATE NEW GROUP
 		if(!empty($newgroup)){
-			if($groupid = CHostGroup::add(array($newgroup))){
+			if($groupid = CHostGroup::add(array('name' => $newgroup))){
 				$groups += $groupid;
 			}
 			else{

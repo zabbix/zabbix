@@ -453,7 +453,7 @@ class zbxXML{
 						$host_groupids[] = $current_groupid;
 					}
 					else{
-						$host_groupids = CHostGroup::add(array(ZBX_DEFAULT_IMPORT_HOST_GROUP));
+						$host_groupids = CHostGroup::add(array('name' => ZBX_DEFAULT_IMPORT_HOST_GROUP));
 						if($host_groupids === false){
 							error(CHostGroup::resetErrors());
 							$result = false;
@@ -475,6 +475,7 @@ class zbxXML{
 						}
 					}
 					if(!empty($groups_to_add)){
+						zbx_valueTo($groups_to_add, array('object' => 1, 'field' => 'name'));
 						$new_groupids = CHostGroup::add($groups_to_add);
 
 						if($new_groupids === false){
