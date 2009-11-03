@@ -540,6 +540,10 @@
 	define('DHOST_STATUS_ACTIVE',		0);
 	define('DHOST_STATUS_DISABLED',		1);
 
+	define('IM_FORCED', 0);
+	define('IM_ESTABLISHED', 1);
+	define('IM_TREE', 2);
+
 	define('EXPRESSION_TYPE_INCLUDED',	0);
 	define('EXPRESSION_TYPE_ANY_INCLUDED',	1);
 	define('EXPRESSION_TYPE_NOT_INCLUDED',	2);

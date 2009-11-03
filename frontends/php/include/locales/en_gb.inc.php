@@ -950,6 +950,7 @@
 	'S_HEXADECIMAL'=>					'Hexadecimal',
 	'S_STORE_VALUE'=>					'Store value',
 	'S_SHOW_VALUE'=>					'Show value',
+	'S_NUMERIC_UINT64'=>			'Numeric (integer 64bit)',
 	'S_NUMERIC_UNSIGNED'=>					'Numeric (unsigned)',
 	'S_NUMERIC_FLOAT'=>					'Numeric (float)',
 	'S_CHARACTER'=>						'Character',
@@ -1402,6 +1403,11 @@
 	'S_TRIGGERS_MASSUPDATE'=>		'Triggers massupdate',
 	'S_TRIGGER_DEPENDENCIES'=>		'Trigger dependencies',
 	'S_INCORRECT_DEPENDENCY'=>		'Incorrect dependency',
+	
+	'S_TEST'=>			  			'Test',
+	'S_TOGGLE_INPUT_METHOD'=>		'Toggle input method',
+	'S_INSERT_MACRO'=>		  		'Insert macro',
+	'S_REPLACE'=>			   		'Replace',
 
 //	tr_comments.php
 	'S_TRIGGER_COMMENTS'=>			'Trigger comments',
@@ -1607,6 +1613,12 @@
 	'S_EXCLUDE'=>		'Exclude',
 	'S_KEYWORD'=>		'Keyword',
 	'S_POSITION'=>		'Position',
+
+//  tr_testexpr.php
+    'S_TEST_DATA'=>                 'Test data',
+    'S_ITEM_FUNCTION'=>             'Item / Function',
+    'S_RESULT_TYPE'=>               'Result type',
+    'S_COMBINED_RESULT'=>           'Combined result',
 
 //	Menu
 

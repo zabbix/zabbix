@@ -83,6 +83,8 @@ frontends/php/fonts/kochi-gothic-subst.ttf -text
 frontends/php/fonts/kochi-mincho-subst.ttf -text
 frontends/php/hostgroups.php -text
 frontends/php/images/flash/zbxclock.swf -text svneol=unset#unset
+frontends/php/images/general/arrowdown.gif -text
+frontends/php/images/general/arrowup.gif -text
 frontends/php/images/general/bar/arrow_down.gif -text
 frontends/php/images/general/bar/arrow_sm.gif -text
 frontends/php/images/general/bar/arrow_up.gif -text
@@ -152,6 +154,9 @@ frontends/php/images/general/sortdown_off.gif -text svneol=unset#unset
 frontends/php/images/general/sortup.gif -text svneol=unset#unset
 frontends/php/images/general/sortup_off.gif -text svneol=unset#unset
 frontends/php/images/general/tick.png -text
+frontends/php/images/general/tr_top_bottom.gif -text
+frontends/php/images/general/tr_top_right.gif -text
+frontends/php/images/general/tr_top_right_bottom.gif -text
 frontends/php/images/general/tree/minus.gif -text
 frontends/php/images/general/tree/plus.gif -text
 frontends/php/images/general/tree/point.gif -text
@@ -325,6 +330,8 @@ frontends/php/styles/popupmenu.css -text
 frontends/php/styles/table.css -text
 frontends/php/styles/ul.css -text
 frontends/php/templates.php -text
+frontends/php/tr_logform.php -text
+frontends/php/tr_testexpr.php -text
 frontends/php/usergrps.php -text
 frontends/php/warning.php -text
 include/dbcache.h -text
