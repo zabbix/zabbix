@@ -845,7 +845,7 @@ INSERT INTO items VALUES (17354,0,'','',161,10001,'CPU $2 time ($3)','system.cpu
 INSERT INTO items VALUES (17356,0,'','',161,10001,'CPU user time (avg1)','system.cpu.util[,user,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17358,0,'','',161,10001,'CPU $2 time ($3)','system.cpu.util[,nice,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17360,0,'','',161,10001,'CPU $2 time ($3)','system.cpu.util[,system,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
-INSERT INTO items VALUES (17362,0,'','',161,10001,'CPU $2 time ($3)','system.cpu.util[,wait,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
+INSERT INTO items VALUES (17362,0,'','',161,10001,'CPU $2 time ($3)','system.cpu.util[,iowait,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17371,3,'','',161,10004,'ICMP ping','icmpping',30,90,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','1','',0,'',0,1,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17373,0,'','',161,10001,'Free disk space on $1 in %','vfs.fs.size[/var,pfree]',30,90,365,0,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17397,0,'','',161,10002,'Service state of DHCP client ($1)','service_state[Dhcp]',30,90,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','1','',0,'',0,3,'','','',0,0,'','','','');
@@ -894,7 +894,7 @@ INSERT INTO items VALUES (17447,0,'','',161,10008,'CPU $2 time ($3)','system.cpu
 INSERT INTO items VALUES (17448,0,'','',161,10008,'CPU $2 time ($3)','system.cpu.util[,nice,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17449,0,'','',161,10008,'CPU $2 time ($3)','system.cpu.util[,system,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17450,0,'','',161,10008,'CPU user time (avg1)','system.cpu.util[,user,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
-INSERT INTO items VALUES (17451,0,'','',161,10008,'CPU $2 time ($3)','system.cpu.util[,wait,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
+INSERT INTO items VALUES (17451,0,'','',161,10008,'CPU $2 time ($3)','system.cpu.util[,iowait,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17452,0,'','',161,10008,'Host name','system.hostname',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17453,0,'','',161,10008,'Host local time','system.localtime',30,90,365,0,NULL,NULL,NULL,0,3,'','unixtime',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17454,0,'','',161,10008,'Free swap space','system.swap.size[,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','','',0,0,'','','','');
@@ -996,7 +996,7 @@ INSERT INTO items VALUES (17549,0,'','',161,10009,'CPU $2 time ($3)','system.cpu
 INSERT INTO items VALUES (17550,0,'','',161,10009,'CPU $2 time ($3)','system.cpu.util[,nice,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17551,0,'','',161,10009,'CPU $2 time ($3)','system.cpu.util[,system,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17552,0,'','',161,10009,'CPU user time (avg1)','system.cpu.util[,user,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
-INSERT INTO items VALUES (17553,0,'','',161,10009,'CPU $2 time ($3)','system.cpu.util[,wait,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
+INSERT INTO items VALUES (17553,0,'','',161,10009,'CPU $2 time ($3)','system.cpu.util[,iowait,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17554,0,'','',161,10009,'Host name','system.hostname',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17555,0,'','',161,10009,'Host local time','system.localtime',30,90,365,0,NULL,NULL,NULL,0,3,'','unixtime',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17556,0,'','',161,10009,'Free swap space','system.swap.size[,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','','',0,0,'','','','');
@@ -1098,7 +1098,7 @@ INSERT INTO items VALUES (17651,0,'','',161,10010,'CPU $2 time ($3)','system.cpu
 INSERT INTO items VALUES (17652,0,'','',161,10010,'CPU $2 time ($3)','system.cpu.util[,nice,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17653,0,'','',161,10010,'CPU $2 time ($3)','system.cpu.util[,system,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17654,0,'','',161,10010,'CPU user time (avg1)','system.cpu.util[,user,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
-INSERT INTO items VALUES (17655,0,'','',161,10010,'CPU $2 time ($3)','system.cpu.util[,wait,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
+INSERT INTO items VALUES (17655,0,'','',161,10010,'CPU $2 time ($3)','system.cpu.util[,iowait,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17656,0,'','',161,10010,'Host name','system.hostname',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17657,0,'','',161,10010,'Host local time','system.localtime',30,90,365,0,NULL,NULL,NULL,0,3,'','unixtime',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17658,0,'','',161,10010,'Free swap space','system.swap.size[,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','','',0,0,'','','','');
@@ -1200,7 +1200,7 @@ INSERT INTO items VALUES (17753,0,'','',161,10011,'CPU $2 time ($3)','system.cpu
 INSERT INTO items VALUES (17754,0,'','',161,10011,'CPU $2 time ($3)','system.cpu.util[,nice,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17755,0,'','',161,10011,'CPU $2 time ($3)','system.cpu.util[,system,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17756,0,'','',161,10011,'CPU user time (avg1)','system.cpu.util[,user,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
-INSERT INTO items VALUES (17757,0,'','',161,10011,'CPU $2 time ($3)','system.cpu.util[,wait,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
+INSERT INTO items VALUES (17757,0,'','',161,10011,'CPU $2 time ($3)','system.cpu.util[,iowait,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17758,0,'','',161,10011,'Host name','system.hostname',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17759,0,'','',161,10011,'Host local time','system.localtime',30,90,365,0,NULL,NULL,NULL,0,3,'','unixtime',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17760,0,'','',161,10011,'Free swap space','system.swap.size[,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','','',0,0,'','','','');
@@ -1302,7 +1302,7 @@ INSERT INTO items VALUES (17855,0,'','',161,10012,'CPU $2 time ($3)','system.cpu
 INSERT INTO items VALUES (17856,0,'','',161,10012,'CPU $2 time ($3)','system.cpu.util[,nice,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17857,0,'','',161,10012,'CPU $2 time ($3)','system.cpu.util[,system,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17858,0,'','',161,10012,'CPU user time (avg1)','system.cpu.util[,user,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
-INSERT INTO items VALUES (17859,0,'','',161,10012,'CPU $2 time ($3)','system.cpu.util[,wait,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
+INSERT INTO items VALUES (17859,0,'','',161,10012,'CPU $2 time ($3)','system.cpu.util[,iowait,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17860,0,'','',161,10012,'Host name','system.hostname',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17861,0,'','',161,10012,'Host local time','system.localtime',30,90,365,0,NULL,NULL,NULL,0,3,'','unixtime',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17862,0,'','',161,10012,'Free swap space','system.swap.size[,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','','',0,0,'','','','');
@@ -1404,7 +1404,7 @@ INSERT INTO items VALUES (17957,0,'','',161,10013,'CPU $2 time ($3)','system.cpu
 INSERT INTO items VALUES (17958,0,'','',161,10013,'CPU $2 time ($3)','system.cpu.util[,nice,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17959,0,'','',161,10013,'CPU $2 time ($3)','system.cpu.util[,system,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17960,0,'','',161,10013,'CPU user time (avg1)','system.cpu.util[,user,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
-INSERT INTO items VALUES (17961,0,'','',161,10013,'CPU $2 time ($3)','system.cpu.util[,wait,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
+INSERT INTO items VALUES (17961,0,'','',161,10013,'CPU $2 time ($3)','system.cpu.util[,iowait,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17962,0,'','',161,10013,'Host name','system.hostname',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17963,0,'','',161,10013,'Host local time','system.localtime',30,90,365,0,NULL,NULL,NULL,0,3,'','unixtime',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (17964,0,'','',161,10013,'Free swap space','system.swap.size[,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','','',0,0,'','','','');
@@ -1506,7 +1506,7 @@ INSERT INTO items VALUES (18059,0,'','',161,10014,'CPU $2 time ($3)','system.cpu
 INSERT INTO items VALUES (18060,0,'','',161,10014,'CPU $2 time ($3)','system.cpu.util[,nice,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (18061,0,'','',161,10014,'CPU $2 time ($3)','system.cpu.util[,system,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (18062,0,'','',161,10014,'CPU user time (avg1)','system.cpu.util[,user,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
-INSERT INTO items VALUES (18063,0,'','',161,10014,'CPU $2 time ($3)','system.cpu.util[,wait,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
+INSERT INTO items VALUES (18063,0,'','',161,10014,'CPU $2 time ($3)','system.cpu.util[,iowait,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (18064,0,'','',161,10014,'Host name','system.hostname',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (18065,0,'','',161,10014,'Host local time','system.localtime',30,90,365,0,NULL,NULL,NULL,0,3,'','unixtime',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (18066,0,'','',161,10014,'Free swap space','system.swap.size[,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','','',0,0,'','','','');
@@ -1608,7 +1608,7 @@ INSERT INTO items VALUES (18161,0,'','',161,10015,'CPU $2 time ($3)','system.cpu
 INSERT INTO items VALUES (18162,0,'','',161,10015,'CPU $2 time ($3)','system.cpu.util[,nice,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (18163,0,'','',161,10015,'CPU $2 time ($3)','system.cpu.util[,system,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (18164,0,'','',161,10015,'CPU user time (avg1)','system.cpu.util[,user,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
-INSERT INTO items VALUES (18165,0,'','',161,10015,'CPU $2 time ($3)','system.cpu.util[,wait,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
+INSERT INTO items VALUES (18165,0,'','',161,10015,'CPU $2 time ($3)','system.cpu.util[,iowait,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (18166,0,'','',161,10015,'Host name','system.hostname',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (18167,0,'','',161,10015,'Host local time','system.localtime',30,90,365,0,NULL,NULL,NULL,0,3,'','unixtime',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (18168,0,'','',161,10015,'Free swap space','system.swap.size[,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','','',0,0,'','','','');
@@ -1917,7 +1917,7 @@ INSERT INTO items VALUES (18470,0,'','',161,10017,'CPU $2 time ($3)','system.cpu
 INSERT INTO items VALUES (18471,0,'','',161,10017,'CPU $2 time ($3)','system.cpu.util[,nice,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',17358,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (18472,0,'','',161,10017,'CPU $2 time ($3)','system.cpu.util[,system,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',17360,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (18473,0,'','',161,10017,'CPU user time (avg1)','system.cpu.util[,user,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',17356,0,'','','',0,0,'','','','');
-INSERT INTO items VALUES (18474,0,'','',161,10017,'CPU $2 time ($3)','system.cpu.util[,wait,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',17362,0,'','','',0,0,'','','','');
+INSERT INTO items VALUES (18474,0,'','',161,10017,'CPU $2 time ($3)','system.cpu.util[,iowait,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',17362,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (18475,0,'','',161,10017,'Host name','system.hostname',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','0','',0,'',10057,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (18476,0,'','',161,10017,'Host local time','system.localtime',30,90,365,0,NULL,NULL,NULL,0,3,'','unixtime',0,0,NULL,'',0,'','','1','',0,'',17352,0,'','','',0,0,'','','','');
 INSERT INTO items VALUES (18477,0,'','',161,10017,'Free swap space','system.swap.size[,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',10014,0,'','','',0,0,'','','','');
