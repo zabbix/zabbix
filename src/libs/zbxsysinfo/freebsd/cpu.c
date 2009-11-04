@@ -226,8 +226,12 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	else
 		return SYSINFO_RET_FAIL;
 
+#ifdef HAVE_GETLOADAVG
 	if (mode >= getloadavg(load, 3))
 		return SYSINFO_RET_FAIL;
+#else
+	return SYSINFO_RET_FAIL;
+#endif	/* HAVE_GETLOADAVG */
 
 	SET_DBL_RESULT(result, load[mode]);
 
