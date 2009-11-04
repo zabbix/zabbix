@@ -52,7 +52,7 @@ class Cscript extends CZBXAPI{
  * @param string $options['order']
  * @return array|int item data as array or false if error
  */
-	public static function get($options=array()){
+	public static function get($options = array()){
 		global $USER_DETAILS;
 
 		$result = array();
@@ -88,18 +88,17 @@ class Cscript extends CZBXAPI{
 		$options = zbx_array_merge($def_options, $options);
 
 // editable + PERMISSION CHECK
-		if((USER_TYPE_SUPER_ADMIN == $user_type) && !is_null($options['editable'])){
+		if(USER_TYPE_SUPER_ADMIN == $user_type){
 
 		}
 		else if(!is_null($options['editable'])){
-			return $result();
+			return $result;
 		}
 		else{
 // Filtering
 			$sql_parts['from']['r'] = 'rights r';
 			$sql_parts['from']['ug'] = 'users_groups ug';
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
-
 
 			$sql_parts['where'][] = 'hg.groupid=r.id';
 			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
@@ -497,18 +496,18 @@ class Cscript extends CZBXAPI{
 		$obj_params = array('editable' => 1, 'hostids' => $hostids);
 		$hosts_read_write = CHost::get($obj_params);
 
-		$scripts_by_host = array();
-
 // initialize array
+		$scripts_by_host = array();
 		foreach($hostids as $id => $hostid){
 			$scripts_by_host[$hostid] = array();
 		}
 //-----
+		$groups = CHostGroup::get(array('hostids' => $hostids, 'select_hosts' => 1, 'extendoutput' => 1));
 
-		$obj_params = array('extendoutput' =>1, 'hostids' => $hostids);
+		$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);
 		$scripts  = CScript::get($obj_params);
 
-		foreach($scripts as $scriptid => $script){
+		foreach($scripts as $num => $script){
 			$add_to_hosts = array();
 			if(PERM_READ_WRITE == $script['host_access']){
 				if($script['groupid'] > 0)
@@ -516,6 +515,7 @@ class Cscript extends CZBXAPI{
 				else
 					$add_to_hosts = $hosts_read_write;
 			}
+			
 			else if(PERM_READ_ONLY == $script['host_access']){
 				if($script['groupid'] > 0)
 					$add_to_hosts = zbx_uint_array_intersect($hosts_read_only, $groups[$script['groupid']]['hostids']);
@@ -531,5 +531,6 @@ class Cscript extends CZBXAPI{
 	//SDI($scripts_by_host);
 	return $scripts_by_host;
 	}
+
 }
 ?>

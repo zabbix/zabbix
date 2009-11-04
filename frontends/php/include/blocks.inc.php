@@ -490,19 +490,23 @@ function make_latest_issues($params = array()){
 		$menus = '';
 
 		$host_nodeid = id2nodeid($row['hostid']);
+
 		foreach($scripts_by_hosts[$row['hostid']] as $id => $script){
 			$script_nodeid = id2nodeid($script['scriptid']);
 			if( (bccomp($host_nodeid ,$script_nodeid ) == 0))
 				$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$row['hostid']."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+		}
+		if(!empty($scripts_by_hosts)){
+			$menus = "[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus;
 		}
 
 		$menus.= "[".zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 		$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?groupid=0&hostid=".$row['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 
 		$menus = rtrim($menus,',');
-		$menus="show_popup_menu(event,[[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180);";
+		$menus = 'show_popup_menu(event,['.$menus.'],180);';
 
-		$host = new CSpan($row['host'],'link');
+		$host = new CSpan($row['host'],'link_script');
 		$host->setAttribute('onclick','javascript: '.$menus);
 		$host->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
@@ -523,7 +527,7 @@ function make_latest_issues($params = array()){
 					$ack_info->setAttribute('style','width: auto;');
 
 					$ack=new CLink(S_YES,'acknow.php?eventid='.$row_event['eventid'],'off');
-					$ack->setHint($ack_info);
+					$ack->setHint($ack_info, '', '', false);
 				}
 				else{
 					$ack= new CLink(S_NO,'acknow.php?eventid='.$row_event['eventid'],'on');
@@ -546,8 +550,8 @@ function make_latest_issues($params = array()){
 			else
 				$description = new CSpan($description,'pointer');
 
-			$description = new CCol($description,get_severity_style($row["priority"]));
-			$description->setHint(make_popup_eventlist($row_event['eventid'], $row['type']));
+			$description = new CCol($description,get_severity_style($row['priority']));
+			$description->setHint(make_popup_eventlist($row_event['eventid'], $row['type']), '', '', false);
 
 			$table->addRow(array(
 				get_node_name_by_elid($row['triggerid']),
