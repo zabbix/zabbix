@@ -134,7 +134,7 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
-		return SYSINFO_RET_FAIL;
+		*tmp = '\0';
 
 	if ('\0' != *tmp && 0 != strcmp(tmp, "all"))	/* default parameter */
 		return SYSINFO_RET_FAIL;
