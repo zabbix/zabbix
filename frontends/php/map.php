@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 	require_once('include/config.inc.php');
 	require_once('include/maps.inc.php');
 
-	$page['title'] = "S_MAP";
+	$page['title'] = 'S_MAP';
 	$page['file'] = 'map.php';
 	$page['type'] = PAGE_TYPE_IMAGE;
 
@@ -97,7 +97,7 @@ include_once('include/page_header.php');
 	}
 	else{
 		$x=imagesx($im)/2-ImageFontWidth(4)*strlen($name)/2;
-		imagetext($im, 5, 0, $x, 1, $darkred, $name);
+		imagetext($im, 10, 0, $x, 25, $darkred, $name);
 	}
 	unset($db_image);
 
@@ -168,8 +168,8 @@ include_once('include/page_header.php');
 		$color		= $darkgreen;
 		$label_color	= $black;
 		$info_line	= '';
-		$label_location = $db_element['label_location'];
-		if(is_null($label_location))	$map['label_location'];
+
+		$label_location = is_null($db_element['label_location']) ? $map['label_location'] : $db_element['label_location'];
 
 		$label_line = expand_map_element_label_by_data($db_element);
 
