@@ -143,7 +143,7 @@ addImage: function(objid){
 		
 		if(IE){
 // workaround to IE6 & IE7 DOM redraw problem
-			addListener(obj.domid, 'load', function(){ $('scrollbar_cntr').show();});
+			addListener(obj.domid, 'load', function(){ setTimeout( function(){$('scrollbar_cntr').show();}, 500);});
 		}
 	}
 
