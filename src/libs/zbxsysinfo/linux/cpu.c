@@ -78,7 +78,7 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		cpu_num = 0;
 	else
 	{
-		cpu_num = atoi(tmp);
+		cpu_num = atoi(tmp) + 1;
 		if (cpu_num < 1 || cpu_num > collector->cpus.count)
 			return SYSINFO_RET_FAIL;
 	}

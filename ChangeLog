@@ -1,5 +1,6 @@
 Changes for 1.7.1
 
+ - [DEV-413] fixed first parameter in system.cpu.util key for linux (all; 0..n) (Sasha)
  - [DEV-411] improved performance of trends module (Sasha)
  - [DEV-428] added new TELNET check 'telnet.run[]' (Sasha)
  - [DEV-428] added new SSH check 'ssh.run[]' (Sasha)
