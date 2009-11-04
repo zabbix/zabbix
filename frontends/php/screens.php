@@ -19,29 +19,28 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/graphs.inc.php');
-	require_once('include/screens.inc.php');
-	require_once('include/blocks.inc.php');
+require_once('include/config.inc.php');
+require_once('include/graphs.inc.php');
+require_once('include/screens.inc.php');
+require_once('include/blocks.inc.php');
 
-	$page['title'] = "S_CUSTOM_SCREENS";
-	$page['file'] = 'screens.php';
-	$page['hist_arg'] = array('config','elementid');
-	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.calendar.js','gtlc.js');
+$page['title'] = "S_CUSTOM_SCREENS";
+$page['file'] = 'screens.php';
+$page['hist_arg'] = array('config','elementid');
+$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.calendar.js','gtlc.js');
 
-	$_REQUEST['config'] = get_request('config',0);
-	if($_REQUEST['config'] == 1) redirect('slides.php');
+$_REQUEST['config'] = get_request('config',0);
+if($_REQUEST['config'] == 1) redirect('slides.php');
 
-	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-	if((1 != $_REQUEST['config']) && (PAGE_TYPE_HTML == $page['type'])){
-		define('ZBX_PAGE_DO_REFRESH', 1);
-	}
+if((1 != $_REQUEST['config']) && (PAGE_TYPE_HTML == $page['type'])){
+	define('ZBX_PAGE_DO_REFRESH', 1);
+}
 
 include_once('include/page_header.php');
 
 ?>
-
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
@@ -54,10 +53,9 @@ include_once('include/page_header.php');
 		'tr_groupid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 		'tr_hostid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 
-
 		'elementid'=>	array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,NULL),
 		'step'=>		array(T_ZBX_INT, O_OPT,  P_SYS,		BETWEEN(0,65535),NULL),
-		'from'=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
+
 		'period'=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	null,NULL),
 		'stime'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	NULL,NULL),
 
@@ -72,11 +70,20 @@ include_once('include/page_header.php');
 	);
 
 	check_fields($fields);
-
+?>
+<?php
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
 			update_profile('web.screens.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
+
+		if('timeline' == $_REQUEST['favobj']){
+			if(isset($_REQUEST['elementid']) && isset($_REQUEST['period'])){
+				navigation_bar_calc();
+				update_profile('web.screens.period',$_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['elementid']);
+			}
+		}
+
 		if(str_in_array($_REQUEST['favobj'],array('screenid','slideshowid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
@@ -132,8 +139,10 @@ include_once('include/page_header.php');
 	$form->setMethod('get');
 
 	$form->addVar('fullscreen',$_REQUEST['fullscreen']);
-	if(isset($_REQUEST['period']))	$form->addVar('period', $_REQUEST['period']);
-	if(isset($_REQUEST['stime']))	$form->addVar('stime', $_REQUEST['stime']);
+	
+	navigation_bar_calc();
+	$form->addVar('period', $_REQUEST['period']);
+	$form->addVar('stime', $_REQUEST['stime']);
 
 	$cmbConfig = new CComboBox('config', $config, "javascript: redirect('slides.php?config=1');");
 	$cmbConfig->addItem(0, S_SCREENS);
@@ -216,7 +225,6 @@ include_once('include/page_header.php');
 <?php
 	if(isset($elementid)){
 		$effectiveperiod = navigation_bar_calc();
-
 
 		$element = get_screen($elementid, 0, $effectiveperiod);
 

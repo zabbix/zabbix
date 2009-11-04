@@ -35,7 +35,7 @@ include_once('include/page_header.php');
 		'period'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	BETWEEN(ZBX_MIN_PERIOD,ZBX_MAX_PERIOD),	null),
 		'from'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	null,			null),
 		'stime'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	null,			null),
-		'border'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
+
 		'name'=>	array(T_ZBX_STR, O_OPT,	NULL,		null,			null),
 		'width'=>	array(T_ZBX_INT, O_OPT,	NULL,		BETWEEN(0,65535),	null),
 		'height'=>	array(T_ZBX_INT, O_OPT,	NULL,		BETWEEN(0,65535),	null),
@@ -86,10 +86,11 @@ include_once('include/page_header.php');
 
 	unset($host);
 
-	if(isset($_REQUEST['period']))		$graph->setPeriod($_REQUEST['period']);
-	if(isset($_REQUEST['from']))		$graph->setFrom($_REQUEST['from']);
-	if(isset($_REQUEST['stime']))		$graph->setSTime($_REQUEST['stime']);
-	if(isset($_REQUEST['border']))		$graph->etBorder(0);
+	navigation_bar_calc();
+	
+//SDI($_REQUEST['stime']);
+	$graph->setPeriod($_REQUEST['period']);
+	$graph->setSTime($_REQUEST['stime']);
 
 	$graph->setWidth(get_request('width',		900));
 	$graph->setHeight(get_request('height',		200));

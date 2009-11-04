@@ -831,8 +831,10 @@ function zbx_value2array(&$values){
 
 // fuunction: zbx_valueTo
 // author: Aly
-function zbx_valueTo(&$value, $options){
-	if(is_null($value)) return false;
+function zbx_valueTo(&$value, $options, $rtrn=false){
+	if(is_null($value)) return $rtrn?$value:false;
+	
+	if($rtrn) $original = $value;
 
 // object or array of objects to hash
 	if(isset($options['hash']) && isset($options['field'])){
@@ -853,13 +855,23 @@ function zbx_valueTo(&$value, $options){
 					$result[$val[$options['field']]] = $val;
 				}
 				else{
-					$value = null;
-					return false;
+					if($rtrn) return null;
+					else{
+						$value = null;
+						return false;
+					}
 				}
 			}
+			
+			$value = $result;
 		}
-
-	return true;
+		
+		if($rtrn){
+			$tmp = $value;
+			$value = $original;
+			return $tmp;
+		}
+		else return true;
 	}
 
 // Value or Array to Object or Array of objects
@@ -873,8 +885,11 @@ function zbx_valueTo(&$value, $options){
 					$value[$key] = array($options['field'] => $val);
 				}
 				else if(!isset($val[$options['field']])){
-					$value = null;
-					return false;
+					if($rtrn) return null;
+					else{
+						$value = null;
+						return false;
+					}
 				}
 			}
 		}
@@ -883,7 +898,13 @@ function zbx_valueTo(&$value, $options){
 			if(!is_array($value)) $value = array($value);
 			else if(!empty($value) && !zbx_ctype_digit(key($value))) $value = array($value);
 		}
-	return true;
+
+		if($rtrn){
+			$tmp = $value;
+			$value = $original;
+			return $tmp;
+		}
+		else return true;
 	}
 
 // value or objects field or array of object to array
@@ -903,12 +924,21 @@ function zbx_valueTo(&$value, $options){
 					$value[$key] = $val[$options['field']];
 				}
 				else{
-					$value = null;
-					return false;
+					if($rtrn) return null;
+					else{
+						$value = null;
+						return false;
+					}
 				}
 			}
 		}
-	return true;
+
+		if($rtrn){
+			$tmp = $value;
+			$value = $original;
+			return $tmp;
+		}
+		else return true;
 	}
 
 // to array
@@ -930,7 +960,12 @@ function zbx_valueTo(&$value, $options){
 			$value = array($value);
 		}
 
-	return true;
+		if($rtrn){
+			$tmp = $value;
+			$value = $original;
+			return $tmp;
+		}
+		else return true;
 	}
 
 // object field or array of objects to value
@@ -951,15 +986,44 @@ function zbx_valueTo(&$value, $options){
 				$value = $first[$options['field']];
 			}
 			else{
+				if($rtrn) return null;
+				else{
+					$value = null;
+					return false;
+				}
+			}
+		}
+
+		if($rtrn){
+			$tmp = $value;
+			$value = $original;
+			return $tmp;
+		}
+		else return true;
+	}
+	
+// array of objects to single (first) object 
+	if(isset($options['object'])){
+		if(!is_array($value)){
+			if($rtrn) return null;
+			else{
 				$value = null;
 				return false;
 			}
 		}
+		else if(zbx_ctype_digit(key($value))){
+			$value = reset($value);
+		}
 
-	return true;
+		if($rtrn){
+			$tmp = $value;
+			$value = $original;
+			return $tmp;
+		}
+		else return true;
 	}
 
-return false;
+return $rtrn?$value:false;
 }
 /************* END ZBX MISC *************/
 

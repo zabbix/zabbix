@@ -222,6 +222,9 @@ objectUpdate: function(id, timelineid){
 					}
 				}
 			}
+			
+// AJAX update of starttime and period
+			this.updateProfile(id, url_stime, period);
 		}
 		else{
 			this.loadDynamic(obj.domid, url_stime, period);
@@ -260,6 +263,21 @@ loadDynamic: function(id, stime, period){
 
 		dom_object.src = url.getUrl();
 	}
+},
+
+updateProfile: function(id, stime, period){
+	if(typeof(Ajax) == 'undefined'){
+		throw("Prototype.js lib is required!");
+		return false;
+	}
+
+	var params = new Array();
+	params['favobj'] = 'timeline';
+	params['favid'] = id;
+	params['period'] = period;
+	params['stime'] = stime;
+
+	send_params(params);
 },
 
 debug: function(fnc_name, id){

@@ -992,7 +992,6 @@
 
 	function navigation_bar_calc(){
 		$_REQUEST['period'] = get_request('period', ZBX_PERIOD_DEFAULT);
-		$_REQUEST['from'] = get_request('from', 0);
 		$_REQUEST['stime'] = get_request('stime', null);
 
 		if($_REQUEST['period']<ZBX_MIN_PERIOD){
