@@ -69,8 +69,18 @@ int     OLD_CPU(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	tmp[MAX_STRING_LEN], mode[MAX_STRING_LEN];
-	int	cpu_num = 0;
+	char	tmp[32];
+	int	cpu_num;
+
+	assert(result);
+
+	init_result(result);
+
+	if (!CPU_COLLECTOR_STARTED(collector))
+	{
+		SET_MSG_RESULT(result, strdup("Collector is not started!"));
+		return SYSINFO_RET_OK;
+	}
 
 	if (num_param(param) > 3)
 		return SYSINFO_RET_FAIL;
@@ -78,11 +88,7 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
 		*tmp = '\0';
 
-	/* default parameter */
-	if (*tmp == '\0')
-		zbx_snprintf(tmp, sizeof(tmp), "all");
-
-	if (0 == strcmp(tmp, "all"))
+	if ('\0' == *tmp || 0 == strcmp(tmp, "all"))	/* default parameter */
 		cpu_num = 0;
 	else
 	{
@@ -94,46 +100,24 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
 		*tmp = '\0';
 
-	/* default parameter */
-	if (*tmp == '\0')
-		zbx_snprintf(tmp, sizeof(tmp), "system");
-
 	/* only 'system' parameter supported */
-	if (0 != strcmp(tmp, "system"))
+	if ('\0' != *tmp && 0 != strcmp(tmp, "system"))	/* default parameter */
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 3, mode, sizeof(mode)))
-		*mode = '\0';
+	if (0 != get_param(param, 3, tmp, sizeof(tmp)))
+		*tmp = '\0';
 
-	/* default parameter */
-	if (*mode == '\0')
-		zbx_snprintf(mode, sizeof(mode), "avg1");
-
-	if (!CPU_COLLECTOR_STARTED(collector))
-	{
-		SET_MSG_RESULT(result, strdup("Collector is not started!"));
-		return SYSINFO_RET_OK;
-	}
-
-	if (0 == strcmp(mode,"avg1"))
-	{
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].util1);
-	}
-	else if(0 == strcmp(mode,"avg5"))
-	{
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].util5);
-	}
-	else if(0 == strcmp(mode,"avg15"))
-	{
-		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].util15);
-	}
+	if ('\0' == *tmp || 0 == strcmp(tmp, "avg1"))	/* default parameter */
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].util1)
+	else if (0 == strcmp(tmp, "avg5"))
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].util5)
+	else if (0 == strcmp(tmp, "avg15"))
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].util15)
 	else
 		return SYSINFO_RET_FAIL;
 
 	return SYSINFO_RET_OK;
 }
-
-
 
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
