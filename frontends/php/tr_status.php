@@ -405,8 +405,33 @@ include_once('include/page_header.php');
 		}
 		$trigger['items'] = $items;
 //----
-		$description = new CSpan($description, 'link');
 
+		$description = new CSpan($description, 'link_script');
+
+// trigger description js menu {{{ 
+		$host = null;
+		$hosts = array_pop($trigger['hosts']);
+		$trigger['hostid'] = $hosts['hostid'];
+		$trigger['host'] = $hosts['host'];
+		
+		$menu_trigger_conf = 'null';
+		if($admin_links){
+			$menu_trigger_conf = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript: redirect('triggers.php?form=update&triggerid=".$trigger['triggerid']."&hostid=".$trigger['hostid']."')\",
+				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
+		}
+		$menu_trigger_url = 'null';
+		if(!zbx_empty($trigger['url'])){
+			$menu_trigger_url = "['".S_URL."',\"javascript: window.location.href='".$trigger['url']."'\",
+				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
+		}
+
+		$description->addAction('onclick',
+			"javascript: create_mon_trigger_menu(event, new Array({'triggerid': '".$trigger['triggerid'].
+				"', 'lastchange': '".$trigger['lastchange']."'}, ".$menu_trigger_conf.", ".$menu_trigger_url."),".
+			zbx_jsvalue($trigger['items']).");"
+		);
+// }}} trigger description js menu
+		
 		if($_REQUEST['show_details']){
 			$font = new CTag('font','yes');
 			$font->setAttribute('color','#000');
@@ -469,12 +494,7 @@ include_once('include/page_header.php');
 
 		$value = new CSpan($tr_status, get_trigger_value_style($trigger['value']));
 
-// JS menu
-		$host = null;
-		$hosts = array_pop($trigger['hosts']);
-		$trigger['hostid'] = $hosts['hostid'];
-		$trigger['host'] = $hosts['host'];
-
+// host JS menu {{{
 		if($_REQUEST['hostid'] < 1){
 
 			$menus = '';
@@ -483,39 +503,27 @@ include_once('include/page_header.php');
 			if(isset($scripts_by_hosts[$trigger['hostid']])){
 				foreach($scripts_by_hosts[$trigger['hostid']] as $id => $script){
 					$script_nodeid = id2nodeid($script['scriptid']);
-					if( (bccomp($host_nodeid ,$script_nodeid ) == 0))
+					if( (bccomp($host_nodeid, $script_nodeid ) == 0))
 						$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$trigger['hostid']."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 				}
+			}
+			if(!empty($scripts_by_hosts)){
+				$menus = "[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus;
 			}
 
 			$menus.= "[".zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 			$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?hostid=".$trigger['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 
 			$menus = rtrim($menus,',');
-			$menus="show_popup_menu(event,[[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180);";
+			$menus='show_popup_menu(event,['.$menus.'],180);';
 
-			$host = new CSpan($trigger['host'], 'link');
+			$host = new CSpan($trigger['host'], 'link_script');
 			$host->setAttribute('onclick','javascript: '.$menus);
 		}
-
-		$menu_trigger_conf = 'null';
-		if($admin_links){
-			$menu_trigger_conf = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript: redirect('triggers.php?form=update&triggerid=".$trigger['triggerid']."&hostid=".$trigger['hostid']."')\",
-				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
-		}
-
-		$menu_trigger_url = 'null';
-		if(!zbx_empty($trigger['url'])){
-			$menu_trigger_url = "['".S_URL."',\"javascript: window.location.href='".$trigger['url']."'\",
-				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
-		}
+// }}} host JS menu
 
 		$tr_desc = new CSpan($description);
-		$tr_desc->addAction('onclick',
-			"javascript: create_mon_trigger_menu(event, new Array({'triggerid': '".$trigger['triggerid'].
-				"', 'lastchange': '".$trigger['lastchange']."'}, ".$menu_trigger_conf.", ".$menu_trigger_url."),".
-			zbx_jsvalue($trigger['items']).");"
-		);
+		
 
 // We add 1 to event start url, so events would show it
 		$clock = new CLink(
