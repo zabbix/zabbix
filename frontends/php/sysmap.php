@@ -169,7 +169,10 @@ include_once('include/page_header.php');
 		insert_map_element_form();
 	}
 	else if(isset($_REQUEST['form']) && ($_REQUEST['form']=='add_link' || ($_REQUEST['form']=='update' && isset($_REQUEST['linkid'])))){
-		$row = DBfetch(DBselect('select count(*) as count from sysmaps_elements where sysmapid='.$_REQUEST['sysmapid']));
+		$sql = 'SELECT count(*) as count '.
+				' FROM sysmaps_elements '.
+				' WHERE sysmapid='.$_REQUEST['sysmapid'];
+		$row = DBfetch(DBselect($sql));
 		if($row['count']>1){
 			show_table_header(S_CONNECTORS);
 			echo SBR;
