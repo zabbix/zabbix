@@ -170,84 +170,12 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	return SYSINFO_RET_OK;
 }
 
-static int	get_cpuload(double *load1, double *load5, double *load15)
-{
-#ifdef HAVE_GETLOADAVG
-	/* OpenBSD 4.2 i386 */
-	double	load[3];
-
-	if (-1 == getloadavg(load, 3))
-		return SYSINFO_RET_FAIL;
-
-	if (load1)
-		*load1 = load[0];
-	if (load5)
-		*load5 = load[1];
-	if (load15)
-		*load15 = load[2];
-
-	return SYSINFO_RET_OK;
-#else
-	return SYSINFO_RET_FAIL;
-#endif /* HAVE_GETLOADAVG */
-}
-
-static int	SYSTEM_CPU_LOAD1(AGENT_RESULT *result)
-{
-	double	value;
-
-	if (SYSINFO_RET_OK != get_cpuload(&value, NULL, NULL))
-		return SYSINFO_RET_FAIL;
-
-	SET_DBL_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
-}
-
-static int	SYSTEM_CPU_LOAD5(AGENT_RESULT *result)
-{
-	double	value;
-
-	if (SYSINFO_RET_OK != get_cpuload(NULL, &value, NULL))
-		return SYSINFO_RET_FAIL;
-
-	SET_DBL_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
-}
-
-static int	SYSTEM_CPU_LOAD15(AGENT_RESULT *result)
-{
-	double	value;
-
-	if (SYSINFO_RET_OK != get_cpuload(NULL, NULL, &value))
-		return SYSINFO_RET_FAIL;
-
-	SET_DBL_RESULT(result, value);
-
-	return SYSINFO_RET_OK;
-}
-
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define CPU_FNCLIST struct cpu_fnclist_s
-CPU_FNCLIST
-{
-	char	*mode;
-	int	(*function)();
-};
-
-	CPU_FNCLIST fl[] =
-	{
-		{"avg1",	SYSTEM_CPU_LOAD1},
-		{"avg5",	SYSTEM_CPU_LOAD5},
-		{"avg15",	SYSTEM_CPU_LOAD15},
-		{0,		0}
-	};
-
-	char	cpuname[MAX_STRING_LEN],
-		mode[MAX_STRING_LEN];
-	int	i;
+	/* OpenBSD 3.9 i386; OpenBSD 4.3 i386 */
+	char	tmp[32];
+	int	mode;
+	double	load[ZBX_AVGMAX];
 
 	assert(result);
 
@@ -256,26 +184,32 @@ CPU_FNCLIST
 	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, cpuname, sizeof(cpuname)))
-		*cpuname = '\0';
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
+		*tmp = '\0';
 
-	/* default parameter */
-	if (*cpuname == '\0')
-		zbx_snprintf(cpuname, sizeof(cpuname), "all");
-
-	if (0 != strncmp(cpuname, "all", sizeof(cpuname)))
+	if ('\0' != *tmp && 0 != strcmp(tmp, "all"))	/* default parameter */
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 2, mode, sizeof(mode)))
-		*mode = '\0';
+	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
+		*tmp = '\0';
 
-	/* default parameter */
-	if (*mode == '\0')
-		zbx_snprintf(mode, sizeof(mode), "avg1");
+	if ('\0' == *tmp || 0 == strcmp(tmp, "avg1"))	/* default parameter */
+		mode = ZBX_AVG1;
+	else if (0 == strcmp(tmp, "avg5"))
+		mode = ZBX_AVG5;
+	else if (0 == strcmp(tmp, "avg15"))
+		mode = ZBX_AVG15;
+	else
+		return SYSINFO_RET_FAIL;
 
-	for (i = 0; fl[i].mode != 0; i++)
-		if (0 == strncmp(mode, fl[i].mode, MAX_STRING_LEN))
-			return (fl[i].function)(result);
-
+#ifdef HAVE_GETLOADAVG
+	if (mode >= getloadavg(load, 3))
+		return SYSINFO_RET_FAIL;
+#else
 	return SYSINFO_RET_FAIL;
+#endif	/* HAVE_GETLOADAVG */
+
+	SET_DBL_RESULT(result, load[mode]);
+
+	return SYSINFO_RET_OK;
 }

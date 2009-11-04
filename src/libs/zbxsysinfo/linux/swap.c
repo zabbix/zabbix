@@ -18,230 +18,56 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
-
 #include "md5.h"
-
-static int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	struct sysinfo info;
-
-	assert(result);
-
-	init_result(result);
-
-	if( 0 == sysinfo(&info))
-	{
-#ifdef HAVE_SYSINFO_MEM_UNIT
-		SET_UI64_RESULT(result, (zbx_uint64_t)info.freeswap * (zbx_uint64_t)info.mem_unit);
-#else
-		SET_UI64_RESULT(result, info.freeswap);
-#endif
-		return SYSINFO_RET_OK;
-	}
-	else
-	{
-		return SYSINFO_RET_FAIL;
-	}
-}
-
-static int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	struct sysinfo info;
-
-	assert(result);
-
-	init_result(result);
-
-	if( 0 == sysinfo(&info))
-	{
-#ifdef HAVE_SYSINFO_MEM_UNIT
-		SET_UI64_RESULT(result, (zbx_uint64_t)info.totalswap * (zbx_uint64_t)info.mem_unit);
-#else
-		SET_UI64_RESULT(result, info.totalswap);
-#endif
-		return SYSINFO_RET_OK;
-	}
-	else
-	{
-		return SYSINFO_RET_FAIL;
-	}
-}
-
-static int	SYSTEM_SWAP_PFREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	AGENT_RESULT	result_tmp;
-	zbx_uint64_t  tot_val = 0;
-	zbx_uint64_t  free_val = 0;
-
-	assert(result);
-
-	init_result(result);
-	init_result(&result_tmp);
-
-	if(SYSTEM_SWAP_TOTAL(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK ||
-		!(result_tmp.type & AR_UINT64))
-			return  SYSINFO_RET_FAIL;
-	tot_val = result_tmp.ui64;
-
-	/* Check for division by zero */
-	if(tot_val == 0)
-	{
-		free_result(&result_tmp);
-		return  SYSINFO_RET_FAIL;
-	}
-
-	if(SYSTEM_SWAP_FREE(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK ||
-		!(result_tmp.type & AR_UINT64))
-			return  SYSINFO_RET_FAIL;
-	free_val = result_tmp.ui64;
-
-	free_result(&result_tmp);
-
-	SET_DBL_RESULT(result, (100.0 * (double)free_val) / (double)tot_val);
-
-	return SYSINFO_RET_OK;
-}
-
-static int	SYSTEM_SWAP_PUSED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	AGENT_RESULT	result_tmp;
-	zbx_uint64_t  tot_val = 0;
-	zbx_uint64_t  free_val = 0;
-
-	assert(result);
-
-	init_result(result);
-	init_result(&result_tmp);
-
-	if(SYSTEM_SWAP_TOTAL(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK ||
-		!(result_tmp.type & AR_UINT64))
-			return  SYSINFO_RET_FAIL;
-	tot_val = result_tmp.ui64;
-
-	/* Check for division by zero */
-	if(tot_val == 0)
-	{
-		free_result(&result_tmp);
-		return  SYSINFO_RET_FAIL;
-	}
-
-	if(SYSTEM_SWAP_FREE(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK ||
-		!(result_tmp.type & AR_UINT64))
-			return  SYSINFO_RET_FAIL;
-	free_val = result_tmp.ui64;
-
-	free_result(&result_tmp);
-
-	SET_DBL_RESULT(result, 100.0-(100.0 * (double)free_val) / (double)tot_val);
-
-	return SYSINFO_RET_OK;
-}
 
 int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-
-#define SWP_FNCLIST struct swp_fnclist_s
-SWP_FNCLIST
-{
-	char *mode;
-	int (*function)();
-};
-
-	SWP_FNCLIST fl[] =
-	{
-		{"total",	SYSTEM_SWAP_TOTAL},
-		{"free",	SYSTEM_SWAP_FREE},
-		{"pfree",	SYSTEM_SWAP_PFREE},
-		{"pused",	SYSTEM_SWAP_PUSED},
-		{0,		0}
-	};
-
-	char swapdev[MAX_STRING_LEN];
-	char mode[MAX_STRING_LEN];
-	int i;
+	struct sysinfo	info;
+	char		swapdev[32], mode[32];
 
 	assert(result);
 
 	init_result(result);
 
-	if(num_param(param) > 2)
-	{
+	if (num_param(param) > 2)
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 1, swapdev, sizeof(swapdev)) != 0)
-	{
+	if (0 != get_param(param, 1, swapdev, sizeof(swapdev)))
+		*swapdev = '\0';
+
+	if ('\0' != *swapdev && 0 != strcmp(swapdev, "all"))	/* default parameter */
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(swapdev[0] == '\0')
-	{
-		/* default parameter */
-		zbx_snprintf(swapdev, sizeof(swapdev), "all");
-	}
+	if (0 != get_param(param, 2, mode, sizeof(mode)))
+		*mode = '\0';
 
-	if(strncmp(swapdev, "all", MAX_STRING_LEN))
-	{
+	if (0 != sysinfo(&info))
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 2, mode, sizeof(mode)) != 0)
-	{
-		mode[0] = '\0';
-	}
-
-	if(mode[0] == '\0')
-	{
-		/* default parameter */
-		zbx_snprintf(mode, sizeof(mode), "free");
-	}
-
-	for(i=0; fl[i].mode!=0; i++)
-	{
-		if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
-		{
-			return (fl[i].function)(cmd, param, flags, result);
-		}
-	}
-
-	return SYSINFO_RET_FAIL;
-}
-
-int	OLD_SWAP(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	key[MAX_STRING_LEN];
-	int	ret;
-
-	assert(result);
-
-	init_result(result);
-
-	if(num_param(param) > 1)
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	if(get_param(param, 1, key, MAX_STRING_LEN) != 0)
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	if(strcmp(key,"free") == 0)
-	{
-		ret = SYSTEM_SWAP_FREE(cmd, param, flags, result);
-	}
-	else if(strcmp(key,"total") == 0)
-	{
-		ret = SYSTEM_SWAP_TOTAL(cmd, param, flags, result);
-	}
+#ifdef HAVE_SYSINFO_MEM_UNIT
+	if ('\0' == *mode || 0 == strcmp(mode, "free"))
+		SET_UI64_RESULT(result, info.freeswap * (zbx_uint64_t)info.mem_unit)
+	else if (0 == strcmp(mode, "total"))
+		SET_UI64_RESULT(result, info.totalswap * (zbx_uint64_t)info.mem_unit)
+	else if (0 == strcmp(mode, "used"))
+		SET_UI64_RESULT(result, (info.totalswap - info.freeswap) * (zbx_uint64_t)info.mem_unit)
+#else
+	if ('\0' == *mode || 0 == strcmp(mode, "free"))
+		SET_UI64_RESULT(result, info.freeswap)
+	else if (0 == strcmp(mode, "total"))
+		SET_UI64_RESULT(result, info.totalswap)
+	else if (0 == strcmp(mode, "used"))
+		SET_UI64_RESULT(result, info.totalswap - info.freeswap)
+#endif
+	else if (0 == strcmp(mode, "pfree"))
+		SET_DBL_RESULT(result, 100.0 * ((double)info.freeswap / (double)info.totalswap))
+	else if (0 == strcmp(mode, "pused"))
+		SET_DBL_RESULT(result, 100.0 - 100.0 * ((double)info.freeswap / (double)info.totalswap))
 	else
-	{
-		ret = SYSINFO_RET_FAIL;
-	}
+		return SYSINFO_RET_FAIL;
 
-	return ret;
+	return SYSINFO_RET_OK;
 }
 
 struct swap_stat_s {
