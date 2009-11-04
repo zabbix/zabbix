@@ -76,6 +76,7 @@ frontends/php/chart7.php -text
 frontends/php/chart_bar.php -text
 frontends/php/conf/.htaccess -text
 frontends/php/conf/maintenance.inc.php -text
+frontends/php/conf/zabbix.conf.php.example -text
 frontends/php/dashboard.php -text
 frontends/php/export.php -text
 frontends/php/fonts/DejaVuSans.ttf -text
