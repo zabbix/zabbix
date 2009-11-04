@@ -33,7 +33,7 @@ class CColorCell extends CDiv{
 	public function setAction($action=null){
 		if(!isset($action)) return false;
 
-		return $this->addAction('onclick', 'javascript: '.$action);
+		return $this->addAction('onclick', $action);
 	}
 }
 ?>

@@ -19,21 +19,22 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/hosts.inc.php');
-	require_once('include/graphs.inc.php');
+require_once('include/config.inc.php');
+require_once('include/hosts.inc.php');
+require_once('include/graphs.inc.php');
 
-	$page['title'] = 'S_CUSTOM_GRAPHS';
-	$page['file'] = 'charts.php';
-	$page['hist_arg'] = array('hostid','grouid','graphid','period','stime');
-	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.calendar.js','gtlc.js');
+$page['title'] = 'S_CUSTOM_GRAPHS';
+$page['file'] = 'charts.php';
+$page['hist_arg'] = array('hostid','grouid','graphid','period','stime');
+$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.calendar.js','gtlc.js');
 
-	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-	define('ZBX_PAGE_DO_REFRESH', 1);
+define('ZBX_PAGE_DO_REFRESH', 1);
 
 include_once('include/page_header.php');
-
+?>
+<?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'groupid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,		DB_ID,NULL),
@@ -62,7 +63,15 @@ include_once('include/page_header.php');
 		if('hat' == $_REQUEST['favobj']){
 			update_profile('web.charts.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
-		else if(str_in_array($_REQUEST['favobj'],array('itemid','graphid'))){
+		
+		if('timeline' == $_REQUEST['favobj']){
+			if(isset($_REQUEST['graphid']) && isset($_REQUEST['period'])){
+				navigation_bar_calc();
+				update_profile('web.graph.period',$_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['graphid']);
+			}
+		}
+		
+		if(str_in_array($_REQUEST['favobj'],array('itemid','graphid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
 				$result = add2favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
@@ -89,7 +98,8 @@ include_once('include/page_header.php');
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
 		exit();
 	}
-
+?>
+<?php
 	$_REQUEST['graphid'] = get_request('graphid', get_profile('web.charts.graphid', 0));
 	if(!in_node($_REQUEST['graphid'])) $_REQUEST['graphid'] = 0;
 

@@ -19,26 +19,26 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/hosts.inc.php');
-	require_once('include/httptest.inc.php');
-	require_once('include/forms.inc.php');
+require_once('include/config.inc.php');
+require_once('include/hosts.inc.php');
+require_once('include/httptest.inc.php');
+require_once('include/forms.inc.php');
 
-	$page['title'] = "S_DETAILS_OF_SCENARIO";
-	$page['file'] = "httpdetails.php";
-	$page['hist_arg'] = array('hostid','grouid','graphid','period','stime');
-	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.calendar.js','gtlc.js');
+$page['title'] = "S_DETAILS_OF_SCENARIO";
+$page['file'] = "httpdetails.php";
+$page['hist_arg'] = array('hostid','grouid','graphid','period','stime');
+$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.calendar.js','gtlc.js');
 
-	define('ZBX_PAGE_DO_REFRESH', 1);
+$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+
+define('ZBX_PAGE_DO_REFRESH', 1);
 
 include_once('include/page_header.php');
-
 ?>
 <?php
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'from'=>	array(T_ZBX_INT, O_OPT,	 null,	'{}>=0', null),
 		'period'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		'stime'=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
 
@@ -50,28 +50,46 @@ include_once('include/page_header.php');
 		'hostid'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 
 		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
-//ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			'isset({favid})'),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 
+//ajax
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
 	);
 
 	check_fields($fields);
+?>
+<?php
+	if(isset($_REQUEST['favobj'])){
+		if('timeline' == $_REQUEST['favobj']){
+			if(isset($_REQUEST['httptestid']) && isset($_REQUEST['period'])){
+				navigation_bar_calc();
+				update_profile('web.httptest.period', $_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['httptestid']);
+			}
+		}
+	}
 
+	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		exit();
+	}
+?>
+<?php
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 
-	$sql = 'select ht.* '.
-		' from httptest ht, applications a '.
-		' where '.DBcondition('a.hostid',$available_hosts).
-			' and a.applicationid=ht.applicationid '.
-			' and ht.httptestid='.$_REQUEST['httptestid'];
+	$sql = 'SELECT ht.* '.
+		' FROM httptest ht, applications a '.
+		' WHERE '.DBcondition('a.hostid',$available_hosts).
+			' AND a.applicationid=ht.applicationid '.
+			' AND ht.httptestid='.$_REQUEST['httptestid'];
 
 	if(!$httptest_data = DBfetch(DBselect($sql))){
 		access_deny();
 	}
-
+	
+	$_REQUEST['period'] = get_request('period', get_profile('web.httptest.period', ZBX_PERIOD_DEFAULT, $_REQUEST['httptestid']));
 	navigation_bar_calc();
+	update_profile('web.httptest.period', $_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['httptestid']);
 ?>
 <?php
 	$details_wdgt = new CWidget();
@@ -215,12 +233,6 @@ include_once('include/page_header.php');
 	$details_wdgt->show();
 
 	echo SBR;
-
-
-	if(isset($_REQUEST['period']) && $_REQUEST['period'] != ZBX_MIN_PERIOD ) {
-		update_profile('web.httptest.period', $_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['httptestid']);
-	}
-	$_REQUEST['period'] = get_profile('web.httptest.period', ZBX_PERIOD_DEFAULT, $_REQUEST['httptestid']);
 
 	show_table_header(array(S_HISTORY.' "',bold($httptest_data['name']),'"'));
 

@@ -17,26 +17,25 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-	require_once('include/defines.inc.php');
-	require_once('include/items.inc.php');
 ?>
 <?php
-	function	httptest_status2str($status)
-	{
-		switch($status)
-		{
+require_once('include/defines.inc.php');
+require_once('include/items.inc.php');
+
+
+	function httptest_status2str($status){
+		switch($status){
 			case HTTPTEST_STATUS_ACTIVE:	$status = S_ACTIVE;		break;
 			case HTTPTEST_STATUS_DISABLED:	$status = S_DISABLED;		break;
 			default:
 				$status = S_UNKNOWN;		break;
 		}
-		return $status;
+
+	return $status;
 	}
 
-	function	httptest_status2style($status)
-	{
-		switch($status)
-		{
+	function httptest_status2style($status){
+		switch($status){
 			case HTTPTEST_STATUS_ACTIVE:	$status = 'off';	break;
 			case HTTPTEST_STATUS_DISABLED:	$status = 'on';		break;
 			default:
