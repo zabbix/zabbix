@@ -23,13 +23,15 @@ class CColor extends CObject{
 	public function __construct($name,$value){
 		parent::__construct();
 
-		$lbl = new CColorCell('lbl_'.$name, $value, "show_color_picker('".$name."')");
+		$lbl = new CColorCell('lbl_'.$name, $value, "javascript: show_color_picker('".$name."')");
 
 		$txt = new CTextBox($name,$value,7);
 		$txt->setAttribute('maxlength', 6);
 		$txt->setAttribute('id', $name);
+
 		$txt->addAction('onchange', "set_color_by_name('".$name."',this.value)");
 		$txt->setAttribute('style', 'margin-top: 0px; margin-bottom: 0px');
+
 		$this->addItem(array($txt, $lbl));
 
 		insert_show_color_picker_javascript();
