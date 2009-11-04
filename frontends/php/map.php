@@ -107,17 +107,17 @@ include_once('include/page_header.php');
 	if(!isset($_REQUEST['noedit'])){
 		$grid = 50;
 
+		$dims = imageTextSize(8, 0, '11');
 		for($x=$grid; $x<$width; $x+=$grid){
 			MyDrawLine($im,$x,0,$x,$height,$black, MAP_LINK_DRAWTYPE_DASHED_LINE);
-			imageText($im, 8, 0, $x+2, 2, $black,$x);
-//			imagestring($im, 2, $x+2,2, $x , $black);
+			imageText($im, 8, 0, $x+3, $dims['height']+3, $black,$x);
 		}
 		for($y=$grid;$y<$height;$y+=$grid){
 			MyDrawLine($im,0,$y,$width,$y,$black, MAP_LINK_DRAWTYPE_DASHED_LINE);
-			imagestring($im, 2, 2,$y+2, $y , $black);
+			imageText($im, 8, 0, 3, $y+$dims['height']+3, $black, $y);
 		}
 
-		imagestring($im, 2, 1,1, "Y X:" , $black);
+		imageText($im, 8, 0, 2, $dims['height']+3, $black, 'Y X:');
 	}
 
 // Draw connectors

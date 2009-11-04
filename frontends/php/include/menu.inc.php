@@ -144,7 +144,7 @@ $ZBX_MENU = array(
 					),
 				array('url'=>'sysmaps.php',
 						'label'=>S_MAPS,
-						'sub_pages'=>array('sysmap.php','popup_link_tr.php')
+						'sub_pages'=>array('image.php','sysmap.php','popup_link_tr.php')
 					),
 				array('url'=>'services.php',
 						'label'=>S_IT_SERVICES,
@@ -167,7 +167,7 @@ $ZBX_MENU = array(
 				array(
 						'url'=>'config.php',
 						'label'=>S_GENERAL,
-						'sub_pages'=>array('image.php')
+						'sub_pages'=>array()
 					),
 				array('url'=>'nodes.php',
 						'label'=>S_DM,
