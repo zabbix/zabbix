@@ -91,7 +91,6 @@ include_once('include/page_header.php');
 
 		'fullscreen'=>		array(T_ZBX_INT, O_OPT,		P_SYS,	IN('0,1'),				null),
 		'btnSelect'=>		array(T_ZBX_STR, O_OPT,  	null,  	null, 					null),
-
 // filter
 		'filter_rst'=>				array(T_ZBX_STR, O_OPT,		P_SYS,	null,	NULL),
 		'filter_set'=>				array(T_ZBX_STR, O_OPT,		P_SYS,	null,	NULL),
@@ -371,16 +370,23 @@ include_once('include/page_header.php');
 			case EVENTS_OPTION_EVENT_LAST:
 				$ev_options['acknowlegded'] = 0;
 				$ev_options['limit'] = 1;
+				$ev_options['sortorder'] = ZBX_SORT_DOWN;
 			break;
 			case EVENTS_OPTION_ALL:
+				$ev_options['time_from'] = time() - ($config['event_expire']*86400);
+				$ev_options['time_till'] = time();
+			break;
 			case EVENTS_OPTION_NOT_ACK:
 				$ev_options['acknowlegded'] = 0;
+				$ev_options['time_from'] = time() - ($config['event_expire']*86400);
+				$ev_options['time_till'] = time();
+			break;
 			case EVENTS_OPTION_ONLYTRUE_NOTACK:
 				$ev_options['acknowlegded'] = 0;
 				$ev_options['value'] = TRIGGER_VALUE_TRUE;
-			default:
 				$ev_options['time_from'] = time() - ($config['event_expire']*86400);
 				$ev_options['time_till'] = time();
+			break;				
 		}
 	}
 
@@ -618,5 +624,4 @@ include_once('include/page_header.php');
 
 
 include_once 'include/page_footer.php';
-
 ?>
