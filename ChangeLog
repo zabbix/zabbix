@@ -1,5 +1,6 @@
 Changes for 1.7.1
 
+ - [DEV-429] added support of system.cpu.switches under Linux 2.4/2.6 (Sasha)
  - [DEV-413] fixed first parameter in system.cpu.util key for linux (all; 0..n) (Sasha)
  - [DEV-411] improved performance of trends module (Sasha)
  - [DEV-428] added new TELNET check 'telnet.run[]' (Sasha)
