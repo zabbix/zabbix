@@ -292,7 +292,7 @@ include_once('include/page_header.php');
 
 		$rst_icon = new CDiv(SPACE,'iconreset');
 		$rst_icon->setAttribute('title',S_RESET);
-		$rst_icon->addAction('onclick',new CJSscript("javascript: graphload(SCROLL_BAR.dom_graphs, ".(time()+100000000).", 3600, false);"));
+		$rst_icon->addAction('onclick',new CJSscript("javascript: var rst = new Curl(); rst.setArgument('stime', 20300000000000); rst.setArgument('period',".ZBX_PERIOD_DEFAULT."); location.href = rst.getUrl();"));
 
 	}
 
