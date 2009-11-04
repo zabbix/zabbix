@@ -140,6 +140,11 @@ addImage: function(objid){
 		addListener(g_img, 'load', obj.sbox_listener);
 
 		addListener(g_img, 'load', moveSBoxes);
+		
+		if(IE){
+// workaround to IE6 & IE7 DOM redraw problem
+			addListener(obj.domid, 'load', function(){ $('scrollbar_cntr').show();});
+		}
 	}
 
 	
@@ -184,6 +189,7 @@ addScroll: function(e, objid){
 	if(obj.dynamic && !is_null($(g_img))){
 		addListener(obj.domid, 'load', function(){ZBX_SCROLLBARS[scrl.scrollbarid].disabled=0;});
 	}
+	
 //SDI('scrollCreate');
 },
 
@@ -1572,7 +1578,7 @@ setZoomLinksStyle: function(){
 },
 
 scrollcreate: function(w){
-	var scr_cntr = $('scrollbar_cntr');	
+	var scr_cntr = $('scrollbar_cntr');
 	if(is_null(scr_cntr)) throw('ERROR: SCROLL [scrollcreate]: scroll container node is not found!');
 	
 	scr_cntr.style.paddingRight = '2px';
