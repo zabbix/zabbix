@@ -47,11 +47,16 @@ include_once('include/page_header.php');
 		show_error_message(S_NO_GRAPH_DEFINED);
 	}
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY,PERM_RES_IDS_ARRAY, get_current_nodeid(true));
+	$options = array();
+	$options['graphids'] = $_REQUEST['graphid'];
+	$options['extendoutput'] = 1;
+	$options['select_hosts'] = 1;
+	
+	$db_data = CGraph::get($options);
+	if(empty($db_data)) access_deny();
+	else zbx_valueTo($db_data, array('object'=>1));
 
-	if(!graph_accessible($_REQUEST['graphid'])){
-		access_deny();
-	}
+	$host = zbx_valueTo($db_data['hosts'], array('object'=>1), true);
 
 	$effectiveperiod = navigation_bar_calc();
 
@@ -66,23 +71,14 @@ include_once('include/page_header.php');
 
 	update_profile('web.charts.graphid',$_REQUEST['graphid']);
 
-	$sql = 'SELECT g.*,h.host,h.hostid '.
-				' FROM graphs g '.
-					' LEFT JOIN graphs_items gi ON g.graphid=gi.graphid '.
-					' LEFT JOIN items i ON gi.itemid=i.itemid '.
-					' LEFT JOIN hosts h ON i.hostid=h.hostid '.
-				' WHERE g.graphid='.$_REQUEST['graphid'].
-					' AND '.DBcondition('h.hostid',$available_hosts);
-
-	$db_data = DBfetch(DBselect($sql));
-
-	$graph = new CChart($db_data['graphtype']);
-
 	$chart_header = '';
-	if(id2nodeid($db_data['hostid']) != get_current_nodeid()){
-		$chart_header = get_node_name_by_elid($db_data['hostid'], true);
+	if(id2nodeid($db_data['graphid']) != get_current_nodeid()){
+		$chart_header = get_node_name_by_elid($db_data['graphid'], true);
 	}
-	$chart_header.= $db_data['host'].': '.$db_data['name'];
+	$chart_header.= $host['host'].': '.$db_data['name'];
+	
+	
+	$graph = new CChart($db_data['graphtype']);
 	$graph->setHeader($chart_header);
 
 	if(isset($_REQUEST['period']))		$graph->setPeriod($_REQUEST['period']);

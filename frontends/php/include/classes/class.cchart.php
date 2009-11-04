@@ -1047,11 +1047,16 @@ class CChart extends CGraphDraw{
 		$test_dims = imageTextSize(7, 90, 'WWW');
 		for($i=$start_i; $i<=$vline_count; $i++){
 			$new_time = $this->from_time+$i*$interval+$offset;
+// DayLightSave
+			if(date('I',$new_time) == 0) $new_time+=3600;
+			
 			$new_pos = $i*$intervalX+$offsetX;
 
+// check		
 			if(($interval == 86400) && date('N',$new_time) == 1) continue;
 // if we step to main_time
 			else if(($i*$interval % $main_interval + $offset) == $main_offset) continue;
+
 /*
 SDI(($i*$interval % $main_interval + $offset).' == '.$main_offset);
 SDI(($interval*$i+$offset).' : '.$interval.' - '.$main_interval);
@@ -1073,7 +1078,7 @@ SDI('======================================');
 			if($interval == 86400) $date_format = 'D';
 			else if($interval > 86400) $date_format = 'd.m';
 			else if($interval < 86400) $date_format = 'H:i';
-
+			
 			$str = date($date_format, $new_time);
 			$dims = imageTextSize(7, 90, $str);
 
@@ -1101,8 +1106,10 @@ SDI('======================================');
 		$old_day=date('d',$this->from_time);
 		for($i=$start_i; $i<=$vline_count; $i++){
 			$new_time = $this->from_time+$i*$interval+$offset;
+// DayLightSave
+			if(date('I',$new_time) == 0) $new_time+=3600;
 
-			$new_day=date('d', $new_time);
+			$new_day = date('d', $new_time);
 			if($old_day != $new_day){
 				$old_day=$new_day;
 
@@ -1116,8 +1123,7 @@ SDI('======================================');
 				$date_format = 'H:i';
 				$color = $this->graphtheme['highlightcolor'];
 			}
-
-
+			
 			$str = date($date_format, $new_time);
 			$dims = imageTextSize(8, 90, $str);
 

@@ -47,7 +47,7 @@ screenid: 0,
 dragged: 0,							// element dragged or just clicked
 screen_obj: null,					// DOM ref to screen obj
 
-debug_status: 0,					// debug status: 0 - off, 1 - on, 2 - SDI;
+debug_status: 2,					// debug status: 0 - off, 1 - on, 2 - SDI;
 debug_info: '',						// debug string
 
 
@@ -62,12 +62,27 @@ initialize: function(screenid, obj_id, id){
 	
 	var trs = this.screen_obj.getElementsByTagName("tr");
 	var c = 0;
+	
+	function wedge(event){ return false }
+	
 	for (var i = 0; i < trs.length; i++){
 		var divs = document.getElementsByClassName("draggable", trs[i]);
 		for (var j = 0; j < divs.length; ++j){
 			addListener(divs[j], 'mousedown', this.deactivate_drag.bindAsEventListener(this), false);
-			new Draggable(divs[j], {revert: 'failure',
+			new Draggable(divs[j], {//revert: 'failure',
 //									handle:'handle'+c,
+									revert: function(){ 
+										if(IE){ 
+											Event.stopObserving(document.body, "drag", wedge, false); 
+											Event.stopObserving(document.body, "selectstart", wedge, false); 
+										} 
+									},
+									onStart: function(){ 
+										if(IE){ 
+											Event.observe(document.body, "drag", wedge, false); 
+											Event.observe(document.body, "selectstart", wedge, false); 
+										} 
+									},
 									onEnd: this.activate_drag.bind(this)
 									}); 
 			c++;
