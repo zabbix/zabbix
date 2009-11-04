@@ -61,9 +61,11 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 		SET_UI64_RESULT(result, info.totalswap - info.freeswap)
 #endif
 	else if (0 == strcmp(mode, "pfree"))
-		SET_DBL_RESULT(result, 100.0 * ((double)info.freeswap / (double)info.totalswap))
+		SET_DBL_RESULT(result, info.totalswap ? 100.0 * ((double)info.freeswap /
+					(double)info.totalswap) : 0.0)
 	else if (0 == strcmp(mode, "pused"))
-		SET_DBL_RESULT(result, 100.0 - 100.0 * ((double)info.freeswap / (double)info.totalswap))
+		SET_DBL_RESULT(result, info.totalswap ? 100.0 - 100.0 * ((double)info.freeswap /
+					(double)info.totalswap) : 0.0)
 	else
 		return SYSINFO_RET_FAIL;
 
