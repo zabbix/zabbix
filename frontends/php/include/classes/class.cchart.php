@@ -1086,7 +1086,7 @@ SDI('======================================');
 						7,
 						90,
 						$this->shiftXleft+$new_pos+round($dims['width']/2),
-						$this->sizeY+$this->shiftY+$dims['height']+4,
+						$this->sizeY+$this->shiftY+$dims['height']+6,
 						$this->getColor($this->graphtheme['textcolor'],0),
 						$str
 			);
@@ -1131,7 +1131,7 @@ SDI('======================================');
 						8,
 						90,
 						$i*$intervalX+$this->shiftXleft+$offsetX+round($dims['width']/2),
-						$this->sizeY+$this->shiftY+$dims['height']+4,
+						$this->sizeY+$this->shiftY+$dims['height']+6,
 						$this->getColor($color,0),
 						$str
 			);

@@ -1176,8 +1176,9 @@
 			$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
 /*
 			$ar = imagettfbbox($fontsize, $angle, $ttf, $string);
+//sdii($ar);
 			if(!$angle)	imagerectangle($image, $x, $y+$ar[1], $x+abs($ar[0] - $ar[4]), $y+$ar[5], $color);
-			else imagerectangle($image, $x, $y+$ar[1], $x-abs($ar[0] - $ar[4]), $y+$ar[5], $color);
+			else imagerectangle($image, $x, $y, $x-abs($ar[0] - $ar[4]), $y+($ar[5]-$ar[1]), $color);
 //*/
 			imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
 		}
@@ -1201,7 +1202,7 @@
 //SDI($dims);
 			if($angle){
 				$x -= $dims['width'];
-				$y += 2;
+				$y -= 2;
 			}
 			else{
 				$y -= $dims['height'] - 2;
