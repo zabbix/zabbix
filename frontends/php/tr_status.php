@@ -406,7 +406,7 @@ include_once('include/page_header.php');
 		$trigger['items'] = $items;
 //----
 
-		$description = new CSpan($description, 'link_script');
+		$description = new CSpan($description, 'link_menu');
 
 // trigger description js menu {{{ 
 		$host = null;
@@ -517,7 +517,7 @@ include_once('include/page_header.php');
 			$menus = rtrim($menus,',');
 			$menus='show_popup_menu(event,['.$menus.'],180);';
 
-			$host = new CSpan($trigger['host'], 'link_script');
+			$host = new CSpan($trigger['host'], 'link_menu');
 			$host->setAttribute('onclick','javascript: '.$menus);
 		}
 // }}} host JS menu

@@ -506,7 +506,7 @@ function make_latest_issues($params = array()){
 		$menus = rtrim($menus,',');
 		$menus = 'show_popup_menu(event,['.$menus.'],180);';
 
-		$host = new CSpan($row['host'],'link_script');
+		$host = new CSpan($row['host'],'link_menu');
 		$host->setAttribute('onclick','javascript: '.$menus);
 		$host->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 

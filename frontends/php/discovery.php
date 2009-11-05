@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,9 +21,8 @@
 	require_once('include/config.inc.php');
 	require_once('include/discovery.inc.php');
 	$page['hist_arg'] = array('druleid');
-
 	$page['file'] = 'discovery.php';
-	$page['title'] = "S_STATUS_OF_DISCOVERY";
+	$page['title'] = 'S_STATUS_OF_DISCOVERY';
 
 include_once('include/page_header.php');
 
@@ -231,14 +230,17 @@ include_once('include/page_header.php');
 				$time = SPACE;
 
 				$hint = new CDiv(SPACE, $class);
-				$hintTable = new CTableInfo();
-				$hintTable->setAttribute('style','width: auto;');
+				
 
 
+				$hintTable = null;
 				if(isset($h_data['services'][$name])){
 					$class = $h_data['services'][$name]['class'];
 					$time = $h_data['services'][$name]['time'];
 
+					$hintTable = new CTableInfo();
+					$hintTable->setAttribute('style','width: auto;');
+				
 					if ($class == 'active') {
 						$hintTable->setHeader(S_UP_TIME);
 					}
@@ -248,10 +250,14 @@ include_once('include/page_header.php');
 
 					$timeColumn = new CCol(zbx_date2age($h_data['services'][$name]['time']), $class);
 					$hintTable->addRow($timeColumn);
-					$hint->setHint($hintTable);
+					//$hint->setHint($hintTable);
 				}
 
-				$table_row[] = new CCol($hint, $class);
+				$c = new CCol($hint, $class);
+				if(!is_null($hintTable)){
+					$c->setHint($hintTable);
+				}
+				$table_row[] = $c;
 			}
 			$table->addRow($table_row);
 		}
@@ -259,9 +265,7 @@ include_once('include/page_header.php');
 
 	$dscvry_wdgt->addItem($table);
 	$dscvry_wdgt->show();
-?>
-<?php
 
+	
 include_once('include/page_footer.php');
-
 ?>
