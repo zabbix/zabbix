@@ -79,6 +79,12 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['favobj'])){
 		$_REQUEST['pmasterid'] = get_request('pmasterid','mainpage');
 
+		if('timeline' == $_REQUEST['favobj']){
+			if(isset($_REQUEST['elementid']) && isset($_REQUEST['period'])){
+				navigation_bar_calc('web.screens', $_REQUEST['elementid']);
+			}
+		}
+
 		if(str_in_array($_REQUEST['favobj'],array('screenid','slideshowid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
@@ -156,10 +162,7 @@ include_once('include/page_header.php');
 	if( 2 != $_REQUEST['fullscreen'] )
 		update_profile('web.screens.elementid',$_REQUEST['elementid']);
 
-	$_REQUEST['period'] = get_request('period',get_profile('web.screens.period', ZBX_PERIOD_DEFAULT, $_REQUEST['elementid']));
-	if($_REQUEST['period'] >= ZBX_MIN_PERIOD){
-		update_profile('web.screens.period',$_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['elementid']);
-	}
+	$effectiveperiod = navigation_bar_calc('web.screens',$_REQUEST['elementid']);	
 ?>
 <?php
 	$slides_wdgt = new CWidget('hat_slides');
