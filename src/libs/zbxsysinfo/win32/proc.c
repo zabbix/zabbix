@@ -44,7 +44,7 @@ static int	zbx_get_processname(HANDLE hProcess, char *baseName)
 		return FAIL;
 
 	zbx_unicode_to_utf8_static(name, baseName, MAX_NAME);
-zbx_error("baseName:'%s'", baseName);
+
 	return SUCCEED;
 }
 
