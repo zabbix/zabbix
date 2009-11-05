@@ -243,7 +243,7 @@ class CGraphDraw{
 
 	public function period2str($period){
 
-		$str = '  ('.zbx_date2age(0,$period).' '.S_HISTORY.')';
+		$str = '  ('.zbx_date2age(0,$period).')';
 //		$str.=' history ';
 
 	return $str;
