@@ -368,7 +368,7 @@ include_once('include/page_header.php');
 
 		switch($show_events){
 			case EVENTS_OPTION_EVENT_LAST:
-				$ev_options['acknowlegded'] = 0;
+				$ev_options['acknowledged'] = 0;
 				$ev_options['limit'] = 1;
 				$ev_options['sortorder'] = ZBX_SORT_DOWN;
 			break;
@@ -377,12 +377,12 @@ include_once('include/page_header.php');
 				$ev_options['time_till'] = time();
 			break;
 			case EVENTS_OPTION_NOT_ACK:
-				$ev_options['acknowlegded'] = 0;
+				$ev_options['acknowledged'] = 0;
 				$ev_options['time_from'] = time() - ($config['event_expire']*86400);
 				$ev_options['time_till'] = time();
 			break;
 			case EVENTS_OPTION_ONLYTRUE_NOTACK:
-				$ev_options['acknowlegded'] = 0;
+				$ev_options['acknowledged'] = 0;
 				$ev_options['value'] = TRIGGER_VALUE_TRUE;
 				$ev_options['time_from'] = time() - ($config['event_expire']*86400);
 				$ev_options['time_till'] = time();
