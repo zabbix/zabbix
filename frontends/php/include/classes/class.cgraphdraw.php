@@ -242,27 +242,9 @@ class CGraphDraw{
 	}
 
 	public function period2str($period){
-		$second = 1; $minute=$second * 60; $hour=$minute*60; $day=$hour*24;
-		$str = ' ( ';
 
-		$days=floor($this->period/$day);
-		$hours=floor(($this->period%$day)/$hour);
-		$minutes=floor((($this->period%$day)%$hour)/$minute);
-		$seconds=floor(((($this->period%$day)%$hour)%$minute)/$second);
-
-		$str.=($days>0 ? $days.'d' : '').($hours>0 ?  $hours.'h' : '').($minutes>0 ? $minutes.'m' : '').($seconds>0 ? $seconds.'s' : '');
-		$str.=' history ';
-
-		$hour=1; $day=$hour*24;
-		$days=floor($this->from/$day);
-		$hours=floor(($this->from%$day)/$hour);
-		$minutes=floor((($this->from%$day)%$hour)/$minute);
-		$seconds=floor(((($this->from%$day)%$hour)%$minute)/$second);
-
-		$str.=($days>0 ? $days.'d' : '').($hours>0 ?  $hours.'h' : '').($minutes>0 ? $minutes.'m' : '').($seconds>0 ? $seconds.'s' : '');
-		$str.=($days+$hours+$minutes+$seconds>0 ? ' in past ' : '');
-
-		$str.=')';
+		$str = '  ('.zbx_date2age(0,$period).' '.S_HISTORY.')';
+//		$str.=' history ';
 
 	return $str;
 	}
@@ -275,7 +257,7 @@ class CGraphDraw{
 			$str=$this->header;
 		}
 
-//		$str.=$this->period2str($this->period);
+		$str.=$this->period2str($this->period);
 
 		$fontnum = 11;
 		if(($this->sizeX < 500) && ($this->type == GRAPH_TYPE_NORMAL || $this->type == GRAPH_TYPE_BAR)) $fontnum = 8;
