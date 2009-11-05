@@ -134,7 +134,7 @@
 	}
 
 	$page['file'] = "popup.php";
-	$page['scripts'] = array('prototype.js');
+	$page['scripts'] = array();
 
 	define('ZBX_PAGE_NO_MENU', 1);
 
@@ -218,7 +218,7 @@ include_once('include/page_header.php');
 //		return empty($field) ? "" : "window.opener.document.forms['".addslashes($frame)."'].elements['".addslashes($field)."'].value='".addslashes($value)."';";
 		if(empty($field)) return '';
 //						"alert(window.opener.document.getElementById('".addslashes($field)."').value);".
-		$script = 	'try{'.
+		$script = 'try{'.
 						"window.opener.document.getElementById('".addslashes($field)."').value='".addslashes($value)."'; ".
 					'} catch(e){'.
 						'throw("Error: Target not found")'.
@@ -1404,6 +1404,7 @@ function add_trigger(formname, triggerid) {
 	parent_document.forms[formname].submit();
 	close_window();
 }
+-->
 </script>
 <?php
 
