@@ -325,9 +325,10 @@ class CScreen extends CZBXAPI{
  * @return boolean | array
  */
 	public static function add($screens){
-
-		$error = 'Unknown ZABBIX internal error';
-		$result_ids = array();
+		zbx_valueTo($screens, array('array' => 1));
+		
+		$errors = array();
+		$result_screens = array();
 		$result = false;
 
 		self::BeginTransaction(__METHOD__);
@@ -341,10 +342,17 @@ class CScreen extends CZBXAPI{
 
 			if(!check_db_fields($screen_db_fields, $screen)){
 				$result = false;
-				$error = 'Wrong fields for screen [ '.$screen['name'].' ]';
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields for screen [ '.$screen['name'].' ]');
 				break;
 			}
 
+			$sql = 'SELECT screenid FROM screens WHERE name='.zbx_dbstr($screen['name']).' AND '.DBin_node('screenid', false);
+			if(DBfetch(DBselect($sql))){
+				$result = false;
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Screen with name [ '.$screen['name'].' ] already exists');
+				break;
+			}
+			
 			$screenid = get_dbid('screens', 'screenid');
 			$sql = 'INSERT INTO screens (screenid, name, hsize, vsize) '.
 				" VALUES ($screenid, ".zbx_dbstr($screen['name']). ", {$screen['hsize']}, {$screen['vsize']})";
@@ -352,15 +360,16 @@ class CScreen extends CZBXAPI{
 
 			if(!$result) break;
 
-			$result_ids[$screenid] = $screenid;
+			$new_screen = array('screenid' => $screenid);
+			$result_screens[] = array_merge($new_screen, $screen);
 		}
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return $result_ids;
+			return $result_screens;
 		}
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);//'Internal zabbix error');
+			self::setMethodErrors(__METHOD__, $errors);
 			return false;
 		}
 	}
@@ -382,25 +391,40 @@ class CScreen extends CZBXAPI{
  * @return boolean
  */
 	public static function update($screens){
-
+		zbx_valueTo($screens, array('array' => 1));
+		
 		$result = false;
+		$errors = array();
 
 		self::BeginTransaction(__METHOD__);
 		foreach($screens as $screen){
 
-			$screen_db_fields = CScreen::getById($screen['screenid']);
-
+			$screen_db_fields = CScreen::get(array('screenids' => $screen['screenid'], 'editable' => 1, 'extendoutput' => 1));
+			zbx_valueTo($screen_db_fields, array('object' => 1));
+			
 			if(!$screen_db_fields){
 				$result = false;
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Screen with ID [ '.$screen['screenid'].' ] does not exists');
 				break;
 			}
 
 			if(!check_db_fields($screen_db_fields, $screen)){
 				$result = false;
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields for screen [ '.$screen['name'].' ]');
 				break;
 			}
 
-			$sql = 'UPDATE screens SET name='.zbx_dbstr($name).", hsize={$screen['hsize']}, vsize={$screen['vsize']}
+			$sql = 'SELECT screenid FROM screens 
+				WHERE name='.zbx_dbstr($screen['name']).
+				' AND '.DBin_node('screenid', false).
+				' AND screenid<>'.$screen['screenid'];
+			if(DBfetch(DBselect($sql))){
+				$result = false;
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Screen with name [ '.$screen['name'].' ] already exists');
+				break;
+			}
+			
+			$sql = 'UPDATE screens SET name='.zbx_dbstr($screen['name']).", hsize={$screen['hsize']}, vsize={$screen['vsize']}
 				WHERE screenid={$screen['screenid']}";
 			$result = DBexecute($sql);
 
@@ -412,7 +436,7 @@ class CScreen extends CZBXAPI{
 			return true;
 		}
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::setMethodErrors(__METHOD__, $errors);
 			return false;
 		}
 	}
