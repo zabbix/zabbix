@@ -270,31 +270,27 @@ static int	GetProcessAttribute(HANDLE hProcess,int attr,int type,int count,doubl
          return SYSINFO_RET_FAIL;
    }
 
-   /* Recalculate final value according to selected type */
-   if (count==1)     /* First instance */
-   {
-      *lastValue = value;
-   }
+	/* Recalculate final value according to selected type */
+	switch (type) {
+	case 0:	/* min */
+		if (count == 0 || value < *lastValue)
+			*lastValue = value;
+		break;
+	case 1:	/* max */
+		if (count == 0 || value > *lastValue)
+			*lastValue = value;
+		break;
+	case 2:	/* avg */
+		*lastValue = (*lastValue * count + value) / (count + 1);
+		break;
+	case 3:	/* sum */
+		*lastValue += value;
+		break;
+	default:
+		return SYSINFO_RET_FAIL;
+	}
 
-   switch(type)
-   {
-      case 0:     /* min */
-         *lastValue = min((*lastValue),value);
-	 break;
-      case 1:     /* max */
-         *lastValue = max((*lastValue),value);
-	 break;
-      case 2:     /* avg */
-         *lastValue = ((*lastValue) * (count-1) + value) / count;
-	 break;
-      case 3:     /* sum */
-         *lastValue = (*lastValue) + value;
-	 break;
-      default:
-         return SYSINFO_RET_FAIL;
-   }
-
-   return SYSINFO_RET_OK;
+	return SYSINFO_RET_OK;
 }
 
 
@@ -377,7 +373,7 @@ int	PROC_INFO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 		{
 			if (SUCCEED == zbx_get_processname(hProcess, baseName))
 				if (0 == stricmp(baseName, proc_name))
-					if (SYSINFO_RET_OK != (ret = GetProcessAttribute(hProcess, attr_id, type_id, ++counter, &value)))
+					if (SYSINFO_RET_OK != (ret = GetProcessAttribute(hProcess, attr_id, type_id, counter++, &value)))
 						break;
 			CloseHandle(hProcess);
 		}
