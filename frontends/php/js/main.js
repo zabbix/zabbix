@@ -115,7 +115,7 @@ pageGoName:			null,			// wich checkboxes should be counted by Go button
 pageGoCount:		0,				// selected checkboxes
 selected_ids:		{},	// ids of selected checkboxes
 
-page:				null,			// loaded apge name
+page:				null,			// loaded page name
 
 init: function(){
 	var path = new Curl();

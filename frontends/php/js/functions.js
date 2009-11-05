@@ -232,7 +232,7 @@ function remove_expression(expr_id){
 	var expr_tr = document.getElementById(expr_id);
 	var id = getIdFromNodeId(expr_id);
 	if(is_number(id)){
-		var elm_v = document.getElementsByName('expressions['+id+'][value]')[0];	
+		var elm_v = document.getElementsByName('expressions['+id+'][value]')[0];
 		var elm_t = document.getElementsByName('expressions['+id+'][type]')[0];	
 		var elm_s = document.getElementsByName('expressions['+id+'][view]')[0];	
 		
@@ -251,7 +251,7 @@ function getIdFromNodeId(id){
 		id = parseInt(id.replace(reg,"$1"));
 	}
 	if(typeof(id)=='number') return id;
-//	var elm = document.getElementsByName('expressions['+id+'][value]')[0];	
+//	var elm = document.getElementsByName('expressions['+id+'][value]')[0];
 
 return null;
 }
@@ -276,7 +276,7 @@ function element_down(elementid){
 	if(typeof(p_obj) == 'undefined') return;
 
 	var c2_obj = nextObject(c_obj);
-	if(c2_obj && (c2_obj.id.length > 0)){	
+	if(c2_obj && (c2_obj.id.length > 0)){
 		swapNodes(c_obj,c2_obj);
 		swapNodesNames(c_obj,c2_obj);
 	}
@@ -642,7 +642,7 @@ function closeform(page){
 }
 
 //------------------------------------------------------
-//					DASHBOARD JS MENU 
+//					DASHBOARD JS MENU
 //------------------------------------------------------
 
 function create_page_menu(e,id){

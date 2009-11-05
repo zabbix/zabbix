@@ -80,7 +80,7 @@ function popup_menu (a_items, a_tpl, x, y) {
 	this.a_index = [];
 	this.a_children = [];
 
-	// assigh methods and event handlers
+	// assign methods and event handlers
 	this.expand      = menu_expand;
 	this.collapse    = menu_collapse;
 
@@ -96,7 +96,7 @@ function popup_menu (a_items, a_tpl, x, y) {
 	this.set_y_direction = mitem_set_y_direction;
 	this.get_y_direction = mitem_get_y_direction;
 
-	// default level scope description structure 
+	// default level scope description structure
 	this.a_tpl_def = {
 		'block_top'  : 0,
 		'block_left' : 0,
@@ -115,7 +115,7 @@ function popup_menu (a_items, a_tpl, x, y) {
 	};
 
 	
-	// assign methods and properties required to imulate parent item
+	// assign methods and properties required to emulate parent item
 	this.getprop = function (s_key) {
 		return this.a_tpl_def[s_key];
 	};
@@ -220,16 +220,16 @@ function menu_expand (n_id) {
 // --------------------------------------------------------------------------------
 function menu_onclick (n_id) {
 	// don't go anywhere if item has no link defined
-	// lookup new item's object	
+	// lookup new item's object
 	if(Boolean(this.a_index[n_id].a_config[1])){
-		// lookup new item's object	
+		// lookup new item's object
 		var o_item = this.a_index[n_id];
 
 		// apply rollout
 		o_item.e_oelement.className = o_item.getstyle(0, 0);
 		o_item.e_ielement.className = o_item.getstyle(1, 0);
 		
-		// update status line	
+		// update status line
 		o_item.upstatus(7);
 		
 		this.o_hidetimer = setTimeout('A_MENUS['+ this.n_id +'].collapse();', 100);//o_item.getprop('hide_delay'));
@@ -243,14 +243,14 @@ function menu_onclick (n_id) {
 // --------------------------------------------------------------------------------
 function menu_onmouseout (n_id) {
 
-	// lookup new item's object	
+	// lookup new item's object
 	var o_item = this.a_index[n_id];
 
 	// apply rollout
 	o_item.e_oelement.className = o_item.getstyle(0, 0);
 	o_item.e_ielement.className = o_item.getstyle(1, 0);
 	
-	// update status line	
+	// update status line
 	o_item.upstatus(7);
 
 	// run mouseover timer
@@ -265,10 +265,10 @@ function menu_onmouseover (n_id) {
 	this.o_hidetimer = null;
 	clearTimeout(this.o_showtimer);
 
-	// lookup new item's object	
+	// lookup new item's object
 	var o_item = this.a_index[n_id];
 
-	// update status line	
+	// update status line
 	o_item.upstatus();
 
 	// apply rollover
@@ -289,7 +289,7 @@ function menu_onmouseover (n_id) {
 // called when mouse button is pressed on menu item
 // --------------------------------------------------------------------------------
 function menu_onmousedown (n_id) {
-	// lookup new item's object	
+	// lookup new item's object
 	var o_item = this.a_index[n_id];
 
 	// apply mouse down style
