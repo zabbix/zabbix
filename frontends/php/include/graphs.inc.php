@@ -954,14 +954,14 @@
 						break;
 					}
 
-					/* founded equal graph item */
+					/* found equal graph item */
 					if(!isset($equal))$equal = 0;
 
 					$equal++;
 				}
 
 				if(isset($equal) && (count($new_gitems) == $equal)){
-/* founded equal graph */
+/* found equal graph */
 					$chd_graphid = $chd_graph['graphid'];
 					break;
 				}
@@ -984,7 +984,7 @@
 		}
 		else{
 			$host = get_host_by_hostid($hostid);
-			info('Skipped coping of graph "'.$db_graph["name"].'" to host "'.$host['host'].'"');
+			info('Skipped copying of graph "'.$db_graph["name"].'" to host "'.$host['host'].'"');
 		}
 
 	return $result;
