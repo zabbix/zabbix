@@ -91,27 +91,40 @@ include_once('include/page_header.php');
 			$_REQUEST['form'] = 'clone';
 		}
 		else if(isset($_REQUEST['save'])){
-			if(isset($_REQUEST["screenid"])){
+			if(isset($_REQUEST['screenid'])){
 				// TODO check permission by new value.
-				$result=update_screen($_REQUEST["screenid"],$_REQUEST["name"],$_REQUEST["hsize"],$_REQUEST["vsize"]);
+//				$result=update_screen($_REQUEST['screenid'],$_REQUEST['name'],$_REQUEST['hsize'],$_REQUEST['vsize']);
+				$result = CScreen::update(array(
+					'screenid' => $_REQUEST['screenid'], 
+					'name' => $_REQUEST['name'], 
+					'hsize' => $_REQUEST['hsize'], 
+					'vsize' => $_REQUEST['vsize']
+				));
+				if(!$result){
+					error(CScreen::resetErrors());
+				}
 				$audit_action = AUDIT_ACTION_UPDATE;
 				show_messages($result, S_SCREEN_UPDATED, S_CANNOT_UPDATE_SCREEN);
 			}
-			else {
+			else{
 				if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 					access_deny();
 
-				DBstart();
-				add_screen($_REQUEST["name"],$_REQUEST["hsize"],$_REQUEST["vsize"]);
-				$result = DBend();
+//				DBstart();
+				$result = CScreen::add(array('name' => $_REQUEST['name'], 'hsize' => $_REQUEST['hsize'], 'vsize' => $_REQUEST['vsize']));
+				if(!$result){
+					error(CScreen::resetErrors());
+				}
+//				add_screen($_REQUEST['name'],$_REQUEST['hsize'],$_REQUEST['vsize']);
+//				$result = DBend();
 
 				$audit_action = AUDIT_ACTION_ADD;
-				show_messages($result,S_SCREEN_ADDED,S_CANNOT_ADD_SCREEN);
+				show_messages($result, S_SCREEN_ADDED, S_CANNOT_ADD_SCREEN);
 			}
 			if($result){
-				add_audit($audit_action,AUDIT_RESOURCE_SCREEN," Name [".$_REQUEST['name']."] ");
-				unset($_REQUEST["form"]);
-				unset($_REQUEST["screenid"]);
+				add_audit($audit_action,AUDIT_RESOURCE_SCREEN,' Name ['.$_REQUEST['name'].'] ');
+				unset($_REQUEST['form']);
+				unset($_REQUEST['screenid']);
 			}
 		}
 		if(isset($_REQUEST["delete"])&&isset($_REQUEST["screenid"])){

@@ -94,6 +94,7 @@
 		return $result;
 	}
 
+/*
 	function add_screen($name,$hsize,$vsize){
 		$screenid=get_dbid("screens","screenid");
 		$sql='INSERT INTO screens (screenid,name,hsize,vsize) '.
@@ -110,7 +111,7 @@
 		$sql="update screens set name=".zbx_dbstr($name).",hsize=$hsize,vsize=$vsize where screenid=$screenid";
 	return  DBexecute($sql);
 	}
-
+*/
 	function delete_screen($screenid){
 		$result=DBexecute('DELETE FROM screens_items where screenid='.$screenid);
 		$result&=DBexecute('DELETE FROM screens_items where resourceid='.$screenid.' and resourcetype='.SCREEN_RESOURCE_SCREEN);
