@@ -83,70 +83,68 @@ struct swap_stat_s {
 
 #if defined(KERNEL_2_4)
 #	define INFO_FILE_NAME	"/proc/partitions"
-#	define PARSE(line)	if(sscanf(line,"%*d %*d %*d %s " \
+#	define PARSE(line)	if (sscanf(line, "%d %d %*d %*s " \
 					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d " \
 					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d %*d %*d %*d", \
-				name,			/* name */ \
+				&rdev_major, 		/* major */ \
+				&rdev_minor, 		/* minor */ \
 				&(result->rio),		/* rio */ \
 				&(result->rsect),	/* rsect */ \
 				&(result->wio),		/* rio */ \
 				&(result->wsect)	/* wsect */ \
-				) != 5) continue
+				) != 6) continue
 #else
 #	define INFO_FILE_NAME	"/proc/diskstats"
-#	define PARSE(line)	if(sscanf(line, "%*d %*d %s " \
+#	define PARSE(line)	if (sscanf(line, "%d %d %*s " \
 					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d " \
 					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d %*d %*d %*d", \
-				name,			/* name */ \
+				&rdev_major, 		/* major */ \
+				&rdev_minor, 		/* minor */ \
 				&(result->rio),		/* rio */ \
 				&(result->rsect),	/* rsect */ \
 				&(result->wio),		/* wio */ \
 				&(result->wsect)	/* wsect */ \
-				) != 5)  \
-					if(sscanf(line,"%*d %*d %s " \
+				) != 6)  \
+					if (sscanf(line, "%d %d %*s " \
 						ZBX_FS_UI64 " " ZBX_FS_UI64 " " \
 						ZBX_FS_UI64 " " ZBX_FS_UI64, \
-					name,			/* name */ \
+					&rdev_major, 		/* major */ \
+					&rdev_minor, 		/* minor */ \
 					&(result->rio),		/* rio */ \
 					&(result->rsect),	/* rsect */ \
 					&(result->wio),		/* wio */ \
 					&(result->wsect)	/* wsect */ \
-					) != 5) continue
+					) != 6) continue
 #endif
 
 static int get_swap_dev_stat(const char *interface, struct swap_stat_s *result)
 {
-	int	ret = SYSINFO_RET_FAIL;
-	char	line[MAX_STRING_LEN];
-
-	char	name[MAX_STRING_LEN];
-
-	FILE *f;
+	int		ret = SYSINFO_RET_FAIL;
+	char		line[MAX_STRING_LEN]/*, name[MAX_STRING_LEN]*/;
+	int		rdev_major, rdev_minor;
+	struct stat	dev_st;
+	FILE		*f;
 
 	assert(result);
 
-	if(NULL != (f = fopen(INFO_FILE_NAME,"r")))
+	if (-1 == stat(interface, &dev_st))
+		return ret;
+
+	if (NULL == (f = fopen(INFO_FILE_NAME, "r")))
+		return ret;
+
+	while (NULL != fgets(line, sizeof(line), f))
 	{
-		while(fgets(line,MAX_STRING_LEN,f) != NULL)
+		PARSE(line);
+
+		if (rdev_major == major(dev_st.st_rdev) && rdev_minor == minor(dev_st.st_rdev))
 		{
-			PARSE(line);
-
-			if(strncmp(name, interface, MAX_STRING_LEN) == 0)
-			{
-				ret = SYSINFO_RET_OK;
-				break;
-			}
+			ret = SYSINFO_RET_OK;
+			break;
 		}
-		fclose(f);
 	}
+	fclose(f);
 
-	if(ret != SYSINFO_RET_OK)
-	{
-		result->rio	= 0;
-		result->rsect	= 0;
-		result->wio	= 0;
-		result->wsect	= 0;
-	}
 	return ret;
 }
 
@@ -188,50 +186,55 @@ static int	get_swap_pages(struct swap_stat_s *result)
 
 static int	get_swap_stat(const char *interface, struct swap_stat_s *result)
 {
-	int			ret = SYSINFO_RET_FAIL;
+	int			offset = 0, ret = SYSINFO_RET_FAIL;
 	struct swap_stat_s	curr;
 	FILE			*f;
 	char			line[MAX_STRING_LEN], *s;
 
 	memset(result, 0, sizeof(struct swap_stat_s));
 
-	if(0 == strcmp(interface, "all"))
+	if (0 == strcmp(interface, "all"))
 	{
 		ret = get_swap_pages(result);
 		interface = NULL;
 	}
+	else if (0 != strncmp(interface, "/dev/", 5))
+		offset = 5;
 
-	if(NULL != (f = fopen("/proc/swaps","r")) )
+	if (NULL == (f = fopen("/proc/swaps", "r")))
+		return ret;
+
+	while (NULL != fgets(line, sizeof(line), f))
 	{
-		while (fgets(line, sizeof(line), f))
+		if (0 != strncmp(line, "/dev/", 5))
+			continue;
+
+		if (NULL == (s = strchr(line, ' ')))
+			continue;
+
+		*s = '\0';
+
+		if (NULL != interface && 0 != strcmp(interface, line + offset))
+			continue;
+
+		if (SYSINFO_RET_OK == get_swap_dev_stat(line, &curr))
 		{
-			s = strchr(line,' ');
-			if (s && s != line && strncmp(line, "/dev/", 5) == 0)
-			{
-				*s = 0;
+			result->rio	+= curr.rio;
+			result->rsect	+= curr.rsect;
+			result->wio	+= curr.wio;
+			result->wsect	+= curr.wsect;
 
-				if(interface && 0 != strcmp(interface, line+5)) continue;
-
-				if(SYSINFO_RET_OK == get_swap_dev_stat(line+5, &curr))
-				{
-					result->rio	+= curr.rio;
-					result->rsect	+= curr.rsect;
-					result->wio	+= curr.wio;
-					result->wsect	+= curr.wsect;
-
-					ret = SYSINFO_RET_OK;
-				}
-			}
+			ret = SYSINFO_RET_OK;
 		}
-		fclose(f);
 	}
+	fclose(f);
 
 	return ret;
 }
 
 int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char			swapdev[32], mode[32];
+	char			swapdev[MAX_STRING_LEN], mode[32];
 	struct swap_stat_s	ss;
 
 	assert(result);
@@ -268,7 +271,7 @@ int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char			swapdev[32], mode[32];
+	char			swapdev[MAX_STRING_LEN], mode[32];
 	struct swap_stat_s	ss;
 
 	assert(result);
