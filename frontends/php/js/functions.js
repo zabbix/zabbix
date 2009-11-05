@@ -695,5 +695,5 @@ function create_mon_trigger_menu(e, args, items){
 //alert(id+' : '+page_menu[id]);
 
 //alert(page_menu[id]);
-	show_popup_menu(e,tr_menu,280);// JavaScript Document
+	show_popup_menu(e,tr_menu,280);
 }
