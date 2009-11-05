@@ -73,14 +73,14 @@ include_once('include/page_header.php');
 	check_fields($fields);
 	validate_sort_and_sortorder('s.name',ZBX_SORT_UP);
 
-	$config = $_REQUEST['config'] = get_request('config', 0);
+	$config_scr = $_REQUEST['config'] = get_request('config', 0);
 
 	update_profile('web.screenconf.config', $_REQUEST['config'],PROFILE_TYPE_INT);
 ?>
 <?php
 	$_REQUEST['go'] = get_request('go', 'none');
 
-	if( 0 == $config ){
+	if( 0 == $config_scr ){
 		if(isset($_REQUEST["screenid"])){
 			if(!screen_accessible($_REQUEST["screenid"], PERM_READ_WRITE))
 				access_deny();
@@ -262,17 +262,17 @@ include_once('include/page_header.php');
 	$form = new CForm();
 	$form->SetMethod('get');
 
-	$cmbConfig = new CComboBox('config', $config, 'submit()');
+	$cmbConfig = new CComboBox('config', $config_scr, 'submit()');
 	$cmbConfig->addItem(0, S_SCREENS);
 	$cmbConfig->addItem(1, S_SLIDESHOWS);
 
 	$form->addItem($cmbConfig);
-	$form->addItem(new CButton("form", 0 == $config ? S_CREATE_SCREEN : S_SLIDESHOW));
+	$form->addItem(new CButton("form", 0 == $config_scr ? S_CREATE_SCREEN : S_SLIDESHOW));
 
-	show_table_header(0 == $config ? S_CONFIGURATION_OF_SCREENS_BIG : S_CONFIGURATION_OF_SLIDESHOWS_BIG, $form);
+	show_table_header(0 == $config_scr ? S_CONFIGURATION_OF_SCREENS_BIG : S_CONFIGURATION_OF_SLIDESHOWS_BIG, $form);
 	echo SBR;
 
-	if(0 == $config){
+	if(0 == $config_scr){
 		if(isset($_REQUEST['form'])){
 			insert_screen_form();
 		}
@@ -305,12 +305,13 @@ include_once('include/page_header.php');
 				'sortorder' => $sortorder,
 				'limit' => ($config['search_limit']+1)
 			);
+
 			$screens = CScreen::get($options);
 			
 			order_result($screens, $sortfield, $sortorder);
 			$paging = getPagingLine($screens);
 			
-			foreach($screens as $screen){
+			foreach($screens as $num => $screen){
 				$table->addRow(array(
 					new CCheckBox('screens['.$screen['screenid'].']', NULL, NULL, $screen['screenid']),
 					new CLink($screen["name"],'screenedit.php?screenid='.$screen['screenid']),
