@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 	$page['file'] = 'vtext.php';
 	$page['type'] = PAGE_TYPE_IMAGE;
 
-include_once "include/page_header.php";
+	require_once ('include/page_header.php');
 
 ?>
 <?php
@@ -40,25 +40,25 @@ include_once "include/page_header.php";
 ?>
 <?php
 
-	$text = get_request("text",' ');;
-	$font = get_request("font",3);
+	$text = get_request('text', ' ');;
+	$font = get_request('font', 3);
+	
+	$size = imageTextSize(9, 90, $text);
 
-	$width = imagefontwidth($font) * strlen($text);
-	$height = imagefontheight($font);
+	$im = imagecreatetruecolor($size['width']+6, $size['height']);
+	ImageAlphaBlending($im, false);
+	imageSaveAlpha($im, true);
 
-	$im = imagecreate($height,$width);
+	$transparentColor = imagecolorallocatealpha($im, 200, 200, 200, 127);
+	imagefill($im, 0, 0, $transparentColor);
+	
+	$text_color = imagecolorallocate($im, 0, 0, 0);
 
-	$backgroud_color = imagecolorallocate($im,255,255,255);
-	$text_color = imagecolorallocate($im,0,0,0);
-
-	imagestringup($im,$font,0,$width-1,$text,$text_color);
-	imagecolortransparent($im,$backgroud_color);
+	imageText($im, 9, 90, $size['width']+3, $size['height'], $text_color, $text);
 
 	imageOut($im);
 	imagedestroy($im);
-?>
-<?php
 
+	
 include_once('include/page_footer.php');
-
 ?>
