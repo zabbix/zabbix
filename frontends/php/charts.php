@@ -66,8 +66,7 @@ include_once('include/page_header.php');
 		
 		if('timeline' == $_REQUEST['favobj']){
 			if(isset($_REQUEST['graphid']) && isset($_REQUEST['period'])){
-				navigation_bar_calc();
-				update_profile('web.graph.period',$_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['graphid']);
+				navigation_bar_calc('web.graph',$_REQUEST['graphid']);
 			}
 		}
 		
@@ -102,11 +101,6 @@ include_once('include/page_header.php');
 <?php
 	$_REQUEST['graphid'] = get_request('graphid', get_profile('web.charts.graphid', 0));
 	if(!in_node($_REQUEST['graphid'])) $_REQUEST['graphid'] = 0;
-
-	$_REQUEST['stime'] =	get_request('stime',get_profile('web.graph.stime', null, $_REQUEST['graphid']));
-	$_REQUEST['period'] =	get_request('period',get_profile('web.graph.period', ZBX_PERIOD_DEFAULT, $_REQUEST['graphid']));
-
-	$effectiveperiod = navigation_bar_calc();
 
 	if($_REQUEST['graphid']>0){
 		$sql_from = '';
@@ -144,13 +138,7 @@ include_once('include/page_header.php');
 		}
 	}
 
-	if($_REQUEST['graphid']>0){
-		if(isset($_REQUEST['stime']))
-			update_profile('web.graph.stime',$_REQUEST['stime'], PROFILE_TYPE_STR, $_REQUEST['graphid']);
-
-		if($_REQUEST['period'] >= ZBX_MIN_PERIOD)
-			update_profile('web.graph.period',$_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['graphid']);
-	}
+	$effectiveperiod = navigation_bar_calc('web.graph',$_REQUEST['graphid']);
 
 	update_profile('web.charts.graphid',$_REQUEST['graphid']);
 

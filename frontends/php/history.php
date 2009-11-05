@@ -255,10 +255,8 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-	$effectiveperiod = navigation_bar_calc();
-
-	$bstime = $_REQUEST['stime'] = get_request('stime', get_profile('web.item.graph.stime',date('YmdHi',(time()-$_REQUEST['period'])),$_REQUEST['itemid']));
-	update_profile('web.item.graph.stime', $_REQUEST['stime'], PROFILE_TYPE_STR, $_REQUEST['itemid']);
+	$effectiveperiod = navigation_bar_calc('web.item.graph', $_REQUEST['itemid']);
+	$bstime = $_REQUEST['stime'];
 
 	if($_REQUEST['action']=='showgraph' && ($item_type != ITEM_VALUE_TYPE_LOG)){
 		$dom_graph_id = 'graph';

@@ -87,9 +87,7 @@ include_once('include/page_header.php');
 		access_deny();
 	}
 	
-	$_REQUEST['period'] = get_request('period', get_profile('web.httptest.period', ZBX_PERIOD_DEFAULT, $_REQUEST['httptestid']));
-	navigation_bar_calc();
-	update_profile('web.httptest.period', $_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['httptestid']);
+	$effectiveperiod = navigation_bar_calc('web.httptest',$_REQUEST['httptestid']);
 ?>
 <?php
 	$details_wdgt = new CWidget();

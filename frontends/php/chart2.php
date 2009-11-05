@@ -58,17 +58,8 @@ include_once('include/page_header.php');
 
 	$host = zbx_valueTo($db_data['hosts'], array('object'=>1), true);
 
-	$effectiveperiod = navigation_bar_calc();
-
-	if($_REQUEST['graphid']>0){
-		if($_REQUEST['period'] >= ZBX_MIN_PERIOD)
-			update_profile('web.graph.period',$_REQUEST['period'],PROFILE_TYPE_INT,$_REQUEST['graphid']);
-
-		if(isset($_REQUEST['stime'])){
-			update_profile('web.graph.stime',$_REQUEST['stime'], PROFILE_TYPE_STR, $_REQUEST['graphid']);
-		}
-	}
-
+	$effectiveperiod = navigation_bar_calc('web.graph',$_REQUEST['graphid']);
+	
 	update_profile('web.charts.graphid',$_REQUEST['graphid']);
 
 	$chart_header = '';
