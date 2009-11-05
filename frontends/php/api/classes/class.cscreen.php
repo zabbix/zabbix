@@ -156,13 +156,13 @@ class CScreen extends CZBXAPI{
 		$sql = 'SELECT '.$sql_select.'
 				FROM '.$sql_from.'
 				WHERE '.DBin_node('s.screenid', $nodeids).
-				$sql_where.
+					$sql_where.
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
-
 		while($screen = DBfetch($res)){
-			if($options['count'])
+			if(!is_null($options['count'])){
 				$result = $screen;
+			}
 			else{
 				$screenids[$screen['screenid']] = $screen['screenid'];
 
@@ -176,7 +176,6 @@ class CScreen extends CZBXAPI{
 				}
 			}
 		}
-
 
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){}
 		else{
