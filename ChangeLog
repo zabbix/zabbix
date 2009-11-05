@@ -1,5 +1,6 @@
 Changes for 1.7.1
 
+ - [ZBX-1015] added support of LVM devices for system.swap.in/out under Linux (Sasha)
  - [DEV-429] added support of system.cpu.switches under Linux 2.4/2.6 (Sasha)
  - [DEV-413] fixed first parameter in system.cpu.util key for linux (all; 0..n) (Sasha)
  - [DEV-411] improved performance of trends module (Sasha)
