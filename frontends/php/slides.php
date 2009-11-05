@@ -255,6 +255,8 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
+	show_messages();
+
 	$slide_name = S_SLIDESHOW;
 	if(isset($elementid)){
 		if($element = get_slideshow_by_slideshowid($elementid)){
@@ -289,7 +291,7 @@ include_once('include/page_header.php');
 	$submenu = array();
 
 // js menu arrays
-	make_refresh_menu('mainpage','hat_slides',get_profile('web.slides.rf_rate.hat_slides',$element['delay'],null,$elementid),array('elementid'=> $elementid),$menu,$submenu);
+	make_refresh_menu('mainpage','hat_slides',get_profile('web.slides.rf_rate.hat_slides',$element['delay'],$elementid),array('elementid'=> $elementid),$menu,$submenu);
 
 	insert_js('var page_menu='.zbx_jsvalue($menu).";\n".
 			 'var page_submenu='.zbx_jsvalue($submenu).";\n"
@@ -304,10 +306,9 @@ include_once('include/page_header.php');
 	$tab->setAttribute('width','100%');
 
 // Refresh tab
-
 	$refresh_tab = array(
 		array('id' => 'hat_slides',
-				'frequency' => get_profile('web.slides.rf_rate.hat_slides',$element['delay'], null,$elementid),
+				'frequency' => get_profile('web.slides.rf_rate.hat_slides',$element['delay'],$elementid),
 				'url' => 'slides.php?elementid='.$elementid.url_param('stime').url_param('period').url_param('groupid').url_param('hostid'),
 				'params'=> array('lastupdate' => time()),
 			));
@@ -346,19 +347,6 @@ include_once('include/page_header.php');
 
 			zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 			zbx_add_post_js('timeControl.processObjects();');
-
-//*/
-/*
-			$stime = time() - 31536000; // ~1year
-			$bstime = time()-$effectiveperiod;
-
-			if(isset($_REQUEST['stime'])){
-				$bstime = $_REQUEST['stime'];
-				$bstime = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
-			}
-
-			zbx_add_post_js('onload_update_scroll("iframe",0,'.$effectiveperiod.','.$stime.',0,'.$bstime.');');
-//*/
 		}
 		$element = get_slideshow($elementid, 0, $effectiveperiod);
 	}
@@ -379,12 +367,6 @@ include_once('include/page_header.php');
 	$scroll_div->setAttribute('id','scrollbar_cntr');
 	$scroll_div->setAttribute('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
 	$scroll_div->show();
-
-/*
-	$img = new CImg('images/general/tree/zero.gif','space','20','20');
-	$elements = array($img,BR());
-	print(unpack_object($elements));
-//*/
 
 	$jsmenu = new CPUMenu(null,170);
 	$jsmenu->InsertJavaScript();
