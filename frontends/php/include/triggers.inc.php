@@ -3093,8 +3093,7 @@ return $result;
 	
 	function get_item_function_info($expr){
 		global $ZBX_TR_EXPR_ALLOWED_MACROS;
-		
-				
+
 		$value_type = array(
 			ITEM_VALUE_TYPE_UINT64	=> S_NUMERIC_UINT64,
 			ITEM_VALUE_TYPE_FLOAT	=> S_NUMERIC_FLOAT,
@@ -3161,14 +3160,16 @@ return $result;
 			if($item_id == null) return VALUE_TYPE_UNKNOWN;
 	
 			$result = $function_info[$function];
+
 			if(is_array($result['value_type'])){
 				$value_type = null;
 				
 				$item_data = CItem::get(array('extendoutput'=>1, 'itemids'=>$item_id));
+
 				if(zbx_valueTo($item_data, array('object'=>1))){
-					$item_value = $item_data['value_type'];
+					$value_type = $item_data['value_type'];
 				}
-	
+
 				if($value_type == null) return VALUE_TYPE_UNKNOWN;
 	
 				$result['value_type'] = $result['value_type'][$value_type];
