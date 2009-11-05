@@ -253,6 +253,7 @@
 
 		$expression = trim($expression,'& ');
 		$exec = 'return ('.$expression.')?1:0;';
+
 		$ret = eval($exec);
 //echo $debug;
 //echo "$field - result: ".$ret." exec: $exec".SBR.SBR;
