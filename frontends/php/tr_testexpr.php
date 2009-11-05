@@ -61,7 +61,7 @@ include_once('include/page_header.php');
 		if(isset($datas[$expr])) continue;
 	
 		$num = count($datas) + 1;
-		$fname = 'test_data_#'.$num;
+		$fname = 'test_data_n'.$num;
 		$datas[$expr] = get_request($fname, '');
 		$info = get_item_function_info($expr);
 
