@@ -339,13 +339,13 @@ div.icon_sortdown:hover{
 	text-decoration: underline;
 }
 
-.link_script{
+.link_menu{
 	color: #3C3089;
 	text-decoration: none;
 	border-bottom: 1px dotted #3C3089;
 }
 
-.link_script:hover{
+.link_menu:hover{
 	color: #6C80B9;
 	cursor: pointer;
 	text-decoration: none;
