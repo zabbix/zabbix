@@ -413,7 +413,7 @@ createBox: function(obj, hint_text, width, className, byClick){
 	var close_link = '';
 	if(byClick){
 		close_link = '<div class="link" '+
-						'style="text-align: right; backgground-color: #AAA; border-bottom: 1px #333 solid;" '+
+						'style="text-align: right; border-bottom: 1px #333 solid;" '+
 						'onclick="javascript: hintBox.hide(event, \''+boxid+'\');">Close</div>';
 	}
 
@@ -424,7 +424,7 @@ createBox: function(obj, hint_text, width, className, byClick){
 	box.appendChild(box_close);	
 	box_close.appendChild(document.createTextNode('X'));
 	box_close.className = 'link';
-	box_close.setAttribute('style','text-align: right; backgground-color: #AAA;');
+	box_close.setAttribute('style','text-align: right; background-color: #AAA;');
 	box_close.onclick = eval("function(){ hintBox.hide('"+boxid+"'); }");
 */
 	this.boxes[boxid] = box;

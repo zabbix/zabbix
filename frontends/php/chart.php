@@ -59,18 +59,7 @@ include_once('include/page_header.php');
 
 	$graph = new CChart();
 
-//	$_REQUEST['stime'] = get_request('stime',get_profile('web.item.graph.stime', PROFILE_TYPE_STR, $_REQUEST['itemid']));
-	$_REQUEST['period'] = get_request('period',get_profile('web.item.graph.period', ZBX_PERIOD_DEFAULT, $_REQUEST['itemid']));
-
-	if($_REQUEST['itemid']>0){
-		if(isset($_REQUEST['stime']))
-			update_profile('web.item.graph.stime',$_REQUEST['stime'], PROFILE_TYPE_STR, $_REQUEST['itemid']);
-
-		if($_REQUEST['period'] >= ZBX_MIN_PERIOD)
-			update_profile('web.item.graph.period',$_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['itemid']);
-	}
-
-	$_REQUEST['period'] = navigation_bar_calc();
+	$effectiveperiod = navigation_bar_calc('web.item.graph',$_REQUEST['itemid']);
 
 	if(isset($_REQUEST['period']))		$graph->SetPeriod($_REQUEST['period']);
 	if(isset($_REQUEST['from']))		$graph->SetFrom($_REQUEST['from']);

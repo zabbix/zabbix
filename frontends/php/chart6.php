@@ -50,27 +50,17 @@ include_once 'include/page_header.php';
 		show_error_message(S_NO_GRAPH_DEFINED);
 	}
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_RES_IDS_ARRAY, get_current_nodeid(true));
+	$db_data = CGraph::get($options);
+	if(empty($db_data)) access_deny();
+	else zbx_valueTo($db_data, array('object'=>1));
 
-	if(!graph_accessible($_REQUEST['graphid'])){
-		access_deny();
-	}
-
-	$sql = 'SELECT g.*,h.host,h.hostid '.
-			' FROM graphs g '.
-				' LEFT JOIN graphs_items gi ON g.graphid=gi.graphid '.
-				' LEFT JOIN items i ON gi.itemid=i.itemid '.
-				' LEFT JOIN hosts h ON i.hostid=h.hostid '.
-			' WHERE g.graphid='.$_REQUEST['graphid'].
-				' AND '.DBcondition('h.hostid',$available_hosts);
-
-	$db_data = DBfetch(DBselect($sql));
-
+	$effectiveperiod = navigation_bar_calc('web.graph',$_REQUEST['graphid']);
+	
 	$graph = new CPie($db_data['graphtype']);
 
-	if(isset($_REQUEST['period']))		$graph->SetPeriod($_REQUEST['period']);
-	if(isset($_REQUEST['stime']))		$graph->SetSTime($_REQUEST['stime']);
-	if(isset($_REQUEST['border']))		$graph->SetBorder(0);
+	if(isset($_REQUEST['period']))		$graph->setPeriod($_REQUEST['period']);
+	if(isset($_REQUEST['stime']))		$graph->setSTime($_REQUEST['stime']);
+	if(isset($_REQUEST['border']))		$graph->setBorder(0);
 
 	$width = get_request('width', 0);
 
@@ -79,21 +69,20 @@ include_once 'include/page_header.php';
 	$height = get_request('height', 0);
 	if($height <= 0) $height = $db_data['height'];
 
-	$graph->SetWidth($width);
-	$graph->SetHeight($height);
-	$graph->SetHeader($db_data['host'].':'.$db_data['name']);
+	$graph->setWidth($width);
+	$graph->setHeight($height);
+	$graph->setHeader($db_data['host'].':'.$db_data['name']);
 
 	if($db_data['show_3d'] == 1) $graph->switchPie3D();
-	$graph->SwitchLegend($db_data['show_legend']);
+	$graph->switchLegend($db_data['show_legend']);
 
-	$result = DBselect('SELECT gi.* '.
-					' FROM graphs_items gi '.
-					' WHERE gi.graphid='.$db_data['graphid'].
-					' ORDER BY gi.sortorder, gi.itemid DESC');
-
-	while($db_data=DBfetch($result))
-	{
-		$graph->AddItem(
+	$sql = 'SELECT gi.* '.
+			' FROM graphs_items gi '.
+			' WHERE gi.graphid='.$db_data['graphid'].
+			' ORDER BY gi.sortorder, gi.itemid DESC';
+	$result = DBselect($sql);
+	while($db_data=DBfetch($result)){
+		$graph->addItem(
 			$db_data['itemid'],
 			$db_data['calc_fnc'],
 			$db_data['color'],
@@ -105,6 +94,6 @@ include_once 'include/page_header.php';
 ?>
 <?php
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
 
 ?>

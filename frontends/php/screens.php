@@ -79,8 +79,7 @@ include_once('include/page_header.php');
 
 		if('timeline' == $_REQUEST['favobj']){
 			if(isset($_REQUEST['elementid']) && isset($_REQUEST['period'])){
-				navigation_bar_calc();
-				update_profile('web.screens.period',$_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['elementid']);
+				navigation_bar_calc('web.screens', $_REQUEST['elementid']);
 			}
 		}
 
@@ -120,10 +119,7 @@ include_once('include/page_header.php');
 	if( 2 != $_REQUEST['fullscreen'] )
 		update_profile('web.screens.elementid',$_REQUEST['elementid']);
 
-	$_REQUEST['period'] = get_request('period',get_profile('web.screens.period', ZBX_PERIOD_DEFAULT, $_REQUEST['elementid']));
-	if($_REQUEST['period'] >= ZBX_MIN_PERIOD){
-		update_profile('web.screens.period',$_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['elementid']);
-	}
+	$effectiveperiod = navigation_bar_calc('web.screens',$_REQUEST['elementid']);
 ?>
 <?php
 
@@ -140,7 +136,6 @@ include_once('include/page_header.php');
 
 	$form->addVar('fullscreen',$_REQUEST['fullscreen']);
 	
-	navigation_bar_calc();
 	$form->addVar('period', $_REQUEST['period']);
 	$form->addVar('stime', $_REQUEST['stime']);
 
@@ -203,7 +198,6 @@ include_once('include/page_header.php');
 		validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
 
 		$available_groups = $PAGE_GROUPS['groupids'];
-//		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 		$available_hosts = $PAGE_HOSTS['hostids'];
 
 		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
@@ -224,8 +218,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 	if(isset($elementid)){
-		$effectiveperiod = navigation_bar_calc();
-
 		$element = get_screen($elementid, 0, $effectiveperiod);
 
 		$_REQUEST['elementid'] = $elementid;
