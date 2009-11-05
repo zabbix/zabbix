@@ -1,5 +1,6 @@
 Changes for 1.6.7
 
+ - [ZBX-1202] fixed processing of proc_info[] check with 'sum' parameter. Thanks to Kazuo Ito (Sasha)
  - [ZBX-1148] fixed flap between available and unavailable for hosts with mixed agent and simple checks (Sasha)
  - [ZBX-1051] fixed processing of active checks list on the agent side. Symptom: 'Can't open JSON object' message (Sasha)
  - [ZBX-641] fixed oracle OCI-Lob parse (Aly)
