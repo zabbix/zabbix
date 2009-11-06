@@ -102,8 +102,11 @@ include_once('include/page_header.php');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
 
+	$rst_icon = new CDiv(SPACE,'iconreset');
+	$rst_icon->setAttribute('title',S_RESET);
+	$rst_icon->addAction('onclick',new CJSscript("javascript: timeControl.objectReset('".$_REQUEST['httptestid']."');"));
 
-	$details_wdgt->addHeader($text, $fs_icon);
+	$details_wdgt->addHeader($text, array($rst_icon, $fs_icon));
 //-------------
 
 // TABLE
@@ -276,7 +279,7 @@ include_once('include/page_header.php');
 			url_param(GRAPH_TYPE_STACKED, false, 'graphtype');
 
 	$objData = array(
-		'id' => $dom_graph_id,
+		'id' => $_REQUEST['httptestid'],
 		'domid' => $dom_graph_id,
 		'containerid' => $containerid,
 		'src' => $src,
@@ -300,7 +303,7 @@ include_once('include/page_header.php');
 			url_param(GRAPH_TYPE_STACKED, false, 'graphtype');
 
 	$objData = array(
-		'id' => $dom_graph_id,
+		'id' => $_REQUEST['httptestid'],
 		'domid' => $dom_graph_id,
 		'containerid' => $containerid,
 		'src' => $src,
@@ -321,7 +324,7 @@ include_once('include/page_header.php');
 
 	$dom_graph_id = 'none';
 	$objData = array(
-		'id' => $dom_graph_id,
+		'id' => $_REQUEST['httptestid'],
 		'domid' => $dom_graph_id,
 		'loadSBox' => 0,
 		'loadImage' => 0,

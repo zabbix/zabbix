@@ -974,7 +974,7 @@
 
 
 					$objData = array(
-						'id' => $dom_graph_id,
+						'id' => $resourceid,
 						'domid' => $dom_graph_id,
 						'containerid' => $containerid,
 						'objDims' => $graphDims,
@@ -1059,7 +1059,7 @@
 					$graphDims['width'] = $width;
 
 					$objData = array(
-						'id' => $dom_graph_id,
+						'id' => $resourceid,
 						'domid' => $dom_graph_id,
 						'containerid' => $containerid,
 						'objDims' => $graphDims,
