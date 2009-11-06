@@ -149,7 +149,7 @@
 		$cmbGroups->addItem(0, S_ALL_S);
 		order_result($groups, 'name');
 		foreach($groups as $group){
-			$cmbGroups->addItem($group['groupid'], get_node_name_by_elid($group['groupid']).$group['name']);
+			$cmbGroups->addItem($group['groupid'], get_node_name_by_elid($group['groupid'], null, ': ').$group['name']);
 		}
 		$r_form->addItem(array(S_GROUP.SPACE, $cmbGroups));
 		

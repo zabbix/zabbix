@@ -1167,7 +1167,7 @@
 					while($tr_row=DBfetch($tresult)){
 						$cmbGroup->addItem(
 								$tr_row['groupid'],
-								get_node_name_by_elid($tr_row['groupid']).$tr_row['name']
+								get_node_name_by_elid($tr_row['groupid'], null, ': ').$tr_row['name']
 								);
 					}
 					$tr_form->addItem(array(S_GROUP.SPACE,$cmbGroup));
@@ -1194,7 +1194,7 @@
 					while($tr_row=DBfetch($tresult)){
 						$cmbHosts->addItem(
 								$tr_row['hostid'],
-								get_node_name_by_elid($tr_row['hostid']).$tr_row['host']
+								get_node_name_by_elid($tr_row['hostid'], null, ': ').$tr_row['host']
 								);
 					}
 

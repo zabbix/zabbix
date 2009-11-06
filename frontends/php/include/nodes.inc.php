@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -157,7 +157,7 @@
 
 		$switch_node = get_request('switch_node', get_profile('web.nodes.switch_node', -1));
 
-		if(!isset($available_nodes[$switch_node]) || !isset($selected_nodeids[$switch_node])) { //check switch_node
+		if(!isset($available_nodes[$switch_node]) || !uint_in_array($switch_node, $selected_nodeids)) { //check switch_node
 			$switch_node = 0;
 		}
 
@@ -171,7 +171,7 @@
 	return $result;
 	}
 
-	function get_node_name_by_elid($id_val, $forse_with_all_nodes = null){
+	function get_node_name_by_elid($id_val, $forse_with_all_nodes = null, $delimiter = ''){
 		global $ZBX_NODES, $ZBX_VIEWED_NODES;
 
 		if($forse_with_all_nodes === false || (is_null($forse_with_all_nodes) && ($ZBX_VIEWED_NODES['selected'] != 0))) {
@@ -183,7 +183,7 @@
 		if ( !isset($ZBX_NODES[$nodeid]) )
 			return null;
 
-		return '['.$ZBX_NODES[$nodeid]['name'].'] ';
+		return $ZBX_NODES[$nodeid]['name'].$delimiter;
 	}
 
 	function is_show_all_nodes(){
