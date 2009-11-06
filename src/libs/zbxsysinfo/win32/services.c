@@ -237,7 +237,7 @@ int	SERVICES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 		service_state = ZBX_SRV_STATE_STOP_PENDING;
 	else if (0 == strcmp(state, "running"))
 		service_state = ZBX_SRV_STATE_RUNNING;
-	else if (0 == strcmp(state, "contunie_pending"))
+	else if (0 == strcmp(state, "continue_pending"))
 		service_state = ZBX_SRV_STATE_CONTINUE_PENDING;
 	else if (0 == strcmp(state, "pause_pending"))
 		service_state = ZBX_SRV_STATE_PAUSE_PENDING;
