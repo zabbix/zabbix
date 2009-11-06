@@ -412,7 +412,7 @@ function condition_value2str($conditiontype, $value){
 			$group = get_hostgroup_by_groupid($value);
 
 			$str_val = '';
-			if(id2nodeid($value) != get_current_nodeid()) $str_val = get_node_name_by_elid($value, true);
+			if(id2nodeid($value) != get_current_nodeid()) $str_val = get_node_name_by_elid($value, true, ': ');
 			$str_val.= $group['name'];
 			break;
 		case CONDITION_TYPE_TRIGGER:
@@ -422,7 +422,7 @@ function condition_value2str($conditiontype, $value){
 		case CONDITION_TYPE_HOST_TEMPLATE:
 			$host = get_host_by_hostid($value);
 			$str_val = '';
-			if(id2nodeid($value) != get_current_nodeid()) $str_val = get_node_name_by_elid($value, true);
+			if(id2nodeid($value) != get_current_nodeid()) $str_val = get_node_name_by_elid($value, true, ': ');
 			$str_val.= $host['host'];
 			break;
 		case CONDITION_TYPE_TRIGGER_NAME:

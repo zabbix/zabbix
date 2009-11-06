@@ -310,7 +310,7 @@ include_once('include/page_header.php');
 			$groupid = $PAGE_GROUPS['selected'];
 			$cmbGroups = new CComboBox('groupid',$groupid,'javascript: submit();');
 			foreach($PAGE_GROUPS['groups'] as $slct_groupid => $name){
-				$cmbGroups->addItem($slct_groupid, get_node_name_by_elid($slct_groupid).$name);
+				$cmbGroups->addItem($slct_groupid, get_node_name_by_elid($slct_groupid, null, ': ').$name);
 			}
 
 			$frmTitle->addItem(array(S_GROUP,SPACE,$cmbGroups));
@@ -330,7 +330,7 @@ include_once('include/page_header.php');
 
 			$cmbHosts = new CComboBox('hostid',$hostid,'javascript: submit();');
 			foreach($PAGE_HOSTS['hosts'] as $tmp_hostid => $name){
-				$cmbHosts->addItem($tmp_hostid, get_node_name_by_elid($tmp_hostid).$name);
+				$cmbHosts->addItem($tmp_hostid, get_node_name_by_elid($tmp_hostid, null, ': ').$name);
 			}
 
 			$frmTitle->addItem(array(SPACE,S_HOST,SPACE,$cmbHosts));
@@ -579,7 +579,7 @@ include_once('include/page_header.php');
 
 		$result = DBselect('select * from usrgrp where '.DBin_node('usrgrpid').' ORDER BY name');
 		while($row = DBfetch($result)){
-			$name = new CSpan(get_node_name_by_elid($row['usrgrpid']).$row['name'],'link');
+			$name = new CSpan(get_node_name_by_elid($row['usrgrpid'], null, ': ').$row['name'],'link');
 
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
 				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
@@ -614,7 +614,7 @@ include_once('include/page_header.php');
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '').
 				(isset($_REQUEST['submit'])?" window.opener.document.getElementsByName('$dstfrm')[0].submit();":'');
 			}
-			$alias = new CSpan(get_node_name_by_elid($row['userid']).$row['alias'], 'link');
+			$alias = new CSpan(get_node_name_by_elid($row['userid'], null, ': ').$row['alias'], 'link');
 			$alias->onClick($action.' close_window(); return false;');
 
 			$table->addRow(array($alias, $row['name'], $row['surname']));
@@ -922,7 +922,7 @@ include_once('include/page_header.php');
 
 		$result=DBselect($sql);
 		while($row=DBfetch($result)){
-			$row['node_name'] = get_node_name_by_elid($row['graphid']);
+			$row['node_name'] = get_node_name_by_elid($row['graphid'], null, ': ');
 			$name = $row['node_name'].$row['host'].':'.$row['name'];
 
 			$description = new CLink($row['name'],'#');

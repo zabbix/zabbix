@@ -154,7 +154,7 @@ include_once('include/page_header.php');
 		while($row = DBFetch($result)){
 			$row['id'] = $row['serviceid'];
 
-			$row['caption'] = array(get_node_name_by_elid($row['serviceid']), $row['caption']);
+			$row['caption'] = array(get_node_name_by_elid($row['serviceid'], null, ': '), $row['caption']);
 
 			if(empty($row['serviceupid'])) $row['serviceupid']='0';
 			if(empty($row['description'])) $row['description']='None';

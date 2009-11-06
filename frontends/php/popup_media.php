@@ -115,7 +115,7 @@ include_once('include/page_header.php');
 	while($type=DBfetch($types)){
 		$cmbType->addItem(
 				$type['mediatypeid'],
-				get_node_name_by_elid($type['mediatypeid']).$type['description']
+				get_node_name_by_elid($type['mediatypeid'], null, ': ').$type['description']
 				);
 	}
 	$frmMedia->addRow(S_TYPE,$cmbType);

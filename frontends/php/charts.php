@@ -180,10 +180,10 @@ include_once('include/page_header.php');
 	$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
 
 	foreach($PAGE_GROUPS['groups'] as $groupid => $name){
-		$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
+		$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid, null, ': ').$name);
 	}
 	foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
-		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
+		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
 	}
 
 	$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
@@ -206,7 +206,7 @@ include_once('include/page_header.php');
 	
 	$db_graphs = CGraph::get($options);
 	foreach($db_graphs as $num => $db_graph){
-		$cmbGraphs->addItem($db_graph['graphid'], get_node_name_by_elid($db_graph['graphid']).$db_graph['name']);
+		$cmbGraphs->addItem($db_graph['graphid'], get_node_name_by_elid($db_graph['graphid'], null, ': ').$db_graph['name']);
 	}
 
 	$r_form->addItem(array(SPACE.S_GRAPH.SPACE,$cmbGraphs));

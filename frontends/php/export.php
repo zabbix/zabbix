@@ -289,7 +289,7 @@ include_once('include/page_header.php');
 		$cmbGroups = new CComboBox('groupid', $selected_groupid, 'javascript: submit();');
 		$cmbGroups->addItem(0, S_ALL_S);
 		foreach($groups as $groupid => $group){
-			$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$group['name']);
+			$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid, null, ': ').$group['name']);
 		}
 		$form->addItem(array(S_GROUP.SPACE, $cmbGroups));
 

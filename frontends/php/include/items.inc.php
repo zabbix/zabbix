@@ -1136,7 +1136,7 @@ COpt::profiling_start('prepare data');
 		$items = array();
 		while($row = DBfetch($result)){
 			$descr = item_description($row);
-			$row['host'] = get_node_name_by_elid($row['hostid']).$row['host'];
+			$row['host'] = get_node_name_by_elid($row['hostid'], null, ': ').$row['host'];
 			$hosts[strtolower($row['host'])] = $row['host'];
 
 // A little tricky check for attempt to overwrite active trigger (value=1) with

@@ -78,7 +78,7 @@ include_once('include/page_header.php');
 
 	$chart_header = '';
 	if(id2nodeid($host['hostid']) != get_current_nodeid()){
-		$chart_header = get_node_name_by_elid($host['hostid'],true);
+		$chart_header = get_node_name_by_elid($host['hostid'],true, ': ');
 	}
 	$chart_header.= $host['host'].':'.get_request('name','');
 

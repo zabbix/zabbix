@@ -307,10 +307,10 @@ include_once('include/page_header.php');
 		$cmbGroups = new CComboBox('groupid', $PAGE_GROUPS['selected'],'javascript: submit();');
 		$cmbHosts = new CComboBox('hostid', $PAGE_HOSTS['selected'],'javascript: submit();');
 		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
-			$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
+			$cmbGroups->addItem($groupid, $name);
 		}
 		foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
-			$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
+			$cmbHosts->addItem($hostid, $name);
 		}
 
 		$form->addItem(array(S_GROUP.SPACE,$cmbGroups));
