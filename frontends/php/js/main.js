@@ -356,7 +356,12 @@ var blink = {
 	blinkobjs: new Array(),
 
 	init: function(){
-		this.blinkobjs = document.getElementsByName("blink");
+
+		if(IE)
+			this.blinkobjs = $$('*[name=blink]');
+		else
+			this.blinkobjs = document.getElementsByName("blink");
+
 		if(this.blinkobjs.length > 0) this.view();
 	},
 	hide: function(){
@@ -774,8 +779,8 @@ function send_params(params){
 					{
 						'method': 'post',
 						'parameters':params,
-						'onSuccess': function(resp){ },
-//						'onSuccess': function(resp){ SDI(resp.responseText); },
+//						'onSuccess': function(resp){ },
+						'onSuccess': function(resp){ SDI(resp.responseText); },
 						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
 					}
 	);
@@ -793,7 +798,7 @@ function setRefreshRate(pmasterid,dollid,interval,params){
 	params['pmasterid'] = 	pmasterid;
 	params['favid'] = 		dollid;
 	params['favcnt'] = 		interval;
-
+//SDJ($params);
 	send_params(params);
 }
 
