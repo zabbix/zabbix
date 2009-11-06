@@ -2676,13 +2676,13 @@
 		}
 
 		$frmTrig->addRow(S_NAME, new CTextBox('description',$description,90, $limited));
-		
+
 		if($input_method == IM_TREE){
 			$alz = analyze_expression($expression);
 			if($alz !== false){
 				list($outline, $node, $map) = $alz;
 				if(isset($_REQUEST['expr_action']) && $node != null){
-					
+
 					$new_expr = remake_expression($node, $_REQUEST['expr_target'], $_REQUEST['expr_action'], $expr_temp, $map);
 					if($new_expr !== false){
 						$expression = $new_expr;
@@ -2693,10 +2693,10 @@
 						show_messages();
 					}
 				}
-		
+
 				$tree = array();
 				create_node_list($node, $tree);
-		
+
 				$frmTrig->addVar('expression',$expression);
 				$exprfname = 'expr_temp';
 				$exprtxt = new CTextBox($exprfname,$expr_temp,65,'yes');
@@ -2707,19 +2707,19 @@
 				$input_method = IM_FORCED;
 			}
 		}
-		
+
 		if($input_method != IM_TREE){
 			$exprfname = 'expression';
 			$exprtxt = new CTextBox($exprfname,$expression,75,$limited);
 			$exprparam = "getSelectedText(this.form.elements['$exprfname'])";
 		}
-		
+
 		$row = array($exprtxt,
 					 new CButton('insert',$input_method == IM_TREE ? S_EDIT : S_SELECT,
 								 "return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->GetName().
 								 "&dstfld1=${exprfname}&srctbl=expression".
 								 "&srcfld1=expression&expression=' + escape($exprparam),800,200);"));
-		
+
 		if(isset($macrobtn)) array_push($row, $macrobtn);
 		if($input_method == IM_TREE){
 			array_push($row, BR());
@@ -2745,18 +2745,18 @@
 
 			$exprtitle[] = array(SPACE, '(', $btn_im, ')');
 		}
-		
+
 		$frmTrig->addRow($exprtitle, $row);
-		
+
 		if($input_method == IM_TREE){
 			$exp_table = new CTable();
 			$exp_table->setClass('tableinfo');
 			$exp_table->setAttribute('id','exp_list');
 			$exp_table->setOddRowClass('even_row');
 			$exp_table->setEvenRowClass('even_row');
-			
+
 			$exp_table->setHeader(array(S_TARGET, S_EXPRESSION, S_DELETE));
-		
+
 			if($node != null){
 				$exprs = make_disp_tree($tree, $map, true);
 				foreach($exprs as $i => $e){
@@ -2771,9 +2771,9 @@
 			else{
 				$outline = '';
 			}
-		
+
 			$frmTrig->addVar('remove_expression', '');
-		
+
 			$btn_test = new CButton('test_expression', S_TEST,
 									"openWinCentered(".
 									"'tr_testexpr.php?expression=' + encodeURIComponent(this.form.elements['expression'].value)".
@@ -2855,7 +2855,7 @@
 		$frmTrig->addItemToBottomRow(SPACE);
 		$frmTrig->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param("hostid")));
 		$frmTrig->show();
-		
+
 		$jsmenu = new CPUMenu(null,170);
 		$jsmenu->InsertJavaScript();
 	}

@@ -90,18 +90,18 @@ private static $transaction = array('counter' => 0);
 	protected static function setError($method, $errno=ZBX_API_ERROR_INTERNAL, $error='Unknown ZABBIX internal error'){
 		self::$error[] = array('error' => $errno, 'data' => "[ $method ] $error");
 	}
-	
+
 	protected static function setMethodErrors($method, $errors){
 		global $ZBX_MESSAGES;
-		
-		if(empty($errors)){			
+
+		if(empty($errors)){
 			$php_error = end($ZBX_MESSAGES);
 			while($php_error && ($php_error['type'] != 'error')){
 				$php_error = prev($ZBX_MESSAGES);
 			}
-			
+
 			$php_error = $php_error ? $php_error['message'] : null;
-			
+
 			if(is_null($php_error)){
 				self::setError($method);
 			}
@@ -114,7 +114,7 @@ private static $transaction = array('counter' => 0);
 				self::setError($method, $error['errno'], $error['error']);
 			}
 		}
-		
+
 	}
 
 	public static function clearErrors(){

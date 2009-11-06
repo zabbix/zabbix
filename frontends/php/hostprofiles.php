@@ -48,7 +48,7 @@
 		if(empty($res))
 			access_deny();
 	}
-	
+
 
 	if(isset($_REQUEST['groupid'])){
 		update_profile('web.'.$page['menu'].'.groupid', $_REQUEST['groupid'], PROFILE_TYPE_ID);
@@ -56,10 +56,10 @@
 	else{
 		$_REQUEST['groupid'] = get_profile('web.'.$page['menu'].'.groupid', 0);
 	}
-	
+
 	$_REQUEST['prof_type'] = get_request('prof_type', 0);
-	
-// get groups {{{	
+
+// get groups {{{
 	$options = array(
 		'nodeids' => get_current_nodeid(),
 		'real_hosts' => 1,
@@ -72,8 +72,8 @@
 		$groupids[] = $group['groupid'];
 	}
 // }}} get groups
-	
-	
+
+
 	$sortfield = getPageSortField('host');
 	$sortorder = getPageSortOrder();
 	$options = array(
@@ -91,7 +91,7 @@
 		$options['groupids'] = $groupids;
 	}
 	$hosts = CHost::get($options);
-	
+
 
 // unset hosts without profiles, and copy some profile fileds to the uppers array level for sorting
 	$pr = ($_REQUEST['prof_type'] == 0) ? 'profile' : 'profile_ext';
@@ -113,10 +113,10 @@
 				$hosts[$num]['pre_device_hw_arch'] = $host['profile_ext']['device_hw_arch'];
 				$hosts[$num]['pre_device_type'] = $host['profile_ext']['device_type'];
 				$hosts[$num]['pre_device_status'] = $host['profile_ext']['device_status'];
-			}		
+			}
 		}
 	}
-	
+
 	$hostprof_wdgt = new CWidget();
 
 	$profile_form = new CForm(null, 'get');
@@ -129,7 +129,7 @@
 
 	$hostprof_wdgt->addPageHeader(S_HOST_PROFILES_BIG, $profile_form);
 
-	
+
 	if($_REQUEST['hostid'] > 0){
 		echo SBR;
 
@@ -144,7 +144,7 @@
 
 		$r_form = new CForm(null, 'get');
 		$r_form->addVar('prof_type', $_REQUEST['prof_type']);
-		
+
 		$cmbGroups = new CComboBox('groupid', $_REQUEST['groupid'], 'javascript: submit();');
 		$cmbGroups->addItem(0, S_ALL_S);
 		order_result($groups, 'name');
@@ -152,21 +152,21 @@
 			$cmbGroups->addItem($group['groupid'], get_node_name_by_elid($group['groupid'], null, ': ').$group['name']);
 		}
 		$r_form->addItem(array(S_GROUP.SPACE, $cmbGroups));
-		
+
 		$hostprof_wdgt->addHeader(S_HOSTS_BIG, $r_form);
-		
+
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 		$hostprof_wdgt->addHeader($numrows);
 
-		
+
 		order_result($hosts, $sortfield, $sortorder);
 		$paging = getPagingLine($hosts);
-		
-		
+
+
 		$table = new CTableInfo();
-		
-		if(0 == $_REQUEST['prof_type']){	
+
+		if(0 == $_REQUEST['prof_type']){
 			$table->setHeader(array(
 				is_show_all_nodes() ? make_sorting_header(S_NODE, 'hostid') : null,
 				make_sorting_header(S_HOST, 'host'),
@@ -190,14 +190,14 @@
 			);
 		}
 
-		foreach($hosts as $host){	
+		foreach($hosts as $host){
 			$host_groups = array();
 			foreach($host['groups'] as $group){
 				$host_groups[] = $group['name'];
 			}
 			natcasesort($host_groups);
 			$host_groups = implode(', ', $host_groups);
-		
+
 			$row = array(
 				get_node_name_by_elid($host['hostid']),
 				new CLink($host['host'],'?hostid='.$host['hostid'].url_param('groupid').'&prof_type='.$_REQUEST['prof_type']),
@@ -215,7 +215,7 @@
 				$row[] = $host['profile_ext']['device_type'];
 				$row[] = $host['profile_ext']['device_status'];
 			}
-			
+
 			$table->addRow($row);
 		}
 
@@ -225,6 +225,6 @@
 
 	$hostprof_wdgt->show();
 
-	
+
 include_once('include/page_footer.php');
 ?>

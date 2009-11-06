@@ -996,13 +996,13 @@
 				update_profile($idx.'.period',$_REQUEST['period'],PROFILE_TYPE_INT, $idx2);
 			else
 				$_REQUEST['period'] = get_profile($idx.'.period', ZBX_PERIOD_DEFAULT, $idx2);
-				
+
 			if(isset($_REQUEST['stime']))
 				update_profile($idx.'.stime',$_REQUEST['stime'], PROFILE_TYPE_STR, $idx2);
 			else
 				$_REQUEST['stime'] = get_profile($idx.'.stime', null, $idx2);
 		}
-	
+
 		$_REQUEST['period'] = get_request('period', ZBX_PERIOD_DEFAULT);
 		$_REQUEST['stime'] = get_request('stime', null);
 

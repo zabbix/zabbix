@@ -135,7 +135,7 @@ include_once('include/page_header.php');
 	$form->setMethod('get');
 
 	$form->addVar('fullscreen',$_REQUEST['fullscreen']);
-	
+
 	$form->addVar('period', $_REQUEST['period']);
 	$form->addVar('stime', $_REQUEST['stime']);
 

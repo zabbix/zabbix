@@ -95,9 +95,9 @@ include_once('include/page_header.php');
 				// TODO check permission by new value.
 //				$result=update_screen($_REQUEST['screenid'],$_REQUEST['name'],$_REQUEST['hsize'],$_REQUEST['vsize']);
 				$result = CScreen::update(array(
-					'screenid' => $_REQUEST['screenid'], 
-					'name' => $_REQUEST['name'], 
-					'hsize' => $_REQUEST['hsize'], 
+					'screenid' => $_REQUEST['screenid'],
+					'name' => $_REQUEST['name'],
+					'hsize' => $_REQUEST['hsize'],
 					'vsize' => $_REQUEST['vsize']
 				));
 				if(!$result){
@@ -308,22 +308,22 @@ include_once('include/page_header.php');
 				S_DIMENSION_COLS_ROWS,
 				S_SCREEN)
 			);
-			
+
 			$sortfield = getPageSortField('name');
 			$sortorder = getPageSortOrder();
 			$options = array(
-				'editable' => 1, 
-				'extendoutput' => 1, 
+				'editable' => 1,
+				'extendoutput' => 1,
 				'sortfield' => $sortfield,
 				'sortorder' => $sortorder,
 				'limit' => ($config['search_limit']+1)
 			);
 
 			$screens = CScreen::get($options);
-			
+
 			order_result($screens, $sortfield, $sortorder);
 			$paging = getPagingLine($screens);
-			
+
 			foreach($screens as $num => $screen){
 				$table->addRow(array(
 					new CCheckBox('screens['.$screen['screenid'].']', NULL, NULL, $screen['screenid']),
@@ -345,7 +345,7 @@ include_once('include/page_header.php');
 			zbx_add_post_js('chkbxRange.pageGoName = "screens";');
 //---------
 			$footer = get_table_header(array($goBox, $goButton));
-			
+
 			$table = array($paging, $table, $paging, $footer);
 			$form->addItem($table);
 
