@@ -2158,7 +2158,7 @@
 				while($db_valuemap = DBfetch($db_valuemaps))
 					$cmbMap->addItem(
 						$db_valuemap['valuemapid'],
-						get_node_name_by_elid($db_valuemap['valuemapid']).$db_valuemap['name']
+						get_node_name_by_elid($db_valuemap['valuemapid'], null, ': ').$db_valuemap['name']
 						);
 			}
 
@@ -2233,7 +2233,7 @@
 	        while($group=DBfetch($groups)){
 				$cmbGroups->addItem(
 					$group['groupid'],
-					get_node_name_by_elid($group['groupid']).$group['name']
+					get_node_name_by_elid($group['groupid'], null, ': ').$group['name']
 					);
 	        }
 		$frmItem->addRow(S_GROUP,$cmbGroups);
@@ -2421,7 +2421,7 @@
 		while($db_valuemap = DBfetch($db_valuemaps))
 			$cmbMap->addItem(
 					$db_valuemap["valuemapid"],
-					get_node_name_by_elid($db_valuemap["valuemapid"]).$db_valuemap["name"]
+					get_node_name_by_elid($db_valuemap["valuemapid"], null, ': ').$db_valuemap["name"]
 					);
 
 		$link = new CLink("throw map","config.php?config=6");
@@ -6204,7 +6204,7 @@
  		$db_hosts=DBselect($sql);
 
  		while($db_host=DBfetch($db_hosts)){
- 			$cmbHosts->addItem($db_host['hostid'],get_node_name_by_elid($db_host['hostid']).$db_host['host']);
+ 			$cmbHosts->addItem($db_host['hostid'],get_node_name_by_elid($db_host['hostid'], null, ': ').$db_host['host']);
  		}
 
  		$frmHostT->addRow(S_HOSTS,$cmbHosts->Get(S_HOSTS.SPACE.S_IN,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE,$cmbGroups)));
@@ -6259,7 +6259,7 @@
 		while($row=DBfetch($result)){
 			$cmbImg->addItem(
 					$row["imageid"],
-					get_node_name_by_elid($row["imageid"]).$row["name"]
+					get_node_name_by_elid($row["imageid"], null, ': ').$row["name"]
 					);
 		}
 
@@ -6485,7 +6485,7 @@
 
 		$result = DBselect('SELECT * FROM images WHERE imagetype=1 AND '.DBin_node('imageid').' order by name');
 		while($row=DBfetch($result)){
-			$row['name'] = get_node_name_by_elid($row['imageid']).$row['name'];
+			$row['name'] = get_node_name_by_elid($row['imageid'], null, ': ').$row['name'];
 
 			$cmbIconOff->addItem($row['imageid'],$row['name']);
 			$cmbIconOn->addItem($row['imageid'],$row['name']);

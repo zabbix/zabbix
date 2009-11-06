@@ -161,7 +161,7 @@ include_once('include/page_header.php');
 
 		$cmbElements->addItem(
 				$row['elementid'],
-				get_node_name_by_elid($row['elementid']).$row['name']
+				get_node_name_by_elid($row['elementid'], null, ': ').$row['name']
 				);
 		if((bccomp($elementid , $row['elementid']) == 0)) $element_correct = 1;
 		if(!isset($first_element)) $first_element = $row['elementid'];
@@ -202,7 +202,7 @@ include_once('include/page_header.php');
 
 		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
 		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
-			$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
+			$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid, null, ': ').$name);
 		}
 		$form->addItem(array(SPACE.S_GROUP.SPACE,$cmbGroups));
 
@@ -210,7 +210,7 @@ include_once('include/page_header.php');
 		$PAGE_HOSTS['hosts']['0'] = S_DEFAULT;
 		$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
 		foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
-			$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
+			$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
 		}
 		$form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 	}

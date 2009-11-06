@@ -145,10 +145,10 @@ include_once 'include/page_header.php';
 	$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
 
 	foreach($PAGE_GROUPS['groups'] as $groupid => $name){
-		$cmbGroup->addItem($groupid, get_node_name_by_elid($groupid).$name);
+		$cmbGroup->addItem($groupid, get_node_name_by_elid($groupid, null, ': ').$name);
 	}
 	foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
-		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
+		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
 	}
 
 	$r_form->addItem(array(S_GROUP.SPACE,$cmbGroup));

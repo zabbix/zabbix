@@ -253,7 +253,7 @@ if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0) && !isset($available_ho
 		$db_hosts=DBselect($sql);
 		while($db_host=DBfetch($db_hosts)){
 			$cmbHosts->addItem($db_host['hostid'],
-					get_node_name_by_elid($db_host['hostid']).$db_host["host"],
+					get_node_name_by_elid($db_host['hostid'], null, ': ').$db_host["host"],
 					NULL,
 					($db_host["proxy_hostid"] == 0 || ($_REQUEST['hostid']>0) && ($db_host["proxy_hostid"] == $_REQUEST['hostid'])));
 		}

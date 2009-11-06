@@ -712,7 +712,7 @@
 		while($row = DBfetch($result))
 			$cmbUsrGrp->addItem(
 					$row['usrgrpid'],
-					get_node_name_by_elid($row['usrgrpid']).$row['name']
+					get_node_name_by_elid($row['usrgrpid'], null, ': ').$row['name']
 					);
 		$frmOther->addRow(S_USER_GROUP_FOR_DATABASE_DOWN_MESSAGE, $cmbUsrGrp);
 

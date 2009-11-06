@@ -103,7 +103,7 @@ include_once('include/page_header.php');
 			$all_maps[0] = $row['sysmapid'];
 
 		$all_maps[$row['sysmapid']] =
-			get_node_name_by_elid($row['sysmapid']).
+			get_node_name_by_elid($row['sysmapid'], null, ': ').
 			$row['name'];
 	}
 

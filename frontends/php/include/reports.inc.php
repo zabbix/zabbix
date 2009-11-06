@@ -47,10 +47,10 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 	$cmbHosts = new CComboBox('filter_hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
 
 	foreach($PAGE_GROUPS['groups'] as $groupid => $name){
-		$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid).$name);
+		$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid, null, ': ').$name);
 	}
 	foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
-		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$name);
+		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
 	}
 
 	$filterForm->addRow(S_GROUP,$cmbGroups);
@@ -87,7 +87,7 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 		while($row=DBfetch($result)){
 			$cmbHGrps->addItem(
 				$row['groupid'],
-				get_node_name_by_elid($row['groupid']).$row['name']
+				get_node_name_by_elid($row['groupid'], null, ': ').$row['name']
 				);
 		}
 
@@ -108,7 +108,7 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 		while($row=DBfetch($result)){
 			$cmbTrigs->addItem(
 					$row['triggerid'],
-					get_node_name_by_elid($row['triggerid']).expand_trigger_description($row['triggerid'])
+					get_node_name_by_elid($row['triggerid'], null, ': ').expand_trigger_description($row['triggerid'])
 					);
 		}
 

@@ -83,7 +83,7 @@ include_once('include/page_header.php');
 	while($drule = DBfetch($db_drules))
 		$cmbDRules->addItem(
 				$drule['druleid'],
-				get_node_name_by_elid($drule['druleid']).$drule['name']
+				get_node_name_by_elid($drule['druleid'], null, ': ').$drule['name']
 				);
 	$r_form->addVar('fullscreen', $fullscreen);
 	$r_form->addItem(array(S_DISCOVERY_RULE.SPACE,$cmbDRules));

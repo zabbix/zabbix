@@ -2202,7 +2202,7 @@ return $result;
 		while($row = DBfetch($result)){
 			if(trigger_dependent($row['triggerid']))	continue;
 
-			$row['host'] = get_node_name_by_elid($row['hostid']).$row['host'];
+			$row['host'] = get_node_name_by_elid($row['hostid'], null, ': ').$row['host'];
 			$row['description'] = expand_trigger_description_constants($row['description'], $row);
 
 			$hosts[strtolower($row['host'])] = $row['host'];

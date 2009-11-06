@@ -238,7 +238,7 @@ include_once('include/page_header.php');
 		foreach($db_hosts as $hostid => $db_host){
 // add all except selected hosts
 			if(!isset($hosts[$hostid]))
-				$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$db_host['host']);
+				$cmbHosts->addItem($hostid, $db_host['host']);
 		}
 
 // select selected hosts and add them
@@ -250,7 +250,7 @@ include_once('include/page_header.php');
 			'extendoutput' => 1);
 		$db_hosts = CHost::get($params);
 		foreach($db_hosts as $hostid => $db_host){
-			$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid).$db_host['host']);
+			$cmbHosts->addItem($hostid, $db_host['host']);
 		}
 
 		$frmHostG->addRow(S_HOSTS, $cmbHosts->Get(S_HOSTS.SPACE.S_IN,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE, $cmbGroups)));
