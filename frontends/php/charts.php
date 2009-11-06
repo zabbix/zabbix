@@ -44,7 +44,6 @@ include_once('include/page_header.php');
 		'period'=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	null,NULL),
 		'stime'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	NULL,NULL),
 		'action'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'go','add','remove'"),NULL),
-		'reset'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'reset'"),NULL),
 		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN('0,1'),NULL),
 
 //ajax
@@ -157,8 +156,6 @@ include_once('include/page_header.php');
 	$available_groups= $PAGE_GROUPS['groupids'];
 	$available_hosts = $PAGE_HOSTS['hostids'];
 
-	$available_graphs = get_accessible_graphs(PERM_READ_LIST, $available_hosts, PERM_RES_IDS_ARRAY, get_current_nodeid(true));
-
 	if(($_REQUEST['graphid']>0) && ($row=DBfetch(DBselect('SELECT DISTINCT graphid, name FROM graphs WHERE graphid='.$_REQUEST['graphid'])))){
 		if(!graph_accessible($_REQUEST['graphid'])){
 			update_profile('web.charts.graphid',0);
@@ -195,34 +192,21 @@ include_once('include/page_header.php');
 	$cmbGraphs = new CComboBox('graphid',$_REQUEST['graphid'],'submit()');
 	$cmbGraphs->addItem(0,S_SELECT_GRAPH_DOT_DOT_DOT);
 
-	$sql_from = '';
-	$sql_where = '';
+	$options = array();
+	$options['extendoutput'] = 1;
+	$options['sortfield'] = 'name';
+	
 	if($_REQUEST['groupid'] > 0){
-		$sql_from .= ',hosts_groups hg ';
-		$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
+		$options['groupids'] = $_REQUEST['groupid'];
 	}
+
 	if($_REQUEST['hostid'] > 0){
-		$sql_where.= ' AND h.hostid='.$_REQUEST['hostid'];
+		$options['hostids'] = $_REQUEST['hostid'];
 	}
-
-	$sql = 'SELECT DISTINCT g.graphid,g.name '.
-		' FROM graphs g,graphs_items gi,items i,hosts h'.$sql_from.
-		' WHERE gi.graphid=g.graphid '.
-			' AND i.itemid=gi.itemid '.
-			' AND h.hostid=i.hostid '.
-			' AND h.status='.HOST_STATUS_MONITORED.
-			$sql_where.
-
-			' AND '.DBin_node('g.graphid').
-			' AND '.DBcondition('g.graphid',$available_graphs).
-		' ORDER BY g.name';
-
-	$result = DBselect($sql);
-	while($row=DBfetch($result)){
-		$cmbGraphs->addItem(
-				$row['graphid'],
-				get_node_name_by_elid($row['graphid']).$row['name']
-				);
+	
+	$db_graphs = CGraph::get($options);
+	foreach($db_graphs as $num => $db_graph){
+		$cmbGraphs->addItem($db_graph['graphid'], get_node_name_by_elid($db_graph['graphid']).$db_graph['name']);
 	}
 
 	$r_form->addItem(array(SPACE.S_GRAPH.SPACE,$cmbGraphs));
@@ -280,8 +264,7 @@ include_once('include/page_header.php');
 
 		$rst_icon = new CDiv(SPACE,'iconreset');
 		$rst_icon->setAttribute('title',S_RESET);
-		$rst_icon->addAction('onclick',new CJSscript("javascript: var rst = new Curl(); rst.setArgument('stime', 20300000000000); rst.setArgument('period',".ZBX_PERIOD_DEFAULT."); location.href = rst.getUrl();"));
-
+		$rst_icon->addAction('onclick',new CJSscript("javascript: timeControl.objectReset('".$_REQUEST['graphid']."');"));
 	}
 
 	$charts_wdgt->addPageHeader(S_GRAPHS_BIG,array($icon,$rst_icon,$fs_icon));
@@ -305,7 +288,7 @@ include_once('include/page_header.php');
 		}
 
 		$objData = array(
-			'id' => $dom_graph_id,
+			'id' => $_REQUEST['graphid'],
 			'domid' => $dom_graph_id,
 			'containerid' => $containerid,
 			'src' => $src,

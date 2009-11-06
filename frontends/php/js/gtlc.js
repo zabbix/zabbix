@@ -38,14 +38,14 @@ debug_status: 	0,			// debug status: 0 - off, 1 - on, 2 - SDI;
 debug_info: 	'',			// debug string
 debug_prev:		'',			// don't log repeated fnc
 
-addObject: function(id, time, objData){
-	this.debug('addObject', id);
+addObject: function(domid, time, objData){
+	this.debug('addObject', domid);
 
-	this.objectList[id] = {
+	this.objectList[domid] = {
 		'processed': 0,
-		'id': id,
+		'id': domid,
 		'containerid': null,
-		'domid': id,
+		'domid': domid,
 		'time': {},
 		'objDims': {},
 		'src': location.href,
@@ -57,8 +57,8 @@ addObject: function(id, time, objData){
 		'mainObject': 0			// object on changing will reflect on all others
 	}
 
-	for(key in this.objectList[id]){
-		if(isset(key, objData)) this.objectList[id][key] = objData[key];
+	for(key in this.objectList[domid]){
+		if(isset(key, objData)) this.objectList[domid][key] = objData[key];
 	}
 	
 	var now = new Date();
@@ -68,8 +68,8 @@ addObject: function(id, time, objData){
 	if(!isset('starttime', time))	time.starttime = time.endtime - 3*time.period;
 	if(!isset('usertime', time))	time.usertime = time.endtime;
 	
-	this.objectList[id].time = time;
-	this.objectList[id].timeline = create_timeline(this.objectList[id].id, 
+	this.objectList[domid].time = time;
+	this.objectList[domid].timeline = create_timeline(this.objectList[domid].domid, 
 									  parseInt(time.period), 
 									  parseInt(time.starttime), 
 									  parseInt(time.usertime), 
@@ -109,8 +109,8 @@ processObjects: function(){
 			obj.src = g_url.getUrl();
 		}
 
-		if(obj.loadImage) this.addImage(obj.id);
-		else if(obj.loadScroll) this.addScroll(null,obj.id);
+		if(obj.loadImage) this.addImage(obj.domid);
+		else if(obj.loadScroll) this.addScroll(null,obj.domid);
 
 //		addListener(g_img, 'load', function(){addTimeControl(domobjectid, time, loadSBox); })
 //		g_img.onload = function(){ addTimeControl(key); };		
@@ -193,25 +193,27 @@ addScroll: function(e, objid){
 //SDI('scrollCreate');
 },
 
-objectUpdate: function(id, timelineid){
-	this.debug('objectUpdate', id);
+objectUpdate: function(domid, timelineid){
+	this.debug('objectUpdate', domid);
 
-	if(!isset(id, this.objectList)) throw('timeControl: Object is not declared "'+graphid+'"');
+	if(!isset(domid, this.objectList)) throw('timeControl: Object is not declared "'+domid+'"');
 	
-	var obj = this.objectList[id];
+	var obj = this.objectList[domid];
 		
 	var usertime = ZBX_TIMELINES[timelineid].usertime();
 	var period = ZBX_TIMELINES[timelineid].period();
 	var now = ZBX_TIMELINES[timelineid].now()
 	
-	if(now) usertime += 86400*31;
+	if(now) usertime += 86400*356;
 	
 	var date = datetoarray(usertime - period);
 	var url_stime = ''+date[2]+date[1]+date[0]+date[3]+date[4];
 	
 	if(obj.dynamic){
-		if(obj.mainObject){
+// AJAX update of starttime and period
+		this.updateProfile(obj.id, url_stime, period);
 
+		if(obj.mainObject){
 			for(var key in this.objectList){
 				if(empty(this.objectList[key])) continue;
 
@@ -227,19 +229,16 @@ objectUpdate: function(id, timelineid){
 						if(this.objectList[key].loadImage && !is_null($(obj.domid))) ZBX_SCROLLBARS[key].disabled = 1;
 					}
 				}
-			}
-			
-// AJAX update of starttime and period
-			this.updateProfile(id, url_stime, period);
+			}			
 		}
 		else{
 			this.loadDynamic(obj.domid, url_stime, period);
 			
-			if(isset(id, ZBX_SCROLLBARS)){
-				ZBX_SCROLLBARS[id].setBarPosition();
-				ZBX_SCROLLBARS[id].setGhostByBar();
-				ZBX_SCROLLBARS[id].setTabInfo();
-				if(!is_null($(obj.domid))) ZBX_SCROLLBARS[id].disabled = 1;
+			if(isset(domid, ZBX_SCROLLBARS)){
+				ZBX_SCROLLBARS[domid].setBarPosition();
+				ZBX_SCROLLBARS[domid].setGhostByBar();
+				ZBX_SCROLLBARS[domid].setTabInfo();
+				if(!is_null($(obj.domid))) ZBX_SCROLLBARS[domid].disabled = 1;
 			}
 
 		}
@@ -254,6 +253,42 @@ objectUpdate: function(id, timelineid){
 //	alert(uri.getUrl());
 		location.href = url.getUrl();
 	}
+},
+
+objectReset: function(id){
+// unix timestamp
+	var usertime = 1600000000;
+
+	var period = 3600;
+	var url_stime = 201911051255;
+	
+	this.updateProfile(id, url_stime, period);
+	
+	for(var key in this.objectList){
+		if(empty(this.objectList[key])) continue;
+
+		if(this.objectList[key].dynamic){
+			this.objectList[key].timeline.period(period);
+			this.objectList[key].timeline.usertime(usertime);
+			this.loadDynamic(this.objectList[key].domid, url_stime, period);
+			
+			if(isset(key, ZBX_SCROLLBARS)){
+				ZBX_SCROLLBARS[key].setBarPosition();
+				ZBX_SCROLLBARS[key].setGhostByBar();
+				ZBX_SCROLLBARS[key].setTabInfo();
+				if(this.objectList[key].loadImage) ZBX_SCROLLBARS[key].disabled = 1;
+			}
+		}
+		else if(!this.objectList[key].dynamic){
+			url = new Curl(location.href);
+			url.unsetArgument('stime');
+			url.unsetArgument('period');
+			url.unsetArgument('output');
+	
+//	alert(uri.getUrl());
+			location.href = url.getUrl();
+		}
+	}	
 },
 
 loadDynamic: function(id, stime, period){
@@ -280,6 +315,7 @@ updateProfile: function(id, stime, period){
 	var params = new Array();
 	params['favobj'] = 'timeline';
 	params['favid'] = id;
+	params['graphid'] = id;
 	params['period'] = period;
 	params['stime'] = stime;
 

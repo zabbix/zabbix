@@ -576,7 +576,7 @@ COpt::profiling_stop('history');
 			$objData = array();
 
 			if(isset($dom_graph_id)){
-				$objData['id'] = $dom_graph_id;
+				$objData['id'] = $_REQUEST['itemid'];
 				$objData['domid'] = $dom_graph_id;
 				$objData['containerid'] = $containerid;
 				$objData['src'] = $src;
@@ -590,7 +590,7 @@ COpt::profiling_stop('history');
 			else{
 				$dom_graph_id = 'graph';
 
-				$objData['id'] = $dom_graph_id;
+				$objData['id'] = $_REQUEST['itemid'];
 				$objData['domid'] = $dom_graph_id;
 				$objData['loadSBox'] = 0;
 				$objData['loadImage'] = 0;

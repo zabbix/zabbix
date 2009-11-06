@@ -56,7 +56,7 @@ class CGraph extends CZBXAPI{
 		$userid = $USER_DETAILS['userid'];
 		$result = array();
 
-		$sort_columns = array('graphid'); // allowed columns for sorting
+		$sort_columns = array('graphid','name'); // allowed columns for sorting
 
 		$sql_parts = array(
 			'select' => array('graphs' => 'g.graphid'),
@@ -168,6 +168,8 @@ class CGraph extends CZBXAPI{
 
 // graphids
 		if(!is_null($options['graphids'])){
+			zbx_value2array($options['graphids']);
+
 			$sql_parts['where'][] = DBcondition('g.graphid', $options['graphids']);
 		}
 

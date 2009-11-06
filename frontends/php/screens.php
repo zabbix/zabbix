@@ -236,7 +236,7 @@ include_once('include/page_header.php');
 
 			$dom_graph_id = 'screen_scroll';
 			$objData = array(
-				'id' => $dom_graph_id,
+				'id' => $_REQUEST['elementid'],
 				'domid' => $dom_graph_id,
 				'loadSBox' => 0,
 				'loadImage' => 0,
