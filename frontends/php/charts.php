@@ -62,13 +62,13 @@ include_once('include/page_header.php');
 		if('hat' == $_REQUEST['favobj']){
 			update_profile('web.charts.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
-		
+
 		if('timeline' == $_REQUEST['favobj']){
 			if(isset($_REQUEST['graphid']) && isset($_REQUEST['period'])){
 				navigation_bar_calc('web.graph',$_REQUEST['graphid']);
 			}
 		}
-		
+
 		if(str_in_array($_REQUEST['favobj'],array('itemid','graphid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
@@ -195,7 +195,7 @@ include_once('include/page_header.php');
 	$options = array();
 	$options['extendoutput'] = 1;
 	$options['sortfield'] = 'name';
-	
+
 	if($_REQUEST['groupid'] > 0){
 		$options['groupids'] = $_REQUEST['groupid'];
 	}
@@ -203,7 +203,7 @@ include_once('include/page_header.php');
 	if($_REQUEST['hostid'] > 0){
 		$options['hostids'] = $_REQUEST['hostid'];
 	}
-	
+
 	$db_graphs = CGraph::get($options);
 	foreach($db_graphs as $num => $db_graph){
 		$cmbGraphs->addItem($db_graph['graphid'], get_node_name_by_elid($db_graph['graphid'], null, ': ').$db_graph['name']);

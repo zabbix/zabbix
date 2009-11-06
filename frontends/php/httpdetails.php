@@ -86,7 +86,7 @@ include_once('include/page_header.php');
 	if(!$httptest_data = DBfetch(DBselect($sql))){
 		access_deny();
 	}
-	
+
 	$effectiveperiod = navigation_bar_calc('web.httptest',$_REQUEST['httptestid']);
 ?>
 <?php

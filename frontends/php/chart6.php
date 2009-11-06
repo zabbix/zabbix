@@ -55,7 +55,7 @@ include_once 'include/page_header.php';
 	else zbx_valueTo($db_data, array('object'=>1));
 
 	$effectiveperiod = navigation_bar_calc('web.graph',$_REQUEST['graphid']);
-	
+
 	$graph = new CPie($db_data['graphtype']);
 
 	if(isset($_REQUEST['period']))		$graph->setPeriod($_REQUEST['period']);

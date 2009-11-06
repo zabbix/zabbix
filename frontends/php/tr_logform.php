@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2007 SIA Zabbix
 **
@@ -35,7 +35,7 @@ $strltype = array();
 $strltype[] = 'log[%';
 $strltype[] = 'eventlog[%';
 $strltype[] = 'snmptraps';
-	
+
 include_once('include/page_header.php');
 ?>
 <?php
@@ -52,7 +52,7 @@ include_once('include/page_header.php');
 		'groupid'=>			array(T_ZBX_INT, O_OPT,	 P_SYS,		DB_ID,	null),
 		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,		DB_ID,	null),
 		'triggerid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,		DB_ID,	null),
-		
+
 		'type'=>			array(T_ZBX_INT, O_OPT,  NULL, 		IN('0,1'),	null),
 		'priority'=>		array(T_ZBX_INT, O_OPT,  NULL, 		IN('0,1,2,3,4,5'),	'isset({save_trigger})'),
 		'expressions'=>		array(T_ZBX_STR, O_OPT,	 NULL,		NOT_EMPTY,	'isset({save_trigger})'),
@@ -65,16 +65,16 @@ include_once('include/page_header.php');
 		'keys'=> 			array(T_ZBX_STR, O_OPT,  NULL,		NULL,	NULL),
 		'ltype'=> 			array(T_ZBX_INT, O_OPT,  NULL,		IN('0,1,2'),NULL)
 	);
-	
+
 	check_fields($fields);
-							
+
 	$itemid = get_request('itemid',0);
 
 //------------------------ <ACTIONS> ---------------------------
 if(isset($_REQUEST['save_trigger'])){
 
 	show_messages();
-	
+
 	$expression = construct_expression($_REQUEST['itemid'],get_request('expressions',array()));
 //SDII($_REQUEST);
 	if($expression){
@@ -83,13 +83,13 @@ if(isset($_REQUEST['save_trigger'])){
 		$now=time();
 		if(isset($_REQUEST['status']))	{ $status=TRIGGER_STATUS_DISABLED; }
 		else{ $status=TRIGGER_STATUS_ENABLED; }
-		
+
 		//if(isset($_REQUEST['type']))	{ $type=TRIGGER_MULT_EVENT_ENABLED; }
 		//else{ $type=TRIGGER_MULT_EVENT_DISABLED; }
 		$type=TRIGGER_MULT_EVENT_ENABLED;
-	
+
 		$deps = get_request('dependences',array());
-	
+
 		if(isset($_REQUEST['triggerid'])){
 			$trigger_data = get_trigger_by_triggerid($_REQUEST['triggerid']);
 			if($trigger_data['templateid']){
@@ -106,22 +106,22 @@ if(isset($_REQUEST['save_trigger'])){
 			$trigger['status'] = $status;
 			$trigger['comments'] = $_REQUEST['comments'];
 			$trigger['url'] = $_REQUEST['url'];
-			
+
 			DBstart();
 			$result = CTrigger::update($trigger);
 //			update_trigger($_REQUEST['triggerid'],$expression,$_REQUEST["description"],$type,$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],$deps, $trigger_data['templateid']);
-	
+
 			$result &= CTrigger::deleteDependencies($trigger);
 			$result &= CTrigger::addDependencies($deps);
 
 //REVERT
 			$result = DBend($result);
-			
+
 			$triggerid = $_REQUEST['triggerid'];
 			$audit_action = AUDIT_ACTION_UPDATE;
-	
+
 			show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
-		} 
+		}
 		else {
 			$trigger = array();
 			$trigger['expression'] = $expression;
@@ -131,14 +131,14 @@ if(isset($_REQUEST['save_trigger'])){
 			$trigger['status'] = $status;
 			$trigger['comments'] = $_REQUEST['comments'];
 			$trigger['url'] = $_REQUEST['url'];
-			
+
 			DBstart();
 			if($triggerid = CTrigger::add($trigger)){
 				$result = zbx_valueTo($triggerid, array('field' => 'triggerid'));
 			}
-			
+
 //			$triggerid=add_trigger($expression,$_REQUEST["description"],$type,$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],$deps);
-	
+
 			$result &= CTrigger::addDependencies($deps);
 
 //REVERT
@@ -146,10 +146,10 @@ if(isset($_REQUEST['save_trigger'])){
 
 			$result = $triggerid;
 			$audit_action = AUDIT_ACTION_ADD;
-	
+
 			show_messages($triggerid, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 		}
-	
+
 		if($result){
 			add_audit($audit_action, AUDIT_RESOURCE_TRIGGER, S_TRIGGER." [".$triggerid."] [".expand_trigger_description($triggerid)."] ");
 			unset($_REQUEST["sform"]);
@@ -171,7 +171,7 @@ if(isset($_REQUEST['sform'])){
 	$frmTRLog->addVar('form_refresh',get_request('form_refresh',1));
 
 	$ltype = 0;
-	$matchkey = $strltype[$ltype];	
+	$matchkey = $strltype[$ltype];
 	if(isset($_REQUEST['ltype'])) {
 		$frmTRLog->addVar('ltype',$_REQUEST['ltype']);
 		$matchkey = $strltype[$_REQUEST['ltype']];
@@ -181,9 +181,9 @@ if(isset($_REQUEST['sform'])){
 
 	if(isset($_REQUEST['triggerid']) && !isset($_REQUEST['form_refresh'])){
 		$frmTRLog->addVar('form_refresh',get_request('form_refresh',1));
-		
+
 		$sql = 'SELECT DISTINCT f.functionid, f.function, f.parameter, t.expression, '.
-								' t.description, t.priority, t.comments, t.url, t.status, t.type'. 
+								' t.description, t.priority, t.comments, t.url, t.status, t.type'.
 					' FROM functions as f, triggers as t, items as i '.
 					' WHERE t.triggerid='.$_REQUEST['triggerid'].
 						' AND i.itemid=f.itemid '.
@@ -199,7 +199,7 @@ if(isset($_REQUEST['sform'])){
 			$comments = $rows['comments'];
 			$url = $rows['url'];
 			$status = $rows['status'];
-			
+
 			$functionid[] = '/\{'.$rows['functionid'].'\}/Uu';
 			$functions[] = $rows['function'].'('.$rows['parameter'].')';
 		}
@@ -216,10 +216,10 @@ if(isset($_REQUEST['sform'])){
 
 		$expression = preg_split('/ [&|] /',$expression);
 		$expr_v = preg_split('/ [&|] /',$expr_v);
-	
+
 		foreach($expression as $id => $expr){
 			$expr = preg_replace('/^\((.*)\)$/u','$1',$expr);
-			
+
 			if(preg_match('/\([regexp|iregexp].+\)[=|#]0/U',$expr, $rr)){
 
 				$value = preg_replace('/(\(([regexp|iregexp].*)\)[=|#]0)/U','$2',$expr);
@@ -249,7 +249,7 @@ if(isset($_REQUEST['sform'])){
 
 			$value = preg_replace($functionid,$functions,$value);
 			$value = preg_replace('/([=|#]0)/','',$value);
-			
+
 			$expressions[$id]['view'] = trim($value);
 		}
 	}
@@ -264,8 +264,8 @@ if(isset($_REQUEST['sform'])){
 	}
 
 	$keys = get_request('keys',array());
-	
-//sdi('<pre>'.print_r($expressions, true).'</pre>');	
+
+//sdi('<pre>'.print_r($expressions, true).'</pre>');
 	$frmTRLog->addRow(S_DESCRIPTION,new CTextBox('description',$description,80));
 
 	$item = '';
@@ -285,20 +285,20 @@ if(isset($_REQUEST['sform'])){
 
 	$script = "javascript: return PopUp('popup.php?dstfrm=".$frmTRLog->getName()."&dstfld1=itemid&dstfld2=item&srctbl=items&srcfld1=itemid&srcfld2=description',800,450);";
 	$cbtn = new CButton('select_item',S_SELECT,$script);
-	
+
 	$frmTRLog->addRow(S_ITEM,array($ctb, $cbtn));
 	$frmTRLog->addVar('itemid',$itemid);
 
-	
+
 	$exp_select = new CComboBox('expr_type');
 	$exp_select->setAttribute('id','expr_type');
 		$exp_select->addItem(REGEXP_INCLUDE,S_INCLUDE);
 		$exp_select->addItem(REGEXP_EXCLUDE,S_EXCLUDE);
 
-	
+
 	$ctb = new CTextBox('expression','',80);
 	$ctb->setAttribute('id','logexpr');
-	
+
 	$cb = new CButton('add_exp',S_ADD,'javascript: add_logexpr();');
 	$cb->setType('button');
 	$cb->setAttribute('id','add_exp');
@@ -312,14 +312,14 @@ if(isset($_REQUEST['sform'])){
 
 	$cbIregexp = new CCheckBox('iregexp', 'no', null,1);
 	$cbIregexp->setAttribute('id','iregexp');
-	
+
 	$frmTRLog->addRow(S_EXPRESSION,array($ctb,BR(),$cbIregexp,'iregexp',SPACE,$cbAdd,SPACE,$cbOr,SPACE,$exp_select,SPACE, $cb));
 
 	$keyTable = new CTableInfo(null);
 	$keyTable->setAttribute('id','key_list');
 	$keyTable->setHeader(array(S_KEYWORD,S_TYPE, new CLink(S_DELETE,'#')));
-	
-	$table = new CTableInfo(null);	
+
+	$table = new CTableInfo(null);
 	$table->setAttribute('id','exp_list');
 	$table->setHeader(array(S_EXPRESSION,S_TYPE, S_POSITION,new CLink(S_DELETE,'#')));
 
@@ -344,7 +344,7 @@ if(isset($_REQUEST['sform'])){
 		$imgdn = new CImg('images/general/arrowdown.gif','down',12,14);
 		$imgdn->setAttribute('onclick','javascript:  element_down("logtr'.$id.'");');
 		$imgdn->setAttribute('onmouseover','javascript: this.style.cursor = "pointer";');
-	
+
 		$del_url = new CLink('Delete','#','action','javascript: if(confirm("Delete expression?")) remove_expression("logtr'.$id.'"); return false;');
 
 		$row = new CRow(array(htmlspecialchars($expr['view']),(($expr['type']==REGEXP_INCLUDE)?S_INCLUDE:S_EXCLUDE),array($imgup,SPACE,$imgdn),$del_url));
@@ -376,9 +376,9 @@ if(isset($_REQUEST['sform'])){
 
 	$frmTRLog->addRow(SPACE,$keyTable);
 	$frmTRLog->addRow(SPACE,$table);
-	
+
 //	$frmTRLog->addRow(S_MULTIPLE_EVENTS,new CCheckBox('type', (($type == TRIGGER_MULT_EVENT_ENABLED)?'yes':'no'), null,1));
-	
+
 	$sev_select = new CComboBox('priority',null);
 		$sev_select->addItem(TRIGGER_SEVERITY_NOT_CLASSIFIED,S_NOT_CLASSIFIED,(($priority == TRIGGER_SEVERITY_NOT_CLASSIFIED)?'on':'off'));
 		$sev_select->addItem(TRIGGER_SEVERITY_INFORMATION,S_INFORMATION,(($priority == TRIGGER_SEVERITY_INFORMATION)?'on':'off'));
@@ -386,29 +386,29 @@ if(isset($_REQUEST['sform'])){
 		$sev_select->addItem(TRIGGER_SEVERITY_AVERAGE,S_AVERAGE,(($priority == TRIGGER_SEVERITY_AVERAGE)?'on':'off'));
 		$sev_select->addItem(TRIGGER_SEVERITY_HIGH,S_HIGH,(($priority == TRIGGER_SEVERITY_HIGH)?'on':'off'));
 		$sev_select->addItem(TRIGGER_SEVERITY_DISASTER,S_DISASTER,(($priority == TRIGGER_SEVERITY_DISASTER)?'on':'off'));
-			
+
 	$frmTRLog->addRow(S_SEVERITY,$sev_select);
-	
+
 	$frmTRLog->addRow(S_COMMENTS,new CTextArea('comments',$comments));
-	
+
 	$frmTRLog->addRow(S_URL,new CTextBox('url',$url,80));
 
 	$frmTRLog->addRow(S_DISABLED,new CCheckBox('status', (($status == TRIGGER_STATUS_DISABLED)?'yes':'no'), null,1));
-	
+
 	$frmTRLog->addItemToBottomRow(new CButton('save_trigger',S_SAVE,'javascript: document.forms[0].action += \'?saction=1\';'));
 	$frmTRLog->addItemToBottomRow(SPACE);
 
 	$cb = new CButton('cancel',S_CANCEL);
 	$cb->setType('button');
 	$cb->setAction('javascript: self.close();');
-	
+
 	$frmTRLog->addItemToBottomRow($cb);
 	if ($bExprResult) {
 	  $frmTRLog->show();
 	}
 }
 //------------------------ </FORM> ---------------------------
-	
+
 ?>
 <?php
 

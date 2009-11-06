@@ -841,7 +841,7 @@ class CItem extends CZBXAPI{
 			if($item['templateid'] == 0){
 				delete_item($itemid);
 			}
-			
+
 *///////////////
 			$result = add_item($item);
 			if(!$result) break;

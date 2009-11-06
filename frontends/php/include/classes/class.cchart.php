@@ -1049,10 +1049,10 @@ class CChart extends CGraphDraw{
 			$new_time = $this->from_time+$i*$interval+$offset;
 // DayLightSave
 			if(date('I',$new_time) == 0) $new_time+=3600;
-			
+
 			$new_pos = $i*$intervalX+$offsetX;
 
-// check		
+// check
 			if(($interval == 86400) && date('N',$new_time) == 1) continue;
 // if we step to main_time
 			else if(($i*$interval % $main_interval + $offset) == $main_offset) continue;
@@ -1078,7 +1078,7 @@ SDI('======================================');
 			if($interval == 86400) $date_format = 'D';
 			else if($interval > 86400) $date_format = 'd.m';
 			else if($interval < 86400) $date_format = 'H:i';
-			
+
 			$str = date($date_format, $new_time);
 			$dims = imageTextSize(7, 90, $str);
 
@@ -1123,7 +1123,7 @@ SDI('======================================');
 				$date_format = 'H:i';
 				$color = $this->graphtheme['highlightcolor'];
 			}
-			
+
 			$str = date($date_format, $new_time);
 			$dims = imageTextSize(8, 90, $str);
 
@@ -1403,10 +1403,10 @@ SDI('======================================');
 			}
 
 			$data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];
-			
+
 			if($this->itemsHost) $item_caption = $this->items[$i]['description'];
 			else $item_caption = $this->items[$i]['host'].': '.$this->items[$i]['description'];
-				
+
 			if(isset($data) && isset($data['min'])){
 				if($this->items[$i]['axisside'] == GRAPH_YAXIS_SIDE_LEFT)
 					$units['left'] = $this->items[$i]['units'];

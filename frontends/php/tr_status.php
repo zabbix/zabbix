@@ -386,7 +386,7 @@ include_once('include/page_header.php');
 				$ev_options['value'] = TRIGGER_VALUE_TRUE;
 				$ev_options['time_from'] = time() - ($config['event_expire']*86400);
 				$ev_options['time_till'] = time();
-			break;				
+			break;
 		}
 	}
 
@@ -408,12 +408,12 @@ include_once('include/page_header.php');
 
 		$description = new CSpan($description, 'link_menu');
 
-// trigger description js menu {{{ 
+// trigger description js menu {{{
 		$host = null;
 		$hosts = array_pop($trigger['hosts']);
 		$trigger['hostid'] = $hosts['hostid'];
 		$trigger['host'] = $hosts['host'];
-		
+
 		$menu_trigger_conf = 'null';
 		if($admin_links){
 			$menu_trigger_conf = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript: redirect('triggers.php?form=update&triggerid=".$trigger['triggerid']."&hostid=".$trigger['hostid']."')\",
@@ -431,7 +431,7 @@ include_once('include/page_header.php');
 			zbx_jsvalue($trigger['items']).");"
 		);
 // }}} trigger description js menu
-		
+
 		if($_REQUEST['show_details']){
 			$font = new CTag('font','yes');
 			$font->setAttribute('color','#000');
@@ -523,7 +523,7 @@ include_once('include/page_header.php');
 // }}} host JS menu
 
 		$tr_desc = new CSpan($description);
-		
+
 
 // We add 1 to event start url, so events would show it
 		$clock = new CLink(

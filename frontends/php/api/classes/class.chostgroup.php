@@ -451,7 +451,7 @@ class CHostGroup extends CZBXAPI{
 		global $USER_DETAILS;
 
 		zbx_valueTo($groups, array('array' =>1));
-		
+
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only SuperAdmins can create HostGroups');
 			return false;

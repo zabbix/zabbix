@@ -775,7 +775,7 @@ include_once('include/page_header.php');
 		$dbkey[0]='log[%';
 		$dbkey[1]='eventlog[%';
 		$dbkey[2]='snmptraps';
-	
+
 		$show_host = true;
 
 		$items_wdgt = new CWidget();
@@ -1059,10 +1059,10 @@ include_once('include/page_header.php');
 			if(preg_match('/^(log\[.*\]|eventlog\[.*\]|snmptraps).*$/',$item['key_'],$matchkeys)){
 				preg_match('/(log|eventlog|snmptraps)/', $matchkeys[0], $matchkey);
 				$ltype = $logtype[$matchkey[1]];
-				
+
 				$triggers_flag = false;
 				$triggers=",Array('Edit Trigger',null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']}\n";
-				
+
 				foreach($item['triggers'] as $num => $trigger){
 					$triggers .= ',["'.$trigger['description_expanded'].'",'.
 										zbx_jsvalue("javascript: openWinCentered('tr_logform.php?sform=1&itemid=".$item['itemid'].
@@ -1071,7 +1071,7 @@ include_once('include/page_header.php');
 																"'titlebar=no, resizable=yes, scrollbars=yes');").']';
 					$triggers_flag = true;
 				}
-				
+
 				if($triggers_flag){
 					$triggers = rtrim($triggers,',').')';
 				}
@@ -1084,7 +1084,7 @@ include_once('include/page_header.php');
 														zbx_jsvalue($item['itemid']).','.
 														zbx_jsvalue($item['description_expanded']).','.
 														$ltype.$triggers.');');
-			} 
+			}
 			else {
 				$menuicon = SPACE;
 			}
@@ -1148,7 +1148,7 @@ include_once('include/page_header.php');
 		$items_wdgt->addItem($form);
 		$items_wdgt->show();
 	}
-	
+
 	$jsmenu = new CPUMenu(null,200);
 	$jsmenu->InsertJavaScript();
 ?>

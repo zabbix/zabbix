@@ -303,6 +303,6 @@ include_once('include/page_header.php');
 		$dscry_wdgt->show();
 	}
 
-	
+
 include_once('include/page_footer.php');
 ?>
