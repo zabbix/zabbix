@@ -779,8 +779,8 @@ function send_params(params){
 					{
 						'method': 'post',
 						'parameters':params,
-//						'onSuccess': function(resp){ },
-						'onSuccess': function(resp){ SDI(resp.responseText); },
+						'onSuccess': function(resp){ },
+//						'onSuccess': function(resp){ SDI(resp.responseText); },
 						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
 					}
 	);
