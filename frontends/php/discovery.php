@@ -230,7 +230,7 @@ include_once('include/page_header.php');
 				$time = SPACE;
 
 				$hint = new CDiv(SPACE, $class);
-				
+
 
 
 				$hintTable = null;
@@ -240,7 +240,7 @@ include_once('include/page_header.php');
 
 					$hintTable = new CTableInfo();
 					$hintTable->setAttribute('style','width: auto;');
-				
+
 					if ($class == 'active') {
 						$hintTable->setHeader(S_UP_TIME);
 					}
@@ -266,6 +266,6 @@ include_once('include/page_header.php');
 	$dscvry_wdgt->addItem($table);
 	$dscvry_wdgt->show();
 
-	
+
 include_once('include/page_footer.php');
 ?>

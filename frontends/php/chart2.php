@@ -51,7 +51,7 @@ include_once('include/page_header.php');
 	$options['graphids'] = $_REQUEST['graphid'];
 	$options['extendoutput'] = 1;
 	$options['select_hosts'] = 1;
-	
+
 	$db_data = CGraph::get($options);
 	if(empty($db_data)) access_deny();
 	else zbx_valueTo($db_data, array('object'=>1));
@@ -59,7 +59,7 @@ include_once('include/page_header.php');
 	$host = zbx_valueTo($db_data['hosts'], array('object'=>1), true);
 
 	$effectiveperiod = navigation_bar_calc('web.graph',$_REQUEST['graphid']);
-	
+
 	update_profile('web.charts.graphid',$_REQUEST['graphid']);
 
 	$chart_header = '';
@@ -67,8 +67,8 @@ include_once('include/page_header.php');
 		$chart_header = get_node_name_by_elid($db_data['graphid'], true, ': ');
 	}
 	$chart_header.= $host['host'].': '.$db_data['name'];
-	
-	
+
+
 	$graph = new CChart($db_data['graphtype']);
 	$graph->setHeader($chart_header);
 

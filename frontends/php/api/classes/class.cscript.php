@@ -515,7 +515,7 @@ class Cscript extends CZBXAPI{
 				else
 					$add_to_hosts = $hosts_read_write;
 			}
-			
+
 			else if(PERM_READ_ONLY == $script['host_access']){
 				if($script['groupid'] > 0)
 					$add_to_hosts = zbx_uint_array_intersect($hosts_read_only, $groups[$script['groupid']]['hostids']);

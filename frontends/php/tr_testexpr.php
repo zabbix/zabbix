@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -41,7 +41,7 @@ include_once('include/page_header.php');
 	$expression = urldecode(get_request('expression', ''));
 
 	list($outline, $node, $map) = analyze_expression($expression);
-	
+
 	$tree = array();
 	create_node_list($node, $tree);
 
@@ -59,7 +59,7 @@ include_once('include/page_header.php');
 	foreach ($map as $key => $val){
 		$expr = $val['expression'];
 		if(isset($datas[$expr])) continue;
-	
+
 		$num = count($datas) + 1;
 		$fname = 'test_data_n'.$num;
 		$datas[$expr] = get_request($fname, '');
@@ -69,12 +69,12 @@ include_once('include/page_header.php');
 
 		if(substr($validation, 0, COMBO_PATTERN_LENGTH) == COMBO_PATTERN){
 			$vals = explode(',', substr($validation, COMBO_PATTERN_LENGTH, strlen($validation) - COMBO_PATTERN_LENGTH - 4));
-	
+
 			$control = new CComboBox($fname, $datas[$expr]);
 			foreach ($vals as $v) $control->addItem($v, $v);
 		}
 		else $control = new CTextBox($fname, $datas[$expr], 30);
-	
+
 		$data_table->addRow(new CRow(array($num, $expr, $info['value_type'], $control)));
 		$fields[$fname] = array($info['type'], O_OPT, null, $validation, 'isset({test_expression})');
 	}
@@ -83,7 +83,7 @@ include_once('include/page_header.php');
 
 	$fields['test_expression'] = array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null);
 	check_fields($fields);
-	
+
 
 //------------------------ <ACTIONS> ---------------------------
 	if(isset($_REQUEST['test_expression'])){
@@ -111,59 +111,59 @@ include_once('include/page_header.php');
 	$res_table->setOddRowClass('even_row');
 	$res_table->setEvenRowClass('even_row');
 	$res_table->setHeader(array(S_EXPRESSION, S_RESULT));
-	
+
 	$exprs = make_disp_tree($tree, $map);
 	foreach($exprs as $e){
 		$result = '-';
 		if($test && $e['key']){
 			$i = &$map[$e['key']];
 			$value = convert($datas[$i['expression']]);
-			
+
 			if(empty($value)) $value = "''";
-			
+
 			eval("\$result = ".$value.($i['sign'] == '=' ? '==' : ($i['sign'] == '#' ? '!=' : $i['sign'])).convert($i['value']).';');
 			$i['result'] = $result = $result == 1 ? 'TRUE' : 'FALSE';
 		}
-		
+
 		$style = 'text-align: center;';
-		if($result != '-') 
+		if($result != '-')
 			$style = ($result == 'TRUE')?'background-color: #ccf; color: #00f;': 'background-color: #fcc; color: #f00;';
 
-		$col = new CCol($result);		
+		$col = new CCol($result);
 		$col->setAttribute('style', $style);
 		$res_table->addRow(new CRow(array($e['expr'], $col)));
 	}
-	
+
 	$result = '-';
 	if($test){
 		$combine_expr = $outline;
 		foreach ($map as $key => $val){
 			$combine_expr = str_replace($key, strtolower($val['result']), $combine_expr);
 		}
-		
+
 		eval("\$result = ".$combine_expr.';');
 		$result = $result == 1 ? 'TRUE' : 'FALSE';
 	}
 
 	$style = 'text-align: center;';
-	if($result != '-') 
+	if($result != '-')
 		$style = ($result == 'TRUE')?'background-color: #ccf; color: #00f;': 'background-color: #fcc; color: #f00;';
-	
+
 	$col = new CCol($result);
 	$col->setAttribute('style', $style);
 	$res_table->setFooter(array($outline, $col), $res_table->headerClass);
-	
+
 	$frm_test->addRow(S_RESULT, $res_table);
-	
+
 // action buttons
 	$frm_test->addItemToBottomRow(new CButton('test_expression', S_TEST));
 	$frm_test->addItemToBottomRow(SPACE);
-	
+
 	$btn_close = new CButton('close', S_CLOSE);
 	$btn_close->setType('button');
 	$btn_close->setAction('javascript: self.close();');
 	$frm_test->addItemToBottomRow($btn_close);
-	
+
 	$frm_test->show();
 
 //------------------------ </FORM> ---------------------------

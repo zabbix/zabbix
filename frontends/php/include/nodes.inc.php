@@ -82,7 +82,7 @@
 
 		// zbx_set_post_cookie('zbx_current_nodeid', $ZBX_CURRENT_NODEID);
 		define('ZBX_NODES_INITIALIZED', 1);
-		
+
 // reset profiles if node is different than local
 		if($ZBX_CURRENT_NODEID != $ZBX_LOCALNODEID){
 			get_profile(null, null, null, null, true);

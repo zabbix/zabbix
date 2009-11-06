@@ -87,7 +87,7 @@ include_once('include/page_header.php');
 	unset($host);
 
 	navigation_bar_calc();
-	
+
 //SDI($_REQUEST['stime']);
 	$graph->setPeriod($_REQUEST['period']);
 	$graph->setSTime($_REQUEST['stime']);

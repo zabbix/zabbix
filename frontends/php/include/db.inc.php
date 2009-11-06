@@ -656,7 +656,7 @@ else {
 	function DBin_node( $id_name, $nodes = null ){
 		if(is_null($nodes))	$nodes = get_current_nodeid();
 		else if(is_bool($nodes)) $nodes = get_current_nodeid($nodes);
-		
+
 		if(empty($nodes))	$nodes = 0;
 
 		if(is_array($nodes)){

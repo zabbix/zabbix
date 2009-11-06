@@ -107,7 +107,7 @@
 	}
 ?>
 <?php
-	
+
 	$nodes_wdgt = new CWidget();
 
 	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST);
@@ -231,7 +231,7 @@
 					' WHERE '.DBcondition('n.nodeid', $available_nodes).
 					order_by('n.nodeid,n.name,n.nodetype,n.timezone,n.ip','n.masterid');
 			$db_nodes = DBselect($sql);
-			
+
 			while($row=DBfetch($db_nodes)){
 				$node_type = detect_node_type($row);
 				$node_type_name = node_type2str($node_type);
@@ -256,6 +256,6 @@
 		$nodes_wdgt->addItem($table);
 		$nodes_wdgt->show();
 	}
-	
+
 include_once('include/page_footer.php');
 ?>

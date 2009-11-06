@@ -834,7 +834,7 @@ function zbx_value2array(&$values){
 // author: Aly
 function zbx_valueTo(&$value, $options, $rtrn=false){
 	if(is_null($value)) return $rtrn?$value:false;
-	
+
 	if($rtrn) $original = $value;
 
 // object or array of objects to hash
@@ -863,10 +863,10 @@ function zbx_valueTo(&$value, $options, $rtrn=false){
 					}
 				}
 			}
-			
+
 			$value = $result;
 		}
-		
+
 		if($rtrn){
 			$tmp = $value;
 			$value = $original;
@@ -957,7 +957,7 @@ function zbx_valueTo(&$value, $options, $rtrn=false){
 				unset($new_value);
 			}
 		}
-		else if(!empty($value)){ 
+		else if(!empty($value)){
 			$value = array($value);
 		}
 
@@ -1002,8 +1002,8 @@ function zbx_valueTo(&$value, $options, $rtrn=false){
 		}
 		else return true;
 	}
-	
-// array of objects to single (first) object 
+
+// array of objects to single (first) object
 	if(isset($options['object'])){
 		if(!is_array($value)){
 			if($rtrn) return null;

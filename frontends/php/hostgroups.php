@@ -75,7 +75,7 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['save'])){
 		$hosts = get_request('hosts', array());
 		$hosts = array_intersect($available_hosts, $hosts);
-		
+
 		if(isset($_REQUEST['groupid'])){
 			DBstart();
 			$result = update_host_group($_REQUEST['groupid'], $_REQUEST['gname'], $hosts);
@@ -182,14 +182,14 @@ include_once('include/page_header.php');
 
 		$group_name = get_request('gname', '');
 		$frm_title = S_HOST_GROUP;
-		if($groupid > 0){	
+		if($groupid > 0){
 			$group = get_hostgroup_by_groupid($groupid);
 			$frm_title .= ' ['.$group['name'].']';
-			
+
 // if first time select all hosts for group from db
 			if(!isset($_REQUEST['form_refresh'])){
 				$group_name = $group['name'];
-				
+
 				$params = array(
 					'groupids' => $groupid,
 					'editable' => 1,
@@ -201,7 +201,7 @@ include_once('include/page_header.php');
 				}
 			}
 		}
-		
+
 		$frmHostG = new CFormTable($frm_title, 'hostgroups.php');
 		$frmHostG->setName('hg_form');
 		if($groupid > 0)

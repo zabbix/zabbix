@@ -567,6 +567,6 @@ include_once('include/page_header.php');
 		$http_wdgt->show();
 	}
 
-	
+
 include_once('include/page_footer.php');
 ?>

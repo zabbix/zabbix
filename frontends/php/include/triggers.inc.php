@@ -2957,7 +2957,7 @@ return $result;
 			if(strlen($n['expr']) == 1){
 				$key = $n['expr'];
 				$tgt = $map[$key];
-				
+
 				array_push($expr, SPACE, bold($n['expr']),SPACE);
 
 				$e = $tgt['expression'].$tgt['sign'].$tgt['value'];
@@ -3090,7 +3090,7 @@ return $result;
 
 	return $expr;
 	}
-	
+
 	function get_item_function_info($expr){
 		global $ZBX_TR_EXPR_ALLOWED_MACROS;
 
@@ -3101,7 +3101,7 @@ return $result;
 			ITEM_VALUE_TYPE_LOG		=> S_LOG,
 			ITEM_VALUE_TYPE_TEXT	=> S_TEXT
 			);
-		
+
 		$type_of_value_type = array(
 			ITEM_VALUE_TYPE_UINT64	=> T_ZBX_INT,
 			ITEM_VALUE_TYPE_FLOAT	=> T_ZBX_DBL,
@@ -3109,7 +3109,7 @@ return $result;
 			ITEM_VALUE_TYPE_LOG		=> T_ZBX_STR,
 			ITEM_VALUE_TYPE_TEXT	=> T_ZBX_STR
 			);
-		
+
 		$function_info = array(
 			'abschange' =>	array('value_type'	=> $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 			'avg' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
@@ -3158,12 +3158,12 @@ return $result;
 			unset($expr_res);
 
 			if($item_id == null) return VALUE_TYPE_UNKNOWN;
-	
+
 			$result = $function_info[$function];
 
 			if(is_array($result['value_type'])){
 				$value_type = null;
-				
+
 				$item_data = CItem::get(array('extendoutput'=>1, 'itemids'=>$item_id));
 
 				if(zbx_valueTo($item_data, array('object'=>1))){
@@ -3171,24 +3171,24 @@ return $result;
 				}
 
 				if($value_type == null) return VALUE_TYPE_UNKNOWN;
-	
+
 				$result['value_type'] = $result['value_type'][$value_type];
 				$result['type'] = $result['type'][$value_type];
-	
+
 				if($result['type'] == T_ZBX_INT || $result['type'] == T_ZBX_DBL){
 					$result['type'] = T_ZBX_STR;
 					$result['validation'] = 'preg_match("/^'.ZBX_PREG_NUMBER.'$/u",{})';
 				}
 			}
 		}
-	
+
 	return $result;
 	}
-	
+
 	function convert($value){
 		$val = trim($value);
 		if(!preg_match(ZBX_PREG_NUMBER, $val)) return $value;
-	
+
 		$last = strtolower($val{strlen($val)-1});
 		switch($last){
 			case 't': $val *= 1024 * 1024 * 1024 * 1024;
@@ -3196,7 +3196,7 @@ return $result;
 			case 'm': $val *= 1024 * 1024;
 			case 'k': $val *= 1024;
 		}
-	
+
 	return $val;
 	}
 ?>

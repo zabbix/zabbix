@@ -102,7 +102,7 @@ require_once('include/httptest.inc.php');
 		info('Updated host group ['.$name.']');
 		if(!empty($hosts))
 			$result = update_host_groups_by_groupid($groupid,$hosts);
-			
+
 	return $result;
 	}
 
