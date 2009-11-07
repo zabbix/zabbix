@@ -138,7 +138,6 @@
 	'S_NO_DATA_FOR_EXPORT'=>			'Нет данных для экспорта',
 	'S_NO_DATA_SMALL'=>			'нет данных',
 	'S_RULES'=>			'Правила',
-	'S_SKIP'=>			'Пропустить',
 	'S_EXISTING'=>			'Существующий',
 	'S_MISSING'=>			'Пропущенный',
 	'S_REFRESH'=>			'Обновить',
@@ -177,8 +176,6 @@
 	'S_RETURN'=>			'Вернуться',
 	'S_ACKNOWLEDGE_ALARM_BY'=>			'Подтвердить сигнализацию как',
 	'S_ADD_COMMENT_BY'=>			'Добавить комментарий как',
-	'S_COMMENT_ADDED'=>			'Комментарий добавлен',
-	'S_CANNOT_ADD_COMMENT'=>			'Невозможно добавить комментарий',
 	'S_ALARM_ACKNOWLEDGES_BIG'=>			'ПОДТВЕРЖДЕНИЯ СИГНАЛИЗАЦИИ',
 	'S_ACKNOWLEDGE_ADDED'=>			'Подтверждение добавлено',
 	'S_SYS_BULK_ACKNOWLEDGE'=>			'----[БОЛЬШАЯ ЧАТЬ ПОДТВЕРЖДЕНА]----',
@@ -647,7 +644,6 @@
 	'S_GROUPS'=>			'Группы',
 	'S_MINUS_ALL_GROUPS_MINUS'=>			'- все группы -',
 	'S_NO_GROUPS_DEFINED'=>			'Нет определенных групп',
-	'S_FOR_GROUP_SMALL'=>			'для группы',
 	'S_NEW_GROUP'=>			'Новая группа',
 	'S_DNS_NAME'=>			'DNS имя',
 	'S_IP_ADDRESS'=>			'IP адрес',
@@ -1416,8 +1412,6 @@
 	'S_LATEST_DATA'=>			'Последние данные',
 	'S_INCORRECT_DESCRIPTION'=>			'Неверное описание',
 	'S_CANT_FORMAT_TREE'=>			'Не удается построить дерево',
-	'S_UNSUPPORTED_FILE_FORMAT'=>			'Неподдерживаемый формат файла',
-	'S_UNSUPPORTED_VERSION_OF_IMPORTED_DATA'=>			'Неподдерживаемая версия импортируемых данных'
 
 	);
 ?>

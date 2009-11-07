@@ -138,7 +138,6 @@
 	'S_NO_DATA_FOR_EXPORT'=>			'エクスポートするデータがありません',
 	'S_NO_DATA_SMALL'=>			'データなし',
 	'S_RULES'=>			'ルール',
-	'S_SKIP'=>			'スキップ',
 	'S_EXISTING'=>			'存在する場合',
 	'S_MISSING'=>			'存在しない場合',
 	'S_REFRESH'=>			'更新',
@@ -177,8 +176,6 @@
 	'S_RETURN'=>			'戻る',
 	'S_ACKNOWLEDGE_ALARM_BY'=>			'対応コメントユーザ:',
 	'S_ADD_COMMENT_BY'=>			'コメントを追加',
-	'S_COMMENT_ADDED'=>			'コメントを追加しました',
-	'S_CANNOT_ADD_COMMENT'=>			'コメントを追加できません',
 	'S_ALARM_ACKNOWLEDGES_BIG'=>			'アラーム確認',
 	'S_ACKNOWLEDGE_ADDED'=>			'対応コメントを追加しました',
 	'S_SYS_BULK_ACKNOWLEDGE'=>			'----[対応コメントの一括処理]----',
@@ -647,7 +644,6 @@
 	'S_GROUPS'=>			'グループ',
 	'S_MINUS_ALL_GROUPS_MINUS'=>			'- すべてのグループ -',
 	'S_NO_GROUPS_DEFINED'=>			'グループが定義されていません',
-	'S_FOR_GROUP_SMALL'=>			'for group',
 	'S_NEW_GROUP'=>			'新規グループ作成',
 	'S_DNS_NAME'=>			'DNS名',
 	'S_IP_ADDRESS'=>			'IPアドレス',
@@ -1415,8 +1411,6 @@
 	'S_LATEST_DATA'=>			'最新データ',
 	'S_INCORRECT_DESCRIPTION'=>			'不正な名前です',
 	'S_CANT_FORMAT_TREE'=>			'ツリーをフォーマットできません',
-	'S_UNSUPPORTED_FILE_FORMAT'=>			'サポートされていないファイルフォーマットです',
-	'S_UNSUPPORTED_VERSION_OF_IMPORTED_DATA'=>			'サポートされていないインポートデータのバージョンです',
 
 	);
 ?>

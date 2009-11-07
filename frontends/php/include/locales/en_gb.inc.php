@@ -158,7 +158,6 @@
 	'S_NO_DATA_FOR_EXPORT'=>		'No data for export',
 	'S_NO_DATA_SMALL'=>			'no data',
 	'S_RULES'=>				'Rules',
-	'S_SKIP'=>				'Skip',
 	'S_EXISTING'=>				'Existing',
 	'S_MISSING'=>				'Missing',
 	'S_REFRESH'=>				'Refresh',
@@ -203,8 +202,6 @@
 	'S_RETURN'=>				'Return',
 	'S_ACKNOWLEDGE_ALARM_BY'=>		'Acknowledge alarm by',
 	'S_ADD_COMMENT_BY'=>			'Add comment by',
-	'S_COMMENT_ADDED'=>			'Comment added',
-	'S_CANNOT_ADD_COMMENT'=>		'Cannot add comment',
 	'S_ALARM_ACKNOWLEDGES_BIG'=>		'ALARM ACKNOWLEDGES',
 	'S_ACKNOWLEDGE_ADDED'=>			'Acknowledge added',
 	'S_CANNOT_ACKNOWLEDGE_EVENT'=>		'Cannot acknowledge event',
@@ -677,7 +674,6 @@
 
 //	hosts.php
 	'S_MACROS'=>					'Macros',
-	'S_MACRO'=>					'Macro',
 	'S_WRONG_MACRO'=>				'Wrong macro',
 	'S_MACRO_TOO_LONG'=>				'Macro name is too long, should not exceed 64 chars.',
 	'S_MACRO_VALUE_TOO_LONG'=>			'Macro value is too long, should not exceed 255 chars.',
@@ -744,7 +740,6 @@
 	'S_MINUS_ALL_GROUPS_MINUS'=>			' - all groups - ',
 	'S_ALL_GROUPS'=>				'All groups',
 	'S_NO_GROUPS_DEFINED'=>				'No groups defined',
-	'S_FOR_GROUP_SMALL'=>				'for group',
 	'S_NEW_GROUP'=>					'New group',
 	'S_DNS_NAME'=>					'DNS name',
 	'S_IP_ADDRESS'=>				'IP address',
@@ -1517,7 +1512,6 @@
 	'S_DISABLE_API'=>				'Disable API',
 	'S_ENABLE_DEBUG'=>				'Enable DEBUG',
 	'S_DISABLE_DEBUG'=>				'Disable DEBUG',
-	'S_LOGIN_ATTEMPT'=>				'Login attempt',
 	'S_BLOCKED'=>					'Blocked',
 	'S_UNBLOCK_SELECTED'=>				'Unblock selected',
 
@@ -1640,7 +1634,5 @@
 //	Errors
 	'S_INCORRECT_DESCRIPTION'=>			'Incorrect description',
 	'S_CANT_FORMAT_TREE'=>				'Can\'t format Tree',
-	'S_UNSUPPORTED_FILE_FORMAT'=>			'Unsupported file format',
-	'S_UNSUPPORTED_VERSION_OF_IMPORTED_DATA'=>	'Unsupported version of imported data'
 	);
 ?>
