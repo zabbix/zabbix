@@ -459,7 +459,6 @@
 	'S_TEST'=>					'Test',
 	'S_DELIMITER'=>					'Delimiter',
 	'S_TEST_STRING'=>				'Test string',
-	'S_COMBINED_RESULT'=>				'Combined result',
 
 	'S_NEW_REGULAR_EXPRESSION'=>			'New regular expression',
 	'S_REGULAR_EXPRESSION_ADDED'=>			'Regular expression added',
@@ -1404,7 +1403,6 @@
 	'S_TRIGGER_DEPENDENCIES'=>		'Trigger dependencies',
 	'S_INCORRECT_DEPENDENCY'=>		'Incorrect dependency',
 
-	'S_TEST'=>				'Test',
 	'S_TOGGLE_INPUT_METHOD'=>		'Toggle input method',
 	'S_INSERT_MACRO'=>			'Insert macro',
 	'S_REPLACE'=>				'Replace',
@@ -1615,10 +1613,10 @@
 	'S_POSITION'=>		'Position',
 
 //  tr_testexpr.php
-    'S_TEST_DATA'=>                 'Test data',
-    'S_ITEM_FUNCTION'=>             'Item / Function',
-    'S_RESULT_TYPE'=>               'Result type',
-    'S_COMBINED_RESULT'=>           'Combined result',
+	'S_TEST_DATA'=>		'Test data',
+	'S_ITEM_FUNCTION'=>	'Item / Function',
+	'S_RESULT_TYPE'=>	'Result type',
+	'S_COMBINED_RESULT'=>	'Combined result',
 
 //	Menu
 
