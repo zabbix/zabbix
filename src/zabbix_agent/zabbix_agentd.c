@@ -88,7 +88,7 @@ char usage_message[] =
 char *help_message[] = {
 	"Options:",
 	"",
-	"  -c --config <file>    Specify configuration file",
+	"  -c --config <file>    Specify configuration file. Use absolute path",
 	"  -h --help             give this help",
 	"  -V --version          display version number",
 	"  -p --print            print supported metrics and exit",
