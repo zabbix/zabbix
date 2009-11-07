@@ -13,7 +13,8 @@ is a daemon for monitoring of various server parameters.
 Use the alternate system wide
 .I config-file
 instead  of
-.I /etc/zabbix/zabbix_agentd.conf
+.I /etc/zabbix/zabbix_agentd.conf\fR.
+Use absolute path.
 .
 .IP "-p, --print"
 Print supported metrics and exit.
