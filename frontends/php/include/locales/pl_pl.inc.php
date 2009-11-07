@@ -135,7 +135,6 @@
 	'S_NO_DATA_FOR_EXPORT'=>			'Brak danych do eksportu',
 	'S_NO_DATA_SMALL'=>				'brak danych',
 	'S_RULES'=>					'Reguły',
-	'S_SKIP'=>					'Pomiń',
 	'S_EXISTING'=>					'Istniejące',
 	'S_MISSING'=>					'Brakujące',
 	'S_REFRESH'=>					'Odśwież',
@@ -173,8 +172,6 @@
 	'S_RETURN'=>					'Powrót',
 	'S_ACKNOWLEDGE_ALARM_BY'=>			'Potwierdzenie alarmu przez',
 	'S_ADD_COMMENT_BY'=>				'Dodanie komentarza przez',
-	'S_COMMENT_ADDED'=>				'Komentarz dodany',
-	'S_CANNOT_ADD_COMMENT'=>			'Nie można dodać komentarza',
 	'S_ALARM_ACKNOWLEDGES_BIG'=>			'POTWIERDZENIA ALARMÓW',
 	'S_ACKNOWLEDGE_ADDED'=>				'Potwierdzenie dodane',
 	'S_SYS_BULK_ACKNOWLEDGE'=>			'----[POTWIERDZENIE ZBIOROWE]----',
@@ -521,7 +518,6 @@
 	'S_GROUPS'=>					'Grupy',
 	'S_MINUS_ALL_GROUPS_MINUS'=>			'- wszystkie grupy -',
 	'S_NO_GROUPS_DEFINED'=>				'Brak zdefiniowanych grup',
-	'S_FOR_GROUP_SMALL'=>				'dla grupy',
 	'S_NEW_GROUP'=>					'Nowa grupa',
 	'S_DNS_NAME'=>					'Nazwa DNS',
 	'S_IP_ADDRESS'=>				'Adres IP',
@@ -1210,8 +1206,6 @@
 	'S_LATEST_DATA'=>				'Ostatnie dane',
 	'S_INCORRECT_DESCRIPTION'=>			'Niepoprawny opis',
 	'S_CANT_FORMAT_TREE'=>				'Nie można sformatować Drzewa',
-	'S_UNSUPPORTED_FILE_FORMAT'=>			'Niewspierany format pliku',
-	'S_UNSUPPORTED_VERSION_OF_IMPORTED_DATA'=>	'Niewspierana wersja zaimportowanych danych',
 
 	);
 ?>

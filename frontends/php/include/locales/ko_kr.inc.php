@@ -143,7 +143,6 @@
 	'S_BACK'=>				'뒤로',
 	'S_NO_DATA_FOR_EXPORT'=>		'내보낼 데이터가 없습니다',
 	'S_RULES'=>				'규칙',
-	'S_SKIP'=>				'건너뜀',
 	'S_EXISTING'=>				'존재하는 경우',
 	'S_MISSING'=>				'존재하지 않는 경우',
 	'S_REFRESH'=>				'갱신',
@@ -181,8 +180,6 @@
 	'S_RETURN'=>				'뒤로',
 	'S_ACKNOWLEDGE_ALARM_BY'=>		'인지 사용자:',
 	'S_ADD_COMMENT_BY'=>			'주석 추가',
-	'S_COMMENT_ADDED'=>			'주석을 추가하였습니다',
-	'S_CANNOT_ADD_COMMENT'=>		'주석을 추가할 수 없습니다',
 	'S_ALARM_ACKNOWLEDGES_BIG'=>		'알람 확인',
 	'S_ACKNOWLEDGE_ADDED'=>			'인지를 추가하였습니다',
 

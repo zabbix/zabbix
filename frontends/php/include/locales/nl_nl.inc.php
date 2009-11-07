@@ -31,8 +31,6 @@
 	'S_ACKNOWLEDGE'=>			'Herkenning',
 	'S_ACKNOWLEDGE_ALARM_BY'=>			'Bevesting Herkenning',
 	'S_ADD_COMMENT_BY'=>			'Voeg opmerking toe',
-	'S_COMMENT_ADDED'=>			'Opmering toegevoegd',
-	'S_CANNOT_ADD_COMMENT'=>			'Kan opmerking niet toevoegen',
 	'S_ALARM_ACKNOWLEDGES_BIG'=>			'ALARM HERKENNINGEN',
 	'S_CONFIGURATION_OF_ACTIONS'=>			'Configuratie van acties',
 	'S_CONFIGURATION_OF_ACTIONS_BIG'=>			'CONFIGURATIE VAN ACTIES',

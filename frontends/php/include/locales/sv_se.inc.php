@@ -31,8 +31,6 @@
 	'S_ACKNOWLEDGE'=>			'Bekräfta',
 	'S_ACKNOWLEDGE_ALARM_BY'=>			'Bekräfta alarm för',
 	'S_ADD_COMMENT_BY'=>			'Lägg till kommentar av',
-	'S_COMMENT_ADDED'=>			'Kommentar lades till',
-	'S_CANNOT_ADD_COMMENT'=>			'Kan inte lägga till kommentar',
 	'S_ALARM_ACKNOWLEDGES_BIG'=>			'ALARMBEKRÄFTELSER',
 	'S_CONFIGURATION_OF_ACTIONS'=>			'Konfiguration av åtgärder',
 	'S_CONFIGURATION_OF_ACTIONS_BIG'=>			'KONFIGURATION AV ÅTGÄRDER',
