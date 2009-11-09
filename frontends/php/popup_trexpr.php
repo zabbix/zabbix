@@ -231,8 +231,7 @@ include_once "include/page_header.php";
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
-function add_var_to_opener_obj(obj,name,value)
-{
+function add_var_to_opener_obj(obj,name,value){
         new_variable = window.opener.document.createElement('input');
         new_variable.type = 'hidden';
         new_variable.name = name;
@@ -241,26 +240,30 @@ function add_var_to_opener_obj(obj,name,value)
         obj.appendChild(new_variable);
 }
 
-function InsertText(obj, value)
-{
-	if (navigator.appName == "Microsoft Internet Explorer") {
+function InsertText(obj, value){
+    <?php if ($dstfld1 == 'expression') { ?>
+	if(IE){
 		obj.focus();
 		var s = window.opener.document.selection.createRange();
 		s.text = value;
-	} else if (obj.selectionStart || obj.selectionStart == '0') {
+	} 
+	else if (obj.selectionStart || obj.selectionStart == '0') {
 		var s = obj.selectionStart;
 		var e = obj.selectionEnd;
 		obj.value = obj.value.substring(0, s) + value + obj.value.substring(e, obj.value.length);
-	} else {
+	} 
+	else {
 		obj.value += value;
 	}
+    <?php } else { ?>
+	obj.value = value;
+	<?php } ?>
 }
 -->
 </script>
 <?php
 
-	if(isset($_REQUEST['insert']))
-	{
+	if(isset($_REQUEST['insert'])){
 
 		$expression = sprintf("{%s:%s.%s(%s%s)}%s%s",
 			$item_data['host'],
@@ -276,12 +279,10 @@ function InsertText(obj, value)
 <!--
 var form = window.opener.document.forms['<?php echo $dstfrm; ?>'];
 
-if(form)
-{
+if(form){
 	var el = form.elements['<?php echo $dstfld1; ?>'];
 
-	if(el)
-	{
+	if(el){
 		InsertText(el, <?php echo zbx_jsvalue($expression); ?>);
 		close_window();
 	}
@@ -296,11 +297,11 @@ if(form)
 	$form = new CFormTable(S_CONDITION);
 	$form->SetHelp('config_triggers.php');
 	$form->SetName('expression');
-	$form->AddVar('dstfrm', $dstfrm);
-	$form->AddVar('dstfld1', $dstfld1);
+	$form->addVar('dstfrm', $dstfrm);
+	$form->addVar('dstfld1', $dstfld1);
 
-	$form->AddVar('itemid',$itemid);
-	$form->AddRow(S_ITEM, array(
+	$form->addVar('itemid',$itemid);
+	$form->addRow(S_ITEM, array(
 		new CTextBox('description', $description, 50, 'yes'),
 		new CButton('select', S_SELECT, "return PopUp('popup.php?dstfrm=".$form->GetName().
 				"&dstfld1=itemid&dstfld2=description&".
@@ -308,68 +309,58 @@ if(form)
 		));
 
 	$cmbFnc = new CComboBox('expr_type', $expr_type	, 'submit()');
-	foreach($functions as  $id => $f)
-	{
-		foreach($f['operators'] as $op => $txt_op)
-		{
-			$cmbFnc->AddItem($id.'['.$op.']', str_replace('{OP}', $txt_op, $f['description']));
+	foreach($functions as  $id => $f){
+		foreach($f['operators'] as $op => $txt_op){
+			$cmbFnc->addItem($id.'['.$op.']', str_replace('{OP}', $txt_op, $f['description']));
 		}
 	}
-	$form->AddRow(S_FUNCTION, $cmbFnc);
+	$form->addRow(S_FUNCTION, $cmbFnc);
 
-	if(isset($functions[$function]['params']))
-	{
-		foreach($functions[$function]['params'] as $pid => $pf )
-		{
+	if(isset($functions[$function]['params'])){
+		foreach($functions[$function]['params'] as $pid => $pf ){
 			$pv = (isset($param[$pid])) ? $param[$pid] : null;
 
-			if($pf['T'] == T_ZBX_INT)
-			{
-				if( 0 == $pid)
-				{
-					if( isset($pf['M']) && is_array($pf['M']))
-					{
+			if($pf['T'] == T_ZBX_INT){
+				if( 0 == $pid){
+					if( isset($pf['M']) && is_array($pf['M'])){
 						$cmbParamType = new CComboBox('paramtype', $paramtype);
-						foreach( $pf['M'] as $mid => $caption )
-						{
-							$cmbParamType->AddItem($mid, $caption);
+						foreach( $pf['M'] as $mid => $caption ){
+							$cmbParamType->addItem($mid, $caption);
 						}
-					} else {
-						$form->AddVar('paramtype', PARAM_TYPE_SECONDS);
+					} 
+					else {
+						$form->addVar('paramtype', PARAM_TYPE_SECONDS);
 						$cmbParamType = S_SECONDS;
 					}
 				}
-				else
-				{
+				else{
 					$cmbParamType = null;
 				}
 
 
-				$form->AddRow(S_LAST_OF.' ', array(
+				$form->addRow(S_LAST_OF.' ', array(
 					new CNumericBox('param['.$pid.']', $pv, 10),
 					$cmbParamType
 					));
 			}
-			else
-			{
-				$form->AddRow($pf['C'], new CTextBox('param['.$pid.']', $pv, 30));
-				$form->AddVar('paramtype', PARAM_TYPE_SECONDS);
+			else{
+				$form->addRow($pf['C'], new CTextBox('param['.$pid.']', $pv, 30));
+				$form->addVar('paramtype', PARAM_TYPE_SECONDS);
 			}
 		}
 	}
-	else
-	{
-		$form->AddVar('paramtype', PARAM_TYPE_SECONDS);
-		$form->AddVar('param', 0);
+	else{
+		$form->addVar('paramtype', PARAM_TYPE_SECONDS);
+		$form->addVar('param', 0);
 	}
 
-	$form->AddRow('N', new CTextBox('value', $value, 10));
+	$form->addRow('N', new CTextBox('value', $value, 10));
 
-	$form->AddItemToBottomRow(new CButton('insert',S_INSERT));
-	$form->Show();
+	$form->addItemToBottomRow(new CButton('insert',S_INSERT));
+	$form->show();
 ?>
 <?php
 
-include_once "include/page_footer.php";
+include_once('include/page_footer.php');
 
 ?>

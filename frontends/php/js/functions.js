@@ -327,18 +327,18 @@ function swapNodesNames(n1,n2){
 		return true;
 	}
 return false;
-}
+}	
 
 function closeform(page){
 	var msg="";
 	try{
-		msg = (IE)?(document.getElementsByTagName('p')[0].innerText):(document.getElementsByTagName('p')[0].textContent);
+		msg = (IE)?(document.getElementById('page_msg').innerText):(document.getElementById('page_msg').textContent);
 		opener.location.replace(page+'?msg='+encodeURI(msg));
 	} catch(e){
 		alert(e);
 	}
-
-	self.close();
+	
+self.close();
 }
 
 function add_keyword(bt_type){
@@ -628,17 +628,6 @@ function display_element(name){
 	else {
 		elmnt.style.display = 'none';
 	}
-}
-
-function closeform(page){
-	var msg="";
-	try{
-		msg = (IE)?(document.getElementById('page_msg').innerText):(document.getElementById('page_msg').textContent);
-	} catch(e){
-		alert(e);
-	}
-	opener.location.replace('services.php?msg='+encodeURI(msg));
-	self.close();
 }
 
 //------------------------------------------------------

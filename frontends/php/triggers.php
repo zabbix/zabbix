@@ -114,8 +114,26 @@ include_once('include/page_header.php');
 	update_profile('web.triggers.showdisabled',$showdisabled,PROFILE_TYPE_INT);
 
 
+// EXPRESSION ACTIONS
+	if(isset($_REQUEST['add_expression'])){
+		$_REQUEST['expression'] = $_REQUEST['expr_temp'];
+		$_REQUEST['expr_temp'] = '';
+	}
+	else if(isset($_REQUEST['and_expression'])){
+		$_REQUEST['expr_action'] = '&';
+	}
+	else if(isset($_REQUEST['or_expression'])){
+		$_REQUEST['expr_action'] = '|';
+	}
+	else if(isset($_REQUEST['replace_expression'])){
+		$_REQUEST['expr_action'] = 'r';
+	}
+	else if(isset($_REQUEST['remove_expression']) && strlen($_REQUEST['remove_expression'])){
+		$_REQUEST['expr_action'] = 'R';
+		$_REQUEST['expr_target'] = $_REQUEST['remove_expression'];
+	}
 /* FORM ACTIONS */
-	if(isset($_REQUEST['clone']) && isset($_REQUEST['triggerid'])){
+	else if(isset($_REQUEST['clone']) && isset($_REQUEST['triggerid'])){
 		unset($_REQUEST['triggerid']);
 		$_REQUEST['form'] = 'clone';
 	}
