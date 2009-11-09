@@ -34,7 +34,6 @@ include_once 'include/page_header.php';
 	$fields=array(
 		'graphid'=>		array(T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,		null),
 		'period'=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	BETWEEN(ZBX_MIN_PERIOD,ZBX_MAX_PERIOD),	null),
-		'from'=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	null,		null),
 		'stime'=>		array(T_ZBX_STR, O_OPT,		P_SYS,		null,		null),
 		'border'=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	IN('0,1'),	null),
 		'width'=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	'{}>0',		null),
@@ -54,7 +53,7 @@ include_once 'include/page_header.php';
 	if(empty($db_data)) access_deny();
 	else zbx_valueTo($db_data, array('object'=>1));
 
-	$effectiveperiod = navigation_bar_calc('web.graph',$_REQUEST['graphid']);
+	$effectiveperiod = navigation_bar_calc();
 
 	$graph = new CPie($db_data['graphtype']);
 

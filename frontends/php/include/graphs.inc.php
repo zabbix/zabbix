@@ -991,6 +991,7 @@
 	}
 
 	function navigation_bar_calc($idx=null, $idx2=null){
+//SDI($_REQUEST['stime']);
 		if(!is_null($idx) && (is_null($idx2) || ($idx2 > 0))){
 			if(isset($_REQUEST['period']) && ($_REQUEST['period'] >= ZBX_MIN_PERIOD))
 				update_profile($idx.'.period',$_REQUEST['period'],PROFILE_TYPE_INT, $idx2);
@@ -1023,6 +1024,10 @@
 				$_REQUEST['stime'] = date('YmdHi', time()-$_REQUEST['period']);
 			}
 		}
+		else{
+			$_REQUEST['stime'] = date('YmdHi');
+		}
+
 	return $_REQUEST['period'];
 	}
 
