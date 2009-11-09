@@ -412,6 +412,6 @@ if(isset($_REQUEST['sform'])){
 ?>
 <?php
 
-include_once "include/page_footer.php";
+include_once('include/page_footer.php');
 
 ?>
