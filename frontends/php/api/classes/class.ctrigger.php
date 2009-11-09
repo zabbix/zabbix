@@ -82,6 +82,7 @@ class CTrigger extends CZBXAPI{
 			'itemids'				=> null,
 			'applicationids'		=> null,
 			'status'				=> null,
+			'monitored' 			=> null,
 			'severity'				=> null,
 			'templated_triggers'	=> null,
 			'not_templated_triggers'	=> null,
@@ -225,6 +226,19 @@ class CTrigger extends CZBXAPI{
 		if(!is_null($options['status'])){
 			$sql_parts['where'][] = 't.status='.$options['status'];
 		}
+		
+// monitored
+		if(!is_null($options['monitored'])){
+			$sql_parts['from']['f'] = 'functions f';
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['from']['h'] = 'hosts h';
+			$sql_parts['where']['ih'] = 'i.hostid=h.hostid';
+			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
+			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
+			$sql_parts['where'][] = 'i.status='.ITEM_STATUS_ACTIVE;
+			$sql_parts['where'][] = 't.status='.TRIGGER_STATUS_ENABLED;
+			$sql_parts['where'][] = 'h.status='.HOST_STATUS_MONITORED;
+		}
 
 // severity
 		if(!is_null($options['severity'])){
@@ -361,6 +375,7 @@ class CTrigger extends CZBXAPI{
 				' WHERE '.DBin_node('t.triggerid', $nodeids).
 					$sql_where.
 				$sql_order;
+//sdi($sql);
 		$db_res = DBselect($sql, $sql_limit);
 		while($trigger = DBfetch($db_res)){
 			if($options['count'])
