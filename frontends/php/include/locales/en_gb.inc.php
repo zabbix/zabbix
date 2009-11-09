@@ -453,6 +453,7 @@
 	'S_EXPRESSION_TYPE'=>				'Expression type',
 	'S_NEW_EXPRESSION'=>				'New expression',
 	'S_IGNORE_CASE'=>				'Ignore case',
+	'S_CASE_SENSITIVE' => 'Case sensitive',
 	'S_TEST'=>					'Test',
 	'S_DELIMITER'=>					'Delimiter',
 	'S_TEST_STRING'=>				'Test string',
