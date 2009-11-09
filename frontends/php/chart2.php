@@ -58,7 +58,7 @@ include_once('include/page_header.php');
 
 	$host = zbx_valueTo($db_data['hosts'], array('object'=>1), true);
 
-	$effectiveperiod = navigation_bar_calc('web.graph',$_REQUEST['graphid']);
+	$effectiveperiod = navigation_bar_calc();
 
 	update_profile('web.charts.graphid',$_REQUEST['graphid']);
 

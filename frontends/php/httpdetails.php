@@ -25,8 +25,8 @@ require_once('include/httptest.inc.php');
 require_once('include/forms.inc.php');
 
 $page['title'] = "S_DETAILS_OF_SCENARIO";
-$page['file'] = "httpdetails.php";
-$page['hist_arg'] = array('hostid','grouid','graphid','period','stime');
+$page['file'] = 'httpdetails.php';
+$page['hist_arg'] = array('hostid','grouid','graphid');
 $page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.calendar.js','gtlc.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
@@ -64,8 +64,7 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['favobj'])){
 		if('timeline' == $_REQUEST['favobj']){
 			if(isset($_REQUEST['httptestid']) && isset($_REQUEST['period'])){
-				navigation_bar_calc();
-				update_profile('web.httptest.period', $_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['httptestid']);
+				navigation_bar_calc('web.httptest', $_REQUEST['httptestid']);
 			}
 		}
 	}

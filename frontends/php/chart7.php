@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,12 +19,12 @@
 **/
 ?>
 <?php
-	require_once 'include/config.inc.php';
-	require_once 'include/graphs.inc.php';
+require_once 'include/config.inc.php';
+require_once 'include/graphs.inc.php';
 
-	$page['file']	= 'chart7.php';
-	$page['title']	= "S_CHART";
-	$page['type']	= PAGE_TYPE_IMAGE;
+$page['file']	= 'chart7.php';
+$page['title']	= "S_CHART";
+$page['type']	= PAGE_TYPE_IMAGE;
 
 include_once 'include/page_header.php';
 
