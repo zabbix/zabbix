@@ -182,14 +182,15 @@ class CChart extends CGraphDraw{
 
 		$now = time(NULL);
 
-		if(isset($this->stime)){
-			$this->from_time	= $this->stime; // + timeZone offset
-			$this->to_time		= $this->stime + $this->period; // + timeZone offset
-		}
-		else{
-			$this->to_time		= $now - 3600 * $this->from;
-			$this->from_time	= $this->to_time - $this->period; // + timeZone offset
-		}
+		if(!isset($this->stime)){
+			$this->stime	= $now - $this->period;
+		}		
+
+		$this->diffTZ = (date('I',$this->stime) - date('I',$this->stime + $this->period)) * 3600;
+//		$this->stime += $this->diffTZ;
+		
+		$this->from_time	= $this->stime; // + timeZone offset
+		$this->to_time		= $this->stime + $this->period; // + timeZone offset
 
 		$p = $this->to_time - $this->from_time;		// graph size in time
 		$z = $p - $this->from_time % $p;			// graphsize - mod(from_time,p) for Oracle...
@@ -212,7 +213,7 @@ class CChart extends CGraphDraw{
 
 			$type = $this->items[$i]['calc_type'];
 			if($type == GRAPH_ITEM_AGGREGATED) {
-				/* skip current period */
+// skip current period
 				$from_time	= $this->from_time - $this->period * $this->items[$i]['periods_cnt'];
 				$to_time	= $this->from_time;
 			}
@@ -827,7 +828,9 @@ class CChart extends CGraphDraw{
 		$intervalX = ($sub_interval * $this->sizeX) / $this->period;
 
 		if($sub_interval > 86400){
-			$offset = (8 - date('w',$this->from_time)) * 86400;
+			$offset = (7 - date('w',$this->from_time)) * 86400;
+			$offset+= $this->diffTZ;
+
 			$next = $this->from_time + $offset;
 
 			$offset = mktime(0, 0, 0, date('m', $next), date('d', $next), date('Y', $next)) - $this->from_time;
@@ -835,6 +838,7 @@ class CChart extends CGraphDraw{
 		}
 		else{
 			$offset = $sub_interval - (($this->from_time + date('Z', $this->from_time)) % $sub_interval);
+//			$offset+= $this->diffTZ;
 			$offsetX = ($offset * $this->sizeX) / $this->period;
 		}
 
@@ -861,7 +865,8 @@ class CChart extends CGraphDraw{
 		$intervalX = ($main_interval * $this->sizeX) / $this->period;
 
 		if($main_interval > 86400){
-			$offset = (8 - date('w',$this->from_time)) * 86400;
+			$offset = (7 - date('w',$this->from_time)) * 86400;
+			$offset+= $this->diffTZ;
 			$next = $this->from_time + $offset;
 
 			$offset = mktime(0, 0, 0, date('m', $next), date('d', $next), date('Y', $next)) - $this->from_time;
@@ -869,6 +874,7 @@ class CChart extends CGraphDraw{
 		}
 		else{
 			$offset = $main_interval - (($this->from_time + (date('Z', $this->from_time))) % $main_interval);
+			$offset+= $this->diffTZ;
 			$offsetX = $offset * ($this->sizeX / $this->period);
 		}
 
@@ -1024,7 +1030,7 @@ class CChart extends CGraphDraw{
 	private function drawTimeGrid(){
 		$this->calctimeInterval();
 		$this->drawSubTimeGrid();
-		$this->drawMainTimeGrid();
+//		$this->drawMainTimeGrid();
 	}
 
 	private function drawSubTimeGrid(){
@@ -1047,22 +1053,32 @@ class CChart extends CGraphDraw{
 		$test_dims = imageTextSize(7, 90, 'WWW');
 		for($i=$start_i; $i<=$vline_count; $i++){
 			$new_time = $this->from_time+$i*$interval+$offset;
-// DayLightSave
-			if(date('I',$new_time) == 0) $new_time+=3600;
-
 			$new_pos = $i*$intervalX+$offsetX;
 
-// check
-			if(($interval == 86400) && date('N',$new_time) == 1) continue;
-// if we step to main_time
-			else if(($i*$interval % $main_interval + $offset) == $main_offset) continue;
+// DayLightSave
+			if(($interval > 3600) && date('I',$this->to_time) == date('I',$new_time)) $new_time+=$this->diffTZ;
 
-/*
-SDI(($i*$interval % $main_interval + $offset).' == '.$main_offset);
-SDI(($interval*$i+$offset).' : '.$interval.' - '.$main_interval);
-SDI($offset.' : '.$main_offset);
-SDI('======================================');
-//*/
+// MAIN Interval Checks
+			if(($interval < 3600) && (date('i',$new_time) == 0)){
+				$this->DrawMainPeriod($new_time, $new_pos);
+				continue;
+			}
+			
+			if(($interval > 3600) && ($interval < 86400) && (date('H',$new_time) == 0)){
+				$this->DrawMainPeriod($new_time, $new_pos);
+				continue;
+			}
+			
+			if(($interval == 86400) && (date('N',$new_time) == 7)){
+				$this->DrawMainPeriod($new_time, $new_pos);
+				continue;
+			}
+			
+			if(($interval > 86400) && (($i*$interval % $main_interval + $offset) == $main_offset)){
+				$this->DrawMainPeriod($new_time, $new_pos);
+				continue;
+			}
+//----------
 
 			dashedline($this->im,
 					$this->shiftXleft+$new_pos,
@@ -1092,84 +1108,69 @@ SDI('======================================');
 			);
 
 		}
-	}
-
-	private function drawMainTimeGrid(){
-		$main = &$this->grid['horizontal']['main'];
-		$interval = $main['interval'];
-		$vline_count = $main['linecount'];
-		$intervalX = $main['intervalx'];
-		$offset = $main['offset'];
-		$offsetX = $main['offsetx'];
-		$start_i = $main['start'];
-
-		$old_day=date('d',$this->from_time);
-		for($i=$start_i; $i<=$vline_count; $i++){
-			$new_time = $this->from_time+$i*$interval+$offset;
-// DayLightSave
-			if(date('I',$new_time) == 0) $new_time+=3600;
-
-			$new_day = date('d', $new_time);
-			if($old_day != $new_day){
-				$old_day=$new_day;
-
-				if($interval > 86400) $date_format = 'd.m';
-				else if(date('Hi', $new_time) == 0) $date_format = 'd.m';
-				else $date_format = 'd.m H:i';
-
-				$color = $this->graphtheme['highlightcolor'];
-			}
-			else{
-				$date_format = 'H:i';
-				$color = $this->graphtheme['highlightcolor'];
-			}
-
-			$str = date($date_format, $new_time);
-			$dims = imageTextSize(8, 90, $str);
-
-			imageText($this->im,
-						8,
-						90,
-						$i*$intervalX+$this->shiftXleft+$offsetX+round($dims['width']/2),
-						$this->sizeY+$this->shiftY+$dims['height']+6,
-						$this->getColor($color,0),
-						$str
-			);
-
-			dashedline($this->im,
-					$i*$intervalX+$this->shiftXleft+$offsetX,
-					$this->shiftY,
-					$i*$intervalX+$this->shiftXleft+$offsetX,
-					$this->sizeY+$this->shiftY,
-					$this->getColor($this->graphtheme['maingridcolor'], 0)
-			);
-		}
-
-
+		
 // First && Last
 // Start
-		$str = date('d.m H:i',$this->from_time);
+		$str = date('d.m H:i',$this->stime);
 		$dims = imageTextSize(8, 90, $str);
 		imageText($this->im,
 					8,
 					90,
 					$this->shiftXleft + round($dims['width']/2),
-					$this->sizeY+$this->shiftY + $dims['height'] + 4,
+					$this->sizeY+$this->shiftY + $dims['height'] + 6,
 					$this->getColor($this->graphtheme['highlightcolor'], 0),
 					$str
 			);
 
 // End
-		$str = date('d.m H:i',$this->to_time);
+		$endtime = $this->to_time;// - $this->diffTZ;
+
+		$str = date('d.m H:i',$endtime);
 		$dims = imageTextSize(8, 90, $str);
 		imageText($this->im,
 					8,
 					90,
 					$this->sizeX+$this->shiftXleft + round($dims['width']/2),
-					$this->sizeY+$this->shiftY + $dims['height'] + 4,
+					$this->sizeY+$this->shiftY + $dims['height'] + 6,
 					$this->getColor($this->graphtheme['highlightcolor'], 0),
 					$str
 			);
+	}
+
+	private function drawMainPeriod($new_time, $new_pos){
+		if(date('H',$new_time) == 0){
+			$old_day=$new_day;
+
+			if($interval > 86400) $date_format = 'd.m';
+			else if(date('Hi', $new_time) == 0) $date_format = 'd.m';
+			else $date_format = 'd.m H:i';
+
+			$color = $this->graphtheme['highlightcolor'];
+		}
+		else{
+			$date_format = 'H:i';
+			$color = $this->graphtheme['highlightcolor'];
+		}
+
+		$str = date($date_format, $new_time);
+		$dims = imageTextSize(8, 90, $str);
+
+		imageText($this->im,
+					8,
+					90,
+					$this->shiftXleft+$new_pos+round($dims['width']/2),
+					$this->sizeY+$this->shiftY+$dims['height']+6,
+					$this->getColor($color,0),
+					$str
+		);
+
+		dashedline($this->im,
+				$this->shiftXleft+$new_pos,
+				$this->shiftY,
+				$this->shiftXleft+$new_pos,
+				$this->sizeY+$this->shiftY,
+				$this->getColor($this->graphtheme['maingridcolor'], 0)
+		);
 	}
 
 	private function drawLeftSide(){
