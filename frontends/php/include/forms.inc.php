@@ -6797,16 +6797,21 @@
 
 					$tmp_result = false;
 					if($expression['case_sensitive']){
-						foreach($paterns as $pid => $patern)
-							$tmp_result |= (zbx_stristr($test_string,$patern) !== false);
-					}
-					else{
-						foreach($paterns as $pid => $patern){
+						foreach($paterns as $pid => $patern){						
 							$tmp_result |= (zbx_strstr($test_string,$patern) !== false);
 						}
 					}
+					else{
+						foreach($paterns as $pid => $patern){
+							$tmp_result |= (zbx_stristr($test_string,$patern) !== false);
+						}
+					}
 
-					$results[$id] &= $tmp_result;
+					if(uint_in_array($expression['expression_type'], array(EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED)))
+						$results[$id] &= $tmp_result;
+					else if($expression['expression_type'] == EXPRESSION_TYPE_NOT_INCLUDED){
+						$results[$id] &= !$tmp_result;
+					}
 					$final_result &= $results[$id];
 				}
 			}
@@ -6891,7 +6896,7 @@
 				new CCheckBox('all_expressions',null,'checkAll("Regular expression","all_expressions","g_expressionid");'),
 				S_EXPRESSION,
 				S_EXPECTED_RESULT,
-				S_IGNORE_CASE,
+				S_CASE_SENSITIVE,
 				S_EDIT
 			));
 
@@ -6977,7 +6982,7 @@
 
 		$chkbCase = new CCheckBox('new_expression[case_sensitive]', $new_expression['case_sensitive'],null,1);
 
-		$tblExp->addRow(array(S_IGNORE_CASE,$chkbCase));
+		$tblExp->addRow(array(S_CASE_SENSITIVE,$chkbCase));
 
 		$tblExpFooter = new CTableInfo($tblExp);
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 	require_once('include/forms.inc.php');
 
 
-	$page['title'] = "S_CONFIGURATION_OF_ZABBIX";
+	$page['title'] = 'S_CONFIGURATION_OF_ZABBIX';
 	$page['file'] = 'config.php';
 	$page['hist_arg'] = array('config');
 
@@ -37,7 +37,6 @@
 //		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 
 		'config'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN('0,3,5,6,7,8,9,10,11'),	NULL),
-
 // other form
 		'alert_history'=>		array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),	'isset({config})&&({config}==0)&&isset({save})'),
 		'event_history'=>		array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),	'isset({config})&&({config}==0)&&isset({save})'),
@@ -45,12 +44,10 @@
 		'refresh_unsupported'=>		array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),	'isset({config})&&({config}==5)&&isset({save})'),
 		'alert_usrgrpid'=>		array(T_ZBX_INT, O_NO,	NULL,	DB_ID,			'isset({config})&&({config}==5)&&isset({save})'),
 		'discovery_groupid'=>		array(T_ZBX_INT, O_NO,	NULL,	DB_ID,			'isset({config})&&({config}==5)&&isset({save})'),
-
 // image form
 		'imageid'=>			array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,			'isset({config})&&({config}==3)&&(isset({form})&&({form}=="update"))'),
 		'name'=>			array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==3)&&isset({save})'),
 		'imagetype'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN('1,2'),		'isset({config})&&({config}==3)&&(isset({save}))'),
-
 //value mapping
 		'valuemapid'=>			array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,			'isset({config})&&({config}==6)&&(isset({form})&&({form}=="update"))'),
 		'mapname'=>			array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY, 		'isset({config})&&({config}==6)&&isset({save})'),
@@ -58,7 +55,6 @@
 		'rem_value'=>			array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,65535), NULL),
 		'add_value'=>			array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY, 'isset({add_map})'),
 		'add_newvalue'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY, 'isset({add_map})'),
-
 /* actions */
 		'add_map'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'del_map'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -73,7 +69,6 @@
 		'dropdown_first_remember'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('0,1'),	NULL),
 		'max_in_table' => 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,99999),	'isset({config})&&({config}==8)&&isset({save})'),
 		'search_limit' => 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,99999),	'isset({config})&&({config}==8)&&isset({save})'),
-
 /* Macros */
 		'macros_rem'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'macros'=>				array(T_ZBX_STR, O_OPT, P_SYS,			NULL,	NULL),
@@ -81,10 +76,8 @@
 		'value_new'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	'isset({macro_add})'),
 		'macro_add' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'macros_del' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-
 /* Themes */
 		'default_theme'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,			'isset({config})&&({config}==9)&&isset({save})'),
-
 // regexp
 		'regexpids'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
 		'regexpid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			'isset({config})&&({config}==10)&&(isset({form})&&({form}=="update"))'),
@@ -101,7 +94,6 @@
 		'add_expression'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		null),
 		'edit_expressionid'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		null),
 		'delete_expression'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		null),
-
 /* other */
 		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
@@ -895,20 +887,18 @@
 //  config = 10 // Regular Expressions  //
 //////////////////////////////////////////
 	else if($_REQUEST['config'] == 10){
-		if(isset($_REQUEST["form"])){
+		if(isset($_REQUEST['form'])){
 
-			$frmRegExp = new CForm('config.php','post');
+			$frmRegExp = new CForm('config.php', 'post');
 			$frmRegExp->setName(S_REGULAR_EXPRESSION);
+			$frmRegExp->addVar('form', get_request('form', 1));
 
-			$frmRegExp->addVar('form',get_request('form',1));
-
-			$from_rfr = get_request('form_refresh',0);
-			$frmRegExp->addVar('form_refresh',$from_rfr+1);
-
-			$frmRegExp->addVar('config',get_request('config',10));
+			$from_rfr = get_request('form_refresh', 0);
+			$frmRegExp->addVar('form_refresh', $from_rfr+1);
+			$frmRegExp->addVar('config', get_request('config', 10));
 
 			if(isset($_REQUEST['regexpid']))
-				$frmRegExp->addVar('regexpid',$_REQUEST['regexpid']);
+				$frmRegExp->addVar('regexpid', $_REQUEST['regexpid']);
 
 			$left_tab = new CTable();
 			$left_tab->setCellPadding(3);
@@ -920,8 +910,8 @@
 					S_REGULAR_EXPRESSION,
 					get_regexp_form(),//null,
 					null,
-					'hat_regexp',
-					get_profile('web.config.hats.hat_regexp.state',1)
+					'hat_regexp'
+					//get_profile('web.config.hats.hat_regexp.state',1)
 				));
 
 			$right_tab = new CTable();
@@ -934,8 +924,8 @@
 					S_EXPRESSIONS,
 					get_expressions_tab(),//null,
 					null,
-					'hat_expressions',
-					get_profile('web.config.hats.hat_expressions.state',1)
+					'hat_expressions'
+//					get_profile('web.config.hats.hat_expressions.state',1)
 				));
 
 			if(isset($_REQUEST['new_expression'])){
@@ -943,8 +933,8 @@
 						S_NEW_EXPRESSION,
 						get_expression_form(),//null
 						null,
-						'hat_new_expression',
-						get_profile('web.config.hats.hat_new_expression.state',1)
+						'hat_new_expression'
+//						get_profile('web.config.hats.hat_new_expression.state',1)
 					));
 			}
 
@@ -1078,9 +1068,7 @@
 	}
 
 	$cnf_wdgt->show();
-?>
-<?php
 
+	
 include_once('include/page_footer.php');
-
 ?>
