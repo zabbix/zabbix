@@ -143,7 +143,15 @@ class Curl{
 	public function formatQuery(){
 		$query = '';
 		foreach($this->arguments as $key => $value){
-			if(!is_null($value)) $query.= $key.'='.$value.'&';
+			if(is_null($value)) continue;
+			if(is_array($value)){
+				foreach($value as $vkey => $vvalue){
+					$query.= $key.'['.$vkey.']='.$vvalue.'&';
+				}
+			}
+			else{
+				$query.= $key.'='.$value.'&';
+			}
 		}
 		$this->query = rtrim($query,'&');
 	}
