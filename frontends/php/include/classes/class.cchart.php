@@ -1059,12 +1059,17 @@ class CChart extends CGraphDraw{
 			if(($interval > 3600) && date('I',$this->to_time) == date('I',$new_time)) $new_time+=$this->diffTZ;
 
 // MAIN Interval Checks
+			if(($interval < 1800) && (date('i',$new_time) == 30)){
+				$this->DrawMainPeriod($new_time, $new_pos);
+				continue;
+			}
+
 			if(($interval < 3600) && (date('i',$new_time) == 0)){
 				$this->DrawMainPeriod($new_time, $new_pos);
 				continue;
 			}
 			
-			if(($interval > 3600) && ($interval < 86400) && (date('H',$new_time) == 0)){
+			if(($interval >= 3600) && ($interval < 86400) && (date('H',$new_time) == 0)){
 				$this->DrawMainPeriod($new_time, $new_pos);
 				continue;
 			}

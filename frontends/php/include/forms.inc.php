@@ -2778,7 +2778,7 @@
 									"openWinCentered(".
 									"'tr_testexpr.php?expression=' + encodeURIComponent(this.form.elements['expression'].value)".
 									",'ExpressionTest'".
-									",750,600".
+									",850,400".
 									",'titlebar=no, resizable=yes, scrollbars=yes');".
 									"return false;");
 			if (empty($outline)) $btn_test->setAttribute('disabled', 'yes');
