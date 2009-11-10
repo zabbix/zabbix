@@ -660,7 +660,7 @@ class CTrigger extends CZBXAPI{
  * @param array $triggers[0,...]['status'] OPTIONAL
  * @param array $triggers[0,...]['comments'] OPTIONAL
  * @param array $triggers[0,...]['url'] OPTIONAL
-* @param array $triggers[0,...]['templateid'] OPTIONAL
+ * @param array $triggers[0,...]['templateid'] OPTIONAL
  * @return boolean
  */
 	public static function update($triggers){
