@@ -317,6 +317,7 @@ include_once('include/page_header.php');
 
 
 	$options = array(
+		'nodeids' => get_current_nodeid(),
 		'status' => TRIGGER_STATUS_ENABLED,
 		'filter' => 1,
 		'extendoutput' => 1,
@@ -348,7 +349,7 @@ include_once('include/page_header.php');
 	}
 
 	$triggers = CTrigger::get($options);
-
+	
 // sorting && paging
 	order_page_result($triggers, 'description');
 	$paging = getPagingLine($triggers);
@@ -357,6 +358,7 @@ include_once('include/page_header.php');
 
 	if($show_events != EVENTS_OPTION_NOEVENT){
 		$ev_options = array(
+			'nodeids' => get_current_nodeid(),
 			'object' => EVENT_OBJECT_TRIGGER,
 			'nopermissions' => 1,
 			'extendoutput' => 1,
