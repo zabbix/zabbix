@@ -445,13 +445,15 @@ function __autoload($class_name){
 	}
 
 	function error($msgs){
-		global $ZBX_MESSAGES;
+		global $ZBX_MESSAGES, $USER_DETAILS;
 		zbx_value2array($msgs);
 
 		if(is_null($ZBX_MESSAGES))
 			$ZBX_MESSAGES = array();
-
+			
 		foreach($msgs as $msg){
+			if(!$USER_DETAILS['debug_mode'])
+				$msg = preg_replace('/^\[.+?::.+?\]/', '', $msg);
 			array_push($ZBX_MESSAGES, array('type' => 'error', 'message' => $msg));
 		}
 	}
