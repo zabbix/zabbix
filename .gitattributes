@@ -155,6 +155,7 @@ frontends/php/images/general/sortdown_off.gif -text svneol=unset#unset
 frontends/php/images/general/sortup.gif -text svneol=unset#unset
 frontends/php/images/general/sortup_off.gif -text svneol=unset#unset
 frontends/php/images/general/tick.png -text
+frontends/php/images/general/tr_space.gif -text
 frontends/php/images/general/tr_top_bottom.gif -text
 frontends/php/images/general/tr_top_right.gif -text
 frontends/php/images/general/tr_top_right_bottom.gif -text
