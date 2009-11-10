@@ -1236,6 +1236,7 @@
 	function prepare_subfilter_output($data, $subfilter, $subfilter_name){
 
 		$output = array();
+		order_result($data, 'name');
 		foreach($data as $id => $elem){
 
 // subfilter is activated
