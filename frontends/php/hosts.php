@@ -142,23 +142,23 @@ include_once('include/page_header.php');
 
 		if(!CUserMacro::validate($macro_new)){
 			error(S_WRONG_MACRO.' : '.$macro_new);
-			show_messages(false, '', S_MACROS);
+			show_messages(false, '', S_CANNOT_ADD_MACRO);
 		}
 		else if(zbx_empty($value_new)){
 			error(S_EMPTY_MACRO_VALUE);
-			show_messages(false, '', S_MACROS);
+			show_messages(false, '', S_CANNOT_ADD_MACRO);
 		}
 		else if(str_in_array($macro_new, $currentmacros)){
 			error(S_MACRO_EXISTS.' : '.$macro_new);
-			show_messages(false, '', S_MACROS);
+			show_messages(false, '', S_CANNOT_ADD_MACRO);
 		}
 		else if(strlen($macro_new) > 64){
 			error(S_MACRO_TOO_LONG.' : '.$macro_new);
-			show_messages(false, '', S_MACROS);
+			show_messages(false, '', S_CANNOT_ADD_MACRO);
 		}
 		else if(strlen($value_new) > 255){
 			error(S_MACRO_VALUE_TOO_LONG.' : '.$value_new);
-			show_messages(false, '', S_MACROS);
+			show_messages(false, '', S_CANNOT_ADD_MACRO);
 		}
 		else{
 			$_REQUEST['macros'][$macro_new]['macro'] = $macro_new;
