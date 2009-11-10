@@ -490,12 +490,12 @@ class CTrigger extends CZBXAPI{
  * @return array|boolean array of trigger data || false if error
  */
 	public static function getById($trigger){
-	$trigger =  get_trigger_by_triggerid($trigger['triggerid']);
-	$result = $trigger ? true : false;
-	if($result)
-		$result = $trigger;
-	else
-		self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+		$trigger =  get_trigger_by_triggerid($trigger['triggerid']);
+		$result = $trigger ? true : false;
+		if($result)
+			$result = $trigger;
+		else
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 
 	return $result;
 }

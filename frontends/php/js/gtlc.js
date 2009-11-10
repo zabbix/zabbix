@@ -2090,7 +2090,7 @@ mousemove: function(e){
 
 	e = e || window.event;
 	
-	if(IE || OP) cancelEvent(e);
+	if(IE) cancelEvent(e);
 
 	if(ZBX_SBOX[this.sbox_id].mousedown == true){
 		this.optimize_event(e);
