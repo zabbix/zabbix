@@ -23,29 +23,29 @@
 	define('ZABBIX_API_VERSION','1.7.1');
 /* USER DEFINES */
 
-	define('ZBX_LOGIN_ATTEMPTS',				5);
-	define('ZBX_LOGIN_BLOCK',					30); // sec
+	define('ZBX_LOGIN_ATTEMPTS',			5);
+	define('ZBX_LOGIN_BLOCK',			30); // sec
 
-	define('TRIGGERS_OPTION_DISABLED',			0);	// reserved
-	define('TRIGGERS_OPTION_ONLYTRUE',			1);	// use 0 to disable
-	define('TRIGGERS_OPTION_ALL',				2);	// use 0 to disable
+	define('TRIGGERS_OPTION_DISABLED',		0);	// reserved
+	define('TRIGGERS_OPTION_ONLYTRUE',		1);	// use 0 to disable
+	define('TRIGGERS_OPTION_ALL',			2);	// use 0 to disable
 
-	define('TRIGGER_FALSE_PERIOD', 				600);	// 10min,  0 - disable
-	define('TRIGGER_BLINK_PERIOD',				300);	// 5min,  0 - disable
+	define('TRIGGER_FALSE_PERIOD', 			600);	// 10min,  0 - disable
+	define('TRIGGER_BLINK_PERIOD',			300);	// 5min,  0 - disable
 
-	define('EVENTS_OPTION_DISABLED',			0);	// reserved
-	define('EVENTS_OPTION_NOEVENT',				1);	// use 0 to disable
-	define('EVENTS_OPTION_ALL',					2);	// use 0 to disable
-	define('EVENTS_OPTION_NOT_ACK',				3);	// use 0 to disable
+	define('EVENTS_OPTION_DISABLED',		0);	// reserved
+	define('EVENTS_OPTION_NOEVENT',			1);	// use 0 to disable
+	define('EVENTS_OPTION_ALL',			2);	// use 0 to disable
+	define('EVENTS_OPTION_NOT_ACK',			3);	// use 0 to disable
 	define('EVENTS_OPTION_ONLYTRUE_NOTACK',		4);	// use 0 to disable
-	define('EVENTS_OPTION_EVENT_LAST',			6); // use 0 to disable
+	define('EVENTS_OPTION_EVENT_LAST',		6); // use 0 to disable
 
-	define('ZBX_MIN_PERIOD',					3600);				// 1 hour
-	define('ZBX_MAX_PERIOD', 					2*365*86400);		// ~2 years
+	define('ZBX_MIN_PERIOD',			3600);			// 1 hour
+	define('ZBX_MAX_PERIOD',			2*365*86400);		// ~2 years
 	define('ZBX_PERIOD_DEFAULT', 				86400);				// 1 day
 
-	define('ZBX_FONTPATH', 						realpath('fonts'));		// where to search for font  (GD > 2.0.18)
-	define('ZBX_GRAPH_FONT_NAME', 				'DejaVuSans');			// font file name
+	define('ZBX_FONTPATH',				realpath('fonts'));	// where to search for font (GD > 2.0.18)
+	define('ZBX_GRAPH_FONT_NAME',			'DejaVuSans');		// font file name
 /* END OF USERS DEFINES */
 
 	define('ZBX_AUTH_INTERNAL',	0);
@@ -59,12 +59,12 @@
 	define('PAGE_TYPE_HTML_BLOCK',		4);	// simple block of html (as text)
 	define('PAGE_TYPE_JSON_RPC',		5);	// api call
 
-	define('ZBX_SESSION_ACTIVE', 0);
-	define('ZBX_SESSION_PASSIVE', 1);
+	define('ZBX_SESSION_ACTIVE',		0);
+	define('ZBX_SESSION_PASSIVE',		1);
 
-	define('ZBX_DROPDOWN_FIRST_NONE',		0);
-	define('ZBX_DROPDOWN_FIRST_ALL',		1);
-	define('ZBX_DROPDOWN_FIRST_ZBX162',		2);
+	define('ZBX_DROPDOWN_FIRST_NONE',	0);
+	define('ZBX_DROPDOWN_FIRST_ALL',	1);
+	define('ZBX_DROPDOWN_FIRST_ZBX162',	2);
 
 	define('T_ZBX_STR',			0);
 	define('T_ZBX_INT',			1);
@@ -184,8 +184,8 @@
 	define('HOST_AVAILABLE_TRUE',		1);
 	define('HOST_AVAILABLE_FALSE',		2);
 
-	define('MAINTENANCE_TYPE_NORMAL', 	0);
-	define('MAINTENANCE_TYPE_NODATA', 	1);
+	define('MAINTENANCE_TYPE_NORMAL',	0);
+	define('MAINTENANCE_TYPE_NODATA',	1);
 
 	define('TIMEPERIOD_TYPE_ONETIME',	0);
 	define('TIMEPERIOD_TYPE_HOURLY',	1);
@@ -194,11 +194,11 @@
 	define('TIMEPERIOD_TYPE_MONTHLY',	4);
 	define('TIMEPERIOD_TYPE_YEARLY',	5);
 
-	define('MAP_LABEL_TYPE_LABEL',0);
-	define('MAP_LABEL_TYPE_IP',1);
-	define('MAP_LABEL_TYPE_NAME',2);
-	define('MAP_LABEL_TYPE_STATUS',3);
-	define('MAP_LABEL_TYPE_NOTHING',4);
+	define('MAP_LABEL_TYPE_LABEL',		0);
+	define('MAP_LABEL_TYPE_IP',		1);
+	define('MAP_LABEL_TYPE_NAME',		2);
+	define('MAP_LABEL_TYPE_STATUS',		3);
+	define('MAP_LABEL_TYPE_NOTHING',	4);
 
 	define('MAP_LABEL_LOC_BOTTOM',		0);
 	define('MAP_LABEL_LOC_LEFT',		1);
@@ -215,42 +215,42 @@
 	define('SYSMAP_ELEMENT_ICON_OFF',	1);
 	define('SYSMAP_ELEMENT_ICON_UNKNOWN',	2);
 
-	define('ITEM_TYPE_ZABBIX',0);
-	define('ITEM_TYPE_SNMPV1',1);
-	define('ITEM_TYPE_TRAPPER',2);
-	define('ITEM_TYPE_SIMPLE',3);
-	define('ITEM_TYPE_SNMPV2C',4);
-	define('ITEM_TYPE_INTERNAL',5);
-	define('ITEM_TYPE_SNMPV3',6);
-	define('ITEM_TYPE_ZABBIX_ACTIVE',7);
-	define('ITEM_TYPE_AGGREGATE',8);
-	define('ITEM_TYPE_HTTPTEST',9);
-	define('ITEM_TYPE_EXTERNAL',10);
-	define('ITEM_TYPE_DB_MONITOR',11);
-	define('ITEM_TYPE_IPMI',12);
-	define('ITEM_TYPE_SSH',13);
-	define('ITEM_TYPE_TELNET',14);
+	define('ITEM_TYPE_ZABBIX',		0);
+	define('ITEM_TYPE_SNMPV1',		1);
+	define('ITEM_TYPE_TRAPPER',		2);
+	define('ITEM_TYPE_SIMPLE',		3);
+	define('ITEM_TYPE_SNMPV2C',		4);
+	define('ITEM_TYPE_INTERNAL',		5);
+	define('ITEM_TYPE_SNMPV3',		6);
+	define('ITEM_TYPE_ZABBIX_ACTIVE',	7);
+	define('ITEM_TYPE_AGGREGATE',		8);
+	define('ITEM_TYPE_HTTPTEST',		9);
+	define('ITEM_TYPE_EXTERNAL',		10);
+	define('ITEM_TYPE_DB_MONITOR',		11);
+	define('ITEM_TYPE_IPMI',		12);
+	define('ITEM_TYPE_SSH',			13);
+	define('ITEM_TYPE_TELNET',		14);
 
-	define('ITEM_VALUE_TYPE_FLOAT',0);
-	define('ITEM_VALUE_TYPE_STR',1);
-	define('ITEM_VALUE_TYPE_LOG',2);
-	define('ITEM_VALUE_TYPE_UINT64',3);
-	define('ITEM_VALUE_TYPE_TEXT',4);
+	define('ITEM_VALUE_TYPE_FLOAT',		0);
+	define('ITEM_VALUE_TYPE_STR',		1);
+	define('ITEM_VALUE_TYPE_LOG',		2);
+	define('ITEM_VALUE_TYPE_UINT64',	3);
+	define('ITEM_VALUE_TYPE_TEXT',		4);
 
-	define('ITEM_DATA_TYPE_DECIMAL',0);
-	define('ITEM_DATA_TYPE_OCTAL',1);
-	define('ITEM_DATA_TYPE_HEXADECIMAL',2);
+	define('ITEM_DATA_TYPE_DECIMAL',	0);
+	define('ITEM_DATA_TYPE_OCTAL',		1);
+	define('ITEM_DATA_TYPE_HEXADECIMAL',	2);
 
-	define('ITEM_STATUS_ACTIVE',0);
-	define('ITEM_STATUS_DISABLED',1);
-	define('ITEM_STATUS_NOTSUPPORTED',3);
+	define('ITEM_STATUS_ACTIVE',		0);
+	define('ITEM_STATUS_DISABLED',		1);
+	define('ITEM_STATUS_NOTSUPPORTED',	3);
 
 	define('ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV',0);
 	define('ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV',1);
 	define('ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV',2);
 
-	define('ITEM_AUTHTYPE_PASSWORD',0);
-	define('ITEM_AUTHTYPE_PUBLICKEY',1);
+	define('ITEM_AUTHTYPE_PASSWORD',	0);
+	define('ITEM_AUTHTYPE_PUBLICKEY',	1);
 
 	define('GRAPH_ITEM_DRAWTYPE_LINE',		0);
 	define('GRAPH_ITEM_DRAWTYPE_FILLED_REGION',	1);
