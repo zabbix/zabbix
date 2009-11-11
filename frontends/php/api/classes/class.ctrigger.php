@@ -226,7 +226,7 @@ class CTrigger extends CZBXAPI{
 		if(!is_null($options['status'])){
 			$sql_parts['where'][] = 't.status='.$options['status'];
 		}
-		
+
 // monitored
 		if(!is_null($options['monitored'])){
 			$sql_parts['from']['f'] = 'functions f';

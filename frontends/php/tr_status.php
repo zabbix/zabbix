@@ -349,7 +349,7 @@ include_once('include/page_header.php');
 	}
 
 	$triggers = CTrigger::get($options);
-	
+
 // sorting && paging
 	order_page_result($triggers, 'description');
 	$paging = getPagingLine($triggers);

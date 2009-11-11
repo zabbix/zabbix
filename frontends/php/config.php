@@ -1069,6 +1069,6 @@
 
 	$cnf_wdgt->show();
 
-	
+
 include_once('include/page_footer.php');
 ?>

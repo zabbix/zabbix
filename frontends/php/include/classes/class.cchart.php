@@ -184,11 +184,11 @@ class CChart extends CGraphDraw{
 
 		if(!isset($this->stime)){
 			$this->stime	= $now - $this->period;
-		}		
+		}
 
 		$this->diffTZ = (date('I',$this->stime) - date('I',$this->stime + $this->period)) * 3600;
 //		$this->stime += $this->diffTZ;
-		
+
 		$this->from_time	= $this->stime; // + timeZone offset
 		$this->to_time		= $this->stime + $this->period; // + timeZone offset
 
@@ -1068,17 +1068,17 @@ class CChart extends CGraphDraw{
 				$this->DrawMainPeriod($new_time, $new_pos);
 				continue;
 			}
-			
+
 			if(($interval >= 3600) && ($interval < 86400) && (date('H',$new_time) == 0)){
 				$this->DrawMainPeriod($new_time, $new_pos);
 				continue;
 			}
-			
+
 			if(($interval == 86400) && (date('N',$new_time) == 7)){
 				$this->DrawMainPeriod($new_time, $new_pos);
 				continue;
 			}
-			
+
 			if(($interval > 86400) && (($i*$interval % $main_interval + $offset) == $main_offset)){
 				$this->DrawMainPeriod($new_time, $new_pos);
 				continue;
@@ -1113,7 +1113,7 @@ class CChart extends CGraphDraw{
 			);
 
 		}
-		
+
 // First && Last
 // Start
 		$str = date('d.m H:i',$this->stime);

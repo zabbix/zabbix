@@ -127,7 +127,7 @@ static ssize_t	telnet_read(int socket_fd, char *buf, size_t *buf_left, size_t *b
 				break;
 			case 251:	/* Option code (WILL) */
 			case 252:	/* Option code (WON'T) */
-			case 253:	/* Option code (DO) */ 
+			case 253:	/* Option code (DO) */
 			case 254:	/* Option code (DON'T) */
 				// reply to all commands with "WONT", unless it is SGA (suppres go ahead)
 				while (0 == (rc = telnet_socket_read(socket_fd, &c3, 1)))
@@ -140,8 +140,8 @@ static ssize_t	telnet_read(int socket_fd, char *buf, size_t *buf_left, size_t *b
 				telnet_socket_write(socket_fd, &c, 1);	/* IAC */
 				c = (c2 == 253) ? 252 : 254; /* DO ? WON'T : DON'T */
 
-				telnet_socket_write(socket_fd, &c, 1); 
-				telnet_socket_write(socket_fd, &c3, 1); 
+				telnet_socket_write(socket_fd, &c, 1);
+				telnet_socket_write(socket_fd, &c3, 1);
 				break;
 			default:
 				break;
@@ -371,7 +371,7 @@ static int	telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	flags = fcntl(s.socket, F_GETFL);
 	if (0 == (flags & O_NONBLOCK))
 		fcntl(s.socket, F_SETFL, flags | O_NONBLOCK);
-			
+
 	if (FAIL == telnet_login(s.socket, item->username, item->password, result))
 		goto tcp_close;
 

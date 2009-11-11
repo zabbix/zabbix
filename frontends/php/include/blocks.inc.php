@@ -174,7 +174,7 @@ return $table;
 // Author: Aly
 function make_system_summary(){
 	global $USER_DETAILS;
-	
+
 	$config = select_config();
 
 	$table = new CTableInfo();
@@ -193,7 +193,7 @@ function make_system_summary(){
 	$options = array(
 		'monitored_hosts' => 1,
 		'with_monitored_triggers' => 1,
-		'extendoutput' => 1	
+		'extendoutput' => 1
 	);
 	$groups = CHostGroup::get($options);
 	order_result($groups, 'name');
@@ -209,7 +209,7 @@ function make_system_summary(){
 		$groups[$num]['tab_priority'][TRIGGER_SEVERITY_NOT_CLASSIFIED] = array('count' => 0, 'triggers' => array());
 	}
 // }}} SELECT HOST GROUPS
-	
+
 // SELECT TRIGGERS {{{
 	$options = array(
 		'groupids' => $groupids,
@@ -230,7 +230,7 @@ function make_system_summary(){
 		}
 	}
 // }}} SELECT TRIGGERS
-	
+
 	foreach($groups as $num => $group){
 		$group_row = new CRow();
 		if(is_show_all_nodes())
@@ -242,7 +242,7 @@ function make_system_summary(){
 
 		foreach($group['tab_priority'] as $severity => $data){
 			$trigger_count = $data['count'];
-			
+
 			if($trigger_count){
 				$table_inf = new CTableInfo();
 				$table_inf->setAttribute('style', 'width: 400px;');
@@ -275,7 +275,7 @@ function make_system_summary(){
 					);
 					$event = CEvent::get($options);
 					zbx_valueTo($event, array('object' => 1));
-	
+
 					if(!empty($event)){
 						if($config['event_ack_enable']){
 							$ack = ($event['acknowledged'] == 1) ? new CLink(S_YES, 'acknow.php?eventid='.$event['eventid'], 'off')
