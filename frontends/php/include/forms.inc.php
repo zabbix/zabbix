@@ -6798,7 +6798,7 @@
 
 					$tmp_result = false;
 					if($expression['case_sensitive']){
-						foreach($paterns as $pid => $patern){						
+						foreach($paterns as $pid => $patern){
 							$tmp_result |= (zbx_strstr($test_string,$patern) !== false);
 						}
 					}

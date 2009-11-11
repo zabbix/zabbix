@@ -450,7 +450,7 @@ function __autoload($class_name){
 
 		if(is_null($ZBX_MESSAGES))
 			$ZBX_MESSAGES = array();
-			
+
 		foreach($msgs as $msg){
 			if(!$USER_DETAILS['debug_mode'])
 				$msg = preg_replace('/^\[.+?::.+?\]/', '', $msg);

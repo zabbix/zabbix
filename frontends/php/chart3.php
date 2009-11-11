@@ -73,7 +73,7 @@ include_once('include/page_header.php');
 			access_deny();
 		}
 	}
-	
+
 	$effectiveperiod = navigation_bar_calc();
 
 	$graph = new CChart(get_request('graphtype'	,GRAPH_TYPE_NORMAL));

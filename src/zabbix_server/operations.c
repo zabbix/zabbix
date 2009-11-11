@@ -828,7 +828,7 @@ void	op_group_add(DB_EVENT *event, DB_OPERATION *operation)
 
 	if (0 == (hostid = add_discovered_host(event)))
 		return;
-	
+
 	add_discovered_host_group(hostid, operation->objectid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

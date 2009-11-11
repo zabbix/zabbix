@@ -1302,7 +1302,7 @@ static int	DBupdate_graph(
 			"update graphs_items"
 			" set calc_fnc=%d,"
 				"drawtype=1,"
-				"type=%d" 
+				"type=%d"
 			" where graphid=" ZBX_FS_UI64,
 			CALC_FNC_AVG,
 			GRAPH_ITEM_SIMPLE,

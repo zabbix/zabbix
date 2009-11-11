@@ -246,12 +246,12 @@ function InsertText(obj, value){
 		obj.focus();
 		var s = window.opener.document.selection.createRange();
 		s.text = value;
-	} 
+	}
 	else if (obj.selectionStart || obj.selectionStart == '0') {
 		var s = obj.selectionStart;
 		var e = obj.selectionEnd;
 		obj.value = obj.value.substring(0, s) + value + obj.value.substring(e, obj.value.length);
-	} 
+	}
 	else {
 		obj.value += value;
 	}
@@ -327,7 +327,7 @@ if(form){
 						foreach( $pf['M'] as $mid => $caption ){
 							$cmbParamType->addItem($mid, $caption);
 						}
-					} 
+					}
 					else {
 						$form->addVar('paramtype', PARAM_TYPE_SECONDS);
 						$cmbParamType = S_SECONDS;
