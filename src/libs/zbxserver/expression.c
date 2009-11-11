@@ -1032,6 +1032,51 @@ static int	DBget_trigger_value_by_triggerid(zbx_uint64_t triggerid, char **repla
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBget_trigger_events_unacknowledged                              *
+ *                                                                            *
+ * Purpose: retrieve number of unacknowledged PROBLEM events for a trigger    *
+ *          which generated event                                             *
+ *                                                                            *
+ * Parameters: triggerid - trigger identificator from database                *
+ *             replace_to - pointer to result buffer                          *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int DBget_trigger_events_unacknowledged(zbx_uint64_t triggerid, char **replace_to)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = FAIL;
+
+	result = DBselect(
+			"select count(*)"
+			" from events"
+			" where object=%d"
+				" and objectid=" ZBX_FS_UI64
+				" and value=%d"
+				" and acknowledged=0",
+			EVENT_OBJECT_TRIGGER,
+			triggerid,
+			TRIGGER_VALUE_TRUE);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		*replace_to = zbx_dsprintf(*replace_to, "%s", row[0]);
+		ret = SUCCEED;
+	}
+	DBfree_result(result);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBget_dhost_value_by_event                                       *
  *                                                                            *
  * Purpose: retrieve discovered host value by event and field name            *
@@ -1708,6 +1753,8 @@ static int	get_node_value_by_event(DB_EVENT *event, char **replace_to, const cha
 #define MVAR_TRIGGER_VALUE		"{TRIGGER.VALUE}"
 #define MVAR_TRIGGER_URL		"{TRIGGER.URL}"
 
+#define MVAR_TRIGGER_EVENTS_UNACK	"{TRIGGER.EVENTS.UNACK}"
+
 #define MVAR_PROFILE_DEVICETYPE		"{PROFILE.DEVICETYPE}"
 #define MVAR_PROFILE_NAME		"{PROFILE.NAME}"
 #define MVAR_PROFILE_OS			"{PROFILE.OS}"
@@ -1936,6 +1983,8 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 					replace_to = zbx_dsprintf(replace_to, "%d", event->value);
 				else if (0 == strcmp(m, MVAR_TRIGGER_URL))
 					replace_to = zbx_dsprintf(replace_to, "%s", event->trigger_url);
+				else if (0 == strcmp(m, MVAR_TRIGGER_EVENTS_UNACK))
+					ret = DBget_trigger_events_unacknowledged(event->objectid, &replace_to);
 				else if (0 == strcmp(m, MVAR_EVENT_ID))
 					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->eventid);
 				else if (0 == strcmp(m, MVAR_EVENT_DATE))
