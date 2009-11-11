@@ -1756,6 +1756,42 @@ static char	buf_string[640];
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_host_string                                                  *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: <host> or "???" if host not found                            *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_host_string(zbx_uint64_t hostid)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	result = DBselect(
+			"select host"
+			" from hosts"
+			" where hostid=" ZBX_FS_UI64,
+			hostid);
+
+	if (NULL != (row = DBfetch(result)))
+		zbx_snprintf(buf_string, sizeof(buf_string), "%s", row[0]);
+	else
+		zbx_snprintf(buf_string, sizeof(buf_string), "???");
+
+	DBfree_result(result);
+
+	return buf_string;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_host_key_string                                              *
  *                                                                            *
  * Purpose:                                                                   *
