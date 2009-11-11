@@ -30,7 +30,7 @@
 	define('TRIGGERS_OPTION_ONLYTRUE',		1);	// use 0 to disable
 	define('TRIGGERS_OPTION_ALL',			2);	// use 0 to disable
 
-	define('TRIGGER_FALSE_PERIOD', 			600);	// 10min,  0 - disable
+	define('TRIGGER_FALSE_PERIOD',			600);	// 10min, 0 - disable
 	define('TRIGGER_BLINK_PERIOD',			300);	// 5min,  0 - disable
 
 	define('EVENTS_OPTION_DISABLED',		0);	// reserved
@@ -40,9 +40,9 @@
 	define('EVENTS_OPTION_ONLYTRUE_NOTACK',		4);	// use 0 to disable
 	define('EVENTS_OPTION_EVENT_LAST',		6); // use 0 to disable
 
-	define('ZBX_MIN_PERIOD',			3600);			// 1 hour
-	define('ZBX_MAX_PERIOD',			2*365*86400);		// ~2 years
-	define('ZBX_PERIOD_DEFAULT', 				86400);				// 1 day
+	define('ZBX_MIN_PERIOD',			3600);		// 1 hour
+	define('ZBX_MAX_PERIOD',			2*365*86400);	// ~2 years
+	define('ZBX_PERIOD_DEFAULT',			86400);		// 1 day
 
 	define('ZBX_FONTPATH',				realpath('fonts'));	// where to search for font (GD > 2.0.18)
 	define('ZBX_GRAPH_FONT_NAME',			'DejaVuSans');		// font file name
@@ -119,8 +119,8 @@
 	define('AUDIT_RESOURCE_GRAPH',			6);
 	define('AUDIT_RESOURCE_GRAPH_ELEMENT',		7);
 //	define('AUDIT_RESOURCE_ESCALATION',		8);
-//	define('AUDIT_RESOURCE_ESCALATION_RULE',9);
-//	define('AUDIT_RESOURCE_AUTOREGISTRATION',10);
+//	define('AUDIT_RESOURCE_ESCALATION_RULE',	9);
+//	define('AUDIT_RESOURCE_AUTOREGISTRATION',	10);
 	define('AUDIT_RESOURCE_USER_GROUP',		11);
 	define('AUDIT_RESOURCE_APPLICATION',		12);
 	define('AUDIT_RESOURCE_TRIGGER',		13);
@@ -245,9 +245,9 @@
 	define('ITEM_STATUS_DISABLED',		1);
 	define('ITEM_STATUS_NOTSUPPORTED',	3);
 
-	define('ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV',0);
-	define('ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV',1);
-	define('ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV',2);
+	define('ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV',	0);
+	define('ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV',		1);
+	define('ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV',		2);
 
 	define('ITEM_AUTHTYPE_PASSWORD',	0);
 	define('ITEM_AUTHTYPE_PUBLICKEY',	1);
@@ -264,20 +264,20 @@
 	define('MAP_LINK_DRAWTYPE_DOT',			3);
 	define('MAP_LINK_DRAWTYPE_DASHED_LINE',		4);
 
-	define('SERVICE_ALGORITHM_NONE',0);
-	define('SERVICE_ALGORITHM_MAX',1);
-	define('SERVICE_ALGORITHM_MIN',2);
+	define('SERVICE_ALGORITHM_NONE',	0);
+	define('SERVICE_ALGORITHM_MAX',		1);
+	define('SERVICE_ALGORITHM_MIN',		2);
 
-	define('TRIGGER_MULT_EVENT_DISABLED',0);
-	define('TRIGGER_MULT_EVENT_ENABLED',1);
+	define('TRIGGER_MULT_EVENT_DISABLED',	0);
+	define('TRIGGER_MULT_EVENT_ENABLED',	1);
 
-	define('TRIGGER_STATUS_ENABLED',0);
-	define('TRIGGER_STATUS_DISABLED',1);
-	define('TRIGGER_STATUS_UNKNOWN',2);
+	define('TRIGGER_STATUS_ENABLED',	0);
+	define('TRIGGER_STATUS_DISABLED',	1);
+	define('TRIGGER_STATUS_UNKNOWN',	2);
 
-	define('TRIGGER_VALUE_FALSE',0);
-	define('TRIGGER_VALUE_TRUE',1);
-	define('TRIGGER_VALUE_UNKNOWN',2);
+	define('TRIGGER_VALUE_FALSE',		0);
+	define('TRIGGER_VALUE_TRUE',		1);
+	define('TRIGGER_VALUE_UNKNOWN',		2);
 
 	define('TRIGGER_SEVERITY_NOT_CLASSIFIED',	0);
 	define('TRIGGER_SEVERITY_INFORMATION',		1);
@@ -286,24 +286,24 @@
 	define('TRIGGER_SEVERITY_HIGH',			4);
 	define('TRIGGER_SEVERITY_DISASTER',		5);
 
-	define('ALERT_MAX_RETRIES',3);
+	define('ALERT_MAX_RETRIES',		3);
 
-	define('ALERT_STATUS_NOT_SENT',0);
-	define('ALERT_STATUS_SENT',1);
-	define('ALERT_STATUS_FAILED',2);
+	define('ALERT_STATUS_NOT_SENT',		0);
+	define('ALERT_STATUS_SENT',		1);
+	define('ALERT_STATUS_FAILED',		2);
 
-	define('ALERT_TYPE_MESSAGE',0);
-	define('ALERT_TYPE_COMMAND',1);
+	define('ALERT_TYPE_MESSAGE',		0);
+	define('ALERT_TYPE_COMMAND',		1);
 
-	define('MEDIA_TYPE_EMAIL',0);
-	define('MEDIA_TYPE_EXEC',1);
-	define('MEDIA_TYPE_SMS',2);
-	define('MEDIA_TYPE_JABBER',3);
+	define('MEDIA_TYPE_EMAIL',		0);
+	define('MEDIA_TYPE_EXEC',		1);
+	define('MEDIA_TYPE_SMS',		2);
+	define('MEDIA_TYPE_JABBER',		3);
 
 	define('ACTION_DEFAULT_MSG', '{TRIGGER.NAME}: {STATUS}');
 
-	define('ACTION_STATUS_ENABLED',0);
-	define('ACTION_STATUS_DISABLED',1);
+	define('ACTION_STATUS_ENABLED',		0);
+	define('ACTION_STATUS_DISABLED',	1);
 
 	define('OPERATION_TYPE_MESSAGE',	0);
 	define('OPERATION_TYPE_COMMAND',	1);
@@ -316,24 +316,24 @@
 	define('OPERATION_TYPE_HOST_ENABLE',	8);
 	define('OPERATION_TYPE_HOST_DISABLE',	9);
 
-	define('ACTION_EVAL_TYPE_AND_OR',0);
-	define('ACTION_EVAL_TYPE_AND',1);
-	define('ACTION_EVAL_TYPE_OR',2);
+	define('ACTION_EVAL_TYPE_AND_OR',	0);
+	define('ACTION_EVAL_TYPE_AND',		1);
+	define('ACTION_EVAL_TYPE_OR',		2);
 
 	define('OPERATION_OBJECT_USER',		0);
 	define('OPERATION_OBJECT_GROUP',	1);
 
-	define('LOGFILE_SEVERITY_NOT_CLASSIFIED',0);
-	define('LOGFILE_SEVERITY_INFORMATION',1);
-	define('LOGFILE_SEVERITY_WARNING',2);
-	define('LOGFILE_SEVERITY_AVERAGE',3);
-	define('LOGFILE_SEVERITY_HIGH',4);
-	define('LOGFILE_SEVERITY_DISASTER',5);
-	define('LOGFILE_SEVERITY_AUDIT_SUCCESS',6);
-	define('LOGFILE_SEVERITY_AUDIT_FAILURE',7);
+	define('LOGFILE_SEVERITY_NOT_CLASSIFIED',	0);
+	define('LOGFILE_SEVERITY_INFORMATION',		1);
+	define('LOGFILE_SEVERITY_WARNING',		2);
+	define('LOGFILE_SEVERITY_AVERAGE',		3);
+	define('LOGFILE_SEVERITY_HIGH',			4);
+	define('LOGFILE_SEVERITY_DISASTER',		5);
+	define('LOGFILE_SEVERITY_AUDIT_SUCCESS',	6);
+	define('LOGFILE_SEVERITY_AUDIT_FAILURE',	7);
 
-	define('SCREEN_SIMPLE_ITEM',0);
-	define('SCREEN_DYNAMIC_ITEM',1);
+	define('SCREEN_SIMPLE_ITEM',		0);
+	define('SCREEN_DYNAMIC_ITEM',		1);
 
 	define('SCREEN_RESOURCE_GRAPH',			0);
 	define('SCREEN_RESOURCE_SIMPLE_GRAPH',		1);
@@ -368,8 +368,8 @@
 	define('STYLE_VERTICAL',	1);
 
 /* view style [OVERVIEW]*/
-	define('STYLE_LEFT', 0);
-	define('STYLE_TOP', 1);
+	define('STYLE_LEFT',	0);
+	define('STYLE_TOP',	1);
 
 /* time module tipe */
 	define('TIME_TYPE_LOCAL',	0);
@@ -392,16 +392,16 @@
 	define('PROFILE_TYPE_ARRAY_INT',	5);
 	define('PROFILE_TYPE_ARRAY_STR',	6);
 
-	define('CALC_FNC_MIN', 1);
-	define('CALC_FNC_AVG', 2);
-	define('CALC_FNC_MAX', 4);
-	define('CALC_FNC_ALL', 7);
-	define('CALC_FNC_LST', 9);
+	define('CALC_FNC_MIN',	1);
+	define('CALC_FNC_AVG',	2);
+	define('CALC_FNC_MAX',	4);
+	define('CALC_FNC_ALL',	7);
+	define('CALC_FNC_LST',	9);
 
 
-	define('SERVICE_TIME_TYPE_UPTIME', 0);
-	define('SERVICE_TIME_TYPE_DOWNTIME', 1);
-	define('SERVICE_TIME_TYPE_ONETIME_DOWNTIME', 2);
+	define('SERVICE_TIME_TYPE_UPTIME',		0);
+	define('SERVICE_TIME_TYPE_DOWNTIME',		1);
+	define('SERVICE_TIME_TYPE_ONETIME_DOWNTIME',	2);
 
 	define('USER_TYPE_ZABBIX_USER',		1);
 	define('USER_TYPE_ZABBIX_ADMIN',	2);
@@ -410,16 +410,16 @@
 	define('ZBX_NOT_INTERNAL_GROUP',	0);
 	define('ZBX_INTERNAL_GROUP',		1);
 
-	define('GROUP_STATUS_DISABLED', 1);
-	define('GROUP_STATUS_ENABLED', 0);
+	define('GROUP_STATUS_DISABLED',	1);
+	define('GROUP_STATUS_ENABLED',	0);
 
 // IMPORTANT!!!    by priority	DESC
 	define('GROUP_GUI_ACCESS_SYSTEM',	0);
 	define('GROUP_GUI_ACCESS_INTERNAL',	1);
 	define('GROUP_GUI_ACCESS_DISABLED',	2);
 
-	define('GROUP_API_ACCESS_DISABLED', 0);
-	define('GROUP_API_ACCESS_ENABLED', 1);
+	define('GROUP_API_ACCESS_DISABLED',	0);
+	define('GROUP_API_ACCESS_ENABLED',	1);
 
 	define('GROUP_DEBUG_MODE_DISABLED',	0);
 	define('GROUP_DEBUG_MODE_ENABLED',	1);
@@ -462,8 +462,8 @@
 	define('HTTPSTEP_ITEM_TYPE_IN',		2);
 	define('HTTPSTEP_ITEM_TYPE_LASTSTEP',	3);
 
-	define('EVENT_ACK_DISABLED','0');
-	define('EVENT_ACK_ENABLED','1');
+	define('EVENT_ACK_DISABLED',	'0');
+	define('EVENT_ACK_ENABLED',	'1');
 
 	define('EVENTS_NOFALSEFORB_STATUS_ALL',		0);	// used with TRIGGERS_OPTION_NOFALSEFORB
 	define('EVENTS_NOFALSEFORB_STATUS_FALSE',	1);	// used with TRIGGERS_OPTION_NOFALSEFORB
@@ -540,9 +540,9 @@
 	define('DHOST_STATUS_ACTIVE',		0);
 	define('DHOST_STATUS_DISABLED',		1);
 
-	define('IM_FORCED', 0);
-	define('IM_ESTABLISHED', 1);
-	define('IM_TREE', 2);
+	define('IM_FORCED',	0);
+	define('IM_ESTABLISHED',1);
+	define('IM_TREE',	2);
 
 	define('EXPRESSION_TYPE_INCLUDED',	0);
 	define('EXPRESSION_TYPE_ANY_INCLUDED',	1);

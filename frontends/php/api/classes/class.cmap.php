@@ -55,8 +55,8 @@ class CMap extends CZBXAPI{
  * @param int $options['count'] count Hosts, returned column name is rowscount
  * @param string $options['pattern'] search hosts by pattern in host names
  * @param int $options['limit'] limit selection
- * @param string $options['sortorder'] 
- * @param string $options['sortfield'] 
+ * @param string $options['sortorder']
+ * @param string $options['sortfield']
  * @return array|boolean Host data as array or false if error
  */
 	public static function get($options=array()){
@@ -344,7 +344,7 @@ class CMap extends CZBXAPI{
 		$result = true;
 
 		zbx_valueTo($maps, array('array' => 1));
-		
+
 		self::BeginTransaction(__METHOD__);
 		foreach($maps as $map){
 
@@ -362,7 +362,7 @@ class CMap extends CZBXAPI{
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields for map');
 				break;
 			}
-			
+
 			$sysmapid = add_sysmap($map['name'], $map['width'], $map['height'], $map['backgroundid'], $map['label_type'], $map['label_location']);
 			if(!$sysmapid){
 				$result = false;
@@ -406,13 +406,13 @@ class CMap extends CZBXAPI{
 		$result = array();
 
 		zbx_valueTo($maps, array('array' => 1));
-		
+
 		self::BeginTransaction(__METHOD__);
 		foreach($maps as $map){
 
 			$map_db_fields = CMap::get(array('sysmapids' => $map['sysmapid'], 'extendoutput' => 1));
 			zbx_valueTo($map_db_fields, array('object' => 1));
-			
+
 
 			if(!$map_db_fields){
 				$result = false;
@@ -426,8 +426,8 @@ class CMap extends CZBXAPI{
 				break;
 			}
 
-			$sql = 'UPDATE sysmaps SET name='.zbx_dbstr($map['name']).", width={$map['width']}, height={$map['height']}, 
-				backgroundid={$map['backgroundid']}, label_type={$map['label_type']}, label_location={$map['label_location']} 
+			$sql = 'UPDATE sysmaps SET name='.zbx_dbstr($map['name']).", width={$map['width']}, height={$map['height']},
+				backgroundid={$map['backgroundid']}, label_type={$map['label_type']}, label_location={$map['label_location']}
 				WHERE sysmapid={$map['sysmapid']}";
 			$result = DBexecute($sql);
 
@@ -461,11 +461,11 @@ class CMap extends CZBXAPI{
 	public static function delete($sysmaps){
 		$result = true;
 		$errors = array();
-		
+
 		zbx_valueTo($sysmaps, array('array' => 1, 'field' => 'sysmapid'));
-		
+
 		self::BeginTransaction(__METHOD__);
-		
+
 		$result &= delete_sysmaps_elements_with_sysmapid($sysmaps);
 
 		$res = DBselect('SELECT linkid FROM sysmaps_links WHERE '.DBcondition('sysmapid', $sysmaps));
@@ -477,9 +477,9 @@ class CMap extends CZBXAPI{
 		$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.sysmapids' AND source='sysmapid' AND ".DBcondition('value_id', $sysmapids));
 		$result &= DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid', $sysmaps).' AND resourcetype='.SCREEN_RESOURCE_MAP);
 		$result &= DBexecute('DELETE FROM sysmaps WHERE '.DBcondition('sysmapid', $sysmaps));
-	
+
 		$result = self::EndTransaction($result, __METHOD__);
-		
+
 		if($result)
 			return true;
 		else{
@@ -509,11 +509,11 @@ class CMap extends CZBXAPI{
 		$errors = array();
 		$result_links = array();
 		$result = true;
-		
+
 		zbx_valueTo($links, array('array' => 1));
-		
+
 		self::BeginTransaction(__METHOD__);
-		
+
 		foreach($links as $link){
 
 			$link_db_fields = array(
@@ -535,11 +535,11 @@ class CMap extends CZBXAPI{
 				$result = false;
 				break;
 			}
-			
+
 			$new_link = array('linkid' => $linkid);
 			$result_links[] = array_merge($new_link, $link);
 		}
-		
+
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
@@ -577,7 +577,7 @@ class CMap extends CZBXAPI{
 		$result = true;
 
 		zbx_valueTo($elements, array('array' => 1));
-		
+
 		self::BeginTransaction(__METHOD__);
 		foreach($elements as $element){
 
@@ -609,7 +609,7 @@ class CMap extends CZBXAPI{
 				$result = false;
 				break;
 			}
-			
+
 			$new_selement = array('selementid' => $selementid);
 			$result_elements[] = array_merge($new_selement, $element);
 		}
@@ -639,7 +639,7 @@ class CMap extends CZBXAPI{
  * @return array|boolean selementid as array or false if error
  *
 	public static function getSeId($data){
-	
+
 		$element = $selement_data['elementid'];
 		$sysmapid = $selement_data['sysmapid'];
 		$sql = 'select selementid from sysmaps_elements where elementid='.$element.' and sysmapid='.$sysmapid;
@@ -673,7 +673,7 @@ class CMap extends CZBXAPI{
 		$errors = array();
 		$result_linktriggers = array();
 		$result = false;
-		
+
 		zbx_valueTo($linktriggers, array('array' => 1));
 
 		self::BeginTransaction(__METHOD__);
@@ -694,14 +694,14 @@ class CMap extends CZBXAPI{
 
 			$linktriggerid = get_dbid('sysmaps_link_triggers', 'linktriggerid');
 			$sql = 'INSERT INTO sysmaps_link_triggers (linktriggerid, linkid, triggerid, drawtype, color) '.
-				" VALUES ($linktriggerid, {$linktrigger['linkid']}, {$linktrigger['triggerid']}, 
+				" VALUES ($linktriggerid, {$linktrigger['linkid']}, {$linktrigger['triggerid']},
 				{$linktrigger['drawtype']},".zbx_dbstr($linktrigger['color']).')';
 			$result = DBexecute($sql);
 			if(!$result){
 				$result = false;
 				break;
 			}
-			
+
 			$new_linktriggerid = array('linktriggerid' => $linktriggerid);
 			$result_linktriggers[] = array_merge($new_linktriggerid, $linktriggerid);
 		}
@@ -714,7 +714,7 @@ class CMap extends CZBXAPI{
 			return false;
 		}
 	}
-	
+
 }
 
 ?>
