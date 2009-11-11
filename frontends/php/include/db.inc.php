@@ -699,7 +699,7 @@ else {
 
 	function get_dbid($table,$field){
 // PGSQL on transaction failure on all queries returns false..
-		global $DB;
+		global $DB, $ZBX_LOCALNODEID;
 		if(($DB['TYPE'] == 'POSTGRESQL') && $DB['TRANSACTIONS'] && !$DB['TRANSACTION_STATE']) return 1;
 //------
 
@@ -707,8 +707,6 @@ else {
 
 		$found = false;
 		do{
-			global $ZBX_LOCALNODEID;
-
 			$min=bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000'));
 			$max=bcadd(bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000')),'99999999999');
 			$row = DBfetch(DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid .' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field)));

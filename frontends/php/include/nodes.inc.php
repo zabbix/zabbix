@@ -19,6 +19,34 @@
 **/
 ?>
 <?php
+
+	function update_node_profile($nodeids){
+		global $USER_DETAILS;
+		
+		$sql = "DELETE FROM profiles WHERE userid={$USER_DETAILS['userid']} AND idx='web.nodes.selected'";
+		DBexecute($sql);
+		
+		foreach($nodeids as $nodeid){
+			$profileid = get_dbid('profiles', 'profileid');
+			$sql='INSERT INTO profiles (profileid, userid, idx, value_id, type)'.
+				" VALUES ($profileid, {$USER_DETAILS['userid']}, 'web.nodes.selected', $nodeid, 4)";
+			DBexecute($sql);
+		}
+	}
+	
+	function get_node_profile($default=null){
+		global $USER_DETAILS;
+		$result = array();
+		
+		$sql = "SELECT value_id FROM profiles WHERE userid={$USER_DETAILS['userid']} AND idx='web.nodes.selected'";
+		$db_profiles = DBselect($sql);
+		while($profile = DBfetch($db_profiles)){
+			$result[] = $profile['value_id'];
+		}
+		
+		return (empty($result) ? $default : $result);
+	}
+	
 	function init_nodes(){
 		/* Init CURRENT NODE ID */
 		if(defined('ZBX_NODES_INITIALIZED')) return;
@@ -70,8 +98,9 @@
 				$ZBX_CURMASTERID = $ZBX_LOCMASTERID;
 			}
 
-			if(isset($_REQUEST['select_nodes']))
-				update_profile('web.nodes.selected', $ZBX_VIEWED_NODES['nodeids'], PROFILE_TYPE_ARRAY_ID);
+			// if(isset($_REQUEST['select_nodes']))
+				// update_profile('web.nodes.selected', $ZBX_VIEWED_NODES['nodeids'], PROFILE_TYPE_ARRAY_ID);
+			update_node_profile($ZBX_VIEWED_NODES['nodeids']);
 			if(isset($_REQUEST['switch_node']))
 				update_profile('web.nodes.switch_node', $ZBX_VIEWED_NODES['selected'], PROFILE_TYPE_ID);
 		}
@@ -139,7 +168,9 @@
 		$available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST, PERM_RES_DATA_ARRAY);
 		$available_nodes = get_tree_by_parentid($ZBX_LOCALNODEID, $available_nodes, 'masterid'); //remove parent nodes
 
-		$selected_nodeids = get_request('selected_nodes', get_profile('web.nodes.selected', array($USER_DETAILS['node']['nodeid'])));
+		
+		// $selected_nodeids = get_request('selected_nodes', get_profile('web.nodes.selected', array($USER_DETAILS['node']['nodeid'])));
+		$selected_nodeids = get_request('selected_nodes', get_node_profile(array($USER_DETAILS['node']['nodeid'])));
 
 // +++ Fill $result['NODEIDS'], $result['NODES'] +++
 		$nodes = array();
