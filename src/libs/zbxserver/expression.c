@@ -1051,28 +1051,40 @@ static int	DBget_dhost_value_by_event(DB_EVENT *event, char **replace_to, const 
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret = FAIL;
+	char		sql[MAX_STRING_LEN];
 
 	switch (event->object)
 	{
 	case EVENT_OBJECT_DHOST:
-		result = DBselect("select %s from dhosts h where h.dhostid=" ZBX_FS_UI64,
-				fieldname, event->objectid);
+		zbx_snprintf(sql, sizeof(sql),
+				"select %s"
+				" from dhosts h,dservices s"
+				" where h.dhostid=s.dhostid"
+					" and h.dhostid=" ZBX_FS_UI64
+				" order by s.dserviceid",
+				fieldname,
+				event->objectid);
 		break;
 	case EVENT_OBJECT_DSERVICE:
-		result = DBselect("select %s from dhosts h,dservices s"
-				" where h.dhostid=s.dhostid and s.dserviceid=" ZBX_FS_UI64,
-				fieldname, event->objectid);
+		zbx_snprintf(sql, sizeof(sql),
+				"select %s"
+				" from dhosts h,dservices s"
+				" where h.dhostid=s.dhostid"
+					" and s.dserviceid=" ZBX_FS_UI64,
+				fieldname,
+				event->objectid);
 		break;
 	default:
 		return ret;
 	}
+
+	result = DBselectN(sql, 1);
 
 	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 	{
 		*replace_to = zbx_dsprintf(*replace_to, "%s", row[0]);
 		ret = SUCCEED;
 	}
-
 	DBfree_result(result);
 
 	return ret;
@@ -1969,7 +1981,7 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 				else if (0 == strcmp(m, MVAR_DISCOVERY_RULE_NAME))
 					ret = DBget_drule_value_by_event(event, &replace_to, "name");
 				else if (0 == strcmp(m, MVAR_DISCOVERY_DEVICE_IPADDRESS))
-					ret = DBget_dhost_value_by_event(event, &replace_to, "h.ip");
+					ret = DBget_dhost_value_by_event(event, &replace_to, "s.ip");
 				else if (0 == strcmp(m, MVAR_DISCOVERY_DEVICE_STATUS))
 				{
 					if (SUCCEED == (ret = DBget_dhost_value_by_event(event, &replace_to, "h.status")))
@@ -1993,7 +2005,7 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 					ret = DBget_dservice_value_by_event(event, &replace_to, "s.port");
 				else if (0 == strcmp(m, MVAR_DISCOVERY_SERVICE_STATUS))
 				{
-					if (SUCCEED == (ret = DBget_dhost_value_by_event(event, &replace_to, "s.status")))
+					if (SUCCEED == (ret = DBget_dservice_value_by_event(event, &replace_to, "s.status")))
 						replace_to = zbx_dsprintf(replace_to, "%s",
 								(DOBJECT_STATUS_UP == atoi(replace_to)) ? "UP" : "DOWN");
 				}
@@ -2001,7 +2013,7 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 				{
 					zbx_snprintf(sql, sizeof(sql), "case when s.status=%d then s.lastup else s.lastdown end",
 							DOBJECT_STATUS_UP);
-					if (SUCCEED == (ret = DBget_dhost_value_by_event(event, &replace_to, sql)))
+					if (SUCCEED == (ret = DBget_dservice_value_by_event(event, &replace_to, sql)))
 						replace_to = zbx_dsprintf(replace_to, "%s", zbx_age2str(time(NULL) - atoi(replace_to)));
 				}
 			}

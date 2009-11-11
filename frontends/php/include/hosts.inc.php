@@ -1850,10 +1850,10 @@ return $result;
 
 		$result = true;
 
-		$sql = 'SELECT key_,type,count(*) as cnt '.
+		$sql = 'SELECT key_,count(*) as cnt '.
 			' FROM items '.
 			' WHERE '.DBcondition('hostid',$templateid_list).
-			' GROUP BY key_,type '.
+			' GROUP BY key_ '.
 			' ORDER BY cnt DESC';
 		$res = DBselect($sql);
 		while($db_cnt = DBfetch($res)){

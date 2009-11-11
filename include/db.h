@@ -206,7 +206,7 @@ typedef enum {
 #define GRAPH_NAME_LEN			128
 #define GRAPH_NAME_LEN_MAX		GRAPH_NAME_LEN+1
 
-#define GRAPH_ITEM_COLOR_LEN		32
+#define GRAPH_ITEM_COLOR_LEN		6
 #define GRAPH_ITEM_COLOR_LEN_MAX	GRAPH_ITEM_COLOR_LEN+1
 
 #define ACTION_SUBJECT_LEN		255
@@ -636,37 +636,18 @@ int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid);
 void	get_latest_event_status(zbx_uint64_t triggerid, int *prev_status, int *latest_status);
 
 
-void	DBdelete_template_elements(
-		zbx_uint64_t  hostid,
-		zbx_uint64_t templateid,
-		unsigned char unlink_mode
-	);
-int	DBcopy_template_elements(
-		zbx_uint64_t hostid,
-		zbx_uint64_t templateid,
-		unsigned char copy_mode
-	);
-int	DBsync_host_with_template(
-		zbx_uint64_t hostid,
-		zbx_uint64_t templateid
-	);
-int	DBsync_host_with_templates(
-		zbx_uint64_t hostid
-	);
-int	DBdelete_host(
-		zbx_uint64_t hostid
-	);
-void	DBupdate_services(
-		zbx_uint64_t triggerid,
-		int status,
-		int clock
-	);
+int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid,
+		unsigned char unlink_mode);
+int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid);
+int	DBdelete_host(zbx_uint64_t hostid);
+void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock);
 
 /* History related functions */
 int	DBadd_trend(zbx_uint64_t itemid, double value, int clock);
 int	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
 
 void	DBadd_condition_alloc(char **sql, int *sql_alloc, int *sql_offset, const char *fieldname, const zbx_uint64_t *values, const int num);
+char	*zbx_host_string(zbx_uint64_t hostid);
 char	*zbx_host_key_string(zbx_uint64_t itemid);
 char	*zbx_host_key_string_by_item(DB_ITEM *item);
 char	*zbx_host_key_function_string(zbx_uint64_t functionid);
