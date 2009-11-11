@@ -48,7 +48,7 @@ function get_profile($idx,$default_value=null,$idx2=0,$source=null,$nocache=fals
 		$sql = 'SELECT * '.
 				' FROM profiles '.
 				' WHERE userid='.$USER_DETAILS['userid'].
-					' AND '.DBin_node('profileid').
+					' AND '.DBin_node('profileid', false).
 				' ORDER BY userid ASC, profileid ASC';
 		$db_profiles = DBselect($sql);
 		while($profile=DBfetch($db_profiles)){
@@ -103,10 +103,10 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 	if($value === false) return false;
 
 	$sql_cond = '';
-// dirty fix, but havn't figureout something better
+ // dirty fix, but havn't figureout something better
 	if($idx != 'web.nodes.switch_node') $sql_cond.= ' AND '.DBin_node('profileid', false);
 // ---
-	if(zbx_numeric($idx2)) 	$sql_cond.= ' AND idx2='.$idx2.' AND '.DBin_node('idx2', false);
+	// if(zbx_numeric($idx2)) 	$sql_cond.= ' AND idx2='.$idx2.' AND '.DBin_node('idx2', false);
 
 
 	if(profile_type($type,'array')){
