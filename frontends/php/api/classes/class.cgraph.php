@@ -77,6 +77,9 @@ class CGraph extends CZBXAPI{
 			'not_templated_graphs'	=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
+// filter
+			'pattern'				=> '',
+
 // output
 			'select_hosts'			=> null,
 			'select_templates'		=> null,
@@ -84,7 +87,8 @@ class CGraph extends CZBXAPI{
 			'select_graph_items'	=> null,
 			'extendoutput'			=> null,
 			'count'					=> null,
-			'pattern'				=> '',
+			'preservekeys'			=> null,
+
 			'sortfield'				=> '',
 			'sortorder'				=> '',
 			'limit'					=> null
@@ -304,12 +308,15 @@ class CGraph extends CZBXAPI{
 			}
 		}
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
+		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
+			return $result;
+		}
 
 
 // Adding GraphItems
 		if($options['select_graph_items']){
-			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1);
+			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1, 'preservekeys' => 1);
 			$gitems = CGraphItem::get($obj_params);
 			foreach($gitems as $gitemid => $gitem){
 				foreach($gitem['graphids'] as $num => $graphid){
@@ -321,7 +328,7 @@ class CGraph extends CZBXAPI{
 
 // Adding Hosts
 		if($options['select_hosts']){
-			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1);
+			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1, 'preservekeys' => 1);
 			$hosts = CHost::get($obj_params);
 			foreach($hosts as $hostid => $host){
 				foreach($host['graphids'] as $num => $graphid){
@@ -333,7 +340,7 @@ class CGraph extends CZBXAPI{
 
 // Adding Templates
 		if($options['select_templates']){
-			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1);
+			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1, 'preservekeys' => 1);
 			$templates = CTemplate::get($obj_params);
 			foreach($templates as $templateid => $template){
 				foreach($template['graphids'] as $num => $graphid){
@@ -345,7 +352,7 @@ class CGraph extends CZBXAPI{
 
 // Adding Items
 		if($options['select_items']){
-			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1);
+			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1, 'preservekeys' => 1);
 			$items = CItem::get($obj_params);
 			foreach($items as $itemid => $item){
 				foreach($item['graphids'] as $num => $graphid){
@@ -353,6 +360,11 @@ class CGraph extends CZBXAPI{
 					$result[$graphid]['items'][$itemid] = $item;
 				}
 			}
+		}
+
+// removing keys (hash -> array)
+		if(is_null($options['preservekeys'])){
+			$result = zbx_cleanHashes($result);
 		}
 
 	return $result;
@@ -416,43 +428,44 @@ class CGraph extends CZBXAPI{
 	return $result;
 	}
 
-	/**
-	 * Add graph
-	 *
-	 * <code>
-	 * $graphs = array(
-	 * 	*string 'name'			=> null,
-	 * 	int 'width'			=> 900,
-	 * 	int 'height'			=> 200,
-	 * 	int 'ymin_type'			=> 0,
-	 * 	int 'ymax_type'			=> 0,
-	 * 	int 'yaxismin'			=> 0,
-	 * 	int 'yaxismax'			=> 100,
-	 * 	int 'ymin_itemid'		=> 0,
-	 * 	int 'ymax_itemid'		=> 0,
-	 * 	int 'show_work_period'		=> 1,
-	 * 	int 'show_triggers'		=> 1,
-	 * 	int 'graphtype'			=> 0,
-	 * 	int 'show_legend'		=> 0,
-	 * 	int 'show_3d'			=> 0,
-	 * 	int 'percent_left'		=> 0,
-	 * 	int 'percent_right'		=> 0
-	 * );
-	 * </code>
-	 *
-	 * @static
-	 * @param array $graphs multidimensional array with graphs data
-	 * @return boolean
-	 */
+/**
+ * Add graph
+ *
+ * <code>
+ * $graphs = array(
+ * 	*string 'name'			=> null,
+ * 	int 'width'			=> 900,
+ * 	int 'height'			=> 200,
+ * 	int 'ymin_type'			=> 0,
+ * 	int 'ymax_type'			=> 0,
+ * 	int 'yaxismin'			=> 0,
+ * 	int 'yaxismax'			=> 100,
+ * 	int 'ymin_itemid'		=> 0,
+ * 	int 'ymax_itemid'		=> 0,
+ * 	int 'show_work_period'		=> 1,
+ * 	int 'show_triggers'		=> 1,
+ * 	int 'graphtype'			=> 0,
+ * 	int 'show_legend'		=> 0,
+ * 	int 'show_3d'			=> 0,
+ * 	int 'percent_left'		=> 0,
+ * 	int 'percent_right'		=> 0
+ * );
+ * </code>
+ *
+ * @static
+ * @param array $graphs multidimensional array with graphs data
+ * @return boolean
+ */
 	public static function add($graphs){
+		zbx_toAray($graphs);
 
 		$error = 'Unknown ZABBIX internal error';
-		$result_ids = array();
+		$new_graphs = array();
 		$result = true;
 
 		self::BeginTransaction(__METHOD__);
 
-		foreach($graphs as $graph){
+		foreach($graphs as $gnum => $graph){
 
 			if(!is_array($graph['gitems']) || empty($graph['gitems'])){
 				$result = false;
@@ -509,19 +522,24 @@ class CGraph extends CZBXAPI{
 				$graph['gitems'][$id] = $gitem;
 			}
 
-			$result = add_graph_with_items($graph['name'],$graph['width'],$graph['height'],$graph['ymin_type'],$graph['ymax_type'],$graph['yaxismin'],
-				$graph['yaxismax'],$graph['ymin_itemid'],$graph['ymax_itemid'],$graph['showworkperiod'],$graph['showtriggers'],$graph['graphtype'],
-				$graph['legend'],$graph['graph3d'],$graph['percent_left'],$graph['percent_right'],$graph['gitems'],$graph['templateid']);
+			$new_graph = array();
+			$new_graph['graphid'] = add_graph_with_items($graph['name'],$graph['width'],$graph['height'],
+										$graph['ymin_type'],$graph['ymax_type'],$graph['yaxismin'],
+										$graph['yaxismax'],$graph['ymin_itemid'],$graph['ymax_itemid'],
+										$graph['showworkperiod'],$graph['showtriggers'],$graph['graphtype'],
+										$graph['legend'],$graph['graph3d'],$graph['percent_left'],
+										$graph['percent_right'],$graph['gitems'],$graph['templateid']);
 
-
-			if(!$result) break;
-			$result_ids[$result] = $result;
-
+			if(!$new_graph['graphid']){
+				$result = false;
+				break;
+			}
+			$new_graphs[] = array_merge($new_graph, $graph);
 		}
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return $result_ids;
+			return $new_graphs;
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);//'Internal zabbix error');
@@ -529,20 +547,21 @@ class CGraph extends CZBXAPI{
 		}
 	}
 
-	/**
-	 * Update graphs
-	 *
-	 * @static
-	 * @param array $graphs multidimensional array with graphs data
-	 * @return boolean
-	 */
+/**
+ * Update graphs
+ *
+ * @static
+ * @param array $graphs multidimensional array with graphs data
+ * @return boolean
+ */
 	public static function update($graphs){
-
+		zbx_toArray($graphs);
+		
 		$result_ids = array();
 		$result = false;
 
 		self::BeginTransaction(__METHOD__);
-		foreach($graphs as $graph){
+		foreach($graphs as $gnum => $graph){
 
 			$host_db_fields = self::getById(array('graphid' => $graph['graphid']));
 
@@ -565,7 +584,7 @@ class CGraph extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return $result_ids;
+			return $graphs;
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
@@ -573,30 +592,67 @@ class CGraph extends CZBXAPI{
 		}
 	}
 
-	/**
-	 * Add items to graph
-	 *
-	 * <code>
-	 * $items = array(
-	 * 	*string 'graphid'		=> null,
-	 * 	array 'items' 			=> (
-	 *		'item1' => array(
-	 * 			*int 'itemid'			=> null,
-	 * 			int 'color'			=> '000000',
-	 * 			int 'drawtype'			=> 0,
-	 * 			int 'sortorder'			=> 0,
-	 * 			int 'yaxisside'			=> 1,
-	 * 			int 'calc_fnc'			=> 2,
-	 * 			int 'type'			=> 0,
-	 * 			int 'periods_cnt'		=> 5,
-	 *		), ... )
-	 * );
-	 * </code>
-	 *
-	 * @static
-	 * @param array $items multidimensional array with items data
-	 * @return boolean
-	 */
+/**
+ * Delete graphs
+ *
+ * @static
+ * @param _array $graphs
+ * @param array $graphs['graphids']
+ * @return boolean
+ */
+	public static function delete($graphs){
+		$graphs = zbx_toArray($graphs);		
+
+		$options = array('editable'=>1, 'extendoutput'=>1);
+		$options['graphids'] = zbx_objectValues($graphs, 'graphid');
+		$del_graphs = CGraph::get($options);
+		
+		$graphids = array();
+		foreach($del_graphs as $inum => $graph){
+			$graphids[] = $graph['graphid'];
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_GRAPH, 'Graph ['.$graph['name'].']');
+		}
+
+		if(!empty($graphids)){
+			$result = delete_graph($graphids);
+		}
+		else{
+			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Incorrect input parameter [ graphs ]');
+			$result = false;
+		}
+
+		if($result)
+			return $del_graphs;
+		else{
+			self::setError(__METHOD__);
+			return false;
+		}
+	}
+
+/**
+ * Add items to graph
+ *
+ * <code>
+ * $items = array(
+ * 	*string 'graphid'		=> null,
+ * 	array 'items' 			=> (
+ *		'item1' => array(
+ * 			*int 'itemid'			=> null,
+ * 			int 'color'			=> '000000',
+ * 			int 'drawtype'			=> 0,
+ * 			int 'sortorder'			=> 0,
+ * 			int 'yaxisside'			=> 1,
+ * 			int 'calc_fnc'			=> 2,
+ * 			int 'type'			=> 0,
+ * 			int 'periods_cnt'		=> 5,
+ *		), ... )
+ * );
+ * </code>
+ *
+ * @static
+ * @param array $items multidimensional array with items data
+ * @return boolean
+ */
 	public static function addItems($items){
 
 		$error = 'Unknown ZABBIX internal error';
@@ -691,16 +747,16 @@ class CGraph extends CZBXAPI{
 			if(!$result) return false;
 		}
 
-		return true;
+	return true;
 	}
 
-	/**
-	 * Delete graph items
-	 *
-	 * @static
-	 * @param array $items
-	 * @return boolean
-	 */
+/**
+ * Delete graph items
+ *
+ * @static
+ * @param array $items
+ * @return boolean
+ */
 	public static function deleteItems($item_list, $force=false){
 		$error = 'Unknown ZABBIX internal error';
 		$result = true;
@@ -745,34 +801,5 @@ class CGraph extends CZBXAPI{
 
 		return $result;
 	}
-
-	/**
-	 * Delete graphs
-	 *
-	 * @static
-	 * @param _array $graphids
-	 * @param array $graphids['graphids']
-	 * @return boolean
-	 */
-	public static function delete($graphids){
-		$graphids = isset($graphids['graphids']) ? $graphids['graphids'] : array();
-		zbx_value2array($graphids);
-
-		if(!empty($graphids)){
-			$result = delete_graph($graphids);
-		}
-		else{
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ graphids ]');
-			$result = false;
-		}
-
-		if($result)
-			return true;
-		else{
-			self::setError(__METHOD__);
-			return false;
-		}
-	}
-
 }
 ?>

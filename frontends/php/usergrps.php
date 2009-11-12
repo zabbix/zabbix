@@ -19,21 +19,21 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/triggers.inc.php');
-	require_once('include/media.inc.php');
-	require_once('include/users.inc.php');
-	require_once('include/forms.inc.php');
-	require_once('include/js.inc.php');
+require_once('include/config.inc.php');
+require_once('include/triggers.inc.php');
+require_once('include/media.inc.php');
+require_once('include/users.inc.php');
+require_once('include/forms.inc.php');
+require_once('include/js.inc.php');
 
-	$page['title'] = 'S_USER_GROUPS';
-	$page['file'] = 'usergrps.php';
-	$page['hist_arg'] = array('config');
-	$page['scripts'] = array();
+$page['title'] = 'S_USER_GROUPS';
+$page['file'] = 'usergrps.php';
+$page['hist_arg'] = array('config');
+$page['scripts'] = array();
 
 include_once('include/page_header.php');
 
-	$_REQUEST['config'] = get_request('config','usergrps.php');
+$_REQUEST['config'] = get_request('config','usergrps.php');
 
 ?>
 <?php
@@ -389,8 +389,9 @@ include_once('include/page_header.php');
 		$paging = getPagingLine($usrgrps);
 //---------
 
-		foreach($usrgrps as $usrgrpid => $usrgrp){
-
+		foreach($usrgrps as $ugnum => $usrgrp){
+			$usrgrpid = $usrgrp['usrgrpid'];
+			
 			$api_access = ($usrgrp['api_access'] == GROUP_API_ACCESS_ENABLED)
 				? new CLink(S_ENABLED, 'usergrps.php?go=disable_api&usrgrpid='.$usrgrpid, 'orange')
 				: new CLink(S_DISABLED, 'usergrps.php?go=enable_api&usrgrpid='.$usrgrpid, 'enabled');
@@ -417,8 +418,8 @@ include_once('include/page_header.php');
 			}
 
 			$users = array();
-			foreach($usrgrp['users'] as $userid => $user){
-				$users[] = new CLink($user['alias'],'users.php?form=update&userid='.$userid);
+			foreach($usrgrp['users'] as $unum => $user){
+				$users[] = new CLink($user['alias'],'users.php?form=update&userid='.$user['userid']);
 				$users[] = ', ';
 			}
 			array_pop($users);

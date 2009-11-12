@@ -69,6 +69,8 @@ class CScreen extends CZBXAPI{
 			'screenids'					=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
+// filter
+			'pattern'					=> '',
 // OutPut
 			'extendoutput'				=> null,
 			'select_groups'				=> null,
@@ -78,7 +80,8 @@ class CScreen extends CZBXAPI{
 			'select_graphs'				=> null,
 			'select_applications'		=> null,
 			'count'						=> null,
-			'pattern'					=> '',
+			'preservekeys'				=> null,
+
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
@@ -258,7 +261,10 @@ class CScreen extends CZBXAPI{
 			}
 		}
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
+		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
+			return $result;
+		}
 
 
 // Adding Items
@@ -277,6 +283,11 @@ class CScreen extends CZBXAPI{
 				$result[$sitem['screenid']]['itemids'][$sitem['screenitemid']] = $sitem['screenitemid'];
 				$result[$sitem['screenid']]['items'][$sitem['screenitemid']] = $sitem;
 			}
+		}
+
+// removing keys (hash -> array)
+		if(is_null($options['preservekeys'])){
+			$result = zbx_cleanHashes($result);
 		}
 
 	return $result;
@@ -325,7 +336,7 @@ class CScreen extends CZBXAPI{
  * @return boolean | array
  */
 	public static function add($screens){
-		zbx_valueTo($screens, array('array' => 1));
+		$screens = zbx_toArray($screens);
 
 		$errors = array();
 		$result_screens = array();
@@ -391,7 +402,7 @@ class CScreen extends CZBXAPI{
  * @return boolean
  */
 	public static function update($screens){
-		zbx_valueTo($screens, array('array' => 1));
+		$screens = zbx_toArray($screens);
 
 		$result = false;
 		$errors = array();
@@ -400,7 +411,7 @@ class CScreen extends CZBXAPI{
 		foreach($screens as $screen){
 
 			$screen_db_fields = CScreen::get(array('screenids' => $screen['screenid'], 'editable' => 1, 'extendoutput' => 1));
-			zbx_valueTo($screen_db_fields, array('object' => 1));
+			$screen_db_fields = reset($screen_db_fields);
 
 			if(!$screen_db_fields){
 				$result = false;

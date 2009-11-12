@@ -392,7 +392,9 @@ include_once('include/page_header.php');
 		}
 	}
 
-	foreach($triggers as $triggerid => $trigger){
+	foreach($triggers as $tnum => $trigger){
+		$triggerid = $trigger['triggerid'];
+		
 		$trigger['events'] = array();
 
 		$elements = array();
@@ -400,10 +402,10 @@ include_once('include/page_header.php');
 
 // Items
 		$items = array();
-		foreach($trigger['items'] as $itemid => $item){
-			$items[$itemid]['itemid'] = $item['itemid'];
-			$items[$itemid]['action'] = str_in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)) ? 'showgraph' : 'showvalues';
-			$items[$itemid]['description'] = item_description($item);
+		foreach($trigger['items'] as $inum => &$item){
+			$item['itemid'] = $item['itemid'];
+			$item['action'] = str_in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)) ? 'showgraph' : 'showvalues';
+			$item['description'] = item_description($item);
 		}
 		$trigger['items'] = $items;
 //----
@@ -551,13 +553,14 @@ include_once('include/page_header.php');
 			$ev_options['triggerids'] = $triggerid;
 			$events = CEvent::get($ev_options);
 
-			foreach($events as $eventid => $row_event){
+			foreach($events as $enum => $row_event){
+				$eventid = $event['eventid'];
 				$value = new CSpan(trigger_value2str($row_event['value']), get_trigger_value_style($row_event['value']));
 
 				if($config['event_ack_enable']){
 					if($row_event['acknowledged'] == 1){
 						$acks_cnt = DBfetch(DBselect('SELECT COUNT(*) as cnt FROM acknowledges WHERE eventid='.$row_event['eventid']));
-						$ack=array(
+						$ack = array(
 							new CSpan(S_YES,'off'),
 							SPACE.'('.$acks_cnt['cnt'].SPACE,
 							new CLink(S_SHOW,'acknow.php?eventid='.$row_event['eventid']),')');

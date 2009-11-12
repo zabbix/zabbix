@@ -54,9 +54,9 @@ include_once('include/page_header.php');
 
 	$db_data = CGraph::get($options);
 	if(empty($db_data)) access_deny();
-	else zbx_valueTo($db_data, array('object'=>1));
+	else $db_data = reset($db_data);
 
-	$host = zbx_valueTo($db_data['hosts'], array('object'=>1), true);
+	$host = reset($db_data['hosts']);
 
 	$effectiveperiod = navigation_bar_calc();
 

@@ -106,7 +106,7 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
  // dirty fix, but havn't figureout something better
 	if($idx != 'web.nodes.switch_node') $sql_cond.= ' AND '.DBin_node('profileid', false);
 // ---
-	// if(zbx_numeric($idx2)) 	$sql_cond.= ' AND idx2='.$idx2.' AND '.DBin_node('idx2', false);
+	if(zbx_numeric($idx2)) $sql_cond.= ' AND idx2='.$idx2.' AND '.DBin_node('idx2', false);
 
 
 	if(profile_type($type,'array')){
@@ -320,8 +320,7 @@ function select_config($cache = true){
 	global $page;
 	static $config;
 
-	if($cache && isset($config))
-		return $config;
+	if($cache && isset($config)) return $config;
 
 	$row = DBfetch(DBselect('SELECT * FROM config WHERE '.DBin_node('configid', get_current_nodeid(false))));
 

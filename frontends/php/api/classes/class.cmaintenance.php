@@ -75,11 +75,15 @@ class CMaintenance extends CZBXAPI{
 			'maintenanceids'		=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
+// filter
+			'pattern'				=> '',
+
 // OutPut
 			'extendoutput'			=> null,
 			'select_hosts'			=> null,
 			'count'					=> null,
-			'pattern'				=> '',
+			'preservekeys'			=> null,
+
 			'sortfield'				=> '',
 			'sortorder'				=> '',
 			'limit'					=> null,
@@ -264,8 +268,15 @@ class CMaintenance extends CZBXAPI{
 			}
 		}
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
+		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
+			return $result;
+		}
 
+// removing keys (hash -> array)
+		if(is_null($options['preservekeys'])){
+			$result = zbx_cleanHashes($result);
+		}
 
 	return $result;
 	}

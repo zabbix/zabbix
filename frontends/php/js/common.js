@@ -639,8 +639,8 @@ function ScaleChartToParenElement(obj_name){
 }
 
 function insert_in_element(element_name, text){
-	if(IE8)
-		var elems = $$('div[name='+element_name+']');
+	if(IE)
+		var elems = $$('[name='+element_name+']');
 	else
 		var elems = document.getElementsByName(element_name);
 

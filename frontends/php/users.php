@@ -19,17 +19,17 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/triggers.inc.php');
-	require_once('include/media.inc.php');
-	require_once('include/users.inc.php');
-	require_once('include/forms.inc.php');
-	require_once('include/js.inc.php');
+require_once('include/config.inc.php');
+require_once('include/triggers.inc.php');
+require_once('include/media.inc.php');
+require_once('include/users.inc.php');
+require_once('include/forms.inc.php');
+require_once('include/js.inc.php');
 
-	$page['title'] = 'S_USERS';
-	$page['file'] = 'users.php';
-	$page['hist_arg'] = array();
-	$page['scripts'] = array();
+$page['title'] = 'S_USERS';
+$page['file'] = 'users.php';
+$page['hist_arg'] = array();
+$page['scripts'] = array();
 
 include_once('include/page_header.php');
 
@@ -213,6 +213,7 @@ include_once('include/page_header.php');
 			unset($_REQUEST['form']);
 		}
 	}
+
 // Add USER to GROUP
 	else if(isset($_REQUEST['grpaction'])&&isset($_REQUEST['usrgrpid'])&&isset($_REQUEST['userid'])&&($_REQUEST['grpaction']==1)){
 		$user=CUser::getById(array('userid' => $_REQUEST['userid']));
@@ -233,6 +234,7 @@ include_once('include/page_header.php');
 		unset($_REQUEST['grpaction']);
 		unset($_REQUEST['form']);
 	}
+
 // Remove USER from GROUP
 	else if(isset($_REQUEST['grpaction'])&&isset($_REQUEST['usrgrpid'])&&isset($_REQUEST['userid'])&&($_REQUEST['grpaction']==0)){
 		$user=CUser::getById(array('userid' => $_REQUEST['userid']));
@@ -267,7 +269,7 @@ include_once('include/page_header.php');
 			$options = array('userids'=>$group_userid,
 							'extendoutput' => 1);
 			$users = CUser::get($options);
-			foreach($users as $userid => $user){
+			foreach($users as $unum => $user){
 				info('User '.$user['alias'].' unblocked');
 				add_audit(AUDIT_ACTION_UPDATE,	AUDIT_RESOURCE_USER,
 							'Unblocked user alias ['.$user['alias'].'] name ['.$user['name'].'] surname ['.$user['surname'].']');
@@ -336,8 +338,8 @@ include_once('include/page_header.php');
 
 		$options = array('extendoutput' => 1, 'order' => 'name');
 		$usrgrps = CUserGroup::get($options);
-		foreach($usrgrps as $usrgrpid => $usrgrp){
-			$cmbUGrp->addItem($usrgrpid, $usrgrp['name']);
+		foreach($usrgrps as $ugnum => $usrgrp){
+			$cmbUGrp->addItem($usrgrp['usrgrpid'], $usrgrp['name']);
 		}
 
 		$form->addItem(array(S_USER_GROUP.SPACE,$cmbUGrp));
@@ -360,7 +362,6 @@ include_once('include/page_header.php');
 		}
 
 		$users = CUser::get($options);
-		$userids = array_keys($users);
 
 		$form = new CForm(null,'post');
 		$form->setName('users');
@@ -386,10 +387,12 @@ include_once('include/page_header.php');
 		$paging = getPagingLine($users);
 //---------
 
-		// set default lastaccess time to 0.
-		foreach($users as $userid => $user){
-			$usessions[$userid] = array('lastaccess' => 0);
+// set default lastaccess time to 0.
+		foreach($users as $unum => $user){
+			$usessions[$user['userid']] = array('lastaccess' => 0);
 		}
+
+		$userids = zbx_objectValues($users, 'userid');
 		$sql = 'SELECT s.userid, MAX(s.lastaccess) as lastaccess, s.status '.
 				' FROM sessions s'.
 				' WHERE '.DBcondition('s.userid', $userids).
@@ -401,7 +404,8 @@ include_once('include/page_header.php');
 			}
 		}
 
-		foreach($users as $userid => $user){
+		foreach($users as $unum => $user){
+			$userid = $user['userid'];
 			$session = $usessions[$userid];
 
 // Online time
@@ -423,8 +427,8 @@ include_once('include/page_header.php');
 
 // UserGroups
 			$users_groups = array();
-			foreach($user['usrgrps'] as $usrgrpid => $usrgrp){
-				$users_groups[] = new CLink($usrgrp['name'],'usergrps.php?form=update&usrgrpid='.$usrgrpid);
+			foreach($user['usrgrps'] as $ugnum => $usrgrp){
+				$users_groups[] = new CLink($usrgrp['name'],'usergrps.php?form=update&usrgrpid='.$usrgrp['usrgrpid']);
 				$users_groups[] = BR();
 			}
 			array_pop($users_groups);

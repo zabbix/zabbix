@@ -99,20 +99,17 @@ include_once('include/page_header.php');
 	validate_sort_and_sortorder('description',ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go','none');
+
+// PERMISSIONS
+	if(get_request('triggerid',0) > 0){
+		$triggers = available_triggers($_REQUEST['triggerid'], 1);
+		if(empty($triggers)) access_deny();
+	}
 ?>
 <?php
-// triggerid permission check
-	$available_triggers = CTrigger::get(array('editable' => 1));
-
-	if(isset($_REQUEST['triggerid']))
-		//if(!check_right_on_trigger_by_triggerid(PERM_READ_WRITE, $_REQUEST['triggerid']))
-		if(!isset($available_triggers[$_REQUEST['triggerid']]))
-			access_deny();
-//----
 
 	$showdisabled = get_request('showdisabled', 0);
 	update_profile('web.triggers.showdisabled',$showdisabled,PROFILE_TYPE_INT);
-
 
 // EXPRESSION ACTIONS
 	if(isset($_REQUEST['add_expression'])){
@@ -145,11 +142,10 @@ include_once('include/page_header.php');
 		$visible = get_request('visible',array());
 		$_REQUEST['dependencies'] = get_request('dependencies',array());
 
-		$triggers = $_REQUEST['g_triggerid'];
-		$triggers = zbx_uint_array_intersect($triggers, $available_triggers);
+		$triggers = available_triggers($_REQUEST['g_triggerid'], 1);
 
 		DBstart();
-		foreach($triggers as $id => $triggerid){
+		foreach($triggers as $tnum => $triggerid){
 			$db_trig = get_trigger_by_triggerid($triggerid);
 			$db_trig['dependencies'] = get_trigger_dependencies_by_triggerid($triggerid);
 
@@ -223,21 +219,12 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['triggerid'])){
 		$result = false;
 
-		if(!isset($available_triggers[$_REQUEST['triggerid']]))
-			access_deny();
-
-		if($trigger_data = DBfetch(
-			DBselect('SELECT DISTINCT t.triggerid,t.description,t.expression,h.host '.
-				' FROM triggers t '.
-					' LEFT JOIN functions f on t.triggerid=f.triggerid '.
-					' LEFT JOIN items i on f.itemid=i.itemid '.
-					' LEFT JOIN hosts h on i.hostid=h.hostid '.
-				' WHERE t.triggerid='.$_REQUEST['triggerid'].
-					' AND t.templateid=0')
-			))
-		{
+		$options = array('triggerids' => $_REQUEST['triggerid'], 'extendoutput'=>1);
+		
+		$triggers = CTrigger::get($options);
+		if($trigger_data = reset($triggers)){
 			DBstart();
-			$result = delete_trigger($_REQUEST['triggerid']);
+			$result = CTrigger::delete($triggers);
 			$result = DBend($result);
 			if($result){
 				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $_REQUEST['triggerid'], $trigger_data['description'], NULL, NULL, NULL);
@@ -253,7 +240,7 @@ include_once('include/page_header.php');
 			unset($_REQUEST['triggerid']);
 		}
 	}
-/* DEPENDENCE ACTIONS */
+// DEPENDENCE ACTIONS
 	else if(isset($_REQUEST['add_dependence'])&&isset($_REQUEST['new_dependence'])){
 		if(!isset($_REQUEST['dependencies']))
 			$_REQUEST['dependencies'] = array();
@@ -274,15 +261,12 @@ include_once('include/page_header.php');
 // ------- GO ---------
 	else if(str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_triggerid'])){
 
-		$_REQUEST['g_triggerid'] = array_intersect($_REQUEST['g_triggerid'],$available_triggers);
+		$options = array('extendoutput'=>1, 'editable'=>1);
+		$options['triggerids'] = $_REQUEST['g_triggerid'];
 
-		$sql = 'SELECT triggerid, description FROM triggers'.
-				' WHERE '.DBcondition('triggerid',$_REQUEST['g_triggerid']);
-		$result = DBSelect($sql);
-		while($trigger = DBfetch($result)) {
-			$triggers[$trigger['triggerid']] = $trigger;
-		}
-
+		$triggers = CTrigger::get($options);
+		$triggerids = zbx_objectValues($triggers, 'triggerid');
+		
 		if(($_REQUEST['go'] == 'activate')){
 			$status = TRIGGER_STATUS_ENABLED;
 			$status_old = array('status'=>0);
@@ -295,32 +279,41 @@ include_once('include/page_header.php');
 		}
 
 		DBstart();
-		$go_result = update_trigger_status($_REQUEST['g_triggerid'],$status);
+		$go_result = update_trigger_status($triggerids, $status);
 
 		if($go_result){
-			foreach($_REQUEST['g_triggerid'] as $id => $triggerid){
-				$serv_status = (isset($_REQUEST['group_enable'])) ? get_service_status_of_trigger($triggerid) : 0;
-				update_services($triggerid, $serv_status); // updating status to all services by the dependency
-				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, $triggerid, $triggers[$triggerid]['description'], 'triggers', $status_old, $status_new);
+			foreach($triggers as $tnum => $trigger){
+				$serv_status = (isset($_REQUEST['group_enable']))?get_service_status_of_trigger($trigger['triggerid']):0;
+				
+				update_services($trigger['triggerid'], $serv_status); // updating status to all services by the dependency
+				add_audit_ext(AUDIT_ACTION_UPDATE, 
+								AUDIT_RESOURCE_TRIGGER, 
+								$trigger['triggerid'], 
+								$trigger['description'], 
+								'triggers', 
+								$status_old, 
+								$status_new);
 			}
 		}
+
 		$go_result = DBend($go_result);
 		show_messages($go_result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
-
 	}
 	else if(isset($_REQUEST['copy']) && isset($_REQUEST['g_triggerid']) && ($_REQUEST['go'] == 'copy_to')){
 		if(isset($_REQUEST['copy_targetid']) && ($_REQUEST['copy_targetid'] > 0) && isset($_REQUEST['copy_type'])){
 			if(0 == $_REQUEST['copy_type']){ /* hosts */
 				$hosts_ids = $_REQUEST['copy_targetid'];
 			}
-			else{ /* groups */
+			else{ 
+// groups
 				$hosts_ids = array();
 				$group_ids = $_REQUEST['copy_targetid'];
 
-				$db_hosts = DBselect('SELECT DISTINCT h.hostid '.
+				$sql = 'SELECT DISTINCT h.hostid '.
 					' FROM hosts h, hosts_groups hg'.
 					' WHERE h.hostid=hg.hostid '.
-						' AND '.DBcondition('hg.groupid',$group_ids));
+						' AND '.DBcondition('hg.groupid',$group_ids);
+				$db_hosts = DBselect($sql);
 				while($db_host = DBfetch($db_hosts)){
 					array_push($hosts_ids, $db_host['hostid']);
 				}
@@ -350,25 +343,30 @@ include_once('include/page_header.php');
 		show_messages($go_result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['g_triggerid'])){
-		$_REQUEST['g_triggerid'] = array_intersect($_REQUEST['g_triggerid'],$available_triggers);
+		$options = array('extendoutput'=>1, 'editable'=>1);
+		$options['triggerids'] = $_REQUEST['g_triggerid'];
+
+		$triggers = CTrigger::get($options);
 
 		DBstart();
-		foreach($_REQUEST['g_triggerid'] as $id => $triggerid){
-			$row = DBfetch(DBselect('SELECT triggerid,templateid, description FROM triggers t WHERE t.triggerid='.$triggerid));
+		foreach($triggers as $tnum => $trigger){
+			$triggerid = $trigger['triggerid'];
+			
 			$description = expand_trigger_description($triggerid);
-			if($row['templateid'] <> 0){
-				unset($_REQUEST['g_triggerid'][$id]);
-				error("Cannot delete trigger [ $description ] (Templated trigger)");
+			if($trigger['templateid'] != 0){
+				unset($triggers[$tnum]);
+				error('Cannot delete trigger [ '.$description.' ] (Templated trigger)');
 				continue;
 			}
 
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $triggerid, $description, NULL, NULL, NULL);
 		}
 
-		$go_result = !empty($_REQUEST['g_triggerid']);
+		$go_result = !empty($triggers);
 		if($go_result){
-			$go_result = delete_trigger($_REQUEST['g_triggerid']);
+			$go_result = CTrigger::delete($triggers);
 		}
+
 		$go_result = DBend($go_result);
 		show_messages($go_result, S_TRIGGERS_DELETED, S_CANNOT_DELETE_TRIGGERS);
 	}
@@ -549,7 +547,8 @@ include_once('include/page_header.php');
 		$paging = getPagingLine($triggers);
 //---------
 
-		foreach($triggers as $triggerid => $trigger){
+		foreach($triggers as $tnum => &$trigger){
+			$triggerid = $trigger['triggerid'];
 
 			$description = array();
 			if($trigger['templateid'] > 0){
@@ -565,7 +564,7 @@ include_once('include/page_header.php');
 			$deps = get_trigger_dependencies_by_triggerid($triggerid);
 			if(count($deps) > 0){
 				$description[] = array(BR(), bold(S_DEPENDS_ON.' : '));
-				foreach($deps as $num => $dep_triggerid) {
+				foreach($deps as $dnum => $dep_triggerid) {
 					$description[] = BR();
 
 					$hosts = get_hosts_by_triggerid($dep_triggerid);

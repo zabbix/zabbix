@@ -3166,7 +3166,7 @@ return $result;
 
 				$item_data = CItem::get(array('extendoutput'=>1, 'itemids'=>$item_id));
 
-				if(zbx_valueTo($item_data, array('object'=>1))){
+				if($item_data = reset($item_data)){
 					$value_type = $item_data['value_type'];
 				}
 

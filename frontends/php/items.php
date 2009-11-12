@@ -19,15 +19,15 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/hosts.inc.php');
-	require_once('include/items.inc.php');
-	require_once('include/forms.inc.php');
+require_once('include/config.inc.php');
+require_once('include/hosts.inc.php');
+require_once('include/items.inc.php');
+require_once('include/forms.inc.php');
 
-	$page['title'] = 'S_CONFIGURATION_OF_ITEMS';
-	$page['file'] = 'items.php';
-	$page['scripts'] = array('scriptaculous.js?load=effects');
-	$page['hist_arg'] = array();
+$page['title'] = 'S_CONFIGURATION_OF_ITEMS';
+$page['file'] = 'items.php';
+$page['scripts'] = array('scriptaculous.js?load=effects');
+$page['hist_arg'] = array();
 
 include_once('include/page_header.php');
 ?>
@@ -182,6 +182,13 @@ include_once('include/page_header.php');
 	validate_sort_and_sortorder('description', ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go', 'none');
+
+// PERMISSIONS
+	if(get_request('hostid', 0) > 0){
+		$options = array('hostids' => $_REQUEST['hostid'], 'extendoutput' => 1, 'templated_hosts' => 1);
+		$hosts = CHost::get($options);
+		if(empty($hosts)) access_deny();
+	}
 ?>
 <?php
 /* AJAX */
@@ -196,17 +203,9 @@ include_once('include/page_header.php');
 	}
 //--------
 
-	if(isset($_REQUEST['hostid']) && $_REQUEST['hostid'] > 0){
-		$ah = CHost::get(array('hostids' => $_REQUEST['hostid'], 'editable' => 1, 'templated_hosts' => 1));
-		if(!$ah){
-			access_deny();
-		}
-	}
-
 	$hostid = get_request('hostid', 0);
 	if($hostid > 0){
-		$_REQUEST['filter_host'] = CHost::get(array('hostids' => $hostid, 'extendoutput' => 1, 'templated_hosts' => 1));
-		$_REQUEST['filter_host'] = reset($_REQUEST['filter_host']);
+		$_REQUEST['filter_host'] = reset($hosts);
 		$_REQUEST['filter_host'] = $_REQUEST['filter_host']['host'];
 		$_REQUEST['filter_set'] = 1;
 	}
@@ -274,7 +273,7 @@ include_once('include/page_header.php');
 		$hostid = $hostid ? $hostid : 0;
 	}
 
-	/* SUBFILTERS { --->>> */
+// SUBFILTERS {
 	$subfilters = array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'subfilter_status',
 		'subfilter_templated_items', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval', 'subfilter_history', 'subfilter_trends');
 
@@ -286,7 +285,7 @@ include_once('include/page_header.php');
 			$_REQUEST[$name] = get_request($name, array());
 		}
 	}
-	/* --->>> } SUBFILTERS */
+// } SUBFILTERS 
 
 ?>
 <?php
@@ -878,51 +877,53 @@ include_once('include/page_header.php');
 			S_ERROR
 		));
 
-/* SET VALUES FOR SUBFILTERS { --->>> */
+// SET VALUES FOR SUBFILTERS {
 // if any of subfilters = false then item shouldnt be shown
-		foreach($items as $itemid => $item){
-			$items[$itemid]['subfilters'] = array();
+		foreach($items as $num => &$item){
+			$itemid = $item['itemid'];
+			
+			$item['subfilters'] = array();
 
-			$items[$itemid]['subfilters']['subfilter_hosts'] =
+			$item['subfilters']['subfilter_hosts'] =
 				(empty($_REQUEST['subfilter_hosts']) || (boolean)array_intersect($_REQUEST['subfilter_hosts'], $item['hostids']));
 
-			$items[$itemid]['subfilters']['subfilter_apps'] = false;
+			$item['subfilters']['subfilter_apps'] = false;
 			if(empty($_REQUEST['subfilter_apps'])){
-				$items[$itemid]['subfilters']['subfilter_apps'] = true;
+				$item['subfilters']['subfilter_apps'] = true;
 			}
 			else{
-				foreach($items[$itemid]['applications'] as $app){
+				foreach($item['applications'] as $app){
 					if(str_in_array($app['name'], $_REQUEST['subfilter_apps'])){
-						$items[$itemid]['subfilters']['subfilter_apps'] = true;
+						$item['subfilters']['subfilter_apps'] = true;
 						break;
 					}
 				}
 			}
 
-			$items[$itemid]['subfilters']['subfilter_types'] =
+			$item['subfilters']['subfilter_types'] =
 				(empty($_REQUEST['subfilter_types']) || uint_in_array($item['type'], $_REQUEST['subfilter_types']));
 
-			$items[$itemid]['subfilters']['subfilter_value_types'] =
+			$item['subfilters']['subfilter_value_types'] =
 				(empty($_REQUEST['subfilter_value_types']) || uint_in_array($item['value_type'], $_REQUEST['subfilter_value_types']));
 
-			$items[$itemid]['subfilters']['subfilter_status'] =
+			$item['subfilters']['subfilter_status'] =
 				(empty($_REQUEST['subfilter_status']) || uint_in_array($item['status'], $_REQUEST['subfilter_status']));
 
-			$items[$itemid]['subfilters']['subfilter_templated_items'] =
+			$item['subfilters']['subfilter_templated_items'] =
 				(empty($_REQUEST['subfilter_templated_items']) || (($item['templateid'] == 0) && uint_in_array(0, $_REQUEST['subfilter_templated_items']))
 				|| (($item['templateid'] > 0) && uint_in_array(1, $_REQUEST['subfilter_templated_items'])));
 
-			$items[$itemid]['subfilters']['subfilter_with_triggers'] =
+			$item['subfilters']['subfilter_with_triggers'] =
 				(empty($_REQUEST['subfilter_with_triggers']) || ((count($item['triggerids']) == 0) && uint_in_array(0, $_REQUEST['subfilter_with_triggers']))
 				|| ((count($item['triggerids']) > 0) && uint_in_array(1, $_REQUEST['subfilter_with_triggers'])));
 
-			$items[$itemid]['subfilters']['subfilter_history'] =
+			$item['subfilters']['subfilter_history'] =
 				(empty($_REQUEST['subfilter_history']) || uint_in_array($item['history'], $_REQUEST['subfilter_history']));
 
-			$items[$itemid]['subfilters']['subfilter_trends'] =
+			$item['subfilters']['subfilter_trends'] =
 				(empty($_REQUEST['subfilter_trends']) || uint_in_array($item['trends'], $_REQUEST['subfilter_trends']));
 
-			$items[$itemid]['subfilters']['subfilter_interval'] =
+			$item['subfilters']['subfilter_interval'] =
 				(empty($_REQUEST['subfilter_interval']) || uint_in_array($item['delay'], $_REQUEST['subfilter_interval']));
 		}
 // } SET VALUES FOR SUBFILTERS
@@ -932,9 +933,9 @@ include_once('include/page_header.php');
 		$items_wdgt->addFlicker(get_item_filter_form($items), get_profile('web.items.filter.state', 0));
 
 // Subfilter out items
-		foreach($items as $itemid => $item){
+		foreach($items as $num => $item){
 			foreach($item['subfilters'] as $subfilter => $value){
-				if(!$value) unset($items[$itemid]);
+				if(!$value) unset($items[$num]);
 			}
 		}
 
@@ -944,7 +945,7 @@ include_once('include/page_header.php');
 		$paging = getPagingLine($items);
 //---------
 
-		foreach($items as $num => $item){
+		foreach($items as $inum => $item){
 
 			if($show_host){
 				$host = array_pop($item['hosts']);
@@ -981,7 +982,7 @@ include_once('include/page_header.php');
 			}
 			else{
 				$applications = array();
-				foreach($item['applications'] as $appid => $app){
+				foreach($item['applications'] as $anum => $app){
 					$applications[] = $app['name'];
 				}
 				$applications = implode(', ', $applications);
@@ -997,7 +998,7 @@ include_once('include/page_header.php');
 			));
 
 // TRIGGERS INFO
-			foreach($item['triggers'] as $num => &$trigger){
+			foreach($item['triggers'] as $tnum => &$trigger){
 				$triggerid = $trigger['triggerid'];
 				$tr_description = array();
 

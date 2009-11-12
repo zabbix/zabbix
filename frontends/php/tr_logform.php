@@ -133,8 +133,9 @@ if(isset($_REQUEST['save_trigger'])){
 			$trigger['url'] = $_REQUEST['url'];
 
 			DBstart();
-			if($triggerid = CTrigger::add($trigger)){
-				$result = zbx_valueTo($triggerid, array('field' => 'triggerid'));
+			if($db_triggers = CTrigger::add($trigger)){
+				$triggerids = zbx_objectValues(db_triggers, 'triggerid');
+				$result = reset($triggerids);
 			}
 
 //			$triggerid=add_trigger($expression,$_REQUEST["description"],$type,$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],$deps);

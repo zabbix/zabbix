@@ -17,15 +17,17 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-
-	require_once('include/config.inc.php');
-	require_once('include/discovery.inc.php');
-	$page['hist_arg'] = array('druleid');
-	$page['file'] = 'discovery.php';
-	$page['title'] = 'S_STATUS_OF_DISCOVERY';
+?>
+<?php
+require_once('include/config.inc.php');
+require_once('include/discovery.inc.php');
+$page['hist_arg'] = array('druleid');
+$page['file'] = 'discovery.php';
+$page['title'] = 'S_STATUS_OF_DISCOVERY';
 
 include_once('include/page_header.php');
-
+?>
+<?php
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
@@ -38,7 +40,10 @@ include_once('include/page_header.php');
 	);
 
 	check_fields($fields);
+	validate_sort_and_sortorder('ip',ZBX_SORT_UP);
 
+?>
+<?php
 /* AJAX	*/
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
@@ -50,9 +55,6 @@ include_once('include/page_header.php');
 		exit();
 	}
 //--------
-
-	validate_sort_and_sortorder('ip',ZBX_SORT_UP);
-
 
 	$dscvry_wdgt = new CWidget('hat_discovery');
 
@@ -266,6 +268,9 @@ include_once('include/page_header.php');
 	$dscvry_wdgt->addItem($table);
 	$dscvry_wdgt->show();
 
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>

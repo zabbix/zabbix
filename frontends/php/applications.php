@@ -19,30 +19,16 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/hosts.inc.php');
-	require_once('include/forms.inc.php');
+require_once('include/config.inc.php');
+require_once('include/hosts.inc.php');
+require_once('include/forms.inc.php');
 
-	$page['title'] = 'S_APPLICATIONS';
-	$page['file'] = 'applications.php';
-	$page['hist_arg'] = array('groupid', 'hostid');
-	$page['scripts'] = array();
+$page['title'] = 'S_APPLICATIONS';
+$page['file'] = 'applications.php';
+$page['hist_arg'] = array('groupid', 'hostid');
+$page['scripts'] = array();
 
 include_once('include/page_header.php');
-
-	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
-
-	if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0) && !isset($available_groups[$_REQUEST['groupid']])){
-		access_deny();
-	}
-	if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0) && !isset($available_hosts[$_REQUEST['hostid']])) {
-		access_deny();
-	}
-	if(isset($_REQUEST['apphostid']) && ($_REQUEST['apphostid']>0) && !isset($available_hosts[$_REQUEST['apphostid']])) {
-		access_deny();
-	}
-
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -79,6 +65,23 @@ include_once('include/page_header.php');
 	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go', 'none');
+	
+
+// PERMISSIONS
+	if(get_request('groupid', 0) > 0){
+		$groupids = available_groups($_REQUEST['groupid'], 1);
+		if(empty($groupids)) access_deny();
+	}
+	
+	if(get_request('hostid', 0) > 0){
+		$hostids = available_hosts($_REQUEST['hostid'], 1);
+		if(empty($hostids)) access_deny();
+	}
+	
+	if(get_request('apphostid', 0) > 0){
+		$hostids = available_hosts($_REQUEST['apphostid'], 1);
+		if(empty($hostids)) access_deny();
+	}
 ?>
 <?php
 
@@ -191,8 +194,6 @@ include_once('include/page_header.php');
 		$path = $url->getPath();
 		insert_js('cookie.eraseArray("'.$path.'")');
 	}
-
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,AVAILABLE_NOCACHE); /* update available_hosts after ACTIONS */
 ?>
 <?php
 	$params = array();
@@ -205,10 +206,6 @@ include_once('include/page_header.php');
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
 
 	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
-
-//	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,AVAILABLE_NOCACHE); /* update available_hosts after ACTIONS */
-	$available_groups = $PAGE_GROUPS['groupids'];
-	$available_hosts = $PAGE_HOSTS['hostids'];
 ?>
 <?php
 
@@ -369,7 +366,9 @@ include_once('include/page_header.php');
 		$paging = getPagingLine($applications);
 //---------
 
-		foreach($applications as $applicationid => $application){
+		foreach($applications as $anum => $application){
+			$applicationid = $application['applicationid'];
+
 			if($application['templateid']==0){
 				$name = new CLink($application['name'],'applications.php?form=update&applicationid='.$applicationid);
 			}
@@ -413,6 +412,9 @@ include_once('include/page_header.php');
 		$app_wdgt->addItem($form);
 		$app_wdgt->show();
 	}
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>

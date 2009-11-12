@@ -31,7 +31,8 @@ $page['scripts'] = array();
 $page['hist_arg'] = array();
 
 include_once('include/page_header.php');
-
+?>
+<?php
 
 //---------------------------------- CHECKS ------------------------------------
 

@@ -63,6 +63,8 @@ class CGraphItem extends CZBXAPI{
 			'expand_data'			=> null,
 			'extendoutput'			=> null,
 			'count'					=> null,
+			'preservekeys'			=> null,
+
 			'sortfield'				=> '',
 			'sortorder'				=> '',
 			'limit'					=> null
@@ -219,7 +221,16 @@ class CGraphItem extends CZBXAPI{
 			}
 		}
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
+		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
+			return $result;
+		}
+		
+
+// removing keys (hash -> array)
+		if(is_null($options['preservekeys'])){
+			$result = zbx_cleanHashes($result);
+		}
 
 	return $result;
 	}

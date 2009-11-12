@@ -79,13 +79,6 @@ class CItem extends CZBXAPI{
 			'templated_items'		=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
-// OutPut
-			'extendoutput'			=> null,
-			'select_hosts'			=> null,
-			'select_triggers'		=> null,
-			'select_graphs'			=> null,
-			'select_applications'	=> null,
-			'count'					=> null,
 // filter
 			'filter'				=> null,
 
@@ -107,6 +100,16 @@ class CItem extends CZBXAPI{
 			'with_triggers'			=> null,
 //
 			'pattern'				=> null,
+
+// OutPut
+			'extendoutput'			=> null,
+			'select_hosts'			=> null,
+			'select_triggers'		=> null,
+			'select_graphs'			=> null,
+			'select_applications'	=> null,
+			'count'					=> null,
+			'preservekeys'			=> null,
+
 			'sortfield'				=> '',
 			'sortorder'				=> '',
 			'limit'					=> null
@@ -451,12 +454,15 @@ class CItem extends CZBXAPI{
 			}
 		}
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
+		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
+			return $result;
+		}
 
 // Adding Objects
 // Adding hosts
 		if($options['select_hosts']){
-			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids, 'nopermissions' => 1);
+			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids, 'nopermissions' => 1, 'preservekeys' => 1);
 			$hosts = CHost::get($obj_params);
 			foreach($hosts as $hostid => $host){
 				foreach($host['itemids'] as $num => $itemid){
@@ -476,7 +482,7 @@ class CItem extends CZBXAPI{
 
 // Adding triggers
 		if($options['select_triggers']){
-			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids);
+			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids, 'preservekeys' => 1);
 			$triggers = CTrigger::get($obj_params);
 			foreach($triggers as $triggerid => $trigger){
 				foreach($trigger['itemids'] as $num => $itemid){
@@ -488,7 +494,7 @@ class CItem extends CZBXAPI{
 
 // Adding graphs
 		if($options['select_graphs']){
-			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids);
+			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids, 'preservekeys' => 1);
 			$graphs = CGraph::get($obj_params);
 			foreach($graphs as $graphid => $graph){
 				foreach($graph['itemids'] as $num => $itemid){
@@ -500,7 +506,7 @@ class CItem extends CZBXAPI{
 
 // Adding applications
 		if($options['select_applications']){
-			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids);
+			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids, 'preservekeys' => 1);
 			$applications = CApplication::get($obj_params);
 			foreach($applications as $applicationid => $application){
 				foreach($application['itemids'] as $num => $itemid){
@@ -508,7 +514,11 @@ class CItem extends CZBXAPI{
 					$result[$itemid]['applications'][$applicationid] = $application;
 				}
 			}
+		}
 
+// removing keys (hash -> array)
+		if(is_null($options['preservekeys'])){
+			$result = zbx_cleanHashes($result);
 		}
 
 	return $result;
@@ -629,11 +639,14 @@ class CItem extends CZBXAPI{
 	 * @return array|boolean
 	 */
 	public static function add($items){
-		$itemids = array();
+		$items = zbx_toArray($items);
+
+		$new_items = array();
+		
 		self::BeginTransaction(__METHOD__);
 
 		$result = true;
-		foreach($items as $item){
+		foreach($items as $inum => $item){
 
 /*//////////////
 			$item_db_fields = array(
@@ -843,15 +856,21 @@ class CItem extends CZBXAPI{
 			}
 
 *///////////////
-			$result = add_item($item);
-			if(!$result) break;
-			$itemids['result'] = $result;
+			$new_item = array();
+			$new_item['itemid'] = add_item($item);
+			
+			if(!$new_item){
+				$result = false;
+				break;
+			}
+			
+			$new_items[] = array_merge($new_item, $item);
 		}
 
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
-			return $itemids;
+			return $new_items;
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
@@ -871,19 +890,22 @@ class CItem extends CZBXAPI{
 	 * @return boolean
 	 */
 	public static function update($items){
+		$items = zbx_toArray($items);
 
 		$result = true;
-		$itemids = array();
+		$upd_items = array();
+		
 		self::BeginTransaction(__METHOD__);
-		foreach($items as $item){
+		foreach($items as $inum => $item){
 			$result = update_item($item['itemid'], $item);
 			if(!$result) break;
-			$itemids[$result] = $result;
+			
+			$upd_items[] = $item;
 		}
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
-			return $itemids;
+			return $upd_items;
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
@@ -891,35 +913,44 @@ class CItem extends CZBXAPI{
 	}
 
 /**
-	 * Delete items
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param array $itemids
-	 * @return array|boolean
-	 */
-	public static function delete($itemids){
-		$itemids = isset($itemids['itemids']) ? $itemids['itemids'] : array();
-		zbx_value2array($itemids);
+ * Delete items
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $items multidimensional array with item objects
+ * @param array $items[0,...]['itemid']
+ * @return deleted items
+ */
+	public static function delete($items){
+		$items = zbx_toArray($items);
 
+		$options = array('editable'=>1, 'extendoutput'=>1);
+		$options['itemids'] = zbx_objectValues($items, 'itemid');
+		$del_items = CItem::get($options);
+		
+		$itemids = array();
+		foreach($del_items as $inum => $item){
+			$itemids[] = $item['itemid'];
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, 'Item ['.$Item['description'].']');
+		}
+	
 		if(!empty($itemids)){
 			$result = delete_item($itemids);
 		}
 		else{
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ itemids ]');
+			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Incorrect input parameter [ items ]');
 			$result = false;
 		}
 		if($result)
-			return $itemids;
+			return $del_items;
 		else{
 			self::setError(__METHOD__);
 			return false;
 		}
 	}
-
 }
 ?>
