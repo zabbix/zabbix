@@ -615,7 +615,7 @@
 		if(isset($userid)){
 /*			if(bccomp($userid,$USER_DETAILS['userid'])==0) $profile = 1;*/
 
-			$user=CUser::getById(array('userid' => $userid));
+			$user = CUser::getById(array('userid' => $userid));
 			$frm_title = S_USER.' "'.$user['alias'].'"';
 		}
 
@@ -762,8 +762,8 @@
 			$lstGroups->attributes['style'] = 'width: 320px';
 
 			$groups = CUserGroup::get(array('usrgrpids' => $user_groups, 'extendoutput' => 1));
-			foreach($groups as $groupid => $group){
-				$lstGroups->addItem($groupid, $group['name']);
+			foreach($groups as $num => $group){
+				$lstGroups->addItem($group['groupid'], $group['name']);
 			}
 
 			$frmUser->addRow(S_GROUPS,
@@ -1481,7 +1481,7 @@
 		);
 
 // generate array with values for subfilters of selected items
-		foreach($items as $item){
+		foreach($items as $num => $item){
 
 			if(zbx_empty($filter_host)){
 // hosts
@@ -2478,6 +2478,7 @@
 		$frmCopy->addRow(S_TARGET_TYPE, $cmbCopyType);
 
 		$target_list = array();
+
 		$groups = CHostGroup::get(array('extendoutput'=>1, 'order'=>'name'));
 		if(0 == $copy_type){
 			$cmbGroup = new CComboBox('filter_groupid',$filter_groupid,'submit()');
@@ -2492,7 +2493,9 @@
 							'order'=>'host',
 							'groupids'=> $filter_groupid);
 			$hosts = CHost::get($options);
-			foreach($hosts as $hostid => $host){
+			foreach($hosts as $num => $host){
+				$hostid = $host['hostid'];
+
 				array_push($target_list,array(
 					new CCheckBox('copy_targetid['.$hostid.']',
 						uint_in_array($hostid, $copy_targetid),
@@ -2505,7 +2508,8 @@
 			}
 
 			$templates = CTemplate::get($options);
-			foreach($templates as $templateid => $template){
+			foreach($templates as $num => $template){
+				$templateid = $template['templateid'];
 				array_push($target_list,array(
 					new CCheckBox('copy_targetid['.$templateid.']',
 						uint_in_array($templateid, $copy_targetid),
@@ -2913,7 +2917,7 @@
 			$percent_right = $row['percent_right'];
 
 			$db_items = CGraphItem::get(array('graphids' => $_REQUEST['graphid'], 'sortfield' => 'sortorder', 'extendoutput' => 1));
-			foreach($db_items as $item){
+			foreach($db_items as $num => $item){
 				$items[] = array(
 					'itemid' => $item['itemid'],
 					'drawtype' => $item['drawtype'],

@@ -74,12 +74,16 @@ class Cscript extends CZBXAPI{
 			'hostids'				=> null,
 			'scriptids'				=> null,
 			'editable'				=> null,
+// Filter
+			'pattern'				=> '',
+
 // OutPut
 			'extendoutput'			=> null,
 			'select_groups'			=> null,
 			'select_hosts'			=> null,
 			'count'					=> null,
-			'pattern'				=> '',
+			'preservekeys'			=> null,
+
 			'sortfield'				=> '',
 			'sortorder'				=> '',
 			'limit'					=> null
@@ -248,13 +252,16 @@ class Cscript extends CZBXAPI{
 			}
 		}
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
+		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
+			return $result;
+		}
 
 // Adding Objects
 // Adding groups
 		if($options['select_groups']){
 			foreach($result as $scriptid => $script){
-				$obj_params = array('extendoutput' => 1);
+				$obj_params = array('extendoutput' => 1, 'preservekeys' => 1);
 
 				if($script['host_access'] == PERM_READ_WRITE){
 					$obj_params['editable'] = 1;
@@ -267,14 +274,14 @@ class Cscript extends CZBXAPI{
 				$groups = CHostGroup::get($obj_params);
 
 				$result[$scriptid]['groups'] = $groups;
-				$result[$scriptid]['groupids'] = array_keys($groups);
+				$result[$scriptid]['groupids'] = zbx_objectValues($groups,'groupid');
 			}
 		}
 
 // Adding hosts
 		if($options['select_hosts']){
 			foreach($result as $scriptid => $script){
-				$obj_params = array('extendoutput' => 1);
+				$obj_params = array('extendoutput' => 1, 'preservekeys' => 1);
 
 				if($script['host_access'] == PERM_READ_WRITE){
 					$obj_params['editable'] = 1;
@@ -287,8 +294,13 @@ class Cscript extends CZBXAPI{
 				$hosts = CHost::get($obj_params);
 
 				$result[$scriptid]['hosts'] = $hosts;
-				$result[$scriptid]['hostids'] = array_keys($hosts);
+				$result[$scriptid]['hostids'] = zbx_objectValues($hosts, 'hostid');
 			}
+		}
+
+// removing keys (hash -> array)
+		if(is_null($options['preservekeys'])){
+			$result = zbx_cleanHashes($result);
 		}
 
 	return $result;
@@ -490,10 +502,10 @@ class Cscript extends CZBXAPI{
 
 		zbx_value2array($hostids);
 
-		$obj_params = array('hostids' => $hostids);
+		$obj_params = array('hostids' => $hostids, 'preservekeys' => 1);
 		$hosts_read_only  = CHost::get($obj_params);
 
-		$obj_params = array('editable' => 1, 'hostids' => $hostids);
+		$obj_params = array('editable' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
 		$hosts_read_write = CHost::get($obj_params);
 
 // initialize array
@@ -504,7 +516,7 @@ class Cscript extends CZBXAPI{
 //-----
 		$groups = CHostGroup::get(array('hostids' => $hostids, 'select_hosts' => 1, 'extendoutput' => 1));
 
-		$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);
+		$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
 		$scripts  = CScript::get($obj_params);
 
 		foreach($scripts as $num => $script){

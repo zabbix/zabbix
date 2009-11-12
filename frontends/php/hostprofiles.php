@@ -45,8 +45,7 @@
 	$_REQUEST['hostid'] = get_request('hostid', 0);
 	if($_REQUEST['hostid'] > 0){
 		$res = CHost::get(array('real_hosts' => 1, 'hostids' => $_REQUEST['hostid']));
-		if(empty($res))
-			access_deny();
+		if(empty($res)) access_deny();
 	}
 
 

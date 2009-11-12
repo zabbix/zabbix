@@ -94,6 +94,7 @@ class CAction extends CZBXAPI{
 			'select_conditions'		=> null,
 			'select_operations'		=> null,
 			'count'					=> null,
+			'preservekeys'			=> null,
 
 			'sortfield'				=> '',
 			'sortorder'				=> '',
@@ -101,7 +102,6 @@ class CAction extends CZBXAPI{
 		);
 
 		$options = zbx_array_merge($def_options, $options);
-
 
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
@@ -406,7 +406,10 @@ class CAction extends CZBXAPI{
 			}
 		}
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
+		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
+			return $result;
+		}
 
 // Adding Objects
 // Adding Conditions
@@ -446,6 +449,11 @@ class CAction extends CZBXAPI{
 				$result[$operation['actionid']]['operationids'][$operation['operationid']] = $operation['operationid'];
 				$result[$operation['actionid']]['operations'][$operation['operationid']] = $operation;
 			}
+		}
+
+// removing keys (hash -> array)
+		if(is_null($options['preservekeys'])){
+			$result = zbx_cleanHashes($result);
 		}
 
 	return $result;

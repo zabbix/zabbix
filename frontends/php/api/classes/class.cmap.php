@@ -81,11 +81,15 @@ class CMap extends CZBXAPI{
 			'sysmapids'					=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
+// filtet
+			'pattern'					=> '',
+
 // OutPut
 			'extendoutput'				=> null,
 			'select_elements'			=> null,
 			'count'						=> null,
-			'pattern'					=> '',
+			'preservekeys'				=> null,
+
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
@@ -266,10 +270,9 @@ class CMap extends CZBXAPI{
 		}
 
 		if(is_null($options['extendoutput']) || !is_null($options['count'])){
-			zbx_valueTo($result, array('array' => 1));
+			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
-
 
 // Adding Elements
 		if($options['select_elements']){
@@ -289,7 +292,11 @@ class CMap extends CZBXAPI{
 			}
 		}
 
-	zbx_valueTo($result, array('array' => 1));
+// removing keys (hash -> array)
+		if(is_null($options['preservekeys'])){
+			$result = zbx_cleanHashes($result);
+		}
+
 	return $result;
 	}
 
@@ -343,7 +350,7 @@ class CMap extends CZBXAPI{
 		$result_maps = array();
 		$result = true;
 
-		zbx_valueTo($maps, array('array' => 1));
+		$maps = zbx_toArray($maps);
 
 		self::BeginTransaction(__METHOD__);
 		foreach($maps as $map){
@@ -405,13 +412,13 @@ class CMap extends CZBXAPI{
 	public static function update($maps){
 		$result = array();
 
-		zbx_valueTo($maps, array('array' => 1));
+		$maps = zbx_toArray($maps);
 
 		self::BeginTransaction(__METHOD__);
 		foreach($maps as $map){
 
 			$map_db_fields = CMap::get(array('sysmapids' => $map['sysmapid'], 'extendoutput' => 1));
-			zbx_valueTo($map_db_fields, array('object' => 1));
+			$map_db_fields = reset($map_db_fields);		
 
 
 			if(!$map_db_fields){
@@ -462,7 +469,7 @@ class CMap extends CZBXAPI{
 		$result = true;
 		$errors = array();
 
-		zbx_valueTo($sysmaps, array('array' => 1, 'field' => 'sysmapid'));
+		$sysmaps = zbx_objectValues($sysmaps, 'sysmapid');
 
 		self::BeginTransaction(__METHOD__);
 
@@ -510,7 +517,7 @@ class CMap extends CZBXAPI{
 		$result_links = array();
 		$result = true;
 
-		zbx_valueTo($links, array('array' => 1));
+		$links = zbx_toArray($links);
 
 		self::BeginTransaction(__METHOD__);
 
@@ -576,7 +583,7 @@ class CMap extends CZBXAPI{
 		$result_elements = array();
 		$result = true;
 
-		zbx_valueTo($elements, array('array' => 1));
+		$elements = zbx_toArray($elements);
 
 		self::BeginTransaction(__METHOD__);
 		foreach($elements as $element){
@@ -674,7 +681,7 @@ class CMap extends CZBXAPI{
 		$result_linktriggers = array();
 		$result = false;
 
-		zbx_valueTo($linktriggers, array('array' => 1));
+		$linktriggers = zbx_toArray($linktriggers);
 
 		self::BeginTransaction(__METHOD__);
 		foreach($linktriggers as $linktrigger){

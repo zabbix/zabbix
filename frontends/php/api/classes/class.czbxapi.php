@@ -24,6 +24,7 @@ class CZBXAPI{
 public static $error = array();
 private static $transaction = array('counter' => 0);
 
+// TRANSACTION METHODS{
 	protected static function BeginTransaction($caller = 'CZBXAPI'){
 		global $DB;
 
@@ -86,7 +87,9 @@ private static $transaction = array('counter' => 0);
 
 	return $result;
 	}
+// TRANSACTION METHODS}
 
+// ERROR METHODS{
 	protected static function setError($method, $errno=ZBX_API_ERROR_INTERNAL, $error='Unknown ZABBIX internal error'){
 		self::$error[] = array('error' => $errno, 'data' => "[ $method ] $error");
 	}
@@ -134,5 +137,5 @@ private static $transaction = array('counter' => 0);
 		self::clearErrors();
 		return $errors;
 	}
-
+// ERROR METHODS}
 }

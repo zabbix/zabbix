@@ -19,17 +19,16 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/hosts.inc.php');
-	require_once('include/httptest.inc.php');
-	require_once('include/forms.inc.php');
+require_once('include/config.inc.php');
+require_once('include/hosts.inc.php');
+require_once('include/httptest.inc.php');
+require_once('include/forms.inc.php');
 
-	$page['title'] = 'S_CONFIGURATION_OF_WEB_MONITORING';
-	$page['file'] = 'httpconf.php';
-	$page['hist_arg'] = array('groupid','hostid');
+$page['title'] = 'S_CONFIGURATION_OF_WEB_MONITORING';
+$page['file'] = 'httpconf.php';
+$page['hist_arg'] = array('groupid','hostid');
 
 include_once('include/page_header.php');
-
 ?>
 <?php
 
@@ -567,6 +566,9 @@ include_once('include/page_header.php');
 		$http_wdgt->show();
 	}
 
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>

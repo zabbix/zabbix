@@ -19,27 +19,17 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/hosts.inc.php');
-	require_once('include/maintenances.inc.php');
-	require_once('include/forms.inc.php');
+require_once('include/config.inc.php');
+require_once('include/hosts.inc.php');
+require_once('include/maintenances.inc.php');
+require_once('include/forms.inc.php');
 
-	$page['title'] = 'S_MAINTENANCE';
-	$page['file'] = 'maintenance.php';
-	$page['hist_arg'] = array('groupid','hostid');
-	$page['scripts'] = array('class.calendar.js');
+$page['title'] = 'S_MAINTENANCE';
+$page['file'] = 'maintenance.php';
+$page['hist_arg'] = array('groupid','hostid');
+$page['scripts'] = array('class.calendar.js');
 
 include_once('include/page_header.php');
-
-	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
-
-	if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0) && !isset($available_groups[$_REQUEST['groupid']])){
-		access_deny();
-	}
-	if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0) && !isset($available_hosts[$_REQUEST['hostid']])) {
-		access_deny();
-	}
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -90,6 +80,17 @@ include_once('include/page_header.php');
 	validate_sort_and_sortorder('name',ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go','none');
+	
+// PERMISSIONS
+	if(get_request('groupid', 0) > 0){
+		$groupids = available_groups($_REQUEST['groupid'], 1);
+		if(empty($groupids)) access_deny();
+	}
+	
+	if(get_request('hostid', 0) > 0){
+		$hostids = available_hosts($_REQUEST['hostid'], 1);
+		if(empty($hostids)) access_deny();
+	}
 ?>
 <?php
 /************ MAINTENANCE ****************/
@@ -116,8 +117,6 @@ include_once('include/page_header.php');
 
 		DBstart();
 
-// update available_hosts after ACTIONS
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY,null,AVAILABLE_NOCACHE);
 		if(isset($_REQUEST['maintenanceid'])) delete_timeperiods_by_maintenanceid($_REQUEST['maintenanceid']);
 
 		$timeperiodids = array();
@@ -328,18 +327,12 @@ include_once('include/page_header.php');
 		insert_js('cookie.eraseArray("'.$path.'")');
 	}
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,AVAILABLE_NOCACHE); /* update available_hosts after ACTIONS */
-
-
 	$params = array('only_current_node' => 1);
 
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
 
 	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS, true);
-
-	$available_groups = $PAGE_GROUPS['groupids'];
-	$available_hosts = $PAGE_HOSTS['hostids'];
 
 	$frmForm = new CForm();
 	$frmForm->setMethod('get');
@@ -489,14 +482,15 @@ include_once('include/page_header.php');
 		$paging = getPagingLine($maintenances);
 //---------
 
-		foreach($maintenances as $maintenanceid => $maintenance){
+		foreach($maintenances as $mnum => $maintenance){
+			$maintenanceid = $maintenance['maintenanceid'];
 
 			if($maintenance['active_till'] < time()) $mnt_status = new CSpan(S_EXPIRED,'red');
 			else $mnt_status = new CSpan(S_ACTIVE,'green');
 
 			$table->addRow(array(
-				new CCheckBox('maintenanceids['.$maintenance['maintenanceid'].']',NULL,NULL,$maintenance['maintenanceid']),
-				new CLink($maintenance['name'],'maintenance.php?form=update&maintenanceid='.$maintenance['maintenanceid'].'#form'),
+				new CCheckBox('maintenanceids['.$maintenanceid.']',NULL,NULL,$maintenanceid),
+				new CLink($maintenance['name'],'maintenance.php?form=update&maintenanceid='.$maintenanceid.'#form'),
 				$maintenance['maintenance_type']?S_NO_DATA_PROCESSING:S_NORMAL_PROCESSING,
 				$mnt_status,
 				$maintenance['description']

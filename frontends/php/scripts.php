@@ -195,7 +195,7 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 
 		$usrgrps = CUserGroup::get(array('extendoutput'=>1, 'sortfield'=>'name'));
 
-		foreach($usrgrps as $usrgrpid => $usr_group){
+		foreach($usrgrps as $ugnum => $usr_group){
 			$usr_groups->addItem($usr_group['usrgrpid'],$usr_group['name']);
 		}
 
@@ -205,8 +205,8 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 		$host_groups->addItem(0,S_ALL_S);
 
 		$groups = CHostGroup::get(array('extendoutput' => 1, 'sortfield'=>'name'));
-		foreach($groups as $groupid => $group){
-			$host_groups->addItem($groupid,$group['name']);
+		foreach($groups as $gnum => $group){
+			$host_groups->addItem($group['groupid'],$group['name']);
 		}
 
 		$frmScr->addRow(S_HOST_GROUPS,$host_groups);
@@ -266,7 +266,9 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 		$scripts_wdgt->addItem($paging);
 //---------
 
-		foreach($scripts as $scriptid => $script){
+		foreach($scripts as $snum => $script){
+			$scriptid = $script['scriptid'];
+
 			$user_group_name = S_ALL_S;
 
 			if($script['usrgrpid'] > 0){

@@ -19,15 +19,15 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/hosts.inc.php');
-	require_once('include/graphs.inc.php');
-	require_once('include/forms.inc.php');
+require_once('include/config.inc.php');
+require_once('include/hosts.inc.php');
+require_once('include/graphs.inc.php');
+require_once('include/forms.inc.php');
 
-	$page['title'] = 'S_CONFIGURATION_OF_GRAPHS';
-	$page['file'] = 'graphs.php';
-	$page['hist_arg'] = array();
-	$page['scripts'] = array();
+$page['title'] = 'S_CONFIGURATION_OF_GRAPHS';
+$page['file'] = 'graphs.php';
+$page['hist_arg'] = array();
+$page['scripts'] = array();
 
 include_once('include/page_header.php');
 
@@ -90,6 +90,12 @@ include_once('include/page_header.php');
 	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go', 'none');
+	
+// PERMISSIONS
+	if(get_request('graphid',0) > 0){
+		$graphs = available_graphs($_REQUEST['graphid'], 1);
+		if(empty($graphs)) access_deny();
+	}
 ?>
 <?php
 
@@ -97,9 +103,6 @@ include_once('include/page_header.php');
 	$_REQUEST['group_gid'] = get_request('group_gid', array());
 	$_REQUEST['graph3d'] = get_request('graph3d', 0);
 	$_REQUEST['legend'] = get_request('legend', 0);
-
-	$available_hosts_all_nodes = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,get_current_nodeid(true));
-	$available_graphs = CGraph::get(array('nodeids'=>get_current_nodeid(true), 'editable'=>1));
 
 // ---- <ACTIONS> ----
 	if(isset($_REQUEST['clone']) && isset($_REQUEST['graphid'])){
@@ -110,18 +113,19 @@ include_once('include/page_header.php');
 
 		$items = get_request('items', array());
 		$itemids = array();
-		foreach($items as $gitem){
+		foreach($items as $inum => $gitem){
 			$itemids[$gitem['itemid']] = $gitem['itemid'];
 		}
 
 		if(!empty($itemids)){
-			$sql = 'SELECT h.hostid '.
-					' FROM hosts h,items i '.
-					' WHERE h.hostid=i.hostid '.
-						' AND '.DBcondition('i.itemid', $itemids).
-						' AND '.DBcondition('h.hostid',$available_hosts_all_nodes,true);
-			if(DBfetch(DBselect($sql,1))){
-				access_deny();
+			$options = array('itemids'=>$itemids, 'editable'=>1, 'nodes'=>get_current_node(true));
+			$db_items = CItem::get($options);
+			$db_items = zbx_toHash($db_items, 'itemid');
+			
+			foreach($itemids as $inum => $itemid){
+				if(!isset($db_items[$itemid])){
+					access_deny();
+				}
 			}
 		}
 
@@ -193,15 +197,13 @@ include_once('include/page_header.php');
 			show_messages($result, S_GRAPH_ADDED, S_CANNOT_ADD_GRAPH);
 		}
 	}
-	else if(isset($_REQUEST['delete']) && isset($_REQUEST['graphid'])){
-		$graph=get_graph_by_graphid($_REQUEST['graphid']);
-
-		if(!isset($available_graphs[$_REQUEST['graphid']])){
-			access_deny();
-		}
+	else if(isset($_REQUEST['delete']) && isset($_REQUEST['graphid'])){		
+		$options = array('graphids'=>$_REQUEST['graphid'], 'extendoutput'=>1, 'editable'=>1, 'nopermissions'=>1);
+		$graphs = CGraph::get($options);
+		$graph = reset($graphs);
 
 		DBstart();
-			$result = delete_graph($_REQUEST['graphid']);
+			$result = CGraph::delete($graphs);
 		$result = DBend($result);
 
 		if($result){
@@ -255,18 +257,23 @@ include_once('include/page_header.php');
 	}
 //------ GO -------
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_graphid'])){
-		$group_graphid = $_REQUEST['group_graphid'];
-		$group_graphid = zbx_uint_array_intersect($group_graphid, $available_graphs);
+		$options = array('graphids'=>$_REQUEST['group_graphid'], 'extendoutput'=>1, 'editable'=>1);
+		$graphs = CGraph::get($options);
+
 		$go_result = false;
 
 		DBstart();
-		foreach($group_graphid as $id => $graphid){
-			$graph=get_graph_by_graphid($graphid);
-			if($graph['templateid']<>0)	continue;
+		foreach($graphs as $gnum => $graph){
+			if($graph['templateid'] != 0){
+				unset($graphs[$gnum]);
+				error('Cannot delete graph [ '.$graph['name'].' ] (Templated graph)');
+				continue;
+			}
+			
 			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH,'Graph ['.$graph['name'].']');
 		}
-		if(!empty($group_graphid)){
-			$go_result = delete_graph($group_graphid);
+		if(!empty($graphs)){
+			$go_result = CGraph::delete($graphs);
 		}
 
 		$go_result = DBend($go_result);
@@ -278,24 +285,30 @@ include_once('include/page_header.php');
 			if(0 == $_REQUEST['copy_type']){ /* hosts */
 				$hosts_ids = $_REQUEST['copy_targetid'];
 			}
-			else{ /* groups */
-				$hosts_ids = array();
+			else{ 
+// groups
+				zbx_value2array($_REQUEST['copy_targetid']);
 
-				$sql = 'SELECT DISTINCT h.hostid '.
-						' FROM hosts h, hosts_groups hg'.
-						' WHERE h.hostid=hg.hostid '.
-							' AND '.DBcondition('hg.groupid',$_REQUEST['copy_targetid']).
-							' AND '.DBcondition('h.hostid',$available_hosts_all_nodes);
-				$db_hosts = DBselect($sql);
-				while($db_host = DBfetch($db_hosts)){
-					array_push($hosts_ids, $db_host['hostid']);
+				$options = array('groupids'=>$_REQUEST['copy_targetid'], 'editable'=>1, 'nodes'=>get_current_node(true));
+				$db_groups = CHostGroup::get($options);
+				$db_groups = zbx_toHash($db_groups, 'groupid');
+
+				foreach($_REQUEST['copy_targetid'] as $gnum => $groupid){
+					if(!isset($db_groups[$groupid])){
+						access_deny();
+					}
 				}
+				
+				$options = array('groupids'=>$_REQUEST['copy_targetid'], 'editable'=>1, 'nodes'=>get_current_node(true));
+				$db_hosts = CHost::get($options);
+				$db_hosts = zbx_toHash($db_hosts, 'hostid');
 			}
 			DBstart();
-			foreach($_REQUEST['group_graphid'] as $graph_id)
-				foreach($hosts_ids as $host_id){
-					copy_graph_to_host($graph_id, $host_id, true);
+			foreach($_REQUEST['group_graphid'] as $gnum => $graph_id){
+				foreach($db_hosts as $hnum => $hostid){
+					copy_graph_to_host($graph_id, $hostid, true);
 				}
+			}
 			$go_result = DBend();
 			$_REQUEST['go'] = 'none2';
 		}
@@ -477,7 +490,7 @@ include_once('include/page_header.php');
 		$graphs = CGraph::get($options);
 
 // Change graphtype from numbers to names, for correct sorting
-		foreach($graphs as $graphid => $graph){
+		foreach($graphs as $gnum => $graph){
 			switch($graph['graphtype']){
 				case GRAPH_TYPE_STACKED:
 					$graphtype = S_STACKED;
@@ -492,7 +505,8 @@ include_once('include/page_header.php');
 					$graphtype = S_NORMAL;
 				break;
 			}
-			$graphs[$graphid]['graphtype'] = $graphtype;
+
+			$graphs[$gnum]['graphtype'] = $graphtype;
 		}
 
 // sorting
@@ -500,7 +514,8 @@ include_once('include/page_header.php');
 		$paging = getPagingLine($graphs);
 //---------
 
-		foreach($graphs as $graphid => $graph){
+		foreach($graphs as $gnum => $graph){
+			$graphid = $graph['graphid'];
 
 			$host_list = NULL;
 			if($_REQUEST['hostid'] == 0){

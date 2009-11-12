@@ -196,17 +196,19 @@ function make_system_summary(){
 		'extendoutput' => 1
 	);
 	$groups = CHostGroup::get($options);
+	$groups = zbx_toHash($groups, 'groupid');
+	
 	order_result($groups, 'name');
 	$groupids = array();
-	foreach($groups as $num => $group){
+	foreach($groups as $gnum => &$group){
 		$groupids[] = $group['groupid'];
-		$groups[$num]['tab_priority'] = array();
-		$groups[$num]['tab_priority'][TRIGGER_SEVERITY_DISASTER] = array('count' => 0, 'triggers' => array());
-		$groups[$num]['tab_priority'][TRIGGER_SEVERITY_HIGH] = array('count' => 0, 'triggers' => array());
-		$groups[$num]['tab_priority'][TRIGGER_SEVERITY_AVERAGE] = array('count' => 0, 'triggers' => array());
-		$groups[$num]['tab_priority'][TRIGGER_SEVERITY_WARNING] = array('count' => 0, 'triggers' => array());
-		$groups[$num]['tab_priority'][TRIGGER_SEVERITY_INFORMATION] = array('count' => 0, 'triggers' => array());
-		$groups[$num]['tab_priority'][TRIGGER_SEVERITY_NOT_CLASSIFIED] = array('count' => 0, 'triggers' => array());
+		$group['tab_priority'] = array();
+		$group['tab_priority'][TRIGGER_SEVERITY_DISASTER] = array('count' => 0, 'triggers' => array());
+		$group['tab_priority'][TRIGGER_SEVERITY_HIGH] = array('count' => 0, 'triggers' => array());
+		$group['tab_priority'][TRIGGER_SEVERITY_AVERAGE] = array('count' => 0, 'triggers' => array());
+		$group['tab_priority'][TRIGGER_SEVERITY_WARNING] = array('count' => 0, 'triggers' => array());
+		$group['tab_priority'][TRIGGER_SEVERITY_INFORMATION] = array('count' => 0, 'triggers' => array());
+		$group['tab_priority'][TRIGGER_SEVERITY_NOT_CLASSIFIED] = array('count' => 0, 'triggers' => array());
 	}
 // }}} SELECT HOST GROUPS
 
@@ -219,9 +221,11 @@ function make_system_summary(){
 		'filter' => 1,
 		'only_true' => 1
 	);
+	
 	$triggers = CTrigger::get($options);
 	order_result($triggers, 'lastchange', ZBX_SORT_DOWN);
-	foreach($triggers as $num => $trigger){
+	
+	foreach($triggers as $tnum => $trigger){
 		if(!trigger_dependent($trigger['triggerid'])){
 			if($groups[$trigger['groupid']]['tab_priority'][$trigger['priority']]['count'] < 30){
 				$groups[$trigger['groupid']]['tab_priority'][$trigger['priority']]['triggers'][] = $trigger;
@@ -231,7 +235,7 @@ function make_system_summary(){
 	}
 // }}} SELECT TRIGGERS
 
-	foreach($groups as $num => $group){
+	foreach($groups as $gnum => $group){
 		$group_row = new CRow();
 		if(is_show_all_nodes())
 			$group_row->addItem(get_node_name_by_elid($group['groupid']));
@@ -255,7 +259,7 @@ function make_system_summary(){
 					S_ACTIONS
 				));
 
-				foreach($data['triggers'] as $num => $trigger){
+				foreach($data['triggers'] as $tnum => $trigger){
 					$trigger_hosts = array();
 					foreach($trigger['hosts'] as $host){
 						$trigger_hosts[] = $host['host'];
@@ -274,7 +278,7 @@ function make_system_summary(){
 						'sortorder' => ZBX_SORT_DOWN
 					);
 					$event = CEvent::get($options);
-					zbx_valueTo($event, array('object' => 1));
+					$event = reset($event);
 
 					if(!empty($event)){
 						if($config['event_ack_enable']){
@@ -313,6 +317,7 @@ function make_system_summary(){
 		$table->addRow($group_row);
 	}
 	$table->setFooter(new CCol(S_UPDATED.': '.date("H:i:s", time())));
+
 return $table;
 }
 
@@ -399,8 +404,7 @@ function make_latest_issues($params = array()){
 
 	$scripts_by_hosts = CScript::getScriptsByHosts($available_hosts);
 
-
-	$config=select_config();
+	$config = select_config();
 
 	$sql_select = '';
 	$sql_from = '';
@@ -610,7 +614,7 @@ return $table;
 
 // Author: Aly
 function make_discovery_status(){
-	$drules = array();
+	$drules = array(); 
 
 	$db_drules = DBselect('select distinct * from drules where '.DBin_node('druleid').' order by name');
 	while($drule_data = DBfetch($db_drules)){
@@ -655,98 +659,6 @@ function make_discovery_status(){
 	$table->setFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
 
 return 	$table;
-}
-
-function make_latest_data(){
-	global $USER_DETAILS;
-
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
-
-	while($db_app = DBfetch($db_applications)){
-		$db_items = DBselect('SELECT DISTINCT i.* '.
-					' FROM items i,items_applications ia'.
-					' WHERE ia.applicationid='.$db_app['applicationid'].
-						' AND i.itemid=ia.itemid'.
-						' AND i.status='.ITEM_STATUS_ACTIVE.
-					order_by('i.description,i.itemid,i.lastclock'));
-
-		$app_rows = array();
-		$item_cnt = 0;
-		while($db_item = DBfetch($db_items)){
-			$description = item_description($db_item);
-
-			if( !zbx_empty($_REQUEST['select']) && !zbx_stristr($description, $_REQUEST['select']) ) continue;
-
-			++$item_cnt;
-			if(!uint_in_array($db_app['applicationid'],$_REQUEST['applications']) && !isset($show_all_apps)) continue;
-
-			if(isset($db_item['lastclock']))
-				$lastclock=date(S_DATE_FORMAT_YMDHMS,$db_item['lastclock']);
-			else
-				$lastclock = new CCol('-', 'center');
-
-			$lastvalue=format_lastvalue($db_item);
-
-			if( isset($db_item['lastvalue']) && isset($db_item['prevvalue']) &&
-				($db_item['value_type'] == 0) && ($db_item['lastvalue']-$db_item['prevvalue'] != 0) )
-			{
-				if($db_item['lastvalue']-$db_item['prevvalue']<0){
-					$change=convert_units($db_item['lastvalue']-$db_item['prevvalue'],$db_item['units']);
-				}
-				else{
-					$change='+'.convert_units($db_item['lastvalue']-$db_item['prevvalue'],$db_item['units']);
-				}
-				$change=nbsp($change);
-			}
-			else{
-				$change=new CCol('-','center');
-			}
-			if(($db_item['value_type']==ITEM_VALUE_TYPE_FLOAT) ||($db_item['value_type']==ITEM_VALUE_TYPE_UINT64)){
-				$actions=new CLink(S_GRAPH,'history.php?action=showgraph&itemid='.$db_item['itemid']);
-			}
-			else{
-				$actions=new CLink(S_HISTORY,'history.php?action=showvalues&period=3600&itemid='.$db_item['itemid']);
-			}
-			array_push($app_rows, new CRow(array(
-				is_show_all_nodes() ? SPACE : null,
-				$_REQUEST['hostid'] > 0 ? NULL : SPACE,
-				str_repeat(SPACE,6).$description,
-				$lastclock,
-				new CCol($lastvalue, $lastvalue=='-' ? 'center' : null),
-				$change,
-				$actions
-				)));
-		}
-
-		if($item_cnt > 0){
-			if(uint_in_array($db_app['applicationid'],$_REQUEST['applications']) || isset($show_all_apps)){
-				$link = new CLink(new CImg('images/general/opened.gif'),
-					'?close=1&applicationid='.$db_app['applicationid'].
-					url_param('groupid').url_param('hostid').url_param('applications').
-					url_param('select'));
-			}
-			else{
-				$link = new CLink(new CImg('images/general/closed.gif'),
-					'?open=1&applicationid='.$db_app['applicationid'].
-					url_param('groupid').url_param('hostid').url_param('applications').
-					url_param('select'));
-			}
-
-			$col = new CCol(array($link,SPACE,bold($db_app['name']),
-				SPACE.'('.$item_cnt.SPACE.S_ITEMS.')'));
-			$col->setColSpan(5);
-
-			$table->ShowRow(array(
-					get_node_name_by_elid($db_app['hostid']),
-					$_REQUEST['hostid'] > 0 ? NULL : $db_app['host'],
-					$col
-					));
-
-			$any_app_exist = true;
-
-			foreach($app_rows as $row)	$table->ShowRow($row);
-		}
-	}
 }
 
 function make_graph_menu(&$menu,&$submenu){

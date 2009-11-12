@@ -114,7 +114,7 @@ include_once('include/page_header.php');
 
 	$hosts = selectByPattern($db_hosts, 'host', $search, $rows_per_page);
 
-	$hostids = array_keys($hosts);
+	$hostids = zbx_objectValues($hosts, 'hostid');
 	$hostsgroups = array();
 	$sql = 'SELECT * FROM hosts_groups hg WHERE '.DBcondition('hg.hostid', $hostids);
 	$res = DBselect($sql);
@@ -147,7 +147,7 @@ include_once('include/page_header.php');
 	$table  = new CTableInfo();
 	$table->setHeader($header);
 
-	foreach($hosts as $num => $host){
+	foreach($hosts as $gnum => $host){
 		$hostid = $host['hostid'];
 		$groupid = isset($hostsgroups[$hostid])?$hostsgroups[$hostid]:0;
 		$link = 'groupid='.$groupid.'&hostid='.$hostid;
@@ -228,7 +228,7 @@ include_once('include/page_header.php');
 	$table  = new CTableInfo();
 	$table->setHeader($header);
 
-	foreach($hostGroups as $num => $group){
+	foreach($hostGroups as $hnum => $group){
 		$hostgroupid = $group['groupid'];
 
 		$caption = make_decoration($group['name'], $search);
@@ -267,7 +267,7 @@ include_once('include/page_header.php');
 
 		$templates = selectByPattern($db_templates, 'host', $search, $rows_per_page);
 
-		$templateids = array_keys($templates);
+		$templateids = zbx_objectValues($templates, 'templateid');
 		$hostsgroups = array();
 		$sql = 'SELECT * FROM hosts_groups hg WHERE '.DBcondition('hg.hostid', $templateids);
 		$res = DBselect($sql);
@@ -297,7 +297,7 @@ include_once('include/page_header.php');
 		$table  = new CTableInfo();
 		$table->setHeader($header);
 
-		foreach($templates as $num => $template){
+		foreach($templates as $tnum => $template){
 			$templateid = $template['hostid'];
 
 			$groupid = isset($hostsgroups[$templateid])?$hostsgroups[$templateid]:0;

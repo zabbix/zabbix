@@ -23,25 +23,13 @@ require_once('include/config.inc.php');
 require_once('include/hosts.inc.php');
 require_once('include/forms.inc.php');
 
-	$page['title'] = 'S_TEMPLATES';
-	$page['file'] = 'templates.php';
-	$page['hist_arg'] = array('groupid');
+$page['title'] = 'S_TEMPLATES';
+$page['file'] = 'templates.php';
+$page['hist_arg'] = array('groupid');
 
-	include_once('include/page_header.php');
-
-	//$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
-	if(get_request('groupid', 0) > 0){
-		$groupids = CHostGroup::get(array('groupids' => $_REQUEST['groupid'], 'editable' => 1));
-		if(empty($groupids)) access_deny();
-	}
-
-	//$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
-	$available_hosts = CTemplate::get(array('editable' => 1));
-	if((get_request('templateid', 0) > 0) && !isset($available_hosts[$_REQUEST['templateid']])) {
-		access_deny();
-	}
-
-
+include_once('include/page_header.php');
+?>
+<?php
 //		VAR						TYPE		OPTIONAL FLAGS			VALIDATION	EXCEPTION
 	$fields=array(
 		'hosts'				=> array(T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID, 		NULL),
@@ -75,11 +63,23 @@ require_once('include/forms.inc.php');
 		'form'				=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
 		'form_refresh'		=> array(T_ZBX_STR, O_OPT,	NULL,			NULL,		NULL)
 	);
-	check_fields($fields);
 
+// OUTER DATA
+	check_fields($fields);
 	validate_sort_and_sortorder('host', ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go', 'none');
+
+// PERMISSIONS
+	if(get_request('groupid', 0) > 0){
+		$groupids = available_groups($_REQUEST['groupid'], 1);
+		if(empty($groupids)) access_deny();
+	}
+	
+	if(get_request('templateid', 0) > 0){
+		$hostids = available_hosts($_REQUEST['templateid'], 1);
+		if(empty($hostids)) access_deny();
+	}
 ?>
 <?php
 /**********************************/
@@ -685,6 +685,7 @@ require_once('include/forms.inc.php');
 // combo for group selection
 		$groups = CHostGroup::get(array('editable' => 1, 'extendoutput' => 1));
 		order_result($groups, 'name');
+
 		$cmbGroups = new CComboBox('groupid', $groupid_selected, 'javascript: submit();');
 		$cmbGroups->addItem(0, S_ALL_SMALL);
 		foreach($groups as $group){
@@ -715,7 +716,7 @@ require_once('include/forms.inc.php');
 			S_LINKED_TO
 		));
 
-		//$config = select_config();
+//$config = select_config();
 // get templates
 
 		$sortfield = getPageSortField('host');
@@ -727,6 +728,7 @@ require_once('include/forms.inc.php');
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
+
 		if($groupid_selected > 0){
 			$options['groupids'] = $groupid_selected;
 		}
@@ -737,7 +739,7 @@ require_once('include/forms.inc.php');
 //--------
 
 		$options = array(
-			'templateids' => array_keys($templates),
+			'templateids' => zbx_objectValues($templates, 'hostid'),
 			'extendoutput' => 1,
 			'select_hosts' => 1,
 			'select_templates' => 1,
@@ -747,11 +749,12 @@ require_once('include/forms.inc.php');
 			'select_applications' => 1,
 			'nopermissions' => 1
 		);
+
 		$templates = CTemplate::get($options);
 		order_result($templates, $sortfield, $sortorder);
 //-----
 
-		foreach($templates as $template){
+		foreach($templates as $num => $template){
 			$templates_output = array();
 			if($template['proxy_hostid']){
 				$proxy = get_host_by_hostid($template['proxy_hostid']);
@@ -771,7 +774,7 @@ require_once('include/forms.inc.php');
 			$i = 0;
 			$linked_templates_output = array();
 			order_result($template['templates'], 'host');
-			foreach($template['templates'] as $linked_template){
+			foreach($template['templates'] as $snum => $linked_template){
 				$i++;
 				if($i > $config['max_in_table']){
 					$linked_templates_output[] = '...';
@@ -789,7 +792,7 @@ require_once('include/forms.inc.php');
 			$i = 0;
 			$linked_to_hosts_output = array();
 			order_result($template['hosts'], 'host');
-			foreach($template['hosts'] as $linked_to_host){
+			foreach($template['hosts'] as $snum => $linked_to_host){
 				$i++;
 				if($i > $config['max_in_table']){
 					$linked_to_hosts_output[] = '...';

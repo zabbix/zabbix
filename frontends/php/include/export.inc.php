@@ -475,7 +475,7 @@ class zbxXML{
 						}
 					}
 					if(!empty($groups_to_add)){
-						zbx_valueTo($groups_to_add, array('object' => 1, 'field' => 'name'));
+						$groups_to_add = zbx_toObject($groups_to_add, 'name');
 						$new_groupids = CHostGroup::add($groups_to_add);
 
 						if($new_groupids === false){
@@ -707,7 +707,7 @@ class zbxXML{
 				if(isset($rules['template']['exist'])){
 					$templates = $host->xpath('templates/template');
 					$host_templates = CTemplate::get(array('hostids' => $current_hostid));
-					$host_templateids = array_flip(array_keys($host_templates));
+					$host_templateids = array_flip(zbx_objectValues($host_templates,'templateid'));
 
 					$templates_to_upd = array();
 					foreach($templates as $template){

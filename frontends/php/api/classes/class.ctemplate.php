@@ -69,8 +69,12 @@ class CTemplate extends CZBXAPI{
 			'with_graphs'				=> null,
 			'editable' 					=> null,
 			'nopermissions'				=> null,
+// filter
+			'pattern'					=> '',
+
 // OutPut
 			'extendoutput'				=> null,
+			'select_groups'				=> null,
 			'select_hosts'				=> null,
 			'select_templates'			=> null,
 			'select_items'				=> null,
@@ -79,7 +83,8 @@ class CTemplate extends CZBXAPI{
 			'select_applications'		=> null,
 			'select_macros'				=> null,
 			'count'						=> null,
-			'pattern'					=> '',
+			'preservekeys'				=> null,
+
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
@@ -271,6 +276,11 @@ class CTemplate extends CZBXAPI{
 				else{
 					if(!isset($result[$template['hostid']])) $result[$template['hostid']]= array();
 
+					if($options['select_groups'] && !isset($result[$template['hostid']]['groupids'])){
+						$template['groupids'] = array();
+						$template['groups'] = array();
+					}
+
 					if($options['select_templates'] && !isset($result[$template['hostid']]['templateids'])){
 						$template['templateids'] = array();
 						$template['templates'] = array();
@@ -304,7 +314,7 @@ class CTemplate extends CZBXAPI{
 						$template['macroids'] = array();
 					}
 
-					// groupids
+// groupids
 					if(isset($template['groupid'])){
 						if(!isset($result[$template['hostid']]['groupids']))
 							$result[$template['hostid']]['groupids'] = array();
@@ -312,21 +322,24 @@ class CTemplate extends CZBXAPI{
 						$result[$template['hostid']]['groupids'][$template['groupid']] = $template['groupid'];
 						unset($template['groupid']);
 					}
-					// hostids
+
+// hostids
 					if(isset($template['linked_hostid'])){
 						if(!isset($result[$template['hostid']]['hostids'])) $result[$template['hostid']]['hostids'] = array();
 
 						$result[$template['hostid']]['hostids'][$template['linked_hostid']] = $template['linked_hostid'];
 						unset($template['linked_hostid']);
 					}
-					// itemids
+
+// itemids
 					if(isset($template['itemid'])){
 						if(!isset($result[$template['hostid']]['itemids'])) $result[$template['hostid']]['itemids'] = array();
 
 						$result[$template['hostid']]['itemids'][$template['itemid']] = $template['itemid'];
 						unset($template['itemid']);
 					}
-					// graphids
+
+// graphids
 					if(isset($template['graphid'])){
 						if(!isset($result[$template['hostid']]['graphids'])) $result[$template['hostid']]['graphids'] = array();
 
@@ -340,12 +353,27 @@ class CTemplate extends CZBXAPI{
 
 		}
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
+		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
+			return $result;
+		}
 
 // Adding Objects
+// Adding Groups
+		if($options['select_groups']){
+			$obj_params = array('extend output' => 1, 'hostids' => $templateids, 'preservekeys' => 1);
+			$groups = CHostgroup::get($obj_params);
+			foreach($groups as $groupid => $group){
+				foreach($group['hostids'] as $num => $templateid){
+					$result[$templateid]['groupids'][$groupid] = $groupid;
+					$result[$templateid]['groups'][$groupid] = $group;
+				}
+			}
+		}
+
 // Adding Templates
 		if($options['select_templates']){
-			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids);
+			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids, 'preservekeys' => 1);
 			$templates = CTemplate::get($obj_params);
 			foreach($templates as $templateid => $template){
 				foreach($template['hostids'] as $num => $hostid){
@@ -357,7 +385,7 @@ class CTemplate extends CZBXAPI{
 
 // Adding Hosts
 		if($options['select_hosts']){
-			$obj_params = array('extendoutput' => 1, 'templateids' => $templateids, 'templated_hosts' => 1);
+			$obj_params = array('extendoutput' => 1, 'templateids' => $templateids, 'templated_hosts' => 1, 'preservekeys' => 1);
 			$hosts = CHost::get($obj_params);
 			foreach($hosts as $hostid => $host){
 				foreach($host['templateids'] as $num => $templateid){
@@ -369,7 +397,7 @@ class CTemplate extends CZBXAPI{
 
 // Adding Items
 		if($options['select_items']){
-			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids, 'nopermissions' => 1);
+			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids, 'nopermissions' => 1, 'preservekeys' => 1);
 			$items = CItem::get($obj_params);
 			foreach($items as $itemid => $item){
 				foreach($item['hostids'] as $num => $hostid){
@@ -381,7 +409,7 @@ class CTemplate extends CZBXAPI{
 
 // Adding triggers
 		if($options['select_triggers']){
-			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids);
+			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids, 'preservekeys' => 1);
 			$triggers = CTrigger::get($obj_params);
 			foreach($triggers as $triggerid => $trigger){
 				foreach($trigger['hostids'] as $num => $hostid){
@@ -393,7 +421,7 @@ class CTemplate extends CZBXAPI{
 
 // Adding graphs
 		if($options['select_graphs']){
-			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids);
+			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids, 'preservekeys' => 1);
 			$graphs = CGraph::get($obj_params);
 			foreach($graphs as $graphid => $graph){
 				foreach($graph['hostids'] as $num => $hostid){
@@ -404,7 +432,7 @@ class CTemplate extends CZBXAPI{
 		}
 // Adding applications
 		if($options['select_applications']){
-			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids);
+			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids, 'preservekeys' => 1);
 			$applications = Capplication::get($obj_params);
 			foreach($applications as $applicationid => $application){
 				foreach($application['hostids'] as $num => $hostid){
@@ -416,7 +444,7 @@ class CTemplate extends CZBXAPI{
 
 // Adding macros
 		if($options['select_macros']){
-			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);
+			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
 			$macros = CUserMacro::get($obj_params);
 			foreach($macros as $macroid => $macro){
 				foreach($macro['hostids'] as $num => $hostid){
@@ -426,23 +454,28 @@ class CTemplate extends CZBXAPI{
 			}
 		}
 
+// removing keys (hash -> array)
+		if(is_null($options['preservekeys'])){
+			$result = zbx_cleanHashes($result);
+		}
+
 	return $result;
 	}
 
-	/**
-	 * Gets all Template data from DB by Template ID
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @static
-	 * @param _array $template_data
-	 * @param array $template_data['templateid']
-	 * @return array|boolean template data as array or false if error
-	 */
+/**
+ * Gets all Template data from DB by Template ID
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @static
+ * @param _array $template_data
+ * @param array $template_data['templateid']
+ * @return array|boolean template data as array or false if error
+ */
 	public static function getById($template_data){
 		$sql = 'SELECT * FROM hosts WHERE hostid='.$template_data['templateid'].' AND status=3';
 		$template = DBfetch(DBselect($sql));
@@ -456,19 +489,19 @@ class CTemplate extends CZBXAPI{
 		}
 	}
 
-	/**
-	 * Get Template ID by Template name
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param array $template_data
-	 * @param array $template_data['template']
-	 * @return string templateid
-	 */
+/**
+ * Get Template ID by Template name
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $template_data
+ * @param array $template_data['template']
+ * @return string templateid
+ */
 	public static function getId($template_data){
 		$sql = 'SELECT hostid FROM hosts '.
 			' WHERE host='.zbx_dbstr($template_data['name']).
@@ -485,43 +518,45 @@ class CTemplate extends CZBXAPI{
 		}
 	}
 
-	/**
-	 * Add Template
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $templates multidimensional array with templates data
-	 * @param string $templates['host']
-	 * @param string $templates['port']
-	 * @param string $templates['status']
-	 * @param string $templates['useip']
-	 * @param string $templates['dns']
-	 * @param string $templates['ip']
-	 * @param string $templates['proxy_hostid']
-	 * @param string $templates['useipmi']
-	 * @param string $templates['ipmi_ip']
-	 * @param string $templates['ipmi_port']
-	 * @param string $templates['ipmi_authtype']
-	 * @param string $templates['ipmi_privilege']
-	 * @param string $templates['ipmi_username']
-	 * @param string $templates['ipmi_password']
-	 * @return boolean
-	 */
+/**
+ * Add Template
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $templates multidimensional array with templates data
+ * @param string $templates['host']
+ * @param string $templates['port']
+ * @param string $templates['status']
+ * @param string $templates['useip']
+ * @param string $templates['dns']
+ * @param string $templates['ip']
+ * @param string $templates['proxy_hostid']
+ * @param string $templates['useipmi']
+ * @param string $templates['ipmi_ip']
+ * @param string $templates['ipmi_port']
+ * @param string $templates['ipmi_authtype']
+ * @param string $templates['ipmi_privilege']
+ * @param string $templates['ipmi_username']
+ * @param string $templates['ipmi_password']
+ * @return boolean
+ */
 	public static function add($templates){
+		$templates = zbx_toArray($templates);
+		
 		$tpls = null;
 		$newgroup = '';
 		$status = 3;
 		$error = 'Internal Zabbix eror';
-		$templateids = array();
+		$new_templates = array();
 
 		$result = false;
 
 		self::BeginTransaction(__METHOD__);
-		foreach($templates as $template){
+		foreach($templates as $tnum => $template){
 
 			if(empty($template['groupids'])){
 				$result = false;
@@ -551,35 +586,42 @@ class CTemplate extends CZBXAPI{
 				break;
 			}
 
-			$result = add_host($template['host'], $template['port'], $status, $template['useip'], $template['dns'], $template['ip'],
+			$new_template = array();
+			$new_template['templateid'] = add_host($template['host'], $template['port'], $status, $template['useip'], $template['dns'], $template['ip'],
 				$template['proxy_hostid'], $tpls, $template['useipmi'], $template['ipmi_ip'], $template['ipmi_port'], $template['ipmi_authtype'],
 				$template['ipmi_privilege'], $template['ipmi_username'], $template['ipmi_password'], $newgroup, $template['groupids']);
-			if(!$result) break;
-			$templateids[$result] = $result;
+				
+			if(!$new_template['templateid']){
+				$result = false;
+				break;
+			}
+			$new_templates[] = array_merge($new_template, $template);
 		}
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
-			return $templateids;
+			return $new_templates;
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
 			return $result;
 		}
 	}
 
-	/**
-	 * Update Template
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param array $templates multidimensional array with templates data
-	 * @return boolean
-	 */
+/**
+ * Update Template
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $templates multidimensional array with templates data
+ * @return boolean
+ */
 	public static function update($templates){
+		$templates = zbx_toArray($templates);
+
 		$tpls = null;
 		$newgroup = '';
 		$status = 3;
@@ -588,7 +630,7 @@ class CTemplate extends CZBXAPI{
 		$result = false;
 
 		self::BeginTransaction(__METHOD__);
-		foreach($templates as $template){
+		foreach($templates as $tnum => $template){
 
 			$sql = 'SELECT DISTINCT * '.
 				' FROM hosts '.
@@ -618,7 +660,7 @@ class CTemplate extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
-			return $templateids;
+			return $templates;
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
@@ -626,22 +668,31 @@ class CTemplate extends CZBXAPI{
 
 	}
 
-	/**
-	 * Delete Template
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param array $templateids
-	 * @param array $templateids['templateids']
-	 * @return boolean
-	 */
-	public static function delete($templateids){
-		$templateids = isset($templateids['templateids']) ? $templateids['templateids'] : array();
-		zbx_value2array($templateids);
+/**
+ * Delete Template
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $templateids
+ * @param array $templateids['templateids']
+ * @return boolean
+ */
+	public static function delete($templates){
+		$templates = zbx_toArray($templates);
+
+		$options = array('editable'=>1, 'extendoutput'=>1);
+		$options['templateids'] = zbx_objectValues($templates, 'templateid');
+		$del_templates = CTemplate::get($options);
+		
+		$templateids = array();
+		foreach($del_templates as $tnum => $template){
+			$templateids[] = $template['templateid'];
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Template ['.$template['host'].']');
+		}
 
 		if(!empty($templateids)){
 			$result = delete_host($templateids, false);
@@ -652,7 +703,7 @@ class CTemplate extends CZBXAPI{
 		}
 
 		if($result)
-			return $templateids;
+			return $del_templates;
 		else{
 			self::setError(__METHOD__);
 			return false;
@@ -660,20 +711,20 @@ class CTemplate extends CZBXAPI{
 	}
 
 
-	/**
-	 * Link Template to Hosts
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param array $data
-	 * @param string $data['templateid']
-	 * @param array $data['hostids']
-	 * @return boolean
-	 */
+/**
+ * Link Template to Hosts
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $data
+ * @param string $data['templateid']
+ * @param array $data['hostids']
+ * @return boolean
+ */
 	public static function linkHosts($data){
 		$result = false;
 		$error = '';
@@ -709,21 +760,21 @@ class CTemplate extends CZBXAPI{
 		}
 	}
 
-	/**
-	 * Unlink Hosts from Templates
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $data
-	 * @param string $data['templateid']
-	 * @param array $data['hostids']
-	 * @param boolean $data['clean']
-	 * @return boolean
-	 */
+/**
+ * Unlink Hosts from Templates
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $data
+ * @param string $data['templateid']
+ * @param array $data['hostids']
+ * @param boolean $data['clean']
+ * @return boolean
+ */
 	public static function unlinkHosts($data){
 		$templateid = $data['templateid'];
 		$hostids = $data['hostids'];
@@ -742,20 +793,20 @@ class CTemplate extends CZBXAPI{
 		}
 	}
 
-	/**
-	 * Link Host to Templates
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param array $data
-	 * @param string $data['hostid']
-	 * @param array $data['templateids']
-	 * @return boolean
-	 */
+/**
+ * Link Host to Templates
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $data
+ * @param string $data['hostid']
+ * @param array $data['templateids']
+ * @return boolean
+ */
 	public static function linkTemplates($data){
 		$result = true;
 		$error = '';
@@ -787,21 +838,21 @@ class CTemplate extends CZBXAPI{
 		}
 	}
 
-	/**
-	 * Unlink Templates from Host
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param string $data
-	 * @param string $data['templateid']
-	 * @param array $data['hostids']
-	 * @param boolean $data['clean'] whether to wipe all info from template elements.
-	 * @return boolean
-	 */
+/**
+ * Unlink Templates from Host
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param string $data
+ * @param string $data['templateid']
+ * @param array $data['hostids']
+ * @param boolean $data['clean'] whether to wipe all info from template elements.
+ * @return boolean
+ */
 	public static function unlinkTemplates($data){
 		$templateid = $data['templateid'];
 		$hostids = $data['hostids'];

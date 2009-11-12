@@ -222,7 +222,7 @@ include_once('include/page_header.php');
 //------
 
 		$objectids = array();
-		foreach($dsc_events as $eventid => $event_data){
+		foreach($dsc_events as $enum => $event_data){
 			$objectids[$event_data['objectid']] = $event_data['objectid'];
 		}
 
@@ -296,16 +296,28 @@ include_once('include/page_header.php');
 		$table = array($paging, $table, $paging);
 	}
 	else{
+
+		$table = new CTableInfo(S_NO_EVENTS_FOUND);
+		$table->setHeader(array(
+				make_sorting_header(S_TIME,'clock'),
+				is_show_all_nodes()?S_NODE:null,
+				($_REQUEST['hostid'] == 0)?S_HOST:null,
+				S_DESCRIPTION,
+				S_STATUS,
+				S_SEVERITY,
+				S_DURATION,
+				($config['event_ack_enable'])?S_ACK:NULL,
+				S_ACTIONS
+			));
+
 		$options = array(
 						'object' => EVENT_OBJECT_TRIGGER,
 						'time_from' => $_REQUEST['nav_time'],
 						'time_till' => null,
 						'extendoutput' => 1,
-						'select_hosts' => 1,
-						'select_triggers' => 1,
-						'select_items' => 1,
 						'sortfield' => 'clock',
 						'sortorder' => getPageSortOrder(),
+						'nopermissions' => 1,
 						'limit' => ($config['search_limit']+1)
 					);
 
@@ -326,65 +338,64 @@ include_once('include/page_header.php');
 
 		if(!empty($trigOpt)){
 			$triggers = CTrigger::get($trigOpt);
-			$triggerids = array_keys($triggers);
-			$options['triggerids'] = array_keys($triggers);
+			$triggerids = zbx_objectValues($triggers, 'triggerid');
+			$options['triggerids'] = $triggerids;
 		}
 
 		if($hide_unknown) $options['hide_unknown'] = 1;
 
 		$events = CEvent::get($options);
 
-		$table = new CTableInfo(S_NO_EVENTS_FOUND);
-		$table->setHeader(array(
-				make_sorting_header(S_TIME,'clock'),
-				is_show_all_nodes()?S_NODE:null,
-				($_REQUEST['hostid'] == 0)?S_HOST:null,
-				S_DESCRIPTION,
-				S_STATUS,
-				S_SEVERITY,
-				S_DURATION,
-				($config['event_ack_enable'])?S_ACK:NULL,
-				S_ACTIONS
-			));
-
-// sorting
-Copt::profiling_start('order');
+// sorting & paging
 		order_page_result($events, 'eventid');
-Copt::profiling_stop('order');
-
-// PAGING UPPER
 		$paging = getPagingLine($events);
 //------
 
-		foreach($events as $eventid => $event){
-			$trigger = $event['triggers'][$event['objectid']];
+		$options = array(
+						'eventids' => zbx_objectValues($events,'eventid'),
+						'extendoutput' => 1,
+						'select_hosts' => 1,
+						'select_triggers' => 1,
+						'select_items' => 1,
+						'nopermissions' => 1
+					);
+		$events = CEvent::get($options);
+		
+// sorting & paging
+		order_page_result($events, 'eventid');
+//------
 
-			$events[$eventid]['desc'] = expand_trigger_description_by_data($trigger, ZBX_FLAG_EVENT);
+		foreach($events as $enum => &$event){
+			$eventid = $event['eventid'];
+			
+			$trigger = reset($event['triggers']);
 
-			$events[$eventid] += $trigger;
-			$event = $events[$eventid];
+			$event['desc'] = expand_trigger_description_by_data($trigger, ZBX_FLAG_EVENT);
 
-			$events[$eventid]['duration'] = zbx_date2age($event['clock']);
+			$event += $trigger;
+
+			$event['duration'] = zbx_date2age($event['clock']);
 			if($next_event = get_next_event($event,$hide_unknown)){
-				$events[$eventid]['duration'] = zbx_date2age($event['clock'],$next_event['clock']);
+				$event['duration'] = zbx_date2age($event['clock'],$next_event['clock']);
 			}
 
-			$events[$eventid]['value'] = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value']));
+			$event['value'] = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value']));
 		}
 
-		foreach($events as $eventid => $event){
+		foreach($events as $enum => $event){
+			$eventid = $event['eventid'];
 // Host
 			$host = array_pop($event['hosts']);
 
 // Trigger
-			$trigger = $event['triggers'][$event['objectid']];
+			$trigger = reset($event['triggers']);
 
 // Items
 			$items = array();
-			foreach($event['items'] as $itemid => $item){
-				$items[$itemid]['itemid'] = $item['itemid'];
-				$items[$itemid]['action'] = str_in_array($item['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))?'showgraph':'showvalues';
-				$items[$itemid]['description'] = item_description($item);
+			foreach($event['items'] as $inum => &$item){
+				$item['itemid'] = $item['itemid'];
+				$item['action'] = str_in_array($item['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))?'showgraph':'showvalues';
+				$item['description'] = item_description($item);
 			}
 
 // Actions
@@ -398,8 +409,6 @@ Copt::profiling_stop('order');
 					$ack = new CLink(S_NO,'acknow.php?eventid='.$event['eventid'],'on');
 				}
 			}
-
-
 
 			$tr_desc = new CSpan($event['desc'],'pointer');
 			$tr_desc->addAction('onclick',"create_mon_trigger_menu(event, ".

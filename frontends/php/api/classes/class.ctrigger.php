@@ -88,14 +88,6 @@ class CTrigger extends CZBXAPI{
 			'not_templated_triggers'	=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
-// OutPut
-			'extendoutput'			=> null,
-			'select_hosts'			=> null,
-			'select_items'			=> null,
-			'select_dependencies'	=> null,
-			'count'					=> null,
-			'expand_data'			=> null,
-
 // filter
 			'filter'				=> null,
 			'group'					=> null,
@@ -103,8 +95,17 @@ class CTrigger extends CZBXAPI{
 			'only_true'				=> null,
 			'min_severity'			=> null,
 //
-
 			'pattern'				=> '',
+
+// OutPut
+			'extendoutput'			=> null,
+			'select_hosts'			=> null,
+			'select_items'			=> null,
+			'select_dependencies'	=> null,
+			'count'					=> null,
+			'expand_data'			=> null,
+			'preservekeys'			=> null,
+
 			'sortfield'				=> '',
 			'sortorder'				=> '',
 			'limit'					=> null
@@ -420,38 +421,41 @@ class CTrigger extends CZBXAPI{
 				}
 			}
 		}
-
-		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
+		
+		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
+			return $result;
+		}
 
 // Adding Objects
 // Adding trigger dependencies
 		if($options['select_dependencies']){
 			$deps = array();
 			$depids = array();
+
 			$sql = 'SELECT triggerid_up, triggerid_down FROM trigger_depends WHERE '.DBcondition('triggerid_down', $triggerids);
 			$db_deps = DBselect($sql);
-
 			while($db_dep = DBfetch($db_deps)){
 				if(!isset($deps[$db_dep['triggerid_down']])) $deps[$db_dep['triggerid_down']] = array();
 				$deps[$db_dep['triggerid_down']][$db_dep['triggerid_up']] = $db_dep['triggerid_up'];
 				$depids[] = $db_dep['triggerid_up'];
 			}
 
-			$obj_params = array('triggerids' => $depids, 'extendoutput' => 1, 'expand_data' => 1);
+			$obj_params = array('triggerids' => $depids, 'extendoutput' => 1, 'expand_data' => 1, 'preservekeys' => 1);
 			$allowed = CTrigger::get($obj_params); //allowed triggerids
 
 			foreach($deps as $triggerid => $deptriggers){
-				foreach($deptriggers as $deptriggerid){
-					if(isset($allowed[$deptriggerid]))
+				foreach($deptriggers as $num => $deptriggerid){
+					if(isset($allowed[$deptriggerid])){
 						$result[$triggerid]['dependencies'][$deptriggerid] = $allowed[$deptriggerid];
+					}
 				}
 			}
 		}
 
-
 // Adding hosts
 		if($options['select_hosts']){
-			$obj_params = array('templated_hosts' => 1, 'extendoutput' => 1, 'triggerids' => $triggerids, 'nopermissions' => 1);
+			$obj_params = array('templated_hosts' => 1, 'extendoutput' => 1, 'triggerids' => $triggerids, 'nopermissions' => 1, 'preservekeys' => 1);
 			$hosts = CHost::get($obj_params);
 			foreach($hosts as $hostid => $host){
 				foreach($host['triggerids'] as $num => $triggerid){
@@ -463,7 +467,7 @@ class CTrigger extends CZBXAPI{
 
 // Adding Items
 		if($options['select_items']){
-			$obj_params = array('extendoutput' => 1, 'triggerids' => $triggerids, 'nopermissions' => 1);
+			$obj_params = array('extendoutput' => 1, 'triggerids' => $triggerids, 'nopermissions' => 1, 'preservekeys' => 1);
 			$items = CItem::get($obj_params);
 			foreach($items as $itemid => $item){
 				foreach($item['triggerids'] as $num => $triggerid){
@@ -473,32 +477,13 @@ class CTrigger extends CZBXAPI{
 			}
 		}
 
+// removing keys (hash -> array)
+		if(is_null($options['preservekeys'])){
+			$result = zbx_cleanHashes($result);
+		}
+
 	return $result;
 	}
-
-/**
- * Gets all trigger data from DB by Trigger ID
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $trigger
- * @param array $trigger['triggerid']
- * @return array|boolean array of trigger data || false if error
- */
-	public static function getById($trigger){
-		$trigger =  get_trigger_by_triggerid($trigger['triggerid']);
-		$result = $trigger ? true : false;
-		if($result)
-			$result = $trigger;
-		else
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
-
-	return $result;
-}
 
 /**
  * Get triggerid by host.host and trigger.expression
@@ -516,7 +501,7 @@ class CTrigger extends CZBXAPI{
  * @param array $triggers[0,...]['description'] OPTIONAL
  */
 	public static function getId($triggers){
-		zbx_valueTo($triggers, array('array' => 1));
+		$triggers = zbx_toArray($triggers);
 
 		$result = false;
 
@@ -589,10 +574,10 @@ class CTrigger extends CZBXAPI{
  * @return boolean
  */
 	public static function add($triggers){
-		zbx_valueTo($triggers, array('array'=>1));
+		$triggers = zbx_toArray($triggers);
 
 		$result = true;
-		$triggerids = array();
+		$new_triggers = array();
 		self::BeginTransaction(__METHOD__);
 
 		foreach($triggers as $num => $trigger){
@@ -631,12 +616,12 @@ class CTrigger extends CZBXAPI{
 				break;
 			}
 
-			$triggerids[] = array_merge($trigger, $new_trigger);
+			$new_triggers[] = array_merge($trigger, $new_trigger);
 		}
 
 		$result = self::EndTransaction($result, __METHOD__);
 		if($result)
-			return $triggerids;
+			return $new_triggers;
 		else{
 			self::setError(__METHOD__);
 			return false;
@@ -664,13 +649,14 @@ class CTrigger extends CZBXAPI{
  * @return boolean
  */
 	public static function update($triggers){
-		zbx_valueTo($triggers, array('array'=>1));
+		$triggers = zbx_toArray($triggers);
 
 		$result = true;
 		$triggerids = array();
+		$upd_triggers = array();
 
 		self::BeginTransaction(__METHOD__);
-		foreach($triggers as $num => $trigger){
+		foreach($triggers as $tnum => $trigger){
 			$trigger_db_fields = self::get(array('triggerids' => $trigger['triggerid'], 'extendoutput' => 1, 'editable' => 1));
 			$trigger_db_fields = reset($trigger_db_fields);
 			if(!isset($trigger_db_fields)) {
@@ -696,12 +682,13 @@ class CTrigger extends CZBXAPI{
 									array(),
 									$trigger['templateid']);
 			if(!$result) break;
-			$triggerids[$trigger['triggerid']] = $result;
+		
+			$upd_triggers[] = $trigger;
 		}
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
-			return $triggerids;
+			return $upd_triggers;
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
@@ -719,15 +706,19 @@ class CTrigger extends CZBXAPI{
  *
  * @param _array $triggers multidimensional array with trigger objects
  * @param array $triggers[0,...]['triggerid']
- * @param _array $triggerids['triggerids']
- * @return boolean
+ * @return deleted triggers
  */
 	public static function delete($triggers){
-		zbx_valueTo($triggers, array('array'=>1));
+		$triggers = zbx_toArray($triggers);
 
+		$options = array('editable'=>1, 'extendoutput'=>1);
+		$options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
+		$del_triggers = CTrigger::get($options);
+		
 		$triggerids = array();
-		foreach($triggers as $num => $trigger){
+		foreach($del_triggers as $inum => $trigger){
 			$triggerids[] = $trigger['triggerid'];
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, 'Trigger ['.$trigger['description'].']');
 		}
 
 		if(!empty($triggerids)){
@@ -739,7 +730,7 @@ class CTrigger extends CZBXAPI{
 		}
 
 		if($result)
-			return $result;
+			return $del_triggers;
 		else{
 			self::setError(__METHOD__);
 			return false;
@@ -747,21 +738,21 @@ class CTrigger extends CZBXAPI{
 	}
 
 /**
-	 * Add dependency for trigger
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $triggers_data
-	 * @param array $triggers_data['triggerid]
-	 * @param array $triggers_data['depends_on_triggerid']
-	 * @return boolean
-	 */
+ * Add dependency for trigger
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $triggers_data
+ * @param array $triggers_data['triggerid]
+ * @param array $triggers_data['depends_on_triggerid']
+ * @return boolean
+ */
 	public static function addDependencies($triggers_data){
-		zbx_valueTo($triggers_data, array('array' => 1));
+		$triggers_data = zbx_toArray($triggers_data);
 
 		$result = true;
 
@@ -795,7 +786,7 @@ class CTrigger extends CZBXAPI{
  * @return boolean
  */
 	public static function deleteDependencies($triggers){
-		zbx_valueTo($triggers, array('array'=>1));
+		$triggers = zbx_toArray($triggers);
 
 		$triggerids = array();
 		foreach($triggers as $num => $trigger){

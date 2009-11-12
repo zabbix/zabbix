@@ -96,6 +96,7 @@ class CAlert extends CZBXAPI{
 			'select_mediatypes'		=> null,
 			'select_users'			=> null,
 			'count'					=> null,
+			'preservekeys'			=> null,
 
 			'sortfield'				=> '',
 			'sortorder'				=> '',
@@ -374,7 +375,10 @@ class CAlert extends CZBXAPI{
 			}
 		}
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
+		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
+			return $result;
+		}
 
 // Adding Objects
 		$users = array();
@@ -382,7 +386,7 @@ class CAlert extends CZBXAPI{
 
 // Adding Users
 		if($options['select_users']){
-			$obj_params = array('extendoutput' => 1, 'userids' => $userids);
+			$obj_params = array('extendoutput' => 1, 'userids' => $userids, 'preservekeys' => 1);
 			$users = CUser::get($obj_params);
 		}
 
@@ -405,6 +409,11 @@ class CAlert extends CZBXAPI{
 				$result[$alertid]['userids'][$alert['userid']] = $alert['userid'];
 				$result[$alertid]['users'][$alert['userid']] = $users[$alert['userid']];
 			}
+		}
+		
+// removing keys (hash -> array)
+		if(is_null($options['preservekeys'])){
+			$result = zbx_cleanHashes($result);
 		}
 
 	return $result;

@@ -830,202 +830,119 @@ function zbx_value2array(&$values){
 	}
 }
 
-// fuunction: zbx_valueTo
-// author: Aly
-function zbx_valueTo(&$value, $options, $rtrn=false){
-	if(is_null($value)) return $rtrn?$value:false;
-
-	if($rtrn) $original = $value;
-
+// fuunction: zbx_toHash
 // object or array of objects to hash
-	if(isset($options['hash']) && isset($options['field'])){
-		if(!is_array($value)){
-			$value = array($value => $value);
-		}
-		else if(isset($value[$options['field']])){
-			$value = array($value[$options['field']] => $value);
-		}
-		else{
-			$result = array();
+// author: Aly
+function zbx_toHash(&$value, $field){
+	if(is_null($value)) return $value;
+	$result = array();
 
-			foreach($value as $key => $val){
-				if(!is_array($val)){
-					$result[$val] = $val;
-				}
-				else if(isset($val[$options['field']])){
-					$result[$val[$options['field']]] = $val;
-				}
-				else{
-					if($rtrn) return null;
-					else{
-						$value = null;
-						return false;
-					}
-				}
+	if(!is_array($value)){
+		$result = array($value => $value);
+	}
+	else if(isset($value[$field])){
+		$result[$value[$field]] = $value;
+	}
+	else{
+		$result = array();
+
+		foreach($value as $key => $val){
+			if(!is_array($val)){
+				$result[$val] = $val;
 			}
-
-			$value = $result;
+			else if(isset($val[$field])){
+				$result[$val[$field]] = $val;
+			}
 		}
-
-		if($rtrn){
-			$tmp = $value;
-			$value = $original;
-			return $tmp;
-		}
-		else return true;
 	}
 
-// Value or Array to Object or Array of objects
-	if(isset($options['object']) && isset($options['field'])){
-		if(!is_array($value)){
-			$value = array($options['field'] => $value);
-		}
-		else if(!isset($value[$options['field']])){
-			foreach($value as $key => $val){
-				if(!is_array($val)){
-					$value[$key] = array($options['field'] => $val);
-				}
-				else if(!isset($val[$options['field']])){
-					if($rtrn) return null;
-					else{
-						$value = null;
-						return false;
-					}
-				}
-			}
-		}
-
-		if(isset($options['array'])){
-			if(!is_array($value)) $value = array($value);
-			else if(!empty($value) && !zbx_ctype_digit(key($value))) $value = array($value);
-		}
-
-		if($rtrn){
-			$tmp = $value;
-			$value = $original;
-			return $tmp;
-		}
-		else return true;
-	}
-
-// value or objects field or array of object to array
-	if(isset($options['array']) && isset($options['field'])){
-		if(!is_array($value)){
-			$value = array($value);
-		}
-		else if(isset($value[$options['field']])){
-			$value = array($value[$options['field']]);
-		}
-		else{
-			foreach($value as $key => $val){
-				if(!is_array($val)){
-					//$value[$key] = $val;
-				}
-				else if(isset($val[$options['field']])){
-					$value[$key] = $val[$options['field']];
-				}
-				else{
-					if($rtrn) return null;
-					else{
-						$value = null;
-						return false;
-					}
-				}
-			}
-		}
-
-		if($rtrn){
-			$tmp = $value;
-			$value = $original;
-			return $tmp;
-		}
-		else return true;
-	}
-
-// to array
-	if(isset($options['array'])){
-		if(!is_array($value)){
-			$value = array($value);
-		}
-		else if(zbx_ctype_digit(key($value))){
-			if(is_string(key($value))){
-				$new_value = array();
-				foreach($value as $key => $val){
-					$new_value[] = $val;
-				}
-				$value = $new_value;
-				unset($new_value);
-			}
-		}
-		else if(!empty($value)){
-			$value = array($value);
-		}
-
-		if($rtrn){
-			$tmp = $value;
-			$value = $original;
-			return $tmp;
-		}
-		else return true;
-	}
-
-// object field or array of objects to value
-	if(isset($options['field'])){
-		if(!is_array($value)){
-//			$value = $value;
-		}
-		else if(isset($value[$options['field']])){
-			$value = $value[$options['field']];
-		}
-		else{
-			$first = reset($value);
-
-			if(!is_array($first)){
-				$value = $first;
-			}
-			else if(isset($first[$options['field']])){
-				$value = $first[$options['field']];
-			}
-			else{
-				if($rtrn) return null;
-				else{
-					$value = null;
-					return false;
-				}
-			}
-		}
-
-		if($rtrn){
-			$tmp = $value;
-			$value = $original;
-			return $tmp;
-		}
-		else return true;
-	}
-
-// array of objects to single (first) object
-	if(isset($options['object'])){
-		if(!is_array($value)){
-			if($rtrn) return null;
-			else{
-				$value = null;
-				return false;
-			}
-		}
-		else if(zbx_ctype_digit(key($value))){
-			$value = reset($value);
-		}
-
-		if($rtrn){
-			$tmp = $value;
-			$value = $original;
-			return $tmp;
-		}
-		else return true;
-	}
-
-return $rtrn?$value:false;
+return $result;
 }
-/************* END ZBX MISC *************/
 
+// fuunction: zbx_toObject
+// Value or Array to Object or Array of objects
+// author: Aly
+function zbx_toObject(&$value, $field){
+	if(is_null($value)) return $value;
+	$result = array();
+	
+// Value or Array to Object or Array of objects
+	if(!is_array($value)){
+		$result = array(array($field => $value));
+	}
+	else if(!isset($value[$field])){
+		foreach($value as $key => $val){
+			if(!is_array($val)){
+				$result[] = array($field => $val);
+			}
+		}
+	}
+
+return $result;
+}
+
+// fuunction: zbx_toArray
+// author: Aly
+function zbx_toArray(&$value){
+	if(is_null($value)) return $value;
+	$result = array();
+	
+	if(!is_array($value)){
+		$result = array($value);
+	}
+	else if(zbx_ctype_digit(key($value))){
+		$result = array_values($value);
+	}
+	else if(!empty($value)){
+		$result = array($value);
+	}
+
+return $result;
+}
+
+// fuunction: zbx_objectFields
+// value OR object OR array of objects TO an array
+// author: Aly
+function zbx_objectValues(&$value, $field){
+	if(is_null($value)) return $value;
+	$result = array();
+	
+	if(!is_array($value)){
+		$result = array($value);
+	}
+	else if(isset($value[$field])){
+		$result = array($value[$field]);
+	}
+	else{
+		foreach($value as $key => $val){
+			if(!is_array($val)){
+				$result[] = $val;
+			}
+			else if(isset($val[$field])){
+				$result[] = $val[$field];
+			}
+		}
+	}
+
+return $result;
+}
+
+function zbx_cleanHashes($value){
+	if(is_null($value)) return $value;
+	$result = $value;
+
+	if(is_array($result)){
+		if(zbx_ctype_digit(key($result))){
+			$result = array_values($result);
+		}
+
+		foreach($result as $key => $val){
+			$result[$key] = zbx_cleanHashes($val);
+		}
+	}
+
+return $result;
+}
+
+/************* END ZBX MISC *************/
 ?>

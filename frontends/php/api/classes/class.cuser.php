@@ -88,13 +88,17 @@ class CUser extends CZBXAPI{
 			'status'					=> null,
 			'with_gui_access'			=> null,
 			'with_api_access'			=> null,
+// filter
+			'pattern'					=> '',
+
 // OutPut
 			'extendoutput'				=> null,
 			'editable'					=> null,
 			'select_usrgrps'			=> null,
 			'get_access'				=> null,
 			'count'						=> null,
-			'pattern'					=> '',
+			'preservekeys'				=> null,
+
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
@@ -244,9 +248,12 @@ class CUser extends CZBXAPI{
 			}
 		}
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
+		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
+			return $result;
+		}
 
-
+// Adding Objects
 		if($options['get_access'] != 0){
 			foreach($result as $userid => $user){
 				$result[$userid] += array('api_access' => 0, 'gui_access' => 0, 'debug_mode' => 0, 'users_status' => 0);
@@ -266,7 +273,7 @@ class CUser extends CZBXAPI{
 // Adding Objects
 // Adding usergroups
 		if($options['select_usrgrps']){
-			$obj_params = array('extendoutput' => 1, 'userids' => $userids);
+			$obj_params = array('extendoutput' => 1, 'userids' => $userids, 'preservekeys' => 1);
 			$usrgrps = CUserGroup::get($obj_params);
 			foreach($usrgrps as $usrgrpid => $usrgrp){
 				foreach($usrgrp['userids'] as $num => $userid){
@@ -274,6 +281,11 @@ class CUser extends CZBXAPI{
 					$result[$userid]['usrgrps'][$usrgrpid] = $usrgrp;
 				}
 			}
+		}
+		
+// removing keys (hash -> array)
+		if(is_null($options['preservekeys'])){
+			$result = zbx_cleanHashes($result);
 		}
 
 	return $result;

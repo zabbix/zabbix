@@ -19,24 +19,23 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/actions.inc.php');
-	require_once('include/hosts.inc.php');
-	include_once('include/discovery.inc.php');
-	require_once('include/triggers.inc.php');
-	require_once('include/events.inc.php');
-	require_once('include/forms.inc.php');
-	require_once('include/media.inc.php');
-	require_once('include/nodes.inc.php');
+require_once('include/config.inc.php');
+require_once('include/actions.inc.php');
+require_once('include/hosts.inc.php');
+include_once('include/discovery.inc.php');
+require_once('include/triggers.inc.php');
+require_once('include/events.inc.php');
+require_once('include/forms.inc.php');
+require_once('include/media.inc.php');
+require_once('include/nodes.inc.php');
 
-
-	$page['title']		= 'S_CONFIGURATION_OF_ACTIONS';
-	$page['file']		= 'actionconf.php';
-	$page['hist_arg']	= array();
+$page['title']		= 'S_CONFIGURATION_OF_ACTIONS';
+$page['file']		= 'actionconf.php';
+$page['hist_arg']	= array();
 
 include_once('include/page_header.php');
 
-	$_REQUEST['eventsource'] = get_request('eventsource',get_profile('web.actionconf.eventsource',EVENT_SOURCE_TRIGGERS));
+$_REQUEST['eventsource'] = get_request('eventsource',get_profile('web.actionconf.eventsource',EVENT_SOURCE_TRIGGERS));
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -112,7 +111,7 @@ include_once('include/page_header.php');
 
 	if(isset($_REQUEST['actionid'])){
 		$aa = CAction::get(array('actionids' => $_REQUEST['actionid'], 'editable' => 1));
-		if(!$aa){
+		if(empty($aa)){
 			access_deny();
 		}
 	}
@@ -514,13 +513,14 @@ include_once('include/page_header.php');
 		$paging = getPagingLine($actions);
 //-------
 
-		foreach($actions as $actionid => $action){
+		foreach($actions as $anum => $action){
+			$actionid = $action['actionid'];
 
 			$conditions = array();
 
 // sorting
 			order_result($action['conditions'], 'conditiontype', null, true);
-			foreach($action['conditions'] as $conditionid => $condition){
+			foreach($action['conditions'] as $cnum => $condition){
 				array_push($conditions, array(get_condition_desc(
 							$condition['conditiontype'],
 							$condition['operator'],
@@ -532,7 +532,7 @@ include_once('include/page_header.php');
 
 // sorting
 			order_result($action['operations'], 'operationtype', null, true);
-			foreach($action['operations'] as $operationid => $operation){
+			foreach($action['operations'] as $onum => $operation){
 				array_push($operations,array(get_operation_desc(SHORT_DESCRITION, $operation),BR()));
 			}
 
@@ -587,6 +587,8 @@ include_once('include/page_header.php');
 	}
 
 	$action_wdgt->show();
+?>
+<?php
 
 include_once('include/page_footer.php');
 
