@@ -457,14 +457,14 @@ class CGraph extends CZBXAPI{
  * @return boolean
  */
 	public static function add($graphs){
-		zbx_toAray($graphs);
+		$graphs = zbx_toArray($graphs);
+		$graphids = array();
 
 		$error = 'Unknown ZABBIX internal error';
-		$new_graphs = array();
+
 		$result = true;
 
 		self::BeginTransaction(__METHOD__);
-
 		foreach($graphs as $gnum => $graph){
 
 			if(!is_array($graph['gitems']) || empty($graph['gitems'])){
@@ -501,7 +501,7 @@ class CGraph extends CZBXAPI{
 				break;
 			}
 
-			foreach($graph['gitems'] as $id => $gitem){
+			foreach($graph['gitems'] as $ginum => $gitem){
 
 				$gitem_db_fields = array(
 					'itemid' => null,
@@ -522,23 +522,20 @@ class CGraph extends CZBXAPI{
 				$graph['gitems'][$id] = $gitem;
 			}
 
-			$new_graph = array();
-			$new_graph['graphid'] = add_graph_with_items($graph['name'],$graph['width'],$graph['height'],
+			$result = add_graph_with_items($graph['name'],$graph['width'],$graph['height'],
 										$graph['ymin_type'],$graph['ymax_type'],$graph['yaxismin'],
 										$graph['yaxismax'],$graph['ymin_itemid'],$graph['ymax_itemid'],
 										$graph['showworkperiod'],$graph['showtriggers'],$graph['graphtype'],
 										$graph['legend'],$graph['graph3d'],$graph['percent_left'],
 										$graph['percent_right'],$graph['gitems'],$graph['templateid']);
 
-			if(!$new_graph['graphid']){
-				$result = false;
-				break;
-			}
-			$new_graphs[] = array_merge($new_graph, $graph);
+			if(!$result) break;
+			$graphids[] = $result;
 		}
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
+			$new_graphs = CGraph::get(array('graphids'=>$graphids, 'extendoutput'=>1, 'nopermissions'=>1, 'select_graph_items'=>1));
 			return $new_graphs;
 		}
 		else{
@@ -555,36 +552,45 @@ class CGraph extends CZBXAPI{
  * @return boolean
  */
 	public static function update($graphs){
-		zbx_toArray($graphs);
-		
-		$result_ids = array();
+		$graphs = zbx_toArray($graphs);
+		$graphids = array();
+
+		$upd_graphs = CGraph::get(array('graphids'=>zbx_objectValues($graphs, 'graphid'), 
+									'editable'=>1, 
+									'extendoutput'=>1, 
+									'preservekeys'=>1));
+		foreach($graphs as $gnum => $graph){
+			if(!isset($upd_graphs[$graph['graphid']])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				return false;
+			}
+			$graphids[] = $graph['graphid'];
+		}
+
 		$result = false;
 
 		self::BeginTransaction(__METHOD__);
 		foreach($graphs as $gnum => $graph){
+			$graph_db_fields = $upd_graphs[$graph['graphid']];
 
-			$host_db_fields = self::getById(array('graphid' => $graph['graphid']));
-
-			if(!$host_db_fields) {
+			if(!check_db_fields($graph_db_fields, $graph)){
 				$result = false;
 				break;
 			}
 
-			if(!check_db_fields($host_db_fields, $graph)){
-				$result = false;
-				break;
-			}
+			$result = update_graph($graph['graphid'],$graph['name'],$graph['width'],$graph['height'],
+									$graph['ymin_type'],$graph['ymax_type'],$graph['yaxismin'],
+									$graph['yaxismax'],$graph['ymin_itemid'],$graph['ymax_itemid'],$graph['show_work_period'],
+									$graph['show_triggers'],$graph['graphtype'],$graph['show_legend'],$graph['show_3d'],
+									$graph['percent_left'],$graph['percent_right'],$graph['templateid']);
 
-			$result = update_graph($graph['graphid'],$graph['name'],$graph['width'],$graph['height'],$graph['ymin_type'],$graph['ymax_type'],$graph['yaxismin'],
-				$graph['yaxismax'],$graph['ymin_itemid'],$graph['ymax_itemid'],$graph['show_work_period'],$graph['show_triggers'],$graph['graphtype'],
-				$graph['show_legend'],$graph['show_3d'],$graph['percent_left'],$graph['percent_right'],$graph['templateid']);
 			if(!$result) break;
-			$result_ids[$graph['graphid']] = $result;
 		}
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return $graphs;
+			$upd_graphs = CGraph::get(array('graphids'=>$graphids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			return $upd_graphs;
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
@@ -601,14 +607,19 @@ class CGraph extends CZBXAPI{
  * @return boolean
  */
 	public static function delete($graphs){
-		$graphs = zbx_toArray($graphs);		
-
-		$options = array('editable'=>1, 'extendoutput'=>1);
-		$options['graphids'] = zbx_objectValues($graphs, 'graphid');
-		$del_graphs = CGraph::get($options);
-		
+		$graphs = zbx_toArray($graphs);
 		$graphids = array();
-		foreach($del_graphs as $inum => $graph){
+		
+		$del_graphs = CGraph::get(array('graphids'=>zbx_objectValues($graphs, 'graphid'), 
+											'editable'=>1, 
+											'extendoutput'=>1, 
+											'preservekeys'=>1);
+		foreach($graphs as $gnum => $graph){
+			if(!isset($del_graphs[$graph['graphid']])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				return false;
+			}
+
 			$graphids[] = $graph['graphid'];
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_GRAPH, 'Graph ['.$graph['name'].']');
 		}
@@ -621,8 +632,9 @@ class CGraph extends CZBXAPI{
 			$result = false;
 		}
 
-		if($result)
-			return $del_graphs;
+		if($result){
+			return zbx_cleanHashes($del_graphs);
+		}
 		else{
 			self::setError(__METHOD__);
 			return false;
