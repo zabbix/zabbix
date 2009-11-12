@@ -186,7 +186,7 @@ include_once('include/page_header.php');
 				$result = false;
 			}
 		}
-// <<<--- CREATE|UPDATE TEMPLATE WITH GROUPS AND LINKED TEMPLATES --->>>
+// CREATE/UPDATE TEMPLATE WITH GROUPS AND LINKED TEMPLATES {
 		if($templateid){
 			if(isset($_REQUEST['clear_templates'])) {
 				foreach($_REQUEST['clear_templates'] as $id){
@@ -215,8 +215,8 @@ include_once('include/page_header.php');
 			$templates_to_link = array_diff($templates, $original_templates);
 			$result &= CTemplate::linkTemplates(array('hostid' => $templateid, 'templateids' => $templates_to_link));
 		}
-// --->>> <<<---
-// <<<--- FULL_CLONE --->>>
+// }
+// FULL_CLONE {
 		if(!zbx_empty($templateid) && $templateid && $clone_templateid && ($_REQUEST['form'] == 'full_clone')){
 // Host applications
 			$sql = 'SELECT * FROM applications WHERE hostid='.$clone_templateid.' AND templateid=0';
@@ -272,8 +272,8 @@ include_once('include/page_header.php');
 			}
 
 		}
-// --->>> <<<---
-// <<<--- LINK/UNLINK HOSTS --->>>
+// }
+// LINK/UNLINK HOSTS {
 		if($result){
 			$hosts = CHost::get(array('hostids' => $hosts, 'editable' => 1, 'templated_hosts' => 1));
 //-- unlink --
@@ -312,7 +312,7 @@ include_once('include/page_header.php');
 					$host['ipmi_password'],null,$host_groups);
 			}
 		}
-// --->>> <<<---
+// }
 // MACROS {
 		if($result){
 			$macros = get_request('macros', array());
@@ -373,17 +373,8 @@ include_once('include/page_header.php');
 		$go_result = true;
 		$templates = get_request('templates', array());
 		$del_hosts = CTemplate::get(array('templateids' => $templates, 'editable' => 1));
-		// $sql = 'SELECT host, hostid '.
-				// ' FROM hosts '.
-				// ' WHERE '.DBin_node('hostid').
-					// ' AND '.DBcondition('hostid', $hosts).
-					// ' AND '.DBcondition('hostid', $available_hosts);
-		// $db_hosts = DBselect($sql);
 
 		DBstart();
-		// foreach($del_hosts as $del_host){
-			// add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$del_host['host'].']');
-		// }
 		$go_result = delete_host($del_hosts, $unlink_mode);
 		$go_result = DBend($go_result);
 
@@ -464,9 +455,7 @@ include_once('include/page_header.php');
 			$groups = CHostGroup::get($options);
 
 // get template hosts from db
-			$params = array('templateids' => $templateid,
-				'editable' => 1,
-				'templated_hosts' => 1);
+			$params = array('templateids' => $templateid, 'editable' => 1, 'templated_hosts' => 1);
 			$hosts_linked_to = CHost::get($params);
 
 			$templates = $original_templates;
@@ -494,7 +483,8 @@ include_once('include/page_header.php');
 		$options = array('editable' => 1, 'extendoutput' => 1);
 		$all_groups = CHostGroup::get($options);
 		order_result($all_groups, 'name');
-		foreach($all_groups as $group){
+		
+		foreach($all_groups as $gnum => $group){
 			$group_tb->addItem($group['groupid'], $group['name']);
 		}
 		$template_tbl->addRow(array(S_GROUPS, $group_tb->get(S_IN.SPACE.S_GROUPS,S_OTHER.SPACE.S_GROUPS)));
@@ -512,7 +502,7 @@ include_once('include/page_header.php');
 			$twb_groupid = $gr['groupid'];
 		}
 		$cmbGroups = new CComboBox('twb_groupid', $twb_groupid, 'submit()');
-		foreach($all_groups as $group){
+		foreach($all_groups as $gnum => $group){
 			$cmbGroups->addItem($group['groupid'], $group['name']);
 		}
 
@@ -526,7 +516,7 @@ include_once('include/page_header.php');
 			'extendoutput' => 1);
 		$db_hosts = CHost::get($params);
 		order_result($db_hosts, 'host');
-		foreach($db_hosts as $db_host){
+		foreach($db_hosts as $hnum => $db_host){
 			if(!isset($hosts_linked_to[$db_host['hostid']])) // add all except selected hosts
 			$host_tb->addItem($db_host['hostid'], $db_host['host']);
 		}
@@ -539,7 +529,7 @@ include_once('include/page_header.php');
 			'extendoutput' => 1);
 		$db_hosts = CHost::get($params);
 		order_result($db_hosts, 'host');
-		foreach($db_hosts as $db_host){
+		foreach($db_hosts as $hnum => $db_host){
 			$host_tb->addItem($db_host['hostid'], $db_host['host']);
 		}
 
@@ -547,8 +537,8 @@ include_once('include/page_header.php');
 
 // FORM ITEM : linked Template table
 		$template_table = new CTable();
-		$template_table->SetCellPadding(0);
-		$template_table->SetCellSpacing(0);
+		$template_table->setCellPadding(0);
+		$template_table->setCellSpacing(0);
 		foreach($templates as $tid => $tname){
 			$frmHost->addVar('templates['.$tid.']', $tname);
 			$template_table->addRow(array(
@@ -566,7 +556,7 @@ include_once('include/page_header.php');
 				url_param($templates,false,'existed_templates')."',450,450)", 'T')
 		)));
 
-// <<<--- FULL CLONE --->>>
+// FULL CLONE {
 		if($_REQUEST['form'] == 'full_clone'){
 // FORM ITEM : Template items
 			$items_lbx = new CListBox('items', null, 8);
@@ -579,9 +569,9 @@ include_once('include/page_header.php');
 				$items_lbx->setAttribute('style', 'width: 200px;');
 			}
 			else{
-				foreach($template_items as $titemid => $titem){
+				foreach($template_items as $inum => $titem){
 					$item_description = item_description($titem);
-					$items_lbx->addItem($titemid, $item_description);
+					$items_lbx->addItem($titem['itemid'], $item_description);
 				}
 			}
 			$template_tbl->addRow(array(S_ITEMS, $items_lbx));
@@ -598,9 +588,9 @@ include_once('include/page_header.php');
 				$trig_lbx->setAttribute('style','width: 200px;');
 			}
 			else{
-				foreach($template_triggers as $ttriggerid => $ttrigger){
-					$trigger_description = expand_trigger_description($ttriggerid);
-					$trig_lbx->addItem($ttriggerid, $trigger_description);
+				foreach($template_triggers as $tnum => $ttrigger){
+					$trigger_description = expand_trigger_description($ttrigger['triggerid']);
+					$trig_lbx->addItem($ttrigger['triggerid'], $trigger_description);
 				}
 			}
 			$template_tbl->addRow(array(S_TRIGGERS, $trig_lbx));
@@ -617,13 +607,13 @@ include_once('include/page_header.php');
 				$graphs_lbx->setAttribute('style','width: 200px;');
 			}
 			else{
-				foreach($template_graphs as $tgraphid => $tgraph){
-					$graphs_lbx->addItem($tgraphid, $tgraph['name']);
+				foreach($template_graphs as $tnum => $tgraph){
+					$graphs_lbx->addItem($tgraph['graphid'], $tgraph['name']);
 				}
 			}
 			$template_tbl->addRow(array(S_GRAPHS, $graphs_lbx));
 		}
-// --->>> FULL CLONE <<<---
+// FULL CLONE }
 
 		$host_footer = array();
 		$host_footer[] = new CButton('save', S_SAVE);
@@ -688,7 +678,7 @@ include_once('include/page_header.php');
 
 		$cmbGroups = new CComboBox('groupid', $groupid_selected, 'javascript: submit();');
 		$cmbGroups->addItem(0, S_ALL_SMALL);
-		foreach($groups as $group){
+		foreach($groups as $gnum => $group){
 			$cmbGroups->addItem($group['groupid'], $group['name']);
 		}
 		$frmForm->addItem(array(S_GROUP.SPACE, $cmbGroups));
@@ -739,7 +729,7 @@ include_once('include/page_header.php');
 //--------
 
 		$options = array(
-			'templateids' => zbx_objectValues($templates, 'hostid'),
+			'templateids' => zbx_objectValues($templates, 'templateid'),
 			'extendoutput' => 1,
 			'select_hosts' => 1,
 			'select_templates' => 1,
@@ -760,15 +750,15 @@ include_once('include/page_header.php');
 				$proxy = get_host_by_hostid($template['proxy_hostid']);
 				$templates_output[] = $proxy['host'].':';
 			}
-			$templates_output[] = new CLink($template['host'], 'templates.php?form=update&templateid='.$template['hostid'].url_param('groupid'));
+			$templates_output[] = new CLink($template['host'], 'templates.php?form=update&templateid='.$template['templateid'].url_param('groupid'));
 
-			$applications = array(new CLink(S_APPLICATIONS,'applications.php?groupid='.$groupid_selected.'&hostid='.$template['hostid']),
+			$applications = array(new CLink(S_APPLICATIONS,'applications.php?groupid='.$groupid_selected.'&hostid='.$template['templateid']),
 				' ('.count($template['applications']).')');
-			$items = array(new CLink(S_ITEMS,'items.php?groupid='.$groupid_selected.'&hostid='.$template['hostid']),
+			$items = array(new CLink(S_ITEMS,'items.php?groupid='.$groupid_selected.'&hostid='.$template['templateid']),
 				' ('.count($template['itemids']).')');
-			$triggers = array(new CLink(S_TRIGGERS,'triggers.php?groupid='.$groupid_selected.'&hostid='.$template['hostid']),
+			$triggers = array(new CLink(S_TRIGGERS,'triggers.php?groupid='.$groupid_selected.'&hostid='.$template['templateid']),
 				' ('.count($template['triggerids']).')');
-			$graphs = array(new CLink(S_GRAPHS,'graphs.php?groupid='.$groupid_selected.'&hostid='.$template['hostid']),
+			$graphs = array(new CLink(S_GRAPHS,'graphs.php?groupid='.$groupid_selected.'&hostid='.$template['templateid']),
 				' ('.count($template['graphids']).')');
 
 			$i = 0;
@@ -782,7 +772,7 @@ include_once('include/page_header.php');
 					break;
 				}
 
-				$url = 'templates.php?form=update&templateid='.$linked_template['hostid'].url_param('groupid');
+				$url = 'templates.php?form=update&templateid='.$linked_template['templateid'].url_param('groupid');
 				$linked_templates_output[] = new CLink($linked_template['host'], $url, 'unknown');
 				$linked_templates_output[] = ', ';
 			}
@@ -822,7 +812,7 @@ include_once('include/page_header.php');
 
 
 			$table->addRow(array(
-				new CCheckBox('templates['.$template['hostid'].']', NULL, NULL, $template['hostid']),
+				new CCheckBox('templates['.$template['templateid'].']', NULL, NULL, $template['templateid']),
 				$templates_output,
 				$applications,
 				$items,

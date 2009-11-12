@@ -665,16 +665,17 @@ class CHost extends CZBXAPI{
  * @return boolean
  */
 	public static function add($hosts){
+		$hosts = zbx_toArray($hosts);
+		$hostids = array();
+		
 		$templates = null;
 		$newgroup = '';
 
-		$result_ids = array();
 		$result = false;
 
 		self::BeginTransaction(__METHOD__);
 
 		foreach($hosts as $num => $host){
-
 			if(empty($host['groupids'])){
 				$result = false;
 				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'No groups for host [ '.$host['host'].' ]');
@@ -707,19 +708,19 @@ class CHost extends CZBXAPI{
 				break;
 			}
 
-
-
 			$result = add_host($host['host'], $host['port'], $host['status'], $host['useip'], $host['dns'], $host['ip'],
 				$host['proxy_hostid'], $templates, $host['useipmi'], $host['ipmi_ip'], $host['ipmi_port'], $host['ipmi_authtype'],
 				$host['ipmi_privilege'], $host['ipmi_username'], $host['ipmi_password'], $newgroup, $host['groupids']);
+
 			if(!$result) break;
-			$result_ids[] = $result;
+			$hostids[] = $result;
 		}
 
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return $result_ids;
+			$new_hosts = CHost::get(array('hostids'=>$hostids, 'editable'=>1, 'extendoutput'=>1, 'nopermissions'=>1));			
+			return $new_hosts;
 		}
 		else{
 			self::setError(__METHOD__);
@@ -754,23 +755,26 @@ class CHost extends CZBXAPI{
  * @return boolean
  */
 	public static function update($hosts){
+		$hosts = zbx_toArray($hosts);
+		$hostids = array();
+		
+		$upd_hosts = CHost::get(array('hostids'=> zbx_objectValues($hosts, 'hostid'), 'editable'=>1, 'extendoutput'=>1, 'preservekeys'=>1));
+		foreach($hosts as $gnum => $host){
+			if(!isset($upd_hosts[$host['hostid']])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				return false;
+			}
+			$hostids[] = $host['hostid'];
+		}
+		
 		$templates = null;
 		$newgroup = '';
 
-		$hostids = array();
-
 		$result = false;
-
 		self::BeginTransaction(__METHOD__);
 
 		foreach($hosts as $num => $host){
-
-			$host_db_fields = CHost::getById($host);
-
-			if(!$host_db_fields){
-				$result = false;
-				break;
-			}
+			$host_db_fields = $upd_hosts[$host['hostid']];
 
 			if(!check_db_fields($host_db_fields, $host)){
 				$result = false;
@@ -782,16 +786,15 @@ class CHost extends CZBXAPI{
 			$result = update_host($host['hostid'], $host['host'], $host['port'], $host['status'], $host['useip'], $host['dns'], $host['ip'],
 				$host['proxy_hostid'], $templates, $host['useipmi'], $host['ipmi_ip'], $host['ipmi_port'], $host['ipmi_authtype'],
 				$host['ipmi_privilege'], $host['ipmi_username'], $host['ipmi_password'], $newgroup, $groups);
+
 			if(!$result) break;
-			$hostids[] = $result;
 		}
 
-//		$result = DBend($result);
 		$result = self::EndTransaction($result, __METHOD__);
 
-
 		if($result){
-			return $hostids;
+			$upd_hosts = CHost::get(array('hostids'=>$hostids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			return $upd_hosts;
 		}
 		else{
 			self::setError(__METHOD__);
@@ -809,7 +812,7 @@ class CHost extends CZBXAPI{
  * @version 1
  *
  * @param _array $hosts multidimensional array with Hosts data
- * @param array $hosts['hosts'] Host IDs to update
+ * @param array $hosts['hosts'] Array of Host objects to update
  * @param string $hosts['host'] Host name.
  * @param array $hosts['groupids'] HostGroup IDs add Host to.
  * @param int $hosts['port'] Port. OPTIONAL
@@ -827,9 +830,21 @@ class CHost extends CZBXAPI{
  * @param string $hosts['ipmi_password'] IPMI password. OPTIONAL
  * @return boolean
  */
-	public static function massUpdate($hosts) {
-		$hostids = isset($hosts['hosts']) ? $hosts['hosts'] : array();
-		$hostids = zbx_objectValues($hostids, 'hostid');
+	public static function massUpdate($hosts){
+		$params = $hosts;
+		$hosts = $hosts['hosts'];
+		
+		$hosts = zbx_toArray($hosts);
+		$hostids = array();
+		
+		$upd_hosts = CHost::get(array('hostids'=> zbx_objectValues($hosts, 'hostid'), 'editable'=>1, 'extendoutput'=>1, 'preservekeys'=>1));
+		foreach($hosts as $gnum => $host){
+			if(!isset($upd_hosts[$host['hostid']])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				return false;
+			}
+			$hostids[] = $host['hostid'];
+		}
 
 		if(empty($hostids)){
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ hostids ]');
@@ -837,20 +852,20 @@ class CHost extends CZBXAPI{
 		}
 		else{
 			$sql = 'UPDATE hosts SET '.
-				(isset($hosts['proxy_hostid']) ? ',proxy_hostid='.$hosts['proxy_hostid'] : '').
-				(isset($hosts['host']) ? ',host='.zbx_dbstr($hosts['host']) : '').
-				(isset($hosts['port']) ? ',port='.$hosts['port'] : '').
-				(isset($hosts['status']) ? ',status='.$hosts['status'] : '').
-				(isset($hosts['useip']) ? ',useip='.$hosts['useip'] : '').
-				(isset($hosts['dns']) ? ',dns='.zbx_dbstr($hosts['dns']) : '').
-				(isset($hosts['ip']) ? ',ip='.zbx_dbstr($hosts['ip']) : '').
-				(isset($hosts['useipmi']) ? ',useipmi='.$hosts['useipmi'] : '').
-				(isset($hosts['ipmi_port']) ? ',ipmi_port='.$hosts['ipmi_port'] : '').
-				(isset($hosts['ipmi_authtype']) ? ',ipmi_authtype='.$hosts['ipmi_authtype'] : '').
-				(isset($hosts['ipmi_privilege']) ? ',ipmi_privilege='.$hosts['ipmi_privilege'] : '').
-				(isset($hosts['ipmi_username']) ? ',ipmi_username='.zbx_dbstr($hosts['ipmi_username']) : '').
-				(isset($hosts['ipmi_password']) ? ',ipmi_password='.zbx_dbstr($hosts['ipmi_password']) : '').
-				(isset($hosts['ipmi_ip']) ? ',ipmi_ip='.zbx_dbstr($hosts['ipmi_ip']) : '').
+				(isset($params['proxy_hostid']) ? ',proxy_hostid='.$params['proxy_hostid'] : '').
+				(isset($params['host']) ? ',host='.zbx_dbstr($params['host']) : '').
+				(isset($params['port']) ? ',port='.$params['port'] : '').
+				(isset($params['status']) ? ',status='.$params['status'] : '').
+				(isset($params['useip']) ? ',useip='.$params['useip'] : '').
+				(isset($params['dns']) ? ',dns='.zbx_dbstr($params['dns']) : '').
+				(isset($params['ip']) ? ',ip='.zbx_dbstr($params['ip']) : '').
+				(isset($params['useipmi']) ? ',useipmi='.$params['useipmi'] : '').
+				(isset($params['ipmi_port']) ? ',ipmi_port='.$params['ipmi_port'] : '').
+				(isset($params['ipmi_authtype']) ? ',ipmi_authtype='.$params['ipmi_authtype'] : '').
+				(isset($params['ipmi_privilege']) ? ',ipmi_privilege='.$params['ipmi_privilege'] : '').
+				(isset($params['ipmi_username']) ? ',ipmi_username='.zbx_dbstr($params['ipmi_username']) : '').
+				(isset($params['ipmi_password']) ? ',ipmi_password='.zbx_dbstr($params['ipmi_password']) : '').
+				(isset($params['ipmi_ip']) ? ',ipmi_ip='.zbx_dbstr($params['ipmi_ip']) : '').
 				' WHERE '.DBcondition('hostid', $hostids);
 
 			$sql = substr_replace($sql, '', strpos($sql, ','), 1);
@@ -859,7 +874,8 @@ class CHost extends CZBXAPI{
 		}
 
 		if($result){
-			return $hostids;
+			$upd_hosts = CHost::get(array('hostids'=>$hostids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			return $upd_hosts;
 		}
 		else{
 			self::setError(__METHOD__);
@@ -882,13 +898,18 @@ class CHost extends CZBXAPI{
  */
 	public static function delete($hosts){
 		$hosts = zbx_toArray($hosts);
-
-		$options = array('editable'=>1, 'extendoutput'=>1);
-		$options['hostids'] = zbx_objectValues($hosts, 'hostid');
-		$del_hosts = CHost::get($options);
-		
 		$hostids = array();
-		foreach($del_hosts as $num => $host){
+		
+		$del_hosts = CHost::get(array('hostids'=> zbx_objectValues($hosts, 'hostid'), 
+									'editable'=>1, 
+									'extendoutput'=>1, 
+									'preservekeys'=>1));
+		foreach($hosts as $num => $host){
+			if(!isset($del_hosts[$host['hostid']])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				return false;
+			}
+			
 			$hostids[] = $host['hostid'];
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$host['host'].']');
 		}
@@ -901,8 +922,9 @@ class CHost extends CZBXAPI{
 			$result = false;
 		}
 
-		if($result)
-			return $del_hosts;
+		if($result){
+			return zbx_cleanHashes($del_hosts);
+		}
 		else{
 			self::setError(__METHOD__);
 			return false;

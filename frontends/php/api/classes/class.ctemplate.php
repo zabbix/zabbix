@@ -268,44 +268,47 @@ class CTemplate extends CZBXAPI{
 			if($options['count'])
 				$result = $template;
 			else{
-				$templateids[$template['hostid']] = $template['hostid'];
+				$template['templateid'] = $template['hostid'];
+				unset($template['hostid']);
+
+				$templateids[$template['templateid']] = $template['templateid'];
 
 				if(is_null($options['extendoutput'])){
-					$result[$template['hostid']] = $template['hostid'];
+					$result[$template['templateid']] = $template['templateid'];
 				}
 				else{
-					if(!isset($result[$template['hostid']])) $result[$template['hostid']]= array();
+					if(!isset($result[$template['templateid']])) $result[$template['templateid']]= array();
 
-					if($options['select_groups'] && !isset($result[$template['hostid']]['groupids'])){
+					if($options['select_groups'] && !isset($result[$template['templateid']]['groupids'])){
 						$template['groupids'] = array();
 						$template['groups'] = array();
 					}
 
-					if($options['select_templates'] && !isset($result[$template['hostid']]['templateids'])){
+					if($options['select_templates'] && !isset($result[$template['templateid']]['templateids'])){
 						$template['templateids'] = array();
 						$template['templates'] = array();
 					}
 
-					if($options['select_hosts'] && !isset($result[$template['hostid']]['hostids'])){
+					if($options['select_hosts'] && !isset($result[$template['templateid']]['hostids'])){
 						$template['hostids'] = array();
 						$template['hosts'] = array();
 					}
 
-					if($options['select_items'] && !isset($result[$template['hostid']]['itemids'])){
+					if($options['select_items'] && !isset($result[$template['templateid']]['itemids'])){
 						$template['itemids'] = array();
 						$template['items'] = array();
 					}
 
-					if($options['select_triggers'] && !isset($result[$template['hostid']]['triggers'])){
+					if($options['select_triggers'] && !isset($result[$template['templateid']]['triggers'])){
 						$template['triggerids'] = array();
 						$template['triggers'] = array();
 					}
 
-					if($options['select_graphs'] && !isset($result[$template['hostid']]['graphids'])){
+					if($options['select_graphs'] && !isset($result[$template['templateid']]['graphids'])){
 						$template['graphids'] = array();
 						$template['graphs'] = array();
 					}
-					if($options['select_applications'] && !isset($result[$template['hostid']]['applications'])){
+					if($options['select_applications'] && !isset($result[$template['templateid']]['applications'])){
 						$template['applications'] = array();
 						$template['applicationids'] = array();
 					}
@@ -316,38 +319,38 @@ class CTemplate extends CZBXAPI{
 
 // groupids
 					if(isset($template['groupid'])){
-						if(!isset($result[$template['hostid']]['groupids']))
-							$result[$template['hostid']]['groupids'] = array();
+						if(!isset($result[$template['templateid']]['groupids']))
+							$result[$template['templateid']]['groupids'] = array();
 
-						$result[$template['hostid']]['groupids'][$template['groupid']] = $template['groupid'];
+						$result[$template['templateid']]['groupids'][$template['groupid']] = $template['groupid'];
 						unset($template['groupid']);
 					}
 
 // hostids
 					if(isset($template['linked_hostid'])){
-						if(!isset($result[$template['hostid']]['hostids'])) $result[$template['hostid']]['hostids'] = array();
+						if(!isset($result[$template['templateid']]['hostids'])) $result[$template['templateid']]['hostids'] = array();
 
-						$result[$template['hostid']]['hostids'][$template['linked_hostid']] = $template['linked_hostid'];
+						$result[$template['templateid']]['hostids'][$template['linked_hostid']] = $template['linked_hostid'];
 						unset($template['linked_hostid']);
 					}
 
 // itemids
 					if(isset($template['itemid'])){
-						if(!isset($result[$template['hostid']]['itemids'])) $result[$template['hostid']]['itemids'] = array();
+						if(!isset($result[$template['templateid']]['itemids'])) $result[$template['templateid']]['itemids'] = array();
 
-						$result[$template['hostid']]['itemids'][$template['itemid']] = $template['itemid'];
+						$result[$template['templateid']]['itemids'][$template['itemid']] = $template['itemid'];
 						unset($template['itemid']);
 					}
 
 // graphids
 					if(isset($template['graphid'])){
-						if(!isset($result[$template['hostid']]['graphids'])) $result[$template['hostid']]['graphids'] = array();
+						if(!isset($result[$template['templateid']]['graphids'])) $result[$template['templateid']]['graphids'] = array();
 
-						$result[$template['hostid']]['graphids'][$template['graphid']] = $template['graphid'];
+						$result[$template['templateid']]['graphids'][$template['graphid']] = $template['graphid'];
 						unset($template['graphid']);
 					}
 
-					$result[$template['hostid']] += $template;
+					$result[$template['templateid']] += $template;
 				}
 			}
 
@@ -546,12 +549,12 @@ class CTemplate extends CZBXAPI{
  */
 	public static function add($templates){
 		$templates = zbx_toArray($templates);
+		$templateids = array();
 		
 		$tpls = null;
 		$newgroup = '';
 		$status = 3;
 		$error = 'Internal Zabbix eror';
-		$new_templates = array();
 
 		$result = false;
 
@@ -586,21 +589,20 @@ class CTemplate extends CZBXAPI{
 				break;
 			}
 
-			$new_template = array();
-			$new_template['templateid'] = add_host($template['host'], $template['port'], $status, $template['useip'], $template['dns'], $template['ip'],
+			$result = add_host($template['host'], $template['port'], $status, $template['useip'], $template['dns'], $template['ip'],
 				$template['proxy_hostid'], $tpls, $template['useipmi'], $template['ipmi_ip'], $template['ipmi_port'], $template['ipmi_authtype'],
 				$template['ipmi_privilege'], $template['ipmi_username'], $template['ipmi_password'], $newgroup, $template['groupids']);
 				
-			if(!$new_template['templateid']){
-				$result = false;
-				break;
-			}
-			$new_templates[] = array_merge($new_template, $template);
+			if(!$result) break;
+
+			$templateids[] = $result;
 		}
 		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result)
+		if($result){
+			$new_templates = CTemplate::get(array('templateids'=>$templateids, 'extendoutput'=>1, 'nopermissions'=>1));			
 			return $new_templates;
+		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
 			return $result;
@@ -621,27 +623,29 @@ class CTemplate extends CZBXAPI{
  */
 	public static function update($templates){
 		$templates = zbx_toArray($templates);
+		$templateids = array();
+
+		$upd_templates = CTemplate::get(array('templateids'=>zbx_objectValues($templates, 'templateid'), 
+									'editable'=>1, 
+									'extendoutput'=>1, 
+									'preservekeys'=>1));
+		foreach($templates as $gnum => $template){
+			if(!isset($upd_templates[$template['templateid']])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				return false;
+			}
+			$templateids[] = $template['templateid'];
+		}
 
 		$tpls = null;
 		$newgroup = '';
 		$status = 3;
 
-		$templateids = array();
 		$result = false;
 
 		self::BeginTransaction(__METHOD__);
 		foreach($templates as $tnum => $template){
-
-			$sql = 'SELECT DISTINCT * '.
-				' FROM hosts '.
-				' WHERE hostid='.$template['hostid'];
-
-			$host_db_fields = DBfetch(DBselect($sql));
-
-			if(!isset($host_db_fields)) {
-				$result = false;
-				break;
-			}
+			$host_db_fields = $upd_templates[$template['templateid']];
 
 			if(!check_db_fields($host_db_fields, $template)){
 				error('Incorrect arguments pasted to function [CTemplate::update]');
@@ -649,23 +653,27 @@ class CTemplate extends CZBXAPI{
 				break;
 			}
 
-			$groups = get_groupids_by_host($template['hostid']);
+			$groups = get_groupids_by_host($template['templateid']);
 
-			$result = update_host($template['hostid'], $template['host'], $template['port'], $status, $template['useip'], $template['dns'], $template['ip'],
-				$template['proxy_hostid'], $tpls, $template['useipmi'], $template['ipmi_ip'], $template['ipmi_port'], $template['ipmi_authtype'],
-				$template['ipmi_privilege'], $template['ipmi_username'], $template['ipmi_password'], $newgroup, $groups);
+			$result = update_host($template['templateid'], $template['host'], $template['port'], $status, 
+								$template['useip'], $template['dns'], $template['ip'],
+								$template['proxy_hostid'], $tpls, $template['useipmi'], 
+								$template['ipmi_ip'], $template['ipmi_port'], $template['ipmi_authtype'],
+								$template['ipmi_privilege'], $template['ipmi_username'], $template['ipmi_password'], $newgroup, $groups);
+								
 			if(!$result) break;
-			$templateids[$result] = $result;
 		}
+
 		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result)
-			return $templates;
+		if($result){
+			$upd_templates = CTemplate::get(array('templateids'=>$templateids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			return $upd_templates;
+		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
-
 	}
 
 /**
@@ -683,13 +691,17 @@ class CTemplate extends CZBXAPI{
  */
 	public static function delete($templates){
 		$templates = zbx_toArray($templates);
-
-		$options = array('editable'=>1, 'extendoutput'=>1);
-		$options['templateids'] = zbx_objectValues($templates, 'templateid');
-		$del_templates = CTemplate::get($options);
-		
 		$templateids = array();
-		foreach($del_templates as $tnum => $template){
+
+		$del_templates = CTemplate::get(array('templateids'=>zbx_objectValues($templates, 'templateid'), 
+											'editable'=>1, 
+											'extendoutput'=>1, 
+											'preservekeys'=>1);
+		foreach($templates as $gnum => $template){
+			if(!isset($del_templates[$template['templateid']])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				return false;
+			}
 			$templateids[] = $template['templateid'];
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Template ['.$template['host'].']');
 		}
@@ -702,8 +714,9 @@ class CTemplate extends CZBXAPI{
 			$result = false;
 		}
 
-		if($result)
-			return $del_templates;
+		if($result){
+			return zbx_cleanHashes($del_templates);
+		}
 		else{
 			self::setError(__METHOD__);
 			return false;

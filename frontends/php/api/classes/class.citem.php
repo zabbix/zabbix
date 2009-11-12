@@ -640,8 +640,7 @@ class CItem extends CZBXAPI{
 	 */
 	public static function add($items){
 		$items = zbx_toArray($items);
-
-		$new_items = array();
+		$itemids = array();
 		
 		self::BeginTransaction(__METHOD__);
 
@@ -856,21 +855,19 @@ class CItem extends CZBXAPI{
 			}
 
 *///////////////
-			$new_item = array();
-			$new_item['itemid'] = add_item($item);
+
+			$result = add_item($item);
 			
-			if(!$new_item){
-				$result = false;
-				break;
-			}
-			
-			$new_items[] = array_merge($new_item, $item);
+			if(!$result) break;
+			$itemids[] = $result;
 		}
 
 		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result)
+		if($result){
+			$new_items = CItem::get(array('itemids'=>$itemids, 'extendoutput'=>1, 'nopermissions'=>1));			
 			return $new_items;
+		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
@@ -878,34 +875,52 @@ class CItem extends CZBXAPI{
 	}
 
 /**
-	 * Update item
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param array $items multidimensional array with items data
-	 * @return boolean
-	 */
+ * Update item
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $items multidimensional array with items data
+ * @return boolean
+ */
 	public static function update($items){
 		$items = zbx_toArray($items);
-
+		$itemids = array();
+		
+		$upd_items = CItem::get(array('itemids'=> zbx_objectValues($items, 'itemid'), 'editable'=>1, 'extendoutput'=>1, 'preservekeys'=>1));
+		foreach($items as $gnum => $item){
+			if(!isset($upd_items[$item['itemid']])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				return false;
+			}
+			$itemids[] = $item['itemid'];
+		}
+		
 		$result = true;
-		$upd_items = array();
 		
 		self::BeginTransaction(__METHOD__);
 		foreach($items as $inum => $item){
+			$item_db_fields = $upd_items[$item['itemid']];
+
+			if(!check_db_fields($item_db_fields, $item)){
+				error('Incorrect arguments pasted to function [CItem::update]');
+				$result = false;
+				break;
+			}
+			
 			$result = update_item($item['itemid'], $item);
 			if(!$result) break;
-			
-			$upd_items[] = $item;
 		}
+
 		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result)
+		if($result){
+			$upd_items = CItem::get(array('itemids'=>$itemids, 'extendoutput'=>1, 'nopermissions'=>1));			
 			return $upd_items;
+		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
@@ -927,13 +942,15 @@ class CItem extends CZBXAPI{
  */
 	public static function delete($items){
 		$items = zbx_toArray($items);
-
-		$options = array('editable'=>1, 'extendoutput'=>1);
-		$options['itemids'] = zbx_objectValues($items, 'itemid');
-		$del_items = CItem::get($options);
-		
 		$itemids = array();
-		foreach($del_items as $inum => $item){
+		
+		$del_items = Citem::get(array('itemids'=> zbx_objectValues($items, 'itemid'), 'editable'=>1, 'extendoutput'=>1, 'preservekeys'=>1));
+		foreach($items as $num => $item){
+			if(!isset($del_items[$item['itemid']])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				return false;
+			}
+
 			$itemids[] = $item['itemid'];
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, 'Item ['.$Item['description'].']');
 		}
@@ -945,8 +962,10 @@ class CItem extends CZBXAPI{
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Incorrect input parameter [ items ]');
 			$result = false;
 		}
-		if($result)
-			return $del_items;
+
+		if($result){
+			return zbx_cleanHashes($del_items);
+		}
 		else{
 			self::setError(__METHOD__);
 			return false;
