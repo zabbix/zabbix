@@ -1,6 +1,7 @@
 Changes for 1.7.1
 
- - [DEV-430] added notification macros {TRIGGER.EVENTS.UNACK} (Sasha)
+ - [DEV-430] added map labels macro {TRIGGERS.UNACK} (Sasha)
+ - [DEV-430] added notification macro {TRIGGER.EVENTS.UNACK} (Sasha)
  - [ZBX-1095] fixed "Link to template" operation for discovered hosts (Sasha)
  - [ZBX-1015] added support of LVM devices for system.swap.in/out under Linux. Thanks to Takanori Suzuki (Sasha)
  - [DEV-429] added support of system.cpu.switches under Linux 2.4/2.6 (Sasha)
