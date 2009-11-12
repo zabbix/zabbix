@@ -540,7 +540,7 @@ class CHostGroup extends CZBXAPI{
 		$del_groups = CGroup::get(array('groupids'=>zbx_objectValues($groups, 'groupid'), 
 											'editable'=>1, 
 											'extendoutput'=>1, 
-											'preservekeys'=>1);
+											'preservekeys'=>1));
 		foreach($groups as $gnum => $group){
 			if(!isset($del_groups[$group['groupid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');

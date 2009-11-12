@@ -696,7 +696,7 @@ class CTemplate extends CZBXAPI{
 		$del_templates = CTemplate::get(array('templateids'=>zbx_objectValues($templates, 'templateid'), 
 											'editable'=>1, 
 											'extendoutput'=>1, 
-											'preservekeys'=>1);
+											'preservekeys'=>1));
 		foreach($templates as $gnum => $template){
 			if(!isset($del_templates[$template['templateid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
