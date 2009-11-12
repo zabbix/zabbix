@@ -1509,8 +1509,8 @@ static void	DCsync_items()
 	ZBX_DC_SSHITEM	*sshitem;
 	ZBX_DC_TELNETITEM	*telnetitem;
 	zbx_uint64_t	itemid, hostid, proxy_hostid;
-	int		i, new, delay;
-	unsigned char	poller_type, poller_num, type;
+	int		i, new, delay, nextcheck;
+	unsigned char	poller_type, poller_num, type, status;
 	char		*key;
 
 	zbx_uint64_t	*ids = NULL;
@@ -1550,6 +1550,7 @@ static void	DCsync_items()
 		type = (unsigned char)atoi(row[3]);
 		key = row[6];
 		delay = atoi(row[15]);
+		status = (unsigned char)atoi(row[20]);
 
 		/* array of selected items */
 		uint64_array_add(&ids, &ids_allocated, &ids_num, itemid, ITEM_ALLOC_STEP);
@@ -1570,22 +1571,33 @@ static void	DCsync_items()
 		{
 			item->itemid = itemid;
 			item->nextcheck = calculate_item_nextcheck(itemid, type, delay, row[16], now);
+			if (ITEM_STATUS_NOTSUPPORTED == status && item->nextcheck > now + CONFIG_REFRESH_UNSUPPORTED)
+				item->nextcheck = now + CONFIG_REFRESH_UNSUPPORTED;
 
 			DCupdate_idxitem01(i, NULL, NULL, &hostid, key);
 			DCupdate_idxitem02(i, NULL, NULL, NULL, &poller_type, &poller_num, &item->nextcheck);
 		}
 		else
 		{
+			if (ITEM_STATUS_ACTIVE == status && (status != item->status || delay != item->delay))
+				nextcheck = calculate_item_nextcheck(itemid, type, delay, row[16], now);
+			else if (ITEM_STATUS_NOTSUPPORTED == status && status != item->status &&
+					item->nextcheck > now + CONFIG_REFRESH_UNSUPPORTED)
+				nextcheck = now + CONFIG_REFRESH_UNSUPPORTED;
+			else
+				nextcheck = item->nextcheck;
+
 			DCupdate_idxitem01(i, &item->hostid, item->key, &hostid, key);
 			DCupdate_idxitem02(i, &item->poller_type, &item->poller_num, &item->nextcheck,
-					&poller_type, &poller_num, &item->nextcheck);
+					&poller_type, &poller_num, &nextcheck);
+			item->nextcheck = nextcheck;
 		}
 
 		item->hostid = hostid;
 		item->poller_type = poller_type;
 		item->poller_num = poller_num;
 		item->type = type;
-		item->status = (unsigned char)atoi(row[20]);
+		item->status = status;
 		item->data_type = (unsigned char)atoi(row[4]);
 		item->value_type = (unsigned char)atoi(row[5]);
 		zbx_strlcpy(item->key, key, sizeof(item->key));
