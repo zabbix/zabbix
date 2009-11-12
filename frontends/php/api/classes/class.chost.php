@@ -106,6 +106,10 @@ class CHost extends CZBXAPI{
 			'with_graphs'				=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
+// filter
+			'pattern'					=> '',
+			'extend_pattern'			=> null,
+
 // OutPut
 			'extendoutput'				=> null,
 			'select_groups'				=> null,
@@ -117,8 +121,8 @@ class CHost extends CZBXAPI{
 			'select_macros'				=> null,
 			'select_profile'			=> null,
 			'count'						=> null,
-			'pattern'					=> '',
-			'extend_pattern'			=> null,
+			'preservekeys'				=> null,
+
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
@@ -363,7 +367,7 @@ class CHost extends CZBXAPI{
 		$sql = 'SELECT '.$sql_select.'
 				FROM '.$sql_from.'
 				WHERE '.DBin_node('h.hostid', $nodeids).
-				$sql_where.
+					$sql_where.
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
 		while($host = DBfetch($res)){
@@ -415,7 +419,7 @@ class CHost extends CZBXAPI{
 						$result[$host['hostid']]['macroids'] = array();
 					}
 
-					// groupids
+// groupids
 					if(isset($host['groupid'])){
 						if(!isset($result[$host['hostid']]['groupids']))
 							$result[$host['hostid']]['groupids'] = array();
@@ -423,7 +427,8 @@ class CHost extends CZBXAPI{
 						$result[$host['hostid']]['groupids'][$host['groupid']] = $host['groupid'];
 						unset($host['groupid']);
 					}
-					// templateids
+
+// templateids
 					if(isset($host['templateid'])){
 						if(!isset($result[$host['hostid']]['templateids']))
 							$result[$host['hostid']]['templateids'] = array();
@@ -431,7 +436,8 @@ class CHost extends CZBXAPI{
 						$result[$host['hostid']]['templateids'][$host['templateid']] = $host['templateid'];
 						unset($host['templateid']);
 					}
-					// triggerids
+
+// triggerids
 					if(isset($host['triggerid'])){
 						if(!isset($result[$host['hostid']]['triggerids']))
 							$result[$host['hostid']]['triggerids'] = array();
@@ -439,7 +445,8 @@ class CHost extends CZBXAPI{
 						$result[$host['hostid']]['triggerids'][$host['triggerid']] = $host['triggerid'];
 						unset($host['triggerid']);
 					}
-					// itemids
+
+// itemids
 					if(isset($host['itemid'])){
 						if(!isset($result[$host['hostid']]['itemids']))
 							$result[$host['hostid']]['itemids'] = array();
@@ -447,7 +454,8 @@ class CHost extends CZBXAPI{
 						$result[$host['hostid']]['itemids'][$host['itemid']] = $host['itemid'];
 						unset($host['itemid']);
 					}
-					// graphids
+
+// graphids
 					if(isset($host['graphid'])){
 						if(!isset($result[$host['hostid']]['graphids']))
 							$result[$host['hostid']]['graphids'] = array();
@@ -461,12 +469,15 @@ class CHost extends CZBXAPI{
 			}
 		}
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
+		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
+			return $result;
+		}
 
 // Adding Objects
 // Adding Groups
 		if($options['select_groups']){
-			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);
+			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
 			$groups = CHostgroup::get($obj_params);
 			foreach($groups as $groupid => $group){
 				foreach($group['hostids'] as $num => $hostid){
@@ -496,7 +507,7 @@ class CHost extends CZBXAPI{
 
 // Adding Templates
 		if($options['select_templates']){
-			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);
+			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
 			$templates = CTemplate::get($obj_params);
 			foreach($templates as $templateid => $template){
 				foreach($template['hostids'] as $num => $hostid){
@@ -508,7 +519,7 @@ class CHost extends CZBXAPI{
 
 // Adding Items
 		if($options['select_items']){
-			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'nopermissions' => 1);
+			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'nopermissions' => 1, 'preservekeys' => 1);
 			$items = CItem::get($obj_params);
 			foreach($items as $itemid => $item){
 				foreach($item['hostids'] as $num => $hostid){
@@ -520,7 +531,7 @@ class CHost extends CZBXAPI{
 
 // Adding triggers
 		if($options['select_triggers']){
-			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);
+			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
 			$triggers = CTrigger::get($obj_params);
 			foreach($triggers as $triggerid => $trigger){
 				foreach($trigger['hostids'] as $num => $hostid){
@@ -532,7 +543,7 @@ class CHost extends CZBXAPI{
 
 // Adding graphs
 		if($options['select_graphs']){
-			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);
+			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
 			$graphs = CGraph::get($obj_params);
 			foreach($graphs as $graphid => $graph){
 				foreach($graph['hostids'] as $num => $hostid){
@@ -544,7 +555,7 @@ class CHost extends CZBXAPI{
 
 // Adding applications
 		if($options['select_applications']){
-			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);
+			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
 			$applications = CApplication::get($obj_params);
 			foreach($applications as $applicationid => $application){
 				foreach($application['hostids'] as $num => $hostid){
@@ -556,7 +567,7 @@ class CHost extends CZBXAPI{
 
 // Adding macros
 		if($options['select_macros']){
-			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);
+			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
 			$macros = CUserMacro::get($obj_params);
 			foreach($macros as $macroid => $macro){
 				foreach($macro['hostids'] as $num => $hostid){
@@ -566,7 +577,10 @@ class CHost extends CZBXAPI{
 			}
 		}
 
-//		zbx_valueTo($result,array('array'=>1));
+// removing keys (hash -> array)
+		if(is_null($options['preservekeys'])){
+			$result = zbx_cleanHashes($result);
+		}
 
 	return $result;
 	}
@@ -667,7 +681,7 @@ class CHost extends CZBXAPI{
 				break;
 			}
 
-			zbx_valueTo($host['groupids'], array('array' => 1));
+			$host['groupids'] = zbx_toArray($host['groupids']);
 
 			$host_db_fields = array(
 				'host' => null,
@@ -699,8 +713,9 @@ class CHost extends CZBXAPI{
 				$host['proxy_hostid'], $templates, $host['useipmi'], $host['ipmi_ip'], $host['ipmi_port'], $host['ipmi_authtype'],
 				$host['ipmi_privilege'], $host['ipmi_username'], $host['ipmi_password'], $newgroup, $host['groupids']);
 			if(!$result) break;
-			$result_ids[$result] = $result;
+			$result_ids[] = $result;
 		}
+
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
@@ -768,7 +783,7 @@ class CHost extends CZBXAPI{
 				$host['proxy_hostid'], $templates, $host['useipmi'], $host['ipmi_ip'], $host['ipmi_port'], $host['ipmi_authtype'],
 				$host['ipmi_privilege'], $host['ipmi_username'], $host['ipmi_password'], $newgroup, $groups);
 			if(!$result) break;
-			$hostids[$result] = $result;
+			$hostids[] = $result;
 		}
 
 //		$result = DBend($result);
@@ -794,7 +809,7 @@ class CHost extends CZBXAPI{
  * @version 1
  *
  * @param _array $hosts multidimensional array with Hosts data
- * @param array $hosts['hostids'] Host IDs to update
+ * @param array $hosts['hosts'] Host IDs to update
  * @param string $hosts['host'] Host name.
  * @param array $hosts['groupids'] HostGroup IDs add Host to.
  * @param int $hosts['port'] Port. OPTIONAL
@@ -813,9 +828,8 @@ class CHost extends CZBXAPI{
  * @return boolean
  */
 	public static function massUpdate($hosts) {
-
-		$hostids = isset($hosts['hostids']) ? $hosts['hostids'] : array();
-		zbx_value2array($hostids);
+		$hostids = isset($hosts['hosts']) ? $hosts['hosts'] : array();
+		$hostids = zbx_objectValues($hostids, 'hostid');
 
 		if(empty($hostids)){
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ hostids ]');
@@ -867,10 +881,16 @@ class CHost extends CZBXAPI{
  * @return array|boolean
  */
 	public static function delete($hosts){
+		$hosts = zbx_toArray($hosts);
 
+		$options = array('editable'=>1, 'extendoutput'=>1);
+		$options['hostids'] = zbx_objectValues($hosts, 'hostid');
+		$del_hosts = CHost::get($options);
+		
 		$hostids = array();
-		foreach($hosts as $host){
+		foreach($del_hosts as $num => $host){
 			$hostids[] = $host['hostid'];
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$host['host'].']');
 		}
 
 		if(!empty($hostids)){
@@ -882,7 +902,7 @@ class CHost extends CZBXAPI{
 		}
 
 		if($result)
-			return $hostids;
+			return $del_hosts;
 		else{
 			self::setError(__METHOD__);
 			return false;

@@ -131,7 +131,6 @@
 	$right_tab->addRow($event_ack);
 //----------------
 
-
 // event sms actions
 	$actions_sms = new CWidget(
 		'hat_eventactionmsgs',
@@ -179,5 +178,7 @@
 
 ?>
 <?php
+
 include_once('include/page_footer.php');
+
 ?>

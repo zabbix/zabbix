@@ -19,13 +19,13 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/maps.inc.php');
-	require_once('include/forms.inc.php');
+require_once('include/config.inc.php');
+require_once('include/maps.inc.php');
+require_once('include/forms.inc.php');
 
-	$page['title'] = 'S_NETWORK_MAPS';
-	$page['file'] = 'sysmaps.php';
-	$page['hist_arg'] = array();
+$page['title'] = 'S_NETWORK_MAPS';
+$page['file'] = 'sysmaps.php';
+$page['hist_arg'] = array();
 
 include_once('include/page_header.php');
 
@@ -211,6 +211,9 @@ include_once('include/page_header.php');
 		$map_wdgt->show();
 	}
 
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>

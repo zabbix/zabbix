@@ -19,24 +19,14 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/hosts.inc.php');
+require_once('include/config.inc.php');
+require_once('include/hosts.inc.php');
 
-	$page['title'] = 'S_HOST_GROUPS';
-	$page['file'] = 'hostgroups.php';
-	$page['hist_arg'] = array();
+$page['title'] = 'S_HOST_GROUPS';
+$page['file'] = 'hostgroups.php';
+$page['hist_arg'] = array();
 
 include_once('include/page_header.php');
-
-	$available_groups = CHostGroup::get(array('editable' => 1));
-	$available_hosts = CHost::get(array('editable' => 1, 'templated_hosts' => 1));
-
-	if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0) && !isset($available_groups[$_REQUEST['groupid']])){
-		access_deny();
-	}
-	if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0) && !isset($available_hosts[$_REQUEST['hostid']])) {
-		access_deny();
-	}
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -65,6 +55,17 @@ include_once('include/page_header.php');
 	validate_sort_and_sortorder('name',ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go','none');
+	
+// PERMISSIONS
+	if(get_request('groupid', 0) > 0){
+		$groupids = available_groups($_REQUEST['groupid'], 1);
+		if(empty($groupids)) access_deny();
+	}
+	
+	if(get_request('hostid', 0) > 0){
+		$hostids = available_hosts($_REQUEST['hostid'], 1);
+		if(empty($hostids)) access_deny();
+	}
 ?>
 <?php
 /*** <--- ACTIONS ---> ***/
@@ -74,7 +75,7 @@ include_once('include/page_header.php');
 	}
 	else if(isset($_REQUEST['save'])){
 		$hosts = get_request('hosts', array());
-		$hosts = array_intersect($available_hosts, $hosts);
+		$hosts = available_hosts($hosts, 1);
 
 		if(isset($_REQUEST['groupid'])){
 			DBstart();
@@ -130,10 +131,12 @@ include_once('include/page_header.php');
 /*				if(!$group = get_hostgroup_by_groupid($db_group['groupid'])) continue;*/
 				$go_result &= delete_host_group($db_group['groupid']);
 
-/*				if($result){
+/*
+				if($result){
 					add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST_GROUP,
 					S_HOST_GROUP.' ['.$group['name'].' ] ['.$group['groupid'].']');
-				}*/
+				}
+//*/
 			}
 			$go_result = DBend($go_result);
 			show_messages($go_result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
@@ -144,9 +147,9 @@ include_once('include/page_header.php');
 		$groups = get_request('groups', array());
 		if(!empty($groups)){
 			DBstart();
-			$hostids = CHost::get(array('groupids' => $groups, 'editable' => 1));
+			$hosts = CHost::get(array('groupids' => $groups, 'editable' => 1));
 
-			$go_result = CHost::massUpdate(array('hostids' => $hostids, 'status' => $status));
+			$go_result = CHost::massUpdate(array('hosts' => $hosts, 'status' => $status));
 			if(!$go_result)
 				error(CHost::resetErrors());
 
@@ -196,16 +199,17 @@ include_once('include/page_header.php');
 					'sortfield' => 'host',
 					'templated_hosts' => 1);
 				$db_hosts = CHost::get($params);
-				foreach($db_hosts as $hostid => $db_host){
-					$hosts[$hostid] = $hostid;
-				}
+				$hosts = zbx_toHash($db_hosts, 'hostid');
 			}
 		}
 
 		$frmHostG = new CFormTable($frm_title, 'hostgroups.php');
 		$frmHostG->setName('hg_form');
-		if($groupid > 0)
+
+		if($groupid > 0){
 			$frmHostG->addVar('groupid', $groupid);
+		}
+
 		$frmHostG->addRow(S_GROUP_NAME, new CTextBox('gname', $group_name, 48));
 
 // select all possible groups
@@ -220,6 +224,7 @@ include_once('include/page_header.php');
 			$gr = reset($db_groups);
 			$twb_groupid = $gr['groupid'];
 		}
+
 		$cmbGroups = new CComboBox('twb_groupid', $twb_groupid, 'submit()');
 		foreach($db_groups as $row){
 			$cmbGroups->addItem($row['groupid'], $row['name']);
@@ -235,10 +240,10 @@ include_once('include/page_header.php');
 			'editable' => 1,
 			'extendoutput' => 1);
 		$db_hosts = CHost::get($params);
-		foreach($db_hosts as $hostid => $db_host){
+		foreach($db_hosts as $num => $db_host){
 // add all except selected hosts
-			if(!isset($hosts[$hostid]))
-				$cmbHosts->addItem($hostid, $db_host['host']);
+			if(!isset($hosts[$db_host['hostid']]))
+				$cmbHosts->addItem($db_host['hostid'], $db_host['host']);
 		}
 
 // select selected hosts and add them
@@ -249,8 +254,8 @@ include_once('include/page_header.php');
 			'editable' => 1,
 			'extendoutput' => 1);
 		$db_hosts = CHost::get($params);
-		foreach($db_hosts as $hostid => $db_host){
-			$cmbHosts->addItem($hostid, $db_host['host']);
+		foreach($db_hosts as $num => $db_host){
+			$cmbHosts->addItem($db_host['hostid'], $db_host['host']);
 		}
 
 		$frmHostG->addRow(S_HOSTS, $cmbHosts->Get(S_HOSTS.SPACE.S_IN,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE, $cmbGroups)));
@@ -309,7 +314,7 @@ include_once('include/page_header.php');
 //-----
 
 		$options = array(
-			'groupids' => array_keys($groups),
+			'groupids' => zbx_objectValues($groups, 'groupid'),
 			'extendoutput' => 1,
 			'select_hosts' => 1,
 			'nopermissions' => 1
@@ -320,7 +325,7 @@ include_once('include/page_header.php');
 		order_result($groups, $sortfield, $sortorder);
 //---------
 
-		foreach($groups as $group){
+		foreach($groups as $num => $group){
 			$tpl_count = 0;
 			$host_count = 0;
 			$i = 0;

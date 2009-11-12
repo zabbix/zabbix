@@ -97,8 +97,8 @@ include_once('include/page_header.php');
 		);
 		$graphs = CGraph::get($params);
 
-/* SELECT GRAPH ITEMS */
-		$graphids = array_keys($graphs);
+// SELECT GRAPH ITEMS
+		$graphids = zbx_objectValues($graphs, 'graphid');
 		$params = array(
 			'graphids' => $graphids,
 			'extendoutput' => 1,
@@ -106,10 +106,10 @@ include_once('include/page_header.php');
 		);
 		$gitems = CGraphItem::get($params);
 
-		foreach($gitems as $gitemid => $gitem){
-			$gitems[$gitemid]['host_key_'] = $gitem['host'].':'.$gitem['key_'];
+		foreach($gitems as $gnum => $gitem){
+			$gitems[$gitem['gitemid']]['host_key_'] = $gitem['host'].':'.$gitem['key_'];
 		}
-/* SELECT TEMPLATES */
+// SELECT TEMPLATES
 		$params = array(
 			'hostids' => zbx_uint_array_intersect($hostids, $hostids_templates),
 			'extendoutput' => 1
@@ -123,15 +123,15 @@ include_once('include/page_header.php');
 		);
 		$macros = CUserMacro::get($params);
 
-/* SELECT ITEMS */
+// SELECT ITEMS
 		$params = array(
 			'hostids' => zbx_uint_array_intersect($hostids, $hostids_items),
 			'extendoutput' => 1
 		);
 		$items = Citem::get($params);
 
-/* SELECT APPLICATIONS */
-		$itemids = array_keys($items);
+// SELECT APPLICATIONS
+		$itemids = zbx_objectValues($items, 'itemid');
 //sdii($itemids);
 		$params = array(
 			'itemids' => $itemids,

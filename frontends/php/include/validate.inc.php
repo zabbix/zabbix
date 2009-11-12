@@ -579,7 +579,6 @@
 		}
 
 		$fields = null;
-
 		if($err&ZBX_VALID_ERROR){
 			invalid_url();
 		}

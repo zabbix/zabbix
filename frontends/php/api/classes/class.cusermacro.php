@@ -91,15 +91,18 @@ class CUserMacro extends CZBXAPI{
 			'macros'					=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
+// filter
+			'pattern'					=> '',
+
 // OutPut
 			'globalmacro'				=> null,
 			'extendoutput'				=> null,
 			'select_groups'				=> null,
 			'select_hosts'				=> null,
 			'select_templates'			=> null,
-
 			'count'						=> null,
-			'pattern'					=> '',
+			'preservekeys'				=> null,
+
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
@@ -376,12 +379,15 @@ class CUserMacro extends CZBXAPI{
 			}
 		}
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
+		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
+			return $result;
+		}
 
 // Adding Objects
 // Adding Groups
 		if($options['select_groups']){
-			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);
+			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
 			$groups = CHostgroup::get($obj_params);
 			foreach($groups as $groupid => $group){
 				foreach($group['hostids'] as $num => $hostid){
@@ -397,7 +403,7 @@ class CUserMacro extends CZBXAPI{
 
 // Adding Templates
 		if($options['select_templates']){
-			$obj_params = array('extendoutput' => 1, 'templateids' => $hostids);
+			$obj_params = array('extendoutput' => 1, 'templateids' => $hostids, 'preservekeys' => 1);
 			$templates = CTemplate::get($obj_params);
 			foreach($templates as $templateid => $template){
 				foreach($template['hostids'] as $num => $hostid){
@@ -406,13 +412,14 @@ class CUserMacro extends CZBXAPI{
 							$result[$macroid]['templates'][$templateid] = $template;
 							$result[$macroid]['templateids'][$templateid] = $templateid;
 						}
-					}				}
+					}
+				}
 			}
 		}
 
 // Adding Hosts
 		if($options['select_hosts']){
-			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids);
+			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
 			$hosts = CHost::get($obj_params);
 			foreach($hosts as $id => $host){
 				foreach($template['hostids'] as $num => $hostid){
@@ -424,6 +431,11 @@ class CUserMacro extends CZBXAPI{
 					}
 				}
 			}
+		}
+
+// removing keys (hash -> array)
+		if(is_null($options['preservekeys'])){
+			$result = zbx_cleanHashes($result);
 		}
 
 	return $result;
@@ -810,7 +822,7 @@ class CUserMacro extends CZBXAPI{
 			if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $trigger['expression'], $arr)){
 				$macros = self::getMacros($arr[1], array('triggerid' => $trigger['triggerid']));
 
-				$search = array_keys($macros);
+				$search = zbx_objectValues($macros, 'macroid');
 				$values = array_values($macros);
 				$triggers[$num]['expression'] = str_replace($search, $values, $trigger['expression']);
 			}
@@ -833,7 +845,7 @@ class CUserMacro extends CZBXAPI{
 			if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $item['key_'], $arr)){
 				$macros = self::getMacros($arr[1], array('itemid' => $item['itemid']));
 
-				$search = array_keys($macros);
+				$search = zbx_objectValues($macros, 'macroid');
 				$values = array_values($macros);
 				$items[$num]['key_'] = str_replace($search, $values, $item['key_']);
 			}

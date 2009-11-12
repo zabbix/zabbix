@@ -96,6 +96,8 @@ class CEvent extends CZBXAPI{
 			'select_items'			=> null,
 			'select_triggers'		=> null,
 			'count'					=> null,
+			'preservekeys'			=> null,
+
 			'sortfield'				=> '',
 			'sortorder'				=> '',
 			'limit'					=> null
@@ -118,7 +120,7 @@ class CEvent extends CZBXAPI{
 		else if(($options['object'] == EVENT_OBJECT_TRIGGER) || ($options['source'] == EVENT_SOURCE_TRIGGER)){
 
 			$triggers = CTrigger::get();
-			$triggerids = array_keys($triggers);
+			$triggerids = zbx_objectValues($triggers, 'triggerid');
 
 			if(!is_null($options['triggerids']))
 				$options['triggerids'] = array_intersect($options['triggerids'], $triggerids);
@@ -327,7 +329,7 @@ class CEvent extends CZBXAPI{
 						$result[$event['eventid']]['triggers'] = array();
 					}
 
-					// hostids
+// hostids
 					if(isset($event['hostid'])){
 						if(!isset($result[$event['eventid']]['hostids'])) $result[$event['eventid']]['hostids'] = array();
 
@@ -335,7 +337,7 @@ class CEvent extends CZBXAPI{
 						unset($event['hostid']);
 					}
 
-					// triggerids
+// triggerids
 					if(isset($event['triggerid'])){
 						if(!isset($result[$event['eventid']]['triggerids'])) $result[$event['eventid']]['triggerids'] = array();
 
@@ -343,7 +345,7 @@ class CEvent extends CZBXAPI{
 						unset($event['triggerid']);
 					}
 
-					// itemids
+// itemids
 					if(isset($event['itemid'])){
 						if(!isset($result[$event['eventid']]['itemids'])) $result[$event['eventid']]['itemids'] = array();
 
@@ -356,12 +358,15 @@ class CEvent extends CZBXAPI{
 			}
 		}
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
+		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
+			return $result;
+		}
 
 // Adding Objects
 // Adding hosts
 		if($options['select_hosts']){
-			$obj_params = array('extendoutput' => 1, 'triggerids' => $triggerids, 'nopermissions' => 1);
+			$obj_params = array('extendoutput' => 1, 'triggerids' => $triggerids, 'nopermissions' => 1, 'preservekeys' => 1);
 			$hosts = CHost::get($obj_params);
 
 			$triggers = array();
@@ -388,7 +393,7 @@ class CEvent extends CZBXAPI{
 
 // Adding triggers
 		if($options['select_triggers']){
-			$obj_params = array('extendoutput' => 1, 'triggerids' => $triggerids, 'nopermissions' => 1);
+			$obj_params = array('extendoutput' => 1, 'triggerids' => $triggerids, 'nopermissions' => 1, 'preservekeys' => 1);
 			$triggers = CTrigger::get($obj_params);
 
 			foreach($result as $eventid => $event){
@@ -405,7 +410,7 @@ class CEvent extends CZBXAPI{
 
 // Adding items
 		if($options['select_items']){
-			$obj_params = array('extendoutput' => 1, 'triggerids' => $triggerids, 'nopermissions' => 1);
+			$obj_params = array('extendoutput' => 1, 'triggerids' => $triggerids, 'nopermissions' => 1, 'preservekeys' => 1);
 			$db_items = CItem::get($obj_params);
 			$items = array();
 
@@ -429,6 +434,11 @@ class CEvent extends CZBXAPI{
 					$result[$eventid]['items'] = array();
 				}
 			}
+		}
+
+// removing keys (hash -> array)
+		if(is_null($options['preservekeys'])){
+			$result = zbx_cleanHashes($result);
 		}
 
 	return $result;

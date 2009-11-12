@@ -75,11 +75,15 @@ class CUserGroup extends CZBXAPI{
 			'status'					=> null,
 			'with_gui_access'			=> null,
 			'with_api_access'			=> null,
+// filter
+			'pattern'					=> '',
+
 // OutPut
 			'extendoutput'				=> null,
 			'select_users'				=> null,
 			'count'						=> null,
-			'pattern'					=> '',
+			'preservekeys'				=> null,
+
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
@@ -221,12 +225,15 @@ class CUserGroup extends CZBXAPI{
 			}
 		}
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])) return $result;
+		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
+			return $result;
+		}
 
 // Adding Objects
 // Adding users
 		if($options['select_users']){
-			$obj_params = array('extendoutput' => 1, 'usrgrpids' => $usrgrpids);
+			$obj_params = array('extendoutput' => 1, 'usrgrpids' => $usrgrpids, 'preservekeys' => 1);
 			$users = CUser::get($obj_params);
 			foreach($users as $userid => $user){
 				foreach($user['usrgrpids'] as $num => $usrgrpid){
@@ -234,6 +241,11 @@ class CUserGroup extends CZBXAPI{
 					$result[$usrgrpid]['users'][$userid] = $user;
 				}
 			}
+		}
+
+// removing keys (hash -> array)
+		if(is_null($options['preservekeys'])){
+			$result = zbx_cleanHashes($result);
 		}
 
 	return $result;

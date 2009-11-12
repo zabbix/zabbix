@@ -90,10 +90,9 @@
 COpt::profiling_stop('script');
 COpt::show();
 
-print('<!--'."\n".'SELECTS: '.$DB['SELECT_COUNT']."\n".'EXECUTE: '.$DB['EXECUTE_COUNT']."\n".'TOTAL: '.($DB['EXECUTE_COUNT']+$DB['SELECT_COUNT'])."\n".'-->');
-
 		echo "</body>\n";
 		echo "</html>\n";
 	}
-	exit;
+
+exit;
 ?>

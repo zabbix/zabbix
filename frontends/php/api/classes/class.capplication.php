@@ -76,12 +76,16 @@ class CApplication extends CZBXAPI{
 			'applicationids'		=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
+// Filter
+			'pattern'				=> '',
+
 // OutPut
 			'extendoutput'			=> null,
 			'expand_data'			=> null,
 			'select_items'			=> null,
 			'count'					=> null,
-			'pattern'				=> '',
+			'preservekeys'			=> null,
+
 			'sortfield'				=> '',
 			'sortorder'				=> '',
 			'limit'					=> null
@@ -265,12 +269,15 @@ class CApplication extends CZBXAPI{
 			}
 		}
 
-		if(is_null($options['extendoutput'])) return $result;
+		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
+			return $result;
+		}
 
 // Adding Objects
 // Adding items
 		if($options['select_items']){
-			$obj_params = array('extendoutput' => 1, 'applicationids' => $applicationids, 'nopermissions' => 1);
+			$obj_params = array('extendoutput' => 1, 'applicationids' => $applicationids, 'nopermissions' => 1, 'preservekeys' => 1);
 			$items = CItem::get($obj_params);
 			foreach($items as $itemid => $item){
 				foreach($item['applicationids'] as $num => $applicationid){
@@ -280,6 +287,10 @@ class CApplication extends CZBXAPI{
 			}
 		}
 
+// removing keys (hash -> array)
+		if(is_null($options['preservekeys'])){
+			$result = zbx_cleanHashes($result);
+		}
 
 	return $result;
 	}
