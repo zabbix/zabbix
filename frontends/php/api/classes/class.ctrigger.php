@@ -575,11 +575,11 @@ class CTrigger extends CZBXAPI{
  */
 	public static function add($triggers){
 		$triggers = zbx_toArray($triggers);
-
+		$triggerids = array();
+		
 		$result = true;
-		$new_triggers = array();
-		self::BeginTransaction(__METHOD__);
 
+		self::BeginTransaction(__METHOD__);
 		foreach($triggers as $num => $trigger){
 			$trigger_db_fields = array(
 				'expression'	=> null,
@@ -598,8 +598,7 @@ class CTrigger extends CZBXAPI{
 				break;
 			}
 
-			$new_trigger = array();
-			$new_trigger['triggerid'] = add_trigger(
+			$result = add_trigger(
 				$trigger['expression'],
 				$trigger['description'],
 				$trigger['type'],
@@ -611,17 +610,16 @@ class CTrigger extends CZBXAPI{
 				$trigger['templateid']
 			);
 
-			if(!$new_trigger['triggerid']){
-				$result = false;
-				break;
-			}
+			if(!$result) break;
 
-			$new_triggers[] = array_merge($trigger, $new_trigger);
+			$triggerids[] = $result;
 		}
 
 		$result = self::EndTransaction($result, __METHOD__);
-		if($result)
+		if($result){
+			$new_triggers = CTrigger::get(array('triggerids'=>$triggerids, 'extendoutput'=>1, 'nopermissions'=>1));			
 			return $new_triggers;
+		}
 		else{
 			self::setError(__METHOD__);
 			return false;
@@ -650,19 +648,25 @@ class CTrigger extends CZBXAPI{
  */
 	public static function update($triggers){
 		$triggers = zbx_toArray($triggers);
-
-		$result = true;
 		$triggerids = array();
-		$upd_triggers = array();
+		
+		$upd_triggers = CTrigger::get(array('triggerids'=>zbx_objectValues($triggers, 'triggerid'), 
+											'editable'=>1, 
+											'extendoutput'=>1, 
+											'preservekeys'=>1);
+		foreach($triggers as $gnum => $trigger){
+			if(!isset($upd_triggers[$trigger['triggerid']])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				return false;
+			}
+			$triggerids[] = $trigger['triggerid'];
+		}
+		
+		$result = true;
 
 		self::BeginTransaction(__METHOD__);
 		foreach($triggers as $tnum => $trigger){
-			$trigger_db_fields = self::get(array('triggerids' => $trigger['triggerid'], 'extendoutput' => 1, 'editable' => 1));
-			$trigger_db_fields = reset($trigger_db_fields);
-			if(!isset($trigger_db_fields)) {
-				$result = false;
-				break;
-			}
+			$trigger_db_fields = $upd_triggers[$trigger['triggerid']];
 
 			if(!check_db_fields($trigger_db_fields, $trigger)){
 				error('Incorrect arguments pasted to function [CTrigger::update]');
@@ -682,13 +686,13 @@ class CTrigger extends CZBXAPI{
 									array(),
 									$trigger['templateid']);
 			if(!$result) break;
-		
-			$upd_triggers[] = $trigger;
 		}
 		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result)
+		if($result){
+			$upd_triggers = CTrigger::get(array('triggerids'=>$triggerids, 'extendoutput'=>1, 'nopermissions'=>1));			
 			return $upd_triggers;
+		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
@@ -709,14 +713,19 @@ class CTrigger extends CZBXAPI{
  * @return deleted triggers
  */
 	public static function delete($triggers){
-		$triggers = zbx_toArray($triggers);
-
-		$options = array('editable'=>1, 'extendoutput'=>1);
-		$options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
-		$del_triggers = CTrigger::get($options);
-		
+		$triggers = zbx_toArray($triggers);		
 		$triggerids = array();
-		foreach($del_triggers as $inum => $trigger){
+		
+		$del_triggers = CTrigger::get(array('triggerids'=>zbx_objectValues($triggers, 'triggerid'), 
+											'editable'=>1, 
+											'extendoutput'=>1, 
+											'preservekeys'=>1);
+		foreach($triggers as $gnum => $trigger){
+			if(!isset($del_triggers[$trigger['triggerid']])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				return false;
+			}
+
 			$triggerids[] = $trigger['triggerid'];
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, 'Trigger ['.$trigger['description'].']');
 		}
@@ -729,8 +738,9 @@ class CTrigger extends CZBXAPI{
 			$result = false;
 		}
 
-		if($result)
-			return $del_triggers;
+		if($result){
+			return zbx_cleanHashes($del_triggers);
+		}
 		else{
 			self::setError(__METHOD__);
 			return false;
