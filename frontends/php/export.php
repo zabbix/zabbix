@@ -79,6 +79,7 @@ include_once('include/page_header.php');
 			'hostids' => $hostids,
 			'templated_hosts' => 1,
 			'extendoutput' => 1,
+			'preservekeys' => 1,
 			'select_profile' => 1
 		);
 		$hosts = CHost::get($params);
@@ -86,6 +87,7 @@ include_once('include/page_header.php');
 /* SELECT HOST GROUPS */
 		$params = array(
 			'hostids' => $hostids,
+			'preservekeys' => 1,
 			'extendoutput' => 1
 		);
 		$groups = CHostGroup::get($params);
@@ -93,6 +95,7 @@ include_once('include/page_header.php');
 /* SELECT GRAPHS */
 		$params = array(
 			'hostids' => zbx_uint_array_intersect($hostids, $hostids_graphs),
+			'preservekeys' => 1,
 			'extendoutput' => 1
 		);
 		$graphs = CGraph::get($params);
@@ -102,6 +105,7 @@ include_once('include/page_header.php');
 		$params = array(
 			'graphids' => $graphids,
 			'extendoutput' => 1,
+			'preservekeys' => 1,
 			'expand_data' => 1
 		);
 		$gitems = CGraphItem::get($params);
@@ -112,6 +116,7 @@ include_once('include/page_header.php');
 // SELECT TEMPLATES
 		$params = array(
 			'hostids' => zbx_uint_array_intersect($hostids, $hostids_templates),
+			'preservekeys' => 1,
 			'extendoutput' => 1
 		);
 		$templates = CTemplate::get($params);
@@ -119,6 +124,7 @@ include_once('include/page_header.php');
 /* SELECT MACROS */
 		$params = array(
 			'hostids' => $hostids,
+			'preservekeys' => 1,
 			'extendoutput' => 1
 		);
 		$macros = CUserMacro::get($params);
@@ -126,6 +132,7 @@ include_once('include/page_header.php');
 // SELECT ITEMS
 		$params = array(
 			'hostids' => zbx_uint_array_intersect($hostids, $hostids_items),
+			'preservekeys' => 1,
 			'extendoutput' => 1
 		);
 		$items = Citem::get($params);
@@ -135,6 +142,7 @@ include_once('include/page_header.php');
 //sdii($itemids);
 		$params = array(
 			'itemids' => $itemids,
+			'preservekeys' => 1,
 			'extendoutput' => 1
 		);
 		$applications = Capplication::get($params);
@@ -144,6 +152,7 @@ include_once('include/page_header.php');
 		$params = array(
 			'hostids' => zbx_uint_array_intersect($hostids, $hostids_triggers),
 			'extendoutput' => 1,
+			'preservekeys' => 1,
 			'select_dependencies' => 1,
 			'expand_data' => 1
 		);
@@ -218,7 +227,8 @@ include_once('include/page_header.php');
 			'select_templates' => 1,
 			'select_items' => 1,
 			'select_triggers' => 1,
-			'select_graphs' => 1
+			'select_graphs' => 1,
+			'preservekeys' => 1
 		);
 		$hosts_all = CHost::get($params);
 
@@ -323,6 +333,7 @@ include_once('include/page_header.php');
 		$params = array(
 			'templated_hosts' => 1,
 			'extendoutput' => 1,
+			'preservekeys' => 1,
 		);
 		if($selected_groupid > 0){
 			$params += array('groupids' => $selected_groupid);
