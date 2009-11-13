@@ -530,17 +530,17 @@ class CTrigger extends CZBXAPI{
 				' WHERE '.$sql_where.
 					' AND '.DBin_node('t.triggerid', false);
 		if($db_triggers = DBselect($sql)){
-			$result = true;
+//			$result = true;
 
 			while($tmp_trigger = DBfetch($db_triggers)) {
 				$tmp_exp = explode_exp($tmp_trigger['expression'], false);
 				if(strcmp($tmp_exp, $trigger['expression']) == 0) {
-					$triggerids[] = array_merge($tmp_trigger, $trigger);
+					$triggerids[] = $tmp_trigger['triggerid'];
 					break;
 				}
 			}
 		}
-	
+
 		if(!empty($triggerids))
 			$result = self::get(array('triggerids'=>$triggerids, 'extendoutput'=>1));
 		

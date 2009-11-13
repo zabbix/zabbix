@@ -53,7 +53,7 @@ class CTemplate extends CZBXAPI{
 		$sql_parts = array(
 			'select' => array('templates' => 'h.hostid'),
 			'from' => array('hosts h'),
-			'where' => array('h.status=3'),
+			'where' => array('h.status='.HOST_STATUS_TEMPLATE),
 			'order' => array(),
 			'limit' => null);
 
@@ -269,8 +269,6 @@ class CTemplate extends CZBXAPI{
 				$result = $template;
 			else{
 				$template['templateid'] = $template['hostid'];
-				unset($template['hostid']);
-
 				$templateids[$template['templateid']] = $template['templateid'];
 
 				if(is_null($options['extendoutput'])){
@@ -475,20 +473,21 @@ class CTemplate extends CZBXAPI{
  * @version 1
  *
  * @param array $template_data
- * @param array $template_data['template']
+ * @param array $template_data['host']
  * @return string templateid
  */
 	public static function getObjects($template_data){
 		$result = array();
 		$templateid = array();
 		
-		$sql = 'SELECT hostid FROM hosts '.
-			' WHERE host='.zbx_dbstr($template_data['name']).
-				' AND status=3 '.
-				' AND '.DBin_node('hostid', false);
+		$sql = 'SELECT hostid '.
+				' FROM hosts '.
+				' WHERE host='.zbx_dbstr($template_data['host']).
+					' AND status='.HOST_STATUS_TEMPLATE.
+					' AND '.DBin_node('hostid', false);
 		$res = DBselect($sql);
 		while($template = DBfetch($res)){
-			$templateids[$template['templateid']] = $template['templateid'];
+			$templateids[$template['hostid']] = $template['hostid'];
 		}
 
 		if(!empty($templateids))
@@ -529,7 +528,7 @@ class CTemplate extends CZBXAPI{
 		
 		$tpls = null;
 		$newgroup = '';
-		$status = 3;
+		$status = HOST_STATUS_TEMPLATE;
 		$error = 'Internal Zabbix eror';
 
 		$result = false;
@@ -615,7 +614,7 @@ class CTemplate extends CZBXAPI{
 
 		$tpls = null;
 		$newgroup = '';
-		$status = 3;
+		$status = HOST_STATUS_TEMPLATE;
 
 		$result = false;
 
@@ -800,27 +799,53 @@ class CTemplate extends CZBXAPI{
 		$result = true;
 		$error = '';
 
-		$hostid = $data['hostid'];
-		$templateids = $data['templateids'];
+		$hosts = $data['hosts'];
+		$templates = $data['templates'];
+		
+		$hosts = zbx_toArray($hosts);
+		$hostids = zbx_objectValues($hosts, 'hostid');
+		
+		$templates = zbx_toArray($templates);
+		$templateids = zbx_objectValues($templates, 'templateid');
 
 		self::BeginTransaction(__METHOD__);
-
-		foreach($templateids as $templateid){
-			$hosttemplateid = get_dbid('hosts_templates', 'hosttemplateid');
-			if(!$result = DBexecute('INSERT INTO hosts_templates VALUES ('.$hosttemplateid.','.$hostid.','.$templateid.')'))
-				break;
+		
+		$sql = 'SELECT hostid, templateid FROM hosts_templates WHERE '.DBcondition('hostid', $hostids).' AND '.DBcondition('templateid', $templateids);
+		$linked_db = DBexecute($sql);
+		while($pair = DBfetch($linked_db)){
+			$linked[$pair['templateid']] = array($pair['hostid'] => $pair['hostid']);
 		}
+
+		foreach($templates as $tnum => $template){
+			$templateid = $template['templateid'];
+			
+			$hosttemplateid = get_dbid('hosts_templates', 'hosttemplateid');
+			foreach($hosts as $hnum => $host){
+			
+				if(isset($linked[$templateid]) && isset($linked[$templateid][$host['hostid']])) continue;
+				
+				if(!$result = DBexecute('INSERT INTO hosts_templates VALUES ('.$hosttemplateid.','.$host['hostid'].','.$templateid.')'))
+				$result = false;
+				break;
+			}
+			if(!$result) break;
+		}
+
 		if($result){
-			foreach($templateids as $templateid){
-//				$result = sync_host_with_templates($hostid, $templateid);
-				sync_host_with_templates($hostid, $templateid);
+			foreach($templates as $tnum => $template){
+				foreach($hosts as $hnum => $host){
+//					$result = sync_host_with_templates($hostid, $templateid);
+					sync_host_with_templates($host['hostid'], $template['templateid']);
+				}
 //				if(!$result) break;
 			}
 		}
+
 		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result)
+		if($result){
 			return true;
+		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
 			return false;
