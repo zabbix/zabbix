@@ -713,9 +713,11 @@ class CTrigger extends CZBXAPI{
  * @return deleted triggers
  */
 	public static function delete($triggers){
+		self::BeginTransaction(__METHOD__);
+
 		$triggers = zbx_toArray($triggers);		
 		$triggerids = array();
-		
+
 		$del_triggers = CTrigger::get(array('triggerids'=>zbx_objectValues($triggers, 'triggerid'), 
 											'editable'=>1, 
 											'extendoutput'=>1, 
@@ -737,7 +739,9 @@ class CTrigger extends CZBXAPI{
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ triggerids ]');
 			$result = false;
 		}
-
+		
+		$result = self::EndTransaction($result, __METHOD__);
+		
 		if($result){
 			return zbx_cleanHashes($del_triggers);
 		}

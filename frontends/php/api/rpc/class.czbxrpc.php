@@ -84,10 +84,15 @@ class czbxrpc{
 
 		call_user_func(array('self', $resource), $action, $params);
 
-		if(self::$result !== false)
+		if(self::$result !== false){
 			self::$result = array('result' => self::$result);
-		else
+		}
+		else{
+// Abort started in API transactions if they are not closed
+			CZBXAPI::endAPITransactions(false);
+
 			self::$result = reset(CZBXAPI::$error);
+		}
 
 	return self::$result;
 	}
