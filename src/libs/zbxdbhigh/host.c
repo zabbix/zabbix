@@ -23,6 +23,7 @@
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
+#include "dbcache.h"
 
 #define ZBX_MAX_APPLICATIONS 64
 #define ZBX_MAX_DEPENDENCES	128
@@ -2118,27 +2119,24 @@ static void	DBdelete_template_applications(
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static int	DBreset_items_nextcheck(
-		zbx_uint64_t	triggerid
-	)
+static int	DBreset_items_nextcheck(zbx_uint64_t triggerid)
 {
-	DB_RESULT	db_functions;
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	itemid;
 
-	DB_ROW		function_data;
+	result = DBselect(
+			"select itemid"
+			" from functions"
+			" where triggerid=" ZBX_FS_UI64,
+			triggerid);
 
-	zbx_uint64_t
-		itemid;
-
-	db_functions = DBselect("select itemid from functions where triggerid=" ZBX_FS_UI64, triggerid);
-
-	while( (function_data = DBfetch(db_functions)) )
+	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(itemid, function_data[0]);
-
-		DBexecute("update items set nextcheck=0 where itemid=" ZBX_FS_UI64, itemid);
+		ZBX_STR2UINT64(itemid, row[0]);
+		DCreset_item_nextcheck(itemid);
 	}
-
-	DBfree_result(db_functions);
+	DBfree_result(result);
 
 	return SUCCEED;
 }
