@@ -505,7 +505,7 @@ class CScreen extends CZBXAPI{
 
 		self::BeginTransaction(__METHOD__);
 		if(!empty($screenids)){
-			foreach($screenids as $screenid){
+			foreach($screenids as $snum => $screenid){
 				$result = DBexecute('DELETE FROM screens_items WHERE screenid='.$screenid);
 				$result &= DBexecute('DELETE FROM screens_items WHERE resourceid='.$screenid.' AND resourcetype='.SCREEN_RESOURCE_SCREEN);
 				$result &= DBexecute('DELETE FROM slides WHERE screenid='.$screenid);
@@ -565,7 +565,7 @@ class CScreen extends CZBXAPI{
 		$result = true;
 
 		self::BeginTransaction(__METHOD__);
-		foreach($screen_items as $screen_item){
+		foreach($screen_items as $snum => $screen_item){
 
 			extract($screen_item);
 			$sql="DELETE FROM screens_items WHERE screenid=$screenid AND x=$x AND y=$y";
@@ -608,7 +608,7 @@ class CScreen extends CZBXAPI{
 		$result = true;
 
 		self::BeginTransaction(__METHOD__);
-		foreach($screen_items as $screen_itemid){
+		foreach($screen_items as $snum => $screen_itemid){
 			$sql='DELETE FROM screens_items WHERE screenitemid='.$screen_itemid;
 			if(!$result) break;
 		}

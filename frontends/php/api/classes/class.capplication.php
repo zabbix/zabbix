@@ -380,7 +380,7 @@ class CApplication extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_applications = CApplication::get(array('applicationids'=>$applicationids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$new_applications = self::get(array('applicationids'=>$applicationids, 'extendoutput'=>1, 'nopermissions'=>1));			
 			return $new_applications;
 		}
 		else{
@@ -407,7 +407,7 @@ class CApplication extends CZBXAPI{
 		$applications = zbx_toArray($applications);
 		$applicationids = array();
 		
-		$upd_applications = CApplication::get(array('applicationids'=>zbx_objectValues($applications, 'applicationid'), 
+		$upd_applications = self::get(array('applicationids'=>zbx_objectValues($applications, 'applicationid'), 
 											'editable'=>1, 
 											'extendoutput'=>1, 
 											'preservekeys'=>1));
@@ -438,7 +438,7 @@ class CApplication extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_applications = CApplication::get(array('applicationids'=>$applicationids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$upd_applications = self::get(array('applicationids'=>$applicationids, 'extendoutput'=>1, 'nopermissions'=>1));			
 			return $upd_applications;
 		}
 		else{
@@ -464,7 +464,7 @@ class CApplication extends CZBXAPI{
 		$applications = zbx_toArray($applications);		
 		$applicationids = array();
 		
-		$del_applications = CApplication::get(array('applicationids'=>zbx_objectValues($applications, 'applicationid'), 
+		$del_applications = self::get(array('applicationids'=>zbx_objectValues($applications, 'applicationid'), 
 											'editable'=>1, 
 											'extendoutput'=>1, 
 											'preservekeys'=>1));
