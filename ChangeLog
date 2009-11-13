@@ -1,4 +1,4 @@
-Changes for 1.7.1
+Changes for 1.7.2
 
  - [DEV-430] added map labels macro {TRIGGERS.UNACK} (Sasha)
  - [DEV-430] added notification macro {TRIGGER.EVENTS.UNACK} (Sasha)
@@ -9,6 +9,9 @@ Changes for 1.7.1
  - [DEV-411] improved performance of trends module (Sasha)
  - [DEV-428] added new TELNET check 'telnet.run[]' (Sasha)
  - [DEV-428] added new SSH check 'ssh.run[]' (Sasha)
+
+Changes for 1.7.1
+
  - [DEV-339] added internal check zabbix[wcache,*] for cache module (Sasha)
  - [ZBX-1071] move Zabbix client utilities from sbin to bin (Richlv)
 
