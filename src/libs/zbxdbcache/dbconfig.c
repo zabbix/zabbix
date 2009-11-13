@@ -3160,3 +3160,28 @@ unlock:
 
 	return res;
 }
+
+void	DCreset_item_nextcheck(zbx_uint64_t itemid)
+{
+	int		index, dc_nextcheck;
+	ZBX_DC_ITEM	*dc_item;
+
+	LOCK_CACHE;
+
+	index = get_nearestindex(config->items, sizeof(ZBX_DC_ITEM), config->items_num, itemid);
+	if (index == config->items_num)
+		goto unlock;
+
+	dc_item = &config->items[index];
+	if (dc_item->itemid != itemid)
+		goto unlock;
+
+	dc_nextcheck = time(NULL);
+
+	DCupdate_idxitem02(index, &dc_item->poller_type, &dc_item->poller_num, &dc_item->nextcheck,
+			&dc_item->poller_type, &dc_item->poller_num, &dc_nextcheck);
+
+	dc_item->nextcheck = dc_nextcheck;
+unlock:
+	UNLOCK_CACHE;
+}

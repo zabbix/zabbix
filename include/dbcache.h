@@ -251,4 +251,6 @@ void	DCconfig_update_item(zbx_uint64_t itemid, unsigned char status, int now);
 int	DCconfig_activate_host(DC_ITEM *item);
 int	DCconfig_deactivate_host(DC_ITEM *item, int now);
 
+void	DCreset_item_nextcheck(zbx_uint64_t itemid);
+
 #endif

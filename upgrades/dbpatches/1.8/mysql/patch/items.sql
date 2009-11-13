@@ -1,3 +1,4 @@
+alter table items drop nextcheck;
 alter table items add data_type  integer     DEFAULT '0' NOT NULL;
 alter table items add authtype   integer     DEFAULT '0' NOT NULL;
 alter table items add username   varchar(64) DEFAULT ''  NOT NULL;
