@@ -529,7 +529,7 @@ include_once('include/page_header.php');
 		DBstart();
 		foreach($del_hosts as $num => $host){
 			$go_result &= CHost::delete($host);
-//			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$db_host['host'].']');
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$db_host['host'].']');
 		}
 		$go_result = DBend($go_result);
 

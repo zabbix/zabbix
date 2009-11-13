@@ -466,33 +466,6 @@ class CTemplate extends CZBXAPI{
 	}
 
 /**
- * Gets all Template data from DB by Template ID
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @static
- * @param _array $template_data
- * @param array $template_data['templateid']
- * @return array|boolean template data as array or false if error
- */
-	public static function getById($template_data){
-		$sql = 'SELECT * FROM hosts WHERE hostid='.$template_data['templateid'].' AND status=3';
-		$template = DBfetch(DBselect($sql));
-
-		$result = $template ? true : false;
-		if($result)
-			return $template;
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
-			return false;
-		}
-	}
-
-/**
  * Get Template ID by Template name
  *
  * {@source}
@@ -505,20 +478,23 @@ class CTemplate extends CZBXAPI{
  * @param array $template_data['template']
  * @return string templateid
  */
-	public static function getId($template_data){
+	public static function getObjects($template_data){
+		$result = array();
+		$templateid = array();
+		
 		$sql = 'SELECT hostid FROM hosts '.
 			' WHERE host='.zbx_dbstr($template_data['name']).
 				' AND status=3 '.
 				' AND '.DBin_node('hostid', false);
-		$templateid = DBfetch(DBselect($sql));
-
-		$result = $templateid ? true : false;
-		if($result)
-			return $templateid['hostid'];
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
-			return false;
+		$res = DBselect($sql);
+		while($template = DBfetch($res)){
+			$templateids[$template['templateid']] = $template['templateid'];
 		}
+
+		if(!empty($templateids))
+			$result = self::get(array('templateids'=>$templateids, 'extendoutput'=>1));
+		
+	return $result;
 	}
 
 /**

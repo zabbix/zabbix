@@ -460,32 +460,6 @@ class CAction extends CZBXAPI{
 	}
 
 /**
- * Gets all Action data from DB by Action ID
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $action_data
- * @param string $action_data['actionid']
- * @return array|boolean
- */
-	public static function getById($action_data){
-		$sql = 'SELECT * FROM actions WHERE actionid='.$action_data['actionid'];
-		$action = DBfetch(DBselect($sql));
-
-		$result = $action ? true : false;
-		if($result)
-			return $action;
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'action with id: '.$action_data['actionid'].' doesn\'t exists.');
-			return false;
-		}
-	}
-
-/**
  * Add actions
  *
  * {@source}

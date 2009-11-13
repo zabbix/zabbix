@@ -199,9 +199,10 @@ include_once('include/page_header.php');
 
 	}
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['userid'])){
-		$user=CUser::getById(array('userid' => $_REQUEST['userid']));
+		$users = CUser::get(array('userids' => $_REQUEST['userid'],  'extendoutput' => 1));
+		$user = reset($users);
 
-		$result = CUser::delete(zbx_toObject($_REQUEST['userid'], 'userids'));
+		$result = CUser::delete($users);
 		if(!$result) error(CUser::resetErrors());
 
 		show_messages($result, S_USER_DELETED, S_CANNOT_DELETE_USER);
@@ -215,8 +216,11 @@ include_once('include/page_header.php');
 
 // Add USER to GROUP
 	else if(isset($_REQUEST['grpaction'])&&isset($_REQUEST['usrgrpid'])&&isset($_REQUEST['userid'])&&($_REQUEST['grpaction']==1)){
-		$user=CUser::getById(array('userid' => $_REQUEST['userid']));
-		$group=CUserGroup::getById(array('usrgrpid' => $_REQUEST['usrgrpid']));
+		$user = CUser::get(array('userids'=>$_REQUEST['userid'],'extendoutput'=>1));
+		$user = reset($user);
+		
+		$group = CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'],  'extendoutput' => 1));
+		$group = reset($group);
 
 		DBstart();
 		$result = add_user_to_group($_REQUEST['userid'],$_REQUEST['usrgrpid']);
@@ -236,8 +240,11 @@ include_once('include/page_header.php');
 
 // Remove USER from GROUP
 	else if(isset($_REQUEST['grpaction'])&&isset($_REQUEST['usrgrpid'])&&isset($_REQUEST['userid'])&&($_REQUEST['grpaction']==0)){
-		$user=CUser::getById(array('userid' => $_REQUEST['userid']));
-		$group=CUserGroup::getById(array('usrgrpid' => $_REQUEST['usrgrpid']));
+		$user = CUser::get(array('userids'=>$_REQUEST['userid'],'extendoutput'=>1));
+		$user = reset($user);
+		
+		$group = CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'],  'extendoutput' => 1));
+		$group = reset($group);
 
 		DBstart();
 		$result = remove_user_from_group($_REQUEST['userid'],$_REQUEST['usrgrpid']);
@@ -281,12 +288,15 @@ include_once('include/page_header.php');
 		$go_result = false;
 
 		$group_userid = get_request('group_userid', array());
-
+		$db_users = CUser::get(array('userids' => $group_userid, 'extendoutput' => 1));
+		$db_users = zbx_toHash($db_users, 'userid');
+		
 		DBstart();
-		foreach($group_userid as $userid){
-			if(!($user_data = CUser::getById(array('userid' => $userid)))) continue;
+		foreach($group_userid as $ugnum => $userid){
+			if(!isset($db_users[$userid])) continue;
+			$user_data = $db_users[$userid];
 
-			$go_result |= (bool) CUser::delete(zbx_toObject($userid,'userids'));
+			$go_result |= (bool) CUser::delete($user_data);
 			if(!$go_result) error(CUser::resetErrors());
 
 			if($go_result){

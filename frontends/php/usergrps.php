@@ -160,8 +160,9 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 		}
 	}
 	else if(isset($_REQUEST['delete'])){
-		$group = CUserGroup::getById(array('usrgrpid' => $_REQUEST['usrgrpid']));
-
+		$group = CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'], 'extendoutput' => 1));
+		$group = reset($group);
+	
 		DBstart();
 		$result = delete_user_group($_REQUEST['usrgrpid']);
 		$result = DBend($result);

@@ -235,51 +235,32 @@ class CGraphItem extends CZBXAPI{
 	return $result;
 	}
 
-	/**
-	 * Gets all Graphitem data from DB by Graph ID
-	 *
-	 * @static
-	 * @param _array $gitem_data
-	 * @param string $gitem_data['gitemid']
-	 * @return array|boolean host data as array or false if error
-	 */
-	public static function getById($gitem_data){
-		$graph = get_graphitem_by_gitemid($gitem_data['gitemid']);
-
-		$result = $graph ? true : false;
-		if($result)
-			return $graph;
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Graph with id: '.$gitem_data['gitemid'].' doesn\'t exists.');
-			return false;
-		}
-	}
-
-	/**
-	 * Get graphid by graph name
-	 *
-	 * @static
-	 * @param _array $gitem_data
-	 * @param array $gitem_data['itemid']
-	 * @param array $gitem_data['graphid']
-	 * @return string|boolean graphid
-	 */
-	public static function getId($gitem_data){
-		$result = false;
+/**
+ * Get graph items by graph id and graph item id
+ *
+ * @static
+ * @param _array $gitem_data
+ * @param array $gitem_data['itemid']
+ * @param array $gitem_data['graphid']
+ * @return string|boolean graphid
+ */
+	public static function getObjects($gitem_data){
+		$result = array();
+		$gitemids = array();
 
 		$sql = 'SELECT gi.gitemid '.
 				' FROM graphs_items gi '.
 				' WHERE gi.itemid='.$gitem_data['itemid'].
 					' AND gi.graphid='.$gitem_data['graphid'].
 		$db_res = DBselect($sql);
-		if($graph = DBfetch($db_res))
-			$result = $graph['graphid'];
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Host with name: "'.$graph_data['name'].'" doesn\'t exists.');
+		while($gitem = DBfetch($db_res)){
+			$gitemids[$gitem['gitemid']] = $gitem['gitemid'];
 		}
 
+		if(!empty($gitemids))
+			$result = self::get(array('gitemids'=>$gitemids, 'extendoutput'=>1));
+		
 	return $result;
 	}
-
 }
 ?>

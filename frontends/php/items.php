@@ -269,8 +269,10 @@ include_once('include/page_header.php');
 	}
 
 	if(isset($_REQUEST['filter_host']) && !zbx_empty($_REQUEST['filter_host'])){
-		$hostid = CHost::getId(array('host' => $_REQUEST['filter_host']));
-		$hostid = $hostid ? $hostid : 0;
+		$hostid = CHost::getObjects(array('host' => $_REQUEST['filter_host']));
+		$hostid = reset($hostid);
+
+		$hostid = $hostid?$host['hostid']:0;
 	}
 
 // SUBFILTERS {

@@ -159,7 +159,9 @@ include_once('include/page_header.php');
 		$db_acks = get_acknowledges_by_eventid($event['eventid']);
 		while($db_ack = DBfetch($db_acks)){
 
-			$db_user = CUser::getById(array('userid' => $db_ack['userid']));
+			$db_user = CUser::get(array('userids' => $db_ack['userid'], 'extendoutput' => 1));
+			$db_user = reset($db_user);
+			
 			$table->addRow(array(
 				new CCol($db_user['alias'], 'user'),
 				new CCol(date(S_DATE_FORMAT_YMDHMS,$db_ack['clock']),'time')),

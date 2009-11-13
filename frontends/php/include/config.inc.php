@@ -857,8 +857,8 @@ function __autoload($class_name){
 		}
 		else if($permission=='User'){
 			if(isset($id)&&($id!=0)){
-				if($user=CUser::getById(array('userid' => $id)))
-					$res=$user['alias'];
+				$users = CUser::get(array('userids' => $id,  'extendoutput' => 1));
+				if($user = reset($users)) $res = $user['alias'];
 			}
 			else if(!isset($id) || $id == 0){
 				$res='All users';

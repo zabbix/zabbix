@@ -252,31 +252,6 @@ class CUserGroup extends CZBXAPI{
 	}
 
 /**
- * Gets all UserGroup data from DB by usrgrpid.
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $group_data
- * @param array $group_data['usrgrpid'] UserGroup ID
- * @return array|boolean user data as array or false if error
- */
-	public static function getById($group_data){
-
-		$group = DBfetch(DBselect('SELECT * FROM usrgrp WHERE usrgrpid='.$group_data['usrgrpid']));
-
-		if($group)
-			return $group;
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'UserGroup with id: '.$group_data['usrgrpid'].' doesn\'t exists.');
-			return false;
-		}
-	}
-
-/**
  * Get UserGroup ID by UserGroup name.
  *
  * {@source}
@@ -294,19 +269,21 @@ class CUserGroup extends CZBXAPI{
  * @param array $group_data
  * @return string|boolean
  */
-	public static function getId($group_data){
-		$result = false;
+	public static function getObjects($group_data){
+		$result = array();
+		$usrgrpids = array();
 
 		$sql = 'SELECT g.usrgrpid '.
 				' FROM usrgrp g '.
 				' WHERE g.name='.zbx_dbstr($group_data['name']).
 					' AND '.DBin_node('g.usrgrpid', false);
-
-		if($group = DBfetch(DBselect($sql)))
-			$result = $group['usrgrpid'];
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Host with name: "'.$user_data['alias'].'" doesn\'t exists.');
+		$res = DBselect($sql);
+		while($group = DBfetch($res))P
+			$usrgrpids[$group['usrgrpid']] = $group['usrgrpid'];
 		}
+			
+		if(!empty($usrgrpids))
+			$result = self::get(array('usrgrpids'=>$usrgrpids, 'extendoutput'=>1));
 
 	return $result;
 	}

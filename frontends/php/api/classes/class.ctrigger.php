@@ -500,57 +500,51 @@ class CTrigger extends CZBXAPI{
  * @param array $triggers[0,...]['hostid'] OPTIONAL
  * @param array $triggers[0,...]['description'] OPTIONAL
  */
-	public static function getId($triggers){
-		$triggers = zbx_toArray($triggers);
-
-		$result = false;
-
+	public static function getObjects($trigger){
+		$result = array();
 		$triggerids = array();
-		foreach($triggers as $num => $trigger){
-			$sql_where = '';
-			$sql_from = '';
+		
+		$sql_where = '';
+		$sql_from = '';
 
-			if(isset($trigger['hostid']) || isset($trigger['host'])){
-				$sql_from .= ', functions f, items i, hosts h ';
+		if(isset($trigger['hostid']) || isset($trigger['host'])){
+			$sql_from .= ', functions f, items i, hosts h ';
 
-				$sql_where .= ' f.itemid=i.itemid '.
-					' AND f.triggerid=t.triggerid'.
-					' AND i.hostid=h.hostid';
+			$sql_where .= ' f.itemid=i.itemid '.
+				' AND f.triggerid=t.triggerid'.
+				' AND i.hostid=h.hostid';
 
-				if(isset($trigger['hostid']))
-					$sql_where .= ' AND h.hostid='.$trigger['hostid'];
+			if(isset($trigger['hostid']))
+				$sql_where .= ' AND h.hostid='.$trigger['hostid'];
 
-				if(isset($trigger['host']))
-					$sql_where .= ' AND h.host='.zbx_dbstr($trigger['host']);
-			}
+			if(isset($trigger['host']))
+				$sql_where .= ' AND h.host='.zbx_dbstr($trigger['host']);
+		}
 
-			if(isset($trigger['description'])) {
-				$sql_where .= ' AND t.description='.zbx_dbstr($trigger['description']);
-			}
+		if(isset($trigger['description'])) {
+			$sql_where .= ' AND t.description='.zbx_dbstr($trigger['description']);
+		}
 
-			$sql = 'SELECT DISTINCT t.triggerid, t.expression '.
-					' FROM triggers t'.$sql_from.
-					' WHERE '.$sql_where.
-						' AND '.DBin_node('t.triggerid', false);
-			if($db_triggers = DBselect($sql)){
-				$result = true;
+		$sql = 'SELECT DISTINCT t.triggerid, t.expression '.
+				' FROM triggers t'.$sql_from.
+				' WHERE '.$sql_where.
+					' AND '.DBin_node('t.triggerid', false);
+		if($db_triggers = DBselect($sql)){
+			$result = true;
 
-				while($tmp_trigger = DBfetch($db_triggers)) {
-					$tmp_exp = explode_exp($tmp_trigger['expression'], false);
-					if(strcmp($tmp_exp, $trigger['expression']) == 0) {
-						$triggerids[] = array_merge($tmp_trigger, $trigger);
-						break;
-					}
+			while($tmp_trigger = DBfetch($db_triggers)) {
+				$tmp_exp = explode_exp($tmp_trigger['expression'], false);
+				if(strcmp($tmp_exp, $trigger['expression']) == 0) {
+					$triggerids[] = array_merge($tmp_trigger, $trigger);
+					break;
 				}
 			}
 		}
-
-		if($result)
-			return $triggerids;
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
-			return false;
-		}
+	
+		if(!empty($triggerids))
+			$result = self::get(array('triggerids'=>$triggerids, 'extendoutput'=>1));
+		
+	return $result;
 	}
 
 /**

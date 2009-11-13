@@ -281,56 +281,36 @@ class CMaintenance extends CZBXAPI{
 	return $result;
 	}
 
-	/**
-	 * Gets all Maintenance data from DB by Maintenance ID
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param int $maintenance
-	 * @param int $maintenance['maintenanceid']
-	 * @return array|boolean Maintenance data || false if error
-	 */
-	public static function getById($maintenance){
-		$maintenance = get_maintenance_by_maintenanceid($maintenance['maintenanceid']);
-		$result = $maintenance?true:false;
-		if($result)
-			return $maintenance;
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Maintenance with id: '.$maintenance['maintenanceid'].' does not exists.');
-			return false;
+/**
+ * Get Maintenance ID by host.name and item.key
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $maintenance
+ * @param array $maintenance['name']
+ * @param array $maintenance['hostid']
+ * @return int|boolean
+ */
+	public static function getObjects($maintenance){
+		$result = array();
+		$maintenanceids = array();
+
+		$sql = 'SELECT m.maintenanceid '.
+				' FROM maintenances m '.
+				' WHERE m.name='.$maintenance['name'];
+		$res = DBselect($sql);
+		while($maintenance = DBfetch($res)){
+			$maintenanceids[maintenance['maintenanceid']] = $maintenance['maintenanceid'];
 		}
-	}
-
-	/**
-	 * Get Maintenance ID by host.name and item.key
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param array $maintenance
-	 * @param array $maintenance['name']
-	 * @param array $maintenance['hostid']
-	 * @return int|boolean
-	 */
-	public static function getId($maintenance){
-
-		$sql = 'SELECT m.maintenanceid FROM maintenances m WHERE m.name='.$maintenance['name'];
-		$maintenance = DBfetch(DBselect($sql));
-
-		$result = (bool) $maintenance;
-		if($result)
-			return $maintenance['maintenanceid'];
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Maintenance does not exists.');
-			return false;
-		}
+		
+		if(!empty($maintenanceids))
+			$result = self::get(array('maintenanceids'=>$maintenanceids, 'extendoutput'=>1));
+		
+	return $result;
 	}
 
 /**

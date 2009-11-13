@@ -177,8 +177,9 @@ include_once('include/page_header.php');
 
 
 	if($_REQUEST['alias']){
-		$userid = CUser::getId(array('alias' => $_REQUEST['alias']));
-		$options['userids'] = $userid;
+		$user = CUser::getObjects(array('alias' => $_REQUEST['alias']));
+		$user = reset($user);
+		$options['userids'] = $user['userid'];
 	}
 	$alerts = CAlert::get($options);
 

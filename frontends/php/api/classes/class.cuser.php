@@ -337,31 +337,6 @@ class CUser extends CZBXAPI{
 	}
 
 /**
- * Get User data by User ID
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $user_data
- * @param array $user_data['userid'] User ID
- * @return array|boolean User data as array or false if error
- */
-	public static function getById($user_data){
-
-		$user = DBfetch(DBselect('SELECT * FROM users WHERE userid='.$user_data['userid']));
-
-		if($user)
-			return $user;
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'No user with id ['.$user_data['userid'].']');
-			return false;
-		}
-	}
-
-/**
  * Get User ID by User alias
  *
  * {@source}
@@ -374,19 +349,21 @@ class CUser extends CZBXAPI{
  * @param array $user_data['alias'] User alias
  * @return string|boolean
  */
-	public static function getId($user_data){
-		$result = false;
+	public static function getObjects($user_data){
+		$result = array();
+		$userids = array();
 
 		$sql = 'SELECT u.userid '.
 				' FROM users u '.
 				' WHERE u.alias='.zbx_dbstr($user_data['alias']).
 					' AND '.DBin_node('u.userid', false);
-
-		if($user = DBfetch(DBselect($sql)))
-			$result = $user['userid'];
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'User with name: ['.$user_data['alias'].'] doesn\'t exists.');
+		$res = DBselect($sql);
+		while($user = DBfetch($res)){
+			$userids[$user['userid']] = $user['userid'];
 		}
+		
+		if(!empty($userids))
+			$result = self::get(array('userids'=>$userids, 'extendoutput'=>1));
 
 	return $result;
 	}
