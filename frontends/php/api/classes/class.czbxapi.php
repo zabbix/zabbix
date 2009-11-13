@@ -43,7 +43,7 @@ private static $transaction = array('counter' => 0);
 			}
 			else{
 				self::$transaction['counter'] = 2;
-				self::$transaction['owner'] = 'outer';
+				self::$transaction['owner'] = 'DB_CLASS';
 			}
 		}
 
@@ -86,6 +86,16 @@ private static $transaction = array('counter' => 0);
 		}
 
 	return $result;
+	}
+
+	protected static function endAPITransactions($result){
+		if((self::$transaction['counter'] > 0) && (self::$transaction['owner'] != 'DB_CLASS')){
+			unset(self::$transaction['owner']);
+			self::$transaction[$caller] = 0;
+			self::$transaction['counter'] = 0;
+
+			$result = DBend($result);
+		}
 	}
 // TRANSACTION METHODS}
 

@@ -459,19 +459,19 @@ class CAction extends CZBXAPI{
 	return $result;
 	}
 
-	/**
-	 * Gets all Action data from DB by Action ID
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $action_data
-	 * @param string $action_data['actionid']
-	 * @return array|boolean
-	 */
+/**
+ * Gets all Action data from DB by Action ID
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $action_data
+ * @param string $action_data['actionid']
+ * @return array|boolean
+ */
 	public static function getById($action_data){
 		$sql = 'SELECT * FROM actions WHERE actionid='.$action_data['actionid'];
 		$action = DBfetch(DBselect($sql));
@@ -485,32 +485,33 @@ class CAction extends CZBXAPI{
 		}
 	}
 
-	/**
-	 * Add actions
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $actions multidimensional array with actions data
-	 * @param array $actions[0,...]['expression']
-	 * @param array $actions[0,...]['description']
-	 * @param array $actions[0,...]['type'] OPTIONAL
-	 * @param array $actions[0,...]['priority'] OPTIONAL
-	 * @param array $actions[0,...]['status'] OPTIONAL
-	 * @param array $actions[0,...]['comments'] OPTIONAL
-	 * @param array $actions[0,...]['url'] OPTIONAL
-	 * @return boolean
-	 */
+/**
+ * Add actions
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $actions multidimensional array with actions data
+ * @param array $actions[0,...]['expression']
+ * @param array $actions[0,...]['description']
+ * @param array $actions[0,...]['type'] OPTIONAL
+ * @param array $actions[0,...]['priority'] OPTIONAL
+ * @param array $actions[0,...]['status'] OPTIONAL
+ * @param array $actions[0,...]['comments'] OPTIONAL
+ * @param array $actions[0,...]['url'] OPTIONAL
+ * @return boolean
+ */
 	public static function add($actions){
-
+		$actions = zbx_toArray($actions);
 		$actionids = array();
-		self::BeginTransaction(__METHOD__);
-
+		
 		$result = false;
-		foreach($actions as $num => $action){
+		
+		self::BeginTransaction(__METHOD__);
+		foreach($actions as $anum => $action){
 			$action_db_fields = array(
 				'actionid'		=> null,
 				'eventid'		=> null,
@@ -541,51 +542,63 @@ class CAction extends CZBXAPI{
 						$action['status'].','.$action['retries'].','.zbx_dbstr($action['error']).','.$action['nextcheck'].','.
 						$action['esc_step'].','.$action['actiontype'].' )';
 			$result = DBexecute($sql);
+
 			if(!$result) break;
-			$actionids[$actionid] = $actionid;
+			$actionids[] = $actionid;
 		}
 
 		$result = self::EndTransaction($result, __METHOD__);
-		if($result)
-			return $actionids;
+		if($result){
+			$new_actions = CAction::get(array('actionids'=>$actionids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			return $new_actions;
+		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
 
-	/**
-	 * Update actions
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $actions multidimensional array with actions data
-	 * @param array $actions[0,...]['actionid']
-	 * @param array $actions[0,...]['expression']
-	 * @param array $actions[0,...]['description']
-	 * @param array $actions[0,...]['type'] OPTIONAL
-	 * @param array $actions[0,...]['priority'] OPTIONAL
-	 * @param array $actions[0,...]['status'] OPTIONAL
-	 * @param array $actions[0,...]['comments'] OPTIONAL
-	 * @param array $actions[0,...]['url'] OPTIONAL
-	 * @return boolean
-	 */
+/**
+ * Update actions
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $actions multidimensional array with actions data
+ * @param array $actions[0,...]['actionid']
+ * @param array $actions[0,...]['expression']
+ * @param array $actions[0,...]['description']
+ * @param array $actions[0,...]['type'] OPTIONAL
+ * @param array $actions[0,...]['priority'] OPTIONAL
+ * @param array $actions[0,...]['status'] OPTIONAL
+ * @param array $actions[0,...]['comments'] OPTIONAL
+ * @param array $actions[0,...]['url'] OPTIONAL
+ * @return boolean
+ */
 	public static function update($actions){
-
+		$actions = zbx_toArray($actions);
+		$actionids = array();
+		
+		$upd_actions = CAction::get(array('actionids'=>zbx_objectValues($actions, 'actionid'), 
+											'editable'=>1, 
+											'extendoutput'=>1, 
+											'preservekeys'=>1));
+		foreach($actions as $anum => $action){
+			if(!isset($upd_actions[$action['actionid']])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				return false;
+			}
+			$actionids[] = $action['actionid'];
+		}
+		
 		$result = true;
 
 		self::BeginTransaction(__METHOD__);
-		foreach($actions as $action){
-			$action_db_fields = CAction::getById($action);
-
-			if(!$action_db_fields){
-				$result = false;
-				break;
-			}
+		foreach($actions as $anum => $action){
+			$action_db_fields = $upd_actions[$action['actionid']];
 
 			if(!check_db_fields($action_db_fields, $action)){
 				$result = false;
@@ -600,31 +613,35 @@ class CAction extends CZBXAPI{
 		}
 
 		$result = self::EndTransaction($result, __METHOD__);
-		if($result)
-			return true;
+
+		if($result){
+			$upd_actions = CAction::get(array('actionids'=>$actionids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			return $upd_actions;
+		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
 
-	/**
-	 * add conditions
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $conditions multidimensional array with conditions data
-	 * @param array $conditions[0,...]['actionid']
-	 * @param array $conditions[0,...]['type']
-	 * @param array $conditions[0,...]['value']
-	 * @param array $conditions[0,...]['operator']
-	 * @return boolean
-	 */
+/**
+ * add conditions
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $conditions multidimensional array with conditions data
+ * @param array $conditions[0,...]['actionid']
+ * @param array $conditions[0,...]['type']
+ * @param array $conditions[0,...]['value']
+ * @param array $conditions[0,...]['operator']
+ * @return boolean
+ */
 	public static function addConditions($conditions){
+		$conditions = zbx_toArray($conditions);
 		$result = true;
 
 		if(!check_permission_for_action_conditions($conditions)){
@@ -632,7 +649,7 @@ class CAction extends CZBXAPI{
 			return false;
 		}
 
-		foreach($conditions as $condition){
+		foreach($conditions as $cnum => $condition){
 			if( !validate_condition($condition['type'],$condition['value']) ){
 				self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 				return false;
@@ -640,54 +657,55 @@ class CAction extends CZBXAPI{
 		}
 
 		self::BeginTransaction(__METHOD__);
-		foreach($conditions as $condition){
+		foreach($conditions as $cnum => $condition){
 
 			$result = add_action_condition($condition['actionid'], $condition);
 			if(!$result) break;
 		}
 		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result)
-			return true;
+		if($result){
+			return $conditions;
+		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
 
-	/**
-	 * add operations
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $operations multidimensional array with operations data
-	 * @param array $operations[0,...]['actionid']
-	 * @param array $operations[0,...]['operationtype']
-	 * @param array $operations[0,...]['object']
-	 * @param array $operations[0,...]['objectid']
-	 * @param array $operations[0,...]['shortdata']
-	 * @param array $operations[0,...]['longdata']
-	 * @param array $operations[0,...]['esc_period']
-	 * @param array $operations[0,...]['esc_step_from']
-	 * @param array $operations[0,...]['esc_step_to']
-	 * @param array $operations[0,...]['default_msg']
-	 * @param array $operations[0,...]['evaltype']
-	 * @param array $operations[0,...]['mediatypeid']
-	 * @param array $operations[0,...]['opconditions']
-	 * @param array $operations[0,...]['opconditions']['conditiontype']
-	 * @param array $operations[0,...]['opconditions']['operator']
-	 * @param array $operations[0,...]['opconditions']['value']
-	 * @return boolean
-	 */
+/**
+ * add operations
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $operations multidimensional array with operations data
+ * @param array $operations[0,...]['actionid']
+ * @param array $operations[0,...]['operationtype']
+ * @param array $operations[0,...]['object']
+ * @param array $operations[0,...]['objectid']
+ * @param array $operations[0,...]['shortdata']
+ * @param array $operations[0,...]['longdata']
+ * @param array $operations[0,...]['esc_period']
+ * @param array $operations[0,...]['esc_step_from']
+ * @param array $operations[0,...]['esc_step_to']
+ * @param array $operations[0,...]['default_msg']
+ * @param array $operations[0,...]['evaltype']
+ * @param array $operations[0,...]['mediatypeid']
+ * @param array $operations[0,...]['opconditions']
+ * @param array $operations[0,...]['opconditions']['conditiontype']
+ * @param array $operations[0,...]['opconditions']['operator']
+ * @param array $operations[0,...]['opconditions']['value']
+ * @return boolean
+ */
 	public static function addOperations($operations){
-
+		$operations = zbx_toArray($operations);
 		$result = true;
 
-		foreach($operations as $operation){
+		foreach($operations as $onum => $operation){
 			if(!validate_operation($operation)){
 				self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 				return false;
@@ -695,14 +713,15 @@ class CAction extends CZBXAPI{
 		}
 
 		self::BeginTransaction(__METHOD__);
-		foreach($operations as $operation){
+		foreach($operations as $onum => $operation){
 			$result = add_action_operation($operation['actionid'], $operation);
 			if(!$result) break;
 		}
 		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result)
-			return true;
+		if($result){
+			return $operations;
+		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
@@ -722,9 +741,23 @@ class CAction extends CZBXAPI{
  * @param array $actionids['actionids']
  * @return boolean
  */
-	public static function delete($actionids){
-		$actionids = isset($actionids['actionids']) ? $actionids['actionids'] : array();
-		zbx_value2array($actionids);
+	public static function delete($actions){
+		$actions = zbx_toArray($actions);		
+		$actionids = array();
+		
+		$del_actions = Caction::get(array('actionids'=>zbx_objectValues($actions, 'actionid'), 
+											'editable'=>1, 
+											'extendoutput'=>1, 
+											'preservekeys'=>1));
+		foreach($actions as $anum => $action){
+			if(!isset($del_actions[$action['actionid']])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				return false;
+			}
+
+			$actionids[] = $action['actionid'];
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ACTION, 'Action ['.$action['name'].']');
+		}
 
 		if(!empty($actionids)){
 			$sql = 'DELETE FROM actions WHERE '.DBcondition('actionid', $actionids);
@@ -735,8 +768,9 @@ class CAction extends CZBXAPI{
 			$result = false;
 		}
 
-		if($result)
-			return true;
+		if($result){
+			return zbx_cleanHashes($del_actions);
+		}
 		else{
 			self::setError(__METHOD__);
 			return false;

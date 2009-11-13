@@ -365,20 +365,24 @@ class CApplication extends CZBXAPI{
  * @return boolean
  */
 	public static function add($applications){
-
-		$result = false;
+		$applications = zbx_toArray($applications);
 		$applicationids = array();
+		
+		$result = false;
 
 		self::BeginTransaction(__METHOD__);
-		foreach($applications as $application){
+		foreach($applications as $anum => $application){
 			$result = add_application($application['name'], $application['hostid']);
+			
 			if(!$result) break;
-			$applicationids[$result] = $result;
+			$applicationids[] = $result;
 		}
 		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result)
-			return $applicationids;
+		if($result){
+			$new_applications = CApplication::get(array('applicationids'=>$applicationids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			return $new_applications;
+		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
@@ -400,18 +404,43 @@ class CApplication extends CZBXAPI{
  * @return boolean
  */
 	public static function update($applications){
-
+		$applications = zbx_toArray($applications);
+		$applicationids = array();
+		
+		$upd_applications = CApplication::get(array('applicationids'=>zbx_objectValues($applications, 'applicationid'), 
+											'editable'=>1, 
+											'extendoutput'=>1, 
+											'preservekeys'=>1));
+		foreach($applications as $anum => $application){
+			if(!isset($upd_applications[$application['applicationid']])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				return false;
+			}
+			$applicationids[] = $application['applicationid'];
+		}
+		
 		$result = false;
 
 		self::BeginTransaction(__METHOD__);
-		foreach($applications as $application){
+		foreach($applications as $anum => $application){
+			$application_db_fields = $upd_applications[$application['applicationid']];
+
+			if(!check_db_fields($application_db_fields, $application)){
+				error('Incorrect arguments pasted to function [CApplication::update]');
+				$result = false;
+				break;
+			}
+			
 			$result = update_application($application['applicationid'], $application['name'], $application['hostid']);
+			
 			if(!$result) break;
 		}
 		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result)
-			return true;
+		if($result){
+			$upd_applications = CApplication::get(array('applicationids'=>$applicationids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			return $upd_applications;
+		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
@@ -427,13 +456,27 @@ class CApplication extends CZBXAPI{
  * @since 1.8
  * @version 1
  *
- * @param _array $applicationids
- * @param array $applicationids['applicationids']
+ * @param _array $applications
+ * @param array $applications[0,...]['applicationid']
  * @return boolean
  */
-	public static function delete($applicationids){
-		$applicationids = isset($applicationids['applicationids']) ? $applicationids['applicationids'] : array();
-		zbx_value2array($applicationids);
+	public static function delete($applications){
+		$applications = zbx_toArray($applications);		
+		$applicationids = array();
+		
+		$del_applications = CApplication::get(array('applicationids'=>zbx_objectValues($applications, 'applicationid'), 
+											'editable'=>1, 
+											'extendoutput'=>1, 
+											'preservekeys'=>1));
+		foreach($applications as $anum => $application){
+			if(!isset($del_applications[$application['applicationid']])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				return false;
+			}
+
+			$applicationids[] = $application['applicationid'];
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_APPLICATION, 'application ['.$application['name'].']');
+		}
 
 		if(!empty($applicationids)){
 			$result = delete_application($applicationids);
@@ -443,8 +486,9 @@ class CApplication extends CZBXAPI{
 			$result = false;
 		}
 
-		if($result)
-			return true;
+		if($result){
+			return zbx_cleanHashes($del_applications);
+		}
 		else{
 			self::setError(__METHOD__);
 			return false;

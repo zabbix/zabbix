@@ -516,27 +516,73 @@ class CUserGroup extends CZBXAPI{
  * @version 1
  *
  * <code>
- * $data = array(
- * 	*string 'usrgrpid' => 'UserGroup ID',
- * 	*array 'userids' => ('User ID', 'User ID', ...)
- * )
+ * 	@param $usrgrps[0,...]['usrgrpids']
+ * 	@param $users[0,...]['userids']
  * </code>
  *
  * @param array $data
  * @return boolean
  */
-	public static function addUsers($data){
+	public static function addUsers($usrgrps, $users){
+		self::BeginTransaction(__METHOD__);
+
+		global $USER_DETAILS;
+		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can remove Users from Groups');
+			return false;
+		}
+
+		$usrgrps = zbx_toArray($usrgrps);
+		$usrgrpids = array();
+		$dep_usrgrps = array();
+
+		$upd_usrgrps = self::get(array('usrgrpids'=>zbx_objectValues($usrgrps, 'usrgrpid'), 
+											'extendoutput'=>1, 
+											'preservekeys'=>1));
+		foreach($usrgrps as $ugnum => $usrgrp){
+			if(($usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED) || ($usrgrp['users_status'] == GROUP_STATUS_DISABLED)){
+				$dep_usrgrps[$usrgrp['usrgrpid']] = $usrgrp['usrgrpid'];
+			}
+
+			$usrgrpids[] = $usrgrp['usrgrpid'];
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER_GROUP, 'User group ['.$usrgrp['name'].']');
+		}
+
+		$users = zbx_toArray($users);
+		$userids = array();
+
+		$upd_users = self::get(array('userids'=>zbx_objectValues($users, 'userid'), 
+											'extendoutput'=>1, 
+											'preservekeys'=>1));
+		foreach($users as $gnum => $user){
+			if((bccomp($USER_DETAILS['userid'],$user['userid']) == 0) && !empty($dep_usrgrps)){
+				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, S_USER_CANNOT_CHANGE_STATUS);
+				$result = false;
+			}
+
+			$userids[] = $user['userid'];
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER, 'User ['.$user['alias'].']');
+		}
+		
 		$result = false;
 
-		self::BeginTransaction(__METHOD__);
-		foreach($data['userids'] as $userid){
-			$result = add_user_to_group($userid, $data['usrgrpid']);
+		self::removeUsers($usrgrps, $users);
+		foreach($usrgrps as $ugnum => $usrgrp){
+			foreach($users as $unaum => $user){
+				$result = add_user_to_group($userid, $usrgrp['usrgrpid']);
+			}
+
 			if(!$result) break;
 		}
+
 		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result)
-			return true;
+		if($result){
+			$upd_usrgrps = self::get(array('usrgrpids'=>zbx_objectValues($usrgrps, 'usrgrpid'), 
+											'extendoutput'=>1, 
+											'select_users'=>1));
+			return $upd_usrgrps;
+		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
@@ -553,27 +599,57 @@ class CUserGroup extends CZBXAPI{
  * @version 1
  *
  * <code>
- * $data = array(
- * 	*string 'usrgrpid' => 'UserGroup ID',
- * 	*array 'userids' => ('User ID', 'User ID', ...)
- * )
+ * 	@param $usrgrps[0,...]['usrgrpids']
+ * 	@param $users[0,...]['userids']
  * </code>
  *
  * @param array $data
  * @return boolean
  */
-	public static function removeUsers($data){
-		$result = false;
-
+	public static function removeUsers($usrgrps, $users){
 		self::BeginTransaction(__METHOD__);
-		foreach($data['userids'] as $userid){
-			$result = remove_user_from_group($userid, $data['usrgrpid']);
+
+		global $USER_DETAILS;
+		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can remove Users from Groups');
+			return false;
+		}
+
+		$usrgrps = zbx_toArray($usrgrps);
+		$usrgrpids = array();
+
+		$upd_usrgrps = self::get(array('usrgrpids'=>zbx_objectValues($usrgrps, 'usrgrpid'), 
+											'extendoutput'=>1, 
+											'preservekeys'=>1));
+		foreach($usrgrps as $ugnum => $usrgrp){
+			$usrgrpids[] = $usrgrp['usrgrpid'];
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER_GROUP, 'User group ['.$usrgrp['name'].']');
+		}
+		
+		$users = zbx_toArray($users);
+		$userids = array();
+
+		$upd_users = self::get(array('userids'=>zbx_objectValues($users, 'userid'), 
+											'extendoutput'=>1, 
+											'preservekeys'=>1));
+		foreach($users as $gnum => $user){
+			$userids[] = $user['userid'];
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER, 'User ['.$user['alias'].']');
+		}
+
+		foreach($usrgrps as $ugnum => $usrgrp){
+			$result = DBexecute('DELETE FROM users_groups WHERE usrgrpid='.$usrgrpid.' AND '.DBcondition('userid', $userids));
 			if(!$result) break;
 		}
+
 		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result)
-			return true;
+		if($result){
+			$upd_usrgrps = self::get(array('usrgrpids'=>zbx_objectValues($usrgrps, 'usrgrpid'), 
+											'extendoutput'=>1, 
+											'select_users'=>1));
+			return $upd_usrgrps;
+		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
@@ -593,26 +669,44 @@ class CUserGroup extends CZBXAPI{
  * @param array $groupids['usrgrpids']
  * @return boolean
  */
-	public static function delete($usrgrpids){
+	public static function delete($usrgrps){
+		self::BeginTransaction(__METHOD__);
+
+		global $USER_DETAILS;
+		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can delete User Groups');
+			return false;
+		}
+
+		$usrgrps = zbx_toArray($usrgrps);
+		$usrgrpids = array();
+
+		$del_usrgrps = self::get(array('usrgrpids'=>zbx_objectValues($usrgrps, 'usrgrpid'), 
+											'extendoutput'=>1, 
+											'preservekeys'=>1));
+		foreach($usrgrps as $gnum => $usrgrp){
+			$usrgrpids[] = $usrgrp['usrgrpid'];
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER_GROUP, 'User group ['.$usrgrp['name'].']');
+		}
+		
 		$result = false;
-		$usrgrpids = isset($usrgrpids['usrgrpids']) ? $usrgrpids['usrgrpids'] : array();
-		$usrgrpids = zbx_value2array($usrgrpids);
 
 		if(!empty($usrgrpids)){
-			self::BeginTransaction(__METHOD__);
 			foreach($usrgrpids as $groupid){
 				$result = delete_user_group($groupid);
 				if(!$result) break;
 			}
-			$result = self::EndTransaction($result, __METHOD__);
 		}
 		else{
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ usrgrpids ]');
 			$result = false;
 		}
 
-		if($result)
-			return true;
+		$result = self::EndTransaction($result, __METHOD__);
+			
+		if($result){
+			return zbx_cleanHashes($del_users);
+		}
 		else{
 			self::setError(__METHOD__);
 			return false;

@@ -783,25 +783,26 @@ require_once('include/httptest.inc.php');
 	}
 
 	function get_host_by_hostid($hostid,$no_error_message=0){
-
-		$sql="select * from hosts where hostid=$hostid";
+		$sql='SELECT * FROM hosts WHERE hostid='.$hostid;
 		$result=DBselect($sql);
 		$row=DBfetch($result);
-		if($row)
-		{
+		if($row){
 			return $row;
 		}
 		if($no_error_message == 0)
-			error("No host with hostid=[$hostid]");
-		return	false;
+			error('No host with hostid=['.$hostid.']');
+
+	return	false;
 	}
 
 	function get_hosts_by_templateid($templateids){
 		zbx_value2array($templateids);
-		return DBselect('SELECT h.* '.
-						' FROM hosts h, hosts_templates ht '.
-						' WHERE h.hostid=ht.hostid '.
-							' AND '.DBcondition('ht.templateid',$templateids));
+		$sql = 'SELECT h.* '.
+				' FROM hosts h, hosts_templates ht '.
+				' WHERE h.hostid=ht.hostid '.
+					' AND '.DBcondition('ht.templateid',$templateids);
+
+	return DBselect($sql);
 	}
 
 // Update Host status
