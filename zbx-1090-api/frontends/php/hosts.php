@@ -530,7 +530,8 @@ include_once('include/page_header.php');
 			$go_result = CHost::delete($host);
 			
 			if(!$go_result) break;
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$host['host'].']');
+			$go_result = reset($go_result);
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$go_result['host'].']');
 		}
 		$go_result = DBend($go_result);
 

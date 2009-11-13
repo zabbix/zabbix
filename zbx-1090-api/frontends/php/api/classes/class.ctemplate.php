@@ -799,27 +799,42 @@ class CTemplate extends CZBXAPI{
 		$result = true;
 		$error = '';
 
-		$hostid = $data['hostid'];
-		$templateids = $data['templateids'];
+		$hosts = $data['hosts'];
+		$templates = $data['templates'];
+		
+		$hosts = zbx_toArray($hosts);
+		
+		$templates = zbx_toArray($templates);
 
 		self::BeginTransaction(__METHOD__);
 
-		foreach($templateids as $templateid){
+		foreach($templates as $tnum => $template){
+			$templateid = $template['templateid'];
+			
 			$hosttemplateid = get_dbid('hosts_templates', 'hosttemplateid');
-			if(!$result = DBexecute('INSERT INTO hosts_templates VALUES ('.$hosttemplateid.','.$hostid.','.$templateid.')'))
+			foreach($hosts as $hnum => $host){
+				if(!$result = DBexecute('INSERT INTO hosts_templates VALUES ('.$hosttemplateid.','.$host['hostid'].','.templateid.')'))
+				$result = false;
 				break;
+			}
+			if(!$result) break;
 		}
+
 		if($result){
-			foreach($templateids as $templateid){
-//				$result = sync_host_with_templates($hostid, $templateid);
-				sync_host_with_templates($hostid, $templateid);
+			foreach($templates as $tnum => $template){
+				foreach($hosts as $hnum => $host){
+//					$result = sync_host_with_templates($hostid, $templateid);
+					sync_host_with_templates($hostid, $template['templateid']);
+				}
 //				if(!$result) break;
 			}
 		}
+
 		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result)
+		if($result){
 			return true;
+		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
 			return false;

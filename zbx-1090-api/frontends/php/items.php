@@ -272,7 +272,7 @@ include_once('include/page_header.php');
 		$hostid = CHost::getObjects(array('host' => $_REQUEST['filter_host']));
 		$hostid = reset($hostid);
 
-		$hostid = $hostid?$host['hostid']:0;
+		$hostid = $hostid?$hostid['hostid']:0;
 	}
 
 // SUBFILTERS {

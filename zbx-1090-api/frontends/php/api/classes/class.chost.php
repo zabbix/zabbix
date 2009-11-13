@@ -701,7 +701,6 @@ class CHost extends CZBXAPI{
 
 		if($result){
 			$new_hosts = self::get(array('hostids'=>$hostids, 'editable'=>1, 'extendoutput'=>1, 'nopermissions'=>1));
-SDI($new_hosts);
 			return $new_hosts;
 		}
 		else{
