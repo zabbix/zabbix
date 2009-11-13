@@ -377,7 +377,7 @@ class CTemplate extends CZBXAPI{
 // Adding Templates
 		if($options['select_templates']){
 			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids, 'preservekeys' => 1);
-			$templates = CTemplate::get($obj_params);
+			$templates = self::get($obj_params);
 			foreach($templates as $templateid => $template){
 				foreach($template['hostids'] as $num => $hostid){
 					$result[$hostid]['templateids'][$templateid] = $templateid;
@@ -600,7 +600,7 @@ class CTemplate extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_templates = CTemplate::get(array('templateids'=>$templateids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$new_templates = self::get(array('templateids'=>$templateids, 'extendoutput'=>1, 'nopermissions'=>1));			
 			return $new_templates;
 		}
 		else{
@@ -625,7 +625,7 @@ class CTemplate extends CZBXAPI{
 		$templates = zbx_toArray($templates);
 		$templateids = array();
 
-		$upd_templates = CTemplate::get(array('templateids'=>zbx_objectValues($templates, 'templateid'), 
+		$upd_templates = self::get(array('templateids'=>zbx_objectValues($templates, 'templateid'), 
 									'editable'=>1, 
 									'extendoutput'=>1, 
 									'preservekeys'=>1));
@@ -667,7 +667,7 @@ class CTemplate extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_templates = CTemplate::get(array('templateids'=>$templateids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$upd_templates = self::get(array('templateids'=>$templateids, 'extendoutput'=>1, 'nopermissions'=>1));			
 			return $upd_templates;
 		}
 		else{
@@ -693,7 +693,7 @@ class CTemplate extends CZBXAPI{
 		$templates = zbx_toArray($templates);
 		$templateids = array();
 
-		$del_templates = CTemplate::get(array('templateids'=>zbx_objectValues($templates, 'templateid'), 
+		$del_templates = self::get(array('templateids'=>zbx_objectValues($templates, 'templateid'), 
 											'editable'=>1, 
 											'extendoutput'=>1, 
 											'preservekeys'=>1));
