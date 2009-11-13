@@ -309,7 +309,7 @@ include_once('include/page_header.php');
 		S_STATUS,
 		make_sorting_header(S_LAST_CHANGE,'lastchange'),
 		is_show_all_nodes() ? S_NODE : null,
-		($_REQUEST['hostid']>0) ? null : S_HOST,
+		S_HOST,
 		make_sorting_header(S_NAME,'description'),
 		$show_event_col ? S_ACKNOWLEDGED : NULL,
 		S_COMMENTS
@@ -413,8 +413,7 @@ include_once('include/page_header.php');
 		$description = new CSpan($description, 'link_menu');
 
 // trigger description js menu {{{
-		$host = null;
-		$hosts = array_pop($trigger['hosts']);
+		$hosts = reset($trigger['hosts']);
 		$trigger['hostid'] = $hosts['hostid'];
 		$trigger['host'] = $hosts['host'];
 
@@ -499,16 +498,17 @@ include_once('include/page_header.php');
 		$value = new CSpan($tr_status, get_trigger_value_style($trigger['value']));
 
 // host JS menu {{{
-		if($_REQUEST['hostid'] < 1){
 
+		$hosts_list = array();
+		foreach($trigger['hosts'] as $num => $trigger_host){
 			$menus = '';
 
-			$host_nodeid = id2nodeid($trigger['hostid']);
-			if(isset($scripts_by_hosts[$trigger['hostid']])){
-				foreach($scripts_by_hosts[$trigger['hostid']] as $id => $script){
+			$host_nodeid = id2nodeid($trigger_host['hostid']);
+			if(isset($scripts_by_hosts[$trigger_host['hostid']])){
+				foreach($scripts_by_hosts[$trigger_host['hostid']] as $id => $script){
 					$script_nodeid = id2nodeid($script['scriptid']);
 					if( (bccomp($host_nodeid, $script_nodeid ) == 0))
-						$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$trigger['hostid']."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+						$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$trigger_host['hostid']."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 				}
 			}
 			if(!empty($scripts_by_hosts)){
@@ -516,14 +516,34 @@ include_once('include/page_header.php');
 			}
 
 			$menus.= "[".zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
-			$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?hostid=".$trigger['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+			$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?hostid=".$trigger_host['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 
 			$menus = rtrim($menus,',');
 			$menus='show_popup_menu(event,['.$menus.'],180);';
+			
+			$maint_span = null;
+			if($trigger_host['maintenance_status']){
+				$text = $trigger_host['maintenance_type'] ? S_NO_DATA_MAINTENANCE : S_NORMAL_MAINTENANCE;
+				$text = ' ['.$text.']';
+				$maint_span = new CSpan($text, 'orange pointer');
+				
+				$maintenance = CMaintenance::get(array('maintenanceids' => $trigger_host['maintenanceid'], 'extendoutput' => 1));
+				$maintenance = reset($maintenance);
+				$maint_hint = new CSpan($maintenance['name'].($maintenance['description']=='' ? '' : ': '.$maintenance['description']));
+				
+				$maint_span->setHint($maint_hint);
+			}
 
-			$host = new CSpan($trigger['host'], 'link_menu');
-			$host->setAttribute('onclick','javascript: '.$menus);
+			
+			$hosts_span = new CSpan($trigger_host['host'], 'link_menu');
+			$hosts_span->setAttribute('onclick','javascript: '.$menus);
+			$hosts_list[] = $hosts_span;
+			$hosts_list[] = $maint_span;
+			$hosts_list[] = ', ';
 		}
+
+		array_pop($hosts_list);
+		$host = new CCol($hosts_list);
 // }}} host JS menu
 
 		$tr_desc = new CSpan($description);
