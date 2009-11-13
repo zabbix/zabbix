@@ -535,7 +535,7 @@ class CGraph extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_graphs = CGraph::get(array('graphids'=>$graphids, 'extendoutput'=>1, 'nopermissions'=>1, 'select_graph_items'=>1));
+			$new_graphs = self::get(array('graphids'=>$graphids, 'extendoutput'=>1, 'nopermissions'=>1, 'select_graph_items'=>1));
 			return $new_graphs;
 		}
 		else{
@@ -555,7 +555,7 @@ class CGraph extends CZBXAPI{
 		$graphs = zbx_toArray($graphs);
 		$graphids = array();
 
-		$upd_graphs = CGraph::get(array('graphids'=>zbx_objectValues($graphs, 'graphid'), 
+		$upd_graphs = self::get(array('graphids'=>zbx_objectValues($graphs, 'graphid'), 
 									'editable'=>1, 
 									'extendoutput'=>1, 
 									'preservekeys'=>1));
@@ -589,7 +589,7 @@ class CGraph extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_graphs = CGraph::get(array('graphids'=>$graphids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$upd_graphs = self::get(array('graphids'=>$graphids, 'extendoutput'=>1, 'nopermissions'=>1));			
 			return $upd_graphs;
 		}
 		else{
@@ -610,7 +610,7 @@ class CGraph extends CZBXAPI{
 		$graphs = zbx_toArray($graphs);
 		$graphids = array();
 		
-		$del_graphs = CGraph::get(array('graphids'=>zbx_objectValues($graphs, 'graphid'), 
+		$del_graphs = self::get(array('graphids'=>zbx_objectValues($graphs, 'graphid'), 
 											'editable'=>1, 
 											'extendoutput'=>1, 
 											'preservekeys'=>1));
@@ -699,7 +699,7 @@ class CGraph extends CZBXAPI{
 		}
 
 		// check if graph is templated graph, then items cannot be added
-		$graph = CGraph::getById(array('graphid' => $graphid));
+		$graph = self::getById(array('graphid' => $graphid));
 		if($graph['templateid'] != 0){
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Cannot edit templated graph : '.$graph['name']);
 			return false;
@@ -778,7 +778,7 @@ class CGraph extends CZBXAPI{
 
 		if(!$force){
 			// check if graph is templated graph, then items cannot be deleted
-			$graph = CGraph::getById(array('graphid' => $graphid));
+			$graph = self::getById(array('graphid' => $graphid));
 			if($graph['templateid'] != 0){
 				self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Cannot edit templated graph : '.$graph['name']);
 				return false;

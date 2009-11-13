@@ -713,8 +713,6 @@ class CTrigger extends CZBXAPI{
  * @return deleted triggers
  */
 	public static function delete($triggers){
-		self::BeginTransaction(__METHOD__);
-
 		$triggers = zbx_toArray($triggers);		
 		$triggerids = array();
 
@@ -732,6 +730,7 @@ class CTrigger extends CZBXAPI{
 			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, 'Trigger ['.$trigger['description'].']');
 		}
 
+		self::BeginTransaction(__METHOD__);
 		if(!empty($triggerids)){
 			$result = delete_trigger($triggerids);
 		}

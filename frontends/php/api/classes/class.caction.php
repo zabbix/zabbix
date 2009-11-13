@@ -759,6 +759,7 @@ class CAction extends CZBXAPI{
 			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ACTION, 'Action ['.$action['name'].']');
 		}
 
+		self::BeginTransaction(__METHOD__);
 		if(!empty($actionids)){
 			$sql = 'DELETE FROM actions WHERE '.DBcondition('actionid', $actionids);
 			$result = DBexecute($sql);
@@ -767,6 +768,8 @@ class CAction extends CZBXAPI{
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ actionids ]');
 			$result = false;
 		}
+		
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
 			return zbx_cleanHashes($del_actions);

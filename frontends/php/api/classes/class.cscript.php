@@ -382,7 +382,7 @@ class Cscript extends CZBXAPI{
 //------
 
 		self::BeginTransaction(__METHOD__);
-		foreach($scripts as $num => $script){
+		foreach($scripts as $snum => $script){
 			$script_db_fields = array(
 				'name' => null,
 				'command' => null,

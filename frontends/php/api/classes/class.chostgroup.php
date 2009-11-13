@@ -427,7 +427,7 @@ class CHostGroup extends CZBXAPI{
 			}
 			$group = $group['name'];
 
-			$group_exist = CHostGroup::getId(array('name' => $group));
+			$group_exist = self::getId(array('name' => $group));
 			if($group_exist != false){
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => "HostGroup [ $group ] already exists");
 				$result = false;
@@ -493,7 +493,7 @@ class CHostGroup extends CZBXAPI{
 		self::BeginTransaction(__METHOD__);
 		foreach($groups as $num => $group){
 
-			$group_exist = CHostGroup::getId(array('name' => $group['name']));
+			$group_exist = self::getId(array('name' => $group['name']));
 			if($group_exist && ($group_exist != $group['groupid'])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'HostGroup [ '.$group['name'].' ] already exists');
 				$result = false;
@@ -633,7 +633,9 @@ class CHostGroup extends CZBXAPI{
 
 */
 		self::BeginTransaction(__METHOD__);
+		
 		$result = delete_host_group($groupids);
+		
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){

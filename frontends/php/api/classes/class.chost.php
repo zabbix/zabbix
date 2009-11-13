@@ -719,7 +719,7 @@ class CHost extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_hosts = CHost::get(array('hostids'=>$hostids, 'editable'=>1, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$new_hosts = self::get(array('hostids'=>$hostids, 'editable'=>1, 'extendoutput'=>1, 'nopermissions'=>1));			
 			return $new_hosts;
 		}
 		else{
@@ -758,7 +758,7 @@ class CHost extends CZBXAPI{
 		$hosts = zbx_toArray($hosts);
 		$hostids = array();
 		
-		$upd_hosts = CHost::get(array('hostids'=> zbx_objectValues($hosts, 'hostid'), 'editable'=>1, 'extendoutput'=>1, 'preservekeys'=>1));
+		$upd_hosts = self::get(array('hostids'=> zbx_objectValues($hosts, 'hostid'), 'editable'=>1, 'extendoutput'=>1, 'preservekeys'=>1));
 		foreach($hosts as $gnum => $host){
 			if(!isset($upd_hosts[$host['hostid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
@@ -793,7 +793,7 @@ class CHost extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_hosts = CHost::get(array('hostids'=>$hostids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$upd_hosts = self::get(array('hostids'=>$hostids, 'extendoutput'=>1, 'nopermissions'=>1));			
 			return $upd_hosts;
 		}
 		else{
@@ -837,7 +837,7 @@ class CHost extends CZBXAPI{
 		$hosts = zbx_toArray($hosts);
 		$hostids = array();
 		
-		$upd_hosts = CHost::get(array('hostids'=> zbx_objectValues($hosts, 'hostid'), 'editable'=>1, 'extendoutput'=>1, 'preservekeys'=>1));
+		$upd_hosts = self::get(array('hostids'=> zbx_objectValues($hosts, 'hostid'), 'editable'=>1, 'extendoutput'=>1, 'preservekeys'=>1));
 		foreach($hosts as $gnum => $host){
 			if(!isset($upd_hosts[$host['hostid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
@@ -846,6 +846,7 @@ class CHost extends CZBXAPI{
 			$hostids[] = $host['hostid'];
 		}
 
+		self::BeginTransaction(__METHOD__);
 		if(empty($hostids)){
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ hostids ]');
 			return false;
@@ -872,9 +873,11 @@ class CHost extends CZBXAPI{
 
 			$result = DBexecute($sql);
 		}
+		
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_hosts = CHost::get(array('hostids'=>$hostids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$upd_hosts = self::get(array('hostids'=>$hostids, 'extendoutput'=>1, 'nopermissions'=>1));			
 			return $upd_hosts;
 		}
 		else{
@@ -900,7 +903,7 @@ class CHost extends CZBXAPI{
 		$hosts = zbx_toArray($hosts);
 		$hostids = array();
 		
-		$del_hosts = CHost::get(array('hostids'=> zbx_objectValues($hosts, 'hostid'), 
+		$del_hosts = self::get(array('hostids'=> zbx_objectValues($hosts, 'hostid'), 
 									'editable'=>1, 
 									'extendoutput'=>1, 
 									'preservekeys'=>1));
@@ -913,7 +916,8 @@ class CHost extends CZBXAPI{
 			$hostids[] = $host['hostid'];
 			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$host['host'].']');
 		}
-
+		
+		self::BeginTransaction(__METHOD__);
 		if(!empty($hostids)){
 			$result = delete_host($hostids, false);
 		}
@@ -921,7 +925,9 @@ class CHost extends CZBXAPI{
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter');
 			$result = false;
 		}
-
+		
+		$result = self::EndTransaction($result, __METHOD__);
+		
 		if($result){
 			return zbx_cleanHashes($del_hosts);
 		}

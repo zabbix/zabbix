@@ -353,7 +353,7 @@ class CMap extends CZBXAPI{
 		$maps = zbx_toArray($maps);
 
 		self::BeginTransaction(__METHOD__);
-		foreach($maps as $map){
+		foreach($maps as $mnum => $map){
 
 			$map_db_fields = array(
 				'name' => null,
