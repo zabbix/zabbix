@@ -210,10 +210,10 @@ class CScreen extends CZBXAPI{
 						break;
 					}
 				}
-	// sdii($graphs_to_check);
-	// sdii($items_to_check);
-	// sdii($maps_to_check);
-	// sdii($screens_to_check);
+// sdii($graphs_to_check);
+// sdii($items_to_check);
+// sdii($maps_to_check);
+// sdii($screens_to_check);
 
 				$allowed_graphs = CGraph::get(array('graphids' => $graphs_to_check, 'editable' => isset($options['editable'])));
 				$allowed_items = CItem::get(array('itemids' => $items_to_check, 'editable' => isset($options['editable'])));
@@ -337,13 +337,13 @@ class CScreen extends CZBXAPI{
  */
 	public static function add($screens){
 		$screens = zbx_toArray($screens);
-
+		$screenid = array();
+		
 		$errors = array();
-		$result_screens = array();
 		$result = false;
 
 		self::BeginTransaction(__METHOD__);
-		foreach($screens as $screen){
+		foreach($screens as $snum => $screen){
 
 			$screen_db_fields = array(
 				'name' => null,
@@ -371,13 +371,14 @@ class CScreen extends CZBXAPI{
 
 			if(!$result) break;
 
-			$new_screen = array('screenid' => $screenid);
-			$result_screens[] = array_merge($new_screen, $screen);
+			$screenids[] = $screenid;
 		}
+
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return $result_screens;
+			$new_screens = self::get(array('screenids'=>$screenids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			return $new_screens;
 		}
 		else{
 			self::setMethodErrors(__METHOD__, $errors);
@@ -403,12 +404,27 @@ class CScreen extends CZBXAPI{
  */
 	public static function update($screens){
 		$screens = zbx_toArray($screens);
+		$screenids = array();
 
-		$result = false;
+		$result = true;
 		$errors = array();
+		
+		$upd_screens = self::get(array('screenids'=>zbx_objectValues($screens, 'screenid'), 
+											'editable'=>1, 
+											'extendoutput'=>1, 
+											'preservekeys'=>1));
 
+		foreach($screens as $gnum => $screen){
+			if(!isset($upd_screens[$screen['screenid']])){
+				
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				return false;
+			}
+			$screenids[] = $screen['screenid'];
+		}
+		
 		self::BeginTransaction(__METHOD__);
-		foreach($screens as $screen){
+		foreach($screens as $snum => $screen){
 
 			$screen_db_fields = CScreen::get(array('screenids' => $screen['screenid'], 'editable' => 1, 'extendoutput' => 1));
 			$screen_db_fields = reset($screen_db_fields);
@@ -425,10 +441,11 @@ class CScreen extends CZBXAPI{
 				break;
 			}
 
-			$sql = 'SELECT screenid FROM screens
-				WHERE name='.zbx_dbstr($screen['name']).
-				' AND '.DBin_node('screenid', false).
-				' AND screenid<>'.$screen['screenid'];
+			$sql = 'SELECT screenid '.
+				' FROM screens '.
+				' WHERE name='.zbx_dbstr($screen['name']).
+					' AND '.DBin_node('screenid', false).
+					' AND screenid<>'.$screen['screenid'];
 			if(DBfetch(DBselect($sql))){
 				$result = false;
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Screen with name [ '.$screen['name'].' ] already exists');
@@ -441,10 +458,12 @@ class CScreen extends CZBXAPI{
 
 			if(!$result) break;
 		}
+
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return true;
+			$upd_screens = self::get(array('screenids'=>$screenids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			return $upd_screens;
 		}
 		else{
 			self::setMethodErrors(__METHOD__, $errors);
@@ -462,36 +481,52 @@ class CScreen extends CZBXAPI{
  * @since 1.8
  * @version 1
  *
- * @param array $screenids
- * @param array $screenids['screenids']
+ * @param array $screens
+ * @param array $screens[0,...]['screenid']
  * @return boolean
  */
-	public static function delete($screenids){
+	public static function delete($screens){
+		$screens = zbx_toArray($screens);
+		$screenids = zbx_objectValues($screens, 'screenid');
 		$result = true;
-		$screenids = isset($screenids['screenids']) ? $screenids['screenids'] : array();
-		zbx_value2array($screenids);
+		
+		$del_screens = self::get(array('screenids'=>zbx_objectValues($screens, 'screenid'), 
+											'editable'=>1, 
+											'extendoutput'=>1, 
+											'preservekeys'=>1));
 
+		foreach($screens as $gnum => $screen){
+			if(!isset($del_screens[$screen['screenid']])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				return false;
+			}
+			$screenids[] = $screen['screenid'];
+		}
+
+		self::BeginTransaction(__METHOD__);
 		if(!empty($screenids)){
-			self::BeginTransaction(__METHOD__);
 			foreach($screenids as $screenid){
 				$result = DBexecute('DELETE FROM screens_items WHERE screenid='.$screenid);
 				$result &= DBexecute('DELETE FROM screens_items WHERE resourceid='.$screenid.' AND resourcetype='.SCREEN_RESOURCE_SCREEN);
 				$result &= DBexecute('DELETE FROM slides WHERE screenid='.$screenid);
-				$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.screenids' AND source='screenid' AND value_id=$screenid");
+				$result &= DBexecute('DELETE FROM profiles '.
+									' WHERE idx='.zbx_dbstr('web.favorite.screenids').
+										' AND source='.zbx_dbstr('screenid').
+										' AND value_id='.$screenid);
 				$result &= DBexecute('DELETE FROM screens WHERE screenid='.$screenid);
 				if(!$result) break;
 			}
-			$result = self::EndTransaction($result, __METHOD__);
 		}
 		else{
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ screenids ]');
 			$result = false;
 		}
 
+		$result = self::EndTransaction($result, __METHOD__);
 
-
-		if($result)
-			return true;
+		if($result){
+			return zbx_cleanHashes($del_screens);
+		}
 		else{
 			self::setError(__METHOD__);
 			return false;

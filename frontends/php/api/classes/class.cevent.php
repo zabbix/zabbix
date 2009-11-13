@@ -489,12 +489,13 @@ class CEvent extends CZBXAPI{
  * @return boolean
  */
 	public static function add($events){
-
+		$events = zbx_toArray($events);
 		$eventids = array();
-		$triggers = array();
-		self::BeginTransaction(__METHOD__);
-
+		
 		$result = false;
+		$triggers = array();
+		
+		self::BeginTransaction(__METHOD__);
 		foreach($events as $num => $event){
 			$event_db_fields = array(
 				'source'		=> null,
@@ -533,8 +534,9 @@ class CEvent extends CZBXAPI{
 		}
 
 		$result = self::EndTransaction($result, __METHOD__);
-		if($result)
+		if($result){
 			return $eventids;
+		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;

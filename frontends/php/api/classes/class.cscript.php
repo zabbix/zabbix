@@ -330,20 +330,20 @@ class Cscript extends CZBXAPI{
 		}
 	}
 
-	/**
-	 * Get Script ID by host.name and item.key
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param array $script
-	 * @param array $script['name']
-	 * @param array $script['hostid']
-	 * @return int|boolean
-	 */
+/**
+ * Get Script ID by host.name and item.key
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $script
+ * @param array $script['name']
+ * @param array $script['hostid']
+ * @return int|boolean
+ */
 	public static function getId($script){
 
 		$sql = 'SELECT scriptid '.
@@ -375,8 +375,11 @@ class Cscript extends CZBXAPI{
  * @return boolean
  */
 	public static function add($scripts){
-
+		$scripts = zbx_toArray($scripts);
+		$scriptids = array();
+		
 		$result = false;
+//------
 
 		self::BeginTransaction(__METHOD__);
 		foreach($scripts as $num => $script){
@@ -396,12 +399,16 @@ class Cscript extends CZBXAPI{
 
 			$result = add_script($script['name'],$script['command'],$script['usrgrpid'],$script['groupid'],$script['host_access']);
 			if(!$result) break;
+			
+			$scriptids[] = $result;
 		}
 
 		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result)
-			return true;
+		if($result){
+			$new_scripts = self::get(array('scriptids'=>$scriptids, 'extendoutput'=>1));
+			return $new_scripts;
+		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
@@ -423,9 +430,25 @@ class Cscript extends CZBXAPI{
  * @return boolean
  */
 	public static function update($scripts){
-
+		$scripts = zbx_toArray($scripts);
+		$scriptids = array();
+		
 		$result = false;
+//------
+		$upd_scripts = self::get(array('scriptids'=>zbx_objectValues($scripts, 'scriptid'), 
+											'editable'=>1, 
+											'extendoutput'=>1, 
+											'preservekeys'=>1));
+		foreach($scripts as $snum => $script){
+			if(!isset($upd_scripts[$script['scriptid']])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				return false;
+			}
 
+			$scriptids[] = $script['scriptid'];
+			//add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCRIPT, 'Script ['.$script['name'].']');
+		}
+		
 		self::BeginTransaction(__METHOD__);
 		foreach($scripts as $num => $script){
 
@@ -445,10 +468,13 @@ class Cscript extends CZBXAPI{
 			$result = update_script($script['scriptid'], $script['name'],$script['command'],$script['usrgrpid'],$script['groupid'],$script['host_access']);
 			if(!$result) break;
 		}
+
 		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result)
-			return true;
+		if($result){
+			$upd_scripts = self::get(array('scriptids'=>$scriptids, 'extendoutput'=>1));
+			return $upd_scripts;
+		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
@@ -468,10 +494,27 @@ class Cscript extends CZBXAPI{
  * @param array $scriptids
  * @return boolean
  */
-	public static function delete($scriptids){
-		$scriptids = isset($scriptids['scriptids']) ? $scriptids['scriptids'] : array();
-		zbx_value2array($scriptids);
+	public static function delete($scripts){
+		$scripts = zbx_toArray($scripts);
+		$scriptids = array();
+		
+		$result = false;
+//------
+		$del_scripts = self::get(array('scriptids'=>zbx_objectValues($scripts, 'scriptid'), 
+											'editable'=>1, 
+											'extendoutput'=>1, 
+											'preservekeys'=>1));
+		foreach($scripts as $snum => $script){
+			if(!isset($del_scripts[$script['scriptid']])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				return false;
+			}
 
+			$scriptids[] = $script['scriptid'];
+			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, 'Script ['.$script['name'].']');
+		}
+		
+		self::BeginTransaction(__METHOD__);
 		if(!empty($scriptids)){
 			$result = delete_script($scriptids);
 		}
@@ -479,9 +522,12 @@ class Cscript extends CZBXAPI{
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ scriptids ]');
 			$result = false;
 		}
+		
+		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result)
-			return true;
+		if($result){
+			return zbx_cleanHashes($del_scripts);
+		}
 		else{
 			self::setError(__METHOD__);
 			return false;

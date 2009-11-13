@@ -332,34 +332,44 @@ class CUserGroup extends CZBXAPI{
  * @param array $groups multidimensional array with UserGroups data
  * @return boolean
  */
-	public static function add($groups){
-		$error = 'Unknown ZABBIX internal error';
+	public static function add($usrgrps){
+		global $USER_DETAILS;
+		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can add User Groups');
+			return false;
+		}
+
+		$usrgrps = zbx_toArray($usrgrps);
+		$usrgrpids = array();
+		
 		$result = false;
+		$error = 'Unknown ZABBIX internal error';
 
 		self::BeginTransaction(__METHOD__);
-
-		foreach($groups as $group){
-
-			$group_db_fields = array(
+		foreach($usrgrps as $ugnum => $usrgrp){
+			$usrgrp_db_fields = array(
 				'name' 				=> null,
 				'users_status' 		=> GROUP_STATUS_DISABLED,
 				'gui_access' 		=> 200,
 				'api_access' 		=> 0
 			);
 
-			if(!check_db_fields($group_db_fields, $group)){
+			if(!check_db_fields($usrgrp_db_fields, $usrgrp)){
 				$result = false;
-				$error = 'Wrong fields for user group [ '.$group['name'].' ]';
+				$error = 'Wrong fields for user group [ '.$usrgrp['name'].' ]';
 				break;
 			}
 
-			$result = add_user_group($group['name'], $group['users_status'], $group['gui_access'], $group['api_access']);
+			$result = add_user_group($usrgrp['name'], $usrgrp['users_status'], $usrgrp['gui_access'], $usrgrp['api_access']);
 			if(!$result) break;
+			
+			$usrgrpids[] = $result;
 		}
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return true;
+			$new_usrgrps = self::get(array('usrgrpids'=>$usrgrpids, 'extendoutput'=>1));			
+			return $new_usrgrps;
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
@@ -379,29 +389,50 @@ class CUserGroup extends CZBXAPI{
  * @param array $groups multidimensional array with UserGroups data
  * @return boolean
  */
-	public static function update($groups){
+	public static function update($usrgrps){
+		global $USER_DETAILS;
+		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can edit User Groups');
+			return false;
+		}
+
+		$usrgrps = zbx_toArray($usrgrps);
+		$usrgrpids = array();
+		$dep_usrgrps = array();
 		$result = false;
 
+//-----
+		$upd_usrgrps = self::get(array('usrgrpids'=>zbx_objectValues($usrgrps, 'usrgrpid'), 
+											'extendoutput'=>1, 
+											'preservekeys'=>1));
+
+		foreach($usrgrps as $ugnum => $usrgrp){
+			if(($usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED) || ($usrgrp['users_status'] == GROUP_STATUS_DISABLED)){
+				$dep_usrgrps[$usrgrp['usrgrpid']] = $usrgrp['usrgrpid'];
+			}
+
+			$usrgrpids[] = $usrgrp['usrgrpid'];
+			//add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER_GROUP, 'User group ['.$usrgrp['name'].']');
+		}
+	
 		self::BeginTransaction(__METHOD__);
-		foreach($groups as $group){
-			$group_db_fields = self::getById(array('usrgrpid' => $group['usrgrpid']));
+		foreach($usrgrps as $ugnum => $usrgrp){
+			$group_db_fields = $upd_usrgrps[$usrgrp['usrgrpid']];
 
-			if(!$group_db_fields) {
+			if(!check_db_fields($group_db_fields, $usrgrp)){
 				$result = false;
 				break;
 			}
-
-			if(!check_db_fields($group_db_fields, $group)){
-				$result = false;
-				break;
-			}
-			$result = update_user_group($group['usrgrpid'], $group['name'],$group['users_status'], $group['gui_access'],$group['api_access']);
+			
+			$result = update_user_group($usrgrp['usrgrpid'], $usrgrp['name'], $usrgrp['users_status'], $usrgrp['gui_access'], $usrgrp['api_access']);
 			if(!$result) break;
 		}
+
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return true;
+			$upd_usrgrps = self::get(array('usrgrpids'=>$usrgrpids, 'extendoutput'=>1));
+			return $upd_usrgrps;
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
@@ -477,7 +508,6 @@ class CUserGroup extends CZBXAPI{
 		$usrgrpid = $rights['usrgrpid'];
 
 		self::BeginTransaction(__METHOD__);
-
 		foreach($rights['rights'] as $right){
 			$sql = 'SELECT rightid, permission FROM rights WHERE groupid='.$usrgrpid.' AND id='.$right['id'];
 			$curr_perm = DBfetch(DBselect($sql));
@@ -492,6 +522,7 @@ class CUserGroup extends CZBXAPI{
 				$sql = 'INSERT INTO rights (rightid, groupid, permission, id)'.
 					' VALUES ('.$id.','.$usrgrpid.','.$right['permission'].','.$right['id'].')';
 			}
+
 			$result = DBexecute($sql);
 			if(!$result) break;
 		}
@@ -523,19 +554,22 @@ class CUserGroup extends CZBXAPI{
  * @param array $data
  * @return boolean
  */
-	public static function addUsers($usrgrps, $users){
-		self::BeginTransaction(__METHOD__);
-
+	public static function addUsers($data){
 		global $USER_DETAILS;
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
-			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can remove Users from Groups');
+			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can add Users to Groups');
 			return false;
 		}
 
+		$usrgrps = $data['usrgrps'];
+		$users = $data['users'];
+		
 		$usrgrps = zbx_toArray($usrgrps);
 		$usrgrpids = array();
 		$dep_usrgrps = array();
+		$result = false;
 
+//-----
 		$upd_usrgrps = self::get(array('usrgrpids'=>zbx_objectValues($usrgrps, 'usrgrpid'), 
 											'extendoutput'=>1, 
 											'preservekeys'=>1));
@@ -545,7 +579,7 @@ class CUserGroup extends CZBXAPI{
 			}
 
 			$usrgrpids[] = $usrgrp['usrgrpid'];
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER_GROUP, 'User group ['.$usrgrp['name'].']');
+			//add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER_GROUP, 'User group ['.$usrgrp['name'].']');
 		}
 
 		$users = zbx_toArray($users);
@@ -561,11 +595,11 @@ class CUserGroup extends CZBXAPI{
 			}
 
 			$userids[] = $user['userid'];
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER, 'User ['.$user['alias'].']');
+			//add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER, 'User ['.$user['alias'].']');
 		}
-		
-		$result = false;
 
+		self::BeginTransaction(__METHOD__);
+		
 		self::removeUsers($usrgrps, $users);
 		foreach($usrgrps as $ugnum => $usrgrp){
 			foreach($users as $unaum => $user){
@@ -578,7 +612,7 @@ class CUserGroup extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_usrgrps = self::get(array('usrgrpids'=>zbx_objectValues($usrgrps, 'usrgrpid'), 
+			$upd_usrgrps = self::get(array('usrgrpids'=>$usrgrpids, 
 											'extendoutput'=>1, 
 											'select_users'=>1));
 			return $upd_usrgrps;
@@ -606,24 +640,27 @@ class CUserGroup extends CZBXAPI{
  * @param array $data
  * @return boolean
  */
-	public static function removeUsers($usrgrps, $users){
-		self::BeginTransaction(__METHOD__);
-
+	public static function removeUsers($data){
 		global $USER_DETAILS;
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can remove Users from Groups');
 			return false;
 		}
 
+		$usrgrps = $data['usrgrps'];
+		$users = $data['users'];
+
 		$usrgrps = zbx_toArray($usrgrps);
 		$usrgrpids = array();
+		$result = false;
 
+//-----
 		$upd_usrgrps = self::get(array('usrgrpids'=>zbx_objectValues($usrgrps, 'usrgrpid'), 
 											'extendoutput'=>1, 
 											'preservekeys'=>1));
 		foreach($usrgrps as $ugnum => $usrgrp){
 			$usrgrpids[] = $usrgrp['usrgrpid'];
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER_GROUP, 'User group ['.$usrgrp['name'].']');
+			//add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER_GROUP, 'User group ['.$usrgrp['name'].']');
 		}
 		
 		$users = zbx_toArray($users);
@@ -634,9 +671,10 @@ class CUserGroup extends CZBXAPI{
 											'preservekeys'=>1));
 		foreach($users as $gnum => $user){
 			$userids[] = $user['userid'];
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER, 'User ['.$user['alias'].']');
+			//add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER, 'User ['.$user['alias'].']');
 		}
-
+		
+		self::BeginTransaction(__METHOD__);
 		foreach($usrgrps as $ugnum => $usrgrp){
 			$result = DBexecute('DELETE FROM users_groups WHERE usrgrpid='.$usrgrpid.' AND '.DBcondition('userid', $userids));
 			if(!$result) break;
@@ -670,8 +708,6 @@ class CUserGroup extends CZBXAPI{
  * @return boolean
  */
 	public static function delete($usrgrps){
-		self::BeginTransaction(__METHOD__);
-
 		global $USER_DETAILS;
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can delete User Groups');
@@ -680,17 +716,18 @@ class CUserGroup extends CZBXAPI{
 
 		$usrgrps = zbx_toArray($usrgrps);
 		$usrgrpids = array();
+		$result = false;
 
+//-----
 		$del_usrgrps = self::get(array('usrgrpids'=>zbx_objectValues($usrgrps, 'usrgrpid'), 
 											'extendoutput'=>1, 
 											'preservekeys'=>1));
 		foreach($usrgrps as $gnum => $usrgrp){
 			$usrgrpids[] = $usrgrp['usrgrpid'];
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER_GROUP, 'User group ['.$usrgrp['name'].']');
+			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER_GROUP, 'User group ['.$usrgrp['name'].']');
 		}
 		
-		$result = false;
-
+		self::BeginTransaction(__METHOD__);
 		if(!empty($usrgrpids)){
 			foreach($usrgrpids as $groupid){
 				$result = delete_user_group($groupid);

@@ -545,7 +545,7 @@ class CHostGroup extends CZBXAPI{
 				return false;
 			}
 			$groupids[] = $group['groupid'];
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOSTGROUP, 'Group ['.$group['name'].']');
+			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOSTGROUP, 'Group ['.$group['name'].']');
 		}
 
 		if(empty($groupids)){
@@ -624,7 +624,7 @@ class CHostGroup extends CZBXAPI{
 			$hostgroup_old = get_hostgroup_by_groupid($id);
 			$result = DBexecute('DELETE FROM groups WHERE groupid='.$id);
 			if ($result)
-				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST_GROUP, $id, $hostgroup_old['name'], 'groups', NULL, NULL);
+				//add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST_GROUP, $id, $hostgroup_old['name'], 'groups', NULL, NULL);
 			else
 				break;
 		}

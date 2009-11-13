@@ -481,17 +481,19 @@ class CUserMacro extends CZBXAPI{
  * @param string $macros['hostid']
  * @param string $macros['macros'][0..]['macro']
  * @param string $macros['macros'][0..]['value']
- * @return array|boolean
+ * @return array of object macros
  */
 	public static function add($macros){
+		$macros = zbx_toArray($macros);
+		$hostmacroids = array();
+		
 		$result = true;
-
 		$hostid = $macros['hostid'];
+		
 		self::BeginTransaction(__METHOD__);
-
-		foreach($macros['macros'] as $macro){
-			$macroid = self::getHostMacroID(array('hostid' => $hostid, 'macro' => $macro['macro']));
-			if(!$macroid){
+		foreach($macros['macros'] as $mnum => $macro){
+			$hostmacroid = self::getHostMacroID(array('hostid' => $hostid, 'macro' => $macro['macro']));
+			if(!$hostmacroid){
 				$hostmacroid = get_dbid('hostmacro', 'hostmacroid');
 
 				$sql = 'INSERT INTO hostmacro (hostmacroid, hostid, macro, value)
@@ -500,12 +502,15 @@ class CUserMacro extends CZBXAPI{
 
 				if(!$result) break;
 			}
+			$hostmacroids[] = $hostmacroid;
 		}
 
 		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result)
-			return true;
+		if($result){
+			$new_macros = self::get(array('hostmacroids'=>$hostmacroids, 'extendoutput'=>1, 'nopermissions'=>1));
+			return $new_macros;
+		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
 			return false;
@@ -528,13 +533,16 @@ class CUserMacro extends CZBXAPI{
  * @return array|boolean
  */
 	public static function update($macros){
-		$result = true;
+		$macros = zbx_toArray($macros);
+		$hostmacroids = array();
+		
+		$result = false;
+//------
 
-//		self::BeginTransaction(__METHOD__);
-		self::BeginTransaction(__CLASS__);
-
+		self::BeginTransaction(__METHOD__);
+		
 		$sql = 'DELETE FROM hostmacro WHERE hostid='.$macros['hostid'];
-		DBexecute($sql);
+		$result = DBexecute($sql);
 
 		foreach($macros['macros'] as $macro){
 			$hostmacroid = get_dbid('hostmacro', 'hostmacroid');
@@ -544,20 +552,22 @@ class CUserMacro extends CZBXAPI{
 			$result = DBExecute($sql);
 
 			if(!$result) break;
+			$hostmacroids[] = $hostmacroid;
 		}
 
-//		$result = self::EndTransaction($result, __METHOD__);
-		$result = self::EndTransaction($result);
+		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result)
-			return true;
+		if($result){
+			$upd_macros = self::get(array('hostmacroids'=>$hostmacroids, 'extendoutput'=>1, 'nopermissions'=>1));
+			return $upd_macros;
+		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
 			return false;
 		}
 	}
 
-	/**
+/**
  * Update macros values
  *
  * {@source}
@@ -573,14 +583,20 @@ class CUserMacro extends CZBXAPI{
  * @return array|boolean
  */
 	public static function updateValue($macros){
-		$result = true;
+		$macros = zbx_toArray($macros);
+		$hostmacroids = array();
+		
+		$result = false;
+//------
 
 		self::BeginTransaction(__METHOD__);
 
-		foreach($macros['macros'] as $macro){
+		foreach($macros['macros'] as $mnum => $macro){
 
-			$sql = 'UPDATE hostmacro SET value='.zbx_dbstr($macro['value']).
-				'WHERE hostid='.$macros['hostid'].' AND macro='.zbx_dbstr($macro['macro']);
+			$sql = 'UPDATE hostmacro '.
+					' SET value='.zbx_dbstr($macro['value']).
+					' WHERE hostid='.$macros['hostid'].
+						' AND macro='.zbx_dbstr($macro['macro']);
 			$result = DBExecute($sql);
 
 			if(!$result) break;
@@ -588,14 +604,58 @@ class CUserMacro extends CZBXAPI{
 
 		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result)
-			return true;
+		if($result){
+//			$upd_macros = self::get(array('macroids'=>$macroids, 'extendoutput'=>1, 'nopermissions'=>1));
+//			return $upd_macros;
+			return $macros;
+		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
 			return false;
 		}
 	}
 
+/**
+ * Delete UserMacros
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $hostmacroids
+ * @param array $hostmacroids['hostmacroids']
+ * @return boolean
+ */
+	public static function deleteHostMacro($hostmacros){
+		$hostmacros = zbx_toArray($hostmacros);
+		$hostmacroids = zbx_objectValues($hostmacros, 'hostmacroid');
+		
+		$result = false;
+//------
+
+		self::BeginTransaction(__METHOD__);
+		if(!empty($hostmacroids)){
+			$sql = 'DELETE FROM hostmacro WHERE '.DBcondition('hostmacroid', $hostmacroids);
+			$result = DBexecute($sql);
+		}
+		else{
+			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ hostmacroids ]');
+			$result = false;
+		}
+
+		$result = self::EndTransaction($result, __METHOD__);
+
+		if($result){
+			return $hostmacroids;
+		}
+		else{
+			self::setError(__METHOD__);
+			return false;
+		}
+	}
+	
 /**
  * Add global macros
  *
@@ -612,9 +672,14 @@ class CUserMacro extends CZBXAPI{
  * @return array|boolean
  */
 	public static function addGlobal($macros){
-		$result = true;
+		$macros = zbx_toArray($macros);
+		$globalmacroids = array();
+		
+		$result = false;
+//------
+
 		self::BeginTransaction(__METHOD__);
-		foreach($macros as $macro){
+		foreach($macros as $mnum => $macro){
 
 			$globalmacroid = get_dbid('globalmacro', 'globalmacroid');
 
@@ -623,14 +688,55 @@ class CUserMacro extends CZBXAPI{
 			$result = DBExecute($sql);
 
 			if(!$result) break;
+			$globalmacroids[] = $globalmacroid;
 		}
 
 		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result)
-			return true;
+		if($result){
+			$new_macros = self::get(array('globalmacroids'=>$globalmacroids, 'extendoutput'=>1, 'nopermissions'=>1));
+			return $new_macros;
+		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
+			return false;
+		}
+	}
+
+/**
+ * Delete UserMacros
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $globalmacroids
+ * @param array $globalmacroids['globalmacroids']
+ * @return boolean
+ */
+	public static function deleteGlobalMacro($globalmacros){
+		$globalmacros = zbx_toArray($globalmacros);
+		$globalmacroids = zbx_objectValues($globalmacros, 'globalmacroid');
+		
+		$result = false;
+//------
+
+		if(!empty($globalmacroids)){
+			$sql = 'DELETE FROM globalmacro WHERE '.DBcondition('globalmacroid', $globalmacroids);
+			$result = DBexecute($sql);
+		}
+		else{
+			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ globalmacroids ]');
+			$result = false;
+		}
+
+		if($result){
+			return $globalmacroids;
+		}
+		else{
+			self::setError(__METHOD__);
 			return false;
 		}
 	}
@@ -648,18 +754,22 @@ class CUserMacro extends CZBXAPI{
  * @return array|boolean
  */
 	public static function validate($macros){
-		zbx_value2array($macros);
-		$result = true;
+		$macros = zbx_toArray($macros);
+		$globalmacroids = array();
+		
+		$result = false;
+//------
 
-		foreach($macros as $macro){
-			if(!preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $macro)){
+		foreach($macros as $mnum => $macro){
+			if(!preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $macro['macro'])){
 				$result = false;
 				break;
 			}
 		}
 
-		if($result)
+		if($result){
 			return true;
+		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
 			return false;
@@ -852,77 +962,6 @@ class CUserMacro extends CZBXAPI{
 		}
 
 		if($single) $items = $items[0];
-	}
-
-
-/**
- * Delete UserMacros
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param array $hostmacroids
- * @param array $hostmacroids['hostmacroids']
- * @return boolean
- */
-	public static function deleteHostMacro($hostmacroids){
-
-		$hostmacroids = isset($hostmacroids['hostmacroids']) ? $hostmacroids['hostmacroids'] : array();
-		zbx_value2array($hostmacroids);
-
-		if(!empty($hostmacroids)){
-			$sql = 'DELETE FROM hostmacro WHERE '.DBcondition('hostmacroid', $hostmacroids);
-			$result = DBexecute($sql);
-		}
-		else{
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ hostmacroids ]');
-			$result = false;
-		}
-
-
-		if($result)
-			return $hostmacroids;
-		else{
-			self::setError(__METHOD__);
-			return false;
-		}
-	}
-
-/**
- * Delete UserMacros
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param array $globalmacroids
- * @param array $globalmacroids['globalmacroids']
- * @return boolean
- */
-	public static function deleteGlobalMacro($globalmacroids){
-		$globalmacroids = isset($globalmacroids['globalmacroids']) ? $globalmacroids['globalmacroids'] : array();
-		zbx_value2array($globalmacroids);
-
-		if(!empty($globalmacroids)){
-			$sql = 'DELETE FROM globalmacro WHERE '.DBcondition('globalmacroid', $globalmacroids);
-			$result = DBexecute($sql);
-		}
-		else{
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ globalmacroids ]');
-			$result = false;
-		}
-
-		if($result)
-			return $globalmacroids;
-		else{
-			self::setError(__METHOD__);
-			return false;
-		}
 	}
 }
 ?>
