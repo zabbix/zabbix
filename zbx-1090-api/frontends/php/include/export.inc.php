@@ -469,9 +469,9 @@ class zbxXML{
 // HOST GROUPS
 				$xpath = new DOMXPath($xml);
 				$groups = $xpath->query('groups/group', $host);
-				
 				$host_groups = array();
-				if($groups->length > 0){
+				if($groups->length == 0){
+
 					$default_group = CHostGroup::getObjects(array('name' => ZBX_DEFAULT_IMPORT_HOST_GROUP));
 
 					if(empty($default_group)){
@@ -615,19 +615,26 @@ class zbxXML{
 							$macros_to_add[] =  $macro_db;
 						}
 					}
-//sdii($macros_to_upd);
+// sdii($macros_to_upd);
+// sdii($macros_to_add);
 
-					$r = CUserMacro::add($macros_to_add);
-					if($r === false){
-						error(CUserMacro::resetErrors());
-						$result = false;
-						break;
+					if(!empty($macros_to_upd)){
+						$r = CUserMacro::add($macros_to_add);
+						if($r === false){
+							error(CUserMacro::resetErrors());
+							$result = false;
+							break;
+						}
 					}
-					$r = CUserMacro::updateValue($macros_to_upd);
-					if($r === false){
-						error(CUserMacro::resetErrors());
-						$result = false;
-						break;
+					
+					if(!empty($macros_to_upd)){
+						$r = CUserMacro::updateValue($macros_to_upd);
+						if($r === false){
+							error(CUserMacro::resetErrors());
+							$result = false;
+							
+							break;
+						}
 					}
 				}
 // ITEMS {{{
@@ -728,27 +735,29 @@ class zbxXML{
 					foreach($triggers as $trigger){
 						$trigger_db = self::mapXML2arr($trigger, XML_TAG_TRIGGER);
 						$trigger_db['expression'] = str_replace('{{HOSTNAME}:', '{'.$host_db['host'].':', $trigger_db['expression']);
+						$trigger_db['hostid'] = $current_host['hostid'];
 
 						$current_trigger = CTrigger::getObjects($trigger_db);
+//sdii($current_trigger);
 						$current_trigger = reset($current_trigger);
 						
-// sdi('trigger: '.$trigger_db['description'].' | triggerID: '. $current_triggerid);
-// sdi(isset($rules['trigger']['missed']));
+
 						if(!$current_trigger && !isset($rules['trigger']['missed'])) continue; // break if update nonexist
 						if($current_trigger && !isset($rules['trigger']['exist'])) continue; // break if not update exist
 
 						
 						if($current_trigger && isset($rules['trigger']['exist'])){
 							$triggers_for_dependencies[] = $current_trigger;
+							$current_trigger['expression'] = explode_exp($current_trigger['expression'], false);
 							$triggers_to_upd[] = $current_trigger;
 						}
 						if(!$current_trigger && isset($rules['trigger']['missed'])){
 							$trigger_db['hostid'] = $current_host['hostid'];
+							$trigger_db['expression'] = explode_exp($trigger_db['expression'], false);
 							$triggers_to_add[] = $trigger_db;
 						}
 					}
-// sdii($triggers_to_add);
-// sdii($triggers_to_upd);
+
 					if(!empty($triggers_to_add)){
 						$added_triggers = CTrigger::add($triggers_to_add);
 						if($added_triggers === false){
@@ -777,7 +786,7 @@ class zbxXML{
 					
 					$templates_to_link = array();
 					foreach($templates as $template){
-						$current_template = CTemplate::getObjects(array('name' => $template->nodeValue));
+						$current_template = CTemplate::getObjects(array('host' => $template->nodeValue));
 						$current_template = reset($current_template);
 
 						if(!$current_template && !isset($rules['template']['missed'])) continue; // break if update nonexist
@@ -786,6 +795,7 @@ class zbxXML{
 //sdi('template: '.$template.' | TemplateID: '. $current_templateid);
 						$templates_to_link[] = $current_template;
 					}
+// sdii($templates_to_link);
 					$r = CTemplate::linkTemplates(array('hosts' => $current_host, 'templates' => $templates_to_link));
 					if($r === false){
 						error(CTemplate::resetErrors());

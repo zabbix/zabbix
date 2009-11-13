@@ -803,17 +803,28 @@ class CTemplate extends CZBXAPI{
 		$templates = $data['templates'];
 		
 		$hosts = zbx_toArray($hosts);
+		$hostids = zbx_objectValues($hosts, 'hostid');
 		
 		$templates = zbx_toArray($templates);
+		$templateids = zbx_objectValues($templates, 'templateid');
 
 		self::BeginTransaction(__METHOD__);
+		
+		$sql = 'SELECT hostid, templateid FROM hosts_templates WHERE '.DBcondition('hostid', $hostids).' AND '.DBcondition('templateid', $templateids);
+		$linked_db = DBexecute($sql);
+		while($pair = DBfetch($linked_db)){
+			$linked[$pair['templateid']] = array($pair['hostid'] => $pair['hostid']);
+		}
 
 		foreach($templates as $tnum => $template){
 			$templateid = $template['templateid'];
 			
 			$hosttemplateid = get_dbid('hosts_templates', 'hosttemplateid');
 			foreach($hosts as $hnum => $host){
-				if(!$result = DBexecute('INSERT INTO hosts_templates VALUES ('.$hosttemplateid.','.$host['hostid'].','.templateid.')'))
+			
+				if(isset($linked[$templateid]) && isset($linked[$templateid][$host['hostid']])) continue;
+				
+				if(!$result = DBexecute('INSERT INTO hosts_templates VALUES ('.$hosttemplateid.','.$host['hostid'].','.$templateid.')'))
 				$result = false;
 				break;
 			}
@@ -824,7 +835,7 @@ class CTemplate extends CZBXAPI{
 			foreach($templates as $tnum => $template){
 				foreach($hosts as $hnum => $host){
 //					$result = sync_host_with_templates($hostid, $templateid);
-					sync_host_with_templates($hostid, $template['templateid']);
+					sync_host_with_templates($host['hostid'], $template['templateid']);
 				}
 //				if(!$result) break;
 			}

@@ -506,13 +506,13 @@ class CUserMacro extends CZBXAPI{
 		
 		self::BeginTransaction(__METHOD__);
 		foreach($macros as $mnum => $macro){
-			$hostid = $macro['hostid'];
-			$hostmacroid = self::getHostMacroID(array('hostid' => $hostid, 'macro' => $macro['macro']));
+
+			$hostmacroid = self::getHostMacroObjects(array('hostid' => $macro['hostid'], 'macro' => $macro['macro']));
 			if(!$hostmacroid){
 				$hostmacroid = get_dbid('hostmacro', 'hostmacroid');
 
 				$sql = 'INSERT INTO hostmacro (hostmacroid, hostid, macro, value)
-					VALUES('.$hostmacroid.', '.$hostid.', '.zbx_dbstr($macro['macro']).', '.zbx_dbstr($macro['value']).')';
+					VALUES('.$hostmacroid.', '.$macro['hostid'].', '.zbx_dbstr($macro['macro']).', '.zbx_dbstr($macro['value']).')';
 				$result = DBExecute($sql);
 
 				if(!$result) break;
@@ -523,7 +523,7 @@ class CUserMacro extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_macros = self::get(array('hostmacroids'=>$hostmacroids, 'extendoutput'=>1, 'nopermissions'=>1));
+			$new_macros = self::get(array('hostmacroids' => $hostmacroids, 'extendoutput' => 1, 'nopermissions' => 1));
 			return $new_macros;
 		}
 		else{
