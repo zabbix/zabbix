@@ -475,7 +475,7 @@
 	else if($_REQUEST['config'] == 11){ // Macros
 	/* REMOVE MACROS */
 		if(isset($_REQUEST['macros_del']) && isset($_REQUEST['macros_rem'])){
-			$result = CUserMacro::deleteGlobalMacro(array('globalmacroids' => $_REQUEST['macros_rem']));
+			$result = CUserMacro::deleteGlobalMacro(zbx_toObject($_REQUEST['macros_rem'], 'globalmacroid'));
 		}
 	/* ADD MACRO */
 		if(isset($_REQUEST['macro_add'])){
@@ -504,7 +504,8 @@
 				$result = false;
 			}
 			else{
-				$result = CUserMacro::addGlobal(array(array('macro' => $macro_new, 'value' => $value_new)));
+				$macro = array('macro' => $macro_new, 'value' => $value_new);
+				$result = CUserMacro::addGlobal($macro);
 			}
 
 			if($result){

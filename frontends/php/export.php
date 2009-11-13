@@ -59,7 +59,7 @@ include_once('include/page_header.php');
 
 	check_fields($fields);
 	validate_sort_and_sortorder('host', ZBX_SORT_UP);
-
+//SDI($_REQUEST);
 	$preview = ($_REQUEST['go'] == 'preview') ? true : false;
 	$update = get_request('update', null);
 
@@ -157,13 +157,13 @@ include_once('include/page_header.php');
 			'expand_data' => 1
 		);
 		$triggers = CTrigger::get($params);
-		foreach($triggers as $triggerid => $trigger){
-			$triggers[$triggerid]['expression'] = explode_exp($trigger['expression'], false);
+		foreach($triggers as $tnum => $trigger){
+			$triggers[$trigger['triggerid']]['expression'] = explode_exp($trigger['expression'], false);
 		}
 
 /* SELECT TRIGGER DEPENDENCIES */
 		$dependencies = array();
-		foreach($triggers as $trigger){
+		foreach($triggers as $tnum => $trigger){
 			if(!empty($trigger['dependencies'])){
 				if(!isset($dependencies[$trigger['triggerid']])) $dependencies[$trigger['triggerid']] = array();
 
@@ -232,25 +232,27 @@ include_once('include/page_header.php');
 		);
 		$hosts_all = CHost::get($params);
 
-		foreach($hosts_all as $hostid => $host){
+		foreach($hosts_all as $hnum => $host){
+			$hostid = $host['hostid'];
+			
 			$el_table = new CTableInfo(S_ONLY_HOST_INFO);
 
-			foreach($host['templates'] as $template){
+			foreach($host['templates'] as $tnum => $template){
 				if(isset($hostids_templates[$hostid])){
 					$el_table->addRow(array(S_TEMPLATE, $template['host']));
 				}
 			}
-			foreach($host['items'] as $item){
+			foreach($host['items'] as $inum => $item){
 				if(isset($hostids_items[$hostid])){
 					$el_table->addRow(array(S_ITEM, $item['description']));
 				}
 			}
-			foreach($host['triggers'] as $trigger){
+			foreach($host['triggers'] as $tnum => $trigger){
 				if(isset($hostids_triggers[$hostid])){
 					$el_table->addRow(array(S_TRIGGER, $trigger['description']));
 				}
 			}
-			foreach($host['graphs'] as $graph){
+			foreach($host['graphs'] as $gnum => $graph){
 				if(isset($hostids_graphs[$hostid])){
 					$el_table->addRow(array(S_GRAPH, $graph['name']));
 				}
@@ -294,11 +296,12 @@ include_once('include/page_header.php');
 		$form = new CForm(null, 'post');
 		$form->setName('export_hosts_frm');
 
-		$groups = CHostGroup::get(array('extendoutput' => 1, 'sortfield' => 'name'));
-
 		$cmbGroups = new CComboBox('groupid', $selected_groupid, 'javascript: submit();');
 		$cmbGroups->addItem(0, S_ALL_S);
-		foreach($groups as $groupid => $group){
+		
+		$groups = CHostGroup::get(array('extendoutput' => 1, 'sortfield' => 'name'));
+		foreach($groups as $gnum => $group){
+			$groupid = $group['groupid'];
 			$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid, null, ': ').$group['name']);
 		}
 		$form->addItem(array(S_GROUP.SPACE, $cmbGroups));
@@ -346,7 +349,9 @@ include_once('include/page_header.php');
 //-------
 
 		$count_chkbx = 0;
-		foreach($hosts_all as $hostid => $host){
+		foreach($hosts_all as $hnum => $host){
+			$hostid = $host['hostid'];
+			
 			$status = new CCol(host_status2str($host['status']), host_status2style($host['status']));
 
 			$params = array('hostids' => $hostid, 'count' => 1);
@@ -427,6 +432,9 @@ include_once('include/page_header.php');
 		$export_wdgt->show();
 	}
 
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>

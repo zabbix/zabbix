@@ -524,29 +524,6 @@ class CItem extends CZBXAPI{
 	return $result;
 	}
 
-/**
-	 * Gets all item data from DB by itemid
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param int $item_data
-	 * @param int $item_data['itemid']
-	 * @return array|boolean item data || false if error
-	 */
-	public static function getById($item_data){
-		$item = get_item_by_itemid($item_data['itemid']);
-		$result = $item ? true : false;
-		if($result)
-			return $item;
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Item with id: '.$itemid.' doesn\'t exists.');
-			return false;
-		}
-	}
 
 /**
 	 * Get itemid by host.name and item.key
@@ -559,36 +536,26 @@ class CItem extends CZBXAPI{
 	 *
 	 * @param array $item_data
 	 * @param array $item_data['key_']
-	 * @param array $item_data['host'] ALTERNATIVE
-	 * @param array $item_data['hostid'] ALTERNATIVE
+	 * @param array $item_data['hostid']
 	 * @return int|boolean
 	 */
-	public static function getId($item_data){
-		if(isset($item_data['hostid'])){
-			$hostid = $item_data['hostid'];
-		}
-		else{
-			if(!isset($item_data['host'])){
-				self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Item doesn\'t exists.');
-				return false;
-			}
-			$hostid = CHost::getId(array('host' => $item_data['host']));
-		}
+	public static function getObjects($item_data){
+		$result = array();
+		$itemids = array();
 
 		$sql = 'SELECT DISTINCT i.itemid'.
-			' FROM items i'.
-			' WHERE i.key_='.zbx_dbstr($item_data['key_']).
-				' AND i.hostid='.$hostid;
-
-		$itemid = DBfetch(DBselect($sql));
-
-		$result = $itemid ? $itemid['itemid'] : false;
-		if($result)
-			return $result;
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Item doesn\'t exists.');
-			return false;
+				' FROM items i'.
+				' WHERE i.key_='.zbx_dbstr($item_data['key_']).
+					' AND i.hostid='.$item_data['hostid'];
+		$res = DBselect($sql);
+		while($item = DBfetch($res)){
+			$itemids[$item['itemid']] = $item['itemid'];
 		}
+		
+		if(!empty($itemids))
+			$result = self::get(array('itemids'=>$itemids, 'extendoutput'=>1));
+		
+	return $result;
 	}
 
 /**

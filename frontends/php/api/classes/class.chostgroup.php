@@ -364,31 +364,23 @@ class CHostGroup extends CZBXAPI{
  * @param array $data['name']
  * @return string|boolean HostGroup ID or false if error
  */
-	public static function getId($data){
-		global $USER_DETAILS;
+	public static function getObjects($data){
+		$result = array();
+		$groupids = array();
 
-		if(!isset($data['name']) || empty($data['name'])){
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ name ]');
-			return false;
+		$sql = 'SELECT groupid '.
+				' FROM groups '.
+				' WHERE name='.zbx_dbstr($data['name']).
+					' AND '.DBin_node('groupid', false);
+		$res = DBselect($sql);
+		while($group=DBfetch($res)){
+			$groupids[$group['groupid']] = $group['groupid'];
 		}
 
-		$sql = 'SELECT groupid FROM groups WHERE name='.zbx_dbstr($data['name']).' AND '.DBin_node('groupid', false);
-		$groupid = DBfetch(DBselect($sql));
-
-		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
-			$cnt = self::get(array('groupids' => $groupid, 'count' => 1));
-			if($cnt['rowscount'] != 1){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, "You have no rights for HostGroup [ $groupid ]");
-				return false;
-			}
-		}
-
-		if($groupid)
-			return $groupid['groupid'];
-		else{
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, "HostGroup with name [ {$data['name']} ] does not exists");
-			return false;
-		}
+		if(!empty($groupids))
+			$result = self::get(array('groupids'=>$groupids, 'extendoutput'=>1));
+		
+	return $result;
 	}
 
 /**
@@ -427,8 +419,8 @@ class CHostGroup extends CZBXAPI{
 			}
 			$group = $group['name'];
 
-			$group_exist = self::getId(array('name' => $group));
-			if($group_exist != false){
+			$group_exist = self::getObjects(array('name' => $group));
+			if(!empty($group_exist)){
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => "HostGroup [ $group ] already exists");
 				$result = false;
 				break;
@@ -493,8 +485,9 @@ class CHostGroup extends CZBXAPI{
 		self::BeginTransaction(__METHOD__);
 		foreach($groups as $num => $group){
 
-			$group_exist = self::getId(array('name' => $group['name']));
-			if($group_exist && ($group_exist != $group['groupid'])){
+			$group_exist = self::getObjects(array('name' => $group['name']));
+			$group_exist = reset($group_exist);
+			if(!$group_exist && ($group_exist['groupid'] != $group['groupid'])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'HostGroup [ '.$group['name'].' ] already exists');
 				$result = false;
 				break;
@@ -560,7 +553,8 @@ class CHostGroup extends CZBXAPI{
 		if(count($groupids) != count($dlt_groupids)){
 			foreach($groupids as $groupid){
 				if(!isset($dlt_groupids[$groupid])){
-					$group = self::getById(array('groupid' => $groupid));
+					$group = self::get(array('groupids' => $groupid,  'extendoutput' => 1));
+					$group = reset($group);
 					if($group['internal'] == ZBX_INTERNAL_GROUP)
 						self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, "HostGroup [ {$group['name']} ] is internal and can not be deleted");
 					else
