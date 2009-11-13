@@ -606,6 +606,7 @@ class CHost extends CZBXAPI{
 				' FROM hosts '.
 				' WHERE host='.zbx_dbstr($host_data['host']).
 					' AND '.DBin_node('hostid', false);
+
 		$res = DBselect($sql);
 		while($host = DBfetch($res)){
 			$hostids[$host['hostid']] = $host['hostid'];
@@ -699,7 +700,7 @@ class CHost extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_hosts = self::get(array('hostids'=>$hostids, 'editable'=>1, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$new_hosts = self::get(array('hostids'=>$hostids, 'editable'=>1, 'extendoutput'=>1, 'nopermissions'=>1));
 			return $new_hosts;
 		}
 		else{
@@ -887,6 +888,11 @@ class CHost extends CZBXAPI{
 									'editable'=>1, 
 									'extendoutput'=>1, 
 									'preservekeys'=>1));
+		if(empty($del_hosts)){
+			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Host does not exist');
+			return false;
+		}
+
 		foreach($hosts as $num => $host){
 			if(!isset($del_hosts[$host['hostid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');

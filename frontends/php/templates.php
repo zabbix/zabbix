@@ -311,21 +311,20 @@ include_once('include/page_header.php');
 // MACROS {
 		if($result){
 			$macros = get_request('macros', array());
-			$macrostoadd = array('hostid' => $templateid, 'macros' => array());
+			$macrostoadd = array();
 
-			foreach($macros as $macro){
-				if(!CUserMacro::validate($macro)){
-					$result = false;
-					break;
-				}
-				$macrostoadd['macros'][] = $macro;
+			foreach($macros as $mnum => $macro){
+				$macro['hostid'] = $templateid;
+				$macrostoadd[] = $macro;
 			}
 
-			$result = CUserMacro::update($macrostoadd);
-
+			if(!empty($macrostoadd))
+				$result = CUserMacro::update($macrostoadd);
+				
 			if(!$result)
-				error('S_ERROR_ADDING_MACRO');
+				error(S_ERROR_ADDING_MACRO);
 		}
+
 // } MACROS
 		$result = DBend($result);
 

@@ -925,7 +925,7 @@ function validate_operation($operation){
 					}
 					break;
 				case OPERATION_OBJECT_GROUP:
-					$usrgrps = CUserGroup::get(array('usrgrpids' => $operation['objectid']),  'extendoutput' => 1);
+					$usrgrps = CUserGroup::get(array('usrgrpids' => $operation['objectid'],  'extendoutput' => 1));
 					if(empty($usrgrps)){
 						error(S_INCORRECT_GROUP);
 						return false;

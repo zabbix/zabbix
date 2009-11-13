@@ -417,17 +417,16 @@ class CHostGroup extends CZBXAPI{
 				$result = false;
 				break;
 			}
-			$group = $group['name'];
 
-			$group_exist = self::getObjects(array('name' => $group));
+			$group_exist = self::getObjects(array('name' => $group['name']));
 			if(!empty($group_exist)){
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => "HostGroup [ $group ] already exists");
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'HostGroup [ '.$group['name'].' ] already exists');
 				$result = false;
 				break;
 			}
 
 			$groupid = get_dbid('groups', 'groupid');
-			$sql = 'INSERT INTO groups (groupid, name, internal) VALUES ('.$groupid.', '.zbx_dbstr($group).', '.ZBX_NOT_INTERNAL_GROUP.')';
+			$sql = 'INSERT INTO groups (groupid, name, internal) VALUES ('.$groupid.', '.zbx_dbstr($group['name']).', '.ZBX_NOT_INTERNAL_GROUP.')';
 			$result = DBexecute($sql);
 			if(!$result) break;
 
@@ -670,6 +669,7 @@ class CHostGroup extends CZBXAPI{
 			'extendoutput' => 1, 
 			'preservekeys' => 1)
 		);
+
 		foreach($groups as $num => $group){
 			if(!isset($allowed_groups[$group['groupid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');

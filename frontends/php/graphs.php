@@ -118,7 +118,7 @@ include_once('include/page_header.php');
 		}
 
 		if(!empty($itemids)){
-			$options = array('itemids'=>$itemids, 'editable'=>1, 'nodes'=>get_current_node(true));
+			$options = array('itemids'=>$itemids, 'editable'=>1, 'nodes'=>get_current_nodeid(true));
 			$db_items = CItem::get($options);
 			$db_items = zbx_toHash($db_items, 'itemid');
 			
@@ -289,7 +289,7 @@ include_once('include/page_header.php');
 // groups
 				zbx_value2array($_REQUEST['copy_targetid']);
 
-				$options = array('groupids'=>$_REQUEST['copy_targetid'], 'editable'=>1, 'nodes'=>get_current_node(true));
+				$options = array('groupids'=>$_REQUEST['copy_targetid'], 'editable'=>1, 'nodes'=>get_current_nodeid(true));
 				$db_groups = CHostGroup::get($options);
 				$db_groups = zbx_toHash($db_groups, 'groupid');
 
@@ -299,7 +299,7 @@ include_once('include/page_header.php');
 					}
 				}
 				
-				$options = array('groupids'=>$_REQUEST['copy_targetid'], 'editable'=>1, 'nodes'=>get_current_node(true));
+				$options = array('groupids'=>$_REQUEST['copy_targetid'], 'editable'=>1, 'nodes'=>get_current_nodeid(true));
 				$db_hosts = CHost::get($options);
 				$db_hosts = zbx_toHash($db_hosts, 'hostid');
 			}
