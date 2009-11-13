@@ -88,9 +88,6 @@ class czbxrpc{
 			self::$result = array('result' => self::$result);
 		}
 		else{
-// Abort started in API transactions if they are not closed
-			CZBXAPI::endAPITransactions(false);
-
 			self::$result = reset(CZBXAPI::$error);
 		}
 

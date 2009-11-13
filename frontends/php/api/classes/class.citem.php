@@ -822,7 +822,7 @@ class CItem extends CZBXAPI{
 				);
 
 			if ($result)
-				add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_ITEM, $itemid, $item['description'], NULL, NULL, NULL);
+				//add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_ITEM, $itemid, $item['description'], NULL, NULL, NULL);
 			else
 				return $result;
 
@@ -952,7 +952,7 @@ class CItem extends CZBXAPI{
 			}
 
 			$itemids[] = $item['itemid'];
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, 'Item ['.$Item['description'].']');
+			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, 'Item ['.$Item['description'].']');
 		}
 	
 		if(!empty($itemids)){

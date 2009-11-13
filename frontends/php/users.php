@@ -160,7 +160,7 @@ include_once('include/page_header.php');
 				$user['userid'] = $_REQUEST['userid'];
 
 				DBstart();
-				$result = CUser::update(array($user));
+				$result = CUser::update($user);
 				$result = DBend($result);
 				if(!$result) error(CUser::resetErrors());
 
@@ -170,7 +170,7 @@ include_once('include/page_header.php');
 				$action = AUDIT_ACTION_ADD;
 
 				DBstart();
-				$result = CUser::add(array($user));
+				$result = CUser::add($user);
 				$result = DBend($result);
 
 				if(!$result) error(CUser::resetErrors());
@@ -201,13 +201,12 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['userid'])){
 		$user=CUser::getById(array('userid' => $_REQUEST['userid']));
 
-		$result = CUser::delete(array('userids' => $_REQUEST['userid']));
+		$result = CUser::delete(zbx_toObject($_REQUEST['userid'], 'userids'));
 		if(!$result) error(CUser::resetErrors());
 
 		show_messages($result, S_USER_DELETED, S_CANNOT_DELETE_USER);
 		if($result){
-			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER,
-				'User alias ['.$user['alias'].'] name ['.$user['name'].'] surname ['.$user['surname'].']');
+			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER,'User alias ['.$user['alias'].'] name ['.$user['name'].'] surname ['.$user['surname'].']');
 
 			unset($_REQUEST['userid']);
 			unset($_REQUEST['form']);
@@ -287,7 +286,7 @@ include_once('include/page_header.php');
 		foreach($group_userid as $userid){
 			if(!($user_data = CUser::getById(array('userid' => $userid)))) continue;
 
-			$go_result |= (bool) CUser::delete(array('userids' => $userid));
+			$go_result |= (bool) CUser::delete(zbx_toObject($userid,'userids'));
 			if(!$go_result) error(CUser::resetErrors());
 
 			if($go_result){

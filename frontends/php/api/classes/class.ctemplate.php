@@ -703,7 +703,7 @@ class CTemplate extends CZBXAPI{
 				return false;
 			}
 			$templateids[] = $template['templateid'];
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Template ['.$template['host'].']');
+			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Template ['.$template['host'].']');
 		}
 
 		if(!empty($templateids)){

@@ -475,7 +475,7 @@ class CApplication extends CZBXAPI{
 			}
 
 			$applicationids[] = $application['applicationid'];
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_APPLICATION, 'application ['.$application['name'].']');
+			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_APPLICATION, 'application ['.$application['name'].']');
 		}
 
 		if(!empty($applicationids)){

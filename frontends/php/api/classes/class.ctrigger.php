@@ -442,7 +442,7 @@ class CTrigger extends CZBXAPI{
 			}
 
 			$obj_params = array('triggerids' => $depids, 'extendoutput' => 1, 'expand_data' => 1, 'preservekeys' => 1);
-			$allowed = CTrigger::get($obj_params); //allowed triggerids
+			$allowed = self::get($obj_params); //allowed triggerids
 
 			foreach($deps as $triggerid => $deptriggers){
 				foreach($deptriggers as $num => $deptriggerid){
@@ -617,7 +617,7 @@ class CTrigger extends CZBXAPI{
 
 		$result = self::EndTransaction($result, __METHOD__);
 		if($result){
-			$new_triggers = CTrigger::get(array('triggerids'=>$triggerids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$new_triggers = self::get(array('triggerids'=>$triggerids, 'extendoutput'=>1, 'nopermissions'=>1));			
 			return $new_triggers;
 		}
 		else{
@@ -650,7 +650,7 @@ class CTrigger extends CZBXAPI{
 		$triggers = zbx_toArray($triggers);
 		$triggerids = array();
 		
-		$upd_triggers = CTrigger::get(array('triggerids'=>zbx_objectValues($triggers, 'triggerid'), 
+		$upd_triggers = self::get(array('triggerids'=>zbx_objectValues($triggers, 'triggerid'), 
 											'editable'=>1, 
 											'extendoutput'=>1, 
 											'preservekeys'=>1));
@@ -669,7 +669,7 @@ class CTrigger extends CZBXAPI{
 			$trigger_db_fields = $upd_triggers[$trigger['triggerid']];
 
 			if(!check_db_fields($trigger_db_fields, $trigger)){
-				error('Incorrect arguments pasted to function [CTrigger::update]');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Incorrect arguments pasted to function [CTrigger::update]');
 				$result = false;
 				break;
 			}
@@ -690,7 +690,7 @@ class CTrigger extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_triggers = CTrigger::get(array('triggerids'=>$triggerids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$upd_triggers = self::get(array('triggerids'=>$triggerids, 'extendoutput'=>1, 'nopermissions'=>1));			
 			return $upd_triggers;
 		}
 		else{
@@ -718,7 +718,7 @@ class CTrigger extends CZBXAPI{
 		$triggers = zbx_toArray($triggers);		
 		$triggerids = array();
 
-		$del_triggers = CTrigger::get(array('triggerids'=>zbx_objectValues($triggers, 'triggerid'), 
+		$del_triggers = self::get(array('triggerids'=>zbx_objectValues($triggers, 'triggerid'), 
 											'editable'=>1, 
 											'extendoutput'=>1, 
 											'preservekeys'=>1));
@@ -729,7 +729,7 @@ class CTrigger extends CZBXAPI{
 			}
 
 			$triggerids[] = $trigger['triggerid'];
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, 'Trigger ['.$trigger['description'].']');
+			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, 'Trigger ['.$trigger['description'].']');
 		}
 
 		if(!empty($triggerids)){

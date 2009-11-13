@@ -621,7 +621,7 @@ class CGraph extends CZBXAPI{
 			}
 
 			$graphids[] = $graph['graphid'];
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_GRAPH, 'Graph ['.$graph['name'].']');
+			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_GRAPH, 'Graph ['.$graph['name'].']');
 		}
 
 		if(!empty($graphids)){
