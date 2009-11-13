@@ -662,7 +662,6 @@ class CHostGroup extends CZBXAPI{
  * @return boolean
  */
 	public static function addHosts($data){
-		global $USER_DETAILS;
 		
 		$result = true;
 		$groups = zbx_toArray($data['groups']);
@@ -726,7 +725,8 @@ class CHostGroup extends CZBXAPI{
 			$result = self::get(array(
 				'groupids' => $groupids, 
 				'extendoutput' => 1, 
-				'select_hosts' => 1));
+				'select_hosts' => 1,
+				'nopermission' => 1));
 			return $result;
 		}
 		else{
@@ -750,7 +750,6 @@ class CHostGroup extends CZBXAPI{
  * @return boolean
  */
 	public static function removeHosts($data){
-		global $USER_DETAILS;
 
 		$result = true;
 		$groups = zbx_toArray($data['groups']);
@@ -811,7 +810,8 @@ class CHostGroup extends CZBXAPI{
 			$result = self::get(array(
 				'groupids' => $groupids, 
 				'extendoutput' => 1, 
-				'select_hosts' => 1));
+				'select_hosts' => 1,
+				'nopermission' => 1));
 			return $result;
 		}
 		else{
@@ -835,7 +835,6 @@ class CHostGroup extends CZBXAPI{
  * @return boolean
  */
 	public static function updateHosts($data){
-		global $USER_DETAILS;
 
 		$result = true;
 		$groups = zbx_toArray($data['groups']);
@@ -887,7 +886,8 @@ class CHostGroup extends CZBXAPI{
 			$result = self::get(array(
 				'groupids' => $groupids, 
 				'extendoutput' => 1, 
-				'select_hosts' => 1));
+				'select_hosts' => 1,
+				'nopermission' => 1));
 			return $result;
 		}
 		else{
