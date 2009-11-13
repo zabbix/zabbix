@@ -405,8 +405,6 @@ class CHostGroup extends CZBXAPI{
  * @return array
  */
 	public static function add($groups){
-		$groups = zbx_toArray($groups);
-		
 		global $USER_DETAILS;
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can create HostGroups');
@@ -632,8 +630,9 @@ class CHostGroup extends CZBXAPI{
 		}
 
 */
+		self::BeginTransaction(__METHOD__);
 		$result = delete_host_group($groupids);
-//		$result = self::EndTransaction($result, __METHOD__);
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
 			return zbx_cleanHashes($del_groups);
@@ -695,7 +694,7 @@ class CHostGroup extends CZBXAPI{
 			$linked[$pair['groupid']] = array($pair['hostid'] => $pair['hostid']);
 		}
 
-		foreach($groupids as $groupid){
+		foreach($groupids as $gnum => $groupid){
 			foreach($hostids as $hostid){
 				if(isset($linked[$groupid]) && isset($linked[$groupid][$hostid])) continue;
 

@@ -422,28 +422,28 @@ class CUser extends CZBXAPI{
 	 * @return array|boolean
 	 */
 	public static function add($users){
-		global $USER_DETAILS;
-		$error = 'Unknown ZABBIX internal error';
-		$result = false;
-		$resultids = array();
-
 		self::BeginTransaction(__METHOD__);
 
-		foreach($users as $user){
+		global $USER_DETAILS;
+		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can create Users');
+			return false;
+		}
 
+		$users = zbx_toArray($users);
+		$userids = array();
+		
+		$error = 'Unknown ZABBIX internal error';
+		$result = false;
+
+		foreach($users as $unum => $user){
 // copy from frontend {
-			if($USER_DETAILS['type'] != USER_TYPE_SUPER_ADMIN){
-				$error = 'Insufficient permissions';
-				$result = false;
-				break;
-			}
-
 			$sql = 'SELECT * '.
 					' FROM users '.
 					' WHERE alias='.zbx_dbstr($user['alias']).
 						' AND '.DBin_node('userid', false);
 			if(DBfetch(DBselect($sql))){
-				$error = "User [ {$user['alias']} ] already exists";
+				$error = 'User [ '.$user['alias'].' ] already exists';
 				$result = false;
 				break;
 			}
@@ -512,14 +512,15 @@ class CUser extends CZBXAPI{
 			}
 
 // } copy from frontend
-
-			$resultids[$userid] = $userid;
 			if(!$result) break;
+			
+			$userids[] = $userid;
 		}
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return $resultids;
+			$upd_users = self::get(array('userids'=>$userids, 'extendoutput'=>1, 'nopermissions'=>1));
+			return $upd_users;
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
@@ -559,43 +560,55 @@ class CUser extends CZBXAPI{
  * @return boolean
  */
 	public static function update($users){
+		self::BeginTransaction(__METHOD__);
+
+		global $USER_DETAILS;
+		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can update Users');
+			return false;
+		}
+
+		$users = zbx_toArray($users);
+		$userids = array();
+
+		$upd_users = self::get(array('userids'=>zbx_objectValues($users, 'userid'), 
+											'extendoutput'=>1, 
+											'preservekeys'=>1));
+		foreach($users as $gnum => $user){
+			if($user['alias'] != $del_users[$user['userid']]['alias']){
+				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Cannot update user alias'.'[ '.$user['alias'].' ]');
+				$result = false;
+			}
+			
+			$userids[] = $user['userid'];
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User ['.$user['alias'].']');
+		}
+
 		$result = false;
 		$error = 'Unknown ZABBIX internal error';
+		foreach($users as $unum => $user){
+			$user_db_fields = $upd_users[$user['userid']];
 
-		self::BeginTransaction(__METHOD__);
-		foreach($users as $user){
-			$userid = $user['userid'];
+			if(!check_db_fields($user_db_fields, $user)){
+				error('Incorrect arguments pasted to function [CUser::update]');
+				$result = false;
+				break;
+			}
 
 // copy from frontend {
 			$result = true;
 
-			$sql = 'SELECT DISTINCT * '.
-				' FROM users '.
-				' WHERE ( alias='.zbx_dbstr($user['alias']).' OR userid='.$userid.' ) '.
-					' AND '.DBin_node('userid', id2nodeid($userid));
-
-			$db_users = DBselect($sql);
-			while($db_user = DBfetch($db_users)){
-				if($db_user['userid'] != $userid){
-					$error = 'User [ '.$user['alias'].' ] already exists';
-					$result = false;
-					break;
-				}
-				$user_db_fields = $db_user;
-			}
-
-			if(!isset($user_db_fields)) {
-				return false;
+			$sql = 'SELECT DISTINCT userid FROM users WHERE alias='.zbx_dbstr($user['alias']).' AND '.DBin_node('userid', id2nodeid($userid));
+			$db_user = DBfetch(DBselect($sql));
+			
+			if($db_user){
+				$error = 'User [ '.$user['alias'].' ] already exists';
+				$result = false;
+				break;
 			}
 
 			if(isset($user['passwd'])) {
 				$user['passwd'] = md5($user['passwd']);
-			}
-
-			if(!check_db_fields($user_db_fields, $user)){
-				$error = 'Incorrect parameters pasted to method [ user.update ]';
-				$result = false;
-				break;
 			}
 
 			$sql = 'UPDATE users SET '.
@@ -617,7 +630,7 @@ class CUser extends CZBXAPI{
 			if($result && !is_null($user['user_groups'])){
 				DBexecute('DELETE FROM users_groups WHERE userid='.$userid);
 
-				$user['user_groups'] = cusergroup::get(array('usrgrpids' => $user['user_groups'], 'extendoutput' => 1));
+				$user['user_groups'] = CUserGroup::get(array('usrgrpids' => $user['user_groups'], 'extendoutput' => 1));
 				foreach($user['user_groups'] as $groupid => $group){
 					if(!$result) break;
 
@@ -653,13 +666,80 @@ class CUser extends CZBXAPI{
 // } copy from frontend
 			if(!$result) break;
 		}
+
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return true;
+			$upd_users = self::get(array('userids'=>$userids, 'extendoutput'=>1, 'nopermissions'=>1));
+			return $upd_users;
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
+			return false;
+		}
+	}
+
+
+/**
+ * Delete Users
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $users
+ * @param array $users[0,...]['userids']
+ * @return boolean
+ */
+	public static function delete($users){
+		self::BeginTransaction(__METHOD__);
+
+		global $USER_DETAILS;
+		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
+			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can delete Users');
+			return false;
+		}
+
+		$users = zbx_toArray($users);
+		$userids = array();
+
+		$del_users = self::get(array('userids'=>zbx_objectValues($users, 'userid'), 
+											'extendoutput'=>1, 
+											'preservekeys'=>1));
+		foreach($users as $gnum => $user){
+			if(bccomp($USER_DETAILS['userid'],$user['userid']) == 0){
+				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, S_USER_CANNOT_DELETE_ITSELF);
+				$result = false;
+			}
+
+			if($del_users[$user['userid']]['alias'] == ZBX_GUEST_USER){
+				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, S_CANNOT_DELETE_USER.'[ '.ZBX_GUEST_USER.' ]');
+				$result = false;
+			}
+			
+			$userids[] = $user['userid'];
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User ['.$user['alias'].']');
+		}
+		
+		$result = false;
+
+		if(empty($userids)){
+			$result = DBexecute('DELETE FROM operations WHERE '.OPERATION_OBJECT_USER.' AND '.DBcondition('objectid', $userids));
+			$result = DBexecute('DELETE FROM media WHERE '.DBcondition('userid', $userids));
+			$result = DBexecute('DELETE FROM profiles WHERE '.DBcondition('userid', $userids));
+			$result = DBexecute('DELETE FROM users_groups WHERE '.DBcondition('userid', $userids));
+			$result = DBexecute('DELETE FROM users WHERE '.DBcondition('userid', $userids));
+		}
+		
+		$result = self::EndTransaction($result, __METHOD__);
+
+		if($result){
+			return zbx_cleanHashes($del_users);
+		}
+		else{
+			self::setError(__METHOD__);
 			return false;
 		}
 	}
@@ -766,62 +846,6 @@ class CUser extends CZBXAPI{
 			return false;
 		}
 
-	}
-
-/**
- * Delete Users
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param array $userids
- * @param array $userids['userids']
- * @return boolean
- */
-	public static function delete($userids){
-		global $USER_DETAILS;
-
-		$result = true;
-		$userids = isset($userids['userids']) ? $userids['userids'] : array();
-		zbx_value2array($userids);
-
-
-		if(empty($userids)){
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ userids ]');
-			$result = false;
-		}
-
-		if(DBfetch(DBselect('SELECT * FROM users WHERE '.DBcondition('userid', $userids).' AND alias='.zbx_dbstr(ZBX_GUEST_USER)))){
-		self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, S_CANNOT_DELETE_USER.'[ '.ZBX_GUEST_USER.' ]');
-			$result = false;
-		}
-
-		if(uint_in_array($USER_DETAILS['userid'], $userids)){
-		self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, S_USER_CANNOT_DELETE_ITSELF);
-			$result = false;
-		}
-
-		if($result){
-			self::BeginTransaction(__METHOD__);
-
-			$result &= DBexecute('DELETE FROM operations WHERE '.OPERATION_OBJECT_USER.' AND '.DBcondition('objectid', $userids));
-			$result &= DBexecute('DELETE FROM media WHERE '.DBcondition('userid', $userids));
-			$result &= DBexecute('DELETE FROM profiles WHERE '.DBcondition('userid', $userids));
-			$result &= DBexecute('DELETE FROM users_groups WHERE '.DBcondition('userid', $userids));
-			$result &= DBexecute('DELETE FROM users WHERE '.DBcondition('userid', $userids));
-
-			$result = self::EndTransaction($result, __METHOD__);
-		}
-
-		if($result)
-			return true;
-		else{
-			self::setError(__METHOD__);
-			return false;
-		}
 	}
 
 }
