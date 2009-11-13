@@ -463,19 +463,18 @@ include_once('include/page_header.php');
 // MACROS {
 		if($result){
 			$macros = get_request('macros', array());
-			$macrostoadd = array('hostid' => $hostid, 'macros' => array());
+			$macrostoadd = array();
 
 			foreach($macros as $mnum => $macro){
-				if(!CUserMacro::validate($macro)){
-					$result = false;
-					break;
-				}
+				$macro['hostid'] = $hostid;
 				$macrostoadd[] = $macro;
 			}
-			$result = CUserMacro::update($macrostoadd);
 
+			if(!empty($macrostoadd))
+				$result = CUserMacro::update($macrostoadd);
+				
 			if(!$result)
-				error('S_ERROR_ADDING_MACRO');
+				error(S_ERROR_ADDING_MACRO);
 		}
 // } MACROS
 
@@ -527,9 +526,11 @@ include_once('include/page_header.php');
 		
 		$go_result = true;
 		DBstart();
-		foreach($del_hosts as $num => $host){
-			$go_result &= CHost::delete($host);
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$db_host['host'].']');
+		foreach($hosts as $num => $host){
+			$go_result = CHost::delete($host);
+			
+			if(!$go_result) break;
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$host['host'].']');
 		}
 		$go_result = DBend($go_result);
 

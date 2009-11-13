@@ -889,6 +889,11 @@ SDI($new_hosts);
 									'editable'=>1, 
 									'extendoutput'=>1, 
 									'preservekeys'=>1));
+		if(empty($del_hosts)){
+			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Host does not exist');
+			return false;
+		}
+
 		foreach($hosts as $num => $host){
 			if(!isset($del_hosts[$host['hostid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');

@@ -539,16 +539,22 @@ class CUserMacro extends CZBXAPI{
  */
 	public static function update($macros){
 		$macros = zbx_toArray($macros);
+		$new_macros = array();
 		$hostmacroids = array();
-		
 		$result = false;
 //------
-
-		self::BeginTransaction(__METHOD__);
+		$hostids = array();
 		
+		self::BeginTransaction(__METHOD__);
 		foreach($macros as $mnum => $macro){
 			$result = DBexecute('DELETE FROM hostmacro WHERE hostid='.$macro['hostid']);
-	
+			
+			if(isset($macro['macro']) && isset($macro['value'])){
+				if(CUserMacro::validate($macro)) $new_macros[] = $macro;
+			}
+		}
+		
+		foreach($new_macros as $mnum => $macro){
 			$hostmacroid = get_dbid('hostmacro', 'hostmacroid');
 
 			$sql = 'INSERT INTO hostmacro (hostmacroid, hostid, macro, value) '.
