@@ -511,11 +511,15 @@ function get_operation_desc($type=SHORT_DESCRITION, $data){
 				case OPERATION_TYPE_MESSAGE:
 					switch($data['object']){
 						case OPERATION_OBJECT_USER:
-							$obj_data = CUser::getById(array('userid' => $data['objectid']));
+							$obj_data = CUser::get(array('userids' => $data['objectid'],  'extendoutput' => 1));
+							$obj_data = reset($obj_data);
+							
 							$obj_data = S_USER.' "'.$obj_data['alias'].'"';
 							break;
 						case OPERATION_OBJECT_GROUP:
-							$obj_data = CUserGroup::getById(array('usrgrpid' => $data['objectid']));
+							$obj_data = CUserGroup::get(array('usrgrpids' => $data['objectid'],  'extendoutput' => 1));
+							$obj_data = reset($obj_data);
+							
 							$obj_data = S_GROUP.' "'.$obj_data['name'].'"';
 							break;
 					}
@@ -914,13 +918,15 @@ function validate_operation($operation){
 		case OPERATION_TYPE_MESSAGE:
 			switch($operation['object']){
 				case OPERATION_OBJECT_USER:
-					if( !CUser::getById(array('userid' => $operation['objectid'])) ){
+					$users = CUser::get(array('userids' => $operation['objectid'],  'extendoutput' => 1));
+					if(empty($users)){
 						error(S_INCORRECT_USER);
 						return false;
 					}
 					break;
 				case OPERATION_OBJECT_GROUP:
-					if( !CUserGroup::getById(array('usrgrpid' => $operation['objectid']))){
+					$usrgrps = CUserGroup::get(array('usrgrpids' => $operation['objectid']),  'extendoutput' => 1);
+					if(empty($usrgrps)){
 						error(S_INCORRECT_GROUP);
 						return false;
 					}

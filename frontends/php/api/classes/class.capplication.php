@@ -295,29 +295,6 @@ class CApplication extends CZBXAPI{
 	return $result;
 	}
 
-/**
- * Gets all Application data from DB by Application ID
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param int $app_data
- * @param int $app_data['applicationid']
- * @return array|boolean application data || false if error
- */
-	public static function getById($app_data){
-		$item = get_application_by_applicationid($app_data['applicationid']);
-		$result = $item ? true : false;
-		if($result)
-			return $item;
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Application with id: '.$app_data['applicationid'].' doesn\'t exists.');
-			return false;
-		}
-	}
 
 /**
  * Get Application ID by host.name and item.key
@@ -333,21 +310,23 @@ class CApplication extends CZBXAPI{
  * @param array $app_data['hostid']
  * @return int|boolean
  */
-	public static function getId($app_data){
-
+	public static function getObjects($app_data){
+		$result = array();
+		$applicationids = array();
+				
 		$sql = 'SELECT applicationid '.
 				' FROM applications '.
 				' WHERE hostid='.$app_data['hostid'].
 					' AND name='.zbx_dbstr($app_data['name']);
-		$appid = DBfetch(DBselect($sql));
-
-		$result = $appid ? true : false;
-		if($result)
-			return $appid['applicationid'];
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Application doesn\'t exists.');
-			return false;
+		$res = DBselect($sql);
+		while($app = DBfetch($res)){
+			$applicationids[$app['applicationid']] = $app['applicationid'];
 		}
+	
+		if(!empty($applicationids))
+			$result = self::get(array('applicationids'=>$applicationids, 'extendoutput'=>1));
+		
+	return $result;
 	}
 
 /**

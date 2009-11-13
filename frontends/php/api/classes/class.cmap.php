@@ -300,32 +300,6 @@ class CMap extends CZBXAPI{
 	return $result;
 	}
 
-/**
- * Gets all Map data from DB by Map ID
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $map_data
- * @param string $map_data['mapid']
- * @return array|boolean Map data as array or false if error
- *
-	public static function getById($map_data){
-		$sql = 'SELECT * FROM sysmaps WHERE sysmapid='.$map_data['sysmapid'];
-		$map = DBfetch(DBselect($sql));
-
-		$result = $map ? true : false;
-		if($result)
-			return $map;
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'map with id: '.$map_data['screenid'].' doesn\'t exists.');
-			return false;
-		}
-	}
-//*/
 
 /**
  * Add Map

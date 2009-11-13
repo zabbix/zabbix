@@ -294,33 +294,6 @@ class CScreen extends CZBXAPI{
 	}
 
 /**
- * Gets all Screen data from DB by Screen ID
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $screen_data
- * @param string $screen_data['screenid']
- * @return array|boolean Screen data as array or false if error
- */
-	public static function getById($screen_data){
-		$sql = 'SELECT * FROM screens WHERE screenid='.$screen_data['screenid'];
-		$screen = DBfetch(DBselect($sql));
-
-		$result = $screen ? true : false;
-		if($result)
-			return $screen;
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'screen with id: '.$screen_data['screenid'].' doesn\'t exists.');
-			return false;
-		}
-	}
-
-
-/**
  * Add Screen
  *
  * {@source}

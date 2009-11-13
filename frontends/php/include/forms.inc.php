@@ -614,8 +614,9 @@
 		$frm_title = S_USER;
 		if(isset($userid)){
 /*			if(bccomp($userid,$USER_DETAILS['userid'])==0) $profile = 1;*/
-
-			$user = CUser::getById(array('userid' => $userid));
+			$users = CUser::get(array('userids' => $userid,  'extendoutput' => 1));
+			$user = reset($users);
+			
 			$frm_title = S_USER.' "'.$user['alias'].'"';
 		}
 
@@ -936,7 +937,9 @@
 
 		$frm_title = S_USER_GROUP;
 		if(isset($_REQUEST['usrgrpid'])){
-			$usrgrp		= CUserGroup::getById(array('usrgrpid' => $_REQUEST['usrgrpid']));
+			$usrgrp		= CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'],  'extendoutput' => 1));
+			$usrgrp = reset($usrgrp);
+
 			$frm_title	= S_USER_GROUP.' "'.$usrgrp['name'].'"';
 		}
 
@@ -1798,7 +1801,9 @@
 
 		if(isset($_REQUEST['itemid'])){
 			$frmItem->addVar('itemid', $_REQUEST['itemid']);
-			$item_data = CItem::getById(array('itemid' => $_REQUEST['itemid']));
+			$item_data = CItem::get(array('itemids' => $_REQUEST['itemid'],  'extendoutput' => 1));
+			$item_data = reset($item_data);
+			
 			$hostid	= ($hostid > 0) ? $hostid : $item_data['hostid'];
 			$limited = (($item_data['templateid'] == 0)  && ($item_data['type'] != ITEM_TYPE_HTTPTEST)) ? null : 'yes';
 		}
@@ -2894,7 +2899,9 @@
 
 		if(isset($_REQUEST['graphid'])){
 			$frmGraph->addVar('graphid', $_REQUEST['graphid']);
-			$row = CGraph::getById(array('graphid' => $_REQUEST['graphid']));
+			$row = CGraph::get(array('graphids' => $_REQUEST['graphid'],  'extendoutput' => 1));
+			$row = reset($row);
+			
 			$frmGraph->setTitle(S_GRAPH.' "'.$row['name'].'"');
 		}
 
@@ -4652,13 +4659,19 @@
 				if( $new_operation['object'] == OPERATION_OBJECT_GROUP){
 					$object_srctbl = 'usrgrp';
 					$object_srcfld1 = 'usrgrpid';
-					$object_name = CUserGroup::getById(array('usrgrpid' => $new_operation['objectid']));
+					
+					$object_name = CUserGroup::get(array('usrgrpids' => $new_operation['objectid'],  'extendoutput' => 1));
+					$object_name = reset($object_name);
+					
 					$display_name = 'name';
 				}
 				else{
 					$object_srctbl = 'users';
 					$object_srcfld1 = 'userid';
-					$object_name = CUser::getById(array('userid' => $new_operation['objectid']));
+					
+					$object_name = CUser::get(array('userids' => $new_operation['objectid'],  'extendoutput' => 1));
+					$object_name = reset($object_name);
+					
 					$display_name = 'alias';
 				}
 

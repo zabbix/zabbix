@@ -445,32 +445,6 @@ class CEvent extends CZBXAPI{
 	}
 
 /**
- * Gets all event data from DB by event ID
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $event
- * @param array $event['eventid']
- * @return array|boolean array of event data || false if error
- */
-	public static function getById($event){
-		$sql =
-		$event =  get_event_by_eventid($event['eventid']);
-		$result = $event ? true : false;
-		if($result)
-			$result = $event;
-		else
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
-
-		return $result;
-	}
-
-
-/**
  * Add events ( without alerts )
  *
  * {@source}

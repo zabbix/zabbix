@@ -586,31 +586,6 @@ class CHost extends CZBXAPI{
 	}
 
 /**
- * Gets all Host data from DB by Host ID
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $host_data
- * @param string $host_data['hostid']
- * @return array|boolean Host data as array or false if error
- */
-	public static function getById($host_data){
-		$sql = 'SELECT * FROM hosts WHERE hostid='.$host_data['hostid'];
-		$host = DBfetch(DBselect($sql));
-
-		if($host)
-			return $host;
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Host with ID [ '.$host_data['hostid'].' ] does not exists');
-			return false;
-		}
-	}
-
-/**
  * Get Host ID by Host name
  *
  * {@source}
@@ -623,18 +598,23 @@ class CHost extends CZBXAPI{
  * @param string $host_data['host']
  * @return int|boolean
  */
-	public static function getId($host_data){
+	public static function getObjects($host_data){
+		$result = array();
+		$hostids = array();
+		
 		$sql = 'SELECT hostid '.
 				' FROM hosts '.
 				' WHERE host='.zbx_dbstr($host_data['host']).
 					' AND '.DBin_node('hostid', false);
 		$res = DBselect($sql);
-		if($hostid = DBfetch($res))
-			return $hostid['hostid'];
-		else{
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Host with name [ '.$host_data['host'].' ] does not exists.');
-			return false;
+		while($host = DBfetch($res)){
+			$hostids[$host['hostid']] = $host['hostid'];
 		}
+
+		if(!empty($hostids))
+			$result = self::get(array('hostids'=>$hostids, 'extendoutput'=>1));
+		
+	return $result;
 	}
 
 /**

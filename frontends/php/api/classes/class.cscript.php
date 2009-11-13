@@ -306,30 +306,6 @@ class Cscript extends CZBXAPI{
 	return $result;
 	}
 
-	/**
-	 * Gets all Script data from DB by Script ID
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param int $script
-	 * @param int $script['scriptid']
-	 * @return array|boolean script data || false if error
-	 */
-	public static function getById($script){
-		$item = get_script_by_scriptid($script['scriptid']);
-		$result = $item ? true : false;
-		if($result)
-			return $item;
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Script with id: '.$script['scriptid'].' doesn\'t exists.');
-			return false;
-		}
-	}
-
 /**
  * Get Script ID by host.name and item.key
  *
@@ -344,20 +320,23 @@ class Cscript extends CZBXAPI{
  * @param array $script['hostid']
  * @return int|boolean
  */
-	public static function getId($script){
-
+	public static function getObjects($script){
+		$result = array();
+		$scriptids = array();
+		
 		$sql = 'SELECT scriptid '.
 				' FROM scripts '.
 				' WHERE '.DBin_node('scriptid').
 					' AND name='.$script['name'];
-		$script = DBfetch(DBselect($sql));
-		$result = $script ? true : false;
-		if($result)
-			return $script['scriptid'];
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_NO_HOST, 'data' => 'Script doesn\'t exists.');
-			return false;
+		$res = DBselect($sql);
+		while($script = DBfetch($res)){
+			$scriptids[$script['scriptid']] = $script['scriptid'];
 		}
+
+		if(!empty($scriptids))
+			$result = self::get(array('scriptids'=>$scriptids, 'extendoutput'=>1));
+		
+	return $result;
 	}
 
 /**
@@ -451,13 +430,7 @@ class Cscript extends CZBXAPI{
 		
 		self::BeginTransaction(__METHOD__);
 		foreach($scripts as $num => $script){
-
-			$script_db_fields = CHost::getById($script);
-
-			if(!$script_db_fields){
-				$result = false;
-				break;
-			}
+			$script_db_fields = $upd_scripts[$script['scriptid']];
 
 			if(!check_db_fields($script_db_fields, $script)){
 				$result = false;

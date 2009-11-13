@@ -370,61 +370,38 @@ class CGraph extends CZBXAPI{
 	return $result;
 	}
 
-	/**
-	 * Gets all graph data from DB by graphid
-	 *
-	 * <code>
-	 * $graph_data = array(
-	 * 	*string 'graphid' => 'graphid'
-	 * )
-	 * </code>
-	 *
-	 * @static
-	 * @param array $graph_data
-	 * @return array|boolean host data as array or false if error
-	 */
-	public static function getById($graph_data){
-		$graph = get_graph_by_graphid($graph_data['graphid']);
 
-		$result = $graph ? true : false;
-		if($result)
-			return $graph;
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Graph with id: '.$graph_data['graphid'].' doesn\'t exists.');
-			return false;
-		}
-	}
+/**
+ * Get graphid by graph name
+ *
+ * <code>
+ * $graph_data = array(
+ * 	*string 'graph' => 'graph name'
+ * );
+ * </code>
+ *
+ * @static
+ * @param array $graph_data
+ * @return string|boolean graphid
+ */
+	public static function getObjects($graph_data){
+		$result = array();
+		$graphids = array();
 
-	/**
-	 * Get graphid by graph name
-	 *
-	 * <code>
-	 * $graph_data = array(
-	 * 	*string 'graph' => 'graph name'
-	 * );
-	 * </code>
-	 *
-	 * @static
-	 * @param array $graph_data
-	 * @return string|boolean graphid
-	 */
-	public static function getId($graph_data){
-		$result = false;
-
-
-		$sql = 'SELECT DISTINCT g.graphid'.
+		$sql = 'SELECT g.graphid '.
 				' FROM graphs g, graphs_items gi, items i'.
 				' WHERE g.graphid=gi.graphid '.
 					' AND gi.itemid=i.itemid'.
 					' AND g.name='.zbx_dbstr($graph_data['name']).
 					' AND i.hostid='.$graph_data['hostid'];
 		$db_res = DBselect($sql);
-		if($graph = DBfetch($db_res))
-			$result = $graph['graphid'];
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Host with name: "'.$graph_data['name'].'" doesn\'t exists.');
+		while($graph = DBfetch($db_res)){
+			$graphids[$graph['graphid']] = $graph['graphid'];
 		}
 
+		if(!empty($graphids))
+			$result = self::get(array('graphids'=>$graphids, 'extendoutput'=>1));
+		
 	return $result;
 	}
 
@@ -698,8 +675,10 @@ class CGraph extends CZBXAPI{
 			$itemids[$item['itemid']] = $item['itemid'];
 		}
 
-		// check if graph is templated graph, then items cannot be added
-		$graph = self::getById(array('graphid' => $graphid));
+// check if graph is templated graph, then items cannot be added
+		$graph = self::get(array('graphids' => $graphid,  'extendoutput' => 1));
+		$graph = reset($graph);
+		
 		if($graph['templateid'] != 0){
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Cannot edit templated graph : '.$graph['name']);
 			return false;
@@ -778,7 +757,9 @@ class CGraph extends CZBXAPI{
 
 		if(!$force){
 			// check if graph is templated graph, then items cannot be deleted
-			$graph = self::getById(array('graphid' => $graphid));
+			$graph = self::get(array('graphids' => $graphid,  'extendoutput' => 1));
+			$graph = reset($graph);
+
 			if($graph['templateid'] != 0){
 				self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Cannot edit templated graph : '.$graph['name']);
 				return false;
