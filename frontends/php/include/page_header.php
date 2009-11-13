@@ -298,6 +298,20 @@ COpt::compare_files_with_menu($ZBX_MENU);
 				unset($combo_node_list);
 			}
 		}
+		
+		if(isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)){
+			$tab = new CTable();
+			
+			$td_l = new CCol(new CSpan($ZBX_SERVER_NAME, 'textcolorstyles'));
+			if(is_null($node_form))
+				$td_l->addStyle('padding-right: 5px;');
+			else
+				$td_l->addStyle('padding-right: 20px; padding-bottom: 2px;');
+				
+			$tab->AddRow(array($td_l, $node_form));
+			$node_form = $tab;
+		}
+
 
 // 1st level menu
 		$table = new CTable();
