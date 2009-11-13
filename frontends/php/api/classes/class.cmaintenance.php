@@ -333,88 +333,129 @@ class CMaintenance extends CZBXAPI{
 		}
 	}
 
-	/**
-	 * Add maintenances
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $maintenances
-	 * @param array $maintenance['name']
-	 * @param array $maintenance['hostid']
-	 * @return boolean
-	 */
+/**
+ * Add maintenances
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $maintenances
+ * @param array $maintenance['name']
+ * @param array $maintenance['hostid']
+ * @return boolean
+ */
 	public static function add($maintenances){
-
+		$maintenances = zbx_toArray($maintenances);
+		$maintenanceids = array();
 		$result = false;
+//------
 
 		self::BeginTransaction(__METHOD__);
 		foreach($maintenances as $num => $maintenance){
 			$result = add_maintenance($maintenance);
 			if(!$result) break;
+			
+			$maintenanceids[] = $result;
 		}
 		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result)
-			return true;
+		if($result){
+			$new_maintenances = self::get(array('maintenanceids'=>$maintenanceids, 'extendoutput'=>1));
+			return $new_maintenances;
+		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
 
-	/**
-	 * Update maintenances
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $maintenances
-	 * @param array $maintenance['name']
-	 * @param array $maintenance['hostid']
-	 * @return boolean
-	 */
+/**
+ * Update maintenances
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $maintenances
+ * @param array $maintenance['name']
+ * @param array $maintenance['hostid']
+ * @return boolean
+ */
 	public static function update($maintenances){
-
+		$maintenances = zbx_toArray($maintenances);
+		$maintenanceids = array();
 		$result = false;
+//------
+
+		$upd_maintenances = self::get(array('maintenanceids'=>zbx_objectValues($maintenances, 'maintenanceid'), 
+											'editable'=>1, 
+											'extendoutput'=>1, 
+											'preservekeys'=>1));
+		foreach($maintenances as $snum => $maintenance){
+			if(!isset($upd_maintenances[$maintenance['maintenanceid']])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				return false;
+			}
+
+			$maintenanceids[] = $maintenance['maintenanceid'];
+			//add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MAINTENANCE, 'Maintenance ['.$maintenance['name'].']');
+		}
 
 		self::BeginTransaction(__METHOD__);
 		foreach($maintenances as $num => $maintenance){
 			$result = update_maintenance($maintenance['maintenanceid'], $maintenance);
 			if(!$result) break;
 		}
+	
 		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result)
-			return true;
+		if($result){
+			$upd_maintenances = self::get(array('maintenanceids'=>$maintenanceids, 'extendoutput'=>1));
+			return $upd_maintenances;
+		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
 		}
 	}
 
-	/**
-	 * Delete maintenances
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $maintenanceids
-	 * @param _array $maintenanceids['maintenanceids']
-	 * @return boolean
-	 */
-	public static function delete($maintenanceids){
-		$maintenanceids = isset($maintenanceids['maintenanceids']) ? $maintenanceids['maintenanceids'] : array();
-		zbx_value2array($maintenanceids);
+/**
+ * Delete maintenances
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $maintenanceids
+ * @param _array $maintenanceids['maintenanceids']
+ * @return boolean
+ */
+	public static function delete($maintenances){
+		$maintenances = zbx_toArray($maintenances);
+		$maintenanceids = array();
+		$result = false;
+//------
+
+		$del_maintenances = self::get(array('maintenanceids'=>zbx_objectValues($maintenances, 'maintenanceid'), 
+											'editable'=>1, 
+											'extendoutput'=>1, 
+											'preservekeys'=>1));
+		foreach($maintenances as $snum => $maintenance){
+			if(!isset($del_maintenances[$maintenance['maintenanceid']])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				return false;
+			}
+
+			$maintenanceids[] = $maintenance['maintenanceid'];
+			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAINTENANCE, 'Maintenance ['.$maintenance['name'].']');
+		}
 
 		if(!empty($maintenanceids)){
 			$result = delete_maintenance($maintenanceids);
@@ -424,8 +465,9 @@ class CMaintenance extends CZBXAPI{
 			$result = false;
 		}
 
-		if($result)
-			return true;
+		if($result){
+			return zbx_cleanHashes($del_maintenances);
+		}
 		else{
 			self::setError(__METHOD__);
 			return false;

@@ -756,7 +756,7 @@ class CAction extends CZBXAPI{
 			}
 
 			$actionids[] = $action['actionid'];
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ACTION, 'Action ['.$action['name'].']');
+			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ACTION, 'Action ['.$action['name'].']');
 		}
 
 		if(!empty($actionids)){

@@ -98,7 +98,7 @@ include_once('include/page_header.php');
 
 		$currentmacros = array_keys(get_request('macros', array()));
 
-		if(!CUserMacro::validate($macro_new)){
+		if(!CUserMacro::validate(zbx_toObject($macro_new, 'macro'))){
 			error(S_WRONG_MACRO.' : '.$macro_new);
 			show_messages(false, '', S_MACROS);
 		}
@@ -319,7 +319,7 @@ include_once('include/page_header.php');
 			$macrostoadd = array('hostid' => $templateid, 'macros' => array());
 
 			foreach($macros as $macro){
-				if(!CUserMacro::validate($macro['macro'])){
+				if(!CUserMacro::validate($macro)){
 					$result = false;
 					break;
 				}

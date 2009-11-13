@@ -291,20 +291,20 @@ class CUser extends CZBXAPI{
 	return $result;
 	}
 
-	/**
-	 * Authenticate user
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $user
-	 * @param array $user['user'] User alias
-	 * @param array $user['password'] User password
-	 * @return string session ID
-	 */
+/**
+ * Authenticate user
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $user
+ * @param array $user['user'] User alias
+ * @param array $user['password'] User password
+ * @return string session ID
+ */
 	public static function authenticate($user){
 
 		$login = user_login($user['user'], $user['password'], ZBX_AUTH_INTERNAL);
@@ -319,36 +319,36 @@ class CUser extends CZBXAPI{
 		}
 	}
 
-	/**
-	 * Check if session ID is authenticated
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $session
-	 * @param array $session['sessionid'] Session ID
-	 * @return boolean
-	 */
+/**
+ * Check if session ID is authenticated
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $session
+ * @param array $session['sessionid'] Session ID
+ * @return boolean
+ */
 	public static function checkAuth($session){
 		return check_authentication($session['sessionid']);
 	}
 
-	/**
-	 * Get User data by User ID
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $user_data
-	 * @param array $user_data['userid'] User ID
-	 * @return array|boolean User data as array or false if error
-	 */
+/**
+ * Get User data by User ID
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $user_data
+ * @param array $user_data['userid'] User ID
+ * @return array|boolean User data as array or false if error
+ */
 	public static function getById($user_data){
 
 		$user = DBfetch(DBselect('SELECT * FROM users WHERE userid='.$user_data['userid']));
@@ -361,19 +361,19 @@ class CUser extends CZBXAPI{
 		}
 	}
 
-	/**
-	 * Get User ID by User alias
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $user_data
-	 * @param array $user_data['alias'] User alias
-	 * @return string|boolean
-	 */
+/**
+ * Get User ID by User alias
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $user_data
+ * @param array $user_data['alias'] User alias
+ * @return string|boolean
+ */
 	public static function getId($user_data){
 		$result = false;
 
@@ -391,39 +391,37 @@ class CUser extends CZBXAPI{
 	return $result;
 	}
 
-	/**
-	 * Add Users
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param _array $users multidimensional array with Users data
-	 * @param string $users['name']
-	 * @param string $users['surname']
-	 * @param array $users['alias']
-	 * @param string $users['passwd']
-	 * @param string $users['url']
-	 * @param int $users['autologin']
-	 * @param int $users['autologout']
-	 * @param string $users['lang']
-	 * @param string $users['theme']
-	 * @param int $users['refresh']
-	 * @param int $users['rows_per_page']
-	 * @param int $users['type']
-	 * @param array $users['user_medias']
-	 * @param string $users['user_medias']['mediatypeid']
-	 * @param string $users['user_medias']['address']
-	 * @param int $users['user_medias']['severity']
-	 * @param int $users['user_medias']['active']
-	 * @param string $users['user_medias']['period']
-	 * @return array|boolean
-	 */
+/**
+ * Add Users
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param _array $users multidimensional array with Users data
+ * @param string $users['name']
+ * @param string $users['surname']
+ * @param array $users['alias']
+ * @param string $users['passwd']
+ * @param string $users['url']
+ * @param int $users['autologin']
+ * @param int $users['autologout']
+ * @param string $users['lang']
+ * @param string $users['theme']
+ * @param int $users['refresh']
+ * @param int $users['rows_per_page']
+ * @param int $users['type']
+ * @param array $users['user_medias']
+ * @param string $users['user_medias']['mediatypeid']
+ * @param string $users['user_medias']['address']
+ * @param int $users['user_medias']['severity']
+ * @param int $users['user_medias']['active']
+ * @param string $users['user_medias']['period']
+ * @return array|boolean
+ */
 	public static function add($users){
-		self::BeginTransaction(__METHOD__);
-
 		global $USER_DETAILS;
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can create Users');
@@ -435,7 +433,8 @@ class CUser extends CZBXAPI{
 		
 		$error = 'Unknown ZABBIX internal error';
 		$result = false;
-
+		
+		self::BeginTransaction(__METHOD__);
 		foreach($users as $unum => $user){
 // copy from frontend {
 			$sql = 'SELECT * '.
@@ -560,8 +559,6 @@ class CUser extends CZBXAPI{
  * @return boolean
  */
 	public static function update($users){
-		self::BeginTransaction(__METHOD__);
-
 		global $USER_DETAILS;
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can update Users');
@@ -570,7 +567,8 @@ class CUser extends CZBXAPI{
 
 		$users = zbx_toArray($users);
 		$userids = array();
-
+		$result = false;
+		
 		$upd_users = self::get(array('userids'=>zbx_objectValues($users, 'userid'), 
 											'extendoutput'=>1, 
 											'preservekeys'=>1));
@@ -581,16 +579,17 @@ class CUser extends CZBXAPI{
 			}
 			
 			$userids[] = $user['userid'];
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User ['.$user['alias'].']');
+			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User ['.$user['alias'].']');
 		}
 
-		$result = false;
 		$error = 'Unknown ZABBIX internal error';
+
+		self::BeginTransaction(__METHOD__);
 		foreach($users as $unum => $user){
 			$user_db_fields = $upd_users[$user['userid']];
 
 			if(!check_db_fields($user_db_fields, $user)){
-				error('Incorrect arguments pasted to function [CUser::update]');
+				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Incorrect arguments pasted to function [CUser::update]');
 				$result = false;
 				break;
 			}
@@ -694,8 +693,6 @@ class CUser extends CZBXAPI{
  * @return boolean
  */
 	public static function delete($users){
-		self::BeginTransaction(__METHOD__);
-
 		global $USER_DETAILS;
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can delete Users');
@@ -704,6 +701,7 @@ class CUser extends CZBXAPI{
 
 		$users = zbx_toArray($users);
 		$userids = array();
+		$result = false;
 
 		$del_users = self::get(array('userids'=>zbx_objectValues($users, 'userid'), 
 											'extendoutput'=>1, 
@@ -720,11 +718,10 @@ class CUser extends CZBXAPI{
 			}
 			
 			$userids[] = $user['userid'];
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User ['.$user['alias'].']');
+			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User ['.$user['alias'].']');
 		}
 		
-		$result = false;
-
+		self::BeginTransaction(__METHOD__);
 		if(empty($userids)){
 			$result = DBexecute('DELETE FROM operations WHERE '.OPERATION_OBJECT_USER.' AND '.DBcondition('objectid', $userids));
 			$result = DBexecute('DELETE FROM media WHERE '.DBcondition('userid', $userids));

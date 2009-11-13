@@ -232,7 +232,12 @@ class CAlert extends CZBXAPI{
 				$sql_parts['select']['userid'] = 'a.userid';
 			}
 
-			$sql_parts['where'][] = DBcondition('a.userid', $options['userids']);
+			$field = 'a.userid';
+			if(!is_null($options['time_from']) || !is_null($options['time_till'])){
+				$field = '(a.userid+0)';
+			}
+
+			$sql_parts['where'][] = DBcondition($field, $options['userids']);
 		}
 
 // mediatypeids
@@ -439,12 +444,13 @@ class CAlert extends CZBXAPI{
  * @return boolean
  */
 	public static function add($alerts){
-
+		$alerts = zbx_toArray($alerts);
 		$alertids = array();
-		self::BeginTransaction(__METHOD__);
-
 		$result = false;
-		foreach($alerts as $num => $alert){
+//------
+
+		self::BeginTransaction(__METHOD__);
+		foreach($alerts as $anum => $alert){
 			$alert_db_fields = array(
 				'actionid'		=> null,
 				'eventid'		=> null,
@@ -476,12 +482,16 @@ class CAlert extends CZBXAPI{
 								$alert['esc_step'].','.$alert['alerttype'].' )';
 			$result = DBexecute($sql);
 			if(!$result) break;
-			$alertids[$alertid] = $alertid;
+
+			$alertids[] = $alertid;
 		}
 
 		$result = self::EndTransaction($result, __METHOD__);
-		if($result)
-			return $alertids;
+	
+		if($result){
+			$upd_alerts = self::get(array('alertids'=>$alertids, 'extendoutput'=>1));
+			return $upd_alerts;
+		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
 			return false;
@@ -502,8 +512,24 @@ class CAlert extends CZBXAPI{
  * @return boolean
  */
 	public static function delete($alertids){
-		$alertids = isset($alertids['alertids']) ? $alertids['alertids'] : array();
-		zbx_value2array($alertids);
+		$alerts = zbx_toArray($alerts);
+		$alertids = array();
+		$result = false;
+//------
+
+		$del_alerts = self::get(array('alertids'=>zbx_objectValues($alerts, 'alertid'), 
+											'editable'=>1, 
+											'extendoutput'=>1, 
+											'preservekeys'=>1));
+		foreach($alerts as $snum => $alert){
+			if(!isset($del_alerts[$alert['alertid']])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				return false;
+			}
+
+			$alertids[] = $alert['alertid'];
+			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_alert, 'alert ['.$alert['name'].']');
+		}
 
 		if(!empty($alertids)){
 			$sql = 'DELETE FROM alerts WHERE '.DBcondition('alertid', $alertids);
@@ -514,8 +540,9 @@ class CAlert extends CZBXAPI{
 			$result = false;
 		}
 
-		if($result)
-			return $result;
+		if($result){
+			return zbx_cleanHashes($del_alerts);
+		}
 		else{
 			self::setError(__METHOD__);
 			return false;

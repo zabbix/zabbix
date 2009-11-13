@@ -483,7 +483,7 @@
 			$macro_new = get_request('macro_new');
 			$value_new = get_request('value_new', null);
 
-			if(!CUserMacro::validate($macro_new)){
+			if(!CUserMacro::validate(zbx_toObject($macro_new, 'macro'))){
 				error(S_WRONG_MACRO.' : '.$macro_new);
 				$result = false;
 			}

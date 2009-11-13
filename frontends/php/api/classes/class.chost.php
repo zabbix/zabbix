@@ -911,7 +911,7 @@ class CHost extends CZBXAPI{
 			}
 			
 			$hostids[] = $host['hostid'];
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$host['host'].']');
+			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$host['host'].']');
 		}
 
 		if(!empty($hostids)){
