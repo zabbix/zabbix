@@ -455,20 +455,30 @@ class CUserMacro extends CZBXAPI{
  * @return array|boolean UserMacros data as array or false if error
  */
 	public static function getHostMacroObjects($macro_data){
+		$macro_data = zbx_toArray($macro_data);
 		$result = array();
 		$hostmacroids = array();
-		
-		$sql = 'SELECT hostmacroid '.
-				' FROM hostmacro '.
-				' WHERE hostmacroid='.$macro_data['hostmacroid'];
-		$res = DBselect($sql);
-		while($macro = DBfetch($res)){
-			$hostmacroids[$macro['$hostmacroid']] = $macro['$hostmacroid'];
+	
+		$macros = array();
+		foreach($macro_data as $macro_obj){
+			if(!isset($macro_obj['hostid'])) $macro_obj['hostid'] = array();
+			$macros[$macro_obj['hostid']][] = $macro_obj['macro'];
+		}
+
+		foreach($macros as $hostid => $mac_list){
+			$sql = 'SELECT hostmacroid '.
+					' FROM hostmacro '.
+					' WHERE hostid='.$hostid.
+					' AND '.DBcondition('macro', $mac_list, false, true);
+			$res = DBselect($sql);
+			while($macro = DBfetch($res)){
+				$hostmacroids[$macro['$hostmacroid']] = $macro['$hostmacroid'];
+			}
 		}
 	
 		if(!empty($hostmacroids))
-			$result = self::get(array('hostmacroids'=>$hostmacroids, 'extendoutput'=>1));
-		
+			$result = self::get(array('hostmacroids' => $hostmacroids, 'extendoutput' => 1));
+	
 	return $result;
 	}
 
@@ -496,7 +506,7 @@ class CUserMacro extends CZBXAPI{
 		
 		self::BeginTransaction(__METHOD__);
 		foreach($macros as $mnum => $macro){
-			$hostid = $macros['hostid'];
+			$hostid = $macro['hostid'];
 			$hostmacroid = self::getHostMacroID(array('hostid' => $hostid, 'macro' => $macro['macro']));
 			if(!$hostmacroid){
 				$hostmacroid = get_dbid('hostmacro', 'hostmacroid');

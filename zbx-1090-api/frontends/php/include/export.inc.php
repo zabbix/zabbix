@@ -392,8 +392,10 @@ class zbxXML{
 		foreach($map as $db_name => $xml_name){
 			if($xml_name == '')
 				$map[$db_name] = $db_name;
+			else
+				$map[$xml_name] = $db_name;
 		}
-		
+	
 		foreach($xml->childNodes as $node){
 			if(isset($map[$node->nodeName]))
 				$array[$map[$node->nodeName]] = $node->nodeValue;
@@ -555,7 +557,7 @@ class zbxXML{
 
 // HOST PROFILES
 				$xpath = new DOMXPath($xml);
-				$profile_node = $xpath->query('host_profile', $host);
+				$profile_node = $xpath->query('host_profile/*', $host);
 
 				if($profile_node->length > 0){
 					$profile = array();
@@ -704,7 +706,7 @@ class zbxXML{
 							}	
 						}
 						
-						$r = CApplication::updateItems(array('applications' => $item_applications, 'items' => $current_item));
+						$r = CApplication::addItems(array('applications' => $item_applications, 'items' => $current_item));
 						if($r === false){
 							error(CApplication::resetErrors());
 							$result = false;
