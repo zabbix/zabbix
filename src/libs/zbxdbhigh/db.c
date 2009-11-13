@@ -737,63 +737,87 @@ void  DBdelete_trigger(zbx_uint64_t triggerid)
 
 void DBupdate_triggers_status_after_restart(void)
 {
-	int	lastchange;
-	int	now;
-
+	const char	*__function_name = "DBupdate_triggers_after_restart";
 	DB_RESULT	result;
 	DB_RESULT	result2;
-	DB_ROW	row;
-	DB_ROW	row2;
+	DB_ROW		row;
+	DB_ROW		row2;
 	DB_TRIGGER	trigger;
+	zbx_uint64_t	itemid;
+	int		type, lastclock, delay, nextcheck,
+			min_nextcheck, now;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBupdate_triggers_after_restart()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	now=time(NULL);
+	now = time(NULL);
 
 	DBbegin();
 
-	result = DBselect("select distinct t.triggerid,t.expression,t.description,t.status,t.priority,t.value,t.url,t.comments from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and i.nextcheck+i.delay<%d and i.key_<>'%s' and h.status not in (%d,%d) and i.type not in (%d)",
-		now,
-		SERVER_STATUS_KEY,
-		HOST_STATUS_DELETED,
-		HOST_STATUS_TEMPLATE,
-		ITEM_TYPE_TRAPPER);
+	result = DBselect(
+			"select distinct t.triggerid,t.expression,t.description,"
+				"t.status,t.priority,t.value,t.url,t.comments"
+			" from hosts h,items i,triggers t,functions f"
+			" where h.hostid=i.hostid"
+				" and i.itemid=f.itemid"
+				" and f.triggerid=t.triggerid"
+				" and h.status in (%d)"
+				" and i.status in (%d)"
+				" and t.status in (%d)"
+				" and i.type not in (%d)"
+				" and i.key_ not in ('%s','%s')",
+			HOST_STATUS_MONITORED,
+			ITEM_STATUS_ACTIVE,
+			TRIGGER_STATUS_ENABLED,
+			ITEM_TYPE_TRAPPER,
+			SERVER_STATUS_KEY, SERVER_ZABBIXLOG_KEY);
 
-	while((row=DBfetch(result)))
+	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(trigger.triggerid,row[0]);
-		strscpy(trigger.expression,row[1]);
-		strscpy(trigger.description,row[2]);
-		trigger.status		= atoi(row[3]);
-		trigger.priority	= atoi(row[4]);
-		trigger.value		= atoi(row[5]);
-		trigger.url		= row[6];
-		trigger.comments	= row[7];
+		ZBX_STR2UINT64(trigger.triggerid, row[0]);
+		strscpy(trigger.expression, row[1]);
+		strscpy(trigger.description, row[2]);
+		trigger.status = atoi(row[3]);
+		trigger.priority = atoi(row[4]);
+		trigger.value = atoi(row[5]);
+		trigger.url = row[6];
+		trigger.comments = row[7];
 
-		result2 = DBselect("select min(i.nextcheck+i.delay) from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and i.nextcheck<>0 and t.triggerid=" ZBX_FS_UI64 " and i.type not in (%d)",
-			trigger.triggerid,
-			ITEM_TYPE_TRAPPER);
-		row2=DBfetch(result2);
-		if(!row2 || DBis_null(row2[0])==SUCCEED)
+		result2 = DBselect(
+				"select i.itemid,i.type,i.lastclock,i.delay,i.delay_flex"
+				" from hosts h,items i,triggers t,functions f"
+				" where h.hostid=i.hostid"
+					" and i.itemid=f.itemid"
+					" and f.triggerid=t.triggerid"
+					" and t.triggerid=" ZBX_FS_UI64
+					" and i.type not in (%d)",
+				trigger.triggerid,
+				ITEM_TYPE_TRAPPER);
+
+		min_nextcheck = 0;
+		while (NULL != (row2 = DBfetch(result2)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "No triggers to update (2)");
-			DBfree_result(result2);
-			continue;
-		}
+			ZBX_STR2UINT64(itemid, row2[0]);
+			type = atoi(row2[1]);
+			lastclock = atoi(row2[2]);
+			delay = atoi(row2[3]);
 
-		lastchange=atoi(row2[0]);
+			nextcheck = calculate_item_nextcheck(itemid, type, delay, row2[4], lastclock);
+			if (0 == min_nextcheck || nextcheck < min_nextcheck)
+				min_nextcheck = nextcheck;
+		}
 		DBfree_result(result2);
 
-		DBupdate_trigger_value(&trigger,TRIGGER_VALUE_UNKNOWN,lastchange,"ZABBIX was down.");
-	}
+		if (min_nextcheck >= now)
+			continue;
 
+		DBupdate_trigger_value(&trigger, TRIGGER_VALUE_UNKNOWN,
+				min_nextcheck, "ZABBIX was down.");
+	}
 	DBfree_result(result);
 
 	DBcommit();
 
-	zabbix_log(LOG_LEVEL_DEBUG,"End of DBupdate_triggers_after_restart()");
-
-	return;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 int	DBadd_trend(zbx_uint64_t itemid, double value, int clock)

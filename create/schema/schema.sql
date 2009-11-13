@@ -679,7 +679,6 @@ FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|history	|t_integer	|'90'	|NOT NULL	|ZBX_SYNC
 FIELD		|trends		|t_integer	|'365'	|NOT NULL	|ZBX_SYNC
-FIELD		|nextcheck	|t_time		|'0'	|NOT NULL	|0
 FIELD		|lastvalue	|t_varchar(255)	|	|NULL		|0
 FIELD		|lastclock	|t_time		|	|NULL		|0
 FIELD		|prevvalue	|t_varchar(255)	|	|NULL		|0
@@ -710,7 +709,6 @@ FIELD		|password	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|publickey	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|privatekey	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 UNIQUE		|1		|hostid,key_
-INDEX		|2		|nextcheck
 INDEX		|3		|status
 INDEX		|4		|templateid
 
