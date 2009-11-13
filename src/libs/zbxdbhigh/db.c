@@ -793,21 +793,24 @@ void DBupdate_triggers_status_after_restart(void)
 				trigger.triggerid,
 				ITEM_TYPE_TRAPPER);
 
-		min_nextcheck = 0;
+		min_nextcheck = -1;
 		while (NULL != (row2 = DBfetch(result2)))
 		{
 			ZBX_STR2UINT64(itemid, row2[0]);
 			type = atoi(row2[1]);
-			lastclock = atoi(row2[2]);
+			if (SUCCEED == DBis_null(row2[2]))
+				lastclock = 0;
+			else
+				lastclock = atoi(row2[2]);
 			delay = atoi(row2[3]);
 
 			nextcheck = calculate_item_nextcheck(itemid, type, delay, row2[4], lastclock);
-			if (0 == min_nextcheck || nextcheck < min_nextcheck)
+			if (-1 == min_nextcheck || nextcheck < min_nextcheck)
 				min_nextcheck = nextcheck;
 		}
 		DBfree_result(result2);
 
-		if (min_nextcheck >= now)
+		if (-1 == min_nextcheck || min_nextcheck >= now)
 			continue;
 
 		DBupdate_trigger_value(&trigger, TRIGGER_VALUE_UNKNOWN,
