@@ -474,5 +474,118 @@ class CApplication extends CZBXAPI{
 		}
 	}
 
+	
+/**
+ * Add Items to applications 
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $data
+ * @param array $data['applications']
+ * @param array $data['items']
+ * @return boolean
+ */
+	public static function addItems($data){
+	
+		$result = true;
+		
+		$applications = zbx_toArray($data['applications']);
+		$items = zbx_toArray($data['items']);
+		$applicationids = array();
+		$itemids = array();
+		
+// PERMISSION {{{
+		$allowed_applications = self::get(array(
+			'applicationids' => zbx_objectValues($applications, 'applicationid'),
+			'editable' => 1, 
+			'extendoutput' => 1, 
+			'preservekeys' => 1)
+		);
+		foreach($applications as $num => $application){
+			if(!isset($allowed_applications[$application['applicationid']])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				return false;
+			}
+			$applicationids[] = $application['applicationid'];
+		}
+		
+		$allowed_items = CItem::get(array(
+			'itemids' => zbx_objectValues($items, 'itemid'),
+			'editable' => 1, 
+			'extendoutput' => 1, 
+			'preservekeys' => 1)
+		);
+		foreach($items as $num => $item){
+			if(!isset($allowed_items[$item['itemid']])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				return false;
+			}
+			$itemids[] = $item['itemid'];
+		}
+// }}} PERMISSION
+	
+		
+		self::BeginTransaction(__METHOD__);
+		
+		$sql = 'SELECT itemid, applicationid FROM items_applications WHERE '.
+			DBcondition('itemid', $itemids).' AND '.DBcondition('applicationid', $applicationids);
+		$linked_db = DBexecute($sql);
+		while($pair = DBfetch($linked_db)){
+			$linked[$pair['applicationid']] = array($pair['itemid'] => $pair['itemid']);
+		}
+
+		foreach($applicationids as $anum => $applicationid){
+			foreach($itemids as $inum => $itemid){
+				if(isset($linked[$applicationid]) && isset($linked[$applicationid][$itemid])) continue;
+
+				$itemappid = get_dbid('items_applications', 'itemappid');
+				$result = DBexecute("INSERT INTO items_applications (itemappid, itemid, applicationid) VALUES ($itemappid, $itemid, $applicationid)");
+				if(!$result){
+					break 2;
+				}
+			}
+		}
+		
+		if($result){
+			foreach($itemids as $itemid){
+				$db_childs = DBselect('SELECT itemid, hostid FROM items WHERE templateid='.$itemid);
+				
+				if($child = DBfetch($db_childs)){
+					$db_apps = DBselect('SELECT a1.applicationid FROM applications a1, applications a2'.
+						" WHERE a1.name=a2.name AND a1.hostid={$child['hostid']} AND ".DBcondition('a2.applicationid', $applicationids));
+					while($app = DBfetch($db_apps)){
+						$child_applications[] = $app;					
+					}
+					$result = self::addItems(array('items' => $child, 'applications' => $child_applications));
+					if(!$result){
+						break;
+					}
+				}
+			}
+		}
+		
+		
+		$result = self::EndTransaction($result, __METHOD__);	
+	
+		if($result){
+			$result = self::get(array(
+				'applicationids' => $applicationids, 
+				'extendoutput' => 1, 
+				'select_items' => 1,
+				'nopermission' => 1));
+			return $result;
+		}
+		else{
+			self::setError(__METHOD__);
+			return false;
+		}
+	}
+ 
+ 
 }
+
 ?>

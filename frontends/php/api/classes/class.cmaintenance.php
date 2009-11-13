@@ -304,7 +304,7 @@ class CMaintenance extends CZBXAPI{
 				' WHERE m.name='.$maintenance['name'];
 		$res = DBselect($sql);
 		while($maintenance = DBfetch($res)){
-			$maintenanceids[maintenance['maintenanceid']] = $maintenance['maintenanceid'];
+			$maintenanceids[$maintenance['maintenanceid']] = $maintenance['maintenanceid'];
 		}
 		
 		if(!empty($maintenanceids))

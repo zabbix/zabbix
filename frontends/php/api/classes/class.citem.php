@@ -872,6 +872,10 @@ class CItem extends CZBXAPI{
 		foreach($items as $inum => $item){
 			$item_db_fields = $upd_items[$item['itemid']];
 
+			unset($item_db_fields['lastvalue']);
+			unset($item_db_fields['prevvalue']);
+			unset($item_db_fields['lastclock']);
+			unset($item_db_fields['prevorgvalue']);
 			if(!check_db_fields($item_db_fields, $item)){
 				error('Incorrect arguments pasted to function [CItem::update]');
 				$result = false;

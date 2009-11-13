@@ -734,6 +734,7 @@ return $result;
 		}
 
 		if($item_count == 0){
+			sdii($expression);
 			error('An item key must be used in trigger expression');
 			return false;
 		}
