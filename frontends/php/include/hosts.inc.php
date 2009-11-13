@@ -27,7 +27,7 @@ require_once('include/httptest.inc.php');
 /* HOST GROUP functions */
 
 	function update_host_groups_by_groupid($groupid,$hosts=array()){
-		$grp_hosts = CHost::get(array('groupids'=>$groupid, 'editable'=>1));
+		$grp_hosts = CHost::get(array('groupids'=>$groupid, 'editable'=>1, 'preservekeys' => 1));
 		$grp_hostids = array_keys($grp_hosts);
 
 // unlinked hosts
@@ -45,11 +45,13 @@ require_once('include/httptest.inc.php');
 			return false;
 		}
 		$result = DBexecute('DELETE FROM hosts_groups WHERE groupid='.$groupid);
-		$result = CHostGroup::addHosts(array('hostids' => $hosts, 'groupids' => $groupid));
+		$hosts = zbx_toObject($hosts, 'hostid');
+		$result = CHostGroup::addHosts(array('hosts' => $hosts, 'groups' => array('groupid' => $groupid)));
 
 	return $result;
 	}
 
+/*
 	function update_host_groups($hostid,$groups=array()){
 		if(empty($groups)){
 			$host = get_host_by_hostid($hostid);
@@ -58,10 +60,11 @@ require_once('include/httptest.inc.php');
 		}
 		DBexecute('DELETE FROM hosts_groups WHERE hostid='.$hostid);
 		foreach($groups as $groupid){
-			$result = CHostGroup::addHosts(array('hostids' => array($hostid), 'groupids' => $groupid));
+			$result = CHostGroup::addHosts(array('hosts' => array($hostid), 'groups' => $groupid));
 		}
 	return $result;
 	}
+ */	
 
 	function setHostGroupInternal($groupids, $internal=ZBX_NOT_INTERNAL_GROUP){
 		zbx_value2array($groupids);
@@ -72,18 +75,20 @@ require_once('include/httptest.inc.php');
 	}
 
 	function add_host_group($name, $hosts=array()){
-		$groupids = CHostGroup::add(array('name' => $name));
-		if(!$groupids){
-			error(CHostGroup::resetErrors());
+		$group = CHostGroup::add(array('name' => $name));
+		if(!$group){
+			error(CHostgroup::resetErrors());
 			return false;
 		}
+		
+		$group = reset($group);
+		$groupid = $group['groupid'];
 
-		add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, reset($groupids), $name, 'groups', NULL, NULL);
+		add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $groupid, $name, 'groups', NULL, NULL);
 
-		$groupid = reset($groupids);
 		info('Added host group ['.$name.']');
 		if(!empty($hosts))
-			update_host_groups_by_groupid($groupid,$hosts);
+			update_host_groups_by_groupid($groupid, $hosts);
 
 	return $groupid;
 	}
@@ -273,7 +278,11 @@ require_once('include/httptest.inc.php');
 			$groups[] = reset($newgroupid);
 		}
 
-		if(!update_host_groups($hostid, $groups)) return false;
+		$hosts = array('hostid' => $hostid);
+		$groups = zbx_toObject($groups, 'groupid');
+		if(!CHostGroup::addHosts(array('hosts' => $hosts, 'groups' => $groups))) return false;
+		
+	//	if(!update_host_groups($hostid, $groups)) return false;
 
 		sync_host_with_templates($hostid);
 
@@ -322,12 +331,26 @@ require_once('include/httptest.inc.php');
 		if(!$result)
 			return $result;
 
+		$groups = zbx_toObject($groups, 'groupid');
 		if(!zbx_empty($newgroup)){
-			if(!$newgroupid = CHostGroup::add(array('name' => $newgroup))) return false;
-			$groups[$newgroupid] = reset($newgroupid);
+			if(!$newgroup = CHostGroup::add(array('name' => $newgroup))){
+				error(CHostGroup::resetErrors());
+				return false;
+			}
+			$groups = array_merge($groups, $newgroup);
 		}
 
-		$result = update_host_groups($hostid, $groups);
+		$hosts = array('hostid' => $hostid);
+		
+		$result = CHostGroup::updateHosts(array('hosts' => $hosts, 'groups' => $groups));
+
+		if(!$result){
+			error(CHostGroup::resetErrors());
+			return false;
+		}
+			
+		
+		//$result = update_host_groups($hostid, $groups);
 
 		if(count($new_templates) > 0){
 			sync_host_with_templates($hostid,array_keys($new_templates));

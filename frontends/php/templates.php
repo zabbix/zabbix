@@ -159,15 +159,9 @@ include_once('include/page_header.php');
 
 		$result = true;
 
-		if(count($groups) > 0){
-			$g1 = count($groups);
-			$groups = CHostGroup::get(array('groupids' => $groups, 'editable' => 1));
-			if(count($groups) != $g1) access_deny();
-		}
-		else{
-			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
-				access_deny();
-		}
+		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
+			access_deny();
+		
 
 		$clone_templateid = false;
 		if($_REQUEST['form'] == 'full_clone'){
@@ -178,9 +172,10 @@ include_once('include/page_header.php');
 		DBstart();
 
 // CREATE NEW GROUP
+		$groups = zbx_toObject($groups, 'groupid');
 		if(!empty($newgroup)){
-			if($groupid = CHostGroup::add(array('name' => $newgroup))){
-				$groups += $groupid;
+			if($newgroup = CHostGroup::add(array('name' => $newgroup))){
+				$groups = array_merge($groups, $newgroup);
 			}
 			else{
 				$result = false;
@@ -193,13 +188,13 @@ include_once('include/page_header.php');
 					$result &= unlink_template($_REQUEST['templateid'], $id, false);
 				}
 			}
-			$result = CTemplate::update(array(array('hostid' => $templateid, 'host' => $template_name)));
-			$result &= CHostGroup::updateHosts(array('hostids' => $templateid, 'groupids' => $groups));
+			$result = CTemplate::update(array(array('templateid' => $templateid, 'host' => $template_name)));
+			$result &= CHostGroup::updateHosts(array('hosts' => array('hostid' => $templateid), 'groups' => $groups));
 			$msg_ok 	= S_TEMPLATE_UPDATED;
 			$msg_fail 	= S_CANNOT_UPDATE_TEMPLATE;
 		}
 		else{
-			if($result = CTemplate::add(array(array('host' => $template_name, 'groupids' => $groups)))){
+			if($result = CTemplate::add(array('host' => $template_name, 'groupids' => zbx_objectValues($groups, 'groupid')))){
 				$templateid = reset($result);
 			}
 			else{
