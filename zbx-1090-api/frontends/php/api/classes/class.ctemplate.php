@@ -53,7 +53,7 @@ class CTemplate extends CZBXAPI{
 		$sql_parts = array(
 			'select' => array('templates' => 'h.hostid'),
 			'from' => array('hosts h'),
-			'where' => array('h.status=3'),
+			'where' => array('h.status='.HOST_STATUS_TEMPLATE),
 			'order' => array(),
 			'limit' => null);
 
@@ -269,8 +269,6 @@ class CTemplate extends CZBXAPI{
 				$result = $template;
 			else{
 				$template['templateid'] = $template['hostid'];
-				unset($template['hostid']);
-
 				$templateids[$template['templateid']] = $template['templateid'];
 
 				if(is_null($options['extendoutput'])){
@@ -475,20 +473,21 @@ class CTemplate extends CZBXAPI{
  * @version 1
  *
  * @param array $template_data
- * @param array $template_data['template']
+ * @param array $template_data['host']
  * @return string templateid
  */
 	public static function getObjects($template_data){
 		$result = array();
 		$templateid = array();
 		
-		$sql = 'SELECT hostid FROM hosts '.
-			' WHERE host='.zbx_dbstr($template_data['name']).
-				' AND status=3 '.
-				' AND '.DBin_node('hostid', false);
+		$sql = 'SELECT hostid '.
+				' FROM hosts '.
+				' WHERE host='.zbx_dbstr($template_data['host']).
+					' AND status='.HOST_STATUS_TEMPLATE.
+					' AND '.DBin_node('hostid', false);
 		$res = DBselect($sql);
 		while($template = DBfetch($res)){
-			$templateids[$template['templateid']] = $template['templateid'];
+			$templateids[$template['hostid']] = $template['hostid'];
 		}
 
 		if(!empty($templateids))
@@ -529,7 +528,7 @@ class CTemplate extends CZBXAPI{
 		
 		$tpls = null;
 		$newgroup = '';
-		$status = 3;
+		$status = HOST_STATUS_TEMPLATE;
 		$error = 'Internal Zabbix eror';
 
 		$result = false;
@@ -615,7 +614,7 @@ class CTemplate extends CZBXAPI{
 
 		$tpls = null;
 		$newgroup = '';
-		$status = 3;
+		$status = HOST_STATUS_TEMPLATE;
 
 		$result = false;
 

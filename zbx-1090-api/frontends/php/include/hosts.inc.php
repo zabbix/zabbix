@@ -272,16 +272,20 @@ require_once('include/httptest.inc.php');
 			info('Added new host ['.$host.']');
 
 		if(!zbx_empty($newgroup)){
-			if(!$newgroupid = CHostGroup::add(array('name' => $newgroup))) return false;
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, reset($newgroupid), $newgroup, 'groups', NULL, NULL);
-			info('Added host group ['.$newgroup.']');
-			$groups[] = reset($newgroupid);
+			$newgroup = CHostGroup::add(array('name' => $newgroup));
+			
+			if($newgroup !== false) $newgroup = reset($newgroup);
+			else return false;
+			
+			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $newgroup['groupid'], $newgroup['name'], 'groups', NULL, NULL);
+			info('Added host group ['.$newgroup['name'].']');
+			$groups[] = $newgroup['groupid'];
 		}
 
 		$hosts = array('hostid' => $hostid);
 		$groups = zbx_toObject($groups, 'groupid');
 		if(!CHostGroup::addHosts(array('hosts' => $hosts, 'groups' => $groups))) return false;
-		
+
 	//	if(!update_host_groups($hostid, $groups)) return false;
 
 		sync_host_with_templates($hostid);

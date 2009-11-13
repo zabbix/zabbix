@@ -470,7 +470,7 @@ include_once('include/page_header.php');
 					$result = false;
 					break;
 				}
-				$macrostoadd['macros'][] = $macro;
+				$macrostoadd[] = $macro;
 			}
 			$result = CUserMacro::update($macrostoadd);
 

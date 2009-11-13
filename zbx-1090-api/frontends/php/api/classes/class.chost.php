@@ -606,6 +606,7 @@ class CHost extends CZBXAPI{
 				' FROM hosts '.
 				' WHERE host='.zbx_dbstr($host_data['host']).
 					' AND '.DBin_node('hostid', false);
+
 		$res = DBselect($sql);
 		while($host = DBfetch($res)){
 			$hostids[$host['hostid']] = $host['hostid'];
@@ -699,7 +700,8 @@ class CHost extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_hosts = self::get(array('hostids'=>$hostids, 'editable'=>1, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$new_hosts = self::get(array('hostids'=>$hostids, 'editable'=>1, 'extendoutput'=>1, 'nopermissions'=>1));
+SDI($new_hosts);
 			return $new_hosts;
 		}
 		else{

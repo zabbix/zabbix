@@ -448,10 +448,17 @@ class zbxXML{
 			foreach($hosts as $host){
 // IMPORT RULES
 				$host_db = self::mapXML2arr($host, XML_TAG_HOST);
-				$current_host = CHost::getObjects(array('host' => $host_db['host']));
+				
+				if(!isset($host_db['status'])) $host_db['status'] = HOST_STATUS_TEMPLATE;
+				if($host_db['status'] == HOST_STATUS_TEMPLATE){
+					$current_host = CTemplate::getObjects(array('host' => $host_db['host']));
+				}
+				else{
+					$current_host = CHost::getObjects(array('host' => $host_db['host']));
+				}
+
 				$current_host = reset($current_host);
 				//$current_hostid = empty($current_host) ? false : $current_host[0]['hostid'];
-				
 				
 				if(!$current_host && !isset($rules['host']['missed'])) continue; // break if update nonexist
 				if($current_host && !isset($rules['host']['exist'])) continue; // break if not update exist
@@ -462,7 +469,7 @@ class zbxXML{
 				$groups = $xpath->query('groups/group', $host);
 				
 				$host_groups = array();
-				if(empty($groups)){
+				if($groups->length > 0){
 					$default_group = CHostGroup::getObjects(array('name' => ZBX_DEFAULT_IMPORT_HOST_GROUP));
 
 					if(empty($default_group)){
@@ -506,7 +513,14 @@ class zbxXML{
 				if($current_host && isset($rules['host']['exist'])){
 					$current_host = array_merge($current_host, $host_db);
 
-					$r = CHost::update($current_host);
+					if($host_db['status'] == HOST_STATUS_TEMPLATE){
+						$r = CTemplate::update($current_host);
+					}
+					else{
+						$r = CHost::update($current_host);
+					}
+					
+					
 					if($r === false){
 						error(CHost::resetErrors());
 						$result = false;
@@ -523,20 +537,27 @@ class zbxXML{
 
 				if(!$current_host && isset($rules['host']['missed'])){
 					$host_db['groupids'] = zbx_objectValues($host_groups, 'groupid');
-					$current_host = CHost::add($host_db);
-					if($current_host === false){
+					if($host_db['status'] == HOST_STATUS_TEMPLATE){
+						$current_host = CTemplate::add($host_db);
+					}
+					else{
+						$current_host = CHost::add($host_db);
+					}
+
+					if(empty($current_host)){
 						error(CHostGroup::resetErrors());
 						$result = false;
 						break;
 					}
-					
+
 					$current_host = reset($current_host);
 				}
 
 // HOST PROFILES
 				$xpath = new DOMXPath($xml);
 				$profile_node = $xpath->query('host_profile', $host);
-				if(!empty($profile_node)){
+
+				if($profile_node->length > 0){
 					$profile = array();
 					foreach($profile_node as $num => $field){
 						$profile[$field->nodeName] = $field->nodeValue;
@@ -561,7 +582,7 @@ class zbxXML{
 				$xpath = new DOMXPath($xml);
 				$profile_ext_node = $xpath->query('host_profiles_ext', $host);
 				
-				if(!empty($profile_ext_node)){
+				if($profile_ext_node->length > 0){
 					$profile_ext = array();
 					foreach($profile_ext_node as $num => $field){
 						$profile_ext[$field->nodeName] = $field->nodeValue;
@@ -575,7 +596,7 @@ class zbxXML{
 				$xpath = new DOMXPath($xml);
 				$macros = $xpath->query('macros/macro', $host);
 				
-				if(!empty($macros)){
+				if($macros->length > 0){
 					$macros_to_add = array();
 					$macros_to_upd = array();
 					foreach($macros as $macro){
@@ -618,6 +639,8 @@ class zbxXML{
 					foreach($items as $item){
 						$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
 						
+						$item_db['hostid'] = $current_host['hostid'];
+//SDII($item_db);
 						$current_item = CItem::getObjects($item_db);
 						$current_item = reset($current_item);
 						
@@ -833,7 +856,7 @@ class zbxXML{
 			$xpath = new DOMXPath($xml);
 			$dependencies = $xpath->query('dependencies/dependency');
 			
-			if(!empty($dependencies)){
+			if($dependencies->length > 0){
 				$triggers_for_dependencies = zbx_objectFields($triggers_for_dependencies, 'triggerid');
 				$triggers_for_dependencies = array_flip($triggers_for_dependencies);
 				

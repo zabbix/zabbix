@@ -454,17 +454,22 @@ class CUserMacro extends CZBXAPI{
  * @param string $macro_data['macroid']
  * @return array|boolean UserMacros data as array or false if error
  */
-	public static function getHostMacroById($macro_data){
-		$sql = 'SELECT * FROM hostmacro WHERE hostmacroid='.$macro_data['hostmacroid'];
-		$macro = DBfetch(DBselect($sql));
-
-		$result = $macro ? true : false;
-		if($result)
-			return $macro;
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'HostMacro with id: '.$macro_data['macroid'].' doesn\'t exists.');
-			return false;
+	public static function getHostMacroObjects($macro_data){
+		$result = array();
+		$hostmacroids = array();
+		
+		$sql = 'SELECT hostmacroid '.
+				' FROM hostmacro '.
+				' WHERE hostmacroid='.$macro_data['hostmacroid'];
+		$res = DBselect($sql);
+		while($macro = DBfetch($res)){
+			$hostmacroids[$macro['$hostmacroid']] = $macro['$hostmacroid'];
 		}
+	
+		if(!empty($hostmacroids))
+			$result = self::get(array('hostmacroids'=>$hostmacroids, 'extendoutput'=>1));
+		
+	return $result;
 	}
 
 
@@ -478,9 +483,9 @@ class CUserMacro extends CZBXAPI{
  * @version 1
  *
  * @param _array $macros
- * @param string $macros['hostid']
- * @param string $macros['macros'][0..]['macro']
- * @param string $macros['macros'][0..]['value']
+ * @param string $macros[0..]['hostid']
+ * @param string $macros[0..]['macro']
+ * @param string $macros[0..]['value']
  * @return array of object macros
  */
 	public static function add($macros){
@@ -488,10 +493,10 @@ class CUserMacro extends CZBXAPI{
 		$hostmacroids = array();
 		
 		$result = true;
-		$hostid = $macros['hostid'];
 		
 		self::BeginTransaction(__METHOD__);
-		foreach($macros['macros'] as $mnum => $macro){
+		foreach($macros as $mnum => $macro){
+			$hostid = $macros['hostid'];
 			$hostmacroid = self::getHostMacroID(array('hostid' => $hostid, 'macro' => $macro['macro']));
 			if(!$hostmacroid){
 				$hostmacroid = get_dbid('hostmacro', 'hostmacroid');
@@ -541,14 +546,13 @@ class CUserMacro extends CZBXAPI{
 
 		self::BeginTransaction(__METHOD__);
 		
-		$sql = 'DELETE FROM hostmacro WHERE hostid='.$macros['hostid'];
-		$result = DBexecute($sql);
-
-		foreach($macros['macros'] as $macro){
+		foreach($macros as $mnum => $macro){
+			$result = DBexecute('DELETE FROM hostmacro WHERE hostid='.$macro['hostid']);
+	
 			$hostmacroid = get_dbid('hostmacro', 'hostmacroid');
 
-			$sql = 'INSERT INTO hostmacro (hostmacroid, hostid, macro, value)
-				VALUES('.$hostmacroid.', '.$macros['hostid'].', '.zbx_dbstr($macro['macro']).', '.zbx_dbstr($macro['value']).')';
+			$sql = 'INSERT INTO hostmacro (hostmacroid, hostid, macro, value) '.
+				' VALUES('.$hostmacroid.', '.$macro['hostid'].', '.zbx_dbstr($macro['macro']).', '.zbx_dbstr($macro['value']).')';
 			$result = DBExecute($sql);
 
 			if(!$result) break;
@@ -591,11 +595,11 @@ class CUserMacro extends CZBXAPI{
 
 		self::BeginTransaction(__METHOD__);
 
-		foreach($macros['macros'] as $mnum => $macro){
+		foreach($macros as $mnum => $macro){
 
 			$sql = 'UPDATE hostmacro '.
 					' SET value='.zbx_dbstr($macro['value']).
-					' WHERE hostid='.$macros['hostid'].
+					' WHERE hostid='.$macro['hostid'].
 						' AND macro='.zbx_dbstr($macro['macro']);
 			$result = DBExecute($sql);
 
@@ -757,7 +761,7 @@ class CUserMacro extends CZBXAPI{
 		$macros = zbx_toArray($macros);
 		$globalmacroids = array();
 		
-		$result = false;
+		$result = true;
 //------
 
 		foreach($macros as $mnum => $macro){
@@ -789,17 +793,22 @@ class CUserMacro extends CZBXAPI{
  * @param string $macro_data['macroid']
  * @return array|boolean UserMacros data as array or false if error
  */
-	public static function getGlobalMacroById($macro_data){
-		$sql = 'SELECT * FROM globalmacro WHERE globalmacroid='.$macro_data['globalmacroid'];
-		$macro = DBfetch(DBselect($sql));
-
-		$result = $macro ? true : false;
-		if($result)
-			return $macro;
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'GlobalMacro with id: '.$macro_data['macroid'].' doesn\'t exists.');
-			return false;
+	public static function getGlobalMacroObjects($macro_data){
+		$result = array();
+		$globalmacroids = array();
+		
+		$sql = 'SELECT globalmacroid '.
+				' FROM globalmacro '.
+				' WHERE globalmacroid='.$macro_data['globalmacroid'];
+		$res = DBselect($sql);
+		while($macro = DBfetch($res)){
+			$globalmacroids[$macro[globalmacroid]] = $macro[globalmacroid];
 		}
+
+		if(!empty($globalmacroids))
+			$result = self::get(array('globalmacroids'=>$globalmacroids, 'extendoutput'=>1));
+		
+	return $result;
 	}
 
 /**
