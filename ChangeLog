@@ -1,3 +1,7 @@
+Changes for 1.7.3
+
+ - [DEV-137] updated French translation. Thanks to alixen (Richlv)
+
 Changes for 1.7.2
 
  - [DEV-430] added map labels macro {TRIGGERS.UNACK} (Sasha)
@@ -5,7 +9,7 @@ Changes for 1.7.2
  - [ZBX-1095] fixed "Link to template" operation for discovered hosts (Sasha)
  - [ZBX-1015] added support of LVM devices for system.swap.in/out under Linux. Thanks to Takanori Suzuki (Sasha)
  - [DEV-429] added support of system.cpu.switches under Linux 2.4/2.6 (Sasha)
- - [DEV-413] fixed first parameter in system.cpu.util key for linux (all; 0..n) (Sasha)
+ - [DEV-413] fixed first parameter in system.cpu.util key for Linux (all; 0..n) (Sasha)
  - [DEV-411] improved performance of trends module (Sasha)
  - [DEV-428] added new TELNET check 'telnet.run[]' (Sasha)
  - [DEV-428] added new SSH check 'ssh.run[]' (Sasha)
@@ -45,7 +49,7 @@ Changes for 1.7.0
  - [DEV-137] sql file "data.sql" was fixed, a default value was added (Dmitry)
  - [DEV-137] sql file "data.sql" was fixed, some default values were added (Dmitry)
  - [DEV-412] improved timeline in charts (Aly)
- - [DEV-353] Discovery: added support of IP masks (Sasha) 
+ - [DEV-353] Discovery: added support of IP masks (Sasha)
  - [DEV-137] poller will continue processing of other items after enabling a host (Alexei)
  - [DEV-137] modified Makefile to use tr instead of sed for better compatibility (Alexei)
  - [DEV-339] added a dummy function for DB cache monitoring (Alexei)
