@@ -191,16 +191,19 @@ function make_system_summary(){
 
 // SELECT HOST GROUPS {{{
 	$options = array(
+		'nodeids' => get_current_nodeid(),
 		'monitored_hosts' => 1,
 		'with_monitored_triggers' => 1,
+		'select_hosts' => 1,
 		'extendoutput' => 1
 	);
 	$groups = CHostGroup::get($options);
+
 	$groups = zbx_toHash($groups, 'groupid');
 	
 	order_result($groups, 'name');
 	$groupids = array();
-	foreach($groups as $gnum => &$group){
+	foreach($groups as $gnum => $group){
 		$groupids[] = $group['groupid'];
 		$group['tab_priority'] = array();
 		$group['tab_priority'][TRIGGER_SEVERITY_DISASTER] = array('count' => 0, 'triggers' => array());
@@ -209,11 +212,13 @@ function make_system_summary(){
 		$group['tab_priority'][TRIGGER_SEVERITY_WARNING] = array('count' => 0, 'triggers' => array());
 		$group['tab_priority'][TRIGGER_SEVERITY_INFORMATION] = array('count' => 0, 'triggers' => array());
 		$group['tab_priority'][TRIGGER_SEVERITY_NOT_CLASSIFIED] = array('count' => 0, 'triggers' => array());
+		$groups[$gnum] = $group;
 	}
 // }}} SELECT HOST GROUPS
 
 // SELECT TRIGGERS {{{
 	$options = array(
+		'nodeids' => get_current_nodeid(),
 		'groupids' => $groupids,
 		'monitored' => 1,
 		'select_hosts' => 1,
@@ -221,20 +226,22 @@ function make_system_summary(){
 		'filter' => 1,
 		'only_true' => 1
 	);
-	
 	$triggers = CTrigger::get($options);
 	order_result($triggers, 'lastchange', ZBX_SORT_DOWN);
 	
 	foreach($triggers as $tnum => $trigger){
-		if(!trigger_dependent($trigger['triggerid'])){
-			if($groups[$trigger['groupid']]['tab_priority'][$trigger['priority']]['count'] < 30){
-				$groups[$trigger['groupid']]['tab_priority'][$trigger['priority']]['triggers'][] = $trigger;
+		foreach($groups as $groupid => $group){
+			if(!trigger_dependent($trigger['triggerid'])){
+				if(zbx_uint_array_intersect($trigger['hostids'], $group['hostids'])){
+					if($groups[$groupid]['tab_priority'][$trigger['priority']]['count'] < 30){
+						$groups[$groupid]['tab_priority'][$trigger['priority']]['triggers'][] = $trigger;
+					}
+					$groups[$groupid]['tab_priority'][$trigger['priority']]['count']++;
+				}
 			}
-			$groups[$trigger['groupid']]['tab_priority'][$trigger['priority']]['count']++;
 		}
 	}
 // }}} SELECT TRIGGERS
-
 	foreach($groups as $gnum => $group){
 		$group_row = new CRow();
 		if(is_show_all_nodes())
@@ -268,6 +275,7 @@ function make_system_summary(){
 
 
 					$options = array(
+						'nodeids' => get_current_nodeid(),
 						'triggerids' => $trigger['triggerid'],
 						'object' => EVENT_SOURCE_TRIGGERS,
 						'value' => TRIGGER_VALUE_TRUE,
@@ -287,15 +295,14 @@ function make_system_summary(){
 						}
 
 						// $description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock' => $event['clock'])), ZBX_FLAG_EVENT);
-						$description = expand_trigger_description_by_data($trigger, ZBX_FLAG_EVENT);
 						$actions = get_event_actions_status($event['eventid']);
 					}
 					else{
-						$description = expand_trigger_description_by_data($trigger, ZBX_FLAG_EVENT);
 						$ack = '-';
 						$actions = S_NO_DATA_SMALL;
 						$event['clock'] = $trigger['lastchange'];
 					}
+					$description = expand_trigger_description_by_data($trigger, ZBX_FLAG_EVENT);
 
 					$table_inf->addRow(array(
 						get_node_name_by_elid($trigger['triggerid']),
@@ -316,7 +323,8 @@ function make_system_summary(){
 		}
 		$table->addRow($group_row);
 	}
-	$table->setFooter(new CCol(S_UPDATED.': '.date("H:i:s", time())));
+
+	$table->setFooter(new CCol(S_UPDATED.': '.date('H:i:s', time())));
 
 return $table;
 }

@@ -402,12 +402,13 @@ include_once('include/page_header.php');
 
 // Items
 		$items = array();
-		foreach($trigger['items'] as $inum => &$item){
-			$item['itemid'] = $item['itemid'];
-			$item['action'] = str_in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)) ? 'showgraph' : 'showvalues';
-			$item['description'] = item_description($item);
+		foreach($trigger['items'] as $inum => $item){
+			$items[$inum]['itemid'] = $item['itemid'];
+			$items[$inum]['action'] = str_in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)) ? 'showgraph' : 'showvalues';
+			$items[$inum]['description'] = item_description($item);
 		}
 		$trigger['items'] = $items;
+
 //----
 
 		$description = new CSpan($description, 'link_menu');
@@ -431,7 +432,7 @@ include_once('include/page_header.php');
 		$description->addAction('onclick',
 			"javascript: create_mon_trigger_menu(event, new Array({'triggerid': '".$trigger['triggerid'].
 				"', 'lastchange': '".$trigger['lastchange']."'}, ".$menu_trigger_conf.", ".$menu_trigger_url."),".
-			zbx_jsvalue($trigger['items']).");"
+			zbx_jsvalue($items).");"
 		);
 // }}} trigger description js menu
 

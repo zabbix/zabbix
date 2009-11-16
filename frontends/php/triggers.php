@@ -547,7 +547,7 @@ include_once('include/page_header.php');
 		$paging = getPagingLine($triggers);
 //---------
 
-		foreach($triggers as $tnum => &$trigger){
+		foreach($triggers as $tnum => $trigger){
 			$triggerid = $trigger['triggerid'];
 
 			$description = array();
@@ -637,6 +637,7 @@ include_once('include/page_header.php');
 				$error
 			));
 
+			$triggers[$tnum] = $trigger;
 		}
 
 //----- GO ------
