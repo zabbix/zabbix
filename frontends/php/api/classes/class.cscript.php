@@ -533,7 +533,7 @@ class Cscript extends CZBXAPI{
 			$scripts_by_host[$hostid] = array();
 		}
 //-----
-		$groups = CHostGroup::get(array('hostids' => $hostids, 'select_hosts' => 1, 'extendoutput' => 1));
+		$groups = CHostGroup::get(array('hostids' => $hostids, 'select_hosts' => 1, 'extendoutput' => 1, 'preservekeys' => 1));
 
 		$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
 		$scripts  = CScript::get($obj_params);

@@ -365,7 +365,7 @@ include_once('include/page_header.php');
 		order_page_result($events, 'eventid');
 //------
 
-		foreach($events as $enum => &$event){
+		foreach($events as $enum => $event){
 			$eventid = $event['eventid'];
 			
 			$trigger = reset($event['triggers']);
@@ -380,6 +380,8 @@ include_once('include/page_header.php');
 			}
 
 			$event['value'] = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value']));
+			
+			$events[$enum] = $event;
 		}
 
 		foreach($events as $enum => $event){
@@ -392,11 +394,13 @@ include_once('include/page_header.php');
 
 // Items
 			$items = array();
-			foreach($event['items'] as $inum => &$item){
+			foreach($event['items'] as $inum => $item){
 				$item['itemid'] = $item['itemid'];
 				$item['action'] = str_in_array($item['value_type'],array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64))?'showgraph':'showvalues';
 				$item['description'] = item_description($item);
+				$items[] = $item;
 			}
+			
 
 // Actions
 			$actions = get_event_actions_status($event['eventid']);

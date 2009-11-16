@@ -881,9 +881,7 @@ include_once('include/page_header.php');
 
 // SET VALUES FOR SUBFILTERS {
 // if any of subfilters = false then item shouldnt be shown
-		foreach($items as $num => &$item){
-			$itemid = $item['itemid'];
-			
+		foreach($items as $num => $item){
 			$item['subfilters'] = array();
 
 			$item['subfilters']['subfilter_hosts'] =
@@ -927,6 +925,8 @@ include_once('include/page_header.php');
 
 			$item['subfilters']['subfilter_interval'] =
 				(empty($_REQUEST['subfilter_interval']) || uint_in_array($item['delay'], $_REQUEST['subfilter_interval']));
+				
+			$items[$num] = $item;
 		}
 // } SET VALUES FOR SUBFILTERS
 
@@ -1000,7 +1000,7 @@ include_once('include/page_header.php');
 			));
 
 // TRIGGERS INFO
-			foreach($item['triggers'] as $tnum => &$trigger){
+			foreach($item['triggers'] as $tnum => $trigger){
 				$triggerid = $trigger['triggerid'];
 				$tr_description = array();
 
@@ -1042,6 +1042,8 @@ include_once('include/page_header.php');
 					explode_exp($trigger['expression'], 1),
 					$tstatus,
 				));
+					
+				$item['triggers'][$tnum] = $trigger;
 			}
 
 			if(!empty($item['triggers'])){
