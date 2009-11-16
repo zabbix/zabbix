@@ -637,7 +637,8 @@ return $result;
 		$item_count = 0;
 // Replace all {server:key.function(param)} and {MACRO} with '$ZBX_TR_EXPR_REPLACE_TO'
 //		while(ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT, $expr, $arr)){
-		while(preg_match('/'.ZBX_PREG_EXPRESSION_TOKEN_FORMAT.'/', $expr, $arr)){
+		while(preg_match('/'.ZBX_PREG_EXPRESSION_TOKEN_FORMAT.'/u', $expr, $arr)){
+
 			if($arr[ZBX_EXPRESSION_MACRO_ID] && !isset($ZBX_TR_EXPR_SIMPLE_MACROS[$arr[ZBX_EXPRESSION_MACRO_ID]]) ){
 				error('Unknown macro ['.$arr[ZBX_EXPRESSION_MACRO_ID].']');
 				return false;
@@ -734,7 +735,6 @@ return $result;
 		}
 
 		if($item_count == 0){
-			sdii($expression);
 			error('An item key must be used in trigger expression');
 			return false;
 		}

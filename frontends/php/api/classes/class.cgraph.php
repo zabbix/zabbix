@@ -496,7 +496,7 @@ class CGraph extends CZBXAPI{
 					$error = 'Wrong fields for items';
 					break 2;
 				}
-				$graph['gitems'][$id] = $gitem;
+				$graph['gitems'][$ginum] = $gitem;
 			}
 
 			$result = add_graph_with_items($graph['name'],$graph['width'],$graph['height'],
