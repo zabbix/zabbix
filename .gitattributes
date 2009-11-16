@@ -3,10 +3,14 @@ bin/win32/zabbix_agentd.exe -text
 bin/win32/zabbix_get.exe -text
 bin/win32/zabbix_sender.exe -text
 bin/win64/zabbix_agentd.exe -text
+bin/win64/zabbix_get.exe -text
+bin/win64/zabbix_sender.exe -text
 build/win32/project/Makefile_agent -text
 build/win32/project/Makefile_agent_x64 -text
 build/win32/project/Makefile_get -text
+build/win32/project/Makefile_get_x64 -text
 build/win32/project/Makefile_sender -text
+build/win32/project/Makefile_sender_x64 -text
 build/win32/project/ZABBIX.sln -text
 build/win32/project/zabbix_agentd.vcproj -text
 build/win32/project/zabbix_agentd_win32.cmd -text
