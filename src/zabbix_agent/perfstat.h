@@ -25,7 +25,7 @@
 #	include "perfmon.h"
 
 #	define PERF_COLLECTOR_STARTED(collector)	((collector) && (collector)->perfs.pdh_query)
-#	define UNSUPPORTED_REFRESH_PERIOD		120
+#	define UNSUPPORTED_REFRESH_PERIOD		600
 
 struct zbx_perfs
 {
@@ -40,7 +40,6 @@ struct zbx_perfs
    int			CurrentNum;
    int			status;
    char			*error;
-   time_t		nextcheck;	/* refresh time of not supported counters */
 };
 
 typedef struct zbx_perfs PERF_COUNTERS;
@@ -49,6 +48,7 @@ typedef struct s_perfs_stat_data
 {
 	PERF_COUNTERS	*pPerfCounterList;
 	HQUERY		pdh_query;
+	time_t		nextcheck;	/* refresh time of not supported counters */
 } ZBX_PERF_STAT_DATA;
 
 int	add_perf_counter(const char *name, const char *counterPath, int interval);
