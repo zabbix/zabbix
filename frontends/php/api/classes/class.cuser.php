@@ -414,16 +414,6 @@ class CUser extends CZBXAPI{
 		self::BeginTransaction(__METHOD__);
 		foreach($users as $unum => $user){
 // copy from frontend {
-			$sql = 'SELECT * '.
-					' FROM users '.
-					' WHERE alias='.zbx_dbstr($user['alias']).
-						' AND '.DBin_node('userid', false);
-			if(DBfetch(DBselect($sql))){
-				$error = 'User [ '.$user['alias'].' ] already exists';
-				$result = false;
-				break;
-			}
-
 			$user_db_fields = array(
 				'name' => 'ZABBIX',
 				'surname' => 'USER',
@@ -447,22 +437,34 @@ class CUser extends CZBXAPI{
 				break;
 			}
 
+			$sql = 'SELECT * '.
+					' FROM users '.
+					' WHERE alias='.zbx_dbstr($user['alias']).
+						' AND '.DBin_node('userid', false);
+
+			if(DBfetch(DBselect($sql))){
+				$error = 'User [ '.$user['alias'].' ] already exists';
+				$result = false;
+				break;
+			}
+
 			$userid = get_dbid('users', 'userid');
 
-			$result = DBexecute('INSERT INTO users (userid,name,surname,alias,passwd,url,autologin,autologout,lang,theme,refresh,rows_per_page,type) VALUES ('.
-				$userid.','.
-				zbx_dbstr($user['name']).','.
-				zbx_dbstr($user['surname']).','.
-				zbx_dbstr($user['alias']).','.
-				zbx_dbstr(md5($user['passwd'])).','.
-				zbx_dbstr($user['url']).','.
-				$user['autologin'].','.
-				$user['autologout'].','.
-				zbx_dbstr($user['lang']).','.
-				zbx_dbstr($user['theme']).','.
-				$user['refresh'].','.
-				$user['rows_per_page'].','.
-				$user['type'].
+			$result = DBexecute('INSERT INTO users (userid,name,surname,alias,passwd,url,autologin,autologout,lang,theme,refresh,rows_per_page,type) '.
+				' VALUES ('.
+					$userid.','.
+					zbx_dbstr($user['name']).','.
+					zbx_dbstr($user['surname']).','.
+					zbx_dbstr($user['alias']).','.
+					zbx_dbstr(md5($user['passwd'])).','.
+					zbx_dbstr($user['url']).','.
+					$user['autologin'].','.
+					$user['autologout'].','.
+					zbx_dbstr($user['lang']).','.
+					zbx_dbstr($user['theme']).','.
+					$user['refresh'].','.
+					$user['rows_per_page'].','.
+					$user['type'].
 				')');
 
 			if($result){
@@ -545,16 +547,11 @@ class CUser extends CZBXAPI{
 		$users = zbx_toArray($users);
 		$userids = array();
 		$result = false;
-		
+
 		$upd_users = self::get(array('userids'=>zbx_objectValues($users, 'userid'), 
 											'extendoutput'=>1, 
 											'preservekeys'=>1));
 		foreach($users as $gnum => $user){
-			if($user['alias'] != $del_users[$user['userid']]['alias']){
-				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Cannot update user alias'.'[ '.$user['alias'].' ]');
-				$result = false;
-			}
-			
 			$userids[] = $user['userid'];
 			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User ['.$user['alias'].']');
 		}
@@ -574,10 +571,14 @@ class CUser extends CZBXAPI{
 // copy from frontend {
 			$result = true;
 
-			$sql = 'SELECT DISTINCT userid FROM users WHERE alias='.zbx_dbstr($user['alias']).' AND '.DBin_node('userid', id2nodeid($userid));
+			$sql = 'SELECT userid '.
+					' FROM users '.
+					' WHERE alias='.zbx_dbstr($user['alias']).
+						' AND '.DBin_node('userid', id2nodeid($user['userid']));
+
 			$db_user = DBfetch(DBselect($sql));
 			
-			if($db_user){
+			if($db_user && ($db_user['userid'] != $user['userid'])){
 				$error = 'User [ '.$user['alias'].' ] already exists';
 				$result = false;
 				break;
@@ -588,21 +589,22 @@ class CUser extends CZBXAPI{
 			}
 
 			$sql = 'UPDATE users SET '.
-					' name='.zbx_dbstr($user['name']).
-					' ,surname='.zbx_dbstr($user['surname']).
-					' ,alias='.zbx_dbstr($user['alias']).
-					' ,passwd='.zbx_dbstr($user['passwd']).
-					' ,url='.zbx_dbstr($user['url']).
-					' ,autologin='.$user['autologin'].
-					' ,autologout='.$user['autologout'].
-					' ,lang='.zbx_dbstr($user['lang']).
-					' ,theme='.zbx_dbstr($user['theme']).
-					' ,refresh='.$user['refresh'].
-					' ,rows_per_page='.$user['rows_per_page'].
-					' ,type='.$user['type'].
-					' WHERE userid='.$userid;
-			$result = DBexecute($sql);
+						' name='.zbx_dbstr($user['name']).', '.
+						' surname='.zbx_dbstr($user['surname']).', '.
+						' alias='.zbx_dbstr($user['alias']).', '.
+						' passwd='.zbx_dbstr($user['passwd']).', '.
+						' url='.zbx_dbstr($user['url']).', '.
+						' autologin='.$user['autologin'].', '.
+						' autologout='.$user['autologout'].', '.
+						' lang='.zbx_dbstr($user['lang']).', '.
+						' theme='.zbx_dbstr($user['theme']).', '.
+						' refresh='.$user['refresh'].', '.
+						' rows_per_page='.$user['rows_per_page'].', '.
+						' type='.$user['type'].
+					' WHERE userid='.$user['userid'];
 
+			$result = DBexecute($sql);
+/*
 			if($result && !is_null($user['user_groups'])){
 				DBexecute('DELETE FROM users_groups WHERE userid='.$userid);
 
@@ -638,7 +640,7 @@ class CUser extends CZBXAPI{
 							zbx_dbstr($media_data['period']).')');
 				}
 			}
-
+//*/
 // } copy from frontend
 			if(!$result) break;
 		}
@@ -697,9 +699,9 @@ class CUser extends CZBXAPI{
 			$userids[] = $user['userid'];
 			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User ['.$user['alias'].']');
 		}
-		
+
 		self::BeginTransaction(__METHOD__);
-		if(empty($userids)){
+		if(!empty($userids)){
 			$result = DBexecute('DELETE FROM operations WHERE '.OPERATION_OBJECT_USER.' AND '.DBcondition('objectid', $userids));
 			$result = DBexecute('DELETE FROM media WHERE '.DBcondition('userid', $userids));
 			$result = DBexecute('DELETE FROM profiles WHERE '.DBcondition('userid', $userids));
