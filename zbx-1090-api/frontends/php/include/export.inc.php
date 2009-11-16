@@ -453,7 +453,7 @@ class zbxXML{
 				
 				if(!isset($host_db['status'])) $host_db['status'] = HOST_STATUS_TEMPLATE;
 				if($host_db['status'] == HOST_STATUS_TEMPLATE){
-					$current_host = CTemplate::getObjects(array('host' => $host_db['host']));
+					$current_host = CTemplate::getObjects(array('template' => $host_db['host']));
 				}
 				else{
 					$current_host = CHost::getObjects(array('host' => $host_db['host']));
@@ -753,7 +753,6 @@ class zbxXML{
 						}
 						if(!$current_trigger && isset($rules['trigger']['missed'])){
 							$trigger_db['hostid'] = $current_host['hostid'];
-							$trigger_db['expression'] = explode_exp($trigger_db['expression'], false);
 							$triggers_to_add[] = $trigger_db;
 						}
 					}
@@ -786,7 +785,7 @@ class zbxXML{
 					
 					$templates_to_link = array();
 					foreach($templates as $template){
-						$current_template = CTemplate::getObjects(array('host' => $template->nodeValue));
+						$current_template = CTemplate::getObjects(array('template' => $template->nodeValue));
 						$current_template = reset($current_template);
 
 						if(!$current_template && !isset($rules['template']['missed'])) continue; // break if update nonexist
@@ -838,13 +837,24 @@ class zbxXML{
 							if($gitem_host == '{HOSTNAME}'){
 								$gitem_host = $host_db['host'];
 							}
-							$gitem_db['host'] = $gitem_host;
+							
+							
+							$gitem_hostid = CHost::getObjects(array('host' => $gitem_host));
+// sdii($gitem_hostid);
+							$gitem_templateid = CTemplate::getObjects(array('template' => $gitem_host));
+// sdii($gitem_templateid);
+							$gitem_hostid = array_merge($gitem_hostid, $gitem_templateid);
+							
+							
+							$gitem_hostid = reset($gitem_hostid);
+
+							$gitem_db['hostid'] = $gitem_hostid['hostid'];
 							$gitem_db['key_'] = implode(':', $data);
 
 //sdi('gitem_host: '.$gitem_host.' | gitem_key: '. $gitem_key);
 
 							$current_gitem = CItem::getObjects($gitem_db);
-							$current_gitem = reset($itemid);
+							$current_gitem = reset($current_gitem);
 							if($current_gitem){ // if item exists, add graph item to graph
 								$gitem_db['itemid'] = $current_gitem['itemid'];
 								$graph_db['gitems'][$current_gitem['itemid']] = $gitem_db;
