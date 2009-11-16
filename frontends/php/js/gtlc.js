@@ -31,7 +31,7 @@
 //timeControl.addObject(id, time, objData)
 
 var timeControl = {
-objectList: {},				// objects needs to be controled
+objectList: {},				// objects needs to be controlled
 
 // DEBUG
 debug_status: 	0,			// debug status: 0 - off, 1 - on, 2 - SDI;
@@ -113,8 +113,8 @@ processObjects: function(){
 		else if(obj.loadScroll) this.addScroll(null,obj.domid);
 
 //		addListener(g_img, 'load', function(){addTimeControl(domobjectid, time, loadSBox); })
-//		g_img.onload = function(){ addTimeControl(key); };		
-	}	
+//		g_img.onload = function(){ addTimeControl(key); };
+	}
 },
 
 addImage: function(objid){
@@ -147,7 +147,7 @@ addImage: function(objid){
 		}
 	}
 
-	
+
 },
 
 addSBox: function(e, objid){
@@ -171,7 +171,7 @@ addSBox: function(e, objid){
 
 addScroll: function(e, objid){
 	this.debug('addScroll', objid);
-	
+
 	var obj = this.objectList[objid];
 //SDJ(this.objectList);
 	var g_img = $(obj.domid);
@@ -182,14 +182,14 @@ addScroll: function(e, objid){
 		g_width = get_bodywidth() - 25;	
 		if(!is_number(g_width)) g_width = 900;
 	}
-	
+
 	var scrl = scrollCreate(obj.domid, g_width, obj.timeline.timelineid);
 	scrl.onchange = this.objectUpdate.bind(this);
-	
+
 	if(obj.dynamic && !is_null($(g_img))){
 		addListener(obj.domid, 'load', function(){ZBX_SCROLLBARS[scrl.scrollbarid].disabled=0;});
 	}
-	
+
 //SDI('scrollCreate');
 },
 
@@ -413,7 +413,7 @@ minperiod: 3600,				// minimal allowed period
 
 // DEBUG
 debug_status: 	1,			// debug status: 0 - off, 1 - on, 2 - SDI;
-debug_info: 	'',			// debug string
+debug_info:	'',			// debug string
 debug_prev:		'',			// don't log repeated fnc
 
 initialize: function(id, period, starttime, usertime, endtime){
@@ -437,10 +437,10 @@ return parseInt(tmp_date.getTime()/1000);
 
 setNow: function(){
 	var end = this.timeNow();
-	
+
 	this._endtime = end;
 	this._usertime = end;
-	
+
 	this.now();
 },
 
@@ -457,10 +457,10 @@ period: function(period){
 	if('undefined' == typeof(period)) return this._period;
 
 	if((this._usertime - period) < this._starttime)  period = this._usertime - this._starttime;
-	
+
 //	if((this._usertime - this.period() + period) > this._endtime) period = this._period + this._endtime - this._usertime;
 	if(period < this.minperiod) period = this.minperiod;
-	
+
 	this._period = period;
 
 return this._period;
@@ -468,14 +468,14 @@ return this._period;
 
 usertime: function(usertime){
 	this.debug('usertime');
-	
+
 	if('undefined' == typeof(usertime)) return this._usertime;
 
 	if((usertime + this.minperiod) < this._starttime) usertime = this._starttime + this.minperiod;
 	if(usertime > this._endtime) usertime = this._endtime;
 
 	this._usertime = usertime;
-	
+
 	this.now();
 	
 return this._usertime;
@@ -514,7 +514,7 @@ debug: function(fnc_name, id){
 		if(this.debug_status == 2){
 			SDI(str);
 		}
-		
+
 		this.debug_prev = str;
 	}
 }
@@ -532,7 +532,7 @@ function scrollCreate(sbid, w, timelineid){
 	}
 	
 	if(is_null(timelineid)){
-		throw "Parametrs haven't been sent properly";
+		throw "Parameters haven't been sent properly";
 		return false;
 	}
 	
