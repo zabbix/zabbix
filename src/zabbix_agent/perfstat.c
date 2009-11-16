@@ -313,7 +313,6 @@ void	collect_perfstat()
 	PDH_STATISTICS	statData;
 	PDH_STATUS	status;
 	time_t		now;
-	LPTSTR		wcounterPath;
 
 	if (NULL == ppsd->pdh_query)	/* collector is not started */
 		return;
@@ -334,11 +333,9 @@ void	collect_perfstat()
 		if (cptr->status == ITEM_STATUS_NOTSUPPORTED &&
 				cptr->nextcheck <= now)		/* refresh inactive counter */
 		{
-			wcounterPath = zbx_utf8_to_unicode(cptr->counterPath);
-
 			/* Add user counters to query */
 			if (ERROR_SUCCESS != (status = PdhAddCounter(ppsd->pdh_query,
-					wcounterPath, 0, &cptr->handle)))
+					cptr->counterPath, 0, &cptr->handle)))
 			{
 				cptr->status    = ITEM_STATUS_NOTSUPPORTED;
 				cptr->error     = zbx_dsprintf(cptr->error, "%s",
@@ -358,8 +355,6 @@ void	collect_perfstat()
 						" added. Interval %d seconds",
 						cptr->counterPath, cptr->interval);
 			}
-
-			zbx_free(wcounterPath);
 		}
 
 		if (cptr->status == ITEM_STATUS_NOTSUPPORTED)	/* Inactive counter? */
