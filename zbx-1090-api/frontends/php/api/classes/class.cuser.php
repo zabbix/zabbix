@@ -550,7 +550,7 @@ class CUser extends CZBXAPI{
 											'extendoutput'=>1, 
 											'preservekeys'=>1));
 		foreach($users as $gnum => $user){
-			if($user['alias'] != $del_users[$user['userid']]['alias']){
+			if($user['alias'] != $upd_users[$user['userid']]['alias']){
 				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Cannot update user alias'.'[ '.$user['alias'].' ]');
 				$result = false;
 			}
@@ -574,10 +574,12 @@ class CUser extends CZBXAPI{
 // copy from frontend {
 			$result = true;
 
-			$sql = 'SELECT DISTINCT userid FROM users WHERE alias='.zbx_dbstr($user['alias']).' AND '.DBin_node('userid', id2nodeid($userid));
+			$sql = 'SELECT userid '.
+					' FROM users '.
+					' WHERE alias='.zbx_dbstr($user['alias']).
+						' AND '.DBin_node('userid', id2nodeid($user['userid']));
 			$db_user = DBfetch(DBselect($sql));
-			
-			if($db_user){
+			if($db_user['userid'] != $user['userid']){
 				$error = 'User [ '.$user['alias'].' ] already exists';
 				$result = false;
 				break;
