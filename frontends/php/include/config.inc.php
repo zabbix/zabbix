@@ -446,13 +446,13 @@ function __autoload($class_name){
 
 	function error($msgs){
 		global $ZBX_MESSAGES, $USER_DETAILS;
-		zbx_value2array($msgs);
+		$msgs = zbx_toArray($msgs);
 
 		if(is_null($ZBX_MESSAGES))
 			$ZBX_MESSAGES = array();
 
-		foreach($msgs as $mnum => $msg){
-			if(isset($USER_DETAILS['debug_mode']) && !$USER_DETAILS['debug_mode']){
+		foreach($msgs as $msg){
+			if(isset($USER_DETAILS['debug_mode']) && !is_object($msg) && !$USER_DETAILS['debug_mode']){
 				$msg = preg_replace('/^\[.+?::.+?\]/', '', $msg);
 			}
 			array_push($ZBX_MESSAGES, array('type' => 'error', 'message' => $msg));
@@ -466,9 +466,9 @@ function __autoload($class_name){
 	}
 
 	function fatal_error($msg){
-		include_once "include/page_header.php";
+		include_once 'include/page_header.php';
 		show_error_message($msg);
-		include_once "include/page_footer.php";
+		include_once 'include/page_footer.php';
 	}
 
 	function get_tree_by_parentid($parentid,&$tree,$parent_field, $level=0){
