@@ -225,6 +225,7 @@ function insert_javascript_for_visibilitybox(){
 function redirect($url,$timeout=null){
 	zbx_flush_post_cookies();
 
+	$script = '';
 	if( is_numeric($timeout) ) {
 		$script.='setTimeout(\'window.location="'.$url.'"\','.($timeout*1000).')';
 	}
