@@ -1729,7 +1729,7 @@ return $result;
 			}
 		}
 
-	return $result;
+	return (bool) $result;
 	}
 
 	function get_application_by_applicationid($applicationid,$no_error_message=0){
