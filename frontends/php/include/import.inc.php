@@ -160,11 +160,12 @@
 					break;
 				case XML_TAG_HOSTPROFILE:
 				case XML_TAG_HOSTPROFILE_EXT:
+				case XML_TAG_GROUPS:
 				case XML_TAG_TEMPLATE:
 				case XML_TAG_ITEM:
 				case XML_TAG_TRIGGER:
 				case XML_TAG_DEPENDS:
-				case XML_TAG_GRAPH_ELEMENT:
+				case XML_TAG_GRAPH_ELEMENT:			
 				/*case XML_TAG_SCREEN:
 				case XML_TAG_SCREEN_ELEMENT:*/
 					$data		= $attrs;
@@ -176,7 +177,6 @@
 					break;
 				case XML_TAG_DEPENDENCIES:
 				case XML_TAG_ZABBIX_EXPORT:
-				case XML_TAG_GROUPS:
 				case XML_TAG_APPLICATIONS:
 				case XML_TAG_TEMPLATES:
 				case XML_TAG_ITEMS:
@@ -199,7 +199,6 @@
 			}
 
 			global $USER_DETAILS;
-
 			$data = &$this->data[$name];
 			switch($name){
 				case XML_TAG_HOST:

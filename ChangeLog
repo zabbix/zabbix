@@ -1,5 +1,6 @@
 Changes for 1.6.8
 
+ - [ZBX-1276] fixed import template as template if status tag is after groups tag in xml (Vedmak)
  - [ZBX-1150] added refreshing of not supported performance counters (Sasha)
 
 Changes for 1.6.7
