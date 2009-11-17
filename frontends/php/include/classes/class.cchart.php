@@ -747,26 +747,49 @@ class CChart extends CGraphDraw{
 		if($diff_val == 0) $diff_val = 1;
 
 		$intervalX = ($interval * $this->sizeY) / $diff_val;
-
+		
+//SDI($this->m_maxY[$other_side].' - '.$this->m_minY[$other_side]);
 		if(isset($this->axis_valuetype[$other_side])){
 			$dist = ($this->m_maxY[$other_side] - $this->m_minY[$other_side]);
 			$interval = 0;
 			foreach($intervals as $num => $int){
+//SDI($dist.' < '.bcmul($this->gridLinesCount[$side],$int));
 				if($dist < bcmul($this->gridLinesCount[$side],$int)){
 					$interval = $int;
 					break;
 				}
 			}
-
-// correctin MIN & MAX
+// diff check
+			$diff_min = ($this->m_minY[$other_side] - floor($this->m_minY[$other_side] / $interval) * $interval);
+			$diff_max = ($this->m_maxY[$other_side] - ceil($this->m_maxY[$other_side] / $interval) * $interval);
+			
+// correcting MIN & MAX
 			$this->m_minY[$other_side] = floor($this->m_minY[$other_side] / $interval) * $interval;
 			$this->m_maxY[$other_side] = ceil($this->m_maxY[$other_side] / $interval) * $interval;
 //--------------------
 
+// if we lowered min more than highed max - need additional recalculating			
+			if($diff_min > $diff_max){
+				$dist = ($this->m_maxY[$other_side] - $this->m_minY[$other_side]);
+				$interval = 0;
+				foreach($intervals as $num => $int){
+//SDI($dist.' < '.bcmul($this->gridLinesCount[$side],$int));
+					if($dist < bcmul($this->gridLinesCount[$side],$int)){
+						$interval = $int;
+						break;
+					}
+				}
+	
+// recorrecting MIN & MAX
+				$this->m_minY[$other_side] = floor($this->m_minY[$other_side] / $interval) * $interval;
+				$this->m_maxY[$other_side] = ceil($this->m_maxY[$other_side] / $interval) * $interval;
+//--------------------
+			}
+
 			$this->gridLinesCount[$other_side] = $this->gridLinesCount[$side];
 			$this->m_maxY[$other_side] = $this->m_minY[$other_side] + $interval * $this->gridLinesCount[$other_side];
 
-//SDI($this->m_minY[$other_side].' - '.$this->m_maxY[$other_side].' : '.$interval);
+//SDI($this->m_minY[$other_side].' - '.$this->m_maxY[$other_side].' : '.$interval.' x '.$this->gridLinesCount[$side]);
 		}
 
 		$sides = array(GRAPH_YAXIS_SIDE_LEFT,GRAPH_YAXIS_SIDE_RIGHT);
