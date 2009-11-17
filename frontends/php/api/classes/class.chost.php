@@ -629,7 +629,7 @@ class CHost extends CZBXAPI{
  *
  * @param _array $hosts multidimensional array with Hosts data
  * @param string $hosts['host'] Host name.
- * @param array $hosts['groupids'] HostGroup IDs add Host to.
+ * @param array $hosts['groups'] array of HostGroup objects with IDs add Host to.
  * @param int $hosts['port'] Port. OPTIONAL
  * @param int $hosts['status'] Host Status. OPTIONAL
  * @param int $hosts['useip'] Use IP. OPTIONAL
@@ -648,22 +648,40 @@ class CHost extends CZBXAPI{
 	public static function add($hosts){
 		$hosts = zbx_toArray($hosts);
 		$hostids = array();
+
+		$groupids = array();
 		
 		$templates = null;
 		$newgroup = '';
 
 		$result = false;
 
-		self::BeginTransaction(__METHOD__);
-
-		foreach($hosts as $num => $host){
-			if(empty($host['groupids'])){
-				$result = false;
+		foreach($hosts as $hnum => $host){
+			if(empty($host['groups'])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'No groups for host [ '.$host['host'].' ]');
-				break;
+				return false;
 			}
+						
+			$hosts[$hnum]['groups'] = zbx_toArray($hosts[$hnum]['groups']);
+			
+			foreach($hosts[$hnum]['groups'] as $gnum => $group){
+				$groupids[$group['groupid']] = $group['groupid'];
+			}
+		}
 
-			$host['groupids'] = zbx_toArray($host['groupids']);
+		$upd_groups = CHostGroup::get(array('groupids'=>$groupids,
+										'editable'=>1, 
+										'preservekeys'=>1));
+		foreach($groupids as $gnum => $groupid){
+			if(!isset($upd_groups[$groupid])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You do not have enough rights for operation');
+				return false;
+			}
+		}
+
+		self::BeginTransaction(__METHOD__);
+		foreach($hosts as $num => $host){
+			$host['groupids'] = zbx_objectValues($host['groups'], 'groupid');
 
 			$host_db_fields = array(
 				'host' => null,
@@ -742,7 +760,7 @@ class CHost extends CZBXAPI{
 		$upd_hosts = self::get(array('hostids'=> zbx_objectValues($hosts, 'hostid'), 'editable'=>1, 'extendoutput'=>1, 'preservekeys'=>1));
 		foreach($hosts as $gnum => $host){
 			if(!isset($upd_hosts[$host['hostid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You do not have enough rights for operation');
 				return false;
 			}
 			$hostids[] = $host['hostid'];

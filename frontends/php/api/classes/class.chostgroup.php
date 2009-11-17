@@ -677,7 +677,7 @@ class CHostGroup extends CZBXAPI{
 			}
 			$groupids[] = $group['groupid'];
 		}
-		
+
 		$allowed_hosts = CHost::get(array(
 			'hostids' => zbx_objectValues($hosts, 'hostid'),
 			'editable' => 1, 
@@ -685,6 +685,7 @@ class CHostGroup extends CZBXAPI{
 			'extendoutput' => 1, 
 			'preservekeys' => 1)
 		);
+
 		foreach($hosts as $num => $host){
 			if(!isset($allowed_hosts[$host['hostid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
@@ -694,14 +695,13 @@ class CHostGroup extends CZBXAPI{
 		}
 // }}} PERMISSION	
 		
-
-		self::BeginTransaction(__METHOD__);
 		$sql = 'SELECT hostid, groupid FROM hosts_groups WHERE '.DBcondition('hostid', $hostids).' AND '.DBcondition('groupid', $groupids);
 		$linked_db = DBexecute($sql);
 		while($pair = DBfetch($linked_db)){
 			$linked[$pair['groupid']] = array($pair['hostid'] => $pair['hostid']);
 		}
 
+		self::BeginTransaction(__METHOD__);
 		foreach($groupids as $gnum => $groupid){
 			foreach($hostids as $hostid){
 				if(isset($linked[$groupid]) && isset($linked[$groupid][$hostid])) continue;
