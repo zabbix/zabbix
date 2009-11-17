@@ -199,7 +199,7 @@ void	update_triggers(zbx_uint64_t itemid)
  *                                                                            *
  ******************************************************************************/
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, AGENT_RESULT *value, int now,
-		int timestamp, char *source, int severity, int logeventid, int lastlogsize)
+		int timestamp, char *source, int severity, int logeventid, int lastlogsize, int mtime)
 {
 /*	if (value->type & AR_UINT64)
 		zabbix_log(LOG_LEVEL_DEBUG, "In dc_add_history(itemid:" ZBX_FS_UI64 ",key:\"%s\",value_type:%d,UINT64:"ZBX_FS_UI64")",
@@ -238,7 +238,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, AGENT_RESULT 
 		case ITEM_VALUE_TYPE_LOG:
 			if (GET_STR_RESULT(value))
 				DCadd_history_log(itemid, value->str, now, timestamp, source, severity,
-						logeventid, lastlogsize);
+						logeventid, lastlogsize, mtime);
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			if (GET_UI64_RESULT(value))

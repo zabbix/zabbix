@@ -1512,6 +1512,7 @@ void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
 
 	item->lastlogsize		= atoi(row[24]);
 	item->data_type			= atoi(row[25]);
+	item->mtime			= atoi(row[26]);
 
 	key = zbx_dsprintf(key, "%s", item->key_orig);
 	substitute_simple_macros(NULL, NULL, item, NULL, NULL, &key, MACRO_TYPE_ITEM_KEY, NULL, 0);

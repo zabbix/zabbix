@@ -708,6 +708,7 @@ FIELD		|username	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|password	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|publickey	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|privatekey	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|mtime		|t_integer	|'0'	|NOT NULL	|0
 UNIQUE		|1		|hostid,key_
 INDEX		|3		|status
 INDEX		|4		|templateid

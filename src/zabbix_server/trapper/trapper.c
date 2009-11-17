@@ -129,6 +129,9 @@ static void	calc_timestamp(char *line,int *timestamp, char *format)
  *             key - item's key                                               *
  *             value - new value of server:key                                *
  *             lastlogsize - if key=log[*], last size of log file             *
+ *                           if key=eventlog[*], last event id of the log     *
+ *             mtime - if key=log[*], last modification time of log file      *
+ *                     if key=eventlog[*], is not used                        *
  *                                                                            *
  * Return value: SUCCEED - new value processed successfully                   *
  *               FAIL - otherwise                                             *
@@ -148,25 +151,26 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_mass_data()");
 
 	DCinit_nextchecks();
-
+	
 	for (i = 0; i < value_num; i++)
-	{
+	{		
 		if (SUCCEED != DCconfig_get_item_by_key(&item, proxy_hostid, values[i].host_name, values[i].key))
 			continue;
-
+		
 		if (item.host.maintenance_status == HOST_MAINTENANCE_STATUS_ON &&
 				item.host.maintenance_type == MAINTENANCE_TYPE_NODATA &&
 				item.host.maintenance_from <= values[i].clock)
 			continue;
-
+		
 		if (item.type != ITEM_TYPE_TRAPPER && item.type != ITEM_TYPE_ZABBIX_ACTIVE)
 			if (0 != proxy_hostid && (item.type == ITEM_TYPE_INTERNAL ||
 						item.type == ITEM_TYPE_AGGREGATE ||
 						item.type == ITEM_TYPE_DB_MONITOR))
-				continue;
+			continue;
 
 		if (item.type == ITEM_TYPE_ZABBIX_ACTIVE &&
 				FAIL == zbx_tcp_check_security(sock, item.trapper_hosts, 1))
+
 			continue;
 
 		if (0 == strcmp(values[i].value, "ZBX_NOTSUPPORTED"))
@@ -185,10 +189,10 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 			{
 				if (ITEM_VALUE_TYPE_LOG == item.value_type)
 					calc_timestamp(values[i].value, &values[i].timestamp, item.logtimefmt);
-
+				
 				dc_add_history(item.itemid, item.value_type, &agent, values[i].clock,
 						values[i].timestamp, values[i].source, values[i].severity,
-						values[i].logeventid, values[i].lastlogsize);
+						values[i].logeventid, values[i].lastlogsize, values[i].mtime);
 
 				if (NULL != processed)
 					(*processed)++;
@@ -350,6 +354,9 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *jp, const
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGLASTSIZE, tmp, sizeof(tmp)))
 			av->lastlogsize = atoi(tmp);
+			
+		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_MTIME, tmp, sizeof(tmp)))
+			av->mtime = atoi(tmp);
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGTIMESTAMP, tmp, sizeof(tmp)))
 			av->timestamp = atoi(tmp);
@@ -363,7 +370,7 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *jp, const
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGEVENTID, tmp, sizeof(tmp)))
 			av->logeventid = atoi(tmp);
 
-		value_num ++;
+		value_num++;
 
 		if (value_num == VALUES_MAX) {
 			process_mass_data(sock, proxy_hostid, values, value_num, &processed, proxy_timediff);
@@ -588,8 +595,8 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 		else if (*s == '<')
 		{
 			comms_parse_response(s, av.host_name, sizeof(av.host_name), av.key, sizeof(av.key), value_dec, sizeof(value_dec),
-					lastlogsize, sizeof(lastlogsize), timestamp, sizeof(timestamp), source, sizeof(source),
-					severity, sizeof(severity));
+					lastlogsize, sizeof(lastlogsize), timestamp, sizeof(timestamp), 
+					source, sizeof(source),	severity, sizeof(severity));
 
 			av.value	= value_dec;
 			av.lastlogsize	= atoi(lastlogsize);

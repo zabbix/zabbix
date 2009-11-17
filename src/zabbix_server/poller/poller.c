@@ -199,7 +199,7 @@ static void	update_key_status(zbx_uint64_t hostid, int host_status, time_t now)
 		init_result(&agent);
 		SET_UI64_RESULT(&agent, host_status);
 
-		dc_add_history(items[i].itemid, items[i].value_type, &agent, now, 0, NULL, 0, 0, 0);
+		dc_add_history(items[i].itemid, items[i].value_type, &agent, now, 0, NULL, 0, 0, 0, 0);
 
 		free_result(&agent);
 	}
@@ -586,7 +586,7 @@ static int	get_values(int now)
 		{
 			activate_host(&items[i], now);
 
-			dc_add_history(items[i].itemid, items[i].value_type, &agent, now, 0, NULL, 0, 0, 0);
+			dc_add_history(items[i].itemid, items[i].value_type, &agent, now, 0, NULL, 0, 0, 0, 0);
 
 			DCconfig_update_item(items[i].itemid, ITEM_STATUS_ACTIVE, now);
 		}

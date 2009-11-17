@@ -59,7 +59,7 @@
 #define HAVE_SIGNAL_H
 
 /* Define to 1 if you have the <io.h> header file. */
-#define HAVE_IO_H
+#define HAVE_IO_H 1
 
 /* Define to 1 if you have the <fcntl.h> header file. */
 #define HAVE_FCNTL_H

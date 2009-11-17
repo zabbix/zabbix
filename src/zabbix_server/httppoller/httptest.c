@@ -89,7 +89,7 @@ static int process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 
 	value_type = (unsigned char)atoi(row[1]);
 
-	dc_add_history(itemid, value_type, value, time(NULL), 0, NULL, 0, 0, 0);
+	dc_add_history(itemid, value_type, value, time(NULL), 0, NULL, 0, 0, 0, 0);
 
 	DBfree_result(result);
 
