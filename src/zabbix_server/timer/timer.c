@@ -570,10 +570,8 @@ void main_timer_loop()
 
 	for (;;) {
 		process_time_functions();
-zabbix_set_log_level(LOG_LEVEL_DEBUG);
 		if (1 == maintenance)
 			process_maintenance();
-zabbix_set_log_level(LOG_LEVEL_WARNING);
 
 		now = time(NULL);
 		nextcheck = now + TIMER_DELAY - (now % TIMER_DELAY);
