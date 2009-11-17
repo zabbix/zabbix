@@ -266,6 +266,7 @@ require_once('include/httptest.inc.php');
 
 		$hostid = db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,
 								$useipmi,$ipmi_ip,$ipmi_port,$ipmi_authtype,$ipmi_privilege,$ipmi_username,$ipmi_password);
+
 		if(!$hostid)
 			return $hostid;
 		else
@@ -284,7 +285,37 @@ require_once('include/httptest.inc.php');
 
 		$hosts = array('hostid' => $hostid);
 		$groups = zbx_toObject($groups, 'groupid');
-		if(!CHostGroup::addHosts(array('hosts' => $hosts, 'groups' => $groups))) return false;
+
+// COPY FROM API HostGroup:addHosts
+		$linked = array();
+		
+		$tmp_hostids = zbx_objectValues($hosts, 'hostid');
+		$tmp_groupids = zbx_objectValues($groups, 'groupid');
+		
+		$sql = 'SELECT hostid, groupid '.
+				' FROM hosts_groups '.
+				' WHERE '.DBcondition('hostid', $tmp_hostids).
+					' AND '.DBcondition('groupid', $tmp_groupids);
+		$linked_db = DBexecute($sql);
+		while($pair = DBfetch($linked_db)){
+			$linked[$pair['groupid']] = array($pair['hostid'] => $pair['hostid']);
+		}
+
+		foreach($tmp_groupids as $gnum => $groupid){
+			foreach($tmp_hostids as $hnum => $hostid){
+				if(isset($linked[$groupid]) && isset($linked[$groupid][$hostid])) continue;
+
+				$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
+				$result = DBexecute('INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ('.$hostgroupid.','.$hostid.','.$groupid.')');
+				if(!$result){
+					return false;
+				}
+			}
+		}
+//permisssion problems
+//		if(!CHostGroup::addHosts(array('hosts' => $hosts, 'groups' => $groups))) return false;		
+//----------
+
 
 	//	if(!update_host_groups($hostid, $groups)) return false;
 
