@@ -684,7 +684,7 @@
 					'snmpv3_privpassphrase'	=> array('template' => 1),
 					'value_type'		=> array(),
 					'data_type'		=> array(),
-					'trapper_hosts'		=> array(),
+					'trapper_hosts'		=> array('template' =>1 ),
 					'units'			=> array(),
 					'multiplier'		=> array(),
 					'delta'			=> array('template' => 1 , 'httptest' => 1),

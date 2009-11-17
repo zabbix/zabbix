@@ -1727,7 +1727,7 @@
 
 // Insert form for Item information
 	function insert_item_form(){
-		global  $USER_DETAILS;
+		global $USER_DETAILS;
 
 		$frmItem = new CFormTable(S_ITEM, 'items.php', 'post');
 		$frmItem->setHelp('web.items.item.php');
@@ -2178,7 +2178,7 @@
 		}
 
 		if($type==ITEM_TYPE_TRAPPER){
-			$frmItem->addRow(S_ALLOWED_HOSTS, new CTextBox('trapper_hosts',$trapper_hosts,40,$limited));
+			$frmItem->addRow(S_ALLOWED_HOSTS, new CTextBox('trapper_hosts',$trapper_hosts,40));
 		}
 		else{
 			$frmItem->addVar('trapper_hosts',$trapper_hosts);
