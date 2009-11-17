@@ -460,12 +460,10 @@ static int	get_values(int now)
 	const char	*__function_name = "get_values";
 	DC_ITEM		items[MAX_ITEMS];
 	AGENT_RESULT	agent;
-	int		i, num, res;
-
 	zbx_uint64_t	*ids = NULL, *snmpids = NULL, *ipmiids = NULL;
-	static int	ids_alloc = 1, snmpids_alloc = 1, ipmiids_alloc = 1;
-	int		ids_num = 0, snmpids_num = 0, ipmiids_num = 0;
-
+	int		ids_alloc = 0, snmpids_alloc = 0, ipmiids_alloc = 0,
+			ids_num = 0, snmpids_num = 0, ipmiids_num = 0,
+			i, num, res;
 	static char	*key = NULL, *ipmi_ip = NULL, *params = NULL,
 			*username = NULL, *publickey = NULL, *privatekey = NULL,
 			*password = NULL;
@@ -473,13 +471,6 @@ static int	get_values(int now)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	DCinit_nextchecks();
-
-	if (NULL == ids)
-	{
-		ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
-		snmpids = zbx_malloc(snmpids, snmpids_alloc * sizeof(zbx_uint64_t));
-		ipmiids = zbx_malloc(ipmiids, ipmiids_alloc * sizeof(zbx_uint64_t));
-	}
 
 	num = DCconfig_get_poller_items(poller_type, poller_num, now, items, MAX_ITEMS);
 
@@ -646,6 +637,15 @@ static int	get_values(int now)
 
 	zbx_free(key);
 	zbx_free(ipmi_ip);
+	zbx_free(params);
+	zbx_free(username);
+	zbx_free(publickey);
+	zbx_free(privatekey);
+	zbx_free(password);
+
+	zbx_free(ids);
+	zbx_free(snmpids);
+	zbx_free(ipmiids);
 
 	DCflush_nextchecks();
 

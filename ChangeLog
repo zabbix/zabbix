@@ -1,5 +1,6 @@
 Changes for 1.7.3
 
+ - [ZBX-1289] fixed memory leak in server pollers (Sasha)
  - [DEV-433] added generation events after maintenance period if trigger status changed during this period (Sasha)
  - [DEV-137] updated French translation. Thanks to alixen (Richlv)
 
