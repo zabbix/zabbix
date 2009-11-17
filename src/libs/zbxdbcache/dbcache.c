@@ -2452,7 +2452,10 @@ int	DCget_item_lastclock(zbx_uint64_t itemid)
 {
 	int	i, index;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCvacuum_text()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In DCget_item_lastclock()");
+
+	if (0 == CONFIG_DBSYNCER_FORKS)
+		return FAIL;
 
 	LOCK_CACHE;
 

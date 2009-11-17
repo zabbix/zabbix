@@ -177,7 +177,7 @@ static void ping_database()
  ******************************************************************************/
 void main_watchdog_loop()
 {
-	zabbix_log(LOG_LEVEL_WARNING, "In main_watchdog_loop()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In main_watchdog_loop()");
 
 	/* Disable writing to database in zabbix_syslog() */
 	CONFIG_ENABLE_LOG = 0;
