@@ -31,7 +31,6 @@
 
 		if(DBfetch(DBselect('SELECT screenid FROM screens WHERE screenid='.$screenid.' AND '.DBin_node('screenid', get_current_nodeid($perm))))){
 			$result = true;
-//			$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,PERM_RES_IDS_ARRAY,get_current_nodeid(true));
 
 			$db_result = DBselect('SELECT * FROM screens_items WHERE screenid='.$screenid);
 			while(($ac_data = DBfetch($db_result)) && $result){
@@ -45,8 +44,7 @@
 
 							if($perm == PERM_READ_WRITE) $options['editable'] = 1;
 							$graphids = CGraph::get($options);
-
-//							$graphids = get_accessible_graphs($perm,array(),null,get_current_nodeid(true));
+							$graphids = zbx_toHash($graphids, 'graphid');
 						}
 
 						$result &= isset($graphids[$ac_data['resourceid']]);
