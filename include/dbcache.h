@@ -253,4 +253,7 @@ int	DCconfig_deactivate_host(DC_ITEM *item, int now);
 
 void	DCreset_item_nextcheck(zbx_uint64_t itemid);
 
+void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
+		int maintenance_type, int maintenance_from);
+
 #endif
