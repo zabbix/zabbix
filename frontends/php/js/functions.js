@@ -452,7 +452,7 @@ function remove_keyword(key_id){
 }
 
 function check_target(e){
-	var targets = document.getElementsByName('expr_target');
+	var targets = document.getElementsByName('expr_target_single');
 	for (var i = 0; i < targets.length; ++i) {
 		targets[i].checked = targets[i] == e;
 	}

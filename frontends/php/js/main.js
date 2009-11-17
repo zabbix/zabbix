@@ -171,6 +171,7 @@ check: function(e){
 
 	if(!(e.ctrlKey || e.shiftKey)) return true;
 	if(obj.name.indexOf('all_') > -1) return true;
+	if(obj.name.indexOf('_single') > -1) return true;
 
 
 	var obj_name = obj.name.split('[')[0];

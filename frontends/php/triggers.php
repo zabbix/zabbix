@@ -52,7 +52,7 @@ include_once('include/page_header.php');
 
         'input_method'=>	array(T_ZBX_INT, O_OPT,  NULL,  NOT_EMPTY,'isset({toggle_input_method})'),
         'expr_temp'=>		array(T_ZBX_STR, O_OPT,  NULL,  NOT_EMPTY,'(isset({add_expression})||isset({and_expression})||isset({or_expression})||isset({replace_expression}))'),
-        'expr_target'=>		array(T_ZBX_STR, O_OPT,  NULL,  NOT_EMPTY,'(isset({and_expression})||isset({or_expression})||isset({replace_expression}))'),
+        'expr_target_single'=>		array(T_ZBX_STR, O_OPT,  NULL,  NOT_EMPTY,'(isset({and_expression})||isset({or_expression})||isset({replace_expression}))'),
 
 		'dependencies'=>	array(T_ZBX_INT, O_OPT,  NULL,	DB_ID, NULL),
 		'new_dependence'=>	array(T_ZBX_INT, O_OPT,  NULL,	DB_ID.'{}>0','isset({add_dependence})'),
@@ -127,7 +127,7 @@ include_once('include/page_header.php');
 	}
 	else if(isset($_REQUEST['remove_expression']) && strlen($_REQUEST['remove_expression'])){
 		$_REQUEST['expr_action'] = 'R';
-		$_REQUEST['expr_target'] = $_REQUEST['remove_expression'];
+		$_REQUEST['expr_target_single'] = $_REQUEST['remove_expression'];
 	}
 /* FORM ACTIONS */
 	else if(isset($_REQUEST['clone']) && isset($_REQUEST['triggerid'])){
