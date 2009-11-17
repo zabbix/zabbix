@@ -2553,8 +2553,8 @@ static int	DCconfig_get_normal_poller_items(unsigned char poller_type, unsigned 
 		if (NULL == (dc_host = DCget_dc_host(dc_item->hostid)))
 			continue;
 
-		if (HOST_MAINTENANCE_STATUS_OFF != dc_host->maintenance_status ||
-				MAINTENANCE_TYPE_NORMAL != dc_host->maintenance_type)
+		if (HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
+				MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type)
 			continue;
 
 		switch (dc_item->type) {
@@ -2635,8 +2635,8 @@ static int	DCconfig_get_unreachable_poller_items(unsigned char poller_type, unsi
 		if (dc_host->nextcheck_ > now)
 			break;
 
-		if (HOST_MAINTENANCE_STATUS_OFF != dc_host->maintenance_status ||
-				MAINTENANCE_TYPE_NORMAL != dc_host->maintenance_type)
+		if (HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
+				MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type)
 			continue;
 
 		item[0] = (0 != dc_host->errors_from && dc_host->disable_until <= now);
@@ -2765,6 +2765,10 @@ int	DCconfig_get_normal_poller_nextcheck(unsigned char poller_type, unsigned cha
 			continue;
 
 		if (NULL == (dc_host = DCget_dc_host(dc_item->hostid)))
+			continue;
+
+		if (HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
+				MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type)
 			continue;
 
 		switch (dc_item->type) {
@@ -3182,6 +3186,48 @@ void	DCreset_item_nextcheck(zbx_uint64_t itemid)
 			&dc_item->poller_type, &dc_item->poller_num, &dc_nextcheck);
 
 	dc_item->nextcheck = dc_nextcheck;
+unlock:
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_set_maintenance                                         *
+ *                                                                            *
+ * Purpose: Set host maintenance status                                       *
+ *                                                                            *
+ * Parameters: hostid - [IN] host ID (0 - keys from all hosts)                *
+ *             key - [IN] key name                                            *
+ *             items - [OUT] pointer to array of DC_ITEM structures           *
+ *                                                                            *
+ * Return value: number of items                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
+		int maintenance_type, int maintenance_from)
+{
+	int		index;
+	ZBX_DC_HOST	*dc_host;
+
+	LOCK_CACHE;
+
+	index = get_nearestindex(config->hosts, sizeof(ZBX_DC_HOST), config->hosts_num, hostid);
+	if (index == config->hosts_num)
+		goto unlock;
+
+	dc_host = &config->hosts[index];
+	if (dc_host->hostid != hostid)
+		goto unlock;
+
+	if (HOST_MAINTENANCE_STATUS_OFF == dc_host->maintenance_status ||
+			HOST_MAINTENANCE_STATUS_OFF == maintenance_status)
+		dc_host->maintenance_from = maintenance_from;
+	dc_host->maintenance_status = maintenance_status;
+	dc_host->maintenance_type = maintenance_type;
 unlock:
 	UNLOCK_CACHE;
 }
