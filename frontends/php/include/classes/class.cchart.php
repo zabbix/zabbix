@@ -795,7 +795,8 @@ class CChart extends CGraphDraw{
 // align to the closest human time interval
 		$raw_time_interval = ($this->gridPixels*$this->period)/$this->sizeX;
 		$intervals = array(
-			array('main'=> 600,'sub' => 60),				// 1 minute
+			array('main'=> 3600,'sub' => 60),				// 1 minute
+			array('main'=> 3600,'sub' => 120),				// 5 minutes
 			array('main'=> 3600,'sub' => 300),				// 5 minutes
 			array('main'=> 3600,'sub' => 900),				// 15 minutes
 			array('main'=> 3600,'sub' => 1800),				// 30 minutes
@@ -1059,11 +1060,6 @@ class CChart extends CGraphDraw{
 			if(($interval > 3600) && date('I',$this->to_time) == date('I',$new_time)) $new_time+=$this->diffTZ;
 
 // MAIN Interval Checks
-			if(($interval < 1800) && (date('i',$new_time) == 30)){
-				$this->DrawMainPeriod($new_time, $new_pos);
-				continue;
-			}
-
 			if(($interval < 3600) && (date('i',$new_time) == 0)){
 				$this->DrawMainPeriod($new_time, $new_pos);
 				continue;
