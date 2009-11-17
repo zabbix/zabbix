@@ -102,16 +102,19 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 	for (i = 0; i + szbyte <= (size_t)nbytes; i += szbyte)
 	{
 		if (0 == memcmp(&buf[i], lf, szbyte))	/* LF (Unix) */
+		{
+			i += szbyte;
 			break;
-
+		}
+		
 		if (0 == memcmp(&buf[i], cr, szbyte))	/* CR (Mac) */
 		{
 			if (i + szbyte < (size_t)nbytes && 0 == memcmp(&buf[i + szbyte], lf, szbyte))	/* CR+LF (Windows) */
 				i += szbyte;
+			i += szbyte;
 			break;
 		}
 	}
-	i += szbyte;
 
 	lseek(fd, offset + i, SEEK_SET);
 

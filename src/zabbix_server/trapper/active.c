@@ -301,6 +301,8 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_DELAY, tmp, ZBX_JSON_TYPE_STRING);
 		zbx_snprintf(tmp, sizeof(tmp), "%d", item.lastlogsize);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_LOGLASTSIZE, tmp, ZBX_JSON_TYPE_STRING);
+		zbx_snprintf(tmp, sizeof(tmp), "%d", item.mtime);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_MTIME, tmp, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json);
 
 		/* Special processing for log[] items */

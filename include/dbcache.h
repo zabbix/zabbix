@@ -85,6 +85,7 @@ ZBX_DC_HISTORY
 	int		severity;
 	int		logeventid;
 	int		lastlogsize;
+	int		mtime;
 	int		keep_history;
 	int		keep_trends;
 	int		functions;
@@ -207,7 +208,7 @@ void	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value_orig, int clock)
 void	DCadd_history_str(zbx_uint64_t itemid, char *value_orig, int clock);
 void	DCadd_history_text(zbx_uint64_t itemid, char *value_orig, int clock);
 void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, int timestamp, char *source, int severity,
-		int logeventid,int lastlogsize);
+		int logeventid, int lastlogsize, int mtime);
 int	DCsync_history(int sync_type);
 void	init_database_cache(zbx_process_t p);
 void	free_database_cache(void);

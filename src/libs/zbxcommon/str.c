@@ -329,10 +329,10 @@ void	zbx_strcpy_alloc(char **str, int *alloc_len, int *offset, const char *src)
  ******************************************************************************/
 void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src)
 {
-	assert(str && *str);
-	assert(alloc_len);
-	assert(offset);
-
+	assert(str);
+	assert(offset && 0 <= *offset);
+	assert(alloc_len && 0 <= *alloc_len);
+	
 	if (*offset + 1 >= *alloc_len) {
 		*alloc_len += 64;
 		*str = zbx_realloc(*str, *alloc_len);

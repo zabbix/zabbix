@@ -35,6 +35,7 @@ AGENT_VALUE
 	char	key[ITEM_KEY_LEN_MAX];
 	char	*value;
 	int	lastlogsize;
+	int	mtime;
 	int	timestamp;
 	char	*source;
 	int	severity;
