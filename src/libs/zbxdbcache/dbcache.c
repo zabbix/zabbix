@@ -925,10 +925,11 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			value_esc = DBdyn_escape_string_len(h->value_orig.value_str, ITEM_LASTVALUE_LEN);
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 576,
-					",prevvalue=lastvalue,lastvalue='%s',lastlogsize=%d",
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 600,
+					",prevvalue=lastvalue,lastvalue='%s',lastlogsize=%d,mtime=%d",
 					value_esc,
-					h->lastlogsize);
+					h->lastlogsize,
+					h->mtime);
 			zbx_free(value_esc);
 			break;
 		}
@@ -981,7 +982,7 @@ static void	DCmass_proxy_update_item(ZBX_DC_HISTORY *history, int history_num)
 	int		sql_offset = 0, i, j;
 	zbx_uint64_t	*ids = NULL;
 	int		ids_alloc, ids_num = 0;
-	int		lastlogsize;
+	int		lastlogsize, mtime;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCmass_proxy_update_item()");
 
@@ -998,7 +999,7 @@ static void	DCmass_proxy_update_item(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < ids_num; i++)
 	{
-		lastlogsize = -1;
+		lastlogsize = mtime = -1;
 
 		for (j = 0; j < history_num; j++)
 		{
@@ -1010,14 +1011,17 @@ static void	DCmass_proxy_update_item(ZBX_DC_HISTORY *history, int history_num)
 
 			if (lastlogsize < history[j].lastlogsize)
 				lastlogsize = history[j].lastlogsize;
+			if (mtime < history[j].mtime)
+				mtime = history[j].mtime;
 		}
 
-		if (-1 == lastlogsize)
+		if (-1 == lastlogsize || -1 == mtime)
 			continue;
 
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
-				"update items set lastlogsize=%d where itemid=" ZBX_FS_UI64 ";\n",
+				"update items set lastlogsize=%d, mtime=%d where itemid=" ZBX_FS_UI64 ";\n",
 				lastlogsize,
+				mtime,
 				ids[i]);
 
 		DBexecute_overflowed_sql(&sql, &sql_allocated, &sql_offset);
@@ -2326,7 +2330,7 @@ void	DCadd_history_text(zbx_uint64_t itemid, char *value_orig, int clock)
  *                                                                            *
  ******************************************************************************/
 void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, int timestamp, char *source, int severity,
-		int logeventid, int lastlogsize)
+		int logeventid, int lastlogsize, int mtime)
 {
 	ZBX_DC_HISTORY	*history;
 	size_t		len1, len2;
@@ -2360,6 +2364,7 @@ void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, int tim
 	history->severity		= severity;
 	history->logeventid		= logeventid;
 	history->lastlogsize		= lastlogsize;
+	history->mtime			= mtime;
 	history->keep_history		= 0;
 	history->keep_trends		= 0;
 

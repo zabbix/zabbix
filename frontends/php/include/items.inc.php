@@ -587,7 +587,7 @@
 		}
 
 		$item_old = get_item_by_itemid($itemid);
-		DBexecute('UPDATE items SET lastlogsize=0 WHERE itemid='.$itemid.' AND key_<>'.zbx_dbstr($item['key_']));
+		DBexecute('UPDATE items SET lastlogsize=0, mtime=0 WHERE itemid='.$itemid.' AND key_<>'.zbx_dbstr($item['key_']));
 
 
 		if($upd_app){

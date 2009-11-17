@@ -69,6 +69,10 @@
 #	define uint32_t	__int32
 #endif /* uint32_t */
 
+#ifndef PATH_SEPARATOR
+#	define PATH_SEPARATOR	'\\'
+#endif /* PATH_SEPARATOR */
+
 #else /* _WINDOWS */
 
 #	define zbx_stat(path, buf)		stat(path, buf)
@@ -103,10 +107,18 @@
 
 #	define zbx_pid_t	pid_t
 
+#ifndef PATH_SEPARATOR
+#	define PATH_SEPARATOR	'/'
+#endif
+
 #endif /* _WINDOWS */
 
 #ifndef S_ISREG
 #	define S_ISREG(x) (((x) & S_IFMT) == S_IFREG)
+#endif
+
+#ifndef S_ISDIR
+#	define S_ISDIR(x) (((x) & S_IFMT) == S_IFDIR)
 #endif
 
 #define ZBX_STR2UINT64(uint,string) sscanf(string ,ZBX_FS_UI64 ,&uint);

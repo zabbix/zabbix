@@ -63,6 +63,7 @@ typedef struct zbx_active_metric_type
 	int	status;
 /* Must be long for fseek() */
 	long	lastlogsize;
+	int	mtime;
 } ZBX_ACTIVE_METRIC;
 
 typedef struct active_ckeck_args
@@ -82,6 +83,7 @@ typedef struct zbx_active_buffer_element_type
 	long	lastlogsize;
 	int	clock;
 	int	logeventid;
+	int	mtime;
 } ZBX_ACTIVE_BUFFER_ELEMENT;
 
 typedef struct zbx_active_buffer_type

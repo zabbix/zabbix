@@ -91,7 +91,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 			SET_DBL_RESULT(&value, *value_dbl);
 		}
 
-		dc_add_history(item.itemid, item.value_type, &value, now, 0, NULL, 0, 0, 0);
+		dc_add_history(item.itemid, item.value_type, &value, now, 0, NULL, 0, 0, 0, 0);
 
 		DCconfig_update_item(item.itemid, ITEM_STATUS_ACTIVE, now);
 
