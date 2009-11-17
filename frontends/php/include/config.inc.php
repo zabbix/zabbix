@@ -278,10 +278,10 @@ function __autoload($class_name){
 	function show_messages($bool=TRUE,$okmsg=NULL,$errmsg=NULL){
 		global	$page, $ZBX_MESSAGES;
 
-		if (!defined('PAGE_HEADER_LOADED')) return;
-		if (defined('ZBX_API_REQUEST')) return;
-
-		if (!isset($page["type"])) $page["type"] = PAGE_TYPE_HTML;
+		if(!defined('PAGE_HEADER_LOADED')) return;
+		if(defined('ZBX_API_REQUEST')) return;
+		
+		if(!isset($page['type'])) $page['type'] = PAGE_TYPE_HTML;
 
 		$message = array();
 		$width = 0;
@@ -290,6 +290,9 @@ function __autoload($class_name){
 
 		if(!$bool && !is_null($errmsg))		$msg='ERROR: '.$errmsg;
 		else if($bool && !is_null($okmsg))	$msg=$okmsg;
+
+		$api_errors = CZBXAPI::resetErrors();
+		if(!empty($api_errors)) error($api_errors);
 
 		if(isset($msg)){
 			switch($page['type']){
@@ -331,7 +334,7 @@ function __autoload($class_name){
 			}
 		}
 
-		if(isset($ZBX_MESSAGES)){
+		if(isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)){
 			if($page['type'] == PAGE_TYPE_IMAGE){
 				$msg_font = 2;
 				foreach($ZBX_MESSAGES as $msg){

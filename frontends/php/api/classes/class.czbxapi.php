@@ -101,7 +101,7 @@ private static $transaction = array('counter' => 0);
 
 // ERROR METHODS{
 	protected static function setError($method, $errno=ZBX_API_ERROR_INTERNAL, $error='Unknown ZABBIX internal error'){
-		self::$error[] = array('error' => $errno, 'data' => '[ '.$method.' ] '.$error);
+		CZBXAPI::$error[] = array('error' => $errno, 'data' => '[ '.$method.' ] '.$error);
 	}
 
 	protected static function setMethodErrors($method, $errors){

@@ -764,7 +764,7 @@
 
 			$groups = CUserGroup::get(array('usrgrpids' => $user_groups, 'extendoutput' => 1));
 			foreach($groups as $num => $group){
-				$lstGroups->addItem($group['groupid'], $group['name']);
+				$lstGroups->addItem($group['usrgrpid'], $group['name']);
 			}
 
 			$frmUser->addRow(S_GROUPS,
