@@ -142,12 +142,7 @@ class CTag extends CObject{
 	}
 
 	public function addAction($name, $value){
-		if(is_object($value)){
-			$this->attributes[$name] = unpack_object($value);
-		}
-		else if(!empty($value)){
-			$this->attributes[$name] = htmlentities(str_replace(array("\r", "\n"), '', strval($value)),ENT_COMPAT,S_HTML_CHARSET);
-		}
+		$this->setAttribute($name, $value);
 	}
 
 	public function setHint($text, $width='', $class='', $byclick=true){
