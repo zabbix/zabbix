@@ -2693,7 +2693,7 @@
 				list($outline, $node, $map) = $alz;
 				if(isset($_REQUEST['expr_action']) && $node != null){
 
-					$new_expr = remake_expression($node, $_REQUEST['expr_target'], $_REQUEST['expr_action'], $expr_temp, $map);
+					$new_expr = remake_expression($node, $_REQUEST['expr_target_single'], $_REQUEST['expr_action'], $expr_temp, $map);
 					if($new_expr !== false){
 						$expression = $new_expr;
 						list($outline, $node, $map) = analyze_expression($expression);
@@ -2770,10 +2770,13 @@
 			if($node != null){
 				$exprs = make_disp_tree($tree, $map, true);
 				foreach($exprs as $i => $e){
-					$tgt_chk = new CCheckbox('expr_target', ($i==0)?'yes':'no', 'check_target(this);', $e['id']);
-					$del_url = new CLink(S_DELETE,'#','action',
-										 'javascript: if(confirm("Delete expression?")) { delete_expression('.
-										 $e['id'] .'); document.forms["config_triggers.php"].submit(); } return false;');
+					$tgt_chk = new CCheckbox('expr_target_single', ($i==0)?'yes':'no', 'check_target(this);', $e['id']);
+					$del_url = new CSpan(S_DELETE,'link');
+					$del_url->setAttribute('onclick', 'javascript: if(confirm("Delete expression?")) {'.
+										 	' delete_expression('.$e['id'] .');'.
+										 	' document.forms["config_triggers.php"].submit(); '.
+										'}');
+
 					$row = new CRow(array($tgt_chk, $e['expr'], $del_url));
 					$exp_table->addRow($row);
 				}
