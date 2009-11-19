@@ -2670,7 +2670,6 @@ static int	DCconfig_get_unreachable_poller_items(unsigned char poller_type, unsi
 				if (0 == item[1])
 					break;
 				item[1] = 0;
-				break;
 				goto copy_item;
 			case ITEM_TYPE_IPMI:
 				if (0 == item[2])
