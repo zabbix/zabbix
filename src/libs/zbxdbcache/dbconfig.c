@@ -1570,9 +1570,10 @@ static void	DCsync_items()
 		if (new)
 		{
 			item->itemid = itemid;
-			item->nextcheck = calculate_item_nextcheck(itemid, type, delay, row[16], now);
-			if (ITEM_STATUS_NOTSUPPORTED == status && item->nextcheck > now + CONFIG_REFRESH_UNSUPPORTED)
-				item->nextcheck = now + CONFIG_REFRESH_UNSUPPORTED;
+			if (ITEM_STATUS_NOTSUPPORTED == status)
+				item->nextcheck = calculate_item_nextcheck(itemid, type, CONFIG_REFRESH_UNSUPPORTED, NULL, now);
+			else
+				item->nextcheck = calculate_item_nextcheck(itemid, type, delay, row[16], now);
 
 			DCupdate_idxitem01(i, NULL, NULL, &hostid, key);
 			DCupdate_idxitem02(i, NULL, NULL, NULL, &poller_type, &poller_num, &item->nextcheck);
@@ -1580,10 +1581,11 @@ static void	DCsync_items()
 		else
 		{
 			if (ITEM_STATUS_ACTIVE == status && (status != item->status || delay != item->delay))
-				nextcheck = calculate_item_nextcheck(itemid, type, delay, row[16], now);
-			else if (ITEM_STATUS_NOTSUPPORTED == status && status != item->status &&
-					item->nextcheck > now + CONFIG_REFRESH_UNSUPPORTED)
-				nextcheck = now + CONFIG_REFRESH_UNSUPPORTED;
+				nextcheck = calculate_item_nextcheck(itemid, type,
+						delay, row[16], now);
+			else if (ITEM_STATUS_NOTSUPPORTED == status && status != item->status)
+				nextcheck = calculate_item_nextcheck(itemid, type,
+						CONFIG_REFRESH_UNSUPPORTED, NULL, now);
 			else
 				nextcheck = item->nextcheck;
 
@@ -2910,7 +2912,8 @@ void	DCconfig_update_item(zbx_uint64_t itemid, unsigned char status, int now)
 		goto unlock;
 
 	if (ITEM_STATUS_NOTSUPPORTED == status)
-		dc_nextcheck = now + CONFIG_REFRESH_UNSUPPORTED;
+		dc_nextcheck = calculate_item_nextcheck(dc_item->itemid, dc_item->type,
+				CONFIG_REFRESH_UNSUPPORTED, NULL, now);
 	else
 	{
 		dc_flexitem = DCget_dc_flexitem(itemid);;
