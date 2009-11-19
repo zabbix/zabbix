@@ -212,7 +212,8 @@ static void	activate_host(DC_ITEM *item, int now)
 	char		sql[MAX_STRING_LEN], error_msg[MAX_STRING_LEN];
 	int		offset = 0, *errors_from, *disable_until;
 	unsigned char	*available;
-	const char	*fld_errors_from, *fld_available, *fld_disable_until, *type;
+	const char	*fld_errors_from, *fld_available, *fld_disable_until,
+			*fld_error, *type;
 
 	switch (item->type) {
 	case ITEM_TYPE_ZABBIX:
@@ -223,6 +224,7 @@ static void	activate_host(DC_ITEM *item, int now)
 		fld_errors_from = "errors_from";
 		fld_available = "available";
 		fld_disable_until = "disable_until";
+		fld_error = "error";
 		type = "ZABBIX";
 		break;
 	case ITEM_TYPE_SNMPv1:
@@ -235,6 +237,7 @@ static void	activate_host(DC_ITEM *item, int now)
 		fld_errors_from = "snmp_errors_from";
 		fld_available = "snmp_available";
 		fld_disable_until = "snmp_disable_until";
+		fld_error = "snmp_error";
 		type = "SNMP";
 		break;
 	case ITEM_TYPE_IPMI:
@@ -245,6 +248,7 @@ static void	activate_host(DC_ITEM *item, int now)
 		fld_errors_from = "ipmi_errors_from";
 		fld_available = "ipmi_available";
 		fld_disable_until = "ipmi_disable_until";
+		fld_error = "ipmi_error";
 		type = "IPMI";
 		break;
 	default:
@@ -277,9 +281,11 @@ static void	activate_host(DC_ITEM *item, int now)
 
 	*errors_from = 0;
 	*disable_until = 0;
-	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d,%s=%d,error='' where hostid=" ZBX_FS_UI64,
+	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
+			"%s=%d,%s=%d,%s='' where hostid=" ZBX_FS_UI64,
 			fld_errors_from, *errors_from,
 			fld_disable_until, *disable_until,
+			fld_error,
 			item->host.hostid);
 
 	DBbegin();
@@ -332,7 +338,8 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 	char		sql[MAX_STRING_LEN], *error_esc, error_msg[MAX_STRING_LEN];
 	int		offset = 0, *errors_from, *disable_until;
 	unsigned char	*available;
-	const char	*fld_errors_from, *fld_available, *fld_disable_until, *type;
+	const char	*fld_errors_from, *fld_available, *fld_disable_until,
+			*fld_error, *type;
 
 	switch (item->type) {
 	case ITEM_TYPE_ZABBIX:
@@ -343,6 +350,7 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 		fld_errors_from = "errors_from";
 		fld_available = "available";
 		fld_disable_until = "disable_until";
+		fld_error = "error";
 		type = "ZABBIX";
 		break;
 	case ITEM_TYPE_SNMPv1:
@@ -355,6 +363,7 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 		fld_errors_from = "snmp_errors_from";
 		fld_available = "snmp_available";
 		fld_disable_until = "snmp_disable_until";
+		fld_error = "snmp_error";
 		type = "SNMP";
 		break;
 	case ITEM_TYPE_IPMI:
@@ -365,6 +374,7 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 		fld_errors_from = "ipmi_errors_from";
 		fld_available = "ipmi_available";
 		fld_disable_until = "ipmi_disable_until";
+		fld_error = "ipmi_error";
 		type = "IPMI";
 		break;
 	default:
@@ -420,8 +430,8 @@ static void	deactivate_host(DC_ITEM *item, int now, const char *error)
 			}
 
 			error_esc = DBdyn_escape_string_len(error, HOST_ERROR_LEN);
-			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "error='%s',",
-					error_esc);
+			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s='%s',",
+					fld_error, error_esc);
 			zbx_free(error_esc);
 		}
 	}
