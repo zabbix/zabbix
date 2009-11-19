@@ -725,9 +725,16 @@ include_once('include/page_header.php');
 				break;
 			}
 
-			if(!zbx_empty($host['error'])){
+			if(!zbx_empty($host['error']) || !zbx_empty($host['snmp_error']) || !zbx_empty($host['ipmi_error'])){
 				$error = new CDiv(SPACE, 'iconerror');
-				$error->setHint($host['error'], '', 'on');
+				$error_msg = '';
+				if (!zbx_empty($host['error']))
+					$error_msg .= $host['error'];
+				if (!zbx_empty($host['snmp_error']))
+					$error_msg .= (empty($error_msg) ? '' : '<br>').$host['snmp_error'];
+				if (!zbx_empty($host['ipmi_error']))
+					$error_msg .= (empty($error_msg) ? '' : '<br>').$host['ipmi_error'];
+				$error->setHint($error_msg, '', 'on');
 			}
 			else{
 				$error = new CDiv(SPACE, 'iconok');
