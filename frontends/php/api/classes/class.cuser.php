@@ -561,6 +561,15 @@ class CUser extends CZBXAPI{
 		self::BeginTransaction(__METHOD__);
 		foreach($users as $unum => $user){
 			$user_db_fields = $upd_users[$user['userid']];
+			
+// unset if not changed passwd	
+			if(isset($user['passwd']) && !is_null($user['passwd'])){
+				$user['passwd'] = md5($user['passwd']);
+			}
+			else{
+				unset($user['passwd']);
+			}
+//---------
 
 			if(!check_db_fields($user_db_fields, $user)){
 				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Incorrect arguments pasted to function [CUser::update]');
@@ -582,10 +591,6 @@ class CUser extends CZBXAPI{
 				$error = 'User [ '.$user['alias'].' ] already exists';
 				$result = false;
 				break;
-			}
-
-			if(isset($user['passwd'])) {
-				$user['passwd'] = md5($user['passwd']);
 			}
 
 			$sql = 'UPDATE users SET '.
