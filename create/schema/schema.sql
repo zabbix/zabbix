@@ -549,6 +549,8 @@ FIELD		|maintenance_from|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|ipmi_ip	|t_varchar(64)	|'127.0.0.1'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|ipmi_errors_from|t_integer	|'0'	|NOT NULL	|0
 FIELD		|snmp_errors_from|t_integer	|'0'	|NOT NULL	|0
+FIELD		|ipmi_error	|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|snmp_error	|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|host
 INDEX		|2		|status
 INDEX		|3		|proxy_hostid
