@@ -56,7 +56,7 @@ links:	{},				// map links array
 selects: new Array(),				// selected Elements
 
 menu_active: 0,						// To recognize D&D
-debug_status: 2,					// debug status: 0 - off, 1 - on, 2 - SDI;
+debug_status: 0,					// debug status: 0 - off, 1 - on, 2 - SDI;
 debug_info: '',						// debug string
 
 mselement: {
@@ -142,8 +142,8 @@ get_sysmap_by_sysmapid: function(sysmapid){
 					{
 						'method': 'post',
 						'parameters':params,
-						'onSuccess': function(resp){ SDI(resp.responseText); },
-//						'onSuccess': function(resp){ },
+//						'onSuccess': function(resp){ SDI(resp.responseText); },
+						'onSuccess': function(resp){ },
 						'onFailure': function(){ throw('Get selements FAILED.'); }
 					}
 	);
@@ -199,8 +199,8 @@ add_empty_selement: function(){
 					{
 						'method': 'post',
 						'parameters':params,
-//						'onSuccess': function(resp){ },
-						'onSuccess': function(resp){ SDI(resp.responseText); },
+						'onSuccess': function(resp){ },
+//						'onSuccess': function(resp){ SDI(resp.responseText); },
 						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
 					}
 	);
@@ -383,8 +383,8 @@ update_selement: function(selement){
 					{
 						'method': 'post',
 						'parameters':params,
-//						'onSuccess': function(resp){ },
-						'onSuccess': function(resp){ SDI(resp.responseText); },
+						'onSuccess': function(resp){ },
+//						'onSuccess': function(resp){ SDI(resp.responseText); },
 						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
 					}
 	);
@@ -672,7 +672,7 @@ update_mapimg: function(){
 set_mapimg: function(resp){
 	this.debug('set_mapimg');
 
-SDI(resp.responseText);
+//SDI(resp.responseText);
 	if(is_null(this.mapimg)){
 		this.mapimg = $('sysmap_img');
 //		this.container.appendChild(this.mapimg);
@@ -944,11 +944,15 @@ show_link_menu: function(e){
 			
 			if(form_key == 'triggers'){
 				var values = zbx_link_form_menu[form_key][0];
-				
-				var srctbl1 = 'triggers';
-				var srcfld1 = form_key;
+//SDJ(mlink);
+				for(var j=0; j<mlink.linktriggers.length; j++){
+					if((typeof(mlink.linktriggers[j] != 'undefined')) && !is_null(mlink.linktriggers[j])){
+						var srctbl1 = 'triggers';
+						var srcfld1 = form_key;
 
-				var value_action = 'javascript: '+
+						var linktrigger = mlink.linktriggers[j];
+
+						var value_action = 'javascript: '+
 							"PopUp('popup.php?srctbl="+srctbl1+
 								'&reference=sysmap_link'+
 								'&sysmapid='+this.sysmapid+
@@ -956,10 +960,14 @@ show_link_menu: function(e){
 								'&sid='+id+
 								'&dstfrm=null'+
 								'&srcfld1='+srcfld1+
-								"&dstfld1="+srcfld1+"',800,450); void(0);",
-				value_action = '<span onclick="'+value_action+'">'+mlink['tr_desc']+'</span>';
+								"&dstfld1="+srcfld1+"',800,450); void(0);";
 
-				sub_menu.push([value_action,'#',function(){return false;}]);
+						var desc_exp_trunc = linktrigger.desc_exp.substr(0, 40)+'...';
+						value_action = '<span onclick="'+value_action+'">'+desc_exp_trunc+'</span>';
+
+						sub_menu.push([value_action,'#',function(){return false;}]);
+					}
+				}
 			}
 			else if((form_key == 'selementid1') || (form_key == 'selementid2')){
 				for(var j=0; j<this.selementids.length; j++){

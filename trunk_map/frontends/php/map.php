@@ -282,8 +282,8 @@ include_once('include/page_header.php');
 				$x_label = $x + imagesx($img);
 
 
-			imagefilledrectangle($im, $x_label-1, $y+$dims['height']+1, $x_label + $dims['width']+1, $y - 1, $white);
-			imagetext($im, 8, 0, $x_label, $y+$dims['height'], ($num == $cnt)?$color:$label_color, $str);
+			imagefilledrectangle($im, $x_label-1, $y+$dims['height']+3, $x_label + $dims['width']+1, $y + 2, $white);
+			imagetext($im, 8, 0, $x_label, $y+$dims['height']+2, ($num == $cnt)?$color:$label_color, $str);
 
 			$y += $dims['height']+4;
 		}
