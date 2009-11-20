@@ -101,7 +101,7 @@ function __autoload($class_name){
 
 	/********** START INITIALIZATION *********/
 
-	set_error_handler('zbx_err_handler');
+//	set_error_handler('zbx_err_handler');
 
 	global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_CONFIGURATION_FILE, $DB;
 	global $ZBX_SERVER, $ZBX_SERVER_PORT;
@@ -269,6 +269,12 @@ function __autoload($class_name){
 					break;
 				case 'html':
 					return PAGE_TYPE_HTML_BLOCK;
+					break;
+				case 'img':
+					return PAGE_TYPE_IMAGE;
+					break;
+				case 'css':
+					return PAGE_TYPE_CSS;
 					break;
 			}
 		}
@@ -939,17 +945,34 @@ function __autoload($class_name){
 		Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT");
 	}
 
-	function ImageOut($image,$format=NULL){
+	function ImageOut(&$image,$format=NULL){
+		global $page;
 		global $IMAGE_FORMAT_DEFAULT;
 
-		if(is_null($format)) $format = $IMAGE_FORMAT_DEFAULT;
+		if($page['type'] != PAGE_TYPE_IMAGE){
+			ob_start();
+			imagepng($image);
+			$image_txt = ob_get_contents();
+			ob_end_clean();
 
-		if(IMAGE_FORMAT_JPEG == $format)
-			ImageJPEG($image);
-		else
-			ImagePNG($image);
-
-		imagedestroy($image);
+			session_start();
+			$id = md5($image_txt);
+			$_SESSION['imageid'][$id] = $image_txt;
+			session_write_close();
+			print($id);
+			
+//			print(base64_encode($image_txt));
+		}
+		else{
+			if(is_null($format)) $format = $IMAGE_FORMAT_DEFAULT;
+			
+			if(IMAGE_FORMAT_JPEG == $format)
+				imagejpeg($image);
+			else
+				imagepng($image);
+		}
+		
+//		imagedestroy($image);
 	}
 
 	function encode_log($data){

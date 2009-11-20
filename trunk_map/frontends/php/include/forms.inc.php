@@ -6316,7 +6316,7 @@
 		$frmMap->show();
 
 	}
-
+/*
 	function insert_map_element_form(){
 		global $USER_DETAILS;
 
@@ -6546,6 +6546,7 @@
 
 		$frmEl->show();
 	}
+//*/
 
 	function insert_map_link_form(){
 
@@ -6722,18 +6723,20 @@
 	function insert_command_result_form($scriptid,$hostid){
 		$result = execute_script($scriptid,$hostid);
 
-		$script_info = DBfetch(DBselect("SELECT name FROM scripts WHERE scriptid=$scriptid"));
+		$sql = 'SELECT name '.
+				' FROM scripts '.
+				' WHERE scriptid='.$scriptid;
+		$script_info = DBfetch(DBselect($sql));
 
-		$frmResult = new CFormTable($script_info["name"].': '.script_make_command($scriptid,$hostid));
-		$message = $result["message"];
-		if($result["flag"] != 0) {
+		$frmResult = new CFormTable($script_info['name'].': '.script_make_command($scriptid,$hostid));
+		$message = $result['message'];
+		if($result['flag'] != 0) {
 			error($message);
-			$message = "";
+			$message = '';
 		}
 
-		$frmResult->addRow(S_RESULT,new CTextArea("message",$message,100,25,'yes'));
+		$frmResult->addRow(S_RESULT,new CTextArea('message',$message,100,25,'yes'));
 		$frmResult->addItemToBottomRow(new CButton('close',S_CLOSE,'window.close();'));
-
 		$frmResult->show();
 	}
 

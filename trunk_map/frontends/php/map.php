@@ -24,7 +24,7 @@
 
 	$page['title'] = 'S_MAP';
 	$page['file'] = 'map.php';
-	$page['type'] = PAGE_TYPE_IMAGE;
+	$page['type'] = detect_page_type(PAGE_TYPE_IMAGE);
 
 include_once('include/page_header.php');
 
@@ -32,9 +32,16 @@ include_once('include/page_header.php');
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'sysmapid'=>	array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,		NULL),
-		'noedit'=>	array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1'),	NULL),
-		'border'=>	array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1'),	NULL)
+		'sysmapid'=>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,		NULL),
+		
+		'selements'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID, NULL),
+		'links'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID, NULL),
+		'noselements'=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),	NULL),
+		'nolinks'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),	NULL),
+		
+		'show_triggers'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN("0,1,2,3"),	NULL),		
+		'noedit'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1'),	NULL),
+		'border'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1'),	NULL)
 	);
 
 	check_fields($fields);
@@ -48,12 +55,14 @@ include_once('include/page_header.php');
 		include_once('include/page_footer.php');
 	}
 
+
 	$name		= $map['name'];
 	$width		= $map['width'];
 	$height		= $map['height'];
 	$backgroundid	= $map['backgroundid'];
 	$label_type	= $map['label_type'];
-
+	$status_view = 0;// $map['status_view'];
+	
 	if(function_exists('imagecreatetruecolor')&&@imagecreatetruecolor(1,1)){
 		$im = imagecreatetruecolor($width,$height);
 	}
@@ -72,7 +81,7 @@ include_once('include/page_header.php');
 	$white		= imagecolorallocate($im,255,255,255);
 	$black		= imagecolorallocate($im,0,0,0);
 	$gray		= imagecolorallocate($im,150,150,150);
-
+	
 	$colors['Red']		= imagecolorallocate($im,255,0,0);
 	$colors['Dark Red']	= imagecolorallocate($im,150,0,0);
 	$colors['Green']	= imagecolorallocate($im,0,255,0);
@@ -85,6 +94,7 @@ include_once('include/page_header.php');
 	$colors['Black']	= imagecolorallocate($im,0,0,0);
 	$colors['Gray']		= imagecolorallocate($im,150,150,150);
 	$colors['White']	= imagecolorallocate($im,255,255,255);
+
 
 	$x=imagesx($im);
 	$y=imagesy($im);
@@ -119,20 +129,49 @@ include_once('include/page_header.php');
 
 		imageText($im, 8, 0, 2, $dims['height']+3, $black, 'Y X:');
 	}
+// ACTION /////////////////////////////////////////////////////////////////////////////
 
+	$json = new CJSON();
+
+	if(isset($_REQUEST['selements']) || isset($_REQUEST['noselements'])){
+		$selements = get_request('selements', '[]');
+		$selements = $json->decode($selements, true);
+	}
+	else{
+		$selements = array();
+		$res = DBselect('select * from sysmaps_elements where sysmapid='.$_REQUEST['sysmapid']);
+		while($selement = DBfetch($res)){
+			$selements[$selement['selementid']] = $selement;
+		}
+	}
+
+	if(isset($_REQUEST['links']) || isset($_REQUEST['nolinks'])){
+		$links = get_request('links', '[]');
+		$links = $json->decode($links, true);
+	}
+	else{
+		$links = array();
+		$res = DBselect('select * from sysmaps_links where sysmapid='.$_REQUEST['sysmapid']);
+		while($link = DBfetch($res)){
+			$links[$link['linkid']] = $link;
+		}
+	}
+
+//SDI($links); exit;
 // Draw connectors
+	foreach($links as $linkid => $link){
+		if(empty($link)) continue;
 
-	$links = DBselect('select * from sysmaps_links where sysmapid='.$_REQUEST['sysmapid']);
-	while($link = DBfetch($links)){
-		list($x1, $y1) = get_icon_center_by_selementid($link['selementid1']);
-		list($x2, $y2) = get_icon_center_by_selementid($link['selementid2']);
+		$selement = $selements[$link['selementid1']];
+		list($x1, $y1) = get_icon_center_by_selement($selement);
+
+		$selement = $selements[$link['selementid2']];
+		list($x2, $y2) = get_icon_center_by_selement($selement);
 
 		$drawtype = $link['drawtype'];
 		$color = convertColor($im,$link['color']);
 
-		$triggers = get_link_triggers($link['linkid']);
-
-
+		$triggers = $link['linktriggers'];
 		if(!empty($triggers)){
 			$max_severity=0;
 			$options = array();
@@ -153,35 +192,40 @@ include_once('include/page_header.php');
 		}
 		MyDrawLine($im,$x1,$y1,$x2,$y2,$color,$drawtype);
 	}
+//-----------------------
 
-// Draw elements
+// Draws elements
 	$icons=array();
-	$db_elements = DBselect('select * from sysmaps_elements where sysmapid='.$_REQUEST['sysmapid']);
+	foreach($selements as $selementid => $selement){
+		if(empty($selement)) continue;
 
-	while($db_element = DBfetch($db_elements)){
-		if($img = get_png_by_selementid($db_element['selementid'])){
-			imagecopy($im,$img,$db_element['x'],$db_element['y'],0,0,ImageSX($img),ImageSY($img));
+		$img = get_png_by_selement($selement);
+
+		if(!isset($_REQUEST['noselements'])){
+			imagecopy($im,$img,$selement['x'],$selement['y'],0,0,ImageSX($img),ImageSY($img));
 		}
 
 		if($label_type==MAP_LABEL_TYPE_NOTHING)	continue;
 
 		$color		= $darkgreen;
 		$label_color	= $black;
+		
 		$info_line	= '';
 
-		$label_location = is_null($db_element['label_location']) ? $map['label_location'] : $db_element['label_location'];
+		$label_location = $selement['label_location'];
+		if(is_null($label_location)) $label_location = $map['label_location'];
 
-		$label_line = expand_map_element_label_by_data($db_element);
+		$label_line = expand_map_element_label_by_data($selement);
 
-		$el_info = get_info_by_selementid($db_element['selementid']);
+		$el_info = get_info_by_selement($selement,$status_view);
 
 		$info_line	= $el_info['info'];
 		$color		= $el_info['color'];
 
-		if($label_type==MAP_LABEL_TYPE_STATUS){
+		if($label_type == MAP_LABEL_TYPE_STATUS){
 			$label_line = '';
 		}
-		else if($label_type==MAP_LABEL_TYPE_NAME){
+		else if($label_type == MAP_LABEL_TYPE_NAME){
 			$label_line = $el_info['name'];
 		}
 
@@ -192,18 +236,19 @@ include_once('include/page_header.php');
 
 		unset($el_info);
 
-		if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
-			$host = get_host_by_hostid($db_element['elementid']);
+		if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
+			$host = get_host_by_hostid($selement['elementid']);
 
-			if( $label_type==MAP_LABEL_TYPE_IP )
-				$label_line=$host['ip'];
+			if($label_type==MAP_LABEL_TYPE_IP) $label_line = $host['ip'];
+				
+			if($host['status'] == HOST_STATUS_NOT_MONITORED) $label_color = $darkred;
 		}
 
-		if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE){
-			$label_line = expand_map_element_label_by_data($db_element);
+		if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE){
+			$label_line = expand_map_element_label_by_data($selement);
 		}
 
-		if($label_line=='' && $info_line=='')	continue;
+		if($label_line=='' && $info_line=='') continue;
 
 		$label_line = str_replace("\r", '', $label_line);
 		$strings = explode("\n", $label_line);
@@ -211,12 +256,12 @@ include_once('include/page_header.php');
 		$cnt = count($strings);
 		$num = 0;
 
-		$x = $db_element['x'];
-		$y = $db_element['y'];
+		$x = $selement['x'];
+		$y = $selement['y'];
 		$h = ImageFontHeight(2);
 
-		$x_info = $db_element['x'];
-		$y_info = $db_element['y'];
+		$x_info = $selement['x'];
+		$y_info = $selement['y'];
 
 		if($label_location == MAP_LABEL_LOC_TOP)
 			$y -= $h * $cnt;
@@ -250,12 +295,12 @@ include_once('include/page_header.php');
 		imagerectangle($im,0,0,$width-1,$height-1,$colors['Black']);
 	}
 
-	ImageOut($im);
+	imageOut($im);
 
-	ImageDestroy($im);
+	imagedestroy($im);
 ?>
 <?php
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
 
 ?>

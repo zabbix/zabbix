@@ -482,8 +482,8 @@ function insert_js_function($fnct_name){
 	}
 };
 
-
 function insert_js($script){
-	print('<script type="text/javascript"><!--'."\n".$script."\n".'--></script>');
+print('<script type="text/javascript">// <![CDATA['."\n".$script."\n".'// ]]></script>');
 }
+
 ?>

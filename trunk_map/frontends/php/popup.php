@@ -173,6 +173,11 @@ include_once('include/page_header.php');
 
 		'reference'=>	array(T_ZBX_STR, O_OPT, null,   null,		null),
 
+//dmaps
+		'sysmapid'=>	array(T_ZBX_INT, O_OPT, null,   DB_ID,		'isset({reference})'),
+		'cmapid'=>		array(T_ZBX_INT, O_OPT, null,   null,		'isset({reference})'),
+		'sid'=>			array(T_ZBX_INT, O_OPT, null,   null,		'isset({reference})'),
+
 		'select'=>		array(T_ZBX_STR,	O_OPT,	P_SYS|P_ACT,	null,	null)
 	);
 
@@ -244,9 +249,15 @@ include_once('include/page_header.php');
 	$frmTitle->addVar('srcfld1', $srcfld1);
 	$frmTitle->addVar('srcfld2', $srcfld2);
 	$frmTitle->addVar('multiselect', $multiselect);
-	if(isset($_REQUEST['reference']))
-		$frmTitle->addVar('reference',	$_REQUEST['reference']);
 
+// Optional
+	if(isset($_REQUEST['reference'])){
+		$frmTitle->addVar('reference',	get_request('reference','0'));
+		$frmTitle->addVar('sysmapid',	get_request('sysmapid','0'));
+		$frmTitle->addVar('cmapid',		get_request('cmapid','0'));
+		$frmTitle->addVar('sid',		get_request('sid','0'));
+	}
+	
 	if(isset($only_hostid)){
 		$_REQUEST['hostid'] = $only_hostid;
 		$frmTitle->addVar('only_hostid',$only_hostid);
@@ -374,10 +385,24 @@ include_once('include/page_header.php');
 		while($host = DBfetch($db_hosts)){
 
 			$name = new CSpan($host['host'],'link');
-			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
-				$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
-					get_window_opener($dstfrm, $dstfld2, $host[$srcfld2]).
-					"window.opener.setTimeout('add2favorites();', 1000);";
+			if(isset($_REQUEST['reference'])){
+				$cmapid = get_request('cmapid',0);
+				$sid = get_request('sid',0);
+
+				$action = '';
+				if($_REQUEST['reference']=='dashboard'){
+					$action = get_window_opener($dstfrm, $dstfld1, $srctbl).
+						get_window_opener($dstfrm, $dstfld2, $host[$srcfld2]).
+						"window.opener.setTimeout('add2favorites();', 1000);";
+				}
+				else if($_REQUEST['reference']=='sysmap_element'){
+					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_selement_option($sid,".
+									"[{'key':'elementtype','value':'".SYSMAP_ELEMENT_TYPE_HOST."'},".
+										"{'key':'$dstfld1','value':'$host[$srcfld1]'}]);";
+				}
+				else if($_REQUEST['reference']=='sysmap_link'){
+					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_link_option($sid,[{'key':'$dstfld1','value':'$host[$srcfld1]'}]);";
+				}
 			}
 			else{
 				$action = get_window_opener($dstfrm, $dstfld1, $host[$srcfld1]).
@@ -520,10 +545,24 @@ include_once('include/page_header.php');
 		$db_groups = DBselect($sql);
 		while($row = DBfetch($db_groups)){
 			$name = new CSpan($row['name'],'link');
-			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
-				$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
-					get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
-					"window.opener.setTimeout('add2favorites();', 1000);";
+			if(isset($_REQUEST['reference'])){
+				$cmapid = get_request('cmapid',0);
+				$sid = get_request('sid',0);
+
+				$action = '';
+				if($_REQUEST['reference']=='dashboard'){
+					$action = get_window_opener($dstfrm, $dstfld1, $srcfld2).
+						get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
+						"window.opener.setTimeout('add2favorites();', 1000);";
+				}
+				else if($_REQUEST['reference'] =='sysmap_element'){
+					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_selement_option($sid,".
+									"[{'key':'elementtype','value':'".SYSMAP_ELEMENT_TYPE_HOST_GROUP."'},".
+										"{'key':'$dstfld1','value':'$row[$srcfld1]'}]);";
+				}
+				else if($_REQUEST['reference'] =='sysmap_link'){
+					$action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_link_option($sid,[{'key':'$dstfld1','value':'$row[$srcfld1]'}]);";
+				}
 			}
 			else{
 				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
@@ -677,8 +716,9 @@ include_once('include/page_header.php');
 					' AND '.DBin_node('t.triggerid', $nodeid).
 					' AND '.DBcondition('t.triggerid',$available_triggers).
 					' AND h.status in ('.implode(',', $host_status).')';
-		if($hostid>0)
-			$sql .= ' AND h.hostid='.$hostid;
+		
+		if($hostid>0) $sql .= ' AND h.hostid='.$hostid;
+
 		$sql .= ' GROUP BY h.host, t.triggerid, t.description, t.expression, t.priority, t.status'.
 				' ORDER BY h.host,t.description';
 		$result=DBselect($sql);
@@ -690,7 +730,29 @@ include_once('include/page_header.php');
 				$js_action = 'add_selected_values("'.S_TRIGGERS.'", "'.$dstfrm.'", "'.$dstfld1.'", "'.$dstact.'", "'.$row["triggerid"].'");';
 			}
 			else {
-				$js_action = 'add_value("'.$dstfld1.'", "'.$dstfld2.'", "'.$row["triggerid"].'", "'.$exp_desc.'");';
+				if(isset($_REQUEST['reference'])){
+					$cmapid = get_request('cmapid',0);
+					$sid = get_request('sid',0);
+
+					$js_action = '';
+					if($_REQUEST['reference'] =='sysmap_element'){
+						$js_action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_selement_option($sid,".
+										"[{'key':'elementtype','value':'".SYSMAP_ELEMENT_TYPE_TRIGGER."'},".
+											"{'key':'$dstfld1','value':'$row[$srcfld1]'}]);";
+					}
+					else if($_REQUEST['reference'] =='sysmap_link'){
+						$params = array(array('key'=> $dstfld1, 'value'=> $row[$srcfld1]));
+
+						if($dstfld1 == 'triggerid'){
+							$params[] = array('key'=> 'tr_desc', 'value'=> $row['host'].':'.$exp_desc);
+						}
+
+						$js_action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_link_option($sid,".zbx_jsvalue($params).");";
+					}
+				}
+				else{
+					$js_action = 'add_value("'.$dstfld1.'", "'.$dstfld2.'", "'.$row["triggerid"].'", "'.$exp_desc.'");';
+				}
 			}
 			$description->onClick($js_action);
 

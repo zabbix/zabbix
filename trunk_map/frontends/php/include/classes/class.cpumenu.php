@@ -26,7 +26,8 @@ class CPUMenu{
 	var $width;
 	*/
 /* public */
-	public function __construct($items=array(), $width=null){
+	public function __construct($items=array(), $width=null, $mod=false){
+		$this->mod = $mod;
 		$this->insertJavaScript();
 		/*********************** ITEM ARRAY ***********************
 		 ITEM: array(name, url, param, css, submenu1, submenu2, ... , submenuN)
@@ -57,7 +58,10 @@ class CPUMenu{
 	public function insertJavaScript(){
 		if(defined('CPUMENU_INSERTJAVASCRIPT_INSERTED')) return;
 		define('CPUMENU_INSERTJAVASCRIPT_INSERTED', 1);
-		echo '<script language="JavaScript" type="text/javascript" src="js/menu.js"></script>';
+		if($this->mod)
+			echo '<script language="JavaScript" type="text/javascript" src="js/menu_mod.js"></script>';
+		else
+			echo '<script language="JavaScript" type="text/javascript" src="js/menu.js"></script>';
 	}
 }
 ?>

@@ -19,19 +19,12 @@
 **/
 ?>
 <?php
-	function	get_image_by_imageid($imageid){
-		/*global $DB;
-
-		$st = sqlite3_query($DB['DB'], 'select * from images WHERE imageid='.$imageid);
-		info(implode(',',sqlite3_fetch_array($st)));
-		info(sqlite3_column_type($st,3));
-		info(SQLITE3_INTEGER.','.SQLITE3_FLOAT.','.SQLITE3_TEXT.','.SQLITE3_BLOB.','.SQLITE3_NULL);
-		return 0;*/
+	function get_image_by_imageid($imageid){
 		global $DB;
 
-		$result = DBselect('select * from images WHERE imageid='.$imageid);
-		$row = DBfetch($result);
-		if($row){
+		$sql = 'SELECT * FROM images WHERE imageid='.$imageid;
+		$result = DBselect($sql);
+		if($row = DBfetch($result)){
 			if($DB['TYPE'] == "ORACLE"){
 				if(!isset($row['image']))
 					return 0;
