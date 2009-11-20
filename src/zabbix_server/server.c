@@ -386,6 +386,11 @@ int MAIN_ZABBIX_ENTRY(void)
 #else
 #	define SNMP_FEATURE_STATUS " NO"
 #endif
+#ifdef	HAVE_OPENIPMI
+#	define IPMI_FEATURE_STATUS "YES"
+#else
+#	define IPMI_FEATURE_STATUS " NO"
+#endif
 #ifdef  HAVE_LIBCURL
 #	define LIBCURL_FEATURE_STATUS "YES"
 #else
@@ -401,10 +406,15 @@ int MAIN_ZABBIX_ENTRY(void)
 #else
 #	define ODBC_FEATURE_STATUS " NO"
 #endif
-#ifdef  HAVE_IPV6
-#       define IPV6_FEATURE_STATUS "YES"
+#ifdef	HAVE_SSH2
+#       define SSH2_FEATURE_STATUS "YES"
 #else
-#       define IPV6_FEATURE_STATUS " NO"
+#       define SSH2_FEATURE_STATUS " NO"
+#endif
+#ifdef  HAVE_IPV6
+#	define IPV6_FEATURE_STATUS "YES"
+#else
+#	define IPV6_FEATURE_STATUS " NO"
 #endif
 
 	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. ZABBIX %s (revision %s).",
@@ -413,9 +423,11 @@ int MAIN_ZABBIX_ENTRY(void)
 
 	zabbix_log( LOG_LEVEL_WARNING, "**** Enabled features ****");
 	zabbix_log( LOG_LEVEL_WARNING, "SNMP monitoring:       " SNMP_FEATURE_STATUS	);
+	zabbix_log( LOG_LEVEL_WARNING, "IPMI monitoring:       " IPMI_FEATURE_STATUS	);
 	zabbix_log( LOG_LEVEL_WARNING, "WEB monitoring:        " LIBCURL_FEATURE_STATUS	);
 	zabbix_log( LOG_LEVEL_WARNING, "Jabber notifications:  " JABBER_FEATURE_STATUS	);
 	zabbix_log( LOG_LEVEL_WARNING, "ODBC:                  " ODBC_FEATURE_STATUS	);
+	zabbix_log( LOG_LEVEL_WARNING, "SSH2 support:          " SSH2_FEATURE_STATUS	);
 	zabbix_log( LOG_LEVEL_WARNING, "IPv6 support:          " IPV6_FEATURE_STATUS	);
 	zabbix_log( LOG_LEVEL_WARNING, "**************************");
 
