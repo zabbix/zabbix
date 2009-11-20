@@ -425,6 +425,8 @@ src/zabbix_server/trapper/proxyconfig.c -text
 src/zabbix_server/trapper/proxyconfig.h -text
 src/zabbix_server/trapper/proxydiscovery.c -text
 src/zabbix_server/trapper/proxydiscovery.h -text
+src/zabbix_server/trapper/proxyhosts.c -text
+src/zabbix_server/trapper/proxyhosts.h -text
 test/env/standalone/conf/template_agent.conf -text
 test/env/standalone/conf/template_proxy.conf -text
 test/env/standalone/conf/template_server.conf -text

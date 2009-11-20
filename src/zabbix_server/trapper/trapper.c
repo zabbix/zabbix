@@ -38,6 +38,7 @@
 #include "proxyconfig.h"
 #include "proxydiscovery.h"
 #include "proxyautoreg.h"
+#include "proxyhosts.h"
 
 #include "daemon.h"
 
@@ -583,10 +584,14 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 				{
 					ret = send_list_of_active_checks_json(sock, &jp, zbx_process);
 				}
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_HOST_AVAILABILITY))
+				{
+					ret = process_host_availability(sock, &jp);
+				}
 				else
 				{
-					zabbix_log( LOG_LEVEL_WARNING, "Unknown request received [%s]",
-						value);
+					zabbix_log(LOG_LEVEL_WARNING, "Unknown request received [%s]",
+							value);
 				}
 			}
 			return ret;
