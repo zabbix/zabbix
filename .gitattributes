@@ -84,8 +84,6 @@ frontends/php/conf/zabbix.conf.php.example -text
 frontends/php/dashboard.php -text
 frontends/php/export.php -text
 frontends/php/fonts/DejaVuSans.ttf -text
-frontends/php/fonts/kochi-gothic-subst.ttf -text
-frontends/php/fonts/kochi-mincho-subst.ttf -text
 frontends/php/hostgroups.php -text
 frontends/php/images/flash/zbxclock.swf -text svneol=unset#unset
 frontends/php/images/general/arrowdown.gif -text
