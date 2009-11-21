@@ -47,7 +47,7 @@
 #include "heart/heart.h"
 
 char *progname = NULL;
-char title_message[] = "ZABBIX Proxy (daemon)";
+char title_message[] = "Zabbix Proxy (daemon)";
 char usage_message[] = "[-hV] [-c <file>]";
 
 #ifndef HAVE_GETOPT_LONG
@@ -422,7 +422,7 @@ int MAIN_ZABBIX_ENTRY(void)
 #       define IPV6_FEATURE_STATUS " NO"
 #endif
 
-	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_proxy. ZABBIX %s (revision %s).",
+	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_proxy. Zabbix %s (revision %s).",
 			ZABBIX_VERSION,
 			ZABBIX_REVISION);
 
@@ -676,7 +676,7 @@ void	zbx_on_exit()
 	php_sem_remove(&sqlite_access);
 #endif /* HAVE_SQLITE3 */
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "ZABBIX Proxy stopped. ZABBIX %s (revision %s).",
+	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Proxy stopped. Zabbix %s (revision %s).",
 		ZABBIX_VERSION,
 		ZABBIX_REVISION);
 
