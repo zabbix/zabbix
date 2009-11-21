@@ -102,11 +102,11 @@ char *help_message[] = {
 	"",
 	"Functions:",
 	"",
-	"  -i --install          install ZABBIX agent as service",
-	"  -d --uninstall        uninstall ZABBIX agent from service",
+	"  -i --install          install Zabbix agent as service",
+	"  -d --uninstall        uninstall Zabbix agent from service",
 
-	"  -s --start            start ZABBIX agent service",
-	"  -x --stop             stop ZABBIX agent service",
+	"  -s --start            start Zabbix agent service",
+	"  -x --stop             stop Zabbix agent service",
 
 	"  -m --multiple-agents  service name will include hostname",
 
@@ -243,7 +243,7 @@ int MAIN_ZABBIX_ENTRY(void)
 		CONFIG_LOG_FILE
 		);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd started. ZABBIX %s (revision %s).",
+	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd started. Zabbix %s (revision %s).",
 			ZABBIX_VERSION,
 			ZABBIX_REVISION);
 
@@ -344,7 +344,7 @@ void	zbx_on_exit()
 
 	zbx_sleep(2); /* wait for all threads closing */
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "ZABBIX Agent stopped. ZABBIX %s (revision %s).",
+	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION,
 			ZABBIX_REVISION);
 

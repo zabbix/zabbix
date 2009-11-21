@@ -49,7 +49,7 @@
 #include "escalator/escalator.h"
 
 char *progname = NULL;
-char title_message[] = "ZABBIX Server (daemon)";
+char title_message[] = "Zabbix Server (daemon)";
 char usage_message[] = "[-hV] [-c <file>] [-n <nodeid>]";
 
 #ifndef HAVE_GETOPT_LONG
@@ -417,7 +417,7 @@ int MAIN_ZABBIX_ENTRY(void)
 #	define IPV6_FEATURE_STATUS " NO"
 #endif
 
-	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. ZABBIX %s (revision %s).",
+	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. Zabbix %s (revision %s).",
 			ZABBIX_VERSION,
 			ZABBIX_REVISION);
 
@@ -730,7 +730,7 @@ void	zbx_on_exit()
 	php_sem_remove(&sqlite_access);
 #endif /* HAVE_SQLITE3 */
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "ZABBIX Server stopped. ZABBIX %s (revision %s).",
+	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Server stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION,
 			ZABBIX_REVISION);
 
