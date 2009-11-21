@@ -560,7 +560,7 @@ static int	get_values(int now)
 		case ITEM_TYPE_ZABBIX:
 			if (SUCCEED == uint64_array_exists(ids, ids_num, items[i].host.hostid))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "ZABBIX Host " ZBX_FS_UI64 " is unreachable. Skipping [%s]",
+				zabbix_log(LOG_LEVEL_DEBUG, "Zabbix Host " ZBX_FS_UI64 " is unreachable. Skipping [%s]",
 						items[i].host.hostid, items[i].key_orig);
 				continue;
 			}

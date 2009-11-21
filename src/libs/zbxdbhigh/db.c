@@ -814,7 +814,7 @@ void DBupdate_triggers_status_after_restart(void)
 			continue;
 
 		DBupdate_trigger_value(&trigger, TRIGGER_VALUE_UNKNOWN,
-				min_nextcheck, "ZABBIX was down.");
+				min_nextcheck, "Zabbix was restarted.");
 	}
 	DBfree_result(result);
 
