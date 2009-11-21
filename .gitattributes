@@ -40,7 +40,7 @@ create/data/images/UPS_small.png -text svneol=unset#unset
 create/data/images/Workstation.png -text svneol=unset#unset
 create/data/images/Workstation_small.png -text svneol=unset#unset
 create/data/recreate.sh -text
-docs/ZABBIX[!!-~]Manual[!!-~]v1.6[!!-~]rev[!!-~]17.pdf -text
+docs/README -text
 frontends/php/api/.htaccess -text
 frontends/php/api/classes/class.caction.php -text
 frontends/php/api/classes/class.calert.php -text
