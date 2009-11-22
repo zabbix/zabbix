@@ -465,7 +465,7 @@
 			update_trigger_value_to_unknown_by_itemid($itemids);
 
 			if($status==ITEM_STATUS_ACTIVE)
-				$sql='UPDATE items SET status='.$status.",error='',nextcheck=0 ".
+				$sql='UPDATE items SET status='.$status.",error='' ".
 					' WHERE '.DBcondition('itemid',$itemids);
 			else
 				$sql='UPDATE items SET status='.$status.
