@@ -680,8 +680,6 @@ include_once('include/page_header.php');
 			$go_result |= $cur_result;
 
 			if($cur_result){
-				DBexecute('update items set nextcheck=0,lastvalue=null,lastclock=null,prevvalue=null where itemid='.$id);
-
 				$host = get_host_by_hostid($item['hostid']);
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
 					S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].'] '.S_HISTORY_CLEANED);

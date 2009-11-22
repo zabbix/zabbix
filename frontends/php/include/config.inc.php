@@ -688,23 +688,6 @@ function __autoload($class_name){
 		else return validate_float($str);
 	}
 
-
-	/******************************************************************************
-	 *                                                                            *
-	 * Purpose: Reset nextcheck for related items                                 *
-	 *                                                                            *
-	 * Comments: !!! Don't forget sync code with C !!!                            *
-	 *                                                                            *
-	 ******************************************************************************/
-	function reset_items_nextcheck($triggerid){
-/*		$sql='SELECT itemid from functions WHERE triggerid='.$triggerid;
-		$result=DBselect($sql);
-		while($row=DBfetch($result)){
-			$sql='UPDATE items SET nextcheck=0 WHERE itemid='.$row['itemid'];
-			DBexecute($sql);
-		}*/
-	}
-
 	function get_status(){
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 		$status = array();
