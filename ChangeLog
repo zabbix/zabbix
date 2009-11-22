@@ -1,5 +1,6 @@
 Changes for 1.7.3
 
+ - [ZBX-1222] fixed default Debug Log level for agents (Alexei)
  - [DEV-434] added support of host availability for proxy hosts (Sasha)
  - [ZBX-1289] fixed memory leak in server pollers (Sasha)
  - [DEV-433] added generation events after maintenance period if trigger status changed during this period (Sasha)
