@@ -411,9 +411,9 @@ class zbxXML{
 		libxml_use_internal_errors(true);
 		
 		$xml = new DOMDocument();
-		$xml->load($file);
+		$result = $xml->load($file);
 
-		if(!$xml){
+		if(!$result){
 			foreach(libxml_get_errors() as $error){
 				$text = '';
 
