@@ -1,5 +1,6 @@
 Changes for 1.7.3
 
+ - [ZBX-998] modified PostgreSQL schema for support of uint64 history values (Sasha)
  - [ZBX-1317] fixed resource type for maintenance in audit (Vedmak)
  - [DEV-369] added support of file log rotation, item's "log[]" "file" parameter now has a format of "[path][regexp]" (Dmitry)
  - [ZBX-1310] fixed template creating form (Vedmak)
