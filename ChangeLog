@@ -1,5 +1,6 @@
 Changes for 1.7.3
 
+ - [DEV-137] added file CREDITS (Alexei)
  - [DEV-333] fixed possible server crash while processing remote commands (Dmitry)
  - [ZBX-998] modified PostgreSQL schema for support of uint64 history values (Sasha)
  - [ZBX-1317] fixed resource type for maintenance in audit (Vedmak)
