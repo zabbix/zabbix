@@ -125,8 +125,6 @@ include_once('include/page_header.php');
 							$link['linktriggers'][$lnum]['desc_exp'] = $description;
 						}
 
-						$link['tr_desc'] = $description;
-						
 						$action .= 'ZBX_SYSMAPS['.$cmapid.'].map.add_link('.zbx_jsvalue($link).'); '."\n";
 					}
 

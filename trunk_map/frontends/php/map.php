@@ -180,6 +180,8 @@ include_once('include/page_header.php');
 			$options['triggerids'] = array();
 
 			foreach($triggers as $id => $link_trigger){
+				if($link_trigger['triggerid'] == 0) continue;
+
 				$triggers[$id] = zbx_array_merge($link_trigger,get_trigger_by_triggerid($link_trigger['triggerid']));
 				if(($triggers[$id]['status'] == TRIGGER_STATUS_ENABLED) && ($triggers[$id]['value'] == TRIGGER_VALUE_TRUE)){
 					if($triggers[$id]['priority'] >= $max_severity){

@@ -177,6 +177,7 @@ include_once('include/page_header.php');
 		'sysmapid'=>	array(T_ZBX_INT, O_OPT, null,   DB_ID,		'isset({reference})'),
 		'cmapid'=>		array(T_ZBX_INT, O_OPT, null,   null,		'isset({reference})'),
 		'sid'=>			array(T_ZBX_INT, O_OPT, null,   null,		'isset({reference})'),
+		'ssid'=>		array(T_ZBX_INT, O_OPT, null,   null,		null),
 
 		'select'=>		array(T_ZBX_STR,	O_OPT,	P_SYS|P_ACT,	null,	null)
 	);
@@ -256,6 +257,7 @@ include_once('include/page_header.php');
 		$frmTitle->addVar('sysmapid',	get_request('sysmapid','0'));
 		$frmTitle->addVar('cmapid',		get_request('cmapid','0'));
 		$frmTitle->addVar('sid',		get_request('sid','0'));
+		$frmTitle->addVar('ssid',		get_request('ssid','0'));
 	}
 	
 	if(isset($only_hostid)){
@@ -733,6 +735,7 @@ include_once('include/page_header.php');
 				if(isset($_REQUEST['reference'])){
 					$cmapid = get_request('cmapid',0);
 					$sid = get_request('sid',0);
+					$ssid = get_request('ssid',0);
 
 					$js_action = '';
 					if($_REQUEST['reference'] =='sysmap_element'){
@@ -740,21 +743,22 @@ include_once('include/page_header.php');
 										"[{'key':'elementtype','value':'".SYSMAP_ELEMENT_TYPE_TRIGGER."'},".
 											"{'key':'$dstfld1','value':'$row[$srcfld1]'}]);";
 					}
-					else if($_REQUEST['reference'] =='sysmap_link'){
+					else if($_REQUEST['reference'] =='sysmap_linktrigger'){
 						$params = array(array('key'=> $dstfld1, 'value'=> $row[$srcfld1]));
 
 						if($dstfld1 == 'triggerid'){
-							$params[] = array('key'=> 'tr_desc', 'value'=> $row['host'].':'.$exp_desc);
+							$params[] = array('key'=> 'desc_exp', 'value'=> $row['host'].':'.$exp_desc);
 						}
 
-						$js_action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_link_option($sid,".zbx_jsvalue($params).");";
+						$js_action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_linktrigger_option($sid,$ssid, ".zbx_jsvalue($params).");";
 					}
 				}
 				else{
 					$js_action = 'add_value("'.$dstfld1.'", "'.$dstfld2.'", "'.$row["triggerid"].'", "'.$exp_desc.'");';
 				}
 			}
-			$description->onClick($js_action);
+
+			$description->setAttribute('onclick', $js_action."; close_window(); return false;");
 
 			if($row['dep_count'] > 0){
 				$description = array(

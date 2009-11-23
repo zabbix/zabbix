@@ -1092,13 +1092,12 @@
 		$menu = '';
 		$cmapid = get_request('favid',0);
 		
-		$ln_menu = array(
-				array('form_key'=>'selementid1',		'value'=> S_ELEMENT_1),
-				array('form_key'=>'selementid2',		'value'=> S_ELEMENT_2),
-				array('form_key'=>'triggers',			'value'=> S_TRIGGERS),
-				array('form_key'=>'drawtype', 			'value'=> S_TYPE_OFF),
-				array('form_key'=>'color', 				'value'=> S_COLOR_OFF),
-			);
+		$ln_menu = array('selementid1' => S_ELEMENT_1,
+						'selementid2' => S_ELEMENT_2,
+						'triggers' => S_TRIGGERS,
+						'drawtype' => S_TYPE,
+						'color' => S_COLOR
+				);
 		
 		$menu.= 'var zbx_link_menu = '.zbx_jsvalue($ln_menu).';'."\n";
 		

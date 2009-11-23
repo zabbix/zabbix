@@ -91,6 +91,15 @@ mlink: {
 	status:			1				// status of link 1 - active, 2 - passive
 },
 
+
+mlinktrigger: {
+	linktriggerid:	0,					// ALWAYS must be a STRING (js doesn't support uint64)
+	triggerid:		0,					// ALWAYS must be a STRING (js doesn't support uint64)
+	desc_exp:		'Set Trigger',		// default trigger caption
+	drawtype:		0,
+	color:			'Red'
+},
+
 initialize: function(container, sysmapid, id){
 	this.debug('initialize');
 
@@ -231,6 +240,20 @@ add_empty_link: function(){
 	this.add_link(mlink,1);
 },
 
+
+add_empty_linktrigger: function(linkid){
+	this.debug('add_empty_link');
+
+	var id = this.linkids[linkid];
+
+	var mlinktrigger = {};
+	for(var key in this.mlinktrigger){
+		mlinktrigger[key] = this.mlinktrigger[key];
+	}
+
+
+	this.add_linktrigger(id, mlinktrigger, 1);
+},
 
 // SYSMAP FORM
 save_sysmap: function(){
@@ -453,7 +476,7 @@ get_linkid_by_selementids: function(selementid1,selementid2){
 
 add_link: function(mlink, update_map){
 	this.debug('add_link');
-
+//SDJ(mlink);
 	var mid = 0;
 	if((typeof(mlink['linkid']) == 'undefined') || (mlink['linkid'] == 0)){
 		do{
@@ -502,7 +525,7 @@ update_link_option: function(id, params){ // params = [{'key': key, 'value':valu
 					if(this.links[this.linkids[id]]['selementid1'] == pair.value)
 					return false;
 				}
-				
+			
 				this.links[this.linkids[id]][pair.key] = pair.value;
 			}
 		}
@@ -560,7 +583,74 @@ remove_links_by_selementid: function(selementid){
 	}
 },
 
+add_linktrigger: function(linkid, linktrigger, update_map){
+this.debug('add_linktrigger');
+//SDJ(linktrigger);
 
+	if((typeof(this.links[linkid]) == 'undefined') || is_null(this.links[linkid])) return;
+
+	var mid = 0;
+	if((typeof(linktrigger['linktriggerid']) == 'undefined') || (linktrigger['linktriggerid'] == 0)){
+		do{
+			mid = parseInt(Math.random(1000000000) * 1000000000);
+			mid = mid.toString();
+		}while(typeof(this.links[linkid][mid]) != 'undefined');
+
+		linktrigger['linktriggerid'] = mid;
+	}
+	else{
+		mid = linktrigger.linktriggerid;
+	}
+
+	this.links[linkid].linktriggers.unshift(linktrigger);
+
+	if((typeof(update_map) != 'undefined') && (update_map == 1)){
+		this.update_mapimg();
+	}
+},
+
+update_linktrigger_option: function(linkid, linktriggerid, params){
+this.debug('update_linktrigger_option');
+
+	if((typeof(this.linkids[linkid]) == 'undefined') || is_null(this.linkids[linkid])) return;
+	var id = this.linkids[linkid];
+//SDI(key+' : '+value);
+	for(var i=0; i < params.length; i++){
+		if(typeof(params[i]) != 'undefined'){
+			var pair = params[i];
+
+			for(var num in this.links[id].linktriggers){
+				if(!empty(this.links[id].linktriggers[num])){
+					var linktrigger = this.links[id].linktriggers[num];
+					if(linktrigger.linktriggerid == linktriggerid){
+						this.links[id].linktriggers[num][pair.key] = pair.value;
+					}
+				}
+			}
+
+		}
+	}
+
+	this.update_mapimg();
+},
+
+remove_linktrigger: function(linkid, linktriggerid){
+this.debug('remove_linktrigger');
+
+	if((typeof(this.linkids[linkid]) == 'undefined') || is_null(this.linkids[linkid])) return;
+
+//SDI(key+' : '+value);
+	for(var num in this.links[linkid].linktriggers){
+		if(!empty(this.links[linkid].linktriggers[num])){
+			var linktrigger = this.links[linkid].linktriggers[num];
+			if(linktrigger.linktriggerid == linktriggerid){
+				delete(this.links[linkid].linktriggers[num]);
+			}
+		}
+	}
+
+	this.update_mapimg();
+},
 // ---------- IMAGES MANIPULATION ------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------
 
@@ -935,43 +1025,79 @@ show_link_menu: function(e){
 		var link_menu = new Array('Link '+link_count,null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']});
 		link_menu.push(['Link '+link_count,null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}]);
 //SDJ(zbx_link_menu);
-		for(var i=0; i<zbx_link_menu.length; i++){
-			var form_key = zbx_link_menu[i]['form_key'];
-			var caption = zbx_link_menu[i]['value'];
+		for(var form_key in zbx_link_menu){
+			var caption = zbx_link_menu[form_key];
 	
 			var sub_menu = new Array(caption,null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']});
 			sub_menu.push([caption,null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}]);
-			
+			sub_menu.push(['<span onclick="javascript: ZBX_SYSMAPS['+this.id+'].map.add_empty_linktrigger('+id+');">Add Trigger</span>',
+					'#',
+					function(){return false;},
+					{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']}
+					]);
+
 			if(form_key == 'triggers'){
-				var values = zbx_link_form_menu[form_key][0];
 //SDJ(mlink);
-				for(var j=0; j<mlink.linktriggers.length; j++){
-					if((typeof(mlink.linktriggers[j] != 'undefined')) && !is_null(mlink.linktriggers[j])){
-						var srctbl1 = 'triggers';
-						var srcfld1 = form_key;
+				for(var j=0; j < mlink.linktriggers.length; j++){
+					if((typeof(mlink.linktriggers[j]) == 'undefined') || is_null(mlink.linktriggers[j])) continue;
 
-						var linktrigger = mlink.linktriggers[j];
+					var linktrigger = mlink.linktriggers[j];
+					var desc_exp_trunc = linktrigger.desc_exp.substr(0, 40)+'...';
+//SDJ(linktrigger);
+					var ssub_menu = new Array(desc_exp_trunc,null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']});
+					ssub_menu.push([desc_exp_trunc,null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}]);
 
-						var value_action = 'javascript: '+
-							"PopUp('popup.php?srctbl="+srctbl1+
-								'&reference=sysmap_link'+
-								'&sysmapid='+this.sysmapid+
-								'&cmapid='+this.id+
-								'&sid='+id+
-								'&dstfrm=null'+
-								'&srcfld1='+srcfld1+
-								"&dstfld1="+srcfld1+"',800,450); void(0);";
+					for(var lt_field in linktrigger){
+						if(lt_field == 'triggerid'){
+							var srctbl1 = 'triggers';
+							var srcfld1 = 'triggerid';
 
-						var desc_exp_trunc = linktrigger.desc_exp.substr(0, 40)+'...';
-						value_action = '<span onclick="'+value_action+'">'+desc_exp_trunc+'</span>';
+							var value_action = 'javascript: '+
+								"PopUp('popup.php?srctbl="+srctbl1+
+									'&reference=sysmap_linktrigger'+
+									'&sysmapid='+this.sysmapid+
+									'&cmapid='+this.id+
+									'&sid='+id+
+									'&ssid='+linktrigger.linktriggerid+
+									'&dstfrm=null'+
+									'&srcfld1='+srcfld1+
+									"&dstfld1="+srcfld1+"',800,450); void(0);";
 
-						sub_menu.push([value_action,'#',function(){return false;}]);
+
+							value_action = '<span onclick="'+value_action+'">'+desc_exp_trunc+'</span>';
+
+							ssub_menu.push([value_action,'#',function(){return false;}]);
+						}
+						else{
+							if(typeof(zbx_link_form_menu[lt_field]) == 'undefined') continue;
+
+							var fields = zbx_link_form_menu[lt_field];
+
+							var sssub_menu = new Array(zbx_link_menu[lt_field],null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']});
+							sssub_menu.push([zbx_link_menu[lt_field],null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}]);
+
+							for(var k=0; k < fields.length; k++){
+								if(typeof(fields[k]) != 'undefined'){
+									var values = fields[k];
+									var value_action = "javascript: ZBX_SYSMAPS["+this.id+"].map.update_linktrigger_option("+id+","+linktrigger.linktriggerid+",[{'key':'"+lt_field+"','value':'"+values['key']+"'}]);";
+									value_action = '<span onclick="'+value_action+'">'+values['value']+'</span>';
+
+									if(linktrigger[lt_field] == values['key'])
+										sssub_menu.push([value_action,'#',null,{'outer' : ['pum_b_submenu'],'inner' : ['pum_i_submenu']}]);
+									else
+										sssub_menu.push([value_action,'#',function(){return false;}]);
+								}
+							}
+							ssub_menu.push(sssub_menu);
+						}
 					}
+
+					sub_menu.push(ssub_menu);
 				}
 			}
 			else if((form_key == 'selementid1') || (form_key == 'selementid2')){
 				for(var j=0; j<this.selementids.length; j++){
-					if((typeof(this.selementids[j] != 'undefined')) && !is_null(this.selementids[j])){
+					if((typeof(this.selementids[j]) != 'undefined') && !is_null(this.selementids[j])){
 						var selement = this.selements[this.selementids[j]];
 						
 						var value_action = "javascript: ZBX_SYSMAPS["+this.id+"].map.update_link_option("+id+",[{'key':'"+form_key+"','value':'"+selement['selementid']+"'}]);";
