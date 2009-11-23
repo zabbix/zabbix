@@ -575,7 +575,6 @@ include_once('include/page_header.php');
 			$events = CEvent::get($ev_options);
 
 			foreach($events as $enum => $row_event){
-				$eventid = $event['eventid'];
 				$value = new CSpan(trigger_value2str($row_event['value']), get_trigger_value_style($row_event['value']));
 
 				if($config['event_ack_enable']){
