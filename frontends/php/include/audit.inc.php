@@ -43,6 +43,7 @@
 		$str_resource[AUDIT_RESOURCE_SLIDESHOW]		= S_SLIDESHOW;
 		$str_resource[AUDIT_RESOURCE_PROXY]		= S_PROXY;
 		$str_resource[AUDIT_RESOURCE_REGEXP] = S_REGULAR_EXPRESSION;
+		$str_resource[AUDIT_RESOURCE_MAINTENANCE] = S_MAINTENANCE;
 
 		if(isset($str_resource[$resource_type]))
 			return $str_resource[$resource_type];
