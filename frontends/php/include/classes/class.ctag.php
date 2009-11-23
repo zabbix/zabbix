@@ -132,7 +132,7 @@ class CTag extends CObject{
 			$this->attributes[$name] = unpack_object($value);
 		}
 		else if(isset($value))
-			$this->attributes[$name] = htmlspecialchars(strval($value));
+			$this->attributes[$name] = htmlspecialchars(str_replace(array("\r", "\n"), '', strval($value)));
 		else
 			unset($this->attributes[$name]);
 	}
