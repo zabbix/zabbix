@@ -532,16 +532,35 @@ class CTemplate extends CZBXAPI{
 		$error = 'Internal Zabbix eror';
 
 		$result = false;
+		
+		foreach($templates as $tnum => $template){
+			if(empty($template['groups'])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'No groups for template [ '.$template['host'].' ]');
+				return false;
+			}
+		
+			$templates[$tnum]['groups'] = zbx_toArray($templates[$tnum]['groups']);
+			
+			foreach($templates[$tnum]['groups'] as $gnum => $group){
+				$groupids[$group['groupid']] = $group['groupid'];
+			}
+		}
+		
+		$upd_groups = CHostGroup::get(array(
+			'groupids' => $groupids,
+			'editable' => 1, 
+			'preservekeys' => 1));
+		foreach($groupids as $gnum => $groupid){
+			if(!isset($upd_groups[$groupid])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You do not have enough rights for operation');
+				return false;
+			}
+		}
 
 		self::BeginTransaction(__METHOD__);
 		foreach($templates as $tnum => $template){
-
-			if(empty($template['groupids'])){
-				$result = false;
-				$error = 'No groups for template [ '.$template['host'].' ]';
-				break;
-			}
-
+			$template['groupids'] = zbx_objectValues($template['groups'], 'groupid');
+			
 			$host_db_fields = array(
 				'host' => null,
 				'port' => 0,
@@ -791,21 +810,18 @@ class CTemplate extends CZBXAPI{
  * @version 1
  *
  * @param array $data
- * @param string $data['hostid']
- * @param array $data['templateids']
+ * @param string $data['hosts']
+ * @param array $data['templats']
  * @return boolean
  */
 	public static function linkTemplates($data){
 		$result = true;
-		$error = '';
-
-		$hosts = $data['hosts'];
-		$templates = $data['templates'];
+		$errors = array();
 		
-		$hosts = zbx_toArray($hosts);
+		$hosts = zbx_toArray($data['hosts']);
 		$hostids = zbx_objectValues($hosts, 'hostid');
 		
-		$templates = zbx_toArray($templates);
+		$templates = zbx_toArray($data['templates']);
 		$templateids = zbx_objectValues($templates, 'templateid');
 
 		self::BeginTransaction(__METHOD__);
@@ -847,7 +863,7 @@ class CTemplate extends CZBXAPI{
 			return true;
 		}
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
+			self::setMethodErrors(__METHOD__, $errors);
 			return false;
 		}
 	}
