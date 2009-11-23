@@ -1,5 +1,6 @@
 Changes for 1.7.3
 
+ - [ZBX-1272] server name is now shown in page title too (Vedmak)
  - [DEV-137] PDF manual replaced by a README file with a link to on-line documentation
  - [ZBX-1302] fixed references to missing items.nextcheck in the GUI (Alexei)
  - [ZBX-1230] IP adresss is made a default selection in host details form (Alexei)
