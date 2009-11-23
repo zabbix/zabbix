@@ -1,6 +1,6 @@
 <?php
 /*
-** ZABBIX
+** Zabbix
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -176,7 +176,7 @@
 	'S_NEW_INSTALLATION'=>			'New installation',
 	'S_NEW_INSTALLATION_BIG'=>		'NEW INSTALLATION',
 	'S_INSTALLATION_UPDATE'=>		'Installation/Update',
-	'S_ZABBIX_IS_UNAVAILABLE'=>		'ZABBIX is temporary unavailable',
+	'S_ZABBIX_IS_UNAVAILABLE'=>		'Zabbix is temporary unavailable',
 	'S_REQUIRE_MB_STRING_MODULE'=>		'Multibyte String module required to run FrontEnd',
 
 //	node.php
@@ -358,7 +358,7 @@
 
 //	config.php
 	'S_GUI'=>					'GUI',
-	'S_ZBX162_MODE'=>				'ZABBIX 1.6.2 comp. mode',
+	'S_ZBX162_MODE'=>				'Zabbix 1.6.2 comp. mode',
 	'S_DROPDOWN_FIRST_ENTRY'=>			'Dropdown first entry',
 	'S_DROPDOWN_REMEMBER_SELECTED'=>		'remember selected',
 	'S_MAX_IN_TABLE' =>				'Max count of elements to show inside table cell',
@@ -386,7 +386,7 @@
 	'S_NEW_MAPPING'=>				'New mapping',
 	'S_NO_MAPPING_DEFINED'=>			'No mapping defined',
 	'S_CREATE_VALUE_MAP'=>				'Create value map',
-	'S_CONFIGURATION_OF_ZABBIX'=>			'Configuration of ZABBIX',
+	'S_CONFIGURATION_OF_ZABBIX'=>			'Configuration of Zabbix',
 	'S_CONFIGURATION_OF_ZABBIX_BIG'=>		'CONFIGURATION OF ZABBIX',
 	'S_CONFIGURATION_UPDATED'=>			'Configuration updated',
 	'S_CONFIGURATION_WAS_NOT_UPDATED'=>		'Configuration was not updated',
@@ -489,7 +489,7 @@
 
 //  Authentication
 	'S_AUTHENTICATION'=>			'Authentication',
-	'S_AUTHENTICATION_TO_ZABBIX'=>		'Authentication to ZABBIX',
+	'S_AUTHENTICATION_TO_ZABBIX'=>		'Authentication to Zabbix',
 	'S_BASE_DN'=>				'Base DN',
 	'S_BIND_DN'=>				'Bind DN',
 	'S_BIND_PASSWORD'=>			'Bind Password',
@@ -499,7 +499,7 @@
 	'S_MUST_BE_VALID_SMALL'=>		'must be valid',
 	'S_LDAP_AUTH'=>				'LDAP Authentication',
 	'S_HTTP_AUTH'=>				'HTTP Authentication',
-	'S_ZABBIX_INTERNAL_AUTH'=>		'ZABBIX Internal authentication',
+	'S_ZABBIX_INTERNAL_AUTH'=>		'Zabbix Internal authentication',
 	'S_DEFAULT_AUTHENTICATION'=>		'Default authentication',
 
 
@@ -514,7 +514,7 @@
 	'S_GRAPH'=>				'Graph',
 
 //	Footer
-	'S_ZABBIX'=>				'ZABBIX',
+	'S_ZABBIX'=>				'Zabbix',
 	'S_COPYRIGHT_BY'=>			'Copyright 2001-2009 by ',
 	'S_CONNECTED_AS'=>			'Connected as',
 	'S_NOT_CONNECTED'=>			'Not connected',
@@ -914,19 +914,19 @@
 	'S_INTERVAL'=>						'Interval',
 	'S_HISTORY'=>						'History',
 	'S_TRENDS'=>						'Trends',
-	'S_ZABBIX_AGENT'=>					'ZABBIX agent',
-	'S_ZABBIX_AGENT_ACTIVE'=>				'ZABBIX agent (active)',
+	'S_ZABBIX_AGENT'=>					'Zabbix agent',
+	'S_ZABBIX_AGENT_ACTIVE'=>				'Zabbix agent (active)',
 	'S_SNMPV1_AGENT'=>					'SNMPv1 agent',
-	'S_ZABBIX_TRAPPER'=>					'ZABBIX trapper',
+	'S_ZABBIX_TRAPPER'=>					'Zabbix trapper',
 	'S_SIMPLE_CHECK'=>					'Simple check',
 	'S_SNMPV2_AGENT'=>					'SNMPv2 agent',
 	'S_SNMPV3_AGENT'=>					'SNMPv3 agent',
-	'S_ZABBIX_INTERNAL'=>					'ZABBIX internal',
+	'S_ZABBIX_INTERNAL'=>					'Zabbix internal',
 	'S_ZABBIX_DATABASE_MONITOR'=>				'Database monitor',
 	'S_IPMI_AGENT'=>					'IPMI agent',
 	'S_SSH_AGENT'=>						'SSH agent',
 	'S_TELNET_AGENT'=>					'TELNET agent',
-	'S_ZABBIX_AGGREGATE'=>					'ZABBIX aggregate',
+	'S_ZABBIX_AGGREGATE'=>					'Zabbix aggregate',
 	'S_EXTERNAL_CHECK'=>					'External check',
 	'S_WEB_MONITORING'=>					'Web monitoring',
 	'S_WEB_CHECKS_BIG'=>					'WEB CHECKS',
@@ -1123,10 +1123,10 @@
 
 //	report1.php
 	'S_REPORT_BIG'=>			'REPORT',
-	'S_STATUS_OF_ZABBIX'=>			'Status of ZABBIX',
+	'S_STATUS_OF_ZABBIX'=>			'Status of Zabbix',
 	'S_STATUS_OF_ZABBIX_BIG'=>		'STATUS OF ZABBIX',
 	'S_VALUE'=>				'Value',
-	'S_ZABBIX_SERVER_IS_RUNNING'=>		'ZABBIX server is running',
+	'S_ZABBIX_SERVER_IS_RUNNING'=>		'Zabbix server is running',
 	'S_VALUES_STORED'=>			'Values stored',
 	'S_TRENDS_STORED'=>			'Trends stored',
 	'S_NUMBER_OF_TRIGGERS'=>		'Number of triggers (enabled/disabled)[true/unknown/false]',
@@ -1385,7 +1385,7 @@
 	'S_DEPENDS_ON'=>			'Depends on',
 	'S_DEPENDENT'=>				'Dependent',
 	'S_URL'=>				'URL',
-	'S_INVALID_URL_PARAMS'=>		'ZABBIX has recieved an incorrect request',
+	'S_INVALID_URL_PARAMS'=>		'Zabbix has received an incorrect request',
 	'S_CREATE_TRIGGER'=>			'Create Trigger',
 	'S_INSERT'=>				'Insert',
 	'S_SECONDS'=>				'Seconds',
@@ -1436,9 +1436,9 @@
 	'S_FOUND'=>				'Found',
 
 //	users.php
-	'S_ZABBIX_USER'=>				'ZABBIX User',
-	'S_ZABBIX_ADMIN'=>				'ZABBIX Admin',
-	'S_SUPER_ADMIN'=>				'ZABBIX Super Admin',
+	'S_ZABBIX_USER'=>				'Zabbix User',
+	'S_ZABBIX_ADMIN'=>				'Zabbix Admin',
+	'S_SUPER_ADMIN'=>				'Zabbix Super Admin',
 	'S_USER_TYPE'=>					'User type',
 	'S_USERS'=>					'Users',
 	'S_USER_ADDED'=>				'User added',
@@ -1542,7 +1542,7 @@
 	'S_TOOLS'=>				'Tools',
 	'S_RESULT'=>				'Result',
 	'S_CLOSE'=>				'Close',
-	'S_CONNECT_TO_SERVER_ERROR'=>		'Cannot connect to ZABBIX server',
+	'S_CONNECT_TO_SERVER_ERROR'=>		'Cannot connect to Zabbix server',
 
 
 //	audit.php
@@ -1559,7 +1559,7 @@
 	'S_GRAPH_ELEMENT'=>			'Graph element',
 	'S_UNKNOWN_RESOURCE'=>			'Unknown resource',
 	'S_ALREADY_EXISTS_SMALL'=>		'already exists',
-	'S_ZABBIX_CONFIG'=>			'ZABBIX config',
+	'S_ZABBIX_CONFIG'=>			'Zabbix config',
 
 //	profile.php
 	'S_USER_PROFILE_BIG'=>			'USER PROFILE',
@@ -1583,7 +1583,7 @@
 	'S_POLISH_PL'=>				'Polish (PL)',
 
 //	index.php
-	'S_ZABBIX_BIG'=>			'ZABBIX',
+	'S_ZABBIX_BIG'=>			'Zabbix',
 
 //	hostprofiles.php
 	'S_HOST_PROFILES'=>			'Host profiles',

@@ -1,14 +1,15 @@
 Changes for 1.7.3
 
+ - [ZBX-1324] replaced user visible string ZABBIX with Zabbix (Alexei, Richlv)
  - [DEV-137] added file CREDITS (Alexei)
  - [DEV-333] fixed possible server crash while processing remote commands (Dmitry)
  - [ZBX-998] modified PostgreSQL schema for support of uint64 history values (Sasha)
  - [ZBX-1317] fixed resource type for maintenance in audit (Vedmak)
- - [DEV-369] added support of file log rotation, item's "log[]" "file" parameter now has a format of "[path][regexp]" (Dmitry)
+ - [DEV-369] added support of file log rotation, item's "log[]" parameter "file" now has a format of "[path][regexp]" (Dmitry)
  - [ZBX-1310] fixed template creating form (Vedmak)
  - [ZBX-1312] removed huge, unused Japanese fonts (Richlv)
  - [ZBX-1272] server name is now shown in page title too (Vedmak)
- - [DEV-137] PDF manual replaced by a README file with a link to on-line documentation
+ - [DEV-137] PDF manual replaced by a README file with a link to on-line documentation (Alexei)
  - [ZBX-1302] fixed references to missing items.nextcheck in the GUI (Alexei)
  - [ZBX-1230] IP adresss is made a default selection in host details form (Alexei)
  - [ZBX-1222] fixed default Debug Log level for agents (Alexei)
