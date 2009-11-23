@@ -609,6 +609,8 @@ upgrades/dbpatches/1.8/postgresql/patch/graphs_items.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/groups.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/history_log.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/history_text.sql -text
+upgrades/dbpatches/1.8/postgresql/patch/history_uint.sql -text
+upgrades/dbpatches/1.8/postgresql/patch/history_uint_sync.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/hostmacro.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/hosts.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/hosts_groups.sql -text
@@ -629,6 +631,7 @@ upgrades/dbpatches/1.8/postgresql/patch/services.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/sessions.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/sysmaps_elements.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/timeperiods.sql -text
+upgrades/dbpatches/1.8/postgresql/patch/trends_uint.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/user_history.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/users.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/usrgrp.sql -text

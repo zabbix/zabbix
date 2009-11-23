@@ -524,17 +524,6 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	return ret;
 }
 
-static int	DBchk_uint64(zbx_uint64_t value)
-{
-#if defined(HAVE_POSTGRESQL)
-	register zbx_uint64_t	pg_max_bigint = (zbx_uint64_t)__UINT64_C(0x7FFFFFFFFFFFFFFF);
-
-	if (value > pg_max_bigint)
-		return FAIL;
-#endif
-	return SUCCEED;
-}
-
 static int	DBchk_double(double value)
 {
 #if defined(HAVE_POSTGRESQL) || defined(HAVE_ORACLE) || defined(HAVE_SQLITE3)
@@ -567,32 +556,23 @@ int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c
 			if (SUCCEED == is_uoct(c))
 			{
 				ZBX_OCT2UINT64(value_uint64, c);
-				if (SUCCEED == DBchk_uint64(value_uint64))
-				{
-					SET_UI64_RESULT(result, value_uint64);
-					ret = SUCCEED;
-				}
+				SET_UI64_RESULT(result, value_uint64);
+				ret = SUCCEED;
 			}
 			break;
 		case ITEM_DATA_TYPE_HEXADECIMAL:
 			if (SUCCEED == is_uhex(c))
 			{
 				ZBX_HEX2UINT64(value_uint64, c);
-				if (SUCCEED == DBchk_uint64(value_uint64))
-				{
-					SET_UI64_RESULT(result, value_uint64);
-					ret = SUCCEED;
-				}
+				SET_UI64_RESULT(result, value_uint64);
+				ret = SUCCEED;
 			}
 			break;
 		default:	/* ITEM_DATA_TYPE_DECIMAL */
 			if (SUCCEED == is_uint64(c, &value_uint64))
 			{
-				if (SUCCEED == DBchk_uint64(value_uint64))
-				{
-					SET_UI64_RESULT(result, value_uint64);
-					ret = SUCCEED;
-				}
+				SET_UI64_RESULT(result, value_uint64);
+				ret = SUCCEED;
 			}
 		}
 		break;
@@ -652,8 +632,6 @@ static zbx_uint64_t* get_result_ui64_value(AGENT_RESULT *result)
 
 		if (SUCCEED != is_uint64(result->str, &value))
 			return NULL;
-		if (SUCCEED != DBchk_uint64(value))
-			return NULL;
 
 		SET_UI64_RESULT(result, value)
 	}
@@ -664,8 +642,6 @@ static zbx_uint64_t* get_result_ui64_value(AGENT_RESULT *result)
 		del_zeroes(result->text);
 
 		if (SUCCEED != is_uint64(result->text, &value))
-			return NULL;
-		if (SUCCEED != DBchk_uint64(value))
 			return NULL;
 
 		SET_UI64_RESULT(result, value)

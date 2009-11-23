@@ -867,7 +867,7 @@ FIELD		|sysmapid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|width		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|height		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|backgroundid	|t_bigint	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|backgroundid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|images
 FIELD		|label_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|label_location	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|name
