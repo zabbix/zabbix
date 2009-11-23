@@ -183,6 +183,7 @@ include_once('include/page_header.php');
 		}
 // CREATE/UPDATE TEMPLATE WITH GROUPS AND LINKED TEMPLATES {
 		if($templateid){
+			$template = zbx_toObject($templateid, 'hostid');
 			if(isset($_REQUEST['clear_templates'])) {
 				foreach($_REQUEST['clear_templates'] as $id){
 					$result &= unlink_template($_REQUEST['templateid'], $id, false);
@@ -190,25 +191,29 @@ include_once('include/page_header.php');
 			}
 			$result = CTemplate::update(array(array('templateid' => $templateid, 'host' => $template_name)));
 			$result &= CHostGroup::updateHosts(array('hosts' => array('hostid' => $templateid), 'groups' => $groups));
-			$msg_ok 	= S_TEMPLATE_UPDATED;
-			$msg_fail 	= S_CANNOT_UPDATE_TEMPLATE;
+			$msg_ok = S_TEMPLATE_UPDATED;
+			$msg_fail = S_CANNOT_UPDATE_TEMPLATE;
 		}
 		else{
-			if($result = CTemplate::add(array('host' => $template_name, 'groupids' => zbx_objectValues($groups, 'groupid')))){
-				$templateid = reset($result);
+			if($result = CTemplate::add(array('host' => $template_name, 'groups' => $groups))){
+				$template = reset($result);
+				$templateid = $template['hostid'];
 			}
 			else{
 				error(CTemplate::resetErrors());
 				$result = false;
 			}
-			$msg_ok 	= S_TEMPLATE_ADDED;
-			$msg_fail 	= S_CANNOT_ADD_TEMPLATE;
+			$msg_ok = S_TEMPLATE_ADDED;
+			$msg_fail = S_CANNOT_ADD_TEMPLATE;
 		}
+		
 		if($result){
 			$original_templates = get_templates_by_hostid($templateid);
 			$original_templates = array_keys($original_templates);
 			$templates_to_link = array_diff($templates, $original_templates);
-			$result &= CTemplate::linkTemplates(array('hostid' => $templateid, 'templateids' => $templates_to_link));
+			$templates_to_link = zbx_toObject($templates_to_link, 'hostid');
+			
+			$result &= CTemplate::linkTemplates(array('hosts' => $template, 'templates' => $templates_to_link));
 		}
 // }
 // FULL_CLONE {
@@ -449,7 +454,7 @@ include_once('include/page_header.php');
 			$groups = CHostGroup::get($options);
 
 // get template hosts from db
-			$params = array('templateids' => $templateid, 'editable' => 1, 'templated_hosts' => 1);
+			$params = array('templateids' => $templateid, 'editable' => 1, 'templated_hosts' => 1, 'preservekeys' => 1);
 			$hosts_linked_to = CHost::get($params);
 
 			$templates = $original_templates;

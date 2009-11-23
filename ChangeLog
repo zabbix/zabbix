@@ -1,5 +1,6 @@
 Changes for 1.7.3
 
+ - [ZBX-1310] fixed template creating form (Vedmak)
  - [ZBX-1312] removed huge, unused Japanese fonts (Richlv)
  - [ZBX-1272] server name is now shown in page title too (Vedmak)
  - [DEV-137] PDF manual replaced by a README file with a link to on-line documentation
