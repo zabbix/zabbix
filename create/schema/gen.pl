@@ -116,7 +116,7 @@ ZBX_TABLE	tables[]={
 	"t_cksum_text"	=>	"nclob"  
 );
 
-%postgresql=("t_bigint"	=>	"bigint",
+%postgresql=("t_bigint"	=>	"numeric(20)",
 	"database"	=>	"postgresql",
 	"before"	=>	"",
 	"after"		=>	"",
