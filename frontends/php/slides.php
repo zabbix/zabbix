@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2007 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,12 +19,13 @@
 **/
 ?>
 <?php
+
 	require_once('include/config.inc.php');
 	require_once('include/graphs.inc.php');
 	require_once('include/screens.inc.php');
 	require_once('include/blocks.inc.php');
 
-	$page['title'] = "S_CUSTOM_SCREENS";
+	$page['title'] = 'S_CUSTOM_SCREENS';
 	$page['file'] = 'slides.php';
 	$page['hist_arg'] = array('config','elementid');
 	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.pmaster.js','class.calendar.js','gtlc.js');
@@ -40,29 +41,23 @@
 
 include_once('include/page_header.php');
 
-?>
 
+?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'config'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	null), // 0 - screens, 1 - slides
-
 		'groupid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
 		'hostid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
-
 // STATUS OF TRIGGER
 		'tr_groupid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 		'tr_hostid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-
-
-		'elementid'=>	array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,NULL),
+		'elementid'=>	array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID, NULL),
 		'step'=>		array(T_ZBX_INT, O_OPT,  P_SYS,		BETWEEN(0,65535),NULL),
 		'period'=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	null,NULL),
 		'stime'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	NULL,NULL),
-
 		'reset'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'reset'"),NULL),
 		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN('0,1,2'),		NULL),
-
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
@@ -370,9 +365,7 @@ include_once('include/page_header.php');
 
 	$jsmenu = new CPUMenu(null,170);
 	$jsmenu->InsertJavaScript();
-?>
-<?php
-echo SBR;
-include_once('include/page_footer.php');
 
+	
+include_once('include/page_footer.php');
 ?>
