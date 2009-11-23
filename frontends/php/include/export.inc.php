@@ -488,7 +488,7 @@ class zbxXML{
 					$groups_to_add = array();
 					foreach($groups as $group){
 						$current_group = CHostGroup::getObjects(array('name' => $group->nodeValue));
-//sdi('group: '.$group_name.' | GroupID: '. $current_groupid);
+// sdii($current_group);
 						if(empty($current_group)){	
 							$groups_to_add = array_merge($groups_to_add, $current_group);
 						}
@@ -509,7 +509,7 @@ class zbxXML{
 						$host_groups = array_merge($host_groups, $new_groups);
 					}
 				}
-
+// sdii($host_groups);
 // HOSTS
 //sdi('Host: '.$host_db['host'].' | HostID: '. $current_hostid);
 				if($current_host && isset($rules['host']['exist'])){
@@ -816,12 +816,12 @@ class zbxXML{
 						
 						$current_graph = CGraph::getObjects($graph_db);
 						$current_graph = reset($current_graph);
-
+// sdii($current_graph);
 						if(!$current_graph && !isset($rules['graph']['missed'])) continue; // break if update nonexist
 						if($current_graph && !isset($rules['graph']['exist'])) continue; // break if not update exist
 //sdi('graph: '.$graph_db['name'].' | graphID: '. $current_graphid);
 						if($current_graph){ // if exists, delete graph to add then new
-							CGraph::delete(array('graphs' => $current_graph));
+							CGraph::delete($current_graph);
 						}
 //sdii($graph_db);
 // GRAPH ITEMS {{{

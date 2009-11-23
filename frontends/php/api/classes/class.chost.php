@@ -661,7 +661,7 @@ class CHost extends CZBXAPI{
 				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'No groups for host [ '.$host['host'].' ]');
 				return false;
 			}
-						
+		
 			$hosts[$hnum]['groups'] = zbx_toArray($hosts[$hnum]['groups']);
 			
 			foreach($hosts[$hnum]['groups'] as $gnum => $group){
@@ -669,9 +669,10 @@ class CHost extends CZBXAPI{
 			}
 		}
 
-		$upd_groups = CHostGroup::get(array('groupids'=>$groupids,
-										'editable'=>1, 
-										'preservekeys'=>1));
+		$upd_groups = CHostGroup::get(array(
+			'groupids' => $groupids,
+			'editable' => 1, 
+			'preservekeys' => 1));
 		foreach($groupids as $gnum => $groupid){
 			if(!isset($upd_groups[$groupid])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You do not have enough rights for operation');

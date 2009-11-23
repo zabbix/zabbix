@@ -586,11 +586,12 @@ class CGraph extends CZBXAPI{
 	public static function delete($graphs){
 		$graphs = zbx_toArray($graphs);
 		$graphids = array();
-		
-		$del_graphs = self::get(array('graphids'=>zbx_objectValues($graphs, 'graphid'), 
-											'editable'=>1, 
-											'extendoutput'=>1, 
-											'preservekeys'=>1));
+
+		$del_graphs = self::get(array(
+			'graphids' => zbx_objectValues($graphs, 'graphid'), 
+			'editable' => 1, 
+			'extendoutput' => 1, 
+			'preservekeys' => 1));
 		foreach($graphs as $gnum => $graph){
 			if(!isset($del_graphs[$graph['graphid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
