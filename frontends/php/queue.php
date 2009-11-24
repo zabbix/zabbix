@@ -61,11 +61,26 @@ include_once "include/page_header.php";
 <?php
 	$now = time();
 
+	$norm_item_types = array(
+			ITEM_TYPE_ZABBIX,
+			ITEM_TYPE_ZABBIX_ACTIVE,
+			ITEM_TYPE_SSH,
+			ITEM_TYPE_TELNET,
+			ITEM_TYPE_SIMPLE,
+			ITEM_TYPE_INTERNAL,
+			ITEM_TYPE_AGGREGATE,
+			ITEM_TYPE_EXTERNAL);
+	$snmp_item_types = array(
+			ITEM_TYPE_SNMPV1,
+			ITEM_TYPE_SNMPV2C,
+			ITEM_TYPE_SNMPV3);
+	$ipmi_item_types = array(
+			ITEM_TYPE_IPMI);
+
 	$item_types = array(
 			ITEM_TYPE_ZABBIX,
 			ITEM_TYPE_ZABBIX_ACTIVE,
 			ITEM_TYPE_SNMPV1,
-			//ITEM_TYPE_TRAPPER,
 			ITEM_TYPE_SNMPV2C,
 			ITEM_TYPE_SNMPV3,
 			ITEM_TYPE_IPMI,
@@ -74,19 +89,20 @@ include_once "include/page_header.php";
 			ITEM_TYPE_SIMPLE,
 			ITEM_TYPE_INTERNAL,
 			ITEM_TYPE_AGGREGATE,
-			//ITEM_TYPE_HTTPTEST,
 			ITEM_TYPE_EXTERNAL);
 
-	$result = DBselect('SELECT i.itemid,i.lastclock,i.description,i.key_,i.type,h.host,h.hostid,h.proxy_hostid,i.delay,i.delay_flex '.
-		' FROM items i,hosts h '.
-		' WHERE i.status='.ITEM_STATUS_ACTIVE.
-			' AND i.type in ('.implode(',',$item_types).') '.
-			' AND ((h.status='.HOST_STATUS_MONITORED.' AND h.available != '.HOST_AVAILABLE_FALSE.') '.
-				' OR (h.status='.HOST_STATUS_MONITORED.' AND h.available='.HOST_AVAILABLE_FALSE.' AND h.disable_until<='.$now.')) '.
-			' AND i.hostid=h.hostid '.
-/*			' AND i.nextcheck + 5 <'.$now.*/
-			' AND i.key_ NOT IN ('.zbx_dbstr('status').','.zbx_dbstr('icmpping').','.zbx_dbstr('icmppingsec').','.zbx_dbstr('zabbix[log]').') '.
-			' AND i.value_type not in ('.ITEM_VALUE_TYPE_LOG.') '.
+	$result = DBselect('SELECT i.itemid,i.lastclock,i.description,i.key_,i.type,h.host,h.hostid,h.proxy_hostid,i.delay,i.delay_flex'.
+		' FROM items i,hosts h'.
+		' WHERE i.hostid=h.hostid'.
+			' AND h.status='.HOST_STATUS_MONITORED.
+			' AND i.status='.ITEM_STATUS_ACTIVE.
+			' AND i.value_type not in ('.ITEM_VALUE_TYPE_LOG.')'.
+			' AND i.key_ NOT IN ('.zbx_dbstr('status').','.zbx_dbstr('zabbix[log]').')'.
+			' AND ('.
+				'(h.available<>'.HOST_AVAILABLE_FALSE.' AND i.type in ('.implode(',',$norm_item_types).'))'.
+				' OR (h.snmp_available<>'.HOST_AVAILABLE_FALSE.' AND i.type in ('.implode(',',$snmp_item_types).'))'.
+				' OR (h.ipmi_available<>'.HOST_AVAILABLE_FALSE.' AND i.type in ('.implode(',',$ipmi_item_types).'))'.
+				')'.
 			' AND '.DBcondition('h.hostid',$available_hosts).
 			' AND '.DBin_node('h.hostid', get_current_nodeid()).
 		' ORDER BY i.lastclock,h.host,i.description,i.key_');
