@@ -1115,6 +1115,7 @@ int	DBget_queue_count(void)
 				" and i.status=%d"
 				" and i.value_type not in (%d)"
 				" and i.key_ not in ('%s','%s')"
+				" and not i.lastclock is null"
 				" and ("
 					"(h.available<>%d and i.type in (%d,%d,%d,%d,%d,%d,%d,%d))"
 					" or (h.snmp_available<>%d and i.type in (%d,%d,%d))"

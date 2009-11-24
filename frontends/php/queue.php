@@ -98,6 +98,7 @@ include_once "include/page_header.php";
 			' AND i.status='.ITEM_STATUS_ACTIVE.
 			' AND i.value_type not in ('.ITEM_VALUE_TYPE_LOG.')'.
 			' AND i.key_ NOT IN ('.zbx_dbstr('status').','.zbx_dbstr('zabbix[log]').')'.
+			' AND NOT i.lastclock IS NULL'.
 			' AND ('.
 				'(h.available<>'.HOST_AVAILABLE_FALSE.' AND i.type in ('.implode(',',$norm_item_types).'))'.
 				' OR (h.snmp_available<>'.HOST_AVAILABLE_FALSE.' AND i.type in ('.implode(',',$snmp_item_types).'))'.
