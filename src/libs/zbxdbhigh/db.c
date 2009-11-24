@@ -1107,33 +1107,39 @@ int	DBget_queue_count(void)
 	now = time(NULL);
 
 	result = DBselect(
-			"select i.itemid,i.type,i.delay,i.delay_flex,i.lastclock,h.proxy_hostid "
+			"select i.itemid,i.type,i.delay,i.delay_flex,i.lastclock,h.host"
 			" from items i,hosts h"
 			" where i.hostid=h.hostid"
 				" and h.proxy_hostid=0"
+				" and h.status=%d"
 				" and i.status=%d"
-				" and i.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)"
-				" and ((h.status=%d and h.available!=%d)"
-					" or (h.status=%d and h.available=%d and h.disable_until<=%d))"
-				" and not i.key_ like '%s' and not i.key_ like '%s%%' and not i.key_ like '%s'"
 				" and i.value_type not in (%d)"
+				" and i.key_ not in ('%s','%s')"
+				" and ("
+					"(h.available<>%d and i.type in (%d,%d,%d,%d,%d,%d,%d,%d))"
+					" or (h.snmp_available<>%d and i.type in (%d,%d,%d))"
+					" or (h.ipmi_available<>%d and i.type in (%d))"
+					")"
 				DB_NODE,
+			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
-			ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3,
-				ITEM_TYPE_IPMI, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE,
-				ITEM_TYPE_EXTERNAL, ITEM_TYPE_SSH,
-			HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE,
-			HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, now,
-			SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ZABBIXLOG_KEY,
 			ITEM_VALUE_TYPE_LOG,
+			SERVER_STATUS_KEY, SERVER_ZABBIXLOG_KEY,
+			HOST_AVAILABLE_FALSE,
+				ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+				ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
+			HOST_AVAILABLE_FALSE,
+				ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3,
+			HOST_AVAILABLE_FALSE,
+				ITEM_TYPE_IPMI,
 			DBnode_local("i.itemid"));
-
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(itemid, row[0]);
 		item_type	= atoi(row[1]);
 		delay		= atoi(row[2]);
 		delay_flex	= row[3];
+
 		if (FAIL == (lastclock = DCget_item_lastclock(itemid)))
 		{
 			if (SUCCEED == DBis_null(row[4]))
@@ -1144,7 +1150,7 @@ int	DBget_queue_count(void)
 
 		nextcheck = calculate_item_nextcheck(itemid, item_type, delay, delay_flex, lastclock);
 
-		if (now > nextcheck)
+		if (now - nextcheck > 5)
 			res++;
 	}
 	DBfree_result(result);
