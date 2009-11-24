@@ -1,7 +1,7 @@
 Changes for 1.7.3
 
  - [DEV-333] fixed processing of not supported active and trapper items (Sasha)
- - [DEV-333] fixed queue screen with separated availability of SNMP,IPMI and others items (Sasha)
+ - [DEV-333,ZBX-1254] fixed queue screen with separated availability of SNMP,IPMI and others items (Sasha)
  - [ZBX-1324] replaced user visible string ZABBIX with Zabbix (Alexei, Richlv)
  - [DEV-137] added file CREDITS (Alexei)
  - [DEV-333] fixed possible server crash while processing remote commands (Dmitry)
