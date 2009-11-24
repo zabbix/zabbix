@@ -440,6 +440,8 @@ int main(int argc, char **argv)
 		{
 			total_count++; /* also used as inputline */
 
+			zbx_rtrim(in_line, "\r\n");
+
 			hostname = in_line;
 
 			if (NULL == (key = strchr(hostname, ' ')))
@@ -457,11 +459,11 @@ int main(int argc, char **argv)
 					zabbix_log(LOG_LEVEL_WARNING, "[line %d] 'Timestamp' required", total_count);
 					continue;
 				}
+
+				*clock++ = '\0';
 			}
 			else
 				clock = key;
-
-			*clock++ = '\0';
 
 			if (NULL == (key_value = strchr(clock, ' ')))
 			{
