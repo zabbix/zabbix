@@ -177,7 +177,6 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 		if (0 == strcmp(values[i].value, "ZBX_NOTSUPPORTED"))
 		{
 			DCadd_nextcheck(&item, (time_t)values[i].clock, values[i].value);
-			DCconfig_update_item(item.itemid, ITEM_STATUS_NOTSUPPORTED, values[i].clock);
 
 			if (NULL != processed)
 				(*processed)++;
@@ -198,11 +197,17 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 				if (NULL != processed)
 					(*processed)++;
 			}
+			else if (GET_MSG_RESULT(&agent))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
+						item.host.host, item.key_orig, agent.msg);
+				DCadd_nextcheck(&item, (time_t)values[i].clock, agent.msg);
+			}
 			else
 			{
-				if (GET_MSG_RESULT(&agent))
-					zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
-							item.host.host, item.key_orig, agent.msg);
+				/* this should never happen
+				 * set_result_type() always set MSG result if not SUCCEED
+				 */
 			}
 			free_result(&agent);
 	 	}
