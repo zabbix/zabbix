@@ -94,7 +94,7 @@ disconnect:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	process_history_table_data(ZBX_TABLE *table, int master_nodeid, int nodeid)
+static void	process_history_table_data(ZBX_TABLE *table, int master_nodeid, int nodeid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;

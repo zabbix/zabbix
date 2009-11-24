@@ -27,6 +27,27 @@
 #include "comms.h"
 #include "nodecomms.h"
 
+int	is_slave_node(int slave_nodeid)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = FAIL;
+
+	result = DBselect(
+			"select nodeid"
+			" from nodes"
+			" where nodeid=%d"
+				" and masterid=%d",
+			slave_nodeid,
+			CONFIG_NODEID);
+
+	if (NULL != (row = DBfetch(result)))
+		ret = SUCCEED;
+	DBfree_result(result);
+
+	return ret;
+}
+
 int	connect_to_node(int nodeid, zbx_sock_t *sock)
 {
 	DB_RESULT	result;

@@ -24,6 +24,7 @@
 
 extern char	*CONFIG_SOURCE_IP;
 
+int	is_slave_node(int slave_nodeid);
 int	connect_to_node(int nodeid, zbx_sock_t *sock);
 int	send_data_to_node(int nodeid, zbx_sock_t *sock, const char *data);
 int	recv_data_from_node(int nodeid, zbx_sock_t *sock, char **data);
