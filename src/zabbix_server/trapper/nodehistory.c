@@ -55,7 +55,6 @@ int	send_history_last_id(zbx_sock_t *sock, const char *data)
 	DB_ROW		row;
 	const char	*r;
 	const ZBX_TABLE	*table;
-	const ZBX_FIELD *field;
 	int		buffer_offset;
 	int		sender_nodeid, nodeid, res;
 
@@ -77,6 +76,13 @@ int	send_history_last_id(zbx_sock_t *sock, const char *data)
 	if (NULL == r)
 		goto error;
 
+	if (FAIL == is_slave_node(sender_nodeid))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "NODE %d: Received data from unknown node %d [%s]",
+				CONFIG_NODEID, sender_nodeid, data);
+		goto fail;
+	}
+
 	zbx_get_next_field(&r, &buffer, &buffer_allocated, '\n'); /* nodeid */
 	nodeid = atoi(buffer);
 	if (NULL == r)
@@ -86,11 +92,14 @@ int	send_history_last_id(zbx_sock_t *sock, const char *data)
 	if (NULL == (table = DBget_table(buffer)))
 		goto error;
 
+	if (0 == (table->flags & (ZBX_HISTORY | ZBX_HISTORY_SYNC)))
+		goto error;
+
 	if (NULL == r)
 		goto error;
 
 	zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER); /* field name */
-	if (NULL == (field = DBget_field(table, buffer)))
+	if (0 != strcmp(buffer, table->recid))
 		goto error;
 
 	buffer_offset= 0;
@@ -98,9 +107,9 @@ int	send_history_last_id(zbx_sock_t *sock, const char *data)
 			"select max(%s)"
 			" from %s"
 			" where 1=1" DB_NODE,
-			field->name,
+			table->recid,
 			table->table,
-			DBnode(field->name, nodeid));
+			DBnode(table->recid, nodeid));
 
 	buffer_offset= 0;
 	result = DBselect("%s", buffer);
@@ -120,6 +129,12 @@ int	send_history_last_id(zbx_sock_t *sock, const char *data)
 
 	return res;
 error:
+	zabbix_log( LOG_LEVEL_ERR, "NODE %d: Received invalid record from node %d for node %d [%s]",
+		CONFIG_NODEID,
+		sender_nodeid,
+		nodeid,
+		data);
+fail:
 	buffer_offset= 0;
 	zbx_snprintf_alloc(&buffer, &buffer_allocated, &buffer_offset, 8, "FAIL");
 
@@ -128,12 +143,6 @@ error:
 	alarm(0);
 
 	zbx_free(buffer);
-
-	zabbix_log( LOG_LEVEL_ERR, "NODE %d: Received invalid record from node %d for node %d [%s]",
-		CONFIG_NODEID,
-		sender_nodeid,
-		nodeid,
-		data);
 
 	return FAIL;
 }
