@@ -472,7 +472,7 @@ class CUserMacro extends CZBXAPI{
 					' AND '.DBcondition('macro', $mac_list, false, true);
 			$res = DBselect($sql);
 			while($macro = DBfetch($res)){
-				$hostmacroids[$macro['$hostmacroid']] = $macro['$hostmacroid'];
+				$hostmacroids[$macro['hostmacroid']] = $macro['hostmacroid'];
 			}
 		}
 	
