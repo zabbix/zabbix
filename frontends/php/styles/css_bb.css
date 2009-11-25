@@ -356,6 +356,18 @@ div.iconok{
 	background-image: url('../images/general/ok_icon_bb.png');
 }
 
+div.iconzbxavailable{
+	background-image: url('../images/general/zabbix_available_bb.png');
+}
+
+div.iconsnmpavailable{
+	background-image: url('../images/general/snmp_available_bb.png');
+}
+
+div.iconipmiavailable{
+	background-image: url('../images/general/ipmi_available_bb.png');
+}
+
 div.sla_green{
 	background-image: url('../images/gradients/sla_blue15.png');
 }
