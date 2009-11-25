@@ -3292,8 +3292,8 @@
 
 /* form row generation */
 		$cmbType =  new CComboBox('maintenance_type', $maintenance_type);
-		$cmbType->addItem(MAINTENANCE_TYPE_NORMAL, S_NORMAL_PROCESSING);
-		$cmbType->addItem(MAINTENANCE_TYPE_NODATA, S_NO_DATA_PROCESSING);
+		$cmbType->addItem(MAINTENANCE_TYPE_NORMAL, S_WITH_DATA_COLLECTION);
+		$cmbType->addItem(MAINTENANCE_TYPE_NODATA, S_NO_DATA_COLLECTION);
 		$tblMntc->addRow(array(S_MAINTENANCE_TYPE, $cmbType));
 
 
