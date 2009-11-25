@@ -1117,7 +1117,8 @@ int	DBget_queue_count(void)
 				" and i.key_ not in ('%s','%s')"
 				" and not i.lastclock is null"
 				" and ("
-					"(h.available<>%d and i.type in (%d,%d,%d,%d,%d,%d,%d,%d))"
+					"i.type in (%d,%d,%d,%d,%d,%d,%d)"
+					" or (h.available<>%d and i.type in (%d))"
 					" or (h.snmp_available<>%d and i.type in (%d,%d,%d))"
 					" or (h.ipmi_available<>%d and i.type in (%d))"
 					")"
@@ -1126,9 +1127,10 @@ int	DBget_queue_count(void)
 			ITEM_STATUS_ACTIVE,
 			ITEM_VALUE_TYPE_LOG,
 			SERVER_STATUS_KEY, SERVER_ZABBIXLOG_KEY,
+				ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SIMPLE,
+				ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
 			HOST_AVAILABLE_FALSE,
-				ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-				ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
+				ITEM_TYPE_ZABBIX,
 			HOST_AVAILABLE_FALSE,
 				ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c, ITEM_TYPE_SNMPv3,
 			HOST_AVAILABLE_FALSE,
