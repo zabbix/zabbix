@@ -136,7 +136,7 @@
 	 * Function: get_service_status
 	 *
 	 * Description:
-	 *     retrive true status
+	 *     Retrieve true status
 	 *
 	 * Author:
 	 *     Aly
