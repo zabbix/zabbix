@@ -62,7 +62,6 @@ include_once "include/page_header.php";
 	$now = time();
 
 	$norm_item_types = array(
-			ITEM_TYPE_ZABBIX,
 			ITEM_TYPE_ZABBIX_ACTIVE,
 			ITEM_TYPE_SSH,
 			ITEM_TYPE_TELNET,
@@ -70,6 +69,8 @@ include_once "include/page_header.php";
 			ITEM_TYPE_INTERNAL,
 			ITEM_TYPE_AGGREGATE,
 			ITEM_TYPE_EXTERNAL);
+	$zbx_item_types = array(
+			ITEM_TYPE_ZABBIX);
 	$snmp_item_types = array(
 			ITEM_TYPE_SNMPV1,
 			ITEM_TYPE_SNMPV2C,
@@ -100,7 +101,8 @@ include_once "include/page_header.php";
 			' AND i.key_ NOT IN ('.zbx_dbstr('status').','.zbx_dbstr('zabbix[log]').')'.
 			' AND NOT i.lastclock IS NULL'.
 			' AND ('.
-				'(h.available<>'.HOST_AVAILABLE_FALSE.' AND i.type in ('.implode(',',$norm_item_types).'))'.
+				' i.type in ('.implode(',',$norm_item_types).')'.
+				' OR (h.available<>'.HOST_AVAILABLE_FALSE.' AND i.type in ('.implode(',',$zbx_item_types).'))'.
 				' OR (h.snmp_available<>'.HOST_AVAILABLE_FALSE.' AND i.type in ('.implode(',',$snmp_item_types).'))'.
 				' OR (h.ipmi_available<>'.HOST_AVAILABLE_FALSE.' AND i.type in ('.implode(',',$ipmi_item_types).'))'.
 				')'.
