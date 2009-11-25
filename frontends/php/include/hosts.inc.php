@@ -906,7 +906,7 @@ require_once('include/httptest.inc.php');
  * Function: get_templates_by_hostid
  *
  * Description:
- *     Retrive templates for specified host
+ *     Retrieve templates for specified host
  *
  * Author:
  *		Eugene Grigorjev (eugene.grigorjev@zabbix.com)
@@ -933,7 +933,7 @@ require_once('include/httptest.inc.php');
  * Function: get_viewed_groups
  *
  * Description:
- *     Retrive groups for dropdown
+ *     Retrieve groups for dropdown
  *
  * Author:
  *		Artem "Aly" Suharev
@@ -1184,7 +1184,7 @@ return $result;
  * Function: get_viewed_hosts
  *
  * Description:
- *     Retrive groups for dropdown
+ *     Retrieve groups for dropdown
  *
  * Author:
  *		Artem "Aly" Suharev
@@ -1812,7 +1812,7 @@ return $result;
 	 * Function: delete_template_applications
 	 *
 	 * Description:
-	 *     Delete applicatios from host by templates
+	 *     Delete applications from host by templates
 	 *
 	 * Author:
 	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
@@ -1858,7 +1858,7 @@ return $result;
 	 * Function: copy_template_applications
 	 *
 	 * Description:
-	 *     Copy applicatios from templates to host
+	 *     Copy applications from templates to host
 	 *
 	 * Author:
 	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
