@@ -85,7 +85,6 @@ class CEvent extends CZBXAPI{
 
 // filter
 			'hide_unknown'			=> null,
-			'acknowledged'			=> null,
 			'value'					=> null,
 			'time_from'				=> null,
 			'time_till'				=> null,

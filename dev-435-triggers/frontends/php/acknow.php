@@ -37,9 +37,10 @@ include_once('include/page_header.php');
 
 //		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'eventid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,				null),
-		'events'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,				null),
-		'message'=>		array(T_ZBX_STR, O_OPT,	NULL,	$bulk ? NULL : NOT_EMPTY,	'isset({save})||isset({saveandreturn})'),
+		'eventid'=>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
+		'triggerid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
+		'events'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	null),
+		'message'=>			array(T_ZBX_STR, O_OPT,	NULL,	$bulk ? NULL : NOT_EMPTY,	'isset({save})||isset({saveandreturn})'),
 // Actions
 		'go'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
 // form
@@ -49,6 +50,8 @@ include_once('include/page_header.php');
 	);
 	check_fields($fields);
 
+	$bulk = ($bulk || isset($_REQUEST['triggerid']));
+
 	if(isset($_REQUEST['cancel'])){
 		$last_page = $USER_DETAILS['last_page'];
 		$url = $last_page ? new CUrl($last_page['url']) : new CUrl('tr_status.php?hostid='.get_profile('web.tr_status.hostid', 0));
@@ -56,48 +59,28 @@ include_once('include/page_header.php');
 		exit;
 	}
 
-	if(!isset($_REQUEST['events']) && !isset($_REQUEST['eventid'])){
+	if(!isset($_REQUEST['events']) && !isset($_REQUEST['eventid']) && !isset($_REQUEST['triggerid'])){
 		show_message(S_NO_EVENTS_TO_ACKNOWLEDGE);
 		include_once('include/page_footer.php');
 	}
 
-	if(isset($_REQUEST['eventid'])){
-		$events[$_REQUEST['eventid']] = $_REQUEST['eventid'];
-	}
-	else{
-		$events = $_REQUEST['events'];
-	}
 
 //$bulk = (count($events) > 1);
 ?>
 <?php
-	// $available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY, get_current_nodeid());
 
-	// $db_data = DBfetch(DBselect('SELECT COUNT(DISTINCT  e.eventid) as cnt'.
-			// ' FROM events e'.
-			// ' WHERE '.DBcondition('e.eventid',$events).
-				// ' AND '.DBcondition('e.objectid',$available_triggers).
-				// ' AND e.object='.EVENT_OBJECT_TRIGGER.
-				// ' AND '.DBin_node('e.eventid')
-			// ));
-
-	// if($db_data['cnt'] != count($events)){
-		// access_deny();
-	// }
-
-	// $db_data = DBfetch(DBselect('SELECT DISTINCT  e.*,t.triggerid,t.expression,t.description,t.expression,h.host,h.hostid '.
-		// ' FROM hosts h, items i, functions f, events e, triggers t'.
-		// ' WHERE h.hostid=i.hostid '.
-			// ' AND i.itemid=f.itemid '.
-			// ' AND f.triggerid=t.triggerid '.
-			// ' AND '.DBcondition('e.eventid',$events).
-			// ' AND e.object='.EVENT_OBJECT_TRIGGER.
-			// ' AND e.objectid=t.triggerid '.
-			// ' AND '.DBcondition('t.triggerid',$available_triggers).
-			// ' AND '.DBin_node('e.eventid')
-		// ));
-
-	$events = CEvent::get(array('eventids' => $events, 'extendoutput' => 1, 'select_triggers' => 1));
+	$options = array('extendoutput' => 1, 'select_triggers' => 1);
+	if(isset($_REQUEST['eventid'])){
+		$options['eventids'] = $_REQUEST['eventid'];
+	}
+	else if(isset($_REQUEST['events'])){
+		$options['eventids'] = $_REQUEST['events'];
+	}
+	else if(isset($_REQUEST['triggerid'])){
+		$options['triggerids'] = $_REQUEST['triggerid'];
+	}
+	$events = CEvent::get($options);
+	
 	if(!$bulk){
 		$event = reset($events);
 		$event_trigger = reset($event['triggers']);
