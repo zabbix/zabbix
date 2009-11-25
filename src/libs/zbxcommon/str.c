@@ -1512,6 +1512,14 @@ int	zbx_get_next_field(const char **line, char **output, int *olen, char separat
 	char	*ret;
 	int	flen;
 
+	assert(line);
+
+	if (NULL == *line)
+	{
+		(*output)[0] = '\0';
+		return 0;
+	}
+
 	ret = strchr(*line, separator);
 	if (ret) {
 		flen = (int)(ret - *line);

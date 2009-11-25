@@ -538,7 +538,7 @@ int	node_history(char *data, size_t datalen)
 			zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER); /* tablename */
 
 			table = DBget_table(buffer);
-			if (0 == (table->flags & (ZBX_HISTORY | ZBX_HISTORY_SYNC)))
+			if (NULL != table && 0 == (table->flags & (ZBX_HISTORY | ZBX_HISTORY_SYNC)))
 				table = NULL;
 
 			if (NULL != table && 0 != (table->flags & ZBX_HISTORY_SYNC)) {
@@ -559,6 +559,7 @@ int	node_history(char *data, size_t datalen)
 				zabbix_log(LOG_LEVEL_ERR, "NODE %d: Invalid received data: unknown tablename \"%s\"",
 					CONFIG_NODEID,
 					buffer);
+				res = FAIL;
 			}
 			if (NULL != newline) {
 				zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Received %s from node %d for node %d datalen %d",
