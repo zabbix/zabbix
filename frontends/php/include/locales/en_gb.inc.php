@@ -627,11 +627,11 @@
 	'S_MAINTENANCE_TYPE'=>			'Maintenance type',
 	'S_EXPIRED'=>				'Expired',
 
-	'S_NORMAL_PROCESSING'=>			'Normal processing',
-	'S_NO_DATA_PROCESSING'=>		'No data processing',
-	
-	'S_NORMAL_MAINTENANCE' => 'Normal maintenance',
-	'S_NO_DATA_MAINTENANCE' => 'No data maintenance', 
+	'S_WITH_DATA_COLLECTION'=>		'With data collection',
+	'S_NO_DATA_COLLECTION'=>		'No data collection',
+
+	'S_NORMAL_MAINTENANCE'=>		'Normal maintenance',
+	'S_NO_DATA_MAINTENANCE'=>		'No data maintenance', 
 
 	'S_DELETE_MAINTENANCE_PERIOD_Q'=>	'Delete maintenance period?',
 
