@@ -759,7 +759,7 @@ include_once('include/page_header.php');
 			$ipmi_available->addStyle('border: 0');
 			
 			$av_table = new CTable();
-			$av_table->AddRow(array($zbx_available, $snmp_available, $ipmi_available));
+			$av_table->AddRow(array($zbx_available, ' ', $snmp_available, ' ', $ipmi_available));
 
 			if(empty($host['templates'])){
 				$templates = '-';
