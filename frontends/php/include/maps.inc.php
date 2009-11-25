@@ -689,7 +689,7 @@
  * Function: get_action_map_by_sysmapid
  *
  * Description:
- *     Retrive action for map element
+ *     Retrieve action for map element
  *
  * Author:
  *     Eugene Grigorjev
