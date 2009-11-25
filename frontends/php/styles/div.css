@@ -258,6 +258,96 @@ div.iconok{
 div.iconok:hover{
 }
 
+div.iconzbxunknown{
+	height: 14px;
+	width: 14px;
+	background-image: url('../images/general/zabbix_unknown.png');
+	background-repeat:no-repeat;
+}
+
+div.iconzbxunknown:hover{
+}
+
+div.iconzbxavailable{
+	height: 14px;
+	width: 14px;
+	background-image: url('../images/general/zabbix_available.png');
+	background-repeat:no-repeat;
+}
+
+div.iconzbxavailable:hover{
+}
+
+div.iconzbxunavailable{
+	height: 14px;
+	width: 14px;
+	background-image: url('../images/general/zabbix_unavailable.png');
+	background-repeat:no-repeat;
+}
+
+div.iconzbxunavailable:hover{
+}
+
+div.iconsnmpunknown{
+	height: 14px;
+	width: 14px;
+	background-image: url('../images/general/snmp_unknown.png');
+	background-repeat:no-repeat;
+}
+
+div.iconsnmpunknown:hover{
+}
+
+div.iconsnmpavailable{
+	height: 14px;
+	width: 14px;
+	background-image: url('../images/general/snmp_available.png');
+	background-repeat:no-repeat;
+}
+
+div.iconsnmpavailable:hover{
+}
+
+div.iconsnmpunavailable{
+	height: 14px;
+	width: 14px;
+	background-image: url('../images/general/snmp_unavailable.png');
+	background-repeat:no-repeat;
+}
+
+div.iconsnmpunavailable:hover{
+}
+
+div.iconipmiunknown{
+	height: 14px;
+	width: 14px;
+	background-image: url('../images/general/ipmi_unknown.png');
+	background-repeat:no-repeat;
+}
+
+div.iconipmiunknown:hover{
+}
+
+div.iconipmiavailable{
+	height: 14px;
+	width: 14px;
+	background-image: url('../images/general/ipmi_available.png');
+	background-repeat:no-repeat;
+}
+
+div.iconipmiavailable:hover{
+}
+
+div.iconipmiunavailable{
+	height: 14px;
+	width: 14px;
+	background-image: url('../images/general/ipmi_unavailable.png');
+	background-repeat:no-repeat;
+}
+
+div.iconipmiunavailable:hover{
+}
+
 div.dbl_arrow_down{
 	height: 10px;
 	width: 9px;

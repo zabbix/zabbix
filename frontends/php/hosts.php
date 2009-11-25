@@ -638,8 +638,7 @@ include_once('include/page_header.php');
 			S_PORT,
 			S_TEMPLATES,
 			make_sorting_header(S_STATUS, 'status'),
-			S_AVAILABILITY,
-			S_ERROR
+			S_AVAILABILITY
 		));
 
 
@@ -715,30 +714,52 @@ include_once('include/page_header.php');
 
 			switch($host['available']){
 				case HOST_AVAILABLE_TRUE:
-					$available = new CCol(S_AVAILABLE, 'off');
-				break;
+					$zbx_available = new CDiv(SPACE, 'iconzbxavailable');
+					break;
 				case HOST_AVAILABLE_FALSE:
-					$available = new CCol(S_NOT_AVAILABLE, 'on');
-				break;
+					$zbx_available = new CDiv(SPACE, 'iconzbxunavailable');
+					$zbx_available->setHint($host['error'], '', 'on');
+					break;
 				case HOST_AVAILABLE_UNKNOWN:
-					$available = new CCol(S_UNKNOWN, 'unknown');
-				break;
+					$zbx_available = new CDiv(SPACE, 'iconzbxunknown');
+					break;
 			}
 
-			if(!zbx_empty($host['error']) || !zbx_empty($host['snmp_error']) || !zbx_empty($host['ipmi_error'])){
-				$error = new CDiv(SPACE, 'iconerror');
-				$error_msg = '';
-				if (!zbx_empty($host['error']))
-					$error_msg .= $host['error'];
-				if (!zbx_empty($host['snmp_error']))
-					$error_msg .= (empty($error_msg) ? '' : '<br>').$host['snmp_error'];
-				if (!zbx_empty($host['ipmi_error']))
-					$error_msg .= (empty($error_msg) ? '' : '<br>').$host['ipmi_error'];
-				$error->setHint($error_msg, '', 'on');
+			switch($host['snmp_available']){
+				case HOST_AVAILABLE_TRUE:
+					$snmp_available = new CDiv(SPACE, 'iconsnmpavailable');
+					break;
+				case HOST_AVAILABLE_FALSE:
+					$snmp_available = new CDiv(SPACE, 'iconsnmpunavailable');
+					$snmp_available->setHint($host['snmp_error'], '', 'on');
+					break;
+				case HOST_AVAILABLE_UNKNOWN:
+					$snmp_available = new CDiv(SPACE, 'iconsnmpunknown');
+					break;
 			}
-			else{
-				$error = new CDiv(SPACE, 'iconok');
+
+			switch($host['ipmi_available']){
+				case HOST_AVAILABLE_TRUE:
+					$ipmi_available = new CDiv(SPACE, 'iconipmiavailable');
+					break;
+				case HOST_AVAILABLE_FALSE:
+					$ipmi_available = new CDiv(SPACE, 'iconipmiunavailable');
+					$ipmi_available->setHint($host['ipmi_error'], '', 'on');
+					break;
+				case HOST_AVAILABLE_UNKNOWN:
+					$ipmi_available = new CDiv(SPACE, 'iconipmiunknown');
+					break;
 			}
+
+			$zbx_available = new CCol($zbx_available);
+			$zbx_available->addStyle('border: 0');
+			$snmp_available = new CCol($snmp_available);
+			$snmp_available->addStyle('border: 0');
+			$ipmi_available = new CCol($ipmi_available);
+			$ipmi_available->addStyle('border: 0');
+			
+			$av_table = new CTable();
+			$av_table->AddRow(array($zbx_available, ' ', $snmp_available, ' ', $ipmi_available));
 
 			if(empty($host['templates'])){
 				$templates = '-';
@@ -762,10 +783,9 @@ include_once('include/page_header.php');
 				$dns,
 				$ip,
 				empty($host['port']) ? '-' : $host['port'],
-				$templates,
+				new CCol($templates, 'wraptext'),
 				$status,
-				$available,
-				$error
+				$av_table
 			));
 		}
 
