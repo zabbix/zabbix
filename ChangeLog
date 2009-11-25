@@ -1,5 +1,6 @@
 Changes for 1.7.3
 
+ - [ZBX-1346] fix Timeout directive description in server and proxy configuration files (Richlv)
  - [DEV-436] improved display of ZABBIX/SNMP/IPMI agents availability information in hosts configuration screen (Sasha, Vedmak)
  - [ZBX-1337] rename maintenance types for clarity (Richlv)
  - [DEV-333] fixed processing of not supported active and trapper items (Sasha)
