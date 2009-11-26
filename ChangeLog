@@ -1,5 +1,6 @@
 Changes for 1.7.3
 
+ - [ZBXNEXT-146] added support of numeric values with plus sign (Sasha)
  - [ZBX-1358] make more graph strings translatable; patch by alixen (Richlv)
  - [ZBX-1346] fix Timeout directive description in server and proxy configuration files (Richlv)
  - [DEV-436] improved display of ZABBIX/SNMP/IPMI agents availability information in hosts configuration screen (Sasha, Vedmak)
