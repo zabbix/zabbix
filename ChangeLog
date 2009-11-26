@@ -1,5 +1,6 @@
 Changes for 1.7.3
 
+ - [ZBX-1368] fixed evaluating of "<=" operator in Uptime/Downtime Action condition (Dmitry)
  - [ZBX-1369] make time units translatable in graphs; patch by alixen (Richlv)
  - [ZBXNEXT-146] added support of numeric values with plus sign (Sasha)
  - [ZBX-1358] make more graph strings translatable; patch by alixen (Richlv)
