@@ -47,23 +47,24 @@ sysmapid: null,						// sysmapid
 container: null,					// selements and links HTML container (D&D dropable area)
 mapimg: null,						// HTML element map img
 
-selementids: new Array(),
-selements: {},				// map selements array
+selements: {},						// map selements array
+links:	{},							// map links array
 
-linkids: new Array(),
-links:	{},				// map links array
-
-selects: new Array(),				// selected Elements
+selection: {
+	count: 0,						// numer of selected elements
+	position: 0,					// elements numerate
+	selements: new Array()			// selected SElements
+},
 
 menu_active: 0,						// To recognize D&D
 debug_status: 0,					// debug status: 0 - off, 1 - on, 2 - SDI;
 debug_info: '',						// debug string
 
 mselement: {
-	id:				null,			// internal element id
 	selementid: 	0,			// ALWAYS must be a STRING (js doesn't support uint64) 
-	elementtype:	5,			// 5-UNDEFINED
+	elementtype:	4,			// 5-UNDEFINED
 	elementid: 		0,			// ALWAYS must be a STRING (js doesn't support uint64) 
+	elementName:	'',			// element name
 	iconid_on:		19,			// ALWAYS must be a STRING (js doesn't support uint64)
 	iconid_off:		19,			// ALWAYS must be a STRING (js doesn't support uint64)
 	iconid_unknown:	19,			// ALWAYS must be a STRING (js doesn't support uint64)
@@ -80,14 +81,13 @@ mselement: {
 },
 
 mlink: {
-	id:				null,			// internal link id
 	linkid:			0,				// ALWAYS must be a STRING (js doesn't support uint64)
 	selementid1:	0,				// ALWAYS must be a STRING (js doesn't support uint64)
 	selementid2:	0,				// ALWAYS must be a STRING (js doesn't support uint64)
-	linktriggers:	0,				// ALWAYS must be a STRING (js doesn't support uint64)
+	linktriggers:	{},				// ALWAYS must be a STRING (js doesn't support uint64)
 	tr_desc:		'Select',		// default trigger caption
 	drawtype:		0,
-	color:			'Green',
+	color:			'0000CC',
 	status:			1				// status of link 1 - active, 2 - passive
 },
 
@@ -97,8 +97,11 @@ mlinktrigger: {
 	triggerid:		0,					// ALWAYS must be a STRING (js doesn't support uint64)
 	desc_exp:		'Set Trigger',		// default trigger caption
 	drawtype:		0,
-	color:			'Red'
+	color:			'CC0000'
 },
+
+selementForm:		{},					// container for Selement form dom objects
+linkForm:			{},					// container for link form dom objects
 
 initialize: function(container, sysmapid, id){
 	this.debug('initialize');
@@ -151,8 +154,8 @@ get_sysmap_by_sysmapid: function(sysmapid){
 					{
 						'method': 'post',
 						'parameters':params,
-//						'onSuccess': function(resp){ SDI(resp.responseText); },
-						'onSuccess': function(resp){ },
+						'onSuccess': function(resp){ SDI(resp.responseText); },
+//						'onSuccess': function(resp){ },
 						'onFailure': function(){ throw('Get selements FAILED.'); }
 					}
 	);
@@ -165,14 +168,14 @@ dragend_sysmap_update: function(dragable,e){
 	
 	var element = dragable.element;
 	var element_id = element.id.split('_');
-	var id = element_id[(element_id.length - 1)];
+	var selementid = element_id[(element_id.length - 1)];
 	
 	var pos = new Array();
 	pos.x = parseInt(element.style.left,10);
 	pos.y = parseInt(element.style.top,10);
 
-	this.selements[this.selementids[id]].x = pos.x;
-	this.selements[this.selementids[id]].y = pos.y;
+	this.selements[selementid].x = pos.x;
+	this.selements[selementid].y = pos.y;
 	
 	this.update_mapimg();
 //	alert(id+' : '+this.selementids[id]);
@@ -221,12 +224,24 @@ add_empty_link: function(){
 
 	var id = this.linkids.length;
 	
-	if((this.selects.length > 1) && !is_null(this.selects[0]) && !is_null(this.selects[1])){			
-		var selementid1 = this.selementids[this.selects[0]];
-		var selementid2 = this.selementids[this.selects[1]];
+	if(this.selection.count == 2){
+		var selementid1 = null;
+		var selementid2 = null;
+
+		for(var i=0; i < this.selection.position; i++){
+			if(!isset(i, this.selection.selements)) continue;
+			
+			if(is_null(selementid1)){
+				selementid1 = this.selection.selements[i];
+			}
+			else{
+				selementid2 = this.selection.selements[i];
+				break;
+			}
+		}
 	}
 	else{
-		this.info('Elements are not selected');
+		this.info('Two elements should be selected');
 		return false;
 	}
 		
@@ -234,6 +249,7 @@ add_empty_link: function(){
 	for(var key in this.mlink){
 		mlink[key] = this.mlink[key];
 	}
+
 	mlink['selementid1'] = selementid1;
 	mlink['selementid2'] = selementid2;
 
@@ -284,83 +300,81 @@ save_sysmap: function(){
 // ---------- ELEMENTS ------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------
 
-select_selement: function(id){
+select_selement: function(selementid, multi){
 	this.debug('select_selement');
-	var selement = this.selements[this.selementids[id]].html_obj;
-	
-	if((typeof(this.selementids[id]) != 'undefiend') && !is_null(this.selementids[id])){
+//--
+	if(!isset(selementid, this.selements) || empty(this.selements[selementid])) return false;
+
+	var multi = multi || false;
+	var selement = this.selements[selementid];
+
+	if((typeof(this.selements[selementid]) != 'undefiend') && !empty(this.selements[selementid])){
 		var position = null;
-		var selementid = this.selementids[id];
-		
-		if(!is_null(this.selements[selementid].selected)){
-			position = this.selements[selementid].selected;
 
-			this.selects[position] = null;
-			this.selements[selementid].selected = null;
+		if(is_null(this.selements[selementid].selected)){	
+			position = this.selection.position;
 
-			for(var i=position; i<1; i++){
-				if((typeof(this.selects[i+1]) != 'undefined') && !is_null(this.selects[i+1])){
-					this.selects[i] = this.selects[i+1];
-					this.selements[this.selementids[this.selects[i]]].selected = i;
-				}
-			}
-			this.selects[1] = null;
+			this.selection.selements[position] = selementid;
+			this.selements[selementid].selected = position;
 
-			selement.style.border = '0px';
+			selement.html_obj.style.border = '1px #FF0000 solid';
+
+			this.selection.count++;
+			this.selection.position++;
 		}
 		else{
-			for(var i=0; i<2; i++){
-				if(is_null(this.selects[i])){
-					this.selects[i] = id;
-					this.selements[selementid].selected = i;
-					break;
-				}
-			}
-
-			if(is_null(this.selements[selementid].selected)){
-				this.selements[this.selementids[this.selects[0]]].html_obj.style.border = '0px';
-				this.selements[this.selementids[this.selects[0]]].selected = null;
-				
-				for(var i=0; i<1; i++){
-					this.selects[i] = this.selects[i+1];
-					this.selements[this.selementids[this.selects[i]]].selected = i;
-				}
-				
-				this.selects[1] = id;
-				this.selements[selementid].selected = 1;
-			}
+			this.selection.count--;
+			position = selement.selected;
 			
-			selement.style.border = '1px #FF0000 solid';
-		}		
+			this.selection.selements[position] = null;
+			delete(this.selection.selements[position]);
+
+			this.selements[selementid].selected = null;
+
+			selement.html_obj.style.border = '0px';
+		}
+
+		if(!multi && (this.selection.count > 1)){
+			for(var i=0; i<this.selection.position; i++){
+				if(!isset(i,this.selection.selements) || (this.selection.selements[i] == selementid)) continue;;
+
+				this.selection.count--;
+
+				var tmp_selementid = this.selection.selements[i];
+
+				this.selements[this.selection.selements[i]].selected = null;
+				this.selements[this.selection.selements[i]].html_obj.style.border = '0px';
+
+				this.selection.selements[i] = null;
+				delete(this.selection.selements[i]);
+			}
+		}
 	}
+
 return false;
 },
 
 add_selement: function(selement, update_icon){
 	this.debug('add_selement');
 
-	var sid = 0;
+	var selementid = 0;
 	if((typeof(selement['selementid']) == 'undefined') || (selement['selementid'] == 0)){
 		do{
-			sid = parseInt(Math.random(1000000000) * 1000000000);
-			sid = sid.toString();
-		}while(typeof(this.selements[sid]) != 'undefined');
+			selementid = parseInt(Math.random(1000000000) * 1000000000);
+			selementid = sid.toString();
+		}while(typeof(this.selements[selementid]) != 'undefined');
 		
-		selement['selementid'] = sid;
+		selement['selementid'] = selementid;
 	}
 	else{
-		sid = selement.selementid;
+		selementid = selement.selementid;
 	}
 	
-	selement.id = this.selementids.length;
-	
-	if(typeof(this.selements[sid]) == 'undefined'){
-		this.selementids.push(sid);
+	if(typeof(this.selements[selementid]) == 'undefined'){
 		selement.selected = null;
 	}
 	else{
-		selement.id = this.selements[sid].id;
-		selement.selected = this.selements[sid].selected;
+		selement.selected = this.selements[selementid].selected;
 	}
 	
 	if((typeof(update_icon) != 'undefined') && (update_icon != 0)){
@@ -368,29 +382,26 @@ add_selement: function(selement, update_icon){
 		selement.image = null;
 	}
 
-	this.selements[sid] = selement;
+	this.selements[selementid] = selement;
 },
 
-update_selement_option: function(id, params){ // params = [{'key': key, 'value':value},{'key': key, 'value':value}]
+update_selement_option: function(selementid, params){ // params = {'key': value, 'key': value}
 	this.debug('update_selement_option');
-	
-	if((typeof(this.selementids[id]) != 'undefined') && !is_null(this.selementids[id])){
-		for(var i=0; i < params.length; i++){
-			if(typeof(params[i]) != 'undefined'){
-				var pair = params[i];
-//SDI(pair.key+' : '+pair.value);
-				this.selements[this.selementids[id]][pair.key] = pair.value;
-			}
-		}
-		
-//SDJ(this.selements[this.selementids[id]]);
-		this.update_selement(this.selements[this.selementids[id]],1);
+//--
+	if(!isset(selementid, this.selements) || empty(this.selements[selementid])) return false;
+
+	for(var key in params){
+		if(!isset(key, params) || is_null(params[key])) continue;
+		this.selements[selementid][key] = params[key];
+//SDI(key+' : '+params[key]);
 	}
+
+	this.update_selement(this.selements[selementid]);
 },
 
 update_selement: function(selement){
 	this.debug('update_selement');
-
+//--
 	var url = new Curl(location.href);
 	
 	var params = {
@@ -417,33 +428,39 @@ remove_selements: function(){
 	this.debug('remove_selements');
 
 	if(Confirm('Delete selected elements?')){
-		for(var i=0; i<this.selects.length; i++){
-			this.remove_selement_by_id(this.selects[i]);
+		for(var i=0; i<this.selection.position; i++){
+			if(!isset(i, this.selection.selements)) continue;
+
+			this.remove_selement(this.selection.selements[i]);
 		}
 
 		this.update_mapimg();
 	}	
 },
 
-remove_selement_by_id: function(id){
-	this.debug('remove_selement_by_id');
+remove_selement: function(selementid, update_map){
+	this.debug('remove_selement');
 
-	if((typeof(this.selementids[id]) != 'undefined') && (!is_null(this.selementids[id]))){
-		var selementid = this.selementids[id];
+	if(!isset(selementid, this.selements) || empty(this.selements[selementid])) return false;
 		
 // Unselect
-		this.selects[this.selements[selementid].selected] = null;
+	this.selection.count--;
+	this.selection.selements[this.selements[selementid].selected] = null;
+	delete(this.selection.selements[this.selements[selementid].selected]);
+
 // Remove related links
-		this.remove_links_by_selementid(selementid);
+	this.remove_links_by_selementid(selementid);
 // remove icon
-		this.remove_selement_img(this.selements[selementid]);
-		
+	this.remove_selement_img(this.selements[selementid]);
+	
 //		this.selements[selementid].html_obj.remove();
 // remove selement
-		this.selements[selementid] = null;
-		this.selementids[id] = null;
+	this.selements[selementid] = null;
+	delete(this.selements[selementid]);
 
-		delete(this.selements[selementid]);
+
+	if((typeof(update_map) != 'undefined') && (update_map != 0)){
+		this.update_mapimg();
 	}
 },
 
@@ -456,51 +473,41 @@ get_linkid_by_selementids: function(selementid1,selementid2){
 	var result = false;
 	var links = {};
 	var linkid = 0;
-	for(var i=0; i < this.linkids.length; i++){
-		linkid = this.linkids[i];
 
-		if((typeof(this.links[linkid]) != 'undefined') && !is_null(this.links[linkid])){
-			if((this.links[linkid].selementid1 == selementid1) && (this.links[linkid].selementid2 == selementid2)){
-				links[i] = i;
-				result = links;
-			}
-			else if((this.links[linkid].selementid1 == selementid2) && (this.links[linkid].selementid2 == selementid1)){
-				links[i] = i;
-				result = links;
-			}
+	for(var linkid in this.links){
+		if(empty(this.links[linkid])) continue;
+
+		if((this.links[linkid].selementid1 == selementid1) && (this.links[linkid].selementid2 == selementid2)){
+			links[i] = i;
+			result = links;
+		}
+		else if((this.links[linkid].selementid1 == selementid2) && (this.links[linkid].selementid2 == selementid1)){
+			links[i] = i;
+			result = links;
 		}
 	}
 	
-	return result;
+return result;
 },
 
 add_link: function(mlink, update_map){
 	this.debug('add_link');
 //SDJ(mlink);
-	var mid = 0;
+	var linkid = 0;
 	if((typeof(mlink['linkid']) == 'undefined') || (mlink['linkid'] == 0)){
 		do{
-			mid = parseInt(Math.random(1000000000) * 1000000000);
-			mid = mid.toString();
-		}while(typeof(this.links[mid]) != 'undefined');
+			linkid = parseInt(Math.random(1000000000) * 1000000000);
+			linkid = linkid.toString();
+		}while(typeof(this.links[linkid]) != 'undefined');
 		
-		mlink['linkid'] = mid;
+		mlink['linkid'] = linkid;
 	}
 	else{
-		mid = mlink.linkid;
+		linkid = mlink.linkid;
 	}
 
-	mlink.id = this.linkids.length;
 	mlink.status = 1;
-	
-	if(typeof(this.links[mid]) == 'undefined'){
-		this.linkids.push(mid);
-	}
-	else{
-		mlink.id = this.links[mid].id
-	}
-
-	this.links[mid] = mlink;
+	this.links[linkid] = mlink;
 	
 	if((typeof(update_map) != 'undefined') && (update_map == 1)){
 		this.update_mapimg();
@@ -508,77 +515,84 @@ add_link: function(mlink, update_map){
 },
 
 
-update_link_option: function(id, params){ // params = [{'key': key, 'value':value},{'key': key, 'value':value},...]
+update_link_option: function(linkid, params){ // params = [{'key': key, 'value':value},{'key': key, 'value':value},...]
 	this.debug('update_link_option');
 	
-	if((typeof(this.linkids[id]) != 'undefined') && !is_null(this.linkids[id])){
+	if(!isset(linkid, this.links) || empty(this.links[linkid])) return false;
 //SDI(key+' : '+value);
-		for(var i=0; i < params.length; i++){
-			if(typeof(params[i]) != 'undefined'){
-				var pair = params[i];
-				if(pair.key == 'selementid1'){
-					if(this.links[this.linkids[id]]['selementid2'] == pair.value)
-					return false;
-				}
-				
-				if(pair.key == 'selementid2'){
-					if(this.links[this.linkids[id]]['selementid1'] == pair.value)
-					return false;
-				}
-			
-				this.links[this.linkids[id]][pair.key] = pair.value;
-			}
+	for(var key in params){
+		if(empty(params[key])) continue;
+		
+		if(key == 'selementid1'){
+			if(this.links[linkid]['selementid2'] == params[key])
+			return false;
 		}
 
-		this.update_mapimg();
+		if(key == 'selementid2'){
+			if(this.links[linkid]['selementid1'] == params[key])
+			return false;
+		}
+
+		this.links[linkid][key] = params[key];
+//SDI(key+' : '+value);
 	}
+
+	this.update_mapimg();
 },
 
 remove_links: function(){
 	this.debug('remove_links');
 
-	if((this.selects.length > 1) && !is_null(this.selects[0]) && !is_null(this.selects[1])){			
-		var selementid1 = this.selementids[this.selects[0]];
-		var selementid2 = this.selementids[this.selects[1]];
-		
-		var link_ids = this.get_linkid_by_selementids(selementid1,selementid2);
-		if(link_ids !== false){
-			if(Confirm('Delete Links between selected elements?')){			
-				for(var id in link_ids){
-					this.remove_link_by_id(id);
-				}
-				this.update_mapimg();
+	if(this.selection.count == 2){
+		var selementid1 = null;
+		var selementid2 = null;
+
+		for(var i=0; i < this.selection.position; i++){
+			if(!isset(i, this.selection.selements)) continue;
+			
+			if(is_null(selementid1)){
+				selementid1 = this.selection.selements[i];
+			}
+			else{
+				selementid2 = this.selection.selements[i];
+				break;
 			}
 		}
 	}
 	else{
-		this.info('Elements are not selected');
+		this.info('Please select two elements');
 		return false;
-	}	
+	}
+	
+	var linkids = this.get_linkid_by_selementids(selementid1,selementid2);
+
+	if(linkids !== false){
+		if(Confirm('Delete Links between selected elements?')){			
+			for(var linkid in linkids){
+				this.remove_link(linkid);
+			}
+			this.update_mapimg();
+		}
+	}
 },
 
-remove_link_by_id: function(id){
-	this.debug('remove_link_by_id');
+remove_link: function(linkid){
+	this.debug('remove_link');
 
-	if((typeof(this.linkids[id]) != 'undefined') && !is_null(this.linkids[id])){
-		var linkid = this.linkids[id];
-		
-		this.linkids[id] = null;
-		this.links[linkid] = null;
-		delete(this.links[linkid]);
-	}
+	if(!isset(linkid, this.links) || empty(this.links[linkid])) return false;
+
+	this.links[linkid] = null;
+	delete(this.links[linkid]);
 },
 
 remove_links_by_selementid: function(selementid){
 	this.debug('remove_links_by_selementid');
 
-	for(var i=0; i < this.linkids.length; i++){
-		if((typeof(this.linkids[i]) != 'undefined') && !is_null(this.linkids[i])){
-			var linkid = this.linkids[i];
-			
-			if((this.links[linkid].selementid1 == selementid) || (this.links[linkid].selementid2 == selementid)){
-				this.remove_link_by_id(i);
-			}
+	for(var linkid in this.links){
+		if(empty(this.links[linkid])) continue;
+
+		if((this.links[linkid].selementid1 == selementid) || (this.links[linkid].selementid2 == selementid)){
+			this.remove_link(linkid);
 		}
 	}
 },
@@ -587,22 +601,22 @@ add_linktrigger: function(linkid, linktrigger, update_map){
 this.debug('add_linktrigger');
 //SDJ(linktrigger);
 
-	if((typeof(this.links[linkid]) == 'undefined') || is_null(this.links[linkid])) return;
+	if(!isset(linkid,this.links) || empty(this.links[linkid])) return false;
 
-	var mid = 0;
-	if((typeof(linktrigger['linktriggerid']) == 'undefined') || (linktrigger['linktriggerid'] == 0)){
+	var linktriggerid = 0;
+	if(!isset('linktriggerid',linktrigger) || (linktrigger['linktriggerid'] == 0)){
 		do{
-			mid = parseInt(Math.random(1000000000) * 1000000000);
-			mid = mid.toString();
-		}while(typeof(this.links[linkid][mid]) != 'undefined');
+			linktriggerid = parseInt(Math.random(1000000000) * 1000000000);
+			linktriggerid = linktriggerid.toString();
+		}while(typeof(this.links[linkid].linktriggers[linktriggerid]) != 'undefined');
 
-		linktrigger['linktriggerid'] = mid;
+		linktrigger['linktriggerid'] = linktriggerid;
 	}
 	else{
-		mid = linktrigger.linktriggerid;
+		linktriggerid = linktrigger.linktriggerid;
 	}
 
-	this.links[linkid].linktriggers.unshift(linktrigger);
+	this.links[linkid].linktriggers[linktriggerid] = linktrigger;
 
 	if((typeof(update_map) != 'undefined') && (update_map == 1)){
 		this.update_mapimg();
@@ -612,22 +626,16 @@ this.debug('add_linktrigger');
 update_linktrigger_option: function(linkid, linktriggerid, params){
 this.debug('update_linktrigger_option');
 
-	if((typeof(this.linkids[linkid]) == 'undefined') || is_null(this.linkids[linkid])) return;
-	var id = this.linkids[linkid];
+	if(!isset(linkid,this.links) || empty(this.links[linkid])) return false;
+
 //SDI(key+' : '+value);
 	for(var i=0; i < params.length; i++){
 		if(typeof(params[i]) != 'undefined'){
 			var pair = params[i];
 
-			for(var num in this.links[id].linktriggers){
-				if(!empty(this.links[id].linktriggers[num])){
-					var linktrigger = this.links[id].linktriggers[num];
-					if(linktrigger.linktriggerid == linktriggerid){
-						this.links[id].linktriggers[num][pair.key] = pair.value;
-					}
-				}
+			if(isset(linktriggerid, this.links[linkid].linktriggers) && !empty(this.links[linkid].linktriggers[linktriggerid])){
+				this.links[linkid].linktriggers[linktriggerid][pair.key] = pair.value;
 			}
-
 		}
 	}
 
@@ -637,17 +645,11 @@ this.debug('update_linktrigger_option');
 remove_linktrigger: function(linkid, linktriggerid){
 this.debug('remove_linktrigger');
 
-	if((typeof(this.linkids[linkid]) == 'undefined') || is_null(this.linkids[linkid])) return;
-
+	if(!isset(linkid,this.links) || empty(this.links[linkid])) return false;
+	if(!isset(linktriggerid, this.links[linkid].linktriggers) || empty(this.links[linkid].linktriggers[linktriggerid])) return false;
 //SDI(key+' : '+value);
-	for(var num in this.links[linkid].linktriggers){
-		if(!empty(this.links[linkid].linktriggers[num])){
-			var linktrigger = this.links[linkid].linktriggers[num];
-			if(linktrigger.linktriggerid == linktriggerid){
-				delete(this.links[linkid].linktriggers[num]);
-			}
-		}
-	}
+	this.links[linkid].linktriggers[linktriggerid] = null;
+	delete(this.links[linkid].linktriggers[linktriggerid]);
 
 	this.update_mapimg();
 },
@@ -658,7 +660,7 @@ this.debug('remove_linktrigger');
 add_selement_img: function(selement){
 	this.debug('add_selement_img');
 
-	var dom_id = 'selement_'+selement.id;
+	var dom_id = 'selement_'+selement.selementid;
 
 	var selement_div = $(dom_id);
 	if(is_null(selement_div)){
@@ -702,10 +704,10 @@ update_selements_icon: function(){
 		setTimeout('ZBX_SYSMAPS['+this.id+'].map.update_selements_icon();',500);
 	}
 	else{
-		for(var i=0; i < this.selementids.length; i++){
-			if((typeof(this.selementids[i]) != 'undefined') && !is_null(this.selementids[i])){
-				this.selements[this.selementids[i]].html_obj = this.add_selement_img(this.selements[this.selementids[i]]);
-				this.selements[this.selementids[i]].image = null;
+		for(var selementid in this.selements){
+			if(!empty(this.selements[selementid])){
+				this.selements[selementid].html_obj = this.add_selement_img(this.selements[selementid]);
+				this.selements[selementid].image = null;
 			}
 		}
 	}
@@ -845,18 +847,14 @@ get_selements_params: function(params, selementid){
 	}
 	
 	if(typeof(selementid) != 'undefined'){
-		var id = this.selementids[selementid];
-		
-		if(typeof(this.selements[id]) != 'undefined'){
-			params['selements['+id+']'] = Object.toJSON(this.selements[id]);
-//			params = this.get_selement_params_by_selement(params, 0, selementid, this.selements[id]);
+		if(isset(selementid, this.selements)){
+			params['selements['+selementid+']'] = Object.toJSON(this.selements[selementid]);
 		}
-		
-		return params;
 	}
 	else{
 		params['selements'] = Object.toJSON(this.selements);
 	}
+
 return params;
 },
 
@@ -868,15 +866,14 @@ get_links_params: function(params, linkid){
 	}
 
 	if(typeof(linkid) != 'undefined'){
-		var id = this.linkids[linkid];
-		
-		if((typeof(this.links[id]) != 'undefined') && (this.links[id].status == 1)){
-			params['links['+id+']'] = Object.toJSON(this.links[id]);
+		if(isset(linkid, this.links)){
+			params['links['+linkid+']'] = Object.toJSON(this.links[linkid]);
 		}
 	}
 	else{
 		params['links'] = Object.toJSON(this.links);
 	}
+
 return params;
 },
 
@@ -889,6 +886,9 @@ deactivate_menu: function(){
 	this.debug('deactivate_menu');
 	this.menu_active = 0;
 },
+
+
+//------------------------------------------------------------------------------------------------------
 // ---------- MENU ------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------
 
@@ -899,21 +899,1589 @@ show_menu: function(e){
 	var e = e || window.event;
 	var element = eventTarget(e);
 	var element_id = element.id.split('_');
-	var id = element_id[(element_id.length - 1)];
+	var selementid = element_id[(element_id.length - 1)];
 
-	if(e.ctrlKey){
-		this.select_selement(id);
+	if(e.ctrlKey || e.shiftKey){
+		this.select_selement(selementid, true);
 	}
 	else{
-		if((this.selects.length > 1) && !is_null(this.selects[0]) && !is_null(this.selects[1]) && ((this.selects[0] == id) || (this.selects[1] == id))){	
-			this.show_link_menu(e);
-		}
-		else{
-			this.show_selement_menu(e);
-		}
+		this.select_selement(selementid);
+	}
+
+	if(this.selection.count == 0){
+		this.hideForm(e);
+	}
+	else{
+		this.showForm(e, selementid);
+	}
+},
+
+
+//  Form  ------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------
+
+showForm: function(e, selementid){
+	this.debug('showForm');
+//--
+
+	var divForm = document.getElementById('divSelementForm');
+	
+	if((typeof(divForm) == 'undefined') || empty(divForm)){
+		var divForm = document.createElement('div');
+		var doc_body = document.getElementsByTagName('body')[0];
+		doc_body.appendChild(divForm);
+		
+		divForm.setAttribute('id','divSelementForm');
+		divForm.style.zIndex = 100;
+		divForm.style.position = 'absolute';
+		divForm.style.top = '50px';
+		divForm.style.left = '500px';
+		
+		new Draggable(divForm,{});		
+	}
+
+
+	if(is_null($('selementForm'))){
+		this.createForm_selement(e);
+		$(divForm).appendChild(this.selementForm.form);
+//		$(divForm).appendChild(document.createElement('br'));
+	}
+	this.updateForm_selement(e, selementid);
+
+
+	if(is_null($('multiContainer'))){
+		this.create_multiContainer(e);
+		$(divForm).appendChild(this.multiContainer.container);
+//		$(divForm).appendChild(document.createElement('br'));
+	}
+	this.update_multiContainer(e);
+
+	$(divForm).show();
+},
+
+hideForm: function(e){
+	this.debug('hideForm');
+//--
+
+	var divForm = $('divSelementForm');
+	if(!is_null(divForm)) divForm.hide();
+	
+	for(var i=0; i<this.selection.position; i++){
+		if(!isset(i,this.selection.selements)) continue;;
+
+		this.selection.count--;
+
+		this.selements[this.selection.selements[i]].selected = null;
+		this.selements[this.selection.selements[i]].html_obj.style.border = '0px';
+
+		this.selection.selements[i] = null;
+		delete(this.selection.selements[i]);
+	}
+},
+
+
+//  Multi Container  ------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------
+
+create_multiContainer: function(e, selementid){
+	this.debug('create_multiContainer');
+//--
+
+// var initialization 
+	this.multiContainer = {};
+
+
+// Down Stream	
+
+	var e_table_1 = document.createElement('table');
+this.multiContainer.container = e_table_1;
+
+	e_table_1.setAttribute('id',"multiContainer");
+	e_table_1.setAttribute('cellSpacing',"1");
+	e_table_1.setAttribute('cellPadding',"3");
+	e_table_1.className = "tableinfo";
+},
+
+update_multiContainer: function(e){
+	this.debug('update_multiContainer');
+//--
+	var tbody = document.createElement('tbody');
+	
+	var e_tr_3 = document.createElement('tr');
+	e_tr_3.className = "header";
+	tbody.appendChild(e_tr_3);
+	
+	
+	var e_td_4 = document.createElement('td');
+	e_tr_3.appendChild(e_td_4);
+	e_td_4.appendChild(document.createTextNode('Label'));
+	
+
+	var e_td_4 = document.createElement('td');
+	e_tr_3.appendChild(e_td_4);	
+	e_td_4.appendChild(document.createTextNode('Type'));
+	
+
+	var e_td_4 = document.createElement('td');
+	e_tr_3.appendChild(e_td_4);
+	e_td_4.appendChild(document.createTextNode('Description'));
+	
+	var selement = null;
+	for(var i=0; i<this.selection.position; i++){
+		if(!isset(i, this.selection.selements)) continue;
+		if(!isset(this.selection.selements[i], this.selements)) continue;
+		
+		selement = this.selements[this.selection.selements[i]];
+
+		var e_tr_3 = document.createElement('tr');
+		e_tr_3.className = "even_row";
+		tbody.appendChild(e_tr_3);
+		
+	
+		var e_td_4 = document.createElement('td');
+		e_tr_3.appendChild(e_td_4);
+	
+	
+		var e_span_5 = document.createElement('span');
+//		e_span_5.setAttribute('href',"sysmap.php?sysmapid=100100000000002&amp;form=update&amp;selementid=100100000000004&amp;sid=791bd54e24454e2b");
+		e_span_5.className = "link";
+		e_td_4.appendChild(e_span_5);
+		
+		e_span_5.appendChild(document.createTextNode(selement.label));
+		
+		
+		var e_td_4 = document.createElement('td');
+		e_td_4.appendChild(document.createTextNode(selement.elementtype));
+		e_tr_3.appendChild(e_td_4);		
+	
+		var e_td_4 = document.createElement('td');
+		e_td_4.appendChild(document.createTextNode(selement.elementName));
+		e_tr_3.appendChild(e_td_4);	
+	}
+
+	this.multiContainer.container.update(tbody);
+},
+
+
+//  SELEMENTS FORM ----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+
+createForm_selement: function(e){
+this.debug('createForm_selement');
+
+// var initialization of diferent types of form
+	this.selementForm.typeDOM = {};
+
+// Form creation
+	var e_form_1 = document.createElement('form');
+this.selementForm.form = e_form_1;
+
+	e_form_1.setAttribute('id',"selementForm");
+	e_form_1.setAttribute('name',"selementForm");
+	e_form_1.setAttribute('accept-charset',"utf-8");
+	e_form_1.setAttribute('action',"sysmap.php");
+	e_form_1.setAttribute('method',"post");
+
+
+// HIDDEN
+	var e_input_2 = document.createElement('input');
+this.selementForm.selementid = e_input_2;
+	e_input_2.setAttribute('type',"hidden");
+	e_input_2.setAttribute('value','');
+	e_input_2.setAttribute('id',"selementid");
+	e_input_2.setAttribute('name',"selementid");
+	e_form_1.appendChild(e_input_2);
+	
+	
+	var e_input_2 = document.createElement('input');
+this.selementForm.elementid = e_input_2;
+	e_input_2.setAttribute('type',"hidden");
+	e_input_2.setAttribute('value',"");
+	e_input_2.setAttribute('id',"elementid");
+	e_input_2.setAttribute('name',"elementid");
+	e_form_1.appendChild(e_input_2);
+
+
+// TABLE
+	var e_table_2 = document.createElement('table');
+	e_table_2.setAttribute('cellSpacing',"0");
+	e_table_2.setAttribute('cellPadding',"1");
+	e_table_2.setAttribute('align',"center");
+	e_table_2.className = "formtable";
+
+	e_form_1.appendChild(e_table_2);
+
+	var e_tbody_3 = document.createElement('tbody');	
+	e_table_2.appendChild(e_tbody_3);
+
+
+	var e_tr_4 = document.createElement('tr');
+	e_tr_4.className = "header";
+	e_tbody_3.appendChild(e_tr_4);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.setAttribute('colSpan',"2");
+	e_td_5.className = "form_row_first";
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_span_6 = document.createElement('span');
+	e_span_6.setAttribute('target',"_blank");
+	e_span_6.setAttribute('style',"padding-left: 5px; float: right; text-decoration: none;");
+	e_span_6.setAttribute('onclick','window.open("http://www.zabbix.com/documentation.php");');
+	e_td_5.appendChild(e_span_6);
+
+	var e_div_7 = document.createElement('div');
+	e_div_7.className = "iconhelp";
+	e_div_7.appendChild(document.createTextNode(' '));
+	if(!IE)	e_span_6.appendChild(e_div_7);
+	
+	
+	e_td_5.appendChild(document.createTextNode('Edit map element'));
+
+
+	var e_tr_4 = document.createElement('tr');
+	e_tr_4.className = "form_even_row";
+	e_tbody_3.appendChild(e_tr_4);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_l";
+	e_td_5.appendChild(document.createTextNode('Type'));
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_r";
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_select_6 = document.createElement('select');
+this.selementForm.elementtype = e_select_6;
+
+	e_select_6.setAttribute('size',"1");
+	e_select_6.className = "biginput";
+	e_select_6.setAttribute('name',"elementtype");
+	e_select_6.setAttribute('id',"elementtype");
+	e_td_5.appendChild(e_select_6);
+
+	addListener(e_select_6, 'change', this.updateForm_selementByType.bindAsEventListener(this));
+
+
+	var e_option_7 = document.createElement('option');
+	e_option_7.setAttribute('value',"0");
+	e_option_7.appendChild(document.createTextNode('Host'));
+	e_select_6.appendChild(e_option_7);
+
+
+	var e_option_7 = document.createElement('option');
+	e_option_7.setAttribute('value',"1");
+	e_option_7.appendChild(document.createTextNode('Map'));
+	e_select_6.appendChild(e_option_7);
+
+
+	var e_option_7 = document.createElement('option');
+	e_option_7.setAttribute('value',"2");
+	e_option_7.appendChild(document.createTextNode('Trigger'));
+	e_select_6.appendChild(e_option_7);
+
+
+	var e_option_7 = document.createElement('option');
+	e_option_7.setAttribute('value',"3");
+	e_option_7.appendChild(document.createTextNode('Host group'));
+	e_select_6.appendChild(e_option_7);
+
+
+	var e_option_7 = document.createElement('option');
+	e_option_7.setAttribute('value',"4");
+	e_option_7.appendChild(document.createTextNode('Image'));
+	e_select_6.appendChild(e_option_7);
+
+
+	var e_tr_4 = document.createElement('tr');
+	e_tr_4.className = "form_even_row";
+	e_tbody_3.appendChild(e_tr_4);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_l";
+	e_td_5.appendChild(document.createTextNode('Label'));
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_r";
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_textarea_6 = document.createElement('textarea');
+this.selementForm.label = e_textarea_6;
+
+	e_textarea_6.setAttribute('cols',"32");
+	e_textarea_6.setAttribute('rows',"4");
+	e_textarea_6.setAttribute('name',"label");
+	e_textarea_6.className = "biginput";
+	e_td_5.appendChild(e_textarea_6);
+
+
+	var e_tr_4 = document.createElement('tr');
+	e_tr_4.className = "form_even_row";
+	e_tbody_3.appendChild(e_tr_4);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_l";
+	e_td_5.appendChild(document.createTextNode('Label location'));
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_r";
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_select_6 = document.createElement('select');
+this.selementForm.label_location = e_select_6;
+
+	e_select_6.setAttribute('size',"1");
+	e_select_6.className = "biginput";
+	e_select_6.setAttribute('name',"label_location");
+	e_select_6.setAttribute('id',"label_location");
+	e_td_5.appendChild(e_select_6);
+
+
+	var e_option_7 = document.createElement('option');
+	e_option_7.setAttribute('value',"-1");
+	e_option_7.appendChild(document.createTextNode('-'));	
+	e_select_6.appendChild(e_option_7);
+
+
+	var e_option_7 = document.createElement('option');
+	e_option_7.setAttribute('value',"0");
+	e_option_7.appendChild(document.createTextNode('Bottom'));
+	e_select_6.appendChild(e_option_7);
+	
+	
+	var e_option_7 = document.createElement('option');
+	e_option_7.setAttribute('value',"1");
+	e_option_7.appendChild(document.createTextNode('Left'));
+	e_select_6.appendChild(e_option_7);
+
+
+	var e_option_7 = document.createElement('option');
+	e_option_7.setAttribute('value',"2");
+	e_option_7.appendChild(document.createTextNode('Right'));
+	e_select_6.appendChild(e_option_7);
+	
+	
+	var e_option_7 = document.createElement('option');
+	e_option_7.setAttribute('value',"3");
+	e_option_7.appendChild(document.createTextNode('Top'));
+	e_select_6.appendChild(e_option_7);
+
+// Element Name
+	var e_tr_4 = document.createElement('tr');
+this.selementForm.typeDOM.elementName = e_tr_4;
+
+	e_tr_4.className = "form_even_row";
+	e_tbody_3.appendChild(e_tr_4);
+
+
+	var e_td_5 = document.createElement('td');
+this.selementForm.typeDOM.elementCaption = e_td_5;
+
+	e_td_5.className = "form_row_l";
+	e_td_5.appendChild(document.createTextNode('Host'));
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_r";
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_input_6 = document.createElement('input');
+this.selementForm.elementName = e_input_6;
+
+	e_input_6.setAttribute('readonly',"readonly");
+	e_input_6.setAttribute('value',"");
+	e_input_6.setAttribute('size',"32");
+	e_input_6.setAttribute('id',"elementName");
+	e_input_6.setAttribute('name',"elementName");
+	e_input_6.className = "biginput";
+	e_td_5.appendChild(e_input_6);
+
+	e_td_5.appendChild(document.createTextNode('  '));
+	
+	var e_span_6 = document.createElement('span');
+this.selementForm.elementTypeSelect = e_span_6;
+
+	e_span_6.className = "link";
+	e_span_6.appendChild(document.createTextNode('Select'));
+	e_td_5.appendChild(e_span_6);
+
+// ICON OFF
+	var e_tr_4 = document.createElement('tr');
+this.selementForm.typeDOM.iconid_off = e_tr_4;
+
+	e_tr_4.className = "form_even_row";
+	e_tbody_3.appendChild(e_tr_4);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_l";
+	e_td_5.appendChild(document.createTextNode('Icon (ok)'));
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_r";
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_select_6 = document.createElement('select');
+this.selementForm.iconid_off = e_select_6;
+
+	e_select_6.className = "biginput";
+	e_select_6.setAttribute('name',"iconid_off");
+	e_select_6.setAttribute('id',"iconid_off");
+	e_td_5.appendChild(e_select_6);
+
+
+	var icons = zbx_selement_form_menu['icons'];
+	for(var iconid in icons){
+		if(empty(icons[iconid])) continue;
+		
+		
+		var e_option_7 = document.createElement('option');
+		e_option_7.setAttribute('value', iconid);
+		e_option_7.appendChild(document.createTextNode(icons[iconid]));
+		
+		e_select_6.appendChild(e_option_7);
+	}
+
+// ICON ON
+	var e_tr_4 = document.createElement('tr');
+this.selementForm.typeDOM.iconid_on = e_tr_4;
+
+	e_tr_4.className = "form_even_row";
+	e_tbody_3.appendChild(e_tr_4);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_l";
+	e_td_5.appendChild(document.createTextNode('Icon (problem)'));
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_r";
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_select_6 = document.createElement('select');
+this.selementForm.iconid_on = e_select_6;
+
+	e_select_6.className = "biginput";
+	e_select_6.setAttribute('name',"iconid_on");
+	e_select_6.setAttribute('id',"iconid_on");
+	e_td_5.appendChild(e_select_6);
+
+
+	var icons = zbx_selement_form_menu['icons'];
+	for(var iconid in icons){
+		if(empty(icons[iconid])) continue;
+		
+		var e_option_7 = document.createElement('option');
+		e_option_7.setAttribute('value', iconid);
+		e_option_7.appendChild(document.createTextNode(icons[iconid]));		
+		e_select_6.appendChild(e_option_7);
+	}
+
+
+// ICON UNKNOWN
+	var e_tr_4 = document.createElement('tr');
+this.selementForm.typeDOM.iconid_unknown = e_tr_4;
+
+	e_tr_4.className = "form_even_row";
+	e_tbody_3.appendChild(e_tr_4);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_l";
+	e_td_5.appendChild(document.createTextNode('Icon (unknown)'));
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_r";
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_select_6 = document.createElement('select');
+this.selementForm.iconid_unknown = e_select_6;
+
+	e_select_6.className = "biginput";
+	e_select_6.setAttribute('name',"iconid_unknown");
+	e_select_6.setAttribute('id',"iconid_unknown");
+	e_td_5.appendChild(e_select_6);
+
+
+	var icons = zbx_selement_form_menu['icons'];
+	for(var iconid in icons){
+		if(empty(icons[iconid])) continue;
+		
+		var e_option_7 = document.createElement('option');
+		e_option_7.setAttribute('value', iconid);
+		e_option_7.appendChild(document.createTextNode(icons[iconid]));		
+		e_select_6.appendChild(e_option_7);
 	}
 	
+
+// ICON MAINTENANCE
+	var e_tr_4 = document.createElement('tr');
+this.selementForm.typeDOM.iconid_maintenance = e_tr_4;
+
+	e_tr_4.className = "form_even_row";
+	e_tbody_3.appendChild(e_tr_4);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_l";
+	e_td_5.appendChild(document.createTextNode('Icon (In maintenance)'));
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_r";
+	e_tr_4.appendChild(e_td_5);
+	
+
+	var e_select_6 = document.createElement('select');
+this.selementForm.iconid_maintenance = e_select_6;
+
+	e_select_6.className = "biginput";
+	e_select_6.setAttribute('name',"iconid_maintenance");
+	e_select_6.setAttribute('id',"iconid_maintenance");
+	e_td_5.appendChild(e_select_6);
+
+
+	var icons = zbx_selement_form_menu['icons'];
+	for(var iconid in icons){
+		if(empty(icons[iconid])) continue;
+		
+		var e_option_7 = document.createElement('option');
+		e_option_7.setAttribute('value', iconid);
+		e_option_7.appendChild(document.createTextNode(icons[iconid]));		
+		e_select_6.appendChild(e_option_7);
+	}
+	
+	
+// ICON DISABLED
+	var e_tr_4 = document.createElement('tr');
+this.selementForm.typeDOM.iconid_disabled = e_tr_4;
+
+	e_tr_4.className = "form_even_row";
+	e_tbody_3.appendChild(e_tr_4);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_l";
+	e_td_5.appendChild(document.createTextNode('Icon (disabled)'));
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_r";
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_select_6 = document.createElement('select');
+this.selementForm.iconid_disabled = e_select_6;
+
+	e_select_6.className = "biginput";
+	e_select_6.setAttribute('name',"iconid_disabled");
+	e_select_6.setAttribute('id',"iconid_disabled");
+	e_td_5.appendChild(e_select_6);
+
+
+	var icons = zbx_selement_form_menu['icons'];
+	for(var iconid in icons){
+		if(empty(icons[iconid])) continue;
+				
+		var e_option_7 = document.createElement('option');
+		e_option_7.setAttribute('value', iconid);
+		e_option_7.appendChild(document.createTextNode(icons[iconid]));
+		e_select_6.appendChild(e_option_7);
+	}
+
+
+	var e_tr_4 = document.createElement('tr');
+	e_tr_4.className = "form_even_row";
+	e_tbody_3.appendChild(e_tr_4);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_l";
+	e_td_5.appendChild(document.createTextNode('Coordinate X'));
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_r";
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_input_6 = document.createElement('input');
+this.selementForm.x = e_input_6;
+
+	e_input_6.setAttribute('onchange'," if(isNaN(parseInt(this.value,10))) this.value = 0;  else this.value = parseInt(this.value,10);");
+	e_input_6.setAttribute('style',"text-align: right;");
+	e_input_6.setAttribute('maxlength',"5");
+	e_input_6.setAttribute('value', '0');
+	e_input_6.setAttribute('size',"5");
+	e_input_6.setAttribute('id',"x");
+	e_input_6.setAttribute('name',"x");
+	e_input_6.className = "biginput";
+//	e_td_5.appendChild(e_input_6);
+
+	var e_span_6 = document.createElement('span');
+this.selementForm.x = e_span_6;
+	e_td_5.appendChild(e_span_6);
+
+
+	var e_tr_4 = document.createElement('tr');
+	e_tr_4.className = "form_even_row";
+	e_tbody_3.appendChild(e_tr_4);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_l";
+	e_td_5.appendChild(document.createTextNode('Coordinate Y'));
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_r";
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_input_6 = document.createElement('input');
+this.selementForm.y = e_input_6;
+
+	e_input_6.setAttribute('onchange'," if(isNaN(parseInt(this.value,10))) this.value = 0;  else this.value = parseInt(this.value,10);");
+	e_input_6.setAttribute('style',"text-align: right;");
+	e_input_6.setAttribute('maxlength',"5");
+	e_input_6.setAttribute('value', '0');
+	e_input_6.setAttribute('size',"5");
+	e_input_6.setAttribute('id',"y");
+	e_input_6.setAttribute('name',"y");
+	e_input_6.className = "biginput";
+//	e_td_5.appendChild(e_input_6);
+	
+	var e_span_6 = document.createElement('span');
+this.selementForm.y = e_span_6;
+	e_td_5.appendChild(e_span_6);
+	
+
+	var e_tr_4 = document.createElement('tr');
+	e_tr_4.className = "form_even_row";
+	e_tbody_3.appendChild(e_tr_4);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_l";
+	e_td_5.appendChild(document.createTextNode('URL'));
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_r";
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_input_6 = document.createElement('input');
+this.selementForm.url = e_input_6;
+	e_input_6.setAttribute('value', '');
+	e_input_6.setAttribute('size',"42");
+	e_input_6.setAttribute('id',"url");
+	e_input_6.setAttribute('name',"url");
+	e_input_6.className = "biginput";
+	e_td_5.appendChild(e_input_6);
+
+
+	var e_tr_4 = document.createElement('tr');
+	e_tr_4.className = "footer";
+	e_tbody_3.appendChild(e_tr_4);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.setAttribute('colSpan',"2");
+	e_td_5.className = "form_row_last";
+	e_td_5.appendChild(document.createTextNode(' '));
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_input_6 = document.createElement('input');
+	e_input_6.setAttribute('type',"button");
+	e_input_6.setAttribute('name',"apply");
+	e_input_6.className = "button";
+	e_input_6.setAttribute('value',"Apply");
+	
+	addListener(e_input_6, 'click', this.saveForm_selement.bindAsEventListener(this));
+	
+	e_td_5.appendChild(document.createTextNode(' '));
+	e_td_5.appendChild(e_input_6);
+
+
+	var e_input_6 = document.createElement('input');
+	e_input_6.setAttribute('type',"button");
+	e_input_6.setAttribute('name',"remove");
+	e_input_6.className = "button";
+	e_input_6.setAttribute('value',"Remove");
+	
+	addListener(e_input_6, 'click', this.deleteForm_selement.bindAsEventListener(this));
+
+	e_td_5.appendChild(document.createTextNode(' '));
+	e_td_5.appendChild(e_input_6);
+
+
+	var e_input_6 = document.createElement('input');
+	e_input_6.setAttribute('type',"button");
+	e_input_6.setAttribute('name',"close");
+	e_input_6.className = "button";
+	e_input_6.setAttribute('value',"Close");
+	
+	addListener(e_input_6, 'click', this.hideForm.bindAsEventListener(this));
+	
+	e_td_5.appendChild(e_input_6);
 },
+
+updateForm_selement: function(e, selementid){
+	this.debug('updateForm_selement');
+//--
+	
+	if(this.selection.count == 1){
+// If we already editing it than do not update it
+		if(this.selementForm.selementid.value == selementid) return false;
+		
+		this.updateForm_selementByType();
+		var selement = this.selements[selementid];
+
+// SELEMENT
+		this.selementForm.selementid.value = selementid;
+
+// Element Type
+		this.selementForm.elementtype.selectedIndex = selement.elementtype;
+
+// Label
+		$(this.selementForm.label).update(selement.label);
+	
+// Label Location
+		this.selementForm.label_location.selectedIndex = parseInt(selement.label_location,10)+1;
+
+// Element
+		this.selementForm.elementid.value = selement.elementid;
+		this.selementForm.elementName.value = selement.elementName;
+	
+// Icon OK
+		for(var i=0; i<this.selementForm.iconid_off.options.length; i++){
+			if(!isset(i, this.selementForm.iconid_off.options)) continue;
+			
+			if(this.selementForm.iconid_off.options[i].value === selement.iconid_off){
+				this.selementForm.iconid_off.options[i].selected = true;
+			}
+		}
+		
+// Icon PROBLEM
+		for(var i=0; i<this.selementForm.iconid_on.options.length; i++){
+			if(!isset(i, this.selementForm.iconid_on.options)) continue;
+			
+			if(this.selementForm.iconid_on.options[i].value === selement.iconid_on){
+				this.selementForm.iconid_on.options[i].selected = true;
+			}
+		}
+	
+// Icon UNKNOWN
+		for(var i=0; i<this.selementForm.iconid_unknown.options.length; i++){
+			if(!isset(i, this.selementForm.iconid_unknown.options)) continue;
+			
+			if(this.selementForm.iconid_unknown.options[i].value === selement.iconid_unknown){
+				this.selementForm.iconid_unknown.options[i].selected = true;
+			}
+		}
+	
+// Icon MAINTENANCE
+		for(var i=0; i<this.selementForm.iconid_maintenance.options.length; i++){
+			if(!isset(i, this.selementForm.iconid_maintenance.options)) continue;
+			
+			if(this.selementForm.iconid_maintenance.options[i].value === selement.iconid_maintenance){
+				this.selementForm.iconid_maintenance.options[i].selected = true;
+			}
+		}
+	
+// Icon DISABLED
+		for(var i=0; i<this.selementForm.iconid_disabled.options.length; i++){
+			if(!isset(i, this.selementForm.iconid_disabled.options)) continue;
+			
+			if(this.selementForm.iconid_disabled.options[i].value === selement.iconid_disabled){
+				this.selementForm.iconid_disabled.options[i].selected = true;
+			}
+		}
+
+// X & Y
+//		this.selementForm.x.value = selement.x;
+//		this.selementForm.y.value = selement.y;
+		$(this.selementForm.x).update(selement.x);
+		$(this.selementForm.y).update(selement.y);
+
+// URL
+		this.selementForm.url.value = selement.url;
+	}
+},
+
+// UPDATE FORM BY element TYPE
+updateForm_selementByType: function(){
+	this.debug('updateForm_selementByType');
+//--
+
+	var elementtype = this.selementForm.elementtype.selectedIndex;
+	
+	this.selementForm.elementName.value = '';
+	this.selementForm.elementid.value = '0';
+	
+	var srctbl = '';
+	var srcfld1 = '';
+	var srcfld2 = '';
+	var display_style = IE?'block':'table-row';
+
+	switch(elementtype){
+		case 0:
+// host
+			var srctbl = 'hosts';
+			var srcfld1 = 'hostid';
+			var srcfld2 = 'host';
+			this.selementForm.typeDOM.elementCaption.update('Host');
+			
+			this.selementForm.typeDOM.elementName.style.display = display_style;
+			this.selementForm.typeDOM.iconid_off.style.display = display_style;
+			this.selementForm.typeDOM.iconid_on.style.display = display_style;
+			this.selementForm.typeDOM.iconid_unknown.style.display = display_style;
+			this.selementForm.typeDOM.iconid_maintenance.style.display = display_style;
+			this.selementForm.typeDOM.iconid_disabled.style.display = display_style;
+		break;
+		case 1:
+// maps
+			var srctbl = 'maps';
+			var srcfld1 = 'mapid';
+			var srcfld2 = 'name';
+			this.selementForm.typeDOM.elementCaption.update('Map');
+			
+			this.selementForm.typeDOM.elementName.style.display = display_style;
+			this.selementForm.typeDOM.iconid_off.style.display = display_style;
+			this.selementForm.typeDOM.iconid_on.style.display = display_style;
+			this.selementForm.typeDOM.iconid_unknown.style.display = 'none';
+			this.selementForm.typeDOM.iconid_maintenance.style.display = 'none';
+			this.selementForm.typeDOM.iconid_disabled.style.display = 'none';
+		break;
+		case 2:
+// trigger
+			var srctbl = 'triggers';
+			var srcfld1 = 'triggerid';
+			var srcfld2 = 'description';
+			this.selementForm.typeDOM.elementCaption.update('Trigger');
+			
+			this.selementForm.typeDOM.elementName.style.display = display_style;
+			this.selementForm.typeDOM.iconid_off.style.display = display_style;
+			this.selementForm.typeDOM.iconid_on.style.display = display_style;
+			this.selementForm.typeDOM.iconid_unknown.style.display = display_style;
+			this.selementForm.typeDOM.iconid_maintenance.style.display = display_style;
+			this.selementForm.typeDOM.iconid_disabled.style.display = display_style;
+		break;
+		case 3:
+// host group
+			var srctbl = 'groups';
+			var srcfld1 = 'groupid';
+			var srcfld2 = 'name';
+			this.selementForm.typeDOM.elementCaption.update('Group');
+			
+			this.selementForm.typeDOM.elementName.style.display = display_style;
+			this.selementForm.typeDOM.iconid_off.style.display = display_style;
+			this.selementForm.typeDOM.iconid_on.style.display = display_style;
+			this.selementForm.typeDOM.iconid_unknown.style.display = display_style;
+			this.selementForm.typeDOM.iconid_maintenance.style.display = 'none';
+			this.selementForm.typeDOM.iconid_disabled.style.display = 'none';
+
+		break;
+		case 4:
+// image
+			this.selementForm.typeDOM.elementCaption.update('Image');
+			
+			this.selementForm.typeDOM.elementName.style.display = 'none';
+			this.selementForm.typeDOM.iconid_off.style.display = display_style;
+			this.selementForm.typeDOM.iconid_on.style.display = 'none';
+			this.selementForm.typeDOM.iconid_unknown.style.display = 'none';
+			this.selementForm.typeDOM.iconid_maintenance.style.display = 'none';
+			this.selementForm.typeDOM.iconid_disabled.style.display = 'none';
+
+		break;
+	}
+	
+	if(!empty(srctbl)){
+		var popup_url = 'popup.php?dstfrm=selementForm&dstfld1=elementid&dstfld2=elementName';
+		popup_url+= '&srctbl='+srctbl;
+		popup_url+= '&srcfld1='+srcfld1;
+		popup_url+= '&srcfld2='+srcfld2;
+		
+		this.selementForm.elementTypeSelect.onclick =  function(){ PopUp(popup_url,450,450);};
+	}
+
+},
+
+saveForm_selement: function(e){
+	this.debug('saveForm_selement');
+//--
+
+	var selementid = this.selementForm.selementid.value;
+	var selement = this.selements[selementid];
+
+	var params = {};
+
+// Element Type
+	params.elementtype = this.selementForm.elementtype.selectedIndex;
+	
+// Label
+	params.label = this.selementForm.label.innerHTML;
+	
+// Label Location
+	params.label_location = parseInt(this.selementForm.label_location.selectedIndex, 10) - 1;
+
+
+// Element
+	params.elementid = this.selementForm.elementid.value;
+	params.elementName = this.selementForm.elementName.value;
+	
+// Icon OK
+	params.iconid_off = this.selementForm.iconid_off.options[this.selementForm.iconid_off.selectedIndex].value;
+	
+// Icon PROBLEM
+	params.iconid_on = this.selementForm.iconid_on.options[this.selementForm.iconid_on.selectedIndex].value;
+
+// Icon UNKNOWN
+	params.iconid_unknown = this.selementForm.iconid_unknown.options[this.selementForm.iconid_unknown.selectedIndex].value;
+
+// Icon MAINTENANCE
+	params.iconid_maintenance = this.selementForm.iconid_maintenance.options[this.selementForm.iconid_maintenance.selectedIndex].value;
+
+// Icon DISABLED
+	params.iconid_disabled = this.selementForm.iconid_disabled.options[this.selementForm.iconid_disabled.selectedIndex].value;
+
+// X & Y
+//	params.x = this.selementForm.x.value;
+//	params.y = this.selementForm.y.value;
+
+// URL
+	params.url = this.selementForm.url.value;
+	
+	
+	this.update_selement_option(selementid, params);
+	this.update_multiContainer(e);
+//	this.hideForm();
+},
+
+deleteForm_selement: function(e){
+	this.debug('deleteForm_selement');
+//--
+
+	var selementid = this.selementForm.selementid.value;	
+	var selement = this.selements[selementid];
+	
+	if(Confirm('Delete element "'+selement.elementName+'"?')){
+		this.remove_selement(selementid, true);
+		this.hideForm(e);
+	}
+	else
+		return false;
+},
+
+//**************************************************************************************************************************************************
+//**************************************************************************************************************************************************
+//**************************************************************************************************************************************************
+//**************************************************************************************************************************************************
+//**************************************************************************************************************************************************
+//**************************************************************************************************************************************************
+//**************************************************************************************************************************************************
+//**************************************************************************************************************************************************
+//**************************************************************************************************************************************************
+//**************************************************************************************************************************************************
+//**************************************************************************************************************************************************
+//**************************************************************************************************************************************************
+//**************************************************************************************************************************************************
+//**************************************************************************************************************************************************
+
+
+createForm_link: function(e){
+this.debug('createForm_link');
+
+	var e_form_1 = document.createElement('form');
+	e_form_1.setAttribute('id',"web.sysmap.connector.php");
+	e_form_1.setAttribute('name',"web.sysmap.connector.php");
+	e_form_1.setAttribute('accept-charset',"utf-8");
+	e_form_1.setAttribute('action',"sysmap.php");
+	e_form_1.setAttribute('method',"post");
+
+	var e_table_2 = document.createElement('table');
+	e_table_2.setAttribute('cellSpacing',"0");
+	e_table_2.setAttribute('cellPadding',"1");
+	e_table_2.setAttribute('align',"center");
+	e_table_2.className = "formtable";
+
+	e_form_1.appendChild(e_table_2);
+
+	var e_tbody_3 = document.createElement('tbody');
+	e_table_2.appendChild(e_tbody_3);
+
+	var e_tr_4 = document.createElement('tr');
+	e_tr_4.className = "header";
+
+	e_tbody_3.appendChild(e_tr_4);
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.setAttribute('colSpan',"2");
+	e_td_5.className = "form_row_first";
+
+	e_tr_4.appendChild(e_td_5);
+
+	var e_span_6 = document.createElement('span');
+	e_span_6.setAttribute('target',"_blank");
+	e_span_6.setAttribute('style',"padding-left: 5px; float: right; text-decoration: none;");
+	e_span_6.setAttribute('onclick','window.open("http://www.zabbix.com/documentation.php");');
+	e_span_6.setAttribute('class',"http://www.zabbix.com/documentation.php");
+
+	e_td_5.appendChild(e_span_6);
+
+	var e_div_7 = document.createElement('div');
+	e_div_7.className = "iconhelp";
+
+	e_span_6.appendChild(e_div_7);
+
+	e_div_7.appendChild(document.createTextNode(' '));
+
+
+	e_td_5.appendChild(document.createTextNode('Edit connector'));
+
+
+
+	var e_input_4 = document.createElement('input');
+	e_input_4.setAttribute('type',"hidden");
+	e_input_4.setAttribute('value',"791bd54e24454e2b");
+	e_input_4.setAttribute('id',"sid");
+	e_input_4.setAttribute('name',"sid");
+
+	e_tbody_3.appendChild(e_input_4);
+
+	var e_input_4 = document.createElement('input');
+	e_input_4.setAttribute('type',"hidden");
+	e_input_4.setAttribute('value',"update");
+	e_input_4.setAttribute('id',"form");
+	e_input_4.setAttribute('name',"form");
+
+	e_tbody_3.appendChild(e_input_4);
+
+	var e_input_4 = document.createElement('input');
+	e_input_4.setAttribute('type',"hidden");
+	e_input_4.setAttribute('value',"1");
+	e_input_4.setAttribute('id',"form_refresh");
+	e_input_4.setAttribute('name',"form_refresh");
+
+	e_tbody_3.appendChild(e_input_4);
+
+	var e_input_4 = document.createElement('input');
+	e_input_4.setAttribute('type',"hidden");
+	e_input_4.setAttribute('value',"100100000000002");
+	e_input_4.setAttribute('id',"sysmapid");
+	e_input_4.setAttribute('name',"sysmapid");
+
+	e_tbody_3.appendChild(e_input_4);
+
+	var e_input_4 = document.createElement('input');
+	e_input_4.setAttribute('type',"hidden");
+	e_input_4.setAttribute('value',"100100000000018");
+	e_input_4.setAttribute('id',"linkid");
+	e_input_4.setAttribute('name',"linkid");
+
+	e_tbody_3.appendChild(e_input_4);
+
+	var e_tr_4 = document.createElement('tr');
+
+	e_tr_4.className = "form_even_row";
+
+	e_tbody_3.appendChild(e_tr_4);
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_l";
+
+	e_tr_4.appendChild(e_td_5);
+
+	e_td_5.appendChild(document.createTextNode('Element 1'));
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_r";
+
+	e_tr_4.appendChild(e_td_5);
+
+	var e_select_6 = document.createElement('select');
+	e_select_6.setAttribute('size',"1");
+	e_select_6.className = "biginput";
+	e_select_6.setAttribute('name',"selementid1");
+	e_select_6.setAttribute('id',"selementid1");
+
+	e_td_5.appendChild(e_select_6);
+
+	var e_option_7 = document.createElement('option');
+	e_option_7.setAttribute('selected',"selected");
+	e_option_7.setAttribute('value',"100100000000002");
+
+	e_select_6.appendChild(e_option_7);
+
+	e_option_7.appendChild(document.createTextNode('ZABBIX Server:ZABBIX-Server'));
+
+	var e_option_7 = document.createElement('option');
+	e_option_7.setAttribute('value',"100100000000005");
+
+	e_select_6.appendChild(e_option_7);
+
+	e_option_7.appendChild(document.createTextNode('ZABBIX-Server2:ZABBIX-Server'));
+
+	var e_option_7 = document.createElement('option');
+	e_option_7.setAttribute('value',"100100000000004");
+
+	e_select_6.appendChild(e_option_7);
+
+	e_option_7.appendChild(document.createTextNode('hpg_3000:hpg_3000'));
+
+
+
+
+	var e_tr_4 = document.createElement('tr');
+	e_tr_4.className = "form_even_row";
+	e_tbody_3.appendChild(e_tr_4);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_l";
+	e_tr_4.appendChild(e_td_5);
+	e_td_5.appendChild(document.createTextNode('Element 2'));
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_r";
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_select_6 = document.createElement('select');
+	e_select_6.setAttribute('size',"1");
+	e_select_6.className = "biginput";
+	e_select_6.setAttribute('name',"selementid2");
+	e_select_6.setAttribute('id',"selementid2");
+	e_td_5.appendChild(e_select_6);
+
+
+	var e_option_7 = document.createElement('option');
+	e_option_7.setAttribute('value',"100100000000002");
+	e_select_6.appendChild(e_option_7);
+	e_option_7.appendChild(document.createTextNode('ZABBIX Server:ZABBIX-Server'));
+
+
+	var e_option_7 = document.createElement('option');
+	e_option_7.setAttribute('value',"100100000000005");
+	e_select_6.appendChild(e_option_7);
+	e_option_7.appendChild(document.createTextNode('ZABBIX-Server2:ZABBIX-Server'));
+
+
+	var e_option_7 = document.createElement('option');
+	e_option_7.setAttribute('selected',"selected");
+	e_option_7.setAttribute('value',"100100000000004");
+
+	e_select_6.appendChild(e_option_7);
+
+	e_option_7.appendChild(document.createTextNode('hpg_3000:hpg_3000'));
+
+
+	var e_tr_4 = document.createElement('tr');
+	e_tr_4.className = "form_even_row";
+	e_tbody_3.appendChild(e_tr_4);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_l";
+	e_tr_4.appendChild(e_td_5);
+	e_td_5.appendChild(document.createTextNode('Link status indicators'));
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_r";
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_table_6 = document.createElement('table');
+	e_table_6.setAttribute('cellSpacing',"1");
+	e_table_6.setAttribute('cellPadding',"3");
+	e_table_6.setAttribute('id',"link_triggers");
+	e_table_6.className = "tableinfo";
+
+	e_td_5.appendChild(e_table_6);
+
+	var e_tbody_7 = document.createElement('tbody');e_table_6.appendChild(e_tbody_7);
+
+	var e_tr_8 = document.createElement('tr');
+	e_tr_8.className = "header";
+
+	e_tbody_7.appendChild(e_tr_8);
+
+	var e_td_9 = document.createElement('td');e_tr_8.appendChild(e_td_9);
+
+	var e_input_10 = document.createElement('input');
+	e_input_10.setAttribute('type',"checkbox");
+	e_input_10.setAttribute('onclick',"checkAll('web.sysmap.connector.php','all_triggers','triggers');");
+	e_input_10.setAttribute('id',"all_triggers");
+	e_input_10.setAttribute('name',"all_triggers");
+	e_input_10.setAttribute('value',"yes");
+	e_input_10.className = "checkbox";
+
+	e_td_9.appendChild(e_input_10);
+
+	var e_td_9 = document.createElement('td');e_tr_8.appendChild(e_td_9);
+
+	e_td_9.appendChild(document.createTextNode('Triggers'));
+
+	var e_td_9 = document.createElement('td');e_tr_8.appendChild(e_td_9);
+
+	e_td_9.appendChild(document.createTextNode('Type'));
+
+	var e_td_9 = document.createElement('td');e_tr_8.appendChild(e_td_9);
+
+	e_td_9.appendChild(document.createTextNode('Colour'));
+
+
+
+	var e_tr_8 = document.createElement('tr');
+
+	e_tr_8.className = "even_row";
+
+	e_tbody_7.appendChild(e_tr_8);
+
+	var e_td_9 = document.createElement('td');e_tr_8.appendChild(e_td_9);
+
+	var e_input_10 = document.createElement('input');
+	e_input_10.setAttribute('type',"checkbox");
+	e_input_10.setAttribute('id',"triggers[100100000013490][triggerid]");
+	e_input_10.setAttribute('name',"triggers[100100000013490][triggerid]");
+	e_input_10.setAttribute('value',"100100000013490");
+	e_input_10.className = "checkbox";
+
+	e_td_9.appendChild(e_input_10);
+
+	var e_input_10 = document.createElement('input');
+	e_input_10.setAttribute('type',"hidden");
+	e_input_10.setAttribute('value',"100100000013490");
+	e_input_10.setAttribute('id',"triggers[100100000013490][triggerid]");
+	e_input_10.setAttribute('name',"triggers[100100000013490][triggerid]");
+
+	e_td_9.appendChild(e_input_10);
+
+
+	var e_td_9 = document.createElement('td');e_tr_8.appendChild(e_td_9);
+
+	var e_span_10 = document.createElement('span');
+	e_span_10.setAttribute('onclick',"javascript: openWinCentered('popup_link_tr.php?form=1&amp;dstfrm=web.sysmap.connector.php&triggerid=100100000013490&drawtype=0&color=000077','ZBX_Link_Indicator',560,260,'scrollbars=1, toolbar=0, menubar=0, resizable=0');");
+	e_span_10.className = "link";
+
+	e_td_9.appendChild(e_span_10);
+
+	e_span_10.appendChild(document.createTextNode('gzip compression is off for connector http-8080 on Conflict'));
+
+	var e_input_10 = document.createElement('input');
+	e_input_10.setAttribute('type',"hidden");
+	e_input_10.setAttribute('value',"gzip compression is off for connector http-8080 on Conflict");
+	e_input_10.setAttribute('id',"triggers[100100000013490][description]");
+	e_input_10.setAttribute('name',"triggers[100100000013490][description]");
+
+	e_td_9.appendChild(e_input_10);
+
+
+	var e_td_9 = document.createElement('td');e_tr_8.appendChild(e_td_9);
+
+	e_td_9.appendChild(document.createTextNode('Line'));
+	var e_input_10 = document.createElement('input');
+	e_input_10.setAttribute('type',"hidden");
+	e_input_10.setAttribute('value',"0");
+	e_input_10.setAttribute('id',"triggers[100100000013490][drawtype]");
+	e_input_10.setAttribute('name',"triggers[100100000013490][drawtype]");
+
+	e_td_9.appendChild(e_input_10);
+
+
+	var e_td_9 = document.createElement('td');e_tr_8.appendChild(e_td_9);
+
+	var e_span_10 = document.createElement('span');
+	e_span_10.setAttribute('style',"text-decoration: none; outline-color: black; outline-style: solid; outline-width: 1px; background-color: rgb(0, 0, 119);");
+
+	e_td_9.appendChild(e_span_10);
+
+	e_span_10.appendChild(document.createTextNode('   '));
+
+	var e_input_10 = document.createElement('input');
+	e_input_10.setAttribute('type',"hidden");
+	e_input_10.setAttribute('value',"000077");
+	e_input_10.setAttribute('id',"triggers[100100000013490][color]");
+	e_input_10.setAttribute('name',"triggers[100100000013490][color]");
+
+	e_td_9.appendChild(e_input_10);
+
+
+
+	var e_tr_8 = document.createElement('tr');
+
+	e_tr_8.className = "even_row";
+
+	e_tbody_7.appendChild(e_tr_8);
+
+	var e_td_9 = document.createElement('td');e_tr_8.appendChild(e_td_9);
+
+	var e_input_10 = document.createElement('input');
+	e_input_10.setAttribute('type',"checkbox");
+	e_input_10.setAttribute('id',"triggers[100100000013492][triggerid]");
+	e_input_10.setAttribute('name',"triggers[100100000013492][triggerid]");
+	e_input_10.setAttribute('value',"100100000013492");
+	e_input_10.className = "checkbox";
+
+	e_td_9.appendChild(e_input_10);
+
+	var e_input_10 = document.createElement('input');
+	e_input_10.setAttribute('type',"hidden");
+	e_input_10.setAttribute('value',"100100000013492");
+	e_input_10.setAttribute('id',"triggers[100100000013492][triggerid]");
+	e_input_10.setAttribute('name',"triggers[100100000013492][triggerid]");
+
+	e_td_9.appendChild(e_input_10);
+
+
+	var e_td_9 = document.createElement('td');e_tr_8.appendChild(e_td_9);
+
+	var e_span_10 = document.createElement('span');
+	e_span_10.setAttribute('onclick',"javascript: openWinCentered('popup_link_tr.php?form=1&amp;dstfrm=web.sysmap.connector.php&amp;triggerid=100100000013492&amp;drawtype=0&amp;color=007700','ZBX_Link_Indicator',560,260,'scrollbars=1, toolbar=0, menubar=0, resizable=0');");
+	e_span_10.className = "link";
+
+	e_td_9.appendChild(e_span_10);
+
+	e_span_10.appendChild(document.createTextNode('70% http-8080 worker threads busy on Conflict'));
+
+	var e_input_10 = document.createElement('input');
+	e_input_10.setAttribute('type',"hidden");
+	e_input_10.setAttribute('value',"70% http-8080 worker threads busy on Conflict");
+	e_input_10.setAttribute('id',"triggers[100100000013492][description]");
+	e_input_10.setAttribute('name',"triggers[100100000013492][description]");
+
+	e_td_9.appendChild(e_input_10);
+
+
+	var e_td_9 = document.createElement('td');e_tr_8.appendChild(e_td_9);
+
+	e_td_9.appendChild(document.createTextNode('Line'));
+	var e_input_10 = document.createElement('input');
+	e_input_10.setAttribute('type',"hidden");
+	e_input_10.setAttribute('value',"0");
+	e_input_10.setAttribute('id',"triggers[100100000013492][drawtype]");
+	e_input_10.setAttribute('name',"triggers[100100000013492][drawtype]");
+
+	e_td_9.appendChild(e_input_10);
+
+
+	var e_td_9 = document.createElement('td');e_tr_8.appendChild(e_td_9);
+
+	var e_span_10 = document.createElement('span');
+	e_span_10.setAttribute('style',"text-decoration: none; outline-color: black; outline-style: solid; outline-width: 1px; background-color: rgb(0, 119, 0);");
+
+	e_td_9.appendChild(e_span_10);
+
+	e_span_10.appendChild(document.createTextNode('   '));
+
+	var e_input_10 = document.createElement('input');
+	e_input_10.setAttribute('type',"hidden");
+	e_input_10.setAttribute('value',"007700");
+	e_input_10.setAttribute('id',"triggers[100100000013492][color]");
+	e_input_10.setAttribute('name',"triggers[100100000013492][color]");
+
+	e_td_9.appendChild(e_input_10);
+
+
+	var e_br_6 = document.createElement('br');
+
+	e_td_5.appendChild(e_br_6);
+
+	var e_input_6 = document.createElement('input');
+	e_input_6.setAttribute('type',"button");
+	e_input_6.setAttribute('accesskey',"T");
+	e_input_6.setAttribute('title',"Add [Alt+T]");
+	e_input_6.setAttribute('onclick',"javascript: openWinCentered('popup_link_tr.php?form=1&amp;dstfrm=web.sysmap.connector.php','ZBX_Link_Indicator',560,260,'scrollbars=1, toolbar=0, menubar=0, resizable=0');");
+	e_input_6.setAttribute('name',"btn1");
+	e_input_6.className = "button";
+	e_input_6.setAttribute('value',"Add");
+
+	e_td_5.appendChild(e_input_6);
+
+	var e_input_6 = document.createElement('input');
+	e_input_6.setAttribute('type',"submit");
+	e_input_6.setAttribute('accesskey',"T");
+	e_input_6.setAttribute('title',"Remove [Alt+T]");
+	e_input_6.setAttribute('onclick',"javascript: remove_childs_6('web.sysmap.connector.php','triggers','tr');");
+	e_input_6.setAttribute('name',"btn1");
+	e_input_6.className = "button";
+	e_input_6.setAttribute('value',"Remove");
+	e_td_5.appendChild(e_input_6);
+
+
+	var e_tr_4 = document.createElement('tr');
+	e_tr_4.className = "form_even_row";
+	e_tbody_3.appendChild(e_tr_4);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_l";
+	e_tr_4.appendChild(e_td_5);
+	e_td_5.appendChild(document.createTextNode('Type (OK)'));
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_r";
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_select_6 = document.createElement('select');
+	e_select_6.setAttribute('size',"1");
+	e_select_6.className = "biginput";
+	e_select_6.setAttribute('name',"drawtype");
+	e_select_6.setAttribute('id',"drawtype");
+	e_td_5.appendChild(e_select_6);
+
+
+	var e_option_7 = document.createElement('option');
+	e_option_7.setAttribute('value',"0");
+	e_option_7.appendChild(document.createTextNode('Line'));
+	e_select_6.appendChild(e_option_7);
+
+
+	var e_option_7 = document.createElement('option');
+	e_option_7.setAttribute('value',"2");
+	e_option_7.appendChild(document.createTextNode('Bold line'));
+	e_select_6.appendChild(e_option_7);
+
+
+	var e_option_7 = document.createElement('option');
+	e_option_7.setAttribute('value',"3");
+	e_option_7.appendChild(document.createTextNode('Dot'));
+	e_select_6.appendChild(e_option_7);
+
+
+	var e_option_7 = document.createElement('option');
+	e_option_7.setAttribute('value',"4");
+	e_option_7.appendChild(document.createTextNode('Dashed line'));
+	e_select_6.appendChild(e_option_7);
+
+
+	var e_tr_4 = document.createElement('tr');
+	e_tr_4.className = "form_even_row";
+	e_tbody_3.appendChild(e_tr_4);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_l";
+	e_td_5.appendChild(document.createTextNode('Colour (OK)'));
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_r";
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_input_6 = document.createElement('input');
+	e_input_6.setAttribute('style',"margin-top: 0px; margin-bottom: 0px;");
+	e_input_6.setAttribute('onchange',"set_color_by_name('color',this.value)");
+	e_input_6.setAttribute('maxlength',"6");
+	e_input_6.setAttribute('value',"000055");
+	e_input_6.setAttribute('size',"7");
+	e_input_6.setAttribute('id',"color");
+	e_input_6.setAttribute('name',"color");
+	e_input_6.className = "biginput";
+	e_td_5.appendChild(e_input_6);
+
+
+	var e_div_6 = document.createElement('div');
+	e_div_6.setAttribute('onclick',"javascript: show_color_picker('color')");
+	e_div_6.setAttribute('style',"border: 1px solid black; display: inline; width: 10px; height: 10px; text-decoration: none; background-color: rgb(0, 0, 85);");
+	e_div_6.setAttribute('title',"#000055");
+	e_div_6.setAttribute('id',"lbl_color");
+	e_div_6.setAttribute('name',"lbl_color");
+	e_div_6.className = "pointer";
+	e_div_6.appendChild(document.createTextNode('   '));
+	e_td_5.appendChild(e_div_6);
+
+
+	var e_tr_4 = document.createElement('tr');
+	e_tr_4.className = "footer";
+	e_tbody_3.appendChild(e_tr_4);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.setAttribute('colSpan',"2");
+	e_td_5.className = "form_row_last";
+	e_td_5.appendChild(document.createTextNode(' '));
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_input_6 = document.createElement('input');
+	e_input_6.setAttribute('type',"submit");
+	e_input_6.setAttribute('name',"save_link_6");
+	e_input_6.className = "button";
+	e_input_6.setAttribute('value',"Save");
+	e_td_5.appendChild(document.createTextNode(' '));
+	e_td_5.appendChild(e_input_6);
+
+
+	var e_input_6 = document.createElement('input');
+	e_input_6.setAttribute('type',"submit");
+	e_input_6.setAttribute('onclick',"if(Confirm('Delete link?')) return redirect('sysmap.php?delete=1&amp;linkid=100100000000018&amp;sysmapid=100100000000002&amp;sid=791bd54e24454e2b'); else return false;");
+	e_input_6.setAttribute('name',"delete");
+	e_input_6.className = "button";
+	e_input_6.setAttribute('value',"Delete");
+	e_td_5.appendChild(document.createTextNode(' '));
+	e_td_5.appendChild(e_input_6);
+
+
+	var e_input_6 = document.createElement('input');
+	e_input_6.setAttribute('type',"button");
+	e_input_6.setAttribute('name',"cancel");
+	e_input_6.className = "button";
+	e_input_6.setAttribute('value',"Cancel");
+
+	e_td_5.appendChild(e_input_6);
+},
+
+updateForm_link: function(e){
+},
+
+
+
+
+//**************************************************************************************************************
+//**************************************************************************************************************
+//**************************************************************************************************************
+//**************************************************************************************************************
+//**************************************************************************************************************
+//**************************************************************************************************************
 
 show_selement_menu: function(e){
 	this.debug('show_selement_menu');

@@ -196,7 +196,7 @@
 	define('TIMEPERIOD_TYPE_YEARLY',	5);
 
 	define('MAP_LABEL_TYPE_LABEL',		0);
-	define('MAP_LABEL_TYPE_IP',		1);
+	define('MAP_LABEL_TYPE_IP',			1);
 	define('MAP_LABEL_TYPE_NAME',		2);
 	define('MAP_LABEL_TYPE_STATUS',		3);
 	define('MAP_LABEL_TYPE_NOTHING',	4);
@@ -204,14 +204,13 @@
 	define('MAP_LABEL_LOC_BOTTOM',		0);
 	define('MAP_LABEL_LOC_LEFT',		1);
 	define('MAP_LABEL_LOC_RIGHT',		2);
-	define('MAP_LABEL_LOC_TOP',		3);
+	define('MAP_LABEL_LOC_TOP',			3);
 
 	define('SYSMAP_ELEMENT_TYPE_HOST',		0);
 	define('SYSMAP_ELEMENT_TYPE_MAP',		1);
 	define('SYSMAP_ELEMENT_TYPE_TRIGGER',	2);
 	define('SYSMAP_ELEMENT_TYPE_HOST_GROUP',3);
 	define('SYSMAP_ELEMENT_TYPE_IMAGE',		4);
-	define('SYSMAP_ELEMENT_TYPE_UNDEFINED',	5);
 
 	define('SYSMAP_ELEMENT_ICON_ON',		0);
 	define('SYSMAP_ELEMENT_ICON_OFF',		1);
@@ -223,7 +222,7 @@
 	define('ITEM_TYPE_TRAPPER',		2);
 	define('ITEM_TYPE_SIMPLE',		3);
 	define('ITEM_TYPE_SNMPV2C',		4);
-	define('ITEM_TYPE_INTERNAL',		5);
+	define('ITEM_TYPE_INTERNAL',	5);
 	define('ITEM_TYPE_SNMPV3',		6);
 	define('ITEM_TYPE_ZABBIX_ACTIVE',	7);
 	define('ITEM_TYPE_AGGREGATE',		8);

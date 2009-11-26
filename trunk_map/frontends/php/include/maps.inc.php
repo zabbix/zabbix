@@ -1013,8 +1013,7 @@
 		$el_form_menu['elementtype'][] = array('key'=> SYSMAP_ELEMENT_TYPE_TRIGGER,		'value'=> S_TRIGGER);
 		$el_form_menu['elementtype'][] = array('key'=> SYSMAP_ELEMENT_TYPE_HOST_GROUP,	'value'=> S_HOST_GROUP);
 		$el_form_menu['elementtype'][] = array('key'=> SYSMAP_ELEMENT_TYPE_IMAGE,		'value'=> S_IMAGE);
-		$el_form_menu['elementtype'][] = array('key'=> SYSMAP_ELEMENT_TYPE_UNDEFINED,	'value'=> S_UNDEFINED);
-		
+
 
 // ELEMENTID by TYPE
 		$el_form_menu['elementid'] = array();
@@ -1062,20 +1061,12 @@
 		$el_form_menu['label_location'][] = array('key'=> 2, 'value'=> S_RIGHT);
 		$el_form_menu['label_location'][] = array('key'=> 3, 'value'=> S_TOP);
 // ICONS 
-		$el_form_menu['iconid_off'] = array();
-		$el_form_menu['iconid_on'] = array();
-		$el_form_menu['iconid_unknown'] = array();
-		$el_form_menu['iconid_maintenance'] = array();
-		$el_form_menu['iconid_disabled'] = array();
+		$el_form_menu['icons'] = array();
 		
 		$result = DBselect('SELECT * FROM images WHERE imagetype=1 AND '.DBin_node('imageid').' ORDER BY name');
 		while($row=DBfetch($result)){
 			$row['name'] = get_node_name_by_elid($row['imageid']).$row['name'];
-			$el_form_menu['iconid_off'][] = array('key'=>$row['imageid'], 'value'=>$row['name']);
-			$el_form_menu['iconid_on'][] = array('key'=>$row['imageid'], 'value'=>$row['name']);
-			$el_form_menu['iconid_unknown'][] = array('key'=>$row['imageid'], 'value'=>$row['name']);
-			$el_form_menu['iconid_maintenance'][] = array('key'=>$row['imageid'], 'value'=>$row['name']);
-			$el_form_menu['iconid_disabled'][] = array('key'=>$row['imageid'], 'value'=>$row['name']);
+			$el_form_menu['icons'][$row['imageid']] = $row['name'];
 		}
 		
 // URL
@@ -1413,6 +1404,66 @@
 				get_map_elements($db_mapelement, $elements);
 			}
 			break;
+		}
+	}
+	
+	function add_elementNames(&$selements){
+		$hostids = array();
+		$triggerids = array();
+		$mapids = array();
+		$hostgroupids = array();
+
+		foreach($selements as $snum => $selement){
+			switch($selement['elementtype']){
+				case SYSMAP_ELEMENT_TYPE_HOST:
+					$hostids[] = $selement['elementid'];
+					break;
+				case SYSMAP_ELEMENT_TYPE_MAP:
+					$mapids[] = $selement['elementid'];
+					break;
+				case SYSMAP_ELEMENT_TYPE_TRIGGER:
+					$triggerids[] = $selement['elementid'];
+					break;
+				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+					$hostgroupids[] = $selement['elementid'];
+					break;
+				case SYSMAP_ELEMENT_TYPE_IAGE:
+				default:
+					break;
+			}
+		}
+		
+		
+		$hosts = CHost::get(array('hostids'=>$hostids, 'extendoutput'=>1, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
+		$hosts = zbx_toHash($hosts, 'hostid');
+		
+		$maps = CMap::get(array('mapids'=>$mapids, 'extendoutput'=>1, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
+		$maps = zbx_toHash($maps, 'mapid');
+		
+		$triggers = CTrigger::get(array('triggerids'=>$triggerids, 'extendoutput'=>1, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
+		$triggers = zbx_toHash($triggers, 'triggerid');
+		
+		$hostgroups = CHostGroup::get(array('hostgroupids'=>$hostgroupids, 'extendoutput'=>1, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
+		$hostgroups = zbx_toHash($hostgroups, 'groupid');
+		
+		foreach($selements as $snum => $selement){
+			switch($selement['elementtype']){
+				case SYSMAP_ELEMENT_TYPE_HOST:
+					$selements[$snum]['elementName'] = $hosts[$selement['elementid']]['host'];
+					break;
+				case SYSMAP_ELEMENT_TYPE_MAP:
+					$selements[$snum]['elementName'] = $maps[$selement['elementid']]['name'];
+					break;
+				case SYSMAP_ELEMENT_TYPE_TRIGGER:
+					$selements[$snum]['elementName'] = expand_trigger_description_by_data($triggers[$selement['elementid']]);
+					break;
+				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+					$selements[$snum]['elementName'] = $groups[$selement['elementid']]['name'];
+					break;
+				case SYSMAP_ELEMENT_TYPE_IAGE:
+				default:
+					$selements[$snum]['elementName'] = 'image';
+			}
 		}
 	}
 ?>

@@ -98,13 +98,13 @@ include_once('include/page_header.php');
 					$options = array('sysmapids'=> $sysmapid, 'extendoutput'=>1, 'select_selements'=>1, 'select_links'=>1);
 					$sysmaps = CMap::get($options);
 					$db_map = reset($sysmaps);
+//SDII($db_map);
+					add_elementNames($db_map['selements']);
 
 					$action .= 'ZBX_SYSMAPS['.$cmapid.'].map.mselement["label_location"]='.$db_map['label_location'].'; '."\n";
 
 					foreach($db_map['selements'] as $snum => $selement){
-						foreach($selement as $key => $value){
-							if(is_int($key)) unset($selement[$key]);
-						}
+
 //						$element['image'] = get_base64_icon($element);
 						$selement['image'] = get_selement_iconid($selement);
 						$action .= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement).'); '."\n";
@@ -115,7 +115,7 @@ include_once('include/page_header.php');
 							if(is_int($key)) unset($link[$key]);
 						}
 
-						$description = S_SELECT;
+						$link['linktriggers'] = zbx_toHash($link['linktriggers'], 'linktriggerid');
 						foreach($link['linktriggers'] as $lnum => $linktrigger){
 							$hosts = get_hosts_by_triggerid($linktrigger['triggerid']);
 							if($host = DBfetch($hosts)){
@@ -148,7 +148,7 @@ include_once('include/page_header.php');
 										
 					foreach($selements as $id => $selement){
 						if($selement['elementid'] == 0){
-							$selement['elementtype'] = SYSMAP_ELEMENT_TYPE_UNDEFINED;
+							$selement['elementtype'] = SYSMAP_ELEMENT_TYPE_IMAGE;
 						}
 						
 						if(uint_in_array($selement['selementid'], $db_selementids)){
