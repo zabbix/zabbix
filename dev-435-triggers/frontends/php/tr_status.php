@@ -298,16 +298,16 @@ include_once('include/page_header.php');
 	$table = new CTableInfo();	
 	$table->setHeader(array(
 		$show_event_col ? new CLink(new CImg('images/general/opened.gif'), null, null, 'showHideRows(this);') : NULL,
-		$show_event_col ? new CCheckBox('all_events', false, "checkAll('".$m_form->GetName()."','all_events','events');") : NULL,
-		make_sorting_header(S_SEVERITY,'priority'),
+		new CCheckBox('all_events', false, "checkAll('".$m_form->GetName()."','all_events','events');"), // aaaaaaaaaaa
+		make_sorting_header(S_SEVERITY, 'priority'),
 		S_STATUS,
-		make_sorting_header(S_LAST_CHANGE,'lastchange'),
+		make_sorting_header(S_LAST_CHANGE, 'lastchange'),
 		S_AGE,
 		$show_event_col ? S_DURATION : NULL,
+		S_ACKNOWLEDGED,
 		is_show_all_nodes() ? S_NODE : null,
 		S_HOST,
 		make_sorting_header(S_NAME, 'description'),
-		S_ACKNOWLEDGED,
 		S_COMMENTS
 	));
 
@@ -353,6 +353,26 @@ include_once('include/page_header.php');
 	order_result($triggers, $sortfield, $sortorder);
 //---------
 
+	$ev_options = array(
+		'nodeids' => get_current_nodeid(),
+		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
+		'object' => EVENT_OBJECT_TRIGGER,
+		'nopermissions' => 1,
+		'extendoutput' => 1,
+		'acknowledged' => 0,
+		'value' => TRIGGER_VALUE_TRUE,
+		// 'time_from' => time() - ($config['event_expire']*86400),
+		// 'time_till' => time(),
+	);
+	$events = CEvent::get($ev_options);
+	foreach($triggers as $tnum => $trigger){
+		$triggers[$tnum]['event_count'] = 0;
+		$triggers[$tnum]['events'] = array();
+	}
+	foreach($events as $enum => $event){
+		$triggers[$event['objectid']]['event_count']++;
+	}
+
 	if($show_events != EVENTS_OPTION_NOEVENT){
 		$ev_options = array(
 			'nodeids' => get_current_nodeid(),
@@ -360,10 +380,9 @@ include_once('include/page_header.php');
 			'object' => EVENT_OBJECT_TRIGGER,
 			'nopermissions' => 1,
 			'extendoutput' => 1,
-			'select_hosts' => 1,
 			'sortfield' => 'clock',
 			'sortorder' => ZBX_SORT_DOWN,
-			'limit' => $config['event_show_max']
+			//'limit' => $config['event_show_max']
 		);
 		switch($show_events){
 			case EVENTS_OPTION_ALL:
@@ -382,20 +401,18 @@ include_once('include/page_header.php');
 				$ev_options['time_till'] = time();
 			break;
 		}
-		$events = CEvent::get($ev_options);
-		
+	}	
+	$events = CEvent::get($ev_options);
 	foreach($events as $enum => $event){
-			if(!isset($triggers[$event['objectid']]['events'])) $triggers[$event['objectid']]['events'] = array();
-			$triggers[$event['objectid']]['events'][$event['eventid']] = $event;
-		}
+		$triggers[$event['objectid']]['events'][$event['eventid']] = $event;
 	}
+	
 
-	$row_class = 'even_row';
 	
 	foreach($triggers as $tnum => $trigger){		
-		$row_class = ($row_class == 'odd_row') ? 'even_row' : 'odd_row';
 		
-		if(!isset($trigger['events'])) $trigger['events'] = array();
+		
+		//$trigger['events'] = array_slice($trigger['events'], 1, 30);
 		
 		$trigger['desc'] = $description = expand_trigger_description($trigger['triggerid']);
 
@@ -548,15 +565,16 @@ include_once('include/page_header.php');
 			'events.php?triggerid='.$trigger['triggerid'].'&nav_time='.$trigger['lastchange']
 		);
 
-		$unack_count = 0;
-		foreach($trigger['events'] as $event){
-			if(!$event['acknowledged'] && ($event['value'] == TRIGGER_VALUE_TRUE)) $unack_count++;
-		}
-		if($unack_count){
-			$to_ack = new CCol(array($unack_count.SPACE, new CLink(S_TO_ACKNOWLEDGE, 'acknow.php?triggerid='.$trigger['triggerid'], 'on')), 'on center');
+		// $unack_count = 0;
+
+		// foreach($trigger['events'] as $event){
+			// if(!$event['acknowledged'] && ($event['value'] == TRIGGER_VALUE_TRUE)) $unack_count++;
+		// }
+		if($trigger['event_count']){
+			$to_ack = new CCol(array($trigger['event_count'].SPACE, new CLink(S_TO_ACKNOWLEDGE, 'acknow.php?triggerid='.$trigger['triggerid'], 'on')), 'on center');
 		}
 		else{
-			$to_ack = new CCol($unack_count.SPACE.S_TO_ACKNOWLEDGE, 'off center');
+			$to_ack = new CCol($trigger['event_count'].SPACE.S_TO_ACKNOWLEDGE, 'off center');
 		}
 		
 		
@@ -573,69 +591,73 @@ include_once('include/page_header.php');
 
 		$table->addRow(array(
 			$open_close,
-			$show_event_col ? SPACE : NULL,
+			new CCheckBox('triggers['.$trigger['triggerid'].']', 'no', NULL, $trigger['triggerid']), // aaaaaaaaa
 			new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'], $trigger['value'])),
 			$status,
 			$lastchange,
 			zbx_date2age($trigger['lastchange']),
 			$show_event_col ? SPACE : NULL,
+			$to_ack,
 			get_node_name_by_elid($trigger['triggerid']),
 			$host,
 			$tr_desc,
-			$to_ack,
 			new CLink(zbx_empty($trigger['comments']) ? S_ADD : S_SHOW, 'tr_comments.php?triggerid='.$trigger['triggerid'])
-		), $row_class);
+		), 'even_row');
 
 
-		foreach($trigger['events'] as $enum => $row_event){
-			$status = new CSpan(trigger_value2str($row_event['value']), get_trigger_value_style($row_event['value']));
+		if($show_events != EVENTS_OPTION_NOEVENT){
+			$i = 0;
+			foreach($trigger['events'] as $enum => $row_event){
+				$i++;
+				
+				$status = new CSpan(trigger_value2str($row_event['value']), get_trigger_value_style($row_event['value']));
 
-			if($config['event_ack_enable']){
-				if($row_event['value'] == TRIGGER_VALUE_TRUE){
-					if($row_event['acknowledged'] == 1){
-						$acks_cnt = DBfetch(DBselect('SELECT COUNT(*) as cnt FROM acknowledges WHERE eventid='.$row_event['eventid']));
-						$ack = array(new CSpan(S_YES, 'off'),SPACE.'('.$acks_cnt['cnt'].SPACE,
-							new CLink(S_SHOW,'acknow.php?eventid='.$row_event['eventid']),')');
+				if($config['event_ack_enable']){
+					if($row_event['value'] == TRIGGER_VALUE_TRUE){
+						if($row_event['acknowledged'] == 1){
+							$acks_cnt = DBfetch(DBselect('SELECT COUNT(*) as cnt FROM acknowledges WHERE eventid='.$row_event['eventid']));
+							$ack = array(new CSpan(S_YES, 'off'),SPACE.'('.$acks_cnt['cnt'].SPACE,
+								new CLink(S_SHOW,'acknow.php?eventid='.$row_event['eventid']),')');
+						}
+						else{
+							$ack = new CLink(S_NOT_ACKNOWLEDGED, 'acknow.php?eventid='.$row_event['eventid'], 'on');
+						}
 					}
 					else{
-						$ack = new CLink(S_NOT_ACKNOWLEDGED, 'acknow.php?eventid='.$row_event['eventid'], 'on');
+						$ack = null;
 					}
 				}
-				else{
-					$ack = null;
+				
+				if(($row_event['acknowledged'] == 0) && ($row_event['value'] == TRIGGER_VALUE_TRUE)){
+					$ack_cb = new CCheckBox('events['.$row_event['eventid'].']', 'no', NULL, $row_event['eventid']);
 				}
+				else{
+					$ack_cb = SPACE;
+				}
+				
+				$clock = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS, $row_event['clock']),
+					'tr_events.php?triggerid='.$trigger['triggerid'].'&eventid='.$row_event['eventid']);
+				$next_clock = isset($trigger['events'][$enum+1]) ? $trigger['events'][$enum+1]['clock'] : time();
+				
+				$empty_col = new CCol();
+				$empty_col->setColSpan(3);
+				$row = new CRow(array(
+					SPACE,
+					$ack_cb,
+					SPACE, // severity
+					$status,
+					$clock,
+					zbx_date2age($row_event['clock']),
+					zbx_date2age($row_event['clock'], $next_clock),
+					($config['event_ack_enable']) ? (new CCol($ack, 'center')) : NULL,
+					is_show_all_nodes() ? SPACE : null, // node
+					$empty_col
+				), 'odd_row');
+				$row->setAttribute('data-parentid', $trigger['triggerid']);
+				$table->addRow($row);
+				
+				if($i > $config['event_show_max']) break;
 			}
-			
-			if(!$config['event_ack_enable']){
-				$ack_cb = NULL;
-			}
-			else if(($row_event['acknowledged'] == 0) && ($row_event['value'] == TRIGGER_VALUE_TRUE)){
-				$ack_cb = new CCheckBox('events['.$row_event['eventid'].']', 'no', NULL, $row_event['eventid']);
-			}
-			else{
-				$ack_cb = SPACE;
-			}
-			
-			$clock = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS, $row_event['clock']),
-				'tr_events.php?triggerid='.$trigger['triggerid'].'&eventid='.$row_event['eventid']);
-			$next_clock = isset($trigger['events'][$enum+1]) ? $trigger['events'][$enum+1]['clock'] : time();
-			
-			$row = new CRow(array(
-				SPACE,
-				$ack_cb,
-				SPACE, // severity
-				$status,
-				$clock,
-				zbx_date2age($row_event['clock']),
-				zbx_date2age($row_event['clock'], $next_clock),
-				is_show_all_nodes() ? SPACE : null, // node
-				SPACE, // host
-				SPACE, //trigger
-				($config['event_ack_enable']) ? (new CCol($ack, 'center')) : NULL,
-				SPACE //comment
-			), $row_class);
-			$row->setAttribute('data-parentid', $trigger['triggerid']);
-			$table->addRow($row);
 		}
 	}
 
