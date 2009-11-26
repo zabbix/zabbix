@@ -27,6 +27,15 @@
 	'S_DATE_FORMAT_YMD'=>			'd M Y',
 	'S_HTML_CHARSET'=>			'UTF-8',
 
+	'S_YEAR_SHORT' =>			'y',
+	'S_MONTH_SHORT' =>			'm',
+	'S_WEEK_SHORT' =>			'w',
+	'S_DAY_SHORT' =>			'd',
+	'S_HOUR_SHORT' =>			'h',
+	'S_MINUTE_SHORT' =>			'm',
+	'S_SECOND_SHORT' =>			's',
+	'S_MILLISECOND_SHORT' =>		'ms',
+
 	'S_ACTIVATE_SELECTED'=>			'Activate selected',
 	'S_DISABLE_SELECTED'=>			'Disable selected',
 	'S_DELETE_SELECTED'=>			'Delete selected',

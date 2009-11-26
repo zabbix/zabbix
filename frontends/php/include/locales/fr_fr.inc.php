@@ -26,6 +26,16 @@
 	'S_DATE_FORMAT_YMDHMS'=>			'd M Y H:i:s',
 	'S_DATE_FORMAT_YMD'=>			'd M Y',
 	'S_HTML_CHARSET'=>			'UTF-8',
+
+	'S_YEAR_SHORT' =>			'a',
+	'S_MONTH_SHORT' =>			'm',
+	'S_WEEK_SHORT' =>			's',
+	'S_DAY_SHORT' =>			'j',
+	'S_HOUR_SHORT' =>			'h',
+	'S_MINUTE_SHORT' =>			'm',
+	'S_SECOND_SHORT' =>			's',
+	'S_MILLISECOND_SHORT' =>		'ms',
+
 	'S_ACTIVATE_SELECTED'=>			'Activer les éléments sélectionnés',
 	'S_DISABLE_SELECTED'=>			'Désactiver les éléments sélectionnés',
 	'S_DELETE_SELECTED'=>			'Supprimer les éléments sélectionnés',
