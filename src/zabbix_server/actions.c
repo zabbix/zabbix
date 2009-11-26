@@ -789,7 +789,7 @@ static int	check_discovery_condition(DB_EVENT *event, DB_CONDITION *condition)
 
 			switch (condition->operator)
 			{
-			case CONDITION_OPERATOR_EQUAL:
+			case CONDITION_OPERATOR_LESS_EQUAL:
 				if (0 != tmp_int && (now - tmp_int) <= condition_value)
 					ret = SUCCEED;
 				break;
