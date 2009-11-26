@@ -296,9 +296,11 @@ include_once('include/page_header.php');
 	$show_event_col = ($config['event_ack_enable'] && ($_REQUEST['show_events'] != EVENTS_OPTION_NOEVENT));
 	
 	$table = new CTableInfo();	
+	$header_cb = ($show_event_col) ? new CCheckBox('all_events', false, "checkAll('".$m_form->GetName()."','all_events','events');")
+		: new CCheckBox('all_triggers', false, "checkAll('".$m_form->GetName()."','all_triggers', 'triggers');");
 	$table->setHeader(array(
 		$show_event_col ? new CLink(new CImg('images/general/opened.gif'), null, null, 'showHideRows(this);') : NULL,
-		new CCheckBox('all_events', false, "checkAll('".$m_form->GetName()."','all_events','events');"), // aaaaaaaaaaa
+		$header_cb,
 		make_sorting_header(S_SEVERITY, 'priority'),
 		S_STATUS,
 		make_sorting_header(S_LAST_CHANGE, 'lastchange'),
@@ -356,13 +358,10 @@ include_once('include/page_header.php');
 	$ev_options = array(
 		'nodeids' => get_current_nodeid(),
 		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
-		'object' => EVENT_OBJECT_TRIGGER,
 		'nopermissions' => 1,
 		'extendoutput' => 1,
 		'acknowledged' => 0,
-		'value' => TRIGGER_VALUE_TRUE,
-		// 'time_from' => time() - ($config['event_expire']*86400),
-		// 'time_till' => time(),
+		'value' => TRIGGER_VALUE_TRUE
 	);
 	$events = CEvent::get($ev_options);
 	foreach($triggers as $tnum => $trigger){
@@ -377,42 +376,34 @@ include_once('include/page_header.php');
 		$ev_options = array(
 			'nodeids' => get_current_nodeid(),
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
-			'object' => EVENT_OBJECT_TRIGGER,
 			'nopermissions' => 1,
 			'extendoutput' => 1,
 			'sortfield' => 'clock',
 			'sortorder' => ZBX_SORT_DOWN,
+			'time_from' => time() - ($config['event_expire']*86400),
+			'time_till' => time(),
 			//'limit' => $config['event_show_max']
 		);
 		switch($show_events){
 			case EVENTS_OPTION_ALL:
-				$ev_options['time_from'] = time() - ($config['event_expire']*86400);
-				$ev_options['time_till'] = time();
 			break;
 			case EVENTS_OPTION_NOT_ACK:
 				$ev_options['acknowledged'] = 0;
-				$ev_options['time_from'] = time() - ($config['event_expire']*86400);
-				$ev_options['time_till'] = time();
 			break;
 			case EVENTS_OPTION_ONLYTRUE_NOTACK:
 				$ev_options['acknowledged'] = 0;
 				$ev_options['value'] = TRIGGER_VALUE_TRUE;
-				$ev_options['time_from'] = time() - ($config['event_expire']*86400);
-				$ev_options['time_till'] = time();
 			break;
 		}
 	}	
 	$events = CEvent::get($ev_options);
 	foreach($events as $enum => $event){
-		$triggers[$event['objectid']]['events'][$event['eventid']] = $event;
+		$triggers[$event['objectid']]['events'][] = $event;
 	}
 	
 
 	
 	foreach($triggers as $tnum => $trigger){		
-		
-		
-		//$trigger['events'] = array_slice($trigger['events'], 1, 30);
 		
 		$trigger['desc'] = $description = expand_trigger_description($trigger['triggerid']);
 
@@ -452,11 +443,11 @@ include_once('include/page_header.php');
 // }}} trigger description js menu
 
 		if($_REQUEST['show_details']){
-			$font = new CTag('font','yes');
-			$font->setAttribute('color','#000');
-			$font->setAttribute('size','-2');
-			$font->addItem(explode_exp($trigger['expression'],1,false,true));
-			$description = array($description,BR(), $font);
+			$font = new CTag('font', 'yes');
+			$font->setAttribute('color', '#000');
+			$font->setAttribute('size', '-2');
+			$font->addItem(explode_exp($trigger['expression'], 1, false,true));
+			$description = array($description, BR(), $font);
 		}
 
 // DEPENDENCIES {{{
@@ -528,7 +519,7 @@ include_once('include/page_header.php');
 			$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?hostid=".$trigger_host['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 
 			$menus = rtrim($menus,',');
-			$menus='show_popup_menu(event,['.$menus.'],180);';
+			$menus = 'show_popup_menu(event,['.$menus.'],180);';
 			
 			$maint_span = null;
 			if($trigger_host['maintenance_status']){
@@ -565,13 +556,8 @@ include_once('include/page_header.php');
 			'events.php?triggerid='.$trigger['triggerid'].'&nav_time='.$trigger['lastchange']
 		);
 
-		// $unack_count = 0;
-
-		// foreach($trigger['events'] as $event){
-			// if(!$event['acknowledged'] && ($event['value'] == TRIGGER_VALUE_TRUE)) $unack_count++;
-		// }
 		if($trigger['event_count']){
-			$to_ack = new CCol(array($trigger['event_count'].SPACE, new CLink(S_TO_ACKNOWLEDGE, 'acknow.php?triggerid='.$trigger['triggerid'], 'on')), 'on center');
+			$to_ack = new CCol(array($trigger['event_count'].SPACE, new CLink(S_TO_ACKNOWLEDGE, 'acknow.php?triggers[]='.$trigger['triggerid'], 'on')), 'on center');
 		}
 		else{
 			$to_ack = new CCol($trigger['event_count'].SPACE.S_TO_ACKNOWLEDGE, 'off center');
@@ -591,7 +577,7 @@ include_once('include/page_header.php');
 
 		$table->addRow(array(
 			$open_close,
-			new CCheckBox('triggers['.$trigger['triggerid'].']', 'no', NULL, $trigger['triggerid']), // aaaaaaaaa
+			$show_event_col ? SPACE : new CCheckBox('triggers['.$trigger['triggerid'].']', 'no', NULL, $trigger['triggerid']),
 			new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'], $trigger['value'])),
 			$status,
 			$lastchange,
@@ -607,6 +593,7 @@ include_once('include/page_header.php');
 
 		if($show_events != EVENTS_OPTION_NOEVENT){
 			$i = 0;
+
 			foreach($trigger['events'] as $enum => $row_event){
 				$i++;
 				
@@ -637,7 +624,7 @@ include_once('include/page_header.php');
 				
 				$clock = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS, $row_event['clock']),
 					'tr_events.php?triggerid='.$trigger['triggerid'].'&eventid='.$row_event['eventid']);
-				$next_clock = isset($trigger['events'][$enum+1]) ? $trigger['events'][$enum+1]['clock'] : time();
+				$next_clock = isset($trigger['events'][$enum-1]) ? $trigger['events'][$enum-1]['clock'] : time();
 				
 				$empty_col = new CCol();
 				$empty_col->setColSpan(3);
@@ -648,9 +635,9 @@ include_once('include/page_header.php');
 					$status,
 					$clock,
 					zbx_date2age($row_event['clock']),
-					zbx_date2age($row_event['clock'], $next_clock),
+					zbx_date2age($next_clock, $row_event['clock']),
 					($config['event_ack_enable']) ? (new CCol($ack, 'center')) : NULL,
-					is_show_all_nodes() ? SPACE : null, // node
+					is_show_all_nodes() ? SPACE : null,
 					$empty_col
 				), 'odd_row');
 				$row->setAttribute('data-parentid', $trigger['triggerid']);
@@ -665,12 +652,12 @@ include_once('include/page_header.php');
 	$footer = null;
 	if($config['event_ack_enable']){
 		$goBox = new CComboBox('go');
-		$goBox->addItem('bulkacknowledge',S_BULK_ACKNOWLEDGE);
+		$goBox->addItem('bulkacknowledge', S_BULK_ACKNOWLEDGE);
 
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO.' (0)');
-		$goButton->setAttribute('id','goButton');
-		zbx_add_post_js('chkbxRange.pageGoName = "events";');
+		$goButton = new CButton('goButton', S_GO.' (0)');
+		$goButton->setAttribute('id', 'goButton');
+		$show_event_col ? zbx_add_post_js('chkbxRange.pageGoName = "events";') : zbx_add_post_js('chkbxRange.pageGoName = "triggers";');
 
 		$footer = get_table_header(array($goBox, $goButton));
 	}
@@ -687,7 +674,7 @@ include_once('include/page_header.php');
 
 	zbx_add_post_js('blink.init();');
 
-	$jsmenu = new CPUMenu(null,170);
+	$jsmenu = new CPUMenu(null, 170);
 	$jsmenu->InsertJavaScript();
 
 

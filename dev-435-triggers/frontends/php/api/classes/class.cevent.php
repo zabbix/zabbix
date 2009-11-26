@@ -118,13 +118,15 @@ class CEvent extends CZBXAPI{
 		}
 		else if(($options['object'] == EVENT_OBJECT_TRIGGER) || ($options['source'] == EVENT_SOURCE_TRIGGER)){
 
-			$triggers = CTrigger::get();
-			$triggerids = zbx_objectValues($triggers, 'triggerid');
+			$tr_options = array();
 
 			if(!is_null($options['triggerids']))
-				$options['triggerids'] = array_intersect($options['triggerids'], $triggerids);
-			else
-				$options['triggerids'] = $triggerids;
+				$tr_options['triggerids'] = $options['triggerids'];
+			
+			$triggers = CTrigger::get($tr_options);
+			$triggerids = zbx_objectValues($triggers, 'triggerid');
+
+			$options['triggerids'] = $triggerids;
 
 /*
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
@@ -207,7 +209,7 @@ class CEvent extends CZBXAPI{
 		if(!is_null($options['triggerids']) && ($options['object'] == EVENT_OBJECT_TRIGGER)){
 			zbx_value2array($options['triggerids']);
 
-			$sql_parts['where']['e'] = '(e.object-0)='.EVENT_OBJECT_TRIGGER;
+			$sql_parts['where']['o'] = '(e.object-0)='.EVENT_OBJECT_TRIGGER;
 			$sql_parts['where'][] = DBcondition('e.objectid', $options['triggerids']);
 		}
 
@@ -218,7 +220,7 @@ class CEvent extends CZBXAPI{
 
 // object
 		if(!is_null($options['object'])){
-			$sql_parts['where'][] = 'e.object='.$options['object'];
+			$sql_parts['where']['o'] = 'e.object='.$options['object'];
 		}
 
 // acknowledged

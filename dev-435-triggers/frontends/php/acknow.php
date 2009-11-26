@@ -38,7 +38,7 @@ include_once('include/page_header.php');
 //		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'eventid'=>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
-		'triggerid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
+		'triggers' =>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	null),
 		'events'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	null),
 		'message'=>			array(T_ZBX_STR, O_OPT,	NULL,	$bulk ? NULL : NOT_EMPTY,	'isset({save})||isset({saveandreturn})'),
 // Actions
@@ -59,7 +59,7 @@ include_once('include/page_header.php');
 		exit;
 	}
 
-	if(!isset($_REQUEST['events']) && !isset($_REQUEST['eventid']) && !isset($_REQUEST['triggerid'])){
+	if(!isset($_REQUEST['events']) && !isset($_REQUEST['eventid']) && !isset($_REQUEST['triggers'])){
 		show_message(S_NO_EVENTS_TO_ACKNOWLEDGE);
 		include_once('include/page_footer.php');
 	}
@@ -76,8 +76,8 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['events'])){
 		$options['eventids'] = $_REQUEST['events'];
 	}
-	else if(isset($_REQUEST['triggerid'])){
-		$options['triggerids'] = $_REQUEST['triggerid'];
+	else if(isset($_REQUEST['triggers'])){
+		$options['triggerids'] = $_REQUEST['triggers'];
 	}
 	$events = CEvent::get($options);
 	
@@ -96,7 +96,7 @@ include_once('include/page_header.php');
 			$event_acknowledged = true;
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, S_ACKNOWLEDGE_ADDED.
 				' ['.expand_trigger_description_by_data($event_trigger).']'.
-				' ['.$_REQUEST["message"].']');
+				' ['.$_REQUEST['message'].']');
 		}
  	}
 	else if(isset($_REQUEST['saveandreturn'])){
