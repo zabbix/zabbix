@@ -322,6 +322,9 @@ select_selement: function(selementid, multi){
 			this.selection.count++;
 			this.selection.position++;
 		}
+		else if((this.selection.count > 1) && !multi){
+// if selected several eements and then we clicked on one of them
+		}
 		else{
 			this.selection.count--;
 			position = selement.selected;
@@ -936,8 +939,6 @@ showForm: function(e, selementid){
 		divForm.style.position = 'absolute';
 		divForm.style.top = '50px';
 		divForm.style.left = '500px';
-		
-		new Draggable(divForm,{});		
 	}
 
 
@@ -956,6 +957,8 @@ showForm: function(e, selementid){
 	}
 	this.update_multiContainer(e);
 
+
+	new Draggable(divForm,{'handle': this.selementForm.dragHandler});	
 	$(divForm).show();
 },
 
@@ -992,40 +995,48 @@ create_multiContainer: function(e, selementid){
 
 
 // Down Stream	
+	var e_div_1 = document.createElement('div');
+this.multiContainer.container = e_div_1;
+	e_div_1.setAttribute('id',"multiContainer");
+	e_div_1.style.height = '100px';
+	e_div_1.style.overflowX = 'auto';
 
-	var e_table_1 = document.createElement('table');
-this.multiContainer.container = e_table_1;
-
-	e_table_1.setAttribute('id',"multiContainer");
-	e_table_1.setAttribute('cellSpacing',"1");
-	e_table_1.setAttribute('cellPadding',"3");
-	e_table_1.className = "tableinfo";
 },
 
 update_multiContainer: function(e){
 	this.debug('update_multiContainer');
 //--
-	var tbody = document.createElement('tbody');
-	
+
+	var e_table_1 = document.createElement('table');
+	e_table_1.setAttribute('cellSpacing',"1");
+	e_table_1.setAttribute('cellPadding',"3");
+	e_table_1.className = "tableinfo";
+
+
+	var e_tbody_2 = document.createElement('tbody');
+	e_table_1.appendChild(e_tbody_2);
+
+
 	var e_tr_3 = document.createElement('tr');
 	e_tr_3.className = "header";
-	tbody.appendChild(e_tr_3);
-	
-	
+	e_tbody_2.appendChild(e_tr_3);
+
+
 	var e_td_4 = document.createElement('td');
 	e_tr_3.appendChild(e_td_4);
 	e_td_4.appendChild(document.createTextNode('Label'));
-	
+
 
 	var e_td_4 = document.createElement('td');
 	e_tr_3.appendChild(e_td_4);	
 	e_td_4.appendChild(document.createTextNode('Type'));
-	
+
 
 	var e_td_4 = document.createElement('td');
 	e_tr_3.appendChild(e_td_4);
 	e_td_4.appendChild(document.createTextNode('Description'));
-	
+
+
 	var selement = null;
 	for(var i=0; i<this.selection.position; i++){
 		if(!isset(i, this.selection.selements)) continue;
@@ -1035,7 +1046,7 @@ update_multiContainer: function(e){
 
 		var e_tr_3 = document.createElement('tr');
 		e_tr_3.className = "even_row";
-		tbody.appendChild(e_tr_3);
+		e_tbody_2.appendChild(e_tr_3);
 		
 	
 		var e_td_4 = document.createElement('td');
@@ -1059,7 +1070,7 @@ update_multiContainer: function(e){
 		e_tr_3.appendChild(e_td_4);	
 	}
 
-	this.multiContainer.container.update(tbody);
+	this.multiContainer.container.update(e_table_1);
 },
 
 
@@ -1121,8 +1132,9 @@ this.selementForm.elementid = e_input_2;
 
 
 	var e_td_5 = document.createElement('td');
+this.selementForm.dragHandler = e_td_5;
 	e_td_5.setAttribute('colSpan',"2");
-	e_td_5.className = "form_row_first";
+	e_td_5.className = "form_row_first pointer";
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -1136,8 +1148,8 @@ this.selementForm.elementid = e_input_2;
 	e_div_7.className = "iconhelp";
 	e_div_7.appendChild(document.createTextNode(' '));
 	if(!IE)	e_span_6.appendChild(e_div_7);
-	
-	
+
+
 	e_td_5.appendChild(document.createTextNode('Edit map element'));
 
 

@@ -1427,7 +1427,7 @@
 				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 					$hostgroupids[] = $selement['elementid'];
 					break;
-				case SYSMAP_ELEMENT_TYPE_IAGE:
+				case SYSMAP_ELEMENT_TYPE_IMAGE:
 				default:
 					break;
 			}
@@ -1460,7 +1460,7 @@
 				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 					$selements[$snum]['elementName'] = $groups[$selement['elementid']]['name'];
 					break;
-				case SYSMAP_ELEMENT_TYPE_IAGE:
+				case SYSMAP_ELEMENT_TYPE_IMAGE:
 				default:
 					$selements[$snum]['elementName'] = 'image';
 			}
