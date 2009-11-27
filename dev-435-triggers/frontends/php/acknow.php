@@ -49,9 +49,8 @@ include_once('include/page_header.php');
 		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null)
 	);
 	check_fields($fields);
-
-	$bulk = ($bulk || isset($_REQUEST['triggerid']));
-
+	
+	
 	if(isset($_REQUEST['cancel'])){
 		$last_page = $USER_DETAILS['last_page'];
 		$url = $last_page ? new CUrl($last_page['url']) : new CUrl('tr_status.php?hostid='.get_profile('web.tr_status.hostid', 0));
@@ -64,108 +63,87 @@ include_once('include/page_header.php');
 		include_once('include/page_footer.php');
 	}
 
-
-//$bulk = (count($events) > 1);
+	$bulk = !isset($_REQUEST['eventid']);
 ?>
 <?php
 
-	$options = array('extendoutput' => 1, 'select_triggers' => 1);
-	if(isset($_REQUEST['eventid'])){
-		$options['eventids'] = $_REQUEST['eventid'];
-	}
-	else if(isset($_REQUEST['events'])){
-		$options['eventids'] = $_REQUEST['events'];
-	}
-	else if(isset($_REQUEST['triggers'])){
-		$options['triggerids'] = $_REQUEST['triggers'];
-	}
-	$events = CEvent::get($options);
 	
 	if(!$bulk){
+		$options = array('extendoutput' => 1, 'select_triggers' => 1, 'eventids' => $_REQUEST['eventid']);
+		$events = CEvent::get($options);
 		$event = reset($events);
 		$event_trigger = reset($event['triggers']);
 		$event_acknowledged = $event['acknowledged'];
+		$_REQUEST['events'] = array('eventid' => $_REQUEST['eventid']);
 	}
 
-	if(isset($_REQUEST['save']) && !$bulk){
+	if(isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])){
 
-		$result = add_acknowledge_coment($event['eventid'], $USER_DETAILS['userid'], $_REQUEST['message']);
-		show_messages($result, S_EVENT_ACKNOWLEDGED, S_CANNOT_ACKNOWLEDGE_EVENT);
-
- 		if($result){
-			$event_acknowledged = true;
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, S_ACKNOWLEDGE_ADDED.
-				' ['.expand_trigger_description_by_data($event_trigger).']'.
-				' ['.$_REQUEST['message'].']');
-		}
- 	}
-	else if(isset($_REQUEST['saveandreturn'])){
-		$result = true;
 		if($bulk){
-			$_REQUEST['message'] .= ($_REQUEST['message'] == '' ? '' : "\n\r") . S_SYS_BULK_ACKNOWLEDGE;
+			$_REQUEST['message'] .= ($_REQUEST['message'] == '' ? '' : "\n\r") . S_SYS_BULK_ACKNOWLEDGE;		
 		}
-
-		foreach($events as $event){
-			$result &= add_acknowledge_coment($event['eventid'], $USER_DETAILS['userid'], $_REQUEST['message']);
-		}
-
+		
+		$events_data = array(
+			'events' => zbx_toObject($_REQUEST['events'], 'eventid'), 
+			'triggers' => zbx_toObject($_REQUEST['triggers'], 'triggerid'),
+			'message' => $_REQUEST['message']);
+		$result = CEvent::acknowledge($events_data);
+		
+		show_messages($result, S_EVENT_ACKNOWLEDGED, S_CANNOT_ACKNOWLEDGE_EVENT);	
 		if($result){
+			$event_acknowledged = true;
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, S_ACKNOWLEDGE_ADDED.
 				' ['.($bulk) ? ' BULK ACKNOWLEDGE ' : (expand_trigger_description_by_data($event_trigger)).']'.
 				' ['.$_REQUEST['message'].']');
 		}
+		
+		if(isset($_REQUEST['saveandreturn'])){
+			$last_page = $USER_DETAILS['last_page'];
 
-		$last_page = $USER_DETAILS['last_page'];
-
-		if(!$last_page){
-			$url = new CUrl('tr_status.php?hostid='.get_profile('web.tr_status.hostid', 0));
-//			$last_page['url']='tr_status.php?hostid='.get_profile('web.tr_status.hostid', 0);
+			if(!$last_page){
+				$url = new CUrl('tr_status.php?hostid='.get_profile('web.tr_status.hostid', 0));
+			}
+			else{
+				$url = new CUrl($last_page['url']);
+			}
+			// redirect($url->getUrl());
+			// exit;
 		}
-		else{
-			$url = new CUrl($last_page['url']);
-		}
-
-		redirect($url->getUrl());
-		exit;
-	}
+		
+ 	}
+	
 ?>
 <?php
-	$msg = $bulk ? ' BULK ACKNOWLEDGE ' : array('"'.expand_trigger_description_by_data($event_trigger).'"',BR(),explode_exp($event_trigger['expression'],1));
-	show_table_header(array(S_ALARM_ACKNOWLEDGES_BIG, ' : ', $msg));
-
-	echo SBR;
-
-	if(!$bulk){
-		$table = new CTable(NULL, 'ack_msgs');
-		$table->setAlign('center');
-
-		$db_acks = get_acknowledges_by_eventid($event['eventid']);
-		while($db_ack = DBfetch($db_acks)){
-
-			$db_user = CUser::get(array('userids' => $db_ack['userid'], 'extendoutput' => 1));
-			$db_user = reset($db_user);
-			
-			$table->addRow(array(
-				new CCol($db_user['alias'], 'user'),
-				new CCol(date(S_DATE_FORMAT_YMDHMS,$db_ack['clock']),'time')),
-				'title');
-
-			$msgCol = new CCol(zbx_nl2br($db_ack['message']));
-			$msgCol->setColspan(2);
-			$table->addRow($msgCol,'msg');
-		}
-/**/
-		if($table->getNumRows() > 0){
-			$table->Show();
-			echo SBR;
-		}
-	}
+	$msg = $bulk ? ' BULK ACKNOWLEDGE ' : expand_trigger_description_by_data($event_trigger);
+	show_table_header(array(S_ALARM_ACKNOWLEDGES_BIG.': ', $msg));
 
 	if($bulk){
 		$title = S_ACKNOWLEDGE_ALARM_BY;
 		$btn_txt2 = S_ACKNOWLEDGE.' '.S_AND_SYMB.' '.S_RETURN;
 	}
 	else{
+		$db_acks = get_acknowledges_by_eventid($_REQUEST['eventid']);
+		if($db_acks){
+			$table = new CTable(null, 'ack_msgs');
+			$table->setAlign('center');
+
+			while($db_ack = DBfetch($db_acks)){
+				$db_user = CUser::get(array('userids' => $db_ack['userid'], 'extendoutput' => 1));
+				$db_user = reset($db_user);
+				
+				$table->addRow(array(
+					new CCol($db_user['alias'], 'user'),
+					new CCol(date(S_DATE_FORMAT_YMDHMS, $db_ack['clock']), 'time')),
+					'title');
+
+				$msgCol = new CCol(zbx_nl2br($db_ack['message']));
+				$msgCol->setColspan(2);
+				$table->addRow($msgCol, 'msg');
+			}
+			
+			$table->Show();
+		}
+		
 		if($event_acknowledged){
 			$title = S_ADD_COMMENT_BY;
 			$btn_txt = S_SAVE;
@@ -178,24 +156,29 @@ include_once('include/page_header.php');
 		}
 	}
 
-	$frmMsg = new CFormTable($title.' "'.$USER_DETAILS['alias'].'"');
-//		$frmMsg->setHelp("manual.php");
 
-	foreach($events as $event){
-		$frmMsg->addVar('events['.$event['eventid'].']', $event['eventid']);
+	$frmMsg = new CFormTable($title.' "'.$USER_DETAILS['alias'].'"');
+
+	if(isset($_REQUEST['eventid'])){
+		$frmMsg->addVar('eventid', $_REQUEST['eventid']);
+	}
+	else if(isset($_REQUEST['triggers'])){
+		foreach($_REQUEST['triggers'] as $triggerid){
+			$frmMsg->addVar('triggers['.$triggerid.']', $triggerid);
+		}
+	}
+	else if(isset($_REQUEST['events'])){
+		foreach($_REQUEST['events'] as $eventid){
+			$frmMsg->addVar('events['.$eventid.']', $eventid);
+		}
 	}
 
 	$frmMsg->addRow(S_MESSAGE, new CTextArea('message', '', 80, 6));
 	$frmMsg->addItemToBottomRow(new CButton('saveandreturn', $btn_txt2));
-	isset($btn_txt) ? $frmMsg->addItemToBottomRow(new CButton('save', $btn_txt)) : '';
-	$frmMsg->addItemToBottomRow(new CButtonCancel(url_param('eventid')));
+	$bulk ? '' : $frmMsg->addItemToBottomRow(new CButton('save', $btn_txt));
+	$frmMsg->addItemToBottomRow(new CButtonCancel());
 
 	$frmMsg->show(false);
-
-	SetFocus($frmMsg->GetName(),'message');
-
-	$frmMsg->Destroy();
-
 
 include_once('include/page_footer.php');
 ?>

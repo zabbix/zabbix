@@ -108,7 +108,7 @@ include_once('include/page_header.php');
 	check_fields($fields);
 
 	if(isset($_REQUEST['favobj'])){
-		if(str_in_array($_REQUEST['favobj'],array('sound'))){
+		if(str_in_array($_REQUEST['favobj'] ,array('sound'))){
 			update_profile('web.tr_status.mute',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 		else if('filter' == $_REQUEST['favobj']){
@@ -185,7 +185,6 @@ include_once('include/page_header.php');
 	foreach($groups as $group){
 		$cmbGroups->addItem($group['groupid'], get_node_name_by_elid($group['groupid'], null, ': ').$group['name']);
 	}
-
 
 	$options = array(
 		'monitored_hosts' => 1,
@@ -299,7 +298,7 @@ include_once('include/page_header.php');
 	$header_cb = ($show_event_col) ? new CCheckBox('all_events', false, "checkAll('".$m_form->GetName()."','all_events','events');")
 		: new CCheckBox('all_triggers', false, "checkAll('".$m_form->GetName()."','all_triggers', 'triggers');");
 	$table->setHeader(array(
-		$show_event_col ? new CLink(new CImg('images/general/opened.gif'), null, null, 'showHideRows(this);') : NULL,
+		$show_event_col ? new CLink(new CImg('images/general/closed.gif'), null, null, 'showHideRows(this);') : NULL,
 		$header_cb,
 		make_sorting_header(S_SEVERITY, 'priority'),
 		S_STATUS,
@@ -312,7 +311,7 @@ include_once('include/page_header.php');
 		make_sorting_header(S_NAME, 'description'),
 		S_COMMENTS
 	));
-
+	
 
 	$sortfield = getPageSortField('description');
 	$sortorder = getPageSortOrder();
@@ -320,9 +319,8 @@ include_once('include/page_header.php');
 		'nodeids' => get_current_nodeid(),
 		'status' => TRIGGER_STATUS_ENABLED,
 		'filter' => 1,
+		'monitored' => 1,
 		'extendoutput' => 1,
-		'select_hosts' => 1,
-		'select_items' => 1,
 		'sortfield' => $sortfield,
 		'sortorder' => $sortorder,
 		'limit' => ($config['search_limit']+1),
@@ -331,9 +329,6 @@ include_once('include/page_header.php');
 // Filtering
 	if($_REQUEST['hostid'] > 0){
 		$options['hostids'] = $_REQUEST['hostid'];
-	}
-	else if(!empty($hosts)){
-		$options['hostids'] = zbx_objectValues($hosts, 'hostid');
 	}
 	else if(($_REQUEST['groupid'] > 0)){
 		$options['groupids'] = $_REQUEST['groupid'];
@@ -348,28 +343,33 @@ include_once('include/page_header.php');
 		$options['min_severity'] = $show_severity;
 	}
 	$triggers = CTrigger::get($options);
+	
 
 // sorting && paging
 	order_result($triggers, $sortfield, $sortorder);
 	$paging = getPagingLine($triggers);
+	
+	$options = array(
+		'nodeids' => get_current_nodeid(),
+		'triggerids' => array_keys($triggers),
+		'extendoutput' => 1,
+		'select_hosts' => 1,
+		'select_items' => 1,
+		'preservekeys' => 1		
+	);
+	$triggers = CTrigger::get($options);
 	order_result($triggers, $sortfield, $sortorder);
 //---------
 
-	$ev_options = array(
-		'nodeids' => get_current_nodeid(),
-		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
-		'nopermissions' => 1,
-		'extendoutput' => 1,
-		'acknowledged' => 0,
-		'value' => TRIGGER_VALUE_TRUE
-	);
-	$events = CEvent::get($ev_options);
 	foreach($triggers as $tnum => $trigger){
-		$triggers[$tnum]['event_count'] = 0;
+		$event_count = CEvent::get(array(
+			'count' => 1, 
+			'triggerids' => $trigger['triggerid'],
+			'acknowledged' => 0,
+			'nopermissions' => 1));
+		$triggers[$tnum]['event_count'] = $event_count['rowscount'];
+		
 		$triggers[$tnum]['events'] = array();
-	}
-	foreach($events as $enum => $event){
-		$triggers[$event['objectid']]['event_count']++;
 	}
 
 	if($show_events != EVENTS_OPTION_NOEVENT){
@@ -395,13 +395,16 @@ include_once('include/page_header.php');
 				$ev_options['value'] = TRIGGER_VALUE_TRUE;
 			break;
 		}
-	}	
-	$events = CEvent::get($ev_options);
-	foreach($events as $enum => $event){
-		$triggers[$event['objectid']]['events'][] = $event;
-	}
+		
+		$events = CEvent::get($ev_options);
 	
 
+		foreach($events as $enum => $event){
+			$triggers[$event['objectid']]['events'][] = $event;
+		}
+	}	
+	
+	
 	
 	foreach($triggers as $tnum => $trigger){		
 		
@@ -495,8 +498,7 @@ include_once('include/page_header.php');
 // }}} DEPENDENCIES
 
 		$tr_desc = new CSpan($description);
-		
-		
+				
 		
 // host JS menu {{{
 		$hosts_list = array();
@@ -556,6 +558,7 @@ include_once('include/page_header.php');
 			'events.php?triggerid='.$trigger['triggerid'].'&nav_time='.$trigger['lastchange']
 		);
 
+
 		if($trigger['event_count']){
 			$to_ack = new CCol(array($trigger['event_count'].SPACE, new CLink(S_TO_ACKNOWLEDGE, 'acknow.php?triggers[]='.$trigger['triggerid'], 'on')), 'on center');
 		}
@@ -565,7 +568,7 @@ include_once('include/page_header.php');
 		
 		
 		if($show_event_col && !empty($trigger['events'])){
-			$open_close = new CLink(new CImg('images/general/opened.gif'), null, null, "showHideRows(this, {$trigger['triggerid']})");
+			$open_close = new CLink(new CImg('images/general/closed.gif'), null, null, "showHideRows(this, {$trigger['triggerid']})");
 		}
 		else if(!$show_event_col){
 			$open_close = null;
@@ -628,10 +631,12 @@ include_once('include/page_header.php');
 				
 				$empty_col = new CCol();
 				$empty_col->setColSpan(3);
+				$ack_cb_col = new CCol($ack_cb);
+				$ack_cb_col->setColSpan(2);
+				//$ack_cb_col->addStyle('text-align: right');
 				$row = new CRow(array(
 					SPACE,
-					$ack_cb,
-					SPACE, // severity
+					$ack_cb_col,
 					$status,
 					$clock,
 					zbx_date2age($row_event['clock']),
@@ -641,6 +646,7 @@ include_once('include/page_header.php');
 					$empty_col
 				), 'odd_row');
 				$row->setAttribute('data-parentid', $trigger['triggerid']);
+				$row->addStyle('display: none;');
 				$table->addRow($row);
 				
 				if($i > $config['event_show_max']) break;
@@ -648,6 +654,7 @@ include_once('include/page_header.php');
 		}
 	}
 
+	
 //----- GO ------
 	$footer = null;
 	if($config['event_ack_enable']){

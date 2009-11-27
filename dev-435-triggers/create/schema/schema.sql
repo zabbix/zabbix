@@ -284,7 +284,7 @@ FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|value		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|acknowledged	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|object,objectid,eventid
-INDEX		|2		|clock
+INDEX		|2		|clock, objectid
 
 TABLE|trends|itemid,clock|
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|0			|items
