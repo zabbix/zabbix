@@ -538,7 +538,7 @@ class CGraph extends CZBXAPI{
 									'preservekeys'=>1));
 		foreach($graphs as $gnum => $graph){
 			if(!isset($upd_graphs[$graph['graphid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 			$graphids[] = $graph['graphid'];
@@ -594,7 +594,7 @@ class CGraph extends CZBXAPI{
 			'preservekeys' => 1));
 		foreach($graphs as $gnum => $graph){
 			if(!isset($del_graphs[$graph['graphid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 

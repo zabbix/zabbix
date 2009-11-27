@@ -1646,7 +1646,8 @@
 	'S_LATEST_DATA'=>			'Latest data',
 
 //	Errors
-	'S_INCORRECT_DESCRIPTION'=>			'Incorrect description',
-	'S_CANT_FORMAT_TREE'=>				'Can\'t format Tree',
+	'S_INCORRECT_DESCRIPTION'=>		'Incorrect description',
+	'S_CANT_FORMAT_TREE'=>			'Can\'t format Tree',
+	'S_NO_PERMISSION'=>			'You do not have permission to perform this operation'
 	);
 ?>
