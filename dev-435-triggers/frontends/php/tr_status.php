@@ -372,6 +372,7 @@ include_once('include/page_header.php');
 		$triggers[$tnum]['events'] = array();
 	}
 
+
 	if($show_events != EVENTS_OPTION_NOEVENT){
 		$ev_options = array(
 			'nodeids' => get_current_nodeid(),
@@ -397,7 +398,6 @@ include_once('include/page_header.php');
 		}
 		
 		$events = CEvent::get($ev_options);
-	
 
 		foreach($events as $enum => $event){
 			$triggers[$event['objectid']]['events'][] = $event;
@@ -578,10 +578,12 @@ include_once('include/page_header.php');
 		}
 		
 
+		$severity_col = new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'], $trigger['value']));
+		if($show_event_col) $severity_col->setColSpan(2);
 		$table->addRow(array(
 			$open_close,
-			$show_event_col ? SPACE : new CCheckBox('triggers['.$trigger['triggerid'].']', 'no', NULL, $trigger['triggerid']),
-			new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'], $trigger['value'])),
+			$show_event_col ? null : new CCheckBox('triggers['.$trigger['triggerid'].']', 'no', NULL, $trigger['triggerid']),
+			$severity_col,
 			$status,
 			$lastchange,
 			zbx_date2age($trigger['lastchange']),

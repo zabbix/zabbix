@@ -294,6 +294,7 @@ class CEvent extends CZBXAPI{
 					$sql_where.
 				$sql_order;
 		$db_res = DBselect($sql, $sql_limit);
+Copt::profiling_start('asd');
 		while($event = DBfetch($db_res)){
 			if($options['count'])
 				$result = $event;
@@ -301,7 +302,7 @@ class CEvent extends CZBXAPI{
 				$eventids[$event['eventid']] = $event['eventid'];
 
 				if(is_null($options['extendoutput'])){
-					$result[] = array('eventid' => $event['eventid']);
+					$result[$event['eventid']] = array('eventid' => $event['eventid']);
 				}
 				else{
 					if($event['object'] == EVENT_OBJECT_TRIGGER){
@@ -430,9 +431,12 @@ class CEvent extends CZBXAPI{
 		
 
 // removing keys (hash -> array)
+
 		if(is_null($options['preservekeys'])){
 			$result = zbx_cleanHashes($result);
 		}
+Copt::profiling_stop('asd');
+
 
 	return $result;
 	}
@@ -572,7 +576,7 @@ class CEvent extends CZBXAPI{
 	public static function acknowledge($events_data){
 		global $USER_DETAILS;
 		$errors = array();
-		
+	
 		$events = isset($events_data['events']) ? zbx_toArray($events_data['events']) : array();
 		$eventids = zbx_objectValues($events, 'eventid');
 		$triggers = isset($events_data['triggers']) ? zbx_toArray($events_data['triggers']) : array();
@@ -597,7 +601,7 @@ class CEvent extends CZBXAPI{
 					return false;
 				}
 			}
-			$events = array_merge($events, self::get(array('triggerids' => $triggerids, 'nopermissions' => 1)));
+			$events = array_merge($events, self::get(array('triggerids' => $triggerids, 'nopermissions' => 1, 'preservekeys' => 1)));
 			$eventids = zbx_objectValues($events, 'eventid');
 		}
 // }}} PERMISSIONS
@@ -605,10 +609,13 @@ class CEvent extends CZBXAPI{
 		
 		$result = DBexecute('UPDATE events SET acknowledged=1 WHERE '.DBcondition('eventid', $eventids));
 		if($result){
+			$time = time();
+			$message = zbx_dbstr($message);
+			
 			foreach($events as $enum => $event){
 				$acknowledgeid = get_dbid('acknowledges', 'acknowledgeid');
 				$result = DBexecute('INSERT INTO acknowledges (acknowledgeid, userid, eventid, clock, message)'.
-					" VALUES ($acknowledgeid, {$USER_DETAILS['userid']}, {$event['eventid']}, ".time().', '.zbx_dbstr($message).')');
+					" VALUES ($acknowledgeid, {$USER_DETAILS['userid']}, {$event['eventid']}, $time, $message)");
 
 				if(!$result)
 					break;
@@ -616,7 +623,6 @@ class CEvent extends CZBXAPI{
 		}
 		
 		$result = self::EndTransaction($result, __METHOD__);
-		
 		
 		if($result){
 			$result = self::get(array(

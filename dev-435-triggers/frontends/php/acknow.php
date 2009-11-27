@@ -74,7 +74,7 @@ include_once('include/page_header.php');
 		$event = reset($events);
 		$event_trigger = reset($event['triggers']);
 		$event_acknowledged = $event['acknowledged'];
-		$_REQUEST['events'] = array('eventid' => $_REQUEST['eventid']);
+		$_REQUEST['events'] = $_REQUEST['eventid'];
 	}
 
 	if(isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])){
@@ -82,7 +82,7 @@ include_once('include/page_header.php');
 		if($bulk){
 			$_REQUEST['message'] .= ($_REQUEST['message'] == '' ? '' : "\n\r") . S_SYS_BULK_ACKNOWLEDGE;		
 		}
-		
+
 		$events_data = array(
 			'events' => zbx_toObject($_REQUEST['events'], 'eventid'), 
 			'triggers' => zbx_toObject($_REQUEST['triggers'], 'triggerid'),
@@ -106,8 +106,9 @@ include_once('include/page_header.php');
 			else{
 				$url = new CUrl($last_page['url']);
 			}
-			// redirect($url->getUrl());
-			// exit;
+			include_once('include/page_footer.php');
+			redirect($url->getUrl());
+			exit;
 		}
 		
  	}
@@ -172,6 +173,7 @@ include_once('include/page_header.php');
 			$frmMsg->addVar('events['.$eventid.']', $eventid);
 		}
 	}
+
 
 	$frmMsg->addRow(S_MESSAGE, new CTextArea('message', '', 80, 6));
 	$frmMsg->addItemToBottomRow(new CButton('saveandreturn', $btn_txt2));
