@@ -468,7 +468,7 @@ class CHostGroup extends CZBXAPI{
 										'preservekeys'=>1));
 		foreach($groups as $gnum => $group){
 			if(!isset($upd_groups[$group['groupid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 			$groupids[] = $group['groupid'];
@@ -535,7 +535,7 @@ class CHostGroup extends CZBXAPI{
 											'preservekeys'=>1));
 		foreach($groups as $gnum => $group){
 			if(!isset($del_groups[$group['groupid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 			$groupids[] = $group['groupid'];
@@ -672,7 +672,7 @@ class CHostGroup extends CZBXAPI{
 
 		foreach($groups as $num => $group){
 			if(!isset($allowed_groups[$group['groupid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 			$groupids[] = $group['groupid'];
@@ -688,7 +688,7 @@ class CHostGroup extends CZBXAPI{
 
 		foreach($hosts as $num => $host){
 			if(!isset($allowed_hosts[$host['hostid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 			$hostids[] = $host['hostid'];
@@ -760,7 +760,7 @@ class CHostGroup extends CZBXAPI{
 		);
 		foreach($groups as $num => $group){
 			if(!isset($allowed_groups[$group['groupid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 			$groupids[] = $group['groupid'];
@@ -776,7 +776,7 @@ class CHostGroup extends CZBXAPI{
 		);
 		foreach($hosts as $num => $host){
 			if(!isset($allowed_hosts[$host['hostid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 			$hostids[] = $host['hostid'];
@@ -845,7 +845,7 @@ class CHostGroup extends CZBXAPI{
 		);
 		foreach($groups as $num => $group){
 			if(!isset($allowed_groups[$group['groupid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 			$groupids[] = $group['groupid'];
@@ -860,7 +860,7 @@ class CHostGroup extends CZBXAPI{
 		);
 		foreach($hosts as $num => $host){
 			if(!isset($allowed_hosts[$host['hostid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 			$hostids[] = $host['hostid'];

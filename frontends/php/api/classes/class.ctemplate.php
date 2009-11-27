@@ -625,7 +625,7 @@ class CTemplate extends CZBXAPI{
 									'preservekeys'=>1));
 		foreach($templates as $gnum => $template){
 			if(!isset($upd_templates[$template['templateid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 			$templateids[] = $template['templateid'];
@@ -693,7 +693,7 @@ class CTemplate extends CZBXAPI{
 											'preservekeys'=>1));
 		foreach($templates as $gnum => $template){
 			if(!isset($del_templates[$template['templateid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 			$templateids[] = $template['templateid'];

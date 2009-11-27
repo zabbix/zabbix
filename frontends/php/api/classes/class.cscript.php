@@ -420,7 +420,7 @@ class Cscript extends CZBXAPI{
 											'preservekeys'=>1));
 		foreach($scripts as $snum => $script){
 			if(!isset($upd_scripts[$script['scriptid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 
@@ -479,7 +479,7 @@ class Cscript extends CZBXAPI{
 											'preservekeys'=>1));
 		foreach($scripts as $snum => $script){
 			if(!isset($del_scripts[$script['scriptid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 
