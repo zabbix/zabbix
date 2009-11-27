@@ -1,5 +1,6 @@
 Changes for 1.7.3
 
+ - [ZBX-1369] make more strings translatable (Richlv)
  - [ZBX-974] recompressed png images with pngcrush. max size reduction 28%, average reduction 10% (Richlv)
  - [ZBX-1373] fixed auto discovery by proxy module (Sasha)
  - [ZBX-1368] fixed evaluating of "<=" operator in Uptime/Downtime Action condition (Dmitry)

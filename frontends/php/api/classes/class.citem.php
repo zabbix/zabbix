@@ -860,7 +860,7 @@ class CItem extends CZBXAPI{
 		$upd_items = self::get(array('itemids'=> zbx_objectValues($items, 'itemid'), 'editable'=>1, 'extendoutput'=>1, 'preservekeys'=>1));
 		foreach($items as $gnum => $item){
 			if(!isset($upd_items[$item['itemid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 			$itemids[] = $item['itemid'];
@@ -918,7 +918,7 @@ class CItem extends CZBXAPI{
 		$del_items = self::get(array('itemids'=> zbx_objectValues($items, 'itemid'), 'editable'=>1, 'extendoutput'=>1, 'preservekeys'=>1));
 		foreach($items as $num => $item){
 			if(!isset($del_items[$item['itemid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 
