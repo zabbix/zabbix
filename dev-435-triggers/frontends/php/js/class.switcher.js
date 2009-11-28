@@ -41,7 +41,7 @@ initialize : function(){
 	
 	if((to_change = cookie.readJSON(this.switchers_name)) != null){
 		cookie.erase(this.switchers_name);
-SDJ(to_change);		
+// SDJ(to_change);		
 		for(var i in to_change){
 			this.switchers[i] = to_change[i];
 			if(this.initialState != to_change[i]){
