@@ -301,10 +301,21 @@ include_once('include/page_header.php');
 	$show_event_col = ($config['event_ack_enable'] && ($_REQUEST['show_events'] != EVENTS_OPTION_NOEVENT));
 	
 	$table = new CTableInfo();	
+	$switchers_name = 'trigger_switchers';
+	
 	$header_cb = ($show_event_col) ? new CCheckBox('all_events', false, "checkAll('".$m_form->GetName()."','all_events','events');")
 		: new CCheckBox('all_triggers', false, "checkAll('".$m_form->GetName()."','all_triggers', 'triggers');");
+		
+	if($show_event_col){
+		$whow_hide_all = new CDiv(new CImg('images/general/closed.gif'), 'pointer');
+		$whow_hide_all->setAttribute('id', $switchers_name);
+	}
+	else{
+		$whow_hide_all = NULL;
+	}
+	
 	$table->setHeader(array(
-		$show_event_col ? new CLink(new CImg('images/general/closed.gif'), null, null, 'switcher.showHide(this);') : NULL,
+		$whow_hide_all,
 		$header_cb,
 		make_sorting_header(S_SEVERITY, 'priority'),
 		S_STATUS,
@@ -693,7 +704,7 @@ include_once('include/page_header.php');
 	$trigg_wdgt->show();
 
 	zbx_add_post_js('blink.init();');
-	zbx_add_post_js('var switcher = new CSwitcher();');
+	zbx_add_post_js("var switcher = new CSwitcher('$switchers_name');");
 
 	$jsmenu = new CPUMenu(null, 170);
 	$jsmenu->InsertJavaScript();
