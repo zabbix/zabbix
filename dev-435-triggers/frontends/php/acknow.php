@@ -106,7 +106,6 @@ include_once('include/page_header.php');
 			else{
 				$url = new CUrl($last_page['url']);
 			}
-			include_once('include/page_footer.php');
 			redirect($url->getUrl());
 			exit;
 		}
