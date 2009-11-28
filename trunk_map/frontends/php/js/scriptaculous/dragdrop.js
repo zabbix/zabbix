@@ -408,7 +408,7 @@ var Draggable = Class.create({
       if (!this._originallyAbsolute)
         Position.relativize(this.element);
 
-	  if(IE7)
+	  if(IE)
 	    this.element._originallyAbsolute = null;
 	  else
       	delete this.element._originallyAbsolute;

@@ -97,8 +97,6 @@ table.page_footer tr td.page_footer_r{
 }
 
 /********** FORM TABLE *************/
-form {margin: 0px}
-
 table.formtable {
 	background-color: #FFFFFF;
 	color: #000000;
@@ -196,6 +194,10 @@ table.formtable tr td.form_row_r table.calendar tr td{ /* right cell */
 	padding-right: 1px;
 }
 
+table.formlongtable{
+	width: 99%;
+}
+
 /*----------------- <TABLESTRIPPED> ----------------*/
 
 table.tablestripped {
@@ -249,9 +251,7 @@ td.form_row_r_simple { /* right cell simple */
 }
 /*-------------- <SERVICES> -----------------*/
 
-table.formlongtable{
-	width: 99%;
-}
+
 /*-------------- </SERVICES> -----------------*/
 
 /************ HISTORY LOG TABLE ***********/
