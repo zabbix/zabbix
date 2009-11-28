@@ -35,9 +35,9 @@
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-	if(PAGE_TYPE_HTML == $page['type']){
-		define('ZBX_PAGE_DO_REFRESH', 1);
-	}
+//	if(PAGE_TYPE_HTML == $page['type']){
+//		define('ZBX_PAGE_DO_REFRESH', 1);
+//	}
 
 include_once('include/page_header.php');
 
