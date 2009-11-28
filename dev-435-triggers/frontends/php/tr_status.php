@@ -30,6 +30,7 @@
 	$page['title'] = 'S_STATUS_OF_TRIGGERS';
 	$page['scripts'] = array('scriptaculous.js?load=effects');
 	$page['hist_arg'] = array('groupid', 'hostid');
+	$page['scripts'] = array('class.switcher.js');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -179,7 +180,12 @@ include_once('include/page_header.php');
 	$r_form = new CForm();
 	$r_form->setMethod('get');
 
-	$groups = CHostGroup::get(array('monitored_hosts' => 1, 'with_monitored_items' => 1, 'nodeids' => get_current_nodeid(), 'extendoutput' => 1));
+	$groups = CHostGroup::get(array(
+		'monitored_hosts' => 1, 
+		'with_monitored_items' => 1, 
+		'nodeids' => get_current_nodeid(), 
+		'extendoutput' => 1,
+		'preservekeys' => 1));
 	$cmbGroups = new CComboBox('groupid', $_REQUEST['groupid'], 'javascript: submit();');
 	$cmbGroups->addItem(0, S_ALL_S);
 	foreach($groups as $group){
@@ -190,7 +196,8 @@ include_once('include/page_header.php');
 		'monitored_hosts' => 1,
 		'with_monitored_items' =>1, 
 		'nodeids' => get_current_nodeid(), 
-		'extendoutput' => 1);
+		'extendoutput' => 1,
+		'preservekeys' => 1);
 	if($_REQUEST['groupid'] != 0)
 		$options['groupids'] = $_REQUEST['groupid'];
 	$hosts = CHost::get($options);
@@ -200,7 +207,6 @@ include_once('include/page_header.php');
 		$cmbHosts->addItem($host['hostid'], get_node_name_by_elid($host['hostid'], null, ': ').$host['host']);
 	}
 
-	$scripts_by_hosts = Cscript::getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
 	
 	$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
 	$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
@@ -298,7 +304,7 @@ include_once('include/page_header.php');
 	$header_cb = ($show_event_col) ? new CCheckBox('all_events', false, "checkAll('".$m_form->GetName()."','all_events','events');")
 		: new CCheckBox('all_triggers', false, "checkAll('".$m_form->GetName()."','all_triggers', 'triggers');");
 	$table->setHeader(array(
-		$show_event_col ? new CLink(new CImg('images/general/closed.gif'), null, null, 'showHideRows(this);') : NULL,
+		$show_event_col ? new CLink(new CImg('images/general/closed.gif'), null, null, 'switcher.showHide(this);') : NULL,
 		$header_cb,
 		make_sorting_header(S_SEVERITY, 'priority'),
 		S_STATUS,
@@ -361,6 +367,8 @@ include_once('include/page_header.php');
 	order_result($triggers, $sortfield, $sortorder);
 //---------
 
+	
+	$trigger_hostids = array();
 	foreach($triggers as $tnum => $trigger){
 		$event_count = CEvent::get(array(
 			'count' => 1, 
@@ -369,10 +377,13 @@ include_once('include/page_header.php');
 			'nopermissions' => 1));
 		$triggers[$tnum]['event_count'] = $event_count['rowscount'];
 		
+		$trigger_hostids = array_merge($trigger_hostids, $trigger['hostids']);
 		$triggers[$tnum]['events'] = array();
 	}
+	$trigger_hostids = array_unique($trigger_hostids);
 
-
+	$scripts_by_hosts = Cscript::getScriptsByHosts($trigger_hostids);
+	
 	if($show_events != EVENTS_OPTION_NOEVENT){
 		$ev_options = array(
 			'nodeids' => get_current_nodeid(),
@@ -383,6 +394,7 @@ include_once('include/page_header.php');
 			'sortorder' => ZBX_SORT_DOWN,
 			'time_from' => time() - ($config['event_expire']*86400),
 			'time_till' => time(),
+			'preservekeys' => 1,
 			//'limit' => $config['event_show_max']
 		);
 		switch($show_events){
@@ -424,12 +436,10 @@ include_once('include/page_header.php');
 
 // trigger description js menu {{{
 		$hosts = reset($trigger['hosts']);
-		$trigger['hostid'] = $hosts['hostid'];
-		$trigger['host'] = $hosts['host'];
 
 		$menu_trigger_conf = 'null';
 		if($admin_links){
-			$menu_trigger_conf = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript: redirect('triggers.php?form=update&triggerid=".$trigger['triggerid']."&hostid=".$trigger['hostid']."')\",
+			$menu_trigger_conf = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript: redirect('triggers.php?form=update&triggerid=".$trigger['triggerid']."')\",
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
 		$menu_trigger_url = 'null';
@@ -449,7 +459,7 @@ include_once('include/page_header.php');
 			$font = new CTag('font', 'yes');
 			$font->setAttribute('color', '#000');
 			$font->setAttribute('size', '-2');
-			$font->addItem(explode_exp($trigger['expression'], 1, false,true));
+			$font->addItem(explode_exp($trigger['expression'], 1, false, true));
 			$description = array($description, BR(), $font);
 		}
 
@@ -568,7 +578,8 @@ include_once('include/page_header.php');
 		
 		
 		if($show_event_col && !empty($trigger['events'])){
-			$open_close = new CLink(new CImg('images/general/closed.gif'), null, null, "showHideRows(this, {$trigger['triggerid']})");
+			$open_close = new CDiv(new CImg('images/general/closed.gif'), 'pointer');
+			$open_close->setAttribute('data-switcherid', $trigger['triggerid']);
 		}
 		else if(!$show_event_col){
 			$open_close = null;
@@ -580,6 +591,7 @@ include_once('include/page_header.php');
 
 		$severity_col = new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'], $trigger['value']));
 		if($show_event_col) $severity_col->setColSpan(2);
+		
 		$table->addRow(array(
 			$open_close,
 			$show_event_col ? null : new CCheckBox('triggers['.$trigger['triggerid'].']', 'no', NULL, $trigger['triggerid']),
@@ -635,7 +647,6 @@ include_once('include/page_header.php');
 				$empty_col->setColSpan(3);
 				$ack_cb_col = new CCol($ack_cb);
 				$ack_cb_col->setColSpan(2);
-				//$ack_cb_col->addStyle('text-align: right');
 				$row = new CRow(array(
 					SPACE,
 					$ack_cb_col,
@@ -682,6 +693,7 @@ include_once('include/page_header.php');
 	$trigg_wdgt->show();
 
 	zbx_add_post_js('blink.init();');
+	zbx_add_post_js('var switcher = new CSwitcher();');
 
 	$jsmenu = new CPUMenu(null, 170);
 	$jsmenu->InsertJavaScript();

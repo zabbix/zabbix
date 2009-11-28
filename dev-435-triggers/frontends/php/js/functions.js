@@ -687,7 +687,7 @@ function create_mon_trigger_menu(e, args, items){
 	show_popup_menu(e,tr_menu,280);
 }
 
-function showHideRows(obj, num){
+/* function showHideRows(obj, num){
 	var img = $(obj).firstDescendant();
 
 	var status = 1;
@@ -720,3 +720,4 @@ function showHideRows(obj, num){
 		}
 	}
 }
+ */

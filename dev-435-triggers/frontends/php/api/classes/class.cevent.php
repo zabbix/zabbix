@@ -294,7 +294,7 @@ class CEvent extends CZBXAPI{
 					$sql_where.
 				$sql_order;
 		$db_res = DBselect($sql, $sql_limit);
-Copt::profiling_start('asd');
+// sdi($sql);
 		while($event = DBfetch($db_res)){
 			if($options['count'])
 				$result = $event;
@@ -435,7 +435,6 @@ Copt::profiling_start('asd');
 		if(is_null($options['preservekeys'])){
 			$result = zbx_cleanHashes($result);
 		}
-Copt::profiling_stop('asd');
 
 
 	return $result;
