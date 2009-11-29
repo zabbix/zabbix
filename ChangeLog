@@ -1,5 +1,6 @@
 Changes for 1.6.8
 
+ - [ZBX-1384] fixed memory leak in processing ldap checks (Sasha)
  - [ZBX-1355] fixed possible server crash when receiving invalid data. Thanks to Nicob (Sasha)
  - [ZBX-1031] added more security checks for communication between nodes. Thanks to Nicob (Sasha)
  - [ZBX-1309] fixed input file processing by zabbix_sender (-i option) (Sasha)

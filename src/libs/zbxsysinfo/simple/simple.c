@@ -92,7 +92,7 @@ lbl_ret:
 	if(attr)	ldap_memfree(attr);
 	if(ber) 	ber_free(ber, 0);
 	if(res)		ldap_msgfree(res);
-	if(res)		ldap_unbind(ldap);
+	if(ldap)	ldap_unbind(ldap);
        
 	return	SYSINFO_RET_OK;
 }
