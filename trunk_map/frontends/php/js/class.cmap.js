@@ -82,6 +82,7 @@ mselement: {
 
 mlink: {
 	linkid:			0,				// ALWAYS must be a STRING (js doesn't support uint64)
+	label:			'',				// Link label
 	selementid1:	0,				// ALWAYS must be a STRING (js doesn't support uint64)
 	selementid2:	0,				// ALWAYS must be a STRING (js doesn't support uint64)
 	linktriggers:	{},				// ALWAYS must be a STRING (js doesn't support uint64)
@@ -1514,7 +1515,7 @@ this.selementForm.elementtype = e_select_6;
 	var e_textarea_6 = document.createElement('textarea');
 this.selementForm.label = e_textarea_6;
 
-	e_textarea_6.setAttribute('cols',"32");
+	e_textarea_6.setAttribute('cols',"48");
 	e_textarea_6.setAttribute('rows',"4");
 	e_textarea_6.setAttribute('name',"label");
 	e_textarea_6.className = "biginput";
@@ -1603,7 +1604,7 @@ this.selementForm.elementName = e_input_6;
 
 	e_input_6.setAttribute('readonly',"readonly");
 	e_input_6.setAttribute('value',"");
-	e_input_6.setAttribute('size',"32");
+	e_input_6.setAttribute('size',"42");
 	e_input_6.setAttribute('id',"elementName");
 	e_input_6.setAttribute('name',"elementName");
 	e_input_6.className = "biginput";
@@ -1686,6 +1687,7 @@ this.selementForm.advanced_icons = e_input_6;
 		
 		e_select_6.appendChild(e_option_7);
 	}
+
 // ICON ON
 	var e_tr_4 = document.createElement('tr');
 this.selementForm.typeDOM.iconid_on = e_tr_4;
@@ -2502,6 +2504,35 @@ this.linkForm.form = e_form_1;
 	e_input_4.setAttribute('name',"linkid");
 	e_tbody_3.appendChild(e_input_4);
 
+
+// LABEL
+	var e_tr_4 = document.createElement('tr');
+	e_tr_4.className = "form_even_row";
+	e_tbody_3.appendChild(e_tr_4);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_l";
+	e_td_5.appendChild(document.createTextNode('Label'));
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_td_5 = document.createElement('td');
+	e_td_5.className = "form_row_r";
+	e_tr_4.appendChild(e_td_5);
+
+
+	var e_textarea_6 = document.createElement('textarea');
+this.linkForm.linklabel = e_textarea_6;
+
+	e_textarea_6.setAttribute('cols',"48");
+	e_textarea_6.setAttribute('rows',"4");
+	e_textarea_6.setAttribute('name',"linklabel");
+	e_textarea_6.setAttribute('id',"linklabel");
+	e_textarea_6.className = "biginput";
+	e_td_5.appendChild(e_textarea_6);
+
+
 // SELEMENTID1
 	var e_tr_4 = document.createElement('tr');
 	e_tr_4.className = "form_even_row";
@@ -2733,6 +2764,11 @@ updateForm_link: function(e, linkid){
 	}
 
 	var maplink = this.links[linkid];
+
+
+// LABEL
+	this.linkForm.linklabel.value = maplink.label;
+
 // SELEMENTID1
 	this.linkForm.selementid1.update();
 	for(var selementid in this.selements){
@@ -2979,6 +3015,9 @@ saveForm_link: function(e){
 
 
 	var params = {};
+
+// Label
+	params.label = this.linkForm.linklabel.value;
 
 // Selementid1
 	params.selementid1 = this.linkForm.selementid1.options[this.linkForm.selementid1.selectedIndex].value;
