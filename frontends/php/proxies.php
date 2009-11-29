@@ -19,55 +19,40 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
+	require_once('include/config.inc.php');
+	require_once('include/hosts.inc.php');
 
-$page['title'] = "S_PROXIES";
-$page['file'] = 'proxies.php';
-$page['hist_arg'] = array('config');
-$page['scripts'] = array();
+	$page['title'] = 'S_PROXIES';
+	$page['file'] = 'proxies.php';
+	$page['hist_arg'] = array('');
 
-include_once('include/page_header.php');
+	include_once('include/page_header.php');
 
-$_REQUEST['config'] = get_request('config','proxies.php');
-
-$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
-$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
-
-
-if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0) && !isset($available_hosts[$_REQUEST['hostid']])) {
-	access_deny();
-}
 ?>
 <?php
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'config'=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-
 /* ARRAYS */
 		'hostid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,		'isset({form})&&({form}=="update")'),
 		'host'=>	array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,	'isset({save})'),
 		'hosts'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-
 // Actions
 		'go'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
-
 // form
 		'save'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'clone'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'cancel'=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-
 /* other */
 		'form'=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>array(T_ZBX_STR, O_OPT, NULL,	NULL,	NULL)
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('h.host',ZBX_SORT_UP);
+	validate_sort_and_sortorder('host', ZBX_SORT_UP);
 
-	$_REQUEST['go'] = get_request('go','none');
+	$_REQUEST['go'] = get_request('go', 'none');
 ?>
 <?php
 
@@ -126,7 +111,7 @@ if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0) && !isset($available_ho
 	}
 // ------- GO --------
 	else if(str_in_array($_REQUEST['go'], array('activate','disable')) && isset($_REQUEST['hosts'])){
-		$result = true;
+		$go_result = true;
 
 		$status = ($_REQUEST['go'] == 'activate')?HOST_STATUS_MONITORED:HOST_STATUS_NOT_MONITORED;
 		$hosts = get_request('hosts',array());
@@ -143,15 +128,15 @@ if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0) && !isset($available_ho
 				$old_status = $db_host['status'];
 				if($old_status == $status) continue;
 
-				$result &= update_host_status($db_host['hostid'], $status);
-				if(!$result) continue;
+				$go_result &= update_host_status($db_host['hostid'], $status);
+				if(!$go_result) continue;
 
 /*				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,'Old status ['.$old_status.'] '.'New status ['.$status.'] ['.$db_host['hostid'].']');*/
 			}
 		}
 
-		$result = DBend($result && !empty($hosts));
-		show_messages($result, S_HOST_STATUS_UPDATED, NULL);
+		$go_result = DBend($go_result && !empty($hosts));
+		show_messages($go_result, S_HOST_STATUS_UPDATED, NULL);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['hosts'])){
 
@@ -160,102 +145,82 @@ if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0) && !isset($available_ho
 		DBstart();
 		foreach($hosts as $hostid){
 			$proxy = get_host_by_hostid($hostid);
-			$result = delete_proxy($hostid);
+			$go_result = delete_proxy($hostid);
 
 			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_PROXY,	'['.$proxy['host'].' ] ['.$proxy['hostid'].']');
 		}
-		$result = DBend();
+		$go_result = DBend();
 
-		show_messages($result, S_PROXY_DELETED, S_CANNOT_DELETE_PROXY);
+		show_messages($go_result, S_PROXY_DELETED, S_CANNOT_DELETE_PROXY);
 	}
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,AVAILABLE_NOCACHE); /* update available_hosts after ACTIONS */
+	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
+		$url = new CUrl();
+		$path = $url->getPath();
+		insert_js('cookie.eraseArray("'.$path.'")');
+	}
+	
 ?>
 <?php
+
 	$proxies_wdgt = new CWidget();
-	$params = array();
-
-	$options = array('only_current_node', 'allow_all');
-	if(isset($_REQUEST['form']) || isset($_REQUEST['massupdate'])) array_push($options,'do_not_select_if_empty');
-
-	foreach($options as $option) $params[$option] = 1;
-	$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
-	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, 0, $params);
-
-	validate_group($PAGE_GROUPS, $PAGE_HOSTS, false);
-
-	$available_groups = $PAGE_GROUPS['groupids'];
-	$available_hosts = $PAGE_HOSTS['hostids'];
-
 
 	$frmForm = new CForm();
-	$frmForm->setMethod('get');
-
-// Config
-	$cmbConf = new CComboBox('config','proxies.php','javascript: submit()');
-	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');
+	$cmbConf = new CComboBox('config', 'proxies.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('nodes.php',S_NODES);
 		$cmbConf->addItem('proxies.php',S_PROXIES);
-
 	$frmForm->addItem($cmbConf);
-
-	if(!isset($_REQUEST["form"])){
+	if(!isset($_REQUEST['form'])){
 		$frmForm->addItem(new CButton('form',S_CREATE_PROXY));
 	}
-
 	$proxies_wdgt->addPageHeader(S_CONFIGURATION_OF_PROXIES, $frmForm);
 
 
-	if(isset($_REQUEST["form"])){
-
-		global	$USER_DETAILS;
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+	if(isset($_REQUEST['form'])){
 
 		$hosts = array();
 		$frm_title = S_PROXY;
 
-		if($_REQUEST['hostid']>0){
+		if($_REQUEST['hostid'] > 0){
 			$proxy = get_host_by_hostid($_REQUEST['hostid']);
-			$frm_title = S_PROXY.' ['.$proxy["host"].']';
+			$frm_title = S_PROXY.' ['.$proxy['host'].']';
 		}
 
-		if(($_REQUEST['hostid']>0) && !isset($_REQUEST["form_refresh"])){
-			$name = $proxy["host"];
-			$db_hosts=DBselect('SELECT hostid '.
+		if(($_REQUEST['hostid'] > 0) && !isset($_REQUEST['form_refresh'])){
+			$name = $proxy['host'];
+			$db_hosts = DBselect(
+				'SELECT hostid '.
 				' FROM hosts '.
-				' WHERE status NOT IN ('.HOST_STATUS_DELETED.') '.
-					' AND proxy_hostid='.$_REQUEST['hostid']);
+				' WHERE proxy_hostid='.$_REQUEST['hostid']);
 
-			while($db_host=DBfetch($db_hosts))
+			while($db_host = DBfetch($db_hosts))
 				array_push($hosts, $db_host['hostid']);
 		}
 		else{
-			$name=get_request("host","");
+			$name = get_request('host', '');
 		}
 
 		$frmHostG = new CFormTable($frm_title,"proxies.php");
 		$frmHostG->setHelp("web.proxy.php");
-		$frmHostG->addVar("config",get_request("config",5));
 
-		if($_REQUEST['hostid']>0){
-			$frmHostG->addVar("hostid",$_REQUEST['hostid']);
+		if($_REQUEST['hostid'] > 0){
+			$frmHostG->addVar('hostid',$_REQUEST['hostid']);
 		}
 
-		$frmHostG->addRow(S_PROXY_NAME,new CTextBox("host",$name,30));
+		$frmHostG->addRow(S_PROXY_NAME, new CTextBox('host', $name, 30));
 
-		$cmbHosts = new CTweenBox($frmHostG,'hosts',$hosts);
+		$cmbHosts = new CTweenBox($frmHostG, 'hosts', $hosts);
 
 		$sql = 'SELECT hostid,proxy_hostid,host '.
 				' FROM hosts '.
 				' WHERE status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
-					' AND '.DBcondition('hostid',$available_hosts).
 				' ORDER BY host';
 		$db_hosts=DBselect($sql);
 		while($db_host=DBfetch($db_hosts)){
 			$cmbHosts->addItem($db_host['hostid'],
-					get_node_name_by_elid($db_host['hostid'], null, ': ').$db_host["host"],
-					NULL,
-					($db_host["proxy_hostid"] == 0 || ($_REQUEST['hostid']>0) && ($db_host["proxy_hostid"] == $_REQUEST['hostid'])));
+				get_node_name_by_elid($db_host['hostid'], null, ': ').$db_host["host"],
+				NULL,
+				($db_host["proxy_hostid"] == 0 || ($_REQUEST['hostid']>0) && ($db_host["proxy_hostid"] == $_REQUEST['hostid'])));
 		}
 		$frmHostG->addRow(S_HOSTS,$cmbHosts->Get(S_PROXY.SPACE.S_HOSTS,S_OTHER.SPACE.S_HOSTS));
 
@@ -265,115 +230,96 @@ if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0) && !isset($available_ho
 			$frmHostG->addItemToBottomRow(new CButton("clone",S_CLONE));
 			$frmHostG->addItemToBottomRow(SPACE);
 			$frmHostG->addItemToBottomRow(
-				new CButtonDelete("Delete selected proxy?",
-					url_param("form").url_param("config").url_param("hostid")
-				)
+				new CButtonDelete('Delete selected proxy?', url_param('form').url_param('hostid'))
 			);
 		}
 		$frmHostG->addItemToBottomRow(SPACE);
-		$frmHostG->addItemToBottomRow(new CButtonCancel(url_param("config")));
+		$frmHostG->addItemToBottomRow(new CButtonCancel());
 
 		$proxies_wdgt->addItem($frmHostG);
 		$proxies_wdgt->show();
 	}
-	else {
+	else{
 
 		$numrows = new CDiv();
-		$numrows->setAttribute('name','numrows');
-
+		$numrows->setAttribute('name', 'numrows');
 		$proxies_wdgt->addHeader(S_PROXIES_BIG);
-//		$proxies_wdgt->addHeader($numrows);
+		$proxies_wdgt->addHeader($numrows);
 
-		$form = new CForm('proxies.php');
-		$form->setMethod('get');
-
+		$form = new CForm('proxies.php', 'get');
 		$form->setName('hosts');
-		$form->addVar('config',get_request('config',0));
 
 		$table = new CTableInfo(S_NO_PROXIES_DEFINED);
-
 		$table->setHeader(array(
-				new CCheckBox('all_hosts',NULL,"checkAll('".$form->GetName()."','all_hosts','hosts');"),
-				make_sorting_link(S_NAME,'g.name'),
-				S_LASTSEEN_AGE,
-				' # ',
-				S_MEMBERS
-			));
+			new CCheckBox('all_hosts', NULL, "checkAll('".$form->GetName()."','all_hosts','hosts');"),
+			make_sorting_header(S_NAME, 'host'),
+			S_LASTSEEN_AGE,
+			' # ',
+			S_MEMBERS
+		));
 
-// sorting
-//		order_page_result($proxies, 'description');
+		
+		$proxies = CHost::get(array(
+			'extendoutput' => 1,
+			'proxy_hosts' => 1,
+			'sortfield' => getPageSortField('host'),
+			'sortorder' => getPageSortOrder()
+		));
+		
+		order_page_result($proxies, 'host');
 
-// PAGING UPPER
-		$paging = BR();
-//		$paging = getPagingLine($proxies);
-		$proxies_wdgt->addItem($paging);
-//---------
+		$paging = getPagingLine($proxies);
 
-		$sql = 'SELECT hostid,host,lastaccess '.
-				' FROM hosts'.
-				' WHERE status IN ('.HOST_STATUS_PROXY.') '.
-					' AND '.DBin_node('hostid').
-				order_by('host');
-		$db_proxies=DBselect($sql);
-		while($db_proxy=DBfetch($db_proxies)){
+		foreach($proxies as $pnum => $proxy){
 			$count = 0;
 			$hosts = array();
 
-			$sql = 'SELECT DISTINCT host,status '.
+			$sql = 'SELECT DISTINCT host, status, hostid '.
 					' FROM hosts'.
-					' WHERE proxy_hostid='.$db_proxy['hostid'].
-						' AND '.DBcondition('hostid',$available_hosts).
+					' WHERE proxy_hostid='.$proxy['hostid'].
 						' AND status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
 					' ORDER BY host';
 			$db_hosts = DBselect($sql);
-			while($db_host=DBfetch($db_hosts)){
-				$style = ($db_host['status']==HOST_STATUS_MONITORED)?NULL:(($db_host['status']==HOST_STATUS_TEMPLATE)?'unknown' :'on');
-				array_push($hosts, empty($hosts) ? '' : ', ', new CSpan($db_host['host'], $style));
+			while($db_host = DBfetch($db_hosts)){
+				$style = ($db_host['status']==HOST_STATUS_MONITORED) ? 'off':(($db_host['status']==HOST_STATUS_TEMPLATE)?'unknown' :'on');
+
+				$hosts[] = new CLink($db_host['host'], 'hosts.php?form=update&hostid='.$db_host['hostid'], $style);
+				$hosts[] = ', ';
 				$count++;
 			}
+			array_pop($hosts);
 
-			if($db_proxy['lastaccess'] != 0)
-				$lastclock = zbx_date2age($db_proxy['lastaccess']);
-			else
-				$lastclock = '-';
+			$lastclock = ($proxy['lastaccess'] == 0) ? '-' : zbx_date2age($proxy['lastaccess']);
 
 			$table->addRow(array(
-				new CCheckBox('hosts['.$db_proxy['hostid'].']', NULL, NULL, $db_proxy['hostid']),
-				new CLink($db_proxy['host'],
-							'proxies.php?form=update&hostid='.$db_proxy['hostid'].url_param('config')),
+				new CCheckBox('hosts['.$proxy['hostid'].']', NULL, NULL, $proxy['hostid']),
+				new CLink($proxy['host'], 'proxies.php?form=update&hostid='.$proxy['hostid']),
 				$lastclock,
 				$count,
-				new CCol((empty($hosts)?'-':$hosts), 'wraptext')
-				));
+				new CCol((empty($hosts) ? '-' : $hosts), 'wraptext')
+			));
 		}
 
-// PAGING FOOTER
-		$table->addRow(new CCol($paging));
-//		$proxies_wdgt->addItem($paging);
-//---------
 
 //----- GO ------
 		$goBox = new CComboBox('go');
-		$goBox->addItem('activate',S_ACTIVATE_SELECTED);
-		$goBox->addItem('disable',S_DISABLE_SELECTED);
-		$goBox->addItem('delete',S_DELETE_SELECTED);
-
+		$goBox->addItem('activate', S_ACTIVATE_SELECTED);
+		$goBox->addItem('disable', S_DISABLE_SELECTED);
+		$goBox->addItem('delete', S_DELETE_SELECTED);
 // goButton name is necessary!!!
-		$goButton = new CButton('goButton',S_GO.' (0)');
-		$goButton->setAttribute('id','goButton');
+		$goButton = new CButton('goButton', S_GO.' (0)');
+		$goButton->setAttribute('id', 'goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
+// --
 
-		$table->setFooter(new CCol(array($goBox, $goButton)));
-//----
-
+		$footer = get_table_header(array($goBox, $goButton));
+		
+		$table = array($paging, $table, $paging, $footer);
 		$form->addItem($table);
-
 		$proxies_wdgt->addItem($form);
 		$proxies_wdgt->show();
 	}
-?>
-<?php
+
 
 include_once('include/page_footer.php');
-
 ?>
