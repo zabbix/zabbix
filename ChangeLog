@@ -1,5 +1,6 @@
 Changes for 1.7.3
 
+ - [ZBX-1329] fixed activating\deactivating host groups (Vedmak)
  - [ZBX-1383] fixed selection after mass operations, performance imrovements and links to host configuration in proxies screen (Vedmak)
  - [ZBX-1377] fixed adding template with linked template (Vedmak)
  - [ZBX-1369] make more strings translatable (Richlv)
