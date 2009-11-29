@@ -181,6 +181,11 @@ class CMap extends CZBXAPI{
 				}
 				else{
 					if(!isset($result[$sysmap['sysmapid']])) $result[$sysmap['sysmapid']]= array();
+					
+					if(!is_null($options['select_elements'])){
+						$result[$sysmap['sysmapid']]['elementids'] = array();
+						$result[$sysmap['sysmapid']]['elements'] = array();
+					}
 
 					$result[$sysmap['sysmapid']] += $sysmap;
 				}
@@ -278,16 +283,13 @@ class CMap extends CZBXAPI{
 // Adding Elements
 		if($options['select_elements']){
 			if(!isset($map_elements)){
+				$map_elements = array();
 				$db_elements = DBselect('SELECT * FROM sysmaps_elements WHERE '.DBcondition('sysmapid', $sysmapids));
 				while($element = DBfetch($db_elements)){
 					$map_elements[$element['sysmapid']] = $element;
 				}
 			}
 			foreach($map_elements as $element){
-				if(!isset($result[$element['sysmapid']]['elementids'])){
-					$result[$element['sysmapid']]['elementids'] = array();
-					$result[$element['sysmapid']]['elements'] = array();
-				}
 				$result[$element['sysmapid']]['elementids'][$element['elementid']] = $element['elementid'];
 				$result[$element['sysmapid']]['elements'][$element['elementid']] = $element;
 			}
