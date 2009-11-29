@@ -153,6 +153,12 @@ include_once('include/page_header.php');
 		$links = array();
 		$res = DBselect('select * from sysmaps_links where sysmapid='.$_REQUEST['sysmapid']);
 		while($link = DBfetch($res)){
+			$link['linktriggers'] = array();
+			$subres = DBselect('select * from sysmaps_linktriggers where linkid='.$link['linkid']);
+			while($linktrigger = DBfetch($res)){
+				$link['linktriggers'][] = $linktrigger;
+			}
+
 			$links[$link['linkid']] = $link;
 		}
 	}
@@ -207,7 +213,7 @@ include_once('include/page_header.php');
 			imagecopy($im,$img,$selement['x'],$selement['y'],0,0,ImageSX($img),ImageSY($img));
 		}
 
-		if($label_type==MAP_LABEL_TYPE_NOTHING)	continue;
+		if($label_type == MAP_LABEL_TYPE_NOTHING)	continue;
 
 		$color		= $darkgreen;
 		$label_color	= $black;

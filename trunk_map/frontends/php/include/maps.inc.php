@@ -883,7 +883,7 @@
 
 	function get_png_by_selementid($selementid){
 		$selement = DBfetch(DBselect('SELECT * FROM sysmaps_elements WHERE selementid='.$selementid));
-		if(!$element)	return FALSE;
+		if(!$selement)	return FALSE;
 
 	return get_png_by_selement($selement);
 	}
@@ -910,6 +910,10 @@
 				break;
 		}
 
+// Process for default icons			
+		if($info['iconid'] == 0) $info['iconid'] = $selement['iconid_off'];
+//------
+
 		$image = get_image_by_imageid($info['iconid']);
 
 		if(!$image){
@@ -927,12 +931,13 @@
 		if($selement['selementid'] > 0){
 			$info = get_info_by_selement($selement);
 //SDI($info);
+
 			switch($info['icon_type']){
-				case SYSMAP_ELEMENT_ICON_ON:
-					$info['iconid'] = $selement['iconid_on'];
-					break;
 				case SYSMAP_ELEMENT_ICON_OFF:
 					$info['iconid'] = $selement['iconid_off'];
+					break;
+				case SYSMAP_ELEMENT_ICON_ON:
+					$info['iconid'] = $selement['iconid_on'];
 					break;
 				case SYSMAP_ELEMENT_ICON_UNKNOWN:
 					$info['iconid'] = $selement['iconid_unknown'];
@@ -941,6 +946,10 @@
 					$info['iconid'] = $selement['iconid_maintenance'];
 					break;
 			}
+
+// Process for default icons			
+			if($info['iconid'] == 0) $info['iconid'] = $selement['iconid_off'];
+//------
 		}
 		else{
 			$info['iconid'] = $selement['iconid_off'];

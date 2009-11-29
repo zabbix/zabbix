@@ -31,7 +31,7 @@
 }
 
 .right_header {
-	border-color: #222;
+	border-color: #222222;
 }
 
 
@@ -87,52 +87,52 @@ table.page_footer{
 
 table.formtable tr td.form_row_first{
 	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
-	border-color: #222;
+	border-color: #222222;
 }
 
 table.formtable tr td.form_row_last {
 	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
-	border-color: #222;
+	border-color: #222222;
 }
 
 table.formtable tr td.form_row_l { /* left cell */
-	border-color: #222;
+	border-color: #222222;
 }
 
 table.formtable tr td.form_row_c { /* center cell */
-	border-color: #222;
+	border-color: #222222;
 }
 
 table.formtable tr td.form_row_r { /* right cell */
-	border-color: #222;
+	border-color: #222222;
 }
 
 td.form_row_l_simple { /* left cell simple */
-	border-color: #222;
+	border-color: #222222;
 }
 
 td.form_row_r_simple { /* right cell simple */
-	border-color: #222;
+	border-color: #222222;
 }
 
 table.formlongtable tr td.form_row_first{
 	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
-	border-color: #222;
+	border-color: #222222;
 }
 
 table.formlongtable tr td.form_row_last {
 	background: #5C7099 url('../images/gradients/table_head2_bb.gif') repeat-x top left;
-	border-color: #222;
+	border-color: #222222;
 }
 
 table.formlongtable tr td.form_row_l { /* left cell */
-	border-color:	#222;
+	border-color:	#222222;
 }
 table.formlongtable tr td.form_row_c { /* center cell */
-	border-color: #222;
+	border-color: #222222;
 }
 table.formlongtable tr td.form_row_r { /* right cell */
-	border-color: #222;
+	border-color: #222222;
 }
 
 table.tabletree tr.footer td {
@@ -229,7 +229,7 @@ table.server_info tr.footer td {
 }
 
 table.history td.caption{
-	color:#0AF;
+	color:#00AAFF;
 }
 
 /* MESSAGES */
@@ -369,11 +369,11 @@ div.icon_sortdown{
 }
 
 div#scrolltableft{
-	color: #0CF;
+	color: #00CCFF;
 }
 
 div#scrolltabright{
-	color: #0CF;
+	color: #00CCFF;
 }
 
 div#selection_box{
@@ -405,6 +405,6 @@ span.info{
 /*////////////////	FORMS	////////////////////*/
 
 .button:hover {
-	border-color: #000;
-	color: #00F;
+	border-color: #000000;
+	color: #0000FF;
 }
