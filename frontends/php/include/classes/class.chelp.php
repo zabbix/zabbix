@@ -30,8 +30,8 @@ class CHelp extends CSpan{
 			$pside = 'right';
 		}
 
-		parent::__construct(new CDiv(SPACE,'iconhelp'), 'http://www.zabbix.com/documentation.php' );//'http://www.zabbix.com/manual/v1.1/'.$url);
-		parent::onClick('window.open("http://www.zabbix.com/documentation.php");');
+		parent::__construct(new CDiv(SPACE,'iconhelp'), 'http://www.zabbix.com/documentation/' );//'http://www.zabbix.com/manual/v1.1/'.$url);
+		parent::onClick('window.open("http://www.zabbix.com/documentation/");');
 		$this->attributes['style'] = 'padding-'.$pside.': 5px; float:'.$side.';text-decoration: none;';
 		$this->attributes['target'] = '_blank';
 	}
