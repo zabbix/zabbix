@@ -396,7 +396,7 @@ update_selement_option: function(selementid, params){ // params = {'key': value,
 	if(!isset(selementid, this.selements) || empty(this.selements[selementid])) return false;
 
 	for(var key in params){
-		if(!isset(key, params) || is_null(params[key])) continue;
+		if(is_null(params[key])) continue;
 		
 		if(is_number(params[key])) params[key] = params[key].toString();
 		this.selements[selementid][key] = params[key];
@@ -538,7 +538,7 @@ update_link_option: function(linkid, params){ // params = [{'key': key, 'value':
 	if(!isset(linkid, this.links) || empty(this.links[linkid])) return false;
 //SDI(key+' : '+value);
 	for(var key in params){
-		if(empty(params[key])) continue;
+		if(is_null(params[key])) continue;
 		
 		if(key == 'selementid1'){
 			if(this.links[linkid]['selementid2'] == params[key])
@@ -595,6 +595,7 @@ remove_links: function(){
 	}
 },
 
+
 remove_link: function(linkid){
 	this.debug('remove_link');
 //--
@@ -604,6 +605,7 @@ remove_link: function(linkid){
 	this.links[linkid] = null;
 	delete(this.links[linkid]);
 },
+
 
 remove_links_by_selementid: function(selementid){
 	this.debug('remove_links_by_selementid');
@@ -644,25 +646,28 @@ add_linktrigger: function(linkid, linktrigger, update_map){
 	}
 },
 
-update_linktrigger_option: function(linkid, linktriggerid, params){
+update_linktrigger_option: function(linkid, linktriggerid, params, update_map){
 	this.debug('update_linktrigger_option');
 //--
 
 	if(!isset(linkid,this.links) || empty(this.links[linkid])) return false;
 
+
 //SDI(key+' : '+value);
 	for(var key in params){
-		if(empty(params[key])) continue;
+		if(is_null(params[key])) continue;
 		if(!isset(linktriggerid, this.links[linkid].linktriggers) || empty(this.links[linkid].linktriggers[linktriggerid])) continue;
 
 		if(is_number(params[key])) params[key] = params[key].toString();
 		this.links[linkid].linktriggers[linktriggerid][pair.key] = params[key];
 	}
 
-	this.update_mapimg();
+	if((typeof(update_map) != 'undefined') && (update_map == 1)){
+		this.update_mapimg();
+	}
 },
 
-remove_linktrigger: function(linkid, linktriggerid){
+remove_linktrigger: function(linkid, linktriggerid, update_map){
 	this.debug('remove_linktrigger');
 //--
 
@@ -672,7 +677,9 @@ remove_linktrigger: function(linkid, linktriggerid){
 	this.links[linkid].linktriggers[linktriggerid] = null;
 	delete(this.links[linkid].linktriggers[linktriggerid]);
 
-	this.update_mapimg();
+	if((typeof(update_map) != 'undefined') && (update_map == 1)){
+		this.update_mapimg();
+	}
 },
 // ---------- IMAGES MANIPULATION ------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------
@@ -966,8 +973,8 @@ showForm: function(e, selementid){
 
 
 // Form init
-	this.updateForm_selement(e, selementid);
-	this.update_multiContainer(e);
+//	this.updateForm_selement(e, selementid);
+//	this.update_multiContainer(e);
 	this.update_linkContainer(e);
 	this.hideForm_link(e);
 //---
@@ -1008,27 +1015,6 @@ create_multiContainer: function(e, selementid){
 	this.multiContainer = {};
 
 
-// Down Stream
-/*
-	var e_table_1 = document.createElement('table');
-this.multiContainer.containerHeader = e_table_1;
-	e_table_1.setAttribute('id',"multiContainer");
-	e_table_1.setAttribute('cellSpacing',"0");
-	e_table_1.setAttribute('cellPadding',"0");
-	e_table_1.style.width = "100%";
-
-
-	var e_tbody_2 = document.createElement('tbody');
-	e_table_1.appendChild(e_tbody_2);
-
-
-	var e_tr_3 = document.createElement('tr');
-	e_tbody_2.appendChild(e_tr_3);
-
-
-	var e_td_4 = document.createElement('td');
-	e_tr_3.appendChild(e_td_4);
-*/	
 	var e_div_1 = document.createElement('div');
 this.multiContainer.container = e_div_1;
 	e_div_1.setAttribute('id',"multiContainer");
@@ -2431,7 +2417,7 @@ hideForm_link: function(e){
 	this.debug('hideForm_link');
 //--
 
-	if(!isset('form', this.linkForm)) return false;
+	if(!isset('form', this.linkForm) || empty(this.linkForm.form)) return false;
 
 	this.linkForm.form.parentNode.removeChild(this.linkForm.form);
 	this.linkForm.form = null;
@@ -2496,8 +2482,9 @@ this.linkForm.form = e_form_1;
 
 	e_td_5.appendChild(document.createTextNode('Edit connector'));
 
-
+// HIDDEN
 	var e_input_4 = document.createElement('input');
+this.linkForm.linkid = e_input_4;
 	e_input_4.setAttribute('type',"hidden");
 	e_input_4.setAttribute('value',"0");
 	e_input_4.setAttribute('id',"linkid");
@@ -2765,6 +2752,9 @@ updateForm_link: function(e, linkid){
 
 	var maplink = this.links[linkid];
 
+// LINKID
+	this.linkForm.linkid.value = linkid;
+
 
 // LABEL
 	this.linkForm.linklabel.value = maplink.label;
@@ -2931,7 +2921,14 @@ linkForm_addLinktrigger: function(linktrigger){
 		e_input_10.setAttribute('name',"link_triggers["+triggerid+"][linktriggerid]");
 		e_td_9.appendChild(e_input_10);
 	}
-		
+
+	var e_input_10 = document.createElement('input');
+	e_input_10.setAttribute('type',"hidden");
+	e_input_10.setAttribute('value',linktrigger.triggerid);
+	e_input_10.setAttribute('id',"link_triggers["+triggerid+"][triggerid]");
+	e_input_10.setAttribute('name',"link_triggers["+triggerid+"][triggerid]");
+	e_td_9.appendChild(e_input_10);
+
 	var e_input_10 = document.createElement('input');
 	e_input_10.setAttribute('type',"hidden");
 	e_input_10.setAttribute('value',linktrigger.desc_exp);
@@ -3026,7 +3023,7 @@ saveForm_link: function(e){
 	params.selementid2 = this.linkForm.selementid2.options[this.linkForm.selementid2.selectedIndex].value;
 
 // Type OK
-	params.drawtype = this.linkForm.drawtype.selectedIndex;
+	params.drawtype = this.linkForm.drawtype.options[this.linkForm.drawtype.selectedIndex].value;
 	
 // Color
 	params.color = this.linkForm.color.value;
@@ -3037,19 +3034,23 @@ saveForm_link: function(e){
 		this.remove_linktrigger(maplink.linkid, linktriggerid);
 	}
 
+	var triggerid = null;
 	var linktrigger = {};
 	var linktriggerid = null;
 
 	var indicators = $$('input[name=link_triggerids]');
 	for(var i=0; i<indicators.length; i++){
 		if(!isset(i, indicators)) continue;
+		
+		linktrigger = {};
+		triggerid = indicators[i].value;
 
-		linktrigger.triggerid = $('link_triggerids['+triggerid+'][triggerid]').value;
-		linktrigger.desc_exp = $('link_triggerids['+triggerid+'][desc_exp]').value;
-		linktrigger.drawtype = $('link_triggerids['+triggerid+'].[drawtype]').value;
-		linktrigger.color = $('link_triggerids['+triggerid+'].[color]').value;
+		linktrigger.triggerid = $('link_triggers['+triggerid+'][triggerid]').value;
+		linktrigger.desc_exp = $('link_triggers['+triggerid+'][desc_exp]').value;
+		linktrigger.drawtype = $('link_triggers['+triggerid+'][drawtype]').value;
+		linktrigger.color = $('link_triggers['+triggerid+'][color]').value;
 
-		linktriggerid = $('link_triggerids['+triggerid+'][linktriggerid]');
+		linktriggerid = $('link_triggers['+triggerid+'][linktriggerid]');
 
 		if(!is_null(linktriggerid)) 
 			linktrigger.linktriggerid = linktriggerid.value;
@@ -3058,7 +3059,9 @@ saveForm_link: function(e){
 	}
 //--
 
+//SDJ(params);
 	this.update_link_option(linkid, params);
+//SDJ(this.links[linkid]);
 
 	this.update_linkContainer(e);
 	this.hideForm_link(e);

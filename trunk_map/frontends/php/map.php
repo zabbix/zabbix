@@ -173,7 +173,7 @@ include_once('include/page_header.php');
 
 		$selement = $selements[$link['selementid2']];
 		list($x2, $y2) = get_icon_center_by_selement($selement);
-
+		
 		$drawtype = $link['drawtype'];
 		$color = convertColor($im,$link['color']);
 
@@ -199,6 +199,57 @@ include_once('include/page_header.php');
 			}
 		}
 		MyDrawLine($im,$x1,$y1,$x2,$y2,$color,$drawtype);
+		
+// Link Label
+		if(empty($link['label'])) continue;
+		
+		$label = $link['label'];
+
+		$label = str_replace("\r", '', $label);
+		$strings = explode("\n", $label);
+
+		$box_width = 0;
+		$box_height = 0;
+
+		foreach($strings as $snum => $str){
+			$dims = imageTextSize(8,0,$str);
+			
+			$box_width = ($box_width > $dims['width'])?$box_width:$dims['width'];
+			$box_height+= $dims['height']+2;
+		}
+
+		$boxX_left = round(($x1 + $x2) / 2 - ($box_width/2) - 6);
+		$boxX_right = round(($x1 + $x2) / 2 + ($box_width/2) + 6);
+
+		$boxY_top = round(($y1 + $y2) / 2 - ($box_height/2) - 4);
+		$boxY_bottom = round(($y1 + $y2) / 2 + ($box_height/2) + 2);
+
+		switch($drawtype){
+			case MAP_LINK_DRAWTYPE_DASHED_LINE:
+			case MAP_LINK_DRAWTYPE_DOT:
+				dashedrectangle($im, $boxX_left, $boxY_top, $boxX_right, $boxY_bottom, $color);
+				break;
+			case MAP_LINK_DRAWTYPE_BOLD_LINE:
+				imagerectangle($im, $boxX_left-1, $boxY_top-1, $boxX_right+1, $boxY_bottom+1, $color);
+			case MAP_LINK_DRAWTYPE_LINE:
+			default:
+				imagerectangle($im, $boxX_left, $boxY_top, $boxX_right, $boxY_bottom, $color);
+		}
+					
+		imagefilledrectangle($im, $boxX_left+1, $boxY_top+1, $boxX_right-1, $boxY_bottom-1, $white);
+
+
+		$increasey = 4;
+		foreach($strings as $snum => $str){
+			$dims = imageTextSize(8,0,$str);
+
+			$labelx = ($x1 + $x2) / 2 - ($dims['width']/2);
+			$labely = $boxY_top + $increasey;
+			
+			imagetext($im, 8, 0, $labelx, $labely+$dims['height'], $black, $str);
+
+			$increasey += $dims['height']+2;			
+		}
 	}
 //-----------------------
 
@@ -256,6 +307,7 @@ include_once('include/page_header.php');
 			$label_line = expand_map_element_label_by_data($selement);
 		}
 
+// LABEL
 		if($label_line=='' && $info_line=='') continue;
 
 		$label_line = str_replace("\r", '', $label_line);
@@ -278,6 +330,7 @@ include_once('include/page_header.php');
 		else	/* MAP_LABEL_LOC_BOTTOM */
 			$y += imagesy($img);
 
+		$increasey = 1;
 		foreach($strings as $str){
 			$num++;
 			$dims = imageTextSize(8,0,$str);
@@ -289,11 +342,10 @@ include_once('include/page_header.php');
 			else	/* MAP_LABEL_LOC_RIGHT */
 				$x_label = $x + imagesx($img);
 
+			imagefilledrectangle($im, $x_label-1, $y+$dims['height']+$increasey+1, $x_label + $dims['width']+1, $y+$increasey, $white);
+			imagetext($im, 8, 0, $x_label, $y+$increasey+$dims['height'], ($num == $cnt)?$color:$label_color, $str);
 
-			imagefilledrectangle($im, $x_label-1, $y+$dims['height']+3, $x_label + $dims['width']+1, $y + 2, $white);
-			imagetext($im, 8, 0, $x_label, $y+$dims['height']+2, ($num == $cnt)?$color:$label_color, $str);
-
-			$y += $dims['height']+4;
+			$increasey+= $dims['height']+2;
 		}
 	}
 
