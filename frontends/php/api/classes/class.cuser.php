@@ -548,9 +548,10 @@ class CUser extends CZBXAPI{
 		$userids = array();
 		$result = false;
 
-		$upd_users = self::get(array('userids'=>zbx_objectValues($users, 'userid'), 
-											'extendoutput'=>1, 
-											'preservekeys'=>1));
+		$upd_users = self::get(array(
+			'userids' => zbx_objectValues($users, 'userid'), 
+			'extendoutput' => 1, 
+			'preservekeys' => 1));
 		foreach($users as $gnum => $user){
 			$userids[] = $user['userid'];
 			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User ['.$user['alias'].']');
@@ -802,7 +803,6 @@ class CUser extends CZBXAPI{
  * @param array $media_data
  * @param string $media_data['userid']
  * @param array $media_data['medias']
- * @param array $media_data['medias']['mediaid']
  * @param string $media_data['medias']['mediatypeid']
  * @param string $media_data['medias']['sendto']
  * @param int $media_data['medias']['severity']
@@ -810,20 +810,48 @@ class CUser extends CZBXAPI{
  * @param string $media_data['medias']['period']
  * @return boolean
  */
-	public static function updateMedia($media_data){
+	public static function updateMedia($data){
+		$errors = array();
+		
 		$result = false;
-		$userid = $media_data['userid'];
+		$users = zbx_toArray($data['users']);
+		$userids = zbx_objectValues($users, 'userid');
+		
+		$medias = zbx_toArray($data['medias']);
 
-		foreach($media_data['medias'] as $media){
-			$result = update_media($media['mediaid'], $userid, $media['mediatypeid'], $media['sendto'], $media['severity'], $media['active'], $media['period']);
-			if(!$result) break;
+		self::BeginTransaction(__METHOD__);
+		
+		$result = DBexecute('DELETE FROM media WHERE '.DBcondition('userid', $userids));
+		if($result){
+			foreach($userids as $userid){
+				foreach($medias as $media){
+				
+					if(!validate_period($media['period'])){
+						$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => "Wrong period [ {$media['period']} ]");
+						$result = false;
+						break 2;
+					}
+					
+					$mediaid = get_dbid('media', 'mediaid');
+					$sql = 'INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period)'.
+							' VALUES ('.$mediaid.','.$userid.','.$media['mediatypeid'].','.
+								zbx_dbstr($media['sendto']).','.$media['active'].','.$media['severity'].','.
+								zbx_dbstr($media['period']).')';
+					$result = DBexecute($sql);
+					if(!$result){
+						break 2;
+					}
+				}
+			}
 		}
+		
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
 			return true;
 		}
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::setMethodErrors(__METHOD__, $errors);
 			return false;
 		}
 

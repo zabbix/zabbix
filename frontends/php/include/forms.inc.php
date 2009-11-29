@@ -605,7 +605,7 @@
 	}
 
 // Insert form for User
-	function insert_user_form($userid,$profile=0){
+	function insert_user_form($userid, $profile=0){
 		global $ZBX_LOCALES;
 		global $USER_DETAILS;
 
@@ -837,15 +837,16 @@
 //view Media Settings for users above "User" +++
 		if(uint_in_array($USER_DETAILS['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN))) {
 			$frmUser->addVar('user_medias', $user_medias);
+			
 			$media_table = new CTableInfo(S_NO_MEDIA_DEFINED);
 			foreach($user_medias as $id => $one_media){
-				if(!isset($one_media["active"]) || $one_media["active"]==0){
+				if(!isset($one_media['active']) || $one_media['active']==0){
 					$status = new CLink(S_ENABLED,'#','enabled');
-					$status->OnClick("return create_var('".$frmUser->GetName()."','disable_media',".$id.", true);");
+					$status->OnClick('return create_var("'.$frmUser->GetName().'","disable_media",'.$id.', true);');
 				}
 				else{
 					$status = new CLink(S_DISABLED,'#','disabled');
-					$status->OnClick("return create_var('".$frmUser->GetName()."','enable_media',".$id.", true);");
+					$status->OnClick('return create_var("'.$frmUser->GetName().'","enable_media",'.$id.', true);');
 				}
 
 				$media_url = '?dstfrm='.$frmUser->GetName().
@@ -868,12 +869,12 @@
 			}
 
 			$frmUser->addRow(
-						S_MEDIA,
-						array($media_table,
-							new CButton('add_media',S_ADD,'javascript: return PopUp("popup_media.php?dstfrm='.$frmUser->GetName().'",550,400);'),
-							SPACE,
-							(count($user_medias) > 0) ? new CButton('del_user_media',S_DELETE_SELECTED) : null
-						));
+				S_MEDIA,
+				array($media_table,
+					new CButton('add_media',S_ADD,'javascript: return PopUp("popup_media.php?dstfrm='.$frmUser->GetName().'",550,400);'),
+					SPACE,
+					(count($user_medias) > 0) ? new CButton('del_user_media',S_DELETE_SELECTED) : null
+				));
 		}
 
 

@@ -1,5 +1,6 @@
 Changes for 1.7.3
 
+ - [ZBX-1287] fixed operations with user medias (Vedmak)
  - [ZBX-1328] better naming for mass operations in the list of host groups (Alexei)
  - [DEV-137] help link redirected to on-line documentation at www.zabbix.com/documentation/ (Alexei)
  - [ZBX-1329] fixed activating\deactivating host groups (Vedmak)

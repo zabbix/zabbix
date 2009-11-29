@@ -138,7 +138,7 @@ include_once('include/page_header.php');
 		else if(isset($_REQUEST['password1']) && ($_REQUEST['alias']!=ZBX_GUEST_USER) && zbx_empty($_REQUEST['password1'])){
 			show_error_message(S_PASSWORD_SHOULD_NOT_BE_EMPTY);
 		}
-		else {
+		else{
 			$user = array();
 			$user['name'] = get_request('name');
 			$user['surname'] = get_request('surname');
@@ -161,19 +161,18 @@ include_once('include/page_header.php');
 
 				DBstart();
 				$result = CUser::update($user);
+				if($result) $result = CUser::updateMedia(array('users' => $user, 'medias' => $user['user_medias']));
 				$result = DBend($result);
 				if(!$result) error(CUser::resetErrors());
 
 				show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 			}
-			else {
+			else{
 				$action = AUDIT_ACTION_ADD;
 
-				DBstart();
 				$result = CUser::add($user);
-				$result = DBend($result);
-
 				if(!$result) error(CUser::resetErrors());
+				
 				show_messages($result, S_USER_ADDED, S_CANNOT_ADD_USER);
 			}
 			if($result){
@@ -213,7 +212,6 @@ include_once('include/page_header.php');
 			unset($_REQUEST['form']);
 		}
 	}
-
 // Add USER to GROUP
 	else if(isset($_REQUEST['grpaction'])&&isset($_REQUEST['usrgrpid'])&&isset($_REQUEST['userid'])&&($_REQUEST['grpaction']==1)){
 		$user = CUser::get(array('userids'=>$_REQUEST['userid'],'extendoutput'=>1));
@@ -237,7 +235,6 @@ include_once('include/page_header.php');
 		unset($_REQUEST['grpaction']);
 		unset($_REQUEST['form']);
 	}
-
 // Remove USER from GROUP
 	else if(isset($_REQUEST['grpaction'])&&isset($_REQUEST['usrgrpid'])&&isset($_REQUEST['userid'])&&($_REQUEST['grpaction']==0)){
 		$user = CUser::get(array('userids'=>$_REQUEST['userid'],'extendoutput'=>1));
@@ -318,29 +315,26 @@ include_once('include/page_header.php');
 
 ?>
 <?php
-	$_REQUEST['filter_usrgrpid'] = get_request('filter_usrgrpid',get_profile('web.users.filter.usrgrpid',0));
+	$_REQUEST['filter_usrgrpid'] = get_request('filter_usrgrpid', get_profile('web.users.filter.usrgrpid', 0));
 	update_profile('web.users.filter.usrgrpid', $_REQUEST['filter_usrgrpid'], PROFILE_TYPE_ID);
 
-	$frmForm = new CForm();
-	$frmForm->setMethod('get');
-	$cmbConf = new CComboBox('config', 'users.php');
-	$cmbConf->setAttribute('onchange', 'javascript: redirect(this.options[this.selectedIndex].value);');
+	$frmForm = new CForm(null, 'get');
+	$cmbConf = new CComboBox('config', 'users.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('usergrps.php', S_USER_GROUPS);
 		$cmbConf->addItem('users.php', S_USERS);
-	$frmForm->addItem(array($cmbConf,SPACE,new CButton('form',S_CREATE_USER)));
+	$frmForm->addItem(array($cmbConf, new CButton('form', S_CREATE_USER)));
 
 	show_table_header(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
-	echo SBR;
+	//echo SBR;
 
 
 	if(isset($_REQUEST['form'])){
-		insert_user_form(get_request('userid',null));
+		insert_user_form(get_request('userid', null));
 	}
 	else{
 		$user_wdgt = new CWidget();
 
-		$form = new CForm();
-		$form->setMethod('get');
+		$form = new CForm(null, 'get');
 
 		$cmbUGrp = new CComboBox('filter_usrgrpid',$_REQUEST['filter_usrgrpid'],'submit()');
 		$cmbUGrp->addItem(0, S_ALL_S);
