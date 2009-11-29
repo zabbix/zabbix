@@ -28,7 +28,7 @@ require_once('include/httptest.inc.php');
 
 	function update_host_groups_by_groupid($groupid,$hosts=array()){
 		$grp_hosts = CHost::get(array('groupids'=>$groupid, 'editable'=>1, 'preservekeys' => 1));
-		$grp_hostids = array_keys($grp_hosts);
+		$grp_hostids = zbx_objectValues($grp_hosts, 'hostid');
 
 // unlinked hosts
 		$missed_hostids = array_diff($grp_hostids, $hosts);

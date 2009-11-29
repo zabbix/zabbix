@@ -844,8 +844,6 @@ function zbx_toHash(&$value, $field){
 		$result[$value[$field]] = $value;
 	}
 	else{
-		$result = array();
-
 		foreach($value as $key => $val){
 			if(!is_array($val)){
 				$result[$val] = $val;

@@ -149,12 +149,16 @@ include_once('include/page_header.php');
 			DBstart();
 			$hosts = CHost::get(array('groupids' => $groups, 'editable' => 1));
 
-			$go_result = CHost::massUpdate(array('hosts' => $hosts, 'status' => $status));
-			if(!$go_result)
-				error(CHost::resetErrors());
-
+			if(empty($hosts)){
+				$go_result = true;
+			}
+			else{
+				$go_result = CHost::massUpdate(array('hosts' => $hosts, 'fields' => array('status' => $status)));
+				if(!$go_result)
+					error(CHost::resetErrors());
+			}
+			
 			$go_result = DBend($go_result);
-
 			show_messages($go_result, S_HOST_STATUS_UPDATED, S_CANNOT_UPDATE_HOST);
 		}
 	}
@@ -199,7 +203,8 @@ include_once('include/page_header.php');
 					'sortfield' => 'host',
 					'templated_hosts' => 1);
 				$db_hosts = CHost::get($params);
-				$hosts = zbx_toHash($db_hosts, 'hostid');
+				$hosts = zbx_objectValues($db_hosts, 'hostid');
+				$hosts = zbx_toHash($hosts, 'hostid');
 			}
 		}
 
