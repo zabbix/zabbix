@@ -686,38 +686,3 @@ function create_mon_trigger_menu(e, args, items){
 //alert(page_menu[id]);
 	show_popup_menu(e,tr_menu,280);
 }
-
-/* function showHideRows(obj, num){
-	var img = $(obj).firstDescendant();
-
-	var status = 1;
-	if(img.readAttribute('src') == 'images/general/closed.gif'){
-		var newImgPath = 'images/general/opened.gif';
-		var oldImgPath = 'images/general/closed.gif';
-	}
-	else{
-		status = 0;
-		var newImgPath = 'images/general/closed.gif';
-		var oldImgPath = 'images/general/opened.gif';
-	}
-	img.writeAttribute('src', newImgPath);
-	
-	if(typeof(num) == 'undefined'){
-		var imgs = $$('img[src='+oldImgPath+']');
-		for(var i=0; i < imgs.length; i++){
-			if(empty(imgs[i])) continue;
-			imgs[i].src = newImgPath;
-		}
-	}
-	
-	var elements = $$('tr[data-parentid]');
-	for(var i=0; i < elements.length; i++){
-		if(empty(elements[i])) continue;
-		
-		if((typeof(num) == 'undefined') || elements[i].getAttribute('data-parentid') == num){
-			if(status) elements[i].style.display = '';
-			else elements[i].style.display = 'none';
-		}
-	}
-}
- */

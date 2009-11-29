@@ -650,7 +650,7 @@ class CTrigger extends CZBXAPI{
 											'preservekeys'=>1));
 		foreach($triggers as $gnum => $trigger){
 			if(!isset($upd_triggers[$trigger['triggerid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 			$triggerids[] = $trigger['triggerid'];
@@ -716,7 +716,7 @@ class CTrigger extends CZBXAPI{
 											'preservekeys'=>1));
 		foreach($triggers as $gnum => $trigger){
 			if(!isset($del_triggers[$trigger['triggerid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 

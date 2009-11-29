@@ -390,7 +390,7 @@ class CScreen extends CZBXAPI{
 		foreach($screens as $gnum => $screen){
 			if(!isset($upd_screens[$screen['screenid']])){
 				
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 			$screenids[] = $screen['screenid'];
@@ -470,7 +470,7 @@ class CScreen extends CZBXAPI{
 
 		foreach($screens as $gnum => $screen){
 			if(!isset($del_screens[$screen['screenid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 			$screenids[] = $screen['screenid'];

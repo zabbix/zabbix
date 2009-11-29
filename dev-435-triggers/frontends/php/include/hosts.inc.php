@@ -190,7 +190,7 @@ require_once('include/httptest.inc.php');
 				'(hostid,proxy_hostid,host,port,status,useip,dns,ip,disable_until,available,'.
 					'useipmi,ipmi_port,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,ipmi_ip) '.
 				' VALUES ('.$hostid.','.$proxy_hostid.','.zbx_dbstr($host).','.$port.','.$status.','.$useip.','.zbx_dbstr($dns).','.zbx_dbstr($ip).',0,'
-					.HOST_AVAILABLE_UNKNOWN.','.($useipmi == 'yes' ? 1 : 0).','.$ipmi_port.','.$ipmi_authtype.','.$ipmi_privilege.','.zbx_dbstr($ipmi_username).','
+					.HOST_AVAILABLE_UNKNOWN.','.($useipmi === 'yes' ? 1 : 0).','.$ipmi_port.','.$ipmi_authtype.','.$ipmi_privilege.','.zbx_dbstr($ipmi_username).','
 					.zbx_dbstr($ipmi_password).','.zbx_dbstr($ipmi_ip).')');
 			if($result){
 				add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST, $hostid, $host, 'hosts', NULL, NULL);
@@ -906,7 +906,7 @@ require_once('include/httptest.inc.php');
  * Function: get_templates_by_hostid
  *
  * Description:
- *     Retrive templates for specified host
+ *     Retrieve templates for specified host
  *
  * Author:
  *		Eugene Grigorjev (eugene.grigorjev@zabbix.com)
@@ -933,7 +933,7 @@ require_once('include/httptest.inc.php');
  * Function: get_viewed_groups
  *
  * Description:
- *     Retrive groups for dropdown
+ *     Retrieve groups for dropdown
  *
  * Author:
  *		Artem "Aly" Suharev
@@ -1184,7 +1184,7 @@ return $result;
  * Function: get_viewed_hosts
  *
  * Description:
- *     Retrive groups for dropdown
+ *     Retrieve groups for dropdown
  *
  * Author:
  *		Artem "Aly" Suharev
@@ -1812,7 +1812,7 @@ return $result;
 	 * Function: delete_template_applications
 	 *
 	 * Description:
-	 *     Delete applicatios from host by templates
+	 *     Delete applications from host by templates
 	 *
 	 * Author:
 	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
@@ -1858,7 +1858,7 @@ return $result;
 	 * Function: copy_template_applications
 	 *
 	 * Description:
-	 *     Copy applicatios from templates to host
+	 *     Copy applications from templates to host
 	 *
 	 * Author:
 	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)

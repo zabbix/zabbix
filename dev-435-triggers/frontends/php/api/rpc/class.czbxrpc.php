@@ -230,7 +230,7 @@ class czbxrpc{
 
 		switch($action){
 			default:
-			$result = call_user_func(array('CAapplication', $action), $params);
+			$result = call_user_func(array('CApplication', $action), $params);
 		}
 
 		self::$result = $result;

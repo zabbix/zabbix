@@ -279,8 +279,10 @@ class zbxXML{
 // HOST
 			$host_node = self::addChildData($hosts_node, XML_TAG_HOST, $host);
 // HOST PROFILE
-			self::addChildData($host_node, XML_TAG_HOSTPROFILE, $host['profile']);
-			self::addChildData($host_node, XML_TAG_HOSTPROFILE_EXT, $host['profile_ext']);
+			if(!empty($host['profile']))
+				self::addChildData($host_node, XML_TAG_HOSTPROFILE, $host['profile']);
+			if(!empty($host['profile_ext']))
+				self::addChildData($host_node, XML_TAG_HOSTPROFILE_EXT, $host['profile_ext']);
 // GROUPS
 			if(isset($data['hosts_groups'])){
 				$groups_node = $host_node->appendChild(new DOMElement(XML_TAG_GROUPS));
@@ -582,7 +584,7 @@ class zbxXML{
 				}
 
 				$xpath = new DOMXPath($xml);
-				$profile_ext_node = $xpath->query('host_profiles_ext', $host);
+				$profile_ext_node = $xpath->query('host_profiles_ext/*', $host);
 				
 				if($profile_ext_node->length > 0){
 					$profile_ext = array();
@@ -607,8 +609,9 @@ class zbxXML{
 						
 						$current_macro = CUserMacro::getHostMacroObjects($macro_db);
 						$current_macro = reset($current_macro);
-
+						
 						if($current_macro){
+							$current_macro['hostid'] = $current_host['hostid'];
 							$macros_to_upd[] = $current_macro;
 						}
 						else{
@@ -618,7 +621,7 @@ class zbxXML{
 // sdii($macros_to_upd);
 // sdii($macros_to_add);
 
-					if(!empty($macros_to_upd)){
+					if(!empty($macros_to_add)){
 						$r = CUserMacro::add($macros_to_add);
 						if($r === false){
 							error(CUserMacro::resetErrors());

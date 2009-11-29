@@ -306,7 +306,7 @@ include_once('include/page_header.php');
 	$header_cb = ($show_event_col) ? new CCheckBox('all_events', false, "checkAll('".$m_form->GetName()."','all_events','events');")
 		: new CCheckBox('all_triggers', false, "checkAll('".$m_form->GetName()."','all_triggers', 'triggers');");
 		
-	if($show_event_col){
+	if($show_events != EVENTS_OPTION_NOEVENT){
 		$whow_hide_all = new CDiv(new CImg('images/general/closed.gif'), 'pointer');
 		$whow_hide_all->setAttribute('id', $switchers_name);
 	}
@@ -322,7 +322,7 @@ include_once('include/page_header.php');
 		make_sorting_header(S_LAST_CHANGE, 'lastchange'),
 		S_AGE,
 		$show_event_col ? S_DURATION : NULL,
-		S_ACKNOWLEDGED,
+		$show_event_col ? S_ACKNOWLEDGED : NULL,
 		is_show_all_nodes() ? S_NODE : null,
 		S_HOST,
 		make_sorting_header(S_NAME, 'description'),
@@ -580,19 +580,24 @@ include_once('include/page_header.php');
 		);
 
 
-		if($trigger['event_count']){
-			$to_ack = new CCol(array($trigger['event_count'].SPACE, new CLink(S_TO_ACKNOWLEDGE, 'acknow.php?triggers[]='.$trigger['triggerid'], 'on')), 'on center');
+		if($config['event_ack_enable']){
+			if($trigger['event_count']){
+				$to_ack = new CCol(array($trigger['event_count'].SPACE, new CLink(S_TO_ACKNOWLEDGE, 'acknow.php?triggers[]='.$trigger['triggerid'], 'on')), 'on center');
+			}
+			else{
+				$to_ack = new CCol($trigger['event_count'].SPACE.S_TO_ACKNOWLEDGE, 'off center');
+			}
 		}
 		else{
-			$to_ack = new CCol($trigger['event_count'].SPACE.S_TO_ACKNOWLEDGE, 'off center');
+			$to_ack = null;
 		}
 		
 		
-		if($show_event_col && !empty($trigger['events'])){
+		if(($show_events != EVENTS_OPTION_NOEVENT) && !empty($trigger['events'])){
 			$open_close = new CDiv(new CImg('images/general/closed.gif'), 'pointer');
 			$open_close->setAttribute('data-switcherid', $trigger['triggerid']);
 		}
-		else if(!$show_event_col){
+		else if($show_events == EVENTS_OPTION_NOEVENT){
 			$open_close = null;
 		}
 		else{

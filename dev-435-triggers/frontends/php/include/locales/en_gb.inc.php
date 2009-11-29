@@ -27,6 +27,15 @@
 	'S_DATE_FORMAT_YMD'=>			'd M Y',
 	'S_HTML_CHARSET'=>			'UTF-8',
 
+	'S_YEAR_SHORT' =>			'y',
+	'S_MONTH_SHORT' =>			'm',
+	'S_WEEK_SHORT' =>			'w',
+	'S_DAY_SHORT' =>			'd',
+	'S_HOUR_SHORT' =>			'h',
+	'S_MINUTE_SHORT' =>			'm',
+	'S_SECOND_SHORT' =>			's',
+	'S_MILLISECOND_SHORT' =>		'ms',
+
 	'S_ACTIVATE_SELECTED'=>			'Activate selected',
 	'S_DISABLE_SELECTED'=>			'Disable selected',
 	'S_DELETE_SELECTED'=>			'Delete selected',
@@ -628,11 +637,11 @@
 	'S_MAINTENANCE_TYPE'=>			'Maintenance type',
 	'S_EXPIRED'=>				'Expired',
 
-	'S_NORMAL_PROCESSING'=>			'Normal processing',
-	'S_NO_DATA_PROCESSING'=>		'No data processing',
-	
-	'S_NORMAL_MAINTENANCE' => 'Normal maintenance',
-	'S_NO_DATA_MAINTENANCE' => 'No data maintenance', 
+	'S_WITH_DATA_COLLECTION'=>		'With data collection',
+	'S_NO_DATA_COLLECTION'=>		'No data collection',
+
+	'S_NORMAL_MAINTENANCE'=>		'Normal maintenance',
+	'S_NO_DATA_MAINTENANCE'=>		'No data maintenance', 
 
 	'S_DELETE_MAINTENANCE_PERIOD_Q'=>	'Delete maintenance period?',
 
@@ -1638,7 +1647,8 @@
 	'S_LATEST_DATA'=>			'Latest data',
 
 //	Errors
-	'S_INCORRECT_DESCRIPTION'=>			'Incorrect description',
-	'S_CANT_FORMAT_TREE'=>				'Can\'t format Tree',
+	'S_INCORRECT_DESCRIPTION'=>		'Incorrect description',
+	'S_CANT_FORMAT_TREE'=>			'Can\'t format Tree',
+	'S_NO_PERMISSION'=>			'You do not have permission to perform this operation'
 	);
 ?>

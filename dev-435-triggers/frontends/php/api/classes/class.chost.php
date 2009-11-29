@@ -840,7 +840,7 @@ class CHost extends CZBXAPI{
 		$upd_hosts = self::get(array('hostids'=> zbx_objectValues($hosts, 'hostid'), 'editable'=>1, 'extendoutput'=>1, 'preservekeys'=>1));
 		foreach($hosts as $gnum => $host){
 			if(!isset($upd_hosts[$host['hostid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 			$hostids[] = $host['hostid'];
@@ -914,7 +914,7 @@ class CHost extends CZBXAPI{
 
 		foreach($hosts as $num => $host){
 			if(!isset($del_hosts[$host['hostid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 			
