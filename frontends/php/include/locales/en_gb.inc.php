@@ -1024,6 +1024,7 @@
 	'S_LAST_VALUE'=>			'Last value',
 
 //	sysmap.php
+	'S_UPPER_LEVEL_MAPS' => 'Upper level maps',
 	'S_LINK'=>				'Link',
 	'S_LINKS'=>				'Links',
 	'S_LABEL'=>				'Label',
