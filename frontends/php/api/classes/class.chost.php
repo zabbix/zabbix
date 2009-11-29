@@ -377,7 +377,7 @@ class CHost extends CZBXAPI{
 				$hostids[$host['hostid']] = $host['hostid'];
 
 				if(is_null($options['extendoutput'])){
-					$result[$host['hostid']] = $host['hostid'];
+					$result[$host['hostid']] = array('hostid' => $host['hostid']);
 				}
 				else{
 					if(!isset($result[$host['hostid']])) $result[$host['hostid']]= array();
@@ -813,32 +813,38 @@ class CHost extends CZBXAPI{
  *
  * @param _array $hosts multidimensional array with Hosts data
  * @param array $hosts['hosts'] Array of Host objects to update
- * @param string $hosts['host'] Host name.
- * @param array $hosts['groupids'] HostGroup IDs add Host to.
- * @param int $hosts['port'] Port. OPTIONAL
- * @param int $hosts['status'] Host Status. OPTIONAL
- * @param int $hosts['useip'] Use IP. OPTIONAL
- * @param string $hosts['dns'] DNS. OPTIONAL
- * @param string $hosts['ip'] IP. OPTIONAL
- * @param int $hosts['proxy_hostid'] Proxy Host ID. OPTIONAL
- * @param int $hosts['useipmi'] Use IPMI. OPTIONAL
- * @param string $hosts['ipmi_ip'] IPMAI IP. OPTIONAL
- * @param int $hosts['ipmi_port'] IPMI port. OPTIONAL
- * @param int $hosts['ipmi_authtype'] IPMI authentication type. OPTIONAL
- * @param int $hosts['ipmi_privilege'] IPMI privilege. OPTIONAL
- * @param string $hosts['ipmi_username'] IPMI username. OPTIONAL
- * @param string $hosts['ipmi_password'] IPMI password. OPTIONAL
+ * @param string $hosts['fields']['host'] Host name.
+ * @param array $hosts['fields']['groupids'] HostGroup IDs add Host to.
+ * @param int $hosts['fields']['port'] Port. OPTIONAL
+ * @param int $hosts['fields']['status'] Host Status. OPTIONAL
+ * @param int $hosts['fields']['useip'] Use IP. OPTIONAL
+ * @param string $hosts['fields']['dns'] DNS. OPTIONAL
+ * @param string $hosts['fields']['ip'] IP. OPTIONAL
+ * @param int $hosts['fields']['proxy_hostid'] Proxy Host ID. OPTIONAL
+ * @param int $hosts['fields']['useipmi'] Use IPMI. OPTIONAL
+ * @param string $hosts['fields']['ipmi_ip'] IPMAI IP. OPTIONAL
+ * @param int $hosts['fields']['ipmi_port'] IPMI port. OPTIONAL
+ * @param int $hosts['fields']['ipmi_authtype'] IPMI authentication type. OPTIONAL
+ * @param int $hosts['fields']['ipmi_privilege'] IPMI privilege. OPTIONAL
+ * @param string $hosts['fields']['ipmi_username'] IPMI username. OPTIONAL
+ * @param string $hosts['fields']['ipmi_password'] IPMI password. OPTIONAL
  * @return boolean
  */
-	public static function massUpdate($hosts){
-		$params = $hosts;
-		$hosts = $hosts['hosts'];
+	public static function massUpdate($hosts_data){
+		$errors = array();
 		
-		$hosts = zbx_toArray($hosts);
+		$hosts = zbx_toArray($hosts_data['hosts']);
+		$fields = $hosts_data['fields'];
+		
 		$hostids = array();
 		
-		$upd_hosts = self::get(array('hostids'=> zbx_objectValues($hosts, 'hostid'), 'editable'=>1, 'extendoutput'=>1, 'preservekeys'=>1));
-		foreach($hosts as $gnum => $host){
+		$upd_hosts = self::get(array(
+			'hostids' => zbx_objectValues($hosts, 'hostid'), 
+			'editable' => 1, 
+			'extendoutput' => 1, 
+			'preservekeys' => 1));
+
+		foreach($hosts as $hnum => $host){
 			if(!isset($upd_hosts[$host['hostid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
@@ -852,24 +858,23 @@ class CHost extends CZBXAPI{
 			return false;
 		}
 		else{
-			$sql = 'UPDATE hosts SET '.
-				(isset($params['proxy_hostid']) ? ',proxy_hostid='.$params['proxy_hostid'] : '').
-				(isset($params['host']) ? ',host='.zbx_dbstr($params['host']) : '').
-				(isset($params['port']) ? ',port='.$params['port'] : '').
-				(isset($params['status']) ? ',status='.$params['status'] : '').
-				(isset($params['useip']) ? ',useip='.$params['useip'] : '').
-				(isset($params['dns']) ? ',dns='.zbx_dbstr($params['dns']) : '').
-				(isset($params['ip']) ? ',ip='.zbx_dbstr($params['ip']) : '').
-				(isset($params['useipmi']) ? ',useipmi='.$params['useipmi'] : '').
-				(isset($params['ipmi_port']) ? ',ipmi_port='.$params['ipmi_port'] : '').
-				(isset($params['ipmi_authtype']) ? ',ipmi_authtype='.$params['ipmi_authtype'] : '').
-				(isset($params['ipmi_privilege']) ? ',ipmi_privilege='.$params['ipmi_privilege'] : '').
-				(isset($params['ipmi_username']) ? ',ipmi_username='.zbx_dbstr($params['ipmi_username']) : '').
-				(isset($params['ipmi_password']) ? ',ipmi_password='.zbx_dbstr($params['ipmi_password']) : '').
-				(isset($params['ipmi_ip']) ? ',ipmi_ip='.zbx_dbstr($params['ipmi_ip']) : '').
-				' WHERE '.DBcondition('hostid', $hostids);
-
-			$sql = substr_replace($sql, '', strpos($sql, ','), 1);
+			$sql_set = array();
+			if(isset($fields['proxy_hostid'])) $sql_set[] = 'proxy_hostid='.$fields['proxy_hostid'];
+			if(isset($fields['host'])) $sql_set[] = 'host='.zbx_dbstr($fields['host']);
+			if(isset($fields['port'])) $sql_set[] = 'port='.$fields['port'];
+			if(isset($fields['status'])) $sql_set[] = 'status='.$fields['status'];
+			if(isset($fields['useip'])) $sql_set[] = 'useip='.$fields['useip'];
+			if(isset($fields['dns'])) $sql_set[] = 'dns='.$fields['dns'];
+			if(isset($fields['ip'])) $sql_set[] = 'ip='.$fields['ip'];
+			if(isset($fields['useipmi'])) $sql_set[] = 'useipmi='.$fields['useipmi'];
+			if(isset($fields['ipmi_port'])) $sql_set[] = 'ipmi_port='.$fields['ipmi_port'];
+			if(isset($fields['ipmi_authtype'])) $sql_set[] = 'ipmi_authtype='.$fields['ipmi_authtype'];
+			if(isset($fields['ipmi_privilege'])) $sql_set[] = 'ipmi_privilege='.$fields['ipmi_privilege'];
+			if(isset($fields['ipmi_username'])) $sql_set[] = 'ipmi_username='.zbx_dbstr($fields['ipmi_username']);
+			if(isset($fields['ipmi_password'])) $sql_set[] = 'ipmi_password='.zbx_dbstr($fields['ipmi_password']);
+			if(isset($fields['ipmi_ip'])) $sql_set[] = 'ipmi_ip='.$fields['ipmi_ip'];
+				
+			$sql = 'UPDATE hosts SET ' . implode(', ', $sql_set) . ' WHERE '.DBcondition('hostid', $hostids);
 
 			$result = DBexecute($sql);
 		}
@@ -877,11 +882,11 @@ class CHost extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_hosts = self::get(array('hostids'=>$hostids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$upd_hosts = self::get(array('hostids' => $hostids, 'extendoutput' => 1, 'nopermissions' => 1));			
 			return $upd_hosts;
 		}
 		else{
-			self::setError(__METHOD__);
+			self::setMethodErrors(__METHOD__, $errors);
 			return false;
 		}
 	}

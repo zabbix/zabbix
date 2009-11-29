@@ -523,9 +523,11 @@ class Cscript extends CZBXAPI{
 
 		$obj_params = array('hostids' => $hostids, 'preservekeys' => 1);
 		$hosts_read_only  = CHost::get($obj_params);
+		$hosts_read_only = zbx_objectValues($hosts_read_only, 'hostid');
 
 		$obj_params = array('editable' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
 		$hosts_read_write = CHost::get($obj_params);
+		$hosts_read_write = zbx_objectValues($hosts_read_write, 'hostid');
 
 // initialize array
 		$scripts_by_host = array();

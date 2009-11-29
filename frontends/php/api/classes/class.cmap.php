@@ -224,6 +224,7 @@ class CMap extends CZBXAPI{
 // sdi($host_groups_to_check);
 
 				$allowed_hosts = CHost::get(array('hostids' => $hosts_to_check, 'editable' => isset($options['editable'])));
+				$allowed_hosts = zbx_objectValues($allowed_hosts, 'hostid');
 				$allowed_maps = CMap::get(array('sysmapids' => $maps_to_check, 'editable' => isset($options['editable'])));
 
 				$allowed_triggers = CTrigger::get(array('triggerids' => $triggers_to_check, 'editable' => isset($options['editable'])));
