@@ -384,11 +384,11 @@ include_once('include/page_header.php');
 
 //----- GO ------
 		$goBox = new CComboBox('go');
-		$goOption = new CComboItem('activate',S_ACTIVATE_SELECTED);
+		$goOption = new CComboItem('activate',S_ACTIVATE_SELECTED_HOSTS);
 		$goOption->setAttribute('confirm','Enable selected Host Groups?');
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
+		$goOption = new CComboItem('disable',S_DISABLE_SELECTED_HOSTS);
 		$goOption->setAttribute('confirm','Disable selected Host Groups?');
 		$goBox->addItem($goOption);
 
