@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [ZBX-1384] fixed memory leak in processing ldap checks (Sasha)
  - [NTP-70] fixed incorrect processing of the same log and eventlog entries (Dmitry)
  - [NTP-66] fixed illegal values in eventlog fields for non eventlog items (Sasha)
  - [NTP-72] fixed wrong trigger expression generation for log items (Vedmak)
