@@ -38,6 +38,8 @@
 
 	'S_ACTIVATE_SELECTED'=>			'Activate selected',
 	'S_DISABLE_SELECTED'=>			'Disable selected',
+	'S_ACTIVATE_SELECTED_HOSTS'=>		'Activate selected hosts',
+	'S_DISABLE_SELECTED_HOSTS'=>			'Disable selected hosts',
 	'S_DELETE_SELECTED'=>			'Delete selected',
 	'S_COPY_SELECTED_TO'=>			'Copy selected to ...',
 
