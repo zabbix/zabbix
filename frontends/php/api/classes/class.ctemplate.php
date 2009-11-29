@@ -828,6 +828,7 @@ class CTemplate extends CZBXAPI{
 		
 		$sql = 'SELECT hostid, templateid FROM hosts_templates WHERE '.DBcondition('hostid', $hostids).' AND '.DBcondition('templateid', $templateids);
 		$linked_db = DBexecute($sql);
+		$linked = array();
 		while($pair = DBfetch($linked_db)){
 			$linked[$pair['templateid']] = array($pair['hostid'] => $pair['hostid']);
 		}
@@ -878,23 +879,36 @@ class CTemplate extends CZBXAPI{
  * @version 1
  *
  * @param string $data
- * @param string $data['templateid']
- * @param array $data['hostids']
+ * @param string $data['templates']
+ * @param array $data['hosts']
  * @param boolean $data['clean'] whether to wipe all info from template elements.
  * @return boolean
  */
 	public static function unlinkTemplates($data){
-		$templateid = $data['templateid'];
-		$hostids = $data['hostids'];
-		$clean = isset($data['clean']);
+		$errors = array();
+		
+		$templateids = zbx_objectValues($data['templates'], 'templateid');
+		$hostids = zbx_objectValues($data['hosts'], 'hostid');
+		$clean = isset($data['clean']) ? $data['clean'] : false;;
 
-		$result = delete_template_elements($hostid, $templateids, $clean);
-		$result&= DBexecute('DELETE FROM hosts_templates WHERE hostid='.$hostid.' AND '.DBcondition('templateid',$templateids));
-
+		self::BeginTransaction(__METHOD__);
+		
+		$sql = 'DELETE FROM hosts_templates WHERE '.DBcondition('hostid', $hostids).' AND '.DBcondition('templateid', $templateids);
+		$result = DBexecute($sql);
+		
+		if($result){
+			foreach($hostids as $hostid){
+				$result = delete_template_elements($hostid, $templateids, $clean);
+				if(!$result) break;
+			}
+		}
+		
+		$result = self::EndTransaction($result, __METHOD__);
+		
 		if($result)
 			return true;
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
+			self::setMethodErrors(__METHOD__, $errors);
 			return false;
 		}
 	}
