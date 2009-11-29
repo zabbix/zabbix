@@ -377,6 +377,13 @@ int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char *lastl
 			(strncmp(item.key,"eventlog[",9)==0)
 		)
 		{
+			if (item.lastlogsize == atoi(lastlogsize))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "The item [" ZBX_FS_UI64 "] has already got a value for the lastlogsize [%i].",
+						item.itemid, item.lastlogsize);
+				DBfree_result(result);
+				return SUCCEED;
+			}
 			item.lastlogsize=atoi(lastlogsize);
 			item.timestamp=atoi(timestamp);
 
