@@ -150,9 +150,9 @@ ZBX_DC_HOST
 	char		ip[HOST_IP_LEN_MAX];
 	char		dns[HOST_DNS_LEN_MAX];
 	unsigned short	port;
-	int		status;
-	int		maintenance_status;
-	int		maintenance_type;
+	unsigned char	status;
+	unsigned char	maintenance_status;
+	unsigned char	maintenance_type;
 	int		maintenance_from;
 	int		errors_from;
 	unsigned char	available;
@@ -170,8 +170,8 @@ ZBX_DC_IPMIHOST
 	zbx_uint64_t	hostid;
 	char		ipmi_ip[HOST_ADDR_LEN_MAX];
 	unsigned short	ipmi_port;
-	int		ipmi_authtype;
-	int		ipmi_privilege;
+	signed char	ipmi_authtype;
+	unsigned char	ipmi_privilege;
 	char		ipmi_username[HOST_IPMI_USERNAME_LEN_MAX];
 	char		ipmi_password[HOST_IPMI_PASSWORD_LEN_MAX];
 };
@@ -472,7 +472,7 @@ static void	DCcheck_freemem(size_t sz)
 {
 	if (config->free_mem < sz)
 	{
-		zbx_error("Configuration buffer is too small. Please increase ConfigSize parameter.");
+		zbx_error("Configuration buffer is too small. Please increase CacheSize parameter.");
 		exit(FAIL);
 	}
 }
@@ -1932,9 +1932,9 @@ static void	DCsync_hosts()
 		zbx_strlcpy(host->ip, row[4], sizeof(host->ip));
 		zbx_strlcpy(host->dns, row[5], sizeof(host->dns));
 		host->port = (unsigned short)atoi(row[6]);
-		host->status = atoi(row[7]);
-		host->maintenance_status = atoi(row[15]);
-		host->maintenance_type = atoi(row[16]);
+		host->status = (unsigned char)atoi(row[7]);
+		host->maintenance_status = (unsigned char)atoi(row[15]);
+		host->maintenance_type = (unsigned char)atoi(row[16]);
 		host->maintenance_from = atoi(row[17]);
 		host->errors_from = errors_from;
 		host->available = (unsigned char)atoi(row[19]);
@@ -1959,8 +1959,8 @@ static void	DCsync_hosts()
 			ipmihost->hostid = hostid;
 			zbx_strlcpy(ipmihost->ipmi_ip, row[9], sizeof(ipmihost->ipmi_ip));
 			ipmihost->ipmi_port = (unsigned short)atoi(row[10]);
-			ipmihost->ipmi_authtype = atoi(row[11]);
-			ipmihost->ipmi_privilege = atoi(row[12]);
+			ipmihost->ipmi_authtype = (signed char)atoi(row[11]);
+			ipmihost->ipmi_privilege = (unsigned char)atoi(row[12]);
 			zbx_strlcpy(ipmihost->ipmi_username, row[13], sizeof(ipmihost->ipmi_username));
 			zbx_strlcpy(ipmihost->ipmi_password, row[14], sizeof(ipmihost->ipmi_password));
 		}
@@ -2050,7 +2050,7 @@ void	init_configuration_cache()
 
 	if (CONFIG_DBCONFIG_SIZE < sz)
 	{
-		zbx_error("Configuration buffer is too small. Please increase ConfigSize parameter.");
+		zbx_error("Configuration buffer is too small. Please increase CacheSize parameter.");
 		exit(FAIL);
 	}
 
