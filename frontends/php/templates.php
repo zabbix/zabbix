@@ -128,12 +128,13 @@ include_once('include/page_header.php');
 // unlink, unlink_and_clear
 	if((isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear']))){
 		$_REQUEST['clear_templates'] = get_request('clear_templates', array());
+
 		if(isset($_REQUEST['unlink'])){
 			$unlink_templates = array_keys($_REQUEST['unlink']);
 		}
 		else{
 			$unlink_templates = array_keys($_REQUEST['unlink_and_clear']);
-			$_REQUEST['clear_templates'] = zbx_array_merge($_REQUEST['clear_templates'],$unlink_templates);
+			$_REQUEST['clear_templates'] = zbx_array_merge($_REQUEST['clear_templates'], $unlink_templates);
 		}
 		foreach($unlink_templates as $id) unset($_REQUEST['templates'][$id]);
 	}
@@ -210,9 +211,13 @@ include_once('include/page_header.php');
 		if($result){
 			$original_templates = get_templates_by_hostid($templateid);
 			$original_templates = array_keys($original_templates);
-			$templates_to_link = array_diff($templates, $original_templates);
-			$templates_to_link = zbx_toObject($templates_to_link, 'hostid');
 			
+			$templates_to_unlink = array_diff($original_templates, $templates);
+			$templates_to_unlink = zbx_toObject($templates_to_unlink, 'templateid');
+			$result &= CTemplate::unlinkTemplates(array('hosts' => $template, 'templates' => $templates_to_unlink));
+			
+			$templates_to_link = array_diff($templates, $original_templates);
+			$templates_to_link = zbx_toObject($templates_to_link, 'templateid');
 			$result &= CTemplate::linkTemplates(array('hosts' => $template, 'templates' => $templates_to_link));
 		}
 // }
