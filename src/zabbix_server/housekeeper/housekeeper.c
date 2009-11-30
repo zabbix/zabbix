@@ -208,7 +208,7 @@ static int housekeeping_events(int now)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int delete_history(char *table, zbx_uint64_t itemid, int keep_history, int now)
+static int	delete_history(const char *table, zbx_uint64_t itemid, int keep_history, int now)
 {
 	DB_RESULT       result;
 	DB_ROW          row;
@@ -291,6 +291,7 @@ static int housekeeping_history_and_trends(int now)
                 deleted += delete_history("history_text", item.itemid, item.history, now);
                 deleted += delete_history("history_log", item.itemid, item.history, now);
                 deleted += delete_history("trends", item.itemid, item.trends, now);
+		deleted += delete_history("trends_uint", item.itemid, item.trends, now);
         }
         DBfree_result(result);
         return deleted;
