@@ -666,6 +666,8 @@ class CUser extends CZBXAPI{
  */
 	public static function delete($users){
 		global $USER_DETAILS;
+		$errors = array();
+		
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can delete Users');
 			return false;
@@ -675,17 +677,19 @@ class CUser extends CZBXAPI{
 		$userids = array();
 		$result = false;
 
-		$del_users = self::get(array('userids'=>zbx_objectValues($users, 'userid'), 
-											'extendoutput'=>1, 
-											'preservekeys'=>1));
+		$del_users = self::get(array(
+			'userids'=>zbx_objectValues($users, 'userid'), 
+			'extendoutput'=>1, 
+			'preservekeys'=>1));
+			
 		foreach($users as $gnum => $user){
-			if(bccomp($USER_DETAILS['userid'],$user['userid']) == 0){
-				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, S_USER_CANNOT_DELETE_ITSELF);
+			if(bccomp($USER_DETAILS['userid'], $user['userid']) == 0){
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_USER_CANNOT_DELETE_ITSELF);
 				$result = false;
 			}
 
 			if($del_users[$user['userid']]['alias'] == ZBX_GUEST_USER){
-				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, S_CANNOT_DELETE_USER.'[ '.ZBX_GUEST_USER.' ]');
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_CANNOT_DELETE_USER.'[ '.ZBX_GUEST_USER.' ]');
 				$result = false;
 			}
 			
@@ -695,7 +699,7 @@ class CUser extends CZBXAPI{
 
 		self::BeginTransaction(__METHOD__);
 		if(!empty($userids)){
-			$result = DBexecute('DELETE FROM operations WHERE '.OPERATION_OBJECT_USER.' AND '.DBcondition('objectid', $userids));
+			$result = DBexecute('DELETE FROM operations WHERE object='.OPERATION_OBJECT_USER.' AND '.DBcondition('objectid', $userids));
 			$result = DBexecute('DELETE FROM media WHERE '.DBcondition('userid', $userids));
 			$result = DBexecute('DELETE FROM profiles WHERE '.DBcondition('userid', $userids));
 			$result = DBexecute('DELETE FROM users_groups WHERE '.DBcondition('userid', $userids));
@@ -708,7 +712,7 @@ class CUser extends CZBXAPI{
 			return zbx_cleanHashes($del_users);
 		}
 		else{
-			self::setError(__METHOD__);
+			self::setMethodErrors(__METHOD__, $errors);
 			return false;
 		}
 	}
