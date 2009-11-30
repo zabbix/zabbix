@@ -170,7 +170,7 @@ class CScreen extends CZBXAPI{
 				$screenids[$screen['screenid']] = $screen['screenid'];
 
 				if(is_null($options['extendoutput'])){
-					$result[$screen['screenid']] = $screen['screenid'];
+					$result[$screen['screenid']] = array('screenid' => $screen['screenid']);
 				}
 				else{
 					if(!isset($result[$screen['screenid']])) $result[$screen['screenid']]= array();
@@ -216,9 +216,13 @@ class CScreen extends CZBXAPI{
 // sdii($screens_to_check);
 
 				$allowed_graphs = CGraph::get(array('graphids' => $graphs_to_check, 'editable' => isset($options['editable'])));
+				$allowed_graphs = zbx_objectValues($allowed_graphs, 'graphid');
 				$allowed_items = CItem::get(array('itemids' => $items_to_check, 'editable' => isset($options['editable'])));
+				$allowed_items = zbx_objectValues($allowed_items, 'itemid');
 				$allowed_maps = CMap::get(array('sysmapids' => $maps_to_check, 'editable' => isset($options['editable'])));
+				$allowed_maps = zbx_objectValues($allowed_maps, 'sysmapid');
 				$allowed_screens = CScreen::get(array('screenids' => $screens_to_check, 'editable' => isset($options['editable'])));
+				$allowed_screens = zbx_objectValues($allowed_screens, 'screenid');
 
 				$restr_graphs = array_diff($graphs_to_check, $allowed_graphs);
 				$restr_items = array_diff($items_to_check, $allowed_items);

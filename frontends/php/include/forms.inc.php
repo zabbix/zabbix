@@ -5644,6 +5644,7 @@
 // add groups
 			$options = array('hostids' => $_REQUEST['hostid']);
 			$host_groups = CHostGroup::get($options);
+			$host_groups = zbx_objectValues($host_groups, 'groupid');
 
 // read profile
 			$db_profiles = DBselect('SELECT * FROM hosts_profiles WHERE hostid='.$_REQUEST['hostid']);

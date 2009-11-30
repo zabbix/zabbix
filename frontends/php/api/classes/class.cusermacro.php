@@ -283,7 +283,7 @@ class CUserMacro extends CZBXAPI{
 					$globalmacroids[$macro['globalmacroid']] = $macro['globalmacroid'];
 
 					if(is_null($options['extendoutput'])){
-						$result[$macro['globalmacroid']] = $macro['globalmacroid'];
+						$result[$macro['globalmacroid']] = array('globalmacroid' => $macro['globalmacroid']);
 					}
 					else{
 						if(!isset($result[$macro['globalmacroid']])) $result[$macro['globalmacroid']]= array();

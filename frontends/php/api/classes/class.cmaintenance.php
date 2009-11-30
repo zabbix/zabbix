@@ -239,7 +239,7 @@ class CMaintenance extends CZBXAPI{
 				$maintenanceids[$maintenance['maintenanceid']] = $maintenance['maintenanceid'];
 
 				if(is_null($options['extendoutput'])){
-					$result[$maintenance['maintenanceid']] = $maintenance['maintenanceid'];
+					$result[$maintenance['maintenanceid']] = array('maintenanceid' => $maintenance['maintenanceid']);
 				}
 				else{
 					if(!isset($result[$maintenance['maintenanceid']]))

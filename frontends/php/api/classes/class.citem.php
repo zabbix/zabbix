@@ -393,7 +393,7 @@ class CItem extends CZBXAPI{
 				$itemids[$item['itemid']] = $item['itemid'];
 
 				if(is_null($options['extendoutput'])){
-					$result[$item['itemid']] = $item['itemid'];
+					$result[$item['itemid']] = array('itemid' => $item['itemid']);
 				}
 				else{
 					if(!isset($result[$item['itemid']]))

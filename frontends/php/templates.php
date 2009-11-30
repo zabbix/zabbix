@@ -378,6 +378,7 @@ include_once('include/page_header.php');
 		$go_result = true;
 		$templates = get_request('templates', array());
 		$del_hosts = CTemplate::get(array('templateids' => $templates, 'editable' => 1));
+		$del_hosts = zbx_objectValues($del_hosts, 'templateid');
 
 		DBstart();
 		$go_result = delete_host($del_hosts, $unlink_mode);
@@ -458,6 +459,7 @@ include_once('include/page_header.php');
 // get template groups from db
 			$options = array('hostids' => $templateid, 'editable' => 1);
 			$groups = CHostGroup::get($options);
+			$groups = zbx_objectValues($groups, 'groupid');
 
 // get template hosts from db
 			$params = array('templateids' => $templateid, 'editable' => 1, 'templated_hosts' => 1, 'preservekeys' => 1);

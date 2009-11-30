@@ -120,6 +120,7 @@ include_once('include/page_header.php');
 		if(!empty($itemids)){
 			$options = array('itemids'=>$itemids, 'editable'=>1, 'nodes'=>get_current_nodeid(true));
 			$db_items = CItem::get($options);
+			$db_items = zbx_objectValues($db_items, 'itemid');
 			$db_items = zbx_toHash($db_items, 'itemid');
 			
 			foreach($itemids as $inum => $itemid){

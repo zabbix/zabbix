@@ -201,7 +201,7 @@ class CUserGroup extends CZBXAPI{
 				$usrgrpids[$usrgrp['usrgrpid']] = $usrgrp['usrgrpid'];
 
 				if(is_null($options['extendoutput'])){
-					$result[$usrgrp['usrgrpid']] = $usrgrp['usrgrpid'];
+					$result[$usrgrp['usrgrpid']] = array('usrgrpid' => $usrgrp['usrgrpid']);
 				}
 				else{
 					if(!isset($result[$usrgrp['usrgrpid']])) $result[$usrgrp['usrgrpid']]= array();

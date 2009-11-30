@@ -263,7 +263,7 @@ class CGraph extends CZBXAPI{
 				$result = $graph;
 			else{
 				if(is_null($options['extendoutput'])){
-					$result[$graph['graphid']] = $graph['graphid'];
+					$result[$graph['graphid']] = array('graphid' => $graph['graphid']);
 				}
 				else{
 					$graphids[$graph['graphid']] = $graph['graphid'];

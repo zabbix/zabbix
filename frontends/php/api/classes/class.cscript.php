@@ -214,7 +214,7 @@ class Cscript extends CZBXAPI{
 				$scriptids[$script['scriptid']] = $script['scriptid'];
 
 				if(is_null($options['extendoutput'])){
-					$result[$script['scriptid']] = $script['scriptid'];
+					$result[$script['scriptid']] = array('scriptid' => $script['scriptid']);
 				}
 				else{
 					if(!isset($result[$script['scriptid']]))
