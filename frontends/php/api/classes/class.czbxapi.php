@@ -108,7 +108,7 @@ private static $transaction = array('counter' => 0);
 		global $ZBX_MESSAGES;
 
 		if(empty($errors)){
-			$php_error = end($ZBX_MESSAGES);
+			$php_error = is_array($ZBX_MESSAGES) ? end($ZBX_MESSAGES) : false;
 			while($php_error && ($php_error['type'] != 'error')){
 				$php_error = prev($ZBX_MESSAGES);
 			}
