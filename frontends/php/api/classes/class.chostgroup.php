@@ -871,12 +871,14 @@ class CHostGroup extends CZBXAPI{
 
 
 		self::BeginTransaction(__METHOD__);
+		
 		$sql = 'DELETE FROM hosts_groups WHERE '.DBcondition('hostid', $hostids);
 		$result = DBexecute($sql);
 // TODO mozhno poprobovatj otsjuda ubratj perm. check, t.k v addHosts tozhe budet proverjatsja
 // poidee vozvrashsatj mozhno result ot add hosts
-		$result = self::addHosts($data);
-		$result = self::EndTransaction($result, __METHOD__);
+
+		$result &= self::addHosts($data);
+		$result &= self::EndTransaction($result, __METHOD__);
 
 		if($result){
 			$result = self::get(array(
