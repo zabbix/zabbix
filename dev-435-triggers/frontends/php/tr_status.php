@@ -322,7 +322,7 @@ include_once('include/page_header.php');
 		make_sorting_header(S_LAST_CHANGE, 'lastchange'),
 		S_AGE,
 		$show_event_col ? S_DURATION : NULL,
-		$show_event_col ? S_ACKNOWLEDGED : NULL,
+		$config['event_ack_enable'] ? S_ACKNOWLEDGED : NULL,
 		is_show_all_nodes() ? S_NODE : null,
 		S_HOST,
 		make_sorting_header(S_NAME, 'description'),

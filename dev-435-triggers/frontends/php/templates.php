@@ -276,6 +276,7 @@ include_once('include/page_header.php');
 // LINK/UNLINK HOSTS {
 		if($result){
 			$hosts = CHost::get(array('hostids' => $hosts, 'editable' => 1, 'templated_hosts' => 1));
+			$hosts = zbx_objectValues($hosts, 'hostid');
 //-- unlink --
 			$linked_hosts = array();
 			$db_childs = get_hosts_by_templateid($templateid);
@@ -456,7 +457,7 @@ include_once('include/page_header.php');
 // get template hosts from db
 			$params = array('templateids' => $templateid, 'editable' => 1, 'templated_hosts' => 1, 'preservekeys' => 1);
 			$hosts_linked_to = CHost::get($params);
-
+			$hosts_linked_to = zbx_objectValues($hosts_linked_to, 'hostid');
 			$templates = $original_templates;
 		}
 		else{

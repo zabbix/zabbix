@@ -462,10 +462,11 @@ class CHostGroup extends CZBXAPI{
 		$groups = zbx_toArray($groups);
 		$groupids = array();
 		
-		$upd_groups = self::get(array('groupids'=>zbx_objectValues($groups, 'groupid'),
-										'editable'=>1, 
-										'extendoutput'=>1, 
-										'preservekeys'=>1));
+		$upd_groups = self::get(array(
+			'groupids' => zbx_objectValues($groups, 'groupid'),
+			'editable' => 1, 
+			'extendoutput' => 1, 
+			'preservekeys' => 1));
 		foreach($groups as $gnum => $group){
 			if(!isset($upd_groups[$group['groupid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -486,7 +487,8 @@ class CHostGroup extends CZBXAPI{
 
 			$group_exist = self::getObjects(array('name' => $group['name']));
 			$group_exist = reset($group_exist);
-			if(!$group_exist && ($group_exist['groupid'] != $group['groupid'])){
+
+			if($group_exist && ($group_exist['groupid'] != $group['groupid'])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'HostGroup [ '.$group['name'].' ] already exists');
 				$result = false;
 				break;

@@ -178,7 +178,7 @@
 	if(!defined('ZBX_PAGE_NO_MENU')){
 COpt::compare_files_with_menu($ZBX_MENU);
 
-		$help = new CLink(S_HELP, 'http://www.zabbix.com/documentation.php', 'small_font', null, 'nosid');
+		$help = new CLink(S_HELP, 'http://www.zabbix.com/documentation/', 'small_font', null, 'nosid');
 		$help->setTarget('_blank');
 		$support = new CLink(S_GET_SUPPORT, 'http://www.zabbix.com/support.php', 'small_font', null, 'nosid');
 		$support->setTarget('_blank');

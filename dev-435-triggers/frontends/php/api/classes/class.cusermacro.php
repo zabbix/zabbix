@@ -919,7 +919,7 @@ class CUserMacro extends CZBXAPI{
 				'nopermissions' => 1,
 				'extendoutput' => 1,
 				'macros' => $macros,
-				'hostids' => $hosts,
+				'hostids' => zbx_objectValues($hosts, 'hostid'),
 				);
 
 			$tmacros = self::get($obj_options);
