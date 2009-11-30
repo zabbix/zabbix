@@ -152,18 +152,26 @@ include_once('include/page_header.php');
 			$user['refresh'] = get_request('refresh');
 			$user['rows_per_page'] = get_request('rows_per_page');
 			$user['type'] = get_request('user_type');
-			$user['user_groups'] = get_request('user_groups', array());
+//			$user['user_groups'] = get_request('user_groups', array());
 			$user['user_medias'] = get_request('user_medias', array());
 
+			$usrgrps = get_request('user_groups', array());
+			$usrgrps = zbx_toObject($usrgrps, 'usrgrpid');
+			
 			if(isset($_REQUEST['userid'])){
 				$action = AUDIT_ACTION_UPDATE;
 				$user['userid'] = $_REQUEST['userid'];
 
 				DBstart();
-				$result = CUser::update($user);
-				if($result) $result = CUser::updateMedia(array('users' => $user, 'medias' => $user['user_medias']));
+				$result = CUser::update($user);					
+				if(!$result) 
+					error(CUser::resetErrors());
+				if($result)	$result = CUserGroup::updateUsers(array('users' => $user, 'usrgrps' => $usrgrps));
+				if($result === false) 
+					error(CUserGroup::resetErrors());
+				if($result !== false) $result = CUser::updateMedia(array('users' => $user, 'medias' => $user['user_medias']));
 				$result = DBend($result);
-				if(!$result) error(CUser::resetErrors());
+				
 
 				show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 			}
@@ -171,7 +179,13 @@ include_once('include/page_header.php');
 				$action = AUDIT_ACTION_ADD;
 
 				$result = CUser::add($user);
-				if(!$result) error(CUser::resetErrors());
+				if(!$result) 
+					error(CUser::resetErrors());
+				if($result) $result = CUserGroup::updateUsers(array('users' => $result, 'usrgrps' => $usrgrps));
+				if(!$result) 
+					error(CUserGroup::resetErrors());
+				$result = DBend($result);
+				
 				
 				show_messages($result, S_USER_ADDED, S_CANNOT_ADD_USER);
 			}
