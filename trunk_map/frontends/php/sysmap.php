@@ -134,41 +134,39 @@ include_once('include/page_header.php');
 					print($action);
 					break;
 				case 'save':
-					SDII($_REQUEST); break;
 					$selements = get_request('selements', '[]');
 					$selements = $json->decode($selements, true);
 
 					$links = get_request('links', '[]');
 					$links = $json->decode($links, true);
 
+					
 					$db_selementids = array();
 					$res = DBselect('SELECT selementid FROM sysmaps_elements WHERE sysmapid='.$sysmapid);
 					while($db_selement = DBfetch($res)){
 						$db_selementids[$db_selement['selementid']] = $db_selement['selementid'];
 					}
-										
+					
+					DBstart();					
 					foreach($selements as $id => $selement){
 						if($selement['elementid'] == 0){
 							$selement['elementtype'] = SYSMAP_ELEMENT_TYPE_IMAGE;
 						}
 						
-						if(uint_in_array($selement['selementid'], $db_selementids)){
-							$result=update_sysmap_element($selement['selementid'],$sysmapid,$selement['elementid'],
-								$selement['elementtype'],$selement['label'],$selement['x'],$selement['y'],
-								$selement['iconid_off'],$selement['iconid_unknown'],$selement['iconid_on'],$selement['iconid_maintenance'],
-								$selement['url'],$selement['label_location']);
-							unset($db_selementids[$selement['selementid']]);
-						}
-						else{
-							$selementid=add_element_to_sysmap($sysmapid,$selement['elementid'],
-								$selement['elementtype'],$selement['label'],$selement['x'],$selement['y'],
-								$selement['iconid_off'],$selement['iconid_unknown'],$selement['iconid_on'],$selement['iconid_maintenance'],
-								$selement['url'],$selement['label_location']);
-							
+						if(isset($selement['new'])){
+							$selement['sysmapid'] = $sysmapid;
+							$selementid = add_element_to_sysmap($selement);
+
 							foreach($links as $id => $link){
 								if($link['selementid1'] == $selement['selementid']) $links[$id]['selementid1']=$selementid;
 								else if($link['selementid2'] == $selement['selementid']) $links[$id]['selementid2']=$selementid;
 							}
+						}
+						else{
+//SDII($selement);
+							$selement['sysmapid'] = $sysmapid;
+							$result = update_sysmap_element($selement);
+							unset($db_selementids[$selement['selementid']]);
 						}
 					}
 
@@ -183,16 +181,14 @@ include_once('include/page_header.php');
 					}
 					
 					foreach($links as $id => $link){
-						if(uint_in_array($link['linkid'], $db_linkids)){
-							$result=update_link($link['linkid'],$sysmapid,$link['selementid1'],$link['selementid2'],
-								$link['triggerid'],	$link['drawtype_off'],$link['color_off'],
-								$link['drawtype_on'],$link['color_on']);
-							unset($db_linkids[$link['linkid']]);
+						if(isset($link['new'])){
+							$link['sysmapid'] = $sysmapid;
+							$result = add_link($link);
 						}
 						else{
-							$result=add_link($sysmapid,$link['selementid1'],$link['selementid2'],
-								$link['triggerid'],	$link['drawtype_off'],$link['color_off'],
-								$link['drawtype_on'],$link['color_on']);
+							$link['sysmapid'] = $sysmapid;
+							$result = update_link($link);
+							unset($db_linkids[$link['linkid']]);
 						}
 					}
 					
@@ -200,7 +196,9 @@ include_once('include/page_header.php');
 						delete_link($linkid);
 					}
 					
-					print('location.href = "sysmaps.php"');
+					$result = DBend(true);
+					
+//					print('location.href = "sysmaps.php"');
 					break;
 			}
 		}

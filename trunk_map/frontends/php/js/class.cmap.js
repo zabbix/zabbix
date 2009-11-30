@@ -220,7 +220,7 @@ add_empty_selement: function(){
 },
 
 // CONNECTORS
-add_empty_link: function(){
+add_empty_link: function(e){
 	this.debug('add_empty_link');
 //--
 	
@@ -254,6 +254,7 @@ add_empty_link: function(){
 	mlink['selementid2'] = selementid2;
 
 	this.add_link(mlink,1);
+	this.update_linkContainer(e);
 },
 
 
@@ -289,8 +290,8 @@ save_sysmap: function(){
 					{
 						'method': 'post',
 						'parameters':params,
-						'onSuccess': function(resp){ },
-//						'onSuccess': function(resp){ SDI(resp.responseText); },
+//						'onSuccess': function(resp){ },
+						'onSuccess': function(resp){ SDI(resp.responseText); },
 						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
 					}
 	);
@@ -532,7 +533,7 @@ add_link: function(mlink, update_map){
 },
 
 
-update_link_option: function(linkid, params){ // params = [{'key': key, 'value':value},{'key': key, 'value':value},...]
+update_link_option: function(linkid, params, update_map){ // params = [{'key': key, 'value':value},{'key': key, 'value':value},...]
 	this.debug('update_link_option');
 //--
 
@@ -556,7 +557,9 @@ update_link_option: function(linkid, params){ // params = [{'key': key, 'value':
 //SDI(key+' : '+value);
 	}
 
-	this.update_mapimg();
+	if((typeof(update_map) != 'undefined') && (update_map == 1)){
+		this.update_mapimg();
+	}
 },
 
 remove_links: function(e){

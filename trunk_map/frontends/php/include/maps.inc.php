@@ -182,22 +182,39 @@
 
 // LINKS
 
-	function add_link($sysmapid,$selementid1,$selementid2,$triggers,$drawtype,$color){
+	function add_link($link){
+		$link_db_fields = array(
+			'sysmapid' => null,
+			'label' => '',
+			'selementid1' => null,
+			'selementid2' => null,
+			'drawtype' => 2,
+			'color' => 3
+		);
+
+		if(!check_db_fields($link_db_fields, $link)){
+			$result = false;
+			$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields for link');
+			break;
+		}
+		
 		$linkid=get_dbid("sysmaps_links","linkid");
 
 		$result=TRUE;
-		foreach($triggers as $id => $trigger){
-			if(empty($trigger['triggerid'])) continue;
-			$result&=add_link_trigger($linkid,$trigger['triggerid'],$trigger['drawtype'],$trigger['color']);
+		foreach($link['linktriggers'] as $id => $linktrigger){
+			if(empty($linktrigger['triggerid'])) continue;
+			$result&=add_link_trigger($linkid,$linktrigger['triggerid'],$linktrigger['drawtype'],$linktrigger['color']);
 		}
 
 		if(!$result){
 			return $result;
 		}
 
-		$result&=DBexecute("insert into sysmaps_links".
-			" (linkid,sysmapid,selementid1,selementid2,drawtype,color)".
-			" values ($linkid,$sysmapid,$selementid1,$selementid2,$drawtype,".zbx_dbstr($color).")");
+		$result&=DBexecute('INSERT INTO sysmaps_links '.
+			' (linkid,sysmapid,label,selementid1,selementid2,drawtype,color) '.
+			' VALUES ('.$linkid.','.$link['sysmapid'].','.zbx_dbstr($link['label']).','.
+						$link['selementid1'].','.$link['selementid2'].','.
+						$link['drawtype'].','.zbx_dbstr($link['color']).')');
 
 		if(!$result)
 			return $result;
@@ -205,13 +222,28 @@
 	return $linkid;
 	}
 
-	function update_link($linkid,$sysmapid,$selementid1,$selementid2,$triggers,$drawtype,$color){
+	function update_link($link){
+		$link_db_fields = array(
+			'sysmapid' => null,
+			'linkid' => null,
+			'label' => '',
+			'selementid1' => null,
+			'selementid2' => null,
+			'drawtype' => 2,
+			'color' => 3
+		);
 
-		$result=delete_all_link_triggers($linkid);;
+		if(!check_db_fields($link_db_fields, $link)){
+			$result = false;
+			$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields for link');
+			break;
+		}
+		
+		$result = delete_all_link_triggers($link['linkid']);
 
-		foreach($triggers as $id => $trigger){
-			if(empty($trigger['triggerid'])) continue;
-			$result&=add_link_trigger($linkid,$trigger['triggerid'],$trigger['drawtype'],$trigger['color']);
+		foreach($link['linktriggers'] as $id => $linktrigger){
+			if(empty($linktrigger['triggerid'])) continue;
+			$result&=add_link_trigger($link['linkid'],$linktrigger['triggerid'],$linktrigger['drawtype'],$linktrigger['color']);
 		}
 
 		if(!$result){
@@ -219,16 +251,21 @@
 		}
 
 		$result&=DBexecute('UPDATE sysmaps_links SET '.
-							" sysmapid=$sysmapid,selementid1=$selementid1,selementid2=$selementid2,".
-							" drawtype=$drawtype,color=".zbx_dbstr($color).
-						" WHERE linkid=$linkid");
+							' sysmapid='.$link['sysmapid'].', '.
+							' label='.zbx_dbstr($link['label']).', '.
+							' selementid1='.$link['selementid1'].', '.
+							' selementid2='.$link['selementid2'].', '.
+							' drawtype='.$link['drawtype'].', '.
+							' color='.zbx_dbstr($link['color']).
+						' WHERE linkid='.$link['linkid']);
 	return	$result;
 	}
 
 	function delete_link($linkid){
 		$result = delete_all_link_triggers($linkid);
-		$result&= DBexecute("delete FROM sysmaps_links WHERE linkid=$linkid");
-	return	$result;
+		$result&= (bool) DBexecute('DELETE FROM sysmaps_links WHERE linkid='.$linkid);
+
+	return $result;
 	}
 
 	function get_link_triggers($linkid){
@@ -291,51 +328,96 @@
 		return false;
 	}
 
-	# Add Element to system map
+// Add Element to system map
+	function add_element_to_sysmap($selement){
+		$selement_db_fields = array(
+			'sysmapid' => null,
+			'elementid' => 0,
+			'elementtype' => 5,
+			'label' => '',
+			'label_location' => 0,
+			'iconid_off' => null,
+			'iconid_on' => 0,
+			'iconid_unknown' => 0,
+			'iconid_maintenance' => 0,
+			'iconid_disabled' => 0,
+			'x' => 50,
+			'y' => 50,
+			'url' => ''
+		);
 
-	function add_element_to_sysmap($sysmapid,$elementid,$elementtype,
-						$label,$x,$y,$iconid_off,$iconid_unknown,$iconid_on,$iconid_disabled,$url,$label_location)
-	{
+		if(!check_db_fields($selement_db_fields, $selement)){
+			$result = false;
+			$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields for element');
+			break;
+		}
+								
 		if($label_location<0) $label_location='null';
-		if(check_circle_elements_link($sysmapid,$elementid,$elementtype))
-		{
+		if(check_circle_elements_link($selement['sysmapid'],$selement['elementid'],$selement['elementtype'])){
 			error("Circular link can't be created");
 			return false;
 		}
 
-		$selementid = get_dbid("sysmaps_elements","selementid");
+		$selementid = get_dbid('sysmaps_elements','selementid');
 
-		$result=DBexecute('INSERT INTO sysmaps_elements '.
-							" (selementid,sysmapid,elementid,elementtype,label,x,y,iconid_off,url,iconid_on,label_location,iconid_unknown,iconid_disabled)".
-						" VALUES ($selementid,$sysmapid,$elementid,$elementtype,".zbx_dbstr($label).
-							",$x,$y,$iconid_off,".zbx_dbstr($url).
-							",$iconid_on,$label_location,$iconid_unknown,$iconid_disabled)");
+		$result = DBexecute('INSERT INTO sysmaps_elements '.
+							'(selementid,sysmapid,elementid,elementtype,label,label_location,'.
+							'iconid_off,iconid_on,iconid_unknown,iconid_maintenance,iconid_disabled,x,y,url)'.
+						' VALUES ('.$selementid.','.$selement['sysmapid'].','.$selement['elementid'].','.
+									$selement['elementtype'].','.zbx_dbstr($selement['label']).','.$selement['label_location'].','.
+									$selement['iconid_off'].','.$selement['iconid_on'].','.$selement['iconid_unknown'].','.
+									$selement['iconid_maintenance'].','.$selement['iconid_disabled'].','.
+									$selement['x'].','.$selement['y'].','.zbx_dbstr($selement['url']).')');
 
 		if(!$result)
 			return $result;
 
-		return $selementid;
+	return $selementid;
 	}
 
-	# Update Element FROM system map
+// Update Element FROM system map
+	function update_sysmap_element($selement){
+		$selement_db_fields = array(
+			'sysmapid' => null,
+			'selementid' => null,
+			'elementid' => 0,
+			'elementtype' => 5,
+			'label' => '',
+			'label_location' => 0,
+			'iconid_off' => null,
+			'iconid_on' => 0,
+			'iconid_unknown' => 0,
+			'iconid_maintenance' => 0,
+			'iconid_disabled' => 0,
+			'x' => 50,
+			'y' => 50,
+			'url' => ''
+		);
 
-	function update_sysmap_element($selementid,$sysmapid,$elementid,$elementtype,
-						$label,$x,$y,$iconid_off,$iconid_unknown,$iconid_on,$iconid_disabled,$url,$label_location)
-	{
-		if($label_location<0) $label_location='null';
-		if(check_circle_elements_link($sysmapid,$elementid,$elementtype))
-		{
+		if(!check_db_fields($selement_db_fields, $selement)){
+			$result = false;
+			$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields for element');
+			break;
+		}
+
+		if(check_circle_elements_link($selement['sysmapid'],$selement['elementid'],$selement['elementtype'])){
 			error("Circular link can't be created");
 			return false;
 		}
 
 		return	DBexecute('UPDATE sysmaps_elements '.
-					"SET elementid=$elementid,elementtype=$elementtype,".
-						"label=".zbx_dbstr($label).",x=$x,y=$y,iconid_off=$iconid_off,".
-						"url=".zbx_dbstr($url).",iconid_on=$iconid_on,".
-						"label_location=$label_location,iconid_unknown=$iconid_unknown,".
-						"iconid_disabled=$iconid_disabled".
-					" WHERE selementid=$selementid");
+					'SET elementid='.$selement['elementid'].', '.
+						' elementtype='.$selement['elementtype'].', '.
+						' label='.zbx_dbstr($selement['label']).', '.
+						' x='.$selement['x'].', '.
+						' y='.$selement['y'].', '.
+						' iconid_off='.$selement['iconid_off'].', '.
+						' url='.zbx_dbstr($selement['url']).', '.
+						' iconid_on='.$selement['iconid_on'].', '.
+						' label_location='.$selement['label_location'].', '.
+						' iconid_unknown='.$selement['iconid_unknown'].', '.
+						' iconid_disabled='.$selement['iconid_disabled'].
+					' WHERE selementid='.$selement['selementid']);
 	}
 
 	/******************************************************************************

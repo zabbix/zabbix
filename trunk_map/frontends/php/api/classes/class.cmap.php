@@ -546,10 +546,11 @@ class CMap extends CZBXAPI{
 
 		self::BeginTransaction(__METHOD__);
 
-		foreach($links as $link){
+		foreach($links as $lnum => $link){
 
 			$link_db_fields = array(
 				'sysmapid' => null,
+				'label' => '',
 				'selementid1' => null,
 				'selementid2' => null,
 				'drawtype' => 2,
@@ -562,7 +563,7 @@ class CMap extends CZBXAPI{
 				break;
 			}
 
-			$linkid = add_link($link['sysmapid'], $link['selementid1'], $link['selementid2'], array(), $link['drawtype'], $link['color']);
+			$linkid = add_link($link['sysmapid'], $link['label'], $link['selementid1'], $link['selementid2'], array(), $link['drawtype'], $link['color']);
 			if(!$linkid){
 				$result = false;
 				break;
@@ -603,17 +604,17 @@ class CMap extends CZBXAPI{
  * @param array $elements[0,...]['url']
  * @param array $elements[0,...]['label_location']
  */
-	public static function addElements($elements){
+	public static function addElements($selements){
 		$errors = array();
-		$result_elements = array();
+		$result_selements = array();
 		$result = true;
 
-		$elements = zbx_toArray($elements);
+		$elements = zbx_toArray($selements);
 
 		self::BeginTransaction(__METHOD__);
-		foreach($elements as $element){
+		foreach($selements as $snumm => $selement){
 
-			$element_db_fields = array(
+			$selement_db_fields = array(
 				'sysmapid' => null,
 				'elementid' => null,
 				'elementtype' => null,
@@ -634,19 +635,17 @@ class CMap extends CZBXAPI{
 				break;
 			}
 
-			$selementid = add_element_to_sysmap($element['sysmapid'],$element['elementid'],$element['elementtype'],$element['label'],
-			$element['x'],$element['y'],$element['iconid_off'],$element['iconid_unknown'],$element['iconid_on'],
-			$element['iconid_disabled'],$element['url'],$element['label_location']);
+			$selementid = add_element_to_sysmap($selement);
 			if(!$selementid){
 				$result = false;
 				break;
 			}
 
 			$new_selement = array('selementid' => $selementid);
-			$result_elements[] = array_merge($new_selement, $element);
+			$result_elements[] = array_merge($new_selement, $selement);
 		}
-		$result = self::EndTransaction($result, __METHOD__);
 
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return $result_elements;
