@@ -1009,7 +1009,7 @@ showForm: function(e, selementid){
 //---
 
 	new Draggable(divForm,{
-				  			'handle': this.selementForm.dragHandler, 
+//				  			'handle': this.selementForm.dragHandler, 
 							'snap': this.get_window_dimensions.bind(this),
 							'starteffect': function(){ return true; },
 							'endeffect': function(){ return true; }
