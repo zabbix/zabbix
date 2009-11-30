@@ -314,7 +314,7 @@ class CEvent extends CZBXAPI{
 					$triggerids[$event['objectid']] = $event['objectid'];
 
 				if(is_null($options['extendoutput'])){
-					$result[$event['eventid']] = $event['eventid'];
+					$result[$event['eventid']] = array('eventid' => $event['eventid']);
 				}
 				else{
 					if(!isset($result[$event['eventid']])) $result[$event['eventid']]= array();

@@ -341,7 +341,7 @@ class CAlert extends CZBXAPI{
 				$mediatypeids[$alert['mediatypeid']] = $alert['mediatypeid'];
 
 				if(is_null($options['extendoutput'])){
-					$result[$alert['alertid']] = $alert['alertid'];
+					$result[$alert['alertid']] = array('alertid' => $alert['alertid']);
 				}
 				else{
 					if(!isset($result[$alert['alertid']])) $result[$alert['alertid']]= array();

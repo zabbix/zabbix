@@ -391,7 +391,7 @@ class CAction extends CZBXAPI{
 				$actionids[$action['actionid']] = $action['actionid'];
 
 				if(is_null($options['extendoutput'])){
-					$result[$action['actionid']] = $action['actionid'];
+					$result[$action['actionid']] = array('actionid' => $action['actionid']);
 				}
 				else{
 					if(!isset($result[$action['actionid']])) $result[$action['actionid']]= array();
