@@ -290,8 +290,8 @@ save_sysmap: function(){
 					{
 						'method': 'post',
 						'parameters':params,
-//						'onSuccess': function(resp){ },
-						'onSuccess': function(resp){ SDI(resp.responseText); },
+						'onSuccess': function(resp){ },
+//						'onSuccess': function(resp){ SDI(resp.responseText); },
 						'onFailure': function(){ document.location = url.getPath()+'?'+Object.toQueryString(params); }
 					}
 	);
@@ -845,9 +845,28 @@ set_container: function(event){
 
 // ---------- MISC FUNCTIONS ------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------
+get_window_dimensions: function(x,y,draggable){
+	this.debug('get_window_dimensions');
+//--
+
+	function constrain(n, lower, upper) {
+		if (n > upper) return upper;
+		else if (n < lower) return lower;
+		else return n;
+	}
+	
+	var h = parseInt(document.body.offsetHeight);
+	var w = parseInt(document.body.offsetWidth);
+	
+	return[
+		constrain(x, 0, w),
+		constrain(y, 0, h)
+	];
+},
 
 get_dragable_dimensions: function(x,y,draggable){
 	this.debug('get_dragable_dimensions');
+//--
 
 	function constrain(n, lower, upper) {
 		if (n > upper) return upper;
@@ -989,7 +1008,12 @@ showForm: function(e, selementid){
 	this.hideForm_link(e);
 //---
 
-	new Draggable(divForm,{'handle': this.selementForm.dragHandler});	
+	new Draggable(divForm,{
+				  			'handle': this.selementForm.dragHandler, 
+							'snap': this.get_window_dimensions.bind(this),
+							'starteffect': function(){ return true; },
+							'endeffect': function(){ return true; }
+						});	
 	$(divForm).show();
 },
 

@@ -198,7 +198,7 @@ include_once('include/page_header.php');
 					
 					$result = DBend(true);
 					
-//					print('location.href = "sysmaps.php"');
+					print('location.href = "sysmaps.php"');
 					break;
 			}
 		}
@@ -237,11 +237,7 @@ include_once('include/page_header.php');
 					if(!empty($selements)){
 						$selement = reset($selements);
 
-						$selement['iconid_off']			= $default_icon['imageid'];
-						$selement['iconid_on']			= $default_icon['imageid'];
-						$selement['iconid_unknown']		= $default_icon['imageid'];
-						$selement['iconid_maintenance']	= $default_icon['imageid'];
-						$selement['iconid_disabled']	= $default_icon['imageid'];
+						$selement['iconid_off']	= $default_icon['imageid'];
 
 //						$selement['image'] = get_base64_icon($element);
 						$selement['image'] = get_selement_iconid($selement);
