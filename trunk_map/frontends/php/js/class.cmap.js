@@ -599,7 +599,7 @@ remove_links: function(e){
 },
 
 
-remove_link: function(linkid){
+remove_link: function(linkid, update_map){
 	this.debug('remove_link');
 //--
 
@@ -607,6 +607,10 @@ remove_link: function(linkid){
 
 	this.links[linkid] = null;
 	delete(this.links[linkid]);
+
+	if((typeof(update_map) != 'undefined') && (update_map == 1)){
+		this.update_mapimg();
+	}
 },
 
 
@@ -963,7 +967,7 @@ showForm: function(e, selementid){
 		doc_body.appendChild(divForm);
 		
 		divForm.setAttribute('id','divSelementForm');
-		divForm.style.backgroundColor = '#FAFAFA';
+		divForm.style.backgroundColor = '#333333';
 		divForm.style.zIndex = 100;
 		divForm.style.position = 'absolute';
 		divForm.style.top = '50px';
@@ -971,7 +975,7 @@ showForm: function(e, selementid){
 		
 
 
-		divForm.style.border = '1px red solid';
+		divForm.style.border = '1px black solid';
 	}
 
 
@@ -3170,8 +3174,9 @@ deleteForm_link: function(e){
 	
 	var maplink = this.links[linkid];
 	
-	if(Confirm('Remove link between "'+this.selements[maplink.selementid1].label+'" and "'+this.selements[maplink.selementid2].label+'"?')){
+	if(Confirm('Remove link between "'+this.selements[maplink.selementid1].label+'" and "'+this.selements[maplink.selementid2].label+'"?')){	
 		this.remove_link(linkid, true);
+		this.update_linkContainer(e);
 		this.hideForm_link(e);
 	}
 	else
