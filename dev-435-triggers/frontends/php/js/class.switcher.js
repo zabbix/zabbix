@@ -30,7 +30,8 @@ initialize : function(name){
 	this.switchers_name = name;
 	
 	var element = $(this.switchers_name);
-	if(typeof(element) != 'undefined')
+
+	if(!is_null(element))
 		addListener(element, 'click', this.showHide.bindAsEventListener(this));
 	
 	var divs = $$('div[data-switcherid]');
