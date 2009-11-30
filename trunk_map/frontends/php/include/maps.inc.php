@@ -1081,7 +1081,7 @@
 // URL
 		$el_form_menu['url'][] = array('key'=> '',	'value'=> '');
 
-		$menu.= 'var zbx_selement_form_menu = '.zbx_jsvalue($el_form_menu).';';
+		$menu.= 'var zbx_selement_form_menu = '.zbx_jsvalue($el_form_menu, true).';';
 	
 	return $menu;
 	}
@@ -1447,14 +1447,14 @@
 		$hosts = zbx_toHash($hosts, 'hostid');
 		
 		$maps = CMap::get(array('mapids'=>$mapids, 'extendoutput'=>1, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
-		$maps = zbx_toHash($maps, 'mapid');
+		$maps = zbx_toHash($maps, 'sysmapid');
 		
 		$triggers = CTrigger::get(array('triggerids'=>$triggerids, 'extendoutput'=>1, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
 		$triggers = zbx_toHash($triggers, 'triggerid');
 		
 		$hostgroups = CHostGroup::get(array('hostgroupids'=>$hostgroupids, 'extendoutput'=>1, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
 		$hostgroups = zbx_toHash($hostgroups, 'groupid');
-		
+
 		foreach($selements as $snum => $selement){
 			switch($selement['elementtype']){
 				case SYSMAP_ELEMENT_TYPE_HOST:

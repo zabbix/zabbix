@@ -20,26 +20,28 @@
 ?>
 <?php
 	function get_image_by_imageid($imageid){
-		global $DB;
 
 		$sql = 'SELECT * FROM images WHERE imageid='.$imageid;
 		$result = DBselect($sql);
 		if($row = DBfetch($result)){
-			if($DB['TYPE'] == "ORACLE"){
-				if(!isset($row['image']))
-					return 0;
-			}
-			else if($DB['TYPE'] == "POSTGRESQL"){
-				$row['image'] = pg_unescape_bytea($row['image']);
-			}
-			else if($DB['TYPE'] == "SQLITE3"){
-				$row['image'] = pack('H*', $row['image']);
-			}
-			return	$row;
+			$row['image'] = zbx_unescape_image($row['image']);
 		}
-		else{
-			return 0;
+	
+	return $row;
+	}
+	
+	function zbx_unescape_image($image){
+		global $DB;
+		
+		$result = ($image)?$image:0;
+		if($DB['TYPE'] == "POSTGRESQL"){
+			$result = pg_unescape_bytea($image);
 		}
+		else if($DB['TYPE'] == "SQLITE3"){
+			$result = pack('H*', $image);
+		}
+
+	return $result;
 	}
 
 	function add_image($name, $imagetype, $file){

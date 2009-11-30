@@ -26,7 +26,7 @@ require_once('include/forms.inc.php');
 $page['title'] = "S_CONFIGURATION_OF_NETWORK_MAPS";
 $page['file'] = 'sysmap.php';
 $page['hist_arg'] = array('sysmapid');
-$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','pmaster.js','class.cmap.js');
+$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.cmap.js');
 $page['type'] = detect_page_type();
 
 include_once('include/page_header.php');
@@ -134,6 +134,7 @@ include_once('include/page_header.php');
 					print($action);
 					break;
 				case 'save':
+					SDII($_REQUEST); break;
 					$selements = get_request('selements', '[]');
 					$selements = $json->decode($selements, true);
 

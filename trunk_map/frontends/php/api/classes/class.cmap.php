@@ -289,6 +289,8 @@ class CMap extends CZBXAPI{
 // Adding Elements
 		if(!is_null($options['select_selements'])){
 			if(!isset($map_selements)){
+				$map_selements = array();
+
 				$sql = 'SELECT se.* FROM sysmaps_elements se WHERE '.DBcondition('se.sysmapid', $sysmapids);
 				$db_selements = DBselect($sql);
 				while($selement = DBfetch($db_selements)){
@@ -310,6 +312,7 @@ class CMap extends CZBXAPI{
 		if(!is_null($options['select_links'])){
 			if(!isset($map_links)){
 				$linkids = array();
+				$map_links = array();
 
 				$sql = 'SELECT sl.* FROM sysmaps_links sl WHERE '.DBcondition('sl.sysmapid', $sysmapids);
 				$db_links = DBselect($sql);

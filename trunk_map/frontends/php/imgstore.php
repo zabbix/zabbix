@@ -46,6 +46,8 @@ include_once('include/page_header.php');
 		$sql = 'SELECT * FROM images WHERE imagetype=1';
 		$res = DBselect($sql);
 		while($image = DBfetch($res)){
+//SDI($image['image']);
+			$image['image'] = zbx_unescape_image($image['image']);
 			$img = imagecreatefromstring($image['image']);
 			
 			$w=imagesx($img); 

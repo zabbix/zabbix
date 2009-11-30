@@ -740,10 +740,10 @@ update_selements_icon: function(){
 	}
 	else{
 		for(var selementid in this.selements){
-			if(!empty(this.selements[selementid])){
-				this.selements[selementid].html_obj = this.add_selement_img(this.selements[selementid]);
-				this.selements[selementid].image = null;
-			}
+			if(empty(this.selements[selementid])) continue;
+
+			this.selements[selementid].html_obj = this.add_selement_img(this.selements[selementid]);
+			this.selements[selementid].image = null;
 		}
 	}
 },
@@ -967,7 +967,7 @@ showForm: function(e, selementid){
 		doc_body.appendChild(divForm);
 		
 		divForm.setAttribute('id','divSelementForm');
-		divForm.style.backgroundColor = '#333333';
+		divForm.style.backgroundColor = '#999999';
 		divForm.style.zIndex = 100;
 		divForm.style.position = 'absolute';
 		divForm.style.top = '50px';
@@ -975,7 +975,7 @@ showForm: function(e, selementid){
 		
 
 
-		divForm.style.border = '1px black solid';
+		divForm.style.border = '1px #999999 solid';
 	}
 
 

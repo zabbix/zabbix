@@ -9,7 +9,7 @@
  *
  * author: Eugene Grigorjev
  */
-function zbx_jsvalue($value){
+function zbx_jsvalue($value, $object = null){
 	if(!is_array($value)) {
 		if(is_object($value)) return unpack_object($value);
 		if(is_string($value)) return '\''.str_replace('\'','\\\'',			/*  '	=> \'	*/
@@ -24,8 +24,8 @@ function zbx_jsvalue($value){
 	if(count($value) == 0) return '[]';
 
 	foreach($value as $id => $v){
-		if(!isset($is_object) && is_string($id)) $is_object = true;
-		$value[$id] = (isset($is_object) ? '\''.$id.'\' : ' : '').zbx_jsvalue($v);
+		if((!isset($is_object) && is_string($id)) || $object) $is_object = true;
+		$value[$id] = (isset($is_object) ? '\''.$id.'\' : ' : '').zbx_jsvalue($v, $object);
 	}
 
 	if(isset($is_object))
