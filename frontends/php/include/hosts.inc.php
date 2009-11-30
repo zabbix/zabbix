@@ -280,11 +280,11 @@ require_once('include/httptest.inc.php');
 			
 			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $newgroup['groupid'], $newgroup['name'], 'groups', NULL, NULL);
 			info('Added host group ['.$newgroup['name'].']');
-			$groups[] = $newgroup['groupid'];
+			$groups[] = array('groupid' => $newgroup['groupid']);
 		}
 
 		$hosts = array('hostid' => $hostid);
-		$groups = zbx_toObject($groups, 'groupid');
+//		$groups = zbx_toObject($groups, 'groupid');
 
 // COPY FROM API HostGroup:addHosts
 		$linked = array();
@@ -366,7 +366,6 @@ require_once('include/httptest.inc.php');
 		if(!$result)
 			return $result;
 
-		$groups = zbx_toObject($groups, 'groupid');
 		if(!zbx_empty($newgroup)){
 			if(!$newgroup = CHostGroup::add(array('name' => $newgroup))){
 				error(CHostGroup::resetErrors());
