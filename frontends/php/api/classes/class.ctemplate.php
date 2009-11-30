@@ -272,7 +272,7 @@ class CTemplate extends CZBXAPI{
 				$templateids[$template['templateid']] = $template['templateid'];
 
 				if(is_null($options['extendoutput'])){
-					$result[$template['templateid']] = $template['templateid'];
+					$result[$template['templateid']] = array('templateid' => $template['templateid']);
 				}
 				else{
 					if(!isset($result[$template['templateid']])) $result[$template['templateid']]= array();
@@ -362,7 +362,7 @@ class CTemplate extends CZBXAPI{
 // Adding Objects
 // Adding Groups
 		if($options['select_groups']){
-			$obj_params = array('extend output' => 1, 'hostids' => $templateids, 'preservekeys' => 1);
+			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids, 'preservekeys' => 1);
 			$groups = CHostgroup::get($obj_params);
 			foreach($groups as $groupid => $group){
 				foreach($group['hostids'] as $num => $templateid){

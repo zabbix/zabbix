@@ -177,7 +177,7 @@ class CMap extends CZBXAPI{
 				$sysmapids[$sysmap['sysmapid']] = $sysmap['sysmapid'];
 
 				if(is_null($options['extendoutput'])){
-					$result[$sysmap['sysmapid']] = $sysmap['sysmapid'];
+					$result[$sysmap['sysmapid']] = array('sysmapid' => $sysmap['sysmapid']);
 				}
 				else{
 					if(!isset($result[$sysmap['sysmapid']])) $result[$sysmap['sysmapid']]= array();
@@ -231,9 +231,13 @@ class CMap extends CZBXAPI{
 				$allowed_hosts = CHost::get(array('hostids' => $hosts_to_check, 'editable' => isset($options['editable'])));
 				$allowed_hosts = zbx_objectValues($allowed_hosts, 'hostid');
 				$allowed_maps = CMap::get(array('sysmapids' => $maps_to_check, 'editable' => isset($options['editable'])));
+				$allowed_maps = zbx_objectValues($allowed_maps, 'sysmapid');
 
 				$allowed_triggers = CTrigger::get(array('triggerids' => $triggers_to_check, 'editable' => isset($options['editable'])));
+				$allowed_triggers = zbx_objectValues($allowed_triggers, 'triggerid');
 				$allowed_host_groups = CHostGroup::get(array('groupids' => $host_groups_to_check, 'editable' => isset($options['editable'])));
+				$allowed_host_groups = zbx_objectValues($allowed_host_groups, 'groupid');
+
 
 				$restr_hosts = array_diff($hosts_to_check, $allowed_hosts);
 				$restr_maps = array_diff($maps_to_check, $allowed_maps);

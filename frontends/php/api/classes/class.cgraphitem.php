@@ -193,7 +193,7 @@ class CGraphItem extends CZBXAPI{
 				$result = $gitem;
 			else{
 				if(is_null($options['extendoutput'])){
-					$result[$gitem['gitemid']] = $gitem['gitemid'];
+					$result[$gitem['gitemid']] = array('gitemid' => $gitem['gitemid']);
 				}
 				else{
 					$gitemids[$gitem['gitemid']] = $gitem['gitemid'];

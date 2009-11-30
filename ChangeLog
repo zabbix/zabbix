@@ -1,5 +1,6 @@
 Changes for 1.7.3
 
+ - [DEV-386] get funtions now always return array of objects (Vedmak)
  - [ZBX-1303] fixed usergroup linkage to users (Vedmak)
  - [ZBX-1287] fixed operations with user medias (Vedmak)
  - [ZBX-1328] better naming for mass operations in the list of host groups (Alexei)

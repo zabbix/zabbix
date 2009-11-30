@@ -301,7 +301,7 @@ class CHostGroup extends CZBXAPI{
 				$result = $group;
 			else{
 				if(is_null($options['extendoutput'])){
-					$result[$group['groupid']] = $group['groupid'];
+					$result[$group['groupid']] = array('groupid' => $group['groupid']);
 				}
 				else{
 					$groupids[$group['groupid']] = $group['groupid'];

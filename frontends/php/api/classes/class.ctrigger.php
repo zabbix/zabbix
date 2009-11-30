@@ -385,7 +385,7 @@ class CTrigger extends CZBXAPI{
 				$triggerids[$trigger['triggerid']] = $trigger['triggerid'];
 
 				if(is_null($options['extendoutput'])){
-					$result[$trigger['triggerid']] = $trigger['triggerid'];
+					$result[$trigger['triggerid']] = array('triggerid' => $trigger['triggerid']);
 				}
 				else{
 					if(!isset($result[$trigger['triggerid']])) $result[$trigger['triggerid']]= array();

@@ -224,7 +224,7 @@ class CUser extends CZBXAPI{
 				$userids[$user['userid']] = $user['userid'];
 
 				if(is_null($options['extendoutput'])){
-					$result[$user['userid']] = $user['userid'];
+					$result[$user['userid']] = array('userid' => $user['userid']);
 				}
 				else{
 					if(!isset($result[$user['userid']])) $result[$user['userid']]= array();
