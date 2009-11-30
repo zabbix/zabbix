@@ -221,8 +221,7 @@ include_once('include/page_header.php');
 
 						$action = '';
 						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement).',1);';
-						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.update_mapimg();';
-						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.show_selement_list();';
+//						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.update_mapimg();';
 						
 						print($action);
 					}
@@ -345,8 +344,7 @@ include_once('include/page_header.php');
 	insert_js(get_selement_form_menu());
 	insert_js(get_link_form_menu());
 	
-	$jsmenu = new CPUMenu(null,200,1);
-	$jsmenu->InsertJavaScript();
+	insert_show_color_picker_javascript();
 ?>
 <?php
 

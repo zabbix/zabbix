@@ -432,7 +432,7 @@ update_selement: function(selement){
 	);
 },
 
-remove_selements: function(){
+remove_selements: function(e){
 	this.debug('remove_selements');
 //--
 
@@ -443,6 +443,7 @@ remove_selements: function(){
 			this.remove_selement(this.selection.selements[i]);
 		}
 
+		this.hideForm(e);
 		this.update_mapimg();
 	}	
 },
@@ -558,7 +559,7 @@ update_link_option: function(linkid, params){ // params = [{'key': key, 'value':
 	this.update_mapimg();
 },
 
-remove_links: function(){
+remove_links: function(e){
 	this.debug('remove_links');
 //--
 
@@ -590,6 +591,8 @@ remove_links: function(){
 			for(var linkid in linkids){
 				this.remove_link(linkid);
 			}
+
+			this.hideForm(e);
 			this.update_mapimg();
 		}
 	}
@@ -973,8 +976,8 @@ showForm: function(e, selementid){
 
 
 // Form init
-//	this.updateForm_selement(e, selementid);
-//	this.update_multiContainer(e);
+	this.updateForm_selement(e, selementid);
+	this.update_multiContainer(e);
 	this.update_linkContainer(e);
 	this.hideForm_link(e);
 //---
@@ -1157,26 +1160,7 @@ create_linkContainer: function(e, selementid){
 
 
 // Down Stream
-/*
-	var e_table_1 = document.createElement('table');
-this.linkContainer.containerHeader = e_table_1;
-	e_table_1.setAttribute('id',"linkContainer");
-	e_table_1.setAttribute('cellSpacing',"0");
-	e_table_1.setAttribute('cellPadding',"0");
-	e_table_1.style.width = "100%";
-
-
-	var e_tbody_2 = document.createElement('tbody');
-	e_table_1.appendChild(e_tbody_2);
-
-
-	var e_tr_3 = document.createElement('tr');
-	e_tbody_2.appendChild(e_tr_3);
-
-
-	var e_td_4 = document.createElement('td');
-	e_tr_3.appendChild(e_td_4);
-*/	
+	
 	var e_div_1 = document.createElement('div');
 this.linkContainer.container = e_div_1;
 	e_div_1.setAttribute('id',"linkContainer");
@@ -1489,6 +1473,16 @@ this.selementForm.elementtype = e_select_6;
 
 	var e_td_5 = document.createElement('td');
 	e_td_5.className = "form_row_l";
+
+	var e_input_6 = document.createElement('input');
+this.selementForm.massEdit.chkboxLabel = e_input_6
+	e_input_6.setAttribute('type', 'checkbox');
+	e_input_6.setAttribute('name', "chkboxLabel");
+	e_input_6.setAttribute('id', "chkboxLabel");
+	e_input_6.className = 'checkbox';
+	e_td_5.appendChild(e_input_6);
+	
+	e_td_5.appendChild(document.createTextNode(' '));
 	e_td_5.appendChild(document.createTextNode('Label'));
 	e_tr_4.appendChild(e_td_5);
 
@@ -1515,6 +1509,18 @@ this.selementForm.label = e_textarea_6;
 
 	var e_td_5 = document.createElement('td');
 	e_td_5.className = "form_row_l";
+	
+
+	var e_input_6 = document.createElement('input');
+this.selementForm.massEdit.chkboxLabelLocation = e_input_6
+	e_input_6.setAttribute('type', 'checkbox');
+	e_input_6.setAttribute('name', "chkboxLabelLocation");
+	e_input_6.setAttribute('id', "chkboxLabelLocation");
+	e_input_6.className = 'checkbox';
+	e_td_5.appendChild(e_input_6);
+	
+	e_td_5.appendChild(document.createTextNode(' '));
+	
 	e_td_5.appendChild(document.createTextNode('Label location'));
 	e_tr_4.appendChild(e_td_5);
 
@@ -1615,6 +1621,18 @@ this.selementForm.typeDOM.iconid_off = e_tr_4;
 
 	var e_td_5 = document.createElement('td');
 	e_td_5.className = "form_row_l";
+
+
+	var e_input_6 = document.createElement('input');
+this.selementForm.massEdit.chkboxIconid_off = e_input_6
+	e_input_6.setAttribute('type', 'checkbox');
+	e_input_6.setAttribute('name', "chkboxIconid_off");
+	e_input_6.setAttribute('id', "chkboxIconid_off");
+	e_input_6.className = 'checkbox';
+	e_td_5.appendChild(e_input_6);
+	
+	e_td_5.appendChild(document.createTextNode(' '));
+
 	e_td_5.appendChild(document.createTextNode('Icon (default)'));
 	e_tr_4.appendChild(e_td_5);
 
@@ -1684,6 +1702,16 @@ this.selementForm.typeDOM.iconid_on = e_tr_4;
 
 	var e_td_5 = document.createElement('td');
 	e_td_5.className = "form_row_l";
+
+	var e_input_6 = document.createElement('input');
+this.selementForm.massEdit.chkboxIconid_on = e_input_6
+	e_input_6.setAttribute('type', 'checkbox');
+	e_input_6.setAttribute('name', "chkboxIconid_on");
+	e_input_6.setAttribute('id', "chkboxIconid_on");
+	e_input_6.className = 'checkbox';
+	e_td_5.appendChild(e_input_6);
+	
+	e_td_5.appendChild(document.createTextNode(' '));
 	e_td_5.appendChild(document.createTextNode('Icon (problem)'));
 	e_tr_4.appendChild(e_td_5);
 
@@ -1729,6 +1757,16 @@ this.selementForm.typeDOM.iconid_unknown = e_tr_4;
 
 	var e_td_5 = document.createElement('td');
 	e_td_5.className = "form_row_l";
+
+	var e_input_6 = document.createElement('input');
+this.selementForm.massEdit.chkboxIconid_unknown = e_input_6
+	e_input_6.setAttribute('type', 'checkbox');
+	e_input_6.setAttribute('name', "chkboxIconid_unknown");
+	e_input_6.setAttribute('id', "chkboxIconid_unknown");
+	e_input_6.className = 'checkbox';
+	e_td_5.appendChild(e_input_6);
+	
+	e_td_5.appendChild(document.createTextNode(' '));
 	e_td_5.appendChild(document.createTextNode('Icon (unknown)'));
 	e_tr_4.appendChild(e_td_5);
 
@@ -1774,6 +1812,16 @@ this.selementForm.typeDOM.iconid_maintenance = e_tr_4;
 
 	var e_td_5 = document.createElement('td');
 	e_td_5.className = "form_row_l";
+
+	var e_input_6 = document.createElement('input');
+this.selementForm.massEdit.chkboxIconid_maintenance = e_input_6
+	e_input_6.setAttribute('type', 'checkbox');
+	e_input_6.setAttribute('name', "chkboxIconid_maintenance");
+	e_input_6.setAttribute('id', "chkboxIconid_maintenance");
+	e_input_6.className = 'checkbox';
+	e_td_5.appendChild(e_input_6);
+	
+	e_td_5.appendChild(document.createTextNode(' '));
 	e_td_5.appendChild(document.createTextNode('Icon (In maintenance)'));
 	e_tr_4.appendChild(e_td_5);
 
@@ -1819,6 +1867,16 @@ this.selementForm.typeDOM.iconid_disabled = e_tr_4;
 
 	var e_td_5 = document.createElement('td');
 	e_td_5.className = "form_row_l";
+
+	var e_input_6 = document.createElement('input');
+this.selementForm.massEdit.chkboxIconid_disabled = e_input_6
+	e_input_6.setAttribute('type', 'checkbox');
+	e_input_6.setAttribute('name', "chkboxIconid_disabled");
+	e_input_6.setAttribute('id', "chkboxIconid_disabled");
+	e_input_6.className = 'checkbox';
+	e_td_5.appendChild(e_input_6);
+	
+	e_td_5.appendChild(document.createTextNode(' '));
 	e_td_5.appendChild(document.createTextNode('Icon (disabled)'));
 	e_tr_4.appendChild(e_td_5);
 
@@ -1923,7 +1981,7 @@ this.selementForm.y = e_input_6;
 this.selementForm.y = e_span_6;
 	e_td_5.appendChild(e_span_6);
 	
-
+// URL
 	var e_tr_4 = document.createElement('tr');
 	e_tr_4.className = "form_even_row";
 	e_tbody_3.appendChild(e_tr_4);
@@ -1931,6 +1989,16 @@ this.selementForm.y = e_span_6;
 
 	var e_td_5 = document.createElement('td');
 	e_td_5.className = "form_row_l";
+
+	var e_input_6 = document.createElement('input');
+this.selementForm.massEdit.chkboxURL = e_input_6
+	e_input_6.setAttribute('type', 'checkbox');
+	e_input_6.setAttribute('name', "chkboxURL");
+	e_input_6.setAttribute('id', "chkboxURL");
+	e_input_6.className = 'checkbox';
+	e_td_5.appendChild(e_input_6);
+	
+	e_td_5.appendChild(document.createTextNode(' '));
 	e_td_5.appendChild(document.createTextNode('URL'));
 	e_tr_4.appendChild(e_td_5);
 
@@ -2159,7 +2227,17 @@ updateForm_selementByType: function(e, multi){
 	var multi = multi || false;
 	var display_style = IE?'block':'table-row';
 
+
 	if(multi){
+		this.selementForm.massEdit.chkboxLabel.style.display = 'inline';
+		this.selementForm.massEdit.chkboxLabelLocation.style.display = 'inline';
+		this.selementForm.massEdit.chkboxIconid_off.style.display = 'inline';
+		this.selementForm.massEdit.chkboxIconid_on.style.display = 'inline';
+		this.selementForm.massEdit.chkboxIconid_unknown.style.display = 'inline';
+		this.selementForm.massEdit.chkboxIconid_maintenance.style.display = 'inline';
+		this.selementForm.massEdit.chkboxIconid_disabled.style.display = 'inline';
+		this.selementForm.massEdit.chkboxURL.style.display = 'inline';
+		
 		this.selementForm.massEdit.elementtype.style.display = 'none';
 		this.selementForm.massEdit.elementName.style.display = 'none';
 
@@ -2176,6 +2254,15 @@ updateForm_selementByType: function(e, multi){
 		return true;
 	}
 	else{
+		this.selementForm.massEdit.chkboxLabel.style.display = 'none';
+		this.selementForm.massEdit.chkboxLabelLocation.style.display = 'none';
+		this.selementForm.massEdit.chkboxIconid_off.style.display = 'none';
+		this.selementForm.massEdit.chkboxIconid_on.style.display = 'none';
+		this.selementForm.massEdit.chkboxIconid_unknown.style.display = 'none';
+		this.selementForm.massEdit.chkboxIconid_maintenance.style.display = 'none';
+		this.selementForm.massEdit.chkboxIconid_disabled.style.display = 'none';
+		this.selementForm.massEdit.chkboxURL.style.display = 'none';
+
 		this.selementForm.massEdit.elementtype.style.display = display_style;
 		this.selementForm.massEdit.elementName.style.display = display_style;
 		this.selementForm.massEdit.x.style.display = display_style;
@@ -2335,44 +2422,51 @@ saveForm_selement: function(e){
 		this.update_selement_option(selementid, params);
 	}
 	else{
-		for(var i=0; i < this.selection.position; i++){
-			if(!isset(i, this.selection.selements)) continue;
-			if(!isset(this.selection.selements[i], this.selements)) continue;
-			
-						
-			var selementid = this.selection.selements[i];
-			var selement = this.selements[selementid];
-	
-			var params = {};
+		var params = {};
 	
 // Label
+		if(this.selementForm.massEdit.chkboxLabel.checked)
 			params.label = this.selementForm.label.value;
 
 // Label Location
+		if(this.selementForm.massEdit.chkboxLabelLocation.checked)
 			params.label_location = parseInt(this.selementForm.label_location.selectedIndex, 10) - 1;
 			
 // Icon OK
+		if(this.selementForm.massEdit.chkboxIconid_off.checked)
 			params.iconid_off = this.selementForm.iconid_off.options[this.selementForm.iconid_off.selectedIndex].value;
 		
 // Icon PROBLEM
+		if(this.selementForm.massEdit.chkboxIconid_on.checked)
 			params.iconid_on = this.selementForm.iconid_on.options[this.selementForm.iconid_on.selectedIndex].value;
 	
 // Icon UNKNOWN
+		if(this.selementForm.massEdit.chkboxIconid_unknown.checked)
 			params.iconid_unknown = this.selementForm.iconid_unknown.options[this.selementForm.iconid_unknown.selectedIndex].value;
 	
 // Icon MAINTENANCE
+		if(this.selementForm.massEdit.chkboxIconid_maintenance.checked)
 			params.iconid_maintenance = this.selementForm.iconid_maintenance.options[this.selementForm.iconid_maintenance.selectedIndex].value;
 	
 // Icon DISABLED
+		if(this.selementForm.massEdit.chkboxIconid_disabled.checked)
 			params.iconid_disabled = this.selementForm.iconid_disabled.options[this.selementForm.iconid_disabled.selectedIndex].value;
 	
 // URL
+		if(this.selementForm.massEdit.chkboxURL.checked)
 			params.url = this.selementForm.url.value;
+		
+		for(var i=0; i < this.selection.position; i++){
+			if(!isset(i, this.selection.selements)) continue;
+			if(!isset(this.selection.selements[i], this.selements)) continue;
 
-
-			this.update_selement_option(selementid, params);
+			var selementid = this.selection.selements[i];
+			this.update_selement_option(selementid, params, false);
 		}
+		this.update_selement_option(selementid, params, true);
 	}
+
+	this.update_mapimg();
 	this.update_multiContainer(e);
 //	this.hideForm();
 },
