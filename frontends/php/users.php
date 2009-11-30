@@ -170,22 +170,23 @@ include_once('include/page_header.php');
 				if($result === false) 
 					error(CUserGroup::resetErrors());
 				if($result !== false) $result = CUser::updateMedia(array('users' => $user, 'medias' => $user['user_medias']));
+				$result = ($result === false) ? false : true;
 				$result = DBend($result);
 				
-
 				show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 			}
 			else{
 				$action = AUDIT_ACTION_ADD;
 
+				DBstart();
 				$result = CUser::add($user);
 				if(!$result) 
 					error(CUser::resetErrors());
 				if($result) $result = CUserGroup::updateUsers(array('users' => $result, 'usrgrps' => $usrgrps));
-				if(!$result) 
+				if($result === false) 
 					error(CUserGroup::resetErrors());
+				$result = ($result === false) ? false : true;
 				$result = DBend($result);
-				
 				
 				show_messages($result, S_USER_ADDED, S_CANNOT_ADD_USER);
 			}

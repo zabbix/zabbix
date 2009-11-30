@@ -1,5 +1,6 @@
 Changes for 1.7.3
 
+ - [ZBX-1363] fixed user deletion wth postgre (Vedmak)
  - [ZBX-1155] fixed host profiles groups selecting if previously selected group was deleted (Vedmak)
  - [DEV-386] get funtions now always return array of objects (Vedmak)
  - [ZBX-1303] fixed usergroup linkage to users (Vedmak)
