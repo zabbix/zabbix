@@ -134,7 +134,7 @@ $fields=array(
 			$user['rows_per_page'] = get_request('rows_per_page');
 //			$user['user_type'] = $USER_DETAILS['type'];
 			$user['user_groups'] = null;
-			$user['user_medias'] = get_request('user_medias');
+			$user['user_medias'] = get_request('user_medias', array());
 
 			DBstart();
 			$result = CUser::update($user);
