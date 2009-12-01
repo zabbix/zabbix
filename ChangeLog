@@ -1,5 +1,6 @@
 Changes for 1.7.3
 
+ - [DEV-435] Improvements in monitoring triggers screen (Vedmak)
  - [ZBX-1340] fixed cancel button in forms (Vedmak)
  - [ZBX-1366] fixed dashboard last 20 issues showing events from different triggers (Vedmak)
  - [ZBX-1382] improved performance in dahsboard latest 20 issues (Vedmak)
