@@ -1,5 +1,6 @@
 Changes for 1.7.3
 
+ - [ZBX-1392] fixed representing of Uptime/Downtime times and slavery discovered devices in STATUS OF DISCOVERY screen (Dmitry)
  - [ZBX-1363] fixed user deletion wth postgre (Vedmak)
  - [ZBX-1155] fixed host profiles groups selecting if previously selected group was deleted (Vedmak)
  - [DEV-386] get funtions now always return array of objects (Vedmak)
