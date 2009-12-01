@@ -185,7 +185,10 @@ include_once('include/page_header.php');
 		'with_monitored_items' => 1, 
 		'nodeids' => get_current_nodeid(), 
 		'extendoutput' => 1,
-		'preservekeys' => 1));
+		'preservekeys' => 1)
+	);
+	order_result($groups, 'name');
+	
 	$cmbGroups = new CComboBox('groupid', $_REQUEST['groupid'], 'javascript: submit();');
 	$cmbGroups->addItem(0, S_ALL_S);
 	foreach($groups as $group){
@@ -201,6 +204,8 @@ include_once('include/page_header.php');
 	if($_REQUEST['groupid'] != 0)
 		$options['groupids'] = $_REQUEST['groupid'];
 	$hosts = CHost::get($options);
+	order_result($hosts, 'host');
+	
 	$cmbHosts = new CComboBox('hostid', $_REQUEST['hostid'], 'javascript: submit();');
 	$cmbHosts->addItem(0, S_ALL_S);
 	foreach($hosts as $host){
@@ -239,12 +244,15 @@ include_once('include/page_header.php');
 	$filterForm->addVar('fullscreen', $_REQUEST['fullscreen']);
 	$filterForm->addVar('groupid', $_REQUEST['groupid']);
 	$filterForm->addVar('hostid', $_REQUEST['hostid']);
-
+	
 	$tr_select = new CComboBox('show_triggers', $show_triggers);
+	if(($_REQUEST['hostid'] == 0) && ($_REQUEST['groupid'] == 0)){
+		$tr_select->setAttribute('disabled', 'disabled');
+	}
 	if(TRIGGERS_OPTION_ONLYTRUE){
 		$tr_select->additem(TRIGGERS_OPTION_ONLYTRUE, S_SHOW_ONLY_PROBLEMS);
 	}
-	if(TRIGGERS_OPTION_ALL && (($_REQUEST['groupid'] != 0) || ($_REQUEST['hostid'] != 0))){
+	if(TRIGGERS_OPTION_ALL){
 		$tr_select->addItem(TRIGGERS_OPTION_ALL, S_SHOW_ALL);
 	}
 
@@ -582,10 +590,10 @@ include_once('include/page_header.php');
 
 		if($config['event_ack_enable']){
 			if($trigger['event_count']){
-				$to_ack = new CCol(array($trigger['event_count'].SPACE, new CLink(S_TO_ACKNOWLEDGE, 'acknow.php?triggers[]='.$trigger['triggerid'], 'on')), 'on center');
+				$to_ack = new CCol(array(new CLink(S_ACKNOWLEDGE, 'acknow.php?triggers[]='.$trigger['triggerid'], 'on'), new CSpan(' ('.$trigger['event_count'].')')), 'center');
 			}
 			else{
-				$to_ack = new CCol($trigger['event_count'].SPACE.S_TO_ACKNOWLEDGE, 'off center');
+				$to_ack = new CCol(S_ACKNOWLEDGED, 'off center');
 			}
 		}
 		else{
