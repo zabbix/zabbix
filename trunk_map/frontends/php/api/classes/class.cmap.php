@@ -179,17 +179,16 @@ class CMap extends CZBXAPI{
 				$sysmapids[$sysmap['sysmapid']] = $sysmap['sysmapid'];
 
 				if(is_null($options['extendoutput'])){
-					$result[$sysmap['sysmapid']] = $sysmap['sysmapid'];
+					$result[$sysmap['sysmapid']] = array('sysmapid' => $sysmap['sysmapid']);
 				}
 				else{
 					if(!isset($result[$sysmap['sysmapid']])) $result[$sysmap['sysmapid']]= array();
-
-
-					if($options['select_selements'] && !isset($result[$sysmap['sysmapid']]['selementids'])){
+					
+					if(!is_null($options['select_selements']) && !isset($result[$sysmap['sysmapid']]['selementids'])){
 						$result[$sysmap['sysmapid']]['selementids'] = array();
 						$result[$sysmap['sysmapid']]['selements'] = array();
 					}
-					if($options['select_links'] && !isset($result[$sysmap['sysmapid']]['linkids'])){
+					if(!is_null($options['select_links']) && !isset($result[$sysmap['sysmapid']]['linkids'])){
 						$result[$sysmap['sysmapid']]['linkids'] = array();
 						$result[$sysmap['sysmapid']]['links'] = array();
 					}
@@ -235,11 +234,12 @@ class CMap extends CZBXAPI{
 // sdi($triggers_to_check);
 // sdi($host_groups_to_check);
 
-				$allowed_hosts = CHost::get(array('hostids' => $hosts_to_check, 'editable' => isset($options['editable'])));
-				$allowed_maps = self::get(array('sysmapids' => $maps_to_check, 'editable' => isset($options['editable'])));
+				$allowed_hosts = CHost::get(array('hostids' => $hosts_to_check, 'editable' => isset($options['editable']), 'preservekeys'=>1));
+				$allowed_maps = self::get(array('sysmapids' => $maps_to_check, 'editable' => isset($options['editable']), 'preservekeys'=>1));
 
-				$allowed_triggers = CTrigger::get(array('triggerids' => $triggers_to_check, 'editable' => isset($options['editable'])));
-				$allowed_host_groups = CHostGroup::get(array('groupids' => $host_groups_to_check, 'editable' => isset($options['editable'])));
+				$allowed_triggers = CTrigger::get(array('triggerids' => $triggers_to_check, 'editable' => isset($options['editable']), 'preservekeys'=>1));
+				$allowed_host_groups = CHostGroup::get(array('groupids' => $host_groups_to_check, 'editable' => isset($options['editable']), 'preservekeys'=>1));
+
 
 				$restr_hosts = array_diff($hosts_to_check, $allowed_hosts);
 				$restr_maps = array_diff($maps_to_check, $allowed_maps);

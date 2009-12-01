@@ -315,7 +315,7 @@ include_once('include/page_header.php');
 	$save_btn = new CButton('save',S_SAVE);
 	$save_btn->setAttribute('id','sysmap_save');
 	
-	$elcn_tab = new CTable(null,'textblackwhite');
+	$elcn_tab = new CTable(null,'textwhite');
 	$elcn_tab->addRow(array(S_ELEMENT.'[',$el_add,$el_rmv,']',SPACE,SPACE,S_LINK.'[',$cn_add,$cn_rmv,']'));
 //	show_table_header($map['name'], $save_btn);
 	show_table_header($elcn_tab, $save_btn);
