@@ -24,7 +24,8 @@ class CButtonCancel extends CButton{
 		parent::__construct('cancel',S_CANCEL);
 		$this->attributes['type'] = 'button';
 		$this->setVars($vars);
-		$this->setAction($action);
+		if(!is_null($action))
+			$this->setAttribute('onclick', $action);
 	}
 	public function setVars($value=NULL){
 		global $page;
@@ -35,7 +36,7 @@ class CButtonCancel extends CButton{
 		$uri = new Curl($url);
 		$url = $uri->getUrl();
 
-		return parent::setAction("javascript: return redirect('".$url."');");
+		return $this->setAttribute('onclick', "javascript: return redirect('".$url."');");
 	}
 }
 ?>
