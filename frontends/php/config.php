@@ -620,7 +620,7 @@
 
 			if($imageid > 0){
 				$frmImages->addRow(S_IMAGE,new CLink(
-					new CImg('image.php?width=640&height=480&imageid='.$imageid,'no image',null),'image.php?imageid='.$row['imageid']));
+					new CImg('imgstore.php?iconid='.$imageid,'no image',null),'image.php?imageid='.$row['imageid']));
 			}
 
 			$frmImages->addItemToBottomRow(new CButton('save',S_SAVE));
@@ -651,27 +651,47 @@
 
 			$cnf_wdgt->addHeader(S_IMAGES_BIG,$r_form);
 
-			$table = new CTableInfo(S_NO_IMAGES_DEFINED);
-			$table->setHeader(array(S_NAME,S_TYPE,S_IMAGE));
+			$table = new CTable(S_NO_IMAGES_DEFINED, 'header_wide');
 
-			$result=DBselect('SELECT imageid,imagetype,name '.
-						' FROM images'.
-						' WHERE '.DBin_node('imageid').
-							' AND imagetype='.$imagetype.
-						' ORDER BY name');
-			while($row=DBfetch($result)){
-				if($row['imagetype'] == IMAGE_TYPE_ICON)	$imagetype=S_ICON;
-				else if($row['imagetype'] == IMAGE_TYPE_BACKGROUND)	$imagetype=S_BACKGROUND;
-				else				$imagetype=S_UNKNOWN;
+			$tr = 0;
+			$row = new CRow();
+			$sql = 'SELECT imageid,imagetype,name '.
+					' FROM images'.
+					' WHERE '.DBin_node('imageid').
+						' AND imagetype='.$imagetype.
+					' ORDER BY name';
+			$result=DBselect($sql);
+			while($image = DBfetch($result)){			
+				switch($image['imagetype']){
+					case IMAGE_TYPE_ICON: 
+						$imagetype=S_ICON;
+						$img = new CImg('imgstore.php?iconid='.$image['imageid'],'no image'); 
+					break;
+					case IMAGE_TYPE_BACKGROUND: 
+						$imagetype=S_BACKGROUND; 
+						$img = new CImg('imgstore.php?iconid='.$image['imageid'],'no image',200);
+					break;
+					default: $imagetype=S_UNKNOWN;
+				}
 
-				$name = new CLink($row['name'],'config.php?form=update'.url_param('config').'&imageid='.$row['imageid']);
+				$name = new CLink($image['name'],'config.php?form=update'.url_param('config').'&imageid='.$image['imageid']);
+				$action = new CLink($img, 'image.php?imageid='.$image['imageid']);
+					
+				$img_td = new CCol();
+				$img_td->setAttribute('align', 'center');
+				$img_td->addItem(array($action, BR(), $name), 'center');
+				
+				$row->addItem($img_td);
+				$tr++;
+				if(($tr % 4) == 0){
+					$table->addRow($row);
+					$row = new CRow();
+				}
+			}
 
-				$table->addRow(array(
-					$name,
-					$imagetype,
-					$actions=new CLink(
-						new CImg('image.php?height=24&imageid='.$row['imageid'],'no image',NULL),'image.php?imageid='.$row['imageid'])
-					));
+			if($tr > 0){
+				while(($tr % 4) != 0){ $tr++; $row->addItem(SPACE);}
+				$table->addRow($row);
 			}
 
 			$cnf_wdgt->addItem($table);

@@ -1028,38 +1028,54 @@
 
 //	sysmap.php
 	'S_UPPER_LEVEL_MAPS' => 'Upper level maps',
-	'S_LINK'=>				'Link',
 	'S_LINKS'=>				'Links',
+	'S_LINK'=>				'Link',
 	'S_LABEL'=>				'Label',
 	'S_X'=>					'X',
 	'S_Y'=>					'Y',
 	'S_ICON_PROBLEM'=>			'Icon (problem)',
 	'S_ICON_OK'=>				'Icon (ok)',
 	'S_ICON_UNKNOWN'=>			'Icon (unknown)',
+	'S_ICON_MAINTENANCE'=>		'Icon (maintenance)',
 	'S_ICON_DISABLED'=>			'Icon (disabled)',
 	'S_ELEMENT_1'=>				'Element 1',
 	'S_ELEMENT_2'=>				'Element 2',
 	'S_LINK_STATUS_INDICATOR'=>		'Link status indicator',
 	'S_CONFIGURATION_OF_NETWORK_MAPS'=>	'Configuration of network maps',
 	'S_CONFIGURATION_OF_NETWORK_MAPS_BIG'=>	'CONFIGURATION OF NETWORK MAPS',
-	'S_DISPLAYED_ELEMENTS'=>		'DISPLAYED ELEMENTS',
-	'S_CONNECTORS'=>			'CONNECTORS',
+
 	'S_ADD_ELEMENT'=>			'Add element',
 	'S_CREATE_CONNECTION'=>			'Create connection',
 	'S_COORDINATE_X'=>			'Coordinate X',
 	'S_COORDINATE_Y'=>			'Coordinate Y',
 
+	'S_DISPLAYED_ELEMENTS'=>	'Displayed elements',
+	'S_CONNECTORS'=>			'Connectors',
 
 //	sysmaps.php
-	'S_MAP_DELETED'=>		'Network map deleted',
+	'S_MAP_DELETED'=>			'Network map deleted',
 	'S_CANNOT_DELETE_MAP'=>		'Cannot delete network map',
-	'S_MAPS_BIG'=>			'MAPS',
+	'S_MAPS_BIG'=>				'MAPS',
 	'S_NO_MAPS_DEFINED'=>		'No maps defined',
-	'S_CREATE_MAP'=>		'Create Map',
+	'S_CREATE_MAP'=>			'Create Map',
 	'S_ICON_LABEL_LOCATION'=>	'Icon label location',
-	'S_BOTTOM'=>			'Bottom',
-	'S_TOP'=>			'Top',
+	'S_ICON_HIGHLIGHTING'=>		'Icon highlighting',
+
+
+	'S_BOTTOM'=>				'Bottom',
+	'S_TOP'=>					'Top',
 	'S_LINK_STATUS_INDICATORS'=>	'Link status indicators',
+
+	'S_ADD_ELEMENT'=>			'Add element',
+	'S_REMOVE_ELEMENT'=>		'Remove element',
+	'S_ADD_LINK'=>				'Add link',
+	'S_REMOVE_LINK'=>			'Remove link',
+	
+	'S_UNDEFINED'=>				'Undefined',
+	'S_TYPE_OFF'=>				'Type (OFF)',
+	'S_TYPE_ON'=>				'Type (ON)',
+	'S_COLOR_OFF'=>				'Color (OFF)',
+	'S_COLOR_ON'=>				'Color (ON)',
 
 //	map.php
 	'S_OK_BIG'=>			'OK',

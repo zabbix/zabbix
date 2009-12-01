@@ -81,12 +81,14 @@ class CMap extends CZBXAPI{
 			'sysmapids'					=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
+
 // filtet
 			'pattern'					=> '',
 
 // OutPut
 			'extendoutput'				=> null,
-			'select_elements'			=> null,
+			'select_selements'			=> null,
+			'select_links'				=> null,
 			'count'						=> null,
 			'preservekeys'				=> null,
 
@@ -103,7 +105,7 @@ class CMap extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid();
 
 // sysmapids
 		if(!is_null($options['sysmapids'])){
@@ -167,7 +169,7 @@ class CMap extends CZBXAPI{
 		$sql = 'SELECT '.$sql_select.'
 				FROM '.$sql_from.'
 				WHERE '.DBin_node('s.sysmapid', $nodeids).
-				$sql_where.
+					$sql_where.
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
 		while($sysmap = DBfetch($res)){
@@ -182,9 +184,13 @@ class CMap extends CZBXAPI{
 				else{
 					if(!isset($result[$sysmap['sysmapid']])) $result[$sysmap['sysmapid']]= array();
 					
-					if(!is_null($options['select_elements'])){
-						$result[$sysmap['sysmapid']]['elementids'] = array();
-						$result[$sysmap['sysmapid']]['elements'] = array();
+					if(!is_null($options['select_selements']) && !isset($result[$sysmap['sysmapid']]['selementids'])){
+						$result[$sysmap['sysmapid']]['selementids'] = array();
+						$result[$sysmap['sysmapid']]['selements'] = array();
+					}
+					if(!is_null($options['select_links']) && !isset($result[$sysmap['sysmapid']]['linkids'])){
+						$result[$sysmap['sysmapid']]['linkids'] = array();
+						$result[$sysmap['sysmapid']]['links'] = array();
 					}
 
 					$result[$sysmap['sysmapid']] += $sysmap;
@@ -228,14 +234,12 @@ class CMap extends CZBXAPI{
 // sdi($triggers_to_check);
 // sdi($host_groups_to_check);
 
-				$allowed_hosts = CHost::get(array('hostids' => $hosts_to_check, 'editable' => isset($options['editable'])));
-				$allowed_hosts = zbx_objectValues($allowed_hosts, 'hostid');
-				$allowed_maps = CMap::get(array('sysmapids' => $maps_to_check, 'editable' => isset($options['editable'])));
+				$allowed_hosts = CHost::get(array('hostids' => $hosts_to_check, 'editable' => isset($options['editable']), 'preservekeys'=>1));
+				$allowed_maps = self::get(array('sysmapids' => $maps_to_check, 'editable' => isset($options['editable']), 'preservekeys'=>1));
 				$allowed_maps = zbx_objectValues($allowed_maps, 'sysmapid');
 
-				$allowed_triggers = CTrigger::get(array('triggerids' => $triggers_to_check, 'editable' => isset($options['editable'])));
-				$allowed_triggers = zbx_objectValues($allowed_triggers, 'triggerid');
-				$allowed_host_groups = CHostGroup::get(array('groupids' => $host_groups_to_check, 'editable' => isset($options['editable'])));
+				$allowed_triggers = CTrigger::get(array('triggerids' => $triggers_to_check, 'editable' => isset($options['editable']), 'preservekeys'=>1));
+				$allowed_host_groups = CHostGroup::get(array('groupids' => $host_groups_to_check, 'editable' => isset($options['editable']), 'preservekeys'=>1));
 				$allowed_host_groups = zbx_objectValues($allowed_host_groups, 'groupid');
 
 
@@ -285,17 +289,59 @@ class CMap extends CZBXAPI{
 		}
 
 // Adding Elements
-		if($options['select_elements']){
-			if(!isset($map_elements)){
-				$map_elements = array();
-				$db_elements = DBselect('SELECT * FROM sysmaps_elements WHERE '.DBcondition('sysmapid', $sysmapids));
-				while($element = DBfetch($db_elements)){
-					$map_elements[$element['sysmapid']] = $element;
+		if(!is_null($options['select_selements'])){
+			if(!isset($map_selements)){
+				$map_selements = array();
+
+				$sql = 'SELECT se.* FROM sysmaps_elements se WHERE '.DBcondition('se.sysmapid', $sysmapids);
+				$db_selements = DBselect($sql);
+				while($selement = DBfetch($db_selements)){
+					$map_selements[$selement['selementid']] = $selement;
 				}
 			}
-			foreach($map_elements as $element){
-				$result[$element['sysmapid']]['elementids'][$element['elementid']] = $element['elementid'];
-				$result[$element['sysmapid']]['elements'][$element['elementid']] = $element;
+
+			foreach($map_selements as $num => $selement){
+				if(!isset($result[$selement['sysmapid']]['selements'])){
+					$result[$selement['sysmapid']]['selementids'] = array();
+					$result[$selement['sysmapid']]['selements'] = array();
+				}
+				$result[$selement['sysmapid']]['selementids'][$selement['selementid']] = $selement['selementid'];
+				$result[$selement['sysmapid']]['selements'][$selement['selementid']] = $selement;
+			}
+		}
+
+// Adding Links
+		if(!is_null($options['select_links'])){
+			if(!isset($map_links)){
+				$linkids = array();
+				$map_links = array();
+
+				$sql = 'SELECT sl.* FROM sysmaps_links sl WHERE '.DBcondition('sl.sysmapid', $sysmapids);
+				$db_links = DBselect($sql);
+				while($link = DBfetch($db_links)){
+					$link['linktriggers'] = array();
+					$link['linktriggerids'] = array();
+
+					$map_links[$link['linkid']] = $link;
+					$linkids[$link['linkid']] = $link['linkid'];
+				}
+
+				$sql = 'SELECT slt.* FROM sysmaps_link_triggers slt WHERE '.DBcondition('slt.linkid', $linkids);
+				$db_link_triggers = DBselect($sql);
+				while($link_trigger = DBfetch($db_link_triggers)){
+					$map_links[$link_trigger['linkid']]['linktriggers'][$link_trigger['linktriggerid']] = $link_trigger;
+					$map_links[$link_trigger['linkid']]['linktriggerids'][$link_trigger['linktriggerid']] = $link_trigger['linktriggerid'];
+				}
+			}
+
+			foreach($map_links as $num => $link){
+				if(!isset($result[$link['sysmapid']]['links'])){
+					$result[$link['sysmapid']]['linkids'] = array();
+					$result[$link['sysmapid']]['links'] = array();
+				}
+
+				$result[$link['sysmapid']]['linkids'][$link['linkid']] = $link['linkid'];
+				$result[$link['sysmapid']]['links'][$link['linkid']] = $link;
 			}
 		}
 
@@ -398,7 +444,7 @@ class CMap extends CZBXAPI{
 		self::BeginTransaction(__METHOD__);
 		foreach($maps as $map){
 
-			$map_db_fields = CMap::get(array('sysmapids' => $map['sysmapid'], 'extendoutput' => 1));
+			$map_db_fields = self::get(array('sysmapids' => $map['sysmapid'], 'extendoutput' => 1));
 			$map_db_fields = reset($map_db_fields);		
 
 
@@ -502,10 +548,11 @@ class CMap extends CZBXAPI{
 
 		self::BeginTransaction(__METHOD__);
 
-		foreach($links as $link){
+		foreach($links as $lnum => $link){
 
 			$link_db_fields = array(
 				'sysmapid' => null,
+				'label' => '',
 				'selementid1' => null,
 				'selementid2' => null,
 				'drawtype' => 2,
@@ -518,7 +565,7 @@ class CMap extends CZBXAPI{
 				break;
 			}
 
-			$linkid = add_link($link['sysmapid'], $link['selementid1'], $link['selementid2'], array(), $link['drawtype'], $link['color']);
+			$linkid = add_link($link['sysmapid'], $link['label'], $link['selementid1'], $link['selementid2'], array(), $link['drawtype'], $link['color']);
 			if(!$linkid){
 				$result = false;
 				break;
@@ -559,17 +606,17 @@ class CMap extends CZBXAPI{
  * @param array $elements[0,...]['url']
  * @param array $elements[0,...]['label_location']
  */
-	public static function addElements($elements){
+	public static function addElements($selements){
 		$errors = array();
-		$result_elements = array();
+		$result_selements = array();
 		$result = true;
 
-		$elements = zbx_toArray($elements);
+		$elements = zbx_toArray($selements);
 
 		self::BeginTransaction(__METHOD__);
-		foreach($elements as $element){
+		foreach($selements as $snumm => $selement){
 
-			$element_db_fields = array(
+			$selement_db_fields = array(
 				'sysmapid' => null,
 				'elementid' => null,
 				'elementtype' => null,
@@ -590,19 +637,17 @@ class CMap extends CZBXAPI{
 				break;
 			}
 
-			$selementid = add_element_to_sysmap($element['sysmapid'],$element['elementid'],$element['elementtype'],$element['label'],
-			$element['x'],$element['y'],$element['iconid_off'],$element['iconid_unknown'],$element['iconid_on'],
-			$element['iconid_disabled'],$element['url'],$element['label_location']);
+			$selementid = add_element_to_sysmap($selement);
 			if(!$selementid){
 				$result = false;
 				break;
 			}
 
 			$new_selement = array('selementid' => $selementid);
-			$result_elements[] = array_merge($new_selement, $element);
+			$result_elements[] = array_merge($new_selement, $selement);
 		}
-		$result = self::EndTransaction($result, __METHOD__);
 
+		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
 			return $result_elements;

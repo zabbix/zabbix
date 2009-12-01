@@ -58,6 +58,10 @@
 			header('Content-Type: application/javascript; charset=UTF-8');
 			if(!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
 			break;
+		case PAGE_TYPE_CSS:
+			header('Content-Type: text/css; charset=UTF-8');
+			if(!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+			break;
 		case PAGE_TYPE_HTML_BLOCK:
 			header('Content-Type: text/plain; charset=UTF-8');
 			if(!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
@@ -140,8 +144,10 @@
 			echo '<link rel="shortcut icon" href="images/general/zabbix.ico" />';
 		}
 	}
+	
+	if($page['file'] == 'sysmap.php') 
+		print('<link rel="stylesheet" type="text/css" href="imgstore.php?css=1&output=css" />');
 ?>
-
 <script type="text/javascript" src="js/prototype.js"></script>
 <script type="text/javascript" src="js/common.js"></script>
 <script type="text/javascript" src="js/class.cookie.js"></script>

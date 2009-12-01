@@ -96,7 +96,7 @@ include_once('include/page_header.php');
 	$maps = CMap::get(array(
 		'extendoutput' => 1, 
 		'nodeids' => get_current_nodeid(),
-		'select_elements' => 1));
+		'select_selements' => 1));
 	$maps = zbx_toHash($maps, 'sysmapid');
 	
 	
@@ -123,8 +123,8 @@ include_once('include/page_header.php');
 		$parent_maps = array();
 //$parent_maps = array_pad($parent_maps, 40, array(SPACE.SPACE, new Clink('Map name 123', 'sdf')));
 		foreach($maps as $sysmapid => $map){
-			foreach($map['elements'] as $enum => $element){
-				if(($element['elementid'] == $_REQUEST['sysmapid']) && ($element['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP)){
+			foreach($map['selements'] as $enum => $selement){
+				if(($selement['elementid'] == $_REQUEST['sysmapid']) && ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP)){
 					$parent_maps[] = SPACE.SPACE;
 					$parent_maps[] = new Clink($map['name'], 'maps.php?sysmapid='.$map['sysmapid'].'&fullscreen='.$_REQUEST['fullscreen']);
 				}
@@ -168,7 +168,9 @@ include_once('include/page_header.php');
 	$map_wdgt->addItem($table);
 	$map_wdgt->addPageHeader(S_NETWORK_MAPS_BIG, array($icon, $fs_icon));
 	$map_wdgt->show();
+?>
+<?php
 
-	
 include_once('include/page_footer.php');
+
 ?>
