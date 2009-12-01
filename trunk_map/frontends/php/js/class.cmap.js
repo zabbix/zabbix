@@ -318,13 +318,15 @@ select_selement: function(selementid, multi){
 			this.selection.selements[position] = selementid;
 			this.selements[selementid].selected = position;
 
-			selement.html_obj.style.border = '1px #FF0000 solid';
+			selement.html_obj.style.border = '1px #3333FF solid';
+			selement.html_obj.style.backgroundColor = '#00AAAA';
+			selement.html_obj.style.opacity = '.60';
 
 			this.selection.count++;
 			this.selection.position++;
 		}
 		else if((this.selection.count > 1) && !multi){
-// if selected several eements and then we clicked on one of them
+// if selected several selements and then we clicked on one of them
 		}
 		else{
 			this.selection.count--;
@@ -336,6 +338,8 @@ select_selement: function(selementid, multi){
 			this.selements[selementid].selected = null;
 
 			selement.html_obj.style.border = '0px';
+			selement.html_obj.style.backgroundColor = 'transparent';
+			selement.html_obj.style.opacity = '1';
 		}
 
 		if(!multi && (this.selection.count > 1)){
@@ -348,6 +352,8 @@ select_selement: function(selementid, multi){
 
 				this.selements[this.selection.selements[i]].selected = null;
 				this.selements[this.selection.selements[i]].html_obj.style.border = '0px';
+				this.selements[this.selection.selements[i]].html_obj.style.backgroundColor = 'transparent';
+				this.selements[this.selection.selements[i]].html_obj.style.opacity = '1';
 
 				this.selection.selements[i] = null;
 				delete(this.selection.selements[i]);
@@ -729,7 +735,9 @@ add_selement_img: function(selement){
 	selement_div.style.visibility = 'visible';
 	
 	if(!is_null(selement.selected)){
-		selement_div.style.border = '1px #FF0000 solid';
+		selement_div.style.border = '1px #3333FF solid';
+		selement_div.style.backgroundColor = '#00AAAA';
+		selement_div.style.opacity = '.60';		
 	}
 
 return selement_div;
@@ -1009,7 +1017,7 @@ showForm: function(e, selementid){
 //---
 
 	new Draggable(divForm,{
-//				  			'handle': this.selementForm.dragHandler, 
+				  			'handle': this.selementForm.dragHandler, 
 							'snap': this.get_window_dimensions.bind(this),
 							'starteffect': function(){ return true; },
 							'endeffect': function(){ return true; }

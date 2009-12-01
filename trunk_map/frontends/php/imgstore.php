@@ -48,41 +48,23 @@ include_once('include/page_header.php');
 		while($image = DBfetch($res)){
 //SDI($image['image']);
 			$image['image'] = zbx_unescape_image($image['image']);
-			$img = imagecreatefromstring($image['image']);
-			
-			$w=imagesx($img); 
-			$h=imagesy($img);
-			
+
+			$ico = imagecreatefromstring($image['image']);
+			$w = imagesx($ico); 
+			$h = imagesy($ico);
+
 			$css.= 'div.sysmap_iconid_'.$image['imageid'].'{'.
 						' height: '.$h.'px; '.
 						' width: '.$w.'px; '.
 						' background-image: url("imgstore.php?iconid='.$image['imageid'].'");'.
 						' background-repeat:no-repeat; }'."\n";
 		}
+
 		print($css);
 	}
 	else if(isset($_REQUEST['iconid'])){
 		$image = get_image_by_imageid($_REQUEST['iconid']);
-		$img = imagecreatefromstring($image['image']);
-		
-		unset($image);
-		
-		$w=imagesx($img); 
-		$h=imagesy($img);
-		
-		if(function_exists('imagecreatetruecolor') && @imagecreatetruecolor(1,1)){
-			$im = imagecreatetruecolor($w,$h);
-		}
-		else{
-			$im = imagecreate($w,$h);
-		}
-
-		imagefilledrectangle($im,0,0,$w,$h, imagecolorallocate($im,255,255,255));
-
-		imagecopy($im,$img,0,0,0,0,$w,$h);
-		imagedestroy($img);
-		
-		imagepng($im);
+		print($image['image']);
 	}
 	else if(isset($_REQUEST['imageid'])){
 		session_start();

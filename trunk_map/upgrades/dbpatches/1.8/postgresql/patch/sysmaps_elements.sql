@@ -12,6 +12,7 @@ CREATE TABLE sysmaps_elements_tmp (
         y               integer         DEFAULT '0'     NOT NULL,
         url             varchar(255)            DEFAULT ''      NOT NULL,
         iconid_disabled         bigint          DEFAULT '0'     NOT NULL,
+	iconid_maintenance      bigint          DEFAULT '0'     NOT NULL,
         PRIMARY KEY (selementid)
 ) with OIDS;
 

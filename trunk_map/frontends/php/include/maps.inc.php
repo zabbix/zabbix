@@ -793,12 +793,13 @@
 		if($maintenance['status']){
 			$out['type'] = TRIGGER_VALUE_UNKNOWN;
 			$out['info'] = S_IN_MAINTENANCE;
+			$out['maintenance'] = 1;
 			if($maintenance['maintenanceid'] > 0){
 				$mnt = get_maintenance_by_maintenanceid($maintenance['maintenanceid']);
 				$out['info'].='['.$mnt['name'].']';
 			}
 			
-			$out['color'] = $colors['Gray'];
+			$out['color'] = $colors['Orange'];
 			$out['iconid'] = $selement['iconid_maintenance'];
 			$out['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
 		}
@@ -970,11 +971,10 @@
 	return get_png_by_selement($selement);
 	}
 	
-	function get_png_by_selement($selement){
-		$info = get_info_by_selement($selement);
+	function get_png_by_selement($selement, $info=null){
+		if(is_null($info))
+			$info = get_info_by_selement($selement);
 		
-//SDII($selement); exit;
-
 		switch($info['icon_type']){
 			case SYSMAP_ELEMENT_ICON_ON:
 				$info['iconid'] = $selement['iconid_on'];

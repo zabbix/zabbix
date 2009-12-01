@@ -60,6 +60,7 @@ include_once('include/page_header.php');
 	$width		= $map['width'];
 	$height		= $map['height'];
 	$backgroundid	= $map['backgroundid'];
+	$highlight	= $map['highlight'];
 	$label_type	= $map['label_type'];
 	$status_view = 0;// $map['status_view'];
 	
@@ -94,6 +95,7 @@ include_once('include/page_header.php');
 	$colors['Black']	= imagecolorallocate($im,0,0,0);
 	$colors['Gray']		= imagecolorallocate($im,150,150,150);
 	$colors['White']	= imagecolorallocate($im,255,255,255);
+	$colors['Orange']	= imagecolorallocate($im,238,96,0);
 
 
 	$x=imagesx($im);
@@ -154,8 +156,9 @@ include_once('include/page_header.php');
 		$res = DBselect('select * from sysmaps_links where sysmapid='.$_REQUEST['sysmapid']);
 		while($link = DBfetch($res)){
 			$link['linktriggers'] = array();
-			$subres = DBselect('select * from sysmaps_linktriggers where linkid='.$link['linkid']);
-			while($linktrigger = DBfetch($res)){
+
+			$subres = DBselect('SELECT * FROM sysmaps_link_triggers WHERE linkid='.$link['linkid']);
+			while($linktrigger = DBfetch($subres)){
 				$link['linktriggers'][] = $linktrigger;
 			}
 
@@ -177,15 +180,15 @@ include_once('include/page_header.php');
 		$drawtype = $link['drawtype'];
 		$color = convertColor($im,$link['color']);
 
-		$triggers = $link['linktriggers'];
-		if(!empty($triggers)){
+		$linktriggers = $link['linktriggers'];
+		if(!empty($linktriggers)){
 			$max_severity=0;
 			$options = array();
 			$options['nopermissions'] = 1;
 			$options['extendoutput'] = 1;
 			$options['triggerids'] = array();
 
-			foreach($triggers as $id => $link_trigger){
+			foreach($linktriggers as $id => $link_trigger){
 				if($link_trigger['triggerid'] == 0) continue;
 
 				$triggers[$id] = zbx_array_merge($link_trigger,get_trigger_by_triggerid($link_trigger['triggerid']));
@@ -235,7 +238,7 @@ include_once('include/page_header.php');
 			default:
 				imagerectangle($im, $boxX_left, $boxY_top, $boxX_right, $boxY_bottom, $color);
 		}
-					
+
 		imagefilledrectangle($im, $boxX_left+1, $boxY_top+1, $boxX_right-1, $boxY_bottom-1, $white);
 
 
@@ -258,16 +261,93 @@ include_once('include/page_header.php');
 	foreach($selements as $selementid => $selement){
 		if(empty($selement)) continue;
 
-		$img = get_png_by_selement($selement);
+//		$info = get_info_by_selement($selement);
+		$el_info = get_info_by_selement($selement,$status_view);
+		$img = get_png_by_selement($selement, $el_info);
 
-		if(!isset($_REQUEST['noselements'])){
-			imagecopy($im,$img,$selement['x'],$selement['y'],0,0,ImageSX($img),ImageSY($img));
+		$iconX = imagesx($img);
+		$iconY = imagesy($img);
+
+		if(isset($_REQUEST['noedit'])){
+	
+			switch($el_info['priority']){
+				case TRIGGER_SEVERITY_DISASTER: 	$hl_color = hex2rgb('FF0000'); break;
+				case TRIGGER_SEVERITY_HIGH:  		$hl_color = hex2rgb('FF8888'); break;
+				case TRIGGER_SEVERITY_AVERAGE:  	$hl_color = hex2rgb('DDAAAA'); break;
+				case TRIGGER_SEVERITY_WARNING:  	$hl_color = hex2rgb('EFEFCC'); break;
+				case TRIGGER_SEVERITY_INFORMATION:  $hl_color = hex2rgb('CCE2CC'); break;
+				case TRIGGER_SEVERITY_NOT_CLASSIFIED:
+				default:
+					$hl_color = null; break;
+			}
+
+	
+			if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_ON){
+				switch($el_info['priority']){
+					case TRIGGER_SEVERITY_DISASTER: 	$hl_color = hex2rgb('FF0000'); break;
+					case TRIGGER_SEVERITY_HIGH:  		$hl_color = hex2rgb('FF8888'); break;
+					case TRIGGER_SEVERITY_AVERAGE:  	$hl_color = hex2rgb('DDAAAA'); break;
+					case TRIGGER_SEVERITY_WARNING:  	$hl_color = hex2rgb('EFEFCC'); break;
+					case TRIGGER_SEVERITY_INFORMATION:  $hl_color = hex2rgb('CCE2CC'); break;
+					case TRIGGER_SEVERITY_NOT_CLASSIFIED:
+					default:
+						$hl_color = null; break;
+				}
+			}
+//$hl_color = hex2rgb('FF0000');
+			if(isset($el_info['maintenance']))	$hl_color = hex2rgb('EE6000');
+			if(isset($el_info['disabled'])) $hl_color = hex2rgb('AA0000');
+
+			if(!is_null($hl_color)){
+				$r = $hl_color[0];
+				$g = $hl_color[1];
+				$b = $hl_color[2];
+		
+				imagefilledellipse($im, 
+						$selement['x'] + ($iconX / 2), 
+						$selement['y'] + ($iconY / 2), 
+						$iconX+20, 
+						$iconX+20, 
+						imagecolorallocatealpha($im,$r,$g,$b, 30)
+					);
+/*
+				for($radius=$iconX; $radius > 0; $radius-=1){
+					$uradius = $iconX-$radius +1;
+					$w = ($uradius * pow(2, $uradius/30)) + 50;
+					$w = ($w > 255)?255:$w;
+
+//SDI($radius.': '.$w.' '.$r.' '.$g.' '.$b.'  -  '.($uradius * pow(1.9, $uradius/40)));
+
+					$d = 0;
+					$dr = $w - $r;
+					$dg = $w - $g;
+					$db = $w - $b;
+					$d = max(array($d, $dr, $dg, $db));
+
+					$r = (($r+$d)>255)?255:($r+$d);
+					$g = (($g+$d)>255)?255:($g+$d);
+					$b = (($b+$d)>255)?255:($b+$d);
+	
+					imagefilledellipse($im, 
+							$selement['x'] + ($iconX / 2), 
+							$selement['y'] + ($iconY / 2), 
+							$radius, 
+							$radius, 
+							imagecolorallocatealpha($im,$r,$g,$b, 0)
+						);
+				}
+//*/
+			}
 		}
 
-		if($label_type == MAP_LABEL_TYPE_NOTHING)	continue;
+		if(!isset($_REQUEST['noselements'])){
+			imagecopy($im,$img,$selement['x'],$selement['y'],0,0,$iconX,$iconY);
+		}
 
-		$color		= $darkgreen;
-		$label_color	= $black;
+		if($label_type == MAP_LABEL_TYPE_NOTHING) continue;
+
+		$color	= $darkgreen;
+		$label_color = $black;
 		
 		$info_line	= '';
 
@@ -276,7 +356,6 @@ include_once('include/page_header.php');
 
 		$label_line = expand_map_element_label_by_data($selement);
 
-		$el_info = get_info_by_selement($selement,$status_view);
 
 		$info_line	= $el_info['info'];
 		$color		= $el_info['color'];
@@ -336,11 +415,11 @@ include_once('include/page_header.php');
 			$dims = imageTextSize(8,0,$str);
 
 			if ($label_location == MAP_LABEL_LOC_TOP || $label_location == MAP_LABEL_LOC_BOTTOM)
-				$x_label = $x + imagesx($img) / 2 - $dims['width'] / 2;
+				$x_label = $x + $iconX / 2 - $dims['width'] / 2;
 			else if ($label_location == MAP_LABEL_LOC_LEFT)
 				$x_label = $x - $dims['width'];
 			else	/* MAP_LABEL_LOC_RIGHT */
-				$x_label = $x + imagesx($img);
+				$x_label = $x + $iconX;
 
 			imagefilledrectangle($im, $x_label-1, $y+$dims['height']+$increasey+1, $x_label + $dims['width']+1, $y+$increasey, $white);
 			imagetext($im, 8, 0, $x_label, $y+$increasey+$dims['height'], ($num == $cnt)?$color:$label_color, $str);

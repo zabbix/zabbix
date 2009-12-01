@@ -1040,14 +1040,17 @@
 	'S_CONNECTORS'=>			'Connectors',
 
 //	sysmaps.php
-	'S_MAP_DELETED'=>		'Network map deleted',
+	'S_MAP_DELETED'=>			'Network map deleted',
 	'S_CANNOT_DELETE_MAP'=>		'Cannot delete network map',
-	'S_MAPS_BIG'=>			'MAPS',
+	'S_MAPS_BIG'=>				'MAPS',
 	'S_NO_MAPS_DEFINED'=>		'No maps defined',
-	'S_CREATE_MAP'=>		'Create Map',
+	'S_CREATE_MAP'=>			'Create Map',
 	'S_ICON_LABEL_LOCATION'=>	'Icon label location',
-	'S_BOTTOM'=>			'Bottom',
-	'S_TOP'=>			'Top',
+	'S_ICON_HIGHLIGHTING'=>		'Icon highlighting',
+
+
+	'S_BOTTOM'=>				'Bottom',
+	'S_TOP'=>					'Top',
 	'S_LINK_STATUS_INDICATORS'=>	'Link status indicators',
 
 	'S_ADD_ELEMENT'=>			'Add element',
