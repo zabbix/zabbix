@@ -279,7 +279,7 @@ include_once('include/page_header.php');
 			$frmHostG->addItemToBottomRow($dltButton);
 		}
 		$frmHostG->addItemToBottomRow(SPACE);
-		$frmHostG->addItemToBottomRow(new CButtonCancel(url_param('config')));
+		$frmHostG->addItemToBottomRow(new CButtonCancel());
 		$frmHostG->show();
 	}
 	else{
