@@ -834,11 +834,11 @@ INDEX		|1		|userid, status
 TABLE|sysmaps_links|linkid|ZBX_SYNC
 FIELD		|linkid		|t_id		|'0'	|NOT NULL	|0
 FIELD		|sysmapid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|sysmaps
-FIELD		|label		|t_varchar(255)|''	|NOT NULL	|ZBX_SYNC
 FIELD		|selementid1	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|sysmaps_elements
 FIELD		|selementid2	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|sysmaps_elements
 FIELD		|drawtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|color		|t_varchar(6)	|'000000'|NOT NULL	|ZBX_SYNC
+FIELD		|label		|t_varchar(255)|''	|NOT NULL	|ZBX_SYNC
 
 TABLE|sysmaps_link_triggers|linktriggerid|ZBX_SYNC
 FIELD		|linktriggerid	|t_id		|'0'	|NOT NULL	|0
@@ -856,13 +856,13 @@ FIELD		|elementtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|iconid_off	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|images
 FIELD		|iconid_on	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|images
 FIELD		|iconid_unknown	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|images
-FIELD		|iconid_maintenance|t_id	|'0'	|NOT NULL	|ZBX_SYNC		|images
-FIELD		|iconid_disabled|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|images
 FIELD		|label		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|label_location	|t_integer	|	|NULL		|ZBX_SYNC
 FIELD		|x		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|y		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|iconid_disabled|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|images
+FIELD		|iconid_maintenance|t_id	|'0'	|NOT NULL	|ZBX_SYNC		|images
 
 TABLE|sysmaps|sysmapid|ZBX_SYNC
 FIELD		|sysmapid	|t_id		|'0'	|NOT NULL	|0
@@ -870,9 +870,9 @@ FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|width		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|height		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|backgroundid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|images
-FIELD		|highlight	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|label_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|label_location	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|highlight	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|name
 
 
