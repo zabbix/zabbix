@@ -305,12 +305,13 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_MTIME, tmp, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json);
 
-		/* Special processing for log[] items */
+		/* Special processing for log[] and log.regexp[] items */
 		do {	/* simple try realization */
 
-			/* log[filename,pattern,maxlinespersec] */
+			/* log[filename,pattern,encoding,maxlinespersec] */
+			/* log.regexp[filename_format,pattern,encoding,maxlinespersec] */
 
-			if (0 != strncmp(item.key, "log[", 4))
+			if (0 != strncmp(item.key, "log[", 4) && 0 != strncmp(item.key, "log.regexp[", 11))
 				break;
 
 			if (2 != parse_command(item.key, NULL, 0, params, MAX_STRING_LEN))

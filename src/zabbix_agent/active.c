@@ -633,7 +633,7 @@ static int	process_value(
 		el->severity	= *severity;
 	if (lastlogsize)
 		el->lastlogsize	= *lastlogsize;
-	if (mtime)/* will be NULL for "eventlog" and the value will be 0 */
+	if (mtime)/* will be NULL for "eventlog" and "log" and the value will be 0, only "log.regexp" matters */
 		el->mtime	= *mtime;
 	if (timestamp)
 		el->timestamp	= *timestamp;
@@ -661,7 +661,7 @@ static void	process_active_checks(char *server, unsigned short port)
 	char		params[MAX_STRING_LEN];
 	char		filename[MAX_STRING_LEN];
 	char		pattern[MAX_STRING_LEN];
-	/*checks `log' and `eventlog' may contain parameter,*/
+	/*checks `log', `eventlog', `log.regexp' may contain parameter,*/
 	/*which overrides CONFIG_MAX_LINES_PER_SECOND*/
 	char		maxlines_persec_str[16];
 	int		maxlines_persec;
@@ -690,8 +690,109 @@ static void	process_active_checks(char *server, unsigned short port)
 		if (active_metrics[i].status != ITEM_STATUS_ACTIVE)
 			continue;
 
-		/* Special processing for log files */
+		/* special processing for log files WITHOUT rotation */
 		if (0 == strncmp(active_metrics[i].key, "log[", 4))
+		{
+			ret = FAIL;
+
+			do { /* simple try realization */
+				if (parse_command(active_metrics[i].key, NULL, 0, params, MAX_STRING_LEN) != 2)
+					break;
+
+				if (num_param( params ) > 4)
+					break;
+
+				if (get_param(params, 1, filename, sizeof(filename)) != 0)
+					break;
+
+				if (get_param(params, 2, pattern, sizeof(pattern)) != 0)
+					*pattern = '\0';
+
+				if (get_param(params, 3, encoding, sizeof(encoding)) != 0)
+					*encoding = '\0';
+
+				zbx_strupper(encoding);
+				
+				if (get_param(params, 4, maxlines_persec_str, sizeof(maxlines_persec_str)) != 0 ||
+						*maxlines_persec_str == '\0')
+					maxlines_persec = CONFIG_MAX_LINES_PER_SECOND;
+				else if ((maxlines_persec = atoi(maxlines_persec_str)) < MIN_VALUE_LINES ||
+						maxlines_persec > MAX_VALUE_LINES)
+					break;
+
+				s_count = p_count = 0;
+				lastlogsize = active_metrics[i].lastlogsize;
+				
+				while (SUCCEED == (ret = process_log(filename, &lastlogsize, &value, encoding))) {
+					if (!value) /* EOF */
+					{
+						/*the file could become empty, must save `lastlogsize'*/
+						active_metrics[i].lastlogsize = lastlogsize;
+						break;
+					}
+
+					if (SUCCEED == regexp_match_ex(regexps, regexps_num, value, pattern, ZBX_CASE_SENSITIVE)) {
+						send_err = process_value(
+									server,
+									port,
+									CONFIG_HOSTNAME,
+									active_metrics[i].key_orig,
+									value,
+									&lastlogsize,
+									NULL,/* "mtime" is not used */
+									NULL,
+									NULL,
+									NULL,
+									NULL
+								);
+						s_count++;
+					}
+					p_count++;
+
+					zbx_free(value);
+
+					if (SUCCEED == send_err)
+					{
+						active_metrics[i].lastlogsize = lastlogsize;
+					}
+					else/* this branch is not neccessary, historically redundant */
+					{
+						lastlogsize = active_metrics[i].lastlogsize;
+					}
+					
+					/* do not flood ZABBIX server if file grows too fast */
+					if (s_count >= (maxlines_persec * active_metrics[i].refresh))
+						break;
+
+					/* do not flood local system if file grows too fast */
+					if (p_count >= (4 * maxlines_persec * active_metrics[i].refresh))
+						break;
+				} //while processing a log
+				
+			} while(0); /* simple try realization */
+
+			if (FAIL == ret) {
+				active_metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
+				zabbix_log( LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.",
+					active_metrics[i].key);
+
+				send_err = process_value(
+					server,
+					port,
+					CONFIG_HOSTNAME,
+					active_metrics[i].key_orig,
+					"ZBX_NOTSUPPORTED",
+					&active_metrics[i].lastlogsize,
+					NULL,/* "mtime" is not used */
+					NULL,
+					NULL,
+					NULL,
+					NULL
+				);
+			}
+		}
+		/* special processing for log files WITH rotation */		
+		else if (0 == strncmp(active_metrics[i].key, "log.regexp[", 11))
 		{
 			ret = FAIL;
 
@@ -724,7 +825,7 @@ static void	process_active_checks(char *server, unsigned short port)
 				lastlogsize = active_metrics[i].lastlogsize;
 				mtime = active_metrics[i].mtime;
 				
-				while (SUCCEED == (ret = process_log(filename, &lastlogsize, &mtime, &value, encoding))) {
+				while (SUCCEED == (ret = process_log_regexp(filename, &lastlogsize, &mtime, &value, encoding))) {
 					if (!value) /* EOF */
 					{
 						/*the file could become empty, must save `lastlogsize' and `mtime'*/
@@ -758,7 +859,7 @@ static void	process_active_checks(char *server, unsigned short port)
 						active_metrics[i].lastlogsize = lastlogsize;
 						active_metrics[i].mtime = mtime;
 					}
-					else/*this branch is not neccessary*/
+					else/*this branch is not neccessary, historically redundant*/
 					{
 						lastlogsize = active_metrics[i].lastlogsize;
 						mtime = active_metrics[i].mtime;
@@ -794,8 +895,8 @@ static void	process_active_checks(char *server, unsigned short port)
 					NULL
 				);
 			}
-		}
-		/* Special processing for eventlog */
+		}		
+		/* special processing for eventlog */
 		else if(strncmp(active_metrics[i].key,"eventlog[",9) == 0)
 		{
 			ret = FAIL;
@@ -937,7 +1038,7 @@ static void	process_active_checks(char *server, unsigned short port)
 					active_metrics[i].key_orig,
 					"ZBX_NOTSUPPORTED",
 					&active_metrics[i].lastlogsize,
-					NULL,
+					NULL,/* "mtime" is not used */
 					NULL,
 					NULL,
 					NULL,
