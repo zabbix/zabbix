@@ -202,7 +202,7 @@ function get_next_event($row,$hide_unknown=0){
 	if((TRIGGER_MULT_EVENT_ENABLED == $row['type']) && (TRIGGER_VALUE_TRUE == $row['value'])){
 		$sql = 'SELECT e.eventid, e.value, e.clock '.
 			' FROM events e'.
-			' WHERE e.objectid='.$row['objectidid'].
+			' WHERE e.objectid='.$row['objectid'].
 				' AND e.eventid > '.$row['eventid'].
 				' AND e.object='.EVENT_OBJECT_TRIGGER.
 				' AND e.value='.$row['value'].

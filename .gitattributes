@@ -310,6 +310,7 @@ frontends/php/js/class.cscreen.js -text
 frontends/php/js/class.ctree.js -text
 frontends/php/js/class.curl.js -text
 frontends/php/js/class.pmaster.js -text
+frontends/php/js/class.switcher.js -text
 frontends/php/js/common.js -text
 frontends/php/js/functions.js -text
 frontends/php/js/gtlc.js -text
@@ -572,6 +573,7 @@ upgrades/dbpatches/1.8/mysql/patch/dhosts.sql -text
 upgrades/dbpatches/1.8/mysql/patch/drules.sql -text
 upgrades/dbpatches/1.8/mysql/patch/dservices.sql -text
 upgrades/dbpatches/1.8/mysql/patch/escalations.sql -text
+upgrades/dbpatches/1.8/mysql/patch/events.sql -text
 upgrades/dbpatches/1.8/mysql/patch/expressions.sql -text
 upgrades/dbpatches/1.8/mysql/patch/globalmacro.sql -text
 upgrades/dbpatches/1.8/mysql/patch/graph_theme.sql -text
@@ -604,6 +606,7 @@ upgrades/dbpatches/1.8/mysql/patch/timeperiods.sql -text
 upgrades/dbpatches/1.8/mysql/patch/user_history.sql -text
 upgrades/dbpatches/1.8/mysql/patch/users.sql -text
 upgrades/dbpatches/1.8/mysql/patch/usrgrp.sql -text
+upgrades/dbpatches/1.8/oracle/patch/events.sql -text
 upgrades/dbpatches/1.8/oracle/patch/hosts.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/actions.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/auditlog.sql -text
@@ -615,6 +618,7 @@ upgrades/dbpatches/1.8/postgresql/patch/dhosts.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/drules.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/dservices.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/escalations.sql -text
+upgrades/dbpatches/1.8/postgresql/patch/events.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/expressions.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/globalmacro.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/graph_theme.sql -text
