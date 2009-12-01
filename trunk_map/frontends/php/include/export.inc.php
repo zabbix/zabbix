@@ -279,8 +279,10 @@ class zbxXML{
 // HOST
 			$host_node = self::addChildData($hosts_node, XML_TAG_HOST, $host);
 // HOST PROFILE
-			self::addChildData($host_node, XML_TAG_HOSTPROFILE, $host['profile']);
-			self::addChildData($host_node, XML_TAG_HOSTPROFILE_EXT, $host['profile_ext']);
+			if(!empty($host['profile']))
+				self::addChildData($host_node, XML_TAG_HOSTPROFILE, $host['profile']);
+			if(!empty($host['profile_ext']))
+				self::addChildData($host_node, XML_TAG_HOSTPROFILE_EXT, $host['profile_ext']);
 // GROUPS
 			if(isset($data['hosts_groups'])){
 				$groups_node = $host_node->appendChild(new DOMElement(XML_TAG_GROUPS));
@@ -411,9 +413,9 @@ class zbxXML{
 		libxml_use_internal_errors(true);
 		
 		$xml = new DOMDocument();
-		$xml->load($file);
+		$result = $xml->load($file);
 
-		if(!$xml){
+		if(!$result){
 			foreach(libxml_get_errors() as $error){
 				$text = '';
 
@@ -488,7 +490,7 @@ class zbxXML{
 					$groups_to_add = array();
 					foreach($groups as $group){
 						$current_group = CHostGroup::getObjects(array('name' => $group->nodeValue));
-//sdi('group: '.$group_name.' | GroupID: '. $current_groupid);
+// sdii($current_group);
 						if(empty($current_group)){	
 							$groups_to_add = array_merge($groups_to_add, $current_group);
 						}
@@ -509,7 +511,7 @@ class zbxXML{
 						$host_groups = array_merge($host_groups, $new_groups);
 					}
 				}
-
+// sdii($host_groups);
 // HOSTS
 //sdi('Host: '.$host_db['host'].' | HostID: '. $current_hostid);
 				if($current_host && isset($rules['host']['exist'])){
@@ -582,7 +584,7 @@ class zbxXML{
 				}
 
 				$xpath = new DOMXPath($xml);
-				$profile_ext_node = $xpath->query('host_profiles_ext', $host);
+				$profile_ext_node = $xpath->query('host_profiles_ext/*', $host);
 				
 				if($profile_ext_node->length > 0){
 					$profile_ext = array();
@@ -607,8 +609,9 @@ class zbxXML{
 						
 						$current_macro = CUserMacro::getHostMacroObjects($macro_db);
 						$current_macro = reset($current_macro);
-
+						
 						if($current_macro){
+							$current_macro['hostid'] = $current_host['hostid'];
 							$macros_to_upd[] = $current_macro;
 						}
 						else{
@@ -618,7 +621,7 @@ class zbxXML{
 // sdii($macros_to_upd);
 // sdii($macros_to_add);
 
-					if(!empty($macros_to_upd)){
+					if(!empty($macros_to_add)){
 						$r = CUserMacro::add($macros_to_add);
 						if($r === false){
 							error(CUserMacro::resetErrors());
@@ -816,12 +819,12 @@ class zbxXML{
 						
 						$current_graph = CGraph::getObjects($graph_db);
 						$current_graph = reset($current_graph);
-
+// sdii($current_graph);
 						if(!$current_graph && !isset($rules['graph']['missed'])) continue; // break if update nonexist
 						if($current_graph && !isset($rules['graph']['exist'])) continue; // break if not update exist
 //sdi('graph: '.$graph_db['name'].' | graphID: '. $current_graphid);
 						if($current_graph){ // if exists, delete graph to add then new
-							CGraph::delete(array('graphs' => $current_graph));
+							CGraph::delete($current_graph);
 						}
 //sdii($graph_db);
 // GRAPH ITEMS {{{

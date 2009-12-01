@@ -407,91 +407,83 @@ return $table;
 function make_latest_issues($params = array()){
 	global $USER_DETAILS;
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
-
-	$scripts_by_hosts = CScript::getScriptsByHosts($available_hosts);
 
 	$config = select_config();
 
-	$sql_select = '';
-	$sql_from = '';
-	$sql_where= '';
-	$limit = 20;
-	if(!empty($params)){
-		if(isset($params['limit']))
-			$limit = $params['limit'];
+	$limit = isset($params['limit']) ? $params['limit'] : 20;
+	$options = array(
+		'extendoutput' => 1,
+		'select_hosts' => 1,
+		'monitored' => 1,
+		'limit' => $limit,
+		'sortfield' => 'lastchange',
+		'sortorder' => ZBX_SORT_DOWN,
+		'filter' => 1,
+		'only_true' => 1
+	);
+	if(isset($params['groupid']) && ($params['groupid'] > 0))
+		$options['groupids'] = $params['groupid'];
+	if(isset($params['hostid']) && ($params['hostid'] > 0))
+		$options['hostids'] = $params['hostid'];
 
-		if(isset($params['groupid']) && ($params['groupid']>0)){
-			$sql_select.=',g.name ';
-			$sql_from.= ',groups g ';
-			$sql_where.= ' AND g.groupid=hg.groupid '.
-							' AND hg.groupid='.$params['groupid'];
-		}
-
-		if(isset($params['hostid']) && ($params['hostid']>0))
-			$sql_where.= ' AND h.hostid='.$params['hostid'];
+	$triggers = CTrigger::get($options);
+	
+// GATHER HOSTS FOR SELECTED TRIGGERS {{{
+	$triggers_hostids = array();
+	foreach($triggers as $tnum => $trigger){
+		$triggers_hostids = array_merge($triggers_hostids, $trigger['hostids']);
 	}
+	$triggers_hostids = array_unique($triggers_hostids);
+// }}} GATHER HOSTS FOR SELECTED TRIGGERS
+
+	$scripts_by_hosts = Cscript::getScriptsByHosts($triggers_hostids);
 
 	$table  = new CTableInfo();
 	$table->setHeader(array(
-		is_show_all_nodes()?S_NODE:null,
-		(isset($params['groupid']) && ($params['groupid']>0))?S_GROUP:null,
+		is_show_all_nodes() ? S_NODE : null,
 		S_HOST,
 		S_ISSUE,
 		S_LAST_CHANGE,
 		S_AGE,
 		($config['event_ack_enable'])? S_ACK : NULL,
 		S_ACTIONS
-		));
+	));
 
-	$sql = 'SELECT DISTINCT t.triggerid,t.type,t.status,t.description,t.expression,t.priority,t.lastchange,t.value,h.host,h.hostid '.$sql_select.
-				' FROM triggers t,hosts h,items i,functions f,hosts_groups hg '.$sql_from.
-				' WHERE f.itemid=i.itemid '.
-					' AND h.hostid=i.hostid '.
-					' AND hg.hostid=h.hostid '.
-					' AND t.triggerid=f.triggerid '.
-					' AND t.status='.TRIGGER_STATUS_ENABLED.
-					' AND i.status='.ITEM_STATUS_ACTIVE.
-					' AND '.DBcondition('t.triggerid',$available_triggers).
-					' AND h.status='.HOST_STATUS_MONITORED.
-					' AND t.value='.TRIGGER_VALUE_TRUE.
-					$sql_where.
-				' ORDER BY t.lastchange DESC';
-	$result = DBselect($sql,$limit);
-	while($row=DBfetch($result)){
+	foreach($triggers as $tnum => $trigger){
 // Check for dependencies
-		if(trigger_dependent($row["triggerid"]))	continue;
+		if(trigger_dependent($trigger["triggerid"]))	continue;
+		
+		$host = reset($trigger['hosts']);
+		$trigger['hostid'] = $host['hostid'];
+		$trigger['host'] = $host['host'];
 
 		$host = null;
 		$menus = '';
+		
+		$host_nodeid = id2nodeid($trigger['hostid']);
 
-		$host_nodeid = id2nodeid($row['hostid']);
-
-		foreach($scripts_by_hosts[$row['hostid']] as $id => $script){
+		foreach($scripts_by_hosts[$trigger['hostid']] as $id => $script){
 			$script_nodeid = id2nodeid($script['scriptid']);
 			if( (bccomp($host_nodeid ,$script_nodeid ) == 0))
-				$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$row['hostid']."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+				$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$trigger['hostid']."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 		}
 		if(!empty($scripts_by_hosts)){
 			$menus = "[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus;
 		}
 
 		$menus.= "[".zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
-		$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?groupid=0&hostid=".$row['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+		$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?groupid=0&hostid=".$trigger['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 
 		$menus = rtrim($menus,',');
 		$menus = 'show_popup_menu(event,['.$menus.'],180);';
 
-		$host = new CSpan($row['host'],'link_menu');
+		$host = new CSpan($trigger['host'],'link_menu pointer');
 		$host->setAttribute('onclick','javascript: '.$menus);
-		$host->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
-		$event_sql = 'SELECT DISTINCT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type, t.url '.
-					' FROM events e, triggers t '.
-					' WHERE e.object='.EVENT_SOURCE_TRIGGERS.
-						' AND e.objectid='.$row['triggerid'].
-						' AND t.triggerid=e.objectid '.
+		$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged'.
+					' FROM events e'.
+					' WHERE e.object='.EVENT_OBJECT_TRIGGER.
+						' AND e.objectid='.$trigger['triggerid'].
 						' AND e.value='.TRIGGER_VALUE_TRUE.
 					' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
 		$res_events = DBSelect($event_sql,1);
@@ -512,26 +504,26 @@ function make_latest_issues($params = array()){
 			}
 
 //			$description = expand_trigger_description($row['triggerid']);
-			$description = expand_trigger_description_by_data(zbx_array_merge($row, array('clock'=>$row_event['clock'])),ZBX_FLAG_EVENT);
+			$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock'=>$row_event['clock'])),ZBX_FLAG_EVENT);
 
 //actions
 			$actions = get_event_actions_stat_hints($row_event['eventid']);
 
 			$clock = new CLink(
 					zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),
-					'events.php?triggerid='.$row['triggerid'].'&source=0&show_unknown=1&nav_time='.$row_event['clock']
+					'events.php?triggerid='.$trigger['triggerid'].'&source=0&show_unknown=1&nav_time='.$row_event['clock']
 					);
 
-			if($row_event['url'])
-				$description = new CLink($description, $row_event['url'], null, null, true);
+			if($trigger['url'])
+				$description = new CLink($description, $trigger['url'], null, null, true);
 			else
 				$description = new CSpan($description,'pointer');
 
-			$description = new CCol($description,get_severity_style($row['priority']));
-			$description->setHint(make_popup_eventlist($row_event['eventid'], $row['type']), '', '', false);
+			$description = new CCol($description,get_severity_style($trigger['priority']));
+			$description->setHint(make_popup_eventlist($row_event['eventid'], $trigger['type'], $trigger['triggerid']), '', '', false);
 
 			$table->addRow(array(
-				get_node_name_by_elid($row['triggerid']),
+				get_node_name_by_elid($trigger['triggerid']),
 				$host,
 				$description,
 				$clock,
@@ -540,9 +532,10 @@ function make_latest_issues($params = array()){
 				$actions
 			));
 		}
-		unset($row,$description,$actions,$alerts,$hint);
+		unset($trigger,$description,$actions,$alerts,$hint);
 	}
 	$table->setFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
+
 return $table;
 }
 
@@ -633,7 +626,7 @@ function make_discovery_status(){
 
 	$db_dhosts = DBselect('SELECT d.* '.
 					' FROM dhosts d '.
-					' ORDER BY d.dhostid,d.status,d.ip');
+					' ORDER BY d.dhostid,d.status');
 
 	$services = array();
 	$discovery_info = array();

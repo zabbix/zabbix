@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -821,7 +821,7 @@
  * Function: get_action_map_by_sysmapid
  *
  * Description:
- *     Retrive action for map element
+ *     Retrieve action for map element
  *
  * Author:
  *     Eugene Grigorjev

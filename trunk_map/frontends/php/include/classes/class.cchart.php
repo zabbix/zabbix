@@ -1397,10 +1397,10 @@ class CChart extends CGraphDraw{
 		$row = array(
 				array('text' => ''),
 				array('text' => ''),
-				array('text' => 'Last', 'align'=> 1, 'fontsize' => 10),
-				array('text' => 'Min', 'align'=> 1, 'fontsize' => 10),
-				array('text' => 'Avg', 'align'=> 1, 'fontsize' => 10),
-				array('text' => 'Max', 'align'=> 1, 'fontsize' => 10)
+				array('text' => S_LST_SMALL, 'align'=> 1, 'fontsize' => 10),
+				array('text' => S_MIN_SMALL, 'align'=> 1, 'fontsize' => 10),
+				array('text' => S_AVG_SMALL, 'align'=> 1, 'fontsize' => 10),
+				array('text' => S_MAX_SMALL, 'align'=> 1, 'fontsize' => 10)
 			);
 
 		$legend->addRow($row);
@@ -1417,11 +1417,11 @@ class CChart extends CGraphDraw{
 			else{
 				$color = $this->getColor($this->items[$i]['color'], GRAPH_STACKED_ALFA);
 				switch($this->items[$i]['calc_fnc']){
-					case CALC_FNC_MIN:	$fnc_name = 'min';	break;
-					case CALC_FNC_MAX:	$fnc_name = 'max';	break;
-					case CALC_FNC_ALL:	$fnc_name = 'all';	break;
+					case CALC_FNC_MIN:	$fnc_name = S_MIN_SMALL;	break;
+					case CALC_FNC_MAX:	$fnc_name = S_MAX_SMALL;	break;
+					case CALC_FNC_ALL:	$fnc_name = S_ALL_SMALL;	break;
 					case CALC_FNC_AVG:
-					default:		$fnc_name = 'avg';
+					default:		$fnc_name = S_AVG_SMALL;
 				}
 			}
 
@@ -1445,7 +1445,7 @@ class CChart extends CGraphDraw{
 			else{
 				$legend->addCell($colNum,array('text' => $item_caption));
 //				$legend->addCell($colNum,array('text' => $this->items[$i]['host'].': '.$this->items[$i]['description']));
-				$legend->addCell($colNum,array('text' => '[ no data ]'));
+				$legend->addCell($colNum,array('text' => '[ '. S_NO_DATA_SMALL . ' ]'));
 			}
 
 			imagefilledrectangle($this->im,

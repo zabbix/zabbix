@@ -328,7 +328,7 @@ function make_small_eventlist($eventid, $trigger_data){
 return $table;
 }
 
-function make_popup_eventlist($eventid, $trigger_type) {
+function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 
 	$table = new CTableInfo();
 	$table->setHeader(array(S_TIME,S_STATUS,S_DURATION, S_AGE, S_ACK));
@@ -338,6 +338,8 @@ function make_popup_eventlist($eventid, $trigger_type) {
 	$sql = 'SELECT * '.
 			' FROM events '.
 			' WHERE eventid<='.$eventid.
+				' AND object='.EVENT_OBJECT_TRIGGER.
+				' AND objectid='.$triggerid.
 			' ORDER BY eventid DESC';
 	$db_events = DBselect($sql, 20);
 
@@ -347,10 +349,10 @@ function make_popup_eventlist($eventid, $trigger_type) {
 			$count++;
 		}
 		else if(!empty($event_list) &&
-				($event_list[$count]['value'] == $event['value']) &&
-				($trigger_type == TRIGGER_MULT_EVENT_ENABLED) &&
-				($event['value'] == TRIGGER_VALUE_TRUE)
-				) {
+			($event_list[$count]['value'] == $event['value']) &&
+			($trigger_type == TRIGGER_MULT_EVENT_ENABLED) &&
+			($event['value'] == TRIGGER_VALUE_TRUE))
+		{
 			$count++;
 		}
 

@@ -38,6 +38,7 @@
 #include "proxyconfig.h"
 #include "proxydiscovery.h"
 #include "proxyautoreg.h"
+#include "proxyhosts.h"
 
 #include "daemon.h"
 
@@ -176,7 +177,6 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 		if (0 == strcmp(values[i].value, "ZBX_NOTSUPPORTED"))
 		{
 			DCadd_nextcheck(&item, (time_t)values[i].clock, values[i].value);
-			DCconfig_update_item(item.itemid, ITEM_STATUS_NOTSUPPORTED, values[i].clock);
 
 			if (NULL != processed)
 				(*processed)++;
@@ -197,11 +197,17 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 				if (NULL != processed)
 					(*processed)++;
 			}
+			else if (GET_MSG_RESULT(&agent))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
+						item.host.host, item.key_orig, agent.msg);
+				DCadd_nextcheck(&item, (time_t)values[i].clock, agent.msg);
+			}
 			else
 			{
-				if (GET_MSG_RESULT(&agent))
-					zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
-							item.host.host, item.key_orig, agent.msg);
+				/* this should never happen
+				 * set_result_type() always set MSG result if not SUCCEED
+				 */
 			}
 			free_result(&agent);
 	 	}
@@ -583,10 +589,14 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 				{
 					ret = send_list_of_active_checks_json(sock, &jp, zbx_process);
 				}
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_HOST_AVAILABILITY))
+				{
+					ret = process_host_availability(sock, &jp);
+				}
 				else
 				{
-					zabbix_log( LOG_LEVEL_WARNING, "Unknown request received [%s]",
-						value);
+					zabbix_log(LOG_LEVEL_WARNING, "Unknown request received [%s]",
+							value);
 				}
 			}
 			return ret;

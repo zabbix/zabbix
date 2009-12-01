@@ -239,7 +239,7 @@ class CMaintenance extends CZBXAPI{
 				$maintenanceids[$maintenance['maintenanceid']] = $maintenance['maintenanceid'];
 
 				if(is_null($options['extendoutput'])){
-					$result[$maintenance['maintenanceid']] = $maintenance['maintenanceid'];
+					$result[$maintenance['maintenanceid']] = array('maintenanceid' => $maintenance['maintenanceid']);
 				}
 				else{
 					if(!isset($result[$maintenance['maintenanceid']]))
@@ -378,7 +378,7 @@ class CMaintenance extends CZBXAPI{
 											'preservekeys'=>1));
 		foreach($maintenances as $snum => $maintenance){
 			if(!isset($upd_maintenances[$maintenance['maintenanceid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 
@@ -429,7 +429,7 @@ class CMaintenance extends CZBXAPI{
 											'preservekeys'=>1));
 		foreach($maintenances as $snum => $maintenance){
 			if(!isset($del_maintenances[$maintenance['maintenanceid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 

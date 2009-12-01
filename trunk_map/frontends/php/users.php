@@ -138,7 +138,7 @@ include_once('include/page_header.php');
 		else if(isset($_REQUEST['password1']) && ($_REQUEST['alias']!=ZBX_GUEST_USER) && zbx_empty($_REQUEST['password1'])){
 			show_error_message(S_PASSWORD_SHOULD_NOT_BE_EMPTY);
 		}
-		else {
+		else{
 			$user = array();
 			$user['name'] = get_request('name');
 			$user['surname'] = get_request('surname');
@@ -152,28 +152,42 @@ include_once('include/page_header.php');
 			$user['refresh'] = get_request('refresh');
 			$user['rows_per_page'] = get_request('rows_per_page');
 			$user['type'] = get_request('user_type');
-			$user['user_groups'] = get_request('user_groups', array());
+//			$user['user_groups'] = get_request('user_groups', array());
 			$user['user_medias'] = get_request('user_medias', array());
 
+			$usrgrps = get_request('user_groups', array());
+			$usrgrps = zbx_toObject($usrgrps, 'usrgrpid');
+			
 			if(isset($_REQUEST['userid'])){
 				$action = AUDIT_ACTION_UPDATE;
 				$user['userid'] = $_REQUEST['userid'];
 
 				DBstart();
-				$result = CUser::update($user);
+				$result = CUser::update($user);					
+				if(!$result) 
+					error(CUser::resetErrors());
+				if($result)	$result = CUserGroup::updateUsers(array('users' => $user, 'usrgrps' => $usrgrps));
+				if($result === false) 
+					error(CUserGroup::resetErrors());
+				if($result !== false) $result = CUser::updateMedia(array('users' => $user, 'medias' => $user['user_medias']));
+				$result = ($result === false) ? false : true;
 				$result = DBend($result);
-				if(!$result) error(CUser::resetErrors());
-
+				
 				show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 			}
-			else {
+			else{
 				$action = AUDIT_ACTION_ADD;
 
 				DBstart();
 				$result = CUser::add($user);
+				if(!$result) 
+					error(CUser::resetErrors());
+				if($result) $result = CUserGroup::updateUsers(array('users' => $result, 'usrgrps' => $usrgrps));
+				if($result === false) 
+					error(CUserGroup::resetErrors());
+				$result = ($result === false) ? false : true;
 				$result = DBend($result);
-
-				if(!$result) error(CUser::resetErrors());
+				
 				show_messages($result, S_USER_ADDED, S_CANNOT_ADD_USER);
 			}
 			if($result){
@@ -213,7 +227,6 @@ include_once('include/page_header.php');
 			unset($_REQUEST['form']);
 		}
 	}
-
 // Add USER to GROUP
 	else if(isset($_REQUEST['grpaction'])&&isset($_REQUEST['usrgrpid'])&&isset($_REQUEST['userid'])&&($_REQUEST['grpaction']==1)){
 		$user = CUser::get(array('userids'=>$_REQUEST['userid'],'extendoutput'=>1));
@@ -237,7 +250,6 @@ include_once('include/page_header.php');
 		unset($_REQUEST['grpaction']);
 		unset($_REQUEST['form']);
 	}
-
 // Remove USER from GROUP
 	else if(isset($_REQUEST['grpaction'])&&isset($_REQUEST['usrgrpid'])&&isset($_REQUEST['userid'])&&($_REQUEST['grpaction']==0)){
 		$user = CUser::get(array('userids'=>$_REQUEST['userid'],'extendoutput'=>1));
@@ -318,29 +330,26 @@ include_once('include/page_header.php');
 
 ?>
 <?php
-	$_REQUEST['filter_usrgrpid'] = get_request('filter_usrgrpid',get_profile('web.users.filter.usrgrpid',0));
+	$_REQUEST['filter_usrgrpid'] = get_request('filter_usrgrpid', get_profile('web.users.filter.usrgrpid', 0));
 	update_profile('web.users.filter.usrgrpid', $_REQUEST['filter_usrgrpid'], PROFILE_TYPE_ID);
 
-	$frmForm = new CForm();
-	$frmForm->setMethod('get');
-	$cmbConf = new CComboBox('config', 'users.php');
-	$cmbConf->setAttribute('onchange', 'javascript: redirect(this.options[this.selectedIndex].value);');
+	$frmForm = new CForm(null, 'get');
+	$cmbConf = new CComboBox('config', 'users.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('usergrps.php', S_USER_GROUPS);
 		$cmbConf->addItem('users.php', S_USERS);
-	$frmForm->addItem(array($cmbConf,SPACE,new CButton('form',S_CREATE_USER)));
+	$frmForm->addItem(array($cmbConf, new CButton('form', S_CREATE_USER)));
 
 	show_table_header(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
-	echo SBR;
+	//echo SBR;
 
 
 	if(isset($_REQUEST['form'])){
-		insert_user_form(get_request('userid',null));
+		insert_user_form(get_request('userid', null));
 	}
 	else{
 		$user_wdgt = new CWidget();
 
-		$form = new CForm();
-		$form->setMethod('get');
+		$form = new CForm(null, 'get');
 
 		$cmbUGrp = new CComboBox('filter_usrgrpid',$_REQUEST['filter_usrgrpid'],'submit()');
 		$cmbUGrp->addItem(0, S_ALL_S);

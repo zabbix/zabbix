@@ -391,7 +391,7 @@ class CAction extends CZBXAPI{
 				$actionids[$action['actionid']] = $action['actionid'];
 
 				if(is_null($options['extendoutput'])){
-					$result[$action['actionid']] = $action['actionid'];
+					$result[$action['actionid']] = array('actionid' => $action['actionid']);
 				}
 				else{
 					if(!isset($result[$action['actionid']])) $result[$action['actionid']]= array();
@@ -562,7 +562,7 @@ class CAction extends CZBXAPI{
 											'preservekeys'=>1));
 		foreach($actions as $anum => $action){
 			if(!isset($upd_actions[$action['actionid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 			$actionids[] = $action['actionid'];
@@ -725,7 +725,7 @@ class CAction extends CZBXAPI{
 											'preservekeys'=>1));
 		foreach($actions as $anum => $action){
 			if(!isset($del_actions[$action['actionid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 

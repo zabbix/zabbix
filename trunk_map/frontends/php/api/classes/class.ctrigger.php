@@ -63,7 +63,7 @@ class CTrigger extends CZBXAPI{
 		$user_type = $USER_DETAILS['type'];
 		$userid = $USER_DETAILS['userid'];
 
-		$sort_columns = array('triggerid', 'description', 'status', 'priority'); // allowed columns for sorting
+		$sort_columns = array('triggerid', 'description', 'status', 'priority', 'lastchange'); // allowed columns for sorting
 
 
 		$sql_parts = array(
@@ -319,7 +319,7 @@ class CTrigger extends CZBXAPI{
 
 				$sql_parts['where'][] = '((t.value='.TRIGGER_VALUE_TRUE.')'.
 										' OR '.
-										'((t.value='.TRIGGER_VALUE_FALSE.') AND (('.time().'-t.lastchange)<'.TRIGGER_FALSE_PERIOD.')))';
+										'((t.value='.TRIGGER_VALUE_FALSE.') AND (t.lastchange>'.(time() - TRIGGER_FALSE_PERIOD).')))';
 			}
 
 // min_severity
@@ -376,7 +376,7 @@ class CTrigger extends CZBXAPI{
 				' WHERE '.DBin_node('t.triggerid', $nodeids).
 					$sql_where.
 				$sql_order;
-//sdi($sql);
+
 		$db_res = DBselect($sql, $sql_limit);
 		while($trigger = DBfetch($db_res)){
 			if($options['count'])
@@ -385,7 +385,7 @@ class CTrigger extends CZBXAPI{
 				$triggerids[$trigger['triggerid']] = $trigger['triggerid'];
 
 				if(is_null($options['extendoutput'])){
-					$result[$trigger['triggerid']] = $trigger['triggerid'];
+					$result[$trigger['triggerid']] = array('triggerid' => $trigger['triggerid']);
 				}
 				else{
 					if(!isset($result[$trigger['triggerid']])) $result[$trigger['triggerid']]= array();
@@ -650,7 +650,7 @@ class CTrigger extends CZBXAPI{
 											'preservekeys'=>1));
 		foreach($triggers as $gnum => $trigger){
 			if(!isset($upd_triggers[$trigger['triggerid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 			$triggerids[] = $trigger['triggerid'];
@@ -716,7 +716,7 @@ class CTrigger extends CZBXAPI{
 											'preservekeys'=>1));
 		foreach($triggers as $gnum => $trigger){
 			if(!isset($del_triggers[$trigger['triggerid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 

@@ -435,7 +435,7 @@ FIELD		|ldap_bind_password|t_varchar(128)|''	|NOT NULL	|ZBX_SYNC
 FIELD		|ldap_search_attribute|t_varchar(128)|''|NOT NULL	|ZBX_SYNC
 FIELD		|dropdown_first_entry|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|dropdown_first_remember|t_integer|'1'	|NOT NULL	|ZBX_SYNC
-FIELD		|discovery_groupid|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|discovery_groupid|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|groups
 FIELD		|max_in_table	|t_integer	|'50'	|NOT NULL	|ZBX_SYNC
 FIELD		|search_limit	|t_integer	|'1000'	|NOT NULL	|ZBX_SYNC
 
@@ -869,7 +869,7 @@ FIELD		|sysmapid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|width		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|height		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|backgroundid	|t_bigint	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|backgroundid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|images
 FIELD		|highlight	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|label_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|label_location	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC

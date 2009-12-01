@@ -75,12 +75,16 @@
 
 //			header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . " GMT");
 
+			$page_title = '';
+			if(isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)){
+				$page_title = $ZBX_SERVER_NAME.': ';
+			}
+			
 			if(isset($page['title']) && defined($page['title'])){
-
-				$page_title = constant($page['title']);
+				$page_title .= constant($page['title']);
 			}
 			else{
-				$page_title = 'ZABBIX';
+				$page_title .= 'ZABBIX';
 				$page['title'] = 'S_ZABBIX';
 			}
 
@@ -180,7 +184,7 @@
 	if(!defined('ZBX_PAGE_NO_MENU')){
 COpt::compare_files_with_menu($ZBX_MENU);
 
-		$help = new CLink(S_HELP, 'http://www.zabbix.com/documentation.php', 'small_font', null, 'nosid');
+		$help = new CLink(S_HELP, 'http://www.zabbix.com/documentation/', 'small_font', null, 'nosid');
 		$help->setTarget('_blank');
 		$support = new CLink(S_GET_SUPPORT, 'http://www.zabbix.com/support.php', 'small_font', null, 'nosid');
 		$support->setTarget('_blank');

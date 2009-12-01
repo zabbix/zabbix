@@ -120,6 +120,7 @@ include_once('include/page_header.php');
 		if(!empty($itemids)){
 			$options = array('itemids'=>$itemids, 'editable'=>1, 'nodes'=>get_current_nodeid(true));
 			$db_items = CItem::get($options);
+			$db_items = zbx_objectValues($db_items, 'itemid');
 			$db_items = zbx_toHash($db_items, 'itemid');
 			
 			foreach($itemids as $inum => $itemid){
@@ -301,12 +302,11 @@ include_once('include/page_header.php');
 				
 				$options = array('groupids'=>$_REQUEST['copy_targetid'], 'editable'=>1, 'nodes'=>get_current_nodeid(true));
 				$db_hosts = CHost::get($options);
-				$db_hosts = zbx_toHash($db_hosts, 'hostid');
 			}
 			DBstart();
 			foreach($_REQUEST['group_graphid'] as $gnum => $graph_id){
-				foreach($db_hosts as $hnum => $hostid){
-					copy_graph_to_host($graph_id, $hostid, true);
+				foreach($db_hosts as $hnum => $host){
+					copy_graph_to_host($graph_id, $host['hostid'], true);
 				}
 			}
 			$go_result = DBend();

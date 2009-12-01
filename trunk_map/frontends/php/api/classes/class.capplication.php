@@ -236,7 +236,7 @@ class CApplication extends CZBXAPI{
 				$applicationids[$application['applicationid']] = $application['applicationid'];
 
 				if(is_null($options['extendoutput'])){
-					$result[$application['applicationid']] = $application['applicationid'];
+					$result[$application['applicationid']] = array('applicatiionid' => $application['applicationid']);
 				}
 				else{
 					if(!isset($result[$application['applicationid']]))
@@ -392,7 +392,7 @@ class CApplication extends CZBXAPI{
 											'preservekeys'=>1));
 		foreach($applications as $anum => $application){
 			if(!isset($upd_applications[$application['applicationid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 			$applicationids[] = $application['applicationid'];
@@ -449,7 +449,7 @@ class CApplication extends CZBXAPI{
 											'preservekeys'=>1));
 		foreach($applications as $anum => $application){
 			if(!isset($del_applications[$application['applicationid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 
@@ -507,7 +507,7 @@ class CApplication extends CZBXAPI{
 		);
 		foreach($applications as $num => $application){
 			if(!isset($allowed_applications[$application['applicationid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 			$applicationids[] = $application['applicationid'];
@@ -521,7 +521,7 @@ class CApplication extends CZBXAPI{
 		);
 		foreach($items as $num => $item){
 			if(!isset($allowed_items[$item['itemid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 			$itemids[] = $item['itemid'];

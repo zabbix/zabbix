@@ -214,7 +214,7 @@ class Cscript extends CZBXAPI{
 				$scriptids[$script['scriptid']] = $script['scriptid'];
 
 				if(is_null($options['extendoutput'])){
-					$result[$script['scriptid']] = $script['scriptid'];
+					$result[$script['scriptid']] = array('scriptid' => $script['scriptid']);
 				}
 				else{
 					if(!isset($result[$script['scriptid']]))
@@ -420,7 +420,7 @@ class Cscript extends CZBXAPI{
 											'preservekeys'=>1));
 		foreach($scripts as $snum => $script){
 			if(!isset($upd_scripts[$script['scriptid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 
@@ -479,7 +479,7 @@ class Cscript extends CZBXAPI{
 											'preservekeys'=>1));
 		foreach($scripts as $snum => $script){
 			if(!isset($del_scripts[$script['scriptid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 
@@ -523,9 +523,11 @@ class Cscript extends CZBXAPI{
 
 		$obj_params = array('hostids' => $hostids, 'preservekeys' => 1);
 		$hosts_read_only  = CHost::get($obj_params);
+		$hosts_read_only = zbx_objectValues($hosts_read_only, 'hostid');
 
 		$obj_params = array('editable' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
 		$hosts_read_write = CHost::get($obj_params);
+		$hosts_read_write = zbx_objectValues($hosts_read_write, 'hostid');
 
 // initialize array
 		$scripts_by_host = array();

@@ -17,6 +17,18 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
+function SDB($return=false){
+	$backtrace = debug_backtrace();
+	array_shift($backtrace);
+	$result = 'DEBUG BACKTRACE: ';
+	foreach($backtrace as $n => $bt){
+		$result .= "  --[$n]-- {$bt['file']} : {$bt['line']} | ";
+		$result .= isset($bt['class']) ? $bt['class'].$bt['type'].$bt['function'] : $bt['function'];
+		$result .= '( '.print_r($bt['args'], true).' ) ';
+	}
+	if($return) return $result;
+	else echo $result;
+}
 function SDI($msg='SDI') { echo 'DEBUG INFO: '; var_dump($msg); echo SBR; } // DEBUG INFO!!!
 function SDII($msg='SDII') { echo 'DEBUG INFO: '; echo '<pre>'.print_r($msg, true).'</pre>'; echo SBR; } // DEBUG INFO!!!
 function VDP($var, $msg=null) { echo 'DEBUG DUMP: '; if(isset($msg)) echo '"'.$msg.'"'.SPACE; var_dump($var); echo SBR; } // DEBUG INFO!!!
@@ -692,23 +704,6 @@ function __autoload($class_name){
 			return 0;
 		}
 		else return validate_float($str);
-	}
-
-
-	/******************************************************************************
-	 *                                                                            *
-	 * Purpose: Reset nextcheck for related items                                 *
-	 *                                                                            *
-	 * Comments: !!! Don't forget sync code with C !!!                            *
-	 *                                                                            *
-	 ******************************************************************************/
-	function reset_items_nextcheck($triggerid){
-/*		$sql='SELECT itemid from functions WHERE triggerid='.$triggerid;
-		$result=DBselect($sql);
-		while($row=DBfetch($result)){
-			$sql='UPDATE items SET nextcheck=0 WHERE itemid='.$row['itemid'];
-			DBexecute($sql);
-		}*/
 	}
 
 	function get_status(){

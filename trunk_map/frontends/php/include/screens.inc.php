@@ -44,6 +44,7 @@
 
 							if($perm == PERM_READ_WRITE) $options['editable'] = 1;
 							$graphids = CGraph::get($options);
+							$graphids = zbx_objectValues($graphids, 'graphid');
 							$graphids = zbx_toHash($graphids, 'graphid');
 						}
 

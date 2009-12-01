@@ -605,7 +605,7 @@
 	}
 
 // Insert form for User
-	function insert_user_form($userid,$profile=0){
+	function insert_user_form($userid, $profile=0){
 		global $ZBX_LOCALES;
 		global $USER_DETAILS;
 
@@ -837,15 +837,16 @@
 //view Media Settings for users above "User" +++
 		if(uint_in_array($USER_DETAILS['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN))) {
 			$frmUser->addVar('user_medias', $user_medias);
+			
 			$media_table = new CTableInfo(S_NO_MEDIA_DEFINED);
 			foreach($user_medias as $id => $one_media){
-				if(!isset($one_media["active"]) || $one_media["active"]==0){
+				if(!isset($one_media['active']) || $one_media['active']==0){
 					$status = new CLink(S_ENABLED,'#','enabled');
-					$status->OnClick("return create_var('".$frmUser->GetName()."','disable_media',".$id.", true);");
+					$status->OnClick('return create_var("'.$frmUser->GetName().'","disable_media",'.$id.', true);');
 				}
 				else{
 					$status = new CLink(S_DISABLED,'#','disabled');
-					$status->OnClick("return create_var('".$frmUser->GetName()."','enable_media',".$id.", true);");
+					$status->OnClick('return create_var("'.$frmUser->GetName().'","enable_media",'.$id.', true);');
 				}
 
 				$media_url = '?dstfrm='.$frmUser->GetName().
@@ -868,12 +869,12 @@
 			}
 
 			$frmUser->addRow(
-						S_MEDIA,
-						array($media_table,
-							new CButton('add_media',S_ADD,'javascript: return PopUp("popup_media.php?dstfrm='.$frmUser->GetName().'",550,400);'),
-							SPACE,
-							(count($user_medias) > 0) ? new CButton('del_user_media',S_DELETE_SELECTED) : null
-						));
+				S_MEDIA,
+				array($media_table,
+					new CButton('add_media',S_ADD,'javascript: return PopUp("popup_media.php?dstfrm='.$frmUser->GetName().'",550,400);'),
+					SPACE,
+					(count($user_medias) > 0) ? new CButton('del_user_media',S_DELETE_SELECTED) : null
+				));
 		}
 
 
@@ -3292,8 +3293,8 @@
 
 /* form row generation */
 		$cmbType =  new CComboBox('maintenance_type', $maintenance_type);
-		$cmbType->addItem(MAINTENANCE_TYPE_NORMAL, S_NORMAL_PROCESSING);
-		$cmbType->addItem(MAINTENANCE_TYPE_NODATA, S_NO_DATA_PROCESSING);
+		$cmbType->addItem(MAINTENANCE_TYPE_NORMAL, S_WITH_DATA_COLLECTION);
+		$cmbType->addItem(MAINTENANCE_TYPE_NODATA, S_NO_DATA_COLLECTION);
 		$tblMntc->addRow(array(S_MAINTENANCE_TYPE, $cmbType));
 
 
@@ -5575,7 +5576,7 @@
 		$host 		= get_request('host',	'');
 		$port 		= get_request('port',	get_profile('HOST_PORT',10050));
 		$status		= get_request('status',	HOST_STATUS_MONITORED);
-		$useip		= get_request('useip',	0);
+		$useip		= get_request('useip',	1);
 		$dns		= get_request('dns',	'');
 		$ip		= get_request('ip',	'0.0.0.0');
 		$proxy_hostid	= get_request('proxy_hostid','');
@@ -5643,6 +5644,7 @@
 // add groups
 			$options = array('hostids' => $_REQUEST['hostid']);
 			$host_groups = CHostGroup::get($options);
+			$host_groups = zbx_objectValues($host_groups, 'groupid');
 
 // read profile
 			$db_profiles = DBselect('SELECT * FROM hosts_profiles WHERE hostid='.$_REQUEST['hostid']);

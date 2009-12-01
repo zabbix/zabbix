@@ -65,11 +65,9 @@
 		'extendoutput' => 1
 	);
 	$groups = CHostGroup::get($options);
-	$groupids = array();
-	foreach($groups as $group){
-		$groups[$group['groupid']] = $group;
-		$groupids[] = $group['groupid'];
-	}
+	$groups = zbx_toHash($groups, 'groupid');
+	
+	if(!isset($groups[$_REQUEST['groupid']])) $_REQUEST['groupid'] = 0;
 // }}} get groups
 
 
@@ -87,7 +85,7 @@
 		$options['groupids'] = $_REQUEST['groupid'];
 	}
 	else{
-		$options['groupids'] = $groupids;
+		$options['groupids'] = zbx_objectValues($groupids, 'groupid');
 	}
 	$hosts = CHost::get($options);
 
@@ -119,8 +117,8 @@
 	$hostprof_wdgt = new CWidget();
 
 	$profile_form = new CForm(null, 'get');
-	$profile_form->addVar('sort', 'host');
-	$profile_form->addVar('sortorder', ZBX_SORT_UP);
+	// $profile_form->addVar('sort', 'host');
+	// $profile_form->addVar('sortorder', ZBX_SORT_UP);
 	$cmbProf = new CComboBox('prof_type', $_REQUEST['prof_type'], 'javascript: submit();');
 	$cmbProf->additem(0, S_NORMAL);
 	$cmbProf->additem(1, S_EXTENDED);
@@ -140,7 +138,6 @@
 		}
 	}
 	else{
-
 		$r_form = new CForm(null, 'get');
 		$r_form->addVar('prof_type', $_REQUEST['prof_type']);
 

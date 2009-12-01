@@ -272,7 +272,7 @@ class CTemplate extends CZBXAPI{
 				$templateids[$template['templateid']] = $template['templateid'];
 
 				if(is_null($options['extendoutput'])){
-					$result[$template['templateid']] = $template['templateid'];
+					$result[$template['templateid']] = array('templateid' => $template['templateid']);
 				}
 				else{
 					if(!isset($result[$template['templateid']])) $result[$template['templateid']]= array();
@@ -362,7 +362,7 @@ class CTemplate extends CZBXAPI{
 // Adding Objects
 // Adding Groups
 		if($options['select_groups']){
-			$obj_params = array('extend output' => 1, 'hostids' => $templateids, 'preservekeys' => 1);
+			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids, 'preservekeys' => 1);
 			$groups = CHostgroup::get($obj_params);
 			foreach($groups as $groupid => $group){
 				foreach($group['hostids'] as $num => $templateid){
@@ -532,16 +532,35 @@ class CTemplate extends CZBXAPI{
 		$error = 'Internal Zabbix eror';
 
 		$result = false;
+		
+		foreach($templates as $tnum => $template){
+			if(empty($template['groups'])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'No groups for template [ '.$template['host'].' ]');
+				return false;
+			}
+		
+			$templates[$tnum]['groups'] = zbx_toArray($templates[$tnum]['groups']);
+			
+			foreach($templates[$tnum]['groups'] as $gnum => $group){
+				$groupids[$group['groupid']] = $group['groupid'];
+			}
+		}
+		
+		$upd_groups = CHostGroup::get(array(
+			'groupids' => $groupids,
+			'editable' => 1, 
+			'preservekeys' => 1));
+		foreach($groupids as $gnum => $groupid){
+			if(!isset($upd_groups[$groupid])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You do not have enough rights for operation');
+				return false;
+			}
+		}
 
 		self::BeginTransaction(__METHOD__);
 		foreach($templates as $tnum => $template){
-
-			if(empty($template['groupids'])){
-				$result = false;
-				$error = 'No groups for template [ '.$template['host'].' ]';
-				break;
-			}
-
+			$template['groupids'] = zbx_objectValues($template['groups'], 'groupid');
+			
 			$host_db_fields = array(
 				'host' => null,
 				'port' => 0,
@@ -606,7 +625,7 @@ class CTemplate extends CZBXAPI{
 									'preservekeys'=>1));
 		foreach($templates as $gnum => $template){
 			if(!isset($upd_templates[$template['templateid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 			$templateids[] = $template['templateid'];
@@ -674,7 +693,7 @@ class CTemplate extends CZBXAPI{
 											'preservekeys'=>1));
 		foreach($templates as $gnum => $template){
 			if(!isset($del_templates[$template['templateid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 			$templateids[] = $template['templateid'];
@@ -791,27 +810,25 @@ class CTemplate extends CZBXAPI{
  * @version 1
  *
  * @param array $data
- * @param string $data['hostid']
- * @param array $data['templateids']
+ * @param string $data['hosts']
+ * @param array $data['templats']
  * @return boolean
  */
 	public static function linkTemplates($data){
 		$result = true;
-		$error = '';
-
-		$hosts = $data['hosts'];
-		$templates = $data['templates'];
+		$errors = array();
 		
-		$hosts = zbx_toArray($hosts);
+		$hosts = zbx_toArray($data['hosts']);
 		$hostids = zbx_objectValues($hosts, 'hostid');
 		
-		$templates = zbx_toArray($templates);
+		$templates = zbx_toArray($data['templates']);
 		$templateids = zbx_objectValues($templates, 'templateid');
 
 		self::BeginTransaction(__METHOD__);
 		
 		$sql = 'SELECT hostid, templateid FROM hosts_templates WHERE '.DBcondition('hostid', $hostids).' AND '.DBcondition('templateid', $templateids);
 		$linked_db = DBexecute($sql);
+		$linked = array();
 		while($pair = DBfetch($linked_db)){
 			$linked[$pair['templateid']] = array($pair['hostid'] => $pair['hostid']);
 		}
@@ -847,7 +864,7 @@ class CTemplate extends CZBXAPI{
 			return true;
 		}
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
+			self::setMethodErrors(__METHOD__, $errors);
 			return false;
 		}
 	}
@@ -862,23 +879,36 @@ class CTemplate extends CZBXAPI{
  * @version 1
  *
  * @param string $data
- * @param string $data['templateid']
- * @param array $data['hostids']
+ * @param string $data['templates']
+ * @param array $data['hosts']
  * @param boolean $data['clean'] whether to wipe all info from template elements.
  * @return boolean
  */
 	public static function unlinkTemplates($data){
-		$templateid = $data['templateid'];
-		$hostids = $data['hostids'];
-		$clean = isset($data['clean']);
+		$errors = array();
+		
+		$templateids = zbx_objectValues($data['templates'], 'templateid');
+		$hostids = zbx_objectValues($data['hosts'], 'hostid');
+		$clean = isset($data['clean']) ? $data['clean'] : false;;
 
-		$result = delete_template_elements($hostid, $templateids, $clean);
-		$result&= DBexecute('DELETE FROM hosts_templates WHERE hostid='.$hostid.' AND '.DBcondition('templateid',$templateids));
-
+		self::BeginTransaction(__METHOD__);
+		
+		$sql = 'DELETE FROM hosts_templates WHERE '.DBcondition('hostid', $hostids).' AND '.DBcondition('templateid', $templateids);
+		$result = DBexecute($sql);
+		
+		if($result){
+			foreach($hostids as $hostid){
+				$result = delete_template_elements($hostid, $templateids, $clean);
+				if(!$result) break;
+			}
+		}
+		
+		$result = self::EndTransaction($result, __METHOD__);
+		
 		if($result)
 			return true;
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
+			self::setMethodErrors(__METHOD__, $errors);
 			return false;
 		}
 	}

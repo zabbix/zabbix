@@ -47,7 +47,7 @@
 #include "heart/heart.h"
 
 char *progname = NULL;
-char title_message[] = "ZABBIX Proxy (daemon)";
+char title_message[] = "Zabbix Proxy (daemon)";
 char usage_message[] = "[-hV] [-c <file>]";
 
 #ifndef HAVE_GETOPT_LONG
@@ -396,6 +396,11 @@ int MAIN_ZABBIX_ENTRY(void)
 #else
 #	define SNMP_FEATURE_STATUS " NO"
 #endif
+#ifdef	HAVE_OPENIPMI
+#	define IPMI_FEATURE_STATUS "YES"
+#else
+#	define IPMI_FEATURE_STATUS " NO"
+#endif
 #ifdef  HAVE_LIBCURL
 #	define LIBCURL_FEATURE_STATUS "YES"
 #else
@@ -406,20 +411,27 @@ int MAIN_ZABBIX_ENTRY(void)
 #else
 #	define ODBC_FEATURE_STATUS " NO"
 #endif
+#ifdef	HAVE_SSH2
+#	define SSH2_FEATURE_STATUS "YES"
+#else
+#	define SSH2_FEATURE_STATUS " NO"
+#endif
 #ifdef  HAVE_IPV6
 #       define IPV6_FEATURE_STATUS "YES"
 #else
 #       define IPV6_FEATURE_STATUS " NO"
 #endif
 
-	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_proxy. ZABBIX %s (revision %s).",
+	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_proxy. Zabbix %s (revision %s).",
 			ZABBIX_VERSION,
 			ZABBIX_REVISION);
 
 	zabbix_log( LOG_LEVEL_WARNING, "**** Enabled features ****");
 	zabbix_log( LOG_LEVEL_WARNING, "SNMP monitoring:       " SNMP_FEATURE_STATUS	);
+	zabbix_log( LOG_LEVEL_WARNING, "IPMI monitoring:       " IPMI_FEATURE_STATUS	);
 	zabbix_log( LOG_LEVEL_WARNING, "WEB monitoring:        " LIBCURL_FEATURE_STATUS	);
 	zabbix_log( LOG_LEVEL_WARNING, "ODBC:                  " ODBC_FEATURE_STATUS	);
+	zabbix_log( LOG_LEVEL_WARNING, "SSH2 support:          " SSH2_FEATURE_STATUS	);
 	zabbix_log( LOG_LEVEL_WARNING, "IPv6 support:          " IPV6_FEATURE_STATUS	);
 	zabbix_log( LOG_LEVEL_WARNING, "**************************");
 
@@ -579,7 +591,7 @@ int MAIN_ZABBIX_ENTRY(void)
 				server_num);
 
 		main_discoverer_loop(ZBX_PROCESS_PROXY, server_num - CONFIG_DBCONFIG_FORKS
-				- CONFIG_CONFSYNCER_FORKS - CONFIG_DATASENDER_FORKS + CONFIG_POLLER_FORKS
+				- CONFIG_CONFSYNCER_FORKS - CONFIG_DATASENDER_FORKS - CONFIG_POLLER_FORKS
 				- CONFIG_TRAPPERD_FORKS - CONFIG_PINGER_FORKS - CONFIG_HOUSEKEEPER_FORKS
 				- CONFIG_UNREACHABLE_POLLER_FORKS - CONFIG_HTTPPOLLER_FORKS);
 	}
@@ -664,7 +676,7 @@ void	zbx_on_exit()
 	php_sem_remove(&sqlite_access);
 #endif /* HAVE_SQLITE3 */
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "ZABBIX Proxy stopped. ZABBIX %s (revision %s).",
+	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Proxy stopped. Zabbix %s (revision %s).",
 		ZABBIX_VERSION,
 		ZABBIX_REVISION);
 

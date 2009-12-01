@@ -151,9 +151,9 @@ DC_HOST
 	char		ip[HOST_IP_LEN_MAX];
 	char		dns[HOST_DNS_LEN_MAX];
 	unsigned short	port;
-	int		status;
-	int		maintenance_status;
-	int		maintenance_type;
+	unsigned char	status;
+	unsigned char	maintenance_status;
+	unsigned char	maintenance_type;
 	int		maintenance_from;
 	int		errors_from;
 	unsigned char	available;
@@ -167,8 +167,8 @@ DC_HOST
 	char		ipmi_ip_orig[HOST_ADDR_LEN_MAX];
 	char		*ipmi_ip;
 	unsigned short	ipmi_port;
-	int		ipmi_authtype;
-	int		ipmi_privilege;
+	signed char	ipmi_authtype;
+	unsigned char	ipmi_privilege;
 	char		ipmi_username[HOST_IPMI_USERNAME_LEN_MAX];
 	char		ipmi_password[HOST_IPMI_PASSWORD_LEN_MAX];
 };

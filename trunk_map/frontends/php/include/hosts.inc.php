@@ -28,7 +28,7 @@ require_once('include/httptest.inc.php');
 
 	function update_host_groups_by_groupid($groupid,$hosts=array()){
 		$grp_hosts = CHost::get(array('groupids'=>$groupid, 'editable'=>1, 'preservekeys' => 1));
-		$grp_hostids = array_keys($grp_hosts);
+		$grp_hostids = zbx_objectValues($grp_hosts, 'hostid');
 
 // unlinked hosts
 		$missed_hostids = array_diff($grp_hostids, $hosts);
@@ -190,7 +190,7 @@ require_once('include/httptest.inc.php');
 				'(hostid,proxy_hostid,host,port,status,useip,dns,ip,disable_until,available,'.
 					'useipmi,ipmi_port,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,ipmi_ip) '.
 				' VALUES ('.$hostid.','.$proxy_hostid.','.zbx_dbstr($host).','.$port.','.$status.','.$useip.','.zbx_dbstr($dns).','.zbx_dbstr($ip).',0,'
-					.HOST_AVAILABLE_UNKNOWN.','.($useipmi == 'yes' ? 1 : 0).','.$ipmi_port.','.$ipmi_authtype.','.$ipmi_privilege.','.zbx_dbstr($ipmi_username).','
+					.HOST_AVAILABLE_UNKNOWN.','.($useipmi === 'yes' ? 1 : 0).','.$ipmi_port.','.$ipmi_authtype.','.$ipmi_privilege.','.zbx_dbstr($ipmi_username).','
 					.zbx_dbstr($ipmi_password).','.zbx_dbstr($ipmi_ip).')');
 			if($result){
 				add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST, $hostid, $host, 'hosts', NULL, NULL);
@@ -280,11 +280,11 @@ require_once('include/httptest.inc.php');
 			
 			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $newgroup['groupid'], $newgroup['name'], 'groups', NULL, NULL);
 			info('Added host group ['.$newgroup['name'].']');
-			$groups[] = $newgroup['groupid'];
+			$groups[] = array('groupid' => $newgroup['groupid']);
 		}
 
 		$hosts = array('hostid' => $hostid);
-		$groups = zbx_toObject($groups, 'groupid');
+//		$groups = zbx_toObject($groups, 'groupid');
 
 // COPY FROM API HostGroup:addHosts
 		$linked = array();
@@ -366,7 +366,6 @@ require_once('include/httptest.inc.php');
 		if(!$result)
 			return $result;
 
-		$groups = zbx_toObject($groups, 'groupid');
 		if(!zbx_empty($newgroup)){
 			if(!$newgroup = CHostGroup::add(array('name' => $newgroup))){
 				error(CHostGroup::resetErrors());
@@ -906,7 +905,7 @@ require_once('include/httptest.inc.php');
  * Function: get_templates_by_hostid
  *
  * Description:
- *     Retrive templates for specified host
+ *     Retrieve templates for specified host
  *
  * Author:
  *		Eugene Grigorjev (eugene.grigorjev@zabbix.com)
@@ -933,7 +932,7 @@ require_once('include/httptest.inc.php');
  * Function: get_viewed_groups
  *
  * Description:
- *     Retrive groups for dropdown
+ *     Retrieve groups for dropdown
  *
  * Author:
  *		Artem "Aly" Suharev
@@ -1184,7 +1183,7 @@ return $result;
  * Function: get_viewed_hosts
  *
  * Description:
- *     Retrive groups for dropdown
+ *     Retrieve groups for dropdown
  *
  * Author:
  *		Artem "Aly" Suharev
@@ -1812,7 +1811,7 @@ return $result;
 	 * Function: delete_template_applications
 	 *
 	 * Description:
-	 *     Delete applicatios from host by templates
+	 *     Delete applications from host by templates
 	 *
 	 * Author:
 	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
@@ -1858,7 +1857,7 @@ return $result;
 	 * Function: copy_template_applications
 	 *
 	 * Description:
-	 *     Copy applicatios from templates to host
+	 *     Copy applications from templates to host
 	 *
 	 * Author:
 	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)

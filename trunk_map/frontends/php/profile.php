@@ -24,7 +24,7 @@
 	require_once('include/forms.inc.php');
 	require_once('include/media.inc.php');
 
-	$page['title'] = "S_USER_PROFILE";
+	$page['title'] = 'S_USER_PROFILE';
 	$page['file'] = 'profile.php';
 	$page['hist_arg'] = array();
 
@@ -134,13 +134,14 @@ $fields=array(
 			$user['rows_per_page'] = get_request('rows_per_page');
 //			$user['user_type'] = $USER_DETAILS['type'];
 			$user['user_groups'] = null;
-			$user['user_medias'] = get_request('user_medias');
+			$user['user_medias'] = get_request('user_medias', array());
 
 			DBstart();
 			$result = CUser::update($user);
+			if($result) $result = CUser::updateMedia(array('users' => $user, 'medias' => $user['user_medias']));
 			$result = DBend($result);
-
 			if(!$result) error(CUser::resetErrors());
+
 			show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 
 			if($result)
@@ -155,9 +156,7 @@ $fields=array(
 	show_table_header(S_USER_PROFILE_BIG.' : '.$USER_DETAILS['name'].' '.$USER_DETAILS['surname']);
 	echo '<br>';
 	insert_user_form($USER_DETAILS['userid'],1);
-?>
-<?php
 
+	
 include_once 'include/page_footer.php';
-
 ?>

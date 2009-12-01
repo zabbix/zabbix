@@ -491,7 +491,7 @@ include_once('include/page_header.php');
 			$table->addRow(array(
 				new CCheckBox('maintenanceids['.$maintenanceid.']',NULL,NULL,$maintenanceid),
 				new CLink($maintenance['name'],'maintenance.php?form=update&maintenanceid='.$maintenanceid.'#form'),
-				$maintenance['maintenance_type']?S_NO_DATA_PROCESSING:S_NORMAL_PROCESSING,
+				$maintenance['maintenance_type']?S_NO_DATA_COLLECTION:S_WITH_DATA_COLLECTION,
 				$mnt_status,
 				$maintenance['description']
 				));

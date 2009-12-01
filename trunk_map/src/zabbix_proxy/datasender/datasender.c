@@ -173,6 +173,145 @@ static void	set_lastid(const ZBX_HISTORY_TABLE *ht, const zbx_uint64_t lastid)
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_host_availability_data                                       *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments: never returns                                                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_host_availability_data(struct zbx_json *j)
+{
+	typedef struct zbx_host_available {
+		zbx_uint64_t	hostid;
+		unsigned char	available, snmp_available, ipmi_available;
+		char		*error, *snmp_error, *ipmi_error;
+	} t_zbx_host_available;
+
+	const char			*__function_name = "get_host_availability_data";
+	zbx_uint64_t			hostid;
+	size_t				sz;
+	DB_RESULT			result;
+	DB_ROW				row;
+	static t_zbx_host_available	*ha = NULL;
+	static int			ha_alloc = 0, ha_num = 0;
+	int				index, new, ret = FAIL;
+	unsigned char			available, snmp_available, ipmi_available;
+	char				*error, *snmp_error, *ipmi_error;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	result = DBselect(
+			"select hostid,available,error,snmp_available,snmp_error,"
+				"ipmi_available,ipmi_error"
+			" from hosts");
+
+	while (NULL != (row = DBfetch(result))) {
+		ZBX_STR2UINT64(hostid, row[0]);
+
+		new = 0;
+
+		index = get_nearestindex(ha, sizeof(t_zbx_host_available), ha_num, hostid);
+		if (index == ha_num || ha[index].hostid != hostid)
+		{
+			if (ha_num == ha_alloc)
+			{
+				ha_alloc += 8;
+				ha = zbx_realloc(ha, sizeof(t_zbx_host_available) * ha_alloc);
+			}
+
+			if (0 != (sz = sizeof(t_zbx_host_available) * (ha_num - index)))
+				memmove(&ha[index + 1], &ha[index], sz);
+			ha_num++;
+
+			ha[index].hostid = hostid;
+			ha[index].available = HOST_AVAILABLE_UNKNOWN;
+			ha[index].snmp_available = HOST_AVAILABLE_UNKNOWN;
+			ha[index].ipmi_available = HOST_AVAILABLE_UNKNOWN;
+			ha[index].error = NULL;
+			ha[index].snmp_error = NULL;
+			ha[index].ipmi_error = NULL;
+
+			new = 1;
+		}
+
+		available = (unsigned char)atoi(row[1]);
+		error = row[2];
+		snmp_available = (unsigned char)atoi(row[3]);
+		snmp_error = row[4];
+		ipmi_available = (unsigned char)atoi(row[5]);
+		ipmi_error = row[6];
+
+		if (0 == new && ha[index].available == available &&
+				ha[index].snmp_available == snmp_available &&
+				ha[index].ipmi_available == ipmi_available &&
+				0 == strcmp(ha[index].error, error) &&
+				0 == strcmp(ha[index].snmp_error, snmp_error) &&
+				0 == strcmp(ha[index].ipmi_error, ipmi_error))
+			continue;
+
+		zbx_json_addobject(j, NULL);
+
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_HOSTID, hostid);
+
+		if (1 == new || ha[index].available != available)
+		{
+			zbx_json_adduint64(j, ZBX_PROTO_TAG_AVAILABLE, available);
+			ha[index].available = available;
+		}
+
+		if (1 == new || ha[index].snmp_available != snmp_available)
+		{
+			zbx_json_adduint64(j, ZBX_PROTO_TAG_SNMP_AVAILABLE, snmp_available);
+			ha[index].snmp_available = snmp_available;
+		}
+
+		if (1 == new || ha[index].ipmi_available != ipmi_available)
+		{
+			zbx_json_adduint64(j, ZBX_PROTO_TAG_IPMI_AVAILABLE, ipmi_available);
+			ha[index].ipmi_available = ipmi_available;
+		}
+
+		if (1 == new || 0 != strcmp(ha[index].error, error))
+		{
+			zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, error, ZBX_JSON_TYPE_STRING);
+			zbx_free(ha[index].error);
+			ha[index].error = strdup(error);
+		}
+
+		if (1 == new || 0 != strcmp(ha[index].snmp_error, snmp_error))
+		{
+			zbx_json_addstring(j, ZBX_PROTO_TAG_SNMP_ERROR, snmp_error, ZBX_JSON_TYPE_STRING);
+			zbx_free(ha[index].snmp_error);
+			ha[index].snmp_error = strdup(snmp_error);
+		}
+
+		if (1 == new || 0 != strcmp(ha[index].ipmi_error, ipmi_error))
+		{
+			zbx_json_addstring(j, ZBX_PROTO_TAG_IPMI_ERROR, ipmi_error, ZBX_JSON_TYPE_STRING);
+			zbx_free(ha[index].ipmi_error);
+			ha[index].ipmi_error = strdup(ipmi_error);
+		}
+
+		zbx_json_close(j);
+
+		ret = SUCCEED;
+	}
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: get_history_data                                                 *
  *                                                                            *
  * Purpose:                                                                   *
@@ -305,6 +444,49 @@ static int get_dhistory_data(struct zbx_json *j, const ZBX_HISTORY_TABLE *ht, zb
 	DBfree_result(result);
 
 	return records;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: host_availability_sender                                         *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	host_availability_sender(struct zbx_json *j)
+{
+	zbx_sock_t	sock;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In host_availability_sender()");
+
+	zbx_json_clean(j);
+	zbx_json_addstring(j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_HOST_AVAILABILITY, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
+
+	zbx_json_addarray(j, ZBX_PROTO_TAG_DATA);
+
+	if (SUCCEED == get_host_availability_data(j))
+	{
+retry:
+		if (SUCCEED == connect_to_server(&sock, 600))	/* alarm !!! */
+		{
+			put_data_to_server(&sock, j);
+			disconnect_server(&sock);
+		}
+		else
+		{
+			sleep(CONFIG_DATASENDER_FREQUENCY);
+			goto retry;
+		}
+	}
 }
 
 /******************************************************************************
@@ -529,6 +711,8 @@ int	main_datasender_loop()
 		sec = zbx_time();
 
 		zbx_setproctitle("data sender [sending data]");
+
+		host_availability_sender(&j);
 
 		records = 0;
 retry_history:

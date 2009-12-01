@@ -128,12 +128,13 @@ include_once('include/page_header.php');
 // unlink, unlink_and_clear
 	if((isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear']))){
 		$_REQUEST['clear_templates'] = get_request('clear_templates', array());
+
 		if(isset($_REQUEST['unlink'])){
 			$unlink_templates = array_keys($_REQUEST['unlink']);
 		}
 		else{
 			$unlink_templates = array_keys($_REQUEST['unlink_and_clear']);
-			$_REQUEST['clear_templates'] = zbx_array_merge($_REQUEST['clear_templates'],$unlink_templates);
+			$_REQUEST['clear_templates'] = zbx_array_merge($_REQUEST['clear_templates'], $unlink_templates);
 		}
 		foreach($unlink_templates as $id) unset($_REQUEST['templates'][$id]);
 	}
@@ -183,6 +184,7 @@ include_once('include/page_header.php');
 		}
 // CREATE/UPDATE TEMPLATE WITH GROUPS AND LINKED TEMPLATES {
 		if($templateid){
+			$template = zbx_toObject($templateid, 'hostid');
 			if(isset($_REQUEST['clear_templates'])) {
 				foreach($_REQUEST['clear_templates'] as $id){
 					$result &= unlink_template($_REQUEST['templateid'], $id, false);
@@ -190,25 +192,33 @@ include_once('include/page_header.php');
 			}
 			$result = CTemplate::update(array(array('templateid' => $templateid, 'host' => $template_name)));
 			$result &= CHostGroup::updateHosts(array('hosts' => array('hostid' => $templateid), 'groups' => $groups));
-			$msg_ok 	= S_TEMPLATE_UPDATED;
-			$msg_fail 	= S_CANNOT_UPDATE_TEMPLATE;
+			$msg_ok = S_TEMPLATE_UPDATED;
+			$msg_fail = S_CANNOT_UPDATE_TEMPLATE;
 		}
 		else{
-			if($result = CTemplate::add(array('host' => $template_name, 'groupids' => zbx_objectValues($groups, 'groupid')))){
-				$templateid = reset($result);
+			if($result = CTemplate::add(array('host' => $template_name, 'groups' => $groups))){
+				$template = reset($result);
+				$templateid = $template['hostid'];
 			}
 			else{
 				error(CTemplate::resetErrors());
 				$result = false;
 			}
-			$msg_ok 	= S_TEMPLATE_ADDED;
-			$msg_fail 	= S_CANNOT_ADD_TEMPLATE;
+			$msg_ok = S_TEMPLATE_ADDED;
+			$msg_fail = S_CANNOT_ADD_TEMPLATE;
 		}
+		
 		if($result){
 			$original_templates = get_templates_by_hostid($templateid);
 			$original_templates = array_keys($original_templates);
+			
+			$templates_to_unlink = array_diff($original_templates, $templates);
+			$templates_to_unlink = zbx_toObject($templates_to_unlink, 'templateid');
+			$result &= CTemplate::unlinkTemplates(array('hosts' => $template, 'templates' => $templates_to_unlink));
+			
 			$templates_to_link = array_diff($templates, $original_templates);
-			$result &= CTemplate::linkTemplates(array('hostid' => $templateid, 'templateids' => $templates_to_link));
+			$templates_to_link = zbx_toObject($templates_to_link, 'templateid');
+			$result &= CTemplate::linkTemplates(array('hosts' => $template, 'templates' => $templates_to_link));
 		}
 // }
 // FULL_CLONE {
@@ -271,6 +281,7 @@ include_once('include/page_header.php');
 // LINK/UNLINK HOSTS {
 		if($result){
 			$hosts = CHost::get(array('hostids' => $hosts, 'editable' => 1, 'templated_hosts' => 1));
+			$hosts = zbx_objectValues($hosts, 'hostid');
 //-- unlink --
 			$linked_hosts = array();
 			$db_childs = get_hosts_by_templateid($templateid);
@@ -367,6 +378,7 @@ include_once('include/page_header.php');
 		$go_result = true;
 		$templates = get_request('templates', array());
 		$del_hosts = CTemplate::get(array('templateids' => $templates, 'editable' => 1));
+		$del_hosts = zbx_objectValues($del_hosts, 'templateid');
 
 		DBstart();
 		$go_result = delete_host($del_hosts, $unlink_mode);
@@ -447,11 +459,12 @@ include_once('include/page_header.php');
 // get template groups from db
 			$options = array('hostids' => $templateid, 'editable' => 1);
 			$groups = CHostGroup::get($options);
+			$groups = zbx_objectValues($groups, 'groupid');
 
 // get template hosts from db
-			$params = array('templateids' => $templateid, 'editable' => 1, 'templated_hosts' => 1);
+			$params = array('templateids' => $templateid, 'editable' => 1, 'templated_hosts' => 1, 'preservekeys' => 1);
 			$hosts_linked_to = CHost::get($params);
-
+			$hosts_linked_to = zbx_objectValues($hosts_linked_to, 'hostid');
 			$templates = $original_templates;
 		}
 		else{

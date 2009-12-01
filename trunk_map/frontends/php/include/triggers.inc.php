@@ -802,8 +802,6 @@ return $result;
 		if($result){
 			DBexecute('update triggers set expression='.zbx_dbstr($expression).' where triggerid='.$triggerid);
 
-			reset_items_nextcheck($triggerid);
-
 			foreach($deps as $id => $triggerid_up){
 				if(!$result2=add_trigger_dependency($triggerid, $triggerid_up)){
 					error(S_INCORRECT_DEPENDENCY.' ['.expand_trigger_description($triggerid_up).']');
@@ -1638,7 +1636,6 @@ return $result;
 		$expression = implode_exp($expression,$triggerid); /* errors can be ignored cose function must return NULL */
 
 		if($event_to_unknown) add_event($triggerid,TRIGGER_VALUE_UNKNOWN);
-		reset_items_nextcheck($triggerid);
 
 		$sql='UPDATE triggers SET ';
 		if(!is_null($expression))	$sql .= ' expression='.zbx_dbstr($expression).',';

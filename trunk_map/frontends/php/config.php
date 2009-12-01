@@ -228,14 +228,14 @@
 			if(!is_null($val = get_request('work_period')))
 				$msg[] = S_WORKING_TIME.' ['.$val.']';
 			if(!is_null($val = get_request('discovery_groupid'))){
-				$val = CHostGroup::get(array('groupids' => $val, 'editable' => 1));
+				$val = CHostGroup::get(array('groupids' => $val, 'editable' => 1, 'extendoutput' => 1));
 				if(!empty($val)){
 
 					$val = array_pop($val);
 					$msg[] = S_GROUP_FOR_DISCOVERED_HOSTS.' ['.$val['name'].']';
 
 					setHostGroupInternal($orig_config['discovery_groupid'], ZBX_NOT_INTERNAL_GROUP);
-					setHostGroupInternal($val, ZBX_INTERNAL_GROUP);
+					setHostGroupInternal($val['groupid'], ZBX_INTERNAL_GROUP);
 				}
 			}
 			if(!is_null($val = get_request('alert_usrgrpid'))){

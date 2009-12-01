@@ -341,7 +341,7 @@ class CAlert extends CZBXAPI{
 				$mediatypeids[$alert['mediatypeid']] = $alert['mediatypeid'];
 
 				if(is_null($options['extendoutput'])){
-					$result[$alert['alertid']] = $alert['alertid'];
+					$result[$alert['alertid']] = array('alertid' => $alert['alertid']);
 				}
 				else{
 					if(!isset($result[$alert['alertid']])) $result[$alert['alertid']]= array();
@@ -523,7 +523,7 @@ class CAlert extends CZBXAPI{
 											'preservekeys'=>1));
 		foreach($alerts as $snum => $alert){
 			if(!isset($del_alerts[$alert['alertid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 

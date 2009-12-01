@@ -365,14 +365,14 @@ function zbx_date2age($start_date,$end_date=0,$utime = false){
 		$ms = round($time,3) * 1000;
 	}
 
-	$str =  (($years)?$years.'y ':'').
-//			(($months)?$months.'m ':'').
-			(($weeks)?$weeks.'w ':'').
-			(($days)?$days.'d ':'').
-			(($hours && !$years && !$months)?$hours.'h ':'').
-			(($minutes && !$years && !$months && !$weeks)?$minutes.'m ':'').
-			((!$years && !$months && !$weeks && !$days && ($ms || $seconds))?$seconds.'s ':'').
-			(($ms && !$years && !$months && !$weeks && !$days && !$hours)?$ms.'ms':'');return $str;
+	$str =  (($years)?$years.S_YEAR_SHORT.' ':'').
+//			(($months)?$months.S_MONTH_SHORT.' ':'').
+			(($weeks)?$weeks.S_WEEK_SHORT.' ':'').
+			(($days)?$days.S_DAY_SHORT.' ':'').
+			(($hours && !$years && !$months)?$hours.S_HOUR_SHORT.' ':'').
+			(($minutes && !$years && !$months && !$weeks)?$minutes.S_MINUTE_SHORT.' ':'').
+			((!$years && !$months && !$weeks && !$days && ($ms || $seconds))?$seconds.S_SECOND_SHORT.' ':'').
+			(($ms && !$years && !$months && !$weeks && !$days && !$hours)?$ms.S_MILLISECOND_SHORT:'');return $str;
 }
 
 function getmicrotime(){
@@ -862,8 +862,6 @@ function zbx_toHash(&$value, $field){
 		$result[$value[$field]] = $value;
 	}
 	else{
-		$result = array();
-
 		foreach($value as $key => $val){
 			if(!is_array($val)){
 				$result[$val] = $val;

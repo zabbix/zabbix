@@ -165,8 +165,11 @@ include_once('include/page_header.php');
 				$hclass = 'enabled';
 				$htime = $dhost['lastup'];
 			}
-			$htype = 'primary';
-
+			
+			if (isset($primary_ip)) /* $primary_ip stores the primary host ip of the dhost */
+			{
+				unset($primary_ip);
+			}
 			$sql = 'SELECT DISTINCT ds.ip, ds.dserviceid'.
 					' FROM dservices ds'.
 					' WHERE ds.dhostid='.$dhost['dhostid'].
@@ -181,11 +184,26 @@ include_once('include/page_header.php');
 					$host = $host['host'];
 				else
 					$host = '';
+					
+				if (isset($primary_ip))
+				{
+					if ($primary_ip === $dhost2['ip'])
+					{
+						$htype = 'primary';
+					}
+					else
+					{
+						$htype = 'slave';
+					}
+				}
+				else
+				{
+					$primary_ip = $dhost2['ip'];
+					$htype = 'primary';
+				}
 
 				$discovery_info[$dhost2['ip']] = array('type' => $htype, 'class' => $hclass, 'host' => $host,
 						'time' => $htime, 'druleid' => $dhost['druleid']);
-				$htype = 'slave';
-				$htime = 0;
 
 				$db_dservices = DBselect('SELECT type,port,key_,status,lastup,lastdown FROM dservices '.
 						' WHERE dhostid='.$dhost['dhostid'].
@@ -225,7 +243,8 @@ include_once('include/page_header.php');
 				get_node_name_by_elid($h_data['druleid']),
 				$h_data['type'] == 'primary' ? new CSpan($ip, $h_data['class']) : new CSpan(SPACE.SPACE.$ip),
 				new CSpan(empty($h_data['host']) ? '-' : $h_data['host']),
-				new CSpan(($h_data['time'] == 0 ? '' : convert_units(time() - $h_data['time'], 'uptime')), $h_data['class'])
+				new CSpan((($h_data['time'] == 0 || $h_data['type'] === 'slave') ? 
+						'' : convert_units(time() - $h_data['time'], 'uptime')), $h_data['class'])				
 				);
 			foreach($services as $name => $foo){
 				$class = null;
