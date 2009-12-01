@@ -89,7 +89,7 @@
 define("USE_PROFILING",1);
 //define("USE_VAR_MON",1);
 define("USE_TIME_PROF",1);
-//define("USE_MEM_PROF",1);
+define("USE_MEM_PROF",1);
 //define("USE_COUNTER_PROF",1);
 //define("USE_MENU_PROF",1);
 //define("USE_MENU_DETAILS",1);
@@ -114,8 +114,9 @@ if(defined('USE_PROFILING')){
 	$var_list = array();
 
 	class COpt{
-	/* protected static $starttime[]=array(); */
-	protected static $debug_info = array();
+		protected static $memory_limit_reached = false;
+		protected static $max_memory_bytes = null;
+		protected static $debug_info = array();
 
 		protected  static function getmicrotime() {
 			if(defined('USE_TIME_PROF')) {
@@ -126,7 +127,6 @@ if(defined('USE_PROFILING')){
 				return 0;
 			}
 		}
-
 
 		public static function showmemoryusage($descr=null){
 			if(defined('USE_MEM_PROF')) {
@@ -164,7 +164,18 @@ if(defined('USE_PROFILING')){
 			global $sqlmark;
 			global $sqlrequests;
 			global $var_list;
+			global $USER_DETAILS;
 
+			if(is_null(self::$max_memory_bytes)) self::$max_memory_bytes = (ini_get('memory_limit') * 0.6 * 1024 * 1024);
+			if((!is_null($USER_DETAILS) && isset($USER_DETAILS['debug_mode']) && ($USER_DETAILS['debug_mode'] == GROUP_DEBUG_MODE_DISABLED))
+				|| self::$memory_limit_reached){
+				return false;
+			}
+			
+			if(self::getmemoryusage() > self::$max_memory_bytes){
+				self::$memory_limit_reached = true;
+			}
+			
 			if(is_null($type)) $type='global';
 
 			$starttime[$type] = COpt::getmicrotime();
@@ -183,7 +194,18 @@ if(defined('USE_PROFILING')){
 			}
 		}
 
-		public static function savesqlrequest($time,$sql){
+		public static function savesqlrequest($time, $sql){
+			global $USER_DETAILS;
+			
+			if(is_null(self::$max_memory_bytes)) self::$max_memory_bytes = (ini_get('memory_limit') * 0.6 * 1024 * 1024);
+			if((!is_null($USER_DETAILS) && isset($USER_DETAILS['debug_mode']) && ($USER_DETAILS['debug_mode'] == GROUP_DEBUG_MODE_DISABLED))
+				|| self::$memory_limit_reached){
+				return false;
+			}
+			if(self::getmemoryusage() > self::$max_memory_bytes){
+				self::$memory_limit_reached = true;
+			}
+			
 			if(defined('USE_SQLREQUEST_PROF')){
 				global $sqlrequests;
 				$time=round($time,6);
@@ -207,7 +229,7 @@ if(defined('USE_PROFILING')){
 			global $USER_DETAILS;
 			global $DB;
 
-			if(isset($USER_DETAILS['debug_mode']) && ($USER_DETAILS['debug_mode'] == GROUP_DEBUG_MODE_DISABLED)) return;
+			
 
 			$endtime = COpt::getmicrotime();
 			$memory = COpt::getmemoryusage();
@@ -291,6 +313,9 @@ if(defined('USE_PROFILING')){
 			$debug->setAttribute('id','zbx_gebug_info');
 			$debug->setAttribute('style','display: none; overflow: auto; width: 95%; border: 1px #777777 solid; margin: 4px; padding: 4px;');
 
+			if(self::$memory_limit_reached){
+				$debug->addItem(array(BR(),new CJSscript('MEMROY LIMIT REACHED! Profiling was stopped to save memory for script processing.'),BR()));
+			}
 			foreach(self::$debug_info as $type => $info){
 				$debug->addItem(array(BR(),new CJSscript($info),BR()));
 			}
