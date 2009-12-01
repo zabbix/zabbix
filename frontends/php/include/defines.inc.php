@@ -19,8 +19,8 @@
 **/
 ?>
 <?php
-	define('ZABBIX_VERSION','1.7.2');
-	define('ZABBIX_API_VERSION','1.7.2');
+	define('ZABBIX_VERSION','1.7.3');
+	define('ZABBIX_API_VERSION','1.7.3');
 /* USER DEFINES */
 
 	define('ZBX_LOGIN_ATTEMPTS',			5);
