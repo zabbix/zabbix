@@ -622,6 +622,7 @@ debug: function(fnc_name, id){
 function hide_color_picker(){
 	if(!color_picker) return;
 
+	color_picker.style.zIndex = 1000;
 	color_picker.style.visibility="hidden"
 	color_picker.style.left	= "-" + ((color_picker.style.width) ? color_picker.style.width : 100) + "px";
 

@@ -232,6 +232,7 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
+frontends/php/imgstore.php -text
 frontends/php/import.php -text
 frontends/php/include/blocks.inc.php -text
 frontends/php/include/classes/class.carea.php -text
@@ -305,6 +306,7 @@ frontends/php/include/regexp.inc.php -text
 frontends/php/include/reports.inc.php -text
 frontends/php/include/scripts.inc.php -text
 frontends/php/js/class.calendar.js -text
+frontends/php/js/class.cmap.js -text
 frontends/php/js/class.cookie.js -text
 frontends/php/js/class.cscreen.js -text
 frontends/php/js/class.ctree.js -text
@@ -601,7 +603,9 @@ upgrades/dbpatches/1.8/mysql/patch/regexps.sql -text
 upgrades/dbpatches/1.8/mysql/patch/rights.sql -text
 upgrades/dbpatches/1.8/mysql/patch/services.sql -text
 upgrades/dbpatches/1.8/mysql/patch/sessions.sql -text
+upgrades/dbpatches/1.8/mysql/patch/sysmaps.sql -text
 upgrades/dbpatches/1.8/mysql/patch/sysmaps_elements.sql -text
+upgrades/dbpatches/1.8/mysql/patch/sysmaps_links.sql -text
 upgrades/dbpatches/1.8/mysql/patch/timeperiods.sql -text
 upgrades/dbpatches/1.8/mysql/patch/user_history.sql -text
 upgrades/dbpatches/1.8/mysql/patch/users.sql -text
@@ -648,7 +652,9 @@ upgrades/dbpatches/1.8/postgresql/patch/regexps.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/rights.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/services.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/sessions.sql -text
+upgrades/dbpatches/1.8/postgresql/patch/sysmaps.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/sysmaps_elements.sql -text
+upgrades/dbpatches/1.8/postgresql/patch/sysmaps_links.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/timeperiods.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/trends_uint.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/user_history.sql -text

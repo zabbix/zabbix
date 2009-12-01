@@ -121,7 +121,7 @@ function SDJ(obj){
 
 /// Alpha-Betic sorting
 function addListener(element, eventname, expression, bubbling){
-	bubbling = bubbling || false;
+	var bubbling = bubbling || false;
 
 	element = $(element);
 	if(element.addEventListener){

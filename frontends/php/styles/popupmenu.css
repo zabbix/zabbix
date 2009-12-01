@@ -12,6 +12,7 @@
 	margin: 0px;
 }
 .pum_o_item:hover {
+	cursor:pointer;
 	text-decoration: underline;
 	background-color: #FDFDFF;
 }
@@ -31,6 +32,7 @@
 	margin: 0px;
 }
 .pum_b_submenu:hover {
+	cursor:pointer;
 	text-decoration: none;
 	background-color: #FDFDFF;
 }
@@ -44,6 +46,7 @@
 	margin: 0px;
 }
 .pum_o_submenu:hover {
+	cursor:pointer;
 	text-decoration: none;
 	background-color: #FDFDFF;
 }
@@ -61,6 +64,7 @@
 	margin: 0px;
 }
 .pum_oheader:hover {
+	cursor:pointer;
 	text-decoration: none;
 }
 .pum_iheader {
