@@ -57,6 +57,7 @@ class CPUMenu{
 	public function insertJavaScript(){
 		if(defined('CPUMENU_INSERTJAVASCRIPT_INSERTED')) return;
 		define('CPUMENU_INSERTJAVASCRIPT_INSERTED', 1);
+
 		echo '<script language="JavaScript" type="text/javascript" src="js/menu.js"></script>';
 	}
 }

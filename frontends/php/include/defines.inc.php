@@ -52,12 +52,13 @@
 	define('ZBX_AUTH_LDAP',		1);
 	define('ZBX_AUTH_HTTP',		2);
 
-	define('PAGE_TYPE_HTML',		0);
-	define('PAGE_TYPE_IMAGE',		1);
-	define('PAGE_TYPE_XML',			2);
-	define('PAGE_TYPE_JS',			3);	// javascript
-	define('PAGE_TYPE_HTML_BLOCK',		4);	// simple block of html (as text)
-	define('PAGE_TYPE_JSON_RPC',		5);	// api call
+	define('PAGE_TYPE_HTML',			0);
+	define('PAGE_TYPE_IMAGE',			1);
+	define('PAGE_TYPE_XML',				2);
+	define('PAGE_TYPE_JS',				3);	// javascript
+	define('PAGE_TYPE_CSS',				4);
+	define('PAGE_TYPE_HTML_BLOCK',		5);	// simple block of html (as text)
+	define('PAGE_TYPE_JSON_RPC',		6);	// api call
 
 	define('ZBX_SESSION_ACTIVE',		0);
 	define('ZBX_SESSION_PASSIVE',		1);
@@ -195,7 +196,7 @@
 	define('TIMEPERIOD_TYPE_YEARLY',	5);
 
 	define('MAP_LABEL_TYPE_LABEL',		0);
-	define('MAP_LABEL_TYPE_IP',		1);
+	define('MAP_LABEL_TYPE_IP',			1);
 	define('MAP_LABEL_TYPE_NAME',		2);
 	define('MAP_LABEL_TYPE_STATUS',		3);
 	define('MAP_LABEL_TYPE_NOTHING',	4);
@@ -203,24 +204,25 @@
 	define('MAP_LABEL_LOC_BOTTOM',		0);
 	define('MAP_LABEL_LOC_LEFT',		1);
 	define('MAP_LABEL_LOC_RIGHT',		2);
-	define('MAP_LABEL_LOC_TOP',		3);
+	define('MAP_LABEL_LOC_TOP',			3);
 
-	define('SYSMAP_ELEMENT_TYPE_HOST',	0);
-	define('SYSMAP_ELEMENT_TYPE_MAP',	1);
+	define('SYSMAP_ELEMENT_TYPE_HOST',		0);
+	define('SYSMAP_ELEMENT_TYPE_MAP',		1);
 	define('SYSMAP_ELEMENT_TYPE_TRIGGER',	2);
 	define('SYSMAP_ELEMENT_TYPE_HOST_GROUP',3);
-	define('SYSMAP_ELEMENT_TYPE_IMAGE',	4);
+	define('SYSMAP_ELEMENT_TYPE_IMAGE',		4);
 
-	define('SYSMAP_ELEMENT_ICON_ON',	0);
-	define('SYSMAP_ELEMENT_ICON_OFF',	1);
+	define('SYSMAP_ELEMENT_ICON_ON',		0);
+	define('SYSMAP_ELEMENT_ICON_OFF',		1);
 	define('SYSMAP_ELEMENT_ICON_UNKNOWN',	2);
+	define('SYSMAP_ELEMENT_ICON_MAINTENANCE',3);
 
 	define('ITEM_TYPE_ZABBIX',		0);
 	define('ITEM_TYPE_SNMPV1',		1);
 	define('ITEM_TYPE_TRAPPER',		2);
 	define('ITEM_TYPE_SIMPLE',		3);
 	define('ITEM_TYPE_SNMPV2C',		4);
-	define('ITEM_TYPE_INTERNAL',		5);
+	define('ITEM_TYPE_INTERNAL',	5);
 	define('ITEM_TYPE_SNMPV3',		6);
 	define('ITEM_TYPE_ZABBIX_ACTIVE',	7);
 	define('ITEM_TYPE_AGGREGATE',		8);

@@ -12308,10 +12308,10 @@ INSERT INTO screens_items VALUES (7,2,0,5,400,100,1,2,0,0,0,0,0,0,'',0);
 -- Dumping data for table `sysmaps`
 --
 
-INSERT INTO sysmaps VALUES (2,'Local network',980,200,0,2,0);
+INSERT INTO sysmaps VALUES (2,'Local network',980,200,0,1,2,0);
 
 --
 -- Dumping data for table `sysmaps_elements`
 --
 
-INSERT INTO sysmaps_elements VALUES (2,2,10017,0,19,19,19,'ZABBIX Server',NULL,100,100,'',19);
+INSERT INTO sysmaps_elements VALUES (2,2,10017,0,19,0,0,0,0,'ZABBIX Server',NULL,100,100,'');

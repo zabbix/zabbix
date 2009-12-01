@@ -1163,10 +1163,8 @@ class CChart extends CGraphDraw{
 
 	private function drawMainPeriod($new_time, $new_pos){
 		if(date('H',$new_time) == 0){
-			$old_day=$new_day;
 
-			if($interval > 86400) $date_format = 'd.m';
-			else if(date('Hi', $new_time) == 0) $date_format = 'd.m';
+			if(date('Hi', $new_time) == 0) $date_format = 'd.m';
 			else $date_format = 'd.m H:i';
 
 			$color = $this->graphtheme['highlightcolor'];

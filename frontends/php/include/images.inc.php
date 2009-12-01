@@ -19,34 +19,29 @@
 **/
 ?>
 <?php
-	function	get_image_by_imageid($imageid){
-		/*global $DB;
+	function get_image_by_imageid($imageid){
 
-		$st = sqlite3_query($DB['DB'], 'select * from images WHERE imageid='.$imageid);
-		info(implode(',',sqlite3_fetch_array($st)));
-		info(sqlite3_column_type($st,3));
-		info(SQLITE3_INTEGER.','.SQLITE3_FLOAT.','.SQLITE3_TEXT.','.SQLITE3_BLOB.','.SQLITE3_NULL);
-		return 0;*/
+		$sql = 'SELECT * FROM images WHERE imageid='.$imageid;
+		$result = DBselect($sql);
+		if($row = DBfetch($result)){
+			$row['image'] = zbx_unescape_image($row['image']);
+		}
+	
+	return $row;
+	}
+	
+	function zbx_unescape_image($image){
 		global $DB;
+		
+		$result = ($image)?$image:0;
+		if($DB['TYPE'] == "POSTGRESQL"){
+			$result = pg_unescape_bytea($image);
+		}
+		else if($DB['TYPE'] == "SQLITE3"){
+			$result = pack('H*', $image);
+		}
 
-		$result = DBselect('select * from images WHERE imageid='.$imageid);
-		$row = DBfetch($result);
-		if($row){
-			if($DB['TYPE'] == "ORACLE"){
-				if(!isset($row['image']))
-					return 0;
-			}
-			else if($DB['TYPE'] == "POSTGRESQL"){
-				$row['image'] = pg_unescape_bytea($row['image']);
-			}
-			else if($DB['TYPE'] == "SQLITE3"){
-				$row['image'] = pack('H*', $row['image']);
-			}
-			return	$row;
-		}
-		else{
-			return 0;
-		}
+	return $result;
 	}
 
 	function add_image($name, $imagetype, $file){

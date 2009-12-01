@@ -9,7 +9,7 @@
  *
  * author: Eugene Grigorjev
  */
-function zbx_jsvalue($value){
+function zbx_jsvalue($value, $object = null){
 	if(!is_array($value)) {
 		if(is_object($value)) return unpack_object($value);
 		if(is_string($value)) return '\''.str_replace('\'','\\\'',			/*  '	=> \'	*/
@@ -24,8 +24,8 @@ function zbx_jsvalue($value){
 	if(count($value) == 0) return '[]';
 
 	foreach($value as $id => $v){
-		if(!isset($is_object) && is_string($id)) $is_object = true;
-		$value[$id] = (isset($is_object) ? '\''.$id.'\' : ' : '').zbx_jsvalue($v);
+		if((!isset($is_object) && is_string($id)) || $object) $is_object = true;
+		$value[$id] = (isset($is_object) ? '\''.$id.'\' : ' : '').zbx_jsvalue($v, $object);
 	}
 
 	if(isset($is_object))
@@ -114,6 +114,79 @@ function inseret_javascript_for_editable_combobox(){
 	}';
 
 	insert_js($js);
+}
+
+function insert_show_color_picker_javascript(){
+	global $SHOW_COLOR_PICKER_SCRIPT_ISERTTED;
+
+	if($SHOW_COLOR_PICKER_SCRIPT_ISERTTED) return;
+	$SHOW_COLOR_PICKER_SCRIPT_ISERTTED = true;
+
+	$table = '';
+
+	$table .= '<table cellspacing="0" cellpadding="1">';
+	$table .= '<tr>';
+	/* gray colors */
+	foreach(array('0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F') as $c){
+		$color = $c.$c.$c.$c.$c.$c;
+		$table .= '<td>'.unpack_object(new CColorCell(null, $color, 'set_color(\\\''.$color.'\\\')')).'</td>';
+	}
+	$table .= '</tr>';
+
+	/* other colors */
+	$colors = array(
+		array('r' => 0, 'g' => 0, 'b' => 1),
+		array('r' => 0, 'g' => 1, 'b' => 0),
+		array('r' => 1, 'g' => 0, 'b' => 0),
+		array('r' => 0, 'g' => 1, 'b' => 1),
+		array('r' => 1, 'g' => 0, 'b' => 1),
+		array('r' => 1, 'g' => 1, 'b' => 0)
+		);
+
+	$brigs  = array(
+		array(0 => '0', 1 => '3'),
+		array(0 => '0', 1 => '4'),
+		array(0 => '0', 1 => '5'),
+		array(0 => '0', 1 => '6'),
+		array(0 => '0', 1 => '7'),
+		array(0 => '0', 1 => '8'),
+		array(0 => '0', 1 => '9'),
+		array(0 => '0', 1 => 'A'),
+		array(0 => '0', 1 => 'B'),
+		array(0 => '0', 1 => 'C'),
+		array(0 => '0', 1 => 'D'),
+		array(0 => '0', 1 => 'E'),
+		array(0 => '3', 1 => 'F'),
+		array(0 => '6', 1 => 'F'),
+		array(0 => '9', 1 => 'F'),
+		array(0 => 'C', 1 => 'F')
+		);
+
+	foreach($colors as $c){
+		$table .= '<tr>';
+		foreach($brigs as $br){
+			$r = $br[$c['r']];
+			$g = $br[$c['g']];
+			$b = $br[$c['b']];
+
+			$color = $r.$r.$g.$g.$b.$b;
+
+			$table .= '<td>'.unpack_object(new CColorCell(null, $color, 'set_color(\\\''.$color.'\\\')')).'</td>';
+		}
+		$table .= '</tr>';
+	}
+	$table .= '</table>';
+	$cancel = '<span onclick="javascript:hide_color_picker();" class="link">'.S_CANCEL.'</span>';
+
+
+	$script = 'var color_picker = null;
+				var curr_lbl = null;
+				var curr_txt = null;'."\n";
+
+	$script.= "var color_table = '".$table.$cancel."'\n";
+	insert_js($script);
+
+	zbx_add_post_js('create_color_picker();');
 }
 
 function insert_javascript_for_tweenbox(){
@@ -482,8 +555,8 @@ function insert_js_function($fnct_name){
 	}
 };
 
-
 function insert_js($script){
-	print('<script type="text/javascript"><!--'."\n".$script."\n".'--></script>');
+print('<script type="text/javascript">// <![CDATA['."\n".$script."\n".'// ]]></script>');
 }
+
 ?>

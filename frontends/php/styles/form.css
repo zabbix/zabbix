@@ -1,5 +1,7 @@
 /* CSS Document */
 
+form {margin: 0px}
+
 /**************** FORM ELEMENTS ****************/
 select{
 	cursor: pointer;

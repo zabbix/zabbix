@@ -6239,56 +6239,60 @@
 	}
 
 	function insert_map_form(){
-		$frm_title = "New system map";
+		$frm_title = 'New system map';
 
-		if(isset($_REQUEST["sysmapid"])){
-			$result=DBselect("SELECT * FROM sysmaps WHERE sysmapid=".$_REQUEST["sysmapid"]);
+		if(isset($_REQUEST['sysmapid'])){
+			$result=DBselect('SELECT * FROM sysmaps WHERE sysmapid='.$_REQUEST['sysmapid']);
 			$row=DBfetch($result);
-			$frm_title = "System map: \"".$row["name"].'"';
+			$frm_title = 'System map: "'.$row['name'].'"';
 		}
 
-		if(isset($_REQUEST["sysmapid"]) && !isset($_REQUEST["form_refresh"])){
-			$name		= $row["name"];
-			$width		= $row["width"];
-			$height		= $row["height"];
-			$backgroundid	= $row["backgroundid"];
-			$label_type	= $row["label_type"];
-			$label_location	= $row["label_location"];
+		if(isset($_REQUEST['sysmapid']) && !isset($_REQUEST['form_refresh'])){
+			$name		= $row['name'];
+			$width		= $row['width'];
+			$height		= $row['height'];
+			$backgroundid	= $row['backgroundid'];
+			$label_type	= $row['label_type'];
+			$label_location	= $row['label_location'];
+			$highlight = $row['highlight'];
 		}
 		else{
-			$name		= get_request("name","");
-			$width		= get_request("width",800);
-			$height		= get_request("height",600);
-			$backgroundid	= get_request("backgroundid",0);
-			$label_type	= get_request("label_type",0);
-			$label_location	= get_request("label_location",0);
+			$name		= get_request('name','');
+			$width		= get_request('width',800);
+			$height		= get_request('height',600);
+			$backgroundid	= get_request('backgroundid',0);
+			$label_type	= get_request('label_type',0);
+			$label_location	= get_request('label_location',0);
+			$highlight = get_request('highlight',0);
 		}
 
 
-		$frmMap = new CFormTable($frm_title,"sysmaps.php");
-		$frmMap->setHelp("web.sysmaps.map.php");
+		$frmMap = new CFormTable($frm_title,'sysmaps.php');
+		$frmMap->setHelp('web.sysmaps.map.php');
 
-		if(isset($_REQUEST["sysmapid"]))
-			$frmMap->addVar("sysmapid",$_REQUEST["sysmapid"]);
+		if(isset($_REQUEST['sysmapid']))
+			$frmMap->addVar('sysmapid',$_REQUEST['sysmapid']);
 
-		$frmMap->addRow(S_NAME,new CTextBox("name",$name,32));
-		$frmMap->addRow(S_WIDTH,new CNumericBox("width",$width,5));
-		$frmMap->addRow(S_HEIGHT,new CNumericBox("height",$height,5));
-
-		$cmbImg = new CComboBox("backgroundid",$backgroundid);
-		$cmbImg->addItem(0,"No image...");
+		$frmMap->addRow(S_NAME,new CTextBox('name',$name,32));
+		$frmMap->addRow(S_WIDTH,new CNumericBox('width',$width,5));
+		$frmMap->addRow(S_HEIGHT,new CNumericBox('height',$height,5));
+		
+		$cmbImg = new CComboBox('backgroundid',$backgroundid);
+		$cmbImg->addItem(0,'No image...');
 
 		$result=DBselect('SELECT * FROM images WHERE imagetype=2 AND '.DBin_node('imageid').' order by name');
 		while($row=DBfetch($result)){
 			$cmbImg->addItem(
-					$row["imageid"],
-					get_node_name_by_elid($row["imageid"], null, ': ').$row["name"]
+					$row['imageid'],
+					get_node_name_by_elid($row['imageid'], null, ': ').$row['name']
 					);
 		}
 
 		$frmMap->addRow(S_BACKGROUND_IMAGE,$cmbImg);
 
-		$cmbLabel = new CComboBox("label_type",$label_type);
+		$frmMap->addRow(S_ICON_HIGHLIGHTING, new CCheckBox('highlight',$highlight,null,1));
+
+		$cmbLabel = new CComboBox('label_type',$label_type);
 		$cmbLabel->addItem(0,S_LABEL);
 		$cmbLabel->addItem(1,S_IP_ADDRESS);
 		$cmbLabel->addItem(2,S_ELEMENT_NAME);
@@ -6296,7 +6300,7 @@
 		$cmbLabel->addItem(4,S_NOTHING);
 		$frmMap->addRow(S_ICON_LABEL_TYPE,$cmbLabel);
 
-		$cmbLocation = new CComboBox("label_location",$label_location);
+		$cmbLocation = new CComboBox('label_location',$label_location);
 
 		$cmbLocation->addItem(0,S_BOTTOM);
 		$cmbLocation->addItem(1,S_LEFT);
@@ -6304,12 +6308,12 @@
 		$cmbLocation->addItem(3,S_TOP);
 		$frmMap->addRow(S_ICON_LABEL_LOCATION,$cmbLocation);
 
-		$frmMap->addItemToBottomRow(new CButton("save",S_SAVE));
+		$frmMap->addItemToBottomRow(new CButton('save',S_SAVE));
 
-		if(isset($_REQUEST["sysmapid"])){
+		if(isset($_REQUEST['sysmapid'])){
 			$frmMap->addItemToBottomRow(SPACE);
-			$frmMap->addItemToBottomRow(new CButtonDelete("Delete system map?",
-					url_param("form").url_param("sysmapid")));
+			$frmMap->addItemToBottomRow(new CButtonDelete('Delete system map?',
+					url_param('form').url_param('sysmapid')));
 		}
 
 		$frmMap->addItemToBottomRow(SPACE);
@@ -6318,7 +6322,7 @@
 		$frmMap->show();
 
 	}
-
+/*
 	function insert_map_element_form(){
 		global $USER_DETAILS;
 
@@ -6548,6 +6552,7 @@
 
 		$frmEl->show();
 	}
+//*/
 
 	function insert_map_link_form(){
 
@@ -6724,18 +6729,20 @@
 	function insert_command_result_form($scriptid,$hostid){
 		$result = execute_script($scriptid,$hostid);
 
-		$script_info = DBfetch(DBselect("SELECT name FROM scripts WHERE scriptid=$scriptid"));
+		$sql = 'SELECT name '.
+				' FROM scripts '.
+				' WHERE scriptid='.$scriptid;
+		$script_info = DBfetch(DBselect($sql));
 
-		$frmResult = new CFormTable($script_info["name"].': '.script_make_command($scriptid,$hostid));
-		$message = $result["message"];
-		if($result["flag"] != 0) {
+		$frmResult = new CFormTable($script_info['name'].': '.script_make_command($scriptid,$hostid));
+		$message = $result['message'];
+		if($result['flag'] != 0) {
 			error($message);
-			$message = "";
+			$message = '';
 		}
 
-		$frmResult->addRow(S_RESULT,new CTextArea("message",$message,100,25,'yes'));
+		$frmResult->addRow(S_RESULT,new CTextArea('message',$message,100,25,'yes'));
 		$frmResult->addItemToBottomRow(new CButton('close',S_CLOSE,'window.close();'));
-
 		$frmResult->show();
 	}
 

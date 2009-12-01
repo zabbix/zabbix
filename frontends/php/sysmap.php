@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,16 +19,17 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/maps.inc.php');
-	require_once('include/forms.inc.php');
+require_once('include/config.inc.php');
+require_once('include/maps.inc.php');
+require_once('include/forms.inc.php');
 
-	$page['title'] = 'S_CONFIGURATION_OF_NETWORK_MAPS';
-	$page['file'] = 'sysmap.php';
-	$page['hist_arg'] = array('sysmapid');
+$page['title'] = "S_CONFIGURATION_OF_NETWORK_MAPS";
+$page['file'] = 'sysmap.php';
+$page['hist_arg'] = array('sysmapid');
+$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.cmap.js');
+$page['type'] = detect_page_type();
 
 include_once('include/page_header.php');
-
 ?>
 <?php
 
@@ -56,17 +57,214 @@ include_once('include/page_header.php');
 		'drawtype'=>array(T_ZBX_INT, O_OPT,  NULL, IN('0,1,2,3,4'),'isset({save_link})'),
 		'color'=>	array(T_ZBX_STR, O_OPT,  NULL, NOT_EMPTY,'isset({save_link})'),
 
-/* actions */
+// actions 
 		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'save_link'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-/* other */
+
+// other
 		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
+		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL),
+		
+//ajax
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,	NULL),
+		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  null,	NULL),
+		'favcnt'=>		array(T_ZBX_INT, O_OPT,	null,	null,	null),
+
+		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'form','list','get','get_img','new_selement','save'"),NULL),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("hat"=={favobj})'),
+		
+		'selements'=>	array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID, NULL),
+		'links'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID, NULL),
 	);
 
 	check_fields($fields);
+
+?>
+<?php
+// ACTION /////////////////////////////////////////////////////////////////////////////
+	if(isset($_REQUEST['favobj'])){
+		@ob_flush();
+		$json = new CJSON();
+		if('sysmap' == $_REQUEST['favobj']){
+			$sysmapid = get_request('sysmapid',0);
+			$cmapid = get_request('favid',0);
+
+			switch($_REQUEST['action']){
+				case 'get':
+					$action = '';
+
+					$options = array('sysmapids'=> $sysmapid, 'extendoutput'=>1, 'select_selements'=>1, 'select_links'=>1);
+					$sysmaps = CMap::get($options);
+					$db_map = reset($sysmaps);
+//SDII($db_map);
+					add_elementNames($db_map['selements']);
+
+					$action .= 'ZBX_SYSMAPS['.$cmapid.'].map.mselement["label_location"]='.$db_map['label_location'].'; '."\n";
+
+					foreach($db_map['selements'] as $snum => $selement){
+
+//						$element['image'] = get_base64_icon($element);
+						$selement['image'] = get_selement_iconid($selement);
+						$action .= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement).'); '."\n";
+					}
+
+					foreach($db_map['links'] as $enum => $link){
+						foreach($link as $key => $value){
+							if(is_int($key)) unset($link[$key]);
+						}
+
+						$link['linktriggers'] = zbx_toHash($link['linktriggers'], 'linktriggerid');
+						foreach($link['linktriggers'] as $lnum => $linktrigger){
+							$hosts = get_hosts_by_triggerid($linktrigger['triggerid']);
+							if($host = DBfetch($hosts)){
+								$description = $host['host'].':'.expand_trigger_description($linktrigger['triggerid']);
+							}
+
+							$link['linktriggers'][$lnum]['desc_exp'] = $description;
+						}
+
+						$action .= 'ZBX_SYSMAPS['.$cmapid.'].map.add_link('.zbx_jsvalue($link).'); '."\n";
+					}
+
+					$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.update_mapimg(); '."\n";
+					$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.update_selements_icon(); '."\n";
+
+					print($action);
+					break;
+				case 'save':
+					$selements = get_request('selements', '[]');
+					$selements = $json->decode($selements, true);
+
+					$links = get_request('links', '[]');
+					$links = $json->decode($links, true);
+
+					
+					$db_selementids = array();
+					$res = DBselect('SELECT selementid FROM sysmaps_elements WHERE sysmapid='.$sysmapid);
+					while($db_selement = DBfetch($res)){
+						$db_selementids[$db_selement['selementid']] = $db_selement['selementid'];
+					}
+					
+					DBstart();					
+					foreach($selements as $id => $selement){
+						if($selement['elementid'] == 0){
+							$selement['elementtype'] = SYSMAP_ELEMENT_TYPE_IMAGE;
+						}
+						
+						if(isset($selement['new'])){
+							$selement['sysmapid'] = $sysmapid;
+							$selementid = add_element_to_sysmap($selement);
+
+							foreach($links as $id => $link){
+								if($link['selementid1'] == $selement['selementid']) $links[$id]['selementid1']=$selementid;
+								else if($link['selementid2'] == $selement['selementid']) $links[$id]['selementid2']=$selementid;
+							}
+						}
+						else{
+//SDII($selement);
+							$selement['sysmapid'] = $sysmapid;
+							$result = update_sysmap_element($selement);
+							unset($db_selementids[$selement['selementid']]);
+						}
+					}
+
+					foreach($db_selementids as $id => $selementid){
+						delete_sysmaps_element($selementid);
+					}
+
+					$db_linkids = array();
+					$res = DBselect('SELECT linkid FROM sysmaps_links WHERE sysmapid='.$sysmapid);
+					while($db_link = DBfetch($res)){
+						$db_linkids[$db_link['linkid']] = $db_link['linkid'];
+					}
+					
+					foreach($links as $id => $link){
+						if(isset($link['new'])){
+							$link['sysmapid'] = $sysmapid;
+							$result = add_link($link);
+						}
+						else{
+							$link['sysmapid'] = $sysmapid;
+							$result = update_link($link);
+							unset($db_linkids[$link['linkid']]);
+						}
+					}
+					
+					foreach($db_linkids as $id => $linkid){
+						delete_link($linkid);
+					}
+					
+					$result = DBend(true);
+					
+					print('location.href = "sysmaps.php"');
+					break;
+			}
+		}
+
+		if('selements' == $_REQUEST['favobj']){
+			$sysmapid = get_request('sysmapid',0);
+			$cmapid = get_request('favid',0);
+			
+			switch($_REQUEST['action']){
+				case 'get_img':
+					$selements = get_request('selements', '[]');
+					$selements = $json->decode($selements, true);
+
+					if(!empty($selements)){
+						$selement = reset($selements);
+
+//						$selement['image'] = get_base64_icon($element);
+						$selement['image'] = get_selement_iconid($selement);
+
+						$action = '';
+						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement).',1);';
+//						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.update_mapimg();';
+						
+						print($action);
+					}
+					else{
+						print('ZBX_SYSMAPS['.$cmapid.'].map.info("Get Img: Element data not found!"); ');
+					}
+				break;
+				case 'new_selement':
+					$sql = 'SELECT i.* FROM images i WHERE '.dbin_node('i.imageid', false).' AND i.imagetype='.IMAGE_TYPE_ICON;
+					$default_icon = DBfetch(DBselect($sql,1));
+
+					$selements = get_request('selements', '[]');
+					$selements = $json->decode($selements, true);
+					if(!empty($selements)){
+						$selement = reset($selements);
+
+						$selement['iconid_off']	= $default_icon['imageid'];
+
+//						$selement['image'] = get_base64_icon($element);
+						$selement['image'] = get_selement_iconid($selement);
+
+						$action = '';
+						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement).',1);';
+						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.update_mapimg();';
+						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.show_selement_list();';
+
+						print($action);
+					}
+					else{
+						print('ZBX_SYSMAPS['.$cmapid.'].map.info("Get Img: Element data not found!"); ');
+					}
+				break;
+			}
+		}
+		
+		if('links' == $_REQUEST['favobj']){
+			switch($_REQUEST['action']){
+			}
+		}
+	}	
+	
+	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		exit();
+	}
 ?>
 <?php
 	show_table_header(S_CONFIGURATION_OF_NETWORK_MAPS_BIG);
@@ -76,255 +274,72 @@ include_once('include/page_header.php');
 	$sysmap = DBfetch(DBselect('select * from sysmaps where sysmapid='.$_REQUEST['sysmapid']));
 ?>
 <?php
-	if(isset($_REQUEST['save'])){
-		$result = false;
-		$selementid = get_request('selementid');
-
-		if(isset($_REQUEST['selementid'])){ // update element
-			if(($_REQUEST['elementid']>0) || ($_REQUEST['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE)){
-				$result=update_sysmap_element($_REQUEST['selementid'],
-					$_REQUEST['sysmapid'],$_REQUEST['elementid'],$_REQUEST['elementtype'],
-					$_REQUEST['label'],$_REQUEST['x'],$_REQUEST['y'],
-					$_REQUEST['iconid_off'],$_REQUEST['iconid_unknown'],$_REQUEST['iconid_on'],
-					$_REQUEST['iconid_disabled'],$_REQUEST['url'],$_REQUEST['label_location']);
-				$selementid = $_REQUEST['selementid'];
-			}
-			else{
-				info('Map element is not selected');
-			}
-
-			show_messages($result,'Element updated','Cannot update element');
-		}
-		else{ // add element
-			if(($_REQUEST['elementid']>0) || ($_REQUEST['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE)){
-				$result=add_element_to_sysmap($_REQUEST['sysmapid'],$_REQUEST['elementid'],
-					$_REQUEST['elementtype'],$_REQUEST['label'],$_REQUEST['x'],$_REQUEST['y'],
-					$_REQUEST['iconid_off'],$_REQUEST['iconid_unknown'],$_REQUEST['iconid_on'],
-					$_REQUEST['iconid_disabled'],$_REQUEST['url'],$_REQUEST['label_location']);
-				$selementid = $result;
-			}
-			else{
-				info('Map element is not selected');
-			}
-
-			show_messages($result,'Element added','Cannot add element');
-		}
-		add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,'Name ['.$sysmap['name'].'] Element ['.$selementid.'] updated ');
-		if($result)	unset($_REQUEST['form']);
-	}
-
-	if(isset($_REQUEST['save_link'])){
-		if(isset($_REQUEST['linkid'])){ // update link
-			$result=update_link($_REQUEST['linkid'],
-				$_REQUEST['sysmapid'],$_REQUEST['selementid1'],$_REQUEST['selementid2'],
-				get_request('triggers',array()), $_REQUEST['drawtype'],$_REQUEST['color']);
-			$linkid = $_REQUEST['linkid'];
-
-			show_messages($result,'Link updated','Cannot update link');
-		}
-		else{ // add link
-			$result=add_link($_REQUEST['sysmapid'],$_REQUEST['selementid1'],$_REQUEST['selementid2'],
-				get_request('triggers',array()),	$_REQUEST['drawtype'],$_REQUEST['color']);
-			$linkid = $result;
-
-			show_messages($result,'Link added','Cannot add link');
-		}
-		add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,'Name ['.$sysmap['name'].'] Link ['.$linkid.'] updated ');
-		if($result)	unset($_REQUEST['form']);
-	}
-	else if(isset($_REQUEST['delete'])){
-
-		if(isset($_REQUEST['linkid'])){
-			$result=delete_link($_REQUEST['linkid']);
-			show_messages($result,'Link deleted','Cannot delete link');
-			add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,
-				'Name ['.$sysmap['name'].'] Link ['.$_REQUEST['linkid'].'] deleted');
-
-			if($result)
-			{
-				unset($_REQUEST['linkid']);
-				unset($_REQUEST['form']);
-			}
-		}
-		else if(isset($_REQUEST['selementid'])){
-			$result=delete_sysmaps_element($_REQUEST['selementid']);
-			show_messages($result,'Element deleted','Cannot delete element');
-			add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,
-				'Name ['.$sysmap['name'].'] Element ['.$_REQUEST['selementid'].'] deleteed ');
-
-			if($result){
-				unset($_REQUEST['selementid']);
-				unset($_REQUEST['form']);
-			}
-		}
-	}
-?>
-<?php
 	echo SBR;
-	if(isset($_REQUEST['form']) && ($_REQUEST['form']=='add_element' ||
-		($_REQUEST['form']=='update' && isset($_REQUEST['selementid']))))
-	{
-		show_table_header(S_DISPLAYED_ELEMENTS);
-		echo SBR;
-		insert_map_element_form();
-	}
-	else if(isset($_REQUEST['form']) && ($_REQUEST['form']=='add_link' || ($_REQUEST['form']=='update' && isset($_REQUEST['linkid'])))){
-		$sql = 'SELECT count(*) as count '.
-				' FROM sysmaps_elements '.
-				' WHERE sysmapid='.$_REQUEST['sysmapid'];
-		$row = DBfetch(DBselect($sql));
-		if($row['count']>1){
-			show_table_header(S_CONNECTORS);
-			echo SBR;
-			insert_map_link_form();
-		}
-		else{
-			info('Not enough elements in this map');
-		}
-	}
-	else{
-		show_table_header(S_DISPLAYED_ELEMENTS, new CButton('form',S_ADD_ELEMENT,
-			"return redirect('".$page['file'].'?form=add_element'.url_param('sysmapid')."');"));
+	$map = get_sysmap_by_sysmapid($_REQUEST['sysmapid']);
+	
+// ELEMENTS
 
-		$table = new CTableInfo();
-		$table->setHeader(array(S_LABEL,S_TYPE,S_X,S_Y,S_ICON_OK,S_ICON_PROBLEM,S_ICON_UNKNOWN,S_ICON_DISABLED));
+	$el_add = new CDiv(SPACE,'iconplus');
+	$el_add->setAttribute('title',S_ADD_ELEMENT);
+	$el_add->setAttribute('id','selement_add');
+	
+	$el_rmv = new CDiv(SPACE,'iconminus');
+	$el_rmv->setAttribute('title',S_REMOVE_ELEMENT);
+	$el_rmv->setAttribute('id','selement_rmv');
+						
+//-----------------
 
-		$map_elements = array();
-		$sql = 'select * '.
-				' from sysmaps_elements '.
-				' where sysmapid='.$_REQUEST['sysmapid'];
-		$db_elements = DBselect($sql);
-		while($db_element = DBfetch($db_elements)){
-			$map_elements[$db_element['selementid']] = $db_element;
-		}
-		order_page_result($map_elements, 'label');
+// CONNECTORS 
+//		echo BR;
+//		show_table_header("CONNECTORS", new CButton("form","Create connection","return Redirect('".$page["file"]."?form=add_link".url_param("sysmapid")."');"));
 
-		foreach($map_elements as $selementid => $db_element){
-			if(    $db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)		$type = S_HOST;
-			elseif($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP)		$type = S_MAP;
-			elseif($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)	$type = S_TRIGGER;
-			elseif($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP)	$type = S_HOST_GROUP;
-			else $type = 'Map element';
+//		$table->Show();
 
-			$table->addRow(array(
-				new CLink(
-					expand_map_element_label_by_data($db_element),
-					"sysmap.php?sysmapid=".$db_element["sysmapid"].
-					"&form=update&selementid=".$db_element["selementid"],
-					"action"),
-				nbsp($type),
-				$db_element['x'],
-				$db_element['y'],
-				$db_element['iconid_off'] ? new CImg('image.php?height=24&imageid='.$db_element['iconid_off'],'no image',NULL) : '-',
-				$db_element['iconid_on'] ? new CImg('image.php?height=24&imageid='.$db_element['iconid_on'],'no image',NULL) : '-',
-				$db_element['iconid_unknown'] ? new CImg('image.php?height=24&imageid='.$db_element['iconid_unknown'],'no image',NULL) : '-',
-				$db_element['iconid_disabled'] ? new CImg('image.php?height=24&imageid='.$db_element['iconid_disabled'],'no image',NULL) : '-'
-				));
-		}
-		$table->show();
+	$cn_add = new CDiv(SPACE,'iconplus');
+	$cn_add->setAttribute('title',S_ADD_LINK);
+	$cn_add->setAttribute('id','link_add');
+	
+	$cn_rmv = new CDiv(SPACE,'iconminus');
+	$cn_rmv->setAttribute('title',S_REMOVE_LINK);
+	$cn_rmv->setAttribute('id','link_rmv');
 
-		echo SBR;
-		show_table_header(S_CONNECTORS, new CButton('form',S_CREATE_CONNECTION,
-			"return redirect('".$page['file'].'?form=add_link'.
-			url_param('sysmapid')."');"));
+	$elcn_tab = new CTable();
+	$elcn_tab->addRow(array(bold('E'),bold('L')));
+	$elcn_tab->addRow(array($el_add,$cn_add));
+	$elcn_tab->addRow(array($el_rmv,$cn_rmv));
 
-		$table = new CTableInfo();
-		$table->setHeader(array(S_LINK,S_ELEMENT_1,S_ELEMENT_2,S_LINK_STATUS_INDICATOR));
+	$td = new CCol($elcn_tab);
+	$td->setAttribute('valign','top');
+//------------------------\
 
-		$i = 1;
+	$save_btn = new CButton('save',S_SAVE);
+	$save_btn->setAttribute('id','sysmap_save');
+	
+	$elcn_tab = new CTable(null,'textwhite');
+	$elcn_tab->addRow(array(S_ELEMENT.'[',$el_add,$el_rmv,']',SPACE,SPACE,S_LINK.'[',$cn_add,$cn_rmv,']'));
+//	show_table_header($map['name'], $save_btn);
+	show_table_header($elcn_tab, $save_btn);
 
-		$links = array();
-		$selementids = array();
-		$sql = 'SELECT linkid,selementid1,selementid2 '.
-				' FROM sysmaps_links '.
-				' WHERE sysmapid='.$_REQUEST['sysmapid'];
-		$result=DBselect($sql);
-		while($row=DBfetch($result)){
-			$links[$row['linkid']] = $row;
-			$selementids[$row['selementid1']] = $row['selementid1'];
-			$selementids[$row['selementid2']] = $row['selementid2'];
-		}
 
-		$labels = array();
-		$sql = 'SELECT selementid, label '.
-				' FROM sysmaps_elements '.
-				' WHERE '.DBcondition('selementid',$selementids);
-		$result=DBselect($sql);
-		while($row=DBfetch($result)){
-			$labels[$row['selementid']] = $row['label'];
-		}
-
-		foreach($links as $linkid => $row){
-			$links[$linkid]['label1']=$labels[$row['selementid1']];
-			$links[$linkid]['label2']=$labels[$row['selementid2']];
-		}
-
-		order_result($links, 'label1', null, true);
-
-		foreach($links as $linkid => $row){
-			$label1 = $row['label1'];
-			$label2 = $row['label2'];
-
-	/* prepare description */
-
-			$triggers = get_link_triggers($row['linkid']);
-			$description=array();
-
-			foreach($triggers as $id => $trigger){
-				if(isset($trigger['triggerid'])){
-					if(!empty($description)) $description[]=BR();
-					$triggers[$id]['description'] = expand_trigger_description($trigger['triggerid']);
-				}
-				$description[]= $triggers[$id]['description'];
-			}
-
-			if(empty($description))
-				$description='-';
-
-	/* draw row */
-			$table->addRow(array(
-				new CLink('link '.$i++,'sysmap.php?sysmapid='.$_REQUEST['sysmapid'].'&form=update&linkid='.$row['linkid']),
-				$label1,
-				$label2,
-				$description
-				));
-		}
-		$table->Show();
-	}
-
-	show_messages();
-
-	echo SBR;
-	$map=get_sysmap_by_sysmapid($_REQUEST['sysmapid']);
-	show_table_header($map['name']);
-
+	$sysmap_img = new CImg('images/general/tree/zero.gif','sysmap');
+	$sysmap_img->setAttribute('id', 'sysmap_img');	
+	
 	$table = new CTable(NULL,'map');
-	if(isset($_REQUEST['sysmapid'])){
-		$linkMap = new CAreaMap('links'.$_REQUEST['sysmapid'].'_'.rand(0,100000));
-
-		$db_elements = DBselect('select * from sysmaps_elements where sysmapid='.$_REQUEST['sysmapid']);
-		while($db_element = DBfetch($db_elements)){
-			$tmp_img = get_png_by_selementid($db_element['selementid']);
-			if(!$tmp_img) continue;
-
-			$x1_	= $db_element['x'];
-			$y1_	= $db_element['y'];
-			$x2_	= $db_element['x'] + imagesx($tmp_img);
-			$y2_	= $db_element['y'] + imagesy($tmp_img);
-
-			$linkMap->addRectArea($x1_,$y1_,$x2_,$y2_,
-				'sysmap.php?form=update&sysmapid='.$_REQUEST['sysmapid'].
-				'&selementid='.$db_element['selementid'],
-				$db_element['label']);
-
-		}
-
-		$imgMap = new CImg('map.php?sysmapid='.$_REQUEST['sysmapid']);
-		$imgMap->setMap($linkMap->GetName());
-		$table->addRow($linkMap);
-		$table->addRow($imgMap);
-	}
+//	$table->addRow(array($td, $sysmap_img));
+	$table->addRow($sysmap_img);
 	$table->Show();
+	
+	$container = new CDiv(null);
+	$container->setAttribute('id','sysmap_cnt');
+	$container->setAttribute('style','position: absolute;');
+	$container->Show();
+	
+	zbx_add_post_js('create_map("sysmap_cnt", "'.$sysmap['sysmapid'].'");');
+	
+	insert_js(get_selement_form_menu());
+	insert_js(get_link_form_menu());
+	
+	insert_show_color_picker_javascript();
 ?>
 <?php
 
