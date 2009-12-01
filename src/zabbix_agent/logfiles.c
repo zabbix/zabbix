@@ -126,7 +126,7 @@ static int split_filename(const char *filename, char **directory, char **format)
 	struct stat buf;
 #ifdef _WINDOWS
 	char *filename_tmp = NULL;
-	char *separator_tmp = NULL;	
+	char *separator_tmp = NULL;
 #endif/*_WINDOWS*/
 	
 	assert(directory && !*directory);
@@ -148,7 +148,7 @@ static int split_filename(const char *filename, char **directory, char **format)
 		separator_tmp = strrchr(filename_tmp, (int)PATH_SEPARATOR);
 		if (separator_tmp == NULL)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "\"%c\" cannot be found in [%s].", PATH_SEPARATOR, *filename_tmp);
+			zabbix_log(LOG_LEVEL_DEBUG, "\"%c\" cannot be found in [%s].", PATH_SEPARATOR, filename_tmp);
 			zbx_free(filename_tmp);
 			return FAIL;
 		}
@@ -172,16 +172,19 @@ static int split_filename(const char *filename, char **directory, char **format)
 		}
 		/* Windows "stat" functions cannot get info about directories with '\' at the end of the path */
 		/* *nix "stat" functions do get it successfully */
-		zbx_rtrim(*directory, "\\");
 		if (-1 == zbx_stat(*directory, &buf) || !S_ISDIR(buf.st_mode))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Cannot find [%s] directory.", *directory);
-			zbx_free(*directory);
-			zbx_free(*format);
-			/* do not free filename_tmp here */
-			*separator_tmp = '\0';/* cut the right part of filename_tmp */
-			separator = NULL;
-			continue;
+			zbx_rtrim(*directory, "\\");
+			if (-1 == zbx_stat(*directory, &buf) || !S_ISDIR(buf.st_mode))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "Cannot find [%s] directory.", *directory);
+				zbx_free(*directory);
+				zbx_free(*format);
+				/* do not free filename_tmp here */
+				*separator_tmp = '\0';/* cut the right part of filename_tmp */
+				separator = NULL;
+				continue;
+			}
 		}
 		zbx_free(filename_tmp);
 	}
@@ -385,9 +388,9 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 
 /******************************************************************************
  *                                                                            *
- * Function: process_log                                                      *
+ * Function: process_log_regexp                                               *
  *                                                                            *
- * Purpose: Get message from logfile(s)                                       *
+ * Purpose: Get message from logfile with rotation                            *
  *                                                                            *
  * Parameters: filename - logfile name (regular expression with a path)       *
  *             lastlogsize - offset for message                               *
@@ -397,7 +400,7 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
  * Return value: returns SUCCEED on succesful reading,                        *
  *               FAIL on other cases                                          *
  *                                                                            *
- * Author: Eugene Grigorjev, Dmitry Borovikov (logrotation)                  *
+ * Author: Dmitry Borovikov (logrotation)                                     *
  *                                                                            *
  * Comments:                                                                  *
  *    This function allocates memory for 'value', because use zbx_free.       *
@@ -405,7 +408,7 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
  *                                                                            *
  *                                                                            *
  ******************************************************************************/
-int	process_log(char *filename, long *lastlogsize, int *mtime, char **value, const char *encoding)
+int	process_log_regexp(char *filename, long *lastlogsize, int *mtime, char **value, const char *encoding)
 {
 	int		i = 0;
 	int		nbytes;
@@ -430,7 +433,7 @@ int	process_log(char *filename, long *lastlogsize, int *mtime, char **value, con
 	struct dirent	*d_ent = NULL;
 #endif/*_WINDOWS*/
 	
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_log() filename [%s] lastlogsize [%li] mtime [%i]",
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_log_regexp() filename [%s] lastlogsize [%li] mtime [%i]",
 			filename, *lastlogsize, *mtime);
 	
 	/* splitting filename */
@@ -470,8 +473,8 @@ int	process_log(char *filename, long *lastlogsize, int *mtime, char **value, con
 	/* allocating memory for logfiles */
 	init_logfiles(&logfiles, &logfiles_alloc, &logfiles_num);
 	
-	zabbix_log(LOG_LEVEL_WARNING, "Starting reading the directory. logfiles_alloc [%i], logfiles_num [%i]",
-			logfiles_alloc, logfiles_num);
+	/*zabbix_log(LOG_LEVEL_WARNING, "Starting reading the directory. logfiles_alloc [%i], logfiles_num [%i]",
+			logfiles_alloc, logfiles_num);*/
 			
 #ifdef _WINDOWS
 
@@ -655,3 +658,76 @@ int	process_log(char *filename, long *lastlogsize, int *mtime, char **value, con
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: process_log                                                      *
+ *                                                                            *
+ * Purpose: Get message from logfile WITHOUT rotation                         *
+ *                                                                            *
+ * Parameters: filename - logfile name                                        *
+ *             lastlogsize - offset for message                               *
+ *             value - pointer for logged message                             *
+ *                                                                            *
+ * Return value: returns SUCCEED on succesful reading,                        *
+ *               FAIL on other cases                                          *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *    This function allocates memory for 'value', because use zbx_free.       *
+ *    Return SUCCEED and NULL value if end of file received.                  *
+ *                                                                            *
+ *                                                                            *
+ ******************************************************************************/
+int	process_log(char *filename, long *lastlogsize, char **value, const char *encoding)
+{
+	int		f;
+	struct stat	buf;
+	int		nbytes, ret = FAIL;
+	char		buffer[MAX_BUF_LEN];
+
+	assert(filename);
+	assert(lastlogsize);
+	assert(value);
+	assert(encoding);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_log() filename:'%s' lastlogsize:%li", filename, *lastlogsize);
+
+	/* Handling of file shrinking */
+	if (0 != zbx_stat(filename, &buf))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot open [%s] [%s]", filename, strerror(errno));
+		return ret;
+	}
+
+	if (buf.st_size < *lastlogsize)
+		*lastlogsize = 0;
+
+	if (-1 == (f = zbx_open(filename, O_RDONLY)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot open [%s] [%s]", filename, strerror(errno));
+		return ret;
+	}
+
+	if ((off_t)-1 != lseek(f, (off_t)*lastlogsize, SEEK_SET))
+	{
+		if (-1 != (nbytes = zbx_read(f, buffer, sizeof(buffer), encoding)))
+		{
+			if (0 != nbytes)
+			{
+				*lastlogsize += nbytes;
+				*value = convert_to_utf8(buffer, nbytes, encoding);
+				zbx_rtrim(*value, "\r\n ");
+			}
+			ret = SUCCEED;
+		}
+		else
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot read from [%s] [%s]", filename, strerror(errno));
+	}
+	else
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot set position to [%li] for [%s] [%s]", *lastlogsize, filename, strerror(errno));
+
+	close(f);
+
+	return ret;
+}

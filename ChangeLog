@@ -1,5 +1,6 @@
 Changes for 1.7.3
 
+ - [DEV-369] added item check "log.regexp" with file log rotation, the parameter "fileformat" has a format [path][regexp] (Dmitry)
  - [DEV-242] add dynamic map creation (Aly)
  - [DEV-435] Improvements in monitoring triggers screen (Vedmak)
  - [ZBX-1340] fixed cancel button in forms (Vedmak)
@@ -33,7 +34,7 @@ Changes for 1.7.3
  - [DEV-333] fixed possible server crash while processing remote commands (Dmitry)
  - [ZBX-998] modified PostgreSQL schema for support of uint64 history values (Sasha)
  - [ZBX-1317] fixed resource type for maintenance in audit (Vedmak)
- - [DEV-369] added support of file log rotation, item's "log[]" parameter "file" now has a format of "[path][regexp]" (Dmitry)
+ - [DEV-369] added support of file log rotation (Dmitry)
  - [ZBX-1310] fixed template creating form (Vedmak)
  - [ZBX-1312] removed huge, unused Japanese fonts (Richlv)
  - [ZBX-1272] server name is now shown in page title too (Vedmak)
