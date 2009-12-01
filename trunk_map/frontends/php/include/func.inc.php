@@ -897,7 +897,7 @@ function zbx_toObject(&$value, $field){
 return $result;
 }
 
-// fuunction: zbx_toArray
+// function: zbx_toArray
 // author: Aly
 function zbx_toArray(&$value){
 	if(is_null($value)) return $value;
@@ -944,20 +944,18 @@ return $result;
 }
 
 function zbx_cleanHashes($value){
-	if(is_null($value)) return $value;
-	$result = $value;
-
-	if(is_array($result)){
-		if(zbx_ctype_digit(key($result))){
-			$result = array_values($result);
+	if(is_array($value)){
+		if(ctype_digit(key($value))){
+			$value = array_values($value);
 		}
 
-		foreach($result as $key => $val){
-			$result[$key] = zbx_cleanHashes($val);
+		foreach($value as $key => $val){
+			if(is_array($val))
+				$value[$key] = zbx_cleanHashes($val);
 		}
 	}
 
-return $result;
+return $value;
 }
 
 /************* END ZBX MISC *************/

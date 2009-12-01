@@ -208,6 +208,7 @@
 
 //	acknow.php
 	'S_NO_EVENTS_TO_ACKNOWLEDGE'=>		'No events to acknowledge',
+	'S_TO_ACKNOWLEDGE' =>		'To acknowledge',
 	'S_ACKNOWLEDGES'=>			'Acknowledges',
 	'S_ACKNOWLEDGE'=>			'Acknowledge',
 	'S_RETURN'=>				'Return',
