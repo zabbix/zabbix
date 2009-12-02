@@ -368,6 +368,7 @@ class CMap extends CZBXAPI{
  * @param array $maps['width']
  * @param int $maps['height']
  * @param string $maps['backgroundid']
+  * @param string $maps['highlight']
  * @param array $maps['label_type']
  * @param int $maps['label_location']
  * @return boolean | array
@@ -384,9 +385,10 @@ class CMap extends CZBXAPI{
 
 			$map_db_fields = array(
 				'name' => null,
-				'width' => 300,
-				'height' => 200,
-				'backgroundid' => 3,
+				'width' => 600,
+				'height' => 400,
+				'backgroundid' => 0,
+				'highlight' => SYSMAP_HIGHLIGH_ON,
 				'label_type' => 2,
 				'label_location' => 3
 			);
@@ -397,7 +399,7 @@ class CMap extends CZBXAPI{
 				break;
 			}
 
-			$sysmapid = add_sysmap($map['name'], $map['width'], $map['height'], $map['backgroundid'], $map['label_type'], $map['label_location']);
+			$sysmapid = add_sysmap($map['name'], $map['width'], $map['height'], $map['backgroundid'], $map['highlight'], $map['label_type'], $map['label_location']);
 			if(!$sysmapid){
 				$result = false;
 				break;

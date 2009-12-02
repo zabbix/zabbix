@@ -2111,11 +2111,7 @@ updateForm_selement: function(e, selementid){
 //--
 
 	if(this.selection.count == 1){
-// If we already editing it than do not update it
-		if(this.selementForm.selementid.value == selementid) return false;
-		
 		var selement = this.selements[selementid];
-
 
 // SELEMENT
 		this.selementForm.selementid.value = selementid;
