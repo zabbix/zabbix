@@ -92,13 +92,15 @@ include_once('include/page_header.php');
 
 	$icon = null;
 	$fs_icon = null;
-	
-	$maps = CMap::get(array(
-		'extendoutput' => 1, 
-		'nodeids' => get_current_nodeid(),
-		'select_selements' => 1));
+
+	$options = array(
+				'extendoutput' => 1, 
+				'nodeids' => get_current_nodeid(),
+				'select_selements' => 1
+		);
+
+	$maps = CMap::get($options);
 	$maps = zbx_toHash($maps, 'sysmapid');
-	
 	
 	if(!empty($maps)){
 		if(!isset($maps[$_REQUEST['sysmapid']])){
@@ -137,8 +139,8 @@ include_once('include/page_header.php');
 		}
 // }}} GET MAP PARENT MAPS
 		
-		
 		$action_map = get_action_map_by_sysmapid($_REQUEST['sysmapid']);
+
 		$table->addRow($action_map);
 
 		$imgMap = new CImg('map.php?noedit=1&sysmapid='.$_REQUEST['sysmapid']);

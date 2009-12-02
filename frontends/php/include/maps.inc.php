@@ -830,18 +830,25 @@
 	function get_action_map_by_sysmapid($sysmapid){
 		$action_map = new CAreaMap('links'.$sysmapid);
 
+		$hostids = array();
+		$selements = array();
 		$sql = 'SELECT * FROM sysmaps_elements WHERE sysmapid='.$sysmapid;
 		$db_elements = DBselect($sql);
 		while($db_element = DBfetch($db_elements)){
+			$selements[$db_element['elementid']] = $db_element;
+			if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)
+				$hostids[$db_element['elementid']] = $db_element['elementid'];
+		}
+		$scripts_by_hosts = CScript::getScriptsByHosts($hostids);
+
+		foreach($selements as $snum => $db_element){
 			$url = $db_element['url'];
 			$alt = 'Label: '.$db_element['label'];
 			$scripts_by_hosts = null;
 
 			if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
 				$host = get_host_by_hostid($db_element['elementid']);
-				if($host['status'] != HOST_STATUS_MONITORED)	continue;
-
-				$scripts_by_hosts = CScript::getScriptsByHosts(array($db_element['elementid']));
+				if($host['status'] != HOST_STATUS_MONITORED) continue;
 
 				if(empty($url))	$url='tr_status.php?hostid='.$db_element['elementid'].'&noactions=true&onlytrue=true&compact=true';
 
@@ -866,7 +873,7 @@
 
 			if(empty($url))	continue;
 
-			$back = get_png_by_selementid($db_element['selementid']);
+			$back = get_png_by_selement($db_element);
 			if(!$back)	continue;
 
 			$x1_ = $db_element['x'];
@@ -875,7 +882,7 @@
 			$y2_ = $db_element['y'] + imagesy($back);
 
 			$r_area = new CArea(array($x1_,$y1_,$x2_,$y2_),$url,$alt,'rect');
-			if(!empty($scripts_by_hosts)){
+			if(($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) && isset($scripts_by_hosts[$db_element['elementid']])){
 				$menus = '';
 
 				$host_nodeid = id2nodeid($db_element['elementid']);
@@ -896,9 +903,9 @@
 				$menus = trim($menus,',');
 				$menus="show_popup_menu(event,[[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180); cancelEvent(event);";
 
-				$r_area->AddAction('onclick','javascript: '.$menus);
+				$r_area->addAction('onclick','javascript: '.$menus);
 			}
-			$action_map->AddItem($r_area);//AddRectArea($x1_,$y1_,$x2_,$y2_, $url, $alt);
+			$action_map->addItem($r_area);//AddRectArea($x1_,$y1_,$x2_,$y2_, $url, $alt);
 		}
 
 		$jsmenu = new CPUMenu(null,170);
@@ -1115,14 +1122,10 @@
 		$el_form_menu['hostid_hosts'][] = array('key'=>SYSMAP_ELEMENT_TYPE_HOST, 'value'=> unpack_object($host_link));
 // MAP
 		$maps = array();
-		$db_maps = DBselect('SELECT DISTINCT n.name as node_name,s.sysmapid,s.name '.
-							' FROM sysmaps s '.
-								' LEFT JOIN nodes n on n.nodeid='.DBid2nodeid('s.sysmapid').
-							' ORDER BY node_name,s.name');
-		while($db_map = DBfetch($db_maps)){
-			if(!sysmap_accessible($db_map['sysmapid'],PERM_READ_ONLY)) continue;
-			
-			$node_name = isset($db_map['node_name']) ? '('.$db_map['node_name'].') ' : '';
+		$sysmaps = CMap::get(array('extendoutput' => 1, 'nodeids'=>get_current_nodeid(true)));
+		order_result($sysmaps, 'name', ZBX_SORT_UP);
+		foreach($maps as $mnum => $db_map){
+			$node_name = get_node_name_by_elid($db_map['mapid']);
 			$maps[] = array($db_map['sysmapid'],$node_name.$db_map['name']);
 		}
 		$el_form_menu['sysmapid_sysmaps'][] = array('key'=>SYSMAP_ELEMENT_TYPE_MAP, 'value'=> $maps);
