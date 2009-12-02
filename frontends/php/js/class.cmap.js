@@ -1035,13 +1035,7 @@ hideForm: function(e){
 	for(var i=0; i<this.selection.position; i++){
 		if(!isset(i,this.selection.selements)) continue;;
 
-		this.selection.count--;
-
-		this.selements[this.selection.selements[i]].selected = null;
-		this.selements[this.selection.selements[i]].html_obj.style.border = '0px';
-
-		this.selection.selements[i] = null;
-		delete(this.selection.selements[i]);
+		this.select_selement(this.selection.selements[i], true);
 	}
 },
 
@@ -1472,7 +1466,7 @@ this.selementForm.elementtype = e_select_6;
 	e_select_6.setAttribute('id',"elementtype");
 	e_td_5.appendChild(e_select_6);
 
-	addListener(e_select_6, 'change', this.updateForm_selementByType.bindAsEventListener(this));
+	addListener(e_select_6, 'change', this.updateForm_selementByType.bindAsEventListener(this,false));
 
 
 	var e_option_7 = document.createElement('option');
@@ -2203,9 +2197,11 @@ updateForm_selement: function(e, selementid){
 // URL
 		this.selementForm.url.value = selement.url;
 
-		this.updateForm_selementByType(e);
+		this.updateForm_selementByType(e, false);
 	}
 	else{
+// SELEMENT
+		this.selementForm.selementid.value = selementid;
 
 // Label
 		this.selementForm.label.value = '';
@@ -2262,10 +2258,8 @@ updateForm_selementByIcons: function(e){
 updateForm_selementByType: function(e, multi){
 	this.debug('updateForm_selementByType');
 //--
-
-	var multi = multi || false;
+	if(typeof(multi) == 'undefined') var multi = false;
 	var display_style = IE?'block':'table-row';
-
 
 	if(multi){
 		this.selementForm.massEdit.chkboxLabel.style.display = 'inline';
