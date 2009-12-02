@@ -268,20 +268,8 @@ include_once('include/page_header.php');
 		$iconX = imagesx($img);
 		$iconY = imagesy($img);
 
-		if(isset($_REQUEST['noedit'])){
-	
-			switch($el_info['priority']){
-				case TRIGGER_SEVERITY_DISASTER: 	$hl_color = hex2rgb('FF0000'); break;
-				case TRIGGER_SEVERITY_HIGH:  		$hl_color = hex2rgb('FF8888'); break;
-				case TRIGGER_SEVERITY_AVERAGE:  	$hl_color = hex2rgb('DDAAAA'); break;
-				case TRIGGER_SEVERITY_WARNING:  	$hl_color = hex2rgb('EFEFCC'); break;
-				case TRIGGER_SEVERITY_INFORMATION:  $hl_color = hex2rgb('CCE2CC'); break;
-				case TRIGGER_SEVERITY_NOT_CLASSIFIED:
-				default:
-					$hl_color = null; break;
-			}
-
-	
+		if(isset($_REQUEST['noedit']) && ($highlight == SYSMAP_HIGHLIGH_ON)){
+			$hl_color = null;
 			if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_ON){
 				switch($el_info['priority']){
 					case TRIGGER_SEVERITY_DISASTER: 	$hl_color = hex2rgb('FF0000'); break;
@@ -291,10 +279,10 @@ include_once('include/page_header.php');
 					case TRIGGER_SEVERITY_INFORMATION:  $hl_color = hex2rgb('CCE2CC'); break;
 					case TRIGGER_SEVERITY_NOT_CLASSIFIED:
 					default:
-						$hl_color = null; break;
 				}
 			}
-//$hl_color = hex2rgb('FF0000');
+
+			if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_UNKNOWN)	$hl_color = hex2rgb('CCCCCC');
 			if(isset($el_info['maintenance']))	$hl_color = hex2rgb('EE6000');
 			if(isset($el_info['disabled'])) $hl_color = hex2rgb('AA0000');
 

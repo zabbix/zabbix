@@ -39,6 +39,7 @@ include_once('include/page_header.php');
 		'width'=>			array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
 		'height'=>			array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
 		'backgroundid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,			'isset({save})'),
+		'highlight'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
 		'label_type'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,4),		'isset({save})'),
 		'label_location'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,3),		'isset({save})'),
 /* Actions */
@@ -68,9 +69,11 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST["save"])){
 		if(isset($_REQUEST["sysmapid"])){
 			// TODO check permission by new value.
+			$_REQUEST['highlight'] = get_request('highlight', 0);
+
 			DBstart();
 			update_sysmap($_REQUEST["sysmapid"],$_REQUEST["name"],$_REQUEST["width"],
-				$_REQUEST["height"],$_REQUEST["backgroundid"],$_REQUEST["label_type"],
+				$_REQUEST["height"],$_REQUEST["backgroundid"],$_REQUEST["highlight"],$_REQUEST["label_type"],
 				$_REQUEST["label_location"]);
 			$result = DBend();
 
@@ -82,8 +85,8 @@ include_once('include/page_header.php');
 				access_deny();
 
 			DBstart();
-			add_sysmap($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
-				$_REQUEST["backgroundid"],$_REQUEST["label_type"],$_REQUEST["label_location"]);
+			add_sysmap($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["backgroundid"],
+					$_REQUEST["highlight"],$_REQUEST["label_type"],$_REQUEST["label_location"]);
 			$result = DBend();
 
 			add_audit_if($result,AUDIT_ACTION_ADD,AUDIT_RESOURCE_MAP,'Name ['.$_REQUEST['name'].']');

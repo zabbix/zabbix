@@ -217,6 +217,9 @@
 	define('SYSMAP_ELEMENT_ICON_UNKNOWN',	2);
 	define('SYSMAP_ELEMENT_ICON_MAINTENANCE',3);
 
+	define('SYSMAP_HIGHLIGH_OFF',		0);
+	define('SYSMAP_HIGHLIGH_ON',		1);
+
 	define('ITEM_TYPE_ZABBIX',		0);
 	define('ITEM_TYPE_SNMPV1',		1);
 	define('ITEM_TYPE_TRAPPER',		2);
