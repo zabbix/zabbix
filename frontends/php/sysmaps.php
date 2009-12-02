@@ -53,13 +53,19 @@ include_once('include/page_header.php');
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('sm.name',ZBX_SORT_UP);
+	validate_sort_and_sortorder('name',ZBX_SORT_UP);
 
 	if(isset($_REQUEST['sysmapid'])){
-		if(!sysmap_accessible($_REQUEST['sysmapid'],PERM_READ_WRITE))
-			access_deny();
+		$options = array(
+			'sysmapids' => $_REQUEST['sysmapid'],
+			'editable' => 1,
+			'extendoutput' => 1,
+		);
 
-		$sysmap = DBfetch(DBselect('select * from sysmaps where sysmapid='.$_REQUEST['sysmapid']));
+		$maps = CMap::get($options);
+		
+		if(empty($maps)) access_deny();
+		else $sysmap = reset($maps);
 	}
 ?>
 <?php
@@ -140,6 +146,7 @@ include_once('include/page_header.php');
 	echo SBR;
 ?>
 <?php
+//	COpt::savesqlrequest(0,'/////////////////////////////////////////////////////////////////////////////////////////////////////////');
 	if(isset($_REQUEST["form"])){
 		insert_map_form();
 	}
@@ -153,46 +160,43 @@ include_once('include/page_header.php');
 		$numrows->setAttribute('name','numrows');
 
 		$map_wdgt->addHeader(S_MAPS_BIG);
-//		$map_wdgt->addHeader($numrows);
+		$map_wdgt->addHeader($numrows);
 
 		$table = new CTableInfo(S_NO_MAPS_DEFINED);
 		$table->setHeader(array(
 			new CCheckBox('all_maps',NULL,"checkAll('".$form->getName()."','all_maps','maps');"),
-			make_sorting_header(S_NAME,'sm.name'),
-			make_sorting_header(S_WIDTH,'sm.width'),
-			make_sorting_header(S_HEIGHT,'sm.height'),
-			S_MAP));
+			make_sorting_header(S_NAME,'name'),
+			make_sorting_header(S_WIDTH,'width'),
+			make_sorting_header(S_HEIGHT,'height'),
+			S_EDIT));
 
-/* sorting
-		order_page_result($applications, 'name');
 
-// PAGING UPPER
-		$paging = getPagingLine($applications);
-		$map_wdgt->addItem($paging);
-//-------*/
-		$map_wdgt->addItem(BR());
+		$sortfield = getPageSortField('name');
+		$sortorder = getPageSortOrder();
 
-		$sql = 'SELECT sm.sysmapid, sm.name, sm.width, sm.height '.
-				' FROM sysmaps sm '.
-				' WHERE '.DBin_node('sm.sysmapid').
-				order_by('sm.name,sm.width,sm.height','sm.sysmapid');
-		$result = DBselect($sql);
-		while($row=DBfetch($result)){
-			if(!sysmap_accessible($row['sysmapid'],PERM_READ_WRITE)) continue;
+		$options = array(
+			'editable' => 1,
+			'extendoutput' => 1,
+			'sortfield' => $sortfield,
+			'sortorder' => $sortorder,
+			'limit' => ($config['search_limit']+1)
+		);
+		$maps = CMap::get($options);
 
+// sorting
+		order_result($maps, $sortfield, $sortorder);
+		$paging = getPagingLine($maps);
+//-------
+		
+		foreach($maps as $mnum => $map){
 			$table->addRow(array(
-				new CCheckBox('maps['.$row['sysmapid'].']', NULL, NULL, $row['sysmapid']),
-				new CLink($row['name'], 'sysmap.php?sysmapid='.$row['sysmapid']),
-				$row['width'],
-				$row['height'],
-				new CLink(S_EDIT, 'sysmaps.php?form=update&sysmapid='.$row['sysmapid'].'#form')
+				new CCheckBox('maps['.$map['sysmapid'].']', NULL, NULL, $map['sysmapid']),
+				new CLink($map['name'], 'sysmap.php?sysmapid='.$map['sysmapid']),
+				$map['width'],
+				$map['height'],
+				new CLink(S_EDIT, 'sysmaps.php?form=update&sysmapid='.$map['sysmapid'].'#form')
 				));
 		}
-
-// PAGING FOOTER
-//		$table->addRow(new CCol($paging));
-//		$map_wdgt->addItem($paging);
-//---------
 
 // goBox
 		$goBox = new CComboBox('go');
@@ -205,8 +209,12 @@ include_once('include/page_header.php');
 		$goButton->setAttribute('id','goButton');
 		zbx_add_post_js('chkbxRange.pageGoName = "maps";');
 
-		$table->setFooter(new CCol(array($goBox, $goButton)));
+		$footer = get_table_header(array($goBox, $goButton));
 //------
+
+// PAGING FOOTER
+		$table = array($paging, $table, $paging, $footer);
+//---------
 
 		$form->addItem($table);
 

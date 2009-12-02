@@ -47,14 +47,18 @@ include_once('include/page_header.php');
 	check_fields($fields);
 ?>
 <?php
-	if(!sysmap_accessible($_REQUEST['sysmapid'],PERM_READ_ONLY)){
-		access_deny();
-	}
 
-	if(!$map = get_sysmap_by_sysmapid($_REQUEST['sysmapid'])){
-		include_once('include/page_footer.php');
-	}
+	$options = array(
+		'sysmapids' => $_REQUEST['sysmapid'],
+		'select_selements' => 1,
+		'select_links' => 1,
+		'extendoutput' => 1
+	);
 
+	$maps = CMap::get($options);
+	
+	if(empty($maps)) access_deny();
+	else $map = reset($maps);
 
 	$name		= $map['name'];
 	$width		= $map['width'];
@@ -140,11 +144,7 @@ include_once('include/page_header.php');
 		$selements = $json->decode($selements, true);
 	}
 	else{
-		$selements = array();
-		$res = DBselect('select * from sysmaps_elements where sysmapid='.$_REQUEST['sysmapid']);
-		while($selement = DBfetch($res)){
-			$selements[$selement['selementid']] = $selement;
-		}
+		$selements = $map['selements'];
 	}
 
 	if(isset($_REQUEST['links']) || isset($_REQUEST['nolinks'])){
@@ -152,24 +152,14 @@ include_once('include/page_header.php');
 		$links = $json->decode($links, true);
 	}
 	else{
-		$links = array();
-		$res = DBselect('select * from sysmaps_links where sysmapid='.$_REQUEST['sysmapid']);
-		while($link = DBfetch($res)){
-			$link['linktriggers'] = array();
-
-			$subres = DBselect('SELECT * FROM sysmaps_link_triggers WHERE linkid='.$link['linkid']);
-			while($linktrigger = DBfetch($subres)){
-				$link['linktriggers'][] = $linktrigger;
-			}
-
-			$links[$link['linkid']] = $link;
-		}
+		$links = $map['links'];
 	}
 
 //SDI($links); exit;
 // Draw connectors
-	foreach($links as $linkid => $link){
+	foreach($links as $lnum => $link){
 		if(empty($link)) continue;
+		$linkid = $link['linkid'];
 
 		$selement = $selements[$link['selementid1']];
 		list($x1, $y1) = get_icon_center_by_selement($selement);
@@ -188,8 +178,10 @@ include_once('include/page_header.php');
 			$options['extendoutput'] = 1;
 			$options['triggerids'] = array();
 
-			foreach($linktriggers as $id => $link_trigger){
+			$triggers = array();
+			foreach($linktriggers as $lt_num => $link_trigger){
 				if($link_trigger['triggerid'] == 0) continue;
+				$id = $link_trigger['linktriggerid'];
 
 				$triggers[$id] = zbx_array_merge($link_trigger,get_trigger_by_triggerid($link_trigger['triggerid']));
 				if(($triggers[$id]['status'] == TRIGGER_STATUS_ENABLED) && ($triggers[$id]['value'] == TRIGGER_VALUE_TRUE)){

@@ -88,7 +88,7 @@ function SDI(msg){
 		doc_body.appendChild(div_help);
 		
 		div_help.setAttribute('id','div_help');
-		div_help.setAttribute('style','position: absolute; right: 10px; top: 10px; border: 1px red solid; width: 500px; height: 400px; background-color: white; font-size: 12px; overflow: auto; z-index: 20;');
+		div_help.setAttribute('style','position: absolute; right: 100px; top: 10px; border: 1px red solid; width: 500px; height: 400px; background-color: white; font-size: 12px; overflow: auto; z-index: 20;');
 		
 //		new Draggable(div_help,{});
 	}
@@ -104,6 +104,29 @@ function SDI(msg){
 	
 	div_help.scrollTop = div_help.scrollHeight;
 
+}
+
+function INFO(msg){
+	var div_info = document.getElementById('div_info');
+
+	if((div_info == 'undefined') || empty(div_info)){
+		var div_info = document.createElement('div');
+		var doc_body = document.getElementsByTagName('body')[0];
+		doc_body.appendChild(div_info);
+		
+		div_info.setAttribute('id','div_info');
+		div_info.setAttribute('style','position: absolute; left: 20px; top: 20px; height: 200px; width: 480px; border: 1px grey solid; background-color: white; font-size: 12px; overflow: auto; z-index: 20;');
+	}
+	
+	var pre = document.createElement('pre');
+	pre.appendChild(document.createTextNode(msg));
+	
+	div_info.appendChild(document.createTextNode("INFO: "));
+	div_info.appendChild(document.createElement("br"));
+	div_info.appendChild(pre);
+	div_info.appendChild(document.createElement("br"));
+	
+	div_info.scrollTop = div_info.scrollHeight;
 }
 
 function SDJ(obj){

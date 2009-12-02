@@ -95,7 +95,7 @@ include_once('include/page_header.php');
 				case 'get':
 					$action = '';
 
-					$options = array('sysmapids'=> $sysmapid, 'extendoutput'=>1, 'select_selements'=>1, 'select_links'=>1);
+					$options = array('sysmapids'=> $sysmapid, 'editable'=>1, 'extendoutput'=>1, 'select_selements'=>1, 'select_links'=>1);
 					$sysmaps = CMap::get($options);
 					$db_map = reset($sysmaps);
 //SDII($db_map);
@@ -134,13 +134,17 @@ include_once('include/page_header.php');
 					print($action);
 					break;
 				case 'save':
+					$options = array('sysmapids'=> $sysmapid, 'editable'=>1, 'extendoutput'=>1, 'select_selements'=>1, 'select_links'=>1);
+					$sysmaps = CMap::get($options);
+					if(empty($sysmaps)) print('alert("Access denied!");');
+					
 					$selements = get_request('selements', '[]');
 					$selements = $json->decode($selements, true);
 
 					$links = get_request('links', '[]');
 					$links = $json->decode($links, true);
 
-					
+					@ob_start();					
 					$db_selementids = array();
 					$res = DBselect('SELECT selementid FROM sysmaps_elements WHERE sysmapid='.$sysmapid);
 					while($db_selement = DBfetch($res)){
@@ -198,7 +202,16 @@ include_once('include/page_header.php');
 					
 					$result = DBend(true);
 					
-					print('location.href = "sysmaps.php"');
+					if($result){
+						print('location.href = "sysmaps.php"');
+						ob_flush();
+					}
+					else{
+						$msg = 'Map save operation failed.'."\n\r";
+						$msg.= ob_get_contents();
+						ob_get_clean();
+						print('INFO('.zbx_jsvalue($msg).');');
+					}
 					break;
 			}
 		}
@@ -269,16 +282,24 @@ include_once('include/page_header.php');
 <?php
 	show_table_header(S_CONFIGURATION_OF_NETWORK_MAPS_BIG);
 
-	if(!sysmap_accessible($_REQUEST['sysmapid'],PERM_READ_WRITE)) access_deny();
+	if(isset($_REQUEST['sysmapid'])){
+		$options = array(
+			'sysmapids' => $_REQUEST['sysmapid'],
+			'editable' => 1,
+			'extendoutput' => 1,
+		);
 
-	$sysmap = DBfetch(DBselect('select * from sysmaps where sysmapid='.$_REQUEST['sysmapid']));
+		$maps = CMap::get($options);
+		
+		if(empty($maps)) access_deny();
+		else $sysmap = reset($maps);
+	}
+	
 ?>
 <?php
 	echo SBR;
-	$map = get_sysmap_by_sysmapid($_REQUEST['sysmapid']);
 	
 // ELEMENTS
-
 	$el_add = new CDiv(SPACE,'iconplus');
 	$el_add->setAttribute('title',S_ADD_ELEMENT);
 	$el_add->setAttribute('id','selement_add');
@@ -333,7 +354,7 @@ include_once('include/page_header.php');
 	$container->setAttribute('id','sysmap_cnt');
 	$container->setAttribute('style','position: absolute;');
 	$container->Show();
-	
+
 	zbx_add_post_js('create_map("sysmap_cnt", "'.$sysmap['sysmapid'].'");');
 	
 	insert_js(get_selement_form_menu());
