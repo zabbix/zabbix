@@ -5,9 +5,9 @@ CREATE TABLE sysmaps_tmp
   width integer NOT NULL DEFAULT 0,
   height integer NOT NULL DEFAULT 0,
   backgroundid bigint NOT NULL DEFAULT 0,
-  highlight integer NOT NULL DEFAULT 1,
   label_type integer NOT NULL DEFAULT 0,
-  label_location integer NOT NULL DEFAULT 0
+  label_location integer NOT NULL DEFAULT 0,
+  highlight integer NOT NULL DEFAULT 1
 )
 WITH (
   OIDS=TRUE
