@@ -210,13 +210,7 @@ sub process_table
 			$pkey="";
 		}
 
-		$ifnotexists = "";
-		if ($output{"database"} eq "sqlite")
-		{
-			$ifnotexists = "IF NOT EXISTS ";
-		}
-
-		print "CREATE TABLE $ifnotexists$table_name (\n";
+		print "CREATE TABLE $table_name (\n";
 	}
 }
 
@@ -305,19 +299,13 @@ sub process_index
 
 	($name,$fields)=split(/\|/, $line,2);
 
-	$ifnotexists = "";
-	if($output{"database"} eq "sqlite")
-	{
-		$ifnotexists = "IF NOT EXISTS ";
-	}
-
 	if($unique == 1)
 	{
-		print "CREATE UNIQUE INDEX $ifnotexists${table_name}_$name\ on $table_name ($fields);\n";
+		print "CREATE UNIQUE INDEX ${table_name}_$name\ on $table_name ($fields);\n";
 	}
 	else
 	{
-		print "CREATE INDEX $ifnotexists${table_name}_$name\ on $table_name ($fields);\n";
+		print "CREATE INDEX ${table_name}_$name\ on $table_name ($fields);\n";
 	}
 }
 
