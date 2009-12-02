@@ -1,5 +1,6 @@
 Changes for 1.7.4
 
+ - [ZBX-1325] fixed error when add host or hostgroup with postgre (Vedmak)
  - [DEV-137] removed "IF NOT EXISTS" clauses from Sqlite DB schema (Alexei)
  - [ZBX-1395] fixed map elements highlighting option (Aly)
  - [ZBX-1396] fixes in map element selection (Aly)

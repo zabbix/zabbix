@@ -296,7 +296,7 @@ require_once('include/httptest.inc.php');
 				' FROM hosts_groups '.
 				' WHERE '.DBcondition('hostid', $tmp_hostids).
 					' AND '.DBcondition('groupid', $tmp_groupids);
-		$linked_db = DBexecute($sql);
+		$linked_db = DBselect($sql);
 		while($pair = DBfetch($linked_db)){
 			$linked[$pair['groupid']] = array($pair['hostid'] => $pair['hostid']);
 		}

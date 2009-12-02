@@ -827,7 +827,7 @@ class CTemplate extends CZBXAPI{
 		self::BeginTransaction(__METHOD__);
 		
 		$sql = 'SELECT hostid, templateid FROM hosts_templates WHERE '.DBcondition('hostid', $hostids).' AND '.DBcondition('templateid', $templateids);
-		$linked_db = DBexecute($sql);
+		$linked_db = DBselect($sql);
 		$linked = array();
 		while($pair = DBfetch($linked_db)){
 			$linked[$pair['templateid']] = array($pair['hostid'] => $pair['hostid']);
