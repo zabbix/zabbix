@@ -139,11 +139,11 @@
 
 // Add System Map
 
-	function add_sysmap($name,$width,$height,$backgroundid,$label_type,$label_location){
+	function add_sysmap($name,$width,$height,$backgroundid,$highlight,$label_type,$label_location){
 		$sysmapid=get_dbid('sysmaps','sysmapid');
 
-		$result=DBexecute('insert into sysmaps (sysmapid,name,width,height,backgroundid,label_type,label_location)'.
-			" values ($sysmapid,".zbx_dbstr($name).",$width,$height,".$backgroundid.",$label_type,$label_location)");
+		$result=DBexecute('insert into sysmaps (sysmapid,name,width,height,backgroundid,highlight,label_type,label_location)'.
+			' VALUES ('.$sysmapid.','.zbx_dbstr($name).','.$width.','.$height.','.$backgroundid.','.$highlight.','.$label_type.','.$label_location.')');
 
 		if(!$result)
 			return $result;
@@ -153,10 +153,10 @@
 
 // Update System Map
 
-	function update_sysmap($sysmapid,$name,$width,$height,$backgroundid,$label_type,$label_location){
-		return	DBexecute('update sysmaps set name='.zbx_dbstr($name).",width=$width,height=$height,".
-			"backgroundid=".$backgroundid.",label_type=$label_type,".
-			"label_location=$label_location WHERE sysmapid=$sysmapid");
+	function update_sysmap($sysmapid,$name,$width,$height,$backgroundid,$highlight,$label_type,$label_location){
+		return	DBexecute('UPDATE sysmaps SET name='.zbx_dbstr($name).',width='.$width.',height='.$height.','.
+			'backgroundid='.$backgroundid.',highlight='.$highlight.',label_type='.$label_type.','.
+			'label_location='.$label_location.' WHERE sysmapid='.$sysmapid);
 	}
 
 // Delete System Map

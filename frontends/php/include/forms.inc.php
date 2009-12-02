@@ -6266,7 +6266,6 @@
 			$highlight = get_request('highlight',0);
 		}
 
-
 		$frmMap = new CFormTable($frm_title,'sysmaps.php');
 		$frmMap->setHelp('web.sysmaps.map.php');
 
