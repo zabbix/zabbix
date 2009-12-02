@@ -159,7 +159,7 @@ int	get_value_db(DC_ITEM *item, AGENT_RESULT *result)
 		{
 			if( NULL != (row = odbc_DBfetch(odbc_DBselect(&dbh, db_sql))) )
 			{
-				if (SUCCEED == set_result_type(result, item->value_type, row[0]))
+				if (SUCCEED == set_result_type(result, item->value_type, item->data_type, row[0]))
 					ret = SUCCEED;
 			}
 			else
