@@ -533,7 +533,7 @@ class CApplication extends CZBXAPI{
 		
 		$sql = 'SELECT itemid, applicationid FROM items_applications WHERE '.
 			DBcondition('itemid', $itemids).' AND '.DBcondition('applicationid', $applicationids);
-		$linked_db = DBexecute($sql);
+		$linked_db = DBselect($sql);
 		while($pair = DBfetch($linked_db)){
 			$linked[$pair['applicationid']] = array($pair['itemid'] => $pair['itemid']);
 		}

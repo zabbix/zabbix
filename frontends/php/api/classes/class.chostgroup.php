@@ -698,7 +698,7 @@ class CHostGroup extends CZBXAPI{
 // }}} PERMISSION	
 		
 		$sql = 'SELECT hostid, groupid FROM hosts_groups WHERE '.DBcondition('hostid', $hostids).' AND '.DBcondition('groupid', $groupids);
-		$linked_db = DBexecute($sql);
+		$linked_db = DBselect($sql);
 		while($pair = DBfetch($linked_db)){
 			$linked[$pair['groupid']] = array($pair['hostid'] => $pair['hostid']);
 		}
