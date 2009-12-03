@@ -164,7 +164,7 @@
 	'S_DO_NOT_KEEP_HISTORY_OLDER_THAN'=>	'이력 보존 기간(일)',
 	'S_DO_NOT_KEEP_TRENDS_OLDER_THAN'=>	'트렌드 보존 기간(일)',
 	'S_MASTER_NODE'=>			'마스터 노드',
-	'S_REMOTE'=>				'리모트',
+	'S_CHILD'=>				'리모트',
 	'S_MASTER'=>				'마스터',
 	'S_NODE_UPDATED'=>			'노드를 갱신하였습니다',
 	'S_CANNOT_UPDATE_NODE'=>		'노드를 갱신할 수 없습니다',

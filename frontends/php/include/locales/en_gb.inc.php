@@ -195,7 +195,7 @@
 	'S_DO_NOT_KEEP_HISTORY_OLDER_THAN'=>	'Do not keep history older than (in days)',
 	'S_DO_NOT_KEEP_TRENDS_OLDER_THAN'=>	'Do not keep trends older than (in days)',
 	'S_MASTER_NODE'=>			'Master node',
-	'S_REMOTE'=>				'Remote',
+	'S_CHILD'=>				'Child',
 	'S_MASTER'=>				'Master',
 	'S_NODE_UPDATED'=>			'Node updated',
 	'S_CANNOT_UPDATE_NODE'=>		'Cannot update node',

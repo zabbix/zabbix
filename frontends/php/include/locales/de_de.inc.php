@@ -155,7 +155,7 @@
 	'S_DO_NOT_KEEP_HISTORY_OLDER_THAN'=>			'Verlauf löschen nach (in Tagen)',
 	'S_DO_NOT_KEEP_TRENDS_OLDER_THAN'=>			'Trend löschen nach (in Tagen)',
 	'S_MASTER_NODE'=>			'Hauptknoten',
-	'S_REMOTE'=>			'Remote',
+	'S_CHILD'=>			'Remote',
 	'S_MASTER'=>			'Master',
 	'S_NODE_UPDATED'=>			'Knoten aktualisiert',
 	'S_CANNOT_UPDATE_NODE'=>			'Kann Knoten nicht aktualisieren',
