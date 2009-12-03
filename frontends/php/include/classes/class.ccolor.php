@@ -33,6 +33,8 @@ class CColor extends CObject{
 		$txt->setAttribute('style', 'margin-top: 0px; margin-bottom: 0px');
 
 		$this->addItem(array($txt, $lbl));
+		
+		insert_show_color_picker_javascript();
 	}
 }
 ?>

@@ -398,7 +398,7 @@ class CTrigger extends CZBXAPI{
 						$result[$trigger['triggerid']]['itemids'] = array();
 						$result[$trigger['triggerid']]['items'] = array();
 					}
-					if($options['select_dependencies'] && !isset($result[$trigger['dependencies']]['itemids'])){
+					if($options['select_dependencies'] && !isset($result[$trigger['triggerid']]['dependencies'])){
 						$result[$trigger['triggerid']]['dependencies'] = array();
 					}
 
