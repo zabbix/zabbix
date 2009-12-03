@@ -1,5 +1,6 @@
 Changes for 1.7.4
 
+ - [ZBX-1398] fixed advanced icons selection (Aly)
  - [ZBX-1357] updated French translation. Thanks to alixen (Richlv)
  - [ZBX-1380] improved performance viewing inventory host (vedmak)
  - [ZBX-1334] improved performance of template edit form (vedmak)

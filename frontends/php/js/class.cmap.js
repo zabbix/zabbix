@@ -2141,7 +2141,7 @@ updateForm_selement: function(e, selementid){
 		var advanced_icons = false;
 
 // Icon PROBLEM
-		advanced_icons = (advanced_icons || selement.iconid_on);
+		advanced_icons = (advanced_icons || selement.iconid_on)?true:false;
 		for(var i=0; i<this.selementForm.iconid_on.options.length; i++){
 			if(!isset(i, this.selementForm.iconid_on.options)) continue;
 			
@@ -2151,7 +2151,7 @@ updateForm_selement: function(e, selementid){
 		}
 	
 // Icon UNKNOWN
-		advanced_icons = (advanced_icons || selement.iconid_on);
+		advanced_icons = (advanced_icons || selement.iconid_unknown)?true:false;
 		for(var i=0; i<this.selementForm.iconid_unknown.options.length; i++){
 			if(!isset(i, this.selementForm.iconid_unknown.options)) continue;
 			
@@ -2159,9 +2159,9 @@ updateForm_selement: function(e, selementid){
 				this.selementForm.iconid_unknown.options[i].selected = true;
 			}
 		}
-	
+
 // Icon MAINTENANCE
-		advanced_icons = (advanced_icons || selement.iconid_on);
+		advanced_icons =(advanced_icons || selement.iconid_maintenance)?true:false;
 		for(var i=0; i<this.selementForm.iconid_maintenance.options.length; i++){
 			if(!isset(i, this.selementForm.iconid_maintenance.options)) continue;
 			
@@ -2171,7 +2171,8 @@ updateForm_selement: function(e, selementid){
 		}
 	
 // Icon DISABLED
-		advanced_icons = (advanced_icons || selement.iconid_on);
+		
+		advanced_icons = (advanced_icons || selement.iconid_disabled)?true:false;
 		for(var i=0; i<this.selementForm.iconid_disabled.options.length; i++){
 			if(!isset(i, this.selementForm.iconid_disabled.options)) continue;
 			
