@@ -39,7 +39,8 @@
 		'timezone'=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(-12,+13),	'isset({save})'),
 		'ip'=>				array(T_ZBX_IP,	 O_OPT,	null,	null,			'isset({save})'),
 		'node_type'=>		array(T_ZBX_INT, O_OPT,	null,
-			IN(ZBX_NODE_REMOTE.','.ZBX_NODE_MASTER.','.ZBX_NODE_LOCAL),		'isset({save})&&!isset({nodeid})'),
+			IN(ZBX_NODE_CHILD.','.ZBX_NODE_MASTER.','.ZBX_NODE_LOCAL),		'isset({save})&&!isset({nodeid})'),
+		'masterid' => 		array(T_ZBX_INT, O_OPT,	null,	DB_ID,	null),
 		'port'=>			array(T_ZBX_INT, O_OPT,	null,	BETWEEN(1,65535),	'isset({save})'),
 		'slave_history'=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535),	'isset({save})'),
 		'slave_trends'=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535),	'isset({save})'),
@@ -69,7 +70,7 @@
 /* update */
 			$audit_action = AUDIT_ACTION_UPDATE;
 			DBstart();
-			$result = update_node($_REQUEST['nodeid'],$_REQUEST['new_nodeid'],
+			$result = update_node($_REQUEST['nodeid'], $_REQUEST['new_nodeid'],
 				$_REQUEST['name'], $_REQUEST['timezone'], $_REQUEST['ip'], $_REQUEST['port'],
 				$_REQUEST['slave_history'], $_REQUEST['slave_trends']);
 			$result = DBend($result);
@@ -80,10 +81,11 @@
 /* add */
 			$audit_action = AUDIT_ACTION_ADD;
 
+			$_REQUEST['masterid'] = isset($_REQUEST['masterid']) ? $_REQUEST['masterid'] : null;
 			DBstart();
 			$nodeid = add_node($_REQUEST['new_nodeid'],
 				$_REQUEST['name'], $_REQUEST['timezone'], $_REQUEST['ip'], $_REQUEST['port'],
-				$_REQUEST['slave_history'], $_REQUEST['slave_trends'], $_REQUEST['node_type']);
+				$_REQUEST['slave_history'], $_REQUEST['slave_trends'], $_REQUEST['node_type'], $_REQUEST['masterid']);
 			$result = DBend($nodeid);
 			show_messages($result, S_NODE_ADDED, S_CANNOT_ADD_NODE);
 		}
@@ -110,10 +112,9 @@
 
 	$nodes_wdgt = new CWidget();
 
-	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST);
+	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST, null, null, false);
 
-	$frmForm = new CForm();
-	$frmForm->setMethod('get');
+	$frmForm = new CForm(null, 'get');
 	$cmbConf = new CComboBox('config', 'nodes.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('nodes.php', S_NODES);
 		$cmbConf->addItem('proxies.php', S_PROXIES);
@@ -126,21 +127,19 @@
 	$nodes_wdgt->addPageHeader(S_CONFIGURATION_OF_NODES, $frmForm);
 
 	if(ZBX_DISTRIBUTED){
+		global $ZBX_NODES, $ZBX_LOCMASTERID;
+		
 		if(isset($_REQUEST['form'])){
-			global $ZBX_CURMASTERID;
-
 			$frm_title = S_NODE;
-
 			if(isset($_REQUEST['nodeid'])){
 				$node_data = get_node_by_nodeid($_REQUEST['nodeid']);
-
-				$node_type = detect_node_type($node_data);
-
-				$masterid	= $node_data['masterid'];
-
-				$frm_title = S_NODE.' "'.$node_data['name'].'"';
+				$frm_title .= ' "'.$node_data['name'].'"';
 			}
 
+			$master_node = DBfetch(DBselect('SELECT name FROM nodes WHERE masterid=0 AND nodetype='.ZBX_NODE_LOCAL));
+			$has_master = (!$master_node) ? true : false;
+			
+			
 			$frmNode= new CFormTable($frm_title);
 			$frmNode->setHelp('node.php');
 
@@ -148,48 +147,57 @@
 				$frmNode->addVar('nodeid', $_REQUEST['nodeid']);
 			}
 
-			if(isset($_REQUEST['nodeid']) && (!isset($_REQUEST['form_refresh']) || isset($_REQUEST['register']))){
-				$new_nodeid	= $node_data['nodeid'];
-				$name		= $node_data['name'];
-				$timezone	= $node_data['timezone'];
-				$ip		= $node_data['ip'];
-				$port		= $node_data['port'];
-				$slave_history	= $node_data['slave_history'];
-				$slave_trends	= $node_data['slave_trends'];
+			if(isset($_REQUEST['nodeid']) && !isset($_REQUEST['form_refresh'])){
+				$new_nodeid = $node_data['nodeid'];
+				$name = $node_data['name'];
+				$timezone = $node_data['timezone'];
+				$ip = $node_data['ip'];
+				$port = $node_data['port'];
+				$slave_history = $node_data['slave_history'];
+				$slave_trends = $node_data['slave_trends'];
+				$masterid = $node_data['masterid'];
+				$node_type = detect_node_type($node_data);	
 			}
 			else{
-				$new_nodeid	= get_request('new_nodeid',0);
-				$name 		= get_request('name','');
-				$timezone 	= get_request('timezone', 0);
-				$ip		= get_request('ip','127.0.0.1');
-				$port		= get_request('port',10051);
-				$slave_history	= get_request('slave_history',90);
-				$slave_trends	= get_request('slave_trends',365);
-				$node_type	= get_request('node_type', ZBX_NODE_REMOTE);
-
-				$masterid	= get_request('masterid', get_current_nodeid(false));
+				$new_nodeid = get_request('new_nodeid', 0);
+				$name = get_request('name', '');
+				$timezone = get_request('timezone', 0);
+				$ip = get_request('ip', '127.0.0.1');
+				$port = get_request('port', 10051);
+				$slave_history = get_request('slave_history', 90);
+				$slave_trends = get_request('slave_trends', 365);
+				$node_type = get_request('node_type', ZBX_NODE_CHILD);
+				$masterid = get_request('masterid', get_current_nodeid(false));
 			}
 
-			$master_node = DBfetch(DBselect('SELECT name FROM nodes WHERE nodeid='.$masterid));
 
 			$frmNode->addRow(S_NAME, new CTextBox('name', $name, 40));
-
 			$frmNode->addRow(S_ID, new CNumericBox('new_nodeid', $new_nodeid, 10));
 
-			if(!isset($_REQUEST['nodeid'])){
+			if(isset($_REQUEST['nodeid'])){
+				$cmbNodeType = new CTextBox('node_type_name', node_type2str($node_type), null, 'yes');
+			}
+			else{
 				$cmbNodeType = new CComboBox('node_type', $node_type, 'submit()');
-				$cmbNodeType->addItem(ZBX_NODE_REMOTE, S_REMOTE);
-				if($ZBX_CURMASTERID == 0){
+				$cmbNodeType->addItem(ZBX_NODE_CHILD, S_CHILD);
+				if(!$has_master){
 					$cmbNodeType->addItem(ZBX_NODE_MASTER, S_MASTER);
 				}
 			}
-			else{
-				$cmbNodeType = new CTextBox('node_type_name', node_type2str($node_type), null, 'yes');
-			}
 			$frmNode->addRow(S_TYPE, $cmbNodeType);
 
-			if($node_type == ZBX_NODE_REMOTE){
-				$frmNode->addRow(S_MASTER_NODE, new CTextBox('master_name',	$master_node['name'], 40, 'yes'));
+			if($node_type == ZBX_NODE_CHILD){
+				if(isset($_REQUEST['nodeid'])){
+					$master_cb = new CTextBox('master_name', $ZBX_NODES[$ZBX_NODES[$_REQUEST['nodeid']]['masterid']]['name'], null, 'yes');
+				}
+				else{
+					$master_cb = new CComboBox('masterid', $masterid);
+					foreach($ZBX_NODES as $node){
+						if($node['nodeid'] == $ZBX_LOCMASTERID) continue;
+						$master_cb->addItem($node['nodeid'], $node['name']);
+					}
+				}
+				$frmNode->addRow(S_MASTER_NODE, $master_cb);
 			}
 
 			$cmbTimeZone = new CComboBox('timezone', $timezone);
@@ -198,19 +206,18 @@
 			}
 			$frmNode->addRow(S_TIME_ZONE, $cmbTimeZone);
 			$frmNode->addRow(S_IP, new CTextBox('ip', $ip, 15));
-			$frmNode->addRow(S_PORT, new CNumericBox('port', $port,5));
-			$frmNode->addRow(S_DO_NOT_KEEP_HISTORY_OLDER_THAN, new CNumericBox('slave_history', $slave_history,6));
-			$frmNode->addRow(S_DO_NOT_KEEP_TRENDS_OLDER_THAN, new CNumericBox('slave_trends', $slave_trends,6));
+			$frmNode->addRow(S_PORT, new CNumericBox('port', $port, 5));
+			$frmNode->addRow(S_DO_NOT_KEEP_HISTORY_OLDER_THAN, new CNumericBox('slave_history', $slave_history, 6));
+			$frmNode->addRow(S_DO_NOT_KEEP_TRENDS_OLDER_THAN, new CNumericBox('slave_trends', $slave_trends, 6));
 
 
-			$frmNode->addItemToBottomRow(new CButton('save',S_SAVE));
+			$frmNode->addItemToBottomRow(new CButton('save', S_SAVE));
 			if(isset($_REQUEST['nodeid']) && $node_type != ZBX_NODE_LOCAL){
 				$frmNode->addItemToBottomRow(SPACE);
-				$frmNode->addItemToBottomRow(new CButtonDelete('Delete selected node?',
-					url_param('form').url_param('nodeid')));
+				$frmNode->addItemToBottomRow(new CButtonDelete('Delete selected node?', url_param('form').url_param('nodeid')));
 			}
 			$frmNode->addItemToBottomRow(SPACE);
-			$frmNode->addItemToBottomRow(new CButtonCancel(url_param('config')));
+			$frmNode->addItemToBottomRow(new CButtonCancel());
 
 			$nodes_wdgt->addItem($frmNode);
 		}
@@ -221,46 +228,41 @@
 
 			$table=new CTableInfo(S_NO_NODES_DEFINED);
 			$table->setHeader(array(
-				make_sorting_header(S_ID,'n.nodeid'),
-				make_sorting_header(S_NAME,'n.name'),
-				make_sorting_header(S_TYPE,'n.nodetype'),
-				make_sorting_header(S_TIME_ZONE,'n.timezone'),
-				make_sorting_header(S_IP.':'.S_PORT,'n.ip')
+				make_sorting_header(S_ID, 'n.nodeid'),
+				make_sorting_header(S_NAME, 'n.name'),
+				make_sorting_header(S_TIME_ZONE, 'n.timezone'),
+				make_sorting_header(S_IP.':'.S_PORT, 'n.ip')
 			));
 
 			$sql = 'SELECT n.* '.
 					' FROM nodes n'.
-					' WHERE '.DBcondition('n.nodeid', $available_nodes).
-					order_by('n.nodeid,n.name,n.nodetype,n.timezone,n.ip','n.masterid');
+					order_by('n.nodeid,n.name,n.timezone,n.ip','n.masterid');
 			$db_nodes = DBselect($sql);
-
-			while($row=DBfetch($db_nodes)){
-				$node_type = detect_node_type($row);
-				$node_type_name = node_type2str($node_type);
+			
+			while($node = DBfetch($db_nodes)){
 
 				$table->addRow(array(
-					$row['nodeid'],
+					$node['nodeid'],
 					array(
-						get_node_path($row['masterid']),
-						new CLink(($row['nodetype'] ? new CSpan($row['name'], 'bold') : $row['name']), '?&form=update&nodeid='.$row['nodeid'])),
-					$node_type == ZBX_NODE_LOCAL ? new CSpan($node_type_name, 'bold') : $node_type_name,
-					new CSpan('GMT'.sprintf('%+03d:00', $row['timezone']),	$row['nodetype'] ? 'bold' : null),
-					new CSpan($row['ip'].':'.$row['port'], $row['nodetype'] ? 'bold' : null)
+						get_node_path($node['masterid']),
+						new CLink(($node['nodetype'] ? new CSpan($node['name'], 'bold') : $node['name']), '?&form=update&nodeid='.$node['nodeid'])),
+					new CSpan('GMT'.sprintf('%+03d:00', $node['timezone']), $node['nodetype'] ? 'bold' : null),
+					new CSpan($node['ip'].':'.$node['port'], 
+					$node['nodetype'] ? 'bold' : null)
 				));
 			}
+
 			$nodes_wdgt->addItem($table);
 		}
-
-		$nodes_wdgt->show();
 	}
 	else{
 		$table = new CTableInfo(S_NOT_DM_SETUP);
 		$nodes_wdgt->addItem($table);
-		$nodes_wdgt->show();
 	}
+	
+	$nodes_wdgt->show();
 ?>
 <?php
 
 include_once('include/page_footer.php');
-
 ?>

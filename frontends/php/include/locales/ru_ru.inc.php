@@ -160,7 +160,7 @@
 	'S_DO_NOT_KEEP_HISTORY_OLDER_THAN'=>			'Не сохранять историю старше чем (в днях)',
 	'S_DO_NOT_KEEP_TRENDS_OLDER_THAN'=>			'Не сохранять тенденции старше чем (в днях)',
 	'S_MASTER_NODE'=>			'Главный узел',
-	'S_REMOTE'=>			'Удаленно',
+	'S_CHILD'=>			'Удаленно',
 	'S_MASTER'=>			'Мастер',
 	'S_NODE_UPDATED'=>			'Узел обновлен',
 	'S_CANNOT_UPDATE_NODE'=>			'Невозможно обновить узел',

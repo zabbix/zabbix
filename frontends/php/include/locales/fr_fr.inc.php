@@ -171,7 +171,7 @@
 	'S_DO_NOT_KEEP_HISTORY_OLDER_THAN'=>			'Ne pas conserver l\'historique de plus de (en jours)',
 	'S_DO_NOT_KEEP_TRENDS_OLDER_THAN'=>			'Ne pas conserver les tendances de plus de (en jours)',
 	'S_MASTER_NODE'=>			'Noeud maitre',
-	'S_REMOTE'=>			'Distant',
+	'S_CHILD'=>			'Distant',
 	'S_MASTER'=>			'Maitre',
 	'S_NODE_UPDATED'=>			'Noeud modifié',
 	'S_CANNOT_UPDATE_NODE'=>			'Modification noeud impossible',
