@@ -388,7 +388,7 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 
 /******************************************************************************
  *                                                                            *
- * Function: process_log_regexp                                               *
+ * Function: process_logrt                                                    *
  *                                                                            *
  * Purpose: Get message from logfile with rotation                            *
  *                                                                            *
@@ -408,7 +408,7 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
  *                                                                            *
  *                                                                            *
  ******************************************************************************/
-int	process_log_regexp(char *filename, long *lastlogsize, int *mtime, char **value, const char *encoding)
+int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, const char *encoding)
 {
 	int		i = 0;
 	int		nbytes;
@@ -433,7 +433,7 @@ int	process_log_regexp(char *filename, long *lastlogsize, int *mtime, char **val
 	struct dirent	*d_ent = NULL;
 #endif/*_WINDOWS*/
 	
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_log_regexp() filename [%s] lastlogsize [%li] mtime [%i]",
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_logrt() filename [%s] lastlogsize [%li] mtime [%i]",
 			filename, *lastlogsize, *mtime);
 	
 	/* splitting filename */
