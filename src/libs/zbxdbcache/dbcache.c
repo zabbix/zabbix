@@ -67,7 +67,7 @@ static int		ZBX_TREND_SIZE = 0;
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Aleksander Vladishev                                               *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -76,6 +76,37 @@ void	*DCget_stats(int request)
 {
 	static zbx_uint64_t	value_uint;
 	static double		value_double;
+	char			*first_text = NULL;
+	size_t			free_len = 0;
+	int			i, index;
+
+	switch (request)
+	{
+	case ZBX_STATS_TEXT_USED:
+	case ZBX_STATS_TEXT_FREE:
+	case ZBX_STATS_TEXT_PFREE:
+		free_len = CONFIG_TEXT_CACHE_SIZE;
+
+		LOCK_CACHE;
+
+		for (i = 0; i < cache->history_num; i++)
+		{
+			index = (cache->history_first + i) % ZBX_HISTORY_SIZE;
+			if (cache->history[index].value_type == ITEM_VALUE_TYPE_STR
+					|| cache->history[index].value_type == ITEM_VALUE_TYPE_TEXT
+					|| cache->history[index].value_type == ITEM_VALUE_TYPE_LOG)
+			{
+				first_text = cache->history[index].value_orig.value_str;
+				break;
+			}
+		}
+
+		UNLOCK_CACHE;
+
+		if (NULL != first_text)
+			free_len -= cache->last_text - first_text;
+		break;
+	}
 
 	switch (request)
 	{
@@ -98,28 +129,40 @@ void	*DCget_stats(int request)
 		value_uint = cache->stats.history_text_counter;
 		return &value_uint;
 	case ZBX_STATS_HISTORY_TOTAL:
-		value_uint = ZBX_HISTORY_SIZE;
+		value_uint = CONFIG_HISTORY_CACHE_SIZE;
 		return &value_uint;
 	case ZBX_STATS_HISTORY_USED:
-		value_uint = cache->history_num;
+		value_uint = cache->history_num * sizeof(ZBX_DC_HISTORY);
 		return &value_uint;
 	case ZBX_STATS_HISTORY_FREE:
-		value_uint = ZBX_HISTORY_SIZE - cache->history_num;
+		value_uint = CONFIG_HISTORY_CACHE_SIZE - cache->history_num * sizeof(ZBX_DC_HISTORY);
 		return &value_uint;
 	case ZBX_STATS_HISTORY_PFREE:
 		value_double = 100 * ((double)(ZBX_HISTORY_SIZE - cache->history_num) / ZBX_HISTORY_SIZE);
 		return &value_double;
 	case ZBX_STATS_TREND_TOTAL:
-		value_uint = ZBX_TREND_SIZE;
+		value_uint = CONFIG_TRENDS_CACHE_SIZE;
 		return &value_uint;
 	case ZBX_STATS_TREND_USED:
-		value_uint = cache->trends_num;
+		value_uint = cache->trends_num * sizeof(ZBX_DC_TREND);
 		return &value_uint;
 	case ZBX_STATS_TREND_FREE:
-		value_uint = ZBX_TREND_SIZE - cache->trends_num;
+		value_uint = CONFIG_TRENDS_CACHE_SIZE - cache->trends_num * sizeof(ZBX_DC_TREND);
 		return &value_uint;
 	case ZBX_STATS_TREND_PFREE:
 		value_double = 100 * ((double)(ZBX_TREND_SIZE - cache->trends_num) / ZBX_TREND_SIZE);
+		return &value_double;
+	case ZBX_STATS_TEXT_TOTAL:
+		value_uint = CONFIG_TEXT_CACHE_SIZE;
+		return &value_uint;
+	case ZBX_STATS_TEXT_USED:
+		value_uint = CONFIG_TEXT_CACHE_SIZE - free_len;
+		return &value_uint;
+	case ZBX_STATS_TEXT_FREE:
+		value_uint = free_len;
+		return &value_uint;
+	case ZBX_STATS_TEXT_PFREE:
+		value_double = 100.0 * ((double)free_len / CONFIG_TEXT_CACHE_SIZE);
 		return &value_double;
 	default:
 		return NULL;
