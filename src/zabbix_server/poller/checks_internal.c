@@ -195,6 +195,8 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_HISTORY_USED))
 			else if (0 == strcmp(tmp1, "free"))
 				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_HISTORY_FREE))
+			else
+				goto not_supported;
 		}
 		else if (0 == strcmp(tmp, "trend"))
 		{
@@ -206,6 +208,48 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_TREND_USED))
 			else if (0 == strcmp(tmp1, "free"))
 				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_TREND_FREE))
+			else
+				goto not_supported;
+		}
+		else if (0 == strcmp(tmp, "text"))
+		{
+			if ('\0' == *tmp1 || 0 == strcmp(tmp1, "pfree"))
+				SET_DBL_RESULT(result, *(double *)DCget_stats(ZBX_STATS_TEXT_PFREE))
+			else if (0 == strcmp(tmp1, "total"))
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_TEXT_TOTAL))
+			else if (0 == strcmp(tmp1, "used"))
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_TEXT_USED))
+			else if (0 == strcmp(tmp1, "free"))
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCget_stats(ZBX_STATS_TEXT_FREE))
+			else
+				goto not_supported;
+		}
+		else
+			goto not_supported;
+	}
+	else if (0 == strcmp(tmp, "rcache"))
+	{
+		if (nparams > 3)
+			goto not_supported;
+
+		if (get_param(params, 2, tmp, sizeof(tmp)) != 0)
+			goto not_supported;
+
+		if (get_param(params, 3, tmp1, sizeof(tmp1)) != 0)
+			*tmp1 = '\0';
+
+		if (0 == strcmp(tmp, "buffer"))
+		{
+			if ('\0' == *tmp1 || 0 == strcmp(tmp1, "pfree"))
+				SET_DBL_RESULT(result, *(double *)DCconfig_get_stats(ZBX_CONFSTATS_BUFFER_PFREE))
+			else if (0 == strcmp(tmp1, "total"))
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCconfig_get_stats(ZBX_CONFSTATS_BUFFER_TOTAL))
+			else if (0 == strcmp(tmp1, "used"))
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCconfig_get_stats(ZBX_CONFSTATS_BUFFER_USED))
+			else if (0 == strcmp(tmp1, "free"))
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)DCconfig_get_stats(ZBX_CONFSTATS_BUFFER_FREE))
+			else
+				goto not_supported;
 		}
 		else
 			goto not_supported;
