@@ -27,7 +27,8 @@ class CTweenBox{
 		$this->name = $name.'_tweenbox';
 		$this->varname = $name;
 
-		$this->value = $value;
+		
+		$this->value = zbx_toHash($value, 't');
 
 		$this->id_l = $this->varname.'_left';
 		$this->id_r = $this->varname.'_right';
@@ -50,7 +51,7 @@ class CTweenBox{
 	public function addItem($value, $caption, $selected=null, $enabled='yes'){
 		if(is_null($selected)){
 			if(is_array($this->value)) {
-				if(str_in_array($value,$this->value))
+				if(isset($this->value[$value]))
 					$selected = 1;
 			}
 			else if(strcmp($value,$this->value) == 0){
