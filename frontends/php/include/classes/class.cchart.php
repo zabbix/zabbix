@@ -759,6 +759,9 @@ class CChart extends CGraphDraw{
 					break;
 				}
 			}
+
+			if($interval == 0) $interval = 1;
+
 // diff check
 			$diff_min = ($this->m_minY[$other_side] - floor($this->m_minY[$other_side] / $interval) * $interval);
 			$diff_max = ($this->m_maxY[$other_side] - ceil($this->m_maxY[$other_side] / $interval) * $interval);
@@ -1251,6 +1254,8 @@ class CChart extends CGraphDraw{
 
 			$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_RIGHT];
 			for($i=0;$i<=$hstr_count;$i++){
+				if($hstr_count == 0) continue;
+
 				$str = convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units);
 				imageText($this->im,
 					8,

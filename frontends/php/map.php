@@ -144,7 +144,7 @@ include_once('include/page_header.php');
 		$selements = $json->decode($selements, true);
 	}
 	else{
-		$selements = $map['selements'];
+		$selements = zbx_toHash($map['selements'], 'selementid');
 	}
 
 	if(isset($_REQUEST['links']) || isset($_REQUEST['nolinks'])){
@@ -152,7 +152,7 @@ include_once('include/page_header.php');
 		$links = $json->decode($links, true);
 	}
 	else{
-		$links = $map['links'];
+		$links = zbx_toHash($map['links'],'linkid');
 	}
 
 //SDI($links); exit;
