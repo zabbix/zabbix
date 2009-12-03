@@ -343,7 +343,7 @@ class CScreen extends CZBXAPI{
 
 			$screenid = get_dbid('screens', 'screenid');
 			$sql = 'INSERT INTO screens (screenid, name, hsize, vsize) '.
-				' VALUES ('.$screenid.','.zbx_dbstr($screen['name']).','.$screen['hsize'].','.$screen['vsize'].')';
+				" VALUES ($screenid, ".zbx_dbstr($screen['name']). ", {$screen['hsize']}, {$screen['vsize']})";
 			$result = DBexecute($sql);
 
 			if(!$result) break;
@@ -429,8 +429,8 @@ class CScreen extends CZBXAPI{
 				break;
 			}
 
-			$sql = 'UPDATE screens SET name='.zbx_dbstr($screen['name']).', hsize='.$screen['hsize'].',vsize='.$screen['vsize'].
-				' WHERE screenid='.$screen['screenid'];
+			$sql = 'UPDATE screens SET name='.zbx_dbstr($screen['name']).", hsize={$screen['hsize']}, vsize={$screen['vsize']}
+				WHERE screenid={$screen['screenid']}";
 			$result = DBexecute($sql);
 
 			if(!$result) break;

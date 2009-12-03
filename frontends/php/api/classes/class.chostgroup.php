@@ -557,9 +557,9 @@ class CHostGroup extends CZBXAPI{
 					$group = self::get(array('groupids' => $groupid,  'extendoutput' => 1));
 					$group = reset($group);
 					if($group['internal'] == ZBX_INTERNAL_GROUP)
-						self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'HostGroup ['.$group['name'].'] is internal and can not be deleted');
+						self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, "HostGroup [ {$group['name']} ] is internal and can not be deleted");
 					else
-						self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'HostGroup ['.$group['name'].'] can not be deleted, due to inner hosts can not be unlinked');
+						self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, "HostGroup [ {$group['name']} ] can not be deleted, due to inner hosts can not be unlinked");
 				}
 			}
 			return false;
