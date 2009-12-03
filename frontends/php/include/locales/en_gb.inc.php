@@ -1634,6 +1634,14 @@
 	'S_DISCOVERY_RULES_BIG'=>		'DISCOVERY RULES',
 	'S_DISCOVERY_CHECKS_BIG'=>		'DISCOVERY CHECKS',
 
+//	forms.inc.php
+//	popup_link_tr.php
+	'S_NEW_CONNECTOR'=>			'New connector',
+	'S_EDIT_CONNECTOR'=>			'Edit connector',
+	'S_MAP_ELEMENT'=>			'Map element',
+	'S_NEW_MAP_ELEMENT'=>			'New map element',
+
+
 //	tr_logform.php
 	'S_INCLUDE'=>		'Include',
 	'S_EXCLUDE'=>		'Exclude',

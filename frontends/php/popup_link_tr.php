@@ -84,7 +84,7 @@ return true;
 	else if(isset($_REQUEST['form'])){
 		echo SBR;
 
-		$frmCnct = new CFormTable('New connector', 'popup_link_tr.php');
+		$frmCnct = new CFormTable(S_NEW_CONNECTOR, 'popup_link_tr.php');
 		$frmCnct->setName('connector_form');
 //		$frmCnct->SetHelp('web.sysmap.connector.php');
 
