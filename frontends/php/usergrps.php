@@ -192,11 +192,10 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 
 		if(!empty($groups)){
 			DBstart();
-			$go_result = delete_user_group($groupids,$_REQUEST['set_gui_access']);
+			$go_result = delete_user_group($groupids);
 			$go_result = DBend($go_result);
 
 			if($go_result){
-				$audit_action = ($_REQUEST['set_gui_access'] == GROUP_GUI_ACCESS_DISABLED)?AUDIT_ACTION_DISABLE:AUDIT_ACTION_UPDATE;
 				foreach($groups as $groupid => $group){
 					add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER_GROUP,'Group name ['.$group['name'].']');
 				}
