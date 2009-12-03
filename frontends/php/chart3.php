@@ -79,10 +79,13 @@ include_once('include/page_header.php');
 	$graph = new CChart(get_request('graphtype'	,GRAPH_TYPE_NORMAL));
 
 	$chart_header = '';
-	if(id2nodeid($host['hostid']) != get_current_nodeid()){
-		$chart_header = get_node_name_by_elid($host['hostid'],true, ': ');
+	if(isset($host)){
+		if(id2nodeid($host['hostid']) != get_current_nodeid()){
+			$chart_header = get_node_name_by_elid($host['hostid'],true, ': ');
+		}
+		$chart_header.= $host['host'].':';
 	}
-	$chart_header.= $host['host'].':'.get_request('name','');
+	$chart_header.=get_request('name','');
 
 	$graph->setHeader($chart_header);
 
