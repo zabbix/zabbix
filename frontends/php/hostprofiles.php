@@ -58,62 +58,6 @@
 
 	$_REQUEST['prof_type'] = get_request('prof_type', 0);
 
-// get groups {{{
-	$options = array(
-		'nodeids' => get_current_nodeid(),
-		'real_hosts' => 1,
-		'extendoutput' => 1
-	);
-	$groups = CHostGroup::get($options);
-	$groups = zbx_toHash($groups, 'groupid');
-	
-	if(!isset($groups[$_REQUEST['groupid']])) $_REQUEST['groupid'] = 0;
-// }}} get groups
-
-
-	$sortfield = getPageSortField('host');
-	$sortorder = getPageSortOrder();
-	$options = array(
-		'extendoutput' => 1,
-		'sortfield' => $sortfield,
-		'sortorder' => $sortorder,
-		'select_profile' => 1,
-		'select_groups' => 1,
-		'limit' => ($config['search_limit']+1)
-	);
-	if($_REQUEST['groupid'] > 0){
-		$options['groupids'] = $_REQUEST['groupid'];
-	}
-	else{
-		$options['groupids'] = zbx_objectValues($groupids, 'groupid');
-	}
-	$hosts = CHost::get($options);
-
-
-// unset hosts without profiles, and copy some profile fileds to the uppers array level for sorting
-	$pr = ($_REQUEST['prof_type'] == 0) ? 'profile' : 'profile_ext';
-	$profile = array();
-	foreach($hosts as $num => $host){
-		if(empty($host[$pr])){
-			unset($hosts[$num]);
-		}
-		else{
-			if($_REQUEST['prof_type'] == 0){
-				$hosts[$num]['pr_name'] = $host['profile']['name'];
-				$hosts[$num]['pr_os'] = $host['profile']['os'];
-				$hosts[$num]['pr_serialno'] = $host['profile']['serialno'];
-				$hosts[$num]['pr_tag'] = $host['profile']['tag'];
-				$hosts[$num]['pr_macaddress'] = $host['profile']['macaddress'];
-			}
-			else{
-				$hosts[$num]['pre_device_os_short'] = $host['profile_ext']['device_os_short'];
-				$hosts[$num]['pre_device_hw_arch'] = $host['profile_ext']['device_hw_arch'];
-				$hosts[$num]['pre_device_type'] = $host['profile_ext']['device_type'];
-				$hosts[$num]['pre_device_status'] = $host['profile_ext']['device_status'];
-			}
-		}
-	}
-
 	$hostprof_wdgt = new CWidget();
 
 	$profile_form = new CForm(null, 'get');
@@ -138,6 +82,62 @@
 		}
 	}
 	else{
+// get groups {{{
+		$options = array(
+			'nodeids' => get_current_nodeid(),
+			'real_hosts' => 1,
+			'extendoutput' => 1
+		);
+		$groups = CHostGroup::get($options);
+		$groups = zbx_toHash($groups, 'groupid');
+		
+		if(!isset($groups[$_REQUEST['groupid']])) $_REQUEST['groupid'] = 0;
+// }}} get groups
+
+
+		$sortfield = getPageSortField('host');
+		$sortorder = getPageSortOrder();
+		$options = array(
+			'extendoutput' => 1,
+			'sortfield' => $sortfield,
+			'sortorder' => $sortorder,
+			'select_profile' => 1,
+			'select_groups' => 1,
+			'limit' => ($config['search_limit']+1)
+		);
+		if($_REQUEST['groupid'] > 0){
+			$options['groupids'] = $_REQUEST['groupid'];
+		}
+		else{
+			$options['groupids'] = zbx_objectValues($groupids, 'groupid');
+		}
+		$hosts = CHost::get($options);
+
+
+	// unset hosts without profiles, and copy some profile fileds to the uppers array level for sorting
+		$pr = ($_REQUEST['prof_type'] == 0) ? 'profile' : 'profile_ext';
+		$profile = array();
+		foreach($hosts as $num => $host){
+			if(empty($host[$pr])){
+				unset($hosts[$num]);
+			}
+			else{
+				if($_REQUEST['prof_type'] == 0){
+					$hosts[$num]['pr_name'] = $host['profile']['name'];
+					$hosts[$num]['pr_os'] = $host['profile']['os'];
+					$hosts[$num]['pr_serialno'] = $host['profile']['serialno'];
+					$hosts[$num]['pr_tag'] = $host['profile']['tag'];
+					$hosts[$num]['pr_macaddress'] = $host['profile']['macaddress'];
+				}
+				else{
+					$hosts[$num]['pre_device_os_short'] = $host['profile_ext']['device_os_short'];
+					$hosts[$num]['pre_device_hw_arch'] = $host['profile_ext']['device_hw_arch'];
+					$hosts[$num]['pre_device_type'] = $host['profile_ext']['device_type'];
+					$hosts[$num]['pre_device_status'] = $host['profile_ext']['device_status'];
+				}
+			}
+		}
+	
 		$r_form = new CForm(null, 'get');
 		$r_form->addVar('prof_type', $_REQUEST['prof_type']);
 
@@ -158,7 +158,6 @@
 
 		order_result($hosts, $sortfield, $sortorder);
 		$paging = getPagingLine($hosts);
-
 
 		$table = new CTableInfo();
 
