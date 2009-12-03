@@ -27,6 +27,7 @@
 #include "dbcache.h"
 #include "dbsyncer.h"
 
+extern int	ZBX_SYNC_MAX;
 /******************************************************************************
  *                                                                            *
  * Function: main_dbsyncer_loop                                               *

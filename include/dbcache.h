@@ -31,11 +31,6 @@
 #define ZBX_DC_ID struct zbx_dc_id_type
 #define ZBX_DC_IDS struct zbx_dc_ids_type
 
-#define	ZBX_HISTORY_SIZE	100000
-/* Must be less than ZBX_HISTORY_SIZE */
-#define	ZBX_SYNC_MAX		1000
-#define	ZBX_TREND_SIZE		100000
-#define	ZBX_TEXTBUFFER_SIZE	16384*1024
 #define ZBX_IDS_SIZE		7
 
 #define ZBX_SYNC_PARTIAL	0
@@ -46,6 +41,9 @@
 
 extern char	*CONFIG_FILE;
 extern int	CONFIG_DBCONFIG_SIZE;
+extern int	CONFIG_HISTORY_CACHE_SIZE;
+extern int	CONFIG_TRENDS_CACHE_SIZE;
+extern int	CONFIG_TEXT_CACHE_SIZE;
 extern int	CONFIG_POLLER_FORKS;
 extern int	CONFIG_IPMIPOLLER_FORKS;
 extern int	CONFIG_UNREACHABLE_POLLER_FORKS;
@@ -79,15 +77,15 @@ ZBX_DC_HISTORY
 	unsigned char	value_type;
 	history_value_t	value_orig;
 	history_value_t	value;
-	int		value_null;
+	unsigned char	value_null;
 	int		timestamp;
 	char		*source;
 	int		severity;
 	int		logeventid;
 	int		lastlogsize;
 	int		mtime;
-	int		keep_history;
-	int		keep_trends;
+	unsigned char	keep_history;
+	unsigned char	keep_trends;
 	int		functions;
 };
 
@@ -104,22 +102,12 @@ ZBX_DC_TREND
 
 ZBX_DC_STATS
 {
-	zbx_uint64_t	buffer_history_num_float;	/* Number of floats in the buffer */
-	zbx_uint64_t	buffer_history_num_uint;
-	zbx_uint64_t	buffer_history_num_str;
-	zbx_uint64_t	buffer_history_num_log;
-	zbx_uint64_t	buffer_history_num_text;
 	zbx_uint64_t	history_counter;	/* Total number of saved values in th DB */
 	zbx_uint64_t	history_float_counter;	/* Number of saved float values in th DB */
 	zbx_uint64_t	history_uint_counter;	/* Number of saved uint values in the DB */
 	zbx_uint64_t	history_str_counter;	/* Number of saved str values in the DB */
 	zbx_uint64_t	history_log_counter;	/* Number of saved log values in the DB */
 	zbx_uint64_t	history_text_counter;	/* Number of saved text values in the DB */
-	zbx_uint64_t	add_trend_counter;	/* Total number of saved trends in the DB */
-	zbx_uint64_t	add_trend_float_counter;/* Number of saved float trends in the DB */
-	zbx_uint64_t	add_trend_uint_counter;	/* Number of saved uint trends in the DB */
-	zbx_uint64_t	update_trigger_counter;	/* Total number of updated triggers */
-	zbx_uint64_t	queries_counter;	/* Total number of executed queries */
 };
 
 ZBX_DC_CACHE
@@ -128,9 +116,9 @@ ZBX_DC_CACHE
 	int		history_num;
 	int		trends_num;
 	ZBX_DC_STATS	stats;
-	ZBX_DC_HISTORY	history[ZBX_HISTORY_SIZE];
-	ZBX_DC_TREND	trends[ZBX_TREND_SIZE];
-	char		text[ZBX_TEXTBUFFER_SIZE];
+	ZBX_DC_HISTORY	*history;	/* [ZBX_HISTORY_SIZE] */
+	ZBX_DC_TREND	*trends;	/* [ZBX_TREND_SIZE] */
+	char		*text;		/* [ZBX_TEXTBUFFER_SIZE] */
 	char		*last_text;
 };
 
