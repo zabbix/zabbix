@@ -945,7 +945,7 @@ return $result;
 
 function zbx_cleanHashes($value){
 	if(is_array($value)){
-		if(ctype_digit(key($value))){
+		if(ctype_digit((string) key($value))){
 			$value = array_values($value);
 		}
 
