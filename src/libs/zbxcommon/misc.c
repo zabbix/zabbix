@@ -1559,3 +1559,57 @@ void	uint64_array_rm(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, in
 		(*num)--;
 	}
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: str2uint64                                                       *
+ *                                                                            *
+ * Purpose: convert string to 64bit unsigned integer                          *
+ *                                                                            *
+ * Parameters: str - string to convert                                        *
+ *             value - pointer to retirned value                              *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is unsigned integer                    *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments: the function automatically processes prefixes 'K','M','G'        *
+ *                                                                            *
+ ******************************************************************************/
+int	str2uint64(char *str, zbx_uint64_t *value)
+{
+	size_t	sz;
+	int	factor = 1, ret;
+	char	c = '\0';
+
+	sz = strlen(str) - 1;
+
+	if (str[sz] == 'K')
+	{
+		c = str[sz];
+		factor = 1024;
+	}
+	else if (str[sz] == 'M')
+	{
+		c = str[sz];
+		factor = 1024 * 1024;
+	}
+	else if (str[sz] == 'G')
+	{
+		c = str[sz];
+		factor = 1024 * 1024 * 1024;
+	}
+
+	if ('\0' != c)
+		str[sz] = '\0';
+
+	if (SUCCEED == (ret = is_uint64(str, value)))
+		*value *= factor;
+
+	if ('\0' != c)
+		str[sz] = c;
+
+	return ret;
+}
+

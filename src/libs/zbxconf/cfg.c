@@ -112,7 +112,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 		*parameter,
 		*value;
 
-	int	var;
+	zbx_uint64_t	var;
 
 	int	result = SUCCEED;
 
@@ -189,7 +189,8 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 					}
 					else if(TYPE_INT == cfg[i].type)
 					{
-						var = atoi(value);
+						if (FAIL == str2uint64(value, &var))
+							goto lbl_incorrect_config;
 
 						if ( (cfg[i].min && var < cfg[i].min) ||
 							(cfg[i].max && var > cfg[i].max) )

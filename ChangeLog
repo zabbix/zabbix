@@ -1,5 +1,6 @@
 Changes for 1.7.4
 
+ - [DEV-438] added support of suffixes (K,M,G) in configuration parameters (Sasha)
  - [DEV-369] item check "log.regexp" was renamed to "logrt" to specify "log rotation" (Dmitry)
  - [DEV-339] added more internal checks zabbix[wcache,*] and abbix[rcache,*] (Sasha)
  - [ZBX-1209] fixed new node not shown in the list after adding (Vedmak)
