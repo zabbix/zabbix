@@ -53,6 +53,10 @@ zbx_process_t		zbx_process;
 
 extern int		CONFIG_DBSYNCER_FREQUENCY;
 
+static int		ZBX_HISTORY_SIZE = 0;
+int			ZBX_SYNC_MAX = 1000;	/* Must be less than ZBX_HISTORY_SIZE */
+static int		ZBX_TREND_SIZE = 0;
+
 /******************************************************************************
  *                                                                            *
  * Function: DCget_stats                                                      *
@@ -811,8 +815,8 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 		}
 		else
 		{
-			h->keep_history = item.history;
-			h->keep_trends = item.trends;
+			h->keep_history = (unsigned char)(item.history ? 1 : 0);
+			h->keep_trends = (unsigned char)(item.trends ? 1 : 0);
 		}
 
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "update items set lastclock=%d",
@@ -1893,7 +1897,7 @@ static int DCitem_already_exists(ZBX_DC_HISTORY *history, int history_num, zbx_u
  ******************************************************************************/
 int	DCsync_history(int sync_type)
 {
-	static ZBX_DC_HISTORY	history[ZBX_SYNC_MAX];
+	static ZBX_DC_HISTORY	*history = NULL;
 	int			i, j, history_num, n, f;
 	int			syncs;
 	int			total_num = 0;
@@ -1912,6 +1916,9 @@ int	DCsync_history(int sync_type)
 
 	if (0 == cache->history_num)
 		return 0;
+
+	if (NULL == history)
+		history = zbx_malloc(history, ZBX_SYNC_MAX * sizeof(ZBX_DC_HISTORY));
 
 	syncs = cache->history_num / ZBX_SYNC_MAX;
 	max_delay = (int)time(NULL) - CONFIG_DBSYNCER_FREQUENCY;
@@ -2058,7 +2065,7 @@ static void DCvacuum_text()
 		if (0 == (offset = first_text - cache->text))
 			return;
 
-		memmove(cache->text, first_text, ZBX_TEXTBUFFER_SIZE - offset);
+		memmove(cache->text, first_text, CONFIG_TEXT_CACHE_SIZE - offset);
 
 		for (i = 0; i < cache->history_num; i++)
 		{
@@ -2097,7 +2104,7 @@ static ZBX_DC_HISTORY *DCget_history_ptr(zbx_uint64_t itemid, size_t text_len)
 {
 	ZBX_DC_HISTORY	*history;
 	int		index;
-	size_t		free_len, sz;
+	size_t		free_len;
 
 retry:
 	if (cache->history_num >= ZBX_HISTORY_SIZE)
@@ -2114,21 +2121,19 @@ retry:
 
 	if (0 != text_len)
 	{
-		sz = sizeof(cache->text);
-
-		if (text_len > sz)
+		if (text_len > CONFIG_TEXT_CACHE_SIZE)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Insufficient shared memory");
 			exit(-1);
 		}
 
-		free_len = sz - (cache->last_text - cache->text);
+		free_len = CONFIG_TEXT_CACHE_SIZE - (cache->last_text - cache->text);
 
 		if (text_len > free_len)
 		{
 			DCvacuum_text();
 
-			free_len = sz - (cache->last_text - cache->text);
+			free_len = CONFIG_TEXT_CACHE_SIZE - (cache->last_text - cache->text);
 
 			if (text_len > free_len)
 			{
@@ -2400,8 +2405,16 @@ void	init_database_cache(zbx_process_t p)
 
 	ZBX_GET_SHM_DBCACHE_KEY(shm_key);
 
-	sz = sizeof(ZBX_DC_IDS);
-	sz += sizeof(ZBX_DC_CACHE);
+	ZBX_HISTORY_SIZE = CONFIG_HISTORY_CACHE_SIZE / sizeof(ZBX_DC_HISTORY);
+	ZBX_TREND_SIZE = CONFIG_TRENDS_CACHE_SIZE / sizeof(ZBX_DC_TREND);
+	if (ZBX_SYNC_MAX > ZBX_HISTORY_SIZE)
+		ZBX_SYNC_MAX = ZBX_HISTORY_SIZE;
+
+	sz = sizeof(ZBX_DC_CACHE);
+	sz += ZBX_HISTORY_SIZE * sizeof(ZBX_DC_HISTORY);
+	sz += ZBX_TREND_SIZE * sizeof(ZBX_DC_TREND);
+	sz += CONFIG_TEXT_CACHE_SIZE;
+	sz += sizeof(ZBX_DC_IDS);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In init_database_cache() size:%d", (int)sz);
 
@@ -2435,10 +2448,18 @@ void	init_database_cache(zbx_process_t p)
 	cache->history_first = 0;
 	cache->history_num = 0;
 	cache->trends_num = 0;
-	cache->last_text = cache->text;
 
 	ptr += sizeof(ZBX_DC_CACHE);
+	cache->history = ptr;
 
+	ptr += ZBX_HISTORY_SIZE * sizeof(ZBX_DC_HISTORY);
+	cache->trends = ptr;
+
+	ptr += ZBX_TREND_SIZE * sizeof(ZBX_DC_TREND);
+	cache->text = ptr;
+	cache->last_text = cache->text;
+
+	ptr += CONFIG_TEXT_CACHE_SIZE;
 	ids = ptr;
 	memset(ids, 0, sizeof(ZBX_DC_IDS));
 	memset(&cache->stats, 0, sizeof(ZBX_DC_STATS));

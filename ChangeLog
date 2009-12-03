@@ -1,5 +1,6 @@
 Changes for 1.7.4
 
+ - [DEV-411] added configuration parameters for dbcache module (Sasha)
  - [ZBX-1090] fixes for returned values from API calls (Aly)
  - [ZBX-1356] fixed undefined errors on user group deletion (Aly)
  - [ZBX-1403] fixed discovery widget to show only discovery from selected node (Aly)
