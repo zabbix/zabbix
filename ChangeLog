@@ -1,5 +1,6 @@
 Changes for 1.7.4
 
+ - [ZBX-1380] improved performance viewing inventory host (vedmak)
  - [ZBX-1334] improved performance of template edit form (vedmak)
  - [DEV-438] added support of suffixes (K,M,G) in configuration parameters (Sasha)
  - [DEV-369] item check "log.regexp" was renamed to "logrt" to specify "log rotation" (Dmitry)
