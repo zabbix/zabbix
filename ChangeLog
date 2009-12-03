@@ -1,5 +1,6 @@
 Changes for 1.7.4
 
+ - [DEV-339] added more internal checks zabbix[wcache,*] and abbix[rcache,*] (Sasha)
  - [ZBX-1209] fixed new node not shown in the list after adding (Vedmak)
  - [ZBX-1221] fixed node adding mechanizm (Vedmak)
  - [ZBX-1400] changed none working time highlight color for default graph themes (Aly)

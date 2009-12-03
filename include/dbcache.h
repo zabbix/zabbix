@@ -219,6 +219,10 @@ void	DCflush_nextchecks();
 #define ZBX_STATS_TREND_USED		11
 #define ZBX_STATS_TREND_FREE		12
 #define ZBX_STATS_TREND_PFREE		13
+#define ZBX_STATS_TEXT_TOTAL		14
+#define ZBX_STATS_TEXT_USED		15
+#define ZBX_STATS_TEXT_FREE		16
+#define ZBX_STATS_TEXT_PFREE		17
 void	*DCget_stats(int request);
 
 zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int num);
@@ -244,5 +248,11 @@ void	DCreset_item_nextcheck(zbx_uint64_t itemid);
 
 void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
 		int maintenance_type, int maintenance_from);
+
+#define ZBX_CONFSTATS_BUFFER_TOTAL	1
+#define ZBX_CONFSTATS_BUFFER_USED	2
+#define ZBX_CONFSTATS_BUFFER_FREE	3
+#define ZBX_CONFSTATS_BUFFER_PFREE	4
+void	*DCconfig_get_stats(int request);
 
 #endif

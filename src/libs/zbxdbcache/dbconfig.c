@@ -3233,3 +3233,42 @@ void	DCconfig_set_maintenance(zbx_uint64_t hostid, int maintenance_status,
 unlock:
 	UNLOCK_CACHE;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_get_stats                                               *
+ *                                                                            *
+ * Purpose: get statistics of the database cache                              *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	*DCconfig_get_stats(int request)
+{
+	static zbx_uint64_t	value_uint;
+	static double		value_double;
+
+	switch (request)
+	{
+	case ZBX_CONFSTATS_BUFFER_TOTAL:
+		value_uint = CONFIG_DBCONFIG_SIZE;
+		return &value_uint;
+	case ZBX_CONFSTATS_BUFFER_USED:
+		value_uint = CONFIG_DBCONFIG_SIZE - config->free_mem;
+		return &value_uint;
+	case ZBX_CONFSTATS_BUFFER_FREE:
+		value_uint = config->free_mem;
+		return &value_uint;
+	case ZBX_CONFSTATS_BUFFER_PFREE:
+		value_double = 100.0 * ((double)config->free_mem / CONFIG_DBCONFIG_SIZE);
+		return &value_double;
+	default:
+		return NULL;
+	}
+}
