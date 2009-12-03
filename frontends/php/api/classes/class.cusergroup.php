@@ -576,7 +576,8 @@ class CUserGroup extends CZBXAPI{
 		foreach($usrgrps as $ugnum => $usrgrp){
 			foreach($users as $unaum => $user){
 				$users_groups_id = get_dbid('users_groups', 'id');
-				$sql = "INSERT INTO users_groups (id, usrgrpid, userid) VALUES ($users_groups_id, {$usrgrp['usrgrpid']}, {$user['userid']})";
+				$sql = 'INSERT INTO users_groups (id, usrgrpid, userid) '.
+						' VALUES ('.$users_groups_id.','.$usrgrp['usrgrpid'].','.$user['userid'].')';
 				$result = DBexecute($sql);
 				if(!$result){
 					$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Error adding user to group');

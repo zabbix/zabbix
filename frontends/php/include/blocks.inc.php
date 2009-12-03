@@ -624,9 +624,10 @@ function make_discovery_status(){
 		$drules[$drule_data['druleid']]['down'] = 0;
 	}
 
-	$db_dhosts = DBselect('SELECT d.* '.
-					' FROM dhosts d '.
-					' ORDER BY d.dhostid,d.status,d.ip');
+	$sql = 'SELECT d.* '.
+			' FROM dhosts d '.
+			' ORDER BY d.dhostid,d.status';
+	$db_dhosts = DBselect($sql);
 
 	$services = array();
 	$discovery_info = array();

@@ -7166,7 +7166,7 @@
 		foreach($macros as $macroid => $macro){
 			$macros_tbl->addItem(new CVar('macros['.$macro['macro'].']', $macro));
 			$macros_tbl->addRow(array(
-				new CCheckBox("macros_rem[{$macro['macro']}]", 'no', null, $macro['macro']),
+				new CCheckBox('macros_rem['.$macro['macro'].']', 'no', null, $macro['macro']),
 				$macro['macro'],
 				SPACE.RARR.SPACE,
 				$macro['value']

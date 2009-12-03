@@ -1060,11 +1060,11 @@
 		$macros_list_tbl = new CTable(S_NO_MACROS_DEFINED);
 		foreach($macros as $macro){
 			$macros_list_tbl->addRow(array(
-				new CCheckBox("macros_rem[{$macro['globalmacroid']}]", 'no', null, $macro['globalmacroid']),
+				new CCheckBox('macros_rem['.$macro['globalmacroid'].']', 'no', null, $macro['globalmacroid']),
 				array(
-					new CTextBox("macros[{$macro['macro']}][macro]", $macro['macro'], 20, true),
+					new CTextBox('macros['.$macro['macro'].'][macro]', $macro['macro'], 20, true),
 					SPACE.RARR.SPACE,
-					new CTextBox("macros[{$macro['macro']}][value]", $macro['value'], 20, true))
+					new CTextBox('macros['.$macro['macro'].'][value]', $macro['value'], 20, true))
 			));
 		}
 
