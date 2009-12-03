@@ -462,9 +462,10 @@ include_once('include/page_header.php');
 			$groups = zbx_objectValues($groups, 'groupid');
 
 // get template hosts from db
-			$params = array('templateids' => $templateid, 'editable' => 1, 'templated_hosts' => 1, 'preservekeys' => 1);
+			$params = array('templateids' => $templateid, 'editable' => 1, 'templated_hosts' => 1);
 			$hosts_linked_to = CHost::get($params);
 			$hosts_linked_to = zbx_objectValues($hosts_linked_to, 'hostid');
+			$hosts_linked_to = zbx_toHash($hosts_linked_to, 'hostid');
 			$templates = $original_templates;
 		}
 		else{
@@ -523,11 +524,12 @@ include_once('include/page_header.php');
 			'extendoutput' => 1);
 		$db_hosts = CHost::get($params);
 		order_result($db_hosts, 'host');
+
 		foreach($db_hosts as $hnum => $db_host){
-			if(!isset($hosts_linked_to[$db_host['hostid']])) // add all except selected hosts
+			if(isset($hosts_linked_to[$db_host['hostid']])) continue;// add all except selected hosts
 			$host_tb->addItem($db_host['hostid'], $db_host['host']);
 		}
-
+		
 // select selected hosts and add them
 		$params = array(
 			'hostids' => $hosts_linked_to,
