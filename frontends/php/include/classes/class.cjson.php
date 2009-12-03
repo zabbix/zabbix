@@ -142,13 +142,11 @@ class CJSON{
 
 		}
 		else {
-
-			// Fall back to PHP-only method
+// Fall back to PHP-only method
 			$encoded = $this->_json_encode($valueToEncode);
-
 		}
 
-		// Sometimes you just don't want some values quoted
+// Sometimes you just don't want some values quoted
 		if(!empty($deQuote)){
 			$encoded = $this->_deQuote($encoded, $deQuote);
 		}
