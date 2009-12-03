@@ -1,5 +1,6 @@
 Changes for 1.7.4
 
+ - [ZBX-137] added patch for Oracle (Alexei)
  - [ZBX-1372] applied patches for localization (Aly)
  - [ZBX-1378] allowed using months in age view (Aly)
  - [ZBX-1301] fixed discovery hosts view in dashboard (Aly)
