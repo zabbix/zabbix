@@ -23,13 +23,13 @@
 	function update_node_profile($nodeids){
 		global $USER_DETAILS;
 
-		$sql = 'DELETE FROM profiles WHERE userid='.$USER_DETAILS['userid'].' AND idx='.zbx_dbstr('web.nodes.selected');
+		$sql = "DELETE FROM profiles WHERE userid={$USER_DETAILS['userid']} AND idx='web.nodes.selected'";
 		DBexecute($sql);
 
 		foreach($nodeids as $nodeid){
 			$profileid = get_dbid('profiles', 'profileid');
 			$sql='INSERT INTO profiles (profileid, userid, idx, value_id, type)'.
-				' VALUES ('.$profileid.','.$USER_DETAILS['userid'].', '.zbx_dbstr('web.nodes.selected').','.$nodeid.', 4)';
+				" VALUES ($profileid, {$USER_DETAILS['userid']}, 'web.nodes.selected', $nodeid, 4)";
 			DBexecute($sql);
 		}
 	}
@@ -38,7 +38,7 @@
 		global $USER_DETAILS;
 		$result = array();
 
-		$sql = 'SELECT value_id FROM profiles WHERE userid='.$USER_DETAILS['userid'].' AND idx='.zbx_dbstr('web.nodes.selected');
+		$sql = "SELECT value_id FROM profiles WHERE userid={$USER_DETAILS['userid']} AND idx='web.nodes.selected'";
 		$db_profiles = DBselect($sql);
 		while($profile = DBfetch($db_profiles)){
 			$result[] = $profile['value_id'];

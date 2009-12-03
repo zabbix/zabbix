@@ -49,8 +49,6 @@ if(!isset($DB)){
 			$result = false;
 		}
 		else{
-			$DB['TYPE'] = strtoupper($DB['TYPE']);
-
 			switch($DB['TYPE']){
 				case 'MYSQL':
 					$mysql_server = $DB['SERVER'].( !empty($DB['PORT']) ? ':'.$DB['PORT'] : '');
@@ -570,21 +568,14 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 				}
 				break;
 		}
-/*
-		if($result === false){
-			switch($DB['TYPE']){
-				case 'MYSQL': mysql_free_result($cursor); break;
-				case 'POSTGRESQL': pg_free_result($cursor); break;
-				case 'ORACLE': oci_free_statement($cursor); break;
-			}
-		}
-//*/
+
 	return $result;
 	}
 
-// string value prepearing
+/* string value prepearing */
 if(isset($DB['TYPE']) && $DB['TYPE'] == 'ORACLE') {
 	function zbx_dbstr($var)	{
+//		return "'".ereg_replace('\'','\'\'',$var)."'";
 		return "'".preg_replace('/\'/','\'\'',$var)."'";
 	}
 
@@ -672,6 +663,7 @@ else {
 			$nodes = implode(',', $nodes);
 		}
 		else if(is_string($nodes)){
+//			if ( !eregi('([0-9\,]+)', $nodes ) )
 			if(!preg_match('/^([0-9,]+)$/', $nodes))
 				fatal_error('Incorrect "nodes" for "DBin_node". Passed ['.$nodes.']');
 		}
@@ -692,6 +684,7 @@ else {
 			$nodes = array($nodes);
 		}
 		else if(is_string($nodes)){
+//			if(!eregi('([0-9\,]+)',$nodes))
 			if(!preg_match('/^([0-9,]+)$/', $nodes))
 				fatal_error('Incorrect "nodes" for "in_node". Passed ['.$nodes.']');
 
@@ -743,7 +736,7 @@ else {
 				DBexecute('UPDATE ids SET nextid=nextid+1 WHERE nodeid='.$nodeid.' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field));
 				$row = DBfetch(DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid.' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field)));
 				if(!$row || is_null($row["nextid"])){
-// Should never be here
+					/* Should never be here */
 					continue;
 				}
 				else{
