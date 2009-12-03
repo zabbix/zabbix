@@ -555,8 +555,12 @@ class CApplication extends CZBXAPI{
 				$db_childs = DBselect('SELECT itemid, hostid FROM items WHERE templateid='.$itemid);
 				
 				if($child = DBfetch($db_childs)){
-					$db_apps = DBselect('SELECT a1.applicationid FROM applications a1, applications a2'.
-						" WHERE a1.name=a2.name AND a1.hostid={$child['hostid']} AND ".DBcondition('a2.applicationid', $applicationids));
+					$sql = 'SELECT a1.applicationid '.
+							' FROM applications a1, applications a2 '.
+							' WHERE a1.name=a2.name '.
+								' AND a1.hostid='.$child['hostid'].
+								' AND '.DBcondition('a2.applicationid', $applicationids);
+					$db_apps = DBselect($sql);
 					while($app = DBfetch($db_apps)){
 						$child_applications[] = $app;					
 					}
