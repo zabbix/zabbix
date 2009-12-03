@@ -624,15 +624,15 @@ function make_discovery_status(){
 		$drules[$drule_data['druleid']]['down'] = 0;
 	}
 
+
+	$services = array();
+	$discovery_info = array();
+
 	$sql = 'SELECT d.* '.
 			' FROM dhosts d '.
 			' WHERE '.DBin_node('d.dhostid').
 			' ORDER BY d.dhostid,d.status';
 	$db_dhosts = DBselect($sql);
-
-	$services = array();
-	$discovery_info = array();
-
 	while($drule_data = DBfetch($db_dhosts)){
 		if(DHOST_STATUS_DISABLED == $drule_data['status']){
 			$drules[$drule_data['druleid']]['down']++;		}

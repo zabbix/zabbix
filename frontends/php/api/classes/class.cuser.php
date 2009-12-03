@@ -577,7 +577,7 @@ class CUser extends CZBXAPI{
 						' AND '.DBin_node('userid', id2nodeid($user['userid']));
 			$db_user = DBfetch(DBselect($sql));
 			if($db_user && ($db_user['userid'] != $user['userid'])){
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => "User [ {$user['alias']} ] already exists");
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'User ['.$user['alias'].'] already exists');
 				$result = false;
 				break;
 			}
@@ -818,7 +818,7 @@ class CUser extends CZBXAPI{
 				foreach($medias as $media){
 				
 					if(!validate_period($media['period'])){
-						$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => "Wrong period [ {$media['period']} ]");
+						$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong period ['.$media['period'].' ]');
 						$result = false;
 						break 2;
 		}
