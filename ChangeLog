@@ -1,5 +1,6 @@
 Changes for 1.6.8
 
+ - [ZBX-1184] fixed support of more than 10 CPU's for system.cpu.util under Linux (Sasha)
  - [ZBX-1365] fixed housekeeper to process trends_uint table (Sasha)
  - [ZBX-1384] fixed memory leak in processing ldap checks (Sasha)
  - [ZBX-1355] fixed possible server crash when receiving invalid data. Thanks to Nicob (Sasha)

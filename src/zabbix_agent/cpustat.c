@@ -242,7 +242,10 @@ static int	get_cpustat(
 		return 1;
 	}
 
-	zbx_snprintf(cpu_name, sizeof(cpu_name), "cpu%c ", cpuid > 0 ? '0' + (cpuid - 1) : ' ');
+	if (cpuid > 0)
+		zbx_snprintf(cpu_name, sizeof(cpu_name), "cpu%d ", cpuid - 1);
+	else
+		zbx_strlcpy(cpu_name, "cpu  ", sizeof(cpu_name));
 
 	while (NULL != fgets(line, sizeof(line), file))
 	{
