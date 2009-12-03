@@ -198,9 +198,8 @@ class CMap extends CZBXAPI{
 			}
 		}
 
-
-
-		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){}
+		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
+		}
 		else{
 			if(!empty($result)){
 				$hosts_to_check = array();
@@ -233,14 +232,30 @@ class CMap extends CZBXAPI{
 // sdi($maps_to_check);
 // sdi($triggers_to_check);
 // sdi($host_groups_to_check);
+				$nodeids = get_current_nodeid(true);
+				$options = array('hostids' => $hosts_to_check, 
+									'nodeids' => $nodeids,
+									'editable' => isset($options['editable']), 
+									'preservekeys'=>1);
+				$allowed_hosts = CHost::get($options);
+				
+				$options = array('sysmapids' => $maps_to_check, 
+									'nodeids' => $nodeids,
+									'editable' => isset($options['editable']), 
+									'preservekeys'=>1);
+				$allowed_maps = self::get($options);
 
-				$allowed_hosts = CHost::get(array('hostids' => $hosts_to_check, 'editable' => isset($options['editable']), 'preservekeys'=>1));
-				$allowed_maps = self::get(array('sysmapids' => $maps_to_check, 'editable' => isset($options['editable']), 'preservekeys'=>1));
-				$allowed_maps = zbx_objectValues($allowed_maps, 'sysmapid');
-
-				$allowed_triggers = CTrigger::get(array('triggerids' => $triggers_to_check, 'editable' => isset($options['editable']), 'preservekeys'=>1));
-				$allowed_host_groups = CHostGroup::get(array('groupids' => $host_groups_to_check, 'editable' => isset($options['editable']), 'preservekeys'=>1));
-				$allowed_host_groups = zbx_objectValues($allowed_host_groups, 'groupid');
+				$options = array('triggerids' => $triggers_to_check,
+									'nodeids' => $nodeids,
+									'editable' => isset($options['editable']), 
+									'preservekeys'=>1);
+				$allowed_triggers = CTrigger::get($options);
+				
+				$options = array('groupids' => $host_groups_to_check,
+									'nodeids' => $nodeids,
+									'editable' => isset($options['editable']), 
+									'preservekeys'=>1);
+				$allowed_host_groups = CHostGroup::get($options);
 
 
 				$restr_hosts = array_diff($hosts_to_check, $allowed_hosts);
@@ -452,7 +467,7 @@ class CMap extends CZBXAPI{
 
 			if(!$map_db_fields){
 				$result = false;
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => "Map with ID [ {$map['sysmapid']} ] does not exists");
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Map with ID ['.$map['sysmapid'].'] does not exists');
 				break;
 			}
 
@@ -462,9 +477,9 @@ class CMap extends CZBXAPI{
 				break;
 			}
 
-			$sql = 'UPDATE sysmaps SET name='.zbx_dbstr($map['name']).", width={$map['width']}, height={$map['height']},
-				backgroundid={$map['backgroundid']}, label_type={$map['label_type']}, label_location={$map['label_location']}
-				WHERE sysmapid={$map['sysmapid']}";
+			$sql = 'UPDATE sysmaps SET name='.zbx_dbstr($map['name']).', width='.$map['width'].', height='.$map['height'].', '.
+					'backgroundid='.$map['backgroundid'].',label_type='.$map['label_type'].',label_location='.$map['label_location'].
+				' WHERE sysmapid='.$map['sysmapid'];
 			$result = DBexecute($sql);
 
 			if(!$result) break;
@@ -729,8 +744,8 @@ class CMap extends CZBXAPI{
 
 			$linktriggerid = get_dbid('sysmaps_link_triggers', 'linktriggerid');
 			$sql = 'INSERT INTO sysmaps_link_triggers (linktriggerid, linkid, triggerid, drawtype, color) '.
-				" VALUES ($linktriggerid, {$linktrigger['linkid']}, {$linktrigger['triggerid']},
-				{$linktrigger['drawtype']},".zbx_dbstr($linktrigger['color']).')';
+				' VALUES ('.$linktriggerid.','.$linktrigger['linkid'].','.$linktrigger['triggerid'].', '.
+					$linktrigger['drawtype'].','.zbx_dbstr($linktrigger['color']).')';
 			$result = DBexecute($sql);
 			if(!$result){
 				$result = false;

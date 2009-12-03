@@ -1624,7 +1624,7 @@ return $result;
 			$sql = 'INSERT INTO applications (applicationid, name, hostid, templateid) '.
 				" VALUES ($applicationid_new, ".zbx_dbstr($name).", $hostid, $templateid)";
 			if($result = DBexecute($sql)){
-				info("Added new application {$host['host']}:$name");
+				info('Added new application '.$host['host'].':'.$name);
 			}
 		}
 		else{
@@ -1632,7 +1632,7 @@ return $result;
 			$result = DBexecute('UPDATE applications SET name='.zbx_dbstr($name).', hostid='.$hostid.', templateid='.$templateid.
 				' WHERE applicationid='.$applicationid);
 			if($result)
-				info("Updated application {$host['host']}:{$old_app['name']}");
+				info('Updated application '.$host['host'].':'.$old_app['name']);
 		}
 
 		if(!$result) return $result;
