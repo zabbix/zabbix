@@ -74,7 +74,7 @@ include_once('include/page_header.php');
 
 	if(isset($_REQUEST["save"])){
 		if(isset($_REQUEST["sysmapid"])){
-			// TODO check permission by new value.
+// TODO check permission by new value.
 			$_REQUEST['highlight'] = get_request('highlight', 0);
 
 			DBstart();
@@ -89,6 +89,8 @@ include_once('include/page_header.php');
 		else {
 			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 				access_deny();
+				
+			$_REQUEST['highlight'] = get_request('highlight', 0);
 
 			DBstart();
 			add_sysmap($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["backgroundid"],

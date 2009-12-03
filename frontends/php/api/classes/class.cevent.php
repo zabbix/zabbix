@@ -613,7 +613,7 @@ class CEvent extends CZBXAPI{
 			foreach($events as $enum => $event){
 				$acknowledgeid = get_dbid('acknowledges', 'acknowledgeid');
 				$result = DBexecute('INSERT INTO acknowledges (acknowledgeid, userid, eventid, clock, message)'.
-					" VALUES ($acknowledgeid, {$USER_DETAILS['userid']}, {$event['eventid']}, $time, $message)");
+					' VALUES ('.$acknowledgeid.','.$USER_DETAILS['userid'].','.$event['eventid'].','.$time.','.$message.')');
 
 				if(!$result)
 					break;

@@ -216,9 +216,11 @@
 		}
 		else{
 			$nodes_wdgt->addHeader(S_NODES_BIG);
+			
+			$nodes_wdgt->addItem(BR());
 
 			$table=new CTableInfo(S_NO_NODES_DEFINED);
-			$table->SetHeader(array(
+			$table->setHeader(array(
 				make_sorting_header(S_ID,'n.nodeid'),
 				make_sorting_header(S_NAME,'n.name'),
 				make_sorting_header(S_TYPE,'n.nodetype'),
@@ -236,7 +238,7 @@
 				$node_type = detect_node_type($row);
 				$node_type_name = node_type2str($node_type);
 
-				$table->AddRow(array(
+				$table->addRow(array(
 					$row['nodeid'],
 					array(
 						get_node_path($row['masterid']),
@@ -256,6 +258,9 @@
 		$nodes_wdgt->addItem($table);
 		$nodes_wdgt->show();
 	}
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>
