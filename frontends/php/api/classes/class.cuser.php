@@ -250,6 +250,7 @@ class CUser extends CZBXAPI{
 
 		if(is_null($options['extendoutput']) || !is_null($options['count'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
+
 			return $result;
 		}
 

@@ -71,7 +71,7 @@
 		if(($result = DBexecute('INSERT INTO auditlog (auditid,userid,clock,action,resourcetype,details,ip) '.
 			' VALUES ('.$auditid.','.$USER_DETAILS['userid'].','.time().','.
 						$action.','.$resourcetype.','.zbx_dbstr($details).','.
-						zbx_dbstr($USER_DETAILS['userip']).')')))
+						zbx_dbstr($USER_DETAILS['userid']).')')))
 		{
 			$result = $auditid;
 		}
