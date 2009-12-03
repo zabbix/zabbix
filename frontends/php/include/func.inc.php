@@ -341,8 +341,8 @@ function zbx_date2age($start_date,$end_date=0,$utime = false){
 	$time -= $years*365*86400;
 
 	$months = 0;
-//	$months = (int ) ($time / (30*86400));
-//	$time -= $months*30*86400;
+	$months = (int ) ($time / (30*86400));
+	$time -= $months*30*86400;
 
 	$weeks = (int ) ($time / (7*86400));
 	$time -= $weeks*7*86400;
@@ -366,9 +366,9 @@ function zbx_date2age($start_date,$end_date=0,$utime = false){
 	}
 
 	$str =  (($years)?$years.S_YEAR_SHORT.' ':'').
-//			(($months)?$months.S_MONTH_SHORT.' ':'').
+			(($months)?$months.S_MONTH_SHORT.' ':'').
 			(($weeks)?$weeks.S_WEEK_SHORT.' ':'').
-			(($days)?$days.S_DAY_SHORT.' ':'').
+			(($days && !$years)?$days.S_DAY_SHORT.' ':'').
 			(($hours && !$years && !$months)?$hours.S_HOUR_SHORT.' ':'').
 			(($minutes && !$years && !$months && !$weeks)?$minutes.S_MINUTE_SHORT.' ':'').
 			((!$years && !$months && !$weeks && !$days && ($ms || $seconds))?$seconds.S_SECOND_SHORT.' ':'').
