@@ -1443,6 +1443,14 @@
 	'S_NO_ITEMS'=>			'Aucun élément',
 	'S_DISCOVERY_RULES_BIG'=>			'REGLES DE DECOUVERTE',
 	'S_DISCOVERY_CHECKS_BIG'=>			'TESTS DE DECOUERTE',
+	
+//	forms.inc.php
+//	popup_link_tr.php
+	'S_NEW_CONNECTOR'=>			'Nouveau connecteur',
+	'S_EDIT_CONNECTOR'=>			'Modifier le connecteur',
+	'S_MAP_ELEMENT'=>			'Elément de la carte',
+	'S_NEW_MAP_ELEMENT'=>			'Nouvel élément de la carte',
+
 	'S_INCLUDE'=>			'Inclure',
 	'S_EXCLUDE'=>			'Exclure',
 	'S_KEYWORD'=>			'Mot-clé',
