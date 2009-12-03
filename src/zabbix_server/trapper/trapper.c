@@ -130,9 +130,9 @@ static void	calc_timestamp(char *line,int *timestamp, char *format)
  *             key - item's key                                               *
  *             value - new value of server:key                                *
  *             lastlogsize - if key=log[*], last size of log file             *
- *                           if key=log.regexp[*], last size of log file      *
+ *                           if key=logrt[*], last size of log file           *
  *                           if key=eventlog[*], last event id of the log     *
- *             mtime - if key=log.regexp[*], last modification time           *
+ *             mtime - if key=logrt[*], last modification time                *
  *                                                             of log file    *
  *                     if key=log[*], is not used                             *
  *                     if key=eventlog[*], is not used                        *

@@ -633,7 +633,7 @@ static int	process_value(
 		el->severity	= *severity;
 	if (lastlogsize)
 		el->lastlogsize	= *lastlogsize;
-	if (mtime)/* will be NULL for "eventlog" and "log" and the value will be 0, only "log.regexp" matters */
+	if (mtime)/* will be NULL for "eventlog" and "log" and the value will be 0, only "logrt" matters */
 		el->mtime	= *mtime;
 	if (timestamp)
 		el->timestamp	= *timestamp;
@@ -661,7 +661,7 @@ static void	process_active_checks(char *server, unsigned short port)
 	char		params[MAX_STRING_LEN];
 	char		filename[MAX_STRING_LEN];
 	char		pattern[MAX_STRING_LEN];
-	/*checks `log', `eventlog', `log.regexp' may contain parameter,*/
+	/*checks `log', `eventlog', `logrt' may contain parameter,*/
 	/*which overrides CONFIG_MAX_LINES_PER_SECOND*/
 	char		maxlines_persec_str[16];
 	int		maxlines_persec;
@@ -792,7 +792,7 @@ static void	process_active_checks(char *server, unsigned short port)
 			}
 		}
 		/* special processing for log files WITH rotation */		
-		else if (0 == strncmp(active_metrics[i].key, "log.regexp[", 11))
+		else if (0 == strncmp(active_metrics[i].key, "logrt[", 11))
 		{
 			ret = FAIL;
 
@@ -825,7 +825,7 @@ static void	process_active_checks(char *server, unsigned short port)
 				lastlogsize = active_metrics[i].lastlogsize;
 				mtime = active_metrics[i].mtime;
 				
-				while (SUCCEED == (ret = process_log_regexp(filename, &lastlogsize, &mtime, &value, encoding))) {
+				while (SUCCEED == (ret = process_logrt(filename, &lastlogsize, &mtime, &value, encoding))) {
 					if (!value) /* EOF */
 					{
 						/*the file could become empty, must save `lastlogsize' and `mtime'*/
