@@ -2488,9 +2488,9 @@
 		$groups = CHostGroup::get(array('extendoutput'=>1, 'order'=>'name'));
 		if(0 == $copy_type){
 			$cmbGroup = new CComboBox('filter_groupid',$filter_groupid,'submit()');
-			foreach($groups as $groupid => $group){
-				if(empty($filter_groupid)) $filter_groupid = $groupid;
-				$cmbGroup->addItem($groupid,$group['name']);
+			foreach($groups as $gnum => $group){
+				if(empty($filter_groupid)) $filter_groupid = $group['groupid'];
+				$cmbGroup->addItem($group['groupid'],$group['name']);
 			}
 
 			$frmCopy->addRow('Group', $cmbGroup);
@@ -2514,6 +2514,7 @@
 			}
 
 			$templates = CTemplate::get($options);
+
 			foreach($templates as $num => $template){
 				$templateid = $template['templateid'];
 				array_push($target_list,array(
