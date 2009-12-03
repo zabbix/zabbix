@@ -144,7 +144,7 @@
 	'S_DO_NOT_KEEP_HISTORY_OLDER_THAN'=>			'No mantener el histórico más de (en días)',
 	'S_DO_NOT_KEEP_TRENDS_OLDER_THAN'=>			'No mantener las tendencias más de (en días)',
 	'S_MASTER_NODE'=>			'Nodo maestro',
-	'S_REMOTE'=>			'Remoto',
+	'S_CHILD'=>			'Remoto',
 	'S_MASTER'=>			'Maestro',
 	'S_NODE_UPDATED'=>			'Nodo actualizado',
 	'S_CANNOT_UPDATE_NODE'=>			'No es posible actualizar el nodo',

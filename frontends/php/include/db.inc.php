@@ -544,9 +544,15 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 		switch($DB['TYPE']){
 			case 'MYSQL':
 				$result = mysql_fetch_assoc($cursor);
+				if(!$result){
+					mysql_free_result($cursor);
+				}
 				break;
 			case 'POSTGRESQL':
 				$result = pg_fetch_assoc($cursor);
+				if(!$result){
+					pg_free_result($cursor);
+				}
 				break;
 			case 'ORACLE':
 				if(ocifetchinto($cursor, $row, (OCI_ASSOC+OCI_RETURN_NULLS))){

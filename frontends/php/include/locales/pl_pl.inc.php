@@ -157,7 +157,7 @@
 	'S_DO_NOT_KEEP_HISTORY_OLDER_THAN'=>		'Nie trzymać historii starszej niż (w dniach)',
 	'S_DO_NOT_KEEP_TRENDS_OLDER_THAN'=>		'Nie trzymać trendów starszych niż (w dniach)',
 	'S_MASTER_NODE'=>				'Węzeł główny',
-	'S_REMOTE'=>					'Zdalny',
+	'S_CHILD'=>					'Zdalny',
 	'S_MASTER'=>					'Główny',
 	'S_NODE_UPDATED'=>				'Węzeł uaktualniony',
 	'S_CANNOT_UPDATE_NODE'=>			'Nie można uaktualnić węzła',

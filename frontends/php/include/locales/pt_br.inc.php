@@ -144,7 +144,7 @@
 	'S_DO_NOT_KEEP_HISTORY_OLDER_THAN'=>			'Não manter no histórico mais do que (dias)',
 	'S_DO_NOT_KEEP_TRENDS_OLDER_THAN'=>			'Não arquivar trends mais do que (dias)',
 	'S_MASTER_NODE'=>			'Nodo mestre',
-	'S_REMOTE'=>			'Remoto',
+	'S_CHILD'=>			'Remoto',
 	'S_MASTER'=>			'Mestre',
 	'S_NODE_UPDATED'=>			'Nodo atualizado',
 	'S_CANNOT_UPDATE_NODE'=>			'Nodo não foi atualizado',

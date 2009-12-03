@@ -228,7 +228,7 @@
 
 		if(bccomp($node_data['nodeid'],get_current_nodeid(false)) == 0)		$node_type = ZBX_NODE_LOCAL;
 		else if(bccomp($node_data['nodeid'] ,$ZBX_CURMASTERID)==0)		$node_type = ZBX_NODE_MASTER;
-		else if(bccomp($node_data['masterid'], get_current_nodeid(false))==0)	$node_type = ZBX_NODE_REMOTE;
+		else if(bccomp($node_data['masterid'], get_current_nodeid(false))==0)	$node_type = ZBX_NODE_CHILD;
 		else $node_type = -1;
 
 	return $node_type;
@@ -237,7 +237,7 @@
 	function node_type2str($node_type){
 		$result = '';
 		switch($node_type){
-			case ZBX_NODE_REMOTE:	$result = S_REMOTE;	break;
+			case ZBX_NODE_CHILD:	$result = S_CHILD;	break;
 			case ZBX_NODE_MASTER:	$result = S_MASTER;	break;
 			case ZBX_NODE_LOCAL:	$result = S_LOCAL;	break;
 			default:		$result = S_UNKNOWN;	break;
@@ -246,8 +246,8 @@
 		return $result;
 	}
 
-	function add_node($new_nodeid,$name,$timezone,$ip,$port,$slave_history,$slave_trends,$node_type){
-		global $ZBX_CURMASTERID;
+	function add_node($new_nodeid,$name,$timezone,$ip,$port,$slave_history,$slave_trends,$node_type, $masterid){
+		global $ZBX_LOCMASTERID, $ZBX_LOCALNODEID;
 
 //		if(!eregi('^'.ZBX_EREG_NODE_FORMAT.'$', $name) ){
 		if(!preg_match('/^'.ZBX_PREG_NODE_FORMAT.'$/i', $name) ){
@@ -256,40 +256,36 @@
 		}
 
 		switch($node_type){
-			case ZBX_NODE_REMOTE:
-				$masterid = get_current_nodeid(false);
-				$nodetype = 0;
-				break;
+			case ZBX_NODE_CHILD:
+				$masterid = $masterid;
+			break;
 			case ZBX_NODE_MASTER:
 				$masterid = 0;
-				$nodetype = 0;
-				if($ZBX_CURMASTERID){
+				if($ZBX_LOCMASTERID){
 					error('Master node already exists');
 					return false;
 				}
-				break;
-			case ZBX_NODE_LOCAL:
-				$masterid = $ZBX_CURMASTERID;
-				$nodetype = 1;
-				break;
+			break;
 			default:
 				error('Incorrect node type');
 				return false;
-				break;
+			break;
 		}
 
-		if(DBfetch(DBselect('select nodeid from nodes where nodeid='.$new_nodeid))){
+		
+		if(DBfetch(DBselect('SELECT nodeid FROM nodes WHERE nodeid='.$new_nodeid))){
 			error('Node with same ID already exists');
 			return false;
 		}
 
-		$result = DBexecute('insert into nodes (nodeid,name,timezone,ip,port,slave_history,slave_trends,'.
-				'nodetype,masterid) values ('.
-				$new_nodeid.','.zbx_dbstr($name).','.$timezone.','.zbx_dbstr($ip).','.$port.','.$slave_history.','.$slave_trends.','.
-				$nodetype.','.$masterid.')');
+		$nodetype = 0;
+		$sql = 'INSERT INTO nodes (nodeid,name,timezone,ip,port,slave_history,slave_trends, nodetype,masterid) '.
+			' VALUES ('.$new_nodeid.','.zbx_dbstr($name).','.$timezone.','.zbx_dbstr($ip).','.$port.','.$slave_history.','.
+			$slave_trends.','.$nodetype.','.$masterid.')';
+		$result = DBexecute($sql);
 
 		if($result && $node_type == ZBX_NODE_MASTER){
-			DBexecute('update nodes set masterid='.$new_nodeid.' where nodeid='.get_current_nodeid(false));
+			DBexecute('UPDATE nodes SET masterid='.$new_nodeid.' WHERE nodeid='.$ZBX_LOCALNODEID);
 			$ZBX_CURMASTERID = $new_nodeid; /* apply Master node for this script */
 		}
 
@@ -303,10 +299,10 @@
 			return false;
 		}
 
-		$result = DBexecute('update nodes set nodeid='.$new_nodeid.',name='.zbx_dbstr($name).','.
-				'timezone='.$timezone.',ip='.zbx_dbstr($ip).',port='.$port.','.
-				'slave_history='.$slave_history.',slave_trends='.$slave_trends.
-				' where nodeid='.$nodeid);
+		$result = DBexecute('UPDATE nodes SET nodeid='.$new_nodeid.',name='.zbx_dbstr($name).','.
+			'timezone='.$timezone.',ip='.zbx_dbstr($ip).',port='.$port.','.
+			'slave_history='.$slave_history.',slave_trends='.$slave_trends.
+			' WHERE nodeid='.$nodeid);
 	return $result;
 	}
 

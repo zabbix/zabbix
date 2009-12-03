@@ -160,7 +160,7 @@
 	'S_DO_NOT_KEEP_HISTORY_OLDER_THAN'=>			'ヒストリの保存期間(日)',
 	'S_DO_NOT_KEEP_TRENDS_OLDER_THAN'=>			'トレンドの保存期間(日)',
 	'S_MASTER_NODE'=>			'マスターノード',
-	'S_REMOTE'=>			'リモート',
+	'S_CHILD'=>			'リモート',
 	'S_MASTER'=>			'マスター',
 	'S_NODE_UPDATED'=>			'ノードを更新しました',
 	'S_CANNOT_UPDATE_NODE'=>			'ノードを更新できません',
