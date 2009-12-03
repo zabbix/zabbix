@@ -22,7 +22,7 @@ function SDB($return=false){
 	array_shift($backtrace);
 	$result = 'DEBUG BACKTRACE: ';
 	foreach($backtrace as $n => $bt){
-		$result .= "  --[$n]-- {$bt['file']} : {$bt['line']} | ";
+		$result .= '  --['.$n.']-- '.$bt['file'].' : '.$bt['line'].' | ';
 		$result .= isset($bt['class']) ? $bt['class'].$bt['type'].$bt['function'] : $bt['function'];
 		$result .= '( '.print_r($bt['args'], true).' ) ';
 	}
@@ -325,6 +325,7 @@ function __autoload($class_name){
 				case PAGE_TYPE_XML:
 					echo htmlspecialchars($msg)."\n";
 					break;
+//				case PAGE_TYPE_JS: break;
 				case PAGE_TYPE_HTML:
 				default:
 					$msg_tab = new CTable($msg,($bool?'msgok':'msgerr'));
