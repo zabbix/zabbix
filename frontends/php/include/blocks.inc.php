@@ -615,10 +615,18 @@ return $table;
 
 // Author: Aly
 function make_discovery_status(){
-	$drules = array(); 
 
-	$db_drules = DBselect('select distinct * from drules where '.DBin_node('druleid').' order by name');
+	$drules = array(); 
+	$druleids = array();
+	$sql = 'SELECT DISTINCT * '.
+			' FROM drules '.
+			' WHERE '.DBin_node('druleid').
+				' AND status='.DHOST_STATUS_ACTIVE.
+			' ORDER BY name';
+	$db_drules = DBselect($sql);
 	while($drule_data = DBfetch($db_drules)){
+		$druleids[$drule_data['druleid']] = $drule_data['druleid'];
+		
 		$drules[$drule_data['druleid']] = $drule_data;
 		$drules[$drule_data['druleid']]['up'] = 0;
 		$drules[$drule_data['druleid']]['down'] = 0;
@@ -631,10 +639,11 @@ function make_discovery_status(){
 	$sql = 'SELECT d.* '.
 			' FROM dhosts d '.
 			' WHERE '.DBin_node('d.dhostid').
+				' AND '.DBcondition('d.druleid', $druleids).
 			' ORDER BY d.dhostid,d.status';
 	$db_dhosts = DBselect($sql);
 	while($drule_data = DBfetch($db_dhosts)){
-		if(DHOST_STATUS_DISABLED == $drule_data['status']){
+		if(DRULE_STATUS_DISABLED == $drule_data['status']){
 			$drules[$drule_data['druleid']]['down']++;		}
 		else{
 			$drules[$drule_data['druleid']]['up']++;
