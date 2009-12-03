@@ -1,5 +1,6 @@
 Changes for 1.7.4
 
+ - [ZBX-1378] allowed using months in age view (Aly)
  - [ZBX-1301] fixed discovery hosts view in dashboard (Aly)
  - [ZBX-1370] fixes in items copy (Aly)
  - [ZBX-1398] fixed advanced icons selection (Aly)
