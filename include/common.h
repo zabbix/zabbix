@@ -898,6 +898,9 @@ void	zbx_strupper(char *str);
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
 
+void	win2unix_eol(char *text);
+int	str2uint64(char *str, zbx_uint64_t *value);
+
 #if defined(_WINDOWS) && defined(_UNICODE)
 int	__zbx_stat(const char *path, struct stat *buf);
 int	__zbx_open(const char *pathname, int flags);
@@ -914,4 +917,3 @@ zbx_uint64_t	zbx_htole_uint64(
 		zbx_uint64_t	data
 	);
 #endif
-void	win2unix_eol(char *text);
