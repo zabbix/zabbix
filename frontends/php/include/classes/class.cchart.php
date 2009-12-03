@@ -714,6 +714,13 @@ class CChart extends CGraphDraw{
 			$side = GRAPH_YAXIS_SIDE_RIGHT;
 			$other_side = GRAPH_YAXIS_SIDE_LEFT;
 		}
+		
+		$tmp_minY = array();
+		$tmp_maxY = array();
+		$tmp_minY[GRAPH_YAXIS_SIDE_LEFT] = $this->m_minY[GRAPH_YAXIS_SIDE_LEFT];
+		$tmp_minY[GRAPH_YAXIS_SIDE_RIGHT] = $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT];
+		$tmp_maxY[GRAPH_YAXIS_SIDE_LEFT] = $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT];
+		$tmp_maxY[GRAPH_YAXIS_SIDE_RIGHT] = $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT];
 //------
 
 // CALC interval
@@ -796,21 +803,21 @@ class CChart extends CGraphDraw{
 		}
 
 		$sides = array(GRAPH_YAXIS_SIDE_LEFT,GRAPH_YAXIS_SIDE_RIGHT);
-		foreach($sides as $side){
+		foreach($sides as $snum => $side){
 			if(!isset($this->axis_valuetype[$side])) continue;
 
 			if($this->ymax_type == GRAPH_YAXIS_TYPE_FIXED){
 				$this->m_maxY[$side] = $this->yaxismax;
 			}
 			else if($this->ymax_type == GRAPH_YAXIS_TYPE_ITEM_VALUE){
-				$this->m_maxY[$side] = $tmp_maxY;
+				$this->m_maxY[$side] = $tmp_maxY[$side];
 			}
 
 			if($this->ymin_type == GRAPH_YAXIS_TYPE_FIXED){
 				$this->m_minY[$side] = $this->yaxismin;
 			}
 			else if($this->ymin_type == GRAPH_YAXIS_TYPE_ITEM_VALUE){
-				$this->m_minY[$side] = $tmp_minY;
+				$this->m_minY[$side] = $tmp_minY[$side];
 			}
 		}
 	}
@@ -1889,7 +1896,13 @@ class CChart extends CGraphDraw{
 
 		$end_time=getmicrotime();
 		$str=sprintf('%0.2f',(getmicrotime()-$start_time));
-		imagestring($this->im, 0,$this->fullSizeX-210,$this->fullSizeY-12,'Data from '.$this->dataFrom.'. Generated in '.$str.' sec', $this->getColor('Gray'));
+
+// if we get chart from config by get method
+		$datafrom = '';
+		if(isset($this->dataFrom))
+			$datafrom = 'Data from '.$this->dataFrom.'. ';
+
+		imagestring($this->im, 0,$this->fullSizeX-210,$this->fullSizeY-12,$datafrom.'Generated in '.$str.' sec', $this->getColor('Gray'));
 
 		unset($this->items, $this->data);
 
