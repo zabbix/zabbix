@@ -1,5 +1,6 @@
 Changes for 1.7.4
 
+ - [ZBX-1403] fixed discovery widget to show only discovery from selected node (Aly)
  - [ZBX-1397] make 'History' string in page header translatable, thanks to Alexey Pustovalov (Richlv)
  - [ZBX-1381] performance improvements for maps view (Aly)
  - [ZBX-1325] fixed error when add host or hostgroup with postgre (Vedmak)

@@ -88,15 +88,15 @@ class CHTTP_request{
 		}
 
 		$headers = $this->headers();
-		$this->raw = "{$this->method}\r\n";
+		$this->raw = $this->method."\r\n";
 
 		foreach($headers as $i=>$header) {
-			$this->raw .= "$i: $header\r\n";
+			$this->raw .= $i.': '.$header."\r\n";
 		}
 
-		$this->raw .= "\r\n{$this->body}";
+		$this->raw .= "\r\n".$this->body;
 
-		return $this->raw;
+	return $this->raw;
 	}
 
 }
