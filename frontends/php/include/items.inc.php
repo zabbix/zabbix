@@ -921,6 +921,7 @@
 			$itemid = $item['itemid'];
 		}
 
+		$same_item = null;
 		$same_items = array();
 		if(isset($itemid)){
 			$sql = 'SELECT src.* '.

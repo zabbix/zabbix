@@ -317,6 +317,7 @@ class CUserMacro extends CZBXAPI{
 					WHERE '.DBin_node('hm.hostmacroid', $nodeids).
 					$sql_where.
 					$sql_order;
+//SDI($sql);
 			$res = DBselect($sql, $sql_limit);
 			while($macro = DBfetch($res)){
 				if($options['count'])
@@ -908,18 +909,21 @@ class CUserMacro extends CZBXAPI{
 
 		$obj_options = array(
 			'nopermissions' => 1,
+			'preservekeys' => 1,
 			'itemids' => $options['itemid'],
-			'triggerids' => $options['triggerid'],
+			'triggerids' => $options['triggerid']
 			);
 		$hosts = CHost::get($obj_options);
+		$hostids = array_keys($hosts);
 
 		$hmacros = array();
 		while((count($hmacro) < count($macros)) && !empty($hosts)){
 			$obj_options = array(
 				'nopermissions' => 1,
 				'extendoutput' => 1,
+				'preservekeys' => 1,
 				'macros' => $macros,
-				'hostids' => zbx_objectValues($hosts, 'hostid'),
+				'hostids' => $hostids
 				);
 
 			$tmacros = self::get($obj_options);
@@ -927,9 +931,11 @@ class CUserMacro extends CZBXAPI{
 
 			$obj_options = array(
 				'nopermissions' => 1,
-				'hostids' => $hosts,
+				'preservekeys' => 1,
+				'hostids' => $hostids
 				);
 			$hosts = CTemplate::get($obj_options);
+			$hostids = array_keys($hosts);
 		}
 
 		$macros = zbx_array_merge($gmacros + $hmacros);
@@ -963,7 +969,7 @@ class CUserMacro extends CZBXAPI{
 			}
 		}
 
-		if($single) $triggers = $triggers[0];
+		if($single) $triggers = reset($triggers);
 	}
 
 
