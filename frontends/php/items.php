@@ -287,7 +287,7 @@ include_once('include/page_header.php');
 			$_REQUEST[$name] = get_request($name, array());
 		}
 	}
-// } SUBFILTERS 
+// } SUBFILTERS
 
 ?>
 <?php
@@ -924,7 +924,7 @@ include_once('include/page_header.php');
 
 			$item['subfilters']['subfilter_interval'] =
 				(empty($_REQUEST['subfilter_interval']) || uint_in_array($item['delay'], $_REQUEST['subfilter_interval']));
-				
+
 			$items[$num] = $item;
 		}
 // } SET VALUES FOR SUBFILTERS
@@ -1041,7 +1041,7 @@ include_once('include/page_header.php');
 					explode_exp($trigger['expression'], 1),
 					$tstatus,
 				));
-					
+
 				$item['triggers'][$tnum] = $trigger;
 			}
 

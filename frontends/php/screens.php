@@ -176,7 +176,7 @@ include_once('include/page_header.php');
 			'screenids' => $elementid,
 			'extendoutput' => 1
 		);
-		
+
 		$screens = CScreen::get($options);
 		if(empty($screens)) access_deny();
 
@@ -189,7 +189,7 @@ include_once('include/page_header.php');
 
 	if($cmbElements->ItemsCount() > 0) $form->addItem(array(SPACE.S_SCREENS.SPACE,$cmbElements));
 
-	
+
 	if((2 != $_REQUEST['fullscreen']) && !empty($elementid) && check_dynamic_items($elementid, 0)){
 		if(!isset($_REQUEST['hostid'])){
 			$_REQUEST['groupid'] = $_REQUEST['hostid'] = 0;

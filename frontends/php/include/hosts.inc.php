@@ -64,7 +64,7 @@ require_once('include/httptest.inc.php');
 		}
 	return $result;
 	}
- */	
+ */
 
 	function setHostGroupInternal($groupids, $internal=ZBX_NOT_INTERNAL_GROUP){
 		zbx_value2array($groupids);
@@ -80,7 +80,7 @@ require_once('include/httptest.inc.php');
 			error(CHostgroup::resetErrors());
 			return false;
 		}
-		
+
 		$group = reset($group);
 		$groupid = $group['groupid'];
 
@@ -274,10 +274,10 @@ require_once('include/httptest.inc.php');
 
 		if(!zbx_empty($newgroup)){
 			$newgroup = CHostGroup::add(array('name' => $newgroup));
-			
+
 			if($newgroup !== false) $newgroup = reset($newgroup);
 			else return false;
-			
+
 			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $newgroup['groupid'], $newgroup['name'], 'groups', NULL, NULL);
 			info('Added host group ['.$newgroup['name'].']');
 			$groups[] = array('groupid' => $newgroup['groupid']);
@@ -288,10 +288,10 @@ require_once('include/httptest.inc.php');
 
 // COPY FROM API HostGroup:addHosts
 		$linked = array();
-		
+
 		$tmp_hostids = zbx_objectValues($hosts, 'hostid');
 		$tmp_groupids = zbx_objectValues($groups, 'groupid');
-		
+
 		$sql = 'SELECT hostid, groupid '.
 				' FROM hosts_groups '.
 				' WHERE '.DBcondition('hostid', $tmp_hostids).
@@ -313,7 +313,7 @@ require_once('include/httptest.inc.php');
 			}
 		}
 //permisssion problems
-//		if(!CHostGroup::addHosts(array('hosts' => $hosts, 'groups' => $groups))) return false;		
+//		if(!CHostGroup::addHosts(array('hosts' => $hosts, 'groups' => $groups))) return false;
 //----------
 
 
@@ -375,15 +375,15 @@ require_once('include/httptest.inc.php');
 		}
 
 		$hosts = array('hostid' => $hostid);
-		
+
 		$result = CHostGroup::updateHosts(array('hosts' => $hosts, 'groups' => $groups));
 
 		if(!$result){
 			error(CHostGroup::resetErrors());
 			return false;
 		}
-			
-		
+
+
 		//$result = update_host_groups($hostid, $groups);
 
 		if(count($new_templates) > 0){

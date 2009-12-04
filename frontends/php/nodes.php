@@ -128,7 +128,7 @@
 
 	if(ZBX_DISTRIBUTED){
 		global $ZBX_NODES, $ZBX_LOCMASTERID;
-		
+
 		if(isset($_REQUEST['form'])){
 			$frm_title = S_NODE;
 			if(isset($_REQUEST['nodeid'])){
@@ -138,8 +138,8 @@
 
 			$master_node = DBfetch(DBselect('SELECT name FROM nodes WHERE masterid=0 AND nodetype='.ZBX_NODE_LOCAL));
 			$has_master = (!$master_node) ? true : false;
-			
-			
+
+
 			$frmNode= new CFormTable($frm_title);
 			$frmNode->setHelp('node.php');
 
@@ -156,7 +156,7 @@
 				$slave_history = $node_data['slave_history'];
 				$slave_trends = $node_data['slave_trends'];
 				$masterid = $node_data['masterid'];
-				$node_type = detect_node_type($node_data);	
+				$node_type = detect_node_type($node_data);
 			}
 			else{
 				$new_nodeid = get_request('new_nodeid', 0);
@@ -223,7 +223,7 @@
 		}
 		else{
 			$nodes_wdgt->addHeader(S_NODES_BIG);
-			
+
 			$nodes_wdgt->addItem(BR());
 
 			$table=new CTableInfo(S_NO_NODES_DEFINED);
@@ -238,7 +238,7 @@
 					' FROM nodes n'.
 					order_by('n.nodeid,n.name,n.timezone,n.ip','n.masterid');
 			$db_nodes = DBselect($sql);
-			
+
 			while($node = DBfetch($db_nodes)){
 
 				$table->addRow(array(
@@ -247,7 +247,7 @@
 						get_node_path($node['masterid']),
 						new CLink(($node['nodetype'] ? new CSpan($node['name'], 'bold') : $node['name']), '?&form=update&nodeid='.$node['nodeid'])),
 					new CSpan('GMT'.sprintf('%+03d:00', $node['timezone']), $node['nodetype'] ? 'bold' : null),
-					new CSpan($node['ip'].':'.$node['port'], 
+					new CSpan($node['ip'].':'.$node['port'],
 					$node['nodetype'] ? 'bold' : null)
 				));
 			}
@@ -259,7 +259,7 @@
 		$table = new CTableInfo(S_NOT_DM_SETUP);
 		$nodes_wdgt->addItem($table);
 	}
-	
+
 	$nodes_wdgt->show();
 ?>
 <?php

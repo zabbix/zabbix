@@ -1443,7 +1443,7 @@
 	'S_NO_ITEMS'=>			'Aucun élément',
 	'S_DISCOVERY_RULES_BIG'=>			'REGLES DE DECOUVERTE',
 	'S_DISCOVERY_CHECKS_BIG'=>			'TESTS DE DECOUERTE',
-	
+
 //	forms.inc.php
 //	popup_link_tr.php
 	'S_NEW_CONNECTOR'=>			'Nouveau connecteur',
@@ -1478,6 +1478,6 @@
 	'S_INCORRECT_DESCRIPTION'=>			'Description incorrecte',
 	'S_CANT_FORMAT_TREE'=>			'Production arbre de tri impossible',
 	'S_NO_PERMISSION'=>			'Vous n\'avez pas la permission d\'effectuer cette opération',
-	
+
 	);
 ?>

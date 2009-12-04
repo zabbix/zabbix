@@ -661,14 +661,14 @@
 						' AND imagetype='.$imagetype.
 					' ORDER BY name';
 			$result=DBselect($sql);
-			while($image = DBfetch($result)){			
+			while($image = DBfetch($result)){
 				switch($image['imagetype']){
-					case IMAGE_TYPE_ICON: 
+					case IMAGE_TYPE_ICON:
 						$imagetype=S_ICON;
-						$img = new CImg('imgstore.php?iconid='.$image['imageid'],'no image'); 
+						$img = new CImg('imgstore.php?iconid='.$image['imageid'],'no image');
 					break;
-					case IMAGE_TYPE_BACKGROUND: 
-						$imagetype=S_BACKGROUND; 
+					case IMAGE_TYPE_BACKGROUND:
+						$imagetype=S_BACKGROUND;
 						$img = new CImg('imgstore.php?iconid='.$image['imageid'],'no image',200);
 					break;
 					default: $imagetype=S_UNKNOWN;
@@ -676,11 +676,11 @@
 
 				$name = new CLink($image['name'],'config.php?form=update'.url_param('config').'&imageid='.$image['imageid']);
 				$action = new CLink($img, 'image.php?imageid='.$image['imageid']);
-					
+
 				$img_td = new CCol();
 				$img_td->setAttribute('align', 'center');
 				$img_td->addItem(array($action, BR(), $name), 'center');
-				
+
 				$row->addItem($img_td);
 				$tr++;
 				if(($tr % 4) == 0){

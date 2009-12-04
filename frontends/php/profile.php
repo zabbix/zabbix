@@ -158,6 +158,6 @@ $fields=array(
 	echo '<br>';
 	insert_user_form($USER_DETAILS['userid'],1);
 
-	
+
 include_once 'include/page_footer.php';
 ?>

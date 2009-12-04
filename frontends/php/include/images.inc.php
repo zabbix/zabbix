@@ -26,13 +26,13 @@
 		if($row = DBfetch($result)){
 			$row['image'] = zbx_unescape_image($row['image']);
 		}
-	
+
 	return $row;
 	}
-	
+
 	function zbx_unescape_image($image){
 		global $DB;
-		
+
 		$result = ($image)?$image:0;
 		if($DB['TYPE'] == "POSTGRESQL"){
 			$result = pg_unescape_bytea($image);
@@ -55,7 +55,7 @@
 				$imageid = get_dbid('images','imageid');
 
 				$image = fread(fopen($file['tmp_name'],'r'),filesize($file['tmp_name']));
-				
+
 				if($DB['TYPE'] == 'POSTGRESQL'){
 					$image = pg_escape_bytea($image);
 					$sql = 'INSERT INTO images (imageid, name, imagetype, image) '.

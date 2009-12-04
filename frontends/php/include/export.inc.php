@@ -267,14 +267,14 @@ class zbxXML{
 	public static function export($data){
 
 		$doc = new DOMDocument('1.0', 'UTF-8');
-		$root = $doc->appendChild(new DOMElement('zabbix_export'));	
+		$root = $doc->appendChild(new DOMElement('zabbix_export'));
 		$root->setAttributeNode(new DOMAttr('version', '1.0'));
 		$root->setAttributeNode(new DOMAttr('date', date('d.m.y')));
 		$root->setAttributeNode(new DOMAttr('time', date('H.i')));
-		
+
 
 		$hosts_node = $root->appendChild(new DOMElement(XML_TAG_HOSTS));
-		
+
 		foreach($data['hosts'] as $host){
 // HOST
 			$host_node = self::addChildData($hosts_node, XML_TAG_HOST, $host);
@@ -357,7 +357,7 @@ class zbxXML{
 
 				foreach($data['graphs'] as $num => $graph){
 					if(isset($graph['hosts'][$host['hostid']])){
-					
+
 						$graph['ymin_item_key'] = '';
 						$graph['ymax_item_key'] = '';
 
@@ -365,7 +365,7 @@ class zbxXML{
 							$graph['ymin_item_key'] = $hostminmaxs[$itemminmaxs[$graph['ymin_itemid']]['hostid']]['host'].':'.
 														$itemminmaxs[$graph['ymin_itemid']]['key_'];
 						}
-							
+
 						if($graph['ymax_itemid'] > 0){
 							$graph['ymax_item_key'] = $hostminmaxs[$itemminmaxs[$graph['ymax_itemid']]['hostid']]['host'].':'.
 														$itemminmaxs[$graph['ymax_itemid']]['key_'];
@@ -373,8 +373,8 @@ class zbxXML{
 
 
 						$graph_node = self::addChildData($graphs_node, XML_TAG_GRAPH, $graph);
-						
-									
+
+
 						if(isset($data['graphs_items'])){
 							$graph_elements_node = $graph_node->appendChild(new DOMElement(XML_TAG_GRAPH_ELEMENTS));
 							foreach($data['graphs_items'] as $ginum => $gitem){
@@ -414,13 +414,13 @@ class zbxXML{
 
 		$doc->preserveWhiteSpace = false;
 		$doc->formatOutput = true;
-		
+
 		return preg_replace_callback('/^( {2,})/m', array('self', 'space2tab'), $doc->saveXML());
 	}
 
 	private static function mapXML2arr($xml, $tag){
 		$array = array();
-		
+
 		foreach(self::$ZBX_EXPORT_MAP[$tag]['attributes'] as $attr => $value){
 			if($value == '') $value = $attr;
 
@@ -437,7 +437,7 @@ class zbxXML{
 			else
 				$map[$xml_name] = $db_name;
 		}
-	
+
 		foreach($xml->childNodes as $node){
 			if(isset($map[$node->nodeName]))
 				$array[$map[$node->nodeName]] = $node->nodeValue;
@@ -451,7 +451,7 @@ class zbxXML{
 		$result = true;
 
 		libxml_use_internal_errors(true);
-		
+
 		$xml = new DOMDocument();
 		$result = $xml->load($file);
 
@@ -484,7 +484,7 @@ class zbxXML{
 		if(isset($rules['host']['exist']) || isset($rules['host']['missed'])){
 			$xpath = new DOMXPath($xml);
 			$hosts = $xpath->query('hosts/host');
-			
+
 // foreach($hosts as $host){
 	// sdi($host->nodeValue);
 // }
@@ -492,7 +492,7 @@ class zbxXML{
 			foreach($hosts as $hnum => $host){
 // IMPORT RULES
 				$host_db = self::mapXML2arr($host, XML_TAG_HOST);
-				
+
 				if(!isset($host_db['status'])) $host_db['status'] = HOST_STATUS_TEMPLATE;
 				if($host_db['status'] == HOST_STATUS_TEMPLATE){
 					$current_hosts = CTemplate::getObjects(array('template' => $host_db['host']));
@@ -503,7 +503,7 @@ class zbxXML{
 
 				$current_host = reset($current_hosts);
 				//$current_hostid = empty($current_host) ? false : $current_host[0]['hostid'];
-				
+
 				if(!$current_host && !isset($rules['host']['missed'])) continue; // break if update nonexist
 				if($current_host && !isset($rules['host']['exist'])) continue; // break if not update exist
 
@@ -531,23 +531,23 @@ class zbxXML{
 					foreach($groups as $gnum => $group){
 						$current_group = CHostGroup::getObjects(array('name' => $group->nodeValue));
 // sdii($current_group);
-						if(empty($current_group)){	
+						if(empty($current_group)){
 							$groups_to_add = array_merge($groups_to_add, $current_group);
 						}
 						else{
 							$host_groups = array_merge($host_groups, $current_group);
 						}
 					}
-					
+
 					if(!empty($groups_to_add)){
 						$new_groups = CHostGroup::add($groups_to_add);
-						
+
 						if($new_groups === false){
 							error(CHostGroup::resetErrors());
 							$result = false;
 							break;
 						}
-						
+
 						$host_groups = array_merge($host_groups, $new_groups);
 					}
 				}
@@ -563,14 +563,14 @@ class zbxXML{
 					else{
 						$r = CHost::update($current_host);
 					}
-					
-					
+
+
 					if($r === false){
 						error(CHost::resetErrors());
 						$result = false;
 						break;
 					}
-					
+
 					$r = CHostGroup::updateHosts(array('hosts' => $current_host, 'groups' => $host_groups));
 					if($r === false){
 						error(CHostGroup::resetErrors());
@@ -625,7 +625,7 @@ class zbxXML{
 
 				$xpath = new DOMXPath($xml);
 				$profile_ext_node = $xpath->query('host_profiles_ext/*', $host);
-				
+
 				if($profile_ext_node->length > 0){
 					$profile_ext = array();
 					foreach($profile_ext_node as $num => $field){
@@ -635,21 +635,21 @@ class zbxXML{
 					delete_host_profile_ext($current_host['hostid']);
 					add_host_profile_ext($current_host['hostid'], $profile_ext);
 				}
-				
+
 // MACROS
 				$xpath = new DOMXPath($xml);
 				$macros = $xpath->query('macros/macro', $host);
-				
+
 				if($macros->length > 0){
 					$macros_to_add = array();
 					$macros_to_upd = array();
 					foreach($macros as $macro){
 						$macro_db = self::mapXML2arr($macro, XML_TAG_MACRO);
 						$macro_db['hostid'] = $current_host['hostid'];
-						
+
 						$current_macro = CUserMacro::getHostMacroObjects($macro_db);
 						$current_macro = reset($current_macro);
-						
+
 						if($current_macro){
 							$current_macro['hostid'] = $current_host['hostid'];
 							$macros_to_upd[] = $current_macro;
@@ -669,13 +669,13 @@ class zbxXML{
 							break;
 						}
 					}
-					
+
 					if(!empty($macros_to_upd)){
 						$r = CUserMacro::updateValue($macros_to_upd);
 						if($r === false){
 							error(CUserMacro::resetErrors());
 							$result = false;
-							
+
 							break;
 						}
 					}
@@ -684,18 +684,18 @@ class zbxXML{
 				if(isset($rules['item']['exist']) || isset($rules['item']['missed'])){
 					$xpath = new DOMXPath($xml);
 					$items = $xpath->query('items/item', $host);
-				
+
 
 					$items_to_add = array();
 					$items_to_upd = array();
 					foreach($items as $inum => $item){
 						$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
-						
+
 						$item_db['hostid'] = $current_host['hostid'];
 //SDII($item_db);
 						$current_item = CItem::getObjects($item_db);
 						$current_item = reset($current_item);
-						
+
 // sdii(array('key_' => $item_db['key_'], 'host' => $host_db['host']));
 						if(!$current_item && !isset($rules['item']['missed'])) continue; // break if update nonexist
 						if($current_item && !isset($rules['item']['exist'])) continue; // break if not update exist
@@ -704,16 +704,16 @@ class zbxXML{
 // ITEM APPLICATIONS {{{
 						$xpath = new DOMXPath($xml);
 						$applications = $xpath->query('applications/application', $item);
-						
+
 						$item_applications = array();
 						$applications_to_add = array();
 
 						foreach($applications as $application){
 							$application_name = $application->nodeValue;
 							$application_db = array('name' => $application_name, 'hostid' => $current_host['hostid']);
-							
+
 							$current_application = CApplication::getObjects($application_db);
-							
+
 							if(empty($current_application)){
 								$applications_to_add = array_merge($applications_to_add, $application_db);
 							}
@@ -722,7 +722,7 @@ class zbxXML{
 							}
 //sdi('application: '.$application.' | applicationID: '. $current_applicationid);
 						}
-						
+
 						if(!empty($applications_to_add)){
 							$new_applications = CApplication::add($applications_to_add);
 							if($new_applications === false){
@@ -732,7 +732,7 @@ class zbxXML{
 							}
 							$item_applications = array_merge($item_applications, $new_applications);
 						}
-// }}} ITEM APPLICATIONS						
+// }}} ITEM APPLICATIONS
 
 
 //sdi('item: '.$item.' | itemID: '. $current_itemid);
@@ -747,15 +747,15 @@ class zbxXML{
 						}
 						if(!$current_item && isset($rules['item']['missed'])){
 							$item_db['hostid'] = $current_host['hostid'];
-							
+
 							$current_item = CItem::add($item_db);
 							if($current_item === false){
 								error(CItem::resetErrors());
 								$result = false;
 								break;
-							}	
+							}
 						}
-						
+
 						$r = CApplication::addItems(array('applications' => $item_applications, 'items' => $current_item));
 						if($r === false){
 							error(CApplication::resetErrors());
@@ -774,7 +774,7 @@ class zbxXML{
 					$added_triggers = array();
 					$triggers_to_add = array();
 					$triggers_to_upd = array();
-					
+
 					foreach($triggers as $trigger){
 						$trigger_db = self::mapXML2arr($trigger, XML_TAG_TRIGGER);
 						$trigger_db['expression'] = str_replace('{{HOSTNAME}:', '{'.$host_db['host'].':', $trigger_db['expression']);
@@ -783,12 +783,12 @@ class zbxXML{
 						$current_trigger = CTrigger::getObjects($trigger_db);
 //sdii($current_trigger);
 						$current_trigger = reset($current_trigger);
-						
+
 
 						if(!$current_trigger && !isset($rules['trigger']['missed'])) continue; // break if update nonexist
 						if($current_trigger && !isset($rules['trigger']['exist'])) continue; // break if not update exist
 
-						
+
 						if($current_trigger && isset($rules['trigger']['exist'])){
 							$triggers_for_dependencies[] = $current_trigger;
 							$current_trigger['expression'] = explode_exp($current_trigger['expression'], false);
@@ -825,7 +825,7 @@ class zbxXML{
 				if(isset($rules['template']['exist'])){
 					$xpath = new DOMXPath($xml);
 					$templates = $xpath->query('templates/template', $host);
-					
+
 					$templates_to_link = array();
 					foreach($templates as $template){
 						$current_template = CTemplate::getObjects(array('template' => $template->nodeValue));
@@ -856,11 +856,11 @@ class zbxXML{
 					foreach($graphs as $gnum=> $graph){
 						$graph_db = self::mapXML2arr($graph, XML_TAG_GRAPH);
 						$graph_db['hostid'] = $current_host['hostid'];
-						
+
 						$current_graph = CGraph::getObjects($graph_db);
 						$current_graph = reset($current_graph);
 // sdii($current_graph);
-						
+
 						if(!$current_graph && !isset($rules['graph']['missed'])) continue; // break if update nonexist
 						if($current_graph && !isset($rules['graph']['exist'])) continue; // break if not update exist
 //sdi('graph: '.$graph_db['name'].' | graphID: '. $current_graphid);
@@ -871,30 +871,30 @@ class zbxXML{
 							if(count($graph_db['ymin_item_key']) < 2){
 								error('Incorrect y min item for graph ['.$graph_db['name'].']');
 							}
-	
+
 							$current_graph['host']	= array_shift($graph_db['ymin_item_key']);
 							$current_graph['ymin_item_key']	= implode(':', $graph_db['ymin_item_key']);
-	
+
 							if(!$item = get_item_by_key($current_graph['ymin_item_key'], $current_graph['host'])){
 								error('Missed item ['.$current_graph['ymin_item_key'].'] for host ['.$current_graph['host'].']');
 							}
-	
+
 							$current_graph['ymin_itemid'] = $item['itemid'];
 						}
-	
+
 						if(!empty($graph_db['ymax_item_key'])){
 							$graph_db['ymax_item_key'] = explode(':', $graph_db['ymax_item_key']);
 							if(count($graph_db['ymax_item_key']) < 2){
 								error('Incorrect y max item for graph ['.$graph_db['name'].']');
 							}
-	
+
 							$current_graph['host']	= array_shift($graph_db['ymax_item_key']);
 							$current_graph['ymax_item_key']	= implode(':', $graph_db['ymax_item_key']);
-	
+
 							if(!$item = get_item_by_key($current_graph['ymax_item_key'], $current_graph['host'])){
 								error('Missed item ['.$current_graph['ymax_item_key'].'] for host ['.$current_graph['host'].']');
 							}
-	
+
 							$current_graph['ymax_itemid'] = $item['itemid'];
 						}
 
@@ -905,7 +905,7 @@ class zbxXML{
 // GRAPH ITEMS {{{
 						$xpath = new DOMXPath($xml);
 						$gitems = $xpath->query('graph_elements/graph_element', $graph);
-					
+
 						$gitems_to_add = array();
 						foreach($gitems as $ginum => $gitem){
 							$gitem_db = self::mapXML2arr($gitem, XML_TAG_GRAPH_ELEMENT);
@@ -915,15 +915,15 @@ class zbxXML{
 							if($gitem_host == '{HOSTNAME}'){
 								$gitem_host = $host_db['host'];
 							}
-							
-							
+
+
 							$gitem_hostid = CHost::getObjects(array('host' => $gitem_host));
 // sdii($gitem_hostid);
 							$gitem_templateid = CTemplate::getObjects(array('template' => $gitem_host));
 // sdii($gitem_templateid);
 							$gitem_hostid = array_merge($gitem_hostid, $gitem_templateid);
-							
-							
+
+
 							$gitem_hostid = reset($gitem_hostid);
 
 							$gitem_db['hostid'] = $gitem_hostid['hostid'];
@@ -955,11 +955,11 @@ class zbxXML{
 // DEPENDENCIES
 			$xpath = new DOMXPath($xml);
 			$dependencies = $xpath->query('dependencies/dependency');
-			
+
 			if($dependencies->length > 0){
 				$triggers_for_dependencies = zbx_objectFields($triggers_for_dependencies, 'triggerid');
 				$triggers_for_dependencies = array_flip($triggers_for_dependencies);
-				
+
 				foreach($dependencies as $dependency){
 					$triggers_to_add_dep = array();
 

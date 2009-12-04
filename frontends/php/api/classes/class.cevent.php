@@ -119,7 +119,7 @@ class CEvent extends CZBXAPI{
 
 			if(!is_null($options['triggerids']))
 				$tr_options['triggerids'] = $options['triggerids'];
-			
+
 			$triggers = CTrigger::get($tr_options);
 			$triggerids = zbx_objectValues($triggers, 'triggerid');
 
@@ -240,7 +240,7 @@ class CEvent extends CZBXAPI{
 		}
 // count
 		if(!is_null($options['count'])){
-			$options['sortfield'] = '';			
+			$options['sortfield'] = '';
 			$sql_parts['select']['events'] = 'COUNT(DISTINCT e.eventid) as rowscount';
 		}
 
@@ -248,7 +248,7 @@ class CEvent extends CZBXAPI{
 // restrict not allowed columns for sorting
 		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
 		if(!zbx_empty($options['sortfield'])){
-		
+
 			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
 
 			$sql_parts['order'][] = 'e.'.$options['sortfield'].' '.$sortorder;
@@ -256,7 +256,7 @@ class CEvent extends CZBXAPI{
 			if(!is_null($options['triggerids']) && ($options['sortfield'] == 'clock')){
 				$sql_parts['where']['o'] = '(e.object-0)='.EVENT_OBJECT_TRIGGER;
 			}
-				
+
 			if(!str_in_array('e.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('e.*', $sql_parts['select'])){
 				$sql_parts['select'][] = 'e.'.$options['sortfield'];
 			}
@@ -307,7 +307,7 @@ class CEvent extends CZBXAPI{
 					if($event['object'] == EVENT_OBJECT_TRIGGER){
 						$triggerids[$event['objectid']] = $event['objectid'];
 					}
-					
+
 					if(!isset($result[$event['eventid']])) $result[$event['eventid']]= array();
 
 					if($options['select_hosts'] && !isset($result[$event['eventid']]['hosts'])){
@@ -346,7 +346,7 @@ class CEvent extends CZBXAPI{
 				}
 			}
 		}
-		
+
 
 		if(is_null($options['extendoutput']) || !is_null($options['count'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
@@ -381,9 +381,9 @@ class CEvent extends CZBXAPI{
 
 // Adding triggers
 		if($options['select_triggers']){
-			$obj_params = array('extendoutput' => 1, 
-							'triggerids' => $triggerids, 
-							'nopermissions' => 1, 
+			$obj_params = array('extendoutput' => 1,
+							'triggerids' => $triggerids,
+							'nopermissions' => 1,
 							'preservekeys' => 1
 						);
 			$triggers = CTrigger::get($obj_params);
@@ -399,9 +399,9 @@ class CEvent extends CZBXAPI{
 
 // Adding items
 		if($options['select_items']){
-			$obj_params = array('extendoutput' => 1, 
-							'triggerids' => $triggerids, 
-							'nopermissions' => 1, 
+			$obj_params = array('extendoutput' => 1,
+							'triggerids' => $triggerids,
+							'nopermissions' => 1,
 							'preservekeys' => 1
 						);
 			$db_items = CItem::get($obj_params);
@@ -425,7 +425,7 @@ class CEvent extends CZBXAPI{
 				}
 			}
 		}
-		
+
 
 // removing keys (hash -> array)
 
@@ -458,10 +458,10 @@ class CEvent extends CZBXAPI{
 	public static function add($events){
 		$events = zbx_toArray($events);
 		$eventids = array();
-		
+
 		$result = false;
 		$triggers = array();
-		
+
 		self::BeginTransaction(__METHOD__);
 		foreach($events as $num => $event){
 			$event_db_fields = array(
@@ -572,13 +572,13 @@ class CEvent extends CZBXAPI{
 	public static function acknowledge($events_data){
 		global $USER_DETAILS;
 		$errors = array();
-	
+
 		$events = isset($events_data['events']) ? zbx_toArray($events_data['events']) : array();
 		$eventids = zbx_objectValues($events, 'eventid');
 		$triggers = isset($events_data['triggers']) ? zbx_toArray($events_data['triggers']) : array();
 		$triggerids = zbx_objectValues($triggers, 'triggerid');
 		$message = $events_data['message'];
-		
+
 // PERMISSIONS {{{
 		if(!empty($events)){
 			$allowed_events = self::get(array('eventids' => $eventids, 'preservekeys' => 1));
@@ -602,12 +602,12 @@ class CEvent extends CZBXAPI{
 		}
 // }}} PERMISSIONS
 		self::BeginTransaction(__METHOD__);
-		
+
 		$result = DBexecute('UPDATE events SET acknowledged=1 WHERE '.DBcondition('eventid', $eventids));
 		if($result){
 			$time = time();
 			$message = zbx_dbstr($message);
-			
+
 			foreach($events as $enum => $event){
 				$acknowledgeid = get_dbid('acknowledges', 'acknowledgeid');
 				$result = DBexecute('INSERT INTO acknowledges (acknowledgeid, userid, eventid, clock, message)'.
@@ -617,13 +617,13 @@ class CEvent extends CZBXAPI{
 					break;
 			}
 		}
-		
+
 		$result = self::EndTransaction($result, __METHOD__);
-		
+
 		if($result){
 			$result = self::get(array(
-				'eventids' => $eventids, 
-				'extendoutput' => 1, 
+				'eventids' => $eventids,
+				'extendoutput' => 1,
 				'nopermission' => 1));
 			return $result;
 		}
@@ -632,8 +632,8 @@ class CEvent extends CZBXAPI{
 			return false;
 		}
 	}
-	
-	
-	
+
+
+
 }
 ?>

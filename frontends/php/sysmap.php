@@ -57,7 +57,7 @@ include_once('include/page_header.php');
 		'drawtype'=>array(T_ZBX_INT, O_OPT,  NULL, IN('0,1,2,3,4'),'isset({save_link})'),
 		'color'=>	array(T_ZBX_STR, O_OPT,  NULL, NOT_EMPTY,'isset({save_link})'),
 
-// actions 
+// actions
 		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'save_link'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -66,7 +66,7 @@ include_once('include/page_header.php');
 // other
 		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL),
-		
+
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,	NULL),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  null,	NULL),
@@ -74,7 +74,7 @@ include_once('include/page_header.php');
 
 		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'form','list','get','get_img','new_selement','save'"),NULL),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("hat"=={favobj})'),
-		
+
 		'selements'=>	array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID, NULL),
 		'links'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID, NULL),
 	);
@@ -137,26 +137,26 @@ include_once('include/page_header.php');
 					$options = array('sysmapids'=> $sysmapid, 'editable'=>1, 'extendoutput'=>1, 'select_selements'=>1, 'select_links'=>1);
 					$sysmaps = CMap::get($options);
 					if(empty($sysmaps)) print('alert("Access denied!");');
-					
+
 					$selements = get_request('selements', '[]');
 					$selements = $json->decode($selements, true);
 
 					$links = get_request('links', '[]');
 					$links = $json->decode($links, true);
 
-					@ob_start();					
+					@ob_start();
 					$db_selementids = array();
 					$res = DBselect('SELECT selementid FROM sysmaps_elements WHERE sysmapid='.$sysmapid);
 					while($db_selement = DBfetch($res)){
 						$db_selementids[$db_selement['selementid']] = $db_selement['selementid'];
 					}
-					
-					DBstart();					
+
+					DBstart();
 					foreach($selements as $id => $selement){
 						if($selement['elementid'] == 0){
 							$selement['elementtype'] = SYSMAP_ELEMENT_TYPE_IMAGE;
 						}
-						
+
 						if(isset($selement['new'])){
 							$selement['sysmapid'] = $sysmapid;
 							$selementid = add_element_to_sysmap($selement);
@@ -183,7 +183,7 @@ include_once('include/page_header.php');
 					while($db_link = DBfetch($res)){
 						$db_linkids[$db_link['linkid']] = $db_link['linkid'];
 					}
-					
+
 					foreach($links as $id => $link){
 						if(isset($link['new'])){
 							$link['sysmapid'] = $sysmapid;
@@ -195,13 +195,13 @@ include_once('include/page_header.php');
 							unset($db_linkids[$link['linkid']]);
 						}
 					}
-					
+
 					foreach($db_linkids as $id => $linkid){
 						delete_link($linkid);
 					}
-					
+
 					$result = DBend(true);
-					
+
 					if($result){
 						print('location.href = "sysmaps.php"');
 						ob_flush();
@@ -219,7 +219,7 @@ include_once('include/page_header.php');
 		if('selements' == $_REQUEST['favobj']){
 			$sysmapid = get_request('sysmapid',0);
 			$cmapid = get_request('favid',0);
-			
+
 			switch($_REQUEST['action']){
 				case 'get_img':
 					$selements = get_request('selements', '[]');
@@ -234,7 +234,7 @@ include_once('include/page_header.php');
 						$action = '';
 						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement).',1);';
 //						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.update_mapimg();';
-						
+
 						print($action);
 					}
 					else{
@@ -268,13 +268,13 @@ include_once('include/page_header.php');
 				break;
 			}
 		}
-		
+
 		if('links' == $_REQUEST['favobj']){
 			switch($_REQUEST['action']){
 			}
 		}
-	}	
-	
+	}
+
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
 		exit();
 	}
@@ -290,27 +290,27 @@ include_once('include/page_header.php');
 		);
 
 		$maps = CMap::get($options);
-		
+
 		if(empty($maps)) access_deny();
 		else $sysmap = reset($maps);
 	}
-	
+
 ?>
 <?php
 	echo SBR;
-	
+
 // ELEMENTS
 	$el_add = new CDiv(SPACE,'iconplus');
 	$el_add->setAttribute('title',S_ADD_ELEMENT);
 	$el_add->setAttribute('id','selement_add');
-	
+
 	$el_rmv = new CDiv(SPACE,'iconminus');
 	$el_rmv->setAttribute('title',S_REMOVE_ELEMENT);
 	$el_rmv->setAttribute('id','selement_rmv');
-						
+
 //-----------------
 
-// CONNECTORS 
+// CONNECTORS
 //		echo BR;
 //		show_table_header("CONNECTORS", new CButton("form","Create connection","return Redirect('".$page["file"]."?form=add_link".url_param("sysmapid")."');"));
 
@@ -319,7 +319,7 @@ include_once('include/page_header.php');
 	$cn_add = new CDiv(SPACE,'iconplus');
 	$cn_add->setAttribute('title',S_ADD_LINK);
 	$cn_add->setAttribute('id','link_add');
-	
+
 	$cn_rmv = new CDiv(SPACE,'iconminus');
 	$cn_rmv->setAttribute('title',S_REMOVE_LINK);
 	$cn_rmv->setAttribute('id','link_rmv');
@@ -335,7 +335,7 @@ include_once('include/page_header.php');
 
 	$save_btn = new CButton('save',S_SAVE);
 	$save_btn->setAttribute('id','sysmap_save');
-	
+
 	$elcn_tab = new CTable(null,'textwhite');
 	$elcn_tab->addRow(array(S_ELEMENT.'[',$el_add,$el_rmv,']',SPACE,SPACE,S_LINK.'[',$cn_add,$cn_rmv,']'));
 //	show_table_header($map['name'], $save_btn);
@@ -343,23 +343,23 @@ include_once('include/page_header.php');
 
 
 	$sysmap_img = new CImg('images/general/tree/zero.gif','sysmap');
-	$sysmap_img->setAttribute('id', 'sysmap_img');	
-	
+	$sysmap_img->setAttribute('id', 'sysmap_img');
+
 	$table = new CTable(NULL,'map');
 //	$table->addRow(array($td, $sysmap_img));
 	$table->addRow($sysmap_img);
 	$table->Show();
-	
+
 	$container = new CDiv(null);
 	$container->setAttribute('id','sysmap_cnt');
 	$container->setAttribute('style','position: absolute;');
 	$container->Show();
 
 	zbx_add_post_js('create_map("sysmap_cnt", "'.$sysmap['sysmapid'].'");');
-	
+
 	insert_js(get_selement_form_menu());
 	insert_js(get_link_form_menu());
-	
+
 	insert_show_color_picker_javascript();
 ?>
 <?php

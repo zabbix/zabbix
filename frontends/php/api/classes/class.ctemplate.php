@@ -318,7 +318,7 @@ class CTemplate extends CZBXAPI{
 
 // hostids
 					if(isset($template['linked_hostid'])){
-						if(!isset($result[$template['templateid']]['hosts'])) 
+						if(!isset($result[$template['templateid']]['hosts']))
 							$result[$template['templateid']]['hosts'] = array();
 
 						$result[$template['templateid']]['hosts'][$template['linked_hostid']] = array('hostid' => $template['linked_hostid']);
@@ -327,7 +327,7 @@ class CTemplate extends CZBXAPI{
 
 // itemids
 					if(isset($template['itemid'])){
-						if(!isset($result[$template['templateid']]['items'])) 
+						if(!isset($result[$template['templateid']]['items']))
 							$result[$template['templateid']]['items'] = array();
 
 						$result[$template['templateid']]['items'][$template['itemid']] = array('itemid' => $template['itemid']);
@@ -466,7 +466,7 @@ class CTemplate extends CZBXAPI{
 	public static function getObjects($template_data){
 		$result = array();
 		$templateid = array();
-		
+
 		$sql = 'SELECT hostid '.
 				' FROM hosts '.
 				' WHERE host='.zbx_dbstr($template_data['template']).
@@ -479,7 +479,7 @@ class CTemplate extends CZBXAPI{
 
 		if(!empty($templateids))
 			$result = self::get(array('templateids'=>$templateids, 'extendoutput'=>1));
-		
+
 	return $result;
 	}
 
@@ -512,30 +512,30 @@ class CTemplate extends CZBXAPI{
 	public static function add($templates){
 		$templates = zbx_toArray($templates);
 		$templateids = array();
-		
+
 		$tpls = null;
 		$newgroup = '';
 		$status = HOST_STATUS_TEMPLATE;
 		$error = 'Internal Zabbix eror';
 
 		$result = false;
-		
+
 		foreach($templates as $tnum => $template){
 			if(empty($template['groups'])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'No groups for template [ '.$template['host'].' ]');
 				return false;
 			}
-		
+
 			$templates[$tnum]['groups'] = zbx_toArray($templates[$tnum]['groups']);
-			
+
 			foreach($templates[$tnum]['groups'] as $gnum => $group){
 				$groupids[$group['groupid']] = $group['groupid'];
 			}
 		}
-		
+
 		$upd_groups = CHostGroup::get(array(
 			'groupids' => $groupids,
-			'editable' => 1, 
+			'editable' => 1,
 			'preservekeys' => 1));
 		foreach($groupids as $gnum => $groupid){
 			if(!isset($upd_groups[$groupid])){
@@ -547,7 +547,7 @@ class CTemplate extends CZBXAPI{
 		self::BeginTransaction(__METHOD__);
 		foreach($templates as $tnum => $template){
 			$template['groupids'] = zbx_objectValues($template['groups'], 'groupid');
-			
+
 			$host_db_fields = array(
 				'host' => null,
 				'port' => 0,
@@ -574,7 +574,7 @@ class CTemplate extends CZBXAPI{
 			$result = add_host($template['host'], $template['port'], $status, $template['useip'], $template['dns'], $template['ip'],
 				$template['proxy_hostid'], $tpls, $template['useipmi'], $template['ipmi_ip'], $template['ipmi_port'], $template['ipmi_authtype'],
 				$template['ipmi_privilege'], $template['ipmi_username'], $template['ipmi_password'], $newgroup, $template['groupids']);
-				
+
 			if(!$result) break;
 
 			$templateids[] = $result;
@@ -582,7 +582,7 @@ class CTemplate extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_templates = self::get(array('templateids'=>$templateids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$new_templates = self::get(array('templateids'=>$templateids, 'extendoutput'=>1, 'nopermissions'=>1));
 			return $new_templates;
 		}
 		else{
@@ -607,9 +607,9 @@ class CTemplate extends CZBXAPI{
 		$templates = zbx_toArray($templates);
 		$templateids = array();
 
-		$upd_templates = self::get(array('templateids'=>zbx_objectValues($templates, 'templateid'), 
-									'editable'=>1, 
-									'extendoutput'=>1, 
+		$upd_templates = self::get(array('templateids'=>zbx_objectValues($templates, 'templateid'),
+									'editable'=>1,
+									'extendoutput'=>1,
 									'preservekeys'=>1));
 		foreach($templates as $gnum => $template){
 			if(!isset($upd_templates[$template['templateid']])){
@@ -637,19 +637,19 @@ class CTemplate extends CZBXAPI{
 
 			$groups = get_groupids_by_host($template['templateid']);
 
-			$result = update_host($template['templateid'], $template['host'], $template['port'], $status, 
+			$result = update_host($template['templateid'], $template['host'], $template['port'], $status,
 								$template['useip'], $template['dns'], $template['ip'],
-								$template['proxy_hostid'], $tpls, $template['useipmi'], 
+								$template['proxy_hostid'], $tpls, $template['useipmi'],
 								$template['ipmi_ip'], $template['ipmi_port'], $template['ipmi_authtype'],
 								$template['ipmi_privilege'], $template['ipmi_username'], $template['ipmi_password'], $newgroup, $groups);
-								
+
 			if(!$result) break;
 		}
 
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_templates = self::get(array('templateids'=>$templateids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$upd_templates = self::get(array('templateids'=>$templateids, 'extendoutput'=>1, 'nopermissions'=>1));
 			return $upd_templates;
 		}
 		else{
@@ -675,9 +675,9 @@ class CTemplate extends CZBXAPI{
 		$templates = zbx_toArray($templates);
 		$templateids = array();
 
-		$del_templates = self::get(array('templateids'=>zbx_objectValues($templates, 'templateid'), 
-											'editable'=>1, 
-											'extendoutput'=>1, 
+		$del_templates = self::get(array('templateids'=>zbx_objectValues($templates, 'templateid'),
+											'editable'=>1,
+											'extendoutput'=>1,
 											'preservekeys'=>1));
 		foreach($templates as $gnum => $template){
 			if(!isset($del_templates[$template['templateid']])){
@@ -805,15 +805,15 @@ class CTemplate extends CZBXAPI{
 	public static function linkTemplates($data){
 		$result = true;
 		$errors = array();
-		
+
 		$hosts = zbx_toArray($data['hosts']);
 		$hostids = zbx_objectValues($hosts, 'hostid');
-		
+
 		$templates = zbx_toArray($data['templates']);
 		$templateids = zbx_objectValues($templates, 'templateid');
 
 		self::BeginTransaction(__METHOD__);
-		
+
 		$sql = 'SELECT hostid, templateid FROM hosts_templates WHERE '.DBcondition('hostid', $hostids).' AND '.DBcondition('templateid', $templateids);
 		$linked_db = DBselect($sql);
 		$linked = array();
@@ -823,12 +823,12 @@ class CTemplate extends CZBXAPI{
 
 		foreach($templates as $tnum => $template){
 			$templateid = $template['templateid'];
-			
+
 			$hosttemplateid = get_dbid('hosts_templates', 'hosttemplateid');
 			foreach($hosts as $hnum => $host){
-			
+
 				if(isset($linked[$templateid]) && isset($linked[$templateid][$host['hostid']])) continue;
-				
+
 				if(!$result = DBexecute('INSERT INTO hosts_templates VALUES ('.$hosttemplateid.','.$host['hostid'].','.$templateid.')'))
 				$result = false;
 				break;
@@ -874,25 +874,25 @@ class CTemplate extends CZBXAPI{
  */
 	public static function unlinkTemplates($data){
 		$errors = array();
-		
+
 		$templateids = zbx_objectValues($data['templates'], 'templateid');
 		$hostids = zbx_objectValues($data['hosts'], 'hostid');
 		$clean = isset($data['clean']) ? $data['clean'] : false;;
 
 		self::BeginTransaction(__METHOD__);
-		
+
 		$sql = 'DELETE FROM hosts_templates WHERE '.DBcondition('hostid', $hostids).' AND '.DBcondition('templateid', $templateids);
 		$result = DBexecute($sql);
-		
+
 		if($result){
 			foreach($hostids as $hostid){
 				$result = delete_template_elements($hostid, $templateids, $clean);
 				if(!$result) break;
 			}
 		}
-		
+
 		$result = self::EndTransaction($result, __METHOD__);
-		
+
 		if($result)
 			return true;
 		else{

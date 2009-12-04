@@ -313,7 +313,7 @@ class CApplication extends CZBXAPI{
 	public static function getObjects($app_data){
 		$result = array();
 		$applicationids = array();
-				
+
 		$sql = 'SELECT applicationid '.
 				' FROM applications '.
 				' WHERE hostid='.$app_data['hostid'].
@@ -322,10 +322,10 @@ class CApplication extends CZBXAPI{
 		while($app = DBfetch($res)){
 			$applicationids[$app['applicationid']] = $app['applicationid'];
 		}
-	
+
 		if(!empty($applicationids))
 			$result = self::get(array('applicationids'=>$applicationids, 'extendoutput'=>1));
-		
+
 	return $result;
 	}
 
@@ -346,20 +346,20 @@ class CApplication extends CZBXAPI{
 	public static function add($applications){
 		$applications = zbx_toArray($applications);
 		$applicationids = array();
-		
+
 		$result = false;
 
 		self::BeginTransaction(__METHOD__);
 		foreach($applications as $anum => $application){
 			$result = add_application($application['name'], $application['hostid']);
-			
+
 			if(!$result) break;
 			$applicationids[] = $result;
 		}
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_applications = self::get(array('applicationids'=>$applicationids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$new_applications = self::get(array('applicationids'=>$applicationids, 'extendoutput'=>1, 'nopermissions'=>1));
 			return $new_applications;
 		}
 		else{
@@ -385,10 +385,10 @@ class CApplication extends CZBXAPI{
 	public static function update($applications){
 		$applications = zbx_toArray($applications);
 		$applicationids = array();
-		
-		$upd_applications = self::get(array('applicationids'=>zbx_objectValues($applications, 'applicationid'), 
-											'editable'=>1, 
-											'extendoutput'=>1, 
+
+		$upd_applications = self::get(array('applicationids'=>zbx_objectValues($applications, 'applicationid'),
+											'editable'=>1,
+											'extendoutput'=>1,
 											'preservekeys'=>1));
 		foreach($applications as $anum => $application){
 			if(!isset($upd_applications[$application['applicationid']])){
@@ -397,7 +397,7 @@ class CApplication extends CZBXAPI{
 			}
 			$applicationids[] = $application['applicationid'];
 		}
-		
+
 		$result = false;
 
 		self::BeginTransaction(__METHOD__);
@@ -409,15 +409,15 @@ class CApplication extends CZBXAPI{
 				$result = false;
 				break;
 			}
-			
+
 			$result = update_application($application['applicationid'], $application['name'], $application['hostid']);
-			
+
 			if(!$result) break;
 		}
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_applications = self::get(array('applicationids'=>$applicationids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$upd_applications = self::get(array('applicationids'=>$applicationids, 'extendoutput'=>1, 'nopermissions'=>1));
 			return $upd_applications;
 		}
 		else{
@@ -440,12 +440,12 @@ class CApplication extends CZBXAPI{
  * @return boolean
  */
 	public static function delete($applications){
-		$applications = zbx_toArray($applications);		
+		$applications = zbx_toArray($applications);
 		$applicationids = array();
-		
-		$del_applications = self::get(array('applicationids'=>zbx_objectValues($applications, 'applicationid'), 
-											'editable'=>1, 
-											'extendoutput'=>1, 
+
+		$del_applications = self::get(array('applicationids'=>zbx_objectValues($applications, 'applicationid'),
+											'editable'=>1,
+											'extendoutput'=>1,
 											'preservekeys'=>1));
 		foreach($applications as $anum => $application){
 			if(!isset($del_applications[$application['applicationid']])){
@@ -474,9 +474,9 @@ class CApplication extends CZBXAPI{
 		}
 	}
 
-	
+
 /**
- * Add Items to applications 
+ * Add Items to applications
  *
  * {@source}
  * @access public
@@ -490,19 +490,19 @@ class CApplication extends CZBXAPI{
  * @return boolean
  */
 	public static function addItems($data){
-	
+
 		$result = true;
-		
+
 		$applications = zbx_toArray($data['applications']);
 		$items = zbx_toArray($data['items']);
 		$applicationids = array();
 		$itemids = array();
-		
+
 // PERMISSION {{{
 		$allowed_applications = self::get(array(
 			'applicationids' => zbx_objectValues($applications, 'applicationid'),
-			'editable' => 1, 
-			'extendoutput' => 1, 
+			'editable' => 1,
+			'extendoutput' => 1,
 			'preservekeys' => 1)
 		);
 		foreach($applications as $num => $application){
@@ -512,11 +512,11 @@ class CApplication extends CZBXAPI{
 			}
 			$applicationids[] = $application['applicationid'];
 		}
-		
+
 		$allowed_items = CItem::get(array(
 			'itemids' => zbx_objectValues($items, 'itemid'),
-			'editable' => 1, 
-			'extendoutput' => 1, 
+			'editable' => 1,
+			'extendoutput' => 1,
 			'preservekeys' => 1)
 		);
 		foreach($items as $num => $item){
@@ -527,10 +527,10 @@ class CApplication extends CZBXAPI{
 			$itemids[] = $item['itemid'];
 		}
 // }}} PERMISSION
-	
-		
+
+
 		self::BeginTransaction(__METHOD__);
-		
+
 		$sql = 'SELECT itemid, applicationid FROM items_applications WHERE '.
 			DBcondition('itemid', $itemids).' AND '.DBcondition('applicationid', $applicationids);
 		$linked_db = DBselect($sql);
@@ -549,11 +549,11 @@ class CApplication extends CZBXAPI{
 				}
 			}
 		}
-		
+
 		if($result){
 			foreach($itemids as $itemid){
 				$db_childs = DBselect('SELECT itemid, hostid FROM items WHERE templateid='.$itemid);
-				
+
 				if($child = DBfetch($db_childs)){
 					$sql = 'SELECT a1.applicationid '.
 							' FROM applications a1, applications a2 '.
@@ -562,7 +562,7 @@ class CApplication extends CZBXAPI{
 								' AND '.DBcondition('a2.applicationid', $applicationids);
 					$db_apps = DBselect($sql);
 					while($app = DBfetch($db_apps)){
-						$child_applications[] = $app;					
+						$child_applications[] = $app;
 					}
 					$result = self::addItems(array('items' => $child, 'applications' => $child_applications));
 					if(!$result){
@@ -571,14 +571,14 @@ class CApplication extends CZBXAPI{
 				}
 			}
 		}
-		
-		
-		$result = self::EndTransaction($result, __METHOD__);	
-	
+
+
+		$result = self::EndTransaction($result, __METHOD__);
+
 		if($result){
 			$result = self::get(array(
-				'applicationids' => $applicationids, 
-				'extendoutput' => 1, 
+				'applicationids' => $applicationids,
+				'extendoutput' => 1,
 				'select_items' => 1,
 				'nopermission' => 1));
 			return $result;
@@ -588,8 +588,8 @@ class CApplication extends CZBXAPI{
 			return false;
 		}
 	}
- 
- 
+
+
 }
 
 ?>

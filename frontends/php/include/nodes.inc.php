@@ -272,7 +272,7 @@
 			break;
 		}
 
-		
+
 		if(DBfetch(DBselect('SELECT nodeid FROM nodes WHERE nodeid='.$new_nodeid))){
 			error('Node with same ID already exists');
 			return false;

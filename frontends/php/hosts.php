@@ -117,14 +117,14 @@ include_once('include/page_header.php');
 		$groupids = available_groups($_REQUEST['groupid'], 1);
 		if(empty($groupids)) access_deny();
 	}
-	
+
 	if(get_request('hostid', 0) > 0){
 		$hostids = available_hosts($_REQUEST['hostid'], 1);
 		if(empty($hostids)) access_deny();
 	}
 ?>
 <?php
-	
+
 /************ ACTIONS FOR HOSTS ****************/
 // REMOVE MACROS
 	if(isset($_REQUEST['macros_del']) && isset($_REQUEST['macros_rem'])){
@@ -474,7 +474,7 @@ include_once('include/page_header.php');
 
 			if(!empty($macrostoadd))
 				$result = CUserMacro::update($macrostoadd);
-				
+
 			if(!$result)
 				error(S_ERROR_ADDING_MACRO);
 		}
@@ -525,12 +525,12 @@ include_once('include/page_header.php');
 	else if($_REQUEST['go'] == 'delete'){
 		$hosts = get_request('hosts', array());
 		$hosts = zbx_toObject($hosts,'hostid');
-		
+
 		$go_result = true;
 		DBstart();
 		foreach($hosts as $num => $host){
 			$go_result = CHost::delete($host);
-			
+
 			if(!$go_result) break;
 			$go_result = reset($go_result);
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$go_result['host'].']');
@@ -548,7 +548,7 @@ include_once('include/page_header.php');
 
 		$status = ($_REQUEST['go'] == 'activate') ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
 		$hosts = get_request('hosts', array());
-				
+
 		$act_hosts = available_hosts($hosts, 1);
 
 		DBstart();
@@ -758,7 +758,7 @@ include_once('include/page_header.php');
 			$snmp_available->addStyle('border: 0');
 			$ipmi_available = new CCol($ipmi_available);
 			$ipmi_available->addStyle('border: 0');
-			
+
 			$av_table = new CTable();
 			$av_table->AddRow(array($zbx_available, $snmp_available, $ipmi_available));
 

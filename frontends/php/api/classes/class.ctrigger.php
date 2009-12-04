@@ -417,7 +417,7 @@ class CTrigger extends CZBXAPI{
 					}
 // itemids
 					if(isset($trigger['itemid'])){
-						if(!isset($result[$trigger['triggerid']]['items'])) 
+						if(!isset($result[$trigger['triggerid']]['items']))
 							$result[$trigger['triggerid']]['items'] = array();
 
 						$result[$trigger['triggerid']]['items'][$trigger['itemid']] = array('itemid' => $trigger['itemid']);
@@ -428,7 +428,7 @@ class CTrigger extends CZBXAPI{
 				}
 			}
 		}
-		
+
 		if(is_null($options['extendoutput']) || !is_null($options['count'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
@@ -508,7 +508,7 @@ class CTrigger extends CZBXAPI{
 	public static function getObjects($trigger){
 		$result = array();
 		$triggerids = array();
-		
+
 		$sql_where = '';
 		$sql_from = '';
 
@@ -548,7 +548,7 @@ class CTrigger extends CZBXAPI{
 
 		if(!empty($triggerids))
 			$result = self::get(array('triggerids'=>$triggerids, 'extendoutput'=>1));
-		
+
 	return $result;
 	}
 
@@ -575,7 +575,7 @@ class CTrigger extends CZBXAPI{
 	public static function add($triggers){
 		$triggers = zbx_toArray($triggers);
 		$triggerids = array();
-		
+
 		$result = true;
 
 		self::BeginTransaction(__METHOD__);
@@ -616,7 +616,7 @@ class CTrigger extends CZBXAPI{
 
 		$result = self::EndTransaction($result, __METHOD__);
 		if($result){
-			$new_triggers = self::get(array('triggerids'=>$triggerids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$new_triggers = self::get(array('triggerids'=>$triggerids, 'extendoutput'=>1, 'nopermissions'=>1));
 			return $new_triggers;
 		}
 		else{
@@ -648,10 +648,10 @@ class CTrigger extends CZBXAPI{
 	public static function update($triggers){
 		$triggers = zbx_toArray($triggers);
 		$triggerids = array();
-		
-		$upd_triggers = self::get(array('triggerids'=>zbx_objectValues($triggers, 'triggerid'), 
-											'editable'=>1, 
-											'extendoutput'=>1, 
+
+		$upd_triggers = self::get(array('triggerids'=>zbx_objectValues($triggers, 'triggerid'),
+											'editable'=>1,
+											'extendoutput'=>1,
 											'preservekeys'=>1));
 		foreach($triggers as $gnum => $trigger){
 			if(!isset($upd_triggers[$trigger['triggerid']])){
@@ -660,7 +660,7 @@ class CTrigger extends CZBXAPI{
 			}
 			$triggerids[] = $trigger['triggerid'];
 		}
-		
+
 		$result = true;
 
 		self::BeginTransaction(__METHOD__);
@@ -689,7 +689,7 @@ class CTrigger extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_triggers = self::get(array('triggerids'=>$triggerids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$upd_triggers = self::get(array('triggerids'=>$triggerids, 'extendoutput'=>1, 'nopermissions'=>1));
 			return $upd_triggers;
 		}
 		else{
@@ -712,12 +712,12 @@ class CTrigger extends CZBXAPI{
  * @return deleted triggers
  */
 	public static function delete($triggers){
-		$triggers = zbx_toArray($triggers);		
+		$triggers = zbx_toArray($triggers);
 		$triggerids = array();
 
-		$del_triggers = self::get(array('triggerids'=>zbx_objectValues($triggers, 'triggerid'), 
-											'editable'=>1, 
-											'extendoutput'=>1, 
+		$del_triggers = self::get(array('triggerids'=>zbx_objectValues($triggers, 'triggerid'),
+											'editable'=>1,
+											'extendoutput'=>1,
 											'preservekeys'=>1));
 		foreach($triggers as $gnum => $trigger){
 			if(!isset($del_triggers[$trigger['triggerid']])){
@@ -737,9 +737,9 @@ class CTrigger extends CZBXAPI{
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ triggerids ]');
 			$result = false;
 		}
-		
+
 		$result = self::EndTransaction($result, __METHOD__);
-		
+
 		if($result){
 			return zbx_cleanHashes($del_triggers);
 		}

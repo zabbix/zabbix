@@ -27,7 +27,7 @@ class CTweenBox{
 		$this->name = $name.'_tweenbox';
 		$this->varname = $name;
 
-		
+
 		$this->value = zbx_toHash($value, 't');
 
 		$this->id_l = $this->varname.'_left';

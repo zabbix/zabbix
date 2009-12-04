@@ -75,7 +75,7 @@ include_once('include/page_header.php');
 		$groupids = available_groups($_REQUEST['groupid'], 1);
 		if(empty($groupids)) access_deny();
 	}
-	
+
 	if(get_request('templateid', 0) > 0){
 		$hostids = available_hosts($_REQUEST['templateid'], 1);
 		if(empty($hostids)) access_deny();
@@ -162,7 +162,7 @@ include_once('include/page_header.php');
 
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
-		
+
 
 		$clone_templateid = false;
 		if($_REQUEST['form'] == 'full_clone'){
@@ -207,15 +207,15 @@ include_once('include/page_header.php');
 			$msg_ok = S_TEMPLATE_ADDED;
 			$msg_fail = S_CANNOT_ADD_TEMPLATE;
 		}
-		
+
 		if($result){
 			$original_templates = get_templates_by_hostid($templateid);
 			$original_templates = array_keys($original_templates);
-			
+
 			$templates_to_unlink = array_diff($original_templates, $templates);
 			$templates_to_unlink = zbx_toObject($templates_to_unlink, 'templateid');
 			$result &= CTemplate::unlinkTemplates(array('hosts' => $template, 'templates' => $templates_to_unlink));
-			
+
 			$templates_to_link = array_diff($templates, $original_templates);
 			$templates_to_link = zbx_toObject($templates_to_link, 'templateid');
 			$result &= CTemplate::linkTemplates(array('hosts' => $template, 'templates' => $templates_to_link));
@@ -331,7 +331,7 @@ include_once('include/page_header.php');
 
 			if(!empty($macrostoadd))
 				$result = CUserMacro::update($macrostoadd);
-				
+
 			if(!$result)
 				error(S_ERROR_ADDING_MACRO);
 		}
@@ -492,7 +492,7 @@ include_once('include/page_header.php');
 		$options = array('editable' => 1, 'extendoutput' => 1);
 		$all_groups = CHostGroup::get($options);
 		order_result($all_groups, 'name');
-		
+
 		foreach($all_groups as $gnum => $group){
 			$group_tb->addItem($group['groupid'], $group['name']);
 		}
@@ -530,7 +530,7 @@ include_once('include/page_header.php');
 			if(isset($hosts_linked_to[$db_host['hostid']])) continue;// add all except selected hosts
 			$host_tb->addItem($db_host['hostid'], $db_host['host']);
 		}
-		
+
 // select selected hosts and add them
 		$params = array(
 			'hostids' => $hosts_linked_to,

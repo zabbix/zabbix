@@ -451,7 +451,7 @@ class CUserMacro extends CZBXAPI{
 		$macro_data = zbx_toArray($macro_data);
 		$result = array();
 		$hostmacroids = array();
-	
+
 		$macros = array();
 		foreach($macro_data as $macro_obj){
 			if(!isset($macro_obj['hostid'])) $macro_obj['hostid'] = array();
@@ -468,10 +468,10 @@ class CUserMacro extends CZBXAPI{
 				$hostmacroids[$macro['hostmacroid']] = $macro['hostmacroid'];
 			}
 		}
-	
+
 		if(!empty($hostmacroids))
 			$result = self::get(array('hostmacroids' => $hostmacroids, 'extendoutput' => 1));
-	
+
 	return $result;
 	}
 
@@ -494,9 +494,9 @@ class CUserMacro extends CZBXAPI{
 	public static function add($macros){
 		$macros = zbx_toArray($macros);
 		$hostmacroids = array();
-		
+
 		$result = true;
-		
+
 		self::BeginTransaction(__METHOD__);
 		foreach($macros as $mnum => $macro){
 
@@ -547,16 +547,16 @@ class CUserMacro extends CZBXAPI{
 		$result = false;
 //------
 		$hostids = array();
-		
+
 		self::BeginTransaction(__METHOD__);
 		foreach($macros as $mnum => $macro){
 			$result = DBexecute('DELETE FROM hostmacro WHERE hostid='.$macro['hostid']);
-			
+
 			if(isset($macro['macro']) && isset($macro['value'])){
 				if(CUserMacro::validate($macro)) $new_macros[] = $macro;
 			}
 		}
-		
+
 		foreach($new_macros as $mnum => $macro){
 			$hostmacroid = get_dbid('hostmacro', 'hostmacroid');
 
@@ -598,7 +598,7 @@ class CUserMacro extends CZBXAPI{
 	public static function updateValue($macros){
 		$macros = zbx_toArray($macros);
 		$hostmacroids = array();
-		
+
 		$result = false;
 //------
 
@@ -644,7 +644,7 @@ class CUserMacro extends CZBXAPI{
 	public static function deleteHostMacro($hostmacros){
 		$hostmacros = zbx_toArray($hostmacros);
 		$hostmacroids = zbx_objectValues($hostmacros, 'hostmacroid');
-		
+
 		$result = false;
 //------
 
@@ -668,7 +668,7 @@ class CUserMacro extends CZBXAPI{
 			return false;
 		}
 	}
-	
+
 /**
  * Add global macros
  *
@@ -687,7 +687,7 @@ class CUserMacro extends CZBXAPI{
 	public static function addGlobal($macros){
 		$macros = zbx_toArray($macros);
 		$globalmacroids = array();
-		
+
 		$result = false;
 //------
 
@@ -732,7 +732,7 @@ class CUserMacro extends CZBXAPI{
 	public static function deleteGlobalMacro($globalmacros){
 		$globalmacros = zbx_toArray($globalmacros);
 		$globalmacroids = zbx_objectValues($globalmacros, 'globalmacroid');
-		
+
 		$result = false;
 //------
 
@@ -769,7 +769,7 @@ class CUserMacro extends CZBXAPI{
 	public static function validate($macros){
 		$macros = zbx_toArray($macros);
 		$globalmacroids = array();
-		
+
 		$result = true;
 //------
 
@@ -805,7 +805,7 @@ class CUserMacro extends CZBXAPI{
 	public static function getGlobalMacroObjects($macro_data){
 		$result = array();
 		$globalmacroids = array();
-		
+
 		$sql = 'SELECT globalmacroid '.
 				' FROM globalmacro '.
 				' WHERE globalmacroid='.$macro_data['globalmacroid'];
@@ -816,7 +816,7 @@ class CUserMacro extends CZBXAPI{
 
 		if(!empty($globalmacroids))
 			$result = self::get(array('globalmacroids'=>$globalmacroids, 'extendoutput'=>1));
-		
+
 	return $result;
 	}
 
