@@ -494,7 +494,7 @@ include_once('include/page_header.php');
 				echo '<span class="textcolorstyles"><pre>'."\n";
 			}
 
-COpt::profiling_start('history');
+//COpt::profiling_start('history');
 			while($row=DBfetch($result)){
 
 				if($DB['TYPE'] == 'ORACLE' && $item_type == ITEM_VALUE_TYPE_TEXT){
@@ -549,7 +549,7 @@ COpt::profiling_start('history');
 			else{
 				echo '</pre></span>';
 			}
-COpt::profiling_stop('history');
+//COpt::profiling_stop('history');
 		}
 	}
 
