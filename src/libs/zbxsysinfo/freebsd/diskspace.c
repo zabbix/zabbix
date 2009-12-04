@@ -18,51 +18,48 @@
 **/
 
 #include "common.h"
-
 #include "sysinfo.h"
 
-int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *free, zbx_uint64_t *used, double *pfree, double *pused)
+static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *free,
+		zbx_uint64_t *used, double *pfree, double *pused)
 {
 #ifdef HAVE_SYS_STATVFS_H
-	struct statvfs	s;
+#	define STATFS	statvfs
+#	define BSIZE	f_frsize
 #else
-	struct statfs	s;
+#	define STATFS	statfs
+#	define BSIZE	f_bsize
 #endif
+	struct STATFS	s;
 
 	assert(fs);
 
-#ifdef HAVE_SYS_STATVFS_H
-	if (0 != statvfs(fs, &s))
-#else
-	if (0 != statfs(fs, &s))
-#endif
-	{
+	if (0 != STATFS(fs, &s))
 		return SYSINFO_RET_FAIL;
+
+	if (total)
+		*total = (zbx_uint64_t)s.f_blocks * s.BSIZE;
+	if (free)
+		*free = (zbx_uint64_t)s.f_bavail * s.BSIZE;
+	if (used)
+		*used = (zbx_uint64_t)(s.f_blocks - s.f_bfree) * s.BSIZE;
+	if (pfree)
+	{
+		if (0 != s.f_blocks - s.f_bfree + s.f_bavail)
+			*pfree = (double)(100.0 * s.f_bavail) /
+					(s.f_blocks - s.f_bfree + s.f_bavail);
+		else
+			*pfree = 0;
+	}
+	if (pused)
+	{
+		if (0 != s.f_blocks - s.f_bfree + s.f_bavail)
+			*pused = 100.0 - (double)(100.0 * s.f_bavail) /
+					(s.f_blocks - s.f_bfree + s.f_bavail);
+		else
+			*pused = 0;
 	}
 
-#ifdef HAVE_SYS_STATVFS_H
-	if (total)
-		*total = (zbx_uint64_t)s.f_blocks * s.f_frsize;
-	if (free)
-		*free = (zbx_uint64_t)s.f_bfree * s.f_frsize;
-	if (used)
-		*used = (zbx_uint64_t)(s.f_blocks - s.f_bfree) * s.f_frsize;
-	if (pfree)
-		*pfree = (double)(100.0 * s.f_bfree) / s.f_blocks;
-	if (pused)
-		*pused = (double)(100.0 * (s.f_blocks - s.f_bfree)) / s.f_blocks;
-#else
-	if (total)
-		*total = (zbx_uint64_t)s.f_blocks * s.f_bsize;
-	if (free)
-		*free = (zbx_uint64_t)s.f_bfree * s.f_bsize;
-	if (used)
-		*used = (zbx_uint64_t)(s.f_blocks - s.f_bfree) * s.f_bsize;
-	if (pfree)
-		*pfree = (double)(100.0 * s.f_bfree) / s.f_blocks;
-	if (pused)
-		*pused = (double)(100.0 * (s.f_blocks - s.f_bfree)) / s.f_blocks;
-#endif
 	return SYSINFO_RET_OK;
 }
 
@@ -146,8 +143,7 @@ FS_FNCLIST
 		{0,		0}
 	};
 
-	char	fsname[MAX_STRING_LEN];
-	char	mode[MAX_STRING_LEN];
+	char	fsname[MAX_STRING_LEN], mode[8];
 	int	i;
 
 	assert(result);
@@ -164,11 +160,11 @@ FS_FNCLIST
 		*mode = '\0';
 
 	/* default parameter */
-	if (*mode == '\0')
+	if ('\0' == *mode)
 		zbx_snprintf(mode, sizeof(mode), "total");
 
 	for (i = 0; fl[i].mode != 0; i++)
-		if (0 == strncmp(mode, fl[i].mode, MAX_STRING_LEN))
+		if (0 == strcmp(mode, fl[i].mode))
 			return (fl[i].function)(fsname, result);
 
 	return SYSINFO_RET_FAIL;
