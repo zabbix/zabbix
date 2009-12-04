@@ -162,12 +162,13 @@ include_once('include/page_header.php');
 			if(isset($_REQUEST['graphid'])){
 
 				DBstart();
+				$gr = get_graph_by_graphid($_REQUEST['graphid']);
 				update_graph_with_items($_REQUEST['graphid'],
 					$_REQUEST['name'],$_REQUEST['width'],$_REQUEST['height'],
 					$_REQUEST['ymin_type'],$_REQUEST['ymax_type'],$_REQUEST['yaxismin'],$_REQUEST['yaxismax'],
 					$_REQUEST['ymin_itemid'],$_REQUEST['ymax_itemid'],
 					$showworkperiod,$showtriggers,$_REQUEST['graphtype'],$_REQUEST['legend'],
-					$_REQUEST['graph3d'],$percent_left,$percent_right,$items);
+					$_REQUEST['graph3d'],$percent_left,$percent_right,$items, $gr['templateid']);
 				$result = DBend();
 
 				if($result){
