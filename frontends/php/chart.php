@@ -69,7 +69,6 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['stime']))		$graph->setSTime($_REQUEST['stime']);
 
 	$graph->addItem($_REQUEST['itemid'], GRAPH_YAXIS_SIDE_LEFT, CALC_FNC_ALL);
-
 	$graph->draw();
 ?>
 <?php

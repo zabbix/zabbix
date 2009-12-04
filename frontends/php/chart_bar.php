@@ -633,6 +633,9 @@ include_once('include/page_header.php');
 //----
 	}
 
+	if(!isset($graph_data['captions'])) $graph_data['captions'] = array();
+	if(!isset($graph_data['legend'])) $graph_data['legend'] = '';
+
 	$graph->setSeriesLegend($graph_data['legend']);
 	$graph->setPeriodCaption($graph_data['captions']);
 

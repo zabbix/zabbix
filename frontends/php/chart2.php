@@ -118,6 +118,7 @@ include_once('include/page_header.php');
 			$db_data['periods_cnt']
 			);
 	}
+
 	$graph->draw();
 ?>
 <?php

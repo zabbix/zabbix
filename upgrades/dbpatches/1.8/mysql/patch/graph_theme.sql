@@ -12,7 +12,7 @@ CREATE TABLE graph_theme (
       highlightcolor          varchar(6)              DEFAULT 'AA4444'        NOT NULL,
       leftpercentilecolor             varchar(6)              DEFAULT '11CC11'        NOT NULL,
       rightpercentilecolor            varchar(6)              DEFAULT 'CC1111'        NOT NULL,
-      noneworktimecolor               varchar(6)              DEFAULT 'CCCCCC'        NOT NULL,
+      noneworktimecolor               varchar(6)              DEFAULT 'E0E0E0'        NOT NULL,
       gridview                integer         DEFAULT 1       NOT NULL,
       legendview              integer         DEFAULT 1       NOT NULL,
       PRIMARY KEY (graphthemeid)

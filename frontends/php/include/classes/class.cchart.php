@@ -1297,7 +1297,7 @@ class CChart extends CGraphDraw{
 			$this->getColor($this->graphtheme['graphcolor'], 0));
 
 		if($this->m_showWorkPeriod != 1) return;
-		if($this->period > 2678400) return; // > 31*24*3600 (month)
+		if($this->period > 3*2678400) return; // > 31*24*3600 (3*month)
 
 		$db_work_period = DBselect('SELECT work_period FROM config');
 		$work_period = DBfetch($db_work_period);
