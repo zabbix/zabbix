@@ -1,5 +1,7 @@
 Changes for 1.7.4
 
+ - [ZBX-1400] updated patches for DB (Aly)
+ - [ZBX-1415] fixed problem displaying bar graphs (Aly)
  - [DEV-440] fixed vfs.fs.size[] to return data in bytes for all OS (Sasha)
  - [DEV-439] fixed vfs.fs.size[] to return available disk space for normal users (Sasha)
  - [ZBX-1246] fixed processing of results from items checks when character data must be interpreted like numeric data (Dmitry)

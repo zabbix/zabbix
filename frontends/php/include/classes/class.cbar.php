@@ -34,6 +34,7 @@ class CBar extends CGraphDraw{
 		$this->drawlegendallow = 0;
 
 		$this->series = array();
+		$this->stacked = false;
 
 		$this->periodCaption = array();
 		$this->seriesLegend = array();
@@ -179,14 +180,25 @@ class CBar extends CGraphDraw{
 
 		if($this->column){
 			$seriesSizeX = $this->sizeX - ($this->seriesDistance * $serieLength);
+// division by zero
+			$tmp = $serieLength * $this->seriesCount;
+			if($tmp == 0) $tmp = 1;
 
-			$this->columnWidth = floor($seriesSizeX / ($serieLength * $this->seriesCount));
+			$this->columnWidth = floor($seriesSizeX / $tmp);
+			
+			if($serieLength == 0) $serieLength = 1;
 			$this->seriesWidth = floor($seriesSizeX / $serieLength);
 		}
 		else{
 			$seriesSizeY = $this->sizeY - ($this->seriesDistance * $serieLength);
 
-			$this->columnWidth = floor($seriesSizeY / ($serieLength * $this->seriesCount));
+// division by zero
+			$tmp = $serieLength * $this->seriesCount;
+			if($tmp == 0) $tmp = 1;
+
+			$this->columnWidth = floor($seriesSizeY / $tmp);
+			
+			if($serieLength == 0) $serieLength = 1;
 			$this->seriesWidth = floor($seriesSizeY / $serieLength);
 		}
 	//SDI($this->columnWidth);
