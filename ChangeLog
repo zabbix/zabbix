@@ -1,5 +1,6 @@
 Changes for 1.7.5
 
+ - [ZBX-1417] fixed permission check in configuration of actions (Aly)
  - [ZBX-1290] fixed maintenance permission check (Aly)
 
 Changes for 1.7.4
