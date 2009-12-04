@@ -1,11 +1,11 @@
 drop table help_items;
 
 CREATE TABLE help_items (
-        itemtype                number(10)              DEFAULT '0'     NOT NULL,
-        key_            nvarchar2(255)          DEFAULT ''      ,
-        description             nvarchar2(255)          DEFAULT ''      ,
+        itemtype                integer         DEFAULT '0'     NOT NULL,
+        key_            varchar(255)            DEFAULT ''      NOT NULL,
+        description             varchar(255)            DEFAULT ''      NOT NULL,
         PRIMARY KEY (itemtype,key_)
-);
+) type=InnoDB;
 
 insert into help_items values (3,'icmpping[&lt;ip&gt;,&lt;count&gt;,&lt;interval&gt;,&lt;size&gt;,&lt;timeout&gt;]','Checks if server is accessible by ICMP ping0 - ICMP ping fails 1 - ICMP ping successfulOne of zabbix_server processes performs ICMP pings once per PingerFrequency seconds.');
 insert into help_items values (3,'icmppingloss[&lt;ip&gt;,&lt;count&gt;,&lt;interval&gt;,&lt;size&gt;,&lt;timeout&gt;]','Returns percentage of lost ICMP ping packets');
