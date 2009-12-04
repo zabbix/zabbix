@@ -943,15 +943,17 @@ function zbx_objectValues(&$value, $field){
 return $result;
 }
 
-function zbx_cleanHashes($value){
+function zbx_cleanHashes($value, $level=0){
+	$level++;
+//	if($level > 3) return $value;
 	if(is_array($value)){
 		if(ctype_digit((string) key($value))){
 			$value = array_values($value);
 		}
 
 		foreach($value as $key => $val){
-			if(is_array($val))
-				$value[$key] = zbx_cleanHashes($val);
+			if(!is_array($val)) continue;
+				$value[$key] = zbx_cleanHashes($val, $level);
 		}
 	}
 

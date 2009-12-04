@@ -93,8 +93,10 @@ include_once('include/page_header.php');
 	$form->addRow(S_RULES, $table);
 
 	$form->addItemToBottomRow(new CButton('import', S_IMPORT));
-	$form->Show();
+	$form->show();
 
+?>
+<?php
 
 include_once('include/page_footer.php');
 

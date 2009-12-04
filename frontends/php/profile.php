@@ -137,8 +137,9 @@ $fields=array(
 			$user['user_medias'] = get_request('user_medias', array());
 
 			DBstart();
-			$result = CUser::update($user);
+			$result = CUser::updateProfile($user);
 			if($result) $result = CUser::updateMedia(array('users' => $user, 'medias' => $user['user_medias']));
+
 			$result = DBend($result);
 			if(!$result) error(CUser::resetErrors());
 

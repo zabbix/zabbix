@@ -390,30 +390,37 @@ class CTrigger extends CZBXAPI{
 				else{
 					if(!isset($result[$trigger['triggerid']])) $result[$trigger['triggerid']]= array();
 
-					if($options['select_hosts'] && !isset($result[$trigger['triggerid']]['hostids'])){
-						$result[$trigger['triggerid']]['hostids'] = array();
+					if($options['select_hosts'] && !isset($result[$trigger['triggerid']]['hosts'])){
 						$result[$trigger['triggerid']]['hosts'] = array();
 					}
-					if($options['select_items'] && !isset($result[$trigger['triggerid']]['itemids'])){
-						$result[$trigger['triggerid']]['itemids'] = array();
+					if($options['select_items'] && !isset($result[$trigger['triggerid']]['items'])){
 						$result[$trigger['triggerid']]['items'] = array();
 					}
 					if($options['select_dependencies'] && !isset($result[$trigger['triggerid']]['dependencies'])){
 						$result[$trigger['triggerid']]['dependencies'] = array();
 					}
 
-					// hostids
-					if(isset($trigger['hostid'])){
-						if(!isset($result[$trigger['triggerid']]['hostids'])) $result[$trigger['triggerid']]['hostids'] = array();
+// groups
+					if(isset($trigger['groupid'])){
+						if(!isset($result[$trigger['triggerid']]['groups'])) $result[$trigger['triggerid']]['groups'] = array();
 
-						$result[$trigger['triggerid']]['hostids'][$trigger['hostid']] = $trigger['hostid'];
+						$result[$trigger['triggerid']]['groups'][$trigger['groupid']] = array('groupid' => $trigger['groupid']);
+						unset($trigger['groupid']);
+					}
+
+// hostids
+					if(isset($trigger['hostid'])){
+						if(!isset($result[$trigger['triggerid']]['hosts'])) $result[$trigger['triggerid']]['hosts'] = array();
+
+						$result[$trigger['triggerid']]['hosts'][$trigger['hostid']] = array('hostid' => $trigger['hostid']);
 						unset($trigger['hostid']);
 					}
-					// itemids
+// itemids
 					if(isset($trigger['itemid'])){
-						if(!isset($result[$trigger['triggerid']]['itemids'])) $result[$trigger['triggerid']]['itemids'] = array();
+						if(!isset($result[$trigger['triggerid']]['items'])) 
+							$result[$trigger['triggerid']]['items'] = array();
 
-						$result[$trigger['triggerid']]['itemids'][$trigger['itemid']] = $trigger['itemid'];
+						$result[$trigger['triggerid']]['items'][$trigger['itemid']] = array('itemid' => $trigger['itemid']);
 						unset($trigger['itemid']);
 					}
 
@@ -458,9 +465,8 @@ class CTrigger extends CZBXAPI{
 			$obj_params = array('templated_hosts' => 1, 'extendoutput' => 1, 'triggerids' => $triggerids, 'nopermissions' => 1, 'preservekeys' => 1);
 			$hosts = CHost::get($obj_params);
 			foreach($hosts as $hostid => $host){
-				foreach($host['triggerids'] as $num => $triggerid){
-					$result[$triggerid]['hostids'][$hostid] = $hostid;
-					$result[$triggerid]['hosts'][$hostid] = $host;
+				foreach($host['triggers'] as $num => $trigger){
+					$result[$trigger['triggerid']]['hosts'][$hostid] = $host;
 				}
 			}
 		}
@@ -470,9 +476,8 @@ class CTrigger extends CZBXAPI{
 			$obj_params = array('extendoutput' => 1, 'triggerids' => $triggerids, 'nopermissions' => 1, 'preservekeys' => 1);
 			$items = CItem::get($obj_params);
 			foreach($items as $itemid => $item){
-				foreach($item['triggerids'] as $num => $triggerid){
-					$result[$triggerid]['itemids'][$itemid] = $itemid;
-					$result[$triggerid]['items'][$itemid] = $item;
+				foreach($item['triggers'] as $num => $trigger){
+					$result[$trigger['triggerid']]['items'][$itemid] = $item;
 				}
 			}
 		}

@@ -385,7 +385,7 @@ include_once('include/page_header.php');
 				(($PAGE_HOSTS['selected'] > 0) ? null : $application['host']),
 				$name,
 				array(new CLink(S_ITEMS,'items.php?hostid='.$PAGE_HOSTS['selected'].'&filter_set=1&filter_application='.$application['name']),
-				SPACE.'('.count($application['itemids']).')')
+				SPACE.'('.count($application['items']).')')
 			));
 		}
 

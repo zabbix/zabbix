@@ -245,21 +245,21 @@ class CMaintenance extends CZBXAPI{
 					if(!isset($result[$maintenance['maintenanceid']]))
 						$result[$maintenance['maintenanceid']]= array();
 
-					// groupids
+// groupids
 					if(isset($maintenance['groupid'])){
-						if(!isset($result[$maintenance['maintenanceid']]['groupids']))
-							$result[$maintenance['maintenanceid']]['groupids'] = array();
+						if(!isset($result[$maintenance['maintenanceid']]['groups']))
+							$result[$maintenance['maintenanceid']]['groups'] = array();
 
-						$result[$maintenance['maintenanceid']]['groupids'][$maintenance['groupid']] = $maintenance['groupid'];
+						$result[$maintenance['maintenanceid']]['groups'][$maintenance['groupid']] = array('groupid' => $maintenance['groupid']);
 						unset($maintenance['groupid']);
 					}
 
-					// hostids
+// hostids
 					if(isset($maintenance['hostid'])){
-						if(!isset($result[$maintenance['maintenanceid']]['hostids']))
-							$result[$maintenance['maintenanceid']]['hostids'] = array();
+						if(!isset($result[$maintenance['maintenanceid']]['hosts']))
+							$result[$maintenance['maintenanceid']]['hosts'] = array();
 
-						$result[$maintenance['maintenanceid']]['hostids'][$maintenance['hostid']] = $maintenance['hostid'];
+						$result[$maintenance['maintenanceid']]['hosts'][$maintenance['hostid']] = array('hostid' => $maintenance['hostid']);
 						unset($maintenance['hostid']);
 					}
 

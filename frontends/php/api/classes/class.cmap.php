@@ -184,12 +184,10 @@ class CMap extends CZBXAPI{
 				else{
 					if(!isset($result[$sysmap['sysmapid']])) $result[$sysmap['sysmapid']]= array();
 					
-					if(!is_null($options['select_selements']) && !isset($result[$sysmap['sysmapid']]['selementids'])){
-						$result[$sysmap['sysmapid']]['selementids'] = array();
+					if(!is_null($options['select_selements']) && !isset($result[$sysmap['sysmapid']]['selements'])){
 						$result[$sysmap['sysmapid']]['selements'] = array();
 					}
-					if(!is_null($options['select_links']) && !isset($result[$sysmap['sysmapid']]['linkids'])){
-						$result[$sysmap['sysmapid']]['linkids'] = array();
+					if(!is_null($options['select_links']) && !isset($result[$sysmap['sysmapid']]['links'])){
 						$result[$sysmap['sysmapid']]['links'] = array();
 					}
 
@@ -207,23 +205,29 @@ class CMap extends CZBXAPI{
 				$triggers_to_check = array();
 				$host_groups_to_check = array();
 				$map_elements = array();
+				$map_elements['hosts'] = array();
+				$map_elements['maps'] = array();
+				$map_elements['triggers'] = array();
+				$map_elements['hostgroups'] = array();
 
 				$db_elements = DBselect('SELECT * FROM sysmaps_elements WHERE '.DBcondition('sysmapid', $sysmapids));
 
 				while($element = DBfetch($db_elements)){
-					$map_elements[$element['elementid']] = $element['elementid'];
-
 					switch($element['elementtype']){
 						case SYSMAP_ELEMENT_TYPE_HOST:
+							$map_elements['hosts'][$element['elementid']] = $element;
 							$hosts_to_check[] = $element['elementid'];
 						break;
 						case SYSMAP_ELEMENT_TYPE_MAP:
+							$map_elements['maps'][$element['elementid']] = $element;
 							$maps_to_check[] = $element['elementid'];
 						break;
 						case SYSMAP_ELEMENT_TYPE_TRIGGER:
+							$map_elements['triggers'][$element['elementid']] = $element;
 							$triggers_to_check[] = $element['elementid'];
 						break;
 						case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+							$map_elements['hostgroups'][$element['elementid']] = $element;
 							$host_groups_to_check[] = $element['elementid'];
 						break;
 					}
@@ -233,29 +237,29 @@ class CMap extends CZBXAPI{
 // sdi($triggers_to_check);
 // sdi($host_groups_to_check);
 				$nodeids = get_current_nodeid(true);
-				$options = array('hostids' => $hosts_to_check, 
+				$host_options = array('hostids' => $hosts_to_check, 
 									'nodeids' => $nodeids,
 									'editable' => isset($options['editable']), 
 									'preservekeys'=>1);
-				$allowed_hosts = CHost::get($options);
+				$allowed_hosts = CHost::get($host_options);
 				
-				$options = array('sysmapids' => $maps_to_check, 
+				$map_options = array('sysmapids' => $maps_to_check, 
 									'nodeids' => $nodeids,
 									'editable' => isset($options['editable']), 
 									'preservekeys'=>1);
-				$allowed_maps = self::get($options);
+				$allowed_maps = self::get($map_options);
 
-				$options = array('triggerids' => $triggers_to_check,
+				$trigger_options = array('triggerids' => $triggers_to_check,
 									'nodeids' => $nodeids,
 									'editable' => isset($options['editable']), 
 									'preservekeys'=>1);
-				$allowed_triggers = CTrigger::get($options);
+				$allowed_triggers = CTrigger::get($trigger_options);
 				
-				$options = array('groupids' => $host_groups_to_check,
+				$hostgroup_options = array('groupids' => $host_groups_to_check,
 									'nodeids' => $nodeids,
 									'editable' => isset($options['editable']), 
 									'preservekeys'=>1);
-				$allowed_host_groups = CHostGroup::get($options);
+				$allowed_host_groups = CHostGroup::get($hostgroup_options);
 
 
 				$restr_hosts = array_diff($hosts_to_check, $allowed_hosts);
@@ -264,32 +268,32 @@ class CMap extends CZBXAPI{
 				$restr_host_groups = array_diff($host_groups_to_check, $allowed_host_groups);
 
 				foreach($restr_hosts as $elementid){
-					foreach($map_elements as $map_elementid => $map_element){
-						if(($map_element['elementid'] == $elementid) && ($map_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)){
+					foreach($map_elements['hosts'] as $map_elementid => $map_element){
+						if(isset($map_elements['hosts'][$elementid])){
 							unset($result[$map_element['sysmapid']]);
 							unset($map_elements[$map_elementid]);
 						}
 					}
 				}
 				foreach($restr_maps as $elementid){
-					foreach($map_elements as $map_elementid => $map_element){
-						if($map_element['elementid'] == $elementid && ($map_element['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP)){
+					foreach($map_elements['maps'] as $map_elementid => $map_element){
+						if(isset($map_elements['maps'][$elementid])){
 							unset($result[$map_element['sysmapid']]);
 							unset($map_elements[$map_elementid]);
 						}
 					}
 				}
 				foreach($restr_triggers as $elementid){
-					foreach($map_elements as $map_elementid => $map_element){
-						if($map_element['elementid'] == $elementid && ($map_element['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)){
+					foreach($map_elements['triggers'] as $map_elementid => $map_element){
+						if(isset($map_elements['triggers'][$elementid])){
 							unset($result[$map_element['sysmapid']]);
 							unset($map_elements[$map_elementid]);
 						}
 					}
 				}
 				foreach($restr_host_groups as $elementid){
-					foreach($map_elements as $map_elementid => $map_element){
-						if($map_element['elementid'] == $elementid && ($map_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP)){
+					foreach($map_elements['hostgroups'] as $map_elementid => $map_element){
+						if(isset($map_elements['hostgroups'][$elementid])){
 							unset($result[$map_element['sysmapid']]);
 							unset($map_elements[$map_elementid]);
 						}
@@ -317,10 +321,8 @@ class CMap extends CZBXAPI{
 
 			foreach($map_selements as $num => $selement){
 				if(!isset($result[$selement['sysmapid']]['selements'])){
-					$result[$selement['sysmapid']]['selementids'] = array();
 					$result[$selement['sysmapid']]['selements'] = array();
 				}
-				$result[$selement['sysmapid']]['selementids'][$selement['selementid']] = $selement['selementid'];
 				$result[$selement['sysmapid']]['selements'][$selement['selementid']] = $selement;
 			}
 		}
@@ -335,7 +337,6 @@ class CMap extends CZBXAPI{
 				$db_links = DBselect($sql);
 				while($link = DBfetch($db_links)){
 					$link['linktriggers'] = array();
-					$link['linktriggerids'] = array();
 
 					$map_links[$link['linkid']] = $link;
 					$linkids[$link['linkid']] = $link['linkid'];
@@ -345,17 +346,14 @@ class CMap extends CZBXAPI{
 				$db_link_triggers = DBselect($sql);
 				while($link_trigger = DBfetch($db_link_triggers)){
 					$map_links[$link_trigger['linkid']]['linktriggers'][$link_trigger['linktriggerid']] = $link_trigger;
-					$map_links[$link_trigger['linkid']]['linktriggerids'][$link_trigger['linktriggerid']] = $link_trigger['linktriggerid'];
 				}
 			}
 
 			foreach($map_links as $num => $link){
 				if(!isset($result[$link['sysmapid']]['links'])){
-					$result[$link['sysmapid']]['linkids'] = array();
 					$result[$link['sysmapid']]['links'] = array();
 				}
 
-				$result[$link['sysmapid']]['linkids'][$link['linkid']] = $link['linkid'];
 				$result[$link['sysmapid']]['links'][$link['linkid']] = $link;
 			}
 		}

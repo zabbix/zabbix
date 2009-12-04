@@ -753,7 +753,7 @@ include_once('include/page_header.php');
 		order_result($templates, $sortfield, $sortorder);
 //-----
 
-		foreach($templates as $num => $template){
+		foreach($templates as $tnum => $template){
 			$templates_output = array();
 			if($template['proxy_hostid']){
 				$proxy = get_host_by_hostid($template['proxy_hostid']);
@@ -764,11 +764,11 @@ include_once('include/page_header.php');
 			$applications = array(new CLink(S_APPLICATIONS,'applications.php?groupid='.$groupid_selected.'&hostid='.$template['templateid']),
 				' ('.count($template['applications']).')');
 			$items = array(new CLink(S_ITEMS,'items.php?groupid='.$groupid_selected.'&hostid='.$template['templateid']),
-				' ('.count($template['itemids']).')');
+				' ('.count($template['items']).')');
 			$triggers = array(new CLink(S_TRIGGERS,'triggers.php?groupid='.$groupid_selected.'&hostid='.$template['templateid']),
-				' ('.count($template['triggerids']).')');
+				' ('.count($template['triggers']).')');
 			$graphs = array(new CLink(S_GRAPHS,'graphs.php?groupid='.$groupid_selected.'&hostid='.$template['templateid']),
-				' ('.count($template['graphids']).')');
+				' ('.count($template['graphs']).')');
 
 			$i = 0;
 			$linked_templates_output = array();

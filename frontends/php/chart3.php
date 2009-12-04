@@ -115,15 +115,15 @@ include_once('include/page_header.php');
 	$graph->setLeftPercentage(get_request('percent_left',0));
 	$graph->setRightPercentage(get_request('percent_right',0));
 
-	foreach($items as $id => $gitem){
+	foreach($items as $gnum => $gitem){
 		$graph->addItem(
 			$gitem['itemid'],
-			$gitem['yaxisside'],
-			$gitem['calc_fnc'],
-			$gitem['color'],
-			$gitem['drawtype'],
-			$gitem['type'],
-			$gitem['periods_cnt']
+			isset($gitem['yaxisside'])?$gitem['yaxisside']:null,
+			isset($gitem['calc_fnc'])?$gitem['calc_fnc']:null,
+			isset($gitem['color'])?$gitem['color']:null,
+			isset($gitem['drawtype'])?$gitem['drawtype']:null,
+			isset($gitem['type'])?$gitem['type']:null,
+			isset($gitem['periods_cnt'])?$gitem['periods_cnt']:null
 			);
 
 		unset($items[$id]);

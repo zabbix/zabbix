@@ -201,19 +201,12 @@ class CGraphItem extends CZBXAPI{
 					if(!isset($result[$gitem['gitemid']]))
 						$result[$gitem['gitemid']]= array();
 
-					// graphids
+// graphids
 					if(isset($gitem['graphid'])){
-						if(!isset($result[$gitem['gitemid']]['graphids'])) $result[$gitem['gitemid']]['graphids'] = array();
+						if(!isset($result[$gitem['gitemid']]['graphs'])) $result[$gitem['gitemid']]['graphs'] = array();
 
-						$result[$gitem['gitemid']]['graphids'][$gitem['graphid']] = $gitem['graphid'];
+						$result[$gitem['gitemid']]['graphs'][$gitem['graphid']] = array('graphid' => $gitem['graphid']);
 						unset($gitem['graphid']);
-					}
-					// itemids
-					if(isset($gitem['itemid']) && !is_null($options['itemids'])){
-						if(!isset($result[$gitem['gitemid']]['itemid'])) $result[$gitem['gitemid']]['itemid'] = array();
-
-						$result[$gitem['gitemid']]['itemids'][$gitem['itemid']] = $gitem['itemid'];
-						unset($gitem['itemid']);
 					}
 
 					$result[$gitem['gitemid']] += $gitem;
