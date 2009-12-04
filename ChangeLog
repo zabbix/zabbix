@@ -1,5 +1,6 @@
 Changes for 1.7.4
 
+ - [ZBX-1246] fixed processing of results from items checks when character data must be interpreted like numeric data (Dmitry)
  - [ZBX-1408] fixed adding images for postgresql (Aly)
  - [ZBX-1410] fixed user profile update (Aly)
  - [ZBX-1371] shrinked API get results (Aly)
