@@ -1,5 +1,5 @@
-<?php 
-/* 
+<?php
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2009 SIA Zabbix
 **
@@ -33,7 +33,7 @@ include_once('include/page_header.php');
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'css'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	null,		null),	
+		'css'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	null,		null),
 		'imageid'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,		null),
 		'iconid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
 	);
@@ -50,7 +50,7 @@ include_once('include/page_header.php');
 			$image['image'] = zbx_unescape_image($image['image']);
 
 			$ico = imagecreatefromstring($image['image']);
-			$w = imagesx($ico); 
+			$w = imagesx($ico);
 			$h = imagesy($ico);
 
 			$css.= 'div.sysmap_iconid_'.$image['imageid'].'{'.

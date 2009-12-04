@@ -363,14 +363,14 @@ class CAlert extends CZBXAPI{
 					}
 // userids
 					if(isset($alert['userid'])){
-						if(!isset($result[$alert['alertid']]['users'])) 
+						if(!isset($result[$alert['alertid']]['users']))
 							$result[$alert['alertid']]['users'] = array();
 
 						$result[$alert['alertid']]['users'][$alert['userid']] = alert('userid' => $alert['userid']);
 					}
 // mediatypeids
 					if(isset($alert['mediatypeid'])){
-						if(!isset($result[$alert['alertid']]['mediatypes'])) 
+						if(!isset($result[$alert['alertid']]['mediatypes']))
 							$result[$alert['alertid']]['mediatypes'] = array();
 
 						$result[$alert['alertid']]['mediatypes'][$alert['mediatypeid']] = array('mediatypeid' => $alert['mediatypeid']);
@@ -414,7 +414,7 @@ class CAlert extends CZBXAPI{
 				$result[$alertid]['users'][$alert['userid']] = $users[$alert['userid']];
 			}
 		}
-		
+
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
 			$result = zbx_cleanHashes($result);
@@ -486,7 +486,7 @@ class CAlert extends CZBXAPI{
 		}
 
 		$result = self::EndTransaction($result, __METHOD__);
-	
+
 		if($result){
 			$upd_alerts = self::get(array('alertids'=>$alertids, 'extendoutput'=>1));
 			return $upd_alerts;
@@ -516,9 +516,9 @@ class CAlert extends CZBXAPI{
 		$result = false;
 //------
 
-		$del_alerts = self::get(array('alertids'=>zbx_objectValues($alerts, 'alertid'), 
-											'editable'=>1, 
-											'extendoutput'=>1, 
+		$del_alerts = self::get(array('alertids'=>zbx_objectValues($alerts, 'alertid'),
+											'editable'=>1,
+											'extendoutput'=>1,
 											'preservekeys'=>1));
 		foreach($alerts as $snum => $alert){
 			if(!isset($del_alerts[$alert['alertid']])){

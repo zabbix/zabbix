@@ -100,13 +100,13 @@ class CMaintenance extends CZBXAPI{
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 			$maintenanceids = array();
 			if(!is_null($options['groupids']) || !is_null($options['hostids'])){
-			
+
 				if(!is_null($options['groupids'])){
 					zbx_value2array($options['groupids']);
 					$sql = ' SELECT mmg.maintenanceid '.
 						' FROM maintenances_groups mmg '.
 						' WHERE '.DBcondition('mmg.groupid', $options['groupids']);
-	
+
 					$res = DBselect($sql);
 					while($miantenace = DBfetch($res)){
 						$maintenanceids[] = $miantenace['maintenanceid'];
@@ -132,7 +132,7 @@ class CMaintenance extends CZBXAPI{
 				while($miantenace = DBfetch($res)){
 					$maintenanceids[] = $miantenace['maintenanceid'];
 				}
-				
+
 				$sql_parts['where'][] = DBcondition('m.maintenanceid',$maintenanceids);
 			}
 		}
@@ -192,7 +192,7 @@ class CMaintenance extends CZBXAPI{
 			while($miantenace = DBfetch($res)){
 				$maintenanceids[] = $miantenace['maintenanceid'];
 			}
-			
+
 			$sql_parts['where'][] = DBcondition('m.maintenanceid',$maintenanceids);
 		}
 
@@ -324,11 +324,11 @@ class CMaintenance extends CZBXAPI{
 		if(!is_null($options['select_groups'])){
 
 		}
-		
+
 		if(!is_null($options['select_hosts'])){
 
 		}
-		
+
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
 			$result = zbx_cleanHashes($result);
@@ -362,10 +362,10 @@ class CMaintenance extends CZBXAPI{
 		while($maintenance = DBfetch($res)){
 			$maintenanceids[$maintenance['maintenanceid']] = $maintenance['maintenanceid'];
 		}
-		
+
 		if(!empty($maintenanceids))
 			$result = self::get(array('maintenanceids'=>$maintenanceids, 'extendoutput'=>1));
-		
+
 	return $result;
 	}
 
@@ -393,7 +393,7 @@ class CMaintenance extends CZBXAPI{
 		foreach($maintenances as $num => $maintenance){
 			$result = add_maintenance($maintenance);
 			if(!$result) break;
-			
+
 			$maintenanceids[] = $result;
 		}
 		$result = self::EndTransaction($result, __METHOD__);
@@ -428,9 +428,9 @@ class CMaintenance extends CZBXAPI{
 		$result = false;
 //------
 
-		$upd_maintenances = self::get(array('maintenanceids'=>zbx_objectValues($maintenances, 'maintenanceid'), 
-											'editable'=>1, 
-											'extendoutput'=>1, 
+		$upd_maintenances = self::get(array('maintenanceids'=>zbx_objectValues($maintenances, 'maintenanceid'),
+											'editable'=>1,
+											'extendoutput'=>1,
 											'preservekeys'=>1));
 		foreach($maintenances as $snum => $maintenance){
 			if(!isset($upd_maintenances[$maintenance['maintenanceid']])){
@@ -447,7 +447,7 @@ class CMaintenance extends CZBXAPI{
 			$result = update_maintenance($maintenance['maintenanceid'], $maintenance);
 			if(!$result) break;
 		}
-	
+
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
@@ -479,9 +479,9 @@ class CMaintenance extends CZBXAPI{
 		$result = false;
 //------
 
-		$del_maintenances = self::get(array('maintenanceids'=>zbx_objectValues($maintenances, 'maintenanceid'), 
-											'editable'=>1, 
-											'extendoutput'=>1, 
+		$del_maintenances = self::get(array('maintenanceids'=>zbx_objectValues($maintenances, 'maintenanceid'),
+											'editable'=>1,
+											'extendoutput'=>1,
 											'preservekeys'=>1));
 		foreach($maintenances as $snum => $maintenance){
 			if(!isset($del_maintenances[$maintenance['maintenanceid']])){

@@ -315,7 +315,7 @@ class CScreen extends CZBXAPI{
 	public static function add($screens){
 		$screens = zbx_toArray($screens);
 		$screenid = array();
-		
+
 		$errors = array();
 		$result = false;
 
@@ -354,7 +354,7 @@ class CScreen extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_screens = self::get(array('screenids'=>$screenids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$new_screens = self::get(array('screenids'=>$screenids, 'extendoutput'=>1, 'nopermissions'=>1));
 			return $new_screens;
 		}
 		else{
@@ -385,21 +385,21 @@ class CScreen extends CZBXAPI{
 
 		$result = true;
 		$errors = array();
-		
-		$upd_screens = self::get(array('screenids'=>zbx_objectValues($screens, 'screenid'), 
-											'editable'=>1, 
-											'extendoutput'=>1, 
+
+		$upd_screens = self::get(array('screenids'=>zbx_objectValues($screens, 'screenid'),
+											'editable'=>1,
+											'extendoutput'=>1,
 											'preservekeys'=>1));
 
 		foreach($screens as $gnum => $screen){
 			if(!isset($upd_screens[$screen['screenid']])){
-				
+
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
 			$screenids[] = $screen['screenid'];
 		}
-		
+
 		self::BeginTransaction(__METHOD__);
 		foreach($screens as $snum => $screen){
 
@@ -439,7 +439,7 @@ class CScreen extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_screens = self::get(array('screenids'=>$screenids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$upd_screens = self::get(array('screenids'=>$screenids, 'extendoutput'=>1, 'nopermissions'=>1));
 			return $upd_screens;
 		}
 		else{
@@ -466,10 +466,10 @@ class CScreen extends CZBXAPI{
 		$screens = zbx_toArray($screens);
 		$screenids = zbx_objectValues($screens, 'screenid');
 		$result = true;
-		
-		$del_screens = self::get(array('screenids'=>zbx_objectValues($screens, 'screenid'), 
-											'editable'=>1, 
-											'extendoutput'=>1, 
+
+		$del_screens = self::get(array('screenids'=>zbx_objectValues($screens, 'screenid'),
+											'editable'=>1,
+											'extendoutput'=>1,
 											'preservekeys'=>1));
 
 		foreach($screens as $gnum => $screen){

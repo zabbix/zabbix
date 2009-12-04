@@ -79,7 +79,7 @@
 			if(isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)){
 				$page_title = $ZBX_SERVER_NAME.': ';
 			}
-			
+
 			if(isset($page['title']) && defined($page['title'])){
 				$page_title .= constant($page['title']);
 			}
@@ -144,8 +144,8 @@
 			echo '<link rel="shortcut icon" href="images/general/zabbix.ico" />';
 		}
 	}
-	
-	if($page['file'] == 'sysmap.php') 
+
+	if($page['file'] == 'sysmap.php')
 		print('<link rel="stylesheet" type="text/css" href="imgstore.php?css=1&output=css" />');
 ?>
 <script type="text/javascript" src="js/prototype.js"></script>
@@ -308,16 +308,16 @@ COpt::compare_files_with_menu($ZBX_MENU);
 				unset($combo_node_list);
 			}
 		}
-		
+
 		if(isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)){
 			$tab = new CTable();
-			
+
 			$td_l = new CCol(new CSpan($ZBX_SERVER_NAME, 'textcolorstyles'));
 			if(is_null($node_form))
 				$td_l->addStyle('padding-right: 5px;');
 			else
 				$td_l->addStyle('padding-right: 20px; padding-bottom: 2px;');
-				
+
 			$tab->AddRow(array($td_l, $node_form));
 			$node_form = $tab;
 		}

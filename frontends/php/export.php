@@ -234,7 +234,7 @@ include_once('include/page_header.php');
 
 		foreach($hosts_all as $hnum => $host){
 			$hostid = $host['hostid'];
-			
+
 			$el_table = new CTableInfo(S_ONLY_HOST_INFO);
 
 			foreach($host['templates'] as $tnum => $template){
@@ -298,7 +298,7 @@ include_once('include/page_header.php');
 
 		$cmbGroups = new CComboBox('groupid', $selected_groupid, 'javascript: submit();');
 		$cmbGroups->addItem(0, S_ALL_S);
-		
+
 		$groups = CHostGroup::get(array('extendoutput' => 1, 'sortfield' => 'name'));
 		foreach($groups as $gnum => $group){
 			$groupid = $group['groupid'];
@@ -351,7 +351,7 @@ include_once('include/page_header.php');
 		$count_chkbx = 0;
 		foreach($hosts_all as $hnum => $host){
 			$hostid = $host['hostid'];
-			
+
 			$status = new CCol(host_status2str($host['status']), host_status2style($host['status']));
 
 			$params = array('hostids' => $hostid, 'count' => 1);

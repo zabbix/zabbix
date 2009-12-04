@@ -90,7 +90,7 @@ include_once('include/page_header.php');
 	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go', 'none');
-	
+
 // PERMISSIONS
 	if(get_request('graphid',0) > 0){
 		$graphs = available_graphs($_REQUEST['graphid'], 1);
@@ -122,7 +122,7 @@ include_once('include/page_header.php');
 			$db_items = CItem::get($options);
 			$db_items = zbx_objectValues($db_items, 'itemid');
 			$db_items = zbx_toHash($db_items, 'itemid');
-			
+
 			foreach($itemids as $inum => $itemid){
 				if(!isset($db_items[$itemid])){
 					access_deny();
@@ -199,7 +199,7 @@ include_once('include/page_header.php');
 			show_messages($result, S_GRAPH_ADDED, S_CANNOT_ADD_GRAPH);
 		}
 	}
-	else if(isset($_REQUEST['delete']) && isset($_REQUEST['graphid'])){		
+	else if(isset($_REQUEST['delete']) && isset($_REQUEST['graphid'])){
 		$options = array('graphids'=>$_REQUEST['graphid'], 'extendoutput'=>1, 'editable'=>1, 'nopermissions'=>1);
 		$graphs = CGraph::get($options);
 		$graph = reset($graphs);
@@ -271,7 +271,7 @@ include_once('include/page_header.php');
 				error('Cannot delete graph [ '.$graph['name'].' ] (Templated graph)');
 				continue;
 			}
-			
+
 			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH,'Graph ['.$graph['name'].']');
 		}
 		if(!empty($graphs)){
@@ -287,7 +287,7 @@ include_once('include/page_header.php');
 			if(0 == $_REQUEST['copy_type']){ /* hosts */
 				$hosts_ids = $_REQUEST['copy_targetid'];
 			}
-			else{ 
+			else{
 // groups
 				zbx_value2array($_REQUEST['copy_targetid']);
 
@@ -300,7 +300,7 @@ include_once('include/page_header.php');
 						access_deny();
 					}
 				}
-				
+
 				$options = array('groupids'=>$_REQUEST['copy_targetid'], 'editable'=>1, 'nodes'=>get_current_nodeid(true));
 				$db_hosts = CHost::get($options);
 			}

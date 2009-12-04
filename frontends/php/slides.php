@@ -366,6 +366,6 @@ include_once('include/page_header.php');
 	$jsmenu = new CPUMenu(null,170);
 	$jsmenu->InsertJavaScript();
 
-	
+
 include_once('include/page_footer.php');
 ?>

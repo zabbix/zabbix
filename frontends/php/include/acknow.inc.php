@@ -64,7 +64,7 @@ function make_acktab_by_eventid($eventid){
 	while($ack = DBfetch($acks)){
 		$user = CUser::get(array('userids' => $ack['userid'],  'extendoutput' => 1));
 		$user = reset($user);
-		
+
 		$table->addRow(array(
 			date(S_DATE_FORMAT_YMDHMS,$ack['clock']),
 			$user['alias'],

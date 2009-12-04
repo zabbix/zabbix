@@ -589,7 +589,7 @@ class CHost extends CZBXAPI{
 	public static function getObjects($host_data){
 		$result = array();
 		$hostids = array();
-		
+
 		$sql = 'SELECT hostid '.
 				' FROM hosts '.
 				' WHERE host='.zbx_dbstr($host_data['host']).
@@ -602,7 +602,7 @@ class CHost extends CZBXAPI{
 
 		if(!empty($hostids))
 			$result = self::get(array('hostids'=>$hostids, 'extendoutput'=>1));
-		
+
 	return $result;
 	}
 
@@ -638,7 +638,7 @@ class CHost extends CZBXAPI{
 		$hostids = array();
 
 		$groupids = array();
-		
+
 		$templates = null;
 		$newgroup = '';
 
@@ -649,9 +649,9 @@ class CHost extends CZBXAPI{
 				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'No groups for host [ '.$host['host'].' ]');
 				return false;
 			}
-		
+
 			$hosts[$hnum]['groups'] = zbx_toArray($hosts[$hnum]['groups']);
-			
+
 			foreach($hosts[$hnum]['groups'] as $gnum => $group){
 				$groupids[$group['groupid']] = $group['groupid'];
 			}
@@ -659,7 +659,7 @@ class CHost extends CZBXAPI{
 
 		$upd_groups = CHostGroup::get(array(
 			'groupids' => $groupids,
-			'editable' => 1, 
+			'editable' => 1,
 			'preservekeys' => 1));
 		foreach($groupids as $gnum => $groupid){
 			if(!isset($upd_groups[$groupid])){
@@ -745,7 +745,7 @@ class CHost extends CZBXAPI{
 	public static function update($hosts){
 		$hosts = zbx_toArray($hosts);
 		$hostids = array();
-		
+
 		$upd_hosts = self::get(array('hostids'=> zbx_objectValues($hosts, 'hostid'), 'editable'=>1, 'extendoutput'=>1, 'preservekeys'=>1));
 		foreach($hosts as $gnum => $host){
 			if(!isset($upd_hosts[$host['hostid']])){
@@ -754,7 +754,7 @@ class CHost extends CZBXAPI{
 			}
 			$hostids[] = $host['hostid'];
 		}
-		
+
 		$templates = null;
 		$newgroup = '';
 
@@ -781,7 +781,7 @@ class CHost extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_hosts = self::get(array('hostids'=>$hostids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$upd_hosts = self::get(array('hostids'=>$hostids, 'extendoutput'=>1, 'nopermissions'=>1));
 			return $upd_hosts;
 		}
 		else{
@@ -820,16 +820,16 @@ class CHost extends CZBXAPI{
  */
 	public static function massUpdate($hosts_data){
 		$errors = array();
-		
+
 		$hosts = zbx_toArray($hosts_data['hosts']);
 		$fields = $hosts_data['fields'];
-		
+
 		$hostids = array();
-		
+
 		$upd_hosts = self::get(array(
-			'hostids' => zbx_objectValues($hosts, 'hostid'), 
-			'editable' => 1, 
-			'extendoutput' => 1, 
+			'hostids' => zbx_objectValues($hosts, 'hostid'),
+			'editable' => 1,
+			'extendoutput' => 1,
 			'preservekeys' => 1));
 
 		foreach($hosts as $hnum => $host){
@@ -861,16 +861,16 @@ class CHost extends CZBXAPI{
 			if(isset($fields['ipmi_username'])) $sql_set[] = 'ipmi_username='.zbx_dbstr($fields['ipmi_username']);
 			if(isset($fields['ipmi_password'])) $sql_set[] = 'ipmi_password='.zbx_dbstr($fields['ipmi_password']);
 			if(isset($fields['ipmi_ip'])) $sql_set[] = 'ipmi_ip='.$fields['ipmi_ip'];
-				
+
 			$sql = 'UPDATE hosts SET ' . implode(', ', $sql_set) . ' WHERE '.DBcondition('hostid', $hostids);
 
 			$result = DBexecute($sql);
 		}
-		
+
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_hosts = self::get(array('hostids' => $hostids, 'extendoutput' => 1, 'nopermissions' => 1));			
+			$upd_hosts = self::get(array('hostids' => $hostids, 'extendoutput' => 1, 'nopermissions' => 1));
 			return $upd_hosts;
 		}
 		else{
@@ -895,10 +895,10 @@ class CHost extends CZBXAPI{
 	public static function delete($hosts){
 		$hosts = zbx_toArray($hosts);
 		$hostids = array();
-		
-		$del_hosts = self::get(array('hostids'=> zbx_objectValues($hosts, 'hostid'), 
-									'editable'=>1, 
-									'extendoutput'=>1, 
+
+		$del_hosts = self::get(array('hostids'=> zbx_objectValues($hosts, 'hostid'),
+									'editable'=>1,
+									'extendoutput'=>1,
 									'preservekeys'=>1));
 		if(empty($del_hosts)){
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Host does not exist');
@@ -910,11 +910,11 @@ class CHost extends CZBXAPI{
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
-			
+
 			$hostids[] = $host['hostid'];
 			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$host['host'].']');
 		}
-		
+
 		self::BeginTransaction(__METHOD__);
 		if(!empty($hostids)){
 			$result = delete_host($hostids, false);
@@ -923,9 +923,9 @@ class CHost extends CZBXAPI{
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter');
 			$result = false;
 		}
-		
+
 		$result = self::EndTransaction($result, __METHOD__);
-		
+
 		if($result){
 			return zbx_cleanHashes($del_hosts);
 		}

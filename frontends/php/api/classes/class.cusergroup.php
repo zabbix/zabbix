@@ -233,8 +233,8 @@ class CUserGroup extends CZBXAPI{
 // Adding Objects
 // Adding users
 		if($options['select_users']){
-			$obj_params = array('extendoutput' => 1, 
-								'usrgrpids' => $usrgrpids, 
+			$obj_params = array('extendoutput' => 1,
+								'usrgrpids' => $usrgrpids,
 								'preservekeys' => 1
 							);
 			$users = CUser::get($obj_params);
@@ -283,7 +283,7 @@ class CUserGroup extends CZBXAPI{
 		while($group = DBfetch($res)){
 			$usrgrpids[$group['usrgrpid']] = $group['usrgrpid'];
 		}
-			
+
 		if(!empty($usrgrpids))
 			$result = self::get(array('usrgrpids'=>$usrgrpids, 'extendoutput'=>1));
 
@@ -320,7 +320,7 @@ class CUserGroup extends CZBXAPI{
 
 		$usrgrps = zbx_toArray($usrgrps);
 		$usrgrpids = array();
-		
+
 		$result = false;
 		$error = 'Unknown ZABBIX internal error';
 
@@ -341,13 +341,13 @@ class CUserGroup extends CZBXAPI{
 
 			$result = add_user_group($usrgrp['name'], $usrgrp['users_status'], $usrgrp['gui_access'], $usrgrp['api_access']);
 			if(!$result) break;
-			
+
 			$usrgrpids[] = $result;
 		}
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_usrgrps = self::get(array('usrgrpids'=>$usrgrpids, 'extendoutput'=>1));			
+			$new_usrgrps = self::get(array('usrgrpids'=>$usrgrpids, 'extendoutput'=>1));
 			return $new_usrgrps;
 		}
 		else{
@@ -381,8 +381,8 @@ class CUserGroup extends CZBXAPI{
 		$result = false;
 
 //-----
-		$upd_usrgrps = self::get(array('usrgrpids'=>zbx_objectValues($usrgrps, 'usrgrpid'), 
-											'extendoutput'=>1, 
+		$upd_usrgrps = self::get(array('usrgrpids'=>zbx_objectValues($usrgrps, 'usrgrpid'),
+											'extendoutput'=>1,
 											'preservekeys'=>1));
 
 		foreach($usrgrps as $ugnum => $usrgrp){
@@ -393,7 +393,7 @@ class CUserGroup extends CZBXAPI{
 			$usrgrpids[] = $usrgrp['usrgrpid'];
 			//add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER_GROUP, 'User group ['.$usrgrp['name'].']');
 		}
-	
+
 		self::BeginTransaction(__METHOD__);
 		foreach($usrgrps as $ugnum => $usrgrp){
 			$group_db_fields = $upd_usrgrps[$usrgrp['usrgrpid']];
@@ -402,7 +402,7 @@ class CUserGroup extends CZBXAPI{
 				$result = false;
 				break;
 			}
-			
+
 			$result = update_user_group($usrgrp['usrgrpid'], $usrgrp['name'], $usrgrp['users_status'], $usrgrp['gui_access'], $usrgrp['api_access']);
 			if(!$result) break;
 		}
@@ -537,7 +537,7 @@ class CUserGroup extends CZBXAPI{
 		global $USER_DETAILS;
 		$result = false;
 		$errors = array();
-		
+
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can add Users to Groups');
 			return false;
@@ -546,10 +546,10 @@ class CUserGroup extends CZBXAPI{
 		$usrgrpids = zbx_objectValues($data['usrgrps'], 'usrgrpid');
 		$userids = zbx_objectValues($data['users'], 'userid');
 		$dep_usrgrps = array();
-		
+
 
 		$usrgrps = self::get(array(
-			'usrgrpids' => $usrgrpids, 
+			'usrgrpids' => $usrgrpids,
 			'extendoutput' => 1,
 			'preservekeys' => 1));
 		foreach($usrgrps as $ugnum => $usrgrp){
@@ -560,8 +560,8 @@ class CUserGroup extends CZBXAPI{
 		}
 
 		$users = CUser::get(array(
-			'userids' => $userids, 
-			'extendoutput' => 1, 
+			'userids' => $userids,
+			'extendoutput' => 1,
 			'preservekeys' => 1));
 		foreach($users as $gnum => $user){
 			if((bccomp($USER_DETAILS['userid'], $user['userid']) == 0) && !empty($dep_usrgrps)){
@@ -573,7 +573,7 @@ class CUserGroup extends CZBXAPI{
 
 // TRANSACTION {{{
 		self::BeginTransaction(__METHOD__);
-	
+
 		$result = DBexecute('DELETE FROM users_groups WHERE '.DBcondition('usrgrpid', $usrgrpids).' OR '.DBcondition('userid', $userids));
 		foreach($usrgrps as $ugnum => $usrgrp){
 			foreach($users as $unaum => $user){
@@ -587,7 +587,7 @@ class CUserGroup extends CZBXAPI{
 				}
 			}
 		}
-		
+
 		$result = self::EndTransaction($result, __METHOD__);
 // }}} TRANSACTION
 
@@ -619,7 +619,7 @@ class CUserGroup extends CZBXAPI{
 	public static function removeUsers($data){
 		global $USER_DETAILS;
 		$result = false;
-		
+
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can remove Users from Groups');
 			return false;
@@ -627,23 +627,23 @@ class CUserGroup extends CZBXAPI{
 
 		$usrgrpids = zbx_objectValues($data['usrgrps'], 'usrgrpsid');
 		$userids = zbx_objectValues($data['users'], 'userid');
-		
+
 		$usrgrps = self::get(array(
-			'usrgrpids' => $usrgrpids, 
-			'extendoutput' => 1, 
+			'usrgrpids' => $usrgrpids,
+			'extendoutput' => 1,
 			'preservekeys' => 1));
 		foreach($usrgrps as $ugnum => $usrgrp){
 			//add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER_GROUP, 'User group ['.$usrgrp['name'].']');
 		}
-		
+
 		$users = self::get(array(
-			'userids' => zbx_objectValues($users, 'userid'), 
-			'extendoutput' => 1, 
+			'userids' => zbx_objectValues($users, 'userid'),
+			'extendoutput' => 1,
 			'preservekeys' => 1));
 		foreach($users as $gnum => $user){
 			//add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER, 'User ['.$user['alias'].']');
 		}
-		
+
 //		self::BeginTransaction(__METHOD__);
 		$result = DBexecute('DELETE FROM users_groups WHERE '.DBcondition('usrgrpid', $usrgrpids).' AND '.DBcondition('userid', $userids));
 //		$result = self::EndTransaction($result, __METHOD__);
@@ -683,14 +683,14 @@ class CUserGroup extends CZBXAPI{
 		$result = false;
 
 //-----
-		$del_usrgrps = self::get(array('usrgrpids'=>zbx_objectValues($usrgrps, 'usrgrpid'), 
-											'extendoutput'=>1, 
+		$del_usrgrps = self::get(array('usrgrpids'=>zbx_objectValues($usrgrps, 'usrgrpid'),
+											'extendoutput'=>1,
 											'preservekeys'=>1));
 		foreach($usrgrps as $gnum => $usrgrp){
 			$usrgrpids[] = $usrgrp['usrgrpid'];
 			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER_GROUP, 'User group ['.$usrgrp['name'].']');
 		}
-		
+
 		self::BeginTransaction(__METHOD__);
 		if(!empty($usrgrpids)){
 			foreach($usrgrpids as $groupid){
@@ -704,7 +704,7 @@ class CUserGroup extends CZBXAPI{
 		}
 
 		$result = self::EndTransaction($result, __METHOD__);
-			
+
 		if($result){
 			return zbx_cleanHashes($del_users);
 		}

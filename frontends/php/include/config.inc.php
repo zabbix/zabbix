@@ -298,7 +298,7 @@ function __autoload($class_name){
 
 		if(!defined('PAGE_HEADER_LOADED')) return;
 		if(defined('ZBX_API_REQUEST')) return;
-		
+
 		if(!isset($page['type'])) $page['type'] = PAGE_TYPE_HTML;
 
 		$message = array();
@@ -956,18 +956,18 @@ function __autoload($class_name){
 			$_SESSION['imageid'][$id] = $image_txt;
 			session_write_close();
 			print($id);
-			
+
 //			print(base64_encode($image_txt));
 		}
 		else{
 			if(is_null($format)) $format = $IMAGE_FORMAT_DEFAULT;
-			
+
 			if(IMAGE_FORMAT_JPEG == $format)
 				imagejpeg($image);
 			else
 				imagepng($image);
 		}
-		
+
 //		imagedestroy($image);
 	}
 

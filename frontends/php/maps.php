@@ -94,22 +94,22 @@ include_once('include/page_header.php');
 	$fs_icon = null;
 
 	$options = array(
-				'extendoutput' => 1, 
+				'extendoutput' => 1,
 				'nodeids' => get_current_nodeid(),
 				'select_selements' => 1
 		);
 
 	$maps = CMap::get($options);
 	$maps = zbx_toHash($maps, 'sysmapid');
-	
+
 	if(!empty($maps)){
 		if(!isset($maps[$_REQUEST['sysmapid']])){
 			$first_map = reset($maps);
 			$_REQUEST['sysmapid'] = $first_map['sysmapid'];
 		}
 		update_profile('web.maps.sysmapid', $_REQUEST['sysmapid']);
-		
-		
+
+
 		$form = new CForm(null, 'get');
 		$form->addVar('fullscreen', $_REQUEST['fullscreen']);
 		$cmbMaps = new CComboBox('sysmapid', get_request('sysmapid', 0), 'submit()');
@@ -118,9 +118,9 @@ include_once('include/page_header.php');
 			$cmbMaps->addItem($sysmapid, get_node_name_by_elid($sysmapid, null, ': ').$map['name']);
 		}
 		$form->addItem($cmbMaps);
-		
+
 		$map_wdgt->addHeader($maps[$_REQUEST['sysmapid']]['name'], $form);
-		
+
 // GET MAP PARENT MAPS {{{
 		$parent_maps = array();
 //$parent_maps = array_pad($parent_maps, 40, array(SPACE.SPACE, new Clink('Map name 123', 'sdf')));
@@ -138,7 +138,7 @@ include_once('include/page_header.php');
 			$map_wdgt->addHeader($parent_maps);
 		}
 // }}} GET MAP PARENT MAPS
-		
+
 		$action_map = get_action_map_by_sysmapid($_REQUEST['sysmapid']);
 
 		$table->addRow($action_map);
@@ -146,7 +146,7 @@ include_once('include/page_header.php');
 		$imgMap = new CImg('map.php?noedit=1&sysmapid='.$_REQUEST['sysmapid']);
 		$imgMap->setMap($action_map->GetName());
 		$table->addRow($imgMap);
-		
+
 		if(infavorites('web.favorite.sysmapids',$_REQUEST['sysmapid'], 'sysmapid')){
 			$icon = new CDiv(SPACE, 'iconminus');
 			$icon->setAttribute('title', S_REMOVE_FROM.' '.S_FAVOURITES);
@@ -164,9 +164,9 @@ include_once('include/page_header.php');
 		$fs_icon = new CDiv(SPACE, 'fullscreen');
 		$fs_icon->setAttribute('title', $_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 		$fs_icon->addAction('onclick', new CJSscript("javascript: document.location = '".$url."';"));
-		
+
 	}
-	
+
 	$map_wdgt->addItem($table);
 	$map_wdgt->addPageHeader(S_NETWORK_MAPS_BIG, array($icon, $fs_icon));
 	$map_wdgt->show();

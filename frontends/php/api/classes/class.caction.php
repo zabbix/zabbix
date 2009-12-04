@@ -476,9 +476,9 @@ class CAction extends CZBXAPI{
 	public static function add($actions){
 		$actions = zbx_toArray($actions);
 		$actionids = array();
-		
+
 		$result = false;
-		
+
 		self::BeginTransaction(__METHOD__);
 		foreach($actions as $anum => $action){
 			$action_db_fields = array(
@@ -518,7 +518,7 @@ class CAction extends CZBXAPI{
 
 		$result = self::EndTransaction($result, __METHOD__);
 		if($result){
-			$new_actions = CAction::get(array('actionids'=>$actionids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$new_actions = CAction::get(array('actionids'=>$actionids, 'extendoutput'=>1, 'nopermissions'=>1));
 			return $new_actions;
 		}
 		else{
@@ -550,10 +550,10 @@ class CAction extends CZBXAPI{
 	public static function update($actions){
 		$actions = zbx_toArray($actions);
 		$actionids = array();
-		
-		$upd_actions = CAction::get(array('actionids'=>zbx_objectValues($actions, 'actionid'), 
-											'editable'=>1, 
-											'extendoutput'=>1, 
+
+		$upd_actions = CAction::get(array('actionids'=>zbx_objectValues($actions, 'actionid'),
+											'editable'=>1,
+											'extendoutput'=>1,
 											'preservekeys'=>1));
 		foreach($actions as $anum => $action){
 			if(!isset($upd_actions[$action['actionid']])){
@@ -562,7 +562,7 @@ class CAction extends CZBXAPI{
 			}
 			$actionids[] = $action['actionid'];
 		}
-		
+
 		$result = true;
 
 		self::BeginTransaction(__METHOD__);
@@ -584,7 +584,7 @@ class CAction extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_actions = CAction::get(array('actionids'=>$actionids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$upd_actions = CAction::get(array('actionids'=>$actionids, 'extendoutput'=>1, 'nopermissions'=>1));
 			return $upd_actions;
 		}
 		else{
@@ -711,12 +711,12 @@ class CAction extends CZBXAPI{
  * @return boolean
  */
 	public static function delete($actions){
-		$actions = zbx_toArray($actions);		
+		$actions = zbx_toArray($actions);
 		$actionids = array();
-		
-		$del_actions = Caction::get(array('actionids'=>zbx_objectValues($actions, 'actionid'), 
-											'editable'=>1, 
-											'extendoutput'=>1, 
+
+		$del_actions = Caction::get(array('actionids'=>zbx_objectValues($actions, 'actionid'),
+											'editable'=>1,
+											'extendoutput'=>1,
 											'preservekeys'=>1));
 		foreach($actions as $anum => $action){
 			if(!isset($del_actions[$action['actionid']])){
@@ -737,7 +737,7 @@ class CAction extends CZBXAPI{
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ actionids ]');
 			$result = false;
 		}
-		
+
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){

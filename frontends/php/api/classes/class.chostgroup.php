@@ -334,9 +334,9 @@ class CHostGroup extends CZBXAPI{
 // Adding hosts
 		$config = select_config();
 		if($options['select_hosts']){
-			$obj_params = array('extendoutput' => 1, 
-							'groupids' => $groupids, 
-							'templated_hosts' => 1, 
+			$obj_params = array('extendoutput' => 1,
+							'groupids' => $groupids,
+							'templated_hosts' => 1,
 							'preservekeys' => 1
 						);
 			$hosts = CHost::get($obj_params);
@@ -386,7 +386,7 @@ class CHostGroup extends CZBXAPI{
 
 		if(!empty($groupids))
 			$result = self::get(array('groupids'=>$groupids, 'extendoutput'=>1));
-		
+
 	return $result;
 	}
 
@@ -406,7 +406,7 @@ class CHostGroup extends CZBXAPI{
 	public static function add($groups){
 		global $USER_DETAILS;
 		$errors = array();
-		
+
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can create HostGroups');
 			return false;
@@ -414,7 +414,7 @@ class CHostGroup extends CZBXAPI{
 
 		$groups = zbx_toArray($groups);
 		$groupids = array();
-		
+
 		$result = true;
 
 		self::BeginTransaction(__METHOD__);
@@ -468,11 +468,11 @@ class CHostGroup extends CZBXAPI{
 	public static function update($groups){
 		$groups = zbx_toArray($groups);
 		$groupids = array();
-		
+
 		$upd_groups = self::get(array(
 			'groupids' => zbx_objectValues($groups, 'groupid'),
-			'editable' => 1, 
-			'extendoutput' => 1, 
+			'editable' => 1,
+			'extendoutput' => 1,
 			'preservekeys' => 1));
 		foreach($groups as $gnum => $group){
 			if(!isset($upd_groups[$group['groupid']])){
@@ -537,10 +537,10 @@ class CHostGroup extends CZBXAPI{
 	public static function delete($groups){
 		$groups = zbx_toArray($groups);
 		$groupids = array();
-		
-		$del_groups = self::get(array('groupids'=>zbx_objectValues($groups, 'groupid'), 
-											'editable'=>1, 
-											'extendoutput'=>1, 
+
+		$del_groups = self::get(array('groupids'=>zbx_objectValues($groups, 'groupid'),
+											'editable'=>1,
+											'extendoutput'=>1,
 											'preservekeys'=>1));
 		foreach($groups as $gnum => $group){
 			if(!isset($del_groups[$group['groupid']])){
@@ -635,9 +635,9 @@ class CHostGroup extends CZBXAPI{
 
 */
 		self::BeginTransaction(__METHOD__);
-		
+
 		$result = delete_host_group($groupids);
-		
+
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
@@ -664,18 +664,18 @@ class CHostGroup extends CZBXAPI{
  * @return boolean
  */
 	public static function addHosts($data){
-		
+
 		$result = true;
 		$groups = zbx_toArray($data['groups']);
 		$hosts = zbx_toArray($data['hosts']);
 		$groupids = array();
 		$hostids = array();
-		
+
 // PERMISSION {{{
 		$allowed_groups = self::get(array(
 			'groupids' => zbx_objectValues($groups, 'groupid'),
-			'editable' => 1, 
-			'extendoutput' => 1, 
+			'editable' => 1,
+			'extendoutput' => 1,
 			'preservekeys' => 1)
 		);
 
@@ -689,9 +689,9 @@ class CHostGroup extends CZBXAPI{
 
 		$allowed_hosts = CHost::get(array(
 			'hostids' => zbx_objectValues($hosts, 'hostid'),
-			'editable' => 1, 
+			'editable' => 1,
 			'templated_hosts' => 1,
-			'extendoutput' => 1, 
+			'extendoutput' => 1,
 			'preservekeys' => 1)
 		);
 
@@ -702,8 +702,8 @@ class CHostGroup extends CZBXAPI{
 			}
 			$hostids[] = $host['hostid'];
 		}
-// }}} PERMISSION	
-		
+// }}} PERMISSION
+
 		$sql = 'SELECT hostid, groupid FROM hosts_groups WHERE '.DBcondition('hostid', $hostids).' AND '.DBcondition('groupid', $groupids);
 		$linked_db = DBselect($sql);
 		while($pair = DBfetch($linked_db)){
@@ -726,8 +726,8 @@ class CHostGroup extends CZBXAPI{
 
 		if($result){
 			$result = self::get(array(
-				'groupids' => $groupids, 
-				'extendoutput' => 1, 
+				'groupids' => $groupids,
+				'extendoutput' => 1,
 				'select_hosts' => 1,
 				'nopermission' => 1));
 			return $result;
@@ -759,12 +759,12 @@ class CHostGroup extends CZBXAPI{
 		$hosts = zbx_toArray($data['hosts']);
 		$groupids = array();
 		$hostids = array();
-		
+
 // PERMISSION {{{
 		$allowed_groups = self::get(array(
 			'groupids' => zbx_objectValues($groups, 'groupid'),
-			'editable' => 1, 
-			'extendoutput' => 1, 
+			'editable' => 1,
+			'extendoutput' => 1,
 			'preservekeys' => 1)
 		);
 		foreach($groups as $num => $group){
@@ -775,12 +775,12 @@ class CHostGroup extends CZBXAPI{
 			$groupids[] = $group['groupid'];
 		}
 		$groupids = array_unique($groupids);
-		
+
 		$allowed_hosts = CHost::get(array(
 			'hostids' => zbx_objectValues($hosts, 'hostid'),
-			'editable' => 1, 
+			'editable' => 1,
 			'templated_hosts' => 1,
-			'extendoutput' => 1, 
+			'extendoutput' => 1,
 			'preservekeys' => 1)
 		);
 		foreach($hosts as $num => $host){
@@ -791,7 +791,7 @@ class CHostGroup extends CZBXAPI{
 			$hostids[] = $host['hostid'];
 		}
 		$hostids = array_unique($hostids);
-// }}} PERMISSION	
+// }}} PERMISSION
 
 
 		self::BeginTransaction(__METHOD__);
@@ -811,8 +811,8 @@ class CHostGroup extends CZBXAPI{
 
 		if($result){
 			$result = self::get(array(
-				'groupids' => $groupids, 
-				'extendoutput' => 1, 
+				'groupids' => $groupids,
+				'extendoutput' => 1,
 				'select_hosts' => 1,
 				'nopermission' => 1));
 			return $result;
@@ -844,12 +844,12 @@ class CHostGroup extends CZBXAPI{
 		$hosts = zbx_toArray($data['hosts']);
 		$groupids = array();
 		$hostids = array();
-		
+
 // PERMISSION {{{
 		$allowed_groups = self::get(array(
 			'groupids' => zbx_objectValues($groups, 'groupid'),
-			'editable' => 1, 
-			'extendoutput' => 1, 
+			'editable' => 1,
+			'extendoutput' => 1,
 			'preservekeys' => 1)
 		);
 		foreach($groups as $num => $group){
@@ -859,12 +859,12 @@ class CHostGroup extends CZBXAPI{
 			}
 			$groupids[] = $group['groupid'];
 		}
-		
+
 		$allowed_hosts = CHost::get(array(
 			'hostids' => zbx_objectValues($hosts, 'hostid'),
-			'editable' => 1, 
+			'editable' => 1,
 			'templated_hosts' => 1,
-			'extendoutput' => 1, 
+			'extendoutput' => 1,
 			'preservekeys' => 1)
 		);
 		foreach($hosts as $num => $host){
@@ -878,7 +878,7 @@ class CHostGroup extends CZBXAPI{
 
 
 		self::BeginTransaction(__METHOD__);
-		
+
 		$sql = 'DELETE FROM hosts_groups WHERE '.DBcondition('hostid', $hostids);
 		$result = DBexecute($sql);
 // TODO mozhno poprobovatj otsjuda ubratj perm. check, t.k v addHosts tozhe budet proverjatsja
@@ -889,8 +889,8 @@ class CHostGroup extends CZBXAPI{
 
 		if($result){
 			$result = self::get(array(
-				'groupids' => $groupids, 
-				'extendoutput' => 1, 
+				'groupids' => $groupids,
+				'extendoutput' => 1,
 				'select_hosts' => 1,
 				'nopermission' => 1));
 			return $result;

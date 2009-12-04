@@ -200,7 +200,7 @@ function make_system_summary(){
 	$groups = CHostGroup::get($options);
 
 	$groups = zbx_toHash($groups, 'groupid');
-	
+
 	order_result($groups, 'name');
 	$groupids = array();
 	foreach($groups as $gnum => $group){
@@ -228,7 +228,7 @@ function make_system_summary(){
 	);
 	$triggers = CTrigger::get($options);
 	order_result($triggers, 'lastchange', ZBX_SORT_DOWN);
-	
+
 	foreach($triggers as $tnum => $trigger){
 		$trigger['groups'] = zbx_toHash($trigger['groups'], 'groupid');
 
@@ -289,7 +289,7 @@ function make_system_summary(){
 					);
 					$event = CEvent::get($options);
 					$event = reset($event);
-					
+
 					$actions = S_NO_DATA_SMALL;
 					$ack = '-';
 //*
@@ -434,7 +434,7 @@ function make_latest_issues($params = array()){
 		$options['hostids'] = $params['hostid'];
 
 	$triggers = CTrigger::get($options);
-	
+
 // GATHER HOSTS FOR SELECTED TRIGGERS {{{
 	$triggers_hosts = array();
 	foreach($triggers as $tnum => $trigger){
@@ -460,14 +460,14 @@ function make_latest_issues($params = array()){
 	foreach($triggers as $tnum => $trigger){
 // Check for dependencies
 		if(trigger_dependent($trigger["triggerid"]))	continue;
-		
+
 		$host = reset($trigger['hosts']);
 		$trigger['hostid'] = $host['hostid'];
 		$trigger['host'] = $host['host'];
 
 		$host = null;
 		$menus = '';
-		
+
 		$host_nodeid = id2nodeid($trigger['hostid']);
 
 		foreach($scripts_by_hosts[$trigger['hostid']] as $id => $script){
@@ -625,7 +625,7 @@ return $table;
 // Author: Aly
 function make_discovery_status(){
 
-	$drules = array(); 
+	$drules = array();
 	$druleids = array();
 	$sql = 'SELECT DISTINCT * '.
 			' FROM drules '.
@@ -635,7 +635,7 @@ function make_discovery_status(){
 	$db_drules = DBselect($sql);
 	while($drule_data = DBfetch($db_drules)){
 		$druleids[$drule_data['druleid']] = $drule_data['druleid'];
-		
+
 		$drules[$drule_data['druleid']] = $drule_data;
 		$drules[$drule_data['druleid']]['up'] = 0;
 		$drules[$drule_data['druleid']]['down'] = 0;

@@ -218,7 +218,7 @@ class CGraphItem extends CZBXAPI{
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
-		
+
 
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
@@ -252,7 +252,7 @@ class CGraphItem extends CZBXAPI{
 
 		if(!empty($gitemids))
 			$result = self::get(array('gitemids'=>$gitemids, 'extendoutput'=>1));
-		
+
 	return $result;
 	}
 }

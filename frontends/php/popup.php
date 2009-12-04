@@ -259,7 +259,7 @@ include_once('include/page_header.php');
 		$frmTitle->addVar('sid',		get_request('sid','0'));
 		$frmTitle->addVar('ssid',		get_request('ssid','0'));
 	}
-	
+
 	if(isset($only_hostid)){
 		$_REQUEST['hostid'] = $only_hostid;
 		$frmTitle->addVar('only_hostid',$only_hostid);

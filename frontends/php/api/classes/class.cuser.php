@@ -273,8 +273,8 @@ class CUser extends CZBXAPI{
 // Adding Objects
 // Adding usergroups
 		if($options['select_usrgrps']){
-			$obj_params = array('extendoutput' => 1, 
-								'userids' => $userids, 
+			$obj_params = array('extendoutput' => 1,
+								'userids' => $userids,
 								'preservekeys' => 1
 							);
 			$usrgrps = CUserGroup::get($obj_params);
@@ -284,7 +284,7 @@ class CUser extends CZBXAPI{
 				}
 			}
 		}
-		
+
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
 			$result = zbx_cleanHashes($result);
@@ -363,7 +363,7 @@ class CUser extends CZBXAPI{
 		while($user = DBfetch($res)){
 			$userids[] = $user['userid'];
 		}
-		
+
 		if(!empty($userids))
 			$result = self::get(array('userids' => $userids, 'extendoutput' => 1));
 
@@ -404,7 +404,7 @@ class CUser extends CZBXAPI{
 		global $USER_DETAILS;
 		$result = false;
 		$errors = array();
-		
+
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can create Users');
 			return false;
@@ -412,7 +412,7 @@ class CUser extends CZBXAPI{
 
 		$users = zbx_toArray($users);
 		$userids = array();
-		
+
 		self::BeginTransaction(__METHOD__);
 		foreach($users as $unum => $user){
 
@@ -438,7 +438,7 @@ class CUser extends CZBXAPI{
 			}
 
 
-			$user_exist = self::getObjects(array('alias' => $user['alias']));		
+			$user_exist = self::getObjects(array('alias' => $user['alias']));
 			if(!empty($user_exist)){
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'User [ '.$user_exist[0]['alias'].' ] already exists');
 				$result = false;
@@ -446,7 +446,7 @@ class CUser extends CZBXAPI{
 			}
 
 			$userid = get_dbid('users', 'userid');
-			$result = DBexecute('INSERT INTO users (userid, name, surname, alias, passwd, url, autologin, autologout, lang, theme, 
+			$result = DBexecute('INSERT INTO users (userid, name, surname, alias, passwd, url, autologin, autologout, lang, theme,
 				refresh, rows_per_page, type) '.
 				' VALUES ('.
 					$userid.','.
@@ -486,7 +486,7 @@ class CUser extends CZBXAPI{
 
 // } copy from frontend
 			if(!$result) break;
-			
+
 			$userids[] = $userid;
 		}
 		$result = self::EndTransaction($result, __METHOD__);
@@ -535,7 +535,7 @@ class CUser extends CZBXAPI{
 		global $USER_DETAILS;
 		$errors = array();
 		$result = true;
-		
+
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can update Users');
 			return false;
@@ -545,19 +545,19 @@ class CUser extends CZBXAPI{
 		$userids = zbx_objectValues($users, 'userid');
 
 		$upd_users = self::get(array(
-			'userids' => zbx_objectValues($users, 'userid'), 
-			'extendoutput' => 1, 
+			'userids' => zbx_objectValues($users, 'userid'),
+			'extendoutput' => 1,
 			'preservekeys' => 1));
 		foreach($users as $gnum => $user){
 			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User ['.$user['alias'].']');
 		}
 
 		self::BeginTransaction(__METHOD__);
-		
+
 		foreach($users as $unum => $user){
 			$user_db_fields = $upd_users[$user['userid']];
-			
-// unset if not changed passwd	
+
+// unset if not changed passwd
 			if(isset($user['passwd']) && !is_null($user['passwd'])){
 				$user['passwd'] = md5($user['passwd']);
 			}
@@ -688,21 +688,21 @@ class CUser extends CZBXAPI{
 		global $USER_DETAILS;
 		$errors = array();
 		$result = true;
-		
+
 		$upd_users = self::get(array(
 			'userids' => $USER_DETAILS['userid'],
-			'extendoutput' => 1, 
+			'extendoutput' => 1,
 			'preservekeys' => 1));
-		
+
 		$upd_user = reset($upd_users);
 		//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User ['.$user['alias'].']');
 
 		self::BeginTransaction(__METHOD__);
-		
+
 
 		$user_db_fields = $upd_user;
-		
-// unset if not changed passwd	
+
+// unset if not changed passwd
 		if(isset($user['passwd']) && !is_null($user['passwd'])){
 			$user['passwd'] = md5($user['passwd']);
 		}
@@ -760,7 +760,7 @@ class CUser extends CZBXAPI{
 	public static function delete($users){
 		global $USER_DETAILS;
 		$errors = array();
-		
+
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can delete Users');
 			return false;
@@ -771,8 +771,8 @@ class CUser extends CZBXAPI{
 		$result = false;
 
 		$del_users = self::get(array(
-			'userids'=>zbx_objectValues($users, 'userid'), 
-			'extendoutput'=>1, 
+			'userids'=>zbx_objectValues($users, 'userid'),
+			'extendoutput'=>1,
 			'preservekeys'=>1));
 
 		foreach($del_users as $gnum => $user){
@@ -785,7 +785,7 @@ class CUser extends CZBXAPI{
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_CANNOT_DELETE_USER.'[ '.ZBX_GUEST_USER.' ]');
 				$result = false;
 			}
-			
+
 			$userids[] = $user['userid'];
 			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User ['.$user['alias'].']');
 		}
@@ -798,7 +798,7 @@ class CUser extends CZBXAPI{
 			$result = DBexecute('DELETE FROM users_groups WHERE '.DBcondition('userid', $userids));
 			$result = DBexecute('DELETE FROM users WHERE '.DBcondition('userid', $userids));
 		}
-		
+
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
@@ -899,26 +899,26 @@ class CUser extends CZBXAPI{
  */
 	public static function updateMedia($data){
 		$errors = array();
-		
+
 		$result = false;
 		$users = zbx_toArray($data['users']);
 		$userids = zbx_objectValues($users, 'userid');
-		
+
 		$medias = zbx_toArray($data['medias']);
 
 		self::BeginTransaction(__METHOD__);
-		
+
 		$result = DBexecute('DELETE FROM media WHERE '.DBcondition('userid', $userids));
 		if($result){
 			foreach($userids as $userid){
 				foreach($medias as $media){
-				
+
 					if(!validate_period($media['period'])){
 						$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong period ['.$media['period'].' ]');
 						$result = false;
 						break 2;
 					}
-					
+
 					$mediaid = get_dbid('media', 'mediaid');
 					$sql = 'INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period)'.
 							' VALUES ('.$mediaid.','.$userid.','.$media['mediatypeid'].','.
@@ -931,7 +931,7 @@ class CUser extends CZBXAPI{
 				}
 			}
 		}
-		
+
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
