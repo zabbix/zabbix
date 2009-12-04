@@ -1,5 +1,6 @@
 Changes for 1.7.4
 
+ - [ZBX-1408] fixed adding images for postgresql (Aly)
  - [ZBX-1410] fixed user profile update (Aly)
  - [ZBX-1371] shrinked API get results (Aly)
  - [ZBX-1411] fixed group and host selection in status of triggers (Aly)
