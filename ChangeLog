@@ -1,5 +1,6 @@
 Changes for 1.6.8
 
+ - [ZBX-3] remove a comment saying syslog is used until it works (Richlv)
  - [ZBX-1184] fixed support of more than 10 CPU's for system.cpu.util under Linux (Sasha)
  - [ZBX-1365] fixed housekeeper to process trends_uint table (Sasha)
  - [ZBX-1384] fixed memory leak in processing ldap checks (Sasha)
