@@ -824,8 +824,6 @@ char* zbx_strdcat(char *dest, const char *src);
 #endif /* HAVE___VA_ARGS__ */
 char* __zbx_zbx_strdcatf(char *dest, const char *f, ...);
 
-int	replace_param(const char *cmd, const char *param, char *out, int outlen);
-
 int	xml_get_data_dyn(const char *xml, const char *tag, char **data);
 void	xml_free_data_dyn(char **data);
 
