@@ -1,3 +1,7 @@
+Changes for 1.7.5
+
+ - [ZBX-1290] fixed maintenance permission check (Aly)
+
 Changes for 1.7.4
 
  - [ZBX-1400] updated patches for DB (Aly)
