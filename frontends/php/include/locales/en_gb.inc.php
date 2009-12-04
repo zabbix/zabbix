@@ -1066,7 +1066,6 @@
 	'S_TOP'=>					'Top',
 	'S_LINK_STATUS_INDICATORS'=>	'Link status indicators',
 
-	'S_ADD_ELEMENT'=>			'Add element',
 	'S_REMOVE_ELEMENT'=>		'Remove element',
 	'S_ADD_LINK'=>				'Add link',
 	'S_REMOVE_LINK'=>			'Remove link',
