@@ -952,6 +952,7 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 			);
 
 	$def_options = array(
+				'deny_all' =>						0,
 				'allow_all' =>						0,
 				'select_first_group'=>				0,
 				'select_first_group_if_empty'=>		0,
@@ -982,6 +983,7 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 	}
 //	if($page['menu'] == 'config') $dd_first_entry = ZBX_DROPDOWN_FIRST_NONE;
 	if($def_options['allow_all']) $dd_first_entry = ZBX_DROPDOWN_FIRST_ALL;
+	if($def_options['deny_all']) $dd_first_entry = ZBX_DROPDOWN_FIRST_NONE;
 
 	$result = array('original'=> -1, 'selected'=>0, 'groups'=> array(), 'groupids'=> array());
 	$groups = &$result['groups'];
@@ -1205,6 +1207,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 			);
 
 	$def_options = array(
+				'deny_all' =>					0,
 				'allow_all' =>					0,
 				'select_first_host'=>			0,
 				'select_first_host_if_empty'=>	0,
@@ -1236,6 +1239,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 		$dd_first_entry = ZBX_DROPDOWN_FIRST_ALL;
 	}
 	if($def_options['allow_all']) $dd_first_entry = ZBX_DROPDOWN_FIRST_ALL;
+	if($def_options['deny_all']) $dd_first_entry = ZBX_DROPDOWN_FIRST_NONE;
 	if($dd_first_entry == ZBX_DROPDOWN_FIRST_ALL) $def_options['select_host_on_group_switch'] = 1;
 
 	$result = array('original'=> -1, 'selected'=>0, 'hosts'=> array(), 'hostids'=> array());
