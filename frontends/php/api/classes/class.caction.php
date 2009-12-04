@@ -127,14 +127,14 @@ class CAction extends CZBXAPI{
 							' NOT EXISTS('.
 							' SELECT rr.id'.
 							' FROM rights rr, users_groups ug'.
-							' WHERE rr.id=cc.value'.
+							' WHERE rr.id='.zbx_dbcast_2bigint('cc.value').
 								' AND rr.groupid=ug.usrgrpid'.
 								' AND ug.userid='.$userid.
 								' AND rr.permission>='.$permission.')'.
 							' OR EXISTS('.
 							' SELECT rr.id'.
 							' FROM rights rr, users_groups ugg'.
-							' WHERE rr.id=cc.value'.
+							' WHERE rr.id='.zbx_dbcast_2bigint('cc.value').
 								' AND rr.groupid=ugg.usrgrpid'.
 								' AND ugg.userid='.$userid.
 								' AND rr.permission<'.$permission.')'.
@@ -152,7 +152,7 @@ class CAction extends CZBXAPI{
 							' NOT EXISTS('.
 								' SELECT hgg.hostid'.
 								' FROM hosts_groups hgg, rights r,users_groups ug'.
-								' WHERE hgg.hostid=cc.value'.
+								' WHERE hgg.hostid='.zbx_dbcast_2bigint('cc.value').
 									' AND r.id=hgg.groupid'.
 									' AND ug.userid='.$userid.
 									' AND r.permission>='.$permission.
@@ -160,7 +160,7 @@ class CAction extends CZBXAPI{
 							' OR EXISTS('.
 								' SELECT hgg.hostid'.
 									' FROM hosts_groups hgg, rights rr, users_groups gg'.
-									' WHERE hgg.hostid=cc.value'.
+									' WHERE hgg.hostid='.zbx_dbcast_2bigint('cc.value').
 										' AND rr.id=hgg.groupid'.
 										' AND rr.groupid=gg.usrgrpid'.
 										' AND gg.userid='.$userid.
@@ -171,8 +171,8 @@ class CAction extends CZBXAPI{
 // condition trigger
 			$sql_parts['where'][] =
 				' NOT EXISTS('.
-					' SELECT cc.conditionid'.
-					' FROM conditions cc'.
+					' SELECT cc.conditionid '.
+					' FROM conditions cc '.
 					' WHERE cc.conditiontype='.CONDITION_TYPE_TRIGGER.
 						' AND cc.actionid=c.actionid'.
 						' AND ('.
@@ -185,11 +185,11 @@ class CAction extends CZBXAPI{
 									' AND hg.groupid=r.id'.
 									' AND i.hostid=hg.hostid'.
 									' AND f.itemid=i.itemid'.
-									' AND f.triggerid=cc.value)'.
+									' AND f.triggerid='.zbx_dbcast_2bigint('cc.value').')'.
 							' OR EXISTS('.
 								' SELECT ff.functionid'.
 								' FROM functions ff, items ii'.
-								' WHERE ff.triggerid=cc.value'.
+								' WHERE ff.triggerid='.zbx_dbcast_2bigint('cc.value').
 									' AND ii.itemid=ff.itemid'.
 									' AND EXISTS('.
 										' SELECT hgg.groupid'.

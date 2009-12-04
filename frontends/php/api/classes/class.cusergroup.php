@@ -80,6 +80,7 @@ class CUserGroup extends CZBXAPI{
 
 // OutPut
 			'extendoutput'				=> null,
+			'editable'					=> null,
 			'select_users'				=> null,
 			'count'						=> null,
 			'preservekeys'				=> null,
@@ -95,8 +96,8 @@ class CUserGroup extends CZBXAPI{
 		if(USER_TYPE_SUPER_ADMIN == $user_type){
 
 		}
-		else if($options['editable']){
-			return $result();
+		else if(!is_null($options['editable']) && ($USER_DETAILS['type']!=USER_TYPE_SUPER_ADMIN)){
+			return array();
 		}
 
 // nodeids
