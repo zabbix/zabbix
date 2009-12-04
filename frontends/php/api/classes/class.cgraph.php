@@ -271,35 +271,33 @@ class CGraph extends CZBXAPI{
 					if(!isset($result[$graph['graphid']]))
 						$result[$graph['graphid']]= array();
 
-					if($options['select_hosts'] && !isset($result[$graph['graphid']]['hostids'])){
-						$result[$graph['graphid']]['hostids'] = array();
+					if($options['select_hosts'] && !isset($result[$graph['graphid']]['hosts'])){
 						$result[$graph['graphid']]['hosts'] = array();
 					}
-					if($options['select_graph_items'] && !isset($result[$graph['graphid']]['gitemids'])){
-						$result[$graph['graphid']]['gitemids'] = array();
+					if($options['select_graph_items'] && !isset($result[$graph['graphid']]['gitems'])){
 						$result[$graph['graphid']]['gitems'] = array();
 					}
-					if($options['select_templates'] && !isset($result[$graph['graphid']]['templateids'])){
-						$result[$graph['graphid']]['templateids'] = array();
+					if($options['select_templates'] && !isset($result[$graph['graphid']]['templates'])){
 						$result[$graph['graphid']]['templates'] = array();
 					}
-					if($options['select_items'] && !isset($result[$graph['graphid']]['itemids'])){
-						$result[$graph['graphid']]['itemids'] = array();
+					if($options['select_items'] && !isset($result[$graph['graphid']]['items'])){
 						$result[$graph['graphid']]['items'] = array();
 					}
 
-					// hostids
+// hostids
 					if(isset($graph['hostid'])){
-						if(!isset($result[$graph['graphid']]['hostids'])) $result[$graph['graphid']]['hostids'] = array();
+						if(!isset($result[$graph['graphid']]['hosts'])) 
+							$result[$graph['graphid']]['hosts'] = array();
 
-						$result[$graph['graphid']]['hostids'][$graph['hostid']] = $graph['hostid'];
+						$result[$graph['graphid']]['hosts'][$graph['hostid']] = array('hostid' => $graph['hostid']);
 						unset($graph['hostid']);
 					}
-					// itemids
+// itemids
 					if(isset($graph['itemid'])){
-						if(!isset($result[$graph['graphid']]['itemid'])) $result[$graph['graphid']]['itemid'] = array();
+						if(!isset($result[$graph['graphid']]['items'])) 
+							$result[$graph['graphid']]['items'] = array();
 
-						$result[$graph['graphid']]['itemids'][$graph['itemid']] = $graph['itemid'];
+						$result[$graph['graphid']]['items'][$graph['itemid']] = array('itemid' => $graph['itemid']);
 						unset($graph['itemid']);
 					}
 
@@ -319,9 +317,8 @@ class CGraph extends CZBXAPI{
 			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1, 'preservekeys' => 1);
 			$gitems = CGraphItem::get($obj_params);
 			foreach($gitems as $gitemid => $gitem){
-				foreach($gitem['graphids'] as $num => $graphid){
-					$result[$graphid]['gitemids'][$gitemid] = $gitemid;
-					$result[$graphid]['gitems'][$gitemid] = $gitem;
+				foreach($gitem['graphs'] as $num => $graph){
+					$result[$graph['graphid']]['gitems'][$gitemid] = $gitem;
 				}
 			}
 		}
@@ -331,9 +328,8 @@ class CGraph extends CZBXAPI{
 			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1, 'preservekeys' => 1);
 			$hosts = CHost::get($obj_params);
 			foreach($hosts as $hostid => $host){
-				foreach($host['graphids'] as $num => $graphid){
-					$result[$graphid]['hostids'][$hostid] = $hostid;
-					$result[$graphid]['hosts'][$hostid] = $host;
+				foreach($host['graphs'] as $num => $graph){
+					$result[$graph['graphid']]['hosts'][$hostid] = $host;
 				}
 			}
 		}
@@ -343,21 +339,23 @@ class CGraph extends CZBXAPI{
 			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1, 'preservekeys' => 1);
 			$templates = CTemplate::get($obj_params);
 			foreach($templates as $templateid => $template){
-				foreach($template['graphids'] as $num => $graphid){
-					$result[$graphid]['templateids'][$templateid] = $templateid;
-					$result[$graphid]['templates'][$templateid] = $template;
+				foreach($template['graphs'] as $num => $graph){
+					$result[$graph['graphid']]['templates'][$templateid] = $template;
 				}
 			}
 		}
 
 // Adding Items
 		if($options['select_items']){
-			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1, 'preservekeys' => 1);
+			$obj_params = array('extendoutput' => 1, 
+								'graphids' => $graphids, 
+								'nopermissions' => 1, 
+								'preservekeys' => 1
+							);
 			$items = CItem::get($obj_params);
 			foreach($items as $itemid => $item){
-				foreach($item['graphids'] as $num => $graphid){
-					$result[$graphid]['itemids'][$itemid] = $itemid;
-					$result[$graphid]['items'][$itemid] = $item;
+				foreach($item['graphs'] as $num => $graph){
+					$result[$graph['graphid']]['items'][$itemid] = $item;
 				}
 			}
 		}

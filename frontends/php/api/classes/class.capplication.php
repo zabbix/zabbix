@@ -242,25 +242,26 @@ class CApplication extends CZBXAPI{
 					if(!isset($result[$application['applicationid']]))
 						$result[$application['applicationid']]= array();
 
-					if($options['select_items'] && !isset($result[$application['applicationid']]['itemids'])){
-						$result[$application['applicationid']]['itemids'] = array();
+
+					if($options['select_items'] && !isset($result[$application['applicationid']]['items'])){
 						$result[$application['applicationid']]['items'] = array();
 					}
 
-					// hostids
+// hostids
 					if(isset($application['hostid']) && !is_null($options['hostids'])){
-						if(!isset($result[$application['applicationid']]['hostids']))
-							$result[$application['applicationid']]['hostids'] = array();
+						if(!isset($result[$application['applicationid']]['hosts']))
+							$result[$application['applicationid']]['hosts'] = array();
 
-						$result[$application['applicationid']]['hostids'][$application['hostid']] = $application['hostid'];
+						$result[$application['applicationid']]['hosts'][$application['hostid']] = array('hostid' => $application['hostid']);
 						unset($application['hostid']);
 					}
-					// itemids
-					if(isset($application['itemid'])){
-						if(!isset($result[$application['applicationid']]['itemids']))
-							$result[$application['applicationid']]['itemids'] = array();
 
-						$result[$application['applicationid']]['itemids'][$application['itemid']] = $application['itemid'];
+// itemids
+					if(isset($application['itemid'])){
+						if(!isset($result[$application['applicationid']]['items']))
+							$result[$application['applicationid']]['items'] = array();
+
+						$result[$application['applicationid']]['items'][$application['itemid']] = array('itemid' => $application['itemid']);
 						unset($application['itemid']);
 					}
 
@@ -280,9 +281,8 @@ class CApplication extends CZBXAPI{
 			$obj_params = array('extendoutput' => 1, 'applicationids' => $applicationids, 'nopermissions' => 1, 'preservekeys' => 1);
 			$items = CItem::get($obj_params);
 			foreach($items as $itemid => $item){
-				foreach($item['applicationids'] as $num => $applicationid){
-					$result[$applicationid]['itemids'][$itemid] = $itemid;
-					$result[$applicationid]['items'][$itemid] = $item;
+				foreach($item['applications'] as $num => $application){
+					$result[$application['applicationid']]['items'][$itemid] = $item;
 				}
 			}
 		}

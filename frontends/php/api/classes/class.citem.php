@@ -399,53 +399,49 @@ class CItem extends CZBXAPI{
 					if(!isset($result[$item['itemid']]))
 						$result[$item['itemid']]= array();
 
-					if($options['select_hosts'] && !isset($result[$item['itemid']]['hostids'])){
-						$result[$item['itemid']]['hostids'] = array();
+					if($options['select_hosts'] && !isset($result[$item['itemid']]['hosts'])){
 						$result[$item['itemid']]['hosts'] = array();
 					}
-					if($options['select_triggers'] && !isset($result[$item['itemid']]['triggerids'])){
-						$result[$item['itemid']]['triggerids'] = array();
+					if($options['select_triggers'] && !isset($result[$item['itemid']]['triggers'])){
 						$result[$item['itemid']]['triggers'] = array();
 					}
-					if($options['select_graphs'] && !isset($result[$item['itemid']]['graphids'])){
-						$result[$item['itemid']]['graphids'] = array();
+					if($options['select_graphs'] && !isset($result[$item['itemid']]['graphs'])){
 						$result[$item['itemid']]['graphs'] = array();
 					}
-					if($options['select_applications'] && !isset($result[$item['itemid']]['applicationids'])){
-						$result[$item['itemid']]['applicationids'] = array();
+					if($options['select_applications'] && !isset($result[$item['itemid']]['applications'])){
 						$result[$item['itemid']]['applications'] = array();
 					}
 
 
-					// hostids
+// hostids
 					if(isset($item['hostid'])){
-						if(!isset($result[$item['itemid']]['hostids'])) $result[$item['itemid']]['hostids'] = array();
+						if(!isset($result[$item['itemid']]['hosts'])) $result[$item['itemid']]['hosts'] = array();
 
-						$result[$item['itemid']]['hostids'][$item['hostid']] = $item['hostid'];
+						$result[$item['itemid']]['hosts'][$item['hostid']] = array('hostid' => $item['hostid']);
 //						unset($item['hostid']);
 					}
-					// triggerids
+// triggerids
 					if(isset($item['triggerid'])){
-						if(!isset($result[$item['itemid']]['triggerids']))
-							$result[$item['itemid']]['triggerids'] = array();
+						if(!isset($result[$item['itemid']]['triggers']))
+							$result[$item['itemid']]['triggers'] = array();
 
-						$result[$item['itemid']]['triggerids'][$item['triggerid']] = $item['triggerid'];
+						$result[$item['itemid']]['triggers'][$item['triggerid']] = array('triggerid' => $item['triggerid']);
 						unset($item['triggerid']);
 					}
-					// graphids
+// graphids
 					if(isset($item['graphid'])){
-						if(!isset($result[$item['itemid']]['graphids']))
-							$result[$item['itemid']]['graphids'] = array();
+						if(!isset($result[$item['itemid']]['graphs']))
+							$result[$item['itemid']]['graphs'] = array();
 
-						$result[$item['itemid']]['graphids'][$item['graphid']] = $item['graphid'];
+						$result[$item['itemid']]['graphs'][$item['graphid']] = array('graphid' => $item['graphid']);
 						unset($item['graphid']);
 					}
-					// applicationids
+// applicationids
 					if(isset($item['applicationid'])){
-						if(!isset($result[$item['itemid']]['applicationids']))
-							$result[$item['itemid']]['applicationids'] = array();
+						if(!isset($result[$item['itemid']]['applications']))
+							$result[$item['itemid']]['applications'] = array();
 
-						$result[$item['itemid']]['applicationids'][$item['applicationid']] = $item['applicationid'];
+						$result[$item['itemid']]['applications'][$item['applicationid']] = array('applicationid' => $item['applicationid']);
 						unset($item['applicationid']);
 					}
 
@@ -465,17 +461,15 @@ class CItem extends CZBXAPI{
 			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids, 'nopermissions' => 1, 'preservekeys' => 1);
 			$hosts = CHost::get($obj_params);
 			foreach($hosts as $hostid => $host){
-				foreach($host['itemids'] as $num => $itemid){
-					$result[$itemid]['hostids'][$hostid] = $hostid;
-					$result[$itemid]['hosts'][$hostid] = $host;
+				foreach($host['items'] as $inum => $item){
+					$result[$item['itemid']]['hosts'][$hostid] = $host;
 				}
 			}
 
 			$templates = CTemplate::get($obj_params);
 			foreach($templates as $templateid => $template){
-				foreach($template['itemids'] as $num => $itemid){
-					$result[$itemid]['hostids'][$templateid] = $templateid;
-					$result[$itemid]['hosts'][$templateid] = $template;
+				foreach($template['items'] as $inum => $item){
+					$result[$item['itemid']]['hosts'][$templateid] = $template;
 				}
 			}
 		}
@@ -485,9 +479,8 @@ class CItem extends CZBXAPI{
 			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids, 'preservekeys' => 1);
 			$triggers = CTrigger::get($obj_params);
 			foreach($triggers as $triggerid => $trigger){
-				foreach($trigger['itemids'] as $num => $itemid){
-					$result[$itemid]['triggerids'][$triggerid] = $triggerid;
-					$result[$itemid]['triggers'][$triggerid] = $trigger;
+				foreach($trigger['items'] as $inum => $item){
+					$result[$item['itemid']]['triggers'][$triggerid] = $trigger;
 				}
 			}
 		}
@@ -497,9 +490,8 @@ class CItem extends CZBXAPI{
 			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids, 'preservekeys' => 1);
 			$graphs = CGraph::get($obj_params);
 			foreach($graphs as $graphid => $graph){
-				foreach($graph['itemids'] as $num => $itemid){
-					$result[$itemid]['graphids'][$graphid] = $graphid;
-					$result[$itemid]['graphs'][$graphid] = $graph;
+				foreach($graph['items'] as $inum => $item){
+					$result[$item['itemid']]['graphs'][$graphid] = $graph;
 				}
 			}
 		}
@@ -509,9 +501,8 @@ class CItem extends CZBXAPI{
 			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids, 'preservekeys' => 1);
 			$applications = CApplication::get($obj_params);
 			foreach($applications as $applicationid => $application){
-				foreach($application['itemids'] as $num => $itemid){
-					$result[$itemid]['applicationids'][$applicationid] = $applicationid;
-					$result[$itemid]['applications'][$applicationid] = $application;
+				foreach($application['items'] as $inum => $item){
+					$result[$item['itemid']]['applications'][$applicationid] = $application;
 				}
 			}
 		}
