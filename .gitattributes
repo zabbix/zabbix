@@ -610,6 +610,7 @@ upgrades/dbpatches/1.8/mysql/patch/timeperiods.sql -text
 upgrades/dbpatches/1.8/mysql/patch/user_history.sql -text
 upgrades/dbpatches/1.8/mysql/patch/users.sql -text
 upgrades/dbpatches/1.8/mysql/patch/usrgrp.sql -text
+upgrades/dbpatches/1.8/mysql/upgrade -text
 upgrades/dbpatches/1.8/oracle/patch/acknowledges.sql -text
 upgrades/dbpatches/1.8/oracle/patch/actions.sql -text
 upgrades/dbpatches/1.8/oracle/patch/alerts.sql -text
