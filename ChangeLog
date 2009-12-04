@@ -1,7 +1,7 @@
 Changes for 1.7.4
 
  - [ZBX-790] added protection of using special characters in user parameters of Zabbix Agent (Sasha)
- - [ZBX-1375] fixed graphs loosing link with template after update (Vedmak)
+ - [ZBX-1375] fixed graphs losing link with template after update (Vedmak)
  - [ZBX-137] added patch for Oracle (Alexei)
  - [ZBX-1372] applied patches for localization (Aly)
  - [ZBX-1378] allowed using months in age view (Aly)
