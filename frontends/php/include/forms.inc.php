@@ -616,7 +616,7 @@
 /*			if(bccomp($userid,$USER_DETAILS['userid'])==0) $profile = 1;*/
 			$users = CUser::get(array('userids' => $userid,  'extendoutput' => 1));
 			$user = reset($users);
-			
+
 			$frm_title = S_USER.' "'.$user['alias'].'"';
 		}
 
@@ -837,7 +837,7 @@
 //view Media Settings for users above "User" +++
 		if(uint_in_array($USER_DETAILS['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN))) {
 			$frmUser->addVar('user_medias', $user_medias);
-			
+
 			$media_table = new CTableInfo(S_NO_MEDIA_DEFINED);
 			foreach($user_medias as $id => $one_media){
 				if(!isset($one_media['active']) || $one_media['active']==0){
@@ -1804,7 +1804,7 @@
 			$frmItem->addVar('itemid', $_REQUEST['itemid']);
 			$item_data = CItem::get(array('itemids' => $_REQUEST['itemid'],  'extendoutput' => 1));
 			$item_data = reset($item_data);
-			
+
 			$hostid	= ($hostid > 0) ? $hostid : $item_data['hostid'];
 			$limited = (($item_data['templateid'] == 0)  && ($item_data['type'] != ITEM_TYPE_HTTPTEST)) ? null : 'yes';
 		}
@@ -2906,7 +2906,7 @@
 			$frmGraph->addVar('graphid', $_REQUEST['graphid']);
 			$row = CGraph::get(array('graphids' => $_REQUEST['graphid'],  'extendoutput' => 1));
 			$row = reset($row);
-			
+
 			$frmGraph->setTitle(S_GRAPH.' "'.$row['name'].'"');
 		}
 
@@ -4664,19 +4664,19 @@
 				if( $new_operation['object'] == OPERATION_OBJECT_GROUP){
 					$object_srctbl = 'usrgrp';
 					$object_srcfld1 = 'usrgrpid';
-					
+
 					$object_name = CUserGroup::get(array('usrgrpids' => $new_operation['objectid'],  'extendoutput' => 1));
 					$object_name = reset($object_name);
-					
+
 					$display_name = 'name';
 				}
 				else{
 					$object_srctbl = 'users';
 					$object_srcfld1 = 'userid';
-					
+
 					$object_name = CUser::get(array('userids' => $new_operation['objectid'],  'extendoutput' => 1));
 					$object_name = reset($object_name);
-					
+
 					$display_name = 'alias';
 				}
 
@@ -6276,7 +6276,7 @@
 		$frmMap->addRow(S_NAME,new CTextBox('name',$name,32));
 		$frmMap->addRow(S_WIDTH,new CNumericBox('width',$width,5));
 		$frmMap->addRow(S_HEIGHT,new CNumericBox('height',$height,5));
-		
+
 		$cmbImg = new CComboBox('backgroundid',$backgroundid);
 		$cmbImg->addItem(0,'No image...');
 

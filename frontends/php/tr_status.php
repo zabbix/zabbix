@@ -123,7 +123,7 @@ include_once('include/page_header.php');
 //--------
 
 	$config = select_config();
-	
+
 	$_REQUEST['groupid'] = get_request('groupid', 0);
 	$_REQUEST['hostid'] = get_request('hostid', 0);
 
@@ -202,7 +202,7 @@ include_once('include/page_header.php');
 		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
 	}
 
-	
+
 	$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
 	$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
@@ -234,7 +234,7 @@ include_once('include/page_header.php');
 	$filterForm->addVar('fullscreen', $_REQUEST['fullscreen']);
 	$filterForm->addVar('groupid', $_REQUEST['groupid']);
 	$filterForm->addVar('hostid', $_REQUEST['hostid']);
-	
+
 	$tr_select = new CComboBox('show_triggers', $show_triggers);
 	if(($_REQUEST['hostid'] == 0) && ($_REQUEST['groupid'] == 0)){
 		$tr_select->setAttribute('disabled', 'disabled');
@@ -297,13 +297,13 @@ include_once('include/page_header.php');
 
 	$admin_links = (($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN) || ($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN));
 	$show_event_col = ($config['event_ack_enable'] && ($_REQUEST['show_events'] != EVENTS_OPTION_NOEVENT));
-	
-	$table = new CTableInfo();	
+
+	$table = new CTableInfo();
 	$switchers_name = 'trigger_switchers';
-	
+
 	$header_cb = ($show_event_col) ? new CCheckBox('all_events', false, "checkAll('".$m_form->GetName()."','all_events','events');")
 		: new CCheckBox('all_triggers', false, "checkAll('".$m_form->GetName()."','all_triggers', 'triggers');");
-		
+
 	if($show_events != EVENTS_OPTION_NOEVENT){
 		$whow_hide_all = new CDiv(new CImg('images/general/closed.gif'), 'pointer');
 		$whow_hide_all->setAttribute('id', $switchers_name);
@@ -311,7 +311,7 @@ include_once('include/page_header.php');
 	else{
 		$whow_hide_all = NULL;
 	}
-	
+
 	$table->setHeader(array(
 		$whow_hide_all,
 		$header_cb,
@@ -326,7 +326,7 @@ include_once('include/page_header.php');
 		make_sorting_header(S_NAME, 'description'),
 		S_COMMENTS
 	));
-	
+
 
 	$sortfield = getPageSortField('description');
 	$sortorder = getPageSortOrder();
@@ -339,7 +339,7 @@ include_once('include/page_header.php');
 		'sortfield' => $sortfield,
 		'sortorder' => $sortorder,
 		'limit' => ($config['search_limit']+1),
-		'preservekeys' => 1		
+		'preservekeys' => 1
 	);
 
 // Filtering
@@ -364,43 +364,43 @@ include_once('include/page_header.php');
 		$options['min_severity'] = $show_severity;
 	}
 	$triggers = CTrigger::get($options);
-	
+
 
 // sorting && paging
 	order_result($triggers, $sortfield, $sortorder);
 	$paging = getPagingLine($triggers);
-	
+
 	$options = array(
 		'nodeids' => get_current_nodeid(),
 		'triggerids' => array_keys($triggers),
 		'extendoutput' => 1,
 		'select_hosts' => 1,
 		'select_items' => 1,
-		'preservekeys' => 1		
+		'preservekeys' => 1
 	);
 	$triggers = CTrigger::get($options);
 	order_result($triggers, $sortfield, $sortorder);
 //---------
 
-	
+
 	$trigger_hosts = array();
 	foreach($triggers as $tnum => $trigger){
 		$event_count = CEvent::get(array(
-			'count' => 1, 
+			'count' => 1,
 			'triggerids' => $trigger['triggerid'],
 			'acknowledged' => 0,
 			'nopermissions' => 1));
 		$triggers[$tnum]['event_count'] = $event_count['rowscount'];
-		
+
 		$trigger_hosts = array_merge($trigger_hosts, $trigger['hosts']);
 		$triggers[$tnum]['events'] = array();
 	}
-	
+
 	$trigger_hosts = zbx_toHash($trigger_hosts, 'hostid');
 	$trigger_hostids = array_keys($trigger_hosts);
-	
+
 	$scripts_by_hosts = Cscript::getScriptsByHosts($trigger_hostids);
-	
+
 	if($show_events != EVENTS_OPTION_NOEVENT){
 		$ev_options = array(
 			'nodeids' => get_current_nodeid(),
@@ -425,18 +425,18 @@ include_once('include/page_header.php');
 				$ev_options['value'] = TRIGGER_VALUE_TRUE;
 			break;
 		}
-		
+
 		$events = CEvent::get($ev_options);
 
 		foreach($events as $enum => $event){
 			$triggers[$event['objectid']]['events'][] = $event;
 		}
-	}	
-	
-	
-	
-	foreach($triggers as $tnum => $trigger){		
-		
+	}
+
+
+
+	foreach($triggers as $tnum => $trigger){
+
 		$trigger['desc'] = $description = expand_trigger_description($trigger['triggerid']);
 
 // Items
@@ -525,8 +525,8 @@ include_once('include/page_header.php');
 // }}} DEPENDENCIES
 
 		$tr_desc = new CSpan($description);
-				
-		
+
+
 // host JS menu {{{
 		$hosts_list = array();
 		foreach($trigger['hosts'] as $num => $trigger_host){
@@ -549,21 +549,21 @@ include_once('include/page_header.php');
 
 			$menus = rtrim($menus,',');
 			$menus = 'show_popup_menu(event,['.$menus.'],180);';
-			
+
 			$maint_span = null;
 			if($trigger_host['maintenance_status']){
 				$text = $trigger_host['maintenance_type'] ? S_NO_DATA_MAINTENANCE : S_NORMAL_MAINTENANCE;
 				$text = ' ['.$text.']';
 				$maint_span = new CSpan($text, 'orange pointer');
-				
+
 				$maintenance = CMaintenance::get(array('maintenanceids' => $trigger_host['maintenanceid'], 'extendoutput' => 1));
 				$maintenance = reset($maintenance);
 				$maint_hint = new CSpan($maintenance['name'].($maintenance['description']=='' ? '' : ': '.$maintenance['description']));
-				
+
 				$maint_span->setHint($maint_hint);
 			}
 
-			
+
 			$hosts_span = new CSpan($trigger_host['host'], 'link_menu');
 			$hosts_span->setAttribute('onclick','javascript: '.$menus);
 			$hosts_list[] = $hosts_span;
@@ -597,8 +597,8 @@ include_once('include/page_header.php');
 		else{
 			$to_ack = null;
 		}
-		
-		
+
+
 		if(($show_events != EVENTS_OPTION_NOEVENT) && !empty($trigger['events'])){
 			$open_close = new CDiv(new CImg('images/general/closed.gif'), 'pointer');
 			$open_close->setAttribute('data-switcherid', $trigger['triggerid']);
@@ -609,11 +609,11 @@ include_once('include/page_header.php');
 		else{
 			$open_close = SPACE;
 		}
-		
+
 
 		$severity_col = new CCol(get_severity_description($trigger['priority']), get_severity_style($trigger['priority'], $trigger['value']));
 		if($show_event_col) $severity_col->setColSpan(2);
-		
+
 		$table->addRow(array(
 			$open_close,
 			$show_event_col ? null : new CCheckBox('triggers['.$trigger['triggerid'].']', 'no', NULL, $trigger['triggerid']),
@@ -635,7 +635,7 @@ include_once('include/page_header.php');
 
 			foreach($trigger['events'] as $enum => $row_event){
 				$i++;
-				
+
 				$status = new CSpan(trigger_value2str($row_event['value']), get_trigger_value_style($row_event['value']));
 
 				if($config['event_ack_enable']){
@@ -653,18 +653,18 @@ include_once('include/page_header.php');
 						$ack = null;
 					}
 				}
-				
+
 				if(($row_event['acknowledged'] == 0) && ($row_event['value'] == TRIGGER_VALUE_TRUE)){
 					$ack_cb = new CCheckBox('events['.$row_event['eventid'].']', 'no', NULL, $row_event['eventid']);
 				}
 				else{
 					$ack_cb = SPACE;
 				}
-				
+
 				$clock = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS, $row_event['clock']),
 					'tr_events.php?triggerid='.$trigger['triggerid'].'&eventid='.$row_event['eventid']);
 				$next_clock = isset($trigger['events'][$enum-1]) ? $trigger['events'][$enum-1]['clock'] : time();
-				
+
 				$empty_col = new CCol();
 				$empty_col->setColSpan(3);
 				$ack_cb_col = new CCol($ack_cb);
@@ -683,13 +683,13 @@ include_once('include/page_header.php');
 				$row->setAttribute('data-parentid', $trigger['triggerid']);
 				$row->addStyle('display: none;');
 				$table->addRow($row);
-				
+
 				if($i > $config['event_show_max']) break;
 			}
 		}
 	}
 
-	
+
 //----- GO ------
 	$footer = null;
 	if($config['event_ack_enable']){

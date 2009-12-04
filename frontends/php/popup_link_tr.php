@@ -111,7 +111,7 @@ return true;
 			'T');
 		$btnSelect->setType('button');
 
-// END preparation 
+// END preparation
 		$description = ($triggerid > 0) ? expand_trigger_description($triggerid) : '';
 
 		$frmCnct->addRow(S_TRIGGER, array(new CTextBox('desc_exp', $description, 70, 'yes'), SPACE, $btnSelect));
@@ -128,5 +128,5 @@ return true;
 <?php
 
 	require_once('include/page_footer.php');
-	
+
 ?>

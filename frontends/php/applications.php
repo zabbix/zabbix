@@ -65,19 +65,19 @@ include_once('include/page_header.php');
 	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 	$_REQUEST['go'] = get_request('go', 'none');
-	
+
 
 // PERMISSIONS
 	if(get_request('groupid', 0) > 0){
 		$groupids = available_groups($_REQUEST['groupid'], 1);
 		if(empty($groupids)) access_deny();
 	}
-	
+
 	if(get_request('hostid', 0) > 0){
 		$hostids = available_hosts($_REQUEST['hostid'], 1);
 		if(empty($hostids)) access_deny();
 	}
-	
+
 	if(get_request('apphostid', 0) > 0){
 		$hostids = available_hosts($_REQUEST['apphostid'], 1);
 		if(empty($hostids)) access_deny();

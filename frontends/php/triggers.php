@@ -220,7 +220,7 @@ include_once('include/page_header.php');
 		$result = false;
 
 		$options = array('triggerids' => $_REQUEST['triggerid'], 'extendoutput'=>1);
-		
+
 		$triggers = CTrigger::get($options);
 		if($trigger_data = reset($triggers)){
 			DBstart();
@@ -266,7 +266,7 @@ include_once('include/page_header.php');
 
 		$triggers = CTrigger::get($options);
 		$triggerids = zbx_objectValues($triggers, 'triggerid');
-		
+
 		if(($_REQUEST['go'] == 'activate')){
 			$status = TRIGGER_STATUS_ENABLED;
 			$status_old = array('status'=>0);
@@ -284,14 +284,14 @@ include_once('include/page_header.php');
 		if($go_result){
 			foreach($triggers as $tnum => $trigger){
 				$serv_status = (isset($_REQUEST['group_enable']))?get_service_status_of_trigger($trigger['triggerid']):0;
-				
+
 				update_services($trigger['triggerid'], $serv_status); // updating status to all services by the dependency
-				add_audit_ext(AUDIT_ACTION_UPDATE, 
-								AUDIT_RESOURCE_TRIGGER, 
-								$trigger['triggerid'], 
-								$trigger['description'], 
-								'triggers', 
-								$status_old, 
+				add_audit_ext(AUDIT_ACTION_UPDATE,
+								AUDIT_RESOURCE_TRIGGER,
+								$trigger['triggerid'],
+								$trigger['description'],
+								'triggers',
+								$status_old,
 								$status_new);
 			}
 		}
@@ -304,7 +304,7 @@ include_once('include/page_header.php');
 			if(0 == $_REQUEST['copy_type']){ /* hosts */
 				$hosts_ids = $_REQUEST['copy_targetid'];
 			}
-			else{ 
+			else{
 // groups
 				$hosts_ids = array();
 				$group_ids = $_REQUEST['copy_targetid'];
@@ -351,7 +351,7 @@ include_once('include/page_header.php');
 		DBstart();
 		foreach($triggers as $tnum => $trigger){
 			$triggerid = $trigger['triggerid'];
-			
+
 			$description = expand_trigger_description($triggerid);
 			if($trigger['templateid'] != 0){
 				unset($triggers[$tnum]);

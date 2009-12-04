@@ -185,7 +185,7 @@ class CBar extends CGraphDraw{
 			if($tmp == 0) $tmp = 1;
 
 			$this->columnWidth = floor($seriesSizeX / $tmp);
-			
+
 			if($serieLength == 0) $serieLength = 1;
 			$this->seriesWidth = floor($seriesSizeX / $serieLength);
 		}
@@ -197,7 +197,7 @@ class CBar extends CGraphDraw{
 			if($tmp == 0) $tmp = 1;
 
 			$this->columnWidth = floor($seriesSizeY / $tmp);
-			
+
 			if($serieLength == 0) $serieLength = 1;
 			$this->seriesWidth = floor($seriesSizeY / $serieLength);
 		}

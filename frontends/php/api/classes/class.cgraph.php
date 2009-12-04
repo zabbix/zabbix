@@ -286,7 +286,7 @@ class CGraph extends CZBXAPI{
 
 // hostids
 					if(isset($graph['hostid'])){
-						if(!isset($result[$graph['graphid']]['hosts'])) 
+						if(!isset($result[$graph['graphid']]['hosts']))
 							$result[$graph['graphid']]['hosts'] = array();
 
 						$result[$graph['graphid']]['hosts'][$graph['hostid']] = array('hostid' => $graph['hostid']);
@@ -294,7 +294,7 @@ class CGraph extends CZBXAPI{
 					}
 // itemids
 					if(isset($graph['itemid'])){
-						if(!isset($result[$graph['graphid']]['items'])) 
+						if(!isset($result[$graph['graphid']]['items']))
 							$result[$graph['graphid']]['items'] = array();
 
 						$result[$graph['graphid']]['items'][$graph['itemid']] = array('itemid' => $graph['itemid']);
@@ -347,9 +347,9 @@ class CGraph extends CZBXAPI{
 
 // Adding Items
 		if($options['select_items']){
-			$obj_params = array('extendoutput' => 1, 
-								'graphids' => $graphids, 
-								'nopermissions' => 1, 
+			$obj_params = array('extendoutput' => 1,
+								'graphids' => $graphids,
+								'nopermissions' => 1,
 								'preservekeys' => 1
 							);
 			$items = CItem::get($obj_params);
@@ -399,7 +399,7 @@ class CGraph extends CZBXAPI{
 
 		if(!empty($graphids))
 			$result = self::get(array('graphids'=>$graphids, 'extendoutput'=>1));
-		
+
 	return $result;
 	}
 
@@ -530,9 +530,9 @@ class CGraph extends CZBXAPI{
 		$graphs = zbx_toArray($graphs);
 		$graphids = array();
 
-		$upd_graphs = self::get(array('graphids'=>zbx_objectValues($graphs, 'graphid'), 
-									'editable'=>1, 
-									'extendoutput'=>1, 
+		$upd_graphs = self::get(array('graphids'=>zbx_objectValues($graphs, 'graphid'),
+									'editable'=>1,
+									'extendoutput'=>1,
 									'preservekeys'=>1));
 		foreach($graphs as $gnum => $graph){
 			if(!isset($upd_graphs[$graph['graphid']])){
@@ -564,7 +564,7 @@ class CGraph extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_graphs = self::get(array('graphids'=>$graphids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$upd_graphs = self::get(array('graphids'=>$graphids, 'extendoutput'=>1, 'nopermissions'=>1));
 			return $upd_graphs;
 		}
 		else{
@@ -586,9 +586,9 @@ class CGraph extends CZBXAPI{
 		$graphids = array();
 
 		$del_graphs = self::get(array(
-			'graphids' => zbx_objectValues($graphs, 'graphid'), 
-			'editable' => 1, 
-			'extendoutput' => 1, 
+			'graphids' => zbx_objectValues($graphs, 'graphid'),
+			'editable' => 1,
+			'extendoutput' => 1,
 			'preservekeys' => 1));
 		foreach($graphs as $gnum => $graph){
 			if(!isset($del_graphs[$graph['graphid']])){
@@ -677,7 +677,7 @@ class CGraph extends CZBXAPI{
 // check if graph is templated graph, then items cannot be added
 		$graph = self::get(array('graphids' => $graphid,  'extendoutput' => 1));
 		$graph = reset($graph);
-		
+
 		if($graph['templateid'] != 0){
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Cannot edit templated graph : '.$graph['name']);
 			return false;

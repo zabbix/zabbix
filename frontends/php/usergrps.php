@@ -162,7 +162,7 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 	else if(isset($_REQUEST['delete'])){
 		$group = CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'], 'extendoutput' => 1));
 		$group = reset($group);
-	
+
 		DBstart();
 		$result = delete_user_group($_REQUEST['usrgrpid']);
 		$result = DBend($result);
@@ -391,7 +391,7 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 
 		foreach($usrgrps as $ugnum => $usrgrp){
 			$usrgrpid = $usrgrp['usrgrpid'];
-			
+
 			$api_access = ($usrgrp['api_access'] == GROUP_API_ACCESS_ENABLED)
 				? new CLink(S_ENABLED, 'usergrps.php?go=disable_api&usrgrpid='.$usrgrpid, 'orange')
 				: new CLink(S_DISABLED, 'usergrps.php?go=enable_api&usrgrpid='.$usrgrpid, 'enabled');

@@ -90,7 +90,7 @@
 		);
 		$groups = CHostGroup::get($options);
 		$groups = zbx_toHash($groups, 'groupid');
-		
+
 		if(!isset($groups[$_REQUEST['groupid']])) $_REQUEST['groupid'] = 0;
 // }}} get groups
 
@@ -137,7 +137,7 @@
 				}
 			}
 		}
-	
+
 		$r_form = new CForm(null, 'get');
 		$r_form->addVar('prof_type', $_REQUEST['prof_type']);
 

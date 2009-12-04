@@ -63,7 +63,7 @@ include_once('include/page_header.php');
 		);
 
 		$maps = CMap::get($options);
-		
+
 		if(empty($maps)) access_deny();
 		else $sysmap = reset($maps);
 	}
@@ -89,7 +89,7 @@ include_once('include/page_header.php');
 		else {
 			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 				access_deny();
-				
+
 			$_REQUEST['highlight'] = get_request('highlight', 0);
 
 			DBstart();
@@ -189,7 +189,7 @@ include_once('include/page_header.php');
 		order_result($maps, $sortfield, $sortorder);
 		$paging = getPagingLine($maps);
 //-------
-		
+
 		foreach($maps as $mnum => $map){
 			$table->addRow(array(
 				new CCheckBox('maps['.$map['sysmapid'].']', NULL, NULL, $map['sysmapid']),

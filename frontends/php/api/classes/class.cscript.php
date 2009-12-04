@@ -259,7 +259,7 @@ class Cscript extends CZBXAPI{
 // Adding groups
 		if($options['select_groups']){
 			foreach($result as $scriptid => $script){
-				$obj_params = array('extendoutput' => 1, 
+				$obj_params = array('extendoutput' => 1,
 									'preservekeys' => 1
 								);
 
@@ -280,7 +280,7 @@ class Cscript extends CZBXAPI{
 // Adding hosts
 		if($options['select_hosts']){
 			foreach($result as $scriptid => $script){
-				$obj_params = array('extendoutput' => 1, 
+				$obj_params = array('extendoutput' => 1,
 									'preservekeys' => 1
 								);
 
@@ -324,7 +324,7 @@ class Cscript extends CZBXAPI{
 	public static function getObjects($script){
 		$result = array();
 		$scriptids = array();
-		
+
 		$sql = 'SELECT scriptid '.
 				' FROM scripts '.
 				' WHERE '.DBin_node('scriptid').
@@ -336,7 +336,7 @@ class Cscript extends CZBXAPI{
 
 		if(!empty($scriptids))
 			$result = self::get(array('scriptids'=>$scriptids, 'extendoutput'=>1));
-		
+
 	return $result;
 	}
 
@@ -357,7 +357,7 @@ class Cscript extends CZBXAPI{
 	public static function add($scripts){
 		$scripts = zbx_toArray($scripts);
 		$scriptids = array();
-		
+
 		$result = false;
 //------
 
@@ -379,7 +379,7 @@ class Cscript extends CZBXAPI{
 
 			$result = add_script($script['name'],$script['command'],$script['usrgrpid'],$script['groupid'],$script['host_access']);
 			if(!$result) break;
-			
+
 			$scriptids[] = $result;
 		}
 
@@ -412,12 +412,12 @@ class Cscript extends CZBXAPI{
 	public static function update($scripts){
 		$scripts = zbx_toArray($scripts);
 		$scriptids = array();
-		
+
 		$result = false;
 //------
-		$upd_scripts = self::get(array('scriptids'=>zbx_objectValues($scripts, 'scriptid'), 
-											'editable'=>1, 
-											'extendoutput'=>1, 
+		$upd_scripts = self::get(array('scriptids'=>zbx_objectValues($scripts, 'scriptid'),
+											'editable'=>1,
+											'extendoutput'=>1,
 											'preservekeys'=>1));
 		foreach($scripts as $snum => $script){
 			if(!isset($upd_scripts[$script['scriptid']])){
@@ -428,7 +428,7 @@ class Cscript extends CZBXAPI{
 			$scriptids[] = $script['scriptid'];
 			//add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCRIPT, 'Script ['.$script['name'].']');
 		}
-		
+
 		self::BeginTransaction(__METHOD__);
 		foreach($scripts as $num => $script){
 			$script_db_fields = $upd_scripts[$script['scriptid']];
@@ -471,12 +471,12 @@ class Cscript extends CZBXAPI{
 	public static function delete($scripts){
 		$scripts = zbx_toArray($scripts);
 		$scriptids = array();
-		
+
 		$result = false;
 //------
-		$del_scripts = self::get(array('scriptids'=>zbx_objectValues($scripts, 'scriptid'), 
-											'editable'=>1, 
-											'extendoutput'=>1, 
+		$del_scripts = self::get(array('scriptids'=>zbx_objectValues($scripts, 'scriptid'),
+											'editable'=>1,
+											'extendoutput'=>1,
 											'preservekeys'=>1));
 		foreach($scripts as $snum => $script){
 			if(!isset($del_scripts[$script['scriptid']])){
@@ -487,7 +487,7 @@ class Cscript extends CZBXAPI{
 			$scriptids[] = $script['scriptid'];
 			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, 'Script ['.$script['name'].']');
 		}
-		
+
 		self::BeginTransaction(__METHOD__);
 		if(!empty($scriptids)){
 			$result = delete_script($scriptids);
@@ -496,7 +496,7 @@ class Cscript extends CZBXAPI{
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ scriptids ]');
 			$result = false;
 		}
-		
+
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
@@ -536,15 +536,15 @@ class Cscript extends CZBXAPI{
 			$scripts_by_host[$hostid] = array();
 		}
 //-----
-		$options = array('hostids' => $hostids, 
-						'select_hosts' => 1, 
-						'extendoutput' => 1, 
+		$options = array('hostids' => $hostids,
+						'select_hosts' => 1,
+						'extendoutput' => 1,
 						'preservekeys' => 1
 					);
 		$groups = CHostGroup::get($options);
 
-		$obj_params = array('extendoutput' => 1, 
-							'hostids' => $hostids, 
+		$obj_params = array('extendoutput' => 1,
+							'hostids' => $hostids,
 							'preservekeys' => 1
 						);
 		$scripts  = CScript::get($obj_params);

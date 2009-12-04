@@ -183,7 +183,7 @@ class CMap extends CZBXAPI{
 				}
 				else{
 					if(!isset($result[$sysmap['sysmapid']])) $result[$sysmap['sysmapid']]= array();
-					
+
 					if(!is_null($options['select_selements']) && !isset($result[$sysmap['sysmapid']]['selements'])){
 						$result[$sysmap['sysmapid']]['selements'] = array();
 					}
@@ -237,27 +237,27 @@ class CMap extends CZBXAPI{
 // sdi($triggers_to_check);
 // sdi($host_groups_to_check);
 				$nodeids = get_current_nodeid(true);
-				$host_options = array('hostids' => $hosts_to_check, 
+				$host_options = array('hostids' => $hosts_to_check,
 									'nodeids' => $nodeids,
-									'editable' => isset($options['editable']), 
+									'editable' => isset($options['editable']),
 									'preservekeys'=>1);
 				$allowed_hosts = CHost::get($host_options);
-				
-				$map_options = array('sysmapids' => $maps_to_check, 
+
+				$map_options = array('sysmapids' => $maps_to_check,
 									'nodeids' => $nodeids,
-									'editable' => isset($options['editable']), 
+									'editable' => isset($options['editable']),
 									'preservekeys'=>1);
 				$allowed_maps = self::get($map_options);
 
 				$trigger_options = array('triggerids' => $triggers_to_check,
 									'nodeids' => $nodeids,
-									'editable' => isset($options['editable']), 
+									'editable' => isset($options['editable']),
 									'preservekeys'=>1);
 				$allowed_triggers = CTrigger::get($trigger_options);
-				
+
 				$hostgroup_options = array('groupids' => $host_groups_to_check,
 									'nodeids' => $nodeids,
-									'editable' => isset($options['editable']), 
+									'editable' => isset($options['editable']),
 									'preservekeys'=>1);
 				$allowed_host_groups = CHostGroup::get($hostgroup_options);
 
@@ -460,7 +460,7 @@ class CMap extends CZBXAPI{
 		foreach($maps as $map){
 
 			$map_db_fields = self::get(array('sysmapids' => $map['sysmapid'], 'extendoutput' => 1));
-			$map_db_fields = reset($map_db_fields);		
+			$map_db_fields = reset($map_db_fields);
 
 
 			if(!$map_db_fields){

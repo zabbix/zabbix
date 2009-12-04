@@ -159,7 +159,7 @@
 		$path = $url->getPath();
 		insert_js('cookie.eraseArray("'.$path.'")');
 	}
-	
+
 ?>
 <?php
 
@@ -258,14 +258,14 @@
 			S_MEMBERS
 		));
 
-		
+
 		$proxies = CHost::get(array(
 			'extendoutput' => 1,
 			'proxy_hosts' => 1,
 			'sortfield' => getPageSortField('host'),
 			'sortorder' => getPageSortOrder()
 		));
-		
+
 		order_page_result($proxies, 'host');
 
 		$paging = getPagingLine($proxies);
@@ -313,7 +313,7 @@
 // --
 
 		$footer = get_table_header(array($goBox, $goButton));
-		
+
 		$table = array($paging, $table, $paging, $footer);
 		$form->addItem($table);
 		$proxies_wdgt->addItem($form);

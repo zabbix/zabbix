@@ -139,14 +139,14 @@ private static $transaction = array('counter' => 0);
 		foreach(self::$error as $error){
 			$return[] = $error['data'];
 		}
-	
+
 	return $return;
 	}
 
 	public static function resetErrors(){
 		$errors = self::getErrorMessages();
 		self::clearErrors();
-	
+
 	return $errors;
 	}
 // ERROR METHODS}

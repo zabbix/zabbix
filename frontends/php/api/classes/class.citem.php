@@ -542,10 +542,10 @@ class CItem extends CZBXAPI{
 		while($item = DBfetch($res)){
 			$itemids[$item['itemid']] = $item['itemid'];
 		}
-		
+
 		if(!empty($itemids))
 			$result = self::get(array('itemids'=>$itemids, 'extendoutput'=>1));
-		
+
 	return $result;
 	}
 
@@ -599,7 +599,7 @@ class CItem extends CZBXAPI{
 	public static function add($items){
 		$items = zbx_toArray($items);
 		$itemids = array();
-		
+
 		self::BeginTransaction(__METHOD__);
 
 		$result = true;
@@ -815,7 +815,7 @@ class CItem extends CZBXAPI{
 *///////////////
 
 			$result = add_item($item);
-			
+
 			if(!$result) break;
 			$itemids[] = $result;
 		}
@@ -823,7 +823,7 @@ class CItem extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_items = self::get(array('itemids'=>$itemids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$new_items = self::get(array('itemids'=>$itemids, 'extendoutput'=>1, 'nopermissions'=>1));
 			return $new_items;
 		}
 		else{
@@ -847,7 +847,7 @@ class CItem extends CZBXAPI{
 	public static function update($items){
 		$items = zbx_toArray($items);
 		$itemids = array();
-		
+
 		$upd_items = self::get(array('itemids'=> zbx_objectValues($items, 'itemid'), 'editable'=>1, 'extendoutput'=>1, 'preservekeys'=>1));
 		foreach($items as $gnum => $item){
 			if(!isset($upd_items[$item['itemid']])){
@@ -856,9 +856,9 @@ class CItem extends CZBXAPI{
 			}
 			$itemids[] = $item['itemid'];
 		}
-		
+
 		$result = true;
-		
+
 		self::BeginTransaction(__METHOD__);
 		foreach($items as $inum => $item){
 			$item_db_fields = $upd_items[$item['itemid']];
@@ -872,7 +872,7 @@ class CItem extends CZBXAPI{
 				$result = false;
 				break;
 			}
-			
+
 			$result = update_item($item['itemid'], $item);
 			if(!$result) break;
 		}
@@ -880,7 +880,7 @@ class CItem extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_items = self::get(array('itemids'=>$itemids, 'extendoutput'=>1, 'nopermissions'=>1));			
+			$upd_items = self::get(array('itemids'=>$itemids, 'extendoutput'=>1, 'nopermissions'=>1));
 			return $upd_items;
 		}
 		else{
@@ -905,7 +905,7 @@ class CItem extends CZBXAPI{
 	public static function delete($items){
 		$items = zbx_toArray($items);
 		$itemids = array();
-		
+
 		$del_items = self::get(array('itemids'=> zbx_objectValues($items, 'itemid'), 'editable'=>1, 'extendoutput'=>1, 'preservekeys'=>1));
 		foreach($items as $num => $item){
 			if(!isset($del_items[$item['itemid']])){
@@ -916,7 +916,7 @@ class CItem extends CZBXAPI{
 			$itemids[] = $item['itemid'];
 			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, 'Item ['.$Item['description'].']');
 		}
-	
+
 		if(!empty($itemids)){
 			$result = delete_item($itemids);
 		}

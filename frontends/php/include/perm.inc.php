@@ -443,7 +443,7 @@ function available_hosts($hostids, $editable=null){
 	$options['templated_hosts'] = 1;
 
 	$hosts = CHost::get($options);
-	
+
 return zbx_objectValues($hosts, 'hostid');
 }
 

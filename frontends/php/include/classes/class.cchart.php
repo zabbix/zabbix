@@ -714,7 +714,7 @@ class CChart extends CGraphDraw{
 			$side = GRAPH_YAXIS_SIDE_RIGHT;
 			$other_side = GRAPH_YAXIS_SIDE_LEFT;
 		}
-		
+
 		$tmp_minY = array();
 		$tmp_maxY = array();
 		$tmp_minY[GRAPH_YAXIS_SIDE_LEFT] = $this->m_minY[GRAPH_YAXIS_SIDE_LEFT];
@@ -754,7 +754,7 @@ class CChart extends CGraphDraw{
 		if($diff_val == 0) $diff_val = 1;
 
 		$intervalX = ($interval * $this->sizeY) / $diff_val;
-		
+
 //SDI($this->m_maxY[$other_side].' - '.$this->m_minY[$other_side]);
 		if(isset($this->axis_valuetype[$other_side])){
 			$dist = ($this->m_maxY[$other_side] - $this->m_minY[$other_side]);
@@ -772,13 +772,13 @@ class CChart extends CGraphDraw{
 // diff check
 			$diff_min = ($this->m_minY[$other_side] - floor($this->m_minY[$other_side] / $interval) * $interval);
 			$diff_max = ($this->m_maxY[$other_side] - ceil($this->m_maxY[$other_side] / $interval) * $interval);
-			
+
 // correcting MIN & MAX
 			$this->m_minY[$other_side] = floor($this->m_minY[$other_side] / $interval) * $interval;
 			$this->m_maxY[$other_side] = ceil($this->m_maxY[$other_side] / $interval) * $interval;
 //--------------------
 
-// if we lowered min more than highed max - need additional recalculating			
+// if we lowered min more than highed max - need additional recalculating
 			if($diff_min > $diff_max){
 				$dist = ($this->m_maxY[$other_side] - $this->m_minY[$other_side]);
 				$interval = 0;
@@ -789,7 +789,7 @@ class CChart extends CGraphDraw{
 						break;
 					}
 				}
-	
+
 // recorrecting MIN & MAX
 				$this->m_minY[$other_side] = floor($this->m_minY[$other_side] / $interval) * $interval;
 				$this->m_maxY[$other_side] = ceil($this->m_maxY[$other_side] / $interval) * $interval;

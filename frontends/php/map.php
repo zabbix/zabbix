@@ -33,13 +33,13 @@ include_once('include/page_header.php');
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'sysmapid'=>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,		NULL),
-		
+
 		'selements'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID, NULL),
 		'links'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID, NULL),
 		'noselements'=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),	NULL),
 		'nolinks'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),	NULL),
-		
-		'show_triggers'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN("0,1,2,3"),	NULL),		
+
+		'show_triggers'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN("0,1,2,3"),	NULL),
 		'noedit'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1'),	NULL),
 		'border'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1'),	NULL)
 	);
@@ -56,7 +56,7 @@ include_once('include/page_header.php');
 	);
 
 	$maps = CMap::get($options);
-	
+
 	if(empty($maps)) access_deny();
 	else $map = reset($maps);
 
@@ -67,7 +67,7 @@ include_once('include/page_header.php');
 	$highlight	= $map['highlight'];
 	$label_type	= $map['label_type'];
 	$status_view = 0;// $map['status_view'];
-	
+
 	if(function_exists('imagecreatetruecolor')&&@imagecreatetruecolor(1,1)){
 		$im = imagecreatetruecolor($width,$height);
 	}
@@ -86,7 +86,7 @@ include_once('include/page_header.php');
 	$white		= imagecolorallocate($im,255,255,255);
 	$black		= imagecolorallocate($im,0,0,0);
 	$gray		= imagecolorallocate($im,150,150,150);
-	
+
 	$colors['Red']		= imagecolorallocate($im,255,0,0);
 	$colors['Dark Red']	= imagecolorallocate($im,150,0,0);
 	$colors['Green']	= imagecolorallocate($im,0,255,0);
@@ -166,7 +166,7 @@ include_once('include/page_header.php');
 
 		$selement = $selements[$link['selementid2']];
 		list($x2, $y2) = get_icon_center_by_selement($selement);
-		
+
 		$drawtype = $link['drawtype'];
 		$color = convertColor($im,$link['color']);
 
@@ -194,10 +194,10 @@ include_once('include/page_header.php');
 			}
 		}
 		MyDrawLine($im,$x1,$y1,$x2,$y2,$color,$drawtype);
-		
+
 // Link Label
 		if(empty($link['label'])) continue;
-		
+
 		$label = $link['label'];
 
 		$label = str_replace("\r", '', $label);
@@ -208,7 +208,7 @@ include_once('include/page_header.php');
 
 		foreach($strings as $snum => $str){
 			$dims = imageTextSize(8,0,$str);
-			
+
 			$box_width = ($box_width > $dims['width'])?$box_width:$dims['width'];
 			$box_height+= $dims['height']+2;
 		}
@@ -240,10 +240,10 @@ include_once('include/page_header.php');
 
 			$labelx = ($x1 + $x2) / 2 - ($dims['width']/2);
 			$labely = $boxY_top + $increasey;
-			
+
 			imagetext($im, 8, 0, $labelx, $labely+$dims['height'], $black, $str);
 
-			$increasey += $dims['height']+2;			
+			$increasey += $dims['height']+2;
 		}
 	}
 //-----------------------
@@ -282,12 +282,12 @@ include_once('include/page_header.php');
 				$r = $hl_color[0];
 				$g = $hl_color[1];
 				$b = $hl_color[2];
-		
-				imagefilledellipse($im, 
-						$selement['x'] + ($iconX / 2), 
-						$selement['y'] + ($iconY / 2), 
-						$iconX+20, 
-						$iconX+20, 
+
+				imagefilledellipse($im,
+						$selement['x'] + ($iconX / 2),
+						$selement['y'] + ($iconY / 2),
+						$iconX+20,
+						$iconX+20,
 						imagecolorallocatealpha($im,$r,$g,$b, 30)
 					);
 /*
@@ -307,12 +307,12 @@ include_once('include/page_header.php');
 					$r = (($r+$d)>255)?255:($r+$d);
 					$g = (($g+$d)>255)?255:($g+$d);
 					$b = (($b+$d)>255)?255:($b+$d);
-	
-					imagefilledellipse($im, 
-							$selement['x'] + ($iconX / 2), 
-							$selement['y'] + ($iconY / 2), 
-							$radius, 
-							$radius, 
+
+					imagefilledellipse($im,
+							$selement['x'] + ($iconX / 2),
+							$selement['y'] + ($iconY / 2),
+							$radius,
+							$radius,
 							imagecolorallocatealpha($im,$r,$g,$b, 0)
 						);
 				}
@@ -328,7 +328,7 @@ include_once('include/page_header.php');
 
 		$color	= $darkgreen;
 		$label_color = $black;
-		
+
 		$info_line	= '';
 
 		$label_location = $selement['label_location'];
@@ -358,7 +358,7 @@ include_once('include/page_header.php');
 			$host = get_host_by_hostid($selement['elementid']);
 
 			if($label_type==MAP_LABEL_TYPE_IP) $label_line = $host['ip'];
-				
+
 			if($host['status'] == HOST_STATUS_NOT_MONITORED) $label_color = $darkred;
 		}
 

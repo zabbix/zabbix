@@ -513,13 +513,13 @@ function get_operation_desc($type=SHORT_DESCRITION, $data){
 						case OPERATION_OBJECT_USER:
 							$obj_data = CUser::get(array('userids' => $data['objectid'],  'extendoutput' => 1));
 							$obj_data = reset($obj_data);
-							
+
 							$obj_data = S_USER.' "'.$obj_data['alias'].'"';
 							break;
 						case OPERATION_OBJECT_GROUP:
 							$obj_data = CUserGroup::get(array('usrgrpids' => $data['objectid'],  'extendoutput' => 1));
 							$obj_data = reset($obj_data);
-							
+
 							$obj_data = S_GROUP.' "'.$obj_data['name'].'"';
 							break;
 					}

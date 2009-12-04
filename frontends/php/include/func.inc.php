@@ -526,7 +526,7 @@ return $HEX[0].$HEX[1].$HEX[2];
 function hex2rgb($color){
 	if($color[0] == '#')
 		$color = substr($color, 1);
-	
+
 	if(strlen($color) == 6)
 		list($r, $g, $b) = array($color[0].$color[1],
 								 $color[2].$color[3],
@@ -535,7 +535,7 @@ function hex2rgb($color){
 		list($r, $g, $b) = array($color[0].$color[0], $color[1].$color[1], $color[2].$color[2]);
 	else
 		return false;
-	
+
 	$r = hexdec($r); $g = hexdec($g); $b = hexdec($b);
 
 return array($r, $g, $b);
@@ -881,7 +881,7 @@ return $result;
 function zbx_toObject(&$value, $field){
 	if(is_null($value)) return $value;
 	$result = array();
-	
+
 // Value or Array to Object or Array of objects
 	if(!is_array($value)){
 		$result = array(array($field => $value));
@@ -902,7 +902,7 @@ return $result;
 function zbx_toArray(&$value){
 	if(is_null($value)) return $value;
 	$result = array();
-	
+
 	if(!is_array($value)){
 		$result = array($value);
 	}
@@ -922,7 +922,7 @@ return $result;
 function zbx_objectValues(&$value, $field){
 	if(is_null($value)) return $value;
 	$result = array();
-	
+
 	if(!is_array($value)){
 		$result = array($value);
 	}

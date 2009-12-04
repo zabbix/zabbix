@@ -527,7 +527,7 @@
 
 //	Footer
 	'S_ZABBIX'=>				'Zabbix',
-	'S_COPYRIGHT_BY'=>			'Copyright 2001-2009 by ',
+	'S_COPYRIGHT_BY'=>			'Copyright 2001-2009 by',
 	'S_CONNECTED_AS'=>			'Connected as',
 	'S_NOT_CONNECTED'=>			'Not connected',
 	'S_SIA_ZABBIX'=>			'SIA Zabbix',
@@ -643,7 +643,7 @@
 	'S_NO_DATA_COLLECTION'=>		'No data collection',
 
 	'S_NORMAL_MAINTENANCE'=>		'Normal maintenance',
-	'S_NO_DATA_MAINTENANCE'=>		'No data maintenance', 
+	'S_NO_DATA_MAINTENANCE'=>		'No data maintenance',
 
 	'S_DELETE_MAINTENANCE_PERIOD_Q'=>	'Delete maintenance period?',
 
@@ -1070,7 +1070,7 @@
 	'S_REMOVE_ELEMENT'=>		'Remove element',
 	'S_ADD_LINK'=>				'Add link',
 	'S_REMOVE_LINK'=>			'Remove link',
-	
+
 	'S_UNDEFINED'=>				'Undefined',
 	'S_TYPE_OFF'=>				'Type (OFF)',
 	'S_TYPE_ON'=>				'Type (ON)',
@@ -1613,6 +1613,7 @@
 
 //	index.php
 	'S_ZABBIX_BIG'=>			'Zabbix',
+	'S_WELCOME'=>				'Welcome to Zabbix! You are connected as',
 
 //	hostprofiles.php
 	'S_HOST_PROFILES'=>			'Host profiles',

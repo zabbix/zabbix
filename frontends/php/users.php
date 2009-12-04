@@ -157,22 +157,22 @@ include_once('include/page_header.php');
 
 			$usrgrps = get_request('user_groups', array());
 			$usrgrps = zbx_toObject($usrgrps, 'usrgrpid');
-			
+
 			if(isset($_REQUEST['userid'])){
 				$action = AUDIT_ACTION_UPDATE;
 				$user['userid'] = $_REQUEST['userid'];
 
 				DBstart();
-				$result = CUser::update($user);					
-				if(!$result) 
+				$result = CUser::update($user);
+				if(!$result)
 					error(CUser::resetErrors());
 				if($result)	$result = CUserGroup::updateUsers(array('users' => $user, 'usrgrps' => $usrgrps));
-				if($result === false) 
+				if($result === false)
 					error(CUserGroup::resetErrors());
 				if($result !== false) $result = CUser::updateMedia(array('users' => $user, 'medias' => $user['user_medias']));
 				$result = ($result === false) ? false : true;
 				$result = DBend($result);
-				
+
 				show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 			}
 			else{
@@ -180,14 +180,14 @@ include_once('include/page_header.php');
 
 				DBstart();
 				$result = CUser::add($user);
-				if(!$result) 
+				if(!$result)
 					error(CUser::resetErrors());
 				if($result) $result = CUserGroup::updateUsers(array('users' => $result, 'usrgrps' => $usrgrps));
-				if($result === false) 
+				if($result === false)
 					error(CUserGroup::resetErrors());
 				$result = ($result === false) ? false : true;
 				$result = DBend($result);
-				
+
 				show_messages($result, S_USER_ADDED, S_CANNOT_ADD_USER);
 			}
 			if($result){
@@ -231,7 +231,7 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['grpaction'])&&isset($_REQUEST['usrgrpid'])&&isset($_REQUEST['userid'])&&($_REQUEST['grpaction']==1)){
 		$user = CUser::get(array('userids'=>$_REQUEST['userid'],'extendoutput'=>1));
 		$user = reset($user);
-		
+
 		$group = CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'],  'extendoutput' => 1));
 		$group = reset($group);
 
@@ -254,7 +254,7 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['grpaction'])&&isset($_REQUEST['usrgrpid'])&&isset($_REQUEST['userid'])&&($_REQUEST['grpaction']==0)){
 		$user = CUser::get(array('userids'=>$_REQUEST['userid'],'extendoutput'=>1));
 		$user = reset($user);
-		
+
 		$group = CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'],  'extendoutput' => 1));
 		$group = reset($group);
 
@@ -302,7 +302,7 @@ include_once('include/page_header.php');
 		$group_userid = get_request('group_userid', array());
 		$db_users = CUser::get(array('userids' => $group_userid, 'extendoutput' => 1));
 		$db_users = zbx_toHash($db_users, 'userid');
-		
+
 		DBstart();
 		foreach($group_userid as $ugnum => $userid){
 			if(!isset($db_users[$userid])) continue;

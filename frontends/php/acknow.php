@@ -23,7 +23,7 @@
 	require_once('include/acknow.inc.php');
 	require_once('include/triggers.inc.php');
 	require_once('include/forms.inc.php');
-	
+
 	$page['title']	= 'S_ACKNOWLEDGES';
 	$page['file']	= 'acknow.php';
 	$page['hist_arg'] = array('eventid');
@@ -49,8 +49,8 @@ include_once('include/page_header.php');
 		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null)
 	);
 	check_fields($fields);
-	
-	
+
+
 	if(isset($_REQUEST['cancel'])){
 		$last_page = $USER_DETAILS['last_page'];
 		$url = $last_page ? new CUrl($last_page['url']) : new CUrl('tr_status.php?hostid='.get_profile('web.tr_status.hostid', 0));
@@ -80,23 +80,23 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])){
 
 		if($bulk){
-			$_REQUEST['message'] .= ($_REQUEST['message'] == '' ? '' : "\n\r") . S_SYS_BULK_ACKNOWLEDGE;		
+			$_REQUEST['message'] .= ($_REQUEST['message'] == '' ? '' : "\n\r") . S_SYS_BULK_ACKNOWLEDGE;
 		}
 
 		$events_data = array(
-			'events' => zbx_toObject($_REQUEST['events'], 'eventid'), 
+			'events' => zbx_toObject($_REQUEST['events'], 'eventid'),
 			'triggers' => zbx_toObject($_REQUEST['triggers'], 'triggerid'),
 			'message' => $_REQUEST['message']);
 		$result = CEvent::acknowledge($events_data);
-		
-		show_messages($result, S_EVENT_ACKNOWLEDGED, S_CANNOT_ACKNOWLEDGE_EVENT);	
+
+		show_messages($result, S_EVENT_ACKNOWLEDGED, S_CANNOT_ACKNOWLEDGE_EVENT);
 		if($result){
 			$event_acknowledged = true;
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, S_ACKNOWLEDGE_ADDED.
 				' ['.($bulk) ? ' BULK ACKNOWLEDGE ' : (expand_trigger_description_by_data($event_trigger)).']'.
 				' ['.$_REQUEST['message'].']');
 		}
-		
+
 		if(isset($_REQUEST['saveandreturn'])){
 			$last_page = $USER_DETAILS['last_page'];
 
@@ -109,9 +109,9 @@ include_once('include/page_header.php');
 			redirect($url->getUrl());
 			exit;
 		}
-		
+
  	}
-	
+
 ?>
 <?php
 	$msg = $bulk ? ' BULK ACKNOWLEDGE ' : expand_trigger_description_by_data($event_trigger);
@@ -130,7 +130,7 @@ include_once('include/page_header.php');
 			while($db_ack = DBfetch($db_acks)){
 				$db_user = CUser::get(array('userids' => $db_ack['userid'], 'extendoutput' => 1));
 				$db_user = reset($db_user);
-				
+
 				$table->addRow(array(
 					new CCol($db_user['alias'], 'user'),
 					new CCol(date(S_DATE_FORMAT_YMDHMS, $db_ack['clock']), 'time')),
@@ -140,10 +140,10 @@ include_once('include/page_header.php');
 				$msgCol->setColspan(2);
 				$table->addRow($msgCol, 'msg');
 			}
-			
+
 			$table->Show();
 		}
-		
+
 		if($event_acknowledged){
 			$title = S_ADD_COMMENT_BY;
 			$btn_txt = S_SAVE;
