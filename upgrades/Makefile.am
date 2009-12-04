@@ -17,3 +17,4 @@ dist-hook:
 	cat $(srcdir)/dbpatches/1.8/mysql/patch/* >$(distdir)/dbpatches/1.8/mysql/patch.sql
 	cat $(srcdir)/dbpatches/1.8/oracle/patch/* >$(distdir)/dbpatches/1.8/oracle/patch.sql
 	cat $(srcdir)/dbpatches/1.8/postgresql/patch/* >$(distdir)/dbpatches/1.8/postgresql/patch.sql
+	cp $(srcdir)/dbpatches/1.8/mysql/upgrade $(distdir)/dbpatches/1.8/mysql/
