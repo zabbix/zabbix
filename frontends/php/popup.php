@@ -174,8 +174,8 @@ include_once('include/page_header.php');
 		'reference'=>	array(T_ZBX_STR, O_OPT, null,   null,		null),
 
 //dmaps
-		'sysmapid'=>	array(T_ZBX_INT, O_OPT, null,   DB_ID,		'isset({reference})'),
-		'cmapid'=>		array(T_ZBX_INT, O_OPT, null,   null,		'isset({reference})'),
+		'sysmapid'=>	array(T_ZBX_INT, O_OPT, null,   DB_ID,		null),
+		'cmapid'=>		array(T_ZBX_INT, O_OPT, null,   null,		null),
 		'sid'=>			array(T_ZBX_INT, O_OPT, null,   null,		'isset({reference})'),
 		'ssid'=>		array(T_ZBX_INT, O_OPT, null,   null,		null),
 
@@ -273,7 +273,7 @@ include_once('include/page_header.php');
 
 	$nodeid = get_request('nodeid', get_current_nodeid(false));
 
-	$params = array();
+	$params = array('select_first_group_if_empty', 'select_first_host_if_empty');
 	foreach($validation_param as  $option) $params[$option] = 1;
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params, $nodeid);
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params, $nodeid);
@@ -364,17 +364,16 @@ include_once('include/page_header.php');
 	show_table_header($page['title'], $frmTitle);
 ?>
 <?php
+
 	if($srctbl == 'hosts'){
 		$table = new CTableInfo(S_NO_HOSTS_DEFINED);
 		$table->setHeader(array(S_HOST,S_DNS,S_IP,S_PORT,S_STATUS,S_AVAILABILITY));
 
 		$sql_from = '';
 		$sql_where = '';
-		if($groupid>0){
-			$sql_from.= ',hosts_groups hg ';
-			$sql_where.= ' AND hg.groupid='.$groupid.
-					 ' AND h.hostid=hg.hostid ';
-		}
+		$sql_from.= ',hosts_groups hg ';
+		$sql_where.= ' AND hg.groupid='.$groupid.
+				 ' AND h.hostid=hg.hostid ';
 
 		$sql = 'SELECT DISTINCT h.* '.
 				' FROM hosts h'.$sql_from.
@@ -489,11 +488,11 @@ include_once('include/page_header.php');
 
 		$sql_from = '';
 		$sql_where = '';
-		if($groupid > 0){
-			$sql_from.= ',hosts_groups hg ';
-			$sql_where.=' AND hg.groupid='.$groupid.
-						' AND h.hostid=hg.hostid ';
-		}
+
+		$sql_from.= ',hosts_groups hg ';
+		$sql_where.=' AND hg.groupid='.$groupid.
+					' AND h.hostid=hg.hostid ';
+
 		$sql = 'SELECT DISTINCT h.* '.
 				' FROM hosts h'.$sql_from.
 				' WHERE '.DBin_node('h.hostid', $nodeid).
@@ -537,7 +536,7 @@ include_once('include/page_header.php');
 		$available_groups	= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY,$nodeid);
 
 		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
-		$table->SetHeader(array(S_NAME));
+		$table->setHeader(array(S_NAME));
 
 		$sql = 'SELECT DISTINCT groupid,name '.
 				' FROM groups '.
@@ -575,19 +574,18 @@ include_once('include/page_header.php');
 
 			$table->addRow($name);
 		}
-		$table->Show();
+		$table->show();
 	}
 	else if(str_in_array($srctbl,array('host_templates'))){
 		$table = new CTableInfo(S_NO_TEMPLATES_DEFINED);
-		$table->SetHeader(array(S_NAME));
+		$table->setHeader(array(S_NAME));
 
 		$sql_from = '';
 		$sql_where = '';
-		if($groupid > 0){
-			$sql_from.= ',hosts_groups hg ';
-			$sql_where.=' AND hg.groupid='.$groupid.
-						' AND h.hostid=hg.hostid ';
-		}
+		$sql_from.= ',hosts_groups hg ';
+		$sql_where.=' AND hg.groupid='.$groupid.
+					' AND h.hostid=hg.hostid ';
+
 		$sql = 'SELECT DISTINCT h.* '.
 				' FROM hosts h'.$sql_from.
 				' WHERE '.DBin_node('h.hostid', $nodeid).
@@ -707,7 +705,7 @@ include_once('include/page_header.php');
 			insert_js_function('add_value');
 			$header = array(S_NAME, S_SEVERITY,	S_STATUS);
 		}
-		$table->SetHeader($header);
+		$table->setHeader($header);
 
 		$sql = 'SELECT h.host,t.triggerid,t.description,t.expression,t.priority,t.status,count(d.triggerid_up) as dep_count '.
 				' FROM hosts h,items i,functions f, triggers t'.
@@ -717,14 +715,12 @@ include_once('include/page_header.php');
 					' AND t.triggerid=f.triggerid'.
 					' AND '.DBin_node('t.triggerid', $nodeid).
 					' AND '.DBcondition('t.triggerid',$available_triggers).
-					' AND h.status in ('.implode(',', $host_status).')';
-		
-		if($hostid>0) $sql .= ' AND h.hostid='.$hostid;
-
-		$sql .= ' GROUP BY h.host, t.triggerid, t.description, t.expression, t.priority, t.status'.
+					' AND h.status in ('.implode(',', $host_status).')'.
+					' AND h.hostid='.$hostid;
+				' GROUP BY h.host, t.triggerid, t.description, t.expression, t.priority, t.status'.
 				' ORDER BY h.host,t.description';
-		$result=DBselect($sql);
 
+		$result=DBselect($sql);
 		while($row = DBfetch($result)) {
 			$exp_desc = expand_trigger_description_by_data($row);
 			$description = new CSpan($exp_desc, 'link');
@@ -821,13 +817,12 @@ include_once('include/page_header.php');
 					' WHERE i.value_type='.ITEM_VALUE_TYPE_LOG.
 						' AND h.hostid=i.hostid '.
 						' AND '.DBin_node('i.itemid', $nodeid).
-						(($hostid>0)?' AND '.$hostid.'=i.hostid ':'').
+						' AND i.hostid='.$hostid.
 						' and '.DBcondition('h.hostid',$available_hosts).
 						' and h.status in ('.implode(',', $host_status).')'.
 					' ORDER BY h.host,i.description, i.key_, i.itemid');
 
-		while($db_item = DBfetch($db_items))
-		{
+		while($db_item = DBfetch($db_items)){
 			$description = new CSpan(item_description($db_item),'link');
 			$description->onClick("return add_item_variable('".$dstfrm."','".$db_item["itemid"]."');");
 
@@ -850,8 +845,7 @@ include_once('include/page_header.php');
 
 		$table->Show();
 	}
-	else if($srctbl == "items")
-	{
+	else if($srctbl == "items"){
 		$table = new CTableInfo(S_SELECT_HOST_DOT_DOT_DOT);
 		$table->SetHeader(array(
 			($hostid>0)?null:S_HOST,
@@ -865,11 +859,9 @@ include_once('include/page_header.php');
 				' WHERE h.hostid=i.hostid '.
 					' AND '.DBin_node('i.itemid', $nodeid).
 					' AND '.DBcondition('h.hostid',$available_hosts).
-					' AND h.status in ('.implode(',', $host_status).')';
-		if($hostid > 0)
-			$sql .= ' AND h.hostid='.$hostid;
-
-		$sql .= " ORDER BY h.host, i.description, i.key_, i.itemid";
+					' AND h.status in ('.implode(',', $host_status).')'.
+					' AND h.hostid='.$hostid.
+				' ORDER BY h.host, i.description, i.key_, i.itemid';
 
 		$result = DBselect($sql);
 		while($row = DBfetch($result)){
@@ -905,18 +897,14 @@ include_once('include/page_header.php');
 			($hostid>0)?null:S_HOST,
 			S_NAME));
 
-		$sql_where = '';
-		if($hostid>0){
-			$sql_where = ' AND h.hostid='.$hostid;
-		}
 		$sql = 'SELECT DISTINCT h.host,a.* '.
 				' FROM hosts h,applications a '.
 				' WHERE h.hostid=a.hostid '.
 					' AND '.DBin_node('a.applicationid', $nodeid).
 					' AND '.DBcondition('h.hostid',$available_hosts).
 					' AND h.status in ('.implode(',', $host_status).')'.
-					$sql_where.
-					' ORDER BY h.host,a.name';
+					' AND h.hostid='.$hostid.
+				' ORDER BY h.host,a.name';
 
 		$result = DBselect($sql);
 		while($row = DBfetch($result)){
@@ -979,13 +967,9 @@ include_once('include/page_header.php');
 				' AND h.hostid=i.hostid '.
 				' AND '.DBin_node('h.hostid', $nodeid).
 				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND '.DBcondition('g.graphid',$available_graphs);
-
-		if($hostid>0)
-			$sql .= ' AND h.hostid='.$hostid;
-
-		$sql .= ' ORDER BY h.host,g.name';
-
+				' AND '.DBcondition('g.graphid',$available_graphs).
+				' AND h.hostid='.$hostid.
+			' ORDER BY h.host,g.name';
 		$result=DBselect($sql);
 		while($row=DBfetch($result)){
 			$row['node_name'] = get_node_name_by_elid($row['graphid'], null, ': ');
@@ -1048,13 +1032,9 @@ include_once('include/page_header.php');
 					' AND i.status='.ITEM_STATUS_ACTIVE.
 					' AND i.value_type IN ('.ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64.') '.
 					' AND '.DBin_node('i.itemid', $nodeid).
-					' AND '.DBcondition('h.hostid',$available_hosts);
-
-		if($hostid>0)
-			$sql .= ' AND h.hostid='.$hostid;
-
-		$sql .= ' ORDER BY h.host, i.description, i.key_, i.itemid';
-
+					' AND '.DBcondition('h.hostid',$available_hosts).
+					' AND h.hostid='.$hostid.
+				' ORDER BY h.host, i.description, i.key_, i.itemid';
 		$result = DBselect($sql);
 		while($row = DBfetch($result)){
 			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
@@ -1093,8 +1073,7 @@ include_once('include/page_header.php');
 		}
 		$table->Show();
 	}
-	else if($srctbl == 'sysmaps')
-	{
+	else if($srctbl == 'sysmaps'){
 		$table = new CTableInfo(S_NO_MAPS_DEFINED);
 		$table->SetHeader(array(S_NAME));
 
@@ -1145,21 +1124,16 @@ include_once('include/page_header.php');
 
 		$sql = 'SELECT n.name as node_name,h.host,i.*,i.key_ '.
 				' FROM hosts h,items i '.
-					' left join nodes n on n.nodeid='.DBid2nodeid('i.itemid').
+					' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('i.itemid').
 				' WHERE h.hostid=i.hostid '.
 					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND i.status='.ITEM_STATUS_ACTIVE.
 					' AND '.DBin_node('i.itemid', $nodeid).
-					' AND '.DBcondition('h.hostid',$available_hosts);
-
-		if($hostid>0)
-			$sql .= ' AND h.hostid='.$hostid;
-
-		$sql .= ' ORDER BY h.host, i.description, i.key_, i.itemid';
-
+					' AND '.DBcondition('h.hostid',$available_hosts).
+					' AND h.hostid='.$hostid.
+				' ORDER BY h.host, i.description, i.key_, i.itemid';
 		$result = DBselect($sql);
-		while($row = DBfetch($result))
-		{
+		while($row = DBfetch($result)){
 			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
 			$row['description'] = item_description($row);
 
@@ -1189,8 +1163,7 @@ include_once('include/page_header.php');
 		}
 		$table->Show();
 	}
-	else if('slides' == $srctbl)
-	{
+	else if('slides' == $srctbl){
 		require_once 'include/screens.inc.php';
 
 		$table = new CTableInfo(S_NO_NODES_DEFINED);
@@ -1220,16 +1193,14 @@ include_once('include/page_header.php');
 
 		$table->Show();
 	}
-	else if($srctbl == 'screens')
-	{
+	else if($srctbl == 'screens'){
 		require_once('include/screens.inc.php');
 
 		$table = new CTableInfo(S_NO_NODES_DEFINED);
 		$table->SetHeader(S_NAME);
 
 		$result = DBselect('select screenid,name from screens where '.DBin_node('screenid',$nodeid).' ORDER BY name');
-		while($row=DBfetch($result))
-		{
+		while($row=DBfetch($result)){
 			if(!screen_accessible($row["screenid"], PERM_READ_ONLY))
 				continue;
 
@@ -1252,8 +1223,7 @@ include_once('include/page_header.php');
 
 		$table->Show();
 	}
-	else if($srctbl == 'screens2')
-	{
+	else if($srctbl == 'screens2'){
 		require_once('include/screens.inc.php');
 
 		$table = new CTableInfo(S_NO_NODES_DEFINED);
@@ -1264,8 +1234,7 @@ include_once('include/page_header.php');
 								' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('s.screenid').
 							' WHERE '.DBin_node('s.screenid',$nodeid).
 							' ORDER BY s.name');
-		while($row=DBfetch($result))
-		{
+		while($row=DBfetch($result)){
 			if(!screen_accessible($row["screenid"], PERM_READ_ONLY)) continue;
 			if(check_screen_recursion($_REQUEST['screenid'],$row['screenid'])) continue;
 
@@ -1293,7 +1262,7 @@ include_once('include/page_header.php');
 	}
 	else if($srctbl == 'overview'){
 		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
-		$table->SetHeader(S_NAME);
+		$table->setHeader(S_NAME);
 
 		$result = DBselect('SELECT DISTINCT n.name as node_name,g.groupid,g.name '.
 						' FROM hosts_groups hg,hosts h,groups g '.

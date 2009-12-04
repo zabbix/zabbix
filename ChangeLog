@@ -1,5 +1,7 @@
 Changes for 1.7.5
 
+ - [ZBX-1407] fixed misc issues with popup (Aly)
+ - [ZBX-1265] fixed undefined variable on user delete through API (Aly)
  - [ZBX-1419] fix MySQL upgrade patch (Richlv)
  - [ZBX-1350] drop and recreate help_items table upon upgrade (Richlv)
  - [ZBX-1418] fixed errors in frontend install wizard (Aly)
