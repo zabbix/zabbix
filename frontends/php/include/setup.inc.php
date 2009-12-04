@@ -185,8 +185,8 @@
 				$final_result,
 				'PHP version: ',
 				phpversion(),
-				version_compare(phpversion(), '5.2.0', '>='),
-				'Minimal version of PHP is 5.2.0'));
+				version_compare(phpversion(), '5.1.0', '>='),
+				'Minimal version of PHP is 5.1.0'));
 
 			$memory_limit = str2mem(ini_get('memory_limit'));
 			$table->addRow($this->get_test_result(
@@ -264,6 +264,16 @@
 					$mbstrings_fnc_exist ? 'yes' : 'no',
 					$mbstrings_fnc_exist,
 					'Requires mb string module [configure PHP with --enable-mbstring]'));
+
+// MultiByte String support
+			$mbstrings_fnc_overload = defined('ZBX_MBSTRINGS_OVERLOADED');
+			$table->addRow(
+				$this->get_test_result(
+					$final_result,
+					'PHP MB string overload:',
+					$mbstrings_fnc_overload ? 'yes' : 'no',
+					$mbstrings_fnc_overload,
+					'MB String overload PHP is not set. Please set "mbstring.func_overload" to 2 in php.ini.'));
 
 //* Check sockets lib
 			$sockets_fnc_exist = function_exists('socket_create');

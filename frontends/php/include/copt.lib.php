@@ -275,9 +275,11 @@ if(defined('USE_PROFILING')){
 			if(defined('USE_SQLREQUEST_PROF')){
 				if(defined('SHOW_SQLREQUEST_DETAILS')){
 					$requests_cnt = count($sqlrequests);
-					$debug_str.= 'SQL selects count: '.$DB['SELECT_COUNT'].OBR;
-					$debug_str.= 'SQL executes count: '.$DB['EXECUTE_COUNT'].OBR;
-					$debug_str.= 'SQL requests count: '.($requests_cnt - $sqlmark[$type]).OBR;
+					if(isset($DB) && isset($DB['SELECT_COUNT'])){
+						$debug_str.= 'SQL selects count: '.$DB['SELECT_COUNT'].OBR;
+						$debug_str.= 'SQL executes count: '.$DB['EXECUTE_COUNT'].OBR;
+						$debug_str.= 'SQL requests count: '.($requests_cnt - $sqlmark[$type]).OBR;
+					}
 
 					$sql_time=0;
 					for($i = $sqlmark[$type]; $i < $requests_cnt; $i++){
