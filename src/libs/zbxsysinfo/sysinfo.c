@@ -335,12 +335,13 @@ void	test_parameters(void)
 		test_parameter(commands[i].key, PROCESS_TEST | PROCESS_USE_TEST_PARAM);
 }
 
-int	replace_param(const char *cmd, const char *param, char *out, int outlen)
+static int	replace_param(const char *cmd, const char *param, char *out, int outlen, char *error, int max_err_len)
 {
 	int ret = SUCCEED;
 	char buf[MAX_STRING_LEN];
 	char command[MAX_STRING_LEN];
 	register char *pl, *pr;
+	const char	suppressed_chars[] = "\\'\"`*?[-]{}~$!&;()<>|#@\0", *c;
 
 	assert(out);
 
@@ -370,7 +371,20 @@ int	replace_param(const char *cmd, const char *param, char *out, int outlen)
 			else
 			{
 				get_param(param, (int)(pr[1] - '0'), buf, MAX_STRING_LEN);
+
+				for (c = suppressed_chars; '\0' != *c; c++)
+					if (NULL != strchr(buf, *c))
+					{
+						zbx_snprintf(error, max_err_len, "Special characters '%s'"
+								" are not allowed in the parameters",
+								suppressed_chars);
+						ret = FAIL;
+						break;
+					}
 			}
+
+			if (FAIL == ret)
+				break;
 
 			zbx_strlcat(out, buf, outlen);
 			outlen -= MIN((int)strlen(buf), (int)outlen);
@@ -407,10 +421,12 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	char	usr_command[MAX_STRING_LEN];
 	int	usr_command_len;
 
-	char	param[MAX_STRING_LEN];
+	char	param[MAX_STRING_LEN], error[MAX_STRING_LEN];
 
 	assert(result);
 	init_result(result);
+
+	*error = '\0';
 
 	alias_expand(in_command, usr_command, MAX_STRING_LEN);
 
@@ -461,7 +477,8 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 					commands[i].main_param,
 					usr_param,
 					param,
-					MAX_STRING_LEN);
+					MAX_STRING_LEN,
+					error, sizeof(error));
 			}
 			else
 			{
@@ -481,6 +498,13 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 				err = NOTSUPPORTED;
 			else if(err == SYSINFO_RET_TIMEOUT)
 				err = TIMEOUT_ERROR;
+		}
+		else
+		{
+			err = NOTSUPPORTED;
+			if ('\0' != *error)
+				zabbix_log(LOG_LEVEL_WARNING, "Item [%s] error: %s",
+						in_command, error);
 		}
 	}
 	else
