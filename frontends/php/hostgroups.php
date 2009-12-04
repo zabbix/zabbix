@@ -337,7 +337,7 @@ include_once('include/page_header.php');
 			$hosts_output = array();
 
 			order_result($group['hosts'], 'host');
-			foreach($group['hosts'] as $host){
+			foreach($group['hosts'] as $hnum => $host){
 				$i++;
 
 				if($i > $config['max_in_table']){

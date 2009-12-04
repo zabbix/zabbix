@@ -175,41 +175,31 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
+	$options = array('allow_all_hosts','with_monitored_triggers');
+	//if(!$ZBX_WITH_ALL_NODES)	array_push($options,'only_current_node');
+
+//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
+	$params = array();
+	foreach($options as  $option) $params[$option] = 1;
+	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
+	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
+//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
+	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
+
+
 	$trigg_wdgt = new CWidget();
 
 	$r_form = new CForm();
 	$r_form->setMethod('get');
 
-	$groups = CHostGroup::get(array(
-		'monitored_hosts' => 1, 
-		'with_monitored_items' => 1, 
-		'nodeids' => get_current_nodeid(), 
-		'extendoutput' => 1,
-		'preservekeys' => 1)
-	);
-	order_result($groups, 'name');
-	
-	$cmbGroups = new CComboBox('groupid', $_REQUEST['groupid'], 'javascript: submit();');
-	$cmbGroups->addItem(0, S_ALL_S);
-	foreach($groups as $group){
-		$cmbGroups->addItem($group['groupid'], get_node_name_by_elid($group['groupid'], null, ': ').$group['name']);
-	}
+	$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
+	$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
 
-	$options = array(
-		'monitored_hosts' => 1,
-		'with_monitored_items' =>1, 
-		'nodeids' => get_current_nodeid(), 
-		'extendoutput' => 1,
-		'preservekeys' => 1);
-	if($_REQUEST['groupid'] != 0)
-		$options['groupids'] = $_REQUEST['groupid'];
-	$hosts = CHost::get($options);
-	order_result($hosts, 'host');
-	
-	$cmbHosts = new CComboBox('hostid', $_REQUEST['hostid'], 'javascript: submit();');
-	$cmbHosts->addItem(0, S_ALL_S);
-	foreach($hosts as $host){
-		$cmbHosts->addItem($host['hostid'], get_node_name_by_elid($host['hostid'], null, ': ').$host['host']);
+	foreach($PAGE_GROUPS['groups'] as $groupid => $name){
+		$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid, null, ': ').$name);
+	}
+	foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
+		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
 	}
 
 	
@@ -351,13 +341,19 @@ include_once('include/page_header.php');
 		'limit' => ($config['search_limit']+1),
 		'preservekeys' => 1		
 	);
+
 // Filtering
-	if($_REQUEST['hostid'] > 0){
-		$options['hostids'] = $_REQUEST['hostid'];
+	if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
+		$options['hostids'] = $PAGE_HOSTS['selected'];
 	}
-	else if(($_REQUEST['groupid'] > 0)){
-		$options['groupids'] = $_REQUEST['groupid'];
+	else if(!empty($PAGE_HOSTS['hostids'])){
+		$options['hostids'] = $PAGE_HOSTS['hostids'];
 	}
+	else if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
+		$options['groupids'] = $PAGE_GROUPS['selected'];
+	}
+
+
 	if(!zbx_empty($_REQUEST['txt_select'])){
 		$options['pattern'] = $_REQUEST['txt_select'];
 	}
@@ -387,7 +383,7 @@ include_once('include/page_header.php');
 //---------
 
 	
-	$trigger_hostids = array();
+	$trigger_hosts = array();
 	foreach($triggers as $tnum => $trigger){
 		$event_count = CEvent::get(array(
 			'count' => 1, 
@@ -396,11 +392,13 @@ include_once('include/page_header.php');
 			'nopermissions' => 1));
 		$triggers[$tnum]['event_count'] = $event_count['rowscount'];
 		
-		$trigger_hostids = array_merge($trigger_hostids, $trigger['hostids']);
+		$trigger_hosts = array_merge($trigger_hosts, $trigger['hosts']);
 		$triggers[$tnum]['events'] = array();
 	}
-	$trigger_hostids = array_unique($trigger_hostids);
-
+	
+	$trigger_hosts = zbx_toHash($trigger_hosts, 'hostid');
+	$trigger_hostids = array_keys($trigger_hosts);
+	
 	$scripts_by_hosts = Cscript::getScriptsByHosts($trigger_hostids);
 	
 	if($show_events != EVENTS_OPTION_NOEVENT){

@@ -1,5 +1,10 @@
 Changes for 1.7.4
 
+ - [ZBX-1410] fixed user profile update (Aly)
+ - [ZBX-1371] shrinked API get results (Aly)
+ - [ZBX-1411] fixed group and host selection in status of triggers (Aly)
+ - [ZBX-1391] fixes for map permission checks (Aly)
+ - [ZBX-1412] fixed graphs in web scenarios (Aly)
  - [ZBX-790] added protection of using special characters in user parameters of Zabbix Agent (Sasha)
  - [ZBX-1375] fixed graphs losing link with template after update (Vedmak)
  - [ZBX-137] added patch for Oracle (Alexei)

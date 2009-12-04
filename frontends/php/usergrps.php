@@ -428,7 +428,7 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 			$table->addRow(array(
 				new CCheckBox('group_groupid['.$usrgrpid.']', NULL, NULL, $usrgrpid),
 				new CLink($usrgrp['name'], 'usergrps.php?form=update&usrgrpid='.$usrgrpid),
-				array(new CLink(S_USERS,'users.php?&filter_usrgrpid='.$usrgrpid), ' (', count($usrgrp['userids']), ')'),
+				array(new CLink(S_USERS,'users.php?&filter_usrgrpid='.$usrgrpid), ' (', count($usrgrp['users']), ')'),
 				new CCol($users, 'wraptext'),
 				$users_status,
 				$gui_access,

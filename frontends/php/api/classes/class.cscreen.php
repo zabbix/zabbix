@@ -279,12 +279,12 @@ class CScreen extends CZBXAPI{
 					$screens_items[$sitem['screenitemid']] = $sitem;
 				}
 			}
+
 			foreach($screens_items as $sitem){
-				if(!isset($result[$sitem['screenid']]['itemids'])){
-					$result[$sitem['screenid']]['itemids'] = array();
+				if(!isset($result[$sitem['screenid']]['items'])){
 					$result[$sitem['screenid']]['items'] = array();
 				}
-				$result[$sitem['screenid']]['itemids'][$sitem['screenitemid']] = $sitem['screenitemid'];
+
 				$result[$sitem['screenid']]['items'][$sitem['screenitemid']] = $sitem;
 			}
 		}

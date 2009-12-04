@@ -230,9 +230,11 @@ function make_system_summary(){
 	order_result($triggers, 'lastchange', ZBX_SORT_DOWN);
 	
 	foreach($triggers as $tnum => $trigger){
+		$trigger['groups'] = zbx_toHash($trigger['groups'], 'groupid');
+
 		foreach($groups as $groupid => $group){
 			if(!trigger_dependent($trigger['triggerid'])){
-				if(zbx_uint_array_intersect($trigger['hostids'], $group['hostids'])){
+				if(isset($trigger['groups'][$group['groupid']])){
 					if($groups[$groupid]['tab_priority'][$trigger['priority']]['count'] < 30){
 						$groups[$groupid]['tab_priority'][$trigger['priority']]['triggers'][] = $trigger;
 					}
@@ -287,7 +289,10 @@ function make_system_summary(){
 					);
 					$event = CEvent::get($options);
 					$event = reset($event);
-
+					
+					$actions = S_NO_DATA_SMALL;
+					$ack = '-';
+//*
 					if(!empty($event)){
 						if($config['event_ack_enable']){
 							$ack = ($event['acknowledged'] == 1) ? new CLink(S_YES, 'acknow.php?eventid='.$event['eventid'], 'off')
@@ -302,6 +307,7 @@ function make_system_summary(){
 						$actions = S_NO_DATA_SMALL;
 						$event['clock'] = $trigger['lastchange'];
 					}
+//*/
 					$description = expand_trigger_description_by_data($trigger, ZBX_FLAG_EVENT);
 
 					$table_inf->addRow(array(
@@ -309,6 +315,7 @@ function make_system_summary(){
 						$trigger_hosts,
 						new CCol($description, get_severity_style($trigger['priority'])),
 						zbx_date2age($event['clock']),
+//						zbx_date2age($trigger['lastchange']),
 						($config['event_ack_enable']) ? (new CCol($ack, 'center')) : NULL,
 						$actions
 					));
@@ -429,11 +436,12 @@ function make_latest_issues($params = array()){
 	$triggers = CTrigger::get($options);
 	
 // GATHER HOSTS FOR SELECTED TRIGGERS {{{
-	$triggers_hostids = array();
+	$triggers_hosts = array();
 	foreach($triggers as $tnum => $trigger){
-		$triggers_hostids = array_merge($triggers_hostids, $trigger['hostids']);
+		$triggers_hosts = array_merge($triggers_hosts, $trigger['hosts']);
 	}
-	$triggers_hostids = array_unique($triggers_hostids);
+	$triggers_hosts = zbx_toHash($triggers_hosts, 'hostid');
+	$triggers_hostids = array_keys($triggers_hosts);
 // }}} GATHER HOSTS FOR SELECTED TRIGGERS
 
 	$scripts_by_hosts = Cscript::getScriptsByHosts($triggers_hostids);
@@ -467,6 +475,7 @@ function make_latest_issues($params = array()){
 			if( (bccomp($host_nodeid ,$script_nodeid ) == 0))
 				$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$trigger['hostid']."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 		}
+
 		if(!empty($scripts_by_hosts)){
 			$menus = "[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus;
 		}

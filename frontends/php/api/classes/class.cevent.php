@@ -310,37 +310,35 @@ class CEvent extends CZBXAPI{
 					
 					if(!isset($result[$event['eventid']])) $result[$event['eventid']]= array();
 
-					if($options['select_hosts'] && !isset($result[$event['eventid']]['hostids'])){
-						$result[$event['eventid']]['hostids'] = array();
+					if($options['select_hosts'] && !isset($result[$event['eventid']]['hosts'])){
 						$result[$event['eventid']]['hosts'] = array();
 					}
 
-					if($options['select_triggers'] && !isset($result[$event['eventid']]['triggerids'])){
-						$result[$event['eventid']]['triggerids'] = array();
+					if($options['select_triggers'] && !isset($result[$event['eventid']]['triggers'])){
 						$result[$event['eventid']]['triggers'] = array();
 					}
 
 // hostids
 					if(isset($event['hostid'])){
-						if(!isset($result[$event['eventid']]['hostids'])) $result[$event['eventid']]['hostids'] = array();
+						if(!isset($result[$event['eventid']]['hosts'])) $result[$event['eventid']]['hosts'] = array();
 
-						$result[$event['eventid']]['hostids'][$event['hostid']] = $event['hostid'];
+						$result[$event['eventid']]['hosts'][$event['hostid']] = array('hostid' => $event['hostid']);
 						unset($event['hostid']);
 					}
 
 // triggerids
 					if(isset($event['triggerid'])){
-						if(!isset($result[$event['eventid']]['triggerids'])) $result[$event['eventid']]['triggerids'] = array();
+						if(!isset($result[$event['eventid']]['triggers'])) $result[$event['eventid']]['triggers'] = array();
 
-						$result[$event['eventid']]['triggerids'][$event['triggerid']] = $event['triggerid'];
+						$result[$event['eventid']]['triggers'][$event['triggerid']] = array('triggerid' => $event['triggerid']);
 						unset($event['triggerid']);
 					}
 
 // itemids
 					if(isset($event['itemid'])){
-						if(!isset($result[$event['eventid']]['itemids'])) $result[$event['eventid']]['itemids'] = array();
+						if(!isset($result[$event['eventid']]['items'])) $result[$event['eventid']]['items'] = array();
 
-						$result[$event['eventid']]['itemids'][$event['itemid']] = $event['itemid'];
+						$result[$event['eventid']]['items'][$event['itemid']] = array('itemid' => $event['itemid']);
 						unset($event['itemid']);
 					}
 
@@ -363,21 +361,19 @@ class CEvent extends CZBXAPI{
 
 			$triggers = array();
 			foreach($hosts as $hostid => $host){
-				foreach($host['triggerids'] as $num => $triggerid){
-					if(!isset($triggers[$triggerid])) $triggers[$triggerid] = array('hostids'=> array(), 'hosts' => array());
+				foreach($host['triggers'] as $tnum => $trigger){
+					$triggerid = $trigger['triggerid'];
+					if(!isset($triggers[$triggerid])) $triggers[$triggerid] = array('hosts' => array());
 
-					$triggers[$triggerid]['hostids'][$hostid] = $hostid;
 					$triggers[$triggerid]['hosts'][$hostid] = $host;
 				}
 			}
 
 			foreach($result as $eventid => $event){
 				if(isset($triggers[$event['objectid']])){
-					$result[$eventid]['hostids'] = $triggers[$event['objectid']]['hostids'];
 					$result[$eventid]['hosts'] = $triggers[$event['objectid']]['hosts'];
 				}
 				else{
-					$result[$eventid]['hostids'] = array();
 					$result[$eventid]['hosts'] = array();
 				}
 			}
@@ -385,16 +381,17 @@ class CEvent extends CZBXAPI{
 
 // Adding triggers
 		if($options['select_triggers']){
-			$obj_params = array('extendoutput' => 1, 'triggerids' => $triggerids, 'nopermissions' => 1, 'preservekeys' => 1);
+			$obj_params = array('extendoutput' => 1, 
+							'triggerids' => $triggerids, 
+							'nopermissions' => 1, 
+							'preservekeys' => 1
+						);
 			$triggers = CTrigger::get($obj_params);
-
 			foreach($result as $eventid => $event){
 				if(isset($triggers[$event['objectid']])){
-					$result[$eventid]['triggerids'][$event['objectid']] = $event['objectid'];
 					$result[$eventid]['triggers'][$event['objectid']] = $triggers[$event['objectid']];
 				}
 				else{
-					$result[$eventid]['triggerids'] = array();
 					$result[$eventid]['triggers'] = array();
 				}
 			}
@@ -402,27 +399,28 @@ class CEvent extends CZBXAPI{
 
 // Adding items
 		if($options['select_items']){
-			$obj_params = array('extendoutput' => 1, 'triggerids' => $triggerids, 'nopermissions' => 1, 'preservekeys' => 1);
+			$obj_params = array('extendoutput' => 1, 
+							'triggerids' => $triggerids, 
+							'nopermissions' => 1, 
+							'preservekeys' => 1
+						);
 			$db_items = CItem::get($obj_params);
 			$items = array();
 
 			$items_evnt = array();
 			foreach($db_items as $itemid => $item){
-				foreach($item['triggerids'] as $num => $triggerid){
-					if(!isset($items[$triggerid])) $items[$triggerid] = array('itemids'=> array(), 'items' => array());
+				foreach($item['triggers'] as $num => $trigger){
+					if(!isset($items[$trigger['triggerid']])) $items[$trigger['triggerid']] = array('items' => array());
 
-					$items[$triggerid]['itemids'][$itemid] = $itemid;
 					$items[$triggerid]['items'][$itemid] = $item;
 				}
 			}
 
 			foreach($result as $eventid => $event){
 				if(isset($items[$event['objectid']])){
-					$result[$eventid]['itemids'] = $items[$event['objectid']]['itemids'];
 					$result[$eventid]['items'] = $items[$event['objectid']]['items'];
 				}
 				else{
-					$result[$eventid]['itemids'] = array();
 					$result[$eventid]['items'] = array();
 				}
 			}
@@ -525,9 +523,9 @@ class CEvent extends CZBXAPI{
  * @param array $eventids['eventids']
  * @return boolean
  */
-	public static function delete($eventids){
-		$eventids = isset($eventids['eventids']) ? $eventids['eventids'] : array();
-		zbx_value2array($eventids);
+	public static function delete($events){
+		$events = zbx_toArray($events);
+		$eventids = zbx_objectValues($events, 'eventid');
 
 		if(!empty($eventids)){
 			$sql = 'DELETE FROM events WHERE '.DBcondition('eventid', $eventids);

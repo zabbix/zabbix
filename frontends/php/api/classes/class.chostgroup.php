@@ -308,17 +308,16 @@ class CHostGroup extends CZBXAPI{
 
 					if(!isset($result[$group['groupid']])) $result[$group['groupid']]= array();
 
-					if($options['select_hosts'] && !isset($result[$group['groupid']]['hostids'])){
-						$result[$group['groupid']]['hostids'] = array();
+					if($options['select_hosts'] && !isset($result[$group['groupid']]['hosts'])){
 						$result[$group['groupid']]['hosts'] = array();
 					}
 
-					// hostids
+// hostids
 					if(isset($group['hostid'])){
-						if(!isset($result[$group['groupid']]['hostids']))
-							$result[$group['groupid']]['hostids'] = array();
+						if(!isset($result[$group['groupid']]['hosts']))
+							$result[$group['groupid']]['hosts'] = array();
 
-						$result[$group['groupid']]['hostids'][$group['hostid']] = $group['hostid'];
+						$result[$group['groupid']]['hosts'][$group['hostid']] = array('hostid' => $group['hostid']);
 						unset($group['hostid']);
 					}
 
@@ -333,21 +332,29 @@ class CHostGroup extends CZBXAPI{
 		}
 
 // Adding hosts
+		$config = select_config();
 		if($options['select_hosts']){
-			$obj_params = array('extendoutput' => 1, 'groupids' => $groupids, 'templated_hosts' => 1, 'preservekeys' => 1);
+			$obj_params = array('extendoutput' => 1, 
+							'groupids' => $groupids, 
+							'templated_hosts' => 1, 
+							'preservekeys' => 1
+						);
 			$hosts = CHost::get($obj_params);
 			foreach($hosts as $hostid => $host){
-				foreach($host['groupids'] as $num => $groupid){
-					$result[$groupid]['hostids'][$hostid] = $hostid;
-					$result[$groupid]['hosts'][$hostid] = $host;
+				foreach($host['groups'] as $num => $group){
+					$result[$group['groupid']]['hosts'][$hostid] = $host;
 				}
 			}
 		}
-		
+
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
+//$var = rand(0,1000);
+//Copt::profiling_start('asdasd'.$var);
 			$result = zbx_cleanHashes($result);
+//Copt::profiling_stop('asdasd'.$var);
 		}
+
 
 	return $result;
 	}

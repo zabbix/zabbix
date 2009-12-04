@@ -121,7 +121,7 @@ include_once('include/page_header.php');
 		);
 		$templates = CTemplate::get($params);
 
-/* SELECT MACROS */
+// SELECT MACROS
 		$params = array(
 			'hostids' => $hostids,
 			'preservekeys' => 1,
@@ -135,7 +135,7 @@ include_once('include/page_header.php');
 			'preservekeys' => 1,
 			'extendoutput' => 1
 		);
-		$items = Citem::get($params);
+		$items = CItem::get($params);
 
 // SELECT APPLICATIONS
 		$itemids = zbx_objectValues($items, 'itemid');

@@ -277,74 +277,68 @@ class CTemplate extends CZBXAPI{
 				else{
 					if(!isset($result[$template['templateid']])) $result[$template['templateid']]= array();
 
-					if($options['select_groups'] && !isset($result[$template['templateid']]['groupids'])){
-						$template['groupids'] = array();
+					if($options['select_groups'] && !isset($result[$template['templateid']]['groups'])){
 						$template['groups'] = array();
 					}
 
-					if($options['select_templates'] && !isset($result[$template['templateid']]['templateids'])){
-						$template['templateids'] = array();
+					if($options['select_templates'] && !isset($result[$template['templateid']]['templates'])){
 						$template['templates'] = array();
 					}
 
-					if($options['select_hosts'] && !isset($result[$template['templateid']]['hostids'])){
-						$template['hostids'] = array();
+					if($options['select_hosts'] && !isset($result[$template['templateid']]['hosts'])){
 						$template['hosts'] = array();
 					}
 
-					if($options['select_items'] && !isset($result[$template['templateid']]['itemids'])){
-						$template['itemids'] = array();
+					if($options['select_items'] && !isset($result[$template['templateid']]['items'])){
 						$template['items'] = array();
 					}
 
 					if($options['select_triggers'] && !isset($result[$template['templateid']]['triggers'])){
-						$template['triggerids'] = array();
 						$template['triggers'] = array();
 					}
 
-					if($options['select_graphs'] && !isset($result[$template['templateid']]['graphids'])){
-						$template['graphids'] = array();
+					if($options['select_graphs'] && !isset($result[$template['templateid']]['graphs'])){
 						$template['graphs'] = array();
 					}
 					if($options['select_applications'] && !isset($result[$template['templateid']]['applications'])){
 						$template['applications'] = array();
-						$template['applicationids'] = array();
 					}
-					if($options['select_macros'] && !isset($result[$host['hostid']]['macroids'])){
+					if($options['select_macros'] && !isset($result[$host['hostid']]['macros'])){
 						$template['macros'] = array();
-						$template['macroids'] = array();
 					}
 
 // groupids
 					if(isset($template['groupid'])){
-						if(!isset($result[$template['templateid']]['groupids']))
-							$result[$template['templateid']]['groupids'] = array();
+						if(!isset($result[$template['templateid']]['groups']))
+							$result[$template['templateid']]['groups'] = array();
 
-						$result[$template['templateid']]['groupids'][$template['groupid']] = $template['groupid'];
+						$result[$template['templateid']]['groups'][$template['groupid']] = array('groupid' => $template['groupid']);
 						unset($template['groupid']);
 					}
 
 // hostids
 					if(isset($template['linked_hostid'])){
-						if(!isset($result[$template['templateid']]['hostids'])) $result[$template['templateid']]['hostids'] = array();
+						if(!isset($result[$template['templateid']]['hosts'])) 
+							$result[$template['templateid']]['hosts'] = array();
 
-						$result[$template['templateid']]['hostids'][$template['linked_hostid']] = $template['linked_hostid'];
+						$result[$template['templateid']]['hosts'][$template['linked_hostid']] = array('hostid' => $template['linked_hostid']);
 						unset($template['linked_hostid']);
 					}
 
 // itemids
 					if(isset($template['itemid'])){
-						if(!isset($result[$template['templateid']]['itemids'])) $result[$template['templateid']]['itemids'] = array();
+						if(!isset($result[$template['templateid']]['items'])) 
+							$result[$template['templateid']]['items'] = array();
 
-						$result[$template['templateid']]['itemids'][$template['itemid']] = $template['itemid'];
+						$result[$template['templateid']]['items'][$template['itemid']] = array('itemid' => $template['itemid']);
 						unset($template['itemid']);
 					}
 
 // graphids
 					if(isset($template['graphid'])){
-						if(!isset($result[$template['templateid']]['graphids'])) $result[$template['templateid']]['graphids'] = array();
+						if(!isset($result[$template['templateid']]['graphs'])) $result[$template['templateid']]['graphs'] = array();
 
-						$result[$template['templateid']]['graphids'][$template['graphid']] = $template['graphid'];
+						$result[$template['templateid']]['graphs'][$template['graphid']] = array('graphid' => $template['graphid']);
 						unset($template['graphid']);
 					}
 
@@ -365,8 +359,7 @@ class CTemplate extends CZBXAPI{
 			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids, 'preservekeys' => 1);
 			$groups = CHostgroup::get($obj_params);
 			foreach($groups as $groupid => $group){
-				foreach($group['hostids'] as $num => $templateid){
-					$result[$templateid]['groupids'][$groupid] = $groupid;
+				foreach($group['hosts'] as $hnum => $templateid){
 					$result[$templateid]['groups'][$groupid] = $group;
 				}
 			}
@@ -377,9 +370,8 @@ class CTemplate extends CZBXAPI{
 			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids, 'preservekeys' => 1);
 			$templates = self::get($obj_params);
 			foreach($templates as $templateid => $template){
-				foreach($template['hostids'] as $num => $hostid){
-					$result[$hostid]['templateids'][$templateid] = $templateid;
-					$result[$hostid]['templates'][$templateid] = $template;
+				foreach($template['hosts'] as $hnum => $host){
+					$result[$host['hostid']]['templates'][$templateid] = $template;
 				}
 			}
 		}
@@ -389,9 +381,8 @@ class CTemplate extends CZBXAPI{
 			$obj_params = array('extendoutput' => 1, 'templateids' => $templateids, 'templated_hosts' => 1, 'preservekeys' => 1);
 			$hosts = CHost::get($obj_params);
 			foreach($hosts as $hostid => $host){
-				foreach($host['templateids'] as $num => $templateid){
-					$result[$templateid]['hostids'][$hostid] = $hostid;
-					$result[$templateid]['hosts'][$hostid] = $host;
+				foreach($host['templates'] as $tnum => $template){
+					$result[$template['templateid']]['hosts'][$hostid] = $host;
 				}
 			}
 		}
@@ -401,9 +392,8 @@ class CTemplate extends CZBXAPI{
 			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids, 'nopermissions' => 1, 'preservekeys' => 1);
 			$items = CItem::get($obj_params);
 			foreach($items as $itemid => $item){
-				foreach($item['hostids'] as $num => $hostid){
-					$result[$hostid]['itemids'][$itemid] = $itemid;
-					$result[$hostid]['items'][$itemid] = $item;
+				foreach($item['hosts'] as $hnum => $host){
+					$result[$host['hostid']]['items'][$itemid] = $item;
 				}
 			}
 		}
@@ -413,9 +403,8 @@ class CTemplate extends CZBXAPI{
 			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids, 'preservekeys' => 1);
 			$triggers = CTrigger::get($obj_params);
 			foreach($triggers as $triggerid => $trigger){
-				foreach($trigger['hostids'] as $num => $hostid){
-					$result[$hostid]['triggerids'][$triggerid] = $triggerid;
-					$result[$hostid]['triggers'][$triggerid] = $trigger;
+				foreach($trigger['hosts'] as $hnum => $host){
+					$result[$host['hostid']]['triggers'][$triggerid] = $trigger;
 				}
 			}
 		}
@@ -425,20 +414,19 @@ class CTemplate extends CZBXAPI{
 			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids, 'preservekeys' => 1);
 			$graphs = CGraph::get($obj_params);
 			foreach($graphs as $graphid => $graph){
-				foreach($graph['hostids'] as $num => $hostid){
-					$result[$hostid]['graphids'][$graphid] = $graphid;
-					$result[$hostid]['graphs'][$graphid] = $graph;
+				foreach($graph['hosts'] as $hnum => $host){
+					$result[$host['hostid']]['graphs'][$graphid] = $graph;
 				}
 			}
 		}
+
 // Adding applications
 		if($options['select_applications']){
 			$obj_params = array('extendoutput' => 1, 'hostids' => $templateids, 'preservekeys' => 1);
 			$applications = Capplication::get($obj_params);
 			foreach($applications as $applicationid => $application){
-				foreach($application['hostids'] as $num => $hostid){
-					$result[$hostid]['applicationids'][$applicationid] = $applicationid;
-					$result[$hostid]['applications'][$applicationid] = $application;
+				foreach($application['hosts'] as $hnum => $host){
+					$result[$host['hostid']]['applications'][$applicationid] = $application;
 				}
 			}
 		}
@@ -448,16 +436,15 @@ class CTemplate extends CZBXAPI{
 			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
 			$macros = CUserMacro::get($obj_params);
 			foreach($macros as $macroid => $macro){
-				foreach($macro['hostids'] as $num => $hostid){
-					$result[$hostid]['macroids'][$macroid] = $macroid;
-					$result[$hostid]['macros'][$macroid] = $macro;
+				foreach($macro['hosts'] as $hnum => $host){
+					$result[$host['hostid']]['macros'][$macroid] = $macro;
 				}
 			}
 		}
 
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
-			$result = zbx_cleanHashes($result);
+//			$result = zbx_cleanHashes($result);
 		}
 
 	return $result;
@@ -576,6 +563,7 @@ class CTemplate extends CZBXAPI{
 				'ipmi_privilege' => 0,
 				'ipmi_username' => '',
 				'ipmi_password' => '',
+				'groupids' => array()
 			);
 
 			if(!check_db_fields($host_db_fields, $template)){

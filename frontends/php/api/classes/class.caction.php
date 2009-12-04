@@ -396,8 +396,7 @@ class CAction extends CZBXAPI{
 				else{
 					if(!isset($result[$action['actionid']])) $result[$action['actionid']]= array();
 
-					if($options['select_conditions'] && !isset($result[$action['actionid']]['conditionids'])){
-						$result[$action['actionid']]['conditionids'] = array();
+					if($options['select_conditions'] && !isset($result[$action['actionid']]['conditions'])){
 						$result[$action['actionid']]['conditions'] = array();
 					}
 
@@ -417,7 +416,6 @@ class CAction extends CZBXAPI{
 			$sql = 'SELECT c.* FROM conditions c WHERE '.DBcondition('c.actionid', $actionids);
 			$res = DBselect($sql);
 			while($condition = DBfetch($res)){
-				$result[$condition['actionid']]['conditionids'][$condition['conditionid']] = $condition['conditionid'];
 				$result[$condition['actionid']]['conditions'][$condition['conditionid']] = $condition;
 			}
 		}
@@ -432,7 +430,6 @@ class CAction extends CZBXAPI{
 			$res = DBselect($sql);
 			while($operation = DBfetch($res)){
 				$operation['opconditions'] = array();
-				$operation['opconditionids'] = array();
 
 				$operations[$operation['operationid']] = $operation;
 				$operationids[$operation['operationid']] = $operation['operationid'];
@@ -442,11 +439,9 @@ class CAction extends CZBXAPI{
 			$res = DBselect($sql);
 			while($opcondition = DBfetch($res)){
 				$operations[$opcondition['operationid']]['opconditions'][$opcondition['opconditionid']] = $opcondition;
-				$operations[$opcondition['operationid']]['opconditionids'][$opcondition['opconditionid']] = $opcondition['opconditionid'];
 			}
 
 			foreach($operations as $operationd => $operation){
-				$result[$operation['actionid']]['operationids'][$operation['operationid']] = $operation['operationid'];
 				$result[$operation['actionid']]['operations'][$operation['operationid']] = $operation;
 			}
 		}

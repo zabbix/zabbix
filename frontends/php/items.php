@@ -880,6 +880,7 @@ include_once('include/page_header.php');
 // SET VALUES FOR SUBFILTERS {
 // if any of subfilters = false then item shouldnt be shown
 		foreach($items as $num => $item){
+			$item['hostids'] = zbx_objectValues($item['hosts'], 'hostid');
 			$item['subfilters'] = array();
 
 			$item['subfilters']['subfilter_hosts'] =
@@ -912,8 +913,8 @@ include_once('include/page_header.php');
 				|| (($item['templateid'] > 0) && uint_in_array(1, $_REQUEST['subfilter_templated_items'])));
 
 			$item['subfilters']['subfilter_with_triggers'] =
-				(empty($_REQUEST['subfilter_with_triggers']) || ((count($item['triggerids']) == 0) && uint_in_array(0, $_REQUEST['subfilter_with_triggers']))
-				|| ((count($item['triggerids']) > 0) && uint_in_array(1, $_REQUEST['subfilter_with_triggers'])));
+				(empty($_REQUEST['subfilter_with_triggers']) || ((count($item['triggers']) == 0) && uint_in_array(0, $_REQUEST['subfilter_with_triggers']))
+				|| ((count($item['triggers']) > 0) && uint_in_array(1, $_REQUEST['subfilter_with_triggers'])));
 
 			$item['subfilters']['subfilter_history'] =
 				(empty($_REQUEST['subfilter_history']) || uint_in_array($item['history'], $_REQUEST['subfilter_history']));

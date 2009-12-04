@@ -1614,7 +1614,7 @@
 					$show_item &= $value;
 				}
 				if($show_item){
-					if(count($item['triggerids']) == 0){
+					if(count($item['triggers']) == 0){
 						$item_params['with_triggers'][0]['count']++;
 					}
 					else{
@@ -6666,15 +6666,15 @@
 
 		if(str_in_array('items', $elements)){
 			$items = array(new CLink(S_ITEMS, 'items.php?hostid='.$header_host['hostid']),
-				' ('.count($header_host['itemids']).')');
+				' ('.count($header_host['items']).')');
 		}
 		if(str_in_array('triggers', $elements)){
 			$triggers = array(new CLink(S_TRIGGERS, 'triggers.php?hostid='.$header_host['hostid']),
-				' ('.count($header_host['triggerids']).')');
+				' ('.count($header_host['triggers']).')');
 		}
 		if(str_in_array('graphs', $elements)){
 			$graphs = array(new CLink(S_GRAPHS, 'graphs.php?hostid='.$header_host['hostid']),
-				' ('.count($header_host['graphids']).')');
+				' ('.count($header_host['graphs']).')');
 		}
 		if(str_in_array('applications', $elements)){
 			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?hostid='.$header_host['hostid']),

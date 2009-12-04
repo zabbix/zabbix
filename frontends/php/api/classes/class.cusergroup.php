@@ -206,17 +206,16 @@ class CUserGroup extends CZBXAPI{
 				else{
 					if(!isset($result[$usrgrp['usrgrpid']])) $result[$usrgrp['usrgrpid']]= array();
 
-					if($options['select_users'] && !isset($result[$usrgrp['usrgrpid']]['userids'])){
-						$result[$usrgrp['usrgrpid']]['userids'] = array();
+					if($options['select_users'] && !isset($result[$usrgrp['usrgrpid']]['users'])){
 						$result[$usrgrp['usrgrpid']]['users'] = array();
 					}
 
-					// groupids
+// groupids
 					if(isset($usrgrp['userid'])){
-						if(!isset($result[$usrgrp['usrgrpid']]['userids']))
-							$result[$usrgrp['usrgrpid']]['userids'] = array();
+						if(!isset($result[$usrgrp['usrgrpid']]['users']))
+							$result[$usrgrp['usrgrpid']]['users'] = array();
 
-						$result[$usrgrp['usrgrpid']]['userids'][$usrgrp['userid']] = $usrgrp['userid'];
+						$result[$usrgrp['usrgrpid']]['users'][$usrgrp['userid']] = array('userid' => $usrgrp['userid']);
 						unset($usrgrp['userid']);
 					}
 
@@ -233,12 +232,14 @@ class CUserGroup extends CZBXAPI{
 // Adding Objects
 // Adding users
 		if($options['select_users']){
-			$obj_params = array('extendoutput' => 1, 'usrgrpids' => $usrgrpids, 'preservekeys' => 1);
+			$obj_params = array('extendoutput' => 1, 
+								'usrgrpids' => $usrgrpids, 
+								'preservekeys' => 1
+							);
 			$users = CUser::get($obj_params);
 			foreach($users as $userid => $user){
-				foreach($user['usrgrpids'] as $num => $usrgrpid){
-					$result[$usrgrpid]['userids'][$userid] = $userid;
-					$result[$usrgrpid]['users'][$userid] = $user;
+				foreach($user['usrgrps'] as $num => $usrgrp){
+					$result[$usrgrp['usrgrpid']]['users'][$userid] = $user;
 				}
 			}
 		}

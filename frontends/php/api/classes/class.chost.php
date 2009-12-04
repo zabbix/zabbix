@@ -382,18 +382,15 @@ class CHost extends CZBXAPI{
 				else{
 					if(!isset($result[$host['hostid']])) $result[$host['hostid']]= array();
 
-					if($options['select_groups'] && !isset($result[$host['hostid']]['groupids'])){
-						$result[$host['hostid']]['groupids'] = array();
+					if($options['select_groups'] && !isset($result[$host['hostid']]['groups'])){
 						$result[$host['hostid']]['groups'] = array();
 					}
 
-					if($options['select_templates'] && !isset($result[$host['hostid']]['templateids'])){
-						$result[$host['hostid']]['templateids'] = array();
+					if($options['select_templates'] && !isset($result[$host['hostid']]['templates'])){
 						$result[$host['hostid']]['templates'] = array();
 					}
 
-					if($options['select_items'] && !isset($result[$host['hostid']]['itemids'])){
-						$result[$host['hostid']]['itemids'] = array();
+					if($options['select_items'] && !isset($result[$host['hostid']]['items'])){
 						$result[$host['hostid']]['items'] = array();
 					}
 					if($options['select_profile'] && !isset($result[$host['hostid']]['profile'])){
@@ -401,66 +398,64 @@ class CHost extends CZBXAPI{
 						$result[$host['hostid']]['profile_ext'] = array();
 					}
 
-					if($options['select_triggers'] && !isset($result[$host['hostid']]['triggerids'])){
-						$result[$host['hostid']]['triggerids'] = array();
+					if($options['select_triggers'] && !isset($result[$host['hostid']]['triggers'])){
 						$result[$host['hostid']]['triggers'] = array();
 					}
 
-					if($options['select_graphs'] && !isset($result[$host['hostid']]['graphids'])){
-						$result[$host['hostid']]['graphids'] = array();
+					if($options['select_graphs'] && !isset($result[$host['hostid']]['graphs'])){
 						$result[$host['hostid']]['graphs'] = array();
 					}
+
 					if($options['select_applications'] && !isset($result[$host['hostid']]['applications'])){
 						$result[$host['hostid']]['applications'] = array();
-						$result[$host['hostid']]['applicationids'] = array();
 					}
-					if($options['select_macros'] && !isset($result[$host['hostid']]['macroids'])){
+
+					if($options['select_macros'] && !isset($result[$host['hostid']]['macros'])){
 						$result[$host['hostid']]['macros'] = array();
-						$result[$host['hostid']]['macroids'] = array();
 					}
 
 // groupids
 					if(isset($host['groupid'])){
-						if(!isset($result[$host['hostid']]['groupids']))
-							$result[$host['hostid']]['groupids'] = array();
+						if(!isset($result[$host['hostid']]['groups']))
+							$result[$host['hostid']]['groups'] = array();
 
-						$result[$host['hostid']]['groupids'][$host['groupid']] = $host['groupid'];
+						$result[$host['hostid']]['groups'][$host['groupid']] = array('groupid' => $host['groupid']);
 						unset($host['groupid']);
 					}
 
 // templateids
 					if(isset($host['templateid'])){
-						if(!isset($result[$host['hostid']]['templateids']))
-							$result[$host['hostid']]['templateids'] = array();
+						if(!isset($result[$host['hostid']]['templates']))
+							$result[$host['hostid']]['templates'] = array();
 
-						$result[$host['hostid']]['templateids'][$host['templateid']] = $host['templateid'];
+						$result[$host['hostid']]['templates'][$host['templateid']] = array('templateid' => $host['templateid']);
 						unset($host['templateid']);
 					}
 
 // triggerids
 					if(isset($host['triggerid'])){
-						if(!isset($result[$host['hostid']]['triggerids']))
-							$result[$host['hostid']]['triggerids'] = array();
+						if(!isset($result[$host['hostid']]['triggers']))
+							$result[$host['hostid']]['triggers'] = array();
 
-						$result[$host['hostid']]['triggerids'][$host['triggerid']] = $host['triggerid'];
+						$result[$host['hostid']]['triggers'][$host['triggerid']] = array('triggerid' => $host['triggerid']);
 						unset($host['triggerid']);
 					}
 
 // itemids
 					if(isset($host['itemid'])){
-						if(!isset($result[$host['hostid']]['itemids']))
-							$result[$host['hostid']]['itemids'] = array();
+						if(!isset($result[$host['hostid']]['items']))
+							$result[$host['hostid']]['items'] = array();
 
-						$result[$host['hostid']]['itemids'][$host['itemid']] = $host['itemid'];
+						$result[$host['hostid']]['items'][$host['itemid']] = array('itemid' => $host['itemid']);
 						unset($host['itemid']);
 					}
 
 // graphids
 					if(isset($host['graphid'])){
-						if(!isset($result[$host['hostid']]['graphids']))
-							$result[$host['hostid']]['graphids'] = array();
+						if(!isset($result[$host['hostid']]['graphs']))
+							$result[$host['hostid']]['graphs'] = array();
 
-						$result[$host['hostid']]['graphids'][$host['graphid']] = $host['graphid'];
+						$result[$host['hostid']]['graphs'][$host['graphid']] = array('graphid' => $host['graphid']);
 						unset($host['graphid']);
 					}
 
@@ -480,9 +475,8 @@ class CHost extends CZBXAPI{
 			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
 			$groups = CHostgroup::get($obj_params);
 			foreach($groups as $groupid => $group){
-				foreach($group['hostids'] as $num => $hostid){
-					$result[$hostid]['groupids'][$groupid] = $groupid;
-					$result[$hostid]['groups'][$groupid] = $group;
+				foreach($group['hosts'] as $num => $host){
+					$result[$host['hostid']]['groups'][$groupid] = $group;
 				}
 			}
 		}
@@ -510,9 +504,8 @@ class CHost extends CZBXAPI{
 			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
 			$templates = CTemplate::get($obj_params);
 			foreach($templates as $templateid => $template){
-				foreach($template['hostids'] as $num => $hostid){
-					$result[$hostid]['templateids'][$templateid] = $templateid;
-					$result[$hostid]['templates'][$templateid] = $template;
+				foreach($template['hosts'] as $num => $host){
+					$result[$host['hostid']]['templates'][$templateid] = $template;
 				}
 			}
 		}
@@ -522,9 +515,8 @@ class CHost extends CZBXAPI{
 			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'nopermissions' => 1, 'preservekeys' => 1);
 			$items = CItem::get($obj_params);
 			foreach($items as $itemid => $item){
-				foreach($item['hostids'] as $num => $hostid){
-					$result[$hostid]['itemids'][$itemid] = $itemid;
-					$result[$hostid]['items'][$itemid] = $item;
+				foreach($item['hosts'] as $num => $host){
+					$result[$host['hostid']]['items'][$itemid] = $item;
 				}
 			}
 		}
@@ -534,9 +526,8 @@ class CHost extends CZBXAPI{
 			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
 			$triggers = CTrigger::get($obj_params);
 			foreach($triggers as $triggerid => $trigger){
-				foreach($trigger['hostids'] as $num => $hostid){
-					$result[$hostid]['triggerids'][$triggerid] = $triggerid;
-					$result[$hostid]['triggers'][$triggerid] = $trigger;
+				foreach($trigger['hosts'] as $num => $host){
+					$result[$host['hostid']]['triggers'][$triggerid] = $trigger;
 				}
 			}
 		}
@@ -546,9 +537,8 @@ class CHost extends CZBXAPI{
 			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
 			$graphs = CGraph::get($obj_params);
 			foreach($graphs as $graphid => $graph){
-				foreach($graph['hostids'] as $num => $hostid){
-					$result[$hostid]['graphids'][$graphid] = $graphid;
-					$result[$hostid]['graphs'][$graphid] = $graph;
+				foreach($graph['hosts'] as $num => $host){
+					$result[$host['hostid']]['graphs'][$graphid] = $graph;
 				}
 			}
 		}
@@ -558,9 +548,8 @@ class CHost extends CZBXAPI{
 			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
 			$applications = CApplication::get($obj_params);
 			foreach($applications as $applicationid => $application){
-				foreach($application['hostids'] as $num => $hostid){
-					$result[$hostid]['applicationids'][$applicationid] = $applicationid;
-					$result[$hostid]['applications'][$applicationid] = $application;
+				foreach($application['hosts'] as $num => $host){
+					$result[$host['hostid']]['applications'][$applicationid] = $application;
 				}
 			}
 		}
@@ -570,9 +559,8 @@ class CHost extends CZBXAPI{
 			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
 			$macros = CUserMacro::get($obj_params);
 			foreach($macros as $macroid => $macro){
-				foreach($macro['hostids'] as $num => $hostid){
-					$result[$hostid]['macroids'][$macroid] = $macroid;
-					$result[$hostid]['macros'][$macroid] = $macro;
+				foreach($macro['hosts'] as $num => $host){
+					$result[$host['hostid']]['macros'][$macroid] = $macro;
 				}
 			}
 		}

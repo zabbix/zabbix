@@ -162,23 +162,22 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 ?>
 <?php
 	if($_REQUEST['type']==SHOW_DATA){
-COpt::profiling_start('get_items_data_overview');
-
+//COpt::profiling_start('get_items_data_overview');
 		$table = get_items_data_overview($PAGE_HOSTS['hostids'],$_REQUEST['view_style']);
-
-COpt::profiling_stop('get_items_data_overview');
+//COpt::profiling_stop('get_items_data_overview');
 	}
 	else if($_REQUEST['type']==SHOW_TRIGGERS){
-COpt::profiling_start('get_triggers_overview');
-
+//COpt::profiling_start('get_triggers_overview');
 		$table = get_triggers_overview($PAGE_HOSTS['hostids'],$_REQUEST['view_style']);
-
-COpt::profiling_stop('get_triggers_overview');
+//COpt::profiling_stop('get_triggers_overview');
 	}
 
 	$over_wdgt->addItem($table);
 
 	$over_wdgt->show();
+?>
+<?php
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
+
 ?>

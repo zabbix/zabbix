@@ -220,30 +220,28 @@ class Cscript extends CZBXAPI{
 					if(!isset($result[$script['scriptid']]))
 						$result[$script['scriptid']] = array();
 
-					if($options['select_groups'] && !isset($result[$script['scriptid']]['groupids'])){
-						$result[$script['scriptid']]['groupids'] = array();
+					if($options['select_groups'] && !isset($result[$script['scriptid']]['groups'])){
 						$result[$script['scriptid']]['groups'] = array();
 					}
 
-					if($options['select_hosts'] && !isset($result[$script['scriptid']]['hostids'])){
-						$result[$script['scriptid']]['hostids'] = array();
+					if($options['select_hosts'] && !isset($result[$script['scriptid']]['hosts'])){
 						$result[$script['scriptid']]['hosts'] = array();
 					}
 
 // groupids
 					if(isset($script['groupid'])){
-						if(!isset($result[$script['scriptid']]['groupids']))
-							$result[$script['scriptid']]['groupids'] = array();
+						if(!isset($result[$script['scriptid']]['groups']))
+							$result[$script['scriptid']]['groups'] = array();
 
-						$result[$script['scriptid']]['groupids'][$script['groupid']] = $script['groupid'];
+						$result[$script['scriptid']]['groups'][$script['groupid']] = array('groupid' => $script['groupid']);
 					}
 
 // hostids
 					if(isset($script['hostid'])){
-						if(!isset($result[$script['scriptid']]['hostids']))
-							$result[$script['scriptid']]['hostids'] = array();
+						if(!isset($result[$script['scriptid']]['hosts']))
+							$result[$script['scriptid']]['hosts'] = array();
 
-						$result[$script['scriptid']]['hostids'][$script['hostid']] = $script['hostid'];
+						$result[$script['scriptid']]['hosts'][$script['hostid']] = array('hostid' => $script['hostid']);
 						unset($script['hostid']);
 					}
 
@@ -261,7 +259,9 @@ class Cscript extends CZBXAPI{
 // Adding groups
 		if($options['select_groups']){
 			foreach($result as $scriptid => $script){
-				$obj_params = array('extendoutput' => 1, 'preservekeys' => 1);
+				$obj_params = array('extendoutput' => 1, 
+									'preservekeys' => 1
+								);
 
 				if($script['host_access'] == PERM_READ_WRITE){
 					$obj_params['editable'] = 1;
@@ -274,14 +274,15 @@ class Cscript extends CZBXAPI{
 				$groups = CHostGroup::get($obj_params);
 
 				$result[$scriptid]['groups'] = $groups;
-				$result[$scriptid]['groupids'] = zbx_objectValues($groups,'groupid');
 			}
 		}
 
 // Adding hosts
 		if($options['select_hosts']){
 			foreach($result as $scriptid => $script){
-				$obj_params = array('extendoutput' => 1, 'preservekeys' => 1);
+				$obj_params = array('extendoutput' => 1, 
+									'preservekeys' => 1
+								);
 
 				if($script['host_access'] == PERM_READ_WRITE){
 					$obj_params['editable'] = 1;
@@ -294,7 +295,7 @@ class Cscript extends CZBXAPI{
 				$hosts = CHost::get($obj_params);
 
 				$result[$scriptid]['hosts'] = $hosts;
-				$result[$scriptid]['hostids'] = zbx_objectValues($hosts, 'hostid');
+
 			}
 		}
 
@@ -535,23 +536,32 @@ class Cscript extends CZBXAPI{
 			$scripts_by_host[$hostid] = array();
 		}
 //-----
-		$groups = CHostGroup::get(array('hostids' => $hostids, 'select_hosts' => 1, 'extendoutput' => 1, 'preservekeys' => 1));
+		$options = array('hostids' => $hostids, 
+						'select_hosts' => 1, 
+						'extendoutput' => 1, 
+						'preservekeys' => 1
+					);
+		$groups = CHostGroup::get($options);
 
-		$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
+		$obj_params = array('extendoutput' => 1, 
+							'hostids' => $hostids, 
+							'preservekeys' => 1
+						);
 		$scripts  = CScript::get($obj_params);
 
 		foreach($scripts as $num => $script){
 			$add_to_hosts = array();
+			$hostids = zbx_objectValues($groups[$script['groupid']]['hosts'], 'hostid');
+
 			if(PERM_READ_WRITE == $script['host_access']){
 				if($script['groupid'] > 0)
-					$add_to_hosts = zbx_uint_array_intersect($hosts_read_write, $groups[$script['groupid']]['hostids']);
+					$add_to_hosts = zbx_uint_array_intersect($hosts_read_write, $hostids);
 				else
 					$add_to_hosts = $hosts_read_write;
 			}
-
 			else if(PERM_READ_ONLY == $script['host_access']){
 				if($script['groupid'] > 0)
-					$add_to_hosts = zbx_uint_array_intersect($hosts_read_only, $groups[$script['groupid']]['hostids']);
+					$add_to_hosts = zbx_uint_array_intersect($hosts_read_only, $hostids);
 				else
 					$add_to_hosts = $hosts_read_only;
 			}
