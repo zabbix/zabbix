@@ -582,6 +582,7 @@ upgrades/dbpatches/1.8/mysql/patch/graph_theme.sql -text
 upgrades/dbpatches/1.8/mysql/patch/graphs.sql -text
 upgrades/dbpatches/1.8/mysql/patch/graphs_items.sql -text
 upgrades/dbpatches/1.8/mysql/patch/groups.sql -text
+upgrades/dbpatches/1.8/mysql/patch/help_items.sql -text
 upgrades/dbpatches/1.8/mysql/patch/history_log.sql -text
 upgrades/dbpatches/1.8/mysql/patch/history_text.sql -text
 upgrades/dbpatches/1.8/mysql/patch/hostmacro.sql -text
@@ -701,6 +702,7 @@ upgrades/dbpatches/1.8/postgresql/patch/graph_theme.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/graphs.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/graphs_items.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/groups.sql -text
+upgrades/dbpatches/1.8/postgresql/patch/help_items.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/history_log.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/history_text.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/history_uint.sql -text

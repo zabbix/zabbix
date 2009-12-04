@@ -1,5 +1,6 @@
 Changes for 1.7.5
 
+ - [ZBX-1350] drop and recreate help_items table upon upgrade (Richlv)
  - [ZBX-1418] fixed errors in frontend install wizard (Aly)
  - [ZBX-1316] changed to standard trigger edit form (Aly)
  - [ZBX-1417] fixed permission check in configuration of actions (Aly)
