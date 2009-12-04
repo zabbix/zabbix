@@ -266,15 +266,15 @@ include_once('include/page_header.php');
 		unset($_REQUEST['groupid'],$_REQUEST['nodeid']);
 	}
 
-	$validation_param = array();
+	$validation_param = array('deny_all','select_first_group_if_empty','select_first_host_if_empty','select_host_on_group_switch');
 	if($monitored_hosts) array_push($validation_param, 'monitored_hosts');
 	if($real_hosts) 	array_push($validation_param, 'real_hosts');
 	if(isset($templated_hosts)) array_push($validation_param, 'templated_hosts');
 
 	$nodeid = get_request('nodeid', get_current_nodeid(false));
 
-	$params = array('select_first_group_if_empty', 'select_first_host_if_empty');
-	foreach($validation_param as  $option) $params[$option] = 1;
+	$params = array();
+	foreach($validation_param as $option) $params[$option] = 1;
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params, $nodeid);
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params, $nodeid);
 
