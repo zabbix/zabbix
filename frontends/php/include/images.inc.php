@@ -55,7 +55,14 @@
 				$imageid = get_dbid('images','imageid');
 
 				$image = fread(fopen($file['tmp_name'],'r'),filesize($file['tmp_name']));
-				if($DB['TYPE'] == 'ORACLE'){
+				
+				if($DB['TYPE'] == 'POSTGRESQL'){
+					$image = pg_escape_bytea($image);
+					$sql = 'INSERT INTO images (imageid, name, imagetype, image) '.
+									' VALUES ('.$imageid.','.zbx_dbstr($name).','.$imagetype.",'".$image."')";
+					return	DBexecute($sql);
+				}
+				else if($DB['TYPE'] == 'ORACLE'){
 					DBstart();
 					$lobimage = OCINewDescriptor($DB['DB'], OCI_D_LOB);
 
@@ -86,9 +93,6 @@
 					OCIFreeStatement($stid);
 
 				return $stid;
-				}
-				else if($DB['TYPE'] == 'POSTGRESQL'){
-					$image = pg_escape_bytea($image);
 				}
 				else if($DB['TYPE'] == 'SQLITE3'){
 					$image = bin2hex($image);
@@ -126,23 +130,21 @@
 				$image=fread(fopen($file['tmp_name'],'r'),filesize($file['tmp_name']));
 
 				if($DB['TYPE'] == 'ORACLE'){
-
 					$result = DBexecute('UPDATE images '.
 									' SET name='.zbx_dbstr($name).',imagetype='.zbx_dbstr($imagetype).
 									' WHERE imageid='.$imageid);
 
 					if(!$result) return $result;
 
-					DBstart();
+
 					if(!$stid = DBselect('SELECT image FROM images WHERE imageid='.$imageid.' FOR UPDATE')){
-						DBend();
 					return false;
 					}
 
 					$row = DBfetch($stid);
 					$lobimage = $row['image'];
 
-					DBend($lobimage->save($image));
+					$lobimage->save($image);
 					$lobimage->free();
 
 				return $stid;
