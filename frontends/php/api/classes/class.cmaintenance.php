@@ -97,41 +97,102 @@ class CMaintenance extends CZBXAPI{
 		}
 
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
+			$maintenanceids = array();
+			if(!is_null($options['groupids']) || !is_null($options['hostids'])){
+			
+				if(!is_null($options['groupids'])){
+					zbx_value2array($options['groupids']);
+					$sql = ' SELECT mmg.maintenanceid '.
+						' FROM maintenances_groups mmg '.
+						' WHERE '.DBcondition('mmg.groupid', $options['groupids']);
+	
+					$res = DBselect($sql);
+					while($miantenace = DBfetch($res)){
+						$maintenanceids[] = $miantenace['maintenanceid'];
+					}
+				}
+
+
+				$sql = ' SELECT mmh.maintenanceid '.
+					' FROM maintenances_hosts mmh, hosts_groups hg '.
+					' WHERE hg.hostid=mmh.hostid ';
+
+				if(!is_null($options['groupids'])){
+					zbx_value2array($options['groupids']);
+					$sql.=' AND '.DBcondition('hg.groupid', $options['groupids']);
+				}
+
+				if(!is_null($options['hostids'])){
+					zbx_value2array($options['hostids']);
+					$sql.=' AND '.DBcondition('hg.hostid', $options['hostids']);
+				}
+
+				$res = DBselect($sql);
+				while($miantenace = DBfetch($res)){
+					$maintenanceids[] = $miantenace['maintenanceid'];
+				}
+				
+				$sql_parts['where'][] = DBcondition('m.maintenanceid',$maintenanceids);
+			}
 		}
 		else{
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
-			$sql_parts['from']['mg'] = 'maintenances_groups mg';
-			$sql_parts['from']['mh'] = 'maintenances_hosts mh';
-			$sql_parts['from']['hg'] = 'hosts_groups hg';
-			$sql_parts['from']['r'] = 'rights r';
-			$sql_parts['from']['ug'] = 'users_groups ug';
+			$maintenanceids = array();
+			$sql = ' SELECT mm.maintenanceid '.
+					' FROM maintenances mm, maintenances_groups mmg, rights r,users_groups ug '.
+					' WHERE r.groupid=ug.usrgrpid  '.
+						' AND ug.userid='.$userid.
+						' AND r.permission>='.$permission.
+						' AND mm.maintenanceid=mmg.maintenanceid  '.
+						' AND NOT EXISTS( '.
+								' SELECT rr.id '.
+								' FROM rights rr, users_groups gg  '.
+								' WHERE rr.id=mmg.groupid  '.
+									' AND rr.groupid=gg.usrgrpid  '.
+									' AND gg.userid='.$userid.
+									' AND rr.permission<'.$permission.')';
+			if(!is_null($options['groupids'])){
+				zbx_value2array($options['groupids']);
+				$sql.=' AND '.DBcondition('mmg.groupid', $options['groupids']);
+			}
 
-			$sql_parts['where'][] = 'r.id=hg.groupid ';
-			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sql_parts['where'][] = 'ug.userid='.$userid;
-			$sql_parts['where'][] = 'r.permission>='.$permission;
-			$sql_parts['where'][] = '((hg.hostid=mh.hostid '.
-									' AND m.maintenanceid=mh.maintenanceid '.
-									' AND NOT EXISTS( '.
-										' SELECT hgg.groupid '.
-										' FROM hosts_groups hgg, rights rr, users_groups gg '.
-										' WHERE hgg.hostid=hg.hostid '.
-											' AND rr.id=hgg.groupid '.
-											' AND rr.groupid=gg.usrgrpid '.
-											' AND gg.userid='.$userid.
-											' AND rr.permission<'.$permission.'))'.
-								' AND '.
-									'(hg.groupid=mg.groupid '.
-									' AND m.maintenanceid=mg.maintenanceid '.
-									' AND NOT EXISTS( '.
-										' SELECT hgg.groupid '.
-										' FROM hosts_groups hgg, rights rr, users_groups gg '.
-										' WHERE hgg.groupid=hg.groupid '.
-											' AND rr.id=hgg.groupid '.
-											' AND rr.groupid=gg.usrgrpid '.
-											' AND gg.userid='.$userid.
-											' AND rr.permission<'.$permission.')))';
+			$res = DBselect($sql);
+			while($miantenace = DBfetch($res)){
+				$maintenanceids[] = $miantenace['maintenanceid'];
+			}
+
+			$sql = ' SELECT mm.maintenanceid '.
+					' FROM maintenances mm, maintenances_hosts mmh, rights r,users_groups ug, hosts_groups hg '.
+					' WHERE r.groupid=ug.usrgrpid  '.
+						' AND ug.userid='.$userid.
+						' AND r.permission>='.$permission.
+						' AND mm.maintenanceid=mmh.maintenanceid  '.
+						' AND hg.hostid=mmh.hostid '.
+						' AND r.id=hg.groupid  '.
+						' AND NOT EXISTS( '.
+								' SELECT rr.id '.
+								 ' FROM rights rr, users_groups gg  '.
+								 ' WHERE rr.id=hg.groupid  '.
+									' AND rr.groupid=gg.usrgrpid  '.
+									' AND gg.userid='.$userid.
+									' AND rr.permission<'.$permission.')';
+			if(!is_null($options['groupids'])){
+				zbx_value2array($options['groupids']);
+				$sql.=' AND '.DBcondition('hg.groupid', $options['groupids']);
+			}
+
+			if(!is_null($options['hostids'])){
+				zbx_value2array($options['hostids']);
+				$sql.=' AND '.DBcondition('hg.hostid', $options['hostids']);
+			}
+
+			$res = DBselect($sql);
+			while($miantenace = DBfetch($res)){
+				$maintenanceids[] = $miantenace['maintenanceid'];
+			}
+			
+			$sql_parts['where'][] = DBcondition('m.maintenanceid',$maintenanceids);
 		}
 
 // nodeids
@@ -139,27 +200,12 @@ class CMaintenance extends CZBXAPI{
 
 // groupids
 		if(!is_null($options['groupids'])){
-			zbx_value2array($options['groupids']);
-
-			if(!is_null($options['extendoutput'])){
-				$sql_parts['select']['groupids'] = 'mg.groupid';
-			}
-			$sql_parts['from']['mg'] = 'maintenances_groups mg';
-			$sql_parts['where']['mmg'] = 'm.maintenanceid=mg.maintenanceid';
-			$sql_parts['where'][] = DBcondition('mg.groupid', $options['groupids']);
+			$options['select_groups'] = 1;
 		}
 
 // hostids
 		if(!is_null($options['hostids'])){
-			zbx_value2array($options['hostids']);
-
-			if(!is_null($options['extendoutput'])){
-				$sql_parts['select']['hostid'] = 'mh.hostid';
-			}
-
-			$sql_parts['from']['mg'] = 'maintenances_hosts mh';
-			$sql_parts['where']['mmh'] = 'm.maintenanceid=mh.maintenanceid';
-			$sql_parts['where'][] = DBcondition('mh.hostid', $options['hostids']);
+			$options['select_hosts'] = 1;
 		}
 
 // maintenanceids
@@ -273,6 +319,15 @@ class CMaintenance extends CZBXAPI{
 			return $result;
 		}
 
+// TODO:
+		if(!is_null($options['select_groups'])){
+
+		}
+		
+		if(!is_null($options['select_hosts'])){
+
+		}
+		
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
 			$result = zbx_cleanHashes($result);
