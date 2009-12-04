@@ -149,22 +149,22 @@ include_once('include/page_header.php');
 	unset($screen_correct);
 	unset($first_screen);
 
+	$options = array(
+		'extendoutput' => 1,
+		'sortfield' => 'name',
+		'sortorder' => ZBX_SORT_UP
+	);
 
-	$result = DBselect('SELECT screenid as elementid, name '.
-			' FROM screens '.
-			' WHERE '.DBin_node('screenid').
-			' ORDER BY name'
-			);
-	while($row=DBfetch($result)){
-		if(!screen_accessible($row['elementid'], PERM_READ_ONLY))
-			continue;
+	$screens = CScreen::get($options);
+	foreach($screens as $snum => $screen){
+		$screen['elementid'] = $screen['screenid'];
 
 		$cmbElements->addItem(
-				$row['elementid'],
-				get_node_name_by_elid($row['elementid'], null, ': ').$row['name']
+				$screen['screenid'],
+				get_node_name_by_elid($screen['screenid'], null, ': ').$screen['name']
 				);
-		if((bccomp($elementid , $row['elementid']) == 0)) $element_correct = 1;
-		if(!isset($first_element)) $first_element = $row['elementid'];
+		if((bccomp($elementid, $screen['screenid']) == 0)) $element_correct = 1;
+		if(!isset($first_element)) $first_element = $screen['screenid'];
 	}
 
 	if(!isset($element_correct) && isset($first_element)){
@@ -172,8 +172,15 @@ include_once('include/page_header.php');
 	}
 
 	if(isset($elementid)){
-		if(!screen_accessible($elementid, PERM_READ_ONLY)) access_deny();
-		$element = get_screen_by_screenid($elementid);
+		$options = array(
+			'screenids' => $elementid,
+			'extendoutput' => 1
+		);
+		
+		$screens = CScreen::get($options);
+		if(empty($screens)) access_deny();
+
+		$element = reset($screens); //get_screen_by_screenid($elementid);
 
 		if($element ){
 			$text = $element['name'];
@@ -182,6 +189,7 @@ include_once('include/page_header.php');
 
 	if($cmbElements->ItemsCount() > 0) $form->addItem(array(SPACE.S_SCREENS.SPACE,$cmbElements));
 
+	
 	if((2 != $_REQUEST['fullscreen']) && !empty($elementid) && check_dynamic_items($elementid, 0)){
 		if(!isset($_REQUEST['hostid'])){
 			$_REQUEST['groupid'] = $_REQUEST['hostid'] = 0;
@@ -280,6 +288,7 @@ include_once('include/page_header.php');
 	$screens_wdgt->addPageHeader(S_SCREENS_BIG,array($icon,$fs_icon));
 
 	$screens_wdgt->addHeader($text,$form);
+	$screens_wdgt->addItem(BR());
 	$screens_wdgt->addItem($element);
 
 	$screens_wdgt->show();
@@ -291,10 +300,10 @@ include_once('include/page_header.php');
 
 	$jsmenu = new CPUMenu(null,170);
 	$jsmenu->InsertJavaScript();
-
+	echo SBR;
 ?>
 <?php
-	echo SBR;
+
 include_once('include/page_footer.php');
 
 ?>
