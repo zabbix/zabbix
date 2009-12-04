@@ -395,14 +395,14 @@ include_once('include/page_header.php');
 ?>
 <?php
 
+	$params=array();
+	$options = array('only_current_node');
+	foreach($options as $option) $params[$option] = 1;
 
-	if(isset($_REQUEST['groupid'])){
-		$groupid_selected = $_REQUEST['groupid'];
-		update_profile('web.'.$page['menu'].'.groupid', $_REQUEST['groupid'], PROFILE_TYPE_ID);
-	}
-	else{
-		$_REQUEST['groupid'] = $groupid_selected = get_profile('web.'.$page['menu'].'.groupid');
-	}
+	$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
+	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
+
+	validate_group($PAGE_GROUPS,$PAGE_HOSTS);
 
 	$frmForm = new CForm();
 	$cmbConf = new CComboBox('config', 'templates.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
@@ -420,7 +420,8 @@ include_once('include/page_header.php');
 
 	show_table_header(S_CONFIGURATION_OF_TEMPLATES, $frmForm);
 	echo SBR;
-
+?>
+<?php
 	if(isset($_REQUEST['form'])){
 
 		$templateid = get_request('templateid', 0);
@@ -685,10 +686,9 @@ include_once('include/page_header.php');
 		$groups = CHostGroup::get(array('editable' => 1, 'extendoutput' => 1));
 		order_result($groups, 'name');
 
-		$cmbGroups = new CComboBox('groupid', $groupid_selected, 'javascript: submit();');
-		$cmbGroups->addItem(0, S_ALL_SMALL);
-		foreach($groups as $gnum => $group){
-			$cmbGroups->addItem($group['groupid'], $group['name']);
+		$cmbGroups = new CComboBox('groupid', $PAGE_GROUPS['selected'], 'javascript: submit();');
+		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
+			$cmbGroups->addItem($groupid, $name);
 		}
 		$frmForm->addItem(array(S_GROUP.SPACE, $cmbGroups));
 
@@ -728,8 +728,8 @@ include_once('include/page_header.php');
 			'limit' => ($config['search_limit']+1)
 		);
 
-		if($groupid_selected > 0){
-			$options['groupids'] = $groupid_selected;
+		if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
+			$options['groupids'] = $PAGE_GROUPS['selected'];
 		}
 		$templates = CTemplate::get($options);
 
@@ -761,13 +761,13 @@ include_once('include/page_header.php');
 			}
 			$templates_output[] = new CLink($template['host'], 'templates.php?form=update&templateid='.$template['templateid'].url_param('groupid'));
 
-			$applications = array(new CLink(S_APPLICATIONS,'applications.php?groupid='.$groupid_selected.'&hostid='.$template['templateid']),
+			$applications = array(new CLink(S_APPLICATIONS,'applications.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$template['templateid']),
 				' ('.count($template['applications']).')');
-			$items = array(new CLink(S_ITEMS,'items.php?groupid='.$groupid_selected.'&hostid='.$template['templateid']),
+			$items = array(new CLink(S_ITEMS,'items.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$template['templateid']),
 				' ('.count($template['items']).')');
-			$triggers = array(new CLink(S_TRIGGERS,'triggers.php?groupid='.$groupid_selected.'&hostid='.$template['templateid']),
+			$triggers = array(new CLink(S_TRIGGERS,'triggers.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$template['templateid']),
 				' ('.count($template['triggers']).')');
-			$graphs = array(new CLink(S_GRAPHS,'graphs.php?groupid='.$groupid_selected.'&hostid='.$template['templateid']),
+			$graphs = array(new CLink(S_GRAPHS,'graphs.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$template['templateid']),
 				' ('.count($template['graphs']).')');
 
 			$i = 0;
@@ -802,7 +802,7 @@ include_once('include/page_header.php');
 				switch($linked_to_host['status']){
 					case HOST_STATUS_NOT_MONITORED:
 						$style = 'on';
-						$url = 'hosts.php?form=update&hostid='.$linked_to_host['hostid'].'&groupid='.$groupid_selected;
+						$url = 'hosts.php?form=update&hostid='.$linked_to_host['hostid'].'&groupid='.$PAGE_GROUPS['selected'];
 					break;
 					case HOST_STATUS_TEMPLATE:
 						$style = 'unknown';
@@ -810,7 +810,7 @@ include_once('include/page_header.php');
 					break;
 					default:
 						$style = null;
-						$url = 'hosts.php?form=update&hostid='.$linked_to_host['hostid'].'&groupid='.$groupid_selected;
+						$url = 'hosts.php?form=update&hostid='.$linked_to_host['hostid'].'&groupid='.$PAGE_GROUPS['selected'];
 					break;
 				}
 
