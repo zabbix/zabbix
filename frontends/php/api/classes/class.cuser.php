@@ -774,8 +774,8 @@ class CUser extends CZBXAPI{
 			'userids'=>zbx_objectValues($users, 'userid'), 
 			'extendoutput'=>1, 
 			'preservekeys'=>1));
-			
-		foreach($users as $gnum => $user){
+
+		foreach($del_users as $gnum => $user){
 			if(bccomp($USER_DETAILS['userid'], $user['userid']) == 0){
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_USER_CANNOT_DELETE_ITSELF);
 				$result = false;
