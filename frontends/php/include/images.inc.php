@@ -96,6 +96,9 @@
 				}
 				else if($DB['TYPE'] == "POSTGRESQL"){
 					$image = pg_escape_bytea($image);
+					$sql = 'INSERT INTO images (imageid, name, imagetype, image) '.
+									' VALUES ('.$imageid.','.zbx_dbstr($name).','.$imagetype.",'".$image."')";
+					return	DBexecute($sql);
 				}
 				else if($DB['TYPE'] == "SQLITE3"){
 					$image = bin2hex($image);
