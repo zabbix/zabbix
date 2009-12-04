@@ -80,6 +80,7 @@ class CMaintenance extends CZBXAPI{
 
 // OutPut
 			'extendoutput'			=> null,
+			'select_groups'			=> null,
 			'select_hosts'			=> null,
 			'count'					=> null,
 			'preservekeys'			=> null,
