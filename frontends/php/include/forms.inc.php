@@ -2662,7 +2662,7 @@
 		$url			= get_request('url'		,'');
 
 		$expr_temp  = get_request('expr_temp','');
-		$input_method = get_request('input_method',IM_TREE);
+		$input_method = get_request('input_method',IM_ESTABLISHED);
 
 		if((isset($_REQUEST['triggerid']) && !isset($_REQUEST['form_refresh']))  || isset($limited)){
 			$description	= $trigger['description'];

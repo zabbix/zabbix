@@ -533,6 +533,7 @@ include_once('include/page_header.php');
 		if($showdisabled == 0){
 		    $options['status'] = TRIGGER_STATUS_ENABLED;
 		}
+
 		if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
 			$options['hostids'] = $PAGE_HOSTS['selected'];
 		}
