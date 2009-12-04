@@ -565,15 +565,6 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-	if(isset($_REQUEST['groupid'])){
-		$groupid_selected = $_REQUEST['groupid'];
-		update_profile('web.'.$page['menu'].'.groupid', $_REQUEST['groupid'], PROFILE_TYPE_ID);
-	}
-	else{
-		$_REQUEST['groupid'] = $groupid_selected = get_profile('web.'.$page['menu'].'.groupid', 0);
-	}
-?>
-<?php
 
 	$frmForm = new CForm();
 	$cmbConf = new CComboBox('config', 'hosts.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
@@ -590,9 +581,17 @@ include_once('include/page_header.php');
 	}
 
 	show_table_header(S_CONFIGURATION_OF_HOSTS, $frmForm);
+
+	$params=array();
+	$options = array('only_current_node');
+	foreach($options as $option) $params[$option] = 1;
+
+	$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
+	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
+
+	validate_group($PAGE_GROUPS,$PAGE_HOSTS);
 ?>
 <?php
-
 	echo SBR;
 
 	if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['hosts'])){
@@ -610,10 +609,9 @@ include_once('include/page_header.php');
 		$groups = CHostGroup::get(array('editable' => 1, 'extendoutput' => 1));
 		order_result($groups, 'name');
 
-		$cmbGroups = new CComboBox('groupid', $groupid_selected, 'javascript: submit();');
-		$cmbGroups->addItem(0, S_ALL_SMALL);
-		foreach($groups as $group){
-			$cmbGroups->addItem($group['groupid'], $group['name']);
+		$cmbGroups = new CComboBox('groupid', $PAGE_GROUPS['selected'], 'javascript: submit();');
+		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
+			$cmbGroups->addItem($groupid, $name);
 		}
 		$frmForm->addItem(array(S_GROUP.SPACE, $cmbGroups));
 
@@ -623,7 +621,7 @@ include_once('include/page_header.php');
 		$hosts_wdgt->addHeader(S_HOSTS_BIG, $frmForm);
 		$hosts_wdgt->addHeader($numrows);
 
-/* table HOSTS */
+// table HOSTS
 		$form = new CForm();
 		$form->setName('hosts');
 
@@ -654,9 +652,10 @@ include_once('include/page_header.php');
 			'limit' => ($config['search_limit']+1)
 		);
 
-		if($groupid_selected > 0){
-			$options['groupids'] = $groupid_selected;
+		if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
+			$options['groupids'] = $PAGE_GROUPS['selected'];
 		}
+
 		$hosts = CHost::get($options);
 
 // sorting && paging
@@ -681,13 +680,13 @@ include_once('include/page_header.php');
 //---------
 
 		foreach($hosts as $num => $host){
-			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?groupid='.$groupid_selected.'&hostid='.$host['hostid']),
+			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$host['hostid']),
 				' ('.count($host['applications']).')');
 			$items = array(new CLink(S_ITEMS, 'items.php?filter_set=1&hostid='.$host['hostid']),
 				' ('.count($host['items']).')');
-			$triggers = array(new CLink(S_TRIGGERS, 'triggers.php?groupid='.$groupid_selected.'&hostid='.$host['hostid']),
+			$triggers = array(new CLink(S_TRIGGERS, 'triggers.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$host['hostid']),
 				' ('.count($host['triggers']).')');
-			$graphs = array(new CLink(S_GRAPHS, 'graphs.php?groupid='.$groupid_selected.'&hostid='.$host['hostid']),
+			$graphs = array(new CLink(S_GRAPHS, 'graphs.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$host['hostid']),
 				' ('.count($host['graphs']).')');
 
 			$description = array();
