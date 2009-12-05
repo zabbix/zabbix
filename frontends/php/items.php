@@ -442,9 +442,9 @@ include_once('include/page_header.php');
 
 			$host = get_host_by_hostid($item['hostid']);
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
-				S_ITEM.' ['.$item['key_'].'] ['.$_REQUEST['itemid'].'] '.S_HOST.' ['.$host['host'].'] '.S_HISTORY_CLEANED);
+				S_ITEM.' ['.$item['key_'].'] ['.$_REQUEST['itemid'].'] '.S_HOST.' ['.$host['host'].'] '.S_HISTORY_CLEARED);
 		}
-		show_messages($result, S_HISTORY_CLEANED, S_CANNOT_CLEAN_HISTORY);
+		show_messages($result, S_HISTORY_CLEARED, S_CANNOT_CLEAR_HISTORY);
 
 	}
 	else if(isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])){
@@ -682,11 +682,11 @@ include_once('include/page_header.php');
 			if($cur_result){
 				$host = get_host_by_hostid($item['hostid']);
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
-					S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].'] '.S_HISTORY_CLEANED);
+					S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].'] '.S_HISTORY_CLEARED);
 			}
 		}
 		$go_result = DBend($go_result);
-		show_messages($go_result, S_HISTORY_CLEANED, $go_result);
+		show_messages($go_result, S_HISTORY_CLEARED, $go_result);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_itemid'])){
 		global $USER_DETAILS;
@@ -1128,7 +1128,7 @@ include_once('include/page_header.php');
 		$goOption->setAttribute('confirm','Copy selected items?');
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('clean_history',S_CLEAN_HISTORY_SELECTED_ITEMS);
+		$goOption = new CComboItem('clean_history',S_CLEAR_HISTORY_SELECTED_ITEMS);
 		$goOption->setAttribute('confirm','Delete history of selected items?');
 		$goBox->addItem($goOption);
 
