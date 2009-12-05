@@ -1067,6 +1067,7 @@
 	'S_LINK_INDICATORS' =>		'Link indicators',
 	'S_TYPE_OK' =>				'Type (OK)',
 	'S_COLOR_OK' =>				'Colour (Problem)',
+	'S_USE_ADVANCED_ICONS' =>	'Use advanced icons',
 
 	'S_BOTTOM'=>				'Bottom',
 	'S_TOP'=>					'Top',
