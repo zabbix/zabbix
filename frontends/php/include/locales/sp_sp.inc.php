@@ -468,7 +468,7 @@
 	'S_NO_ITEMS_DEFINED'=>			'No se han definido monitores',
 	'S_NO_ITEM_DEFINED'=>			'No se ha definido monitor',
 	'S_HISTORY_CLEARED'=>			'Histórico eliminado',
-	'S_CLEAR_HISTORY_SELECTED_ITEMS'=>			'Eliminar histórico del monitor seleccionado',
+	'S_CLEAR_HISTORY_FOR_SELECTED'=>			'Eliminar histórico del monitor seleccionado',
 	'S_CLEAR_HISTORY'=>			'Eliminar histórico',
 	'S_CANNOT_CLEAR_HISTORY'=>			'No es posible eliminar el histórico',
 	'S_CONFIGURATION_OF_ITEMS'=>			'Configuración de monitores',

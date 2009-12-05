@@ -545,7 +545,7 @@ include_once('include/page_header.php');
 		$goOption->setAttribute('confirm','Disable selected WEB scenarios?');
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('clean_history',S_CLEAR_HISTORY_SELECTED_ITEMS);
+		$goOption = new CComboItem('clean_history',S_CLEAR_HISTORY_FOR_SELECTED);
 		$goOption->setAttribute('confirm','Delete history of selected WEB scenarios?');
 		$goBox->addItem($goOption);
 

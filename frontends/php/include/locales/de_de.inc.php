@@ -630,7 +630,7 @@
 	'S_NO_ITEMS_DEFINED'=>			'keine Elemente definiert',
 	'S_NO_ITEM_DEFINED'=>			'kein Element definiert',
 	'S_HISTORY_CLEARED'=>			'Verlauf gelöscht',
-	'S_CLEAR_HISTORY_SELECTED_ITEMS'=>			'Verlauf ausgewählter Elemente löschen',
+	'S_CLEAR_HISTORY_FOR_SELECTED'=>			'Verlauf ausgewählter Elemente löschen',
 	'S_CLEAR_HISTORY'=>			'Verlauf löschen',
 	'S_CANNOT_CLEAR_HISTORY'=>			'Verlauf konnte nicht gelöscht werden',
 	'S_CONFIGURATION_OF_ITEMS'=>			'Konfiguration von Elementen',

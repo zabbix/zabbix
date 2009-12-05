@@ -802,7 +802,7 @@
 	'S_NO_ITEMS_DEFINED'=>			'Aucun élément défini',
 	'S_NO_ITEM_DEFINED'=>			'Aucun élément défini',
 	'S_HISTORY_CLEARED'=>			'Historique nettoyé',
-	'S_CLEAR_HISTORY_SELECTED_ITEMS'=>			'Nettoyage de l\'historique des éléments sélectionnés',
+	'S_CLEAR_HISTORY_FOR_SELECTED'=>			'Nettoyage de l\'historique des éléments sélectionnés',
 	'S_CLEAR_HISTORY'=>			'Nettoyage de l\'historique',
 	'S_CANNOT_CLEAR_HISTORY'=>			'Nettoyage de l\'historique impossible',
 	'S_CONFIGURATION_OF_ITEMS'=>			'Configuration des éléments',
