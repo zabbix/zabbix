@@ -227,7 +227,7 @@ include_once('include/page_header.php');
 /************************* FILTER **************************/
 /***********************************************************/
 
-	$filterForm = new CFormTable('trigger_filter', null, 'get');//,'tr_status.php?filter_set=1','POST',null,'sform');
+	$filterForm = new CFormTable(null, null, 'get');//,'tr_status.php?filter_set=1','POST',null,'sform');
 	$filterForm->setAttribute('name', 'zbx_filter');
 	$filterForm->setAttribute('id', 'zbx_filter');
 
