@@ -2118,7 +2118,7 @@
 		$frmItem->addRow(S_KEEP_HISTORY_IN_DAYS, array(
 			new CNumericBox('history',$history,8),
 			(!isset($_REQUEST['itemid'])) ? null :
-				new CButtonQMessage('del_history',S_CLEAN_HISTORY,S_HISTORY_CLEANING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q)
+				new CButtonQMessage('del_history',S_CLEAR_HISTORY,S_HISTORY_CLEARING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q)
 			));
 
 		if(uint_in_array($value_type, array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)))

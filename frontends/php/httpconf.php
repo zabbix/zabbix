@@ -284,10 +284,10 @@ include_once('include/page_header.php');
 
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO,
 					S_SCENARIO.' ['.$httptest_data['name'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].']'.
-					S_HISTORY_CLEANED);
+					S_HISTORY_CLEARED);
 			}
 		}
-		show_messages($go_result, S_HISTORY_CLEANED, $go_result);
+		show_messages($go_result, S_HISTORY_CLEARED, $go_result);
 	}
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_httptestid'])){
 		$go_result = false;
@@ -545,7 +545,7 @@ include_once('include/page_header.php');
 		$goOption->setAttribute('confirm','Disable selected WEB scenarios?');
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('clean_history',S_CLEAN_HISTORY_SELECTED_ITEMS);
+		$goOption = new CComboItem('clean_history',S_CLEAR_HISTORY_SELECTED_ITEMS);
 		$goOption->setAttribute('confirm','Delete history of selected WEB scenarios?');
 		$goBox->addItem($goOption);
 
