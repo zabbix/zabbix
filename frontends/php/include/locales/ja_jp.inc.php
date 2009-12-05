@@ -779,7 +779,7 @@
 	'S_NO_ITEMS_DEFINED'=>			'アイテムが定義されていません',
 	'S_NO_ITEM_DEFINED'=>			'アイテムが定義されていません',
 	'S_HISTORY_CLEARED'=>			'ヒストリが消去されました',
-	'S_CLEAR_HISTORY_SELECTED_ITEMS'=>			'選択したアイテムのヒストリを消去',
+	'S_CLEAR_HISTORY_FOR_SELECTED'=>			'選択したアイテムのヒストリを消去',
 	'S_CLEAR_HISTORY'=>			'ヒストリを消去',
 	'S_CANNOT_CLEAR_HISTORY'=>			'ヒストリを消去できません',
 	'S_CONFIGURATION_OF_ITEMS'=>			'アイテムの設定',

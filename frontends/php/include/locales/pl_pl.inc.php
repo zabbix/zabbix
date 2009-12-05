@@ -641,7 +641,7 @@
 	'S_NO_ITEMS_DEFINED'=>				'Brak zdefiniowanych elementów',
 	'S_NO_ITEM_DEFINED'=>				'Brak zdefiniowanego elementu',
 	'S_HISTORY_CLEARED'=>				'Wyczyszczono historię',
-	'S_CLEAR_HISTORY_SELECTED_ITEMS'=>		'Wyczyść historię wybranych elementów',
+	'S_CLEAR_HISTORY_FOR_SELECTED'=>		'Wyczyść historię wybranych elementów',
 	'S_CLEAR_HISTORY'=>				'Wyczyść historię',
 	'S_CANNOT_CLEAR_HISTORY'=>			'Nie można wyczyścić historii',
 	'S_CONFIGURATION_OF_ITEMS'=>			'Konfiguracja elementów',

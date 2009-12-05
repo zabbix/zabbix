@@ -468,7 +468,7 @@
 	'S_NO_ITEMS_DEFINED'=>			'No items defined',
 	'S_NO_ITEM_DEFINED'=>			'No item defined',
 	'S_HISTORY_CLEARED'=>			'History cleaned',
-	'S_CLEAR_HISTORY_SELECTED_ITEMS'=>			'Clean history selected items',
+	'S_CLEAR_HISTORY_FOR_SELECTED'=>			'Clean history selected items',
 	'S_CLEAR_HISTORY'=>			'Clean history',
 	'S_CANNOT_CLEAR_HISTORY'=>			'Cannot clean history',
 	'S_CONFIGURATION_OF_ITEMS'=>			'Configuration of items',
