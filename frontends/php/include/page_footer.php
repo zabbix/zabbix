@@ -47,6 +47,11 @@
 	$post_script = '';
 	if($page['type'] == PAGE_TYPE_HTML){
 		$post_script.= 'var page_refresh = null;'."\n";
+
+		if(isset($JS_TRANSLATE)){
+			$post_script.='var locale = '.zbx_jsvalue($JS_TRANSLATE)."\n";
+		}
+
 		$post_script.= 'function zbxCallPostScripts(){'."\n";
 
 		if(isset($ZBX_PAGE_POST_JS)){
