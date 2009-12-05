@@ -534,7 +534,7 @@
 	'S_NO_ITEMS_DEFINED'=>			'아이템이 정의되어 있지 않습니다',
 	'S_NO_ITEM_DEFINED'=>			'아이템이 정의되어 있지 않습니다',
 	'S_HISTORY_CLEARED'=>			'이력이 삭제되었습니다',
-	'S_CLEAR_HISTORY_SELECTED_ITEMS'=>	'선택 아이템 이력 삭제',
+	'S_CLEAR_HISTORY_FOR_SELECTED'=>	'선택 아이템 이력 삭제',
 	'S_CLEAR_HISTORY'=>			'이력 삭제',
 	'S_CANNOT_CLEAR_HISTORY'=>		'이력을 삭제할 수 없습니다',
 	'S_CONFIGURATION_OF_ITEMS'=>		'아이템 설정',

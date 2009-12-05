@@ -467,7 +467,7 @@
 	'S_NO_ITEMS_DEFINED'=>			'Nenhum item definido',
 	'S_NO_ITEM_DEFINED'=>			'Nenhum item  definido',
 	'S_HISTORY_CLEARED'=>			'Histórico zerado',
-	'S_CLEAR_HISTORY_SELECTED_ITEMS'=>			'Zerar histórico dos ítens selecionados',
+	'S_CLEAR_HISTORY_FOR_SELECTED'=>			'Zerar histórico dos ítens selecionados',
 	'S_CLEAR_HISTORY'=>			'Zerar histórico',
 	'S_CANNOT_CLEAR_HISTORY'=>			'Histórico não foi zerado',
 	'S_CONFIGURATION_OF_ITEMS'=>			'Configuração de ítens',

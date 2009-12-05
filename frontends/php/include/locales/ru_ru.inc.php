@@ -779,7 +779,7 @@
 	'S_NO_ITEMS_DEFINED'=>			'Элементы данных не определены',
 	'S_NO_ITEM_DEFINED'=>			'Элемент данных не определены',
 	'S_HISTORY_CLEARED'=>			'История очищена',
-	'S_CLEAR_HISTORY_SELECTED_ITEMS'=>			'Очистить журнал',
+	'S_CLEAR_HISTORY_FOR_SELECTED'=>			'Очистить журнал',
 	'S_CLEAR_HISTORY'=>			'Очистить журнал',
 	'S_CANNOT_CLEAR_HISTORY'=>			'Невозможно очистить историю',
 	'S_CONFIGURATION_OF_ITEMS'=>			'Настройка элементов данных',
