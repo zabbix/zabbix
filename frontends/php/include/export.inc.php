@@ -957,7 +957,7 @@ class zbxXML{
 			$dependencies = $xpath->query('dependencies/dependency');
 
 			if($dependencies->length > 0){
-				$triggers_for_dependencies = zbx_objectFields($triggers_for_dependencies, 'triggerid');
+				$triggers_for_dependencies = zbx_objectValues($triggers_for_dependencies, 'triggerid');
 				$triggers_for_dependencies = array_flip($triggers_for_dependencies);
 
 				foreach($dependencies as $dependency){

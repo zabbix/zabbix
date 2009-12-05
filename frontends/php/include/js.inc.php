@@ -48,6 +48,17 @@ function zbx_add_post_js($script){
 	$ZBX_PAGE_POST_JS[] = $script;
 }
 
+function zbx_addJSLocale($to_translate){
+	global $JS_TRANSLATE;
+	
+	zbx_value2array($to_translate);
+	if(empty($JS_TRANSLATE)) $JS_TRANSLATE = array();
+	
+	foreach($to_translate as $tnum => $string){
+		if(defined($string)) $JS_TRANSLATE[$string] = constant($string);
+		else $JS_TRANSLATE[$string] = 'UNTRANSLATED['.$string.']';
+	}
+}
 
 function get_js_sizeable_graph($dom_graph_id,$url){
 

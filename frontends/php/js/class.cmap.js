@@ -1082,7 +1082,7 @@ update_multiContainer: function(e){
 	
 		var e_td_4 = document.createElement('td');
 		e_td_4.setAttribute('class',"header_l");
-		e_td_4.appendChild(document.createTextNode('Map Elements'));
+		e_td_4.appendChild(document.createTextNode(locale['S_MAP_ELEMENTS']));
 		e_tr_3.appendChild(e_td_4);
 	
 		
@@ -1118,17 +1118,17 @@ update_multiContainer: function(e){
 
 	var e_td_4 = document.createElement('td');
 	e_tr_3.appendChild(e_td_4);
-	e_td_4.appendChild(document.createTextNode('Label'));
+	e_td_4.appendChild(document.createTextNode(locale['S_LABEL']));
 
 
 	var e_td_4 = document.createElement('td');
 	e_tr_3.appendChild(e_td_4);	
-	e_td_4.appendChild(document.createTextNode('Type'));
+	e_td_4.appendChild(document.createTextNode(locale['S_TYPE']));
 
 
 	var e_td_4 = document.createElement('td');
 	e_tr_3.appendChild(e_td_4);
-	e_td_4.appendChild(document.createTextNode('Description'));
+	e_td_4.appendChild(document.createTextNode(locale['S_DESCRIPTION']));
 
 
 	var count = 0;
@@ -1161,12 +1161,12 @@ update_multiContainer: function(e){
 
 		var elementtypeText = '';
 		switch(selement.elementtype){
-			case '0': elementtypeText = 'Host'; break;
-			case '1': elementtypeText = 'Map'; break;
-			case '2': elementtypeText = 'Trigger'; break;
-			case '3': elementtypeText = 'Group'; break;
+			case '0': elementtypeText = locale['S_HOST']; break;
+			case '1': elementtypeText = locale['S_MAP']; break;
+			case '2': elementtypeText = locale['S_TRIGGER']; break;
+			case '3': elementtypeText = locale['S_HOST_GROUP']; break;
 			case '4':
-			default: elementtypeText = 'Image'; break;
+			default: elementtypeText = locale['S_IMAGE']; break;
 		}
 
 		var e_td_4 = document.createElement('td');
@@ -1225,7 +1225,7 @@ update_linkContainer: function(e){
 		
 		var e_td_4 = document.createElement('td');
 		e_td_4.setAttribute('class',"header_l");
-		e_td_4.appendChild(document.createTextNode('Connectors'));
+		e_td_4.appendChild(document.createTextNode(locale['S_CONNECTORS']));
 		e_tr_3.appendChild(e_td_4);
 		
 		
@@ -1261,22 +1261,22 @@ update_linkContainer: function(e){
 
 	var e_td_4 = document.createElement('td');
 	e_tr_3.appendChild(e_td_4);
-	e_td_4.appendChild(document.createTextNode('Link'));
+	e_td_4.appendChild(document.createTextNode(locale['S_LINK']));
 
 
 	var e_td_4 = document.createElement('td');
 	e_tr_3.appendChild(e_td_4);	
-	e_td_4.appendChild(document.createTextNode('Element 1'));
+	e_td_4.appendChild(document.createTextNode(locale['S_ELEMENT']+' 1'));
 
 
 	var e_td_4 = document.createElement('td');
 	e_tr_3.appendChild(e_td_4);
-	e_td_4.appendChild(document.createTextNode('Element 2'));
+	e_td_4.appendChild(document.createTextNode(locale['S_ELEMENT']+' 2'));
 
 
 	var e_td_4 = document.createElement('td');
 	e_tr_3.appendChild(e_td_4);
-	e_td_4.appendChild(document.createTextNode('Link status indicator'));
+	e_td_4.appendChild(document.createTextNode(locale['S_LINK_STATUS_INDICATOR']));
 
 	var selementid = 0;
 	var linkids = {};
@@ -1436,7 +1436,7 @@ this.selementForm.dragHandler = e_td_5;
 	if(!IE)	e_span_6.appendChild(e_div_7);
 
 
-	e_td_5.appendChild(document.createTextNode('Edit map element'));
+	e_td_5.appendChild(document.createTextNode(locale['S_EDIT_MAP_ELEMENT']));
 
 
 	var e_tr_4 = document.createElement('tr');
@@ -1448,7 +1448,7 @@ this.selementForm.massEdit.elementtype = e_tr_4;
 
 	var e_td_5 = document.createElement('td');
 	e_td_5.className = "form_row_l";
-	e_td_5.appendChild(document.createTextNode('Type'));
+	e_td_5.appendChild(document.createTextNode(locale['S_TYPE']));
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -1471,31 +1471,31 @@ this.selementForm.elementtype = e_select_6;
 
 	var e_option_7 = document.createElement('option');
 	e_option_7.setAttribute('value',"0");
-	e_option_7.appendChild(document.createTextNode('Host'));
+	e_option_7.appendChild(document.createTextNode(locale['S_HOST']));
 	e_select_6.appendChild(e_option_7);
 
 
 	var e_option_7 = document.createElement('option');
 	e_option_7.setAttribute('value',"1");
-	e_option_7.appendChild(document.createTextNode('Map'));
+	e_option_7.appendChild(document.createTextNode(locale['S_MAP']));
 	e_select_6.appendChild(e_option_7);
 
 
 	var e_option_7 = document.createElement('option');
 	e_option_7.setAttribute('value',"2");
-	e_option_7.appendChild(document.createTextNode('Trigger'));
+	e_option_7.appendChild(document.createTextNode(locale['S_TRIGGER']));
 	e_select_6.appendChild(e_option_7);
 
 
 	var e_option_7 = document.createElement('option');
 	e_option_7.setAttribute('value',"3");
-	e_option_7.appendChild(document.createTextNode('Host group'));
+	e_option_7.appendChild(document.createTextNode(locale['S_HOST_GROUP']));
 	e_select_6.appendChild(e_option_7);
 
 
 	var e_option_7 = document.createElement('option');
 	e_option_7.setAttribute('value',"4");
-	e_option_7.appendChild(document.createTextNode('Image'));
+	e_option_7.appendChild(document.createTextNode(locale['S_IMAGE']));
 	e_select_6.appendChild(e_option_7);
 
 // LABEL
@@ -1516,7 +1516,7 @@ this.selementForm.massEdit.chkboxLabel = e_input_6
 	e_td_5.appendChild(e_input_6);
 	
 	e_td_5.appendChild(document.createTextNode(' '));
-	e_td_5.appendChild(document.createTextNode('Label'));
+	e_td_5.appendChild(document.createTextNode(locale['S_LABEL']));
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -1554,7 +1554,7 @@ this.selementForm.massEdit.chkboxLabelLocation = e_input_6
 	
 	e_td_5.appendChild(document.createTextNode(' '));
 	
-	e_td_5.appendChild(document.createTextNode('Label location'));
+	e_td_5.appendChild(document.createTextNode(locale['S_LABEL_LOCATION']));
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -1581,25 +1581,25 @@ this.selementForm.label_location = e_select_6;
 
 	var e_option_7 = document.createElement('option');
 	e_option_7.setAttribute('value',"0");
-	e_option_7.appendChild(document.createTextNode('Bottom'));
+	e_option_7.appendChild(document.createTextNode(locale['S_BOTTOM']));
 	e_select_6.appendChild(e_option_7);
 	
 	
 	var e_option_7 = document.createElement('option');
 	e_option_7.setAttribute('value',"1");
-	e_option_7.appendChild(document.createTextNode('Left'));
+	e_option_7.appendChild(document.createTextNode(locale['S_LEFT']));
 	e_select_6.appendChild(e_option_7);
 
 
 	var e_option_7 = document.createElement('option');
 	e_option_7.setAttribute('value',"2");
-	e_option_7.appendChild(document.createTextNode('Right'));
+	e_option_7.appendChild(document.createTextNode(locale['S_RIGHT']));
 	e_select_6.appendChild(e_option_7);
 	
 	
 	var e_option_7 = document.createElement('option');
 	e_option_7.setAttribute('value',"3");
-	e_option_7.appendChild(document.createTextNode('Top'));
+	e_option_7.appendChild(document.createTextNode(locale['S_TOP']));
 	e_select_6.appendChild(e_option_7);
 
 // Element Name
@@ -1615,7 +1615,7 @@ this.selementForm.massEdit.elementName = e_tr_4;
 this.selementForm.typeDOM.elementCaption = e_td_5;
 
 	e_td_5.className = "form_row_l";
-	e_td_5.appendChild(document.createTextNode('Host'));
+	e_td_5.appendChild(document.createTextNode(locale['S_HOST']));
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -1641,7 +1641,7 @@ this.selementForm.elementName = e_input_6;
 this.selementForm.elementTypeSelect = e_span_6;
 
 	e_span_6.className = "link";
-	e_span_6.appendChild(document.createTextNode('Select'));
+	e_span_6.appendChild(document.createTextNode(locale['S_SELECT']));
 	e_td_5.appendChild(e_span_6);
 
 // ICON OFF
@@ -1666,7 +1666,7 @@ this.selementForm.massEdit.chkboxIconid_off = e_input_6
 	
 	e_td_5.appendChild(document.createTextNode(' '));
 
-	e_td_5.appendChild(document.createTextNode('Icon (default)'));
+	e_td_5.appendChild(document.createTextNode(locale['S_ICON_DEFAULT']));
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -1694,7 +1694,7 @@ this.selementForm.typeDOM.advanced_icons = e_tr_4;
 
 	var e_td_5 = document.createElement('td');
 	e_td_5.className = "form_row_l";
-	e_td_5.appendChild(document.createTextNode('Use advanced icons'));
+	e_td_5.appendChild(document.createTextNode(locale['S_USE_ADVANCED_ICONS']));
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -1713,7 +1713,7 @@ this.selementForm.advanced_icons = e_input_6;
 	e_td_5.appendChild(e_input_6);
 	addListener(e_input_6, 'click', this.updateForm_selementByIcons.bindAsEventListener(this));
 
-	var icons = zbx_selement_form_menu['icons'];
+	var icons = zbxSelementIcons['icons'];
 	for(var iconid in icons){
 		if(empty(icons[iconid])) continue;
 		
@@ -1745,7 +1745,7 @@ this.selementForm.massEdit.chkboxIconid_on = e_input_6
 	e_td_5.appendChild(e_input_6);
 	
 	e_td_5.appendChild(document.createTextNode(' '));
-	e_td_5.appendChild(document.createTextNode('Icon (problem)'));
+	e_td_5.appendChild(document.createTextNode(locale['S_ICON_PROBLEM']));
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -1765,11 +1765,11 @@ this.selementForm.iconid_on = e_select_6;
 
 	var e_option_7 = document.createElement('option');
 	e_option_7.setAttribute('value', '0');
-	e_option_7.appendChild(document.createTextNode('Default'));	
+	e_option_7.appendChild(document.createTextNode(locale['S_DEFAULT']));	
 	e_select_6.appendChild(e_option_7);
 
 
-	var icons = zbx_selement_form_menu['icons'];
+	var icons = zbxSelementIcons['icons'];
 	for(var iconid in icons){
 		if(empty(icons[iconid])) continue;
 		
@@ -1800,7 +1800,7 @@ this.selementForm.massEdit.chkboxIconid_unknown = e_input_6
 	e_td_5.appendChild(e_input_6);
 	
 	e_td_5.appendChild(document.createTextNode(' '));
-	e_td_5.appendChild(document.createTextNode('Icon (unknown)'));
+	e_td_5.appendChild(document.createTextNode(locale['S_ICON_UNKNOWN']));
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -1820,11 +1820,11 @@ this.selementForm.iconid_unknown = e_select_6;
 
 	var e_option_7 = document.createElement('option');
 	e_option_7.setAttribute('value', '0');
-	e_option_7.appendChild(document.createTextNode('Default'));	
+	e_option_7.appendChild(document.createTextNode(locale['S_DEFAULT']));	
 	e_select_6.appendChild(e_option_7);
 
 
-	var icons = zbx_selement_form_menu['icons'];
+	var icons = zbxSelementIcons['icons'];
 	for(var iconid in icons){
 		if(empty(icons[iconid])) continue;
 		
@@ -1855,7 +1855,7 @@ this.selementForm.massEdit.chkboxIconid_maintenance = e_input_6
 	e_td_5.appendChild(e_input_6);
 	
 	e_td_5.appendChild(document.createTextNode(' '));
-	e_td_5.appendChild(document.createTextNode('Icon (In maintenance)'));
+	e_td_5.appendChild(document.createTextNode(locale['S_ICON_MAINTENANCE']));
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -1875,11 +1875,11 @@ this.selementForm.iconid_maintenance = e_select_6;
 
 	var e_option_7 = document.createElement('option');
 	e_option_7.setAttribute('value', '0');
-	e_option_7.appendChild(document.createTextNode('Default'));	
+	e_option_7.appendChild(document.createTextNode(locale['S_DEFAULT']));	
 	e_select_6.appendChild(e_option_7);
 
 
-	var icons = zbx_selement_form_menu['icons'];
+	var icons = zbxSelementIcons['icons'];
 	for(var iconid in icons){
 		if(empty(icons[iconid])) continue;
 		
@@ -1910,7 +1910,7 @@ this.selementForm.massEdit.chkboxIconid_disabled = e_input_6
 	e_td_5.appendChild(e_input_6);
 	
 	e_td_5.appendChild(document.createTextNode(' '));
-	e_td_5.appendChild(document.createTextNode('Icon (disabled)'));
+	e_td_5.appendChild(document.createTextNode(locale['S_ICON_DISABLED']));
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -1930,11 +1930,11 @@ this.selementForm.iconid_disabled = e_select_6;
 
 	var e_option_7 = document.createElement('option');
 	e_option_7.setAttribute('value', '0');
-	e_option_7.appendChild(document.createTextNode('Default'));	
+	e_option_7.appendChild(document.createTextNode(locale['S_DEFAULT']));	
 	e_select_6.appendChild(e_option_7);
 
 
-	var icons = zbx_selement_form_menu['icons'];
+	var icons = zbxSelementIcons['icons'];
 	for(var iconid in icons){
 		if(empty(icons[iconid])) continue;
 				
@@ -1953,7 +1953,7 @@ this.selementForm.massEdit.x = e_tr_4;
 
 	var e_td_5 = document.createElement('td');
 	e_td_5.className = "form_row_l";
-	e_td_5.appendChild(document.createTextNode('Coordinate X'));
+	e_td_5.appendChild(document.createTextNode(locale['S_COORDINATE_X']));
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -1988,7 +1988,7 @@ this.selementForm.massEdit.y = e_tr_4;
 
 	var e_td_5 = document.createElement('td');
 	e_td_5.className = "form_row_l";
-	e_td_5.appendChild(document.createTextNode('Coordinate Y'));
+	e_td_5.appendChild(document.createTextNode(locale['S_COORDINATE_Y']));
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -2032,7 +2032,7 @@ this.selementForm.massEdit.chkboxURL = e_input_6
 	e_td_5.appendChild(e_input_6);
 	
 	e_td_5.appendChild(document.createTextNode(' '));
-	e_td_5.appendChild(document.createTextNode('URL'));
+	e_td_5.appendChild(document.createTextNode(locale['S_URL']));
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -2067,7 +2067,7 @@ this.selementForm.url = e_input_6;
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"apply");
 	e_input_6.className = "button";
-	e_input_6.setAttribute('value',"Apply");
+	e_input_6.setAttribute('value',locale['S_APPLY']);
 	
 	addListener(e_input_6, 'click', this.saveForm_selement.bindAsEventListener(this));
 	
@@ -2079,7 +2079,7 @@ this.selementForm.url = e_input_6;
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"remove");
 	e_input_6.className = "button";
-	e_input_6.setAttribute('value',"Remove");
+	e_input_6.setAttribute('value',locale['S_REMOVE']);
 	
 	addListener(e_input_6, 'click', this.deleteForm_selement.bindAsEventListener(this));
 
@@ -2091,7 +2091,7 @@ this.selementForm.url = e_input_6;
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"close");
 	e_input_6.className = "button";
-	e_input_6.setAttribute('value',"Close");
+	e_input_6.setAttribute('value',locale['S_CLOSE']);
 	
 	addListener(e_input_6, 'click', this.hideForm.bindAsEventListener(this));
 	
@@ -2317,7 +2317,7 @@ updateForm_selementByType: function(e, multi){
 			var srctbl = 'hosts';
 			var srcfld1 = 'hostid';
 			var srcfld2 = 'host';
-			$(this.selementForm.typeDOM.elementCaption).update('Host');
+			$(this.selementForm.typeDOM.elementCaption).update(locale['S_HOST']);
 			
 			this.selementForm.typeDOM.elementName.style.display = display_style;
 			this.selementForm.typeDOM.iconid_off.style.display = display_style;
@@ -2328,10 +2328,10 @@ updateForm_selementByType: function(e, multi){
 		break;
 		case '1':
 // maps
-			var srctbl = 'maps';
-			var srcfld1 = 'mapid';
+			var srctbl = 'sysmaps';
+			var srcfld1 = 'sysmapid';
 			var srcfld2 = 'name';
-			$(this.selementForm.typeDOM.elementCaption).update('Map');
+			$(this.selementForm.typeDOM.elementCaption).update(locale['S_MAP']);
 			
 			this.selementForm.typeDOM.elementName.style.display = display_style;
 			this.selementForm.typeDOM.iconid_off.style.display = display_style;
@@ -2345,7 +2345,7 @@ updateForm_selementByType: function(e, multi){
 			var srctbl = 'triggers';
 			var srcfld1 = 'triggerid';
 			var srcfld2 = 'description';
-			$(this.selementForm.typeDOM.elementCaption).update('Trigger');
+			$(this.selementForm.typeDOM.elementCaption).update(locale['S_TRIGGER']);
 			
 			this.selementForm.typeDOM.elementName.style.display = display_style;
 			this.selementForm.typeDOM.iconid_off.style.display = display_style;
@@ -2359,7 +2359,7 @@ updateForm_selementByType: function(e, multi){
 			var srctbl = 'groups';
 			var srcfld1 = 'groupid';
 			var srcfld2 = 'name';
-			$(this.selementForm.typeDOM.elementCaption).update('Group');
+			$(this.selementForm.typeDOM.elementCaption).update(locale['S_HOST_GROUP']);
 			
 			this.selementForm.typeDOM.elementName.style.display = display_style;
 			this.selementForm.typeDOM.iconid_off.style.display = display_style;
@@ -2371,7 +2371,7 @@ updateForm_selementByType: function(e, multi){
 		break;
 		case '4':
 // image
-			$(this.selementForm.typeDOM.elementCaption).update('Image');
+			$(this.selementForm.typeDOM.elementCaption).update(locale['S_IMAGE']);
 			
 			this.selementForm.typeDOM.elementName.style.display = 'none';
 			this.selementForm.typeDOM.iconid_off.style.display = display_style;
@@ -2604,7 +2604,7 @@ this.linkForm.form = e_form_1;
 	e_span_6.appendChild(e_div_7);
 
 
-	e_td_5.appendChild(document.createTextNode('Edit connector'));
+	e_td_5.appendChild(document.createTextNode(locale['S_EDIT_CONNECTOR']));
 
 // HIDDEN
 	var e_input_4 = document.createElement('input');
@@ -2624,7 +2624,7 @@ this.linkForm.linkid = e_input_4;
 
 	var e_td_5 = document.createElement('td');
 	e_td_5.className = "form_row_l";
-	e_td_5.appendChild(document.createTextNode('Label'));
+	e_td_5.appendChild(document.createTextNode(locale['S_LABEL']));
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -2652,7 +2652,7 @@ this.linkForm.linklabel = e_textarea_6;
 
 	var e_td_5 = document.createElement('td');
 	e_td_5.className = "form_row_l";
-	e_td_5.appendChild(document.createTextNode('Element 1'));
+	e_td_5.appendChild(document.createTextNode(locale['S_ELEMENT']+' 1'));
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -2680,7 +2680,7 @@ this.linkForm.selementid1 = e_select_6;
 	e_tr_4.appendChild(e_td_5);
 
 
-	e_td_5.appendChild(document.createTextNode('Element 2'));
+	e_td_5.appendChild(document.createTextNode(locale['S_ELEMENT']+' 2'));
 
 
 	var e_td_5 = document.createElement('td');
@@ -2705,7 +2705,7 @@ this.linkForm.selementid2 = e_select_6;
 
 	var e_td_5 = document.createElement('td');
 	e_td_5.className = "form_row_l";
-	e_td_5.appendChild(document.createTextNode('Link indicators'));
+	e_td_5.appendChild(document.createTextNode(locale['S_LINK_INDICATORS']));
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -2724,7 +2724,7 @@ this.linkForm.linkIndicatorsTable = e_td_5;
 	var e_td_5 = document.createElement('td');
 	e_td_5.className = "form_row_l";
 	e_tr_4.appendChild(e_td_5);
-	e_td_5.appendChild(document.createTextNode('Type (OK)'));
+	e_td_5.appendChild(document.createTextNode(locale['S_TYPE_OK']));
 
 
 	var e_td_5 = document.createElement('td');
@@ -2743,25 +2743,25 @@ this.linkForm.drawtype = e_select_6;
 	
 	var e_option_7 = document.createElement('option');
 	e_option_7.setAttribute('value',"0");
-	e_option_7.appendChild(document.createTextNode('Line'));
+	e_option_7.appendChild(document.createTextNode(locale['S_LINE']));
 	e_select_6.appendChild(e_option_7);
 
 
 	var e_option_7 = document.createElement('option');
 	e_option_7.setAttribute('value',"2");
-	e_option_7.appendChild(document.createTextNode('Bold line'));
+	e_option_7.appendChild(document.createTextNode(locale['S_BOLD_LINE']));
 	e_select_6.appendChild(e_option_7);
 
 
 	var e_option_7 = document.createElement('option');
 	e_option_7.setAttribute('value',"3");
-	e_option_7.appendChild(document.createTextNode('Dot'));
+	e_option_7.appendChild(document.createTextNode(locale['S_DOT']));
 	e_select_6.appendChild(e_option_7);
 
 
 	var e_option_7 = document.createElement('option');
 	e_option_7.setAttribute('value',"4");
-	e_option_7.appendChild(document.createTextNode('Dashed line'));
+	e_option_7.appendChild(document.createTextNode(locale['S_DASHED_LINE']));
 	e_select_6.appendChild(e_option_7);
 
 // Colour OK
@@ -2772,7 +2772,7 @@ this.linkForm.drawtype = e_select_6;
 
 	var e_td_5 = document.createElement('td');
 	e_td_5.className = "form_row_l";
-	e_td_5.appendChild(document.createTextNode('Colour (OK)'));
+	e_td_5.appendChild(document.createTextNode(locale['S_COLOR_OK']));
 	e_tr_4.appendChild(e_td_5);
 
 
@@ -2832,7 +2832,7 @@ this.linkForm.colorPicker = e_div_6;
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"apply");
 	e_input_6.className = "button";
-	e_input_6.setAttribute('value',"Apply");
+	e_input_6.setAttribute('value',locale['S_APPLY']);
 	e_td_5.appendChild(e_input_6);
 	addListener(e_input_6, 'click', this.saveForm_link.bindAsEventListener(this));
 
@@ -2844,7 +2844,7 @@ this.linkForm.colorPicker = e_div_6;
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"remove");
 	e_input_6.className = "button";
-	e_input_6.setAttribute('value',"Remove");
+	e_input_6.setAttribute('value',locale['S_REMOVE']);
 	e_td_5.appendChild(e_input_6);
 	addListener(e_input_6, 'click', this.deleteForm_link.bindAsEventListener(this));
 
@@ -2856,7 +2856,7 @@ this.linkForm.colorPicker = e_div_6;
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"close");
 	e_input_6.className = "button";
-	e_input_6.setAttribute('value',"Close");
+	e_input_6.setAttribute('value',locale['S_CLOSE']);
 	addListener(e_input_6, 'click', this.hideForm_link.bindAsEventListener(this));
 
 
@@ -2958,17 +2958,17 @@ this.linkForm.linkIndicatorsBody = e_tbody_7;
 
 
 	var e_td_9 = document.createElement('td');
-	e_td_9.appendChild(document.createTextNode('Triggers'));
+	e_td_9.appendChild(document.createTextNode(locale['S_TRIGGERS']));
 	e_tr_8.appendChild(e_td_9);
 
 
 	var e_td_9 = document.createElement('td');
-	e_td_9.appendChild(document.createTextNode('Type'));
+	e_td_9.appendChild(document.createTextNode(locale['S_TYPE']));
 	e_tr_8.appendChild(e_td_9);
 
 
 	var e_td_9 = document.createElement('td');
-	e_td_9.appendChild(document.createTextNode('Colour'));
+	e_td_9.appendChild(document.createTextNode(locale['S_COLOR']));
 	e_tr_8.appendChild(e_td_9);
 
 
@@ -2988,7 +2988,7 @@ this.linkForm.linkIndicatorsBody = e_tbody_7;
 	var e_input_6 = document.createElement('input');
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"Add");
-	e_input_6.setAttribute('value',"Add");
+	e_input_6.setAttribute('value',locale['S_ADD']);
 	e_input_6.className = "button";
 	this.linkForm.linkIndicatorsTable.appendChild(e_input_6);
 
@@ -2999,7 +2999,7 @@ this.linkForm.linkIndicatorsBody = e_tbody_7;
 	var e_input_6 = document.createElement('input');
 	e_input_6.setAttribute('type',"button");
 	e_input_6.setAttribute('name',"Remove");
-	e_input_6.setAttribute('value',"Remove");
+	e_input_6.setAttribute('value',locale['S_REMOVE']);
 	e_input_6.className = "button";
 	this.linkForm.linkIndicatorsTable.appendChild(e_input_6);
 	
@@ -3100,10 +3100,10 @@ linkForm_addLinktrigger: function(linktrigger){
 // LINE
 	var lineName = '';
 	switch(linktrigger.drawtype.toString()){
-		case '0': lineName = 'Line'; break;
-		case '1': lineName = 'Bold line'; break;
-		case '2': lineName = 'Dot'; break;
-		case '3': lineName = 'Dashed line'; break;
+		case '0': lineName = locale['S_LINE']; break;
+		case '1': lineName = locale['S_BOLD_LINE']; break;
+		case '2': lineName = locale['S_DOT']; break;
+		case '3': lineName = locale['S_DASHED_LINE']; break;
 	}
 	
 	var e_td_9 = document.createElement('td');

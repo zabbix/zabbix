@@ -1053,6 +1053,10 @@
 	'S_CONNECTORS'=>			'Connectors',
 
 //	sysmaps.php
+	'S_EDIT_MAP_ELEMENT' =>		'Edit map element',
+	'S_ICON_DEFAULT' => 		'Icon (default)',
+	'S_APPLY' =>				'Apply',
+	'S_MAP_ELEMENTS' =>			'Map elements',
 	'S_MAP_DELETED'=>			'Network map deleted',
 	'S_CANNOT_DELETE_MAP'=>		'Cannot delete network map',
 	'S_MAPS_BIG'=>				'MAPS',
@@ -1060,7 +1064,9 @@
 	'S_CREATE_MAP'=>			'Create Map',
 	'S_ICON_LABEL_LOCATION'=>	'Icon label location',
 	'S_ICON_HIGHLIGHTING'=>		'Icon highlighting',
-
+	'S_LINK_INDICATORS' =>		'Link indicators',
+	'S_TYPE_OK' =>				'Type (OK)',
+	'S_COLOR_OK' =>				'Colour (Problem)',
 
 	'S_BOTTOM'=>				'Bottom',
 	'S_TOP'=>					'Top',

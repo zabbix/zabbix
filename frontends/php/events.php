@@ -445,7 +445,7 @@ include_once('include/page_header.php');
 /************************* FILTER **************************/
 /***********************************************************/
 
-	$filterForm = new CFormTable();//,'events.php?filter_set=1','POST',null,'sform');
+	$filterForm = new CFormTable(null, null, 'get');//,'events.php?filter_set=1','POST',null,'sform');
 	$filterForm->setAttribute('name','zbx_filter');
 	$filterForm->setAttribute('id','zbx_filter');
 //	$filterForm->setMethod('get');
