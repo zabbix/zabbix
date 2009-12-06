@@ -113,7 +113,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, long l
 			active_metrics[i].nextcheck = 0;
 		active_metrics[i].refresh = refresh;
 		active_metrics[i].status = ITEM_STATUS_ACTIVE;
-		
+
 		return;
 	}
 
@@ -194,7 +194,7 @@ static int	parse_list_of_checks(char *str)
 /* {"data":[{"key":"system.cpu.num",...,...},{...},...]}
  *          ^------------------------------^
  */ 		if (SUCCEED != zbx_json_brackets_open(p, &jp_row))
-			goto json_error;					
+			goto json_error;
 
 		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_KEY, name, sizeof(name)) || *name == '\0')
 		{
@@ -223,7 +223,7 @@ static int	parse_list_of_checks(char *str)
 		}
 
 		lastlogsize = atoi(tmp);
-		
+
 		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_MTIME, tmp, sizeof(tmp)) || *tmp == '\0')
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Unable to retrieve value of tag \"%s\"",
@@ -234,7 +234,7 @@ static int	parse_list_of_checks(char *str)
 		{
 			mtime = atoi(tmp);
 		}
-		
+
 		add_check(name, key_orig, delay, lastlogsize, mtime);
 	}
 
@@ -712,7 +712,7 @@ static void	process_active_checks(char *server, unsigned short port)
 					*encoding = '\0';
 
 				zbx_strupper(encoding);
-				
+
 				if (get_param(params, 4, maxlines_persec_str, sizeof(maxlines_persec_str)) != 0 ||
 						*maxlines_persec_str == '\0')
 					maxlines_persec = CONFIG_MAX_LINES_PER_SECOND;
@@ -722,7 +722,7 @@ static void	process_active_checks(char *server, unsigned short port)
 
 				s_count = p_count = 0;
 				lastlogsize = active_metrics[i].lastlogsize;
-				
+
 				while (SUCCEED == (ret = process_log(filename, &lastlogsize, &value, encoding))) {
 					if (!value) /* EOF */
 					{
@@ -759,7 +759,7 @@ static void	process_active_checks(char *server, unsigned short port)
 					{
 						lastlogsize = active_metrics[i].lastlogsize;
 					}
-					
+
 					/* do not flood ZABBIX server if file grows too fast */
 					if (s_count >= (maxlines_persec * active_metrics[i].refresh))
 						break;
@@ -768,7 +768,7 @@ static void	process_active_checks(char *server, unsigned short port)
 					if (p_count >= (4 * maxlines_persec * active_metrics[i].refresh))
 						break;
 				} //while processing a log
-				
+
 			} while(0); /* simple try realization */
 
 			if (FAIL == ret) {
@@ -791,7 +791,7 @@ static void	process_active_checks(char *server, unsigned short port)
 				);
 			}
 		}
-		/* special processing for log files WITH rotation */		
+		/* special processing for log files WITH rotation */
 		else if (0 == strncmp(active_metrics[i].key, "logrt[", 11))
 		{
 			ret = FAIL;
@@ -813,7 +813,7 @@ static void	process_active_checks(char *server, unsigned short port)
 					*encoding = '\0';
 
 				zbx_strupper(encoding);
-				
+
 				if (get_param(params, 4, maxlines_persec_str, sizeof(maxlines_persec_str)) != 0 ||
 						*maxlines_persec_str == '\0')
 					maxlines_persec = CONFIG_MAX_LINES_PER_SECOND;
@@ -824,7 +824,7 @@ static void	process_active_checks(char *server, unsigned short port)
 				s_count = p_count = 0;
 				lastlogsize = active_metrics[i].lastlogsize;
 				mtime = active_metrics[i].mtime;
-				
+
 				while (SUCCEED == (ret = process_logrt(filename, &lastlogsize, &mtime, &value, encoding))) {
 					if (!value) /* EOF */
 					{
@@ -864,7 +864,7 @@ static void	process_active_checks(char *server, unsigned short port)
 						lastlogsize = active_metrics[i].lastlogsize;
 						mtime = active_metrics[i].mtime;
 					}
-					
+
 					/* Do not flood ZABBIX server if file grows too fast */
 					if (s_count >= (maxlines_persec * active_metrics[i].refresh))
 						break;
@@ -873,7 +873,7 @@ static void	process_active_checks(char *server, unsigned short port)
 					if (p_count >= (4 * maxlines_persec * active_metrics[i].refresh))
 						break;
 				} //while processing a log
-				
+
 			} while(0); /* simple try realization */
 
 			if (FAIL == ret) {
@@ -895,7 +895,7 @@ static void	process_active_checks(char *server, unsigned short port)
 					NULL
 				);
 			}
-		}		
+		}
 		/* special processing for eventlog */
 		else if(strncmp(active_metrics[i].key,"eventlog[",9) == 0)
 		{
