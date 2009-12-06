@@ -135,7 +135,7 @@ static void run_remote_command(char* host_name, char* command)
 			zbx_snprintf(key, sizeof(key), "system.run[%s,nowait]", p);
 
 			alarm(CONFIG_TIMEOUT);
-			
+
 			init_result(&agent_result);
 
 			ret = get_value_agent(&item, &agent_result);

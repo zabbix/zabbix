@@ -106,7 +106,7 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 			i += szbyte;
 			break;
 		}
-		
+
 		if (0 == memcmp(&buf[i], cr, szbyte))	/* CR (Mac) */
 		{
 			if (i + szbyte < (size_t)nbytes && 0 == memcmp(&buf[i + szbyte], lf, szbyte))	/* CR+LF (Windows) */

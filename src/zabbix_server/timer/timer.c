@@ -401,7 +401,7 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count)
 			continue;
 
 		maintenance_from = atoi(row[2]);
-		
+
 		generate_events(hostid, maintenance_from);
 	}
 	DBfree_result(result);
