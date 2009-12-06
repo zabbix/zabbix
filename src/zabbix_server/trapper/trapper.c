@@ -155,17 +155,17 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_mass_data()");
 
 	DCinit_nextchecks();
-	
+
 	for (i = 0; i < value_num; i++)
-	{		
+	{
 		if (SUCCEED != DCconfig_get_item_by_key(&item, proxy_hostid, values[i].host_name, values[i].key))
 			continue;
-		
+
 		if (item.host.maintenance_status == HOST_MAINTENANCE_STATUS_ON &&
 				item.host.maintenance_type == MAINTENANCE_TYPE_NODATA &&
 				item.host.maintenance_from <= values[i].clock)
 			continue;
-		
+
 		if (item.type != ITEM_TYPE_TRAPPER && item.type != ITEM_TYPE_ZABBIX_ACTIVE)
 			if (0 != proxy_hostid && (item.type == ITEM_TYPE_INTERNAL ||
 						item.type == ITEM_TYPE_AGGREGATE ||
@@ -192,7 +192,7 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 			{
 				if (ITEM_VALUE_TYPE_LOG == item.value_type)
 					calc_timestamp(values[i].value, &values[i].timestamp, item.logtimefmt);
-				
+
 				dc_add_history(item.itemid, item.value_type, &agent, values[i].clock,
 						values[i].timestamp, values[i].source, values[i].severity,
 						values[i].logeventid, values[i].lastlogsize, values[i].mtime);
@@ -363,7 +363,7 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *jp, const
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGLASTSIZE, tmp, sizeof(tmp)))
 			av->lastlogsize = atoi(tmp);
-			
+
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_MTIME, tmp, sizeof(tmp)))
 			av->mtime = atoi(tmp);
 
@@ -608,7 +608,7 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 		else if (*s == '<')
 		{
 			comms_parse_response(s, av.host_name, sizeof(av.host_name), av.key, sizeof(av.key), value_dec, sizeof(value_dec),
-					lastlogsize, sizeof(lastlogsize), timestamp, sizeof(timestamp), 
+					lastlogsize, sizeof(lastlogsize), timestamp, sizeof(timestamp),
 					source, sizeof(source),	severity, sizeof(severity));
 
 			av.value	= value_dec;

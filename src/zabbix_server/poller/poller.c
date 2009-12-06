@@ -188,7 +188,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 	{
 		zbx_rtrim(result->text, " \r\n");
 	}
-	
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
 	return res;

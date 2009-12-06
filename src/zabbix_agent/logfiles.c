@@ -45,12 +45,12 @@ static int split_string(const char *str, char const *del, char **part1, char **p
 	int i = 0;
 	int str_length = 0;
 	int part1_length = 0;
-	int part2_length = 0;	
+	int part2_length = 0;
 	int bytes_offset_tmp = 0;
 	int bytes_allocated_tmp = 0;
-	
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In split_string()");
-	
+
 	assert(str);
 	assert(*str);/* why to split an empty string */
 	assert(del);
@@ -59,7 +59,7 @@ static int split_string(const char *str, char const *del, char **part1, char **p
 	assert(NULL == *part1);/* target 1 must be empty */
 	assert(part2);
 	assert(NULL == *part2);/* target 2 must be empty */
-		
+
 	str_length = strlen(str);
 	if (del <= str || del >= (str + str_length - 1))
 	{
@@ -79,11 +79,11 @@ static int split_string(const char *str, char const *del, char **part1, char **p
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "\"part2\" length is zero bytes long. Cannot proceed.");
 		return FAIL;
-	}	
+	}
 	/* copying part1 */
 	for ( ; i < part1_length; i++)
 	{
-		/*zabbix_log(LOG_LEVEL_DEBUG, "bytes_allocated_tmp [%i] bytes_offset_tmp [%i] character [%c]", 
+		/*zabbix_log(LOG_LEVEL_DEBUG, "bytes_allocated_tmp [%i] bytes_offset_tmp [%i] character [%c]",
 				bytes_allocated_tmp, bytes_offset_tmp, str[i]);*/
 		zbx_chrcpy_alloc(part1, &bytes_allocated_tmp, &bytes_offset_tmp, str[i]);
 	}
@@ -93,12 +93,12 @@ static int split_string(const char *str, char const *del, char **part1, char **p
 	i = part1_length;
 	for ( ; i < str_length; i++)
 	{
-		/*zabbix_log(LOG_LEVEL_DEBUG, "bytes_allocated_tmp [%i] bytes_offset_tmp [%i] character [%c]", 
+		/*zabbix_log(LOG_LEVEL_DEBUG, "bytes_allocated_tmp [%i] bytes_offset_tmp [%i] character [%c]",
 				bytes_allocated_tmp, bytes_offset_tmp, str[i]);*/
 		zbx_chrcpy_alloc(part2, &bytes_allocated_tmp, &bytes_offset_tmp, str[i]);
 	}
 	zabbix_log(LOG_LEVEL_DEBUG, "\"part2\" [%s]", *part2);
-	
+
 	return SUCCEED;
 }
 
@@ -128,21 +128,21 @@ static int split_filename(const char *filename, char **directory, char **format)
 	char *filename_tmp = NULL;
 	char *separator_tmp = NULL;
 #endif/*_WINDOWS*/
-	
+
 	assert(directory && !*directory);
-	assert(format && !*format);	
-	
+	assert(format && !*format);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In split_filename()");
-	
+
 	if (!filename || *filename == '\0')
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Cannot split empty path!");
 		return FAIL;
-	}		
+	}
 
 /* special processing for Windows world, since PATH part cannot be simply divided from REGEXP part (file format) */
 #ifdef _WINDOWS
-	filename_tmp = strdup(filename);	
+	filename_tmp = strdup(filename);
 	while (separator == NULL)
 	{
 		separator_tmp = strrchr(filename_tmp, (int)PATH_SEPARATOR);
@@ -188,9 +188,9 @@ static int split_filename(const char *filename, char **directory, char **format)
 		}
 		zbx_free(filename_tmp);
 	}
-	
-#else/* _WINDOWS */	
-	separator = strrchr(filename, (int)PATH_SEPARATOR);	
+
+#else/* _WINDOWS */
+	separator = strrchr(filename, (int)PATH_SEPARATOR);
 	if (separator == NULL )
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Filename [%s] does not contain any path separator [%c].", filename, PATH_SEPARATOR);
@@ -203,9 +203,9 @@ static int split_filename(const char *filename, char **directory, char **format)
 	}
 	/* Checking whether directory exists. */
 	if (-1 == zbx_stat(*directory, &buf)) {
-		zabbix_log(LOG_LEVEL_WARNING, "Directory [%s] cannot be found on the file system.", *directory);		
+		zabbix_log(LOG_LEVEL_WARNING, "Directory [%s] cannot be found on the file system.", *directory);
 		zbx_free(*directory);
-		zbx_free(*format);		
+		zbx_free(*format);
 		return FAIL;
 	}
 	/* Checking whether directory is really directory, not file. */
@@ -223,7 +223,7 @@ static int split_filename(const char *filename, char **directory, char **format)
 
 struct st_logfile
 {
-	char	*filename;	
+	char	*filename;
 	int	mtime;
 };
 
@@ -247,11 +247,11 @@ struct st_logfile
 static void init_logfiles(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num)
 {
 	assert(logfiles && NULL == *logfiles);
-	assert(logfiles_alloc && 0 == *logfiles_alloc);	
+	assert(logfiles_alloc && 0 == *logfiles_alloc);
 	assert(logfiles_num && 0 == *logfiles_num);
-	
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In init_logfiles()");
-	
+
 	*logfiles_alloc = 64;
 	*logfiles = zbx_malloc(*logfiles, *logfiles_alloc * sizeof(struct st_logfile));
 }
@@ -310,23 +310,23 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 {
 	int i = 0;
 	int cmp = 0;
-	
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In add_logfile() filename: [%s] mtime: [%i]", filename, mtime);
-	
+
 	assert(logfiles);
 	assert(*logfiles);
 	assert(logfiles_alloc);
 	assert(*logfiles_alloc);
 	assert(logfiles_num);
 	assert(0 <= *logfiles_num);
-	
+
 	/* must be done in any case */
 	if (*logfiles_alloc == *logfiles_num)
 	{
 		*logfiles_alloc = *logfiles_alloc * 2;
 		*logfiles = zbx_realloc(*logfiles, *logfiles_alloc);
 	}
-	
+
 	/*from the start go those, which mtimes are smaller*/
 	/*if mtimes are equal, then first go those, which filenames are bigger*/
 	/*the rule: the oldest is put first, the most current is at the end*/
@@ -339,17 +339,17 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 		--------------------------------------------------------------------------------------
 		array[i=0]		array[i=1]		array[i=2]		array[i=3]
 	*/
-	
+
 	/*the application is writing into filename.log; mtimes are more important than filenames*/
-	
+
 	for ( ; i < *logfiles_num; i++)
-	{		
+	{
 		if (mtime > (*logfiles)[i].mtime)
 		{
 			/* this stays on place */
 			continue;
 		}
-		
+
 		if (mtime == (*logfiles)[i].mtime)
 		{
 			cmp = strcmp(filename, (*logfiles)[i].filename);
@@ -370,17 +370,17 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 		/* the place is found, move all from the position forward by one struct */
 		break;
 	}
-	
+
 	/*zabbix_log(LOG_LEVEL_DEBUG, "Decide whether to move memory.");*/
 	if (!(0 == i && 0 == *logfiles_num) && !(0 < *logfiles_num && *logfiles_num == i))
 	{
 		/* do not move if there are not logfiles yet */
 		/* do not move if we are appending the logfile */
 		/*zabbix_log(LOG_LEVEL_DEBUG, " MEMORY MOVE WILL NOW OCCUR! ");*/
-		memmove((void *)&(*logfiles)[i + 1], (const void *)&(*logfiles)[i], 
+		memmove((void *)&(*logfiles)[i + 1], (const void *)&(*logfiles)[i],
 				(size_t)((*logfiles_num - i) * sizeof(struct st_logfile)));
 	}
-	
+
 	(*logfiles)[i].filename = strdup(filename);
 	(*logfiles)[i].mtime = mtime;
 	++(*logfiles_num);
@@ -413,13 +413,13 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 	int		i = 0;
 	int		nbytes;
 	int		ret = FAIL;
-	char		buffer[MAX_BUF_LEN];	
+	char		buffer[MAX_BUF_LEN];
 	char		*directory = NULL;
 	char		*format = NULL;
-	struct stat	file_buf;	
+	struct stat	file_buf;
 	struct st_logfile	*logfiles = NULL;
 	int		logfiles_num = 0;
-	int		logfiles_alloc = 0;	
+	int		logfiles_alloc = 0;
 	int		fd = 0;
 	char		*logfile_candidate = NULL;
 	int		length = 0;
@@ -432,20 +432,20 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 	DIR		*dir = NULL;
 	struct dirent	*d_ent = NULL;
 #endif/*_WINDOWS*/
-	
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_logrt() filename [%s] lastlogsize [%li] mtime [%i]",
 			filename, *lastlogsize, *mtime);
-	
+
 	/* splitting filename */
 	if (SUCCEED != split_filename(filename, &directory, &format))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Filename [%s] does not contain a valid directory and/or format.", filename);		
+		zabbix_log(LOG_LEVEL_WARNING, "Filename [%s] does not contain a valid directory and/or format.", filename);
 		return FAIL;
 	}
-	
+
 #ifdef _WINDOWS
 
-	/* try to "open" Windows directory */	
+	/* try to "open" Windows directory */
 	find_path = zbx_dsprintf(find_path, "%s%c*", directory, PATH_SEPARATOR);
 	find_handle = _findfirst((const char *)find_path, &find_data);
 	if (-1 == find_handle)
@@ -457,7 +457,7 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 		return FAIL;
 	}
 	zbx_free(find_path);
-	
+
 #else /* _WINDOWS */
 
 	if (NULL == (dir = opendir(directory)))
@@ -467,19 +467,19 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 		zbx_free(format);
 		return FAIL;
 	}
-	
+
 #endif /* _WINDOWS */
-	
+
 	/* allocating memory for logfiles */
 	init_logfiles(&logfiles, &logfiles_alloc, &logfiles_num);
-	
+
 	/*zabbix_log(LOG_LEVEL_WARNING, "Starting reading the directory. logfiles_alloc [%i], logfiles_num [%i]",
 			logfiles_alloc, logfiles_num);*/
-			
+
 #ifdef _WINDOWS
 
 	/* reading Windows directory */
-	
+
 	zabbix_log(LOG_LEVEL_DEBUG, "We are in the Windows directory reading cycle.");
 	do {
 		logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%c%s", directory, PATH_SEPARATOR, find_data.name);
@@ -497,9 +497,9 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "[%s] does not match [%s].", logfile_candidate, format);
 		}
-		
+
 		zbx_free(logfile_candidate);
-		
+
 	} while (0 == _findnext(find_handle, &find_data));
 
 #else/*_WINDOWS*/
@@ -513,7 +513,7 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot process read entry [%s].", logfile_candidate);
 			continue;
 		}
-		
+
 		if (NULL != zbx_regexp_match(d_ent->d_name, format, &length))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Adding the file [%s] to logfiles.", logfile_candidate);
@@ -523,12 +523,12 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "[%s] does not match [%s].", logfile_candidate, format);
 		}
-		
+
 		zbx_free(logfile_candidate);
 	}
 
 #endif/*_WINDOWS*/
-	
+
 	/* find the oldest file that match */
 	for (i = 0; i < logfiles_num; i++)
 	{
@@ -541,10 +541,10 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 			break;/* the first occurence is found */
 		}
 	}
-	
+
 	/* escaping those with the same mtime, taking the latest one (without exceptions!) */
 	for (j = i + 1; j < logfiles_num; j++)
-	{		
+	{
 		if (logfiles[j].mtime == logfiles[i].mtime)
 		{
 			i = j;/* moving to the newer one */
@@ -554,13 +554,13 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 			break;/* all next mtimes are bigger */
 		}
 	}
-	
+
 	/* if all mtimes are less than the given one, take the latest file from existing ones */
 	if (0 < logfiles_num && i == logfiles_num)
 	{
 		i = logfiles_num - 1;/* i cannot be bigger than logfiles_num */
 	}
-	
+
 	/* processing matched or moving to the newer one and repeating the cycle */
 	for ( ; i < logfiles_num; i++)
 	{
@@ -569,7 +569,7 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot open [%s]. Error: [%s]", logfile_candidate, strerror(errno));
 			break;/* must return, situation could have changed */
-		}		
+		}
 		*mtime = file_buf.st_mtime;/* must contain the latest mtime as possible */
 		if (file_buf.st_size < *lastlogsize)
 		{
@@ -585,8 +585,8 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 			if (-1 != (nbytes = zbx_read(fd, buffer, sizeof(buffer), encoding)))
 			{
 				if (0 != nbytes)
-				{					
-					*lastlogsize += nbytes;					
+				{
+					*lastlogsize += nbytes;
 					*value = convert_to_utf8(buffer, nbytes, encoding);
 					zbx_rtrim(*value, "\r\n ");
 					ret = SUCCEED;
@@ -601,7 +601,7 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 					}
 					else
 					{
-						zbx_free(logfile_candidate);						
+						zbx_free(logfile_candidate);
 						*lastlogsize = 0;
 						close(fd);
 						continue;/* try to read from more current file */
@@ -616,21 +616,21 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 		}
 		else/* cannot position in the file */
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot set position to [%li] for [%s] with error [%s]", 
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot set position to [%li] for [%s] with error [%s]",
 					*lastlogsize, logfile_candidate, strerror(errno));
 			break;/* must return, situation could have changed */
 		}
 	}/* trying to read from logfiles */
-	
+
 	if (0 == logfiles_num)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "There are not any files matching [%s] found in [%s] directory", 
+		zabbix_log(LOG_LEVEL_WARNING, "There are not any files matching [%s] found in [%s] directory",
 				format, directory);
 	}
 	free_logfiles(&logfiles, &logfiles_alloc, &logfiles_num);
 	if (0 != fd && -1 == close(fd))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Could not close the file [%s] with error [%s]", 
+		zabbix_log(LOG_LEVEL_WARNING, "Could not close the file [%s] with error [%s]",
 					logfile_candidate, strerror(errno));
 	}
 #ifdef _WINDOWS
@@ -649,12 +649,12 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 				directory, strerror(errno));
 	}
 
-#endif /* _WINDOWS */	
-	
+#endif /* _WINDOWS */
+
 	zbx_free(logfile_candidate);
 	zbx_free(directory);
 	zbx_free(format);
-	
+
 	return ret;
 }
 

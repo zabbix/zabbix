@@ -377,7 +377,7 @@ void	collect_perfstat()
 	{
 		if (cptr->status == ITEM_STATUS_NOTSUPPORTED)	/* Inactive counter? */
 			continue;
-			
+
 		PdhGetRawCounterValue(
 			cptr->handle,
 			NULL,
