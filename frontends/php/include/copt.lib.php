@@ -385,7 +385,7 @@ if(defined('USE_PROFILING')){
 		}
 	}
 
-	COpt::set_memory_limit('256M');
+	//COpt::set_memory_limit('256M');
 	COpt::profiling_start('script');
 }
 else{
