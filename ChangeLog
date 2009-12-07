@@ -1,5 +1,6 @@
 Changes for 1.7.5
 
+ - [1306] fixed showing triggers that recently changed state as errors in dashboard (Vedmak)
  - [ZBX-1030] fixed security vulnerability in server allowing remote unauthenticated users to execute scripts. Thanks to Nicob (Sasha)
  - [ZBX-1437] fixed errors in events screen (Vedmak)
  - [ZBX-1433] fixed error viewing event (Vedmak)
