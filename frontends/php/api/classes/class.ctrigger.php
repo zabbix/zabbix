@@ -88,6 +88,7 @@ class CTrigger extends CZBXAPI{
 			'not_templated_triggers'	=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
+			'only_problems'			=> null,
 // filter
 			'filter'				=> null,
 			'group'					=> null,
@@ -245,7 +246,10 @@ class CTrigger extends CZBXAPI{
 		if(!is_null($options['severity'])){
 			$sql_parts['where'][] = 't.priority='.$options['severity'];
 		}
-
+// only_problems
+		if(!is_null($options['only_problems'])){
+			$sql_parts['where']['ot'] = 't.value='.TRIGGER_VALUE_TRUE;
+		}
 // templated_triggers
 		if(!is_null($options['templated_triggers'])){
 			$sql_parts['where'][] = 't.templateid<>0';
@@ -317,11 +321,10 @@ class CTrigger extends CZBXAPI{
 // only_true
 			if(!is_null($options['only_true'])){
 
-				$sql_parts['where'][] = '((t.value='.TRIGGER_VALUE_TRUE.')'.
+				$sql_parts['where']['ot'] = '((t.value='.TRIGGER_VALUE_TRUE.')'.
 										' OR '.
 										'((t.value='.TRIGGER_VALUE_FALSE.') AND (t.lastchange>'.(time() - TRIGGER_FALSE_PERIOD).')))';
 			}
-
 // min_severity
 			if(!is_null($options['min_severity'])){
 				$sql_parts['where'][] = 't.priority>='.$options['min_severity'];
