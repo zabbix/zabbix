@@ -716,7 +716,7 @@ include_once('include/page_header.php');
 					' AND '.DBin_node('t.triggerid', $nodeid).
 					' AND '.DBcondition('t.triggerid',$available_triggers).
 					' AND h.status in ('.implode(',', $host_status).')'.
-					' AND h.hostid='.$hostid;
+					' AND h.hostid='.$hostid.
 				' GROUP BY h.host, t.triggerid, t.description, t.expression, t.priority, t.status'.
 				' ORDER BY h.host,t.description';
 
