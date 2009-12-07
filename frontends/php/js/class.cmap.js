@@ -44,7 +44,7 @@ var Cmap = Class.create();
 Cmap.prototype = {
 id:	null,							// own id
 sysmapid: null,						// sysmapid
-container: null,					// selements and links HTML container (D&D dropable area)
+container: null,					// selements and links HTML container (D&D droppable area)
 mapimg: null,						// HTML element map img
 
 selements: {},						// map selements array
