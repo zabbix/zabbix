@@ -228,9 +228,9 @@ class CAlert extends CZBXAPI{
 		if(!is_null($options['userids'])){
 			zbx_value2array($options['userids']);
 
-			if(!is_null($options['extendoutput'])){
-				$sql_parts['select']['userid'] = 'a.userid';
-			}
+			// if(is_null($options['extendoutput'])){
+				// $sql_parts['select']['userid'] = 'a.userid';
+			// }
 
 			$field = 'a.userid';
 			if(!is_null($options['time_from']) || !is_null($options['time_till'])){
