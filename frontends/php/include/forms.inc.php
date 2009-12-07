@@ -6331,8 +6331,8 @@
 		$script_info = DBfetch(DBselect($sql));
 
 		$frmResult = new CFormTable($script_info['name'].': '.script_make_command($scriptid,$hostid));
-		$message = $result['message'];
-		if($result['flag'] != 0) {
+		$message = $result['value'];
+		if($result['response'] == 'failed'){
 			error($message);
 			$message = '';
 		}

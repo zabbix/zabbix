@@ -65,11 +65,7 @@ function script_make_command($scriptid,$hostid){
 function execute_script($scriptid,$hostid){
 	global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-	$res = true;
 	$message = array();
-
-	$command = script_make_command($scriptid,$hostid);
-	$nodeid = id2nodeid($hostid);
 
 	if(!$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)){
 		return false;
@@ -78,24 +74,34 @@ function execute_script($scriptid,$hostid){
 	$res = socket_connect($socket, $ZBX_SERVER, $ZBX_SERVER_PORT);
 
 	if($res){
-		$send = "Command\255$nodeid\255$hostid\255$command\n";
-		socket_write($socket,$send);
+		$json = new CJSON();
 
-		$res = socket_read($socket,65535);
+		$array = array();
+		$array['request'] = 'command'; 
+		$array['nodeid'] = id2nodeid($hostid); 
+		$array['scriptid'] = $scriptid; 
+		$array['hostid'] = $hostid; 
+
+		$send = $json->encode($array, false);
+
+		socket_write($socket, $send);
+
+		$res = socket_read($socket, 65535);
 	}
 
 	if($res){
-		list($flag,$msg) = explode("\255",$res);
-		$message['flag'] = $flag;
-		$message['message'] = $msg;
+		$json = new CJSON();
+
+		$rcv = $json->decode($res, true);
 	}
 	else{
-		$message['flag']=-1;
-		$message['message'] = S_CONNECT_TO_SERVER_ERROR.' ['.$ZBX_SERVER.':'.$ZBX_SERVER_PORT.'] ['.socket_strerror(socket_last_error()).']';
+		$rcv['response']='failed';
+		$rcv['value'] = S_CONNECT_TO_SERVER_ERROR.' ['.$ZBX_SERVER.':'.$ZBX_SERVER_PORT.']'.
+				' ['.socket_strerror(socket_last_error()).']';
 	}
 
 	socket_close($socket);
-return $message;
+return $rcv;
 }
 
 ?>
