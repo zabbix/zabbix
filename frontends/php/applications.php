@@ -272,7 +272,7 @@ include_once('include/page_header.php');
 		$frmApp->addVar("apphostid",$apphostid);
 
 		if(!isset($_REQUEST["applicationid"])){
-// anly new application can SELECT host
+// any new application can SELECT host
 			$frmApp->addRow(S_HOST,array(
 				new CTextBox("apphost",$apphost,32,'yes'),
 				new CButton("btn1",S_SELECT,
