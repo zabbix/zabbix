@@ -415,7 +415,7 @@ class zbxXML{
 		$doc->preserveWhiteSpace = false;
 		$doc->formatOutput = true;
 
-		return preg_replace_callback('/^( {2,})/m', array('self', 'space2tab'), $doc->saveXML());
+		return preg_replace_callback('/^( {2,})/m', array('zbxXML', 'space2tab'), $doc->saveXML());
 	}
 
 	private static function mapXML2arr($xml, $tag){
