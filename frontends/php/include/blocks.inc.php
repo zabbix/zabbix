@@ -223,8 +223,7 @@ function make_system_summary(){
 		'monitored' => 1,
 		'select_hosts' => 1,
 		'extendoutput' => 1,
-		'filter' => 1,
-		'only_true' => 1
+		'only_problems' => 1
 	);
 	$triggers = CTrigger::get($options);
 	order_result($triggers, 'lastchange', ZBX_SORT_DOWN);
@@ -425,8 +424,7 @@ function make_latest_issues($params = array()){
 		'limit' => $limit,
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
-		'filter' => 1,
-		'only_true' => 1
+		'only_problems' => 1
 	);
 	if(isset($params['groupid']) && ($params['groupid'] > 0))
 		$options['groupids'] = $params['groupid'];
