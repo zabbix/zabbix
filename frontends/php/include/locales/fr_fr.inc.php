@@ -170,9 +170,9 @@
 	'S_TIME_ZONE'=>			'Fuseau horaire',
 	'S_DO_NOT_KEEP_HISTORY_OLDER_THAN'=>			'Ne pas conserver l\'historique de plus de (en jours)',
 	'S_DO_NOT_KEEP_TRENDS_OLDER_THAN'=>			'Ne pas conserver les tendances de plus de (en jours)',
-	'S_MASTER_NODE'=>				'Noeud maitre',
-	'S_CHILD'=>					'Distant',
-	'S_MASTER'=>					'Maitre',
+	'S_MASTER_NODE'=>			'Noeud maitre',
+	'S_CHILD'=>			'Distant',
+	'S_MASTER'=>			'Maitre',
 	'S_NODE_UPDATED'=>			'Noeud modifié',
 	'S_CANNOT_UPDATE_NODE'=>			'Modification noeud impossible',
 	'S_NODE_ADDED'=>			'Noeud ajouté',
@@ -940,6 +940,10 @@
 	'S_COORDINATE_Y'=>			'Coordonnée Y',
 	'S_DISPLAYED_ELEMENTS'=>			'ELEMENTS AFFICHES',
 	'S_CONNECTORS'=>			'CONNECTEURS',
+	'S_EDIT_MAP_ELEMENT'=>			'Modifier l\'élément de la carte',
+	'S_ICON_DEFAULT'=>			'Icône (par défaut)',
+	'S_APPLY'=>			'Appliquer',
+	'S_MAP_ELEMENTS'=>			'Eléments de la carte',
 	'S_MAP_DELETED'=>			'Carte réseau supprimée',
 	'S_CANNOT_DELETE_MAP'=>			'Impossible de supprimer la carte réseau',
 	'S_MAPS_BIG'=>			'CARTES',
@@ -947,6 +951,10 @@
 	'S_CREATE_MAP'=>			'Créer carte',
 	'S_ICON_LABEL_LOCATION'=>			'Position de l\'icône du label',
 	'S_ICON_HIGHLIGHTING'=>			'Mise en évidence de l\'icône',
+	'S_LINK_INDICATORS'=>			'Indicateurs de lien',
+	'S_TYPE_OK'=>			'Type (OK)',
+	'S_COLOR_OK'=>			'Couleur (Problème)',
+	'S_USE_ADVANCED_ICONS'=>			'Utiliser les icônes avancées',
 	'S_BOTTOM'=>			'Bas',
 	'S_TOP'=>			'Haut',
 	'S_LINK_STATUS_INDICATORS'=>			'Lier les indicateurs de statut',
@@ -1429,6 +1437,7 @@
 	'S_HUNGARY_HU'=>			'Hongrois (HU)',
 	'S_POLISH_PL'=>			'Polonais (PL)',
 	'S_ZABBIX_BIG'=>			'ZABBIX',
+	'S_WELCOME'=>			'Bienvenue sur Zabbix ! Vous êtes connecté en tant que',
 	'S_HOST_PROFILES'=>			'Profils serveurs',
 	'S_HOST_PROFILES_BIG'=>			'PROFILS SERVEURS',
 	'S_EXTENDED_HOST_PROFILE'=>			'Profil d\'hôte étendu',
@@ -1443,14 +1452,10 @@
 	'S_NO_ITEMS'=>			'Aucun élément',
 	'S_DISCOVERY_RULES_BIG'=>			'REGLES DE DECOUVERTE',
 	'S_DISCOVERY_CHECKS_BIG'=>			'TESTS DE DECOUERTE',
-
-//	forms.inc.php
-//	popup_link_tr.php
 	'S_NEW_CONNECTOR'=>			'Nouveau connecteur',
 	'S_EDIT_CONNECTOR'=>			'Modifier le connecteur',
 	'S_MAP_ELEMENT'=>			'Elément de la carte',
 	'S_NEW_MAP_ELEMENT'=>			'Nouvel élément de la carte',
-
 	'S_INCLUDE'=>			'Inclure',
 	'S_EXCLUDE'=>			'Exclure',
 	'S_KEYWORD'=>			'Mot-clé',
@@ -1478,6 +1483,6 @@
 	'S_INCORRECT_DESCRIPTION'=>			'Description incorrecte',
 	'S_CANT_FORMAT_TREE'=>			'Production arbre de tri impossible',
 	'S_NO_PERMISSION'=>			'Vous n\'avez pas la permission d\'effectuer cette opération',
-
+	
 	);
 ?>
