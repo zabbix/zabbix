@@ -366,7 +366,7 @@ class CAlert extends CZBXAPI{
 						if(!isset($result[$alert['alertid']]['users']))
 							$result[$alert['alertid']]['users'] = array();
 
-						$result[$alert['alertid']]['users'][$alert['userid']] = alert('userid' => $alert['userid']);
+						$result[$alert['alertid']]['users'][$alert['userid']] = array('userid' => $alert['userid']);
 					}
 // mediatypeids
 					if(isset($alert['mediatypeid'])){
