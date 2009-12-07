@@ -1,5 +1,6 @@
 Changes for 1.7.5
 
+ - [ZBX-1444] added map link macro {host:key.func(param)} (Sasha)
  - [ZBX-1299] fixed "configure" script key "--with-ssh2[=ARG]", custom library path can be provided (Dmitry)
  - [ZBX-1409] fixed administrators cannot edit hosts (Vedmak)
  - [ZBX-1450] add disabling IPMI items if support of IPMI parameters was not compiled in (Sasha)
