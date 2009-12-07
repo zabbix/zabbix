@@ -1,5 +1,6 @@
 Changes for 1.7.5
 
+ - [ZBX-1437] fixed errors in events screen (Vedmak)
  - [ZBX-1433] fixed error viewing event (Vedmak)
  - [ZBX-954] improve wording on frontend buttons and elsewhere (Richlv)
  - [ZBX-1369] make more strings translatable (Richlv)
