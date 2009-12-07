@@ -582,6 +582,9 @@ include_once('include/page_header.php');
 
 	show_table_header(S_CONFIGURATION_OF_HOSTS, $frmForm);
 
+// TODO: neponjatno pochemu hostid sbrasivaetsja no on nuzhen dlja formi
+$thid = get_request('hostid', 0);
+
 	$params=array();
 	$options = array('only_current_node');
 	foreach($options as $option) $params[$option] = 1;
@@ -590,6 +593,7 @@ include_once('include/page_header.php');
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
 
 	validate_group($PAGE_GROUPS,$PAGE_HOSTS);
+$_REQUEST['hostid'] = $thid;
 ?>
 <?php
 	echo SBR;
