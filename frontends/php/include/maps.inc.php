@@ -1118,62 +1118,64 @@
  *     Aleksander Vladishev
  *
  */
-	function expand_map_element_label_by_data($db_element){
-		$label = $db_element['label'];
+	function expand_map_element_label_by_data($db_element, $link_label = null){
+		$label = (null != $db_element) ? $db_element['label'] : $link_label;
 
-		switch($db_element['elementtype']){
-		case SYSMAP_ELEMENT_TYPE_HOST:
-		case SYSMAP_ELEMENT_TYPE_TRIGGER:
-			while(zbx_strstr($label, '{HOSTNAME}') ||
-					zbx_strstr($label, '{HOST.DNS}') ||
-					zbx_strstr($label, '{IPADDRESS}') ||
-					zbx_strstr($label, '{HOST.CONN}'))
-			{
-				if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
-					$sql =' SELECT * FROM hosts WHERE hostid='.$db_element['elementid'];
-				}
-				else if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)
-					$sql =	'SELECT h.* '.
-						' FROM hosts h,items i,functions f '.
-						' WHERE h.hostid=i.hostid '.
-							' AND i.itemid=f.itemid '.
-							' AND f.triggerid='.$db_element['elementid'];
-				else{
-// Should never be here
-				}
-
-				$db_hosts = DBselect($sql);
-
-				if($db_host = DBfetch($db_hosts)){
-					if(zbx_strstr($label, '{HOSTNAME}')){
-						$label = str_replace('{HOSTNAME}', $db_host['host'], $label);
-					}
-
-					if(zbx_strstr($label, '{HOST.DNS}')){
-						$label = str_replace('{HOST.DNS}', $db_host['dns'], $label);
-					}
-
-					if(zbx_strstr($label, '{IPADDRESS}')){
-						$label = str_replace('{IPADDRESS}', $db_host['ip'], $label);
-					}
-
-					if(zbx_strstr($label, '{HOST.CONN}')){
-						$label = str_replace('{HOST.CONN}', $db_host['useip'] ? $db_host['ip'] : $db_host['dns'], $label);
-					}
-				}
-			}
-			break;
-		}
-
-		switch($db_element['elementtype']){
+		if (null != $db_element){
+			switch($db_element['elementtype']){
 			case SYSMAP_ELEMENT_TYPE_HOST:
-			case SYSMAP_ELEMENT_TYPE_MAP:
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
-			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-				while(zbx_strstr($label, '{TRIGGERS.UNACK}')){
-					$label = str_replace('{TRIGGERS.UNACK}', get_triggers_unacknowledged($db_element), $label);
+				while(zbx_strstr($label, '{HOSTNAME}') ||
+						zbx_strstr($label, '{HOST.DNS}') ||
+						zbx_strstr($label, '{IPADDRESS}') ||
+						zbx_strstr($label, '{HOST.CONN}'))
+				{
+					if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
+						$sql =' SELECT * FROM hosts WHERE hostid='.$db_element['elementid'];
+					}
+					else if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)
+						$sql =	'SELECT h.* '.
+							' FROM hosts h,items i,functions f '.
+							' WHERE h.hostid=i.hostid '.
+								' AND i.itemid=f.itemid '.
+								' AND f.triggerid='.$db_element['elementid'];
+					else{
+// Should never be here
+					}
+
+					$db_hosts = DBselect($sql);
+
+					if($db_host = DBfetch($db_hosts)){
+						if(zbx_strstr($label, '{HOSTNAME}')){
+							$label = str_replace('{HOSTNAME}', $db_host['host'], $label);
+						}
+
+						if(zbx_strstr($label, '{HOST.DNS}')){
+							$label = str_replace('{HOST.DNS}', $db_host['dns'], $label);
+						}
+
+						if(zbx_strstr($label, '{IPADDRESS}')){
+							$label = str_replace('{IPADDRESS}', $db_host['ip'], $label);
+						}
+
+						if(zbx_strstr($label, '{HOST.CONN}')){
+							$label = str_replace('{HOST.CONN}', $db_host['useip'] ? $db_host['ip'] : $db_host['dns'], $label);
+						}
+					}
 				}
 				break;
+			}
+
+			switch($db_element['elementtype']){
+				case SYSMAP_ELEMENT_TYPE_HOST:
+				case SYSMAP_ELEMENT_TYPE_MAP:
+				case SYSMAP_ELEMENT_TYPE_TRIGGER:
+				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+					while(zbx_strstr($label, '{TRIGGERS.UNACK}')){
+						$label = str_replace('{TRIGGERS.UNACK}', get_triggers_unacknowledged($db_element), $label);
+					}
+					break;
+			}
 		}
 
 		while(false !== ($pos = strpos($label, '{'))){
