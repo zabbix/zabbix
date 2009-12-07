@@ -316,9 +316,6 @@ void	init_config(void)
 #ifndef	HAVE_LIBCURL
 	CONFIG_HTTPPOLLER_FORKS = 0;
 #endif
-#ifndef	HAVE_OPENIPMI
-	CONFIG_IPMIPOLLER_FORKS = 0;
-#endif
 }
 
 /******************************************************************************
