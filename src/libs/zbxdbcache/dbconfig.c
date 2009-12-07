@@ -2259,6 +2259,41 @@ static ZBX_DC_HOST	*DCget_dc_host(zbx_uint64_t hostid)
 
 /******************************************************************************
  *                                                                            *
+ * Function: DCget_host_by_hostid                                             *
+ *                                                                            *
+ * Purpose: Locate host in configuration cache                                *
+ *                                                                            *
+ * Parameters: host - [OUT] pointer to DC_HOST structure                      *
+ *             hostid - [IN] host ID from database                            *
+ *                                                                            *
+ * Return value: SUCCEED if record located and FAIL otherwise                 *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments: !!! configuration cache must be locked !!!                       *
+ *                                                                            *
+ ******************************************************************************/
+int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid)
+{
+	int		res = FAIL;
+	ZBX_DC_HOST	*dc_host;
+
+	LOCK_CACHE;
+
+	if (NULL == (dc_host = DCget_dc_host(hostid)))
+		goto unlock;
+
+	DCget_host(host, dc_host);
+
+	res = SUCCEED;
+unlock:
+	UNLOCK_CACHE;
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DCget_dc_flexitem                                                *
  *                                                                            *
  * Purpose: Locate item record in configuration cache by itemid               *

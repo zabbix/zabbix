@@ -233,6 +233,7 @@ void	DCsync_confguration();
 void	init_configuration_cache();
 void	free_configuration_cache();
 
+int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
 int	DCconfig_get_item_by_key(DC_ITEM *item, zbx_uint64_t proxy_hostid, const char *hostname, const char *key);
 int	DCconfig_get_item_by_itemid(DC_ITEM *item, zbx_uint64_t itemid);
 int	DCconfig_get_poller_items(unsigned char poller_type, unsigned char poller_num, int now,

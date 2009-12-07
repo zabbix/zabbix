@@ -46,7 +46,9 @@
 #define ZBX_PROTO_TAG_STATUS		"status"
 #define ZBX_PROTO_TAG_TYPE		"type"
 #define ZBX_PROTO_TAG_VALUE		"value"
+#define ZBX_PROTO_TAG_SCRIPTID		"scriptid"
 #define ZBX_PROTO_TAG_HOSTID		"hostid"
+#define ZBX_PROTO_TAG_NODEID		"nodeid"
 #define ZBX_PROTO_TAG_AVAILABLE		"available"
 #define ZBX_PROTO_TAG_SNMP_AVAILABLE	"snmp_available"
 #define ZBX_PROTO_TAG_IPMI_AVAILABLE	"ipmi_available"
@@ -66,6 +68,7 @@
 #define ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA	"auto registration"
 #define	ZBX_PROTO_VALUE_SENDER_DATA		"sender data"
 #define	ZBX_PROTO_VALUE_AGENT_DATA		"agent data"
+#define ZBX_PROTO_VALUE_COMMAND			"command"
 
 typedef enum
 {
