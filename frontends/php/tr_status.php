@@ -124,8 +124,15 @@ include_once('include/page_header.php');
 
 	$config = select_config();
 
-	$_REQUEST['groupid'] = get_request('groupid', 0);
-	$_REQUEST['hostid'] = get_request('hostid', 0);
+	$options = array('allow_all_hosts','with_monitored_triggers');
+	$params = array();
+	foreach($options as  $option) $params[$option] = 1;
+	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
+	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
+	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
+	
+	// $_REQUEST['groupid'] = get_request('groupid', 0);
+	// $_REQUEST['hostid'] = get_request('hostid', 0);
 
 /* FILTER */
 	if(isset($_REQUEST['filter_rst'])){
@@ -175,16 +182,6 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-	$options = array('allow_all_hosts','with_monitored_triggers');
-	//if(!$ZBX_WITH_ALL_NODES)	array_push($options,'only_current_node');
-
-//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
-	$params = array();
-	foreach($options as  $option) $params[$option] = 1;
-	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
-	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
-//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
-	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
 
 
 	$trigg_wdgt = new CWidget();
