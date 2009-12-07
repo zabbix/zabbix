@@ -619,10 +619,10 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 				ZBX_STR2UINT64(hostid, row2[0]);
 				ZBX_STR2UINT64(host_proxy_hostid, row2[3]);
 
-				if (0 != strcmp(host, row2[1]) || port != atoi(row2[2]) || host_proxy_hostid != proxy_hostid)
+				if (0 != strcmp(host, row2[1]) || host_proxy_hostid != proxy_hostid)
 				{
 					DBexecute("update hosts"
-							" set dns='%s',port=%d,proxy_hostid=" ZBX_FS_UI64
+							" set dns='%s',proxy_hostid=" ZBX_FS_UI64
 							" where hostid=" ZBX_FS_UI64,
 							host_esc, port, proxy_hostid,
 							hostid);
