@@ -205,8 +205,11 @@ include_once('include/page_header.php');
 // users
 //		$user = array_pop($row['users']);
 // mediatypes
+
 		$mediatype = array_pop($row['mediatypes']);
 
+		if($mediatype['mediatypeid'] == 0) $mediatype = array('description' => '');
+		
 		$time = date(S_DATE_FORMAT_YMDHMS,$row['clock']);
 
 		if($row['status'] == ALERT_STATUS_SENT){
