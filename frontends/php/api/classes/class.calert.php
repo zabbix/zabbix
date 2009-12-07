@@ -476,7 +476,7 @@ class CAlert extends CZBXAPI{
 			$sql = 'INSERT INTO alerts '.
 					'(alertid, actionid, eventid, userid, mediatypeid, clock, sendto, subject, message, status, retries, error, nextcheck, esc_step, alerttype) '.
 					' VALUES ('.$alertid.','.$alert['actionid'].','.$alert['eventid'].','.$alert['userid'].','.$alert['mediatypeid'].','.
-								$alert['clock'].','.zbx_dbstr($alert['sentto']).','.zbx_dbstr($alert['subject']).','.zbx_dbstr($alert['message']).','.
+								$alert['clock'].','.zbx_dbstr($alert['sendto']).','.zbx_dbstr($alert['subject']).','.zbx_dbstr($alert['message']).','.
 								$alert['status'].','.$alert['retries'].','.zbx_dbstr($alert['error']).','.$alert['nextcheck'].','.
 								$alert['esc_step'].','.$alert['alerttype'].' )';
 			$result = DBexecute($sql);
