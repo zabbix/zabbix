@@ -74,12 +74,19 @@ include_once('include/page_header.php');
 		$_REQUEST['form'] = 'clone';
 	}
 	else if(isset($_REQUEST['save'])){
-		$hosts = get_request('hosts', array());
-		$hosts = available_hosts($hosts, 1);
+	
+		$objects = get_request('hosts', array());
 
+		$hosts = CHost::get(array('hostids' => $objects, 'editable' => 1));
+		$templates = CTemplate::get(array('templateids' => $objects, 'editable' => 1));
+			
 		if(isset($_REQUEST['groupid'])){
 			DBstart();
-			$result = update_host_group($_REQUEST['groupid'], $_REQUEST['gname'], $hosts);
+			$result = CHostgroup::update(array('groupid' => $_REQUEST['groupid'], 'name' => $_REQUEST['gname']));			
+			if($result === false) error(CHostGroup::resetErrors());
+			if($result) $result = CHostGroup::massUpdate(array('hosts' => $hosts, 'templates' => $templates, 'groups' => $result));
+			if($result === false) error(CHostGroup::resetErrors());
+			$result = ($result) ? true : false;
 			$result = DBend($result);
 
 			$msg_ok		= S_GROUP_UPDATED;
@@ -90,8 +97,12 @@ include_once('include/page_header.php');
 				access_deny();
 
 			DBstart();
-			$groupid = add_host_group($_REQUEST['gname'], $hosts);
-			$result = DBend($groupid);
+			$result = CHostgroup::create(array('name' => $_REQUEST['gname']));			
+			if($result === false) error(CHostGroup::resetErrors());
+			if($result) $result = CHostGroup::massAdd(array('hosts' => $hosts, 'templates' => $templates, 'groups' => $result));
+			if($result === false) error(CHostGroup::resetErrors());
+			$result = ($result) ? true : false;
+			$result = DBend($result);
 
 			$msg_ok		= S_GROUP_ADDED;
 			$msg_fail	= S_CANNOT_ADD_GROUP;
