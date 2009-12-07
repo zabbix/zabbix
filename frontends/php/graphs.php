@@ -532,9 +532,11 @@ include_once('include/page_header.php');
 				$real_hosts = get_realhosts_by_graphid($graph['templateid']);
 				$real_host = DBfetch($real_hosts);
 				$name[] = new CLink($real_host['host'], 'graphs.php?'.'hostid='.$real_host['hostid'], 'unknown');
-				$name[] = ':';
+				$name[] = ':'.$graph['name'];
 			}
-			$name[] = new CLink($graph['name'], 'graphs.php?graphid='.$graphid.'&form=update');
+			else{
+				$name[] = new CLink($graph['name'], 'graphs.php?graphid='.$graphid.'&form=update');
+			}
 
 
 			$chkBox = new CCheckBox('group_graphid['.$graphid.']', NULL, NULL, $graphid);

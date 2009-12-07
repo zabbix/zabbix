@@ -1,5 +1,6 @@
 Changes for 1.7.5
 
+ - [ZBX-1449] fixed possibility of editing templated graphs (Vedmak)
  - [ZBX-1174] fixed "Add host" operation in "Discovery" module, ports are now never updated when the host already exists (Dmitry)
  - [ZBX-1357] updated French translation. Thanks to alixen (Richlv)
  - [1306] fixed showing triggers that recently changed state as errors in dashboard (Vedmak)
