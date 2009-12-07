@@ -91,8 +91,6 @@ typedef enum {
 #define DB_DCHECK	struct zbx_dcheck_type
 #define DB_EVENT	struct zbx_event_type
 #define DB_FUNCTION	struct zbx_function_type
-#define DB_GRAPH	struct zbx_graph_type
-#define DB_GRAPH_ITEM	struct zbx_graph_item_type
 #define DB_HOST		struct zbx_host_type
 #define DB_HOUSEKEEPER	struct zbx_housekeeper_type
 #define DB_ITEM		struct zbx_item_type
@@ -107,7 +105,7 @@ typedef enum {
 #define DB_ESCALATION	struct zbx_escalation_type
 
 /* Trigger related defines */
-#define TRIGGER_DESCRIPTION_LEN		255
+#define TRIGGER_DESCRIPTION_LEN		1020
 #define TRIGGER_DESCRIPTION_LEN_MAX	TRIGGER_DESCRIPTION_LEN+1
 #define TRIGGER_EXPRESSION_LEN		255
 #define TRIGGER_EXPRESSION_LEN_MAX	TRIGGER_EXPRESSION_LEN+1
@@ -115,9 +113,6 @@ typedef enum {
 #define TRIGGER_URL_LEN_MAX		TRIGGER_URL_LEN+1
 #define TRIGGER_ERROR_LEN		128
 #define TRIGGER_ERROR_LEN_MAX		TRIGGER_ERROR_LEN+1
-
-#define CONDITION_VALUE_LEN		255
-#define CONDITION_VALUE_LEN_MAX		CONDITION_VALUE_LEN+1
 
 #define HOST_HOST_LEN			64
 #define HOST_HOST_LEN_MAX		HOST_HOST_LEN+1
@@ -134,10 +129,8 @@ typedef enum {
 #define HOST_IPMI_PASSWORD_LEN		20
 #define HOST_IPMI_PASSWORD_LEN_MAX	HOST_IPMI_PASSWORD_LEN+1
 
-#define ITEM_KEY_LEN			255
+#define ITEM_KEY_LEN			1020
 #define ITEM_KEY_LEN_MAX		ITEM_KEY_LEN+1
-#define ITEM_DESCRIPTION_LEN		255
-#define ITEM_DESCRIPTION_LEN_MAX	ITEM_DESCRIPTION_LEN+1
 #define ITEM_SNMP_COMMUNITY_LEN		64
 #define ITEM_SNMP_COMMUNITY_LEN_MAX	ITEM_SNMP_COMMUNITY_LEN+1
 #define ITEM_SNMP_OID_LEN		255
@@ -200,17 +193,8 @@ typedef enum {
 #define ALERT_ERROR_LEN			128
 #define ALERT_ERROR_LEN_MAX		ALERT_ERROR_LEN+1
 
-#define APPLICATION_NAME_LEN		255
-#define APPLICATION_NAME_LEN_MAX	APPLICATION_NAME_LEN+1
-
-#define GRAPH_NAME_LEN			128
-#define GRAPH_NAME_LEN_MAX		GRAPH_NAME_LEN+1
-
 #define GRAPH_ITEM_COLOR_LEN		6
 #define GRAPH_ITEM_COLOR_LEN_MAX	GRAPH_ITEM_COLOR_LEN+1
-
-#define ACTION_SUBJECT_LEN		255
-#define ACTION_SUBJECT_LEN_MAX		ACTION_SUBJECT_LEN+1
 
 #define DHOST_IP_LEN			39
 #define DHOST_IP_LEN_MAX		DHOST_IP_LEN+1
@@ -316,27 +300,6 @@ DB_HOST
 	int	errors_from;
 	char	error[HOST_ERROR_LEN_MAX];
 	int	available;
-};
-
-DB_GRAPH
-{
-	zbx_uint64_t	graphid;
-	char	name[GRAPH_NAME_LEN_MAX];
-	int	width;
-	int	height;
-	int	yaxistype;
-	double	yaxismin;
-	double	yaxismax;
-};
-
-DB_GRAPH_ITEM
-{
-	zbx_uint64_t	gitemid;
-	zbx_uint64_t	graphid;
-	zbx_uint64_t	itemid;
-	int	drawtype;
-	int	sortorder;
-	char	color[GRAPH_ITEM_COLOR_LEN_MAX];
 };
 
 DB_ITEM
@@ -631,8 +594,6 @@ int	DBget_trigger_by_triggerid(int triggerid,DB_TRIGGER *trigger);
 int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid);
 void	DBdelete_sysmaps_hosts_by_hostid(zbx_uint64_t hostid);
 
-int	DBget_graph_item_by_gitemid(int gitemid, DB_GRAPH_ITEM *graph_item);
-int	DBget_graph_by_graphid(int graphid, DB_GRAPH *graph);
 int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid);
 void	get_latest_event_status(zbx_uint64_t triggerid, int *prev_status, int *latest_status);
 
