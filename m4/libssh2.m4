@@ -6,7 +6,7 @@
 # specify whether to default to --with-ssh2 or --without-ssh2.
 # If not supplied, DEFAULT-ACTION is no.
 #
-# This macro #defines HAVE_SSH2 if a required header files is
+# This macro #defines HAVE_SSH2 if a required header files are
 # found, and sets @SSH2_LDFLAGS@, @SSH2_CFLAGS@ and @SSH2_LIBS@
 # to the necessary values.
 #
@@ -27,56 +27,57 @@ AC_TRY_LINK(
 	LIBSSH2_SESSION	*session;
 	session = libssh2_session_init();
 ],
-found_ssh2="yes")
+found_ssh2="yes",)
 ])dnl
 
 AC_DEFUN([LIBSSH2_CHECK_CONFIG],
 [
   AC_ARG_WITH(ssh2,[
 If you want to use SSH2 based checks:
-AC_HELP_STRING([--with-ssh2@<:@=DIR@:>@],[use SSH2 package @<:@default=no@:>@, DIR is the SSH2 library install directory.])],[
+AC_HELP_STRING([--with-ssh2@<:@=DIR@:>@],[use SSH2 package @<:@default=no@:>@, DIR is the SSH2 library install directory.])],
+    [
 	if test "$withval" = "no"; then
 	    want_ssh2="no"
 	    _libssh2_dir="no"
 	elif test "$withval" = "yes"; then
 	    want_ssh2="yes"
-	    _libssh2_dir="yes"
+	    _libssh2_dir="no"
 	else
 	    want_ssh2="yes"
 	    _libssh2_dir=$withval
 	fi
-    ],[want_ssh2=ifelse([$1],,[no],[$1])])
+    ],[want_ssh2=ifelse([$1],,[no],[$1])]
+  )
 
-  if test "x$want_ssh2" != "xno"; then
-    AC_MSG_CHECKING(for SSH2 support)
-
-    if test "x$want_ssh2" = "xyes"; then
-      if test -f /usr/include/libssh2.h; then
-        SSH2_CFLAGS=-I$/usr/include
-        SSH2_LDFLAGS=-L$/usr/lib
-        SSH2_LIBS="-lssh2"
-        found_ssh2="yes"
-      elif test -f /usr/local/include/libssh2.h; then
-        SSH2_CFLAGS=-I$/usr/local/include
-        SSH2_LDFLAGS=-L$/usr/local/lib
-        SSH2_LIBS="-lssh2"
-        found_ssh2="yes"
-      else
-        found_ssh2="no"
-        AC_MSG_RESULT(no)
-      fi
-    else
-      if test -f $_libssh2_dir/include/libssh2.h; then
-        SSH2_CFLAGS=-I$_libssh2_dir/include
-        SSH2_LDFLAGS=-L$_libssh2_dir/lib
-        SSH2_LIBS="-lssh2"
-        found_ssh2="yes"
-      else
-        found_ssh2="no"
-        AC_MSG_RESULT(no)
-      fi
-    fi
-  fi
+  if test "x$want_ssh2" = "xyes"; then
+     AC_MSG_CHECKING(for SSH2 support)
+     if test "x$_libssh2_dir" = "xno"; then
+       if test -f /usr/include/libssh2.h; then
+         SSH2_CFLAGS=-I$/usr/include
+         SSH2_LDFLAGS=-L$/usr/lib
+         SSH2_LIBS="-lssh2"
+         found_ssh2="yes"
+       elif test -f /usr/local/include/libssh2.h; then
+         SSH2_CFLAGS=-I$/usr/local/include
+         SSH2_LDFLAGS=-L$/usr/local/lib
+         SSH2_LIBS="-lssh2"
+         found_ssh2="yes"
+       else #libraries are not found in default directories
+         found_ssh2="no"
+         AC_MSG_RESULT(no)
+       fi # test -f /usr/include/libssh2.h; then
+     else # test "x$_libssh2_dir" = "xno"; then
+       if test -f $_libssh2_dir/include/libssh2.h; then
+	 SSH2_CFLAGS=-I$_libssh2_dir/include
+         SSH2_LDFLAGS=-L$_libssh2_dir/lib
+         SSH2_LIBS="-lssh2"
+         found_ssh2="yes"
+       else #if test -f $_libssh2_dir/include/libssh2.h; then
+         found_ssh2="no"
+         AC_MSG_RESULT(no)
+       fi #test -f $_libssh2_dir/include/libssh2.h; then
+     fi #if test "x$_libssh2_dir" = "xno"; then
+  fi # if test "x$want_ssh2" != "xno"; then
 
   if test "x$found_ssh2" == "xyes"; then
     am_save_cflags="$CFLAGS"
@@ -98,6 +99,7 @@ AC_HELP_STRING([--with-ssh2@<:@=DIR@:>@],[use SSH2 package @<:@default=no@:>@, D
       AC_DEFINE([HAVE_SSH2], 1, [Define to 1 if you have the 'libssh2' library (-lssh2)])
       AC_MSG_RESULT(yes)
     else
+      AC_MSG_RESULT(no)
       SSH2_CFLAGS=""
       SSH2_LDFLAGS=""
       SSH2_LIBS=""
