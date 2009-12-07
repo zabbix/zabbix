@@ -120,7 +120,7 @@ void    signal_handler( int sig )
  *                                                                            *
  * Function: get_value                                                        *
  *                                                                            *
- * Purpose: connect to ZABBIX agent and receive value for given key           *
+ * Purpose: connect to Zabbix agent and receive value for given key           *
  *                                                                            *
  * Parameters: host   - serv name or IP address                               *
  *             port   - port number                                           *

@@ -14,7 +14,7 @@ is a command line utility for sending data to a remote Zabbix Server.
 .IP "-c, --config \fI<file>\fR"
 Specify agent configuration file for reading server details.
 .IP "-z, --zabbix-server \fI<server>\fR"
-Hostname or IP address of ZABBIX Server.
+Hostname or IP address of Zabbix Server.
 .IP "-p, --port \fI<port>\fR"
 Specify port number of server trapper running on the server. Default is 10051.
 .IP "-s, --host \fI<host>\fR"
