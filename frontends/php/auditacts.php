@@ -165,7 +165,6 @@ include_once('include/page_header.php');
 //-------
 
 	$options = array(
-		'alerttype' => ALERT_TYPE_MESSAGE,
 		'extendoutput' => 1,
 //				'select_users' => 1,
 		'select_mediatypes' => 1,
@@ -213,7 +212,10 @@ include_once('include/page_header.php');
 		$time = date(S_DATE_FORMAT_YMDHMS,$row['clock']);
 
 		if($row['status'] == ALERT_STATUS_SENT){
-			$status=new CSpan(S_SENT,'green');
+			if ($row['alerttype'] == ALERT_TYPE_MESSAGE)
+				$status=new CSpan(S_SENT,'green');
+			else
+				$status=new CSpan(S_EXECUTED,'green');
 			$retries=new CSpan(SPACE,'green');
 		}
 		else if($row['status'] == ALERT_STATUS_NOT_SENT){
@@ -226,7 +228,10 @@ include_once('include/page_header.php');
 		}
 		$sendto=$row['sendto'];
 
-		$message = array(bold(S_SUBJECT.': '), br(), $row['subject'], br(), br(), bold(S_MESSAGE.': '), br(), $row['message']);
+		if ($row['alerttype'] == ALERT_TYPE_MESSAGE)
+			$message = array(bold(S_SUBJECT.': '), br(), $row['subject'], br(), br(), bold(S_MESSAGE.': '), br(), $row['message']);
+		else
+			$message = array(bold(S_COMMAND.': '), br(), $row['message']);
 
 		if(empty($row['error'])){
 			$error=new CSpan(SPACE,'off');

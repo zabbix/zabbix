@@ -144,6 +144,7 @@ typedef struct zbx_result_s {
 void    *get_result_value_by_type(AGENT_RESULT *result, int require_type);
 
 extern int	CONFIG_ENABLE_REMOTE_COMMANDS;
+extern int	CONFIG_LOG_REMOTE_COMMANDS;
 
 /* #define TEST_PARAMETERS */
 
