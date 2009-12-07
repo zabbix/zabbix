@@ -1,5 +1,7 @@
 Changes for 1.7.5
 
+ - [DEV-316] added logging of executed commands on agent side. Parameter LogRemoteCommands (Sasha)
+ - [DEV-316] implemented displaing of history of remote commands (Sasha)
  - [ZBX-1444] added map link macro {host:key.func(param)} (Sasha)
  - [ZBX-1299] fixed "configure" script key "--with-ssh2[=ARG]", custom library path can be provided (Dmitry)
  - [ZBX-1409] fixed administrators cannot edit hosts (Vedmak)

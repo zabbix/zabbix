@@ -389,7 +389,10 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	if (*command == '\0')
 		return SYSINFO_RET_FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Run command '%s'", command);
+	if (CONFIG_LOG_REMOTE_COMMANDS == 1)
+		zabbix_log(LOG_LEVEL_WARNING, "Executing command '%s'", command);
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "Executing command '%s'", command);
 
 	if (0 != get_param(param, 2, flag, sizeof(flag)))
 		*flag = '\0';
