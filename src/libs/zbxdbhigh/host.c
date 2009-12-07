@@ -1128,7 +1128,7 @@ static int	DBadd_graph_item(zbx_uint64_t graphid, ZBX_GRAPH_ITEMS *gitem)
 
 	gitemid = DBget_maxid("graphs_items", "gitemid");
 
-	color_esc = DBdyn_escape_string_len(gitem->color, GRAPH_ITEM_COLOR_LEN);
+	color_esc = DBdyn_escape_string(gitem->color);
 
 	DBexecute("insert into graphs_items (gitemid,graphid,itemid,drawtype,"
 			"sortorder,color,yaxisside,calc_fnc,type,periods_cnt)"
@@ -1254,7 +1254,7 @@ static int	DBupdate_graph(
 		old_graphtype = atoi(row[0]);
 	DBfree_result(result);
 
-	name_esc = DBdyn_escape_string_len(name, GRAPH_NAME_LEN);
+	name_esc = DBdyn_escape_string(name);
 
 	DBexecute(
 		"update graphs"
@@ -1544,7 +1544,7 @@ static int	DBadd_graph(
 
 	*new_graphid = DBget_maxid("graphs", "graphid");
 
-	name_esc = DBdyn_escape_string_len(name, GRAPH_NAME_LEN);
+	name_esc = DBdyn_escape_string(name);
 
 	DBexecute("insert into graphs"
 			" (graphid,name,width,height,yaxismin,yaxismax,templateid,"
@@ -2699,7 +2699,7 @@ static int	DBupdate_trigger(
 
 		}
 		if( description ) {
-			str_esc = DBdyn_escape_string_len(description, TRIGGER_DESCRIPTION_LEN);
+			str_esc = DBdyn_escape_string(description);
 			sql = zbx_strdcatf(sql, " description='%s',", str_esc);
 			zbx_free(str_esc);
 		}
@@ -2929,9 +2929,9 @@ static int	DBcopy_trigger_to_host(
 
 			new_triggerid = DBget_maxid("triggers","triggerid");
 
-			description_esc = DBdyn_escape_string_len(trigger_data[0], TRIGGER_DESCRIPTION_LEN);
+			description_esc = DBdyn_escape_string(trigger_data[0]);
 			comments_esc = DBdyn_escape_string(trigger_data[3]);
-			url_esc = DBdyn_escape_string_len(trigger_data[4], TRIGGER_URL_LEN);
+			url_esc = DBdyn_escape_string(trigger_data[4]);
 
 			DBexecute("insert into triggers"
 				" (triggerid,description,priority,status,comments,url,type,value,expression,templateid)"
@@ -2960,8 +2960,8 @@ static int	DBcopy_trigger_to_host(
 				ZBX_STR2UINT64(itemid, function_data[0]);
 				ZBX_STR2UINT64(functionid, function_data[3]);
 
-				function_esc = DBdyn_escape_string_len(function_data[1], FUNCTION_FUNCTION_LEN);
-				parameter_esc = DBdyn_escape_string_len(function_data[2], FUNCTION_PARAMETER_LEN);
+				function_esc = DBdyn_escape_string(function_data[1]);
+				parameter_esc = DBdyn_escape_string(function_data[2]);
 
 				search = zbx_dsprintf(NULL, "{" ZBX_FS_UI64 "}", functionid);
 
@@ -3450,7 +3450,7 @@ static int	DBcopy_template_applications(zbx_uint64_t hostid, zbx_uint64_t templa
 	{
 		ZBX_STR2UINT64(template_applicationid, row[0]);
 
-		name_esc = DBdyn_escape_string_len(row[1], APPLICATION_NAME_LEN);
+		name_esc = DBdyn_escape_string(row[1]);
 
 		if (SUCCEED != (DBis_null(row[2])))
 		{
@@ -3587,23 +3587,23 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 	{
 		ZBX_STR2UINT64(template_itemid, row[0]);
 
-		description_esc			= DBdyn_escape_string_len(row[1], ITEM_DESCRIPTION_LEN);
-		delay_flex_esc			= DBdyn_escape_string_len(row[7], ITEM_DELAY_FLEX_LEN);
-		trapper_hosts_esc		= DBdyn_escape_string_len(row[11], ITEM_TRAPPER_HOSTS_LEN);
-		units_esc			= DBdyn_escape_string_len(row[12], ITEM_UNITS_LEN);
-		formula_esc			= DBdyn_escape_string_len(row[15], ITEM_FORMULA_LEN);
-		logtimefmt_esc			= DBdyn_escape_string_len(row[16], ITEM_LOGTIMEFMT_LEN);
-		params_esc			= DBdyn_escape_string_len(row[18], ITEM_PARAMS_LEN);
-		ipmi_sensor_esc			= DBdyn_escape_string_len(row[19], ITEM_IPMI_SENSOR_LEN);
-		snmp_community_esc		= DBdyn_escape_string_len(row[20], ITEM_SNMP_COMMUNITY_LEN);
-		snmp_oid_esc			= DBdyn_escape_string_len(row[21], ITEM_SNMP_OID_LEN);
-		snmpv3_securityname_esc		= DBdyn_escape_string_len(row[23], ITEM_SNMPV3_SECURITYNAME_LEN);
-		snmpv3_authpassphrase_esc	= DBdyn_escape_string_len(row[25], ITEM_SNMPV3_AUTHPASSPHRASE_LEN);
-		snmpv3_privpassphrase_esc	= DBdyn_escape_string_len(row[26], ITEM_SNMPV3_PRIVPASSPHRASE_LEN);
-		username_esc			= DBdyn_escape_string_len(row[28], ITEM_USERNAME_LEN);
-		password_esc			= DBdyn_escape_string_len(row[29], ITEM_PASSWORD_LEN);
-		publickey_esc			= DBdyn_escape_string_len(row[30], ITEM_PUBLICKEY_LEN);
-		privatekey_esc			= DBdyn_escape_string_len(row[31], ITEM_PRIVATEKEY_LEN);
+		description_esc			= DBdyn_escape_string(row[1]);
+		delay_flex_esc			= DBdyn_escape_string(row[7]);
+		trapper_hosts_esc		= DBdyn_escape_string(row[11]);
+		units_esc			= DBdyn_escape_string(row[12]);
+		formula_esc			= DBdyn_escape_string(row[15]);
+		logtimefmt_esc			= DBdyn_escape_string(row[16]);
+		params_esc			= DBdyn_escape_string(row[18]);
+		ipmi_sensor_esc			= DBdyn_escape_string(row[19]);
+		snmp_community_esc		= DBdyn_escape_string(row[20]);
+		snmp_oid_esc			= DBdyn_escape_string(row[21]);
+		snmpv3_securityname_esc		= DBdyn_escape_string(row[23]);
+		snmpv3_authpassphrase_esc	= DBdyn_escape_string(row[25]);
+		snmpv3_privpassphrase_esc	= DBdyn_escape_string(row[26]);
+		username_esc			= DBdyn_escape_string(row[28]);
+		password_esc			= DBdyn_escape_string(row[29]);
+		publickey_esc			= DBdyn_escape_string(row[30]);
+		privatekey_esc			= DBdyn_escape_string(row[31]);
 
 		if (SUCCEED != (DBis_null(row[32])))
 		{
@@ -3685,7 +3685,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
 		{
 			itemid = DBget_maxid("items","itemid");
 
-			key_esc = DBdyn_escape_string_len(row[2], ITEM_KEY_LEN);
+			key_esc = DBdyn_escape_string(row[2]);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8192,
 					"insert into items"
