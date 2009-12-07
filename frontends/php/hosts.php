@@ -166,7 +166,6 @@ include_once('include/page_header.php');
 			unset($_REQUEST['value_new']);
 		}
 	}
-
 // UNLINK HOST
 	if(isset($_REQUEST['templates_rem']) && (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear']))){
 		$_REQUEST['clear_templates'] = get_request('clear_templates', array());
@@ -178,18 +177,15 @@ include_once('include/page_header.php');
 		foreach($unlink_templates as $id)
 			unset($_REQUEST['templates'][$id]);
 	}
-
 // CLONE HOST
 	else if(isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])){
 		unset($_REQUEST['hostid']);
 		$_REQUEST['form'] = 'clone';
 	}
-
 // FULL CLONE HOST
 	else if(isset($_REQUEST['full_clone']) && isset($_REQUEST['hostid'])){
 		$_REQUEST['form'] = 'full_clone';
 	}
-
 // HOST MASS UPDATE
 	else if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['save'])){
 		$hosts = get_request('hosts', array());
@@ -217,9 +213,9 @@ include_once('include/page_header.php');
 
 		// if(isset($visible['newgroup'])){
 			// $newgroup = get_request('newgroup', '');
-			// $newgroupid = CHostGroup::add(array('name' => $newgroup));
+			// $newgroupid = CHostGroup::create(array('name' => $newgroup));
 			// $newgroupid = reset($newgroupid);
-			// CHostGroup::addHosts(array('hostids' => $hostids, 'groupids' => $newgroupid));
+			// CHostGroup::createHosts(array('hostids' => $hostids, 'groupids' => $newgroupid));
 		// }
 
 		foreach($hosts as $id => $hostid){
@@ -337,20 +333,15 @@ include_once('include/page_header.php');
 	}
 // SAVE HOST
 	else if(isset($_REQUEST['save'])){
-		$useip = get_request('useip', 0);
-		$useipmi = get_request('useipmi', 'no');
+		$useipmi = isset($_REQUEST['useipmi']) ? 1 : 0;
 		$templates = get_request('templates', array());
+		$templates_clear = get_request('clear_templates', array());
 		$proxy_hostid = get_request('proxy_hostid', 0);
-		$groups= get_request('groups', array());
+		$groups = get_request('groups', array());
+		
+		$result = true;
 
-		if(count($groups) > 0){
-			$g1 = count($groups);
-			$groups = CHostGroup::get(array('groupids' => $groups, 'editable' => 1));
-			if(count($groups) != $g1) access_deny();
-		}
-		else{
-			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))) access_deny();
-		}
+		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))) access_deny();
 
 
 		$clone_hostid = false;
@@ -359,42 +350,86 @@ include_once('include/page_header.php');
 			unset($_REQUEST['hostid']);
 		}
 
+		$templates = array_keys($templates);
+		$templates = zbx_toObject($templates, 'templateid');		
+		$templates_clear = zbx_toObject($templates_clear, 'templateid');
 // START SAVE TRANSACTION {{{
 		DBstart();
 
-		if(isset($_REQUEST['hostid'])){
+		$groups = zbx_toObject($groups, 'groupid');
+		if(!empty($_REQUEST['newgroup'])){
+			if($newgroup = CHostGroup::create(array('name' => $_REQUEST['newgroup']))){
+				$groups = array_merge($groups, $newgroup);
+			}
+			else{
+				$result = false;
+			}
+		}
+		
+		if($result){
+			if(isset($_REQUEST['hostid'])){
 
-			$result = true;
-			if(isset($_REQUEST['clear_templates'])){
-				foreach($_REQUEST['clear_templates'] as $id){
-					$result &= unlink_template($_REQUEST['hostid'], $id, false);
+				if($result){
+					$result = CHost::update(array(
+						'hostid' => $_REQUEST['hostid'],
+						'host' => $_REQUEST['host'],
+						'port' => $_REQUEST['port'],
+						'status' => $_REQUEST['status'],
+						'useip' => $_REQUEST['useip'],
+						'dns' => $_REQUEST['dns'],
+						'ip' => $_REQUEST['ip'],
+						'proxy_hostid' => $proxy_hostid,
+						'useipmi' => $useipmi,
+						'ipmi_ip' => $_REQUEST['ipmi_ip'],
+						'ipmi_port' => $_REQUEST['ipmi_port'],
+						'ipmi_authtype' => $_REQUEST['ipmi_authtype'],
+						'ipmi_privilege' => $_REQUEST['ipmi_privilege'],
+						'ipmi_username' => $_REQUEST['ipmi_username'],
+						'ipmi_password' => $_REQUEST['ipmi_password'],
+						'groups' => $groups,
+						'templates' => $templates,
+						'templates_clear' => $templates_clear
+					));
+					
+					$msg_ok = S_HOST_UPDATED;
+					$msg_fail = S_CANNOT_UPDATE_HOST;
+
+					$hostid = $_REQUEST['hostid'];
 				}
 			}
+			else{
+				$host = CHost::create(array(
+					'host' => $_REQUEST['host'],
+					'port' => $_REQUEST['port'],
+					'status' => $_REQUEST['status'],
+					'useip' => $_REQUEST['useip'],
+					'dns' => $_REQUEST['dns'],
+					'ip' => $_REQUEST['ip'],
+					'proxy_hostid' => $proxy_hostid,
+					'templates' => $templates,
+					'useipmi' => $useipmi,
+					'ipmi_ip' => $_REQUEST['ipmi_ip'],
+					'ipmi_port' => $_REQUEST['ipmi_port'],
+					'ipmi_authtype' => $_REQUEST['ipmi_authtype'],
+					'ipmi_privilege' => $_REQUEST['ipmi_privilege'],
+					'ipmi_username' => $_REQUEST['ipmi_username'],
+					'ipmi_password' => $_REQUEST['ipmi_password'],
+					'groups' => $groups,
+					'templates' => $templates
+				));
 
-			if($result){
-				$result = update_host($_REQUEST['hostid'],
-					$_REQUEST['host'],$_REQUEST['port'],$_REQUEST['status'],$useip,$_REQUEST['dns'],
-					$_REQUEST['ip'],$proxy_hostid,$templates,$useipmi,$_REQUEST['ipmi_ip'],
-					$_REQUEST['ipmi_port'],$_REQUEST['ipmi_authtype'],$_REQUEST['ipmi_privilege'],$_REQUEST['ipmi_username'],
-					$_REQUEST['ipmi_password'],$_REQUEST['newgroup'],$groups);
-
-				$msg_ok 	= S_HOST_UPDATED;
-				$msg_fail 	= S_CANNOT_UPDATE_HOST;
-
-				$hostid = $_REQUEST['hostid'];
+				$result &= (bool) $host;
+				if($result){
+					$host = reset($host);
+					$hostid = $host['hostid'];
+				}
+				
+				$msg_ok = S_HOST_ADDED;
+				$msg_fail = S_CANNOT_ADD_HOST;
 			}
+			
 		}
-		else{
-			$hostid = $result = add_host(
-				$_REQUEST['host'],$_REQUEST['port'],$_REQUEST['status'],$useip,$_REQUEST['dns'],
-				$_REQUEST['ip'],$proxy_hostid,$templates,$useipmi,$_REQUEST['ipmi_ip'],
-				$_REQUEST['ipmi_port'],$_REQUEST['ipmi_authtype'],$_REQUEST['ipmi_privilege'],$_REQUEST['ipmi_username'],
-				$_REQUEST['ipmi_password'],$_REQUEST['newgroup'],$groups);
-
-			$msg_ok 	= S_HOST_ADDED;
-			$msg_fail 	= S_CANNOT_ADD_HOST;
-		}
-
+			
 		if($result && $clone_hostid && ($_REQUEST['form'] == 'full_clone')){
 // Host applications
 			$sql = 'SELECT * FROM applications WHERE hostid='.$clone_hostid.' AND templateid=0';
@@ -492,7 +527,6 @@ include_once('include/page_header.php');
 
 		unset($_REQUEST['save']);
 	}
-
 // DELETE HOST
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])){
 
@@ -593,6 +627,7 @@ $thid = get_request('hostid', 0);
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
 
 	validate_group($PAGE_GROUPS,$PAGE_HOSTS);
+	
 $_REQUEST['hostid'] = $thid;
 ?>
 <?php
@@ -678,7 +713,6 @@ $_REQUEST['hostid'] = $thid;
 			'nopermissions' => 1
 		);
 		$hosts = CHost::get($options);
-
 // sorting && paging
 		order_result($hosts, $sortfield, $sortorder);
 //---------

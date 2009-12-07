@@ -5614,7 +5614,6 @@
 		$clear_templates	= get_request('clear_templates',array());
 
 		$frm_title = S_HOST;
-
 		if($_REQUEST['hostid']>0){
 			$db_host = get_host_by_hostid($_REQUEST['hostid']);
 			$frm_title	.= SPACE.' ['.$db_host['host'].']';

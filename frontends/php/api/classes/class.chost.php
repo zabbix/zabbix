@@ -601,7 +601,7 @@ class CHost extends CZBXAPI{
 		}
 
 		if(!empty($hostids))
-			$result = self::get(array('hostids'=>$hostids, 'extendoutput'=>1));
+			$result = self::get(array('hostids' => $hostids, 'extendoutput' => 1));
 
 	return $result;
 	}
@@ -633,30 +633,28 @@ class CHost extends CZBXAPI{
  * @param string $hosts['ipmi_password'] IPMI password. OPTIONAL
  * @return boolean
  */
-	public static function add($hosts){
+	public static function create($hosts){
+		$errors = array();	
 		$hosts = zbx_toArray($hosts);
 		$hostids = array();
-
 		$groupids = array();
-
-		$templates = null;
-		$newgroup = '';
-
 		$result = false;
 
+// CHECK IF HOSTS HAVE AT LEAST 1 GROUP {{{ 
 		foreach($hosts as $hnum => $host){
 			if(empty($host['groups'])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'No groups for host [ '.$host['host'].' ]');
 				return false;
 			}
-
 			$hosts[$hnum]['groups'] = zbx_toArray($hosts[$hnum]['groups']);
 
 			foreach($hosts[$hnum]['groups'] as $gnum => $group){
 				$groupids[$group['groupid']] = $group['groupid'];
 			}
 		}
+// }}} CHECK IF HOSTS HAVE AT LEAST 1 GROUP
 
+// PERMISSIONS {{{
 		$upd_groups = CHostGroup::get(array(
 			'groupids' => $groupids,
 			'editable' => 1,
@@ -667,11 +665,10 @@ class CHost extends CZBXAPI{
 				return false;
 			}
 		}
+// }}} PERMISSIONS
 
 		self::BeginTransaction(__METHOD__);
 		foreach($hosts as $num => $host){
-			$host['groupids'] = zbx_objectValues($host['groups'], 'groupid');
-
 			$host_db_fields = array(
 				'host' => null,
 				'port' => 0,
@@ -687,31 +684,79 @@ class CHost extends CZBXAPI{
 				'ipmi_privilege' => 0,
 				'ipmi_username' => '',
 				'ipmi_password' => '',
-				'groupids' => array()
 			);
 
 			if(!check_db_fields($host_db_fields, $host)){
 				$result = false;
-				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Wrong fields for host [ '.$host['host'].' ]');
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields for host [ '.$host['host'].' ]');
+				break;
+			}
+			
+			if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host['host'])){
+				$result = false;
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Incorrect characters used for Hostname [ '.$host['host'].' ]');
+				break;
+			}
+			if(!empty($dns) && !preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/i', $host['dns'])){
+				$result = false;
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Incorrect characters used for DNS [ '.$host['dns'].' ]');
 				break;
 			}
 
-			$result = add_host($host['host'], $host['port'], $host['status'], $host['useip'], $host['dns'], $host['ip'],
-				$host['proxy_hostid'], $templates, $host['useipmi'], $host['ipmi_ip'], $host['ipmi_port'], $host['ipmi_authtype'],
-				$host['ipmi_privilege'], $host['ipmi_username'], $host['ipmi_password'], $newgroup, $host['groupids']);
+			$host_exists = self::getObjects(array('host' => $host['host']));
+			if(!empty($host_exists)){
+				$result = false;
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Host [ '.$host['host'].' ] already exists');
+				break;
+			}
 
-			if(!$result) break;
-			$hostids[] = $result;
+			$hostid = get_dbid('hosts', 'hostid');
+			$hostids[] = $hostid;
+			$result = DBexecute('INSERT INTO hosts (hostid, proxy_hostid, host, port, status, useip, dns, ip, disable_until, available,'.
+				'useipmi,ipmi_port,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,ipmi_ip) '.
+				' VALUES ('.
+				$hostid.','.
+				$host['proxy_hostid'].','.
+				zbx_dbstr($host['host']).','.
+				$host['port'].','.
+				$host['status'].','.
+				$host['useip'].','.
+				zbx_dbstr($host['dns']).','.
+				zbx_dbstr($host['ip']).
+				',0,'.
+				HOST_AVAILABLE_UNKNOWN.','.
+				$host['useipmi'].','.
+				$host['ipmi_port'].','.
+				$host['ipmi_authtype'].','.
+				$host['ipmi_privilege'].','.
+				zbx_dbstr($host['ipmi_username']).','.
+				zbx_dbstr($host['ipmi_password']).','.
+				zbx_dbstr($host['ipmi_ip']).')'
+			);
+			if(!$result){
+				break;
+			}
+
+			
+			$host['hostid'] = $hostid;
+			$options = array();
+			$options['hosts'] = $host;
+			$options['groups'] = $host['groups'];
+			if(isset($host['templates']) && !is_null($host['templates']))
+				$options['templates'] = $host['templates'];
+			
+			$result &= CHost::massAdd($options);
+			
 		}
 
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_hosts = self::get(array('hostids'=>$hostids, 'editable'=>1, 'extendoutput'=>1, 'nopermissions'=>1));
+			$new_hosts = self::get(array('hostids' => $hostids, 'editable' => 1, 'extendoutput' => 1, 'nopermissions' => 1));
 			return $new_hosts;
 		}
 		else{
-			self::setError(__METHOD__);
+			self::setMethodErrors(__METHOD__, $errors);
 			return false;
 		}
 	}
@@ -740,40 +785,126 @@ class CHost extends CZBXAPI{
  * @param int $hosts['ipmi_privilege'] IPMI privilege. OPTIONAL
  * @param string $hosts['ipmi_username'] IPMI username. OPTIONAL
  * @param string $hosts['ipmi_password'] IPMI password. OPTIONAL
+ * @param string $hosts['groups'] groups
  * @return boolean
  */
 	public static function update($hosts){
+		$errors = array();
+		$result = true;
 		$hosts = zbx_toArray($hosts);
-		$hostids = array();
+		$hostids = zbx_objectValues($hosts, 'hostid');
 
-		$upd_hosts = self::get(array('hostids'=> zbx_objectValues($hosts, 'hostid'), 'editable'=>1, 'extendoutput'=>1, 'preservekeys'=>1));
+		
+		$upd_hosts = self::get(array('hostids'=> $hostids, 'editable'=>1, 'extendoutput'=>1, 'preservekeys'=>1));
 		foreach($hosts as $gnum => $host){
 			if(!isset($upd_hosts[$host['hostid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You do not have enough rights for operation');
 				return false;
 			}
-			$hostids[] = $host['hostid'];
 		}
 
-		$templates = null;
-		$newgroup = '';
-
-		$result = false;
+// CHECK IF HOSTS HAVE AT LEAST 1 GROUP {{{	
+		foreach($hosts as $hnum => $host){
+			if(isset($host['groups']) && empty($host['groups'])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'No groups for host [ '.$host['host'].' ]');
+				return false;
+			}
+			$hosts[$hnum]['groups'] = zbx_toArray($hosts[$hnum]['groups']);			
+		}
+// }}} CHECK IF HOSTS HAVE AT LEAST 1 GROUP
+		
 		self::BeginTransaction(__METHOD__);
-
 		foreach($hosts as $num => $host){
-			$host_db_fields = $upd_hosts[$host['hostid']];
 
-			if(!check_db_fields($host_db_fields, $host)){
+			if(!check_db_fields($upd_hosts[$host['hostid']], $host)){
 				$result = false;
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields for host [ '.$host['host'].' ]');
+				break;
+			}	
+			if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host['host'])){
+				$result = false;
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Incorrect characters used for Hostname [ '.$host['host'].' ]');
+				break;
+			}
+			if(!empty($dns) && !preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/i', $host['dns'])){
+				$result = false;
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Incorrect characters used for DNS [ '.$host['dns'].' ]');
 				break;
 			}
 
-			$groups = get_groupids_by_host($host['hostid']);
+			
+			$host_exists = self::getObjects(array('host' => $host['host']));
+			$host_exists = reset($host_exists);
 
-			$result = update_host($host['hostid'], $host['host'], $host['port'], $host['status'], $host['useip'], $host['dns'], $host['ip'],
-				$host['proxy_hostid'], $templates, $host['useipmi'], $host['ipmi_ip'], $host['ipmi_port'], $host['ipmi_authtype'],
-				$host['ipmi_privilege'], $host['ipmi_username'], $host['ipmi_password'], $newgroup, $groups);
+			if(!empty($host_exists) && ($host_exists['hostid'] != $host['hostid'])){
+				$result = false;
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Host [ '.$host['host'].' ] already exists');
+				break;
+			}
+
+			$sql = 'UPDATE hosts SET '.
+					'proxy_hostid='.$host['proxy_hostid'].
+					',host='.zbx_dbstr($host['host']).
+					',port='.$host['port'].
+					',status='.$host['status'].
+					',useip='.$host['useip'].
+					',dns='.zbx_dbstr($host['dns']).
+					',ip='.zbx_dbstr($host['ip']).
+					',useipmi='.$host['useipmi'].
+					',ipmi_port='.$host['ipmi_port'].
+					',ipmi_authtype='.$host['ipmi_authtype'].
+					',ipmi_privilege='.$host['ipmi_privilege'].
+					',ipmi_username='.zbx_dbstr($host['ipmi_username']).
+					',ipmi_password='.zbx_dbstr($host['ipmi_password']).
+					',ipmi_ip='.zbx_dbstr($host['ipmi_ip']).
+				' WHERE hostid='.$host['hostid'];
+			$result = DBexecute($sql);
+
+			update_host_status($host['hostid'], $host['status']);											
+			
+			
+			if(isset($host['groups']) && !is_null($host['groups'])){
+				$host_groups = CHostGroup::get(array('hostids' => $host['hostid']));
+				$host_groupids = zbx_objectValues($host_groups, 'groupid');
+				$new_groupids = zbx_objectValues($host['groups'], 'groupid');
+
+				$groups_to_add = array_diff($new_groupids, $host_groupids);
+
+				if(!empty($groups_to_add)){
+					$result &= self::massAdd(array('hosts' => $host, 'groups' => $groups_to_add));
+				}
+				
+				$groups_to_del = array_diff($host_groupids, $new_groupids);
+
+				if(!empty($groups_to_del)){
+					$result &= self::massRemove(array('hosts' => $host, 'groups' => $groups_to_del));
+				}
+			}
+			
+			$host['templates_clear'] = isset($host['templates_clear']) ? $host['templates_clear'] : array();
+			if(isset($host['templates_clear']) && !is_null($host['templates_clear'])){
+				foreach($host['templates_clear'] as $tpl){
+					$result = unlink_template($host['hostid'], $tpl['templateid'], false);
+				}
+			}
+			
+			if(isset($host['templates']) && !is_null($host['templates'])){
+				$host_templates = CTemplate::get(array('hostids' => $host['hostid'], 'nopermissions' => 1));
+				$host_templateids = zbx_objectValues($host_templates, 'templateid');
+				$new_templateids = zbx_objectValues($host['templates'], 'templateid');
+				
+				$templates_to_add = array_diff($new_templateids, $host_templateids);
+				if(!empty($templates_to_add)){
+					$result &= CTemplate::massAdd(array('hosts' => $host, 'templates' => $templates_to_add));
+				}
+				
+				$templates_to_del = array_diff($host_templateids, $new_templateids);
+				$templates_to_del = array_diff($templates_to_del, $host['templates_clear']);
+				
+				if(!empty($templates_to_del)){
+					$result &= CTemplate::massRemove(array('hosts' => $host, 'templates' => $templates_to_del));
+				}	
+			}
 
 			if(!$result) break;
 		}
@@ -781,11 +912,11 @@ class CHost extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_hosts = self::get(array('hostids'=>$hostids, 'extendoutput'=>1, 'nopermissions'=>1));
+			$upd_hosts = self::get(array('hostids' => $hostids, 'extendoutput' => 1, 'nopermissions' => 1));			
 			return $upd_hosts;
 		}
 		else{
-			self::setError(__METHOD__);
+			self::setMethodErrors(__METHOD__, $errors);
 			return false;
 		}
 	}
@@ -818,60 +949,141 @@ class CHost extends CZBXAPI{
  * @param string $hosts['fields']['ipmi_password'] IPMI password. OPTIONAL
  * @return boolean
  */
-	public static function massUpdate($hosts_data){
+	public static function massUpdate($data){
 		$errors = array();
-
-		$hosts = zbx_toArray($hosts_data['hosts']);
-		$fields = $hosts_data['fields'];
-
-		$hostids = array();
+		$result = true;
+		
+		$hosts = zbx_toArray($data['hosts']);	
+		$hostids = zbx_objectValues($hosts, 'hostid');
 
 		$upd_hosts = self::get(array(
-			'hostids' => zbx_objectValues($hosts, 'hostid'),
-			'editable' => 1,
-			'extendoutput' => 1,
+			'hostids' => $hostids, 
+			'editable' => 1, 
+			'extendoutput' => 1, 
 			'preservekeys' => 1));
-
 		foreach($hosts as $hnum => $host){
 			if(!isset($upd_hosts[$host['hostid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
-			$hostids[] = $host['hostid'];
 		}
 
 		self::BeginTransaction(__METHOD__);
-		if(empty($hostids)){
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ hostids ]');
-			return false;
-		}
-		else{
-			$sql_set = array();
-			if(isset($fields['proxy_hostid'])) $sql_set[] = 'proxy_hostid='.$fields['proxy_hostid'];
-			if(isset($fields['host'])) $sql_set[] = 'host='.zbx_dbstr($fields['host']);
-			if(isset($fields['port'])) $sql_set[] = 'port='.$fields['port'];
-			if(isset($fields['status'])) $sql_set[] = 'status='.$fields['status'];
-			if(isset($fields['useip'])) $sql_set[] = 'useip='.$fields['useip'];
-			if(isset($fields['dns'])) $sql_set[] = 'dns='.$fields['dns'];
-			if(isset($fields['ip'])) $sql_set[] = 'ip='.$fields['ip'];
-			if(isset($fields['useipmi'])) $sql_set[] = 'useipmi='.$fields['useipmi'];
-			if(isset($fields['ipmi_port'])) $sql_set[] = 'ipmi_port='.$fields['ipmi_port'];
-			if(isset($fields['ipmi_authtype'])) $sql_set[] = 'ipmi_authtype='.$fields['ipmi_authtype'];
-			if(isset($fields['ipmi_privilege'])) $sql_set[] = 'ipmi_privilege='.$fields['ipmi_privilege'];
-			if(isset($fields['ipmi_username'])) $sql_set[] = 'ipmi_username='.zbx_dbstr($fields['ipmi_username']);
-			if(isset($fields['ipmi_password'])) $sql_set[] = 'ipmi_password='.zbx_dbstr($fields['ipmi_password']);
-			if(isset($fields['ipmi_ip'])) $sql_set[] = 'ipmi_ip='.$fields['ipmi_ip'];
+		
+// UPDATE HOSTS PROPERTIES {{{
+		$sql_set = array();
+		if(isset($data['proxy_hostid'])) $sql_set[] = 'proxy_hostid='.$data['proxy_hostid'];
+		if(isset($data['host'])) $sql_set[] = 'host='.zbx_dbstr($data['host']);
+		if(isset($data['port'])) $sql_set[] = 'port='.$data['port'];
+		if(isset($data['status'])) $sql_set[] = 'status='.$data['status'];
+		if(isset($data['useip'])) $sql_set[] = 'useip='.$data['useip'];
+		if(isset($data['dns'])) $sql_set[] = 'dns='.$data['dns'];
+		if(isset($data['ip'])) $sql_set[] = 'ip='.$data['ip'];
+		if(isset($data['useipmi'])) $sql_set[] = 'useipmi='.$data['useipmi'];
+		if(isset($data['ipmi_port'])) $sql_set[] = 'ipmi_port='.$data['ipmi_port'];
+		if(isset($data['ipmi_authtype'])) $sql_set[] = 'ipmi_authtype='.$data['ipmi_authtype'];
+		if(isset($data['ipmi_privilege'])) $sql_set[] = 'ipmi_privilege='.$data['ipmi_privilege'];
+		if(isset($data['ipmi_username'])) $sql_set[] = 'ipmi_username='.zbx_dbstr($data['ipmi_username']);
+		if(isset($data['ipmi_password'])) $sql_set[] = 'ipmi_password='.zbx_dbstr($data['ipmi_password']);
+		if(isset($data['ipmi_ip'])) $sql_set[] = 'ipmi_ip='.$data['ipmi_ip'];
 
+		if(!empty($sql_set)){
 			$sql = 'UPDATE hosts SET ' . implode(', ', $sql_set) . ' WHERE '.DBcondition('hostid', $hostids);
-
 			$result = DBexecute($sql);
 		}
+// }}} UPDATE HOSTS PROPERTIES
+		
+// UPDATE HOSTGROUPS LINKAGE {{{
+		if($result){
+			$groups = zbx_toArray($data['groups']);
+			$groupids = zbx_objectValues($groups, 'groupid');
+		
+			if(!empty($groups)){
+				$sql = 'DELETE FROM hosts_groups WHERE '.DBcondition('hostid', $hostids);
+				$result = DBexecute($sql);
 
+				foreach($groupids as $gnum => $groupid){
+					foreach($hostids as $hostid){
+						$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
+						$result = DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ($hostgroupid, $hostid, $groupid)");
+						if(!$result){
+							break 2;
+						}
+					}
+				}
+			}
+		}
+// }}} UPDATE HOSTGROUPS LINKAGE
+		
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
 			$upd_hosts = self::get(array('hostids' => $hostids, 'extendoutput' => 1, 'nopermissions' => 1));
 			return $upd_hosts;
+		}
+		else{
+			self::setMethodErrors(__METHOD__, $errors);
+			return false;
+		}
+	}
+	
+/**
+ * Add Hosts to HostGroups. All Hosts are added to all HostGroups.
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $data
+ * @param array $data['groups']
+ * @param array $data['hosts']
+ * @return boolean
+ */
+	public static function massAdd($data){
+		$errors = array();
+		
+		if(isset($data['groups'])){
+			$options = array('groups' => zbx_toArray($data['groups']), 'hosts' => zbx_toArray($data['hosts']));
+			$result = CHostGroup::massAdd($options);
+		}
+		
+		if(isset($data['templates'])){
+			$options = array('hosts' => zbx_toArray($data['hosts']), 'templates' => zbx_toArray($data['templates']));
+			$result = CTemplate::massAdd($options);
+		}
+
+		if($result !== false){
+			return $result;
+		}
+		else{
+			self::setMethodErrors(__METHOD__, $errors);
+			return false;
+		}
+	}
+	
+/**
+ * remove Hosts to HostGroups. All Hosts are added to all HostGroups.
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $data
+ * @param array $data['groups']
+ * @param array $data['hosts']
+ * @return boolean
+ */
+	public static function massRemove($data){
+		$errors = array();
+		
+		$result = CHostGroup::massRemove($data);
+
+		if($result !== false){
+			return $result;
 		}
 		else{
 			self::setMethodErrors(__METHOD__, $errors);
@@ -935,5 +1147,9 @@ class CHost extends CZBXAPI{
 		}
 	}
 
+	
+	
+	
+	
 }
 ?>

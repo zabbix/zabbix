@@ -513,11 +513,10 @@ class zbxXML{
 				$groups = $xpath->query('groups/group', $host);
 				$host_groups = array();
 				if($groups->length == 0){
-
 					$default_group = CHostGroup::getObjects(array('name' => ZBX_DEFAULT_IMPORT_HOST_GROUP));
 
 					if(empty($default_group)){
-						$default_group = CHostGroup::add(array('name' => ZBX_DEFAULT_IMPORT_HOST_GROUP));
+						$default_group = CHostGroup::create(array('name' => ZBX_DEFAULT_IMPORT_HOST_GROUP));
 						if($default_group === false){
 							error(CHostGroup::resetErrors());
 							$result = false;
@@ -540,7 +539,7 @@ class zbxXML{
 					}
 
 					if(!empty($groups_to_add)){
-						$new_groups = CHostGroup::add($groups_to_add);
+						$new_groups = CHostGroup::create($groups_to_add);
 
 						if($new_groups === false){
 							error(CHostGroup::resetErrors());
@@ -559,19 +558,20 @@ class zbxXML{
 
 					if($host_db['status'] == HOST_STATUS_TEMPLATE){
 						$r = CTemplate::update($current_host);
+						$options['templates'] = $r;
 					}
 					else{
 						$r = CHost::update($current_host);
+						$options['hosts'] = $r;
 					}
-
-
 					if($r === false){
 						error(CHost::resetErrors());
 						$result = false;
 						break;
 					}
 
-					$r = CHostGroup::updateHosts(array('hosts' => $current_host, 'groups' => $host_groups));
+					$options['groups'] = $host_groups;
+					$r = CHostGroup::massAdd($options);
 					if($r === false){
 						error(CHostGroup::resetErrors());
 						$result = false;
@@ -585,7 +585,7 @@ class zbxXML{
 						$current_host = CTemplate::add($host_db);
 					}
 					else{
-						$current_host = CHost::add($host_db);
+						$current_host = CHost::create($host_db);
 					}
 
 					if(empty($current_host)){
@@ -753,7 +753,7 @@ class zbxXML{
 								error(CItem::resetErrors());
 								$result = false;
 								break;
-							}
+						}
 						}
 
 						$r = CApplication::addItems(array('applications' => $item_applications, 'items' => $current_item));

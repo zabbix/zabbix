@@ -46,7 +46,7 @@ require_once('include/httptest.inc.php');
 		}
 		$result = DBexecute('DELETE FROM hosts_groups WHERE groupid='.$groupid);
 		$hosts = zbx_toObject($hosts, 'hostid');
-		$result = CHostGroup::addHosts(array('hosts' => $hosts, 'groups' => array('groupid' => $groupid)));
+		$result = CHostGroup::createHosts(array('hosts' => $hosts, 'groups' => array('groupid' => $groupid)));
 
 	return $result;
 	}
@@ -60,7 +60,7 @@ require_once('include/httptest.inc.php');
 		}
 		DBexecute('DELETE FROM hosts_groups WHERE hostid='.$hostid);
 		foreach($groups as $groupid){
-			$result = CHostGroup::addHosts(array('hosts' => array($hostid), 'groups' => $groupid));
+			$result = CHostGroup::createHosts(array('hosts' => array($hostid), 'groups' => $groupid));
 		}
 	return $result;
 	}
@@ -75,7 +75,7 @@ require_once('include/httptest.inc.php');
 	}
 
 	function add_host_group($name, $hosts=array()){
-		$group = CHostGroup::add(array('name' => $name));
+		$group = CHostGroup::create(array('name' => $name));
 		if(!$group){
 			error(CHostgroup::resetErrors());
 			return false;
@@ -273,7 +273,7 @@ require_once('include/httptest.inc.php');
 			info('Added new host ['.$host.']');
 
 		if(!zbx_empty($newgroup)){
-			$newgroup = CHostGroup::add(array('name' => $newgroup));
+			$newgroup = CHostGroup::create(array('name' => $newgroup));
 
 			if($newgroup !== false) $newgroup = reset($newgroup);
 			else return false;
@@ -313,7 +313,7 @@ require_once('include/httptest.inc.php');
 			}
 		}
 //permisssion problems
-//		if(!CHostGroup::addHosts(array('hosts' => $hosts, 'groups' => $groups))) return false;
+//		if(!CHostGroup::createHosts(array('hosts' => $hosts, 'groups' => $groups))) return false;		
 //----------
 
 
@@ -367,7 +367,7 @@ require_once('include/httptest.inc.php');
 			return $result;
 
 		if(!zbx_empty($newgroup)){
-			if(!$newgroup = CHostGroup::add(array('name' => $newgroup))){
+			if(!$newgroup = CHostGroup::create(array('name' => $newgroup))){
 				error(CHostGroup::resetErrors());
 				return false;
 			}
@@ -376,7 +376,8 @@ require_once('include/httptest.inc.php');
 
 		$hosts = array('hostid' => $hostid);
 
-		$result = CHostGroup::updateHosts(array('hosts' => $hosts, 'groups' => $groups));
+		$groups = zbx_toObject($groups, 'groupid');
+		$result = CHostGroup::massUpdate(array('hosts' => $hosts, 'groups' => $groups));
 
 		if(!$result){
 			error(CHostGroup::resetErrors());

@@ -115,7 +115,7 @@ class CUserMacro extends CZBXAPI{
 			$options['nopermissions'] = false;
 		}
 
-		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions'] || !is_null($options['globalmacros'])){
+		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions'] || !is_null($options['globalmacro'])){
 		}
 		else{
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
