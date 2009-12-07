@@ -370,7 +370,7 @@ include_once('include/page_header.php');
 
 			$trigger = reset($event['triggers']);
 
-			$event['desc'] = expand_trigger_description_by_data($trigger, ZBX_FLAG_EVENT);
+			$event['desc'] = expand_trigger_description_by_data($trigger);
 
 			$event += $trigger;
 
