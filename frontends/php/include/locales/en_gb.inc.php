@@ -1293,6 +1293,8 @@
 	'S_NEW_SLIDE'=>				'New slide',
 	'S_SHOW_TEXT_AS_HTML'=>			'Show text as HTML',
 
+	'S_WITH_ID_SMALL'=>			'with ID',
+
 //	screenedit.php
 	'S_MAP'=>				'Map',
 	'S_AS_PLAIN_TEXT'=>			'As plain text',
