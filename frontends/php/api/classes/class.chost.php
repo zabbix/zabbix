@@ -706,7 +706,7 @@ class CHost extends CZBXAPI{
 			$host_exists = self::getObjects(array('host' => $host['host']));
 			if(!empty($host_exists)){
 				$result = false;
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Host [ '.$host['host'].' ] already exists');
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_HOST.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				break;
 			}
 
@@ -838,7 +838,7 @@ class CHost extends CZBXAPI{
 
 			if(!empty($host_exists) && ($host_exists['hostid'] != $host['hostid'])){
 				$result = false;
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Host [ '.$host['host'].' ] already exists');
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_HOST.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				break;
 			}
 
