@@ -1,4 +1,8 @@
-Changes for 1.7.5
+Changes for 1.8.1
+
+ - [ZBX-1369] make more strings translatable (Richlv)
+
+Changes for 1.8
 
  - [DEV-316] added logging of executed commands on agent side. Parameter LogRemoteCommands (Sasha)
  - [DEV-316] implemented displaing of history of remote commands (Sasha)
