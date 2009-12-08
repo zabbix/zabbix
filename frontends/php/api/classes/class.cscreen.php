@@ -337,7 +337,7 @@ class CScreen extends CZBXAPI{
 			$sql = 'SELECT screenid FROM screens WHERE name='.zbx_dbstr($screen['name']).' AND '.DBin_node('screenid', false);
 			if(DBfetch(DBselect($sql))){
 				$result = false;
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Screen with name [ '.$screen['name'].' ] already exists');
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_SCREEN.' [ '.$screen['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 				break;
 			}
 
@@ -408,7 +408,7 @@ class CScreen extends CZBXAPI{
 
 			if(!$screen_db_fields){
 				$result = false;
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Screen with ID [ '.$screen['screenid'].' ] does not exists');
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_SCREEN.' '.S_WITH_ID_SMALL.' [ '.$screen['screenid'].' ] '.S_DOESNT_EXIST);
 				break;
 			}
 
@@ -425,7 +425,7 @@ class CScreen extends CZBXAPI{
 					' AND screenid<>'.$screen['screenid'];
 			if(DBfetch(DBselect($sql))){
 				$result = false;
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Screen with name [ '.$screen['name'].' ] already exists');
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_SCREEN.' [ '.$screen['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 				break;
 			}
 
