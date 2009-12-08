@@ -796,6 +796,10 @@
 	'S_CREATE_PROXY'=>				'Create Proxy',
 	'S_PROXY_NAME'=>				'Proxy name',
 	'S_LASTSEEN_AGE'=>				'Last seen (age)',
+	'S_GLOBAL_MACRO'=>				'Global macro',
+	'S_HOST_MACRO'=>				'Host macro',
+	'S_DOESNT_EXIST'=>				'doesn\'t exist',
+	'S_EMPTY_INPUT_PARAMETER'=>			'Empty input parameter',
 
 // templates.php
 	'S_TEMPLATE_LIST'=>			'Templates list',

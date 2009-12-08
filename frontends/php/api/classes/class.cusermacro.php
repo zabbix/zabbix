@@ -741,7 +741,7 @@ class CUserMacro extends CZBXAPI{
 			$result = DBexecute($sql);
 		}
 		else{
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ globalmacroids ]');
+			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, S_EMPTY_INPUT_PARAMETER.' [ globalmacroids ]');
 			$result = false;
 		}
 
@@ -846,7 +846,7 @@ class CUserMacro extends CZBXAPI{
 		if($macroid = DBfetch($res))
 			$result = $macroid['hostmacroid'];
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'HostMacros with name: "'.$macro_data['macro'].'" doesn\'t exists.');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => S_HOST_MACRO.' "'.$macro_data['macro'].'" '.S_DOESNT_EXIST);
 		}
 
 	return $result;
@@ -877,7 +877,7 @@ class CUserMacro extends CZBXAPI{
 		if($macroid = DBfetch($res))
 			$result = $macroid['globalmacroid'];
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'GlobalMacros with name: "'.$macro_data['macro'].'" doesn\'t exists.');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => S_GLOBAL_MACRO.' "'.$macro_data['macro'].'" '.S_DOESNT_EXIST);
 		}
 
 	return $result;
