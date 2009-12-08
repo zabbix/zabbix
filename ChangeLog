@@ -56,7 +56,7 @@ Changes for 1.7.4
  - [ZBX-1334] improved performance of template edit form (vedmak)
  - [DEV-438] added support of suffixes (K,M,G) in configuration parameters (Sasha)
  - [DEV-369] item check "log.regexp" was renamed to "logrt" to specify "log rotation" (Dmitry)
- - [DEV-339] added more internal checks zabbix[wcache,*] and abbix[rcache,*] (Sasha)
+ - [DEV-339] added more internal checks zabbix[wcache,*] and zabbix[rcache,*] (Sasha)
  - [ZBX-1209] fixed new node not shown in the list after adding (Vedmak)
  - [ZBX-1221] fixed node adding mechanizm (Vedmak)
  - [ZBX-1400] changed none working time highlight color for default graph themes (Aly)
