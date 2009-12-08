@@ -43,6 +43,7 @@ done
 
 echo "Converting database to UTF-8"
 
+ALTER DATABASE CHARACTER SET utf8;
 for i in $(echo "show tables;" | $MYSQL -N $MYSQLPARAMS); do
 	echo "ALTER TABLE $i CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;" | $MYSQL $MYSQLPARAMS
 done
