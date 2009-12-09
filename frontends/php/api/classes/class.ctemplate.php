@@ -665,17 +665,18 @@ class CTemplate extends CZBXAPI{
 				break;
 			}
 
-			
-			if(!check_templates_trigger_dependencies($template['templates'])){
-				$result = false;
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong template trigger dependencies');
-				break;
-			}
-			
-			if(check_circle_host_link($template['templateid'], $template['templates'])){
-				$result = false;
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Circular link can not be created');
-				break;
+			if(isset($template['templates']) && !is_null($template['templates'])){
+				if(!check_templates_trigger_dependencies(zbx_toHash($template['templates'], 'templateid'))){
+					$result = false;
+					$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong template trigger dependencies');
+					break;
+				}
+				
+				if(check_circle_host_link($template['templateid'], $template['templates'])){
+					$result = false;
+					$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Circular link can not be created');
+					break;
+				}
 			}
 
 			$sql = 'UPDATE hosts SET host='.zbx_dbstr($template['host']).
