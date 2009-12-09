@@ -2709,9 +2709,9 @@
 				$tree = array();
 				create_node_list($node, $tree);
 
-				$frmTrig->addVar('expression',$expression);
+				$frmTrig->addVar('expression', $expression);
 				$exprfname = 'expr_temp';
-				$exprtxt = new CTextBox($exprfname,$expr_temp,65,'yes');
+				$exprtxt = new CTextBox($exprfname, $expr_temp, 65, 'yes');
 				$macrobtn = new CButton('insert_macro', S_INSERT_MACRO, 'return call_ins_macro_menu(event);');
 				$exprparam = "this.form.elements['$exprfname'].value";
 			}
