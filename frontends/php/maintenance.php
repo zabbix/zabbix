@@ -41,7 +41,6 @@ include_once('include/page_header.php');
 		'groupids'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		'hostid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		'groupid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-
 // maintenance
 		'maintenanceid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'isset({form})&&({form}=="update")'),
 		'maintenanceids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, 		NULL),
@@ -58,10 +57,9 @@ include_once('include/page_header.php');
 		'g_timeperiodid'=>		array(null, O_OPT, null, null, null),
 
 		'edit_timeperiodid'=>	array(null, O_OPT, P_ACT,	DB_ID,	null),
-
+		'twb_groupid' => array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 // actions
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
-
 // form actions
 		'add_timeperiod'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, 	null, null),
 		'del_timeperiod'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -71,7 +69,6 @@ include_once('include/page_header.php');
 		'clone'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-
 /* other */
 		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>array(T_ZBX_STR, O_OPT, NULL,	NULL,	NULL)
@@ -344,11 +341,11 @@ include_once('include/page_header.php');
 	show_table_header(S_CONFIGURATION_OF_MAINTENANCE_PERIODS, $frmForm);
 ?>
 <?php
-	if(isset($_REQUEST["form"])){
-		$frmMaintenance = new CForm('maintenance.php','post');
+	if(isset($_REQUEST['form'])){
+		$frmMaintenance = new CForm('maintenance.php', 'post');
 		$frmMaintenance->setName(S_MAINTENANCE);
 
-		$frmMaintenance->addVar('form',get_request('form',1));
+		$frmMaintenance->addVar('form', get_request('form', 1));
 
 		$from_rfr = get_request('form_refresh',0);
 		$frmMaintenance->addVar('form_refresh',$from_rfr+1);
@@ -521,9 +518,6 @@ include_once('include/page_header.php');
 		$maintenance_wdgt->show();
 	}
 
-?>
-<?php
 
 include_once('include/page_footer.php');
-
 ?>
