@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1473] fixed installation requires mb_string function from php 5.2 (Vedmak)
  - [ZBX-1454] fixed adding user to one group, removes all other users from group (Vedmak)
  - [ZBX-1346] improve example configuration files (Richlv)
  - [ZBX-1369] make more strings translatable (Richlv)
