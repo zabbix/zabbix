@@ -582,7 +582,7 @@ class zbxXML{
 				if(!$current_host && isset($rules['host']['missed'])){
 					$host_db['groups'] = $host_groups;
 					if($host_db['status'] == HOST_STATUS_TEMPLATE){
-						$current_host = CTemplate::add($host_db);
+						$current_host = CTemplate::create($host_db);
 					}
 					else{
 						$current_host = CHost::create($host_db);
