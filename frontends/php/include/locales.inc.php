@@ -41,9 +41,9 @@ function mbstrings_available(){
 		function_exists('mb_strlen') &&
 		function_exists('mb_strtoupper') &&
 		function_exists('mb_strpos') &&
-		function_exists('mb_substr') &&
-		function_exists('mb_stristr') &&
-		function_exists('mb_strstr');
+		function_exists('mb_substr'); //&&
+		// function_exists('mb_stristr') &&
+		// function_exists('mb_strstr');
 
 return $mbstrings_fnc_exist;
 }
