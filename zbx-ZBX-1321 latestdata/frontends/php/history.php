@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,8 +24,8 @@
 	require_once('include/graphs.inc.php');
 
 	$page['file']	= 'history.php';
-	$page['title']	= "S_HISTORY";
-	$page['hist_arg'] = array('itemid', 'hostid','grouid','graphid','period','dec','inc','left','right','stime');
+	$page['title']	= 'S_HISTORY';
+	$page['hist_arg'] = array('itemid', 'hostid', 'grouid', 'graphid', 'period', 'dec', 'inc', 'left', 'right', 'stime');
 	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.calendar.js','gtlc.js');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
@@ -65,7 +65,6 @@ include_once('include/page_header.php');
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
-
 /* actions */
 		'remove_log'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'reset'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -130,18 +129,29 @@ include_once('include/page_header.php');
 		}
 	}
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
-
-	$sql = 'SELECT h.host,i.hostid,i.description,i.key_ '.
-			' FROM items i,hosts h '.
-			' WHERE i.itemid IN ('.(is_array($_REQUEST['itemid']) ? implode(',', $_REQUEST['itemid']) : $_REQUEST['itemid']).') '.
-				' AND h.hostid=i.hostid '.
-				' AND '.DBcondition('h.hostid',$available_hosts, true);
-
-	if(DBfetch(DBselect($sql))){
-		access_deny();
+	
+	$options = array(
+		'itemids' => $_REQUEST['itemid'],
+	);
+	$request_items = zbx_toArray($_REQUEST['itemid']);
+	$allowed_items = CItem::get($options);
+	$allowed_items = zbx_toHash($allowed_items, 'itemid');
+	foreach($request_items as $itemid){
+		if(!isset($allowed_items[$itemid])) access_deny();
 	}
+	
+	// $available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+	// $sql = 'SELECT h.host,i.hostid,i.description,i.key_ '.
+			// ' FROM items i,hosts h '.
+			// ' WHERE i.itemid IN ('.(is_array($_REQUEST['itemid']) ? implode(',', $_REQUEST['itemid']) : $_REQUEST['itemid']).') '.
+				// ' AND h.hostid=i.hostid '.
+				// ' AND '.DBcondition('h.hostid',$available_hosts, true);
 
+	// if(DBfetch(DBselect($sql))){
+		// access_deny();
+	// }
+
+	
 	$sql = 'SELECT h.host,i.hostid,i.* '.
 			' FROM items i,hosts h '.
 			' WHERE i.itemid in ('.(is_array($_REQUEST['itemid']) ? implode(',', $_REQUEST['itemid']) : $_REQUEST['itemid']).') '.
@@ -471,30 +481,34 @@ include_once('include/page_header.php');
 		}
 		else{
 			switch($item_type){
-				case ITEM_VALUE_TYPE_FLOAT:	$h_table = 'history';		break;
-				case ITEM_VALUE_TYPE_UINT64:	$h_table = 'history_uint';	break;
-				case ITEM_VALUE_TYPE_TEXT:	$h_table = 'history_text';	break;
-				default:			$h_table = 'history_str';
+				case ITEM_VALUE_TYPE_FLOAT: 
+					$h_table = 'history'; 
+				break;
+				case ITEM_VALUE_TYPE_UINT64: 
+					$h_table = 'history_uint'; 
+				break;
+				case ITEM_VALUE_TYPE_TEXT: 
+					$h_table = 'history_text'; 
+				break;
+				default: $h_table = 'history_str';
 			}
 
 			$sql = 'SELECT h.clock,h.value,i.valuemapid '.
-							' FROM '.$h_table.' h, items i '.
-							' WHERE h.itemid=i.itemid '.
-								' AND i.itemid='.$_REQUEST['itemid'].
-								$cond_clock.
-							' ORDER BY clock desc';
+					' FROM '.$h_table.' h, items i '.
+					' WHERE h.itemid=i.itemid '.
+						' AND i.itemid='.$_REQUEST['itemid'].
+						$cond_clock.
+					' ORDER BY clock desc';
 			$result = DBselect($sql,$limit);
 			if(!isset($_REQUEST['plaintext'])){
 				$table = new CTableInfo();
 				$table->setHeader(array(S_TIMESTAMP, S_VALUE));
 				$table->setAttribute('id','graph');
-				$table->ShowStart(); // to solve memory leak we call 'Show' method by steps
 			}
 			else{
 				echo '<span class="textcolorstyles"><pre>'."\n";
 			}
 
-//COpt::profiling_start('history');
 			while($row=DBfetch($result)){
 
 				if($DB['TYPE'] == 'ORACLE' && $item_type == ITEM_VALUE_TYPE_TEXT){
@@ -502,22 +516,17 @@ include_once('include/page_header.php');
 						$row['value'] = '';
 				}
 
-
 				if(isset($_REQUEST['plaintext'])){
-					if(str_in_array($item_type, array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))){
+					if($item_type == ITEM_VALUE_TYPE_FLOAT){
 						sscanf($row['value'], '%f', $value);
 					}
 					else{
 						$value = $row['value'];
 					}
-					echo date('Y-m-d H:i:s',$row['clock']);
+					echo date('Y-m-d H:i:s', $row['clock']);
 					echo "\t".$row['clock']."\t".htmlspecialchars($value)."\n";
 				}
 				else{
-					$new_row = array(date('Y.M.d H:i:s', $row['clock']));
-
-					$value_numeric = str_in_array($item_type, array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64));
-
 					if($row['valuemapid'] > 0){
 						$value = replace_value_by_map($row['value'], $row['valuemapid']);
 						$value_mapped = true;
@@ -527,34 +536,36 @@ include_once('include/page_header.php');
 						$value_mapped = false;
 					}
 
-					if($value_numeric && !$value_mapped){
+					
+					if(($item_type == ITEM_VALUE_TYPE_FLOAT) && !$value_mapped){
 						sscanf($row['value'], '%f', $value);
 					}
-					else if(($value_mapped && !$value_numeric) || (!$value_mapped && !$value_numeric)){
-						$pre = new CTag('pre','yes');
+					else if(($item_type == ITEM_VALUE_TYPE_UINT64) && !$value_mapped){}
+					else{
+						$pre = new CTag('pre', 'yes');
 						$pre->addItem($value);
 						$value = $pre;
 					}
 
-					array_push($new_row, $value);
-
-					$table->ShowRow($new_row);
+					$table->addRow(array(
+						date('Y.M.d H:i:s', $row['clock']), 
+						$value
+					));
 				}
 			}
 
 			if(!isset($_REQUEST['plaintext'])){
-				$table->ShowEnd();	// to solve memory leak we call 'Show' method by steps
+				$table->Show();
 				echo SBR;
 			}
 			else{
 				echo '</pre></span>';
 			}
-//COpt::profiling_stop('history');
 		}
 	}
 
 	if(!isset($_REQUEST['plaintext'])){
-		if(str_in_array($_REQUEST['action'],array('showvalues','showgraph'))){
+		if(str_in_array($_REQUEST['action'], array('showvalues', 'showgraph'))){
 			$graphDims['graphHeight'] = 200;
 			$graphDims['shiftXleft'] = 100;
 			$graphDims['shiftXright'] = 50;
@@ -621,9 +632,7 @@ include_once('include/page_header.php');
 			$scroll_div->show();
 		}
 	}
-?>
-<?php
+	
 
-include_once "include/page_footer.php";
-
+require_once('include/page_footer.php');
 ?>
