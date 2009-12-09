@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# WARNING: backup your database before performing upgrade
+
+# This is an unsupported Zabbix upgrade script from 1.6 to 1.8 for MySQL
+# It does the following things:
+#  1. Drops all indexes that might have been created in Zabbix 1.6 database;
+#  2. Converts all tables to UTF-8;
+#  3. Patches the database from 1.6 schema to 1.8 schema.
+
+# Usage: pass required MySQL parameters to this script (like database, user, password etc).
+
+MYSQL="$(which mysql)"
+MYSQLPARAMS="$@"
+
+fail() {
+	echo "$1"
+	exit 1
+}
+
+[[ "$MYSQL" ]] || fail "No mysql binary in path."
+
+drop_index() {
+	echo "alter table $1 drop index $2;" | $MYSQL $MYSQLPARAMS 2>&1 | grep -v "check that column/key exists"
+}
+
+echo "Dropping indexes that might need re-creation"
+
+for i in\
+ "actions      actions_1"\
+ "dhosts       dhosts_1"\
+ "dservices    dservices_1"\
+ "escalations  escalations_2"\
+ "graphs_items graphs_items_1"\
+ "graphs_items graphs_items_2"\
+ "history_log  history_log_2"\
+ "history_text history_text_2"\
+ "httptest     httptest_2"\
+ "httptest     httptest_3"\
+ "services     services_1"; do
+	drop_index $i
+done
+
+echo "Converting database to UTF-8"
+
+ALTER DATABASE CHARACTER SET utf8;
+for i in $(echo "show tables;" | $MYSQL -N $MYSQLPARAMS); do
+	echo "ALTER TABLE $i CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;" | $MYSQL $MYSQLPARAMS
+done
+
+echo "Patching the database"
+
+$MYSQL $MYSQLPARAMS < patch.sql || fail "Failed to patch Zabbix database. Restore from backup"
