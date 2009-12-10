@@ -157,6 +157,7 @@ include_once('include/page_header.php');
 
 			$usrgrps = get_request('user_groups', array());
 			$usrgrps = zbx_toObject($usrgrps, 'usrgrpid');
+			$user['usrgrps'] = $usrgrps;
 
 			if(isset($_REQUEST['userid'])){
 				$action = AUDIT_ACTION_UPDATE;
@@ -166,9 +167,9 @@ include_once('include/page_header.php');
 				$result = CUser::update($user);
 				if(!$result)
 					error(CUser::resetErrors());
-				if($result)	$result = CUserGroup::updateUsers(array('users' => $user, 'usrgrps' => $usrgrps));
-				if($result === false)
-					error(CUserGroup::resetErrors());
+				// if($result)	$result = CUserGroup::updateUsers(array('users' => $user, 'usrgrps' => $usrgrps));
+				// if($result === false)
+					// error(CUserGroup::resetErrors());
 				if($result !== false) $result = CUser::updateMedia(array('users' => $user, 'medias' => $user['user_medias']));
 				$result = ($result === false) ? false : true;
 				$result = DBend($result);
@@ -182,9 +183,9 @@ include_once('include/page_header.php');
 				$result = CUser::add($user);
 				if(!$result)
 					error(CUser::resetErrors());
-				if($result) $result = CUserGroup::updateUsers(array('users' => $result, 'usrgrps' => $usrgrps));
-				if($result === false)
-					error(CUserGroup::resetErrors());
+				// if($result) $result = CUserGroup::updateUsers(array('users' => $result, 'usrgrps' => $usrgrps));
+				// if($result === false)
+					// error(CUserGroup::resetErrors());
 				$result = ($result === false) ? false : true;
 				$result = DBend($result);
 

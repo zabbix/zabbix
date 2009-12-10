@@ -1,5 +1,10 @@
 Changes for 1.8.1
-
+ - [ZBX-1441] fixed wrong rememberes link line type (Vedmak)
+ - [ZBX-1498] fixed error when try to create item with custom key "log" and not Log item type (Vedmak)
+ - [ZBX-1283] fixed group selection in maintenance edit form (Vedmak)
+ - [ZBX-1316] fixed missing trigger expressions using expression constructor (Vedmak)
+ - [ZBX-1473] fixed installation requires mb_string function from php 5.2 (Vedmak)
+ - [ZBX-1454] fixed adding user to one group, removes all other users from group (Vedmak)
  - [ZBX-1346] improve example configuration files (Richlv)
  - [ZBX-1369] make more strings translatable (Richlv)
 

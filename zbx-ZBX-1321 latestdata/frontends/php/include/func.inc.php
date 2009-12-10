@@ -658,13 +658,13 @@ function convert_units($value,$units){
 	return "$s $u$units";
 	}
 
-
 	if($units==''){
-		if(round($value) == round($value,2)){
-			return sprintf('%.0f',$value);
+		if(is_float($value)){
+			return sprintf('%.2f',$value);
 		}
 		else{
-			return sprintf('%.2f',$value);
+			// return sprintf('%.0f',$value);
+			return $value;
 		}
 	}
 
