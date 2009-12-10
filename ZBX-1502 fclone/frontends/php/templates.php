@@ -220,6 +220,7 @@ include_once('include/page_header.php');
 
 // }
 // FULL_CLONE {
+
 		if(!zbx_empty($templateid) && $templateid && $clone_templateid && ($_REQUEST['form'] == 'full_clone')){
 // Host applications
 			$sql = 'SELECT * FROM applications WHERE hostid='.$clone_templateid.' AND templateid=0';
@@ -234,10 +235,9 @@ include_once('include/page_header.php');
 					' WHERE i.hostid='.$clone_templateid.
 						' AND i.templateid=0 '.
 					' ORDER BY i.description';
-
 			$res = DBselect($sql);
 			while($db_item = DBfetch($res)){
-				$result &= copy_item_to_host($db_item['itemid'], $templateid, true);
+				$result &= (bool) copy_item_to_host($db_item['itemid'], $templateid, true);
 			}
 
 // Host triggers
@@ -254,7 +254,7 @@ include_once('include/page_header.php');
 
 			$res = DBselect($sql);
 			while($db_trig = DBfetch($res)){
-				$result &= copy_trigger_to_host($db_trig['triggerid'], $templateid, true);
+				$result &= (bool) copy_trigger_to_host($db_trig['triggerid'], $templateid, true);
 			}
 
 // Host graphs
@@ -271,9 +271,8 @@ include_once('include/page_header.php');
 
 			$res = DBselect($sql);
 			while($db_graph = DBfetch($res)){
-				$result &= copy_graph_to_host($db_graph['graphid'], $templateid, true);
+				$result &= (bool) copy_graph_to_host($db_graph['graphid'], $templateid, true);
 			}
-
 		}
 // }
 // LINK/UNLINK HOSTS {
