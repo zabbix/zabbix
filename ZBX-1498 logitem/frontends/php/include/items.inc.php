@@ -293,7 +293,7 @@
 			return FALSE;
 		}
 
-		if(preg_match('/^log|eventlog\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
+		if(preg_match('/^log\[|eventlog\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
 			error('Value type must be Log for log key');
 			return FALSE;
 		}
@@ -536,7 +536,7 @@
 			$item['delta']=0;
 		}
 
-		if(preg_match('/^log|eventlog\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
+		if(preg_match('/^log\[|eventlog\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
 			error('Value type must be Log for log key');
 			return FALSE;
 		}
