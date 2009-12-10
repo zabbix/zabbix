@@ -353,6 +353,7 @@ include_once('include/page_header.php');
 		$templates = array_keys($templates);
 		$templates = zbx_toObject($templates, 'templateid');		
 		$templates_clear = zbx_toObject($templates_clear, 'templateid');
+		
 // START SAVE TRANSACTION {{{
 		DBstart();
 
@@ -429,7 +430,8 @@ include_once('include/page_header.php');
 			}
 			
 		}
-			
+	
+// FULL CLONE {{{
 		if($result && $clone_hostid && ($_REQUEST['form'] == 'full_clone')){
 // Host applications
 			$sql = 'SELECT * FROM applications WHERE hostid='.$clone_hostid.' AND templateid=0';
@@ -459,13 +461,15 @@ include_once('include/page_header.php');
 
 // Host graphs
 			$graphs = CGraph::get(array('hostids' => $clone_hostid, 'not_templated_graphs' => 1));
-			$graphs = zbx_objectValues($graphs, 'graphid');
+
 			foreach($graphs as $graph){
-				$result &= copy_graph_to_host($graph, $hostid, true);
+				$result &= (bool) copy_graph_to_host($graph['graphid'], $hostid, true);
 			}
 
 			$_REQUEST['hostid'] = $clone_hostid;
 		}
+
+// }}} FULL CLONE
 
 //HOSTS PROFILE Section
 		if($result){
@@ -495,7 +499,6 @@ include_once('include/page_header.php');
 				$result = add_host_profile_ext($hostid, $ext_host_profiles);
 			}
 		}
-//-------------
 
 // MACROS {
 		if($result){
