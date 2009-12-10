@@ -449,14 +449,14 @@ include_once('include/page_header.php');
 
 			$res = DBselect($sql);
 			while($db_item = DBfetch($res)){
-				$result &= copy_item_to_host($db_item['itemid'], $hostid, true);
+				$result &= (bool) copy_item_to_host($db_item['itemid'], $hostid, true);
 			}
 
 // Host triggers
 			$triggers = CTrigger::get(array('hostids' => $clone_hostid, 'not_templated_triggers' => 1));
 			$triggers = zbx_objectValues($triggers, 'triggerid');
 			foreach($triggers as $trigger){
-				$result &= copy_trigger_to_host($trigger, $hostid, true);
+				$result &= (bool) copy_trigger_to_host($trigger, $hostid, true);
 			}
 
 // Host graphs
