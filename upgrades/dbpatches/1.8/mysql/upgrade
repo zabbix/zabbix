@@ -1,21 +1,48 @@
 #!/bin/bash
 
-# WARNING: backup your database before performing upgrade
+echo " WARNING: backup your database before performing upgrade
 
-# This is an unsupported Zabbix upgrade script from 1.6 to 1.8 for MySQL
-# It does the following things:
-#  1. Drops all indexes that might have been created in Zabbix 1.6 database;
-#  2. Converts all tables to UTF-8;
-#  3. Patches the database from 1.6 schema to 1.8 schema.
+ This is an UNSUPPORTED Zabbix upgrade script from 1.6 to 1.8 for MySQL
+ It does the following things:
+  1. Drops all indexes that might have been created in Zabbix 1.6 database;
+  2. Converts all tables to UTF-8;
+  3. Patches the database from 1.6 schema to 1.8 schema;
+  4. Adds the 'Discovered' hosts group and sets it to be used for discovered hosts.
 
-# Usage: pass required MySQL parameters to this script (like database, user, password etc).
+ This script is not for distributed monitoring databases.
+
+ Usage: pass required MySQL parameters to this script (like database, user, password etc).
+"
+
+read -n 1 -p "Continue ? (y/n) " RESPONSE
+
+[ "$RESPONSE" == "y" ] || {
+	echo
+	exit
+}
 
 MYSQL="$(which mysql)"
 MYSQLPARAMS="$@"
+echo
 
 fail() {
 	echo "$1"
 	exit 1
+}
+
+timer() {
+	TIMER=$(echo "$@" | cut -d" " -f 2- | tr " " _)
+	case "$1" in
+	start)
+		let START_$TIMER=$(date +%s)
+		;;
+	stop)
+		let TOTALTIME=$(date +%s)-START_$TIMER
+		let TOTALHOURS=TOTALTIME/3600
+		let TOTALMINUTES=(TOTALTIME-TOTALHOURS*3600)/60
+		let TOTALSECONDS=TOTALTIME%60
+	echo "$(echo $TIMER | tr _ " ") took $TOTALHOURS:$TOTALMINUTES:$TOTALSECONDS"
+	esac
 }
 
 [[ "$MYSQL" ]] || fail "No mysql binary in path."
@@ -24,7 +51,9 @@ drop_index() {
 	echo "alter table $1 drop index $2;" | $MYSQL $MYSQLPARAMS 2>&1 | grep -v "check that column/key exists"
 }
 
-echo "Dropping indexes that might need re-creation"
+echo "Dropping indexes that might need re-creation..."
+
+timer start Dropping indexes
 
 for i in\
  "actions      actions_1"\
@@ -40,14 +69,29 @@ for i in\
  "services     services_1"; do
 	drop_index $i
 done
+echo -n " ... "
+timer stop Dropping indexes
 
-echo "Converting database to UTF-8"
+echo "Converting database to UTF8"
 
-ALTER DATABASE CHARACTER SET utf8;
+timer start Converting to UTF8
+echo "ALTER DATABASE CHARACTER SET utf8;" | $MYSQL $MYSQLPARAMS
 for i in $(echo "show tables;" | $MYSQL -N $MYSQLPARAMS); do
 	echo "ALTER TABLE $i CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;" | $MYSQL $MYSQLPARAMS
 done
+echo -n " ... "
+timer stop Converting to UTF8
 
 echo "Patching the database"
 
+timer start Patching the database
 $MYSQL $MYSQLPARAMS < patch.sql || fail "Failed to patch Zabbix database. Restore from backup"
+echo -n " ... "
+timer stop Patching the database
+
+echo "Adding 'Discovered' host group"
+
+echo "update ids set nextid=nextid+1 where table_name='groups' and field_name='groupid';
+
+update config set discovery_groupid=(select nextid from ids where table_name='groups' and field_name='groupid') where configid='1';
+insert into groups (groupid,name,internal) select nextid,'Discovered Hosts','1' from ids where table_name='groups' and field_name='groupid';" | $MYSQL $MYSQLPARAMS
