@@ -2798,10 +2798,12 @@ return $result;
 
 // mark => expression map
 		$map = array();
+// sdii($temp);
 		for($i = 0, $size = $mark - ord('A'); $i < $size; ++$i){
 			$map[chr($i + ord('A'))] = array('expression'   => $temp[$size - $i - 1],
-											 'sign'		 => $temp[$size + $i]['sign'],
-											 'value'		=> $temp[$size + $i]['value']);
+											 'sign'		 => $temp[$size*2 - $i - 1]['sign'],
+											 'value'		=> $temp[$size*2 - $i -1]['value']);
+									
 		}
 		return array($outline, $root, $map);
 	}
@@ -2992,7 +2994,6 @@ return $result;
 	function remake_expression($node, $nodeid, $action, $new_expr, $map){
 		$target = &find_node($node, $nodeid);
 		if(!is_array($target)) return false;
-
 /* AND, OR */
 		if($action == '&' || $action == '|'){
 			$map['new'] = array('expression' => $new_expr, 'sign' => '', 'value' => '');
