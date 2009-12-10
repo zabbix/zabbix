@@ -3007,8 +3007,12 @@ this.linkForm.linkIndicatorsBody = e_tbody_7;
 //----
 
 	
-// Type ok
-	this.linkForm.drawtype.selectedIndex = maplink.drawtype;
+// Type ok	
+	if(maplink.drawtype == 0) var dindex = 0; // S_LINE
+	if(maplink.drawtype == 2) var dindex = 1; // S_BOLD_LINE
+	if(maplink.drawtype == 3) var dindex = 2; // S_DOT
+	if(maplink.drawtype == 4) var dindex = 3; // S_DASHED_LINE
+	this.linkForm.drawtype.selectedIndex = dindex;
 
 
 // COLOR OK
