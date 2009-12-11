@@ -285,6 +285,8 @@ include_once('include/page_header.php');
 	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['copy'])&&isset($_REQUEST['group_graphid'])){
 		if(isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])){
 		
+			$go_result = true;
+			
 			$options = array(
 				'editable' =>1, 
 				'nodes' => get_current_nodeid(true)
@@ -314,11 +316,12 @@ include_once('include/page_header.php');
 			DBstart();
 			foreach($_REQUEST['group_graphid'] as $gnum => $graph_id){
 				foreach($db_hosts as $hnum => $host){
-					copy_graph_to_host($graph_id, $host['hostid'], true);
+					$go_result &= (bool) copy_graph_to_host($graph_id, $host['hostid'], true);
 				}
 			}
+			$go_result = DBend($go_result);
 			
-			$go_result = DBend();
+			show_messages($go_result, S_GRAPHS_COPIED, S_CANNOT_COPY_GRAPHS);
 			$_REQUEST['go'] = 'none2';
 		}
 		else{
