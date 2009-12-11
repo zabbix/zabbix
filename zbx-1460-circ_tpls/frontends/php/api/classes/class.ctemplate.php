@@ -920,6 +920,7 @@ class CTemplate extends CZBXAPI{
 					if(isset($linked[$templates_linkid]) && isset($linked[$templates_linkid][$templateid])) continue;
 					$hosttemplateid = get_dbid('hosts_templates', 'hosttemplateid');
 					if(!$result = DBexecute('INSERT INTO hosts_templates VALUES ('.$hosttemplateid.','.$templates_linkid.','.$templateid.')')){
+						$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Insert error');
 						break;
 					}
 				}

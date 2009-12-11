@@ -2709,9 +2709,9 @@
 				$tree = array();
 				create_node_list($node, $tree);
 
-				$frmTrig->addVar('expression',$expression);
+				$frmTrig->addVar('expression', $expression);
 				$exprfname = 'expr_temp';
-				$exprtxt = new CTextBox($exprfname,$expr_temp,65,'yes');
+				$exprtxt = new CTextBox($exprfname, $expr_temp, 65, 'yes');
 				$macrobtn = new CButton('insert_macro', S_INSERT_MACRO, 'return call_ins_macro_menu(event);');
 				$exprparam = "this.form.elements['$exprfname'].value";
 			}
@@ -3397,41 +3397,45 @@
 
 	function get_maintenance_hosts_form(&$form){
 		global $USER_DETAILS;
-
 		$tblHlink = new CTableInfo();
-		$tblHlink->setAttribute('style','background-color: #CCC;');
+		$tblHlink->setAttribute('style', 'background-color: #CCC;');
 
-		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE);
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE);
 
 //		validate_group(PERM_READ_WRITE,array('real_hosts'),'web.last.conf.groupid');
 
-		$cmbGroups = new CComboBox('twb_groupid',get_request('twb_groupid',0),'submit()');
-		$sql = 'SELECT DISTINCT g.groupid,g.name '.
-				' FROM groups g,hosts_groups hg,hosts h '.
-				' WHERE '.DBcondition('g.groupid',$available_groups).
-					' AND g.groupid=hg.groupid '.
-					' AND h.hostid=hg.hostid'.
-					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
-				' ORDER BY g.name';
-
-		$result=DBselect($sql);
-		while($row=DBfetch($result)){
-			$cmbGroups->addItem($row['groupid'],$row['name']);
+		$twb_groupid = get_request('twb_groupid', 0);
+		
+		$options = array(
+			'editable' => 1,
+			'extendoutput' => 1,
+			'real_hosts' => 1,
+		);
+		$groups = CHostGroup::get($options);
+		$groups = zbx_toHash($groups, 'groupid');
+		order_result($groups, 'name');
+		
+		if(!isset($groups[$twb_groupid])){
+			$twb_groupid = key($groups);
+		}
+		
+		$cmbGroups = new CComboBox('twb_groupid', $twb_groupid, 'submit()');	
+		foreach($groups as $group){
+			$cmbGroups->addItem($group['groupid'], $group['name']);
 		}
 
 		$hostids = get_request('hostids', array());
 
-		$host_tb = new CTweenBox($form,'hostids',null,10);
+		$host_tb = new CTweenBox($form, 'hostids', null, 10);
 
-		if(isset($_REQUEST['maintenanceid']) && !isset($_REQUEST["form_refresh"])){
+		if(isset($_REQUEST['maintenanceid']) && !isset($_REQUEST['form_refresh'])){
 			$sql_from = ', maintenances_hosts mh ';
 			$sql_where = ' AND h.hostid=mh.hostid '.
 							' AND mh.maintenanceid='.$_REQUEST['maintenanceid'];
 		}
 		else{
 			$sql_from = '';
-			$sql_where =  'AND '.DBcondition('h.hostid',$hostids);
+			$sql_where =  'AND '.DBcondition('h.hostid', $hostids);
 		}
 
 		$sql = 'SELECT DISTINCT h.hostid, h.host '.
@@ -3443,31 +3447,24 @@
 		$db_hosts = DBselect($sql);
 		while($host = DBfetch($db_hosts)){
 			$hostids[$host['hostid']] = $host['hostid'];
-			$host_tb->addItem($host['hostid'],$host['host'], true);
+			$host_tb->addItem($host['hostid'], $host['host'], true);
 		}
 
 
-		$sql_from = '';
-		$sql_where = '';
-		if(isset($_REQUEST['twb_groupid']) && ($_REQUEST['twb_groupid']>0)){
-			$sql_from .= ', hosts_groups hg ';
-			$sql_where .= ' AND hg.groupid='.$_REQUEST['twb_groupid'].
-							' AND h.hostid=hg.hostid ';
+		$options = array(
+			'editable' => 1,
+			'extendoutput' => 1,
+			'groupids' => $twb_groupid
+		);
+		$group_hosts = CHost::get($options);
+		order_result($group_hosts, 'host');
+
+		foreach($group_hosts as $ghost){
+			if(isset($hostids[$ghost['hostid']])) continue;
+			$host_tb->addItem($ghost['hostid'], $ghost['host'], false);
 		}
 
-		$sql = 'SELECT DISTINCT h.* '.
-				' FROM hosts h '.$sql_from.
-				' WHERE '.DBcondition('h.hostid',$available_hosts).
-					' AND '.DBcondition('h.hostid',$hostids,true).
-					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
-					$sql_where.
-				' ORDER BY h.host';
-		$db_hosts = DBselect($sql);
-		while($host = DBfetch($db_hosts)){
-			$host_tb->addItem($host['hostid'],$host['host'], false);
-		}
-
-		$tblHlink->addRow($host_tb->Get(S_IN.SPACE.S_MAINTENANCE,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE,$cmbGroups)));
+		$tblHlink->addRow($host_tb->Get(S_IN.SPACE.S_MAINTENANCE, array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE, $cmbGroups)));
 
 	return $tblHlink;
 	}
