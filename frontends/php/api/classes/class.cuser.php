@@ -464,14 +464,15 @@ class CUser extends CZBXAPI{
 					$user['type'].
 				')');
 
-			// if($result){
-				// foreach($user['user_groups'] as $groupid){
-					// if(!$result) break;
-					// $users_groups_id = get_dbid("users_groups","id");
-					// $result = DBexecute('INSERT INTO users_groups (id,usrgrpid,userid)'.
-						// 'values('.$users_groups_id.','.$groupid.','.$userid.')');
-				// }
-			// }
+			if($result){
+				$usrgrps = zbx_objectValues($user['usrgrps'], 'usrgrpid');
+				foreach($usrgrps as $groupid){
+					if(!$result) break;
+					$users_groups_id = get_dbid("users_groups","id");
+					$result = DBexecute('INSERT INTO users_groups (id,usrgrpid,userid)'.
+						'values('.$users_groups_id.','.$groupid.','.$userid.')');
+				}
+			}
 
 			if($result){
 				foreach($user['user_medias'] as $media_data){
@@ -535,7 +536,8 @@ class CUser extends CZBXAPI{
 		global $USER_DETAILS;
 		$errors = array();
 		$result = true;
-
+		$self = false;
+		
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can update Users');
 			return false;
@@ -554,6 +556,10 @@ class CUser extends CZBXAPI{
 
 		self::BeginTransaction(__METHOD__);
 
+		if(bccomp($USER_DETAILS['userid'], $user['userid']) == 0){
+			$self = true;
+		}
+			
 		foreach($users as $unum => $user){
 			$user_db_fields = $upd_users[$user['userid']];
 
@@ -600,31 +606,54 @@ class CUser extends CZBXAPI{
 					' WHERE userid='.$user['userid'];
 
 			$result = DBexecute($sql);
-/*
-			if($result && !is_null($user['user_groups'])){
-				DBexecute('DELETE FROM users_groups WHERE userid='.$userid);
+			
+			// if(isset($user['usrgrps']) && !is_null($user['usrgrps'])){
+				// $user_groups = CHostGroup::get(array('userids' => $user['userid']));
+				// $user_groupids = zbx_objectValues($user_groups, 'usrgrpid');
+				// $new_groupids = zbx_objectValues($user['usrgrps'], 'usrgrpid');
 
-				$user['user_groups'] = CUserGroup::get(array('usrgrpids' => $user['user_groups'], 'extendoutput' => 1));
-				foreach($user['user_groups'] as $groupid => $group){
+				// $groups_to_add = array_diff($new_groupids, $user_groupids);
+
+				// if(!empty($groups_to_add)){
+					// $result &= self::massAdd(array('users' => $user, 'usrgrps' => $groups_to_add));
+				// }
+				
+				// $groups_to_del = array_diff($user_groupids, $new_groupids);
+				// if(!empty($groups_to_del)){
+					// $result &= self::massRemove(array('users' => $user, 'usrgrps' => $groups_to_del));
+				// }
+			// }
+			
+
+			
+			if($result && isset($user['usrgrps']) && !is_null($user['usrgrps'])){
+				DBexecute('DELETE FROM users_groups WHERE userid='.$user['userid']);
+
+				$usrgrps = CUserGroup::get(array(
+					'usrgrpids' => zbx_objectValues($user['usrgrps'], 'usrgrpid'),
+					'extendoutput' => 1,
+					'preservekeys' => 1));
+
+				foreach($usrgrps as $groupid => $group){
 					if(!$result) break;
 
-					if($group['gui_access'] == GROUP_GUI_ACCESS_DISABLED){
-						$error = 'User cannot restrict access to GUI to him self. Group "'.$group['name'].'"';
+					if(($group['gui_access'] == GROUP_GUI_ACCESS_DISABLED) && $self){
+						$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'User cannot restrict access to GUI to him self. Group "'.$group['name'].'"');
 						$result = false;
-						continue;
+						break;
 					}
 
-					if($group['users_status'] == GROUP_STATUS_DISABLED){
-						$error = 'User cannot disable him self. Group "'.$group['name'].'"';
+					if(($group['users_status'] == GROUP_STATUS_DISABLED) && $self){
+						$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'User cannot disable him self. Group "'.$group['name'].'"');
 						$result = false;
-						continue;
+						break;
 					}
 
 					$users_groups_id = get_dbid('users_groups', 'id');
-					$result = DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES ('.$users_groups_id.','.$groupid.','.$userid.')');
+					$result = DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES ('.$users_groups_id.','.$groupid.','.$user['userid'].')');
 				}
 			}
-
+/*
 			if($result && !is_null($user['user_medias'])){
 				$result = DBexecute('DELETE FROM media WHERE userid='.$userid);
 				foreach($user['user_medias'] as $media_data){
