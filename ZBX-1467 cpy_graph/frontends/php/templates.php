@@ -186,10 +186,9 @@ include_once('include/page_header.php');
 		$templates = zbx_toObject($templates, 'templateid');		
 		$templates_clear = zbx_toObject($templates_clear, 'templateid');
 		
-// CREATE/UPDATE TEMPLATE WITH GROUPS AND LINKED TEMPLATES {
+// CREATE/UPDATE TEMPLATE WITH GROUPS AND LINKED TEMPLATES {{{
 		if($templateid){
-			$template = array('templateid' => $templateid);
-			
+			$template = array('templateid' => $templateid);			
 			$result = CTemplate::update(array(
 				'templateid' => $templateid, 
 				'host' => $template_name, 
@@ -217,9 +216,10 @@ include_once('include/page_header.php');
 			$msg_ok = S_TEMPLATE_ADDED;
 			$msg_fail = S_CANNOT_ADD_TEMPLATE;
 		}
+// }}} CREATE/UPDATE TEMPLATE WITH GROUPS AND LINKED TEMPLATES
 
-// }
 // FULL_CLONE {
+
 		if(!zbx_empty($templateid) && $templateid && $clone_templateid && ($_REQUEST['form'] == 'full_clone')){
 // Host applications
 			$sql = 'SELECT * FROM applications WHERE hostid='.$clone_templateid.' AND templateid=0';
@@ -234,10 +234,9 @@ include_once('include/page_header.php');
 					' WHERE i.hostid='.$clone_templateid.
 						' AND i.templateid=0 '.
 					' ORDER BY i.description';
-
 			$res = DBselect($sql);
 			while($db_item = DBfetch($res)){
-				$result &= copy_item_to_host($db_item['itemid'], $templateid, true);
+				$result &= (bool) copy_item_to_host($db_item['itemid'], $templateid, true);
 			}
 
 // Host triggers
@@ -254,7 +253,7 @@ include_once('include/page_header.php');
 
 			$res = DBselect($sql);
 			while($db_trig = DBfetch($res)){
-				$result &= copy_trigger_to_host($db_trig['triggerid'], $templateid, true);
+				$result &= (bool) copy_trigger_to_host($db_trig['triggerid'], $templateid, true);
 			}
 
 // Host graphs
@@ -271,9 +270,8 @@ include_once('include/page_header.php');
 
 			$res = DBselect($sql);
 			while($db_graph = DBfetch($res)){
-				$result &= copy_graph_to_host($db_graph['graphid'], $templateid, true);
+				$result &= (bool) copy_graph_to_host($db_graph['graphid'], $templateid, true);
 			}
-
 		}
 // }
 // LINK/UNLINK HOSTS {
@@ -296,7 +294,10 @@ include_once('include/page_header.php');
 //-- link --
 			$link_hosts = array_diff($hosts, $linked_hosts);
 
-			CTemplate::massAdd(array('templates' => zbx_toObject($templateid, 'templateid'), 'hosts' => zbx_toObject($hosts, 'hostid')));
+			$result = CTemplate::massAdd(array(
+				'templates' => zbx_toObject($templateid, 'templateid'), 
+				'hosts' => zbx_toObject($hosts, 'hostid')
+			));
 			
 			
 			// $template_name = DBfetch(DBselect('SELECT host FROM hosts WHERE hostid='.$templateid));
