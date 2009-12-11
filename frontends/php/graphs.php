@@ -289,7 +289,8 @@ include_once('include/page_header.php');
 			
 			$options = array(
 				'editable' =>1, 
-				'nodes' => get_current_nodeid(true)
+				'nodes' => get_current_nodeid(true),
+				'templated_hosts' => 1
 			);
 			
 			if(0 == $_REQUEST['copy_type']){ // hosts 
@@ -317,6 +318,7 @@ include_once('include/page_header.php');
 			foreach($_REQUEST['group_graphid'] as $gnum => $graph_id){
 				foreach($db_hosts as $hnum => $host){
 					$go_result &= (bool) copy_graph_to_host($graph_id, $host['hostid'], true);
+
 				}
 			}
 			$go_result = DBend($go_result);
