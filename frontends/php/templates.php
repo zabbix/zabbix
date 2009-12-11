@@ -186,10 +186,9 @@ include_once('include/page_header.php');
 		$templates = zbx_toObject($templates, 'templateid');		
 		$templates_clear = zbx_toObject($templates_clear, 'templateid');
 		
-// CREATE/UPDATE TEMPLATE WITH GROUPS AND LINKED TEMPLATES {
+// CREATE/UPDATE TEMPLATE WITH GROUPS AND LINKED TEMPLATES {{{
 		if($templateid){
-			$template = array('templateid' => $templateid);
-			
+			$template = array('templateid' => $templateid);			
 			$result = CTemplate::update(array(
 				'templateid' => $templateid, 
 				'host' => $template_name, 
@@ -217,8 +216,8 @@ include_once('include/page_header.php');
 			$msg_ok = S_TEMPLATE_ADDED;
 			$msg_fail = S_CANNOT_ADD_TEMPLATE;
 		}
+// }}} CREATE/UPDATE TEMPLATE WITH GROUPS AND LINKED TEMPLATES
 
-// }
 // FULL_CLONE {
 		if(!zbx_empty($templateid) && $templateid && $clone_templateid && ($_REQUEST['form'] == 'full_clone')){
 // Host applications
@@ -296,7 +295,10 @@ include_once('include/page_header.php');
 //-- link --
 			$link_hosts = array_diff($hosts, $linked_hosts);
 
-			CTemplate::massAdd(array('templates' => zbx_toObject($templateid, 'templateid'), 'hosts' => zbx_toObject($hosts, 'hostid')));
+			$result = CTemplate::massAdd(array(
+				'templates' => zbx_toObject($templateid, 'templateid'), 
+				'hosts' => zbx_toObject($hosts, 'hostid')
+			));
 			
 			
 			// $template_name = DBfetch(DBselect('SELECT host FROM hosts WHERE hostid='.$templateid));
