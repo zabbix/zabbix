@@ -2463,11 +2463,11 @@
 
 	function insert_copy_elements_to_forms($elements_array_name){
 
-		$copy_type = get_request("copy_type", 0);
-		$copy_mode = get_request("copy_mode", 0);
-		$filter_groupid = get_request("filter_groupid", 0);
+		$copy_type = get_request('copy_type', 0);
+		$copy_mode = get_request('copy_mode', 0);
+		$filter_groupid = get_request('filter_groupid', 0);
 		$group_itemid = get_request($elements_array_name, array());
-		$copy_targetid = get_request("copy_targetid", array());
+		$copy_targetid = get_request('copy_targetid', array());
 
 		if(!is_array($group_itemid) || (is_array($group_itemid) && count($group_itemid) < 1)){
 			error("Incorrect list of items.");
@@ -2531,10 +2531,10 @@
 		else{
 			foreach($groups as $groupid => $group){
 				array_push($target_list,array(
-					new CCheckBox('copy_targetid['.$groupid.']',
-						uint_in_array($groupid, $copy_targetid),
+					new CCheckBox('copy_targetid['.$group['groupid'].']',
+						uint_in_array($group['groupid'], $copy_targetid),
 						null,
-						$groupid),
+						$group['groupid']),
 					SPACE,
 					$group['name'],
 					BR()
