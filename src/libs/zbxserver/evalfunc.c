@@ -344,7 +344,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 		{
 			switch (item->value_type) {
 			case ITEM_VALUE_TYPE_UINT64:
-				zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
+				offset += zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
 						" and value%s" ZBX_FS_UI64,
 						operators[op],
 						value_uint64);
@@ -352,20 +352,20 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 			case ITEM_VALUE_TYPE_FLOAT:
 				switch (op) {
 				case OP_EQ:
-					zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
+					offset += zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
 							" and value>" ZBX_FS_DBL
 							" and value<" ZBX_FS_DBL,
 							value_double - 0.00001,
 							value_double + 0.00001);
 					break;
 				case OP_NE:
-					zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
+					offset += zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
 							" and not (value>" ZBX_FS_DBL " and value<" ZBX_FS_DBL ")",
 							value_double - 0.00001,
 							value_double + 0.00001);
 					break;
 				default:
-					zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
+					offset += zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
 							" and value%s" ZBX_FS_DBL,
 							operators[op],
 							value_double);
@@ -373,7 +373,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 				break;
 			default:
 				arg2_esc = DBdyn_escape_string(arg2);
-				zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
+				offset += zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
 						" and value like '%s'",
 						arg2_esc);
 				zbx_free(arg2_esc);
@@ -389,6 +389,8 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 		else
 			zbx_snprintf(value, MAX_STRING_LEN, "%s", row[0]);
 		res = SUCCEED;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() value:%s", __function_name, value);
 	}
 	else	/* ZBX_FLAG_VALUES */
 	{
@@ -491,6 +493,8 @@ count_inc:
 		}
 		zbx_snprintf(value, MAX_STRING_LEN, "%d", count);
 		res = SUCCEED;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() value:%s", __function_name, value);
 	}
 	DBfree_result(result);
 	zbx_free(arg2);
