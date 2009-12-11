@@ -7,7 +7,8 @@ echo " WARNING: backup your database before performing upgrade
   1. Drops all indexes that might have been created in Zabbix 1.6 database;
   2. Converts all tables to UTF-8;
   3. Patches the database from 1.6 schema to 1.8 schema;
-  4. Adds the 'Discovered' hosts group and sets it to be used for discovered hosts.
+  4. Adds the 'Discovered Hosts' hosts group and sets it to be used for discovered hosts;
+  5. Adds 'Disabled' usergroup if it is missing.
 
  This script is not for distributed monitoring databases.
 
@@ -89,7 +90,7 @@ $MYSQL $MYSQLPARAMS < patch.sql || fail "Failed to patch Zabbix database. Restor
 echo -n " ... "
 timer stop patching of the database
 
-echo "Adding 'Discovered' host group"
+echo "Adding 'Discovered Hosts' host group"
 
 CURRENTID=$(echo "select nextid from ids where table_name='groups' and field_name='groupid';" | $MYSQL $MYSQLPARAMS -N)
 
@@ -102,3 +103,18 @@ CURRENTID=$(echo "select nextid from ids where table_name='groups' and field_nam
 
 echo "update config set discovery_groupid=(select nextid from ids where table_name='groups' and field_name='groupid') where configid='1';
 insert into groups (groupid,name,internal) select nextid,'Discovered Hosts','1' from ids where table_name='groups' and field_name='groupid';" | $MYSQL $MYSQLPARAMS
+
+echo "Checking for 'Disabled' user group"
+
+[[ "$(echo "select name from usrgrp where name='Disabled';" | $MYSQL $MYSQLPARAMS -N)" ]] || {
+	echo "'Disabled' user group missing, will be added"
+	CURRENTID=$(echo "select nextid from ids where table_name='usrgrp' and field_name='usrgrpid';" | $MYSQL $MYSQLPARAMS -N)
+	
+	[[ "$CURRENTID" ]] && {
+		echo "update ids set nextid='$[$CURRENTID+1]' where table_name='usrgrp' and field_name='usrgrpid';" | $MYSQL $MYSQLPARAMS
+	} || {
+		CURRENTID=$(echo "select usrgrpid from usrgrp order by usrgrpid desc limit 1;" | $MYSQL $MYSQLPARAMS -N)
+		echo "insert into ids values (0,'usrgrp','usrgrpid',$[$CURRENTID+1]);" | $MYSQL $MYSQLPARAMS
+	}
+	echo "insert into usrgrp (usrgrpid,name,gui_access,users_status,api_access,debug_mode) select nextid,'Disabled','0','1','0','0' from ids where table_name='usrgrp' and field_name='usrgrpid';" | $MYSQL $MYSQLPARAMS
+}
