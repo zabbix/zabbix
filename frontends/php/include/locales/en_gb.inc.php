@@ -533,6 +533,8 @@
 	'S_SIA_ZABBIX'=>			'SIA Zabbix',
 
 //	graph.php
+	'S_GRAPHS_COPIED' =>		'Graphs copied',
+	'S_CANNOT_COPY_GRAPHS' =>	'Cannot copy graphs',
 	'S_ITEM_ADDED'=>			'Item added',
 	'S_ITEM_UPDATED'=>			'Item updated',
 	'S_ITEMS_UPDATED'=>			'Items updated',
