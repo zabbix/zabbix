@@ -284,15 +284,23 @@ include_once('include/page_header.php');
 	}
 	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['copy'])&&isset($_REQUEST['group_graphid'])){
 		if(isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])){
-			if(0 == $_REQUEST['copy_type']){ /* hosts */
-				$hosts_ids = $_REQUEST['copy_targetid'];
+		
+			$go_result = true;
+			
+			$options = array(
+				'editable' =>1, 
+				'nodes' => get_current_nodeid(true),
+				'templated_hosts' => 1
+			);
+			
+			if(0 == $_REQUEST['copy_type']){ // hosts 
+				$options['hostids'] = $_REQUEST['copy_targetid']; 
 			}
-			else{
-// groups
+			else{ // groups
 				zbx_value2array($_REQUEST['copy_targetid']);
 
-				$options = array('groupids'=>$_REQUEST['copy_targetid'], 'editable'=>1, 'nodes'=>get_current_nodeid(true));
-				$db_groups = CHostGroup::get($options);
+				$opt = array('groupids'=>$_REQUEST['copy_targetid'], 'editable'=>1, 'nodes'=>get_current_nodeid(true));
+				$db_groups = CHostGroup::get($opt);
 				$db_groups = zbx_toHash($db_groups, 'groupid');
 
 				foreach($_REQUEST['copy_targetid'] as $gnum => $groupid){
@@ -301,16 +309,21 @@ include_once('include/page_header.php');
 					}
 				}
 
-				$options = array('groupids'=>$_REQUEST['copy_targetid'], 'editable'=>1, 'nodes'=>get_current_nodeid(true));
-				$db_hosts = CHost::get($options);
+				$options['groupids'] = $_REQUEST['copy_targetid'];	
 			}
+			
+			$db_hosts = CHost::get($options);
+
 			DBstart();
 			foreach($_REQUEST['group_graphid'] as $gnum => $graph_id){
 				foreach($db_hosts as $hnum => $host){
-					copy_graph_to_host($graph_id, $host['hostid'], true);
+					$go_result &= (bool) copy_graph_to_host($graph_id, $host['hostid'], true);
+
 				}
 			}
-			$go_result = DBend();
+			$go_result = DBend($go_result);
+			
+			show_messages($go_result, S_GRAPHS_COPIED, S_CANNOT_COPY_GRAPHS);
 			$_REQUEST['go'] = 'none2';
 		}
 		else{
@@ -382,8 +395,7 @@ include_once('include/page_header.php');
 	$form->setMethod('get');
 
 // Config
-	$cmbConf = new CComboBox('config','graphs.php','javascript: submit();');
-	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');
+	$cmbConf = new CComboBox('config','graphs.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('templates.php',S_TEMPLATES);
 		$cmbConf->addItem('hosts.php',S_HOSTS);
 		$cmbConf->addItem('items.php',S_ITEMS);
@@ -394,7 +406,7 @@ include_once('include/page_header.php');
 	$form->addItem($cmbConf);
 
 	if(!isset($_REQUEST['form']))
-		$form->addItem(new CButton('form',S_CREATE_GRAPH));
+		$form->addItem(new CButton('form', S_CREATE_GRAPH));
 
 	show_table_header(S_CONFIGURATION_OF_GRAPHS_BIG,$form);
 	echo SBR;
