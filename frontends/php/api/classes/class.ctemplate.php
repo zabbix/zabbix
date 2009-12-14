@@ -881,15 +881,15 @@ class CTemplate extends CZBXAPI{
 			
 			if($result){
 				foreach($hostids as $hostid){
-					foreach($templateids as $tnum => $templateid){
-						if(isset($linked[$hostid]) && isset($linked[$hostid][$templateid])) continue;
-						$hosttemplateid = get_dbid('hosts_templates', 'hosttemplateid');
-						if(!$result = DBexecute('INSERT INTO hosts_templates VALUES ('.$hosttemplateid.','.$hostid.','.$templateid.')')){
-							$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Insert error');
-							break;
-						}
+				foreach($templateids as $tnum => $templateid){
+					if(isset($linked[$hostid]) && isset($linked[$hostid][$templateid])) continue;
+					$hosttemplateid = get_dbid('hosts_templates', 'hosttemplateid');
+					if(!$result = DBexecute('INSERT INTO hosts_templates VALUES ('.$hosttemplateid.','.$hostid.','.$templateid.')')){
+						$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Insert error');
+						break;
 					}
 				}
+			}
 			}
 
 			if($result){
