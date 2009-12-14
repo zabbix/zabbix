@@ -1045,8 +1045,6 @@
 
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_SIMPLE_GRAPH) ){
-					if($editmode == 0) $action = 'history.php?action=showgraph&itemid='.$resourceid.url_param('period').url_param('stime');
-
 					$dom_graph_id = 'graph_'.$screenitemid.'_'.$resourceid;
 					$containerid = 'graph_cont_'.$screenitemid.'_'.$resourceid;
 
@@ -1078,6 +1076,8 @@
 						}
 					}
 //-------------
+					
+					if(($editmode == 0) && !empty($resourceid)) $action = 'history.php?action=showgraph&itemid='.$resourceid.url_param('period').url_param('stime');
 
 					$timeline = array();
 					$timeline['starttime'] = time() - ZBX_MAX_PERIOD;
