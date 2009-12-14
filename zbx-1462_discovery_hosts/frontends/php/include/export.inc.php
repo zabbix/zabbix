@@ -529,18 +529,17 @@ class zbxXML{
 					$groups_to_add = array();
 					foreach($groups as $gnum => $group){
 						$current_group = CHostGroup::getObjects(array('name' => $group->nodeValue));
-// sdii($current_group);
+						
 						if(empty($current_group)){
-							$groups_to_add = array_merge($groups_to_add, $current_group);
+							$groups_to_add[] = array('name' => $group->nodeValue);
 						}
 						else{
 							$host_groups = array_merge($host_groups, $current_group);
 						}
 					}
-
+					
 					if(!empty($groups_to_add)){
 						$new_groups = CHostGroup::create($groups_to_add);
-
 						if($new_groups === false){
 							error(CHostGroup::resetErrors());
 							$result = false;
@@ -550,12 +549,14 @@ class zbxXML{
 						$host_groups = array_merge($host_groups, $new_groups);
 					}
 				}
-// sdii($host_groups);
+ // sdii($host_groups);
 // HOSTS
 //sdi('Host: '.$host_db['host'].' | HostID: '. $current_hostid);
 				if($current_host && isset($rules['host']['exist'])){
+					$host_db['groups'] = $host_groups;
+					
 					$current_host = array_merge($current_host, $host_db);
-
+					
 					if($host_db['status'] == HOST_STATUS_TEMPLATE){
 						$r = CTemplate::update($current_host);
 						$options['templates'] = $r;
@@ -569,20 +570,12 @@ class zbxXML{
 						$result = false;
 						break;
 					}
-
-					$options['groups'] = $host_groups;
-					$r = CHostGroup::massAdd($options);
-					if($r === false){
-						error(CHostGroup::resetErrors());
-						$result = false;
-						break;
-					}
 				}
 
 				if(!$current_host && isset($rules['host']['missed'])){
 					$host_db['groups'] = $host_groups;
 					if($host_db['status'] == HOST_STATUS_TEMPLATE){
-						$current_host = CTemplate::add($host_db);
+						$current_host = CTemplate::create($host_db);
 					}
 					else{
 						$current_host = CHost::create($host_db);

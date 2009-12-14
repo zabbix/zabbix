@@ -613,35 +613,48 @@ class CTemplate extends CZBXAPI{
  * @return boolean
  */
 	public static function update($templates){
+
 		$errors = array();
 		$result = true;
 		$templates = zbx_toArray($templates);
-		$templateids = array();
+		$templateids = zbx_objectValues($templates, 'templateid');
 
 		$upd_templates = self::get(array(
-			'templateids' => zbx_objectValues($templates, 'templateid'), 
+			'templateids' => $templateids, 
 			'editable' => 1, 
 			'extendoutput' => 1, 
 			'preservekeys' => 1
 		));
-		foreach($templates as $gnum => $template){
+		foreach($templates as $tnum => $template){
+// PERMISSIONS {{{
 			if(!isset($upd_templates[$template['templateid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				return false;
 			}
-			$templateids[] = $template['templateid'];
-		}
+// }}} PERMISSIONS
 
-		
-// CHECK IF HOSTS HAVE AT LEAST 1 GROUP {{{	
-		foreach($templates as $hnum => $template){
+// CHECK IF HOSTS HAVE AT LEAST 1 GROUP {{{
 			if(isset($template['groups']) && empty($template['groups'])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'No groups for template [ '.$template['host'].' ]');
 				return false;
 			}
-			$templates[$hnum]['groups'] = zbx_toArray($templates[$hnum]['groups']);			
-		}
+			$templates[$tnum]['groups'] = zbx_toArray($templates[$tnum]['groups']);			
 // }}} CHECK IF HOSTS HAVE AT LEAST 1 GROUP
+
+// CHECK CIRCULAR LINKS {{{
+			if(!self::checkCircularLink($template['templateid'], zbx_objectValues($template['templates'], 'templateid'))){
+				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Circular link can not be created');
+				return false;
+			}
+// }}} CHECK CIRCULAR LINKS
+		}
+
+		
+		// if(!check_templates_trigger_dependencies($templateids)){
+			// self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Wrong template trigger dependencies');
+			// return false;
+		// }
+		
 
 		self::BeginTransaction(__METHOD__);
 		foreach($templates as $tnum => $template){
@@ -662,19 +675,6 @@ class CTemplate extends CZBXAPI{
 			if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $template['host'])){
 				$result = false;
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Incorrect characters used for Hostname [ '.$template['host'].' ]');
-				break;
-			}
-
-			
-			if(!check_templates_trigger_dependencies($template['templates'])){
-				$result = false;
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong template trigger dependencies');
-				break;
-			}
-			
-			if(check_circle_host_link($template['templateid'], $template['templates'])){
-				$result = false;
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Circular link can not be created');
 				break;
 			}
 
@@ -740,6 +740,47 @@ class CTemplate extends CZBXAPI{
 		}
 	}
 
+	private static function checkCircularLink($id, $templateids){
+		if(empty($templateids)) return true;
+
+		foreach($templateids as $tpid){
+			if(bccomp($tpid, $id) == 0) return false;
+		}
+		
+		$sql = 'SELECT templateid FROM hosts_templates WHERE hostid='.$id;
+		$tpls_db = DBselect($sql);
+		while($tpl = DBfetch($tpls_db)){
+			$templateids[] = $tpl['templateid'];		
+		}
+		
+		$first_lvl_templateids = array_unique($templateids);
+		$next_templateids = $first_lvl_templateids;
+		$templateids = array();
+
+		do{
+			$sql = 'SELECT templateid FROM hosts_templates WHERE '.DBcondition('hostid', $next_templateids);
+			$tpls_db = DBselect($sql);
+
+			$next_templateids = array();
+			while($tpl = DBfetch($tpls_db)){
+				$next_templateids[] = $tpl['templateid'];		
+			}
+			$templateids = array_merge($templateids, $next_templateids);
+		}while(!empty($next_templateids));
+	
+		$first_lvl_templateids[] = $id;
+		if(array_intersect($first_lvl_templateids, $templateids)){
+			return false;
+		}
+		// $sql = 'SELECT hostid FROM hosts_templates WHERE '.DBcondition('hostid', $templateids).' AND '.DBcondition('templateid', $templateids);
+		// if(DBfetch(DBselect($sql))){
+			// return false;
+		// }
+		
+		return true;
+	}
+	
+	
 /**
  * Delete Template
  *
@@ -828,7 +869,18 @@ class CTemplate extends CZBXAPI{
 				$linked[$pair['hostid']] = array($pair['templateid'] => $pair['templateid']);
 			}
 		
+		
 			foreach($hostids as $hostid){
+				if(!self::checkCircularLink($hostid, $templateids)){
+					$result = false;
+					$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Circular link can not be created');					
+					break;
+				}
+			}
+			
+			
+			if($result){
+				foreach($hostids as $hostid){
 				foreach($templateids as $tnum => $templateid){
 					if(isset($linked[$hostid]) && isset($linked[$hostid][$templateid])) continue;
 					$hosttemplateid = get_dbid('hosts_templates', 'hosttemplateid');
@@ -837,6 +889,7 @@ class CTemplate extends CZBXAPI{
 						break;
 					}
 				}
+			}
 			}
 
 			if($result){
@@ -867,6 +920,7 @@ class CTemplate extends CZBXAPI{
 					if(isset($linked[$templates_linkid]) && isset($linked[$templates_linkid][$templateid])) continue;
 					$hosttemplateid = get_dbid('hosts_templates', 'hosttemplateid');
 					if(!$result = DBexecute('INSERT INTO hosts_templates VALUES ('.$hosttemplateid.','.$templates_linkid.','.$templateid.')')){
+						$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Insert error');
 						break;
 					}
 				}
