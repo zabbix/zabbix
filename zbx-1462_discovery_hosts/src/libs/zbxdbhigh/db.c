@@ -2123,27 +2123,30 @@ void DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset)
  *           host_name_sample is not modified, allocates new memory!          *
  *                                                                            *
  ******************************************************************************/
-char *DBget_unique_hostname_by_sample(char *host_name_sample)
+char	*DBget_unique_hostname_by_sample(char *host_name_sample)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		num = 2;/* produce alternatives starting from "2" */
-	char		*host_name_temp = NULL;
-	char		*host_name_sample_esc = NULL;
-		
+	int		num = 2;	/* produce alternatives starting from "2" */
+	char		*host_name_temp, *host_name_sample_esc;
+
 	assert(host_name_sample && *host_name_sample);
-	
-	zabbix_log(LOG_LEVEL_DEBUG, "In DBget_unique_hostname_by_sample() sample: [%s]", host_name_sample);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In DBget_unique_hostname_by_sample() sample:'%s'",
+			host_name_sample);
+
 	host_name_sample_esc = DBdyn_escape_string(host_name_sample);
 	result = DBselect(
-		"select host"
-		" from hosts"
-		" where host like '%s%%'"
+			"select host"
+			" from hosts"
+			" where host like '%s%%'"
 		                 DB_NODE
-		" group by host",
-		host_name_sample_esc,
-		DBnode_local("hostid"));
+			" group by host",
+			host_name_sample_esc,
+			DBnode_local("hostid"));
+
 	host_name_temp = strdup(host_name_sample);
+
 	while (NULL != (row = DBfetch(result)))
 	{
 		if (0 < strcmp(host_name_temp, row[0]))
@@ -2158,14 +2161,14 @@ char *DBget_unique_hostname_by_sample(char *host_name_sample)
 		}
 		/* 0 == strcmp(host_name_temp, row[0]) */
 		/* must construct bigger one, the constructed one already exists */
-		zbx_free(host_name_temp);
-		host_name_temp = strdup(host_name_sample);
-		host_name_temp = zbx_strdcatf(host_name_temp, "_%i", num);
-		num++;
+		host_name_temp = zbx_dsprintf(host_name_temp, "%s_%d", host_name_sample, num++);
 	}
-	zbx_free(host_name_sample_esc);
 	DBfree_result(result);
-	zabbix_log(LOG_LEVEL_DEBUG, "End DBget_unique_hostname_by_sample() constructed: [%s]", host_name_temp);
-	
+
+	zbx_free(host_name_sample_esc);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of DBget_unique_hostname_by_sample() constructed:'%s'",
+			host_name_temp);
+
 	return host_name_temp;
 }
