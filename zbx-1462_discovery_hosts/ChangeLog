@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1462] fixed "Add host" operation for "Discovery" module for trying to add a host name which is already used (Dmitry)
  - [ZBX-1283] fixed group selection in maintenance edit form (Vedmak)
  - [ZBX-1316] fixed missing trigger expressions using expression constructor (Vedmak)
  - [ZBX-1473] fixed installation requires mb_string function from php 5.2 (Vedmak)
