@@ -49,13 +49,10 @@ class CUser extends CZBXAPI{
  * @param array $options['usrgrpids'] filter by UserGroup IDs
  * @param array $options['userids'] filter by User IDs
  * @param boolean $options['type'] filter by User type [ USER_TYPE_ZABBIX_USER: 1, USER_TYPE_ZABBIX_ADMIN: 2, USER_TYPE_SUPER_ADMIN: 3 ]
- * @param boolean $options['status'] filter by User status [ 0, 1 ]
- * @param boolean $options['with_gui_access'] filter only with GUI access
- * @param boolean $options['with_api_access'] filter only with API access
  * @param boolean $options['select_usrgrps'] extend with UserGroups data for each User
  * @param boolean $options['get_access'] extend with access data for each User
  * @param boolean $options['extendoutput'] output only User IDs if not set.
- * @param boolean $options['count'] output only count of objects in result. ( ruselt returned in property 'rowscount' )
+ * @param boolean $options['count'] output only count of objects in result. ( result returned in property 'rowscount' )
  * @param string $options['pattern'] filter by Host name containing only give pattern
  * @param int $options['limit'] output will be limited to given number
  * @param string $options['sortfield'] output will be sorted by given property [ 'userid', 'alias' ]
@@ -85,12 +82,8 @@ class CUser extends CZBXAPI{
 			'userids'					=> null,
 			'users' 					=> null,
 			'type'						=> null,
-			'status'					=> null,
-			'with_gui_access'			=> null,
-			'with_api_access'			=> null,
 // filter
 			'pattern'					=> '',
-
 // OutPut
 			'extendoutput'				=> null,
 			'editable'					=> null,
@@ -142,23 +135,11 @@ class CUser extends CZBXAPI{
 		}
 
 // type
-		if(!is_null($options['status'])){
-			$sql_parts['where'][] = 'g.users_status='.$options['status'];
-		}
-// status
-		if(!is_null($options['status'])){
-			$sql_parts['where'][] = 'g.users_status='.$options['status'];
+		if(!is_null($options['type'])){
+			$sql_parts['where'][] = 'u.type='.$options['type'];
 		}
 
-// with_gui_access
-		if(!is_null($options['with_gui_access'])){
-			$sql_parts['where'][] = 'g.gui_access='.GROUP_GUI_ACCESS_ENABLED;
-		}
-// with_api_access
-		if(!is_null($options['with_api_access'])){
-			$sql_parts['where'][] = 'g.api_access='.GROUP_API_ACCESS_ENABLED;
-		}
-
+		
 // extendoutput
 		if(!is_null($options['extendoutput'])){
 			$sql_parts['select']['users'] = 'u.*';
