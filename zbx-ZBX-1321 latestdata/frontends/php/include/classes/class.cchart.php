@@ -722,7 +722,8 @@ class CChart extends CGraphDraw{
 		$tmp_maxY[GRAPH_YAXIS_SIDE_LEFT] = $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT];
 		$tmp_maxY[GRAPH_YAXIS_SIDE_RIGHT] = $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT];
 //------
-
+sdii($tmp_minY);
+sdii($tmp_maxY);
 // CALC interval
 		$col_interval = ($this->gridPixelsVert*($this->m_maxY[$side] - $this->m_minY[$side]))/$this->sizeY;
 		$max = $this->m_maxY[$side];

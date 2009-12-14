@@ -1,6 +1,13 @@
 Changes for 1.8.1
+
+ - [ZBX-1174] fixed sql in "Add host" operation in "Discovery" module (Dmitry)
+ - [ZBX-1431] fixed parameters for user.get api method (Vedmak)
+ - [ZBX-1467] fixed graph copying (Vedmak)
+ - [ZBX-1502] fixed full clone of hosts (Vedmak)
+ - [ZBX-1460] forbidded creation of circular template linkages (Vedmak)
  - [ZBX-1441] fixed wrong rememberes link line type (Vedmak)
  - [ZBX-1498] fixed error when try to create item with custom key "log" and not Log item type (Vedmak)
+ - [ZBX-1497] fixed evaluation of trigger function 'count' (Sasha)
  - [ZBX-1283] fixed group selection in maintenance edit form (Vedmak)
  - [ZBX-1316] fixed missing trigger expressions using expression constructor (Vedmak)
  - [ZBX-1473] fixed installation requires mb_string function from php 5.2 (Vedmak)
@@ -20,7 +27,7 @@ Changes for 1.8
  - [ZBX-1449] fixed possibility of editing templated graphs (Vedmak)
  - [ZBX-1174] fixed "Add host" operation in "Discovery" module, ports are now never updated when the host already exists (Dmitry)
  - [ZBX-1357] updated French translation. Thanks to alixen (Richlv)
- - [1306] fixed showing triggers that recently changed state as errors in dashboard (Vedmak)
+ - [ZBX-1306] fixed showing triggers that recently changed state as errors in dashboard (Vedmak)
  - [ZBX-1030] fixed security vulnerability in server allowing remote unauthenticated users to execute scripts. Thanks to Nicob (Sasha)
  - [ZBX-1437] fixed errors in events screen (Vedmak)
  - [ZBX-1433] fixed error viewing event (Vedmak)
