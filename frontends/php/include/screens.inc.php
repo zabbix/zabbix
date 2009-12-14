@@ -946,8 +946,7 @@
 						if($new_items = get_same_graphitems_for_host($def_items, $_REQUEST['hostid'], false)){
 							$url.= make_url_from_gitems($new_items);
 						}
-
-						$url= make_url_from_graphid($resourceid,false).$url;
+						$url= make_url_from_graphid($resourceid,false).$url;						
 					}
 //-------------
 					$default = false;
@@ -1000,10 +999,6 @@
 					}
 				}
 				else if(($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_SIMPLE_GRAPH)){
-					if($editmode == 0)
-						$action = "history.php?action=showgraph&itemid=$resourceid".
-                                                        url_param("period").url_param("inc").url_param("dec");
-
 // Host feature
 					if(($dynamic == SCREEN_DYNAMIC_ITEM) && isset($_REQUEST['hostid']) && ($_REQUEST['hostid']>0)){
 						if($newitemid = get_same_item_for_host($resourceid,$_REQUEST['hostid'],false)){
@@ -1012,8 +1007,11 @@
 						else{
 							$resourceid='';
 						}
-					}
+					}			
 //-------------
+					if(($editmode == 0) && !empty($resourceid))
+						$action = "history.php?action=showgraph&itemid=$resourceid".url_param("period").url_param("inc").url_param("dec");
+														
 					$url = (empty($resourceid))?'chart3.php?':"chart.php?itemid=$resourceid&";
 					$item = new CLink(
 						new CImg($url."width=$width&height=$height"."&period=$effectiveperiod".url_param("stime")),
