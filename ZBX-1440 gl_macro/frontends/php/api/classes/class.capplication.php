@@ -492,11 +492,14 @@ class CApplication extends CZBXAPI{
 	public static function addItems($data){
 
 		$result = true;
-
+		$errors = array();
+		
 		$applications = zbx_toArray($data['applications']);
 		$items = zbx_toArray($data['items']);
 		$applicationids = array();
 		$itemids = array();
+		
+		if(empty($applications)) return true;
 
 // PERMISSION {{{
 		$allowed_applications = self::get(array(
@@ -551,6 +554,7 @@ class CApplication extends CZBXAPI{
 		}
 
 		if($result){
+			$child_applications = array();
 			foreach($itemids as $itemid){
 				$db_childs = DBselect('SELECT itemid, hostid FROM items WHERE templateid='.$itemid);
 
@@ -584,7 +588,7 @@ class CApplication extends CZBXAPI{
 			return $result;
 		}
 		else{
-			self::setError(__METHOD__);
+			self::setMethodErrors(__METHOD__, $errors);
 			return false;
 		}
 	}
