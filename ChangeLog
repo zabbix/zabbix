@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1440] fixed error when adding global macro (Vedmak)
  - [ZBX-1435] fixed exporting triggers with '&' (Vedmak)
  - [ZBX-1459] fixed template importing (Vedmak)
  - [ZBX-1174] fixed sql in "Add host" operation in "Discovery" module (Dmitry)
