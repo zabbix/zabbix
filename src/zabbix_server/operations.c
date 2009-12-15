@@ -624,7 +624,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 					DBexecute("update hosts"
 							" set dns='%s',proxy_hostid=" ZBX_FS_UI64
 							" where hostid=" ZBX_FS_UI64,
-							host_esc, port, proxy_hostid,
+							host_esc, proxy_hostid,
 							hostid);
 				}
 			}
