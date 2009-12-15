@@ -476,7 +476,7 @@
 	/* REMOVE MACROS */
 		if(isset($_REQUEST['macros_del']) && isset($_REQUEST['macros_rem'])){
 			$result = CUserMacro::deleteGlobalMacro(zbx_toObject($_REQUEST['macros_rem'], 'globalmacroid'));
-			show_messages($result, S_MACROS_DELETED, S_CANNOT_DELETED_MACROS);
+			show_messages($result, S_MACROS_DELETED, S_CANNOT_DELETE_MACROS);
 		}
 	/* ADD MACRO */
 		if(isset($_REQUEST['macro_add'])){
