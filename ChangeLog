@@ -1,5 +1,6 @@
 Changes for 1.6.8
 
+ - [ZBX-1470] fixed importing triggers with ':' in description (Vedmak)
  - [ZBX-1530] fixed wrong host selected clicking simple graph with dynamic item on screen (Vedmak)
  - [ZBX-1408] fixed adding images for postgresql (Aly)
  - [ZBX-3] remove a comment saying syslog is used until it works (Richlv)

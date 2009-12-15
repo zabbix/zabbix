@@ -453,10 +453,13 @@
  *
  * Comments:
  *	  description - host-name:trigger-description. Example( "unix server:low free disk space")
+ *
+ * Fixed by NOB:
+ * Example (template-name: OS: Linux: Ping) did not work
  */
 
 	function get_trigger_by_description($desc){
-		list($host_name, $trigger_description) = explode(':',$desc);
+		list($host_name, $trigger_description) = explode(':',$desc, 2);
 
 		$sql = 'SELECT t.* '.
 				' FROM triggers t, items i, functions f, hosts h '.
