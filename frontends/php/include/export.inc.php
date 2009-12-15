@@ -258,7 +258,8 @@ class zbxXML{
 		}
 		foreach(self::$ZBX_EXPORT_MAP[$child_name]['elements'] as $el => $name){
 			if($name == '') $name = $el;
-			$child_node->appendChild(new DOMElement($name, $data[$el]));
+			$n = $child_node->appendChild(new DOMElement($name));
+			$n->appendChild(new DOMText($data[$el]));
 		}
 
 	return $child_node;
