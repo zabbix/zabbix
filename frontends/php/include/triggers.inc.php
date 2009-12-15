@@ -470,7 +470,7 @@ return $result;
  */
 
 	function get_trigger_by_description($desc){
-		list($host_name, $trigger_description) = explode(':',$desc);
+		list($host_name, $trigger_description) = explode(':',$desc,2);
 
 		$sql = 'SELECT t.* '.
 				' FROM triggers t, items i, functions f, hosts h '.
