@@ -67,7 +67,7 @@ function execute_script($scriptid,$hostid){
 
 	$message = array();
 
-	if(!$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)){
+	if(!$socket = @socket_create(AF_INET, SOCK_STREAM, SOL_TCP)){
 		return false;
 	}
 
