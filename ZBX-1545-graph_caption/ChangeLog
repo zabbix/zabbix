@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1545] fixed showing templated graphs in graph selection combobox (Vedmak)
  - [ZBX-1324] replaced more user visible strings ZABBIX with Zabbix (Richlv)
  - [ZBX-1470] fixed importing triggers with dependencies (Vedmak)
  - [ZBX-1440] fixed error when adding global macro (Vedmak)
