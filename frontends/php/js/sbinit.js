@@ -148,12 +148,24 @@ function graph_zoom_init(graph_id,stime,period,width,height, dynamic){
 }
 
 function graphload(dom_objects,unix_stime,period,dynamic){
-
 	if(period < 3600) return false;
 	
 	var date = datetoarray(unix_stime);
 	var url_stime = ''+date[2]+date[1]+date[0]+date[3]+date[4];
 	
+// ----------------
+	if($('fs_icon') != null){
+		var old_url = $('fs_icon').getAttribute('old_url');
+		
+		var uri = new url(old_url);
+		uri.setArgument('stime', url_stime);
+		var new_url = uri.getUrl();
+		
+		$('fs_icon').onclick = function(){
+			document.location = new_url;
+		};
+	}
+// ----------
 
 	if((typeof(SCROLL_BAR) != 'undefined') && SCROLL_BAR.changed){
 //alert((SCROLL_BAR.dt.getTime()-(SCROLL_BAR.period * 1000))+' == '+SCROLL_BAR.sdt.getTime());

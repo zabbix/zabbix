@@ -93,7 +93,8 @@ include_once 'include/page_header.php';
 	$_REQUEST['graphid'] = get_request('graphid', get_profile('web.charts.graphid', 0, PROFILE_TYPE_ID));
 	if(!in_node($_REQUEST['graphid'])) $_REQUEST['graphid'] = 0;
 
-//	$_REQUEST['stime'] =	get_request('stime',get_profile('web.graph.stime', null, PROFILE_TYPE_STR, $_REQUEST['graphid']));
+
+	// $_REQUEST['stime'] =	get_request('stime',get_profile('web.graph.stime', null, PROFILE_TYPE_STR, $_REQUEST['graphid']));
 	$_REQUEST['period'] =	get_request('period',get_profile('web.graph.period', ZBX_PERIOD_DEFAULT, PROFILE_TYPE_INT, $_REQUEST['graphid']));
 	
 	$effectiveperiod = navigation_bar_calc();
@@ -316,9 +317,12 @@ include_once 'include/page_header.php';
 		}
 		$icon->addOption('id','addrm_fav');
 		
-		$url = '?graphid='.$_REQUEST['graphid'].($_REQUEST['fullscreen']?'':'&fullscreen=1');
+		$url = '?graphid='.$_REQUEST['graphid'].($_REQUEST['fullscreen']?'':'&fullscreen=1').
+			(isset($_REQUEST['stime'])? '&stime='.$_REQUEST['stime'] : '');
 
 		$fs_icon = new CDiv(SPACE,'fullscreen');
+		$fs_icon->addOption('id', 'fs_icon');
+		$fs_icon->addOption('old_url', $url);
 		$fs_icon->addOption('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 		$fs_icon->addAction('onclick',new CScript("javascript: document.location = '".$url."';"));
 		
