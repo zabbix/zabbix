@@ -1014,6 +1014,25 @@ class CHost extends CZBXAPI{
 			}
 		}
 // }}} UPDATE HOSTGROUPS LINKAGE
+
+// PROFILE {{{
+		if($result && !empty($data['profile'])){
+		
+				$sql = 'DELETE FROM hosts_groups WHERE '.DBcondition('hostid', $hostids);
+				$result = DBexecute($sql);
+
+				foreach($groupids as $gnum => $groupid){
+					foreach($hostids as $hostid){
+						$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
+						$result = DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ($hostgroupid, $hostid, $groupid)");
+						if(!$result){
+							break 2;
+						}
+					}
+				}
+			}
+		}
+// }}} PROFILE
 		
 		$result = self::EndTransaction($result, __METHOD__);
 
