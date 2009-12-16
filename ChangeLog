@@ -1,5 +1,6 @@
 Changes for 1.6.8
 
+ - [ZBX-1544] fixed showing discoveries from all nodes in dashboard (Vedmak)
  - [ZBX-1539] fixed reseting graph time when go to fullscreen mode (Vedmak)
  - [ZBX-1470] fixed importing triggers with ':' in description (Vedmak)
  - [ZBX-1530] fixed wrong host selected clicking simple graph with dynamic item on screen (Vedmak)

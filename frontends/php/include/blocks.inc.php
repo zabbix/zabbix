@@ -422,6 +422,7 @@ function make_discovery_status(){
 
 	$db_dhosts = DBselect('SELECT d.* '.
 					' FROM dhosts d '.
+					' WHERE '.DBin_node('druleid').
 					' ORDER BY d.dhostid,d.status,d.ip');
 
 	$services = array();
