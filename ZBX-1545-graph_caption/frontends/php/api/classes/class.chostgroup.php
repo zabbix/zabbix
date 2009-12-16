@@ -72,7 +72,6 @@ class CHostGroup extends CZBXAPI{
 			'with_httptests' 			=> null,
 			'with_monitored_httptests'	=> null,
 			'with_graphs'				=> null,
-			'only_current_node'			=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
 
