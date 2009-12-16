@@ -682,7 +682,7 @@ static int	DBdelete_sysmaps_element(zbx_uint64_t selementid)
 	DB_ROW		row;
 	zbx_uint64_t	linkid;
 
-	result = DBselect("select linkid from sysmaps_links where "
+	result = DBselect("select linkid from sysmaps_links"
 			" where selementid1=" ZBX_FS_UI64 " or selementid2=" ZBX_FS_UI64,
 			selementid,
 			selementid);
@@ -760,7 +760,7 @@ static void DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
 	DB_ROW		row;
 
 	/* disable actions */
-	result = DBselect("select distinct actionid from conditions where conditiontype=%d and value=" ZBX_FS_UI64,
+	result = DBselect("select distinct actionid from conditions where conditiontype=%d and value='" ZBX_FS_UI64 "'",
 			conditiontype, elementid);
 
 	while (NULL != (row = DBfetch(result)))
