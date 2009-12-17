@@ -258,7 +258,8 @@ class zbxXML{
 		}
 		foreach(self::$ZBX_EXPORT_MAP[$child_name]['elements'] as $el => $name){
 			if($name == '') $name = $el;
-			$child_node->appendChild(new DOMElement($name, $data[$el]));
+			$n = $child_node->appendChild(new DOMElement($name));
+			$n->appendChild(new DOMText($data[$el]));
 		}
 
 	return $child_node;
@@ -959,11 +960,15 @@ class zbxXML{
 					$trigger_description = $dependency->getAttribute('description');
 					$current_triggerid = get_trigger_by_description($trigger_description);
 
-//sdi('<b><u>Trigger Description: </u></b>'.$dependency['description'].' | <b>Current_triggerid: </b>'. $current_triggerid['triggerid']);
+// sdi('<b><u>Trigger Description: </u></b>'.$trigger_description.' | <b>Current_triggerid: </b>'. $current_triggerid['triggerid']);
+
 					if($current_triggerid && isset($triggers_for_dependencies[$current_triggerid['triggerid']])){
-						foreach($dependency as $depends_on){
+						$xpath = new DOMXPath($xml);
+						$depends_on_list = $xpath->query('depends', $dependency);
+						
+						foreach($depends_on_list as $depends_on){
 							$depends_triggerid = get_trigger_by_description($depends_on->nodeValue);;
-//sdi('<b>depends on description: </b>'.$depends_on.' | <b>depends_triggerid: </b>'. $depends_triggerid['triggerid']);
+// sdi('<b>depends on description: </b>'.$depends_on->nodeValue.' | <b>depends_triggerid: </b>'. $depends_triggerid['triggerid']);
 							if($depends_triggerid['triggerid']){
 								$triggers_to_add_dep[] = $depends_triggerid['triggerid'];
 								//CTrigger::addDependency(array('triggerid' => $current_triggerid['triggerid'], 'depends_on_triggerid' => $depends_triggerid['triggerid']));
