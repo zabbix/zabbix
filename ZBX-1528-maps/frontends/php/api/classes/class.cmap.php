@@ -211,7 +211,6 @@ class CMap extends CZBXAPI{
 				$map_elements['hostgroups'] = array();
 
 				$db_elements = DBselect('SELECT * FROM sysmaps_elements WHERE '.DBcondition('sysmapid', $sysmapids));
-
 				while($element = DBfetch($db_elements)){
 					switch($element['elementtype']){
 						case SYSMAP_ELEMENT_TYPE_HOST:
@@ -232,41 +231,51 @@ class CMap extends CZBXAPI{
 						break;
 					}
 				}
+
 // sdi($hosts_to_check);
 // sdi($maps_to_check);
 // sdi($triggers_to_check);
 // sdi($host_groups_to_check);
+
 				$nodeids = get_current_nodeid(true);
 				$host_options = array('hostids' => $hosts_to_check,
 									'nodeids' => $nodeids,
 									'editable' => isset($options['editable']),
 									'preservekeys'=>1);
 				$allowed_hosts = CHost::get($host_options);
+				$allowed_hosts = zbx_objectValues($allowed_hosts, 'hostid');
 
 				$map_options = array('sysmapids' => $maps_to_check,
 									'nodeids' => $nodeids,
 									'editable' => isset($options['editable']),
 									'preservekeys'=>1);
 				$allowed_maps = self::get($map_options);
+				$allowed_maps = zbx_objectValues($allowed_maps, 'mapid');
 
 				$trigger_options = array('triggerids' => $triggers_to_check,
 									'nodeids' => $nodeids,
 									'editable' => isset($options['editable']),
 									'preservekeys'=>1);
 				$allowed_triggers = CTrigger::get($trigger_options);
+				$allowed_triggers = zbx_objectValues($allowed_triggers, 'triggerid');
 
 				$hostgroup_options = array('groupids' => $host_groups_to_check,
 									'nodeids' => $nodeids,
 									'editable' => isset($options['editable']),
 									'preservekeys'=>1);
 				$allowed_host_groups = CHostGroup::get($hostgroup_options);
-
+				$allowed_host_groups = zbx_objectValues($allowed_host_groups, 'groupid');
 
 				$restr_hosts = array_diff($hosts_to_check, $allowed_hosts);
 				$restr_maps = array_diff($maps_to_check, $allowed_maps);
 				$restr_triggers = array_diff($triggers_to_check, $allowed_triggers);
 				$restr_host_groups = array_diff($host_groups_to_check, $allowed_host_groups);
-
+/*
+SDII($restr_hosts);
+SDII($restr_maps);
+SDII($restr_triggers);
+SDII($restr_host_groups);
+//*/
 				foreach($restr_hosts as $elementid){
 					foreach($map_elements['hosts'] as $map_elementid => $map_element){
 						if(isset($map_elements['hosts'][$elementid])){
