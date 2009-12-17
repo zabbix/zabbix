@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1465] fixed adding hostgroup elements on map (Aly)
  - [ZBX-1457] hosts in export file is now sorted by hostname (Vedmak)
  - [ZBX-1462] fixed "Add host" operation for "Discovery" module for trying to add a host name which is already used (Dmitry)
  - [ZBX-1547] fixed SQL error while executing discovery action 'remove host' (Sasha)
