@@ -634,13 +634,13 @@ class CHost extends CZBXAPI{
  * @return boolean
  */
 	public static function create($hosts){
-		$errors = array();	
+		$errors = array();
 		$hosts = zbx_toArray($hosts);
 		$hostids = array();
 		$groupids = array();
 		$result = false;
 
-// CHECK IF HOSTS HAVE AT LEAST 1 GROUP {{{ 
+// CHECK IF HOSTS HAVE AT LEAST 1 GROUP {{{
 		foreach($hosts as $hnum => $host){
 			if(empty($host['groups'])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'No groups for host [ '.$host['host'].' ]');
@@ -691,7 +691,7 @@ class CHost extends CZBXAPI{
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields for host [ '.$host['host'].' ]');
 				break;
 			}
-			
+
 			if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host['host'])){
 				$result = false;
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Incorrect characters used for Hostname [ '.$host['host'].' ]');
@@ -737,16 +737,16 @@ class CHost extends CZBXAPI{
 				break;
 			}
 
-			
+
 			$host['hostid'] = $hostid;
 			$options = array();
 			$options['hosts'] = $host;
 			$options['groups'] = $host['groups'];
 			if(isset($host['templates']) && !is_null($host['templates']))
 				$options['templates'] = $host['templates'];
-			
+
 			$result &= CHost::massAdd($options);
-			
+
 		}
 
 		$result = self::EndTransaction($result, __METHOD__);
@@ -794,7 +794,7 @@ class CHost extends CZBXAPI{
 		$hosts = zbx_toArray($hosts);
 		$hostids = zbx_objectValues($hosts, 'hostid');
 
-		
+
 		$upd_hosts = self::get(array('hostids'=> $hostids, 'editable'=>1, 'extendoutput'=>1, 'preservekeys'=>1));
 		foreach($hosts as $gnum => $host){
 			if(!isset($upd_hosts[$host['hostid']])){
@@ -803,16 +803,16 @@ class CHost extends CZBXAPI{
 			}
 		}
 
-// CHECK IF HOSTS HAVE AT LEAST 1 GROUP {{{	
+// CHECK IF HOSTS HAVE AT LEAST 1 GROUP {{{
 		foreach($hosts as $hnum => $host){
 			if(isset($host['groups']) && empty($host['groups'])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'No groups for host [ '.$host['host'].' ]');
 				return false;
 			}
-			$hosts[$hnum]['groups'] = zbx_toArray($hosts[$hnum]['groups']);			
+			$hosts[$hnum]['groups'] = zbx_toArray($hosts[$hnum]['groups']);
 		}
 // }}} CHECK IF HOSTS HAVE AT LEAST 1 GROUP
-		
+
 		self::BeginTransaction(__METHOD__);
 		foreach($hosts as $num => $host){
 
@@ -820,7 +820,7 @@ class CHost extends CZBXAPI{
 				$result = false;
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields for host [ '.$host['host'].' ]');
 				break;
-			}	
+			}
 			if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host['host'])){
 				$result = false;
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Incorrect characters used for Hostname [ '.$host['host'].' ]');
@@ -832,7 +832,7 @@ class CHost extends CZBXAPI{
 				break;
 			}
 
-			
+
 			$host_exists = self::getObjects(array('host' => $host['host']));
 			$host_exists = reset($host_exists);
 
@@ -860,9 +860,9 @@ class CHost extends CZBXAPI{
 				' WHERE hostid='.$host['hostid'];
 			$result = DBexecute($sql);
 
-			update_host_status($host['hostid'], $host['status']);											
-			
-			
+			update_host_status($host['hostid'], $host['status']);
+
+
 			if(isset($host['groups']) && !is_null($host['groups'])){
 				$host_groups = CHostGroup::get(array('hostids' => $host['hostid']));
 				$host_groupids = zbx_objectValues($host_groups, 'groupid');
@@ -873,37 +873,37 @@ class CHost extends CZBXAPI{
 				if(!empty($groups_to_add)){
 					$result &= self::massAdd(array('hosts' => $host, 'groups' => $groups_to_add));
 				}
-				
+
 				$groups_to_del = array_diff($host_groupids, $new_groupids);
 
 				if(!empty($groups_to_del)){
 					$result &= self::massRemove(array('hosts' => $host, 'groups' => $groups_to_del));
 				}
 			}
-			
+
 			$host['templates_clear'] = isset($host['templates_clear']) ? $host['templates_clear'] : array();
 			if(isset($host['templates_clear']) && !is_null($host['templates_clear'])){
 				foreach($host['templates_clear'] as $tpl){
 					$result = unlink_template($host['hostid'], $tpl['templateid'], false);
 				}
 			}
-			
+
 			if(isset($host['templates']) && !is_null($host['templates'])){
 				$host_templates = CTemplate::get(array('hostids' => $host['hostid'], 'nopermissions' => 1));
 				$host_templateids = zbx_objectValues($host_templates, 'templateid');
 				$new_templateids = zbx_objectValues($host['templates'], 'templateid');
-				
+
 				$templates_to_add = array_diff($new_templateids, $host_templateids);
 				if(!empty($templates_to_add)){
 					$result &= CTemplate::massAdd(array('hosts' => $host, 'templates' => $templates_to_add));
 				}
-				
+
 				$templates_to_del = array_diff($host_templateids, $new_templateids);
 				$templates_to_del = array_diff($templates_to_del, $host['templates_clear']);
-				
+
 				if(!empty($templates_to_del)){
 					$result &= CTemplate::massRemove(array('hosts' => $host, 'templates' => $templates_to_del));
-				}	
+				}
 			}
 
 			if(!$result) break;
@@ -912,7 +912,7 @@ class CHost extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_hosts = self::get(array('hostids' => $hostids, 'extendoutput' => 1, 'nopermissions' => 1));			
+			$upd_hosts = self::get(array('hostids' => $hostids, 'extendoutput' => 1, 'nopermissions' => 1));
 			return $upd_hosts;
 		}
 		else{
@@ -952,14 +952,14 @@ class CHost extends CZBXAPI{
 	public static function massUpdate($data){
 		$errors = array();
 		$result = true;
-		
-		$hosts = zbx_toArray($data['hosts']);	
+
+		$hosts = zbx_toArray($data['hosts']);
 		$hostids = zbx_objectValues($hosts, 'hostid');
 
 		$upd_hosts = self::get(array(
-			'hostids' => $hostids, 
-			'editable' => 1, 
-			'extendoutput' => 1, 
+			'hostids' => $hostids,
+			'editable' => 1,
+			'extendoutput' => 1,
 			'preservekeys' => 1));
 		foreach($hosts as $hnum => $host){
 			if(!isset($upd_hosts[$host['hostid']])){
@@ -969,7 +969,7 @@ class CHost extends CZBXAPI{
 		}
 
 		self::BeginTransaction(__METHOD__);
-		
+
 // UPDATE HOSTS PROPERTIES {{{
 		$sql_set = array();
 		if(isset($data['proxy_hostid'])) $sql_set[] = 'proxy_hostid='.$data['proxy_hostid'];
@@ -992,12 +992,12 @@ class CHost extends CZBXAPI{
 			$result = DBexecute($sql);
 		}
 // }}} UPDATE HOSTS PROPERTIES
-		
+
 // UPDATE HOSTGROUPS LINKAGE {{{
 		if($result){
 			$groups = zbx_toArray($data['groups']);
 			$groupids = zbx_objectValues($groups, 'groupid');
-		
+
 			if(!empty($groups)){
 				$sql = 'DELETE FROM hosts_groups WHERE '.DBcondition('hostid', $hostids);
 				$result = DBexecute($sql);
@@ -1014,7 +1014,7 @@ class CHost extends CZBXAPI{
 			}
 		}
 // }}} UPDATE HOSTGROUPS LINKAGE
-		
+
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
@@ -1026,7 +1026,7 @@ class CHost extends CZBXAPI{
 			return false;
 		}
 	}
-	
+
 /**
  * Add Hosts to HostGroups. All Hosts are added to all HostGroups.
  *
@@ -1043,12 +1043,12 @@ class CHost extends CZBXAPI{
  */
 	public static function massAdd($data){
 		$errors = array();
-		
+
 		if(isset($data['groups'])){
 			$options = array('groups' => zbx_toArray($data['groups']), 'hosts' => zbx_toArray($data['hosts']));
 			$result = CHostGroup::massAdd($options);
 		}
-		
+
 		if(isset($data['templates'])){
 			$options = array('hosts' => zbx_toArray($data['hosts']), 'templates' => zbx_toArray($data['templates']));
 			$result = CTemplate::massAdd($options);
@@ -1062,7 +1062,7 @@ class CHost extends CZBXAPI{
 			return false;
 		}
 	}
-	
+
 /**
  * remove Hosts to HostGroups. All Hosts are added to all HostGroups.
  *
@@ -1079,7 +1079,7 @@ class CHost extends CZBXAPI{
  */
 	public static function massRemove($data){
 		$errors = array();
-		
+
 		$result = CHostGroup::massRemove($data);
 
 		if($result !== false){
@@ -1147,9 +1147,9 @@ class CHost extends CZBXAPI{
 		}
 	}
 
-	
-	
-	
-	
+
+
+
+
 }
 ?>
