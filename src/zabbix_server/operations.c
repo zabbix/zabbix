@@ -480,7 +480,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 	DB_ROW		row;
 	DB_ROW		row2;
 	zbx_uint64_t	hostid = 0, proxy_hostid, host_proxy_hostid;
-	char		host[MAX_STRING_LEN], *host_esc, *ip_esc;
+	char		host[MAX_STRING_LEN], *host_esc, *ip_esc, *host_unique, *host_unique_esc;
 	int		port;
 	zbx_uint64_t	groupid;
 
@@ -582,8 +582,8 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 
 			zbx_free(host_esc);
 		}
-		else
-		{
+		else /* EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE */
+		{			
 			alarm(CONFIG_TIMEOUT);
 			zbx_gethost_by_ip(row[1], host, sizeof(host));
 			alarm(0);
@@ -605,14 +605,25 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 			{
 				hostid = DBget_maxid("hosts", "hostid");
 
+				/* for host uniqueness purposes */
+				if ('\0' != *host)
+					host_unique = DBget_unique_hostname_by_sample(host); /* by host name */
+				else
+					host_unique = DBget_unique_hostname_by_sample(row[1]); /* by ip */
+				host_unique_esc = DBdyn_escape_string(host_unique);
+				
 				DBexecute("insert into hosts (hostid,proxy_hostid,host,useip,ip,dns,port)"
 						" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s',1,'%s','%s',%d)",
 						hostid,
 						proxy_hostid,
-						(*host != '\0' ? host_esc : ip_esc), /* Use host name if exists, IP otherwise */
+						/*(*host != '\0' ? host_esc : ip_esc),*/ /* Use host name if exists, IP otherwise */
+						host_unique_esc,
 						ip_esc,
 						host_esc,
 						port);
+				
+				zbx_free(host_unique);
+				zbx_free(host_unique_esc);
 			}
 			else
 			{
