@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1465] fixed adding hostgroup elements on map (Aly)
  - [ZBX-1528] fixed map permissions (Aly)
  - [ZBX-1569] fix incorrect state reference in map connector definition (Richlv)
  - [ZBX-1568] make 'Parent service' string translatable; patch by Kodai (Richlv)
