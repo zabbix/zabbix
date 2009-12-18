@@ -352,7 +352,7 @@
 			break;
 		}
 
-		if($label_location<0) $label_location='null';
+		if($selement['label_location']<0) $selement['label_location']='null';
 		if(check_circle_elements_link($selement['sysmapid'],$selement['elementid'],$selement['elementtype'])){
 			error("Circular link can't be created");
 			return false;
@@ -1434,7 +1434,7 @@
 					$selements[$snum]['elementName'] = expand_trigger_description_by_data($triggers[$selement['elementid']]);
 					break;
 				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-					$selements[$snum]['elementName'] = $groups[$selement['elementid']]['name'];
+					$selements[$snum]['elementName'] = $hostgroups[$selement['elementid']]['name'];
 					break;
 				case SYSMAP_ELEMENT_TYPE_IMAGE:
 				default:
