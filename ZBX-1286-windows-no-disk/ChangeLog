@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1286] Zabbix handles some specified types of errors instead of Windows system, no dialog boxes pop up (Dmitry)
  - [ZBX-1569] fix incorrect state reference in map connector definition (Richlv)
  - [ZBX-1568] make 'Parent service' string translatable; patch by Kodai (Richlv)
  - [ZBX-1457] hosts in export file is now sorted by hostname (Vedmak)
