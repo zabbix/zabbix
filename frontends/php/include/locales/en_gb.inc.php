@@ -1358,6 +1358,7 @@
 	'S_CANNOT_ADD_SERVICE'=>		'Cannot add service',
 	'S_SERVICE_DELETED'=>			'Service deleted',
 	'S_CANNOT_DELETE_SERVICE'=>		'Cannot delete service',
+	'S_PARENT_SERVICE'=>			'Parent service',
 	'S_STATUS_CALCULATION'=>		'Status calculation',
 	'S_STATUS_CALCULATION_ALGORITHM'=>	'Status calculation algorithm',
 	'S_NONE'=>				'None',
