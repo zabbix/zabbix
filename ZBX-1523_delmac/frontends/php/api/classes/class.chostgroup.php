@@ -834,7 +834,7 @@ class CHostGroup extends CZBXAPI{
 		if(count($objectids_to_unlink) != count($unlinkable)){
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'One of the Objects is left without Hostgroup');
 			return false;
-		}	
+		}
 
 		self::BeginTransaction(__METHOD__);
 

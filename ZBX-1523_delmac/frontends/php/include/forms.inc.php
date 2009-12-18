@@ -6739,10 +6739,7 @@
 // if $hostid = null => global macro
 	function get_macros_widget($hostid = null){
 
-		if(is_null($hostid)){
-			$macros = CUserMacro::get(array('extendoutput' => 1, 'globalmacro' => 1));
-		}
-		else if(isset($_REQUEST['form_refresh'])){
+		if(isset($_REQUEST['form_refresh'])){
 			$macros = get_request('macros', array());
 		}
 		else if($hostid > 0){
@@ -6757,7 +6754,8 @@
 		$macros_tbl->setEvenRowClass('form_even_row');
 
 		foreach($macros as $macroid => $macro){
-			$macros_tbl->addItem(new CVar('macros['.$macro['macro'].']', $macro));
+			$macros_tbl->addItem(new CVar('macros['.$macro['macro'].'][macro]', $macro['macro']));
+			$macros_tbl->addItem(new CVar('macros['.$macro['macro'].'][value]', $macro['value']));
 			$macros_tbl->addRow(array(
 				new CCheckBox('macros_rem['.$macro['macro'].']', 'no', null, $macro['macro']),
 				$macro['macro'],

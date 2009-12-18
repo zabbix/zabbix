@@ -369,7 +369,6 @@ include_once('include/page_header.php');
 		
 		if($result){
 			if(isset($_REQUEST['hostid'])){
-
 				if($result){
 					$result = CHost::update(array(
 						'hostid' => $_REQUEST['hostid'],
@@ -389,7 +388,8 @@ include_once('include/page_header.php');
 						'ipmi_password' => $_REQUEST['ipmi_password'],
 						'groups' => $groups,
 						'templates' => $templates,
-						'templates_clear' => $templates_clear
+						'templates_clear' => $templates_clear,
+						'macros' => get_request('macros', array()),
 					));
 					
 					$msg_ok = S_HOST_UPDATED;
@@ -416,7 +416,8 @@ include_once('include/page_header.php');
 					'ipmi_username' => $_REQUEST['ipmi_username'],
 					'ipmi_password' => $_REQUEST['ipmi_password'],
 					'groups' => $groups,
-					'templates' => $templates
+					'templates' => $templates,
+					'macros' => get_request('macros', array()),
 				));
 
 				$result &= (bool) $host;
@@ -499,24 +500,6 @@ include_once('include/page_header.php');
 				$result = add_host_profile_ext($hostid, $ext_host_profiles);
 			}
 		}
-
-// MACROS {
-		if($result){
-			$macros = get_request('macros', array());
-			$macrostoadd = array();
-
-			foreach($macros as $mnum => $macro){
-				$macro['hostid'] = $hostid;
-				$macrostoadd[] = $macro;
-			}
-
-			if(!empty($macrostoadd))
-				$result = CUserMacro::update($macrostoadd);
-
-			if(!$result)
-				error(S_ERROR_ADDING_MACRO);
-		}
-// } MACROS
 
 // }}} START SAVE TRANSACTION
 		$result	= DBend($result);
