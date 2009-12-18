@@ -460,12 +460,12 @@
 	'S_ANY_CHARACTER_STRING_INCLUDED'=>		'Any character string included',
 	'S_CHARACTER_STRING_NOT_INCLUDED'=>		'Character string not included',
 	'S_RESULT_IS_TRUE'=>				'Result is TRUE',
-	'S_RESULT_IS_FALSE'=>				'Result	is FALSE',
+	'S_RESULT_IS_FALSE'=>				'Result is FALSE',
 
 	'S_EXPRESSION_TYPE'=>				'Expression type',
 	'S_NEW_EXPRESSION'=>				'New expression',
 	'S_IGNORE_CASE'=>				'Ignore case',
-	'S_CASE_SENSITIVE' => 'Case sensitive',
+	'S_CASE_SENSITIVE'=>				'Case sensitive',
 	'S_TEST'=>					'Test',
 	'S_DELIMITER'=>					'Delimiter',
 	'S_TEST_STRING'=>				'Test string',
@@ -486,7 +486,7 @@
 	'S_GROUP_FOR_DISCOVERED_HOSTS'=>		'Group for discovered hosts',
 
 //	nodes.php
-	'S_NOT_DM_SETUP' => 'Your setup is not configured for distributed monitoring',
+	'S_NOT_DM_SETUP'=>			'Your setup is not configured for distributed monitoring',
 	'S_CONFIGURATION_OF_NODES'=>		'CONFIGURATION OF NODES',
 	'S_DM'=>				'DM',	// Distributed Monitoring
 	'S_NODE'=>				'Node',
@@ -533,8 +533,8 @@
 	'S_SIA_ZABBIX'=>			'SIA Zabbix',
 
 //	graph.php
-	'S_GRAPHS_COPIED' =>		'Graphs copied',
-	'S_CANNOT_COPY_GRAPHS' =>	'Cannot copy graphs',
+	'S_GRAPHS_COPIED'=>			'Graphs copied',
+	'S_CANNOT_COPY_GRAPHS'=>		'Cannot copy graphs',
 	'S_ITEM_ADDED'=>			'Item added',
 	'S_ITEM_UPDATED'=>			'Item updated',
 	'S_ITEMS_UPDATED'=>			'Items updated',
@@ -1035,7 +1035,7 @@
 	'S_LAST_VALUE'=>			'Last value',
 
 //	sysmap.php
-	'S_UPPER_LEVEL_MAPS' => 'Upper level maps',
+	'S_UPPER_LEVEL_MAPS'=>			'Upper level maps',
 	'S_LINKS'=>				'Links',
 	'S_LINK'=>				'Link',
 	'S_LABEL'=>				'Label',
@@ -1044,7 +1044,7 @@
 	'S_ICON_PROBLEM'=>			'Icon (problem)',
 	'S_ICON_OK'=>				'Icon (ok)',
 	'S_ICON_UNKNOWN'=>			'Icon (unknown)',
-	'S_ICON_MAINTENANCE'=>		'Icon (maintenance)',
+	'S_ICON_MAINTENANCE'=>			'Icon (maintenance)',
 	'S_ICON_DISABLED'=>			'Icon (disabled)',
 	'S_ELEMENT_1'=>				'Element 1',
 	'S_ELEMENT_2'=>				'Element 2',
@@ -1057,7 +1057,7 @@
 	'S_COORDINATE_X'=>			'Coordinate X',
 	'S_COORDINATE_Y'=>			'Coordinate Y',
 
-	'S_DISPLAYED_ELEMENTS'=>	'Displayed elements',
+	'S_DISPLAYED_ELEMENTS'=>		'Displayed elements',
 	'S_CONNECTORS'=>			'Connectors',
 
 //	sysmaps.php
