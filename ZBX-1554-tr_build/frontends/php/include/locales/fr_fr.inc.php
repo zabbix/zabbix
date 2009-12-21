@@ -1483,6 +1483,6 @@
 	'S_INCORRECT_DESCRIPTION'=>			'Description incorrecte',
 	'S_CANT_FORMAT_TREE'=>			'Production arbre de tri impossible',
 	'S_NO_PERMISSION'=>			'Vous n\'avez pas la permission d\'effectuer cette opération',
-	
+
 	);
 ?>

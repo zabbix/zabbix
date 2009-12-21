@@ -2104,3 +2104,71 @@ void DBexecute_overflowed_sql(char **sql, int *sql_allocated, int *sql_offset)
 #endif
 	}
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_unique_hostname_by_sample                                  *
+ *                                                                            *
+ * Purpose: construct a unique host name by the given sample                  *
+ *                                                                            *
+ * Parameters: host_name_sample - a host name to start constructing from      *
+ *                                                                            *
+ * Return value: unique host name which does not exist in the data base       *
+ *                                                                            *
+ * Author: Dmitry Borovikov                                                   *
+ *                                                                            *
+ * Comments: the sample cannot be empty                                       *
+ *           constructs new by adding "_$(number+1)", where "number"          *
+ *           shows count of the sample itself plus already constructed ones   *
+ *           host_name_sample is not modified, allocates new memory!          *
+ *                                                                            *
+ ******************************************************************************/
+char	*DBget_unique_hostname_by_sample(char *host_name_sample)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		num = 2;	/* produce alternatives starting from "2" */
+	char		*host_name_temp, *host_name_sample_esc;
+
+	assert(host_name_sample && *host_name_sample);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In DBget_unique_hostname_by_sample() sample:'%s'",
+			host_name_sample);
+
+	host_name_sample_esc = DBdyn_escape_string(host_name_sample);
+	result = DBselect(
+			"select host"
+			" from hosts"
+			" where host like '%s%%'"
+		                 DB_NODE
+			" group by host",
+			host_name_sample_esc,
+			DBnode_local("hostid"));
+
+	host_name_temp = strdup(host_name_sample);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		if (0 < strcmp(host_name_temp, row[0]))
+		{
+			/* skip those which are lexicographically smaller */
+			continue;
+		}
+		if (0 > strcmp(host_name_temp, row[0]))
+		{
+			/* found, all other will be bigger */
+			break;
+		}
+		/* 0 == strcmp(host_name_temp, row[0]) */
+		/* must construct bigger one, the constructed one already exists */
+		host_name_temp = zbx_dsprintf(host_name_temp, "%s_%d", host_name_sample, num++);
+	}
+	DBfree_result(result);
+
+	zbx_free(host_name_sample_esc);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of DBget_unique_hostname_by_sample() constructed:'%s'",
+			host_name_temp);
+
+	return host_name_temp;
+}
