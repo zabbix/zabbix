@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1584] fixed importing\exporting of ipmi settings (Vedmak)
  - [ZBX-1554] fixed errors when save triggers using "Create log trigger" (Vedmak)
  - [ZBX-1530] fixed showing graph from wrong host, when simple with dynamic item is clicked on screen (Vedmak)
  - [ZBX-1545] fixed showing templated graphs in graph selection combobox (Vedmak)
