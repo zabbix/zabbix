@@ -492,12 +492,12 @@ class CApplication extends CZBXAPI{
 
 		$result = true;
 		$errors = array();
-		
+
 		$applications = zbx_toArray($data['applications']);
 		$items = zbx_toArray($data['items']);
 		$applicationids = array();
 		$itemids = array();
-		
+
 		if(empty($applications)) return true;
 
 // PERMISSION {{{
