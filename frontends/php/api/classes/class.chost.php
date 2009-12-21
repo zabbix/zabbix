@@ -634,13 +634,13 @@ class CHost extends CZBXAPI{
  * @return boolean
  */
 	public static function create($hosts){
-		$errors = array();	
+		$errors = array();
 		$hosts = zbx_toArray($hosts);
 		$hostids = array();
 		$groupids = array();
 		$result = false;
 
-// CHECK IF HOSTS HAVE AT LEAST 1 GROUP {{{ 
+// CHECK IF HOSTS HAVE AT LEAST 1 GROUP {{{
 		foreach($hosts as $hnum => $host){
 			if(empty($host['groups'])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'No groups for host [ '.$host['host'].' ]');
@@ -691,7 +691,7 @@ class CHost extends CZBXAPI{
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields for host [ '.$host['host'].' ]');
 				break;
 			}
-			
+
 			if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host['host'])){
 				$result = false;
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Incorrect characters used for Hostname [ '.$host['host'].' ]');
@@ -737,16 +737,16 @@ class CHost extends CZBXAPI{
 				break;
 			}
 
-			
+
 			$host['hostid'] = $hostid;
 			$options = array();
 			$options['hosts'] = $host;
 			$options['groups'] = $host['groups'];
 			if(isset($host['templates']) && !is_null($host['templates']))
 				$options['templates'] = $host['templates'];
-			
+
 			$result &= CHost::massAdd($options);
-			
+
 		}
 
 		$result = self::EndTransaction($result, __METHOD__);
@@ -795,7 +795,7 @@ class CHost extends CZBXAPI{
 		$hosts = zbx_toArray($hosts);
 		$hostids = zbx_objectValues($hosts, 'hostid');
 
-	
+
 		$options = array(
 			'hostids' => $hostids, 
 			'editable' => 1, 
@@ -808,9 +808,9 @@ class CHost extends CZBXAPI{
 				return false;
 			}
 		}
-		
+
 		self::BeginTransaction(__METHOD__);
-		
+
 		foreach($hosts as $num => $host){	
 			$host['hosts'] = $host;
 			$result = self::massUpdate($host);
@@ -820,7 +820,7 @@ class CHost extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_hosts = self::get(array('hostids' => $hostids, 'extendoutput' => 1, 'nopermissions' => 1));			
+			$upd_hosts = self::get(array('hostids' => $hostids, 'extendoutput' => 1, 'nopermissions' => 1));
 			return $upd_hosts;
 		}
 		else{
@@ -859,15 +859,15 @@ class CHost extends CZBXAPI{
  */
 	public static function massUpdate($data){
 		$transaction = false;
-		
-		$hosts = zbx_toArray($data['hosts']);	
+
+		$hosts = zbx_toArray($data['hosts']);
 		$hostids = zbx_objectValues($hosts, 'hostid');
 		
 		try{
 			$options = array(
-				'hostids' => $hostids, 
-				'editable' => 1, 
-				'extendoutput' => 1, 
+			'hostids' => $hostids,
+			'editable' => 1,
+			'extendoutput' => 1,
 				'preservekeys' => 1,
 			);
 			$upd_hosts = self::get($options);
@@ -888,7 +888,7 @@ class CHost extends CZBXAPI{
 // }}} CHECK IF HOSTS HAVE AT LEAST 1 GROUP
 
 			$transaction = self::BeginTransaction(__METHOD__);
-			
+
 // UPDATE HOSTS PROPERTIES {{{
 			if(isset($data['host'])){
 				if(count($hosts) > 1){
@@ -938,7 +938,7 @@ class CHost extends CZBXAPI{
 				update_host_status($host['hostid'], $host['status']);
 			}
 // }}} UPDATE HOSTS PROPERTIES
-			
+
 
 // UPDATE HOSTGROUPS LINKAGE {{{	
 			if(isset($data['groups']) && !is_null($data['groups'])){
@@ -955,7 +955,7 @@ class CHost extends CZBXAPI{
 						throw new APIException($error);
 					}
 				}
-				
+
 				$groups_to_del = array_diff($host_groupids, $new_groupids);
 
 				if(!empty($groups_to_del)){
@@ -997,7 +997,7 @@ class CHost extends CZBXAPI{
 						throw new APIException($error);
 					}
 				}
-				
+
 				$templates_to_del = array_diff($host_templateids, $new_templateids);
 				$templates_to_del = array_diff($templates_to_del, $cleared_templateids);
 				
@@ -1059,7 +1059,7 @@ class CHost extends CZBXAPI{
 			return false;
 		}
 	}
-	
+
 /**
  * Add Hosts to HostGroups. All Hosts are added to all HostGroups.
  *
@@ -1087,7 +1087,7 @@ class CHost extends CZBXAPI{
 			$options = array('groups' => zbx_toArray($data['groups']), 'hosts' => zbx_toArray($data['hosts']));
 			$result = CHostGroup::massAdd($options);
 		}
-		
+
 		if(isset($data['templates'])){
 			$options = array('hosts' => zbx_toArray($data['hosts']), 'templates' => zbx_toArray($data['templates']));
 			$result = CTemplate::massAdd($options);
@@ -1110,7 +1110,7 @@ class CHost extends CZBXAPI{
 			return false;
 		}
 	}
-	
+
 /**
  * remove Hosts to HostGroups. All Hosts are added to all HostGroups.
  *
@@ -1218,9 +1218,9 @@ class CHost extends CZBXAPI{
 		}
 	}
 
-	
-	
-	
-	
+
+
+
+
 }
 ?>

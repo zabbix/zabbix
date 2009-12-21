@@ -313,7 +313,7 @@ require_once('include/httptest.inc.php');
 			}
 		}
 //permisssion problems
-//		if(!CHostGroup::createHosts(array('hosts' => $hosts, 'groups' => $groups))) return false;		
+//		if(!CHostGroup::createHosts(array('hosts' => $hosts, 'groups' => $groups))) return false;
 //----------
 
 
