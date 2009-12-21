@@ -57,6 +57,7 @@ selection: {
 },
 
 menu_active: 0,						// To recognize D&D
+
 debug_status: 0,					// debug status: 0 - off, 1 - on, 2 - SDI;
 debug_info: '',						// debug string
 
@@ -2356,7 +2357,7 @@ updateForm_selementByType: function(e, multi){
 		break;
 		case '3':
 // host group
-			var srctbl = 'groups';
+			var srctbl = 'host_group';
 			var srcfld1 = 'groupid';
 			var srcfld2 = 'name';
 			$(this.selementForm.typeDOM.elementCaption).update(locale['S_HOST_GROUP']);

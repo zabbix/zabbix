@@ -130,7 +130,7 @@ include_once('include/page_header.php');
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
 	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
-	
+
 	// $_REQUEST['groupid'] = get_request('groupid', 0);
 	// $_REQUEST['hostid'] = get_request('hostid', 0);
 
