@@ -44,7 +44,6 @@ class Cscript extends CZBXAPI{
  * @param array $options['triggerids']
  * @param array $options['scriptids']
  * @param boolean $options['status']
- * @param boolean $options['templated_items']
  * @param boolean $options['editable']
  * @param boolean $options['count']
  * @param string $options['pattern']

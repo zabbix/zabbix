@@ -102,6 +102,7 @@ echo "Converting database to UTF8"
 timer start conversion to UTF8
 echo "ALTER DATABASE CHARACTER SET utf8;" | $MYSQL $MYSQLPARAMS
 for i in $(echo "show tables;" | $MYSQL -N $MYSQLPARAMS); do
+	echo "... converting table $i"
 	echo "ALTER TABLE $i CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;" | $MYSQL $MYSQLPARAMS
 done
 echo -n " ... "
