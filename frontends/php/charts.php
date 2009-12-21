@@ -192,9 +192,11 @@ include_once('include/page_header.php');
 	$cmbGraphs = new CComboBox('graphid',$_REQUEST['graphid'],'submit()');
 	$cmbGraphs->addItem(0,S_SELECT_GRAPH_DOT_DOT_DOT);
 
-	$options = array();
-	$options['extendoutput'] = 1;
-	$options['sortfield'] = 'name';
+	$options = array(
+		'extendoutput' => 1,
+		'sortfield' => 'name',
+		'templated' => 0
+	);
 
 	if($_REQUEST['groupid'] > 0){
 		$options['groupids'] = $_REQUEST['groupid'];

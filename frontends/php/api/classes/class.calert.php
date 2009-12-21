@@ -44,7 +44,6 @@ class CAlert extends CZBXAPI{
  * @param array $options['alertids']
  * @param array $options['applicationids']
  * @param array $options['status']
- * @param array $options['templated_items']
  * @param array $options['editable']
  * @param array $options['extendoutput']
  * @param array $options['count']
