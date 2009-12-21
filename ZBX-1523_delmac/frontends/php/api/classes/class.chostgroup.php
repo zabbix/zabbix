@@ -668,7 +668,7 @@ class CHostGroup extends CZBXAPI{
 
 		$result = true;
 		$errors = array();
-		
+
 		$groups = zbx_toArray($data['groups']);
 		$groupids = zbx_objectValues($groups, 'groupid');
 
@@ -681,7 +681,7 @@ class CHostGroup extends CZBXAPI{
 // PERMISSION {{{
 		$options = array(
 			'groupids' => $groupids,
-			'editable' => 1, 
+			'editable' => 1,
 			'preservekeys' => 1);
 		$allowed_groups = self::get($options);
 		foreach($groups as $num => $group){
@@ -690,7 +690,7 @@ class CHostGroup extends CZBXAPI{
 				return false;
 			}
 		}
-		
+
 		if(!is_null($hosts)){
 			$options = array(
 				'hostids' => $hostids,
@@ -704,11 +704,11 @@ class CHostGroup extends CZBXAPI{
 				}
 			}
 		}
-		
+
 		if(!is_null($templates)){
 			$options = array(
 				'templateids' => $templateids,
-				'editable' => 1, 
+				'editable' => 1,
 				'preservekeys' => 1);
 			$allowed_templates = CTemplate::get($options);
 			foreach($templates as $num => $template){
@@ -722,16 +722,16 @@ class CHostGroup extends CZBXAPI{
 */
 
 		self::BeginTransaction(__METHOD__);
-		
+
 		$objectids = array_merge($hostids, $templateids);
-		
+
 		$linked = array();
 		$sql = 'SELECT hostid, groupid FROM hosts_groups WHERE '.DBcondition('hostid', $objectids).' AND '.DBcondition('groupid', $groupids);
 		$linked_db = DBselect($sql);
 		while($pair = DBfetch($linked_db)){
 			$linked[$pair['groupid']] = array($pair['hostid'] => $pair['hostid']);
 		}
-	
+
 		foreach($groupids as $gnum => $groupid){
 			foreach($objectids as $hostid){
 				if(isset($linked[$groupid]) && isset($linked[$groupid][$hostid])) continue;
@@ -784,12 +784,12 @@ class CHostGroup extends CZBXAPI{
 		$hostids = is_null($hosts) ? array() : zbx_objectValues($hosts, 'hostid');
 		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : null;
 		$templateids = is_null($templates) ? array() : zbx_objectValues($templates, 'templateid');
-		
-/*		
+
+/*
 // PERMISSION {{{
 		$options = array(
 			'groupids' => $groupids,
-			'editable' => 1, 
+			'editable' => 1,
 			'preservekeys' => 1);
 		$allowed_groups = self::get($options);
 		foreach($groups as $num => $group){
@@ -812,11 +812,11 @@ class CHostGroup extends CZBXAPI{
 				}
 			}
 		}
-		
+
 		if(!is_null($templates)){
 			$options = array(
 				'templateids' => $templateids,
-				'editable' => 1, 
+				'editable' => 1,
 				'preservekeys' => 1);
 			$allowed_templates = CTemplate::get($options);
 			foreach($templates as $num => $template){
@@ -885,7 +885,7 @@ class CHostGroup extends CZBXAPI{
 // PERMISSION {{{
 		$options = array(
 			'groupids' => $groupids,
-			'editable' => 1, 
+			'editable' => 1,
 			'preservekeys' => 1);
 		$allowed_groups = self::get($options);
 		foreach($groups as $num => $group){
@@ -908,11 +908,11 @@ class CHostGroup extends CZBXAPI{
 				}
 			}
 		}
-		
+
 		if(!is_null($templates)){
 			$options = array(
 				'templateids' => $templateids,
-				'editable' => 1, 
+				'editable' => 1,
 				'preservekeys' => 1);
 			$allowed_templates = CTemplate::get($options);
 			foreach($templates as $num => $template){
@@ -923,7 +923,7 @@ class CHostGroup extends CZBXAPI{
 			}
 		}
 // }}} PERMISSION
-	
+
 		$hosts_to_unlink = $hosts_to_link = array();
 		if(!is_null($hosts)){
 			$groups_hosts = CHost::get(array('groupids' => $groupids, 'preservekeys' => 1, 'nopermissions' => 1));
@@ -943,11 +943,11 @@ class CHostGroup extends CZBXAPI{
 		if(count($objectids_to_unlink) != count($unlinkable)){
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'One of the Objects is left without Hostgroup');
 			return false;
-		}		
-		
-		
+		}
+
+
 		$objectids_to_link = array_merge($hosts_to_link, $templates_to_link);
-		
+
 		self::BeginTransaction(__METHOD__);
 
 		$sql = 'DELETE FROM hosts_groups WHERE '.DBcondition('groupid', $groupids).' AND '.DBcondition('hostid', $objectids_to_unlink);
@@ -962,7 +962,7 @@ class CHostGroup extends CZBXAPI{
 				}
 			}
 		}
-		
+
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
@@ -978,9 +978,9 @@ class CHostGroup extends CZBXAPI{
 			return false;
 		}
 	}
-	
-	
-	
+
+
+
 
 }
 

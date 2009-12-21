@@ -258,7 +258,8 @@ class zbxXML{
 		}
 		foreach(self::$ZBX_EXPORT_MAP[$child_name]['elements'] as $el => $name){
 			if($name == '') $name = $el;
-			$child_node->appendChild(new DOMElement($name, $data[$el]));
+			$n = $child_node->appendChild(new DOMElement($name));
+			$n->appendChild(new DOMText($data[$el]));
 		}
 
 	return $child_node;
@@ -529,7 +530,7 @@ class zbxXML{
 					$groups_to_add = array();
 					foreach($groups as $gnum => $group){
 						$current_group = CHostGroup::getObjects(array('name' => $group->nodeValue));
-						
+
 						if(empty($current_group)){
 							$groups_to_add[] = array('name' => $group->nodeValue);
 						}
@@ -537,7 +538,7 @@ class zbxXML{
 							$host_groups = array_merge($host_groups, $current_group);
 						}
 					}
-					
+
 					if(!empty($groups_to_add)){
 						$new_groups = CHostGroup::create($groups_to_add);
 						if($new_groups === false){
@@ -554,9 +555,9 @@ class zbxXML{
 //sdi('Host: '.$host_db['host'].' | HostID: '. $current_hostid);
 				if($current_host && isset($rules['host']['exist'])){
 					$host_db['groups'] = $host_groups;
-					
+
 					$current_host = array_merge($current_host, $host_db);
-					
+
 					if($host_db['status'] == HOST_STATUS_TEMPLATE){
 						$r = CTemplate::update($current_host);
 						$options['templates'] = $r;
@@ -959,11 +960,15 @@ class zbxXML{
 					$trigger_description = $dependency->getAttribute('description');
 					$current_triggerid = get_trigger_by_description($trigger_description);
 
-//sdi('<b><u>Trigger Description: </u></b>'.$dependency['description'].' | <b>Current_triggerid: </b>'. $current_triggerid['triggerid']);
+// sdi('<b><u>Trigger Description: </u></b>'.$trigger_description.' | <b>Current_triggerid: </b>'. $current_triggerid['triggerid']);
+
 					if($current_triggerid && isset($triggers_for_dependencies[$current_triggerid['triggerid']])){
-						foreach($dependency as $depends_on){
+						$xpath = new DOMXPath($xml);
+						$depends_on_list = $xpath->query('depends', $dependency);
+
+						foreach($depends_on_list as $depends_on){
 							$depends_triggerid = get_trigger_by_description($depends_on->nodeValue);;
-//sdi('<b>depends on description: </b>'.$depends_on.' | <b>depends_triggerid: </b>'. $depends_triggerid['triggerid']);
+// sdi('<b>depends on description: </b>'.$depends_on->nodeValue.' | <b>depends_triggerid: </b>'. $depends_triggerid['triggerid']);
 							if($depends_triggerid['triggerid']){
 								$triggers_to_add_dep[] = $depends_triggerid['triggerid'];
 								//CTrigger::addDependency(array('triggerid' => $current_triggerid['triggerid'], 'depends_on_triggerid' => $depends_triggerid['triggerid']));

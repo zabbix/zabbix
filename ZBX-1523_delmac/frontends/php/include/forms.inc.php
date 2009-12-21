@@ -3405,7 +3405,7 @@
 //		validate_group(PERM_READ_WRITE,array('real_hosts'),'web.last.conf.groupid');
 
 		$twb_groupid = get_request('twb_groupid', 0);
-		
+
 		$options = array(
 			'editable' => 1,
 			'extendoutput' => 1,
@@ -3414,12 +3414,12 @@
 		$groups = CHostGroup::get($options);
 		$groups = zbx_toHash($groups, 'groupid');
 		order_result($groups, 'name');
-		
+
 		if(!isset($groups[$twb_groupid])){
 			$twb_groupid = key($groups);
 		}
-		
-		$cmbGroups = new CComboBox('twb_groupid', $twb_groupid, 'submit()');	
+
+		$cmbGroups = new CComboBox('twb_groupid', $twb_groupid, 'submit()');
 		foreach($groups as $group){
 			$cmbGroups->addItem($group['groupid'], $group['name']);
 		}

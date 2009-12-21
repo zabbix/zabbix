@@ -706,7 +706,7 @@ class CUserMacro extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_macros = self::get(array('globalmacroids'=>$globalmacroids, 'extendoutput'=>1, 'nopermissions'=>1));
+			$new_macros = self::get(array('globalmacroids'=>$globalmacroids, 'extendoutput'=>1, 'nopermissions'=>1, 'globalmacro' => 1));
 			return $new_macros;
 		}
 		else{
@@ -999,9 +999,6 @@ class CUserMacro extends CZBXAPI{
 		$res = DBselect($sql);
 		if($macroid = DBfetch($res))
 			$result = $macroid['globalmacroid'];
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => S_GLOBAL_MACRO.' "'.$macro_data['macro'].'" '.S_DOESNT_EXIST);
-		}
 
 	return $result;
 	}
