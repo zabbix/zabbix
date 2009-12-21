@@ -628,7 +628,7 @@ calendarcreate: function(){
 		
 	document.body.appendChild(this.clndr_calendar);
 		
-		addListener(this.clndr_calendar,'mousemove', deselectAll);
+		// addListener(this.clndr_calendar,'mousemove', deselectAll);
 	
 	//*********** CALENDAR HAT ****************************** 
 		var line_div = document.createElement('div');
