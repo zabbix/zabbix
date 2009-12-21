@@ -71,7 +71,6 @@ class CTemplate extends CZBXAPI{
 			'nopermissions'				=> null,
 // filter
 			'pattern'					=> '',
-
 // OutPut
 			'extendoutput'				=> null,
 			'select_groups'				=> null,
