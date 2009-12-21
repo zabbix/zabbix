@@ -369,6 +369,7 @@ class CHost extends CZBXAPI{
 				WHERE '.DBin_node('h.hostid', $nodeids).
 					$sql_where.
 				$sql_order;
+// sdi($sql);
 		$res = DBselect($sql, $sql_limit);
 		while($host = DBfetch($res)){
 			if($options['count'])
