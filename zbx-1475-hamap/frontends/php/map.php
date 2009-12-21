@@ -155,6 +155,8 @@ include_once('include/page_header.php');
 		$links = zbx_toHash($map['links'],'linkid');
 	}
 
+	$map_info = getSelementsInfo($selements);
+	
 //SDI($links); exit;
 // Draw connectors
 	foreach($links as $lnum => $link){
@@ -162,10 +164,10 @@ include_once('include/page_header.php');
 		$linkid = $link['linkid'];
 
 		$selement = $selements[$link['selementid1']];
-		list($x1, $y1) = get_icon_center_by_selement($selement);
+		list($x1, $y1) = get_icon_center_by_selement($selement, $map_info[$link['selementid1']]);
 
 		$selement = $selements[$link['selementid2']];
-		list($x2, $y2) = get_icon_center_by_selement($selement);
+		list($x2, $y2) = get_icon_center_by_selement($selement, $map_info[$link['selementid2']]);
 
 		$drawtype = $link['drawtype'];
 		$color = convertColor($im,$link['color']);
@@ -252,12 +254,14 @@ include_once('include/page_header.php');
 //-----------------------
 
 // Draws elements
+
 	$icons=array();
 	foreach($selements as $selementid => $selement){
 		if(empty($selement)) continue;
 
 //		$info = get_info_by_selement($selement);
-		$el_info = get_info_by_selement($selement,$status_view);
+		$el_info = $map_info[$selementid];
+//		$el_info = get_info_by_selement($selement,$status_view);
 		$img = get_png_by_selement($selement, $el_info);
 
 		$iconX = imagesx($img);

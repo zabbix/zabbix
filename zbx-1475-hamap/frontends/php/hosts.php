@@ -793,15 +793,8 @@ $_REQUEST['hostid'] = $thid;
 					break;
 			}
 
-			$zbx_available = new CCol($zbx_available);
-			$zbx_available->addStyle('border: 0');
-			$snmp_available = new CCol($snmp_available);
-			$snmp_available->addStyle('border: 0');
-			$ipmi_available = new CCol($ipmi_available);
-			$ipmi_available->addStyle('border: 0');
-
-			$av_table = new CTable();
-			$av_table->AddRow(array($zbx_available, $snmp_available, $ipmi_available));
+			$av_table = new CTable(null, 'invisible');
+			$av_table->addRow(array($zbx_available, $snmp_available, $ipmi_available));
 
 			if(empty($host['templates'])){
 				$templates = '-';
