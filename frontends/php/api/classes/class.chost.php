@@ -654,6 +654,7 @@ class CHost extends CZBXAPI{
 		}
 // }}} CHECK IF HOSTS HAVE AT LEAST 1 GROUP
 
+
 // PERMISSIONS {{{
 		$upd_groups = CHostGroup::get(array(
 			'groupids' => $groupids,
@@ -713,8 +714,7 @@ class CHost extends CZBXAPI{
 			$hostid = get_dbid('hosts', 'hostid');
 			$hostids[] = $hostid;
 			$result = DBexecute('INSERT INTO hosts (hostid, proxy_hostid, host, port, status, useip, dns, ip, disable_until, available,'.
-				'useipmi,ipmi_port,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,ipmi_ip) '.
-				' VALUES ('.
+				'useipmi,ipmi_port,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,ipmi_ip) VALUES ('.
 				$hostid.','.
 				$host['proxy_hostid'].','.
 				zbx_dbstr($host['host']).','.
@@ -744,6 +744,8 @@ class CHost extends CZBXAPI{
 			$options['groups'] = $host['groups'];
 			if(isset($host['templates']) && !is_null($host['templates']))
 				$options['templates'] = $host['templates'];
+			if(isset($host['macros']) && !is_null($host['macros']))
+				$options['macros'] = $host['macros'];
 
 			$result &= CHost::massAdd($options);
 
@@ -874,15 +876,13 @@ class CHost extends CZBXAPI{
 		
 			foreach($hosts as $hnum => $host){
 				if(!isset($upd_hosts[$host['hostid']])){
-					$error = array('errno' => ZBX_API_ERROR_PERMISSIONS, 'error' => S_NO_PERMISSION);
-					throw new APIException($error);
+					throw new APIException(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 			}
 			
 // CHECK IF HOSTS HAVE AT LEAST 1 GROUP {{{	
 			if(isset($data['groups']) && empty($data['groups'])){
-				$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'No groups for hosts');
-				throw new APIException($error);
+				throw new APIException(ZBX_API_ERROR_PARAMETERS, 'No groups for hosts');
 			}
 			$data['groups'] = zbx_toArray($data['groups']);	
 // }}} CHECK IF HOSTS HAVE AT LEAST 1 GROUP
@@ -907,12 +907,10 @@ class CHost extends CZBXAPI{
 			}
 			
 			if(isset($data['host']) && !preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $data['host'])){
-				$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Incorrect characters used for Hostname [ '.$data['host'].' ]');
-				throw new APIException($error);
+				throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for Hostname [ '.$data['host'].' ]');
 			}
 			if(isset($data['dns']) && !empty($dns) && !preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/i', $data['dns'])){
-				$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Incorrect characters used for DNS [ '.$data['dns'].' ]');
-				throw new APIException($error);
+				throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for DNS [ '.$data['dns'].' ]');
 			}
 				
 			$sql_set = array();
@@ -935,7 +933,7 @@ class CHost extends CZBXAPI{
 				$sql = 'UPDATE hosts SET ' . implode(', ', $sql_set) . ' WHERE '.DBcondition('hostid', $hostids);
 				$result = DBexecute($sql);
 				
-				update_host_status($host['hostid'], $host['status']);
+				update_host_status($hostids, $host['status']);
 			}
 // }}} UPDATE HOSTS PROPERTIES
 
@@ -951,8 +949,7 @@ class CHost extends CZBXAPI{
 				if(!empty($groups_to_add)){
 					$result = self::massAdd(array('hosts' => $hosts, 'groups' => $groups_to_add));
 					if(!$result){
-						$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => '');
-						throw new APIException($error);
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant add grooup');
 					}
 				}
 
@@ -961,8 +958,7 @@ class CHost extends CZBXAPI{
 				if(!empty($groups_to_del)){
 					$result = self::massRemove(array('hosts' => $hosts, 'groups' => $groups_to_del));
 					if(!$result){
-						$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => '');
-						throw new APIException($error);
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant remove group');
 					}
 				}
 			}
@@ -975,8 +971,7 @@ class CHost extends CZBXAPI{
 				foreach($data['templates_clear'] as $tpl){
 					$result = unlink_template($hostid, $tpl['templateid'], false);
 					if(!$result){
-						$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Cannot unlink template [ '.$tpl['templateid'].' ]');
-						throw new APIException($error);
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cannot unlink template [ '.$tpl['templateid'].' ]');
 					}
 					$cleared_templateids[] = $tpl['templateid'];
 				}
@@ -993,8 +988,7 @@ class CHost extends CZBXAPI{
 				if(!empty($templates_to_add)){
 					$result = self::massAdd(array('hosts' => $hosts, 'templates' => $templates_to_add));
 					if(!$result){
-						$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => '');
-						throw new APIException($error);
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant link template');
 					}
 				}
 
@@ -1004,8 +998,7 @@ class CHost extends CZBXAPI{
 				if(!empty($templates_to_del)){
 					$result = self::massRemove(array('hosts' => $hosts, 'templates' => $templates_to_del));
 					if(!$result){
-						$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => '');
-						throw new APIException($error);
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant unlink template');
 					}
 				}
 			}
@@ -1018,8 +1011,7 @@ class CHost extends CZBXAPI{
 
 				$result = self::massAdd(array('hosts' => $hosts, 'macros' => $data['macros']));
 				if(!$result){
-					$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => '');
-					throw new APIException($error);
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant add macro');
 				}
 			
 				$macros_to_del = array();
@@ -1039,13 +1031,12 @@ class CHost extends CZBXAPI{
 				if(!empty($macros_to_del)){
 					$result = self::massRemove(array('hosts' => $hosts, 'macros' => $macros_to_del));
 					if(!$result){
-						$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => '');
-						throw new APIException($error);
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant remove macro');
 					}
 				}		
 			}
 			
-			self::EndTransaction($result, __METHOD__);
+			self::EndTransaction(true, __METHOD__);
 // }}} UPDATE MACROS
 
 			$upd_hosts = self::get(array('hostids' => $hostids, 'extendoutput' => 1, 'nopermissions' => 1));

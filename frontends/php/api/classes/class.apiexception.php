@@ -23,7 +23,7 @@
 class APIException extends Exception{
 	private $errors = array();
 	
-	public function __construct($errors, $message = '', $code = 0) {
+	public function __construct($code, $errors = array(), $message = '') {
         parent::__construct($message, $code);
 		
 		$errors = zbx_toArray($errors);
