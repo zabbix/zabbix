@@ -508,7 +508,7 @@
 				$macro = array('macro' => $macro_new, 'value' => $value_new);
 				$result = CUserMacro::addGlobal($macro);
 			}
-			
+
 
 			if($result){
 				unset($_REQUEST['macro_new']);

@@ -139,7 +139,7 @@ class CUser extends CZBXAPI{
 			$sql_parts['where'][] = 'u.type='.$options['type'];
 		}
 
-		
+
 // extendoutput
 		if(!is_null($options['extendoutput'])){
 			$sql_parts['select']['users'] = 'u.*';
@@ -518,7 +518,7 @@ class CUser extends CZBXAPI{
 		$errors = array();
 		$result = true;
 		$self = false;
-		
+
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can update Users');
 			return false;
@@ -540,7 +540,7 @@ class CUser extends CZBXAPI{
 		if(bccomp($USER_DETAILS['userid'], $user['userid']) == 0){
 			$self = true;
 		}
-			
+
 		foreach($users as $unum => $user){
 			$user_db_fields = $upd_users[$user['userid']];
 
@@ -587,7 +587,7 @@ class CUser extends CZBXAPI{
 					' WHERE userid='.$user['userid'];
 
 			$result = DBexecute($sql);
-			
+
 			// if(isset($user['usrgrps']) && !is_null($user['usrgrps'])){
 				// $user_groups = CHostGroup::get(array('userids' => $user['userid']));
 				// $user_groupids = zbx_objectValues($user_groups, 'usrgrpid');
@@ -598,15 +598,15 @@ class CUser extends CZBXAPI{
 				// if(!empty($groups_to_add)){
 					// $result &= self::massAdd(array('users' => $user, 'usrgrps' => $groups_to_add));
 				// }
-				
+
 				// $groups_to_del = array_diff($user_groupids, $new_groupids);
 				// if(!empty($groups_to_del)){
 					// $result &= self::massRemove(array('users' => $user, 'usrgrps' => $groups_to_del));
 				// }
 			// }
-			
 
-			
+
+
 			if($result && isset($user['usrgrps']) && !is_null($user['usrgrps'])){
 				DBexecute('DELETE FROM users_groups WHERE userid='.$user['userid']);
 
