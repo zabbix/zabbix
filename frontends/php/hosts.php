@@ -338,7 +338,7 @@ include_once('include/page_header.php');
 		$templates_clear = get_request('clear_templates', array());
 		$proxy_hostid = get_request('proxy_hostid', 0);
 		$groups = get_request('groups', array());
-		
+
 		$result = true;
 
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))) access_deny();
@@ -351,9 +351,9 @@ include_once('include/page_header.php');
 		}
 
 		$templates = array_keys($templates);
-		$templates = zbx_toObject($templates, 'templateid');		
+		$templates = zbx_toObject($templates, 'templateid');
 		$templates_clear = zbx_toObject($templates_clear, 'templateid');
-		
+
 // START SAVE TRANSACTION {{{
 		DBstart();
 
@@ -366,7 +366,7 @@ include_once('include/page_header.php');
 				$result = false;
 			}
 		}
-		
+
 		if($result){
 			if(isset($_REQUEST['hostid'])){
 
@@ -391,7 +391,7 @@ include_once('include/page_header.php');
 						'templates' => $templates,
 						'templates_clear' => $templates_clear
 					));
-					
+
 					$msg_ok = S_HOST_UPDATED;
 					$msg_fail = S_CANNOT_UPDATE_HOST;
 
@@ -424,13 +424,13 @@ include_once('include/page_header.php');
 					$host = reset($host);
 					$hostid = $host['hostid'];
 				}
-				
+
 				$msg_ok = S_HOST_ADDED;
 				$msg_fail = S_CANNOT_ADD_HOST;
 			}
-			
+
 		}
-	
+
 // FULL CLONE {{{
 		if($result && $clone_hostid && ($_REQUEST['form'] == 'full_clone')){
 // Host applications
@@ -630,7 +630,7 @@ $thid = get_request('hostid', 0);
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
 
 	validate_group($PAGE_GROUPS,$PAGE_HOSTS);
-	
+
 $_REQUEST['hostid'] = $thid;
 ?>
 <?php
