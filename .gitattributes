@@ -367,6 +367,7 @@ m4/libiodbc.m4 -text
 m4/libssh2.m4 -text
 m4/libunixodbc.m4 -text
 m4/openipmi.m4 -text
+m4/resolv.m4 -text
 man/Makefile.am -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
