@@ -454,14 +454,14 @@ include_once('include/page_header.php');
 			}
 
 // Host triggers
-			$triggers = CTrigger::get(array('hostids' => $clone_hostid, 'not_templated_triggers' => 1));
+			$triggers = CTrigger::get(array('hostids' => $clone_hostid, 'inherited' => 0));
 			$triggers = zbx_objectValues($triggers, 'triggerid');
 			foreach($triggers as $trigger){
 				$result &= (bool) copy_trigger_to_host($trigger, $hostid, true);
 			}
 
 // Host graphs
-			$graphs = CGraph::get(array('hostids' => $clone_hostid, 'not_templated_graphs' => 1));
+			$graphs = CGraph::get(array('hostids' => $clone_hostid, 'inherited' => 0));
 
 			foreach($graphs as $graph){
 				$result &= (bool) copy_graph_to_host($graph['graphid'], $hostid, true);

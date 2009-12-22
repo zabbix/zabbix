@@ -93,7 +93,6 @@ class CUserMacro extends CZBXAPI{
 			'nopermissions'				=> null,
 // filter
 			'pattern'					=> '',
-
 // OutPut
 			'globalmacro'				=> null,
 			'extendoutput'				=> null,

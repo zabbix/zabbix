@@ -1,5 +1,13 @@
 Changes for 1.8.1
 
+ - [ZBX-1385] proxy list in host configuration form is now sorted (Vedmak)
+ - [ZBX-1560] fixed type in application api class call (Vedmak)
+ - [ZBX-1286] Zabbix handles some specified types of errors instead of Windows system, no dialog boxes pop up (Dmitry)
+ - [ZBX-1420] fixed warnings in Dashboard and on script execution if Zabbix server is down (Alexei)
+ - [ZBX-1584] fixed importing\exporting of ipmi settings (Vedmak)
+ - [ZBX-1554] fixed errors when save triggers using "Create log trigger" (Vedmak)
+ - [ZBX-1530] fixed showing graph from wrong host, when simple with dynamic item is clicked on screen (Vedmak)
+ - [ZBX-1545] fixed showing templated graphs in graph selection combobox (Vedmak)
  - [ZBX-1465] fixed adding hostgroup elements on map (Aly)
  - [ZBX-1528] fixed map permissions (Aly)
  - [ZBX-1569] fix incorrect state reference in map connector definition (Richlv)
