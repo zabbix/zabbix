@@ -33,7 +33,14 @@ class zbxXML{
 				'dns'				=> '',
 				'ip'				=> '',
 				'port'				=> '',
-				'status'			=> ''
+				'status'			=> '',
+				'useipmi'			=> '',
+				'ipmi_ip'			=> '',
+				'ipmi_port'			=> '',
+				'ipmi_authtype'		=> '',
+				'ipmi_privilege'	=> '',
+				'ipmi_username'		=> '',
+				'ipmi_password'		=> '',
 			)
 		),
 		XML_TAG_MACRO => array(

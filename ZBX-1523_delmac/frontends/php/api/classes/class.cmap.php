@@ -81,10 +81,8 @@ class CMap extends CZBXAPI{
 			'sysmapids'					=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
-
 // filtet
 			'pattern'					=> '',
-
 // OutPut
 			'extendoutput'				=> null,
 			'select_selements'			=> null,

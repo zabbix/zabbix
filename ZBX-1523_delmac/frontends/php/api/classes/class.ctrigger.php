@@ -47,7 +47,6 @@ class CTrigger extends CZBXAPI{
  * @param array $options['triggerids']
  * @param array $options['applicationids']
  * @param array $options['status']
- * @param array $options['templated_items']
  * @param array $options['editable']
  * @param array $options['extendoutput']
  * @param array $options['count']
@@ -84,7 +83,8 @@ class CTrigger extends CZBXAPI{
 			'status'				=> null,
 			'monitored' 			=> null,
 			'severity'				=> null,
-			'templated_triggers'	=> null,
+			'templated'				=> null,
+			'inherited'				=> null,
 			'not_templated_triggers'	=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
@@ -250,14 +250,32 @@ class CTrigger extends CZBXAPI{
 		if(!is_null($options['only_problems'])){
 			$sql_parts['where']['ot'] = 't.value='.TRIGGER_VALUE_TRUE;
 		}
-// templated_triggers
-		if(!is_null($options['templated_triggers'])){
-			$sql_parts['where'][] = 't.templateid<>0';
+		
+// templated
+		if(!is_null($options['templated'])){			
+			$sql_parts['from']['f'] = 'functions f';
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['from']['h'] = 'hosts h';
+			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
+			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
+			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+			
+			if($options['templated']){
+				$sql_parts['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
+			}
+			else{
+				$sql_parts['where'][] = 'h.status<>'.HOST_STATUS_TEMPLATE;
+			}
 		}
-
-// not_templated_triggers
-		if(!is_null($options['not_templated_triggers'])){
-			$sql_parts['where'][] = 't.templateid=0';
+		
+// inherited
+		if(!is_null($options['inherited'])){
+			if($options['inherited']){
+				$sql_parts['where'][] = 't.templateid<>0';
+			}
+			else{
+				$sql_parts['where'][] = 't.templateid=0';
+			}
 		}
 
 
