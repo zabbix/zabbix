@@ -1479,8 +1479,8 @@
 				else if(isset($info['impi_available'])) $info['info'].= ' ('.$host['ipmi_error'].')';
 //*/
 				if(($info['available'] == HOST_AVAILABLE_FALSE)) $info['info'] = S_UNAVAILABLE_BIG;
-				if(($info['ipmi_available'] == HOST_AVAILABLE_FALSE)) $info['info'] .= "\n".'SNMP '.S_UNAVAILABLE_BIG;
-				if(($info['snmp_available'] == HOST_AVAILABLE_FALSE)) $info['info'] .= "\n".'IPMI '.S_UNAVAILABLE_BIG;
+				if(($info['snmp_available'] == HOST_AVAILABLE_FALSE)) $info['info'] .= "\n".'SNMP '.S_UNAVAILABLE_BIG;
+				if(($info['ipmi_available'] == HOST_AVAILABLE_FALSE)) $info['info'] .= "\n".'IPMI '.S_UNAVAILABLE_BIG;
 			
 				$info['color'] = $colors['Red']; 
 				$info['iconid'] = $selement['iconid_on'];
