@@ -585,6 +585,8 @@ class CTemplate extends CZBXAPI{
 					$options['templates_link'] = $template['templates'];
 				if(isset($template['macros']) && !is_null($template['macros']))
 					$options['macros'] = $template['macros'];
+				if(isset($template['hosts']) && !is_null($template['hosts']))
+					$options['hosts'] = $template['hosts'];
 
 				$result = self::massAdd($options);
 				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS);
@@ -599,7 +601,9 @@ class CTemplate extends CZBXAPI{
 		catch(APIException $e){
 			if($transaction) self::EndTransaction(false, __METHOD__);
 			
-			self::setError(__METHOD__, $e->getCode(), $e->getErrors());
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}
