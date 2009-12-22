@@ -181,17 +181,17 @@ include_once('include/page_header.php');
 				$result = false;
 			}
 		}
-		
+
 		$templates = array_keys($templates);
-		$templates = zbx_toObject($templates, 'templateid');		
+		$templates = zbx_toObject($templates, 'templateid');
 		$templates_clear = zbx_toObject($templates_clear, 'templateid');
-		
+
 // CREATE/UPDATE TEMPLATE WITH GROUPS AND LINKED TEMPLATES {{{
 		if($templateid){
-			$template = array('templateid' => $templateid);			
+			$template = array('templateid' => $templateid);
 			$result = CTemplate::update(array(
-				'templateid' => $templateid, 
-				'host' => $template_name, 
+				'templateid' => $templateid,
+				'host' => $template_name,
 				'groups' => $groups,
 				'templates' => $templates,
 				'templates_clear' => $templates_clear
@@ -200,7 +200,7 @@ include_once('include/page_header.php');
 				error(CTemplate::resetErrors());
 				$result = false;
 			}
-			
+
 			$msg_ok = S_TEMPLATE_UPDATED;
 			$msg_fail = S_CANNOT_UPDATE_TEMPLATE;
 		}
@@ -295,11 +295,11 @@ include_once('include/page_header.php');
 			$link_hosts = array_diff($hosts, $linked_hosts);
 
 			$result = CTemplate::massAdd(array(
-				'templates' => zbx_toObject($templateid, 'templateid'), 
+				'templates' => zbx_toObject($templateid, 'templateid'),
 				'hosts' => zbx_toObject($hosts, 'hostid')
 			));
-			
-			
+
+
 			// $template_name = DBfetch(DBselect('SELECT host FROM hosts WHERE hostid='.$templateid));
 
 			// foreach($link_hosts as $id => $hostid){

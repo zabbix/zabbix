@@ -530,7 +530,7 @@ class zbxXML{
 					$groups_to_add = array();
 					foreach($groups as $gnum => $group){
 						$current_group = CHostGroup::getObjects(array('name' => $group->nodeValue));
-						
+
 						if(empty($current_group)){
 							$groups_to_add[] = array('name' => $group->nodeValue);
 						}
@@ -538,7 +538,7 @@ class zbxXML{
 							$host_groups = array_merge($host_groups, $current_group);
 						}
 					}
-					
+
 					if(!empty($groups_to_add)){
 						$new_groups = CHostGroup::create($groups_to_add);
 						if($new_groups === false){
@@ -555,9 +555,9 @@ class zbxXML{
 //sdi('Host: '.$host_db['host'].' | HostID: '. $current_hostid);
 				if($current_host && isset($rules['host']['exist'])){
 					$host_db['groups'] = $host_groups;
-					
+
 					$current_host = array_merge($current_host, $host_db);
-					
+
 					if($host_db['status'] == HOST_STATUS_TEMPLATE){
 						$r = CTemplate::update($current_host);
 						$options['templates'] = $r;
@@ -965,7 +965,7 @@ class zbxXML{
 					if($current_triggerid && isset($triggers_for_dependencies[$current_triggerid['triggerid']])){
 						$xpath = new DOMXPath($xml);
 						$depends_on_list = $xpath->query('depends', $dependency);
-						
+
 						foreach($depends_on_list as $depends_on){
 							$depends_triggerid = get_trigger_by_description($depends_on->nodeValue);;
 // sdi('<b>depends on description: </b>'.$depends_on->nodeValue.' | <b>depends_triggerid: </b>'. $depends_triggerid['triggerid']);
