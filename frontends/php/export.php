@@ -83,6 +83,7 @@ include_once('include/page_header.php');
 			'select_profile' => 1
 		);
 		$hosts = CHost::get($params);
+		order_result($hosts, 'host');
 
 /* SELECT HOST GROUPS */
 		$params = array(

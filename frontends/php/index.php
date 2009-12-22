@@ -74,7 +74,7 @@ $page['file']	= 'index.php';
 
 	$request = get_request('request');
 	if(isset($_REQUEST['enter'])&&($_REQUEST['enter']=='Enter')){
-
+		global $USER_DETAILS;
 		$name = get_request('name','');
 		$passwd = get_request('password','');
 

@@ -378,7 +378,7 @@ include_once('include/page_header.php');
 	insert_js(get_selement_icons());
 	insert_show_color_picker_javascript();
 
-	zbx_add_post_js('create_map("sysmap_cnt", "'.$sysmap['sysmapid'].'");');	
+	zbx_add_post_js('create_map("sysmap_cnt", "'.$sysmap['sysmapid'].'");');
 ?>
 <?php
 
