@@ -5795,16 +5795,20 @@
 		$host_tbl->addRow(array(S_CONNECT_TO,$cmbConnectBy));
 
 		$host_tbl->addRow(array(S_AGENT_PORT,new CNumericBox('port',$port,5)));
+		
 //Proxy
 		$cmbProxy = new CComboBox('proxy_hostid', $proxy_hostid);
 
 		$cmbProxy->addItem(0, S_NO_PROXY);
-		$db_proxies = DBselect('SELECT hostid,host FROM hosts'.
-				' where status in ('.HOST_STATUS_PROXY.') and '.DBin_node('hostid'));
-		while ($db_proxy = DBfetch($db_proxies))
-			$cmbProxy->addItem($db_proxy['hostid'], $db_proxy['host']);
-
-		$host_tbl->addRow(array(S_MONITORED_BY_PROXY,$cmbProxy));
+		$options = array('proxy_hosts' => 1, 'extendoutput' => 1);
+		$db_proxies = CHost::get($options);
+		order_result($db_proxies, 'host');
+		
+		foreach($db_proxies as $proxy){
+			$cmbProxy->addItem($proxy['hostid'], $proxy['host']);
+		}
+		
+		$host_tbl->addRow(array(S_MONITORED_BY_PROXY, $cmbProxy));
 //----------
 
 		$cmbStatus = new CComboBox('status',$status);
