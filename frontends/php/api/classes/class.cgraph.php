@@ -73,13 +73,12 @@ class CGraph extends CZBXAPI{
 			'graphids' 				=> null,
 			'itemids' 				=> null,
 			'type' 					=> null,
-			'templated_graphs'		=> null,
-			'not_templated_graphs'	=> null,
+			'templated'				=> null,
+			'inherited'				=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
 // filter
 			'pattern'				=> '',
-
 // output
 			'select_hosts'			=> null,
 			'select_templates'		=> null,
@@ -193,12 +192,31 @@ class CGraph extends CZBXAPI{
 			$sql_parts['where'][] = 'g.type='.$options['type'];
 		}
 
-// templated_graphs
-		if(!is_null($options['templated_graphs'])){
-			$sql_parts['where'][] = 'g.templateid<>0';
+// templated
+		if(!is_null($options['templated'])){
+			$sql_parts['from']['gi'] = 'graphs_items gi';
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['from']['h'] = 'hosts h';
+			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
+			$sql_parts['where']['ggi'] = 'g.graphid=gi.graphid';
+			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+			
+			if($options['templated']){
+				$sql_parts['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
+			}
+			else{
+				$sql_parts['where'][] = 'h.status<>'.HOST_STATUS_TEMPLATE;
+			}
 		}
-		else if(!is_null($options['not_templated_graphs'])){
-			$sql_parts['where'][] = 'g.templateid=0';
+		
+// inherited
+		if(!is_null($options['inherited'])){
+			if($options['inherited']){
+				$sql_parts['where'][] = 'g.templateid<>0';
+			}
+			else{
+				$sql_parts['where'][] = 'g.templateid=0';
+			}
 		}
 
 // extendoutput

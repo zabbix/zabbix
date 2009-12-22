@@ -44,7 +44,6 @@ class CApplication extends CZBXAPI{
  * @param array $options['triggerids']
  * @param array $options['applicationids']
  * @param boolean $options['status']
- * @param boolean $options['templated_items']
  * @param boolean $options['editable']
  * @param boolean $options['count']
  * @param string $options['pattern']
@@ -493,12 +492,12 @@ class CApplication extends CZBXAPI{
 
 		$result = true;
 		$errors = array();
-		
+
 		$applications = zbx_toArray($data['applications']);
 		$items = zbx_toArray($data['items']);
 		$applicationids = array();
 		$itemids = array();
-		
+
 		if(empty($applications)) return true;
 
 // PERMISSION {{{
