@@ -596,10 +596,10 @@ class zbxXML{
 //sdi('Host: '.$host_db['host'].' | HostID: '. $current_hostid);
 				$host_db['groups'] = $host_groups;
 				$host_db['macros'] = $host_macros;
-				
+			
 				if($current_host && isset($rules['host']['exist'])){
 
-//					$current_host = array_merge($current_host, $host_db);
+					$current_host = array_merge($current_host, $host_db);
 
 					if($host_db['status'] == HOST_STATUS_TEMPLATE){
 						$r = CTemplate::update($current_host);

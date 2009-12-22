@@ -815,6 +815,7 @@ class CHost extends CZBXAPI{
 
 		foreach($hosts as $num => $host){	
 			$host['hosts'] = $host;
+
 			$result = self::massUpdate($host);
 			if(!$result) break;
 		}
@@ -867,9 +868,9 @@ class CHost extends CZBXAPI{
 		
 		try{
 			$options = array(
-			'hostids' => $hostids,
-			'editable' => 1,
-			'extendoutput' => 1,
+				'hostids' => $hostids,
+				'editable' => 1,
+				'extendoutput' => 1,
 				'preservekeys' => 1,
 			);
 			$upd_hosts = self::get($options);
@@ -976,7 +977,7 @@ class CHost extends CZBXAPI{
 					$cleared_templateids[] = $tpl['templateid'];
 				}
 			}
-		
+
 		
 // UPDATE TEMPLATE LINKAGE {{{
 			if(isset($data['templates']) && !is_null($data['templates'])){
@@ -1005,7 +1006,8 @@ class CHost extends CZBXAPI{
 // }}} UPDATE TEMPLATE LINKAGE
 
 
-// UPDATE MACROS {{{		
+// UPDATE MACROS {{{	
+	
 			if(isset($data['macros']) && !is_null($data['macros'])){
 				$host_macros = CUserMacro::get(array('hostids' => $hostids, 'extendoutput' => 1));
 
@@ -1046,7 +1048,9 @@ class CHost extends CZBXAPI{
 		catch(APIException $e){
 			if($transaction) self::EndTransaction(false, __METHOD__);
 			
-			self::setMethodErrors(__METHOD__, $e->getErrors());
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}
