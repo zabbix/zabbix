@@ -557,10 +557,6 @@ class CTemplate extends CZBXAPI{
 			}
  */			
  
-// check if templetes to link, doesn't contain dependencies on other templates.
-			if(!check_templates_trigger_dependencies($templates))
-				return false;
-
 			if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $template['host'])){
 				$result = false;
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Incorrect characters used for Template name [ '.$template['host'].' ]');
@@ -983,7 +979,8 @@ class CTemplate extends CZBXAPI{
 		catch(APIException $e){
 			if($transaction) self::EndTransaction(false, __METHOD__);
 			
-			self::setMethodErrors(__METHOD__, $e->getErrors());
+			$err = array(array('errno' => $e->getCode(), 'error' => $e->getErrors()));
+			self::setMethodErrors(__METHOD__, $err);
 			return false;
 		}
 	}
@@ -1019,6 +1016,12 @@ class CTemplate extends CZBXAPI{
 		}
 
 		if(isset($data['hosts'])){
+			$hostsids = zbx_objectValues($data['hosts'], 'hostid');
+			self::link($templateids, $hostsids);
+			
+			if(!check_templates_trigger_dependencies($templates))
+				return false;
+				
 			$hostids = zbx_objectValues($data['hosts'], 'hostid');
 
 			$linked = array();
@@ -1171,88 +1174,6 @@ class CTemplate extends CZBXAPI{
 
 
 /**
- * Link Template to Hosts
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param array $data
- * @param string $data['templateid']
- * @param array $data['hostids']
- * @return boolean
- */
-	public static function linkHosts($data){
-		$result = false;
-		$error = '';
-
-		$templateid = $data['templateid'];
-		$hostids = $data['hostids'];
-		self::BeginTransaction(__METHOD__);
-
-		foreach($hostids as $hostid){
-			$hosttemplateid = get_dbid('hosts_templates', 'hosttemplateid');
-			if(!$result = DBexecute('INSERT INTO hosts_templates VALUES ('.$hosttemplateid.','.$hostid.','.$templateid.')')){
-				$error = 'DBexecute';
-				break;
-			}
-		}
-
-		if($result) {
-			foreach($hostids as $hostid){
-				$result = sync_host_with_templates($hostid, $templateid);
-				if(!$result) {
-					$error = 'sync_host_with_templates';
-					break;
-				}
-			}
-		}
-		$result = self::EndTransaction($result, __METHOD__);
-
-		if($result)
-			return true;
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
-			return false;
-		}
-	}
-
-/**
- * Unlink Hosts from Templates
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param _array $data
- * @param string $data['templateid']
- * @param array $data['hostids']
- * @param boolean $data['clean']
- * @return boolean
- */
-	public static function unlinkHosts($data){
-		$templateid = $data['templateid'];
-		$hostids = $data['hostids'];
-		$clean = isset($data['clean']);
-
-		foreach($hostids as $hostid) {
-			$result = delete_template_elements($hostid, array($templateid), $clean);
-		}
-		$result&= DBexecute('DELETE FROM hosts_templates WHERE templateid='.$templateid.' AND '.DBcondition('hostid',$hostids));
-
-		if($result)
-			return true;
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
-			return false;
-		}
-	}
-
-/**
  * Link Host to Templates
  *
  * {@source}
@@ -1320,49 +1241,75 @@ class CTemplate extends CZBXAPI{
 			return false;
 		}
 	}
+	
+	
+	private function link($templateids, $targetids){
+		
+		try{
+			self::BeginTransaction(__METHOD__);
+			
+	// CHECK TEMPLATE TRIGGERS DEPENDENCIES {{{
+			foreach($templateids as $templateid){
+				$triggerids = array();
+				$db_triggers = get_triggers_by_hostid($templateid);
+				while($trigger = DBfetch($db_triggers)) {
+					$triggerids[$trigger['triggerid']] = $trigger['triggerid'];
+				}
 
-/**
- * Unlink Templates from Host
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param string $data
- * @param string $data['templates']
- * @param array $data['hosts']
- * @param boolean $data['clean'] whether to wipe all info from template elements.
- * @return boolean
- */
-	public static function unlinkTemplates($data){
-		$errors = array();
-
-		$templateids = zbx_objectValues($data['templates'], 'templateid');
-		$hostids = zbx_objectValues($data['hosts'], 'hostid');
-		$clean = isset($data['clean']) ? $data['clean'] : false;;
-
-		self::BeginTransaction(__METHOD__);
-
-		$sql = 'DELETE FROM hosts_templates WHERE '.DBcondition('hostid', $hostids).' AND '.DBcondition('templateid', $templateids);
-		$result = DBexecute($sql);
-
-		if($result){
-			foreach($hostids as $hostid){
-				$result = delete_template_elements($hostid, $templateids, $clean);
-				if(!$result) break;
+				$sql = 'SELECT DISTINCT h.hostid, h.host '.
+						' FROM trigger_depends td, functions f, items i, hosts h '.
+						' WHERE (('.DBcondition('td.triggerid_down',$triggerids).' AND f.triggerid=td.triggerid_up) '.
+							' OR ('.DBcondition('td.triggerid_up',$triggerids).' AND f.triggerid=td.triggerid_down)) '.
+							' AND i.itemid=f.itemid '.
+							' AND h.hostid=i.hostid '.
+							' AND h.hostid<>'.$templateid.
+							' AND h.status='.HOST_STATUS_TEMPLATE;
+				
+				if($db_dephosts = DBfetch(DBselect($sql))){
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 
+						'Trigger in template [ '.$templateid.' ] has dependency with trigger in template [ '.$db_dephost['host'].' ]');
+				}
 			}
+	// }}} CHECK TEMPLATE TRIGGERS DEPENDENCIES	
+			
+			
+			
+			$linked = array();
+			$sql = 'SELECT hostid, templateid FROM hosts_templates WHERE '.DBcondition('hostid', $targetids).
+				' AND '.DBcondition('templateid', $templateids);
+			$linked_db = DBselect($sql);
+			while($pair = DBfetch($linked_db)){
+				$linked[$pair['hostid']] = array($pair['templateid'] => $pair['templateid']);
+			}
+
+			foreach($targetids as $targetid){
+				if(!self::checkCircularLink($targetid, $templateids)){
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Circular link can not be created');
+				}
+			}
+
+			foreach($targetids as $targetid){
+				foreach($templateids as $tnum => $templateid){
+					if(isset($linked[$targetid]) && isset($linked[$targetid][$templateid])) continue;
+					
+					$values = array(get_dbid('hosts_templates', 'hosttemplateid'), $targetid, $templateid);
+					$sql = 'INSERT INTO hosts_templates VALUES ('. implode(', ', $values) .')';
+					$result = DBexecute($sql);
+					
+					if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'DBError');
+					
+					sync_host_with_templates($targetid, $templateid);
+				}
+			}
+			
+			self::EndTransaction(true, __METHOD__);
+			
+		}
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			throw new APIException($e->getCode(), $e->getErrors());
 		}
 
-		$result = self::EndTransaction($result, __METHOD__);
-
-		if($result)
-			return true;
-		else{
-			self::setMethodErrors(__METHOD__, $errors);
-			return false;
-		}
 	}
 
 }
