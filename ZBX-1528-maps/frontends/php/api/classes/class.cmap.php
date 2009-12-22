@@ -238,28 +238,28 @@ class CMap extends CZBXAPI{
 				$nodeids = get_current_nodeid(true);
 				$host_options = array('hostids' => $hosts_to_check,
 									'nodeids' => $nodeids,
-									'editable' => isset($options['editable']),
+									'editable' => $options['editable'],
 									'preservekeys'=>1);
 				$allowed_hosts = CHost::get($host_options);
 				$allowed_hosts = zbx_objectValues($allowed_hosts, 'hostid');
 
 				$map_options = array('sysmapids' => $maps_to_check,
 									'nodeids' => $nodeids,
-									'editable' => isset($options['editable']),
+									'editable' => $options['editable'],
 									'preservekeys'=>1);
 				$allowed_maps = self::get($map_options);
 				$allowed_maps = zbx_objectValues($allowed_maps, 'sysmapid');
 
 				$trigger_options = array('triggerids' => $triggers_to_check,
 									'nodeids' => $nodeids,
-									'editable' => isset($options['editable']),
+									'editable' => $options['editable'],
 									'preservekeys'=>1);
 				$allowed_triggers = CTrigger::get($trigger_options);
 				$allowed_triggers = zbx_objectValues($allowed_triggers, 'triggerid');
 
 				$hostgroup_options = array('groupids' => $host_groups_to_check,
 									'nodeids' => $nodeids,
-									'editable' => isset($options['editable']),
+									'editable' => $options['editable'],
 									'preservekeys'=>1);
 				$allowed_host_groups = CHostGroup::get($hostgroup_options);
 				$allowed_host_groups = zbx_objectValues($allowed_host_groups, 'groupid');
