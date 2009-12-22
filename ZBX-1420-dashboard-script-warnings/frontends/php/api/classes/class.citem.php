@@ -76,7 +76,8 @@ class CItem extends CZBXAPI{
 			'graphids'				=> null,
 			'triggerids'			=> null,
 			'applicationids'		=> null,
-			'templated_items'		=> null,
+			'inherited'				=> null,
+			'templated'				=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
 // filter
@@ -214,12 +215,22 @@ class CItem extends CZBXAPI{
 			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
 		}
 
-// templated_items
-		if(!is_null($options['templated_items'])){
-			if($options['templated_items'] == 1)
+// inherited
+		if(!is_null($options['inherited'])){
+			if($options['inherited'])
 				$sql_parts['where'][] = 'i.templateid>0';
 			else
 				$sql_parts['where'][] = 'i.templateid=0';
+		}
+		
+// templated
+		if(!is_null($options['templated'])){
+			$sql_parts['from'][] = 'hosts h';
+			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+			if($options['templated'])
+				$sql_parts['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
+			else
+				$sql_parts['where'][] = 'h.status<>'.HOST_STATUS_TEMPLATE;
 		}
 
 // extendoutput

@@ -207,7 +207,7 @@ include_once('include/page_header.php');
 		$box_height = 0;
 
 		foreach($strings as $snum => $str)
-			$strings[$snum] = expand_map_element_label_by_data(null, $str); 
+			$strings[$snum] = expand_map_element_label_by_data(null, $str);
 
 		foreach($strings as $snum => $str){
 			$dims = imageTextSize(8,0,$str);

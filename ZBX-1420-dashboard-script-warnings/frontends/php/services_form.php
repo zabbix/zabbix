@@ -475,7 +475,7 @@ if(isset($_REQUEST['sform'])){
 	$cb->setType('button');
 	$cb->setAction("javascript: openWinCentered('services_form.php?pservices=1".url_param('serviceid')."','ZBX_Services_List',740,420,'scrollbars=1, toolbar=0, menubar=0, resizable=1, dialog=0');");
 
-	$frmService->addRow('Parent Service',array($ctb,$cb));
+	$frmService->addRow(S_PARENT_SERVICE,array($ctb,$cb));
 //----------
 
 //child links
