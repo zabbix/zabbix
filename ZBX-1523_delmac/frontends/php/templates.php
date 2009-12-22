@@ -185,8 +185,10 @@ include_once('include/page_header.php');
 		$templates = array_keys($templates);
 		$templates = zbx_toObject($templates, 'templateid');
 		$templates_clear = zbx_toObject($templates_clear, 'templateid');
+		
+		$hosts = zbx_toObject($hosts, 'hostid');
 
-// CREATE/UPDATE TEMPLATE WITH GROUPS AND LINKED TEMPLATES {{{
+// CREATE/UPDATE TEMPLATE {{{
 		if($templateid){
 			$template = array('templateid' => $templateid);
 			$result = CTemplate::update(array(
@@ -194,7 +196,9 @@ include_once('include/page_header.php');
 				'host' => $template_name,
 				'groups' => $groups,
 				'templates' => $templates,
-				'templates_clear' => $templates_clear
+				'templates_clear' => $templates_clear,
+				'hosts' => $hosts,
+				'macros' => get_request('macros', array()),
 			));
 			if(!$result){
 				error(CTemplate::resetErrors());
@@ -205,7 +209,14 @@ include_once('include/page_header.php');
 			$msg_fail = S_CANNOT_UPDATE_TEMPLATE;
 		}
 		else{
-			if($result = CTemplate::create(array('host' => $template_name, 'groups' => $groups, 'templates' => $templates))){
+			$result = CTemplate::create(array(
+				'host' => $template_name, 
+				'groups' => $groups, 
+				'templates' => $templates,
+				'hosts' => $hosts,
+				'macros' => get_request('macros', array())
+			));
+			if($result){
 				$template = reset($result);
 				$templateid = $template['hostid'];
 			}
@@ -216,7 +227,7 @@ include_once('include/page_header.php');
 			$msg_ok = S_TEMPLATE_ADDED;
 			$msg_fail = S_CANNOT_ADD_TEMPLATE;
 		}
-// }}} CREATE/UPDATE TEMPLATE WITH GROUPS AND LINKED TEMPLATES
+// }}} CREATE/UPDATE TEMPLATE
 
 // FULL_CLONE {
 
@@ -274,71 +285,8 @@ include_once('include/page_header.php');
 			}
 		}
 // }
-// LINK/UNLINK HOSTS {
-		if($result){
-			$hosts = CHost::get(array('hostids' => $hosts, 'editable' => 1, 'templated_hosts' => 1));
-			$hosts = zbx_objectValues($hosts, 'hostid');
-//-- unlink --
-			$linked_hosts = array();
-			$db_childs = get_hosts_by_templateid($templateid);
-			while($db_child = DBfetch($db_childs)){
-				$linked_hosts[$db_child['hostid']] = $db_child['hostid'];
-			}
 
-			$unlink_hosts = array_diff($linked_hosts, $hosts);
-
-			foreach($unlink_hosts as $id => $value){
-				$result &= unlink_template($value, $templateid, false);
-			}
-
-//-- link --
-			$link_hosts = array_diff($hosts, $linked_hosts);
-
-			$result = CTemplate::massAdd(array(
-				'templates' => zbx_toObject($templateid, 'templateid'),
-				'hosts' => zbx_toObject($hosts, 'hostid')
-			));
-
-
-			// $template_name = DBfetch(DBselect('SELECT host FROM hosts WHERE hostid='.$templateid));
-
-			// foreach($link_hosts as $id => $hostid){
-
-				// $host_groups=array();
-				// $db_hosts_groups = DBselect('SELECT groupid FROM hosts_groups WHERE hostid='.$hostid);
-				// while($hg = DBfetch($db_hosts_groups)) $host_groups[] = $hg['groupid'];
-
-				// $host=get_host_by_hostid($hostid);
-
-				// $templates_tmp=get_templates_by_hostid($hostid);
-				// $templates_tmp[$templateid]=$template_name['host'];
-
-				// $result &= update_host($hostid,
-					// $host['host'],$host['port'],$host['status'],$host['useip'],$host['dns'],
-					// $host['ip'],$host['proxy_hostid'],$templates_tmp,$host['useipmi'],$host['ipmi_ip'],
-					// $host['ipmi_port'],$host['ipmi_authtype'],$host['ipmi_privilege'],$host['ipmi_username'],
-					// $host['ipmi_password'],null,$host_groups);
-			// }
-		}
-// }
-// MACROS {
-		if($result){
-			$macros = get_request('macros', array());
-			$macrostoadd = array();
-
-			foreach($macros as $mnum => $macro){
-				$macro['hostid'] = $templateid;
-				$macrostoadd[] = $macro;
-			}
-
-			if(!empty($macrostoadd))
-				$result = CUserMacro::update($macrostoadd);
-
-			if(!$result)
-				error(S_ERROR_ADDING_MACRO);
-		}
-
-// } MACROS
+		
 		$result = DBend($result);
 
 		show_messages($result, $msg_ok, $msg_fail);

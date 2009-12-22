@@ -510,95 +510,96 @@ class CTemplate extends CZBXAPI{
  * @return boolean
  */
 	public static function create($templates){
-		$errors = array();
+		$transaction = false;
 		
 		$templates = zbx_toArray($templates);
 		$templateids = array();
 
 		$result = false;
 
+		try{
 // CHECK IF HOSTS HAVE AT LEAST 1 GROUP {{{
-		foreach($templates as $tnum => $template){
-			if(empty($template['groups'])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'No groups for template [ '.$template['host'].' ]');
-				return false;
+			foreach($templates as $tnum => $template){
+				if(empty($template['groups'])){
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'No groups for template [ '.$template['host'].' ]');
+				}
+				$templates[$tnum]['groups'] = zbx_toArray($templates[$tnum]['groups']);
+				
+				foreach($templates[$tnum]['groups'] as $gnum => $group){
+					$groupids[$group['groupid']] = $group['groupid'];
+				}
 			}
-			$templates[$tnum]['groups'] = zbx_toArray($templates[$tnum]['groups']);
-			
-			foreach($templates[$tnum]['groups'] as $gnum => $group){
-				$groupids[$group['groupid']] = $group['groupid'];
-			}
-		}
 // }}} CHECK IF HOSTS HAVE AT LEAST 1 GROUP
 
 
 // PERMISSIONS {{{
-		$upd_groups = CHostGroup::get(array(
-			'groupids' => $groupids,
-			'editable' => 1,
-			'preservekeys' => 1));
-		foreach($groupids as $gnum => $groupid){
-			if(!isset($upd_groups[$groupid])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You do not have enough rights for operation');
-				return false;
+			$upd_groups = CHostGroup::get(array(
+				'groupids' => $groupids,
+				'editable' => 1,
+				'preservekeys' => 1));
+			foreach($groupids as $gnum => $groupid){
+				if(!isset($upd_groups[$groupid])){
+					throw new APIException(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				}
 			}
-		}
 // }}} PERMISSIONS
 
-		self::BeginTransaction(__METHOD__);
-		foreach($templates as $tnum => $template){
-
-/* 			$template_db_fields = array(
-				'host' => null,
-			);
-			if(!check_db_fields($template_db_fields, $template)){
-				$result = false;
-				break;
-			}
- */			
- 
-			if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $template['host'])){
-				$result = false;
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Incorrect characters used for Template name [ '.$template['host'].' ]');
-				break;
-			}
-		
-			$template_exists = self::getObjects(array('template' => $template['host']));
-			if(!empty($template_exists)){
-				$result = false;
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_HOST.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
-				break;
-			}
-
-
-			$templateid = get_dbid('hosts', 'hostid');
-			$templateids[] = $templateid;
+			$transaction = self::BeginTransaction(__METHOD__);
 			
-			$values = array($templateid, zbx_dbstr($template['host']), HOST_STATUS_TEMPLATE);
-			$sql = 'INSERT INTO hosts (hostid, host, status) VALUES ('. implode(', ', $values) .')';
-			$result = DBexecute($sql);
+			foreach($templates as $tnum => $template){
 
-			if(!$result) break;
+	/* 			$template_db_fields = array(
+					'host' => null,
+				);
+				if(!check_db_fields($template_db_fields, $template)){
+					$result = false;
+					break;
+				}
+	 */			
+	 
+				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $template['host'])){
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for Template name [ '.$template['host'].' ]');
+				}
+			
+				$template_exists = self::getObjects(array('template' => $template['host']));
+				if(!empty($template_exists)){
+					$result = false;
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+				}
 
-			$template['templateid'] = $templateid;
-			$options = array();
-			$options['templates'] = $template;
-			$options['groups'] = $template['groups'];
-			if(isset($template['templates']) && !is_null($template['templates']))
-				$options['templates_link'] = $template['templates'];
-			if(isset($template['macros']) && !is_null($template['macros']))
-				$options['macros'] = $template['macros'];
 
-			$result &= self::massAdd($options);
-		}
-		$result = self::EndTransaction($result, __METHOD__);
+				$templateid = get_dbid('hosts', 'hostid');
+				$templateids[] = $templateid;
+				
+				$values = array($templateid, zbx_dbstr($template['host']), HOST_STATUS_TEMPLATE);
+				$sql = 'INSERT INTO hosts (hostid, host, status) VALUES ('. implode(', ', $values) .')';
+				$result = DBexecute($sql);
 
-		if($result){
+				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'DBError');
+
+				$template['templateid'] = $templateid;
+				$options = array();
+				$options['templates'] = $template;
+				$options['groups'] = $template['groups'];
+				if(isset($template['templates']) && !is_null($template['templates']))
+					$options['templates_link'] = $template['templates'];
+				if(isset($template['macros']) && !is_null($template['macros']))
+					$options['macros'] = $template['macros'];
+
+				$result = self::massAdd($options);
+				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS);
+			}
+			
+			self::EndTransaction(true, __METHOD__);
+			
 			$new_templates = self::get(array('templateids' => $templateids, 'extendoutput' => 1, 'nopermissions' => 1));
 			return $new_templates;
+			
 		}
-		else{
-			self::setMethodErrors(__METHOD__, $errors);
+		catch(APIException $e){
+			if($transaction) self::EndTransaction(false, __METHOD__);
+			
+			self::setError(__METHOD__, $e->getCode(), $e->getErrors());
 			return false;
 		}
 	}
@@ -617,44 +618,45 @@ class CTemplate extends CZBXAPI{
  */
 	public static function update($templates){
 
-		$errors = array();
-		$result = true;
 		$templates = zbx_toArray($templates);
 		$templateids = zbx_objectValues($templates, 'templateid');
-
-		$upd_templates = self::get(array(
-			'templateids' => $templateids,
-			'editable' => 1,
-			'extendoutput' => 1,
-			'preservekeys' => 1
-		));
-		foreach($templates as $tnum => $template){
-// PERMISSIONS {{{
-			if(!isset($upd_templates[$template['templateid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				return false;
+		
+		try{
+			$upd_templates = self::get(array(
+				'templateids' => $templateids,
+				'editable' => 1,
+				'extendoutput' => 1,
+				'preservekeys' => 1
+			));
+			foreach($templates as $tnum => $template){
+	// PERMISSIONS {{{
+				if(!isset($upd_templates[$template['templateid']])){
+					throw new APIException(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				}
+	// }}} PERMISSIONS
 			}
-// }}} PERMISSIONS
-		}
 
-		self::BeginTransaction(__METHOD__);
+			self::BeginTransaction(__METHOD__);
 
-		foreach($templates as $tnum => $template){	
-			$template['templates_link'] = $template['templates'];
-			$template['templates'] = $template;
-				
-			$result = self::massUpdate($template);
-			if(!$result) break;
-		}
+			foreach($templates as $tnum => $template){
+				$template['templates_link'] = isset($template['templates']) ? $template['templates'] : null;
+				$template['templates'] = $template;
+					
+				$result = self::massUpdate($template);
+				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Failed update template');
+			}
 
-		$result = self::EndTransaction($result, __METHOD__);
-
-		if($result){
+			self::EndTransaction(true, __METHOD__);
 			$upd_templates = self::get(array('templateids'=>$templateids, 'extendoutput'=>1, 'nopermissions'=>1));
 			return $upd_templates;
+			
 		}
-		else{
-			self::setMethodErrors(__METHOD__, $errors);
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}
@@ -806,6 +808,7 @@ class CTemplate extends CZBXAPI{
 
 			$transaction = self::BeginTransaction(__METHOD__);
 
+
 // UPDATE TEMPLATES PROPERTIES {{{
 			if(isset($data['host'])){
 				if(count($templates) > 1){
@@ -879,18 +882,8 @@ class CTemplate extends CZBXAPI{
 		
 // UPDATE TEMPLATE LINKAGE {{{
 			if(isset($data['hosts']) && !is_null($data['hosts'])){
-		
-	// CHECK CIRCULAR LINKS {{{
-				foreach($data['hosts'] as $host_to_link){	
-					if(!self::checkCircularLink($host_to_link['hostid'], templateids)){
-						self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Circular link can not be created');
-						return false;
-					}
-				}
-	// }}} CHECK CIRCULAR LINKS
-
-				$template_hosts = CHost::get(array('hostids' => $templateids));
-				$template_hostids = zbx_objectValues($template_hosts, 'templateid');
+				$template_hosts = CHost::get(array('templateids' => $templateids, 'templated_hosts' => 1));
+				$template_hostids = zbx_objectValues($template_hosts, 'hostid');
 				$new_hostids = zbx_objectValues($data['hosts'], 'hostid');
 				
 				$hosts_to_add = array_diff($new_hostids, $template_hostids);
@@ -939,9 +932,9 @@ class CTemplate extends CZBXAPI{
 
 // UPDATE MACROS {{{		
 			if(isset($data['macros']) && !is_null($data['macros'])){
-				$host_macros = CUserMacro::get(array('hostids' => $hostids, 'extendoutput' => 1));
+				$host_macros = CUserMacro::get(array('hostids' => $templateids, 'extendoutput' => 1));
 
-				$result = self::massAdd(array('templates' => $hosts, 'macros' => $data['macros']));
+				$result = self::massAdd(array('templates' => $templates, 'macros' => $data['macros']));
 				if(!$result){
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant add macro');
 				}
@@ -961,7 +954,7 @@ class CTemplate extends CZBXAPI{
 				}
 
 				if(!empty($macros_to_del)){
-					$result = self::massRemove(array('templates' => $hosts, 'macros' => $macros_to_del));
+					$result = self::massRemove(array('templates' => $templates, 'macros' => $macros_to_del));
 					if(!$result){
 						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant remove macro');
 					}
@@ -979,8 +972,9 @@ class CTemplate extends CZBXAPI{
 		catch(APIException $e){
 			if($transaction) self::EndTransaction(false, __METHOD__);
 			
-			$err = array(array('errno' => $e->getCode(), 'error' => $e->getErrors()));
-			self::setMethodErrors(__METHOD__, $err);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}
@@ -1002,112 +996,45 @@ class CTemplate extends CZBXAPI{
  * @return boolean
  */
 	public static function massAdd($data){
-		$result = true;
-		$errors = array();
-
+		$transaction = false;
+		
 		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : null;
 		$templateids = is_null($templates) ? array() : zbx_objectValues($templates, 'templateid');
 
-		self::BeginTransaction(__METHOD__);
-
-		if(isset($data['groups'])){
-			$options = array('groups' => $data['groups'], 'templates' => $templates);
-			$result = CHostGroup::massAdd($options);
-		}
-
-		if(isset($data['hosts'])){
-			$hostsids = zbx_objectValues($data['hosts'], 'hostid');
-			self::link($templateids, $hostsids);
-			
-			if(!check_templates_trigger_dependencies($templates))
-				return false;
-				
-			$hostids = zbx_objectValues($data['hosts'], 'hostid');
-
-			$linked = array();
-			$sql = 'SELECT hostid, templateid FROM hosts_templates WHERE '.DBcondition('hostid', $hostids).
-				' AND '.DBcondition('templateid', $templateids);
-			$linked_db = DBselect($sql);
-			while($pair = DBfetch($linked_db)){
-				$linked[$pair['hostid']] = array($pair['templateid'] => $pair['templateid']);
-			}
-
-			foreach($hostids as $hostid){
-				if(!self::checkCircularLink($hostid, $templateids)){
-					$result = false;
-					$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Circular link can not be created');
-					break;
-				}
-			}
-
-			if($result){
-				foreach($hostids as $hostid){
-					foreach($templateids as $tnum => $templateid){
-						if(isset($linked[$hostid]) && isset($linked[$hostid][$templateid])) continue;
-						$hosttemplateid = get_dbid('hosts_templates', 'hosttemplateid');
-						if(!$result = DBexecute('INSERT INTO hosts_templates VALUES ('.$hosttemplateid.','.$hostid.','.$templateid.')')){
-							$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Insert error');
-							break;
-						}
-					}
-				}
-			}
-
-			if($result){
-				foreach($hostids as $hostid){
-					foreach($templateids as $tnum => $templateid){
-						if(isset($linked[$hostid]) && isset($linked[$hostid][$templateid])) continue;
-						sync_host_with_templates($hostid, $templateid);
-					}
-				}
-			}
-		}
-
-		if(isset($data['templates_link'])){
-			$templates_linkids = zbx_objectValues($data['templates_link'], 'templateid');
-
-			$linked = array();
-			$sql = 'SELECT hostid, templateid FROM hosts_templates WHERE '.DBcondition('hostid', $templates_linkids).
-				' AND '.DBcondition('templateid', $templateids);
-			$linked_db = DBselect($sql);
-			while($pair = DBfetch($linked_db)){
-				$linked[$pair['hostid']] = array($pair['templateid'] => $pair['templateid']);
-			}
-
-
-			foreach($templates_linkids as $templates_linkid){
-				foreach($templateids as $tnum => $templateid){
-					if(isset($linked[$templateid]) && isset($linked[$templateid][$templates_linkid])) continue;
-					$hosttemplateid = get_dbid('hosts_templates', 'hosttemplateid');
-					if(!$result = DBexecute('INSERT INTO hosts_templates VALUES ('.$hosttemplateid.','.$templateid.','.$templates_linkid.')')){
-						$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Insert error');
-						break;
-					}
-				}
-			}
-
-			if($result){
-				foreach($templates_linkids as $templates_linkid){
-					foreach($templateids as $tnum => $templateid){
-						if(isset($linked[$templates_linkid]) && isset($linked[$templates_linkid][$templateid])) continue;
-						sync_host_with_templates($templateid, $templates_linkid);
-					}
-				}
-			}
-
-		}
 		
-		if(isset($data['macros'])){
-			$options = array('templates' => zbx_toArray($data['templates']), 'macros' => $data['macros']);
-			$result = CUserMacro::massAdd($options);
-		}
+		$transaction = self::BeginTransaction(__METHOD__);
 
-		$result = self::EndTransaction($result, __METHOD__);
+		try{
+			if(isset($data['groups'])){
+				$options = array('groups' => $data['groups'], 'templates' => $templates);
+				$result = CHostGroup::massAdd($options);
+				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant link groups');
+			}
 
-		if($result)
+			if(isset($data['hosts'])){
+				$hostsids = zbx_objectValues($data['hosts'], 'hostid');
+				self::link($templateids, $hostsids);
+			}
+
+			if(isset($data['templates_link'])){
+				$templates_linkids = zbx_objectValues($data['templates_link'], 'templateid');
+				self::link($templates_linkids, $templateids);
+			}
+			
+			if(isset($data['macros'])){
+				$options = array('templates' => zbx_toArray($data['templates']), 'macros' => $data['macros']);
+				$result = CUserMacro::massAdd($options);
+				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant link macros');
+			}
+
+			$result = self::EndTransaction(true, __METHOD__);
 			return true;
-		else{
-			self::setMethodErrors(__METHOD__, $errors);
+		}
+		catch(APIException $e){
+			if($transaction) self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}
@@ -1243,8 +1170,7 @@ class CTemplate extends CZBXAPI{
 	}
 	
 	
-	private function link($templateids, $targetids){
-		
+	private static function link($templateids, $targetids){
 		try{
 			self::BeginTransaction(__METHOD__);
 			
@@ -1271,7 +1197,6 @@ class CTemplate extends CZBXAPI{
 				}
 			}
 	// }}} CHECK TEMPLATE TRIGGERS DEPENDENCIES	
-			
 			
 			
 			$linked = array();
