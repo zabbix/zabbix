@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1592] user groups are now sorted in user list and editing form (Vedmak)
  - [ZBX-1564] fixed processing of performance counters which are represented as number alternatives (Dmitry)
  - [ZBX-479] fixed compilation of Zabbix agent under Mac OS/X (Sasha)
  - [ZBX-1385] proxy list in host configuration form is now sorted (Vedmak)
