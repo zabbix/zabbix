@@ -277,7 +277,7 @@ include_once('include/page_header.php');
 					case TRIGGER_SEVERITY_AVERAGE:  	$hl_color = hex2rgb('DDAAAA'); break;
 					case TRIGGER_SEVERITY_WARNING:  	$hl_color = hex2rgb('EFEFCC'); break;
 					case TRIGGER_SEVERITY_INFORMATION:  $hl_color = hex2rgb('CCE2CC'); break;
-					case TRIGGER_SEVERITY_NOT_CLASSIFIED:
+					case TRIGGER_SEVERITY_NOT_CLASSIFIED: $hl_color = hex2rgb('AAFFAA'); break;
 					default:
 				}
 			}
