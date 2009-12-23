@@ -283,13 +283,15 @@ include_once('include/page_header.php');
 			}
 
 			if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_UNKNOWN){
-				$hl_color = null;
-				$st_color = hex2rgb('CCCCCC');
+				$hl_color = hex2rgb('CCCCCC');
 			}
 
 			if(isset($el_info['unavailable'])){
 				$hl_color = null;
-				$st_color = hex2rgb('FF0000');
+				if($el_info['unavailable'] == HOST_AVAILABLE_FALSE)
+					$st_color = hex2rgb('FF0000');
+				else
+					$st_color = hex2rgb('CCCCCC');
 			}
 			if(isset($el_info['maintenance'])){
 				$hl_color = null;
@@ -370,9 +372,10 @@ include_once('include/page_header.php');
 
 		$label_line = expand_map_element_label_by_data($selement);
 
-
-		$info_line	= $el_info['info'];
-		$color		= $el_info['color'];
+		$info_line = array();
+		foreach($el_info['info'] as $inum => $info){
+			$info_line[] = $info['msg'];
+		}
 
 		if($label_type == MAP_LABEL_TYPE_STATUS){
 			$label_line = '';
@@ -380,13 +383,6 @@ include_once('include/page_header.php');
 		else if($label_type == MAP_LABEL_TYPE_NAME){
 			$label_line = $el_info['name'];
 		}
-
-		if(isset($el_info['disabled']) && $el_info['disabled'] == 1){
-			$info_line = 'DISABLED';
-			$label_color = $gray;
-		}
-
-		unset($el_info);
 
 		if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
 			$host = get_host_by_hostid($selement['elementid']);
@@ -405,7 +401,6 @@ include_once('include/page_header.php');
 
 		$label_line = str_replace("\r", '', $label_line);
 		$strings = explode("\n", $label_line);
-		$info_line = explode("\n", $info_line);
 
 		$cnt = count($strings);
 		$strings = array_merge($strings, $info_line);
@@ -448,12 +443,12 @@ include_once('include/page_header.php');
 //		imagerectangle($im, $x_rec-2-1, $y_rec-1, $x_rec+$w+2+1, $y_rec+($oc*4)+$h+1, $black);
 		imagefilledrectangle($im, $x_rec-2, $y_rec, $x_rec+$w+2, $y_rec+($oc*4)+$h, $white);
 
-
-		$num = 0;
 		$increasey = 0;
-		foreach($strings as $str){
-			$num++;
+		foreach($strings as $num => $str){
 			$dims = imageTextSize(8,0,$str);
+
+			$color = ($num >= $cnt)?$el_info['info'][$num-$cnt]['color']:$label_color;
+
 
 			if($label_location == MAP_LABEL_LOC_TOP || $label_location == MAP_LABEL_LOC_BOTTOM)
 				$x_label = $x + $iconX/2 - $dims['width']/2;
@@ -462,7 +457,8 @@ include_once('include/page_header.php');
 			else
 				$x_label = $x_rec;
 
-			imagetext($im, 8, 0, $x_label, $y_rec+$dims['height']+$increasey, ($num > $cnt)?$color:$label_color, $str);
+
+			imagetext($im, 8, 0, $x_label, $y_rec+$dims['height']+$increasey, $color, $str);
 
 			$increasey+= $dims['height']+4;
 		}

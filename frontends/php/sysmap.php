@@ -212,7 +212,7 @@ include_once('include/page_header.php');
 					$result = DBend(true);
 
 					if($result){
-						print('alert("Map is saved!"); location.href = "sysmaps.php"');
+						print('if(Confirm("Map is saved! Return?")){ location.href = "sysmaps.php"; }');
 						ob_flush();
 					}
 					else{
