@@ -188,6 +188,9 @@ int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 #	define C_IN	ns_c_in
 #endif	/* C_IN */
 
+#ifndef T_ANY
+#	define T_ANY	ns_t_any
+#endif
 #ifndef T_A
 #	define T_A	ns_t_a
 #endif
