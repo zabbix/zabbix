@@ -90,9 +90,9 @@ div.iconminus{
 	width: 18px;
 	background-image: url('../images/general/bttn/minus.png');
 	background-repeat:no-repeat;
+	cursor:pointer;
 }
 div.iconminus:hover{
-	cursor:pointer;
 }
 
 div.iconplus{
@@ -100,9 +100,9 @@ div.iconplus{
 	width: 18px;
 	background-image: url('../images/general/bttn/plus.png');
 	background-repeat:no-repeat;
+	cursor:pointer;
 }
 div.iconplus:hover{
-	cursor:pointer;
 }
 
 div.iconmenu{
@@ -110,10 +110,10 @@ div.iconmenu{
 	width: 18px;
 	background-image: url('../images/general/bttn/menu.png');
 	background-repeat:no-repeat;
+	cursor:pointer;
 }
 
 div.iconmenu:hover{
-	cursor:pointer;
 }
 
 div.arrowup{
@@ -121,10 +121,10 @@ div.arrowup{
 	width: 18px;
 	background-image: url('../images/general/bttn/arrowup.png');
 	background-repeat:no-repeat;
+	cursor:pointer;
 }
 
 div.arrowup:hover{
-	cursor:pointer;
 }
 
 div.arrowdown{
@@ -132,10 +132,10 @@ div.arrowdown{
 	width: 18px;
 	background-image: url('../images/general/bttn/arrowdown.png');
 	background-repeat:no-repeat;
+	cursor:pointer;
 }
 
 div.arrowdown:hover{
-	cursor:pointer;
 }
 
 div.arrowleft{
@@ -143,10 +143,10 @@ div.arrowleft{
 	width: 18px;
 	background-image: url('../images/general/bttn/arrowleft.png');
 	background-repeat:no-repeat;
+	cursor:pointer;
 }
 
 div.arrowleft:hover{
-	cursor:pointer;
 }
 
 div.arrowright{
@@ -154,10 +154,10 @@ div.arrowright{
 	width: 18px;
 	background-image: url('../images/general/bttn/arrowright.png');
 	background-repeat:no-repeat;
+	cursor:pointer;
 }
 
 div.arrowright:hover{
-	cursor:pointer;
 }
 
 div.fullscreen{
@@ -165,10 +165,10 @@ div.fullscreen{
 	width: 18px;
 	background-image: url('../images/general/bttn/fullscreen.png');
 	background-repeat:no-repeat;
+	cursor:pointer;
 }
 
 div.fullscreen:hover{
-	cursor:pointer;
 }
 
 div.iconhelp{
@@ -176,10 +176,10 @@ div.iconhelp{
 	width: 18px;
 	background-image: url('../images/general/bttn/help.png');
 	background-repeat:no-repeat;
+	cursor:pointer;
 }
 
 div.iconhelp:hover{
-	cursor:pointer;
 }
 
 div.filterclosed{
@@ -187,10 +187,10 @@ div.filterclosed{
 	width: 9px;
 	background-image: url('../images/general/closed.gif');
 	background-repeat:no-repeat;
+	cursor:pointer;
 }
 
 div.filterclosed:hover{
-	cursor:pointer;
 }
 
 div.filteropened{
@@ -198,10 +198,10 @@ div.filteropened{
 	width: 9px;
 	background-image: url('../images/general/opened.gif');
 	background-repeat:no-repeat;
+	cursor:pointer;
 }
 
 div.filteropened:hover{
-	cursor:pointer;
 }
 
 div.iconsound{
@@ -209,10 +209,10 @@ div.iconsound{
 	width: 18px;
 	background-image: url('../images/general/bttn/sound.png');
 	background-repeat:no-repeat;
+	cursor:pointer;
 }
 
 div.iconsound:hover{
-	cursor:pointer;
 }
 
 div.iconmute{
@@ -220,10 +220,10 @@ div.iconmute{
 	width: 18px;
 	background-image: url('../images/general/bttn/mute.png');
 	background-repeat:no-repeat;
+	cursor:pointer;
 }
 
 div.iconmute:hover{
-	cursor:pointer;
 }
 
 div.iconreset{
@@ -231,10 +231,10 @@ div.iconreset{
 	width: 18px;
 	background-image: url('../images/general/bttn/reset.png');
 	background-repeat:no-repeat;
+	cursor:pointer;
 }
 
 div.iconreset:hover{
-	cursor:pointer;
 }
 
 div.iconerror{
@@ -242,10 +242,10 @@ div.iconerror{
 	width: 14px;
 	background-image: url('../images/general/error_icon.png');
 	background-repeat:no-repeat;
+	cursor:pointer;
 }
 
 div.iconerror:hover{
-	cursor:pointer;
 }
 
 div.iconok{
@@ -354,10 +354,10 @@ div.dbl_arrow_down{
 	background-image: url('../images/general/dbl_arrow_down2.png');
 	background-repeat:no-repeat;
 	display:block;
+	cursor:pointer;
 }
 
 div.dbl_arrow_down:hover{
-	cursor:pointer;
 }
 
 div.dbl_arrow_up{
@@ -365,10 +365,10 @@ div.dbl_arrow_up{
 	width: 9px;
 	background-image: url('../images/general/dbl_arrow_up2.png');
 	background-repeat:no-repeat;
+	cursor:pointer;
 }
 
 div.dbl_arrow_up:hover{
-	cursor:pointer;
 }
 
 div.sla_green{
@@ -388,9 +388,6 @@ div.icon_sortup{
 	width: 10px;
 	background-image: url('../images/general/sort_up.png');
 	background-repeat:no-repeat;
-}
-
-div.icon_sortup:hover{
 	cursor: pointer;
 }
 
@@ -399,45 +396,42 @@ div.icon_sortdown{
 	width: 10px;
 	background-image: url('../images/general/sort_down.png');
 	background-repeat:no-repeat;
-}
-
-div.icon_sortdown:hover{
 	cursor: pointer;
 }
 
 /********* DIV IMG END *********/
 
 .link{
+	cursor: pointer;
 	color:#3C3089;
 	text-decoration: underline;
 }
 
 .link:hover{
 	color:#6C80B9;
-	cursor: pointer;
 	text-decoration: underline;
 }
 
 .darklink{
 	color:#3C3089;
+	cursor: pointer;
 	text-decoration: underline;
 }
 
 .darklink:hover{
 	color:#6C80B9;
-	cursor: pointer;
 	text-decoration: underline;
 }
 
 .link_menu{
 	color: #3C3089;
+	cursor: pointer;
 	text-decoration: none;
 	border-bottom: 1px dotted #3C3089;
 }
 
 .link_menu:hover{
 	color: #6C80B9;
-	cursor: pointer;
 	text-decoration: none;
 	border-bottom: 1px dotted #6C80B9;
 }
@@ -528,11 +522,11 @@ span.info{
 	font-weight: bold;
 	font-size: 13px;
 	color:#3C3089;
+	cursor: pointer;
 	text-decoration: underline;
 }
 .biglink:hover{
 	color:#6C80B9;
-	cursor: pointer;
 	text-decoration: underline;
 }
 
