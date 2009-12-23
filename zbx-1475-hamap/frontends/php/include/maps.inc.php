@@ -1300,13 +1300,15 @@
 				$info['type'] = TRIGGER_VALUE_UNKNOWN;
 				$info['disabled'] = 1;
 			}
-			
+
 			$info['available'] = $host['available'];
 			$info['snmp_available'] = $host['snmp_available'];
 			$info['ipmi_available'] = $host['ipmi_available'];
-			
+
 			$info['triggers'] = array();
 			foreach($host['triggers'] as $tnum => $trigger){
+				if($trigger['status'] == TRIGGER_STATUS_DISABLED) continue;
+
 				if(!isset($info['type'])) $info['type'] = $trigger['value'];
 				else if($trigger['value'] == TRIGGER_VALUE_TRUE){
 					$info['type'] = $trigger['value'];
@@ -1320,9 +1322,12 @@
 				if($trigger['value'] == TRIGGER_VALUE_TRUE){
 					array_push($info['triggers'], $trigger['triggerid']);
 				}
+				if($host['host'] == 'ZABBIX-Server' && $trigger['value'] == TRIGGER_VALUE_UNKNOWN) 
+					SDII($trigger);
 
 				if(!isset($info[$trigger['value']]))
 					$info[$trigger['value']] = array('count' => 0);
+
 
 				$info[$trigger['value']]['count']++;
 				$info[$trigger['value']]['info'] = $info['name'];
@@ -1387,9 +1392,9 @@
 				if(($info['available'] == HOST_AVAILABLE_FALSE))
 					$info['info'][] = array('msg'=>S_UNAVAILABLE_BIG, 'color'=>$colors['Red']);
 				if(($info['snmp_available'] == HOST_AVAILABLE_FALSE))
-					$info['info'][] = array('msg'=>"\n".'SNMP '.S_UNAVAILABLE_BIG, 'color'=>$colors['Red']);
+					$info['info'][] = array('msg'=>'SNMP '.S_UNAVAILABLE_BIG, 'color'=>$colors['Red']);
 				if(($info['ipmi_available'] == HOST_AVAILABLE_FALSE))
-					$info['info'][] = array('msg'=>"\n".'IPMI '.S_UNAVAILABLE_BIG, 'color'=>$colors['Red']);
+					$info['info'][] = array('msg'=>'IPMI '.S_UNAVAILABLE_BIG, 'color'=>$colors['Red']);
 			
 				$info['iconid'] = $selement['iconid_on'];
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
@@ -1527,6 +1532,7 @@
 
 			$info['triggers'] = array();
 			foreach($group['triggers'] as $tnum => $trigger){
+				if($trigger['status'] == TRIGGER_STATUS_DISABLED) continue;
 
 				if(!isset($info['type'])){
 					$info['type'] = $trigger['value'];
