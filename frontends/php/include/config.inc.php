@@ -113,7 +113,7 @@ function __autoload($class_name){
 
 	/********** START INITIALIZATION *********/
 
-//	set_error_handler('zbx_err_handler');
+	set_error_handler('zbx_err_handler');
 
 	global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_CONFIGURATION_FILE, $DB;
 	global $ZBX_SERVER, $ZBX_SERVER_PORT;

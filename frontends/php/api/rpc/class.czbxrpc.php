@@ -226,7 +226,7 @@ class czbxrpc{
 // APPLICATION
 	private static function application($action, $params){
 
-		CAapplication::$error = array();
+		CApplication::$error = array();
 
 		switch($action){
 			default:
