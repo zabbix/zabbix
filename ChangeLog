@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1606] fixed showing icon errors with qoutes in error text (Vedmak)
  - [ZBX-1571] fixed errors when add proxy (Vedmak)
  - [ZBX-1585] fixed editing time in calendar popup in ie6/7 (Vedmak)
  - [ZBX-1564] fixed processing of performance counters which are represented as number alternatives (Dmitry)
