@@ -49,8 +49,8 @@ INSERT INTO usrgrp VALUES (5,'WEB administrators',0,0,0,0);
 INSERT INTO usrgrp VALUES (6,'Head of IT department',0,0,0,0);
 INSERT INTO usrgrp VALUES (7,'Zabbix administrators',0,0,0,0);
 INSERT INTO usrgrp VALUES (8,'Guests',0,0,0,0);
-INSERT INTO usrgrp VALUES (9,'Disabled',0,0,1,0);
-INSERT INTO usrgrp VALUES (10,'API access',0,1,0,0);
+INSERT INTO usrgrp VALUES (9,'Disabled',0,1,0,0);
+INSERT INTO usrgrp VALUES (10,'API access',0,0,1,0);
 --
 -- Dumping data for table `users_groups`
 --
