@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1612] fixed "API access" and "Disabled" group permissions; patch by Kodai (Richlv)
  - [ZBX-1606] fixed showing icon errors with qoutes in error text (Vedmak)
  - [ZBX-1571] fixed errors when add proxy (Vedmak)
  - [ZBX-1585] fixed editing time in calendar popup in ie6/7 (Vedmak)
