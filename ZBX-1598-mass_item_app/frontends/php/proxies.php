@@ -178,6 +178,7 @@
 
 	if(isset($_REQUEST['form'])){
 
+		$_REQUEST['hostid'] = get_request('hostid', 0);
 		$hosts = array();
 		$frm_title = S_PROXY;
 
