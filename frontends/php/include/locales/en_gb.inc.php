@@ -44,7 +44,7 @@
 	'S_COPY_SELECTED_TO'=>			'Copy selected to ...',
 
 //	dicoveryconf.php
-	'S_HOST_IP'=>				'Host ip',
+	'S_HOST_IP'=>				'Host IP',
 	'S_SERVICE_TYPE'=>			'Service type',
 	'S_SERVICE_PORT'=>			'Service port',
 	'S_DISCOVERY_STATUS'=>			'Discovery status',

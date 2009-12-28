@@ -241,13 +241,6 @@ class CAction extends CZBXAPI{
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 		}
 
-// actionids
-		if(!is_null($options['actionids'])){
-			zbx_value2array($options['actionids']);
-
-			$sql_parts['where'][] = DBcondition('a.actionid', $options['actionids']);
-		}
-
 // triggerids
 		if(!is_null($options['triggerids'])){
 			zbx_value2array($options['triggerids']);
