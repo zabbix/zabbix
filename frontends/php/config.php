@@ -234,8 +234,10 @@
 					$val = array_pop($val);
 					$msg[] = S_GROUP_FOR_DISCOVERED_HOSTS.' ['.$val['name'].']';
 
-					setHostGroupInternal($orig_config['discovery_groupid'], ZBX_NOT_INTERNAL_GROUP);
-					setHostGroupInternal($val['groupid'], ZBX_INTERNAL_GROUP);
+					if($val['groupid'] != $orig_config['discovery_groupid']){
+						setHostGroupInternal($orig_config['discovery_groupid'], ZBX_NOT_INTERNAL_GROUP);
+						setHostGroupInternal($val['groupid'], ZBX_INTERNAL_GROUP);
+					}
 				}
 			}
 			if(!is_null($val = get_request('alert_usrgrpid'))){
@@ -713,8 +715,8 @@
 
 		$cmbGrp = new CComboBox('discovery_groupid', $config['discovery_groupid']);
 		$groups = CHostGroup::get(array('sortfield'=>'name', 'editable' => 1, 'extendoutput' => 1));
-		foreach($groups as $groupid => $group){
-			$cmbGrp->addItem($groupid, $group['name']);
+		foreach($groups as $gnum => $group){
+			$cmbGrp->addItem($group['groupid'], $group['name']);
 		}
 		$frmOther->addRow(S_GROUP_FOR_DISCOVERED_HOSTS, $cmbGrp);
 
