@@ -49,6 +49,7 @@
 			case ITEM_TYPE_IPMI:		$type = S_IPMI_AGENT;			break;
 			case ITEM_TYPE_SSH:		$type = S_SSH_AGENT;			break;
 			case ITEM_TYPE_TELNET:		$type = S_TELNET_AGENT;			break;
+			case ITEM_TYPE_CALCULATED:	$type = S_CALCULATED;			break;
 			default:$type = S_UNKNOWN;			break;
 		}
 	return $type;

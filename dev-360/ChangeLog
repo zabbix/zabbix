@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [DEV-360] added support of calculated items (Sasha)
  - [ZBX-1174] fixed sql in "Add host" operation in "Discovery" module (Dmitry)
  - [ZBX-1431] fixed parameters for user.get api method (Vedmak)
  - [ZBX-1467] fixed graph copying (Vedmak)
