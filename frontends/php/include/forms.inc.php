@@ -763,6 +763,7 @@
 			$lstGroups->attributes['style'] = 'width: 320px';
 
 			$groups = CUserGroup::get(array('usrgrpids' => $user_groups, 'extendoutput' => 1));
+			order_result($groups, 'name');
 			foreach($groups as $num => $group){
 				$lstGroups->addItem($group['usrgrpid'], $group['name']);
 			}
