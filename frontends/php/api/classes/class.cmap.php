@@ -238,6 +238,7 @@ class CMap extends CZBXAPI{
 				$nodeids = get_current_nodeid(true);
 				$host_options = array('hostids' => $hosts_to_check,
 									'nodeids' => $nodeids,
+									'templated_hosts' => 1,
 									'editable' => isset($options['editable']),
 									'preservekeys'=>1);
 				$allowed_hosts = CHost::get($host_options);
