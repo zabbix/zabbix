@@ -469,7 +469,13 @@ class CItem extends CZBXAPI{
 // Adding Objects
 // Adding hosts
 		if($options['select_hosts']){
-			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids, 'nopermissions' => 1, 'preservekeys' => 1);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1, 
+				'itemids' => $itemids, 
+				'nopermissions' => 1, 
+				'preservekeys' => 1
+			);
 			$hosts = CHost::get($obj_params);
 			foreach($hosts as $hostid => $host){
 				foreach($host['items'] as $inum => $item){
@@ -487,7 +493,12 @@ class CItem extends CZBXAPI{
 
 // Adding triggers
 		if($options['select_triggers']){
-			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids, 'preservekeys' => 1);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1, 
+				'itemids' => $itemids, 
+				'preservekeys' => 1
+			);
 			$triggers = CTrigger::get($obj_params);
 			foreach($triggers as $triggerid => $trigger){
 				foreach($trigger['items'] as $inum => $item){
@@ -498,7 +509,12 @@ class CItem extends CZBXAPI{
 
 // Adding graphs
 		if($options['select_graphs']){
-			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids, 'preservekeys' => 1);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1, 
+				'itemids' => $itemids, 
+				'preservekeys' => 1
+			);
 			$graphs = CGraph::get($obj_params);
 			foreach($graphs as $graphid => $graph){
 				foreach($graph['items'] as $inum => $item){
@@ -509,7 +525,12 @@ class CItem extends CZBXAPI{
 
 // Adding applications
 		if($options['select_applications']){
-			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids, 'preservekeys' => 1);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1, 
+				'itemids' => $itemids, 
+				'preservekeys' => 1
+			);
 			$applications = CApplication::get($obj_params);
 			foreach($applications as $applicationid => $application){
 				foreach($application['items'] as $inum => $item){
