@@ -483,7 +483,14 @@ class CTrigger extends CZBXAPI{
 
 // Adding hosts
 		if($options['select_hosts']){
-			$obj_params = array('templated_hosts' => 1, 'extendoutput' => 1, 'triggerids' => $triggerids, 'nopermissions' => 1, 'preservekeys' => 1);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'templated_hosts' => 1, 
+				'extendoutput' => 1, 
+				'triggerids' => $triggerids, 
+				'nopermissions' => 1, 
+				'preservekeys' => 1
+			);
 			$hosts = CHost::get($obj_params);
 			foreach($hosts as $hostid => $host){
 				foreach($host['triggers'] as $num => $trigger){
@@ -494,7 +501,13 @@ class CTrigger extends CZBXAPI{
 
 // Adding Items
 		if($options['select_items']){
-			$obj_params = array('extendoutput' => 1, 'triggerids' => $triggerids, 'nopermissions' => 1, 'preservekeys' => 1);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1, 
+				'triggerids' => $triggerids, 
+				'nopermissions' => 1, 
+				'preservekeys' => 1
+			);
 			$items = CItem::get($obj_params);
 			foreach($items as $itemid => $item){
 				foreach($item['triggers'] as $num => $trigger){
