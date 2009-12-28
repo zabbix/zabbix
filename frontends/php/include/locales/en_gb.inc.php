@@ -1422,6 +1422,7 @@
 	'S_SEVERITY'=>				'Severity',
 	'S_MIN_SEVERITY'=>			'Min severity',
 	'S_DISABLED'=>				'Disabled',
+	'S_DISABLED_BIG'=>			'DISABLED',
 	'S_ENABLED'=>				'Enabled',
 	'S_DISABLE'=>				'Disable',
 	'S_ENABLE'=>				'Enable',

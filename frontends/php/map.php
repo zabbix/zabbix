@@ -259,9 +259,7 @@ include_once('include/page_header.php');
 	foreach($selements as $selementid => $selement){
 		if(empty($selement)) continue;
 
-//		$info = get_info_by_selement($selement);
 		$el_info = $map_info[$selementid];
-//		$el_info = get_info_by_selement($selement,$status_view);
 		$img = get_png_by_selement($selement, $el_info);
 
 		$iconX = imagesx($img);
@@ -387,9 +385,7 @@ include_once('include/page_header.php');
 		if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
 			$host = get_host_by_hostid($selement['elementid']);
 
-			if($label_type==MAP_LABEL_TYPE_IP) $label_line = $host['ip'];
-
-			if($host['status'] == HOST_STATUS_NOT_MONITORED) $label_color = $darkred;
+			if($label_type == MAP_LABEL_TYPE_IP) $label_line = $host['ip'];
 		}
 
 		if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE){
