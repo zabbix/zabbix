@@ -1322,8 +1322,7 @@
 				if($trigger['value'] == TRIGGER_VALUE_TRUE){
 					array_push($info['triggers'], $trigger['triggerid']);
 				}
-				if($host['host'] == 'ZABBIX-Server' && $trigger['value'] == TRIGGER_VALUE_UNKNOWN) 
-					SDII($trigger);
+
 
 				if(!isset($info[$trigger['value']]))
 					$info[$trigger['value']] = array('count' => 0);
@@ -1341,7 +1340,7 @@
 				}
 			}
 
-			if(!isset($info['type'])) $info['type'] = TRIGGER_VALUE_UNKNOWN;
+			if(!isset($info['type'])) $info['type'] = TRIGGER_VALUE_FALSE;
 
 			if($host['status'] == HOST_STATUS_TEMPLATE){
 				$info['type'] = TRIGGER_VALUE_UNKNOWN;
@@ -1364,20 +1363,23 @@
 //----
 // Host unavalable
 
-// Host unavalable
-			if(($info['available'] == HOST_AVAILABLE_UNKNOWN) && 
+			if(isset($info['disabled']) && $info['disabled'] == 1){
+// Disabled
+				$info['info'] = array();					
+				$info['info'][] = array('msg'=>S_DISABLED_BIG, 'color'=>$colors['Dark Red']);
+
+				$info['iconid'] = $selement['iconid_disabled'];
+				$info['icon_type'] = SYSMAP_ELEMENT_ICON_DISABLED;
+			}
+			else if(($info['available'] == HOST_AVAILABLE_UNKNOWN) && 
 				($info['snmp_available'] == HOST_AVAILABLE_UNKNOWN) &&
 				($info['ipmi_available'] == HOST_AVAILABLE_UNKNOWN))
 			{
 // UNKNOWN
-				$info['info'] = array();
+				$info['info'] = array();					
 				$info['info'][] = array('msg'=>S_UNKNOWN_BIG, 'color'=>$colors['Gray']);
-				
-				if(isset($info['disabled']) && $info['disabled'] == 1)
-					$info['iconid'] = $selement['iconid_disabled'];
-				else
-					$info['iconid'] = $selement['iconid_unknown'];
-	
+
+				$info['iconid'] = $selement['iconid_unknown'];	
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_UNKNOWN;
 				$info['unavailable'] = HOST_AVAILABLE_UNKNOWN;
 			}
@@ -1432,11 +1434,7 @@
 										'color'=>$colors['Gray']
 									);
 		
-					if(isset($info['disabled']) && $info['disabled'] == 1)
-						$info['iconid'] = $selement['iconid_disabled'];
-					else
-						$info['iconid'] = $selement['iconid_unknown'];
-		
+					$info['iconid'] = $selement['iconid_unknown'];		
 					$info['icon_type'] = SYSMAP_ELEMENT_ICON_UNKNOWN;
 				}
 				else if($info['type'] == TRIGGER_VALUE_FALSE){
@@ -1565,7 +1563,7 @@
 				}
 			}
 
-			if(!isset($info['type'])) $info['type'] = TRIGGER_VALUE_UNKNOWN;
+			if(!isset($info['type'])) $info['type'] = TRIGGER_VALUE_FALSE;
 
 			if(!isset($info[TRIGGER_VALUE_FALSE])){
 				$info[TRIGGER_VALUE_FALSE]['count']		= 0;
@@ -1710,7 +1708,9 @@
 					$info[TRIGGER_VALUE_TRUE]['info'] = expand_trigger_description_by_data($db_trigger);
 				}
 			}
-			
+
+			if(!isset($info['type'])) $info['type'] = TRIGGER_VALUE_FALSE;
+
 //----			
 			if($info['type'] == TRIGGER_VALUE_TRUE){
 				$color = ($info[$info['type']]['priority'] > 3) ? $colors['Red'] : $colors['Dark Red'];
@@ -1803,7 +1803,7 @@
 			$info['name'] = S_IMAGE;
 
 			$info['type'] = TRIGGER_VALUE_TRUE;
-			$info['info'] = '';
+			$info['info'] = array();
 			
 			$info['count'] = 0;
 			$info['priority'] = 0;
