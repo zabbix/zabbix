@@ -1059,6 +1059,7 @@
 
 	'S_DISPLAYED_ELEMENTS'=>		'Displayed elements',
 	'S_CONNECTORS'=>			'Connectors',
+	'S_UNAVAILABLE_BIG' =>			'UNAVAILABLE',
 
 //	sysmaps.php
 	'S_EDIT_MAP_ELEMENT'=>			'Edit map element',
@@ -1421,6 +1422,7 @@
 	'S_SEVERITY'=>				'Severity',
 	'S_MIN_SEVERITY'=>			'Min severity',
 	'S_DISABLED'=>				'Disabled',
+	'S_DISABLED_BIG'=>			'DISABLED',
 	'S_ENABLED'=>				'Enabled',
 	'S_DISABLE'=>				'Disable',
 	'S_ENABLE'=>				'Enable',

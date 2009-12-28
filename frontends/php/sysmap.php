@@ -95,18 +95,27 @@ include_once('include/page_header.php');
 				case 'get':
 					$action = '';
 
-					$options = array('sysmapids'=> $sysmapid, 'editable'=>1, 'extendoutput'=>1, 'select_selements'=>1, 'select_links'=>1);
+					$options = array(
+						'sysmapids'=> $sysmapid, 
+						'editable'=>1, 
+						'extendoutput'=>1, 
+						'select_selements'=>1, 
+						'select_links'=>1
+					);
+
 					$sysmaps = CMap::get($options);
 					$db_map = reset($sysmaps);
+					
+					$map_info = getSelementsInfo($db_map['selements']);
 //SDII($db_map);
 					add_elementNames($db_map['selements']);
 
 					$action .= 'ZBX_SYSMAPS['.$cmapid.'].map.mselement["label_location"]='.$db_map['label_location'].'; '."\n";
 
 					foreach($db_map['selements'] as $snum => $selement){
-
+						$info = $map_info[$selement['selementid']];
 //						$element['image'] = get_base64_icon($element);
-						$selement['image'] = get_selement_iconid($selement);
+						$selement['image'] = get_selement_iconid($selement, $info);
 						$action .= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement).'); '."\n";
 					}
 
@@ -203,7 +212,7 @@ include_once('include/page_header.php');
 					$result = DBend(true);
 
 					if($result){
-						print('alert("Map is saved!"); location.href = "sysmaps.php"');
+						print('if(Confirm("Map is saved! Return?")){ location.href = "sysmaps.php"; }');
 						ob_flush();
 					}
 					else{

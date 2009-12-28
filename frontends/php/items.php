@@ -270,6 +270,9 @@ include_once('include/page_header.php');
 
 	if(isset($_REQUEST['filter_host']) && !zbx_empty($_REQUEST['filter_host'])){
 		$hostid = CHost::getObjects(array('host' => $_REQUEST['filter_host']));
+		if(empty($hostid))
+			$hostid = CTemplate::getObjects(array('template' => $_REQUEST['filter_host']));
+			
 		$hostid = reset($hostid);
 
 		$hostid = $hostid?$hostid['hostid']:0;
@@ -858,6 +861,7 @@ include_once('include/page_header.php');
 
 		$form = new CForm();
 		$form->setName('items');
+		$form->addVar('hostid', $hostid);
 
 		$table  = new CTableInfo();
 // Table Header //
