@@ -473,7 +473,12 @@ class CHost extends CZBXAPI{
 // Adding Objects
 // Adding Groups
 		if($options['select_groups']){
-			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
+			$obj_params = array(
+					'nodeids' => $nodeids,
+					'extendoutput' => 1, 
+					'hostids' => $hostids, 
+					'preservekeys' => 1				
+				);
 			$groups = CHostgroup::get($obj_params);
 			foreach($groups as $groupid => $group){
 				foreach($group['hosts'] as $num => $host){
@@ -502,7 +507,12 @@ class CHost extends CZBXAPI{
 
 // Adding Templates
 		if($options['select_templates']){
-			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1, 
+				'hostids' => $hostids, 
+				'preservekeys' => 1
+			);
 			$templates = CTemplate::get($obj_params);
 			foreach($templates as $templateid => $template){
 				foreach($template['hosts'] as $num => $host){
@@ -513,7 +523,13 @@ class CHost extends CZBXAPI{
 
 // Adding Items
 		if($options['select_items']){
-			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'nopermissions' => 1, 'preservekeys' => 1);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1, 
+				'hostids' => $hostids, 
+				'nopermissions' => 1, 
+				'preservekeys' => 1
+			);
 			$items = CItem::get($obj_params);
 			foreach($items as $itemid => $item){
 				foreach($item['hosts'] as $num => $host){
@@ -524,7 +540,13 @@ class CHost extends CZBXAPI{
 
 // Adding triggers
 		if($options['select_triggers']){
-			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1, 
+				'hostids' => $hostids, 
+				'preservekeys' => 1
+			);
+
 			$triggers = CTrigger::get($obj_params);
 			foreach($triggers as $triggerid => $trigger){
 				foreach($trigger['hosts'] as $num => $host){
@@ -535,7 +557,13 @@ class CHost extends CZBXAPI{
 
 // Adding graphs
 		if($options['select_graphs']){
-			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1, 
+				'hostids' => $hostids, 
+				'preservekeys' => 1
+			);
+
 			$graphs = CGraph::get($obj_params);
 			foreach($graphs as $graphid => $graph){
 				foreach($graph['hosts'] as $num => $host){
@@ -546,7 +574,12 @@ class CHost extends CZBXAPI{
 
 // Adding applications
 		if($options['select_applications']){
-			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1, 
+				'hostids' => $hostids, 
+				'preservekeys' => 1
+			);
 			$applications = CApplication::get($obj_params);
 			foreach($applications as $applicationid => $application){
 				foreach($application['hosts'] as $num => $host){
@@ -557,7 +590,13 @@ class CHost extends CZBXAPI{
 
 // Adding macros
 		if($options['select_macros']){
-			$obj_params = array('extendoutput' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1, 
+				'hostids' => $hostids, 
+				'preservekeys' => 1
+			);
+
 			$macros = CUserMacro::get($obj_params);
 			foreach($macros as $macroid => $macro){
 				foreach($macro['hosts'] as $num => $host){
