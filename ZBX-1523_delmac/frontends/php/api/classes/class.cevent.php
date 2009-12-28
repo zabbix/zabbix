@@ -355,7 +355,13 @@ class CEvent extends CZBXAPI{
 // Adding Objects
 // Adding hosts
 		if($options['select_hosts']){
-			$obj_params = array('extendoutput' => 1, 'triggerids' => $triggerids, 'nopermissions' => 1, 'preservekeys' => 1);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1, 
+				'triggerids' => $triggerids, 
+				'nopermissions' => 1, 
+				'preservekeys' => 1
+			);
 			$hosts = CHost::get($obj_params);
 
 			$triggers = array();
@@ -380,11 +386,13 @@ class CEvent extends CZBXAPI{
 
 // Adding triggers
 		if($options['select_triggers']){
-			$obj_params = array('extendoutput' => 1,
-							'triggerids' => $triggerids,
-							'nopermissions' => 1,
-							'preservekeys' => 1
-						);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1,
+				'triggerids' => $triggerids,
+				'nopermissions' => 1,
+				'preservekeys' => 1
+			);
 			$triggers = CTrigger::get($obj_params);
 			foreach($result as $eventid => $event){
 				if(isset($triggers[$event['objectid']])){
@@ -398,11 +406,13 @@ class CEvent extends CZBXAPI{
 
 // Adding items
 		if($options['select_items']){
-			$obj_params = array('extendoutput' => 1,
-							'triggerids' => $triggerids,
-							'nopermissions' => 1,
-							'preservekeys' => 1
-						);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1,
+				'triggerids' => $triggerids,
+				'nopermissions' => 1,
+				'preservekeys' => 1
+			);
 			$db_items = CItem::get($obj_params);
 			$items = array();
 
