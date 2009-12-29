@@ -19,19 +19,19 @@
 **/
 ?>
 <?php
-	require_once 'include/config.inc.php';
-	require_once 'include/triggers.inc.php';
-	require_once 'include/js.inc.php';
+require_once('include/config.inc.php');
+require_once('include/triggers.inc.php');
+require_once('include/js.inc.php');
 
-	$dstfrm		= get_request('dstfrm',		0);	// destination form
+$dstfrm	= get_request('dstfrm',	0);	// destination form
 
-	$page['title'] = "S_GRAPH_ITEM";
-	$page['file'] = 'popup_gitem.php';
-	$page['scripts'] = array();
+$page['title'] = "S_GRAPH_ITEM";
+$page['file'] = 'popup_gitem.php';
+$page['scripts'] = array();
 
-	define('ZBX_PAGE_NO_MENU', 1);
+define('ZBX_PAGE_NO_MENU', 1);
 
-include_once 'include/page_header.php';
+include_once('include/page_header.php');
 
 ?>
 <?php
@@ -121,26 +121,26 @@ include_once 'include/page_header.php';
 	else{
 		echo SBR;
 
-		$graphid	= get_request("graphid", 	null);
-		$graphtype	= get_request("graphtype", 	GRAPH_TYPE_NORMAL);
-		$gid		= get_request("gid",	 	null);
-		$list_name	= get_request("list_name", 	null);
-		$itemid		= get_request("itemid", 	0);
-		$color		= get_request("color", 		'009900');
-		$drawtype	= get_request("drawtype",	0);
-		$sortorder	= get_request("sortorder",	0);
-		$yaxisside	= get_request("yaxisside",	0);
-		$calc_fnc	= get_request("calc_fnc",	2);
-		$type		= get_request("type",		0);
-		$periods_cnt	= get_request("periods_cnt",	5);
-		$only_hostid	= get_request("only_hostid",	null);
+		$graphid	= get_request('graphid', 		null);
+		$graphtype	= get_request('graphtype',	 	GRAPH_TYPE_NORMAL);
+		$gid		= get_request('gid',	 		null);
+		$list_name	= get_request('list_name',	 	null);
+		$itemid		= get_request('itemid', 		0);
+		$color		= get_request('color', 			'009900');
+		$drawtype	= get_request('drawtype',		0);
+		$sortorder	= get_request('sortorder',		0);
+		$yaxisside	= get_request('yaxisside',		0);
+		$calc_fnc	= get_request('calc_fnc',		2);
+		$type		= get_request('type',			0);
+		$periods_cnt	= get_request('periods_cnt',	5);
+		$only_hostid	= get_request('only_hostid',	null);
 		$monitored_hosts = get_request('monitored_hosts', null);
 
         $caption = ($itemid) ? S_UPD_ITEM_FOR_THE_GRAPH : S_NEW_ITEM_FOR_THE_GRAPH;
 		$frmGItem = new CFormTable($caption);
 
 		$frmGItem->setName('graph_item');
-		$frmGItem->setHelp("web.graph.item.php");
+		$frmGItem->setHelp('web.graph.item.php');
 
 		$frmGItem->addVar('dstfrm',$_REQUEST['dstfrm']);
 
@@ -168,7 +168,7 @@ include_once 'include/page_header.php';
 		}
 
 		$btnSelect = new CButton('btn1',S_SELECT,
-				"return PopUp('popup.php?dstfrm=".$frmGItem->GetName().
+				"return PopUp('popup.php?writeonly=1&dstfrm=".$frmGItem->GetName().
 				"&dstfld1=itemid&dstfld2=description&".
 				"srctbl=items&srcfld1=itemid&srcfld2=description".$host_condition."');",
 				'T');
@@ -225,10 +225,12 @@ include_once 'include/page_header.php';
 
 				if($graphtype == GRAPH_TYPE_NORMAL){
 					$cmbType = new CComboBox('drawtype',$drawtype);
-					foreach( graph_item_drawtypes() as $i )
-					{
+					$drawtypes = graph_item_drawtypes();
+
+					foreach($drawtypes  as $i){
 						$cmbType->addItem($i,graph_item_drawtype2str($i));
 					}
+
 					$frmGItem->addRow(S_DRAW_STYLE, $cmbType);
 				}
 				else{
