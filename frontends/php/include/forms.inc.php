@@ -6741,7 +6741,6 @@
 	}
 
 
-// if $hostid = null => global macro
 	function get_macros_widget($hostid = null){
 
 		if(isset($_REQUEST['form_refresh'])){
@@ -6753,7 +6752,8 @@
 		else{
 			$macros = array();
 		}
-
+		order_result($macros, 'macro');
+		
 		$macros_tbl = new CTable('', 'tablestripped');
 		$macros_tbl->setOddRowClass('form_odd_row');
 		$macros_tbl->setEvenRowClass('form_even_row');
