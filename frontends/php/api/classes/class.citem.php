@@ -311,7 +311,9 @@ class CItem extends CZBXAPI{
 
 // valuetype
 			if(!is_null($options['valuetype'])){
-				$sql_parts['where'][] = 'i.value_type='.$options['valuetype'];
+				zbx_value2array($options['valuetype']);
+				
+				$sql_parts['where'][] = DBCondition('i.value_type', $options['valuetype']);
 			}
 
 // datatype
