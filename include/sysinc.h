@@ -105,6 +105,10 @@
 #	include <linux/kernel.h>
 #endif
 
+#ifdef HAVE_ARPA_NAMESER_COMPAT_H
+#	include <arpa/nameser_compat.h>
+#endif
+
 #ifdef HAVE_ARPA_NAMESER_H
 #	include <arpa/nameser.h>
 #endif

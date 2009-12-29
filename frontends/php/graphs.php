@@ -284,17 +284,17 @@ include_once('include/page_header.php');
 	}
 	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['copy'])&&isset($_REQUEST['group_graphid'])){
 		if(isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])){
-		
+
 			$go_result = true;
-			
+
 			$options = array(
-				'editable' =>1, 
+				'editable' =>1,
 				'nodes' => get_current_nodeid(true),
 				'templated_hosts' => 1
 			);
-			
-			if(0 == $_REQUEST['copy_type']){ // hosts 
-				$options['hostids'] = $_REQUEST['copy_targetid']; 
+
+			if(0 == $_REQUEST['copy_type']){ // hosts
+				$options['hostids'] = $_REQUEST['copy_targetid'];
 			}
 			else{ // groups
 				zbx_value2array($_REQUEST['copy_targetid']);
@@ -309,9 +309,9 @@ include_once('include/page_header.php');
 					}
 				}
 
-				$options['groupids'] = $_REQUEST['copy_targetid'];	
+				$options['groupids'] = $_REQUEST['copy_targetid'];
 			}
-			
+
 			$db_hosts = CHost::get($options);
 
 			DBstart();
@@ -322,7 +322,7 @@ include_once('include/page_header.php');
 				}
 			}
 			$go_result = DBend($go_result);
-			
+
 			show_messages($go_result, S_GRAPHS_COPIED, S_CANNOT_COPY_GRAPHS);
 			$_REQUEST['go'] = 'none2';
 		}

@@ -2803,7 +2803,7 @@ return $result;
 			$map[chr($i + ord('A'))] = array('expression'   => $temp[$size - $i - 1],
 											 'sign'		 => $temp[$size*2 - $i - 1]['sign'],
 											 'value'		=> $temp[$size*2 - $i -1]['value']);
-									
+
 		}
 		return array($outline, $root, $map);
 	}
