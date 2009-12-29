@@ -49,13 +49,10 @@ class CUser extends CZBXAPI{
  * @param array $options['usrgrpids'] filter by UserGroup IDs
  * @param array $options['userids'] filter by User IDs
  * @param boolean $options['type'] filter by User type [ USER_TYPE_ZABBIX_USER: 1, USER_TYPE_ZABBIX_ADMIN: 2, USER_TYPE_SUPER_ADMIN: 3 ]
- * @param boolean $options['status'] filter by User status [ 0, 1 ]
- * @param boolean $options['with_gui_access'] filter only with GUI access
- * @param boolean $options['with_api_access'] filter only with API access
  * @param boolean $options['select_usrgrps'] extend with UserGroups data for each User
  * @param boolean $options['get_access'] extend with access data for each User
  * @param boolean $options['extendoutput'] output only User IDs if not set.
- * @param boolean $options['count'] output only count of objects in result. ( ruselt returned in property 'rowscount' )
+ * @param boolean $options['count'] output only count of objects in result. ( result returned in property 'rowscount' )
  * @param string $options['pattern'] filter by Host name containing only give pattern
  * @param int $options['limit'] output will be limited to given number
  * @param string $options['sortfield'] output will be sorted by given property [ 'userid', 'alias' ]
@@ -85,12 +82,8 @@ class CUser extends CZBXAPI{
 			'userids'					=> null,
 			'users' 					=> null,
 			'type'						=> null,
-			'status'					=> null,
-			'with_gui_access'			=> null,
-			'with_api_access'			=> null,
 // filter
 			'pattern'					=> '',
-
 // OutPut
 			'extendoutput'				=> null,
 			'editable'					=> null,
@@ -142,22 +135,10 @@ class CUser extends CZBXAPI{
 		}
 
 // type
-		if(!is_null($options['status'])){
-			$sql_parts['where'][] = 'g.users_status='.$options['status'];
-		}
-// status
-		if(!is_null($options['status'])){
-			$sql_parts['where'][] = 'g.users_status='.$options['status'];
+		if(!is_null($options['type'])){
+			$sql_parts['where'][] = 'u.type='.$options['type'];
 		}
 
-// with_gui_access
-		if(!is_null($options['with_gui_access'])){
-			$sql_parts['where'][] = 'g.gui_access='.GROUP_GUI_ACCESS_ENABLED;
-		}
-// with_api_access
-		if(!is_null($options['with_api_access'])){
-			$sql_parts['where'][] = 'g.api_access='.GROUP_API_ACCESS_ENABLED;
-		}
 
 // extendoutput
 		if(!is_null($options['extendoutput'])){
@@ -537,7 +518,7 @@ class CUser extends CZBXAPI{
 		$errors = array();
 		$result = true;
 		$self = false;
-		
+
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can update Users');
 			return false;
@@ -559,7 +540,7 @@ class CUser extends CZBXAPI{
 		if(bccomp($USER_DETAILS['userid'], $user['userid']) == 0){
 			$self = true;
 		}
-			
+
 		foreach($users as $unum => $user){
 			$user_db_fields = $upd_users[$user['userid']];
 
@@ -606,7 +587,7 @@ class CUser extends CZBXAPI{
 					' WHERE userid='.$user['userid'];
 
 			$result = DBexecute($sql);
-			
+
 			// if(isset($user['usrgrps']) && !is_null($user['usrgrps'])){
 				// $user_groups = CHostGroup::get(array('userids' => $user['userid']));
 				// $user_groupids = zbx_objectValues($user_groups, 'usrgrpid');
@@ -617,15 +598,15 @@ class CUser extends CZBXAPI{
 				// if(!empty($groups_to_add)){
 					// $result &= self::massAdd(array('users' => $user, 'usrgrps' => $groups_to_add));
 				// }
-				
+
 				// $groups_to_del = array_diff($user_groupids, $new_groupids);
 				// if(!empty($groups_to_del)){
 					// $result &= self::massRemove(array('users' => $user, 'usrgrps' => $groups_to_del));
 				// }
 			// }
-			
 
-			
+
+
 			if($result && isset($user['usrgrps']) && !is_null($user['usrgrps'])){
 				DBexecute('DELETE FROM users_groups WHERE userid='.$user['userid']);
 

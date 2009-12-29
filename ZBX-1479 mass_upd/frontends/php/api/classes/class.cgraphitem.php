@@ -58,7 +58,7 @@ class CGraphItem extends CZBXAPI{
 			'itemids' 				=> null,
 			'type' 					=> null,
 			'editable'				=> null,
-			'nopermission'			=> null,
+			'nopermissions'			=> null,
 // output
 			'expand_data'			=> null,
 			'extendoutput'			=> null,

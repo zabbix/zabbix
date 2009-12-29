@@ -77,10 +77,10 @@ function execute_script($scriptid,$hostid){
 		$json = new CJSON();
 
 		$array = array();
-		$array['request'] = 'command'; 
-		$array['nodeid'] = id2nodeid($hostid); 
-		$array['scriptid'] = $scriptid; 
-		$array['hostid'] = $hostid; 
+		$array['request'] = 'command';
+		$array['nodeid'] = id2nodeid($hostid);
+		$array['scriptid'] = $scriptid;
+		$array['hostid'] = $hostid;
 
 		$send = $json->encode($array, false);
 

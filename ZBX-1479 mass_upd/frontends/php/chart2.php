@@ -50,13 +50,14 @@ include_once('include/page_header.php');
 	$options = array();
 	$options['graphids'] = $_REQUEST['graphid'];
 	$options['extendoutput'] = 1;
-	$options['select_hosts'] = 1;
 
 	$db_data = CGraph::get($options);
 	if(empty($db_data)) access_deny();
 	else $db_data = reset($db_data);
 
-	$host = reset($db_data['hosts']);
+	$host = CHost::get(array('graphids' => $_REQUEST['graphid'], 'extendoutput' => 1, 'nodeids' => get_current_nodeid(true)));
+
+	$host = reset($host);
 
 	$effectiveperiod = navigation_bar_calc();
 
