@@ -973,7 +973,6 @@ class CHost extends CZBXAPI{
 			if(!empty($sql_set)){
 				$sql = 'UPDATE hosts SET ' . implode(', ', $sql_set) . ' WHERE '.DBcondition('hostid', $hostids);
 				$result = DBexecute($sql);
-				
 				if(isset($data['status']))
 					update_host_status($hostids, $data['status']);
 			}
@@ -1026,13 +1025,11 @@ class CHost extends CZBXAPI{
 				$host_templateids = zbx_objectValues($host_templates, 'templateid');
 				$new_templateids = zbx_objectValues($data['templates'], 'templateid');
 				
-				$templates_to_add = array_diff($new_templateids, $host_templateids);
-				if(!empty($templates_to_add)){
-					$result = self::massAdd(array('hosts' => $hosts, 'templates' => $templates_to_add));
-					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant link template');
-					}
+				$result = self::massAdd(array('hosts' => $hosts, 'templates' => $new_templateids));
+				if(!$result){
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant link template');
 				}
+				
 
 				$templates_to_del = array_diff($host_templateids, $new_templateids);
 				$templates_to_del = array_diff($templates_to_del, $cleared_templateids);

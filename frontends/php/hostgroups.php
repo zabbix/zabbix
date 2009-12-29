@@ -164,8 +164,8 @@ include_once('include/page_header.php');
 				$go_result = true;
 			}
 			else{
-				$go_result = CHost::massUpdate(array('hosts' => $hosts, 'fields' => array('status' => $status)));
-				if(!$go_result)
+				$go_result = CHost::massUpdate(array('hosts' => $hosts, 'status' => $status));
+				if($go_result === false)
 					error(CHost::resetErrors());
 			}
 
