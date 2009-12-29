@@ -23,6 +23,7 @@ require_once "include/graphs.inc.php";
 require_once "include/profiles.inc.php";
 require_once "include/triggers.inc.php";
 require_once "include/items.inc.php";
+require_once "include/httptest.inc.php";
 
 /* HOST GROUP functions */
 	function	add_host_to_group($hostid, $groupid)
@@ -423,7 +424,7 @@ require_once "include/items.inc.php";
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *
 	 */
-	function	delete_host($hostid, $unlink_mode = false)
+	function delete_host($hostid, $unlink_mode = false)
 	{
 		global $DB_TYPE;
 
@@ -436,6 +437,16 @@ require_once "include/items.inc.php";
 			unlink_template($db_child["hostid"], $hostid, $unlink_mode);
 		}
 
+	// delete web tests
+		$sql = 'SELECT DISTINCT ht.* '.
+				' FROM httptest ht, applications ap '.
+				' WHERE ap.hostid='.$hostid.
+					' AND ht.applicationid=ap.applicationid';
+		$db_httptests = DBselect($sql);
+		while($db_httptest = DBfetch($db_httptests)){
+			delete_httptest($db_httptest['httptestid']);
+		}
+		
 	// delete items -> triggers -> graphs
 		$db_items = get_items_by_hostid($hostid);
 		while($db_item = DBfetch($db_items))
@@ -468,6 +479,9 @@ require_once "include/items.inc.php";
 
 	// delete host profile
 		delete_host_profile($hostid);
+		
+	// delete host applications
+		DBexecute("DELETE FROM applications WHERE hostid=$hostid");
 
 	// delete host
 		return DBexecute("delete from hosts where hostid=$hostid");
