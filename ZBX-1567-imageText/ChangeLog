@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1567] fixed availability graph text displaying (Vednak)
  - [ZBX-1581] fixed wrong group saved as discovery group in Administration->General (Vedmak)
  - [ZBX-1592] user groups are now sorted in user list and editing form (Vedmak)
  - [ZBX-1475] improved elements status checks (Aly)
