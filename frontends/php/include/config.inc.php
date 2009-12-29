@@ -56,7 +56,8 @@ function __autoload($class_name){
 		'cusermacro' => 1,
 		'cscreen' => 1,
 		'cmap' => 1,
-		'cgraphitem' => 1
+		'cgraphitem' => 1,
+		'apiexception' => 1,
 	);
 
 	$rpc = array(
