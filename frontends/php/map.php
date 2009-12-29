@@ -437,7 +437,7 @@ include_once('include/page_header.php');
 		}
 		
 //		imagerectangle($im, $x_rec-2-1, $y_rec-1, $x_rec+$w+2+1, $y_rec+($oc*4)+$h+1, $black);
-		imagefilledrectangle($im, $x_rec-2, $y_rec, $x_rec+$w+2, $y_rec+($oc*4)+$h, $white);
+		imagefilledrectangle($im, $x_rec-2, $y_rec-2, $x_rec+$w+2, $y_rec+($oc*4)+$h-2, $white);
 
 		$increasey = 0;
 		foreach($strings as $num => $str){
