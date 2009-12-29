@@ -1486,15 +1486,16 @@
 
 		$selements_info = array();
 		$options = array(
-				'hostids' => zbx_objectValues($selements, 'elementid'),
+				'groupids' => zbx_objectValues($selements, 'elementid'),
 				'extendoutput' => 1,
 				'nopermissions' => 1,
 				'select_hosts' => 1,
 				'select_triggers' => 1,
 				'nodeids' => get_current_nodeid(true)
 			);
-		$hostgroups = CHost::get($options);
+		$hostgroups = CHostGroup::get($options);
 		$hostgroups = zbx_toHash($hostgroups, 'groupid');
+
 		foreach($selements as $snum => $selement){
 			$selements_info[$selement['selementid']] = array();
 			$info = &$selements_info[$selement['selementid']];
@@ -1503,7 +1504,7 @@
 			$group = $hostgroups[$selement['elementid']];
 
 			$info['name'] = $group['name'];
-			
+	
 			foreach($group['hosts'] as $hnum => $host){
 				if($host['maintenance_status'] == MAINTENANCE_TYPE_NODATA){
 					$info['maintenance_status'] = true;
@@ -1528,8 +1529,17 @@
 				}
 			}
 
+			$options = array(
+				'groupids' => $group['groupid'],
+				'extendoutput' => 1,
+				'nodeids' => get_current_nodeid(true)
+				);
+
+			$triggers = CTrigger::get($options);
+			$triggers = zbx_toHash($triggers, 'triggerid');
+
 			$info['triggers'] = array();
-			foreach($group['triggers'] as $tnum => $trigger){
+			foreach($triggers as $tnum => $trigger){
 				if($trigger['status'] == TRIGGER_STATUS_DISABLED) continue;
 
 				if(!isset($info['type'])){
