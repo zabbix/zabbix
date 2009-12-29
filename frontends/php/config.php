@@ -1061,6 +1061,8 @@
 
 		$macros = CUserMacro::get(array('extendoutput' => 1, 'globalmacro' => 1));
 
+		order_result($macros, 'macro');
+
 		$macros_list_tbl = new CTable(S_NO_MACROS_DEFINED);
 		foreach($macros as $macro){
 			$macros_list_tbl->addRow(array(
