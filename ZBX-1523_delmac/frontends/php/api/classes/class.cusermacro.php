@@ -539,7 +539,7 @@ class CUserMacro extends CZBXAPI{
  * @param string $macros['macros'][0..]['value']
  * @return array|boolean
  */
-	public static function update($macros){
+/*	public static function update($macros){
 		$macros = zbx_toArray($macros);
 		$new_macros = array();
 		$hostmacroids = array();
@@ -579,7 +579,7 @@ class CUserMacro extends CZBXAPI{
 			return false;
 		}
 	}
-
+*/
 /**
  * Update macros values
  *
