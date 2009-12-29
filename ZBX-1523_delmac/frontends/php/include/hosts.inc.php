@@ -518,6 +518,16 @@ require_once('include/httptest.inc.php');
 		while($db_child = DBfetch($db_childs)){
 			unlink_template($db_child['hostid'], $hostids, $unlink_mode);
 		}
+		
+// delete web tests
+		$del_httptests = array();
+		$db_httptests = get_httptests_by_hostid($hostids);
+		while($db_httptest = DBfetch($db_httptests)){
+			$del_httptests[$db_httptest['httptestid']] = $db_httptest['httptestid'];
+		}
+		if(!empty($del_httptests)){
+			delete_httptest($del_httptests);
+		}
 
 // delete items -> triggers -> graphs
 		$del_items = array();
@@ -539,9 +549,6 @@ require_once('include/httptest.inc.php');
 
 // delete host from template linkages
 		DBexecute('DELETE FROM hosts_templates WHERE '.DBcondition('hostid',$hostids));
-
-// delete host applications
-		DBexecute('DELETE FROM applications WHERE '.DBcondition('hostid',$hostids));
 
 // disable actions
 		$actionids = array();
@@ -592,15 +599,8 @@ require_once('include/httptest.inc.php');
 		delete_host_profile($hostids);
 		delete_host_profile_ext($hostids);
 
-// delete web tests
-		$del_httptests = array();
-		$db_httptests = get_httptests_by_hostid($hostids);
-		while($db_httptest = DBfetch($db_httptests)){
-			$del_httptests[$db_httptest['httptestid']] = $db_httptest['httptestid'];
-		}
-		if(!empty($del_httptests)){
-			delete_httptest($del_httptests);
-		}
+// delete host applications
+		DBexecute('DELETE FROM applications WHERE '.DBcondition('hostid',$hostids));
 
 // delete host
 		foreach ($hostids as $id) {	/* The section should be improved */
