@@ -201,7 +201,7 @@ static int	get_cpustat(
 	struct	pst_dynamic stats;
 	struct	pst_processor psp;
 
-    #elif defined(HAVE_FUNCTION_SYSCTLBYNAME)
+    #elif defined(HAVE_FUNCTION_SYSCTLBYNAME) && defined(CPUSTATES)
 
 	static long	cp_time[CPUSTATES];
 	size_t		nlen = sizeof(cp_time);
@@ -289,7 +289,7 @@ static int	get_cpustat(
 		return 1;
 	}
 
-    #elif defined(HAVE_FUNCTION_SYSCTLBYNAME)
+    #elif defined(HAVE_FUNCTION_SYSCTLBYNAME) && defined(CPUSTATES)
 	/* FreeBSD 7.0 */
 
 	if (sysctlbyname("kern.cp_time", &cp_time, &nlen, NULL, 0) == -1)

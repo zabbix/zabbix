@@ -44,7 +44,7 @@
 				1 => array('title' => '2. Licence Agreement'		, 'fnc' => 'stage1' ),
 				2 => array('title' => '3. Check of pre-requisites'	, 'fnc' => 'stage2' ),
 				3 => array('title' => '4. Configure DB connection'	, 'fnc' => 'stage3' ),
-				4 => array('title' => '5. ZABBIX server details'	, 'fnc' => 'stage4' ),
+				4 => array('title' => '5. Zabbix server details'	, 'fnc' => 'stage4' ),
 				//4 => array('title' => '5. Distributed monitoring'	, 'fnc' => 'stage4' ),
 				5 => array('title' => '6. Pre-Installation Summary'	, 'fnc' => 'stage5' ),
 				6 => array('title' => '7. Install'			, 'fnc' => 'stage6' ),
@@ -129,8 +129,8 @@
 		}
 
 		function stage0(){
-			return new CTag('div', 'yes', array('Welcome to the ZABBIX frontend installation wizard.',BR(),BR(),
-				'This installation wizard will guide you through the installation of ZABBIX frontend',BR(),BR(),
+			return new CTag('div', 'yes', array('Welcome to the Zabbix frontend installation wizard.',BR(),BR(),
+				'This installation wizard will guide you through the installation of Zabbix frontend',BR(),BR(),
 				'Click the "Next" button to proceed to the next screen. If you want to change something '.
 				'on a previous screen, click "Previous" button',BR(),BR(),
 				'You may cancel installation at any time by clicking "Cancel" button'), 'text');
@@ -397,7 +397,7 @@
 
 			return array(
 				'Please enter host name or host IP address', BR(),
-				'and port number of ZABBIX server', BR(), BR(),
+				'and port number of Zabbix server', BR(), BR(),
 				$table,
 				);
 		}
@@ -461,8 +461,8 @@
 
 			$table->addRow(BR());
 
-			$table->addRow(array(new CCol('ZABBIX server:','header'),	$this->getConfig('ZBX_SERVER',		'unknown')));
-			$table->addRow(array(new CCol('ZABBIX server port:','header'),	$this->getConfig('ZBX_SERVER_PORT',	'unknown')));
+			$table->addRow(array(new CCol('Zabbix server:','header'),	$this->getConfig('ZBX_SERVER',		'unknown')));
+			$table->addRow(array(new CCol('Zabbix server port:','header'),	$this->getConfig('ZBX_SERVER_PORT',	'unknown')));
 			return array(
 				'Please check configuration parameters.', BR(),
 				'If all is correct, press "Next" button, or "Previous" button to change configuration parameters.', BR(), BR(),
@@ -524,7 +524,7 @@
 
 		function stage7(){
 			return array(
-				'Congratulations on successful instalation of ZABBIX frontend.',BR(),BR(),
+				'Congratulations on successful instalation of Zabbix frontend.',BR(),BR(),
 				'Press "Finish" button to complete installation'
 				);
 		}
