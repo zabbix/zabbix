@@ -235,6 +235,7 @@ frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/imgstore.php -text
 frontends/php/import.php -text
+frontends/php/include/apicalls.inc.php -text
 frontends/php/include/blocks.inc.php -text
 frontends/php/include/classes/class.carea.php -text
 frontends/php/include/classes/class.careamap.php -text
