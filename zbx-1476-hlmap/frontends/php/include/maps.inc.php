@@ -844,7 +844,6 @@
 		foreach($selements as $snum => $db_element){
 			$url = $db_element['url'];
 			$alt = 'Label: '.$db_element['label'];
-			$scripts_by_hosts = null;
 
 			if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
 				$host = get_host_by_hostid($db_element['elementid']);

@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1476] fixed host element menu in maps (Aly)
  - [ZBX-1560] fixed type in application api class call (Vedmak)
  - [ZBX-1286] Zabbix handles some specified types of errors instead of Windows system, no dialog boxes pop up (Dmitry)
  - [ZBX-1420] fixed warnings in Dashboard and on script execution if Zabbix server is down (Alexei)
