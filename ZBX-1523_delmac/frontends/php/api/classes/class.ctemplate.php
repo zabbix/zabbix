@@ -708,21 +708,24 @@ class CTemplate extends CZBXAPI{
 
 	private static function checkCircularLink($id, $templateids){
 		if(empty($templateids)) return true;
+$i = 0;
+// target_up_templateids
+		$next_templateids = array($id);
+		$target_up_templateids = array();
+		do{
+			$sql = 'SELECT hostid FROM hosts_templates WHERE '.DBcondition('templateid', $next_templateids);
+			$tpls_db = DBselect($sql);
 
-		foreach($templateids as $tpid){
-			if(bccomp($tpid, $id) == 0) return false;
-		}
-
-		$sql = 'SELECT templateid FROM hosts_templates WHERE hostid='.$id;
-		$tpls_db = DBselect($sql);
-		while($tpl = DBfetch($tpls_db)){
-			$templateids[] = $tpl['templateid'];
-		}
-
-		$first_lvl_templateids = array_unique($templateids);
-		$next_templateids = $first_lvl_templateids;
-		$templateids = array();
-
+			$next_templateids = array();
+			while($tpl = DBfetch($tpls_db)){
+				$next_templateids[] = $tpl['hostid'];
+			}
+			$target_up_templateids = array_merge($target_up_templateids, $next_templateids);
+		}while(!empty($next_templateids));
+		
+// target_down_templateids
+		$next_templateids = array($id);
+		$target_down_templateids = array();
 		do{
 			$sql = 'SELECT templateid FROM hosts_templates WHERE '.DBcondition('hostid', $next_templateids);
 			$tpls_db = DBselect($sql);
@@ -731,17 +734,47 @@ class CTemplate extends CZBXAPI{
 			while($tpl = DBfetch($tpls_db)){
 				$next_templateids[] = $tpl['templateid'];
 			}
-			$templateids = array_merge($templateids, $next_templateids);
+			$target_down_templateids = array_merge($target_down_templateids, $next_templateids);
 		}while(!empty($next_templateids));
 
-		$first_lvl_templateids[] = $id;
-		if(array_intersect($first_lvl_templateids, $templateids)){
+		$target_templateids = array_merge($target_up_templateids, $target_down_templateids);
+		$target_templateids[] = $id;
+		
+
+// source_up_templateids
+		$next_templateids = $templateids;
+		$source_up_templateids = array();
+		do{
+			$sql = 'SELECT hostid FROM hosts_templates WHERE '.DBcondition('templateid', $next_templateids);
+			$tpls_db = DBselect($sql);
+
+			$next_templateids = array();
+			while($tpl = DBfetch($tpls_db)){
+				$next_templateids[] = $tpl['hostid'];
+			}
+			$source_up_templateids = array_merge($source_up_templateids, $next_templateids);
+		}while(!empty($next_templateids));
+
+// source_down_templateids
+		$next_templateids = $templateids;
+		$source_down_templateids = array();
+		do{
+			$sql = 'SELECT templateid FROM hosts_templates WHERE '.DBcondition('hostid', $next_templateids);
+			$tpls_db = DBselect($sql);
+
+			$next_templateids = array();
+			while($tpl = DBfetch($tpls_db)){
+				$next_templateids[] = $tpl['templateid'];
+			}
+			$source_down_templateids = array_merge($source_down_templateids, $next_templateids);
+		}while(!empty($next_templateids));
+
+		$source_templateids = array_merge($source_up_templateids, $source_down_templateids, $templateids);
+		
+		
+		if(array_intersect($target_templateids, $source_templateids)){
 			return false;
 		}
-		// $sql = 'SELECT hostid FROM hosts_templates WHERE '.DBcondition('hostid', $templateids).' AND '.DBcondition('templateid', $templateids);
-		// if(DBfetch(DBselect($sql))){
-			// return false;
-		// }
 
 		return true;
 	}
