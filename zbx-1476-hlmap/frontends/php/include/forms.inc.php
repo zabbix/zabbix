@@ -763,6 +763,7 @@
 			$lstGroups->attributes['style'] = 'width: 320px';
 
 			$groups = CUserGroup::get(array('usrgrpids' => $user_groups, 'extendoutput' => 1));
+			order_result($groups, 'name');
 			foreach($groups as $num => $group){
 				$lstGroups->addItem($group['usrgrpid'], $group['name']);
 			}
@@ -5795,16 +5796,20 @@
 		$host_tbl->addRow(array(S_CONNECT_TO,$cmbConnectBy));
 
 		$host_tbl->addRow(array(S_AGENT_PORT,new CNumericBox('port',$port,5)));
+		
 //Proxy
 		$cmbProxy = new CComboBox('proxy_hostid', $proxy_hostid);
 
 		$cmbProxy->addItem(0, S_NO_PROXY);
-		$db_proxies = DBselect('SELECT hostid,host FROM hosts'.
-				' where status in ('.HOST_STATUS_PROXY.') and '.DBin_node('hostid'));
-		while ($db_proxy = DBfetch($db_proxies))
-			$cmbProxy->addItem($db_proxy['hostid'], $db_proxy['host']);
-
-		$host_tbl->addRow(array(S_MONITORED_BY_PROXY,$cmbProxy));
+		$options = array('proxy_hosts' => 1, 'extendoutput' => 1);
+		$db_proxies = CHost::get($options);
+		order_result($db_proxies, 'host');
+		
+		foreach($db_proxies as $proxy){
+			$cmbProxy->addItem($proxy['hostid'], $proxy['host']);
+		}
+		
+		$host_tbl->addRow(array(S_MONITORED_BY_PROXY, $cmbProxy));
 //----------
 
 		$cmbStatus = new CComboBox('status',$status);
@@ -6739,10 +6744,7 @@
 // if $hostid = null => global macro
 	function get_macros_widget($hostid = null){
 
-		if(is_null($hostid)){
-			$macros = CUserMacro::get(array('extendoutput' => 1, 'globalmacro' => 1));
-		}
-		else if(isset($_REQUEST['form_refresh'])){
+		if(isset($_REQUEST['form_refresh'])){
 			$macros = get_request('macros', array());
 		}
 		else if($hostid > 0){
@@ -6757,7 +6759,8 @@
 		$macros_tbl->setEvenRowClass('form_even_row');
 
 		foreach($macros as $macroid => $macro){
-			$macros_tbl->addItem(new CVar('macros['.$macro['macro'].']', $macro));
+			$macros_tbl->addItem(new CVar('macros['.$macro['macro'].'][macro]', $macro['macro']));
+			$macros_tbl->addItem(new CVar('macros['.$macro['macro'].'][value]', $macro['value']));
 			$macros_tbl->addRow(array(
 				new CCheckBox('macros_rem['.$macro['macro'].']', 'no', null, $macro['macro']),
 				$macro['macro'],

@@ -504,7 +504,7 @@
 			$form->addVar('resourceid',$id);
 
 			$textfield = new CTextbox('caption',$caption,75,'yes');
-			$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=graphs&srcfld1=graphid&srcfld2=name',800,450);");
+			$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=graphs&srcfld1=graphid&srcfld2=name',800,450);");
 			$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 			$form->addRow(S_GRAPH_NAME,array($textfield,SPACE,$selectbtn));
@@ -537,7 +537,7 @@
 			$form->AddVar('resourceid',$id);
 
 			$textfield = new Ctextbox('caption',$caption,75,'yes');
-			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=simple_graph&srcfld1=itemid&srcfld2=description',800,450);");
+			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=simple_graph&srcfld1=itemid&srcfld2=description',800,450);");
 			$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 			$form->AddRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
@@ -565,7 +565,7 @@
 			$form->AddVar('resourceid',$id);
 			$textfield = new Ctextbox('caption',$caption,60,'yes');
 
-			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name',400,450);");
+			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name',400,450);");
 			$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 			$form->AddRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
@@ -598,7 +598,7 @@
 			$form->AddVar('resourceid',$id);
 
 			$textfield = new Ctextbox('caption',$caption,75,'yes');
-			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=plain_text&srcfld1=itemid&srcfld2=description',800,450);");
+			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=plain_text&srcfld1=itemid&srcfld2=description',800,450);");
 			$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 			$form->addRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
@@ -639,7 +639,7 @@
 			$form->AddVar('resourceid',$id);
 
 			$textfield = new Ctextbox('caption',$caption,75,'yes');
-			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=overview&srcfld1=groupid&srcfld2=name',800,450);");
+			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=overview&srcfld1=groupid&srcfld2=name',800,450);");
 			$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 			$form->AddRow(S_GROUP,array($textfield,SPACE,$selectbtn));
@@ -668,7 +668,7 @@
 			$form->addVar('resourceid',$id);
 
 			$textfield = new Ctextbox('caption',$caption,60,'yes');
-			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=screens2&srcfld1=screenid&srcfld2=name&screenid=".$_REQUEST['screenid']."',800,450);");
+			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=screens2&srcfld1=screenid&srcfld2=name&screenid=".$_REQUEST['screenid']."',800,450);");
 			$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 			$form->AddRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
@@ -707,7 +707,7 @@
 			$form->AddVar('resourceid',$id);
 
 			$textfield = new CTextbox('caption',$caption,60,'yes');
-			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=host_group_scr&srcfld1=groupid&srcfld2=name',480,450);");
+			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=host_group_scr&srcfld1=groupid&srcfld2=name',480,450);");
 			$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 			$form->AddRow(S_GROUP,array($textfield,SPACE,$selectbtn));
@@ -1111,7 +1111,7 @@
 
 					if($editmode == 0){
 						$action_map = get_action_map_by_sysmapid($resourceid);
-						$image_map->SetMap($action_map->GetName());
+						$image_map->setMap($action_map->getName());
 						$item = array($action_map,$image_map);
 					}
 					else {
