@@ -763,6 +763,7 @@
 			$lstGroups->attributes['style'] = 'width: 320px';
 
 			$groups = CUserGroup::get(array('usrgrpids' => $user_groups, 'extendoutput' => 1));
+			order_result($groups, 'name');
 			foreach($groups as $num => $group){
 				$lstGroups->addItem($group['usrgrpid'], $group['name']);
 			}
@@ -3405,7 +3406,7 @@
 //		validate_group(PERM_READ_WRITE,array('real_hosts'),'web.last.conf.groupid');
 
 		$twb_groupid = get_request('twb_groupid', 0);
-		
+
 		$options = array(
 			'editable' => 1,
 			'extendoutput' => 1,
@@ -3414,12 +3415,12 @@
 		$groups = CHostGroup::get($options);
 		$groups = zbx_toHash($groups, 'groupid');
 		order_result($groups, 'name');
-		
+
 		if(!isset($groups[$twb_groupid])){
 			$twb_groupid = key($groups);
 		}
-		
-		$cmbGroups = new CComboBox('twb_groupid', $twb_groupid, 'submit()');	
+
+		$cmbGroups = new CComboBox('twb_groupid', $twb_groupid, 'submit()');
 		foreach($groups as $group){
 			$cmbGroups->addItem($group['groupid'], $group['name']);
 		}
@@ -5795,16 +5796,20 @@
 		$host_tbl->addRow(array(S_CONNECT_TO,$cmbConnectBy));
 
 		$host_tbl->addRow(array(S_AGENT_PORT,new CNumericBox('port',$port,5)));
+		
 //Proxy
 		$cmbProxy = new CComboBox('proxy_hostid', $proxy_hostid);
 
 		$cmbProxy->addItem(0, S_NO_PROXY);
-		$db_proxies = DBselect('SELECT hostid,host FROM hosts'.
-				' where status in ('.HOST_STATUS_PROXY.') and '.DBin_node('hostid'));
-		while ($db_proxy = DBfetch($db_proxies))
-			$cmbProxy->addItem($db_proxy['hostid'], $db_proxy['host']);
-
-		$host_tbl->addRow(array(S_MONITORED_BY_PROXY,$cmbProxy));
+		$options = array('proxy_hosts' => 1, 'extendoutput' => 1);
+		$db_proxies = CHost::get($options);
+		order_result($db_proxies, 'host');
+		
+		foreach($db_proxies as $proxy){
+			$cmbProxy->addItem($proxy['hostid'], $proxy['host']);
+		}
+		
+		$host_tbl->addRow(array(S_MONITORED_BY_PROXY, $cmbProxy));
 //----------
 
 		$cmbStatus = new CComboBox('status',$status);

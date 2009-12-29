@@ -338,7 +338,7 @@ include_once('include/page_header.php');
 		$templates_clear = get_request('clear_templates', array());
 		$proxy_hostid = get_request('proxy_hostid', 0);
 		$groups = get_request('groups', array());
-		
+
 		$result = true;
 
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))) access_deny();
@@ -351,9 +351,9 @@ include_once('include/page_header.php');
 		}
 
 		$templates = array_keys($templates);
-		$templates = zbx_toObject($templates, 'templateid');		
+		$templates = zbx_toObject($templates, 'templateid');
 		$templates_clear = zbx_toObject($templates_clear, 'templateid');
-		
+
 // START SAVE TRANSACTION {{{
 		DBstart();
 
@@ -366,7 +366,7 @@ include_once('include/page_header.php');
 				$result = false;
 			}
 		}
-		
+
 		if($result){
 			if(isset($_REQUEST['hostid'])){
 
@@ -391,7 +391,7 @@ include_once('include/page_header.php');
 						'templates' => $templates,
 						'templates_clear' => $templates_clear
 					));
-					
+
 					$msg_ok = S_HOST_UPDATED;
 					$msg_fail = S_CANNOT_UPDATE_HOST;
 
@@ -424,13 +424,13 @@ include_once('include/page_header.php');
 					$host = reset($host);
 					$hostid = $host['hostid'];
 				}
-				
+
 				$msg_ok = S_HOST_ADDED;
 				$msg_fail = S_CANNOT_ADD_HOST;
 			}
-			
+
 		}
-	
+
 // FULL CLONE {{{
 		if($result && $clone_hostid && ($_REQUEST['form'] == 'full_clone')){
 // Host applications
@@ -453,14 +453,14 @@ include_once('include/page_header.php');
 			}
 
 // Host triggers
-			$triggers = CTrigger::get(array('hostids' => $clone_hostid, 'not_templated_triggers' => 1));
+			$triggers = CTrigger::get(array('hostids' => $clone_hostid, 'inherited' => 0));
 			$triggers = zbx_objectValues($triggers, 'triggerid');
 			foreach($triggers as $trigger){
 				$result &= (bool) copy_trigger_to_host($trigger, $hostid, true);
 			}
 
 // Host graphs
-			$graphs = CGraph::get(array('hostids' => $clone_hostid, 'not_templated_graphs' => 1));
+			$graphs = CGraph::get(array('hostids' => $clone_hostid, 'inherited' => 0));
 
 			foreach($graphs as $graph){
 				$result &= (bool) copy_graph_to_host($graph['graphid'], $hostid, true);
@@ -630,7 +630,7 @@ $thid = get_request('hostid', 0);
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
 
 	validate_group($PAGE_GROUPS,$PAGE_HOSTS);
-	
+
 $_REQUEST['hostid'] = $thid;
 ?>
 <?php
@@ -793,15 +793,8 @@ $_REQUEST['hostid'] = $thid;
 					break;
 			}
 
-			$zbx_available = new CCol($zbx_available);
-			$zbx_available->addStyle('border: 0');
-			$snmp_available = new CCol($snmp_available);
-			$snmp_available->addStyle('border: 0');
-			$ipmi_available = new CCol($ipmi_available);
-			$ipmi_available->addStyle('border: 0');
-
-			$av_table = new CTable();
-			$av_table->AddRow(array($zbx_available, $snmp_available, $ipmi_available));
+			$av_table = new CTable(null, 'invisible');
+			$av_table->addRow(array($zbx_available, $snmp_available, $ipmi_available));
 
 			if(empty($host['templates'])){
 				$templates = '-';

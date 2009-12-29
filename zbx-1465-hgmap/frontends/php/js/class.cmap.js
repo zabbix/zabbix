@@ -2385,7 +2385,7 @@ updateForm_selementByType: function(e, multi){
 	}
 	
 	if(!empty(srctbl)){
-		var popup_url = 'popup.php?dstfrm=selementForm&dstfld1=elementid&dstfld2=elementName';
+		var popup_url = 'popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementName';
 		popup_url+= '&srctbl='+srctbl;
 		popup_url+= '&srcfld1='+srcfld1;
 		popup_url+= '&srcfld2='+srcfld2;
