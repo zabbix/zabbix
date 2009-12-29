@@ -80,10 +80,17 @@ include_once('include/page_header.php');
 	show_table_header(S_CONFIGURATION_OF_SCREEN_BIG);
 
 	if(isset($_REQUEST['screenid'])){
-		if(!screen_accessible($_REQUEST['screenid'], PERM_READ_WRITE))
-			access_deny();
+//		if(!screen_accessible($_REQUEST['screenid'], PERM_READ_WRITE)) access_deny();
+		$options = array(
+			'screenids' => $_REQUEST['screenid'],
+			'editable' => 1,
+			'extendoutput' => 1,
+		);
 
-		$screen = get_screen_by_screenid($_REQUEST['screenid']);
+		$screens = CScreen::get($options);
+		if(empty($screens)) access_deny();
+
+		$screen = reset($screens);
 		echo SBR;
 		if(isset($_REQUEST['save'])){
 			if(!isset($_REQUEST['elements']))	$_REQUEST['elements']=0;
