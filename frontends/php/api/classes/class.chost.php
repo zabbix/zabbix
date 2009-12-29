@@ -974,7 +974,8 @@ class CHost extends CZBXAPI{
 				$sql = 'UPDATE hosts SET ' . implode(', ', $sql_set) . ' WHERE '.DBcondition('hostid', $hostids);
 				$result = DBexecute($sql);
 				
-				update_host_status($hostids, $host['status']);
+				if(isset($host['status']))
+					update_host_status($hostids, $host['status']);
 			}
 // }}} UPDATE HOSTS PROPERTIES
 

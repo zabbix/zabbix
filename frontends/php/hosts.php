@@ -202,39 +202,40 @@ include_once('include/page_header.php');
 			}
 		}
 
-		$result = true;
+		try{
+			DBstart();
 
-		DBstart();
+			$hosts = array('hosts' => zbx_toObject($hosts, 'hostid'));
 
-		$hosts = array('hosts' => zbx_toObject($hosts, 'hostid'));
-
-		$properties = array('port', 'useip', 'dns',	'ip', 'proxy_hostid', 'useipmi', 'ipmi_ip', 'ipmi_port', 'ipmi_authtype',
-			'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'status');
-		$new_values = array();
-		foreach($properties as $property){
-			if(isset($visible[$property])){
-				if($property == 'useipmi')
-					$new_values[$property] = isset($_REQUEST['useipmi']) ? 1 : 0;
-				else
-					$new_values[$property] = $_REQUEST[$property];
+			$properties = array('port', 'useip', 'dns',	'ip', 'proxy_hostid', 'useipmi', 'ipmi_ip', 'ipmi_port', 'ipmi_authtype',
+				'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'status');
+			$new_values = array();
+			foreach($properties as $property){
+				if(isset($visible[$property])){
+					if($property == 'useipmi')
+						$new_values[$property] = isset($_REQUEST['useipmi']) ? 1 : 0;
+					else
+						$new_values[$property] = $_REQUEST[$property];
+				}
 			}
-		}
-		$result &= CHost::massUpdate(array_merge($hosts, $new_values));
+			
 
-		
-		$groups = array();
-		if(isset($visible['newgroup']) && !empty($_REQUEST['newgroup'])){
-			$groups = CHostGroup::create(array('name' => $_REQUEST['newgroup']));
-		}
-		if(isset($visible['groups'])){
-			$hosts['groups'] = array_merge(zbx_toObject($_REQUEST['groups'], 'groupid'), $groups);
-		}	
-		if(isset($visible['template_table'])){
-			$hosts['templates'] = zbx_toObject($_REQUEST['templates'], 'templateid');
-		}	
-		$result &= CHost::massAdd($hosts);
+			$groups = array();
+			if(isset($visible['newgroup']) && !empty($_REQUEST['newgroup'])){
+				$groups = CHostGroup::create(array('name' => $_REQUEST['newgroup']));
+				if($groups === false) throw new Exception();
+			}
+			if(isset($visible['groups'])){
+				$hosts['groups'] = array_merge(zbx_toObject($_REQUEST['groups'], 'groupid'), $groups);
+			}	
+			if(isset($visible['template_table'])){
+				$tplids = array_keys($_REQUEST['templates']);
+				$hosts['templates'] = zbx_toObject($tplids, 'templateid');
+			}
+			$result = CHost::massUpdate(array_merge($hosts, $new_values));
+			if($result === false) throw new Exception();
 
-		
+			
 			if($result && isset($visible['useprofile'])){
 				$host_profile = DBfetch(DBselect('SELECT * FROM hosts_profiles WHERE hostid='.$hostid));
 				$host_profile_fields = array('devicetype', 'name', 'os', 'serialno', 'tag','macaddress', 'hardware', 'software', 
@@ -250,11 +251,12 @@ include_once('include/page_header.php');
 							$host_profile[$field] = '';
 					}
 
-					$result &= add_host_profile($hostid,
+					$result = add_host_profile($hostid,
 						$host_profile['devicetype'],$host_profile['name'],$host_profile['os'],
 						$host_profile['serialno'],$host_profile['tag'],$host_profile['macaddress'],
 						$host_profile['hardware'],$host_profile['software'],$host_profile['contact'],
 						$host_profile['location'],$host_profile['notes']);
+					if($result === false) throw new Exception();
 				}
 			}
 
@@ -282,19 +284,16 @@ include_once('include/page_header.php');
 							$host_profile_ext[$field] = $ext_host_profiles[$field];
 						}
 					}
-					$result &= add_host_profile_ext($hostid, $host_profile_ext);
+					$result = add_host_profile_ext($hostid, $host_profile_ext);
+					if($result === false) throw new Exception();
 				}
 			}
-		
+			
 
-		$result = DBend($result);
-
-		$msg_ok 	= S_HOSTS.SPACE.S_UPDATED;
-		$msg_fail 	= S_CANNOT_UPDATE.SPACE.S_HOSTS;
-
-		show_messages($result, $msg_ok, $msg_fail);
-
-		if($result){
+			DBend(true);
+			
+			show_messages(true, S_HOSTS.SPACE.S_UPDATED, S_CANNOT_UPDATE.SPACE.S_HOSTS);
+			
 			unset($_REQUEST['massupdate']);
 			unset($_REQUEST['form']);
 			unset($_REQUEST['hosts']);
@@ -302,6 +301,10 @@ include_once('include/page_header.php');
 			$url = new CUrl();
 			$path = $url->getPath();
 			insert_js('cookie.eraseArray("'.$path.'")');
+		}
+		catch(Exception $e){
+			DBend(false);
+			show_messages(false, S_HOSTS.SPACE.S_UPDATED, S_CANNOT_UPDATE.SPACE.S_HOSTS);
 		}
 
 		unset($_REQUEST['save']);
