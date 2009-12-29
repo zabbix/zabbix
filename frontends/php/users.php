@@ -446,7 +446,9 @@ include_once('include/page_header.php');
 
 // UserGroups
 			$users_groups = array();
-			foreach($user['usrgrps'] as $ugnum => $usrgrp){
+			$usrgrps = $user['usrgrps'];
+			order_result($usrgrps, 'name');
+			foreach($usrgrps as $ugnum => $usrgrp){
 				$users_groups[] = new CLink($usrgrp['name'],'usergrps.php?form=update&usrgrpid='.$usrgrp['usrgrpid']);
 				$users_groups[] = BR();
 			}
