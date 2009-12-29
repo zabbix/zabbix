@@ -332,7 +332,13 @@ class CGraph extends CZBXAPI{
 
 // Adding GraphItems
 		if($options['select_graph_items']){
-			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1, 'preservekeys' => 1);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1, 
+				'graphids' => $graphids, 
+				'nopermissions' => 1, 
+				'preservekeys' => 1
+			);
 			$gitems = CGraphItem::get($obj_params);
 			foreach($gitems as $gitemid => $gitem){
 				foreach($gitem['graphs'] as $num => $graph){
@@ -343,7 +349,13 @@ class CGraph extends CZBXAPI{
 
 // Adding Hosts
 		if($options['select_hosts']){
-			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1, 'preservekeys' => 1);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1, 
+				'graphids' => $graphids, 
+				'nopermissions' => 1, 
+				'preservekeys' => 1
+			);
 			$hosts = CHost::get($obj_params);
 			foreach($hosts as $hostid => $host){
 				foreach($host['graphs'] as $num => $graph){
@@ -354,7 +366,13 @@ class CGraph extends CZBXAPI{
 
 // Adding Templates
 		if($options['select_templates']){
-			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1, 'preservekeys' => 1);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1, 
+				'graphids' => $graphids, 
+				'nopermissions' => 1, 
+				'preservekeys' => 1
+			);
 			$templates = CTemplate::get($obj_params);
 			foreach($templates as $templateid => $template){
 				foreach($template['graphs'] as $num => $graph){
@@ -365,11 +383,13 @@ class CGraph extends CZBXAPI{
 
 // Adding Items
 		if($options['select_items']){
-			$obj_params = array('extendoutput' => 1,
-								'graphids' => $graphids,
-								'nopermissions' => 1,
-								'preservekeys' => 1
-							);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1,
+				'graphids' => $graphids,
+				'nopermissions' => 1,
+				'preservekeys' => 1
+			);
 			$items = CItem::get($obj_params);
 			foreach($items as $itemid => $item){
 				foreach($item['graphs'] as $num => $graph){

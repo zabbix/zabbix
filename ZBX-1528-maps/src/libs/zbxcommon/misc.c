@@ -1195,18 +1195,22 @@ int	is_uint(char *c)
 
 #if defined(_WINDOWS)
 int	_wis_uint(const wchar_t *wide_string)
-{
-	if (L'\0' != *wide_string)
+{	
+	const wchar_t	*wide_char = wide_string;
+	
+	if (L'\0' == *wide_char)
 		return FAIL;
-
-	while (L'\0' != *wide_string)
+		
+	while (L'\0' != *wide_char)
 	{
-		if (0 != iswalpha(*wide_string))
+		if (0 != iswdigit(*wide_char))
+		{
+			wide_char ++;
 			continue;
-
+		}
 		return FAIL;
 	}
-
+	
 	return SUCCEED;
 }
 #endif

@@ -1111,7 +1111,7 @@
 
 					if($editmode == 0){
 						$action_map = get_action_map_by_sysmapid($resourceid);
-						$image_map->SetMap($action_map->GetName());
+						$image_map->setMap($action_map->getName());
 						$item = array($action_map,$image_map);
 					}
 					else {
