@@ -503,20 +503,19 @@ class zbxXML{
 
 				if(!isset($host_db['status'])) $host_db['status'] = HOST_STATUS_TEMPLATE;
 				if($host_db['status'] == HOST_STATUS_TEMPLATE){
-					$current_hosts = CTemplate::getObjects(array('template' => $host_db['host']));
+					$current_host = CTemplate::getObjects(array('template' => $host_db['host']));
 				}
 				else{
-					$current_hosts = CHost::getObjects(array('host' => $host_db['host']));
+					$current_host = CHost::getObjects(array('host' => $host_db['host']));
 				}
 
-				$current_host = reset($current_hosts);
-				//$current_hostid = empty($current_host) ? false : $current_host[0]['hostid'];
+				$current_host = reset($current_host);
 
 				if(!$current_host && !isset($rules['host']['missed'])) continue; // break if update nonexist
 				if($current_host && !isset($rules['host']['exist'])) continue; // break if not update exist
 
 
-// HOST GROUPS
+// HOST GROUPS {{{
 				$xpath = new DOMXPath($xml);
 				$groups = $xpath->query('groups/group', $host);
 				$host_groups = array();
@@ -557,21 +556,63 @@ class zbxXML{
 						$host_groups = array_merge($host_groups, $new_groups);
 					}
 				}
- // sdii($host_groups);
+// }}} HOST GROUPS
+
+
+// MACROS
+				$xpath = new DOMXPath($xml);
+				$macros = $xpath->query('macros/macro', $host);
+
+				$host_macros = array();
+				if($macros->length > 0){
+					foreach($macros as $macro){
+						$host_macros[] = self::mapXML2arr($macro, XML_TAG_MACRO);
+					}
+				}
+// }}} MACROS
+
+
+// TEMPLATES {{{
+				if(isset($rules['template']['exist'])){
+					$xpath = new DOMXPath($xml);
+					$templates = $xpath->query('templates/template', $host);
+
+					$host_templates = array();
+					foreach($templates as $template){
+						$current_template = CTemplate::getObjects(array('template' => $template->nodeValue));
+						$current_template = reset($current_template);
+
+						if(!$current_template && !isset($rules['template']['missed'])) continue; // break if update nonexist
+						if($current_template && !isset($rules['template']['exist'])) continue; // break if not update exist
+
+//sdi('template: '.$template.' | TemplateID: '. $current_templateid);
+						$host_templates[] = $current_template;
+					}
+					
+					$r = CTemplate::massAdd(array('hosts' => $current_host, 'templates' => $host_templates));
+					if($r === false){
+						error(CTemplate::resetErrors());
+						$result = false;
+						break;
+					}
+				}
+// }}} TEMPLATES
+
+
 // HOSTS
 //sdi('Host: '.$host_db['host'].' | HostID: '. $current_hostid);
+				$host_db['groups'] = $host_groups;
+				$host_db['macros'] = $host_macros;
+			
 				if($current_host && isset($rules['host']['exist'])){
-					$host_db['groups'] = $host_groups;
 
 					$current_host = array_merge($current_host, $host_db);
 
 					if($host_db['status'] == HOST_STATUS_TEMPLATE){
 						$r = CTemplate::update($current_host);
-						$options['templates'] = $r;
 					}
 					else{
 						$r = CHost::update($current_host);
-						$options['hosts'] = $r;
 					}
 					if($r === false){
 						error(CHost::resetErrors());
@@ -581,7 +622,7 @@ class zbxXML{
 				}
 
 				if(!$current_host && isset($rules['host']['missed'])){
-					$host_db['groups'] = $host_groups;
+					
 					if($host_db['status'] == HOST_STATUS_TEMPLATE){
 						$current_host = CTemplate::create($host_db);
 					}
@@ -598,7 +639,8 @@ class zbxXML{
 					$current_host = reset($current_host);
 				}
 
-// HOST PROFILES
+
+// HOST PROFILES {{{
 				$xpath = new DOMXPath($xml);
 				$profile_node = $xpath->query('host_profile/*', $host);
 
@@ -636,51 +678,9 @@ class zbxXML{
 					delete_host_profile_ext($current_host['hostid']);
 					add_host_profile_ext($current_host['hostid'], $profile_ext);
 				}
+// }}} HOST PROFILES
 
-// MACROS
-				$xpath = new DOMXPath($xml);
-				$macros = $xpath->query('macros/macro', $host);
 
-				if($macros->length > 0){
-					$macros_to_add = array();
-					$macros_to_upd = array();
-					foreach($macros as $macro){
-						$macro_db = self::mapXML2arr($macro, XML_TAG_MACRO);
-						$macro_db['hostid'] = $current_host['hostid'];
-
-						$current_macro = CUserMacro::getHostMacroObjects($macro_db);
-						$current_macro = reset($current_macro);
-
-						if($current_macro){
-							$current_macro['hostid'] = $current_host['hostid'];
-							$macros_to_upd[] = $current_macro;
-						}
-						else{
-							$macros_to_add[] =  $macro_db;
-						}
-					}
-// sdii($macros_to_upd);
-// sdii($macros_to_add);
-
-					if(!empty($macros_to_add)){
-						$r = CUserMacro::add($macros_to_add);
-						if($r === false){
-							error(CUserMacro::resetErrors());
-							$result = false;
-							break;
-						}
-					}
-
-					if(!empty($macros_to_upd)){
-						$r = CUserMacro::updateValue($macros_to_upd);
-						if($r === false){
-							error(CUserMacro::resetErrors());
-							$result = false;
-
-							break;
-						}
-					}
-				}
 // ITEMS {{{
 				if(isset($rules['item']['exist']) || isset($rules['item']['missed'])){
 					$xpath = new DOMXPath($xml);
@@ -693,7 +693,7 @@ class zbxXML{
 						$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
 
 						$item_db['hostid'] = $current_host['hostid'];
-//SDII($item_db);
+// SDII($item_db);
 						$current_item = CItem::getObjects($item_db);
 						$current_item = reset($current_item);
 
@@ -822,31 +822,6 @@ class zbxXML{
 				}
 // }}} TRIGGERS
 
-// TEMPLATES {{{
-				if(isset($rules['template']['exist'])){
-					$xpath = new DOMXPath($xml);
-					$templates = $xpath->query('templates/template', $host);
-
-					$templates_to_link = array();
-					foreach($templates as $template){
-						$current_template = CTemplate::getObjects(array('template' => $template->nodeValue));
-						$current_template = reset($current_template);
-
-						if(!$current_template && !isset($rules['template']['missed'])) continue; // break if update nonexist
-						if($current_template && !isset($rules['template']['exist'])) continue; // break if not update exist
-
-//sdi('template: '.$template.' | TemplateID: '. $current_templateid);
-						$templates_to_link[] = $current_template;
-					}
-// sdii($templates_to_link);
-					$r = CTemplate::linkTemplates(array('hosts' => $current_host, 'templates' => $templates_to_link));
-					if($r === false){
-						error(CTemplate::resetErrors());
-						$result = false;
-						break;
-					}
-				}
-// {{{ TEMPLATES
 
 // GRAPHS {{{
 				if(isset($rules['graph']['exist']) || isset($rules['graph']['missed'])){
