@@ -567,7 +567,19 @@
 			if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)
 				$hostids[$selement['elementid']] = $selement['elementid'];
 		}
+
 		$scripts_by_hosts = CScript::getScriptsByHosts($hostids);
+		
+		$options = array(
+			'nodeids' => get_current_nodeid(true),
+			'hostids' => $hostids,
+			'extendoutput' => 1,
+			'select_groups' => 1,
+			'select_triggers' => 1,
+			'nopermissions' => 1
+		);
+		$hosts = CHost::get($options);
+		$hosts = zbx_toHash($hosts, 'hostid');
 
 // Draws elements
 		$map_info = getSelementsInfo($sysmap['selements']);
@@ -577,7 +589,7 @@
 			$alt = S_LABEL.': '.$db_element['label'];
 
 			if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
-				$host = get_host_by_hostid($db_element['elementid']);
+				$host = $hosts[$db_element['elementid']];
 				if($host['status'] != HOST_STATUS_MONITORED) continue;
 
 				if(empty($url))	$url='tr_status.php?hostid='.$db_element['elementid'].'&noactions=true&onlytrue=true&compact=true';
@@ -614,7 +626,8 @@
 			$y2_ = $db_element['y'] + imagesy($back);
 
 			$r_area = new CArea(array($x1_,$y1_,$x2_,$y2_),$url,$alt,'rect');
-			if(($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) && isset($scripts_by_hosts[$db_element['elementid']])){
+			if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
+				$group = reset($hosts[$db_element['elementid']]['groups']);
 				$menus = '';
 
 				$host_nodeid = id2nodeid($db_element['elementid']);
@@ -624,12 +637,14 @@
 						$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$db_element["elementid"]."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 				}
 
-				$menus.= '['.zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
+				if(!empty($db_element['url']) || !empty($hosts[$db_element['elementid']]['triggers'])){
+					$menus.= '['.zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 
-				$menus.= "['".S_STATUS_OF_TRIGGERS."',\"javascript: redirect('tr_status.php?groupid=0&hostid=".$db_element['elementid']."&noactions=true&onlytrue=true&compact=true');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+					if(!empty($hosts[$db_element['elementid']]['triggers']))
+						$menus.= "['".S_STATUS_OF_TRIGGERS."',\"javascript: redirect('tr_status.php?groupid=".$group['groupid']."&hostid=".$db_element['elementid']."&noactions=true&onlytrue=true&compact=true');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 
-				if(!empty($db_element['url'])){
-					$menus.= "['".S_MAP.SPACE.S_URL."',\"javascript: location.replace('".$url."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+					if(!empty($db_element['url']))
+						$menus.= "['".S_MAP.SPACE.S_URL."',\"javascript: location.replace('".$url."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 				}
 
 				$menus = trim($menus,',');
@@ -1485,15 +1500,16 @@
 
 		$selements_info = array();
 		$options = array(
-				'hostids' => zbx_objectValues($selements, 'elementid'),
+				'groupids' => zbx_objectValues($selements, 'elementid'),
 				'extendoutput' => 1,
 				'nopermissions' => 1,
 				'select_hosts' => 1,
 				'select_triggers' => 1,
 				'nodeids' => get_current_nodeid(true)
 			);
-		$hostgroups = CHost::get($options);
+		$hostgroups = CHostGroup::get($options);
 		$hostgroups = zbx_toHash($hostgroups, 'groupid');
+
 		foreach($selements as $snum => $selement){
 			$selements_info[$selement['selementid']] = array();
 			$info = &$selements_info[$selement['selementid']];
@@ -1502,7 +1518,7 @@
 			$group = $hostgroups[$selement['elementid']];
 
 			$info['name'] = $group['name'];
-			
+	
 			foreach($group['hosts'] as $hnum => $host){
 				if($host['maintenance_status'] == MAINTENANCE_TYPE_NODATA){
 					$info['maintenance_status'] = true;
@@ -1527,8 +1543,17 @@
 				}
 			}
 
+			$options = array(
+				'groupids' => $group['groupid'],
+				'extendoutput' => 1,
+				'nodeids' => get_current_nodeid(true)
+				);
+
+			$triggers = CTrigger::get($options);
+			$triggers = zbx_toHash($triggers, 'triggerid');
+
 			$info['triggers'] = array();
-			foreach($group['triggers'] as $tnum => $trigger){
+			foreach($triggers as $tnum => $trigger){
 				if($trigger['status'] == TRIGGER_STATUS_DISABLED) continue;
 
 				if(!isset($info['type'])){
