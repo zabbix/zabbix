@@ -44,7 +44,7 @@ include_once 'include/page_header.php';
 
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY);
 
-	$sql = 'SELECT s.serviceid '.
+	$sql = 'SELECT s.serviceid, s.name '.
 				' FROM services s '.
 				' WHERE (s.triggerid is NULL OR '.DBcondition('s.triggerid',$available_triggers).') '.
 					' AND s.serviceid='.$_REQUEST['serviceid'];
@@ -87,7 +87,8 @@ include_once 'include/page_header.php';
 
 	$str=$service['name'].' (year '.date('Y').')';
 	$x=imagesx($im)/2-imagefontwidth(4)*strlen($str)/2;
-	imagestring($im, 4,$x,1, $str , $darkred);
+	// imagestring($im, 4,$x,1, $str , $darkred);
+	imageText($im, 10, 0, $x, 14, $darkred, $str);
 
 	$now = time(NULL);
 	$to_time=$now;
@@ -123,7 +124,8 @@ include_once 'include/page_header.php';
 
 	for($i = 0, $period_start = $start; $i <= $sizeX; $i += $sizeX/52){
 		DashedLine($im,$i+$shiftX,$shiftYup,$i+$shiftX,$sizeY+$shiftYup,$gray);
-		imagestringup($im, 1,$i+$shiftX-4, $sizeY+$shiftYup+32, date('d.M',$period_start) , $black);
+		// imagestringup($im, 1,$i+$shiftX-4, $sizeY+$shiftYup+32, date('d.M',$period_start) , $black);
+		imageText($im, 6, 90, $i+$shiftX+4, $sizeY+$shiftYup+30, $black, date('d.M',$period_start));
 
 		$period_start += 7*24*3600;
 	}
@@ -149,18 +151,17 @@ include_once 'include/page_header.php';
 	}
 
 	for($i=0;$i<=$sizeY;$i+=$sizeY/10){
-		imagestring($im, 1, $sizeX+5+$shiftX, $sizeY-$i-4+$shiftYup, ($i*($maxY-$minY)/$sizeY+$minY).'%' , imagecolorallocate($im,200,40,40));
+		// imagestring($im, 1, $sizeX+5+$shiftX, $sizeY-$i-4+$shiftYup, ($i*($maxY-$minY)/$sizeY+$minY).'%' , imagecolorallocate($im,200,40,40));
+		imageText($im, 7, 0, $sizeX+5+$shiftX, $sizeY-$i-4+$shiftYup+8, $darkred, ($i*($maxY-$minY)/$sizeY+$minY).'%');
 	}
 
 	imagefilledrectangle($im,$shiftX,$sizeY+$shiftYup+39+15*0,$shiftX+5,$sizeY+$shiftYup+35+9+15*0,imagecolorallocate($im,120,235,120));
 	imagerectangle($im,$shiftX,$sizeY+$shiftYup+39+15*0,$shiftX+5,$sizeY+$shiftYup+35+9+15*0,$black);
-	imagetext($im, 2, 0, $shiftX+9, $sizeY+$shiftYup+15*0+35, $black, 'OK (%)');
-	//imagestring($im, 2,$shiftX+9,$sizeY+$shiftYup+15*0+35, 'OK (%)', $black);
+	imageText($im, 8, 0, $shiftX+9, $sizeY+$shiftYup+15*0+45, $black, 'OK (%)');
 
 	imagefilledrectangle($im,$shiftX,$sizeY+$shiftYup+39+15*1,$shiftX+5,$sizeY+$shiftYup+35+9+15*1,$darkred);
 	imagerectangle($im,$shiftX,$sizeY+$shiftYup+39+15*1,$shiftX+5,$sizeY+$shiftYup+15+9+35*1,$black);
-	imagetext($im, 2, 0, $shiftX+9, $sizeY+$shiftYup+15*1+35, $black, 'PROBLEMS (%)');
-	//imagestring($im, 2,$shiftX+9,$sizeY+$shiftYup+15*1+35, 'PROBLEMS (%)', $black);
+	imageText($im, 8, 0, $shiftX+9, $sizeY+$shiftYup+15*1+45, $black, 'PROBLEMS (%)');
 
 	imagestringup($im,0,imagesx($im)-10,imagesy($im)-50, 'http://www.zabbix.com', $gray);
 
