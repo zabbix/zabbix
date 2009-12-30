@@ -695,7 +695,6 @@ static void	process_active_checks(char *server, unsigned short port)
 		{
 			ret = FAIL;
 
-zabbix_log(LOG_LEVEL_WARNING, "key:%s", active_metrics[i].key);
 			do { /* simple try realization */
 				if (parse_command(active_metrics[i].key, NULL, 0, params, MAX_STRING_LEN) != 2)
 					break;
@@ -721,19 +720,16 @@ zabbix_log(LOG_LEVEL_WARNING, "key:%s", active_metrics[i].key);
 					maxlines_persec = CONFIG_MAX_LINES_PER_SECOND;
 				else
 					maxlines_persec = atoi(tmp);
-zabbix_log(LOG_LEVEL_WARNING, "maxlines_persec:%d", maxlines_persec);
 				if (maxlines_persec < MIN_VALUE_LINES || maxlines_persec > MAX_VALUE_LINES)
 					break;
 
 				if (get_param(params, 5, tmp, sizeof(tmp)) != 0)
 					*tmp = '\0';
 
-zabbix_log(LOG_LEVEL_WARNING, "skip:%s", tmp);
 				if ('\0' == *tmp || 0 == strcmp(tmp, "all"))
 					active_metrics[i].skip_old_data = 0;
 				else if (0 != strcmp(tmp, "skip"))
 					break;
-zabbix_log(LOG_LEVEL_WARNING, "skip_old_data:%d", (int)active_metrics[i].skip_old_data);
 
 				s_count = p_count = 0;
 				lastlogsize = active_metrics[i].lastlogsize;
@@ -937,6 +933,7 @@ zabbix_log(LOG_LEVEL_WARNING, "skip_old_data:%d", (int)active_metrics[i].skip_ol
 			ret = FAIL;
 
 #if defined(_WINDOWS)
+zabbix_log(LOG_LEVEL_WARNING, "key:%s", active_metrics[i].key);
 			do{ /* simple try realization */
 				if (parse_command(active_metrics[i].key, NULL, 0, params, MAX_STRING_LEN) != 2) {
 					ret = FAIL;
@@ -973,16 +970,19 @@ zabbix_log(LOG_LEVEL_WARNING, "skip_old_data:%d", (int)active_metrics[i].skip_ol
 				else
 					maxlines_persec = atoi(tmp);
 
+zabbix_log(LOG_LEVEL_WARNING, "maxlines_persec:%d", maxlines_persec);
 				if (maxlines_persec < MIN_VALUE_LINES || maxlines_persec > MAX_VALUE_LINES)
 					break;
 
 				if (get_param(params, 7, tmp, sizeof(tmp)) != 0)
 					*tmp = '\0';
 
+zabbix_log(LOG_LEVEL_WARNING, "skip:%s", tmp);
 				if ('\0' == *tmp || 0 == strcmp(tmp, "all"))
 					active_metrics[i].skip_old_data = 0;
 				else if (0 != strcmp(tmp, "skip"))
 					break;
+zabbix_log(LOG_LEVEL_WARNING, "skip_old_data:%d", (int)active_metrics[i].skip_old_data);
 
 				s_count = 0;
 				p_count = 0;
