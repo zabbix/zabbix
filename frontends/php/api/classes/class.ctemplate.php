@@ -1252,7 +1252,7 @@ $i = 0;
 		try{
 			self::BeginTransaction(__METHOD__);
 			
-	// CHECK TEMPLATE TRIGGERS DEPENDENCIES {{{
+// CHECK TEMPLATE TRIGGERS DEPENDENCIES {{{
 			foreach($templateids as $templateid){
 				$triggerids = array();
 				$db_triggers = get_triggers_by_hostid($templateid);
@@ -1274,7 +1274,7 @@ $i = 0;
 						'Trigger in template [ '.$templateid.' ] has dependency with trigger in template [ '.$db_dephost['host'].' ]');
 				}
 			}
-	// }}} CHECK TEMPLATE TRIGGERS DEPENDENCIES	
+// }}} CHECK TEMPLATE TRIGGERS DEPENDENCIES	
 			
 			
 			$linked = array();
@@ -1282,18 +1282,29 @@ $i = 0;
 				' AND '.DBcondition('templateid', $templateids);
 			$linked_db = DBselect($sql);
 			while($pair = DBfetch($linked_db)){
-				$linked[$pair['hostid']] = array($pair['templateid'] => $pair['templateid']);
+				$linked[] = array($pair['hostid'] => $pair['templateid']);
 			}
 
+			
 			foreach($targetids as $targetid){
-				if(!self::checkCircularLink($targetid, $templateids)){
+				$templateids_to_check = array();
+				foreach($linked as $link){
+					if(isset($link[$targetid]))
+						$templateids_to_check[] = $link[$targetid];
+				}
+
+				$templateids_to_check = array_diff($templateids, $templateids_to_check);
+				
+				if(!self::checkCircularLink($targetid, $templateids_to_check)){
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Circular link can not be created');
 				}
 			}
 
 			foreach($targetids as $targetid){
 				foreach($templateids as $tnum => $templateid){
-					if(isset($linked[$targetid]) && isset($linked[$targetid][$templateid])) continue;
+					foreach($linked as $link){
+						if(isset($link[$targetid]) && ($link[$targetid] == $templateid)) continue 2;
+					}
 					
 					$values = array(get_dbid('hosts_templates', 'hosttemplateid'), $targetid, $templateid);
 					$sql = 'INSERT INTO hosts_templates VALUES ('. implode(', ', $values) .')';

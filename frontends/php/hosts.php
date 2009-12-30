@@ -196,74 +196,54 @@ include_once('include/page_header.php');
 		$_REQUEST['templates'] = get_request('templates', array());
 
 		if(count($_REQUEST['groups']) > 0){
-			$accessible_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY);
+			$accessible_groups = get_accessible_groups_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY);
 			foreach($_REQUEST['groups'] as $gid){
 				if(!isset($accessible_groups[$gid])) access_deny();
 			}
 		}
 
-		$result = true;
+		try{
+			DBstart();
 
-		DBstart();
+			$hosts = array('hosts' => zbx_toObject($hosts, 'hostid'));
 
-		// if(isset($visible['groups'])){
-			// $groupids = get_request('groups', array());
-			// CHostGroup::updateHosts(array('hostids' => $hostids, 'groupids' => $groupids));
-		// }
-
-		// if(isset($visible['newgroup'])){
-			// $newgroup = get_request('newgroup', '');
-			// $newgroupid = CHostGroup::create(array('name' => $newgroup));
-			// $newgroupid = reset($newgroupid);
-			// CHostGroup::createHosts(array('hostids' => $hostids, 'groupids' => $newgroupid));
-		// }
-
-		foreach($hosts as $id => $hostid){
-
-			$db_host = get_host_by_hostid($hostid);
-			$db_templates = get_templates_by_hostid($hostid);
-
-			foreach($db_host as $key => $value){
-				if(isset($visible[$key])){
-					if ($key == 'useipmi')
-						$db_host[$key] = get_request('useipmi', 'no');
+			$properties = array('port', 'useip', 'dns',	'ip', 'proxy_hostid', 'useipmi', 'ipmi_ip', 'ipmi_port', 'ipmi_authtype',
+				'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'status');
+			$new_values = array();
+			foreach($properties as $property){
+				if(isset($visible[$property])){
+					if($property == 'useipmi')
+						$new_values[$property] = isset($_REQUEST['useipmi']) ? 1 : 0;
 					else
-						$db_host[$key] = $_REQUEST[$key];
+						$new_values[$property] = $_REQUEST[$property];
 				}
 			}
+			
 
+			$groups = array();
+			if(isset($visible['newgroup']) && !empty($_REQUEST['newgroup'])){
+				$groups = CHostGroup::create(array('name' => $_REQUEST['newgroup']));
+				if($groups === false) throw new Exception();
+			}
 			if(isset($visible['groups'])){
-				$db_host['groups'] = $_REQUEST['groups'];
-			}
-			else{
-				$db_host['groups'] = get_groupids_by_host($hostid);
-			}
-
+				$hosts['groups'] = array_merge(zbx_toObject($_REQUEST['groups'], 'groupid'), $groups);
+			}	
 			if(isset($visible['template_table'])){
-				foreach($db_templates as $templateid => $name){
-					$result &= unlink_template($hostid, $templateid, false);
-				}
-				$db_host['templates'] = $_REQUEST['templates'];
+				$tplids = array_keys($_REQUEST['templates']);
+				$hosts['templates'] = zbx_toObject($tplids, 'templateid');
 			}
-			else{
-				$db_host['templates'] = $db_templates;
-			}
+			$result = CHost::massUpdate(array_merge($hosts, $new_values));
+			if($result === false) throw new Exception();
 
-			$result &= (bool) update_host($hostid,
-				$db_host['host'],$db_host['port'],$db_host['status'],$db_host['useip'],$db_host['dns'],
-				$db_host['ip'],$db_host['proxy_hostid'],$db_host['templates'],$db_host['useipmi'],$db_host['ipmi_ip'],
-				$db_host['ipmi_port'],$db_host['ipmi_authtype'],$db_host['ipmi_privilege'],$db_host['ipmi_username'],
-				$db_host['ipmi_password'],$_REQUEST['newgroup'],$db_host['groups']);
-
-
+			
 			if($result && isset($visible['useprofile'])){
-
 				$host_profile = DBfetch(DBselect('SELECT * FROM hosts_profiles WHERE hostid='.$hostid));
-				$host_profile_fields = array('devicetype', 'name', 'os', 'serialno', 'tag','macaddress', 'hardware', 'software', 'contact', 'location', 'notes');
+				$host_profile_fields = array('devicetype', 'name', 'os', 'serialno', 'tag','macaddress', 'hardware', 'software', 
+					'contact', 'location', 'notes');
 
 				delete_host_profile($hostid);
 
-				if(get_request('useprofile','no') == 'yes'){
+				if(get_request('useprofile', 'no') == 'yes'){
 					foreach($host_profile_fields as $field){
 						if(isset($visible[$field]))
 							$host_profile[$field] = $_REQUEST[$field];
@@ -271,17 +251,17 @@ include_once('include/page_header.php');
 							$host_profile[$field] = '';
 					}
 
-					$result &= add_host_profile($hostid,
+					$result = add_host_profile($hostid,
 						$host_profile['devicetype'],$host_profile['name'],$host_profile['os'],
 						$host_profile['serialno'],$host_profile['tag'],$host_profile['macaddress'],
 						$host_profile['hardware'],$host_profile['software'],$host_profile['contact'],
 						$host_profile['location'],$host_profile['notes']);
+					if($result === false) throw new Exception();
 				}
 			}
 
 //HOSTS PROFILE EXTANDED Section
 			if($result && isset($visible['useprofile_ext'])){
-
 				$host_profile_ext=DBfetch(DBselect('SELECT * FROM hosts_profiles_ext WHERE hostid='.$hostid));
 				$host_profile_ext_fields = array('device_alias','device_type','device_chassis','device_os','device_os_short',
 					'device_hw_arch','device_serial','device_model','device_tag','device_vendor','device_contract',
@@ -295,31 +275,25 @@ include_once('include/page_header.php');
 
 				delete_host_profile_ext($hostid);
 //ext_host_profiles
-				$useprofile_ext = get_request('useprofile_ext',false);
-				$ext_host_profiles = get_request('ext_host_profiles',array());
 
-				if($useprofile_ext && !empty($ext_host_profiles)){
-					$ext_host_profiles = get_request('ext_host_profiles',array());
+				if(get_request('useprofile_ext', false) && !empty($ext_host_profiles)){
+					$ext_host_profiles = get_request('ext_host_profiles', array());
 
 					foreach($host_profile_ext_fields as $field){
 						if(isset($visible[$field])){
 							$host_profile_ext[$field] = $ext_host_profiles[$field];
 						}
 					}
-
-					$result &= add_host_profile_ext($hostid,$host_profile_ext);
+					$result = add_host_profile_ext($hostid, $host_profile_ext);
+					if($result === false) throw new Exception();
 				}
 			}
-		}
+			
 
-		$result = DBend($result);
-
-		$msg_ok 	= S_HOSTS.SPACE.S_UPDATED;
-		$msg_fail 	= S_CANNOT_UPDATE.SPACE.S_HOSTS;
-
-		show_messages($result, $msg_ok, $msg_fail);
-
-		if($result){
+			DBend(true);
+			
+			show_messages(true, S_HOSTS.SPACE.S_UPDATED, S_CANNOT_UPDATE.SPACE.S_HOSTS);
+			
 			unset($_REQUEST['massupdate']);
 			unset($_REQUEST['form']);
 			unset($_REQUEST['hosts']);
@@ -327,6 +301,10 @@ include_once('include/page_header.php');
 			$url = new CUrl();
 			$path = $url->getPath();
 			insert_js('cookie.eraseArray("'.$path.'")');
+		}
+		catch(Exception $e){
+			DBend(false);
+			show_messages(false, S_HOSTS.SPACE.S_UPDATED, S_CANNOT_UPDATE.SPACE.S_HOSTS);
 		}
 
 		unset($_REQUEST['save']);
