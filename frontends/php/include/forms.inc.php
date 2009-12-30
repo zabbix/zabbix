@@ -5184,7 +5184,7 @@
 		$host 		= get_request('host',	'');
 		$port 		= get_request('port',	get_profile('HOST_PORT',10050));
 		$status		= get_request('status',	HOST_STATUS_MONITORED);
-		$useip		= get_request('useip',	0);
+		$useip		= get_request('useip',	1);
 		$dns		= get_request('dns',	'');
 		$ip			= get_request('ip',	'0.0.0.0');
 		$proxy_hostid	= get_request('proxy_hostid','');
