@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1572] fixed processing of the performance counters defined in the configuration file using non-latin symbols (Dmitry)
  - [ZBX-1625] when mass update hosts, defaul "connect to" option is set to IP (Vedmak)
  - [ZBX-1479] fixed host mass update (Vedmak)
  - [ZBX-1628] removed templates from status of triggers screen (Aly)
