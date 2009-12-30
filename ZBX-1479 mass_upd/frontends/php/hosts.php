@@ -335,6 +335,15 @@ include_once('include/page_header.php');
 // START SAVE TRANSACTION {{{
 		DBstart();
 
+		if(isset($_REQUEST['hostid'])){
+			$msg_ok = S_HOST_UPDATED;
+			$msg_fail = S_CANNOT_UPDATE_HOST;
+		}
+		else{
+			$msg_ok = S_HOST_ADDED;
+			$msg_fail = S_CANNOT_ADD_HOST;
+		}
+		
 		$groups = zbx_toObject($groups, 'groupid');
 		if(!empty($_REQUEST['newgroup'])){
 			if($newgroup = CHostGroup::create(array('name' => $_REQUEST['newgroup']))){
@@ -370,9 +379,6 @@ include_once('include/page_header.php');
 						'macros' => get_request('macros', array()),
 					));
 
-					$msg_ok = S_HOST_UPDATED;
-					$msg_fail = S_CANNOT_UPDATE_HOST;
-
 					$hostid = $_REQUEST['hostid'];
 				}
 			}
@@ -403,9 +409,6 @@ include_once('include/page_header.php');
 					$host = reset($host);
 					$hostid = $host['hostid'];
 				}
-
-				$msg_ok = S_HOST_ADDED;
-				$msg_fail = S_CANNOT_ADD_HOST;
 			}
 
 		}
