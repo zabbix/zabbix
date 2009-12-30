@@ -70,7 +70,7 @@ include_once('include/page_header.php');
 			echo '<script language="JavaScript" type="text/javascript"><!--
 					add_media("'.$_REQUEST['dstfrm'].'",'.
 								$_REQUEST['media'].','.
-								$_REQUEST['mediatypeid'].',"'.
+								zbx_jsvalue($_REQUEST['mediatypeid']).',"'.
 								$_REQUEST['sendto'].'","'.
 								$_REQUEST['period'].'",'.
 								$_REQUEST['active'].','.
