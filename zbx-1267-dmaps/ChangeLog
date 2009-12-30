@@ -1,5 +1,7 @@
 Changes for 1.8.1
 
+ - [ZBX-1553] fixed host group mass activate\disable operation (Vedmak)
+ - [ZBX-1455] added sorting for host\global macros (Vedmak)
  - [ZBX-1523] fixed last macros deletion (Vedmak)
  - [ZBX-1619] fixed web scenario data not removed from DB when host is deleted (Vedmak)
  - [ZBX-1567] fixed availability graph text displaying (Vedmak)
