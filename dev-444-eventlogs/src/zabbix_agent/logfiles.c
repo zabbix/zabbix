@@ -229,35 +229,6 @@ struct st_logfile
 
 /******************************************************************************
  *                                                                            *
- * Function: init_logfiles                                                    *
- *                                                                            *
- * Purpose: allocates memory for logfiles for the first time                  *
- *                                                                            *
- * Parameters: logfiles - pointer to a new list of logfiles                   *
- *             logfiles_alloc - number of logfiles memory was allocated for   *
- *             logfiles_num - number of already inserted logfiles (0)         *
- *                                                                            *
- * Return value: none                                                         *
- *                                                                            *
- * Author: Dmitry Borovikov                                                   *
- *                                                                            *
- * Comments: Assertion can be deleted later for convenience.                  *
- *                                                                            *
- ******************************************************************************/
-static void init_logfiles(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num)
-{
-	assert(logfiles && NULL == *logfiles);
-	assert(logfiles_alloc && 0 == *logfiles_alloc);
-	assert(logfiles_num && 0 == *logfiles_num);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In init_logfiles()");
-
-	*logfiles_alloc = 64;
-	*logfiles = zbx_malloc(*logfiles, *logfiles_alloc * sizeof(struct st_logfile));
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: free_logfiles                                                    *
  *                                                                            *
  * Purpose: releases memory allocated for logfiles                            *
@@ -323,7 +294,7 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 	/* must be done in any case */
 	if (*logfiles_alloc == *logfiles_num)
 	{
-		*logfiles_alloc = *logfiles_alloc * 2;
+		*logfiles_alloc += 64;
 		*logfiles = zbx_realloc(*logfiles, *logfiles_alloc);
 	}
 
@@ -408,7 +379,7 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
  *                                                                            *
  *                                                                            *
  ******************************************************************************/
-int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, const char *encoding)
+int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, const char *encoding, unsigned char skip_old_data)
 {
 	int		i = 0;
 	int		nbytes;
@@ -418,8 +389,7 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 	char		*format = NULL;
 	struct stat	file_buf;
 	struct st_logfile	*logfiles = NULL;
-	int		logfiles_num = 0;
-	int		logfiles_alloc = 0;
+	int			logfiles_alloc = 64, logfiles_num = 0;
 	int		fd = 0;
 	char		*logfile_candidate = NULL;
 	int		length = 0;
@@ -471,7 +441,7 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 #endif /* _WINDOWS */
 
 	/* allocating memory for logfiles */
-	init_logfiles(&logfiles, &logfiles_alloc, &logfiles_num);
+	logfiles = zbx_malloc(logfiles, logfiles_alloc * sizeof(struct st_logfile));
 
 	/*zabbix_log(LOG_LEVEL_WARNING, "Starting reading the directory. logfiles_alloc [%i], logfiles_num [%i]",
 			logfiles_alloc, logfiles_num);*/
@@ -679,7 +649,7 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
  *                                                                            *
  *                                                                            *
  ******************************************************************************/
-int	process_log(char *filename, long *lastlogsize, char **value, const char *encoding)
+int	process_log(char *filename, long *lastlogsize, char **value, const char *encoding, unsigned char skip_old_data)
 {
 	int		f;
 	struct stat	buf;
@@ -698,6 +668,13 @@ int	process_log(char *filename, long *lastlogsize, char **value, const char *enc
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot open [%s] [%s]", filename, strerror(errno));
 		return ret;
+	}
+
+	if (1 == skip_old_data)
+	{
+		*lastlogsize = buf.st_size;
+		zabbix_log(LOG_LEVEL_DEBUG, "Skipping existing data. filename:'%s' lastlogsize:%li",
+				filename, *lastlogsize);
 	}
 
 	if (buf.st_size < *lastlogsize)
