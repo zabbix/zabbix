@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1456] fixed map update on linkage properties change (Aly)
  - [ZBX-1508] fixed action map creation (Aly)
  - [ZBX-1593] fixed errors when admin tries to add hostgroup editin host (Vedmak)
  - [ZBX-1621] fixed ITservices graphs text dispaying (Vedmak)
