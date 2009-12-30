@@ -560,10 +560,7 @@
 		$action_map = new CAreaMap('links'.$sysmap['sysmapid']);
 
 		$hostids = array();
-		$selements = array();
-
 		foreach($sysmap['selements'] as $snum => $selement){
-			$selements[$selement['elementid']] = $selement;
 			if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)
 				$hostids[$selement['elementid']] = $selement['elementid'];
 		}
@@ -572,7 +569,7 @@
 // Draws elements
 		$map_info = getSelementsInfo($sysmap['selements']);
 
-		foreach($selements as $snum => $db_element){
+		foreach($sysmap['selements'] as $snum => $db_element){
 			$url = $db_element['url'];
 			$alt = S_LABEL.': '.$db_element['label'];
 			$scripts_by_hosts = null;
