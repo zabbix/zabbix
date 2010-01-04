@@ -696,7 +696,7 @@ $_REQUEST['hostid'] = $thid;
 
 			$description = array();
 			if($host['proxy_hostid']){
-				$proxy = CHost::get(array('hostids' => $host['proxy_hostid'], 'extendoutput' => 1, 'nopermissions' => 1, 'proxy_hosts' => 1));
+				$proxy = CProxy::get(array('proxyids' => $host['proxy_hostid'], 'extendoutput' => 1));
 				$proxy = reset($proxy);
 				$description[] = $proxy['host'] . ':';
 			}
