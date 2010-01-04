@@ -501,6 +501,12 @@ class zbxXML{
 // IMPORT RULES
 				$host_db = self::mapXML2arr($host, XML_TAG_HOST);
 
+				if(isset($host_db['proxy_hostid'])){
+					$proxy_exists = CHost::get(array('hostids' => $host_db['proxy_hostid']));
+					if(empty($proxy_exists))
+						$host_db['proxy_hostid'] = 0;						
+				}
+				
 				if(!isset($host_db['status'])) $host_db['status'] = HOST_STATUS_TEMPLATE;
 				if($host_db['status'] == HOST_STATUS_TEMPLATE){
 					$current_host = CTemplate::getObjects(array('template' => $host_db['host']));
@@ -832,48 +838,49 @@ class zbxXML{
 					foreach($graphs as $gnum=> $graph){
 						$graph_db = self::mapXML2arr($graph, XML_TAG_GRAPH);
 						$graph_db['hostid'] = $current_host['hostid'];
-
+						
 						$current_graph = CGraph::getObjects($graph_db);
 						$current_graph = reset($current_graph);
-// sdii($current_graph);
+
 
 						if(!$current_graph && !isset($rules['graph']['missed'])) continue; // break if update nonexist
 						if($current_graph && !isset($rules['graph']['exist'])) continue; // break if not update exist
 //sdi('graph: '.$graph_db['name'].' | graphID: '. $current_graphid);
 
 
-						if(!empty($graph_db['ymin_item_key'])){
-							$graph_db['ymin_item_key'] = explode(':', $graph_db['ymin_item_key']);
-							if(count($graph_db['ymin_item_key']) < 2){
-								error('Incorrect y min item for graph ['.$graph_db['name'].']');
+						if($current_graph){
+							if(!empty($graph_db['ymin_item_key'])){
+								$graph_db['ymin_item_key'] = explode(':', $graph_db['ymin_item_key']);
+								if(count($graph_db['ymin_item_key']) < 2){
+									error('Incorrect y min item for graph ['.$graph_db['name'].']');
+								}
+
+								$current_graph['host']	= array_shift($graph_db['ymin_item_key']);
+								$current_graph['ymin_item_key']	= implode(':', $graph_db['ymin_item_key']);
+
+								if(!$item = get_item_by_key($current_graph['ymin_item_key'], $current_graph['host'])){
+									error('Missed item ['.$current_graph['ymin_item_key'].'] for host ['.$current_graph['host'].']');
+								}
+
+								$current_graph['ymin_itemid'] = $item['itemid'];
 							}
 
-							$current_graph['host']	= array_shift($graph_db['ymin_item_key']);
-							$current_graph['ymin_item_key']	= implode(':', $graph_db['ymin_item_key']);
+							if(!empty($graph_db['ymax_item_key'])){
+								$graph_db['ymax_item_key'] = explode(':', $graph_db['ymax_item_key']);
+								if(count($graph_db['ymax_item_key']) < 2){
+									error('Incorrect y max item for graph ['.$graph_db['name'].']');
+								}
 
-							if(!$item = get_item_by_key($current_graph['ymin_item_key'], $current_graph['host'])){
-								error('Missed item ['.$current_graph['ymin_item_key'].'] for host ['.$current_graph['host'].']');
+								$current_graph['host']	= array_shift($graph_db['ymax_item_key']);
+								$current_graph['ymax_item_key']	= implode(':', $graph_db['ymax_item_key']);
+
+								if(!$item = get_item_by_key($current_graph['ymax_item_key'], $current_graph['host'])){
+									error('Missed item ['.$current_graph['ymax_item_key'].'] for host ['.$current_graph['host'].']');
+								}
+
+								$current_graph['ymax_itemid'] = $item['itemid'];
 							}
-
-							$current_graph['ymin_itemid'] = $item['itemid'];
 						}
-
-						if(!empty($graph_db['ymax_item_key'])){
-							$graph_db['ymax_item_key'] = explode(':', $graph_db['ymax_item_key']);
-							if(count($graph_db['ymax_item_key']) < 2){
-								error('Incorrect y max item for graph ['.$graph_db['name'].']');
-							}
-
-							$current_graph['host']	= array_shift($graph_db['ymax_item_key']);
-							$current_graph['ymax_item_key']	= implode(':', $graph_db['ymax_item_key']);
-
-							if(!$item = get_item_by_key($current_graph['ymax_item_key'], $current_graph['host'])){
-								error('Missed item ['.$current_graph['ymax_item_key'].'] for host ['.$current_graph['host'].']');
-							}
-
-							$current_graph['ymax_itemid'] = $item['itemid'];
-						}
-
 						if($current_graph){ // if exists, delete graph to add then new
 							CGraph::delete($current_graph);
 						}
@@ -892,26 +899,25 @@ class zbxXML{
 								$gitem_host = $host_db['host'];
 							}
 
-
 							$gitem_hostid = CHost::getObjects(array('host' => $gitem_host));
-// sdii($gitem_hostid);
 							$gitem_templateid = CTemplate::getObjects(array('template' => $gitem_host));
-// sdii($gitem_templateid);
 							$gitem_hostid = array_merge($gitem_hostid, $gitem_templateid);
+							
+							if(!empty($gitem_hostid)){
 
+								$gitem_hostid = reset($gitem_hostid);
 
-							$gitem_hostid = reset($gitem_hostid);
+								$gitem_db['hostid'] = $gitem_hostid['hostid'];
+								$gitem_db['key_'] = implode(':', $data);
 
-							$gitem_db['hostid'] = $gitem_hostid['hostid'];
-							$gitem_db['key_'] = implode(':', $data);
+	// sdi('gitem_hostid: '.$gitem_db['hostid'].' | gitem_key: '. $gitem_db['key_']);
 
-//sdi('gitem_host: '.$gitem_host.' | gitem_key: '. $gitem_key);
-
-							$current_gitem = CItem::getObjects($gitem_db);
-							$current_gitem = reset($current_gitem);
-							if($current_gitem){ // if item exists, add graph item to graph
-								$gitem_db['itemid'] = $current_gitem['itemid'];
-								$graph_db['gitems'][$current_gitem['itemid']] = $gitem_db;
+								$current_gitem = CItem::getObjects($gitem_db);
+								$current_gitem = reset($current_gitem);
+								if($current_gitem){ // if item exists, add graph item to graph
+									$gitem_db['itemid'] = $current_gitem['itemid'];
+									$graph_db['gitems'][$current_gitem['itemid']] = $gitem_db;
+								}
 							}
 						}
 
