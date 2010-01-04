@@ -272,7 +272,7 @@ include_once('include/page_header.php');
 		$hostid = CHost::getObjects(array('host' => $_REQUEST['filter_host']));
 		if(empty($hostid))
 			$hostid = CTemplate::getObjects(array('template' => $_REQUEST['filter_host']));
-			
+
 		$hostid = reset($hostid);
 
 		$hostid = $hostid?$hostid['hostid']:0;

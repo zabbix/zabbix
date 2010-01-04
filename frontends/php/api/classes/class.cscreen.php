@@ -220,28 +220,28 @@ sdii($screens_to_check);
 
 				$graph_options = array(
 									'nodeids' => $nodeids,
-									'graphids' => $graphs_to_check, 
+									'graphids' => $graphs_to_check,
 									'editable' => $options['editable']);
 				$allowed_graphs = CGraph::get($graph_options);
 				$allowed_graphs = zbx_objectValues($allowed_graphs, 'graphid');
-				
+
 				$item_options = array(
 									'nodeids' => $nodeids,
-									'itemids' => $items_to_check, 
+									'itemids' => $items_to_check,
 									'editable' => $options['editable']);
 				$allowed_items = CItem::get($item_options);
 				$allowed_items = zbx_objectValues($allowed_items, 'itemid');
-				
+
 				$map_options = array(
 									'nodeids' => $nodeids,
-									'sysmapids' => $maps_to_check, 
+									'sysmapids' => $maps_to_check,
 									'editable' => $options['editable']);
 				$allowed_maps = CMap::get($map_options);
 				$allowed_maps = zbx_objectValues($allowed_maps, 'sysmapid');
-				
+
 				$screens_options = array(
 									'nodeids' => $nodeids,
-									'screenids' => $screens_to_check, 
+									'screenids' => $screens_to_check,
 									'editable' => $options['editable']);
 				$allowed_screens = CScreen::get($screens_options);
 				$allowed_screens = zbx_objectValues($allowed_screens, 'screenid');
@@ -271,7 +271,7 @@ SDI('/////////////////////////////////');
 				}
 				foreach($restr_items as $resourceid){
 					foreach($screens_items as $screen_itemid => $screen_item){
-						if(($screen_item['resourceid'] == $resourceid) && 
+						if(($screen_item['resourceid'] == $resourceid) &&
 							(uint_in_array($screen_item['resourcetype'], array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT)))
 						){
 							unset($result[$screen_item['screenid']]);

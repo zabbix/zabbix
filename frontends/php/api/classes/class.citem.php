@@ -222,7 +222,7 @@ class CItem extends CZBXAPI{
 			else
 				$sql_parts['where'][] = 'i.templateid=0';
 		}
-		
+
 // templated
 		if(!is_null($options['templated'])){
 			$sql_parts['from'][] = 'hosts h';
@@ -312,7 +312,7 @@ class CItem extends CZBXAPI{
 // valuetype
 			if(!is_null($options['valuetype'])){
 				zbx_value2array($options['valuetype']);
-				
+
 				$sql_parts['where'][] = DBCondition('i.value_type', $options['valuetype']);
 			}
 
@@ -473,9 +473,9 @@ class CItem extends CZBXAPI{
 		if($options['select_hosts']){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'extendoutput' => 1, 
-				'itemids' => $itemids, 
-				'nopermissions' => 1, 
+				'extendoutput' => 1,
+				'itemids' => $itemids,
+				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
 			$hosts = CHost::get($obj_params);
@@ -497,8 +497,8 @@ class CItem extends CZBXAPI{
 		if($options['select_triggers']){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'extendoutput' => 1, 
-				'itemids' => $itemids, 
+				'extendoutput' => 1,
+				'itemids' => $itemids,
 				'preservekeys' => 1
 			);
 			$triggers = CTrigger::get($obj_params);
@@ -513,8 +513,8 @@ class CItem extends CZBXAPI{
 		if($options['select_graphs']){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'extendoutput' => 1, 
-				'itemids' => $itemids, 
+				'extendoutput' => 1,
+				'itemids' => $itemids,
 				'preservekeys' => 1
 			);
 			$graphs = CGraph::get($obj_params);
@@ -529,8 +529,8 @@ class CItem extends CZBXAPI{
 		if($options['select_applications']){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'extendoutput' => 1, 
-				'itemids' => $itemids, 
+				'extendoutput' => 1,
+				'itemids' => $itemids,
 				'preservekeys' => 1
 			);
 			$applications = CApplication::get($obj_params);
