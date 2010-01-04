@@ -185,7 +185,7 @@ include_once('include/page_header.php');
 		$templates = array_keys($templates);
 		$templates = zbx_toObject($templates, 'templateid');
 		$templates_clear = zbx_toObject($templates_clear, 'templateid');
-		
+
 		$hosts = zbx_toObject($hosts, 'hostid');
 
 // CREATE/UPDATE TEMPLATE {{{
@@ -210,8 +210,8 @@ include_once('include/page_header.php');
 		}
 		else{
 			$result = CTemplate::create(array(
-				'host' => $template_name, 
-				'groups' => $groups, 
+				'host' => $template_name,
+				'groups' => $groups,
 				'templates' => $templates,
 				'hosts' => $hosts,
 				'macros' => get_request('macros', array())
@@ -286,7 +286,7 @@ include_once('include/page_header.php');
 		}
 // }
 
-		
+
 		$result = DBend($result);
 
 		show_messages($result, $msg_ok, $msg_fail);

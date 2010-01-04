@@ -24,12 +24,12 @@ class APICaller{
 
 	public static function call($class, $method, $params){
 		global $USER_DETAILS
-		
+
 		return czbxrpc::call($class.$method, $params);
 	}
-	
+
 	public static function result($result){
-		
+
 	}
 }
 
@@ -37,65 +37,65 @@ class APICaller{
 class CAction{
 
 	public static function get($options=array()){
-		
+
 	}
 
 	public static function add($actions){
-		
+
 	}
 
 	public static function update($actions){
-		
+
 	}
 
 	public static function addConditions($conditions){
-		
+
 	}
 
 	public static function addOperations($operations){
-		
+
 	}
 
 	public static function delete($actions){
-		
+
 	}
 }
 
 class CAlert{
 
 	public static function get($options=array()){
-		
+
 	}
 
 	public static function add($alerts){
-		
+
 	}
 
 	public static function delete($alertids){
-	
+
 	}
 }
 
 class CApplication extends CZBXAPI{
 
 	public static function get($options=array()){
-		
+
 	}
 
 	public static function getObjects($app_data){
-		
+
 	}
 
 	public static function add($applications){
-		
+
 	}
 
 	public static function update($applications){
-		
+
 	}
 
 	public static function delete($applications){
-		
+
 	}
 
 	public static function addItems($data){
@@ -106,15 +106,15 @@ class CApplication extends CZBXAPI{
 class CEvent extends CZBXAPI{
 
 	public static function get($options=array()){
-		
+
 	}
 
 	public static function add($events){
-		
+
 	}
 
 	public static function delete($events){
-		
+
 	}
 
 	public static function deleteByTriggerIDs($triggerids){
@@ -122,30 +122,30 @@ class CEvent extends CZBXAPI{
 	}
 
 	public static function acknowledge($events_data){
-		
+
 	}
 }
 
 class CGraph extends CZBXAPI{
 
 	public static function get($options=array()){
-		
+
 	}
 
 	public static function getObjects($graph_data){
-		
+
 	}
 
 	public static function add($graphs){
-		
+
 	}
 
 	public static function update($graphs){
-		
+
 	}
 
 	public static function delete($graphs){
-		
+
 	}
 
 	public static function addItems($items){
@@ -154,18 +154,18 @@ class CGraph extends CZBXAPI{
 
 	protected static function addItems_rec($graphid, $items, $tpl_graph=false){
 
-		
+
 	}
 
 	public static function deleteItems($item_list, $force=false){
-		
+
 	}
 }
 
 class CGraphItem extends CZBXAPI{
 
 	public static function get($options = array()){
-		
+
 	}
 
 	public static function getObjects($gitem_data){
@@ -176,42 +176,42 @@ class CGraphItem extends CZBXAPI{
 class CHost extends CZBXAPI{
 
 	public static function get($options=array()){
-		
+
 	}
 
 	public static function getObjects($host_data){
-		
+
 	}
 
 	public static function create($hosts){
-		
+
 	}
 
 	public static function update($hosts){
-		
+
 	}
 
 	public static function massUpdate($data){
-		
+
 	}
 
 	public static function massAdd($data){
-		
+
 	}
 
 	public static function massRemove($data){
-		
+
 	}
 
 	public static function delete($hosts){
-		
+
 	}
 }
 
 class CHostGroup extends CZBXAPI{
 
 	public static function get($params){
-		
+
 	}
 
 	public static function getObjects($data){
@@ -219,15 +219,15 @@ class CHostGroup extends CZBXAPI{
 	}
 
 	public static function create($groups){
-		
+
 	}
 
 	public static function update($groups){
-		
+
 	}
 
 	public static function delete($groups){
-		
+
 	}
 
 	public static function massAdd($data){
@@ -246,7 +246,7 @@ class CHostGroup extends CZBXAPI{
 class CItem extends CZBXAPI{
 
 	public static function get($options=array()){
-		
+
 	}
 
 	public static function getObjects($item_data){
@@ -258,18 +258,18 @@ class CItem extends CZBXAPI{
 	}
 
 	public static function update($items){
-		
+
 	}
 
 	public static function delete($items){
-		
+
 	}
 }
 
 class CMaintenance extends CZBXAPI{
 
 	public static function get($options=array()){
-		
+
 	}
 
 	public static function getObjects($maintenance){
@@ -281,11 +281,11 @@ class CMaintenance extends CZBXAPI{
 	}
 
 	public static function update($maintenances){
-	
+
 	}
 
 	public static function delete($maintenances){
-		
+
 	}
 
 }
@@ -293,31 +293,31 @@ class CMaintenance extends CZBXAPI{
 class CMap extends CZBXAPI{
 
 	public static function get($options=array()){
-		
+
 	}
 
 	public static function add($maps){
-		
+
 	}
 
 	public static function update($maps){
-		
+
 	}
 
 	public static function delete($sysmaps){
-		
+
 	}
 
 	public static function addLinks($links){
-		
+
 	}
 
 	public static function addElements($selements){
-		
+
 	}
 
 	public static function addLinkTrigger($linktriggers){
-		
+
 	}
 
 }
@@ -325,19 +325,19 @@ class CMap extends CZBXAPI{
 class CScreen extends CZBXAPI{
 
 	public static function get($options=array()){
-		
+
 	}
 
 	public static function add($screens){
-		
+
 	}
 
 	public static function update($screens){
-		
+
 	}
 
 	public static function delete($screens){
-		
+
 	}
 
 	public static function setItems($screen_items){
@@ -352,49 +352,49 @@ class CScreen extends CZBXAPI{
 class Cscript extends CZBXAPI{
 
 	public static function get($options = array()){
-		
+
 	}
 
 	public static function getObjects($script){
-		
+
 	}
 
 	public static function add($scripts){
-		
+
 	}
 
 	public static function update($scripts){
-		
+
 	}
 
 	public static function delete($scripts){
-		
+
 	}
 
 	public static function execute($scriptid,$hostid){
-	
+
 	}
 
 	public static function getCommand($scriptid,$hostid){
-	
+
 	}
 
 	public static function getScriptsByHosts($hostids){
-		
+
 	}
 }
 
 class CTemplate extends CZBXAPI{
 	public static function get($options = array()) {
-		
+
 	}
 
 	public static function getObjects($template_data){
-		
+
 	}
 
 	public static function create($templates){
-		
+
 	}
 
 	public static function update($templates){
@@ -402,29 +402,29 @@ class CTemplate extends CZBXAPI{
 	}
 
 	private static function checkCircularLink($id, $templateids){
-	
+
 	}
 
 	public static function delete($templates){
-		
+
 	}
 
 	public static function massUpdate($data){
-		
+
 	}
 
 	public static function massAdd($data){
-		
+
 	}
 
 	public static function massRemove($data){
-	
+
 	}
 
 	public static function linkTemplates($data){
-	
+
 	}
-	
+
 	private static function link($templateids, $targetids){
 
 	}
@@ -434,38 +434,38 @@ class CTemplate extends CZBXAPI{
 class CTrigger extends CZBXAPI{
 
 	public static function get($options=array()){
-	
+
 	}
 
 	public static function getObjects($trigger){
-		
+
 	}
 
 	public static function add($triggers){
-		
+
 	}
 
 	public static function update($triggers){
-		
+
 	}
 
 	public static function delete($triggers){
-	
+
 	}
 
 	public static function addDependencies($triggers_data){
-		
+
 	}
 
 	public static function deleteDependencies($triggers){
-	
+
 	}
 }
 
 class CUser extends CZBXAPI{
 
 	public static function get($options=array()){
-		
+
 	}
 
 	public static function authenticate($user){
@@ -477,7 +477,7 @@ class CUser extends CZBXAPI{
 	}
 
 	public static function getObjects($user_data){
-	
+
 	}
 
 	public static function add($users){
@@ -485,19 +485,19 @@ class CUser extends CZBXAPI{
 	}
 
 	public static function update($users){
-		
+
 	}
 
 	public static function updateProfile($user){
-	
+
 	}
 
 	public static function delete($users){
-		
+
 	}
 
 	public static function addMedia($media_data){
-		
+
 	}
 
 	public static function deleteMedia($media_data){
@@ -512,19 +512,19 @@ class CUser extends CZBXAPI{
 class CUserGroup extends CZBXAPI{
 
 	public static function get($options=array()){
-	
+
 	}
 
 	public static function getObjects($group_data){
-		
+
 	}
 
 	public static function add($usrgrps){
-		
+
 	}
 
 	public static function update($usrgrps){
-		
+
 	}
 
 	public static function updateRights($rights){
@@ -532,62 +532,62 @@ class CUserGroup extends CZBXAPI{
 	}
 
 	public static function addRights($rights){
-		
+
 	}
 
 	public static function updateUsers($data){
-		
+
 	}
 
 	public static function removeUsers($data){
-		
+
 	}
 
 	public static function delete($usrgrps){
-		
+
 	}
 }
 
 class CUserMacro extends CZBXAPI{
 
 	public static function get($options=array()){
-		
+
 	}
 
 	public static function getHostMacroObjects($macro_data){
-		
+
 	}
 
 	public static function add($macros){
-		
+
 	}
 
 	public static function update($macros){
-	
+
 	}
 
 	public static function updateValue($macros){
-		
+
 	}
 
 	public static function deleteHostMacro($hostmacros){
-		
+
 	}
 
 	public static function addGlobal($macros){
-	
+
 	}
 
 	public static function deleteGlobalMacro($globalmacros){
-	
+
 	}
 
 	public static function validate($macros){
-		
+
 	}
 
 	public static function getGlobalMacroObjects($macro_data){
-		
+
 	}
 
 	public static function getHostMacroId($macro_data){
@@ -595,27 +595,27 @@ class CUserMacro extends CZBXAPI{
 	}
 
 	public static function massAdd($data){
-		
+
 	}
-	
+
 	public static function massRemove($data){
-		
+
 	}
-	
+
 	public static function getGlobalMacroId($macro_data){
 
 	}
 
 	public static function getMacros($macros, $options){
-	
+
 	}
 
 	public static function resolveTrigger(&$triggers){
-		
+
 	}
 
 	public static function resolveItem(&$items){
-		
+
 	}
 }
 
