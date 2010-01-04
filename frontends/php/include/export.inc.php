@@ -588,7 +588,7 @@ class zbxXML{
 //sdi('template: '.$template.' | TemplateID: '. $current_templateid);
 						$host_templates[] = $current_template;
 					}
-					
+
 					$r = CTemplate::massAdd(array('hosts' => $current_host, 'templates' => $host_templates));
 					if($r === false){
 						error(CTemplate::resetErrors());
@@ -603,7 +603,7 @@ class zbxXML{
 //sdi('Host: '.$host_db['host'].' | HostID: '. $current_hostid);
 				$host_db['groups'] = $host_groups;
 				$host_db['macros'] = $host_macros;
-			
+
 				if($current_host && isset($rules['host']['exist'])){
 
 					$current_host = array_merge($current_host, $host_db);
@@ -622,7 +622,7 @@ class zbxXML{
 				}
 
 				if(!$current_host && isset($rules['host']['missed'])){
-					
+
 					if($host_db['status'] == HOST_STATUS_TEMPLATE){
 						$current_host = CTemplate::create($host_db);
 					}

@@ -156,7 +156,7 @@ include_once('include/page_header.php');
 	}
 
 	$map_info = getSelementsInfo($selements);
-	
+
 //SDI($links); exit;
 // Draw connectors
 	foreach($links as $lnum => $link){
@@ -330,7 +330,7 @@ include_once('include/page_header.php');
 					);
 //--
 			}
-			
+
 			if(!is_null($hl_color)){
 				$r = $hl_color[0];
 				$g = $hl_color[1];
@@ -343,7 +343,7 @@ include_once('include/page_header.php');
 						$iconX+20,
 						imagecolorallocatealpha($im,$r,$g,$b, 0)
 					);
-					
+
 				imageellipse($im,
 						$selement['x'] + ($iconX / 2),
 						$selement['y'] + ($iconY / 2),
@@ -435,7 +435,7 @@ include_once('include/page_header.php');
 				$y_rec = $y + $iconY + $icon_hl;
 				$x_rec = $x + $iconX/2 - $w/2;
 		}
-		
+
 //		imagerectangle($im, $x_rec-2-1, $y_rec-1, $x_rec+$w+2+1, $y_rec+($oc*4)+$h+1, $black);
 		imagefilledrectangle($im, $x_rec-2, $y_rec-2, $x_rec+$w+2, $y_rec+($oc*4)+$h-2, $white);
 

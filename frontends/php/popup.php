@@ -253,7 +253,7 @@ include_once('include/page_header.php');
 	$frmTitle->addVar('srcfld2', $srcfld2);
 	$frmTitle->addVar('multiselect', $multiselect);
 	$frmTitle->addVar('writeonly', $writeonly);
-	
+
 
 // Optional
 	if(isset($_REQUEST['reference'])){
@@ -279,7 +279,7 @@ include_once('include/page_header.php');
 
 	$params = array();
 	foreach($validation_param as $option) $params[$option] = 1;
-	
+
 	$perm = !is_null($writeonly)?PERM_READ_WRITE:PERM_READ_ONLY;
 	$PAGE_GROUPS = get_viewed_groups($perm, $params, $nodeid);
 	$PAGE_HOSTS = get_viewed_hosts($perm, $PAGE_GROUPS['selected'], $params, $nodeid);
@@ -496,7 +496,7 @@ include_once('include/page_header.php');
 		$templates = CTemplate::get($options);
 
 		foreach($templates as $tnum => $host){
-		
+
 			$chk = new CCheckBox('templates['.$host['hostid'].']',isset($templates[$host['hostid']]),
 					null,$host['host']);
 			$chk->setEnabled(!isset($existed_templates[$host['hostid']]));
@@ -726,7 +726,7 @@ include_once('include/page_header.php');
 		foreach($triggers as $tnum => $row){
 			$exp_desc = expand_trigger_description_by_data($row);
 			$description = new CSpan($exp_desc, 'link');
-			
+
 			$host = reset($row['hosts']);
 			$row['host'] = $host['host'];
 
@@ -818,9 +818,9 @@ include_once('include/page_header.php');
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
 		$table->setHeader(array(
-				($hostid>0)?null:S_HOST, 
-				S_DESCRIPTION, 
-				S_KEY,nbsp(S_UPDATE_INTERVAL), 
+				($hostid>0)?null:S_HOST,
+				S_DESCRIPTION,
+				S_KEY,nbsp(S_UPDATE_INTERVAL),
 				S_STATUS
 			));
 
@@ -837,7 +837,7 @@ include_once('include/page_header.php');
 
 		$items = CItem::get($options);
 
-		foreach($items as $inum => $db_item){		
+		foreach($items as $inum => $db_item){
 			$host = reset($db_item['hosts']);
 			$db_item['host'] = $host['host'];
 
@@ -884,7 +884,7 @@ include_once('include/page_header.php');
 
 		$items = CItem::get($options);
 
-		foreach($items as $tnum => $row){		
+		foreach($items as $tnum => $row){
 			$host = reset($row['hosts']);
 			$row['host'] = $host['host'];
 
@@ -985,7 +985,7 @@ include_once('include/page_header.php');
 			'hostids' => $hostid,
 			'extendoutput' => 1,
 			'nodeids' => $nodeid,
-			'select_hosts' => 1			
+			'select_hosts' => 1
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 
@@ -1062,13 +1062,13 @@ include_once('include/page_header.php');
 
 		$items = CItem::get($options);
 
-		foreach($items as $tnum => $row){		
+		foreach($items as $tnum => $row){
 			$host = reset($row['hosts']);
 			$row['host'] = $host['host'];
 
 			$row['description'] = item_description($row);
 			$description = new CLink($row['description'],'#');
-			
+
 			$row['description'] = $row['host'].':'.$row['description'];
 
 			if(isset($_REQUEST['reference'])){
@@ -1109,7 +1109,7 @@ include_once('include/page_header.php');
 			'extendoutput' => 1
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
-	
+
 		$maps = CMap::get($options);
 		order_result($maps, 'name');
 
@@ -1162,7 +1162,7 @@ include_once('include/page_header.php');
 
 		$items = CItem::get($options);
 
-		foreach($items as $tnum => $row){		
+		foreach($items as $tnum => $row){
 			$host = reset($row['hosts']);
 			$row['host'] = $host['host'];
 
