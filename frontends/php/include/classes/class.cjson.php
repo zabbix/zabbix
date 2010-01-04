@@ -59,7 +59,7 @@ class CJSON{
 	 */
 	protected $_config = array(
 		'bypass_ext' => true,
-		'bypass_mb'  => true,
+		'bypass_mb'  => false,
 		'noerror'	=> false
 	);
 
@@ -128,6 +128,7 @@ class CJSON{
 	 *
 	 */
 	public function encode($valueToEncode, $deQuote = array()){
+		mb_internal_encoding('ASCII');
 		if(!$this->_config['bypass_ext'] && function_exists('json_encode')){
 
 			if($this->_config['noerror']){
@@ -151,8 +152,9 @@ class CJSON{
 			$encoded = $this->_deQuote($encoded, $deQuote);
 		}
 
-		return $encoded;
+		mb_internal_encoding('UTF-8');
 
+	return $encoded;
 	}
 
 	/**
@@ -226,6 +228,8 @@ class CJSON{
 	 *
 	 */
 	public function decode($encodedValue, $asArray = false){
+		mb_internal_encoding('ASCII');
+		
 		$first_char = substr(ltrim($encodedValue), 0, 1);
 		if($first_char != '{' && $first_char != '['){
 			return null;
@@ -235,10 +239,13 @@ class CJSON{
 			return json_decode($encodedValue, (bool) $asArray);
 		}
 
-		// Fall back to PHP-only method
+// Fall back to PHP-only method
 		$this->_level = 0;
 		if($this->isValid($encodedValue)){
-			return $this->_json_decode($encodedValue, (bool) $asArray);
+			$result = $this->_json_decode($encodedValue, (bool) $asArray);
+			mb_internal_encoding('UTF-8');
+			
+			return $result;
 		}
 		else {
 			return null;
@@ -1058,21 +1065,23 @@ class CJSON{
 	 *
 	 */
 	public function isValid($str){
-		// string length
+// string length
 		$len = strlen($str);
-		// the next character
-		//$b = 0;
-		// the next character class
-		//$c = 0;
-		// the next state
-		//$s = 0;
+
+// the next character
+//$b = 0;
+// the next character class
+//$c = 0;
+// the next state
+//$s = 0;
 
 		$_the_state = 0;
 		$this->_the_top = -1;
 		$this->_push(self::MODE_DONE);
 
-		for ($_the_index = 0; $_the_index < $len; $_the_index++){
+		for($_the_index = 0; $_the_index < $len; $_the_index++){
 			$b = $str{$_the_index};
+
 			if(chr(ord($b) & 127) == $b){
 				$c = $this->_ascii_class[ord($b)];
 				if($c <= self::S_ERR){
@@ -1083,15 +1092,14 @@ class CJSON{
 				$c = self::S_ETC;
 			}
 
-			// Get the next state from the transition table
+// Get the next state from the transition table
 			$s = $this->_state_transition_table[$_the_state][$c];
 
 			if($s < 0){
-				// Perform one of the predefined actions
+// Perform one of the predefined actions
 
 				switch($s){
-
-					// empty }
+// empty }
 					case -9:
 						if(!$this->_pop(self::MODE_KEY)){
 							return false;
