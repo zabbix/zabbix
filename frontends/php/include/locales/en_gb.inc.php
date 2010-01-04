@@ -620,7 +620,7 @@
 	'S_AS_BLUE'=>				'as Blue',
 
 // maintenance.php
-	'S_MAINTENANCE'=>			'Maintenance',
+	'S_MAINTENANCE'=>				'Maintenance',
 	'S_MAINTENANCE_ADDED'=>			'Maintenance added',
 	'S_MAINTENANCE_UPDATED'=>		'Maintenance updated',
 	'S_MAINTENANCE_DELETED'=>		'Maintenance deleted',
@@ -1060,6 +1060,7 @@
 	'S_DISPLAYED_ELEMENTS'=>		'Displayed elements',
 	'S_CONNECTORS'=>			'Connectors',
 	'S_UNAVAILABLE_BIG' =>			'UNAVAILABLE',
+	'S_MAINTENANCE_BIG' =>		'MAINTENANCE',
 
 //	sysmaps.php
 	'S_EDIT_MAP_ELEMENT'=>			'Edit map element',
