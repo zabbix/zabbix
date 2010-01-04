@@ -501,7 +501,7 @@ class zbxXML{
 // IMPORT RULES
 				$host_db = self::mapXML2arr($host, XML_TAG_HOST);
 
-				if($host_db['proxy_hostid']){
+				if(isset($host_db['proxy_hostid'])){
 					$proxy_exists = CHost::get(array('hostids' => $host_db['proxy_hostid']));
 					if(empty($proxy_exists))
 						$host_db['proxy_hostid'] = 0;						
