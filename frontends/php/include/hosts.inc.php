@@ -518,7 +518,7 @@ require_once('include/httptest.inc.php');
 		while($db_child = DBfetch($db_childs)){
 			unlink_template($db_child['hostid'], $hostids, $unlink_mode);
 		}
-		
+
 // delete web tests
 		$del_httptests = array();
 		$db_httptests = get_httptests_by_hostid($hostids);

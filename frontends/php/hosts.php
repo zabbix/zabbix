@@ -218,7 +218,7 @@ include_once('include/page_header.php');
 						$new_values[$property] = $_REQUEST[$property];
 				}
 			}
-			
+
 
 			$groups = array();
 			if(isset($visible['newgroup']) && !empty($_REQUEST['newgroup'])){
@@ -227,7 +227,7 @@ include_once('include/page_header.php');
 			}
 			if(isset($visible['groups'])){
 				$hosts['groups'] = array_merge(zbx_toObject($_REQUEST['groups'], 'groupid'), $groups);
-			}	
+			}
 			if(isset($visible['template_table'])){
 				$tplids = array_keys($_REQUEST['templates']);
 				$hosts['templates'] = zbx_toObject($tplids, 'templateid');
@@ -235,10 +235,10 @@ include_once('include/page_header.php');
 			$result = CHost::massUpdate(array_merge($hosts, $new_values));
 			if($result === false) throw new Exception();
 
-			
+
 			if($result && isset($visible['useprofile'])){
 				$host_profile = DBfetch(DBselect('SELECT * FROM hosts_profiles WHERE hostid='.$hostid));
-				$host_profile_fields = array('devicetype', 'name', 'os', 'serialno', 'tag','macaddress', 'hardware', 'software', 
+				$host_profile_fields = array('devicetype', 'name', 'os', 'serialno', 'tag','macaddress', 'hardware', 'software',
 					'contact', 'location', 'notes');
 
 				delete_host_profile($hostid);
@@ -288,12 +288,12 @@ include_once('include/page_header.php');
 					if($result === false) throw new Exception();
 				}
 			}
-			
+
 
 			DBend(true);
-			
+
 			show_messages(true, S_HOSTS.SPACE.S_UPDATED, S_CANNOT_UPDATE.SPACE.S_HOSTS);
-			
+
 			unset($_REQUEST['massupdate']);
 			unset($_REQUEST['form']);
 			unset($_REQUEST['hosts']);
@@ -343,7 +343,7 @@ include_once('include/page_header.php');
 			$msg_ok = S_HOST_ADDED;
 			$msg_fail = S_CANNOT_ADD_HOST;
 		}
-		
+
 		$groups = zbx_toObject($groups, 'groupid');
 		if(!empty($_REQUEST['newgroup'])){
 			if($newgroup = CHostGroup::create(array('name' => $_REQUEST['newgroup']))){

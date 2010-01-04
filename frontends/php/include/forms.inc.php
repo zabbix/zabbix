@@ -5796,7 +5796,7 @@
 		$host_tbl->addRow(array(S_CONNECT_TO,$cmbConnectBy));
 
 		$host_tbl->addRow(array(S_AGENT_PORT,new CNumericBox('port',$port,5)));
-		
+
 //Proxy
 		$cmbProxy = new CComboBox('proxy_hostid', $proxy_hostid);
 
@@ -5804,11 +5804,11 @@
 		$options = array('proxy_hosts' => 1, 'extendoutput' => 1);
 		$db_proxies = CHost::get($options);
 		order_result($db_proxies, 'host');
-		
+
 		foreach($db_proxies as $proxy){
 			$cmbProxy->addItem($proxy['hostid'], $proxy['host']);
 		}
-		
+
 		$host_tbl->addRow(array(S_MONITORED_BY_PROXY, $cmbProxy));
 //----------
 
@@ -6753,7 +6753,7 @@
 			$macros = array();
 		}
 		order_result($macros, 'macro');
-		
+
 		$macros_tbl = new CTable('', 'tablestripped');
 		$macros_tbl->setOddRowClass('form_odd_row');
 		$macros_tbl->setEvenRowClass('form_even_row');
