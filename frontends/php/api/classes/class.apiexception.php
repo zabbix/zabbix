@@ -22,14 +22,14 @@
 
 class APIException extends Exception{
 	private $errors = array();
-	
+
 	public function __construct($code, $errors = array(), $message = '') {
         parent::__construct($message, $code);
-		
+
 		$errors = zbx_toArray($errors);
-		$this->errors = $errors;		
+		$this->errors = $errors;
     }
-	
+
 	public function getErrors(){
 		return $this->errors;
 	}

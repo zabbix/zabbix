@@ -1076,7 +1076,7 @@
 						}
 					}
 //-------------
-					
+
 					if(($editmode == 0) && !empty($resourceid)) $action = 'history.php?action=showgraph&itemid='.$resourceid.url_param('period').url_param('stime');
 
 					$timeline = array();

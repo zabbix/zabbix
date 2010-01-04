@@ -357,9 +357,9 @@ class CEvent extends CZBXAPI{
 		if($options['select_hosts']){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'extendoutput' => 1, 
-				'triggerids' => $triggerids, 
-				'nopermissions' => 1, 
+				'extendoutput' => 1,
+				'triggerids' => $triggerids,
+				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
 			$hosts = CHost::get($obj_params);
