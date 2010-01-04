@@ -250,16 +250,16 @@ class CTrigger extends CZBXAPI{
 		if(!is_null($options['only_problems'])){
 			$sql_parts['where']['ot'] = 't.value='.TRIGGER_VALUE_TRUE;
 		}
-		
+
 // templated
-		if(!is_null($options['templated'])){			
+		if(!is_null($options['templated'])){
 			$sql_parts['from']['f'] = 'functions f';
 			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['from']['h'] = 'hosts h';
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
-			
+
 			if($options['templated']){
 				$sql_parts['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
 			}
@@ -267,7 +267,7 @@ class CTrigger extends CZBXAPI{
 				$sql_parts['where'][] = 'h.status<>'.HOST_STATUS_TEMPLATE;
 			}
 		}
-		
+
 // inherited
 		if(!is_null($options['inherited'])){
 			if($options['inherited']){
@@ -483,7 +483,14 @@ class CTrigger extends CZBXAPI{
 
 // Adding hosts
 		if($options['select_hosts']){
-			$obj_params = array('templated_hosts' => 1, 'extendoutput' => 1, 'triggerids' => $triggerids, 'nopermissions' => 1, 'preservekeys' => 1);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'templated_hosts' => 1,
+				'extendoutput' => 1,
+				'triggerids' => $triggerids,
+				'nopermissions' => 1,
+				'preservekeys' => 1
+			);
 			$hosts = CHost::get($obj_params);
 			foreach($hosts as $hostid => $host){
 				foreach($host['triggers'] as $num => $trigger){
@@ -494,7 +501,13 @@ class CTrigger extends CZBXAPI{
 
 // Adding Items
 		if($options['select_items']){
-			$obj_params = array('extendoutput' => 1, 'triggerids' => $triggerids, 'nopermissions' => 1, 'preservekeys' => 1);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1,
+				'triggerids' => $triggerids,
+				'nopermissions' => 1,
+				'preservekeys' => 1
+			);
 			$items = CItem::get($obj_params);
 			foreach($items as $itemid => $item){
 				foreach($item['triggers'] as $num => $trigger){

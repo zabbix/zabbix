@@ -2142,7 +2142,7 @@ updateForm_selement: function(e, selementid){
 		var advanced_icons = false;
 
 // Icon PROBLEM
-		advanced_icons = (advanced_icons || selement.iconid_on)?true:false;
+		advanced_icons = (advanced_icons || (selement.iconid_on != 0))?true:false;
 		for(var i=0; i<this.selementForm.iconid_on.options.length; i++){
 			if(!isset(i, this.selementForm.iconid_on.options)) continue;
 			
@@ -2152,7 +2152,7 @@ updateForm_selement: function(e, selementid){
 		}
 	
 // Icon UNKNOWN
-		advanced_icons = (advanced_icons || selement.iconid_unknown)?true:false;
+		advanced_icons = (advanced_icons || (selement.iconid_unknown != 0))?true:false;
 		for(var i=0; i<this.selementForm.iconid_unknown.options.length; i++){
 			if(!isset(i, this.selementForm.iconid_unknown.options)) continue;
 			
@@ -2162,7 +2162,7 @@ updateForm_selement: function(e, selementid){
 		}
 
 // Icon MAINTENANCE
-		advanced_icons =(advanced_icons || selement.iconid_maintenance)?true:false;
+		advanced_icons =(advanced_icons || (selement.iconid_maintenance != 0))?true:false;
 		for(var i=0; i<this.selementForm.iconid_maintenance.options.length; i++){
 			if(!isset(i, this.selementForm.iconid_maintenance.options)) continue;
 			
@@ -2173,7 +2173,7 @@ updateForm_selement: function(e, selementid){
 	
 // Icon DISABLED
 		
-		advanced_icons = (advanced_icons || selement.iconid_disabled)?true:false;
+		advanced_icons = (advanced_icons || (selement.iconid_disabled != 0))?true:false;
 		for(var i=0; i<this.selementForm.iconid_disabled.options.length; i++){
 			if(!isset(i, this.selementForm.iconid_disabled.options)) continue;
 			
@@ -2385,7 +2385,7 @@ updateForm_selementByType: function(e, multi){
 	}
 	
 	if(!empty(srctbl)){
-		var popup_url = 'popup.php?dstfrm=selementForm&dstfld1=elementid&dstfld2=elementName';
+		var popup_url = 'popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementName';
 		popup_url+= '&srctbl='+srctbl;
 		popup_url+= '&srcfld1='+srcfld1;
 		popup_url+= '&srcfld2='+srcfld2;
@@ -2492,9 +2492,9 @@ saveForm_selement: function(e){
 			if(!isset(this.selection.selements[i], this.selements)) continue;
 
 			var selementid = this.selection.selements[i];
-			this.update_selement_option(selementid, params, false);
+			this.update_selement_option(selementid, params);
 		}
-		this.update_selement_option(selementid, params, true);
+		this.update_selement_option(selementid, params);
 	}
 
 	this.update_mapimg();
@@ -3004,7 +3004,7 @@ this.linkForm.linkIndicatorsBody = e_tbody_7;
 	e_input_6.className = "button";
 	this.linkForm.linkIndicatorsTable.appendChild(e_input_6);
 	
-	addListener(e_input_6, 'click', function(){ remove_childs('linkForm','linktriggers','tr'); });
+	addListener(e_input_6, 'click', function(){ remove_childs('linkForm','link_triggerids','tr'); });
 //----
 
 	
@@ -3194,6 +3194,8 @@ saveForm_link: function(e){
 
 	this.update_linkContainer(e);
 	this.hideForm_link(e);
+
+	this.update_mapimg();
 },
 
 deleteForm_link: function(e){

@@ -43,6 +43,7 @@ create/data/images/Workstation_small.png -text svneol=unset#unset
 create/data/recreate.sh -text
 docs/README -text
 frontends/php/api/.htaccess -text
+frontends/php/api/classes/class.apiexception.php -text
 frontends/php/api/classes/class.caction.php -text
 frontends/php/api/classes/class.calert.php -text
 frontends/php/api/classes/class.capiinfo.php -text
@@ -234,6 +235,7 @@ frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/imgstore.php -text
 frontends/php/import.php -text
+frontends/php/include/apicalls.inc.php -text
 frontends/php/include/blocks.inc.php -text
 frontends/php/include/classes/class.carea.php -text
 frontends/php/include/classes/class.careamap.php -text
@@ -367,6 +369,7 @@ m4/libiodbc.m4 -text
 m4/libssh2.m4 -text
 m4/libunixodbc.m4 -text
 m4/openipmi.m4 -text
+m4/resolv.m4 -text
 man/Makefile.am -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text

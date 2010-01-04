@@ -124,7 +124,7 @@ include_once('include/page_header.php');
 
 	$config = select_config();
 
-	$options = array('allow_all_hosts','with_monitored_triggers');
+	$options = array('allow_all_hosts','monitored_hosts','with_monitored_triggers');
 	$params = array();
 	foreach($options as  $option) $params[$option] = 1;
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
