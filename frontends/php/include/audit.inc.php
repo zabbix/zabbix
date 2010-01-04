@@ -68,10 +68,12 @@
 		if(strlen($details) > 128)
 			$details = substr($details, 0, 125).'...';
 
+		$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];
+		
 		if(($result = DBexecute('INSERT INTO auditlog (auditid,userid,clock,action,resourcetype,details,ip) '.
 			' VALUES ('.$auditid.','.$USER_DETAILS['userid'].','.time().','.
 						$action.','.$resourcetype.','.zbx_dbstr($details).','.
-						zbx_dbstr($USER_DETAILS['userid']).')')))
+						zbx_dbstr($ip).')')))
 		{
 			$result = $auditid;
 		}
