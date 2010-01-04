@@ -480,7 +480,7 @@ class CGraph extends CZBXAPI{
 		self::BeginTransaction(__METHOD__);
 		foreach($graphs as $gnum => $graph){
 
-			if(!is_array($graph['gitems']) || empty($graph['gitems'])){
+			if(!isset($graph['gitems']) || !is_array($graph['gitems']) || empty($graph['gitems'])){
 				$result = false;
 				$error = 'Missing items for graph "'.$graph['name'].'"';
 				break;
