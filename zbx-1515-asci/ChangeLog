@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1515] fixed json encode/decode with mb overload enabled (Aly)
  - [ZBX-1456] fixed map update on linkage properties change (Aly)
  - [ZBX-1625] when mass update hosts, defaul "connect to" option is set to IP (Vedmak)
  - [ZBX-1479] fixed host mass update (Vedmak)
