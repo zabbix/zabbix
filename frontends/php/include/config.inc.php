@@ -57,6 +57,7 @@ function __autoload($class_name){
 		'cscreen' => 1,
 		'cmap' => 1,
 		'cgraphitem' => 1,
+		'cproxy' => 1,
 		'apiexception' => 1,
 	);
 
