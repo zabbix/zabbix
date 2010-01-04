@@ -5801,12 +5801,12 @@
 		$cmbProxy = new CComboBox('proxy_hostid', $proxy_hostid);
 
 		$cmbProxy->addItem(0, S_NO_PROXY);
-		$options = array('proxy_hosts' => 1, 'extendoutput' => 1);
-		$db_proxies = CHost::get($options);
+		$options = array('extendoutput' => 1);
+		$db_proxies = CProxy::get($options);
 		order_result($db_proxies, 'host');
 
 		foreach($db_proxies as $proxy){
-			$cmbProxy->addItem($proxy['hostid'], $proxy['host']);
+			$cmbProxy->addItem($proxy['proxyid'], $proxy['host']);
 		}
 
 		$host_tbl->addRow(array(S_MONITORED_BY_PROXY, $cmbProxy));
