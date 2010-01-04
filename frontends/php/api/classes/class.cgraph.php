@@ -200,7 +200,7 @@ class CGraph extends CZBXAPI{
 			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
 			$sql_parts['where']['ggi'] = 'g.graphid=gi.graphid';
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
-			
+
 			if($options['templated']){
 				$sql_parts['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
 			}
@@ -208,7 +208,7 @@ class CGraph extends CZBXAPI{
 				$sql_parts['where'][] = 'h.status<>'.HOST_STATUS_TEMPLATE;
 			}
 		}
-		
+
 // inherited
 		if(!is_null($options['inherited'])){
 			if($options['inherited']){
@@ -334,9 +334,9 @@ class CGraph extends CZBXAPI{
 		if($options['select_graph_items']){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'extendoutput' => 1, 
-				'graphids' => $graphids, 
-				'nopermissions' => 1, 
+				'extendoutput' => 1,
+				'graphids' => $graphids,
+				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
 			$gitems = CGraphItem::get($obj_params);
@@ -351,9 +351,9 @@ class CGraph extends CZBXAPI{
 		if($options['select_hosts']){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'extendoutput' => 1, 
-				'graphids' => $graphids, 
-				'nopermissions' => 1, 
+				'extendoutput' => 1,
+				'graphids' => $graphids,
+				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
 			$hosts = CHost::get($obj_params);
@@ -368,9 +368,9 @@ class CGraph extends CZBXAPI{
 		if($options['select_templates']){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'extendoutput' => 1, 
-				'graphids' => $graphids, 
-				'nopermissions' => 1, 
+				'extendoutput' => 1,
+				'graphids' => $graphids,
+				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
 			$templates = CTemplate::get($obj_params);

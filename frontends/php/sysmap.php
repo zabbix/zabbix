@@ -96,16 +96,16 @@ include_once('include/page_header.php');
 					$action = '';
 
 					$options = array(
-						'sysmapids'=> $sysmapid, 
-						'editable'=>1, 
-						'extendoutput'=>1, 
-						'select_selements'=>1, 
+						'sysmapids'=> $sysmapid,
+						'editable'=>1,
+						'extendoutput'=>1,
+						'select_selements'=>1,
 						'select_links'=>1
 					);
 
 					$sysmaps = CMap::get($options);
 					$db_map = reset($sysmaps);
-					
+
 					$map_info = getSelementsInfo($db_map['selements']);
 //SDII($db_map);
 					add_elementNames($db_map['selements']);

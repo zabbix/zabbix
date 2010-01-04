@@ -552,7 +552,7 @@
 
 		$sysmaps = CMap::get($options);
 		$sysmap = reset($sysmaps);
-		
+
 	return getActionMapBySysmap($sysmap);
 	}
 
@@ -1205,18 +1205,18 @@
 
 // name
 			$info['name'] = expand_trigger_description_by_data($trigger);
-			
+
 			$info['triggers'] = array();
 			$info['type'] = $trigger['value'];
 			if($info['type'] == TRIGGER_VALUE_TRUE){
 				array_push($info['triggers'], $trigger['triggerid']);
 			}
-			
+
 			if($trigger['status'] != TRIGGER_STATUS_ENABLED){
 				$info['type'] = TRIGGER_VALUE_UNKNOWN;
 				$info['disabled'] = 1;
 			}
-			
+
 			$info[$info['type']] = array('count' => 1);
 			$info[$info['type']]['priority'] = $trigger['priority'];
 			$info[$info['type']]['info'] = $info['name'];
@@ -1226,7 +1226,7 @@
 				$color = ($info[$info['type']]['priority'] > 3) ? $colors['Red'] : $colors['Dark Red'];
 
 				$info['info'] = array();
-				$info['info'][] = array('msg'=>S_PROBLEM_BIG, 'color'=>$color);					
+				$info['info'][] = array('msg'=>S_PROBLEM_BIG, 'color'=>$color);
 
 				$info['iconid'] = $selement['iconid_on'];
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
@@ -1234,23 +1234,23 @@
 			else if($info['type'] == TRIGGER_VALUE_UNKNOWN){
 				$info['info'] = array();
 				$info['info'][] = array(
-									'msg'=>S_UNKNOWN_BIG, 
+									'msg'=>S_UNKNOWN_BIG,
 									'color'=>$colors['Gray']
 								);
-	
-				$info['iconid'] = $selement['iconid_unknown'];	
+
+				$info['iconid'] = $selement['iconid_unknown'];
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_UNKNOWN;
 			}
 			else if($info['type'] == TRIGGER_VALUE_FALSE){
 				$info['info'] = array();
 				$info['info'][] = array(
-									'msg'=>S_OK_BIG, 
+									'msg'=>S_OK_BIG,
 									'color'=>$colors['Dark Green']
 								);
 				$info['iconid'] = $selement['iconid_off'];
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 			}
-	
+
 			$info['priority'] = isset($info[$info['type']]['priority']) ? $info[$info['type']]['priority'] : 0;
 //---
 		}
@@ -1287,12 +1287,12 @@
 			$host = $hosts[$selement['elementid']];
 
 			$info['name'] = $host['host'];
-			
+
 			if($host['maintenance_status'] == MAINTENANCE_TYPE_NODATA){
 				$info['maintenance_status'] = true;
 				$info['maintenanceid'] = $host['maintenanceid'];
 			}
-			
+
 			if($host['status'] != HOST_STATUS_MONITORED){
 				$info['type'] = TRIGGER_VALUE_UNKNOWN;
 				$info['disabled'] = 1;
@@ -1356,35 +1356,35 @@
 				$info[TRIGGER_VALUE_FALSE]['priority']	= 0;
 				$info[TRIGGER_VALUE_FALSE]['info']		= S_OK_BIG;
 			}
-			
+
 //----
 // Host unavalable
 
 			if(isset($info['disabled']) && $info['disabled'] == 1){
 // Disabled
-				$info['info'] = array();					
+				$info['info'] = array();
 				$info['info'][] = array('msg'=>S_DISABLED_BIG, 'color'=>$colors['Dark Red']);
 
 				$info['iconid'] = $selement['iconid_disabled'];
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_DISABLED;
 			}
-			else if(($info['available'] == HOST_AVAILABLE_UNKNOWN) && 
+			else if(($info['available'] == HOST_AVAILABLE_UNKNOWN) &&
 				($info['snmp_available'] == HOST_AVAILABLE_UNKNOWN) &&
 				($info['ipmi_available'] == HOST_AVAILABLE_UNKNOWN))
 			{
 // UNKNOWN
-				$info['info'] = array();					
+				$info['info'] = array();
 				$info['info'][] = array('msg'=>S_UNKNOWN_BIG, 'color'=>$colors['Gray']);
 
-				$info['iconid'] = $selement['iconid_unknown'];	
+				$info['iconid'] = $selement['iconid_unknown'];
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_UNKNOWN;
 				$info['unavailable'] = HOST_AVAILABLE_UNKNOWN;
 			}
-			else if(($info['available'] != HOST_AVAILABLE_TRUE) && 
+			else if(($info['available'] != HOST_AVAILABLE_TRUE) &&
 				($info['snmp_available'] != HOST_AVAILABLE_TRUE) &&
 				($info['ipmi_available'] != HOST_AVAILABLE_TRUE))
 			{
-// UNAVAILABLE					
+// UNAVAILABLE
 				$info['type'] = TRIGGER_VALUE_UNKNOWN;
 
 				$info['info'] = array();
@@ -1394,7 +1394,7 @@
 					$info['info'][] = array('msg'=>'SNMP '.S_UNAVAILABLE_BIG, 'color'=>$colors['Red']);
 				if(($info['ipmi_available'] == HOST_AVAILABLE_FALSE))
 					$info['info'][] = array('msg'=>'IPMI '.S_UNAVAILABLE_BIG, 'color'=>$colors['Red']);
-			
+
 				$info['iconid'] = $selement['iconid_on'];
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
 				$info['unavailable'] = HOST_AVAILABLE_FALSE;
@@ -1403,20 +1403,20 @@
 // AVAILABLE
 				if($info['type'] == TRIGGER_VALUE_TRUE){
 					$color = ($info[$info['type']]['priority'] > 3) ? $colors['Red'] : $colors['Dark Red'];
-		
+
 					$msg = S_PROBLEM_BIG;
 					if($info[$info['type']]['count'] > 1)
 						$msg = $info[$info['type']]['count'].' '.S_PROBLEMS;
 					else if(isset($info[$info['type']]['info']))
 						$msg = $info[$info['type']]['info'];
 
-					
-					$info['info'] = array();						
+
+					$info['info'] = array();
 					$info['info'][] = array('msg'=>$msg, 'color'=>$color);
-	
+
 					if(isset($info[TRIGGER_VALUE_UNKNOWN])){
 						$info['info'][] = array(
-											'msg'=>$info[TRIGGER_VALUE_UNKNOWN]['count'].' '.S_UNKNOWN, 
+											'msg'=>$info[TRIGGER_VALUE_UNKNOWN]['count'].' '.S_UNKNOWN,
 											'color'=>$colors['Gray']
 										);
 					}
@@ -1427,17 +1427,17 @@
 				else if($info['type'] == TRIGGER_VALUE_UNKNOWN){
 					$info['info'] = array();
 					$info['info'][] = array(
-										'msg'=>$info[TRIGGER_VALUE_UNKNOWN]['count'].' '.S_UNKNOWN, 
+										'msg'=>$info[TRIGGER_VALUE_UNKNOWN]['count'].' '.S_UNKNOWN,
 										'color'=>$colors['Gray']
 									);
-		
-					$info['iconid'] = $selement['iconid_unknown'];		
+
+					$info['iconid'] = $selement['iconid_unknown'];
 					$info['icon_type'] = SYSMAP_ELEMENT_ICON_UNKNOWN;
 				}
 				else if($info['type'] == TRIGGER_VALUE_FALSE){
 					$info['info'] = array();
 					$info['info'][] = array(
-										'msg'=>S_OK_BIG, 
+										'msg'=>S_OK_BIG,
 										'color'=>$colors['Dark Green']
 									);
 					$info['iconid'] = $selement['iconid_off'];
@@ -1457,7 +1457,7 @@
 
 				if(!isset($info['info'])) $info['info'] = array();
 				$info['info'][] = array(
-									'msg'=>$msg, 
+									'msg'=>$msg,
 									'color'=>$colors['Orange']
 								);
 
@@ -1501,18 +1501,18 @@
 			$group = $hostgroups[$selement['elementid']];
 
 			$info['name'] = $group['name'];
-	
+
 			foreach($group['hosts'] as $hnum => $host){
 				if($host['maintenance_status'] == MAINTENANCE_TYPE_NODATA){
 					$info['maintenance_status'] = true;
 					$info['maintenanceid'] = $host['maintenanceid'];
 				}
-				
+
 				if($host['status'] != HOST_STATUS_MONITORED){
 					$info['type'] = TRIGGER_VALUE_UNKNOWN;
 					$info['disabled'] = 1;
 				}
-				
+
 				if($host['available'] != HOST_AVAILABLE_TRUE){
 					$info['available'] = $host['available'];
 				}
@@ -1520,7 +1520,7 @@
 				if($host['snmp_available'] != HOST_AVAILABLE_TRUE){
 					$info['snmp_available'] = $host['snmp_available'];
 				}
-				
+
 				if($host['ipmi_available'] != HOST_AVAILABLE_TRUE){
 					$info['ipmi_available'] = $host['ipmi_available'];
 				}
@@ -1550,7 +1550,7 @@
 						$info['type'] = $trigger['value'];
 					}
 				}
-				
+
 				if($trigger['value'] == TRIGGER_VALUE_TRUE){
 					array_push($info['triggers'], $trigger['triggerid']);
 				}
@@ -1577,24 +1577,24 @@
 				$info[TRIGGER_VALUE_FALSE]['priority']	= 0;
 				$info[TRIGGER_VALUE_FALSE]['info']		= S_OK_BIG;
 			}
-	
-//----			
+
+//----
 			if($info['type'] == TRIGGER_VALUE_TRUE){
 				$color = ($info[$info['type']]['priority'] > 3) ? $colors['Red'] : $colors['Dark Red'];
-	
+
 				$msg = S_PROBLEM_BIG;
 				if($info[$info['type']]['count'] > 1)
 					$msg = $info[$info['type']]['count'].' '.S_PROBLEMS;
 				else if(isset($info[$info['type']]['info']))
 					$msg = $info[$info['type']]['info'];
 
-				
-				$info['info'] = array();						
+
+				$info['info'] = array();
 				$info['info'][] = array('msg'=>$msg, 'color'=>$color);
 
 				if(isset($info[TRIGGER_VALUE_UNKNOWN])){
 					$info['info'][] = array(
-										'msg'=>$info[TRIGGER_VALUE_UNKNOWN]['count'].' '.S_UNKNOWN, 
+										'msg'=>$info[TRIGGER_VALUE_UNKNOWN]['count'].' '.S_UNKNOWN,
 										'color'=>$colors['Gray']
 									);
 				}
@@ -1605,35 +1605,35 @@
 			else if($info['type'] == TRIGGER_VALUE_UNKNOWN){
 				$info['info'] = array();
 				$info['info'][] = array(
-									'msg'=>$info[TRIGGER_VALUE_UNKNOWN]['count'].' '.S_UNKNOWN, 
+									'msg'=>$info[TRIGGER_VALUE_UNKNOWN]['count'].' '.S_UNKNOWN,
 									'color'=>$colors['Gray']
 								);
-	
+
 				if(isset($info['disabled']) && $info['disabled'] == 1)
 					$info['iconid'] = $selement['iconid_disabled'];
 				else
 					$info['iconid'] = $selement['iconid_unknown'];
-	
+
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_UNKNOWN;
 			}
 			else if($info['type'] == TRIGGER_VALUE_FALSE){
 				$info['info'] = array();
 				$info['info'][] = array(
-									'msg'=>S_OK_BIG, 
+									'msg'=>S_OK_BIG,
 									'color'=>$colors['Dark Green']
 								);
 				$info['iconid'] = $selement['iconid_off'];
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 			}
-	
+
 // Host in maintenance
 			if(isset($info['maintenance_status'])){
 				$info['info'] = array();
 				$info['info'][] = array(
-									'msg'=>S_IN_MAINTENANCE, 
+									'msg'=>S_IN_MAINTENANCE,
 									'color'=>$colors['Orange']
 								);
-								
+
 				$info['type'] = TRIGGER_VALUE_UNKNOWN;
 				$info['maintenance'] = 1;
 				if($maintenance['maintenanceid'] > 0){
@@ -1680,10 +1680,10 @@
 
 			$info['name'] = $map['name'];
 
-// recursion	
+// recursion
 			$info['triggers'] = array();
 			$infos = getSelementsInfo($map['selements']);
-			
+
 			foreach($infos as $inum => $inf){
 				$info['type'] = $inf['type'];
 
@@ -1718,23 +1718,23 @@
 
 			if(!isset($info['type'])) $info['type'] = TRIGGER_VALUE_FALSE;
 
-//----			
+//----
 			if($info['type'] == TRIGGER_VALUE_TRUE){
 				$color = ($info[$info['type']]['priority'] > 3) ? $colors['Red'] : $colors['Dark Red'];
-	
+
 				$msg = S_PROBLEM_BIG;
 				if($info[$info['type']]['count'] > 1)
 					$msg = $info[$info['type']]['count'].' '.S_PROBLEMS;
 				else if(isset($info[$info['type']]['info']))
 					$msg = $info[$info['type']]['info'];
 
-				
-				$info['info'] = array();						
+
+				$info['info'] = array();
 				$info['info'][] = array('msg'=>$msg, 'color'=>$color);
 
 				if(isset($info[TRIGGER_VALUE_UNKNOWN])){
 					$info['info'][] = array(
-										'msg'=>$info[TRIGGER_VALUE_UNKNOWN]['count'].' '.S_UNKNOWN, 
+										'msg'=>$info[TRIGGER_VALUE_UNKNOWN]['count'].' '.S_UNKNOWN,
 										'color'=>$colors['Gray']
 									);
 				}
@@ -1745,36 +1745,36 @@
 			else if($info['type'] == TRIGGER_VALUE_UNKNOWN){
 				$info['info'] = array();
 				$info['info'][] = array(
-									'msg'=>$info[TRIGGER_VALUE_UNKNOWN]['count'].' '.S_UNKNOWN, 
+									'msg'=>$info[TRIGGER_VALUE_UNKNOWN]['count'].' '.S_UNKNOWN,
 									'color'=>$colors['Gray']
 								);
-	
+
 				if(isset($info['disabled']) && $info['disabled'] == 1)
 					$info['iconid'] = $selement['iconid_disabled'];
 				else
 					$info['iconid'] = $selement['iconid_unknown'];
-	
+
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_UNKNOWN;
 			}
 			else if($info['type'] == TRIGGER_VALUE_FALSE){
 				$info['info'] = array();
 				$info['info'][] = array(
-									'msg'=>S_OK_BIG, 
+									'msg'=>S_OK_BIG,
 									'color'=>$colors['Dark Green']
 								);
 				$info['iconid'] = $selement['iconid_off'];
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 			}
 
-	
+
 // Host in maintenance
 			if(isset($info['maintenance_status'])){
 				$info['info'] = array();
 				$info['info'][] = array(
-									'msg'=>S_IN_MAINTENANCE, 
+									'msg'=>S_IN_MAINTENANCE,
 									'color'=>$colors['Orange']
 								);
-								
+
 				$info['type'] = TRIGGER_VALUE_UNKNOWN;
 				$info['maintenance'] = 1;
 				if($maintenance['maintenanceid'] > 0){
@@ -1811,7 +1811,7 @@
 
 			$info['type'] = TRIGGER_VALUE_TRUE;
 			$info['info'] = array();
-			
+
 			$info['count'] = 0;
 			$info['priority'] = 0;
 
