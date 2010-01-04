@@ -23,6 +23,7 @@
 	require_once('include/hosts.inc.php');
 	require_once('include/triggers.inc.php');
 	require_once('include/scripts.inc.php');
+	require_once('include/maintenances.inc.php');
 
 /*
  * Function: map_link_drawtypes
@@ -1449,10 +1450,10 @@
 			if(isset($info['maintenance_status'])){
 				$info['type'] = TRIGGER_VALUE_UNKNOWN;
 
-				$msg = S_IN_MAINTENANCE;
-				if($maintenance['maintenanceid'] > 0){
-					$mnt = get_maintenance_by_maintenanceid($maintenance['maintenanceid']);
-					$msg.='['.$mnt['name'].']';
+				$msg = S_MAINTENANCE_BIG;
+				if($info['maintenanceid'] > 0){
+					$mnt = get_maintenance_by_maintenanceid($info['maintenanceid']);
+					$msg.=' ('.$mnt['name'].')';
 				}
 
 				if(!isset($info['info'])) $info['info'] = array();

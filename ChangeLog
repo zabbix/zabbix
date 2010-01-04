@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1605] fixed map with host element under maintenance (Aly)
  - [ZBX-1507] fixed userid added instead of ip for some audit actions (Vedmak)
  - [ZBX-1563] fixed error when view history for log type item (Vedmak)
  - [ZBX-1556] fixed importing graphs with items that does not exist in system (Vedmak)
