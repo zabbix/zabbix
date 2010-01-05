@@ -701,7 +701,7 @@ class CChart extends CGraphDraw{
 			$dec = pow(0.1, $num);
 			foreach(array(1,2,5) as $n => $int) $intervals[] = $int * $dec;
 		}
-		foreach(array(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14) as $num){
+		foreach(array(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18) as $num){
 			$dec = bcpow(10, $num);
 			foreach(array(1,2,5) as $n => $int)	$intervals[] = bcmul($int, $dec);
 		}
@@ -722,22 +722,26 @@ class CChart extends CGraphDraw{
 		$tmp_maxY[GRAPH_YAXIS_SIDE_LEFT] = $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT];
 		$tmp_maxY[GRAPH_YAXIS_SIDE_RIGHT] = $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT];
 //------
-sdii($tmp_minY);
-sdii($tmp_maxY);
 // CALC interval
 		$col_interval = ($this->gridPixelsVert*($this->m_maxY[$side] - $this->m_minY[$side]))/$this->sizeY;
 		$max = $this->m_maxY[$side];
 
-		$dist = bcmul(5, bcpow(10, 14));
+		$dist = bcmul(5, bcpow(10, 18));
+		
+
+
 		$interval = 0;
 		foreach($intervals as $num => $int){
 			$t = abs($int - $col_interval);
 
 			if($t<$dist){
+
 				$dist = $t;
 				$interval = $int;
 			}
 		}
+
+
 //------
 
 // correctin MIN & MAX
