@@ -112,7 +112,7 @@ class CLdap{
 		if(!empty($this->cnf['bind_dn']) && !empty($this->cnf['bind_password'])){
 // use superuser credentials
 			if(!ldap_bind($this->ds,$this->cnf['bind_dn'],$this->cnf['bind_password'])){
-				error('LDAP: cannot bind by given DN');
+				error('LDAP: cannot bind by given Bind DN');
 				return false;
 			}
 			$this->bound = 2;
@@ -192,7 +192,6 @@ class CLdap{
 		else {
 			$filter = "(ObjectClass=*)";
 		}
-
 		$sr	= ldap_search($this->ds, $base, $filter);
 		$result	= ldap_get_entries($this->ds, $sr);
 
@@ -249,10 +248,12 @@ class CLdap{
 
 	private function makeFilter($filter, $placeholders) {
 		$placeholders['attr'] = $this->cnf['search_attribute'];
+
 		preg_match_all("/%{([^}]+)/", $filter, $matches, PREG_PATTERN_ORDER);
 //replace each match
 		foreach ($matches[1] as $match) {
 //take first element if array
+//SDII($placeholders);
 			if(is_array($placeholders[$match])) {
 				$value = $placeholders[$match][0];
 			}
@@ -261,6 +262,7 @@ class CLdap{
 			}
 			$filter = str_replace('%{'.$match.'}', $value, $filter);
 		}
+
 	return $filter;
 	}
 }
