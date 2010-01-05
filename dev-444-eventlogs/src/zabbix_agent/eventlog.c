@@ -270,7 +270,7 @@ int process_eventlog(const char *source, long *lastlogsize, unsigned long *out_t
 
 		if (1 == skip_old_data)
 		{
-			*lastlogsize = LastID;
+			*lastlogsize = LastID - 1;
 			zabbix_log(LOG_LEVEL_DEBUG, "Skipping existing data. lastlogsize:%li",
 					*lastlogsize);
 		}

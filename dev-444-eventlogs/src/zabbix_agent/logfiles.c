@@ -461,7 +461,7 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 		if (NULL != zbx_regexp_match(find_data.name, format, &length))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Addint the file [%s] to logfiles.", logfile_candidate);
-			add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, find_data.name, file_buf.st_mtime);
+			add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, find_data.name, (int)file_buf.st_mtime);
 		}
 		else
 		{
@@ -471,6 +471,12 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 		zbx_free(logfile_candidate);
 
 	} while (0 == _findnext(find_handle, &find_data));
+
+	if (-1 == _findclose(find_handle))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Could not close the find directory handle with error [%s]",
+				strerror(errno));
+	}
 
 #else/*_WINDOWS*/
 
@@ -497,38 +503,46 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 		zbx_free(logfile_candidate);
 	}
 
+	if (-1 == closedir(dir))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Could not close the directory [%s] with error [%s]",
+				directory, strerror(errno));
+	}
+
 #endif/*_WINDOWS*/
 
-	/* find the oldest file that match */
-	for (i = 0; i < logfiles_num; i++)
+	if (0 == logfiles_num)
 	{
-		if (logfiles[i].mtime < *mtime)
-		{
-			continue;/* not interested in mtimes less than the given mtime */
-		}
-		else
-		{
-			break;/* the first occurence is found */
-		}
+		zabbix_log(LOG_LEVEL_WARNING, "There are not any files matching [%s] found in [%s] directory",
+				format, directory);
+		goto clean;
 	}
 
-	/* escaping those with the same mtime, taking the latest one (without exceptions!) */
-	for (j = i + 1; j < logfiles_num; j++)
+	if (1 == skip_old_data)
+		i = logfiles_num - 1;
+	else
 	{
-		if (logfiles[j].mtime == logfiles[i].mtime)
+		/* find the oldest file that match */
+		for (i = 0; i < logfiles_num; i++)
 		{
-			i = j;/* moving to the newer one */
-		}
-		else
-		{
-			break;/* all next mtimes are bigger */
-		}
-	}
+			if (logfiles[i].mtime < *mtime)
+				continue;	/* not interested in mtimes less than the given mtime */
 
-	/* if all mtimes are less than the given one, take the latest file from existing ones */
-	if (0 < logfiles_num && i == logfiles_num)
-	{
-		i = logfiles_num - 1;/* i cannot be bigger than logfiles_num */
+			break;			/* the first occurence is found */
+		}
+
+		/* escaping those with the same mtime, taking the latest one (without exceptions!) */
+		for (j = i + 1; j < logfiles_num; j++)
+		{
+			if (logfiles[j].mtime != logfiles[i].mtime)
+				break;		/* all next mtimes are bigger */
+
+			i = j;			/* moving to the newer one */
+		}
+
+		/* if all mtimes are less than the given one, take the latest file from existing ones */
+		if (i == logfiles_num)
+			i = logfiles_num - 1;
 	}
 
 	/* processing matched or moving to the newer one and repeating the cycle */
@@ -540,7 +554,15 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot open [%s]. Error: [%s]", logfile_candidate, strerror(errno));
 			break;/* must return, situation could have changed */
 		}
-		*mtime = file_buf.st_mtime;/* must contain the latest mtime as possible */
+
+		if (1 == skip_old_data)
+		{
+			*lastlogsize = (long)file_buf.st_size;
+			zabbix_log(LOG_LEVEL_DEBUG, "Skipping existing data. filename:'%s' lastlogsize:%li",
+					logfile_candidate, *lastlogsize);
+		}
+
+		*mtime = (int)file_buf.st_mtime;/* must contain the latest mtime as possible */
 		if (file_buf.st_size < *lastlogsize)
 		{
 			*lastlogsize = 0;/* maintain backward compatibility */
@@ -592,35 +614,13 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 		}
 	}/* trying to read from logfiles */
 
-	if (0 == logfiles_num)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "There are not any files matching [%s] found in [%s] directory",
-				format, directory);
-	}
-	free_logfiles(&logfiles, &logfiles_alloc, &logfiles_num);
 	if (0 != fd && -1 == close(fd))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Could not close the file [%s] with error [%s]",
 					logfile_candidate, strerror(errno));
 	}
-#ifdef _WINDOWS
-
-	if (0 != find_handle && -1 == _findclose(find_handle))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Could not close the find directory handle with error [%s]",
-				strerror(errno));
-	}
-
-#else /* _WINDOWS */
-
-	if (dir != NULL && -1 == closedir(dir))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Could not close the directory [%s] with error [%s]",
-				directory, strerror(errno));
-	}
-
-#endif /* _WINDOWS */
-
+clean:
+	free_logfiles(&logfiles, &logfiles_alloc, &logfiles_num);
 	zbx_free(logfile_candidate);
 	zbx_free(directory);
 	zbx_free(format);
@@ -672,7 +672,7 @@ int	process_log(char *filename, long *lastlogsize, char **value, const char *enc
 
 	if (1 == skip_old_data)
 	{
-		*lastlogsize = buf.st_size;
+		*lastlogsize = (long)buf.st_size;
 		zabbix_log(LOG_LEVEL_DEBUG, "Skipping existing data. filename:'%s' lastlogsize:%li",
 				filename, *lastlogsize);
 	}
