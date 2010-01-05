@@ -1,5 +1,7 @@
 Changes for 1.8.1
 
+ - [ZBX-1493] fixed disabled host icon view (Aly)
+ - [ZBX-1546] fixed processing link triggers on map (Aly)
  - [ZBX-1476] fixed host links in map (Aly)
  - [ZBX-1605] fixed map with host element under maintenance (Aly)
  - [ZBX-1507] fixed userid added instead of ip for some audit actions (Vedmak)
