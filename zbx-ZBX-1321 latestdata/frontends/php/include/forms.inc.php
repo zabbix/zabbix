@@ -763,6 +763,7 @@
 			$lstGroups->attributes['style'] = 'width: 320px';
 
 			$groups = CUserGroup::get(array('usrgrpids' => $user_groups, 'extendoutput' => 1));
+			order_result($groups, 'name');
 			foreach($groups as $num => $group){
 				$lstGroups->addItem($group['usrgrpid'], $group['name']);
 			}
@@ -3405,7 +3406,7 @@
 //		validate_group(PERM_READ_WRITE,array('real_hosts'),'web.last.conf.groupid');
 
 		$twb_groupid = get_request('twb_groupid', 0);
-		
+
 		$options = array(
 			'editable' => 1,
 			'extendoutput' => 1,
@@ -3414,12 +3415,12 @@
 		$groups = CHostGroup::get($options);
 		$groups = zbx_toHash($groups, 'groupid');
 		order_result($groups, 'name');
-		
+
 		if(!isset($groups[$twb_groupid])){
 			$twb_groupid = key($groups);
 		}
-		
-		$cmbGroups = new CComboBox('twb_groupid', $twb_groupid, 'submit()');	
+
+		$cmbGroups = new CComboBox('twb_groupid', $twb_groupid, 'submit()');
 		foreach($groups as $group){
 			$cmbGroups->addItem($group['groupid'], $group['name']);
 		}
@@ -5183,7 +5184,7 @@
 		$host 		= get_request('host',	'');
 		$port 		= get_request('port',	get_profile('HOST_PORT',10050));
 		$status		= get_request('status',	HOST_STATUS_MONITORED);
-		$useip		= get_request('useip',	0);
+		$useip		= get_request('useip',	1);
 		$dns		= get_request('dns',	'');
 		$ip			= get_request('ip',	'0.0.0.0');
 		$proxy_hostid	= get_request('proxy_hostid','');
@@ -5795,16 +5796,20 @@
 		$host_tbl->addRow(array(S_CONNECT_TO,$cmbConnectBy));
 
 		$host_tbl->addRow(array(S_AGENT_PORT,new CNumericBox('port',$port,5)));
+
 //Proxy
 		$cmbProxy = new CComboBox('proxy_hostid', $proxy_hostid);
 
 		$cmbProxy->addItem(0, S_NO_PROXY);
-		$db_proxies = DBselect('SELECT hostid,host FROM hosts'.
-				' where status in ('.HOST_STATUS_PROXY.') and '.DBin_node('hostid'));
-		while ($db_proxy = DBfetch($db_proxies))
-			$cmbProxy->addItem($db_proxy['hostid'], $db_proxy['host']);
+		$options = array('extendoutput' => 1);
+		$db_proxies = CProxy::get($options);
+		order_result($db_proxies, 'host');
 
-		$host_tbl->addRow(array(S_MONITORED_BY_PROXY,$cmbProxy));
+		foreach($db_proxies as $proxy){
+			$cmbProxy->addItem($proxy['proxyid'], $proxy['host']);
+		}
+
+		$host_tbl->addRow(array(S_MONITORED_BY_PROXY, $cmbProxy));
 //----------
 
 		$cmbStatus = new CComboBox('status',$status);
@@ -6736,13 +6741,9 @@
 	}
 
 
-// if $hostid = null => global macro
 	function get_macros_widget($hostid = null){
 
-		if(is_null($hostid)){
-			$macros = CUserMacro::get(array('extendoutput' => 1, 'globalmacro' => 1));
-		}
-		else if(isset($_REQUEST['form_refresh'])){
+		if(isset($_REQUEST['form_refresh'])){
 			$macros = get_request('macros', array());
 		}
 		else if($hostid > 0){
@@ -6751,13 +6752,15 @@
 		else{
 			$macros = array();
 		}
+		order_result($macros, 'macro');
 
 		$macros_tbl = new CTable('', 'tablestripped');
 		$macros_tbl->setOddRowClass('form_odd_row');
 		$macros_tbl->setEvenRowClass('form_even_row');
 
 		foreach($macros as $macroid => $macro){
-			$macros_tbl->addItem(new CVar('macros['.$macro['macro'].']', $macro));
+			$macros_tbl->addItem(new CVar('macros['.$macro['macro'].'][macro]', $macro['macro']));
+			$macros_tbl->addItem(new CVar('macros['.$macro['macro'].'][value]', $macro['value']));
 			$macros_tbl->addRow(array(
 				new CCheckBox('macros_rem['.$macro['macro'].']', 'no', null, $macro['macro']),
 				$macro['macro'],

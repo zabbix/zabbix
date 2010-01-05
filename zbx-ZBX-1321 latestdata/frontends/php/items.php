@@ -270,6 +270,9 @@ include_once('include/page_header.php');
 
 	if(isset($_REQUEST['filter_host']) && !zbx_empty($_REQUEST['filter_host'])){
 		$hostid = CHost::getObjects(array('host' => $_REQUEST['filter_host']));
+		if(empty($hostid))
+			$hostid = CTemplate::getObjects(array('template' => $_REQUEST['filter_host']));
+
 		$hostid = reset($hostid);
 
 		$hostid = $hostid?$hostid['hostid']:0;
@@ -836,7 +839,7 @@ include_once('include/page_header.php');
 		if(isset($_REQUEST['filter_status']) && !zbx_empty($_REQUEST['filter_status']) && $_REQUEST['filter_status'] != -1)
 			$options['status'] = $_REQUEST['filter_status'];
 		if(isset($_REQUEST['filter_templated_items']) && !zbx_empty($_REQUEST['filter_templated_items']) && $_REQUEST['filter_templated_items'] != -1)
-			$options['templated_items'] = $_REQUEST['filter_templated_items'];
+			$options['inherited'] = $_REQUEST['filter_templated_items'];
 		if(isset($_REQUEST['filter_with_triggers']) && !zbx_empty($_REQUEST['filter_with_triggers']) && $_REQUEST['filter_with_triggers'] != -1)
 			$options['with_triggers'] = $_REQUEST['filter_with_triggers'];
 
@@ -858,6 +861,7 @@ include_once('include/page_header.php');
 
 		$form = new CForm();
 		$form->setName('items');
+		$form->addVar('hostid', $hostid);
 
 		$table  = new CTableInfo();
 // Table Header //

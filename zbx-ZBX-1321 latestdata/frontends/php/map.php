@@ -155,6 +155,8 @@ include_once('include/page_header.php');
 		$links = zbx_toHash($map['links'],'linkid');
 	}
 
+	$map_info = getSelementsInfo($selements);
+
 //SDI($links); exit;
 // Draw connectors
 	foreach($links as $lnum => $link){
@@ -162,10 +164,10 @@ include_once('include/page_header.php');
 		$linkid = $link['linkid'];
 
 		$selement = $selements[$link['selementid1']];
-		list($x1, $y1) = get_icon_center_by_selement($selement);
+		list($x1, $y1) = get_icon_center_by_selement($selement, $map_info[$link['selementid1']]);
 
 		$selement = $selements[$link['selementid2']];
-		list($x2, $y2) = get_icon_center_by_selement($selement);
+		list($x2, $y2) = get_icon_center_by_selement($selement, $map_info[$link['selementid2']]);
 
 		$drawtype = $link['drawtype'];
 		$color = convertColor($im,$link['color']);
@@ -207,7 +209,7 @@ include_once('include/page_header.php');
 		$box_height = 0;
 
 		foreach($strings as $snum => $str)
-			$strings[$snum] = expand_map_element_label_by_data(null, $str); 
+			$strings[$snum] = expand_map_element_label_by_data(null, $str);
 
 		foreach($strings as $snum => $str){
 			$dims = imageTextSize(8,0,$str);
@@ -252,12 +254,12 @@ include_once('include/page_header.php');
 //-----------------------
 
 // Draws elements
+
 	$icons=array();
 	foreach($selements as $selementid => $selement){
 		if(empty($selement)) continue;
 
-//		$info = get_info_by_selement($selement);
-		$el_info = get_info_by_selement($selement,$status_view);
+		$el_info = $map_info[$selementid];
 		$img = get_png_by_selement($selement, $el_info);
 
 		$iconX = imagesx($img);
@@ -265,6 +267,7 @@ include_once('include/page_header.php');
 
 		if(isset($_REQUEST['noedit']) && ($highlight == SYSMAP_HIGHLIGH_ON)){
 			$hl_color = null;
+			$st_color = null;
 			if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_ON){
 				switch($el_info['priority']){
 					case TRIGGER_SEVERITY_DISASTER: 	$hl_color = hex2rgb('FF0000'); break;
@@ -272,14 +275,61 @@ include_once('include/page_header.php');
 					case TRIGGER_SEVERITY_AVERAGE:  	$hl_color = hex2rgb('DDAAAA'); break;
 					case TRIGGER_SEVERITY_WARNING:  	$hl_color = hex2rgb('EFEFCC'); break;
 					case TRIGGER_SEVERITY_INFORMATION:  $hl_color = hex2rgb('CCE2CC'); break;
-					case TRIGGER_SEVERITY_NOT_CLASSIFIED:
+					case TRIGGER_SEVERITY_NOT_CLASSIFIED: $hl_color = hex2rgb('AAFFAA'); break;
 					default:
 				}
 			}
 
-			if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_UNKNOWN)	$hl_color = hex2rgb('CCCCCC');
-			if(isset($el_info['maintenance']))	$hl_color = hex2rgb('EE6000');
-			if(isset($el_info['disabled'])) $hl_color = hex2rgb('AA0000');
+			if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_UNKNOWN){
+				$hl_color = hex2rgb('CCCCCC');
+			}
+
+			if(isset($el_info['unavailable'])){
+				$hl_color = null;
+				if($el_info['unavailable'] == HOST_AVAILABLE_FALSE)
+					$st_color = hex2rgb('FF0000');
+				else
+					$st_color = hex2rgb('CCCCCC');
+			}
+			if(isset($el_info['maintenance'])){
+				$hl_color = null;
+				$st_color = hex2rgb('EE6000');
+			}
+			if(isset($el_info['disabled'])){
+				$hl_color = null;
+				$st_color = hex2rgb('AA0000');
+			}
+
+			if(!is_null($st_color)){
+				$r = $st_color[0];
+				$g = $st_color[1];
+				$b = $st_color[2];
+
+				imagefilledrectangle($im,
+						$selement['x'] - 2,
+						$selement['y'] - 2,
+						$selement['x'] + $iconX + 2,
+						$selement['y'] + $iconY + 2,
+						imagecolorallocatealpha($im,$r,$g,$b, 0)
+					);
+// shadow
+				imagerectangle($im,
+						$selement['x'] - 2 - 1,
+						$selement['y'] - 2 - 1,
+						$selement['x'] + $iconX + 2 + 1,
+						$selement['y'] + $iconY + 2 + 1,
+						imagecolorallocate($im,120,120,120)
+					);
+
+				imagerectangle($im,
+						$selement['x'] - 2 - 2,
+						$selement['y'] - 2 - 2,
+						$selement['x'] + $iconX + 2 + 2,
+						$selement['y'] + $iconY + 2 + 2,
+						imagecolorallocate($im,220,220,220)
+					);
+//--
+			}
 
 			if(!is_null($hl_color)){
 				$r = $hl_color[0];
@@ -291,35 +341,16 @@ include_once('include/page_header.php');
 						$selement['y'] + ($iconY / 2),
 						$iconX+20,
 						$iconX+20,
-						imagecolorallocatealpha($im,$r,$g,$b, 30)
+						imagecolorallocatealpha($im,$r,$g,$b, 0)
 					);
-/*
-				for($radius=$iconX; $radius > 0; $radius-=1){
-					$uradius = $iconX-$radius +1;
-					$w = ($uradius * pow(2, $uradius/30)) + 50;
-					$w = ($w > 255)?255:$w;
 
-//SDI($radius.': '.$w.' '.$r.' '.$g.' '.$b.'  -  '.($uradius * pow(1.9, $uradius/40)));
-
-					$d = 0;
-					$dr = $w - $r;
-					$dg = $w - $g;
-					$db = $w - $b;
-					$d = max(array($d, $dr, $dg, $db));
-
-					$r = (($r+$d)>255)?255:($r+$d);
-					$g = (($g+$d)>255)?255:($g+$d);
-					$b = (($b+$d)>255)?255:($b+$d);
-
-					imagefilledellipse($im,
-							$selement['x'] + ($iconX / 2),
-							$selement['y'] + ($iconY / 2),
-							$radius,
-							$radius,
-							imagecolorallocatealpha($im,$r,$g,$b, 0)
-						);
-				}
-//*/
+				imageellipse($im,
+						$selement['x'] + ($iconX / 2),
+						$selement['y'] + ($iconY / 2),
+						$iconX+20+1,
+						$iconX+20+1,
+						imagecolorallocate($im,120,120,120)
+					);
 			}
 		}
 
@@ -339,9 +370,10 @@ include_once('include/page_header.php');
 
 		$label_line = expand_map_element_label_by_data($selement);
 
-
-		$info_line	= $el_info['info'];
-		$color		= $el_info['color'];
+		$info_line = array();
+		foreach($el_info['info'] as $inum => $info){
+			$info_line[] = $info['msg'];
+		}
 
 		if($label_type == MAP_LABEL_TYPE_STATUS){
 			$label_line = '';
@@ -350,19 +382,10 @@ include_once('include/page_header.php');
 			$label_line = $el_info['name'];
 		}
 
-		if(isset($el_info['disabled']) && $el_info['disabled'] == 1){
-			$info_line = 'DISABLED';
-			$label_color = $gray;
-		}
-
-		unset($el_info);
-
 		if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
 			$host = get_host_by_hostid($selement['elementid']);
 
-			if($label_type==MAP_LABEL_TYPE_IP) $label_line = $host['ip'];
-
-			if($host['status'] == HOST_STATUS_NOT_MONITORED) $label_color = $darkred;
+			if($label_type == MAP_LABEL_TYPE_IP) $label_line = $host['ip'];
 		}
 
 		if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE){
@@ -374,40 +397,66 @@ include_once('include/page_header.php');
 
 		$label_line = str_replace("\r", '', $label_line);
 		$strings = explode("\n", $label_line);
-		array_push($strings, $info_line);
+
 		$cnt = count($strings);
-		$num = 0;
+		$strings = array_merge($strings, $info_line);
+		$oc = count($strings);
+
+		$h = 0;
+		$w = 0;
+		foreach($strings as $strnum => $str){
+			$dims = imageTextSize(8,0,$str);
+			$h += $dims['height'];
+			$w = max($w, $dims['width']);
+		}
 
 		$x = $selement['x'];
 		$y = $selement['y'];
-		$h = ImageFontHeight(2);
 
-		$x_info = $selement['x'];
-		$y_info = $selement['y'];
+		$icon_hl = 2;
+		if(isset($hl_color) && !is_null($hl_color)) $icon_hl = 14;
+		else if(isset($st_color) && !is_null($st_color)) $icon_hl = 6;
 
-		if($label_location == MAP_LABEL_LOC_TOP)
-			$y -= $h * $cnt;
-		else if ($label_location == MAP_LABEL_LOC_LEFT || $label_location == MAP_LABEL_LOC_RIGHT)
-			$y += imagesy($img) / 2 - $h * $cnt / 2;
-		else	/* MAP_LABEL_LOC_BOTTOM */
-			$y += imagesy($img);
+		switch($label_location){
+			case MAP_LABEL_LOC_TOP:
+				$y_rec = $y - $icon_hl - $h - 6;
+				$x_rec = $x + $iconX/2 - $w/2;
+				break;
+			case MAP_LABEL_LOC_LEFT:
+				$y_rec = $y + $h/2;
+				$x_rec = $x - $icon_hl - $w;
+				break;
+			case MAP_LABEL_LOC_RIGHT:
+				$y_rec = $y + $h/2;
+				$x_rec = $x + $iconX + $icon_hl;
+				break;
+			case MAP_LABEL_LOC_BOTTOM:
+			default:
+				$y_rec = $y + $iconY + $icon_hl;
+				$x_rec = $x + $iconX/2 - $w/2;
+		}
 
-		$increasey = 1;
-		foreach($strings as $str){
-			$num++;
+//		imagerectangle($im, $x_rec-2-1, $y_rec-1, $x_rec+$w+2+1, $y_rec+($oc*4)+$h+1, $black);
+		imagefilledrectangle($im, $x_rec-2, $y_rec-2, $x_rec+$w+2, $y_rec+($oc*4)+$h-2, $white);
+
+		$increasey = 0;
+		foreach($strings as $num => $str){
 			$dims = imageTextSize(8,0,$str);
 
-			if ($label_location == MAP_LABEL_LOC_TOP || $label_location == MAP_LABEL_LOC_BOTTOM)
-				$x_label = $x + $iconX / 2 - $dims['width'] / 2;
-			else if ($label_location == MAP_LABEL_LOC_LEFT)
-				$x_label = $x - $dims['width'];
-			else	/* MAP_LABEL_LOC_RIGHT */
-				$x_label = $x + $iconX;
+			$color = ($num >= $cnt)?$el_info['info'][$num-$cnt]['color']:$label_color;
 
-			imagefilledrectangle($im, $x_label-1, $y+$dims['height']+$increasey+1, $x_label + $dims['width']+1, $y+$increasey, $white);
-			imagetext($im, 8, 0, $x_label, $y+$increasey+$dims['height'], ($num == $cnt)?$color:$label_color, $str);
 
-			$increasey+= $dims['height']+2;
+			if($label_location == MAP_LABEL_LOC_TOP || $label_location == MAP_LABEL_LOC_BOTTOM)
+				$x_label = $x + $iconX/2 - $dims['width']/2;
+			else if($label_location == MAP_LABEL_LOC_LEFT)
+				$x_label = $x_rec + $w - $dims['width'];
+			else
+				$x_label = $x_rec;
+
+
+			imagetext($im, 8, 0, $x_label, $y_rec+$dims['height']+$increasey, $color, $str);
+
+			$increasey+= $dims['height']+4;
 		}
 	}
 

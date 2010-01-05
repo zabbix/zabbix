@@ -178,6 +178,7 @@
 
 	if(isset($_REQUEST['form'])){
 
+		$_REQUEST['hostid'] = get_request('hostid', 0);
 		$hosts = array();
 		$frm_title = S_PROXY;
 
@@ -259,11 +260,11 @@
 		));
 
 
-		$proxies = CHost::get(array(
+		$proxies = CProxy::get(array(
 			'extendoutput' => 1,
-			'proxy_hosts' => 1,
 			'sortfield' => getPageSortField('host'),
-			'sortorder' => getPageSortOrder()
+			'sortorder' => getPageSortOrder(),
+			'editable' => 1,
 		));
 
 		order_page_result($proxies, 'host');
@@ -276,7 +277,7 @@
 
 			$sql = 'SELECT DISTINCT host, status, hostid '.
 					' FROM hosts'.
-					' WHERE proxy_hostid='.$proxy['hostid'].
+					' WHERE proxy_hostid='.$proxy['proxyid'].
 						' AND status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
 					' ORDER BY host';
 			$db_hosts = DBselect($sql);
@@ -292,8 +293,8 @@
 			$lastclock = ($proxy['lastaccess'] == 0) ? '-' : zbx_date2age($proxy['lastaccess']);
 
 			$table->addRow(array(
-				new CCheckBox('hosts['.$proxy['hostid'].']', NULL, NULL, $proxy['hostid']),
-				new CLink($proxy['host'], 'proxies.php?form=update&hostid='.$proxy['hostid']),
+				new CCheckBox('hosts['.$proxy['proxyid'].']', NULL, NULL, $proxy['proxyid']),
+				new CLink($proxy['host'], 'proxies.php?form=update&hostid='.$proxy['proxyid']),
 				$lastclock,
 				$count,
 				new CCol((empty($hosts) ? '-' : $hosts), 'wraptext')

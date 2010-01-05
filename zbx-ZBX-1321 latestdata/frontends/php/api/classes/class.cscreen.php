@@ -200,6 +200,7 @@ class CScreen extends CZBXAPI{
 							$graphs_to_check[] = $sitem['resourceid'];
 						break;
 						case SCREEN_RESOURCE_SIMPLE_GRAPH:
+						case SCREEN_RESOURCE_PLAIN_TEXT:
 							$items_to_check[] = $sitem['resourceid'];
 						break;
 						case SCREEN_RESOURCE_MAP:
@@ -210,19 +211,41 @@ class CScreen extends CZBXAPI{
 						break;
 					}
 				}
-// sdii($graphs_to_check);
-// sdii($items_to_check);
-// sdii($maps_to_check);
-// sdii($screens_to_check);
+/*
+sdii($graphs_to_check);
+sdii($items_to_check);
+sdii($maps_to_check);
+sdii($screens_to_check);
+//*/
 
-				$allowed_graphs = CGraph::get(array('graphids' => $graphs_to_check, 'editable' => isset($options['editable'])));
+				$graph_options = array(
+									'nodeids' => $nodeids,
+									'graphids' => $graphs_to_check,
+									'editable' => $options['editable']);
+				$allowed_graphs = CGraph::get($graph_options);
 				$allowed_graphs = zbx_objectValues($allowed_graphs, 'graphid');
-				$allowed_items = CItem::get(array('itemids' => $items_to_check, 'editable' => isset($options['editable'])));
+
+				$item_options = array(
+									'nodeids' => $nodeids,
+									'itemids' => $items_to_check,
+									'editable' => $options['editable']);
+				$allowed_items = CItem::get($item_options);
 				$allowed_items = zbx_objectValues($allowed_items, 'itemid');
-				$allowed_maps = CMap::get(array('sysmapids' => $maps_to_check, 'editable' => isset($options['editable'])));
+
+				$map_options = array(
+									'nodeids' => $nodeids,
+									'sysmapids' => $maps_to_check,
+									'editable' => $options['editable']);
+				$allowed_maps = CMap::get($map_options);
 				$allowed_maps = zbx_objectValues($allowed_maps, 'sysmapid');
-				$allowed_screens = CScreen::get(array('screenids' => $screens_to_check, 'editable' => isset($options['editable'])));
+
+				$screens_options = array(
+									'nodeids' => $nodeids,
+									'screenids' => $screens_to_check,
+									'editable' => $options['editable']);
+				$allowed_screens = CScreen::get($screens_options);
 				$allowed_screens = zbx_objectValues($allowed_screens, 'screenid');
+
 
 				$restr_graphs = array_diff($graphs_to_check, $allowed_graphs);
 				$restr_items = array_diff($items_to_check, $allowed_items);
@@ -230,6 +253,14 @@ class CScreen extends CZBXAPI{
 				$restr_screens = array_diff($screens_to_check, $allowed_screens);
 
 
+/*
+SDI('---------------------------------------');
+SDII($restr_graphs);
+SDII($restr_items);
+SDII($restr_maps);
+SDII($restr_screens);
+SDI('/////////////////////////////////');
+//*/
 				foreach($restr_graphs as $resourceid){
 					foreach($screens_items as $screen_itemid => $screen_item){
 						if(($screen_item['resourceid'] == $resourceid) && ($screen_item['resourcetype'] == SCREEN_RESOURCE_GRAPH)){
@@ -240,7 +271,9 @@ class CScreen extends CZBXAPI{
 				}
 				foreach($restr_items as $resourceid){
 					foreach($screens_items as $screen_itemid => $screen_item){
-						if($screen_item['resourceid'] == $resourceid && ($screen_item['resourcetype'] == SCREEN_RESOURCE_SIMPLE_GRAPH)){
+						if(($screen_item['resourceid'] == $resourceid) &&
+							(uint_in_array($screen_item['resourcetype'], array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT)))
+						){
 							unset($result[$screen_item['screenid']]);
 							unset($screens_items[$screen_itemid]);
 						}

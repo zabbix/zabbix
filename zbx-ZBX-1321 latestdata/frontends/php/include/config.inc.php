@@ -56,7 +56,9 @@ function __autoload($class_name){
 		'cusermacro' => 1,
 		'cscreen' => 1,
 		'cmap' => 1,
-		'cgraphitem' => 1
+		'cgraphitem' => 1,
+		'cproxy' => 1,
+		'apiexception' => 1,
 	);
 
 	$rpc = array(
@@ -113,7 +115,7 @@ function __autoload($class_name){
 
 	/********** START INITIALIZATION *********/
 
-//	set_error_handler('zbx_err_handler');
+	set_error_handler('zbx_err_handler');
 
 	global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_CONFIGURATION_FILE, $DB;
 	global $ZBX_SERVER, $ZBX_SERVER_PORT;

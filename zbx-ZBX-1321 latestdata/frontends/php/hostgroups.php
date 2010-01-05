@@ -74,15 +74,15 @@ include_once('include/page_header.php');
 		$_REQUEST['form'] = 'clone';
 	}
 	else if(isset($_REQUEST['save'])){
-	
+
 		$objects = get_request('hosts', array());
 
 		$hosts = CHost::get(array('hostids' => $objects, 'editable' => 1));
 		$templates = CTemplate::get(array('templateids' => $objects, 'editable' => 1));
-			
+
 		if(isset($_REQUEST['groupid'])){
 			DBstart();
-			$result = CHostgroup::update(array('groupid' => $_REQUEST['groupid'], 'name' => $_REQUEST['gname']));			
+			$result = CHostgroup::update(array('groupid' => $_REQUEST['groupid'], 'name' => $_REQUEST['gname']));
 			if($result === false) error(CHostGroup::resetErrors());
 			if($result) $result = CHostGroup::massUpdate(array('hosts' => $hosts, 'templates' => $templates, 'groups' => $result));
 			if($result === false) error(CHostGroup::resetErrors());
@@ -97,7 +97,7 @@ include_once('include/page_header.php');
 				access_deny();
 
 			DBstart();
-			$result = CHostgroup::create(array('name' => $_REQUEST['gname']));			
+			$result = CHostgroup::create(array('name' => $_REQUEST['gname']));
 			if($result === false) error(CHostGroup::resetErrors());
 			if($result) $result = CHostGroup::massAdd(array('hosts' => $hosts, 'templates' => $templates, 'groups' => $result));
 			if($result === false) error(CHostGroup::resetErrors());
@@ -164,8 +164,8 @@ include_once('include/page_header.php');
 				$go_result = true;
 			}
 			else{
-				$go_result = CHost::massUpdate(array('hosts' => $hosts, 'fields' => array('status' => $status)));
-				if(!$go_result)
+				$go_result = CHost::massUpdate(array('hosts' => $hosts, 'status' => $status));
+				if($go_result === false)
 					error(CHost::resetErrors());
 			}
 

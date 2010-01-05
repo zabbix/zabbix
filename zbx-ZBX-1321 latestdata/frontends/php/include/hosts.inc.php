@@ -27,7 +27,12 @@ require_once('include/httptest.inc.php');
 /* HOST GROUP functions */
 
 	function update_host_groups_by_groupid($groupid,$hosts=array()){
-		$grp_hosts = CHost::get(array('groupids'=>$groupid, 'editable'=>1, 'preservekeys' => 1));
+		$options = array(
+				'groupids'=>$groupid, 
+				'editable'=>1, 
+				'preservekeys' => 1
+			);
+		$grp_hosts = CHost::get($options);
 		$grp_hostids = zbx_objectValues($grp_hosts, 'hostid');
 
 // unlinked hosts
@@ -46,7 +51,12 @@ require_once('include/httptest.inc.php');
 		}
 		$result = DBexecute('DELETE FROM hosts_groups WHERE groupid='.$groupid);
 		$hosts = zbx_toObject($hosts, 'hostid');
-		$result = CHostGroup::createHosts(array('hosts' => $hosts, 'groups' => array('groupid' => $groupid)));
+		
+		$options = array(
+				'hosts' => $hosts, 
+				'groups' => array('groupid' => $groupid)
+			);
+		$result = CHostGroup::createHosts();
 
 	return $result;
 	}
@@ -95,7 +105,9 @@ require_once('include/httptest.inc.php');
 
 	function update_host_group($groupid,$name,$hosts){
 		$hostgroup_old = get_hostgroup_by_groupid($groupid);
-		$result = CHostGroup::update(array(array('name' => $name, 'groupid' => $groupid)));
+		
+		$options = array(array('name' => $name, 'groupid' => $groupid));
+		$result = CHostGroup::update($options);
 
 		if(!$result){
 			error(CHostGroup::resetErrors());
@@ -111,20 +123,20 @@ require_once('include/httptest.inc.php');
 	return $result;
 	}
 
-	/*
-	 * Function: check_circle_host_link
-	 *
-	 * Description:
-	 *     Check for circular templates linkage
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *
-	 *     NOTE: templates = array(id => name, id2 => name2, ...)
-	 *
-	 */
+/*
+ * Function: check_circle_host_link
+ *
+ * Description:
+ *     Check for circular templates linkage
+ *
+ * Author:
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments:
+ *
+ *     NOTE: templates = array(id => name, id2 => name2, ...)
+ *
+ */
 	function check_circle_host_link($hostid, $templates){
 		if(count($templates) == 0)	return false;
 		if(isset($templates[$hostid]))	return true;
@@ -135,52 +147,51 @@ require_once('include/httptest.inc.php');
 		return false;
 	}
 
-	/*
-	 * Function: db_save_host
-	 *
-	 * Description:
-	 *     Add or update host
-	 *
-	 * Author:
-	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments:
-	 *     if hostid is NULL add new host, in other cases update
-	 *
-	 *     NOTE: templates = array(id => name, id2 => name2, ...)
-	 */
+/*
+ * Function: db_save_host
+ *
+ * Description:
+ *     Add or update host
+ *
+ * Author:
+ *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+ *
+ * Comments:
+ *     if hostid is NULL add new host, in other cases update
+ *
+ *     NOTE: templates = array(id => name, id2 => name2, ...)
+ */
 	function db_save_host($host,$port,$status,$useip,$dns,$ip,$proxy_hostid,$templates,
 							$useipmi,$ipmi_ip,$ipmi_port,$ipmi_authtype,$ipmi_privilege,$ipmi_username,$ipmi_password,
 							$hostid=null)
 	{
-		// check if templetes to link, doesn't contain dependencies on other templates.
+// check if templetes to link, doesn't contain dependencies on other templates.
 		if(HOST_STATUS_TEMPLATE == $status) {
 			if(!check_templates_trigger_dependencies($templates))
 				return false;
 		}
 
-//		if(!eregi('^'.ZBX_EREG_HOST_FORMAT.'$', $host)){
+// if(!eregi('^'.ZBX_EREG_HOST_FORMAT.'$', $host)){
 		if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $host)){
 			error('Incorrect characters used for Hostname');
 			return false;
 		}
 
-// 		if(!empty($dns) && !eregi('^'.ZBX_EREG_DNS_FORMAT.'$', $dns)){
+// if(!empty($dns) && !eregi('^'.ZBX_EREG_DNS_FORMAT.'$', $dns)){
  		if(!empty($dns) && !preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/i', $dns)){
 			error('Incorrect characters used for DNS');
 			return false;
 		}
 
 
-		if(DBfetch(DBselect('SELECT h.host '.
+		$sql = 'SELECT h.host '.
 				' FROM hosts h '.
 				' WHERE h.host='.zbx_dbstr($host).
 					' AND '.DBin_node('h.hostid', get_current_nodeid(false)).
 					' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
-					(isset($hostid)?' AND h.hostid<>'.$hostid:'')
-			)))
-		{
-			error("Host '$host' already exists");
+					(isset($hostid)?' AND h.hostid<>'.$hostid:'');
+		if(DBfetch(DBselect($sql))){
+			error('Host "'.$host.'" already exists');
 			return false;
 		}
 
@@ -313,7 +324,7 @@ require_once('include/httptest.inc.php');
 			}
 		}
 //permisssion problems
-//		if(!CHostGroup::createHosts(array('hosts' => $hosts, 'groups' => $groups))) return false;		
+//		if(!CHostGroup::createHosts(array('hosts' => $hosts, 'groups' => $groups))) return false;
 //----------
 
 
@@ -519,6 +530,16 @@ require_once('include/httptest.inc.php');
 			unlink_template($db_child['hostid'], $hostids, $unlink_mode);
 		}
 
+// delete web tests
+		$del_httptests = array();
+		$db_httptests = get_httptests_by_hostid($hostids);
+		while($db_httptest = DBfetch($db_httptests)){
+			$del_httptests[$db_httptest['httptestid']] = $db_httptest['httptestid'];
+		}
+		if(!empty($del_httptests)){
+			delete_httptest($del_httptests);
+		}
+
 // delete items -> triggers -> graphs
 		$del_items = array();
 		$db_items = get_items_by_hostid($hostids);
@@ -539,9 +560,6 @@ require_once('include/httptest.inc.php');
 
 // delete host from template linkages
 		DBexecute('DELETE FROM hosts_templates WHERE '.DBcondition('hostid',$hostids));
-
-// delete host applications
-		DBexecute('DELETE FROM applications WHERE '.DBcondition('hostid',$hostids));
 
 // disable actions
 		$actionids = array();
@@ -592,15 +610,8 @@ require_once('include/httptest.inc.php');
 		delete_host_profile($hostids);
 		delete_host_profile_ext($hostids);
 
-// delete web tests
-		$del_httptests = array();
-		$db_httptests = get_httptests_by_hostid($hostids);
-		while($db_httptest = DBfetch($db_httptests)){
-			$del_httptests[$db_httptest['httptestid']] = $db_httptest['httptestid'];
-		}
-		if(!empty($del_httptests)){
-			delete_httptest($del_httptests);
-		}
+// delete host applications
+		DBexecute('DELETE FROM applications WHERE '.DBcondition('hostid',$hostids));
 
 // delete host
 		foreach ($hostids as $id) {	/* The section should be improved */

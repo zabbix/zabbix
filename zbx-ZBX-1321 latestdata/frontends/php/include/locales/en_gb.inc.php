@@ -44,7 +44,7 @@
 	'S_COPY_SELECTED_TO'=>			'Copy selected to ...',
 
 //	dicoveryconf.php
-	'S_HOST_IP'=>				'Host ip',
+	'S_HOST_IP'=>				'Host IP',
 	'S_SERVICE_TYPE'=>			'Service type',
 	'S_SERVICE_PORT'=>			'Service port',
 	'S_DISCOVERY_STATUS'=>			'Discovery status',
@@ -460,12 +460,12 @@
 	'S_ANY_CHARACTER_STRING_INCLUDED'=>		'Any character string included',
 	'S_CHARACTER_STRING_NOT_INCLUDED'=>		'Character string not included',
 	'S_RESULT_IS_TRUE'=>				'Result is TRUE',
-	'S_RESULT_IS_FALSE'=>				'Result	is FALSE',
+	'S_RESULT_IS_FALSE'=>				'Result is FALSE',
 
 	'S_EXPRESSION_TYPE'=>				'Expression type',
 	'S_NEW_EXPRESSION'=>				'New expression',
 	'S_IGNORE_CASE'=>				'Ignore case',
-	'S_CASE_SENSITIVE' => 'Case sensitive',
+	'S_CASE_SENSITIVE'=>				'Case sensitive',
 	'S_TEST'=>					'Test',
 	'S_DELIMITER'=>					'Delimiter',
 	'S_TEST_STRING'=>				'Test string',
@@ -486,7 +486,7 @@
 	'S_GROUP_FOR_DISCOVERED_HOSTS'=>		'Group for discovered hosts',
 
 //	nodes.php
-	'S_NOT_DM_SETUP' => 'Your setup is not configured for distributed monitoring',
+	'S_NOT_DM_SETUP'=>			'Your setup is not configured for distributed monitoring',
 	'S_CONFIGURATION_OF_NODES'=>		'CONFIGURATION OF NODES',
 	'S_DM'=>				'DM',	// Distributed Monitoring
 	'S_NODE'=>				'Node',
@@ -533,8 +533,8 @@
 	'S_SIA_ZABBIX'=>			'SIA Zabbix',
 
 //	graph.php
-	'S_GRAPHS_COPIED' =>		'Graphs copied',
-	'S_CANNOT_COPY_GRAPHS' =>	'Cannot copy graphs',
+	'S_GRAPHS_COPIED'=>			'Graphs copied',
+	'S_CANNOT_COPY_GRAPHS'=>		'Cannot copy graphs',
 	'S_ITEM_ADDED'=>			'Item added',
 	'S_ITEM_UPDATED'=>			'Item updated',
 	'S_ITEMS_UPDATED'=>			'Items updated',
@@ -620,7 +620,7 @@
 	'S_AS_BLUE'=>				'as Blue',
 
 // maintenance.php
-	'S_MAINTENANCE'=>			'Maintenance',
+	'S_MAINTENANCE'=>				'Maintenance',
 	'S_MAINTENANCE_ADDED'=>			'Maintenance added',
 	'S_MAINTENANCE_UPDATED'=>		'Maintenance updated',
 	'S_MAINTENANCE_DELETED'=>		'Maintenance deleted',
@@ -1035,7 +1035,7 @@
 	'S_LAST_VALUE'=>			'Last value',
 
 //	sysmap.php
-	'S_UPPER_LEVEL_MAPS' => 'Upper level maps',
+	'S_UPPER_LEVEL_MAPS'=>			'Upper level maps',
 	'S_LINKS'=>				'Links',
 	'S_LINK'=>				'Link',
 	'S_LABEL'=>				'Label',
@@ -1044,7 +1044,7 @@
 	'S_ICON_PROBLEM'=>			'Icon (problem)',
 	'S_ICON_OK'=>				'Icon (ok)',
 	'S_ICON_UNKNOWN'=>			'Icon (unknown)',
-	'S_ICON_MAINTENANCE'=>		'Icon (maintenance)',
+	'S_ICON_MAINTENANCE'=>			'Icon (maintenance)',
 	'S_ICON_DISABLED'=>			'Icon (disabled)',
 	'S_ELEMENT_1'=>				'Element 1',
 	'S_ELEMENT_2'=>				'Element 2',
@@ -1057,31 +1057,33 @@
 	'S_COORDINATE_X'=>			'Coordinate X',
 	'S_COORDINATE_Y'=>			'Coordinate Y',
 
-	'S_DISPLAYED_ELEMENTS'=>	'Displayed elements',
+	'S_DISPLAYED_ELEMENTS'=>		'Displayed elements',
 	'S_CONNECTORS'=>			'Connectors',
+	'S_UNAVAILABLE_BIG' =>			'UNAVAILABLE',
+	'S_MAINTENANCE_BIG' =>		'MAINTENANCE',
 
 //	sysmaps.php
-	'S_EDIT_MAP_ELEMENT' =>		'Edit map element',
-	'S_ICON_DEFAULT' => 		'Icon (default)',
-	'S_APPLY' =>				'Apply',
-	'S_MAP_ELEMENTS' =>			'Map elements',
+	'S_EDIT_MAP_ELEMENT'=>			'Edit map element',
+	'S_ICON_DEFAULT'=> 			'Icon (default)',
+	'S_APPLY'=>				'Apply',
+	'S_MAP_ELEMENTS'=>			'Map elements',
 	'S_MAP_DELETED'=>			'Network map deleted',
-	'S_CANNOT_DELETE_MAP'=>		'Cannot delete network map',
+	'S_CANNOT_DELETE_MAP'=>			'Cannot delete network map',
 	'S_MAPS_BIG'=>				'MAPS',
-	'S_NO_MAPS_DEFINED'=>		'No maps defined',
+	'S_NO_MAPS_DEFINED'=>			'No maps defined',
 	'S_CREATE_MAP'=>			'Create Map',
-	'S_ICON_LABEL_LOCATION'=>	'Icon label location',
-	'S_ICON_HIGHLIGHTING'=>		'Icon highlighting',
-	'S_LINK_INDICATORS' =>		'Link indicators',
-	'S_TYPE_OK' =>				'Type (OK)',
-	'S_COLOR_OK' =>				'Colour (Problem)',
-	'S_USE_ADVANCED_ICONS' =>	'Use advanced icons',
+	'S_ICON_LABEL_LOCATION'=>		'Icon label location',
+	'S_ICON_HIGHLIGHTING'=>			'Icon highlighting',
+	'S_LINK_INDICATORS'=>			'Link indicators',
+	'S_TYPE_OK'=>				'Type (OK)',
+	'S_COLOR_OK'=>				'Colour (OK)',
+	'S_USE_ADVANCED_ICONS'=>		'Use advanced icons',
 
 	'S_BOTTOM'=>				'Bottom',
-	'S_TOP'=>					'Top',
-	'S_LINK_STATUS_INDICATORS'=>	'Link status indicators',
+	'S_TOP'=>				'Top',
+	'S_LINK_STATUS_INDICATORS'=>		'Link status indicators',
 
-	'S_REMOVE_ELEMENT'=>		'Remove element',
+	'S_REMOVE_ELEMENT'=>			'Remove element',
 	'S_ADD_LINK'=>				'Add link',
 	'S_REMOVE_LINK'=>			'Remove link',
 
@@ -1358,6 +1360,7 @@
 	'S_CANNOT_ADD_SERVICE'=>		'Cannot add service',
 	'S_SERVICE_DELETED'=>			'Service deleted',
 	'S_CANNOT_DELETE_SERVICE'=>		'Cannot delete service',
+	'S_PARENT_SERVICE'=>			'Parent service',
 	'S_STATUS_CALCULATION'=>		'Status calculation',
 	'S_STATUS_CALCULATION_ALGORITHM'=>	'Status calculation algorithm',
 	'S_NONE'=>				'None',
@@ -1420,6 +1423,7 @@
 	'S_SEVERITY'=>				'Severity',
 	'S_MIN_SEVERITY'=>			'Min severity',
 	'S_DISABLED'=>				'Disabled',
+	'S_DISABLED_BIG'=>			'DISABLED',
 	'S_ENABLED'=>				'Enabled',
 	'S_DISABLE'=>				'Disable',
 	'S_ENABLE'=>				'Enable',

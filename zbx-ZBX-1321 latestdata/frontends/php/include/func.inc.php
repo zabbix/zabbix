@@ -756,6 +756,7 @@ function zbx_strstr($haystack,$needle){
 	if($pos !== FALSE){
 		$pos = substr($haystack,$pos);
 	}
+
 return $pos;
 }
 
@@ -767,6 +768,7 @@ function zbx_stristr($haystack,$needle){
 	if($pos !== FALSE){
 		$pos = substr($haystack,$pos);
 	}
+
 return $pos;
 }
 

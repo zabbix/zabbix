@@ -57,6 +57,7 @@ selection: {
 },
 
 menu_active: 0,						// To recognize D&D
+
 debug_status: 0,					// debug status: 0 - off, 1 - on, 2 - SDI;
 debug_info: '',						// debug string
 
@@ -528,7 +529,24 @@ add_link: function(mlink, update_map){
 		linkid = mlink.linkid;
 	}
 
-	if(is_array(mlink.linktriggers)) mlink.linktriggers = {};
+	if(is_array(mlink.linktriggers)){
+		var tmp_lts = {};
+		for(var i=0; i<mlink.linktriggers.length; i++){
+			if(!isset(i, mlink.linktriggers) || empty(mlink.linktriggers[i])) continue;
+			var tmp_lt = mlink.linktriggers[i];
+
+			tmp_lts[tmp_lt.linktriggerid] = {};
+
+			tmp_lts[tmp_lt.linktriggerid].linktriggerid = tmp_lt.linktriggerid;
+			tmp_lts[tmp_lt.linktriggerid].linkid = tmp_lt.linkid;
+			tmp_lts[tmp_lt.linktriggerid].triggerid = tmp_lt.triggerid;
+			tmp_lts[tmp_lt.linktriggerid].drawtype = tmp_lt.drawtype;
+			tmp_lts[tmp_lt.linktriggerid].color = tmp_lt.color;
+			tmp_lts[tmp_lt.linktriggerid].desc_exp = tmp_lt.desc_exp;
+		}
+
+		mlink.linktriggers = tmp_lts;
+	} 
 
 	mlink.status = 1;
 	this.links[linkid] = mlink;
@@ -2141,7 +2159,7 @@ updateForm_selement: function(e, selementid){
 		var advanced_icons = false;
 
 // Icon PROBLEM
-		advanced_icons = (advanced_icons || selement.iconid_on)?true:false;
+		advanced_icons = (advanced_icons || (selement.iconid_on != 0))?true:false;
 		for(var i=0; i<this.selementForm.iconid_on.options.length; i++){
 			if(!isset(i, this.selementForm.iconid_on.options)) continue;
 			
@@ -2151,7 +2169,7 @@ updateForm_selement: function(e, selementid){
 		}
 	
 // Icon UNKNOWN
-		advanced_icons = (advanced_icons || selement.iconid_unknown)?true:false;
+		advanced_icons = (advanced_icons || (selement.iconid_unknown != 0))?true:false;
 		for(var i=0; i<this.selementForm.iconid_unknown.options.length; i++){
 			if(!isset(i, this.selementForm.iconid_unknown.options)) continue;
 			
@@ -2161,7 +2179,7 @@ updateForm_selement: function(e, selementid){
 		}
 
 // Icon MAINTENANCE
-		advanced_icons =(advanced_icons || selement.iconid_maintenance)?true:false;
+		advanced_icons =(advanced_icons || (selement.iconid_maintenance != 0))?true:false;
 		for(var i=0; i<this.selementForm.iconid_maintenance.options.length; i++){
 			if(!isset(i, this.selementForm.iconid_maintenance.options)) continue;
 			
@@ -2172,7 +2190,7 @@ updateForm_selement: function(e, selementid){
 	
 // Icon DISABLED
 		
-		advanced_icons = (advanced_icons || selement.iconid_disabled)?true:false;
+		advanced_icons = (advanced_icons || (selement.iconid_disabled != 0))?true:false;
 		for(var i=0; i<this.selementForm.iconid_disabled.options.length; i++){
 			if(!isset(i, this.selementForm.iconid_disabled.options)) continue;
 			
@@ -2356,7 +2374,7 @@ updateForm_selementByType: function(e, multi){
 		break;
 		case '3':
 // host group
-			var srctbl = 'groups';
+			var srctbl = 'host_group';
 			var srcfld1 = 'groupid';
 			var srcfld2 = 'name';
 			$(this.selementForm.typeDOM.elementCaption).update(locale['S_HOST_GROUP']);
@@ -2384,7 +2402,7 @@ updateForm_selementByType: function(e, multi){
 	}
 	
 	if(!empty(srctbl)){
-		var popup_url = 'popup.php?dstfrm=selementForm&dstfld1=elementid&dstfld2=elementName';
+		var popup_url = 'popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementName';
 		popup_url+= '&srctbl='+srctbl;
 		popup_url+= '&srcfld1='+srcfld1;
 		popup_url+= '&srcfld2='+srcfld2;
@@ -2491,9 +2509,9 @@ saveForm_selement: function(e){
 			if(!isset(this.selection.selements[i], this.selements)) continue;
 
 			var selementid = this.selection.selements[i];
-			this.update_selement_option(selementid, params, false);
+			this.update_selement_option(selementid, params);
 		}
-		this.update_selement_option(selementid, params, true);
+		this.update_selement_option(selementid, params);
 	}
 
 	this.update_mapimg();
@@ -3003,7 +3021,7 @@ this.linkForm.linkIndicatorsBody = e_tbody_7;
 	e_input_6.className = "button";
 	this.linkForm.linkIndicatorsTable.appendChild(e_input_6);
 	
-	addListener(e_input_6, 'click', function(){ remove_childs('linkForm','linktriggers','tr'); });
+	addListener(e_input_6, 'click', function(){ remove_childs('linkForm','link_triggerids','tr'); });
 //----
 
 	
@@ -3105,9 +3123,9 @@ linkForm_addLinktrigger: function(linktrigger){
 	var lineName = '';
 	switch(linktrigger.drawtype.toString()){
 		case '0': lineName = locale['S_LINE']; break;
-		case '1': lineName = locale['S_BOLD_LINE']; break;
-		case '2': lineName = locale['S_DOT']; break;
-		case '3': lineName = locale['S_DASHED_LINE']; break;
+		case '2': lineName = locale['S_BOLD_LINE']; break;
+		case '3': lineName = locale['S_DOT']; break;
+		case '4': lineName = locale['S_DASHED_LINE']; break;
 	}
 	
 	var e_td_9 = document.createElement('td');
@@ -3193,6 +3211,8 @@ saveForm_link: function(e){
 
 	this.update_linkContainer(e);
 	this.hideForm_link(e);
+
+	this.update_mapimg();
 },
 
 deleteForm_link: function(e){

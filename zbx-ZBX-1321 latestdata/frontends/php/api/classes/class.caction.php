@@ -44,7 +44,6 @@ class CAction extends CZBXAPI{
  * @param array $options['actionids']
  * @param array $options['applicationids']
  * @param array $options['status']
- * @param array $options['templated_items']
  * @param array $options['editable']
  * @param array $options['extendoutput']
  * @param array $options['count']
@@ -240,13 +239,6 @@ class CAction extends CZBXAPI{
 			$sql_parts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
 			$sql_parts['where']['ef'] = 'e.objectid=f.triggerid';
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
-		}
-
-// actionids
-		if(!is_null($options['actionids'])){
-			zbx_value2array($options['actionids']);
-
-			$sql_parts['where'][] = DBcondition('a.actionid', $options['actionids']);
 		}
 
 // triggerids

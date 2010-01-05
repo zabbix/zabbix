@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2007 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ require_once('include/hosts.inc.php');
 require_once('include/triggers.inc.php');
 require_once('include/items.inc.php');
 
-$page['title'] = "S_TRIGGER_LOG";
+$page['title'] = 'S_TRIGGER_LOG';
 $page['file'] = 'tr_logform.php';
 $page['scripts'] = array();
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
@@ -122,7 +122,7 @@ if(isset($_REQUEST['save_trigger'])){
 
 			show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
 		}
-		else {
+		else{
 			$trigger = array();
 			$trigger['expression'] = $expression;
 			$trigger['description'] = $_REQUEST['description'];
@@ -134,18 +134,24 @@ if(isset($_REQUEST['save_trigger'])){
 
 			DBstart();
 			if($db_triggers = CTrigger::add($trigger)){
-				$triggerids = zbx_objectValues(db_triggers, 'triggerid');
-				$result = reset($triggerids);
+				if($db_triggers !== false){
+					$result = true;
+					$db_triggers = reset($db_triggers);
+					$triggerid = $db_triggers['triggerid'];
+				}
+				else{
+					$result = false;
+				}
 			}
 
 //			$triggerid=add_trigger($expression,$_REQUEST["description"],$type,$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],$deps);
 
 			$result &= CTrigger::addDependencies($deps);
 
-//REVERT
+
 			$result = DBend($result);
 
-			$result = $triggerid;
+			// $result = $triggerid;
 			$audit_action = AUDIT_ACTION_ADD;
 
 			show_messages($triggerid, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
@@ -190,7 +196,7 @@ if(isset($_REQUEST['sform'])){
 						' AND i.itemid=f.itemid '.
 						' AND f.triggerid = t.triggerid '.
 						' AND i.value_type IN ('.ITEM_VALUE_TYPE_LOG.' , '.ITEM_VALUE_TYPE_TEXT.', '.ITEM_VALUE_TYPE_STR.')'.
-						' AND i.key_ LIKE ("'.$matchkey.'")';
+						' AND i.key_ LIKE (\''.$matchkey.'\')';
 		$res = DBselect($sql);
 		while($rows = DBfetch($res)){
 			$description = $rows['description'];
@@ -410,9 +416,6 @@ if(isset($_REQUEST['sform'])){
 }
 //------------------------ </FORM> ---------------------------
 
-?>
-<?php
 
 include_once('include/page_footer.php');
-
 ?>

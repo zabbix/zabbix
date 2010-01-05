@@ -45,7 +45,6 @@ include_once('include/page_header.php');
 	$fields=array(
 		'itemid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	'!isset({favobj})'),
 
-		'from'=>	array(T_ZBX_INT, O_OPT,	 null,	'{}>=0', null),
 		'period'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		'dec'=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		'inc'=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
@@ -205,7 +204,6 @@ include_once('include/page_header.php');
 			$l_header->setName('loglist');
 			$l_header->setMethod('get');
 			$l_header->addVar('action',$_REQUEST['action']);
-			$l_header->addVar('from',get_request('from', 0));
 			$l_header->addVar('period',$_REQUEST['period']);
 			$l_header->addVar('itemid',$_REQUEST['itemid']);
 
@@ -299,7 +297,6 @@ include_once('include/page_header.php');
 				$r_header->setMethod('get');
 
 				$r_header->addVar('action',$_REQUEST['action']);
-				$r_header->addVar('from',$_REQUEST['from']);
 				$r_header->addVar('period',$_REQUEST['period']);
 				$r_header->addVar('itemid',$_REQUEST['itemid']);
 

@@ -93,7 +93,6 @@ class CUserMacro extends CZBXAPI{
 			'nopermissions'				=> null,
 // filter
 			'pattern'					=> '',
-
 // OutPut
 			'globalmacro'				=> null,
 			'extendoutput'				=> null,
@@ -540,22 +539,23 @@ class CUserMacro extends CZBXAPI{
  * @param string $macros['macros'][0..]['value']
  * @return array|boolean
  */
-	public static function update($macros){
+/*	public static function update($macros){
 		$macros = zbx_toArray($macros);
 		$new_macros = array();
 		$hostmacroids = array();
-		$result = false;
+		$result = true;
 //------
 		$hostids = array();
-
 		self::BeginTransaction(__METHOD__);
 		foreach($macros as $mnum => $macro){
-			$result = DBexecute('DELETE FROM hostmacro WHERE hostid='.$macro['hostid']);
+			$hostids[] = $macro['hostid'];
 
 			if(isset($macro['macro']) && isset($macro['value'])){
 				if(CUserMacro::validate($macro)) $new_macros[] = $macro;
 			}
 		}
+
+		$result = DBexecute('DELETE FROM hostmacro WHERE '.DBcondition('hostid', $hostids));
 
 		foreach($new_macros as $mnum => $macro){
 			$hostmacroid = get_dbid('hostmacro', 'hostmacroid');
@@ -579,7 +579,7 @@ class CUserMacro extends CZBXAPI{
 			return false;
 		}
 	}
-
+*/
 /**
  * Update macros values
  *
@@ -677,9 +677,7 @@ class CUserMacro extends CZBXAPI{
  * @static
  * @since 1.8
  * @version 1
- *
  * @param _array $macros
-
  * @param string $macros[0..]['macro']
  * @param string $macros[0..]['value']
  * @return array|boolean
@@ -850,6 +848,130 @@ class CUserMacro extends CZBXAPI{
 		}
 
 	return $result;
+	}
+
+/**
+ * Add Hosts to HostGroups. All Hosts are added to all HostGroups.
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $data
+ * @param array $data['templates']
+ * @param array $data['hosts']
+ * @param array $data['macros']
+ * @return boolean
+ */
+	public static function massAdd($data){
+		$errors = array();
+		$result = true;
+
+		try{
+			$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : null;
+			$hostids = is_null($hosts) ? array() : zbx_objectValues($hosts, 'hostid');
+
+			$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : null;
+			$templateids = is_null($templates) ? array() : zbx_objectValues($templates, 'templateid');
+
+			self::BeginTransaction(__METHOD__);
+
+			if(isset($data['macros'])){
+				if(isset($data['hosts']) || isset($data['templates'])){
+					$linked = array();
+
+					$macros_macro = zbx_objectValues($data['macros'], 'macro');
+
+					$objectids = array_merge($hostids, $templateids);
+
+					$sql = 'SELECT macro, hostid FROM hostmacro WHERE '.DBcondition('hostid', $objectids).' AND '.DBcondition('macro', $macros_macro, false, true);
+					$linked_db = DBselect($sql);
+					while($pair = DBfetch($linked_db)){
+						$linked[] = array('macro' => $pair['macro'], 'hostid' => $pair['hostid']);
+					}
+
+					foreach($data['macros'] as $mnum => $macro){
+						foreach($objectids as $hostid){
+
+							foreach($linked as $link){
+								if(($link['macro'] == $macro['macro']) && ($link['hostid'] == $hostid)) continue 2;
+							}
+
+							$values = array(get_dbid('hostmacro', 'hostmacroid'), $hostid, zbx_dbstr($macro['macro']),
+								zbx_dbstr($macro['value']));
+							$sql = 'INSERT INTO hostmacro (hostmacroid, hostid, macro, value) VALUES ('. implode(', ', $values) .')';
+
+							if(!DBexecute($sql)){
+								$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'DB error');
+								throw new APIException($error);
+							}
+						}
+					}
+				}
+			}
+
+			self::EndTransaction(true, __METHOD__);
+
+			return true;
+		}
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+
+			self::setMethodErrors(__METHOD__, $e->getErrors());
+			return false;
+		}
+	}
+
+/**
+ * Remove Hosts from HostGroups
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $data
+ * @param array $data['groups']
+ * @param array $data['hosts']
+ * @param array $data['templates']
+ * @return boolean
+ */
+	public static function massRemove($data){
+		$errors = array();
+		$result = true;
+
+		$macros = zbx_objectValues($data['macros'], 'macro');
+
+		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : null;
+		$hostids = is_null($hosts) ? array() : zbx_objectValues($hosts, 'hostid');
+
+		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : null;
+		$templateids = is_null($templates) ? array() : zbx_objectValues($templates, 'templateid');
+
+
+		$objectids_to_unlink = array_merge($hostids, $templateids);
+
+		self::BeginTransaction(__METHOD__);
+
+		$sql = 'DELETE FROM hostmacro WHERE '.DBcondition('hostid', $objectids_to_unlink).' AND '.DBcondition('macro', $macros, false, true);
+		$result = DBexecute($sql);
+		$result = self::EndTransaction($result, __METHOD__);
+
+		if($result){
+			// $result = self::get(array(
+				// 'groupids' => $groupids,
+				// 'extendoutput' => 1,
+				// 'select_hosts' => 1,
+				// 'nopermission' => 1));
+			return $result;
+		}
+		else{
+			self::setMethodErrors(__METHOD__, $errors);
+			return false;
+		}
 	}
 
 

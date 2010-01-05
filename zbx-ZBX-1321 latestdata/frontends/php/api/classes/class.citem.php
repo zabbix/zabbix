@@ -76,7 +76,8 @@ class CItem extends CZBXAPI{
 			'graphids'				=> null,
 			'triggerids'			=> null,
 			'applicationids'		=> null,
-			'templated_items'		=> null,
+			'inherited'				=> null,
+			'templated'				=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
 // filter
@@ -214,12 +215,22 @@ class CItem extends CZBXAPI{
 			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
 		}
 
-// templated_items
-		if(!is_null($options['templated_items'])){
-			if($options['templated_items'] == 1)
+// inherited
+		if(!is_null($options['inherited'])){
+			if($options['inherited'])
 				$sql_parts['where'][] = 'i.templateid>0';
 			else
 				$sql_parts['where'][] = 'i.templateid=0';
+		}
+
+// templated
+		if(!is_null($options['templated'])){
+			$sql_parts['from'][] = 'hosts h';
+			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+			if($options['templated'])
+				$sql_parts['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
+			else
+				$sql_parts['where'][] = 'h.status<>'.HOST_STATUS_TEMPLATE;
 		}
 
 // extendoutput
@@ -300,7 +311,9 @@ class CItem extends CZBXAPI{
 
 // valuetype
 			if(!is_null($options['valuetype'])){
-				$sql_parts['where'][] = 'i.value_type='.$options['valuetype'];
+				zbx_value2array($options['valuetype']);
+
+				$sql_parts['where'][] = DBCondition('i.value_type', $options['valuetype']);
 			}
 
 // datatype
@@ -458,7 +471,13 @@ class CItem extends CZBXAPI{
 // Adding Objects
 // Adding hosts
 		if($options['select_hosts']){
-			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids, 'nopermissions' => 1, 'preservekeys' => 1);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1,
+				'itemids' => $itemids,
+				'nopermissions' => 1,
+				'preservekeys' => 1
+			);
 			$hosts = CHost::get($obj_params);
 			foreach($hosts as $hostid => $host){
 				foreach($host['items'] as $inum => $item){
@@ -476,7 +495,12 @@ class CItem extends CZBXAPI{
 
 // Adding triggers
 		if($options['select_triggers']){
-			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids, 'preservekeys' => 1);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1,
+				'itemids' => $itemids,
+				'preservekeys' => 1
+			);
 			$triggers = CTrigger::get($obj_params);
 			foreach($triggers as $triggerid => $trigger){
 				foreach($trigger['items'] as $inum => $item){
@@ -487,7 +511,12 @@ class CItem extends CZBXAPI{
 
 // Adding graphs
 		if($options['select_graphs']){
-			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids, 'preservekeys' => 1);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1,
+				'itemids' => $itemids,
+				'preservekeys' => 1
+			);
 			$graphs = CGraph::get($obj_params);
 			foreach($graphs as $graphid => $graph){
 				foreach($graph['items'] as $inum => $item){
@@ -498,7 +527,12 @@ class CItem extends CZBXAPI{
 
 // Adding applications
 		if($options['select_applications']){
-			$obj_params = array('extendoutput' => 1, 'itemids' => $itemids, 'preservekeys' => 1);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1,
+				'itemids' => $itemids,
+				'preservekeys' => 1
+			);
 			$applications = CApplication::get($obj_params);
 			foreach($applications as $applicationid => $application){
 				foreach($application['items'] as $inum => $item){

@@ -73,13 +73,12 @@ class CGraph extends CZBXAPI{
 			'graphids' 				=> null,
 			'itemids' 				=> null,
 			'type' 					=> null,
-			'templated_graphs'		=> null,
-			'not_templated_graphs'	=> null,
+			'templated'				=> null,
+			'inherited'				=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
 // filter
 			'pattern'				=> '',
-
 // output
 			'select_hosts'			=> null,
 			'select_templates'		=> null,
@@ -193,12 +192,31 @@ class CGraph extends CZBXAPI{
 			$sql_parts['where'][] = 'g.type='.$options['type'];
 		}
 
-// templated_graphs
-		if(!is_null($options['templated_graphs'])){
-			$sql_parts['where'][] = 'g.templateid<>0';
+// templated
+		if(!is_null($options['templated'])){
+			$sql_parts['from']['gi'] = 'graphs_items gi';
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['from']['h'] = 'hosts h';
+			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
+			$sql_parts['where']['ggi'] = 'g.graphid=gi.graphid';
+			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+
+			if($options['templated']){
+				$sql_parts['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
+			}
+			else{
+				$sql_parts['where'][] = 'h.status<>'.HOST_STATUS_TEMPLATE;
+			}
 		}
-		else if(!is_null($options['not_templated_graphs'])){
-			$sql_parts['where'][] = 'g.templateid=0';
+
+// inherited
+		if(!is_null($options['inherited'])){
+			if($options['inherited']){
+				$sql_parts['where'][] = 'g.templateid<>0';
+			}
+			else{
+				$sql_parts['where'][] = 'g.templateid=0';
+			}
 		}
 
 // extendoutput
@@ -314,7 +332,13 @@ class CGraph extends CZBXAPI{
 
 // Adding GraphItems
 		if($options['select_graph_items']){
-			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1, 'preservekeys' => 1);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1,
+				'graphids' => $graphids,
+				'nopermissions' => 1,
+				'preservekeys' => 1
+			);
 			$gitems = CGraphItem::get($obj_params);
 			foreach($gitems as $gitemid => $gitem){
 				foreach($gitem['graphs'] as $num => $graph){
@@ -325,7 +349,13 @@ class CGraph extends CZBXAPI{
 
 // Adding Hosts
 		if($options['select_hosts']){
-			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1, 'preservekeys' => 1);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1,
+				'graphids' => $graphids,
+				'nopermissions' => 1,
+				'preservekeys' => 1
+			);
 			$hosts = CHost::get($obj_params);
 			foreach($hosts as $hostid => $host){
 				foreach($host['graphs'] as $num => $graph){
@@ -336,7 +366,13 @@ class CGraph extends CZBXAPI{
 
 // Adding Templates
 		if($options['select_templates']){
-			$obj_params = array('extendoutput' => 1, 'graphids' => $graphids, 'nopermissions' => 1, 'preservekeys' => 1);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1,
+				'graphids' => $graphids,
+				'nopermissions' => 1,
+				'preservekeys' => 1
+			);
 			$templates = CTemplate::get($obj_params);
 			foreach($templates as $templateid => $template){
 				foreach($template['graphs'] as $num => $graph){
@@ -347,11 +383,13 @@ class CGraph extends CZBXAPI{
 
 // Adding Items
 		if($options['select_items']){
-			$obj_params = array('extendoutput' => 1,
-								'graphids' => $graphids,
-								'nopermissions' => 1,
-								'preservekeys' => 1
-							);
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'extendoutput' => 1,
+				'graphids' => $graphids,
+				'nopermissions' => 1,
+				'preservekeys' => 1
+			);
 			$items = CItem::get($obj_params);
 			foreach($items as $itemid => $item){
 				foreach($item['graphs'] as $num => $graph){
@@ -442,7 +480,7 @@ class CGraph extends CZBXAPI{
 		self::BeginTransaction(__METHOD__);
 		foreach($graphs as $gnum => $graph){
 
-			if(!is_array($graph['gitems']) || empty($graph['gitems'])){
+			if(!isset($graph['gitems']) || !is_array($graph['gitems']) || empty($graph['gitems'])){
 				$result = false;
 				$error = 'Missing items for graph "'.$graph['name'].'"';
 				break;
