@@ -67,6 +67,7 @@ class CUser extends CZBXAPI{
 		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('userid', 'alias'); // allowed columns for sorting
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 
 		$sql_parts = array(
@@ -86,6 +87,7 @@ class CUser extends CZBXAPI{
 			'pattern'					=> '',
 // OutPut
 			'extendoutput'				=> null,
+			'output'				=> API_OUTPUT_REFER,
 			'editable'					=> null,
 			'select_usrgrps'			=> null,
 			'get_access'				=> null,
@@ -99,6 +101,16 @@ class CUser extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
+		
+		if(!is_null($options['extendoutput'])){
+			$options['output'] = API_OUTPUT_EXTEND;
+			
+			if(!is_null($options['select_usrgrps'])){
+				$options['select_usrgrps'] = API_OUTPUT_EXTEND;
+			}
+		}
+		
+		
 // PERMISSION CHECK
 		if(USER_TYPE_SUPER_ADMIN == $user_type){
 
@@ -113,7 +125,7 @@ class CUser extends CZBXAPI{
 // usrgrpids
 		if(!is_null($options['usrgrpids'])){
 			zbx_value2array($options['usrgrpids']);
-			if(!is_null($options['extendoutput'])){
+			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['usrgrpid'] = 'ug.usrgrpid';
 			}
 			$sql_parts['from']['ug'] = 'users_groups ug';
@@ -141,7 +153,7 @@ class CUser extends CZBXAPI{
 
 
 // extendoutput
-		if(!is_null($options['extendoutput'])){
+		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['users'] = 'u.*';
 		}
 
@@ -204,7 +216,7 @@ class CUser extends CZBXAPI{
 			else{
 				$userids[$user['userid']] = $user['userid'];
 
-				if(is_null($options['extendoutput'])){
+				if($options['output'] == API_OUTPUT_SHORTEN){
 					$result[$user['userid']] = array('userid' => $user['userid']);
 				}
 				else{
@@ -228,7 +240,7 @@ class CUser extends CZBXAPI{
 			}
 		}
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 
 			return $result;
@@ -253,14 +265,17 @@ class CUser extends CZBXAPI{
 		}
 // Adding Objects
 // Adding usergroups
-		if($options['select_usrgrps']){
-			$obj_params = array('extendoutput' => 1,
-								'userids' => $userids,
-								'preservekeys' => 1
-							);
+		if(!is_null($options['select_usrgrps']) && str_in_array($options['select_usrgrps'], $subselects_allowed_outputs)){
+			$obj_params = array(
+				'output' => $options['select_usrgrps'],
+				'userids' => $userids,
+				'preservekeys' => 1
+			);
 			$usrgrps = CUserGroup::get($obj_params);
 			foreach($usrgrps as $usrgrpid => $usrgrp){
-				foreach($usrgrp['users'] as $num => $user){
+				$uusers = $usrgrp['users'];
+				unset($usrgrp['users']);
+				foreach($uusers as $num => $user){
 					$result[$user['userid']]['usrgrps'][$usrgrpid] = $usrgrp;
 				}
 			}

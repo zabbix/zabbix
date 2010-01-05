@@ -55,6 +55,7 @@ class CScreen extends CZBXAPI{
 		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('name'); // allowed columns for sorting
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 
 		$sql_parts = array(
@@ -73,6 +74,7 @@ class CScreen extends CZBXAPI{
 			'pattern'					=> '',
 // OutPut
 			'extendoutput'				=> null,
+			'output'				=> API_OUTPUT_REFER,
 			'select_groups'				=> null,
 			'select_templates'			=> null,
 			'select_items'				=> null,
@@ -89,6 +91,31 @@ class CScreen extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
+		
+		if(!is_null($options['extendoutput'])){
+			$options['output'] = API_OUTPUT_EXTEND;
+			
+			if(!is_null($options['select_groups'])){
+				$options['select_groups'] = API_OUTPUT_EXTEND;
+			}
+			if(!is_null($options['select_items'])){
+				$options['select_items'] = API_OUTPUT_EXTEND;
+			}
+			if(!is_null($options['select_templates'])){
+				$options['select_templates'] = API_OUTPUT_EXTEND;
+			}
+			if(!is_null($options['select_triggers'])){
+				$options['select_triggers'] = API_OUTPUT_EXTEND;
+			}
+			if(!is_null($options['select_graphs'])){
+				$options['select_graphs'] = API_OUTPUT_EXTEND;
+			}
+			if(!is_null($options['select_applications'])){
+				$options['select_applications'] = API_OUTPUT_EXTEND;
+			}
+		}
+		
+		
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
@@ -104,7 +131,7 @@ class CScreen extends CZBXAPI{
 		}
 
 // extendoutput
-		if(!is_null($options['extendoutput'])){
+		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['screens'] = 's.*';
 		}
 
@@ -169,7 +196,7 @@ class CScreen extends CZBXAPI{
 			else{
 				$screenids[$screen['screenid']] = $screen['screenid'];
 
-				if(is_null($options['extendoutput'])){
+				if($options['output'] == API_OUTPUT_SHORTEN){
 					$result[$screen['screenid']] = array('screenid' => $screen['screenid']);
 				}
 				else{
@@ -298,14 +325,14 @@ SDI('/////////////////////////////////');
 			}
 		}
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
 
 // Adding Items
-		if($options['select_items']){
+		if(!is_null($options['select_items']) && str_in_array($options['select_items'], $subselects_allowed_outputs)){
 			if(!isset($screens_items)){
 				$db_sitems = DBselect('SELECT * FROM screens_items WHERE '.DBcondition('screenid', $screenids));
 				while($sitem = DBfetch($db_sitems)){

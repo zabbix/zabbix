@@ -689,13 +689,13 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'templateids' => zbx_objectValues($templates, 'templateid'),
-			'extendoutput' => 1,
-			'select_hosts' => 1,
-			'select_templates' => 1,
-			'select_items' => 1,
-			'select_triggers' => 1,
-			'select_graphs' => 1,
-			'select_applications' => 1,
+			'output' => API_OUTPUT_EXTEND,
+			'select_hosts' => API_OUTPUT_EXTEND,
+			'select_templates' => API_OUTPUT_EXTEND,
+			'select_items' => API_OUTPUT_REFER,
+			'select_triggers' => API_OUTPUT_REFER,
+			'select_graphs' => API_OUTPUT_REFER,
+			'select_applications' => API_OUTPUT_REFER,
 			'nopermissions' => 1
 		);
 

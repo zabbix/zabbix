@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,6 +43,7 @@ class CGraphItem extends CZBXAPI{
 		$result = array();
 
 		$sort_columns = array('gitemid'); // allowed columns for sorting
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 		$sql_parts = array(
 			'select' => array('gitems' => 'gi.gitemid'),
@@ -60,6 +61,7 @@ class CGraphItem extends CZBXAPI{
 			'editable'				=> null,
 			'nopermissions'			=> null,
 // output
+			'output'				=> API_OUTPUT_REFER,
 			'expand_data'			=> null,
 			'extendoutput'			=> null,
 			'count'					=> null,
@@ -71,6 +73,11 @@ class CGraphItem extends CZBXAPI{
 		);
 
 		$options = zbx_array_merge($def_options, $options);
+		
+		if(!is_null($options['extendoutput'])){
+			$options['output'] = API_OUTPUT_EXTEND;
+		}
+		
 
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
@@ -108,7 +115,7 @@ class CGraphItem extends CZBXAPI{
 // graphids
 		if(!is_null($options['graphids'])){
 			zbx_value2array($options['graphids']);
-			if(!is_null($options['extendoutput'])){
+			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['graphid'] = 'gi.graphid';
 			}
 			$sql_parts['from']['g'] = 'graphs g';
@@ -118,7 +125,7 @@ class CGraphItem extends CZBXAPI{
 // itemids
 		if(!is_null($options['itemids'])){
 			zbx_value2array($options['itemids']);
-			if(!is_null($options['extendoutput'])){
+			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['itemid'] = 'gi.itemid';
 			}
 			$sql_parts['where'][] = DBcondition('gi.itemid', $options['itemids']);
@@ -128,7 +135,7 @@ class CGraphItem extends CZBXAPI{
 			$sql_parts['where'][] = 'gi.type='.$options['type'];
 		}
 // extendoutput
-		if(!is_null($options['extendoutput'])){
+		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['gitems'] = 'gi.*';
 		}
 // expand_data
@@ -192,7 +199,7 @@ class CGraphItem extends CZBXAPI{
 			if($options['count'])
 				$result = $gitem;
 			else{
-				if(is_null($options['extendoutput'])){
+				if($options['output'] == API_OUTPUT_SHORTEN){
 					$result[$gitem['gitemid']] = array('gitemid' => $gitem['gitemid']);
 				}
 				else{
@@ -214,7 +221,7 @@ class CGraphItem extends CZBXAPI{
 			}
 		}
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}

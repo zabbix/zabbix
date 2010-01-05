@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,6 +60,7 @@ class CEvent extends CZBXAPI{
 		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('eventid', 'clock'); // allowed columns for sorting
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 		$sql_parts = array(
 			'select' => array('events' => 'e.eventid'),
@@ -86,6 +87,7 @@ class CEvent extends CZBXAPI{
 			'time_from'				=> null,
 			'time_till'				=> null,
 // OutPut
+			'output'				=> API_OUTPUT_REFER,
 			'extendoutput'			=> null,
 			'select_hosts'			=> null,
 			'select_items'			=> null,
@@ -101,6 +103,21 @@ class CEvent extends CZBXAPI{
 		$options = zbx_array_merge($def_options, $options);
 
 
+		if(!is_null($options['extendoutput'])){
+			$options['output'] = API_OUTPUT_EXTEND;
+			
+			if(!is_null($options['select_hosts'])){
+				$options['select_hosts'] = API_OUTPUT_EXTEND;
+			}
+			if(!is_null($options['select_triggers'])){
+				$options['select_triggers'] = API_OUTPUT_EXTEND;
+			}
+			if(!is_null($options['select_items'])){
+				$options['select_items'] = API_OUTPUT_EXTEND;
+			}
+		}
+		
+		
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
@@ -165,7 +182,7 @@ class CEvent extends CZBXAPI{
 		if(!is_null($options['groupids'])){
 			zbx_value2array($options['groupids']);
 
-			if(!is_null($options['extendoutput'])){
+			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
 
@@ -182,7 +199,7 @@ class CEvent extends CZBXAPI{
 		if(!is_null($options['hostids'])){
 			zbx_value2array($options['hostids']);
 
-			if(!is_null($options['extendoutput'])){
+			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['hostid'] = 'i.hostid';
 			}
 
@@ -234,7 +251,7 @@ class CEvent extends CZBXAPI{
 			$sql_parts['where'][] = DBcondition('e.value', $options['value']);
 		}
 // extendoutput
-		if(!is_null($options['extendoutput'])){
+		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['events'] = 'e.*';
 		}
 // count
@@ -299,7 +316,7 @@ class CEvent extends CZBXAPI{
 			else{
 				$eventids[$event['eventid']] = $event['eventid'];
 
-				if(is_null($options['extendoutput'])){
+				if($options['output'] == API_OUTPUT_SHORTEN){
 					$result[$event['eventid']] = array('eventid' => $event['eventid']);
 				}
 				else{
@@ -347,17 +364,17 @@ class CEvent extends CZBXAPI{
 		}
 
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
 // Adding Objects
 // Adding hosts
-		if($options['select_hosts']){
+		if(!is_null($options['select_hosts']) && str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'extendoutput' => 1,
+				'output' => $options['select_hosts'],
 				'triggerids' => $triggerids,
 				'nopermissions' => 1,
 				'preservekeys' => 1
@@ -366,7 +383,9 @@ class CEvent extends CZBXAPI{
 
 			$triggers = array();
 			foreach($hosts as $hostid => $host){
-				foreach($host['triggers'] as $tnum => $trigger){
+				$htriggers = $host['triggers'];
+				unset($host['triggers']);
+				foreach($htriggers as $tnum => $trigger){
 					$triggerid = $trigger['triggerid'];
 					if(!isset($triggers[$triggerid])) $triggers[$triggerid] = array('hosts' => array());
 
@@ -385,10 +404,10 @@ class CEvent extends CZBXAPI{
 		}
 
 // Adding triggers
-		if($options['select_triggers']){
+		if(!is_null($options['select_triggers']) && str_in_array($options['select_triggers'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'extendoutput' => 1,
+				'output' => $options['select_triggers'],
 				'triggerids' => $triggerids,
 				'nopermissions' => 1,
 				'preservekeys' => 1
@@ -405,10 +424,10 @@ class CEvent extends CZBXAPI{
 		}
 
 // Adding items
-		if($options['select_items']){
+		if(!is_null($options['select_items']) && str_in_array($options['select_items'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'extendoutput' => 1,
+				'output' => $options['select_items'],
 				'triggerids' => $triggerids,
 				'nopermissions' => 1,
 				'preservekeys' => 1
@@ -418,7 +437,9 @@ class CEvent extends CZBXAPI{
 
 			$items_evnt = array();
 			foreach($db_items as $itemid => $item){
-				foreach($item['triggers'] as $num => $trigger){
+				$itriggers = $item['triggers'];
+				unset($item['triggers']);
+				foreach($itriggers as $num => $trigger){
 					if(!isset($items[$trigger['triggerid']])) $items[$trigger['triggerid']] = array('items' => array());
 
 					$items[$triggerid]['items'][$itemid] = $item;

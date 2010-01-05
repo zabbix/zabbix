@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,6 +60,7 @@ class CAction extends CZBXAPI{
 		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('actionid','name'); // allowed columns for sorting
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 
 		$sql_parts = array(
@@ -90,6 +91,7 @@ class CAction extends CZBXAPI{
 
 // OutPut
 			'extendoutput'			=> null,
+			'output'				=> API_OUTPUT_REFER,
 			'select_conditions'		=> null,
 			'select_operations'		=> null,
 			'count'					=> null,
@@ -102,6 +104,19 @@ class CAction extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
+		
+		if(!is_null($options['extendoutput'])){
+			$options['output'] = API_OUTPUT_EXTEND;
+			
+			if(!is_null($options['select_conditions'])){
+				$options['select_conditions'] = API_OUTPUT_EXTEND;
+			}
+			if(!is_null($options['select_operations'])){
+				$options['select_operations'] = API_OUTPUT_EXTEND;
+			}
+		}
+		
+		
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = null;
@@ -209,7 +224,7 @@ class CAction extends CZBXAPI{
 		if(!is_null($options['groupids'])){
 			zbx_value2array($options['groupids']);
 
-			if(!is_null($options['extendoutput'])){
+			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
 
@@ -228,7 +243,7 @@ class CAction extends CZBXAPI{
 		if(!is_null($options['hostids'])){
 			zbx_value2array($options['hostids']);
 
-			if(!is_null($options['extendoutput'])){
+			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['hostid'] = 'i.hostid';
 			}
 
@@ -245,7 +260,7 @@ class CAction extends CZBXAPI{
 		if(!is_null($options['triggerids'])){
 			zbx_value2array($options['triggerids']);
 
-			if(!is_null($options['extendoutput'])){
+			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['actionid'] = 'a.actionid';
 			}
 
@@ -258,7 +273,7 @@ class CAction extends CZBXAPI{
 		if(!is_null($options['actionids'])){
 			zbx_value2array($options['actionids']);
 
-			if(!is_null($options['extendoutput'])){
+			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['actionid'] = 'a.actionid';
 			}
 
@@ -269,7 +284,7 @@ class CAction extends CZBXAPI{
 		if(!is_null($options['userids'])){
 			zbx_value2array($options['userids']);
 
-			if(!is_null($options['extendoutput'])){
+			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['userid'] = 'a.userid';
 			}
 
@@ -280,7 +295,7 @@ class CAction extends CZBXAPI{
 		if(!is_null($options['mediatypeids'])){
 			zbx_value2array($options['mediatypeids']);
 
-			if(!is_null($options['extendoutput'])){
+			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['mediatypeid'] = 'a.mediatypeid';
 			}
 
@@ -313,7 +328,7 @@ class CAction extends CZBXAPI{
 		}
 
 // extendoutput
-		if(!is_null($options['extendoutput'])){
+		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['actions'] = 'a.*';
 		}
 
@@ -382,7 +397,7 @@ class CAction extends CZBXAPI{
 			else{
 				$actionids[$action['actionid']] = $action['actionid'];
 
-				if(is_null($options['extendoutput'])){
+				if($options['output'] == API_OUTPUT_SHORTEN){
 					$result[$action['actionid']] = array('actionid' => $action['actionid']);
 				}
 				else{
@@ -397,14 +412,14 @@ class CAction extends CZBXAPI{
 			}
 		}
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
 // Adding Objects
 // Adding Conditions
-		if($options['select_conditions']){
+		if(!is_null($options['select_conditions']) && str_in_array($options['select_conditions'], $subselects_allowed_outputs)){
 			$sql = 'SELECT c.* FROM conditions c WHERE '.DBcondition('c.actionid', $actionids);
 			$res = DBselect($sql);
 			while($condition = DBfetch($res)){
@@ -413,7 +428,7 @@ class CAction extends CZBXAPI{
 		}
 
 // Adding Operations
-		if($options['select_operations']){
+		if(!is_null($options['select_operations']) && str_in_array($options['select_operations'], $subselects_allowed_outputs)){
 			$operations = array();
 			$operationids = array();
 			$sql = 'SELECT o.* '.

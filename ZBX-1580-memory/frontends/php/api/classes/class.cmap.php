@@ -67,6 +67,7 @@ class CMap extends CZBXAPI{
 		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('name'); // allowed columns for sorting
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 
 		$sql_parts = array(
@@ -85,6 +86,7 @@ class CMap extends CZBXAPI{
 			'pattern'					=> '',
 // OutPut
 			'extendoutput'				=> null,
+			'output'					=> API_OUTPUT_REFER,
 			'select_selements'			=> null,
 			'select_links'				=> null,
 			'count'						=> null,
@@ -97,6 +99,19 @@ class CMap extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
+		
+		if(!is_null($options['extendoutput'])){
+			$options['output'] = API_OUTPUT_EXTEND;
+			
+			if(!is_null($options['select_selements'])){
+				$options['select_selements'] = API_OUTPUT_EXTEND;
+			}
+			if(!is_null($options['select_links'])){
+				$options['select_links'] = API_OUTPUT_EXTEND;
+			}
+		}
+		
+		
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
@@ -112,7 +127,7 @@ class CMap extends CZBXAPI{
 		}
 
 // extendoutput
-		if(!is_null($options['extendoutput'])){
+		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['sysmaps'] = 's.*';
 		}
 
@@ -176,7 +191,7 @@ class CMap extends CZBXAPI{
 			else{
 				$sysmapids[$sysmap['sysmapid']] = $sysmap['sysmapid'];
 
-				if(is_null($options['extendoutput'])){
+				if($options['output'] == API_OUTPUT_SHORTEN){
 					$result[$sysmap['sysmapid']] = array('sysmapid' => $sysmap['sysmapid']);
 				}
 				else{
@@ -308,7 +323,7 @@ SDI('///////////////////////////////////////');
 			}
 		}
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
@@ -334,7 +349,7 @@ SDI('///////////////////////////////////////');
 		}
 
 // Adding Links
-		if(!is_null($options['select_links'])){
+		if(!is_null($options['select_links']) && str_in_array($options['select_links'], $subselects_allowed_outputs)){
 			if(!isset($map_links)){
 				$linkids = array();
 				$map_links = array();

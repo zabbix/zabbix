@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,6 +60,7 @@ class CItem extends CZBXAPI{
 		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('itemid','description','key_','delay','history','trends','type','status'); // allowed columns for sorting
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 		$sql_parts = array(
 			'select' => array('items' => 'i.itemid'),
@@ -103,6 +104,7 @@ class CItem extends CZBXAPI{
 			'pattern'				=> null,
 
 // OutPut
+			'output'				=> API_OUTPUT_REFER,
 			'extendoutput'			=> null,
 			'select_hosts'			=> null,
 			'select_triggers'		=> null,
@@ -116,8 +118,28 @@ class CItem extends CZBXAPI{
 			'limit'					=> null
 		);
 
+		
 		$options = zbx_array_merge($def_options, $options);
 
+		
+		if(!is_null($options['extendoutput'])){
+			$options['output'] = API_OUTPUT_EXTEND;
+			
+			if(!is_null($options['select_hosts'])){
+				$options['select_hosts'] = API_OUTPUT_EXTEND;
+			}
+			if(!is_null($options['select_triggers'])){
+				$options['select_triggers'] = API_OUTPUT_EXTEND;
+			}
+			if(!is_null($options['select_graphs'])){
+				$options['select_graphs'] = API_OUTPUT_EXTEND;
+			}
+			if(!is_null($options['select_applications'])){
+				$options['select_applications'] = API_OUTPUT_EXTEND;
+			}
+		}
+
+		
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
@@ -153,7 +175,7 @@ class CItem extends CZBXAPI{
 		if(!is_null($options['groupids'])){
 			zbx_value2array($options['groupids']);
 
-			if(!is_null($options['extendoutput'])){
+			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
 
@@ -166,6 +188,10 @@ class CItem extends CZBXAPI{
 		if(!is_null($options['hostids'])){
 			zbx_value2array($options['hostids']);
 
+			if($options['output'] != API_OUTPUT_EXTEND){
+				$sql_parts['select']['hostid'] = 'i.hostid';
+			}
+			
 			$sql_parts['where'][] = DBcondition('i.hostid', $options['hostids']);
 		}
 
@@ -180,7 +206,7 @@ class CItem extends CZBXAPI{
 		if(!is_null($options['triggerids'])){
 			zbx_value2array($options['triggerids']);
 
-			if(!is_null($options['extendoutput'])){
+			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['triggerid'] = 'f.triggerid';
 			}
 
@@ -193,7 +219,7 @@ class CItem extends CZBXAPI{
 		if(!is_null($options['applicationids'])){
 			zbx_value2array($options['applicationids']);
 
-			if(!is_null($options['extendoutput'])){
+			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['applicationid'] = 'ia.applicationid';
 			}
 
@@ -206,7 +232,7 @@ class CItem extends CZBXAPI{
 		if(!is_null($options['graphids'])){
 			zbx_value2array($options['graphids']);
 
-			if(!is_null($options['extendoutput'])){
+			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['graphid'] = 'gi.graphid';
 			}
 
@@ -233,8 +259,8 @@ class CItem extends CZBXAPI{
 				$sql_parts['where'][] = 'h.status<>'.HOST_STATUS_TEMPLATE;
 		}
 
-// extendoutput
-		if(!is_null($options['extendoutput'])){
+// API_OUTPUT_EXTEND
+		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['items'] = 'i.*';
 		}
 
@@ -247,7 +273,7 @@ class CItem extends CZBXAPI{
 		if(!is_null($options['filter'])){
 // group
 			if(!is_null($options['group'])){
-				if(!is_null($options['extendoutput'])){
+				if($options['output'] != API_OUTPUT_SHORTEN){
 					$sql_parts['select']['name'] = 'g.name';
 				}
 
@@ -261,7 +287,7 @@ class CItem extends CZBXAPI{
 
 // host
 			if(!is_null($options['host'])){
-				if(!is_null($options['extendoutput'])){
+				if($options['output'] != API_OUTPUT_SHORTEN){
 					$sql_parts['select']['host'] = 'h.host';
 				}
 
@@ -272,7 +298,7 @@ class CItem extends CZBXAPI{
 
 // application
 			if(!is_null($options['application'])){
-				if(!is_null($options['extendoutput'])){
+				if($options['output'] != API_OUTPUT_SHORTEN){
 					$sql_parts['select']['application'] = 'a.name as application';
 				}
 
@@ -398,6 +424,7 @@ class CItem extends CZBXAPI{
 				' WHERE '.DBin_node('i.itemid', $nodeids).
 					$sql_where.
 				$sql_order;
+//sdi($sql);
 		$res = DBselect($sql, $sql_limit);
 		while($item = DBfetch($res)){
 			if($options['count'])
@@ -405,7 +432,7 @@ class CItem extends CZBXAPI{
 			else{
 				$itemids[$item['itemid']] = $item['itemid'];
 
-				if(is_null($options['extendoutput'])){
+				if($options['output'] == API_OUTPUT_SHORTEN){
 					$result[$item['itemid']] = array('itemid' => $item['itemid']);
 				}
 				else{
@@ -424,7 +451,6 @@ class CItem extends CZBXAPI{
 					if($options['select_applications'] && !isset($result[$item['itemid']]['applications'])){
 						$result[$item['itemid']]['applications'] = array();
 					}
-
 
 // hostids
 					if(isset($item['hostid'])){
@@ -463,79 +489,90 @@ class CItem extends CZBXAPI{
 			}
 		}
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
 // Adding Objects
 // Adding hosts
-		if($options['select_hosts']){
+		if(!is_null($options['select_hosts']) && str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'extendoutput' => 1,
+				'output' => $options['select_hosts'],
 				'itemids' => $itemids,
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
 			$hosts = CHost::get($obj_params);
+
 			foreach($hosts as $hostid => $host){
-				foreach($host['items'] as $inum => $item){
+				$hitems = $host['items'];
+				unset($host['items']);
+				foreach($hitems as $inum => $item){
 					$result[$item['itemid']]['hosts'][$hostid] = $host;
 				}
 			}
 
 			$templates = CTemplate::get($obj_params);
 			foreach($templates as $templateid => $template){
-				foreach($template['items'] as $inum => $item){
+				$titems = $template['items'];
+				unset($template['items']);
+				foreach($titems as $inum => $item){
 					$result[$item['itemid']]['hosts'][$templateid] = $template;
 				}
 			}
 		}
 
 // Adding triggers
-		if($options['select_triggers']){
+		if(!is_null($options['select_triggers']) && str_in_array($options['select_triggers'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'extendoutput' => 1,
+				'output' => $options['select_triggers'],
 				'itemids' => $itemids,
 				'preservekeys' => 1
 			);
 			$triggers = CTrigger::get($obj_params);
 			foreach($triggers as $triggerid => $trigger){
-				foreach($trigger['items'] as $inum => $item){
+				$titems = $trigger['items'];
+				unset($trigger['items']);
+				foreach($titems as $inum => $item){
 					$result[$item['itemid']]['triggers'][$triggerid] = $trigger;
 				}
 			}
 		}
 
 // Adding graphs
-		if($options['select_graphs']){
+		if(!is_null($options['select_graphs']) && str_in_array($options['select_graphs'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'extendoutput' => 1,
+				'output' => $options['select_graphs'],
 				'itemids' => $itemids,
 				'preservekeys' => 1
 			);
 			$graphs = CGraph::get($obj_params);
 			foreach($graphs as $graphid => $graph){
-				foreach($graph['items'] as $inum => $item){
+				$gitems = $graph['items'];
+				unset($graph['items']);
+				foreach($gitems as $inum => $item){
 					$result[$item['itemid']]['graphs'][$graphid] = $graph;
 				}
 			}
 		}
 
 // Adding applications
-		if($options['select_applications']){
+		if(!is_null($options['select_applications']) && str_in_array($options['select_applications'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'extendoutput' => 1,
+				'output' => $options['select_applications'],
 				'itemids' => $itemids,
 				'preservekeys' => 1
 			);
 			$applications = CApplication::get($obj_params);
 			foreach($applications as $applicationid => $application){
-				foreach($application['items'] as $inum => $item){
+				$aitems = $application['items'];
+				unset($application['items']);
+				foreach($aitems as $inum => $item){
 					$result[$item['itemid']]['applications'][$applicationid] = $application;
 				}
 			}
@@ -578,7 +615,7 @@ class CItem extends CZBXAPI{
 		}
 
 		if(!empty($itemids))
-			$result = self::get(array('itemids'=>$itemids, 'extendoutput'=>1));
+			$result = self::get(array('itemids' => $itemids, 'output' => self::API_OUTPUT_EXTEND));
 
 	return $result;
 	}
