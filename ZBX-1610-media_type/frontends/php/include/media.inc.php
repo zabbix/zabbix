@@ -115,7 +115,7 @@
 			' WHERE description='.zbx_dbstr($description).
 				' AND mediatypeid<>'.$mediatypeid.
 				' AND '.DBin_node('mediatypeid');
-		$result=DBexecute($sql);
+		$result=DBselect($sql);
 		if(DBfetch($result)){
 			error("An action type with description '$description' already exists.");
 		}
@@ -162,7 +162,7 @@
 				' FROM media_type '.
 				' WHERE description='.zbx_dbstr($description).
 					' AND '.DBin_node('mediatypeid');
-		$result=DBexecute($sql);
+		$result=DBselect($sql);
 		if(DBfetch($result)){
 			error("An action type with description '$description' already exists.");
 		}
