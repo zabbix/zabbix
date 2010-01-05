@@ -360,7 +360,7 @@
 		}
 
 		$selementid = get_dbid('sysmaps_elements','selementid');
-
+					
 		$result = DBexecute('INSERT INTO sysmaps_elements '.
 							'(selementid,sysmapid,elementid,elementtype,label,label_location,'.
 							'iconid_off,iconid_on,iconid_unknown,iconid_maintenance,iconid_disabled,x,y,url)'.
@@ -410,14 +410,15 @@
 					'SET elementid='.$selement['elementid'].', '.
 						' elementtype='.$selement['elementtype'].', '.
 						' label='.zbx_dbstr($selement['label']).', '.
+						' label_location='.$selement['label_location'].', '.
 						' x='.$selement['x'].', '.
 						' y='.$selement['y'].', '.
 						' iconid_off='.$selement['iconid_off'].', '.
-						' url='.zbx_dbstr($selement['url']).', '.
 						' iconid_on='.$selement['iconid_on'].', '.
-						' label_location='.$selement['label_location'].', '.
 						' iconid_unknown='.$selement['iconid_unknown'].', '.
-						' iconid_disabled='.$selement['iconid_disabled'].
+						' iconid_maintenance='.$selement['iconid_maintenance'].', '.
+						' iconid_disabled='.$selement['iconid_disabled'].', '.
+						' url='.zbx_dbstr($selement['url']).
 					' WHERE selementid='.$selement['selementid']);
 	}
 
@@ -737,6 +738,9 @@
 				break;
 			case SYSMAP_ELEMENT_ICON_MAINTENANCE:
 				$info['iconid'] = $selement['iconid_maintenance'];
+				break;
+			case SYSMAP_ELEMENT_ICON_DISABLED:
+				$info['iconid'] = $selement['iconid_disabled'];
 				break;
 			case SYSMAP_ELEMENT_ICON_OFF:
 			default:
