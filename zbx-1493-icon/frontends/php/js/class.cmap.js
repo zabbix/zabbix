@@ -3123,9 +3123,9 @@ linkForm_addLinktrigger: function(linktrigger){
 	var lineName = '';
 	switch(linktrigger.drawtype.toString()){
 		case '0': lineName = locale['S_LINE']; break;
-		case '1': lineName = locale['S_BOLD_LINE']; break;
-		case '2': lineName = locale['S_DOT']; break;
-		case '3': lineName = locale['S_DASHED_LINE']; break;
+		case '2': lineName = locale['S_BOLD_LINE']; break;
+		case '3': lineName = locale['S_DOT']; break;
+		case '4': lineName = locale['S_DASHED_LINE']; break;
 	}
 	
 	var e_td_9 = document.createElement('td');
