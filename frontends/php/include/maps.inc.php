@@ -565,7 +565,19 @@
 			if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)
 				$hostids[$selement['elementid']] = $selement['elementid'];
 		}
+
 		$scripts_by_hosts = CScript::getScriptsByHosts($hostids);
+		
+		$options = array(
+			'nodeids' => get_current_nodeid(true),
+			'hostids' => $hostids,
+			'extendoutput' => 1,
+			'select_groups' => 1,
+			'select_triggers' => 1,
+			'nopermissions' => 1
+		);
+		$hosts = CHost::get($options);
+		$hosts = zbx_toHash($hosts, 'hostid');
 
 // Draws elements
 		$map_info = getSelementsInfo($sysmap['selements']);
@@ -573,10 +585,9 @@
 		foreach($sysmap['selements'] as $snum => $db_element){
 			$url = $db_element['url'];
 			$alt = S_LABEL.': '.$db_element['label'];
-			$scripts_by_hosts = null;
 
 			if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
-				$host = get_host_by_hostid($db_element['elementid']);
+				$host = $hosts[$db_element['elementid']];
 				if($host['status'] != HOST_STATUS_MONITORED) continue;
 
 				if(empty($url))	$url='tr_status.php?hostid='.$db_element['elementid'].'&noactions=true&onlytrue=true&compact=true';
@@ -593,7 +604,7 @@
 			}
 			else if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER){
 				if(empty($url) && $db_element['elementid']!=0)
-					$url='events.php?triggerid='.$db_element['elementid'];
+					$url='events.php?triggerid='.$db_element['elementid'].'&nav_time='.(time()-7*86400);
 			}
 			else if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP){
 				if(empty($url) && $db_element['elementid']!=0)
@@ -613,7 +624,8 @@
 			$y2_ = $db_element['y'] + imagesy($back);
 
 			$r_area = new CArea(array($x1_,$y1_,$x2_,$y2_),$url,$alt,'rect');
-			if(($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) && isset($scripts_by_hosts[$db_element['elementid']])){
+			if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
+				$group = reset($hosts[$db_element['elementid']]['groups']);
 				$menus = '';
 
 				$host_nodeid = id2nodeid($db_element['elementid']);
@@ -623,12 +635,14 @@
 						$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$db_element["elementid"]."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 				}
 
-				$menus.= '['.zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
+				if(!empty($db_element['url']) || !empty($hosts[$db_element['elementid']]['triggers'])){
+					$menus.= '['.zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 
-				$menus.= "['".S_STATUS_OF_TRIGGERS."',\"javascript: redirect('tr_status.php?groupid=0&hostid=".$db_element['elementid']."&noactions=true&onlytrue=true&compact=true');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+					if(!empty($hosts[$db_element['elementid']]['triggers']))
+						$menus.= "['".S_STATUS_OF_TRIGGERS."',\"javascript: redirect('tr_status.php?groupid=".$group['groupid']."&hostid=".$db_element['elementid']."&noactions=true&onlytrue=true&compact=true');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 
-				if(!empty($db_element['url'])){
-					$menus.= "['".S_MAP.SPACE.S_URL."',\"javascript: location.replace('".$url."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+					if(!empty($db_element['url']))
+						$menus.= "['".S_MAP.SPACE.S_URL."',\"javascript: location.replace('".$url."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 				}
 
 				$menus = trim($menus,',');
