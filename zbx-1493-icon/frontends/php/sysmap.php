@@ -143,7 +143,13 @@ include_once('include/page_header.php');
 					print($action);
 					break;
 				case 'save':
-					$options = array('sysmapids'=> $sysmapid, 'editable'=>1, 'extendoutput'=>1, 'select_selements'=>1, 'select_links'=>1);
+					$options = array(
+							'sysmapids'=> $sysmapid, 
+							'editable'=>1, 
+							'extendoutput'=>1, 
+							'select_selements'=>1, 
+							'select_links'=>1
+						);
 					$sysmaps = CMap::get($options);
 					if(empty($sysmaps)) print('alert("Access denied!");');
 

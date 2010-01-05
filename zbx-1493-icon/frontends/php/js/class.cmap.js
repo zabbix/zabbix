@@ -529,7 +529,24 @@ add_link: function(mlink, update_map){
 		linkid = mlink.linkid;
 	}
 
-	if(is_array(mlink.linktriggers)) mlink.linktriggers = {};
+	if(is_array(mlink.linktriggers)){
+		var tmp_lts = {};
+		for(var i=0; i<mlink.linktriggers.length; i++){
+			if(!isset(i, mlink.linktriggers) || empty(mlink.linktriggers[i])) continue;
+			var tmp_lt = mlink.linktriggers[i];
+
+			tmp_lts[tmp_lt.linktriggerid] = {};
+
+			tmp_lts[tmp_lt.linktriggerid].linktriggerid = tmp_lt.linktriggerid;
+			tmp_lts[tmp_lt.linktriggerid].linkid = tmp_lt.linkid;
+			tmp_lts[tmp_lt.linktriggerid].triggerid = tmp_lt.triggerid;
+			tmp_lts[tmp_lt.linktriggerid].drawtype = tmp_lt.drawtype;
+			tmp_lts[tmp_lt.linktriggerid].color = tmp_lt.color;
+			tmp_lts[tmp_lt.linktriggerid].desc_exp = tmp_lt.desc_exp;
+		}
+
+		mlink.linktriggers = tmp_lts;
+	} 
 
 	mlink.status = 1;
 	this.links[linkid] = mlink;
