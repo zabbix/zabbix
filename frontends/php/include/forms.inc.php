@@ -5378,6 +5378,7 @@
 						$cmbStatus
 					);
 
+// LINK TEMPLATES {{{
 		$template_table = new CTable();
 
 		$template_table->setAttribute('name','template_table');
@@ -5404,15 +5405,17 @@
 					url_param($templates,false,'existed_templates')."',450,450)"));
 
 		$frmHost->addRow(array(
-					new CVisibilityBox('visible[template_table]', isset($visible['template_table']), 'template_table', S_ORIGINAL),S_LINK_WITH_TEMPLATE),
+					new CVisibilityBox('visible[template_table]', isset($visible['template_table']), 'template_table', S_ORIGINAL),S_LINK_ADDITIONAL_TEMPLATES),
 					$template_table, 'T'
 				);
+// }}} LINK TEMPLATES
+
 
 		$frmHost->addRow(array(
 					new CVisibilityBox('visible[useipmi]', isset($visible['useipmi']), 'useipmi', S_ORIGINAL), S_USEIPMI),
 					new CCheckBox('useipmi', $useipmi, 'submit()')
 				);
-
+				
 		if($useipmi == 'yes'){
 			$frmHost->addRow(array(
 				new CVisibilityBox('visible[ipmi_ip]', isset($visible['ipmi_ip']), 'ipmi_ip', S_ORIGINAL), S_IPMI_IP_ADDRESS),
