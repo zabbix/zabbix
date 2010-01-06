@@ -2692,6 +2692,7 @@
 
 		if($input_method == IM_TREE){
 			$alz = analyze_expression($expression);
+
 			if($alz !== false){
 				list($outline, $node, $map) = $alz;
 				if(isset($_REQUEST['expr_action']) && $node != null){
@@ -2839,7 +2840,7 @@
 
 
 		$frmTrig->addRow(S_NEW_DEPENDENCY, $btnSelect, 'new');
-	/* end new dependency */
+// end new dependency
 
 		$type_select = new CComboBox('type');
 		$type_select->additem(TRIGGER_MULT_EVENT_DISABLED,S_NORMAL,(($type == TRIGGER_MULT_EVENT_ENABLED)?'no':'yes'));
