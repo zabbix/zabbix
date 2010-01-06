@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-979] host mass update templates now only link new teplates (Vedmak)
  - [ZBX-1642] fixed possibility of editing read only host items (Vedmak)
  - [ZBX-1242] fixed adding macro in triggers editing form (Aly)
  - [ZBX-1589] fixed no permission error when try to edit host form from search screen (Vedmak)
