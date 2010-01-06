@@ -1113,19 +1113,17 @@ return $result;
 				}
 
 				$state='';
+				$sql = 'SELECT h.host,i.itemid,i.key_,f.function,f.triggerid,f.parameter,i.itemid,i.status'.
+						' FROM items i,functions f,hosts h'.
+						' WHERE f.functionid='.$functionid.
+							' AND i.itemid=f.itemid '.
+							' AND h.hostid=i.hostid';
 
 				if($functionid=='TRIGGER.VALUE'){
 					if(0 == $html) $exp.='{'.$functionid.'}';
 					else array_push($exp,'{'.$functionid.'}');
 				}
-				else if(is_numeric($functionid) &&
-					$function_data = DBfetch(DBselect('SELECT h.host,i.itemid,i.key_,f.function,f.triggerid,f.parameter,i.itemid,i.value_type'.
-													' FROM items i,functions f,hosts h'.
-													' WHERE f.functionid='.$functionid.
-														' AND i.itemid=f.itemid '.
-														' AND h.hostid=i.hostid'
-					)))
-				{
+				else if(is_numeric($functionid) && $function_data = DBfetch(DBselect($sql))){
 					if($template) $function_data['host'] = '{HOSTNAME}';
 
 					if($resolve_macro){
@@ -1142,8 +1140,17 @@ return $result;
 						$exp.='{'.$function_data['host'].':'.$function_data['key_'].'.'.$function_data['function'].'('.$function_data['parameter'].')}';
 					}
 					else{
-						$link = new CLink($function_data['host'].':'.$function_data['key_'],
-							'history.php?action='.( (($function_data['value_type'] == ITEM_VALUE_TYPE_FLOAT) || ($function_data['value_type'] == ITEM_VALUE_TYPE_UINT64))?'showgraph':'showvalues').'&itemid='.$function_data['itemid']);
+						$style = ($function_data['status']==ITEM_STATUS_DISABLED)?'disabled':'unknown';
+						if($function_data['status']==ITEM_STATUS_ACTIVE){
+							$style = 'enabled';
+						}
+						
+						
+						$link = new CLink(
+									$function_data['host'].':'.$function_data['key_'],
+									'items.php?form=update&itemid='.$function_data['itemid'], 
+									$style
+								);
 
 						array_push($exp,array('{',$link,'.',bold($function_data['function'].'('),$function_data['parameter'],bold(')'),'}'));
 					}
