@@ -2747,7 +2747,7 @@ return $result;
  *
  */
 	function  analyze_expression($expression){
-		global $ZBX_TR_EXPR_ALLOWED_MACROS, $ZBX_TR_EXPR_REPLACE_TO, $ZBX_TR_EXPR_ALLOWED_FUNCTIONS;
+		global $ZBX_TR_EXPR_SIMPLE_MACROS, $ZBX_TR_EXPR_REPLACE_TO, $ZBX_TR_EXPR_ALLOWED_FUNCTIONS;
 		if(empty($expression)) return array('', null, null);
 
 		$temp = array();
@@ -2755,7 +2755,7 @@ return $result;
 
 // Replace all {server:key.function(param)} and {MACRO} with '$ZBX_TR_EXPR_REPLACE_TO'
 		while(preg_match('/'.ZBX_PREG_EXPRESSION_TOKEN_FORMAT.'/uU', $expr, $arr)){
-			if($arr[ZBX_EXPRESSION_MACRO_ID] && !isset($ZBX_TR_EXPR_ALLOWED_MACROS[$arr[ZBX_EXPRESSION_MACRO_ID]])){
+			if($arr[ZBX_EXPRESSION_MACRO_ID] && !isset($ZBX_TR_EXPR_SIMPLE_MACROS[$arr[ZBX_EXPRESSION_MACRO_ID]])){
 				error('Unknown macro [' . $arr[ZBX_EXPRESSION_MACRO_ID].']');
 				return array('', null, null);
 			}
@@ -3091,7 +3091,7 @@ return $result;
 	}
 
 	function get_item_function_info($expr){
-		global $ZBX_TR_EXPR_ALLOWED_MACROS;
+		global $ZBX_TR_EXPR_SIMPLE_MACROS;
 
 		$value_type = array(
 			ITEM_VALUE_TYPE_UINT64	=> S_NUMERIC_UINT64,
@@ -3133,7 +3133,7 @@ return $result;
 			'sum' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 			'time' =>		array( 'value_type' => 'HHMMSS',	'type' => T_ZBX_INT,			'validation' => 'strlen({})==6'));
 
-		if(isset($ZBX_TR_EXPR_ALLOWED_MACROS[$expr])){
+		if(isset($ZBX_TR_EXPR_SIMPLE_MACROS[$expr])){
 			$result = array(
 				'value_type'	=> S_0_OR_1,
 				'type'			=> T_ZBX_INT,
