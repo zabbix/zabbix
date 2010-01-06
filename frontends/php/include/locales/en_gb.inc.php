@@ -764,7 +764,7 @@
 	'S_NEW_GROUP'=>					'New group',
 	'S_DNS_NAME'=>					'DNS name',
 	'S_IP_ADDRESS'=>				'IP address',
-	'S_LINK_WITH_TEMPLATE'=>			'Link with Template',
+	'S_LINK_ADDITIONAL_TEMPLATES'=>			'Link additional templates',
 	'S_USEIPMI'=>					'Use IPMI',
 	'S_IPMI_IP_ADDRESS'=>				'IPMI IP address',
 	'S_IPMI_PORT'=>					'IPMI port',
