@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1604] extended maintenance period info messages (Aly)
  - [ZBX-1629] added coloring of items in trigger configuration screen (Aly)
  - [ZBX-979] host mass update templates now only link new teplates (Vedmak)
  - [ZBX-1642] fixed possibility of editing read only host items (Vedmak)

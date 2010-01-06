@@ -250,20 +250,23 @@ include_once('include/page_header.php');
 
 		$result = false;
 		if($new_timeperiod['period'] < 300) {	/* 5 min */
-			info(S_INCORRECT_PERIOD);
+			info(S_INCORRECT_MAINTENANCE_PERIOD.' ('.S_MIN_SMALL.SPACE.S_5_MINUTES.')');
 		}
 		else if(($new_timeperiod['hour'] > 23) || ($new_timeperiod['minute'] > 59)){
 			info(S_INCORRECT_MAINTENANCE_PERIOD);
 		}
 		else if(($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) && ($new_timeperiod['start_date'] < 1)){
-			info(S_INCORRECT_MAINTENANCE_PERIOD);
+			info(S_INCORRECT_MAINTENANCE_DATE);
 		}
 		else if(($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_DAILY) && ($new_timeperiod['every'] < 1)){
-			info(S_INCORRECT_MAINTENANCE_PERIOD);
+			info(S_INCORRECT_MAINTENANCE_DAY_PERIOD);
 		}
 		else if($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_WEEKLY){
-			if(($new_timeperiod['every'] < 1) || ($new_timeperiod['dayofweek'] < 1)){
-				info(S_INCORRECT_MAINTENANCE_PERIOD);
+			if($new_timeperiod['every'] < 1){
+				info(S_INCORRECT_MAINTENANCE_WEEK_PERIOD);
+			}
+			else if($new_timeperiod['dayofweek'] < 1){
+				info(S_INCORRECT_MAINTENANCE_DAYS_OF_WEEK);
 			}
 			else{
 				$result = true;
@@ -271,13 +274,13 @@ include_once('include/page_header.php');
 		}
 		else if($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY){
 			if($new_timeperiod['month'] < 1){
-				info(S_INCORRECT_MAINTENANCE_PERIOD);
+				info(S_INCORRECT_MAINTENANCE_MONTH_PERIOD);
 			}
 			else if(($new_timeperiod['day'] == 0) && ($new_timeperiod['dayofweek'] < 1)){
-				info(S_INCORRECT_MAINTENANCE_PERIOD);
+				info(S_INCORRECT_MAINTENANCE_DAYS_OF_WEEK);
 			}
 			else if((($new_timeperiod['day'] < 1) || ($new_timeperiod['day'] > 31)) && ($new_timeperiod['dayofweek'] == 0)){
-				info(S_INCORRECT_MAINTENANCE_PERIOD);
+				info(S_INCORRECT_MAINTENANCE_DATE);
 			}
 			else{
 				$result = true;
