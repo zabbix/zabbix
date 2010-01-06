@@ -229,6 +229,35 @@ struct st_logfile
 
 /******************************************************************************
  *                                                                            *
+ * Function: init_logfiles                                                    *
+ *                                                                            *
+ * Purpose: allocates memory for logfiles for the first time                  *
+ *                                                                            *
+ * Parameters: logfiles - pointer to a new list of logfiles                   *
+ *             logfiles_alloc - number of logfiles memory was allocated for   *
+ *             logfiles_num - number of already inserted logfiles (0)         *
+ *                                                                            *
+ * Return value: none                                                         *
+ *                                                                            *
+ * Author: Dmitry Borovikov                                                   *
+ *                                                                            *
+ * Comments: Assertion can be deleted later for convenience.                  *
+ *                                                                            *
+ ******************************************************************************/
+static void init_logfiles(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num)
+{
+	assert(logfiles && NULL == *logfiles);
+	assert(logfiles_alloc && 0 == *logfiles_alloc);
+	assert(logfiles_num && 0 == *logfiles_num);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In init_logfiles()");
+
+	*logfiles_alloc = 64;
+	*logfiles = zbx_malloc(*logfiles, *logfiles_alloc * sizeof(struct st_logfile));
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: free_logfiles                                                    *
  *                                                                            *
  * Purpose: releases memory allocated for logfiles                            *
@@ -294,7 +323,7 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 	/* must be done in any case */
 	if (*logfiles_alloc == *logfiles_num)
 	{
-		*logfiles_alloc += 64;
+		*logfiles_alloc = *logfiles_alloc * 2;
 		*logfiles = zbx_realloc(*logfiles, *logfiles_alloc);
 	}
 
@@ -389,7 +418,8 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 	char		*format = NULL;
 	struct stat	file_buf;
 	struct st_logfile	*logfiles = NULL;
-	int			logfiles_alloc = 64, logfiles_num = 0;
+	int		logfiles_num = 0;
+	int		logfiles_alloc = 0;
 	int		fd = 0;
 	char		*logfile_candidate = NULL;
 	int		length = 0;
@@ -441,7 +471,7 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 #endif /* _WINDOWS */
 
 	/* allocating memory for logfiles */
-	logfiles = zbx_malloc(logfiles, logfiles_alloc * sizeof(struct st_logfile));
+	init_logfiles(&logfiles, &logfiles_alloc, &logfiles_num);
 
 	/*zabbix_log(LOG_LEVEL_WARNING, "Starting reading the directory. logfiles_alloc [%i], logfiles_num [%i]",
 			logfiles_alloc, logfiles_num);*/
@@ -461,7 +491,7 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 		if (NULL != zbx_regexp_match(find_data.name, format, &length))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Addint the file [%s] to logfiles.", logfile_candidate);
-			add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, find_data.name, (int)file_buf.st_mtime);
+			add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, find_data.name, file_buf.st_mtime);
 		}
 		else
 		{
@@ -471,12 +501,6 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 		zbx_free(logfile_candidate);
 
 	} while (0 == _findnext(find_handle, &find_data));
-
-	if (-1 == _findclose(find_handle))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Could not close the find directory handle with error [%s]",
-				strerror(errno));
-	}
 
 #else/*_WINDOWS*/
 
@@ -503,46 +527,43 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 		zbx_free(logfile_candidate);
 	}
 
-	if (-1 == closedir(dir))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Could not close the directory [%s] with error [%s]",
-				directory, strerror(errno));
-	}
-
 #endif/*_WINDOWS*/
 
-	if (0 == logfiles_num)
+	if (1 == skip_old_data)
+		i = logfiles_num ? logfiles_num - 1 : 0;
+	else
+		i = 0;
+
+	/* find the oldest file that match */
+	for ( ; i < logfiles_num; i++)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "There are not any files matching [%s] found in [%s] directory",
-				format, directory);
-		goto clean;
+		if (logfiles[i].mtime < *mtime)
+		{
+			continue;/* not interested in mtimes less than the given mtime */
+		}
+		else
+		{
+			break;/* the first occurence is found */
+		}
 	}
 
-	if (1 == skip_old_data)
-		i = logfiles_num - 1;
-	else
+	/* escaping those with the same mtime, taking the latest one (without exceptions!) */
+	for (j = i + 1; j < logfiles_num; j++)
 	{
-		/* find the oldest file that match */
-		for (i = 0; i < logfiles_num; i++)
+		if (logfiles[j].mtime == logfiles[i].mtime)
 		{
-			if (logfiles[i].mtime < *mtime)
-				continue;	/* not interested in mtimes less than the given mtime */
-
-			break;			/* the first occurence is found */
+			i = j;/* moving to the newer one */
 		}
-
-		/* escaping those with the same mtime, taking the latest one (without exceptions!) */
-		for (j = i + 1; j < logfiles_num; j++)
+		else
 		{
-			if (logfiles[j].mtime != logfiles[i].mtime)
-				break;		/* all next mtimes are bigger */
-
-			i = j;			/* moving to the newer one */
+			break;/* all next mtimes are bigger */
 		}
+	}
 
-		/* if all mtimes are less than the given one, take the latest file from existing ones */
-		if (i == logfiles_num)
-			i = logfiles_num - 1;
+	/* if all mtimes are less than the given one, take the latest file from existing ones */
+	if (0 < logfiles_num && i == logfiles_num)
+	{
+		i = logfiles_num - 1;/* i cannot be bigger than logfiles_num */
 	}
 
 	/* processing matched or moving to the newer one and repeating the cycle */
@@ -562,7 +583,7 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 					logfile_candidate, *lastlogsize);
 		}
 
-		*mtime = (int)file_buf.st_mtime;/* must contain the latest mtime as possible */
+		*mtime = file_buf.st_mtime;/* must contain the latest mtime as possible */
 		if (file_buf.st_size < *lastlogsize)
 		{
 			*lastlogsize = 0;/* maintain backward compatibility */
@@ -614,13 +635,35 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 		}
 	}/* trying to read from logfiles */
 
+	if (0 == logfiles_num)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "There are not any files matching [%s] found in [%s] directory",
+				format, directory);
+	}
+	free_logfiles(&logfiles, &logfiles_alloc, &logfiles_num);
 	if (0 != fd && -1 == close(fd))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Could not close the file [%s] with error [%s]",
 					logfile_candidate, strerror(errno));
 	}
-clean:
-	free_logfiles(&logfiles, &logfiles_alloc, &logfiles_num);
+#ifdef _WINDOWS
+
+	if (0 != find_handle && -1 == _findclose(find_handle))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Could not close the find directory handle with error [%s]",
+				strerror(errno));
+	}
+
+#else /* _WINDOWS */
+
+	if (dir != NULL && -1 == closedir(dir))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Could not close the directory [%s] with error [%s]",
+				directory, strerror(errno));
+	}
+
+#endif /* _WINDOWS */
+
 	zbx_free(logfile_candidate);
 	zbx_free(directory);
 	zbx_free(format);

@@ -233,7 +233,9 @@ static int	parse_list_of_checks(char *str)
 			mtime = 0;
 		}
 		else
+		{
 			mtime = atoi(tmp);
+		}
 
 		add_check(name, key_orig, delay, lastlogsize, mtime);
 	}
@@ -663,6 +665,7 @@ static void	process_active_checks(char *server, unsigned short port)
 	char		pattern[MAX_STRING_LEN];
 	/*checks `log', `eventlog', `logrt' may contain parameter,*/
 	/*which overrides CONFIG_MAX_LINES_PER_SECOND*/
+	char		maxlines_persec_str[16];
 	int		maxlines_persec;
 #ifdef	_WINDOWS
 	unsigned long	timestamp, logeventid;
@@ -713,14 +716,11 @@ static void	process_active_checks(char *server, unsigned short port)
 
 				zbx_strupper(encoding);
 
-				if (get_param(params, 4, tmp, sizeof(tmp)) != 0)
-					*tmp = '\0';
-
-				if ('\0' == *tmp)
+				if (get_param(params, 4, maxlines_persec_str, sizeof(maxlines_persec_str)) != 0 ||
+						*maxlines_persec_str == '\0')
 					maxlines_persec = CONFIG_MAX_LINES_PER_SECOND;
-				else
-					maxlines_persec = atoi(tmp);
-				if (maxlines_persec < MIN_VALUE_LINES || maxlines_persec > MAX_VALUE_LINES)
+				else if ((maxlines_persec = atoi(maxlines_persec_str)) < MIN_VALUE_LINES ||
+						maxlines_persec > MAX_VALUE_LINES)
 					break;
 
 				if (get_param(params, 5, tmp, sizeof(tmp)) != 0)
@@ -829,15 +829,11 @@ static void	process_active_checks(char *server, unsigned short port)
 
 				zbx_strupper(encoding);
 
-				if (get_param(params, 4, tmp, sizeof(tmp)) != 0)
-					*tmp = '\0';
-
-				if ('\0' == *tmp)
+				if (get_param(params, 4, maxlines_persec_str, sizeof(maxlines_persec_str)) != 0 ||
+						*maxlines_persec_str == '\0')
 					maxlines_persec = CONFIG_MAX_LINES_PER_SECOND;
-				else
-					maxlines_persec = atoi(tmp);
-
-				if (maxlines_persec < MIN_VALUE_LINES || maxlines_persec > MAX_VALUE_LINES)
+				else if ((maxlines_persec = atoi(maxlines_persec_str)) < MIN_VALUE_LINES ||
+						maxlines_persec > MAX_VALUE_LINES)
 					break;
 
 				if (get_param(params, 5, tmp, sizeof(tmp)) != 0)
@@ -933,7 +929,6 @@ static void	process_active_checks(char *server, unsigned short port)
 			ret = FAIL;
 
 #if defined(_WINDOWS)
-zabbix_log(LOG_LEVEL_WARNING, "key:%s", active_metrics[i].key);
 			do{ /* simple try realization */
 				if (parse_command(active_metrics[i].key, NULL, 0, params, MAX_STRING_LEN) != 2) {
 					ret = FAIL;
@@ -962,27 +957,22 @@ zabbix_log(LOG_LEVEL_WARNING, "key:%s", active_metrics[i].key);
 				if (get_param(params, 5, key_logeventid, sizeof(key_logeventid)) != 0)
 					*key_logeventid = '\0';
 
-				if (get_param(params, 6, tmp, sizeof(tmp)) != 0)
-					*tmp = '\0';
-
-				if ('\0' == *tmp)
+				if (get_param(params, 6, maxlines_persec_str, sizeof(maxlines_persec_str)) != 0 ||
+						*maxlines_persec_str == '\0')
 					maxlines_persec = CONFIG_MAX_LINES_PER_SECOND;
-				else
-					maxlines_persec = atoi(tmp);
-
-zabbix_log(LOG_LEVEL_WARNING, "maxlines_persec:%d", maxlines_persec);
-				if (maxlines_persec < MIN_VALUE_LINES || maxlines_persec > MAX_VALUE_LINES)
+				else if ((maxlines_persec = atoi(maxlines_persec_str)) < MIN_VALUE_LINES ||
+						maxlines_persec > MAX_VALUE_LINES) {
+					ret = FAIL;
 					break;
+				}
 
 				if (get_param(params, 7, tmp, sizeof(tmp)) != 0)
 					*tmp = '\0';
 
-zabbix_log(LOG_LEVEL_WARNING, "skip:%s", tmp);
 				if ('\0' == *tmp || 0 == strcmp(tmp, "all"))
 					active_metrics[i].skip_old_data = 0;
 				else if (0 != strcmp(tmp, "skip"))
 					break;
-zabbix_log(LOG_LEVEL_WARNING, "skip_old_data:%d", (int)active_metrics[i].skip_old_data);
 
 				s_count = 0;
 				p_count = 0;
