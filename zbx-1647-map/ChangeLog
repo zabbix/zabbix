@@ -1,5 +1,7 @@
 Changes for 1.8.1
 
+ - [ZBX-1647] removed respection of host availabilities on maps (Aly)
+ - [ZBX-1495] fixed map level label location (Aly)
  - [ZBX-1242] fixed adding macro in triggers editing form (Aly)
  - [ZBX-1589] fixed no permission error when try to edit host form from search screen (Vedmak)
  - [ZBX-1561] fixed errors when view event info as admin user (Vedmak)
