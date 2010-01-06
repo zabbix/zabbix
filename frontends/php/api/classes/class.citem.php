@@ -725,7 +725,7 @@ class CItem extends CZBXAPI{
 			}
 
 			if(preg_match('/^log|eventlog\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
-				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Value type must be Log for log key');
+				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Type of information must be Log for log key');
 				$result = false;
 				break;
 			}
