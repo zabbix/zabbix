@@ -417,13 +417,19 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 					? new CSpan(S_ENABLED, 'enabled') : new CSpan(S_DISABLED, 'disabled');
 			}
 
-			$users = array();
-			foreach($usrgrp['users'] as $unum => $user){
-				$users[] = new CLink($user['alias'],'users.php?form=update&userid='.$user['userid']);
-				$users[] = ', ';
-			}
-			array_pop($users);
+			if(isset($usrgrp['users'])){
+			
+				$usrgrpusers = $usrgrp['users'];
+				order_result($usrgrpusers, 'name');
+				
+				$users = array();
+				foreach($usrgrpusers as $unum => $user){
+					$users[] = new CLink($user['alias'],'users.php?form=update&userid='.$user['userid']);
+					$users[] = ', ';
+				}
+				array_pop($users);
 
+			}
 
 			$table->addRow(array(
 				new CCheckBox('group_groupid['.$usrgrpid.']', NULL, NULL, $usrgrpid),
