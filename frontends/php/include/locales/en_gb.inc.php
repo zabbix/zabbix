@@ -820,6 +820,7 @@
 	'S_LINKED_TO'=>				'Linked to',
 	'S_TEMPLATE_DELETED'=>			'Template deleted',
 	'S_CANNOT_DELETE_TEMPLATE'=>		'Cannot delete template',
+	'S_LINK_WITH_TEMPLATE' => 	'Link with template',
 
 //	Host profiles
 	'S_HOST_PROFILE'=>			'Host profile',
