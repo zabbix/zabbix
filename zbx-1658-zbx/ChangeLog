@@ -1,5 +1,7 @@
 Changes for 1.8.1
 
+ - [ZBX-1658] removed "Zabbix Status" from dashboard for non super admins (Aly)
+ - [ZBX-1646] improved permissions check in Dashboard (Aly)
  - [ZBX-1604] extended maintenance period info messages (Aly)
  - [ZBX-1647] removed respection of host availabilities on maps (Aly)
  - [ZBX-1495] fixed map level label location (Aly)
