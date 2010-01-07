@@ -686,6 +686,11 @@
 	'S_DECEMBER'=>				'December',
 
 	'S_INCORRECT_MAINTENANCE_PERIOD'=>	'Incorrect maintenance period',
+	'S_INCORRECT_MAINTENANCE_DATE'=>	'Incorrect maintenance date',
+	'S_INCORRECT_MAINTENANCE_DAY_PERIOD' => 'Incorrect maintenance day period',
+	'S_INCORRECT_MAINTENANCE_WEEK_PERIOD' => 'Incorrect maintenance week period',
+	'S_INCORRECT_MAINTENANCE_MONTH_PERIOD' => 'Incorrect maintenance month period',
+	'S_INCORRECT_MAINTENANCE_DAYS_OF_WEEK' => 'Incorrect maintenance days of week',
 
 // hostgroups.php
 	'S_CONFIGURATION_OF_GROUPS'=>		'CONFIGURATION OF HOST GROUPS',
