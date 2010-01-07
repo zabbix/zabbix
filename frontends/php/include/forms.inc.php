@@ -3611,6 +3611,8 @@
 		/* init new_timeperiod variable */
 		$new_timeperiod = get_request('new_timeperiod', array());
 
+		$new = is_array($new_timeperiod);
+		
 		if(is_array($new_timeperiod) && isset($new_timeperiod['id'])){
 			$tblPeriod->addItem(new Cvar('new_timeperiod[id]',$new_timeperiod['id']));
 		}
@@ -3933,7 +3935,7 @@
 //			$tblPeriod->addRow(array(S_AT.SPACE.'('.S_HOUR.':'.S_MINUTE.')', $tabTime));
 
 		$td = new CCol(array(
-			new CButton('add_timeperiod', S_ADD),
+			new CButton('add_timeperiod', $new ? S_EDIT : S_ADD),
 			SPACE,
 			new CButton('cancel_new_timeperiod',S_CANCEL)
 			));
