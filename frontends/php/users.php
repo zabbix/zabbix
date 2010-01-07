@@ -355,7 +355,10 @@ include_once('include/page_header.php');
 		$cmbUGrp = new CComboBox('filter_usrgrpid',$_REQUEST['filter_usrgrpid'],'submit()');
 		$cmbUGrp->addItem(0, S_ALL_S);
 
-		$options = array('extendoutput' => 1, 'order' => 'name');
+		$options = array(
+			'extendoutput' => 1, 
+			'sortfield' => 'name'
+		);
 		$usrgrps = CUserGroup::get($options);
 		foreach($usrgrps as $ugnum => $usrgrp){
 			$cmbUGrp->addItem($usrgrp['usrgrpid'], $usrgrp['name']);
