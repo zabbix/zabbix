@@ -29,17 +29,45 @@ require_once('include/users.inc.php');
 function make_favorite_graphs(){
 	$table = new CTableInfo();
 
+	$graphids = array();
+	$itemids = array();
+	
 	$fav_graphs = get_favorites('web.favorite.graphids');
 	foreach($fav_graphs as $key => $favorite){
+		if('itemid' == $favorite['source']){
+			$itemids[$favorite['value']] = $favorite['value'];
+		}
+		else{
+			$graphids[$favorite['value']] = $favorite['value'];
+		}	
+	}
 
-		$source = $favorite['source'];
+	$options = array(
+			'graphids' => $graphids,
+			'select_hosts' => 1,
+			'extendoutput' => 1
+		);
+	$graphs = CGraph::get($options);
+	$graphs = zbx_toHash($graphs, 'graphid');
+
+	$options = array(
+			'itemids' => $itemids,
+			'select_hosts' => 1,
+			'extendoutput' => 1
+		);
+	$items = CItem::get($options);
+	$items = zbx_toHash($items, 'itemid');
+
+	foreach($fav_graphs as $key => $favorite){
 		$sourceid = $favorite['value'];
 
-		if('itemid' == $source){
-			if(!$item = get_item_by_itemid($sourceid)) continue;
-
-			$host = get_host_by_itemid($sourceid);
-			$item["description"] = item_description($item);
+		if('itemid' == $favorite['source']){
+			if(!isset($items[$sourceid])) continue;
+			
+			$item = $items[$sourceid];
+			$host = reset($item['hosts']);
+			
+			$item['description'] = item_description($item);
 
 			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$host['host'].':'.$item['description'],'history.php?action=showgraph&itemid='.$sourceid);
 			$link->setTarget('blank');
@@ -51,11 +79,10 @@ function make_favorite_graphs(){
 			$icon->setTarget('blank');
 		}
 		else{
-			if(!$graph = get_graph_by_graphid($sourceid)) continue;
-			if(!graph_accessible($sourceid)) continue;
-
-			$result = get_hosts_by_graphid($sourceid);
-			$ghost = DBFetch($result);
+			if(!isset($graphs[$sourceid])) continue;
+			
+			$graph = $graphs[$sourceid];
+			$ghost = reset($graph['hosts']);
 
 			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$ghost['host'].':'.$graph['name'],'charts.php?graphid='.$sourceid);
 			$link->setTarget('blank');
@@ -87,13 +114,27 @@ function make_favorite_screens(){
 
 	$fav_screens = get_favorites('web.favorite.screenids');
 
+	$screenids = array();
+	foreach($fav_screens as $key => $favorite){
+		if('screenid' == $favorite['source']){
+			$screenids[$favorite['value']] = $favorite['value'];
+		}
+	}
+
+	$options = array(
+		'screenids' => $screenids,
+		'extendoutput' => 1
+	);
+	$screens = CScreen::get($options);
+	$screens = zbx_toHash($screens, 'screenid');
+
 	foreach($fav_screens as $key => $favorite){
 		$source = $favorite['source'];
 		$sourceid = $favorite['value'];
 
 		if('slideshowid' == $source){
-			if(!$slide = get_slideshow_by_slideshowid($sourceid)) continue;
 			if(!slideshow_accessible($sourceid, PERM_READ_ONLY)) continue;
+			if(!$slide = get_slideshow_by_slideshowid($sourceid)) continue;
 
 			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$slide['name'],'screens.php?config=1&elementid='.$sourceid);
 			$link->setTarget('blank');
@@ -105,8 +146,8 @@ function make_favorite_screens(){
 			$icon->setTarget('blank');
 		}
 		else{
-			if(!$screen = get_screen_by_screenid($sourceid)) continue;
-			if(!screen_accessible($sourceid, PERM_READ_ONLY)) continue;
+			if(!isset($screens[$sourceid])) continue;
+			$screen = $screens[$sourceid];
 
 			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$screen['name'],'screens.php?config=0&elementid='.$sourceid);
 			$link->setTarget('blank');
@@ -139,21 +180,27 @@ function make_favorite_maps(){
 
 	$fav_sysmaps = get_favorites('web.favorite.sysmapids');
 
+	$sysmapids = array();
 	foreach($fav_sysmaps as $key => $favorite){
+		$sysmapids[$favorite['value']] = $favorite['value'];
+	}
+	
+	$options = array(
+			'sysmapids' => $sysmapids,
+			'extendoutput' => 1
+		);
+	$sysmaps = CMap::get($options);
 
-		$source = $favorite['source'];
-		$sourceid = $favorite['value'];
-
-		if(!$sysmap = get_sysmap_by_sysmapid($sourceid)) continue;
-		if(!sysmap_accessible($sourceid,PERM_READ_ONLY)) continue;
-
-		$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$sysmap['name'],'maps.php?sysmapid='.$sourceid);
+	foreach($sysmaps as $snum => $sysmap){
+		$sysmapid = $sysmap['sysmapid'];
+		
+		$link = new CLink(get_node_name_by_elid($sysmapid, null, ': ').$sysmap['name'],'maps.php?sysmapid='.$sysmapid);
 		$link->setTarget('blank');
 
 		$capt = new CSpan($link);
 		$capt->setAttribute('style','line-height: 14px; vertical-align: middle;');
 
-		$icon = new CLink(new CImg('images/general/chart.png','map',18,18,'borderless'),'maps.php?sysmapid='.$sourceid.'&fullscreen=1');
+		$icon = new CLink(new CImg('images/general/chart.png','map',18,18,'borderless'),'maps.php?sysmapid='.$sysmapid.'&fullscreen=1');
 		$icon->setTarget('blank');
 
 		$table->addRow(new CCol(array(
@@ -730,18 +777,49 @@ function make_graph_submenu(){
 
 	$fav_graphs = get_favorites('web.favorite.graphids');
 
+	$graphids = array();
+	$itemids = array();
+	
+	$fav_graphs = get_favorites('web.favorite.graphids');
 	foreach($fav_graphs as $key => $favorite){
+		if('itemid' == $favorite['source']){
+			$itemids[$favorite['value']] = $favorite['value'];
+		}
+		else{
+			$graphids[$favorite['value']] = $favorite['value'];
+		}	
+	}
 
+	$options = array(
+			'graphids' => $graphids,
+			'nopermissions' => 1,
+			'select_hosts' => 1,
+			'extendoutput' => 1
+		);
+	$graphs = CGraph::get($options);
+	$graphs = zbx_toHash($graphs, 'graphid');
+
+	$options = array(
+			'itemids' => $itemids,
+			'nopermissions' => 1,
+			'select_hosts' => 1,
+			'extendoutput' => 1
+		);
+	$items = CItem::get($options);
+	$items = zbx_toHash($items, 'itemid');
+
+	foreach($fav_graphs as $key => $favorite){
 		$source = $favorite['source'];
 		$sourceid = $favorite['value'];
 
 		if('itemid' == $source){
-			if(!$item = get_item_by_itemid($sourceid)) continue;
-
+			if(!isset($items[$sourceid])) continue;
 			$item_added = true;
 
-			$host = get_host_by_itemid($sourceid);
-			$item["description"] = item_description($item);
+			$item = $items[$sourceid];
+			$host = reset($item['hosts']);
+			
+			$item['description'] = item_description($item);
 
 			$graphids[] = array(
 							'name'	=>	$host['host'].':'.$item['description'],
@@ -751,12 +829,11 @@ function make_graph_submenu(){
 						);
 		}
 		else{
-			if(!$graph = get_graph_by_graphid($sourceid)) continue;
-
+			if(!isset($graphs[$sourceid])) continue;
 			$graph_added = true;
-
-			$result = get_hosts_by_graphid($sourceid);
-			$ghost = DBFetch($result);
+			
+			$graph = $graphs[$sourceid];
+			$ghost = reset($graph['hosts']);
 
 			$graphids[] = array(
 							'name'	=>	$ghost['host'].':'.$graph['name'],
@@ -810,34 +887,40 @@ function make_sysmap_menu(&$menu,&$submenu){
 }
 
 function make_sysmap_submenu(){
-	$sysmapids = array();
 	$fav_sysmaps = get_favorites('web.favorite.sysmapids');
 
+	$maps = array();
+	$sysmapids = array();
 	foreach($fav_sysmaps as $key => $favorite){
+		$sysmapids[$favorite['value']] = $favorite['value'];
+	}
+	
+	$options = array(
+			'sysmapids' => $sysmapids,
+			'nopermissions' => 1,
+			'extendoutput' => 1
+		);
+	$sysmaps = CMap::get($options);
 
-		$source = $favorite['source'];
-		$sourceid = $favorite['value'];
-
-		if(!$sysmap = get_sysmap_by_sysmapid($sourceid)) continue;
-
-		$sysmapids[] = array(
-							'name'	=>	$sysmap['name'],
-							'favobj'=>	'sysmapid',
-							'favid'	=>	$sourceid,
-							'action'=>	'remove'
-						);
+	foreach($sysmaps as $snum => $sysmap){
+		$maps[] = array(
+				'name'	=>	$sysmap['name'],
+				'favobj'=>	'sysmapid',
+				'favid'	=>	$sysmap['sysmapid'],
+				'action'=>	'remove'
+			);
 	}
 
-	if(!empty($sysmapids)){
-		$sysmapids[] = array(
-							'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_MAPS,
-							'favobj'=>	'sysmapid',
-							'favid'	=>	0,
-							'action'=>	'remove'
-						);
+	if(!empty($maps)){
+		$maps[] = array(
+				'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_MAPS,
+				'favobj'=>	'sysmapid',
+				'favid'	=>	0,
+				'action'=>	'remove'
+			);
 	}
 
-return $sysmapids;
+return $maps;
 }
 
 function make_screen_menu(&$menu,&$submenu){
