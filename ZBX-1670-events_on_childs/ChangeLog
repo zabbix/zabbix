@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1670] fixed events from slave nodes not shown when all nodes are selected (Vedmak)
  - [ZBX-1638] added host name to link indicator (Aly)
  - [ZBX-1658] removed "Zabbix Status" from dashboard for non super admins (Aly)
  - [ZBX-1646] improved permissions check in Dashboard (Aly)
