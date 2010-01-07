@@ -1,5 +1,7 @@
 Changes for 1.8.1
 
+ - [ZBX-1658] removed "Zabbix Status" from dashboard for non super admins (Aly)
+ - [ZBX-1646] improved permissions check in Dashboard (Aly)
  - [ZBX-1626] added ldap authentication to API (Aly)
  - [ZBX-1624] fixed template linkage popup, when all templates are selected by default (Vedmak)
  - [ZBX-1604] extended maintenance period info messages (Aly)
