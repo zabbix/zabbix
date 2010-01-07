@@ -1546,7 +1546,7 @@ this.selementForm.massEdit.chkboxLabel = e_input_6
 	var e_textarea_6 = document.createElement('textarea');
 this.selementForm.label = e_textarea_6;
 
-	e_textarea_6.setAttribute('cols',"48");
+	e_textarea_6.setAttribute('cols',"56");
 	e_textarea_6.setAttribute('rows',"4");
 	e_textarea_6.setAttribute('name',"label");
 	e_textarea_6.className = "biginput";
@@ -1647,7 +1647,7 @@ this.selementForm.elementName = e_input_6;
 
 	e_input_6.setAttribute('readonly',"readonly");
 	e_input_6.setAttribute('value',"");
-	e_input_6.setAttribute('size',"42");
+	e_input_6.setAttribute('size',"56");
 	e_input_6.setAttribute('id',"elementName");
 	e_input_6.setAttribute('name',"elementName");
 	e_input_6.className = "biginput";
@@ -2046,6 +2046,7 @@ this.selementForm.massEdit.chkboxURL = e_input_6
 	e_input_6.setAttribute('type', 'checkbox');
 	e_input_6.setAttribute('name', "chkboxURL");
 	e_input_6.setAttribute('id', "chkboxURL");
+
 	e_input_6.className = 'checkbox';
 	e_td_5.appendChild(e_input_6);
 	
@@ -2062,7 +2063,7 @@ this.selementForm.massEdit.chkboxURL = e_input_6
 	var e_input_6 = document.createElement('input');
 this.selementForm.url = e_input_6;
 	e_input_6.setAttribute('value', '');
-	e_input_6.setAttribute('size',"42");
+	e_input_6.setAttribute('size',"56");
 	e_input_6.setAttribute('id',"url");
 	e_input_6.setAttribute('name',"url");
 	e_input_6.className = "biginput";
