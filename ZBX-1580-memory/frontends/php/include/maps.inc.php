@@ -23,6 +23,7 @@
 	require_once('include/hosts.inc.php');
 	require_once('include/triggers.inc.php');
 	require_once('include/scripts.inc.php');
+	require_once('include/maintenances.inc.php');
 
 /*
  * Function: map_link_drawtypes
@@ -359,7 +360,7 @@
 		}
 
 		$selementid = get_dbid('sysmaps_elements','selementid');
-
+					
 		$result = DBexecute('INSERT INTO sysmaps_elements '.
 							'(selementid,sysmapid,elementid,elementtype,label,label_location,'.
 							'iconid_off,iconid_on,iconid_unknown,iconid_maintenance,iconid_disabled,x,y,url)'.
@@ -409,14 +410,15 @@
 					'SET elementid='.$selement['elementid'].', '.
 						' elementtype='.$selement['elementtype'].', '.
 						' label='.zbx_dbstr($selement['label']).', '.
+						' label_location='.$selement['label_location'].', '.
 						' x='.$selement['x'].', '.
 						' y='.$selement['y'].', '.
 						' iconid_off='.$selement['iconid_off'].', '.
-						' url='.zbx_dbstr($selement['url']).', '.
 						' iconid_on='.$selement['iconid_on'].', '.
-						' label_location='.$selement['label_location'].', '.
 						' iconid_unknown='.$selement['iconid_unknown'].', '.
-						' iconid_disabled='.$selement['iconid_disabled'].
+						' iconid_maintenance='.$selement['iconid_maintenance'].', '.
+						' iconid_disabled='.$selement['iconid_disabled'].', '.
+						' url='.zbx_dbstr($selement['url']).
 					' WHERE selementid='.$selement['selementid']);
 	}
 
@@ -564,7 +566,19 @@
 			if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST)
 				$hostids[$selement['elementid']] = $selement['elementid'];
 		}
+
 		$scripts_by_hosts = CScript::getScriptsByHosts($hostids);
+		
+		$options = array(
+			'nodeids' => get_current_nodeid(true),
+			'hostids' => $hostids,
+			'extendoutput' => 1,
+			'select_groups' => 1,
+			'select_triggers' => 1,
+			'nopermissions' => 1
+		);
+		$hosts = CHost::get($options);
+		$hosts = zbx_toHash($hosts, 'hostid');
 
 // Draws elements
 		$map_info = getSelementsInfo($sysmap['selements']);
@@ -572,10 +586,9 @@
 		foreach($sysmap['selements'] as $snum => $db_element){
 			$url = $db_element['url'];
 			$alt = S_LABEL.': '.$db_element['label'];
-			$scripts_by_hosts = null;
 
 			if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
-				$host = get_host_by_hostid($db_element['elementid']);
+				$host = $hosts[$db_element['elementid']];
 				if($host['status'] != HOST_STATUS_MONITORED) continue;
 
 				if(empty($url))	$url='tr_status.php?hostid='.$db_element['elementid'].'&noactions=true&onlytrue=true&compact=true';
@@ -592,7 +605,7 @@
 			}
 			else if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER){
 				if(empty($url) && $db_element['elementid']!=0)
-					$url='events.php?triggerid='.$db_element['elementid'];
+					$url='events.php?triggerid='.$db_element['elementid'].'&nav_time='.(time()-7*86400);
 			}
 			else if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP){
 				if(empty($url) && $db_element['elementid']!=0)
@@ -612,7 +625,8 @@
 			$y2_ = $db_element['y'] + imagesy($back);
 
 			$r_area = new CArea(array($x1_,$y1_,$x2_,$y2_),$url,$alt,'rect');
-			if(($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) && isset($scripts_by_hosts[$db_element['elementid']])){
+			if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST){
+				$group = reset($hosts[$db_element['elementid']]['groups']);
 				$menus = '';
 
 				$host_nodeid = id2nodeid($db_element['elementid']);
@@ -622,12 +636,14 @@
 						$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$db_element["elementid"]."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 				}
 
-				$menus.= '['.zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
+				if(!empty($db_element['url']) || !empty($hosts[$db_element['elementid']]['triggers'])){
+					$menus.= '['.zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 
-				$menus.= "['".S_STATUS_OF_TRIGGERS."',\"javascript: redirect('tr_status.php?groupid=0&hostid=".$db_element['elementid']."&noactions=true&onlytrue=true&compact=true');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+					if(!empty($hosts[$db_element['elementid']]['triggers']))
+						$menus.= "['".S_STATUS_OF_TRIGGERS."',\"javascript: redirect('tr_status.php?groupid=".$group['groupid']."&hostid=".$db_element['elementid']."&noactions=true&onlytrue=true&compact=true');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 
-				if(!empty($db_element['url'])){
-					$menus.= "['".S_MAP.SPACE.S_URL."',\"javascript: location.replace('".$url."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+					if(!empty($db_element['url']))
+						$menus.= "['".S_MAP.SPACE.S_URL."',\"javascript: location.replace('".$url."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 				}
 
 				$menus = trim($menus,',');
@@ -722,6 +738,9 @@
 				break;
 			case SYSMAP_ELEMENT_ICON_MAINTENANCE:
 				$info['iconid'] = $selement['iconid_maintenance'];
+				break;
+			case SYSMAP_ELEMENT_ICON_DISABLED:
+				$info['iconid'] = $selement['iconid_disabled'];
 				break;
 			case SYSMAP_ELEMENT_ICON_OFF:
 			default:
@@ -1368,7 +1387,7 @@
 				$info['iconid'] = $selement['iconid_disabled'];
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_DISABLED;
 			}
-			else if(($info['available'] == HOST_AVAILABLE_UNKNOWN) &&
+/*			else if(($info['available'] == HOST_AVAILABLE_UNKNOWN) &&
 				($info['snmp_available'] == HOST_AVAILABLE_UNKNOWN) &&
 				($info['ipmi_available'] == HOST_AVAILABLE_UNKNOWN))
 			{
@@ -1398,6 +1417,27 @@
 				$info['iconid'] = $selement['iconid_on'];
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
 				$info['unavailable'] = HOST_AVAILABLE_FALSE;
+			}
+//*/
+			else if(isset($info['maintenance_status'])){
+// Host in maintenance
+				$info['type'] = TRIGGER_VALUE_UNKNOWN;
+
+				$msg = S_MAINTENANCE_BIG;
+				if($info['maintenanceid'] > 0){
+					$mnt = get_maintenance_by_maintenanceid($info['maintenanceid']);
+					$msg.=' ('.$mnt['name'].')';
+				}
+
+				if(!isset($info['info'])) $info['info'] = array();
+				$info['info'][] = array(
+									'msg'=>$msg,
+									'color'=>$colors['Orange']
+								);
+
+				$info['iconid'] = $selement['iconid_maintenance'];
+				$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
+				$info['maintenance'] = 1;
 			}
 			else{
 // AVAILABLE
@@ -1445,27 +1485,6 @@
 				}
 			}
 
-// Host in maintenance
-			if(isset($info['maintenance_status'])){
-				$info['type'] = TRIGGER_VALUE_UNKNOWN;
-
-				$msg = S_IN_MAINTENANCE;
-				if($maintenance['maintenanceid'] > 0){
-					$mnt = get_maintenance_by_maintenanceid($maintenance['maintenanceid']);
-					$msg.='['.$mnt['name'].']';
-				}
-
-				if(!isset($info['info'])) $info['info'] = array();
-				$info['info'][] = array(
-									'msg'=>$msg,
-									'color'=>$colors['Orange']
-								);
-
-				$info['iconid'] = $selement['iconid_maintenance'];
-				$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
-				$info['maintenance'] = 1;
-			}
-
 			$info['priority'] = isset($info[$info['type']]['priority']) ? $info[$info['type']]['priority'] : 0;
 //---
 		}
@@ -1503,11 +1522,6 @@
 			$info['name'] = $group['name'];
 
 			foreach($group['hosts'] as $hnum => $host){
-				if($host['maintenance_status'] == MAINTENANCE_TYPE_NODATA){
-					$info['maintenance_status'] = true;
-					$info['maintenanceid'] = $host['maintenanceid'];
-				}
-
 				if($host['status'] != HOST_STATUS_MONITORED){
 					$info['type'] = TRIGGER_VALUE_UNKNOWN;
 					$info['disabled'] = 1;
@@ -1624,25 +1638,6 @@
 								);
 				$info['iconid'] = $selement['iconid_off'];
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
-			}
-
-// Host in maintenance
-			if(isset($info['maintenance_status'])){
-				$info['info'] = array();
-				$info['info'][] = array(
-									'msg'=>S_IN_MAINTENANCE,
-									'color'=>$colors['Orange']
-								);
-
-				$info['type'] = TRIGGER_VALUE_UNKNOWN;
-				$info['maintenance'] = 1;
-				if($maintenance['maintenanceid'] > 0){
-					$mnt = get_maintenance_by_maintenanceid($maintenance['maintenanceid']);
-					$info['info'].='['.$mnt['name'].']';
-				}
-
-				$info['iconid'] = $selement['iconid_maintenance'];
-				$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
 			}
 
 			$info['priority'] = isset($info[$info['type']]['priority']) ? $info[$info['type']]['priority'] : 0;

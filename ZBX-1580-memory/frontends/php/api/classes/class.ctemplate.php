@@ -1340,6 +1340,7 @@ $i = 0;
 			}
 
 
+// for each host choose only templates that will be added, to check circulars
 			foreach($targetids as $targetid){
 				$templateids_to_check = array();
 				foreach($linked as $link){
@@ -1356,8 +1357,11 @@ $i = 0;
 
 			foreach($targetids as $targetid){
 				foreach($templateids as $tnum => $templateid){
-					foreach($linked as $link){
-						if(isset($link[$targetid]) && ($link[$targetid] == $templateid)) continue 2;
+					foreach($linked as $lnum => $link){
+						if(isset($link[$targetid]) && ($link[$targetid] == $templateid)){
+							unset($linked[$lnum]);
+							continue 2;
+						}
 					}
 
 					$values = array(get_dbid('hosts_templates', 'hosttemplateid'), $targetid, $templateid);

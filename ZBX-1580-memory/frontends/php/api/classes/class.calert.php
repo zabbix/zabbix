@@ -98,6 +98,7 @@ class CAlert extends CZBXAPI{
 			'select_users'			=> null,
 			'count'					=> null,
 			'preservekeys'			=> null,
+			'editable'				=> null,
 
 			'sortfield'				=> '',
 			'sortorder'				=> '',
@@ -134,6 +135,7 @@ class CAlert extends CZBXAPI{
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
 			$sql_parts['from']['r'] = 'rights r';
 			$sql_parts['from']['ug'] = 'users_groups ug';
+			$sql_parts['from']['f'] = 'functions f';
 
 			$sql_parts['where']['ae'] = 'a.eventid=e.eventid';
 			$sql_parts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;

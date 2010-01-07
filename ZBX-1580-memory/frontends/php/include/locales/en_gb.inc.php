@@ -620,7 +620,7 @@
 	'S_AS_BLUE'=>				'as Blue',
 
 // maintenance.php
-	'S_MAINTENANCE'=>			'Maintenance',
+	'S_MAINTENANCE'=>				'Maintenance',
 	'S_MAINTENANCE_ADDED'=>			'Maintenance added',
 	'S_MAINTENANCE_UPDATED'=>		'Maintenance updated',
 	'S_MAINTENANCE_DELETED'=>		'Maintenance deleted',
@@ -686,6 +686,11 @@
 	'S_DECEMBER'=>				'December',
 
 	'S_INCORRECT_MAINTENANCE_PERIOD'=>	'Incorrect maintenance period',
+	'S_INCORRECT_MAINTENANCE_DATE'=>	'Incorrect maintenance date',
+	'S_INCORRECT_MAINTENANCE_DAY_PERIOD' => 'Incorrect maintenance day period',
+	'S_INCORRECT_MAINTENANCE_WEEK_PERIOD' => 'Incorrect maintenance week period',
+	'S_INCORRECT_MAINTENANCE_MONTH_PERIOD' => 'Incorrect maintenance month period',
+	'S_INCORRECT_MAINTENANCE_DAYS_OF_WEEK' => 'Incorrect maintenance days of week',
 
 // hostgroups.php
 	'S_CONFIGURATION_OF_GROUPS'=>		'CONFIGURATION OF HOST GROUPS',
@@ -764,7 +769,7 @@
 	'S_NEW_GROUP'=>					'New group',
 	'S_DNS_NAME'=>					'DNS name',
 	'S_IP_ADDRESS'=>				'IP address',
-	'S_LINK_WITH_TEMPLATE'=>			'Link with Template',
+	'S_LINK_ADDITIONAL_TEMPLATES'=>			'Link additional templates',
 	'S_USEIPMI'=>					'Use IPMI',
 	'S_IPMI_IP_ADDRESS'=>				'IPMI IP address',
 	'S_IPMI_PORT'=>					'IPMI port',
@@ -1060,6 +1065,7 @@
 	'S_DISPLAYED_ELEMENTS'=>		'Displayed elements',
 	'S_CONNECTORS'=>			'Connectors',
 	'S_UNAVAILABLE_BIG' =>			'UNAVAILABLE',
+	'S_MAINTENANCE_BIG' =>		'MAINTENANCE',
 
 //	sysmaps.php
 	'S_EDIT_MAP_ELEMENT'=>			'Edit map element',
