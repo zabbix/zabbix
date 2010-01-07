@@ -1387,7 +1387,7 @@
 				$info['iconid'] = $selement['iconid_disabled'];
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_DISABLED;
 			}
-			else if(($info['available'] == HOST_AVAILABLE_UNKNOWN) &&
+/*			else if(($info['available'] == HOST_AVAILABLE_UNKNOWN) &&
 				($info['snmp_available'] == HOST_AVAILABLE_UNKNOWN) &&
 				($info['ipmi_available'] == HOST_AVAILABLE_UNKNOWN))
 			{
@@ -1417,6 +1417,27 @@
 				$info['iconid'] = $selement['iconid_on'];
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
 				$info['unavailable'] = HOST_AVAILABLE_FALSE;
+			}
+//*/
+			else if(isset($info['maintenance_status'])){
+// Host in maintenance
+				$info['type'] = TRIGGER_VALUE_UNKNOWN;
+
+				$msg = S_MAINTENANCE_BIG;
+				if($info['maintenanceid'] > 0){
+					$mnt = get_maintenance_by_maintenanceid($info['maintenanceid']);
+					$msg.=' ('.$mnt['name'].')';
+				}
+
+				if(!isset($info['info'])) $info['info'] = array();
+				$info['info'][] = array(
+									'msg'=>$msg,
+									'color'=>$colors['Orange']
+								);
+
+				$info['iconid'] = $selement['iconid_maintenance'];
+				$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
+				$info['maintenance'] = 1;
 			}
 			else{
 // AVAILABLE
@@ -1464,27 +1485,6 @@
 				}
 			}
 
-// Host in maintenance
-			if(isset($info['maintenance_status'])){
-				$info['type'] = TRIGGER_VALUE_UNKNOWN;
-
-				$msg = S_MAINTENANCE_BIG;
-				if($info['maintenanceid'] > 0){
-					$mnt = get_maintenance_by_maintenanceid($info['maintenanceid']);
-					$msg.=' ('.$mnt['name'].')';
-				}
-
-				if(!isset($info['info'])) $info['info'] = array();
-				$info['info'][] = array(
-									'msg'=>$msg,
-									'color'=>$colors['Orange']
-								);
-
-				$info['iconid'] = $selement['iconid_maintenance'];
-				$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
-				$info['maintenance'] = 1;
-			}
-
 			$info['priority'] = isset($info[$info['type']]['priority']) ? $info[$info['type']]['priority'] : 0;
 //---
 		}
@@ -1522,11 +1522,6 @@
 			$info['name'] = $group['name'];
 
 			foreach($group['hosts'] as $hnum => $host){
-				if($host['maintenance_status'] == MAINTENANCE_TYPE_NODATA){
-					$info['maintenance_status'] = true;
-					$info['maintenanceid'] = $host['maintenanceid'];
-				}
-
 				if($host['status'] != HOST_STATUS_MONITORED){
 					$info['type'] = TRIGGER_VALUE_UNKNOWN;
 					$info['disabled'] = 1;
@@ -1643,25 +1638,6 @@
 								);
 				$info['iconid'] = $selement['iconid_off'];
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
-			}
-
-// Host in maintenance
-			if(isset($info['maintenance_status'])){
-				$info['info'] = array();
-				$info['info'][] = array(
-									'msg'=>S_IN_MAINTENANCE,
-									'color'=>$colors['Orange']
-								);
-
-				$info['type'] = TRIGGER_VALUE_UNKNOWN;
-				$info['maintenance'] = 1;
-				if($maintenance['maintenanceid'] > 0){
-					$mnt = get_maintenance_by_maintenanceid($maintenance['maintenanceid']);
-					$info['info'].='['.$mnt['name'].']';
-				}
-
-				$info['iconid'] = $selement['iconid_maintenance'];
-				$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
 			}
 
 			$info['priority'] = isset($info[$info['type']]['priority']) ? $info[$info['type']]['priority'] : 0;
