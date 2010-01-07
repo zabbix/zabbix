@@ -291,9 +291,9 @@ COpt::compare_files_with_menu($ZBX_MENU);
 // --- ---
 
 				$div_node_tree = new CDiv();
-				$div_node_tree->additem($node_tree->getHTML());
+				$div_node_tree->addItem($node_tree->getHTML());
 
-				$div_node_tree->additem(new CButton('select_nodes', S_SELECT, "javascript: ".
+				$div_node_tree->addItem(new CButton('select_nodes', S_SELECT, "javascript: ".
 																				" hidePopupDiv('select_iframe');".	//IE6 fix
 																				" \$('div_node_tree').setStyle({display:'none'});"));
 
@@ -318,10 +318,9 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			else
 				$td_l->addStyle('padding-right: 20px; padding-bottom: 2px;');
 
-			$tab->AddRow(array($td_l, $node_form));
+			$tab->addRow(array($td_l, $node_form));
 			$node_form = $tab;
 		}
-
 
 // 1st level menu
 		$table = new CTable();

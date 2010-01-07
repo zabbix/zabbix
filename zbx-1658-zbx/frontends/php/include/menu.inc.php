@@ -270,7 +270,9 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 			$show_sub_menu = true;
 // show check
 			if(!isset($sub_page['label'])) $show_sub_menu = false;
-			if(isset($sub_page['user_type']) && ($USER_DETAILS['type'] < $sub_page['user_type'])){
+			if(!isset($sub_page['user_type'])) $sub_page['user_type'] = $menu['user_type'];
+			
+			if($USER_DETAILS['type'] < $sub_page['user_type']){
 				$show_sub_menu = false;
 			}
 //----------
@@ -283,7 +285,8 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 			$sub_menu_active |= (isset($sub_page['sub_pages']) && str_in_array($page['file'], $sub_page['sub_pages']));
 			if($sub_menu_active){
 // PERMISSION CHECK
-				$deny &= ($USER_DETAILS['type'] < $menu['user_type']);
+				$deny &= (($USER_DETAILS['type'] < $menu['user_type']) || ($USER_DETAILS['type'] < $sub_page['user_type']));
+				
 // END OF PERMISSION CHECK
 				$menu_class = 'active';
 				$page_exists = true;
