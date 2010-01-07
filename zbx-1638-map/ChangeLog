@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1638] added host name to link indicator (Aly)
  - [ZBX-1604] extended maintenance period info messages (Aly)
  - [ZBX-1647] removed respection of host availabilities on maps (Aly)
  - [ZBX-1495] fixed map level label location (Aly)

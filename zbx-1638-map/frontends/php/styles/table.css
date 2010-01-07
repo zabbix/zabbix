@@ -169,7 +169,7 @@ table.formtable tr td.form_row_l { /* left cell */
 	text-align:		left;
 	white-space:		nowrap;
 	word-spacing:		0px;
-	width:			50%;
+	width:			30%;
 }
 table.formtable tr td.form_row_c { /* center cell */
 	border-right-style: solid;

@@ -689,7 +689,7 @@ include_once('include/page_header.php');
 
 			$table->addRow(array(
 				$name,
-				$row["description"]
+				$row['description']
 				));
 		}
 		$table->show();
@@ -724,11 +724,12 @@ include_once('include/page_header.php');
 		order_result($triggers, 'description');
 
 		foreach($triggers as $tnum => $row){
+			$host = reset($row['hosts']);
+			$row['host'] = $host['host'];
+			
 			$exp_desc = expand_trigger_description_by_data($row);
 			$description = new CSpan($exp_desc, 'link');
 
-			$host = reset($row['hosts']);
-			$row['host'] = $host['host'];
 
 			if($multiselect) {
 				$js_action = 'add_selected_values("'.S_TRIGGERS.'", "'.$dstfrm.'", "'.$dstfld1.'", "'.$dstact.'", "'.$row["triggerid"].'");';
@@ -743,7 +744,7 @@ include_once('include/page_header.php');
 					if($_REQUEST['reference'] == 'sysmap_element'){
 						$js_action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_selement_option($sid,".
 										"[{'key':'elementtype','value':'".SYSMAP_ELEMENT_TYPE_TRIGGER."'},".
-											"{'key':'$dstfld1','value':'$row[$srcfld1]'}]);";
+											"{'key':'$dstfld1','value':'".$row[$srcfld1]."'}]);";
 					}
 					else if($_REQUEST['reference'] =='sysmap_linktrigger'){
 						$params = array(array('key'=> $dstfld1, 'value'=> $row[$srcfld1]));
@@ -756,7 +757,7 @@ include_once('include/page_header.php');
 					}
 				}
 				else{
-					$js_action = 'add_value("'.$dstfld1.'", "'.$dstfld2.'", "'.$row["triggerid"].'", "'.$exp_desc.'");';
+					$js_action = 'add_value("'.$dstfld1.'", "'.$dstfld2.'", "'.$row["triggerid"].'", "'.$row['host'].':'.$exp_desc.'");';
 				}
 			}
 
