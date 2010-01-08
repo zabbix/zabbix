@@ -125,7 +125,7 @@
 	'S_STATE'=>				'State',
 
 //	httpconf.php
-	'S_SORT' => 'Sort',
+	'S_SORT'=>					'Sort',
 	'S_STATUS_CODES'=>				'Status codes',
 	'S_WEB'=>					'Web',
 	'S_CONFIGURATION_OF_WEB_MONITORING'=>		'Configuration of Web monitoring',
@@ -699,15 +699,19 @@
 	'S_NOVEMBER'=>				'November',
 	'S_DECEMBER'=>				'December',
 
-	'S_INCORRECT_MAINTENANCE_PERIOD'=>	'Incorrect maintenance period',
-	'S_INCORRECT_MAINTENANCE_DATE'=>	'Incorrect maintenance date',
-	'S_INCORRECT_MAINTENANCE_DAY_PERIOD' => 'Incorrect maintenance day period',
-	'S_INCORRECT_MAINTENANCE_WEEK_PERIOD' => 'Incorrect maintenance week period',
-	'S_INCORRECT_MAINTENANCE_MONTH_PERIOD' => 'Incorrect maintenance month period',
-	'S_INCORRECT_MAINTENANCE_DAYS_OF_WEEK' => 'Incorrect maintenance days of week',
+	'S_INCORRECT_MAINTENANCE_PERIOD'=>		'Incorrect maintenance period',
+	'S_INCORRECT_MAINTENANCE_DATE'=>		'Incorrect maintenance date',
+	'S_INCORRECT_MAINTENANCE_DAY_PERIOD'=>		'Incorrect maintenance day period',
+	'S_INCORRECT_MAINTENANCE_WEEK_PERIOD'=>		'Incorrect maintenance week period',
+	'S_INCORRECT_MAINTENANCE_MONTH_PERIOD'=>	'Incorrect maintenance month period',
+	'S_INCORRECT_MAINTENANCE_DAYS_OF_WEEK'=>	'Incorrect maintenance days of week',
 
 // hostgroups.php
 	'S_CONFIGURATION_OF_GROUPS'=>		'CONFIGURATION OF HOST GROUPS',
+	'S_DELETE_SELECTED_GROUP'=>		'Delete selected group?',
+	'S_ENABLE_SELECTED_HOST_GROUPS'=>	'Enable selected Host Groups?',
+	'S_DISABLE_SELECTED_HOST_GROUPS'=>	'Disable selected Host Groups?',
+	'S_DELETE_SELECTED_HOST_GROUPS'=>	'Delete selected Host Groups?',
 
 //	hosts.php
 	'S_MACROS'=>					'Macros',
@@ -834,7 +838,7 @@
 	'S_LINKED_TO'=>				'Linked to',
 	'S_TEMPLATE_DELETED'=>			'Template deleted',
 	'S_CANNOT_DELETE_TEMPLATE'=>		'Cannot delete template',
-	'S_LINK_WITH_TEMPLATE' => 	'Link with template',
+	'S_LINK_WITH_TEMPLATE'=>		'Link with template',
 
 //	Host profiles
 	'S_HOST_PROFILE'=>			'Host profile',
@@ -1079,12 +1083,12 @@
 
 	'S_DISPLAYED_ELEMENTS'=>		'Displayed elements',
 	'S_CONNECTORS'=>			'Connectors',
-	'S_UNAVAILABLE_BIG' =>			'UNAVAILABLE',
-	'S_MAINTENANCE_BIG' =>		'MAINTENANCE',
+	'S_UNAVAILABLE_BIG'=>			'UNAVAILABLE',
+	'S_MAINTENANCE_BIG'=>			'MAINTENANCE',
 
 //	sysmaps.php
 	'S_EDIT_MAP_ELEMENT'=>			'Edit map element',
-	'S_ICON_DEFAULT'=> 			'Icon (default)',
+	'S_ICON_DEFAULT'=>			'Icon (default)',
 	'S_APPLY'=>				'Apply',
 	'S_MAP_ELEMENTS'=>			'Map elements',
 	'S_MAP_DELETED'=>			'Network map deleted',
@@ -1666,7 +1670,7 @@
 	'S_EXTENDED'=>				'Extended',
 
 //	search.php
-	'S_SEARCH_BIG' =>			'SEARCH',
+	'S_SEARCH_BIG'=>			'SEARCH',
 	'S_GO' =>				'Go',
 	'S_FOUND_SMALL' =>			'found',
 	'S_DISPLAYING' =>			'Displaying',
