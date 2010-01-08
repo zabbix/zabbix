@@ -1684,6 +1684,9 @@
 	'S_RESULT_TYPE'=>	'Result type',
 	'S_COMBINED_RESULT'=>	'Combined result',
 
+//  applications.php
+	'S_DELETE_APPLICATION'=>	'Delete this application?',
+
 //	Menu
 
 	'S_HELP'=>				'Help',
