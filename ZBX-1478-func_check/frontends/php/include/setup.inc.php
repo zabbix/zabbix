@@ -169,8 +169,9 @@
 				new CCol('Current value', 'header'),
 				new CCol('Required', 'header'),
 				new CCol('Recommended', 'header'),
-				SPACE,SPACE)
-			);
+				SPACE, 
+				SPACE
+			));
 			$table->addRow($row);
 				
 			$reqs = check_php_requirements();
@@ -185,7 +186,8 @@
 					$result = new CSpan(S_OK, 'green');
 				}
 				else if($req['result'] == 0){
-					$result = new CSpan(S_FAIL, 'fail');
+					$result = new CSpan(S_FAIL, 'link_menu fail');
+					$result->setHint($req['error']);
 				}
 				
 				$row = new CRow(array(
@@ -198,9 +200,6 @@
 					),
 					$req['result'] ? SPACE : 'fail'
 				);
-
-				if(!$req['result'])
-					$row->setHint($req['error']);
 				
 				$table->addRow($row);
 

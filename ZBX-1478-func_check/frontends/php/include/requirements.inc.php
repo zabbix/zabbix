@@ -143,7 +143,7 @@
 		
 		$result = array(
 			'name' => 'PHP timezone',
-			'current' => $req ? 'yes' : 'no',
+			'current' => $req ? ini_get('date.timezone') : 'no',
 			'required' => null,
 			'recommended' => null,
 			'result' => $req,
@@ -437,7 +437,7 @@
 		}
 			
 		$result = array(
-			'name' => 'ctype modele',
+			'name' => 'ctype module',
 			'current' => $req ? 'yes' : 'no',
 			'required' => null,
 			'recommended' => null,
