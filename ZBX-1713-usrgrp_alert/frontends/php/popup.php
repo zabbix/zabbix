@@ -625,7 +625,7 @@ include_once('include/page_header.php');
 		$usergroups = CUserGroup::get($options);
 		order_result($usergroups, 'name');
 
-		foreach($triggers as $tnu => $row){
+		foreach($usergroups as $tnu => $row){
 			$name = new CSpan(get_node_name_by_elid($row['usrgrpid'], null, ': ').$row['name'],'link');
 
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
