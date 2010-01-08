@@ -141,7 +141,7 @@ include_once('include/page_header.php');
 	$cmbStat = new CComboBox('active',$active);
 	$cmbStat->addItem(0,S_ENABLED);
 	$cmbStat->addItem(1,S_DISABLED);
-	$frmMedia->addRow('Status',$cmbStat);
+	$frmMedia->addRow(S_STATUS,$cmbStat);
 
 	$frmMedia->addItemToBottomRow(new CButton('add', ($media > -1)?S_SAVE:S_ADD));
 	$frmMedia->addItemToBottomRow(SPACE);
