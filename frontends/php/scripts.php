@@ -304,7 +304,7 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 //----- GO ------
 		$goBox = new CComboBox('go');
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm','Delete selected scripts?');
+		$goOption->setAttribute('confirm',S_DELETE_SELECTED_SCRIPTS_Q);
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
