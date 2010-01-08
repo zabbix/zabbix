@@ -195,7 +195,7 @@ class CUser extends CZBXAPI{
 		$sql = 'SELECT '.$sql_select.'
 				FROM '.$sql_from.'
 				WHERE '.DBin_node('u.userid', $nodeids).
-				$sql_where.
+					$sql_where.
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
 		while($user = DBfetch($res)){
@@ -235,7 +235,7 @@ class CUser extends CZBXAPI{
 		}
 
 // Adding Objects
-		if($options['get_access'] != 0){
+		if(!is_null($options['get_access'])){
 			foreach($result as $userid => $user){
 				$result[$userid] += array('api_access' => 0, 'gui_access' => 0, 'debug_mode' => 0, 'users_status' => 0);
 			}
@@ -253,7 +253,7 @@ class CUser extends CZBXAPI{
 		}
 // Adding Objects
 // Adding usergroups
-		if($options['select_usrgrps']){
+		if(!is_null($options['select_usrgrps'])){
 			$obj_params = array('extendoutput' => 1,
 								'userids' => $userids,
 								'preservekeys' => 1
