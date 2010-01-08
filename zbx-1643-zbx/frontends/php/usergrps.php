@@ -427,12 +427,18 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 
 			$users = array();
 			order_result($usrgrp['users'], 'alias');
+
 			foreach($usrgrp['users'] as $unum => $user){
 				$user_type_style = 'enabled';
 				if(USER_TYPE_ZABBIX_ADMIN == $user['type']) $user_type_style = 'orange';
 				if(USER_TYPE_SUPER_ADMIN == $user['type']) $user_type_style = 'disabled';
 
-				$users[] = new CLink($user['alias'],'users.php?form=update&userid='.$user['userid']);//, $user_type_style);
+				$user_status_style = 'enabled';
+				if(GROUP_GUI_ACCESS_DISABLED == $user['gui_access']) $user_status_style = 'disabled';
+				if(GROUP_STATUS_DISABLED == $user['users_status']) $user_status_style = 'disabled';
+				
+
+				$users[] = new CLink($user['alias'],'users.php?form=update&userid='.$user['userid'], $user_status_style);//, $user_type_style);
 				$users[] = ', ';
 			}
 			array_pop($users);
