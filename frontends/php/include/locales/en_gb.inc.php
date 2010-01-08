@@ -215,7 +215,6 @@
 
 //	acknow.php
 	'S_NO_EVENTS_TO_ACKNOWLEDGE'=>		'No events to acknowledge',
-	'S_TO_ACKNOWLEDGE' =>		'To acknowledge',
 	'S_ACKNOWLEDGES'=>			'Acknowledges',
 	'S_ACKNOWLEDGE'=>			'Acknowledge',
 	'S_RETURN'=>				'Return',
@@ -472,7 +471,6 @@
 
 	'S_EXPRESSION_TYPE'=>				'Expression type',
 	'S_NEW_EXPRESSION'=>				'New expression',
-	'S_IGNORE_CASE'=>				'Ignore case',
 	'S_CASE_SENSITIVE'=>				'Case sensitive',
 	'S_TEST'=>					'Test',
 	'S_DELIMITER'=>					'Delimiter',
@@ -721,7 +719,6 @@
 
 //	hosts.php
 	'S_MACROS'=>					'Macros',
-	'S_ERROR_ADDING_MACRO'=>			'Error while adding Host Macro',
 	'S_WRONG_MACRO'=>				'Wrong macro',
 	'S_MACRO_TOO_LONG'=>				'Macro name is too long, should not exceed 64 chars.',
 	'S_MACRO_VALUE_TOO_LONG'=>			'Macro value is too long, should not exceed 255 chars.',
@@ -829,12 +826,11 @@
 	'S_CREATE_PROXY'=>				'Create Proxy',
 	'S_PROXY_NAME'=>				'Proxy name',
 	'S_LASTSEEN_AGE'=>				'Last seen (age)',
-	'S_GLOBAL_MACRO'=>				'Global macro',
 	'S_HOST_MACRO'=>				'Host macro',
 	'S_DOESNT_EXIST'=>				'doesn\'t exist',
 	'S_EMPTY_INPUT_PARAMETER'=>			'Empty input parameter',
 	'S_ENABLE_SELECTED_HOSTS'=>			'Enable selected hosts?',
-	'S_DISABLE_SELECTED_HOSTS'=>			'Disable selected hosts?',
+	'S_DISABLE_SELECTED_HOSTS_Q'=>			'Disable selected hosts?',
 	'S_DELETE_SELECTED_HOSTS'=>			'Delete selected hosts?',
 
 // templates.php
@@ -1086,18 +1082,14 @@
 	'S_ICON_UNKNOWN'=>			'Icon (unknown)',
 	'S_ICON_MAINTENANCE'=>			'Icon (maintenance)',
 	'S_ICON_DISABLED'=>			'Icon (disabled)',
-	'S_ELEMENT_1'=>				'Element 1',
-	'S_ELEMENT_2'=>				'Element 2',
 	'S_LINK_STATUS_INDICATOR'=>		'Link status indicator',
 	'S_CONFIGURATION_OF_NETWORK_MAPS'=>	'Configuration of network maps',
 	'S_CONFIGURATION_OF_NETWORK_MAPS_BIG'=>	'CONFIGURATION OF NETWORK MAPS',
 
 	'S_ADD_ELEMENT'=>			'Add element',
-	'S_CREATE_CONNECTION'=>			'Create connection',
 	'S_COORDINATE_X'=>			'Coordinate X',
 	'S_COORDINATE_Y'=>			'Coordinate Y',
 
-	'S_DISPLAYED_ELEMENTS'=>		'Displayed elements',
 	'S_CONNECTORS'=>			'Connectors',
 	'S_UNAVAILABLE_BIG'=>			'UNAVAILABLE',
 	'S_MAINTENANCE_BIG'=>			'MAINTENANCE',
@@ -1127,11 +1119,6 @@
 	'S_ADD_LINK'=>				'Add link',
 	'S_REMOVE_LINK'=>			'Remove link',
 
-	'S_UNDEFINED'=>				'Undefined',
-	'S_TYPE_OFF'=>				'Type (OFF)',
-	'S_TYPE_ON'=>				'Type (ON)',
-	'S_COLOR_OFF'=>				'Color (OFF)',
-	'S_COLOR_ON'=>				'Color (ON)',
 
 //	map.php
 	'S_OK_BIG'=>			'OK',
@@ -1707,8 +1694,6 @@
 //	popup_link_tr.php
 	'S_NEW_CONNECTOR'=>			'New connector',
 	'S_EDIT_CONNECTOR'=>			'Edit connector',
-	'S_MAP_ELEMENT'=>			'Map element',
-	'S_NEW_MAP_ELEMENT'=>			'New map element',
 
 
 //	tr_logform.php
