@@ -412,7 +412,7 @@ include_once('include/page_header.php');
 // goBox
 			$goBox = new CComboBox('go');
 			$goOption = new CComboItem('delete', S_DELETE_SELECTED);
-			$goOption->setAttribute('confirm','Delete selected slides?');
+			$goOption->setAttribute('confirm',S_DELETE_SELECTED_SLIDESHOWS_Q);
 			$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
