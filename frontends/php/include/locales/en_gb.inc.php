@@ -1051,6 +1051,13 @@
 	'S_PUBLIC_KEY'=>					'Public key',
 	'S_AUTHENTICATION_METHOD'=>				'Authentication method',
 	'S_PASSPHRASE'=>					'Passphrase',
+	'S_EDIT_TRIGGER'=>					'Edit Trigger',
+	'S_ENABLE_SELECTED_ITEMS_Q'=>				'Enable selected items?',
+	'S_DISABLE_SELECTED_ITEMS_Q'=>				'Disable selected items?',
+	'S_MASS_UPDATE_SELECTED_ITEMS_Q'=>			'Mass update selected items?',
+	'S_COPY_SELECTED_ITEMS_Q'=>				'Copy selected items?',
+	'S_DELETE_HISTORY_SELECTED_ITEMS_Q'=>			'Delete history of selected items?',
+	'S_DELETE_SELECTED_ITEMS_Q'=>				'Delete selected items?',
 
 //	events.php
 	'S_EVENT'=>				'Event',
