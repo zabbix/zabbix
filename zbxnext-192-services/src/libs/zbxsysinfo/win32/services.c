@@ -246,7 +246,7 @@ int	SERVICES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 				if (SUCCEED == check_service_state(h_srv, service_state))
 				{
 					utf8 = zbx_unicode_to_utf8(ssp[i].lpServiceName);
-					if (SUCCEED == str_in_list(exclude, utf8, ','))
+					if (FAIL == str_in_list(exclude, utf8, ','))
 						buf = zbx_strdcatf(buf, "%s\n", utf8);
 					zbx_free(utf8);
 				}
