@@ -21,7 +21,7 @@
 <?php
 
 	function check_php_version(){
-		$required = '5.1.0';
+		$required = '5.0';
 		$recommended = '5.3.0';
 		
 		if(version_compare(phpversion(), $recommended, '>=')){
