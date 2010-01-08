@@ -509,6 +509,7 @@
 
 // proxies.php
 	'S_CONFIGURATION_OF_PROXIES'=>		'CONFIGURATION OF PROXIES',
+	'S_DELETE_SELECTED_PROXY_Q'=>		'Delete selected proxy?',
 
 //  Authentication
 	'S_AUTHENTICATION'=>			'Authentication',
@@ -1330,6 +1331,7 @@
 	'S_EDIT'=>				'Edit',
 	'S_DYNAMIC_ITEM'=>			'Dynamic item',
 	'S_DIMENSION_COLS_ROWS'=>		'Dimension (cols x rows)',
+	'S_DELETE_SELECTED_SLIDESHOWS_Q'=>	'Delete selected slideshows?',
 
 	'S_SLIDESHOWS'=>			'Slide shows',
 	'S_SLIDESHOW'=>				'Slide show',
