@@ -1222,6 +1222,7 @@
 	'S_DAY'=>					'Day',
 	'S_MONTH'=>					'Month',
 	'S_YEAR'=>					'Year',
+	'S_YEAR_SMALL'=>				'year',
 	'S_HOURLY'=>					'Hourly',
 	'S_DAILY'=>					'Daily',
 	'S_WEEKLY'=>					'Weekly',
