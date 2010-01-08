@@ -642,6 +642,7 @@
 	'S_MAINTENANCE_ADDED'=>			'Maintenance added',
 	'S_MAINTENANCE_UPDATED'=>		'Maintenance updated',
 	'S_MAINTENANCE_DELETED'=>		'Maintenance deleted',
+	'S_DELETE_SELECTED_MAINTENANCE_PERIODS_Q'=>'Delete selected maintenance periods?',
 
 	'S_HOSTS_IN_MAINTENANCE'=>		'Hosts in maintenance',
 	'S_GROUPS_IN_MAINTENANCE'=>		'Groups in maintenance',
@@ -1719,6 +1720,9 @@
 
 //  applications.php
 	'S_DELETE_APPLICATION'=>	'Delete this application?',
+
+// popup_media.php
+	'S_INCORRECT_TIME_PERIOD'=>	'Incorrect time period',
 
 //	Menu
 
