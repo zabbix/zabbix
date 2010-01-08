@@ -270,7 +270,7 @@
 
 			if($added == 0){
 				if(!ctype_digit($_REQUEST['add_value']) || !is_string($_REQUEST['add_newvalue'])){
-					info('Value maps are used to create a mapping between numeric values and string representations');
+					info(S_VALUE_MAPS_CREATE_NUM_STRING);
 					show_messages(false,null,S_CANNNOT_ADD_VALUE_MAP);
 				}
 				else{
@@ -809,7 +809,7 @@
 			$frmValmap->addItemToBottomRow($saveButton);
 			if(isset($_REQUEST["valuemapid"])){
 				$frmValmap->addItemToBottomRow(SPACE);
-				$frmValmap->addItemToBottomRow(new CButtonDelete("Delete selected value mapping?",
+				$frmValmap->addItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_VALUE_MAPPING,
 					url_param("form").url_param("valuemapid").url_param("config")));
 			}
 			else {
