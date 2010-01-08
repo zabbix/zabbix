@@ -486,6 +486,9 @@
 
 	'S_GROUP_FOR_DISCOVERED_HOSTS'=>		'Group for discovered hosts',
 
+	'S_VALUE_MAPS_CREATE_NUM_STRING'=>		'Value maps are used to create a mapping between numeric values and string representations',
+	'S_DELETE_SELECTED_VALUE_MAPPING'=>		'Delete selected value mapping?',
+
 //	nodes.php
 	'S_NOT_DM_SETUP'=>			'Your setup is not configured for distributed monitoring',
 	'S_CONFIGURATION_OF_NODES'=>		'CONFIGURATION OF NODES',
