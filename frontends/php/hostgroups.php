@@ -282,7 +282,7 @@ include_once('include/page_header.php');
 			$frmHostG->addItemToBottomRow(new CButton('clone',S_CLONE));
 			$frmHostG->addItemToBottomRow(SPACE);
 
-			$dltButton = new CButtonDelete('Delete selected group?', url_param('form').url_param('groupid'));
+			$dltButton = new CButtonDelete(S_DELETE_SELECTED_GROUP, url_param('form').url_param('groupid'));
 			$dlt_groups = getDeletableHostGroups($_REQUEST['groupid']);
 
 			if(empty($dlt_groups)) $dltButton->setAttribute('disabled', 'disabled');
@@ -396,15 +396,15 @@ include_once('include/page_header.php');
 //----- GO ------
 		$goBox = new CComboBox('go');
 		$goOption = new CComboItem('activate',S_ACTIVATE_SELECTED_HOSTS);
-		$goOption->setAttribute('confirm','Enable selected Host Groups?');
+		$goOption->setAttribute('confirm',S_ENABLE_SELECTED_HOST_GROUPS);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('disable',S_DISABLE_SELECTED_HOSTS);
-		$goOption->setAttribute('confirm','Disable selected Host Groups?');
+		$goOption->setAttribute('confirm',S_DISABLE_SELECTED_HOST_GROUPS);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm','Delete selected Host Groups?');
+		$goOption->setAttribute('confirm',S_DELETE_SELECTED_HOST_GROUPS);
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
