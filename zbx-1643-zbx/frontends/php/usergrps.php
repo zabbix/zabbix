@@ -401,25 +401,38 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 				: new CLink(S_DISABLED, 'usergrps.php?go=enable_debug&usrgrpid='.$usrgrpid, 'enabled');
 
 			$gui_access = user_auth_type2str($usrgrp['gui_access']);
+
+			$gui_access_style = 'enabled';
+			if(GROUP_GUI_ACCESS_INTERNAL == $usrgrp['gui_access']) $gui_access_style = 'orange';
+			if(GROUP_GUI_ACCESS_DISABLED == $usrgrp['gui_access']) $gui_access_style = 'disabled';
+
 			if(granted2update_group($usrgrpid)){
 
 				$next_gui_auth = ($usrgrp['gui_access']+1 > GROUP_GUI_ACCESS_DISABLED)?GROUP_GUI_ACCESS_SYSTEM:($usrgrp['gui_access']+1);
-				$gui_access = new CLink($gui_access, 'usergrps.php?go=set_gui_access&set_gui_access='.$next_gui_auth.'&usrgrpid='.$usrgrpid,
-					($usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED) ? 'orange' : 'enabled');
+							
+				$gui_access = new CLink(
+									$gui_access, 
+									'usergrps.php?go=set_gui_access&set_gui_access='.$next_gui_auth.'&usrgrpid='.$usrgrpid,
+									$gui_access_style
+								);
 
 				$users_status = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED)
 					? new CLink(S_ENABLED, 'usergrps.php?go=disable_status&usrgrpid='.$usrgrpid, 'enabled')
 					: new CLink(S_DISABLED, 'usergrps.php?go=enable_status&usrgrpid='.$usrgrpid, 'disabled');
 			}
 			else{
-				$gui_access = new CSpan($gui_access, ($usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED)?'orange':'green');
-				$users_status = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED)
-					? new CSpan(S_ENABLED, 'enabled') : new CSpan(S_DISABLED, 'disabled');
+				$gui_access = new CSpan($gui_access, $gui_access_style);
+				$users_status = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED)? new CSpan(S_ENABLED, 'enabled') : new CSpan(S_DISABLED, 'disabled');
 			}
 
 			$users = array();
+			order_result($usrgrp['users'], 'alias');
 			foreach($usrgrp['users'] as $unum => $user){
-				$users[] = new CLink($user['alias'],'users.php?form=update&userid='.$user['userid']);
+				$user_type_style = 'enabled';
+				if(USER_TYPE_ZABBIX_ADMIN == $user['type']) $user_type_style = 'orange';
+				if(USER_TYPE_SUPER_ADMIN == $user['type']) $user_type_style = 'disabled';
+
+				$users[] = new CLink($user['alias'],'users.php?form=update&userid='.$user['userid']);//, $user_type_style);
 				$users[] = ', ';
 			}
 			array_pop($users);
