@@ -827,6 +827,9 @@
 	'S_HOST_MACRO'=>				'Host macro',
 	'S_DOESNT_EXIST'=>				'doesn\'t exist',
 	'S_EMPTY_INPUT_PARAMETER'=>			'Empty input parameter',
+	'S_ENABLE_SELECTED_HOSTS'=>			'Enable selected hosts?',
+	'S_DISABLE_SELECTED_HOSTS'=>			'Disable selected hosts?',
+	'S_DELETE_SELECTED_HOSTS'=>			'Delete selected hosts?',
 
 // templates.php
 	'S_TEMPLATE_LIST'=>			'Templates list',
