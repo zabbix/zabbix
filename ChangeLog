@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1673] fixed removing hosts from hosts group, when user with permission only on host group updates it (Vedmak)
  - [ZBX-1639] fixed processing of logrt[] check (Sasha)
  - [ZBX-1671] make more strings translatable. Thanks to alixen (Richlv)
  - [ZBX-1669] make more strings translatable. Patch by dotneft (Richlv)
