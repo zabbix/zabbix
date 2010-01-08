@@ -85,7 +85,7 @@ include_once 'include/page_header.php';
 	imagefilledrectangle($im,0,0,$x,$y,$white);
 	imagerectangle($im,0,0,$x-1,$y-1,$black);
 
-	$str=$service['name'].' (year '.date('Y').')';
+	$str=$service['name'].' ('.S_YEAR_SMALL.' '.date('Y').')';
 	$x=imagesx($im)/2-imagefontwidth(4)*strlen($str)/2;
 	// imagestring($im, 4,$x,1, $str , $darkred);
 	imageText($im, 10, 0, $x, 14, $darkred, $str);
@@ -157,11 +157,11 @@ include_once 'include/page_header.php';
 
 	imagefilledrectangle($im,$shiftX,$sizeY+$shiftYup+39+15*0,$shiftX+5,$sizeY+$shiftYup+35+9+15*0,imagecolorallocate($im,120,235,120));
 	imagerectangle($im,$shiftX,$sizeY+$shiftYup+39+15*0,$shiftX+5,$sizeY+$shiftYup+35+9+15*0,$black);
-	imageText($im, 8, 0, $shiftX+9, $sizeY+$shiftYup+15*0+45, $black, 'OK (%)');
+	imageText($im, 8, 0, $shiftX+9, $sizeY+$shiftYup+15*0+45, $black, S_OK_BIG.' (%)');
 
 	imagefilledrectangle($im,$shiftX,$sizeY+$shiftYup+39+15*1,$shiftX+5,$sizeY+$shiftYup+35+9+15*1,$darkred);
 	imagerectangle($im,$shiftX,$sizeY+$shiftYup+39+15*1,$shiftX+5,$sizeY+$shiftYup+15+9+35*1,$black);
-	imageText($im, 8, 0, $shiftX+9, $sizeY+$shiftYup+15*1+45, $black, 'PROBLEMS (%)');
+	imageText($im, 8, 0, $shiftX+9, $sizeY+$shiftYup+15*1+45, $black, S_PROBLEM_BIG.' (%)');
 
 	imagestringup($im,0,imagesx($im)-10,imagesy($im)-50, 'http://www.zabbix.com', $gray);
 

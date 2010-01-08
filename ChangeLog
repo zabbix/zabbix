@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1671] make more strings translatable. Thanks to alixen (Richlv)
  - [ZBX-1669] make more strings translatable. Patch by dotneft (Richlv)
  - [ZBX-1627] fixed errors in monitoring->overview (Vedmak)
  - [ZBX-1603] fixed button title when editing maintenance period (Vedmak)
