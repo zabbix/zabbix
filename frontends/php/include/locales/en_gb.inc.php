@@ -27,10 +27,10 @@
 	'S_DATE_FORMAT_YMD'=>			'd M Y',
 	'S_HTML_CHARSET'=>			'UTF-8',
 
-	'S_YEAR_SHORT' =>			'y',
-	'S_MONTH_SHORT' =>			'm',
-	'S_WEEK_SHORT' =>			'w',
-	'S_DAY_SHORT' =>			'd',
+	'S_YEAR_SHORT'=>			'y',
+	'S_MONTH_SHORT'=>			'm',
+	'S_WEEK_SHORT'=>			'w',
+	'S_DAY_SHORT'=>			'd',
 	'S_HOUR_SHORT' =>			'h',
 	'S_MINUTE_SHORT' =>			'm',
 	'S_SECOND_SHORT' =>			's',
@@ -1613,6 +1613,8 @@
 	'S_DISABLE_DEBUG'=>				'Disable DEBUG',
 	'S_BLOCKED'=>					'Blocked',
 	'S_UNBLOCK_SELECTED'=>				'Unblock selected',
+	'S_UBLOCK_SELECTED_USERS_Q'=>			'Unblock selected users?', 
+	'S_DELETE_SELECTED_USERS_Q'=>			'Delete selected users?',
 
 //scripts.php
 	'S_SCRIPTS_CONFIGURATION_BIG'=>		'CONFIGURATION OF SCRIPTS',
@@ -1637,7 +1639,7 @@
 	'S_RESULT'=>				'Result',
 	'S_CLOSE'=>				'Close',
 	'S_CONNECT_TO_SERVER_ERROR'=>		'Cannot connect to Zabbix server',
-
+	'S_DELETE_SELECTED_SCRIPTS_Q'=>		'Delete selected scripts?',
 
 //	audit.php
 	'S_AUDIT'=>				'Audit',
@@ -1688,9 +1690,10 @@
 
 //	search.php
 	'S_SEARCH_BIG'=>			'SEARCH',
-	'S_GO' =>				'Go',
-	'S_FOUND_SMALL' =>			'found',
-	'S_DISPLAYING' =>			'Displaying',
+	'S_GO'=>				'Go',
+	'S_FOUND_SMALL'=>			'found',
+	'S_DISPLAYING'=>			'Displaying',
+	'S_SEARCH_PATTERN_EMPTY'=>		'Search pattern is empty',
 
 //	popup.php
 	'S_CAPTION'=>				'Caption',

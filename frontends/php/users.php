@@ -491,12 +491,12 @@ include_once('include/page_header.php');
 		$goBox = new CComboBox('go');
 
 		$goOption = new CComboItem('unblock',S_UNBLOCK_SELECTED);
-		$goOption->setAttribute('confirm','Unblock selected users?');
+		$goOption->setAttribute('confirm',S_UBLOCK_SELECTED_USERS_Q);
 		$goBox->addItem($goOption);
 //		$goBox->addItem('unblock',S_UNBLOCK_SELECTED);
 
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm','Delete selected users?');
+		$goOption->setAttribute('confirm',S_DELETE_SELECTED_USERS_Q);
 		$goBox->addItem($goOption);
 //		$goBox->addItem('delete',S_DELETE_SELECTED);
 
