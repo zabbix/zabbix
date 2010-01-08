@@ -23,6 +23,7 @@ require_once('include/graphs.inc.php');
 require_once('include/screens.inc.php');
 require_once('include/maps.inc.php');
 require_once('include/users.inc.php');
+require_once('include/requirements.inc.php');
 
 
 // Author: Aly
@@ -337,6 +338,8 @@ return $table;
 
 // Author: Aly
 function make_status_of_zbx(){
+	global $USER_DETAILS;
+
 	$table = new CTableInfo();
 	$table->setHeader(array(
 		S_PARAMETER,
@@ -403,6 +406,24 @@ function make_status_of_zbx(){
 
 	$table->addRow(array(S_NUMBER_OF_USERS,$usr_cnt,new CSpan($online_cnt,'green')));
 	$table->addRow(array(S_REQUIRED_SERVER_PERFORMANCE_NVPS,$status['qps_total'],' - '));
+	
+	
+// CHECK REQUIREMENTS {{{
+	if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN){
+		$reqs = check_php_requirements();
+		foreach($reqs as $req){
+			if($req['result'] == false){
+				$table->addRow(array(
+					new CSpan($req['name'], 'red'), 
+					new CSpan($req['current'], 'red'),
+					new CSpan($req['error'], 'red')
+				));
+			}
+		}
+	}
+// }}}CHECK REQUIREMENTS
+
+
 	$table->setFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
 
 return $table;

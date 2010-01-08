@@ -1224,6 +1224,7 @@ table.requirements tr td.header{
 }
 
 table.requirements tr td{
+	white-space: nowrap;
 	padding-left: 5px;
 	padding-right: 15px;
 	background-color: #FFFFFF;
