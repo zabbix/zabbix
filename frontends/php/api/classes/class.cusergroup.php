@@ -233,10 +233,12 @@ class CUserGroup extends CZBXAPI{
 // Adding Objects
 // Adding users
 		if($options['select_users']){
-			$obj_params = array('extendoutput' => 1,
-								'usrgrpids' => $usrgrpids,
-								'preservekeys' => 1
-							);
+			$obj_params = array(
+					'extendoutput' => 1,
+					'usrgrpids' => $usrgrpids,
+					'get_access' => 1,
+					'preservekeys' => 1
+				);
 			$users = CUser::get($obj_params);
 			foreach($users as $userid => $user){
 				foreach($user['usrgrps'] as $num => $usrgrp){
