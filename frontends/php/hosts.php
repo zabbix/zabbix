@@ -796,15 +796,15 @@ $_REQUEST['hostid'] = $thid;
 		$goBox->addItem('massupdate',S_MASS_UPDATE);
 
 		$goOption = new CComboItem('activate',S_ACTIVATE_SELECTED);
-		$goOption->setAttribute('confirm','Enable selected host?');
+		$goOption->setAttribute('confirm',S_ENABLE_SELECTED_HOSTS);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
-		$goOption->setAttribute('confirm','Disable selected hosts?');
+		$goOption->setAttribute('confirm',S_DISABLE_SELECTED_HOSTS);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm','Delete selected hosts?');
+		$goOption->setAttribute('confirm',S_DELETE_SELECTED_HOSTS);
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
