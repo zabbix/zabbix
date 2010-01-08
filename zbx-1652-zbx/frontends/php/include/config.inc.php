@@ -1090,16 +1090,21 @@ function __autoload($class_name){
 
 	function replace_value_by_map($value, $valuemapid){
 		if($valuemapid < 1) return $value;
+		
+		static $valuemaps = array();
+		if(isset($valuemaps[$valuemapid])) return $valuemaps[$valuemapid];
 
 		$sql = 'SELECT newvalue '.
 				' FROM mappings '.
 				' WHERE valuemapid='.$valuemapid.
 					' AND value='.zbx_dbstr($value);
 		$result = DBselect($sql);
-		$row = DBfetch($result);
-		if($row){
-			return $row["newvalue"]." "."($value)";
+		if($row = DBfetch($result)){
+			$valuemaps[$valuemapid] = $row['newvalue'].' '.'('.$value.')';
+			
+			return $valuemaps[$valuemapid];
 		}
+
 	return $value;
 	}
 /*************** END VALUE MAPPING ******************/
@@ -1241,8 +1246,7 @@ function __autoload($class_name){
 
 /*************** RESULT SORTING ******************/
 
-	function order_result(&$data, $sortfield, $sortorder=ZBX_SORT_UP, $preserve_keys=false){
-// TODO: if works ok, remove commented part and last argument
+	function order_result(&$data, $sortfield, $sortorder=ZBX_SORT_UP){
 		if(empty($data)) return false;
 
 		$sort = array();
@@ -1261,24 +1265,6 @@ function __autoload($class_name){
 			$data[$key] = $tmp[$key];
 		}
 
-/* 		if($preserve_keys == true){
-			$data = array_quicksort($data, $sortfield, $sortorder);
-			return true;
-		}
-
-		$tmp = array();
-		foreach($data as $key => $rows){
-			if(!isset($rows[$sortfield])){
-//				info('Sorting failed ["'.$sortfield.'","'.$sortorder.'"]');
-				return false;
-			}
-			$tmp[$key] = strtolower($rows[$sortfield]);
-		}
-
-		$sortorder = ($sortorder == 'ASC') ? SORT_ASC : SORT_DESC;
-
-		array_multisort($tmp, $sortorder, $data);
- */
 	return true;
 	}
 
@@ -1312,9 +1298,11 @@ function __autoload($class_name){
 
 // Selection
 	function selectByPattern(&$table, $column, $pattern, $limit){
+		$chunk_size = $limit;
+
 		$rsTable = array();
 		foreach($table as $num => $row){
-			if($row[$column] == $pattern)
+			if(strtoupper($row[$column]) == strtoupper($pattern))
 				$rsTable = array($num=>$row) + $rsTable;
 			else if($limit > 0)
 				$rsTable[$num] = $row;
@@ -1325,7 +1313,7 @@ function __autoload($class_name){
 		}
 
 		if(!empty($rsTable)){
-			$rsTable = array_chunk($rsTable, 20, true);
+			$rsTable = array_chunk($rsTable, $chunk_size, true);
 			$rsTable = $rsTable[0];
 		}
 

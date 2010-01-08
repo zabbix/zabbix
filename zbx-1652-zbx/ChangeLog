@@ -1,5 +1,7 @@
 Changes for 1.8.1
 
+ - [ZBX-1643] removed edit links from search if no write access to object (Aly)
+ - [ZBX-1661] fixed value mappings retrieval (Aly)
  - [ZBX-1665] fixed hosts view in graphs configuration screen (Aly)
  - [ZBX-1673] fixed removing hosts from hosts group, when user with permission only on host group updates it (Vedmak)
  - [ZBX-1639] fixed processing of logrt[] check (Sasha)
