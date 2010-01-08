@@ -91,6 +91,9 @@
 	'S_CANNOT_ADD_DISCOVERY_RULE'=>		'Cannot add discovery rule',
 	'S_STATUS_OF_DISCOVERY_BIG'=>		'STATUS OF DISCOVERY',
 	'S_STATUS_OF_DISCOVERY'=>		'Status of discovery',
+	'S_ENABLE_SELECTED_DISCOVERY_RULES'=>	'Enable selected discovery rules?',
+	'S_DISABLE_SELECTED_DISCOVERY_RULES'=>	'Disable selected discovery rules?',
+	'S_DELETE_SELECTED_DISCOVERY_RULES'=>	'Delete selected discovery rules?',
 
 	'S_DISCOVERED'=>			'Discovered',
 	'S_LOST'=>				'Lost',
