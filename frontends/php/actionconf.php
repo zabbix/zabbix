@@ -559,15 +559,15 @@ $_REQUEST['eventsource'] = get_request('eventsource',get_profile('web.actionconf
 //----- GO ------
 		$goBox = new CComboBox('go');
 		$goOption = new CComboItem('activate',S_ENABLE_SELECTED);
-		$goOption->setAttribute('confirm','Enable selected actions?');
+		$goOption->setAttribute('confirm',S_ENABLE.' '.S_SELECTED_ACTIONS);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
-		$goOption->setAttribute('confirm','Disable selected actions?');
+		$goOption->setAttribute('confirm',S_DISABLE.' '.S_SELECTED_ACTIONS);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm','Delete selected actions?');
+		$goOption->setAttribute('confirm',S_DELETE.' '.S_SELECTED_ACTIONS);
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
