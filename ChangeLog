@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBXNEXT-192] added possibility to exclude some services from the result of services[] (Sasha)
  - [ZBX-1478] improved php requirements checks (Vedmak)
  - [ZBX-1713] fixed adding user group to email alerts (Vedmak)
  - [ZBX-1643] removed edit links from search if no write access to object (Aly)
