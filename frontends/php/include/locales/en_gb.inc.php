@@ -280,6 +280,7 @@
 	'S_INCORRECT_OPERATION_TYPE'=>		'Incorrect operation type',
 	'S_INCORRECT_USER'=>			'Incorrect user',
 	'S_INCORRECT_STEPS'=>			'Incorrect steps',
+	'S_SELECTED_ACTIONS'=>			'selected actions?',
 
 //	actions.php
 	'S_ACTIONS'=>				'Actions',
