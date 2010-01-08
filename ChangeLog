@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1478] improved php requirements checks (Vedmak)
  - [ZBX-1713] fixed adding user group to email alerts (Vedmak)
  - [ZBX-1643] removed edit links from search if no write access to object (Aly)
  - [ZBX-1661] fixed value mappings retrieval (Aly)
