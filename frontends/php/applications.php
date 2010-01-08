@@ -235,12 +235,12 @@ include_once('include/page_header.php');
 	echo SBR;
 
 	if(isset($_REQUEST['form'])){
-		$frm_title = 'New Application';
+		$frm_title = S_NEW_APPLICATION;
 
 		if(isset($_REQUEST['applicationid'])){
 			$result=DBselect('SELECT * FROM applications WHERE applicationid='.$_REQUEST['applicationid']);
 			$row=DBfetch($result);
-			$frm_title = 'Application: "'.$row['name'].'"';
+			$frm_title = S_APPLICATION.': "'.$row['name'].'"';
 		}
 
 		if(isset($_REQUEST["applicationid"]) && !isset($_REQUEST["form_refresh"])){
@@ -285,7 +285,7 @@ include_once('include/page_header.php');
 		$frmApp->addItemToBottomRow(new CButton('save',S_SAVE));
 		if(isset($_REQUEST['applicationid'])){
 			$frmApp->addItemToBottomRow(SPACE);
-			$frmApp->addItemToBottomRow(new CButtonDelete('Delete this application?',
+			$frmApp->addItemToBottomRow(new CButtonDelete(S_DELETE_APPLICATION,
 					url_param('config').url_param('hostid').url_param('groupid').
 					url_param('form').url_param('applicationid')));
 		}
