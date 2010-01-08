@@ -1090,16 +1090,21 @@ function __autoload($class_name){
 
 	function replace_value_by_map($value, $valuemapid){
 		if($valuemapid < 1) return $value;
+		
+		static $valuemaps = array();
+		if(isset($valuemaps[$valuemapid])) return $valuemaps[$valuemapid];
 
 		$sql = 'SELECT newvalue '.
 				' FROM mappings '.
 				' WHERE valuemapid='.$valuemapid.
 					' AND value='.zbx_dbstr($value);
 		$result = DBselect($sql);
-		$row = DBfetch($result);
-		if($row){
-			return $row["newvalue"]." "."($value)";
+		if($row = DBfetch($result)){
+			$valuemaps[$valuemapid] = $row['newvalue'].' '.'('.$value.')';
+			
+			return $valuemaps[$valuemapid];
 		}
+
 	return $value;
 	}
 /*************** END VALUE MAPPING ******************/
