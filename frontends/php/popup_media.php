@@ -59,7 +59,7 @@ include_once('include/page_header.php');
 
 	if(isset($_REQUEST['add'])){
 		if( !validate_period($_REQUEST['period']) ){
-			error('Icorrect time period');
+			error(S_INCORRECT_TIME_PERIOD);
 		}
 		else{
 			$severity = 0;
