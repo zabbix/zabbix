@@ -1239,6 +1239,9 @@
 	'S_LOCALES'=>				'Locales',
 	'S_LOCALE_SMALL'=>			'locale',
 	'S_DOWNLOAD'=>				'Download',
+	'S_TAKE_DEF_LOCALE'=>			'Take for default locale',
+	'S_LOCALE_TO_EXTEND'=>			'Locale to extend',
+	'S_NEW_ENTRIES'=>			'New entries',
 
 //  report4.php
 	'S_NOTIFICATIONS'=>			'Notifications',
