@@ -457,15 +457,24 @@ include_once('include/page_header.php');
 			}
 			array_pop($users_groups);
 
+			$user_type_style = 'enabled';
+			if(USER_TYPE_ZABBIX_ADMIN == $user['type']) $user_type_style = 'orange';
+			if(USER_TYPE_SUPER_ADMIN == $user['type']) $user_type_style = 'disabled';
+			
 			$gui_access = user_auth_type2str($user['gui_access']);
-			$gui_access = new CSpan($gui_access, ($user['gui_access'] == GROUP_GUI_ACCESS_DISABLED) ? 'orange' : 'green');
+
+			$gui_access_style = 'green';
+			if(GROUP_GUI_ACCESS_INTERNAL == $user['gui_access']) $gui_access_style = 'orange';
+			if(GROUP_GUI_ACCESS_DISABLED == $user['gui_access']) $gui_access_style = 'disabled';
+			
+			$gui_access = new CSpan($gui_access, $gui_access_style);
 			$users_status = ($user['users_status'] == 1) ? new CSpan(S_DISABLED, 'red') : new CSpan(S_ENABLED, 'green');
 			$api_access = ($user['api_access'] == GROUP_API_ACCESS_ENABLED) ? new CSpan(S_ENABLED, 'orange') : new CSpan(S_DISABLED, 'green');
 			$debug_mode = ($user['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) ? new CSpan(S_ENABLED, 'orange') : new CSpan(S_DISABLED, 'green');
 
 			$table->addRow(array(
 				new CCheckBox('group_userid['.$userid.']', NULL, NULL, $userid),
-				new CLink($user['alias'], 'users.php?form=update&userid='.$userid),
+				new CLink($user['alias'], 'users.php?form=update&userid='.$userid), //, $user_type_style),
 				$user['name'],
 				$user['surname'],
 				user_type2str($user['type']),

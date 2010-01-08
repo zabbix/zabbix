@@ -108,13 +108,31 @@ include_once('include/page_header.php');
 		'pattern' => $search,
 		'extend_pattern' => true,
 		'limit' => $rows_per_page,
-		'select_groups' => 1,
+		'select_groups' => 1
 	);
 	$db_hosts = CHost::get($params);
-	order_result($db_hosts, 'host', null, true);
+	
+	order_result($db_hosts, 'host', null);
 
 	$hosts = selectByPattern($db_hosts, 'host', $search, $rows_per_page);
+	$hostids = zbx_objectValues($hosts, 'hostid');
 
+	$params = array(
+		'nodeids'=> get_current_nodeid(),
+		'hostids' => $hostids,
+		'editable' => 1
+	);
+	$rw_hosts = CHost::get($params);
+	$rw_hosts = zbx_toHash($rw_hosts,'hostid');
+	
+	$params = array(
+		'nodeids'=> get_current_nodeid(),
+		'pattern' => $search,
+		'extend_pattern' => true,
+		'count' => 1,
+	);
+	$hosts_count = CHost::get($params);
+	
 	$params = array(
 		'nodeids'=> get_current_nodeid(),
 		'pattern' => $search,
@@ -139,7 +157,7 @@ include_once('include/page_header.php');
 	$table  = new CTableInfo();
 	$table->setHeader($header);
 
-	foreach($hosts as $gnum => $host){
+	foreach($hosts as $hnum => $host){
 		$hostid = $host['hostid'];
 		
 		$group = reset($host['groups']);
@@ -153,7 +171,12 @@ include_once('include/page_header.php');
 				$pageBox->addItem('graphs.php?'.$link, S_GRAPHS);
 
 			$pageGo = new CButton('pagego', S_GO, "javascript: ".
-							" redirect(\$('hostpages_$hostid').options[\$('hostpages_$hostid').selectedIndex].value);");
+						" redirect(\$('hostpages_$hostid').options[\$('hostpages_$hostid').selectedIndex].value);");
+
+			if(!isset($rw_hosts[$hostid])){
+				$pageBox->setAttribute('disabled','disabled');
+				$pageGo->setAttribute('disabled','disabled');
+			}
 
 			$pageSelect = array($pageBox,SPACE,$pageGo);
 		}
@@ -196,9 +219,20 @@ include_once('include/page_header.php');
 	);
 
 	$db_hostGroups = CHostGroup::get($params);
-	order_result($db_hostGroups, 'name', null, true);
-	$hostGroups = selectByPattern($db_hostGroups, 'name', $search, $rows_per_page);
+	order_result($db_hostGroups, 'name');
 
+	$hostGroups = selectByPattern($db_hostGroups, 'name', $search, $rows_per_page);
+	$groupids = zbx_objectValues($hostGroups, 'groupid');
+
+	$params = array(
+		'nodeids'=> get_current_nodeid(),
+		'groupids' => $groupids,
+		'editable' => 1
+	);
+
+	$rw_hostGroups = CHostGroup::get($params);
+	$rw_hostGroups = zbx_toHash($rw_hostGroups, 'groupid');
+	
 	$params = array(
 		'nodeids'=> get_current_nodeid(),
 		'pattern' => $search,
@@ -225,7 +259,16 @@ include_once('include/page_header.php');
 		$hostgroupid = $group['groupid'];
 
 		$caption = make_decoration($group['name'], $search);
-		$admin_link = $admin?new CLink(S_GO,'hosts.php?config=1&groupid='.$hostgroupid.'&hostid=0'):null;
+		
+		if($admin){
+			if(isset($rw_hostGroups[$hostgroupid]))
+				$admin_link = new CLink(S_GO,'hosts.php?config=1&groupid='.$hostgroupid.'&hostid=0');
+			else			
+				$admin_link = new CSpan(S_GO,'unknown');
+		}
+		else{
+			$admin_link = null;
+		}
 
 		$table->addRow(array(
 			get_node_name_by_elid($hostgroupid),
@@ -247,20 +290,28 @@ include_once('include/page_header.php');
 // FIND Templates
 	if($admin){
 		$params = array(
-			'nodeid'=> get_current_nodeid(),
+			'nodeids'=> get_current_nodeid(),
 			'extendoutput' => 1,
 			'select_groups' => 1,
 			'pattern' => $search,
 			'limit' => $rows_per_page,
-			'order' => 'host',
-			'editable' => 1
+			'sortfield' => 'host'
 		);
 
 		$db_templates = CTemplate::get($params);
-		order_result($db_templates, 'host', null, true);
+		order_result($db_templates, 'host');
 
 		$templates = selectByPattern($db_templates, 'host', $search, $rows_per_page);
+		$templateids = zbx_objectValues($templates, 'templateid');
 
+		$params = array(
+			'nodeids'=> get_current_nodeid(),
+			'templateids' => $templateids,
+			'editable' => 1
+		);
+		$rw_templates = CTemplate::get($params);
+		$rw_templates = zbx_toHash($rw_templates,'templateid');
+		
 		$params = array(
 					'nodeids'=> get_current_nodeid(),
 					'pattern' => $search,
@@ -290,13 +341,26 @@ include_once('include/page_header.php');
 			$link = 'groupid='.$group['groupid'].'&hostid='.$templateid;
 
 			$caption = make_decoration($template['host'], $search);
+			
+			if(isset($rw_templates[$templateid])){
+				$template_link = new CLink($caption,'hosts.php?hostid='.$templateid);
+				$items_link = new CLink(S_GO,'items.php?'.$link);
+				$triggers_link = new CLink(S_GO,'triggers.php?'.$link);
+				$graphs_link = new CLink(S_GO,'graphss.php?'.$link);
+			}
+			else{
+				$template_link = new CSpan($caption);
+				$items_link = new CSpan(S_GO,'unknown');
+				$triggers_link = new CSpan(S_GO,'unknown');
+				$graphs_link = new CSpan(S_GO,'unknown');
+			}
 
 			$table->addRow(array(
 				get_node_name_by_elid($templateid),
-				new CLink($caption,'hosts.php?hostid='.$templateid),
-				new CLink(S_GO,'items.php?'.$link),
-				new CLink(S_GO,'triggers.php?'.$link),
-				new CLink(S_GO,'graphs.php?'.$link)
+				$template_link,
+				$items_link,
+				$triggers_link,
+				$graphs_link
 			));
 		}
 		$table->setFooter(new CCol(S_DISPLAYING.SPACE.$viewCount.SPACE.S_OF_SMALL.SPACE.$overalCount.SPACE.S_FOUND_SMALL));
