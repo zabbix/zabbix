@@ -91,9 +91,15 @@ include_once('include/page_header.php');
 
 	$_REQUEST['go'] = get_request('go', 'none');
 
-// PERMISSIONS
+// PERMISSIONS		
 	if(get_request('graphid',0) > 0){
-		$graphs = available_graphs($_REQUEST['graphid'], 1);
+		$options = array(
+			'nodeids' => get_current_nodeids(true),
+			'graphids' => $_REQUEST['graphid'],
+			'editable' => 1
+		);
+		$graphs = CGraph::get($options);
+
 		if(empty($graphs)) access_deny();
 	}
 ?>
@@ -118,9 +124,12 @@ include_once('include/page_header.php');
 		}
 
 		if(!empty($itemids)){
-			$options = array('itemids'=>$itemids, 'editable'=>1, 'nodes'=>get_current_nodeid(true));
+			$options = array(
+				'nodeids'=>get_current_nodeid(true),
+				'itemids'=>$itemids, 
+				'editable'=>1
+			);
 			$db_items = CItem::get($options);
-			$db_items = zbx_objectValues($db_items, 'itemid');
 			$db_items = zbx_toHash($db_items, 'itemid');
 
 			foreach($itemids as $inum => $itemid){
@@ -489,7 +498,6 @@ include_once('include/page_header.php');
 		$options = array(
 			'editable' => 1,
 			'extendoutput' => 1,
-			'select_hosts' => 1,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1));
@@ -524,6 +532,19 @@ include_once('include/page_header.php');
 
 // sorting
 		order_result($graphs, $sortfield, $sortorder);
+//---------
+
+		$graphids = zbx_objectValues($graphs, 'graphid');
+		$options = array(
+			'graphids' => $graphids,
+			'extendoutput' => 1,
+			'select_hosts' => 1,
+			'select_templates' => 1
+		);
+		$graphs = CGraph::get($options);
+
+// sorting
+		order_result($graphs, $sortfield, $sortorder);
 		$paging = getPagingLine($graphs);
 //---------
 
@@ -535,6 +556,10 @@ include_once('include/page_header.php');
 				$host_list = array();
 				foreach($graph['hosts'] as $host){
 					$host_list[] = $host['host'];
+				}
+
+				foreach($graph['templates'] as $template){
+					$host_list[] = $template['host'];
 				}
 				$host_list = implode(', ', $host_list);
 			}
