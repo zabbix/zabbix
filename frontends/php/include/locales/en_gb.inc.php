@@ -1603,6 +1603,15 @@
 	'S_UBLOCK_SELECTED_USERS_Q'=>			'Unblock selected users?', 
 	'S_DELETE_SELECTED_USERS_Q'=>			'Delete selected users?',
 
+//  usergrps.php
+	'S_ENABLE_SELECTED_GROUPS_Q'=>			'Enable selected groups?',
+	'S_DISABLE_SELECTED_GROUPS_Q'=>			'Disable selected groups?',
+	'S_ENABLE_API_SELECTED_GROUPS_Q'=>		'Enable API access in selected groups?',
+	'S_DISABLE_API_SELECTED_GROUPS_Q'=>		'Disable API access in selected groups?',
+	'S_ENABLE_DEBUG_SELECTED_GROUPS_Q'=>		'Enable debug mode in selected groups?',
+	'S_DISABLE_DEBUG_SELECTED_GROUPS_Q'=>		'Disable debug mode in selected groups?',
+	'S_DELETE_SELECTED_GROUPS_Q'=>			'Delete selected groups?',
+
 //scripts.php
 	'S_SCRIPTS_CONFIGURATION_BIG'=>		'CONFIGURATION OF SCRIPTS',
 	'S_SCRIPTS'=>				'Scripts',

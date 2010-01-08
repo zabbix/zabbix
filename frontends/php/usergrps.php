@@ -460,31 +460,31 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 		$goBox = new CComboBox('go');
 
 		$goOption = new CComboItem('enable_status',S_ENABLE_SELECTED);
-		$goOption->setAttribute('confirm','Enable selected groups?');
+		$goOption->setAttribute('confirm',S_ENABLE_SELECTED_GROUPS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('disable_status',S_DISABLE_SELECTED);
-		$goOption->setAttribute('confirm','Disable selected groups?');
+		$goOption->setAttribute('confirm',S_DISABLE_SELECTED_GROUPS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('enable_api',S_ENABLE_API);
-		$goOption->setAttribute('confirm','Enable API access in selected groups?');
+		$goOption->setAttribute('confirm',S_ENABLE_API_SELECTED_GROUPS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('disable_api',S_DISABLE_API);
-		$goOption->setAttribute('confirm','Disable API access in selected groups?');
+		$goOption->setAttribute('confirm',S_DISABLE_API_SELECTED_GROUPS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('enable_debug',S_ENABLE_DEBUG);
-		$goOption->setAttribute('confirm','Enable debug mode in selected groups?');
+		$goOption->setAttribute('confirm',S_ENABLE_DEBUG_SELECTED_GROUPS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('disable_debug',S_DISABLE_DEBUG);
-		$goOption->setAttribute('confirm','Disable debug mode in selected groups?');
+		$goOption->setAttribute('confirm',S_DISABLE_DEBUG_SELECTED_GROUPS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm','Delete selected groups?');
+		$goOption->setAttribute('confirm',S_DELETE_SELECTED_GROUPS_Q);
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
