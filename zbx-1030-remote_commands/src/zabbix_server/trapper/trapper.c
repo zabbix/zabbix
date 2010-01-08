@@ -564,12 +564,6 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 		return ret;
 /* Process information sent by zabbix_sender */
 	} else {
-		/* Command? */
-		if(strncmp(s,"Command",7) == 0)
-		{
-			node_process_command(sock, s);
-			return ret;
-		}
 		/* Node data exchange? */
 		if(strncmp(s,"Data",4) == 0)
 		{
@@ -643,6 +637,10 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 				else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS))
 				{
 					ret = send_list_of_active_checks_json(sock, &jp);
+				}
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_COMMAND))
+				{
+					ret = node_process_command(sock, s, &jp);
 				}
 				else
 				{

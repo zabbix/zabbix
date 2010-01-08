@@ -17,29 +17,48 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <netinet/in.h>
-#include <netdb.h>
-
-#include <string.h>
-
-#include <time.h>
-
-#include <sys/socket.h>
-#include <errno.h>
-
+#include "common.h"
 #include "nodecommand.h"
 #include "comms.h"
-#include "common.h"
+#include "zbxserver.h"
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
 #include "../poller/checks_ipmi.h"
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_command_by_scriptid                                          *
+ *                                                                            *
+ * Purpose: get script by scriptid                                            *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: NULL if script not found                                     *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static char	*get_command_by_scriptid(zbx_uint64_t scriptid)
+{
+	DB_RESULT	db_result;
+	DB_ROW		db_row;
+	char		*command = NULL;
+
+	db_result = DBselect(
+			"select command"
+			" from scripts"
+			" where scriptid=" ZBX_FS_UI64,
+			scriptid);
+
+	if (NULL != (db_row = DBfetch(db_result)))
+		command = strdup(db_row[0]);
+	DBfree_result(db_result);
+
+	return command;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -57,19 +76,63 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	execute_script(zbx_uint64_t hostid, char *command, char **result, int *result_allocated)
+static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, char **result)
 {
-	int		result_offset = 0;
 	char		*p, buffer[MAX_STRING_LEN];
+	char		*command = NULL;
+	int		result_alloc = 256, result_offset = 0,
+			ret = FAIL;
 	FILE		*f;
-#ifdef HAVE_OPENIPMI
 	DB_RESULT	db_result;
 	DB_ROW		db_row;
 	DB_ITEM		item;
-	int		ret, val;
+#ifdef HAVE_OPENIPMI
+	int		val;
+	char		error[MAX_STRING_LEN];
 #endif
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In execute_script(command:%s)", command);
+	zabbix_log(LOG_LEVEL_DEBUG, "In execute_script() scriptid:" ZBX_FS_UI64
+			" hostid:" ZBX_FS_UI64, scriptid, hostid);
+
+	memset(&item, 0, sizeof(item));
+
+	db_result = DBselect(
+			"select hostid,host,useip,dns,ip"
+			" from hosts"
+			" where hostid=" ZBX_FS_UI64
+				DB_NODE,
+			hostid,
+			DBnode_local("hostid"));
+
+	if (NULL != (db_row = DBfetch(db_result)))
+	{
+		ZBX_STR2UINT64(item.hostid, db_row[0]);
+		item.host_name = strdup(db_row[1]);
+		item.useip = atoi(db_row[2]);
+		item.host_dns = strdup(db_row[3]);
+		item.host_ip = strdup(db_row[4]);
+	}
+	DBfree_result(db_result);
+
+	if (0 == item.hostid)
+	{
+		*result = zbx_dsprintf(*result, "NODE %d: Unknown Host ID [" ZBX_FS_UI64 "]",
+				CONFIG_NODEID, hostid);
+		goto clean;
+	}
+
+	if (NULL == (command = get_command_by_scriptid(scriptid)))
+	{
+		*result = zbx_dsprintf(*result, "NODE %d: Unknowh Script ID [" ZBX_FS_UI64 "]",
+				CONFIG_NODEID, scriptid);
+		goto clean;
+	}
+
+	substitute_simple_macros(NULL, NULL, &item, NULL,
+			&command, MACRO_TYPE_SCRIPT);
+
+	zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Executing command: '%s'",
+			CONFIG_NODEID, command);
 
 	p = command;
 	while (*p == ' ' && *p != '\0')
@@ -102,70 +165,51 @@ static void	execute_script(zbx_uint64_t hostid, char *command, char **result, in
 			{
 				if (SUCCEED == (ret = set_ipmi_control_value(&item, val, buffer, sizeof(buffer))))
 				{
-					zbx_snprintf_alloc(result, result_allocated, &result_offset, 128,
-							"%d%cNODE %d: IPMI command successfully executed",
-							ret,
-							ZBX_DM_DELIMITER,
+					*result = zbx_dsprintf(*result, "NODE %d: IPMI command successfully executed",
 							CONFIG_NODEID);
 				}
 				else
-				{
-					zbx_snprintf_alloc(result, result_allocated, &result_offset, 128,
-							"%d%cNODE %d: Cannot execute IPMI command [%s] error: %s",
-							FAIL,
-							ZBX_DM_DELIMITER,
-							CONFIG_NODEID,
-							command,
-							buffer);
-				}
+					*result = zbx_dsprintf(*result, "NODE %d: Cannot execute IPMI command: %s",
+							CONFIG_NODEID, error);
 			}
 			else
-				zbx_snprintf_alloc(result, result_allocated, &result_offset, 128,
-						"%d%cNODE %d: Cannot parse IPMI command [%s]",
-						FAIL,
-						ZBX_DM_DELIMITER,
-						CONFIG_NODEID,
-						command);
+				*result = zbx_dsprintf(*result, "NODE %d: Cannot parse IPMI command",
+						CONFIG_NODEID);
 		}
 		else
-		{
-			zbx_snprintf_alloc(result, result_allocated, &result_offset, 128,
-					"%d%cNODE %d: Cannot execute [%s] error: Invalid hostid",
-					FAIL,
-					ZBX_DM_DELIMITER,
-					CONFIG_NODEID,
-					command);
-		}
+			*result = zbx_dsprintf(*result, "NODE %d: Unknown Host ID [" ZBX_FS_UI64 "]",
+					CONFIG_NODEID, hostid);
 		DBfree_result(db_result);
 	}
 	else
 	{
 #endif
-		if(0 != (f = popen(p, "r"))) {
-			zbx_snprintf_alloc(result, result_allocated, &result_offset, 8, "%d%c",
-				SUCCEED,
-				ZBX_DM_DELIMITER);
+		if(0 != (f = popen(p, "r")))
+		{
+			*result = zbx_malloc(*result, result_alloc);
+			**result = '\0';
 
-			while (NULL != fgets(buffer, sizeof(buffer)-1, f)) {
-				zbx_snprintf_alloc(result, result_allocated, &result_offset, sizeof(buffer),
-					"%s",
-					buffer);
-			}
-			(*result)[result_offset] = '\0';
+			while (NULL != fgets(buffer, sizeof(buffer), f))
+				zbx_snprintf_alloc(result, &result_alloc, &result_offset,
+						strlen(buffer) + 1, "%s", buffer);
 
 			pclose(f);
-		} else {
-			zbx_snprintf_alloc(result, result_allocated, &result_offset, 128,
-				"%d%cNODE %d: Cannot execute [%s] error:%s",
-				FAIL,
-				ZBX_DM_DELIMITER,
-				CONFIG_NODEID,
-				command,
-				strerror(errno));
+
+			ret = SUCCEED;
 		}
+		else
+			*result = zbx_dsprintf(*result, "NODE %d: Cannot execute command: %s",
+					CONFIG_NODEID, strerror(errno));
 #ifdef HAVE_OPENIPMI
 	}
 #endif
+clean:
+	zbx_free(command);
+	zbx_free(item.host_name);
+	zbx_free(item.host_ip);
+	zbx_free(item.host_dns);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -184,66 +228,49 @@ static void	execute_script(zbx_uint64_t hostid, char *command, char **result, in
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	send_script(int nodeid, const char *data, char **result, int *result_allocated)
+static int	send_script(int nodeid, const char *data, char **result)
 {
 	DB_RESULT	dbresult;
 	DB_ROW		dbrow;
-	int		result_offset = 0;
+	int		ret = FAIL;
 	zbx_sock_t	sock;
 	char		*answer;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In send_script(nodeid:%d)", nodeid);
 
-	dbresult = DBselect("select ip,port from nodes where nodeid=%d",
-		nodeid);
+	dbresult = DBselect(
+			"select ip,port"
+			" from nodes"
+			" where nodeid=%d",
+			nodeid);
 
 	if (NULL != (dbrow = DBfetch(dbresult))) {
-		if (SUCCEED == zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, dbrow[0], atoi(dbrow[1]), ZABBIX_TRAPPER_TIMEOUT)) {
-			if (FAIL == zbx_tcp_send(&sock, data)) {
-				zbx_snprintf_alloc(result, result_allocated, &result_offset, 128,
-					"%d%cNODE %d: Error while sending data to Node [%d] error: %s",
-					FAIL,
-					ZBX_DM_DELIMITER,
-					CONFIG_NODEID,
-					nodeid,
-					zbx_tcp_strerror());
+		if (SUCCEED == (ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, dbrow[0], atoi(dbrow[1]), ZABBIX_TRAPPER_TIMEOUT))) {
+			if (FAIL == (ret = zbx_tcp_send(&sock, data))) {
+				*result = zbx_dsprintf(*result, "NODE %d: Error while sending data to Node [%d]: %s",
+						CONFIG_NODEID, nodeid, zbx_tcp_strerror());
 				goto exit_sock;
 			}
 
-			if (SUCCEED == zbx_tcp_recv(&sock, &answer/*, ZBX_TCP_READ_UNTIL_CLOSE*/)) {
-				zbx_snprintf_alloc(result, result_allocated, &result_offset, strlen(answer)+1,
-				"%s",
-				answer);
-			} else {
-				zbx_snprintf_alloc(result, result_allocated, &result_offset, 128,
-					"%d%cNODE %d: Error while receiving answer from Node [%d] error: %s",
-					FAIL,
-					ZBX_DM_DELIMITER,
-					CONFIG_NODEID,
-					nodeid,
-					zbx_tcp_strerror());
-				goto exit_sock;
-			}
+			if (SUCCEED == (ret = zbx_tcp_recv(&sock, &answer)))
+				*result = zbx_dsprintf(*result, "%s", answer);
+			else
+				*result = zbx_dsprintf(*result, "NODE %d: Error while receiving data from Node [%d]: %s",
+						CONFIG_NODEID, nodeid, zbx_tcp_strerror());
 exit_sock:
 			zbx_tcp_close(&sock);
-		} else {
-			zbx_snprintf_alloc(result, result_allocated, &result_offset, 128,
-				"%d%cNODE %d: Unable to connect to Node [%d] error: %s",
-				FAIL,
-				ZBX_DM_DELIMITER,
-				CONFIG_NODEID,
-				nodeid,
-				zbx_tcp_strerror());
 		}
-	} else {
-		zbx_snprintf_alloc(result, result_allocated, &result_offset, 128,
-			"%d%cNODE %d: Node [%d] is unknown",
-			FAIL,
-			ZBX_DM_DELIMITER,
-			CONFIG_NODEID,
-			nodeid);
+		else
+			*result = zbx_dsprintf(*result, "NODE %d: Unable to connect to Node [%d]: %s",
+					CONFIG_NODEID, nodeid, zbx_tcp_strerror());
 	}
+	else
+		*result = zbx_dsprintf(*result, "NODE %d: Unknown Node ID [%d]",
+				CONFIG_NODEID, nodeid);
+
 	DBfree_result(dbresult);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -262,7 +289,7 @@ exit_sock:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	get_next_point_to_node(int current_nodeid, int slave_nodeid, int *nodeid)
+static int	get_next_point_to_node(int current_nodeid, int slave_nodeid, int *nodeid)
 {
 	DB_RESULT	dbresult;
 	DB_ROW		dbrow;
@@ -301,65 +328,58 @@ int	get_next_point_to_node(int current_nodeid, int slave_nodeid, int *nodeid)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	node_process_command(zbx_sock_t *sock, const char *data)
+int	node_process_command(zbx_sock_t *sock, const char *data, struct zbx_json_parse *jp)
 {
-	const char	*r;
-	char		*tmp = NULL, *result = NULL;
-	int		tmp_allocated = 64, result_allocated = 1024;
-	int		datalen;
-	int		nodeid, next_nodeid;
-	int		result_offset = 0;
-	zbx_uint64_t	hostid;
+	char		*result = NULL, *send = NULL, tmp[64];
+	int		nodeid, next_nodeid, ret = FAIL;
+	zbx_uint64_t	scriptid, hostid;
 
-	result = zbx_malloc(result, result_allocated);
-	tmp = zbx_malloc(tmp, tmp_allocated);
-	datalen = strlen(data);
+	zabbix_log(LOG_LEVEL_DEBUG, "In node_process_command()");
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In node_process_command(datalen:%d)",
-		datalen);
-
-	r = data;
-	zbx_get_next_field(&r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER); /* Constant 'Command' */
-	zbx_get_next_field(&r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER); /* NodeID */
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_NODEID, tmp, sizeof(tmp)))
+		return FAIL;
 	nodeid = atoi(tmp);
-	zbx_get_next_field(&r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER); /* hostid */
+
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SCRIPTID, tmp, sizeof(tmp)))
+		return FAIL;
+	ZBX_STR2UINT64(scriptid, tmp);
+
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOSTID, tmp, sizeof(tmp)))
+		return FAIL;
 	ZBX_STR2UINT64(hostid, tmp);
-	zbx_get_next_field(&r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
 
-	if (nodeid == CONFIG_NODEID) {
-		zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Received command \"%s\"",
-			CONFIG_NODEID,
-			tmp);
+	if (nodeid == CONFIG_NODEID)
+	{
+		ret = execute_script(scriptid, hostid, &result);
+		send = zbx_dsprintf(send, "%d%c%s", ret, ZBX_DM_DELIMITER, result);
+	}
+	else if (SUCCEED == get_next_point_to_node(CONFIG_NODEID, nodeid, &next_nodeid))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Sending command for Node %d to Node %d",
+				CONFIG_NODEID, nodeid, next_nodeid);
 
-		execute_script(hostid, tmp, &result, &result_allocated);
-	} else if (SUCCEED == get_next_point_to_node(CONFIG_NODEID, nodeid, &next_nodeid)) {
-		zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Sending command \"%s\" for nodeid %d"
-			"to node %d",
-			CONFIG_NODEID,
-			tmp,
-			nodeid,
-			next_nodeid);
-
-		send_script(next_nodeid, data, &result, &result_allocated);
-	} else {
-		zbx_snprintf_alloc(&result, &result_allocated, &result_offset, 128,
-			"%d%cNODE %d: Node [%d] is unknown",
-			FAIL,
-			ZBX_DM_DELIMITER,
-			CONFIG_NODEID,
-			nodeid);
+		if (FAIL == (ret = send_script(next_nodeid, data, &result)))
+			send = zbx_dsprintf(send, "%d%c%s", ret, ZBX_DM_DELIMITER, result);
+		else
+			send = strdup(result);
+	}
+	else
+	{
+		send = zbx_dsprintf(send, "%d%cNODE %d: Unknown Node ID [%d]",
+				ret, ZBX_DM_DELIMITER, CONFIG_NODEID, nodeid);
 	}
 
 	alarm(CONFIG_TIMEOUT);
-	if (zbx_tcp_send_raw(sock, result) != SUCCEED) {
+	if (zbx_tcp_send_raw(sock, send) != SUCCEED)
+	{
 		zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Error sending result of command to node %d",
 			CONFIG_NODEID,
 			nodeid);
 	}
 	alarm(0);
 
-	zbx_free(tmp);
 	zbx_free(result);
+	zbx_free(send);
 
 	return SUCCEED;
 }

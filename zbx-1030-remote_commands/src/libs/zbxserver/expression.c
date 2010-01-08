@@ -1596,6 +1596,30 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item,
 				replace_to = zbx_dsprintf(replace_to, "%s", item->useip ? item->host_ip : item->host_dns);
 			}
 		}
+		else if (macro_type & MACRO_TYPE_SCRIPT)
+		{
+			if (0 == strncmp(pr, MVAR_HOSTNAME, strlen(MVAR_HOSTNAME)))
+			{
+				var_len = strlen(MVAR_HOSTNAME);
+				replace_to = zbx_dsprintf(replace_to, "%s", item->host_name);
+			}
+			else if (0 == strncmp(pr, MVAR_IPADDRESS, strlen(MVAR_IPADDRESS)))
+			{
+				var_len = strlen(MVAR_IPADDRESS);
+				replace_to = zbx_dsprintf(replace_to, "%s", item->host_ip);
+			}
+			else if	(0 == strncmp(pr, MVAR_HOST_DNS, strlen(MVAR_HOST_DNS)))
+			{
+				var_len = strlen(MVAR_HOST_DNS);
+				replace_to = zbx_dsprintf(replace_to, "%s", item->host_dns);
+			}
+			else if (0 == strncmp(pr, MVAR_HOST_CONN, strlen(MVAR_HOST_CONN)))
+			{
+				var_len = strlen(MVAR_HOST_CONN);
+				replace_to = zbx_dsprintf(replace_to, "%s",
+						item->useip ? item->host_ip : item->host_dns);
+			}
+		}
 
 /*zabbix_log(LOG_LEVEL_DEBUG, "str_out2 [%s] replace_to [%s]", str_out, replace_to);*/
 		str_out = zbx_strdcat(str_out, replace_to);
