@@ -800,7 +800,7 @@ $_REQUEST['hostid'] = $thid;
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
-		$goOption->setAttribute('confirm',S_DISABLE_SELECTED_HOSTS);
+		$goOption->setAttribute('confirm',S_DISABLE_SELECTED_HOSTS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
