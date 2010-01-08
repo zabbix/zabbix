@@ -83,7 +83,7 @@ include_once('include/page_header.php');
 
 // Header
 	if(zbx_empty($search)){
-		$search = 'Search pattern is empty';
+		$search = S_SEARCH_PATTERN_EMPTY;
 	}
 	$search_wdgt->setClass('header');
 	$search_wdgt->addHeader(array(S_SEARCH_BIG.': ',bold($search)), SPACE);
