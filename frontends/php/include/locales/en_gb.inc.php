@@ -603,6 +603,9 @@
 	'S_GRAPH_SUM'=>				'Graph sum',
 	'S_GRAPH_ITEM'=>			'Graph item',
 	'S_REQUIRED_ITEMS_FOR_GRAPH'=>		'Items required for graph',
+	'S_TEMPLATED_GRAPH'=>			'Templated graph',
+	'S_NO_TARGET_SELECTED'=>		'No target selected',
+	'S_DELETE_SELECTED_GRAPHS'=>		'Delete selected graphs?',
 
 //	history.php
 	'S_SECONDS_SMALL'=>			'seconds',

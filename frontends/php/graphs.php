@@ -277,7 +277,7 @@ include_once('include/page_header.php');
 		foreach($graphs as $gnum => $graph){
 			if($graph['templateid'] != 0){
 				unset($graphs[$gnum]);
-				error('Cannot delete graph [ '.$graph['name'].' ] (Templated graph)');
+				error(S_CANNOT_DELETE_GRAPH.' [ '.$graph['name'].' ] ('.S_TEMPLATED_GRAPH.')');
 				continue;
 			}
 
@@ -336,7 +336,7 @@ include_once('include/page_header.php');
 			$_REQUEST['go'] = 'none2';
 		}
 		else{
-			error('No target selection.');
+			error(S_NO_TARGET_SELECTED);
 		}
 		show_messages();
 	}
@@ -594,7 +594,7 @@ include_once('include/page_header.php');
 		$goBox->addItem('copy_to',S_COPY_SELECTED_TO);
 
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm','Delete selected graphs?');
+		$goOption->setAttribute('confirm',S_DELETE_SELECTED_GRAPHS);
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
