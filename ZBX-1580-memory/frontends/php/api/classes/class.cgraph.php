@@ -247,7 +247,7 @@ class CGraph extends CZBXAPI{
 
 // count
 		if(!is_null($options['count'])){
-			$sql_parts['select']['graphs'] = 'count(g.graphid) as rowscount';
+			$sql_parts['select'] = array('count(g.graphid) as rowscount');
 		}
 
 // pattern
@@ -365,7 +365,7 @@ class CGraph extends CZBXAPI{
 				$ggraphs = $gitem['graphs'];
 				unset($gitem['graphs']);
 				foreach($ggraphs as $num => $graph){
-					$result[$graph['graphid']]['gitems'][$gitemid] = $gitem;
+					$result[$graph['graphid']]['gitems'][] = $gitem;
 				}
 			}
 		}
@@ -384,7 +384,7 @@ class CGraph extends CZBXAPI{
 				$hgraphs = $host['graphs'];
 				unset($host['graphs']);
 				foreach($hgraphs as $num => $graph){
-					$result[$graph['graphid']]['hosts'][$hostid] = $host;
+					$result[$graph['graphid']]['hosts'][] = $host;
 				}
 			}
 		}
@@ -403,7 +403,7 @@ class CGraph extends CZBXAPI{
 				$tgraphs = $template['graphs'];
 				unset($template['graphs']);
 				foreach($tgraphs as $num => $graph){
-					$result[$graph['graphid']]['templates'][$templateid] = $template;
+					$result[$graph['graphid']]['templates'][] = $template;
 				}
 			}
 		}
@@ -422,7 +422,7 @@ class CGraph extends CZBXAPI{
 				$igraphs = $item['graphs'];
 				unset($item['graphs']);
 				foreach($igraphs as $num => $graph){
-					$result[$graph['graphid']]['items'][$itemid] = $item;
+					$result[$graph['graphid']]['items'][] = $item;
 				}
 			}
 		}

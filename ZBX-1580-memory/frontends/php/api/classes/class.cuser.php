@@ -276,7 +276,7 @@ class CUser extends CZBXAPI{
 				$uusers = $usrgrp['users'];
 				unset($usrgrp['users']);
 				foreach($uusers as $num => $user){
-					$result[$user['userid']]['usrgrps'][$usrgrpid] = $usrgrp;
+					$result[$user['userid']]['usrgrps'][] = $usrgrp;
 				}
 			}
 		}

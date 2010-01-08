@@ -517,7 +517,7 @@ class CHost extends CZBXAPI{
 				$ghosts = $group['hosts'];
 				unset($group['hosts']);
 				foreach($ghosts as $num => $host){
-					$result[$host['hostid']]['groups'][$groupid] = $group;
+					$result[$host['hostid']]['groups'][] = $group;
 				}
 			}
 		}
@@ -553,7 +553,7 @@ class CHost extends CZBXAPI{
 				$thosts = $template['hosts'];
 				unset($template['hosts']);
 				foreach($thosts as $num => $host){
-					$result[$host['hostid']]['templates'][$templateid] = $template;
+					$result[$host['hostid']]['templates'][] = $template;
 				}
 			}
 		}
@@ -572,7 +572,7 @@ class CHost extends CZBXAPI{
 				$ihosts = $item['hosts'];
 				unset($item['hosts']);
 				foreach($ihosts as $num => $host){
-					$result[$host['hostid']]['items'][$itemid] = $item;
+					$result[$host['hostid']]['items'][] = $item;
 				}
 			}
 		}
@@ -591,7 +591,7 @@ class CHost extends CZBXAPI{
 				$thosts = $trigger['hosts'];
 				unset($trigger['hosts']);
 				foreach($thosts as $num => $host){
-					$result[$host['hostid']]['triggers'][$triggerid] = $trigger;
+					$result[$host['hostid']]['triggers'][] = $trigger;
 				}
 			}
 		}
@@ -610,7 +610,7 @@ class CHost extends CZBXAPI{
 				$ghosts = $graph['hosts'];
 				unset($graph['hosts']);
 				foreach($ghosts as $num => $host){
-					$result[$host['hostid']]['graphs'][$graphid] = $graph;
+					$result[$host['hostid']]['graphs'][] = $graph;
 				}
 			}
 		}
@@ -628,7 +628,7 @@ class CHost extends CZBXAPI{
 				$ahosts = $application['hosts'];
 				unset($application['hosts']);
 				foreach($ahosts as $num => $host){
-					$result[$host['hostid']]['applications'][$applicationid] = $application;
+					$result[$host['hostid']]['applications'][] = $application;
 				}
 			}
 		}
@@ -647,7 +647,7 @@ class CHost extends CZBXAPI{
 				$mhosts = $macro['hosts'];
 				unset($macro['hosts']);
 				foreach($mhosts as $num => $host){
-					$result[$host['hostid']]['macros'][$macroid] = $macro;
+					$result[$host['hostid']]['macros'][] = $macro;
 				}
 			}
 		}

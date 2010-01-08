@@ -426,11 +426,11 @@ class CAlert extends CZBXAPI{
 
 		foreach($result as $alertid => $alert){
 			if(isset($mediatypes[$alert['mediatypeid']])){
-				$result[$alertid]['mediatypes'][$alert['mediatypeid']] = $mediatypes[$alert['mediatypeid']];
+				$result[$alertid]['mediatypes'][] = $mediatypes[$alert['mediatypeid']];
 			}
 
 			if(isset($users[$alert['userid']])){
-				$result[$alertid]['users'][$alert['userid']] = $users[$alert['userid']];
+				$result[$alertid]['users'][] = $users[$alert['userid']];
 			}
 		}
 

@@ -945,7 +945,13 @@ function zbx_objectValues(&$value, $field){
 return $result;
 }
 
-function zbx_cleanHashes($value, $level=0){
+function zbx_cleanHashes(&$value){
+
+	if(is_array($value) && ctype_digit((string) key($value))){
+		$value = array_values($value);
+	}
+	return $value;
+/*
 	$level++;
 //	if($level > 3) return $value;
 	if(is_array($value)){
@@ -960,6 +966,7 @@ function zbx_cleanHashes($value, $level=0){
 	}
 
 return $value;
+*/
 }
 
 /************* END ZBX MISC *************/

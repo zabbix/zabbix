@@ -305,7 +305,7 @@ class CApplication extends CZBXAPI{
 				$iapplications = $item['applications'];
 				unset($item['applications']);
 				foreach($iapplications as $num => $application){
-					$result[$application['applicationid']]['items'][$itemid] = $item;
+					$result[$application['applicationid']]['items'][] = $item;
 				}
 			}
 		}

@@ -275,7 +275,6 @@ class Cscript extends CZBXAPI{
 			foreach($result as $scriptid => $script){
 				$obj_params = array(
 					'output' => $options['select_groups'],
-					'preservekeys' => 1
 				);
 
 				if($script['host_access'] == PERM_READ_WRITE){
@@ -297,7 +296,6 @@ class Cscript extends CZBXAPI{
 			foreach($result as $scriptid => $script){
 				$obj_params = array(
 					'extendoutput' => $options['select_hosts'],
-					'preservekeys' => 1
 				);
 
 				if($script['host_access'] == PERM_READ_WRITE){

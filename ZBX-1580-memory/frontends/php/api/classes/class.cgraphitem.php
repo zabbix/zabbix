@@ -150,7 +150,7 @@ class CGraphItem extends CZBXAPI{
 
 // count
 		if(!is_null($options['count'])){
-			$sql_parts['select']['gitems'] = 'count(*) as count';
+			$sql_parts['select'] = array('count(*) as count');
 		}
 
 // order

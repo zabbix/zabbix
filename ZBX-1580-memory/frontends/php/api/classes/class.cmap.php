@@ -344,7 +344,7 @@ SDI('///////////////////////////////////////');
 				if(!isset($result[$selement['sysmapid']]['selements'])){
 					$result[$selement['sysmapid']]['selements'] = array();
 				}
-				$result[$selement['sysmapid']]['selements'][$selement['selementid']] = $selement;
+				$result[$selement['sysmapid']]['selements'][] = $selement;
 			}
 		}
 
@@ -375,7 +375,7 @@ SDI('///////////////////////////////////////');
 					$result[$link['sysmapid']]['links'] = array();
 				}
 
-				$result[$link['sysmapid']]['links'][$link['linkid']] = $link;
+				$result[$link['sysmapid']]['links'][] = $link;
 			}
 		}
 

@@ -423,7 +423,7 @@ class CAction extends CZBXAPI{
 			$sql = 'SELECT c.* FROM conditions c WHERE '.DBcondition('c.actionid', $actionids);
 			$res = DBselect($sql);
 			while($condition = DBfetch($res)){
-				$result[$condition['actionid']]['conditions'][$condition['conditionid']] = $condition;
+				$result[$condition['actionid']]['conditions'][] = $condition;
 			}
 		}
 
@@ -449,7 +449,7 @@ class CAction extends CZBXAPI{
 			}
 
 			foreach($operations as $operationd => $operation){
-				$result[$operation['actionid']]['operations'][$operation['operationid']] = $operation;
+				$result[$operation['actionid']]['operations'][] = $operation;
 			}
 		}
 

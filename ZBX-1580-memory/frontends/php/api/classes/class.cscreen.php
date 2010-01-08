@@ -345,7 +345,7 @@ SDI('/////////////////////////////////');
 					$result[$sitem['screenid']]['items'] = array();
 				}
 
-				$result[$sitem['screenid']]['items'][$sitem['screenitemid']] = $sitem;
+				$result[$sitem['screenid']]['items'][] = $sitem;
 			}
 		}
 

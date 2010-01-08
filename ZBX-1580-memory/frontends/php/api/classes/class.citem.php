@@ -510,7 +510,7 @@ class CItem extends CZBXAPI{
 				$hitems = $host['items'];
 				unset($host['items']);
 				foreach($hitems as $inum => $item){
-					$result[$item['itemid']]['hosts'][$hostid] = $host;
+					$result[$item['itemid']]['hosts'][] = $host;
 				}
 			}
 
@@ -519,7 +519,7 @@ class CItem extends CZBXAPI{
 				$titems = $template['items'];
 				unset($template['items']);
 				foreach($titems as $inum => $item){
-					$result[$item['itemid']]['hosts'][$templateid] = $template;
+					$result[$item['itemid']]['hosts'][] = $template;
 				}
 			}
 		}
@@ -537,7 +537,7 @@ class CItem extends CZBXAPI{
 				$titems = $trigger['items'];
 				unset($trigger['items']);
 				foreach($titems as $inum => $item){
-					$result[$item['itemid']]['triggers'][$triggerid] = $trigger;
+					$result[$item['itemid']]['triggers'][] = $trigger;
 				}
 			}
 		}
@@ -555,7 +555,7 @@ class CItem extends CZBXAPI{
 				$gitems = $graph['items'];
 				unset($graph['items']);
 				foreach($gitems as $inum => $item){
-					$result[$item['itemid']]['graphs'][$graphid] = $graph;
+					$result[$item['itemid']]['graphs'][] = $graph;
 				}
 			}
 		}
@@ -573,7 +573,7 @@ class CItem extends CZBXAPI{
 				$aitems = $application['items'];
 				unset($application['items']);
 				foreach($aitems as $inum => $item){
-					$result[$item['itemid']]['applications'][$applicationid] = $application;
+					$result[$item['itemid']]['applications'][] = $application;
 				}
 			}
 		}

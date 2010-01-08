@@ -257,7 +257,7 @@ class CEvent extends CZBXAPI{
 // count
 		if(!is_null($options['count'])){
 			$options['sortfield'] = '';
-			$sql_parts['select']['events'] = 'COUNT(DISTINCT e.eventid) as rowscount';
+			$sql_parts['select'] = array('COUNT(DISTINCT e.eventid) as rowscount');
 		}
 
 // order
@@ -389,7 +389,7 @@ class CEvent extends CZBXAPI{
 					$triggerid = $trigger['triggerid'];
 					if(!isset($triggers[$triggerid])) $triggers[$triggerid] = array('hosts' => array());
 
-					$triggers[$triggerid]['hosts'][$hostid] = $host;
+					$triggers[$triggerid]['hosts'][] = $host;
 				}
 			}
 
@@ -415,7 +415,7 @@ class CEvent extends CZBXAPI{
 			$triggers = CTrigger::get($obj_params);
 			foreach($result as $eventid => $event){
 				if(isset($triggers[$event['objectid']])){
-					$result[$eventid]['triggers'][$event['objectid']] = $triggers[$event['objectid']];
+					$result[$eventid]['triggers'][] = $triggers[$event['objectid']];
 				}
 				else{
 					$result[$eventid]['triggers'] = array();
@@ -435,14 +435,13 @@ class CEvent extends CZBXAPI{
 			$db_items = CItem::get($obj_params);
 			$items = array();
 
-			$items_evnt = array();
 			foreach($db_items as $itemid => $item){
 				$itriggers = $item['triggers'];
 				unset($item['triggers']);
-				foreach($itriggers as $num => $trigger){
+				foreach($itriggers as $trigger){
 					if(!isset($items[$trigger['triggerid']])) $items[$trigger['triggerid']] = array('items' => array());
 
-					$items[$triggerid]['items'][$itemid] = $item;
+					$items[$triggerid]['items'][] = $item;
 				}
 			}
 

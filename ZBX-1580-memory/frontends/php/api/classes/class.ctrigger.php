@@ -492,7 +492,7 @@ class CTrigger extends CZBXAPI{
 			foreach($deps as $triggerid => $deptriggers){
 				foreach($deptriggers as $num => $deptriggerid){
 					if(isset($allowed[$deptriggerid])){
-						$result[$triggerid]['dependencies'][$deptriggerid] = $allowed[$deptriggerid];
+						$result[$triggerid]['dependencies'][] = $allowed[$deptriggerid];
 					}
 				}
 			}
@@ -513,7 +513,7 @@ class CTrigger extends CZBXAPI{
 				$htriggers = $host['triggers'];
 				unset($host['triggers']);
 				foreach($htriggers as $num => $trigger){
-					$result[$trigger['triggerid']]['hosts'][$hostid] = $host;
+					$result[$trigger['triggerid']]['hosts'][] = $host;
 				}
 			}
 		}
@@ -532,7 +532,7 @@ class CTrigger extends CZBXAPI{
 				$itriggers = $item['triggers'];
 				unset($item['triggers']);
 				foreach($itriggers as $num => $trigger){
-					$result[$trigger['triggerid']]['items'][$itemid] = $item;
+					$result[$trigger['triggerid']]['items'][] = $item;
 				}
 			}
 		}
