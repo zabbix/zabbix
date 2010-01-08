@@ -91,6 +91,9 @@
 	'S_CANNOT_ADD_DISCOVERY_RULE'=>		'Cannot add discovery rule',
 	'S_STATUS_OF_DISCOVERY_BIG'=>		'STATUS OF DISCOVERY',
 	'S_STATUS_OF_DISCOVERY'=>		'Status of discovery',
+	'S_ENABLE_SELECTED_DISCOVERY_RULES'=>	'Enable selected discovery rules?',
+	'S_DISABLE_SELECTED_DISCOVERY_RULES'=>	'Disable selected discovery rules?',
+	'S_DELETE_SELECTED_DISCOVERY_RULES'=>	'Delete selected discovery rules?',
 
 	'S_DISCOVERED'=>			'Discovered',
 	'S_LOST'=>				'Lost',
@@ -280,6 +283,7 @@
 	'S_INCORRECT_OPERATION_TYPE'=>		'Incorrect operation type',
 	'S_INCORRECT_USER'=>			'Incorrect user',
 	'S_INCORRECT_STEPS'=>			'Incorrect steps',
+	'S_SELECTED_ACTIONS'=>			'selected actions?',
 
 //	actions.php
 	'S_ACTIONS'=>				'Actions',
@@ -485,6 +489,9 @@
 
 	'S_GROUP_FOR_DISCOVERED_HOSTS'=>		'Group for discovered hosts',
 
+	'S_VALUE_MAPS_CREATE_NUM_STRING'=>		'Value maps are used to create a mapping between numeric values and string representations',
+	'S_DELETE_SELECTED_VALUE_MAPPING'=>		'Delete selected value mapping?',
+
 //	nodes.php
 	'S_NOT_DM_SETUP'=>			'Your setup is not configured for distributed monitoring',
 	'S_CONFIGURATION_OF_NODES'=>		'CONFIGURATION OF NODES',
@@ -513,7 +520,8 @@
 	'S_HTTP_AUTH'=>				'HTTP Authentication',
 	'S_ZABBIX_INTERNAL_AUTH'=>		'Zabbix Internal authentication',
 	'S_DEFAULT_AUTHENTICATION'=>		'Default authentication',
-
+	'S_SWITCHING_HTTP'=>			'Switching HTTP authentication will reset all current sessions! Continue?',
+	'S_SWITCHING_LDAP'=>			'Switching LDAP authentication will reset all current sessions! Continue?',
 
 //	Latest values
 	'S_NO_PERMISSIONS'=>			'No permissions !',
@@ -686,6 +694,11 @@
 	'S_DECEMBER'=>				'December',
 
 	'S_INCORRECT_MAINTENANCE_PERIOD'=>	'Incorrect maintenance period',
+	'S_INCORRECT_MAINTENANCE_DATE'=>	'Incorrect maintenance date',
+	'S_INCORRECT_MAINTENANCE_DAY_PERIOD' => 'Incorrect maintenance day period',
+	'S_INCORRECT_MAINTENANCE_WEEK_PERIOD' => 'Incorrect maintenance week period',
+	'S_INCORRECT_MAINTENANCE_MONTH_PERIOD' => 'Incorrect maintenance month period',
+	'S_INCORRECT_MAINTENANCE_DAYS_OF_WEEK' => 'Incorrect maintenance days of week',
 
 // hostgroups.php
 	'S_CONFIGURATION_OF_GROUPS'=>		'CONFIGURATION OF HOST GROUPS',
@@ -764,7 +777,7 @@
 	'S_NEW_GROUP'=>					'New group',
 	'S_DNS_NAME'=>					'DNS name',
 	'S_IP_ADDRESS'=>				'IP address',
-	'S_LINK_WITH_TEMPLATE'=>			'Link with Template',
+	'S_LINK_ADDITIONAL_TEMPLATES'=>			'Link additional templates',
 	'S_USEIPMI'=>					'Use IPMI',
 	'S_IPMI_IP_ADDRESS'=>				'IPMI IP address',
 	'S_IPMI_PORT'=>					'IPMI port',
@@ -815,6 +828,7 @@
 	'S_LINKED_TO'=>				'Linked to',
 	'S_TEMPLATE_DELETED'=>			'Template deleted',
 	'S_CANNOT_DELETE_TEMPLATE'=>		'Cannot delete template',
+	'S_LINK_WITH_TEMPLATE' => 	'Link with template',
 
 //	Host profiles
 	'S_HOST_PROFILE'=>			'Host profile',
@@ -1215,6 +1229,7 @@
 	'S_DAY'=>					'Day',
 	'S_MONTH'=>					'Month',
 	'S_YEAR'=>					'Year',
+	'S_YEAR_SMALL'=>				'year',
 	'S_HOURLY'=>					'Hourly',
 	'S_DAILY'=>					'Daily',
 	'S_WEEKLY'=>					'Weekly',
@@ -1230,6 +1245,9 @@
 	'S_LOCALES'=>				'Locales',
 	'S_LOCALE_SMALL'=>			'locale',
 	'S_DOWNLOAD'=>				'Download',
+	'S_TAKE_DEF_LOCALE'=>			'Take for default locale',
+	'S_LOCALE_TO_EXTEND'=>			'Locale to extend',
+	'S_NEW_ENTRIES'=>			'New entries',
 
 //  report4.php
 	'S_NOTIFICATIONS'=>			'Notifications',
@@ -1674,6 +1692,9 @@
 	'S_ITEM_FUNCTION'=>	'Item / Function',
 	'S_RESULT_TYPE'=>	'Result type',
 	'S_COMBINED_RESULT'=>	'Combined result',
+
+//  applications.php
+	'S_DELETE_APPLICATION'=>	'Delete this application?',
 
 //	Menu
 

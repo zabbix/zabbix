@@ -63,11 +63,14 @@ include_once('include/page_header.php');
 		'filter_groupid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, 'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
 
 		'showdisabled'=>	array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	NULL),
-/* mass update*/
+
+// mass update
 		'massupdate'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'visible'=>			array(T_ZBX_STR, O_OPT,	null, 	null,	null),
+
 // Actions
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
+
 // form
         'toggle_input_method'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,    NULL,   NULL),
         'add_expression'=> 		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,    NULL,   NULL),
@@ -88,7 +91,8 @@ include_once('include/page_header.php');
 		'mass_save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-/* other */
+
+// other
 		'form'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);

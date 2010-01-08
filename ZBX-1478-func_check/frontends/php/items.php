@@ -185,7 +185,12 @@ include_once('include/page_header.php');
 
 // PERMISSIONS
 	if(get_request('hostid', 0) > 0){
-		$options = array('hostids' => $_REQUEST['hostid'], 'extendoutput' => 1, 'templated_hosts' => 1);
+		$options = array(
+			'hostids' => $_REQUEST['hostid'], 
+			'extendoutput' => 1, 
+			'templated_hosts' => 1, 
+			'editable' => 1
+		);
 		$hosts = CHost::get($options);
 		if(empty($hosts)) access_deny();
 	}
@@ -275,7 +280,7 @@ include_once('include/page_header.php');
 
 		$hostid = reset($hostid);
 
-		$hostid = $hostid?$hostid['hostid']:0;
+		$hostid = $hostid ? $hostid['hostid'] : 0;
 	}
 
 // SUBFILTERS {
@@ -796,6 +801,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'filter' => 1,
 			'extendoutput' => 1,
+			'editable' => 1,
 			'select_hosts' => 1,
 			'select_triggers' => 1,
 			'select_applications' => 1,
@@ -1159,10 +1165,7 @@ include_once('include/page_header.php');
 
 	$jsmenu = new CPUMenu(null,200);
 	$jsmenu->InsertJavaScript();
-?>
-<?php
 
-include_once('include/page_footer.php');
-
+	
 include_once('include/page_footer.php');
 ?>
