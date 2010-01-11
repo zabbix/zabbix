@@ -297,7 +297,6 @@ function make_system_summary(){
 			$group_row->addItem(get_node_name_by_elid($group['groupid']));
 
 		$name = new CLink($group['name'], 'tr_status.php?groupid='.$group['groupid'].'&show_triggers='.TRIGGERS_OPTION_ONLYTRUE);
-		$name->setTarget('blank');
 		$group_row->addItem($name);
 
 		foreach($group['tab_priority'] as $severity => $data){
@@ -436,7 +435,7 @@ function make_hoststat_summary(){
 		if(is_show_all_nodes())
 			$group_row->addItem(get_node_name_by_elid($group['groupid']));
 
-		$name = new CLink($group['name'], 'tr_status.php?groupid='.$group['groupid'].'&show_triggers='.TRIGGERS_OPTION_ONLYTRUE);
+		$name = new CLink($group['name'], 'tr_status.php?groupid='.$group['groupid'].'&hostid=0&show_triggers='.TRIGGERS_OPTION_ONLYTRUE);
 		$group_row->addItem($name);
 
 		$hosts_data = array(
@@ -506,7 +505,7 @@ function make_hoststat_summary(){
 			
 			foreach($problematic_host_list as $hostid => $host_data){
 				$r = new CRow();
-				$r->addItem(new CLink($host_data['host'], 'tr_status.php?hostid='.$hostid.'&show_triggers='.TRIGGERS_OPTION_ONLYTRUE));
+				$r->addItem(new CLink($host_data['host'], 'tr_status.php?groupid='.$group['groupid'].'&hostid='.$hostid.'&show_triggers='.TRIGGERS_OPTION_ONLYTRUE));
 				foreach($host_data['severities'] as $severity => $trigger_count){
 					$r->addItem(new CCol($trigger_count, get_severity_style($severity, $trigger_count)));
 				}
