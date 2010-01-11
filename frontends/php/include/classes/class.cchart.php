@@ -779,7 +779,8 @@ class CChart extends CGraphDraw{
 //--------------------
 
 // if we lowered min more than highed max - need additional recalculating
-			if($diff_min > $diff_max){
+//			if($diff_min > $diff_max){
+			if(($tmp_maxY[$other_side] < $this->m_maxY[$other_side]) || ($tmp_minY[$other_side] > $this->m_minY[$other_side])){
 				$dist = ($this->m_maxY[$other_side] - $this->m_minY[$other_side]);
 				$interval = 0;
 				foreach($intervals as $num => $int){
@@ -805,6 +806,11 @@ class CChart extends CGraphDraw{
 		$sides = array(GRAPH_YAXIS_SIDE_LEFT,GRAPH_YAXIS_SIDE_RIGHT);
 		foreach($sides as $snum => $side){
 			if(!isset($this->axis_valuetype[$side])) continue;
+			
+			if($this->type == GRAPH_TYPE_STACKED){
+				$this->m_minY[$side] = min($tmp_minY[GRAPH_YAXIS_SIDE_LEFT], 0);
+				continue;
+			}
 
 			if($this->ymax_type == GRAPH_YAXIS_TYPE_FIXED){
 				$this->m_maxY[$side] = $this->yaxismax;
@@ -819,7 +825,7 @@ class CChart extends CGraphDraw{
 			else if($this->ymin_type == GRAPH_YAXIS_TYPE_ITEM_VALUE){
 				$this->m_minY[$side] = $tmp_minY[$side];
 			}
-		}
+		}		
 	}
 
 	private function calcTimeInterval(){
