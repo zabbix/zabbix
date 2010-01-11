@@ -19,12 +19,12 @@
 **/
 ?>
 <?php
-	define('ZABBIX_VERSION','1.8');
+	define('ZABBIX_VERSION','1.8.1');
 	define('ZABBIX_API_VERSION','1.0');
 /* USER DEFINES */
 
 	define('ZBX_LOGIN_ATTEMPTS',			5);
-	define('ZBX_LOGIN_BLOCK',			30); // sec
+	define('ZBX_LOGIN_BLOCK',				30); // sec
 
 	define('TRIGGERS_OPTION_DISABLED',		0);	// reserved
 	define('TRIGGERS_OPTION_ONLYTRUE',		1);	// use 0 to disable
@@ -35,16 +35,16 @@
 
 	define('EVENTS_OPTION_DISABLED',		0);	// reserved
 	define('EVENTS_OPTION_NOEVENT',			1);	// use 0 to disable
-	define('EVENTS_OPTION_ALL',			2);	// use 0 to disable
+	define('EVENTS_OPTION_ALL',				2);	// use 0 to disable
 	define('EVENTS_OPTION_NOT_ACK',			3);	// use 0 to disable
-	define('EVENTS_OPTION_ONLYTRUE_NOTACK',		4);	// use 0 to disable
+	define('EVENTS_OPTION_ONLYTRUE_NOTACK',	4);	// use 0 to disable
 	define('EVENTS_OPTION_EVENT_LAST',		0); // use 0 to disable
 
-	define('ZBX_MIN_PERIOD',			3600);		// 1 hour
-	define('ZBX_MAX_PERIOD',			2*365*86400);	// ~2 years
+	define('ZBX_MIN_PERIOD',				3600);		// 1 hour
+	define('ZBX_MAX_PERIOD',				2*365*86400);	// ~2 years
 	define('ZBX_PERIOD_DEFAULT',			3600);		// 1 hour
 
-	define('ZBX_FONTPATH',				realpath('fonts'));	// where to search for font (GD > 2.0.18)
+	define('ZBX_FONTPATH',					realpath('fonts'));	// where to search for font (GD > 2.0.18)
 	define('ZBX_GRAPH_FONT_NAME',			'DejaVuSans');		// font file name
 /* END OF USERS DEFINES */
 

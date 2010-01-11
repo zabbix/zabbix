@@ -179,12 +179,13 @@ static int	check_service_state(SC_HANDLE h_srv, int service_state)
 int	SERVICES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	int				start_type, service_state, ret;
-	char				type[16], state[24], *buf = NULL, *utf8;
+	char				type[16], state[24], *buf = NULL, *utf8,
+					exclude[MAX_STRING_LEN];
 	SC_HANDLE			h_mgr;
 	ENUM_SERVICE_STATUS_PROCESS	*ssp = NULL;
 	DWORD				sz = 0, szn, i, services, resume_handle = 0;
 
-	if (num_param(param) > 2)
+	if (num_param(param) > 3)
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, type, sizeof(type)))
@@ -225,6 +226,9 @@ int	SERVICES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	else
 		return SYSINFO_RET_FAIL;
 
+	if (0 != get_param(param, 3, exclude, sizeof(exclude)))
+		*exclude = '\0';
+
 	if (NULL == (h_mgr = OpenSCManager(NULL, NULL, GENERIC_READ)))
 		return SYSINFO_RET_FAIL;
 
@@ -242,7 +246,8 @@ int	SERVICES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 				if (SUCCEED == check_service_state(h_srv, service_state))
 				{
 					utf8 = zbx_unicode_to_utf8(ssp[i].lpServiceName);
-					buf = zbx_strdcatf(buf, "%s\n", utf8);
+					if (FAIL == str_in_list(exclude, utf8, ','))
+						buf = zbx_strdcatf(buf, "%s\n", utf8);
 					zbx_free(utf8);
 				}
 

@@ -360,8 +360,6 @@
 	'S_ADD'=>			'Aggiungi',
 	'S_STATUS_OF_TRIGGERS'=>			'Stato degli inneschi',
 	'S_STATUS_OF_TRIGGERS_BIG'=>			'STATO DEGLI INNESCHI',
-	'S_SHOW_ONLY_TRUE'=>			'Mostra solo quelli a stato \'VERO\'',
-	'S_SHOW_ACTIONS'=>			'Mostra le azioni',
 	'S_SHOW_DETAILS'=>			'Mostra i dettagli',
 	'S_SELECT'=>			'Mostra barra di selezione',
 	'S_TRIGGERS_BIG'=>			'INNESCHI',

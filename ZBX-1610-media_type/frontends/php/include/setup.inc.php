@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -157,180 +157,54 @@
 					'center')
 				);
 		}
-
-		function get_test_result(&$result, $test_name, $test_value, $condition, $fail_message){
-			$result &= $condition;
-
-			$row = new CRow(array(
-					new CCol($test_name,'header'),
-					$test_value,
-					$condition ? new CSpan(S_OK,'ok') : new CSpan(S_FAIL,'fail')
-				),
-				!$condition ? 'fail' : null);
-
-			if(!$condition && isset($fail_message))
-				$row->setHint($fail_message);
-
-			return $row;
-		}
-
+		
 		function stage2(){
-			$final_result = true;
-
 			$table = new CTable(null, 'requirements');
 			$table->setAlign('center');
 
-			/* Check PHP version */
-			$table->addRow($this->get_test_result(
-				$final_result,
-				'PHP version: ',
-				phpversion(),
-				version_compare(phpversion(), '5.1.0', '>='),
-				'Minimal version of PHP is 5.1.0'));
+			$final_result = true;
+			
+			$row = new CRow(array(
+				SPACE,
+				new CCol('Current value', 'header'),
+				new CCol('Required', 'header'),
+				new CCol('Recommended', 'header'),
+				SPACE, 
+				SPACE
+			));
+			$table->addRow($row);
+				
+			$reqs = check_php_requirements();
+			foreach($reqs as $req){
+			
+				$result = null;
+				if(!is_null($req['recommended']) && ($req['result'] == 1)){
+					$result = new CSpan(S_OK, 'orange');
+				}
+				else if((!is_null($req['recommended']) && ($req['result'] == 2)) 
+					|| (is_null($req['recommended']) && ($req['result'] == 1))){
+					$result = new CSpan(S_OK, 'green');
+				}
+				else if($req['result'] == 0){
+					$result = new CSpan(S_FAIL, 'link_menu fail');
+					$result->setHint($req['error']);
+				}
+				
+				$row = new CRow(array(
+					new CCol(
+						$req['name'], 'header'),
+						$req['current'],
+						$req['required'] ? $req['required'] : SPACE,
+						$req['recommended'] ? $req['recommended'] : SPACE,
+						$result
+					),
+					$req['result'] ? SPACE : 'fail'
+				);
+				
+				$table->addRow($row);
 
-			$memory_limit = str2mem(ini_get('memory_limit'));
-			$table->addRow($this->get_test_result(
-				$final_result,
-				'PHP Memory limit:',
-				function_exists('memory_get_usage') ? mem2str($memory_limit) : 'unlimited',
-				$memory_limit >= 128*1024*1024 || !function_exists('memory_get_usage'),
-				'128M is a minimal PHP memory limitation'));
-
-			$memory_limit = str2mem(ini_get('post_max_size'));
-			$table->addRow(
-				$this->get_test_result(
-					$final_result,
-					'PHP post max size:',
-					mem2str($memory_limit),
-					$memory_limit >= 16*1024*1024,
-					'16M is minimum size of PHP post'));
-
-			$table->addRow(
-				$this->get_test_result(
-					$final_result,
-					'PHP max execution time:',
-					ini_get('max_execution_time').' sec',
-					ini_get('max_execution_time') >= 300,
-					'300 sec is a minimal limitation on execution time of PHP scripts'));
-
-			if(version_compare(phpversion(), '5.1.0', '>=')){
-				$tmezone = ini_get('date.timezone');
-				$table->addRow(
-					$this->get_test_result(
-						$final_result,
-						'PHP Timezone:',
-						empty($tmezone) ? 'n/a' : $tmezone,
-						!empty($tmezone),
-						'Timezone for PHP is not set. Please set "date.timezone" option in php.ini.'));
-				unset($tmezone);
+				$final_result &= (bool) $req['result'];
 			}
-/* Check supporteds databases */
-			global $ZBX_CONFIG;
-
-			$table->addRow(
-				$this->get_test_result(
-					$final_result,
-					'PHP Databases support: ',
-					new CJSscript(implode(SBR, $ZBX_CONFIG['allowed_db'])),
-					!isset($ZBX_CONFIG['allowed_db']['no']),
-					'Requires any database support [MySQL or PostgreSQL or Oracle]'));
-
-/* Check BC math */
-			$bcmath_fnc_exist =
-				function_exists('bcadd') &&
-				function_exists('bccomp') &&
-				function_exists('bcdiv') &&
-				function_exists('bcmod') &&
-				function_exists('bcmul') &&
-				function_exists('bcpow') &&
-				function_exists('bcpowmod') &&
-				function_exists('bcscale') &&
-				function_exists('bcsqrt') &&
-				function_exists('bcsub');
-			$table->addRow(
-				$this->get_test_result(
-					$final_result,
-					'PHP BC math support:',
-					$bcmath_fnc_exist ? 'yes' : 'no',
-					$bcmath_fnc_exist,
-					'Requires bcmath module [configure PHP with --enable-bcmath]'));
-
-// MultiByte String support
-			$mbstrings_fnc_exist = mbstrings_available();
-			$table->addRow(
-				$this->get_test_result(
-					$final_result,
-					'PHP MB string support:',
-					$mbstrings_fnc_exist ? 'yes' : 'no',
-					$mbstrings_fnc_exist,
-					'Requires mb string module [configure PHP with --enable-mbstring]'));
-
-// MultiByte String support
-			$mbstrings_fnc_overload = defined('ZBX_MBSTRINGS_OVERLOADED');
-			$table->addRow(
-				$this->get_test_result(
-					$final_result,
-					'PHP MB string overload:',
-					$mbstrings_fnc_overload ? 'yes' : 'no',
-					$mbstrings_fnc_overload,
-					'MB String overload PHP is not set. Please set "mbstring.func_overload" to 2 in php.ini.'));
-
-//* Check sockets lib
-			$sockets_fnc_exist = function_exists('socket_create');
-			$table->addRow(
-				$this->get_test_result(
-					$final_result,
-					'PHP Sockets support',
-					$sockets_fnc_exist?'yes':'no',
-					$sockets_fnc_exist,
-					'Required Sockets module [configured PHP with --enable-sockets]'));
-//*/
-
-
-/* Check mb-strings
-			$mbstrings_fnc_exist = mbstrings_available();
-			$table->addRow(
-				$this->get_test_result(
-					$final_result,
-					'PHP MB String support',
-					$mbstrings_fnc_exist ? 'yes' : 'no',
-					$mbstrings_fnc_exist,
-					'Required Multibyte String module [configured PHP with --enable-mbstring]'));
-//*/
-
-			/* Check GD existence */
-			$gd_version = S_NO;
-			if(is_callable('gd_info')){
-				$gd_info = gd_info();
-				$gd_version = $gd_info['GD Version'];
-			}
-
-			$table->addRow(
-				$this->get_test_result(
-					$final_result,
-					'GD Version:',
-					$gd_version,
-					$gd_version != S_NO,
-					'The GD extension isn\'t loaded.'));
-
-			/* Check supported image formats */
-			$img_formats = array();
-			if(isset($gd_info)){
-				//if($gd_info['JPG Support']) array_push($img_formats, 'JPEG');
-				if($gd_info['PNG Support']) array_push($img_formats, 'PNG');
-			}
-
-			if(count($img_formats) == 0){
-				$img_formats = array(S_NO);
-				$no_img_formats = true;
-			}
-			$table->addRow(
-				$this->get_test_result(
-					$final_result,
-					'Image formats:',
-					$img_formats,
-					!isset($no_img_formats),
-					'Requires images generation support [PNG]'));
 
 			if(!$final_result){
 				$this->DISABLE_NEXT_BUTTON = true;

@@ -1160,7 +1160,7 @@ function get_action_msgs_for_event($eventid){
 		$table->addRow(array(
 			get_node_name_by_elid($row['alertid']),
 			new CCol($time, 'top'),
-			new CCol($mediatype['description'], 'top'),
+			new CCol((!empty($mediatype['description']) ? $mediatype['description'] : ''), 'top'),
 			new CCol($status, 'top'),
 			new CCol($retries, 'top'),
 			new CCol($sendto, 'top'),

@@ -1113,19 +1113,17 @@ return $result;
 				}
 
 				$state='';
+				$sql = 'SELECT h.host,i.itemid,i.key_,f.function,f.triggerid,f.parameter,i.itemid,i.status'.
+						' FROM items i,functions f,hosts h'.
+						' WHERE f.functionid='.$functionid.
+							' AND i.itemid=f.itemid '.
+							' AND h.hostid=i.hostid';
 
 				if($functionid=='TRIGGER.VALUE'){
 					if(0 == $html) $exp.='{'.$functionid.'}';
 					else array_push($exp,'{'.$functionid.'}');
 				}
-				else if(is_numeric($functionid) &&
-					$function_data = DBfetch(DBselect('SELECT h.host,i.itemid,i.key_,f.function,f.triggerid,f.parameter,i.itemid,i.value_type'.
-													' FROM items i,functions f,hosts h'.
-													' WHERE f.functionid='.$functionid.
-														' AND i.itemid=f.itemid '.
-														' AND h.hostid=i.hostid'
-					)))
-				{
+				else if(is_numeric($functionid) && $function_data = DBfetch(DBselect($sql))){
 					if($template) $function_data['host'] = '{HOSTNAME}';
 
 					if($resolve_macro){
@@ -1142,8 +1140,17 @@ return $result;
 						$exp.='{'.$function_data['host'].':'.$function_data['key_'].'.'.$function_data['function'].'('.$function_data['parameter'].')}';
 					}
 					else{
-						$link = new CLink($function_data['host'].':'.$function_data['key_'],
-							'history.php?action='.( (($function_data['value_type'] == ITEM_VALUE_TYPE_FLOAT) || ($function_data['value_type'] == ITEM_VALUE_TYPE_UINT64))?'showgraph':'showvalues').'&itemid='.$function_data['itemid']);
+						$style = ($function_data['status']==ITEM_STATUS_DISABLED)?'disabled':'unknown';
+						if($function_data['status']==ITEM_STATUS_ACTIVE){
+							$style = 'enabled';
+						}
+						
+						
+						$link = new CLink(
+									$function_data['host'].':'.$function_data['key_'],
+									'items.php?form=update&itemid='.$function_data['itemid'], 
+									$style
+								);
 
 						array_push($exp,array('{',$link,'.',bold($function_data['function'].'('),$function_data['parameter'],bold(')'),'}'));
 					}
@@ -2747,7 +2754,7 @@ return $result;
  *
  */
 	function  analyze_expression($expression){
-		global $ZBX_TR_EXPR_ALLOWED_MACROS, $ZBX_TR_EXPR_REPLACE_TO, $ZBX_TR_EXPR_ALLOWED_FUNCTIONS;
+		global $ZBX_TR_EXPR_SIMPLE_MACROS, $ZBX_TR_EXPR_REPLACE_TO, $ZBX_TR_EXPR_ALLOWED_FUNCTIONS;
 		if(empty($expression)) return array('', null, null);
 
 		$temp = array();
@@ -2755,7 +2762,7 @@ return $result;
 
 // Replace all {server:key.function(param)} and {MACRO} with '$ZBX_TR_EXPR_REPLACE_TO'
 		while(preg_match('/'.ZBX_PREG_EXPRESSION_TOKEN_FORMAT.'/uU', $expr, $arr)){
-			if($arr[ZBX_EXPRESSION_MACRO_ID] && !isset($ZBX_TR_EXPR_ALLOWED_MACROS[$arr[ZBX_EXPRESSION_MACRO_ID]])){
+			if($arr[ZBX_EXPRESSION_MACRO_ID] && !isset($ZBX_TR_EXPR_SIMPLE_MACROS[$arr[ZBX_EXPRESSION_MACRO_ID]])){
 				error('Unknown macro [' . $arr[ZBX_EXPRESSION_MACRO_ID].']');
 				return array('', null, null);
 			}
@@ -3091,7 +3098,7 @@ return $result;
 	}
 
 	function get_item_function_info($expr){
-		global $ZBX_TR_EXPR_ALLOWED_MACROS;
+		global $ZBX_TR_EXPR_SIMPLE_MACROS;
 
 		$value_type = array(
 			ITEM_VALUE_TYPE_UINT64	=> S_NUMERIC_UINT64,
@@ -3133,7 +3140,7 @@ return $result;
 			'sum' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 			'time' =>		array( 'value_type' => 'HHMMSS',	'type' => T_ZBX_INT,			'validation' => 'strlen({})==6'));
 
-		if(isset($ZBX_TR_EXPR_ALLOWED_MACROS[$expr])){
+		if(isset($ZBX_TR_EXPR_SIMPLE_MACROS[$expr])){
 			$result = array(
 				'value_type'	=> S_0_OR_1,
 				'type'			=> T_ZBX_INT,

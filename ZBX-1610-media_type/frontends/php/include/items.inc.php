@@ -294,7 +294,7 @@
 		}
 
 		if(preg_match('/^log\[|eventlog\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
-			error('Value type must be Log for log key');
+			error('Type of information must be Log for log key');
 			return FALSE;
 		}
 
@@ -537,7 +537,7 @@
 		}
 
 		if(preg_match('/^log\[|eventlog\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
-			error('Value type must be Log for log key');
+			error('Type of information must be Log for log key');
 			return FALSE;
 		}
 
@@ -1118,7 +1118,7 @@
 
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
-COpt::profiling_start('prepare data');
+// COpt::profiling_start('prepare_data');
 		$result = DBselect('SELECT DISTINCT h.hostid, h.host,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, '.
 				' i.description, t.priority, i.valuemapid, t.value as tr_value, t.triggerid '.
 			' FROM hosts h, items i '.
@@ -1170,8 +1170,8 @@ COpt::profiling_start('prepare data');
 		}
 
 		ksort($hosts);
-COpt::profiling_stop('prepare data');
-COpt::profiling_start('prepare table');
+// COpt::profiling_stop('prepare_data');
+// COpt::profiling_start('prepare_table');
 
 		if($view_style == STYLE_TOP){
 			$header=array(new CCol(S_ITEMS,'center'));
@@ -1207,7 +1207,7 @@ COpt::profiling_start('prepare table');
 				$table->AddRow($table_row);
 			}
 		}
-COpt::profiling_stop('prepare table');
+// COpt::profiling_stop('prepare_table');
 
 	return $table;
 	}
