@@ -614,7 +614,13 @@
 		$frm_title = S_USER;
 		if(isset($userid)){
 /*			if(bccomp($userid,$USER_DETAILS['userid'])==0) $profile = 1;*/
-			$users = CUser::get(array('userids' => $userid,  'extendoutput' => 1));
+			$options = array(
+					'userids' => $userid,  
+					'extendoutput' => 1
+				);
+			if($profile) $options['nodeids'] = id2nodeid($userid);
+
+			$users = CUser::get($options);
 			$user = reset($users);
 
 			$frm_title = S_USER.' "'.$user['alias'].'"';
