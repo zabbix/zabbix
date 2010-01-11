@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBXNEXT-194] added host status widget to dashboard (Vedmak)
  - [ZBX-1580] reduced frontend memory usage (Vedmak)
  - [ZBX-1663] fixed y axis calculation in stacked graphs (Aly)
  - [ZBX-1468] fixed editing user media types on node with id > 99 (Vedmak)
