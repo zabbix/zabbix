@@ -211,8 +211,9 @@ class CUser extends CZBXAPI{
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
 		while($user = DBfetch($res)){
-			if($options['count'])
+			if(!is_null($options['count'])){
 				$result = $user;
+			}
 			else{
 				$userids[$user['userid']] = $user['userid'];
 
@@ -964,13 +965,15 @@ class CUser extends CZBXAPI{
 		$errors = array();
 		$result = true;
 
-		$upd_users = self::get(array(
+		$options = array(
+			'nodeids' => id2nodeid($USER_DETAILS['userid']),
 			'userids' => $USER_DETAILS['userid'],
 			'extendoutput' => 1,
-			'preservekeys' => 1));
-
+			'preservekeys' => 1
+		);
+		$upd_users = self::get($options);
 		$upd_user = reset($upd_users);
-		//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User ['.$user['alias'].']');
+//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User ['.$user['alias'].']');
 
 		self::BeginTransaction(__METHOD__);
 
@@ -1011,7 +1014,13 @@ class CUser extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_users = self::get(array('userids' => $USER_DETAILS['userid'], 'extendoutput' => 1, 'nopermissions' => 1));
+			$options = array(
+					'nodeids' => id2nodeid($USER_DETAILS['userid']), 
+					'userids' => $USER_DETAILS['userid'], 
+					'extendoutput' => 1
+				);
+
+			$upd_users = self::get($options);
 			return $upd_users;
 		}
 		else{
@@ -1104,18 +1113,27 @@ class CUser extends CZBXAPI{
  * @return boolean
  */
 	public static function addMedia($media_data){
+		global $USER_DETAILS;
+		
 		$result = true;
-		$mediaids = array();
-		$userid = $media_data['userid'];
+		
+		$medias = zbx_toArray($media_data['medias']);
+		$users = zbx_toArray($media_data['users']);
 
-		foreach($media_data['medias'] as $media){
-			$result = add_media( $userid, $media['mediatypeid'], $media['sendto'], $media['severity'], $media['active'], $media['period']);
-			if(!$result) break;
-			$mediaids[$result] = $result;
+		if($USER_DETAILS['type'] < USER_TYPE_ZABBIX_ADMIN){
+			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only ZABBIX Admins can add user Medias');
+			return false;
+		}
+
+		foreach($users as $user){
+			foreach($medias as $media){
+				$result = add_media( $user['userid'], $media['mediatypeid'], $media['sendto'], $media['severity'], $media['active'], $media['period']);
+				if(!$result) break 2;
+			}
 		}
 
 		if($result){
-			return $mediaids;
+			return $medias;
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
@@ -1132,16 +1150,22 @@ class CUser extends CZBXAPI{
  * @since 1.8
  * @version 1
  *
- * @param array $media_data
- * @param string $media_data['userid']
- * @param array $media_data['medias']
+ * @param array $medias
+ * @param array $medias[...][mediaid]
  * @return boolean
  */
-	public static function deleteMedia($media_data){
-		$medias = zbx_toArray($media_data['medias']);
+	public static function deleteMedia($medias){
+		global $USER_DETAILS;
+
+		$medias = zbx_toArray($medias);
 		$mediaids = zbx_objectValues($medias, 'mediaid');
 
-		$sql = 'DELETE FROM media WHERE userid='.$media_data['userid'].' AND '.DBcondition('mediaid', $mediaids);
+		if($USER_DETAILS['type'] < USER_TYPE_ZABBIX_ADMIN){
+			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only ZABBIX Admins can remove user Medias');
+			return false;
+		}
+
+		$sql = 'DELETE FROM media WHERE '.DBcondition('mediaid', $mediaids);
 		$result = DBexecute($sql);
 
 		if($result){
@@ -1163,7 +1187,8 @@ class CUser extends CZBXAPI{
  * @version 1
  *
  * @param array $media_data
- * @param string $media_data['userid']
+ * @param array $media_data['users']
+ * @param array $media_data['users']['userid']
  * @param array $media_data['medias']
  * @param string $media_data['medias']['mediatypeid']
  * @param string $media_data['medias']['sendto']
@@ -1172,52 +1197,93 @@ class CUser extends CZBXAPI{
  * @param string $media_data['medias']['period']
  * @return boolean
  */
-	public static function updateMedia($data){
+	public static function updateMedia($media_data){
+		global $USER_DETAILS;
+
 		$errors = array();
 
 		$result = false;
-		$users = zbx_toArray($data['users']);
-		$userids = zbx_objectValues($users, 'userid');
+		$transaction = false;
+		
+		$new_medias = zbx_toArray($media_data['medias']);
+		$users = zbx_toArray($media_data['users']);
 
-		$medias = zbx_toArray($data['medias']);
+		try{
+			$transaction = self::BeginTransaction(__METHOD__);
 
-		self::BeginTransaction(__METHOD__);
+			if($USER_DETAILS['type'] < USER_TYPE_ZABBIX_ADMIN){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only ZABBIX Admins can change user Medias ');
+				return false;
+			}
 
-		$result = DBexecute('DELETE FROM media WHERE '.DBcondition('userid', $userids));
-		if($result){
-			foreach($userids as $userid){
-				foreach($medias as $media){
+			$upd_medias = array();
+			$del_medias = array();
 
-					if(!validate_period($media['period'])){
-						$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong period ['.$media['period'].' ]');
-						$result = false;
-						break 2;
-					}
+			$userids = zbx_objectValues($users, 'userid');
+			$sql = 'SELECT m.mediaid FROM media m WHERE '.DBcondition('userid', $userids);
+			$result = DBselect($sql);
+			while($media = DBfetch($result)){
+				$del_medias[$media['mediaid']] = $media;
+			}
 
-					$mediaid = get_dbid('media', 'mediaid');
-					$sql = 'INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period)'.
-							' VALUES ('.$mediaid.','.$userid.','.$media['mediatypeid'].','.
-								zbx_dbstr($media['sendto']).','.$media['active'].','.$media['severity'].','.
-								zbx_dbstr($media['period']).')';
-					$result = DBexecute($sql);
-					if(!$result){
-						break 2;
-					}
+			foreach($new_medias as $mnum => $media){
+				if(!isset($media['mediaid'])) continue;
+				
+				if(isset($del_medias[$media['mediaid']])){
+					$upd_medias[$media['mediaid']] = $new_medias[$mnum];
+				}
+
+				unset($new_medias[$mnum]);
+				unset($del_medias[$media['mediaid']]);
+			}
+
+// DELETE
+			if(!empty($del_medias)){
+				$result = self::deleteMedia($del_medias);
+				if(!$result){
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant delete user medias');
 				}
 			}
-		}
 
-		$result = self::EndTransaction($result, __METHOD__);
+// UPDATE
+			foreach($upd_medias as $mnum => $media){
+				if(!validate_period($media['period'])){
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Wrong period ['.$media['period'].']');
+				}
 
-		if($result){
-			return true;
+				$sql = 'UPDATE media '.
+						' SET mediatypeid='.$media['mediatypeid'].','.
+							' sendto='.zbx_dbstr($media['sendto']).','.
+							' active='.$media['active'].','.
+							' severity='.$media['severity'].','.
+							' period='.zbx_dbstr($media['period']).
+						' WHERE mediaid='.$media['mediaid'];
+				$result = DBexecute($sql);
+				if(!$result){
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant update user media');
+				}
+			}
+						
+// CREATE
+			if(!empty($new_medias)){
+				$result = self::addMedia(array('users' => $users, 'medias' => $new_medias));
+				if(!$result){
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant insert user media');
+				}
+			}
+
+			$result = self::EndTransaction($result, __METHOD__);
 		}
-		else{
-			self::setMethodErrors(__METHOD__, $errors);
+		catch(APIException $e){
+			if($transaction) self::EndTransaction(false, __METHOD__);
+
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 
+	return true;
 	}
-
 }
 ?>
