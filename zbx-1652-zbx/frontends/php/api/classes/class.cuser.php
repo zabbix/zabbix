@@ -1098,10 +1098,17 @@ class CUser extends CZBXAPI{
  * @return boolean
  */
 	public static function addMedia($media_data){
+		global $USER_DETAILS;
+		
 		$result = true;
 		
 		$medias = zbx_toArray($media_data['medias']);
 		$users = zbx_toArray($media_data['users']);
+
+		if($USER_DETAILS['type'] < USER_TYPE_ZABBIX_ADMIN){
+			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only ZABBIX Admins can add user Medias');
+			return false;
+		}
 
 		foreach($users as $user){
 			foreach($medias as $media){
@@ -1133,8 +1140,15 @@ class CUser extends CZBXAPI{
  * @return boolean
  */
 	public static function deleteMedia($medias){
+		global $USER_DETAILS;
+
 		$medias = zbx_toArray($medias);
 		$mediaids = zbx_objectValues($medias, 'mediaid');
+
+		if($USER_DETAILS['type'] < USER_TYPE_ZABBIX_ADMIN){
+			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only ZABBIX Admins can remove user Medias');
+			return false;
+		}
 
 		$sql = 'DELETE FROM media WHERE '.DBcondition('mediaid', $mediaids);
 		$result = DBexecute($sql);
@@ -1169,6 +1183,8 @@ class CUser extends CZBXAPI{
  * @return boolean
  */
 	public static function updateMedia($media_data){
+		global $USER_DETAILS;
+
 		$errors = array();
 
 		$result = false;
@@ -1179,7 +1195,12 @@ class CUser extends CZBXAPI{
 
 		try{
 			$transaction = self::BeginTransaction(__METHOD__);
-			
+
+			if($USER_DETAILS['type'] < USER_TYPE_ZABBIX_ADMIN){
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only ZABBIX Admins can change user Medias ');
+				return false;
+			}
+
 			$upd_medias = array();
 			$del_medias = array();
 
