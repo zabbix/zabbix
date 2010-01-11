@@ -88,6 +88,7 @@ $fields=array(
 				unset($_REQUEST['user_medias'][$mediaid]);
 		}
 	}
+
 //Primary Actions
 	elseif(isset($_REQUEST['cancel'])){
 		$url = get_profile('web.menu.view.last', 'index.php');
@@ -118,7 +119,6 @@ $fields=array(
 		}
 		else {
 
-
 			$user = array();
 			$user['userid'] = $USER_DETAILS['userid'];
 //			$user['name'] = $USER_DETAILS['name'];
@@ -138,7 +138,8 @@ $fields=array(
 
 			DBstart();
 			$result = CUser::updateProfile($user);
-			if($result) $result = CUser::updateMedia(array('users' => $user, 'medias' => $user['user_medias']));
+			if($result && ($USER_DETAILS['type'] > USER_TYPE_ZABBIX_USER)) 
+				$result = CUser::updateMedia(array('users' => $user, 'medias' => $user['user_medias']));
 
 			$result = DBend($result);
 			if(!$result) error(CUser::resetErrors());
@@ -157,7 +158,9 @@ $fields=array(
 	show_table_header(S_USER_PROFILE_BIG.' : '.$USER_DETAILS['name'].' '.$USER_DETAILS['surname']);
 	echo '<br>';
 	insert_user_form($USER_DETAILS['userid'],1);
+?>
+<?php
 
+include_once ('include/page_footer.php');
 
-include_once 'include/page_footer.php';
 ?>
