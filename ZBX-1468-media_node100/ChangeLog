@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1468] fixed editing user media types on node with id > 99 (Vedmak)
  - [ZBX-1553] fixed host group mass activate\disable operation (Vedmak)
  - [ZBX-1455] added sorting for host\global macros (Vedmak)
  - [ZBX-1523] fixed last macros deletion (Vedmak)
