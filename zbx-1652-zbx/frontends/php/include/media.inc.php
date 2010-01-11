@@ -188,17 +188,20 @@
 			error("Icorrect time period");
 			return NULL;
 		}
-
+/*
 		$c=count($severity);
 		$s=0;
 		for($i=0;$i<$c;$i++){
 			$s=$s|pow(2,(int)$severity[$i]);
 		}
+//*/
+		$s = $severity;
 
 		$mediaid=get_dbid("media","mediaid");
 
 		$sql='INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period) '.
 				" VALUES ($mediaid,$userid,".$mediatypeid.','.zbx_dbstr($sendto).','.$active.','.$s.','.zbx_dbstr($period).')';
+
 		if($ret = DBexecute($sql)){
 			$ret = $mediaid;
 		}

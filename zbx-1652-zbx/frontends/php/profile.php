@@ -88,6 +88,7 @@ $fields=array(
 				unset($_REQUEST['user_medias'][$mediaid]);
 		}
 	}
+
 //Primary Actions
 	elseif(isset($_REQUEST['cancel'])){
 		$url = get_profile('web.menu.view.last', 'index.php');
@@ -117,7 +118,6 @@ $fields=array(
 			show_error_message(S_PASSWORD_SHOULD_NOT_BE_EMPTY);
 		}
 		else {
-
 
 			$user = array();
 			$user['userid'] = $USER_DETAILS['userid'];
@@ -157,7 +157,9 @@ $fields=array(
 	show_table_header(S_USER_PROFILE_BIG.' : '.$USER_DETAILS['name'].' '.$USER_DETAILS['surname']);
 	echo '<br>';
 	insert_user_form($USER_DETAILS['userid'],1);
+?>
+<?php
 
+include_once ('include/page_footer.php');
 
-include_once 'include/page_footer.php';
 ?>
