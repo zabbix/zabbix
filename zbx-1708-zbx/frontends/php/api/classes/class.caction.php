@@ -403,7 +403,7 @@ class CAction extends CZBXAPI{
 				else{
 					if(!isset($result[$action['actionid']])) $result[$action['actionid']]= array();
 
-					if($options['select_conditions'] && !isset($result[$action['actionid']]['conditions'])){
+					if(!is_null($options['select_conditions']) && !isset($result[$action['actionid']]['conditions'])){
 						$result[$action['actionid']]['conditions'] = array();
 					}
 
