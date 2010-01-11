@@ -504,6 +504,7 @@
 	'S_NEW_NODE'=>				'New node',
 	'S_NO_NODES_DEFINED'=>			'No nodes defined',
 	'S_ALL_NODES'=>				'All nodes',
+	'S_DELETE_SELECTED_NODE_Q'=>		'Delete selected node?',
 
 // proxies.php
 	'S_CONFIGURATION_OF_PROXIES'=>		'CONFIGURATION OF PROXIES',
