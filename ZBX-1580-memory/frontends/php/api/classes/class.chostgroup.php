@@ -936,14 +936,20 @@ class CHostGroup extends CZBXAPI{
 // }}} PERMISSION
 
 		$hosts_to_unlink = $hosts_to_link = array();
+		$options = array(
+			'groupids' => $groupids, 
+			'preservekeys' => 1, 
+			'editable' => 1
+		);
 		if(!is_null($hosts)){
-			$groups_hosts = CHost::get(array('groupids' => $groupids, 'preservekeys' => 1, 'nopermissions' => 1));
+			$groups_hosts = CHost::get($options);
 			$hosts_to_unlink = array_diff(array_keys($groups_hosts), $hostids);
 			$hosts_to_link = array_diff($hostids, array_keys($groups_hosts));
 		}
+		
 		$templates_to_unlink = $templates_to_link = array();
 		if(!is_null($templates)){
-			$groups_templates = CTemplate::get(array('groupids' => $groupids, 'preservekeys' => 1, 'nopermissions' => 1));
+			$groups_templates = CTemplate::get($options);
 			$templates_to_unlink = array_diff(array_keys($groups_templates), $templateids);
 			$templates_to_link = array_diff($templateids, array_keys($groups_templates));
 		}

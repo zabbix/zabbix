@@ -123,7 +123,7 @@ include_once('include/page_header.php');
 
 			$result = true;
 			if(ZBX_AUTH_LDAP == $config['authentication_type']){
-				$result=ldap_authentication($alias,$passwd,$ldap_cnf);
+				$result = CUser::ldapLogin(array('user'=>$alias,'password'=>$passwd,'cnf'=>$ldap_cnf));
 			}
 
 // If we do save and auth_type changed, reset all sessions
@@ -152,7 +152,7 @@ include_once('include/page_header.php');
 				}
 			}
 
-			$result = ldap_authentication($alias,$passwd,$ldap_cnf);
+			$result = CUser::ldapLogin(array('user'=>$alias,'password'=>$passwd,'cnf'=>$ldap_cnf));
 
 			show_messages($result, S_LDAP.SPACE.S_LOGIN.SPACE.S_SUCCESSFUL_SMALL, S_LDAP.SPACE.S_LOGIN.SPACE.S_WAS_NOT.SPACE.S_SUCCESSFUL_SMALL);
 		}
@@ -234,7 +234,7 @@ include_once('include/page_header.php');
 
 		$frmAuth->AddRow(S_DEFAULT_AUTHENTICATION, $cmbConfig);
 
-		$action = "javascript: if(confirm('Switching HTTP authentication will reset all current sessions! Continue?')) return true; else return false;";
+		$action = "javascript: if(confirm('".S_SWITCHING_HTTP."')) return true; else return false;";
 		$frmAuth->AddRow(S_ZABBIX_INTERNAL_AUTH.SPACE.S_ENABLED, new CCheckBox('authentication_type', (ZBX_AUTH_INTERNAL == $config['authentication_type']), $action, ZBX_AUTH_INTERNAL));
 
 		$frmAuth->AddItemToBottomRow(new CButton('save',S_SAVE));
@@ -275,7 +275,7 @@ include_once('include/page_header.php');
 		$frmAuth->AddRow(S_BIND_DN.'*', new CTextBox('ldap_bind_dn',$config['ldap_bind_dn'],64));
 		$frmAuth->AddRow(S_BIND_PASSWORD.'*',new CPassBox('ldap_bind_password',$config['ldap_bind_password']));
 
-		$action = "javascript: if(confirm('Switching LDAP authentication will reset all current sessions! Continue?')) return true; else return false;";
+		$action = "javascript: if(confirm('".S_SWITCHING_LDAP."')) return true; else return false;";
 		$frmAuth->AddRow(S_LDAP.SPACE.S_AUTHENTICATION.SPACE.S_ENABLED, new CCheckBox('authentication_type', $config['authentication_type'],$action,ZBX_AUTH_LDAP));
 
 		$frmAuth->AddRow(S_TEST.SPACE.S_AUTHENTICATION, ' ['.S_MUST_BE_VALID_SMALL.SPACE.S_LDAP.SPACE.S_USER.']');
@@ -320,7 +320,7 @@ include_once('include/page_header.php');
 
 		$frmAuth->AddRow(S_DEFAULT_AUTHENTICATION, $cmbConfig);
 
-		$action = "javascript: if(confirm('Switching HTTP authentication will reset all current sessions! Continue?')) return true; else return false;";
+		$action = "javascript: if(confirm('".S_SWITCHING_HTTP."')) return true; else return false;";
 		$frmAuth->AddRow(S_HTTP_AUTH.SPACE.S_ENABLED, new CCheckBox('authentication_type', (ZBX_AUTH_HTTP == $config['authentication_type']), $action, ZBX_AUTH_HTTP));
 
 		$frmAuth->AddItemToBottomRow(new CButton('save',S_SAVE));

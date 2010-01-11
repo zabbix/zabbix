@@ -247,7 +247,8 @@ class CUserGroup extends CZBXAPI{
 		if(!is_null($options['select_users']) && str_in_array($options['select_users'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'output' => $options['select_users'],
-				'usrgrpids' => $usrgrpids,
+					'usrgrpids' => $usrgrpids,
+					'get_access' => 1,
 				'preservekeys' => 1
 			);
 			$users = CUser::get($obj_params);

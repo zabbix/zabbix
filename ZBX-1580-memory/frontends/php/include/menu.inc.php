@@ -102,9 +102,19 @@ $ZBX_MENU = array(
 			'node_perm'		=> PERM_READ_LIST,
 			'default_page_id'	=> 0,
 			'pages'=>array(
-				array('url'=>'report1.php',	'label'=>S_STATUS_OF_ZABBIX	),
-				array('url'=>'report2.php',	'label'=>S_AVAILABILITY_REPORT	),
-				array('url'=>'report5.php',	'label'=>S_TRIGGERS_TOP_100	),
+				array(
+					'url'=>'report1.php',
+					'label'=>S_STATUS_OF_ZABBIX,
+					'user_type'=>USER_TYPE_SUPER_ADMIN
+				),
+				array(
+					'url'=>'report2.php',
+					'label'=>S_AVAILABILITY_REPORT	
+				),
+				array(
+					'url'=>'report5.php',
+					'label'=>S_TRIGGERS_TOP_100	
+				),
 				array(
 						'url'=>'report6.php',
 						'label'=>S_BAR_REPORTS,
@@ -224,20 +234,20 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 
 	$denyed_page_requested = false;
 
-	/* NOTE - menu array format:
-		first level:
-			'label' 		= main menu title.
-			'default_page_id	= default page url from 'pages' then opened menu.
-			'pages'			= collection of pages which are displayed from this menu.
-						these pages are saved a last visited submenu of main menu.
+/* NOTE - menu array format:
+	first level:
+		'label' 		= main menu title.
+		'default_page_id	= default page url from 'pages' then opened menu.
+		'pages'			= collection of pages which are displayed from this menu.
+					these pages are saved a last visited submenu of main menu.
 
-		second level (pages):
-			'url'	= 	real url for this page
-			'label'	= 	submenu title, if missing, menu skipped, but remembered as last visited page.
-			'sub_pages'	= collection of pages for displaying but not remembered as last visited.
-	*/
+	second level (pages):
+		'url'	= 	real url for this page
+		'label'	= 	submenu title, if missing, menu skipped, but remembered as last visited page.
+		'sub_pages'	= collection of pages for displaying but not remembered as last visited.
+*/
 
-	//SDI($USER_DETAILS);
+//SDI($USER_DETAILS);
 	$page_exists = false;
 	$deny = !defined('ZBX_PAGE_NO_AUTHORIZATION');
 
@@ -260,7 +270,9 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 			$show_sub_menu = true;
 // show check
 			if(!isset($sub_page['label'])) $show_sub_menu = false;
-			if(isset($sub_page['user_type']) && ($USER_DETAILS['type'] < $sub_page['user_type'])){
+			if(!isset($sub_page['user_type'])) $sub_page['user_type'] = $menu['user_type'];
+			
+			if($USER_DETAILS['type'] < $sub_page['user_type']){
 				$show_sub_menu = false;
 			}
 //----------
@@ -273,7 +285,8 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 			$sub_menu_active |= (isset($sub_page['sub_pages']) && str_in_array($page['file'], $sub_page['sub_pages']));
 			if($sub_menu_active){
 // PERMISSION CHECK
-				$deny &= ($USER_DETAILS['type'] < $menu['user_type']);
+				$deny &= (($USER_DETAILS['type'] < $menu['user_type']) || ($USER_DETAILS['type'] < $sub_page['user_type']));
+				
 // END OF PERMISSION CHECK
 				$menu_class = 'active';
 				$page_exists = true;

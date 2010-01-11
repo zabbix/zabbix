@@ -360,8 +360,6 @@
 	'S_ADD'=>			'Add',
 	'S_STATUS_OF_TRIGGERS'=>			'Status of triggers',
 	'S_STATUS_OF_TRIGGERS_BIG'=>			'STATUS OF TRIGGERS',
-	'S_SHOW_ONLY_TRUE'=>			'Show only true',
-	'S_SHOW_ACTIONS'=>			'Show actions',
 	'S_SHOW_DETAILS'=>			'Show details',
 	'S_SELECT'=>			'Select',
 	'S_TRIGGERS_BIG'=>			'TRIGGERS',
