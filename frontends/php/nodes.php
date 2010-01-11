@@ -214,7 +214,7 @@
 			$frmNode->addItemToBottomRow(new CButton('save', S_SAVE));
 			if(isset($_REQUEST['nodeid']) && $node_type != ZBX_NODE_LOCAL){
 				$frmNode->addItemToBottomRow(SPACE);
-				$frmNode->addItemToBottomRow(new CButtonDelete('Delete selected node?', url_param('form').url_param('nodeid')));
+				$frmNode->addItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_NODE_Q, url_param('form').url_param('nodeid')));
 			}
 			$frmNode->addItemToBottomRow(SPACE);
 			$frmNode->addItemToBottomRow(new CButtonCancel());
