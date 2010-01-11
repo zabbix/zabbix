@@ -688,6 +688,10 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('ZBX_API_ERROR_NO_AUTH', 200);
 	define('ZBX_API_ERROR_NO_METHOD', 300);
 	//define('ZBX_API_ERROR_PARAMETERS', 100);
+	
+	define('API_OUTPUT_SHORTEN', 'shorten');
+	define('API_OUTPUT_REFER', 'refer');
+	define('API_OUTPUT_EXTEND', 'extend');
 
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
 	if(!function_exists('version_compare')){
