@@ -30,7 +30,7 @@
 	'S_YEAR_SHORT'=>			'y',
 	'S_MONTH_SHORT'=>			'm',
 	'S_WEEK_SHORT'=>			'w',
-	'S_DAY_SHORT'=>			'd',
+	'S_DAY_SHORT'=>				'd',
 	'S_HOUR_SHORT' =>			'h',
 	'S_MINUTE_SHORT' =>			'm',
 	'S_SECOND_SHORT' =>			's',
@@ -475,6 +475,7 @@
 	'S_TEST'=>					'Test',
 	'S_DELIMITER'=>					'Delimiter',
 	'S_TEST_STRING'=>				'Test string',
+	'S_INCORRECT_EXPRESSION'=>			'Incorrect expression',
 
 	'S_NEW_REGULAR_EXPRESSION'=>			'New regular expression',
 	'S_REGULAR_EXPRESSION_ADDED'=>			'Regular expression added',
