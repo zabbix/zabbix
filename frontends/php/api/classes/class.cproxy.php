@@ -56,6 +56,7 @@ class CProxy extends CZBXAPI{
 		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('hostid', 'host', 'status', 'dns', 'ip'); // allowed columns for sorting
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 
 		$sql_parts = array(
@@ -74,6 +75,7 @@ class CProxy extends CZBXAPI{
 			'pattern'					=> '',
 // OutPut
 			'extendoutput'				=> null,
+			'output'					=> API_OUTPUT_REFER,
 			'count'						=> null,
 			'preservekeys'				=> null,
 
@@ -83,6 +85,12 @@ class CProxy extends CZBXAPI{
 		);
 
 		$options = zbx_array_merge($def_options, $options);
+		
+		
+		if(!is_null($options['extendoutput'])){
+			$options['output'] = API_OUTPUT_EXTEND;
+		}
+		
 
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
@@ -107,7 +115,7 @@ class CProxy extends CZBXAPI{
 		}
 
 // extendoutput
-		if(!is_null($options['extendoutput'])){
+		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['hosts'] = 'h.*';
 		}
 
@@ -175,7 +183,7 @@ class CProxy extends CZBXAPI{
 				$proxy['proxyid'] = $proxy['hostid'];
 				unset($proxy['hostid']);
 				
-				if(is_null($options['extendoutput'])){
+				if($options['output'] == API_OUTPUT_SHORTEN){
 					$result[$proxy['proxyid']] = array('proxyid' => $proxy['proxyid']);
 				}
 				else{
@@ -186,7 +194,7 @@ class CProxy extends CZBXAPI{
 			}
 		}
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
