@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1659] fixed checked marks on multilabel selection on map (Aly)
  - [ZBXNEXT-192] added possibility to exclude some services from the result of services[] (Sasha)
  - [ZBX-1478] improved php requirements checks (Vedmak)
  - [ZBX-1713] fixed adding user group to email alerts (Vedmak)
