@@ -437,7 +437,6 @@ function make_hoststat_summary(){
 			$group_row->addItem(get_node_name_by_elid($group['groupid']));
 
 		$name = new CLink($group['name'], 'tr_status.php?groupid='.$group['groupid'].'&show_triggers='.TRIGGERS_OPTION_ONLYTRUE);
-		$name->setTarget('blank');
 		$group_row->addItem($name);
 
 		$hosts_data = array(
@@ -454,16 +453,7 @@ function make_hoststat_summary(){
 					// if $host is shown for all groups it is in, unset it
 					if(empty($host['groups'])) unset($hosts[$hnum]);
 					
-					$problematic_host = false;
 					$highest_severity = TRIGGER_SEVERITY_NOT_CLASSIFIED;
-					
-					$problematic_host_list[$host['host']] = array();
-					$problematic_host_list[$host['host']][TRIGGER_SEVERITY_DISASTER] = 0;
-					$problematic_host_list[$host['host']][TRIGGER_SEVERITY_HIGH] = 0;
-					$problematic_host_list[$host['host']][TRIGGER_SEVERITY_AVERAGE] = 0;
-					$problematic_host_list[$host['host']][TRIGGER_SEVERITY_WARNING] = 0;
-					$problematic_host_list[$host['host']][TRIGGER_SEVERITY_INFORMATION] = 0;
-					$problematic_host_list[$host['host']][TRIGGER_SEVERITY_NOT_CLASSIFIED] = 0;
 					
 					foreach($triggers as $tnum => $trigger){
 						foreach($trigger['hosts'] as $thnum => $trigger_host){
@@ -472,18 +462,30 @@ function make_hoststat_summary(){
 								// if $trigger is shown for all hosts it is in, unset it
 								if(empty($trigger['hosts'])) unset($triggers[$tnum]);
 								
+								if(!isset($problematic_host_list[$host['hostid']])){
+									$problematic_host_list[$host['hostid']] = array();
+									$problematic_host_list[$host['hostid']]['host'] = $host['host'];
+									$problematic_host_list[$host['hostid']]['severities'] = array();
+									$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_DISASTER] = 0;
+									$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_HIGH] = 0;
+									$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_AVERAGE] = 0;
+									$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_WARNING] = 0;
+									$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_INFORMATION] = 0;
+									$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_NOT_CLASSIFIED] = 0;
+								}
+					
+								
 								if($trigger['priority'] > $highest_severity){
 									$highest_severity = $trigger['priority'];
 								}
-								$problematic_host = true;
 								
-								$problematic_host_list[$host['host']][$trigger['priority']]++;					
+								$problematic_host_list[$host['hostid']]['severities'][$trigger['priority']]++;					
 								
 							}
 						}
 					}
 					
-					$problematic_host ? $hosts_data['problematic']++ : $hosts_data['ok']++;
+					isset($problematic_host_list[$host['hostid']]) ? $hosts_data['problematic']++ : $hosts_data['ok']++;
 				}
 			}
 		}
@@ -502,11 +504,11 @@ function make_hoststat_summary(){
 				S_NOT_CLASSIFIED
 			));
 			
-			foreach($problematic_host_list as $host_name => $problem_triggers){
+			foreach($problematic_host_list as $hostid => $host_data){
 				$r = new CRow();
-				$r->addItem($host_name);
-				foreach($problem_triggers as $severity => $trigger_count){
-					$r->addItem(new CCol($trigger_count, get_severity_style($severity)));
+				$r->addItem(new CLink($host_data['host'], 'tr_status.php?hostid='.$hostid.'&show_triggers='.TRIGGERS_OPTION_ONLYTRUE));
+				foreach($host_data['severities'] as $severity => $trigger_count){
+					$r->addItem(new CCol($trigger_count, get_severity_style($severity, $trigger_count)));
 				}
 				$table_inf->addRow($r);
 			}
