@@ -2311,6 +2311,15 @@ updateForm_selementByType: function(e, multi){
 		this.selementForm.massEdit.chkboxIconid_maintenance.style.display = 'none';
 		this.selementForm.massEdit.chkboxIconid_disabled.style.display = 'none';
 		this.selementForm.massEdit.chkboxURL.style.display = 'none';
+		
+		this.selementForm.massEdit.chkboxLabel.checked = false;
+		this.selementForm.massEdit.chkboxLabelLocation.checked = false;
+		this.selementForm.massEdit.chkboxIconid_off.checked = false;
+		this.selementForm.massEdit.chkboxIconid_on.checked = false;
+		this.selementForm.massEdit.chkboxIconid_unknown.checked = false;
+		this.selementForm.massEdit.chkboxIconid_maintenance.checked = false;
+		this.selementForm.massEdit.chkboxIconid_disabled.checked = false;
+		this.selementForm.massEdit.chkboxURL.checked = false;
 
 		this.selementForm.massEdit.elementtype.style.display = display_style;
 		this.selementForm.massEdit.elementName.style.display = display_style;
