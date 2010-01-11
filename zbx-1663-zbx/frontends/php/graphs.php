@@ -94,7 +94,7 @@ include_once('include/page_header.php');
 // PERMISSIONS		
 	if(get_request('graphid',0) > 0){
 		$options = array(
-			'nodeids' => get_current_nodeids(true),
+			'nodeids' => get_current_nodeid(true),
 			'graphids' => $_REQUEST['graphid'],
 			'editable' => 1
 		);
@@ -430,7 +430,7 @@ include_once('include/page_header.php');
 		if(($_REQUEST['graphtype'] == GRAPH_TYPE_PIE) || ($_REQUEST['graphtype'] == GRAPH_TYPE_EXPLODED)){
 			$table->addRow(new CImg('chart7.php?period=3600'.url_param('items').
 				url_param('name').url_param('legend').url_param('graph3d').url_param('width').url_param('height').url_param('graphtype')));
-			$table->Show();
+			$table->show();
 		}
 		else{
 			$table->addRow(new CImg('chart3.php?period=3600'.url_param('items').
@@ -439,7 +439,7 @@ include_once('include/page_header.php');
 				url_param('ymin_itemid').url_param('ymax_itemid').
 				url_param('show_work_period').url_param('show_triggers').url_param('graphtype').
 				url_param('percent_left').url_param('percent_right')));
-			$table->Show();
+			$table->show();
 		}
 	}
 	else {
