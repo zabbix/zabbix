@@ -63,3 +63,6 @@
 
 /* Define to 1 if you have the <fcntl.h> header file. */
 #define HAVE_FCNTL_H
+
+/* Define to 1 if you have the <Iphlpapi.h> header file. */
+#define HAVE_IPHLPAPI_H
