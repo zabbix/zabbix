@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBXNEXT-196] added "Show with unacknowledged" filter option for triggers screen (Vedmak)
  - [ZBX-1715] fixed errors in IT Services parent selection sceren (Aly)
  - [ZBX-1652] fixed user media deletion on profile save (Aly)
  - [ZBX-1641] fixed handling of "Include" statement in configuration files (Sasha)

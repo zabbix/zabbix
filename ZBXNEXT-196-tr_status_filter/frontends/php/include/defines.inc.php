@@ -29,6 +29,7 @@
 	define('TRIGGERS_OPTION_DISABLED',		0);	// reserved
 	define('TRIGGERS_OPTION_ONLYTRUE',		1);	// use 0 to disable
 	define('TRIGGERS_OPTION_ALL',			2);	// use 0 to disable
+	define('TRIGGERS_OPTION_SHOW_ALL_WITH_UNACKNOWLEDGED',			3);	// use 0 to disable
 
 	define('TRIGGER_FALSE_PERIOD',			1800);	// 10min, 0 - disable
 	define('TRIGGER_BLINK_PERIOD',			1800);	// 5min,  0 - disable
