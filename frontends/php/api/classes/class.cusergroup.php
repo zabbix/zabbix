@@ -219,16 +219,16 @@ class CUserGroup extends CZBXAPI{
 				else{
 					if(!isset($result[$usrgrp['usrgrpid']])) $result[$usrgrp['usrgrpid']]= array();
 
-					if($options['select_users'] && !isset($result[$usrgrp['usrgrpid']]['users'])){
+					if(!is_null($options['select_users']) && !isset($result[$usrgrp['usrgrpid']]['users'])){
 						$result[$usrgrp['usrgrpid']]['users'] = array();
 					}
 
 // groupids
-					if(isset($usrgrp['userid'])){
+					if(isset($usrgrp['userid']) && is_null($options['select_users'])){
 						if(!isset($result[$usrgrp['usrgrpid']]['users']))
 							$result[$usrgrp['usrgrpid']]['users'] = array();
 
-						$result[$usrgrp['usrgrpid']]['users'][$usrgrp['userid']] = array('userid' => $usrgrp['userid']);
+						$result[$usrgrp['usrgrpid']]['users'][] = array('userid' => $usrgrp['userid']);
 						unset($usrgrp['userid']);
 					}
 

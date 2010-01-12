@@ -253,7 +253,10 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-	$effectiveperiod = navigation_bar_calc('web.item.graph', $_REQUEST['itemid']);
+	if(is_array($_REQUEST['itemid'])) $itemid = reset($_REQUEST['itemid']);
+	else $itemid = $_REQUEST['itemid'];
+	$effectiveperiod = navigation_bar_calc('web.item.graph', $itemid);
+
 	$bstime = $_REQUEST['stime'];
 
 	if($_REQUEST['action']=='showgraph' && ($item_type != ITEM_VALUE_TYPE_LOG)){

@@ -478,7 +478,7 @@ include_once('include/page_header.php');
 
 	if(EVENT_SOURCE_TRIGGERS == $source){
 
-		$filterForm->addVar('triggerid',$_REQUEST['triggerid']);
+		$filterForm->addVar('triggerid', get_request('triggerid'));
 
 		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
 			$trigger = expand_trigger_description($_REQUEST['triggerid']);
