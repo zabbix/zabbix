@@ -792,7 +792,7 @@ static void	process_active_checks(char *server, unsigned short port)
 			}
 		}
 		/* special processing for log files WITH rotation */
-		else if (0 == strncmp(active_metrics[i].key, "logrt[", 11))
+		else if (0 == strncmp(active_metrics[i].key, "logrt[", 6))
 		{
 			ret = FAIL;
 

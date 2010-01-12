@@ -59,6 +59,7 @@ class CUserGroup extends CZBXAPI{
 		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('usrgrpid', 'name'); // allowed columns for sorting
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 
 		$sql_parts = array(
@@ -80,6 +81,7 @@ class CUserGroup extends CZBXAPI{
 
 // OutPut
 			'extendoutput'				=> null,
+			'output'				=> API_OUTPUT_REFER,
 			'editable'					=> null,
 			'select_users'				=> null,
 			'count'						=> null,
@@ -92,6 +94,16 @@ class CUserGroup extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
+		
+		if(!is_null($options['extendoutput'])){
+			$options['output'] = API_OUTPUT_EXTEND;
+			
+			if(!is_null($options['select_users'])){
+				$options['select_users'] = API_OUTPUT_EXTEND;
+			}
+		}
+		
+		
 // PERMISSION CHECK
 		if(USER_TYPE_SUPER_ADMIN == $user_type){
 
@@ -114,7 +126,7 @@ class CUserGroup extends CZBXAPI{
 		if(!is_null($options['userids'])){
 			zbx_value2array($options['userids']);
 
-			if(!is_null($options['extendoutput'])){
+			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['userid'] = 'ug.userid';
 			}
 
@@ -138,7 +150,7 @@ class CUserGroup extends CZBXAPI{
 		}
 
 // extendoutput
-		if(!is_null($options['extendoutput'])){
+		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['usrgrp'] = 'g.*';
 		}
 
@@ -201,7 +213,7 @@ class CUserGroup extends CZBXAPI{
 			else{
 				$usrgrpids[$usrgrp['usrgrpid']] = $usrgrp['usrgrpid'];
 
-				if(is_null($options['extendoutput'])){
+				if($options['output'] == API_OUTPUT_SHORTEN){
 					$result[$usrgrp['usrgrpid']] = array('usrgrpid' => $usrgrp['usrgrpid']);
 				}
 				else{
@@ -225,22 +237,26 @@ class CUserGroup extends CZBXAPI{
 			}
 		}
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
 // Adding Objects
 // Adding users
-		if($options['select_users']){
-			$obj_params = array('extendoutput' => 1,
-								'usrgrpids' => $usrgrpids,
-								'preservekeys' => 1
-							);
+		if(!is_null($options['select_users']) && str_in_array($options['select_users'], $subselects_allowed_outputs)){
+			$obj_params = array(
+				'output' => $options['select_users'],
+					'usrgrpids' => $usrgrpids,
+					'get_access' => 1,
+				'preservekeys' => 1
+			);
 			$users = CUser::get($obj_params);
 			foreach($users as $userid => $user){
-				foreach($user['usrgrps'] as $num => $usrgrp){
-					$result[$usrgrp['usrgrpid']]['users'][$userid] = $user;
+				$uusrgrps = $user['usrgrps'];
+				unset($user['usrgrps']);
+				foreach($uusrgrps as $num => $usrgrp){
+					$result[$usrgrp['usrgrpid']]['users'][] = $user;
 				}
 			}
 		}

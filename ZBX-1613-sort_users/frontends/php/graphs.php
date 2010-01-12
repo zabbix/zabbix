@@ -91,9 +91,15 @@ include_once('include/page_header.php');
 
 	$_REQUEST['go'] = get_request('go', 'none');
 
-// PERMISSIONS
+// PERMISSIONS		
 	if(get_request('graphid',0) > 0){
-		$graphs = available_graphs($_REQUEST['graphid'], 1);
+		$options = array(
+			'nodeids' => get_current_nodeid(true),
+			'graphids' => $_REQUEST['graphid'],
+			'editable' => 1
+		);
+		$graphs = CGraph::get($options);
+
 		if(empty($graphs)) access_deny();
 	}
 ?>
@@ -118,9 +124,12 @@ include_once('include/page_header.php');
 		}
 
 		if(!empty($itemids)){
-			$options = array('itemids'=>$itemids, 'editable'=>1, 'nodes'=>get_current_nodeid(true));
+			$options = array(
+				'nodeids'=>get_current_nodeid(true),
+				'itemids'=>$itemids, 
+				'editable'=>1
+			);
 			$db_items = CItem::get($options);
-			$db_items = zbx_objectValues($db_items, 'itemid');
 			$db_items = zbx_toHash($db_items, 'itemid');
 
 			foreach($itemids as $inum => $itemid){
@@ -268,7 +277,7 @@ include_once('include/page_header.php');
 		foreach($graphs as $gnum => $graph){
 			if($graph['templateid'] != 0){
 				unset($graphs[$gnum]);
-				error('Cannot delete graph [ '.$graph['name'].' ] (Templated graph)');
+				error(S_CANNOT_DELETE_GRAPH.' [ '.$graph['name'].' ] ('.S_TEMPLATED_GRAPH.')');
 				continue;
 			}
 
@@ -327,7 +336,7 @@ include_once('include/page_header.php');
 			$_REQUEST['go'] = 'none2';
 		}
 		else{
-			error('No target selection.');
+			error(S_NO_TARGET_SELECTED);
 		}
 		show_messages();
 	}
@@ -421,7 +430,7 @@ include_once('include/page_header.php');
 		if(($_REQUEST['graphtype'] == GRAPH_TYPE_PIE) || ($_REQUEST['graphtype'] == GRAPH_TYPE_EXPLODED)){
 			$table->addRow(new CImg('chart7.php?period=3600'.url_param('items').
 				url_param('name').url_param('legend').url_param('graph3d').url_param('width').url_param('height').url_param('graphtype')));
-			$table->Show();
+			$table->show();
 		}
 		else{
 			$table->addRow(new CImg('chart3.php?period=3600'.url_param('items').
@@ -430,7 +439,7 @@ include_once('include/page_header.php');
 				url_param('ymin_itemid').url_param('ymax_itemid').
 				url_param('show_work_period').url_param('show_triggers').url_param('graphtype').
 				url_param('percent_left').url_param('percent_right')));
-			$table->Show();
+			$table->show();
 		}
 	}
 	else {
@@ -489,7 +498,6 @@ include_once('include/page_header.php');
 		$options = array(
 			'editable' => 1,
 			'extendoutput' => 1,
-			'select_hosts' => 1,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1));
@@ -524,6 +532,19 @@ include_once('include/page_header.php');
 
 // sorting
 		order_result($graphs, $sortfield, $sortorder);
+//---------
+
+		$graphids = zbx_objectValues($graphs, 'graphid');
+		$options = array(
+			'graphids' => $graphids,
+			'extendoutput' => 1,
+			'select_hosts' => 1,
+			'select_templates' => 1
+		);
+		$graphs = CGraph::get($options);
+
+// sorting
+		order_result($graphs, $sortfield, $sortorder);
 		$paging = getPagingLine($graphs);
 //---------
 
@@ -535,6 +556,10 @@ include_once('include/page_header.php');
 				$host_list = array();
 				foreach($graph['hosts'] as $host){
 					$host_list[] = $host['host'];
+				}
+
+				foreach($graph['templates'] as $template){
+					$host_list[] = $template['host'];
 				}
 				$host_list = implode(', ', $host_list);
 			}
@@ -569,7 +594,7 @@ include_once('include/page_header.php');
 		$goBox->addItem('copy_to',S_COPY_SELECTED_TO);
 
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm','Delete selected graphs?');
+		$goOption->setAttribute('confirm',S_DELETE_SELECTED_GRAPHS);
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!

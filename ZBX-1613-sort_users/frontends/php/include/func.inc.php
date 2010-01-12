@@ -449,46 +449,6 @@ function zbx_rksort(&$array, $flags=NULL){
 	return $array;
 }
 
-
-function array_quicksort(&$data, $sortfield, $sortorder=ZBX_SORT_UP, $level=0){
-	$return = array();
-	$greater = array();
-	$less = array();
-	$pivotList = array();
-
-	$data_len = count($data);
-	if($data_len < 2) return $data;
-	else if($data_len > 10){
-		$middle = array_slice($data, round($data_len/2), 1, true);
-		$pivot = reset($middle);
-		$pivotid = key($middle);
-	}
-	else{
-		$pivot = reset($data);
-		$pivotid = key($data);
-	}
-
-	foreach($data as $id => $row){
-		$value = '';
-		$compareValue = '';
-
-		$value = strtolower($row[$sortfield]);
-		$compareValue = strtolower($pivot[$sortfield]);
-
-		if($value < $compareValue) $less[$id] = $row;
-		if($value == $compareValue) $pivotList[$id] = $row;
-		if($value > $compareValue) $greater[$id] = $row;
-	}
-
-	$return += array_quicksort($less,$sortfield,$sortorder, $level+1);
-	$return += $pivotList;
-	$return += array_quicksort($greater,$sortfield,$sortorder, $level+1);
-
-	if(($level == 0) && ($sortorder == ZBX_SORT_DOWN)) $return = array_reverse($return, true);
-
-return $return;
-}
-
 // This function will preserve keys!!!
 // author: Aly
 function zbx_array_merge(){
@@ -945,7 +905,13 @@ function zbx_objectValues(&$value, $field){
 return $result;
 }
 
-function zbx_cleanHashes($value, $level=0){
+function zbx_cleanHashes(&$value){
+
+	if(is_array($value) && ctype_digit((string) key($value))){
+		$value = array_values($value);
+	}
+	return $value;
+/*
 	$level++;
 //	if($level > 3) return $value;
 	if(is_array($value)){
@@ -960,6 +926,7 @@ function zbx_cleanHashes($value, $level=0){
 	}
 
 return $value;
+*/
 }
 
 /************* END ZBX MISC *************/

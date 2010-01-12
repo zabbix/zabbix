@@ -278,15 +278,15 @@ include_once('include/page_header.php');
 // gobox
 		$goBox = new CComboBox('go');
 		$goOption = new CComboItem('activate',S_ENABLE_SELECTED);
-		$goOption->setAttribute('confirm','Enable selected discovery rules?');
+		$goOption->setAttribute('confirm',S_ENABLE_SELECTED_DISCOVERY_RULES);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
-		$goOption->setAttribute('confirm','Disable selected discovery rules?');
+		$goOption->setAttribute('confirm',S_DISABLE_SELECTED_DISCOVERY_RULES);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm','Delete selected discovery rules?');
+		$goOption->setAttribute('confirm',S_DELETE_SELECTED_DISCOVERY_RULES);
 		$goBox->addItem($goOption);
 
 		// goButton name is necessary!!!

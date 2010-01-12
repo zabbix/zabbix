@@ -614,7 +614,13 @@
 		$frm_title = S_USER;
 		if(isset($userid)){
 /*			if(bccomp($userid,$USER_DETAILS['userid'])==0) $profile = 1;*/
-			$users = CUser::get(array('userids' => $userid,  'extendoutput' => 1));
+			$options = array(
+					'userids' => $userid,  
+					'extendoutput' => 1
+				);
+			if($profile) $options['nodeids'] = id2nodeid($userid);
+
+			$users = CUser::get($options);
 			$user = reset($users);
 
 			$frm_title = S_USER.' "'.$user['alias'].'"';
@@ -2906,8 +2912,13 @@
 
 		if(isset($_REQUEST['graphid'])){
 			$frmGraph->addVar('graphid', $_REQUEST['graphid']);
-			$row = CGraph::get(array('graphids' => $_REQUEST['graphid'],  'extendoutput' => 1));
-			$row = reset($row);
+			
+			$options = array(
+						'graphids' => $_REQUEST['graphid'], 
+						'extendoutput' => 1
+					);
+			$graphs = CGraph::get($options);
+			$row = reset($graphs);
 
 			$frmGraph->setTitle(S_GRAPH.' "'.$row['name'].'"');
 		}
@@ -2916,12 +2927,12 @@
 			$name = $row['name'];
 			$width = $row['width'];
 			$height = $row['height'];
-			$ymin_type = $row["ymin_type"];
-			$ymax_type = $row["ymax_type"];
+			$ymin_type = $row['ymin_type'];
+			$ymax_type = $row['ymax_type'];
 			$yaxismin = $row['yaxismin'];
 			$yaxismax = $row['yaxismax'];
-			$ymin_itemid = $row["ymin_itemid"];
-			$ymax_itemid = $row["ymax_itemid"];
+			$ymin_itemid = $row['ymin_itemid'];
+			$ymax_itemid = $row['ymax_itemid'];
 			$showworkperiod = $row['show_work_period'];
 			$showtriggers = $row['show_triggers'];
 			$graphtype = $row['graphtype'];
@@ -2930,19 +2941,13 @@
 			$percent_left = $row['percent_left'];
 			$percent_right = $row['percent_right'];
 
-			$db_items = CGraphItem::get(array('graphids' => $_REQUEST['graphid'], 'sortfield' => 'sortorder', 'extendoutput' => 1));
-			foreach($db_items as $num => $item){
-				$items[] = array(
-					'itemid' => $item['itemid'],
-					'drawtype' => $item['drawtype'],
-					'sortorder' => $item['sortorder'],
-					'color' => $item['color'],
-					'yaxisside' => $item['yaxisside'],
-					'calc_fnc' => $item['calc_fnc'],
-					'type' => $item['type'],
-					'periods_cnt' => $item['periods_cnt']
-				);
-			}
+			$options = array(
+						'graphids' => $_REQUEST['graphid'], 
+						'sortfield' => 'sortorder', 
+						'extendoutput' => 1
+					);
+
+			$items = CGraphItem::get($options);
 		}
 		else{
 			$name = get_request('name', '');
@@ -2955,6 +2960,7 @@
 			else{
 				$width = get_request('width', 900);
 				$height = get_request('height', 200);
+
 			}
 			$ymin_type = get_request('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED);
 			$ymax_type = get_request('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED);
@@ -2974,7 +2980,7 @@
 			if(isset($visible['percent_right'])) $percent_right = get_request('percent_right', 0);
 		}
 
-		/* reinit $_REQUEST */
+/* reinit $_REQUEST */
 		$_REQUEST['items']		= $items;
 		$_REQUEST['name']		= $name;
 		$_REQUEST['width']		= $width;
@@ -2996,7 +3002,7 @@
 		$_REQUEST['graph3d']		= $graph3d;
 		$_REQUEST['percent_left']	= $percent_left;
 		$_REQUEST['percent_right']	= $percent_right;
-		/********************/
+/********************/
 
 		if($graphtype != GRAPH_TYPE_NORMAL){
 			foreach($items as $gid => $gitem){
@@ -3205,7 +3211,6 @@
 				if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
 					$items_table->addRow(array(
 							new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
-//							$gitem['sortorder'],
 							$description,
 							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
 							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
@@ -3220,6 +3225,7 @@
 							$description,
 							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
 							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
+							($gitem['yaxisside']==GRAPH_YAXIS_SIDE_LEFT)?S_LEFT:S_RIGHT,
 							graph_item_drawtype2str($gitem["drawtype"],$gitem["type"]),
 							$color,
 							array( $do_up, ((!is_null($do_up) && !is_null($do_down)) ? SPACE."|".SPACE : ''), $do_down )
@@ -3935,7 +3941,7 @@
 //			$tblPeriod->addRow(array(S_AT.SPACE.'('.S_HOUR.':'.S_MINUTE.')', $tabTime));
 
 		$td = new CCol(array(
-			new CButton('add_timeperiod', $new ? S_EDIT : S_ADD),
+			new CButton('add_timeperiod', $new ? S_SAVE : S_ADD),
 			SPACE,
 			new CButton('cancel_new_timeperiod',S_CANCEL)
 			));

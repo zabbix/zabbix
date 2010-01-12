@@ -401,20 +401,28 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 				: new CLink(S_DISABLED, 'usergrps.php?go=enable_debug&usrgrpid='.$usrgrpid, 'enabled');
 
 			$gui_access = user_auth_type2str($usrgrp['gui_access']);
+
+			$gui_access_style = 'enabled';
+			if(GROUP_GUI_ACCESS_INTERNAL == $usrgrp['gui_access']) $gui_access_style = 'orange';
+			if(GROUP_GUI_ACCESS_DISABLED == $usrgrp['gui_access']) $gui_access_style = 'disabled';
+
 			if(granted2update_group($usrgrpid)){
 
 				$next_gui_auth = ($usrgrp['gui_access']+1 > GROUP_GUI_ACCESS_DISABLED)?GROUP_GUI_ACCESS_SYSTEM:($usrgrp['gui_access']+1);
-				$gui_access = new CLink($gui_access, 'usergrps.php?go=set_gui_access&set_gui_access='.$next_gui_auth.'&usrgrpid='.$usrgrpid,
-					($usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED) ? 'orange' : 'enabled');
+							
+				$gui_access = new CLink(
+									$gui_access, 
+									'usergrps.php?go=set_gui_access&set_gui_access='.$next_gui_auth.'&usrgrpid='.$usrgrpid,
+									$gui_access_style
+								);
 
 				$users_status = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED)
 					? new CLink(S_ENABLED, 'usergrps.php?go=disable_status&usrgrpid='.$usrgrpid, 'enabled')
 					: new CLink(S_DISABLED, 'usergrps.php?go=enable_status&usrgrpid='.$usrgrpid, 'disabled');
 			}
 			else{
-				$gui_access = new CSpan($gui_access, ($usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED)?'orange':'green');
-				$users_status = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED)
-					? new CSpan(S_ENABLED, 'enabled') : new CSpan(S_DISABLED, 'disabled');
+				$gui_access = new CSpan($gui_access, $gui_access_style);
+				$users_status = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED)? new CSpan(S_ENABLED, 'enabled') : new CSpan(S_DISABLED, 'disabled');
 			}
 
 			if(isset($usrgrp['users'])){
@@ -424,7 +432,16 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 				
 				$users = array();
 				foreach($usrgrpusers as $unum => $user){
-					$users[] = new CLink($user['alias'],'users.php?form=update&userid='.$user['userid']);
+				$user_type_style = 'enabled';
+				if(USER_TYPE_ZABBIX_ADMIN == $user['type']) $user_type_style = 'orange';
+				if(USER_TYPE_SUPER_ADMIN == $user['type']) $user_type_style = 'disabled';
+
+				$user_status_style = 'enabled';
+				if(GROUP_GUI_ACCESS_DISABLED == $user['gui_access']) $user_status_style = 'disabled';
+				if(GROUP_STATUS_DISABLED == $user['users_status']) $user_status_style = 'disabled';
+				
+
+				$users[] = new CLink($user['alias'],'users.php?form=update&userid='.$user['userid'], $user_status_style);//, $user_type_style);
 					$users[] = ', ';
 				}
 				array_pop($users);
@@ -447,31 +464,31 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 		$goBox = new CComboBox('go');
 
 		$goOption = new CComboItem('enable_status',S_ENABLE_SELECTED);
-		$goOption->setAttribute('confirm','Enable selected groups?');
+		$goOption->setAttribute('confirm',S_ENABLE_SELECTED_GROUPS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('disable_status',S_DISABLE_SELECTED);
-		$goOption->setAttribute('confirm','Disable selected groups?');
+		$goOption->setAttribute('confirm',S_DISABLE_SELECTED_GROUPS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('enable_api',S_ENABLE_API);
-		$goOption->setAttribute('confirm','Enable API access in selected groups?');
+		$goOption->setAttribute('confirm',S_ENABLE_API_SELECTED_GROUPS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('disable_api',S_DISABLE_API);
-		$goOption->setAttribute('confirm','Disable API access in selected groups?');
+		$goOption->setAttribute('confirm',S_DISABLE_API_SELECTED_GROUPS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('enable_debug',S_ENABLE_DEBUG);
-		$goOption->setAttribute('confirm','Enable debug mode in selected groups?');
+		$goOption->setAttribute('confirm',S_ENABLE_DEBUG_SELECTED_GROUPS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('disable_debug',S_DISABLE_DEBUG);
-		$goOption->setAttribute('confirm','Disable debug mode in selected groups?');
+		$goOption->setAttribute('confirm',S_DISABLE_DEBUG_SELECTED_GROUPS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm','Delete selected groups?');
+		$goOption->setAttribute('confirm',S_DELETE_SELECTED_GROUPS_Q);
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!

@@ -59,7 +59,7 @@ include_once('include/page_header.php');
 
 	if(isset($_REQUEST['add'])){
 		if( !validate_period($_REQUEST['period']) ){
-			error('Icorrect time period');
+			error(S_INCORRECT_TIME_PERIOD);
 		}
 		else{
 			$severity = 0;
@@ -70,7 +70,7 @@ include_once('include/page_header.php');
 			echo '<script language="JavaScript" type="text/javascript"><!--
 					add_media("'.$_REQUEST['dstfrm'].'",'.
 								$_REQUEST['media'].','.
-								$_REQUEST['mediatypeid'].',"'.
+								zbx_jsvalue($_REQUEST['mediatypeid']).',"'.
 								$_REQUEST['sendto'].'","'.
 								$_REQUEST['period'].'",'.
 								$_REQUEST['active'].','.
@@ -141,7 +141,7 @@ include_once('include/page_header.php');
 	$cmbStat = new CComboBox('active',$active);
 	$cmbStat->addItem(0,S_ENABLED);
 	$cmbStat->addItem(1,S_DISABLED);
-	$frmMedia->addRow('Status',$cmbStat);
+	$frmMedia->addRow(S_STATUS,$cmbStat);
 
 	$frmMedia->addItemToBottomRow(new CButton('add', ($media > -1)?S_SAVE:S_ADD));
 	$frmMedia->addItemToBottomRow(SPACE);
