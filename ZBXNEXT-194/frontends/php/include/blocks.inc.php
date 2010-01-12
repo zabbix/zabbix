@@ -385,8 +385,6 @@ return $table;
 function make_hoststat_summary(){
 	global $USER_DETAILS;
 
-	$config = select_config();
-
 	$table = new CTableInfo();
 	$table->setHeader(array(
 		is_show_all_nodes() ? S_NODE : null,
@@ -422,9 +420,10 @@ function make_hoststat_summary(){
 // SELECT TRIGGERS {{{
 	$options = array(
 		'nodeids' => get_current_nodeid(),
-		'hostids' => zbx_objectValues($hosts, 'hostid'),
+		// 'hostids' => zbx_objectValues($hosts, 'hostid'),
 		'output' => API_OUTPUT_EXTEND,
 		'monitored' => 1,
+		'select_hosts' => API_OUTPUT_REFER,
 		'only_problems' => 1,
 	);
 	$triggers = CTrigger::get($options);
@@ -444,6 +443,7 @@ function make_hoststat_summary(){
 		);
 		
 		$problematic_host_list = array();
+		$popup_rows = 0;
 	
 		foreach($hosts as $hnum => $host){
 			foreach($host['groups'] as $hgrnum => $host_group){
@@ -454,6 +454,8 @@ function make_hoststat_summary(){
 					
 					$highest_severity = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 					
+					
+					
 					foreach($triggers as $tnum => $trigger){
 						foreach($trigger['hosts'] as $thnum => $trigger_host){
 							if($trigger_host['hostid'] == $host['hostid']){
@@ -461,24 +463,28 @@ function make_hoststat_summary(){
 								// if $trigger is shown for all hosts it is in, unset it
 								if(empty($trigger['hosts'])) unset($triggers[$tnum]);
 								
-								if(!isset($problematic_host_list[$host['hostid']])){
-									$problematic_host_list[$host['hostid']] = array();
-									$problematic_host_list[$host['hostid']]['host'] = $host['host'];
-									$problematic_host_list[$host['hostid']]['severities'] = array();
-									$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_DISASTER] = 0;
-									$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_HIGH] = 0;
-									$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_AVERAGE] = 0;
-									$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_WARNING] = 0;
-									$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_INFORMATION] = 0;
-									$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_NOT_CLASSIFIED] = 0;
+								if($popup_rows < ZBX_POPUP_MAX_ROWS){
+									if(!isset($problematic_host_list[$host['hostid']])){
+										$problematic_host_list[$host['hostid']] = array();
+										$problematic_host_list[$host['hostid']]['host'] = $host['host'];
+										$problematic_host_list[$host['hostid']]['severities'] = array();
+										$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_DISASTER] = 0;
+										$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_HIGH] = 0;
+										$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_AVERAGE] = 0;
+										$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_WARNING] = 0;
+										$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_INFORMATION] = 0;
+										$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_NOT_CLASSIFIED] = 0;
+									}
+									
+									$problematic_host_list[$host['hostid']]['severities'][$trigger['priority']]++;
+									$popup_rows++;
 								}
-					
 								
 								if($trigger['priority'] > $highest_severity){
 									$highest_severity = $trigger['priority'];
 								}
 								
-								$problematic_host_list[$host['hostid']]['severities'][$trigger['priority']]++;					
+													
 								
 							}
 						}

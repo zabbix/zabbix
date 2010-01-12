@@ -312,7 +312,7 @@ if(defined('USE_PROFILING')){
 		public static function show(){
 // DEBUG of ZBX FrontEnd
 			$debug = new CDiv(null,'textcolorstyles');
-			$debug->setAttribute('id','zbx_gebug_info');
+			$debug->setAttribute('name','zbx_gebug_info');
 			$debug->setAttribute('style','display: none; overflow: auto; width: 95%; border: 1px #777777 solid; margin: 4px; padding: 4px;');
 
 			if(self::$memory_limit_reached){
