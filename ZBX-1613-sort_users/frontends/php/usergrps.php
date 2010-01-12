@@ -428,7 +428,7 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 			if(isset($usrgrp['users'])){
 			
 				$usrgrpusers = $usrgrp['users'];
-				order_result($usrgrpusers, 'name');
+				order_result($usrgrpusers, 'alias');
 				
 				$users = array();
 				foreach($usrgrpusers as $unum => $user){
