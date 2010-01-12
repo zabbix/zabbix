@@ -127,6 +127,7 @@ include_once('include/page_header.php');
 			$options = array(
 				'nodeids'=>get_current_nodeid(true),
 				'itemids'=>$itemids, 
+				'webitems'=>1,
 				'editable'=>1
 			);
 			$db_items = CItem::get($options);

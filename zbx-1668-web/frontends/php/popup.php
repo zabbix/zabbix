@@ -883,7 +883,8 @@ include_once('include/page_header.php');
 
 		$options = array(
 				'nodeids' => $nodeid,
-				'hostids'=> $hostid,
+				'hostids' => $hostid,
+				'webitems' => 1,
 				'extendoutput' => 1,
 				'select_hosts' => 1,
 				'sortfield'=>'description'

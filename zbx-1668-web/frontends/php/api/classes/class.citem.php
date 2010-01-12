@@ -65,7 +65,7 @@ class CItem extends CZBXAPI{
 		$sql_parts = array(
 			'select' => array('items' => 'i.itemid'),
 			'from' => array('items i'),
-			'where' => array('i.type<>9'),
+			'where' => array('webtype' => 'i.type<>9'),
 			'order' => array(),
 			'limit' => null);
 
@@ -77,6 +77,7 @@ class CItem extends CZBXAPI{
 			'graphids'				=> null,
 			'triggerids'			=> null,
 			'applicationids'		=> null,
+			'webitems'				=> null,
 			'inherited'				=> null,
 			'templated'				=> null,
 			'editable'				=> null,
@@ -239,6 +240,11 @@ class CItem extends CZBXAPI{
 			$sql_parts['from']['gi'] = 'graphs_items gi';
 			$sql_parts['where'][] = DBcondition('gi.graphid', $options['graphids']);
 			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
+		}
+
+// webitems
+		if(!is_null($options['webitems'])){
+			unset($sql_parts['where']['webtype']);
 		}
 
 // inherited
