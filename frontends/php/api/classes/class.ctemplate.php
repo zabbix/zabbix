@@ -313,68 +313,68 @@ class CTemplate extends CZBXAPI{
 				else{
 					if(!isset($result[$template['templateid']])) $result[$template['templateid']]= array();
 
-					if($options['select_groups'] && !isset($result[$template['templateid']]['groups'])){
+					if(!is_null($options['select_groups']) && !isset($result[$template['templateid']]['groups'])){
 						$template['groups'] = array();
 					}
 
-					if($options['select_templates'] && !isset($result[$template['templateid']]['templates'])){
+					if(!is_null($options['select_templates']) && !isset($result[$template['templateid']]['templates'])){
 						$template['templates'] = array();
 					}
 
-					if($options['select_hosts'] && !isset($result[$template['templateid']]['hosts'])){
+					if(!is_null($options['select_hosts']) && !isset($result[$template['templateid']]['hosts'])){
 						$template['hosts'] = array();
 					}
 
-					if($options['select_items'] && !isset($result[$template['templateid']]['items'])){
+					if(!is_null($options['select_items']) && !isset($result[$template['templateid']]['items'])){
 						$template['items'] = array();
 					}
 
-					if($options['select_triggers'] && !isset($result[$template['templateid']]['triggers'])){
+					if(!is_null($options['select_triggers']) && !isset($result[$template['templateid']]['triggers'])){
 						$template['triggers'] = array();
 					}
 
-					if($options['select_graphs'] && !isset($result[$template['templateid']]['graphs'])){
+					if(!is_null($options['select_graphs']) && !isset($result[$template['templateid']]['graphs'])){
 						$template['graphs'] = array();
 					}
-					if($options['select_applications'] && !isset($result[$template['templateid']]['applications'])){
+					if(!is_null($options['select_applications']) && !isset($result[$template['templateid']]['applications'])){
 						$template['applications'] = array();
 					}
-					if($options['select_macros'] && !isset($result[$host['hostid']]['macros'])){
+					if(!is_null($options['select_macros']) && !isset($result[$host['hostid']]['macros'])){
 						$template['macros'] = array();
 					}
 
 // groupids
-					if(isset($template['groupid'])){
+					if(isset($template['groupid']) && is_null($options['select_groups'])){
 						if(!isset($result[$template['templateid']]['groups']))
 							$result[$template['templateid']]['groups'] = array();
 
-						$result[$template['templateid']]['groups'][$template['groupid']] = array('groupid' => $template['groupid']);
+						$result[$template['templateid']]['groups'][] = array('groupid' => $template['groupid']);
 						unset($template['groupid']);
 					}
 
 // hostids
-					if(isset($template['linked_hostid'])){
+					if(isset($template['linked_hostid']) && is_null($options['select_hosts'])){
 						if(!isset($result[$template['templateid']]['hosts']))
 							$result[$template['templateid']]['hosts'] = array();
 
-						$result[$template['templateid']]['hosts'][$template['linked_hostid']] = array('hostid' => $template['linked_hostid']);
+						$result[$template['templateid']]['hosts'][] = array('hostid' => $template['linked_hostid']);
 						unset($template['linked_hostid']);
 					}
 
 // itemids
-					if(isset($template['itemid'])){
+					if(isset($template['itemid']) && is_null($options['select_items'])){
 						if(!isset($result[$template['templateid']]['items']))
 							$result[$template['templateid']]['items'] = array();
 
-						$result[$template['templateid']]['items'][$template['itemid']] = array('itemid' => $template['itemid']);
+						$result[$template['templateid']]['items'][] = array('itemid' => $template['itemid']);
 						unset($template['itemid']);
 					}
 
 // graphids
-					if(isset($template['graphid'])){
+					if(isset($template['graphid']) && is_null($options['select_graphs'])){
 						if(!isset($result[$template['templateid']]['graphs'])) $result[$template['templateid']]['graphs'] = array();
 
-						$result[$template['templateid']]['graphs'][$template['graphid']] = array('graphid' => $template['graphid']);
+						$result[$template['templateid']]['graphs'][] = array('graphid' => $template['graphid']);
 						unset($template['graphid']);
 					}
 

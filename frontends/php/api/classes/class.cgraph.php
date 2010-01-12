@@ -310,33 +310,33 @@ class CGraph extends CZBXAPI{
 					if(!isset($result[$graph['graphid']]))
 						$result[$graph['graphid']]= array();
 
-					if($options['select_hosts'] && !isset($result[$graph['graphid']]['hosts'])){
+					if(!is_null($options['select_hosts']) && !isset($result[$graph['graphid']]['hosts'])){
 						$result[$graph['graphid']]['hosts'] = array();
 					}
-					if($options['select_graph_items'] && !isset($result[$graph['graphid']]['gitems'])){
+					if(!is_null($options['select_graph_items']) && !isset($result[$graph['graphid']]['gitems'])){
 						$result[$graph['graphid']]['gitems'] = array();
 					}
-					if($options['select_templates'] && !isset($result[$graph['graphid']]['templates'])){
+					if(!is_null($options['select_templates']) && !isset($result[$graph['graphid']]['templates'])){
 						$result[$graph['graphid']]['templates'] = array();
 					}
-					if($options['select_items'] && !isset($result[$graph['graphid']]['items'])){
+					if(!is_null($options['select_items']) && !isset($result[$graph['graphid']]['items'])){
 						$result[$graph['graphid']]['items'] = array();
 					}
 
 // hostids
-					if(isset($graph['hostid'])){
+					if(isset($graph['hostid']) && is_null($options['select_hosts'])){
 						if(!isset($result[$graph['graphid']]['hosts']))
 							$result[$graph['graphid']]['hosts'] = array();
 
-						$result[$graph['graphid']]['hosts'][$graph['hostid']] = array('hostid' => $graph['hostid']);
+						$result[$graph['graphid']]['hosts'][] = array('hostid' => $graph['hostid']);
 						unset($graph['hostid']);
 					}
 // itemids
-					if(isset($graph['itemid'])){
+					if(isset($graph['itemid']) && is_null($options['select_items'])){
 						if(!isset($result[$graph['graphid']]['items']))
 							$result[$graph['graphid']]['items'] = array();
 
-						$result[$graph['graphid']]['items'][$graph['itemid']] = array('itemid' => $graph['itemid']);
+						$result[$graph['graphid']]['items'][] = array('itemid' => $graph['itemid']);
 						unset($graph['itemid']);
 					}
 

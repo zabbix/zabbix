@@ -234,28 +234,28 @@ class Cscript extends CZBXAPI{
 					if(!isset($result[$script['scriptid']]))
 						$result[$script['scriptid']] = array();
 
-					if($options['select_groups'] && !isset($result[$script['scriptid']]['groups'])){
+					if(!is_null($options['select_groups']) && !isset($result[$script['scriptid']]['groups'])){
 						$result[$script['scriptid']]['groups'] = array();
 					}
 
-					if($options['select_hosts'] && !isset($result[$script['scriptid']]['hosts'])){
+					if(!is_null($options['select_hosts']) && !isset($result[$script['scriptid']]['hosts'])){
 						$result[$script['scriptid']]['hosts'] = array();
 					}
 
 // groupids
-					if(isset($script['groupid'])){
+					if(isset($script['groupid']) && is_null($options['select_groups'])){
 						if(!isset($result[$script['scriptid']]['groups']))
 							$result[$script['scriptid']]['groups'] = array();
 
-						$result[$script['scriptid']]['groups'][$script['groupid']] = array('groupid' => $script['groupid']);
+						$result[$script['scriptid']]['groups'][] = array('groupid' => $script['groupid']);
 					}
 
 // hostids
-					if(isset($script['hostid'])){
+					if(isset($script['hostid']) && is_null($options['select_hosts'])){
 						if(!isset($result[$script['scriptid']]['hosts']))
 							$result[$script['scriptid']]['hosts'] = array();
 
-						$result[$script['scriptid']]['hosts'][$script['hostid']] = array('hostid' => $script['hostid']);
+						$result[$script['scriptid']]['hosts'][] = array('hostid' => $script['hostid']);
 						unset($script['hostid']);
 					}
 

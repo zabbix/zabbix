@@ -84,6 +84,7 @@ class CApplication extends CZBXAPI{
 			'output'				=> API_OUTPUT_REFER,
 			'extendoutput'			=> null,
 			'expand_data'			=> null,
+			'select_hosts'			=> null,
 			'select_items'			=> null,
 			'count'					=> null,
 			'preservekeys'			=> null,
@@ -259,25 +260,29 @@ class CApplication extends CZBXAPI{
 						$result[$application['applicationid']]= array();
 
 
-					if($options['select_items'] && !isset($result[$application['applicationid']]['items'])){
+					if(!is_null($options['select_hosts']) && !isset($result[$application['applicationid']]['hosts'])){
+						$result[$application['applicationid']]['hosts'] = array();
+					}
+
+					if(!is_null($options['select_items']) && !isset($result[$application['applicationid']]['items'])){
 						$result[$application['applicationid']]['items'] = array();
 					}
 
 // hostids
-					if(isset($application['hostid']) && !is_null($options['hostids'])){
+					if(isset($application['hostid']) && is_null($options['select_hosts'])){
 						if(!isset($result[$application['applicationid']]['hosts']))
 							$result[$application['applicationid']]['hosts'] = array();
 
-						$result[$application['applicationid']]['hosts'][$application['hostid']] = array('hostid' => $application['hostid']);
+						$result[$application['applicationid']]['hosts'][] = array('hostid' => $application['hostid']);
 						unset($application['hostid']);
 					}
 
 // itemids
-					if(isset($application['itemid'])){
+					if(isset($application['itemid']) && is_null($options['select_items'])){
 						if(!isset($result[$application['applicationid']]['items']))
 							$result[$application['applicationid']]['items'] = array();
 
-						$result[$application['applicationid']]['items'][$application['itemid']] = array('itemid' => $application['itemid']);
+						$result[$application['applicationid']]['items'][] = array('itemid' => $application['itemid']);
 						unset($application['itemid']);
 					}
 
@@ -289,6 +294,25 @@ class CApplication extends CZBXAPI{
 		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
+		}
+
+// Adding Objects
+// Adding Hosts
+		if(!is_null($options['select_hosts']) && str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+			$obj_params = array(
+				'output' => $options['select_hosts'], 
+				'applicationids' => $applicationids, 
+				'nopermissions' => 1, 
+				'preservekeys' => 1
+			);
+			$hosts = CHost::get($obj_params);
+			foreach($hosts as $hostid => $host){
+				$iapplications = $host['applications'];
+				unset($host['applications']);
+				foreach($iapplications as $num => $application){
+					$result[$application['applicationid']]['hosts'][] = $host;
+				}
+			}
 		}
 
 // Adding Objects

@@ -1493,10 +1493,10 @@
 
 // generate array with values for subfilters of selected items
 		foreach($items as $num => $item){
-
 			if(zbx_empty($filter_host)){
 // hosts
 				$host = reset($item['hosts']);
+
 				if(!isset($item_params['hosts'][$host['hostid']])){
 					$item_params['hosts'][$host['hostid']] = array('name' => $host['host'], 'count' => 0);
 				}
