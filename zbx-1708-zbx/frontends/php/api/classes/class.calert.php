@@ -347,6 +347,7 @@ class CAlert extends CZBXAPI{
 				' WHERE '.DBin_node('a.alertid', $nodeids).
 					$sql_where.
 				$sql_order;
+//SDI($sql);
 		$db_res = DBselect($sql, $sql_limit);
 		while($alert = DBfetch($db_res)){
 			if($options['count'])
@@ -376,7 +377,7 @@ class CAlert extends CZBXAPI{
 							$result[$alert['alertid']]['hosts'] = array();
 
 						$result[$alert['alertid']]['hosts'][] = array('hostid' => $alert['hostid']);
-						unset($alert['hostid']);
+//						unset($alert['hostid']);
 					}
 // userids
 					if(isset($alert['userid']) && is_null($options['select_users'])){
@@ -438,7 +439,7 @@ class CAlert extends CZBXAPI{
 		}
 
 		foreach($result as $alertid => $alert){
-			if(isset($hosts[$alert['hostid']])){
+			if(isset($alert['hostid']) && isset($hosts[$alert['hostid']])){
 				$result[$alertid]['hosts'][] = $hosts[$alert['hostid']];
 			}
 

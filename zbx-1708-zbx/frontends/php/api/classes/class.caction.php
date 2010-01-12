@@ -388,6 +388,7 @@ class CAction extends CZBXAPI{
 				' WHERE '.DBin_node('a.actionid', $nodeids).
 					$sql_where.
 				$sql_order;
+//SDI($sql);
 		$db_res = DBselect($sql, $sql_limit);
 		while($action = DBfetch($db_res)){
 
