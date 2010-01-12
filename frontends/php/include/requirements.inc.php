@@ -333,7 +333,7 @@
 		
 		if(is_callable('gd_info')){
 			$gd_info = gd_info();
-			preg_match('/(\d.?)+/', $gd_info['GD Version'], $current);
+			preg_match('/(\d\.?)+/', $gd_info['GD Version'], $current);
 			$current = $current[0];
 		}
 		
