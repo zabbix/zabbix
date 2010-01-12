@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1573] fixed colon precedence in user right entries (Aly)
  - [ZBX-1708] fixed errors in log items history screen (Aly)
  - [ZBX-1715] fixed errors in IT Services parent selection sceren (Aly)
  - [ZBX-1652] fixed user media deletion on profile save (Aly)
