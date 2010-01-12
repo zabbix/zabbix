@@ -416,80 +416,80 @@ class CHost extends CZBXAPI{
 				else{
 					if(!isset($result[$host['hostid']])) $result[$host['hostid']]= array();
 
-					if($options['select_groups'] && !isset($result[$host['hostid']]['groups'])){
+					if(!is_null($options['select_groups']) && !isset($result[$host['hostid']]['groups'])){
 						$result[$host['hostid']]['groups'] = array();
 					}
 
-					if($options['select_templates'] && !isset($result[$host['hostid']]['templates'])){
+					if(!is_null($options['select_templates']) && !isset($result[$host['hostid']]['templates'])){
 						$result[$host['hostid']]['templates'] = array();
 					}
 
-					if($options['select_items'] && !isset($result[$host['hostid']]['items'])){
+					if(!is_null($options['select_items']) && !isset($result[$host['hostid']]['items'])){
 						$result[$host['hostid']]['items'] = array();
 					}
-					if($options['select_profile'] && !isset($result[$host['hostid']]['profile'])){
+					if(!is_null($options['select_profile']) && !isset($result[$host['hostid']]['profile'])){
 						$result[$host['hostid']]['profile'] = array();
 						$result[$host['hostid']]['profile_ext'] = array();
 					}
 
-					if($options['select_triggers'] && !isset($result[$host['hostid']]['triggers'])){
+					if(!is_null($options['select_triggers']) && !isset($result[$host['hostid']]['triggers'])){
 						$result[$host['hostid']]['triggers'] = array();
 					}
 
-					if($options['select_graphs'] && !isset($result[$host['hostid']]['graphs'])){
+					if(!is_null($options['select_graphs']) && !isset($result[$host['hostid']]['graphs'])){
 						$result[$host['hostid']]['graphs'] = array();
 					}
 
-					if($options['select_applications'] && !isset($result[$host['hostid']]['applications'])){
+					if(!is_null($options['select_applications']) && !isset($result[$host['hostid']]['applications'])){
 						$result[$host['hostid']]['applications'] = array();
 					}
 
-					if($options['select_macros'] && !isset($result[$host['hostid']]['macros'])){
+					if(!is_null($options['select_macros']) && !isset($result[$host['hostid']]['macros'])){
 						$result[$host['hostid']]['macros'] = array();
 					}
 
 // groupids
-					if(isset($host['groupid'])){
+					if(isset($host['groupid']) && is_null($options['select_groups'])){
 						if(!isset($result[$host['hostid']]['groups']))
 							$result[$host['hostid']]['groups'] = array();
 
-						$result[$host['hostid']]['groups'][$host['groupid']] = array('groupid' => $host['groupid']);
+						$result[$host['hostid']]['groups'][] = array('groupid' => $host['groupid']);
 						unset($host['groupid']);
 					}
 
 // templateids
-					if(isset($host['templateid'])){
+					if(isset($host['templateid']) && is_null($options['select_templates'])){
 						if(!isset($result[$host['hostid']]['templates']))
 							$result[$host['hostid']]['templates'] = array();
 
-						$result[$host['hostid']]['templates'][$host['templateid']] = array('templateid' => $host['templateid']);
+						$result[$host['hostid']]['templates'][] = array('templateid' => $host['templateid']);
 						unset($host['templateid']);
 					}
 
 // triggerids
-					if(isset($host['triggerid'])){
+					if(isset($host['triggerid']) && is_null($options['select_triggers'])){
 						if(!isset($result[$host['hostid']]['triggers']))
 							$result[$host['hostid']]['triggers'] = array();
 
-						$result[$host['hostid']]['triggers'][$host['triggerid']] = array('triggerid' => $host['triggerid']);
+						$result[$host['hostid']]['triggers'][] = array('triggerid' => $host['triggerid']);
 						unset($host['triggerid']);
 					}
 
 // itemids
-					if(isset($host['itemid'])){
+					if(isset($host['itemid']) && is_null($options['select_items'])){
 						if(!isset($result[$host['hostid']]['items']))
 							$result[$host['hostid']]['items'] = array();
 
-						$result[$host['hostid']]['items'][$host['itemid']] = array('itemid' => $host['itemid']);
+						$result[$host['hostid']]['items'][] = array('itemid' => $host['itemid']);
 						unset($host['itemid']);
 					}
 
 // graphids
-					if(isset($host['graphid'])){
+					if(isset($host['graphid']) && is_null($options['select_graphs'])){
 						if(!isset($result[$host['hostid']]['graphs']))
 							$result[$host['hostid']]['graphs'] = array();
 
-						$result[$host['hostid']]['graphs'][$host['graphid']] = array('graphid' => $host['graphid']);
+						$result[$host['hostid']]['graphs'][] = array('graphid' => $host['graphid']);
 						unset($host['graphid']);
 					}
 

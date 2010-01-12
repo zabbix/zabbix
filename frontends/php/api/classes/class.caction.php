@@ -388,6 +388,7 @@ class CAction extends CZBXAPI{
 				' WHERE '.DBin_node('a.actionid', $nodeids).
 					$sql_where.
 				$sql_order;
+//SDI($sql);
 		$db_res = DBselect($sql, $sql_limit);
 		while($action = DBfetch($db_res)){
 
@@ -403,7 +404,7 @@ class CAction extends CZBXAPI{
 				else{
 					if(!isset($result[$action['actionid']])) $result[$action['actionid']]= array();
 
-					if($options['select_conditions'] && !isset($result[$action['actionid']]['conditions'])){
+					if(!is_null($options['select_conditions']) && !isset($result[$action['actionid']]['conditions'])){
 						$result[$action['actionid']]['conditions'] = array();
 					}
 
