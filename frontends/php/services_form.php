@@ -235,7 +235,7 @@ if(isset($_REQUEST['pservices'])){
 		$description = $db_service_data['name'];
 
 		$description = new CSpan($description,'link');
-		$description->setAction('javascript:
+		$description->setAttribute('onclick', 'javascript:
 						window.opener.document.forms[0].elements[\'parent_name\'].value = '.zbx_jsvalue($db_service_data['name']).';
 						window.opener.document.forms[0].elements[\'parentname\'].value = '.zbx_jsvalue($db_service_data['name']).';
 						window.opener.document.forms[0].elements[\'parentid\'].value = '.zbx_jsvalue($db_service_data['serviceid']).';
