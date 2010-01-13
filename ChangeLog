@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1577] fixed pie chart display (Aly)
  - [ZBX-1613] added sorting for user groups members (Vedmak)
  - [ZBX-1734] changed severity coloring in events screen (Aly)
  - [ZBX-1573] fixed colon precedence in user right entries (Aly)
