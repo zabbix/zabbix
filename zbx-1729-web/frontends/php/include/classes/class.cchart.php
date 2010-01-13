@@ -432,7 +432,7 @@ class CChart extends CGraphDraw{
 		$cnt = 0;
 
 		foreach($this->items as $inum => $item){
-			$sql = 'SELECT distinct tr.triggerid,tr.expression,tr.priority '.
+			$sql = 'SELECT distinct tr.triggerid,tr.expression,tr.priority, tr.value '.
 					' FROM triggers tr,functions f,items i'.
 					' WHERE tr.triggerid=f.triggerid '.
 						" AND f.function IN ('last','min','avg','max') ".
@@ -461,10 +461,12 @@ class CChart extends CGraphDraw{
 
 //				if($val <= $minY || $val >= $maxY)	continue;
 //SDI($item['itemid']);
-				if($trigger['priority'] == 5)		$color = 'Priority Disaster';
-				elseif($trigger['priority'] == 4)	$color = 'Priority High';
-				elseif($trigger['priority'] == 3)	$color = 'Priority Average';
-				else 								$color = 'Priority';
+				$color = 'Priority';
+				if($trigger['value'] == TRIGGER_VALUE_TRUE){
+					if($trigger['priority'] == 5)		$color = 'Priority Disaster';
+					else if($trigger['priority'] == 4)	$color = 'Priority High';
+					else if($trigger['priority'] == 3)	$color = 'Priority Average';
+				}
 	
 				array_push($this->triggers,array(
 					'y' => $this->sizeY - (($val-$minY) / ($maxY-$minY)) * $this->sizeY + $this->shiftY,

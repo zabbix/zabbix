@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1729] removed limitation of showings triggers in charts only by one item (Aly)
  - [ZBX-1729] removed excesive space in chart header,  informational messages (triggers, percentile) are separated (Aly)
  - [ZBX-1734] changed severity coloring in events screen (Aly)
  - [ZBX-1573] fixed colon precedence in user right entries (Aly)
