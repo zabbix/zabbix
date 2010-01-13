@@ -243,7 +243,7 @@ include_once('include/page_header.php');
 	if(TRIGGERS_OPTION_ONLYTRUE){
 		$tr_select->additem(TRIGGERS_OPTION_ONLYTRUE, S_SHOW_ONLY_PROBLEMS);
 	}
-	if(TRIGGERS_OPTION_SHOW_ALL_WITH_UNACKNOWLEDGED){
+	if(TRIGGERS_OPTION_SHOW_ALL_WITH_UNACKNOWLEDGED && $config['event_ack_enable']){
 		$tr_select->addItem(TRIGGERS_OPTION_SHOW_ALL_WITH_UNACKNOWLEDGED, S_SHOW_ALL_WITH_UNACKNOWLEDGED);
 	}
 
@@ -339,15 +339,14 @@ include_once('include/page_header.php');
 		'extendoutput' => 1,
 		'sortfield' => $sortfield,
 		'sortorder' => $sortorder,
-		'limit' => ($config['search_limit']+1),
-		'preservekeys' => 1
+		'limit' => ($config['search_limit']+1)
 	);
 
 // Filtering
 	if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
 		$options['hostids'] = $PAGE_HOSTS['selected'];
 	}
-	else if(!empty($PAGE_HOSTS['hostids'])){
+	else if(($PAGE_GROUPS['selected'] > 0) && !empty($PAGE_HOSTS['hostids'])){
 		$options['hostids'] = $PAGE_HOSTS['hostids'];
 	}
 	else if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
@@ -361,11 +360,14 @@ include_once('include/page_header.php');
 	if($show_triggers == TRIGGERS_OPTION_ONLYTRUE){
 		$options['only_true'] = 1;
 	}
+	if($show_triggers == TRIGGERS_OPTION_SHOW_ALL_WITH_UNACKNOWLEDGED){
+		$options['with_unacknowledged_events'] = 1;
+	}
 	if($show_severity > -1){
 		$options['min_severity'] = $show_severity;
 	}
-	$triggers = CTrigger::get($options);
 
+	$triggers = CTrigger::get($options);
 
 // sorting && paging
 	order_result($triggers, $sortfield, $sortorder);
@@ -373,32 +375,38 @@ include_once('include/page_header.php');
 
 	$options = array(
 		'nodeids' => get_current_nodeid(),
-		'triggerids' => array_keys($triggers),
+		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 		'extendoutput' => 1,
 		'select_hosts' => 1,
-		'select_items' => 1,
-		'preservekeys' => 1
+		'select_items' => 1
 	);
 	$triggers = CTrigger::get($options);
+	$triggers = zbx_toHash($triggers, 'triggerid');
+
 	order_result($triggers, $sortfield, $sortorder);
 //---------
 
-
+	if($config['event_ack_enable']){
+		foreach($triggers as $tnum => $trigger){
+			$options = array(
+				'count' => 1,
+				'triggerids' => $trigger['triggerid'],
+				'acknowledged' => 0,
+				'nopermissions' => 1
+			);
+			$event_count = CEvent::get($options);
+			
+			$triggers[$tnum]['event_count'] = $event_count['rowscount'];
+			$triggers[$tnum]['events'] = array();
+		}
+	}
+	
 	$trigger_hosts = array();
 	foreach($triggers as $tnum => $trigger){
-		$event_count = CEvent::get(array(
-			'count' => 1,
-			'triggerids' => $trigger['triggerid'],
-			'acknowledged' => 0,
-			'nopermissions' => 1));
-		$triggers[$tnum]['event_count'] = $event_count['rowscount'];
-
 		$trigger_hosts = array_merge($trigger_hosts, $trigger['hosts']);
-		$triggers[$tnum]['events'] = array();
 	}
 
-	$trigger_hosts = zbx_toHash($trigger_hosts, 'hostid');
-	$trigger_hostids = array_keys($trigger_hosts);
+	$trigger_hostids = zbx_objectValues($trigger_hosts, 'hostid');
 
 	$scripts_by_hosts = Cscript::getScriptsByHosts($trigger_hostids);
 
@@ -412,9 +420,9 @@ include_once('include/page_header.php');
 			'sortorder' => ZBX_SORT_DOWN,
 			'time_from' => time() - ($config['event_expire']*86400),
 			'time_till' => time(),
-			'preservekeys' => 1,
 			//'limit' => $config['event_show_max']
 		);
+
 		switch($show_events){
 			case EVENTS_OPTION_ALL:
 			break;
@@ -437,8 +445,6 @@ include_once('include/page_header.php');
 
 
 	foreach($triggers as $tnum => $trigger){
-		if(($show_triggers == TRIGGERS_OPTION_SHOW_ALL_WITH_UNACKNOWLEDGED) && ($trigger['event_count'] == 0)) continue;
-		
 		$trigger['desc'] = $description = expand_trigger_description($trigger['triggerid']);
 
 // Items
