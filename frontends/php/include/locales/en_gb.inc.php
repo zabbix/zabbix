@@ -1443,6 +1443,7 @@
 	'S_LAST_365_DAYS'=>			'Last 365 days',
 
 //	triggers.php
+	'S_SHOW_ALL_WITH_UNACKNOWLEDGED' => 'Show triggers with unacknowledged events',
 	'S_NO_TRIGGER'=>			'No trigger',
 	'S_NO_TRIGGERS_DEFINED'=>		'No triggers defined',
 	'S_NO_TRIGGER_DEFINED'=>		'No trigger defined',
