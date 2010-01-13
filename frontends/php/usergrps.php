@@ -425,10 +425,13 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 				$users_status = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED)? new CSpan(S_ENABLED, 'enabled') : new CSpan(S_DISABLED, 'disabled');
 			}
 
-			$users = array();
-			order_result($usrgrp['users'], 'alias');
-
-			foreach($usrgrp['users'] as $unum => $user){
+			if(isset($usrgrp['users'])){
+			
+				$usrgrpusers = $usrgrp['users'];
+				order_result($usrgrpusers, 'alias');
+				
+				$users = array();
+				foreach($usrgrpusers as $unum => $user){
 				$user_type_style = 'enabled';
 				if(USER_TYPE_ZABBIX_ADMIN == $user['type']) $user_type_style = 'orange';
 				if(USER_TYPE_SUPER_ADMIN == $user['type']) $user_type_style = 'disabled';
@@ -439,10 +442,11 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 				
 
 				$users[] = new CLink($user['alias'],'users.php?form=update&userid='.$user['userid'], $user_status_style);//, $user_type_style);
-				$users[] = ', ';
-			}
-			array_pop($users);
+					$users[] = ', ';
+				}
+				array_pop($users);
 
+			}
 
 			$table->addRow(array(
 				new CCheckBox('group_groupid['.$usrgrpid.']', NULL, NULL, $usrgrpid),
