@@ -372,7 +372,9 @@ function zbx_date2age($start_date,$end_date=0,$utime = false){
 			(($hours && !$years && !$months)?$hours.S_HOUR_SHORT.' ':'').
 			(($minutes && !$years && !$months && !$weeks)?$minutes.S_MINUTE_SHORT.' ':'').
 			((!$years && !$months && !$weeks && !$days && ($ms || $seconds))?$seconds.S_SECOND_SHORT.' ':'').
-			(($ms && !$years && !$months && !$weeks && !$days && !$hours)?$ms.S_MILLISECOND_SHORT:'');return $str;
+			(($ms && !$years && !$months && !$weeks && !$days && !$hours)?$ms.S_MILLISECOND_SHORT:'');
+
+return trim($str,' ');			
 }
 
 function getmicrotime(){
