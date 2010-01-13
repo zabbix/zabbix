@@ -210,7 +210,7 @@ class CGraphItem extends CZBXAPI{
 						$result[$gitem['gitemid']]= array();
 
 // graphids
-					if(isset($gitem['graphid']) && !is_null($options['select_graphs'])){
+					if(isset($gitem['graphid']) && is_null($options['select_graphs'])){
 						if(!isset($result[$gitem['gitemid']]['graphs'])) $result[$gitem['gitemid']]['graphs'] = array();
 
 						$result[$gitem['gitemid']]['graphs'][] = array('graphid' => $gitem['graphid']);
