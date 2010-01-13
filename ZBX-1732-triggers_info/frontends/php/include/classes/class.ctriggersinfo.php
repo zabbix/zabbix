@@ -26,15 +26,16 @@ class CTriggersInfo extends CTable{
  public $style;
  public $show_header;
  public $nodeid;
+ public $groupid;
 
-	public function __construct($style = STYLE_HORISONTAL){
+	public function __construct($groupid=0, $style = STYLE_HORISONTAL){
 		$this->style = null;
 
 		parent::__construct(NULL,'triggers_info');
 		$this->setOrientation($style);
 		$this->show_header = true;
-		$this->nodeid = get_current_nodeid();
-		$this->groupid = 0;
+		$this->nodeid = id2nodeid($groupid);;
+		$this->groupid = $groupid;
 	}
 
 	public function setOrientation($value){
