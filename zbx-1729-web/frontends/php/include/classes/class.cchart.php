@@ -459,7 +459,7 @@ class CChart extends CGraphDraw{
 				$minY = $this->m_minY[$this->items[0]['axisside']];
 				$maxY = $this->m_maxY[$this->items[0]['axisside']];
 
-				if($val <= $minY || $val >= $maxY)	continue;
+//				if($val <= $minY || $val >= $maxY)	continue;
 //SDI($item['itemid']);
 				if($trigger['priority'] == 5)		$color = 'Priority Disaster';
 				elseif($trigger['priority'] == 4)	$color = 'Priority High';
