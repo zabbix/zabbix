@@ -55,8 +55,12 @@ include_once('include/page_header.php');
 	if(empty($db_data)) access_deny();
 	else $db_data = reset($db_data);
 
-	$host = CHost::get(array('graphids' => $_REQUEST['graphid'], 'extendoutput' => 1, 'nodeids' => get_current_nodeid(true)));
-
+	$options = array(
+			'graphids' => $_REQUEST['graphid'], 
+			'extendoutput' => 1, 
+			'nodeids' => get_current_nodeid(true)
+		);
+	$host = CHost::get($options);
 	$host = reset($host);
 
 	$effectiveperiod = navigation_bar_calc();
