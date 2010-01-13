@@ -49,9 +49,17 @@ include_once 'include/page_header.php';
 		show_error_message(S_NO_GRAPH_DEFINED);
 	}
 
+	$options = array(
+			'graphids' => $_REQUEST['graphid'],
+			'select_hosts' => 1,
+			'extendoutput' => 1
+		);
+
 	$db_data = CGraph::get($options);
 	if(empty($db_data)) access_deny();
 	else $db_data = reset($db_data);
+
+	$host = reset($db_data['hosts']);
 
 	$effectiveperiod = navigation_bar_calc();
 
@@ -70,7 +78,7 @@ include_once 'include/page_header.php';
 
 	$graph->setWidth($width);
 	$graph->setHeight($height);
-	$graph->setHeader($db_data['host'].':'.$db_data['name']);
+	$graph->setHeader($host['host'].':'.$db_data['name']);
 
 	if($db_data['show_3d'] == 1) $graph->switchPie3D();
 	$graph->switchLegend($db_data['show_legend']);
