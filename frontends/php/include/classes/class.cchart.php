@@ -426,53 +426,57 @@ class CChart extends CGraphDraw{
 	protected function calcTriggers(){
 		$this->triggers = array();
 		if($this->m_showTriggers != 1) return;
-		if($this->num != 1) return; // skip multiple graphs
+//		if($this->num != 1) return; // skip multiple graphs
 
 		$max = 3;
 		$cnt = 0;
 
-		$sql = 'SELECT distinct tr.triggerid,tr.expression,tr.priority '.
-				' FROM triggers tr,functions f,items i'.
-				' WHERE tr.triggerid=f.triggerid '.
-					" AND f.function IN ('last','min','avg','max') ".
-					' AND tr.status='.TRIGGER_STATUS_ENABLED.
-					' AND i.itemid=f.itemid '.
-					' AND f.itemid='.$this->items[0]['itemid'].
-				' ORDER BY tr.priority';
-		$db_triggers = DBselect($sql);
-		while(($trigger = DBfetch($db_triggers)) && ($cnt < $max)){
-			$db_fnc_cnt = DBselect('SELECT count(*) as cnt FROM functions f WHERE f.triggerid='.$trigger['triggerid']);
-			$fnc_cnt = DBfetch($db_fnc_cnt);
-			if($fnc_cnt['cnt'] != 1) continue;
+		foreach($this->items as $inum => $item){
+			$sql = 'SELECT distinct tr.triggerid,tr.expression,tr.priority, tr.value '.
+					' FROM triggers tr,functions f,items i'.
+					' WHERE tr.triggerid=f.triggerid '.
+						" AND f.function IN ('last','min','avg','max') ".
+						' AND tr.status='.TRIGGER_STATUS_ENABLED.
+						' AND i.itemid=f.itemid '.
+						' AND f.itemid='.$item['itemid'].
+					' ORDER BY tr.priority';
+			$db_triggers = DBselect($sql);
+			while(($trigger = DBfetch($db_triggers)) && ($cnt < $max)){
+				$db_fnc_cnt = DBselect('SELECT count(*) as cnt FROM functions f WHERE f.triggerid='.$trigger['triggerid']);
+				$fnc_cnt = DBfetch($db_fnc_cnt);
 
-			CUserMacro::resolveTrigger($trigger);
+				if($fnc_cnt['cnt'] != 1) continue;
 
-//			if(!eregi('\{([0-9]{1,})\}([\<\>\=]{1})([0-9\.]{1,})([K|M|G]{0,1})',$trigger['expression'],$arr)) continue;
-			if(!preg_match('/\{([0-9]{1,})\}([\<\>\=]{1})([0-9\.]{1,})([K|M|G]{0,1})/i', $trigger['expression'], $arr)) continue;
+				CUserMacro::resolveTrigger($trigger);
+//SDII($trigger);
+				if(!preg_match('/\{([0-9]{1,})\}([\<\>\=]{1})([0-9\.]{1,})([K|M|G]{0,1})/i', $trigger['expression'], $arr)) continue;
+	
+				$val = $arr[3];
+				if(strcasecmp($arr[4],'K') == 0)	$val *= 1024;
+				else if(strcasecmp($arr[4],'M') == 0)	$val *= 1048576; //1024*1024;
+				else if(strcasecmp($arr[4],'G') == 0)	$val *= 1073741824; //1024*1024*1024;
+	
+				$minY = $this->m_minY[$this->items[0]['axisside']];
+				$maxY = $this->m_maxY[$this->items[0]['axisside']];
 
-			$val = $arr[3];
-			if(strcasecmp($arr[4],'K') == 0)	$val *= 1024;
-			else if(strcasecmp($arr[4],'M') == 0)	$val *= 1048576; //1024*1024;
-			else if(strcasecmp($arr[4],'G') == 0)	$val *= 1073741824; //1024*1024*1024;
-
-			$minY = $this->m_minY[$this->items[0]['axisside']];
-			$maxY = $this->m_maxY[$this->items[0]['axisside']];
-
-			if($val <= $minY || $val >= $maxY)	continue;
-
-			if($trigger['priority'] == 5)		$color = 'Priority Disaster';
-			elseif($trigger['priority'] == 4)	$color = 'Priority High';
-			elseif($trigger['priority'] == 3)	$color = 'Priority Average';
-			else 					$color = 'Priority';
-
-			array_push($this->triggers,array(
-				'y' => $this->sizeY - (($val-$minY) / ($maxY-$minY)) * $this->sizeY + $this->shiftY,
-				'color' => $color,
-				'description' => 'trigger: '.expand_trigger_description($trigger['triggerid']).' ['.$arr[2].' '.$arr[3].$arr[4].']'
-				));
-			++$cnt;
+//				if($val <= $minY || $val >= $maxY)	continue;
+//SDI($item['itemid']);
+				$color = 'Priority';
+				if($trigger['value'] == TRIGGER_VALUE_TRUE){
+					if($trigger['priority'] == 5)		$color = 'Priority Disaster';
+					else if($trigger['priority'] == 4)	$color = 'Priority High';
+					else if($trigger['priority'] == 3)	$color = 'Priority Average';
+				}
+	
+				array_push($this->triggers,array(
+					'y' => $this->sizeY - (($val-$minY) / ($maxY-$minY)) * $this->sizeY + $this->shiftY,
+					'color' => $color,
+					'description' => 'trigger: '.expand_trigger_description($trigger['triggerid']),
+					'constant' => '['.$arr[2].' '.$arr[3].$arr[4].']'
+					));
+				++$cnt;
+			}
 		}
-
 	}
 
 //Calculates percentages for left & right y axis
@@ -1146,7 +1150,6 @@ class CChart extends CGraphDraw{
 						$this->getColor($this->graphtheme['textcolor'],0),
 						$str
 			);
-
 		}
 
 // First && Last
@@ -1388,9 +1391,9 @@ class CChart extends CGraphDraw{
 
 	protected function drawTriggers(){
 		if($this->m_showTriggers != 1) return;
-		if($this->num != 1) return; // skip multiple graphs
+//		if($this->num != 1) return; // skip multiple graphs
 
-		foreach($this->triggers as $trigger){
+		foreach($this->triggers as $tnum => $trigger){
 			dashedline(
 				$this->im,
 				$this->shiftXleft,
@@ -1453,6 +1456,7 @@ class CChart extends CGraphDraw{
 					$units['left'] = $this->items[$i]['units'];
 				else
 					$units['right'] = $this->items[$i]['units'];
+
 				$legend->addCell($colNum, array('text' => $item_caption));
 				$legend->addCell($colNum, array('text' => '['.$fnc_name.']'));
 				$legend->addCell($colNum, array('text' => convert_units($this->getLastValue($i),$this->items[$i]['units']), 'align'=> 2));
@@ -1465,7 +1469,7 @@ class CChart extends CGraphDraw{
 //				$legend->addCell($colNum,array('text' => $this->items[$i]['host'].': '.$this->items[$i]['description']));
 				$legend->addCell($colNum,array('text' => '[ '. S_NO_DATA_SMALL . ' ]'));
 			}
-
+			
 			imagefilledrectangle($this->im,
 							$leftXShift - 5,
 							$this->sizeY+$this->shiftY+14*$colNum+$this->legendOffsetY-10,
@@ -1488,10 +1492,20 @@ class CChart extends CGraphDraw{
 			else $i++;
 		}
 
+		$legend->draw();
+
 		if($this->sizeY < 100){
-			$legend->draw();
-			return ;
+			return true;
 		}
+
+		$legend = new CImageTextTable(
+				$this->im, 
+				$leftXShift+10, 
+				$this->sizeY+$this->shiftY+14*$colNum+$this->legendOffsetY
+			);
+		$legend->color = $this->getColor($this->graphtheme['textcolor'], 0);
+		$legend->rowheight = 14;
+		$legend->fontsize = 9;
 
 // Draw percentile
 		if($this->type == GRAPH_TYPE_NORMAL){
@@ -1535,23 +1549,41 @@ class CChart extends CGraphDraw{
 			}
 		}
 
+		$legend->draw();
+
+		$legend = new CImageTextTable(
+				$this->im, 
+				$leftXShift+10, 
+				$this->sizeY+$this->shiftY+14*$colNum+$this->legendOffsetY + 5
+			);
+		$legend->color = $this->getColor($this->graphtheme['textcolor'], 0);
+		$legend->rowheight = 14;
+		$legend->fontsize = 9;
+
 // Draw triggers
+//SDII($this->triggers);
 		foreach($this->triggers as $trigger){
 			imagefilledellipse($this->im,
 				$leftXShift,
-				$this->sizeY+$this->shiftY+12*$colNum+$this->legendOffsetY,
+				$this->sizeY+$this->shiftY+14*$colNum+$this->legendOffsetY,
 				10,
 				10,
 				$this->getColor($trigger['color']));
 
 			imageellipse($this->im,
 				$leftXShift,
-				$this->sizeY+$this->shiftY+12*$colNum+$this->legendOffsetY,
+				$this->sizeY+$this->shiftY+14*$colNum+$this->legendOffsetY,
 				10,
 				10,
 				$this->getColor('Black No Alpha'));
 
-			$legend->addCell($colNum,array('text' => $trigger['description']));
+//			$legend->addCell($colNum,array('text' => $trigger['description']));
+//			$legend->addCell($colNum, array('text' => $trigger['constant']));
+			
+			$legend->addRow(array(
+				array('text' => $trigger['description']),
+				array('text' => $trigger['constant'])
+				));
 			$colNum++;
 		}
 

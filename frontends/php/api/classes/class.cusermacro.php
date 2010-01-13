@@ -1040,7 +1040,10 @@ class CUserMacro extends CZBXAPI{
 	public static function getMacros($macros, $options){
 		zbx_value2array($macros);
 
-		$def_options = array( 'itemid' => null, 'triggerid' => null);
+		$def_options = array( 
+			'itemid' => null, 
+			'triggerid' => null
+		);
 		$options = zbx_array_merge($def_options, $options);
 
 		$hmacro = array();
@@ -1108,8 +1111,9 @@ class CUserMacro extends CZBXAPI{
 			if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $trigger['expression'], $arr)){
 				$macros = self::getMacros($arr[1], array('triggerid' => $trigger['triggerid']));
 
-				$search = zbx_objectValues($macros, 'macroid');
+				$search = array_keys($macros);
 				$values = array_values($macros);
+
 				$triggers[$num]['expression'] = str_replace($search, $values, $trigger['expression']);
 			}
 		}
