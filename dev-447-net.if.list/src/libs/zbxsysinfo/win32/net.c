@@ -94,7 +94,7 @@ static char	*get_if_adminstatus_string(DWORD status)
 int	NET_IF_LIST(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	DWORD		dwSize, dwRetVal, i, j;
-	char		*buf = NULL, *utf8;
+	char		*buf = NULL;
 	int		buf_alloc = 512, buf_offset = 0, ret = SYSINFO_RET_FAIL;
 	/* variables used for GetIfTable and GetIfEntry */
 	MIB_IFTABLE	*pIfTable = NULL;
