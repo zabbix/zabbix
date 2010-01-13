@@ -1237,9 +1237,7 @@
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_TRIGGERS_INFO) ){
-					$item = new CTriggersInfo($style);
-					if($resourceid > 0)
-						$item->set_host_group($resourceid);
+					$item = new CTriggersInfo($resourceid, $style);
 					$item = array($item);
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}

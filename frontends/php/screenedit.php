@@ -41,7 +41,7 @@ include_once('include/page_header.php');
 		'screenitemid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))&&(!isset({x})||!isset({y}))'),
 		'resourcetype'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,15),	'isset({save})'),
 		'caption'=>		array(T_ZBX_STR, O_OPT,  null,  null,	null),
-		'resourceid'=>	array(T_ZBX_INT, O_OPT,  null,  DB_ID.'(!isset({caption}) || ({}!=0))', 	'isset({save})'),
+		'resourceid'=>	array(T_ZBX_INT, O_OPT,  null,  DB_ID, 	'isset({save})'),
 		'width'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	null),
 		'height'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	null),
 		'colspan'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
@@ -92,36 +92,60 @@ include_once('include/page_header.php');
 
 		$screen = reset($screens);
 		echo SBR;
+		
 		if(isset($_REQUEST['save'])){
-			if(!isset($_REQUEST['elements']))	$_REQUEST['elements']=0;
+			if(!isset($_REQUEST['elements'])) $_REQUEST['elements'] = 0;
 
-			DBstart();
-			if(isset($_REQUEST['screenitemid'])){
-				$result = update_screen_item($_REQUEST['screenitemid'],
-					$_REQUEST['resourcetype'],$_REQUEST['resourceid'],$_REQUEST['width'],
-					$_REQUEST['height'],$_REQUEST['colspan'],$_REQUEST['rowspan'],
-					$_REQUEST['elements'],$_REQUEST['valign'],
-					$_REQUEST['halign'],$_REQUEST['style'],$_REQUEST['url'],$_REQUEST['dynmic']);
+			try{
+				DBstart();
+			
+				if(isset($_REQUEST['screenitemid'])){
+					$msg_ok = S_ITEM_UPDATED;
+					$msg_err = S_CANNOT_UPDATE_ITEM;
+				}
+				else{
+					$msg_ok = S_ITEM_ADDED;
+					$msg_err = S_CANNOT_ADD_ITEM;
+				}
+				
+				$resources = array(SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT, SCREEN_RESOURCE_MAP,
+					SCREEN_RESOURCE_SCREEN, SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW);
+				if(str_in_array($_REQUEST['resourcetype'], $resources) && ($_REQUEST['resourceid'] == 0)){
+					throw new Exception('Incorrect resource');
+				}
+				
+				if(isset($_REQUEST['screenitemid'])){
+					$result = update_screen_item($_REQUEST['screenitemid'],
+						$_REQUEST['resourcetype'],$_REQUEST['resourceid'],$_REQUEST['width'],
+						$_REQUEST['height'],$_REQUEST['colspan'],$_REQUEST['rowspan'],
+						$_REQUEST['elements'],$_REQUEST['valign'],
+						$_REQUEST['halign'],$_REQUEST['style'],$_REQUEST['url'],$_REQUEST['dynmic']);
+					
+					if(!$result) throw new Exception();
+				}
+				else{
+					$result=add_screen_item(
+						$_REQUEST['resourcetype'],$_REQUEST['screenid'],
+						$_REQUEST['x'],$_REQUEST['y'],$_REQUEST['resourceid'],
+						$_REQUEST['width'],$_REQUEST['height'],$_REQUEST['colspan'],
+						$_REQUEST['rowspan'],$_REQUEST['elements'],$_REQUEST['valign'],
+						$_REQUEST['halign'],$_REQUEST['style'],$_REQUEST['url'],$_REQUEST['dynmic']);
 
-				show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
-			}
-			else{
-				$result=add_screen_item(
-					$_REQUEST['resourcetype'],$_REQUEST['screenid'],
-					$_REQUEST['x'],$_REQUEST['y'],$_REQUEST['resourceid'],
-					$_REQUEST['width'],$_REQUEST['height'],$_REQUEST['colspan'],
-					$_REQUEST['rowspan'],$_REQUEST['elements'],$_REQUEST['valign'],
-					$_REQUEST['halign'],$_REQUEST['style'],$_REQUEST['url'],$_REQUEST['dynmic']);
+					if(!$result) throw new Exception();
+				}
+				
+				DBend(true);
 
-				show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
-			}
-			$result = DBend($result);
-
-			if($result){
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_SCREEN,' Name ['.$screen['name'].'] cell changed '.
-					(isset($_REQUEST['screenitemid']) ? '['.$_REQUEST['screenitemid'].']' :
-						'['.$_REQUEST['x'].','.$_REQUEST['y'].']'));
-				unset($_REQUEST['form']);
+					(isset($_REQUEST['screenitemid']) ? '['.$_REQUEST['screenitemid'].']' :	'['.$_REQUEST['x'].','.$_REQUEST['y'].']'));
+					unset($_REQUEST['form']);
+				
+				show_messages(true, $msg_ok, $msg_err);
+			}
+			catch(Exception $e){
+				DBend(false);
+				error($e->getMessage());
+				show_messages(false, $msg_ok, $msg_err);
 			}
 		}
 		else if(isset($_REQUEST['delete'])){
