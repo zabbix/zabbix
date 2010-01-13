@@ -21,40 +21,289 @@
 #include "sysinfo.h"
 #include "log.h"
 
+/*
+ * returns interface statistics by IP address or interface name
+ */
+static int	get_if_stats(const char *if_name, MIB_IFROW *pIfRow)
+{
+	DWORD		dwSize, dwRetVal, i, j;
+	int		ret = FAIL;
+	char		ip[16];
+	/* variables used for GetIfTable and GetIfEntry */
+	MIB_IFTABLE	*pIfTable = NULL;
+	/* variables used for GetIpAddrTable */
+	MIB_IPADDRTABLE	*pIPAddrTable = NULL;
+	IN_ADDR		in_addr;
+
+	/* Allocate memory for our pointers. */
+	dwSize = sizeof(MIB_IPADDRTABLE);
+	pIPAddrTable = (MIB_IPADDRTABLE *)zbx_malloc(pIPAddrTable, sizeof(MIB_IPADDRTABLE));
+
+	/* Make an initial call to GetIpAddrTable to get the
+	   necessary size into the dwSize variable */
+	if (ERROR_INSUFFICIENT_BUFFER == GetIpAddrTable(pIPAddrTable, &dwSize, 0))
+		pIPAddrTable = (MIB_IPADDRTABLE *)zbx_realloc(pIPAddrTable, dwSize);
+
+	/* Make a second call to GetIpAddrTable to get the
+	   actual data we want */
+	if (NO_ERROR != (dwRetVal = GetIpAddrTable(pIPAddrTable, &dwSize, 0)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "GetIpAddrTable failed with error: %s", strerror_from_system(dwRetVal));
+		goto clean;
+	}
+
+	/* Allocate memory for our pointers. */
+	dwSize = sizeof(MIB_IFTABLE);
+	pIfTable = (MIB_IFTABLE *)zbx_malloc(pIfTable, dwSize);
+	
+	/* Before calling GetIfEntry, we call GetIfTable to make
+	   sure there are entries to get and retrieve the interface index.
+	   Make an initial call to GetIfTable to get the necessary size into dwSize */
+	if (ERROR_INSUFFICIENT_BUFFER == GetIfTable(pIfTable, &dwSize, 0))
+		pIfTable = (MIB_IFTABLE *)zbx_realloc(pIfTable, dwSize);
+
+	/* Make a second call to GetIfTable to get the actual data we want. */
+	if (NO_ERROR != (dwRetVal = GetIfTable(pIfTable, &dwSize, 0)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "GetIfTable failed with error: %s", strerror_from_system(dwRetVal));
+		goto clean;
+	}
+
+	for (i = 0; i < pIfTable->dwNumEntries; i++)
+	{
+		pIfRow->dwIndex = pIfTable->table[i].dwIndex;
+		if (NO_ERROR != (dwRetVal = GetIfEntry(pIfRow)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "GetIfEntry failed with error: %s",
+					strerror_from_system(dwRetVal));
+			continue;
+		}
+
+		for (j = 0; j < pIfRow->dwDescrLen; j++)
+			if ((char)pIfRow->bDescr[j] != if_name[j])
+				break;
+
+		if (j == pIfRow->dwDescrLen)
+		{
+			ret = SUCCEED;
+			break;
+		}
+
+		for (j = 0; j < pIPAddrTable->dwNumEntries; j++)
+		{
+			if (pIPAddrTable->table[j].dwIndex == pIfRow->dwIndex)
+			{
+				in_addr.S_un.S_addr = pIPAddrTable->table[j].dwAddr;
+				zbx_snprintf(ip, sizeof(ip), "%s", inet_ntoa(in_addr));
+				if (0 == strcmp(if_name, ip))
+				{
+					ret = SUCCEED;
+					break;
+				}
+			}
+		}
+		
+		if (SUCCEED == ret)
+			break;
+	}
+clean:
+	zbx_free(pIfTable);
+	zbx_free(pIPAddrTable);
+
+	return ret;
+}
+
 int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef TODO
-#error Realize function KERNEL_MAXFILES!!!
-#endif /* todo */
+	char		if_name[MAX_STRING_LEN], mode[32];
+	MIB_IFROW	pIfRow;
 
-	return SYSINFO_RET_FAIL;
+	assert(result);
+
+	init_result(result);
+
+	if (num_param(param) > 2)
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 2, mode, sizeof(mode)))
+		*mode = '\0';
+
+	if (FAIL == get_if_stats(if_name, &pIfRow))
+		return SYSINFO_RET_FAIL;
+
+	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
+	{
+		SET_UI64_RESULT(result, pIfRow.dwInOctets);
+	}
+	else if (0 == strcmp(mode, "packets"))
+	{
+		SET_UI64_RESULT(result, pIfRow.dwInUcastPkts + pIfRow.dwInNUcastPkts);
+	}
+	else if (0 == strcmp(mode, "errors"))
+	{
+		SET_UI64_RESULT(result, pIfRow.dwInErrors);
+	}
+	else if (0 == strcmp(mode, "dropped"))
+	{
+		SET_UI64_RESULT(result, pIfRow.dwInDiscards + pIfRow.dwInUnknownProtos);
+	}
+	else
+		return SYSINFO_RET_FAIL;
+
+	return SYSINFO_RET_OK;
 }
 
 int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef TODO
-#error Realize function NET_IF_OUT!!!
-#endif /* todo */
+	char		if_name[MAX_STRING_LEN], mode[32];
+	MIB_IFROW	pIfRow;
 
-	return SYSINFO_RET_FAIL;
+	assert(result);
+
+	init_result(result);
+
+	if (num_param(param) > 2)
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 2, mode, sizeof(mode)))
+		*mode = '\0';
+
+	if (FAIL == get_if_stats(if_name, &pIfRow))
+		return SYSINFO_RET_FAIL;
+
+	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
+	{
+		SET_UI64_RESULT(result, pIfRow.dwOutOctets);
+	}
+	else if (0 == strcmp(mode, "packets"))
+	{
+		SET_UI64_RESULT(result, pIfRow.dwOutUcastPkts + pIfRow.dwOutNUcastPkts);
+	}
+	else if (0 == strcmp(mode, "errors"))
+	{
+		SET_UI64_RESULT(result, pIfRow.dwOutErrors);
+	}
+	else if (0 == strcmp(mode, "dropped"))
+	{
+		SET_UI64_RESULT(result, pIfRow.dwOutDiscards);
+	}
+	else
+		return SYSINFO_RET_FAIL;
+
+	return SYSINFO_RET_OK;
 }
 
 int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef TODO
-#error Realize function NET_IF_TOTAL!!!
-#endif /* todo */
+	char		if_name[MAX_STRING_LEN], mode[32];
+	MIB_IFROW	pIfRow;
 
-	return SYSINFO_RET_FAIL;
+	assert(result);
+
+	init_result(result);
+
+	if (num_param(param) > 2)
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 1, if_name, sizeof(if_name)))
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 2, mode, sizeof(mode)))
+		*mode = '\0';
+
+	if (FAIL == get_if_stats(if_name, &pIfRow))
+		return SYSINFO_RET_FAIL;
+
+	if ('\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
+	{
+		SET_UI64_RESULT(result, pIfRow.dwInOctets + pIfRow.dwOutOctets);
+	}
+	else if (0 == strcmp(mode, "packets"))
+	{
+		SET_UI64_RESULT(result, pIfRow.dwInUcastPkts + pIfRow.dwInNUcastPkts +
+				pIfRow.dwOutUcastPkts + pIfRow.dwOutNUcastPkts);
+	}
+	else if (0 == strcmp(mode, "errors"))
+	{
+		SET_UI64_RESULT(result, pIfRow.dwInErrors + pIfRow.dwOutErrors);
+	}
+	else if (0 == strcmp(mode, "dropped"))
+	{
+		SET_UI64_RESULT(result, pIfRow.dwInDiscards + pIfRow.dwInUnknownProtos +
+				pIfRow.dwOutDiscards);
+	}
+	else
+		return SYSINFO_RET_FAIL;
+
+	return SYSINFO_RET_OK;
 }
 
-int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef TODO
-#error Realize function NET_TCP_LISTEN!!!
-#endif /* todo */
+	/* Declare and initialize variables */
+	MIB_TCPTABLE	*pTcpTable = NULL;
+	DWORD		dwSize, dwRetVal;
+	int		i, ret = SYSINFO_RET_FAIL;
+	zbx_uint64_t	port;
+	char		tmp[8];
 
-	return SYSINFO_RET_FAIL;
+	assert(result);
+
+	init_result(result);
+
+	if (num_param(param) > 1)
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)))
+		return SYSINFO_RET_FAIL;
+
+	if (SUCCEED != is_uint64(tmp, &port))
+		return SYSINFO_RET_FAIL;
+
+	if (port > 65535)
+		return SYSINFO_RET_FAIL;
+
+	dwSize = sizeof(MIB_TCPTABLE);
+	pTcpTable = (MIB_TCPTABLE *)zbx_malloc(pTcpTable, dwSize);
+
+	/* Make an initial call to GetTcpTable to
+	   get the necessary size into the dwSize variable */
+	if (ERROR_INSUFFICIENT_BUFFER == (dwRetVal = GetTcpTable(pTcpTable, &dwSize, TRUE)))
+		pTcpTable = (MIB_TCPTABLE *)zbx_realloc(pTcpTable, dwSize);
+
+	/* Make a second call to GetTcpTable to get
+	   the actual data we require */
+	if (NO_ERROR == (dwRetVal = GetTcpTable(pTcpTable, &dwSize, TRUE)))
+	{
+		for (i = 0; i < (int) pTcpTable->dwNumEntries; i++)
+		{
+			if (MIB_TCP_STATE_LISTEN == pTcpTable->table[i].dwState &&
+					(u_short)port == ntohs((u_short)pTcpTable->table[i].dwLocalPort))
+			{
+				SET_UI64_RESULT(result, 1);
+				break;
+			}
+		}
+		ret = SYSINFO_RET_OK;
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "GetTcpTable failed with error: %s", strerror_from_system(dwRetVal));
+		goto clean;
+	}
+
+	if (!ISSET_UI64(result))
+		SET_UI64_RESULT(result, 0)
+clean:
+	zbx_free(pTcpTable);
+
+	return ret;
 }
 
 int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -94,7 +343,7 @@ static char	*get_if_adminstatus_string(DWORD status)
 int	NET_IF_LIST(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	DWORD		dwSize, dwRetVal, i, j;
-	char		*buf = NULL, *utf8;
+	char		*buf = NULL;
 	int		buf_alloc = 512, buf_offset = 0, ret = SYSINFO_RET_FAIL;
 	/* variables used for GetIfTable and GetIfEntry */
 	MIB_IFTABLE	*pIfTable = NULL;
