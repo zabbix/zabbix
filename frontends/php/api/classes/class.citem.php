@@ -616,7 +616,7 @@ class CItem extends CZBXAPI{
 		}
 
 		if(!empty($itemids))
-			$result = self::get(array('itemids' => $itemids, 'output' => self::API_OUTPUT_EXTEND));
+			$result = self::get(array('itemids' => $itemids, 'output' => API_OUTPUT_EXTEND));
 
 	return $result;
 	}
