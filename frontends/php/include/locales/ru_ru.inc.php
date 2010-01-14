@@ -313,7 +313,6 @@
 	'S_VIEW'=>			'Вид',
 	'S_GUI'=>			'GUI',
 	'S_ZBX162_MODE'=>			'Режим совместимости с ZABBIX 1.6.2',
-	'S_DROPDOWN_FIRST_ENTRY'=>			'',
 	'S_DROPDOWN_REMEMBER_SELECTED'=>			'запоминать выбранное',
 	'S_MAX_IN_TABLE'=>			'Макс. количество элементов в таблице',
 	'S_SEARCH_LIMIT'=>			'Лимит элементов в поиске/фильтре',
