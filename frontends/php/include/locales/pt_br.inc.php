@@ -321,7 +321,6 @@
 	'S_MINUS_OTHER_MINUS'=>			'- outro -',
 	'S_GRAPH'=>			'Gráfico',
 	'S_CONNECTED_AS'=>			'Conectado como',
-	'S_SIA_ZABBIX'=>			'',
 	'S_ITEM_ADDED'=>			'Item incluído',
 	'S_ITEM_UPDATED'=>			'Item atualizada',
 	'S_ITEMS_UPDATED'=>			'Ítens atualizados',
