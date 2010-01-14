@@ -454,6 +454,25 @@ function get_scroll_pos(){
 	return [ scrOfX, scrOfY ];
 }
 
+function insert_in_element(element_name, text){
+	if(IE)
+		var elems = $$('[name='+element_name+']');
+	else
+		var elems = document.getElementsByName(element_name);
+
+	for(var key=0; key < elems.length; key++){
+		if((typeof(elems[key]) != 'undefined') && !is_null(elems[key])){
+			$(elems[key]).update(text);
+		}
+	}
+}
+
+function insert_sizeable_graph(graph_id,url){
+	if((typeof(ZBX_G_WIDTH) != 'undefined')) url += "&amp;width="+ZBX_G_WIDTH;
+
+	document.write('<img id="'+graph_id+'" src="'+url+'" alt="graph" /><br />');
+}
+
 function is_empty_form(id){
 	id = $(id);
 	var count = 0;
@@ -581,6 +600,23 @@ function ShowHide(obj,style){
 	}
 }
 
+function showHideByName(name, style){
+	if(typeof(style) == 'undefined') var style = 'none';
+
+	var objs = $$('[name='+name+']');
+
+	if(empty(objs)){
+		throw 'ShowHide(): Object not found.';
+		return false;
+	}
+	
+	for(var i=0; i<objs.length; i++){
+		var obj = objs[i];
+		obj.style.display = style;
+	}
+
+}
+
 function showHideEffect(obj, eff, time, cb_afterFinish){
 	obj = $(obj);
 	if(!obj){
@@ -659,25 +695,6 @@ function ScaleChartToParenElement(obj_name){
 	for(i = obj.length-1; i>=0; i--){
 		obj[i].src += "&width=" + (obj[i].parentNode.offsetWidth - obj[i].parentNode.offsetLeft - 10);
 	}
-}
-
-function insert_in_element(element_name, text){
-	if(IE)
-		var elems = $$('[name='+element_name+']');
-	else
-		var elems = document.getElementsByName(element_name);
-
-	for(var key=0; key < elems.length; key++){
-		if((typeof(elems[key]) != 'undefined') && !is_null(elems[key])){
-			$(elems[key]).update(text);
-		}
-	}
-}
-
-function insert_sizeable_graph(graph_id,url){
-	if((typeof(ZBX_G_WIDTH) != 'undefined')) url += "&amp;width="+ZBX_G_WIDTH;
-
-	document.write('<img id="'+graph_id+'" src="'+url+'" alt="graph" /><br />');
 }
 
 

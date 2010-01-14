@@ -72,6 +72,10 @@ include_once "include/page_header.php";
 					$syssum = make_system_summary();
 					$syssum->show();
 					break;
+				case 'hat_hoststat':
+					$hoststat = make_hoststat_summary();
+					$hoststat->show();
+					break;
 				case 'hat_stszbx':
 					$stszbx = make_status_of_zbx();
 					$stszbx->show();
@@ -172,6 +176,7 @@ include_once "include/page_header.php";
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 
@@ -206,6 +211,7 @@ include_once "include/page_header.php";
 	make_screen_menu($menu,$submenu);
 
 	make_refresh_menu('mainpage','hat_syssum',get_profile('web.dahsboard.rf_rate.hat_syssum',60),null,$menu,$submenu);
+	make_refresh_menu('mainpage','hat_hoststat',get_profile('web.dahsboard.rf_rate.hat_hoststat',60),null,$menu,$submenu);
 	make_refresh_menu('mainpage','hat_stszbx',get_profile('web.dahsboard.rf_rate.hat_stszbx',60),null,$menu,$submenu);
 	make_refresh_menu('mainpage','hat_lastiss',get_profile('web.dahsboard.rf_rate.hat_lastiss',60),null,$menu,$submenu);
 	make_refresh_menu('mainpage','hat_webovr',get_profile('web.dahsboard.rf_rate.hat_webovr',60),null,$menu,$submenu);
@@ -278,6 +284,9 @@ include_once "include/page_header.php";
 			),
 		array('id' => 'hat_webovr',
 				'frequency'  => get_profile('web.dahsboard.rf_rate.hat_webovr',60)
+			),
+		array('id' => 'hat_hoststat',
+				'frequency'  => get_profile('web.dahsboard.rf_rate.hat_hoststat',60)
 			)
 /*		array('id' => 'hat_custom',
 				'frequency'  =>	get_profile('web.dahsboard.rf_rate.hat_custom',60),
@@ -311,6 +320,19 @@ include_once "include/page_header.php";
 						);
 	$sys_stat->addHeader(S_SYSTEM_STATUS,array($refresh_menu));
 	$right_tab->addRow($sys_stat);
+//----------------
+
+// Host status
+	$refresh_menu = new CDiv(SPACE, 'iconmenu');
+	$refresh_menu->addAction('onclick', 'javascript: create_page_menu(event,"hat_hoststat");');
+	$refresh_menu->setAttribute('title',S_MENU);
+
+	$hoststat = new CWidget('hat_hoststat',
+						new CSpan(S_LOADING_P,'textcolorstyles'),//make_system_summary()
+						get_profile('web.dashboard.hats.hat_hoststat.state',1)
+						);
+	$hoststat->addHeader(S_HOST_STATUS_STATUS,array($refresh_menu));
+	$right_tab->addRow($hoststat);
 //----------------
 
 // Last Issues
@@ -403,6 +425,6 @@ include_once "include/page_header.php";
 ?>
 <?php
 
-include_once "include/page_footer.php";
+include_once("include/page_footer.php");
 
 ?>
