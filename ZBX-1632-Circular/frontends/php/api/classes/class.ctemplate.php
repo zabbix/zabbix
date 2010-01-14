@@ -760,80 +760,6 @@ class CTemplate extends CZBXAPI{
 		}
 	}
 
-	private static function checkCircularLink($id, $templateids){
-		if(empty($templateids)) return true;
-$i = 0;
-// target_up_templateids
-		$next_templateids = array($id);
-		$target_up_templateids = array();
-		do{
-			$sql = 'SELECT hostid FROM hosts_templates WHERE '.DBcondition('templateid', $next_templateids);
-			$tpls_db = DBselect($sql);
-
-			$next_templateids = array();
-			while($tpl = DBfetch($tpls_db)){
-				$next_templateids[] = $tpl['hostid'];
-			}
-			$target_up_templateids = array_merge($target_up_templateids, $next_templateids);
-		}while(!empty($next_templateids));
-
-// target_down_templateids
-		$next_templateids = array($id);
-		$target_down_templateids = array();
-		do{
-			$sql = 'SELECT templateid FROM hosts_templates WHERE '.DBcondition('hostid', $next_templateids);
-			$tpls_db = DBselect($sql);
-
-			$next_templateids = array();
-			while($tpl = DBfetch($tpls_db)){
-				$next_templateids[] = $tpl['templateid'];
-			}
-			$target_down_templateids = array_merge($target_down_templateids, $next_templateids);
-		}while(!empty($next_templateids));
-
-		$target_templateids = array_merge($target_up_templateids, $target_down_templateids);
-		$target_templateids[] = $id;
-
-
-// source_up_templateids
-		$next_templateids = $templateids;
-		$source_up_templateids = array();
-		do{
-			$sql = 'SELECT hostid FROM hosts_templates WHERE '.DBcondition('templateid', $next_templateids);
-			$tpls_db = DBselect($sql);
-
-			$next_templateids = array();
-			while($tpl = DBfetch($tpls_db)){
-				$next_templateids[] = $tpl['hostid'];
-			}
-			$source_up_templateids = array_merge($source_up_templateids, $next_templateids);
-		}while(!empty($next_templateids));
-
-// source_down_templateids
-		$next_templateids = $templateids;
-		$source_down_templateids = array();
-		do{
-			$sql = 'SELECT templateid FROM hosts_templates WHERE '.DBcondition('hostid', $next_templateids);
-			$tpls_db = DBselect($sql);
-
-			$next_templateids = array();
-			while($tpl = DBfetch($tpls_db)){
-				$next_templateids[] = $tpl['templateid'];
-			}
-			$source_down_templateids = array_merge($source_down_templateids, $next_templateids);
-		}while(!empty($next_templateids));
-
-		$source_templateids = array_merge($source_up_templateids, $source_down_templateids, $templateids);
-
-
-		if(array_intersect($target_templateids, $source_templateids)){
-			return false;
-		}
-
-		return true;
-	}
-
-
 /**
  * Delete Template
  *
@@ -1303,6 +1229,8 @@ $i = 0;
 
 
 	private static function link($templateids, $targetids){
+		if(empty($templateids)) return true;
+		
 		try{
 			self::BeginTransaction(__METHOD__);
 
@@ -1339,21 +1267,63 @@ $i = 0;
 				$linked[] = array($pair['hostid'] => $pair['templateid']);
 			}
 
-
-// for each host choose only templates that will be added, to check circulars
+// add template linkages, if problems rollback later			
 			foreach($targetids as $targetid){
-				$templateids_to_check = array();
-				foreach($linked as $link){
-					if(isset($link[$targetid]))
-						$templateids_to_check[] = $link[$targetid];
+				foreach($templateids as $tnum => $templateid){
+					foreach($linked as $lnum => $link){
+						if(isset($link[$targetid]) && ($link[$targetid] == $templateid)) continue 2;
+					}
+
+					$values = array(get_dbid('hosts_templates', 'hosttemplateid'), $targetid, $templateid);
+					$sql = 'INSERT INTO hosts_templates VALUES ('. implode(', ', $values) .')';
+					$result = DBexecute($sql);
+
+					if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'DBError');
 				}
+			}
 
-				$templateids_to_check = array_diff($templateids, $templateids_to_check);
+// CHECK CIRCULAR LINKAGE {{{
 
-				if(!self::checkCircularLink($targetid, $templateids_to_check)){
+// get template linkage graph
+			$sql = 'SELECT ht.hostid, ht.templateid'.
+				' FROM hosts_templates ht, hosts h'.
+				' WHERE ht.hostid=h.hostid'.
+					' AND h.status=3';
+			$db_graph = DBselect($sql);
+			$graph = array();
+			while($branch = DBfetch($db_graph)){
+				if(!isset($graph[$branch['hostid']])) $graph[$branch['hostid']] = array();
+				$graph[$branch['hostid']][] = $branch['templateid'];
+			}
+
+// get points that have more than one parent templates			
+			$start_points = array();
+			$sql = 'SELECT max(ht.hostid) as hostid, ht.templateid'.
+				' FROM('.
+					' SELECT count(htt.templateid) as ccc, htt.hostid'.
+					' FROM hosts_templates htt'.
+					' WHERE htt.hostid NOT IN ( SELECT httt.templateid FROM hosts_templates httt )'.
+					' GROUP BY htt.hostid'.
+					' ) ggg, hosts_templates ht'.
+				' WHERE ggg.ccc>1'.
+					' AND ht.hostid=ggg.hostid'.
+				' GROUP BY ht.templateid';
+			$db_start_points = DBselect($sql);
+			while($start_point = DBfetch($db_start_points)){				
+				$start_points[] = $start_point['hostid'];
+			}
+// add to the start points also points which we add current templates
+			$start_points = array_merge($start_points, $targetids);
+				
+			foreach($start_points as $start){
+				$path = array();
+				if(!self::checkCircularLink($graph, $start, $path)){
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Circular link can not be created');
 				}
 			}
+
+// }}} CHECK CIRCULAR LINKAGE
+
 
 			foreach($targetids as $targetid){
 				foreach($templateids as $tnum => $templateid){
@@ -1363,13 +1333,6 @@ $i = 0;
 							continue 2;
 						}
 					}
-
-					$values = array(get_dbid('hosts_templates', 'hosttemplateid'), $targetid, $templateid);
-					$sql = 'INSERT INTO hosts_templates VALUES ('. implode(', ', $values) .')';
-					$result = DBexecute($sql);
-
-					if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'DBError');
-
 					sync_host_with_templates($targetid, $templateid);
 				}
 			}
@@ -1384,5 +1347,15 @@ $i = 0;
 
 	}
 
+	private static function checkCircularLink(&$graph, $current, &$path){
+		
+		if(isset($path[$current])) return false;
+		$path[$current] = $current;
+		if(!isset($graph[$current])) return true;
+		
+		foreach($graph[$current] as $step){
+			if(!self::checkCircularLink($graph, $step, $path)) return false;
+		}
+	}
 }
 ?>
