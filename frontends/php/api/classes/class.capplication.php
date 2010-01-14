@@ -253,7 +253,7 @@ class CApplication extends CZBXAPI{
 				$applicationids[$application['applicationid']] = $application['applicationid'];
 
 				if($options['output'] == API_OUTPUT_SHORTEN){
-					$result[$application['applicationid']] = array('applicatiionid' => $application['applicationid']);
+					$result[$application['applicationid']] = array('applicationid' => $application['applicationid']);
 				}
 				else{
 					if(!isset($result[$application['applicationid']]))
