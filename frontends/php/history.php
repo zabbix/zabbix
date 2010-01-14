@@ -231,9 +231,19 @@ include_once "include/page_header.php";
 	elseif($_REQUEST["action"]=="showvalues" || $_REQUEST["action"]=="showlatest")
 	{
 		if($_REQUEST["action"]=="showvalues")
-		{		
-			$time = time(null) - $effectiveperiod - $_REQUEST["from"] * 3600;
-			$till = time(null) - $_REQUEST["from"] * 3600;
+		{	
+		
+			if($_REQUEST["stime"]>200000000000 && $_REQUEST["stime"]<220000000000)
+			{
+				$stime=mktime(substr($_REQUEST["stime"],8,2),substr($_REQUEST["stime"],10,2),0,
+					substr($_REQUEST["stime"],4,2),substr($_REQUEST["stime"],6,2),substr($_REQUEST["stime"],0,4));
+				
+				$stime = $stime + $effectiveperiod;
+			}
+			else $stime = time(null);
+				
+			$time = $stime - $effectiveperiod - $_REQUEST["from"] * 3600;
+			$till = $stime - $_REQUEST["from"] * 3600;
 			$hours=$effectiveperiod / 3600;
 
 			$l_header = "Showing history of ".$effectiveperiod." seconds($hours h)".BR.
