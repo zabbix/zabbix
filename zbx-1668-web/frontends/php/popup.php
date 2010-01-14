@@ -838,7 +838,7 @@ include_once('include/page_header.php');
 				'extendoutput' => 1,
 				'select_hosts' => 1,
 				'filter' => 1,
-				'type' => ITEM_VALUE_TYPE_LOG,
+				'valuetype' => ITEM_VALUE_TYPE_LOG,
 				'sortfield'=>'description'
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;

@@ -1210,7 +1210,7 @@
 				default:
 					$list_name='deny';
 			}
-			$lst['group'][$list_name]->addItem($group['groupid'],$group['node_name'].':'.$group['name']);
+			$lst['group'][$list_name]->addItem($group['groupid'],(!empty($group['node_name'])?$group['node_name'].':':$group['node_name']).$group['name']);
 		}
 		unset($groups);
 
@@ -1227,7 +1227,7 @@
 				case PERM_READ_WRITE:	$list_name='read_write';	break;
 				default:		$list_name='deny';		break;
 			}
-			$lst['host'][$list_name]->addItem($host['hostid'],$host['node_name'].':'.$host['host']);
+			$lst['host'][$list_name]->addItem($host['hostid'], (!empty($host['node_name'])?$host['node_name'].':':$host['node_name']).$host['host']);
 		}
 		unset($hosts);
 
@@ -1493,10 +1493,10 @@
 
 // generate array with values for subfilters of selected items
 		foreach($items as $num => $item){
-
 			if(zbx_empty($filter_host)){
 // hosts
 				$host = reset($item['hosts']);
+
 				if(!isset($item_params['hosts'][$host['hostid']])){
 					$item_params['hosts'][$host['hostid']] = array('name' => $host['host'], 'count' => 0);
 				}

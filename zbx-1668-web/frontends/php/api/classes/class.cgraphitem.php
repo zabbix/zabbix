@@ -61,6 +61,7 @@ class CGraphItem extends CZBXAPI{
 			'editable'				=> null,
 			'nopermissions'			=> null,
 // output
+			'select_graphs'			=> null,
 			'output'				=> API_OUTPUT_REFER,
 			'expand_data'			=> null,
 			'extendoutput'			=> null,
@@ -209,10 +210,10 @@ class CGraphItem extends CZBXAPI{
 						$result[$gitem['gitemid']]= array();
 
 // graphids
-					if(isset($gitem['graphid'])){
+					if(isset($gitem['graphid']) && is_null($options['select_graphs'])){
 						if(!isset($result[$gitem['gitemid']]['graphs'])) $result[$gitem['gitemid']]['graphs'] = array();
 
-						$result[$gitem['gitemid']]['graphs'][$gitem['graphid']] = array('graphid' => $gitem['graphid']);
+						$result[$gitem['gitemid']]['graphs'][] = array('graphid' => $gitem['graphid']);
 						unset($gitem['graphid']);
 					}
 

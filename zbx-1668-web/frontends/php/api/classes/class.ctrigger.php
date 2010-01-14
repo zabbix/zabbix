@@ -102,6 +102,7 @@ class CTrigger extends CZBXAPI{
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
 			'extendoutput'			=> null,
+			'select_groups'			=> null,
 			'select_hosts'			=> null,
 			'select_items'			=> null,
 			'select_dependencies'	=> null,
@@ -428,37 +429,37 @@ class CTrigger extends CZBXAPI{
 				else{
 					if(!isset($result[$trigger['triggerid']])) $result[$trigger['triggerid']]= array();
 
-					if($options['select_hosts'] && !isset($result[$trigger['triggerid']]['hosts'])){
+					if(!is_null($options['select_hosts']) && !isset($result[$trigger['triggerid']]['hosts'])){
 						$result[$trigger['triggerid']]['hosts'] = array();
 					}
-					if($options['select_items'] && !isset($result[$trigger['triggerid']]['items'])){
+					if(!is_null($options['select_items']) && !isset($result[$trigger['triggerid']]['items'])){
 						$result[$trigger['triggerid']]['items'] = array();
 					}
-					if($options['select_dependencies'] && !isset($result[$trigger['triggerid']]['dependencies'])){
+					if(!is_null($options['select_dependencies']) && !isset($result[$trigger['triggerid']]['dependencies'])){
 						$result[$trigger['triggerid']]['dependencies'] = array();
 					}
 
 // groups
-					if(isset($trigger['groupid'])){
+					if(isset($trigger['groupid']) && is_null($options['select_groups'])){
 						if(!isset($result[$trigger['triggerid']]['groups'])) $result[$trigger['triggerid']]['groups'] = array();
 
-						$result[$trigger['triggerid']]['groups'][$trigger['groupid']] = array('groupid' => $trigger['groupid']);
+						$result[$trigger['triggerid']]['groups'][] = array('groupid' => $trigger['groupid']);
 						unset($trigger['groupid']);
 					}
 
 // hostids
-					if(isset($trigger['hostid'])){
+					if(isset($trigger['hostid']) && is_null($options['select_hosts'])){
 						if(!isset($result[$trigger['triggerid']]['hosts'])) $result[$trigger['triggerid']]['hosts'] = array();
 
-						$result[$trigger['triggerid']]['hosts'][$trigger['hostid']] = array('hostid' => $trigger['hostid']);
+						$result[$trigger['triggerid']]['hosts'][] = array('hostid' => $trigger['hostid']);
 						unset($trigger['hostid']);
 					}
 // itemids
-					if(isset($trigger['itemid'])){
+					if(isset($trigger['itemid']) && is_null($options['select_items'])){
 						if(!isset($result[$trigger['triggerid']]['items']))
 							$result[$trigger['triggerid']]['items'] = array();
 
-						$result[$trigger['triggerid']]['items'][$trigger['itemid']] = array('itemid' => $trigger['itemid']);
+						$result[$trigger['triggerid']]['items'][] = array('itemid' => $trigger['itemid']);
 						unset($trigger['itemid']);
 					}
 
@@ -496,6 +497,10 @@ class CTrigger extends CZBXAPI{
 					}
 				}
 			}
+		}
+
+// Adding groups
+		if(!is_null($options['select_groups']) && str_in_array($options['select_groups'], $subselects_allowed_outputs)){
 		}
 
 // Adding hosts

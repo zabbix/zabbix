@@ -326,35 +326,39 @@ class CEvent extends CZBXAPI{
 
 					if(!isset($result[$event['eventid']])) $result[$event['eventid']]= array();
 
-					if($options['select_hosts'] && !isset($result[$event['eventid']]['hosts'])){
+					if(!is_null($options['select_hosts']) && !isset($result[$event['eventid']]['hosts'])){
 						$result[$event['eventid']]['hosts'] = array();
 					}
 
-					if($options['select_triggers'] && !isset($result[$event['eventid']]['triggers'])){
+					if(!is_null($options['select_triggers']) && !isset($result[$event['eventid']]['triggers'])){
 						$result[$event['eventid']]['triggers'] = array();
+					}
+					
+					if(!is_null($options['select_items']) && !isset($result[$event['eventid']]['items'])){
+						$result[$event['eventid']]['items'] = array();
 					}
 
 // hostids
-					if(isset($event['hostid'])){
+					if(isset($event['hostid']) && is_null($options['select_hosts'])){
 						if(!isset($result[$event['eventid']]['hosts'])) $result[$event['eventid']]['hosts'] = array();
 
-						$result[$event['eventid']]['hosts'][$event['hostid']] = array('hostid' => $event['hostid']);
+						$result[$event['eventid']]['hosts'][] = array('hostid' => $event['hostid']);
 						unset($event['hostid']);
 					}
 
 // triggerids
-					if(isset($event['triggerid'])){
+					if(isset($event['triggerid']) && is_null($options['select_triggers'])){
 						if(!isset($result[$event['eventid']]['triggers'])) $result[$event['eventid']]['triggers'] = array();
 
-						$result[$event['eventid']]['triggers'][$event['triggerid']] = array('triggerid' => $event['triggerid']);
+						$result[$event['eventid']]['triggers'][] = array('triggerid' => $event['triggerid']);
 						unset($event['triggerid']);
 					}
 
 // itemids
-					if(isset($event['itemid'])){
+					if(isset($event['itemid']) && is_null($options['select_items'])){
 						if(!isset($result[$event['eventid']]['items'])) $result[$event['eventid']]['items'] = array();
 
-						$result[$event['eventid']]['items'][$event['itemid']] = array('itemid' => $event['itemid']);
+						$result[$event['eventid']]['items'][] = array('itemid' => $event['itemid']);
 						unset($event['itemid']);
 					}
 

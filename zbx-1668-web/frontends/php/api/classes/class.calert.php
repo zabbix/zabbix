@@ -96,6 +96,7 @@ class CAlert extends CZBXAPI{
 			'output'				=> API_OUTPUT_REFER,
 			'select_mediatypes'		=> null,
 			'select_users'			=> null,
+			'select_hosts'			=> null,
 			'count'					=> null,
 			'preservekeys'			=> null,
 			'editable'				=> null,
@@ -346,6 +347,7 @@ class CAlert extends CZBXAPI{
 				' WHERE '.DBin_node('a.alertid', $nodeids).
 					$sql_where.
 				$sql_order;
+//SDI($sql);
 		$db_res = DBselect($sql, $sql_limit);
 		while($alert = DBfetch($db_res)){
 			if($options['count'])
@@ -370,25 +372,26 @@ class CAlert extends CZBXAPI{
 					}
 
 // hostids
-					if(isset($alert['hostid'])){
-						if(!isset($result[$alert['alertid']]['hosts'])) $result[$alert['alertid']]['hosts'] = array();
+					if(isset($alert['hostid']) && is_null($options['select_hosts'])){
+						if(!isset($result[$alert['alertid']]['hosts'])) 
+							$result[$alert['alertid']]['hosts'] = array();
 
-						$result[$alert['alertid']]['hosts'][$alert['hostid']] = array('hostid' => $alert['hostid']);
-						unset($alert['hostid']);
+						$result[$alert['alertid']]['hosts'][] = array('hostid' => $alert['hostid']);
+//						unset($alert['hostid']);
 					}
 // userids
-					if(isset($alert['userid'])){
+					if(isset($alert['userid']) && is_null($options['select_users'])){
 						if(!isset($result[$alert['alertid']]['users']))
 							$result[$alert['alertid']]['users'] = array();
 
-						$result[$alert['alertid']]['users'][$alert['userid']] = array('userid' => $alert['userid']);
+						$result[$alert['alertid']]['users'][] = array('userid' => $alert['userid']);
 					}
 // mediatypeids
-					if(isset($alert['mediatypeid'])){
+					if(isset($alert['mediatypeid']) && is_null($options['select_mediatypes'])){
 						if(!isset($result[$alert['alertid']]['mediatypes']))
 							$result[$alert['alertid']]['mediatypes'] = array();
 
-						$result[$alert['alertid']]['mediatypes'][$alert['mediatypeid']] = array('mediatypeid' => $alert['mediatypeid']);
+						$result[$alert['alertid']]['mediatypes'][] = array('mediatypeid' => $alert['mediatypeid']);
 					}
 
 					$result[$alert['alertid']] += $alert;
@@ -402,8 +405,19 @@ class CAlert extends CZBXAPI{
 		}
 
 // Adding Objects
+		$hosts = array();
 		$users = array();
 		$mediatypes = array();
+
+// Adding hosts
+		if(!is_null($options['select_hosts']) && str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+			$obj_params = array(
+				'output' => $options['select_hosts'], 
+				'hostids' => $hostids, 
+				'preservekeys' => 1
+			);
+			$hosts = CHost::get($obj_params);
+		}
 
 // Adding Users
 		if(!is_null($options['select_users']) && str_in_array($options['select_users'], $subselects_allowed_outputs)){
@@ -425,6 +439,10 @@ class CAlert extends CZBXAPI{
 		}
 
 		foreach($result as $alertid => $alert){
+			if(isset($alert['hostid']) && isset($hosts[$alert['hostid']])){
+				$result[$alertid]['hosts'][] = $hosts[$alert['hostid']];
+			}
+
 			if(isset($mediatypes[$alert['mediatypeid']])){
 				$result[$alertid]['mediatypes'][] = $mediatypes[$alert['mediatypeid']];
 			}

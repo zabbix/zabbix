@@ -519,6 +519,9 @@ include_once('include/page_header.php');
 		$user_wdgt->show();
 	}
 
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>

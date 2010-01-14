@@ -319,16 +319,16 @@ class CHostGroup extends CZBXAPI{
 
 					if(!isset($result[$group['groupid']])) $result[$group['groupid']]= array();
 
-					if($options['select_hosts'] && !isset($result[$group['groupid']]['hosts'])){
+					if(!is_null($options['select_hosts']) && !isset($result[$group['groupid']]['hosts'])){
 						$result[$group['groupid']]['hosts'] = array();
 					}
 
 // hostids
-					if(isset($group['hostid'])){
+					if(isset($group['hostid']) && is_null($options['select_hosts'])){
 						if(!isset($result[$group['groupid']]['hosts']))
 							$result[$group['groupid']]['hosts'] = array();
 
-						$result[$group['groupid']]['hosts'][$group['hostid']] = array('hostid' => $group['hostid']);
+						$result[$group['groupid']]['hosts'][] = array('hostid' => $group['hostid']);
 						unset($group['hostid']);
 					}
 

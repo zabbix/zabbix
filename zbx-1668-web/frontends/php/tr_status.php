@@ -160,7 +160,8 @@ include_once('include/page_header.php');
 	}
 //--
 
-	$_REQUEST['show_triggers'] = (($_REQUEST['groupid'] != 0) || ($_REQUEST['hostid'] != 0)) ? $_REQUEST['show_triggers'] : 1;
+	$_REQUEST['show_triggers'] = (($_REQUEST['groupid'] == 0) && ($_REQUEST['hostid'] == 0) && ($_REQUEST['show_triggers'] == TRIGGERS_OPTION_ALL)) 
+		? TRIGGERS_OPTION_ONLYTRUE : $_REQUEST['show_triggers'];
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
 		update_profile('web.tr_status.filter.show_details', $_REQUEST['show_details'], PROFILE_TYPE_INT);
 		update_profile('web.tr_status.filter.show_triggers', $_REQUEST['show_triggers'], PROFILE_TYPE_INT);
@@ -233,14 +234,17 @@ include_once('include/page_header.php');
 	$filterForm->addVar('hostid', $_REQUEST['hostid']);
 
 	$tr_select = new CComboBox('show_triggers', $show_triggers);
-	if(($_REQUEST['hostid'] == 0) && ($_REQUEST['groupid'] == 0)){
-		$tr_select->setAttribute('disabled', 'disabled');
+	if(($_REQUEST['hostid'] == 0) && ($_REQUEST['groupid'] == 0) && TRIGGERS_OPTION_ALL){
+		$tr_select->addItem(TRIGGERS_OPTION_ALL, S_SHOW_ALL, false, false);
+	}
+	else if(TRIGGERS_OPTION_ALL){
+		$tr_select->addItem(TRIGGERS_OPTION_ALL, S_SHOW_ALL);
 	}
 	if(TRIGGERS_OPTION_ONLYTRUE){
 		$tr_select->additem(TRIGGERS_OPTION_ONLYTRUE, S_SHOW_ONLY_PROBLEMS);
 	}
-	if(TRIGGERS_OPTION_ALL){
-		$tr_select->addItem(TRIGGERS_OPTION_ALL, S_SHOW_ALL);
+	if(TRIGGERS_OPTION_SHOW_ALL_WITH_UNACKNOWLEDGED){
+		$tr_select->addItem(TRIGGERS_OPTION_SHOW_ALL_WITH_UNACKNOWLEDGED, S_SHOW_ALL_WITH_UNACKNOWLEDGED);
 	}
 
 	$ev_select = new CComboBox('show_events', $_REQUEST['show_events']);
@@ -433,7 +437,8 @@ include_once('include/page_header.php');
 
 
 	foreach($triggers as $tnum => $trigger){
-
+		if(($show_triggers == TRIGGERS_OPTION_SHOW_ALL_WITH_UNACKNOWLEDGED) && ($trigger['event_count'] == 0)) continue;
+		
 		$trigger['desc'] = $description = expand_trigger_description($trigger['triggerid']);
 
 // Items
