@@ -938,8 +938,7 @@ class CUserMacro extends CZBXAPI{
 							$sql = 'INSERT INTO hostmacro (hostmacroid, hostid, macro, value) VALUES ('. implode(', ', $values) .')';
 
 							if(!DBexecute($sql)){
-								$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'DB error');
-								throw new APIException($error);
+								throw new APIException(ZBX_API_ERROR_PARAMETERS, 'DB error');
 							}
 						}
 					}
