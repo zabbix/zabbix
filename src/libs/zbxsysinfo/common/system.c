@@ -77,10 +77,10 @@ int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_R
 		offset = zbx_snprintf(buf, sizeof(buf), "%d-%d-%d,%d:%d:%d.%d,",
 				1900 + tm->tm_year, 1 + tm->tm_mon, tm->tm_mday,
 				tm->tm_hour, tm->tm_min, tm->tm_sec, (int)(tv.tv_usec / 1000));
-#ifdef SYSV
-		if (tm_p->tm_isdst > 0)	/* Daylight saving time */
+
+		if (tm->tm_isdst > 0)	/* Daylight saving time */
 			gmtoff += 3600;	/* Assume add one hour */
-#endif
+
 		h = (unsigned short)(abs(gmtoff) / 3600);
 		m = (unsigned short)((abs(gmtoff) - h * 3600) / 60);
 
