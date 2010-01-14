@@ -195,6 +195,25 @@ else
 	AC_MSG_RESULT(no)
 fi
 
+dnl Check for tm_gmtoff in struct tm
+AC_MSG_CHECKING(for tm_gmtoff in struct tm)
+AC_TRY_COMPILE([
+#ifdef HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif	/* HAVE_SYS_TIME_H */
+
+#ifdef HAVE_TIME_H
+#include <time.h>
+#endif	/* HAVE_TIME_H */
+],
+[
+	struct tm tm;
+	tm.tm_gmtoff;
+],
+AC_DEFINE(HAVE_TM_TM_GMTOFF,1,[Define to 1 if 'tm.tm_gmtoff' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
 dnl Check for mem_unit in struct sysinfo
 AC_MSG_CHECKING(for mem_unit in struct sysinfo)
 AC_TRY_COMPILE([#include <sys/sysinfo.h>],
