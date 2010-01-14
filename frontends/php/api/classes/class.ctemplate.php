@@ -944,8 +944,7 @@ $i = 0;
 // UPDATE TEMPLATES PROPERTIES {{{
 			if(isset($data['host'])){
 				if(count($templates) > 1){
-					$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields');
-					throw new APIException($error);
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Wrong fields');
 				}
 
 				$template_exists = self::getObjects(array('template' => $data['host']));
@@ -953,8 +952,7 @@ $i = 0;
 				$cur_template = reset($templates);
 
 				if(!empty($template_exists) && ($template_exists['templateid'] != $cur_template['templateid'])){
-					$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
-					throw new APIException($error);
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 			}
 
