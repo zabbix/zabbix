@@ -758,7 +758,7 @@ include_once 'include/discovery.inc.php';
 		foreach($cmd_list as $cmd)
 		{
 			$cmd = trim($cmd, "\x00..\x1F");
-			if(!ereg("^(({HOSTNAME})|([0-9a-zA-Z\_\.[.-.]]{1,}))(:|#)[[:print:]]*$",$cmd,$cmd_items)){
+			if(!ereg("^(({HOSTNAME})|([0-9a-zA-Z\_\.[.-.] ]{1,}))(:|#)[[:print:]]*$",$cmd,$cmd_items)){
 				error("Incorrect command: '$cmd'");
 				return FALSE;
 			}

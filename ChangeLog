@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [NTP-93] fixed error when remote command host contain spaces (Vedmak)
  - [NTP-92] fixed date input in history screen (Vedmak)
  - [NTP-76] fixed deletion of web items when host is deleted (Vedmak)
  - [ZBX-1184] fixed support of more than 10 CPU's for system.cpu.util under Linux (Sasha)
