@@ -30,7 +30,7 @@ int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_R
 {
 	char		type[16], buf[32];
 	struct tm	*tm;
-	int		gmtoff, offset;
+	int		gmtoff, offset, ms;
 	unsigned short	h, m;
 #if defined(_WINDOWS)
         struct _timeb	tv;
@@ -60,11 +60,18 @@ int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 		tm = localtime(&tv.time);
 
-		milliseconds = tv.millitm;
+		ms = tv.millitm;
 #else /* not _WINDOWS */
 		gettimeofday(&tv, &tz);
 
 		tm = localtime(&tv.tv_sec);
+
+		ms = (int)(tv.tv_usec / 1000);
+#endif /* _WINDOWS */
+
+		offset = zbx_snprintf(buf, sizeof(buf), "%d-%d-%d,%d:%d:%d.%d,",
+				1900 + tm->tm_year, 1 + tm->tm_mon, tm->tm_mday,
+				tm->tm_hour, tm->tm_min, tm->tm_sec, ms);
 
 		/* Timezone offset */
 #if defined(HAVE_TM_TM_GMTOFF)
@@ -72,11 +79,6 @@ int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_R
 #else
 		gmtoff = -timezone;
 #endif /* HAVE_TM_TM_GMTOFF */
-#endif /* _WINDOWS */
-
-		offset = zbx_snprintf(buf, sizeof(buf), "%d-%d-%d,%d:%d:%d.%d,",
-				1900 + tm->tm_year, 1 + tm->tm_mon, tm->tm_mday,
-				tm->tm_hour, tm->tm_min, tm->tm_sec, (int)(tv.tv_usec / 1000));
 
 		if (tm->tm_isdst > 0)	/* Daylight saving time */
 			gmtoff += 3600;	/* Assume add one hour */
@@ -92,6 +94,8 @@ int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 		SET_STR_RESULT(result, strdup(buf));
 	}
+	else
+		return SYSINFO_RET_FAIL;
 
 	return SYSINFO_RET_OK;
 }
