@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1725] fixed graphitem sortorder (Aly)
  - [ZBX-1729] removed limitation of showings triggers in charts only by one item (Aly)
  - [ZBX-1729] removed excessive space in chart header,  informational messages (triggers, percentile) are separated (Aly)
  - [ZBX-1577] fixed pie chart display (Aly)
