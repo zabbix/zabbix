@@ -45,7 +45,11 @@
 	show_messages();
 
 	$post_script = '';
-	if($page['type'] == PAGE_TYPE_HTML){
+	if($page['type'] == PAGE_TYPE_HTML_BLOCK){
+COpt::profiling_stop('script');
+COpt::show();
+	}
+	else if($page['type'] == PAGE_TYPE_HTML){
 		$post_script.= 'var page_refresh = null;'."\n";
 
 		if(isset($JS_TRANSLATE)){
