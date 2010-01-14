@@ -1726,6 +1726,9 @@
 // popup_media.php
 	'S_INCORRECT_TIME_PERIOD'=>	'Incorrect time period',
 
+// page_header.php
+	'S_REFRESHED_EVERY_SMALL'=>	'refreshed every',
+
 //	Menu
 
 	'S_HELP'=>				'Help',
