@@ -98,7 +98,7 @@
 			}
 
 			if((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && $USER_DETAILS['refresh']){
-				$page_title .= ' [refreshed every '.$USER_DETAILS['refresh'].' sec]';
+				$page_title .= ' ['.S_REFRESHED_EVERY_SMALL.SPACE.$USER_DETAILS['refresh'].SPACE.S_SEC_SMALL.']';
 			}
 		break;
 	}
