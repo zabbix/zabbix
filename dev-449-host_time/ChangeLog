@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [DEV-447] added system.localtime[local] check (Sasha)
  - [ZBX-1357] updated French translation. Thanks to alixen (Richlv)
  - [ZBX-1732] added node and group name for screen widget "triggers info" (Vedmak)
  - [ZBXNEXT-196] added "Show with unacknowledged" filter option for triggers screen (Vedmak)
