@@ -1293,13 +1293,14 @@ require_once('include/js.inc.php');
 						$items = CItem::get($options);
 						$item = reset($items);
 						$host = reset($item['hosts']);
+
 //2010-12-01,12:44:13.324,+4:00
-//						$item['lastvalue'] = '2010-1-15,18:23:13.324,+4:00';
+//						$item['lastvalue'] = '2010-1-15,10:23:13.324,-4:0';
 //						$item['lastclock'] = time();
 
 						$timeType = $host['host'];
 
-						preg_match('/([+-]{1})([\d]{1,2}):([\d]{2})/', $item['lastvalue'], $arr);
+						preg_match('/([+-]{1})([\d]{1,2}):([\d]{1,2})/', $item['lastvalue'], $arr);
 						if(!empty($arr)){
 							$timeZone = $arr[2]*3600 + $arr[3]*60;
 							if($arr[1] == '-') $timeZone = 0 - $timeZone;
