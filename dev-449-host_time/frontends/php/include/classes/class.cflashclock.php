@@ -30,7 +30,7 @@ class CFlashClock extends CFlash{
 		if(!is_numeric($width) || $width < 24) $width = 200;
 		if(!is_numeric($height) || $height< 24) $height = 200;
 
-		$this->src = 'images/flash/zbxclock2.swf?analog=1&smooth=1';
+		$this->src = 'images/flash/zbxclock.swf?analog=1&smooth=1';
 		if(!is_null($url))	$this->src .= '&url='.urlencode($url);
 
 		parent::__construct($this->src,$width,$height);
