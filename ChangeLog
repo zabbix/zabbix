@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1717] fixed configuration -> ITservices display bugs when nodeid is greater than 99 (Vedmak)
  - [ZBX-1712] removed empty translation strings (Richlv)
  - [ZBXNEXT-194] added host status widget to dashboard (Vedmak)
  - [ZBX-1670] fixed events from slave nodes not shown when all nodes are selected (Vedmak)
