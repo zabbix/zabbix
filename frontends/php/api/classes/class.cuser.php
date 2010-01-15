@@ -228,11 +228,11 @@ class CUser extends CZBXAPI{
 					}
 
 // usrgrpids
-					if(isset($user['usrgrpid'])){
+					if(isset($user['usrgrpid'])  && is_null($options['select_usrgrps'])){
 						if(!isset($result[$user['userid']]['usrgrps']))
 							$result[$user['userid']]['usrgrps'] = array();
 
-						$result[$user['userid']]['usrgrps'][$user['usrgrpid']] = array('usrgrpid' => $user['usrgrpid']);
+						$result[$user['userid']]['usrgrps'][] = array('usrgrpid' => $user['usrgrpid']);
 						unset($user['usrgrpid']);
 					}
 
