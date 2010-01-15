@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1714] added confirmation dialog for proxy operations (Vedmak)
  - [ZBX-1717] fixed configuration -> ITservices display bugs when nodeid is greater than 99 (Vedmak)
  - [ZBX-1712] removed empty translation strings (Richlv)
  - [ZBXNEXT-194] added host status widget to dashboard (Vedmak)
