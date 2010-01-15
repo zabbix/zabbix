@@ -392,6 +392,7 @@ include_once('include/page_header.php');
 				'count' => 1,
 				'triggerids' => $trigger['triggerid'],
 				'acknowledged' => 0,
+				'value' => TRIGGER_VALUE_TRUE,
 				'nopermissions' => 1
 			);
 			$event_count = CEvent::get($options);
@@ -638,7 +639,7 @@ include_once('include/page_header.php');
 		), 'even_row');
 
 
-		if($show_events != EVENTS_OPTION_NOEVENT){
+		if(($show_events != EVENTS_OPTION_NOEVENT) && $config['event_ack_enable']){
 			$i = 0;
 
 			foreach($trigger['events'] as $enum => $row_event){

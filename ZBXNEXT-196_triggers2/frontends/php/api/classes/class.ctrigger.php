@@ -275,6 +275,7 @@ class CTrigger extends CZBXAPI{
 				' FROM events e'.
 				' WHERE e.objectid=t.triggerid'.
 					' AND e.object=0'.
+					' AND e.value='.TRIGGER_VALUE_TRUE.
 					' AND e.acknowledged=0)';
 		}
 // templated
