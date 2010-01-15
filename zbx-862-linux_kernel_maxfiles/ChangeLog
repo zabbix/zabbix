@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-862] added support of kernel.maxproc[] under Linux 2.6 (Sasha)
  - [ZBX-1712] removed empty translation strings (Richlv)
  - [ZBXNEXT-194] added host status widget to dashboard (Vedmak)
  - [ZBX-1670] fixed events from slave nodes not shown when all nodes are selected (Vedmak)
