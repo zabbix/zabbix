@@ -630,7 +630,7 @@ class CEvent extends CZBXAPI{
 					return false;
 				}
 			}
-			$events = array_merge($events, self::get(array('triggerids' => $triggerids, 'nopermissions' => 1, 'preservekeys' => 1)));
+			$events = array_merge($events, self::get(array('triggerids' => $triggerids, 'nopermissions' => 1, 'preservekeys' => 1, 'output' => API_OUTPUT_SHORTEN)));
 			$eventids = zbx_objectValues($events, 'eventid');
 		}
 // }}} PERMISSIONS
