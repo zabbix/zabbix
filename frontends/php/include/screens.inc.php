@@ -1299,7 +1299,7 @@
 						}
 						break;
 					case TIME_TYPE_SERVER:
-						$timeOffset = date('Z') - 14400;
+						$timeOffset = date('Z');
 						break;
 					default:
 						$timeOffset = null;
