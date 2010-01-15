@@ -702,12 +702,12 @@
 
 			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
 			if(remove_nodes_from_id($resourceid) > 0){
-				$result=DBselect('SELECT DISTINCT n.name as node_name,g.groupid,g.name '.
+				$sql = 'SELECT DISTINCT n.name as node_name,g.groupid,g.name '.
 						' FROM hosts_groups hg, groups g '.
 							' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('g.groupid').
 						' WHERE '.DBcondition('g.groupid',$available_groups).
-							' AND g.groupid='.$resourceid);
-
+							' AND g.groupid='.$resourceid;
+				$result=DBselect($sql);
 				while($row=DBfetch($result)){
 					$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
 					$caption = $row['node_name'].$row['name'];
@@ -1277,35 +1277,65 @@
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_CLOCK) ){
+					$error = null;
 					$timeOffset = null;
-
+					$timeZone = null;
+					
 					switch($style){
 					 case TIME_TYPE_HOST:
 						$options = array(
 							'itemids' => $resourceid,
+							'select_hosts' => API_OUTPUT_EXTEND,
 							'output' => API_OUTPUT_EXTEND
 						);
 
 						$items = CItem::get($options);
 						$item = reset($items);
-		
-						$lastvalue = $item['lastvalue'];
-						preg_match('/([+-]{1})([\d]{1,2}):([\d]{2})/', $lastvalue, $arr);
-						if(!empty($arr)){
-							$timeOffset = $arr[2]*3600 + $arr[3]*60;
-
-							if($arr[1] == '-')
-								$timeOffset = 0 - $timeOffset;
+						$host = reset($item['hosts']);
+						
+						$timeType = $host['host'];
+						if($lastvalue = strtotime($item['lastvalue'])){
+							$diff = (time() - date('Z') - $item['lastcheck']);
+							$timeOffset = $lastvalue + $diff;
 						}
+						else{
+							$error = S_NO_DATA_BIG;
+						}
+/*
+//2010-12-01,12:44:13.324,+4:00
+						preg_match(
+							'/([\d]{4})-([\d]{1,2})-([\d]{1,2}),([\d]{1,2}):([\d]{1,2}):([\d]{1,2}).([\d]{1,3}),([+-]{1})([\d]{1,2}):([\d]{2})/', 
+							$lastvalue, 
+							$arr
+						);
+//*/
+
+						preg_match('/([+-]{1})([\d]{1,2}):([\d]{2})/', $item['lastvalue'], $arr);
+						if(!empty($arr)){
+							$timeZone = $arr[2]*3600 + $arr[3]*60;
+							if($arr[1] == '-') $timeZone = 0 - $timeZone;
+						}
+
 						break;
 					case TIME_TYPE_SERVER:
-						$timeOffset = date('Z');
+						$error = null;
+						$timeType = S_SERVER_BIG;
+						$timeOffset = time();
+						$timeZone = date('Z');
 						break;
 					default:
+						$error = null;
+						$timeType = S_LOCAL_BIG;
 						$timeOffset = null;
+						$timeZone = null;
 					}
 
-					$item = new CFlashClock($width, $height, $timeOffset, $action);
+					$item = new CFlashClock($width, $height, $action);
+					$item->setTimeError($error);
+					$item->setTimeType($timeType);
+					$item->setTimeZone($timeZone);
+					$item->setTimeOffset($timeOffset);
+					
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_SCREEN) ){
 					$item = array(get_screen($resourceid, 2, $effectiveperiod));

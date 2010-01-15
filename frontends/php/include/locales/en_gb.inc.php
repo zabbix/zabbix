@@ -175,6 +175,7 @@
 	'S_BACK_BIG'=>				'BACK',
 	'S_NO_DATA_FOR_EXPORT'=>		'No data for export',
 	'S_NO_DATA_SMALL'=>			'no data',
+	'S_NO_DATA_BIG'=>			'NO DATA',
 	'S_RULES'=>				'Rules',
 	'S_EXISTING'=>				'Existing',
 	'S_MISSING'=>				'Missing',
@@ -182,6 +183,8 @@
 	'S_IMPORTED'=>				'Imported',
 	'S_SUCCESSEFULLY_SMALL'=>		'successfully',
 	'S_FAILED_SMALL'=>			'failed',
+	'S_LOCAL_BIG'=>				'LOCAL',
+	'S_SERVER_BIG'=>			'SERVER',
 
 //	admin.php
 	'S_PREVIOUS'=>				'Previous',
