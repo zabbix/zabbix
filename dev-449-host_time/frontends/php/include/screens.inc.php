@@ -1293,28 +1293,24 @@ require_once('include/js.inc.php');
 						$items = CItem::get($options);
 						$item = reset($items);
 						$host = reset($item['hosts']);
-						
-						$timeType = $host['host'];
-						if($lastvalue = strtotime($item['lastvalue'])){
-							$diff = (time() - date('Z') - $item['lastclock']);
-							$timeOffset = $lastvalue + $diff;
-						}
-						else{
-							$error = S_NO_DATA_BIG;
-						}
-/*
 //2010-12-01,12:44:13.324,+4:00
-						preg_match(
-							'/([\d]{4})-([\d]{1,2})-([\d]{1,2}),([\d]{1,2}):([\d]{1,2}):([\d]{1,2}).([\d]{1,3}),([+-]{1})([\d]{1,2}):([\d]{2})/', 
-							$lastvalue, 
-							$arr
-						);
-//*/
+//						$item['lastvalue'] = '2010-1-15,18:23:13.324,+4:00';
+//						$item['lastclock'] = time();
+
+						$timeType = $host['host'];
 
 						preg_match('/([+-]{1})([\d]{1,2}):([\d]{2})/', $item['lastvalue'], $arr);
 						if(!empty($arr)){
 							$timeZone = $arr[2]*3600 + $arr[3]*60;
 							if($arr[1] == '-') $timeZone = 0 - $timeZone;
+						}
+
+						if($lastvalue = strtotime($item['lastvalue'])){
+							$diff = (time() - $item['lastclock']);
+							$timeOffset = $lastvalue + $diff;
+						}
+						else{
+							$error = S_NO_DATA_BIG;
 						}
 
 						break;
