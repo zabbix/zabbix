@@ -508,8 +508,8 @@
 	'S_DELETE_SELECTED_NODE_Q'=>		'Delete selected node?',
 
 // proxies.php
-	'S_ENABLE_SELECTED_PROXIES' => 'Enable selected proxies?',
-	'S_DISABLE_SELECTED_PROXIES' => 'Disable selected proxies?',
+	'S_ENABLE_SELECTED_PROXIES' => 'Enable hosts monitored by selected proxies?',
+	'S_DISABLE_SELECTED_PROXIES' => 'Disable hosts monitored by selected proxies?',
 	'S_DELETE_SELECTED_PROXIES' => 'Delete selected proxies?',
 	'S_CONFIGURATION_OF_PROXIES'=>		'CONFIGURATION OF PROXIES',
 	'S_DELETE_SELECTED_PROXY_Q'=>		'Delete selected proxy?',
