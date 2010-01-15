@@ -614,7 +614,12 @@ class CEvent extends CZBXAPI{
 
 // PERMISSIONS {{{
 		if(!empty($events)){
-			$allowed_events = self::get(array('eventids' => $eventids, 'preservekeys' => 1));
+			$options = array(
+				'eventids' => $eventids, 
+				'preservekeys' => 1, 
+				'output' => API_OUTPUT_SHORTEN
+			);
+			$allowed_events = self::get($options);
 			foreach($events as $num => $event){
 				if(!isset($allowed_events[$event['eventid']])){
 					self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
@@ -630,7 +635,13 @@ class CEvent extends CZBXAPI{
 					return false;
 				}
 			}
-			$events = array_merge($events, self::get(array('triggerids' => $triggerids, 'nopermissions' => 1, 'preservekeys' => 1, 'output' => API_OUTPUT_SHORTEN)));
+			$options = array(
+				'triggerids' => $triggerids, 
+				'nopermissions' => 1, 
+				'preservekeys' => 1, 
+				'output' => API_OUTPUT_SHORTEN
+			);
+			$events = array_merge($events, self::get($options));
 			$eventids = zbx_objectValues($events, 'eventid');
 		}
 // }}} PERMISSIONS
