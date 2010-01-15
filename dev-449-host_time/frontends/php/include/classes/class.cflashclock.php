@@ -24,29 +24,26 @@ class CFlashClock extends CFlash{
  public $timetype;
  public $src;
 
-	public function __construct($width = 200, $height = 200, $timetype = TIME_TYPE_LOCAL, $url = NULL){
+	public function __construct($width = 200, $height = 200, $timeOffset = null, $url = NULL){
 		$this->timetype = null;
 
 		if(!is_numeric($width) || $width < 24) $width = 200;
 		if(!is_numeric($height) || $height< 24) $height = 200;
 
-		$this->src = 'images/flash/zbxclock.swf?analog=1&smooth=1';
+		$this->src = 'images/flash/zbxclock2.swf?analog=1&smooth=1';
 		if(!is_null($url))	$this->src .= '&url='.urlencode($url);
 
 		parent::__construct($this->src,$width,$height);
-		$this->setTimeType($timetype);
+		$this->setTimeOffset($timeOffset);
 	}
 
-	public function setTimeType($value){
-		if($value != TIME_TYPE_LOCAL && $value != TIME_TYPE_SERVER)
-			return $this->error('Incorrect value vor SetTimeType ['.$value.']');
-
-		$this->timetype = $value;
+	public function setTimeOffset($value){
+		$this->timeOffset = $value;
 	}
 
 	public function bodyToString(){
-		if($this->timetype == TIME_TYPE_SERVER)
-			$this->setSrc($this->src.'&timestamp='.(time() + date('Z')));
+		if(!is_null($this->timeOffset))
+			$this->setSrc($this->src.'&timeoffset='.$this->timeOffset);
 
 	return parent::bodyToString();
 	}

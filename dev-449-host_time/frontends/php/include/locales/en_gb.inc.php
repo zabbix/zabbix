@@ -1355,6 +1355,7 @@
 	'S_TIME_TYPE'=>				'Time type',
 	'S_SERVER_TIME'=>			'Server time',
 	'S_LOCAL_TIME'=>			'Local time',
+	'S_HOST_TIME'=>				'Host time',
 
 	'S_STYLE'=>				'Style',
 	'S_VERTICAL'=>				'Vertical',
