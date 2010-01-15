@@ -49,7 +49,7 @@ include_once('include/page_header.php');
 		'elements'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,65535),	null),
 		'valign'=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(VALIGN_MIDDLE,VALIGN_BOTTOM),		null),
 		'halign'=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(HALIGN_CENTER,HALIGN_RIGHT),		null),
-		'style'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(STYLE_HORISONTAL,STYLE_VERTICAL),	'isset({save})'),
+		'style'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,2),	'isset({save})'),
 		'url'=>			array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})'),
 		'dynamic'=>		array(T_ZBX_INT, O_OPT,  null,  null,			null),
 		'x'=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),		'isset({save})&&(isset({form})&&({form}!="update"))'),
@@ -107,13 +107,18 @@ include_once('include/page_header.php');
 					$msg_ok = S_ITEM_ADDED;
 					$msg_err = S_CANNOT_ADD_ITEM;
 				}
-				
+
 				$resources = array(SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT, SCREEN_RESOURCE_MAP,
-					SCREEN_RESOURCE_SCREEN, SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW);
+					SCREEN_RESOURCE_SCREEN, SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW, SCREEN_RESOURCE_CLOCK);
 				if(str_in_array($_REQUEST['resourcetype'], $resources) && ($_REQUEST['resourceid'] == 0)){
-					throw new Exception('Incorrect resource');
+					if(SCREEN_RESOURCE_CLOCK == $_REQUEST['resourcetype']){
+						if(TIME_TYPE_HOST == $_REQUEST['style']) throw new Exception('Incorrect resource');
+					}
+					else{		
+						throw new Exception('Incorrect resource');
+					}
 				}
-				
+
 				if(isset($_REQUEST['screenitemid'])){
 					$result = update_screen_item($_REQUEST['screenitemid'],
 						$_REQUEST['resourcetype'],$_REQUEST['resourceid'],$_REQUEST['width'],
