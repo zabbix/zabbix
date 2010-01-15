@@ -20,11 +20,11 @@
 function SDB($return=false){
 	$backtrace = debug_backtrace();
 	array_shift($backtrace);
-	$result = 'DEBUG BACKTRACE: ';
+	$result = 'DEBUG BACKTRACE: <br/>';
 	foreach($backtrace as $n => $bt){
 		$result .= '  --['.$n.']-- '.$bt['file'].' : '.$bt['line'].' | ';
 		$result .= isset($bt['class']) ? $bt['class'].$bt['type'].$bt['function'] : $bt['function'];
-		$result .= '( '.print_r($bt['args'], true).' ) ';
+		$result .= '( '.print_r($bt['args'], true).' ) <br/>';
 	}
 	if($return) return $result;
 	else echo $result;
