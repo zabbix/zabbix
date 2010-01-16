@@ -36,7 +36,7 @@ int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	if(NULL != ( f = fopen("/proc/sys/fs/file-max","r") ))
 	{
-		if(fgets(line,MAX_STRING_LEN,f) != NULL);
+		if (NULL != fgets(line, sizeof(line), f))
 		{
 			if(sscanf(line,ZBX_FS_UI64 "\n", &value) == 1)
 			{
@@ -52,29 +52,24 @@ int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef HAVE_FUNCTION_SYSCTL_KERN_MAXPROC
-	int	mib[2],len;
-	int	maxproc;
+#ifdef HAVE_FUNCTION_SYSCTL_KERN_PIDMAX
+	size_t	sz;
+	int	maxproc, mib[2] = {CTL_KERN, KERN_PIDMAX};
 
 	assert(result);
 
-        init_result(result);
+	init_result(result);
 
-	mib[0]=CTL_KERN;
-	mib[1]=KERN_MAXPROC;
+	sz = sizeof(maxproc);
 
-	len=sizeof(maxproc);
-
-	if(sysctl(mib,2,&maxproc,(size_t *)&len,NULL,0) != 0)
-	{
-		return	SYSINFO_RET_FAIL;
-/*		printf("Errno [%m]");*/
-	}
+	if (0 != sysctl(mib, 2, &maxproc, &sz, NULL, 0))
+		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, maxproc);
+
 	return SYSINFO_RET_OK;
 #else
-	return	SYSINFO_RET_FAIL;
+	return SYSINFO_RET_FAIL;
 #endif
 }
 
