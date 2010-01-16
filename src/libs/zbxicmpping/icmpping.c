@@ -162,7 +162,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 			if (0 != strcmp(c, "-"))
 			{
-				sec = atof(c);
+				/* Convert ms to seconds */
+				sec = atof(c)/1000;
 
 				if (host->rcv == 0 || host->min > sec)
 					host->min = sec;
