@@ -315,7 +315,7 @@ include_once('include/page_header.php');
 
 	$table->setHeader(array(
 		$whow_hide_all,
-		$header_cb,
+		$config['event_ack_enable'] ? $header_cb : null,
 		make_sorting_header(S_SEVERITY, 'priority'),
 		S_STATUS,
 		make_sorting_header(S_LAST_CHANGE, 'lastchange'),
@@ -398,13 +398,13 @@ include_once('include/page_header.php');
 			$event_count = CEvent::get($options);
 			
 			$triggers[$tnum]['event_count'] = $event_count['rowscount'];
-			$triggers[$tnum]['events'] = array();
 		}
 	}
 	
 	$trigger_hosts = array();
 	foreach($triggers as $tnum => $trigger){
 		$trigger_hosts = array_merge($trigger_hosts, $trigger['hosts']);
+		$triggers[$tnum]['events'] = array();
 	}
 
 	$trigger_hostids = zbx_objectValues($trigger_hosts, 'hostid');
@@ -429,6 +429,7 @@ include_once('include/page_header.php');
 			break;
 			case EVENTS_OPTION_NOT_ACK:
 				$ev_options['acknowledged'] = 0;
+				$ev_options['value'] = TRIGGER_VALUE_TRUE;
 			break;
 			case EVENTS_OPTION_ONLYTRUE_NOTACK:
 				$ev_options['acknowledged'] = 0;
@@ -625,7 +626,8 @@ include_once('include/page_header.php');
 
 		$table->addRow(array(
 			$open_close,
-			$show_event_col ? null : new CCheckBox('triggers['.$trigger['triggerid'].']', 'no', NULL, $trigger['triggerid']),
+			$config['event_ack_enable'] ? 
+				($show_event_col ? null : new CCheckBox('triggers['.$trigger['triggerid'].']', 'no', null, $trigger['triggerid'])) : null,
 			$severity_col,
 			$status,
 			$lastchange,
@@ -639,7 +641,7 @@ include_once('include/page_header.php');
 		), 'even_row');
 
 
-		if(($show_events != EVENTS_OPTION_NOEVENT) && $config['event_ack_enable']){
+		if($show_events != EVENTS_OPTION_NOEVENT){
 			$i = 0;
 
 			foreach($trigger['events'] as $enum => $row_event){
@@ -680,7 +682,7 @@ include_once('include/page_header.php');
 				$ack_cb_col->setColSpan(2);
 				$row = new CRow(array(
 					SPACE,
-					$ack_cb_col,
+					$config['event_ack_enable'] ? $ack_cb_col : null,
 					$status,
 					$clock,
 					zbx_date2age($row_event['clock']),
