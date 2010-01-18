@@ -911,10 +911,10 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 		fi
 	fi
 
-	AC_MSG_CHECKING(for ZABBIX server database selection)
+	AC_MSG_CHECKING(for Zabbix server database selection)
 	if test "x$have_db" = "xno"; then
 		AC_MSG_RESULT(error)
-		AC_MSG_ERROR([No database selected for ZABBIX server. Use --with-mysql or --with-oracle or --with-pgsql or --with-sqlite3.])
+		AC_MSG_ERROR([No database selected for Zabbix server. Use --with-mysql or --with-oracle or --with-pgsql or --with-sqlite3.])
 	else
 		AC_MSG_RESULT(ok)
 	fi
@@ -1312,7 +1312,7 @@ echo
 echo "***********************************************************"
 echo "*            Now run '${am_make} install'                       *"
 echo "*                                                         *"
-echo "*            Thank you for using ZABBIX!                  *"
+echo "*            Thank you for using Zabbix!                  *"
 echo "*              <http://www.zabbix.com>                    *"
 echo "***********************************************************"
 echo
