@@ -405,7 +405,7 @@ createBox: function(obj, hint_text, width, className, byClick){
 	else obj.parentNode.appendChild(box);
 	
 	box.setAttribute('id', boxid);
-	box.style.visibility = 'hidden';
+	box.style.display = 'none';
 	box.className = 'hintbox';
 	
 	if(!empty(className)){
@@ -547,10 +547,13 @@ show: function(e, obj, hintbox){
 	hintbox.x	= pos.left;
 //*/
 	
+	hintbox.style.visibility = 'hidden';
+	hintbox.style.display = 'block';
+
 	posit = $(obj).positionedOffset();
 	cumoff = $(obj).cumulativeOffset();
 	if(parseInt(cumoff.left+10+hintbox.offsetWidth) > body_width){
-		posit.left-=parseInt(hintbox.offsetWidth);
+		posit.left-=parseInt((cumoff.left+10+hintbox.offsetWidth) - body_width);
 		posit.left-=10;
 		//posit.left=(pos.left < 0)?0:posit.left;
 	}
