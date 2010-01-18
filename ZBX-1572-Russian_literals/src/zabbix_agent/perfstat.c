@@ -184,7 +184,7 @@ int	add_perfs_from_config(const char *line)
 	
 	if (FAIL == zbx_unicode_to_utf8_static(wcounterPath, counterPath, PDH_MAX_COUNTER_PATH))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "PerfCounter \"%s\" could not be converted to UTF-8.", wcounterPath);
+		zabbix_log(LOG_LEVEL_DEBUG, "PerfCounter \"%s\" could not be converted to UTF-8.", counterPath);
 		zbx_free(wcounterPath);
 		return FAIL;
 	}
