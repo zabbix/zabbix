@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1572] fixed processing of the performance counters defined in the configuration file using non-latin symbols (Dmitry)
  - [ZBX-1264] added support of simplified syntax for external checks (Alexei)
  - [ZBX-1483] fixed icmppingsec to return seconds as in 1.6.x (Alexei)
  - [ZBX-862] added support of kernel.maxproc[] under Linux 2.6 (Sasha)
