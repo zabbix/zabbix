@@ -344,6 +344,7 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 			if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]) && 0 != atoi(row[0]))
 				ret = SUCCEED;
 			DBfree_result(result);
+			break;
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
 					condition->operator,
