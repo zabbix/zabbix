@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -511,7 +511,20 @@ include_once('include/page_header.php');
 
 		$graphs = CGraph::get($options);
 
-// Change graphtype from numbers to names, for correct sorting
+		order_result($graphs, $sortfield, $sortorder);
+		$paging = getPagingLine($graphs);
+
+		
+		$graphids = zbx_objectValues($graphs, 'graphid');
+		$options = array(
+			'graphids' => $graphids,
+			'extendoutput' => 1,
+			'select_hosts' => 1,
+			'select_templates' => 1
+		);
+		$graphs = CGraph::get($options);
+
+		// Change graphtype from numbers to names, for correct sorting
 		foreach($graphs as $gnum => $graph){
 			switch($graph['graphtype']){
 				case GRAPH_TYPE_STACKED:
@@ -527,27 +540,10 @@ include_once('include/page_header.php');
 					$graphtype = S_NORMAL;
 				break;
 			}
-
 			$graphs[$gnum]['graphtype'] = $graphtype;
 		}
-
-// sorting
+		
 		order_result($graphs, $sortfield, $sortorder);
-//---------
-
-		$graphids = zbx_objectValues($graphs, 'graphid');
-		$options = array(
-			'graphids' => $graphids,
-			'extendoutput' => 1,
-			'select_hosts' => 1,
-			'select_templates' => 1
-		);
-		$graphs = CGraph::get($options);
-
-// sorting
-		order_result($graphs, $sortfield, $sortorder);
-		$paging = getPagingLine($graphs);
-//---------
 
 		foreach($graphs as $gnum => $graph){
 			$graphid = $graph['graphid'];
