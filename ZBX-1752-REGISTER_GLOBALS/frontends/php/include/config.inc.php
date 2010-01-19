@@ -952,10 +952,11 @@ function __autoload($class_name){
 			imagepng($image);
 			$image_txt = ob_get_contents();
 			ob_end_clean();
-
+//SDI($image_txt);
 			session_start();
 			$id = md5($image_txt);
-			$_SESSION['imageid'][$id] = $image_txt;
+			$_SESSION['image_id'] = array();
+			$_SESSION['image_id'][$id] = $image_txt;
 			session_write_close();
 			print($id);
 
