@@ -486,7 +486,7 @@ SDI('///////////////////////////////////////');
 
 			if(!$map_db_fields){
 				$result = false;
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Map with ID ['.$map['sysmapid'].'] does not exists');
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Map with ID ['.$map['sysmapid'].'] does not exist');
 				break;
 			}
 
