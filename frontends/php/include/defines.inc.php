@@ -38,7 +38,7 @@
 	define('EVENTS_OPTION_NOEVENT',			1);	// use 0 to disable
 	define('EVENTS_OPTION_ALL',				2);	// use 0 to disable
 	define('EVENTS_OPTION_NOT_ACK',			3);	// use 0 to disable
-	define('EVENTS_OPTION_ONLYTRUE_NOTACK',	4);	// use 0 to disable
+	define('EVENTS_OPTION_ONLYTRUE_NOTACK',	0);	// use 0 to disable
 	define('EVENTS_OPTION_EVENT_LAST',		0); // use 0 to disable
 
 	define('ZBX_MIN_PERIOD',				3600);		// 1 hour
