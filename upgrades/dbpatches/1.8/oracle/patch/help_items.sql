@@ -71,7 +71,7 @@ insert into help_items values(0,'system.users.num','Number of users connected. C
 insert into help_items values(0,'vfs.dev.read[device &lt;,type&gt; &lt;,mode&gt;]','Device read statistics.');
 insert into help_items values(0,'vfs.dev.write[device &lt;,type&gt; &lt;,mode&gt;]','Device write statistics.');
 insert into help_items values(0,'vfs.file.cksum[file]','Calculate check sum of a given file. Check sum of the file calculate by standard algorithm used by UNIX utility cksum. Example: vfs.file.cksum[/etc/passwd]');
-insert into help_items values(0,'vfs.file.exists[file]','Check file existance. 0 - file does not exists, 1 - file exists');
+insert into help_items values(0,'vfs.file.exists[file]','Check file existance. 0 - file does not exist, 1 - file exists');
 insert into help_items values(0,'vfs.file.md5sum[file]','Calculate MD5 check sum of a given file. String MD5 hash of the file. Can be used for files less than 64MB, unsupported otherwise. Example: vfs.file.md5sum[/etc/zabbix/zabbix_agentd.conf]');
 insert into help_items values(0,'vfs.file.regexp[file,regexp]','Find string in a file. Matched string');
 insert into help_items values(0,'vfs.file.regmatch[file,regexp]','Find string in a file. 0 - expression not found, 1 - found');
@@ -120,7 +120,7 @@ insert into help_items values(7,'system.users.num','Number of users connected. C
 insert into help_items values(7,'vfs.dev.read[device &lt;,type&gt; &lt;,mode&gt;]','Device read statistics.');
 insert into help_items values(7,'vfs.dev.write[device &lt;,type&gt; &lt;,mode&gt;]','Device write statistics.');
 insert into help_items values(7,'vfs.file.cksum[file]','Calculate check sum of a given file. Check sum of the file calculate by standard algorithm used by UNIX utility cksum. Example: vfs.file.cksum[/etc/passwd]');
-insert into help_items values(7,'vfs.file.exists[file]','Check file existance. 0 - file does not exists, 1 - file exists');
+insert into help_items values(7,'vfs.file.exists[file]','Check file existance. 0 - file does not exist, 1 - file exists');
 insert into help_items values(7,'vfs.file.md5sum[file]','Calculate MD5 check sum of a given file. String MD5 hash of the file. Can be used for files less than 64MB, unsupported otherwise. Example: vfs.file.md5sum[/etc/zabbix/zabbix_agentd.conf]');
 insert into help_items values(7,'vfs.file.regexp[file,regexp]','Find string in a file. Matched string');
 insert into help_items values(7,'vfs.file.regmatch[file,regexp]','Find string in a file. 0 - expression not found, 1 - found');
