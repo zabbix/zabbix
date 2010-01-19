@@ -254,17 +254,17 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['move_up']) && isset($_REQUEST['items'])){
 		if(isset($_REQUEST['items'][$_REQUEST['move_up']])){
 			$tmp = $_REQUEST['items'][$_REQUEST['move_up']];
-			$_REQUEST['items'][$_REQUEST['move_up']] = $_REQUEST['items'][$_REQUEST['move_up'] - 1];
-			$_REQUEST['items'][$_REQUEST['move_up'] - 1] = $tmp;
 
+			$_REQUEST['items'][$_REQUEST['move_up']]['sortorder'] = $_REQUEST['items'][$_REQUEST['move_up'] - 1]['sortorder'];
+			$_REQUEST['items'][$_REQUEST['move_up'] - 1]['sortorder'] = $tmp['sortorder'];
 		}
 	}
 	else if(isset($_REQUEST['move_down']) && isset($_REQUEST['items'])){
 		if(isset($_REQUEST['items'][$_REQUEST['move_down']])){
 			$tmp = $_REQUEST['items'][$_REQUEST['move_down']];
-			$_REQUEST['items'][$_REQUEST['move_down']] = $_REQUEST['items'][$_REQUEST['move_down'] + 1];
-			$_REQUEST['items'][$_REQUEST['move_down'] + 1] = $tmp;
-
+				
+			$_REQUEST['items'][$_REQUEST['move_down']]['sortorder'] = $_REQUEST['items'][$_REQUEST['move_down'] + 1]['sortorder'];
+			$_REQUEST['items'][$_REQUEST['move_down'] + 1]['sortorder'] = $tmp['sortorder'];
 		}
 	}
 //------ GO -------

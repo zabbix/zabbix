@@ -3011,12 +3011,16 @@
 			}
 		}
 
-		array_merge($items);
-		foreach($items as $key => $item){
-			$items[$key]['sortorder'] = $key;
-			//asort_by_key($items, 'sortorder');
+		$icount = count($items);
+		for($i=0; $i < $icount-1; $i++){
+			if($items[$i]['sortorder'] == $items[$i+1]['sortorder'])
+				for($j=$i+1; $j < $icount; $j++)
+					if($items[$j-1]['sortorder'] >= $items[$j]['sortorder']) $items[$j]['sortorder']++;
 		}
 
+		asort_by_key($items, 'sortorder');
+			
+		$items = array_values($items);
 
 		$group_gid = get_request('group_gid', array());
 
@@ -3149,7 +3153,6 @@
 			$frmGraph->addRow(S_LEGEND,new CCheckBox('legend',$legend,'javascript: graphs.submit(this);',1));
 		}
 
-
 		$only_hostid = null;
 		$monitored_hosts = null;
 
@@ -3163,7 +3166,6 @@
 			$items_table = new CTableInfo();
 			foreach($items as $gid => $gitem){
 				//if($graphtype == GRAPH_TYPE_STACKED && $gitem['type'] == GRAPH_ITEM_AGGREGATED) continue;
-
 				$host = get_host_by_itemid($gitem['itemid']);
 				$item = get_item_by_itemid($gitem['itemid']);
 
