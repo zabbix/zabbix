@@ -398,18 +398,24 @@ class CChart extends CGraphDraw{
 
 				for($j = $i-1; $j >= 0; $j--){
 					if($this->items[$j]['axisside'] != $this->items[$i]['axisside']) continue;
-
+//SDI($this->items[$j]['calc_type']);
 					$prev_data = &$this->data[$this->items[$j]['itemid']][$this->items[$j]['calc_type']];
+					$calc_fnc = graph_item_calc_fnc2str($this->items[$j]['calc_fnc']);
 
 					if(!isset($prev_data))	continue;
 
 					for($ci = 0; $ci < $this->sizeX; $ci++){
+						$prev_shift	= &$prev_data['shift_'.$calc_fnc];
+						$prev_var	= &$prev_data[$calc_fnc];
+
 						foreach(array('min','max','avg') as $var_name){
 							$shift_var_name	= 'shift_'.$var_name;
 							$curr_shift	= &$curr_data[$shift_var_name];
 							$curr_var	= &$curr_data[$var_name];
-							$prev_shift	= &$prev_data[$shift_var_name];
-							$prev_var	= &$prev_data[$var_name];
+
+//							$prev_shift	= &$prev_data[$shift_var_name];
+//							$prev_var	= &$prev_data[$var_name];
+							
 							$curr_shift[$ci] = $prev_var[$ci] + $prev_shift[$ci];
 						}
 					}
