@@ -89,7 +89,7 @@ class czbxrpc{
 
 		$class_name = 'C'.$resource;
 		if(!method_exists($class_name, $action)){
-			self::$result = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Action does not exists');
+			self::$result = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Action does not exist');
 			return self::$result;
 		}
 
