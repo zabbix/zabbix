@@ -179,7 +179,7 @@ class CMap extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.'
+		$sql = 'SELECT DISTINCT '.$sql_select.'
 				FROM '.$sql_from.'
 				WHERE '.DBin_node('s.sysmapid', $nodeids).
 					$sql_where.
