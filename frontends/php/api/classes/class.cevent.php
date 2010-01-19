@@ -608,8 +608,6 @@ class CEvent extends CZBXAPI{
 
 		$events = isset($events_data['events']) ? zbx_toArray($events_data['events']) : array();
 		$eventids = zbx_objectValues($events, 'eventid');
-		$triggers = isset($events_data['triggers']) ? zbx_toArray($events_data['triggers']) : array();
-		$triggerids = zbx_objectValues($triggers, 'triggerid');
 		$message = $events_data['message'];
 
 // PERMISSIONS {{{
@@ -627,24 +625,8 @@ class CEvent extends CZBXAPI{
 				}
 			}
 		}
-		if(!empty($triggers)){
-			$allowed_triggers = CTrigger::get(array('triggerids' => $triggerids, 'preservekeys' => 1));
-			foreach($triggers as $num => $trigger){
-				if(!isset($allowed_triggers[$trigger['triggerid']])){
-					self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
-					return false;
-				}
-			}
-			$options = array(
-				'triggerids' => $triggerids, 
-				'nopermissions' => 1, 
-				'preservekeys' => 1, 
-				'output' => API_OUTPUT_SHORTEN
-			);
-			$events = array_merge($events, self::get($options));
-			$eventids = zbx_objectValues($events, 'eventid');
-		}
 // }}} PERMISSIONS
+
 		self::BeginTransaction(__METHOD__);
 
 		$result = DBexecute('UPDATE events SET acknowledged=1 WHERE '.DBcondition('eventid', $eventids));

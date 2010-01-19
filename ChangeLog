@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1759] fixed bug when bulk acknowledge, acknowledges already acknowledged events (Vedmak)
  - [ZBX-1596] fixed checking of allowed hosts for data sent by zabbix_sender (Dmitry)
  - [ZBX-1572] fixed processing of the performance counters defined in the configuration file using non-latin symbols (Dmitry)
  - [ZBX-1264] added support of simplified syntax for external checks (Alexei)
