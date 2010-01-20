@@ -394,6 +394,7 @@ class zbxXML{
 							foreach($data['graphs_items'] as $ginum => $gitem){
 								$tmp_item = get_item_by_itemid($gitem['itemid']);
 
+								$gitem['graphs'] = zbx_toHash($gitem['graphs'], 'graphid');
 								if(isset($gitem['graphs'][$graph['graphid']])){
 									self::addChildData($graph_elements_node, XML_TAG_GRAPH_ELEMENT, $gitem);
 								}
