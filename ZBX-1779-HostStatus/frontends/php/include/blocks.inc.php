@@ -453,15 +453,11 @@ function make_hoststat_summary(){
 					if(empty($host['groups'])) unset($hosts[$hnum]);
 					
 					$highest_severity = TRIGGER_SEVERITY_NOT_CLASSIFIED;
-					
-					
+				
 					
 					foreach($triggers as $tnum => $trigger){
 						foreach($trigger['hosts'] as $thnum => $trigger_host){
 							if($trigger_host['hostid'] == $host['hostid']){
-								unset($trigger['hosts'][$thnum]);
-								// if $trigger is shown for all hosts it is in, unset it
-								if(empty($trigger['hosts'])) unset($triggers[$tnum]);
 								
 								if($popup_rows < ZBX_POPUP_MAX_ROWS){
 									if(!isset($problematic_host_list[$host['hostid']])){
@@ -483,13 +479,9 @@ function make_hoststat_summary(){
 								if($trigger['priority'] > $highest_severity){
 									$highest_severity = $trigger['priority'];
 								}
-								
-													
-								
 							}
 						}
 					}
-					
 					isset($problematic_host_list[$host['hostid']]) ? $hosts_data['problematic']++ : $hosts_data['ok']++;
 				}
 			}
