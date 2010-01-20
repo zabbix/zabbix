@@ -300,6 +300,9 @@ include_once('include/page_header.php');
 		}
 	}
 
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>
