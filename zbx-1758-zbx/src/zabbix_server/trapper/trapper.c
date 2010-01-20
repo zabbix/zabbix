@@ -171,11 +171,13 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 						item.type == ITEM_TYPE_AGGREGATE ||
 						item.type == ITEM_TYPE_DB_MONITOR))
 			continue;
-
-		if (item.type == ITEM_TYPE_ZABBIX_ACTIVE &&
+			
+		if (item.type == ITEM_TYPE_TRAPPER &&
 				FAIL == zbx_tcp_check_security(sock, item.trapper_hosts, 1))
-
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Process data failed: %s", zbx_tcp_strerror());
 			continue;
+		}
 
 		if (0 == strcmp(values[i].value, "ZBX_NOTSUPPORTED"))
 		{

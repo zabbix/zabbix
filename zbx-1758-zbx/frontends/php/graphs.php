@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -254,17 +254,17 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['move_up']) && isset($_REQUEST['items'])){
 		if(isset($_REQUEST['items'][$_REQUEST['move_up']])){
 			$tmp = $_REQUEST['items'][$_REQUEST['move_up']];
-			$_REQUEST['items'][$_REQUEST['move_up']] = $_REQUEST['items'][$_REQUEST['move_up'] - 1];
-			$_REQUEST['items'][$_REQUEST['move_up'] - 1] = $tmp;
 
+			$_REQUEST['items'][$_REQUEST['move_up']]['sortorder'] = $_REQUEST['items'][$_REQUEST['move_up'] - 1]['sortorder'];
+			$_REQUEST['items'][$_REQUEST['move_up'] - 1]['sortorder'] = $tmp['sortorder'];
 		}
 	}
 	else if(isset($_REQUEST['move_down']) && isset($_REQUEST['items'])){
 		if(isset($_REQUEST['items'][$_REQUEST['move_down']])){
 			$tmp = $_REQUEST['items'][$_REQUEST['move_down']];
-			$_REQUEST['items'][$_REQUEST['move_down']] = $_REQUEST['items'][$_REQUEST['move_down'] + 1];
-			$_REQUEST['items'][$_REQUEST['move_down'] + 1] = $tmp;
-
+				
+			$_REQUEST['items'][$_REQUEST['move_down']]['sortorder'] = $_REQUEST['items'][$_REQUEST['move_down'] + 1]['sortorder'];
+			$_REQUEST['items'][$_REQUEST['move_down'] + 1]['sortorder'] = $tmp['sortorder'];
 		}
 	}
 //------ GO -------
@@ -511,7 +511,20 @@ include_once('include/page_header.php');
 
 		$graphs = CGraph::get($options);
 
-// Change graphtype from numbers to names, for correct sorting
+		order_result($graphs, $sortfield, $sortorder);
+		$paging = getPagingLine($graphs);
+
+		
+		$graphids = zbx_objectValues($graphs, 'graphid');
+		$options = array(
+			'graphids' => $graphids,
+			'extendoutput' => 1,
+			'select_hosts' => 1,
+			'select_templates' => 1
+		);
+		$graphs = CGraph::get($options);
+
+		// Change graphtype from numbers to names, for correct sorting
 		foreach($graphs as $gnum => $graph){
 			switch($graph['graphtype']){
 				case GRAPH_TYPE_STACKED:
@@ -527,27 +540,10 @@ include_once('include/page_header.php');
 					$graphtype = S_NORMAL;
 				break;
 			}
-
 			$graphs[$gnum]['graphtype'] = $graphtype;
 		}
-
-// sorting
+		
 		order_result($graphs, $sortfield, $sortorder);
-//---------
-
-		$graphids = zbx_objectValues($graphs, 'graphid');
-		$options = array(
-			'graphids' => $graphids,
-			'extendoutput' => 1,
-			'select_hosts' => 1,
-			'select_templates' => 1
-		);
-		$graphs = CGraph::get($options);
-
-// sorting
-		order_result($graphs, $sortfield, $sortorder);
-		$paging = getPagingLine($graphs);
-//---------
 
 		foreach($graphs as $gnum => $graph){
 			$graphid = $graph['graphid'];
