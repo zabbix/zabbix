@@ -435,7 +435,7 @@ static void	process_maintenance()
 	const char			*__function_name = "process_maintenance";
 	DB_RESULT			result;
 	DB_ROW				row;
-	int				day, wday, mon, mday, sec;
+	int				day, week, wday, mon, mday, sec;
 	struct tm			*tm;
 	zbx_uint64_t			db_maintenanceid;
 	time_t				now, db_active_since, maintenance_from;
@@ -484,46 +484,64 @@ static void	process_maintenance()
 		db_period		= atoi(row[9]);
 		db_start_date		= atoi(row[10]);
 
+		tm = localtime(&db_active_since);
+		db_active_since		= db_active_since - (tm->tm_hour * 3600 + tm->tm_min * 60 + tm->tm_sec);
+
 		switch (db_timeperiod_type) {
 		case TIMEPERIOD_TYPE_ONETIME:
+			/* check for start date and maintenance period */
 			if (db_start_date > now || now >= db_start_date + db_period)
 				continue;
 			maintenance_from = db_start_date;
 			break;
 		case TIMEPERIOD_TYPE_DAILY:
+			/* check for every n day */
 			day = now - (int)db_active_since;
-			day = day / 86400 + ((day % 86400) ? 1 : 0);
+			day = day / 86400 + 1;
 			if (0 != (day % db_every))
 				continue;
 
-			if (db_start_time > sec || sec >= db_start_time + db_period)
+			/* check for start time and maintenance period */
+			db_start_date = now - sec + db_start_time;
+			if (sec < db_period)
+				db_start_date -= 86400;
+			if (db_start_date > now || now >= db_start_date + db_period)
 				continue;
-			maintenance_from = now - sec + db_start_time;
+			maintenance_from = db_start_date;
 			break;
 		case TIMEPERIOD_TYPE_WEEKLY:
+			/* check for day of week */
 			if (0 == (db_dayofweek & (1 << wday)))
 				continue;
 
-			day = now - (int)db_active_since;
-			day = day / 86400 + ((day % 86400) ? 1 : 0);
-			if (0 != ((day / 7 + ((day % 7) ? 1 : 0)) % db_every))
+			/* check for every n week */
+			week = now - (int)db_active_since;
+			week = week / 604800 + 1;
+			if (0 != (week % db_every))
 				continue;
 
-			if (db_start_time > sec || sec >= db_start_time + db_period)
+			/* check for start time and maintenance period */
+			db_start_date = now - sec + db_start_time;
+			if (sec < db_period)
+				db_start_date -= 86400;
+			if (db_start_date > now || now >= db_start_date + db_period)
 				continue;
-			maintenance_from = now - sec + db_start_time;
+			maintenance_from = db_start_date;
 			break;
 		case TIMEPERIOD_TYPE_MONTHLY:
+			/* check for month */
 			if (0 == (db_month & (1 << mon)))
 				continue;
 
 			if (0 != db_day)
 			{
+				/* check for day of the month */
 				if (mday != db_day)
 					continue;
 			}
 			else
 			{
+				/* check for day of the week */
 				if (0 == (db_dayofweek & (1 << wday)))
 					continue;
 
@@ -531,9 +549,13 @@ static void	process_maintenance()
 					continue;
 			}
 
-			if (db_start_time > sec || sec >= db_start_time + db_period)
+			/* check for start time and maintenance period */
+			db_start_date = now - sec + db_start_time;
+			if (sec < db_period)
+				db_start_date -= 86400;
+			if (db_start_date > now || now >= db_start_date + db_period)
 				continue;
-			maintenance_from = now - sec + db_start_time;
+			maintenance_from = db_start_date;
 			break;
 		default:
 			continue;
