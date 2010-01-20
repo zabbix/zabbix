@@ -30,7 +30,7 @@
 	$page['title'] = 'S_STATUS_OF_TRIGGERS';
 	$page['scripts'] = array('scriptaculous.js?load=effects');
 	$page['hist_arg'] = array('groupid', 'hostid');
-	$page['scripts'] = array('class.switcher.js');
+	$page['scripts'] = array('class.cswitcher.js');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -243,7 +243,7 @@ include_once('include/page_header.php');
 	if(TRIGGERS_OPTION_ONLYTRUE){
 		$tr_select->additem(TRIGGERS_OPTION_ONLYTRUE, S_SHOW_ONLY_PROBLEMS);
 	}
-	if(TRIGGERS_OPTION_SHOW_ALL_WITH_UNACKNOWLEDGED){
+	if(TRIGGERS_OPTION_SHOW_ALL_WITH_UNACKNOWLEDGED && $config['event_ack_enable']){
 		$tr_select->addItem(TRIGGERS_OPTION_SHOW_ALL_WITH_UNACKNOWLEDGED, S_SHOW_ALL_WITH_UNACKNOWLEDGED);
 	}
 
@@ -315,7 +315,7 @@ include_once('include/page_header.php');
 
 	$table->setHeader(array(
 		$whow_hide_all,
-		$header_cb,
+		$config['event_ack_enable'] ? $header_cb : null,
 		make_sorting_header(S_SEVERITY, 'priority'),
 		S_STATUS,
 		make_sorting_header(S_LAST_CHANGE, 'lastchange'),
@@ -339,15 +339,14 @@ include_once('include/page_header.php');
 		'extendoutput' => 1,
 		'sortfield' => $sortfield,
 		'sortorder' => $sortorder,
-		'limit' => ($config['search_limit']+1),
-		'preservekeys' => 1
+		'limit' => ($config['search_limit']+1)
 	);
 
 // Filtering
 	if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
 		$options['hostids'] = $PAGE_HOSTS['selected'];
 	}
-	else if(!empty($PAGE_HOSTS['hostids'])){
+	else if(($PAGE_GROUPS['selected'] > 0) && !empty($PAGE_HOSTS['hostids'])){
 		$options['hostids'] = $PAGE_HOSTS['hostids'];
 	}
 	else if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
@@ -361,11 +360,14 @@ include_once('include/page_header.php');
 	if($show_triggers == TRIGGERS_OPTION_ONLYTRUE){
 		$options['only_true'] = 1;
 	}
+	if($show_triggers == TRIGGERS_OPTION_SHOW_ALL_WITH_UNACKNOWLEDGED){
+		$options['with_unacknowledged_events'] = 1;
+	}
 	if($show_severity > -1){
 		$options['min_severity'] = $show_severity;
 	}
-	$triggers = CTrigger::get($options);
 
+	$triggers = CTrigger::get($options);
 
 // sorting && paging
 	order_result($triggers, $sortfield, $sortorder);
@@ -373,32 +375,39 @@ include_once('include/page_header.php');
 
 	$options = array(
 		'nodeids' => get_current_nodeid(),
-		'triggerids' => array_keys($triggers),
+		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 		'extendoutput' => 1,
 		'select_hosts' => 1,
-		'select_items' => 1,
-		'preservekeys' => 1
+		'select_items' => 1
 	);
 	$triggers = CTrigger::get($options);
+	$triggers = zbx_toHash($triggers, 'triggerid');
+
 	order_result($triggers, $sortfield, $sortorder);
 //---------
 
-
+	if($config['event_ack_enable']){
+		foreach($triggers as $tnum => $trigger){
+			$options = array(
+				'count' => 1,
+				'triggerids' => $trigger['triggerid'],
+				'acknowledged' => 0,
+				'value' => TRIGGER_VALUE_TRUE,
+				'nopermissions' => 1
+			);
+			$event_count = CEvent::get($options);
+			
+			$triggers[$tnum]['event_count'] = $event_count['rowscount'];
+		}
+	}
+	
 	$trigger_hosts = array();
 	foreach($triggers as $tnum => $trigger){
-		$event_count = CEvent::get(array(
-			'count' => 1,
-			'triggerids' => $trigger['triggerid'],
-			'acknowledged' => 0,
-			'nopermissions' => 1));
-		$triggers[$tnum]['event_count'] = $event_count['rowscount'];
-
 		$trigger_hosts = array_merge($trigger_hosts, $trigger['hosts']);
 		$triggers[$tnum]['events'] = array();
 	}
 
-	$trigger_hosts = zbx_toHash($trigger_hosts, 'hostid');
-	$trigger_hostids = array_keys($trigger_hosts);
+	$trigger_hostids = zbx_objectValues($trigger_hosts, 'hostid');
 
 	$scripts_by_hosts = Cscript::getScriptsByHosts($trigger_hostids);
 
@@ -412,14 +421,15 @@ include_once('include/page_header.php');
 			'sortorder' => ZBX_SORT_DOWN,
 			'time_from' => time() - ($config['event_expire']*86400),
 			'time_till' => time(),
-			'preservekeys' => 1,
 			//'limit' => $config['event_show_max']
 		);
+
 		switch($show_events){
 			case EVENTS_OPTION_ALL:
 			break;
 			case EVENTS_OPTION_NOT_ACK:
 				$ev_options['acknowledged'] = 0;
+				$ev_options['value'] = TRIGGER_VALUE_TRUE;
 			break;
 			case EVENTS_OPTION_ONLYTRUE_NOTACK:
 				$ev_options['acknowledged'] = 0;
@@ -437,8 +447,6 @@ include_once('include/page_header.php');
 
 
 	foreach($triggers as $tnum => $trigger){
-		if(($show_triggers == TRIGGERS_OPTION_SHOW_ALL_WITH_UNACKNOWLEDGED) && ($trigger['event_count'] == 0)) continue;
-		
 		$trigger['desc'] = $description = expand_trigger_description($trigger['triggerid']);
 
 // Items
@@ -575,6 +583,7 @@ include_once('include/page_header.php');
 
 		array_pop($hosts_list);
 		$host = new CCol($hosts_list);
+		$host->addStyle('white-space: normal;');
 // }}} host JS menu
 
 
@@ -590,10 +599,10 @@ include_once('include/page_header.php');
 
 		if($config['event_ack_enable']){
 			if($trigger['event_count']){
-				$to_ack = new CCol(array(new CLink(S_ACKNOWLEDGE, 'acknow.php?triggers[]='.$trigger['triggerid'], 'on'), new CSpan(' ('.$trigger['event_count'].')')), 'center');
+				$to_ack = new CCol(array(new CLink(S_ACKNOWLEDGE, 'acknow.php?triggers[]='.$trigger['triggerid'], 'on'), ' ('.$trigger['event_count'].')'));
 			}
 			else{
-				$to_ack = new CCol(S_ACKNOWLEDGED, 'off center');
+				$to_ack = new CCol(S_ACKNOWLEDGED, 'off');
 			}
 		}
 		else{
@@ -618,7 +627,8 @@ include_once('include/page_header.php');
 
 		$table->addRow(array(
 			$open_close,
-			$show_event_col ? null : new CCheckBox('triggers['.$trigger['triggerid'].']', 'no', NULL, $trigger['triggerid']),
+			$config['event_ack_enable'] ? 
+				($show_event_col ? null : new CCheckBox('triggers['.$trigger['triggerid'].']', 'no', null, $trigger['triggerid'])) : null,
 			$severity_col,
 			$status,
 			$lastchange,
@@ -652,7 +662,7 @@ include_once('include/page_header.php');
 						}
 					}
 					else{
-						$ack = null;
+						$ack = SPACE;
 					}
 				}
 
@@ -673,12 +683,12 @@ include_once('include/page_header.php');
 				$ack_cb_col->setColSpan(2);
 				$row = new CRow(array(
 					SPACE,
-					$ack_cb_col,
+					$config['event_ack_enable'] ? $ack_cb_col : null,
 					$status,
 					$clock,
 					zbx_date2age($row_event['clock']),
 					zbx_date2age($next_clock, $row_event['clock']),
-					($config['event_ack_enable']) ? (new CCol($ack, 'center')) : NULL,
+					($config['event_ack_enable']) ? $ack : NULL,
 					is_show_all_nodes() ? SPACE : null,
 					$empty_col
 				), 'odd_row');

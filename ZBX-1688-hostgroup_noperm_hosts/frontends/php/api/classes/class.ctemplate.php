@@ -298,7 +298,6 @@ class CTemplate extends CZBXAPI{
 				WHERE '.DBin_node('h.hostid', $nodeids).
 					$sql_where.
 				$sql_order;
-
 		$res = DBselect($sql, $sql_limit);
 		while($template = DBfetch($res)){
 			if($options['count'])
@@ -403,7 +402,7 @@ class CTemplate extends CZBXAPI{
 				$ghosts = $group['hosts'];
 				unset($group['hosts']);
 				foreach($ghosts as $hnum => $template){
-					$result[$template['templateid']]['groups'][] = $group;
+					$result[$template['hostid']]['groups'][] = $group;
 				}
 			}
 		}

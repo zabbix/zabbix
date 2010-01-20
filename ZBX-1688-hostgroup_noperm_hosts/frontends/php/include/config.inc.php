@@ -20,11 +20,11 @@
 function SDB($return=false){
 	$backtrace = debug_backtrace();
 	array_shift($backtrace);
-	$result = 'DEBUG BACKTRACE: ';
+	$result = 'DEBUG BACKTRACE: <br/>';
 	foreach($backtrace as $n => $bt){
 		$result .= '  --['.$n.']-- '.$bt['file'].' : '.$bt['line'].' | ';
 		$result .= isset($bt['class']) ? $bt['class'].$bt['type'].$bt['function'] : $bt['function'];
-		$result .= '( '.print_r($bt['args'], true).' ) ';
+		$result .= '( '.print_r($bt['args'], true).' ) <br/>';
 	}
 	if($return) return $result;
 	else echo $result;
@@ -952,10 +952,11 @@ function __autoload($class_name){
 			imagepng($image);
 			$image_txt = ob_get_contents();
 			ob_end_clean();
-
+//SDI($image_txt);
 			session_start();
 			$id = md5($image_txt);
-			$_SESSION['imageid'][$id] = $image_txt;
+			$_SESSION['image_id'] = array();
+			$_SESSION['image_id'][$id] = $image_txt;
 			session_write_close();
 			print($id);
 

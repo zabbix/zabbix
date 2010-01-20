@@ -24,14 +24,14 @@ require_once('include/audit.inc.php');
 require_once('include/actions.inc.php');
 require_once('include/users.inc.php');
 
-	$page['title'] = "S_AUDIT";
-	$page['file'] = 'auditacts.php';
-	$page['hist_arg'] = array();
-	$page['scripts'] = array('class.calendar.js','scriptaculous.js?load=effects');
+$page['title'] = "S_AUDIT";
+$page['file'] = 'auditacts.php';
+$page['hist_arg'] = array();
+$page['scripts'] = array('class.calendar.js','scriptaculous.js?load=effects');
 
-	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-	$_REQUEST['config'] = get_request('config','auditacts.php');
+$_REQUEST['config'] = get_request('config','auditacts.php');
 
 include_once('include/page_header.php');
 ?>
@@ -165,11 +165,10 @@ include_once('include/page_header.php');
 //-------
 
 	$options = array(
-		'extendoutput' => 1,
-//				'select_users' => 1,
-		'select_mediatypes' => 1,
 		'time_from' => $nav_time,
-		'sortfield' => 'clock',
+		'extendoutput' => 1,
+		'select_mediatypes' => 1,
+		'sortfield' => getPageSortField('alertid'),
 		'sortorder' => getPageSortOrder(),
 		'limit' => ($config['search_limit']+1)
 	);
@@ -185,18 +184,18 @@ include_once('include/page_header.php');
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$table->setHeader(array(
 			is_show_all_nodes()?S_NODES:null,
-			make_sorting_header(S_TIME,'clock'),
+			make_sorting_header(S_TIME,'alertid'),
 			S_TYPE,
-			make_sorting_header(S_STATUS,'status'),
-			make_sorting_header(S_RETRIES_LEFT,'retries'),
-			make_sorting_header(S_RECIPIENTS,'sendto'),
+			S_STATUS,
+			S_RETRIES_LEFT,
+			S_RECIPIENTS,
 			S_MESSAGE,
 			S_ERROR
 			));
 
 
 // sorting && paging
-	order_page_result($alerts, 'clock');
+	order_page_result($alerts, 'alertid');
 	$paging = getPagingLine($alerts);
 //---------
 

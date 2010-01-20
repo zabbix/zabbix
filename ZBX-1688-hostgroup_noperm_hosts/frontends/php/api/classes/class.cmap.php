@@ -179,7 +179,7 @@ class CMap extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.'
+		$sql = 'SELECT DISTINCT '.$sql_select.'
 				FROM '.$sql_from.'
 				WHERE '.DBin_node('s.sysmapid', $nodeids).
 					$sql_where.
@@ -486,7 +486,7 @@ SDI('///////////////////////////////////////');
 
 			if(!$map_db_fields){
 				$result = false;
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Map with ID ['.$map['sysmapid'].'] does not exists');
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Map with ID ['.$map['sysmapid'].'] does not exist');
 				break;
 			}
 

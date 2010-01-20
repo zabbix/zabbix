@@ -163,7 +163,8 @@ int	add_perfs_from_config(const char *line)
 	char	name[MAX_STRING_LEN],
 		counterPath[PDH_MAX_COUNTER_PATH],
 		interval[MAX_STRING_LEN];
-
+	LPTSTR	wcounterPath = NULL;
+	
 	assert(line);
 
 	if (num_param(line) != 3)
@@ -174,6 +175,21 @@ int	add_perfs_from_config(const char *line)
 
         if (0 != get_param(line, 2, counterPath, sizeof(counterPath)))
 		goto lbl_syntax_error;
+
+	if (NULL == (wcounterPath = zbx_acp_to_unicode(counterPath)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "PerfCounter \"%s\" could not be converted to UNICODE.", counterPath);
+		return FAIL;
+	}
+	
+	if (FAIL == zbx_unicode_to_utf8_static(wcounterPath, counterPath, PDH_MAX_COUNTER_PATH))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "PerfCounter \"%s\" could not be converted to UTF-8.", counterPath);
+		zbx_free(wcounterPath);
+		return FAIL;
+	}
+	
+	zbx_free(wcounterPath);
 
         if (0 != get_param(line, 3, interval, sizeof(interval)))
 		goto lbl_syntax_error;

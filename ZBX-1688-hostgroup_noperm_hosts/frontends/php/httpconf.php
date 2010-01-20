@@ -479,7 +479,7 @@ include_once('include/page_header.php');
 
 			$status=new CCol(new CLink(httptest_status2str($httptest_data['status']),
 					'?group_httptestid[]='.$httptest_data['httptestid'].
-					'&group_task='.($httptest_data['status']?S_ACTIVATE_SELECTED:S_DISABLE_SELECTED),
+					'&go='.($httptest_data['status']?'activate':'disable'),
 					httptest_status2style($httptest_data['status'])));
 
 

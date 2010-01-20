@@ -342,20 +342,23 @@ class CAlert extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.
+		$sql = 'SELECT DISTINCT '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('a.alertid', $nodeids).
 					$sql_where.
 				$sql_order;
-//SDI($sql);
 		$db_res = DBselect($sql, $sql_limit);
 		while($alert = DBfetch($db_res)){
 			if($options['count'])
 				$result = $alert;
 			else{
 				$alertids[$alert['alertid']] = $alert['alertid'];
-				$userids[$alert['userid']] = $alert['userid'];
-				$mediatypeids[$alert['mediatypeid']] = $alert['mediatypeid'];
+				
+				if(isset($alert['userid']))
+					$userids[$alert['userid']] = $alert['userid'];
+
+				if(isset($alert['mediatypeid']))
+					$mediatypeids[$alert['mediatypeid']] = $alert['mediatypeid'];
 
 				if($options['output'] == API_OUTPUT_SHORTEN){
 					$result[$alert['alertid']] = array('alertid' => $alert['alertid']);

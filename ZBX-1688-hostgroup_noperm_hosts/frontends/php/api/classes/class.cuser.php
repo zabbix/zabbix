@@ -204,7 +204,7 @@ class CUser extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.'
+		$sql = 'SELECT DISTINCT '.$sql_select.'
 				FROM '.$sql_from.'
 				WHERE '.DBin_node('u.userid', $nodeids).
 				$sql_where.
@@ -228,11 +228,11 @@ class CUser extends CZBXAPI{
 					}
 
 // usrgrpids
-					if(isset($user['usrgrpid'])){
+					if(isset($user['usrgrpid'])  && is_null($options['select_usrgrps'])){
 						if(!isset($result[$user['userid']]['usrgrps']))
 							$result[$user['userid']]['usrgrps'] = array();
 
-						$result[$user['userid']]['usrgrps'][$user['usrgrpid']] = array('usrgrpid' => $user['usrgrpid']);
+						$result[$user['userid']]['usrgrps'][] = array('usrgrpid' => $user['usrgrpid']);
 						unset($user['usrgrpid']);
 					}
 
