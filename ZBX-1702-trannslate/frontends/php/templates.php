@@ -585,7 +585,7 @@ include_once('include/page_header.php');
 			$host_footer[] = SPACE;
 			$host_footer[] = new CButtonDelete(S_DELETE_SELECTED_HOST_Q, url_param('form').url_param('templateid').url_param('groupid'));
 			$host_footer[] = SPACE;
-			$host_footer[] = new CButtonQMessage('delete_and_clear', 'Delete AND clear', S_DELETE_SELECTED_HOSTS_Q, url_param('form').
+			$host_footer[] = new CButtonQMessage('delete_and_clear', S_DELETE_AND_CLEAR, S_DELETE_SELECTED_HOSTS_Q, url_param('form').
 				url_param('templateid').url_param('groupid'));
 		}
 		array_push($host_footer, SPACE, new CButtonCancel(url_param('groupid')));
@@ -786,11 +786,11 @@ include_once('include/page_header.php');
 		$goBox = new CComboBox('go');
 
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm','Delete selected templates?');
+		$goOption->setAttribute('confirm',S_DELETE_SELECTED_TEMPLATES_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('delete_and_clear',S_DELETE_SELECTED_WITH_LINKED_ELEMENTS);
-		$goOption->setAttribute('confirm','Warning: this will delete selected templates and clear all linked hosts?');
+		$goOption->setAttribute('confirm',S_WARNING_THIS_DELETE_TEMPLATES_AND_CLEAR);
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
