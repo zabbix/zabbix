@@ -800,11 +800,11 @@ include_once('include/page_header.php');
 		$sortorder = getPageSortOrder();
 		$options = array(
 			'filter' => 1,
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1,
-			'select_hosts' => 1,
-			'select_triggers' => 1,
-			'select_applications' => 1,
+			'select_hosts' => API_OUTPUT_EXTEND,
+			'select_triggers' => API_OUTPUT_EXTEND,
+			'select_applications' => API_OUTPUT_EXTEND,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
