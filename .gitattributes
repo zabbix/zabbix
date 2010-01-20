@@ -313,10 +313,10 @@ frontends/php/js/class.calendar.js -text
 frontends/php/js/class.cmap.js -text
 frontends/php/js/class.cookie.js -text
 frontends/php/js/class.cscreen.js -text
+frontends/php/js/class.cswitcher.js -text
 frontends/php/js/class.ctree.js -text
 frontends/php/js/class.curl.js -text
 frontends/php/js/class.pmaster.js -text
-frontends/php/js/class.switcher.js -text
 frontends/php/js/common.js -text
 frontends/php/js/functions.js -text
 frontends/php/js/gtlc.js -text

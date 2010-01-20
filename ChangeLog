@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1776] fixed js error for ie6 in triggers status screen (Aly)
  - [ZBX-1752] fixed error showing maps when REGISTER_GLOBALS in PHP is on (Vedmak)
  - [ZBX-954] fixed typos in changelog, error messages and frontend item hints (Richlv)
  - [ZBX-1725] fixed graphitem sortorder (Aly)
