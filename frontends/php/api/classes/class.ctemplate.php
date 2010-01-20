@@ -403,7 +403,7 @@ class CTemplate extends CZBXAPI{
 				$ghosts = $group['hosts'];
 				unset($group['hosts']);
 				foreach($ghosts as $hnum => $template){
-					$result[$template['templateid']]['groups'][] = $group;
+					$result[$template['hostid']]['groups'][] = $group;
 				}
 			}
 		}
