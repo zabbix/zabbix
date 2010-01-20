@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2001-2009 SIA Zabbix
+** Copyright (C) 2001-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ require_once('include/config.inc.php');
 require_once('include/hosts.inc.php');
 require_once('include/html.inc.php');
 
-$page["title"] = "S_SEARCH";
+$page['title'] = 'S_SEARCH';
 $page['file'] = 'search.php';
 $page['hist_arg'] = array();
 $page['scripts'] = array('class.pmaster.js','scriptaculous.js?load=effects');
@@ -346,7 +346,7 @@ include_once('include/page_header.php');
 				$template_link = new CLink($caption,'hosts.php?hostid='.$templateid);
 				$items_link = new CLink(S_GO,'items.php?'.$link);
 				$triggers_link = new CLink(S_GO,'triggers.php?'.$link);
-				$graphs_link = new CLink(S_GO,'graphss.php?'.$link);
+				$graphs_link = new CLink(S_GO,'graphs.php?'.$link);
 			}
 			else{
 				$template_link = new CSpan($caption);
