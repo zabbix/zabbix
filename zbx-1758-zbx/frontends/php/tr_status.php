@@ -30,7 +30,7 @@
 	$page['title'] = 'S_STATUS_OF_TRIGGERS';
 	$page['scripts'] = array('scriptaculous.js?load=effects');
 	$page['hist_arg'] = array('groupid', 'hostid');
-	$page['scripts'] = array('class.switcher.js');
+	$page['scripts'] = array('class.cswitcher.js');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 

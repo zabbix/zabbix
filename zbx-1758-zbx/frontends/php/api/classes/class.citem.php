@@ -729,7 +729,7 @@ class CItem extends CZBXAPI{
 
 			$host = CHost::get(array('hostids' => $item['hostid'], 'noprermissions' => 1, 'templated_hosts' => 1));
 			if(empty($host)){
-				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Host with HostID ['.$item['hostid'].'] does not exists');
+				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Host with HostID ['.$item['hostid'].'] does not exist');
 				$result = false;
 				break;
 			}
