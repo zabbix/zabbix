@@ -139,9 +139,7 @@ storeCookie : function(){
 	}
 
 	cookie.createArray(this.switchers_name, storeArray);
-},
-
-
+}
 }
 
 
