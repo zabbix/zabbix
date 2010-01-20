@@ -287,7 +287,7 @@ class CUserMacro extends CZBXAPI{
 			if(!empty($sql_parts_global['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts_global['order']);
 			$sql_limit = $sql_parts_global['limit'];
 
-			$sql = 'SELECT '.$sql_select.'
+			$sql = 'SELECT DISTINCT '.$sql_select.'
 					FROM '.$sql_from.'
 					WHERE '.DBin_node('gm.globalmacroid', $nodeids).
 					$sql_where.
