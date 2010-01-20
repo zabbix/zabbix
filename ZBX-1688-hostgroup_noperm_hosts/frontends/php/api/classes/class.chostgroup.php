@@ -909,7 +909,7 @@ class CHostGroup extends CZBXAPI{
 		if(!is_null($hosts)){
 			$options = array(
 				'hostids' => $hostids,
-			'editable' => 1,
+				'editable' => 1,
 				'preservekeys' => 1);
 			$allowed_hosts = CHost::get($options);
 			foreach($hosts as $num => $host){

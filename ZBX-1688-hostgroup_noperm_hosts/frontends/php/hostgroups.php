@@ -77,8 +77,8 @@ include_once('include/page_header.php');
 
 		$objects = get_request('hosts', array());
 
-		$hosts = CHost::get(array('hostids' => $objects, 'editable' => 1));
-		$templates = CTemplate::get(array('templateids' => $objects, 'editable' => 1));
+		$hosts = CHost::get(array('hostids' => $objects, 'output' => API_OUTPUT_SHORTEN));
+		$templates = CTemplate::get(array('templateids' => $objects, 'output' => API_OUTPUT_SHORTEN));
 
 		if(isset($_REQUEST['groupid'])){
 			DBstart();
@@ -211,11 +211,21 @@ include_once('include/page_header.php');
 				$params = array(
 					'groupids' => $groupid,
 					'editable' => 1,
-					'sortfield' => 'host',
-					'templated_hosts' => 1);
+					'templated_hosts' => 1,
+					'output' => API_OUTPUT_SHORTEN
+				);
 				$db_hosts = CHost::get($params);
-				$hosts = zbx_objectValues($db_hosts, 'hostid');
-				$hosts = zbx_toHash($hosts, 'hostid');
+				$hosts = zbx_toHash($db_hosts, 'hostid');
+				
+				$params = array(
+					'groupids' => $groupid,
+					'editable' => 0,
+					'templated_hosts' => 1,
+					'output' => API_OUTPUT_EXTEND
+				);
+				$db_hosts = CHost::get($params);
+				$hosts_disabled = zbx_toHash($db_hosts, 'hostid');
+				$hosts_disabled = array_diff_key($hosts_disabled, $hosts);
 			}
 		}
 
@@ -247,6 +257,13 @@ include_once('include/page_header.php');
 		}
 
 		$cmbHosts = new CTweenBox($frmHostG, 'hosts', $hosts, 25);
+		
+// add disaabled hosts
+		if(!isset($_REQUEST['form_refresh'])){
+			foreach($hosts_disabled as $disabled){
+				$cmbHosts->addItem($disabled['hostid'], $disabled['host'], true, true);
+			}
+		}
 
 // get hosts from selected twb_groupid combo
 		$params = array(
@@ -267,7 +284,7 @@ include_once('include/page_header.php');
 			'hostids' => $hosts,
 			'templated_hosts' =>1 ,
 			'sortfield' => 'host',
-			'editable' => 1,
+			// 'editable' => 1,
 			'extendoutput' => 1);
 		$db_hosts = CHost::get($params);
 		foreach($db_hosts as $num => $db_host){
