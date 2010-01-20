@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1774] fixed error in slide screen in case if no screens defined (Aly)
  - [ZBX-1758] improved node filtering in sqls (Aly)
  - [ZBX-1776] fixed js error for ie6 in triggers status screen (Aly)
  - [ZBX-1752] fixed error showing maps when REGISTER_GLOBALS in PHP is on (Vedmak)

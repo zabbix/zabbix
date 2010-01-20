@@ -17,11 +17,11 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-
-	require_once('include/events.inc.php');
-	require_once('include/actions.inc.php');
-	require_once('include/js.inc.php');
-
+?>
+<?php
+require_once('include/events.inc.php');
+require_once('include/actions.inc.php');
+require_once('include/js.inc.php');
 ?>
 <?php
 	function screen_accessible($screenid,$perm){
@@ -211,7 +211,8 @@
 					' AND '.DBin_node('slideshowid', get_current_nodeid(null,$perm));
 		if(DBselect($sql)){
 			$result = true;
-			
+
+			$screenids = array();
 			$sql = 'SELECT DISTINCT screenid '.
 					' FROM slides '.
 					' WHERE slideshowid='.$slideshowid;
