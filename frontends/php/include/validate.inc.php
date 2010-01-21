@@ -450,7 +450,8 @@
 	}
 
 	function check_field(&$fields, &$field, $checks){
-		list($type,$opt,$flags,$validation,$exception)=$checks;
+		if(!isset($checks[5])) $checks[5] = $field;
+		list($type,$opt,$flags,$validation,$exception,$caption)=$checks;
 
 		if($flags&P_UNSET_EMPTY && isset($_REQUEST[$field]) && $_REQUEST[$field]==''){
 			unset_request($field,'P_UNSET_EMPTY');
@@ -521,15 +522,15 @@
 		if(is_null($exception) || ($except == true)){
 
 			if(!$validation)	$valid = TRUE;
-			else			$valid = calc_exp($fields,$field,$validation);
+			else				$valid = calc_exp($fields,$field,$validation);
 
 			if(!$valid){
 				if($flags&P_SYS){
-					info('Critical error. Incorrect value for ['.$field.'] = "'.$_REQUEST[$field].'"');
+					info('Critical error. Incorrect value for ['.$caption.'] = "'.$_REQUEST[$field].'"');
 					return ZBX_VALID_ERROR;
 				}
 				else{
-					info('Warning. Incorrect value for ['.$field.']');
+					info('Warning. Incorrect value for ['.$caption.']');
 					return ZBX_VALID_WARNING;
 				}
 			}
@@ -583,8 +584,9 @@
 			invalid_url();
 		}
 
-		if($show_messages) show_messages();
+		if($show_messages && ($err!=ZBX_VALID_OK)) 
+			show_messages($err==ZBX_VALID_OK, NULL, S_PAGE_RECEIVED_INCORRECT_DATA);
 
-		return ($err==ZBX_VALID_OK ? 1 : 0);
+	return ($err==ZBX_VALID_OK ? 1 : 0);
 	}
 ?>
