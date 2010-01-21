@@ -1734,6 +1734,7 @@
 
 // page_header.php
 	'S_REFRESHED_EVERY_SMALL'=>	'refreshed every',
+	'S_PAGE_RECEIVED_INCORRECT_DATA' => 'Page received incorrect data',
 
 //	Menu
 
