@@ -3012,10 +3012,16 @@
 		}
 
 		$icount = count($items);
-		for($i=0; $i < $icount-1; $i++){
-			if($items[$i]['sortorder'] == $items[$i+1]['sortorder'])
-				for($j=$i+1; $j < $icount; $j++)
+		for($i=0; $i < $icount-1;){
+// check if we deletd an item
+			$next = $i+1;
+			while(!isset($items[$next]) && ($next < ($icount-1))) $next++;
+			
+			if(isset($items[$next]) && ($items[$i]['sortorder'] == $items[$next]['sortorder']))
+				for($j=$next; $j < $icount; $j++)
 					if($items[$j-1]['sortorder'] >= $items[$j]['sortorder']) $items[$j]['sortorder']++;
+
+			$i = $next;
 		}
 
 		asort_by_key($items, 'sortorder');
