@@ -1270,6 +1270,15 @@
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 			}
 
+			if(isset($info['disabled']) && $info['disabled'] == 1){
+// Disabled
+				$info['info'] = array();
+				$info['info'][] = array('msg'=>S_DISABLED_BIG, 'color'=>$colors['Dark Red']);
+
+				$info['iconid'] = $selement['iconid_disabled'];
+				$info['icon_type'] = SYSMAP_ELEMENT_ICON_DISABLED;
+			}
+
 			$info['priority'] = isset($info[$info['type']]['priority']) ? $info[$info['type']]['priority'] : 0;
 //---
 		}
