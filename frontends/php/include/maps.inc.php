@@ -605,11 +605,11 @@
 			}
 			else if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER){
 				if(empty($url) && $db_element['elementid']!=0)
-					$url='events.php?triggerid='.$db_element['elementid'].'&nav_time='.(time()-7*86400);
+					$url='events.php?source=0&triggerid='.$db_element['elementid'].'&nav_time='.(time()-7*86400);
 			}
 			else if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP){
 				if(empty($url) && $db_element['elementid']!=0)
-					$url='events.php?hostid=0&groupid='.$db_element['elementid'];
+					$url='events.php?source=0&hostid=0&groupid='.$db_element['elementid'];
 			}
 
 			if(empty($url))	continue;
