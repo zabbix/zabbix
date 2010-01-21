@@ -208,6 +208,9 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 		}
 	}
 
+	if (1 != level)	/* skip mandatory parameters check  for included files */
+		return result;
+
 	/* Check for mandatory parameters */
 	for(i = 0; cfg[i].parameter != 0; i++)
 	{

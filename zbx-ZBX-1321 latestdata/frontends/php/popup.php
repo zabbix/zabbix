@@ -198,6 +198,8 @@ include_once('include/page_header.php');
 	$multiselect = get_request('multiselect', 0); //if create popup with checkboxes
 	$dstact 	= get_request('dstact', '');
 	$writeonly = get_request('writeonly');
+	
+	$existed_templates = get_request('existed_templates', null);
 
 
 
@@ -253,6 +255,8 @@ include_once('include/page_header.php');
 	$frmTitle->addVar('srcfld2', $srcfld2);
 	$frmTitle->addVar('multiselect', $multiselect);
 	$frmTitle->addVar('writeonly', $writeonly);
+	if(!is_null($existed_templates))
+		$frmTitle->addVar('existed_templates', $existed_templates);
 
 
 // Optional
@@ -309,6 +313,7 @@ include_once('include/page_header.php');
 									'applications','screens','slides','graphs','simple_graph',
 									'sysmaps','plain_text','screens2','overview','host_group_scr')))
 		{
+
 			if(ZBX_DISTRIBUTED){
 				$cmbNode = new CComboBox('nodeid', $nodeid, 'submit()');
 
@@ -467,18 +472,20 @@ include_once('include/page_header.php');
 		}
 		else if(isset($_REQUEST['select'])){
 			$new_templates = array_diff($templates, $existed_templates);
+			$script = '';
 			if(count($new_templates) > 0) {
-				$script = '';
 				foreach($new_templates as $id => $name){
 					$script .= 'add_variable(null,"templates['.$id.']","'.$name.'","'.$dstfrm.'",window.opener.document);'."\n";
 				}
 
-				$script.= 'var form = window.opener.document.forms["'.$dstfrm.'"];'.
-					' if(form) form.submit();'.
-					' close_window();';
-				insert_js($script);
+				
 			} // if count new_templates > 0
 
+			$script.= 'var form = window.opener.document.forms["'.$dstfrm.'"];'.
+					' if(form) form.submit();'.
+					' close_window();';
+			insert_js($script);
+			
 			unset($new_templates);
 		}
 
@@ -487,15 +494,15 @@ include_once('include/page_header.php');
 
 		$options = array(
 				'nodeids' => $nodeid,
-				'groupids'=>$groupid,
+				'groupids' => $groupid,
 				'extendoutput' => 1,
-				'sortfield'=>'host'
+				'sortfield' => 'host'
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 
-		$templates = CTemplate::get($options);
+		$template_list = CTemplate::get($options);
 
-		foreach($templates as $tnum => $host){
+		foreach($template_list as $tnum => $host){
 
 			$chk = new CCheckBox('templates['.$host['hostid'].']',isset($templates[$host['hostid']]),
 					null,$host['host']);
@@ -618,7 +625,7 @@ include_once('include/page_header.php');
 		$usergroups = CUserGroup::get($options);
 		order_result($usergroups, 'name');
 
-		foreach($triggers as $tnu => $row){
+		foreach($usergroups as $tnu => $row){
 			$name = new CSpan(get_node_name_by_elid($row['usrgrpid'], null, ': ').$row['name'],'link');
 
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
@@ -689,7 +696,7 @@ include_once('include/page_header.php');
 
 			$table->addRow(array(
 				$name,
-				$row["description"]
+				$row['description']
 				));
 		}
 		$table->show();
@@ -724,11 +731,12 @@ include_once('include/page_header.php');
 		order_result($triggers, 'description');
 
 		foreach($triggers as $tnum => $row){
+			$host = reset($row['hosts']);
+			$row['host'] = $host['host'];
+			
 			$exp_desc = expand_trigger_description_by_data($row);
 			$description = new CSpan($exp_desc, 'link');
 
-			$host = reset($row['hosts']);
-			$row['host'] = $host['host'];
 
 			if($multiselect) {
 				$js_action = 'add_selected_values("'.S_TRIGGERS.'", "'.$dstfrm.'", "'.$dstfld1.'", "'.$dstact.'", "'.$row["triggerid"].'");';
@@ -743,7 +751,7 @@ include_once('include/page_header.php');
 					if($_REQUEST['reference'] == 'sysmap_element'){
 						$js_action = "window.opener.ZBX_SYSMAPS[$cmapid].map.update_selement_option($sid,".
 										"[{'key':'elementtype','value':'".SYSMAP_ELEMENT_TYPE_TRIGGER."'},".
-											"{'key':'$dstfld1','value':'$row[$srcfld1]'}]);";
+											"{'key':'$dstfld1','value':'".$row[$srcfld1]."'}]);";
 					}
 					else if($_REQUEST['reference'] =='sysmap_linktrigger'){
 						$params = array(array('key'=> $dstfld1, 'value'=> $row[$srcfld1]));
@@ -756,7 +764,7 @@ include_once('include/page_header.php');
 					}
 				}
 				else{
-					$js_action = 'add_value("'.$dstfld1.'", "'.$dstfld2.'", "'.$row["triggerid"].'", "'.$exp_desc.'");';
+					$js_action = 'add_value("'.$dstfld1.'", "'.$dstfld2.'", "'.$row["triggerid"].'", "'.$row['host'].':'.$exp_desc.'");';
 				}
 			}
 
@@ -830,7 +838,7 @@ include_once('include/page_header.php');
 				'extendoutput' => 1,
 				'select_hosts' => 1,
 				'filter' => 1,
-				'type' => ITEM_VALUE_TYPE_LOG,
+				'valuetype' => ITEM_VALUE_TYPE_LOG,
 				'sortfield'=>'description'
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
@@ -875,7 +883,8 @@ include_once('include/page_header.php');
 
 		$options = array(
 				'nodeids' => $nodeid,
-				'hostids'=> $hostid,
+				'hostids' => $hostid,
+				'webitems' => 1,
 				'extendoutput' => 1,
 				'select_hosts' => 1,
 				'sortfield'=>'description'

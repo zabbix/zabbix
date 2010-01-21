@@ -1546,7 +1546,7 @@ this.selementForm.massEdit.chkboxLabel = e_input_6
 	var e_textarea_6 = document.createElement('textarea');
 this.selementForm.label = e_textarea_6;
 
-	e_textarea_6.setAttribute('cols',"48");
+	e_textarea_6.setAttribute('cols',"56");
 	e_textarea_6.setAttribute('rows',"4");
 	e_textarea_6.setAttribute('name',"label");
 	e_textarea_6.className = "biginput";
@@ -1647,7 +1647,7 @@ this.selementForm.elementName = e_input_6;
 
 	e_input_6.setAttribute('readonly',"readonly");
 	e_input_6.setAttribute('value',"");
-	e_input_6.setAttribute('size',"42");
+	e_input_6.setAttribute('size',"56");
 	e_input_6.setAttribute('id',"elementName");
 	e_input_6.setAttribute('name',"elementName");
 	e_input_6.className = "biginput";
@@ -2046,6 +2046,7 @@ this.selementForm.massEdit.chkboxURL = e_input_6
 	e_input_6.setAttribute('type', 'checkbox');
 	e_input_6.setAttribute('name', "chkboxURL");
 	e_input_6.setAttribute('id', "chkboxURL");
+
 	e_input_6.className = 'checkbox';
 	e_td_5.appendChild(e_input_6);
 	
@@ -2062,7 +2063,7 @@ this.selementForm.massEdit.chkboxURL = e_input_6
 	var e_input_6 = document.createElement('input');
 this.selementForm.url = e_input_6;
 	e_input_6.setAttribute('value', '');
-	e_input_6.setAttribute('size',"42");
+	e_input_6.setAttribute('size',"56");
 	e_input_6.setAttribute('id',"url");
 	e_input_6.setAttribute('name',"url");
 	e_input_6.className = "biginput";
@@ -2310,6 +2311,15 @@ updateForm_selementByType: function(e, multi){
 		this.selementForm.massEdit.chkboxIconid_maintenance.style.display = 'none';
 		this.selementForm.massEdit.chkboxIconid_disabled.style.display = 'none';
 		this.selementForm.massEdit.chkboxURL.style.display = 'none';
+		
+		this.selementForm.massEdit.chkboxLabel.checked = false;
+		this.selementForm.massEdit.chkboxLabelLocation.checked = false;
+		this.selementForm.massEdit.chkboxIconid_off.checked = false;
+		this.selementForm.massEdit.chkboxIconid_on.checked = false;
+		this.selementForm.massEdit.chkboxIconid_unknown.checked = false;
+		this.selementForm.massEdit.chkboxIconid_maintenance.checked = false;
+		this.selementForm.massEdit.chkboxIconid_disabled.checked = false;
+		this.selementForm.massEdit.chkboxURL.checked = false;
 
 		this.selementForm.massEdit.elementtype.style.display = display_style;
 		this.selementForm.massEdit.elementName.style.display = display_style;

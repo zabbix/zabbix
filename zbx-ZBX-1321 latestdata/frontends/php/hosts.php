@@ -228,13 +228,16 @@ include_once('include/page_header.php');
 			if(isset($visible['groups'])){
 				$hosts['groups'] = array_merge(zbx_toObject($_REQUEST['groups'], 'groupid'), $groups);
 			}
-			if(isset($visible['template_table'])){
-				$tplids = array_keys($_REQUEST['templates']);
-				$hosts['templates'] = zbx_toObject($tplids, 'templateid');
-			}
 			$result = CHost::massUpdate(array_merge($hosts, $new_values));
 			if($result === false) throw new Exception();
 
+			
+			if(isset($visible['template_table'])){
+				$tplids = array_keys($_REQUEST['templates']);
+				$result = CHost::massAdd(array('hosts' => $hosts['hosts'], 'templates' => zbx_toObject($tplids, 'templateid')));
+				if($result === false) throw new Exception();
+			}
+			
 
 			if($result && isset($visible['useprofile'])){
 				$host_profile = DBfetch(DBselect('SELECT * FROM hosts_profiles WHERE hostid='.$hostid));
@@ -671,12 +674,12 @@ $_REQUEST['hostid'] = $thid;
 
 		$options = array(
 			'hostids' => zbx_objectValues($hosts, 'hostid'),
-			'extendoutput' => 1,
-			'select_templates' => 1,
-			'select_items' => 1,
-			'select_triggers' => 1,
-			'select_graphs' => 1,
-			'select_applications' => 1,
+			'output' => API_OUTPUT_EXTEND,
+			'select_templates' => API_OUTPUT_EXTEND,
+			'select_items' => API_OUTPUT_REFER,
+			'select_triggers' => API_OUTPUT_REFER,
+			'select_graphs' => API_OUTPUT_REFER,
+			'select_applications' => API_OUTPUT_REFER,
 			'nopermissions' => 1
 		);
 		$hosts = CHost::get($options);
@@ -793,15 +796,15 @@ $_REQUEST['hostid'] = $thid;
 		$goBox->addItem('massupdate',S_MASS_UPDATE);
 
 		$goOption = new CComboItem('activate',S_ACTIVATE_SELECTED);
-		$goOption->setAttribute('confirm','Enable selected host?');
+		$goOption->setAttribute('confirm',S_ENABLE_SELECTED_HOSTS);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
-		$goOption->setAttribute('confirm','Disable selected hosts?');
+		$goOption->setAttribute('confirm',S_DISABLE_SELECTED_HOSTS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm','Delete selected hosts?');
+		$goOption->setAttribute('confirm',S_DELETE_SELECTED_HOSTS);
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!

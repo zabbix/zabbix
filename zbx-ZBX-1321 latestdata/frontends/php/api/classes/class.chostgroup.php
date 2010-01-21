@@ -47,6 +47,7 @@ class CHostGroup extends CZBXAPI{
 		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('groupid', 'name'); // allowed columns for sorting
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 
 		$sql_parts = array(
@@ -79,6 +80,7 @@ class CHostGroup extends CZBXAPI{
 			'pattern' 					=> '',
 
 // output
+			'output'					=> API_OUTPUT_REFER,
 			'extendoutput'				=> null,
 			'select_hosts'				=> null,
 			'count'						=> null,
@@ -91,6 +93,16 @@ class CHostGroup extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $params);
 
+		
+		if(!is_null($options['extendoutput'])){
+			$options['output'] = API_OUTPUT_EXTEND;
+			
+			if(!is_null($options['select_hosts'])){
+				$options['select_hosts'] = API_OUTPUT_EXTEND;
+			}
+		}
+		
+		
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
@@ -128,7 +140,7 @@ class CHostGroup extends CZBXAPI{
 // hostids
 		if(!is_null($options['hostids'])){
 			zbx_value2array($options['hostids']);
-			if(!is_null($options['extendoutput'])){
+			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['hostid'] = 'hg.hostid';
 			}
 
@@ -236,7 +248,7 @@ class CHostGroup extends CZBXAPI{
 		}
 
 // extendoutput
-		if(!is_null($options['extendoutput'])){
+		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['groups'] = 'g.*';
 		}
 
@@ -245,7 +257,7 @@ class CHostGroup extends CZBXAPI{
 			$options['select_hosts'] = 0;
 			$options['sortfield'] = '';
 
-			$sql_parts['select']['groups'] = 'COUNT(DISTINCT g.groupid) as rowscount';
+			$sql_parts['select'] = array('COUNT(DISTINCT g.groupid) as rowscount');
 		}
 
 // pattern
@@ -289,7 +301,7 @@ class CHostGroup extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.
+		$sql = 'SELECT DISTINCT '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('g.groupid', $nodeids).
 					$sql_where.
@@ -299,7 +311,7 @@ class CHostGroup extends CZBXAPI{
 			if($options['count'])
 				$result = $group;
 			else{
-				if(is_null($options['extendoutput'])){
+				if($options['output'] == API_OUTPUT_SHORTEN){
 					$result[$group['groupid']] = array('groupid' => $group['groupid']);
 				}
 				else{
@@ -307,16 +319,16 @@ class CHostGroup extends CZBXAPI{
 
 					if(!isset($result[$group['groupid']])) $result[$group['groupid']]= array();
 
-					if($options['select_hosts'] && !isset($result[$group['groupid']]['hosts'])){
+					if(!is_null($options['select_hosts']) && !isset($result[$group['groupid']]['hosts'])){
 						$result[$group['groupid']]['hosts'] = array();
 					}
 
 // hostids
-					if(isset($group['hostid'])){
+					if(isset($group['hostid']) && is_null($options['select_hosts'])){
 						if(!isset($result[$group['groupid']]['hosts']))
 							$result[$group['groupid']]['hosts'] = array();
 
-						$result[$group['groupid']]['hosts'][$group['hostid']] = array('hostid' => $group['hostid']);
+						$result[$group['groupid']]['hosts'][] = array('hostid' => $group['hostid']);
 						unset($group['hostid']);
 					}
 
@@ -325,37 +337,35 @@ class CHostGroup extends CZBXAPI{
 			}
 		}
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
 // Adding hosts
-		$config = select_config();
-		if($options['select_hosts']){
+		if(!is_null($options['select_hosts']) && str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'extendoutput' => 1,
+				'output' => $options['select_hosts'],
 				'groupids' => $groupids,
 				'templated_hosts' => 1,
 				'preservekeys' => 1
 			);
 			$hosts = CHost::get($obj_params);
+
 			foreach($hosts as $hostid => $host){
-				foreach($host['groups'] as $num => $group){
-					$result[$group['groupid']]['hosts'][$hostid] = $host;
+				$hgroups = $host['groups'];
+				unset($host['groups']);
+				foreach($hgroups as $num => $group){
+					$result[$group['groupid']]['hosts'][] = $host;
 				}
 			}
 		}
 
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
-//$var = rand(0,1000);
-//Copt::profiling_start('asdasd'.$var);
 			$result = zbx_cleanHashes($result);
-//Copt::profiling_stop('asdasd'.$var);
 		}
-
 
 	return $result;
 	}
@@ -926,14 +936,20 @@ class CHostGroup extends CZBXAPI{
 // }}} PERMISSION
 
 		$hosts_to_unlink = $hosts_to_link = array();
+		$options = array(
+			'groupids' => $groupids, 
+			'preservekeys' => 1, 
+			'editable' => 1
+		);
 		if(!is_null($hosts)){
-			$groups_hosts = CHost::get(array('groupids' => $groupids, 'preservekeys' => 1, 'nopermissions' => 1));
+			$groups_hosts = CHost::get($options);
 			$hosts_to_unlink = array_diff(array_keys($groups_hosts), $hostids);
 			$hosts_to_link = array_diff($hostids, array_keys($groups_hosts));
 		}
+		
 		$templates_to_unlink = $templates_to_link = array();
 		if(!is_null($templates)){
-			$groups_templates = CTemplate::get(array('groupids' => $groupids, 'preservekeys' => 1, 'nopermissions' => 1));
+			$groups_templates = CTemplate::get($options);
 			$templates_to_unlink = array_diff(array_keys($groups_templates), $templateids);
 			$templates_to_link = array_diff($templateids, array_keys($groups_templates));
 		}

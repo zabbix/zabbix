@@ -272,7 +272,7 @@ class CMaintenance extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.
+		$sql = 'SELECT DISTINCT '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('m.maintenanceid', $nodeids).
 					$sql_where.
@@ -292,20 +292,20 @@ class CMaintenance extends CZBXAPI{
 						$result[$maintenance['maintenanceid']]= array();
 
 // groupids
-					if(isset($maintenance['groupid'])){
+					if(isset($maintenance['groupid']) && is_null($options['select_groups'])){
 						if(!isset($result[$maintenance['maintenanceid']]['groups']))
 							$result[$maintenance['maintenanceid']]['groups'] = array();
 
-						$result[$maintenance['maintenanceid']]['groups'][$maintenance['groupid']] = array('groupid' => $maintenance['groupid']);
+						$result[$maintenance['maintenanceid']]['groups'][] = array('groupid' => $maintenance['groupid']);
 						unset($maintenance['groupid']);
 					}
 
 // hostids
-					if(isset($maintenance['hostid'])){
+					if(isset($maintenance['hostid']) && is_null($options['select_hosts'])){
 						if(!isset($result[$maintenance['maintenanceid']]['hosts']))
 							$result[$maintenance['maintenanceid']]['hosts'] = array();
 
-						$result[$maintenance['maintenanceid']]['hosts'][$maintenance['hostid']] = array('hostid' => $maintenance['hostid']);
+						$result[$maintenance['maintenanceid']]['hosts'][] = array('hostid' => $maintenance['hostid']);
 						unset($maintenance['hostid']);
 					}
 

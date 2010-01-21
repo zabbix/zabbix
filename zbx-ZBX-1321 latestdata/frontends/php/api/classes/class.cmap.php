@@ -67,6 +67,7 @@ class CMap extends CZBXAPI{
 		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('name'); // allowed columns for sorting
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 
 		$sql_parts = array(
@@ -85,6 +86,7 @@ class CMap extends CZBXAPI{
 			'pattern'					=> '',
 // OutPut
 			'extendoutput'				=> null,
+			'output'					=> API_OUTPUT_REFER,
 			'select_selements'			=> null,
 			'select_links'				=> null,
 			'count'						=> null,
@@ -97,6 +99,19 @@ class CMap extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
+		
+		if(!is_null($options['extendoutput'])){
+			$options['output'] = API_OUTPUT_EXTEND;
+			
+			if(!is_null($options['select_selements'])){
+				$options['select_selements'] = API_OUTPUT_EXTEND;
+			}
+			if(!is_null($options['select_links'])){
+				$options['select_links'] = API_OUTPUT_EXTEND;
+			}
+		}
+		
+		
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
@@ -112,7 +127,7 @@ class CMap extends CZBXAPI{
 		}
 
 // extendoutput
-		if(!is_null($options['extendoutput'])){
+		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['sysmaps'] = 's.*';
 		}
 
@@ -164,7 +179,7 @@ class CMap extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.'
+		$sql = 'SELECT DISTINCT '.$sql_select.'
 				FROM '.$sql_from.'
 				WHERE '.DBin_node('s.sysmapid', $nodeids).
 					$sql_where.
@@ -176,7 +191,7 @@ class CMap extends CZBXAPI{
 			else{
 				$sysmapids[$sysmap['sysmapid']] = $sysmap['sysmapid'];
 
-				if(is_null($options['extendoutput'])){
+				if($options['output'] == API_OUTPUT_SHORTEN){
 					$result[$sysmap['sysmapid']] = array('sysmapid' => $sysmap['sysmapid']);
 				}
 				else{
@@ -308,7 +323,7 @@ SDI('///////////////////////////////////////');
 			}
 		}
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
@@ -329,12 +344,12 @@ SDI('///////////////////////////////////////');
 				if(!isset($result[$selement['sysmapid']]['selements'])){
 					$result[$selement['sysmapid']]['selements'] = array();
 				}
-				$result[$selement['sysmapid']]['selements'][$selement['selementid']] = $selement;
+				$result[$selement['sysmapid']]['selements'][] = $selement;
 			}
 		}
 
 // Adding Links
-		if(!is_null($options['select_links'])){
+		if(!is_null($options['select_links']) && str_in_array($options['select_links'], $subselects_allowed_outputs)){
 			if(!isset($map_links)){
 				$linkids = array();
 				$map_links = array();
@@ -360,7 +375,7 @@ SDI('///////////////////////////////////////');
 					$result[$link['sysmapid']]['links'] = array();
 				}
 
-				$result[$link['sysmapid']]['links'][$link['linkid']] = $link;
+				$result[$link['sysmapid']]['links'][] = $link;
 			}
 		}
 
@@ -471,7 +486,7 @@ SDI('///////////////////////////////////////');
 
 			if(!$map_db_fields){
 				$result = false;
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Map with ID ['.$map['sysmapid'].'] does not exists');
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Map with ID ['.$map['sysmapid'].'] does not exist');
 				break;
 			}
 

@@ -121,7 +121,7 @@ include_once('include/page_header.php');
 
 		$items_count = count($_REQUEST['itemid']);
 		if($items_count > 1){
-			$main_header = count($_REQUEST['itemid']).' log files';
+			$main_header = count($_REQUEST['itemid']).SPACE.S_LOG_FILES_SMALL;
 		}
 		else{
 			$_REQUEST['itemid'] = array_pop($_REQUEST['itemid']);
@@ -228,11 +228,11 @@ include_once('include/page_header.php');
 			}
 
 			$l_header->addItem(array(
-				'Log files list',SPACE,
+				S_LOG_FILES_LIST,SPACE,
 				$cmbLogList,SPACE,
-				new CButton('add_log','add',"return PopUp('popup.php?".
+				new CButton('add_log',S_ADD,"return PopUp('popup.php?".
 					"dstfrm=".$l_header->getName()."&srctbl=logitems&dstfld1=itemid&srcfld1=itemid');"),SPACE,
-				$cmbLogList->ItemsCount() > 1 ? new CButton("remove_log","Remove selected") : null
+				$cmbLogList->ItemsCount() > 1 ? new CButton("remove_log",S_REMOVE_SELECTED) : null
 				));
 		}
 
@@ -263,7 +263,10 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-	$effectiveperiod = navigation_bar_calc('web.item.graph', $_REQUEST['itemid']);
+	if(is_array($_REQUEST['itemid'])) $itemid = reset($_REQUEST['itemid']);
+	else $itemid = $_REQUEST['itemid'];
+	$effectiveperiod = navigation_bar_calc('web.item.graph', $itemid);
+
 	$bstime = $_REQUEST['stime'];
 
 	if($_REQUEST['action']=='showgraph' && ($item_type != ITEM_VALUE_TYPE_LOG)){
@@ -318,7 +321,7 @@ include_once('include/page_header.php');
 					$cmbColor->addItem(MARK_COLOR_BLUE,S_AS_BLUE);
 					$r_header->addItem(array($cmbColor,SPACE));
 				}
-				$r_header->addItem(new CButton('select','Select'));
+				$r_header->addItem(new CButton('select',S_SELECT));
 			}
 			else{
 				$r_header = null;

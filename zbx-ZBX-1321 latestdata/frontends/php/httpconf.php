@@ -479,7 +479,7 @@ include_once('include/page_header.php');
 
 			$status=new CCol(new CLink(httptest_status2str($httptest_data['status']),
 					'?group_httptestid[]='.$httptest_data['httptestid'].
-					'&group_task='.($httptest_data['status']?S_ACTIVATE_SELECTED:S_DISABLE_SELECTED),
+					'&go='.($httptest_data['status']?'activate':'disable'),
 					httptest_status2style($httptest_data['status'])));
 
 
@@ -538,19 +538,19 @@ include_once('include/page_header.php');
 //----- GO ------
 		$goBox = new CComboBox('go');
 		$goOption = new CComboItem('activate',S_ACTIVATE_SELECTED);
-		$goOption->setAttribute('confirm','Enable selected WEB scenarios?');
+		$goOption->setAttribute('confirm',S_ENABLE_SELECTED_WEB_SCENARIOS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
-		$goOption->setAttribute('confirm','Disable selected WEB scenarios?');
+		$goOption->setAttribute('confirm',S_DISABLE_SELECTED_WEB_SCENARIOS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('clean_history',S_CLEAR_HISTORY_FOR_SELECTED);
-		$goOption->setAttribute('confirm','Delete history of selected WEB scenarios?');
+		$goOption->setAttribute('confirm',S_DELETE_HISTORY_SELECTED_WEB_SCENARIOS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm','Delete selected WEB scenarios?');
+		$goOption->setAttribute('confirm',S_DELETE_SELECTED_WEB_SCENARIOS_Q);
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!

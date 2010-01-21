@@ -17,11 +17,11 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-
-	require_once('include/events.inc.php');
-	require_once('include/actions.inc.php');
-	require_once('include/js.inc.php');
-
+?>
+<?php
+require_once('include/events.inc.php');
+require_once('include/actions.inc.php');
+require_once('include/js.inc.php');
 ?>
 <?php
 	function screen_accessible($screenid,$perm){
@@ -205,15 +205,35 @@
 	function slideshow_accessible($slideshowid, $perm){
 		$result = false;
 
-		if(DBselect('select slideshowid from slideshows where slideshowid='.$slideshowid.
-			' and '.DBin_node('slideshowid', get_current_nodeid(null,$perm))))
-		{
+		$sql = 'SELECT slideshowid '.
+				' FROM slideshows '.
+				' WHERE slideshowid='.$slideshowid.
+					' AND '.DBin_node('slideshowid', get_current_nodeid(null,$perm));
+		if(DBselect($sql)){
 			$result = true;
-			$db_slides = DBselect('select distinct screenid from slides where slideshowid='.$slideshowid);
-			while($slide_data = DBfetch($db_slides)){
-				if(!$result = screen_accessible($slide_data["screenid"], PERM_READ_ONLY)) break;
+
+			$screenids = array();
+			$sql = 'SELECT DISTINCT screenid '.
+					' FROM slides '.
+					' WHERE slideshowid='.$slideshowid;
+			$db_screens = DBselect($sql);
+			while($slide_data = DBfetch($db_screens)){
+				$screenids[$slide_data['screenid']] = $slide_data['screenid'];
+			}
+			
+			$options = array(
+					'screenids' => $screenids
+				);
+			if($perm == PERM_READ_WRITE) $options['editable'] = 1;
+
+			$screens = CScreen::get($options);
+			$screens = zbx_toHash($screens, 'screenid');
+
+			foreach($screenids as $snum => $screenid){
+				if(!isset($screens[$screenid])) return false;
 			}
 		}
+		
 	return $result;
 	}
 
@@ -1218,9 +1238,7 @@
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_TRIGGERS_INFO) ){
-					$item = new CTriggersInfo($style);
-					if($resourceid > 0)
-						$item->set_host_group($resourceid);
+					$item = new CTriggersInfo($resourceid, $style);
 					$item = array($item);
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}

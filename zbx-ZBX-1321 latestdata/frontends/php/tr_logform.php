@@ -324,11 +324,11 @@ if(isset($_REQUEST['sform'])){
 
 	$keyTable = new CTableInfo(null);
 	$keyTable->setAttribute('id','key_list');
-	$keyTable->setHeader(array(S_KEYWORD,S_TYPE, new CLink(S_DELETE,'#')));
+	$keyTable->setHeader(array(S_KEYWORD,S_TYPE, S_ACTION));
 
 	$table = new CTableInfo(null);
 	$table->setAttribute('id','exp_list');
-	$table->setHeader(array(S_EXPRESSION,S_TYPE, S_POSITION,new CLink(S_DELETE,'#')));
+	$table->setHeader(array(S_EXPRESSION,S_TYPE, S_POSITION, S_ACTION));
 
 	$maxid=0;
 
@@ -352,7 +352,8 @@ if(isset($_REQUEST['sform'])){
 		$imgdn->setAttribute('onclick','javascript:  element_down("logtr'.$id.'");');
 		$imgdn->setAttribute('onmouseover','javascript: this.style.cursor = "pointer";');
 
-		$del_url = new CLink('Delete','#','action','javascript: if(confirm("Delete expression?")) remove_expression("logtr'.$id.'"); return false;');
+		$del_url = new CSpan('Delete','link');
+		$del_url->setAttribute('onclick', 'javascript: if(confirm("Delete expression?")) remove_expression("logtr'.$id.'"); return false;');
 
 		$row = new CRow(array(htmlspecialchars($expr['view']),(($expr['type']==REGEXP_INCLUDE)?S_INCLUDE:S_EXCLUDE),array($imgup,SPACE,$imgdn),$del_url));
 		$row->setAttribute('id','logtr'.$id);

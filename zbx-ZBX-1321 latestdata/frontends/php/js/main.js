@@ -121,7 +121,7 @@ init: function(){
 	var path = new Curl();
 	this.page = path.getPath();
 	
-	this.selected_ids = cookie.readJSON('cb_'+this.page);
+	this.selected_ids = cookie.readJSON('cb_'+this.page+'_'+this.pageGoName);
 
 	var chk_bx = document.getElementsByTagName('input');
 
@@ -306,7 +306,7 @@ setGo: function(){
 		
 		var tmp_val = $('goButton').value.split(' ');
 		$('goButton').value = tmp_val[0]+' ('+countChecked+')';
-		cookie.createJSON('cb_'+this.page, this.selected_ids);
+		cookie.createJSON('cb_'+this.page+'_'+this.pageGoName, this.selected_ids);
 
 		this.pageGoCount = countChecked;
 	}

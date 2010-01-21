@@ -58,7 +58,6 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
 // ACTION /////////////////////////////////////////////////////////////////////////////
 	if(isset($_REQUEST['favobj'])){
 		$_REQUEST['pmasterid'] = get_request('pmasterid','mainpage');
@@ -72,6 +71,10 @@ include_once "include/page_header.php";
 				case 'hat_syssum':
 					$syssum = make_system_summary();
 					$syssum->show();
+					break;
+				case 'hat_hoststat':
+					$hoststat = make_hoststat_summary();
+					$hoststat->show();
 					break;
 				case 'hat_stszbx':
 					$stszbx = make_status_of_zbx();
@@ -173,6 +176,7 @@ include_once "include/page_header.php";
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 
@@ -207,6 +211,7 @@ include_once "include/page_header.php";
 	make_screen_menu($menu,$submenu);
 
 	make_refresh_menu('mainpage','hat_syssum',get_profile('web.dahsboard.rf_rate.hat_syssum',60),null,$menu,$submenu);
+	make_refresh_menu('mainpage','hat_hoststat',get_profile('web.dahsboard.rf_rate.hat_hoststat',60),null,$menu,$submenu);
 	make_refresh_menu('mainpage','hat_stszbx',get_profile('web.dahsboard.rf_rate.hat_stszbx',60),null,$menu,$submenu);
 	make_refresh_menu('mainpage','hat_lastiss',get_profile('web.dahsboard.rf_rate.hat_lastiss',60),null,$menu,$submenu);
 	make_refresh_menu('mainpage','hat_webovr',get_profile('web.dahsboard.rf_rate.hat_webovr',60),null,$menu,$submenu);
@@ -279,12 +284,30 @@ include_once "include/page_header.php";
 			),
 		array('id' => 'hat_webovr',
 				'frequency'  => get_profile('web.dahsboard.rf_rate.hat_webovr',60)
+			),
+		array('id' => 'hat_hoststat',
+				'frequency'  => get_profile('web.dahsboard.rf_rate.hat_hoststat',60)
 			)
 /*		array('id' => 'hat_custom',
 				'frequency'  =>	get_profile('web.dahsboard.rf_rate.hat_custom',60),
 				'url'=>	'charts.php?groupid=4&hostid=10017&graphid=5&output=html&fullscreen=1'
 			)*/
 	);
+
+// Status of ZBX
+	if(USER_TYPE_SUPER_ADMIN == $USER_DETAILS['type']){
+		$refresh_menu = new CDiv(SPACE,'iconmenu');
+		$refresh_menu->addAction('onclick','javascript: create_page_menu(event,"hat_stszbx");');
+		$refresh_menu->setAttribute('title',S_MENU);
+	
+		$zbx_stat = new CWidget('hat_stszbx',
+							new CSpan(S_LOADING_P,'textcolorstyles'),//make_status_of_zbx()
+							get_profile('web.dashboard.hats.hat_stszbx.state',1)
+							);
+		$zbx_stat->addHeader(S_STATUS_OF_ZABBIX,array($refresh_menu));
+		$right_tab->addRow($zbx_stat);
+	}
+//----------------
 
 // System status
 	$refresh_menu = new CDiv(SPACE,'iconmenu');
@@ -299,17 +322,17 @@ include_once "include/page_header.php";
 	$right_tab->addRow($sys_stat);
 //----------------
 
-// Status of ZBX
-	$refresh_menu = new CDiv(SPACE,'iconmenu');
-	$refresh_menu->addAction('onclick','javascript: create_page_menu(event,"hat_stszbx");');
+// Host status
+	$refresh_menu = new CDiv(SPACE, 'iconmenu');
+	$refresh_menu->addAction('onclick', 'javascript: create_page_menu(event,"hat_hoststat");');
 	$refresh_menu->setAttribute('title',S_MENU);
 
-	$zbx_stat = new CWidget('hat_stszbx',
-						new CSpan(S_LOADING_P,'textcolorstyles'),//make_status_of_zbx()
-						get_profile('web.dashboard.hats.hat_stszbx.state',1)
+	$hoststat = new CWidget('hat_hoststat',
+						new CSpan(S_LOADING_P,'textcolorstyles'),//make_system_summary()
+						get_profile('web.dashboard.hats.hat_hoststat.state',1)
 						);
-	$zbx_stat->addHeader(S_STATUS_OF_ZABBIX,array($refresh_menu));
-	$right_tab->addRow($zbx_stat);
+	$hoststat->addHeader(S_HOST_STATUS_STATUS,array($refresh_menu));
+	$right_tab->addRow($hoststat);
 //----------------
 
 // Last Issues
@@ -402,6 +425,6 @@ include_once "include/page_header.php";
 ?>
 <?php
 
-include_once "include/page_footer.php";
+include_once("include/page_footer.php");
 
 ?>

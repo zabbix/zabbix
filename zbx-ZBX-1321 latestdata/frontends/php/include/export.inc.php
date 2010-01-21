@@ -295,6 +295,7 @@ class zbxXML{
 			if(isset($data['hosts_groups'])){
 				$groups_node = $host_node->appendChild(new DOMElement(XML_TAG_GROUPS));
 				foreach($data['hosts_groups'] as $gnum => $group){
+					$group['hosts'] = zbx_toHash($group['hosts'], 'hostid');
 					if(isset($group['hosts'][$host['hostid']])){
 						$groups_node->appendChild(new DOMElement(XML_TAG_GROUP, $group['name']));
 					}
@@ -305,6 +306,7 @@ class zbxXML{
 			if(isset($data['triggers'])){
 				$triggers_node = $host_node->appendChild(new DOMElement(XML_TAG_TRIGGERS));
 				foreach($data['triggers'] as $tnum => $trigger){
+					$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 					if(isset($trigger['hosts'][$host['hostid']])){
 						self::addChildData($triggers_node, XML_TAG_TRIGGER, $trigger);
 					}
@@ -315,12 +317,14 @@ class zbxXML{
 			if(isset($data['items'])){
 				$items_node = $host_node->appendChild(new DOMElement(XML_TAG_ITEMS));
 				foreach($data['items'] as $item){
+					$item['hosts'] = zbx_toHash($item['hosts'], 'hostid');
 					if(isset($item['hosts'][$host['hostid']])){
 						$item_node = self::addChildData($items_node, XML_TAG_ITEM, $item);
 //sdi('Item: '. date('H i s u'));
 						if(isset($data['items_applications'])){
 							$applications_node = $item_node->appendChild(new DOMElement(XML_TAG_APPLICATIONS));
 							foreach($data['items_applications'] as $application){
+								$application['items'] = zbx_toHash($application['items'], 'itemid');
 								if(isset($application['items'][$item['itemid']])){
 									$applications_node->appendChild(new DOMElement(XML_TAG_APPLICATION, $application['name']));
 								}
@@ -334,6 +338,7 @@ class zbxXML{
 			if(isset($data['templates'])){
 				$templates_node = $host_node->appendChild(new DOMElement(XML_TAG_TEMPLATES));
 				foreach($data['templates'] as $template){
+					$template['hosts'] = zbx_toHash($template['hosts'], 'hostid');
 					if(isset($template['hosts'][$host['hostid']])){
 						$templates_node->appendChild(new DOMElement(XML_TAG_TEMPLATE, $template['host']));
 					}
@@ -364,6 +369,7 @@ class zbxXML{
 				$hostminmaxs = zbx_toHash($hostminmaxs, 'hostid');
 
 				foreach($data['graphs'] as $num => $graph){
+					$graph['hosts'] = zbx_toHash($graph['hosts'], 'hostid');
 					if(isset($graph['hosts'][$host['hostid']])){
 
 						$graph['ymin_item_key'] = '';
@@ -388,6 +394,7 @@ class zbxXML{
 							foreach($data['graphs_items'] as $ginum => $gitem){
 								$tmp_item = get_item_by_itemid($gitem['itemid']);
 
+								$gitem['graphs'] = zbx_toHash($gitem['graphs'], 'graphid');
 								if(isset($gitem['graphs'][$graph['graphid']])){
 									self::addChildData($graph_elements_node, XML_TAG_GRAPH_ELEMENT, $gitem);
 								}
@@ -401,6 +408,7 @@ class zbxXML{
 			if(isset($data['macros'])){
 				$macros_node = $host_node->appendChild(new DOMElement(XML_TAG_MACROS));
 				foreach($data['macros'] as $mnum => $macro){
+					$macro['hosts'] = zbx_toHash($macro['hosts'], 'hostid');
 					if(isset($macro['hosts'][$host['hostid']])){
 						self::addChildData($macros_node, XML_TAG_MACRO, $macro);
 					}

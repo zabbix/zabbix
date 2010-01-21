@@ -185,7 +185,12 @@ include_once('include/page_header.php');
 
 // PERMISSIONS
 	if(get_request('hostid', 0) > 0){
-		$options = array('hostids' => $_REQUEST['hostid'], 'extendoutput' => 1, 'templated_hosts' => 1);
+		$options = array(
+			'hostids' => $_REQUEST['hostid'], 
+			'extendoutput' => 1, 
+			'templated_hosts' => 1, 
+			'editable' => 1
+		);
 		$hosts = CHost::get($options);
 		if(empty($hosts)) access_deny();
 	}
@@ -275,7 +280,7 @@ include_once('include/page_header.php');
 
 		$hostid = reset($hostid);
 
-		$hostid = $hostid?$hostid['hostid']:0;
+		$hostid = $hostid ? $hostid['hostid'] : 0;
 	}
 
 // SUBFILTERS {
@@ -667,7 +672,7 @@ include_once('include/page_header.php');
 			$_REQUEST['go'] = 'none2';
 		}
 		else{
-			error('No target selection.');
+			error(S_NO_TARGET_SELECTED);
 		}
 		show_messages();
 	}
@@ -795,10 +800,11 @@ include_once('include/page_header.php');
 		$sortorder = getPageSortOrder();
 		$options = array(
 			'filter' => 1,
-			'extendoutput' => 1,
-			'select_hosts' => 1,
-			'select_triggers' => 1,
-			'select_applications' => 1,
+			'output' => API_OUTPUT_EXTEND,
+			'editable' => 1,
+			'select_hosts' => API_OUTPUT_EXTEND,
+			'select_triggers' => API_OUTPUT_EXTEND,
+			'select_applications' => API_OUTPUT_EXTEND,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
@@ -1069,7 +1075,7 @@ include_once('include/page_header.php');
 				$ltype = $logtype[$matchkey[1]];
 
 				$triggers_flag = false;
-				$triggers=",Array('Edit Trigger',null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']}\n";
+				$triggers=",Array('".S_EDIT_TRIGGER."',null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']}\n";
 
 				foreach($item['triggers'] as $num => $trigger){
 					$triggers .= ',["'.$trigger['description_expanded'].'",'.
@@ -1117,27 +1123,27 @@ include_once('include/page_header.php');
 // GO{
 		$goBox = new CComboBox('go');
 		$goOption = new CComboItem('activate',S_ACTIVATE_SELECTED);
-		$goOption->setAttribute('confirm','Enable selected items?');
+		$goOption->setAttribute('confirm',S_ENABLE_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
-		$goOption->setAttribute('confirm','Disable selected items?');
+		$goOption->setAttribute('confirm',S_DISABLE_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('massupdate',S_MASS_UPDATE);
-		$goOption->setAttribute('confirm','Mass update selected items?');
+		$goOption->setAttribute('confirm',S_MASS_UPDATE_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('copy_to',S_COPY_SELECTED_TO);
-		$goOption->setAttribute('confirm','Copy selected items?');
+		$goOption->setAttribute('confirm',S_COPY_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('clean_history',S_CLEAR_HISTORY_FOR_SELECTED);
-		$goOption->setAttribute('confirm','Delete history of selected items?');
+		$goOption->setAttribute('confirm',S_DELETE_HISTORY_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm','Delete selected items?');
+		$goOption->setAttribute('confirm',S_DELETE_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
@@ -1159,10 +1165,7 @@ include_once('include/page_header.php');
 
 	$jsmenu = new CPUMenu(null,200);
 	$jsmenu->InsertJavaScript();
-?>
-<?php
 
-include_once('include/page_footer.php');
-
+	
 include_once('include/page_footer.php');
 ?>

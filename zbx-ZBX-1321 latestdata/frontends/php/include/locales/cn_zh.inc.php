@@ -385,8 +385,6 @@
 	'S_ADD'=>			'Add',
 	'S_STATUS_OF_TRIGGERS'=>			'触发器状态',
 	'S_STATUS_OF_TRIGGERS_BIG'=>			'触发器的状态',
-	'S_SHOW_ONLY_TRUE'=>			'Show only true',
-	'S_SHOW_ACTIONS'=>			'显示操作',
 	'S_SHOW_DETAILS'=>			'显示细节',
 	'S_SELECT'=>			'搜索',
 	'S_TRIGGERS_BIG'=>			'触发器',

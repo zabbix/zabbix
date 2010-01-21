@@ -19,32 +19,35 @@
 **/
 ?>
 <?php
-	define('ZABBIX_VERSION','1.8');
+	define('ZABBIX_VERSION','1.8.1');
 	define('ZABBIX_API_VERSION','1.0');
 /* USER DEFINES */
 
 	define('ZBX_LOGIN_ATTEMPTS',			5);
-	define('ZBX_LOGIN_BLOCK',			30); // sec
+	define('ZBX_LOGIN_BLOCK',				30); // sec
 
 	define('TRIGGERS_OPTION_DISABLED',		0);	// reserved
 	define('TRIGGERS_OPTION_ONLYTRUE',		1);	// use 0 to disable
 	define('TRIGGERS_OPTION_ALL',			2);	// use 0 to disable
+	define('TRIGGERS_OPTION_SHOW_ALL_WITH_UNACKNOWLEDGED',			3);	// use 0 to disable
 
 	define('TRIGGER_FALSE_PERIOD',			1800);	// 10min, 0 - disable
 	define('TRIGGER_BLINK_PERIOD',			1800);	// 5min,  0 - disable
 
 	define('EVENTS_OPTION_DISABLED',		0);	// reserved
 	define('EVENTS_OPTION_NOEVENT',			1);	// use 0 to disable
-	define('EVENTS_OPTION_ALL',			2);	// use 0 to disable
+	define('EVENTS_OPTION_ALL',				2);	// use 0 to disable
 	define('EVENTS_OPTION_NOT_ACK',			3);	// use 0 to disable
-	define('EVENTS_OPTION_ONLYTRUE_NOTACK',		4);	// use 0 to disable
+	define('EVENTS_OPTION_ONLYTRUE_NOTACK',	0);	// use 0 to disable
 	define('EVENTS_OPTION_EVENT_LAST',		0); // use 0 to disable
 
-	define('ZBX_MIN_PERIOD',			3600);		// 1 hour
-	define('ZBX_MAX_PERIOD',			2*365*86400);	// ~2 years
+	define('ZBX_MIN_PERIOD',				3600);		// 1 hour
+	define('ZBX_MAX_PERIOD',				2*365*86400);	// ~2 years
 	define('ZBX_PERIOD_DEFAULT',			3600);		// 1 hour
+	
+	define('ZBX_POPUP_MAX_ROWS',			20);
 
-	define('ZBX_FONTPATH',				realpath('fonts'));	// where to search for font (GD > 2.0.18)
+	define('ZBX_FONTPATH',					realpath('fonts'));	// where to search for font (GD > 2.0.18)
 	define('ZBX_GRAPH_FONT_NAME',			'DejaVuSans');		// font file name
 /* END OF USERS DEFINES */
 
@@ -688,6 +691,10 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('ZBX_API_ERROR_NO_AUTH', 200);
 	define('ZBX_API_ERROR_NO_METHOD', 300);
 	//define('ZBX_API_ERROR_PARAMETERS', 100);
+	
+	define('API_OUTPUT_SHORTEN', 'shorten');
+	define('API_OUTPUT_REFER', 'refer');
+	define('API_OUTPUT_EXTEND', 'extend');
 
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
 	if(!function_exists('version_compare')){

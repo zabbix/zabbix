@@ -231,7 +231,7 @@
 			$frmHostG->addItemToBottomRow(new CButton("clone",S_CLONE));
 			$frmHostG->addItemToBottomRow(SPACE);
 			$frmHostG->addItemToBottomRow(
-				new CButtonDelete('Delete selected proxy?', url_param('form').url_param('hostid'))
+				new CButtonDelete(S_DELETE_SELECTED_PROXY_Q, url_param('form').url_param('hostid'))
 			);
 		}
 		$frmHostG->addItemToBottomRow(SPACE);
@@ -304,9 +304,19 @@
 
 //----- GO ------
 		$goBox = new CComboBox('go');
-		$goBox->addItem('activate', S_ACTIVATE_SELECTED);
-		$goBox->addItem('disable', S_DISABLE_SELECTED);
-		$goBox->addItem('delete', S_DELETE_SELECTED);
+		
+		$goOption = new CComboItem('activate',S_ACTIVATE_SELECTED);
+		$goOption->setAttribute('confirm',S_ENABLE_SELECTED_PROXIES);
+		$goBox->addItem($goOption);
+		
+		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
+		$goOption->setAttribute('confirm',S_DISABLE_SELECTED_PROXIES);
+		$goBox->addItem($goOption);
+		
+		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
+		$goOption->setAttribute('confirm',S_DELETE_SELECTED_PROXIES);
+		$goBox->addItem($goOption);
+		
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton', S_GO.' (0)');
 		$goButton->setAttribute('id', 'goButton');

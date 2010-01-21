@@ -27,10 +27,10 @@
 	'S_DATE_FORMAT_YMD'=>			'd M Y',
 	'S_HTML_CHARSET'=>			'UTF-8',
 
-	'S_YEAR_SHORT' =>			'y',
-	'S_MONTH_SHORT' =>			'm',
-	'S_WEEK_SHORT' =>			'w',
-	'S_DAY_SHORT' =>			'd',
+	'S_YEAR_SHORT'=>			'y',
+	'S_MONTH_SHORT'=>			'm',
+	'S_WEEK_SHORT'=>			'w',
+	'S_DAY_SHORT'=>				'd',
 	'S_HOUR_SHORT' =>			'h',
 	'S_MINUTE_SHORT' =>			'm',
 	'S_SECOND_SHORT' =>			's',
@@ -91,6 +91,9 @@
 	'S_CANNOT_ADD_DISCOVERY_RULE'=>		'Cannot add discovery rule',
 	'S_STATUS_OF_DISCOVERY_BIG'=>		'STATUS OF DISCOVERY',
 	'S_STATUS_OF_DISCOVERY'=>		'Status of discovery',
+	'S_ENABLE_SELECTED_DISCOVERY_RULES'=>	'Enable selected discovery rules?',
+	'S_DISABLE_SELECTED_DISCOVERY_RULES'=>	'Disable selected discovery rules?',
+	'S_DELETE_SELECTED_DISCOVERY_RULES'=>	'Delete selected discovery rules?',
 
 	'S_DISCOVERED'=>			'Discovered',
 	'S_LOST'=>				'Lost',
@@ -122,7 +125,7 @@
 	'S_STATE'=>				'State',
 
 //	httpconf.php
-	'S_SORT' => 'Sort',
+	'S_SORT'=>					'Sort',
 	'S_STATUS_CODES'=>				'Status codes',
 	'S_WEB'=>					'Web',
 	'S_CONFIGURATION_OF_WEB_MONITORING'=>		'Configuration of Web monitoring',
@@ -152,6 +155,10 @@
 	'S_REQUIRED'=>					'Required',
 	'S_STEP_OF_SCENARIO'=>				'Step of scenario',
 	'S_BASIC_AUTHENTICATION'=>			'Basic authentication',
+	'S_ENABLE_SELECTED_WEB_SCENARIOS_Q'=>		'Enable selected WEB scenarios?',
+	'S_DISABLE_SELECTED_WEB_SCENARIOS_Q'=>		'Disable selected WEB scenarios?',
+	'S_DELETE_HISTORY_SELECTED_WEB_SCENARIOS_Q'=>	'Delete history of selected WEB scenarios?',
+	'S_DELETE_SELECTED_WEB_SCENARIOS_Q'=>		'Delete selected WEB scenarios?',
 
 //	exp_imp.php
 	'S_ELEMENT'=>				'Element',
@@ -208,7 +215,6 @@
 
 //	acknow.php
 	'S_NO_EVENTS_TO_ACKNOWLEDGE'=>		'No events to acknowledge',
-	'S_TO_ACKNOWLEDGE' =>		'To acknowledge',
 	'S_ACKNOWLEDGES'=>			'Acknowledges',
 	'S_ACKNOWLEDGE'=>			'Acknowledge',
 	'S_RETURN'=>				'Return',
@@ -280,6 +286,7 @@
 	'S_INCORRECT_OPERATION_TYPE'=>		'Incorrect operation type',
 	'S_INCORRECT_USER'=>			'Incorrect user',
 	'S_INCORRECT_STEPS'=>			'Incorrect steps',
+	'S_SELECTED_ACTIONS'=>			'selected actions?',
 
 //	actions.php
 	'S_ACTIONS'=>				'Actions',
@@ -464,11 +471,11 @@
 
 	'S_EXPRESSION_TYPE'=>				'Expression type',
 	'S_NEW_EXPRESSION'=>				'New expression',
-	'S_IGNORE_CASE'=>				'Ignore case',
 	'S_CASE_SENSITIVE'=>				'Case sensitive',
 	'S_TEST'=>					'Test',
 	'S_DELIMITER'=>					'Delimiter',
 	'S_TEST_STRING'=>				'Test string',
+	'S_INCORRECT_EXPRESSION'=>			'Incorrect expression',
 
 	'S_NEW_REGULAR_EXPRESSION'=>			'New regular expression',
 	'S_REGULAR_EXPRESSION_ADDED'=>			'Regular expression added',
@@ -485,6 +492,9 @@
 
 	'S_GROUP_FOR_DISCOVERED_HOSTS'=>		'Group for discovered hosts',
 
+	'S_VALUE_MAPS_CREATE_NUM_STRING'=>		'Value maps are used to create a mapping between numeric values and string representations',
+	'S_DELETE_SELECTED_VALUE_MAPPING'=>		'Delete selected value mapping?',
+
 //	nodes.php
 	'S_NOT_DM_SETUP'=>			'Your setup is not configured for distributed monitoring',
 	'S_CONFIGURATION_OF_NODES'=>		'CONFIGURATION OF NODES',
@@ -495,9 +505,14 @@
 	'S_NEW_NODE'=>				'New node',
 	'S_NO_NODES_DEFINED'=>			'No nodes defined',
 	'S_ALL_NODES'=>				'All nodes',
+	'S_DELETE_SELECTED_NODE_Q'=>		'Delete selected node?',
 
 // proxies.php
+	'S_ENABLE_SELECTED_PROXIES' => 'Enable hosts monitored by selected proxies?',
+	'S_DISABLE_SELECTED_PROXIES' => 'Disable hosts monitored by selected proxies?',
+	'S_DELETE_SELECTED_PROXIES' => 'Delete selected proxies?',
 	'S_CONFIGURATION_OF_PROXIES'=>		'CONFIGURATION OF PROXIES',
+	'S_DELETE_SELECTED_PROXY_Q'=>		'Delete selected proxy?',
 
 //  Authentication
 	'S_AUTHENTICATION'=>			'Authentication',
@@ -513,7 +528,8 @@
 	'S_HTTP_AUTH'=>				'HTTP Authentication',
 	'S_ZABBIX_INTERNAL_AUTH'=>		'Zabbix Internal authentication',
 	'S_DEFAULT_AUTHENTICATION'=>		'Default authentication',
-
+	'S_SWITCHING_HTTP'=>			'Switching HTTP authentication will reset all current sessions! Continue?',
+	'S_SWITCHING_LDAP'=>			'Switching LDAP authentication will reset all current sessions! Continue?',
 
 //	Latest values
 	'S_NO_PERMISSIONS'=>			'No permissions !',
@@ -595,6 +611,9 @@
 	'S_GRAPH_SUM'=>				'Graph sum',
 	'S_GRAPH_ITEM'=>			'Graph item',
 	'S_REQUIRED_ITEMS_FOR_GRAPH'=>		'Items required for graph',
+	'S_TEMPLATED_GRAPH'=>			'Templated graph',
+	'S_NO_TARGET_SELECTED'=>		'No target selected',
+	'S_DELETE_SELECTED_GRAPHS'=>		'Delete selected graphs?',
 
 //	history.php
 	'S_SECONDS_SMALL'=>			'seconds',
@@ -609,6 +628,9 @@
 	'S_SOURCE'=>				'Source',
 	'S_EVENT_ID'=>				'Event ID',
 	'S_HIDE_UNKNOWN'=>			'Hide unknown',
+	'S_LOG_FILES_SMALL'=>			'log files',
+	'S_REMOVE_SELECTED'=>			'Remove selected',
+	'S_LOG_FILES_LIST'=>			'Log files list',
 
 	'S_SHOW_SELECTED'=>			'Show selected',
 	'S_HIDE_SELECTED'=>			'Hide selected',
@@ -624,6 +646,7 @@
 	'S_MAINTENANCE_ADDED'=>			'Maintenance added',
 	'S_MAINTENANCE_UPDATED'=>		'Maintenance updated',
 	'S_MAINTENANCE_DELETED'=>		'Maintenance deleted',
+	'S_DELETE_SELECTED_MAINTENANCE_PERIODS_Q'=>'Delete selected maintenance periods?',
 
 	'S_HOSTS_IN_MAINTENANCE'=>		'Hosts in maintenance',
 	'S_GROUPS_IN_MAINTENANCE'=>		'Groups in maintenance',
@@ -685,14 +708,22 @@
 	'S_NOVEMBER'=>				'November',
 	'S_DECEMBER'=>				'December',
 
-	'S_INCORRECT_MAINTENANCE_PERIOD'=>	'Incorrect maintenance period',
+	'S_INCORRECT_MAINTENANCE_PERIOD'=>		'Incorrect maintenance period',
+	'S_INCORRECT_MAINTENANCE_DATE'=>		'Incorrect maintenance date',
+	'S_INCORRECT_MAINTENANCE_DAY_PERIOD'=>		'Incorrect maintenance day period',
+	'S_INCORRECT_MAINTENANCE_WEEK_PERIOD'=>		'Incorrect maintenance week period',
+	'S_INCORRECT_MAINTENANCE_MONTH_PERIOD'=>	'Incorrect maintenance month period',
+	'S_INCORRECT_MAINTENANCE_DAYS_OF_WEEK'=>	'Incorrect maintenance days of week',
 
 // hostgroups.php
 	'S_CONFIGURATION_OF_GROUPS'=>		'CONFIGURATION OF HOST GROUPS',
+	'S_DELETE_SELECTED_GROUP'=>		'Delete selected group?',
+	'S_ENABLE_SELECTED_HOST_GROUPS'=>	'Enable selected Host Groups?',
+	'S_DISABLE_SELECTED_HOST_GROUPS'=>	'Disable selected Host Groups?',
+	'S_DELETE_SELECTED_HOST_GROUPS'=>	'Delete selected Host Groups?',
 
 //	hosts.php
 	'S_MACROS'=>					'Macros',
-	'S_ERROR_ADDING_MACRO'=>			'Error while adding Host Macro',
 	'S_WRONG_MACRO'=>				'Wrong macro',
 	'S_MACRO_TOO_LONG'=>				'Macro name is too long, should not exceed 64 chars.',
 	'S_MACRO_VALUE_TOO_LONG'=>			'Macro value is too long, should not exceed 255 chars.',
@@ -764,7 +795,7 @@
 	'S_NEW_GROUP'=>					'New group',
 	'S_DNS_NAME'=>					'DNS name',
 	'S_IP_ADDRESS'=>				'IP address',
-	'S_LINK_WITH_TEMPLATE'=>			'Link with Template',
+	'S_LINK_ADDITIONAL_TEMPLATES'=>			'Link additional templates',
 	'S_USEIPMI'=>					'Use IPMI',
 	'S_IPMI_IP_ADDRESS'=>				'IPMI IP address',
 	'S_IPMI_PORT'=>					'IPMI port',
@@ -800,10 +831,12 @@
 	'S_CREATE_PROXY'=>				'Create Proxy',
 	'S_PROXY_NAME'=>				'Proxy name',
 	'S_LASTSEEN_AGE'=>				'Last seen (age)',
-	'S_GLOBAL_MACRO'=>				'Global macro',
 	'S_HOST_MACRO'=>				'Host macro',
 	'S_DOESNT_EXIST'=>				'doesn\'t exist',
 	'S_EMPTY_INPUT_PARAMETER'=>			'Empty input parameter',
+	'S_ENABLE_SELECTED_HOSTS'=>			'Enable selected hosts?',
+	'S_DISABLE_SELECTED_HOSTS_Q'=>			'Disable selected hosts?',
+	'S_DELETE_SELECTED_HOSTS'=>			'Delete selected hosts?',
 
 // templates.php
 	'S_TEMPLATE_LIST'=>			'Templates list',
@@ -815,6 +848,7 @@
 	'S_LINKED_TO'=>				'Linked to',
 	'S_TEMPLATE_DELETED'=>			'Template deleted',
 	'S_CANNOT_DELETE_TEMPLATE'=>		'Cannot delete template',
+	'S_LINK_WITH_TEMPLATE'=>		'Link with template',
 
 //	Host profiles
 	'S_HOST_PROFILE'=>			'Host profile',
@@ -1020,6 +1054,13 @@
 	'S_PUBLIC_KEY'=>					'Public key',
 	'S_AUTHENTICATION_METHOD'=>				'Authentication method',
 	'S_PASSPHRASE'=>					'Passphrase',
+	'S_EDIT_TRIGGER'=>					'Edit Trigger',
+	'S_ENABLE_SELECTED_ITEMS_Q'=>				'Enable selected items?',
+	'S_DISABLE_SELECTED_ITEMS_Q'=>				'Disable selected items?',
+	'S_MASS_UPDATE_SELECTED_ITEMS_Q'=>			'Mass update selected items?',
+	'S_COPY_SELECTED_ITEMS_Q'=>				'Copy selected items?',
+	'S_DELETE_HISTORY_SELECTED_ITEMS_Q'=>			'Delete history of selected items?',
+	'S_DELETE_SELECTED_ITEMS_Q'=>				'Delete selected items?',
 
 //	events.php
 	'S_EVENT'=>				'Event',
@@ -1046,25 +1087,21 @@
 	'S_ICON_UNKNOWN'=>			'Icon (unknown)',
 	'S_ICON_MAINTENANCE'=>			'Icon (maintenance)',
 	'S_ICON_DISABLED'=>			'Icon (disabled)',
-	'S_ELEMENT_1'=>				'Element 1',
-	'S_ELEMENT_2'=>				'Element 2',
 	'S_LINK_STATUS_INDICATOR'=>		'Link status indicator',
 	'S_CONFIGURATION_OF_NETWORK_MAPS'=>	'Configuration of network maps',
 	'S_CONFIGURATION_OF_NETWORK_MAPS_BIG'=>	'CONFIGURATION OF NETWORK MAPS',
 
 	'S_ADD_ELEMENT'=>			'Add element',
-	'S_CREATE_CONNECTION'=>			'Create connection',
 	'S_COORDINATE_X'=>			'Coordinate X',
 	'S_COORDINATE_Y'=>			'Coordinate Y',
 
-	'S_DISPLAYED_ELEMENTS'=>		'Displayed elements',
 	'S_CONNECTORS'=>			'Connectors',
-	'S_UNAVAILABLE_BIG' =>			'UNAVAILABLE',
-	'S_MAINTENANCE_BIG' =>		'MAINTENANCE',
+	'S_UNAVAILABLE_BIG'=>			'UNAVAILABLE',
+	'S_MAINTENANCE_BIG'=>			'MAINTENANCE',
 
 //	sysmaps.php
 	'S_EDIT_MAP_ELEMENT'=>			'Edit map element',
-	'S_ICON_DEFAULT'=> 			'Icon (default)',
+	'S_ICON_DEFAULT'=>			'Icon (default)',
 	'S_APPLY'=>				'Apply',
 	'S_MAP_ELEMENTS'=>			'Map elements',
 	'S_MAP_DELETED'=>			'Network map deleted',
@@ -1087,11 +1124,6 @@
 	'S_ADD_LINK'=>				'Add link',
 	'S_REMOVE_LINK'=>			'Remove link',
 
-	'S_UNDEFINED'=>				'Undefined',
-	'S_TYPE_OFF'=>				'Type (OFF)',
-	'S_TYPE_ON'=>				'Type (ON)',
-	'S_COLOR_OFF'=>				'Color (OFF)',
-	'S_COLOR_ON'=>				'Color (ON)',
 
 //	map.php
 	'S_OK_BIG'=>			'OK',
@@ -1128,6 +1160,9 @@
 	'S_AGE'=>				'Age',
 	'S_ISSUE'=>				'Issue',
 	'S_SYSTEM_STATUS'=>			'System status',
+	'S_HOST_STATUS_STATUS'=>			'Host status',
+	'S_WITHOUT_PROBLEMS' =>				'Without problems',
+	'S_WITH_PROBLEMS' =>				'With problems',
 	'S_LAST_20_ISSUES'=>			'Last 20 issues',
 	'S_FAVOURITE'=>				'Favourite',
 	'S_FAVOURITES'=>			'Favourites',
@@ -1215,6 +1250,7 @@
 	'S_DAY'=>					'Day',
 	'S_MONTH'=>					'Month',
 	'S_YEAR'=>					'Year',
+	'S_YEAR_SMALL'=>				'year',
 	'S_HOURLY'=>					'Hourly',
 	'S_DAILY'=>					'Daily',
 	'S_WEEKLY'=>					'Weekly',
@@ -1230,6 +1266,9 @@
 	'S_LOCALES'=>				'Locales',
 	'S_LOCALE_SMALL'=>			'locale',
 	'S_DOWNLOAD'=>				'Download',
+	'S_TAKE_DEF_LOCALE'=>			'Take for default locale',
+	'S_LOCALE_TO_EXTEND'=>			'Locale to extend',
+	'S_NEW_ENTRIES'=>			'New entries',
 
 //  report4.php
 	'S_NOTIFICATIONS'=>			'Notifications',
@@ -1287,6 +1326,7 @@
 	'S_EDIT'=>				'Edit',
 	'S_DYNAMIC_ITEM'=>			'Dynamic item',
 	'S_DIMENSION_COLS_ROWS'=>		'Dimension (cols x rows)',
+	'S_DELETE_SELECTED_SLIDESHOWS_Q'=>	'Delete selected slideshows?',
 
 	'S_SLIDESHOWS'=>			'Slide shows',
 	'S_SLIDESHOW'=>				'Slide show',
@@ -1409,6 +1449,7 @@
 	'S_LAST_365_DAYS'=>			'Last 365 days',
 
 //	triggers.php
+	'S_SHOW_ALL_WITH_UNACKNOWLEDGED' => 'Show triggers with unacknowledged events',
 	'S_NO_TRIGGER'=>			'No trigger',
 	'S_NO_TRIGGERS_DEFINED'=>		'No triggers defined',
 	'S_NO_TRIGGER_DEFINED'=>		'No trigger defined',
@@ -1568,6 +1609,17 @@
 	'S_DISABLE_DEBUG'=>				'Disable DEBUG',
 	'S_BLOCKED'=>					'Blocked',
 	'S_UNBLOCK_SELECTED'=>				'Unblock selected',
+	'S_UBLOCK_SELECTED_USERS_Q'=>			'Unblock selected users?', 
+	'S_DELETE_SELECTED_USERS_Q'=>			'Delete selected users?',
+
+//  usergrps.php
+	'S_ENABLE_SELECTED_GROUPS_Q'=>			'Enable selected groups?',
+	'S_DISABLE_SELECTED_GROUPS_Q'=>			'Disable selected groups?',
+	'S_ENABLE_API_SELECTED_GROUPS_Q'=>		'Enable API access in selected groups?',
+	'S_DISABLE_API_SELECTED_GROUPS_Q'=>		'Disable API access in selected groups?',
+	'S_ENABLE_DEBUG_SELECTED_GROUPS_Q'=>		'Enable debug mode in selected groups?',
+	'S_DISABLE_DEBUG_SELECTED_GROUPS_Q'=>		'Disable debug mode in selected groups?',
+	'S_DELETE_SELECTED_GROUPS_Q'=>			'Delete selected groups?',
 
 //scripts.php
 	'S_SCRIPTS_CONFIGURATION_BIG'=>		'CONFIGURATION OF SCRIPTS',
@@ -1592,7 +1644,7 @@
 	'S_RESULT'=>				'Result',
 	'S_CLOSE'=>				'Close',
 	'S_CONNECT_TO_SERVER_ERROR'=>		'Cannot connect to Zabbix server',
-
+	'S_DELETE_SELECTED_SCRIPTS_Q'=>		'Delete selected scripts?',
 
 //	audit.php
 	'S_AUDIT'=>				'Audit',
@@ -1642,10 +1694,11 @@
 	'S_EXTENDED'=>				'Extended',
 
 //	search.php
-	'S_SEARCH_BIG' =>			'SEARCH',
-	'S_GO' =>				'Go',
-	'S_FOUND_SMALL' =>			'found',
-	'S_DISPLAYING' =>			'Displaying',
+	'S_SEARCH_BIG'=>			'SEARCH',
+	'S_GO'=>				'Go',
+	'S_FOUND_SMALL'=>			'found',
+	'S_DISPLAYING'=>			'Displaying',
+	'S_SEARCH_PATTERN_EMPTY'=>		'Search pattern is empty',
 
 //	popup.php
 	'S_CAPTION'=>				'Caption',
@@ -1659,8 +1712,6 @@
 //	popup_link_tr.php
 	'S_NEW_CONNECTOR'=>			'New connector',
 	'S_EDIT_CONNECTOR'=>			'Edit connector',
-	'S_MAP_ELEMENT'=>			'Map element',
-	'S_NEW_MAP_ELEMENT'=>			'New map element',
 
 
 //	tr_logform.php
@@ -1674,6 +1725,15 @@
 	'S_ITEM_FUNCTION'=>	'Item / Function',
 	'S_RESULT_TYPE'=>	'Result type',
 	'S_COMBINED_RESULT'=>	'Combined result',
+
+//  applications.php
+	'S_DELETE_APPLICATION'=>	'Delete this application?',
+
+// popup_media.php
+	'S_INCORRECT_TIME_PERIOD'=>	'Incorrect time period',
+
+// page_header.php
+	'S_REFRESHED_EVERY_SMALL'=>	'refreshed every',
 
 //	Menu
 

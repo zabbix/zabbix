@@ -98,7 +98,7 @@
 			}
 
 			if((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && $USER_DETAILS['refresh']){
-				$page_title .= ' [refreshed every '.$USER_DETAILS['refresh'].' sec]';
+				$page_title .= ' ['.S_REFRESHED_EVERY_SMALL.SPACE.$USER_DETAILS['refresh'].SPACE.S_SEC_SMALL.']';
 			}
 		break;
 	}
@@ -200,7 +200,13 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			if($USER_DETAILS['debug_mode'] == GROUP_DEBUG_MODE_ENABLED){
 
 				$debug = new CLink(S_DEBUG, '#debug', 'small_font', null, 'nosid');
-				$debug->setAttribute('onclick', "javascript: ShowHide('zbx_gebug_info', 'block');");
+
+				$d_script = " if(!isset('state', this)) this.state = 'none'; ".
+							" if(this.state == 'none') this.state = 'block'; ".
+							" else this.state = 'none'; ".
+							" showHideByName('zbx_gebug_info', this.state);";
+
+				$debug->setAttribute('onclick', 'javascript: '.$d_script);
 
 				array_push($page_header_r_col,$debug,'|');
 			}
@@ -291,9 +297,9 @@ COpt::compare_files_with_menu($ZBX_MENU);
 // --- ---
 
 				$div_node_tree = new CDiv();
-				$div_node_tree->additem($node_tree->getHTML());
+				$div_node_tree->addItem($node_tree->getHTML());
 
-				$div_node_tree->additem(new CButton('select_nodes', S_SELECT, "javascript: ".
+				$div_node_tree->addItem(new CButton('select_nodes', S_SELECT, "javascript: ".
 																				" hidePopupDiv('select_iframe');".	//IE6 fix
 																				" \$('div_node_tree').setStyle({display:'none'});"));
 
@@ -318,10 +324,9 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			else
 				$td_l->addStyle('padding-right: 20px; padding-bottom: 2px;');
 
-			$tab->AddRow(array($td_l, $node_form));
+			$tab->addRow(array($td_l, $node_form));
 			$node_form = $tab;
 		}
-
 
 // 1st level menu
 		$table = new CTable();

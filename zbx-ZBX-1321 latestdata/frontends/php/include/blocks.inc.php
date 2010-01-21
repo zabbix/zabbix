@@ -23,23 +23,52 @@ require_once('include/graphs.inc.php');
 require_once('include/screens.inc.php');
 require_once('include/maps.inc.php');
 require_once('include/users.inc.php');
+require_once('include/requirements.inc.php');
 
 
 // Author: Aly
 function make_favorite_graphs(){
 	$table = new CTableInfo();
 
+	$graphids = array();
+	$itemids = array();
+	
 	$fav_graphs = get_favorites('web.favorite.graphids');
 	foreach($fav_graphs as $key => $favorite){
+		if('itemid' == $favorite['source']){
+			$itemids[$favorite['value']] = $favorite['value'];
+		}
+		else{
+			$graphids[$favorite['value']] = $favorite['value'];
+		}	
+	}
 
-		$source = $favorite['source'];
+	$options = array(
+			'graphids' => $graphids,
+			'select_hosts' => 1,
+			'extendoutput' => 1
+		);
+	$graphs = CGraph::get($options);
+	$graphs = zbx_toHash($graphs, 'graphid');
+
+	$options = array(
+			'itemids' => $itemids,
+			'select_hosts' => 1,
+			'extendoutput' => 1
+		);
+	$items = CItem::get($options);
+	$items = zbx_toHash($items, 'itemid');
+
+	foreach($fav_graphs as $key => $favorite){
 		$sourceid = $favorite['value'];
 
-		if('itemid' == $source){
-			if(!$item = get_item_by_itemid($sourceid)) continue;
-
-			$host = get_host_by_itemid($sourceid);
-			$item["description"] = item_description($item);
+		if('itemid' == $favorite['source']){
+			if(!isset($items[$sourceid])) continue;
+			
+			$item = $items[$sourceid];
+			$host = reset($item['hosts']);
+			
+			$item['description'] = item_description($item);
 
 			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$host['host'].':'.$item['description'],'history.php?action=showgraph&itemid='.$sourceid);
 			$link->setTarget('blank');
@@ -51,11 +80,10 @@ function make_favorite_graphs(){
 			$icon->setTarget('blank');
 		}
 		else{
-			if(!$graph = get_graph_by_graphid($sourceid)) continue;
-			if(!graph_accessible($sourceid)) continue;
-
-			$result = get_hosts_by_graphid($sourceid);
-			$ghost = DBFetch($result);
+			if(!isset($graphs[$sourceid])) continue;
+			
+			$graph = $graphs[$sourceid];
+			$ghost = reset($graph['hosts']);
 
 			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$ghost['host'].':'.$graph['name'],'charts.php?graphid='.$sourceid);
 			$link->setTarget('blank');
@@ -87,13 +115,27 @@ function make_favorite_screens(){
 
 	$fav_screens = get_favorites('web.favorite.screenids');
 
+	$screenids = array();
+	foreach($fav_screens as $key => $favorite){
+		if('screenid' == $favorite['source']){
+			$screenids[$favorite['value']] = $favorite['value'];
+		}
+	}
+
+	$options = array(
+		'screenids' => $screenids,
+		'extendoutput' => 1
+	);
+	$screens = CScreen::get($options);
+	$screens = zbx_toHash($screens, 'screenid');
+
 	foreach($fav_screens as $key => $favorite){
 		$source = $favorite['source'];
 		$sourceid = $favorite['value'];
 
 		if('slideshowid' == $source){
-			if(!$slide = get_slideshow_by_slideshowid($sourceid)) continue;
 			if(!slideshow_accessible($sourceid, PERM_READ_ONLY)) continue;
+			if(!$slide = get_slideshow_by_slideshowid($sourceid)) continue;
 
 			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$slide['name'],'screens.php?config=1&elementid='.$sourceid);
 			$link->setTarget('blank');
@@ -105,8 +147,8 @@ function make_favorite_screens(){
 			$icon->setTarget('blank');
 		}
 		else{
-			if(!$screen = get_screen_by_screenid($sourceid)) continue;
-			if(!screen_accessible($sourceid, PERM_READ_ONLY)) continue;
+			if(!isset($screens[$sourceid])) continue;
+			$screen = $screens[$sourceid];
 
 			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$screen['name'],'screens.php?config=0&elementid='.$sourceid);
 			$link->setTarget('blank');
@@ -139,21 +181,27 @@ function make_favorite_maps(){
 
 	$fav_sysmaps = get_favorites('web.favorite.sysmapids');
 
+	$sysmapids = array();
 	foreach($fav_sysmaps as $key => $favorite){
+		$sysmapids[$favorite['value']] = $favorite['value'];
+	}
+	
+	$options = array(
+			'sysmapids' => $sysmapids,
+			'extendoutput' => 1
+		);
+	$sysmaps = CMap::get($options);
 
-		$source = $favorite['source'];
-		$sourceid = $favorite['value'];
-
-		if(!$sysmap = get_sysmap_by_sysmapid($sourceid)) continue;
-		if(!sysmap_accessible($sourceid,PERM_READ_ONLY)) continue;
-
-		$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$sysmap['name'],'maps.php?sysmapid='.$sourceid);
+	foreach($sysmaps as $snum => $sysmap){
+		$sysmapid = $sysmap['sysmapid'];
+		
+		$link = new CLink(get_node_name_by_elid($sysmapid, null, ': ').$sysmap['name'],'maps.php?sysmapid='.$sysmapid);
 		$link->setTarget('blank');
 
 		$capt = new CSpan($link);
 		$capt->setAttribute('style','line-height: 14px; vertical-align: middle;');
 
-		$icon = new CLink(new CImg('images/general/chart.png','map',18,18,'borderless'),'maps.php?sysmapid='.$sourceid.'&fullscreen=1');
+		$icon = new CLink(new CImg('images/general/chart.png','map',18,18,'borderless'),'maps.php?sysmapid='.$sysmapid.'&fullscreen=1');
 		$icon->setTarget('blank');
 
 		$table->addRow(new CCol(array(
@@ -249,7 +297,6 @@ function make_system_summary(){
 			$group_row->addItem(get_node_name_by_elid($group['groupid']));
 
 		$name = new CLink($group['name'], 'tr_status.php?groupid='.$group['groupid'].'&show_triggers='.TRIGGERS_OPTION_ONLYTRUE);
-		$name->setTarget('blank');
 		$group_row->addItem($name);
 
 		foreach($group['tab_priority'] as $severity => $data){
@@ -335,8 +382,167 @@ function make_system_summary(){
 return $table;
 }
 
+function make_hoststat_summary(){
+	global $USER_DETAILS;
+
+	$table = new CTableInfo();
+	$table->setHeader(array(
+		is_show_all_nodes() ? S_NODE : null,
+		S_HOST_GROUP,
+		S_WITHOUT_PROBLEMS,
+		S_WITH_PROBLEMS,
+		S_TOTAL
+	));
+
+// SELECT HOST GROUPS {{{
+	$options = array(
+		'nodeids' => get_current_nodeid(),
+		'monitored_hosts' => 1,
+		'with_monitored_triggers' => 1,
+		'output' => API_OUTPUT_EXTEND
+	);
+	$groups = CHostGroup::get($options);
+
+	order_result($groups, 'name');
+// }}} SELECT HOST GROUPS
+
+// SELECT HOSTS {{{
+	$options = array(
+		'nodeids' => get_current_nodeid(),
+		'groupids' => zbx_objectValues($groups, 'groupid'),
+		'output' => API_OUTPUT_EXTEND,
+		'monitored_hosts' => 1,
+		'with_monitored_triggers' => 1
+	);
+	$hosts = CHost::get($options);
+// }}} SELECT HOSTS
+
+// SELECT TRIGGERS {{{
+	$options = array(
+		'nodeids' => get_current_nodeid(),
+		// 'hostids' => zbx_objectValues($hosts, 'hostid'),
+		'output' => API_OUTPUT_EXTEND,
+		'monitored' => 1,
+		'select_hosts' => API_OUTPUT_REFER,
+		'only_problems' => 1,
+	);
+	$triggers = CTrigger::get($options);
+// }}} SELECT TRIGGERS
+
+	foreach($groups as $gnum => $group){
+		$group_row = new CRow();
+		if(is_show_all_nodes())
+			$group_row->addItem(get_node_name_by_elid($group['groupid']));
+
+		$name = new CLink($group['name'], 'tr_status.php?groupid='.$group['groupid'].'&hostid=0&show_triggers='.TRIGGERS_OPTION_ONLYTRUE);
+		$group_row->addItem($name);
+
+		$hosts_data = array(
+			'problematic' => 0,
+			'ok' => 0
+		);
+		
+		$problematic_host_list = array();
+		$popup_rows = 0;
+	
+		foreach($hosts as $hnum => $host){
+			foreach($host['groups'] as $hgrnum => $host_group){
+				if($host_group['groupid'] == $group['groupid']){
+					unset($host['groups'][$hgrnum]);
+					// if $host is shown for all groups it is in, unset it
+					if(empty($host['groups'])) unset($hosts[$hnum]);
+					
+					$highest_severity = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+					
+					
+					
+					foreach($triggers as $tnum => $trigger){
+						foreach($trigger['hosts'] as $thnum => $trigger_host){
+							if($trigger_host['hostid'] == $host['hostid']){
+								unset($trigger['hosts'][$thnum]);
+								// if $trigger is shown for all hosts it is in, unset it
+								if(empty($trigger['hosts'])) unset($triggers[$tnum]);
+								
+								if($popup_rows < ZBX_POPUP_MAX_ROWS){
+									if(!isset($problematic_host_list[$host['hostid']])){
+										$problematic_host_list[$host['hostid']] = array();
+										$problematic_host_list[$host['hostid']]['host'] = $host['host'];
+										$problematic_host_list[$host['hostid']]['severities'] = array();
+										$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_DISASTER] = 0;
+										$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_HIGH] = 0;
+										$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_AVERAGE] = 0;
+										$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_WARNING] = 0;
+										$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_INFORMATION] = 0;
+										$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_NOT_CLASSIFIED] = 0;
+									}
+									
+									$problematic_host_list[$host['hostid']]['severities'][$trigger['priority']]++;
+									$popup_rows++;
+								}
+								
+								if($trigger['priority'] > $highest_severity){
+									$highest_severity = $trigger['priority'];
+								}
+								
+													
+								
+							}
+						}
+					}
+					
+					isset($problematic_host_list[$host['hostid']]) ? $hosts_data['problematic']++ : $hosts_data['ok']++;
+				}
+			}
+		}
+		
+// if hostgroup contains problematic hosts, hint should be built
+		if($hosts_data['problematic']){
+			$table_inf = new CTableInfo();
+			$table_inf->setAttribute('style', 'width: 400px;');
+			$table_inf->setHeader(array(
+				S_HOST,
+				S_DISASTER,
+				S_HIGH,
+				S_AVERAGE,
+				S_WARNING,
+				S_INFORMATION,
+				S_NOT_CLASSIFIED
+			));
+			
+			foreach($problematic_host_list as $hostid => $host_data){
+				$r = new CRow();
+				$r->addItem(new CLink($host_data['host'], 'tr_status.php?groupid='.$group['groupid'].'&hostid='.$hostid.'&show_triggers='.TRIGGERS_OPTION_ONLYTRUE));
+				foreach($host_data['severities'] as $severity => $trigger_count){
+					$r->addItem(new CCol($trigger_count, get_severity_style($severity, $trigger_count)));
+				}
+				$table_inf->addRow($r);
+			}
+			
+			$problematic_count = new CSpan($hosts_data['problematic'], 'pointer');
+			$problematic_count->setHint($table_inf);
+		}
+		else{
+			$problematic_count = 0;
+		}
+
+		
+
+		$group_row->addItem(new CCol($hosts_data['ok'], get_severity_style($highest_severity, 0)));
+		$group_row->addItem(new CCol($problematic_count, get_severity_style($highest_severity, $hosts_data['problematic'])));
+		$group_row->addItem($hosts_data['problematic'] + $hosts_data['ok']);
+
+		$table->addRow($group_row);
+	}
+
+	$table->setFooter(new CCol(S_UPDATED.': '.date('H:i:s', time())));
+
+return $table;
+}
+
 // Author: Aly
 function make_status_of_zbx(){
+	global $USER_DETAILS;
+
 	$table = new CTableInfo();
 	$table->setHeader(array(
 		S_PARAMETER,
@@ -403,6 +609,24 @@ function make_status_of_zbx(){
 
 	$table->addRow(array(S_NUMBER_OF_USERS,$usr_cnt,new CSpan($online_cnt,'green')));
 	$table->addRow(array(S_REQUIRED_SERVER_PERFORMANCE_NVPS,$status['qps_total'],' - '));
+	
+	
+// CHECK REQUIREMENTS {{{
+	if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN){
+		$reqs = check_php_requirements();
+		foreach($reqs as $req){
+			if($req['result'] == false){
+				$table->addRow(array(
+					new CSpan($req['name'], 'red'), 
+					new CSpan($req['current'], 'red'),
+					new CSpan($req['error'], 'red')
+				));
+			}
+		}
+	}
+// }}}CHECK REQUIREMENTS
+
+
 	$table->setFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
 
 return $table;
@@ -730,18 +954,49 @@ function make_graph_submenu(){
 
 	$fav_graphs = get_favorites('web.favorite.graphids');
 
+	$graphids = array();
+	$itemids = array();
+	
+	$fav_graphs = get_favorites('web.favorite.graphids');
 	foreach($fav_graphs as $key => $favorite){
+		if('itemid' == $favorite['source']){
+			$itemids[$favorite['value']] = $favorite['value'];
+		}
+		else{
+			$graphids[$favorite['value']] = $favorite['value'];
+		}	
+	}
 
+	$options = array(
+			'graphids' => $graphids,
+			'nopermissions' => 1,
+			'select_hosts' => 1,
+			'extendoutput' => 1
+		);
+	$graphs = CGraph::get($options);
+	$graphs = zbx_toHash($graphs, 'graphid');
+
+	$options = array(
+			'itemids' => $itemids,
+			'nopermissions' => 1,
+			'select_hosts' => 1,
+			'extendoutput' => 1
+		);
+	$items = CItem::get($options);
+	$items = zbx_toHash($items, 'itemid');
+
+	foreach($fav_graphs as $key => $favorite){
 		$source = $favorite['source'];
 		$sourceid = $favorite['value'];
 
 		if('itemid' == $source){
-			if(!$item = get_item_by_itemid($sourceid)) continue;
-
+			if(!isset($items[$sourceid])) continue;
 			$item_added = true;
 
-			$host = get_host_by_itemid($sourceid);
-			$item["description"] = item_description($item);
+			$item = $items[$sourceid];
+			$host = reset($item['hosts']);
+			
+			$item['description'] = item_description($item);
 
 			$graphids[] = array(
 							'name'	=>	$host['host'].':'.$item['description'],
@@ -751,12 +1006,11 @@ function make_graph_submenu(){
 						);
 		}
 		else{
-			if(!$graph = get_graph_by_graphid($sourceid)) continue;
-
+			if(!isset($graphs[$sourceid])) continue;
 			$graph_added = true;
-
-			$result = get_hosts_by_graphid($sourceid);
-			$ghost = DBFetch($result);
+			
+			$graph = $graphs[$sourceid];
+			$ghost = reset($graph['hosts']);
 
 			$graphids[] = array(
 							'name'	=>	$ghost['host'].':'.$graph['name'],
@@ -810,34 +1064,40 @@ function make_sysmap_menu(&$menu,&$submenu){
 }
 
 function make_sysmap_submenu(){
-	$sysmapids = array();
 	$fav_sysmaps = get_favorites('web.favorite.sysmapids');
 
+	$maps = array();
+	$sysmapids = array();
 	foreach($fav_sysmaps as $key => $favorite){
+		$sysmapids[$favorite['value']] = $favorite['value'];
+	}
+	
+	$options = array(
+			'sysmapids' => $sysmapids,
+			'nopermissions' => 1,
+			'extendoutput' => 1
+		);
+	$sysmaps = CMap::get($options);
 
-		$source = $favorite['source'];
-		$sourceid = $favorite['value'];
-
-		if(!$sysmap = get_sysmap_by_sysmapid($sourceid)) continue;
-
-		$sysmapids[] = array(
-							'name'	=>	$sysmap['name'],
-							'favobj'=>	'sysmapid',
-							'favid'	=>	$sourceid,
-							'action'=>	'remove'
-						);
+	foreach($sysmaps as $snum => $sysmap){
+		$maps[] = array(
+				'name'	=>	$sysmap['name'],
+				'favobj'=>	'sysmapid',
+				'favid'	=>	$sysmap['sysmapid'],
+				'action'=>	'remove'
+			);
 	}
 
-	if(!empty($sysmapids)){
-		$sysmapids[] = array(
-							'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_MAPS,
-							'favobj'=>	'sysmapid',
-							'favid'	=>	0,
-							'action'=>	'remove'
-						);
+	if(!empty($maps)){
+		$maps[] = array(
+				'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_MAPS,
+				'favobj'=>	'sysmapid',
+				'favid'	=>	0,
+				'action'=>	'remove'
+			);
 	}
 
-return $sysmapids;
+return $maps;
 }
 
 function make_screen_menu(&$menu,&$submenu){
