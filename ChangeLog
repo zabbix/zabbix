@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1653] fixed link from maps to events (Aly)
  - [ZBX-1164] improved error messaging in regexp form (Aly)
  - [ZBX-1774] fixed error in slide screen in case if no screens defined (Aly)
  - [ZBX-1758] improved node filtering in sqls (Aly)
