@@ -711,6 +711,14 @@ include_once('include/page_header.php');
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton', S_GO.' (0)');
 		$goButton->setAttribute('id', 'goButton');
+
+                $jsLocale = array(
+                                'S_CLOSE',
+                                'S_NO_ELEMENTS_SELECTES'
+                );
+
+                zbx_addJSLocale($jsLocale);
+
 		$show_event_col ? zbx_add_post_js('chkbxRange.pageGoName = "events";') : zbx_add_post_js('chkbxRange.pageGoName = "triggers";');
 
 		$footer = get_table_header(array($goBox, $goButton));

@@ -573,6 +573,14 @@ $_REQUEST['eventsource'] = get_request('eventsource',get_profile('web.actionconf
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
+
+                $jsLocale = array(
+                                'S_CLOSE',
+                                'S_NO_ELEMENTS_SELECTES'
+                );
+
+                zbx_addJSLocale($jsLocale);
+
 		zbx_add_post_js('chkbxRange.pageGoName = "g_actionid";');
 
 		$footer = get_table_header(array($goBox, $goButton));

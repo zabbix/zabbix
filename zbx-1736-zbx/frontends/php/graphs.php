@@ -597,6 +597,14 @@ include_once('include/page_header.php');
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
+
+                $jsLocale = array(
+                                'S_CLOSE',
+                                'S_NO_ELEMENTS_SELECTES'
+                );
+
+                zbx_addJSLocale($jsLocale);
+
 		zbx_add_post_js('chkbxRange.pageGoName = "group_graphid";');
 
 		$footer = get_table_header(new CCol(array($goBox, $goButton)));
