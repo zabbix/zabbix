@@ -469,6 +469,7 @@ class CChart extends CGraphDraw{
 				}
 	
 				array_push($this->triggers,array(
+					'skipdraw' => ($val <= $minY || $val >= $maxY),
 					'y' => $this->sizeY - (($val-$minY) / ($maxY-$minY)) * $this->sizeY + $this->shiftY,
 					'color' => $color,
 					'description' => 'trigger: '.expand_trigger_description($trigger['triggerid']),
@@ -818,6 +819,7 @@ class CChart extends CGraphDraw{
 
 			if($this->ymax_type == GRAPH_YAXIS_TYPE_FIXED){
 				$this->m_maxY[$side] = $this->yaxismax;
+				$this->m_minY[$side] = 0;
 			}
 			else if($this->ymax_type == GRAPH_YAXIS_TYPE_ITEM_VALUE){
 				$this->m_maxY[$side] = $tmp_maxY[$side];
@@ -1219,12 +1221,14 @@ class CChart extends CGraphDraw{
 			$minY = $this->m_minY[GRAPH_YAXIS_SIDE_LEFT];
 			$maxY = $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT];
 
-			for($item=0;$item<$this->num;$item++){
+			$units = null;
+			for($item=0; $item<$this->num; $item++){
 				if($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_LEFT){
-					$units=$this->items[$item]['units'];
-					break;
+					if(is_null($units)) $units = $this->items[$item]['units'];
+					else if($this->items[$item]['units'] != $units) $units = false;
 				}
 			}
+			if(is_null($units) || ($units === false)) $units = '';
 
 			$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_LEFT];
 			for($i=0; $i<=$hstr_count; $i++){
@@ -1261,13 +1265,15 @@ class CChart extends CGraphDraw{
 			$minY = $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT];
 			$maxY = $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT];
 
-			for($item=0;$item<$this->num;$item++){
+			$units = null;
+			for($item=0; $item<$this->num; $item++){
 				if($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_RIGHT){
-					$units=$this->items[$item]['units'];
-					break;
+					if(is_null($units)) $units = $this->items[$item]['units'];
+					else if($this->items[$item]['units'] != $units) $units = false;
 				}
 			}
-
+			if(is_null($units) || ($units === false)) $units = '';
+			
 			$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_RIGHT];
 			for($i=0;$i<=$hstr_count;$i++){
 				if($hstr_count == 0) continue;
@@ -1394,6 +1400,8 @@ class CChart extends CGraphDraw{
 //		if($this->num != 1) return; // skip multiple graphs
 
 		foreach($this->triggers as $tnum => $trigger){
+			if($trigger['skipdraw']) continue;
+			
 			dashedline(
 				$this->im,
 				$this->shiftXleft,
@@ -1794,9 +1802,21 @@ class CChart extends CGraphDraw{
 			if($this->graphOrientation[GRAPH_YAXIS_SIDE_LEFT] == '-') $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] = 0;
 			else $this->m_minY[GRAPH_YAXIS_SIDE_LEFT] = 0;
 		}
+		else if($this->m_minY[GRAPH_YAXIS_SIDE_LEFT] > $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT]){
+			if($this->graphOrientation[GRAPH_YAXIS_SIDE_LEFT] == '-'){
+				$this->m_minY[GRAPH_YAXIS_SIDE_LEFT] = 0.2 * $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT];
+			}
+			else $this->m_minY[GRAPH_YAXIS_SIDE_LEFT] = 0;
+		}
 
 		if($this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] == $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT]){
 			if($this->graphOrientation[GRAPH_YAXIS_SIDE_RIGHT] == '-') $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] = 0;
+			else $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] = 0;
+		}
+		else if($this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] > $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT]){
+			if($this->graphOrientation[GRAPH_YAXIS_SIDE_RIGHT] == '-'){
+				$this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] = 0.2 * $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT];
+			}
 			else $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] = 0;
 		}
 //*/
