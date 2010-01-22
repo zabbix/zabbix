@@ -62,6 +62,7 @@ class CGraphDraw{
 		$this->border=1;
 		$this->num=0;
 		$this->type = $type;			// graph type
+		$this->baseFontSize=ZBX_GRAPH_BASE_FONT_SIZE;		
 
 		$this->axis_valuetype = array();		// overal items type (int/float)
 
@@ -191,6 +192,11 @@ class CGraphDraw{
 		if(is_null($value)) $value = 900;
 
 		$this->sizeX = $value;
+		
+// scale basefontsize
+		// if($this->sizeX<=700) $this->baseFontSize -= round(((700 - $value) / 100 ), 0);
+		// $this->baseFontSize = max($this->baseFontSize,4);
+		// $this->baseFontSize = ceil($this->baseFontSize*S_FONT_SIZE_MULTIPLIER);
 	}
 
 	public function setHeight($value = NULL){
@@ -259,10 +265,11 @@ class CGraphDraw{
 
 		$str.=$this->period2str($this->period);
 
-		$fontnum = 11;
-		if(($this->sizeX < 500) && ($this->type == GRAPH_TYPE_NORMAL || $this->type == GRAPH_TYPE_BAR)) $fontnum = 8;
+		$fontnum = $this->baseFontSize + 2;
+		//if(($this->sizeX < 500) && ($this->type == GRAPH_TYPE_NORMAL || $this->type == GRAPH_TYPE_BAR)) $fontnum = 8;
 
-		$x=$this->fullSizeX/2-imagefontwidth($fontnum)*strlen($str)/2;
+		$dims = imageTextSize( $fontnum, 0, $str );
+		$x = $this->fullSizeX/2-($dims['width']/2);
 		imagetext($this->im, $fontnum, 0, $x, 24, $this->getColor($this->graphtheme['textcolor'], 0), $str);
 	}
 

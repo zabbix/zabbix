@@ -133,17 +133,19 @@
 			$graphDims['yaxis'] = $yaxis;
 		}
 
+		$bigShiftAmount = ZBX_GRAPH_BASE_FONT_SIZE*12;
+		$smallShiftAmount = 25;		
 		if($yaxis == 2){
-			$graphDims['shiftXleft'] = 100;
-			$graphDims['shiftXright'] = 100;
+			$graphDims['shiftXleft'] = $bigShiftAmount;
+			$graphDims['shiftXright'] = $bigShiftAmount;
 		}
 		else if($yaxis == 0){
-			$graphDims['shiftXleft'] = 100;
-			$graphDims['shiftXright'] = 50;
+			$graphDims['shiftXleft'] = $bigShiftAmount;
+			$graphDims['shiftXright'] = $smallShiftAmount;
 		}
 		else{
-			$graphDims['shiftXleft'] = 50;
-			$graphDims['shiftXright'] = 100;
+			$graphDims['shiftXleft'] = $smallShiftAmount;
+			$graphDims['shiftXright'] = $bigShiftAmount;
 		}
 //-------------
 

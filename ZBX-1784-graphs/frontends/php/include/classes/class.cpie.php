@@ -354,9 +354,9 @@ class CPie extends CGraphDraw{
 							$this->getColor('Black No Alpha')
 						);
 
-			$dims = imageTextSize(8, 0, $str);
+			$dims = imageTextSize($this->baseFontSize, 0, $str);
 			imageText($this->im,
-						8,
+						$this->baseFontSize,
 						0,
 						$this->shiftXleft+15,
 						$this->sizeY+$shiftY+14*$i+5,
@@ -385,7 +385,7 @@ class CPie extends CGraphDraw{
 					);
 
 			imagetext($this->im,
-						8,
+						$this->baseFontSize,
 						0,
 						$shiftX+5,
 						$this->shiftY+10+14*$i+10,

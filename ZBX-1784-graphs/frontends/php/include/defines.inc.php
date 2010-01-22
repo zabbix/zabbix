@@ -25,7 +25,7 @@
 
 	define('ZBX_LOGIN_ATTEMPTS',			5);
 	define('ZBX_LOGIN_BLOCK',				30); // sec
-
+	
 	define('TRIGGERS_OPTION_DISABLED',		0);	// reserved
 	define('TRIGGERS_OPTION_ONLYTRUE',		1);	// use 0 to disable
 	define('TRIGGERS_OPTION_ALL',			2);	// use 0 to disable
@@ -49,6 +49,9 @@
 
 	define('ZBX_FONTPATH',					realpath('fonts'));	// where to search for font (GD > 2.0.18)
 	define('ZBX_GRAPH_FONT_NAME',			'DejaVuSans');		// font file name
+	
+	define('ZBX_GRAPH_BASE_FONT_SIZE',				7); 
+
 /* END OF USERS DEFINES */
 
 	define('ZBX_AUTH_INTERNAL',	0);
