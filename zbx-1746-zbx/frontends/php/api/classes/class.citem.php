@@ -926,7 +926,13 @@ class CItem extends CZBXAPI{
 		$items = zbx_toArray($items);
 		$itemids = array();
 
-		$upd_items = self::get(array('itemids'=> zbx_objectValues($items, 'itemid'), 'editable'=>1, 'extendoutput'=>1, 'preservekeys'=>1));
+		$options = array(
+				'itemids'=> zbx_objectValues($items, 'itemid'), 
+				'editable'=>1, 
+				'extendoutput'=>1, 
+				'preservekeys'=>1
+			);
+		$upd_items = self::get($options);
 		foreach($items as $gnum => $item){
 			if(!isset($upd_items[$item['itemid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);

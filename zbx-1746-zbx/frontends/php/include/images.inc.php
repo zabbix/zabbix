@@ -173,7 +173,23 @@
 	}
 
 	function delete_image($imageid){
-		return	DBexecute('DELETE FROM images WHERE imageid='.$imageid);
+		$sql = 'SELECT i.imageid '.
+				' FROM images i '.
+				' WHERE '.dbin_node('i.imageid', false).
+					' AND i.imagetype='.IMAGE_TYPE_ICON;
+		$default_icon = DBfetch(DBselect($sql,1));
+		
+// icons
+		DBexecute('UPDATE sysmaps_elements SET iconid_off='.$default_icon['imageid'].' WHERE iconid_off='.$imageid);
+		DBexecute('UPDATE sysmaps_elements SET iconid_on='.$default_icon['imageid'].' WHERE iconid_on='.$imageid);
+		DBexecute('UPDATE sysmaps_elements SET iconid_unknown='.$default_icon['imageid'].' WHERE iconid_unknown='.$imageid);
+		DBexecute('UPDATE sysmaps_elements SET iconid_disabled='.$default_icon['imageid'].' WHERE iconid_disabled='.$imageid);
+		DBexecute('UPDATE sysmaps_elements SET iconid_maintenance='.$default_icon['imageid'].' WHERE iconid_maintenance='.$imageid);
+
+//background
+		DBexecute('UPDATE sysmaps SET backgroundid=0 WHERE backgroundid='.$imageid);
+		
+	return	DBexecute('DELETE FROM images WHERE imageid='.$imageid);
 	}
 
 ?>
