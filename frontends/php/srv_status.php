@@ -157,7 +157,7 @@ include_once('include/page_header.php');
 			$row['caption'] = array(get_node_name_by_elid($row['serviceid'], null, ': '), $row['caption']);
 
 			if(empty($row['serviceupid'])) $row['serviceupid']='0';
-			if(empty($row['description'])) $row['description']='None';
+			if(empty($row['description'])) $row['description']=S_NONE;
 			$row['graph'] = new CLink(S_SHOW,'srv_status.php?serviceid='.$row['serviceid'].'&showgraph=1'.url_param('path'));
 
 			if(isset($row["triggerid"]) && !empty($row["triggerid"])){
@@ -296,7 +296,7 @@ include_once('include/page_header.php');
 			$srv_wdgt->show();
 		}
 		else {
-			error('Can not format Tree. Check logik structure in service links');
+			error(S_CANNOT_FORMAT_TREE_CHECK_LOGIC);
 		}
 	}
 
