@@ -481,7 +481,7 @@ class CAction extends CZBXAPI{
  * @param array $actions[0,...]['url'] OPTIONAL
  * @return boolean
  */
-	public static function add($actions){
+	public static function create($actions){
 		$actions = zbx_toArray($actions);
 		$actionids = array();
 

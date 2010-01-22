@@ -488,7 +488,7 @@ class CEvent extends CZBXAPI{
  * @param array $events[0,...]['acknowledged'] OPTIONAL
  * @return boolean
  */
-	public static function add($events){
+	public static function create($events){
 		$events = zbx_toArray($events);
 		$eventids = array();
 

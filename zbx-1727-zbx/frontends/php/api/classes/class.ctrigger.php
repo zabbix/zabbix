@@ -641,7 +641,7 @@ class CTrigger extends CZBXAPI{
  * @param array $triggers[0,...]['templateid'] OPTIONAL
  * @return boolean
  */
-	public static function add($triggers){
+	public static function create($triggers){
 		$triggers = zbx_toArray($triggers);
 		$triggerids = array();
 

@@ -407,7 +407,7 @@ SDI('///////////////////////////////////////');
  * @param int $maps['label_location']
  * @return boolean | array
  */
-	public static function add($maps){
+	public static function create($maps){
 		$errors = array();
 		$result_maps = array();
 		$result = true;

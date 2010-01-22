@@ -647,7 +647,7 @@ class CUser extends CZBXAPI{
  * @param string $users['user_medias']['period']
  * @return array|boolean
  */
-	public static function add($users){
+	public static function create($users){
 		global $USER_DETAILS;
 		$result = false;
 		$errors = array();

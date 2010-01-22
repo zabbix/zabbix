@@ -524,7 +524,7 @@ class CUserMacro extends CZBXAPI{
  * @param string $macros[0..]['value']
  * @return array of object macros
  */
-	public static function add($macros){
+	public static function create($macros){
 		$macros = zbx_toArray($macros);
 		$hostmacroids = array();
 

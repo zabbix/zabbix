@@ -390,7 +390,7 @@ class CApplication extends CZBXAPI{
  * @param array $app_data['hostid']
  * @return boolean
  */
-	public static function add($applications){
+	public static function create($applications){
 		$applications = zbx_toArray($applications);
 		$applicationids = array();
 

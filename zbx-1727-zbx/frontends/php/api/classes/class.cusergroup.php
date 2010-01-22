@@ -327,7 +327,7 @@ class CUserGroup extends CZBXAPI{
  * @param array $groups multidimensional array with UserGroups data
  * @return boolean
  */
-	public static function add($usrgrps){
+	public static function create($usrgrps){
 		global $USER_DETAILS;
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can add User Groups');

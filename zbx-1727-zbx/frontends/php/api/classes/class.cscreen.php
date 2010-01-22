@@ -372,7 +372,7 @@ SDI('/////////////////////////////////');
  * @param int $screens['vsize']
  * @return boolean | array
  */
-	public static function add($screens){
+	public static function create($screens){
 		$screens = zbx_toArray($screens);
 		$screenid = array();
 
