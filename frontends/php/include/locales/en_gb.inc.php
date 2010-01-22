@@ -849,6 +849,9 @@
 	'S_TEMPLATE_DELETED'=>			'Template deleted',
 	'S_CANNOT_DELETE_TEMPLATE'=>		'Cannot delete template',
 	'S_LINK_WITH_TEMPLATE'=>		'Link with template',
+	'S_DELETE_AND_CLEAR'=>			'Delete AND clear',
+	'S_DELETE_SELECTED_TEMPLATES_Q'=>	'Delete selected templates?',
+	'S_WARNING_THIS_DELETE_TEMPLATES_AND_CLEAR'=>'Warning: this will delete selected templates and clear all linked hosts',
 
 //	Host profiles
 	'S_HOST_PROFILE'=>			'Host profile',
@@ -1090,7 +1093,10 @@
 	'S_LINK_STATUS_INDICATOR'=>		'Link status indicator',
 	'S_CONFIGURATION_OF_NETWORK_MAPS'=>	'Configuration of network maps',
 	'S_CONFIGURATION_OF_NETWORK_MAPS_BIG'=>	'CONFIGURATION OF NETWORK MAPS',
-
+	'S_MAP_SAVED_RETURN_Q'=>		'Map is saved! Return?',
+	'S_MAP_SAVE_OPERATION_FAILED'=>		'Map save operation failed.',
+	'S_GET_IMG_ELEMENT_DATA_NOT_FOUND'=>	'Get Img: Element data not found!',
+	
 	'S_ADD_ELEMENT'=>			'Add element',
 	'S_COORDINATE_X'=>			'Coordinate X',
 	'S_COORDINATE_Y'=>			'Coordinate Y',
@@ -1115,6 +1121,11 @@
 	'S_TYPE_OK'=>				'Type (OK)',
 	'S_COLOR_OK'=>				'Colour (OK)',
 	'S_USE_ADVANCED_ICONS'=>		'Use advanced icons',
+	'S_DELETE_SELECTED_MAPS_Q'=>		'Delete selected maps?',
+	'S_MAP_ADDED'=>				'Network map added',
+	'S_CANNOT_ADD_MAP'=>			'Cannot add network map',
+	'S_MAP_UPDATED'=>			'Network map updated',
+	'S_CANNOT_UPDATE_MAP'=>			'Cannot update network map',
 
 	'S_BOTTOM'=>				'Bottom',
 	'S_TOP'=>				'Top',
@@ -1447,6 +1458,7 @@
 	'S_LAST_7_DAYS'=>			'Last 7 days',
 	'S_LAST_30_DAYS'=>			'Last 30 days',
 	'S_LAST_365_DAYS'=>			'Last 365 days',
+	'S_CANNOT_FORMAT_TREE_CHECK_LOGIC'=> 'Cannot format Tree. Check logic structure in service links', 
 
 //	triggers.php
 	'S_SHOW_ALL_WITH_UNACKNOWLEDGED' => 'Show triggers with unacknowledged events',
@@ -1496,6 +1508,13 @@
 	'S_TOGGLE_INPUT_METHOD'=>		'Toggle input method',
 	'S_INSERT_MACRO'=>			'Insert macro',
 	'S_REPLACE'=>				'Replace',
+	
+	'S_TEMPLATED_TRIGGER'=>			'Templated trigger',
+	'S_ENABLE_SELECTED_TRIGGERS_Q'=>	'Enable selected triggers?',
+	'S_DISABLE_SELECTED_TRIGGERS_Q'=>	'Disable selected triggers?',
+	'S_MASS_UPDATE_SELECTED_TRIGGERS_Q'=>	'Mass update selected triggers?',
+	'S_COPY_SELECTED_TRIGGERS_Q'=>		'Copy selected triggers?',
+	'S_DELETE_SELECTED_TRIGGERS_Q'=>	'Delete selected triggerers?',
 
 //	tr_comments.php
 	'S_TRIGGER_COMMENTS'=>			'Trigger comments',
@@ -1719,6 +1738,8 @@
 	'S_EXCLUDE'=>		'Exclude',
 	'S_KEYWORD'=>		'Keyword',
 	'S_POSITION'=>		'Position',
+	'S_DELETE_EXPRESSION_Q'=>	'Delete expression?',
+	'S_DELETE_KEYWORD_Q'=>		'Delete keyword?',
 
 //  tr_testexpr.php
 	'S_TEST_DATA'=>		'Test data',
