@@ -160,7 +160,7 @@ include_once('include/page_header.php');
 	}
 //--
 
-	$_REQUEST['show_triggers'] = (($_REQUEST['groupid'] == 0) && ($_REQUEST['hostid'] == 0) && ($_REQUEST['show_triggers'] == TRIGGERS_OPTION_ALL)) 
+	$_REQUEST['show_triggers'] = (($_REQUEST['groupid'] == 0) && ($_REQUEST['hostid'] == 0) && ($_REQUEST['show_triggers'] == TRIGGERS_OPTION_ALL))
 		? TRIGGERS_OPTION_ONLYTRUE : $_REQUEST['show_triggers'];
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
 		update_profile('web.tr_status.filter.show_details', $_REQUEST['show_details'], PROFILE_TYPE_INT);
@@ -396,11 +396,11 @@ include_once('include/page_header.php');
 				'nopermissions' => 1
 			);
 			$event_count = CEvent::get($options);
-			
+
 			$triggers[$tnum]['event_count'] = $event_count['rowscount'];
 		}
 	}
-	
+
 	$trigger_hosts = array();
 	foreach($triggers as $tnum => $trigger){
 		$trigger_hosts = array_merge($trigger_hosts, $trigger['hosts']);
@@ -627,7 +627,7 @@ include_once('include/page_header.php');
 
 		$table->addRow(array(
 			$open_close,
-			$config['event_ack_enable'] ? 
+			$config['event_ack_enable'] ?
 				($show_event_col ? null : new CCheckBox('triggers['.$trigger['triggerid'].']', 'no', null, $trigger['triggerid'])) : null,
 			$severity_col,
 			$status,

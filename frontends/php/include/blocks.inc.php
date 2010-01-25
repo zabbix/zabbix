@@ -32,7 +32,7 @@ function make_favorite_graphs(){
 
 	$graphids = array();
 	$itemids = array();
-	
+
 	$fav_graphs = get_favorites('web.favorite.graphids');
 	foreach($fav_graphs as $key => $favorite){
 		if('itemid' == $favorite['source']){
@@ -40,7 +40,7 @@ function make_favorite_graphs(){
 		}
 		else{
 			$graphids[$favorite['value']] = $favorite['value'];
-		}	
+		}
 	}
 
 	$options = array(
@@ -64,10 +64,10 @@ function make_favorite_graphs(){
 
 		if('itemid' == $favorite['source']){
 			if(!isset($items[$sourceid])) continue;
-			
+
 			$item = $items[$sourceid];
 			$host = reset($item['hosts']);
-			
+
 			$item['description'] = item_description($item);
 
 			$link = new CLink(get_node_name_by_elid($sourceid, null, ': ').$host['host'].':'.$item['description'],'history.php?action=showgraph&itemid='.$sourceid);
@@ -81,7 +81,7 @@ function make_favorite_graphs(){
 		}
 		else{
 			if(!isset($graphs[$sourceid])) continue;
-			
+
 			$graph = $graphs[$sourceid];
 			$ghost = reset($graph['hosts']);
 
@@ -185,7 +185,7 @@ function make_favorite_maps(){
 	foreach($fav_sysmaps as $key => $favorite){
 		$sysmapids[$favorite['value']] = $favorite['value'];
 	}
-	
+
 	$options = array(
 			'sysmapids' => $sysmapids,
 			'extendoutput' => 1
@@ -194,7 +194,7 @@ function make_favorite_maps(){
 
 	foreach($sysmaps as $snum => $sysmap){
 		$sysmapid = $sysmap['sysmapid'];
-		
+
 		$link = new CLink(get_node_name_by_elid($sysmapid, null, ': ').$sysmap['name'],'maps.php?sysmapid='.$sysmapid);
 		$link->setTarget('blank');
 
@@ -441,28 +441,28 @@ function make_hoststat_summary(){
 			'problematic' => 0,
 			'ok' => 0
 		);
-		
+
 		$problematic_host_list = array();
 		$popup_rows = 0;
-	
+
 		foreach($hosts as $hnum => $host){
 			foreach($host['groups'] as $hgrnum => $host_group){
 				if($host_group['groupid'] == $group['groupid']){
 					unset($host['groups'][$hgrnum]);
 					// if $host is shown for all groups it is in, unset it
 					if(empty($host['groups'])) unset($hosts[$hnum]);
-					
+
 					$highest_severity = TRIGGER_SEVERITY_NOT_CLASSIFIED;
-					
-					
-					
+
+
+
 					foreach($triggers as $tnum => $trigger){
 						foreach($trigger['hosts'] as $thnum => $trigger_host){
 							if($trigger_host['hostid'] == $host['hostid']){
 								unset($trigger['hosts'][$thnum]);
 								// if $trigger is shown for all hosts it is in, unset it
 								if(empty($trigger['hosts'])) unset($triggers[$tnum]);
-								
+
 								if($popup_rows < ZBX_POPUP_MAX_ROWS){
 									if(!isset($problematic_host_list[$host['hostid']])){
 										$problematic_host_list[$host['hostid']] = array();
@@ -475,26 +475,26 @@ function make_hoststat_summary(){
 										$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_INFORMATION] = 0;
 										$problematic_host_list[$host['hostid']]['severities'][TRIGGER_SEVERITY_NOT_CLASSIFIED] = 0;
 									}
-									
+
 									$problematic_host_list[$host['hostid']]['severities'][$trigger['priority']]++;
 									$popup_rows++;
 								}
-								
+
 								if($trigger['priority'] > $highest_severity){
 									$highest_severity = $trigger['priority'];
 								}
-								
-													
-								
+
+
+
 							}
 						}
 					}
-					
+
 					isset($problematic_host_list[$host['hostid']]) ? $hosts_data['problematic']++ : $hosts_data['ok']++;
 				}
 			}
 		}
-		
+
 // if hostgroup contains problematic hosts, hint should be built
 		if($hosts_data['problematic']){
 			$table_inf = new CTableInfo();
@@ -508,7 +508,7 @@ function make_hoststat_summary(){
 				S_INFORMATION,
 				S_NOT_CLASSIFIED
 			));
-			
+
 			foreach($problematic_host_list as $hostid => $host_data){
 				$r = new CRow();
 				$r->addItem(new CLink($host_data['host'], 'tr_status.php?groupid='.$group['groupid'].'&hostid='.$hostid.'&show_triggers='.TRIGGERS_OPTION_ONLYTRUE));
@@ -517,7 +517,7 @@ function make_hoststat_summary(){
 				}
 				$table_inf->addRow($r);
 			}
-			
+
 			$problematic_count = new CSpan($hosts_data['problematic'], 'pointer');
 			$problematic_count->setHint($table_inf);
 		}
@@ -525,7 +525,7 @@ function make_hoststat_summary(){
 			$problematic_count = 0;
 		}
 
-		
+
 
 		$group_row->addItem(new CCol($hosts_data['ok'], get_severity_style($highest_severity, 0)));
 		$group_row->addItem(new CCol($problematic_count, get_severity_style($highest_severity, $hosts_data['problematic'])));
@@ -609,15 +609,15 @@ function make_status_of_zbx(){
 
 	$table->addRow(array(S_NUMBER_OF_USERS,$usr_cnt,new CSpan($online_cnt,'green')));
 	$table->addRow(array(S_REQUIRED_SERVER_PERFORMANCE_NVPS,$status['qps_total'],' - '));
-	
-	
+
+
 // CHECK REQUIREMENTS {{{
 	if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN){
 		$reqs = check_php_requirements();
 		foreach($reqs as $req){
 			if($req['result'] == false){
 				$table->addRow(array(
-					new CSpan($req['name'], 'red'), 
+					new CSpan($req['name'], 'red'),
 					new CSpan($req['current'], 'red'),
 					new CSpan($req['error'], 'red')
 				));
@@ -956,7 +956,7 @@ function make_graph_submenu(){
 
 	$graphids = array();
 	$itemids = array();
-	
+
 	$fav_graphs = get_favorites('web.favorite.graphids');
 	foreach($fav_graphs as $key => $favorite){
 		if('itemid' == $favorite['source']){
@@ -964,7 +964,7 @@ function make_graph_submenu(){
 		}
 		else{
 			$graphids[$favorite['value']] = $favorite['value'];
-		}	
+		}
 	}
 
 	$options = array(
@@ -995,7 +995,7 @@ function make_graph_submenu(){
 
 			$item = $items[$sourceid];
 			$host = reset($item['hosts']);
-			
+
 			$item['description'] = item_description($item);
 
 			$graphids[] = array(
@@ -1008,7 +1008,7 @@ function make_graph_submenu(){
 		else{
 			if(!isset($graphs[$sourceid])) continue;
 			$graph_added = true;
-			
+
 			$graph = $graphs[$sourceid];
 			$ghost = reset($graph['hosts']);
 
@@ -1071,7 +1071,7 @@ function make_sysmap_submenu(){
 	foreach($fav_sysmaps as $key => $favorite){
 		$sysmapids[$favorite['value']] = $favorite['value'];
 	}
-	
+
 	$options = array(
 			'sysmapids' => $sysmapids,
 			'nopermissions' => 1,

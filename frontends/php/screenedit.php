@@ -92,13 +92,13 @@ include_once('include/page_header.php');
 
 		$screen = reset($screens);
 		echo SBR;
-		
+
 		if(isset($_REQUEST['save'])){
 			if(!isset($_REQUEST['elements'])) $_REQUEST['elements'] = 0;
 
 			try{
 				DBstart();
-			
+
 				if(isset($_REQUEST['screenitemid'])){
 					$msg_ok = S_ITEM_UPDATED;
 					$msg_err = S_CANNOT_UPDATE_ITEM;
@@ -107,20 +107,20 @@ include_once('include/page_header.php');
 					$msg_ok = S_ITEM_ADDED;
 					$msg_err = S_CANNOT_ADD_ITEM;
 				}
-				
+
 				$resources = array(SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT, SCREEN_RESOURCE_MAP,
 					SCREEN_RESOURCE_SCREEN, SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW);
 				if(str_in_array($_REQUEST['resourcetype'], $resources) && ($_REQUEST['resourceid'] == 0)){
 					throw new Exception('Incorrect resource');
 				}
-				
+
 				if(isset($_REQUEST['screenitemid'])){
 					$result = update_screen_item($_REQUEST['screenitemid'],
 						$_REQUEST['resourcetype'],$_REQUEST['resourceid'],$_REQUEST['width'],
 						$_REQUEST['height'],$_REQUEST['colspan'],$_REQUEST['rowspan'],
 						$_REQUEST['elements'],$_REQUEST['valign'],
 						$_REQUEST['halign'],$_REQUEST['style'],$_REQUEST['url'],$_REQUEST['dynmic']);
-					
+
 					if(!$result) throw new Exception();
 				}
 				else{
@@ -133,13 +133,13 @@ include_once('include/page_header.php');
 
 					if(!$result) throw new Exception();
 				}
-				
+
 				DBend(true);
 
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_SCREEN,' Name ['.$screen['name'].'] cell changed '.
 					(isset($_REQUEST['screenitemid']) ? '['.$_REQUEST['screenitemid'].']' :	'['.$_REQUEST['x'].','.$_REQUEST['y'].']'));
 					unset($_REQUEST['form']);
-				
+
 				show_messages(true, $msg_ok, $msg_err);
 			}
 			catch(Exception $e){

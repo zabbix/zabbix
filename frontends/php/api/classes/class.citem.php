@@ -119,13 +119,13 @@ class CItem extends CZBXAPI{
 			'limit'					=> null
 		);
 
-		
+
 		$options = zbx_array_merge($def_options, $options);
 
-		
+
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
-			
+
 			if(!is_null($options['select_hosts'])){
 				$options['select_hosts'] = API_OUTPUT_EXTEND;
 			}
@@ -140,7 +140,7 @@ class CItem extends CZBXAPI{
 			}
 		}
 
-		
+
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
@@ -192,7 +192,7 @@ class CItem extends CZBXAPI{
 			if($options['output'] != API_OUTPUT_EXTEND){
 				$sql_parts['select']['hostid'] = 'i.hostid';
 			}
-			
+
 			$sql_parts['where'][] = DBcondition('i.hostid', $options['hostids']);
 		}
 

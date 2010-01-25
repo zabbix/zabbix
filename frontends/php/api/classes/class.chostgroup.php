@@ -93,16 +93,16 @@ class CHostGroup extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $params);
 
-		
+
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
-			
+
 			if(!is_null($options['select_hosts'])){
 				$options['select_hosts'] = API_OUTPUT_EXTEND;
 			}
 		}
-		
-		
+
+
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
@@ -937,8 +937,8 @@ class CHostGroup extends CZBXAPI{
 
 		$hosts_to_unlink = $hosts_to_link = array();
 		$options = array(
-			'groupids' => $groupids, 
-			'preservekeys' => 1, 
+			'groupids' => $groupids,
+			'preservekeys' => 1,
 			'editable' => 1
 		);
 		if(!is_null($hosts)){
@@ -946,7 +946,7 @@ class CHostGroup extends CZBXAPI{
 			$hosts_to_unlink = array_diff(array_keys($groups_hosts), $hostids);
 			$hosts_to_link = array_diff($hostids, array_keys($groups_hosts));
 		}
-		
+
 		$templates_to_unlink = $templates_to_link = array();
 		if(!is_null($templates)){
 			$groups_templates = CTemplate::get($options);

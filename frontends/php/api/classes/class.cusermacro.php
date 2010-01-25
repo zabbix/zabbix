@@ -111,10 +111,10 @@ class CUserMacro extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
-		
+
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
-			
+
 			if(!is_null($options['select_groups'])){
 				$options['select_groups'] = API_OUTPUT_EXTEND;
 			}
@@ -125,8 +125,8 @@ class CUserMacro extends CZBXAPI{
 				$options['select_templates'] = API_OUTPUT_EXTEND;
 			}
 		}
-		
-		
+
+
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
@@ -403,8 +403,8 @@ class CUserMacro extends CZBXAPI{
 // Adding Groups
 		if(!is_null($options['select_groups']) && str_in_array($options['select_groups'], $subselects_allowed_outputs)){
 			$obj_params = array(
-				'output' => $options['select_groups'], 
-				'hostids' => $hostids, 
+				'output' => $options['select_groups'],
+				'hostids' => $hostids,
 				'preservekeys' => 1
 			);
 			$groups = CHostgroup::get($obj_params);
@@ -424,8 +424,8 @@ class CUserMacro extends CZBXAPI{
 // Adding Templates
 		if(!is_null($options['select_templates']) && str_in_array($options['select_templates'], $subselects_allowed_outputs)){
 			$obj_params = array(
-				'output' => $options['select_templates'], 
-				'hostids' => $hostids, 
+				'output' => $options['select_templates'],
+				'hostids' => $hostids,
 				'preservekeys' => 1
 			);
 			$templates = CTemplate::get($obj_params);
@@ -445,8 +445,8 @@ class CUserMacro extends CZBXAPI{
 // Adding Hosts
 		if(!is_null($options['select_hosts']) && str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
 			$obj_params = array(
-				'output' => $options['select_hosts'], 
-				'hostids' => $hostids, 
+				'output' => $options['select_hosts'],
+				'hostids' => $hostids,
 				'preservekeys' => 1
 			);
 			$hosts = CHost::get($obj_params);
@@ -1039,8 +1039,8 @@ class CUserMacro extends CZBXAPI{
 	public static function getMacros($macros, $options){
 		zbx_value2array($macros);
 
-		$def_options = array( 
-			'itemid' => null, 
+		$def_options = array(
+			'itemid' => null,
 			'triggerid' => null
 		);
 		$options = zbx_array_merge($def_options, $options);
