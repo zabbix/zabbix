@@ -188,7 +188,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$help->setTarget('_blank');
 		$support = new CLink(S_GET_SUPPORT, 'http://www.zabbix.com/support.php', 'small_font', null, 'nosid');
 		$support->setTarget('_blank');
-		$printview = new CLink(S_PRINT, $_SERVER['REQUEST_URI'].(empty($_GET)?'?':'&').'print=1', 'small_font', null, 'nosid');
+		$printview = new CLink(S_PRINT, $_SERVER['REQUEST_URI'].(empty($_GET)?'?':'&').'print=1', 'small_font');
 
 		$page_header_r_col = array($help,'|',$support,'|',$printview);
 
