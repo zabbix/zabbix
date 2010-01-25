@@ -103,6 +103,7 @@
 	'S_DOWN_TIME'=>				'Downtime',
 	'S_DISCOVERED_DEVICE'=>			'Discovered device',
 	'S_MONITORED_HOST'=>			'Monitored host',
+	'S_INCORRECT_IP_RANGE'=>		'Incorrect IP range.',
 
 //	httpdetails.php
 	'S_DETAILS_OF_SCENARIO'=>		'Details of scenario',
@@ -355,6 +356,10 @@
 	'S_EXECUTED'=>				'executed',
 	'S_NOT_SENT'=>				'not sent',
 	'S_NO_ACTIONS_FOUND'=>			'No actions found',
+	'S_INCORRECT_COMMAND'=>			'Incorrect command',
+	'S_UNKNOWN_GROUP_NAME'=>		'Unknown group name',
+	'S_UNKNOWN_HOST_NAME' => 'Unknown host name',
+	'S_IN_COMMAND_SMALL'=>			'in command',
 
 // Lines
 	'S_LINE'=>				'Line',
@@ -1756,6 +1761,29 @@
 // page_header.php
 	'S_REFRESHED_EVERY_SMALL'=>	'refreshed every',
 	'S_PAGE_RECEIVED_INCORRECT_DATA' => 'Page received incorrect data',
+	
+//	copt.inc.php
+	'S_STATS_FOR'=>			'Stats for',
+	'S_TOTAL_TIME'=>		'Total time',
+	'S_MEMORY_LIMIT'=>		'Memory limit',
+	'S_MEMORY_USAGE'=>		'Memory usage',
+	'S_MEMORY_LEAK'=>		'Memory leak',
+	'S_SQL_SELECTS_COUNT'=>		'SQL selects count',
+	'S_SQL_EXECUTES_COUNT'=>	'SQL executes count',
+	'S_SQL_REQUESTS_COUNT'=>	'SQL requests count',
+	'S_TOTAL_TIME_SPENT_ON_SQL'=>	'Total time spent on SQL',
+	'S_END_OF'=>			'End of',
+	'S_MEMORY_LIMIT_REACHED'=>	'MEMROY LIMIT REACHED! Profiling was stopped to save memory for script processing.',
+	
+// 	func.inc.php
+	'S_WRONG_TYPE'=>			'Wrong type',
+	'S_INCOORECT_TYPE_OF_ASORT_BY_KEY'=>	'Incorrect type of asort_by_key',
+	'S_DAYS_SMALL'=>			'days',
+	'S_B'=>			'B',
+	'S_M'=>			'M',
+	'S_K'=>			'K',
+	'S_G'=>			'G',
+	'S_T'=>			'T',
 
 //	Menu
 
