@@ -27,5 +27,5 @@
 //$ZBX_GUI_ACCESS_IP_RANGE = array('127.0.0.1');
 
 // MSG shown on Warning screen!
-//$_REQUEST['warning_msg'] = 'ZABBIX is under maintenance.';
+//$_REQUEST['warning_msg'] = 'Zabbix is under maintenance.';
 ?>
