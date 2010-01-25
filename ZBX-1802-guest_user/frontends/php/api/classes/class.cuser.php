@@ -809,6 +809,14 @@ class CUser extends CZBXAPI{
 
 		foreach($users as $unum => $user){
 			$user_db_fields = $upd_users[$user['userid']];
+			
+// check if we change guest user
+			if(($user_db_fields['alias'] == ZBX_GUEST_USER) && isset($user['alias']) && ($user['alias'] != ZBX_GUEST_USER)){
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Cannot rename guest user');
+				$result = false;
+				break;			
+			}
+
 
 // unset if not changed passwd
 			if(isset($user['passwd']) && !is_null($user['passwd'])){
@@ -1075,7 +1083,7 @@ class CUser extends CZBXAPI{
 		}
 
 		self::BeginTransaction(__METHOD__);
-		if(!empty($userids)){
+		if(!empty($userids) && $result){
 			$result = DBexecute('DELETE FROM operations WHERE object='.OPERATION_OBJECT_USER.' AND '.DBcondition('objectid', $userids));
 			$result = DBexecute('DELETE FROM media WHERE '.DBcondition('userid', $userids));
 			$result = DBexecute('DELETE FROM profiles WHERE '.DBcondition('userid', $userids));
