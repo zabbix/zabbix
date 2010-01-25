@@ -307,7 +307,7 @@ include_once('include/page_header.php');
 				'url' => 'slides.php?elementid='.$elementid.url_param('stime').url_param('period').url_param('groupid').url_param('hostid'),
 				'params'=> array('lastupdate' => time()),
 			));
-//	add_doll_objects($refresh_tab);
+	add_doll_objects($refresh_tab);
 
 	$refresh_icon = new CDiv(SPACE,'iconmenu');
 	$refresh_icon->addAction('onclick','javascript: create_page_menu(event,"hat_slides");');
