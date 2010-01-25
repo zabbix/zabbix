@@ -450,12 +450,12 @@ class CChart extends CGraphDraw{
 				CUserMacro::resolveTrigger($trigger);
 //SDII($trigger);
 				if(!preg_match('/\{([0-9]{1,})\}([\<\>\=]{1})([0-9\.]{1,})([K|M|G]{0,1})/i', $trigger['expression'], $arr)) continue;
-	
+
 				$val = $arr[3];
 				if(strcasecmp($arr[4],'K') == 0)	$val *= 1024;
 				else if(strcasecmp($arr[4],'M') == 0)	$val *= 1048576; //1024*1024;
 				else if(strcasecmp($arr[4],'G') == 0)	$val *= 1073741824; //1024*1024*1024;
-	
+
 				$minY = $this->m_minY[$this->items[0]['axisside']];
 				$maxY = $this->m_maxY[$this->items[0]['axisside']];
 
@@ -467,7 +467,7 @@ class CChart extends CGraphDraw{
 					else if($trigger['priority'] == 4)	$color = 'Priority High';
 					else if($trigger['priority'] == 3)	$color = 'Priority Average';
 				}
-	
+
 				array_push($this->triggers,array(
 					'skipdraw' => ($val <= $minY || $val >= $maxY),
 					'y' => $this->sizeY - (($val-$minY) / ($maxY-$minY)) * $this->sizeY + $this->shiftY,
@@ -811,7 +811,7 @@ class CChart extends CGraphDraw{
 		$sides = array(GRAPH_YAXIS_SIDE_LEFT,GRAPH_YAXIS_SIDE_RIGHT);
 		foreach($sides as $snum => $side){
 			if(!isset($this->axis_valuetype[$side])) continue;
-			
+
 			if($this->type == GRAPH_TYPE_STACKED){
 				$this->m_minY[$side] = min($tmp_minY[GRAPH_YAXIS_SIDE_LEFT], 0);
 				continue;
@@ -831,7 +831,7 @@ class CChart extends CGraphDraw{
 			else if($this->ymin_type == GRAPH_YAXIS_TYPE_ITEM_VALUE){
 				$this->m_minY[$side] = $tmp_minY[$side];
 			}
-		}		
+		}
 	}
 
 	private function calcTimeInterval(){
@@ -1273,7 +1273,7 @@ class CChart extends CGraphDraw{
 				}
 			}
 			if(is_null($units) || ($units === false)) $units = '';
-			
+
 			$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_RIGHT];
 			for($i=0;$i<=$hstr_count;$i++){
 				if($hstr_count == 0) continue;
@@ -1401,7 +1401,7 @@ class CChart extends CGraphDraw{
 
 		foreach($this->triggers as $tnum => $trigger){
 			if($trigger['skipdraw']) continue;
-			
+
 			dashedline(
 				$this->im,
 				$this->shiftXleft,
@@ -1477,7 +1477,7 @@ class CChart extends CGraphDraw{
 //				$legend->addCell($colNum,array('text' => $this->items[$i]['host'].': '.$this->items[$i]['description']));
 				$legend->addCell($colNum,array('text' => '[ '. S_NO_DATA_SMALL . ' ]'));
 			}
-			
+
 			imagefilledrectangle($this->im,
 							$leftXShift - 5,
 							$this->sizeY+$this->shiftY+14*$colNum+$this->legendOffsetY-10,
@@ -1507,8 +1507,8 @@ class CChart extends CGraphDraw{
 		}
 
 		$legend = new CImageTextTable(
-				$this->im, 
-				$leftXShift+10, 
+				$this->im,
+				$leftXShift+10,
 				$this->sizeY+$this->shiftY+14*$colNum+$this->legendOffsetY
 			);
 		$legend->color = $this->getColor($this->graphtheme['textcolor'], 0);
@@ -1560,8 +1560,8 @@ class CChart extends CGraphDraw{
 		$legend->draw();
 
 		$legend = new CImageTextTable(
-				$this->im, 
-				$leftXShift+10, 
+				$this->im,
+				$leftXShift+10,
 				$this->sizeY+$this->shiftY+14*$colNum+$this->legendOffsetY + 5
 			);
 		$legend->color = $this->getColor($this->graphtheme['textcolor'], 0);
@@ -1587,7 +1587,7 @@ class CChart extends CGraphDraw{
 
 //			$legend->addCell($colNum,array('text' => $trigger['description']));
 //			$legend->addCell($colNum, array('text' => $trigger['constant']));
-			
+
 			$legend->addRow(array(
 				array('text' => $trigger['description']),
 				array('text' => $trigger['constant'])

@@ -186,9 +186,9 @@ include_once('include/page_header.php');
 // PERMISSIONS
 	if(get_request('hostid', 0) > 0){
 		$options = array(
-			'hostids' => $_REQUEST['hostid'], 
-			'extendoutput' => 1, 
-			'templated_hosts' => 1, 
+			'hostids' => $_REQUEST['hostid'],
+			'extendoutput' => 1,
+			'templated_hosts' => 1,
 			'editable' => 1
 		);
 		$hosts = CHost::get($options);
@@ -1166,6 +1166,6 @@ include_once('include/page_header.php');
 	$jsmenu = new CPUMenu(null,200);
 	$jsmenu->InsertJavaScript();
 
-	
+
 include_once('include/page_footer.php');
 ?>

@@ -105,7 +105,7 @@ class CEvent extends CZBXAPI{
 
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
-			
+
 			if(!is_null($options['select_hosts'])){
 				$options['select_hosts'] = API_OUTPUT_EXTEND;
 			}
@@ -116,8 +116,8 @@ class CEvent extends CZBXAPI{
 				$options['select_items'] = API_OUTPUT_EXTEND;
 			}
 		}
-		
-		
+
+
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
@@ -333,7 +333,7 @@ class CEvent extends CZBXAPI{
 					if(!is_null($options['select_triggers']) && !isset($result[$event['eventid']]['triggers'])){
 						$result[$event['eventid']]['triggers'] = array();
 					}
-					
+
 					if(!is_null($options['select_items']) && !isset($result[$event['eventid']]['items'])){
 						$result[$event['eventid']]['items'] = array();
 					}
@@ -613,8 +613,8 @@ class CEvent extends CZBXAPI{
 // PERMISSIONS {{{
 		if(!empty($events)){
 			$options = array(
-				'eventids' => $eventids, 
-				'preservekeys' => 1, 
+				'eventids' => $eventids,
+				'preservekeys' => 1,
 				'output' => API_OUTPUT_SHORTEN
 			);
 			$allowed_events = self::get($options);

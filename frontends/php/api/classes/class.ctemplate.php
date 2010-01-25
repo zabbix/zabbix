@@ -93,10 +93,10 @@ class CTemplate extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
-		
+
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
-			
+
 			if(!is_null($options['select_groups'])){
 				$options['select_groups'] = API_OUTPUT_EXTEND;
 			}
@@ -122,8 +122,8 @@ class CTemplate extends CZBXAPI{
 				$options['select_macros'] = API_OUTPUT_EXTEND;
 			}
 		}
-		
-		
+
+
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
@@ -158,7 +158,7 @@ class CTemplate extends CZBXAPI{
 // groupids
 		if(!is_null($options['groupids'])){
 			zbx_value2array($options['groupids']);
-			
+
 			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}

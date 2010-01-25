@@ -229,7 +229,7 @@ class CJSON{
 	 */
 	public function decode($encodedValue, $asArray = false){
 		mb_internal_encoding('ASCII');
-		
+
 		$first_char = substr(ltrim($encodedValue), 0, 1);
 		if($first_char != '{' && $first_char != '['){
 			return null;
@@ -244,7 +244,7 @@ class CJSON{
 		if($this->isValid($encodedValue)){
 			$result = $this->_json_decode($encodedValue, (bool) $asArray);
 			mb_internal_encoding('UTF-8');
-			
+
 			return $result;
 		}
 		else {

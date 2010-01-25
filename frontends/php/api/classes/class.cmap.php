@@ -99,10 +99,10 @@ class CMap extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
-		
+
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
-			
+
 			if(!is_null($options['select_selements'])){
 				$options['select_selements'] = API_OUTPUT_EXTEND;
 			}
@@ -110,8 +110,8 @@ class CMap extends CZBXAPI{
 				$options['select_links'] = API_OUTPUT_EXTEND;
 			}
 		}
-		
-		
+
+
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;

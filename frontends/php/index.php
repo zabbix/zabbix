@@ -78,7 +78,7 @@ $page['file']	= 'index.php';
 		$name = get_request('name','');
 		$passwd = get_request('password','');
 
-		
+
 		$login = CUser::login(array('user'=>$name, 'password'=>$passwd, 'auth_type'=>$authentication_type));
 
 		if($login){

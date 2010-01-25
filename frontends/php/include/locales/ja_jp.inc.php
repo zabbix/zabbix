@@ -1483,6 +1483,6 @@
 	'S_INCORRECT_DESCRIPTION'=>			'不正な名前です',
 	'S_CANT_FORMAT_TREE'=>			'ツリーをフォーマットできません',
 	'S_NO_PERMISSION'=>			'操作に対する権限を有していません',
-	
+
 	);
 ?>
