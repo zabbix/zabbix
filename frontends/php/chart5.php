@@ -19,14 +19,14 @@
 **/
 ?>
 <?php
-	require_once 'include/config.inc.php';
-	require_once 'include/services.inc.php';
+require_once('include/config.inc.php');
+require_once('include/services.inc.php');
 
-	$page['file']	= 'chart5.php';
-	$page['title']	= "S_CHART";
-	$page['type']	= PAGE_TYPE_IMAGE;
+$page['file']	= 'chart5.php';
+$page['title']	= "S_CHART";
+$page['type']	= PAGE_TYPE_IMAGE;
 
-include_once 'include/page_header.php';
+include_once('include/page_header.php');
 
 ?>
 <?php
@@ -103,7 +103,7 @@ include_once 'include/page_header.php';
 	if($wday==0) $wday=7;
 	$start=$start-($wday-1)*24*3600;
 
-	$weeks = (int)(date('z')/7 +1);
+	$weeks = (int) date('W') + ($wday?1:0);
 
 	for($i=0;$i<52;$i++){
 		if(($period_start=$start+7*24*3600*$i) > time())
@@ -113,9 +113,11 @@ include_once 'include/page_header.php';
 			$period_end = time();
 
 		$stat = calculate_service_availability($_REQUEST['serviceid'],$period_start,$period_end);
+
 		$problem[$i]=$stat['problem'];
 		$ok[$i]=$stat['ok'];
 		$count_now[$i]=1;
+		
 	}
 
 	for($i=0;$i<=$sizeY;$i+=$sizeY/10){
@@ -125,7 +127,7 @@ include_once 'include/page_header.php';
 	for($i = 0, $period_start = $start; $i <= $sizeX; $i += $sizeX/52){
 		DashedLine($im,$i+$shiftX,$shiftYup,$i+$shiftX,$sizeY+$shiftYup,$gray);
 		// imagestringup($im, 1,$i+$shiftX-4, $sizeY+$shiftYup+32, date('d.M',$period_start) , $black);
-		imageText($im, 6, 90, $i+$shiftX+4, $sizeY+$shiftYup+30, $black, date('d.M',$period_start));
+		imageText($im, 6, 90, $i+$shiftX+4, $sizeY+$shiftYup+35, $black, date('d.M',$period_start));
 
 		$period_start += 7*24*3600;
 	}
@@ -133,7 +135,7 @@ include_once 'include/page_header.php';
 	$maxY = max(max($problem), 100);
 	$minY = 0;
 
-	$maxX = 900;
+	$maxX = $sizeX;
 	$minX = 0;
 
 	for($i=1;$i<=$weeks;$i++){
@@ -141,13 +143,41 @@ include_once 'include/page_header.php';
 		$x2=($sizeX/52)*($i-1-$minX)*$sizeX/($maxX-$minX);
 
 		$y2=$sizeY*($ok[$i-1]-$minY)/($maxY-$minY);
-		$y2=$sizeY-$y2;
 
-		imagefilledrectangle($im,$x2+$shiftX,$y2+$shiftYup,$x2+$shiftX+8,$sizeY+$shiftYup,imagecolorallocate($im,120,235,120));
-		imagerectangle($im,$x2+$shiftX,$y2+$shiftYup,$x2+$shiftX+8,$sizeY+$shiftYup,$black);
+		$maxSizeY = $sizeY;
+		if($i == $weeks){
+			$maxSizeY = $sizeY * (date('w') / 7);
+			$y2 = $maxSizeY * ($ok[$i-1]-$minY)/($maxY-$minY);
+			
+/*
+SDI($ok[$i-1]);
+SDI($maxSizeY);
+SDI($y2);
+//*/
+		}
 
-		imagefilledrectangle($im,$x2+$shiftX,$shiftYup,$x2+$shiftX+8,$y2+$shiftYup,imagecolorallocate($im,235,120,120));
-		imagerectangle($im,$x2+$shiftX,$shiftYup,$x2+$shiftX+8,$y2+$shiftYup,$black);
+		imagefilledrectangle($im,
+						$x2+$shiftX,$shiftYup+$sizeY-$y2,
+						$x2+$shiftX+8,$shiftYup+$sizeY,
+						imagecolorallocate($im,120,235,120)
+					);
+		imagerectangle($im,
+						$x2+$shiftX,$shiftYup+$sizeY-$y2,
+						$x2+$shiftX+8,$shiftYup+$sizeY,
+						$black
+					);
+//*
+		imagefilledrectangle($im,
+						$x2+$shiftX,$shiftYup+$sizeY-$maxSizeY,
+						$x2+$shiftX+8,$shiftYup+$sizeY-$y2,
+						imagecolorallocate($im,235,120,120)
+					);
+		imagerectangle($im,
+						$x2+$shiftX,$shiftYup+$sizeY-$maxSizeY,
+						$x2+$shiftX+8,$shiftYup+$sizeY-$y2,
+						$black
+					);
+//*/
 	}
 
 	for($i=0;$i<=$sizeY;$i+=$sizeY/10){
@@ -155,13 +185,13 @@ include_once 'include/page_header.php';
 		imageText($im, 7, 0, $sizeX+5+$shiftX, $sizeY-$i-4+$shiftYup+8, $darkred, ($i*($maxY-$minY)/$sizeY+$minY).'%');
 	}
 
-	imagefilledrectangle($im,$shiftX,$sizeY+$shiftYup+39+15*0,$shiftX+5,$sizeY+$shiftYup+35+9+15*0,imagecolorallocate($im,120,235,120));
-	imagerectangle($im,$shiftX,$sizeY+$shiftYup+39+15*0,$shiftX+5,$sizeY+$shiftYup+35+9+15*0,$black);
-	imageText($im, 8, 0, $shiftX+9, $sizeY+$shiftYup+15*0+45, $black, S_OK_BIG.' (%)');
+	imagefilledrectangle($im,$shiftX,$sizeY+$shiftYup+34+15*1,$shiftX+5,$sizeY+$shiftYup+30+9+15*1,imagecolorallocate($im,120,235,120));
+	imagerectangle($im,$shiftX,$sizeY+$shiftYup+34+15*1,$shiftX+5,$sizeY+$shiftYup+30+9+15*1,$black);
+	imageText($im, 8, 0, $shiftX+9, $sizeY+$shiftYup+15*1+41, $black, S_OK_BIG.' (%)');
 
-	imagefilledrectangle($im,$shiftX,$sizeY+$shiftYup+39+15*1,$shiftX+5,$sizeY+$shiftYup+35+9+15*1,$darkred);
-	imagerectangle($im,$shiftX,$sizeY+$shiftYup+39+15*1,$shiftX+5,$sizeY+$shiftYup+15+9+35*1,$black);
-	imageText($im, 8, 0, $shiftX+9, $sizeY+$shiftYup+15*1+45, $black, S_PROBLEM_BIG.' (%)');
+	imagefilledrectangle($im,$shiftX,$sizeY+$shiftYup+34+15*2,$shiftX+5,$sizeY+$shiftYup+30+9+15*2,$darkred);
+	imagerectangle($im,$shiftX,$sizeY+$shiftYup+34+15*2,$shiftX+5,$sizeY+$shiftYup+30+9+15*2,$black);
+	imageText($im, 8, 0, $shiftX+9, $sizeY+$shiftYup+15*2+41, $black, S_PROBLEM_BIG.' (%)');
 
 	imagestringup($im,0,imagesx($im)-10,imagesy($im)-50, 'http://www.zabbix.com', $gray);
 
@@ -173,6 +203,6 @@ include_once 'include/page_header.php';
 ?>
 <?php
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
 
 ?>
