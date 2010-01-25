@@ -584,7 +584,7 @@
 			invalid_url();
 		}
 
-		if($show_messages && ($err!=ZBX_VALID_OK)) 
+		if($show_messages && ($err!=ZBX_VALID_OK))
 			show_messages($err==ZBX_VALID_OK, NULL, S_PAGE_RECEIVED_INCORRECT_DATA);
 
 	return ($err==ZBX_VALID_OK ? 1 : 0);

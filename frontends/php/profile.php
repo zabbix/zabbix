@@ -138,7 +138,7 @@ $fields=array(
 
 			DBstart();
 			$result = CUser::updateProfile($user);
-			if($result && ($USER_DETAILS['type'] > USER_TYPE_ZABBIX_USER)) 
+			if($result && ($USER_DETAILS['type'] > USER_TYPE_ZABBIX_USER))
 				$result = CUser::updateMedia(array('users' => $user, 'medias' => $user['user_medias']));
 
 			$result = DBend($result);

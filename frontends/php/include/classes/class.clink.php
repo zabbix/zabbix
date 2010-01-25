@@ -46,7 +46,7 @@ class CLink extends CTag{
 		if(is_null($this->nosid)) {
 			$sid = isset($_COOKIE['zbx_sessionid']) ? substr($_COOKIE['zbx_sessionid'],16,16) : null;
 
-			if(!is_null($sid)){			
+			if(!is_null($sid)){
 				if((strstr($value,'&') !== false) || (strstr($value,'?') !== false)) $value.= '&sid='.$sid;
 				else $value.= '?sid='.$sid;
 

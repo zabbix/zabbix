@@ -202,7 +202,7 @@ function __autoload($class_name){
 				'nodeid'=>0)
 			);
 	}
-	
+
 	process_locales();
 // INIT MB Strings if it's available
 	init_mbstrings();
@@ -1092,7 +1092,7 @@ function __autoload($class_name){
 
 	function replace_value_by_map($value, $valuemapid){
 		if($valuemapid < 1) return $value;
-		
+
 		static $valuemaps = array();
 		if(isset($valuemaps[$valuemapid])) return $valuemaps[$valuemapid];
 
@@ -1103,7 +1103,7 @@ function __autoload($class_name){
 		$result = DBselect($sql);
 		if($row = DBfetch($result)){
 			$valuemaps[$valuemapid] = $row['newvalue'].' '.'('.$value.')';
-			
+
 			return $valuemaps[$valuemapid];
 		}
 

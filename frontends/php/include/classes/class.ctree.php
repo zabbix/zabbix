@@ -224,7 +224,7 @@ class CTree{
 			$parentid = $rows['parentid'];
 			$this->tree[$parentid]['nodelist'].=$id.',';
 		}
-		
+
 		foreach($this->tree as $id => $rows){
 			if($rows['nodetype'] == '2'){
 				$js .= $this->treename.'_tree[\''.$id.'\'] = { status: \'close\',  nodelist : \''.$rows['nodelist'].'\', parentid : \''.$rows['parentid'].'\'};';

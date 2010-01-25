@@ -70,8 +70,8 @@ include_once('include/page_header.php');
 
 	if(!$bulk){
 		$options = array(
-			'extendoutput' => 1, 
-			'select_triggers' => 1, 
+			'extendoutput' => 1,
+			'select_triggers' => 1,
 			'eventids' => $_REQUEST['eventid']
 		);
 		$events = CEvent::get($options);
@@ -86,13 +86,13 @@ include_once('include/page_header.php');
 		if($bulk){
 			$_REQUEST['message'] .= ($_REQUEST['message'] == '' ? '' : "\n\r") . S_SYS_BULK_ACKNOWLEDGE;
 		}
-		
+
 		if(isset($_REQUEST['events'])){
 			$_REQUEST['events'] = zbx_toObject($_REQUEST['events'], 'eventid');
 		}
 		else if(isset($_REQUEST['triggers'])){
 			$options = array(
-				'output' => API_OUTPUT_SHORTEN, 
+				'output' => API_OUTPUT_SHORTEN,
 				'acknowledged' => 0,
 				'triggerids' => $_REQUEST['triggers']
 			);

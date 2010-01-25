@@ -117,7 +117,7 @@ include_once('include/page_header.php');
 		$problem[$i]=$stat['problem'];
 		$ok[$i]=$stat['ok'];
 		$count_now[$i]=1;
-		
+
 	}
 
 	for($i=0;$i<=$sizeY;$i+=$sizeY/10){
@@ -148,7 +148,7 @@ include_once('include/page_header.php');
 		if($i == $weeks){
 			$maxSizeY = $sizeY * (date('w') / 7);
 			$y2 = $maxSizeY * ($ok[$i-1]-$minY)/($maxY-$minY);
-			
+
 /*
 SDI($ok[$i-1]);
 SDI($maxSizeY);
