@@ -307,7 +307,7 @@ include_once('include/page_header.php');
 				'url' => 'slides.php?elementid='.$elementid.url_param('stime').url_param('period').url_param('groupid').url_param('hostid'),
 				'params'=> array('lastupdate' => time()),
 			));
-	add_doll_objects($refresh_tab);
+//	add_doll_objects($refresh_tab);
 
 	$refresh_icon = new CDiv(SPACE,'iconmenu');
 	$refresh_icon->addAction('onclick','javascript: create_page_menu(event,"hat_slides");');
@@ -330,7 +330,7 @@ include_once('include/page_header.php');
 
 			$dom_graph_id = 'iframe';
 			$objData = array(
-				'id' => $_REQUEST['elementid'],
+				'id' => $elementid,
 				'domid' => $dom_graph_id,
 				'loadSBox' => 0,
 				'loadImage' => 0,
@@ -362,6 +362,8 @@ include_once('include/page_header.php');
 	$scroll_div->setAttribute('id','scrollbar_cntr');
 	$scroll_div->setAttribute('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
 	$scroll_div->show();
+
+	print(SBR);
 
 	$jsmenu = new CPUMenu(null,170);
 	$jsmenu->InsertJavaScript();
