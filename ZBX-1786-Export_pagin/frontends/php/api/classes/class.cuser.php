@@ -1074,7 +1074,7 @@ class CUser extends CZBXAPI{
 			}
 
 			if($del_users[$user['userid']]['alias'] == ZBX_GUEST_USER){
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_CANNOT_DELETE_USER.'[ '.ZBX_GUEST_USER.' ]');
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_CANNOT_DELETE_USER.' [ '.ZBX_GUEST_USER.' ]');
 				$result = false;
 			}
 
