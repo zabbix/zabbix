@@ -1060,7 +1060,7 @@ class CUser extends CZBXAPI{
 
 		$users = zbx_toArray($users);
 		$userids = array();
-		$result = false;
+		$result = true;
 
 		$del_users = self::get(array(
 			'userids'=>zbx_objectValues($users, 'userid'),
