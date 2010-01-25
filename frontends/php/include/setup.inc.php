@@ -157,31 +157,31 @@
 					'center')
 				);
 		}
-		
+
 		function stage2(){
 			$table = new CTable(null, 'requirements');
 			$table->setAlign('center');
 
 			$final_result = true;
-			
+
 			$row = new CRow(array(
 				SPACE,
 				new CCol('Current value', 'header'),
 				new CCol('Required', 'header'),
 				new CCol('Recommended', 'header'),
-				SPACE, 
+				SPACE,
 				SPACE
 			));
 			$table->addRow($row);
-				
+
 			$reqs = check_php_requirements();
 			foreach($reqs as $req){
-			
+
 				$result = null;
 				if(!is_null($req['recommended']) && ($req['result'] == 1)){
 					$result = new CSpan(S_OK, 'orange');
 				}
-				else if((!is_null($req['recommended']) && ($req['result'] == 2)) 
+				else if((!is_null($req['recommended']) && ($req['result'] == 2))
 					|| (is_null($req['recommended']) && ($req['result'] == 1))){
 					$result = new CSpan(S_OK, 'green');
 				}
@@ -189,7 +189,7 @@
 					$result = new CSpan(S_FAIL, 'link_menu fail');
 					$result->setHint($req['error']);
 				}
-				
+
 				$row = new CRow(array(
 					new CCol(
 						$req['name'], 'header'),
@@ -200,7 +200,7 @@
 					),
 					$req['result'] ? SPACE : 'fail'
 				);
-				
+
 				$table->addRow($row);
 
 				$final_result &= (bool) $req['result'];

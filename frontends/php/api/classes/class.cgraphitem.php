@@ -74,11 +74,11 @@ class CGraphItem extends CZBXAPI{
 		);
 
 		$options = zbx_array_merge($def_options, $options);
-		
+
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
 		}
-		
+
 
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){

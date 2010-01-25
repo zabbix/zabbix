@@ -109,11 +109,11 @@ $ZBX_MENU = array(
 				),
 				array(
 					'url'=>'report2.php',
-					'label'=>S_AVAILABILITY_REPORT	
+					'label'=>S_AVAILABILITY_REPORT
 				),
 				array(
 					'url'=>'report5.php',
-					'label'=>S_TRIGGERS_TOP_100	
+					'label'=>S_TRIGGERS_TOP_100
 				),
 				array(
 						'url'=>'report6.php',
@@ -271,7 +271,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 // show check
 			if(!isset($sub_page['label'])) $show_sub_menu = false;
 			if(!isset($sub_page['user_type'])) $sub_page['user_type'] = $menu['user_type'];
-			
+
 			if($USER_DETAILS['type'] < $sub_page['user_type']){
 				$show_sub_menu = false;
 			}
@@ -286,7 +286,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 			if($sub_menu_active){
 // PERMISSION CHECK
 				$deny &= (($USER_DETAILS['type'] < $menu['user_type']) || ($USER_DETAILS['type'] < $sub_page['user_type']));
-				
+
 // END OF PERMISSION CHECK
 				$menu_class = 'active';
 				$page_exists = true;

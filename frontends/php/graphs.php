@@ -91,7 +91,7 @@ include_once('include/page_header.php');
 
 	$_REQUEST['go'] = get_request('go', 'none');
 
-// PERMISSIONS		
+// PERMISSIONS
 	if(get_request('graphid',0) > 0){
 		$options = array(
 			'nodeids' => get_current_nodeid(true),
@@ -126,7 +126,7 @@ include_once('include/page_header.php');
 		if(!empty($itemids)){
 			$options = array(
 				'nodeids'=>get_current_nodeid(true),
-				'itemids'=>$itemids, 
+				'itemids'=>$itemids,
 				'webitems'=>1,
 				'editable'=>1
 			);
@@ -262,7 +262,7 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['move_down']) && isset($_REQUEST['items'])){
 		if(isset($_REQUEST['items'][$_REQUEST['move_down']])){
 			$tmp = $_REQUEST['items'][$_REQUEST['move_down']];
-				
+
 			$_REQUEST['items'][$_REQUEST['move_down']]['sortorder'] = $_REQUEST['items'][$_REQUEST['move_down'] + 1]['sortorder'];
 			$_REQUEST['items'][$_REQUEST['move_down'] + 1]['sortorder'] = $tmp['sortorder'];
 		}
@@ -514,7 +514,7 @@ include_once('include/page_header.php');
 		order_result($graphs, $sortfield, $sortorder);
 		$paging = getPagingLine($graphs);
 
-		
+
 		$graphids = zbx_objectValues($graphs, 'graphid');
 		$options = array(
 			'graphids' => $graphids,
@@ -542,7 +542,7 @@ include_once('include/page_header.php');
 			}
 			$graphs[$gnum]['graphtype'] = $graphtype;
 		}
-		
+
 		order_result($graphs, $sortfield, $sortorder);
 
 		foreach($graphs as $gnum => $graph){

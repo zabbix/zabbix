@@ -23,7 +23,7 @@
 	function check_php_version(){
 		$required = '5.0';
 		$recommended = '5.3.0';
-		
+
 		if(version_compare(phpversion(), $recommended, '>=')){
 			$req = 2;
 		}
@@ -33,7 +33,7 @@
 		else{
 			$req = 0;
 		}
-	
+
 		$result = array(
 			'name' => 'PHP version',
 			'current' => phpversion(),
@@ -42,16 +42,16 @@
 			'result' => $req,
 			'error' => 'Minimal version of PHP is 5.1.0'
 		);
-		
+
 		return $result;
 	}
-	
+
 	function check_php_memory_limit(){
 		$required = 128*1024*1024;
 		$recommended = 256*1024*1024;
-		
+
 		$current = ini_get('memory_limit');
-		
+
 		if(str2mem($current) >= $recommended){
 			$req = 2;
 		}
@@ -61,7 +61,7 @@
 		else{
 			$req = 0;
 		}
-			
+
 		$result = array(
 			'name' => 'PHP memory limit',
 			'current' => $current,
@@ -70,16 +70,16 @@
 			'result' => $req,
 			'error' => '128M is a minimal PHP memory limitation'
 		);
-		
+
 		return $result;
 	}
-	
+
 	function check_php_post_max_size(){
 		$required = 16*1024*1024;
 		$recommended = 32*1024*1024;
-		
+
 		$current = ini_get('post_max_size');
-		
+
 		if(str2mem($current) >= $recommended){
 			$req = 2;
 		}
@@ -89,7 +89,7 @@
 		else{
 			$req = 0;
 		}
-			
+
 		$result = array(
 			'name' => 'PHP post max size',
 			'current' => $current,
@@ -98,16 +98,16 @@
 			'result' => $req,
 			'error' => '16M is minimum size of PHP post'
 		);
-		
+
 		return $result;
 	}
-	
+
 	function check_php_max_execution_time(){
 		$required = 300;
 		$recommended = 600;
-		
+
 		$current = ini_get('max_execution_time');
-		
+
 		if($current >= $recommended){
 			$req = 2;
 		}
@@ -117,7 +117,7 @@
 		else{
 			$req = 0;
 		}
-			
+
 		$result = array(
 			'name' => 'PHP max execution time',
 			'current' => $current,
@@ -126,21 +126,21 @@
 			'result' => $req,
 			'error' => '300 sec is a minimal limitation on execution time of PHP scripts'
 		);
-		
+
 		return $result;
 	}
-	
-	function check_php_timezone(){		
+
+	function check_php_timezone(){
 		$current = ini_get('date.timezone');
 		$current = !empty($current);
-		
+
 		if($current){
 			$req = 1;
 		}
 		else{
 			$req = 0;
 		}
-		
+
 		$result = array(
 			'name' => 'PHP timezone',
 			'current' => $req ? ini_get('date.timezone') : 'no',
@@ -149,13 +149,13 @@
 			'result' => $req,
 			'error' => 'Timezone for PHP is not set. Please set "date.timezone" option in php.ini.'
 		);
-		
+
 		return $result;
 	}
-	
+
 	function check_php_databases(){
 		$current = array();
-		
+
 		if(function_exists('mysql_pconnect') &&
 			function_exists('mysql_select_db') &&
 			function_exists('mysql_error') &&
@@ -164,7 +164,7 @@
 			function_exists('mysql_fetch_row') &&
 			function_exists('mysql_data_seek') &&
 			function_exists('mysql_insert_id')){
-			
+
 			$current[] = 'MySQL';
 		}
 
@@ -173,19 +173,19 @@
 			function_exists('pg_fetch_row') &&
 			function_exists('pg_exec') &&
 			function_exists('pg_getlastoid')){
-			
+
 			$current[] = 'PostgreSQL';
 		}
-		
+
 		if(function_exists('ocilogon') &&
 			function_exists('ocierror') &&
 			function_exists('ociparse') &&
 			function_exists('ociexecute') &&
 			function_exists('ocifetchinto')){
-			
+
 			$current[] = 'Oracle';
 		}
-		
+
 		if(function_exists('sqlite3_open') &&
 			function_exists('sqlite3_close') &&
 			function_exists('sqlite3_query') &&
@@ -193,17 +193,17 @@
 			function_exists('sqlite3_fetch_array') &&
 			function_exists('sqlite3_query_close') &&
 			function_exists('sqlite3_exec')){
-			
+
 			$current[] = 'SQLite3';
 		}
-		
+
 		if(!empty($current)){
 			$req = 1;
 		}
 		else{
 			$req = 0;
 		}
-		
+
 		$result = array(
 			'name' => 'PHP databases support',
 			'current' => empty($current) ? 'no' : new CJSscript(implode(SBR, $current)),
@@ -212,12 +212,12 @@
 			'result' => $req,
 			'error' => 'Requires any database support [MySQL or PostgreSQL or Oracle or SQLite3]'
 		);
-		
+
 		return $result;
 	}
-	
+
 	function check_php_bc(){
-		
+
 		$current = function_exists('bcadd') &&
 			function_exists('bccomp') &&
 			function_exists('bcdiv') &&
@@ -228,14 +228,14 @@
 			function_exists('bcscale') &&
 			function_exists('bcsqrt') &&
 			function_exists('bcsub');
-			
+
 		if($current){
 			$req = 1;
 		}
 		else{
 			$req = 0;
 		}
-		
+
 		$result = array(
 			'name' => 'PHP BC math',
 			'current' => $req ? 'yes' : 'no',
@@ -244,12 +244,12 @@
 			'result' => $req,
 			'error' => 'Requires bcmath module [configure PHP with --enable-bcmath]'
 		);
-		
+
 		return $result;
 	}
-	
+
 	function check_php_mbstring(){
-		
+
 		$current = function_exists('bcadd') &&
 			function_exists('bccomp') &&
 			function_exists('bcdiv') &&
@@ -260,14 +260,14 @@
 			function_exists('bcscale') &&
 			function_exists('bcsqrt') &&
 			function_exists('bcsub');
-			
+
 		if($current){
 			$req = 1;
 		}
 		else{
 			$req = 0;
 		}
-		
+
 		$result = array(
 			'name' => 'PHP MB string',
 			'current' => $req ? 'yes' : 'no',
@@ -276,21 +276,21 @@
 			'result' => $req,
 			'error' => 'Requires mb string module [configure PHP with --enable-mbstring]'
 		);
-		
+
 		return $result;
 	}
-	
+
 	function check_php_mb_overload(){
-		
+
 		$current = defined('ZBX_MBSTRINGS_OVERLOADED');
-		
+
 		if($current){
 			$req = 1;
 		}
 		else{
 			$req = 0;
 		}
-		
+
 		$result = array(
 			'name' => 'PHP MB string overload',
 			'current' => $req ? 'yes' : 'no',
@@ -299,21 +299,21 @@
 			'result' => $req,
 			'error' => 'MB String overload PHP is not set. Please set "mbstring.func_overload" to 2 in php.ini.'
 		);
-		
+
 		return $result;
 	}
-	
+
 	function check_php_sockets(){
-		
+
 		$current = function_exists('socket_create');
-		
+
 		if($current){
 			$req = 1;
 		}
 		else{
 			$req = 0;
 		}
-			
+
 		$result = array(
 			'name' => 'PHP Sockets',
 			'current' => $req ? 'yes' : 'no',
@@ -322,21 +322,21 @@
 			'result' => $req,
 			'error' => 'Required Sockets module [configured PHP with --enable-sockets]'
 		);
-		
+
 		return $result;
 	}
-	
+
 	function check_php_gd(){
-		
+
 		$required = '2.0';
 		$recommended = '2.0.34';
-		
+
 		if(is_callable('gd_info')){
 			$gd_info = gd_info();
 			preg_match('/(\d\.?)+/', $gd_info['GD Version'], $current);
 			$current = $current[0];
 		}
-		
+
 		if(version_compare($current, $recommended, '>=')){
 			$req = 2;
 		}
@@ -346,7 +346,7 @@
 		else{
 			$req = 0;
 		}
-			
+
 		$result = array(
 			'name' => 'PHP GD',
 			'current' => $current,
@@ -355,12 +355,12 @@
 			'result' => $req,
 			'error' => 'The GD extension isn\'t loaded.'
 		);
-		
+
 		return $result;
 	}
-	
+
 	function check_php_gd_png(){
-		
+
 		if(is_callable('gd_info')){
 			$gd_info = gd_info();
 			$current = isset($gd_info['PNG Support']);
@@ -375,7 +375,7 @@
 		else{
 			$req = 0;
 		}
-			
+
 		$result = array(
 			'name' => 'GD PNG Support',
 			'current' => $req ? 'yes' : 'no',
@@ -384,14 +384,14 @@
 			'result' => $req,
 			'error' => 'Requires images generation support [PNG]'
 		);
-		
+
 		return $result;
 	}
-	
-	function check_php_xml(){		
+
+	function check_php_xml(){
 		$required = '2.6.15';
 		$recommended = '2.7.6';
-		
+
 		$current = constant('LIBXML_DOTTED_VERSION');
 		if(version_compare($current, $recommended, '>=')){
 			$req = 2;
@@ -402,7 +402,7 @@
 		else{
 			$req = 0;
 		}
-			
+
 		$result = array(
 			'name' => 'libxml module',
 			'current' => $current,
@@ -411,10 +411,10 @@
 			'result' => $req,
 			'error' => 'php-xml module is not installed'
 		);
-		
+
 		return $result;
 	}
-	
+
 	function check_php_ctype(){
 
 		$current = function_exists('ctype_alnum') &&
@@ -428,14 +428,14 @@
 			function_exists('ctype_space') &&
 			function_exists('ctype_xdigit') &&
 			function_exists('ctype_upper');
-			
+
 		if($current){
 			$req = 1;
 		}
 		else{
 			$req = 0;
 		}
-			
+
 		$result = array(
 			'name' => 'ctype module',
 			'current' => $req ? 'yes' : 'no',
@@ -444,13 +444,13 @@
 			'result' => $req,
 			'error' => 'Requires ctype module [configure PHP with --enable-ctype]'
 		);
-		
+
 		return $result;
 	}
-	
+
 	function check_php_requirements(){
 		$result = array();
-		
+
 		$result[] = check_php_version();
 		$result[] = check_php_memory_limit();
 		$result[] = check_php_post_max_size();
@@ -468,5 +468,5 @@
 
 		return $result;
 	}
-	
+
 ?>
