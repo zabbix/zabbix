@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,12 +25,12 @@ require_once('include/forms.inc.php');
 define('ZBX_NOT_ALLOW_ALL_NODES', 1);
 define('ZBX_HIDE_NODE_SELECTION', 1);
 
-$page['title']	= "S_ZABBIX_BIG";
+$page['title']	= 'S_ZABBIX_BIG';
 $page['file']	= 'index.php';
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'name'=>			array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'isset({enter})'),
+		'name'=>			array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'isset({enter})', S_LOGIN),
 		'password'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({enter})'),
 		'sessionid'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		NULL),
 		'message'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,		NULL),
