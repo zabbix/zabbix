@@ -1710,6 +1710,7 @@
 //	index.php
 	'S_ZABBIX_BIG'=>			'Zabbix',
 	'S_WELCOME'=>				'Welcome to Zabbix! You are connected as',
+	'S_LOGIN_NAME'=> 'Login name',
 
 //	hostprofiles.php
 	'S_HOST_PROFILES'=>			'Host profiles',

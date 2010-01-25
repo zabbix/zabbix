@@ -189,6 +189,7 @@ function __autoload($class_name){
 
 		if(file_exists('include/locales/'.$USER_DETAILS['lang'].'.inc.php')){
 			include_once('include/locales/'.$USER_DETAILS['lang'].'.inc.php');
+			process_locales();
 		}
 	}
 	else{
@@ -203,7 +204,10 @@ function __autoload($class_name){
 			);
 	}
 	
+	include_once('include/locales/en_gb.inc.php');
 	process_locales();
+	set_zbx_locales();
+	
 // INIT MB Strings if it's available
 	init_mbstrings();
 /*

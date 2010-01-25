@@ -49,6 +49,10 @@ function check_authorisation(){
 
 	$user = array('sessionid'=>$sessionid);
 	if(!$auth = CUser::checkAuthentication($user)){
+		
+		include_once('include/locales/en_gb.inc.php');
+		process_locales();
+
 		include('index.php');
 		exit();
 	}
