@@ -117,6 +117,9 @@ include_once('include/page_header.php');
 						$element->show();
 						insert_js('timeControl.processObjects();');
 					}
+					else{
+						print(SBR.S_NO_SLIDESHOWS_DEFINED);
+					}
 
 					break;
 			}
@@ -152,18 +155,17 @@ include_once('include/page_header.php');
 <?php
 	$config = $_REQUEST['config'];
 
-	$_REQUEST['elementid'] = get_request('elementid',get_profile('web.screens.elementid', null));
-
+	$elementid = get_request('elementid',get_profile('web.slides.elementid', null));
 	if( 2 != $_REQUEST['fullscreen'] )
-		update_profile('web.screens.elementid',$_REQUEST['elementid']);
+		update_profile('web.slides.elementid',$elementid);
 
-	$effectiveperiod = navigation_bar_calc('web.screens',$_REQUEST['elementid']);
+	$effectiveperiod = navigation_bar_calc('web.slides',$elementid);
 ?>
 <?php
 	$slides_wdgt = new CWidget('hat_slides');
 
-	$elementid = get_request('elementid', null);
-	if($elementid <= 0) $elementid = null;
+	$elementid = get_request('elementid', 0);
+//	if($elementid <= 0) $elementid = null;
 
 	$text = S_SLIDESHOWS;
 
@@ -253,15 +255,13 @@ include_once('include/page_header.php');
 	show_messages();
 
 	$slide_name = S_SLIDESHOW;
-	if(isset($elementid)){
-		if($element = get_slideshow_by_slideshowid($elementid)){
-			$slide_name = $element['name'];
-		}
+	if($element = get_slideshow_by_slideshowid($elementid)){
+		$slide_name = $element['name'];
 	}
 
 	$icon = null;
 	$fs_icon = null;
-	if(isset($elementid) && $element){
+	if($elementid && $element){
 		if(infavorites('web.favorite.screenids',$elementid,'slideshowid')){
 			$icon = new CDiv(SPACE,'iconminus');
 			$icon->setAttribute('title',S_REMOVE_FROM.' '.S_FAVOURITES);
@@ -313,7 +313,7 @@ include_once('include/page_header.php');
 	$refresh_icon->addAction('onclick','javascript: create_page_menu(event,"hat_slides");');
 	$refresh_icon->setAttribute('title',S_MENU);
 
-	if(isset($elementid)){
+	if($elementid){
 		$effectiveperiod = navigation_bar_calc();
 		if( 2 != $_REQUEST['fullscreen'] ){
 // NAV BAR
@@ -366,6 +366,9 @@ include_once('include/page_header.php');
 	$jsmenu = new CPUMenu(null,170);
 	$jsmenu->InsertJavaScript();
 
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>
