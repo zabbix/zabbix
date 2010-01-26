@@ -481,7 +481,7 @@ class CAction extends CZBXAPI{
  * @param array $actions[0,...]['url'] OPTIONAL
  * @return boolean
  */
-	public static function add($actions){
+	public static function create($actions){
 		$actions = zbx_toArray($actions);
 		$actionids = array();
 
@@ -490,20 +490,17 @@ class CAction extends CZBXAPI{
 		self::BeginTransaction(__METHOD__);
 		foreach($actions as $anum => $action){
 			$action_db_fields = array(
-				'actionid'		=> null,
-				'eventid'		=> null,
-				'userid'		=> null,
-				'clock'			=> time(),
-				'mediatypeid'	=> 0,
-				'sendto'		=> null,
-				'subject'		=> '',
-				'message'		=> '',
-				'status'		=> ALERT_STATUS_NOT_SENT,
-				'retries'		=> 0,
-				'error'			=> '',
-				'nextcheck'		=> null,
-				'esc_step'		=> 0,
-				'actiontype'		=> ALERT_TYPE_MESSAGE
+				'actionid'			=> null,
+				'name'				=> null,
+				'eventsource'		=> null,
+				'evaltype'			=> null,
+				'status'			=> 0,
+				'esc_period'		=> '',
+				'def_shortdata'		=> '',
+				'def_longdata'		=> '',
+				'recovery_msg'		=> '',
+				'r_shordata'		=> '',
+				'r_londata'			=> ''
 			);
 
 			if(!check_db_fields($action_db_fields, $action)){
@@ -513,11 +510,8 @@ class CAction extends CZBXAPI{
 
 			$actionid = get_dbid('actions', 'actionid');
 			$sql = 'INSERT INTO actions '.
-					'(actionid, actionid, eventid, userid, mediatypeid, clock, sendto, subject, message, status, retries, error, nextcheck, esc_step, actiontype) '.
-					' VALUES ('.$actionid.','.$action['actionid'].','.$action['eventid'].','.$action['userid'].','.$action['mediatypeid'].','.
-						$action['clock'].','.zbx_dbstr($action['sentto']).','.zbx_dbstr($action['subject']).','.zbx_dbstr($action['message']).','.
-						$action['status'].','.$action['retries'].','.zbx_dbstr($action['error']).','.$action['nextcheck'].','.
-						$action['esc_step'].','.$action['actiontype'].' )';
+						'(actionid,name,eventsource,esc_period,def_shortdata,def_longdata,recovery_msg,r_shortdata,r_longdata,evaltype,status)'.
+					' VALUES ('.$action['actionid'].','.zbx_dbstr($action['name']).','.$action['eventsource'].','.$action['esc_period'].','.zbx_dbstr($action['def_shortdata']).','.zbx_dbstr($action['def_longdata']).','.$action['recovery_msg'].','.zbx_dbstr($action['r_shortdata']).','.zbx_dbstr($action['r_longdata']).','.$action['evaltype'].','.$action['status'].')');
 			$result = DBexecute($sql);
 
 			if(!$result) break;
