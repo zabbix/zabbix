@@ -1023,7 +1023,7 @@ class CUserMacro extends CZBXAPI{
  * @return boolean
  */
 	public static function massUpdate($data){
-
+	
 		try{
 			$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : null;
 			$hostids = is_null($hosts) ? array() : zbx_objectValues($hosts, 'hostid');
@@ -1031,33 +1031,31 @@ class CUserMacro extends CZBXAPI{
 			$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : null;
 			$templateids = is_null($templates) ? array() : zbx_objectValues($templates, 'templateid');
 
-			self::BeginTransaction(__METHOD__);
-
 			if(isset($data['macros'])){
+				self::BeginTransaction(__METHOD__);
+				
 				if(isset($data['hosts']) || isset($data['templates'])){
-					$linked = array();
-
-					// $macros_macro = zbx_objectValues($data['macros'], 'macro');
-
 					$objectids = array_merge($hostids, $templateids);
 					$macros = zbx_toHash($data['macros'], 'macro');
 
+					$macros_macros = zbx_objectValues($data['macros'], 'macro');
+					
 					$sql = 'SELECT macro, hostid, value FROM hostmacro'.
 						' WHERE '.DBcondition('hostid', $objectids).
-						' AND '.DBcondition('macro', zbx_objectValues($data['macros'], 'macro'), false, true);
+						' AND '.DBcondition('macro', $macros_macros, false, true);
 					$row_db = DBselect($sql);
 					while($row = DBfetch($row_db)){
 						$sql = 'UPDATE hostmacro SET value='.zbx_dbstr($macros[$row['macro']]['value']).
-							' WHERE macro='.$row['macro'].' AND hostid='.$row['hostid'];
+							' WHERE macro='.zbx_dbstr($row['macro']).' AND hostid='.$row['hostid'];
 							
 						if(!DBexecute($sql)){
 							throw new APIException(ZBX_API_ERROR_PARAMETERS, 'DB error');
 						}
 					}
 				}
+				
+				self::EndTransaction(true, __METHOD__);
 			}
-
-			self::EndTransaction(true, __METHOD__);
 
 			return true;
 		}
