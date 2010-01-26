@@ -1761,8 +1761,8 @@
 	'S_INCORRECT_TIME_PERIOD'=>	'Incorrect time period',
 
 // page_header.php
-	'S_REFRESHED_EVERY_SMALL'=>	'refreshed every',
-	'S_PAGE_RECEIVED_INCORRECT_DATA' => 'Page received incorrect data',
+	'S_REFRESHED_EVERY_SMALL'=>		'refreshed every',
+	'S_PAGE_RECEIVED_INCORRECT_DATA'=>	'Page received incorrect data',
 
 //	copt.inc.php
 	'S_STATS_FOR'=>			'Stats for',
@@ -1775,11 +1775,11 @@
 	'S_SQL_REQUESTS_COUNT'=>	'SQL requests count',
 	'S_TOTAL_TIME_SPENT_ON_SQL'=>	'Total time spent on SQL',
 	'S_END_OF'=>			'End of',
-	'S_MEMORY_LIMIT_REACHED'=>	'MEMROY LIMIT REACHED! Profiling was stopped to save memory for script processing.',
+	'S_MEMORY_LIMIT_REACHED'=>	'MEMORY LIMIT REACHED! Profiling was stopped to save memory for script processing.',
 
 // 	func.inc.php
 	'S_WRONG_TYPE'=>			'Wrong type',
-	'S_INCOORECT_TYPE_OF_ASORT_BY_KEY'=>	'Incorrect type of asort_by_key',
+	'S_INCORRECT_TYPE_OF_ASORT_BY_KEY'=>	'Incorrect type of asort_by_key',
 	'S_DAYS_SMALL'=>			'days',
 	'S_B'=>			'B',
 	'S_M'=>			'M',
