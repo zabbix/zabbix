@@ -77,8 +77,8 @@ include_once('include/page_header.php');
 
 		$objects = get_request('hosts', array());
 
-		$hosts = CHost::get(array('hostids' => $objects, 'editable' => 1));
-		$templates = CTemplate::get(array('templateids' => $objects, 'editable' => 1));
+		$hosts = CHost::get(array('hostids' => $objects, 'output' => API_OUTPUT_SHORTEN));
+		$templates = CTemplate::get(array('templateids' => $objects, 'output' => API_OUTPUT_SHORTEN));
 
 		if(isset($_REQUEST['groupid'])){
 			DBstart();
@@ -210,11 +210,11 @@ include_once('include/page_header.php');
 
 				$params = array(
 					'groupids' => $groupid,
-					'editable' => 1,
-					'sortfield' => 'host',
-					'templated_hosts' => 1);
-				$db_hosts = CHost::get($params);
-				$hosts = zbx_objectValues($db_hosts, 'hostid');
+					'templated_hosts' => 1,
+					'output' => API_OUTPUT_SHORTEN
+				);
+				$hosts = CHost::get($params);
+				$hosts = zbx_objectValues($hosts, 'hostid');
 				$hosts = zbx_toHash($hosts, 'hostid');
 			}
 		}
@@ -240,14 +240,14 @@ include_once('include/page_header.php');
 			$gr = reset($db_groups);
 			$twb_groupid = $gr['groupid'];
 		}
-
 		$cmbGroups = new CComboBox('twb_groupid', $twb_groupid, 'submit()');
 		foreach($db_groups as $row){
 			$cmbGroups->addItem($row['groupid'], $row['name']);
 		}
 
+		
 		$cmbHosts = new CTweenBox($frmHostG, 'hosts', $hosts, 25);
-
+		
 // get hosts from selected twb_groupid combo
 		$params = array(
 			'groupids' => $twb_groupid,
@@ -265,13 +265,26 @@ include_once('include/page_header.php');
 // select selected hosts and add them
 		$params = array(
 			'hostids' => $hosts,
-			'templated_hosts' =>1 ,
+			'templated_hosts' => 1,
 			'sortfield' => 'host',
+			'output' => API_OUTPUT_EXTEND
+		);
+		$r_hosts = CHost::get($params);
+
+		$params = array(
+			'hostids' => $hosts,
+			'templated_hosts' =>1,
 			'editable' => 1,
-			'extendoutput' => 1);
-		$db_hosts = CHost::get($params);
-		foreach($db_hosts as $num => $db_host){
-			$cmbHosts->addItem($db_host['hostid'], $db_host['host']);
+			'output' => API_OUTPUT_SHORTEN
+		);
+		
+		$rw_hosts = CHost::get($params);
+		$rw_hosts = zbx_toHash($rw_hosts, 'hostid');	
+		foreach($r_hosts as $num => $host){
+			if(isset($rw_hosts[$host['hostid']]))
+				$cmbHosts->addItem($host['hostid'], $host['host']);
+			else
+				$cmbHosts->addItem($host['hostid'], $host['host'], true, false);
 		}
 
 		$frmHostG->addRow(S_HOSTS, $cmbHosts->Get(S_HOSTS.SPACE.S_IN,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE, $cmbGroups)));
