@@ -5587,6 +5587,9 @@
 		global $USER_DETAILS;
 
 		$host_groups = get_request('groups', array());
+		if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0) && !uint_in_array($_REQUEST['groupid'], $host_groups)){
+			array_push($host_groups, $_REQUEST['groupid']);
+		}
 
 		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
 
