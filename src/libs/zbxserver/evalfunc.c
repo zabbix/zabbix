@@ -728,12 +728,6 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (item->value_type != ITEM_VALUE_TYPE_FLOAT && item->value_type != ITEM_VALUE_TYPE_UINT64 &&
-			item->value_type != ITEM_VALUE_TYPE_STR && item->value_type != ITEM_VALUE_TYPE_TEXT &&
-			item->value_type != ITEM_VALUE_TYPE_LOG)
-		goto clean;
-
-
 	if (0 == strcmp(function, "last"))
 	{
 		if (FAIL == get_function_parameter_uint(item, parameters, 1, &arg1, &flag) || flag != ZBX_FLAG_VALUES)
@@ -1608,7 +1602,7 @@ clean:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int evaluate_function(char *value, DB_ITEM *item, const char *function, char *parameter, time_t now)
+int evaluate_function(char *value, DB_ITEM *item, const char *function, const char *parameter, time_t now)
 {
 	int	ret;
 	struct  tm      *tm;

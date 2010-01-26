@@ -432,6 +432,8 @@ src/zabbix_server/dbsyncer/dbsyncer.h -text
 src/zabbix_server/escalator/Makefile.am -text
 src/zabbix_server/escalator/escalator.c -text
 src/zabbix_server/escalator/escalator.h -text
+src/zabbix_server/poller/checks_calculated.c -text
+src/zabbix_server/poller/checks_calculated.h -text
 src/zabbix_server/poller/checks_ipmi.c -text
 src/zabbix_server/poller/checks_ipmi.h -text
 src/zabbix_server/poller/checks_ssh.c -text

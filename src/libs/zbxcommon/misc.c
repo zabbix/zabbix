@@ -1617,3 +1617,105 @@ int	str2uint64(char *str, zbx_uint64_t *value)
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: is_hostname_char                                                 *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:  SUCCEED - the char is allowed in the host name              *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments: in host name allowed characters: '0-9a-zA-Z_. -]'                *
+ *           !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+int	is_hostname_char(const char c)
+{
+	if (c >= 'a' && c <= 'z')
+		return SUCCEED;
+
+	if (c == '.' || c == '_' || c == '-' || c == ' ')
+		return SUCCEED;
+
+	if (c >= 'A' && c <= 'Z')
+		return SUCCEED;
+
+	if (c >= '0' && c <= '9')
+		return SUCCEED;
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: is_key_char                                                      *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:  SUCCEED - the char is allowed in the item key               *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments: in host name allowed characters: '0-9a-zA-Z_.,]'                 *
+ *           !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+int	is_key_char(const char c)
+{
+	if (c >= 'a' && c <= 'z')
+		return SUCCEED;
+
+	if (c == '.' || c == ',' || c == '_')
+		return SUCCEED;
+
+	if (c >= 'A' && c <= 'Z')
+		return SUCCEED;
+
+	if (c >= '0' && c <= '9')
+		return SUCCEED;
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: is_function_char                                                 *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:  SUCCEED - the char is allowed in the trigger function       *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments: in host name allowed characters: '0-9a-zA-Z_. -]'                *
+ *           !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+int	is_function_char(const char c)
+{
+	if (c >= 'a' && c <= 'z')
+		return SUCCEED;
+
+	if (c == '_')
+		return SUCCEED;
+
+	if (c >= 'A' && c <= 'Z')
+		return SUCCEED;
+
+	if (c >= '0' && c <= '9')
+		return SUCCEED;
+
+	return FAIL;
+}
+
