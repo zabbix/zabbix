@@ -382,7 +382,7 @@ class CMaintenance extends CZBXAPI{
  * @param array $maintenance['hostid']
  * @return boolean
  */
-	public static function add($maintenances){
+	public static function create($maintenances){
 		$maintenances = zbx_toArray($maintenances);
 		$maintenanceids = array();
 		$result = false;

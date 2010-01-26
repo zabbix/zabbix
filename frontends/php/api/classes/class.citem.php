@@ -674,7 +674,7 @@ class CItem extends CZBXAPI{
 	 * @param array $items multidimensional array with items data
 	 * @return array|boolean
 	 */
-	public static function add($items){
+	public static function create($items){
 		$items = zbx_toArray($items);
 		$itemids = array();
 
