@@ -1760,6 +1760,9 @@
 // popup_media.php
 	'S_INCORRECT_TIME_PERIOD'=>	'Incorrect time period',
 
+// main.js
+	'S_NO_ELEMENTS_SELECTES'=>	'No elements selected!',
+
 // page_header.php
 	'S_REFRESHED_EVERY_SMALL'=>		'refreshed every',
 	'S_PAGE_RECEIVED_INCORRECT_DATA'=>	'Page received incorrect data',
