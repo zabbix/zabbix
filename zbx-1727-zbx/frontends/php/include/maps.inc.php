@@ -360,7 +360,7 @@
 		}
 
 		$selementid = get_dbid('sysmaps_elements','selementid');
-					
+
 		$result = DBexecute('INSERT INTO sysmaps_elements '.
 							'(selementid,sysmapid,elementid,elementtype,label,label_location,'.
 							'iconid_off,iconid_on,iconid_unknown,iconid_maintenance,iconid_disabled,x,y,url)'.
@@ -568,7 +568,7 @@
 		}
 
 		$scripts_by_hosts = CScript::getScriptsByHosts($hostids);
-		
+
 		$options = array(
 			'nodeids' => get_current_nodeid(true),
 			'hostids' => $hostids,

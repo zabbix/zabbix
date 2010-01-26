@@ -615,7 +615,7 @@
 		if(isset($userid)){
 /*			if(bccomp($userid,$USER_DETAILS['userid'])==0) $profile = 1;*/
 			$options = array(
-					'userids' => $userid,  
+					'userids' => $userid,
 					'extendoutput' => 1
 				);
 			if($profile) $options['nodeids'] = id2nodeid($userid);
@@ -2912,9 +2912,9 @@
 
 		if(isset($_REQUEST['graphid'])){
 			$frmGraph->addVar('graphid', $_REQUEST['graphid']);
-			
+
 			$options = array(
-						'graphids' => $_REQUEST['graphid'], 
+						'graphids' => $_REQUEST['graphid'],
 						'extendoutput' => 1
 					);
 			$graphs = CGraph::get($options);
@@ -2942,8 +2942,8 @@
 			$percent_right = $row['percent_right'];
 
 			$options = array(
-						'graphids' => $_REQUEST['graphid'], 
-						'sortfield' => 'sortorder', 
+						'graphids' => $_REQUEST['graphid'],
+						'sortfield' => 'sortorder',
 						'extendoutput' => 1
 					);
 
@@ -3016,7 +3016,7 @@
 // check if we deletd an item
 			$next = $i+1;
 			while(!isset($items[$next]) && ($next < ($icount-1))) $next++;
-			
+
 			if(isset($items[$next]) && ($items[$i]['sortorder'] == $items[$next]['sortorder']))
 				for($j=$next; $j < $icount; $j++)
 					if($items[$j-1]['sortorder'] >= $items[$j]['sortorder']) $items[$j]['sortorder']++;
@@ -3025,7 +3025,7 @@
 		}
 
 		asort_by_key($items, 'sortorder');
-			
+
 		$items = array_values($items);
 
 		$group_gid = get_request('group_gid', array());
@@ -3626,7 +3626,7 @@
 		$new_timeperiod = get_request('new_timeperiod', array());
 
 		$new = is_array($new_timeperiod);
-		
+
 		if(is_array($new_timeperiod) && isset($new_timeperiod['id'])){
 			$tblPeriod->addItem(new Cvar('new_timeperiod[id]',$new_timeperiod['id']));
 		}
@@ -5431,7 +5431,7 @@
 					new CVisibilityBox('visible[useipmi]', isset($visible['useipmi']), 'useipmi', S_ORIGINAL), S_USEIPMI),
 					new CCheckBox('useipmi', $useipmi, 'submit()')
 				);
-				
+
 		if($useipmi == 'yes'){
 			$frmHost->addRow(array(
 				new CVisibilityBox('visible[ipmi_ip]', isset($visible['ipmi_ip']), 'ipmi_ip', S_ORIGINAL), S_IPMI_IP_ADDRESS),

@@ -220,7 +220,7 @@ require_once('include/js.inc.php');
 			while($slide_data = DBfetch($db_screens)){
 				$screenids[$slide_data['screenid']] = $slide_data['screenid'];
 			}
-			
+
 			$options = array(
 					'screenids' => $screenids
 				);
@@ -233,7 +233,7 @@ require_once('include/js.inc.php');
 				if(!isset($screens[$screenid])) return false;
 			}
 		}
-		
+
 	return $result;
 	}
 

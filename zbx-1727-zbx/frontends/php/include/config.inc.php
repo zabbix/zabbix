@@ -189,7 +189,6 @@ function __autoload($class_name){
 
 		if(file_exists('include/locales/'.$USER_DETAILS['lang'].'.inc.php')){
 			include_once('include/locales/'.$USER_DETAILS['lang'].'.inc.php');
-			process_locales();
 		}
 	}
 	else{
@@ -200,9 +199,11 @@ function __autoload($class_name){
 			'type'  =>'0',
 			'node'  =>array(
 				'name'  =>'- unknown -',
-				'nodeid'=>0));
+				'nodeid'=>0)
+			);
 	}
 
+	process_locales();
 // INIT MB Strings if it's available
 	init_mbstrings();
 /*
@@ -1091,7 +1092,7 @@ function __autoload($class_name){
 
 	function replace_value_by_map($value, $valuemapid){
 		if($valuemapid < 1) return $value;
-		
+
 		static $valuemaps = array();
 		if(isset($valuemaps[$valuemapid])) return $valuemaps[$valuemapid];
 
@@ -1102,7 +1103,7 @@ function __autoload($class_name){
 		$result = DBselect($sql);
 		if($row = DBfetch($result)){
 			$valuemaps[$valuemapid] = $row['newvalue'].' '.'('.$value.')';
-			
+
 			return $valuemaps[$valuemapid];
 		}
 

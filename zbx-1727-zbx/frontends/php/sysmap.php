@@ -144,10 +144,10 @@ include_once('include/page_header.php');
 					break;
 				case 'save':
 					$options = array(
-							'sysmapids'=> $sysmapid, 
-							'editable'=>1, 
-							'extendoutput'=>1, 
-							'select_selements'=>1, 
+							'sysmapids'=> $sysmapid,
+							'editable'=>1,
+							'extendoutput'=>1,
+							'select_selements'=>1,
 							'select_links'=>1
 						);
 					$sysmaps = CMap::get($options);

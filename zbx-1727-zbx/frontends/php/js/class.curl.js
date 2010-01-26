@@ -129,7 +129,7 @@ formatArguments: function(){
 
 	if(args.length<1) return;
 	
-	for(i=0; i<args.length; i++){
+	for(var i=0; i<args.length; i++){
 		keyval = args[i].split('=');
 		this.args[keyval[0]] = (keyval.length>1)?keyval[1]:'';
 	}

@@ -86,7 +86,7 @@ include_once('include/page_header.php');
 	}
 //--------
 
-// FILTER 
+// FILTER
 	if(isset($_REQUEST['filter_rst'])){
 		$_REQUEST['nav_time'] = time();
 		$_REQUEST['triggerid'] = 0;
