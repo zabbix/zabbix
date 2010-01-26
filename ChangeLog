@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1177] returned slide-level refresh rate (Aly)
  - [ZBX-1331] implemented auto adding selected group on host creation (Aly)
  - [ZBX-1427] fixed adding Actions through API (Aly)
  - [ZBX-1810] fixed adding user media through API (Aly)
