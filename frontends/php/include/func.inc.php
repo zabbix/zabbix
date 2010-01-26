@@ -423,7 +423,7 @@ function natksort(&$array) {
 
 function asort_by_key(&$array, $key){
 	if(!is_array($array)) {
-		error(S_INCOORECT_TYPE_OF_ASORT_BY_KEY);
+		error(S_INCORRECT_TYPE_OF_ASORT_BY_KEY);
 		return array();
 	}
 
