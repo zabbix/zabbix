@@ -259,7 +259,6 @@ require_once('include/js.inc.php');
 			$slideid = get_dbid('slides','slideid');
 
 // TODO: resulve conflict about regression of delay per slide
-			$slide['delay'] = $delay;
 			$result = DBexecute('INSERT INTO slides (slideid,slideshowid,screenid,step,delay) '.
 								' VALUES ('.$slideid.','.$slideshowid.','.$slide['screenid'].','.($i++).','.$slide['delay'].')');
 			if(!$result) return false;
