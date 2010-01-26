@@ -188,17 +188,14 @@ require_once('include/js.inc.php');
 			$curr_step = $step;
 		}
 
-		$sql = 'SELECT sl.screenid,sl.delay,ss.delay as ss_delay '.
-				' FROM slides sl,slideshows ss '.
+		$sql = 'SELECT sl.* '.
+				' FROM slides sl, slideshows ss '.
 				' WHERE ss.slideshowid='.$slideshowid.
-					' and ss.slideshowid=sl.slideshowid '.
+					' and sl.slideshowid=ss.slideshowid '.
 					' and sl.step='.$curr_step;
 		$slide_data = DBfetch(DBselect($sql));
-		if($slide_data['delay'] <= 0){
-			$slide_data['delay'] = $slide_data['ss_delay'];
-		}
 
-	return get_screen($slide_data['screenid'],2,$effectiveperiod);
+	return $slide_data;
 	}
 
 
