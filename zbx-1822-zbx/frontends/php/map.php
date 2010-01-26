@@ -266,7 +266,7 @@ include_once('include/page_header.php');
 		$iconX = imagesx($img);
 		$iconY = imagesy($img);
 
-		if(isset($_REQUEST['noedit']) && ($highlight == SYSMAP_HIGHLIGH_ON)){
+		if(isset($_REQUEST['noedit']) && (($highlight%2) == SYSMAP_HIGHLIGH_ON)){
 			$hl_color = null;
 			$st_color = null;
 			if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_ON){
