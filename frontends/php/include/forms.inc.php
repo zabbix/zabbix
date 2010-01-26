@@ -1380,7 +1380,8 @@
 		foreach(array(ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE,
 			ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_TRAPPER,
 			ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_HTTPTEST,
-			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET) as $it)
+			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+			ITEM_TYPE_CALCULATED) as $it)
 				$cmbType->addItem($it, item_type2str($it));
 		$col_table2->addRow(array(bold(S_TYPE.': '), $cmbType));
 
@@ -1809,6 +1810,14 @@
 			if (0 == strncmp($params, "DSN=<database source name>", 26))
 				$params = '';
 			break;
+		default:
+			if ($key == 'db.odbc.select[<unique short description>]' ||
+					$key == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]' ||
+					$key == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]')
+				$key = '';
+			if (0 == strncmp($params, "DSN=<database source name>", 26))
+				$params = '';
+			break;
 		}
 
 		if(isset($_REQUEST['itemid'])){
@@ -1947,7 +1956,8 @@
 			foreach(array(ITEM_TYPE_ZABBIX,ITEM_TYPE_ZABBIX_ACTIVE,ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_SNMPV1,ITEM_TYPE_SNMPV2C,ITEM_TYPE_SNMPV3,ITEM_TYPE_TRAPPER,
 				ITEM_TYPE_INTERNAL,ITEM_TYPE_AGGREGATE,ITEM_TYPE_EXTERNAL,
-				ITEM_TYPE_DB_MONITOR,ITEM_TYPE_IPMI,ITEM_TYPE_SSH,ITEM_TYPE_TELNET) as $it)
+				ITEM_TYPE_DB_MONITOR,ITEM_TYPE_IPMI,ITEM_TYPE_SSH,ITEM_TYPE_TELNET,
+				ITEM_TYPE_CALCULATED) as $it)
 					$cmbType->addItem($it,item_type2str($it));
 			$frmItem->addRow(S_TYPE, $cmbType);
 		}
@@ -2047,6 +2057,8 @@
 
 			if (ITEM_TYPE_DB_MONITOR == $type)
 				$frmItem->addRow(S_PARAMS, new CTextArea('params',$params,60,4));
+			else if (ITEM_TYPE_CALCULATED == $type)
+				$frmItem->addRow(S_EXPRESSION, new CTextArea('params',$params,60,4));
 			else
 				$frmItem->addVar('params',$params);
 		}
