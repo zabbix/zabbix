@@ -482,7 +482,7 @@ class CAlert extends CZBXAPI{
  * @param array $alerts[0,...]['url'] OPTIONAL
  * @return boolean
  */
-	public static function add($alerts){
+	public static function create($alerts){
 		$alerts = zbx_toArray($alerts);
 		$alertids = array();
 		$result = false;
