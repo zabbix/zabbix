@@ -190,7 +190,7 @@ function __autoload($class_name){
 		if(file_exists('include/locales/'.$USER_DETAILS['lang'].'.inc.php')){
 			include_once('include/locales/'.$USER_DETAILS['lang'].'.inc.php');
 			process_locales();
-		}
+		}		
 	}
 	else{
 		$USER_DETAILS = array(
