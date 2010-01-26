@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1576] fixed evaluating aggregate items for large host groups (Sasha)
  - [ZBX-1822] changed in map, elements hosts now always show only count of problems (Aly)
  - [DEV-360] added support of calculated items (Sasha)
  - [ZBX-1821] fixed map problem if icon element is not selected (Aly)
