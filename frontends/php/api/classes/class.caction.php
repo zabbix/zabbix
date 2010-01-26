@@ -490,15 +490,14 @@ class CAction extends CZBXAPI{
 		self::BeginTransaction(__METHOD__);
 		foreach($actions as $anum => $action){
 			$action_db_fields = array(
-				'actionid'			=> null,
 				'name'				=> null,
 				'eventsource'		=> null,
 				'evaltype'			=> null,
 				'status'			=> 0,
-				'esc_period'		=> '',
+				'esc_period'		=> 0,
 				'def_shortdata'		=> '',
 				'def_longdata'		=> '',
-				'recovery_msg'		=> '',
+				'recovery_msg'		=> 0,
 				'r_shordata'		=> '',
 				'r_londata'			=> ''
 			);
@@ -511,7 +510,7 @@ class CAction extends CZBXAPI{
 			$actionid = get_dbid('actions', 'actionid');
 			$sql = 'INSERT INTO actions '.
 						'(actionid,name,eventsource,esc_period,def_shortdata,def_longdata,recovery_msg,r_shortdata,r_longdata,evaltype,status)'.
-					' VALUES ('.$action['actionid'].','.zbx_dbstr($action['name']).','.$action['eventsource'].','.$action['esc_period'].','.zbx_dbstr($action['def_shortdata']).','.zbx_dbstr($action['def_longdata']).','.$action['recovery_msg'].','.zbx_dbstr($action['r_shortdata']).','.zbx_dbstr($action['r_longdata']).','.$action['evaltype'].','.$action['status'].')');
+					' VALUES ('.$actionid.','.zbx_dbstr($action['name']).','.$action['eventsource'].','.$action['esc_period'].','.zbx_dbstr($action['def_shortdata']).','.zbx_dbstr($action['def_longdata']).','.$action['recovery_msg'].','.zbx_dbstr($action['r_shortdata']).','.zbx_dbstr($action['r_longdata']).','.$action['evaltype'].','.$action['status'].')';
 			$result = DBexecute($sql);
 
 			if(!$result) break;
