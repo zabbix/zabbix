@@ -106,7 +106,8 @@ include_once('include/page_header.php');
 					$sysmaps = CMap::get($options);
 					$db_map = reset($sysmaps);
 
-					$map_info = getSelementsInfo($db_map['selements']);
+					$expandProblem = ($db_map['highlight'] > 1)? 0 : 1;
+					$map_info = getSelementsInfo($db_map['selements'], $expandProblem);
 //SDII($db_map);
 					add_elementNames($db_map['selements']);
 

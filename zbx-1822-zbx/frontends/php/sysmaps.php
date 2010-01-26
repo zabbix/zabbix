@@ -35,10 +35,11 @@ include_once('include/page_header.php');
 	$fields=array(
 		'maps'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		'sysmapid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
-		'name'=>			array(T_ZBX_STR, O_OPT,	 NULL,	NOT_EMPTY,		'isset({save})'),
+		'name'=>			array(T_ZBX_STR, O_OPT,	 NULL,	NOT_EMPTY,			'isset({save})'),
 		'width'=>			array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
 		'height'=>			array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
-		'backgroundid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,			'isset({save})'),
+		'backgroundid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,				'isset({save})'),
+		'expproblem'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
 		'highlight'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
 		'label_type'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,4),		'isset({save})'),
 		'label_location'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,3),		'isset({save})'),
@@ -76,12 +77,24 @@ include_once('include/page_header.php');
 		if(isset($_REQUEST["sysmapid"])){
 // TODO check permission by new value.
 			$_REQUEST['highlight'] = get_request('highlight', 0);
+			$_REQUEST['expproblem'] = get_request('expproblem', 0);
+
+			$map = array(
+					'sysmapid' => $_REQUEST['sysmapid'],
+					'name' => $_REQUEST['name'],
+					'width' => $_REQUEST['width'],
+					'height' => $_REQUEST['height'],
+					'backgroundid' => $_REQUEST['backgroundid'],
+					'highlight' => $_REQUEST['highlight'],
+					'label_type' => $_REQUEST['label_type'],
+					'label_location' => $_REQUEST['label_location']
+				);
+
+			if($_REQUEST['expproblem'] == 0) $map['highlight']+=2;
 
 			DBstart();
-			update_sysmap($_REQUEST["sysmapid"],$_REQUEST["name"],$_REQUEST["width"],
-				$_REQUEST["height"],$_REQUEST["backgroundid"],$_REQUEST["highlight"],$_REQUEST["label_type"],
-				$_REQUEST["label_location"]);
-			$result = DBend();
+			$result = CMap::update($map);
+			$result = DBend($result);
 
 			add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,'Name ['.$_REQUEST['name'].']');
 			show_messages($result,S_MAP_UPDATED,S_CANNOT_UPDATE_MAP);
@@ -91,11 +104,23 @@ include_once('include/page_header.php');
 				access_deny();
 
 			$_REQUEST['highlight'] = get_request('highlight', 0);
+			$_REQUEST['expproblem'] = get_request('expproblem', 0);
+			
+			$map = array(
+					'name' => $_REQUEST['name'],
+					'width' => $_REQUEST['width'],
+					'height' => $_REQUEST['height'],
+					'backgroundid' => $_REQUEST['backgroundid'],
+					'highlight' => $_REQUEST['highlight'],
+					'label_type' => $_REQUEST['label_type'],
+					'label_location' => $_REQUEST['label_location']
+				);
+
+			if($_REQUEST['expproblem'] == 0) $map['highlight']+=2;
 
 			DBstart();
-			add_sysmap($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["backgroundid"],
-					$_REQUEST["highlight"],$_REQUEST["label_type"],$_REQUEST["label_location"]);
-			$result = DBend();
+			$result = CMap::create($map);
+			$result = DBend($result);
 
 			add_audit_if($result,AUDIT_ACTION_ADD,AUDIT_RESOURCE_MAP,'Name ['.$_REQUEST['name'].']');
 			show_messages($result,S_MAP_ADDED,S_CANNOT_ADD_MAP);
@@ -105,9 +130,11 @@ include_once('include/page_header.php');
 		}
 	}
 	else if(isset($_REQUEST["delete"])&&isset($_REQUEST["sysmapid"])){
+		$maps = zbx_toObject($_REQUEST["sysmapid"], 'sysmapid');
+
 		DBstart();
-		delete_sysmap($_REQUEST["sysmapid"]);
-		$result = DBend();
+		$result = CMap::delete($maps);
+		$result = DBend($result);
 
 		add_audit_if($result,AUDIT_ACTION_DELETE,AUDIT_RESOURCE_MAP,'Name ['.$sysmap['name'].']');
 		show_messages($result, S_MAP_DELETED, S_CANNOT_DELETE_MAP);
@@ -119,12 +146,12 @@ include_once('include/page_header.php');
 		$go_result = true;
 		$maps = get_request('maps', array());
 
+		$maps = zbx_toObject($maps, 'sysmapid');
+
 		DBstart();
-		foreach($maps as $mapid){
-			$go_result &= delete_sysmap($mapid);
-			if(!$go_result) break;
-		}
-		$go_result = DBend($go_result);
+		$result = CMap::delete($maps);
+		$go_result = DBend($result);
+		
 
 		if($go_result){
 			unset($_REQUEST["form"]);
