@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1582] fixed processing ssh.run[...] check to avoid the server crashing on libssh2 timeout (Dmitry)
  - [ZBX-1688] hosts, user doesn't have permission to, are shown gray in hostgroup configuration screen (Vedmak)
  - [ZBX-1608] fixed notifications after maintenance periods (Sasha)
  - [ZBX-1576] fixed evaluating aggregate items for large host groups (Sasha)
