@@ -1447,8 +1447,10 @@
 					$msg = S_PROBLEM_BIG;
 					if($info[$info['type']]['count'] > 1)
 						$msg = $info[$info['type']]['count'].' '.S_PROBLEMS;
-					else if(isset($info[$info['type']]['info']))
-						$msg = $info[$info['type']]['info'];
+					else 
+						$msg = $info[$info['type']]['count'].' '.S_PROBLEM;
+//					else if(isset($info[$info['type']]['info']))
+//						$msg = $info[$info['type']]['info'];
 
 
 					$info['info'] = array();
