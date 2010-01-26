@@ -122,9 +122,15 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			}
 			break;
 		case ITEM_TYPE_AGGREGATE:
-			alarm(CONFIG_TIMEOUT);
 			res = get_value_aggregate(item, result);
-			alarm(0);
+
+			if (SUCCEED != res && GET_MSG_RESULT(result))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
+						item->host.host, item->key_orig, result->msg);
+				zabbix_syslog("Item [%s:%s] error: %s",
+						item->host.host, item->key_orig, result->msg);
+			}
 			break;
 		case ITEM_TYPE_EXTERNAL:
 			alarm(CONFIG_TIMEOUT);

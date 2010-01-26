@@ -79,14 +79,58 @@ static	int	evaluate_one(double *result, int *num, char *grpfunc, char const *val
 }
 
 /*
+ * get array of items with specified key for selected group
+ */
+static void	aggregate_get_items(zbx_uint64_t **ids, int *ids_alloc, int *ids_num, const char *hostgroup, const char *itemkey)
+{
+	char		*hostgroup_esc, *itemkey_esc;
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	itemid;
+
+	hostgroup_esc = DBdyn_escape_string(hostgroup);
+	itemkey_esc = DBdyn_escape_string(itemkey);
+
+	result = DBselect(
+			"select i.itemid"
+			" from items i,hosts_groups hg,hosts h,groups g"
+			" where hg.groupid=g.groupid"
+				" and i.hostid=h.hostid"
+				" and hg.hostid=h.hostid"
+				" and g.name='%s'"
+				" and i.key_='%s'"
+				" and i.status=%d"
+				" and h.status=%d"
+				DB_NODE,
+			hostgroup_esc,
+			itemkey_esc,
+			ITEM_STATUS_ACTIVE,
+			HOST_STATUS_MONITORED,
+			DBnode_local("h.hostid"));
+
+	zbx_free(itemkey_esc);
+	zbx_free(hostgroup_esc);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(itemid, row[0]);
+		uint64_array_add(ids, ids_alloc, ids_num, itemid, 64);
+	}
+	DBfree_result(result);
+}
+
+/*
  * grpfunc: grpmax, grpmin, grpsum, grpavg
  * itemfunc: last, min, max, avg, sum,count
  */
-static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, char *itemkey, char *itemfunc, char *param)
+static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc,
+		const char *hostgroup, const char *itemkey,
+		const char *itemfunc, const char *param)
 {
-	char		sql[MAX_STRING_LEN];
-	char		sql2[MAX_STRING_LEN];
-	char		hostgroup_esc[MAX_STRING_LEN],itemkey_esc[MAX_STRING_LEN];
+	char		*sql = NULL;
+	int		sql_alloc = 2048, sql_offset = 0;
+	char		*sql2 = NULL;
+	int		sql2_alloc = 2048, sql2_offset = 0;
 
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -96,7 +140,9 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 	const		char		*value;
 	int		num = 0;
 	int		now;
-	char		items[MAX_STRING_LEN],items2[MAX_STRING_LEN];
+	zbx_uint64_t	*ids = NULL;
+	int		ids_alloc = 0, ids_num = 0;
+	int		ret = FAIL;
 
 	now=time(NULL);
 
@@ -109,63 +155,67 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 
 	init_result(res);
 
-	DBescape_string(itemkey,itemkey_esc,MAX_STRING_LEN);
-	DBescape_string(hostgroup,hostgroup_esc,MAX_STRING_LEN);
-/* Get list of affected item IDs */
-	strscpy(items,"0");
-	result = DBselect("select i.itemid from items i,hosts_groups hg,hosts h,groups g"
-			" where hg.groupid=g.groupid and i.hostid=h.hostid and hg.hostid=h.hostid"
-			" and g.name='%s' and i.key_='%s' and i.status=%d and h.status=%d" DB_NODE,
-		hostgroup_esc,
-		itemkey_esc,
-		ITEM_STATUS_ACTIVE,
-		HOST_STATUS_MONITORED,
-		DBnode_local("h.hostid"));
+	aggregate_get_items(&ids, &ids_alloc, &ids_num, hostgroup, itemkey);
 
-	while((row=DBfetch(result)))
+	if (0 == ids_num)
 	{
-		zbx_snprintf(items2,sizeof(items2),"%s,%s",
-			items,
-			row[0]);
-/*		zabbix_log( LOG_LEVEL_WARNING, "ItemIDs items2[%s])",items2);*/
-		strscpy(items,items2);
-/*		zabbix_log( LOG_LEVEL_WARNING, "ItemIDs items[%s])",items2);*/
+		SET_MSG_RESULT(res, zbx_dsprintf(NULL, "No items for key [%s] in group [%s]",
+				itemkey, hostgroup));
+		goto clean;
 	}
-	DBfree_result(result);
 
-	if(strcmp(itemfunc,"last") == 0)
+	sql = zbx_malloc(sql, sql_alloc);
+	sql2 = zbx_malloc(sql2, sql2_alloc);
+
+	if (0 == strcmp(itemfunc, "last"))
 	{
-		zbx_snprintf(sql,sizeof(sql),"select itemid,value_type,lastvalue from items where lastvalue is not NULL and items.itemid in (%s)",
-			items);
-		zbx_snprintf(sql2,sizeof(sql2),"select itemid,value_type,lastvalue from items where 0=1");
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128,
+				"select itemid,value_type,lastvalue"
+				" from items"
+				" where lastvalue is not NULL"
+					" and");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", ids, ids_num);
+
+		zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset, 128,
+				"select itemid,value_type,lastvalue"
+				" from items"
+				" where 0=1");
 	}
 		/* The SQL works very very slow on MySQL 4.0. That's why it has been split into two. */
 /*		zbx_snprintf(sql,sizeof(sql),"select items.itemid,items.value_type,min(history.value) from items,hosts_groups,hosts,groups,history where history.itemid=items.itemid and hosts_groups.groupid=groups.groupid and items.hostid=hosts.hostid and hosts_groups.hostid=hosts.hostid and groups.name='%s' and items.key_='%s' and history.clock>%d group by 1,2",hostgroup_esc, itemkey_esc, now - atoi(param));*/
-	else if( (strcmp(itemfunc,"min") == 0) ||
-		(strcmp(itemfunc,"max") == 0) ||
-		(strcmp(itemfunc,"avg") == 0) ||
-		(strcmp(itemfunc,"count") == 0) ||
-		(strcmp(itemfunc,"sum") == 0)
-	)
+	else if (0 == strcmp(itemfunc,"min") || 0 == strcmp(itemfunc,"max") ||
+			0 == strcmp(itemfunc,"avg") || 0 == strcmp(itemfunc,"count") ||
+			0 == strcmp(itemfunc,"sum"))
 	{
-		zbx_snprintf(sql,sizeof(sql),"select h.itemid,i.value_type,%s(h.value) from items i,history h where h.itemid=i.itemid and h.itemid in (%s) and h.clock>%d group by h.itemid,i.value_type",
-			itemfunc,
-			items,
-			now - atoi(param));
-		zbx_snprintf(sql2,sizeof(sql),"select h.itemid,i.value_type,%s(h.value) from items i,history_uint h where h.itemid=i.itemid and h.itemid in (%s) and h.clock>%d group by h.itemid,i.value_type",
-			itemfunc,
-			items,
-			now - atoi(param));
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128,
+				"select i.itemid,i.value_type,%s(h.value)"
+				" from items i,history h"
+				" where h.itemid=i.itemid"
+					" and h.clock>%d"
+					" and",
+				itemfunc,
+				now - atoi(param));
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", ids, ids_num);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
+				" group by i.itemid,i.value_type");
+
+		zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset, 128,
+				"select i.itemid,i.value_type,%s(h.value)"
+				" from items i,history_uint h"
+				" where h.itemid=i.itemid"
+					" and h.clock>%d"
+					" and",
+				itemfunc,
+				now - atoi(param));
+		DBadd_condition_alloc(&sql2, &sql2_alloc, &sql2_offset, "i.itemid", ids, ids_num);
+		zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset, 64,
+				" group by i.itemid,i.value_type");
 	}
 	else
 	{
 		SET_MSG_RESULT(res, strdup("Unsupported item function"));
-		zabbix_log( LOG_LEVEL_WARNING, "Unsupported item function [%s])",
-			itemfunc);
-		return FAIL;
+		goto clean;
 	}
-	zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]",sql);
-	zabbix_log( LOG_LEVEL_DEBUG, "SQL2 [%s]",sql2);
 
 	result = DBselect("%s",sql);
 	while((row=DBfetch(result)))
@@ -175,10 +225,8 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 		if(FAIL == evaluate_one(&d, &num, grpfunc, value, valuetype))
 		{
 			SET_MSG_RESULT(res, strdup("Unsupported group function"));
-			zabbix_log( LOG_LEVEL_WARNING, "Unsupported group function [%s])",
-				grpfunc);
 			DBfree_result(result);
-			return FAIL;
+			goto clean;
 		}
 	}
 	DBfree_result(result);
@@ -191,21 +239,17 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 		if(FAIL == evaluate_one(&d, &num, grpfunc, value, valuetype))
 		{
 			SET_MSG_RESULT(res, strdup("Unsupported group function"));
-			zabbix_log( LOG_LEVEL_WARNING, "Unsupported group function [%s])",
-				grpfunc);
 			DBfree_result(result);
-			return FAIL;
+			goto clean;
 		}
 	}
 	DBfree_result(result);
 
 	if(num==0)
 	{
-		SET_MSG_RESULT(res, strdup("No values"));
-		zabbix_log( LOG_LEVEL_WARNING, "No values for group[%s] key[%s])",
-			hostgroup,
-			itemkey);
-		return FAIL;
+		SET_MSG_RESULT(res, zbx_dsprintf(NULL, "No values for key [%s] in group [%s]",
+				itemkey, hostgroup));
+		goto clean;
 	}
 
 	if(strcmp(grpfunc,"grpavg") == 0)
@@ -217,9 +261,17 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 		SET_DBL_RESULT(res, d);
 	}
 
-	zabbix_log( LOG_LEVEL_DEBUG, "End evaluate_aggregate(result:" ZBX_FS_DBL ")",
-		d);
-	return SUCCEED;
+	zabbix_log(LOG_LEVEL_DEBUG, "evaluate_aggregate() result:" ZBX_FS_DBL, d);
+
+	ret = SUCCEED;
+clean:
+	zbx_free(ids);
+	zbx_free(sql);
+	zbx_free(sql2);
+
+	zabbix_log( LOG_LEVEL_DEBUG, "End of evaluate_aggregate():%s", zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
