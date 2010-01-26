@@ -30,7 +30,7 @@ $page['file']	= 'index.php';
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'name'=>			array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'isset({enter})', S_LOGIN),
+		'name'=>			array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'isset({enter})', S_LOGIN_NAME),
 		'password'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({enter})'),
 		'sessionid'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		NULL),
 		'message'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,		NULL),
@@ -100,11 +100,11 @@ include_once('include/page_header.php');
 			case ZBX_AUTH_INTERNAL:
 			default:
 //	konqueror bug #138024; adding useless param(login=1) to the form's action path to avoid bug!!
-				$frmLogin = new CFormTable('Login','index.php?login=1','post','multipart/form-data');
+				$frmLogin = new CFormTable(S_LOGIN,'index.php?login=1','post','multipart/form-data');
 				$frmLogin->setHelp('web.index.login');
 				$frmLogin->addVar('request', $request);
-				$frmLogin->addRow('Login name', new CTextBox('name'));
-				$frmLogin->addRow('Password', new CPassBox('password'));
+				$frmLogin->addRow(S_LOGIN_NAME, new CTextBox('name'));
+				$frmLogin->addRow(S_PASSWORD, new CPassBox('password'));
 				$frmLogin->addItemToBottomRow(new CButton('enter','Enter'));
 				$frmLogin->show(false);
 
