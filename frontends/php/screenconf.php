@@ -19,14 +19,14 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/screens.inc.php');
-	require_once('include/forms.inc.php');
-	require_once('include/maps.inc.php');
+require_once('include/config.inc.php');
+require_once('include/screens.inc.php');
+require_once('include/forms.inc.php');
+require_once('include/maps.inc.php');
 
-	$page['title'] = 'S_SCREENS';
-	$page['file'] = 'screenconf.php';
-	$page['hist_arg'] = array('config');
+$page['title'] = 'S_SCREENS';
+$page['file'] = 'screenconf.php';
+$page['hist_arg'] = array('config');
 
 include_once('include/page_header.php');
 
