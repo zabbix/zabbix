@@ -180,7 +180,7 @@ include_once('include/page_header.php');
 				$action = AUDIT_ACTION_ADD;
 
 				DBstart();
-				$result = CUser::add($user);
+				$result = CUser::create($user);
 				if(!$result)
 					error(CUser::resetErrors());
 				// if($result) $result = CUserGroup::updateUsers(array('users' => $result, 'usrgrps' => $usrgrps));

@@ -368,7 +368,7 @@ class Cscript extends CZBXAPI{
  * @param array $script['hostid']
  * @return boolean
  */
-	public static function add($scripts){
+	public static function create($scripts){
 		$scripts = zbx_toArray($scripts);
 		$scriptids = array();
 

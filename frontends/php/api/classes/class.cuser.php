@@ -647,7 +647,7 @@ class CUser extends CZBXAPI{
  * @param string $users['user_medias']['period']
  * @return array|boolean
  */
-	public static function add($users){
+	public static function create($users){
 		global $USER_DETAILS;
 		$result = false;
 		$errors = array();
@@ -1133,9 +1133,22 @@ class CUser extends CZBXAPI{
 			return false;
 		}
 
-		foreach($users as $user){
-			foreach($medias as $media){
-				$result = add_media( $user['userid'], $media['mediatypeid'], $media['sendto'], $media['severity'], $media['active'], $media['period']);
+		foreach($users as $unum => $user){
+			foreach($medias as $mnum => $media){
+					if(!validate_period($media['period'])){
+						self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Incorrect time period');
+						return false;
+					}
+
+					$mediaid = get_dbid('media','mediaid');
+			
+					$sql='INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period) '.
+							' VALUES ('.$mediaid.','.$user['userid'].','.$media['mediatypeid'].','.
+										zbx_dbstr($media['sendto']).','.$media['active'].','.$media['severity'].','.
+										zbx_dbstr($media['period']).')';
+			
+					$result = DBexecute($sql);
+
 				if(!$result) break 2;
 			}
 		}
