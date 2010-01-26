@@ -322,7 +322,7 @@ static char	*get_if_type_string(DWORD type)
 		case IF_TYPE_ETHERNET_CSMACD:		return "Ethernet";
 		case IF_TYPE_ISO88025_TOKENRING:	return "Token Ring";
 		case IF_TYPE_PPP:			return "PPP";
-		case IF_TYPE_SOFTWARE_LOOPBACK:		return "Software Lookback";
+		case IF_TYPE_SOFTWARE_LOOPBACK:		return "Software Loopback";
 		case IF_TYPE_ATM:			return "ATM";
 		case IF_TYPE_IEEE80211:			return "IEEE 802.11 Wireless";
 		case IF_TYPE_TUNNEL:			return "Tunnel type encapsulation";
