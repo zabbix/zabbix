@@ -527,13 +527,6 @@
 	return TRUE;
 	}
 
-	function get_info_by_selementid($selementid,$view_status=0){
-		$db_element = get_sysmaps_element_by_selementid($selementid);
-		$info = get_info_by_selement($db_element,$view_status);
-
-	return $info;
-	}
-
 /*
  * Function: get_action_map_by_sysmapid
  *
@@ -725,9 +718,7 @@
 	return get_png_by_selement($selement);
 	}
 
-	function get_png_by_selement($selement, $info=null){
-		if(is_null($info))
-			$info = get_info_by_selement($selement);
+	function get_png_by_selement($selement, $info){
 
 		switch($info['icon_type']){
 			case SYSMAP_ELEMENT_ICON_ON:
