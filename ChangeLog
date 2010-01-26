@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1746] fixed problems viewing map element (Aly)
  - [ZBX-1763] applied patch with translation for some javascript strings (Aly)
  - [DEV-447,DEV-448] added support of net.if.* under Windows (Sasha)
  - [ZBX-1582] fixed processing ssh.run[...] check to avoid the server crashing on libssh2 timeout (Dmitry)
