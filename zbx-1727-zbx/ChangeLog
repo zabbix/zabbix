@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1810] fixed adding user media through API (Aly)
  - [ZBX-1783] fixed problem with fixed Y axis in graphs (Aly)
  - [ZBX-1654] fixed disabled trigger map icon (Aly)
  - [ZBX-1653] fixed link from maps to events (Aly)
