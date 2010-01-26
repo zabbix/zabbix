@@ -41,6 +41,7 @@ ZBX_METRIC	parameters_specific[]=
 	{"net.if.out",		CF_USEUPARAM,	NET_IF_OUT,		0,	"lo,bytes"},
 	{"net.if.total",	CF_USEUPARAM,	NET_IF_TOTAL,		0,	"lo,bytes"},
         {"net.if.collisions",   CF_USEUPARAM,   NET_IF_COLLISIONS,      0,      "lo"},
+	{"net.if.list",		0,		NET_IF_LIST,		0,	0},
 
 	{"vm.memory.size",	CF_USEUPARAM,	VM_MEMORY_SIZE,		0,	"free"},
 

@@ -45,6 +45,10 @@
 #	include "Wspiapi.h"
 #endif
 
+#ifdef HAVE_IPHLPAPI_H
+#	include <Iphlpapi.h>
+#endif
+
 #ifdef HAVE_WINDOWS_H
 #	include <windows.h>
 #endif
