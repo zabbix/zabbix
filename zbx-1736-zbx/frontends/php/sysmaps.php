@@ -84,7 +84,7 @@ include_once('include/page_header.php');
 			$result = DBend();
 
 			add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,'Name ['.$_REQUEST['name'].']');
-			show_messages($result,"Network map updated","Cannot update network map");
+			show_messages($result,S_MAP_UPDATED,S_CANNOT_UPDATE_MAP);
 		}
 		else {
 			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
@@ -98,7 +98,7 @@ include_once('include/page_header.php');
 			$result = DBend();
 
 			add_audit_if($result,AUDIT_ACTION_ADD,AUDIT_RESOURCE_MAP,'Name ['.$_REQUEST['name'].']');
-			show_messages($result,"Network map added","Cannot add network map");
+			show_messages($result,S_MAP_ADDED,S_CANNOT_ADD_MAP);
 		}
 		if($result){
 			unset($_REQUEST["form"]);
@@ -203,7 +203,7 @@ include_once('include/page_header.php');
 // goBox
 		$goBox = new CComboBox('go');
 		$goOption = new CComboItem('delete', S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm','Delete selected maps?');
+		$goOption->setAttribute('confirm',S_DELETE_SELECTED_MAPS_Q);
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!

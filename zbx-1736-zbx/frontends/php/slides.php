@@ -20,24 +20,24 @@
 ?>
 <?php
 
-	require_once('include/config.inc.php');
-	require_once('include/graphs.inc.php');
-	require_once('include/screens.inc.php');
-	require_once('include/blocks.inc.php');
+require_once('include/config.inc.php');
+require_once('include/graphs.inc.php');
+require_once('include/screens.inc.php');
+require_once('include/blocks.inc.php');
 
-	$page['title'] = 'S_CUSTOM_SCREENS';
-	$page['file'] = 'slides.php';
-	$page['hist_arg'] = array('config','elementid');
-	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.pmaster.js','class.calendar.js','gtlc.js');
+$page['title'] = 'S_CUSTOM_SCREENS';
+$page['file'] = 'slides.php';
+$page['hist_arg'] = array('config','elementid');
+$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.pmaster.js','class.calendar.js','gtlc.js');
 
-	$config = $_REQUEST['config'] = get_request('config', 1);
-	if($_REQUEST['config'] == 0) redirect('screens.php');
+$config = $_REQUEST['config'] = get_request('config', 1);
+if($_REQUEST['config'] == 0) redirect('screens.php');
 
-	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-	if(PAGE_TYPE_HTML == $page['type']){
-		define('ZBX_PAGE_DO_REFRESH', 1);
-	}
+if(PAGE_TYPE_HTML == $page['type']){
+	define('ZBX_PAGE_DO_REFRESH', 1);
+}
 
 include_once('include/page_header.php');
 
@@ -110,12 +110,28 @@ include_once('include/page_header.php');
 
 					if(!is_null($elementid)){
 						$effectiveperiod = navigation_bar_calc();
-
 						$step = get_request('upd_counter');
 
-						$element = get_slideshow($elementid, $step, $effectiveperiod);
+						$slideshow = get_slideshow_by_slideshowid($elementid);
+						$screen = get_slideshow($elementid, $step);
+
+						$element = get_screen($screen['screenid'],2,$effectiveperiod);
+
+						$refresh = get_profile('web.slides.rf_rate.hat_slides', 0, null, $elementid);
+						if($refresh == 0){
+							if($screen['delay'] > 0) $refresh = $screen['delay'];
+							else $refresh = $slideshow['delay'];
+						}
+
 						$element->show();
-						insert_js('timeControl.processObjects();');
+
+						$script = get_update_doll_script('mainpage', $_REQUEST['favid'], 'frequency', $refresh)."\n";
+						$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'restartDoll')."\n";
+						$script.= 'timeControl.processObjects();';
+						insert_js($script);
+					}
+					else{
+						print(SBR.S_NO_SLIDESHOWS_DEFINED);
 					}
 
 					break;
@@ -126,21 +142,21 @@ include_once('include/page_header.php');
 			if(str_in_array($_REQUEST['favid'],array('hat_slides'))){
 				$elementid = $_REQUEST['elementid'];
 
-				update_profile('web.slides.rf_rate.'.$_REQUEST['favid'],$_REQUEST['favcnt'], PROFILE_TYPE_INT, $elementid);
-				$_REQUEST['favcnt'] = get_profile('web.slides.rf_rate.'.$_REQUEST['favid'],30,null,$elementid);
+				update_profile('web.slides.rf_rate.hat_slides', $_REQUEST['favcnt'], PROFILE_TYPE_INT, $elementid);
 
-				$script = get_update_doll_script('mainpage', $_REQUEST['favid'], 'frequency', $_REQUEST['favcnt'])."\n";
-//				$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'url', 'slides.php?elementid='.$elementid.'&output=html'.url_param('stime').url_param('period'));
+				$script= get_update_doll_script('mainpage', $_REQUEST['favid'], 'frequency', $_REQUEST['favcnt'])."\n";
 				$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'stopDoll')."\n";
 				$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'startDoll')."\n";
-				print $script."\n";
+
 
 				$menu = array();
 				$submenu = array();
 
 				make_refresh_menu('mainpage', $_REQUEST['favid'],$_REQUEST['favcnt'],array('elementid'=> $elementid),$menu,$submenu);
 
-				print('page_menu["menu_'.$_REQUEST['favid'].'"] = '.zbx_jsvalue($menu['menu_'.$_REQUEST['favid']]).';');
+				$script.= 'page_menu["menu_'.$_REQUEST['favid'].'"] = '.zbx_jsvalue($menu['menu_'.$_REQUEST['favid']]).';'."\n";
+				
+				print($script);
 			}
 		}
 	}
@@ -152,18 +168,17 @@ include_once('include/page_header.php');
 <?php
 	$config = $_REQUEST['config'];
 
-	$_REQUEST['elementid'] = get_request('elementid',get_profile('web.screens.elementid', null));
-
+	$elementid = get_request('elementid',get_profile('web.slides.elementid', null));
 	if( 2 != $_REQUEST['fullscreen'] )
-		update_profile('web.screens.elementid',$_REQUEST['elementid']);
+		update_profile('web.slides.elementid',$elementid);
 
-	$effectiveperiod = navigation_bar_calc('web.screens',$_REQUEST['elementid']);
+	$effectiveperiod = navigation_bar_calc('web.slides',$elementid);
 ?>
 <?php
 	$slides_wdgt = new CWidget('hat_slides');
 
-	$elementid = get_request('elementid', null);
-	if($elementid <= 0) $elementid = null;
+	$elementid = get_request('elementid', 0);
+//	if($elementid <= 0) $elementid = null;
 
 	$text = S_SLIDESHOWS;
 
@@ -230,7 +245,6 @@ include_once('include/page_header.php');
 		validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
 
 		$available_groups = $PAGE_GROUPS['groupids'];
-//		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 		$available_hosts = $PAGE_HOSTS['hostids'];
 
 		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
@@ -253,15 +267,18 @@ include_once('include/page_header.php');
 	show_messages();
 
 	$slide_name = S_SLIDESHOW;
-	if(isset($elementid)){
-		if($element = get_slideshow_by_slideshowid($elementid)){
-			$slide_name = $element['name'];
-		}
+	if($element = get_slideshow_by_slideshowid($elementid)){
+		$slide_name = $element['name'];
 	}
 
 	$icon = null;
 	$fs_icon = null;
-	if(isset($elementid) && $element){
+	if($elementid && $element){
+		$screen = get_slideshow($elementid, 0);
+		if($screen['delay'] > 0) $element['delay'] = $screen['delay'];
+
+		update_profile('web.slides.rf_rate.hat_slides', 0, PROFILE_TYPE_INT, $elementid);
+		
 		if(infavorites('web.favorite.screenids',$elementid,'slideshowid')){
 			$icon = new CDiv(SPACE,'iconminus');
 			$icon->setAttribute('title',S_REMOVE_FROM.' '.S_FAVOURITES);
@@ -286,7 +303,7 @@ include_once('include/page_header.php');
 	$submenu = array();
 
 // js menu arrays
-	make_refresh_menu('mainpage','hat_slides',get_profile('web.slides.rf_rate.hat_slides',$element['delay'],$elementid),array('elementid'=> $elementid),$menu,$submenu);
+	make_refresh_menu('mainpage','hat_slides',$element['delay'],array('elementid'=> $elementid),$menu,$submenu);
 
 	insert_js('var page_menu='.zbx_jsvalue($menu).";\n".
 			 'var page_submenu='.zbx_jsvalue($submenu).";\n"
@@ -303,7 +320,7 @@ include_once('include/page_header.php');
 // Refresh tab
 	$refresh_tab = array(
 		array('id' => 'hat_slides',
-				'frequency' => get_profile('web.slides.rf_rate.hat_slides',$element['delay'],$elementid),
+				'frequency' => $element['delay'],
 				'url' => 'slides.php?elementid='.$elementid.url_param('stime').url_param('period').url_param('groupid').url_param('hostid'),
 				'params'=> array('lastupdate' => time()),
 			));
@@ -313,7 +330,7 @@ include_once('include/page_header.php');
 	$refresh_icon->addAction('onclick','javascript: create_page_menu(event,"hat_slides");');
 	$refresh_icon->setAttribute('title',S_MENU);
 
-	if(isset($elementid)){
+	if($elementid){
 		$effectiveperiod = navigation_bar_calc();
 		if( 2 != $_REQUEST['fullscreen'] ){
 // NAV BAR
@@ -330,7 +347,7 @@ include_once('include/page_header.php');
 
 			$dom_graph_id = 'iframe';
 			$objData = array(
-				'id' => $_REQUEST['elementid'],
+				'id' => $elementid,
 				'domid' => $dom_graph_id,
 				'loadSBox' => 0,
 				'loadImage' => 0,
@@ -343,7 +360,10 @@ include_once('include/page_header.php');
 			zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 			zbx_add_post_js('timeControl.processObjects();');
 		}
-		$element = get_slideshow($elementid, 0, $effectiveperiod);
+		
+//		$screen = get_slideshow($elementid, 0);
+//		$element = get_screen($screen['screenid'],2,$effectiveperiod);
+		$element = new CSpan(S_LOADING_P,'textcolorstyles');
 	}
 	else{
 		$element = new CSpan(S_LOADING_P,'textcolorstyles');
@@ -363,9 +383,14 @@ include_once('include/page_header.php');
 	$scroll_div->setAttribute('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
 	$scroll_div->show();
 
+	print(SBR);
+
 	$jsmenu = new CPUMenu(null,170);
 	$jsmenu->InsertJavaScript();
 
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>

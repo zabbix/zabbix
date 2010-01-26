@@ -512,9 +512,9 @@ class zbxXML{
 				if(isset($host_db['proxy_hostid'])){
 					$proxy_exists = CHost::get(array('hostids' => $host_db['proxy_hostid']));
 					if(empty($proxy_exists))
-						$host_db['proxy_hostid'] = 0;						
+						$host_db['proxy_hostid'] = 0;
 				}
-				
+
 				if(!isset($host_db['status'])) $host_db['status'] = HOST_STATUS_TEMPLATE;
 				if($host_db['status'] == HOST_STATUS_TEMPLATE){
 					$current_host = CTemplate::getObjects(array('template' => $host_db['host']));
@@ -739,7 +739,7 @@ class zbxXML{
 						}
 
 						if(!empty($applications_to_add)){
-							$new_applications = CApplication::add($applications_to_add);
+							$new_applications = CApplication::create($applications_to_add);
 							if($new_applications === false){
 								error(CApplication::resetErrors());
 								$result = false;
@@ -763,7 +763,7 @@ class zbxXML{
 						if(!$current_item && isset($rules['item']['missed'])){
 							$item_db['hostid'] = $current_host['hostid'];
 
-							$current_item = CItem::add($item_db);
+							$current_item = CItem::create($item_db);
 							if($current_item === false){
 								error(CItem::resetErrors());
 								$result = false;
@@ -816,7 +816,7 @@ class zbxXML{
 					}
 
 					if(!empty($triggers_to_add)){
-						$added_triggers = CTrigger::add($triggers_to_add);
+						$added_triggers = CTrigger::create($triggers_to_add);
 						if($added_triggers === false){
 							error(CTrigger::resetErrors());
 							$result = false;
@@ -846,7 +846,7 @@ class zbxXML{
 					foreach($graphs as $gnum=> $graph){
 						$graph_db = self::mapXML2arr($graph, XML_TAG_GRAPH);
 						$graph_db['hostid'] = $current_host['hostid'];
-						
+
 						$current_graph = CGraph::getObjects($graph_db);
 						$current_graph = reset($current_graph);
 
@@ -910,7 +910,7 @@ class zbxXML{
 							$gitem_hostid = CHost::getObjects(array('host' => $gitem_host));
 							$gitem_templateid = CTemplate::getObjects(array('template' => $gitem_host));
 							$gitem_hostid = array_merge($gitem_hostid, $gitem_templateid);
-							
+
 							if(!empty($gitem_hostid)){
 
 								$gitem_hostid = reset($gitem_hostid);
@@ -932,7 +932,7 @@ class zbxXML{
 						$graphs_to_add[] = $graph_db;
 					}
 //sdii($graphs_to_add);
-					$r = CGraph::add($graphs_to_add);
+					$r = CGraph::create($graphs_to_add);
 					if($r === false){
 						error(CGraph::resetErrors());
 						$result = false;

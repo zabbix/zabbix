@@ -359,7 +359,7 @@ include_once('include/page_header.php');
 			$description = expand_trigger_description($triggerid);
 			if($trigger['templateid'] != 0){
 				unset($triggers[$tnum]);
-				error('Cannot delete trigger [ '.$description.' ] (Templated trigger)');
+				error(S_CANNOT_DELETE_TRIGGER.' [ '.$description.' ] ('.S_TEMPLATED_TRIGGER.')');
 				continue;
 			}
 
@@ -648,23 +648,23 @@ include_once('include/page_header.php');
 //----- GO ------
 		$goBox = new CComboBox('go');
 		$goOption = new CComboItem('activate',S_ACTIVATE_SELECTED);
-		$goOption->setAttribute('confirm','Enable selected triggers?');
+		$goOption->setAttribute('confirm',S_ENABLE_SELECTED_TRIGGERS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
-		$goOption->setAttribute('confirm','Disable selected triggers?');
+		$goOption->setAttribute('confirm',S_DISABLE_SELECTED_TRIGGERS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('massupdate',S_MASS_UPDATE);
-		$goOption->setAttribute('confirm','Mass update selected triggers?');
+		$goOption->setAttribute('confirm',S_MASS_UPDATE_SELECTED_TRIGGERS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('copy_to',S_COPY_SELECTED_TO);
-		$goOption->setAttribute('confirm','Copy selected triggers?');
+		$goOption->setAttribute('confirm',S_COPY_SELECTED_TRIGGERS_Q);
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
-		$goOption->setAttribute('confirm','Delete selected triggerers?');
+		$goOption->setAttribute('confirm',S_DELETE_SELECTED_TRIGGERS_Q);
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!

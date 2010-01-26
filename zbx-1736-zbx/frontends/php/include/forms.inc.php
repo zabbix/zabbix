@@ -67,7 +67,7 @@
 		$form->addRow(S_UPDATE_INTERVAL_IN_SEC, $delayBox);
 
 		$tblSteps = new CTableInfo(S_NO_SLIDES_DEFINED);
-		$tblSteps->setHeader(array(S_SCREEN, SPACE));
+		$tblSteps->setHeader(array(S_SCREEN, S_DELAY, S_SORT));
 		if(count($steps) > 0){
 			ksort($steps);
 			$first = min(array_keys($steps));
@@ -100,6 +100,7 @@
 
 			$tblSteps->addRow(array(
 				array(new CCheckBox('sel_step[]',null,null,$sid), $name),
+				$s['delay'],
 				array($up, isset($up) && isset($down) ? SPACE : null, $down)
 				));
 		}
@@ -108,12 +109,13 @@
 		$form->addRow(S_SLIDES, array(
 			$tblSteps,
 			!isset($new_step) ? new CButton('add_step_bttn',S_ADD,
-				"return create_var('".$form->GetName()."','add_step',1, true);") : null,
+				"return create_var('".$form->getName()."','add_step',1, true);") : null,
 			(count($steps) > 0) ? new CButton('del_sel_step',S_DELETE_SELECTED) : null
 			));
 
 		if(isset($new_step)){
 			if( !isset($new_step['screenid']) )	$new_step['screenid'] = 0;
+			if( !isset($new_step['delay']) )	$new_step['delay'] = 0;
 
 			if( isset($new_step['sid']) )
 				$form->addVar('new_step[sid]',$new_step['sid']);
@@ -123,6 +125,8 @@
 			$screen_data = get_screen_by_screenid($new_step['screenid']);
 
 			$form->addRow(S_NEW_SLIDE, array(
+					S_DELAY,
+					new CNumericBox('new_step[delay]', $new_step['delay'], 5), BR(),
 					new CTextBox('screen_name', $screen_data['name'], 40, 'yes'),
 					new CButton('select_screen',S_SELECT,
 						'return PopUp("popup.php?dstfrm='.$form->GetName().'&srctbl=screens'.
@@ -615,7 +619,7 @@
 		if(isset($userid)){
 /*			if(bccomp($userid,$USER_DETAILS['userid'])==0) $profile = 1;*/
 			$options = array(
-					'userids' => $userid,  
+					'userids' => $userid,
 					'extendoutput' => 1
 				);
 			if($profile) $options['nodeids'] = id2nodeid($userid);
@@ -1376,7 +1380,8 @@
 		foreach(array(ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE,
 			ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_TRAPPER,
 			ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_HTTPTEST,
-			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET) as $it)
+			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+			ITEM_TYPE_CALCULATED) as $it)
 				$cmbType->addItem($it, item_type2str($it));
 		$col_table2->addRow(array(bold(S_TYPE.': '), $cmbType));
 
@@ -1805,6 +1810,14 @@
 			if (0 == strncmp($params, "DSN=<database source name>", 26))
 				$params = '';
 			break;
+		default:
+			if ($key == 'db.odbc.select[<unique short description>]' ||
+					$key == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]' ||
+					$key == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]')
+				$key = '';
+			if (0 == strncmp($params, "DSN=<database source name>", 26))
+				$params = '';
+			break;
 		}
 
 		if(isset($_REQUEST['itemid'])){
@@ -1943,7 +1956,8 @@
 			foreach(array(ITEM_TYPE_ZABBIX,ITEM_TYPE_ZABBIX_ACTIVE,ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_SNMPV1,ITEM_TYPE_SNMPV2C,ITEM_TYPE_SNMPV3,ITEM_TYPE_TRAPPER,
 				ITEM_TYPE_INTERNAL,ITEM_TYPE_AGGREGATE,ITEM_TYPE_EXTERNAL,
-				ITEM_TYPE_DB_MONITOR,ITEM_TYPE_IPMI,ITEM_TYPE_SSH,ITEM_TYPE_TELNET) as $it)
+				ITEM_TYPE_DB_MONITOR,ITEM_TYPE_IPMI,ITEM_TYPE_SSH,ITEM_TYPE_TELNET,
+				ITEM_TYPE_CALCULATED) as $it)
 					$cmbType->addItem($it,item_type2str($it));
 			$frmItem->addRow(S_TYPE, $cmbType);
 		}
@@ -2043,6 +2057,8 @@
 
 			if (ITEM_TYPE_DB_MONITOR == $type)
 				$frmItem->addRow(S_PARAMS, new CTextArea('params',$params,60,4));
+			else if (ITEM_TYPE_CALCULATED == $type)
+				$frmItem->addRow(S_EXPRESSION, new CTextArea('params',$params,60,4));
 			else
 				$frmItem->addVar('params',$params);
 		}
@@ -2912,9 +2928,9 @@
 
 		if(isset($_REQUEST['graphid'])){
 			$frmGraph->addVar('graphid', $_REQUEST['graphid']);
-			
+
 			$options = array(
-						'graphids' => $_REQUEST['graphid'], 
+						'graphids' => $_REQUEST['graphid'],
 						'extendoutput' => 1
 					);
 			$graphs = CGraph::get($options);
@@ -2942,8 +2958,8 @@
 			$percent_right = $row['percent_right'];
 
 			$options = array(
-						'graphids' => $_REQUEST['graphid'], 
-						'sortfield' => 'sortorder', 
+						'graphids' => $_REQUEST['graphid'],
+						'sortfield' => 'sortorder',
 						'extendoutput' => 1
 					);
 
@@ -3012,14 +3028,20 @@
 		}
 
 		$icount = count($items);
-		for($i=0; $i < $icount-1; $i++){
-			if($items[$i]['sortorder'] == $items[$i+1]['sortorder'])
-				for($j=$i+1; $j < $icount; $j++)
+		for($i=0; $i < $icount-1;){
+// check if we deletd an item
+			$next = $i+1;
+			while(!isset($items[$next]) && ($next < ($icount-1))) $next++;
+
+			if(isset($items[$next]) && ($items[$i]['sortorder'] == $items[$next]['sortorder']))
+				for($j=$next; $j < $icount; $j++)
 					if($items[$j-1]['sortorder'] >= $items[$j]['sortorder']) $items[$j]['sortorder']++;
+
+			$i = $next;
 		}
 
 		asort_by_key($items, 'sortorder');
-			
+
 		$items = array_values($items);
 
 		$group_gid = get_request('group_gid', array());
@@ -3620,7 +3642,7 @@
 		$new_timeperiod = get_request('new_timeperiod', array());
 
 		$new = is_array($new_timeperiod);
-		
+
 		if(is_array($new_timeperiod) && isset($new_timeperiod['id'])){
 			$tblPeriod->addItem(new Cvar('new_timeperiod[id]',$new_timeperiod['id']));
 		}
@@ -5425,7 +5447,7 @@
 					new CVisibilityBox('visible[useipmi]', isset($visible['useipmi']), 'useipmi', S_ORIGINAL), S_USEIPMI),
 					new CCheckBox('useipmi', $useipmi, 'submit()')
 				);
-				
+
 		if($useipmi == 'yes'){
 			$frmHost->addRow(array(
 				new CVisibilityBox('visible[ipmi_ip]', isset($visible['ipmi_ip']), 'ipmi_ip', S_ORIGINAL), S_IPMI_IP_ADDRESS),
@@ -5581,6 +5603,9 @@
 		global $USER_DETAILS;
 
 		$host_groups = get_request('groups', array());
+		if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0) && !uint_in_array($_REQUEST['groupid'], $host_groups)){
+			array_push($host_groups, $_REQUEST['groupid']);
+		}
 
 		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
 

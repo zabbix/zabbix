@@ -40,6 +40,7 @@
 #include "checks_ssh.h"
 #endif	/* HAVE_SSH2 */
 #include "checks_telnet.h"
+#include "checks_calculated.h"
 
 #define MAX_ITEMS	64
 
@@ -121,9 +122,15 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			}
 			break;
 		case ITEM_TYPE_AGGREGATE:
-			alarm(CONFIG_TIMEOUT);
 			res = get_value_aggregate(item, result);
-			alarm(0);
+
+			if (SUCCEED != res && GET_MSG_RESULT(result))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
+						item->host.host, item->key_orig, result->msg);
+				zabbix_syslog("Item [%s:%s] error: %s",
+						item->host.host, item->key_orig, result->msg);
+			}
 			break;
 		case ITEM_TYPE_EXTERNAL:
 			alarm(CONFIG_TIMEOUT);
@@ -140,9 +147,11 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			break;
 		case ITEM_TYPE_SSH:
 #ifdef HAVE_SSH2
-			alarm(CONFIG_TIMEOUT);
+			/* Cannot use "alarming" since it breaks down libssh2 and our process terminates. */
+			/* libssh2 has its own default timeout == 60 and it should not hang on under usual circumstances. */
+			/* alarm(CONFIG_TIMEOUT); */
 			res = get_value_ssh(item, result);
-			alarm(0);
+			/* alarm(0); */
 #else
 			SET_MSG_RESULT(result, strdup("Support of SSH parameters was not compiled in"));
 			res = NOTSUPPORTED;
@@ -160,6 +169,17 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			alarm(CONFIG_TIMEOUT);
 			res = get_value_telnet(item, result);
 			alarm(0);
+
+			if (SUCCEED != res && GET_MSG_RESULT(result))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
+						item->host.host, item->key_orig, result->msg);
+				zabbix_syslog("Item [%s:%s] error: %s",
+						item->host.host, item->key_orig, result->msg);
+			}
+			break;
+		case ITEM_TYPE_CALCULATED:
+			res = get_value_calculated(item, result);
 
 			if (SUCCEED != res && GET_MSG_RESULT(result))
 			{

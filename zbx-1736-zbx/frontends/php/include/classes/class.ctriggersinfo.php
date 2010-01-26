@@ -122,7 +122,7 @@ class CTriggersInfo extends CTable{
 			else{
 				$header_str.= S_ALL_GROUPS;
 			}
-		
+
 			$header = new CCol($header_str,"header");
 			if($this->style == STYLE_HORISONTAL)
 				$header->SetColspan(7);

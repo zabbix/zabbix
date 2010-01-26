@@ -99,10 +99,10 @@ class CMap extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
-		
+
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
-			
+
 			if(!is_null($options['select_selements'])){
 				$options['select_selements'] = API_OUTPUT_EXTEND;
 			}
@@ -110,8 +110,8 @@ class CMap extends CZBXAPI{
 				$options['select_links'] = API_OUTPUT_EXTEND;
 			}
 		}
-		
-		
+
+
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
@@ -407,7 +407,7 @@ SDI('///////////////////////////////////////');
  * @param int $maps['label_location']
  * @return boolean | array
  */
-	public static function add($maps){
+	public static function create($maps){
 		$errors = array();
 		$result_maps = array();
 		$result = true;

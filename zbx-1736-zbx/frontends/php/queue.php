@@ -68,7 +68,8 @@ include_once "include/page_header.php";
 			ITEM_TYPE_SIMPLE,
 			ITEM_TYPE_INTERNAL,
 			ITEM_TYPE_AGGREGATE,
-			ITEM_TYPE_EXTERNAL);
+			ITEM_TYPE_EXTERNAL,
+			ITEM_TYPE_CALCULATED);
 	$zbx_item_types = array(
 			ITEM_TYPE_ZABBIX);
 	$snmp_item_types = array(
@@ -90,7 +91,8 @@ include_once "include/page_header.php";
 			ITEM_TYPE_SIMPLE,
 			ITEM_TYPE_INTERNAL,
 			ITEM_TYPE_AGGREGATE,
-			ITEM_TYPE_EXTERNAL);
+			ITEM_TYPE_EXTERNAL,
+			ITEM_TYPE_CALCULATED);
 
 	$result = DBselect('SELECT i.itemid,i.lastclock,i.description,i.key_,i.type,h.host,h.hostid,h.proxy_hostid,i.delay,i.delay_flex'.
 		' FROM items i,hosts h'.

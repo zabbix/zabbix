@@ -109,24 +109,24 @@ require_once('include/items.inc.php');
 			}
 
 			$item_args = array(
-				'description'	=> $item['description'],
+				'description'		=> $item['description'],
 				'key_'			=> $item['key_'],
 				'hostid'		=> $hostid,
 				'delay'			=> $delay,
 				'type'			=> ITEM_TYPE_HTTPTEST,
-				'snmp_community'=> '',
+				'snmp_community'=>	'',
 				'snmp_oid'		=> '',
-				'value_type'	=> $item['type'],
+				'value_type'		=> $item['type'],
 				'data_type'		=> ITEM_DATA_TYPE_DECIMAL,
-				'trapper_hosts'	=> 'localhost',
+				'trapper_hosts'		=> 'localhost',
 				'snmp_port'		=> 161,
 				'units'			=> $item['units'],
-				'multiplier'	=> 0,
+				'multiplier'		=> 0,
 				'snmpv3_securityname'	=> '',
 				'snmpv3_securitylevel'	=> 0,
 				'snmpv3_authpassphrase'	=> '',
 				'snmpv3_privpassphrase'	=> '',
-				'formula'			=> 0,
+				'formula'		=> 0,
 				'logtimefmt'		=> '',
 				'delay_flex'		=> '',
 				'authtype'		=> 0,
@@ -134,7 +134,7 @@ require_once('include/items.inc.php');
 				'password'		=> '',
 				'publickey'		=> '',
 				'privatekey'		=> '',
-				'params'			=> '',
+				'params'		=> '',
 				'ipmi_sensor'		=> '',
 				'applications'		=> array($applicationid));
 
@@ -369,7 +369,7 @@ require_once('include/items.inc.php');
 	function add_httptest($hostid, $application, $name, $authentication, $http_user, $http_password, $delay, $status, $agent, $macros, $steps){
 		$result = db_save_httptest(null, $hostid, $application, $name, $authentication, $http_user, $http_password, $delay, $status, $agent, $macros, $steps);
 
-		if($result) info("Sceanrio '".$name."' added");
+		if($result) info("Scenario '".$name."' added");
 
 	return $result;
 	}
@@ -377,7 +377,7 @@ require_once('include/items.inc.php');
 	function update_httptest($httptestid, $hostid, $application, $name, $authentication, $http_user, $http_password, $delay, $status, $agent, $macros, $steps){
 		$result = db_save_httptest($httptestid, $hostid, $application, $name, $authentication, $http_user, $http_password, $delay, $status, $agent, $macros, $steps);
 
-		if($result)	info("Sceanrio '".$name."' updated");
+		if($result)	info("Scenario '".$name."' updated");
 
 	return $result;
 	}
@@ -429,7 +429,7 @@ require_once('include/items.inc.php');
 		if(!DBexecute('DELETE FROM httptest WHERE '.DBcondition('httptestid',$httptestids))) return false;
 
 		foreach($httptests as $id => $httptest){
-			info("Sceanrio '".$httptest["name"]."' deleted");
+			info("Scenario '".$httptest["name"]."' deleted");
 		}
 
 	return true;

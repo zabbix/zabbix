@@ -360,7 +360,7 @@
 		}
 
 		$selementid = get_dbid('sysmaps_elements','selementid');
-					
+
 		$result = DBexecute('INSERT INTO sysmaps_elements '.
 							'(selementid,sysmapid,elementid,elementtype,label,label_location,'.
 							'iconid_off,iconid_on,iconid_unknown,iconid_maintenance,iconid_disabled,x,y,url)'.
@@ -527,13 +527,6 @@
 	return TRUE;
 	}
 
-	function get_info_by_selementid($selementid,$view_status=0){
-		$db_element = get_sysmaps_element_by_selementid($selementid);
-		$info = get_info_by_selement($db_element,$view_status);
-
-	return $info;
-	}
-
 /*
  * Function: get_action_map_by_sysmapid
  *
@@ -568,7 +561,7 @@
 		}
 
 		$scripts_by_hosts = CScript::getScriptsByHosts($hostids);
-		
+
 		$options = array(
 			'nodeids' => get_current_nodeid(true),
 			'hostids' => $hostids,
@@ -725,9 +718,7 @@
 	return get_png_by_selement($selement);
 	}
 
-	function get_png_by_selement($selement, $info=null){
-		if(is_null($info))
-			$info = get_info_by_selement($selement);
+	function get_png_by_selement($selement, $info){
 
 		switch($info['icon_type']){
 			case SYSMAP_ELEMENT_ICON_ON:
@@ -1456,8 +1447,10 @@
 					$msg = S_PROBLEM_BIG;
 					if($info[$info['type']]['count'] > 1)
 						$msg = $info[$info['type']]['count'].' '.S_PROBLEMS;
-					else if(isset($info[$info['type']]['info']))
-						$msg = $info[$info['type']]['info'];
+					else 
+						$msg = $info[$info['type']]['count'].' '.S_PROBLEM;
+//					else if(isset($info[$info['type']]['info']))
+//						$msg = $info[$info['type']]['info'];
 
 
 					$info['info'] = array();

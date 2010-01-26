@@ -543,7 +543,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',get_profile('web.actionconf
 			}
 			else{
 				$status= new CLink(S_ENABLED,
-					'actionconf.php?go=disable=1&g_actionid%5B%5D='.$action['actionid'].url_param('eventsource'),
+					'actionconf.php?go=disable&g_actionid%5B%5D='.$action['actionid'].url_param('eventsource'),
 					'enabled');
 			}
 

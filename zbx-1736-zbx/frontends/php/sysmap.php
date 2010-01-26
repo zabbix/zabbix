@@ -144,10 +144,10 @@ include_once('include/page_header.php');
 					break;
 				case 'save':
 					$options = array(
-							'sysmapids'=> $sysmapid, 
-							'editable'=>1, 
-							'extendoutput'=>1, 
-							'select_selements'=>1, 
+							'sysmapids'=> $sysmapid,
+							'editable'=>1,
+							'extendoutput'=>1,
+							'select_selements'=>1,
 							'select_links'=>1
 						);
 					$sysmaps = CMap::get($options);
@@ -218,11 +218,11 @@ include_once('include/page_header.php');
 					$result = DBend(true);
 
 					if($result){
-						print('if(Confirm("Map is saved! Return?")){ location.href = "sysmaps.php"; }');
+						print('if(Confirm("'.S_MAP_SAVED_RETURN_Q.'")){ location.href = "sysmaps.php"; }');
 						ob_flush();
 					}
 					else{
-						$msg = 'Map save operation failed.'."\n\r";
+						$msg = S_MAP_SAVE_OPERATION_FAILED."\n\r";
 						$msg.= ob_get_contents();
 						ob_get_clean();
 						print('INFO('.zbx_jsvalue($msg).');');
@@ -253,7 +253,7 @@ include_once('include/page_header.php');
 						print($action);
 					}
 					else{
-						print('ZBX_SYSMAPS['.$cmapid.'].map.info("Get Img: Element data not found!"); ');
+						print('ZBX_SYSMAPS['.$cmapid.'].map.info("'.S_GET_IMG_ELEMENT_DATA_NOT_FOUND.'"); ');
 					}
 				break;
 				case 'new_selement':
@@ -278,7 +278,7 @@ include_once('include/page_header.php');
 						print($action);
 					}
 					else{
-						print('ZBX_SYSMAPS['.$cmapid.'].map.info("Get Img: Element data not found!"); ');
+						print('ZBX_SYSMAPS['.$cmapid.'].map.info("'.S_GET_IMG_ELEMENT_DATA_NOT_FOUND.'"); ');
 					}
 				break;
 			}

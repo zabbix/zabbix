@@ -409,9 +409,9 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 			if(granted2update_group($usrgrpid)){
 
 				$next_gui_auth = ($usrgrp['gui_access']+1 > GROUP_GUI_ACCESS_DISABLED)?GROUP_GUI_ACCESS_SYSTEM:($usrgrp['gui_access']+1);
-							
+
 				$gui_access = new CLink(
-									$gui_access, 
+									$gui_access,
 									'usergrps.php?go=set_gui_access&set_gui_access='.$next_gui_auth.'&usrgrpid='.$usrgrpid,
 									$gui_access_style
 								);
@@ -426,10 +426,10 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 			}
 
 			if(isset($usrgrp['users'])){
-			
+
 				$usrgrpusers = $usrgrp['users'];
 				order_result($usrgrpusers, 'alias');
-				
+
 				$users = array();
 				foreach($usrgrpusers as $unum => $user){
 				$user_type_style = 'enabled';
@@ -439,7 +439,7 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 				$user_status_style = 'enabled';
 				if(GROUP_GUI_ACCESS_DISABLED == $user['gui_access']) $user_status_style = 'disabled';
 				if(GROUP_STATUS_DISABLED == $user['users_status']) $user_status_style = 'disabled';
-				
+
 
 				$users[] = new CLink($user['alias'],'users.php?form=update&userid='.$user['userid'], $user_status_style);//, $user_type_style);
 					$users[] = ', ';

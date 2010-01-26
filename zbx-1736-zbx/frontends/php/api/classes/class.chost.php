@@ -132,10 +132,10 @@ class CHost extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
-		
+
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
-			
+
 			if(!is_null($options['select_groups'])){
 				$options['select_groups'] = API_OUTPUT_EXTEND;
 			}
@@ -161,8 +161,8 @@ class CHost extends CZBXAPI{
 				$options['select_profile'] = API_OUTPUT_EXTEND;
 			}
 		}
-		
-		
+
+
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
@@ -1092,15 +1092,10 @@ class CHost extends CZBXAPI{
 
 
 // UPDATE MACROS {{{
-
 			if(isset($data['macros']) && !is_null($data['macros'])){
 				$host_macros = CUserMacro::get(array('hostids' => $hostids, 'extendoutput' => 1));
 
-				$result = self::massAdd(array('hosts' => $hosts, 'macros' => $data['macros']));
-				if(!$result){
-					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant add macro');
-				}
-
+				
 				$macros_to_del = array();
 				foreach($host_macros as $hmacro){
 					$del = true;
@@ -1114,12 +1109,21 @@ class CHost extends CZBXAPI{
 						$macros_to_del[] = $hmacro;
 					}
 				}
-
 				if(!empty($macros_to_del)){
 					$result = self::massRemove(array('hosts' => $hosts, 'macros' => $macros_to_del));
 					if(!$result){
 						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant remove macro');
 					}
+				}
+				
+				$result = CUsermacro::massUpdate(array('hosts' => $hosts, 'macros' => $data['macros']));
+				if(!$result){
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cannot update macro');
+				}
+				
+				$result = self::massAdd(array('hosts' => $hosts, 'macros' => $data['macros']));
+				if(!$result){
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cannot add macro');
 				}
 			}
 

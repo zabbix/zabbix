@@ -304,19 +304,19 @@
 
 //----- GO ------
 		$goBox = new CComboBox('go');
-		
+
 		$goOption = new CComboItem('activate',S_ACTIVATE_SELECTED);
 		$goOption->setAttribute('confirm',S_ENABLE_SELECTED_PROXIES);
 		$goBox->addItem($goOption);
-		
+
 		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
 		$goOption->setAttribute('confirm',S_DISABLE_SELECTED_PROXIES);
 		$goBox->addItem($goOption);
-		
+
 		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
 		$goOption->setAttribute('confirm',S_DELETE_SELECTED_PROXIES);
 		$goBox->addItem($goOption);
-		
+
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton', S_GO.' (0)');
 		$goButton->setAttribute('id', 'goButton');
