@@ -1682,7 +1682,18 @@
 			$infos = getSelementsInfo($map['selements']);
 
 			foreach($infos as $inum => $inf){
-				$info['type'] = $inf['type'];
+
+				if(!isset($info['type'])){
+					$info['type'] = $inf['type'];
+				}
+				else if($inf['type'] == TRIGGER_VALUE_TRUE){
+					$info['type'] = $inf['type'];
+				}
+				else if($info['type'] != TRIGGER_VALUE_TRUE){
+					if(($info['type'] == TRIGGER_VALUE_FALSE) || ($inf['type'] == TRIGGER_VALUE_UNKNOWN)){
+						$info['type'] = $inf['type'];
+					}
+				}
 
 //				$info['triggers'] += $inf['triggers'];
 				$info['triggers'] = array_merge($info['triggers'], $inf['triggers']);
@@ -1695,8 +1706,9 @@
 					$info[$info['type']]['info'] = $inf['info'];
 				}
 			}
-
+//SDII($info);
 			$count = count($info['triggers']);
+
 			if($count > 0){
 				$info[TRIGGER_VALUE_TRUE]['count'] = $count;
 
@@ -1709,7 +1721,9 @@
 								' AND i.itemid=f.itemid '.
 								' AND f.triggerid=t.triggerid';
 					$db_trigger = DBfetch(DBselect($sql));
-					$info[TRIGGER_VALUE_TRUE]['info'] = expand_trigger_description_by_data($db_trigger);
+					
+					$info[TRIGGER_VALUE_TRUE]['info'] = array();
+					$info[TRIGGER_VALUE_TRUE]['info'][] = array('msg' => expand_trigger_description_by_data($db_trigger));
 				}
 			}
 
@@ -1722,9 +1736,14 @@
 				$msg = S_PROBLEM_BIG;
 				if($info[$info['type']]['count'] > 1)
 					$msg = $info[$info['type']]['count'].' '.S_PROBLEMS;
-				else if(isset($info[$info['type']]['info']))
-					$msg = $info[$info['type']]['info'];
-
+				else if(isset($info[$info['type']]['info'])){
+					if($tmp = reset($info[$info['type']]['info'])){
+						$msg = $tmp['msg'];
+					}
+					else{
+						$msg = '';
+					}
+				}
 
 				$info['info'] = array();
 				$info['info'][] = array('msg'=>$msg, 'color'=>$color);
@@ -1806,8 +1825,13 @@
 
 			$info['name'] = S_IMAGE;
 
-			$info['type'] = TRIGGER_VALUE_TRUE;
+			$info['type'] = TRIGGER_VALUE_FALSE;
+
 			$info['info'] = array();
+			$info['info'][] = array(
+								'msg'=>'',
+								'color'=>$colors['Black']
+							);
 
 			$info['count'] = 0;
 			$info['priority'] = 0;
