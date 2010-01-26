@@ -341,7 +341,7 @@ submitGo: function(e){
 		return true;
 	}
 	else{
-		alert('No elements selected!');
+		alert(locale['S_NO_ELEMENTS_SELECTES']);
 		Event.stop(e);
 		return false;
 	}
@@ -420,7 +420,7 @@ createBox: function(obj, hint_text, width, className, byClick){
 	if(byClick){
 		close_link = '<div class="link" '+
 						'style="text-align: right; border-bottom: 1px #333 solid;" '+
-						'onclick="javascript: hintBox.hide(event, \''+boxid+'\');">Close</div>';
+						'onclick="javascript: hintBox.hide(event, \''+boxid+'\');">'+locale['S_CLOSE']+'</div>';
 	}
 
 	box.innerHTML = close_link + hint_text;
