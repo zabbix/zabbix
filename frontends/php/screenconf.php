@@ -111,7 +111,7 @@ include_once('include/page_header.php');
 					access_deny();
 
 //				DBstart();
-				$result = CScreen::add(array('name' => $_REQUEST['name'], 'hsize' => $_REQUEST['hsize'], 'vsize' => $_REQUEST['vsize']));
+				$result = CScreen::create(array('name' => $_REQUEST['name'], 'hsize' => $_REQUEST['hsize'], 'vsize' => $_REQUEST['vsize']));
 				if(!$result){
 					error(CScreen::resetErrors());
 				}

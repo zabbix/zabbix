@@ -498,7 +498,7 @@ class CGraph extends CZBXAPI{
  * @param array $graphs multidimensional array with graphs data
  * @return boolean
  */
-	public static function add($graphs){
+	public static function create($graphs){
 		$graphs = zbx_toArray($graphs);
 		$graphids = array();
 
