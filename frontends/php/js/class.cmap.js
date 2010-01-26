@@ -828,7 +828,6 @@ update_mapimg: function(){
 set_mapimg: function(resp){
 	this.debug('set_mapimg');
 
-//SDI(resp.responseText);
 	if(is_null(this.mapimg)){
 		this.mapimg = $('sysmap_img');
 //		this.container.appendChild(this.mapimg);
@@ -2446,6 +2445,25 @@ saveForm_selement: function(e){
 // Element
 		params.elementid = this.selementForm.elementid.value;
 		params.elementName = this.selementForm.elementName.value;
+
+		if(params.elementid == 0){
+			switch(params.elementtype.toString()){
+//host
+				case '0': this.info('Host is not selected.'); break;
+//map
+				case '1': this.info('Map is not selected.'); break;
+//tr
+				case '2': this.info('Trigger is not selected.'); break;
+//hg
+				case '3': this.info('Host group is not selected.'); break;
+// image
+				case '4':
+				default:
+			}
+
+			return false;
+		}
+
 		
 // Icon OK
 		params.iconid_off = this.selementForm.iconid_off.options[this.selementForm.iconid_off.selectedIndex].value;
