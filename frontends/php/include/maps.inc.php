@@ -138,51 +138,8 @@
 	return	$result;
 	}
 
-// Add System Map
-
-	function add_sysmap($name,$width,$height,$backgroundid,$highlight,$label_type,$label_location){
-		$sysmapid=get_dbid('sysmaps','sysmapid');
-
-		$result=DBexecute('insert into sysmaps (sysmapid,name,width,height,backgroundid,highlight,label_type,label_location)'.
-			' VALUES ('.$sysmapid.','.zbx_dbstr($name).','.$width.','.$height.','.$backgroundid.','.$highlight.','.$label_type.','.$label_location.')');
-
-		if(!$result)
-			return $result;
-
-	return $sysmapid;
-	}
-
-// Update System Map
-
-	function update_sysmap($sysmapid,$name,$width,$height,$backgroundid,$highlight,$label_type,$label_location){
-		return	DBexecute('UPDATE sysmaps SET name='.zbx_dbstr($name).',width='.$width.',height='.$height.','.
-			'backgroundid='.$backgroundid.',highlight='.$highlight.',label_type='.$label_type.','.
-			'label_location='.$label_location.' WHERE sysmapid='.$sysmapid);
-	}
-
-// Delete System Map
-
-	function delete_sysmap($sysmapids){
-		zbx_value2array($sysmapids);
-
-		$result = delete_sysmaps_elements_with_sysmapid($sysmapids);
-		if(!$result)	return	$result;
-
-		$res=DBselect('SELECT linkid FROM sysmaps_links WHERE '.DBcondition('sysmapid',$sysmapids));
-		while($rows = DBfetch($res)){
-			$result&=delete_link($rows['linkid']);
-		}
-
-		$result = DBexecute('DELETE FROM sysmaps_elements WHERE '.DBcondition('sysmapid',$sysmapids));
-		$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.sysmapids' AND source='sysmapid' AND ".DBcondition('value_id',$sysmapids));
-		$result &= DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid',$sysmapids).' AND resourcetype='.SCREEN_RESOURCE_MAP);
-		$result &= DBexecute('DELETE FROM sysmaps WHERE '.DBcondition('sysmapid',$sysmapids));
-
-	return $result;
-	}
 
 // LINKS
-
 	function add_link($link){
 		$link_db_fields = array(
 			'sysmapid' => null,
@@ -1283,7 +1240,7 @@
  * Author: Aly
  */
 
- 	function getHostsInfo($selements){
+ 	function getHostsInfo($selements, $expandProblem=false){
 		global $colors;
 
 		$selements_info = array();
@@ -1447,10 +1404,10 @@
 					$msg = S_PROBLEM_BIG;
 					if($info[$info['type']]['count'] > 1)
 						$msg = $info[$info['type']]['count'].' '.S_PROBLEMS;
+					else if($expandProblem && isset($info[$info['type']]['info']))
+						$msg = $info[$info['type']]['info'];
 					else 
 						$msg = $info[$info['type']]['count'].' '.S_PROBLEM;
-//					else if(isset($info[$info['type']]['info']))
-//						$msg = $info[$info['type']]['info'];
 
 
 					$info['info'] = array();
@@ -1499,7 +1456,7 @@
  * Description: Retrive selement
  * Author: Aly
  */
- 	function getHostGroupsInfo($selements){
+ 	function getHostGroupsInfo($selements, $expandProblem=false){
 		global $colors;
 
 		$selements_info = array();
@@ -1601,9 +1558,10 @@
 				$msg = S_PROBLEM_BIG;
 				if($info[$info['type']]['count'] > 1)
 					$msg = $info[$info['type']]['count'].' '.S_PROBLEMS;
-				else if(isset($info[$info['type']]['info']))
+				else if($expandProblem && isset($info[$info['type']]['info']))
 					$msg = $info[$info['type']]['info'];
-
+				else 
+					$msg = $info[$info['type']]['count'].' '.S_PROBLEM;
 
 				$info['info'] = array();
 				$info['info'][] = array('msg'=>$msg, 'color'=>$color);
@@ -1655,12 +1613,12 @@
  * Author: Aly
  */
 
- 	function getMapsInfo($selements){
+ 	function getMapsInfo($selements, $expandProblem=false){
 		global $colors;
 
 		$selements_info = array();
 		$options = array(
-				'mapids' => zbx_objectValues($selements, 'elementid'),
+				'sysmapids' => zbx_objectValues($selements, 'elementid'),
 				'extendoutput' => 1,
 				'nopermissions' => 1,
 				'select_selements' => 1,
@@ -1736,7 +1694,7 @@
 				$msg = S_PROBLEM_BIG;
 				if($info[$info['type']]['count'] > 1)
 					$msg = $info[$info['type']]['count'].' '.S_PROBLEMS;
-				else if(isset($info[$info['type']]['info'])){
+				else if($expandProblem && isset($info[$info['type']]['info'])){
 					if($tmp = reset($info[$info['type']]['info'])){
 						$msg = $tmp['msg'];
 					}
@@ -1744,6 +1702,8 @@
 						$msg = '';
 					}
 				}
+				else 
+					$msg = $info[$info['type']]['count'].' '.S_PROBLEM;
 
 				$info['info'] = array();
 				$info['info'][] = array('msg'=>$msg, 'color'=>$color);
@@ -1853,7 +1813,7 @@
  * Author: Aly
  */
 
-	function getSelementsInfo($selemetns){
+	function getSelementsInfo($selemetns, $expandProblem=false){
 		$hosts = array();
 		$maps = array();
 		$triggers = array();
@@ -1889,9 +1849,9 @@ SDII($images);
 
 		$info = array();
 		$info += getTriggersInfo($triggers);
-		$info += getHostsInfo($hosts);
-		$info += getHostGroupsInfo($hostgroups);
-		$info += getMapsInfo($maps);
+		$info += getHostsInfo($hosts, $expandProblem);
+		$info += getHostGroupsInfo($hostgroups, $expandProblem);
+		$info += getMapsInfo($maps, $expandProblem);
 		$info += getImagesInfo($images);
 
 	return $info;

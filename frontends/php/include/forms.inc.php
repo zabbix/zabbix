@@ -6248,6 +6248,8 @@
 			$label_type	= $row['label_type'];
 			$label_location	= $row['label_location'];
 			$highlight = $row['highlight'];
+			
+			$expandproblem = $row['expandproblem'];
 		}
 		else{
 			$name		= get_request('name','');
@@ -6257,6 +6259,8 @@
 			$label_type	= get_request('label_type',0);
 			$label_location	= get_request('label_location',0);
 			$highlight = get_request('highlight',0);
+			
+			$expandproblem = get_request('expandproblem',0);
 		}
 
 		$frmMap = new CFormTable($frm_title,'sysmaps.php');
@@ -6283,6 +6287,8 @@
 		$frmMap->addRow(S_BACKGROUND_IMAGE,$cmbImg);
 
 		$frmMap->addRow(S_ICON_HIGHLIGHTING, new CCheckBox('highlight',$highlight,null,1));
+		
+		$frmMap->addRow(S_EXPAND_SINGLE_PROBLEM, new CCheckBox('expandproblem',$expandproblem,null,1));
 
 		$cmbLabel = new CComboBox('label_type',$label_type);
 		$cmbLabel->addItem(0,S_LABEL);
