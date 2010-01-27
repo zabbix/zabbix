@@ -400,10 +400,13 @@ src/libs/zbxjson/Makefile.am -text
 src/libs/zbxjson/json.c -text
 src/libs/zbxnix/ipc.c -text
 src/libs/zbxserver/Makefile.am -text
+src/libs/zbxsysinfo/aix/vmstats.c -text
 src/libs/zbxsysinfo/freebsd/boottime.c -text
 src/libs/zbxsysinfo/netbsd/boottime.c -text
 src/libs/zbxsysinfo/openbsd/boottime.c -text
 src/libs/zbxsysinfo/solaris/boottime.c -text
+src/zabbix_agent/vmstats.c -text
+src/zabbix_agent/vmstats.h -text
 src/zabbix_proxy/Makefile.am -text
 src/zabbix_proxy/datasender/Makefile.am -text
 src/zabbix_proxy/datasender/datasender.c -text
