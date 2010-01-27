@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1757] fixed oracle 1.8 upgrade patch, not null constraints (Vedmak)
  - [ZBX-1762] fixed errors when editing media types (Vedmak)
  - [DEV-445] added support of system.stat[] under AIX (Sasha)
  - [ZBX-1633] fixed sysmaps in PostgreSQL upgrade patch (Sasha)
