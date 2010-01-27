@@ -64,6 +64,17 @@ include_once('include/page_header.php');
 		'ipmi_password'=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,				'isset({useipmi})&&isset({go})&&({go}!="massupdate")'),
 
 		'useprofile'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
+'devicetype'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'name'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'os'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'serialno'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'tag'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'macaddress'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'hardware'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'software'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'contact'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'location'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'notes'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
 		'host_profile'=> 	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY,   NULL,   NULL),
 
 		'useprofile_ext'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
