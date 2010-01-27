@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1617] fixed triggers duplicating in template linking for discovered hosts (Sasha)
  - [ZBX-1840] fixed bad performance of the node synchronization - fixed database index (Sasha)
  - [ZBX-1742] fixed processing of "system.uptime" check under Windows to return values as integers (Dmitry)
  - [ZBX-1786] fixed not remembered group when use paging in export screen (Vedmak)
