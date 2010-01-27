@@ -824,7 +824,6 @@ class CHost extends CZBXAPI{
 				break;
 			}
 
-
 			$host['hostid'] = $hostid;
 			$options = array();
 			$options['hosts'] = $host;
@@ -835,7 +834,26 @@ class CHost extends CZBXAPI{
 				$options['macros'] = $host['macros'];
 
 			$result &= CHost::massAdd($options);
-
+			
+			if(isset($host['profile'])){
+				$fields = array_keys($host['profile']);
+				$fields = implode(', ', $fields);
+				
+				$values = array_map('zbx_dbstr', $host['profile']);
+				$values = implode(', ', $values);
+				
+				DBexecute('INSERT INTO hosts_profiles (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')');
+			}
+			
+			if(isset($host['extendedProfile'])){
+				$fields = array_keys($host['extendedProfile']);
+				$fields = implode(', ', $fields);
+				
+				$values = array_map('zbx_dbstr', $host['extendedProfile']);
+				$values = implode(', ', $values);
+				
+				DBexecute('INSERT INTO hosts_profiles_ext (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')');			
+			}
 		}
 
 		$result = self::EndTransaction($result, __METHOD__);
@@ -1095,7 +1113,6 @@ class CHost extends CZBXAPI{
 			if(isset($data['macros']) && !is_null($data['macros'])){
 				$host_macros = CUserMacro::get(array('hostids' => $hostids, 'extendoutput' => 1));
 
-				
 				$macros_to_del = array();
 				foreach($host_macros as $hmacro){
 					$del = true;
@@ -1127,9 +1144,112 @@ class CHost extends CZBXAPI{
 				}
 			}
 
-			self::EndTransaction(true, __METHOD__);
+			
 // }}} UPDATE MACROS
 
+
+// PROFILE {{{
+			if(isset($data['profile']) && !is_null($data['profile'])){
+				if(empty($data['profile'])){
+					$sql = 'DELETE FROM hosts_profiles WHERE '.DBcondition('hostid', $hostids);
+					if(!DBexecute($sql))
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cannot delete profile');
+				}
+				else{
+					$existing_profiles = array();
+					$existing_profiles_db = DBselect('SELECT hostid FROM hosts_profiles WHERE '.DBcondition('hostid', $hostids));
+					while($existing_profile = DBfetch($existing_profiles_db)){
+						$existing_profiles[] = $existing_profile['hostid'];
+					}
+					
+					$hostids_without_profile = array_diff($hostids, $existing_profiles);
+
+					$fields = array_keys($data['profile']);
+					$fields = implode(', ', $fields);
+					
+					$values = array_map('zbx_dbstr', $data['profile']);
+					$values = implode(', ', $values);
+						
+					foreach($hostids_without_profile as $hostid){				
+						$sql = 'INSERT INTO hosts_profiles (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')';
+						if(!DBexecute($sql))
+							throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cannot create profile');
+					}
+					
+					if(!empty($existing_profiles)){
+					
+						$host_profile_fields = array('devicetype', 'name', 'os', 'serialno', 'tag','macaddress', 'hardware', 'software',
+							'contact', 'location', 'notes');
+						$sql_set = array();
+						foreach($host_profile_fields as $field){
+							if(isset($data['profile'][$field])) $sql_set[] = $field.'='.zbx_dbstr($data['profile'][$field]);
+						}
+						
+						$sql = 'UPDATE hosts_profiles SET ' . implode(', ', $sql_set) . ' WHERE '.DBcondition('hostid', $existing_profiles);
+						if(!DBexecute($sql))
+							throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cannot update profile');
+					}
+				}
+			}
+// }}} PROFILE
+
+
+// EXTENDED PROFILE {{{
+			if(isset($data['extendedProfile']) && !is_null($data['extendedProfile'])){
+				if(empty($data['extendedProfile'])){
+					$sql = 'DELETE FROM hosts_profiles_ext WHERE '.DBcondition('hostid', $hostids);
+					if(!DBexecute($sql))
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cannot delete extended profile');					
+				}
+				else{
+					$existing_profiles = array();
+					$existing_profiles_db = DBselect('SELECT hostid FROM hosts_profiles_ext WHERE '.DBcondition('hostid', $hostids));
+					while($existing_profile = DBfetch($existing_profiles_db)){
+						$existing_profiles[] = $existing_profile;
+					}
+					
+					$hostids_without_profile = array_diff($hostids, $existing_profiles);
+					
+					$fields = array_keys($data['extendedProfile']);
+					$fields = implode(', ', $fields);
+					
+					$values = array_map('zbx_dbstr', $data['extendedProfile']);
+					$values = implode(', ', $values);
+						
+					foreach($hostids_without_profile as $hostid){
+						$sql = 'INSERT INTO hosts_profiles_ext (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')';
+						if(!DBexecute($sql))
+							throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cannot create extended profile');
+					}
+					
+					if(!empty($existing_profiles)){
+					
+						$host_profile_ext_fields = array('device_alias','device_type','device_chassis','device_os','device_os_short',
+							'device_hw_arch','device_serial','device_model','device_tag','device_vendor','device_contract',
+							'device_who','device_status','device_app_01','device_app_02','device_app_03','device_app_04',
+							'device_app_05','device_url_1','device_url_2','device_url_3','device_networks','device_notes',
+							'device_hardware','device_software','ip_subnet_mask','ip_router','ip_macaddress','oob_ip',
+							'oob_subnet_mask','oob_router','date_hw_buy','date_hw_install','date_hw_expiry','date_hw_decomm','site_street_1',
+							'site_street_2','site_street_3','site_city','site_state','site_country','site_zip','site_rack','site_notes',
+							'poc_1_name','poc_1_email','poc_1_phone_1','poc_1_phone_2','poc_1_cell','poc_1_screen','poc_1_notes','poc_2_name',
+							'poc_2_email','poc_2_phone_1','poc_2_phone_2','poc_2_cell','poc_2_screen','poc_2_notes');
+							
+						$sql_set = array();
+						foreach($host_profile_fields as $field){
+							if(isset($data['extendedProfile'][$field])) $sql_set[] = $field.'='.zbx_dbstr($data['extendedProfile'][$field]);
+						}
+						
+						$sql = 'UPDATE hosts_profiles_ext SET ' . implode(', ', $sql_set) . ' WHERE '.DBcondition('hostid', $existing_profiles);
+						if(!DBexecute($sql))
+							throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cannot update extended profile');
+					}
+				}
+			}
+// }}} EXTENDED PROFILE
+
+			
+			self::EndTransaction(true, __METHOD__);
+			
 			$upd_hosts = self::get(array('hostids' => $hostids, 'extendoutput' => 1, 'nopermissions' => 1));
 			return $upd_hosts;
 
