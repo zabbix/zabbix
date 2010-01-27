@@ -32,11 +32,10 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 		return SYSINFO_RET_FAIL;
 		
 	/* result must be integer to correctly interpret it in frontend (uptime) */
-	if (!ISSET_DBL(result))
+	if (!GET_UI64_RESULT(result))
 		return SYSINFO_RET_FAIL;
 
-	SET_UI64_RESULT(result, (zbx_uint64_t)(result->dbl));
-	UNSET_DBL_RESULT(result);
-	
+	UNSET_RESULT_EXCLUDING(result, AR_UINT64);
+
 	return SYSINFO_RET_OK;
 }
