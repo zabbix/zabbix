@@ -598,12 +598,12 @@ class zbxXML{
 						$host_templates[] = $current_template;
 					}
 					
-					if($host_db['status'] == HOST_STATUS_TEMPLATE){
-						$host_db['templates_link'] = $host_templates;
-					}
-					else{
+					// if($host_db['status'] == HOST_STATUS_TEMPLATE){
 						$host_db['templates'] = $host_templates;
-					}
+					// }
+					// else{
+						// $host_db['templates'] = $host_templates;
+					// }
 
 					// $r = CTemplate::massAdd(array('templates' => $current_host, 'templates_link' => $host_templates));
 					// if($r === false){
