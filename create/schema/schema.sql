@@ -153,7 +153,7 @@ FIELD		|recordid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|cksumtype	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|cksum		|t_cksum_text	|''	|NOT NULL	|0
 FIELD		|sync		|t_char(128)	|''	|NOT NULL	|0
-INDEX		|cksum_1	|nodeid,tablename,recordid,cksumtype
+INDEX		|1		|nodeid,cksumtype,tablename,recordid
 
 TABLE|services_times|timeid|ZBX_SYNC
 FIELD		|timeid		|t_id		|'0'	|NOT NULL	|0
