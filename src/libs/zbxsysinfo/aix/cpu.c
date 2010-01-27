@@ -266,7 +266,7 @@ int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGEN
 	if (-1 == perfstat_cpu_total(NULL, &ps_cpu_total, sizeof(ps_cpu_total), 1))
 		return SYSINFO_RET_FAIL;
 
-	SET_UI64_RESULT(result, (zbx_uint64_t)(ps_cpu_total.devintrs + ps_cpu_total.softintrs));
+	SET_UI64_RESULT(result, (zbx_uint64_t)ps_cpu_total.devintrs);
 
 	return SYSINFO_RET_OK;
 #else
