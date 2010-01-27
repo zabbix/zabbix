@@ -1734,6 +1734,7 @@
 	'S_NO_ITEMS'=>				'No items',
 	'S_DISCOVERY_RULES_BIG'=>		'DISCOVERY RULES',
 	'S_DISCOVERY_CHECKS_BIG'=>		'DISCOVERY CHECKS',
+	'S_HOSTS_AND_TEMPLATES_BIG' => 'Hosts and templates',
 
 //	forms.inc.php
 //	popup_link_tr.php

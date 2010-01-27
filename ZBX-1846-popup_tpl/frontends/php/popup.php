@@ -33,102 +33,106 @@
 	switch($srctbl){
 		case 'host_templates':
 		case 'templates':
-			$page['title'] = "S_TEMPLATES_BIG";
+			$page['title'] = 'S_TEMPLATES_BIG';
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			$templated_hosts = true;
 			break;
+		case 'hosts_and_templates':
+			$page['title'] = 'S_HOSTS_AND_TEMPLATES_BIG';
+			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
+		break;
 		case 'hosts':
-			$page['title'] = "S_HOSTS_BIG";
+			$page['title'] = 'S_HOSTS_BIG';
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'proxies':
-			$page['title'] = "S_PROXIES_BIG";
+			$page['title'] = 'S_PROXIES_BIG';
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'applications':
-			$page['title'] = "S_APPLICATIONS_BIG";
+			$page['title'] = 'S_APPLICATIONS_BIG';
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'host_group':
-			$page['title'] = "S_HOST_GROUPS_BIG";
+			$page['title'] = 'S_HOST_GROUPS_BIG';
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'triggers':
-			$page['title'] = "S_TRIGGERS_BIG";
+			$page['title'] = 'S_TRIGGERS_BIG';
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'logitems':
-			$page['title'] = "S_ITEMS_BIG";
+			$page['title'] = 'S_ITEMS_BIG';
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'usrgrp':
-			$page['title'] = "S_GROUPS";
+			$page['title'] = 'S_GROUPS';
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'users':
-			$page['title'] = "S_USERS";
+			$page['title'] = 'S_USERS';
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'items':
-			$page['title'] = "S_ITEMS_BIG";
+			$page['title'] = 'S_ITEMS_BIG';
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'help_items':
-			$page['title'] = "S_STANDARD_ITEMS_BIG";
+			$page['title'] = 'S_STANDARD_ITEMS_BIG';
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'screens':
-			$page['title'] = "S_SCREENS_BIG";
+			$page['title'] = 'S_SCREENS_BIG';
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'slides':
-			$page['title'] = "S_SLIDESHOWS_BIG";
+			$page['title'] = 'S_SLIDESHOWS_BIG';
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'graphs':
-			$page['title'] = "S_GRAPHS_BIG";
+			$page['title'] = 'S_GRAPHS_BIG';
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'simple_graph':
-			$page['title'] = "S_SIMPLE_GRAPH_BIG";
+			$page['title'] = 'S_SIMPLE_GRAPH_BIG';
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'sysmaps':
-			$page['title'] = "S_MAPS_BIG";
+			$page['title'] = 'S_MAPS_BIG';
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
 		case 'plain_text':
-			$page['title'] = "S_PLAIN_TEXT_BIG";
+			$page['title'] = 'S_PLAIN_TEXT_BIG';
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'screens2':
-			$page['title'] = "S_SCREENS_BIG";
+			$page['title'] = 'S_SCREENS_BIG';
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'overview':
-			$page['title'] = "S_OVERVIEW_BIG";
+			$page['title'] = 'S_OVERVIEW_BIG';
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'host_group_scr':
-			$page['title'] = "S_HOST_GROUPS_BIG";
+			$page['title'] = 'S_HOST_GROUPS_BIG';
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'nodes':
 			if(ZBX_DISTRIBUTED){
-				$page['title'] = "S_NODES_BIG";
+				$page['title'] = 'S_NODES_BIG';
 				$min_user_type = USER_TYPE_ZABBIX_USER;
 				break;
 			}
 		case 'drules':
-			$page['title'] = "S_DISCOVERY_RULES_BIG";
+			$page['title'] = 'S_DISCOVERY_RULES_BIG';
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'dchecks':
-			$page['title'] = "S_DISCOVERY_CHECKS_BIG";
+			$page['title'] = 'S_DISCOVERY_CHECKS_BIG';
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		default:
-			$page['title'] = "S_ERROR";
+			$page['title'] = 'S_ERROR';
 			$error = true;
 			break;
 	}
@@ -291,7 +295,7 @@ include_once('include/page_header.php');
 	if(str_in_array($srctbl, array('graphs','applications','screens','triggers','logitems','items','simple_graph','plain_text'))){
 		validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
 	}
-	else if(str_in_array($srctbl,array('host_group','hosts','templates','host_templates'))){
+	else if(str_in_array($srctbl,array('host_group','hosts','templates','host_templates','hosts_and_templates'))){
 		validate_group($PAGE_GROUPS, $PAGE_HOSTS);
 	}
 
@@ -313,7 +317,6 @@ include_once('include/page_header.php');
 									'applications','screens','slides','graphs','simple_graph',
 									'sysmaps','plain_text','screens2','overview','host_group_scr')))
 		{
-
 			if(ZBX_DISTRIBUTED){
 				$cmbNode = new CComboBox('nodeid', $nodeid, 'submit()');
 
@@ -329,7 +332,7 @@ include_once('include/page_header.php');
 		if(!isset($ok)) $nodeid = get_current_nodeid();
 		unset($ok);
 
-		if(str_in_array($srctbl,array('hosts','templates','triggers','logitems','items','applications','host_templates','graphs','simple_graph','plain_text'))){
+		if(str_in_array($srctbl,array('hosts_and_templates', 'hosts','templates','triggers','logitems','items','applications','host_templates','graphs','simple_graph','plain_text'))){
 
 			$groupid = $PAGE_GROUPS['selected'];
 			$cmbGroups = new CComboBox('groupid',$groupid,'javascript: submit();');
@@ -606,6 +609,36 @@ include_once('include/page_header.php');
 				$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
 			}
+
+			$name->setAttribute('onclick',$action." close_window(); return false;");
+
+			$table->addRow($name);
+		}
+		$table->show();
+	}
+	else if(str_in_array($srctbl,array('hosts_and_templates'))){
+		$table = new CTableInfo(S_NO_TEMPLATES_DEFINED);
+		$table->setHeader(array(S_NAME));
+
+		$options = array(
+			'nodeids' => $nodeid,
+			'groupids' => $groupid,
+			'extendoutput' => 1,
+			'sortfield'=>'host'
+		);
+		if(!is_null($writeonly)) $options['editable'] = 1;
+
+		$templates = CTemplate::get($options);
+		foreach($templates as $tnum => $template){
+			$templates[$tnum]['hostid'] = $template['templateid'];
+		}
+		$hosts = CHost::get($options);
+		$objects = array_merge($templates, $hosts);
+	
+		foreach($objects as $row){
+			$name = new CSpan($row['host'], 'link');
+			$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
+			(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
 
 			$name->setAttribute('onclick',$action." close_window(); return false;");
 
