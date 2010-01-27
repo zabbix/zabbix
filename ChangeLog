@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [ZBX-1321] fixed displaying of large unsigned int values in latest data (Vedmak)
  - [ZBX-1838] fixed value mapping in overview screen (Aly)
  - [ZBX-1788] fixed proxy configuration form showing hosts from all nodes (Vedmak)
  - [ZBX-954] fix typo in default trigger names (Richlv)
