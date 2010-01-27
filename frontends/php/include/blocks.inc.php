@@ -444,7 +444,7 @@ function make_hoststat_summary(){
 
 		$problematic_host_list = array();
 		$popup_rows = 0;
-
+ $highest_severity = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 		foreach($hosts as $hnum => $host){
 			foreach($host['groups'] as $hgrnum => $host_group){
 				if($host_group['groupid'] == $group['groupid']){
@@ -452,7 +452,7 @@ function make_hoststat_summary(){
 					// if $host is shown for all groups it is in, unset it
 					if(empty($host['groups'])) unset($hosts[$hnum]);
 
-					$highest_severity = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+				//	$highest_severity = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 
 
 
