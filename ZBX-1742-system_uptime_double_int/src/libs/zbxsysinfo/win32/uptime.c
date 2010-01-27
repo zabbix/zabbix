@@ -30,7 +30,7 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
 	if (SYSINFO_RET_FAIL == PERF_MONITOR(cmd, counter_path, flags, result))
 		return SYSINFO_RET_FAIL;
-		
+
 	/* result must be integer to correctly interpret it in frontend (uptime) */
 	if (!GET_UI64_RESULT(result))
 		return SYSINFO_RET_FAIL;
