@@ -19,14 +19,14 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/screens.inc.php');
-	require_once('include/forms.inc.php');
-	require_once('include/maps.inc.php');
+require_once('include/config.inc.php');
+require_once('include/screens.inc.php');
+require_once('include/forms.inc.php');
+require_once('include/maps.inc.php');
 
-	$page['title'] = 'S_SCREENS';
-	$page['file'] = 'screenconf.php';
-	$page['hist_arg'] = array('config');
+$page['title'] = 'S_SCREENS';
+$page['file'] = 'screenconf.php';
+$page['hist_arg'] = array('config');
 
 include_once('include/page_header.php');
 
@@ -111,7 +111,7 @@ include_once('include/page_header.php');
 					access_deny();
 
 //				DBstart();
-				$result = CScreen::add(array('name' => $_REQUEST['name'], 'hsize' => $_REQUEST['hsize'], 'vsize' => $_REQUEST['vsize']));
+				$result = CScreen::create(array('name' => $_REQUEST['name'], 'hsize' => $_REQUEST['hsize'], 'vsize' => $_REQUEST['vsize']));
 				if(!$result){
 					error(CScreen::resetErrors());
 				}
@@ -342,6 +342,14 @@ include_once('include/page_header.php');
 			// goButton name is necessary!!!
 			$goButton = new CButton('goButton', S_GO);
 			$goButton->setAttribute('id', 'goButton');
+
+			$jsLocale = array(
+				'S_CLOSE',
+				'S_NO_ELEMENTS_SELECTES'
+			);
+
+			zbx_addJSLocale($jsLocale);
+
 			zbx_add_post_js('chkbxRange.pageGoName = "screens";');
 //---------
 			$footer = get_table_header(array($goBox, $goButton));
@@ -418,6 +426,14 @@ include_once('include/page_header.php');
 // goButton name is necessary!!!
 			$goButton = new CButton('goButton',S_GO);
 			$goButton->setAttribute('id','goButton');
+
+            		$jsLocale = array(
+                            		'S_CLOSE',
+                            		'S_NO_ELEMENTS_SELECTES'
+        	        );
+
+            		zbx_addJSLocale($jsLocale);
+
 			zbx_add_post_js('chkbxRange.pageGoName = "shows";');
 
 			$table->setFooter(new CCol(array($goBox, $goButton)));

@@ -501,10 +501,6 @@ class zbxXML{
 			$xpath = new DOMXPath($xml);
 			$hosts = $xpath->query('hosts/host');
 
-// foreach($hosts as $host){
-	// sdi($host->nodeValue);
-// }
-
 			foreach($hosts as $hnum => $host){
 // IMPORT RULES
 				$host_db = self::mapXML2arr($host, XML_TAG_HOST);
@@ -512,9 +508,9 @@ class zbxXML{
 				if(isset($host_db['proxy_hostid'])){
 					$proxy_exists = CHost::get(array('hostids' => $host_db['proxy_hostid']));
 					if(empty($proxy_exists))
-						$host_db['proxy_hostid'] = 0;						
+						$host_db['proxy_hostid'] = 0;
 				}
-				
+
 				if(!isset($host_db['status'])) $host_db['status'] = HOST_STATUS_TEMPLATE;
 				if($host_db['status'] == HOST_STATUS_TEMPLATE){
 					$current_host = CTemplate::getObjects(array('template' => $host_db['host']));
@@ -599,22 +595,15 @@ class zbxXML{
 						if(!$current_template && !isset($rules['template']['missed'])) continue; // break if update nonexist
 						if($current_template && !isset($rules['template']['exist'])) continue; // break if not update exist
 
-//sdi('template: '.$template.' | TemplateID: '. $current_templateid);
 						$host_templates[] = $current_template;
 					}
-
-					$r = CTemplate::massAdd(array('hosts' => $current_host, 'templates' => $host_templates));
-					if($r === false){
-						error(CTemplate::resetErrors());
-						$result = false;
-						break;
-					}
+					
+					$host_db['templates'] = $host_templates;
 				}
 // }}} TEMPLATES
 
 
 // HOSTS
-//sdi('Host: '.$host_db['host'].' | HostID: '. $current_hostid);
 				$host_db['groups'] = $host_groups;
 				$host_db['macros'] = $host_macros;
 
@@ -707,11 +696,10 @@ class zbxXML{
 						$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
 
 						$item_db['hostid'] = $current_host['hostid'];
-// SDII($item_db);
+
 						$current_item = CItem::getObjects($item_db);
 						$current_item = reset($current_item);
 
-// sdii(array('key_' => $item_db['key_'], 'host' => $host_db['host']));
 						if(!$current_item && !isset($rules['item']['missed'])) continue; // break if update nonexist
 						if($current_item && !isset($rules['item']['exist'])) continue; // break if not update exist
 
@@ -735,11 +723,10 @@ class zbxXML{
 							else{
 								$item_applications = array_merge($item_applications, $current_application);
 							}
-//sdi('application: '.$application.' | applicationID: '. $current_applicationid);
 						}
 
 						if(!empty($applications_to_add)){
-							$new_applications = CApplication::add($applications_to_add);
+							$new_applications = CApplication::create($applications_to_add);
 							if($new_applications === false){
 								error(CApplication::resetErrors());
 								$result = false;
@@ -748,9 +735,6 @@ class zbxXML{
 							$item_applications = array_merge($item_applications, $new_applications);
 						}
 // }}} ITEM APPLICATIONS
-
-
-//sdi('item: '.$item.' | itemID: '. $current_itemid);
 
 						if($current_item && isset($rules['item']['exist'])){
 							$current_item = CItem::update($current_item);
@@ -763,12 +747,12 @@ class zbxXML{
 						if(!$current_item && isset($rules['item']['missed'])){
 							$item_db['hostid'] = $current_host['hostid'];
 
-							$current_item = CItem::add($item_db);
+							$current_item = CItem::create($item_db);
 							if($current_item === false){
 								error(CItem::resetErrors());
 								$result = false;
 								break;
-						}
+							}
 						}
 
 						$r = CApplication::addItems(array('applications' => $item_applications, 'items' => $current_item));
@@ -780,6 +764,7 @@ class zbxXML{
 					}
 				}
 // }}} ITEMS
+
 
 // TRIGGERS {{{
 				if(isset($rules['trigger']['exist']) || isset($rules['trigger']['missed'])){
@@ -796,7 +781,6 @@ class zbxXML{
 						$trigger_db['hostid'] = $current_host['hostid'];
 
 						$current_trigger = CTrigger::getObjects($trigger_db);
-//sdii($current_trigger);
 						$current_trigger = reset($current_trigger);
 
 
@@ -816,7 +800,7 @@ class zbxXML{
 					}
 
 					if(!empty($triggers_to_add)){
-						$added_triggers = CTrigger::add($triggers_to_add);
+						$added_triggers = CTrigger::create($triggers_to_add);
 						if($added_triggers === false){
 							error(CTrigger::resetErrors());
 							$result = false;
@@ -846,15 +830,12 @@ class zbxXML{
 					foreach($graphs as $gnum=> $graph){
 						$graph_db = self::mapXML2arr($graph, XML_TAG_GRAPH);
 						$graph_db['hostid'] = $current_host['hostid'];
-						
+
 						$current_graph = CGraph::getObjects($graph_db);
 						$current_graph = reset($current_graph);
 
-
 						if(!$current_graph && !isset($rules['graph']['missed'])) continue; // break if update nonexist
 						if($current_graph && !isset($rules['graph']['exist'])) continue; // break if not update exist
-//sdi('graph: '.$graph_db['name'].' | graphID: '. $current_graphid);
-
 
 						if($current_graph){
 							if(!empty($graph_db['ymin_item_key'])){
@@ -892,7 +873,6 @@ class zbxXML{
 						if($current_graph){ // if exists, delete graph to add then new
 							CGraph::delete($current_graph);
 						}
-//sdii($graph_db);
 // GRAPH ITEMS {{{
 						$xpath = new DOMXPath($xml);
 						$gitems = $xpath->query('graph_elements/graph_element', $graph);
@@ -910,15 +890,13 @@ class zbxXML{
 							$gitem_hostid = CHost::getObjects(array('host' => $gitem_host));
 							$gitem_templateid = CTemplate::getObjects(array('template' => $gitem_host));
 							$gitem_hostid = array_merge($gitem_hostid, $gitem_templateid);
-							
+
 							if(!empty($gitem_hostid)){
 
 								$gitem_hostid = reset($gitem_hostid);
 
 								$gitem_db['hostid'] = $gitem_hostid['hostid'];
 								$gitem_db['key_'] = implode(':', $data);
-
-	// sdi('gitem_hostid: '.$gitem_db['hostid'].' | gitem_key: '. $gitem_db['key_']);
 
 								$current_gitem = CItem::getObjects($gitem_db);
 								$current_gitem = reset($current_gitem);
@@ -931,8 +909,7 @@ class zbxXML{
 
 						$graphs_to_add[] = $graph_db;
 					}
-//sdii($graphs_to_add);
-					$r = CGraph::add($graphs_to_add);
+					$r = CGraph::create($graphs_to_add);
 					if($r === false){
 						error(CGraph::resetErrors());
 						$result = false;
@@ -967,7 +944,6 @@ class zbxXML{
 // sdi('<b>depends on description: </b>'.$depends_on->nodeValue.' | <b>depends_triggerid: </b>'. $depends_triggerid['triggerid']);
 							if($depends_triggerid['triggerid']){
 								$triggers_to_add_dep[] = $depends_triggerid['triggerid'];
-								//CTrigger::addDependency(array('triggerid' => $current_triggerid['triggerid'], 'depends_on_triggerid' => $depends_triggerid['triggerid']));
 							}
 						}
 						$r = update_trigger($current_triggerid['triggerid'],null,null,null,null,null,null,null,$triggers_to_add_dep,null);

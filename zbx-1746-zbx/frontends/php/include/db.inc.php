@@ -686,7 +686,7 @@ else {
 
 			$nodes = zbx_toArray($nodes);
 		}
-		
+
 		$sql = '';
 		foreach($nodes as $nnum => $nodeid){
 			$sql.= '('.$id_name.'  BETWEEN '.$nodeid.'00000000000000 AND '.$nodeid.'99999999999999)';

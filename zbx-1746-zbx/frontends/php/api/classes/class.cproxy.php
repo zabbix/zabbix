@@ -85,12 +85,12 @@ class CProxy extends CZBXAPI{
 		);
 
 		$options = zbx_array_merge($def_options, $options);
-		
-		
+
+
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
 		}
-		
+
 
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
@@ -182,7 +182,7 @@ class CProxy extends CZBXAPI{
 
 				$proxy['proxyid'] = $proxy['hostid'];
 				unset($proxy['hostid']);
-				
+
 				if($options['output'] == API_OUTPUT_SHORTEN){
 					$result[$proxy['proxyid']] = array('proxyid' => $proxy['proxyid']);
 				}

@@ -94,16 +94,16 @@ class CUserGroup extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
-		
+
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
-			
+
 			if(!is_null($options['select_users'])){
 				$options['select_users'] = API_OUTPUT_EXTEND;
 			}
 		}
-		
-		
+
+
 // PERMISSION CHECK
 		if(USER_TYPE_SUPER_ADMIN == $user_type){
 
@@ -327,7 +327,7 @@ class CUserGroup extends CZBXAPI{
  * @param array $groups multidimensional array with UserGroups data
  * @return boolean
  */
-	public static function add($usrgrps){
+	public static function create($usrgrps){
 		global $USER_DETAILS;
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can add User Groups');

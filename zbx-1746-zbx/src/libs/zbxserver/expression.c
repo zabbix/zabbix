@@ -231,7 +231,7 @@ void	delete_spaces(char *c)
  *           It is recursive function!                                        *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
+static int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
 {
 	double	value1,value2;
 	char	first[MAX_STRING_LEN],second[MAX_STRING_LEN];
@@ -602,19 +602,14 @@ int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
  * Comments: example: ({15}>10)|({123}=1)                                     *
  *                                                                            *
  ******************************************************************************/
-int	evaluate(int *result, char *exp, char *error, int maxerrlen)
+int	evaluate(double *value, char *exp, char *error, int maxerrlen)
 {
-	double	value;
-	char	*res;
-	char	simple[MAX_STRING_LEN];
-	char	tmp[MAX_STRING_LEN];
-	char	value_str[MAX_STRING_LEN];
-	int	i,l,r;
-	char	c;
-	int	t;
+	const char	*__function_name = "evaluate";
+	char		*res, simple[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
+			value_str[MAX_STRING_LEN], c;
+	int		i,l,r,t;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate(%s)",
-		exp);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, exp);
 
 	res = NULL;
 
@@ -648,7 +643,7 @@ int	evaluate(int *result, char *exp, char *error, int maxerrlen)
 		}
 		simple[r-l-1]=0;
 
-		if( evaluate_simple( &value, simple, error, maxerrlen ) != SUCCEED )
+		if( evaluate_simple( value, simple, error, maxerrlen ) != SUCCEED )
 		{
 			/* Changed to LOG_LEVEL_DEBUG */
 			zabbix_log( LOG_LEVEL_DEBUG, "%s",
@@ -663,8 +658,7 @@ int	evaluate(int *result, char *exp, char *error, int maxerrlen)
 		res = zbx_strdcat(res, tmp);
 		tmp[l]=c;
 
-		zbx_snprintf(value_str,MAX_STRING_LEN-1,"%lf",
-			value);
+		zbx_snprintf(value_str, sizeof(value_str), ZBX_FS_DBL, *value);
 		res = zbx_strdcat(res, value_str);
 		res = zbx_strdcat(res, tmp+r+1);
 
@@ -673,7 +667,7 @@ int	evaluate(int *result, char *exp, char *error, int maxerrlen)
 
 		zbx_free(res); res = NULL;
 	}
-	if( evaluate_simple( &value, tmp, error, maxerrlen ) != SUCCEED )
+	if( evaluate_simple( value, tmp, error, maxerrlen ) != SUCCEED )
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "%s",
 			error);
@@ -681,17 +675,8 @@ int	evaluate(int *result, char *exp, char *error, int maxerrlen)
 			error);
 		return	FAIL;
 	}
-	if(cmp_double(value,0) == 0)
-	{
-		*result = TRIGGER_VALUE_FALSE;
-	}
-	else
-	{
-		*result = TRIGGER_VALUE_TRUE;
-	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End evaluate(result:%lf)",
-		value);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:" ZBX_FS_DBL, __function_name, *value);
 
 	return SUCCEED;
 }
@@ -2150,6 +2135,15 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				zbxmacros_get_value(macros, &dc_item->host.hostid, 1, m, &replace_to);
 		}
+		else if (macro_type & MACRO_TYPE_ITEM_EXPRESSION)
+		{
+			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
+			{
+				zbxmacros_get_value(macros, &dc_item->host.hostid, 1, m, &replace_to);
+				if (FAIL == (res = is_double_prefix(replace_to)) && NULL != error)
+					zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
+			}
+		}
 		else if (macro_type & MACRO_TYPE_FUNCTION_PARAMETER)
 		{
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
@@ -2446,6 +2440,7 @@ int	evaluate_expression(int *result,char **expression, DB_TRIGGER *trigger, char
 	/* Required for substitution of macros */
 	DB_EVENT		event;
 	int			ret = FAIL;
+	double			value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, *expression);
 
@@ -2463,8 +2458,13 @@ int	evaluate_expression(int *result,char **expression, DB_TRIGGER *trigger, char
 		delete_spaces(*expression);
 		if( substitute_functions(expression, error, maxerrlen) == SUCCEED)
 		{
-			if( evaluate(result, *expression, error, maxerrlen) == SUCCEED)
+			if( evaluate(&value, *expression, error, maxerrlen) == SUCCEED)
 			{
+				if (0 == cmp_double(value, 0))
+					*result = TRIGGER_VALUE_FALSE;
+				else
+					*result = TRIGGER_VALUE_TRUE;
+
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() result:%d", __function_name, *result);
 				ret = SUCCEED;
 				goto out;

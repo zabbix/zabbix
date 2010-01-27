@@ -299,7 +299,7 @@ include_once "include/page_header.php";
 		$refresh_menu = new CDiv(SPACE,'iconmenu');
 		$refresh_menu->addAction('onclick','javascript: create_page_menu(event,"hat_stszbx");');
 		$refresh_menu->setAttribute('title',S_MENU);
-	
+
 		$zbx_stat = new CWidget('hat_stszbx',
 							new CSpan(S_LOADING_P,'textcolorstyles'),//make_status_of_zbx()
 							get_profile('web.dashboard.hats.hat_stszbx.state',1)
@@ -416,6 +416,13 @@ include_once "include/page_header.php";
 
 	$dashboard_wdgt->addItem($fav_form);
 	$dashboard_wdgt->show();
+
+	$jsLocale = array(
+		'S_CLOSE',
+		'S_NO_ELEMENTS_SELECTES'
+	);
+
+	zbx_addJSLocale($jsLocale);
 
 	$jsmenu = new CPUMenu(null,170);
 	$jsmenu->InsertJavaScript();

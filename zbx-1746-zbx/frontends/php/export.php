@@ -286,6 +286,14 @@ include_once('include/page_header.php');
 // } GO box
 		$table->setFooter(new CCol($form));
 		$table->show();
+
+		$jsLocale = array(
+			'S_CLOSE',
+			'S_NO_ELEMENTS_SELECTES'
+		);
+
+		zbx_addJSLocale($jsLocale);
+
 		zbx_add_post_js('chkbxRange.pageGoCount = 1;');
 	}
 	else{
@@ -420,6 +428,14 @@ include_once('include/page_header.php');
 		// goButton name is necessary!!!
 		$goButton = new CButton('goButton', S_GO.' ('.$count_chkbx.')');
 		$goButton->setAttribute('id','goButton');
+
+                $jsLocale = array(
+                                'S_CLOSE',
+                                'S_NO_ELEMENTS_SELECTES'
+                );
+
+                zbx_addJSLocale($jsLocale);
+
 		zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
 
 		$footer = get_table_header(array($goBox, $goButton));

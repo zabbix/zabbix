@@ -1,7 +1,6 @@
-<?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2008 SIA Zabbix
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,15 +16,14 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-?>
-<?php
 
-// Maintenance mode
-//define('ZBX_DENY_GUI_ACCESS',1);
+#ifndef ZABBIX_CHECKS_CALCULATED_H
+#define ZABBIX_CHECKS_CALCULATED_H
 
-// IP range, who are allowed to connect to FrontEnd
-//$ZBX_GUI_ACCESS_IP_RANGE = array('127.0.0.1');
+#include "common.h"
+#include "dbcache.h"
+#include "sysinfo.h"
 
-// MSG shown on Warning screen!
-//$_REQUEST['warning_msg'] = 'Zabbix is under maintenance.';
-?>
+int	get_value_calculated(DC_ITEM *item, AGENT_RESULT *result);
+
+#endif

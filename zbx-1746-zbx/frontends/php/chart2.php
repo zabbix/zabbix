@@ -56,8 +56,8 @@ include_once('include/page_header.php');
 	else $db_data = reset($db_data);
 
 	$options = array(
-			'graphids' => $_REQUEST['graphid'], 
-			'extendoutput' => 1, 
+			'graphids' => $_REQUEST['graphid'],
+			'extendoutput' => 1,
 			'nodeids' => get_current_nodeid(true)
 		);
 	$host = CHost::get($options);

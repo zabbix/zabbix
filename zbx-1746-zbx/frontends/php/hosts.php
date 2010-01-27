@@ -231,13 +231,13 @@ include_once('include/page_header.php');
 			$result = CHost::massUpdate(array_merge($hosts, $new_values));
 			if($result === false) throw new Exception();
 
-			
+
 			if(isset($visible['template_table'])){
 				$tplids = array_keys($_REQUEST['templates']);
 				$result = CHost::massAdd(array('hosts' => $hosts['hosts'], 'templates' => zbx_toObject($tplids, 'templateid')));
 				if($result === false) throw new Exception();
 			}
-			
+
 
 			if($result && isset($visible['useprofile'])){
 				$host_profile = DBfetch(DBselect('SELECT * FROM hosts_profiles WHERE hostid='.$hostid));
@@ -810,6 +810,14 @@ $_REQUEST['hostid'] = $thid;
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton', S_GO);
 		$goButton->setAttribute('id', 'goButton');
+
+		$jsLocale = array(
+			'S_CLOSE',
+			'S_NO_ELEMENTS_SELECTES'
+		);
+
+		zbx_addJSLocale($jsLocale);
+
 		zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
 
 		$footer = get_table_header(array($goBox, $goButton));

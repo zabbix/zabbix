@@ -155,7 +155,8 @@ include_once('include/page_header.php');
 		$links = zbx_toHash($map['links'],'linkid');
 	}
 
-	$map_info = getSelementsInfo($selements);
+	$expandProblem = ($map['highlight'] > 1)? 0 : 1;
+	$map_info = getSelementsInfo($selements, $expandProblem);
 
 //SDI($links); exit;
 // Draw connectors
@@ -265,7 +266,7 @@ include_once('include/page_header.php');
 		$iconX = imagesx($img);
 		$iconY = imagesy($img);
 
-		if(isset($_REQUEST['noedit']) && ($highlight == SYSMAP_HIGHLIGH_ON)){
+		if(isset($_REQUEST['noedit']) && (($highlight%2) == SYSMAP_HIGHLIGH_ON)){
 			$hl_color = null;
 			$st_color = null;
 			if($el_info['icon_type'] == SYSMAP_ELEMENT_ICON_ON){

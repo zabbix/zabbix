@@ -28,8 +28,8 @@ require_once('include/httptest.inc.php');
 
 	function update_host_groups_by_groupid($groupid,$hosts=array()){
 		$options = array(
-				'groupids'=>$groupid, 
-				'editable'=>1, 
+				'groupids'=>$groupid,
+				'editable'=>1,
 				'preservekeys' => 1
 			);
 		$grp_hosts = CHost::get($options);
@@ -51,9 +51,9 @@ require_once('include/httptest.inc.php');
 		}
 		$result = DBexecute('DELETE FROM hosts_groups WHERE groupid='.$groupid);
 		$hosts = zbx_toObject($hosts, 'hostid');
-		
+
 		$options = array(
-				'hosts' => $hosts, 
+				'hosts' => $hosts,
 				'groups' => array('groupid' => $groupid)
 			);
 		$result = CHostGroup::createHosts();
@@ -105,7 +105,7 @@ require_once('include/httptest.inc.php');
 
 	function update_host_group($groupid,$name,$hosts){
 		$hostgroup_old = get_hostgroup_by_groupid($groupid);
-		
+
 		$options = array(array('name' => $name, 'groupid' => $groupid));
 		$result = CHostGroup::update($options);
 

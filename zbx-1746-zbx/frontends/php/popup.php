@@ -198,7 +198,7 @@ include_once('include/page_header.php');
 	$multiselect = get_request('multiselect', 0); //if create popup with checkboxes
 	$dstact 	= get_request('dstact', '');
 	$writeonly = get_request('writeonly');
-	
+
 	$existed_templates = get_request('existed_templates', null);
 
 
@@ -478,14 +478,14 @@ include_once('include/page_header.php');
 					$script .= 'add_variable(null,"templates['.$id.']","'.$name.'","'.$dstfrm.'",window.opener.document);'."\n";
 				}
 
-				
+
 			} // if count new_templates > 0
 
 			$script.= 'var form = window.opener.document.forms["'.$dstfrm.'"];'.
 					' if(form) form.submit();'.
 					' close_window();';
 			insert_js($script);
-			
+
 			unset($new_templates);
 		}
 
@@ -733,7 +733,7 @@ include_once('include/page_header.php');
 		foreach($triggers as $tnum => $row){
 			$host = reset($row['hosts']);
 			$row['host'] = $host['host'];
-			
+
 			$exp_desc = expand_trigger_description_by_data($row);
 			$description = new CSpan($exp_desc, 'link');
 

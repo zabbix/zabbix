@@ -133,7 +133,7 @@ if(isset($_REQUEST['save_trigger'])){
 			$trigger['url'] = $_REQUEST['url'];
 
 			DBstart();
-			if($db_triggers = CTrigger::add($trigger)){
+			if($db_triggers = CTrigger::create($trigger)){
 				if($db_triggers !== false){
 					$result = true;
 					$db_triggers = reset($db_triggers);
@@ -353,7 +353,7 @@ if(isset($_REQUEST['sform'])){
 		$imgdn->setAttribute('onmouseover','javascript: this.style.cursor = "pointer";');
 
 		$del_url = new CSpan('Delete','link');
-		$del_url->setAttribute('onclick', 'javascript: if(confirm("Delete expression?")) remove_expression("logtr'.$id.'"); return false;');
+		$del_url->setAttribute('onclick', 'javascript: if(confirm("'.S_DELETE_EXPRESSION_Q.'")) remove_expression("logtr'.$id.'"); return false;');
 
 		$row = new CRow(array(htmlspecialchars($expr['view']),(($expr['type']==REGEXP_INCLUDE)?S_INCLUDE:S_EXCLUDE),array($imgup,SPACE,$imgdn),$del_url));
 		$row->setAttribute('id','logtr'.$id);
@@ -370,7 +370,7 @@ if(isset($_REQUEST['sform'])){
 	$maxid=0;
 	foreach($keys as $id => $val){
 
-	  $del_url = new CLink('Delete','#','action','javascript: if(confirm("Delete keyword?")) remove_keyword("keytr'.$id.'"); return false;');
+	  $del_url = new CLink('Delete','#','action','javascript: if(confirm("'.S_DELETE_KEYWORD_Q.'")) remove_keyword("keytr'.$id.'"); return false;');
 	  $row = new CRow(array(htmlspecialchars($val['value']),$val['type'],$del_url));
 	  $row->setAttribute('id','keytr'.$id);
 	  $keyTable->addRow($row);
