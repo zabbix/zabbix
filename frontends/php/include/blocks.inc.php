@@ -459,9 +459,6 @@ function make_hoststat_summary(){
 					foreach($triggers as $tnum => $trigger){
 						foreach($trigger['hosts'] as $thnum => $trigger_host){
 							if($trigger_host['hostid'] == $host['hostid']){
-								unset($trigger['hosts'][$thnum]);
-								// if $trigger is shown for all hosts it is in, unset it
-								if(empty($trigger['hosts'])) unset($triggers[$tnum]);
 
 								if($popup_rows < ZBX_POPUP_MAX_ROWS){
 									if(!isset($problematic_host_list[$host['hostid']])){
