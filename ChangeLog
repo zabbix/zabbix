@@ -1,11 +1,12 @@
 Changes for 1.8.1
 
+ - [ZBX-1762] fixed errors when editing media types (Vedmak)
  - [DEV-445] added support of system.stat[] under AIX (Sasha)
  - [ZBX-1633] fixed sysmaps in PostgreSQL upgrade patch (Sasha)
  - [ZBX-1617] fixed triggers duplicating in template linking for discovered hosts (Sasha)
  - [ZBX-1840] fixed bad performance of the node synchronization - fixed database index (Sasha)
  - [ZBX-1742] fixed processing of "system.uptime" check under Windows to return values as integers (Dmitry)
- - [ZBX-1786] fixed not remembered group when use paging in export screen (Vedmak)
+ - [ZBX-1786] fixed not remembered group when using paging in export screen (Vedmak)
  - [ZBX-1735] added "ERROR" words to some error messages in data cache module (Dmitry)
  - [ZBX-1321] fixed displaying of large unsigned int values in latest data (Vedmak)
  - [ZBX-1838] fixed value mapping in overview screen (Aly)
