@@ -1094,25 +1094,24 @@ function __autoload($class_name){
 	return TRUE;
 	}
 
-	function replace_value_by_map($value, $valuemapid){
-		if($valuemapid < 1) return $value;
-
-		static $valuemaps = array();
-		if(isset($valuemaps[$valuemapid])) return $valuemaps[$valuemapid];
-
-		$sql = 'SELECT newvalue '.
-				' FROM mappings '.
-				' WHERE valuemapid='.$valuemapid.
-					' AND value='.zbx_dbstr($value);
-		$result = DBselect($sql);
-		if($row = DBfetch($result)){
-			$valuemaps[$valuemapid] = $row['newvalue'].' '.'('.$value.')';
-
-			return $valuemaps[$valuemapid];
-		}
-
-	return $value;
-	}
+	function replace_value_by_map($value, $valuemapid){ 
+		if($valuemapid < 1) return $value; 
+		
+		static $valuemaps = array(); 
+		if(isset($valuemaps[$valuemapid][$value])) return $valuemaps[$valuemapid][$value]; 
+		
+		$sql = 'SELECT newvalue '. 
+				' FROM mappings '. 
+				' WHERE valuemapid='.$valuemapid. 
+					' AND value='.zbx_dbstr($value); 
+		$result = DBselect($sql); 
+		if($row = DBfetch($result)){ 
+			$valuemaps[$valuemapid][$value] = $row['newvalue'].' '.'('.$value.')'; 
+			return $valuemaps[$valuemapid][$value]; 
+		} 
+	
+	return $value; 
+	} 
 /*************** END VALUE MAPPING ******************/
 
 
