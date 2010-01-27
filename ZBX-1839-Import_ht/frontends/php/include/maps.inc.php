@@ -1737,7 +1737,7 @@
 				$msg = S_PROBLEM_BIG;
 				if($info[$info['type']]['count'] > 1)
 					$msg = $info[$info['type']]['count'].' '.S_PROBLEMS;
-				else if($expandProblem && isset($info[$info['type']]['info']))
+				else if($expandProblem && isset($info[$info['type']]['info'])){
 					if($tmp = reset($info[$info['type']]['info'])){
 						$msg = $tmp['msg'];
 					}
