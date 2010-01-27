@@ -482,7 +482,7 @@ static void	DCcheck_freemem(size_t sz)
 {
 	if (config->free_mem < sz)
 	{
-		zbx_error("Configuration buffer is too small. Please increase CacheSize parameter.");
+		zbx_error("ERROR: Configuration buffer is too small. Please increase CacheSize parameter.");
 		exit(FAIL);
 	}
 }
@@ -2175,7 +2175,7 @@ void	init_configuration_cache()
 
 	if ( -1 == (shm_id = zbx_shmget(shm_key, (size_t)CONFIG_DBCONFIG_SIZE)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Can't allocate shared memory for configuration cache.");
+		zabbix_log(LOG_LEVEL_CRIT, "ERROR: Can't allocate shared memory for configuration cache.");
 		exit(1);
 	}
 
