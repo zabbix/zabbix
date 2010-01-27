@@ -213,6 +213,9 @@ lbl_create:
 	collector = shmat(shm_id, 0, 0);
 	collector->cpus.cpu = (ZBX_SINGLE_CPU_STAT_DATA *)(collector + 1);
 	collector->cpus.count = cpu_count;
+#ifdef _AIX
+	memset(&collector->vmstat, 0, sizeof(collector->vmstat));
+#endif
 
 	if ((void*)(-1) == collector)
 	{
@@ -307,6 +310,9 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 
 		collect_stats_interfaces(&(collector->interfaces)); /* TODO */
 		collect_stats_diskdevices(&(collector->diskdevices)); /* TODO */
+#ifdef _AIX
+		collect_vmstat_data(&collector->vmstat);
+#endif
 
 		zbx_sleep(1);
 	}

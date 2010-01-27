@@ -1,5 +1,6 @@
 Changes for 1.8.1
 
+ - [DEV-445] added support of system.stat[] under AIX (Sasha)
  - [ZBX-1604] extended maintenance period info messages (Aly)
  - [ZBX-1647] removed respection of host availabilities on maps (Aly)
  - [ZBX-1495] fixed map level label location (Aly)

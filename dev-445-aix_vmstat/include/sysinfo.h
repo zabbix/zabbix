@@ -253,4 +253,8 @@ int	SERVICES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 int	PROC_INFO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 #endif /* _WINDOWS */
 
+#ifdef _AIX
+int	SYSTEM_STAT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+#endif	/* _AIX */
+
 #endif
