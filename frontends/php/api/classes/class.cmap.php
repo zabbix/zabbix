@@ -433,11 +433,12 @@ SDI('///////////////////////////////////////');
 				break;
 			}
 
-			$sysmapid = add_sysmap($map['name'], $map['width'], $map['height'], $map['backgroundid'], $map['highlight'], $map['label_type'], $map['label_location']);
-			if(!$sysmapid){
-				$result = false;
-				break;
-			}
+			$sysmapid=get_dbid('sysmaps','sysmapid');
+			$result=DBexecute('INSERT INTO sysmaps (sysmapid,name,width,height,backgroundid,highlight,label_type,label_location)'.
+					' VALUES ('.$sysmapid.','.zbx_dbstr($map['name']).','.$map['width'].','.$map['height'].','.
+								$map['backgroundid'].','.$map['highlight'].','.$map['label_type'].','.$map['label_location'].')');
+					
+			if(!$result) break;
 
 			$new_map = array('sysmapid' => $sysmapid);
 			$result_maps[] = array_merge($new_map, $map);
@@ -496,9 +497,15 @@ SDI('///////////////////////////////////////');
 				break;
 			}
 
-			$sql = 'UPDATE sysmaps SET name='.zbx_dbstr($map['name']).', width='.$map['width'].', height='.$map['height'].', '.
-					'backgroundid='.$map['backgroundid'].',label_type='.$map['label_type'].',label_location='.$map['label_location'].
-				' WHERE sysmapid='.$map['sysmapid'];
+			$sql = 'UPDATE sysmaps '.
+					' SET name='.zbx_dbstr($map['name']).','.
+						' width='.$map['width'].','.
+						' height='.$map['height'].','.
+						' backgroundid='.$map['backgroundid'].','.
+						' highlight='.$map['highlight'].','.
+						' label_type='.$map['label_type'].','.
+						' label_location='.$map['label_location'].
+					' WHERE sysmapid='.$map['sysmapid'];
 			$result = DBexecute($sql);
 
 			if(!$result) break;
@@ -532,21 +539,50 @@ SDI('///////////////////////////////////////');
 		$result = true;
 		$errors = array();
 
-		$sysmaps = zbx_objectValues($sysmaps, 'sysmapid');
+		$sysmapids = zbx_objectValues($sysmaps, 'sysmapid');
 
 		self::BeginTransaction(__METHOD__);
 
-		$result &= delete_sysmaps_elements_with_sysmapid($sysmaps);
+// delete selements
+		$selementids = array();
+		$sql = 'SELECT selementid '.
+				' FROM sysmaps_elements '.
+				' WHERE '.DBcondition('sysmapid',$sysmapids).
+					' AND elementtype='.SYSMAP_ELEMENT_TYPE_MAP;
+		$db_elements = DBselect($sql);
+		while($db_element = DBfetch($db_elements)){
+			$selementids[$db_element['selementid']] = $db_element['selementid'];
+		}
 
-		$res = DBselect('SELECT linkid FROM sysmaps_links WHERE '.DBcondition('sysmapid', $sysmaps));
+		if(!empty($selementids)){
+			$sysmap_linkids = array();
+			$sql = 'SELECT linkid FROM sysmaps_links '.
+					' WHERE '.DBcondition('selementid1',$selementids).
+						' OR '.DBcondition('selementid2',$selementids);
+	
+			$res=DBselect($sql);
+			while($rows = DBfetch($res)){
+				$sysmap_linkids[$rows['linkid']] = $rows['linkid'];
+			}
+
+			if(!empty($sysmap_linkids)){
+				DBexecute('DELETE FROM sysmaps_link_triggers WHERE '.DBcondition('linkid',$sysmap_linkids));
+				DBexecute('DELETE FROM sysmaps_links WHERE '.DBcondition('linkid',$sysmap_linkids));
+			}
+			
+			DBexecute('DELETE FROM sysmaps_elements WHERE '.DBcondition('selementid',$selementids));
+		}
+//----
+
+		$res = DBselect('SELECT linkid FROM sysmaps_links WHERE '.DBcondition('sysmapid', $sysmapids));
 		while($rows = DBfetch($res)){
 			$result &= delete_link($rows['linkid']);
 		}
 
-		$result &= DBexecute('DELETE FROM sysmaps_elements WHERE '.DBcondition('sysmapid', $sysmaps));
+		$result &= DBexecute('DELETE FROM sysmaps_elements WHERE '.DBcondition('sysmapid', $sysmapids));
 		$result &= DBexecute("DELETE FROM profiles WHERE idx='web.favorite.sysmapids' AND source='sysmapid' AND ".DBcondition('value_id', $sysmapids));
-		$result &= DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid', $sysmaps).' AND resourcetype='.SCREEN_RESOURCE_MAP);
-		$result &= DBexecute('DELETE FROM sysmaps WHERE '.DBcondition('sysmapid', $sysmaps));
+		$result &= DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid', $sysmapids).' AND resourcetype='.SCREEN_RESOURCE_MAP);
+		$result &= DBexecute('DELETE FROM sysmaps WHERE '.DBcondition('sysmapid', $sysmapids));
 
 		$result = self::EndTransaction($result, __METHOD__);
 

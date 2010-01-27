@@ -1283,7 +1283,7 @@
  * Author: Aly
  */
 
- 	function getHostsInfo($selements){
+ 	function getHostsInfo($selements, $expandProblem=false){
 		global $colors;
 
 		$selements_info = array();
@@ -1447,10 +1447,10 @@
 					$msg = S_PROBLEM_BIG;
 					if($info[$info['type']]['count'] > 1)
 						$msg = $info[$info['type']]['count'].' '.S_PROBLEMS;
+					else if($expandProblem && isset($info[$info['type']]['info']))
+						$msg = $info[$info['type']]['info'];
 					else 
 						$msg = $info[$info['type']]['count'].' '.S_PROBLEM;
-//					else if(isset($info[$info['type']]['info']))
-//						$msg = $info[$info['type']]['info'];
 
 
 					$info['info'] = array();
@@ -1499,7 +1499,7 @@
  * Description: Retrive selement
  * Author: Aly
  */
- 	function getHostGroupsInfo($selements){
+ 	function getHostGroupsInfo($selements, $expandProblem=false){
 		global $colors;
 
 		$selements_info = array();
@@ -1601,9 +1601,10 @@
 				$msg = S_PROBLEM_BIG;
 				if($info[$info['type']]['count'] > 1)
 					$msg = $info[$info['type']]['count'].' '.S_PROBLEMS;
-				else if(isset($info[$info['type']]['info']))
+				else if($expandProblem && isset($info[$info['type']]['info']))
 					$msg = $info[$info['type']]['info'];
-
+				else 
+					$msg = $info[$info['type']]['count'].' '.S_PROBLEM;
 
 				$info['info'] = array();
 				$info['info'][] = array('msg'=>$msg, 'color'=>$color);
@@ -1655,12 +1656,12 @@
  * Author: Aly
  */
 
- 	function getMapsInfo($selements){
+ 	function getMapsInfo($selements, $expandProblem=false){
 		global $colors;
 
 		$selements_info = array();
 		$options = array(
-				'mapids' => zbx_objectValues($selements, 'elementid'),
+				'sysmapids' => zbx_objectValues($selements, 'elementid'),
 				'extendoutput' => 1,
 				'nopermissions' => 1,
 				'select_selements' => 1,
@@ -1736,7 +1737,7 @@
 				$msg = S_PROBLEM_BIG;
 				if($info[$info['type']]['count'] > 1)
 					$msg = $info[$info['type']]['count'].' '.S_PROBLEMS;
-				else if(isset($info[$info['type']]['info'])){
+				else if($expandProblem && isset($info[$info['type']]['info']))
 					if($tmp = reset($info[$info['type']]['info'])){
 						$msg = $tmp['msg'];
 					}
@@ -1744,6 +1745,8 @@
 						$msg = '';
 					}
 				}
+				else 
+					$msg = $info[$info['type']]['count'].' '.S_PROBLEM;
 
 				$info['info'] = array();
 				$info['info'][] = array('msg'=>$msg, 'color'=>$color);
@@ -1853,7 +1856,7 @@
  * Author: Aly
  */
 
-	function getSelementsInfo($selemetns){
+	function getSelementsInfo($selemetns, $expandProblem=false){
 		$hosts = array();
 		$maps = array();
 		$triggers = array();
@@ -1889,9 +1892,9 @@ SDII($images);
 
 		$info = array();
 		$info += getTriggersInfo($triggers);
-		$info += getHostsInfo($hosts);
-		$info += getHostGroupsInfo($hostgroups);
-		$info += getMapsInfo($maps);
+		$info += getHostsInfo($hosts, $expandProblem);
+		$info += getHostGroupsInfo($hostgroups, $expandProblem);
+		$info += getMapsInfo($maps, $expandProblem);
 		$info += getImagesInfo($images);
 
 	return $info;
