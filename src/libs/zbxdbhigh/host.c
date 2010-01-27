@@ -3825,7 +3825,7 @@ static int	DBcopy_template_triggers(zbx_uint64_t hostid, zbx_uint64_t templateid
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
-			"select t.triggerid"
+			"select distinct t.triggerid"
 			" from triggers t,functions f,items i"
 			" where i.hostid=" ZBX_FS_UI64
 				" and f.itemid=i.itemid"
