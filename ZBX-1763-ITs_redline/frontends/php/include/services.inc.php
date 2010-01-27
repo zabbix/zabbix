@@ -339,35 +339,43 @@ function VDI($time,$show=1){
 	$time = (is_array($time))?$time:getdate($time);
 return ($time['mon'].'/'.$time['mday'].'/'.$time['year'].' '.$time['hours'].':'.$time['minutes'].':'.$time['seconds']);
 }
-*/
+//*/
 	function expand_periodical_service_times(&$data,  $period_start, $period_end, $ts_from, $ts_to, $type='ut'){ /* 'ut' OR 'dt' */
-//SDI("PERIOD: ".VDI($period_start).' - '.VDI($period_end));
-//SDI('serv time: '.VDI($ts_from,0).' - '.VDI($ts_to,0));
+// sdii($data);
+// SDI("PERIOD: ".VDI($period_start).' - '.VDI($period_end));
+// SDI('serv time: '.VDI($ts_from,0).' - '.VDI($ts_to,0));
 			/* calculate period FROM '-1 week' to know period name for  $period_start */
 
 			for($curr = ($period_start - (7*24*3600)); $curr<=$period_end;$curr+=86400){
-
+// SDI('FROM00 '.date('d-M-Y H:i:s', $curr));
 				$curr_date = getdate($curr);
 				$from_date = getdate($ts_from);
 
+// SDI('FROM0 '.VDI($curr_date,0));
 				if($curr_date['wday'] == $from_date['wday']){
 					$curr_from = mktime(
 						$from_date['hours'],$from_date['minutes'],$from_date['seconds'],
 						$curr_date['mon'],$curr_date['mday'],$curr_date['year']
-						);
-//SDI('FROM '.VDI($curr_from,0));
-					$curr_to = $curr_from + ($ts_to - $ts_from);
+					);
+
 
 					$curr_from	= max($curr_from, $period_start);
 					$curr_from	= min($curr_from, $period_end);
-//SDI('FROM2 '.VDI($curr_from,0));
-//SDI('TO '.VDI($curr_to,0));
-					$curr_to	= max($curr_to, $period_start);
-					$curr_to	= min($curr_to, $period_end);
-//SDI('TO2 '.VDI($curr_to,0).' : '.VDI($curr,0));
-					$curr = $curr_to;
-//SDI('CURR '.VDI($curr,0));
 
+					$curr_to = $curr_from + ($ts_to - $ts_from);
+					
+// SDI('FROM2 '.VDI($curr_from,0));
+// SDI('TO '.VDI($curr_to,0));
+
+// SDI('FROM3 '.date('d-M-Y H:i:s', $curr_to));
+					$curr_to	= max($curr_to, $period_start);
+// SDI('FROM4 '.date('d-M-Y H:i:s', $curr_to));
+					$curr_to	= min($curr_to, $period_end);
+// SDI('FROM5 '.date('d-M-Y H:i:s', $curr_to));
+
+// SDI('TO2 '.VDI($curr_to,0).' : '.VDI($curr,0));
+					$curr = $curr_to;
+// SDI('CURR '.VDI($curr,0));
 					if(isset($data[$curr_from][$type.'_s']))
 						$data[$curr_from][$type.'_s'] ++;
 					else
