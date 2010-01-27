@@ -434,17 +434,17 @@ include_once 'include/page_header.php';
 			($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64) &&
 			($db_item['lastvalue']-$db_item['prevvalue'] != 0) )
 		{
-			if($db_item['lastvalue']-$db_item['prevvalue']<0){
-				$change=convert_units($db_item['lastvalue']-$db_item['prevvalue'],$db_item['units']);
-				$change=nbsp($change);
+			$change = '';
+			if($db_item['lastvalue']-$db_item['prevvalue']>0){
+				$change = '+';
 			}
-			else{
-				$change='+'.convert_units($db_item['lastvalue']-$db_item['prevvalue'],$db_item['units']);
-				$change=nbsp($change);
-			}
+
+			$digits = ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? 2 : 0;
+			$change = $change . convert_units(bcsub($db_item['lastvalue'], $db_item['prevvalue'], $digits), $db_item['units']);
+			$change = nbsp($change);
 		}
 		else{
-			$change=new CCol(' - ');
+			$change = new CCol(' - ');
 		}
 
 		if(($db_item['value_type']==ITEM_VALUE_TYPE_FLOAT) || ($db_item['value_type']==ITEM_VALUE_TYPE_UINT64)){
