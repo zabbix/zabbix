@@ -572,9 +572,6 @@ $_REQUEST['hostid'] = $thid;
 		$frmForm = new CForm();
 		$frmForm->setMethod('get');
 
-		$groups = CHostGroup::get(array('editable' => 1, 'extendoutput' => 1));
-		order_result($groups, 'name');
-
 		$cmbGroups = new CComboBox('groupid', $PAGE_GROUPS['selected'], 'javascript: submit();');
 		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
 			$cmbGroups->addItem($groupid, $name);
