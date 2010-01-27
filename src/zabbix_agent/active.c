@@ -125,6 +125,8 @@ static void	add_check(const char *key, const char *key_orig, int refresh, long l
 	active_metrics[i].status	= ITEM_STATUS_ACTIVE;
 	active_metrics[i].lastlogsize	= lastlogsize;
 	active_metrics[i].mtime		= mtime;
+	/* can skip existing log[] and eventlog[] data */
+	active_metrics[i].skip_old_data	= active_metrics[i].lastlogsize ? 0 : 1;
 
 	/* move to the last metric */
 	i++;
@@ -673,6 +675,7 @@ static void	process_active_checks(char *server, unsigned short port)
 	char		key_logeventid[MAX_STRING_LEN], str_logeventid[8]/*for `regex_match_ex'*/;
 #endif
 	char		encoding[32];
+	char		tmp[16];
 
 	AGENT_RESULT	result;
 
@@ -699,7 +702,7 @@ static void	process_active_checks(char *server, unsigned short port)
 				if (parse_command(active_metrics[i].key, NULL, 0, params, MAX_STRING_LEN) != 2)
 					break;
 
-				if (num_param( params ) > 4)
+				if (num_param( params ) > 5)
 					break;
 
 				if (get_param(params, 1, filename, sizeof(filename)) != 0)
@@ -720,10 +723,22 @@ static void	process_active_checks(char *server, unsigned short port)
 						maxlines_persec > MAX_VALUE_LINES)
 					break;
 
+				if (get_param(params, 5, tmp, sizeof(tmp)) != 0)
+					*tmp = '\0';
+
+				if ('\0' == *tmp || 0 == strcmp(tmp, "all"))
+					active_metrics[i].skip_old_data = 0;
+				else if (0 != strcmp(tmp, "skip"))
+					break;
+
 				s_count = p_count = 0;
 				lastlogsize = active_metrics[i].lastlogsize;
 
-				while (SUCCEED == (ret = process_log(filename, &lastlogsize, &value, encoding))) {
+				while (SUCCEED == (ret = process_log(filename, &lastlogsize, &value, encoding,
+						active_metrics[i].skip_old_data)))
+				{
+					active_metrics[i].skip_old_data = 0;
+
 					if (!value) /* EOF */
 					{
 						/*the file could become empty, must save `lastlogsize'*/
@@ -800,7 +815,7 @@ static void	process_active_checks(char *server, unsigned short port)
 				if (parse_command(active_metrics[i].key, NULL, 0, params, MAX_STRING_LEN) != 2)
 					break;
 
-				if (num_param( params ) > 4)
+				if (num_param( params ) > 5)
 					break;
 
 				if (get_param(params, 1, filename, sizeof(filename)) != 0)
@@ -821,11 +836,23 @@ static void	process_active_checks(char *server, unsigned short port)
 						maxlines_persec > MAX_VALUE_LINES)
 					break;
 
+				if (get_param(params, 5, tmp, sizeof(tmp)) != 0)
+					*tmp = '\0';
+
+				if ('\0' == *tmp || 0 == strcmp(tmp, "all"))
+					active_metrics[i].skip_old_data = 0;
+				else if (0 != strcmp(tmp, "skip"))
+					break;
+
 				s_count = p_count = 0;
 				lastlogsize = active_metrics[i].lastlogsize;
 				mtime = active_metrics[i].mtime;
 
-				while (SUCCEED == (ret = process_logrt(filename, &lastlogsize, &mtime, &value, encoding))) {
+				while (SUCCEED == (ret = process_logrt(filename, &lastlogsize, &mtime, &value, encoding,
+						active_metrics[i].skip_old_data)))
+				{
+					active_metrics[i].skip_old_data = 0;
+
 					if (!value) /* EOF */
 					{
 						/*the file could become empty, must save `lastlogsize' and `mtime'*/
@@ -908,7 +935,7 @@ static void	process_active_checks(char *server, unsigned short port)
 					break;
 				}
 
-				if (num_param(params) > 6) {
+				if (num_param(params) > 7) {
 					ret = FAIL;
 					break;
 				}
@@ -939,14 +966,25 @@ static void	process_active_checks(char *server, unsigned short port)
 					break;
 				}
 
+				if (get_param(params, 7, tmp, sizeof(tmp)) != 0)
+					*tmp = '\0';
+
+				if ('\0' == *tmp || 0 == strcmp(tmp, "all"))
+					active_metrics[i].skip_old_data = 0;
+				else if (0 != strcmp(tmp, "skip"))
+					break;
+
 				s_count = 0;
 				p_count = 0;
 				lastlogsize = active_metrics[i].lastlogsize;
 				/* "mtime" parameter is not used by "eventlog" checks */
 
 				while (SUCCEED == (ret = process_eventlog(filename, &lastlogsize,
-					&timestamp, &source, &severity, &value, &logeventid)))
+						&timestamp, &source, &severity, &value, &logeventid,
+						active_metrics[i].skip_old_data)))
 				{
+					active_metrics[i].skip_old_data = 0;
+
 					if (!value) /* EOF */
 					{
 						/*the eventlog could become empty, must save `lastlogsize'*/
