@@ -919,7 +919,8 @@ class CHost extends CZBXAPI{
 		self::BeginTransaction(__METHOD__);
 
 		foreach($hosts as $num => $host){
-			$host['hosts'] = $host;
+$th = $host;
+			$host['hosts'] = $th;
 
 			$result = self::massUpdate($host);
 			if(!$result) break;
@@ -999,7 +1000,7 @@ class CHost extends CZBXAPI{
 			if(isset($data['host'])){
 				if(count($hosts) > 1){
 					$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields');
-					throw new APIException($error);
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cannot mass update host name');
 				}
 
 				$host_exists = self::getObjects(array('host' => $data['host']));
@@ -1008,7 +1009,7 @@ class CHost extends CZBXAPI{
 
 				if(!empty($host_exists) && ($host_exists['hostid'] != $cur_host['hostid'])){
 					$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
-					throw new APIException($error);
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 			}
 
