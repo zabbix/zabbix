@@ -223,6 +223,9 @@
 
 	define('SYSMAP_HIGHLIGH_OFF',		0);
 	define('SYSMAP_HIGHLIGH_ON',		1);
+	
+	define('SYSMAP_EXPANDPROBLEM_OFF',		0);
+	define('SYSMAP_EXPANDPROBLEM_ON',		1);
 
 	define('ITEM_TYPE_ZABBIX',		0);
 	define('ITEM_TYPE_SNMPV1',		1);
