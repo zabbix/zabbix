@@ -820,7 +820,7 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 
 	item->lastvalue_uint64	= value->ui64;
 	item->lastvalue_dbl	= value->dbl;
-	item->lastvalue_str	= value->str;
+	item->lastvalue_str	= (ITEM_VALUE_TYPE_TEXT == item->value_type) ? value->text : value->str;
 	item->lastvalue_null	= 0;
 
 	/* Required for nodata() */
