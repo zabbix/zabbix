@@ -1313,7 +1313,7 @@ class CTemplate extends CZBXAPI{
 				$start_points[] = $start_point['hostid'];
 			}
 // add to the start points also points which we add current templates
-			$start_points = array_merge($start_points, $targetids);
+			$start_points = array_unique(array_merge($start_points, $targetids));
 				
 			foreach($start_points as $start){
 				$path = array();
@@ -1356,6 +1356,8 @@ class CTemplate extends CZBXAPI{
 		foreach($graph[$current] as $step){
 			if(!self::checkCircularLink($graph, $step, $path)) return false;
 		}
+		
+		return true;
 	}
 }
 ?>
