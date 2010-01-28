@@ -1710,7 +1710,7 @@
 	'S_POLISH_PL'=>				'Polish (PL)',
 
 //	index.php
-	'S_ZABBIX_BIG'=>			'Zabbix',
+	'S_ZABBIX_BIG'=>			'ZABBIX',
 	'S_WELCOME'=>				'Welcome to Zabbix! You are connected as',
 	'S_LOGIN_NAME'=> 'Login name',
 

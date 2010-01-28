@@ -1056,7 +1056,7 @@ $th = $host;
 				if(!empty($groups_to_add)){
 					$result = self::massAdd(array('hosts' => $hosts, 'groups' => $groups_to_add));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant add grooup');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t add group');
 					}
 				}
 
@@ -1065,7 +1065,7 @@ $th = $host;
 				if(!empty($groups_to_del)){
 					$result = self::massRemove(array('hosts' => $hosts, 'groups' => $groups_to_del));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant remove group');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t remove group');
 					}
 				}
 			}
@@ -1093,7 +1093,7 @@ $th = $host;
 
 				$result = self::massAdd(array('hosts' => $hosts, 'templates' => $new_templateids));
 				if(!$result){
-					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant link template');
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t link template');
 				}
 
 
@@ -1103,7 +1103,7 @@ $th = $host;
 				if(!empty($templates_to_del)){
 					$result = self::massRemove(array('hosts' => $hosts, 'templates' => $templates_to_del));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant unlink template');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t unlink template');
 					}
 				}
 			}
@@ -1130,7 +1130,7 @@ $th = $host;
 				if(!empty($macros_to_del)){
 					$result = self::massRemove(array('hosts' => $hosts, 'macros' => $macros_to_del));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant remove macro');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t remove macro');
 					}
 				}
 				
@@ -1200,7 +1200,7 @@ $th = $host;
 				if(empty($data['extendedProfile'])){
 					$sql = 'DELETE FROM hosts_profiles_ext WHERE '.DBcondition('hostid', $hostids);
 					if(!DBexecute($sql))
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cannot delete extended profile');					
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cannot delete extended profile');
 				}
 				else{
 					$existing_profiles = array();

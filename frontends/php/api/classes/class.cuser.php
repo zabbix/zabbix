@@ -1262,7 +1262,7 @@ class CUser extends CZBXAPI{
 			if(!empty($del_medias)){
 				$result = self::deleteMedia($del_medias);
 				if(!$result){
-					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant delete user medias');
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t delete user medias');
 				}
 			}
 
@@ -1281,7 +1281,7 @@ class CUser extends CZBXAPI{
 						' WHERE mediaid='.$media['mediaid'];
 				$result = DBexecute($sql);
 				if(!$result){
-					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant update user media');
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t update user media');
 				}
 			}
 
@@ -1289,7 +1289,7 @@ class CUser extends CZBXAPI{
 			if(!empty($new_medias)){
 				$result = self::addMedia(array('users' => $users, 'medias' => $new_medias));
 				if(!$result){
-					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant insert user media');
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t insert user media');
 				}
 			}
 
