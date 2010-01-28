@@ -1141,12 +1141,12 @@ class CUser extends CZBXAPI{
 					}
 
 					$mediaid = get_dbid('media','mediaid');
-			
+
 					$sql='INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period) '.
 							' VALUES ('.$mediaid.','.$user['userid'].','.$media['mediatypeid'].','.
 										zbx_dbstr($media['sendto']).','.$media['active'].','.$media['severity'].','.
 										zbx_dbstr($media['period']).')';
-			
+
 					$result = DBexecute($sql);
 
 				if(!$result) break 2;

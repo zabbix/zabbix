@@ -741,7 +741,7 @@ class CTemplate extends CZBXAPI{
 				$template['templates'] = $template;
 
 				$result = self::massUpdate($template);
-				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Failed update template');
+				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Failed to update template');
 			}
 
 			self::EndTransaction(true, __METHOD__);
