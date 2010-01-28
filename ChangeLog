@@ -1,8 +1,12 @@
+Changes for 1.8.2
+
+ - [ZBX-954] fix minor typos (Richlv)
+
 Changes for 1.8.1
 
  - [ZBX-1850] fixed warnings when saving host with enabled profile (Vedmak)
  - [ZBX-1779] fixed incorrect number of problems in Host Status widget (Vedmak)
- - [ZBX-1849] fixed colors of trigger severity in Host Status widget (Vedmak)
+ - [ZBX-1849] fixed colours of trigger severity in Host Status widget (Vedmak)
  - [ZBX-1757] fixed oracle 1.8 upgrade patch, not null constraints (Vedmak)
  - [ZBX-1762] fixed errors when editing media types (Vedmak)
  - [DEV-445] added support of system.stat[] under AIX (Sasha)

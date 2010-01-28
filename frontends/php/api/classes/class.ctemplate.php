@@ -980,7 +980,7 @@ $i = 0;
 				if(!empty($groups_to_add)){
 					$result = self::massAdd(array('templates' => $templates, 'groups' => $groups_to_add));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant add grooup');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t add group');
 					}
 				}
 
@@ -989,7 +989,7 @@ $i = 0;
 				if(!empty($groups_to_del)){
 					$result = self::massRemove(array('templates' => $templates, 'groups' => $groups_to_del));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant remove group');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t remove group');
 					}
 				}
 			}
@@ -1019,7 +1019,7 @@ $i = 0;
 				if(!empty($hosts_to_add)){
 					$result = self::massAdd(array('templates' => $templates, 'hosts' => $hosts_to_add));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant link template');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t link template');
 					}
 				}
 
@@ -1029,7 +1029,7 @@ $i = 0;
 				if(!empty($hosts_to_del)){
 					$result = self::massRemove(array('hosts' => $hosts_to_del, 'templates' => $templates));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant unlink template');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t unlink template');
 					}
 				}
 			}
@@ -1044,7 +1044,7 @@ $i = 0;
 				if(!empty($templates_to_add)){
 					$result = self::massAdd(array('templates' => $templates, 'templates_link' => $templates_to_add));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant link template');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t link template');
 					}
 				}
 
@@ -1054,7 +1054,7 @@ $i = 0;
 				if(!empty($templates_to_del)){
 					$result = self::massRemove(array('templates' => $templates, 'templates_link' => $templates_to_del));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant unlink template');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t unlink template');
 					}
 				}
 			}
@@ -1065,7 +1065,7 @@ $i = 0;
 
 				$result = self::massAdd(array('templates' => $templates, 'macros' => $data['macros']));
 				if(!$result){
-					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant add macro');
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t add macro');
 				}
 
 				$macros_to_del = array();
@@ -1085,7 +1085,7 @@ $i = 0;
 				if(!empty($macros_to_del)){
 					$result = self::massRemove(array('templates' => $templates, 'macros' => $macros_to_del));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant remove macro');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t remove macro');
 					}
 				}
 			}
@@ -1137,7 +1137,7 @@ $i = 0;
 			if(isset($data['groups'])){
 				$options = array('groups' => $data['groups'], 'templates' => $templates);
 				$result = CHostGroup::massAdd($options);
-				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant link groups');
+				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t link groups');
 			}
 
 			if(isset($data['hosts'])){
@@ -1153,7 +1153,7 @@ $i = 0;
 			if(isset($data['macros'])){
 				$options = array('templates' => zbx_toArray($data['templates']), 'macros' => $data['macros']);
 				$result = CUserMacro::massAdd($options);
-				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant link macros');
+				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t link macros');
 			}
 
 			$result = self::EndTransaction(true, __METHOD__);
