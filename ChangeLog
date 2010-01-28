@@ -161,6 +161,7 @@ Changes for 1.8.1
  - [ZBX-1470] fixed importing triggers with dependencies (Vedmak)
  - [ZBX-1440] fixed error when adding global macro (Vedmak)
  - [ZBX-1435] fixed exporting triggers with '&' (Vedmak)
+ - [ZBX-1459] fixed template importing (Vedmak)
  - [ZBX-1174] fixed sql in "Add host" operation in "Discovery" module (Dmitry)
  - [ZBX-1431] fixed parameters for user.get api method (Vedmak)
  - [ZBX-1467] fixed graph copying (Vedmak)
