@@ -24,32 +24,6 @@
 
 #include "evalfunc.h"
 
-static const char	*get_table_by_value_type(int value_type)
-{
-	switch (value_type) {
-	case ITEM_VALUE_TYPE_FLOAT: return "history"; break;
-	case ITEM_VALUE_TYPE_UINT64: return "history_uint"; break;
-	case ITEM_VALUE_TYPE_STR: return "history_str"; break;
-	case ITEM_VALUE_TYPE_TEXT: return "history_text"; break;
-	case ITEM_VALUE_TYPE_LOG: return "history_log"; break;
-	default:
-		return NULL;
-	}
-}
-
-static const char	*get_key_by_value_type(int value_type)
-{
-	switch (value_type) {
-	case ITEM_VALUE_TYPE_FLOAT:
-	case ITEM_VALUE_TYPE_UINT64:
-	case ITEM_VALUE_TYPE_STR: return "clock"; break;
-	case ITEM_VALUE_TYPE_TEXT:
-	case ITEM_VALUE_TYPE_LOG: return "id"; break;
-	default:
-		return NULL;
-	}
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: evaluate_LOGSOURCE                                               *
@@ -1186,7 +1160,7 @@ static int evaluate_STR(char *value, DB_ITEM *item, char *function, char *parame
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	char		str[MAX_STRING_LEN], *lastvalue = NULL, sql[MAX_STRING_LEN];
+	char		str[MAX_STRING_LEN];
 	char		encoding[MAX_STRING_LEN];
 	int		func;
 	int		res = SUCCEED;
@@ -1195,6 +1169,7 @@ static int evaluate_STR(char *value, DB_ITEM *item, char *function, char *parame
 	int		regexps_alloc = 0, regexps_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_STR()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_STR() %s", item->lastvalue_str);
 
 	if (item->value_type != ITEM_VALUE_TYPE_STR && item->value_type != ITEM_VALUE_TYPE_TEXT &&
 			item->value_type != ITEM_VALUE_TYPE_LOG)
@@ -1237,56 +1212,29 @@ static int evaluate_STR(char *value, DB_ITEM *item, char *function, char *parame
 		}
 	}
 
-	if (item->value_type == ITEM_VALUE_TYPE_TEXT || item->value_type == ITEM_VALUE_TYPE_LOG)
-	{
-		zbx_snprintf(sql, sizeof(sql),
-				"select value"
-				" from %s"
-				" where itemid=" ZBX_FS_UI64
-				" order by %s desc",
-				get_table_by_value_type(item->value_type),
-				item->itemid,
-				get_key_by_value_type(item->value_type));
-		result = DBselectN(sql, 1);
-
-		if (NULL != (row = DBfetch(result)))
-			lastvalue = strdup(row[0]);
-		DBfree_result(result);
+	switch (func) {
+	case ZBX_FUNC_STR:
+		if (NULL != strstr(item->lastvalue_str, str))
+			strcpy(value, "1");
+		else
+			strcpy(value, "0");
+		break;
+	case ZBX_FUNC_REGEXP:
+		if (SUCCEED == regexp_match_ex(regexps, regexps_num, item->lastvalue_str, str, ZBX_CASE_SENSITIVE, encoding))
+			strcpy(value, "1");
+		else
+			strcpy(value, "0");
+		break;
+	case ZBX_FUNC_IREGEXP:
+		if (SUCCEED == regexp_match_ex(regexps, regexps_num, item->lastvalue_str, str, ZBX_IGNORE_CASE, encoding))
+			strcpy(value, "1");
+		else
+			strcpy(value, "0");
+		break;
 	}
-	else
-		lastvalue = item->lastvalue_str;
-
-	if (NULL != lastvalue)
-	{
-		switch (func) {
-		case ZBX_FUNC_STR:
-			if (NULL != strstr(lastvalue, str))
-				strcpy(value, "1");
-			else
-				strcpy(value, "0");
-			break;
-		case ZBX_FUNC_REGEXP:
-			if (SUCCEED == regexp_match_ex(regexps, regexps_num, lastvalue, str, ZBX_CASE_SENSITIVE, encoding))
-				strcpy(value, "1");
-			else
-				strcpy(value, "0");
-			break;
-		case ZBX_FUNC_IREGEXP:
-			if (SUCCEED == regexp_match_ex(regexps, regexps_num, lastvalue, str, ZBX_IGNORE_CASE, encoding))
-				strcpy(value, "1");
-			else
-				strcpy(value, "0");
-			break;
-		}
-	}
-	else
-		res = FAIL;
 
 	if ((func == ZBX_FUNC_REGEXP || func == ZBX_FUNC_IREGEXP) && *str == '@')
 		zbx_free(regexps);
-
-	if (NULL != lastvalue && lastvalue != item->lastvalue_str)
-		zbx_free(lastvalue);
 
 	return res;
 }
