@@ -893,11 +893,11 @@ class CHostGroup extends CZBXAPI{
 		$hostids = zbx_objectValues($hosts, 'hostid');
 		$templateids = zbx_objectValues($templates, 'templateid');
 
-		
+
 		$hosts_to_unlink = $hosts_to_link = array();
 		$options = array(
-			'groupids' => $groupids, 
-			'preservekeys' => 1, 
+			'groupids' => $groupids,
+			'preservekeys' => 1,
 			// 'editable' => 1
 		);
 		if(!is_null($hosts)){
@@ -905,7 +905,7 @@ class CHostGroup extends CZBXAPI{
 			$hosts_to_unlink = array_diff(array_keys($groups_hosts), $hostids);
 			$hosts_to_link = array_diff($hostids, array_keys($groups_hosts));
 		}
-		
+
 		$templates_to_unlink = $templates_to_link = array();
 		if(!is_null($templates)){
 			$groups_templates = CTemplate::get($options);
@@ -915,7 +915,7 @@ class CHostGroup extends CZBXAPI{
 
 		$objectids_to_link = array_merge($hosts_to_link, $templates_to_link);
 		$objectids_to_unlink = array_merge($hosts_to_unlink, $templates_to_unlink);
-		
+
 // PERMISSION {{{
 		$options = array(
 			'groupids' => $groupids,
@@ -965,7 +965,7 @@ class CHostGroup extends CZBXAPI{
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'One of the Objects is left without Hostgroup');
 			return false;
 		}
-		
+
 		self::BeginTransaction(__METHOD__);
 
 		$sql = 'DELETE FROM hosts_groups WHERE '.DBcondition('groupid', $groupids).' AND '.DBcondition('hostid', $objectids_to_unlink);

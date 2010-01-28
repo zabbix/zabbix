@@ -439,7 +439,7 @@ SDI('///////////////////////////////////////');
 					' VALUES ('.$sysmapid.','.zbx_dbstr($map['name']).','.$map['width'].','.$map['height'].','.
 								$map['backgroundid'].','.$map['label_type'].','.$map['label_location'].','.
 								$map['highlight'].','.$map['expandproblem'].')');
-					
+
 			if(!$result) break;
 
 			$new_map = array('sysmapid' => $sysmapid);
@@ -562,7 +562,7 @@ SDI('///////////////////////////////////////');
 			$sql = 'SELECT linkid FROM sysmaps_links '.
 					' WHERE '.DBcondition('selementid1',$selementids).
 						' OR '.DBcondition('selementid2',$selementids);
-	
+
 			$res=DBselect($sql);
 			while($rows = DBfetch($res)){
 				$sysmap_linkids[$rows['linkid']] = $rows['linkid'];
@@ -572,7 +572,7 @@ SDI('///////////////////////////////////////');
 				DBexecute('DELETE FROM sysmaps_link_triggers WHERE '.DBcondition('linkid',$sysmap_linkids));
 				DBexecute('DELETE FROM sysmaps_links WHERE '.DBcondition('linkid',$sysmap_linkids));
 			}
-			
+
 			DBexecute('DELETE FROM sysmaps_elements WHERE '.DBcondition('selementid',$selementids));
 		}
 //----
