@@ -927,9 +927,9 @@ class CItem extends CZBXAPI{
 		$itemids = array();
 
 		$options = array(
-				'itemids'=> zbx_objectValues($items, 'itemid'), 
-				'editable'=>1, 
-				'extendoutput'=>1, 
+				'itemids'=> zbx_objectValues($items, 'itemid'),
+				'editable'=>1,
+				'extendoutput'=>1,
 				'preservekeys'=>1
 			);
 		$upd_items = self::get($options);
