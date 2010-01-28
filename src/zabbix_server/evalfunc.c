@@ -1169,7 +1169,6 @@ static int evaluate_STR(char *value, DB_ITEM *item, char *function, char *parame
 	int		regexps_alloc = 0, regexps_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_STR()");
-	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_STR() %s", item->lastvalue_str);
 
 	if (item->value_type != ITEM_VALUE_TYPE_STR && item->value_type != ITEM_VALUE_TYPE_TEXT &&
 			item->value_type != ITEM_VALUE_TYPE_LOG)
