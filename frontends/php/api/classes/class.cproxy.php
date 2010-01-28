@@ -572,7 +572,7 @@ class CProxy extends CZBXAPI{
 				if(!empty($groups_to_add)){
 					$result = self::massAdd(array('hosts' => $hosts, 'groups' => $groups_to_add));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant add grooup');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t add group');
 					}
 				}
 
@@ -581,7 +581,7 @@ class CProxy extends CZBXAPI{
 				if(!empty($groups_to_del)){
 					$result = self::massRemove(array('hosts' => $hosts, 'groups' => $groups_to_del));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant remove group');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t remove group');
 					}
 				}
 			}
@@ -609,7 +609,7 @@ class CProxy extends CZBXAPI{
 
 				$result = self::massAdd(array('hosts' => $hosts, 'templates' => $new_templateids));
 				if(!$result){
-					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant link template');
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t link template');
 				}
 
 
@@ -619,7 +619,7 @@ class CProxy extends CZBXAPI{
 				if(!empty($templates_to_del)){
 					$result = self::massRemove(array('hosts' => $hosts, 'templates' => $templates_to_del));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant unlink template');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t unlink template');
 					}
 				}
 			}
@@ -633,7 +633,7 @@ class CProxy extends CZBXAPI{
 
 				$result = self::massAdd(array('hosts' => $hosts, 'macros' => $data['macros']));
 				if(!$result){
-					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant add macro');
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t add macro');
 				}
 
 				$macros_to_del = array();
@@ -653,7 +653,7 @@ class CProxy extends CZBXAPI{
 				if(!empty($macros_to_del)){
 					$result = self::massRemove(array('hosts' => $hosts, 'macros' => $macros_to_del));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant remove macro');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t remove macro');
 					}
 				}
 			}

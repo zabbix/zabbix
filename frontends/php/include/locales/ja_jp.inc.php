@@ -1436,7 +1436,7 @@
 	'S_DUTCH_NL'=>			'オランダ語 (NL)',
 	'S_HUNGARY_HU'=>			'ハンガリー語 (HU)',
 	'S_POLISH_PL'=>			'ポーランド語 (PL)',
-	'S_ZABBIX_BIG'=>			'Zabbix',
+	'S_ZABBIX_BIG'=>			'ZABBIX',
 	'S_WELCOME'=>			'Zabbixへようこそ！次のユーザでログインしました',
 	'S_HOST_PROFILES'=>			'ホストプロファイル',
 	'S_HOST_PROFILES_BIG'=>			'ホストプロファイル',

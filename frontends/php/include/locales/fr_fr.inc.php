@@ -1523,7 +1523,7 @@
 	'S_DUTCH_NL'=>			'Hollandais (NL)',
 	'S_HUNGARY_HU'=>			'Hongrois (HU)',
 	'S_POLISH_PL'=>			'Polonais (PL)',
-	'S_ZABBIX_BIG'=>			'Zabbix',
+	'S_ZABBIX_BIG'=>			'ZABBIX',
 	'S_WELCOME'=>			'Bienvenue sur Zabbix ! Vous êtes connecté en tant que',
 	'S_HOST_PROFILES'=>			'Profils serveurs',
 	'S_HOST_PROFILES_BIG'=>			'PROFILS SERVEURS',
