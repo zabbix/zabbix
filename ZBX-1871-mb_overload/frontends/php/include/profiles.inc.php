@@ -206,7 +206,7 @@ return $result;
 
 // ----------- MISC PROFILE FUNCTIONS -----------
 function profile_type($type,$profile_type){
-	$profile_type = strtolower($profile_type);
+	$profile_type = zbx_strtolower($profile_type);
 	switch($profile_type){
 		case 'array':
 			$result = uint_in_array($type,array(PROFILE_TYPE_ARRAY_ID,PROFILE_TYPE_ARRAY_INT,PROFILE_TYPE_ARRAY_STR));

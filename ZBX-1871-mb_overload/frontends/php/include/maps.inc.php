@@ -922,14 +922,14 @@
 			}
 		}
 
-		while(false !== ($pos = strpos($label, '{'))){
+		while(false !== ($pos = zbx_strpos($label, '{'))){
 			$expr = substr($label, $pos);
 
-			if(false === ($pos = strpos($expr, '}'))) break;
+			if(false === ($pos = zbx_strpos($expr, '}'))) break;
 
 			$expr = substr($expr, 1, $pos - 1);
 
-			if(false === ($pos = strpos($expr, ':'))){
+			if(false === ($pos = zbx_strpos($expr, ':'))){
 				$label = str_replace('{'.$expr.'}', '???', $label);
 				continue;
 			}
@@ -937,7 +937,7 @@
 			$host = substr($expr, 0, $pos);
 			$key = substr($expr, $pos + 1);
 
-			if(false === ($pos = strrpos($key, '.'))){
+			if(false === ($pos = zbx_strrpos($key, '.'))){
 				$label = str_replace('{'.$expr.'}', '???', $label);
 				continue;
 			}
@@ -945,7 +945,7 @@
 			$function = substr($key, $pos + 1);
 			$key = substr($key, 0, $pos);
 
-			if(false === ($pos = strpos($function, '('))){
+			if(false === ($pos = zbx_strpos($function, '('))){
 				$label = str_replace('{'.$expr.'}', '???', $label);
 				continue;
 			}
@@ -953,7 +953,7 @@
 			$parameter = substr($function, $pos + 1);
 			$function = substr($function, 0, $pos);
 
-			if(false === ($pos = strrpos($parameter, ')'))){
+			if(false === ($pos = zbx_strrpos($parameter, ')'))){
 				$label = str_replace('{'.$expr.'}', '???', $label);
 				continue;
 			}

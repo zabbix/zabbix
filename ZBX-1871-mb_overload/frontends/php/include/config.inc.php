@@ -34,7 +34,7 @@ function SDII($msg='SDII') { echo 'DEBUG INFO: '; echo '<pre>'.print_r($msg, tru
 function VDP($var, $msg=null) { echo 'DEBUG DUMP: '; if(isset($msg)) echo '"'.$msg.'"'.SPACE; var_dump($var); echo SBR; } // DEBUG INFO!!!
 function TODO($msg) { echo 'TODO: '.$msg.SBR; }  // DEBUG INFO!!!
 function __autoload($class_name){
-	$class_name = strtolower($class_name);
+	$class_name = zbx_strtolower($class_name);
 	$api = array(
 		'czbxapi' => 1,
 		'capiinfo' => 1,
@@ -326,7 +326,7 @@ function __autoload($class_name){
 						'text'	=> $msg,
 						'color'	=> (!$bool) ? array('R'=>255,'G'=>0,'B'=>0) : array('R'=>34,'G'=>51,'B'=>68),
 						'font'	=> 2));
-					$width = max($width, ImageFontWidth(2) * strlen($msg) + 1);
+					$width = max($width, ImageFontWidth(2) * zbx_strlen($msg) + 1);
 					$height += imagefontheight(2) + 1;
 					break;
 				case PAGE_TYPE_XML:
@@ -376,7 +376,7 @@ function __autoload($class_name){
 							'color'	=> array('R'=>155,'G'=>155,'B'=>55),
 							'font'	=> $msg_font));
 					}
-					$width = max($width, imagefontwidth($msg_font) * strlen($msg['message']) + 1);
+					$width = max($width, imagefontwidth($msg_font) * zbx_strlen($msg['message']) + 1);
 					$height += imagefontheight($msg_font) + 1;
 				}
 			}
@@ -390,7 +390,7 @@ function __autoload($class_name){
 
 				foreach($ZBX_MESSAGES as $msg){
 					$lst_error->addItem($msg['message'], $msg['type']);
-					$bool = ($bool && ('error' != strtolower($msg['type'])));
+					$bool = ($bool && ('error' != zbx_strtolower($msg['type'])));
 				}
 
 //message scroll if needed
@@ -1307,7 +1307,7 @@ function __autoload($class_name){
 
 		$rsTable = array();
 		foreach($table as $num => $row){
-			if(strtoupper($row[$column]) == strtoupper($pattern))
+			if(zbx_strtoupper($row[$column]) == zbx_strtoupper($pattern))
 				$rsTable = array($num=>$row) + $rsTable;
 			else if($limit > 0)
 				$rsTable[$num] = $row;

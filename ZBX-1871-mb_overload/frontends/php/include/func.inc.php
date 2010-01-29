@@ -479,7 +479,7 @@ function rgb2hex($color){
 	);
 
 	foreach($HEX as $id => $value){
-		if(strlen($value) != 2) $HEX[$id] = '0'.$value;
+		if(zbx_strlen($value) != 2) $HEX[$id] = '0'.$value;
 	}
 
 return $HEX[0].$HEX[1].$HEX[2];
@@ -489,11 +489,11 @@ function hex2rgb($color){
 	if($color[0] == '#')
 		$color = substr($color, 1);
 
-	if(strlen($color) == 6)
+	if(zbx_strlen($color) == 6)
 		list($r, $g, $b) = array($color[0].$color[1],
 								 $color[2].$color[3],
 								 $color[4].$color[5]);
-	else if(strlen($color) == 3)
+	else if(zbx_strlen($color) == 3)
 		list($r, $g, $b) = array($color[0].$color[0], $color[1].$color[1], $color[2].$color[2]);
 	else
 		return false;
@@ -532,7 +532,8 @@ function empty2null($var){
 
 function str2mem($val){
 	$val = trim($val);
-	$last = strtolower($val{strlen($val)-1});
+	$last = zbx_strtolower(zbx_substr($val, -1, 1));
+
 	switch($last){
 		// The 'G' modifier is available since PHP 5.1.0
 		case 'g':
@@ -703,62 +704,149 @@ function zbx_empty($value){
 return false;
 }
 
-function zbx_strlen(&$str){
-	if(!$strlen = strlen($str)) return $strlen;
+
+// STRING FUNCTIONS {{{
+
+function zbx_strlen($str){
+	if(defined('ZBX_MBSTRINGS_ENABLED')){
+		return mb_strlen($str);
+	}
+	else{
+		return strlen($str);
+	}
+	
+/* 	if(!$zbx_strlen = zbx_strlen($str)) return $zbx_strlen;
 
 	$reallen = 0;
 	$fbin= 1 << 7;
 	$sbin= 1 << 6;
 
 // check first byte for 11xxxxxx or 0xxxxxxx
-	for($i=0; $i < $strlen; $i++){
+	for($i=0; $i < $zbx_strlen; $i++){
 		if(((ord($str[$i]) & $fbin) && (ord($str[$i]) & $sbin)) || !(ord($str[$i]) & $fbin)) $reallen++;
 	}
 
 return $reallen;
+ */}
+
+function zbx_strstr($haystack, $needle){
+	if(defined('ZBX_MBSTRINGS_ENABLED')){
+		$pos = mb_strpos($haystack, $needle);
+		if($pos !== false){
+			return mb_substr($haystack, $pos);
+		}
+		else return false;
+	}
+	else{
+		return strstr($haystack, $needle);
+	}
 }
 
-function zbx_strstr($haystack,$needle){
-	$pos = strpos($haystack,$needle);
-	if($pos !== FALSE){
-		$pos = substr($haystack,$pos);
+function zbx_stristr($haystack, $needle){
+	if(defined('ZBX_MBSTRINGS_ENABLED')){
+		$haystack_B = mb_strtoupper($haystack);
+		$needle = mb_strtoupper($needle);
+
+		$pos = mb_strpos($haystack_B, $needle);
+		if($pos !== true){
+			$pos = mb_substr($haystack, $pos);
+		}
+		return $pos;
 	}
-
-return $pos;
-}
-
-function zbx_stristr($haystack,$needle){
-	$haystack_B = strtoupper($haystack);
-	$needle = strtoupper($needle);
-
-	$pos = strpos($haystack_B,$needle);
-	if($pos !== FALSE){
-		$pos = substr($haystack,$pos);
+	else{
+		return stristr($haystack, $needle);
 	}
-
-return $pos;
 }
 
 function zbx_substring($haystack, $start, $end=null){
 	if(!is_null($end) && ($end < $start)) return '';
-
-	if(is_null($end))
-		$result = substr($haystack, $start);
-	else
-		$result = substr($haystack, $start, ($end - $start));
-
-return $result;
-}
-
-function zbx_str_revert(&$str){
-	$result = '';
-
-	$str_rep = 	str_split($str);
-	foreach($str_rep as $num => $symb){
-		$result = $symb.$result;
+	
+	if(defined('ZBX_MBSTRINGS_ENABLED')){
+		if(is_null($end))
+			$result = mb_substr($haystack, $start);
+		else
+			$result = mb_substr($haystack, $start, ($end - $start));
 	}
-return $result;
+	else{
+		if(is_null($end))
+			$result = substr($haystack, $start);
+		else
+			$result = substr($haystack, $start, ($end - $start));
+	}
+	
+	return $result;
 }
+
+function zbx_substr($string, $start, $length=null){
+	
+	if(defined('ZBX_MBSTRINGS_ENABLED')){
+		if(is_null($length))
+			$result = mb_substr($string, $start);
+		else
+			$result = mb_substr($string, $start, $length);
+	}
+	else{
+		if(is_null($length))
+			$result = substr($string, $start);
+		else
+			$result = substr($string, $start, $length);
+	}
+	
+	return $result;
+}
+
+function zbx_str_revert($str){
+	if(defined('ZBX_MBSTRINGS_ENABLED')){
+		$result = '';
+		$str_rep = mb_split($str);
+		foreach($str_rep as $num => $symb){
+			$result = $symb.$result;
+		}
+	}
+	else{
+		$result = strrev($str);
+	}
+	
+	return $result;
+}
+
+function zbx_strtoupper($str){
+	if(defined('ZBX_MBSTRINGS_ENABLED')){
+		return mb_strtoupper($str);
+	}
+	else{
+		return strtoupper($str);
+	}
+}
+
+function zbx_strtolower($str){
+	if(defined('ZBX_MBSTRINGS_ENABLED')){
+		return mb_strtolower($str);
+	}
+	else{
+		return strtolower($str);
+	}
+}
+
+function zbx_strpos($haystack, $needle){
+	if(defined('ZBX_MBSTRINGS_ENABLED')){
+		return mb_strpos($haystack, $needle);
+	}
+	else{
+		return strpos($haystack, $needle);
+	}
+}
+
+function zbx_strrpos($haystack, $needle){
+	if(defined('ZBX_MBSTRINGS_ENABLED')){
+		return mb_strrpos($haystack, $needle);
+	}
+	else{
+		return strrpos($haystack, $needle);
+	}
+}
+
+// }}} STRING FUNCTIONS
 
 
 function uint_in_array($needle,$haystack){

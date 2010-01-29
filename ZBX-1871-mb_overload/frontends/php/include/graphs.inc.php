@@ -1261,11 +1261,11 @@
 
 			if($angle){
 				$result['width'] = imagefontheight($fontsize);
-				$result['height'] = imagefontwidth($fontsize) * strlen($string);
+				$result['height'] = imagefontwidth($fontsize) * zbx_strlen($string);
 			}
 			else{
 				$result['height'] = imagefontheight($fontsize);
-				$result['width'] = imagefontwidth($fontsize) * strlen($string);
+				$result['width'] = imagefontwidth($fontsize) * zbx_strlen($string);
 			}
 		}
 

@@ -152,11 +152,11 @@ include_once('include/page_header.php');
 			error(S_MACRO_EXISTS.' : '.$macro_new);
 			show_messages(false, '', S_CANNOT_ADD_MACRO);
 		}
-		else if(strlen($macro_new) > 64){
+		else if(zbx_strlen($macro_new) > 64){
 			error(S_MACRO_TOO_LONG.' : '.$macro_new);
 			show_messages(false, '', S_CANNOT_ADD_MACRO);
 		}
-		else if(strlen($value_new) > 255){
+		else if(zbx_strlen($value_new) > 255){
 			error(S_MACRO_VALUE_TOO_LONG.' : '.$value_new);
 			show_messages(false, '', S_CANNOT_ADD_MACRO);
 		}

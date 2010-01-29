@@ -1138,7 +1138,7 @@
 		while($row = DBfetch($result)){
 			$descr = item_description($row);
 			$row['host'] = get_node_name_by_elid($row['hostid'], null, ': ').$row['host'];
-			$hosts[strtolower($row['host'])] = $row['host'];
+			$hosts[zbx_strtolower($row['host'])] = $row['host'];
 
 // A little tricky check for attempt to overwrite active trigger (value=1) with
 // inactive or active trigger with lower priority.
@@ -1390,7 +1390,7 @@
 					$db_item["value_type"] == ITEM_VALUE_TYPE_TEXT ||
 					$db_item["value_type"] == ITEM_VALUE_TYPE_LOG){
 				$lastvalue=$db_item["lastvalue"];
-				if(strlen($lastvalue) > 20)
+				if(zbx_strlen($lastvalue) > 20)
 					$lastvalue = substr($lastvalue,0,20)." ...";
 				$lastvalue = nbsp(htmlspecialchars($lastvalue));
 			}
