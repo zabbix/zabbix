@@ -936,6 +936,8 @@ class CTemplate extends CZBXAPI{
 
 
 // UPDATE TEMPLATE LINKAGE {{{
+// firstly need to unlink all things, to correctly check circulars
+
 			if(isset($data['hosts']) && !is_null($data['hosts'])){
 				$template_hosts = CHost::get(array('templateids' => $templateids, 'templated_hosts' => 1));
 				$template_hostids = zbx_objectValues($template_hosts, 'hostid');
@@ -949,8 +951,27 @@ class CTemplate extends CZBXAPI{
 					if(!$result){
 						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t unlink template');
 					}
-				}
+				}			
+			}
+			
+			if(isset($data['templates_link']) && !is_null($data['templates_link'])){
+
+				$template_templates = CTemplate::get(array('hostids' => $templateids));
+				$template_templateids = zbx_objectValues($template_templates, 'templateid');
+				$new_templateids = zbx_objectValues($data['templates_link'], 'templateid');
 				
+				$templates_to_del = array_diff($template_templateids, $new_templateids);
+				$templates_to_del = array_diff($templates_to_del, $cleared_templateids);
+				if(!empty($templates_to_del)){
+					$result = self::massRemove(array('templates' => $templates, 'templates_link' => $templates_to_del));
+					if(!$result){
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t unlink template');
+					}
+				}	
+			}
+
+			if(isset($data['hosts']) && !is_null($data['hosts'])){
+			
 				$hosts_to_add = array_diff($new_hostids, $template_hostids);
 				if(!empty($hosts_to_add)){
 					$result = self::massAdd(array('templates' => $templates, 'hosts' => $hosts_to_add));
@@ -959,13 +980,9 @@ class CTemplate extends CZBXAPI{
 					}
 				}
 			}
-// }}} UPDATE TEMPLATE LINKAGE
 
 			if(isset($data['templates_link']) && !is_null($data['templates_link'])){
-				$template_templates = CTemplate::get(array('hostids' => $templateids));
-				$template_templateids = zbx_objectValues($template_templates, 'templateid');
-				$new_templateids = zbx_objectValues($data['templates_link'], 'templateid');
-
+			
 				$templates_to_add = array_diff($new_templateids, $template_templateids);
 				if(!empty($templates_to_add)){
 					$result = self::massAdd(array('templates' => $templates, 'templates_link' => $templates_to_add));
@@ -973,17 +990,9 @@ class CTemplate extends CZBXAPI{
 						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t link template');
 					}
 				}
-
-				$templates_to_del = array_diff($template_templateids, $new_templateids);
-				$templates_to_del = array_diff($templates_to_del, $cleared_templateids);
-
-				if(!empty($templates_to_del)){
-					$result = self::massRemove(array('templates' => $templates, 'templates_link' => $templates_to_del));
-					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t unlink template');
-					}
-				}
 			}
+// }}} UPDATE TEMPLATE LINKAGE
+
 
 // UPDATE MACROS {{{
 			if(isset($data['macros']) && !is_null($data['macros'])){
@@ -1015,7 +1024,6 @@ class CTemplate extends CZBXAPI{
 					}
 				}
 			}
-
 // }}} UPDATE MACROS
 
 			self::EndTransaction(true, __METHOD__);
@@ -1311,7 +1319,8 @@ class CTemplate extends CZBXAPI{
 			}
 // add to the start points also points which we add current templates
 			$start_points = array_unique(array_merge($start_points, $targetids));
-				
+sdii($graph);
+sdii($start_points);				
 			foreach($start_points as $start){
 				$path = array();
 				if(!self::checkCircularLink($graph, $start, $path)){
