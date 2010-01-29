@@ -1,3 +1,7 @@
+Changes for 1.8.2
+
+ - [NTP-97] fixed naming procedure for discovered IPv6 hosts without DNS provided replacing all not-allowed symbols with '_' (Dmitry)
+
 Changes for 1.8.1
 
  - [ZBX-1850] fixed warnings when saving host with enabled profile (Vedmak)

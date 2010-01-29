@@ -1719,3 +1719,34 @@ int	is_function_char(const char c)
 	return FAIL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: make_hostname                                                    *
+ *                                                                            *
+ * Purpose: replace all not-allowed hostname symbols in the string            *
+ *                                                                            *
+ * Parameters: host - the target C-style string                               *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Dmitry Borovikov                                                   *
+ *                                                                            *
+ * Comments: the string must be null-terminated, otherwise not secure!        *
+ *                                                                            *
+ ******************************************************************************/
+void	make_hostname(char const *host)
+{
+	int	i = 0;
+	char	*c = NULL;
+	
+	assert(host);
+	
+	zabbix_log(LOG_LEVEL_DEBUG, "In make_hostname() hostname: '%s'", host);
+	
+	c = host;
+	for ( ; '\0' != *c; ++c)
+		if (FAIL == is_hostname_char(*c))
+			*c = '_';
+	
+	zabbix_log(LOG_LEVEL_DEBUG, "End make_hostname() hostname: '%s'", host);
+}
