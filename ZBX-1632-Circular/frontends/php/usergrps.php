@@ -409,9 +409,9 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 			if(granted2update_group($usrgrpid)){
 
 				$next_gui_auth = ($usrgrp['gui_access']+1 > GROUP_GUI_ACCESS_DISABLED)?GROUP_GUI_ACCESS_SYSTEM:($usrgrp['gui_access']+1);
-							
+
 				$gui_access = new CLink(
-									$gui_access, 
+									$gui_access,
 									'usergrps.php?go=set_gui_access&set_gui_access='.$next_gui_auth.'&usrgrpid='.$usrgrpid,
 									$gui_access_style
 								);
@@ -425,10 +425,13 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 				$users_status = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED)? new CSpan(S_ENABLED, 'enabled') : new CSpan(S_DISABLED, 'disabled');
 			}
 
-			$users = array();
-			order_result($usrgrp['users'], 'alias');
+			if(isset($usrgrp['users'])){
 
-			foreach($usrgrp['users'] as $unum => $user){
+				$usrgrpusers = $usrgrp['users'];
+				order_result($usrgrpusers, 'alias');
+
+				$users = array();
+				foreach($usrgrpusers as $unum => $user){
 				$user_type_style = 'enabled';
 				if(USER_TYPE_ZABBIX_ADMIN == $user['type']) $user_type_style = 'orange';
 				if(USER_TYPE_SUPER_ADMIN == $user['type']) $user_type_style = 'disabled';
@@ -436,13 +439,14 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 				$user_status_style = 'enabled';
 				if(GROUP_GUI_ACCESS_DISABLED == $user['gui_access']) $user_status_style = 'disabled';
 				if(GROUP_STATUS_DISABLED == $user['users_status']) $user_status_style = 'disabled';
-				
+
 
 				$users[] = new CLink($user['alias'],'users.php?form=update&userid='.$user['userid'], $user_status_style);//, $user_type_style);
-				$users[] = ', ';
-			}
-			array_pop($users);
+					$users[] = ', ';
+				}
+				array_pop($users);
 
+			}
 
 			$table->addRow(array(
 				new CCheckBox('group_groupid['.$usrgrpid.']', NULL, NULL, $usrgrpid),
@@ -490,6 +494,14 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
+
+		$jsLocale = array(
+			'S_CLOSE',
+			'S_NO_ELEMENTS_SELECTES'
+		);
+
+		zbx_addJSLocale($jsLocale);
+
 		zbx_add_post_js('chkbxRange.pageGoName = "group_groupid";');
 
 		$footer = get_table_header(array($goBox, $goButton));

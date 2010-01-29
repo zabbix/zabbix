@@ -668,23 +668,33 @@ else {
 		return (int)bcdiv("$id_var",'100000000000000');
 	}
 
-	function DBin_node( $id_name, $nodes = null ){
+	function DBin_node($id_name, $nodes = null){
 		if(is_null($nodes))	$nodes = get_current_nodeid();
 		else if(is_bool($nodes)) $nodes = get_current_nodeid($nodes);
 
-		if(empty($nodes))	$nodes = 0;
+		if(empty($nodes)){
+			$nodes = array(0);
+		}
+		else if(!is_array($nodes)){
+			if(is_string($nodes)){
+				if(!preg_match('/^([0-9,]+)$/', $nodes))
+					fatal_error('Incorrect "nodes" for "DBin_node". Passed ['.$nodes.']');
+			}
+			else if(!zbx_ctype_digit($nodes)){
+				fatal_error('Incorrect type of "nodes" for "DBin_node". Passed ['.gettype($nodes).']');
+			}
 
-		if(is_array($nodes)){
-			$nodes = implode(',', $nodes);
+			$nodes = zbx_toArray($nodes);
 		}
-		else if(is_string($nodes)){
-			if(!preg_match('/^([0-9,]+)$/', $nodes))
-				fatal_error('Incorrect "nodes" for "DBin_node". Passed ['.$nodes.']');
+
+		$sql = '';
+		foreach($nodes as $nnum => $nodeid){
+			$sql.= '('.$id_name.'  BETWEEN '.$nodeid.'00000000000000 AND '.$nodeid.'99999999999999)';
+			$sql.= ' OR ';
 		}
-		else if(!zbx_numeric($nodes)){
-			fatal_error('Incorrect type of "nodes" for "DBin_node". Passed ['.gettype($nodes).']');
-		}
-	return (' '.DBid2nodeid($id_name).' in ('.$nodes.') ');
+
+		$sql = '('.trim($sql, 'OR ').')';
+	return $sql;
 	}
 
 	function in_node( $id_var, $nodes = null ){

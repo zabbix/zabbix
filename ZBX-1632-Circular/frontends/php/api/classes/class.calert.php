@@ -111,7 +111,7 @@ class CAlert extends CZBXAPI{
 
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
-			
+
 			if(!is_null($options['select_mediatypes'])){
 				$options['select_mediatypes'] = API_OUTPUT_EXTEND;
 			}
@@ -119,8 +119,8 @@ class CAlert extends CZBXAPI{
 				$options['select_users'] = API_OUTPUT_EXTEND;
 			}
 		}
-		
-		
+
+
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
@@ -342,20 +342,23 @@ class CAlert extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.
+		$sql = 'SELECT DISTINCT '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('a.alertid', $nodeids).
 					$sql_where.
 				$sql_order;
-//SDI($sql);
 		$db_res = DBselect($sql, $sql_limit);
 		while($alert = DBfetch($db_res)){
 			if($options['count'])
 				$result = $alert;
 			else{
 				$alertids[$alert['alertid']] = $alert['alertid'];
-				$userids[$alert['userid']] = $alert['userid'];
-				$mediatypeids[$alert['mediatypeid']] = $alert['mediatypeid'];
+
+				if(isset($alert['userid']))
+					$userids[$alert['userid']] = $alert['userid'];
+
+				if(isset($alert['mediatypeid']))
+					$mediatypeids[$alert['mediatypeid']] = $alert['mediatypeid'];
 
 				if($options['output'] == API_OUTPUT_SHORTEN){
 					$result[$alert['alertid']] = array('alertid' => $alert['alertid']);
@@ -373,7 +376,7 @@ class CAlert extends CZBXAPI{
 
 // hostids
 					if(isset($alert['hostid']) && is_null($options['select_hosts'])){
-						if(!isset($result[$alert['alertid']]['hosts'])) 
+						if(!isset($result[$alert['alertid']]['hosts']))
 							$result[$alert['alertid']]['hosts'] = array();
 
 						$result[$alert['alertid']]['hosts'][] = array('hostid' => $alert['hostid']);
@@ -412,8 +415,8 @@ class CAlert extends CZBXAPI{
 // Adding hosts
 		if(!is_null($options['select_hosts']) && str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
 			$obj_params = array(
-				'output' => $options['select_hosts'], 
-				'hostids' => $hostids, 
+				'output' => $options['select_hosts'],
+				'hostids' => $hostids,
 				'preservekeys' => 1
 			);
 			$hosts = CHost::get($obj_params);
@@ -422,8 +425,8 @@ class CAlert extends CZBXAPI{
 // Adding Users
 		if(!is_null($options['select_users']) && str_in_array($options['select_users'], $subselects_allowed_outputs)){
 			$obj_params = array(
-				'output' => $options['select_users'], 
-				'userids' => $userids, 
+				'output' => $options['select_users'],
+				'userids' => $userids,
 				'preservekeys' => 1
 			);
 			$users = CUser::get($obj_params);
@@ -479,7 +482,7 @@ class CAlert extends CZBXAPI{
  * @param array $alerts[0,...]['url'] OPTIONAL
  * @return boolean
  */
-	public static function add($alerts){
+	public static function create($alerts){
 		$alerts = zbx_toArray($alerts);
 		$alertids = array();
 		$result = false;

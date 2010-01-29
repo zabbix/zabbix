@@ -205,7 +205,8 @@ function insert_javascript_for_tweenbox(){
 	if(defined('SHOW_TWINBOX_SCRIPT_INSERTTED') || (PAGE_TYPE_HTML != $page['type'])) return;
 	define('SHOW_TWINBOX_SCRIPT_INSERTTED', 1);
 
-	$js = 'function moveListBoxSelectedItem(formname,objname,from,to,action){
+	$js = '
+		function moveListBoxSelectedItem(formname,objname,from,to,action){
 			var result = true
 
 			from = $(from);
@@ -215,7 +216,7 @@ function insert_javascript_for_tweenbox(){
 			var i = 0;
 			while(i<from.options.length){
 
-				if(from.options[i].selected == true) {
+				if((from.options[i].selected == true) && from.options[i].disabled != true) {
 					//	from.options[i].selected = false;
 
 					var temp = from.options[i].cloneNode(true);
@@ -255,6 +256,7 @@ function insert_javascript_for_tweenbox(){
 		}';
 
 	insert_js($js);
+	zbx_add_post_js('if(IE6 || IE7 ) $$("select option[disabled]").each(function(e){e.setStyle({color: "gray"});});');
 }
 
 function insert_javascript_for_visibilitybox(){

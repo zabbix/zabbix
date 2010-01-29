@@ -972,19 +972,19 @@ function validate_commands($commands){
 		$cmd = trim($cmd, "\x00..\x1F");
 //		if(!ereg("^(({HOSTNAME})|".ZBX_EREG_INTERNAL_NAMES.")(:|#)[[:print:]]*$",$cmd,$cmd_items)){
 		if(!preg_match("/^(({HOSTNAME})|".ZBX_PREG_INTERNAL_NAMES.")(:|#)[".ZBX_PREG_PRINT."]*$/", $cmd, $cmd_items)){
-			error("Incorrect command: '$cmd'");
+			error(S_INCORRECT_COMMAND.": '$cmd'");
 			return FALSE;
 		}
 
-		if($cmd_items[4] == "#"){ // group
-			if(!DBfetch(DBselect("select groupid from groups where name=".zbx_dbstr($cmd_items[1])))){
-				error("Unknown group name: '".$cmd_items[1]."' in command ".$cmd."'");
+		if($cmd_items[4] == '#'){ // group
+			if(!DBfetch(DBselect('select groupid from groups where name='.zbx_dbstr($cmd_items[1])))){
+				error(S_UNKNOWN_GROUP_NAME.": '".$cmd_items[1]."' ".S_IN_COMMAND_SMALL." '".$cmd."'");
 				return FALSE;
 			}
 		}
-		else if($cmd_items[4] == ":"){ // host
-			if(($cmd_items[1] != '{HOSTNAME}') && !DBfetch(DBselect("select hostid from hosts where host=".zbx_dbstr($cmd_items[1])))){
-				error("Unknown host name '".$cmd_items[1]."' in command '".$cmd."'");
+		else if($cmd_items[4] == ':'){ // host
+			if(($cmd_items[1] != '{HOSTNAME}') && !DBfetch(DBselect('select hostid from hosts where host='.zbx_dbstr($cmd_items[1])))){
+				error(S_UNKNOWN_HOST_NAME.": '".$cmd_items[1]."' ".S_IN_COMMAND_SMALL." '".$cmd."'");
 				return FALSE;
 			}
 		}

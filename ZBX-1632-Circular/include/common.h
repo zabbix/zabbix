@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -120,9 +120,9 @@
 #define ON	1
 #define OFF	0
 
-#define	APPLICATION_NAME	"ZABBIX Agent"
-#define	ZABBIX_REVDATE		"7 December 2009"
-#define	ZABBIX_VERSION		"1.8"
+#define	APPLICATION_NAME	"Zabbix Agent"
+#define	ZABBIX_REVDATE		"27 January 2010"
+#define	ZABBIX_VERSION		"1.8.2"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
@@ -186,7 +186,8 @@ typedef enum
 	ITEM_TYPE_DB_MONITOR,
 	ITEM_TYPE_IPMI,
 	ITEM_TYPE_SSH,
-	ITEM_TYPE_TELNET
+	ITEM_TYPE_TELNET,
+	ITEM_TYPE_CALCULATED
 } zbx_item_type_t;
 
 typedef enum
@@ -389,7 +390,7 @@ typedef enum
 #define SERVER_ICMPPINGSEC_KEY	"icmppingsec"
 /* Special item key used for ICMP ping loss packages */
 #define SERVER_ICMPPINGLOSS_KEY	"icmppingloss"
-/* Special item key used for internal ZABBIX log */
+/* Special item key used for internal Zabbix log */
 #define SERVER_ZABBIXLOG_KEY	"zabbix[log]"
 
 /* Media types */
@@ -750,6 +751,8 @@ void	rtrim_spaces(char *c);
 void	delete_reol(char *c);
 int	get_param(const char *param, int num, char *buf, int maxlen);
 int	num_param(const char *param);
+char	*get_param_dyn(const char *param, int num);
+void	remove_param(char *param, int num);
 int	get_key_param(char *param, int num, char *buf, int maxlen);
 int	num_key_param(char *param);
 int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char *delay_flex, time_t now);
@@ -914,4 +917,10 @@ zbx_uint64_t	zbx_letoh_uint64(
 zbx_uint64_t	zbx_htole_uint64(
 		zbx_uint64_t	data
 	);
+
+int	is_hostname_char(const char c);
+int	is_key_char(const char c);
+int	is_function_char(const char c);
+int	parse_function(char **exp, char **func, char **params);
+int	parse_host_key(char *exp, char **host, char **key);
 #endif

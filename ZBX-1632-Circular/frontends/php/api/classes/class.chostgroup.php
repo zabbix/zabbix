@@ -93,16 +93,16 @@ class CHostGroup extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $params);
 
-		
+
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
-			
+
 			if(!is_null($options['select_hosts'])){
 				$options['select_hosts'] = API_OUTPUT_EXTEND;
 			}
 		}
-		
-		
+
+
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
@@ -301,7 +301,7 @@ class CHostGroup extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.
+		$sql = 'SELECT DISTINCT '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('g.groupid', $nodeids).
 					$sql_where.
@@ -893,6 +893,29 @@ class CHostGroup extends CZBXAPI{
 		$hostids = zbx_objectValues($hosts, 'hostid');
 		$templateids = zbx_objectValues($templates, 'templateid');
 
+
+		$hosts_to_unlink = $hosts_to_link = array();
+		$options = array(
+			'groupids' => $groupids,
+			'preservekeys' => 1,
+			// 'editable' => 1
+		);
+		if(!is_null($hosts)){
+			$groups_hosts = CHost::get($options);
+			$hosts_to_unlink = array_diff(array_keys($groups_hosts), $hostids);
+			$hosts_to_link = array_diff($hostids, array_keys($groups_hosts));
+		}
+
+		$templates_to_unlink = $templates_to_link = array();
+		if(!is_null($templates)){
+			$groups_templates = CTemplate::get($options);
+			$templates_to_unlink = array_diff(array_keys($groups_templates), $templateids);
+			$templates_to_link = array_diff($templateids, array_keys($groups_templates));
+		}
+
+		$objectids_to_link = array_merge($hosts_to_link, $templates_to_link);
+		$objectids_to_unlink = array_merge($hosts_to_unlink, $templates_to_unlink);
+
 // PERMISSION {{{
 		$options = array(
 			'groupids' => $groupids,
@@ -907,13 +930,14 @@ class CHostGroup extends CZBXAPI{
 		}
 
 		if(!is_null($hosts)){
+			$hosts_to_check = array_merge($hosts_to_link, $hosts_to_unlink);
 			$options = array(
-				'hostids' => $hostids,
-			'editable' => 1,
+				'hostids' => $hosts_to_check,
+				'editable' => 1,
 				'preservekeys' => 1);
 			$allowed_hosts = CHost::get($options);
-			foreach($hosts as $num => $host){
-				if(!isset($allowed_hosts[$host['hostid']])){
+			foreach($hosts_to_check as $num => $hostid){
+				if(!isset($allowed_hosts[$hostid])){
 					self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 					return false;
 				}
@@ -921,13 +945,14 @@ class CHostGroup extends CZBXAPI{
 		}
 
 		if(!is_null($templates)){
+			$templates_to_check = array_merge($templates_to_link, $templates_to_unlink);
 			$options = array(
-				'templateids' => $templateids,
+				'templateids' => $templates_to_check,
 				'editable' => 1,
 				'preservekeys' => 1);
 			$allowed_templates = CTemplate::get($options);
-			foreach($templates as $num => $template){
-				if(!isset($allowed_templates[$template['templateid']])){
+			foreach($templates_to_check as $num => $templateid){
+				if(!isset($allowed_templates[$templateid])){
 					self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 					return false;
 				}
@@ -935,35 +960,11 @@ class CHostGroup extends CZBXAPI{
 		}
 // }}} PERMISSION
 
-		$hosts_to_unlink = $hosts_to_link = array();
-		$options = array(
-			'groupids' => $groupids, 
-			'preservekeys' => 1, 
-			'editable' => 1
-		);
-		if(!is_null($hosts)){
-			$groups_hosts = CHost::get($options);
-			$hosts_to_unlink = array_diff(array_keys($groups_hosts), $hostids);
-			$hosts_to_link = array_diff($hostids, array_keys($groups_hosts));
-		}
-		
-		$templates_to_unlink = $templates_to_link = array();
-		if(!is_null($templates)){
-			$groups_templates = CTemplate::get($options);
-			$templates_to_unlink = array_diff(array_keys($groups_templates), $templateids);
-			$templates_to_link = array_diff($templateids, array_keys($groups_templates));
-		}
-
-
-		$objectids_to_unlink = array_merge($hosts_to_unlink, $templates_to_unlink);
 		$unlinkable = getUnlinkableHosts($groupids, $objectids_to_unlink);
 		if(count($objectids_to_unlink) != count($unlinkable)){
 			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'One of the Objects is left without Hostgroup');
 			return false;
 		}
-
-
-		$objectids_to_link = array_merge($hosts_to_link, $templates_to_link);
 
 		self::BeginTransaction(__METHOD__);
 

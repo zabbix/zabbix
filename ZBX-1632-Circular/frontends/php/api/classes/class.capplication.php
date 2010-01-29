@@ -96,16 +96,16 @@ class CApplication extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
-		
+
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
-			
+
 			if(!is_null($options['select_items'])){
 				$options['select_items'] = API_OUTPUT_EXTEND;
 			}
 		}
-		
-		
+
+
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
@@ -153,7 +153,7 @@ class CApplication extends CZBXAPI{
 			if($options['output'] != API_OUTPUT_EXTEND){
 				$sql_parts['select']['hostid'] = 'a.hostid';
 			}
-			
+
 			$sql_parts['where'][] = DBcondition('a.hostid', $options['hostids']);
 		}
 // expand_data
@@ -240,7 +240,7 @@ class CApplication extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.
+		$sql = 'SELECT DISTINCT '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('a.applicationid', $nodeids).
 					$sql_where.
@@ -253,7 +253,7 @@ class CApplication extends CZBXAPI{
 				$applicationids[$application['applicationid']] = $application['applicationid'];
 
 				if($options['output'] == API_OUTPUT_SHORTEN){
-					$result[$application['applicationid']] = array('applicatiionid' => $application['applicationid']);
+					$result[$application['applicationid']] = array('applicationid' => $application['applicationid']);
 				}
 				else{
 					if(!isset($result[$application['applicationid']]))
@@ -300,9 +300,9 @@ class CApplication extends CZBXAPI{
 // Adding Hosts
 		if(!is_null($options['select_hosts']) && str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
 			$obj_params = array(
-				'output' => $options['select_hosts'], 
-				'applicationids' => $applicationids, 
-				'nopermissions' => 1, 
+				'output' => $options['select_hosts'],
+				'applicationids' => $applicationids,
+				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
 			$hosts = CHost::get($obj_params);
@@ -319,9 +319,9 @@ class CApplication extends CZBXAPI{
 // Adding items
 		if(!is_null($options['select_items']) && str_in_array($options['select_items'], $subselects_allowed_outputs)){
 			$obj_params = array(
-				'output' => $options['select_items'], 
-				'applicationids' => $applicationids, 
-				'nopermissions' => 1, 
+				'output' => $options['select_items'],
+				'applicationids' => $applicationids,
+				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
 			$items = CItem::get($obj_params);
@@ -390,7 +390,7 @@ class CApplication extends CZBXAPI{
  * @param array $app_data['hostid']
  * @return boolean
  */
-	public static function add($applications){
+	public static function create($applications){
 		$applications = zbx_toArray($applications);
 		$applicationids = array();
 

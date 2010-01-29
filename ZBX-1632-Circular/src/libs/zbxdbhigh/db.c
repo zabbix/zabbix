@@ -1198,9 +1198,9 @@ zbx_uint64_t DBget_proxy_lastaccess(const char *hostname)
 	zbx_free(host_esc);
 
 	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0])) {
-		zabbix_log(LOG_LEVEL_ERR, "Proxy \"%s\" not exists",
+		zabbix_log(LOG_LEVEL_ERR, "Proxy \"%s\" does not exist",
 				hostname);
-		zabbix_syslog("Proxy \"%s\" not exists",
+		zabbix_syslog("Proxy \"%s\" does not exist",
 				hostname);
 		DBfree_result(result);
 		return FAIL;

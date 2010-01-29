@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2001-2009 SIA Zabbix
+** Copyright (C) 2001-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ require_once('include/config.inc.php');
 require_once('include/hosts.inc.php');
 require_once('include/html.inc.php');
 
-$page["title"] = "S_SEARCH";
+$page['title'] = 'S_SEARCH';
 $page['file'] = 'search.php';
 $page['hist_arg'] = array();
 $page['scripts'] = array('class.pmaster.js','scriptaculous.js?load=effects');
@@ -111,7 +111,7 @@ include_once('include/page_header.php');
 		'select_groups' => 1
 	);
 	$db_hosts = CHost::get($params);
-	
+
 	order_result($db_hosts, 'host', null);
 
 	$hosts = selectByPattern($db_hosts, 'host', $search, $rows_per_page);
@@ -124,7 +124,7 @@ include_once('include/page_header.php');
 	);
 	$rw_hosts = CHost::get($params);
 	$rw_hosts = zbx_toHash($rw_hosts,'hostid');
-	
+
 	$params = array(
 		'nodeids'=> get_current_nodeid(),
 		'pattern' => $search,
@@ -132,7 +132,7 @@ include_once('include/page_header.php');
 		'count' => 1,
 	);
 	$hosts_count = CHost::get($params);
-	
+
 	$params = array(
 		'nodeids'=> get_current_nodeid(),
 		'pattern' => $search,
@@ -159,7 +159,7 @@ include_once('include/page_header.php');
 
 	foreach($hosts as $hnum => $host){
 		$hostid = $host['hostid'];
-		
+
 		$group = reset($host['groups']);
 		$link = 'groupid='.$group['groupid'].'&hostid='.$hostid;
 
@@ -232,7 +232,7 @@ include_once('include/page_header.php');
 
 	$rw_hostGroups = CHostGroup::get($params);
 	$rw_hostGroups = zbx_toHash($rw_hostGroups, 'groupid');
-	
+
 	$params = array(
 		'nodeids'=> get_current_nodeid(),
 		'pattern' => $search,
@@ -259,11 +259,11 @@ include_once('include/page_header.php');
 		$hostgroupid = $group['groupid'];
 
 		$caption = make_decoration($group['name'], $search);
-		
+
 		if($admin){
 			if(isset($rw_hostGroups[$hostgroupid]))
 				$admin_link = new CLink(S_GO,'hosts.php?config=1&groupid='.$hostgroupid.'&hostid=0');
-			else			
+			else
 				$admin_link = new CSpan(S_GO,'unknown');
 		}
 		else{
@@ -311,7 +311,7 @@ include_once('include/page_header.php');
 		);
 		$rw_templates = CTemplate::get($params);
 		$rw_templates = zbx_toHash($rw_templates,'templateid');
-		
+
 		$params = array(
 					'nodeids'=> get_current_nodeid(),
 					'pattern' => $search,
@@ -341,12 +341,12 @@ include_once('include/page_header.php');
 			$link = 'groupid='.$group['groupid'].'&hostid='.$templateid;
 
 			$caption = make_decoration($template['host'], $search);
-			
+
 			if(isset($rw_templates[$templateid])){
 				$template_link = new CLink($caption,'hosts.php?hostid='.$templateid);
 				$items_link = new CLink(S_GO,'items.php?'.$link);
 				$triggers_link = new CLink(S_GO,'triggers.php?'.$link);
-				$graphs_link = new CLink(S_GO,'graphss.php?'.$link);
+				$graphs_link = new CLink(S_GO,'graphs.php?'.$link);
 			}
 			else{
 				$template_link = new CSpan($caption);

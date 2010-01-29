@@ -67,7 +67,7 @@
 		$form->addRow(S_UPDATE_INTERVAL_IN_SEC, $delayBox);
 
 		$tblSteps = new CTableInfo(S_NO_SLIDES_DEFINED);
-		$tblSteps->setHeader(array(S_SCREEN, SPACE));
+		$tblSteps->setHeader(array(S_SCREEN, S_DELAY, S_SORT));
 		if(count($steps) > 0){
 			ksort($steps);
 			$first = min(array_keys($steps));
@@ -100,6 +100,7 @@
 
 			$tblSteps->addRow(array(
 				array(new CCheckBox('sel_step[]',null,null,$sid), $name),
+				$s['delay'],
 				array($up, isset($up) && isset($down) ? SPACE : null, $down)
 				));
 		}
@@ -108,12 +109,13 @@
 		$form->addRow(S_SLIDES, array(
 			$tblSteps,
 			!isset($new_step) ? new CButton('add_step_bttn',S_ADD,
-				"return create_var('".$form->GetName()."','add_step',1, true);") : null,
+				"return create_var('".$form->getName()."','add_step',1, true);") : null,
 			(count($steps) > 0) ? new CButton('del_sel_step',S_DELETE_SELECTED) : null
 			));
 
 		if(isset($new_step)){
 			if( !isset($new_step['screenid']) )	$new_step['screenid'] = 0;
+			if( !isset($new_step['delay']) )	$new_step['delay'] = 0;
 
 			if( isset($new_step['sid']) )
 				$form->addVar('new_step[sid]',$new_step['sid']);
@@ -123,6 +125,8 @@
 			$screen_data = get_screen_by_screenid($new_step['screenid']);
 
 			$form->addRow(S_NEW_SLIDE, array(
+					S_DELAY,
+					new CNumericBox('new_step[delay]', $new_step['delay'], 5), BR(),
 					new CTextBox('screen_name', $screen_data['name'], 40, 'yes'),
 					new CButton('select_screen',S_SELECT,
 						'return PopUp("popup.php?dstfrm='.$form->GetName().'&srctbl=screens'.
@@ -615,7 +619,7 @@
 		if(isset($userid)){
 /*			if(bccomp($userid,$USER_DETAILS['userid'])==0) $profile = 1;*/
 			$options = array(
-					'userids' => $userid,  
+					'userids' => $userid,
 					'extendoutput' => 1
 				);
 			if($profile) $options['nodeids'] = id2nodeid($userid);
@@ -1376,7 +1380,8 @@
 		foreach(array(ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE,
 			ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_TRAPPER,
 			ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_HTTPTEST,
-			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET) as $it)
+			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+			ITEM_TYPE_CALCULATED) as $it)
 				$cmbType->addItem($it, item_type2str($it));
 		$col_table2->addRow(array(bold(S_TYPE.': '), $cmbType));
 
@@ -1805,6 +1810,14 @@
 			if (0 == strncmp($params, "DSN=<database source name>", 26))
 				$params = '';
 			break;
+		default:
+			if ($key == 'db.odbc.select[<unique short description>]' ||
+					$key == 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]' ||
+					$key == 'telnet.run[<unique short description>,<ip>,<port>,<encoding>]')
+				$key = '';
+			if (0 == strncmp($params, "DSN=<database source name>", 26))
+				$params = '';
+			break;
 		}
 
 		if(isset($_REQUEST['itemid'])){
@@ -1928,7 +1941,7 @@
 			new CTextBox('host',$host,32,true),
 			new CButton('btn_host', S_SELECT,
 				"return PopUp('popup.php?dstfrm=".$frmItem->getName().
-				"&dstfld1=host&dstfld2=form_hostid&srctbl=hosts&srcfld1=host&srcfld2=hostid',450,450);",
+				"&dstfld1=host&dstfld2=form_hostid&srctbl=hosts_and_templates&srcfld1=host&srcfld2=hostid',450,450);",
 				'H')
 			));
 
@@ -1943,7 +1956,8 @@
 			foreach(array(ITEM_TYPE_ZABBIX,ITEM_TYPE_ZABBIX_ACTIVE,ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_SNMPV1,ITEM_TYPE_SNMPV2C,ITEM_TYPE_SNMPV3,ITEM_TYPE_TRAPPER,
 				ITEM_TYPE_INTERNAL,ITEM_TYPE_AGGREGATE,ITEM_TYPE_EXTERNAL,
-				ITEM_TYPE_DB_MONITOR,ITEM_TYPE_IPMI,ITEM_TYPE_SSH,ITEM_TYPE_TELNET) as $it)
+				ITEM_TYPE_DB_MONITOR,ITEM_TYPE_IPMI,ITEM_TYPE_SSH,ITEM_TYPE_TELNET,
+				ITEM_TYPE_CALCULATED) as $it)
 					$cmbType->addItem($it,item_type2str($it));
 			$frmItem->addRow(S_TYPE, $cmbType);
 		}
@@ -2043,6 +2057,8 @@
 
 			if (ITEM_TYPE_DB_MONITOR == $type)
 				$frmItem->addRow(S_PARAMS, new CTextArea('params',$params,60,4));
+			else if (ITEM_TYPE_CALCULATED == $type)
+				$frmItem->addRow(S_EXPRESSION, new CTextArea('params',$params,60,4));
 			else
 				$frmItem->addVar('params',$params);
 		}
@@ -2912,9 +2928,9 @@
 
 		if(isset($_REQUEST['graphid'])){
 			$frmGraph->addVar('graphid', $_REQUEST['graphid']);
-			
+
 			$options = array(
-						'graphids' => $_REQUEST['graphid'], 
+						'graphids' => $_REQUEST['graphid'],
 						'extendoutput' => 1
 					);
 			$graphs = CGraph::get($options);
@@ -2942,8 +2958,8 @@
 			$percent_right = $row['percent_right'];
 
 			$options = array(
-						'graphids' => $_REQUEST['graphid'], 
-						'sortfield' => 'sortorder', 
+						'graphids' => $_REQUEST['graphid'],
+						'sortfield' => 'sortorder',
 						'extendoutput' => 1
 					);
 
@@ -3011,12 +3027,22 @@
 			}
 		}
 
-		array_merge($items);
-		foreach($items as $key => $item){
-			$items[$key]['sortorder'] = $key;
-			//asort_by_key($items, 'sortorder');
+		$icount = count($items);
+		for($i=0; $i < $icount-1;){
+// check if we deletd an item
+			$next = $i+1;
+			while(!isset($items[$next]) && ($next < ($icount-1))) $next++;
+
+			if(isset($items[$next]) && ($items[$i]['sortorder'] == $items[$next]['sortorder']))
+				for($j=$next; $j < $icount; $j++)
+					if($items[$j-1]['sortorder'] >= $items[$j]['sortorder']) $items[$j]['sortorder']++;
+
+			$i = $next;
 		}
 
+		asort_by_key($items, 'sortorder');
+
+		$items = array_values($items);
 
 		$group_gid = get_request('group_gid', array());
 
@@ -3149,7 +3175,6 @@
 			$frmGraph->addRow(S_LEGEND,new CCheckBox('legend',$legend,'javascript: graphs.submit(this);',1));
 		}
 
-
 		$only_hostid = null;
 		$monitored_hosts = null;
 
@@ -3163,7 +3188,6 @@
 			$items_table = new CTableInfo();
 			foreach($items as $gid => $gitem){
 				//if($graphtype == GRAPH_TYPE_STACKED && $gitem['type'] == GRAPH_ITEM_AGGREGATED) continue;
-
 				$host = get_host_by_itemid($gitem['itemid']);
 				$item = get_item_by_itemid($gitem['itemid']);
 
@@ -3618,7 +3642,7 @@
 		$new_timeperiod = get_request('new_timeperiod', array());
 
 		$new = is_array($new_timeperiod);
-		
+
 		if(is_array($new_timeperiod) && isset($new_timeperiod['id'])){
 			$tblPeriod->addItem(new Cvar('new_timeperiod[id]',$new_timeperiod['id']));
 		}
@@ -5206,84 +5230,90 @@
 		$ipmi_username	= get_request('ipmi_username', '');
 		$ipmi_password	= get_request('ipmi_password', '');
 
-		$useprofile	= get_request('useprofile','no');
-
-		$devicetype	= get_request('devicetype','');
-		$name		= get_request('name','');
-		$os			= get_request('os','');
-		$serialno	= get_request('serialno','');
-		$tag		= get_request('tag','');
-		$macaddress	= get_request('macaddress','');
-		$hardware	= get_request('hardware','');
-		$software	= get_request('software','');
-		$contact	= get_request('contact','');
-		$location	= get_request('location','');
-		$notes		= get_request('notes','');
+		
+		$useprofile	= get_request('useprofile', 'no');
+		$host_profile = get_request('host_profile', array());
+		$profile_fields = array(
+			'devicetype' => S_DEVICE_TYPE, 
+			'name' => S_NAME, 
+			'os' => S_OS, 
+			'serialno' => S_SERIALNO, 
+			'tag' => S_TAG,
+			'macaddress' => S_MACADDRESS, 
+			'hardware' => S_HARDWARE, 
+			'software' => S_SOFTWARE,
+			'contact' => S_CONTACT, 
+			'location' => S_LOCATION, 
+			'notes' => S_NOTES
+		);
+		foreach($profile_fields as $field => $caption){
+			if(!isset($host_profile[$field])) $host_profile[$field] = '';
+		}
 
 // BEGIN: HOSTS PROFILE EXTENDED Section
 		$useprofile_ext = get_request('useprofile_ext','no');
 		$ext_host_profiles = get_request('ext_host_profiles', array());
 
 		$ext_profiles_fields = array(
-				'device_alias'=>S_DEVICE_ALIAS,
-				'device_type'=>S_DEVICE_TYPE,
-				'device_chassis'=>S_DEVICE_CHASSIS,
-				'device_os'=>S_DEVICE_OS,
-				'device_os_short'=>S_DEVICE_OS_SHORT,
-				'device_hw_arch'=>S_DEVICE_HW_ARCH,
-				'device_serial'=>S_DEVICE_SERIAL,
-				'device_model'=>S_DEVICE_MODEL,
-				'device_tag'=>S_DEVICE_TAG,
-				'device_vendor'=>S_DEVICE_VENDOR,
-				'device_contract'=>S_DEVICE_CONTRACT,
-				'device_who'=>S_DEVICE_WHO,
-				'device_status'=>S_DEVICE_STATUS,
-				'device_app_01'=>S_DEVICE_APP_01,
-				'device_app_02'=>S_DEVICE_APP_02,
-				'device_app_03'=>S_DEVICE_APP_03,
-				'device_app_04'=>S_DEVICE_APP_04,
-				'device_app_05'=>S_DEVICE_APP_05,
-				'device_url_1'=>S_DEVICE_URL_1,
-				'device_url_2'=>S_DEVICE_URL_2,
-				'device_url_3'=>S_DEVICE_URL_3,
-				'device_networks'=>S_DEVICE_NETWORKS,
-				'device_notes'=>S_DEVICE_NOTES,
-				'device_hardware'=>S_DEVICE_HARDWARE,
-				'device_software'=>S_DEVICE_SOFTWARE,
-				'ip_subnet_mask'=>S_IP_SUBNET_MASK,
-				'ip_router'=>S_IP_ROUTER,
-				'ip_macaddress'=>S_IP_MACADDRESS,
-				'oob_ip'=>S_OOB_IP,
-				'oob_subnet_mask'=>S_OOB_SUBNET_MASK,
-				'oob_router'=>S_OOB_ROUTER,
-				'date_hw_buy'=>S_DATE_HW_BUY,
-				'date_hw_install'=>S_DATE_HW_INSTALL,
-				'date_hw_expiry'=>S_DATE_HW_EXPIRY,
-				'date_hw_decomm'=>S_DATE_HW_DECOMM,
-				'site_street_1'=>S_SITE_STREET_1,
-				'site_street_2'=>S_SITE_STREET_2,
-				'site_street_3'=>S_SITE_STREET_3,
-				'site_city'=>S_SITE_CITY,
-				'site_state'=>S_SITE_STATE,
-				'site_country'=>S_SITE_COUNTRY,
-				'site_zip'=>S_SITE_ZIP,
-				'site_rack'=>S_SITE_RACK,
-				'site_notes'=>S_SITE_NOTES,
-				'poc_1_name'=>S_POC_1_NAME,
-				'poc_1_email'=>S_POC_1_EMAIL,
-				'poc_1_phone_1'=>S_POC_1_PHONE_1,
-				'poc_1_phone_2'=>S_POC_1_PHONE_2,
-				'poc_1_cell'=>S_POC_1_CELL,
-				'poc_1_screen'=>S_POC_1_SCREEN,
-				'poc_1_notes'=>S_POC_1_NOTES,
-				'poc_2_name'=>S_POC_2_NAME,
-				'poc_2_email'=>S_POC_2_EMAIL,
-				'poc_2_phone_1'=>S_POC_2_PHONE_1,
-				'poc_2_phone_2'=>S_POC_2_PHONE_2,
-				'poc_2_cell'=>S_POC_2_CELL,
-				'poc_2_screen'=>S_POC_2_SCREEN,
-				'poc_2_notes'=>S_POC_2_NOTES
-			);
+			'device_alias'=>S_DEVICE_ALIAS,
+			'device_type'=>S_DEVICE_TYPE,
+			'device_chassis'=>S_DEVICE_CHASSIS,
+			'device_os'=>S_DEVICE_OS,
+			'device_os_short'=>S_DEVICE_OS_SHORT,
+			'device_hw_arch'=>S_DEVICE_HW_ARCH,
+			'device_serial'=>S_DEVICE_SERIAL,
+			'device_model'=>S_DEVICE_MODEL,
+			'device_tag'=>S_DEVICE_TAG,
+			'device_vendor'=>S_DEVICE_VENDOR,
+			'device_contract'=>S_DEVICE_CONTRACT,
+			'device_who'=>S_DEVICE_WHO,
+			'device_status'=>S_DEVICE_STATUS,
+			'device_app_01'=>S_DEVICE_APP_01,
+			'device_app_02'=>S_DEVICE_APP_02,
+			'device_app_03'=>S_DEVICE_APP_03,
+			'device_app_04'=>S_DEVICE_APP_04,
+			'device_app_05'=>S_DEVICE_APP_05,
+			'device_url_1'=>S_DEVICE_URL_1,
+			'device_url_2'=>S_DEVICE_URL_2,
+			'device_url_3'=>S_DEVICE_URL_3,
+			'device_networks'=>S_DEVICE_NETWORKS,
+			'device_notes'=>S_DEVICE_NOTES,
+			'device_hardware'=>S_DEVICE_HARDWARE,
+			'device_software'=>S_DEVICE_SOFTWARE,
+			'ip_subnet_mask'=>S_IP_SUBNET_MASK,
+			'ip_router'=>S_IP_ROUTER,
+			'ip_macaddress'=>S_IP_MACADDRESS,
+			'oob_ip'=>S_OOB_IP,
+			'oob_subnet_mask'=>S_OOB_SUBNET_MASK,
+			'oob_router'=>S_OOB_ROUTER,
+			'date_hw_buy'=>S_DATE_HW_BUY,
+			'date_hw_install'=>S_DATE_HW_INSTALL,
+			'date_hw_expiry'=>S_DATE_HW_EXPIRY,
+			'date_hw_decomm'=>S_DATE_HW_DECOMM,
+			'site_street_1'=>S_SITE_STREET_1,
+			'site_street_2'=>S_SITE_STREET_2,
+			'site_street_3'=>S_SITE_STREET_3,
+			'site_city'=>S_SITE_CITY,
+			'site_state'=>S_SITE_STATE,
+			'site_country'=>S_SITE_COUNTRY,
+			'site_zip'=>S_SITE_ZIP,
+			'site_rack'=>S_SITE_RACK,
+			'site_notes'=>S_SITE_NOTES,
+			'poc_1_name'=>S_POC_1_NAME,
+			'poc_1_email'=>S_POC_1_EMAIL,
+			'poc_1_phone_1'=>S_POC_1_PHONE_1,
+			'poc_1_phone_2'=>S_POC_1_PHONE_2,
+			'poc_1_cell'=>S_POC_1_CELL,
+			'poc_1_screen'=>S_POC_1_SCREEN,
+			'poc_1_notes'=>S_POC_1_NOTES,
+			'poc_2_name'=>S_POC_2_NAME,
+			'poc_2_email'=>S_POC_2_EMAIL,
+			'poc_2_phone_1'=>S_POC_2_PHONE_1,
+			'poc_2_phone_2'=>S_POC_2_PHONE_2,
+			'poc_2_cell'=>S_POC_2_CELL,
+			'poc_2_screen'=>S_POC_2_SCREEN,
+			'poc_2_notes'=>S_POC_2_NOTES
+		);
 
 		foreach($ext_profiles_fields as $field => $caption){
 			if(!isset($ext_host_profiles[$field])) $ext_host_profiles[$field] = '';
@@ -5423,7 +5453,7 @@
 					new CVisibilityBox('visible[useipmi]', isset($visible['useipmi']), 'useipmi', S_ORIGINAL), S_USEIPMI),
 					new CCheckBox('useipmi', $useipmi, 'submit()')
 				);
-				
+
 		if($useipmi == 'yes'){
 			$frmHost->addRow(array(
 				new CVisibilityBox('visible[ipmi_ip]', isset($visible['ipmi_ip']), 'ipmi_ip', S_ORIGINAL), S_IPMI_IP_ADDRESS),
@@ -5482,90 +5512,36 @@
 		);
 // END:   HOSTS PROFILE EXTENDED Section
 
-		if($useprofile=='yes'){
-			$frmHost->addRow(array(
-				new CVisibilityBox('visible[devicetype]', isset($visible['devicetype']), 'devicetype', S_ORIGINAL),S_DEVICE_TYPE),
-				new CTextBox('devicetype',$devicetype,61)
-			);
-
-			$frmHost->addRow(array(
-				new CVisibilityBox('visible[name]', isset($visible['name']), 'name', S_ORIGINAL),S_NAME),
-				new CTextBox('name',$name,61)
-			);
-
-			$frmHost->addRow(array(
-				new CVisibilityBox('visible[os]', isset($visible['os']), 'os', S_ORIGINAL),S_OS),
-				new CTextBox('os',$os,61)
-			);
-
-			$frmHost->addRow(array(
-				new CVisibilityBox('visible[serialno]', isset($visible['serialno']), 'serialno', S_ORIGINAL),S_SERIALNO),
-				new CTextBox('serialno',$serialno,61)
-			);
-
-			$frmHost->addRow(array(
-				new CVisibilityBox('visible[tag]', isset($visible['tag']), 'tag', S_ORIGINAL),S_TAG),
-				new CTextBox('tag',$tag,61)
-			);
-
-			$frmHost->addRow(array(
-				new CVisibilityBox('visible[macaddress]', isset($visible['macaddress']), 'macaddress', S_ORIGINAL),S_MACADDRESS),
-				new CTextBox('macaddress',$macaddress,61)
-			);
-
-			$frmHost->addRow(array(
-				new CVisibilityBox('visible[hardware]', isset($visible['hardware']), 'hardware', S_ORIGINAL),S_HARDWARE),
-				new CTextArea('hardware',$hardware,60,4)
-			);
-
-			$frmHost->addRow(array(
-				new CVisibilityBox('visible[software]', isset($visible['software']), 'software', S_ORIGINAL),S_SOFTWARE),
-				new CTextArea('software',$software,60,4)
-			);
-
-			$frmHost->addRow(array(
-				new CVisibilityBox('visible[contact]', isset($visible['contact']), 'contact', S_ORIGINAL),S_CONTACT),
-				new CTextArea('contact',$contact,60,4)
-			);
-
-			$frmHost->addRow(array(
-				new CVisibilityBox('visible[location]', isset($visible['location']), 'location', S_ORIGINAL),S_LOCATION),
-				new CTextArea('location',$location,60,4)
-			);
-
-			$frmHost->addRow(array(
-				new CVisibilityBox('visible[notes]', isset($visible['notes']), 'notes', S_ORIGINAL),S_NOTES),
-				new CTextArea('notes',$notes,60,4)
-			);
-		}
-		else{
-			$frmHost->addVar('devicetype',	$devicetype);
-			$frmHost->addVar('name',	$name);
-			$frmHost->addVar('os',		$os);
-			$frmHost->addVar('serialno',	$serialno);
-			$frmHost->addVar('tag',		$tag);
-			$frmHost->addVar('macaddress',	$macaddress);
-			$frmHost->addVar('hardware',	$hardware);
-			$frmHost->addVar('software',	$software);
-			$frmHost->addVar('contact',	$contact);
-			$frmHost->addVar('location',	$location);
-			$frmHost->addVar('notes',	$notes);
+		if($useprofile=='yes'){	
+			if($useprofile == 'yes'){
+				foreach($profile_fields as $field => $caption){
+					$frmHost->addRow(array(
+						new CVisibilityBox('visible['.$field.']', isset($visible[$field]), 'host_profile['.$field.']', S_ORIGINAL), $caption),
+						new CTextBox('host_profile['.$field.']',$host_profile[$field],80)
+					);
+				}
+			}
+			else{
+				foreach($profile_fields as $field => $caption){
+					$frmHost->addVar('host_profile['.$field.']', $host_profile[$field]);
+				}
+			}
 		}
 
 // BEGIN: HOSTS PROFILE EXTENDED Section
-	if($useprofile_ext=='yes'){
-		foreach($ext_profiles_fields as $prof_field => $caption){
-			$frmHost->addRow(array(
-				new CVisibilityBox('visible['.$prof_field.']', isset($visible[$prof_field]), 'ext_host_profiles['.$prof_field.']', S_ORIGINAL),$caption),
-				new CTextBox('ext_host_profiles['.$prof_field.']',$ext_host_profiles[$prof_field],80)
-			);
+		if($useprofile_ext=='yes'){
+			foreach($ext_profiles_fields as $prof_field => $caption){
+				$frmHost->addRow(array(
+					new CVisibilityBox('visible['.$prof_field.']', isset($visible[$prof_field]), 'ext_host_profiles['.$prof_field.']', S_ORIGINAL),$caption),
+					new CTextBox('ext_host_profiles['.$prof_field.']',$ext_host_profiles[$prof_field],80)
+				);
+			}
 		}
-	}
-	else{
-		foreach($ext_profiles_fields as $prof_field => $caption){
-			$frmHost->addVar('ext_host_profiles['.$prof_field.']',	$ext_host_profiles[$prof_field]);
+		else{
+			foreach($ext_profiles_fields as $prof_field => $caption){
+				$frmHost->addVar('ext_host_profiles['.$prof_field.']',	$ext_host_profiles[$prof_field]);
+			}
 		}
-	}
 // END:   HOSTS PROFILE EXTENDED Section
 
 		$frmHost->addItemToBottomRow(new CButton('save',S_SAVE));
@@ -5579,6 +5555,9 @@
 		global $USER_DETAILS;
 
 		$host_groups = get_request('groups', array());
+		if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0) && !uint_in_array($_REQUEST['groupid'], $host_groups)){
+			array_push($host_groups, $_REQUEST['groupid']);
+		}
 
 		$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE);
 
@@ -6268,7 +6247,9 @@
 			$backgroundid	= $row['backgroundid'];
 			$label_type	= $row['label_type'];
 			$label_location	= $row['label_location'];
-			$highlight = $row['highlight'];
+			$highlight = ($row['highlight']%2);
+			
+			$expproblem = ($row['highlight'] > 1) ? 0 : 1;
 		}
 		else{
 			$name		= get_request('name','');
@@ -6278,6 +6259,8 @@
 			$label_type	= get_request('label_type',0);
 			$label_location	= get_request('label_location',0);
 			$highlight = get_request('highlight',0);
+			
+			$expproblem = isset($_REQUEST['form_refresh']) ? get_request('expproblem',0) : 1;
 		}
 
 		$frmMap = new CFormTable($frm_title,'sysmaps.php');
@@ -6304,6 +6287,8 @@
 		$frmMap->addRow(S_BACKGROUND_IMAGE,$cmbImg);
 
 		$frmMap->addRow(S_ICON_HIGHLIGHTING, new CCheckBox('highlight',$highlight,null,1));
+		
+		$frmMap->addRow(S_EXPAND_SINGLE_PROBLEM, new CCheckBox('expproblem',$expproblem,null,1));
 
 		$cmbLabel = new CComboBox('label_type',$label_type);
 		$cmbLabel->addItem(0,S_LABEL);

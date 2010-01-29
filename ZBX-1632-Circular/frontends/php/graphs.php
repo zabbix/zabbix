@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ include_once('include/page_header.php');
 		'copy_mode'	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0'),NULL),
 
 		'graphid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
-		'name'=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,		'isset({save})'),
+		'name'=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,		'isset({save})', S_NAME),
 		'width'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
 		'height'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
 
@@ -91,7 +91,7 @@ include_once('include/page_header.php');
 
 	$_REQUEST['go'] = get_request('go', 'none');
 
-// PERMISSIONS		
+// PERMISSIONS
 	if(get_request('graphid',0) > 0){
 		$options = array(
 			'nodeids' => get_current_nodeid(true),
@@ -126,7 +126,8 @@ include_once('include/page_header.php');
 		if(!empty($itemids)){
 			$options = array(
 				'nodeids'=>get_current_nodeid(true),
-				'itemids'=>$itemids, 
+				'itemids'=>$itemids,
+				'webitems'=>1,
 				'editable'=>1
 			);
 			$db_items = CItem::get($options);
@@ -253,17 +254,17 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['move_up']) && isset($_REQUEST['items'])){
 		if(isset($_REQUEST['items'][$_REQUEST['move_up']])){
 			$tmp = $_REQUEST['items'][$_REQUEST['move_up']];
-			$_REQUEST['items'][$_REQUEST['move_up']] = $_REQUEST['items'][$_REQUEST['move_up'] - 1];
-			$_REQUEST['items'][$_REQUEST['move_up'] - 1] = $tmp;
 
+			$_REQUEST['items'][$_REQUEST['move_up']]['sortorder'] = $_REQUEST['items'][$_REQUEST['move_up'] - 1]['sortorder'];
+			$_REQUEST['items'][$_REQUEST['move_up'] - 1]['sortorder'] = $tmp['sortorder'];
 		}
 	}
 	else if(isset($_REQUEST['move_down']) && isset($_REQUEST['items'])){
 		if(isset($_REQUEST['items'][$_REQUEST['move_down']])){
 			$tmp = $_REQUEST['items'][$_REQUEST['move_down']];
-			$_REQUEST['items'][$_REQUEST['move_down']] = $_REQUEST['items'][$_REQUEST['move_down'] + 1];
-			$_REQUEST['items'][$_REQUEST['move_down'] + 1] = $tmp;
 
+			$_REQUEST['items'][$_REQUEST['move_down']]['sortorder'] = $_REQUEST['items'][$_REQUEST['move_down'] + 1]['sortorder'];
+			$_REQUEST['items'][$_REQUEST['move_down'] + 1]['sortorder'] = $tmp['sortorder'];
 		}
 	}
 //------ GO -------
@@ -510,7 +511,20 @@ include_once('include/page_header.php');
 
 		$graphs = CGraph::get($options);
 
-// Change graphtype from numbers to names, for correct sorting
+		order_result($graphs, $sortfield, $sortorder);
+		$paging = getPagingLine($graphs);
+
+
+		$graphids = zbx_objectValues($graphs, 'graphid');
+		$options = array(
+			'graphids' => $graphids,
+			'extendoutput' => 1,
+			'select_hosts' => 1,
+			'select_templates' => 1
+		);
+		$graphs = CGraph::get($options);
+
+		// Change graphtype from numbers to names, for correct sorting
 		foreach($graphs as $gnum => $graph){
 			switch($graph['graphtype']){
 				case GRAPH_TYPE_STACKED:
@@ -526,27 +540,10 @@ include_once('include/page_header.php');
 					$graphtype = S_NORMAL;
 				break;
 			}
-
 			$graphs[$gnum]['graphtype'] = $graphtype;
 		}
 
-// sorting
 		order_result($graphs, $sortfield, $sortorder);
-//---------
-
-		$graphids = zbx_objectValues($graphs, 'graphid');
-		$options = array(
-			'graphids' => $graphids,
-			'extendoutput' => 1,
-			'select_hosts' => 1,
-			'select_templates' => 1
-		);
-		$graphs = CGraph::get($options);
-
-// sorting
-		order_result($graphs, $sortfield, $sortorder);
-		$paging = getPagingLine($graphs);
-//---------
 
 		foreach($graphs as $gnum => $graph){
 			$graphid = $graph['graphid'];
@@ -600,6 +597,14 @@ include_once('include/page_header.php');
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
+
+		$jsLocale = array(
+			'S_CLOSE',
+			'S_NO_ELEMENTS_SELECTES'
+		);
+
+		zbx_addJSLocale($jsLocale);
+
 		zbx_add_post_js('chkbxRange.pageGoName = "group_graphid";');
 
 		$footer = get_table_header(new CCol(array($goBox, $goButton)));

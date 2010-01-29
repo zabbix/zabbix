@@ -163,6 +163,9 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		case CR_CONNECTION_ERROR:
 		case CR_SERVER_LOST:
 		case ER_SERVER_SHUTDOWN:
+		case ER_ACCESS_DENIED_ERROR: /* wrong user or password */
+		case ER_ILLEGAL_GRANT_FOR_TABLE: /* user without any privileges */
+		case ER_TABLEACCESS_DENIED_ERROR:/* user without some privilege */
 		case ER_UNKNOWN_ERROR:
 			ret = ZBX_DB_DOWN;
 			break;
@@ -553,6 +556,9 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 				case	CR_CONNECTION_ERROR:
 				case	CR_SERVER_LOST:
 				case	ER_SERVER_SHUTDOWN:
+				case	ER_ACCESS_DENIED_ERROR: /* wrong user or password */
+				case	ER_ILLEGAL_GRANT_FOR_TABLE: /* user without any privileges */
+				case	ER_TABLEACCESS_DENIED_ERROR:/* user without some privilege */
 				case	ER_UNKNOWN_ERROR:
 					ret = ZBX_DB_DOWN;
 					break;
@@ -884,6 +890,9 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 				case	CR_CONNECTION_ERROR:
 				case	CR_SERVER_LOST:
 				case	ER_SERVER_SHUTDOWN:
+				case	ER_ACCESS_DENIED_ERROR: /* wrong user or password */
+				case	ER_ILLEGAL_GRANT_FOR_TABLE: /* user without any privileges */
+				case	ER_TABLEACCESS_DENIED_ERROR:/* user without some privilege */
 				case	ER_UNKNOWN_ERROR:
 					result = (DB_RESULT)ZBX_DB_DOWN;
 					break;

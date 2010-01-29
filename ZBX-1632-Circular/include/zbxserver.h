@@ -40,8 +40,9 @@
 #define MACRO_TYPE_ITEM_PASSWORD	0x0400
 #define MACRO_TYPE_ITEM_SCRIPT		0x0800
 #define MACRO_TYPE_SCRIPT		0x1000
+#define MACRO_TYPE_ITEM_EXPRESSION	0x2000
 
-int	evaluate_function(char *value, DB_ITEM *item, const char *function, char *parameters, time_t now);
+int	evaluate_function(char *value, DB_ITEM *item, const char *function, const char *parameters, time_t now);
 void    update_triggers (zbx_uint64_t itemid);
 void	update_functions(DB_ITEM *item, time_t now);
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, AGENT_RESULT *value, int now,
@@ -53,4 +54,6 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 void	substitute_macros(DB_EVENT *event, DB_ACTION *action, DB_ESCALATION *escalation, char **data);
 
 int	evaluate_expression(int *result,char **expression, DB_TRIGGER *triggger, char *error, int maxerrlen);
+int	evaluate(double *value, char *exp, char *error, int maxerrlen);
+
 #endif

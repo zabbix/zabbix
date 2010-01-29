@@ -372,7 +372,9 @@ function zbx_date2age($start_date,$end_date=0,$utime = false){
 			(($hours && !$years && !$months)?$hours.S_HOUR_SHORT.' ':'').
 			(($minutes && !$years && !$months && !$weeks)?$minutes.S_MINUTE_SHORT.' ':'').
 			((!$years && !$months && !$weeks && !$days && ($ms || $seconds))?$seconds.S_SECOND_SHORT.' ':'').
-			(($ms && !$years && !$months && !$weeks && !$days && !$hours)?$ms.S_MILLISECOND_SHORT:'');return $str;
+			(($ms && !$years && !$months && !$weeks && !$days && !$hours)?$ms.S_MILLISECOND_SHORT:'');
+
+return trim($str,' ');
 }
 
 function getmicrotime(){
@@ -381,7 +383,7 @@ function getmicrotime(){
 }
 
 function getDateStringByType($type, $timestamp){
-	$str = 'Wrong type';
+	$str = S_WRONG_TYPE;
 	switch($type){
 		case TIMEPERIOD_TYPE_HOURLY:
 			$str = date('H:i', $timestamp);
@@ -421,7 +423,7 @@ function natksort(&$array) {
 
 function asort_by_key(&$array, $key){
 	if(!is_array($array)) {
-		error('Incorrect type of asort_by_key');
+		error(S_INCORRECT_TYPE_OF_ASORT_BY_KEY);
 		return array();
 	}
 
@@ -545,9 +547,9 @@ function str2mem($val){
 }
 
 function mem2str($size){
-	$prefix = 'B';
-	if($size > 1048576) {	$size = $size/1048576;	$prefix = 'M'; }
-	elseif($size > 1024) {	$size = $size/1024;	$prefix = 'K'; }
+	$prefix = S_B;
+	if($size > 1048576) {	$size = $size/1048576;	$prefix = S_M; }
+	elseif($size > 1024) {	$size = $size/1024;	$prefix = S_K; }
 	return round($size, 6).$prefix;
 }
 
@@ -577,7 +579,7 @@ function convert_units($value,$units){
 			$ret = sprintf("%02d:%02d:%02d", $hours, $min, $value);
 		}
 		else{
-			$ret = sprintf("%d days, %02d:%02d:%02d", $days, $hours, $min, $value);
+			$ret = sprintf("%d ".S_DAYS_SMALL.", %02d:%02d:%02d", $days, $hours, $min, $value);
 		}
 		return $ret;
 	}
@@ -596,15 +598,15 @@ function convert_units($value,$units){
 			$u="";
 		}
 		else if($abs<1000*1000){
-			$u='K';
+			$u=S_K;
 			$value=$value/1000;
 		}
 		else if($abs<1000*1000*1000){
-			$u='M';
+			$u=S_M;
 			$value=$value/(1000*1000);
 		}
 		else{
-			$u='G';
+			$u=S_G;
 			$value=$value/(1000*1000*1000);
 		}
 
@@ -618,13 +620,18 @@ function convert_units($value,$units){
 	return "$s $u$units";
 	}
 
-
 	if($units==''){
-		if(round($value) == round($value,2)){
-			return sprintf('%.0f',$value);
+		if(is_float($value)){
+			if(round($value) == round($value,2)){
+				return sprintf('%.0f',$value);
+			}
+			else{
+				return sprintf('%.2f',$value);
+			}
 		}
 		else{
-			return sprintf('%.2f',$value);
+			// return sprintf('%.0f',$value);
+			return $value;
 		}
 	}
 
@@ -634,19 +641,19 @@ function convert_units($value,$units){
 		$u='';
 	}
 	else if($abs<1024*1024){
-		$u='K';
+		$u=S_K;
 		$value=$value/1024;
 	}
 	else if($abs<1024*1024*1024){
-		$u='M';
+		$u=S_M;
 		$value=$value/(1024*1024);
 	}
 	else if($abs<1024*1024*1024*1024){
-		$u='G';
+		$u=S_G;
 		$value=$value/(1024*1024*1024);
 	}
 	else{
-		$u='T';
+		$u=S_T;
 		$value=$value/(1024*1024*1024*1024);
 	}
 

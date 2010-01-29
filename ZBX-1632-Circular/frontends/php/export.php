@@ -286,24 +286,36 @@ include_once('include/page_header.php');
 // } GO box
 		$table->setFooter(new CCol($form));
 		$table->show();
+
+		$jsLocale = array(
+			'S_CLOSE',
+			'S_NO_ELEMENTS_SELECTES'
+		);
+
+		zbx_addJSLocale($jsLocale);
+
 		zbx_add_post_js('chkbxRange.pageGoCount = 1;');
 	}
 	else{
-
+	
 		$export_wdgt = new CWidget();
-		$selected_groupid = get_request('groupid', 0);
 
 // Page header {
 		$form = new CForm(null, 'post');
 		$form->setName('export_hosts_frm');
 
+		$params=array();
+		$options = array('only_current_node');
+		foreach($options as $option) $params[$option] = 1;
+		$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
+		$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
+		validate_group($PAGE_GROUPS,$PAGE_HOSTS);
+		
+		$selected_groupid = $PAGE_GROUPS['selected'];
+		
 		$cmbGroups = new CComboBox('groupid', $selected_groupid, 'javascript: submit();');
-		$cmbGroups->addItem(0, S_ALL_S);
-
-		$groups = CHostGroup::get(array('extendoutput' => 1, 'sortfield' => 'name'));
-		foreach($groups as $gnum => $group){
-			$groupid = $group['groupid'];
-			$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid, null, ': ').$group['name']);
+		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
+			$cmbGroups->addItem($groupid, $name);
 		}
 		$form->addItem(array(S_GROUP.SPACE, $cmbGroups));
 
@@ -420,6 +432,14 @@ include_once('include/page_header.php');
 		// goButton name is necessary!!!
 		$goButton = new CButton('goButton', S_GO.' ('.$count_chkbx.')');
 		$goButton->setAttribute('id','goButton');
+
+                $jsLocale = array(
+                                'S_CLOSE',
+                                'S_NO_ELEMENTS_SELECTES'
+                );
+
+                zbx_addJSLocale($jsLocale);
+
 		zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
 
 		$footer = get_table_header(array($goBox, $goButton));

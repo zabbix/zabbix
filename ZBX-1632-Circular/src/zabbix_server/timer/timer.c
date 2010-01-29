@@ -321,15 +321,22 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from)
 
 static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count)
 {
+	typedef struct maintenance_s
+	{
+		zbx_uint64_t	hostid;
+		int		maintenance_from;
+		void		*next;
+	} maintenance_t;
+
 	const char	*__function_name = "update_maintenance_hosts";
 	int		i;
 	zbx_uint64_t	*ids = NULL, hostid;
-	int		ids_alloc = 0, ids_num = 0,
-			maintenance_type, maintenance_from;
+	int		ids_alloc = 0, ids_num = 0;
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*sql = NULL;
 	int		sql_alloc = 1024, sql_offset;
+	maintenance_t	*maintenances = NULL, *m;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -397,12 +404,14 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count)
 
 		uint64_array_add(&ids, &ids_alloc, &ids_num, hostid, 4);
 
-		if (MAINTENANCE_TYPE_NORMAL != (maintenance_type = atoi(row[1])))
+		if (MAINTENANCE_TYPE_NORMAL != atoi(row[1]))
 			continue;
 
-		maintenance_from = atoi(row[2]);
-
-		generate_events(hostid, maintenance_from);
+		m = zbx_malloc(NULL, sizeof(maintenance_t));
+		m->hostid = hostid;
+		m->maintenance_from = atoi(row[2]);
+		m->next = maintenances;
+		maintenances = m;
 	}
 	DBfree_result(result);
 
@@ -426,6 +435,15 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count)
 
 	zbx_free(sql);
 	zbx_free(ids);
+
+	for (m = maintenances; m != NULL; m = m->next)
+		generate_events(m->hostid, m->maintenance_from);
+
+	for (m = maintenances; m != NULL; m = maintenances)
+	{
+		maintenances = m->next;
+		zbx_free(m);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

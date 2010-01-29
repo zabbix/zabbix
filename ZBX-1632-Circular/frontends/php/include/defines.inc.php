@@ -19,8 +19,8 @@
 **/
 ?>
 <?php
-	define('ZABBIX_VERSION','1.8.1');
-	define('ZABBIX_API_VERSION','1.0');
+	define('ZABBIX_VERSION','1.8.2');
+	define('ZABBIX_API_VERSION','1.1');
 /* USER DEFINES */
 
 	define('ZBX_LOGIN_ATTEMPTS',			5);
@@ -29,6 +29,7 @@
 	define('TRIGGERS_OPTION_DISABLED',		0);	// reserved
 	define('TRIGGERS_OPTION_ONLYTRUE',		1);	// use 0 to disable
 	define('TRIGGERS_OPTION_ALL',			2);	// use 0 to disable
+	define('TRIGGERS_OPTION_SHOW_ALL_WITH_UNACKNOWLEDGED',			3);	// use 0 to disable
 
 	define('TRIGGER_FALSE_PERIOD',			1800);	// 10min, 0 - disable
 	define('TRIGGER_BLINK_PERIOD',			1800);	// 5min,  0 - disable
@@ -37,12 +38,14 @@
 	define('EVENTS_OPTION_NOEVENT',			1);	// use 0 to disable
 	define('EVENTS_OPTION_ALL',				2);	// use 0 to disable
 	define('EVENTS_OPTION_NOT_ACK',			3);	// use 0 to disable
-	define('EVENTS_OPTION_ONLYTRUE_NOTACK',	4);	// use 0 to disable
+	define('EVENTS_OPTION_ONLYTRUE_NOTACK',	0);	// use 0 to disable
 	define('EVENTS_OPTION_EVENT_LAST',		0); // use 0 to disable
 
 	define('ZBX_MIN_PERIOD',				3600);		// 1 hour
 	define('ZBX_MAX_PERIOD',				2*365*86400);	// ~2 years
 	define('ZBX_PERIOD_DEFAULT',			3600);		// 1 hour
+
+	define('ZBX_POPUP_MAX_ROWS',			20);
 
 	define('ZBX_FONTPATH',					realpath('fonts'));	// where to search for font (GD > 2.0.18)
 	define('ZBX_GRAPH_FONT_NAME',			'DejaVuSans');		// font file name
@@ -236,6 +239,7 @@
 	define('ITEM_TYPE_IPMI',		12);
 	define('ITEM_TYPE_SSH',			13);
 	define('ITEM_TYPE_TELNET',		14);
+	define('ITEM_TYPE_CALCULATED',		15);
 
 	define('ITEM_VALUE_TYPE_FLOAT',		0);
 	define('ITEM_VALUE_TYPE_STR',		1);
@@ -575,8 +579,8 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 
 	define('ZBX_PREG_SPACES', '(\s+){0,1}');
 	define('ZBX_PREG_MACRO_NAME', '([A-Z0-9\._]+)');
-	define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_\. \-$]+)');
-	define('ZBX_PREG_KEY_NAME', '([0-9a-zA-Z_\.,: \-$]+)');
+	define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_\. \-]+)');	/* !!! Don't forget sync code with C !!! */
+	define('ZBX_PREG_KEY_NAME', '([0-9a-zA-Z_\.,]+)');	/* !!! Don't forget sync code with C !!! */
 	define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+){0,1}');
 	define('ZBX_PREG_SIGN', '([&|><=+*\/#\-])');
 	define('ZBX_PREG_NUMBER', '([\-+]?[0-9]+[.]{0,1}[0-9]*[A-Z]{0,1})');
@@ -688,7 +692,7 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('ZBX_API_ERROR_NO_AUTH', 200);
 	define('ZBX_API_ERROR_NO_METHOD', 300);
 	//define('ZBX_API_ERROR_PARAMETERS', 100);
-	
+
 	define('API_OUTPUT_SHORTEN', 'shorten');
 	define('API_OUTPUT_REFER', 'refer');
 	define('API_OUTPUT_EXTEND', 'extend');

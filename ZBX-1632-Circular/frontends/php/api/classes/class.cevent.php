@@ -105,7 +105,7 @@ class CEvent extends CZBXAPI{
 
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
-			
+
 			if(!is_null($options['select_hosts'])){
 				$options['select_hosts'] = API_OUTPUT_EXTEND;
 			}
@@ -116,8 +116,8 @@ class CEvent extends CZBXAPI{
 				$options['select_items'] = API_OUTPUT_EXTEND;
 			}
 		}
-		
-		
+
+
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
@@ -303,7 +303,7 @@ class CEvent extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.
+		$sql = 'SELECT DISTINCT '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('e.eventid', $nodeids).
 					$sql_where.
@@ -333,7 +333,7 @@ class CEvent extends CZBXAPI{
 					if(!is_null($options['select_triggers']) && !isset($result[$event['eventid']]['triggers'])){
 						$result[$event['eventid']]['triggers'] = array();
 					}
-					
+
 					if(!is_null($options['select_items']) && !isset($result[$event['eventid']]['items'])){
 						$result[$event['eventid']]['items'] = array();
 					}
@@ -488,7 +488,7 @@ class CEvent extends CZBXAPI{
  * @param array $events[0,...]['acknowledged'] OPTIONAL
  * @return boolean
  */
-	public static function add($events){
+	public static function create($events){
 		$events = zbx_toArray($events);
 		$eventids = array();
 
@@ -608,13 +608,16 @@ class CEvent extends CZBXAPI{
 
 		$events = isset($events_data['events']) ? zbx_toArray($events_data['events']) : array();
 		$eventids = zbx_objectValues($events, 'eventid');
-		$triggers = isset($events_data['triggers']) ? zbx_toArray($events_data['triggers']) : array();
-		$triggerids = zbx_objectValues($triggers, 'triggerid');
 		$message = $events_data['message'];
 
 // PERMISSIONS {{{
 		if(!empty($events)){
-			$allowed_events = self::get(array('eventids' => $eventids, 'preservekeys' => 1));
+			$options = array(
+				'eventids' => $eventids,
+				'preservekeys' => 1,
+				'output' => API_OUTPUT_SHORTEN
+			);
+			$allowed_events = self::get($options);
 			foreach($events as $num => $event){
 				if(!isset($allowed_events[$event['eventid']])){
 					self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
@@ -622,18 +625,8 @@ class CEvent extends CZBXAPI{
 				}
 			}
 		}
-		if(!empty($triggers)){
-			$allowed_triggers = CTrigger::get(array('triggerids' => $triggerids, 'preservekeys' => 1));
-			foreach($triggers as $num => $trigger){
-				if(!isset($allowed_triggers[$trigger['triggerid']])){
-					self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
-					return false;
-				}
-			}
-			$events = array_merge($events, self::get(array('triggerids' => $triggerids, 'nopermissions' => 1, 'preservekeys' => 1)));
-			$eventids = zbx_objectValues($events, 'eventid');
-		}
 // }}} PERMISSIONS
+
 		self::BeginTransaction(__METHOD__);
 
 		$result = DBexecute('UPDATE events SET acknowledged=1 WHERE '.DBcondition('eventid', $eventids));

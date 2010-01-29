@@ -180,7 +180,7 @@ include_once('include/page_header.php');
 				$action = AUDIT_ACTION_ADD;
 
 				DBstart();
-				$result = CUser::add($user);
+				$result = CUser::create($user);
 				if(!$result)
 					error(CUser::resetErrors());
 				// if($result) $result = CUserGroup::updateUsers(array('users' => $result, 'usrgrps' => $usrgrps));
@@ -356,7 +356,7 @@ include_once('include/page_header.php');
 		$cmbUGrp->addItem(0, S_ALL_S);
 
 		$options = array(
-			'extendoutput' => 1, 
+			'extendoutput' => 1,
 			'sortfield' => 'name'
 		);
 		$usrgrps = CUserGroup::get($options);
@@ -460,13 +460,13 @@ include_once('include/page_header.php');
 			$user_type_style = 'enabled';
 			if(USER_TYPE_ZABBIX_ADMIN == $user['type']) $user_type_style = 'orange';
 			if(USER_TYPE_SUPER_ADMIN == $user['type']) $user_type_style = 'disabled';
-			
+
 			$gui_access = user_auth_type2str($user['gui_access']);
 
 			$gui_access_style = 'green';
 			if(GROUP_GUI_ACCESS_INTERNAL == $user['gui_access']) $gui_access_style = 'orange';
 			if(GROUP_GUI_ACCESS_DISABLED == $user['gui_access']) $gui_access_style = 'disabled';
-			
+
 			$gui_access = new CSpan($gui_access, $gui_access_style);
 			$users_status = ($user['users_status'] == 1) ? new CSpan(S_DISABLED, 'red') : new CSpan(S_ENABLED, 'green');
 			$api_access = ($user['api_access'] == GROUP_API_ACCESS_ENABLED) ? new CSpan(S_ENABLED, 'orange') : new CSpan(S_DISABLED, 'green');
@@ -504,6 +504,13 @@ include_once('include/page_header.php');
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton', S_GO);
 		$goButton->setAttribute('id','goButton');
+
+		$jsLocale = array(
+			'S_CLOSE',
+			'S_NO_ELEMENTS_SELECTES'
+		);
+
+		zbx_addJSLocale($jsLocale);
 
 		zbx_add_post_js('chkbxRange.pageGoName = "group_userid";');
 		$footer = get_table_header(array($goBox, $goButton));

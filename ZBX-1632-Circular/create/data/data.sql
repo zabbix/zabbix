@@ -432,7 +432,7 @@ insert into help_items values(0,'system.users.num','Number of users connected. C
 insert into help_items values(0,'vfs.dev.read[device &lt;,type&gt; &lt;,mode&gt;]','Device read statistics.');
 insert into help_items values(0,'vfs.dev.write[device &lt;,type&gt; &lt;,mode&gt;]','Device write statistics.');
 insert into help_items values(0,'vfs.file.cksum[file]','Calculate check sum of a given file. Check sum of the file calculate by standard algorithm used by UNIX utility cksum. Example: vfs.file.cksum[/etc/passwd]');
-insert into help_items values(0,'vfs.file.exists[file]','Check file existance. 0 - file does not exists, 1 - file exists');
+insert into help_items values(0,'vfs.file.exists[file]','Check file existance. 0 - file does not exist, 1 - file exists');
 insert into help_items values(0,'vfs.file.md5sum[file]','Calculate MD5 check sum of a given file. String MD5 hash of the file. Can be used for files less than 64MB, unsupported otherwise. Example: vfs.file.md5sum[/etc/zabbix/zabbix_agentd.conf]');
 insert into help_items values(0,'vfs.file.regexp[file,regexp]','Find string in a file. Matched string');
 insert into help_items values(0,'vfs.file.regmatch[file,regexp]','Find string in a file. 0 - expression not found, 1 - found');
@@ -481,7 +481,7 @@ insert into help_items values(7,'system.users.num','Number of users connected. C
 insert into help_items values(7,'vfs.dev.read[device &lt;,type&gt; &lt;,mode&gt;]','Device read statistics.');
 insert into help_items values(7,'vfs.dev.write[device &lt;,type&gt; &lt;,mode&gt;]','Device write statistics.');
 insert into help_items values(7,'vfs.file.cksum[file]','Calculate check sum of a given file. Check sum of the file calculate by standard algorithm used by UNIX utility cksum. Example: vfs.file.cksum[/etc/passwd]');
-insert into help_items values(7,'vfs.file.exists[file]','Check file existance. 0 - file does not exists, 1 - file exists');
+insert into help_items values(7,'vfs.file.exists[file]','Check file existance. 0 - file does not exist, 1 - file exists');
 insert into help_items values(7,'vfs.file.md5sum[file]','Calculate MD5 check sum of a given file. String MD5 hash of the file. Can be used for files less than 64MB, unsupported otherwise. Example: vfs.file.md5sum[/etc/zabbix/zabbix_agentd.conf]');
 insert into help_items values(7,'vfs.file.regexp[file,regexp]','Find string in a file. Matched string');
 insert into help_items values(7,'vfs.file.regmatch[file,regexp]','Find string in a file. 0 - expression not found, 1 - found');
@@ -5609,7 +5609,7 @@ INSERT INTO triggers VALUES (10008,'{11295}<10','Low number of free inodes on {H
 INSERT INTO triggers VALUES (10010,'{10010}>5','Processor load is too high on {HOSTNAME}','',0,2,3,0,0,'','',0,0);
 INSERT INTO triggers VALUES (10011,'{10234}>10','Too many processes running on {HOSTNAME}','',0,2,3,0,0,'','',0,0);
 INSERT INTO triggers VALUES (10012,'{10212}<100000','Lack of free swap space on {HOSTNAME}','',0,2,4,0,0,'','',0,0);
-INSERT INTO triggers VALUES (10013,'{10013}>50','Too may users connected on server {HOSTNAME}','',0,2,3,0,0,'','',0,0);
+INSERT INTO triggers VALUES (10013,'{10013}>50','Too many users connected on server {HOSTNAME}','',0,2,3,0,0,'','',0,0);
 INSERT INTO triggers VALUES (10014,'{10197}>0','/etc/inetd.conf has been changed on server {HOSTNAME}','',0,2,2,0,0,'','',0,0);
 INSERT INTO triggers VALUES (10015,'{10201}>0','/vmlinuz has been changed on server {HOSTNAME}','',0,2,2,0,0,'','',0,0);
 INSERT INTO triggers VALUES (10016,'{10199}>0','/etc/passwd has been changed on server {HOSTNAME}','',0,2,3,0,0,'','',0,0);
@@ -5881,7 +5881,7 @@ INSERT INTO triggers VALUES (12215,'{11304}<10','Low number of free inodes on {H
 INSERT INTO triggers VALUES (12216,'{11305}>5','Processor load is too high on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12217,'{11306}>10','Too many processes running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12218,'{11307}<100000','Lack of free swap space on {HOSTNAME}','',0,2,4,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12219,'{11308}>50','Too may users connected on server {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12219,'{11308}>50','Too many users connected on server {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12220,'{11309}>0','/etc/inetd.conf has been changed on server {HOSTNAME}','',0,2,2,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12221,'{11310}>0','/vmlinuz has been changed on server {HOSTNAME}','',0,2,2,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12222,'{11311}>0','/etc/passwd has been changed on server {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
@@ -5925,7 +5925,7 @@ INSERT INTO triggers VALUES (12259,'{11348}<10','Low number of free inodes on {H
 INSERT INTO triggers VALUES (12260,'{11349}>5','Processor load is too high on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12261,'{11350}>10','Too many processes running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12262,'{11351}<100000','Lack of free swap space on {HOSTNAME}','',0,2,4,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12263,'{11352}>50','Too may users connected on server {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12263,'{11352}>50','Too many users connected on server {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12264,'{11353}>0','/etc/inetd.conf has been changed on server {HOSTNAME}','',0,2,2,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12265,'{11354}>0','/vmlinuz has been changed on server {HOSTNAME}','',0,2,2,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12266,'{11355}>0','/etc/passwd has been changed on server {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
@@ -5969,7 +5969,7 @@ INSERT INTO triggers VALUES (12303,'{11392}<10','Low number of free inodes on {H
 INSERT INTO triggers VALUES (12304,'{11393}>5','Processor load is too high on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12305,'{11394}>10','Too many processes running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12306,'{11395}<100000','Lack of free swap space on {HOSTNAME}','',0,2,4,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12307,'{11396}>50','Too may users connected on server {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12307,'{11396}>50','Too many users connected on server {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12308,'{11397}>0','/etc/inetd.conf has been changed on server {HOSTNAME}','',0,2,2,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12309,'{11398}>0','/vmlinuz has been changed on server {HOSTNAME}','',0,2,2,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12310,'{11399}>0','/etc/passwd has been changed on server {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
@@ -6013,7 +6013,7 @@ INSERT INTO triggers VALUES (12347,'{11436}<10','Low number of free inodes on {H
 INSERT INTO triggers VALUES (12348,'{11437}>5','Processor load is too high on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12349,'{11438}>10','Too many processes running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12350,'{11439}<100000','Lack of free swap space on {HOSTNAME}','',0,2,4,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12351,'{11440}>50','Too may users connected on server {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12351,'{11440}>50','Too many users connected on server {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12352,'{11441}>0','/etc/inetd.conf has been changed on server {HOSTNAME}','',0,2,2,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12353,'{11442}>0','/vmlinuz has been changed on server {HOSTNAME}','',0,2,2,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12354,'{11443}>0','/etc/passwd has been changed on server {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
@@ -6057,7 +6057,7 @@ INSERT INTO triggers VALUES (12391,'{11480}<10','Low number of free inodes on {H
 INSERT INTO triggers VALUES (12392,'{11481}>5','Processor load is too high on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12393,'{11482}>10','Too many processes running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12394,'{11483}<100000','Lack of free swap space on {HOSTNAME}','',0,2,4,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12395,'{11484}>50','Too may users connected on server {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12395,'{11484}>50','Too many users connected on server {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12396,'{11485}>0','/etc/inetd.conf has been changed on server {HOSTNAME}','',0,2,2,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12397,'{11486}>0','/vmlinuz has been changed on server {HOSTNAME}','',0,2,2,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12398,'{11487}>0','/etc/passwd has been changed on server {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
@@ -6101,7 +6101,7 @@ INSERT INTO triggers VALUES (12435,'{11524}<10','Low number of free inodes on {H
 INSERT INTO triggers VALUES (12436,'{11525}>5','Processor load is too high on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12437,'{11526}>10','Too many processes running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12438,'{11527}<100000','Lack of free swap space on {HOSTNAME}','',0,2,4,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12439,'{11528}>50','Too may users connected on server {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12439,'{11528}>50','Too many users connected on server {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12440,'{11529}>0','/etc/inetd.conf has been changed on server {HOSTNAME}','',0,2,2,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12441,'{11530}>0','/vmlinuz has been changed on server {HOSTNAME}','',0,2,2,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12442,'{11531}>0','/etc/passwd has been changed on server {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
@@ -6145,7 +6145,7 @@ INSERT INTO triggers VALUES (12479,'{11568}<10','Low number of free inodes on {H
 INSERT INTO triggers VALUES (12480,'{11569}>5','Processor load is too high on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12481,'{11570}>10','Too many processes running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12482,'{11571}<100000','Lack of free swap space on {HOSTNAME}','',0,2,4,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12483,'{11572}>50','Too may users connected on server {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12483,'{11572}>50','Too many users connected on server {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12484,'{11573}>0','/etc/inetd.conf has been changed on server {HOSTNAME}','',0,2,2,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12485,'{11574}>0','/vmlinuz has been changed on server {HOSTNAME}','',0,2,2,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12486,'{11575}>0','/etc/passwd has been changed on server {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
@@ -6189,7 +6189,7 @@ INSERT INTO triggers VALUES (12523,'{11612}<10','Low number of free inodes on {H
 INSERT INTO triggers VALUES (12524,'{11613}>5','Processor load is too high on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12525,'{11614}>10','Too many processes running on {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12526,'{11615}<100000','Lack of free swap space on {HOSTNAME}','',0,2,4,0,0,'','Trigger just added. No status update so far.',0,0);
-INSERT INTO triggers VALUES (12527,'{11616}>50','Too may users connected on server {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
+INSERT INTO triggers VALUES (12527,'{11616}>50','Too many users connected on server {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12528,'{11617}>0','/etc/inetd.conf has been changed on server {HOSTNAME}','',0,2,2,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12529,'{11618}>0','/vmlinuz has been changed on server {HOSTNAME}','',0,2,2,0,0,'','Trigger just added. No status update so far.',0,0);
 INSERT INTO triggers VALUES (12530,'{11619}>0','/etc/passwd has been changed on server {HOSTNAME}','',0,2,3,0,0,'','Trigger just added. No status update so far.',0,0);
@@ -6455,7 +6455,7 @@ INSERT INTO triggers VALUES (12789,'{11878}>0','Hostname was changed on {HOSTNAM
 INSERT INTO triggers VALUES (12790,'{11879}<100000','Lack of free swap space on {HOSTNAME}','',0,2,4,0,0,'','',10012,0);
 INSERT INTO triggers VALUES (12791,'{11880}>0','Host information was changed on {HOSTNAME}','',0,2,1,0,0,'','',10044,0);
 INSERT INTO triggers VALUES (12792,'{11881}<600','{HOSTNAME} has just been restarted','',0,2,1,0,0,'','',10021,0);
-INSERT INTO triggers VALUES (12793,'{11882}>50','Too may users connected on server {HOSTNAME}','',0,2,3,0,0,'','',10013,0);
+INSERT INTO triggers VALUES (12793,'{11882}>50','Too many users connected on server {HOSTNAME}','',0,2,3,0,0,'','',10013,0);
 INSERT INTO triggers VALUES (12794,'{11883}>0','/etc/inetd.conf has been changed on server {HOSTNAME}','',0,2,2,0,0,'','',10014,0);
 INSERT INTO triggers VALUES (12795,'{11884}>0','/etc/passwd has been changed on server {HOSTNAME}','',0,2,3,0,0,'','',10016,0);
 INSERT INTO triggers VALUES (12796,'{11885}>0','/etc/services has been changed on server {HOSTNAME}','',0,2,3,0,0,'','',10031,0);

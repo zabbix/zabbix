@@ -251,6 +251,11 @@ int	PERF_MONITOR(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 int	SERVICE_STATE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	SERVICES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	PROC_INFO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	NET_IF_LIST(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 #endif /* _WINDOWS */
+
+#ifdef _AIX
+int	SYSTEM_STAT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+#endif	/* _AIX */
 
 #endif

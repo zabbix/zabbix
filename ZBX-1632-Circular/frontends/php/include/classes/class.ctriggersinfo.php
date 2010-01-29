@@ -26,15 +26,16 @@ class CTriggersInfo extends CTable{
  public $style;
  public $show_header;
  public $nodeid;
+ public $groupid;
 
-	public function __construct($style = STYLE_HORISONTAL){
+	public function __construct($groupid=0, $style = STYLE_HORISONTAL){
 		$this->style = null;
 
 		parent::__construct(NULL,'triggers_info');
 		$this->setOrientation($style);
 		$this->show_header = true;
-		$this->nodeid = get_current_nodeid();
-		$this->groupid = 0;
+		$this->nodeid = id2nodeid($groupid);;
+		$this->groupid = $groupid;
 	}
 
 	public function setOrientation($value){
@@ -109,7 +110,20 @@ class CTriggersInfo extends CTable{
 		}
 
 		if($this->show_header){
-			$header = new CCol(S_TRIGGERS_INFO,"header");
+			$node = get_node_by_nodeid($this->nodeid);
+			$header_str = S_TRIGGERS_INFO.SPACE;
+
+			if($node > 0) $header_str.= '('.$node['name'].')'.SPACE;
+
+			if(remove_nodes_from_id($this->groupid)>0){
+				$group = get_hostgroup_by_groupid($this->groupid);
+				$header_str.= S_GROUP.SPACE.'&quot;'.$group['name'].'&quot;';
+			}
+			else{
+				$header_str.= S_ALL_GROUPS;
+			}
+
+			$header = new CCol($header_str,"header");
 			if($this->style == STYLE_HORISONTAL)
 				$header->SetColspan(7);
 			$this->addRow($header);

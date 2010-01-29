@@ -20,11 +20,11 @@
 function SDB($return=false){
 	$backtrace = debug_backtrace();
 	array_shift($backtrace);
-	$result = 'DEBUG BACKTRACE: ';
+	$result = 'DEBUG BACKTRACE: <br/>';
 	foreach($backtrace as $n => $bt){
 		$result .= '  --['.$n.']-- '.$bt['file'].' : '.$bt['line'].' | ';
 		$result .= isset($bt['class']) ? $bt['class'].$bt['type'].$bt['function'] : $bt['function'];
-		$result .= '( '.print_r($bt['args'], true).' ) ';
+		$result .= '( '.print_r($bt['args'], true).' ) <br/>';
 	}
 	if($return) return $result;
 	else echo $result;
@@ -190,7 +190,7 @@ function __autoload($class_name){
 		if(file_exists('include/locales/'.$USER_DETAILS['lang'].'.inc.php')){
 			include_once('include/locales/'.$USER_DETAILS['lang'].'.inc.php');
 			process_locales();
-		}
+		}		
 	}
 	else{
 		$USER_DETAILS = array(
@@ -200,9 +200,14 @@ function __autoload($class_name){
 			'type'  =>'0',
 			'node'  =>array(
 				'name'  =>'- unknown -',
-				'nodeid'=>0));
+				'nodeid'=>0)
+			);
 	}
 
+	include_once('include/locales/en_gb.inc.php');
+	process_locales();
+	set_zbx_locales();
+	
 // INIT MB Strings if it's available
 	init_mbstrings();
 /*
@@ -952,10 +957,11 @@ function __autoload($class_name){
 			imagepng($image);
 			$image_txt = ob_get_contents();
 			ob_end_clean();
-
+//SDI($image_txt);
 			session_start();
 			$id = md5($image_txt);
-			$_SESSION['imageid'][$id] = $image_txt;
+			$_SESSION['image_id'] = array();
+			$_SESSION['image_id'][$id] = $image_txt;
 			session_write_close();
 			print($id);
 
@@ -1088,25 +1094,24 @@ function __autoload($class_name){
 	return TRUE;
 	}
 
-	function replace_value_by_map($value, $valuemapid){
-		if($valuemapid < 1) return $value;
+	function replace_value_by_map($value, $valuemapid){ 
+		if($valuemapid < 1) return $value; 
 		
-		static $valuemaps = array();
-		if(isset($valuemaps[$valuemapid])) return $valuemaps[$valuemapid];
-
-		$sql = 'SELECT newvalue '.
-				' FROM mappings '.
-				' WHERE valuemapid='.$valuemapid.
-					' AND value='.zbx_dbstr($value);
-		$result = DBselect($sql);
-		if($row = DBfetch($result)){
-			$valuemaps[$valuemapid] = $row['newvalue'].' '.'('.$value.')';
-			
-			return $valuemaps[$valuemapid];
-		}
-
-	return $value;
-	}
+		static $valuemaps = array(); 
+		if(isset($valuemaps[$valuemapid][$value])) return $valuemaps[$valuemapid][$value]; 
+		
+		$sql = 'SELECT newvalue '. 
+				' FROM mappings '. 
+				' WHERE valuemapid='.$valuemapid. 
+					' AND value='.zbx_dbstr($value); 
+		$result = DBselect($sql); 
+		if($row = DBfetch($result)){ 
+			$valuemaps[$valuemapid][$value] = $row['newvalue'].' '.'('.$value.')'; 
+			return $valuemaps[$valuemapid][$value]; 
+		} 
+	
+	return $value; 
+	} 
 /*************** END VALUE MAPPING ******************/
 
 

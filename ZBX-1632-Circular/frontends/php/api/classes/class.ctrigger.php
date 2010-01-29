@@ -86,10 +86,10 @@ class CTrigger extends CZBXAPI{
 			'severity'				=> null,
 			'templated'				=> null,
 			'inherited'				=> null,
-			'not_templated_triggers'	=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
 			'only_problems'			=> null,
+			'with_unacknowledged_events' => null,
 // filter
 			'filter'				=> null,
 			'group'					=> null,
@@ -117,10 +117,10 @@ class CTrigger extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
-		
+
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
-			
+
 			if(!is_null($options['select_hosts'])){
 				$options['select_hosts'] = API_OUTPUT_EXTEND;
 			}
@@ -131,7 +131,7 @@ class CTrigger extends CZBXAPI{
 				$options['select_dependencies'] = API_OUTPUT_EXTEND;
 			}
 		}
-		
+
 
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
@@ -268,7 +268,16 @@ class CTrigger extends CZBXAPI{
 		if(!is_null($options['only_problems'])){
 			$sql_parts['where']['ot'] = 't.value='.TRIGGER_VALUE_TRUE;
 		}
-
+// with_unacknowledged_events
+		if(!is_null($options['with_unacknowledged_events'])){
+			$sql_parts['where']['unack'] = ' EXISTS('.
+				' SELECT e.eventid'.
+				' FROM events e'.
+				' WHERE e.objectid=t.triggerid'.
+					' AND e.object=0'.
+					' AND e.value='.TRIGGER_VALUE_TRUE.
+					' AND e.acknowledged=0)';
+		}
 // templated
 		if(!is_null($options['templated'])){
 			$sql_parts['from']['f'] = 'functions f';
@@ -410,7 +419,7 @@ class CTrigger extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.
+		$sql = 'SELECT DISTINCT '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('t.triggerid', $nodeids).
 					$sql_where.
@@ -632,7 +641,7 @@ class CTrigger extends CZBXAPI{
  * @param array $triggers[0,...]['templateid'] OPTIONAL
  * @return boolean
  */
-	public static function add($triggers){
+	public static function create($triggers){
 		$triggers = zbx_toArray($triggers);
 		$triggerids = array();
 

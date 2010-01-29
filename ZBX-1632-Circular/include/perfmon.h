@@ -40,13 +40,11 @@
 // Performance Countername structure
 //
 
-#define MAX_PERFCOUNTER_NAME_LEN      (108)	/* old naming <MAX_COUNTER_NAME> */
-
 struct perfcounter
 {
 	struct perfcounter *next;
 	unsigned long	pdhIndex;
-	TCHAR		name[MAX_PERFCOUNTER_NAME_LEN];
+	TCHAR		name[PDH_MAX_COUNTER_NAME];
 	/* must be caracter array! if you want to rewrite */
 	/* to dinacal memory allocation CHECK for usage   */
 	/* of sizeof function                             */

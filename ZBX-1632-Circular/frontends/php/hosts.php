@@ -64,17 +64,18 @@ include_once('include/page_header.php');
 		'ipmi_password'=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,				'isset({useipmi})&&isset({go})&&({go}!="massupdate")'),
 
 		'useprofile'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
-		'devicetype'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
-		'name'=>			array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
-		'os'=>				array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+'devicetype'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'name'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'os'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
 		'serialno'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
-		'tag'=>				array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'tag'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
 		'macaddress'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
 		'hardware'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
 		'software'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
-		'contact'=>			array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'contact'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
 		'location'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
-		'notes'=>			array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'notes'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'host_profile'=> 	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY,   NULL,   NULL),
 
 		'useprofile_ext'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
 		'ext_host_profiles'=> 	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY,   NULL,   NULL),
@@ -218,6 +219,28 @@ include_once('include/page_header.php');
 						$new_values[$property] = $_REQUEST[$property];
 				}
 			}
+				
+// PROFILES {{{
+			if(isset($visible['useprofile'])){
+				$host_profile = get_request('host_profile', array());
+				if(get_request('useprofile', false) && !empty($host_profile)){
+					$new_values['profile'] = $host_profile;
+				}
+				else{
+					$new_values['profile'] = array();
+				}
+			}
+			
+			if(isset($visible['useprofile_ext'])){
+				$ext_host_profiles = get_request('ext_host_profiles', array());
+				if(get_request('useprofile_ext', false) && !empty($ext_host_profiles)){
+					$new_values['extendedProfile'] = $ext_host_profiles;
+				}
+				else{
+					$new_values['extendedProfile'] = array();
+				}
+			}
+// }}} PROFILES
 
 
 			$groups = array();
@@ -231,67 +254,12 @@ include_once('include/page_header.php');
 			$result = CHost::massUpdate(array_merge($hosts, $new_values));
 			if($result === false) throw new Exception();
 
-			
+
 			if(isset($visible['template_table'])){
 				$tplids = array_keys($_REQUEST['templates']);
 				$result = CHost::massAdd(array('hosts' => $hosts['hosts'], 'templates' => zbx_toObject($tplids, 'templateid')));
 				if($result === false) throw new Exception();
 			}
-			
-
-			if($result && isset($visible['useprofile'])){
-				$host_profile = DBfetch(DBselect('SELECT * FROM hosts_profiles WHERE hostid='.$hostid));
-				$host_profile_fields = array('devicetype', 'name', 'os', 'serialno', 'tag','macaddress', 'hardware', 'software',
-					'contact', 'location', 'notes');
-
-				delete_host_profile($hostid);
-
-				if(get_request('useprofile', 'no') == 'yes'){
-					foreach($host_profile_fields as $field){
-						if(isset($visible[$field]))
-							$host_profile[$field] = $_REQUEST[$field];
-						elseif(!isset($host_profile[$field]))
-							$host_profile[$field] = '';
-					}
-
-					$result = add_host_profile($hostid,
-						$host_profile['devicetype'],$host_profile['name'],$host_profile['os'],
-						$host_profile['serialno'],$host_profile['tag'],$host_profile['macaddress'],
-						$host_profile['hardware'],$host_profile['software'],$host_profile['contact'],
-						$host_profile['location'],$host_profile['notes']);
-					if($result === false) throw new Exception();
-				}
-			}
-
-//HOSTS PROFILE EXTANDED Section
-			if($result && isset($visible['useprofile_ext'])){
-				$host_profile_ext=DBfetch(DBselect('SELECT * FROM hosts_profiles_ext WHERE hostid='.$hostid));
-				$host_profile_ext_fields = array('device_alias','device_type','device_chassis','device_os','device_os_short',
-					'device_hw_arch','device_serial','device_model','device_tag','device_vendor','device_contract',
-					'device_who','device_status','device_app_01','device_app_02','device_app_03','device_app_04',
-					'device_app_05','device_url_1','device_url_2','device_url_3','device_networks','device_notes',
-					'device_hardware','device_software','ip_subnet_mask','ip_router','ip_macaddress','oob_ip',
-					'oob_subnet_mask','oob_router','date_hw_buy','date_hw_install','date_hw_expiry','date_hw_decomm','site_street_1',
-					'site_street_2','site_street_3','site_city','site_state','site_country','site_zip','site_rack','site_notes',
-					'poc_1_name','poc_1_email','poc_1_phone_1','poc_1_phone_2','poc_1_cell','poc_1_screen','poc_1_notes','poc_2_name',
-					'poc_2_email','poc_2_phone_1','poc_2_phone_2','poc_2_cell','poc_2_screen','poc_2_notes');
-
-				delete_host_profile_ext($hostid);
-//ext_host_profiles
-
-				if(get_request('useprofile_ext', false) && !empty($ext_host_profiles)){
-					$ext_host_profiles = get_request('ext_host_profiles', array());
-
-					foreach($host_profile_ext_fields as $field){
-						if(isset($visible[$field])){
-							$host_profile_ext[$field] = $ext_host_profiles[$field];
-						}
-					}
-					$result = add_host_profile_ext($hostid, $host_profile_ext);
-					if($result === false) throw new Exception();
-				}
-			}
-
 
 			DBend(true);
 
@@ -615,9 +583,6 @@ $_REQUEST['hostid'] = $thid;
 		$frmForm = new CForm();
 		$frmForm->setMethod('get');
 
-		$groups = CHostGroup::get(array('editable' => 1, 'extendoutput' => 1));
-		order_result($groups, 'name');
-
 		$cmbGroups = new CComboBox('groupid', $PAGE_GROUPS['selected'], 'javascript: submit();');
 		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
 			$cmbGroups->addItem($groupid, $name);
@@ -674,12 +639,12 @@ $_REQUEST['hostid'] = $thid;
 
 		$options = array(
 			'hostids' => zbx_objectValues($hosts, 'hostid'),
-			'extendoutput' => 1,
-			'select_templates' => 1,
-			'select_items' => 1,
-			'select_triggers' => 1,
-			'select_graphs' => 1,
-			'select_applications' => 1,
+			'output' => API_OUTPUT_EXTEND,
+			'select_templates' => API_OUTPUT_EXTEND,
+			'select_items' => API_OUTPUT_REFER,
+			'select_triggers' => API_OUTPUT_REFER,
+			'select_graphs' => API_OUTPUT_REFER,
+			'select_applications' => API_OUTPUT_REFER,
 			'nopermissions' => 1
 		);
 		$hosts = CHost::get($options);
@@ -810,6 +775,14 @@ $_REQUEST['hostid'] = $thid;
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton', S_GO);
 		$goButton->setAttribute('id', 'goButton');
+
+		$jsLocale = array(
+			'S_CLOSE',
+			'S_NO_ELEMENTS_SELECTES'
+		);
+
+		zbx_addJSLocale($jsLocale);
+
 		zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
 
 		$footer = get_table_header(array($goBox, $goButton));

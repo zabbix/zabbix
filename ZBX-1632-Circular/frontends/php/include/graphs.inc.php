@@ -623,18 +623,18 @@
 		return $result;
 	}
 
-        /*
-         * Function: update_graph_with_items
-         *
-         * Description:
-         *     Update graph with items and recursion for template
-         *
-         * Author:
-         *     Eugene Grigorjev
-         *
-         * Comments: !!! Don't forget sync code with C !!!
-         *
-         */
+/*
+ * Function: update_graph_with_items
+ *
+ * Description:
+ *     Update graph with items and recursion for template
+ *
+ * Author:
+ *     Eugene Grigorjev
+ *
+ * Comments: !!! Don't forget sync code with C !!!
+ *
+ */
 	function update_graph_with_items($graphid,$name,$width,$height,$ymin_type,$ymax_type,$yaxismin,$yaxismax,$ymin_itemid,$ymax_itemid,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$percent_left,$percent_right,$gitems=array(),$templateid=0)
 	{
 		$result = false;
@@ -644,7 +644,7 @@
 			return $result;
 		}
 
-		/* check items for template graph */
+// check items for template graph
 		$tmp_hosts = get_hosts_by_graphid($graphid);
 		$host = DBfetch($tmp_hosts);
 		if($host["status"] == HOST_STATUS_TEMPLATE ){
@@ -670,7 +670,7 @@
 			}
 		}
 
-		/* firstly update child graphs */
+// firstly update child graphs
 		$chd_graphs = get_graphs_by_templateid($graphid);
 		while($chd_graph = DBfetch($chd_graphs)){
 			$tmp_hosts = get_hosts_by_graphid($chd_graph['graphid']);
@@ -692,7 +692,7 @@
 		DBexecute('DELETE FROM graphs_items WHERE graphid='.$graphid);
 
 		foreach($gitems as $gitem){
-			if ( ! ($result = add_item_to_graph(
+			if (!$result = add_item_to_graph(
 					$graphid,
 					$gitem['itemid'],
 					$gitem['color'],
@@ -701,7 +701,7 @@
 					$gitem['yaxisside'],
 					$gitem['calc_fnc'],
 					$gitem['type'],
-					$gitem['periods_cnt'])) )
+					$gitem['periods_cnt']))
 			{
 				return $result;
 			}
@@ -1025,7 +1025,7 @@
 			}
 		}
 		else{
-			$_REQUEST['stime'] = date('YmdHi');
+			$_REQUEST['stime'] = date('YmdHi', time()-$_REQUEST['period']);
 		}
 
 	return $_REQUEST['period'];

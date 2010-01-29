@@ -92,10 +92,10 @@ class Cscript extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
-		
+
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
-			
+
 			if(!is_null($options['select_groups'])){
 				$options['select_groups'] = API_OUTPUT_EXTEND;
 			}
@@ -103,8 +103,8 @@ class Cscript extends CZBXAPI{
 				$options['select_hosts'] = API_OUTPUT_EXTEND;
 			}
 		}
-		
-		
+
+
 // editable + PERMISSION CHECK
 		if(USER_TYPE_SUPER_ADMIN == $user_type){
 
@@ -215,7 +215,7 @@ class Cscript extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.
+		$sql = 'SELECT DISTINCT '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('s.scriptid', $nodeids).
 					$sql_where.
@@ -368,7 +368,7 @@ class Cscript extends CZBXAPI{
  * @param array $script['hostid']
  * @return boolean
  */
-	public static function add($scripts){
+	public static function create($scripts){
 		$scripts = zbx_toArray($scripts);
 		$scriptids = array();
 

@@ -86,21 +86,21 @@
 	**     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
 	**/
 
-define("USE_PROFILING",1);
-//define("USE_VAR_MON",1);
-define("USE_TIME_PROF",1);
-define("USE_MEM_PROF",1);
-//define("USE_COUNTER_PROF",1);
-//define("USE_MENU_PROF",1);
-//define("USE_MENU_DETAILS",1);
-define("USE_SQLREQUEST_PROF",1);
-define("SHOW_SQLREQUEST_DETAILS",1);
+define('USE_PROFILING',1);
+//define('USE_VAR_MON',1);
+define('USE_TIME_PROF',1);
+define('USE_MEM_PROF',1);
+//define('USE_COUNTER_PROF',1);
+//define('USE_MENU_PROF',1);
+//define('USE_MENU_DETAILS',1);
+define('USE_SQLREQUEST_PROF',1);
+define('SHOW_SQLREQUEST_DETAILS',1);
 // What is considered long query
-define("LONG_QUERY",0.01);
+define('LONG_QUERY',0.01);
 // WHat is limit on total time spent on all SQL queries
-define("QUERY_TOTAL_TIME",0.5);
+define('QUERY_TOTAL_TIME',0.5);
 // WHat is limit on total time spent
-define("TOTAL_TIME",1.0);
+define('TOTAL_TIME',1.0);
 //define("SHOW_SQLREQUEST_LONG_QUERIES_ONLY",1);
 
 if(!defined('OBR')) define('OBR',"<br/>\n");
@@ -166,7 +166,7 @@ if(defined('USE_PROFILING')){
 			global $var_list;
 			global $USER_DETAILS;
 
-			if(is_null(self::$max_memory_bytes)) self::$max_memory_bytes = (ini_get('memory_limit') * 0.6 * 1024 * 1024);
+			if(is_null(self::$max_memory_bytes)) self::$max_memory_bytes = (ini_get('memory_limit') * 0.8 * 1024 * 1024);
 			if((!is_null($USER_DETAILS) && isset($USER_DETAILS['debug_mode']) && ($USER_DETAILS['debug_mode'] == GROUP_DEBUG_MODE_DISABLED))
 				|| self::$memory_limit_reached){
 				return false;
@@ -197,7 +197,8 @@ if(defined('USE_PROFILING')){
 		public static function savesqlrequest($time, $sql){
 			global $USER_DETAILS;
 
-			if(is_null(self::$max_memory_bytes)) self::$max_memory_bytes = (ini_get('memory_limit') * 0.6 * 1024 * 1024);
+			if(is_null(self::$max_memory_bytes)) self::$max_memory_bytes = (ini_get('memory_limit') * 0.8 * 1024 * 1024);
+
 			if((!is_null($USER_DETAILS) && isset($USER_DETAILS['debug_mode']) && ($USER_DETAILS['debug_mode'] == GROUP_DEBUG_MODE_DISABLED))
 				|| self::$memory_limit_reached){
 				return false;
@@ -238,21 +239,21 @@ if(defined('USE_PROFILING')){
 
 			$debug_str = '';
 			$debug_str.= '<a name="debug"></a>';
-			$debug_str.= "******************* Stats for $type *************************".OBR;
+			$debug_str.= "******************* ".S_STATS_FOR." $type *************************".OBR;
 			if(defined('USE_TIME_PROF')){
 				$time = $endtime - $starttime[$type];
 				if($time < TOTAL_TIME){
-					$debug_str.= 'Total time: '.round($time,6).OBR;
+					$debug_str.= S_TOTAL_TIME.': '.round($time,6).OBR;
 				}
 				else{
-					$debug_str.= '<b>Total time: '.round($time,6).'</b>'.OBR;
+					$debug_str.= '<b>'.S_TOTAL_TIME.': '.round($time,6).'</b>'.OBR;
 				}
 			}
 
 			if(defined('USE_MEM_PROF')){
-				$debug_str.= 'Memory limit	: '.ini_get('memory_limit').OBR;
-				$debug_str.= 'Memory usage	: '.mem2str($memorystamp[$type]).' - '.mem2str($memory).OBR;
-				$debug_str.= 'Memory leak	: '.mem2str($memory - $memorystamp[$type]).OBR;
+				$debug_str.= S_MEMORY_LIMIT.'	: '.ini_get('memory_limit').OBR;
+				$debug_str.= S_MEMORY_USAGE.'	: '.mem2str($memorystamp[$type]).' - '.mem2str($memory).OBR;
+				$debug_str.= S_MEMORY_LEAK.'	: '.mem2str($memory - $memorystamp[$type]).OBR;
 			}
 
 			if(defined('USE_VAR_MON')){
@@ -276,9 +277,9 @@ if(defined('USE_PROFILING')){
 				if(defined('SHOW_SQLREQUEST_DETAILS')){
 					$requests_cnt = count($sqlrequests);
 					if(isset($DB) && isset($DB['SELECT_COUNT'])){
-						$debug_str.= 'SQL selects count: '.$DB['SELECT_COUNT'].OBR;
-						$debug_str.= 'SQL executes count: '.$DB['EXECUTE_COUNT'].OBR;
-						$debug_str.= 'SQL requests count: '.($requests_cnt - $sqlmark[$type]).OBR;
+						$debug_str.= S_SQL_SELECTS_COUNT.': '.$DB['SELECT_COUNT'].OBR;
+						$debug_str.= S_SQL_EXECUTES_COUNT.': '.$DB['EXECUTE_COUNT'].OBR;
+						$debug_str.= S_SQL_REQUESTS_COUNT.': '.($requests_cnt - $sqlmark[$type]).OBR;
 					}
 
 					$sql_time=0;
@@ -286,10 +287,10 @@ if(defined('USE_PROFILING')){
 						$time=$sqlrequests[$i][0];
 						$sql_time+=$time;
 						if($time < LONG_QUERY){
-							$debug_str.= 'Time:'.round($time,8).' SQL:&nbsp;'.$sqlrequests[$i][1].OBR;
+							$debug_str.= S_TIME.':'.round($time,8).' SQL:&nbsp;'.$sqlrequests[$i][1].OBR;
 						}
 						else{
-							$debug_str.= '<b>Time:'.round($time,8).' LONG SQL:&nbsp;'.$sqlrequests[$i][1].'</b>'.OBR;
+							$debug_str.= '<b>'.S_TIME.':'.round($time,8).' LONG SQL:&nbsp;'.$sqlrequests[$i][1].'</b>'.OBR;
 						}
 					}
 				}
@@ -298,13 +299,13 @@ if(defined('USE_PROFILING')){
 				}
 
 				if($sql_time < QUERY_TOTAL_TIME){
-					$debug_str.= 'Total time spent on SQL: '.round($sql_time,8).OBR;
+					$debug_str.= S_TOTAL_TIME_SPENT_ON_SQL.': '.round($sql_time,8).OBR;
 				}
 				else{
-					$debug_str.= '<b>Total time spent on SQL: '.round($sql_time,8).'</b>'.OBR;
+					$debug_str.= '<b>'.S_TOTAL_TIME_SPENT_ON_SQL.': '.round($sql_time,8).'</b>'.OBR;
 				}
 			}
-			$debug_str.= "******************** End of $type ***************************".OBR;
+			$debug_str.= "******************** ".S_END_OF." $type ***************************".OBR;
 
 			self::$debug_info[$type] = $debug_str;
 		}
@@ -312,11 +313,11 @@ if(defined('USE_PROFILING')){
 		public static function show(){
 // DEBUG of ZBX FrontEnd
 			$debug = new CDiv(null,'textcolorstyles');
-			$debug->setAttribute('id','zbx_gebug_info');
+			$debug->setAttribute('name','zbx_gebug_info');
 			$debug->setAttribute('style','display: none; overflow: auto; width: 95%; border: 1px #777777 solid; margin: 4px; padding: 4px;');
 
 			if(self::$memory_limit_reached){
-				$debug->addItem(array(BR(),new CJSscript('MEMROY LIMIT REACHED! Profiling was stopped to save memory for script processing.'),BR()));
+				$debug->addItem(array(BR(),new CJSscript(S_MEMORY_LIMIT_REACHED),BR()));
 			}
 			foreach(self::$debug_info as $type => $info){
 				$debug->addItem(array(BR(),new CJSscript($info),BR()));

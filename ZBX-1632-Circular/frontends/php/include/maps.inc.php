@@ -360,7 +360,7 @@
 		}
 
 		$selementid = get_dbid('sysmaps_elements','selementid');
-					
+
 		$result = DBexecute('INSERT INTO sysmaps_elements '.
 							'(selementid,sysmapid,elementid,elementtype,label,label_location,'.
 							'iconid_off,iconid_on,iconid_unknown,iconid_maintenance,iconid_disabled,x,y,url)'.
@@ -527,13 +527,6 @@
 	return TRUE;
 	}
 
-	function get_info_by_selementid($selementid,$view_status=0){
-		$db_element = get_sysmaps_element_by_selementid($selementid);
-		$info = get_info_by_selement($db_element,$view_status);
-
-	return $info;
-	}
-
 /*
  * Function: get_action_map_by_sysmapid
  *
@@ -568,7 +561,7 @@
 		}
 
 		$scripts_by_hosts = CScript::getScriptsByHosts($hostids);
-		
+
 		$options = array(
 			'nodeids' => get_current_nodeid(true),
 			'hostids' => $hostids,
@@ -605,11 +598,11 @@
 			}
 			else if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER){
 				if(empty($url) && $db_element['elementid']!=0)
-					$url='events.php?triggerid='.$db_element['elementid'].'&nav_time='.(time()-7*86400);
+					$url='events.php?source=0&triggerid='.$db_element['elementid'].'&nav_time='.(time()-7*86400);
 			}
 			else if($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP){
 				if(empty($url) && $db_element['elementid']!=0)
-					$url='events.php?hostid=0&groupid='.$db_element['elementid'];
+					$url='events.php?source=0&hostid=0&groupid='.$db_element['elementid'];
 			}
 
 			if(empty($url))	continue;
@@ -725,9 +718,7 @@
 	return get_png_by_selement($selement);
 	}
 
-	function get_png_by_selement($selement, $info=null){
-		if(is_null($info))
-			$info = get_info_by_selement($selement);
+	function get_png_by_selement($selement, $info){
 
 		switch($info['icon_type']){
 			case SYSMAP_ELEMENT_ICON_ON:
@@ -1270,6 +1261,15 @@
 				$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 			}
 
+			if(isset($info['disabled']) && $info['disabled'] == 1){
+// Disabled
+				$info['info'] = array();
+				$info['info'][] = array('msg'=>S_DISABLED_BIG, 'color'=>$colors['Dark Red']);
+
+				$info['iconid'] = $selement['iconid_disabled'];
+				$info['icon_type'] = SYSMAP_ELEMENT_ICON_DISABLED;
+			}
+
 			$info['priority'] = isset($info[$info['type']]['priority']) ? $info[$info['type']]['priority'] : 0;
 //---
 		}
@@ -1283,7 +1283,7 @@
  * Author: Aly
  */
 
- 	function getHostsInfo($selements){
+ 	function getHostsInfo($selements, $expandProblem=false){
 		global $colors;
 
 		$selements_info = array();
@@ -1447,8 +1447,10 @@
 					$msg = S_PROBLEM_BIG;
 					if($info[$info['type']]['count'] > 1)
 						$msg = $info[$info['type']]['count'].' '.S_PROBLEMS;
-					else if(isset($info[$info['type']]['info']))
+					else if($expandProblem && isset($info[$info['type']]['info']))
 						$msg = $info[$info['type']]['info'];
+					else 
+						$msg = $info[$info['type']]['count'].' '.S_PROBLEM;
 
 
 					$info['info'] = array();
@@ -1497,7 +1499,7 @@
  * Description: Retrive selement
  * Author: Aly
  */
- 	function getHostGroupsInfo($selements){
+ 	function getHostGroupsInfo($selements, $expandProblem=false){
 		global $colors;
 
 		$selements_info = array();
@@ -1599,9 +1601,10 @@
 				$msg = S_PROBLEM_BIG;
 				if($info[$info['type']]['count'] > 1)
 					$msg = $info[$info['type']]['count'].' '.S_PROBLEMS;
-				else if(isset($info[$info['type']]['info']))
+				else if($expandProblem && isset($info[$info['type']]['info']))
 					$msg = $info[$info['type']]['info'];
-
+				else 
+					$msg = $info[$info['type']]['count'].' '.S_PROBLEM;
 
 				$info['info'] = array();
 				$info['info'][] = array('msg'=>$msg, 'color'=>$color);
@@ -1653,12 +1656,12 @@
  * Author: Aly
  */
 
- 	function getMapsInfo($selements){
+ 	function getMapsInfo($selements, $expandProblem=false){
 		global $colors;
 
 		$selements_info = array();
 		$options = array(
-				'mapids' => zbx_objectValues($selements, 'elementid'),
+				'sysmapids' => zbx_objectValues($selements, 'elementid'),
 				'extendoutput' => 1,
 				'nopermissions' => 1,
 				'select_selements' => 1,
@@ -1680,7 +1683,18 @@
 			$infos = getSelementsInfo($map['selements']);
 
 			foreach($infos as $inum => $inf){
-				$info['type'] = $inf['type'];
+
+				if(!isset($info['type'])){
+					$info['type'] = $inf['type'];
+				}
+				else if($inf['type'] == TRIGGER_VALUE_TRUE){
+					$info['type'] = $inf['type'];
+				}
+				else if($info['type'] != TRIGGER_VALUE_TRUE){
+					if(($info['type'] == TRIGGER_VALUE_FALSE) || ($inf['type'] == TRIGGER_VALUE_UNKNOWN)){
+						$info['type'] = $inf['type'];
+					}
+				}
 
 //				$info['triggers'] += $inf['triggers'];
 				$info['triggers'] = array_merge($info['triggers'], $inf['triggers']);
@@ -1693,8 +1707,9 @@
 					$info[$info['type']]['info'] = $inf['info'];
 				}
 			}
-
+//SDII($info);
 			$count = count($info['triggers']);
+
 			if($count > 0){
 				$info[TRIGGER_VALUE_TRUE]['count'] = $count;
 
@@ -1707,7 +1722,9 @@
 								' AND i.itemid=f.itemid '.
 								' AND f.triggerid=t.triggerid';
 					$db_trigger = DBfetch(DBselect($sql));
-					$info[TRIGGER_VALUE_TRUE]['info'] = expand_trigger_description_by_data($db_trigger);
+					
+					$info[TRIGGER_VALUE_TRUE]['info'] = array();
+					$info[TRIGGER_VALUE_TRUE]['info'][] = array('msg' => expand_trigger_description_by_data($db_trigger));
 				}
 			}
 
@@ -1720,9 +1737,16 @@
 				$msg = S_PROBLEM_BIG;
 				if($info[$info['type']]['count'] > 1)
 					$msg = $info[$info['type']]['count'].' '.S_PROBLEMS;
-				else if(isset($info[$info['type']]['info']))
-					$msg = $info[$info['type']]['info'];
-
+				else if($expandProblem && isset($info[$info['type']]['info'])){
+					if($tmp = reset($info[$info['type']]['info'])){
+						$msg = $tmp['msg'];
+					}
+					else{
+						$msg = '';
+					}
+				}
+				else 
+					$msg = $info[$info['type']]['count'].' '.S_PROBLEM;
 
 				$info['info'] = array();
 				$info['info'][] = array('msg'=>$msg, 'color'=>$color);
@@ -1804,8 +1828,13 @@
 
 			$info['name'] = S_IMAGE;
 
-			$info['type'] = TRIGGER_VALUE_TRUE;
+			$info['type'] = TRIGGER_VALUE_FALSE;
+
 			$info['info'] = array();
+			$info['info'][] = array(
+								'msg'=>'',
+								'color'=>$colors['Black']
+							);
 
 			$info['count'] = 0;
 			$info['priority'] = 0;
@@ -1827,7 +1856,7 @@
  * Author: Aly
  */
 
-	function getSelementsInfo($selemetns){
+	function getSelementsInfo($selemetns, $expandProblem=false){
 		$hosts = array();
 		$maps = array();
 		$triggers = array();
@@ -1863,9 +1892,9 @@ SDII($images);
 
 		$info = array();
 		$info += getTriggersInfo($triggers);
-		$info += getHostsInfo($hosts);
-		$info += getHostGroupsInfo($hostgroups);
-		$info += getMapsInfo($maps);
+		$info += getHostsInfo($hosts, $expandProblem);
+		$info += getHostGroupsInfo($hostgroups, $expandProblem);
+		$info += getMapsInfo($maps, $expandProblem);
 		$info += getImagesInfo($images);
 
 	return $info;

@@ -32,10 +32,6 @@
 
 	if($_REQUEST['fullscreen']=get_request('fullscreen', 0)) define('ZBX_PAGE_NO_MENU', 1);
 
-	include_once('include/locales/en_gb.inc.php');
-	process_locales();
-	set_zbx_locales();
-
 	require_once('include/menu.inc.php');
 
 	zbx_define_menu_restrictions();
@@ -98,7 +94,7 @@
 			}
 
 			if((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && $USER_DETAILS['refresh']){
-				$page_title .= ' [refreshed every '.$USER_DETAILS['refresh'].' sec]';
+				$page_title .= ' ['.S_REFRESHED_EVERY_SMALL.SPACE.$USER_DETAILS['refresh'].SPACE.S_SEC_SMALL.']';
 			}
 		break;
 	}
@@ -200,7 +196,13 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			if($USER_DETAILS['debug_mode'] == GROUP_DEBUG_MODE_ENABLED){
 
 				$debug = new CLink(S_DEBUG, '#debug', 'small_font', null, 'nosid');
-				$debug->setAttribute('onclick', "javascript: ShowHide('zbx_gebug_info', 'block');");
+
+				$d_script = " if(!isset('state', this)) this.state = 'none'; ".
+							" if(this.state == 'none') this.state = 'block'; ".
+							" else this.state = 'none'; ".
+							" showHideByName('zbx_gebug_info', this.state);";
+
+				$debug->setAttribute('onclick', 'javascript: '.$d_script);
 
 				array_push($page_header_r_col,$debug,'|');
 			}

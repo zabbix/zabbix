@@ -86,7 +86,7 @@ include_once('include/page_header.php');
 	}
 //--------
 
-// FILTER 
+// FILTER
 	if(isset($_REQUEST['filter_rst'])){
 		$_REQUEST['nav_time'] = time();
 		$_REQUEST['triggerid'] = 0;
@@ -312,17 +312,20 @@ include_once('include/page_header.php');
 			));
 
 		$options = array(
-						'object' => EVENT_OBJECT_TRIGGER,
-						'time_from' => $_REQUEST['nav_time'],
-						'time_till' => null,
-						'extendoutput' => 1,
-						'sortfield' => 'clock',
-						'sortorder' => getPageSortOrder(),
-						'nopermissions' => 1,
-						'limit' => ($config['search_limit']+1)
-					);
+			'nodeids' => get_current_nodeid(),
+			'object' => EVENT_OBJECT_TRIGGER,
+			'time_from' => $_REQUEST['nav_time'],
+			'time_till' => null,
+			'extendoutput' => 1,
+			'sortfield' => 'clock',
+			'sortorder' => getPageSortOrder(),
+			'nopermissions' => 1,
+			'limit' => ($config['search_limit']+1)
+		);
 
-		$trigOpt = array();
+		$trigOpt = array(
+			'nodeids' => get_current_nodeid(),
+		);
 		if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
 			$trigOpt['hostids'] = $PAGE_HOSTS['selected'];
 		}
@@ -353,13 +356,14 @@ include_once('include/page_header.php');
 //------
 
 		$options = array(
-						'eventids' => zbx_objectValues($events,'eventid'),
-						'extendoutput' => 1,
-						'select_hosts' => 1,
-						'select_triggers' => 1,
-						'select_items' => 1,
-						'nopermissions' => 1
-					);
+			'nodeids' => get_current_nodeid(),
+			'eventids' => zbx_objectValues($events,'eventid'),
+			'extendoutput' => 1,
+			'select_hosts' => 1,
+			'select_triggers' => 1,
+			'select_items' => 1,
+			'nopermissions' => 1
+		);
 		$events = CEvent::get($options);
 
 // sorting & paging

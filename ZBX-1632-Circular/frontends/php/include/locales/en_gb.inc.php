@@ -103,6 +103,7 @@
 	'S_DOWN_TIME'=>				'Downtime',
 	'S_DISCOVERED_DEVICE'=>			'Discovered device',
 	'S_MONITORED_HOST'=>			'Monitored host',
+	'S_INCORRECT_IP_RANGE'=>		'Incorrect IP range.',
 
 //	httpdetails.php
 	'S_DETAILS_OF_SCENARIO'=>		'Details of scenario',
@@ -355,6 +356,10 @@
 	'S_EXECUTED'=>				'executed',
 	'S_NOT_SENT'=>				'not sent',
 	'S_NO_ACTIONS_FOUND'=>			'No actions found',
+	'S_INCORRECT_COMMAND'=>			'Incorrect command',
+	'S_UNKNOWN_GROUP_NAME'=>		'Unknown group name',
+	'S_UNKNOWN_HOST_NAME' => 'Unknown host name',
+	'S_IN_COMMAND_SMALL'=>			'in command',
 
 // Lines
 	'S_LINE'=>				'Line',
@@ -508,6 +513,9 @@
 	'S_DELETE_SELECTED_NODE_Q'=>		'Delete selected node?',
 
 // proxies.php
+	'S_ENABLE_SELECTED_PROXIES' => 'Enable hosts monitored by selected proxies?',
+	'S_DISABLE_SELECTED_PROXIES' => 'Disable hosts monitored by selected proxies?',
+	'S_DELETE_SELECTED_PROXIES' => 'Delete selected proxies?',
 	'S_CONFIGURATION_OF_PROXIES'=>		'CONFIGURATION OF PROXIES',
 	'S_DELETE_SELECTED_PROXY_Q'=>		'Delete selected proxy?',
 
@@ -846,6 +854,9 @@
 	'S_TEMPLATE_DELETED'=>			'Template deleted',
 	'S_CANNOT_DELETE_TEMPLATE'=>		'Cannot delete template',
 	'S_LINK_WITH_TEMPLATE'=>		'Link with template',
+	'S_DELETE_AND_CLEAR'=>			'Delete AND clear',
+	'S_DELETE_SELECTED_TEMPLATES_Q'=>	'Delete selected templates?',
+	'S_WARNING_THIS_DELETE_TEMPLATES_AND_CLEAR'=>'Warning: this will delete selected templates and clear all linked hosts',
 
 //	Host profiles
 	'S_HOST_PROFILE'=>			'Host profile',
@@ -1087,6 +1098,9 @@
 	'S_LINK_STATUS_INDICATOR'=>		'Link status indicator',
 	'S_CONFIGURATION_OF_NETWORK_MAPS'=>	'Configuration of network maps',
 	'S_CONFIGURATION_OF_NETWORK_MAPS_BIG'=>	'CONFIGURATION OF NETWORK MAPS',
+	'S_MAP_SAVED_RETURN_Q'=>		'Map is saved! Return?',
+	'S_MAP_SAVE_OPERATION_FAILED'=>		'Map save operation failed.',
+	'S_GET_IMG_ELEMENT_DATA_NOT_FOUND'=>	'Get Img: Element data not found!',
 
 	'S_ADD_ELEMENT'=>			'Add element',
 	'S_COORDINATE_X'=>			'Coordinate X',
@@ -1099,27 +1113,33 @@
 //	sysmaps.php
 	'S_EDIT_MAP_ELEMENT'=>			'Edit map element',
 	'S_ICON_DEFAULT'=>			'Icon (default)',
-	'S_APPLY'=>				'Apply',
+	'S_APPLY'=>					'Apply',
 	'S_MAP_ELEMENTS'=>			'Map elements',
 	'S_MAP_DELETED'=>			'Network map deleted',
 	'S_CANNOT_DELETE_MAP'=>			'Cannot delete network map',
-	'S_MAPS_BIG'=>				'MAPS',
+	'S_MAPS_BIG'=>					'MAPS',
 	'S_NO_MAPS_DEFINED'=>			'No maps defined',
-	'S_CREATE_MAP'=>			'Create Map',
+	'S_CREATE_MAP'=>				'Create Map',
 	'S_ICON_LABEL_LOCATION'=>		'Icon label location',
 	'S_ICON_HIGHLIGHTING'=>			'Icon highlighting',
 	'S_LINK_INDICATORS'=>			'Link indicators',
-	'S_TYPE_OK'=>				'Type (OK)',
-	'S_COLOR_OK'=>				'Colour (OK)',
+	'S_TYPE_OK'=>					'Type (OK)',
+	'S_COLOR_OK'=>					'Colour (OK)',
 	'S_USE_ADVANCED_ICONS'=>		'Use advanced icons',
+	'S_DELETE_SELECTED_MAPS_Q'=>		'Delete selected maps?',
+	'S_MAP_ADDED'=>					'Network map added',
+	'S_CANNOT_ADD_MAP'=>			'Cannot add network map',
+	'S_MAP_UPDATED'=>				'Network map updated',
+	'S_CANNOT_UPDATE_MAP'=>			'Cannot update network map',
+	'S_EXPAND_SINGLE_PROBLEM'=>		'Expand single problem',
 
-	'S_BOTTOM'=>				'Bottom',
-	'S_TOP'=>				'Top',
-	'S_LINK_STATUS_INDICATORS'=>		'Link status indicators',
+	'S_BOTTOM'=>					'Bottom',
+	'S_TOP'=>						'Top',
+	'S_LINK_STATUS_INDICATORS'=>	'Link status indicators',
 
 	'S_REMOVE_ELEMENT'=>			'Remove element',
-	'S_ADD_LINK'=>				'Add link',
-	'S_REMOVE_LINK'=>			'Remove link',
+	'S_ADD_LINK'=>					'Add link',
+	'S_REMOVE_LINK'=>				'Remove link',
 
 
 //	map.php
@@ -1157,6 +1177,9 @@
 	'S_AGE'=>				'Age',
 	'S_ISSUE'=>				'Issue',
 	'S_SYSTEM_STATUS'=>			'System status',
+	'S_HOST_STATUS_STATUS'=>			'Host status',
+	'S_WITHOUT_PROBLEMS' =>				'Without problems',
+	'S_WITH_PROBLEMS' =>				'With problems',
 	'S_LAST_20_ISSUES'=>			'Last 20 issues',
 	'S_FAVOURITE'=>				'Favourite',
 	'S_FAVOURITES'=>			'Favourites',
@@ -1234,6 +1257,7 @@
 	'S_TILL'=>					'Till',
 	'S_TO'=>					'To',
 	'S_OK'=>					'Ok',
+	'S_PROBLEM'=>					'Problem',
 	'S_PROBLEMS'=>					'Problems',
 	'S_PERCENTAGE'=>				'Percentage',
 	'S_SLA'=>					'SLA',
@@ -1441,8 +1465,10 @@
 	'S_LAST_7_DAYS'=>			'Last 7 days',
 	'S_LAST_30_DAYS'=>			'Last 30 days',
 	'S_LAST_365_DAYS'=>			'Last 365 days',
+	'S_CANNOT_FORMAT_TREE_CHECK_LOGIC'=> 'Cannot format Tree. Check logic structure in service links',
 
 //	triggers.php
+	'S_SHOW_ALL_WITH_UNACKNOWLEDGED' => 'Show triggers with unacknowledged events',
 	'S_NO_TRIGGER'=>			'No trigger',
 	'S_NO_TRIGGERS_DEFINED'=>		'No triggers defined',
 	'S_NO_TRIGGER_DEFINED'=>		'No trigger defined',
@@ -1489,6 +1515,13 @@
 	'S_TOGGLE_INPUT_METHOD'=>		'Toggle input method',
 	'S_INSERT_MACRO'=>			'Insert macro',
 	'S_REPLACE'=>				'Replace',
+
+	'S_TEMPLATED_TRIGGER'=>			'Templated trigger',
+	'S_ENABLE_SELECTED_TRIGGERS_Q'=>	'Enable selected triggers?',
+	'S_DISABLE_SELECTED_TRIGGERS_Q'=>	'Disable selected triggers?',
+	'S_MASS_UPDATE_SELECTED_TRIGGERS_Q'=>	'Mass update selected triggers?',
+	'S_COPY_SELECTED_TRIGGERS_Q'=>		'Copy selected triggers?',
+	'S_DELETE_SELECTED_TRIGGERS_Q'=>	'Delete selected triggerers?',
 
 //	tr_comments.php
 	'S_TRIGGER_COMMENTS'=>			'Trigger comments',
@@ -1602,7 +1635,7 @@
 	'S_DISABLE_DEBUG'=>				'Disable DEBUG',
 	'S_BLOCKED'=>					'Blocked',
 	'S_UNBLOCK_SELECTED'=>				'Unblock selected',
-	'S_UBLOCK_SELECTED_USERS_Q'=>			'Unblock selected users?', 
+	'S_UBLOCK_SELECTED_USERS_Q'=>			'Unblock selected users?',
 	'S_DELETE_SELECTED_USERS_Q'=>			'Delete selected users?',
 
 //  usergrps.php
@@ -1677,8 +1710,9 @@
 	'S_POLISH_PL'=>				'Polish (PL)',
 
 //	index.php
-	'S_ZABBIX_BIG'=>			'Zabbix',
+	'S_ZABBIX_BIG'=>			'ZABBIX',
 	'S_WELCOME'=>				'Welcome to Zabbix! You are connected as',
+	'S_LOGIN_NAME'=> 'Login name',
 
 //	hostprofiles.php
 	'S_HOST_PROFILES'=>			'Host profiles',
@@ -1700,6 +1734,7 @@
 	'S_NO_ITEMS'=>				'No items',
 	'S_DISCOVERY_RULES_BIG'=>		'DISCOVERY RULES',
 	'S_DISCOVERY_CHECKS_BIG'=>		'DISCOVERY CHECKS',
+	'S_HOSTS_AND_TEMPLATES_BIG' => 'Hosts and templates',
 
 //	forms.inc.php
 //	popup_link_tr.php
@@ -1712,6 +1747,8 @@
 	'S_EXCLUDE'=>		'Exclude',
 	'S_KEYWORD'=>		'Keyword',
 	'S_POSITION'=>		'Position',
+	'S_DELETE_EXPRESSION_Q'=>	'Delete expression?',
+	'S_DELETE_KEYWORD_Q'=>		'Delete keyword?',
 
 //  tr_testexpr.php
 	'S_TEST_DATA'=>		'Test data',
@@ -1724,6 +1761,36 @@
 
 // popup_media.php
 	'S_INCORRECT_TIME_PERIOD'=>	'Incorrect time period',
+
+// main.js
+	'S_NO_ELEMENTS_SELECTES'=>	'No elements selected!',
+
+// page_header.php
+	'S_REFRESHED_EVERY_SMALL'=>		'refreshed every',
+	'S_PAGE_RECEIVED_INCORRECT_DATA'=>	'Page received incorrect data',
+
+//	copt.inc.php
+	'S_STATS_FOR'=>			'Stats for',
+	'S_TOTAL_TIME'=>		'Total time',
+	'S_MEMORY_LIMIT'=>		'Memory limit',
+	'S_MEMORY_USAGE'=>		'Memory usage',
+	'S_MEMORY_LEAK'=>		'Memory leak',
+	'S_SQL_SELECTS_COUNT'=>		'SQL selects count',
+	'S_SQL_EXECUTES_COUNT'=>	'SQL executes count',
+	'S_SQL_REQUESTS_COUNT'=>	'SQL requests count',
+	'S_TOTAL_TIME_SPENT_ON_SQL'=>	'Total time spent on SQL',
+	'S_END_OF'=>			'End of',
+	'S_MEMORY_LIMIT_REACHED'=>	'MEMORY LIMIT REACHED! Profiling was stopped to save memory for script processing.',
+
+// 	func.inc.php
+	'S_WRONG_TYPE'=>			'Wrong type',
+	'S_INCORRECT_TYPE_OF_ASORT_BY_KEY'=>	'Incorrect type of asort_by_key',
+	'S_DAYS_SMALL'=>			'days',
+	'S_B'=>			'B',
+	'S_M'=>			'M',
+	'S_K'=>			'K',
+	'S_G'=>			'G',
+	'S_T'=>			'T',
 
 //	Menu
 

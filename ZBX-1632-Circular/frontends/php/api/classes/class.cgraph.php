@@ -97,10 +97,10 @@ class CGraph extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
-		
+
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
-			
+
 			if(!is_null($options['select_hosts'])){
 				$options['select_hosts'] = API_OUTPUT_EXTEND;
 			}
@@ -114,8 +114,8 @@ class CGraph extends CZBXAPI{
 				$options['select_graph_items'] = API_OUTPUT_EXTEND;
 			}
 		}
-		
-		
+
+
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
@@ -291,7 +291,7 @@ class CGraph extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.
+		$sql = 'SELECT DISTINCT '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('g.graphid', $nodeids).
 					$sql_where.
@@ -498,7 +498,7 @@ class CGraph extends CZBXAPI{
  * @param array $graphs multidimensional array with graphs data
  * @return boolean
  */
-	public static function add($graphs){
+	public static function create($graphs){
 		$graphs = zbx_toArray($graphs);
 		$graphids = array();
 

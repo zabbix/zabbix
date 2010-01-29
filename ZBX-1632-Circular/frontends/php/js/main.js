@@ -121,7 +121,7 @@ init: function(){
 	var path = new Curl();
 	this.page = path.getPath();
 	
-	this.selected_ids = cookie.readJSON('cb_'+this.page);
+	this.selected_ids = cookie.readJSON('cb_'+this.page+'_'+this.pageGoName);
 
 	var chk_bx = document.getElementsByTagName('input');
 
@@ -306,7 +306,7 @@ setGo: function(){
 		
 		var tmp_val = $('goButton').value.split(' ');
 		$('goButton').value = tmp_val[0]+' ('+countChecked+')';
-		cookie.createJSON('cb_'+this.page, this.selected_ids);
+		cookie.createJSON('cb_'+this.page+'_'+this.pageGoName, this.selected_ids);
 
 		this.pageGoCount = countChecked;
 	}
@@ -341,7 +341,7 @@ submitGo: function(e){
 		return true;
 	}
 	else{
-		alert('No elements selected!');
+		alert(locale['S_NO_ELEMENTS_SELECTES']);
 		Event.stop(e);
 		return false;
 	}
@@ -420,7 +420,7 @@ createBox: function(obj, hint_text, width, className, byClick){
 	if(byClick){
 		close_link = '<div class="link" '+
 						'style="text-align: right; border-bottom: 1px #333 solid;" '+
-						'onclick="javascript: hintBox.hide(event, \''+boxid+'\');">Close</div>';
+						'onclick="javascript: hintBox.hide(event, \''+boxid+'\');">'+locale['S_CLOSE']+'</div>';
 	}
 
 	box.innerHTML = close_link + hint_text;

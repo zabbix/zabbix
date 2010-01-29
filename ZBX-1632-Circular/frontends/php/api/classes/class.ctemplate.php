@@ -93,10 +93,10 @@ class CTemplate extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
-		
+
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
-			
+
 			if(!is_null($options['select_groups'])){
 				$options['select_groups'] = API_OUTPUT_EXTEND;
 			}
@@ -122,8 +122,8 @@ class CTemplate extends CZBXAPI{
 				$options['select_macros'] = API_OUTPUT_EXTEND;
 			}
 		}
-		
-		
+
+
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
@@ -158,7 +158,7 @@ class CTemplate extends CZBXAPI{
 // groupids
 		if(!is_null($options['groupids'])){
 			zbx_value2array($options['groupids']);
-			
+
 			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
@@ -298,7 +298,6 @@ class CTemplate extends CZBXAPI{
 				WHERE '.DBin_node('h.hostid', $nodeids).
 					$sql_where.
 				$sql_order;
-
 		$res = DBselect($sql, $sql_limit);
 		while($template = DBfetch($res)){
 			if($options['count'])
@@ -403,7 +402,7 @@ class CTemplate extends CZBXAPI{
 				$ghosts = $group['hosts'];
 				unset($group['hosts']);
 				foreach($ghosts as $hnum => $template){
-					$result[$template['templateid']]['groups'][] = $group;
+					$result[$template['hostid']]['groups'][] = $group;
 				}
 			}
 		}
@@ -742,7 +741,7 @@ class CTemplate extends CZBXAPI{
 				$template['templates'] = $template;
 
 				$result = self::massUpdate($template);
-				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Failed update template');
+				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Failed to update template');
 			}
 
 			self::EndTransaction(true, __METHOD__);
@@ -870,8 +869,7 @@ class CTemplate extends CZBXAPI{
 // UPDATE TEMPLATES PROPERTIES {{{
 			if(isset($data['host'])){
 				if(count($templates) > 1){
-					$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields');
-					throw new APIException($error);
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Wrong fields');
 				}
 
 				$template_exists = self::getObjects(array('template' => $data['host']));
@@ -879,8 +877,7 @@ class CTemplate extends CZBXAPI{
 				$cur_template = reset($templates);
 
 				if(!empty($template_exists) && ($template_exists['templateid'] != $cur_template['templateid'])){
-					$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
-					throw new APIException($error);
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 			}
 
@@ -909,7 +906,7 @@ class CTemplate extends CZBXAPI{
 				if(!empty($groups_to_add)){
 					$result = self::massAdd(array('templates' => $templates, 'groups' => $groups_to_add));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant add grooup');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t add group');
 					}
 				}
 
@@ -918,7 +915,7 @@ class CTemplate extends CZBXAPI{
 				if(!empty($groups_to_del)){
 					$result = self::massRemove(array('templates' => $templates, 'groups' => $groups_to_del));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant remove group');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t remove group');
 					}
 				}
 			}
@@ -948,7 +945,7 @@ class CTemplate extends CZBXAPI{
 				if(!empty($hosts_to_add)){
 					$result = self::massAdd(array('templates' => $templates, 'hosts' => $hosts_to_add));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant link template');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t link template');
 					}
 				}
 
@@ -958,7 +955,7 @@ class CTemplate extends CZBXAPI{
 				if(!empty($hosts_to_del)){
 					$result = self::massRemove(array('hosts' => $hosts_to_del, 'templates' => $templates));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant unlink template');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t unlink template');
 					}
 				}
 			}
@@ -973,7 +970,7 @@ class CTemplate extends CZBXAPI{
 				if(!empty($templates_to_add)){
 					$result = self::massAdd(array('templates' => $templates, 'templates_link' => $templates_to_add));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant link template');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t link template');
 					}
 				}
 
@@ -983,7 +980,7 @@ class CTemplate extends CZBXAPI{
 				if(!empty($templates_to_del)){
 					$result = self::massRemove(array('templates' => $templates, 'templates_link' => $templates_to_del));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant unlink template');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t unlink template');
 					}
 				}
 			}
@@ -994,7 +991,7 @@ class CTemplate extends CZBXAPI{
 
 				$result = self::massAdd(array('templates' => $templates, 'macros' => $data['macros']));
 				if(!$result){
-					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant add macro');
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t add macro');
 				}
 
 				$macros_to_del = array();
@@ -1014,7 +1011,7 @@ class CTemplate extends CZBXAPI{
 				if(!empty($macros_to_del)){
 					$result = self::massRemove(array('templates' => $templates, 'macros' => $macros_to_del));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant remove macro');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t remove macro');
 					}
 				}
 			}
@@ -1066,7 +1063,7 @@ class CTemplate extends CZBXAPI{
 			if(isset($data['groups'])){
 				$options = array('groups' => $data['groups'], 'templates' => $templates);
 				$result = CHostGroup::massAdd($options);
-				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant link groups');
+				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t link groups');
 			}
 
 			if(isset($data['hosts'])){
@@ -1082,7 +1079,7 @@ class CTemplate extends CZBXAPI{
 			if(isset($data['macros'])){
 				$options = array('templates' => zbx_toArray($data['templates']), 'macros' => $data['macros']);
 				$result = CUserMacro::massAdd($options);
-				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant link macros');
+				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t link macros');
 			}
 
 			$result = self::EndTransaction(true, __METHOD__);

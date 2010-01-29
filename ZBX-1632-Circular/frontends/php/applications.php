@@ -277,7 +277,7 @@ include_once('include/page_header.php');
 				new CTextBox("apphost",$apphost,32,'yes'),
 				new CButton("btn1",S_SELECT,
 					"return PopUp('popup.php?dstfrm=".$frmApp->GetName().
-					"&dstfld1=apphostid&dstfld2=apphost&srctbl=hosts&srcfld1=hostid&srcfld2=host',450,450);",
+					"&dstfld1=apphostid&dstfld2=apphost&srctbl=hosts_and_templates&srcfld1=hostid&srcfld2=host',450,450);",
 					'T')
 				));
 		}
@@ -398,6 +398,14 @@ include_once('include/page_header.php');
 		// goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO.' (0)');
 		$goButton->setAttribute('id','goButton');
+
+		$jsLocale = array(
+			'S_CLOSE',
+			'S_NO_ELEMENTS_SELECTES'
+		);
+
+		zbx_addJSLocale($jsLocale);
+
 		zbx_add_post_js('chkbxRange.pageGoName = "applications";');
 
 		$footer = get_table_header(new CCol(array($goBox, $goButton)));

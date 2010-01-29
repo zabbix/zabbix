@@ -65,7 +65,7 @@ class CItem extends CZBXAPI{
 		$sql_parts = array(
 			'select' => array('items' => 'i.itemid'),
 			'from' => array('items i'),
-			'where' => array('i.type<>9'),
+			'where' => array('webtype' => 'i.type<>9'),
 			'order' => array(),
 			'limit' => null);
 
@@ -77,6 +77,7 @@ class CItem extends CZBXAPI{
 			'graphids'				=> null,
 			'triggerids'			=> null,
 			'applicationids'		=> null,
+			'webitems'				=> null,
 			'inherited'				=> null,
 			'templated'				=> null,
 			'editable'				=> null,
@@ -118,13 +119,13 @@ class CItem extends CZBXAPI{
 			'limit'					=> null
 		);
 
-		
+
 		$options = zbx_array_merge($def_options, $options);
 
-		
+
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
-			
+
 			if(!is_null($options['select_hosts'])){
 				$options['select_hosts'] = API_OUTPUT_EXTEND;
 			}
@@ -139,7 +140,7 @@ class CItem extends CZBXAPI{
 			}
 		}
 
-		
+
 // editable + PERMISSION CHECK
 		if(defined('ZBX_API_REQUEST')){
 			$options['nopermissions'] = false;
@@ -191,7 +192,7 @@ class CItem extends CZBXAPI{
 			if($options['output'] != API_OUTPUT_EXTEND){
 				$sql_parts['select']['hostid'] = 'i.hostid';
 			}
-			
+
 			$sql_parts['where'][] = DBcondition('i.hostid', $options['hostids']);
 		}
 
@@ -239,6 +240,11 @@ class CItem extends CZBXAPI{
 			$sql_parts['from']['gi'] = 'graphs_items gi';
 			$sql_parts['where'][] = DBcondition('gi.graphid', $options['graphids']);
 			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
+		}
+
+// webitems
+		if(!is_null($options['webitems'])){
+			unset($sql_parts['where']['webtype']);
 		}
 
 // inherited
@@ -419,7 +425,7 @@ class CItem extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.
+		$sql = 'SELECT DISTINCT '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('i.itemid', $nodeids).
 					$sql_where.
@@ -616,7 +622,7 @@ class CItem extends CZBXAPI{
 		}
 
 		if(!empty($itemids))
-			$result = self::get(array('itemids' => $itemids, 'output' => self::API_OUTPUT_EXTEND));
+			$result = self::get(array('itemids' => $itemids, 'output' => API_OUTPUT_EXTEND));
 
 	return $result;
 	}
@@ -668,7 +674,7 @@ class CItem extends CZBXAPI{
 	 * @param array $items multidimensional array with items data
 	 * @return array|boolean
 	 */
-	public static function add($items){
+	public static function create($items){
 		$items = zbx_toArray($items);
 		$itemids = array();
 
@@ -723,7 +729,7 @@ class CItem extends CZBXAPI{
 
 			$host = CHost::get(array('hostids' => $item['hostid'], 'noprermissions' => 1, 'templated_hosts' => 1));
 			if(empty($host)){
-				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Host with HostID ['.$item['hostid'].'] does not exists');
+				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Host with HostID ['.$item['hostid'].'] does not exist');
 				$result = false;
 				break;
 			}
@@ -920,7 +926,13 @@ class CItem extends CZBXAPI{
 		$items = zbx_toArray($items);
 		$itemids = array();
 
-		$upd_items = self::get(array('itemids'=> zbx_objectValues($items, 'itemid'), 'editable'=>1, 'extendoutput'=>1, 'preservekeys'=>1));
+		$options = array(
+				'itemids'=> zbx_objectValues($items, 'itemid'),
+				'editable'=>1,
+				'extendoutput'=>1,
+				'preservekeys'=>1
+			);
+		$upd_items = self::get($options);
 		foreach($items as $gnum => $item){
 			if(!isset($upd_items[$item['itemid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
