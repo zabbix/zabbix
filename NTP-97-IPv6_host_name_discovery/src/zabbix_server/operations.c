@@ -480,7 +480,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 	DB_ROW		row;
 	DB_ROW		row2;
 	zbx_uint64_t	hostid = 0, proxy_hostid, host_proxy_hostid;
-	char		host[MAX_STRING_LEN], *host_correct, *host_esc, *ip_esc, *host_unique, *host_unique_esc;
+	char		host[MAX_STRING_LEN], *host_esc, *ip_esc, *host_unique, *host_unique_esc;
 	int		port;
 	zbx_uint64_t	groupid;
 
@@ -607,14 +607,19 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 
 				/* for host uniqueness purposes */
 				if ('\0' != *host)
-					host_correct = strdup(host);	/* by host name */
+				{
+					/* by host name */
+					make_hostname(host); /* replace not-allowed symbols */
+					host_unique = DBget_unique_hostname_by_sample(host);
+				}
 				else
-					host_correct = strdup(row[1]);	/* by ip */
+				{
+					/* by ip */
+					make_hostname(row[1]); /* replace not-allowed symbols */
+					host_unique = DBget_unique_hostname_by_sample(row[1]);
+				}				
 				
-				make_hostname(host_correct);    /* escape not-allowed symbols */
-				host_unique = DBget_unique_hostname_by_sample(host_correct);
 				host_unique_esc = DBdyn_escape_string(host_unique);
-				zbx_free(host_correct);
 				
 				DBexecute("insert into hosts (hostid,proxy_hostid,host,useip,ip,dns,port)"
 						" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s',1,'%s','%s',%d)",
