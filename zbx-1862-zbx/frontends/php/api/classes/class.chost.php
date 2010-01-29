@@ -926,6 +926,10 @@ class CHost extends CZBXAPI{
 			}
 	
 			$result = self::EndTransaction($result, __METHOD__);
+			
+		
+			$upd_hosts = self::get(array('hostids' => $hostids, 'extendoutput' => 1, 'nopermissions' => 1));
+			return $upd_hosts;
 		}
 		catch(APIException $e){
 			if($transaction) self::EndTransaction(false, __METHOD__);
@@ -936,9 +940,6 @@ class CHost extends CZBXAPI{
 			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
-		
-		$upd_hosts = self::get(array('hostids' => $hostids, 'extendoutput' => 1, 'nopermissions' => 1));
-	return $upd_hosts;
 	}
 
 /**
@@ -1256,13 +1257,13 @@ class CHost extends CZBXAPI{
 
 			$upd_hosts = self::get(array('hostids' => $hostids, 'extendoutput' => 1, 'nopermissions' => 1));
 			return $upd_hosts;
-
 		}
 		catch(APIException $e){
 			if($transaction) self::EndTransaction(false, __METHOD__);
 
 			$error = $e->getErrors();
 			$error = reset($error);
+
 			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}

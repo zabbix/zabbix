@@ -1381,13 +1381,15 @@ $i = 0;
 			}
 
 			self::EndTransaction(true, __METHOD__);
-
+			
+			return true;
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
 			throw new APIException($e->getCode(), $e->getErrors());
+			
+			return false;
 		}
-
 	}
 }
 ?>
