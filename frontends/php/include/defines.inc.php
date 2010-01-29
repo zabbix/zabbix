@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	define('ZABBIX_VERSION','1.8.1');
+	define('ZABBIX_VERSION','1.8.2');
 	define('ZABBIX_API_VERSION','1.1');
 /* USER DEFINES */
 
