@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1881] fixed checkbox selection cookies (Vedmak)
  - [ZBX-1324] replaced more user visible strings ZABBIX with Zabbix (Richlv)
  - [ZBX-1859] fixed map element image (Aly)
  - [ZBX-954] fix minor typos (Richlv)

@@ -150,11 +150,19 @@ include_once('include/page_header.php');
 		$_REQUEST['show_details'] = get_request('show_details',	get_profile('web.tr_status.filter.show_details', 0));
 	}
 
+	if(get_request('show_events') != get_profile('web.tr_status.filter.show_events')){
+		$url = new CUrl();
+		$path = $url->getPath();
+		insert_js('cookie.eraseArray("'.$path.'")');
+	}
+	
 	$_REQUEST['show_triggers'] = get_request('show_triggers', get_profile('web.tr_status.filter.show_triggers', TRIGGERS_OPTION_ONLYTRUE));
 	$_REQUEST['show_events'] = get_request('show_events', get_profile('web.tr_status.filter.show_events', EVENTS_OPTION_NOEVENT));
 	$_REQUEST['show_severity'] = get_request('show_severity', get_profile('web.tr_status.filter.show_severity', -1));
 	$_REQUEST['txt_select'] = get_request('txt_select', get_profile('web.tr_status.filter.txt_select', ''));
 
+	
+	
 	if((EVENT_ACK_DISABLED == $config['event_ack_enable']) && !str_in_array($_REQUEST['show_events'],array(EVENTS_OPTION_NOEVENT,EVENTS_OPTION_ALL))){
 		$_REQUEST['show_events'] = EVENTS_OPTION_NOEVENT;
 	}
