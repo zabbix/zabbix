@@ -557,15 +557,23 @@ class CTemplate extends CZBXAPI{
  * @param array $template_data['host']
  * @return string templateid
  */
-	public static function getObjects($template_data){
+	public static function getObjects($templateData){
 		$result = array();
 		$templateid = array();
 
+		$sql_where = '';
+		if(isset($templateData['host']))
+			$sql_where.= ' AND host='.zbx_dbstr($templateData['host']);
+			
+		if(isset($templateData['templateid']))
+			$sql_where.= ' AND hostid='.zbx_dbstr($templateData['templateid']);
+
+
 		$sql = 'SELECT hostid '.
 				' FROM hosts '.
-				' WHERE host='.zbx_dbstr($template_data['template']).
-					' AND status='.HOST_STATUS_TEMPLATE.
-					' AND '.DBin_node('hostid', false);
+				' WHERE status='.HOST_STATUS_TEMPLATE.
+					' AND '.DBin_node('hostid', false).
+					$sql_where;
 		$res = DBselect($sql);
 		while($template = DBfetch($res)){
 			$templateids[$template['hostid']] = $template['hostid'];
@@ -642,20 +650,19 @@ class CTemplate extends CZBXAPI{
 
 			foreach($templates as $tnum => $template){
 
-	/* 			$template_db_fields = array(
-					'host' => null,
+	 			$template_db_fields = array(
+					'host' => null
 				);
+
 				if(!check_db_fields($template_db_fields, $template)){
-					$result = false;
-					break;
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Field "host" is mandatory');
 				}
-	 */
 
 				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $template['host'])){
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for Template name [ '.$template['host'].' ]');
 				}
 
-				$template_exists = self::getObjects(array('template' => $template['host']));
+				$template_exists = self::getObjects(array('host' => $template['host']));
 				if(!empty($template_exists)){
 					$result = false;
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
@@ -665,8 +672,7 @@ class CTemplate extends CZBXAPI{
 				$templateid = get_dbid('hosts', 'hostid');
 				$templateids[] = $templateid;
 
-				$values = array($templateid, zbx_dbstr($template['host']), HOST_STATUS_TEMPLATE);
-				$sql = 'INSERT INTO hosts (hostid, host, status) VALUES ('. implode(', ', $values) .')';
+				$sql = 'INSERT INTO hosts (hostid, host, status) VALUES ('.$templateid.','.zbx_dbstr($template['host']).','.HOST_STATUS_TEMPLATE.')';
 				$result = DBexecute($sql);
 
 				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'DBError');
@@ -1320,9 +1326,12 @@ $i = 0;
 							' AND h.hostid<>'.$templateid.
 							' AND h.status='.HOST_STATUS_TEMPLATE;
 
-				if($db_dephosts = DBfetch(DBselect($sql))){
+				if($db_dephost = DBfetch(DBselect($sql))){
+					$tmp_tpls = self::getObjects(array('templateid'=>$templateid));
+					$tmp_tpl = reset($tmp_tpls);
+					
 					throw new APIException(ZBX_API_ERROR_PARAMETERS,
-						'Trigger in template [ '.$templateid.' ] has dependency with trigger in template [ '.$db_dephost['host'].' ]');
+						'Trigger in template [ '.$tmp_tpl['host'].' ] has dependency with trigger in template [ '.$db_dephost['host'].' ]');
 				}
 			}
 // }}} CHECK TEMPLATE TRIGGERS DEPENDENCIES
@@ -1380,6 +1389,5 @@ $i = 0;
 		}
 
 	}
-
 }
 ?>
