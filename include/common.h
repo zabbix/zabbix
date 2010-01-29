@@ -120,7 +120,7 @@
 #define ON	1
 #define OFF	0
 
-#define	APPLICATION_NAME	"ZABBIX Agent"
+#define	APPLICATION_NAME	"Zabbix Agent"
 #define	ZABBIX_REVDATE		"27 January 2010"
 #define	ZABBIX_VERSION		"1.8.2"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
@@ -390,7 +390,7 @@ typedef enum
 #define SERVER_ICMPPINGSEC_KEY	"icmppingsec"
 /* Special item key used for ICMP ping loss packages */
 #define SERVER_ICMPPINGLOSS_KEY	"icmppingloss"
-/* Special item key used for internal ZABBIX log */
+/* Special item key used for internal Zabbix log */
 #define SERVER_ZABBIXLOG_KEY	"zabbix[log]"
 
 /* Media types */
