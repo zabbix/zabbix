@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1860] fixed line breaks at begin of export xml file (Vedmak)
  - [ZBX-1881] fixed checkbox selection cookies (Vedmak)
  - [DEV-163] improved the description of "perf_counter" check in the "help_items" table (Dmitry)
  - [ZBX-1324] replaced more user visible strings ZABBIX with Zabbix (Richlv)
