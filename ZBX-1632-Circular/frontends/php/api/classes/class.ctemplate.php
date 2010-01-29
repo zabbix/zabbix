@@ -1315,11 +1315,11 @@ class CTemplate extends CZBXAPI{
 				' GROUP BY ht.templateid';
 			$db_start_points = DBselect($sql);
 			while($start_point = DBfetch($db_start_points)){				
-				$start_points[] = $start_point['hostid'];
+				$start_points[$start_point['hostid']] = $start_point['hostid'];
 				$graph[$start_point['hostid']][] = $start_point['templateid'];
 			}
 // add to the start points also points which we add current templates
-			$start_points = array_unique(array_merge($start_points, $targetids));
+			$start_points = array_merge($start_points, $targetids);
 			
 			foreach($start_points as $start){
 				$path = array();
