@@ -1319,8 +1319,6 @@ class CTemplate extends CZBXAPI{
 			}
 // add to the start points also points which we add current templates
 			$start_points = array_unique(array_merge($start_points, $targetids));
-sdii($graph);
-sdii($start_points);				
 			foreach($start_points as $start){
 				$path = array();
 				if(!self::checkCircularLink($graph, $start, $path)){
