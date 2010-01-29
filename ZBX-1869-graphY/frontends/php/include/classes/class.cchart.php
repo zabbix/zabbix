@@ -607,8 +607,8 @@ class CChart extends CGraphDraw{
 				}
 			}
 		}
-
-	return $minY;
+// -0.001 to show grid for one grade below mimimal
+	return ($minY != 0 ? $minY-0.001 : $minY);
 	}
 
 // Calculation of maximum Y of a side (left/right)
@@ -672,7 +672,9 @@ class CChart extends CGraphDraw{
 
 			}
 		}
-	return $maxY;
+// +0.001 to show grid one grade above maximal Y
+	return $maxY+0.0001;
+	// return $maxY;
 	}
 
 	protected function calcZero(){
