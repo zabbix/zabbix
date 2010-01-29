@@ -941,14 +941,6 @@ class CTemplate extends CZBXAPI{
 				$template_hostids = zbx_objectValues($template_hosts, 'hostid');
 				$new_hostids = zbx_objectValues($data['hosts'], 'hostid');
 
-				$hosts_to_add = array_diff($new_hostids, $template_hostids);
-				if(!empty($hosts_to_add)){
-					$result = self::massAdd(array('templates' => $templates, 'hosts' => $hosts_to_add));
-					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t link template');
-					}
-				}
-
 				$hosts_to_del = array_diff($template_hostids, $new_hostids);
 				$hosts_to_del = array_diff($hosts_to_del, $cleared_templateids);
 
@@ -956,6 +948,14 @@ class CTemplate extends CZBXAPI{
 					$result = self::massRemove(array('hosts' => $hosts_to_del, 'templates' => $templates));
 					if(!$result){
 						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t unlink template');
+					}
+				}
+				
+				$hosts_to_add = array_diff($new_hostids, $template_hostids);
+				if(!empty($hosts_to_add)){
+					$result = self::massAdd(array('templates' => $templates, 'hosts' => $hosts_to_add));
+					if(!$result){
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t link template');
 					}
 				}
 			}
@@ -1235,7 +1235,7 @@ class CTemplate extends CZBXAPI{
 			foreach($templateids as $templateid){
 				$triggerids = array();
 				$db_triggers = get_triggers_by_hostid($templateid);
-				while($trigger = DBfetch($db_triggers)) {
+				while($trigger = DBfetch($db_triggers)){
 					$triggerids[$trigger['triggerid']] = $trigger['triggerid'];
 				}
 
