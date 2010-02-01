@@ -607,9 +607,18 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 
 				/* for host uniqueness purposes */
 				if ('\0' != *host)
-					host_unique = DBget_unique_hostname_by_sample(host); /* by host name */
+				{
+					/* by host name */
+					make_hostname(host); /* replace not-allowed symbols */
+					host_unique = DBget_unique_hostname_by_sample(host);
+				}
 				else
-					host_unique = DBget_unique_hostname_by_sample(row[1]); /* by ip */
+				{
+					/* by ip */
+					make_hostname(row[1]); /* replace not-allowed symbols */
+					host_unique = DBget_unique_hostname_by_sample(row[1]);
+				}				
+				
 				host_unique_esc = DBdyn_escape_string(host_unique);
 				
 				DBexecute("insert into hosts (hostid,proxy_hostid,host,useip,ip,dns,port)"

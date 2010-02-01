@@ -1719,3 +1719,28 @@ int	is_function_char(const char c)
 	return FAIL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: make_hostname                                                    *
+ *                                                                            *
+ * Purpose: replace all not-allowed hostname symbols in the string            *
+ *                                                                            *
+ * Parameters: host - the target C-style string                               *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Dmitry Borovikov                                                   *
+ *                                                                            *
+ * Comments: the string must be null-terminated, otherwise not secure!        *
+ *                                                                            *
+ ******************************************************************************/
+void	make_hostname(char const *host)
+{
+	char	*c = NULL;
+	
+	assert(host);
+	
+	for ( c = host; '\0' != *c; ++c)
+		if (FAIL == is_hostname_char(*c))
+			*c = '_';
+}
