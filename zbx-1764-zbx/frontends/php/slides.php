@@ -76,7 +76,7 @@ include_once('include/page_header.php');
 
 		if('timeline' == $_REQUEST['favobj']){
 			if(isset($_REQUEST['elementid']) && isset($_REQUEST['period'])){
-				navigation_bar_calc('web.screens', $_REQUEST['elementid']);
+				navigation_bar_calc('web.slides', true);
 			}
 		}
 
@@ -172,7 +172,7 @@ include_once('include/page_header.php');
 	if( 2 != $_REQUEST['fullscreen'] )
 		update_profile('web.slides.elementid',$elementid);
 
-	$effectiveperiod = navigation_bar_calc('web.slides',$elementid);
+	$effectiveperiod = navigation_bar_calc('web.slides');
 ?>
 <?php
 	$slides_wdgt = new CWidget('hat_slides');
@@ -186,9 +186,6 @@ include_once('include/page_header.php');
 	$form->setMethod('get');
 	$form->addVar('config',S_SLIDESHOWS);
 	$form->addVar('fullscreen',$_REQUEST['fullscreen']);
-
-	if(isset($_REQUEST['period']))	$form->addVar('period', $_REQUEST['period']);
-	if(isset($_REQUEST['stime']))	$form->addVar('stime', $_REQUEST['stime']);
 
 	$cmbConfig = new CComboBox('config', $config, "javascript: redirect('screens.php?config=0');");
 	$cmbConfig->addItem(0, S_SCREENS);

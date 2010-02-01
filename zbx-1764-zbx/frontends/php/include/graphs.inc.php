@@ -134,16 +134,16 @@
 		}
 
 		if($yaxis == 2){
-			$graphDims['shiftXleft'] = 100;
-			$graphDims['shiftXright'] = 100;
+			$graphDims['shiftXleft'] = 75;
+			$graphDims['shiftXright'] = 75;
 		}
 		else if($yaxis == 0){
-			$graphDims['shiftXleft'] = 100;
-			$graphDims['shiftXright'] = 50;
+			$graphDims['shiftXleft'] = 75;
+			$graphDims['shiftXright'] = 30;
 		}
 		else{
-			$graphDims['shiftXleft'] = 50;
-			$graphDims['shiftXright'] = 100;
+			$graphDims['shiftXleft'] = 30;
+			$graphDims['shiftXright'] = 75;
 		}
 //-------------
 
@@ -990,18 +990,20 @@
 	return $result;
 	}
 
-	function navigation_bar_calc($idx=null, $idx2=null){
+	function navigation_bar_calc($idx=null, $update=false){
 //SDI($_REQUEST['stime']);
-		if(!is_null($idx) && (is_null($idx2) || ($idx2 > 0))){
-			if(isset($_REQUEST['period']) && ($_REQUEST['period'] >= ZBX_MIN_PERIOD))
-				update_profile($idx.'.period',$_REQUEST['period'],PROFILE_TYPE_INT, $idx2);
-			else
-				$_REQUEST['period'] = get_profile($idx.'.period', ZBX_PERIOD_DEFAULT, $idx2);
 
-			if(isset($_REQUEST['stime']))
-				update_profile($idx.'.stime',$_REQUEST['stime'], PROFILE_TYPE_STR, $idx2);
-			else
-				$_REQUEST['stime'] = get_profile($idx.'.stime', null, $idx2);
+		if(!is_null($idx)){
+			if($update){
+				if(isset($_REQUEST['period']) && ($_REQUEST['period'] >= ZBX_MIN_PERIOD))
+					update_profile($idx.'.period',$_REQUEST['period'],PROFILE_TYPE_INT);
+					
+				if(isset($_REQUEST['stime']))
+					update_profile($idx.'.stime',$_REQUEST['stime'], PROFILE_TYPE_STR);
+			}
+
+			$_REQUEST['period'] = get_request('period', get_profile($idx.'.period', ZBX_PERIOD_DEFAULT));
+			$_REQUEST['stime'] = get_request('stime', get_profile($idx.'.stime'));
 		}
 
 		$_REQUEST['period'] = get_request('period', ZBX_PERIOD_DEFAULT);

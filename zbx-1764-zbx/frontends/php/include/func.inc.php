@@ -553,8 +553,8 @@ function mem2str($size){
 	return round($size, 6).$prefix;
 }
 
-/* Do not forget to sync it with add_value_suffix in evalfunc.c! */
-function convert_units($value,$units){
+// showUnits:  0/false - units off, 1/true - units short, 2 - units long
+function convert_units($value, $units, $showUnits=1){
 // Special processing for unix timestamps
 	if($units=='unixtime'){
 		$ret=date('Y.m.d H:i:s',$value);
@@ -590,81 +590,60 @@ function convert_units($value,$units){
 
 	$u='';
 
-// Special processing for bits (kilo=1000, not 1024 for bits)
-	if( ($units=='b') || ($units=='bps')){
-		$abs=abs($value);
-
-		if($abs<1000){
-			$u="";
-		}
-		else if($abs<1000*1000){
-			$u=S_K;
-			$value=$value/1000;
-		}
-		else if($abs<1000*1000*1000){
-			$u=S_M;
-			$value=$value/(1000*1000);
-		}
-		else{
-			$u=S_G;
-			$value=$value/(1000*1000*1000);
-		}
-
-		if(round($value) == round($value,2)){
-			$s=sprintf('%.0f',$value);
-		}
-		else{
-			$s=sprintf('%.2f',$value);
-		}
-
-	return "$s $u$units";
+// Any other unit
+//-------------------
+	switch($units){
+		case 'B':
+			$step=1024;
+			break;
+		case 'b':
+		case 'bps':
+		default:
+			$step = 1000;
 	}
 
-	if($units==''){
-		if(is_float($value)){
-			if(round($value) == round($value,2)){
-				return sprintf('%.0f',$value);
-			}
-			else{
-				return sprintf('%.2f',$value);
-			}
+// INIT intervals
+	static $digitUnits;
+	if(is_null($digitUnits)){
+		$digitUnits = array(
+				array('pow'=>1, 'short'=>S_K, 'long'=>S_KILO),
+				array('pow'=>2, 'short'=>S_M, 'long'=>S_MEGA),
+				array('pow'=>3, 'short'=>S_G, 'long'=>S_GIGA),
+				array('pow'=>4, 'short'=>S_T, 'long'=>S_TERA),
+				array('pow'=>5, 'short'=>S_P, 'long'=>S_PETA),
+				array('pow'=>6, 'short'=>S_E, 'long'=>S_EXA)
+			);
+
+		foreach($digitUnits as $dunit => $data){
+			$digitUnits[$dunit]['value'] = bcpow($step, $data['pow']);
 		}
-		else{
-			// return sprintf('%.0f',$value);
-			return $value;
+	}
+//---
+	$abs = abs($value);
+	
+	$valUnit = array('pow'=>0, 'short'=>'', 'long'=>'', 'value'=>$value);
+	if($abs >= $step){	
+		foreach($digitUnits as $dnum => $data){
+			if(bccomp($abs, $data['value']) > -1) $valUnit = $data;
+			else break;
 		}
+
+		$valUnit['value'] = bcdiv($value, $valUnit['value'], 4);
 	}
 
-	$abs=abs($value);
-
-	if($abs<1024){
-		$u='';
+//------
+	if(is_null($format)){
+		if(round($valUnit['value'],2) == round($valUnit['value'],0)) $format = '%.0f %s%s';
+		else $format = '%.2f %s%s';
 	}
-	else if($abs<1024*1024){
-		$u=S_K;
-		$value=$value/1024;
+	
+	switch($showUnits){
+		case 0: $units = ''; 
+		case 1: $desc = $valUnit['short']; break;
+		case 2: $desc = $valUnit['long']; break;
 	}
-	else if($abs<1024*1024*1024){
-		$u=S_M;
-		$value=$value/(1024*1024);
-	}
-	else if($abs<1024*1024*1024*1024){
-		$u=S_G;
-		$value=$value/(1024*1024*1024);
-	}
-	else{
-		$u=S_T;
-		$value=$value/(1024*1024*1024*1024);
-	}
-
-	if(round($value) == round($value,2)){
-		$s=sprintf('%.0f',$value);
-	}
-	else{
-		$s=sprintf('%.2f',$value);
-	}
-
-return "$s $u$units";
+	
+return sprintf($format, $valUnit['value'], $desc, $units);
 }
 
 /*************** END CONVERTING ******************/
