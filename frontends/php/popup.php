@@ -170,6 +170,7 @@ include_once('include/page_header.php');
 		'multiselect'=>		array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL),
 		'submit'=>			array(T_ZBX_STR,O_OPT,	null,	null,	null),
 
+		'excludeids'=>		array(T_ZBX_STR, O_OPT,	null,	null,	null),
 		'only_hostid'=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		'monitored_hosts'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
 		'real_hosts'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
@@ -204,6 +205,7 @@ include_once('include/page_header.php');
 	$writeonly = get_request('writeonly');
 
 	$existed_templates = get_request('existed_templates', null);
+	$excludeids = get_request('excludeids', null);
 
 
 
@@ -261,6 +263,8 @@ include_once('include/page_header.php');
 	$frmTitle->addVar('writeonly', $writeonly);
 	if(!is_null($existed_templates))
 		$frmTitle->addVar('existed_templates', $existed_templates);
+	if(!is_null($excludeids))
+		$frmTitle->addVar('excludeids', $excludeids);
 
 
 // Optional
@@ -467,6 +471,7 @@ include_once('include/page_header.php');
 	}
 	else if($srctbl == 'templates'){
 		$existed_templates = get_request('existed_templates', array());
+		$excludeids = get_request('excludeids', array());
 
 		$templates = get_request('templates', array());
 		$templates = $templates + $existed_templates;
@@ -504,12 +509,10 @@ include_once('include/page_header.php');
 		if(!is_null($writeonly)) $options['editable'] = 1;
 
 		$template_list = CTemplate::get($options);
-
 		foreach($template_list as $tnum => $host){
 
-			$chk = new CCheckBox('templates['.$host['hostid'].']',isset($templates[$host['hostid']]),
-					null,$host['host']);
-			$chk->setEnabled(!isset($existed_templates[$host['hostid']]));
+			$chk = new CCheckBox('templates['.$host['hostid'].']', isset($templates[$host['hostid']]), null, $host['host']);
+			$chk->setEnabled(!isset($existed_templates[$host['hostid']]) && !isset($excludeids[$host['hostid']]));
 
 			$table->addRow(array(
 				array(
