@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1877] template itself in template linkage popup is now disabled (Vedmak)
  - [ZBX-1896] fixed no permission error when try to view history for web item (Vedmak)
  - [ZBX-1860] fixed line breaks at begin of export xml file (Vedmak)
  - [ZBX-1881] fixed checkbox selection cookies (Vedmak)
