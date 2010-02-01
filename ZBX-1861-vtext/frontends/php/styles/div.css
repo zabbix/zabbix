@@ -1,5 +1,13 @@
 /* CSS Document */
 
+div.vtext{
+/* 	-webkit-transform: rotate(-90deg); 
+ 	-moz-transform: rotate(-90deg);	
+	filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+ */	
+	display: inline-block;
+	white-space: nowrap;
+}
 div.disaster{
 	background-color: #FF0000;
 	width: 100%;

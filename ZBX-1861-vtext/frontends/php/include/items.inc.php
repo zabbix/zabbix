@@ -1115,6 +1115,20 @@
  */
 	function get_items_data_overview($hostids,$view_style=null){
 
+		zbx_add_post_js('
+			var ar = $$(".vtext");
+
+			for(var e=0; e<ar.length; e++){
+				var w = ar[e].offsetWidth;
+				var h = ar[e].offsetHeight;
+				
+				ar[e].parentNode.style.height = w+h+"px";
+				
+			
+				ar[e].setAttribute("style", "-webkit-transform: rotate(-90deg); position: relative; top:"+(parseInt(w/2)-(h/2))+"px;");
+			}'
+		);
+	
 		if(is_null($view_style)) $view_style = get_profile('web.overview.view.style',STYLE_TOP);
 
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
@@ -1177,7 +1191,7 @@
 		if($view_style == STYLE_TOP){
 			$header=array(new CCol(S_ITEMS,'center'));
 			foreach($hosts as $hostname){
-				$header = array_merge($header,array(new CImg('vtext.php?text='.$hostname)));
+				$header[] = new CDiv($hostname, 'vtext');
 			}
 
 			$table->SetHeader($header,'vertical_header');
