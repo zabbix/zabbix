@@ -64,10 +64,10 @@ melement: {
 	selementid: 	0,			// ALWAYS must be a STRING (js doesn't support uint64) 
 	elementtype:	4,			// 4-UNDEFINED
 	elementid: 		0,			// ALWAYS must be a STRING (js doesn't support uint64) 
-	iconid_on:		19,			// ALWAYS must be a STRING (js doesn't support uint64)
-	iconid_off:		19,			// ALWAYS must be a STRING (js doesn't support uint64)
-	iconid_unknown:	19,			// ALWAYS must be a STRING (js doesn't support uint64)
-	iconid_maintenance:19,		// ALWAYS must be a STRING (js doesn't support uint64)
+	iconid_on:		0,			// ALWAYS must be a STRING (js doesn't support uint64)
+	iconid_off:		0,			// ALWAYS must be a STRING (js doesn't support uint64)
+	iconid_unknown:	0,			// ALWAYS must be a STRING (js doesn't support uint64)
+	iconid_maintenance:0,		// ALWAYS must be a STRING (js doesn't support uint64)
 	label:			'New Element',
 	label_location:	3,
 	x:				0,

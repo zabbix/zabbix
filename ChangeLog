@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [NTP-96] fixed error when create new element on map (Vedmak)
  - [NTP-87] fixed performance of iregexp(), regexp() and str() functions (Sasha)
  - [NTP-93] fixed error when remote command host contain spaces (Vedmak)
  - [NTP-92] fixed date input in history screen (Vedmak)

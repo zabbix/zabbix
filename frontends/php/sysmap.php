@@ -210,6 +210,18 @@ include_once "include/page_header.php";
 					if(!empty($elements)){
 						$element = $elements[0];
 //						$element['image'] = get_base64_icon($element);
+//SDI($element);						
+						if($element['iconid_off'] == 0){
+							$sql = 'SELECT i.* FROM images i WHERE '.dbin_node('i.imageid', false).' AND i.imagetype=1 ORDER BY imageid ASC';
+							$default_icon = DBfetch(DBselect($sql,1));
+// SDI($sql);
+							$element['iconid_off'] = $default_icon['imageid'];
+							$element['iconid_on'] = $default_icon['imageid'];
+							$element['iconid_unknown'] = $default_icon['imageid'];
+							$element['iconid_maintenance'] = $default_icon['imageid'];
+
+						}
+//SDI($element);
 						$element['image'] = get_element_iconid($element);
 
 						$action = '';
