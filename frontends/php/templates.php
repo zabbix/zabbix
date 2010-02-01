@@ -511,9 +511,9 @@ include_once('include/page_header.php');
 		$template_tbl->addRow(array(S_LINK_WITH_TEMPLATE, array(
 			$template_table,
 			new CButton('add_template', S_ADD,
-				"return PopUp('popup.php?dstfrm=".$frmHost->GetName().
-				"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
-				url_param($templates,false,'existed_templates')."',450,450)", 'T')
+				'return PopUp("popup.php?dstfrm='.$frmHost->GetName().
+				'&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host&excludeids['.$templateid.']='.$templateid.
+				url_param($templates,false,"existed_templates").'",450,450)', 'T')
 		)));
 
 // FULL CLONE {
