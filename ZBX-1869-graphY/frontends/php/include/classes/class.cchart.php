@@ -608,7 +608,8 @@ class CChart extends CGraphDraw{
 			}
 		}
 // -0.001 to show grid for one grade below mimimal
-	return ($minY != 0 ? $minY-0.001 : $minY);
+	// return ($minY != 0 ? $minY-0.001 : $minY);
+	return $minY;
 	}
 
 // Calculation of maximum Y of a side (left/right)
@@ -673,8 +674,8 @@ class CChart extends CGraphDraw{
 			}
 		}
 // +0.001 to show grid one grade above maximal Y
-	return $maxY+0.0001;
-	// return $maxY;
+	// return $maxY+0.0001;
+	return $maxY;
 	}
 
 	protected function calcZero(){
@@ -752,8 +753,9 @@ class CChart extends CGraphDraw{
 //------
 
 // correctin MIN & MAX
-		$this->m_minY[$side] = floor($this->m_minY[$side] / $interval) * $interval;
-		$this->m_maxY[$side] = ceil($this->m_maxY[$side] / $interval) * $interval;
+		$this->m_minY[$side] = (floor($this->m_minY[$side] / $interval) * $interval) != 0 ?
+			floor($this->m_minY[$side] / $interval) * $interval - 0.001 : 0;
+		$this->m_maxY[$side] = ceil($this->m_maxY[$side] / $interval) * $interval + 0.001;
 //--------------------
 
 //SDI($this->m_minY[$side].' - '.$this->m_maxY[$side].' : '.$interval);
@@ -1238,6 +1240,7 @@ class CChart extends CGraphDraw{
 			if(is_null($units) || ($units === false)) $units = '';
 
 			$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_LEFT];
+
 			for($i=0; $i<=$hstr_count; $i++){
 // division by zero
 				$hstr_count = ($hstr_count == 0)?1:$hstr_count;
@@ -1875,7 +1878,7 @@ class CChart extends CGraphDraw{
 
 			$data = &$this->data[$this->items[$item]['itemid']][$this->items[$item]['calc_type']];
 
-			if(!isset($data))	continue;
+			if(!isset($data)) continue;
 
 			if($this->items[$item]['calc_type'] == GRAPH_ITEM_AGGREGATED){
 				$drawtype	= GRAPH_ITEM_DRAWTYPE_LINE;
