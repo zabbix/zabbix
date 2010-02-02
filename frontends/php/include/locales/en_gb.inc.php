@@ -1792,6 +1792,15 @@
 	'S_G'=>			'G',
 	'S_T'=>			'T',
 
+//	maintenances.inc.php
+	'S_ON_SMALL'=>			'on',
+	'S_EVERY_SMALL'=>		'every',
+	'S_DAY_SMALL'=>			'day',
+	'S_OF_EVERY_SMALL'=>		'of every',
+	'S_WEEKS_SMALL'=>		'weeks',
+	'S_WEEK_SMALL'=>		'week',
+	
+
 //	Menu
 
 	'S_HELP'=>				'Help',
