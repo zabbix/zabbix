@@ -604,26 +604,31 @@ function convert_units($value, $units, $showUnits=1){
 
 // INIT intervals
 	static $digitUnits;
-	if(is_null($digitUnits)){
-		$digitUnits = array(
+	if(is_null($digitUnits)) $digitUnits = array();
+
+	if(!isset($digitUnits[$step])){
+		$digitUnits[$step] = array(
 				array('pow'=>1, 'short'=>S_K, 'long'=>S_KILO),
 				array('pow'=>2, 'short'=>S_M, 'long'=>S_MEGA),
 				array('pow'=>3, 'short'=>S_G, 'long'=>S_GIGA),
 				array('pow'=>4, 'short'=>S_T, 'long'=>S_TERA),
 				array('pow'=>5, 'short'=>S_P, 'long'=>S_PETA),
-				array('pow'=>6, 'short'=>S_E, 'long'=>S_EXA)
+				array('pow'=>6, 'short'=>S_E, 'long'=>S_EXA),
+				array('pow'=>7, 'short'=>S_Z, 'long'=>S_ZETTA),
+				array('pow'=>8, 'short'=>S_Y, 'long'=>S_YOTTA)
 			);
 
-		foreach($digitUnits as $dunit => $data){
-			$digitUnits[$dunit]['value'] = bcpow($step, $data['pow']);
+		foreach($digitUnits[$step] as $dunit => $data){
+			$digitUnits[$step][$dunit]['value'] = bcpow($step, $data['pow']);
 		}
 	}
 //---
-	$abs = abs($value);
-	
+	if($value < 0) $abs = bcmul($value, '-1');
+	else $abs = $value;
+
 	$valUnit = array('pow'=>0, 'short'=>'', 'long'=>'', 'value'=>$value);
 	if($abs >= $step){	
-		foreach($digitUnits as $dnum => $data){
+		foreach($digitUnits[$step] as $dnum => $data){
 			if(bccomp($abs, $data['value']) > -1) $valUnit = $data;
 			else break;
 		}

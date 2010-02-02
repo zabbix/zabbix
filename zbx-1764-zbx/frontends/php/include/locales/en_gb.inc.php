@@ -1799,6 +1799,10 @@
 	'S_PETA'=>		'Peta',
 	'S_E'=>			'E',
 	'S_EXA'=>		'Exa',
+	'S_Z'=>			'Z',
+	'S_ZETTA'=>		'Zetta',
+	'S_Y'=>			'Y',
+	'S_YOTTA'=>		'Yotta',
 
 //	Menu
 

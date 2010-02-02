@@ -114,7 +114,12 @@ class CChart extends CGraphDraw{
 
 		$this->items[$this->num] = get_item_by_itemid($itemid);
 		$this->items[$this->num]['description']=item_description($this->items[$this->num]);
-		list($this->items[$this->num]['units'], $this->items[$this->num]['unitsLong']) = explode(',', $this->items[$this->num]['units']);
+
+		if(strpos($this->items[$this->num]['units'], ',') !== false)
+			list($this->items[$this->num]['units'], $this->items[$this->num]['unitsLong']) = explode(',', $this->items[$this->num]['units']);
+		else
+			$this->items[$this->num]['unitsLong'] = '';
+
 
 		$host=get_host_by_hostid($this->items[$this->num]['hostid']);
 
