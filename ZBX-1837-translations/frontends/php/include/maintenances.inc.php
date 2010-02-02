@@ -301,10 +301,10 @@ function shedule2str($timeperiod){
 	$str = 'At '.$timeperiod['hour'].':'.$timeperiod['minute'].' on ';
 
 	if($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME){
-		$str= S_AT.SPACE.date('H',$timeperiod['start_date']).':	'.date('i',$timeperiod['start_date']).SPACE.S_ON_SMALL.SPACE.date(S_DATE_FORMAT_YMD,$timeperiod['start_date']);
+		$str = S_AT.SPACE.date('H',$timeperiod['start_date']).':	'.date('i',$timeperiod['start_date']).SPACE.S_ON_SMALL.SPACE.date(S_DATE_FORMAT_YMD,$timeperiod['start_date']);
 	}
 	else if($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_DAILY){
-		$str.= S_EVERY_SMALL.SPACE.(($timeperiod['every']>1)?$timeperiod['every'].SPACE.S_DAYS_SMALL.:S_DAY_SMALL);
+		$str .= S_EVERY_SMALL.SPACE.(($timeperiod['every'] > 1) ? $timeperiod['every'].SPACE.S_DAYS_SMALL : S_DAY_SMALL);
 	}
 	else if($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_WEEKLY){
 		$days = '';
