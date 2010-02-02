@@ -23,7 +23,7 @@
 
 		foreach($childs as $id => $child){		//add childs
 			if((bccomp($parentid , $child['serviceid'])==0)){
-				error('Service can\'t be parent and child in onetime.');
+				error(S_SERVICE_CANNOT_PARENT_AND_CHILD_IN_ONETIME);
 				return FALSE;
 			}
 		}
@@ -71,7 +71,7 @@
 	function	update_service($serviceid,$name,$triggerid,$algorithm,$showsla,$goodsla,$sortorder,$service_times=array(),$parentid,$childs){
 		foreach($childs as $id => $child){		//add childs
 			if((bccomp($parentid , $child['serviceid'])==0)){
-				error('Service can\'t be parent and child in onetime.');
+				error(S_SERVICE_CANNOT_PARENT_AND_CHILD_IN_ONETIME);
 				return FALSE;
 			}
 		}
@@ -271,12 +271,12 @@
 
 	function add_service_link($servicedownid,$serviceupid,$softlink){
 		if( ($softlink==0) && (is_service_hardlinked($servicedownid)==true) ){
-			error("cannot link hardlinked service.");
+			error(S_CANNOT_LINK_HARDLINKED_SERVICE);
 			return	false;
 		}
 
 		if((bccomp($servicedownid, $serviceupid)==0)){
-			error("cannot link service to itself.");
+			error(S_CANNOT_LINK_SERVICE_TO_ITSELF);
 			return	false;
 		}
 
@@ -297,7 +297,7 @@
 		}
 
 		if((bccomp($servicedownid, $serviceupid)==0)){
-			error("cannot link service to itself.");
+			error(S_CANNOT_LINK_SERVICE_TO_ITSELF);
 			return	false;
 		}
 
@@ -588,7 +588,7 @@ if($serviceid == 1 || $serviceid == 2){
 		$res = DBfetch(DBselect("SELECT * FROM services WHERE serviceid=".$serviceid));
 		if(!$res)
 		{
-			error("No service with serviceid=[".$serviceid."]");
+			error(S_NO_SERVICE_WITH." serviceid=[".$serviceid."]");
 			return	FALSE;
 		}
 		return $res;
@@ -598,7 +598,7 @@ if($serviceid == 1 || $serviceid == 2){
 		$result=DBselect("SELECT * FROM services_links WHERE linkid=$linkid");
 		$res = DBfetch($result);
 		if(!$res){
-			error("No service linkage with linkid=[$linkid]");
+			error(S_NO_SERVICE_LINKAGE_WITH." linkid=[$linkid]");
 			return	FALSE;
 		}
 		return $res;
@@ -751,7 +751,7 @@ function update_services_rec($serviceid){
 			DBexecute('UPDATE services SET status='.$status.' WHERE serviceid='.$serviceupid);
 		}
 		else{
-			error('Unknown calculation algorithm of service status ['.$algorithm.']');
+			error(S_UNKNOWN_CALC_ALGORITHM_OF_SERVICE_STATUS.SPACE.'['.$algorithm.']');
 			return false;
 		}
 	}
