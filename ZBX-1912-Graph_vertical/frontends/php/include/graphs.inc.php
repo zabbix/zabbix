@@ -1190,14 +1190,41 @@
 		$gdinfo = gd_info();
 
 		if($gdinfo['FreeType Support'] && function_exists('imagettftext')){
-			$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
+		
+			if(preg_match(ZBX_PREG_DEF_FONT_STRING, $string) || (ZBX_FONT_NAME == ZBX_GRAPH_FONT_NAME)){
+				$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
+				imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
+			}
+			else if($angle == 0){
+				$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
+				imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
+			}
+			else{
+				$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
+				
+				$size = imageTextSize($fontsize, 0, $string);
+
+				$imgg = imagecreatetruecolor($size['width']+1, $size['height']);
+				$transparentColor = imagecolorallocatealpha($imgg, 200, 200, 200, 127);
+				imagefill($imgg, 0, 0, $transparentColor);
+
+				imagettftext($imgg, $fontsize, 0, 0, $size['height'], $color, $ttf, $string);
+				
+				$imgg = imagerotate($imgg, $angle, $transparentColor);
+				ImageAlphaBlending($imgg, false);
+				imageSaveAlpha($imgg, true);
+				
+				imagecopy($image, $imgg, $x - $size['height'], $y - $size['width'], 0, 0, $size['height'], $size['width']+1);
+				
+				imagedestroy($imgg);
+			}
 /*
 			$ar = imagettfbbox($fontsize, $angle, $ttf, $string);
 //sdii($ar);
 			if(!$angle)	imagerectangle($image, $x, $y+$ar[1], $x+abs($ar[0] - $ar[4]), $y+$ar[5], $color);
 			else imagerectangle($image, $x, $y, $x-abs($ar[0] - $ar[4]), $y+($ar[5]-$ar[1]), $color);
 //*/
-			imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
+			
 		}
 		else{
 			$dims = imageTextSize($fontsize, $angle, $string);
@@ -1236,8 +1263,15 @@
 		$gdinfo = gd_info();
 
 		$result = array();
+		
 		if($gdinfo['FreeType Support'] && function_exists('imagettfbbox')){
-			$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
+		
+			if(preg_match(ZBX_PREG_DEF_FONT_STRING, $string)){
+				$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
+			}
+			else{
+				$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
+			}
 
 			$ar = imagettfbbox($fontsize, $angle, $ttf, $string);
 
