@@ -342,7 +342,7 @@ function get_accessible_groups_by_user($user_data,$perm,$perm_res=null,$nodeid=n
 	$result = array();
 
 	$userid =& $user_data['userid'];
-	if(!isset($userid)) fatal_error('Incorrect user data in "get_accessible_groups_by_user"');
+	if(!isset($userid)) fatal_error(S_INCORRECT_USER_DATA_IN.SPACE.'"get_accessible_groups_by_user"');
 	$user_type =& $user_data['type'];
 
 COpt::counter_up('perm_group['.$userid.','.$perm.','.$perm_res.','.$nodeid.']');
@@ -424,7 +424,7 @@ function get_accessible_nodes_by_user(&$user_data,$perm,$perm_res=null,$nodeid=n
 
 	$userid		=& $user_data['userid'];
 	$user_type	=& $user_data['type'];
-	if(!isset($userid)) fatal_error('Incorrect user data in "get_accessible_nodes_by_user"');
+	if(!isset($userid)) fatal_error(S_INCORRECT_USER_DATA_IN.SPACE.'"get_accessible_nodes_by_user"');
 
 
 	$nodeid_str =(is_array($nodeid))?md5(implode('',$nodeid)):strval($nodeid);
