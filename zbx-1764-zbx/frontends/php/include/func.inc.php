@@ -632,10 +632,8 @@ function convert_units($value, $units, $showUnits=1){
 	}
 
 //------
-	if(is_null($format)){
-		if(round($valUnit['value'],2) == round($valUnit['value'],0)) $format = '%.0f %s%s';
-		else $format = '%.2f %s%s';
-	}
+	if(round($valUnit['value'],2) == round($valUnit['value'],0)) $format = '%.0f %s%s';
+	else $format = '%.2f %s%s';
 	
 	switch($showUnits){
 		case 0: $units = ''; 
