@@ -438,7 +438,7 @@ include_once('include/page_header.php');
 				url_param('name').url_param('width').url_param('height').
 				url_param('ymin_type').url_param('ymax_type').url_param('yaxismin').url_param('yaxismax').
 				url_param('ymin_itemid').url_param('ymax_itemid').
-				url_param('show_work_period').url_param('show_triggers').url_param('graphtype').
+				url_param('showworkperiod').url_param('showtriggers').url_param('graphtype').
 				url_param('percent_left').url_param('percent_right')));
 			$table->show();
 		}
@@ -618,6 +618,9 @@ include_once('include/page_header.php');
 		$graphs_wdgt->addItem($form);
 		$graphs_wdgt->show();
 	}
+?>
+<?php
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
+
 ?>
