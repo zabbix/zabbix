@@ -1191,7 +1191,7 @@
 
 		if($gdinfo['FreeType Support'] && function_exists('imagettftext')){
 		
-			if(preg_match(ZBX_PREG_DEF_FONT_STRING, $string) || (ZBX_FONT_NAME == ZBX_GRAPH_FONT_NAME)){
+			if((preg_match(ZBX_PREG_DEF_FONT_STRING, $string) && ($angle != 0)) || (ZBX_FONT_NAME == ZBX_GRAPH_FONT_NAME)){
 				$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
 				imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
 			}
@@ -1266,7 +1266,7 @@
 		
 		if($gdinfo['FreeType Support'] && function_exists('imagettfbbox')){
 		
-			if(preg_match(ZBX_PREG_DEF_FONT_STRING, $string)){
+			if(preg_match(ZBX_PREG_DEF_FONT_STRING, $string) && ($angle != 0)){
 				$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
 			}
 			else{
