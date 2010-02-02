@@ -415,14 +415,23 @@ if(!isset($DB)){
 						$till = $offset + $limit;
 						$query = 'SELECT * FROM ('.$query.') WHERE rownum BETWEEN '.intval($offset).' AND '.intval($till);
 					}
-
-					$result = DBexecute($query);
-					if(!$result){
-						$e = ocierror($result);
+					
+					$stid = oci_parse($DB['DB'], $query);
+					if($stid){
+						$result = @oci_execute($stid, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS));
+						if(!$result){
+							$e = oci_error($stid);
+							error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+						}
+					}
+					else{
+						$e = @oci_error();
 						error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 					}
-
-					break;
+					
+					$result = ($result) ? $stid : false;
+					
+				break;
 				case 'SQLITE3':
 					if(!$DB['TRANSACTIONS']){
 						lock_db_access();
@@ -493,19 +502,18 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 					}
 					break;
 				case 'ORACLE':
-					$stid=OCIParse($DB['DB'],$query);
-					if(!$stid){
-						$e=@ocierror();
-						error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
-					}
-
-					$result=@OCIExecute($stid,($DB['TRANSACTIONS']?OCI_DEFAULT:OCI_COMMIT_ON_SUCCESS));
-					if(!$result){
-						$e=ocierror($stid);
-						error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+					$stid = oci_parse($DB['DB'], $query);
+					if($stid){
+						$result = @oci_execute($stid, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS));
+						if(!$result){
+							$e = oci_error($stid);
+							error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+						}
 					}
 					else{
-						$result = $stid;
+						$e = @oci_error();
+						error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+						$result = false;
 					}
 
 					break;
