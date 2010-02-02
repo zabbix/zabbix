@@ -1808,6 +1808,9 @@
 	'S_NO_SERVICE_LINKAGE_WITH'=>				'No service linkage with',
 	'S_UNKNOWN_CALC_ALGORITHM_OF_SERVICE_STATUS'=>		'Unknown calculation algorithm of service status',
 
+//	perm.inc.php
+	'S_INCORRECT_USER_DATA_IN'=>		'Incorrect user data in',
+	
 //	Menu
 
 	'S_HELP'=>				'Help',
