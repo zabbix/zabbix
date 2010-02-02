@@ -448,18 +448,30 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+static int	day_in_month(int year, int mon)
+{
+#define is_leap_year(year) (((year % 4) == 0 && (year % 100) != 0) || (year % 400) == 0)
+	unsigned char month[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+	unsigned char month_leap[12] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
+	if (is_leap_year(year))
+		return month_leap[mon];
+	else
+		return month[mon];
+}
+
 static void	process_maintenance()
 {
 	const char			*__function_name = "process_maintenance";
 	DB_RESULT			result;
 	DB_ROW				row;
-	int				day, wday, mon, mday, sec;
+	int				day, week, wday, sec;
 	struct tm			*tm;
 	zbx_uint64_t			db_maintenanceid;
-	time_t				now, db_active_since, maintenance_from;
+	time_t				now, db_active_since, active_since, db_start_date, maintenance_from;
 	zbx_timeperiod_type_t		db_timeperiod_type;
 	int				db_every, db_month, db_dayofweek, db_day, db_start_time,
-					db_period, db_start_date, db_maintenance_type;
+					db_period, db_maintenance_type;
 	static zbx_host_maintenance_t	*hm = NULL;
 	static int			hm_alloc = 4;
 	int				hm_count = 0;
@@ -474,9 +486,6 @@ static void	process_maintenance()
 	now = time(NULL);
 	tm = localtime(&now);
 	sec = tm->tm_hour * 3600 + tm->tm_min * 60 + tm->tm_sec;
-	wday = (tm->tm_wday == 0 ? 7 : tm->tm_wday) - 1;	/* The number of days since Sunday, in the range 0 to 6. */
-	mon = tm->tm_mon;					/* The number of months since January, in the range 0 to 11 */
-	mday = tm->tm_mday;					/* The day of the month, in the range 1 to 31. */
 
 	result = DBselect(
 			"select m.maintenanceid,m.maintenance_type,m.active_since,"
@@ -504,58 +513,99 @@ static void	process_maintenance()
 
 		switch (db_timeperiod_type) {
 		case TIMEPERIOD_TYPE_ONETIME:
-			if (db_start_date > now || now >= db_start_date + db_period)
-				continue;
-			maintenance_from = db_start_date;
 			break;
 		case TIMEPERIOD_TYPE_DAILY:
-			day = now - (int)db_active_since;
-			day = day / 86400 + ((day % 86400) ? 1 : 0);
-			if (0 != (day % db_every))
+			db_start_date = now - sec + db_start_time;
+			if (sec < db_start_time)
+				db_start_date -= 86400;
+
+			if (db_start_date < db_active_since)
 				continue;
 
-			if (db_start_time > sec || sec >= db_start_time + db_period)
-				continue;
-			maintenance_from = now - sec + db_start_time;
+			tm = localtime(&db_active_since);
+			active_since = db_active_since - (tm->tm_hour * 3600 + tm->tm_min * 60 + tm->tm_sec);
+
+			day = (db_start_date - active_since) / 86400 + 1;
+			db_start_date -= 86400 * (day % db_every);
 			break;
 		case TIMEPERIOD_TYPE_WEEKLY:
-			if (0 == (db_dayofweek & (1 << wday)))
+			db_start_date = now - sec + db_start_time;
+			if (sec < db_start_time)
+				db_start_date -= 86400;
+
+			if (db_start_date < db_active_since)
 				continue;
 
-			day = now - (int)db_active_since;
-			day = day / 86400 + ((day % 86400) ? 1 : 0);
-			if (0 != ((day / 7 + ((day % 7) ? 1 : 0)) % db_every))
-				continue;
+			tm = localtime(&db_active_since);
+			wday = (tm->tm_wday == 0 ? 7 : tm->tm_wday) - 1;
+			active_since = db_active_since - (wday * 86400 + tm->tm_hour * 3600 + tm->tm_min * 60 + tm->tm_sec);
 
-			if (db_start_time > sec || sec >= db_start_time + db_period)
-				continue;
-			maintenance_from = now - sec + db_start_time;
-			break;
-		case TIMEPERIOD_TYPE_MONTHLY:
-			if (0 == (db_month & (1 << mon)))
-				continue;
-
-			if (0 != db_day)
+			for (; db_start_date >= db_active_since; db_start_date -= 86400)
 			{
-				if (mday != db_day)
+				/* check for every x week(s) */
+				week = (db_start_date - active_since) / 604800 + 1;
+				if (0 != (week % db_every))
 					continue;
-			}
-			else
-			{
+
+				/* check for day of the week */
+				tm = localtime(&db_start_date);
+				wday = (tm->tm_wday == 0 ? 7 : tm->tm_wday) - 1;
 				if (0 == (db_dayofweek & (1 << wday)))
 					continue;
 
-				if (0 != ((mday / 7 + ((mday % 7) ? 1 : 0)) % db_every))
-					continue;
+				break;
 			}
+			break;
+		case TIMEPERIOD_TYPE_MONTHLY:
+			db_start_date = now - sec + db_start_time;
+			if (sec < db_start_time)
+				db_start_date -= 86400;
 
-			if (db_start_time > sec || sec >= db_start_time + db_period)
-				continue;
-			maintenance_from = now - sec + db_start_time;
+			for (; db_start_date >= db_active_since; db_start_date -= 86400)
+			{
+				/* check for month */
+				tm = localtime(&db_start_date);
+				if (0 == (db_month & (1 << tm->tm_mon)))
+					continue;
+
+				if (0 != db_day)
+				{
+					/* check for day of the month */
+					if (db_day != tm->tm_mday)
+						continue;
+				}
+				else
+				{
+					/* check for day of the week */
+					wday = (tm->tm_wday == 0 ? 7 : tm->tm_wday) - 1;
+					if (0 == (db_dayofweek & (1 << wday)))
+						continue;
+
+					/* check for number of day (first, second, third, fourth or last) */
+					day = (tm->tm_mday - 1) / 7 + 1;
+					if (5 == db_every && 4 == day)
+					{
+						if (tm->tm_mday + 7 <= day_in_month(tm->tm_year, tm->tm_mon))
+							continue;
+					}
+					else if (db_every != day)
+						continue;
+				}
+
+				break;
+			}
 			break;
 		default:
 			continue;
 		}
+
+		if (db_start_date < db_active_since)
+			continue;
+
+		if (db_start_date > now || now >= db_start_date + db_period)
+			continue;
+
+		maintenance_from = db_start_date;
 
 		process_maintenance_hosts(&hm, &hm_alloc, &hm_count, maintenance_from, db_maintenanceid, db_maintenance_type);
 	}
