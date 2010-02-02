@@ -1799,7 +1799,14 @@
 	'S_OF_EVERY_SMALL'=>		'of every',
 	'S_WEEKS_SMALL'=>		'weeks',
 	'S_WEEK_SMALL'=>		'week',
-	
+
+//	services.inc.php
+	'S_SERVICE_CANNOT_PARENT_AND_CHILD_IN_ONETIME'=>	'Service cannot be parent and child in onetime.',
+	'S_CANNOT_LINK_HARDLINKED_SERVICE'=>			'Cannot link hardlinked service.',
+	'S_CANNOT_LINK_SERVICE_TO_ITSELF'=>			'Cannot link service to itself.',
+	'S_NO_SERVICE_WITH'=>					'No service with',
+	'S_NO_SERVICE_LINKAGE_WITH'=>				'No service linkage with',
+	'S_UNKNOWN_CALC_ALGORITHM_OF_SERVICE_STATUS'=>		'Unknown calculation algorithm of service status',
 
 //	Menu
 
