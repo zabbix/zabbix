@@ -563,7 +563,7 @@ class CTemplate extends CZBXAPI{
 
 		$sql = 'SELECT hostid '.
 				' FROM hosts '.
-				' WHERE host='.zbx_dbstr($template_data['template']).
+				' WHERE host='.zbx_dbstr($template_data['host']).
 					' AND status='.HOST_STATUS_TEMPLATE.
 					' AND '.DBin_node('hostid', false);
 		$res = DBselect($sql);
@@ -571,8 +571,14 @@ class CTemplate extends CZBXAPI{
 			$templateids[$template['hostid']] = $template['hostid'];
 		}
 
-		if(!empty($templateids))
-			$result = self::get(array('templateids'=>$templateids, 'extendoutput'=>1));
+		if(!empty($templateids)){
+			$options = array(
+				'templateids'=>$templateids, 
+				'output'=>API_OUTPUT_EXTEND
+			);
+
+			$result = self::get($options);
+		}
 
 	return $result;
 	}
@@ -655,12 +661,18 @@ class CTemplate extends CZBXAPI{
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for Template name [ '.$template['host'].' ]');
 				}
 
-				$template_exists = self::getObjects(array('template' => $template['host']));
+				$template_exists = self::getObjects(array('host' => $template['host']));
 				if(!empty($template_exists)){
 					$result = false;
-					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 
+				$host_exists = CHost::getObjects(array('host' => $host['host']));
+				if(!empty($host_exists)){
+					$result = false;
+					$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_HOST.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+					break;
+				}
 
 				$templateid = get_dbid('hosts', 'hostid');
 				$templateids[] = $templateid;
@@ -946,11 +958,16 @@ $i = 0;
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Wrong fields');
 				}
 
-				$template_exists = self::getObjects(array('template' => $data['host']));
+				$template_exists = self::getObjects(array('host' => $data['host']));
 				$template_exists = reset($template_exists);
 				$cur_template = reset($templates);
 
 				if(!empty($template_exists) && ($template_exists['templateid'] != $cur_template['templateid'])){
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+				}
+				
+				$host_exists = CHost::getObjects(array('host' => $data['host']));
+				if(!empty($host_exists)){
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 			}
