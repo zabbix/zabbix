@@ -276,7 +276,7 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['filter_host']) && !zbx_empty($_REQUEST['filter_host'])){
 		$hostid = CHost::getObjects(array('host' => $_REQUEST['filter_host']));
 		if(empty($hostid))
-			$hostid = CTemplate::getObjects(array('template' => $_REQUEST['filter_host']));
+			$hostid = CTemplate::getObjects(array('host' => $_REQUEST['filter_host']));
 
 		$hostid = reset($hostid);
 
