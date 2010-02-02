@@ -636,12 +636,11 @@ class CChart extends CGraphDraw{
 				continue;
 
 			foreach(array(GRAPH_ITEM_SIMPLE, GRAPH_ITEM_AGGREGATED) as $type){
-				if(!isset($this->data[$this->items[$i]['itemid']][$type]))
-					continue;
+				if(!isset($this->data[$this->items[$i]['itemid']][$type])) continue;
 
 				$data = &$this->data[$this->items[$i]['itemid']][$type];
 
-				if(!isset($data))	continue;
+				if(!isset($data)) continue;
 
 				if($type == GRAPH_ITEM_AGGREGATED)
 					$calc_fnc = CALC_FNC_ALL;
@@ -666,8 +665,10 @@ class CChart extends CGraphDraw{
 
 				if(!isset($val)) continue;
 
-				for($ci=0; $ci < min(count($val),count($shift_val)); $ci++) $val[$ci] += $shift_val[$ci];
-
+				for($ci=0; $ci < min(count($val),count($shift_val)); $ci++){
+					$val[$ci] += $shift_val[$ci];
+				}
+//SDII($val);
 				if(!isset($maxY)){
 					if(isset($val) && count($val) > 0){
 						$maxY = max($val);
@@ -679,6 +680,7 @@ class CChart extends CGraphDraw{
 
 			}
 		}
+
 	return $maxY;
 	}
 
