@@ -1811,6 +1811,14 @@
 //	perm.inc.php
 	'S_INCORRECT_USER_DATA_IN'=>		'Incorrect user data in',
 	
+//	images.inc.php
+	'S_COULD_NOT_SAVE_IMAGE'=>		'Could not save image!',
+	'S_EXECUTE_SQL_ERROR'=>			'Execute SQL error',
+	'S_PARSE_SQL_ERROR'=>			'Parse SQL error',
+	'S_IMAGE_SIZE_MUST_BE_LESS_THAN_MB'=>	'Image size must be less than 1Mb',
+	'S_SELECT_IMAGE_TO_DOWNLOAD'=>		'Select image to download',
+	'S_INCORRECT_IMAGE'=>			'Incorrect Image',
+	
 //	Menu
 
 	'S_HELP'=>				'Help',
