@@ -65,7 +65,7 @@ include_once('include/page_header.php');
 
 		if('timeline' == $_REQUEST['favobj']){
 			if(isset($_REQUEST['graphid']) && isset($_REQUEST['period'])){
-				navigation_bar_calc('web.graph',$_REQUEST['graphid']);
+				navigation_bar_calc('web.graph', true);
 			}
 		}
 
@@ -137,7 +137,7 @@ include_once('include/page_header.php');
 		}
 	}
 
-	$effectiveperiod = navigation_bar_calc('web.graph',$_REQUEST['graphid']);
+	$effectiveperiod = navigation_bar_calc('web.graph');
 
 	update_profile('web.charts.graphid',$_REQUEST['graphid']);
 

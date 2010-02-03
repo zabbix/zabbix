@@ -98,7 +98,8 @@ function update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN,$idx2=null,$sourc
 	if(profile_type($type,'unknown')) $type = profile_type_by_value($value);
 	else $value = profile_value_by_type($value,$type);
 
-//if($idx == 'web.history') SDI('PROF: v='.$value.'  t='.$type);
+//if(strpos($idx,'stime') !== false) SDI('PROF ['.$idx.']: v='.$value.'  t='.$type);
+
 
 	if($value === false) return false;
 
