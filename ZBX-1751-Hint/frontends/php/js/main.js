@@ -553,9 +553,10 @@ show: function(e, obj, hintbox){
 	posit = $(obj).positionedOffset();
 	cumoff = $(obj).cumulativeOffset();
 	if(parseInt(cumoff.left+10+hintbox.offsetWidth) > body_width){
-		posit.left-=parseInt((cumoff.left+10+hintbox.offsetWidth) - body_width);
+		// posit.left-=parseInt((cumoff.left+10+hintbox.offsetWidth) - body_width);
+		posit.left-=parseInt(hintbox.offsetWidth);
 		posit.left-=10;
-		//posit.left=(pos.left < 0)?0:posit.left;
+		posit.left = (posit.left < 0) ? 0 : posit.left;
 	}
 	else{
 		posit.left+=10;
