@@ -35,6 +35,9 @@ class CChart extends CGraphDraw{
 
 		$this->yaxisright=0;
 		$this->yaxisleft=0;
+		
+		$this->skipLeftScale = 0;		// in case if left axis should be drawn but dosn't contain any data
+		$this->skipRightScale = 0;		// in case if right axis should be drawn but dosn't contain any data
 
 		$this->ymin_itemid = 0;
 		$this->ymax_itemid = 0;
@@ -1246,149 +1249,148 @@ class CChart extends CGraphDraw{
 	}
 
 	private function drawLeftSide(){
-		if($this->yaxisleft == 1){
-			$minY = $this->m_minY[GRAPH_YAXIS_SIDE_LEFT];
-			$maxY = $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT];
+		if(($this->yaxisleft == 0) || ($this->skipLeftScale == 1)) return;
 
-			$units = null;
-			$unitsLong = null;
+		$minY = $this->m_minY[GRAPH_YAXIS_SIDE_LEFT];
+		$maxY = $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT];
+
+		$units = null;
+		$unitsLong = null;
+		for($item=0; $item<$this->num; $item++){
+			if($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_LEFT){
+				if(is_null($units)) $units = $this->items[$item]['units'];
+				else if($this->items[$item]['units'] != $units) $units = false;
+			}
+		}
+
+		if(is_null($units) || ($units === false)){
+			$units = '';
+		}
+		else{
 			for($item=0; $item<$this->num; $item++){
-				if($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_LEFT){
-					if(is_null($units)) $units = $this->items[$item]['units'];
-					else if($this->items[$item]['units'] != $units) $units = false;
+				if(($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_LEFT) && !empty($this->items[$item]['unitsLong'])){
+					$unitsLong = $this->items[$item]['unitsLong'];
+					break;
 				}
 			}
+		}
 
-			if(is_null($units) || ($units === false)){
-				$units = '';
-			}
-			else{
-				for($item=0; $item<$this->num; $item++){
-					if(($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_LEFT) && !empty($this->items[$item]['unitsLong'])){
-						$unitsLong = $this->items[$item]['unitsLong'];
-						break;
-					}
-				}
-			}
+		if(!empty($unitsLong)){
+			$dims = imageTextSize(9, 90, $unitsLong);
 
-			if(!empty($unitsLong)){
-				$dims = imageTextSize(9, 90, $unitsLong);
-
-				$tmpY = $this->sizeY/2+$this->shiftY+$dims['height']/2;
-				if($tmpY < $dims['height']) $tmpY = $dims['height'] + 6;
-				
-				imageText($this->im,
-					9,
-					90,
-					$dims['width']+8,
-					$tmpY,
-					$this->getColor($this->graphtheme['textcolor'], 0),
-					$unitsLong
-				);
-			}
+			$tmpY = $this->sizeY/2+$this->shiftY+$dims['height']/2;
+			if($tmpY < $dims['height']) $tmpY = $dims['height'] + 6;
 			
-			$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_LEFT];
-			for($i=0; $i<=$hstr_count; $i++){
+			imageText($this->im,
+				9,
+				90,
+				$dims['width']+8,
+				$tmpY,
+				$this->getColor($this->graphtheme['textcolor'], 0),
+				$unitsLong
+			);
+		}
+		
+		$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_LEFT];
+		for($i=0; $i<=$hstr_count; $i++){
 // division by zero
-				$hstr_count = ($hstr_count == 0)?1:$hstr_count;
+			$hstr_count = ($hstr_count == 0)?1:$hstr_count;
 
-				$str = convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units, false);
+			$str = convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units, false);
 
-				$dims = imageTextSize(7, 0, $str);
+			$dims = imageTextSize(7, 0, $str);
 
-				imageText($this->im,
-					7,
-					0,
-					$this->shiftXleft - $dims['width'] - 6,
-					$this->sizeY-$this->sizeY*$i/$hstr_count+$this->shiftY + 4,
-					$this->getColor($this->graphtheme['textcolor'], 0),
-					$str
-				);
-			}
+			imageText($this->im,
+				7,
+				0,
+				$this->shiftXleft - $dims['width'] - 6,
+				$this->sizeY-$this->sizeY*$i/$hstr_count+$this->shiftY + 4,
+				$this->getColor($this->graphtheme['textcolor'], 0),
+				$str
+			);
+		}
 
-			if(($this->zero[GRAPH_YAXIS_SIDE_LEFT] != ($this->sizeY+$this->shiftY)) && ($this->zero[GRAPH_YAXIS_SIDE_LEFT] != $this->shiftY)){
-				imageline($this->im,
-							$this->shiftXleft,
-							$this->zero[GRAPH_YAXIS_SIDE_LEFT],
-							$this->shiftXleft+$this->sizeX,
-							$this->zero[GRAPH_YAXIS_SIDE_LEFT],
-							$this->getColor(GRAPH_ZERO_LINE_COLOR_LEFT)
-						);
-			}
-			
+		if(($this->zero[GRAPH_YAXIS_SIDE_LEFT] != ($this->sizeY+$this->shiftY)) && ($this->zero[GRAPH_YAXIS_SIDE_LEFT] != $this->shiftY)){
+			imageline($this->im,
+						$this->shiftXleft,
+						$this->zero[GRAPH_YAXIS_SIDE_LEFT],
+						$this->shiftXleft+$this->sizeX,
+						$this->zero[GRAPH_YAXIS_SIDE_LEFT],
+						$this->getColor(GRAPH_ZERO_LINE_COLOR_LEFT)
+					);
 		}
 	}
 
 	private function drawRightSide(){
-		if($this->yaxisright == 1){
-			$minY = $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT];
-			$maxY = $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT];
+		if(($this->yaxisright == 0) || ($this->skipRightScale == 1)) return;
 
-			$units = null;
-			$unitsLong = null;
+		$minY = $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT];
+		$maxY = $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT];
+
+		$units = null;
+		$unitsLong = null;
+		for($item=0; $item<$this->num; $item++){
+			if($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_RIGHT){
+				if(is_null($units)) $units = $this->items[$item]['units'];
+				else if($this->items[$item]['units'] != $units) $units = false;
+			}
+		}
+
+		if(is_null($units) || ($units === false)){
+			$units = '';
+		}
+		else{
 			for($item=0; $item<$this->num; $item++){
-				if($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_RIGHT){
-					if(is_null($units)) $units = $this->items[$item]['units'];
-					else if($this->items[$item]['units'] != $units) $units = false;
+				if(($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_RIGHT) && !empty($this->items[$item]['unitsLong'])){
+					$unitsLong = $this->items[$item]['unitsLong'];
+					break;
 				}
 			}
+		}
 
-			if(is_null($units) || ($units === false)){
-				$units = '';
-			}
-			else{
-				for($item=0; $item<$this->num; $item++){
-					if(($this->items[$item]['axisside'] == GRAPH_YAXIS_SIDE_RIGHT) && !empty($this->items[$item]['unitsLong'])){
-						$unitsLong = $this->items[$item]['unitsLong'];
-						break;
-					}
-				}
-			}
+		if(!empty($unitsLong)){
+			$dims = imageTextSize(9, 90, $unitsLong);
 
-			if(!empty($unitsLong)){
-				$dims = imageTextSize(9, 90, $unitsLong);
-
-				$tmpY = $this->sizeY/2+$this->shiftY+$dims['height']/2;
-				if($tmpY < $dims['height']) $tmpY = $dims['height'] + 6;
-				
-				imageText($this->im,
-					9,
-					90,
-					$this->fullSizeX - $dims['width'],
-					$tmpY,
-					$this->getColor($this->graphtheme['textcolor'], 0),
-					$unitsLong
-				);
-			}
-
-
-			$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_RIGHT];
-			for($i=0;$i<=$hstr_count;$i++){
-				if($hstr_count == 0) continue;
-
-				$str = convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units, false);
-				imageText($this->im,
-					7,
-					0,
-					$this->sizeX+$this->shiftXleft+12,
-					$this->sizeY-$this->sizeY*$i/$hstr_count+$this->shiftY + 4,
-					$this->getColor($this->graphtheme['textcolor'], 0),
-					$str
-				);
-			}
+			$tmpY = $this->sizeY/2+$this->shiftY+$dims['height']/2;
+			if($tmpY < $dims['height']) $tmpY = $dims['height'] + 6;
 			
+			imageText($this->im,
+				9,
+				90,
+				$this->fullSizeX - $dims['width'],
+				$tmpY,
+				$this->getColor($this->graphtheme['textcolor'], 0),
+				$unitsLong
+			);
+		}
 
-			if(($this->zero[GRAPH_YAXIS_SIDE_RIGHT] != $this->sizeY+$this->shiftY) &&
-				($this->zero[GRAPH_YAXIS_SIDE_RIGHT] != $this->shiftY))
-			{
-				imageline($this->im,
-							$this->shiftXleft,
-							$this->zero[GRAPH_YAXIS_SIDE_RIGHT],
-							$this->shiftXleft+$this->sizeX,
-							$this->zero[GRAPH_YAXIS_SIDE_RIGHT],
-							$this->getColor(GRAPH_ZERO_LINE_COLOR_RIGHT)
-						); //*/
-			}
+
+		$hstr_count = $this->gridLinesCount[GRAPH_YAXIS_SIDE_RIGHT];
+		for($i=0;$i<=$hstr_count;$i++){
+			if($hstr_count == 0) continue;
+
+			$str = convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units, false);
+			imageText($this->im,
+				7,
+				0,
+				$this->sizeX+$this->shiftXleft+12,
+				$this->sizeY-$this->sizeY*$i/$hstr_count+$this->shiftY + 4,
+				$this->getColor($this->graphtheme['textcolor'], 0),
+				$str
+			);
+		}
+		
+
+		if(($this->zero[GRAPH_YAXIS_SIDE_RIGHT] != $this->sizeY+$this->shiftY) &&
+			($this->zero[GRAPH_YAXIS_SIDE_RIGHT] != $this->shiftY))
+		{
+			imageline($this->im,
+						$this->shiftXleft,
+						$this->zero[GRAPH_YAXIS_SIDE_RIGHT],
+						$this->shiftXleft+$this->sizeX,
+						$this->zero[GRAPH_YAXIS_SIDE_RIGHT],
+						$this->getColor(GRAPH_ZERO_LINE_COLOR_RIGHT)
+					); //*/
 		}
 	}
 
@@ -1889,7 +1891,10 @@ class CChart extends CGraphDraw{
 //*
 		if($this->m_minY[GRAPH_YAXIS_SIDE_LEFT] == $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT]){
 			if($this->graphOrientation[GRAPH_YAXIS_SIDE_LEFT] == '-') $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] = 0;
-			else if($this->m_minY[GRAPH_YAXIS_SIDE_LEFT] == 0) $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] = 1;
+			else if($this->m_minY[GRAPH_YAXIS_SIDE_LEFT] == 0){
+				$this->m_maxY[GRAPH_YAXIS_SIDE_LEFT] = 1;
+				$this->skipLeftScale = 1;
+			}
 			else $this->m_minY[GRAPH_YAXIS_SIDE_LEFT] = 0;
 		}
 		else if($this->m_minY[GRAPH_YAXIS_SIDE_LEFT] > $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT]){
@@ -1901,7 +1906,10 @@ class CChart extends CGraphDraw{
 
 		if($this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] == $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT]){
 			if($this->graphOrientation[GRAPH_YAXIS_SIDE_RIGHT] == '-') $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] = 0;
-			else if($this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] == 0) $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] = 1;
+			else if($this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] == 0){
+				$this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT] = 1;
+				$this->skipRightScale = 1;
+			}
 			else $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] = 0;
 		}
 		else if($this->m_minY[GRAPH_YAXIS_SIDE_RIGHT] > $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT]){
