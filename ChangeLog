@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1912] fixed nonstandart font vertical text display (Vedmak)
  - [ZBX-1915] fixed template/host name check on creation/update (Aly)
  - [ZBX-1820] fixed graph preview in configuration graph form (Aly)
  - [ZBX-1777] fixed evaluating of the maintenance periods (Sasha)
