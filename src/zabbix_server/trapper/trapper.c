@@ -494,6 +494,8 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 	char		value[MAX_STRING_LEN];
 	AGENT_VALUE	av;
 
+	memset(&av, 0, sizeof(AGENT_VALUE));
+	
 	zbx_rtrim(s, " \r\n\0");
 
 	datalen = strlen(s);
