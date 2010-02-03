@@ -285,6 +285,11 @@ include_once 'include/page_header.php';
 		$description = item_description($db_item);
 
 		if(!empty($_REQUEST['select']) && !zbx_stristr($description, $_REQUEST['select']) ) continue;
+		
+		if(strpos($db_item['units'], ',') !== false)
+			list($db_item['units'], $db_item['unitsLong']) = explode(',', $db_item['units']);
+		else
+			$db_item['unitsLong'] = '';
 
 		$db_app = &$db_apps[$db_item['applicationid']];
 
@@ -412,6 +417,11 @@ include_once 'include/page_header.php';
 		$description = item_description($db_item);
 
 		if(!empty($_REQUEST['select']) && !zbx_stristr($description, $_REQUEST['select']) ) continue;
+		
+		if(strpos($db_item['units'], ',') !== false)
+			list($db_item['units'], $db_item['unitsLong']) = explode(',', $db_item['units']);
+		else
+			$db_item['unitsLong'] = '';
 
 		$db_host = &$db_hosts[$db_item['hostid']];
 
