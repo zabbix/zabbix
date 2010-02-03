@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1923] fixed processing of data sent by 1.4, 1.6 agents not allowing wrong "eventid" values (Dmitry)
  - [ZBX-1763] fixed SLA showing red line when there is no problem (Vedmak)
  - [ZBX-1922] fixed compilation of Zabbix agent under ac AIX 5.1/5.2 (Sasha)
  - [ZBX-1899] fixed sticky starttime in graphs (Aly)
