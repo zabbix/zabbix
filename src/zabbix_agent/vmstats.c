@@ -71,7 +71,9 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 	zbx_uint64_t	r1, r2, didle_donated_purr, dbusy_donated_purr, didle_stolen_purr, dbusy_stolen_purr,
 			entitled_purr, unused_purr;
 	perfstat_memory_total_t		memstats;
+#ifdef _AIXVERSION_530
 	perfstat_partition_total_t	lparstats;
+#endif
 	perfstat_cpu_total_t		cpustats;
 	perfstat_disk_total_t		diskstats;
 
@@ -80,11 +82,13 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 	/* retrieve the metrics
 	 * Upon successful completion, the number of structures filled is returned.
 	 * If unsuccessful, a value of -1 is returned and the errno global variable is set */
+#ifdef _AIXVERSION_530
 	if (-1 == perfstat_partition_total(NULL, &lparstats, sizeof(perfstat_partition_total_t), 1))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "perfstat_partition_total: %s", strerror(errno));
 		return;
 	}
+#endif
 
 	if (-1 == perfstat_cpu_total(NULL, &cpustats, sizeof(perfstat_cpu_total_t), 1))
 	{
@@ -122,6 +126,7 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 		vmstat->sy = (double)(cpustats.syscall - last_syscall) / (double)(now - last_clock);
 		vmstat->cs = (double)(cpustats.pswitch - last_pswitch) / (double)(now - last_clock);
 
+#ifdef _AIXVERSION_530
 		/* --- cpu ---- */
 		dpcpu_us = lparstats.puser - last_puser;
 		dpcpu_sy = lparstats.psys  - last_psys;
@@ -129,14 +134,14 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 		dpcpu_wa = lparstats.pwait - last_pwait;
 
 		delta_purr = pcputime = dpcpu_us + dpcpu_sy + dpcpu_id + dpcpu_wa;
-
+#endif	/* _AIXVERSION_530 */
 		dlcpu_us = cpustats.user - last_user;
 		dlcpu_sy = cpustats.sys  - last_sys;
 		dlcpu_id = cpustats.idle - last_idle;
 		dlcpu_wa = cpustats.wait - last_wait;
 
 		lcputime = dlcpu_us + dlcpu_sy + dlcpu_id + dlcpu_wa;
-
+#ifdef _AIXVERSION_530
 		/* Distribute the donated and stolen purr to the existing purr buckets in case if donation is 
 		enabled.*/
 		if (lparstats.type.b.donate_enabled)
@@ -208,21 +213,42 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 						(XINTFRAC * (double)dtimebase);
 			}
 		}
+#else	/* not _AIXVERSION_530 */
+		dlcpu_us = cpustats.user - last_user;
+		dlcpu_sy = cpustats.sys  - last_sys;
+		dlcpu_id = cpustats.idle - last_idle;
+		dlcpu_wa = cpustats.wait - last_wait;
 
+		lcputime = dlcpu_us + dlcpu_sy + dlcpu_id + dlcpu_wa;
+
+		/* Physical Processor Utilization */
+		vmstat->cpu_us = (double)dlcpu_us * 100.0 / (double)lcputime;
+		vmstat->cpu_sy = (double)dlcpu_sy * 100.0 / (double)lcputime;
+		vmstat->cpu_id = (double)dlcpu_id * 100.0 / (double)lcputime;
+		vmstat->cpu_wa = (double)dlcpu_wa * 100.0 / (double)lcputime;
+
+#endif	/* _AIXVERSION_530 */
 		/* --- disk --- */
 		vmstat->disk_bps = 512 * ((diskstats.wblks - last_wblks) + (diskstats.rblks - last_rblks)) /
 				(now - last_clock);
 		vmstat->disk_tps = (double)(diskstats.xfers - last_xfers) / (double)(now - last_clock);
 
 		/* -- memory -- */
+#ifdef _AIXVERSION_520
 		vmstat->mem_avm = (zbx_uint64_t)memstats.virt_active;	/* Active virtual pages. Virtual pages are considered
 									   active if they have been accessed */
+#endif	/* _AIXVERSION_520 */
 		vmstat->mem_fre = (zbx_uint64_t)memstats.real_free;	/* free real memory (in 4KB pages) */
 	}
 	else
 	{
+#ifdef _AIXVERSION_530
 		vmstat->shared_enabled = (unsigned char)lparstats.type.b.shared_enabled;
 		vmstat->pool_util_authority = (unsigned char)lparstats.type.b.pool_util_authority;
+#endif	/* _AIXVERSION_530 */
+#ifdef _AIXVERSION_520
+		vmstat->aix52stats = 1;
+#endif	/* _AIXVERSION_520 */
 	}
 
 	/* saving last values */
@@ -242,15 +268,11 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 	last_syscall = (zbx_uint64_t)cpustats.syscall;
 	last_pswitch = (zbx_uint64_t)cpustats.pswitch;
 	/* --- cpu ---- */
+#ifdef _AIXVERSION_530
 	last_puser = (zbx_uint64_t)lparstats.puser;
 	last_psys = (zbx_uint64_t)lparstats.psys;
 	last_pidle = (zbx_uint64_t)lparstats.pidle;
 	last_pwait = (zbx_uint64_t)lparstats.pwait;
-
-	last_user = (zbx_uint64_t)cpustats.user;
-	last_sys = (zbx_uint64_t)cpustats.sys;
-	last_idle = (zbx_uint64_t)cpustats.idle;
-	last_wait = (zbx_uint64_t)cpustats.wait;
 
 	last_timebase_last = (zbx_uint64_t)lparstats.timebase_last;
 
@@ -261,11 +283,16 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 
 	last_idle_stolen_purr = (zbx_uint64_t)lparstats.idle_stolen_purr;
 	last_busy_stolen_purr = (zbx_uint64_t)lparstats.busy_stolen_purr;
+#endif	/* not _AIXVERSION_530 */
+	last_user = (zbx_uint64_t)cpustats.user;
+	last_sys = (zbx_uint64_t)cpustats.sys;
+	last_idle = (zbx_uint64_t)cpustats.idle;
+	last_wait = (zbx_uint64_t)cpustats.wait;
 
 	last_xfers = (zbx_uint64_t)diskstats.xfers;
 	last_wblks = (zbx_uint64_t)diskstats.wblks;
 	last_rblks = (zbx_uint64_t)diskstats.rblks;
-#endif
+#endif	/* _AIXVERSION_530 */
 }
 
 void	collect_vmstat_data(ZBX_VMSTAT_DATA *vmstat)
