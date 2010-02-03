@@ -2213,7 +2213,7 @@ moveright: function(width){
 calcperiod: function(){
 	this.debug('calcperiod');
 
-	if(this.box.width >= this.obj.width){
+	if((this.box.width+1) >= this.obj.width){
 		var new_period = this.timeline.period();
 	}
 	else{

@@ -19,23 +19,23 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/items.inc.php');
-	require_once('include/graphs.inc.php');
+require_once('include/config.inc.php');
+require_once('include/items.inc.php');
+require_once('include/graphs.inc.php');
 
-	$page['file']	= 'history.php';
-	$page['title']	= 'S_HISTORY';
-	$page['hist_arg'] = array('itemid', 'hostid', 'grouid', 'graphid', 'period', 'dec', 'inc', 'left', 'right', 'stime');
-	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.calendar.js','gtlc.js');
+$page['file']	= 'history.php';
+$page['title']	= 'S_HISTORY';
+$page['hist_arg'] = array('itemid', 'hostid', 'grouid', 'graphid', 'period', 'dec', 'inc', 'left', 'right', 'stime');
+$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.calendar.js','gtlc.js');
 
-	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-	if(isset($_REQUEST['plaintext'])){
-		define('ZBX_PAGE_NO_MENU', 1);
-	}
-	else if(PAGE_TYPE_HTML == $page['type']){
-		define('ZBX_PAGE_DO_REFRESH', 1);
-	}
+if(isset($_REQUEST['plaintext'])){
+	define('ZBX_PAGE_NO_MENU', 1);
+}
+else if(PAGE_TYPE_HTML == $page['type']){
+	define('ZBX_PAGE_DO_REFRESH', 1);
+}
 
 include_once('include/page_header.php');
 
@@ -79,6 +79,10 @@ include_once('include/page_header.php');
 ?>
 <?php
 	if(isset($_REQUEST['favobj'])){
+		if('timeline' == $_REQUEST['favobj']){
+			navigation_bar_calc('web.item.graph', true);
+		}
+
 		if(str_in_array($_REQUEST['favobj'],array('itemid','graphid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
@@ -131,6 +135,7 @@ include_once('include/page_header.php');
 	
 	$options = array(
 		'itemids' => $_REQUEST['itemid'],
+		'webitems' => 1,
 	);
 	$request_items = zbx_toArray($_REQUEST['itemid']);
 	$allowed_items = CItem::get($options);
@@ -138,18 +143,6 @@ include_once('include/page_header.php');
 	foreach($request_items as $itemid){
 		if(!isset($allowed_items[$itemid])) access_deny();
 	}
-	
-	// $available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
-	// $sql = 'SELECT h.host,i.hostid,i.description,i.key_ '.
-			// ' FROM items i,hosts h '.
-			// ' WHERE i.itemid IN ('.(is_array($_REQUEST['itemid']) ? implode(',', $_REQUEST['itemid']) : $_REQUEST['itemid']).') '.
-				// ' AND h.hostid=i.hostid '.
-				// ' AND '.DBcondition('h.hostid',$available_hosts, true);
-
-	// if(DBfetch(DBselect($sql))){
-		// access_deny();
-	// }
-
 	
 	$sql = 'SELECT h.host,i.hostid,i.* '.
 			' FROM items i,hosts h '.
@@ -265,7 +258,7 @@ include_once('include/page_header.php');
 <?php
 	if(is_array($_REQUEST['itemid'])) $itemid = reset($_REQUEST['itemid']);
 	else $itemid = $_REQUEST['itemid'];
-	$effectiveperiod = navigation_bar_calc('web.item.graph', $itemid);
+	$effectiveperiod = navigation_bar_calc('web.item.graph');
 
 	$bstime = $_REQUEST['stime'];
 
@@ -567,8 +560,8 @@ include_once('include/page_header.php');
 	if(!isset($_REQUEST['plaintext'])){
 		if(str_in_array($_REQUEST['action'], array('showvalues', 'showgraph'))){
 			$graphDims['graphHeight'] = 200;
-			$graphDims['shiftXleft'] = 100;
-			$graphDims['shiftXright'] = 50;
+			$graphDims['shiftXleft'] = 75;
+			$graphDims['shiftXright'] = 30;
 			$graphDims['graphtype'] = 0;
 
 // NAV BAR

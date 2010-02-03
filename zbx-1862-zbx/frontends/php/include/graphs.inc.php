@@ -134,16 +134,16 @@
 		}
 
 		if($yaxis == 2){
-			$graphDims['shiftXleft'] = 100;
-			$graphDims['shiftXright'] = 100;
+			$graphDims['shiftXleft'] = 75;
+			$graphDims['shiftXright'] = 75;
 		}
 		else if($yaxis == 0){
-			$graphDims['shiftXleft'] = 100;
-			$graphDims['shiftXright'] = 50;
+			$graphDims['shiftXleft'] = 75;
+			$graphDims['shiftXright'] = 30;
 		}
 		else{
-			$graphDims['shiftXleft'] = 50;
-			$graphDims['shiftXright'] = 100;
+			$graphDims['shiftXleft'] = 30;
+			$graphDims['shiftXright'] = 75;
 		}
 //-------------
 
@@ -990,18 +990,20 @@
 	return $result;
 	}
 
-	function navigation_bar_calc($idx=null, $idx2=null){
+	function navigation_bar_calc($idx=null, $update=false){
 //SDI($_REQUEST['stime']);
-		if(!is_null($idx) && (is_null($idx2) || ($idx2 > 0))){
-			if(isset($_REQUEST['period']) && ($_REQUEST['period'] >= ZBX_MIN_PERIOD))
-				update_profile($idx.'.period',$_REQUEST['period'],PROFILE_TYPE_INT, $idx2);
-			else
-				$_REQUEST['period'] = get_profile($idx.'.period', ZBX_PERIOD_DEFAULT, $idx2);
 
-			if(isset($_REQUEST['stime']))
-				update_profile($idx.'.stime',$_REQUEST['stime'], PROFILE_TYPE_STR, $idx2);
-			else
-				$_REQUEST['stime'] = get_profile($idx.'.stime', null, $idx2);
+		if(!is_null($idx)){
+			if($update){
+				if(isset($_REQUEST['period']) && ($_REQUEST['period'] >= ZBX_MIN_PERIOD))
+					update_profile($idx.'.period',$_REQUEST['period'],PROFILE_TYPE_INT);
+					
+				if(isset($_REQUEST['stime']))
+					update_profile($idx.'.stime',$_REQUEST['stime'], PROFILE_TYPE_STR);
+			}
+
+			$_REQUEST['period'] = get_request('period', get_profile($idx.'.period', ZBX_PERIOD_DEFAULT));
+			$_REQUEST['stime'] = get_request('stime', get_profile($idx.'.stime'));
 		}
 
 		$_REQUEST['period'] = get_request('period', ZBX_PERIOD_DEFAULT);
@@ -1190,14 +1192,41 @@
 		$gdinfo = gd_info();
 
 		if($gdinfo['FreeType Support'] && function_exists('imagettftext')){
-			$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
+		
+			if((preg_match(ZBX_PREG_DEF_FONT_STRING, $string) && ($angle != 0)) || (ZBX_FONT_NAME == ZBX_GRAPH_FONT_NAME)){
+				$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
+				imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
+			}
+			else if($angle == 0){
+				$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
+				imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
+			}
+			else{
+				$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
+				
+				$size = imageTextSize($fontsize, 0, $string);
+
+				$imgg = imagecreatetruecolor($size['width']+1, $size['height']);
+				$transparentColor = imagecolorallocatealpha($imgg, 200, 200, 200, 127);
+				imagefill($imgg, 0, 0, $transparentColor);
+
+				imagettftext($imgg, $fontsize, 0, 0, $size['height'], $color, $ttf, $string);
+				
+				$imgg = imagerotate($imgg, $angle, $transparentColor);
+				ImageAlphaBlending($imgg, false);
+				imageSaveAlpha($imgg, true);
+				
+				imagecopy($image, $imgg, $x - $size['height'], $y - $size['width'], 0, 0, $size['height'], $size['width']+1);
+				
+				imagedestroy($imgg);
+			}
 /*
 			$ar = imagettfbbox($fontsize, $angle, $ttf, $string);
 //sdii($ar);
 			if(!$angle)	imagerectangle($image, $x, $y+$ar[1], $x+abs($ar[0] - $ar[4]), $y+$ar[5], $color);
 			else imagerectangle($image, $x, $y, $x-abs($ar[0] - $ar[4]), $y+($ar[5]-$ar[1]), $color);
 //*/
-			imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
+			
 		}
 		else{
 			$dims = imageTextSize($fontsize, $angle, $string);
@@ -1236,8 +1265,15 @@
 		$gdinfo = gd_info();
 
 		$result = array();
+		
 		if($gdinfo['FreeType Support'] && function_exists('imagettfbbox')){
-			$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
+		
+			if(preg_match(ZBX_PREG_DEF_FONT_STRING, $string) && ($angle != 0)){
+				$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
+			}
+			else{
+				$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
+			}
 
 			$ar = imagettfbbox($fontsize, $angle, $ttf, $string);
 

@@ -51,6 +51,8 @@
 	define('ZBX_GRAPH_FONT_NAME',			'DejaVuSans');		// font file name
 /* END OF USERS DEFINES */
 
+	define('ZBX_FONT_NAME',			'DejaVuSans');
+	
 	define('ZBX_AUTH_INTERNAL',	0);
 	define('ZBX_AUTH_LDAP',		1);
 	define('ZBX_AUTH_HTTP',		2);
@@ -584,6 +586,8 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+){0,1}');
 	define('ZBX_PREG_SIGN', '([&|><=+*\/#\-])');
 	define('ZBX_PREG_NUMBER', '([\-+]?[0-9]+[.]{0,1}[0-9]*[A-Z]{0,1})');
+	
+	define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
 //--
 
 	define('ZBX_PREG_DNS_FORMAT', '([0-9a-zA-Z_\.\-$]+)');
@@ -714,4 +718,8 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 /* init $_REQUEST */
 	ini_set('variables_order', 'GP');
 	$_REQUEST = $_POST + $_GET;
+
+/* init precision */
+	ini_set("precision", 21);
+
 ?>

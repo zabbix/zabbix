@@ -1787,11 +1787,50 @@
 	'S_INCORRECT_TYPE_OF_ASORT_BY_KEY'=>	'Incorrect type of asort_by_key',
 	'S_DAYS_SMALL'=>			'days',
 	'S_B'=>			'B',
-	'S_M'=>			'M',
 	'S_K'=>			'K',
+	'S_KILO'=>		'Kilo',
+	'S_M'=>			'M',
+	'S_MEGA'=>		'Mega',
 	'S_G'=>			'G',
+	'S_GIGA'=>		'Giga',
 	'S_T'=>			'T',
+	'S_TERA'=>		'Tera',
+	'S_P'=>			'P',
+	'S_PETA'=>		'Peta',
+	'S_E'=>			'E',
+	'S_EXA'=>		'Exa',
+	'S_Z'=>			'Z',
+	'S_ZETTA'=>		'Zetta',
+	'S_Y'=>			'Y',
+	'S_YOTTA'=>		'Yotta',
 
+//	maintenances.inc.php
+	'S_ON_SMALL'=>			'on',
+	'S_EVERY_SMALL'=>		'every',
+	'S_DAY_SMALL'=>			'day',
+	'S_OF_EVERY_SMALL'=>		'of every',
+	'S_WEEKS_SMALL'=>		'weeks',
+	'S_WEEK_SMALL'=>		'week',
+
+//	services.inc.php
+	'S_SERVICE_CANNOT_PARENT_AND_CHILD_IN_ONETIME'=>	'Service cannot be parent and child in onetime.',
+	'S_CANNOT_LINK_HARDLINKED_SERVICE'=>			'Cannot link hardlinked service.',
+	'S_CANNOT_LINK_SERVICE_TO_ITSELF'=>			'Cannot link service to itself.',
+	'S_NO_SERVICE_WITH'=>					'No service with',
+	'S_NO_SERVICE_LINKAGE_WITH'=>				'No service linkage with',
+	'S_UNKNOWN_CALC_ALGORITHM_OF_SERVICE_STATUS'=>		'Unknown calculation algorithm of service status',
+
+//	perm.inc.php
+	'S_INCORRECT_USER_DATA_IN'=>		'Incorrect user data in',
+	
+//	images.inc.php
+	'S_COULD_NOT_SAVE_IMAGE'=>		'Could not save image!',
+	'S_EXECUTE_SQL_ERROR'=>			'Execute SQL error',
+	'S_PARSE_SQL_ERROR'=>			'Parse SQL error',
+	'S_IMAGE_SIZE_MUST_BE_LESS_THAN_MB'=>	'Image size must be less than 1Mb',
+	'S_SELECT_IMAGE_TO_DOWNLOAD'=>		'Select image to download',
+	'S_INCORRECT_IMAGE'=>			'Incorrect Image',
+	
 //	Menu
 
 	'S_HELP'=>				'Help',

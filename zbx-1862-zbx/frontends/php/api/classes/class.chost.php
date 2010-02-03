@@ -687,8 +687,14 @@ class CHost extends CZBXAPI{
 			$hostids[$host['hostid']] = $host['hostid'];
 		}
 
-		if(!empty($hostids))
-			$result = self::get(array('hostids' => $hostids, 'extendoutput' => 1));
+		if(!empty($hostids)){
+			$options = array(
+				'hostids'=>$hostids, 
+				'output'=>API_OUTPUT_EXTEND
+			);
+
+			$result = self::get($options);
+		}
 
 	return $result;
 	}
@@ -795,6 +801,13 @@ class CHost extends CZBXAPI{
 			if(!empty($host_exists)){
 				$result = false;
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_HOST.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+				break;
+			}
+
+			$host_exists = CTemplate::getObjects(array('host' => $host['host']));
+			if(!empty($host_exists)){
+				$result = false;
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_TEMPLATE.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				break;
 			}
 
@@ -1014,6 +1027,12 @@ class CHost extends CZBXAPI{
 				if(!empty($host_exists) && ($host_exists['hostid'] != $cur_host['hostid'])){
 					$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+				}
+				
+				$host_exists = CTemplate::getObjects(array('host' => $host['host']));
+				if(!empty($host_exists)){
+					$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 			}
 
