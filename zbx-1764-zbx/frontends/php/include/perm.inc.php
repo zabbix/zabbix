@@ -168,19 +168,23 @@ return false;
  * Author: Aly
  */
 function get_user_system_auth($userid){
-	$result = ZBX_AUTH_INTERNAL;
-
-	$user_auth = get_user_auth($userid);
-
-	switch($user_auth){
-		case GROUP_GUI_ACCESS_SYSTEM:
-			$config = select_config();
-			$result = $config['authentication_type'];
-			break;
-		case GROUP_GUI_ACCESS_INTERNAL:
-		case GROUP_GUI_ACCESS_DISABLED:
-		default:
-			break;
+	$config = select_config();
+	
+	if($config['authentication_type'] == ZBX_AUTH_HTTP){
+		$result = ZBX_AUTH_HTTP;
+	}
+	else{
+		$result = get_user_auth($userid);
+		switch($result){
+			case GROUP_GUI_ACCESS_SYSTEM:
+				$config = select_config();
+				$result = $config['authentication_type'];
+				break;
+			case GROUP_GUI_ACCESS_INTERNAL:
+			case GROUP_GUI_ACCESS_DISABLED:
+			default:
+				break;
+		}
 	}
 
 return $result;
@@ -338,7 +342,7 @@ function get_accessible_groups_by_user($user_data,$perm,$perm_res=null,$nodeid=n
 	$result = array();
 
 	$userid =& $user_data['userid'];
-	if(!isset($userid)) fatal_error('Incorrect user data in "get_accessible_groups_by_user"');
+	if(!isset($userid)) fatal_error(S_INCORRECT_USER_DATA_IN.SPACE.'"get_accessible_groups_by_user"');
 	$user_type =& $user_data['type'];
 
 COpt::counter_up('perm_group['.$userid.','.$perm.','.$perm_res.','.$nodeid.']');
@@ -420,7 +424,7 @@ function get_accessible_nodes_by_user(&$user_data,$perm,$perm_res=null,$nodeid=n
 
 	$userid		=& $user_data['userid'];
 	$user_type	=& $user_data['type'];
-	if(!isset($userid)) fatal_error('Incorrect user data in "get_accessible_nodes_by_user"');
+	if(!isset($userid)) fatal_error(S_INCORRECT_USER_DATA_IN.SPACE.'"get_accessible_nodes_by_user"');
 
 
 	$nodeid_str =(is_array($nodeid))?md5(implode('',$nodeid)):strval($nodeid);

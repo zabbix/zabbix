@@ -181,7 +181,7 @@
 	function add_user_group($name,$users_status,$gui_access,$api_access,$debug_mode,$users=array(),$rights=array()){
 
 		if(DBfetch(DBselect('select * from usrgrp where name='.zbx_dbstr($name).' and '.DBin_node('usrgrpid', get_current_nodeid(false))))){
-			error("Group '$name' already exists");
+			error(S_GROUP.SPACE.$name.SPACE.S_ALREADY_EXISTS_SMALL);
 			return 0;
 		}
 
@@ -224,7 +224,7 @@
 					' AND usrgrpid<>'.$usrgrpid.
 					' AND '.DBin_node('usrgrpid', false);
 		if(DBfetch(DBselect($sql))){
-			error("Group '$name' already exists");
+			error(S_GROUP.SPACE.$name.SPACE.S_ALREADY_EXISTS_SMALL);
 			return 0;
 		}
 

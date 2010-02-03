@@ -462,11 +462,10 @@ typedef enum
 typedef enum
 {
 	TIMEPERIOD_TYPE_ONETIME = 0,
-	TIMEPERIOD_TYPE_HOURLY,
-	TIMEPERIOD_TYPE_DAILY,
+/*	TIMEPERIOD_TYPE_HOURLY,*/
+	TIMEPERIOD_TYPE_DAILY = 2,
 	TIMEPERIOD_TYPE_WEEKLY,
 	TIMEPERIOD_TYPE_MONTHLY,
-	TIMEPERIOD_TYPE_YEARLY
 } zbx_timeperiod_type_t;
 
 typedef enum
@@ -923,4 +922,5 @@ int	is_key_char(const char c);
 int	is_function_char(const char c);
 int	parse_function(char **exp, char **func, char **params);
 int	parse_host_key(char *exp, char **host, char **key);
+void	make_hostname(char const *host);
 #endif

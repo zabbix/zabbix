@@ -513,7 +513,7 @@ class zbxXML{
 
 				if(!isset($host_db['status'])) $host_db['status'] = HOST_STATUS_TEMPLATE;
 				if($host_db['status'] == HOST_STATUS_TEMPLATE){
-					$current_host = CTemplate::getObjects(array('template' => $host_db['host']));
+					$current_host = CTemplate::getObjects(array('host' => $host_db['host']));
 				}
 				else{
 					$current_host = CHost::getObjects(array('host' => $host_db['host']));
@@ -589,7 +589,7 @@ class zbxXML{
 
 					$host_templates = array();
 					foreach($templates as $template){
-						$current_template = CTemplate::getObjects(array('template' => $template->nodeValue));
+						$current_template = CTemplate::getObjects(array('host' => $template->nodeValue));
 						$current_template = reset($current_template);
 
 						if(!$current_template && !isset($rules['template']['missed'])) continue; // break if update nonexist
@@ -888,7 +888,7 @@ class zbxXML{
 							}
 
 							$gitem_hostid = CHost::getObjects(array('host' => $gitem_host));
-							$gitem_templateid = CTemplate::getObjects(array('template' => $gitem_host));
+							$gitem_templateid = CTemplate::getObjects(array('host' => $gitem_host));
 							$gitem_hostid = array_merge($gitem_hostid, $gitem_templateid);
 
 							if(!empty($gitem_hostid)){

@@ -730,7 +730,7 @@
 			$frmUser->addRow(S_SURNAME,	new CTextBox('surname',$surname,40));
 		}
 
-		$auth_type = (isset($userid))?get_user_system_auth($userid):$config['authentication_type'];
+		$auth_type = isset($userid) ? get_user_system_auth($userid) : $config['authentication_type'];
 
 		if(ZBX_AUTH_INTERNAL == $auth_type){
 			if(!isset($userid) || isset($change_password)){
@@ -747,12 +747,12 @@
 				$frmUser->addRow(S_PASSWORD, $passwd_but);
 			}
 		}
-		else{
-			if(!isset($userid) || isset($change_password)){
-				$frmUser->addVar('password1','');
-				$frmUser->addVar('password2','');
-			}
-		}
+		// else{
+			// if(!isset($userid) || isset($change_password)){
+				// $frmUser->addVar('password1','');
+				// $frmUser->addVar('password2','');
+			// }
+		// }
 
 		if($profile==0){
 
