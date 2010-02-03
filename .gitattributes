@@ -744,6 +744,9 @@ upgrades/dbpatches/1.8/postgresql/patch/trends_uint.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/user_history.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/users.sql -text
 upgrades/dbpatches/1.8/postgresql/patch/usrgrp.sql -text
+upgrades/dbpatches/2.0/mysql/patch/items.sql -text
 upgrades/dbpatches/2.0/mysql/patch/sysmaps.sql -text
+upgrades/dbpatches/2.0/oracle/patch/items.sql -text
 upgrades/dbpatches/2.0/oracle/patch/sysmaps.sql -text
+upgrades/dbpatches/2.0/postgresql/patch/items.sql -text
 upgrades/dbpatches/2.0/postgresql/patch/sysmaps.sql -text
