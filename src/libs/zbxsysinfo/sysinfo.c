@@ -341,7 +341,7 @@ static int	replace_param(const char *cmd, const char *param, char *out, int outl
 	char buf[MAX_STRING_LEN];
 	char command[MAX_STRING_LEN];
 	register char *pl, *pr;
-	const char	suppressed_chars[] = "\\'\"`*?[-]{}~$!&;()<>|#@\0", *c;
+	const char	suppressed_chars[] = "\\'\"`*?[]{}~$!&;()<>|#@\0", *c;
 
 	assert(out);
 
