@@ -822,32 +822,24 @@ require_once('include/js.inc.php');
 		$result=DBselect('SELECT name,hsize,vsize FROM screens WHERE screenid='.$screenid);
 		$row=DBfetch($result);
 		if(!$row) return new CTableInfo(S_NO_SCREENS_DEFINED);
-
-		for($r=0;$r<$row['vsize'];$r++){
-			for($c=0;$c<$row['hsize'];$c++){
-				if(isset($skip_field[$r][$c]))	continue;
-
-				$sql='SELECT * FROM screens_items WHERE screenid='.$screenid.' AND x='.$c.' AND y='.$r;
-				$iresult=DBSelect($sql);
-				$irow=DBfetch($iresult);
-
-				if($irow){
-					$colspan=$irow['colspan'];
-					$rowspan=$irow['rowspan'];
-				}
-				else {
-					$colspan=0;
-					$rowspan=0;
-				}
-
-				for($i=0; $i < $rowspan || $i==0; $i++){
-					for($j=0; $j < $colspan || $j==0; $j++){
-						if($i!=0 || $j!=0)
-							$skip_field[$r+$i][$c+$j]=1;
+				
+		$sql = 'SELECT * FROM screens_items WHERE screenid='.$screenid;
+		$iresult = DBSelect($sql);
+		$irows = array();
+		
+		$skip_field = array();
+		while($irow = DBfetch($iresult)){
+			for($i=0; $i < $irow['rowspan'] || $i==0; $i++){
+				for($j=0; $j < $irow['colspan'] || $j==0; $j++){
+					if($i!=0 || $j!=0){
+						if(!isset($skip_field[$irow['y']+$i])) $skip_field[$irow['y']+$i] = array();
+						$skip_field[$irow['y']+$i][$irow['x']+$j] = 1;
 					}
 				}
-			}
+			}				
 		}
+	
+		
 		$table = new CTable(
 			new CLink('No rows in screen '.$row['name'],'screenconf.php?config=0&form=update&screenid='.$screenid),
 			($editmode == 0 || $editmode == 2) ? 'screen_view' : 'screen_edit');
