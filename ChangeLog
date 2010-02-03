@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1763] fixed SLA showing red line when there is no problem (Vedmak)
  - [ZBX-1922] fixed compilation of Zabbix agent under ac AIX 5.1/5.2 (Sasha)
  - [ZBX-1899] fixed sticky starttime in graphs (Aly)
  - [ZBX-1785] fixed starttime in screens, slides on screen/slide switch (Aly)
