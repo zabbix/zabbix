@@ -12,10 +12,11 @@ CREATE TABLE sysmaps_tmp (
 ) with OIDS;
 
 insert into sysmaps_tmp select sysmapid,name,width,height,backgroundid,label_type,label_location,highlight,1 from sysmaps;
+
+UPDATE sysmaps_tmp SET expandproblem=0 WHERE highlight>1;
+UPDATE sysmaps_tmp SET highlight=(highlight-2) WHERE highlight>1;
+
 drop table sysmaps;
 
 alter table sysmaps_tmp rename to sysmaps;
 CREATE INDEX sysmaps_1 on sysmaps (name);
-
-UPDATE sysmaps SET expandproblem=0 WHERE highlight>1;
-UPDATE sysmaps SET highlight=(highlight-2) WHERE highlight>1;
