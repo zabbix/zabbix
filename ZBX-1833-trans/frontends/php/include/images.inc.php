@@ -55,7 +55,7 @@
 				$imageid = get_dbid('images','imageid');
 
 				$image = fread(fopen($file['tmp_name'],'r'),filesize($file['tmp_name']));
-
+    
 				if($DB['TYPE'] == 'POSTGRESQL'){
 					$image = pg_escape_bytea($image);
 					$sql = 'INSERT INTO images (imageid, name, imagetype, image) '.
@@ -71,7 +71,7 @@
 						' return image into :image');
 					if(!$stid){
 						$e = ocierror($stid);
-						error('Parse SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+						error(S_PARSE_SQL_ERROR.' ['.$e['message'].']'.SPACE.S_IN_SMALL.SPACE.'['.$e['sqltext'].']');
 						return false;
 					}
 
@@ -79,13 +79,13 @@
 
 					if(!OCIExecute($stid, OCI_DEFAULT)){
 						$e = ocierror($stid);
-						error('Execute SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+						error(S_EXECUTE_SQL_ERROR.SPACE.'['.$e['message'].']'.SPACE.S_IN_SMALL.SPACE.'['.$e['sqltext'].']');
 						return false;
 					}
 
 					$result = DBend($lobimage->save($image));
 					if(!$result){
-						error('Could not save image!');
+						error(S_COULD_NOT_SAVE_IMAGE);
 					return false;
 					}
 
@@ -102,11 +102,11 @@
 									' VALUES ('.$imageid.','.zbx_dbstr($name).','.$imagetype.','.zbx_dbstr($image).')');
 			}
 			else{
-				error('Image size must be less than 1Mb');
+				error(S_IMAGE_SIZE_MUST_BE_LESS_THAN_MB);
 			}
 		}
 		else{
-			error('Select image to download');
+			error(S_SELECT_IMAGE_TO_DOWNLOAD);
 		}
 		return false;
 	}
@@ -122,7 +122,7 @@
 			global $DB;
 
 			if($file['error'] != 0 || $file['size']==0){
-				error('Incorrect Image');
+				error(S_INCORRECT_IMAGE);
 				return FALSE;
 			}
 
@@ -166,7 +166,7 @@
 				return	DBexecute($sql);
 			}
 			else{
-				error('Image size must be less than 1MB');
+				error(S_IMAGE_SIZE_MUST_BE_LESS_THAN_MB);
 				return FALSE;
 			}
 		}
