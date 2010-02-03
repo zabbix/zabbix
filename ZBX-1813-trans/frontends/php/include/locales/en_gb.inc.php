@@ -1819,6 +1819,9 @@
 	'S_SELECT_IMAGE_TO_DOWNLOAD'=>		'Select image to download',
 	'S_INCORRECT_IMAGE'=>			'Incorrect Image',
 	
+//	regexp.inc.php
+	'S_INCORRECT_ARGUMENTS_PASTED_TO_FUNCTION'=>	'Incorrect arguments pasted to function',
+
 //	Menu
 
 	'S_HELP'=>				'Help',
