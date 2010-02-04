@@ -140,6 +140,7 @@ class CHostGroup extends CZBXAPI{
 // hostids
 		if(!is_null($options['hostids'])){
 			zbx_value2array($options['hostids']);
+
 			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['hostid'] = 'hg.hostid';
 			}
