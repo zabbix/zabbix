@@ -175,11 +175,11 @@ include_once('include/page_header.php');
 
 
 	if($_REQUEST['alias']){
-		$user = CUser::getObjects(array('alias' => $_REQUEST['alias']));
+		$user = API::User()->getObjects(array('alias' => $_REQUEST['alias']));
 		$user = reset($user);
 		$options['userids'] = $user['userid'];
 	}
-	$alerts = CAlert::get($options);
+	$alerts = API::Alert()->get($options);
 
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$table->setHeader(array(

@@ -98,7 +98,7 @@ include_once('include/page_header.php');
 
 		$currentmacros = array_keys(get_request('macros', array()));
 
-		if(!CUserMacro::validate(zbx_toObject($macro_new, 'macro'))){
+		if(!API::UserMacro()->validate(zbx_toObject($macro_new, 'macro'))){
 			error(S_WRONG_MACRO.' : '.$macro_new);
 			show_messages(false, '', S_MACROS);
 		}
@@ -174,7 +174,7 @@ include_once('include/page_header.php');
 // CREATE NEW GROUP
 		$groups = zbx_toObject($groups, 'groupid');
 		if(!empty($newgroup)){
-			if($newgroup = CHostGroup::create(array('name' => $newgroup))){
+			if($newgroup = API::HostGroup()->create(array('name' => $newgroup))){
 				$groups = array_merge($groups, $newgroup);
 			}
 			else{
@@ -191,7 +191,7 @@ include_once('include/page_header.php');
 // CREATE/UPDATE TEMPLATE {{{
 		if($templateid){
 			$template = array('templateid' => $templateid);
-			$result = CTemplate::update(array(
+			$result = API::Template()->update(array(
 				'templateid' => $templateid,
 				'host' => $template_name,
 				'groups' => $groups,
@@ -201,7 +201,7 @@ include_once('include/page_header.php');
 				'macros' => get_request('macros', array()),
 			));
 			if(!$result){
-				error(CTemplate::resetErrors());
+				error(API::Template()->resetErrors());
 				$result = false;
 			}
 
@@ -209,7 +209,7 @@ include_once('include/page_header.php');
 			$msg_fail = S_CANNOT_UPDATE_TEMPLATE;
 		}
 		else{
-			$result = CTemplate::create(array(
+			$result = API::Template()->create(array(
 				'host' => $template_name,
 				'groups' => $groups,
 				'templates' => $templates,
@@ -221,7 +221,7 @@ include_once('include/page_header.php');
 				$templateid = $template['hostid'];
 			}
 			else{
-				error(CTemplate::resetErrors());
+				error(API::Template()->resetErrors());
 				$result = false;
 			}
 			$msg_ok = S_TEMPLATE_ADDED;
@@ -327,7 +327,7 @@ include_once('include/page_header.php');
 
 		$go_result = true;
 		$templates = get_request('templates', array());
-		$del_hosts = CTemplate::get(array('templateids' => $templates, 'editable' => 1));
+		$del_hosts = API::Template()->get(array('templateids' => $templates, 'editable' => 1));
 		$del_hosts = zbx_objectValues($del_hosts, 'templateid');
 
 		DBstart();
@@ -409,12 +409,12 @@ include_once('include/page_header.php');
 		if(($templateid > 0) && !isset($_REQUEST['form_refresh'])){
 // get template groups from db
 			$options = array('hostids' => $templateid, 'editable' => 1);
-			$groups = CHostGroup::get($options);
+			$groups = API::HostGroup()->get($options);
 			$groups = zbx_objectValues($groups, 'groupid');
 
 // get template hosts from db
 			$params = array('templateids' => $templateid, 'editable' => 1, 'templated_hosts' => 1);
-			$hosts_linked_to = CHost::get($params);
+			$hosts_linked_to = API::Host()->get($params);
 			$hosts_linked_to = zbx_objectValues($hosts_linked_to, 'hostid');
 			$hosts_linked_to = zbx_toHash($hosts_linked_to, 'hostid');
 			$templates = $original_templates;
@@ -440,7 +440,7 @@ include_once('include/page_header.php');
 // get all Groups
 		$group_tb = new CTweenBox($frmHost, 'groups', $groups, 10);
 		$options = array('editable' => 1, 'extendoutput' => 1);
-		$all_groups = CHostGroup::get($options);
+		$all_groups = API::HostGroup()->get($options);
 		order_result($all_groups, 'name');
 
 		foreach($all_groups as $gnum => $group){
@@ -454,7 +454,7 @@ include_once('include/page_header.php');
 
 // FORM ITEM : linked Hosts tween box [  ] [  ]
 		// $options = array('editable' => 1, 'extendoutput' => 1);
-		// $twb_groups = CHostGroup::get($options);
+		// $twb_groups = API::HostGroup()->get($options);
 		$twb_groupid = get_request('twb_groupid', 0);
 		if($twb_groupid == 0){
 			$gr = reset($all_groups);
@@ -473,7 +473,7 @@ include_once('include/page_header.php');
 			'templated_hosts' => 1,
 			'editable' => 1,
 			'extendoutput' => 1);
-		$db_hosts = CHost::get($params);
+		$db_hosts = API::Host()->get($params);
 		order_result($db_hosts, 'host');
 
 		foreach($db_hosts as $hnum => $db_host){
@@ -487,7 +487,7 @@ include_once('include/page_header.php');
 			'templated_hosts' => 1,
 			'editable' => 1,
 			'extendoutput' => 1);
-		$db_hosts = CHost::get($params);
+		$db_hosts = API::Host()->get($params);
 		order_result($db_hosts, 'host');
 		foreach($db_hosts as $hnum => $db_host){
 			$host_tb->addItem($db_host['hostid'], $db_host['host']);
@@ -523,7 +523,7 @@ include_once('include/page_header.php');
 			$items_lbx->setAttribute('disabled', 'disabled');
 
 			$options = array('editable' => 1, 'hostids' => $templateid, 'extendoutput' => 1);
-			$template_items = CItem::get($options);
+			$template_items = API::Item()->get($options);
 
 			if(empty($template_items)){
 				$items_lbx->setAttribute('style', 'width: 200px;');
@@ -542,7 +542,7 @@ include_once('include/page_header.php');
 			$trig_lbx->setAttribute('disabled', 'disabled');
 
 			$options = array('editable' => 1, 'hostids' => $templateid, 'extendoutput' => 1);
-			$template_triggers = CTrigger::get($options);
+			$template_triggers = API::Trigger()->get($options);
 
 			if(empty($template_triggers)){
 				$trig_lbx->setAttribute('style','width: 200px;');
@@ -561,7 +561,7 @@ include_once('include/page_header.php');
 			$graphs_lbx->setAttribute('disabled', 'disabled');
 
 			$options = array('editable' => 1, 'hostids' => $templateid, 'extendoutput' => 1);
-			$template_graphs = CGraph::get($options);
+			$template_graphs = API::Graph()->get($options);
 
 			if(empty($template_graphs)){
 				$graphs_lbx->setAttribute('style','width: 200px;');
@@ -633,7 +633,7 @@ include_once('include/page_header.php');
 		$frmForm->setMethod('get');
 
 // combo for group selection
-		$groups = CHostGroup::get(array('editable' => 1, 'extendoutput' => 1));
+		$groups = API::HostGroup()->get(array('editable' => 1, 'extendoutput' => 1));
 		order_result($groups, 'name');
 
 		$cmbGroups = new CComboBox('groupid', $PAGE_GROUPS['selected'], 'javascript: submit();');
@@ -681,7 +681,7 @@ include_once('include/page_header.php');
 		if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
 			$options['groupids'] = $PAGE_GROUPS['selected'];
 		}
-		$templates = CTemplate::get($options);
+		$templates = API::Template()->get($options);
 
 		order_result($templates, $sortfield, $sortorder);
 		$paging = getPagingLine($templates);
@@ -699,7 +699,7 @@ include_once('include/page_header.php');
 			'nopermissions' => 1
 		);
 
-		$templates = CTemplate::get($options);
+		$templates = API::Template()->get($options);
 		order_result($templates, $sortfield, $sortorder);
 //-----
 

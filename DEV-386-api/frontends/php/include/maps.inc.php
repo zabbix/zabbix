@@ -545,7 +545,7 @@
 				'nopermissions' => 1
 			);
 
-		$sysmaps = CMap::get($options);
+		$sysmaps = API::Map()->get($options);
 		$sysmap = reset($sysmaps);
 
 	return getActionMapBySysmap($sysmap);
@@ -560,7 +560,7 @@
 				$hostids[$selement['elementid']] = $selement['elementid'];
 		}
 
-		$scripts_by_hosts = CScript::getScriptsByHosts($hostids);
+		$scripts_by_hosts = API::Script()->getScriptsByHosts($hostids);
 
 		$options = array(
 			'nodeids' => get_current_nodeid(true),
@@ -570,7 +570,7 @@
 			'select_triggers' => 1,
 			'nopermissions' => 1
 		);
-		$hosts = CHost::get($options);
+		$hosts = API::Host()->get($options);
 		$hosts = zbx_toHash($hosts, 'hostid');
 
 // Draws elements
@@ -1154,16 +1154,16 @@
 		}
 
 
-		$hosts = CHost::get(array('hostids'=>$hostids, 'extendoutput'=>1, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
+		$hosts = API::Host()->get(array('hostids'=>$hostids, 'extendoutput'=>1, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
 		$hosts = zbx_toHash($hosts, 'hostid');
 
-		$maps = CMap::get(array('mapids'=>$mapids, 'extendoutput'=>1, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
+		$maps = API::Map()->get(array('mapids'=>$mapids, 'extendoutput'=>1, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
 		$maps = zbx_toHash($maps, 'sysmapid');
 
-		$triggers = CTrigger::get(array('triggerids'=>$triggerids, 'extendoutput'=>1, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
+		$triggers = API::Trigger()->get(array('triggerids'=>$triggerids, 'extendoutput'=>1, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
 		$triggers = zbx_toHash($triggers, 'triggerid');
 
-		$hostgroups = CHostGroup::get(array('hostgroupids'=>$hostgroupids, 'extendoutput'=>1, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
+		$hostgroups = API::HostGroup()->get(array('hostgroupids'=>$hostgroupids, 'extendoutput'=>1, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
 		$hostgroups = zbx_toHash($hostgroups, 'groupid');
 
 		foreach($selements as $snum => $selement){
@@ -1204,7 +1204,7 @@
 			'nopermissions' => 1,
 			'nodeids' => get_current_nodeid(true)
 			);
-		$triggers = CTrigger::get($options);
+		$triggers = API::Trigger()->get($options);
 		$triggers = zbx_toHash($triggers, 'triggerid');
 		foreach($selements as $snum => $selement){
 			$selements_info[$selement['selementid']] = array();
@@ -1295,7 +1295,7 @@
 				'select_triggers' => 1,
 				'nodeids' => get_current_nodeid(true)
 			);
-		$hosts = CHost::get($options);
+		$hosts = API::Host()->get($options);
 		$hosts = zbx_toHash($hosts, 'hostid');
 
 		foreach($selements as $snum => $selement){
@@ -1511,7 +1511,7 @@
 				'select_triggers' => 1,
 				'nodeids' => get_current_nodeid(true)
 			);
-		$hostgroups = CHostGroup::get($options);
+		$hostgroups = API::HostGroup()->get($options);
 		$hostgroups = zbx_toHash($hostgroups, 'groupid');
 
 		foreach($selements as $snum => $selement){
@@ -1548,7 +1548,7 @@
 				'nodeids' => get_current_nodeid(true)
 				);
 
-			$triggers = CTrigger::get($options);
+			$triggers = API::Trigger()->get($options);
 			$triggers = zbx_toHash($triggers, 'triggerid');
 
 			$info['triggers'] = array();
@@ -1667,7 +1667,7 @@
 				'select_selements' => 1,
 				'nodeids' => get_current_nodeid(true)
 			);
-		$maps = CMap::get($options);
+		$maps = API::Map()->get($options);
 		$maps = zbx_toHash($maps, 'sysmapid');
 		foreach($selements as $snum => $selement){
 			$selements_info[$selement['selementid']] = array();

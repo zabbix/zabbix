@@ -375,7 +375,7 @@ include_once('include/page_header.php');
 		$options['min_severity'] = $show_severity;
 	}
 
-	$triggers = CTrigger::get($options);
+	$triggers = API::Trigger()->get($options);
 
 // sorting && paging
 	order_result($triggers, $sortfield, $sortorder);
@@ -388,7 +388,7 @@ include_once('include/page_header.php');
 		'select_hosts' => 1,
 		'select_items' => 1
 	);
-	$triggers = CTrigger::get($options);
+	$triggers = API::Trigger()->get($options);
 	$triggers = zbx_toHash($triggers, 'triggerid');
 
 	order_result($triggers, $sortfield, $sortorder);
@@ -403,7 +403,7 @@ include_once('include/page_header.php');
 				'value' => TRIGGER_VALUE_TRUE,
 				'nopermissions' => 1
 			);
-			$event_count = CEvent::get($options);
+			$event_count = API::Event()->get($options);
 
 			$triggers[$tnum]['event_count'] = $event_count['rowscount'];
 		}
@@ -417,7 +417,7 @@ include_once('include/page_header.php');
 
 	$trigger_hostids = zbx_objectValues($trigger_hosts, 'hostid');
 
-	$scripts_by_hosts = Cscript::getScriptsByHosts($trigger_hostids);
+	$scripts_by_hosts = API::Script()->getScriptsByHosts($trigger_hostids);
 
 	if($show_events != EVENTS_OPTION_NOEVENT){
 		$ev_options = array(
@@ -445,7 +445,7 @@ include_once('include/page_header.php');
 			break;
 		}
 
-		$events = CEvent::get($ev_options);
+		$events = API::Event()->get($ev_options);
 
 		foreach($events as $enum => $event){
 			$triggers[$event['objectid']]['events'][] = $event;
@@ -574,7 +574,7 @@ include_once('include/page_header.php');
 				$text = ' ['.$text.']';
 				$maint_span = new CSpan($text, 'orange pointer');
 
-				$maintenance = CMaintenance::get(array('maintenanceids' => $trigger_host['maintenanceid'], 'extendoutput' => 1));
+				$maintenance = API::Maintenance()->get(array('maintenanceids' => $trigger_host['maintenanceid'], 'extendoutput' => 1));
 				$maintenance = reset($maintenance);
 				$maint_hint = new CSpan($maintenance['name'].($maintenance['description']=='' ? '' : ': '.$maintenance['description']));
 

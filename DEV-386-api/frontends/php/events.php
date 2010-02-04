@@ -154,7 +154,7 @@ include_once('include/page_header.php');
 		$available_hosts = $PAGE_HOSTS['hostids'];
 
 		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
-			$triggers = CTrigger::get(array( 'triggerids' => $_REQUEST['triggerid'] ));
+			$triggers = API::Trigger()->get(array( 'triggerids' => $_REQUEST['triggerid'] ));
 			if(empty($triggers)){
 				unset($_REQUEST['triggerid']);
 			}
@@ -215,7 +215,7 @@ include_once('include/page_header.php');
 						'limit' => ($config['search_limit']+1)
 					);
 
-		$dsc_events = CEvent::get($options);
+		$dsc_events = API::Event()->get($options);
 
 // PAGING UPPER && SORTING
 		order_page_result($dsc_events, 'clock', ZBX_SORT_DOWN);
@@ -341,14 +341,14 @@ include_once('include/page_header.php');
 		}
 
 		if(!empty($trigOpt)){
-			$triggers = CTrigger::get($trigOpt);
+			$triggers = API::Trigger()->get($trigOpt);
 			$triggerids = zbx_objectValues($triggers, 'triggerid');
 			$options['triggerids'] = $triggerids;
 		}
 
 		if($hide_unknown) $options['hide_unknown'] = 1;
 
-		$events = CEvent::get($options);
+		$events = API::Event()->get($options);
 
 // sorting & paging
 		order_page_result($events, 'eventid');
@@ -364,7 +364,7 @@ include_once('include/page_header.php');
 			'select_items' => 1,
 			'nopermissions' => 1
 		);
-		$events = CEvent::get($options);
+		$events = API::Event()->get($options);
 
 // sorting & paging
 		order_page_result($events, 'eventid');

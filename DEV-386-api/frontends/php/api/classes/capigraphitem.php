@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with GraphItems
  */
-class CGraphItem extends CZBXAPI{
+class CAPIGraphItem extends CZBXAPI{
 /**
 * Get GraphItems data
 *

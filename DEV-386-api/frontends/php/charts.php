@@ -206,7 +206,7 @@ include_once('include/page_header.php');
 		$options['hostids'] = $_REQUEST['hostid'];
 	}
 
-	$db_graphs = CGraph::get($options);
+	$db_graphs = API::Graph()->get($options);
 	foreach($db_graphs as $num => $db_graph){
 		$cmbGraphs->addItem($db_graph['graphid'], get_node_name_by_elid($db_graph['graphid'], null, ': ').$db_graph['name']);
 	}

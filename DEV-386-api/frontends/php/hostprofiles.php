@@ -44,7 +44,7 @@
 // permission check, imo should be remuved in future.
 	$_REQUEST['hostid'] = get_request('hostid', 0);
 	if($_REQUEST['hostid'] > 0){
-		$res = CHost::get(array('real_hosts' => 1, 'hostids' => $_REQUEST['hostid']));
+		$res = API::Host()->get(array('real_hosts' => 1, 'hostids' => $_REQUEST['hostid']));
 		if(empty($res)) access_deny();
 	}
 
@@ -88,7 +88,7 @@
 			'real_hosts' => 1,
 			'extendoutput' => 1
 		);
-		$groups = CHostGroup::get($options);
+		$groups = API::HostGroup()->get($options);
 		$groups = zbx_toHash($groups, 'groupid');
 
 		if(!isset($groups[$_REQUEST['groupid']])) $_REQUEST['groupid'] = 0;
@@ -111,7 +111,7 @@
 		else{
 			$options['groupids'] = zbx_objectValues($groupids, 'groupid');
 		}
-		$hosts = CHost::get($options);
+		$hosts = API::Host()->get($options);
 
 
 	// unset hosts without profiles, and copy some profile fileds to the uppers array level for sorting

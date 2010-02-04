@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with Maps
  */
-class CMap extends CZBXAPI{
+class CAPIMap extends CZBXAPI{
 /**
  * Get Map data
  *
@@ -249,7 +249,7 @@ class CMap extends CZBXAPI{
 									'nodeids' => $nodeids,
 									'editable' => $options['editable'],
 									'preservekeys'=>1);
-				$allowed_hosts = CHost::get($host_options);
+				$allowed_hosts = API::Host()->get($host_options);
 				$allowed_hosts = zbx_objectValues($allowed_hosts, 'hostid');
 
 				$map_options = array('sysmapids' => $maps_to_check,
@@ -263,14 +263,14 @@ class CMap extends CZBXAPI{
 									'nodeids' => $nodeids,
 									'editable' => $options['editable'],
 									'preservekeys'=>1);
-				$allowed_triggers = CTrigger::get($trigger_options);
+				$allowed_triggers = API::Trigger()->get($trigger_options);
 				$allowed_triggers = zbx_objectValues($allowed_triggers, 'triggerid');
 
 				$hostgroup_options = array('groupids' => $host_groups_to_check,
 									'nodeids' => $nodeids,
 									'editable' => $options['editable'],
 									'preservekeys'=>1);
-				$allowed_host_groups = CHostGroup::get($hostgroup_options);
+				$allowed_host_groups = API::HostGroup()->get($hostgroup_options);
 				$allowed_host_groups = zbx_objectValues($allowed_host_groups, 'groupid');
 
 				$restr_hosts = array_diff($hosts_to_check, $allowed_hosts);

@@ -63,7 +63,7 @@ include_once('include/page_header.php');
 			'extendoutput' => 1,
 		);
 
-		$maps = CMap::get($options);
+		$maps = API::Map()->get($options);
 
 		if(empty($maps)) access_deny();
 		else $sysmap = reset($maps);
@@ -93,7 +93,7 @@ include_once('include/page_header.php');
 			if($_REQUEST['expproblem'] == 0) $map['highlight']+=2;
 
 			DBstart();
-			$result = CMap::update($map);
+			$result = API::Map()->update($map);
 			$result = DBend($result);
 
 			add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,'Name ['.$_REQUEST['name'].']');
@@ -119,7 +119,7 @@ include_once('include/page_header.php');
 			if($_REQUEST['expproblem'] == 0) $map['highlight']+=2;
 
 			DBstart();
-			$result = CMap::create($map);
+			$result = API::Map()->create($map);
 			$result = DBend($result);
 
 			add_audit_if($result,AUDIT_ACTION_ADD,AUDIT_RESOURCE_MAP,'Name ['.$_REQUEST['name'].']');
@@ -133,7 +133,7 @@ include_once('include/page_header.php');
 		$maps = zbx_toObject($_REQUEST["sysmapid"], 'sysmapid');
 
 		DBstart();
-		$result = CMap::delete($maps);
+		$result = API::Map()->delete($maps);
 		$result = DBend($result);
 
 		add_audit_if($result,AUDIT_ACTION_DELETE,AUDIT_RESOURCE_MAP,'Name ['.$sysmap['name'].']');
@@ -149,7 +149,7 @@ include_once('include/page_header.php');
 		$maps = zbx_toObject($maps, 'sysmapid');
 
 		DBstart();
-		$result = CMap::delete($maps);
+		$result = API::Map()->delete($maps);
 		$go_result = DBend($result);
 		
 
@@ -210,7 +210,7 @@ include_once('include/page_header.php');
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-		$maps = CMap::get($options);
+		$maps = API::Map()->get($options);
 
 // sorting
 		order_result($maps, $sortfield, $sortorder);

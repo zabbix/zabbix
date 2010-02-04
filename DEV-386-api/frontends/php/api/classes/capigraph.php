@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with graphs
  */
-class CGraph extends CZBXAPI{
+class CAPIGraph extends CZBXAPI{
 /**
 * Get graph data
 *
@@ -360,7 +360,7 @@ class CGraph extends CZBXAPI{
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			$gitems = CGraphItem::get($obj_params);
+			$gitems = API::GraphItem()->get($obj_params);
 			foreach($gitems as $gitemid => $gitem){
 				$ggraphs = $gitem['graphs'];
 				unset($gitem['graphs']);
@@ -379,7 +379,7 @@ class CGraph extends CZBXAPI{
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			$hosts = CHost::get($obj_params);
+			$hosts = API::Host()->get($obj_params);
 			foreach($hosts as $hostid => $host){
 				$hgraphs = $host['graphs'];
 				unset($host['graphs']);
@@ -398,7 +398,7 @@ class CGraph extends CZBXAPI{
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			$templates = CTemplate::get($obj_params);
+			$templates = API::Template()->get($obj_params);
 			foreach($templates as $templateid => $template){
 				$tgraphs = $template['graphs'];
 				unset($template['graphs']);
@@ -417,7 +417,7 @@ class CGraph extends CZBXAPI{
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			$items = CItem::get($obj_params);
+			$items = API::Item()->get($obj_params);
 			foreach($items as $itemid => $item){
 				$igraphs = $item['graphs'];
 				unset($item['graphs']);

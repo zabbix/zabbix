@@ -82,7 +82,7 @@ include_once('include/page_header.php');
 			'preservekeys' => 1,
 			'select_profile' => 1
 		);
-		$hosts = CHost::get($params);
+		$hosts = API::Host()->get($params);
 		order_result($hosts, 'host');
 
 /* SELECT HOST GROUPS */
@@ -91,7 +91,7 @@ include_once('include/page_header.php');
 			'preservekeys' => 1,
 			'extendoutput' => 1
 		);
-		$groups = CHostGroup::get($params);
+		$groups = API::HostGroup()->get($params);
 
 /* SELECT GRAPHS */
 		$params = array(
@@ -99,7 +99,7 @@ include_once('include/page_header.php');
 			'preservekeys' => 1,
 			'extendoutput' => 1
 		);
-		$graphs = CGraph::get($params);
+		$graphs = API::Graph()->get($params);
 
 // SELECT GRAPH ITEMS
 		$graphids = zbx_objectValues($graphs, 'graphid');
@@ -109,7 +109,7 @@ include_once('include/page_header.php');
 			'preservekeys' => 1,
 			'expand_data' => 1
 		);
-		$gitems = CGraphItem::get($params);
+		$gitems = API::GraphItem()->get($params);
 
 		foreach($gitems as $gnum => $gitem){
 			$gitems[$gitem['gitemid']]['host_key_'] = $gitem['host'].':'.$gitem['key_'];
@@ -120,7 +120,7 @@ include_once('include/page_header.php');
 			'preservekeys' => 1,
 			'extendoutput' => 1
 		);
-		$templates = CTemplate::get($params);
+		$templates = API::Template()->get($params);
 
 // SELECT MACROS
 		$params = array(
@@ -128,7 +128,7 @@ include_once('include/page_header.php');
 			'preservekeys' => 1,
 			'extendoutput' => 1
 		);
-		$macros = CUserMacro::get($params);
+		$macros = API::UserMacro()->get($params);
 
 // SELECT ITEMS
 		$params = array(
@@ -136,7 +136,7 @@ include_once('include/page_header.php');
 			'preservekeys' => 1,
 			'extendoutput' => 1
 		);
-		$items = CItem::get($params);
+		$items = API::Item()->get($params);
 
 // SELECT APPLICATIONS
 		$itemids = zbx_objectValues($items, 'itemid');
@@ -146,7 +146,7 @@ include_once('include/page_header.php');
 			'preservekeys' => 1,
 			'extendoutput' => 1
 		);
-		$applications = Capplication::get($params);
+		$applications = API::Application()->get($params);
 //sdii($applications);
 
 /* SELECT TRIGGERS */
@@ -157,7 +157,7 @@ include_once('include/page_header.php');
 			'select_dependencies' => 1,
 			'expand_data' => 1
 		);
-		$triggers = CTrigger::get($params);
+		$triggers = API::Trigger()->get($params);
 		foreach($triggers as $tnum => $trigger){
 			$triggers[$trigger['triggerid']]['expression'] = explode_exp($trigger['expression'], false);
 		}
@@ -231,7 +231,7 @@ include_once('include/page_header.php');
 			'select_graphs' => 1,
 			'preservekeys' => 1
 		);
-		$hosts_all = CHost::get($params);
+		$hosts_all = API::Host()->get($params);
 
 		foreach($hosts_all as $hnum => $host){
 			$hostid = $host['hostid'];
@@ -354,7 +354,7 @@ include_once('include/page_header.php');
 		if($selected_groupid > 0){
 			$params += array('groupids' => $selected_groupid);
 		}
-		$hosts_all = CHost::get($params);
+		$hosts_all = API::Host()->get($params);
 
 // sorting
 		order_page_result($hosts_all, 'host');
@@ -369,16 +369,16 @@ include_once('include/page_header.php');
 
 			$params = array('hostids' => $hostid, 'count' => 1);
 // get item count
-			$item_cnt = CItem::get($params);
+			$item_cnt = API::Item()->get($params);
 			$item_cnt = $item_cnt['rowscount'];
 // get template count
-			$template_cnt = CTemplate::get($params);
+			$template_cnt = API::Template()->get($params);
 			$template_cnt = $template_cnt['rowscount'];
 // get trigger count
-			$trigger_cnt = CTrigger::get($params);
+			$trigger_cnt = API::Trigger()->get($params);
 			$trigger_cnt = $trigger_cnt['rowscount'];
 // get graph count
-			$graph_cnt = CGraph::get($params);
+			$graph_cnt = API::Graph()->get($params);
 			$graph_cnt = $graph_cnt['rowscount'];
 
 			$template_cnt = ($template_cnt > 0)

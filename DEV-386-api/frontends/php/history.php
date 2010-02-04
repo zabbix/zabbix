@@ -138,7 +138,7 @@ include_once('include/page_header.php');
 		'webitems' => 1,
 	);
 	$request_items = zbx_toArray($_REQUEST['itemid']);
-	$allowed_items = CItem::get($options);
+	$allowed_items = API::Item()->get($options);
 	$allowed_items = zbx_toHash($allowed_items, 'itemid');
 	foreach($request_items as $itemid){
 		if(!isset($allowed_items[$itemid])) access_deny();

@@ -225,10 +225,10 @@ include_once('include/page_header.php');
 
 		$options = array('triggerids' => $_REQUEST['triggerid'], 'extendoutput'=>1);
 
-		$triggers = CTrigger::get($options);
+		$triggers = API::Trigger()->get($options);
 		if($trigger_data = reset($triggers)){
 			DBstart();
-			$result = CTrigger::delete($triggers);
+			$result = API::Trigger()->delete($triggers);
 			$result = DBend($result);
 			if($result){
 				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $_REQUEST['triggerid'], $trigger_data['description'], NULL, NULL, NULL);
@@ -268,7 +268,7 @@ include_once('include/page_header.php');
 		$options = array('extendoutput'=>1, 'editable'=>1);
 		$options['triggerids'] = $_REQUEST['g_triggerid'];
 
-		$triggers = CTrigger::get($options);
+		$triggers = API::Trigger()->get($options);
 		$triggerids = zbx_objectValues($triggers, 'triggerid');
 
 		if(($_REQUEST['go'] == 'activate')){
@@ -350,7 +350,7 @@ include_once('include/page_header.php');
 		$options = array('extendoutput'=>1, 'editable'=>1);
 		$options['triggerids'] = $_REQUEST['g_triggerid'];
 
-		$triggers = CTrigger::get($options);
+		$triggers = API::Trigger()->get($options);
 
 		DBstart();
 		foreach($triggers as $tnum => $trigger){
@@ -368,7 +368,7 @@ include_once('include/page_header.php');
 
 		$go_result = !empty($triggers);
 		if($go_result){
-			$go_result = CTrigger::delete($triggers);
+			$go_result = API::Trigger()->delete($triggers);
 		}
 
 		$go_result = DBend($go_result);
@@ -545,7 +545,7 @@ include_once('include/page_header.php');
 			$options['groupids'] = $PAGE_GROUPS['selected'];
 		}
 
-		$triggers = CTrigger::get($options);
+		$triggers = API::Trigger()->get($options);
 
 // sorting && paginf
 		order_result($triggers, $sortfield, $sortorder);

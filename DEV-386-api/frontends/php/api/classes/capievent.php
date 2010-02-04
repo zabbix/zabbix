@@ -27,7 +27,7 @@
  * Class containing methods for operations with events
  *
  */
-class CEvent extends CZBXAPI{
+class CAPIEvent extends CZBXAPI{
 /**
  * Get events data
  *
@@ -136,7 +136,7 @@ class CEvent extends CZBXAPI{
 			if(!is_null($options['triggerids']))
 				$tr_options['triggerids'] = $options['triggerids'];
 
-			$triggers = CTrigger::get($tr_options);
+			$triggers = API::Trigger()->get($tr_options);
 			$triggerids = zbx_objectValues($triggers, 'triggerid');
 
 			$options['triggerids'] = $triggerids;
@@ -383,7 +383,7 @@ class CEvent extends CZBXAPI{
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			$hosts = CHost::get($obj_params);
+			$hosts = API::Host()->get($obj_params);
 
 			$triggers = array();
 			foreach($hosts as $hostid => $host){
@@ -416,7 +416,7 @@ class CEvent extends CZBXAPI{
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			$triggers = CTrigger::get($obj_params);
+			$triggers = API::Trigger()->get($obj_params);
 			foreach($result as $eventid => $event){
 				if(isset($triggers[$event['objectid']])){
 					$result[$eventid]['triggers'][] = $triggers[$event['objectid']];
@@ -436,7 +436,7 @@ class CEvent extends CZBXAPI{
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			$db_items = CItem::get($obj_params);
+			$db_items = API::Item()->get($obj_params);
 			$items = array();
 
 			foreach($db_items as $itemid => $item){
@@ -530,7 +530,7 @@ class CEvent extends CZBXAPI{
 		}
 
 		if($result){
-			$result = CTrigger::update($triggers);
+			$result = API::Trigger()->update($triggers);
 		}
 
 		$result = self::EndTransaction($result, __METHOD__);

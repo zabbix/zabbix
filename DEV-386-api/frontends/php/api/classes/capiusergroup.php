@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with UserGroups.
  */
-class CUserGroup extends CZBXAPI{
+class CAPIUserGroup extends CZBXAPI{
 /**
  * Get UserGroups
  *
@@ -251,7 +251,7 @@ class CUserGroup extends CZBXAPI{
 					'get_access' => 1,
 				'preservekeys' => 1
 			);
-			$users = CUser::get($obj_params);
+			$users = API::User()->get($obj_params);
 			foreach($users as $userid => $user){
 				$uusrgrps = $user['usrgrps'];
 				unset($user['usrgrps']);
@@ -575,7 +575,7 @@ class CUserGroup extends CZBXAPI{
 			//add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER_GROUP, 'User group ['.$usrgrp['name'].']');
 		}
 
-		$users = CUser::get(array(
+		$users = API::User()->get(array(
 			'userids' => $userids,
 			'extendoutput' => 1,
 			'preservekeys' => 1));

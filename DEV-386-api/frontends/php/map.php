@@ -55,7 +55,7 @@ include_once('include/page_header.php');
 		'extendoutput' => 1
 	);
 
-	$maps = CMap::get($options);
+	$maps = API::Map()->get($options);
 
 	if(empty($maps)) access_deny();
 	else $map = reset($maps);

@@ -27,7 +27,7 @@
  * Class containing methods for operations with Applications
  *
  */
-class CApplication extends CZBXAPI{
+class CAPIApplication extends CZBXAPI{
 /**
  * Get Applications data
  *
@@ -79,7 +79,6 @@ class CApplication extends CZBXAPI{
 			'nopermissions'			=> null,
 // Filter
 			'pattern'				=> '',
-
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
 			'extendoutput'			=> null,
@@ -305,7 +304,7 @@ class CApplication extends CZBXAPI{
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			$hosts = CHost::get($obj_params);
+			$hosts = API::Host()->get($obj_params);
 			foreach($hosts as $hostid => $host){
 				$iapplications = $host['applications'];
 				unset($host['applications']);
@@ -324,7 +323,7 @@ class CApplication extends CZBXAPI{
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			$items = CItem::get($obj_params);
+			$items = API::Item()->get($obj_params);
 			foreach($items as $itemid => $item){
 				$iapplications = $item['applications'];
 				unset($item['applications']);
@@ -452,7 +451,7 @@ class CApplication extends CZBXAPI{
 			$application_db_fields = $upd_applications[$application['applicationid']];
 
 			if(!check_db_fields($application_db_fields, $application)){
-				error('Incorrect arguments pasted to function [CApplication::update]');
+				error('Incorrect arguments pasted to function [API::Application()->update]');
 				$result = false;
 				break;
 			}
@@ -563,7 +562,7 @@ class CApplication extends CZBXAPI{
 			$applicationids[] = $application['applicationid'];
 		}
 
-		$allowed_items = CItem::get(array(
+		$allowed_items = API::Item()->get(array(
 			'itemids' => zbx_objectValues($items, 'itemid'),
 			'editable' => 1,
 			'extendoutput' => 1,

@@ -27,7 +27,7 @@
  * Class containing methods for operations with Items
  *
  */
-class CItem extends CZBXAPI{
+class CAPIItem extends CZBXAPI{
 /**
  * Get items data
  *
@@ -511,7 +511,7 @@ class CItem extends CZBXAPI{
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			$hosts = CHost::get($obj_params);
+			$hosts = API::Host()->get($obj_params);
 
 			foreach($hosts as $hostid => $host){
 				$hitems = $host['items'];
@@ -521,7 +521,7 @@ class CItem extends CZBXAPI{
 				}
 			}
 
-			$templates = CTemplate::get($obj_params);
+			$templates = API::Template()->get($obj_params);
 			foreach($templates as $templateid => $template){
 				$titems = $template['items'];
 				unset($template['items']);
@@ -539,7 +539,7 @@ class CItem extends CZBXAPI{
 				'itemids' => $itemids,
 				'preservekeys' => 1
 			);
-			$triggers = CTrigger::get($obj_params);
+			$triggers = API::Trigger()->get($obj_params);
 			foreach($triggers as $triggerid => $trigger){
 				$titems = $trigger['items'];
 				unset($trigger['items']);
@@ -557,7 +557,7 @@ class CItem extends CZBXAPI{
 				'itemids' => $itemids,
 				'preservekeys' => 1
 			);
-			$graphs = CGraph::get($obj_params);
+			$graphs = API::Graph()->get($obj_params);
 			foreach($graphs as $graphid => $graph){
 				$gitems = $graph['items'];
 				unset($graph['items']);
@@ -575,7 +575,7 @@ class CItem extends CZBXAPI{
 				'itemids' => $itemids,
 				'preservekeys' => 1
 			);
-			$applications = CApplication::get($obj_params);
+			$applications = API::Application()->get($obj_params);
 			foreach($applications as $applicationid => $application){
 				$aitems = $application['items'];
 				unset($application['items']);
@@ -727,7 +727,7 @@ class CItem extends CZBXAPI{
 				break;
 			}
 
-			$host = CHost::get(array('hostids' => $item['hostid'], 'noprermissions' => 1, 'templated_hosts' => 1));
+			$host = API::Host()->get(array('hostids' => $item['hostid'], 'noprermissions' => 1, 'templated_hosts' => 1));
 			if(empty($host)){
 				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Host with HostID ['.$item['hostid'].'] does not exist');
 				$result = false;
@@ -952,7 +952,7 @@ class CItem extends CZBXAPI{
 			unset($item_db_fields['lastclock']);
 			unset($item_db_fields['prevorgvalue']);
 			if(!check_db_fields($item_db_fields, $item)){
-				error('Incorrect arguments pasted to function [CItem::update]');
+				error('Incorrect arguments pasted to function [API::Item()->update]');
 				$result = false;
 				break;
 			}

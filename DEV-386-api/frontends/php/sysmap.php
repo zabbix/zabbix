@@ -103,7 +103,7 @@ include_once('include/page_header.php');
 						'select_links'=>1
 					);
 
-					$sysmaps = CMap::get($options);
+					$sysmaps = API::Map()->get($options);
 					$db_map = reset($sysmaps);
 
 					$expandProblem = ($db_map['highlight'] > 1)? 0 : 1;
@@ -151,7 +151,7 @@ include_once('include/page_header.php');
 							'select_selements'=>1,
 							'select_links'=>1
 						);
-					$sysmaps = CMap::get($options);
+					$sysmaps = API::Map()->get($options);
 					if(empty($sysmaps)) print('alert("Access denied!");');
 
 					$selements = get_request('selements', '[]');
@@ -305,7 +305,7 @@ include_once('include/page_header.php');
 			'extendoutput' => 1,
 		);
 
-		$maps = CMap::get($options);
+		$maps = API::Map()->get($options);
 
 		if(empty($maps)) access_deny();
 		else $sysmap = reset($maps);

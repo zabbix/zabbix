@@ -346,7 +346,7 @@ include_once('include/page_header.php');
 			$options['groupids'] = $PAGE_GROUPS['selected'];
 		}
 
-		$applications = CApplication::get($options);
+		$applications = API::Application()->get($options);
 
 		$form = new CForm();
 		$form->setName('applications');

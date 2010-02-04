@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with UserMacro
  */
-class CUserMacro extends CZBXAPI{
+class CAPIUserMacro extends CZBXAPI{
 /**
  * Get UserMacros data
  *
@@ -407,7 +407,7 @@ class CUserMacro extends CZBXAPI{
 				'hostids' => $hostids,
 				'preservekeys' => 1
 			);
-			$groups = CHostgroup::get($obj_params);
+			$groups = API::HostGroup()->get($obj_params);
 			foreach($groups as $groupid => $group){
 				$ghosts = $group['hosts'];
 				unset($group['hosts']);
@@ -428,7 +428,7 @@ class CUserMacro extends CZBXAPI{
 				'hostids' => $hostids,
 				'preservekeys' => 1
 			);
-			$templates = CTemplate::get($obj_params);
+			$templates = API::Template()->get($obj_params);
 			foreach($templates as $templateid => $template){
 				$thosts = $template['hosts'];
 				unset($template['hosts']);
@@ -449,7 +449,7 @@ class CUserMacro extends CZBXAPI{
 				'hostids' => $hostids,
 				'preservekeys' => 1
 			);
-			$hosts = CHost::get($obj_params);
+			$hosts = API::Host()->get($obj_params);
 			foreach($hosts as $hostid => $host){
 				foreach($result as $macroid => $macro){
 					if($macro['hostid'] == $hostid){
@@ -585,7 +585,7 @@ class CUserMacro extends CZBXAPI{
 			$hostids[] = $macro['hostid'];
 
 			if(isset($macro['macro']) && isset($macro['value'])){
-				if(CUserMacro::validate($macro)) $new_macros[] = $macro;
+				if(API::UserMacro()->validate($macro)) $new_macros[] = $macro;
 			}
 		}
 
@@ -1119,7 +1119,7 @@ class CUserMacro extends CZBXAPI{
 			'itemids' => $options['itemid'],
 			'triggerids' => $options['triggerid']
 			);
-		$hosts = CHost::get($obj_options);
+		$hosts = API::Host()->get($obj_options);
 		$hostids = array_keys($hosts);
 
 		$hmacros = array();
@@ -1140,7 +1140,7 @@ class CUserMacro extends CZBXAPI{
 				'preservekeys' => 1,
 				'hostids' => $hostids
 				);
-			$hosts = CTemplate::get($obj_options);
+			$hosts = API::Template()->get($obj_options);
 			$hostids = array_keys($hosts);
 		}
 
