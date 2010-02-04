@@ -22,8 +22,8 @@
 		-= slow =-
 		vs
 		-= fast =-
-	1)strlen
-		if (strlen($foo) < 5) { echo "Foo is too short"; }
+	1)zbx_strlen
+		if (zbx_strlen($foo) < 5) { echo "Foo is too short"; }
 		vs
 		if (!isset($foo{5})) { echo "Foo is too short"; }
 

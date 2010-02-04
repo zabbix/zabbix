@@ -88,7 +88,7 @@ $output = '<?php
 
 		foreach($_REQUEST['langTo'] as $key => $value){
 			$value= addslashes($value);
-			$output.= "'".strtoupper($key)."'=>\t\t\t'".$value."',\n\t";
+			$output.= "'".zbx_strtoupper($key)."'=>\t\t\t'".$value."',\n\t";
 		}
 
 $output.='
