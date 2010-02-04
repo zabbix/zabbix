@@ -21,6 +21,7 @@
 <?php
 
 class czbxrpc{
+
 	public static function call($method, $params, $source){
 		
 		$notifications = array(
@@ -41,54 +42,54 @@ class czbxrpc{
 		}
 	}
 	
-	public static function auth($sessionid){
-	
-		$without_auth = array('apiinfo.version'); // list of methods which does not require athentication
+	public static function auth($method, $params, $sessionid){
+		global $USER_DETAILS;
+		
+		list($resource, $action) = explode('.', $method);
+		
+		$without_auth = array('info.version'); // list of methods which does not require athentication
 		
 		if(!str_in_array($method, $without_auth)){
 			if(($resource == 'user') && ($action == 'authenticate')){
 				$sessionid = null;
 
 				$options = array(
-							'users' => $params['user'],
-							'extendoutput' => 1,
-							'get_access' => 1
-						);
+					'users' => $params['user'],
+					'extendoutput' => 1,
+					'get_access' => 1
+				);
 				$users = API::User()->get($options);
 				$user = reset($users);
 				if($user['api_access'] != GROUP_API_ACCESS_ENABLED){
-					self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'No API access');
-					return self::$result;
+					return array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'No API access');
 				}
 			}
 
 			if(empty($sessionid) && (($resource != 'user') || ($action != 'authenticate'))){
-				self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
-				return self::$result;
+				return array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
 			}
 			else if(!empty($sessionid)){
 				if(!API::User()->checkAuthentication(array('sessionid' => $sessionid))){
-					self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
-					return self::$result;
+					return array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
 				}
 
 				$options = array(
-						'userids' => $USER_DETAILS['userid'],
-						'extendoutput' => 1,
-						'get_access' => 1
-					);
+					'userids' => $USER_DETAILS['userid'],
+					'extendoutput' => 1,
+					'get_access' => 1
+				);
 				$users = API::User()->get($options);
 				$user = reset($users);
 				if($user['api_access'] != GROUP_API_ACCESS_ENABLED){
-					self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'No API access');
-					return self::$result;
+					return array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'No API access');
 				}
 			}
 		}
+		
+		return true;
 	}
 	
 	private static function callJSON($method, $params){	
-		global $USER_DETAILS;
 		// http bla bla
 	}
 	
@@ -113,5 +114,6 @@ class czbxrpc{
 			return array('error' => $e->getCode(), 'data' => $e->getErrors(), 'trace' => $e->getTrace());
 		}		
 	}
+	
 }
 ?>

@@ -696,6 +696,10 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('ZBX_API_ERROR_NO_AUTH', 200);
 	define('ZBX_API_ERROR_NO_METHOD', 300);
 	//define('ZBX_API_ERROR_PARAMETERS', 100);
+	
+	
+	define('DATA_SOURCE_API', 'api');
+	define('DATA_SOURCE_JSON', 'json');
 
 	define('API_OUTPUT_SHORTEN', 'shorten');
 	define('API_OUTPUT_REFER', 'refer');

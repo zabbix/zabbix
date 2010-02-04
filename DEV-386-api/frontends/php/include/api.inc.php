@@ -20,9 +20,6 @@
 ?>
 <?php
 
-define('DATA_SOURCE_API', 'api');
-define('DATA_SOURCE_JSON', 'json');
-
 class CAPIObject{
 	private $name;
 	

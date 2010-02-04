@@ -47,7 +47,7 @@ function __autoload($class_name){
 		'capihostgroup' => 1,
 		'capiitem' => 1,
 		'capimaintenance' => 1,
-		'capiproxy' => null,
+		'capiproxy' => 1,
 		'capiscript' => 1,
 		'capitemplate' => 1,
 		'capitrigger' => 1,
