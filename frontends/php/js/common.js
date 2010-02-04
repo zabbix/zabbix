@@ -414,6 +414,7 @@ function get_bodywidth(){
 	else{
 		w = (w2 > w)?w2:w;
 	}
+
 return w;
 }
 

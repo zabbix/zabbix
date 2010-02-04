@@ -915,40 +915,107 @@ class CHost extends CZBXAPI{
 		$hosts = zbx_toArray($hosts);
 		$hostids = zbx_objectValues($hosts, 'hostid');
 
-
-		$options = array(
-			'hostids' => $hostids,
-			'editable' => 1,
-			'preservekeys' => 1
-		);
-		$upd_hosts = self::get($options);
-		foreach($hosts as $gnum => $host){
-			if(!isset($upd_hosts[$host['hostid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You do not have enough rights for operation');
-				return false;
+		try{
+			$options = array(
+				'hostids' => $hostids,
+				'editable' => 1,
+				'preservekeys' => 1
+			);
+			$upd_hosts = self::get($options);
+			foreach($hosts as $gnum => $host){
+				if(!isset($upd_hosts[$host['hostid']])){
+					throw new APIException(ZBX_API_ERROR_PERMISSIONS, 'You do not have enough rights for operation');
+				}
 			}
-		}
-
-		self::BeginTransaction(__METHOD__);
-
-		foreach($hosts as $num => $host){
-$th = $host;
-			$host['hosts'] = $th;
-
-			$result = self::massUpdate($host);
-			if(!$result) break;
-		}
-
-		$result = self::EndTransaction($result, __METHOD__);
-
-		if($result){
+	
+			$transaction = self::BeginTransaction(__METHOD__);
+	
+			foreach($hosts as $num => $host){
+				$tmp = $host;
+				$host['hosts'] = $tmp;
+	
+				$result = self::massUpdate($host);
+				if(!$result) throw new APIException(ZBX_API_ERROR_INTERNAL, 'Host update failed');
+			}
+	
+			$result = self::EndTransaction($result, __METHOD__);
+			
+		
 			$upd_hosts = self::get(array('hostids' => $hostids, 'extendoutput' => 1, 'nopermissions' => 1));
 			return $upd_hosts;
 		}
-		else{
-			self::setMethodErrors(__METHOD__, $errors);
+		catch(APIException $e){
+			if($transaction) self::EndTransaction(false, __METHOD__);
+
+			$error = $e->getErrors();
+			$error = reset($error);
+
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
+	}
+
+/**
+ * Add Hosts to HostGroups. All Hosts are added to all HostGroups.
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $data
+ * @param array $data['groups']
+ * @param array $data['hosts']
+ * @return boolean
+ */
+	public static function massAdd($data){
+		$errors = array();
+		$result = true;
+
+		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : null;
+		$hostids = is_null($hosts) ? array() : zbx_objectValues($hosts, 'hostid');
+
+		try{
+			$transaction = self::BeginTransaction(__METHOD__);
+	
+			if(isset($data['groups'])){
+				$options = array(
+					'groups' => zbx_toArray($data['groups']), 
+					'hosts' => zbx_toArray($data['hosts'])
+				);
+				$result = CHostGroup::massAdd($options);
+			}
+	
+			if(isset($data['templates'])){
+				$options = array(
+					'hosts' => zbx_toArray($data['hosts']), 
+					'templates' => zbx_toArray($data['templates'])
+				);
+				$result = CTemplate::massAdd($options);
+			}
+	
+			if(isset($data['macros'])){
+				$options = array(
+					'hosts' => zbx_toArray($data['hosts']), 
+					'macros' => $data['macros']
+				);
+				$result = CUserMacro::massAdd($options);
+			}
+	
+			$result = self::EndTransaction($result, __METHOD__);
+		}
+		catch(APIException $e){
+			if($transaction) self::EndTransaction(false, __METHOD__);
+
+			$error = $e->getErrors();
+			$error = reset($error);
+
+			self::setError(__METHOD__, $e->getCode(), $error);
+			return false;
+		}
+
+	return $result;
 	}
 
 /**
@@ -1272,65 +1339,14 @@ $th = $host;
 
 			$upd_hosts = self::get(array('hostids' => $hostids, 'extendoutput' => 1, 'nopermissions' => 1));
 			return $upd_hosts;
-
 		}
 		catch(APIException $e){
 			if($transaction) self::EndTransaction(false, __METHOD__);
 
 			$error = $e->getErrors();
 			$error = reset($error);
+
 			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
-	}
-
-/**
- * Add Hosts to HostGroups. All Hosts are added to all HostGroups.
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param array $data
- * @param array $data['groups']
- * @param array $data['hosts']
- * @return boolean
- */
-	public static function massAdd($data){
-		$errors = array();
-		$result = true;
-
-		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : null;
-		$hostids = is_null($hosts) ? array() : zbx_objectValues($hosts, 'hostid');
-
-		self::BeginTransaction(__METHOD__);
-
-		if(isset($data['groups'])){
-			$options = array('groups' => zbx_toArray($data['groups']), 'hosts' => zbx_toArray($data['hosts']));
-			$result = CHostGroup::massAdd($options);
-		}
-
-		if(isset($data['templates'])){
-			$options = array('hosts' => zbx_toArray($data['hosts']), 'templates' => zbx_toArray($data['templates']));
-			$result = CTemplate::massAdd($options);
-		}
-
-		if(isset($data['macros'])){
-			$options = array('hosts' => zbx_toArray($data['hosts']), 'macros' => $data['macros']);
-			$result = CUserMacro::massAdd($options);
-		}
-
-
-		$result = self::EndTransaction($result, __METHOD__);
-
-
-		if($result !== false){
-			return $result;
-		}
-		else{
-			self::setMethodErrors(__METHOD__, $errors);
 			return false;
 		}
 	}
