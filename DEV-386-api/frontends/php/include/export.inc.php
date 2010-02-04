@@ -361,11 +361,11 @@ class zbxXML{
 					'nopermissions' => 1
 				);
 
-				$itemminmaxs = CItem::get($options);
+				$itemminmaxs = API::Item()->get($options);
 				$itemminmaxs = zbx_toHash($itemminmaxs, 'itemid');
 
 
-				$hostminmaxs = CHost::get($options);
+				$hostminmaxs = API::Host()->get($options);
 				$hostminmaxs = zbx_toHash($hostminmaxs, 'hostid');
 
 				foreach($data['graphs'] as $num => $graph){
@@ -506,17 +506,17 @@ class zbxXML{
 				$host_db = self::mapXML2arr($host, XML_TAG_HOST);
 
 				if(isset($host_db['proxy_hostid'])){
-					$proxy_exists = CHost::get(array('hostids' => $host_db['proxy_hostid']));
+					$proxy_exists = API::Host()->get(array('hostids' => $host_db['proxy_hostid']));
 					if(empty($proxy_exists))
 						$host_db['proxy_hostid'] = 0;
 				}
 
 				if(!isset($host_db['status'])) $host_db['status'] = HOST_STATUS_TEMPLATE;
 				if($host_db['status'] == HOST_STATUS_TEMPLATE){
-					$current_host = CTemplate::getObjects(array('host' => $host_db['host']));
+					$current_host = API::Template()->getObjects(array('host' => $host_db['host']));
 				}
 				else{
-					$current_host = CHost::getObjects(array('host' => $host_db['host']));
+					$current_host = API::Host()->getObjects(array('host' => $host_db['host']));
 				}
 
 				$current_host = reset($current_host);
@@ -530,12 +530,12 @@ class zbxXML{
 				$groups = $xpath->query('groups/group', $host);
 				$host_groups = array();
 				if($groups->length == 0){
-					$default_group = CHostGroup::getObjects(array('name' => ZBX_DEFAULT_IMPORT_HOST_GROUP));
+					$default_group = API::HostGroup()->getObjects(array('name' => ZBX_DEFAULT_IMPORT_HOST_GROUP));
 
 					if(empty($default_group)){
-						$default_group = CHostGroup::create(array('name' => ZBX_DEFAULT_IMPORT_HOST_GROUP));
+						$default_group = API::HostGroup()->create(array('name' => ZBX_DEFAULT_IMPORT_HOST_GROUP));
 						if($default_group === false){
-							error(CHostGroup::resetErrors());
+							error(API::HostGroup()->resetErrors());
 							$result = false;
 							break;
 						}
@@ -545,7 +545,7 @@ class zbxXML{
 				else{
 					$groups_to_add = array();
 					foreach($groups as $gnum => $group){
-						$current_group = CHostGroup::getObjects(array('name' => $group->nodeValue));
+						$current_group = API::HostGroup()->getObjects(array('name' => $group->nodeValue));
 
 						if(empty($current_group)){
 							$groups_to_add[] = array('name' => $group->nodeValue);
@@ -556,9 +556,9 @@ class zbxXML{
 					}
 
 					if(!empty($groups_to_add)){
-						$new_groups = CHostGroup::create($groups_to_add);
+						$new_groups = API::HostGroup()->create($groups_to_add);
 						if($new_groups === false){
-							error(CHostGroup::resetErrors());
+							error(API::HostGroup()->resetErrors());
 							$result = false;
 							break;
 						}
@@ -589,7 +589,7 @@ class zbxXML{
 
 					$host_templates = array();
 					foreach($templates as $template){
-						$current_template = CTemplate::getObjects(array('host' => $template->nodeValue));
+						$current_template = API::Template()->getObjects(array('host' => $template->nodeValue));
 						$current_template = reset($current_template);
 
 						if(!$current_template && !isset($rules['template']['missed'])) continue; // break if update nonexist
@@ -612,13 +612,13 @@ class zbxXML{
 					$current_host = array_merge($current_host, $host_db);
 
 					if($host_db['status'] == HOST_STATUS_TEMPLATE){
-						$r = CTemplate::update($current_host);
+						$r = API::Template()->update($current_host);
 					}
 					else{
-						$r = CHost::update($current_host);
+						$r = API::Host()->update($current_host);
 					}
 					if($r === false){
-						error(CHost::resetErrors());
+						error(API::Host()->resetErrors());
 						$result = false;
 						break;
 					}
@@ -627,14 +627,14 @@ class zbxXML{
 				if(!$current_host && isset($rules['host']['missed'])){
 
 					if($host_db['status'] == HOST_STATUS_TEMPLATE){
-						$current_host = CTemplate::create($host_db);
+						$current_host = API::Template()->create($host_db);
 					}
 					else{
-						$current_host = CHost::create($host_db);
+						$current_host = API::Host()->create($host_db);
 					}
 
 					if(empty($current_host)){
-						error(CHostGroup::resetErrors());
+						error(API::HostGroup()->resetErrors());
 						$result = false;
 						break;
 					}
@@ -697,7 +697,7 @@ class zbxXML{
 
 						$item_db['hostid'] = $current_host['hostid'];
 
-						$current_item = CItem::getObjects($item_db);
+						$current_item = API::Item()->getObjects($item_db);
 						$current_item = reset($current_item);
 
 						if(!$current_item && !isset($rules['item']['missed'])) continue; // break if update nonexist
@@ -715,7 +715,7 @@ class zbxXML{
 							$application_name = $application->nodeValue;
 							$application_db = array('name' => $application_name, 'hostid' => $current_host['hostid']);
 
-							$current_application = CApplication::getObjects($application_db);
+							$current_application = API::Application()->getObjects($application_db);
 
 							if(empty($current_application)){
 								$applications_to_add = array_merge($applications_to_add, $application_db);
@@ -726,9 +726,9 @@ class zbxXML{
 						}
 
 						if(!empty($applications_to_add)){
-							$new_applications = CApplication::create($applications_to_add);
+							$new_applications = API::Application()->create($applications_to_add);
 							if($new_applications === false){
-								error(CApplication::resetErrors());
+								error(API::Application()->resetErrors());
 								$result = false;
 								break 2;
 							}
@@ -737,9 +737,9 @@ class zbxXML{
 // }}} ITEM APPLICATIONS
 
 						if($current_item && isset($rules['item']['exist'])){
-							$current_item = CItem::update($current_item);
+							$current_item = API::Item()->update($current_item);
 							if($current_item === false){
-								error(CItem::resetErrors());
+								error(API::Item()->resetErrors());
 								$result = false;
 								break;
 							}
@@ -747,17 +747,17 @@ class zbxXML{
 						if(!$current_item && isset($rules['item']['missed'])){
 							$item_db['hostid'] = $current_host['hostid'];
 
-							$current_item = CItem::create($item_db);
+							$current_item = API::Item()->create($item_db);
 							if($current_item === false){
-								error(CItem::resetErrors());
+								error(API::Item()->resetErrors());
 								$result = false;
 								break;
 							}
 						}
 
-						$r = CApplication::addItems(array('applications' => $item_applications, 'items' => $current_item));
+						$r = API::Application()->addItems(array('applications' => $item_applications, 'items' => $current_item));
 						if($r === false){
-							error(CApplication::resetErrors());
+							error(API::Application()->resetErrors());
 							$result = false;
 							break;
 						}
@@ -780,7 +780,7 @@ class zbxXML{
 						$trigger_db['expression'] = str_replace('{{HOSTNAME}:', '{'.$host_db['host'].':', $trigger_db['expression']);
 						$trigger_db['hostid'] = $current_host['hostid'];
 
-						$current_trigger = CTrigger::getObjects($trigger_db);
+						$current_trigger = API::Trigger()->getObjects($trigger_db);
 						$current_trigger = reset($current_trigger);
 
 
@@ -800,17 +800,17 @@ class zbxXML{
 					}
 
 					if(!empty($triggers_to_add)){
-						$added_triggers = CTrigger::create($triggers_to_add);
+						$added_triggers = API::Trigger()->create($triggers_to_add);
 						if($added_triggers === false){
-							error(CTrigger::resetErrors());
+							error(API::Trigger()->resetErrors());
 							$result = false;
 							break;
 						}
 					}
 					if(!empty($triggers_to_upd)){
-						$r = CTrigger::update($triggers_to_upd);
+						$r = API::Trigger()->update($triggers_to_upd);
 						if($r === false){
-							error(CTrigger::resetErrors());
+							error(API::Trigger()->resetErrors());
 							$result = false;
 							break;
 						}
@@ -831,7 +831,7 @@ class zbxXML{
 						$graph_db = self::mapXML2arr($graph, XML_TAG_GRAPH);
 						$graph_db['hostid'] = $current_host['hostid'];
 
-						$current_graph = CGraph::getObjects($graph_db);
+						$current_graph = API::Graph()->getObjects($graph_db);
 						$current_graph = reset($current_graph);
 
 						if(!$current_graph && !isset($rules['graph']['missed'])) continue; // break if update nonexist
@@ -871,7 +871,7 @@ class zbxXML{
 							}
 						}
 						if($current_graph){ // if exists, delete graph to add then new
-							CGraph::delete($current_graph);
+							API::Graph()->delete($current_graph);
 						}
 // GRAPH ITEMS {{{
 						$xpath = new DOMXPath($xml);
@@ -887,8 +887,8 @@ class zbxXML{
 								$gitem_host = $host_db['host'];
 							}
 
-							$gitem_hostid = CHost::getObjects(array('host' => $gitem_host));
-							$gitem_templateid = CTemplate::getObjects(array('host' => $gitem_host));
+							$gitem_hostid = API::Host()->getObjects(array('host' => $gitem_host));
+							$gitem_templateid = API::Template()->getObjects(array('host' => $gitem_host));
 							$gitem_hostid = array_merge($gitem_hostid, $gitem_templateid);
 
 							if(!empty($gitem_hostid)){
@@ -898,7 +898,7 @@ class zbxXML{
 								$gitem_db['hostid'] = $gitem_hostid['hostid'];
 								$gitem_db['key_'] = implode(':', $data);
 
-								$current_gitem = CItem::getObjects($gitem_db);
+								$current_gitem = API::Item()->getObjects($gitem_db);
 								$current_gitem = reset($current_gitem);
 								if($current_gitem){ // if item exists, add graph item to graph
 									$gitem_db['itemid'] = $current_gitem['itemid'];
@@ -909,9 +909,9 @@ class zbxXML{
 
 						$graphs_to_add[] = $graph_db;
 					}
-					$r = CGraph::create($graphs_to_add);
+					$r = API::Graph()->create($graphs_to_add);
 					if($r === false){
-						error(CGraph::resetErrors());
+						error(API::Graph()->resetErrors());
 						$result = false;
 						break;
 					}

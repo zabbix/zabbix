@@ -48,7 +48,7 @@ function make_favorite_graphs(){
 			'select_hosts' => 1,
 			'extendoutput' => 1
 		);
-	$graphs = CGraph::get($options);
+	$graphs = API::Graph()->get($options);
 	$graphs = zbx_toHash($graphs, 'graphid');
 
 	$options = array(
@@ -56,7 +56,7 @@ function make_favorite_graphs(){
 			'select_hosts' => 1,
 			'extendoutput' => 1
 		);
-	$items = CItem::get($options);
+	$items = API::Item()->get($options);
 	$items = zbx_toHash($items, 'itemid');
 
 	foreach($fav_graphs as $key => $favorite){
@@ -126,7 +126,7 @@ function make_favorite_screens(){
 		'screenids' => $screenids,
 		'extendoutput' => 1
 	);
-	$screens = CScreen::get($options);
+	$screens = API::Screen()->get($options);
 	$screens = zbx_toHash($screens, 'screenid');
 
 	foreach($fav_screens as $key => $favorite){
@@ -190,7 +190,7 @@ function make_favorite_maps(){
 			'sysmapids' => $sysmapids,
 			'extendoutput' => 1
 		);
-	$sysmaps = CMap::get($options);
+	$sysmaps = API::Map()->get($options);
 
 	foreach($sysmaps as $snum => $sysmap){
 		$sysmapid = $sysmap['sysmapid'];
@@ -245,7 +245,7 @@ function make_system_summary(){
 		'select_hosts' => 1,
 		'extendoutput' => 1
 	);
-	$groups = CHostGroup::get($options);
+	$groups = API::HostGroup()->get($options);
 
 	$groups = zbx_toHash($groups, 'groupid');
 
@@ -273,7 +273,7 @@ function make_system_summary(){
 		'extendoutput' => 1,
 		'only_problems' => 1
 	);
-	$triggers = CTrigger::get($options);
+	$triggers = API::Trigger()->get($options);
 	order_result($triggers, 'lastchange', ZBX_SORT_DOWN);
 
 	foreach($triggers as $tnum => $trigger){
@@ -333,7 +333,7 @@ function make_system_summary(){
 						'sortfield' => 'eventid',
 						'sortorder' => ZBX_SORT_DOWN
 					);
-					$event = CEvent::get($options);
+					$event = API::Event()->get($options);
 					$event = reset($event);
 
 					$actions = S_NO_DATA_SMALL;
@@ -401,7 +401,7 @@ function make_hoststat_summary(){
 		'with_monitored_triggers' => 1,
 		'output' => API_OUTPUT_EXTEND
 	);
-	$groups = CHostGroup::get($options);
+	$groups = API::HostGroup()->get($options);
 
 	order_result($groups, 'name');
 // }}} SELECT HOST GROUPS
@@ -414,7 +414,7 @@ function make_hoststat_summary(){
 		'monitored_hosts' => 1,
 		'with_monitored_triggers' => 1
 	);
-	$hosts = CHost::get($options);
+	$hosts = API::Host()->get($options);
 // }}} SELECT HOSTS
 
 // SELECT TRIGGERS {{{
@@ -426,7 +426,7 @@ function make_hoststat_summary(){
 		'select_hosts' => API_OUTPUT_REFER,
 		'only_problems' => 1,
 	);
-	$triggers = CTrigger::get($options);
+	$triggers = API::Trigger()->get($options);
 // }}} SELECT TRIGGERS
 
 	foreach($groups as $gnum => $group){
@@ -652,7 +652,7 @@ function make_latest_issues($params = array()){
 	if(isset($params['hostid']) && ($params['hostid'] > 0))
 		$options['hostids'] = $params['hostid'];
 
-	$triggers = CTrigger::get($options);
+	$triggers = API::Trigger()->get($options);
 
 // GATHER HOSTS FOR SELECTED TRIGGERS {{{
 	$triggers_hosts = array();
@@ -663,7 +663,7 @@ function make_latest_issues($params = array()){
 	$triggers_hostids = array_keys($triggers_hosts);
 // }}} GATHER HOSTS FOR SELECTED TRIGGERS
 
-	$scripts_by_hosts = Cscript::getScriptsByHosts($triggers_hostids);
+	$scripts_by_hosts = API::Script()->getScriptsByHosts($triggers_hostids);
 
 	$table  = new CTableInfo();
 	$table->setHeader(array(
@@ -970,7 +970,7 @@ function make_graph_submenu(){
 			'select_hosts' => 1,
 			'extendoutput' => 1
 		);
-	$graphs = CGraph::get($options);
+	$graphs = API::Graph()->get($options);
 	$graphs = zbx_toHash($graphs, 'graphid');
 
 	$options = array(
@@ -979,7 +979,7 @@ function make_graph_submenu(){
 			'select_hosts' => 1,
 			'extendoutput' => 1
 		);
-	$items = CItem::get($options);
+	$items = API::Item()->get($options);
 	$items = zbx_toHash($items, 'itemid');
 
 	foreach($fav_graphs as $key => $favorite){
@@ -1074,7 +1074,7 @@ function make_sysmap_submenu(){
 			'nopermissions' => 1,
 			'extendoutput' => 1
 		);
-	$sysmaps = CMap::get($options);
+	$sysmaps = API::Map()->get($options);
 
 	foreach($sysmaps as $snum => $sysmap){
 		$maps[] = array(

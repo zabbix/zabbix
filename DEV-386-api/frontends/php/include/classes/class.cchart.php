@@ -457,7 +457,7 @@ class CChart extends CGraphDraw{
 
 				if($fnc_cnt['cnt'] != 1) continue;
 
-				CUserMacro::resolveTrigger($trigger);
+				API::UserMacro()->resolveTrigger($trigger);
 //SDII($trigger);
 				if(!preg_match('/\{([0-9]{1,})\}([\<\>\=]{1})([0-9\.]{1,})([K|M|G]{0,1})/i', $trigger['expression'], $arr)) continue;
 

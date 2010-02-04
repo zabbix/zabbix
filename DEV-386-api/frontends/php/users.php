@@ -163,13 +163,13 @@ include_once('include/page_header.php');
 				$user['userid'] = $_REQUEST['userid'];
 
 				DBstart();
-				$result = CUser::update($user);
+				$result = API::User()->update($user);
 				if(!$result)
-					error(CUser::resetErrors());
-				// if($result)	$result = CUserGroup::updateUsers(array('users' => $user, 'usrgrps' => $usrgrps));
+					error(API::User()->resetErrors());
+				// if($result)	$result = API::UserGroup()->updateUsers(array('users' => $user, 'usrgrps' => $usrgrps));
 				// if($result === false)
-					// error(CUserGroup::resetErrors());
-				if($result !== false) $result = CUser::updateMedia(array('users' => $user, 'medias' => $user['user_medias']));
+					// error(API::UserGroup()->resetErrors());
+				if($result !== false) $result = API::User()->updateMedia(array('users' => $user, 'medias' => $user['user_medias']));
 				$result = ($result === false) ? false : true;
 				$result = DBend($result);
 
@@ -179,12 +179,12 @@ include_once('include/page_header.php');
 				$action = AUDIT_ACTION_ADD;
 
 				DBstart();
-				$result = CUser::create($user);
+				$result = API::User()->create($user);
 				if(!$result)
-					error(CUser::resetErrors());
-				// if($result) $result = CUserGroup::updateUsers(array('users' => $result, 'usrgrps' => $usrgrps));
+					error(API::User()->resetErrors());
+				// if($result) $result = API::UserGroup()->updateUsers(array('users' => $result, 'usrgrps' => $usrgrps));
 				// if($result === false)
-					// error(CUserGroup::resetErrors());
+					// error(API::UserGroup()->resetErrors());
 				$result = ($result === false) ? false : true;
 				$result = DBend($result);
 
@@ -213,11 +213,11 @@ include_once('include/page_header.php');
 
 	}
 	else if(isset($_REQUEST['delete'])&&isset($_REQUEST['userid'])){
-		$users = CUser::get(array('userids' => $_REQUEST['userid'],  'extendoutput' => 1));
+		$users = API::User()->get(array('userids' => $_REQUEST['userid'],  'extendoutput' => 1));
 		$user = reset($users);
 
-		$result = CUser::delete($users);
-		if(!$result) error(CUser::resetErrors());
+		$result = API::User()->delete($users);
+		if(!$result) error(API::User()->resetErrors());
 
 		show_messages($result, S_USER_DELETED, S_CANNOT_DELETE_USER);
 		if($result){
@@ -229,10 +229,10 @@ include_once('include/page_header.php');
 	}
 // Add USER to GROUP
 	else if(isset($_REQUEST['grpaction'])&&isset($_REQUEST['usrgrpid'])&&isset($_REQUEST['userid'])&&($_REQUEST['grpaction']==1)){
-		$user = CUser::get(array('userids'=>$_REQUEST['userid'],'extendoutput'=>1));
+		$user = API::User()->get(array('userids'=>$_REQUEST['userid'],'extendoutput'=>1));
 		$user = reset($user);
 
-		$group = CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'],  'extendoutput' => 1));
+		$group = API::UserGroup()->get(array('usrgrpids' => $_REQUEST['usrgrpid'],  'extendoutput' => 1));
 		$group = reset($group);
 
 		DBstart();
@@ -252,10 +252,10 @@ include_once('include/page_header.php');
 	}
 // Remove USER from GROUP
 	else if(isset($_REQUEST['grpaction'])&&isset($_REQUEST['usrgrpid'])&&isset($_REQUEST['userid'])&&($_REQUEST['grpaction']==0)){
-		$user = CUser::get(array('userids'=>$_REQUEST['userid'],'extendoutput'=>1));
+		$user = API::User()->get(array('userids'=>$_REQUEST['userid'],'extendoutput'=>1));
 		$user = reset($user);
 
-		$group = CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'],  'extendoutput' => 1));
+		$group = API::UserGroup()->get(array('usrgrpids' => $_REQUEST['usrgrpid'],  'extendoutput' => 1));
 		$group = reset($group);
 
 		DBstart();
@@ -286,7 +286,7 @@ include_once('include/page_header.php');
 		if($go_result){
 			$options = array('userids'=>$group_userid,
 							'extendoutput' => 1);
-			$users = CUser::get($options);
+			$users = API::User()->get($options);
 			foreach($users as $unum => $user){
 				info('User '.$user['alias'].' unblocked');
 				add_audit(AUDIT_ACTION_UPDATE,	AUDIT_RESOURCE_USER,
@@ -300,7 +300,7 @@ include_once('include/page_header.php');
 		$go_result = false;
 
 		$group_userid = get_request('group_userid', array());
-		$db_users = CUser::get(array('userids' => $group_userid, 'extendoutput' => 1));
+		$db_users = API::User()->get(array('userids' => $group_userid, 'extendoutput' => 1));
 		$db_users = zbx_toHash($db_users, 'userid');
 
 		DBstart();
@@ -308,8 +308,8 @@ include_once('include/page_header.php');
 			if(!isset($db_users[$userid])) continue;
 			$user_data = $db_users[$userid];
 
-			$go_result |= (bool) CUser::delete($user_data);
-			if(!$go_result) error(CUser::resetErrors());
+			$go_result |= (bool) API::User()->delete($user_data);
+			if(!$go_result) error(API::User()->resetErrors());
 
 			if($go_result){
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER,
@@ -358,7 +358,7 @@ include_once('include/page_header.php');
 			'extendoutput' => 1,
 			'sortfield' => 'name'
 		);
-		$usrgrps = CUserGroup::get($options);
+		$usrgrps = API::UserGroup()->get($options);
 		foreach($usrgrps as $ugnum => $usrgrp){
 			$cmbUGrp->addItem($usrgrp['usrgrpid'], $usrgrp['name']);
 		}
@@ -382,7 +382,7 @@ include_once('include/page_header.php');
 			$options['usrgrpids'] = $_REQUEST['filter_usrgrpid'];
 		}
 
-		$users = CUser::get($options);
+		$users = API::User()->get($options);
 
 		$form = new CForm(null,'post');
 		$form->setName('users');

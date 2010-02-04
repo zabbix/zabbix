@@ -23,106 +23,6 @@
 define('DATA_SOURCE_API', 'api');
 define('DATA_SOURCE_JSON', 'json');
 
-class APICaller{
-	
-	public static function call($method, $params, $source){
-		
-		$notifications = array(
-			'apiinfo.version' => 1
-		);
-		
-		if(is_null($params) && !isset($notifications[$method])){
-			return array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Resource ('.$resource.') does not exist');
-		}
-
-		switch($source){
-			case DATA_SOURCE_API:
-				return self::callAPI($method, $params);
-			break;
-			case DATA_SOURCE_JSON:
-				return self::callJSON($method, $params);
-			break;
-		}
-	}
-	
-	public static function auth($sessionid){
-	
-		$without_auth = array('apiinfo.version'); // list of methods which does not require athentication
-		
-// Authentication {{{
-		if(!str_in_array($method, $without_auth)){
-			if(($resource == 'user') && ($action == 'authenticate')){
-				$sessionid = null;
-
-				$options = array(
-							'users' => $params['user'],
-							'extendoutput' => 1,
-							'get_access' => 1
-						);
-				$users = CUser::get($options);
-				$user = reset($users);
-				if($user['api_access'] != GROUP_API_ACCESS_ENABLED){
-					self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'No API access');
-					return self::$result;
-				}
-			}
-
-			if(empty($sessionid) && (($resource != 'user') || ($action != 'authenticate'))){
-				self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
-				return self::$result;
-			}
-			else if(!empty($sessionid)){
-				if(!CUser::checkAuthentication(array('sessionid' => $sessionid))){
-					self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
-					return self::$result;
-				}
-
-				$options = array(
-						'userids' => $USER_DETAILS['userid'],
-						'extendoutput' => 1,
-						'get_access' => 1
-					);
-				$users = CUser::get($options);
-				$user = reset($users);
-				if($user['api_access'] != GROUP_API_ACCESS_ENABLED){
-					self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'No API access');
-					return self::$result;
-				}
-			}
-		}
-// }}} Authentication
-
-	}
-	
-	private static function callJSON($method, $params){	
-		global $USER_DETAILS;
-		// http bla bla
-	}
-	
-	private static function callAPI($method, $params){
-	
-		list($resource, $action) = explode('.', $method);
-		
-		$class_name = 'CAPI'.$resource;
-		
-		if(!class_exists($class_name)){
-			return array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Resource ('.$resource.') does not exist');
-		}
-
-		if(!method_exists($class_name, $action)){
-			return array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Action ('.$action.') does not exist');
-		}
-
-		try{
-			$result = call_user_func(array($class_name, $action), $params);
-			return array('result' => $result);
-		}
-		catch(APIException $e){
-			return array('error' => $e->getCode(), 'data' => $e->getErrors(), 'trace' => $e->getTrace());
-		}		
-	}
-}
-
 class CAPIObject{
 	private $name;
 	
@@ -131,7 +31,7 @@ class CAPIObject{
 	}
 	
 	public function __call($method, $params){
-		$result = APICaller::call($this->name.$method, $params, DATA_SOURCE_API);
+		$result = czbxrpc::call($this->name.'.'.$method, $params[0], DATA_SOURCE_API);
 		if(isset($result['result'])) return $result['result'];
 		else{
 			$errors = zbx_toArray($result['data']);

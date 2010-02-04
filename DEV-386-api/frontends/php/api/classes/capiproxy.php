@@ -278,7 +278,7 @@ class CAPIProxy extends CZBXAPI{
 		$result = false;
 
 // PERMISSIONS {{{
-		$upd_groups = CHostGroup::get(array(
+		$upd_groups = API::HostGroup()->get(array(
 			'groupids' => $groupids,
 			'editable' => 1,
 			'preservekeys' => 1));
@@ -369,7 +369,7 @@ class CAPIProxy extends CZBXAPI{
 			if(isset($host['macros']) && !is_null($host['macros']))
 				$options['macros'] = $host['macros'];
 
-			$result &= CHost::massAdd($options);
+			$result &= API::Host()->massAdd($options);
 
 		}
 
@@ -563,7 +563,7 @@ class CAPIProxy extends CZBXAPI{
 
 // UPDATE HOSTGROUPS LINKAGE {{{
 			if(isset($data['groups']) && !is_null($data['groups'])){
-				$host_groups = CHostGroup::get(array('hostids' => $hostids));
+				$host_groups = API::HostGroup()->get(array('hostids' => $hostids));
 				$host_groupids = zbx_objectValues($host_groups, 'groupid');
 				$new_groupids = zbx_objectValues($data['groups'], 'groupid');
 
@@ -603,7 +603,7 @@ class CAPIProxy extends CZBXAPI{
 
 // UPDATE TEMPLATE LINKAGE {{{
 			if(isset($data['templates']) && !is_null($data['templates'])){
-				$host_templates = CTemplate::get(array('hostids' => $hostids));
+				$host_templates = API::Template()->get(array('hostids' => $hostids));
 				$host_templateids = zbx_objectValues($host_templates, 'templateid');
 				$new_templateids = zbx_objectValues($data['templates'], 'templateid');
 
@@ -629,7 +629,7 @@ class CAPIProxy extends CZBXAPI{
 // UPDATE MACROS {{{
 
 			if(isset($data['macros']) && !is_null($data['macros'])){
-				$host_macros = CUserMacro::get(array('hostids' => $hostids, 'extendoutput' => 1));
+				$host_macros = API::UserMacro()->get(array('hostids' => $hostids, 'extendoutput' => 1));
 
 				$result = self::massAdd(array('hosts' => $hosts, 'macros' => $data['macros']));
 				if(!$result){
@@ -700,17 +700,17 @@ class CAPIProxy extends CZBXAPI{
 
 		if(isset($data['groups'])){
 			$options = array('groups' => zbx_toArray($data['groups']), 'hosts' => zbx_toArray($data['hosts']));
-			$result = CHostGroup::massAdd($options);
+			$result = API::HostGroup()->massAdd($options);
 		}
 
 		if(isset($data['templates'])){
 			$options = array('hosts' => zbx_toArray($data['hosts']), 'templates' => zbx_toArray($data['templates']));
-			$result = CTemplate::massAdd($options);
+			$result = API::Template()->massAdd($options);
 		}
 
 		if(isset($data['macros'])){
 			$options = array('hosts' => zbx_toArray($data['hosts']), 'macros' => $data['macros']);
-			$result = CUserMacro::massAdd($options);
+			$result = API::UserMacro()->massAdd($options);
 		}
 
 
@@ -751,17 +751,17 @@ class CAPIProxy extends CZBXAPI{
 
 		if(isset($data['groups'])){
 			$options = array('groups' => zbx_toArray($data['groups']), 'hosts' => zbx_toArray($data['hosts']));
-			$result = CHostGroup::massRemove($options);
+			$result = API::HostGroup()->massRemove($options);
 		}
 
 		if(isset($data['templates'])){
 			$options = array('hosts' => zbx_toArray($data['hosts']), 'templates' => zbx_toArray($data['templates']));
-			$result = CTemplate::massRemove($options);
+			$result = API::Template()->massRemove($options);
 		}
 
 		if(isset($data['macros'])){
 			$options = array('hosts' => zbx_toArray($data['hosts']), 'macros' => $data['macros']);
-			$result = CUserMacro::massRemove($options);
+			$result = API::UserMacro()->massRemove($options);
 		}
 
 

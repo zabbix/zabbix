@@ -513,7 +513,7 @@ class CAPIHost extends CZBXAPI{
 					'hostids' => $hostids,
 					'preservekeys' => 1
 				);
-			$groups = CHostgroup::get($obj_params);
+			$groups = API::HostGroup()->get($obj_params);
 			foreach($groups as $groupid => $group){
 				$ghosts = $group['hosts'];
 				unset($group['hosts']);
@@ -549,7 +549,7 @@ class CAPIHost extends CZBXAPI{
 				'hostids' => $hostids,
 				'preservekeys' => 1
 			);
-			$templates = CTemplate::get($obj_params);
+			$templates = API::Template()->get($obj_params);
 			foreach($templates as $templateid => $template){
 				$thosts = $template['hosts'];
 				unset($template['hosts']);
@@ -568,7 +568,7 @@ class CAPIHost extends CZBXAPI{
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			$items = CItem::get($obj_params);
+			$items = API::Item()->get($obj_params);
 			foreach($items as $itemid => $item){
 				$ihosts = $item['hosts'];
 				unset($item['hosts']);
@@ -587,7 +587,7 @@ class CAPIHost extends CZBXAPI{
 				'preservekeys' => 1
 			);
 
-			$triggers = CTrigger::get($obj_params);
+			$triggers = API::Trigger()->get($obj_params);
 			foreach($triggers as $triggerid => $trigger){
 				$thosts = $trigger['hosts'];
 				unset($trigger['hosts']);
@@ -606,7 +606,7 @@ class CAPIHost extends CZBXAPI{
 				'preservekeys' => 1
 			);
 
-			$graphs = CGraph::get($obj_params);
+			$graphs = API::Graph()->get($obj_params);
 			foreach($graphs as $graphid => $graph){
 				$ghosts = $graph['hosts'];
 				unset($graph['hosts']);
@@ -624,7 +624,7 @@ class CAPIHost extends CZBXAPI{
 				'hostids' => $hostids,
 				'preservekeys' => 1
 			);
-			$applications = CApplication::get($obj_params);
+			$applications = API::Application()->get($obj_params);
 			foreach($applications as $applicationid => $application){
 				$ahosts = $application['hosts'];
 				unset($application['hosts']);
@@ -643,7 +643,7 @@ class CAPIHost extends CZBXAPI{
 				'preservekeys' => 1
 			);
 
-			$macros = CUserMacro::get($obj_params);
+			$macros = API::UserMacro()->get($obj_params);
 			foreach($macros as $macroid => $macro){
 				$mhosts = $macro['hosts'];
 				unset($macro['hosts']);
@@ -750,7 +750,7 @@ class CAPIHost extends CZBXAPI{
 
 
 // PERMISSIONS {{{
-		$upd_groups = CHostGroup::get(array(
+		$upd_groups = API::HostGroup()->get(array(
 			'groupids' => $groupids,
 			'editable' => 1,
 			'preservekeys' => 1));
@@ -805,7 +805,7 @@ class CAPIHost extends CZBXAPI{
 				break;
 			}
 
-			$host_exists = CTemplate::getObjects(array('host' => $host['host']));
+			$host_exists = API::Template()->getObjects(array('host' => $host['host']));
 			if(!empty($host_exists)){
 				$result = false;
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_TEMPLATE.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
@@ -847,7 +847,7 @@ class CAPIHost extends CZBXAPI{
 			if(isset($host['macros']) && !is_null($host['macros']))
 				$options['macros'] = $host['macros'];
 
-			$result &= CHost::massAdd($options);
+			$result &= API::Host()->massAdd($options);
 
 			if(isset($host['profile'])){
 				$fields = array_keys($host['profile']);
@@ -1026,7 +1026,7 @@ $th = $host;
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 				
-				$host_exists = CTemplate::getObjects(array('host' => $host['host']));
+				$host_exists = API::Template()->getObjects(array('host' => $host['host']));
 				if(!empty($host_exists)){
 					$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
@@ -1067,7 +1067,7 @@ $th = $host;
 
 // UPDATE HOSTGROUPS LINKAGE {{{
 			if(isset($data['groups']) && !is_null($data['groups'])){
-				$host_groups = CHostGroup::get(array('hostids' => $hostids));
+				$host_groups = API::HostGroup()->get(array('hostids' => $hostids));
 				$host_groupids = zbx_objectValues($host_groups, 'groupid');
 				$new_groupids = zbx_objectValues($data['groups'], 'groupid');
 
@@ -1107,7 +1107,7 @@ $th = $host;
 
 // UPDATE TEMPLATE LINKAGE {{{
 			if(isset($data['templates']) && !is_null($data['templates'])){
-				$host_templates = CTemplate::get(array('hostids' => $hostids));
+				$host_templates = API::Template()->get(array('hostids' => $hostids));
 				$host_templateids = zbx_objectValues($host_templates, 'templateid');
 				$new_templateids = zbx_objectValues($data['templates'], 'templateid');
 
@@ -1132,7 +1132,7 @@ $th = $host;
 
 // UPDATE MACROS {{{
 			if(isset($data['macros']) && !is_null($data['macros'])){
-				$host_macros = CUserMacro::get(array('hostids' => $hostids, 'extendoutput' => 1));
+				$host_macros = API::UserMacro()->get(array('hostids' => $hostids, 'extendoutput' => 1));
 
 				$macros_to_del = array();
 				foreach($host_macros as $hmacro){
@@ -1154,7 +1154,7 @@ $th = $host;
 					}
 				}
 
-				$result = CUsermacro::massUpdate(array('hosts' => $hosts, 'macros' => $data['macros']));
+				$result = API::UserMacro()->massUpdate(array('hosts' => $hosts, 'macros' => $data['macros']));
 				if(!$result){
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cannot update macro');
 				}
@@ -1310,17 +1310,17 @@ $th = $host;
 
 		if(isset($data['groups'])){
 			$options = array('groups' => zbx_toArray($data['groups']), 'hosts' => zbx_toArray($data['hosts']));
-			$result = CHostGroup::massAdd($options);
+			$result = API::HostGroup()->massAdd($options);
 		}
 
 		if(isset($data['templates'])){
 			$options = array('hosts' => zbx_toArray($data['hosts']), 'templates' => zbx_toArray($data['templates']));
-			$result = CTemplate::massAdd($options);
+			$result = API::Template()->massAdd($options);
 		}
 
 		if(isset($data['macros'])){
 			$options = array('hosts' => zbx_toArray($data['hosts']), 'macros' => $data['macros']);
-			$result = CUserMacro::massAdd($options);
+			$result = API::UserMacro()->massAdd($options);
 		}
 
 
@@ -1361,17 +1361,17 @@ $th = $host;
 
 		if(isset($data['groups'])){
 			$options = array('groups' => zbx_toArray($data['groups']), 'hosts' => zbx_toArray($data['hosts']));
-			$result = CHostGroup::massRemove($options);
+			$result = API::HostGroup()->massRemove($options);
 		}
 
 		if(isset($data['templates'])){
 			$options = array('hosts' => zbx_toArray($data['hosts']), 'templates' => zbx_toArray($data['templates']));
-			$result = CTemplate::massRemove($options);
+			$result = API::Template()->massRemove($options);
 		}
 
 		if(isset($data['macros'])){
 			$options = array('hosts' => zbx_toArray($data['hosts']), 'macros' => $data['macros']);
-			$result = CUserMacro::massRemove($options);
+			$result = API::UserMacro()->massRemove($options);
 		}
 
 

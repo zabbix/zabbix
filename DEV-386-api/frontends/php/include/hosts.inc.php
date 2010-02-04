@@ -32,7 +32,7 @@ require_once('include/httptest.inc.php');
 				'editable'=>1,
 				'preservekeys' => 1
 			);
-		$grp_hosts = CHost::get($options);
+		$grp_hosts = API::Host()->get($options);
 		$grp_hostids = zbx_objectValues($grp_hosts, 'hostid');
 
 // unlinked hosts
@@ -56,7 +56,7 @@ require_once('include/httptest.inc.php');
 				'hosts' => $hosts,
 				'groups' => array('groupid' => $groupid)
 			);
-		$result = CHostGroup::createHosts();
+		$result = API::HostGroup()->createHosts();
 
 	return $result;
 	}
@@ -70,7 +70,7 @@ require_once('include/httptest.inc.php');
 		}
 		DBexecute('DELETE FROM hosts_groups WHERE hostid='.$hostid);
 		foreach($groups as $groupid){
-			$result = CHostGroup::createHosts(array('hosts' => array($hostid), 'groups' => $groupid));
+			$result = API::HostGroup()->createHosts(array('hosts' => array($hostid), 'groups' => $groupid));
 		}
 	return $result;
 	}
@@ -85,9 +85,9 @@ require_once('include/httptest.inc.php');
 	}
 
 	function add_host_group($name, $hosts=array()){
-		$group = CHostGroup::create(array('name' => $name));
+		$group = API::HostGroup()->create(array('name' => $name));
 		if(!$group){
-			error(CHostgroup::resetErrors());
+			error(API::HostGroup()->resetErrors());
 			return false;
 		}
 
@@ -107,10 +107,10 @@ require_once('include/httptest.inc.php');
 		$hostgroup_old = get_hostgroup_by_groupid($groupid);
 
 		$options = array(array('name' => $name, 'groupid' => $groupid));
-		$result = CHostGroup::update($options);
+		$result = API::HostGroup()->update($options);
 
 		if(!$result){
-			error(CHostGroup::resetErrors());
+			error(API::HostGroup()->resetErrors());
 			return $result;
 		}
 
@@ -284,7 +284,7 @@ require_once('include/httptest.inc.php');
 			info('Added new host ['.$host.']');
 
 		if(!zbx_empty($newgroup)){
-			$newgroup = CHostGroup::create(array('name' => $newgroup));
+			$newgroup = API::HostGroup()->create(array('name' => $newgroup));
 
 			if($newgroup !== false) $newgroup = reset($newgroup);
 			else return false;
@@ -324,7 +324,7 @@ require_once('include/httptest.inc.php');
 			}
 		}
 //permisssion problems
-//		if(!CHostGroup::createHosts(array('hosts' => $hosts, 'groups' => $groups))) return false;
+//		if(!API::HostGroup()->createHosts(array('hosts' => $hosts, 'groups' => $groups))) return false;
 //----------
 
 
@@ -378,8 +378,8 @@ require_once('include/httptest.inc.php');
 			return $result;
 
 		if(!zbx_empty($newgroup)){
-			if(!$newgroup = CHostGroup::create(array('name' => $newgroup))){
-				error(CHostGroup::resetErrors());
+			if(!$newgroup = API::HostGroup()->create(array('name' => $newgroup))){
+				error(API::HostGroup()->resetErrors());
 				return false;
 			}
 			$groups = array_merge($groups, $newgroup);
@@ -388,10 +388,10 @@ require_once('include/httptest.inc.php');
 		$hosts = array('hostid' => $hostid);
 
 		$groups = zbx_toObject($groups, 'groupid');
-		$result = CHostGroup::massUpdate(array('hosts' => $hosts, 'groups' => $groups));
+		$result = API::HostGroup()->massUpdate(array('hosts' => $hosts, 'groups' => $groups));
 
 		if(!$result){
-			error(CHostGroup::resetErrors());
+			error(API::HostGroup()->resetErrors());
 			return false;
 		}
 

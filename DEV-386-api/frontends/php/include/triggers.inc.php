@@ -1100,7 +1100,7 @@ return $result;
 
 					if($resolve_macro){
 						$function_data['expression'] = $macros;
-						CUserMacro::resolveTrigger($function_data);
+						API::UserMacro()->resolveTrigger($function_data);
 						$macros = $function_data['expression'];
 					}
 
@@ -1128,10 +1128,10 @@ return $result;
 
 					if($resolve_macro){
 						$trigger = $function_data;
-						CUserMacro::resolveItem($function_data);
+						API::UserMacro()->resolveItem($function_data);
 
 						$function_data['expression'] = $function_data['parameter'];
-						CUserMacro::resolveTrigger($function_data);
+						API::UserMacro()->resolveTrigger($function_data);
 						$function_data['parameter'] = $function_data['expression'];
 					}
 
@@ -3170,7 +3170,7 @@ return $result;
 			if(is_array($result['value_type'])){
 				$value_type = null;
 
-				$item_data = CItem::get(array('extendoutput'=>1, 'itemids'=>$item_id));
+				$item_data = API::Item()->get(array('extendoutput'=>1, 'itemids'=>$item_id));
 
 				if($item_data = reset($item_data)){
 					$value_type = $item_data['value_type'];

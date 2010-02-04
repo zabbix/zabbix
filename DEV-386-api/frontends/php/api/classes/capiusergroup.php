@@ -251,7 +251,7 @@ class CAPIUserGroup extends CZBXAPI{
 					'get_access' => 1,
 				'preservekeys' => 1
 			);
-			$users = CUser::get($obj_params);
+			$users = API::User()->get($obj_params);
 			foreach($users as $userid => $user){
 				$uusrgrps = $user['usrgrps'];
 				unset($user['usrgrps']);
@@ -575,7 +575,7 @@ class CAPIUserGroup extends CZBXAPI{
 			//add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER_GROUP, 'User group ['.$usrgrp['name'].']');
 		}
 
-		$users = CUser::get(array(
+		$users = API::User()->get(array(
 			'userids' => $userids,
 			'extendoutput' => 1,
 			'preservekeys' => 1));

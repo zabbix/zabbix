@@ -527,7 +527,7 @@ class CAPIAction extends CZBXAPI{
 
 			self::EndTransaction(true, __METHOD__);
 			
-			$new_actions = CAction::get(array('actionids'=>$actionids, 'extendoutput'=>1, 'nopermissions'=>1));
+			$new_actions = API::Action()->get(array('actionids'=>$actionids, 'extendoutput'=>1, 'nopermissions'=>1));
 			return $new_actions;
 		}
 		catch(APIException $e){
@@ -562,7 +562,7 @@ class CAPIAction extends CZBXAPI{
 		$actions = zbx_toArray($actions);
 		$actionids = array();
 
-		$upd_actions = CAction::get(array('actionids'=>zbx_objectValues($actions, 'actionid'),
+		$upd_actions = API::Action()->get(array('actionids'=>zbx_objectValues($actions, 'actionid'),
 											'editable'=>1,
 											'extendoutput'=>1,
 											'preservekeys'=>1));
@@ -595,7 +595,7 @@ class CAPIAction extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_actions = CAction::get(array('actionids'=>$actionids, 'extendoutput'=>1, 'nopermissions'=>1));
+			$upd_actions = API::Action()->get(array('actionids'=>$actionids, 'extendoutput'=>1, 'nopermissions'=>1));
 			return $upd_actions;
 		}
 		else{
@@ -725,7 +725,7 @@ class CAPIAction extends CZBXAPI{
 		$actions = zbx_toArray($actions);
 		$actionids = array();
 
-		$del_actions = Caction::get(array('actionids'=>zbx_objectValues($actions, 'actionid'),
+		$del_actions = API::Action()->get(array('actionids'=>zbx_objectValues($actions, 'actionid'),
 											'editable'=>1,
 											'extendoutput'=>1,
 											'preservekeys'=>1));

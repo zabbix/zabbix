@@ -272,7 +272,7 @@ class CAPIUser extends CZBXAPI{
 				'userids' => $userids,
 				'preservekeys' => 1
 			);
-			$usrgrps = CUserGroup::get($obj_params);
+			$usrgrps = API::UserGroup()->get($obj_params);
 			foreach($usrgrps as $usrgrpid => $usrgrp){
 				$uusers = $usrgrp['users'];
 				unset($usrgrp['users']);
@@ -475,7 +475,7 @@ class CAPIUser extends CZBXAPI{
 		global	$USER_DETAILS;
 		global	$ZBX_LOCALNODEID;
 		global	$ZBX_NODES;
-
+if(!isset($user['sessionid'])) sdb();
 		$sessionid = is_null($user)?null:$user['sessionid'];
 
 		$USER_DETAILS = NULL;
@@ -863,7 +863,7 @@ class CAPIUser extends CZBXAPI{
 			$result = DBexecute($sql);
 
 			// if(isset($user['usrgrps']) && !is_null($user['usrgrps'])){
-				// $user_groups = CHostGroup::get(array('userids' => $user['userid']));
+				// $user_groups = API::HostGroup()->get(array('userids' => $user['userid']));
 				// $user_groupids = zbx_objectValues($user_groups, 'usrgrpid');
 				// $new_groupids = zbx_objectValues($user['usrgrps'], 'usrgrpid');
 
@@ -884,7 +884,7 @@ class CAPIUser extends CZBXAPI{
 			if($result && isset($user['usrgrps']) && !is_null($user['usrgrps'])){
 				DBexecute('DELETE FROM users_groups WHERE userid='.$user['userid']);
 
-				$usrgrps = CUserGroup::get(array(
+				$usrgrps = API::UserGroup()->get(array(
 					'usrgrpids' => zbx_objectValues($user['usrgrps'], 'usrgrpid'),
 					'extendoutput' => 1,
 					'preservekeys' => 1));

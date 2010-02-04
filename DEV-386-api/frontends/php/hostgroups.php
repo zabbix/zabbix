@@ -77,15 +77,15 @@ include_once('include/page_header.php');
 
 		$objects = get_request('hosts', array());
 
-		$hosts = CHost::get(array('hostids' => $objects, 'output' => API_OUTPUT_SHORTEN));
-		$templates = CTemplate::get(array('templateids' => $objects, 'output' => API_OUTPUT_SHORTEN));
+		$hosts = API::Host()->get(array('hostids' => $objects, 'output' => API_OUTPUT_SHORTEN));
+		$templates = API::Template()->get(array('templateids' => $objects, 'output' => API_OUTPUT_SHORTEN));
 
 		if(isset($_REQUEST['groupid'])){
 			DBstart();
-			$result = CHostgroup::update(array('groupid' => $_REQUEST['groupid'], 'name' => $_REQUEST['gname']));
-			if($result === false) error(CHostGroup::resetErrors());
-			if($result) $result = CHostGroup::massUpdate(array('hosts' => $hosts, 'templates' => $templates, 'groups' => $result));
-			if($result === false) error(CHostGroup::resetErrors());
+			$result = API::HostGroup()->update(array('groupid' => $_REQUEST['groupid'], 'name' => $_REQUEST['gname']));
+			if($result === false) error(API::HostGroup()->resetErrors());
+			if($result) $result = API::HostGroup()->massUpdate(array('hosts' => $hosts, 'templates' => $templates, 'groups' => $result));
+			if($result === false) error(API::HostGroup()->resetErrors());
 			$result = ($result) ? true : false;
 			$result = DBend($result);
 
@@ -97,10 +97,10 @@ include_once('include/page_header.php');
 				access_deny();
 
 			DBstart();
-			$result = CHostgroup::create(array('name' => $_REQUEST['gname']));
-			if($result === false) error(CHostGroup::resetErrors());
-			if($result) $result = CHostGroup::massAdd(array('hosts' => $hosts, 'templates' => $templates, 'groups' => $result));
-			if($result === false) error(CHostGroup::resetErrors());
+			$result = API::HostGroup()->create(array('name' => $_REQUEST['gname']));
+			if($result === false) error(API::HostGroup()->resetErrors());
+			if($result) $result = API::HostGroup()->massAdd(array('hosts' => $hosts, 'templates' => $templates, 'groups' => $result));
+			if($result === false) error(API::HostGroup()->resetErrors());
 			$result = ($result) ? true : false;
 			$result = DBend($result);
 
@@ -158,15 +158,15 @@ include_once('include/page_header.php');
 		$groups = get_request('groups', array());
 		if(!empty($groups)){
 			DBstart();
-			$hosts = CHost::get(array('groupids' => $groups, 'editable' => 1));
+			$hosts = API::Host()->get(array('groupids' => $groups, 'editable' => 1));
 
 			if(empty($hosts)){
 				$go_result = true;
 			}
 			else{
-				$go_result = CHost::massUpdate(array('hosts' => $hosts, 'status' => $status));
+				$go_result = API::Host()->massUpdate(array('hosts' => $hosts, 'status' => $status));
 				if($go_result === false)
-					error(CHost::resetErrors());
+					error(API::Host()->resetErrors());
 			}
 
 			$go_result = DBend($go_result);
@@ -213,7 +213,7 @@ include_once('include/page_header.php');
 					'templated_hosts' => 1,
 					'output' => API_OUTPUT_SHORTEN
 				);
-				$hosts = CHost::get($params);
+				$hosts = API::Host()->get($params);
 				$hosts = zbx_objectValues($hosts, 'hostid');
 				$hosts = zbx_toHash($hosts, 'hostid');
 			}
@@ -234,7 +234,7 @@ include_once('include/page_header.php');
 			'sortfield' => 'name',
 			'editable' => 1,
 			'extendoutput' => 1);
-		$db_groups = CHostGroup::get($params);
+		$db_groups = API::HostGroup()->get($params);
 		$twb_groupid = get_request('twb_groupid', 0);
 		if($twb_groupid == 0){
 			$gr = reset($db_groups);
@@ -255,7 +255,7 @@ include_once('include/page_header.php');
 			'sortfield' => 'host',
 			'editable' => 1,
 			'extendoutput' => 1);
-		$db_hosts = CHost::get($params);
+		$db_hosts = API::Host()->get($params);
 		foreach($db_hosts as $num => $db_host){
 // add all except selected hosts
 			if(!isset($hosts[$db_host['hostid']]))
@@ -269,7 +269,7 @@ include_once('include/page_header.php');
 			'sortfield' => 'host',
 			'output' => API_OUTPUT_EXTEND
 		);
-		$r_hosts = CHost::get($params);
+		$r_hosts = API::Host()->get($params);
 
 		$params = array(
 			'hostids' => $hosts,
@@ -278,7 +278,7 @@ include_once('include/page_header.php');
 			'output' => API_OUTPUT_SHORTEN
 		);
 		
-		$rw_hosts = CHost::get($params);
+		$rw_hosts = API::Host()->get($params);
 		$rw_hosts = zbx_toHash($rw_hosts, 'hostid');	
 		foreach($r_hosts as $num => $host){
 			if(isset($rw_hosts[$host['hostid']]))
@@ -336,7 +336,7 @@ include_once('include/page_header.php');
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-		$groups = CHostGroup::get($options);
+		$groups = API::HostGroup()->get($options);
 
 		order_result($groups, $sortfield, $sortorder);
 		$paging = getPagingLine($groups);
@@ -350,7 +350,7 @@ include_once('include/page_header.php');
 		);
 
 // sorting && paging
-		$groups = CHostGroup::get($options);
+		$groups = API::HostGroup()->get($options);
 		order_result($groups, $sortfield, $sortorder);
 //---------
 

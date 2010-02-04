@@ -99,7 +99,7 @@ include_once('include/page_header.php');
 				'select_selements' => 1
 		);
 
-	$maps = CMap::get($options);
+	$maps = API::Map()->get($options);
 	$maps = zbx_toHash($maps, 'sysmapid');
 
 	if(!empty($maps)){

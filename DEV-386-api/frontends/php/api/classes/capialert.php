@@ -416,7 +416,7 @@ class CAPIAlert extends CZBXAPI{
 				'hostids' => $hostids,
 				'preservekeys' => 1
 			);
-			$hosts = CHost::get($obj_params);
+			$hosts = API::Host()->get($obj_params);
 		}
 
 // Adding Users
@@ -426,7 +426,7 @@ class CAPIAlert extends CZBXAPI{
 				'userids' => $userids,
 				'preservekeys' => 1
 			);
-			$users = CUser::get($obj_params);
+			$users = API::User()->get($obj_params);
 		}
 
 // Adding MediaTypes

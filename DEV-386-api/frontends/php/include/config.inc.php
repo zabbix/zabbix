@@ -78,7 +78,7 @@ function __autoload($class_name){
 ?>
 <?php
 
-	require_once('include/apicaller.inc.php');
+	require_once('include/api.inc.php');
 	
 	require_once('include/defines.inc.php');
 	require_once('include/func.inc.php');
