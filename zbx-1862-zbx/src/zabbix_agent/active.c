@@ -767,7 +767,7 @@ static void	process_active_checks(char *server, unsigned short port)
 					/* do not flood local system if file grows too fast */
 					if (p_count >= (4 * maxlines_persec * active_metrics[i].refresh))
 						break;
-				} //while processing a log
+				}	/* while processing a log */
 
 			} while(0); /* simple try realization */
 
@@ -872,7 +872,7 @@ static void	process_active_checks(char *server, unsigned short port)
 					/* Do not flood local system if file grows too fast */
 					if (p_count >= (4 * maxlines_persec * active_metrics[i].refresh))
 						break;
-				} //while processing a log
+				}	/* while processing a log */
 
 			} while(0); /* simple try realization */
 
@@ -1019,7 +1019,7 @@ static void	process_active_checks(char *server, unsigned short port)
 					/* Do not flood local system if file grows too fast */
 					if (p_count >= (4 * maxlines_persec * active_metrics[i].refresh))
 						break;
-				} //while processing an eventlog
+				}	/* while processing an eventlog */
 
 				break;
 

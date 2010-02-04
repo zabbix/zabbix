@@ -28,6 +28,7 @@
 		/* public */
 		unsigned char	shared_enabled; 	/* partition runs in shared mode */
 		unsigned char	pool_util_authority;	/* pool utilization available */
+		unsigned char	aix52stats;
 		/* - general -- */
 		double		ent;
 		/* --- kthr --- */
