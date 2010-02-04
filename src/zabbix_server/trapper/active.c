@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "db.h"
+#include "dbcache.h"
 #include "log.h"
 
 #include "active.h"
@@ -120,6 +121,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request, zbx_process_t zb
 	int		res = FAIL;
 	zbx_uint64_t	hostid;
 	char		error[MAX_STRING_LEN];
+	DC_ITEM		dc_item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In send_list_of_active_checks()");
 
@@ -166,10 +168,18 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request, zbx_process_t zb
 	buffer_offset = 0;
 	while (NULL != (row = DBfetch(result)))
 	{
+		if (FAIL == DCconfig_get_item_by_key(&dc_item, (zbx_uint64_t)0, host, row[0]))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Item '%s' was not found in the server cache. Not sending now.", row[0]);
+			continue;
+		}
+
+		zabbix_log(LOG_LEVEL_DEBUG, "Item '%s' was successfully found in the server cache. Sending.", row[0]);
+
 		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, 512, "%s:%s:%s\n",
-				row[0],
-				row[1],
-				row[2]);
+				row[0],		/* item key */
+				row[1],		/* item delay */
+				row[2]);	/* item lastlogsize */
 	}
 	DBfree_result(result);
 
@@ -239,6 +249,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 	int		res = FAIL;
 	zbx_uint64_t	hostid;
 	char		error[MAX_STRING_LEN];
+	DC_ITEM		dc_item;
 
 	char		**regexp = NULL;
 	int		regexp_alloc = 32;
@@ -291,6 +302,14 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		if (FAIL == DCconfig_get_item_by_key(&dc_item, (zbx_uint64_t)0, host, row[1]))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Item '%s' was not found in the server cache. Not sending now.", row[1]);
+			continue;
+		}
+
+		zabbix_log(LOG_LEVEL_DEBUG, "Item '%s' was successfully found in the server cache. Sending.", row[1]);
+
 		DBget_item_from_db(&item, row);
 
 		zbx_json_addobject(&json, NULL);
