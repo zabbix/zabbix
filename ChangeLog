@@ -1,3 +1,7 @@
+Changes for 1.6.9
+
+ - [ZBX-1030] fixed security vulnerability in server allowing remote unauthenticated users to execute scripts. Thanks to Nicob (Sasha)
+
 Changes for 1.6.8
 
  - [ZBX-1063] fixed checking for the maximal possible value of the zabbix_agentd loglevel (Dmitry)
