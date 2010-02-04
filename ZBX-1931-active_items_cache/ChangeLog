@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1931] fixed process of sending active checks to ensure every active item is located in the server cache (Dmitry)
  - [ZBX-1650] allowed to pass "-" (dash) in parameters for "UserParameter" flexible parameters (Dmitry)
  - [ZBX-1923] fixed processing of data sent by 1.4, 1.6 agents not allowing wrong "eventid" values (Dmitry)
  - [ZBX-1763] fixed SLA showing red line when there is no problem (Vedmak)
