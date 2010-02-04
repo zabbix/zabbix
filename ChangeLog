@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1879] fixed unnecessary line brakes in IE7 (Vedmak)
  - [ZBX-1931] fixed process of sending active checks to ensure every active item is located in the server cache (Dmitry)
  - [ZBX-1935] remove incorrect item and fix minor typo in the default Windows template (Richlv)
  - [ZBX-1650] allowed to pass "-" (dash) in parameters for "UserParameter" flexible parameters (Dmitry)
