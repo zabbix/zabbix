@@ -502,7 +502,7 @@ table.tableinfo tr.footer td {
 }
 
 table.tableinfo tr > td:first-child{
-	width: 1px;
+	width: 1%;
 }
 
 table.tableinfo tr td.wraptext {
