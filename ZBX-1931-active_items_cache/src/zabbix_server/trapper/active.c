@@ -168,16 +168,18 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request, zbx_process_t zb
 	buffer_offset = 0;
 	while (NULL != (row = DBfetch(result)))
 	{
-		if (SUCCEED == DCconfig_get_item_by_key(&dc_item, (zbx_uint64_t)0, host, row[0]))
+		if (FAIL == DCconfig_get_item_by_key(&dc_item, (zbx_uint64_t)0, host, row[0]))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Item '%s' was successfully found in the server cache. Sending.", row[0]);
-			zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, 512, "%s:%s:%s\n",
-				row[0],	/* item key */
-				row[1],	/* item delay */
-				row[2]);	/* item lastlogsize */
-		}
-		else
 			zabbix_log(LOG_LEVEL_DEBUG, "Item '%s' was not found in the server cache. Not sending now.", row[0]);
+			continue;
+		}
+
+		zabbix_log(LOG_LEVEL_DEBUG, "Item '%s' was successfully found in the server cache. Sending.", row[0]);
+
+		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, 512, "%s:%s:%s\n",
+				row[0],		/* item key */
+				row[1],		/* item delay */
+				row[2]);	/* item lastlogsize */
 	}
 	DBfree_result(result);
 
@@ -300,71 +302,72 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		if (SUCCEED == DCconfig_get_item_by_key(&dc_item, (zbx_uint64_t)0, host, row[1]))
+		if (FAIL == DCconfig_get_item_by_key(&dc_item, (zbx_uint64_t)0, host, row[1]))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Item '%s' was successfully found in the server cache. Sending.", row[1]);
-			
-			DBget_item_from_db(&item, row);
-			
-			zbx_json_addobject(&json, NULL);
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY, item.key, ZBX_JSON_TYPE_STRING);
-			if (0 != strcmp(item.key, item.key_orig))
-				zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY_ORIG, item.key_orig, ZBX_JSON_TYPE_STRING);
-			zbx_snprintf(tmp, sizeof(tmp), "%d", item.delay);
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_DELAY, tmp, ZBX_JSON_TYPE_STRING);
-			zbx_snprintf(tmp, sizeof(tmp), "%d", item.lastlogsize);
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_LOGLASTSIZE, tmp, ZBX_JSON_TYPE_STRING);
-			zbx_snprintf(tmp, sizeof(tmp), "%d", item.mtime);
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_MTIME, tmp, ZBX_JSON_TYPE_STRING);
-			zbx_json_close(&json);
-
-			/* Special processing for log[] and logrt[] items */
-			do {	/* simple try realization */
-
-				/* log[filename,pattern,encoding,maxlinespersec] */
-				/* logrt[filename_format,pattern,encoding,maxlinespersec] */
-
-				if (0 != strncmp(item.key, "log[", 4) && 0 != strncmp(item.key, "logrt[", 11))
-					break;
-
-				if (2 != parse_command(item.key, NULL, 0, params, MAX_STRING_LEN))
-					break;
-
-				/*dealing with `pattern' parameter*/
-				if (0 == get_param(params, 2, pattern, sizeof(pattern)) &&
-					*pattern == '@')
-						add_regexp_name(&regexp, &regexp_alloc, &regexp_num, pattern + 1);
-			} while (0);	/* simple try realization */
-
-			/* Special processing for eventlog[] items */
-			do {	/* simple try realization */
-
-				/* eventlog[filename,pattern,severity,source,logeventid,maxlinespersec] */
-
-				if (0 != strncmp(item.key, "eventlog[", 9))
-					break;
-
-				if (2 != parse_command(item.key, NULL, 0, params, MAX_STRING_LEN))
-					break;
-
-				/*dealing with `pattern' parameter*/
-				if (0 == get_param(params, 2, pattern, sizeof(pattern)) &&
-					*pattern == '@')
-						add_regexp_name(&regexp, &regexp_alloc, &regexp_num, pattern + 1);
-
-				/*dealing with `severity' parameter*/
-				if (0 == get_param(params, 3, key_severity, sizeof(key_severity)) &&
-					*key_severity == '@')
-						add_regexp_name(&regexp, &regexp_alloc, &regexp_num, key_severity + 1);
-
-				/*dealing with `logeventid' parameter*/
-				if (0 == get_param(params, 5, key_logeventid, sizeof(key_logeventid)) &&
-					*key_logeventid == '@')
-						add_regexp_name(&regexp, &regexp_alloc, &regexp_num, key_logeventid + 1);
-			} while (0);	/* simple try realization */
-		}
-		else
 			zabbix_log(LOG_LEVEL_DEBUG, "Item '%s' was not found in the server cache. Not sending now.", row[1]);
+			continue;
+		}
+
+		zabbix_log(LOG_LEVEL_DEBUG, "Item '%s' was successfully found in the server cache. Sending.", row[1]);
+
+		DBget_item_from_db(&item, row);
+
+		zbx_json_addobject(&json, NULL);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY, item.key, ZBX_JSON_TYPE_STRING);
+		if (0 != strcmp(item.key, item.key_orig))
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY_ORIG, item.key_orig, ZBX_JSON_TYPE_STRING);
+		zbx_snprintf(tmp, sizeof(tmp), "%d", item.delay);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_DELAY, tmp, ZBX_JSON_TYPE_STRING);
+		zbx_snprintf(tmp, sizeof(tmp), "%d", item.lastlogsize);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_LOGLASTSIZE, tmp, ZBX_JSON_TYPE_STRING);
+		zbx_snprintf(tmp, sizeof(tmp), "%d", item.mtime);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_MTIME, tmp, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&json);
+
+		/* Special processing for log[] and logrt[] items */
+		do {	/* simple try realization */
+
+			/* log[filename,pattern,encoding,maxlinespersec] */
+			/* logrt[filename_format,pattern,encoding,maxlinespersec] */
+
+			if (0 != strncmp(item.key, "log[", 4) && 0 != strncmp(item.key, "logrt[", 11))
+				break;
+
+			if (2 != parse_command(item.key, NULL, 0, params, MAX_STRING_LEN))
+				break;
+
+			/*dealing with `pattern' parameter*/
+			if (0 == get_param(params, 2, pattern, sizeof(pattern)) &&
+				*pattern == '@')
+					add_regexp_name(&regexp, &regexp_alloc, &regexp_num, pattern + 1);
+		} while (0);	/* simple try realization */
+
+		/* Special processing for eventlog[] items */
+		do {	/* simple try realization */
+
+			/* eventlog[filename,pattern,severity,source,logeventid,maxlinespersec] */
+
+			if (0 != strncmp(item.key, "eventlog[", 9))
+				break;
+
+			if (2 != parse_command(item.key, NULL, 0, params, MAX_STRING_LEN))
+				break;
+
+			/*dealing with `pattern' parameter*/
+			if (0 == get_param(params, 2, pattern, sizeof(pattern)) &&
+				*pattern == '@')
+					add_regexp_name(&regexp, &regexp_alloc, &regexp_num, pattern + 1);
+
+			/*dealing with `severity' parameter*/
+			if (0 == get_param(params, 3, key_severity, sizeof(key_severity)) &&
+				*key_severity == '@')
+					add_regexp_name(&regexp, &regexp_alloc, &regexp_num, key_severity + 1);
+
+			/*dealing with `logeventid' parameter*/
+			if (0 == get_param(params, 5, key_logeventid, sizeof(key_logeventid)) &&
+				*key_logeventid == '@')
+					add_regexp_name(&regexp, &regexp_alloc, &regexp_num, key_logeventid + 1);
+		} while (0);	/* simple try realization */
 	}
 	zbx_json_close(&json);
 
