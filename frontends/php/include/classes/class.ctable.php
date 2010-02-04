@@ -75,13 +75,13 @@ class CTable extends CTag{
 	public function prepareRow($item,$rowClass=NULL){
 		if(is_null($item)) return NULL;
 
-		if(is_object($item) && strtolower(get_class($item))=='ccol') {
+		if(is_object($item) && zbx_strtolower(get_class($item))=='ccol') {
 			if(isset($this->header) && !isset($item->attributes['colspan']))
 				$item->attributes['colspan'] = $this->colnum;
 
 			$item = new CRow($item,$rowClass);
 		}
-		if(is_object($item) && strtolower(get_class($item))=='crow') {
+		if(is_object($item) && zbx_strtolower(get_class($item))=='crow') {
 			if(isset($rowClass))
 				$item->setClass($rowClass);
 		}
@@ -101,7 +101,7 @@ class CTable extends CTag{
 		if(isset($_REQUEST['print'])) hide_form_items($value);
 		if(is_null($class)) $class = $this->headerClass;
 
-		if(is_object($value) && strtolower(get_class($value))=='crow') {
+		if(is_object($value) && zbx_strtolower(get_class($value))=='crow') {
 			if(!is_null($class)) $value->setClass($class);
 		}
 		else{

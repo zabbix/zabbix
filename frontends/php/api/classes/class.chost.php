@@ -351,13 +351,13 @@ class CHost extends CZBXAPI{
 		if(!zbx_empty($options['pattern'])){
 			if($options['extend_pattern']){
 				$sql_parts['where'][] = ' ( '.
-											'UPPER(h.host) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%').' OR '.
+											'UPPER(h.host) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%').' OR '.
 											'h.ip LIKE '.zbx_dbstr('%'.$options['pattern'].'%').' OR '.
-											'UPPER(h.dns) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%').
+											'UPPER(h.dns) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%').
 										' ) ';
 			}
 			else{
-				$sql_parts['where'][] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
+				$sql_parts['where'][] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
 			}
 		}
 

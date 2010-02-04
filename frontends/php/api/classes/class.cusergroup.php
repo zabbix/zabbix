@@ -163,7 +163,7 @@ class CUserGroup extends CZBXAPI{
 
 // pattern
 		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where'][] = ' UPPER(g.name) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
+			$sql_parts['where'][] = ' UPPER(g.name) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
 		}
 
 // order

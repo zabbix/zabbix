@@ -254,7 +254,7 @@ class CTemplate extends CZBXAPI{
 
 // pattern
 		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where'][] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
+			$sql_parts['where'][] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
 		}
 
 // order
@@ -1035,10 +1035,9 @@ class CTemplate extends CZBXAPI{
 						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t unlink template');
 					}
 				}			
-			}
+				}
 			
 			if(isset($data['templates_link']) && !is_null($data['templates_link'])){
-
 				$template_templates = CTemplate::get(array('hostids' => $templateids));
 				$template_templateids = zbx_objectValues($template_templates, 'templateid');
 				$new_templateids = zbx_objectValues($data['templates_link'], 'templateid');
