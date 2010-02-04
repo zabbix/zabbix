@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2007 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -160,18 +160,18 @@ include_once('include/page_header.php');
 			if(empty($row['description'])) $row['description']=S_NONE;
 			$row['graph'] = new CLink(S_SHOW,'srv_status.php?serviceid='.$row['serviceid'].'&showgraph=1'.url_param('path'));
 
-			if(isset($row["triggerid"]) && !empty($row["triggerid"])){
+			if(isset($row['triggerid']) && !empty($row['triggerid'])){
 
 				$url = new CLink(expand_trigger_description($row['triggerid']),'events.php?source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$row['triggerid']);
 				$row['caption'] = array($row['caption'],' [',$url,']');
 
 			}
 
-			if($row["status"]==0 || (isset($service) && (bccomp($service["serviceid"] , $row["serviceid"]) == 0))){
-				$row['reason']='-';
+			if($row['status']==0 || (isset($service) && (bccomp($service['serviceid'] , $row['serviceid']) == 0))){
+				$row['reason'] = '-';
 			}
 			else {
-				$row['reason']='-';
+				$row['reason'] = '-';
 				$result2=DBselect('SELECT s.triggerid,s.serviceid '.
 								' FROM services s, triggers t '.
 								' WHERE s.status>0 '.
@@ -195,6 +195,7 @@ include_once('include/page_header.php');
 			if($row['showsla'] == 1){
 
 				$stat = calculate_service_availability($row['serviceid'], $period_start, $period_end);
+
 				$p = min($stat['problem'], 20);
 				$sla_style = ($row['goodsla'] > $stat['ok'])?'on':'off';
 
@@ -300,9 +301,6 @@ include_once('include/page_header.php');
 		}
 	}
 
-?>
-<?php
 
 include_once('include/page_footer.php');
-
 ?>

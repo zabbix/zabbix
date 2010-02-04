@@ -444,7 +444,7 @@ insert into help_items values(0,'vm.memory.size[&lt;mode&gt;]','Amount of memory
 insert into help_items values(0,'web.page.get[host,&lt;path&gt;,&lt;port&gt;]','Get content of WEB page. Default path is /');
 insert into help_items values(0,'web.page.perf[host,&lt;path&gt;,&lt;port&gt;]','Get timing of loading full WEB page. Default path is /');
 insert into help_items values(0,'web.page.regexp[host,&lt;path&gt;,&lt;port&gt;,&lt;regexp&gt;,&lt;length&gt;]','Get first occurence of regexp in WEB page. Default path is /');
-insert into help_items values(0,'perf_counter[counter]','Value of any performance counter, where parameter is the counter path.');
+insert into help_items values(0,'perf_counter[counter, interval]','Value of any performance counter, where "counter" parameter is the counter path and "interval" parameter is a number of last seconds, for which the agent returns an average value.');
 insert into help_items values(0,'service_state[service]','State of service. 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service');
 insert into help_items values(0,'proc_info[&lt;process&gt;,&lt;attribute&gt;,&lt;type&gt;]','Different information about specific process(es)');
 
@@ -853,8 +853,7 @@ INSERT INTO items VALUES (17397,0,'','',161,10002,'Service state of DHCP client 
 INSERT INTO items VALUES (17399,0,'','',161,10002,'Number of threads','perf_counter[\\System\\threads]',30,90,365,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
 INSERT INTO items VALUES (17401,0,'','',161,10002,'File read bytes per second','perf_counter[\\System\\File Read Bytes/sec]',30,90,365,NULL,NULL,NULL,0,0,'','Bps',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
 INSERT INTO items VALUES (17403,0,'','',161,10002,'File write bytes per second','perf_counter[\\System\\File Write Bytes/sec]',30,90,365,NULL,NULL,NULL,0,0,'','Bps',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
-INSERT INTO items VALUES (17405,0,'','',161,10002,'Average disk read queue length','perf_counter[\\Physical Disk(_Total)\\Avg. Disk Read Queue Length]',30,90,365,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
-INSERT INTO items VALUES (17409,0,'','',161,10002,'Average disk read queue length','perf_counter[\\PhysicalDisk(_Total)\\Avg. Disk Read QUeue Length]',30,90,365,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
+INSERT INTO items VALUES (17409,0,'','',161,10002,'Average disk read queue length','perf_counter[\\PhysicalDisk(_Total)\\Avg. Disk Read Queue Length]',30,90,365,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
 INSERT INTO items VALUES (17411,0,'','',161,10002,'Average disk write queue length','perf_counter[\\PhysicalDisk(_Total)\\Avg. Disk Write Queue Length]',30,90,365,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','','',0,0,'','','','',0);
 INSERT INTO items VALUES (17412,0,'','',161,10008,'Ping to the server (TCP)','agent.ping',30,7,365,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,1,'','','',0,0,'','','','',0);
 INSERT INTO items VALUES (17413,0,'','',161,10008,'Version of zabbix_agent(d) running','agent.version',1800,7,365,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','','',0,0,'','','','',0);

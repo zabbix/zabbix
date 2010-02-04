@@ -502,7 +502,7 @@ class CGraph extends CZBXAPI{
 		$graphs = zbx_toArray($graphs);
 		$graphids = array();
 
-		$error = 'Unknown ZABBIX internal error';
+		$error = 'Unknown Zabbix internal error';
 
 		$result = true;
 
@@ -581,7 +581,7 @@ class CGraph extends CZBXAPI{
 			return $new_graphs;
 		}
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);//'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);//'Internal Zabbix error');
 			return false;
 		}
 	}
@@ -635,7 +635,7 @@ class CGraph extends CZBXAPI{
 			return $upd_graphs;
 		}
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal Zabbix error');
 			return false;
 		}
 	}
@@ -710,7 +710,7 @@ class CGraph extends CZBXAPI{
  */
 	public static function addItems($items){
 
-		$error = 'Unknown ZABBIX internal error';
+		$error = 'Unknown Zabbix internal error';
 		$result_ids = array();
 		$result = false;
 		$tpl_graph = false;
@@ -776,7 +776,7 @@ class CGraph extends CZBXAPI{
 			return $result;
 		}
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);//'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);//'Internal Zabbix error');
 			return false;
 		}
 	}
@@ -815,7 +815,7 @@ class CGraph extends CZBXAPI{
  * @return boolean
  */
 	public static function deleteItems($item_list, $force=false){
-		$error = 'Unknown ZABBIX internal error';
+		$error = 'Unknown Zabbix internal error';
 		$result = true;
 
 		$graphid = $item_list['graphid'];

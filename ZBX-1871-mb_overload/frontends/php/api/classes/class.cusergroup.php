@@ -338,7 +338,7 @@ class CUserGroup extends CZBXAPI{
 		$usrgrpids = array();
 
 		$result = false;
-		$error = 'Unknown ZABBIX internal error';
+		$error = 'Unknown Zabbix internal error';
 
 		self::BeginTransaction(__METHOD__);
 		foreach($usrgrps as $ugnum => $usrgrp){

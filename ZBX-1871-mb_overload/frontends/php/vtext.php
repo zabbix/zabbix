@@ -41,20 +41,22 @@
 <?php
 
 	$text = get_request('text', ' ');;
-	$font = get_request('font', 3);
+	$font = get_request('font', 9);
 
-	$size = imageTextSize(9, 90, $text);
+	$size = imageTextSize($font, 0, $text);
 
-	$im = imagecreatetruecolor($size['width']+6, $size['height']);
-	ImageAlphaBlending($im, false);
-	imageSaveAlpha($im, true);
+	$im = imagecreatetruecolor($size['width']+2, $size['height']+2);
 
 	$transparentColor = imagecolorallocatealpha($im, 200, 200, 200, 127);
 	imagefill($im, 0, 0, $transparentColor);
 
 	$text_color = imagecolorallocate($im, 0, 0, 0);
 
-	imageText($im, 9, 90, $size['width']+3, $size['height'], $text_color, $text);
+	imageText($im, $font, 0, 0, $size['height'], $text_color, $text);
+
+	$im = imagerotate($im, 90, $transparentColor);
+	ImageAlphaBlending($im, false);
+	imageSaveAlpha($im, true);
 
 	imageOut($im);
 	imagedestroy($im);

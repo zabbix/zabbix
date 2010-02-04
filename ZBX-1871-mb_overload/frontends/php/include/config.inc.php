@@ -141,7 +141,9 @@ function __autoload($class_name){
 	}
 
 	if(file_exists($ZBX_CONFIGURATION_FILE) && !isset($_COOKIE['ZBX_CONFIG']) && !isset($DENY_GUI)){
+		ob_start();
 		include $ZBX_CONFIGURATION_FILE;
+		ob_end_clean ();
 		require_once('include/db.inc.php');
 
 		$error = '';
@@ -174,7 +176,9 @@ function __autoload($class_name){
 	}
 	else{
 		if(file_exists($ZBX_CONFIGURATION_FILE)){
+			ob_start();
 			include $ZBX_CONFIGURATION_FILE;
+			ob_end_clean ();
 		}
 
 		require_once('include/db.inc.php');

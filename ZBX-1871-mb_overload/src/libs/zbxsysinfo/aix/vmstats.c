@@ -120,7 +120,7 @@ int	SYSTEM_STAT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		SET_DBL_RESULT(result, collector->vmstat.ent)
 	else if (0 == strcmp(section, "memory"))
 	{
-		if (0 == strcmp(type, "avm"))
+		if (0 == strcmp(type, "avm") && collector->vmstat.aix52stats)
 			SET_UI64_RESULT(result, collector->vmstat.mem_avm)
 		else if (0 == strcmp(type, "fre"))
 			SET_UI64_RESULT(result, collector->vmstat.mem_fre)

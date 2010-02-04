@@ -19,11 +19,11 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
+require_once('include/config.inc.php');
 
-	$page['file']	= 'chart.php';
-	$page['title']	= "S_CHART";
-	$page['type']	= PAGE_TYPE_IMAGE;
+$page['file']	= 'chart.php';
+$page['title']	= "S_CHART";
+$page['type']	= PAGE_TYPE_IMAGE;
 
 include_once('include/page_header.php');
 
@@ -59,7 +59,7 @@ include_once('include/page_header.php');
 
 	$graph = new CChart();
 
-	$effectiveperiod = navigation_bar_calc('web.item.graph',$_REQUEST['itemid']);
+	$effectiveperiod = navigation_bar_calc('web.item.graph',false);
 
 	if(isset($_REQUEST['period']))		$graph->SetPeriod($_REQUEST['period']);
 	if(isset($_REQUEST['from']))		$graph->SetFrom($_REQUEST['from']);
