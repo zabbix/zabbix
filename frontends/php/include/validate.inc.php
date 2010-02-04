@@ -203,7 +203,7 @@
 
 	function validate_ip_range($str){
 		foreach(explode(',',$str) as $ip_range){
-			if(false !== strpos($ip_range, '/') ) {
+			if(false !== zbx_strpos($ip_range, '/') ) {
 				if(false === validate_ip_range_mask($ip_range) )
 					return false;
 			}
@@ -413,7 +413,7 @@
 			}
 		}
 //*
-		if(($type == T_ZBX_STR) && !defined('ZBX_ALLOW_UNICODE') && (strlen($var) != zbx_strlen($var))){
+		if(($type == T_ZBX_STR) && !defined('ZBX_ALLOW_UNICODE') && (zbx_strlen($var) != zbx_strlen($var))){
 			if($flags&P_SYS){
 				info('Critical error. Field ['.$field.'] contains Multibyte chars');
 				return ZBX_VALID_ERROR;

@@ -324,7 +324,7 @@ class CTrigger extends CZBXAPI{
 
 // pattern
 		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where'][] = ' UPPER(t.description) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
+			$sql_parts['where'][] = ' UPPER(t.description) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
 		}
 
 
@@ -344,7 +344,7 @@ class CTrigger extends CZBXAPI{
 				$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 				$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
 				$sql_parts['where']['ghg'] = 'g.groupid = hg.groupid';
-				$sql_parts['where'][] = ' UPPER(g.name)='.zbx_dbstr(strtoupper($options['group']));
+				$sql_parts['where'][] = ' UPPER(g.name)='.zbx_dbstr(zbx_strtoupper($options['group']));
 			}
 
 // host
@@ -360,7 +360,7 @@ class CTrigger extends CZBXAPI{
 				$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
 				$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 				$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
-				$sql_parts['where'][] = ' UPPER(h.host)='.zbx_dbstr(strtoupper($options['host']));
+				$sql_parts['where'][] = ' UPPER(h.host)='.zbx_dbstr(zbx_strtoupper($options['host']));
 			}
 
 // only_true

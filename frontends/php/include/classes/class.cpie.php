@@ -277,7 +277,7 @@ class CPie extends CGraphDraw{
 			}
 
 			$this->sum += $item_value;
-			$strvaluelength = max($strvaluelength,strlen(convert_units($item_value,$this->items[$i]['unit'])));
+			$strvaluelength = max($strvaluelength,zbx_strlen(convert_units($item_value,$this->items[$i]['unit'])));
 		}
 
 		if(isset($graph_sum)) $this->sum = $graph_sum;
@@ -292,8 +292,8 @@ class CPie extends CGraphDraw{
 		$max_desc_len=0;
 
 		for($i=0;$i<$this->num;$i++){
-			if(strlen($this->items[$i]['host'])>$max_host_len)		$max_host_len=strlen($this->items[$i]['host']);
-			if(strlen($this->items[$i]['description'])>$max_desc_len)	$max_desc_len=strlen($this->items[$i]['description']);
+			if(zbx_strlen($this->items[$i]['host'])>$max_host_len)		$max_host_len=zbx_strlen($this->items[$i]['host']);
+			if(zbx_strlen($this->items[$i]['description'])>$max_desc_len)	$max_desc_len=zbx_strlen($this->items[$i]['description']);
 		}
 
 		for($i=0;$i<$this->num;$i++){

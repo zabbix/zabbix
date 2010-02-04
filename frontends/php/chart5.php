@@ -86,7 +86,7 @@ include_once('include/page_header.php');
 	imagerectangle($im,0,0,$x-1,$y-1,$black);
 
 	$str=$service['name'].' ('.S_YEAR_SMALL.' '.date('Y').')';
-	$x=imagesx($im)/2-imagefontwidth(4)*strlen($str)/2;
+	$x=imagesx($im)/2-imagefontwidth(4)*zbx_strlen($str)/2;
 	// imagestring($im, 4,$x,1, $str , $darkred);
 	imageText($im, 10, 0, $x, 14, $darkred, $str);
 
