@@ -112,7 +112,7 @@ include_once('include/page_header.php');
 		imagecopy($im,$back,0,0,0,0,imagesx($back),imagesy($back));
 	}
 	else{
-		$x=imagesx($im)/2-ImageFontWidth(4)*strlen($name)/2;
+		$x=imagesx($im)/2-ImageFontWidth(4)*zbx_strlen($name)/2;
 		imagetext($im, 10, 0, $x, 25, $darkred, $name);
 	}
 	unset($db_image);

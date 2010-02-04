@@ -51,7 +51,7 @@ class Curl{
 		if(empty($url)){
 			$this->formatArguments();
 
-			// $protocol = (strpos(strtolower($_SERVER['SERVER_PROTOCOL']), 'shttp') !== false)?'shttp':'http';
+			// $protocol = (zbx_strpos(zbx_strtolower($_SERVER['SERVER_PROTOCOL']), 'shttp') !== false)?'shttp':'http';
 			$protocol = ((isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on')) || ($_SERVER['SERVER_PORT'] == 443)) ? 'https' : 'http';
 
 			$this->url = $url = $protocol.'://'.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'].$_SERVER['SCRIPT_NAME'].'?'.$this->getQuery();
@@ -59,29 +59,29 @@ class Curl{
 		else{
 			$this->url=urldecode($url);
 
-			$tmp_pos = strpos($this->url,'?');
+			$tmp_pos = zbx_strpos($this->url,'?');
 			$this->query=($tmp_pos!==false)?(substr($this->url,$tmp_pos+1)):'';
 
-			$tmp_pos = strpos($this->query,'#');
+			$tmp_pos = zbx_strpos($this->query,'#');
 			if($tmp_pos!==false) $this->query=zbx_substring($this->query,0,$tmp_pos);
 
 			$this->formatArguments($this->query);
 		}
 
-		$protocolSepIndex=strpos($this->url,'://');
+		$protocolSepIndex=zbx_strpos($this->url,'://');
 		if($protocolSepIndex!==false){
-			$this->protocol= strtolower(zbx_substring($this->url,0,$protocolSepIndex));
+			$this->protocol= zbx_strtolower(zbx_substring($this->url,0,$protocolSepIndex));
 
 			$this->host=substr($this->url, $protocolSepIndex+3);
 
-			$tmp_pos = strpos($this->host,'/');
+			$tmp_pos = zbx_strpos($this->host,'/');
 			if($tmp_pos!==false) $this->host=zbx_substring($this->host,0,$tmp_pos);
 
-			$atIndex=strpos($this->host,'@');
+			$atIndex=zbx_strpos($this->host,'@');
 			if($atIndex!==false){
 				$credentials=zbx_substring($this->host,0,$atIndex);
 
-				$colonIndex=strpos(credentials,':');
+				$colonIndex=zbx_strpos(credentials,':');
 				if($colonIndex!==false){
 					$this->username=zbx_substring($credentials,0,$colonIndex);
 					$this->password=substr($credentials,$colonIndex);
@@ -92,13 +92,13 @@ class Curl{
 				$this->host=substr($this->host,$atIndex+1);
 			}
 
-			$host_ipv6 = strpos($this->host,']');
+			$host_ipv6 = zbx_strpos($this->host,']');
 			if($host_ipv6!==false){
 				if($host_ipv6 < (zbx_strlen($this->host)-1)){
 					$host_ipv6++;
 					$host_less = substr($this->host,$host_ipv6);
 
-					$portColonIndex=strpos($host_less,':');
+					$portColonIndex=zbx_strpos($host_less,':');
 					if($portColonIndex!==false){
 						$this->host=zbx_substring($this->host,0,$host_ipv6);
 						$this->port=substr($host_less,$portColonIndex+1);
@@ -106,7 +106,7 @@ class Curl{
 				}
 			}
 			else{
-				$portColonIndex=strpos($this->host,':');
+				$portColonIndex=zbx_strpos($this->host,':');
 
 				if($portColonIndex!==false){
 					$this->port=substr($this->host,$portColonIndex+1);
@@ -115,7 +115,7 @@ class Curl{
 			}
 
 			$this->file = substr($this->url,$protocolSepIndex+3);
-			$this->file = substr($this->file, strpos($this->file,'/'));
+			$this->file = substr($this->file, zbx_strpos($this->file,'/'));
 
 			if($this->file == $this->host) $this->file = '';
 		}
@@ -123,13 +123,13 @@ class Curl{
 			$this->file = $this->url;
 		}
 
-		$tmp_pos = strpos($this->file,'?');
+		$tmp_pos = zbx_strpos($this->file,'?');
 		if($tmp_pos!==false) $this->file=zbx_substring($this->file, 0, $tmp_pos);
 
-		$refSepIndex=strpos($url,'#');
+		$refSepIndex=zbx_strpos($url,'#');
 		if($refSepIndex!==false){
 			$this->file = zbx_substring($this->file,0,$refSepIndex);
-			$this->reference = substr($url,strpos($url,'#')+1);
+			$this->reference = substr($url,zbx_strpos($url,'#')+1);
 		}
 
 		$this->path=$this->file;

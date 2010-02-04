@@ -46,7 +46,7 @@ class CComboBox extends CTag{
 
 	public function addItem($value, $caption='', $selected=NULL, $enabled='yes'){
 //			if($enabled=='no') return;	/* disable item method 1 */
-		if(is_object($value) && strtolower(get_class($value))=='ccomboitem'){
+		if(is_object($value) && zbx_strtolower(get_class($value))=='ccomboitem'){
 			parent::addItem($value);
 		}
 		else{

@@ -262,7 +262,7 @@ class CGraphDraw{
 		$fontnum = 11;
 		if(($this->sizeX < 500) && ($this->type == GRAPH_TYPE_NORMAL || $this->type == GRAPH_TYPE_BAR)) $fontnum = 8;
 
-		$x=$this->fullSizeX/2-imagefontwidth($fontnum)*strlen($str)/2;
+		$x=$this->fullSizeX/2-imagefontwidth($fontnum)*zbx_strlen($str)/2;
 		imagetext($this->im, $fontnum, 0, $x, 24, $this->getColor($this->graphtheme['textcolor'], 0), $str);
 	}
 

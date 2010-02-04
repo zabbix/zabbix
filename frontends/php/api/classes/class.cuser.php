@@ -166,7 +166,7 @@ class CUser extends CZBXAPI{
 
 // pattern
 		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where'][] = ' UPPER(u.alias) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
+			$sql_parts['where'][] = ' UPPER(u.alias) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
 		}
 
 // order
@@ -436,7 +436,7 @@ class CUser extends CZBXAPI{
 		if(is_null($cnf)){
 			$config = select_config();
 			foreach($config as $id => $value){
-				if(strpos($id,'ldap_') !== false){
+				if(zbx_strpos($id,'ldap_') !== false){
 					$cnf[str_replace('ldap_','',$id)] = $config[$id];
 				}
 			}
