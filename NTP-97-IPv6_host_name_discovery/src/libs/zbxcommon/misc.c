@@ -1734,7 +1734,7 @@ int	is_function_char(const char c)
  * Comments: the string must be null-terminated, otherwise not secure!        *
  *                                                                            *
  ******************************************************************************/
-void	make_hostname(char const *host)
+void	make_hostname(char * const host)
 {
 	char	*c = NULL;
 	
