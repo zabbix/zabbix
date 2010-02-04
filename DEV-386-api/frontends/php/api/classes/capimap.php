@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with Maps
  */
-class CMap extends CZBXAPI{
+class CAPIMap extends CZBXAPI{
 /**
  * Get Map data
  *

@@ -25,9 +25,8 @@
  */
 /**
  * Class containing methods for operations with Actions
- *
  */
-class CAction extends CZBXAPI{
+class CAPIAction extends CZBXAPI{
 /**
  * Get Actions data
  *
@@ -37,7 +36,7 @@ class CAction extends CZBXAPI{
  * @since 1.8
  * @version 1
  *
- * @param _array $options
+ * @param array $options
  * @param array $options['itemids']
  * @param array $options['hostids']
  * @param array $options['groupids']
@@ -80,7 +79,6 @@ class CAction extends CZBXAPI{
 			'mediatypeids'			=> null,
 			'userids'				=> null,
 			'nopermissions'			=> null,
-
 // filter
 			'eventsource'			=> null,
 			'evaltype'				=> null,
@@ -88,7 +86,6 @@ class CAction extends CZBXAPI{
 			'esc_period'			=> null,
 			'recovery_msg'			=> null,
 			'pattern'				=> '',
-
 // OutPut
 			'extendoutput'			=> null,
 			'output'				=> API_OUTPUT_REFER,
@@ -485,45 +482,58 @@ class CAction extends CZBXAPI{
 		$actions = zbx_toArray($actions);
 		$actionids = array();
 
-		$result = false;
+		try{
+			self::BeginTransaction(__METHOD__);
+			
+			foreach($actions as $anum => $action){
+				$action_db_fields = array(
+					'name'				=> null,
+					'eventsource'		=> null,
+					'evaltype'			=> null,
+					'status'			=> 0,
+					'esc_period'		=> 0,
+					'def_shortdata'		=> '',
+					'def_longdata'		=> '',
+					'recovery_msg'		=> 0,
+					'r_shordata'		=> '',
+					'r_londata'			=> ''
+				);
 
-		self::BeginTransaction(__METHOD__);
-		foreach($actions as $anum => $action){
-			$action_db_fields = array(
-				'name'				=> null,
-				'eventsource'		=> null,
-				'evaltype'			=> null,
-				'status'			=> 0,
-				'esc_period'		=> 0,
-				'def_shortdata'		=> '',
-				'def_longdata'		=> '',
-				'recovery_msg'		=> 0,
-				'r_shordata'		=> '',
-				'r_londata'			=> ''
-			);
+				if(!check_db_fields($action_db_fields, $action)){
+					CZBXAPI::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for action');
+				}
 
-			if(!check_db_fields($action_db_fields, $action)){
-				$result = false;
-				break;
+				$actionids[] = $actionid = get_dbid('actions', 'actionid');
+				$values = array(
+					'actionid' => $actionid,
+					'name' => zbx_dbstr($action['name']),
+					'eventsource' => $action['eventsource'],
+					'esc_period' => $action['esc_period'],
+					'def_shortdata' => zbx_dbstr($action['def_shortdata']),
+					'def_longdata' => zbx_dbstr($action['def_longdata']),
+					'recovery_msg' => $action['recovery_msg'],
+					'r_shortdata' => zbx_dbstr($action['r_shortdata']),
+					'r_longdata' => zbx_dbstr($action['r_longdata']),
+					'evaltype' => $action['evaltype'],
+					'status' => $action['status']
+				);
+				
+				$sql = 'INSERT INTO actions ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
+				$sql .= '/* '.__METHOD__.' */';
+
+				if(!DBexecute($sql)) 
+					CZBXAPI::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for action');
 			}
 
-			$actionid = get_dbid('actions', 'actionid');
-			$sql = 'INSERT INTO actions '.
-						'(actionid,name,eventsource,esc_period,def_shortdata,def_longdata,recovery_msg,r_shortdata,r_longdata,evaltype,status)'.
-					' VALUES ('.$actionid.','.zbx_dbstr($action['name']).','.$action['eventsource'].','.$action['esc_period'].','.zbx_dbstr($action['def_shortdata']).','.zbx_dbstr($action['def_longdata']).','.$action['recovery_msg'].','.zbx_dbstr($action['r_shortdata']).','.zbx_dbstr($action['r_longdata']).','.$action['evaltype'].','.$action['status'].')';
-			$result = DBexecute($sql);
-
-			if(!$result) break;
-			$actionids[] = $actionid;
-		}
-
-		$result = self::EndTransaction($result, __METHOD__);
-		if($result){
+			self::EndTransaction(true, __METHOD__);
+			
 			$new_actions = CAction::get(array('actionids'=>$actionids, 'extendoutput'=>1, 'nopermissions'=>1));
 			return $new_actions;
 		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			
+			self::setMethodErrors(__METHOD__, $e->getCode(), $e->getErrors());
 			return false;
 		}
 	}

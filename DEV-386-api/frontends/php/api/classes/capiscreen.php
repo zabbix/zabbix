@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with Screens
  */
-class CScreen extends CZBXAPI{
+class CAPIScreen extends CZBXAPI{
 /**
  * Get Screen data
  *
@@ -74,7 +74,7 @@ class CScreen extends CZBXAPI{
 			'pattern'					=> '',
 // OutPut
 			'extendoutput'				=> null,
-			'output'				=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_REFER,
 			'select_groups'				=> null,
 			'select_templates'			=> null,
 			'select_items'				=> null,

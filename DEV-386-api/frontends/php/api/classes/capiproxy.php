@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with Proxies
  */
-class CProxy extends CZBXAPI{
+class CAPIProxy extends CZBXAPI{
 /**
  * Get Proxy data
  *
@@ -209,7 +209,7 @@ class CProxy extends CZBXAPI{
 
 	return $result;
 	}
-
+	
 /**
  * Get Proxy ID by Proxy name
  *
@@ -219,10 +219,10 @@ class CProxy extends CZBXAPI{
  * @since 1.8
  * @version 1
  *
- * @param _array $proxy_data
+ * @param array $proxy_data
  * @param string $proxy_data['proxy']
  * @return int|boolean
- *
+ */
 	public static function getObjects($proxy_data){
 		$result = array();
 		$proxyids = array();
@@ -238,7 +238,7 @@ class CProxy extends CZBXAPI{
 		}
 
 		if(!empty($proxyids))
-			$result = self::get(array('proxyids' => $proxyids, 'extendoutput' => 1));
+			$result = self::get(array('proxyids' => $proxyids, 'output' => API_OUTPUT_EXTEND));
 
 	return $result;
 	}

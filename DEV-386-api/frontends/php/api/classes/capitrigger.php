@@ -27,7 +27,7 @@
  * Class containing methods for operations with Triggers
  *
  */
-class CTrigger extends CZBXAPI{
+class CAPITrigger extends CZBXAPI{
 
 	public static $error = array();
 
@@ -98,7 +98,6 @@ class CTrigger extends CZBXAPI{
 			'min_severity'			=> null,
 //
 			'pattern'				=> '',
-
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
 			'extendoutput'			=> null,

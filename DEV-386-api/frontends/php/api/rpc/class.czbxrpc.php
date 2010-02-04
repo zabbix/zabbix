@@ -41,46 +41,48 @@ class czbxrpc{
 
 		list($resource, $action) = explode('.', $method);
 
-		$without_auth = array('apiinfo.version'); // list of methods which does not require athentication
-
-		if(!str_in_array($method, $without_auth)){
+		if(defined('ZBX_API_REQUEST')){
+		
+			$without_auth = array('apiinfo.version'); // list of methods which does not require athentication
 // Authentication {{{
-			if(($resource == 'user') && ($action == 'authenticate')){
-				$sessionid = null;
+			if(!str_in_array($method, $without_auth)){
+				if(($resource == 'user') && ($action == 'authenticate')){
+					$sessionid = null;
 
-				$options = array(
-							'users' => $params['user'],
-							'extendoutput' => 1,
-							'get_access' => 1
-						);
-				$users = CUser::get($options);
-				$user = reset($users);
-				if($user['api_access'] != GROUP_API_ACCESS_ENABLED){
-					self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'No API access');
-					return self::$result;
+					$options = array(
+								'users' => $params['user'],
+								'extendoutput' => 1,
+								'get_access' => 1
+							);
+					$users = CUser::get($options);
+					$user = reset($users);
+					if($user['api_access'] != GROUP_API_ACCESS_ENABLED){
+						self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'No API access');
+						return self::$result;
+					}
 				}
-			}
 
-			if(empty($sessionid) && (($resource != 'user') || ($action != 'authenticate'))){
-				self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
-				return self::$result;
-			}
-			else if(!empty($sessionid)){
-				if(!CUser::checkAuthentication(array('sessionid' => $sessionid))){
+				if(empty($sessionid) && (($resource != 'user') || ($action != 'authenticate'))){
 					self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
 					return self::$result;
 				}
+				else if(!empty($sessionid)){
+					if(!CUser::checkAuthentication(array('sessionid' => $sessionid))){
+						self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'Not authorized');
+						return self::$result;
+					}
 
-				$options = array(
-						'userids' => $USER_DETAILS['userid'],
-						'extendoutput' => 1,
-						'get_access' => 1
-					);
-				$users = CUser::get($options);
-				$user = reset($users);
-				if($user['api_access'] != GROUP_API_ACCESS_ENABLED){
-					self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'No API access');
-					return self::$result;
+					$options = array(
+							'userids' => $USER_DETAILS['userid'],
+							'extendoutput' => 1,
+							'get_access' => 1
+						);
+					$users = CUser::get($options);
+					$user = reset($users);
+					if($user['api_access'] != GROUP_API_ACCESS_ENABLED){
+						self::$result = array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => 'No API access');
+						return self::$result;
+					}
 				}
 			}
 // }}} Authentication
@@ -97,7 +99,7 @@ class czbxrpc{
 			return self::$result;
 		}
 
-		call_user_func(array('self', $resource), $action, $params);
+		call_user_func(array('czbxrpc', $resource), $action, $params);
 
 		if(self::$result !== false){
 			self::$result = array('result' => self::$result);
@@ -111,247 +113,171 @@ class czbxrpc{
 
 // APIINFO
 	private static function apiinfo($action, $params){
-
-		CAPIInfo::$error = array();
-
 		switch($action){
 			default:
 			$result = call_user_func(array('CAPIInfo', $action), $params);
 		}
-
 		self::$result = $result;
 	}
 // USER
 	private static function user($action, $params){
-
-		CUser::$error = array();
-
 		switch($action){
 			default:
-			$result = call_user_func(array('CUser', $action), $params);
+			$result = call_user_func(array('CAPIUser', $action), $params);
 		}
-
 		self::$result = $result;
 	}
 
 // HOST GROUP
 	private static function hostgroup($action, $params){
-
-		CHostGroup::$error = array();
-
 		switch($action){
 			default:
-			$result = call_user_func(array('CHostGroup', $action), $params);
+			$result = call_user_func(array('CAPIHostGroup', $action), $params);
 		}
-
 		self::$result = $result;
 	}
 
 // TEMPLATE
 	private static function template($action, $params){
-
-		CTemplate::$error = array();
-
 		switch($action){
 			default:
-			$result = call_user_func(array('CTemplate', $action), $params);
+			$result = call_user_func(array('CAPITemplate', $action), $params);
 		}
-
 		self::$result = $result;
 	}
 
 // HOST
 	private static function host($action, $params){
-
-		CHost::$error = array();
-
 		switch($action){
 			default:
-			$result = call_user_func(array('CHost', $action), $params);
+			$result = call_user_func(array('CAPIHost', $action), $params);
 		}
-
 		self::$result = $result;
 	}
 
 // ITEM
 	private static function item($action, $params){
-
-		CItem::$error = array();
-
 		switch($action){
 			default:
-			$result = call_user_func(array('CItem', $action), $params);
+			$result = call_user_func(array('CAPIItem', $action), $params);
 		}
-
 		self::$result = $result;
 	}
 
 // TRIGGER
 	private static function trigger($action, $params){
-
-		CTrigger::$error = array();
-
 		switch($action){
 			default:
-			$result = call_user_func(array('CTrigger', $action), $params);
+			$result = call_user_func(array('CAPITrigger', $action), $params);
 		}
-
 		self::$result = $result;
 	}
 
 // GRAPH
 	private static function graph($action, $params){
-
-		CGraph::$error = array();
-
 		switch($action){
 			default:
-			$result = call_user_func(array('CGraph', $action), $params);
+			$result = call_user_func(array('CAPIGraph', $action), $params);
 		}
-
 		self::$result = $result;
 	}
 
 // ACTION
 	private static function action($action, $params){
-
-		CAction::$error = array();
-
 		switch($action){
 			default:
-			$result = call_user_func(array('CAction', $action), $params);
+			$result = call_user_func(array('CAPIAction', $action), $params);
 		}
-
 		self::$result = $result;
 	}
 
 // ALERT
 	private static function alert($action, $params){
-
-		CAlert::$error = array();
-
 		switch($action){
 			default:
-			$result = call_user_func(array('CAlert', $action), $params);
+			$result = call_user_func(array('CAPIAlert', $action), $params);
 		}
-
 		self::$result = $result;
 	}
 
 // APPLICATION
 	private static function application($action, $params){
-
-		CApplication::$error = array();
-
 		switch($action){
 			default:
-			$result = call_user_func(array('CApplication', $action), $params);
+			$result = call_user_func(array('CAPIApplication', $action), $params);
 		}
-
 		self::$result = $result;
 	}
 
 // EVENT
 	private static function event($action, $params){
-
-		CEvent::$error = array();
-
 		switch($action){
 			default:
-			$result = call_user_func(array('CEvent', $action), $params);
+			$result = call_user_func(array('CAPIEvent', $action), $params);
 		}
-
 		self::$result = $result;
 	}
 
 // GRAPHITEM
 	private static function graphitem($action, $params){
-
-		CGraphItem::$error = array();
-
 		switch($action){
 			default:
-			$result = call_user_func(array('CGraphItem', $action), $params);
+			$result = call_user_func(array('CAPIGraphItem', $action), $params);
 		}
-
 		self::$result = $result;
 	}
 
 // MAINTENANCE
 	private static function maintenance($action, $params){
-
-		CMaintenance::$error = array();
-
 		switch($action){
 			default:
-			$result = call_user_func(array('CMaintenance', $action), $params);
+			$result = call_user_func(array('CAPIMaintenance', $action), $params);
 		}
-
 		self::$result = $result;
 	}
 
 // MAP
 	private static function map($action, $params){
-
-		CMap::$error = array();
-
 		switch($action){
 			default:
-			$result = call_user_func(array('CMap', $action), $params);
+			$result = call_user_func(array('CAPIMap', $action), $params);
 		}
-
 		self::$result = $result;
 	}
 
 // SCREEN
 	private static function screen($action, $params){
-
-		CScreen::$error = array();
-
 		switch($action){
 			default:
-			$result = call_user_func(array('CScreen', $action), $params);
+			$result = call_user_func(array('CAPIScreen', $action), $params);
 		}
-
 		self::$result = $result;
 	}
 
 // SCRIPT
 	private static function script($action, $params){
-
-		CScript::$error = array();
-
 		switch($action){
 			default:
-			$result = call_user_func(array('CScript', $action), $params);
+			$result = call_user_func(array('CAPIScript', $action), $params);
 		}
-
 		self::$result = $result;
 	}
 
 // USERGROUP
 	private static function usergroup($action, $params){
-
-		CUserGroup::$error = array();
-
 		switch($action){
 			default:
-			$result = call_user_func(array('CUserGroup', $action), $params);
+			$result = call_user_func(array('CAPIUserGroup', $action), $params);
 		}
-
 		self::$result = $result;
 	}
 
 // USERMACRO
 	private static function usermacro($action, $params){
-
-		CUserMacro::$error = array();
-
 		switch($action){
 			default:
-			$result = call_user_func(array('CUserMacro', $action), $params);
+			$result = call_user_func(array('CAPIUserMacro', $action), $params);
 		}
-
 		self::$result = $result;
 	}
 }

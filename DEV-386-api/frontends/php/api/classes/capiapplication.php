@@ -27,7 +27,7 @@
  * Class containing methods for operations with Applications
  *
  */
-class CApplication extends CZBXAPI{
+class CAPIApplication extends CZBXAPI{
 /**
  * Get Applications data
  *
@@ -79,7 +79,6 @@ class CApplication extends CZBXAPI{
 			'nopermissions'			=> null,
 // Filter
 			'pattern'				=> '',
-
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
 			'extendoutput'			=> null,

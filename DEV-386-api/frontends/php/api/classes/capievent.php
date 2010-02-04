@@ -27,7 +27,7 @@
  * Class containing methods for operations with events
  *
  */
-class CEvent extends CZBXAPI{
+class CAPIEvent extends CZBXAPI{
 /**
  * Get events data
  *

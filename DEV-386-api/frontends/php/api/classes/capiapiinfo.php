@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with APIInfo
  */
-class CAPIInfo extends CZBXAPI{
+class CAPIAPIInfo extends CZBXAPI{
 /**
  * Get API version
  *

@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with Hosts
  */
-class CHost extends CZBXAPI{
+class CAPIHost extends CZBXAPI{
 /**
  * Get Host data
  *
@@ -94,9 +94,11 @@ class CHost extends CZBXAPI{
 			'itemids'					=> null,
 			'triggerids'				=> null,
 			'graphids'					=> null,
-			'monitored_hosts'			=> null,
-			'templated_hosts'			=> null,
-			'proxy_hosts'				=> null,
+			// 'monitored_hosts'			=> null,
+			'monitored'			=> null,
+			'templated'			=> null,
+			// 'templated_hosts'			=> null,
+			// 'proxy_hosts'				=> null,
 			'with_items'				=> null,
 			'with_monitored_items'		=> null,
 			'with_historical_items'		=> null,
@@ -110,7 +112,6 @@ class CHost extends CZBXAPI{
 // filter
 			'pattern'					=> '',
 			'extend_pattern'			=> null,
-
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
 			'extendoutput'				=> null,

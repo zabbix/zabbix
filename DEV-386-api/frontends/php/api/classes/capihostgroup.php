@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with HostGroups
  */
-class CHostGroup extends CZBXAPI{
+class CAPIHostGroup extends CZBXAPI{
 /**
  * Get HostGroups
  *
@@ -75,10 +75,8 @@ class CHostGroup extends CZBXAPI{
 			'with_graphs'				=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
-
 // filter
 			'pattern' 					=> '',
-
 // output
 			'output'					=> API_OUTPUT_REFER,
 			'extendoutput'				=> null,
