@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,8 +25,9 @@
  */
 /**
  * Class containing methods for operations with Alerts
+ *
  */
-class CAPIAlert extends CZBXAPI{
+class CAlert extends CZBXAPI{
 /**
  * Get Alerts data
  *
@@ -81,6 +82,7 @@ class CAPIAlert extends CZBXAPI{
 			'mediatypeids'			=> null,
 			'userids'				=> null,
 			'nopermissions'			=> null,
+
 // filter
 			'status'				=> null,
 			'retries'				=> null,
@@ -88,6 +90,7 @@ class CAPIAlert extends CZBXAPI{
 			'alerttype'				=> null,
 			'time_from'				=> null,
 			'time_till'				=> null,
+
 // OutPut
 			'extendoutput'			=> null,
 			'output'				=> API_OUTPUT_REFER,
@@ -416,7 +419,7 @@ class CAPIAlert extends CZBXAPI{
 				'hostids' => $hostids,
 				'preservekeys' => 1
 			);
-			$hosts = API::Host()->get($obj_params);
+			$hosts = CHost::get($obj_params);
 		}
 
 // Adding Users
@@ -426,7 +429,7 @@ class CAPIAlert extends CZBXAPI{
 				'userids' => $userids,
 				'preservekeys' => 1
 			);
-			$users = API::User()->get($obj_params);
+			$users = CUser::get($obj_params);
 		}
 
 // Adding MediaTypes

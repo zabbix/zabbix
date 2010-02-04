@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with Users
  */
-class CAPIUser extends CZBXAPI{
+class CUser extends CZBXAPI{
 /**
  * Get Users data
  *
@@ -87,7 +87,7 @@ class CAPIUser extends CZBXAPI{
 			'pattern'					=> '',
 // OutPut
 			'extendoutput'				=> null,
-			'output'					=> API_OUTPUT_REFER,
+			'output'				=> API_OUTPUT_REFER,
 			'editable'					=> null,
 			'select_usrgrps'			=> null,
 			'get_access'				=> null,
@@ -272,7 +272,7 @@ class CAPIUser extends CZBXAPI{
 				'userids' => $userids,
 				'preservekeys' => 1
 			);
-			$usrgrps = API::UserGroup()->get($obj_params);
+			$usrgrps = CUserGroup::get($obj_params);
 			foreach($usrgrps as $usrgrpid => $usrgrp){
 				$uusers = $usrgrp['users'];
 				unset($usrgrp['users']);
@@ -475,7 +475,7 @@ class CAPIUser extends CZBXAPI{
 		global	$USER_DETAILS;
 		global	$ZBX_LOCALNODEID;
 		global	$ZBX_NODES;
-if(!isset($user['sessionid'])) sdb();
+
 		$sessionid = is_null($user)?null:$user['sessionid'];
 
 		$USER_DETAILS = NULL;
@@ -863,7 +863,7 @@ if(!isset($user['sessionid'])) sdb();
 			$result = DBexecute($sql);
 
 			// if(isset($user['usrgrps']) && !is_null($user['usrgrps'])){
-				// $user_groups = API::HostGroup()->get(array('userids' => $user['userid']));
+				// $user_groups = CHostGroup::get(array('userids' => $user['userid']));
 				// $user_groupids = zbx_objectValues($user_groups, 'usrgrpid');
 				// $new_groupids = zbx_objectValues($user['usrgrps'], 'usrgrpid');
 
@@ -884,7 +884,7 @@ if(!isset($user['sessionid'])) sdb();
 			if($result && isset($user['usrgrps']) && !is_null($user['usrgrps'])){
 				DBexecute('DELETE FROM users_groups WHERE userid='.$user['userid']);
 
-				$usrgrps = API::UserGroup()->get(array(
+				$usrgrps = CUserGroup::get(array(
 					'usrgrpids' => zbx_objectValues($user['usrgrps'], 'usrgrpid'),
 					'extendoutput' => 1,
 					'preservekeys' => 1));

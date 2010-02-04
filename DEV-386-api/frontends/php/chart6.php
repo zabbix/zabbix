@@ -55,7 +55,7 @@ include_once 'include/page_header.php';
 			'extendoutput' => 1
 		);
 
-	$db_data = API::Graph()->get($options);
+	$db_data = CGraph::get($options);
 	if(empty($db_data)) access_deny();
 	else $db_data = reset($db_data);
 

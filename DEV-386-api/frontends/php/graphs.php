@@ -98,7 +98,7 @@ include_once('include/page_header.php');
 			'graphids' => $_REQUEST['graphid'],
 			'editable' => 1
 		);
-		$graphs = API::Graph()->get($options);
+		$graphs = CGraph::get($options);
 
 		if(empty($graphs)) access_deny();
 	}
@@ -130,7 +130,7 @@ include_once('include/page_header.php');
 				'webitems'=>1,
 				'editable'=>1
 			);
-			$db_items = API::Item()->get($options);
+			$db_items = CItem::get($options);
 			$db_items = zbx_toHash($db_items, 'itemid');
 
 			foreach($itemids as $inum => $itemid){
@@ -211,11 +211,11 @@ include_once('include/page_header.php');
 	}
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['graphid'])){
 		$options = array('graphids'=>$_REQUEST['graphid'], 'extendoutput'=>1, 'editable'=>1, 'nopermissions'=>1);
-		$graphs = API::Graph()->get($options);
+		$graphs = CGraph::get($options);
 		$graph = reset($graphs);
 
 		DBstart();
-			$result = API::Graph()->delete($graphs);
+			$result = CGraph::delete($graphs);
 		$result = DBend($result);
 
 		if($result){
@@ -270,7 +270,7 @@ include_once('include/page_header.php');
 //------ GO -------
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_graphid'])){
 		$options = array('graphids'=>$_REQUEST['group_graphid'], 'extendoutput'=>1, 'editable'=>1);
-		$graphs = API::Graph()->get($options);
+		$graphs = CGraph::get($options);
 
 		$go_result = false;
 
@@ -285,7 +285,7 @@ include_once('include/page_header.php');
 			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH,'Graph ['.$graph['name'].']');
 		}
 		if(!empty($graphs)){
-			$go_result = API::Graph()->delete($graphs);
+			$go_result = CGraph::delete($graphs);
 		}
 
 		$go_result = DBend($go_result);
@@ -310,7 +310,7 @@ include_once('include/page_header.php');
 				zbx_value2array($_REQUEST['copy_targetid']);
 
 				$opt = array('groupids'=>$_REQUEST['copy_targetid'], 'editable'=>1, 'nodes'=>get_current_nodeid(true));
-				$db_groups = API::HostGroup()->get($opt);
+				$db_groups = CHostGroup::get($opt);
 				$db_groups = zbx_toHash($db_groups, 'groupid');
 
 				foreach($_REQUEST['copy_targetid'] as $gnum => $groupid){
@@ -322,7 +322,7 @@ include_once('include/page_header.php');
 				$options['groupids'] = $_REQUEST['copy_targetid'];
 			}
 
-			$db_hosts = API::Host()->get($options);
+			$db_hosts = CHost::get($options);
 
 			DBstart();
 			foreach($_REQUEST['group_graphid'] as $gnum => $graph_id){
@@ -509,7 +509,7 @@ include_once('include/page_header.php');
 			$options['groupids'] = $PAGE_GROUPS['selected'];
 		}
 
-		$graphs = API::Graph()->get($options);
+		$graphs = CGraph::get($options);
 
 		order_result($graphs, $sortfield, $sortorder);
 		$paging = getPagingLine($graphs);
@@ -522,7 +522,7 @@ include_once('include/page_header.php');
 			'select_hosts' => 1,
 			'select_templates' => 1
 		);
-		$graphs = API::Graph()->get($options);
+		$graphs = CGraph::get($options);
 
 		// Change graphtype from numbers to names, for correct sorting
 		foreach($graphs as $gnum => $graph){

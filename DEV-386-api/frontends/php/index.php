@@ -79,7 +79,7 @@ $page['file']	= 'index.php';
 		$passwd = get_request('password','');
 
 
-		$login = API::User()->login(array('user'=>$name, 'password'=>$passwd, 'auth_type'=>$authentication_type));
+		$login = CUser::login(array('user'=>$name, 'password'=>$passwd, 'auth_type'=>$authentication_type));
 
 		if($login){
 			$url = is_null($request)?$USER_DETAILS['url']:$request;

@@ -74,7 +74,7 @@ include_once('include/page_header.php');
 			'select_triggers' => 1,
 			'eventids' => $_REQUEST['eventid']
 		);
-		$events = API::Event()->get($options);
+		$events = CEvent::get($options);
 		$event = reset($events);
 		$event_trigger = reset($event['triggers']);
 		$event_acknowledged = $event['acknowledged'];
@@ -96,13 +96,13 @@ include_once('include/page_header.php');
 				'acknowledged' => 0,
 				'triggerids' => $_REQUEST['triggers']
 			);
-			$_REQUEST['events'] = API::Event()->get($options);
+			$_REQUEST['events'] = CEvent::get($options);
 		}
 
 		$events_data = array(
 			'events' => $_REQUEST['events'],
 			'message' => $_REQUEST['message']);
-		$result = API::Event()->acknowledge($events_data);
+		$result = CEvent::acknowledge($events_data);
 
 		show_messages($result, S_EVENT_ACKNOWLEDGED, S_CANNOT_ACKNOWLEDGE_EVENT);
 		if($result){
@@ -143,7 +143,7 @@ include_once('include/page_header.php');
 			$table->setAlign('center');
 
 			while($db_ack = DBfetch($db_acks)){
-				$db_user = API::User()->get(array('userids' => $db_ack['userid'], 'extendoutput' => 1));
+				$db_user = CUser::get(array('userids' => $db_ack['userid'], 'extendoutput' => 1));
 				$db_user = reset($db_user);
 
 				$table->addRow(array(

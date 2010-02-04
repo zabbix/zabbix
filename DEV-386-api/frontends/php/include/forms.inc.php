@@ -624,7 +624,7 @@
 				);
 			if($profile) $options['nodeids'] = id2nodeid($userid);
 
-			$users = API::User()->get($options);
+			$users = CUser::get($options);
 			$user = reset($users);
 
 			$frm_title = S_USER.' "'.$user['alias'].'"';
@@ -772,7 +772,7 @@
 			$lstGroups = new CListBox('user_groups_to_del[]', null, 10);
 			$lstGroups->attributes['style'] = 'width: 320px';
 
-			$groups = API::UserGroup()->get(array('usrgrpids' => $user_groups, 'extendoutput' => 1));
+			$groups = CUserGroup::get(array('usrgrpids' => $user_groups, 'extendoutput' => 1));
 			order_result($groups, 'name');
 			foreach($groups as $num => $group){
 				$lstGroups->addItem($group['usrgrpid'], $group['name']);
@@ -949,7 +949,7 @@
 
 		$frm_title = S_USER_GROUP;
 		if(isset($_REQUEST['usrgrpid'])){
-			$usrgrp		= API::UserGroup()->get(array('usrgrpids' => $_REQUEST['usrgrpid'],  'extendoutput' => 1));
+			$usrgrp		= CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'],  'extendoutput' => 1));
 			$usrgrp = reset($usrgrp);
 
 			$frm_title	= S_USER_GROUP.' "'.$usrgrp['name'].'"';
@@ -1822,7 +1822,7 @@
 
 		if(isset($_REQUEST['itemid'])){
 			$frmItem->addVar('itemid', $_REQUEST['itemid']);
-			$item_data = API::Item()->get(array('itemids' => $_REQUEST['itemid'],  'extendoutput' => 1));
+			$item_data = CItem::get(array('itemids' => $_REQUEST['itemid'],  'extendoutput' => 1));
 			$item_data = reset($item_data);
 
 			$hostid	= ($hostid > 0) ? $hostid : $item_data['hostid'];
@@ -1831,7 +1831,7 @@
 
 		if(is_null($host)){
 			if($hostid > 0){
-				$host_info = API::Host()->get(array('hostids' => $hostid, 'extendoutput' => 1, 'templated_hosts' => 1));
+				$host_info = CHost::get(array('hostids' => $hostid, 'extendoutput' => 1, 'templated_hosts' => 1));
 				$host_info = reset($host_info);
 				$host = $host_info['host'];
 			}
@@ -2508,7 +2508,7 @@
 
 		$target_list = array();
 
-		$groups = API::HostGroup()->get(array('extendoutput'=>1, 'order'=>'name'));
+		$groups = CHostGroup::get(array('extendoutput'=>1, 'order'=>'name'));
 		if(0 == $copy_type){
 			$cmbGroup = new CComboBox('filter_groupid',$filter_groupid,'submit()');
 			foreach($groups as $gnum => $group){
@@ -2521,7 +2521,7 @@
 			$options = array('extendoutput'=>1,
 							'order'=>'host',
 							'groupids'=> $filter_groupid);
-			$hosts = API::Host()->get($options);
+			$hosts = CHost::get($options);
 			foreach($hosts as $num => $host){
 				$hostid = $host['hostid'];
 
@@ -2536,7 +2536,7 @@
 				));
 			}
 
-			$templates = API::Template()->get($options);
+			$templates = CTemplate::get($options);
 
 			foreach($templates as $num => $template){
 				$templateid = $template['templateid'];
@@ -2933,7 +2933,7 @@
 						'graphids' => $_REQUEST['graphid'],
 						'extendoutput' => 1
 					);
-			$graphs = API::Graph()->get($options);
+			$graphs = CGraph::get($options);
 			$row = reset($graphs);
 
 			$frmGraph->setTitle(S_GRAPH.' "'.$row['name'].'"');
@@ -2963,7 +2963,7 @@
 						'extendoutput' => 1
 					);
 
-			$items = API::GraphItem()->get($options);
+			$items = CGraphItem::get($options);
 		}
 		else{
 			$name = get_request('name', '');
@@ -3443,7 +3443,7 @@
 			'extendoutput' => 1,
 			'real_hosts' => 1,
 		);
-		$groups = API::HostGroup()->get($options);
+		$groups = CHostGroup::get($options);
 		$groups = zbx_toHash($groups, 'groupid');
 		order_result($groups, 'name');
 
@@ -3488,7 +3488,7 @@
 			'extendoutput' => 1,
 			'groupids' => $twb_groupid
 		);
-		$group_hosts = API::Host()->get($options);
+		$group_hosts = CHost::get($options);
 		order_result($group_hosts, 'host');
 
 		foreach($group_hosts as $ghost){
@@ -4696,7 +4696,7 @@
 					$object_srctbl = 'usrgrp';
 					$object_srcfld1 = 'usrgrpid';
 
-					$object_name = API::UserGroup()->get(array('usrgrpids' => $new_operation['objectid'],  'extendoutput' => 1));
+					$object_name = CUserGroup::get(array('usrgrpids' => $new_operation['objectid'],  'extendoutput' => 1));
 					$object_name = reset($object_name);
 
 					$display_name = 'name';
@@ -4705,7 +4705,7 @@
 					$object_srctbl = 'users';
 					$object_srcfld1 = 'userid';
 
-					$object_name = API::User()->get(array('userids' => $new_operation['objectid'],  'extendoutput' => 1));
+					$object_name = CUser::get(array('userids' => $new_operation['objectid'],  'extendoutput' => 1));
 					$object_name = reset($object_name);
 
 					$display_name = 'alias';
@@ -5632,7 +5632,7 @@
 
 // add groups
 			$options = array('hostids' => $_REQUEST['hostid']);
-			$host_groups = API::HostGroup()->get($options);
+			$host_groups = CHostGroup::get($options);
 			$host_groups = zbx_objectValues($host_groups, 'groupid');
 
 // read profile
@@ -5762,7 +5762,7 @@
 
 		$grp_tb = new CTweenBox($frmHost, 'groups', $host_groups, 10);
 
-		$all_groups = API::HostGroup()->get(array('editable' => 1, 'extendoutput' => 1));
+		$all_groups = CHostGroup::get(array('editable' => 1, 'extendoutput' => 1));
 		order_result($all_groups, 'name');
 		foreach($all_groups as $group){
 			$grp_tb->addItem($group['groupid'], $group['name']);
@@ -6651,7 +6651,7 @@
 		if(str_in_array('applications', $elements))
 			$header_host_opt['select_applications'] = 1;
 
-		$header_host = API::Host()->get($header_host_opt);
+		$header_host = CHost::get($header_host_opt);
 		$header_host = array_pop($header_host);
 
 
@@ -6744,7 +6744,7 @@
 			$macros = get_request('macros', array());
 		}
 		else if($hostid > 0){
-			$macros = API::UserMacro()->get(array('extendoutput' => 1, 'hostids' => $hostid));
+			$macros = CUserMacro::get(array('extendoutput' => 1, 'hostids' => $hostid));
 		}
 		else{
 			$macros = array();

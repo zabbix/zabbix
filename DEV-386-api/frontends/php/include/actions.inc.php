@@ -511,13 +511,13 @@ function get_operation_desc($type=SHORT_DESCRITION, $data){
 				case OPERATION_TYPE_MESSAGE:
 					switch($data['object']){
 						case OPERATION_OBJECT_USER:
-							$obj_data = API::User()->get(array('userids' => $data['objectid'],  'extendoutput' => 1));
+							$obj_data = CUser::get(array('userids' => $data['objectid'],  'extendoutput' => 1));
 							$obj_data = reset($obj_data);
 
 							$obj_data = S_USER.' "'.$obj_data['alias'].'"';
 							break;
 						case OPERATION_OBJECT_GROUP:
-							$obj_data = API::UserGroup()->get(array('usrgrpids' => $data['objectid'],  'extendoutput' => 1));
+							$obj_data = CUserGroup::get(array('usrgrpids' => $data['objectid'],  'extendoutput' => 1));
 							$obj_data = reset($obj_data);
 
 							$obj_data = S_GROUP.' "'.$obj_data['name'].'"';
@@ -918,14 +918,14 @@ function validate_operation($operation){
 		case OPERATION_TYPE_MESSAGE:
 			switch($operation['object']){
 				case OPERATION_OBJECT_USER:
-					$users = API::User()->get(array('userids' => $operation['objectid'],  'extendoutput' => 1));
+					$users = CUser::get(array('userids' => $operation['objectid'],  'extendoutput' => 1));
 					if(empty($users)){
 						error(S_INCORRECT_USER);
 						return false;
 					}
 					break;
 				case OPERATION_OBJECT_GROUP:
-					$usrgrps = API::UserGroup()->get(array('usrgrpids' => $operation['objectid'],  'extendoutput' => 1));
+					$usrgrps = CUserGroup::get(array('usrgrpids' => $operation['objectid'],  'extendoutput' => 1));
 					if(empty($usrgrps)){
 						error(S_INCORRECT_GROUP);
 						return false;
@@ -1111,7 +1111,7 @@ function get_action_msgs_for_event($eventid){
 	));
 
 
-	$alerts = API::Alert()->get(array(
+	$alerts = CAlert::get(array(
 		'eventids' => $eventid,
 		'alerttype' => ALERT_TYPE_MESSAGE,
 		'extendoutput' => 1,
@@ -1184,7 +1184,7 @@ function get_action_cmds_for_event($eventid){
 	));
 
 
-	$alerts = API::Alert()->get(array(
+	$alerts = CAlert::get(array(
 		'eventids' => $eventid,
 		'alerttype' => ALERT_TYPE_COMMAND,
 		'extendoutput' => 1,

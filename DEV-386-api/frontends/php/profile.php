@@ -137,12 +137,12 @@ $fields=array(
 			$user['user_medias'] = get_request('user_medias', array());
 
 			DBstart();
-			$result = API::User()->updateProfile($user);
+			$result = CUser::updateProfile($user);
 			if($result && ($USER_DETAILS['type'] > USER_TYPE_ZABBIX_USER))
-				$result = API::User()->updateMedia(array('users' => $user, 'medias' => $user['user_medias']));
+				$result = CUser::updateMedia(array('users' => $user, 'medias' => $user['user_medias']));
 
 			$result = DBend($result);
-			if(!$result) error(API::User()->resetErrors());
+			if(!$result) error(CUser::resetErrors());
 
 			show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 

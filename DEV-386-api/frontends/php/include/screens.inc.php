@@ -43,7 +43,7 @@ require_once('include/js.inc.php');
 							$options['nodeids'] = get_current_nodeid(true);
 
 							if($perm == PERM_READ_WRITE) $options['editable'] = 1;
-							$graphids = API::Graph()->get($options);
+							$graphids = CGraph::get($options);
 							$graphids = zbx_objectValues($graphids, 'graphid');
 							$graphids = zbx_toHash($graphids, 'graphid');
 						}
@@ -62,7 +62,7 @@ require_once('include/js.inc.php');
 						$options['nodeids'] = get_current_nodeid(true);
 						if($perm == PERM_READ_WRITE) $options['editable'] = 1;
 
-						$items = API::Item()->get($options);
+						$items = CItem::get($options);
 						if($items['rowscount'] == 0){
 							$result = false;
 						}
@@ -223,7 +223,7 @@ require_once('include/js.inc.php');
 				);
 			if($perm == PERM_READ_WRITE) $options['editable'] = 1;
 
-			$screens = API::Screen()->get($options);
+			$screens = CScreen::get($options);
 			$screens = zbx_toHash($screens, 'screenid');
 
 			foreach($screenids as $snum => $screenid){

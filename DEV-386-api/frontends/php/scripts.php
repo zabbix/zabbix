@@ -193,7 +193,7 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 		$usr_groups = new CCombobox('usrgrpid',$usrgrpid);
 		$usr_groups->addItem(0,S_ALL_S);
 
-		$usrgrps = API::UserGroup()->get(array('extendoutput'=>1, 'sortfield'=>'name'));
+		$usrgrps = CUserGroup::get(array('extendoutput'=>1, 'sortfield'=>'name'));
 
 		foreach($usrgrps as $ugnum => $usr_group){
 			$usr_groups->addItem($usr_group['usrgrpid'],$usr_group['name']);
@@ -204,7 +204,7 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 		$host_groups = new CCombobox('groupid',$groupid);
 		$host_groups->addItem(0,S_ALL_S);
 
-		$groups = API::HostGroup()->get(array('extendoutput' => 1, 'sortfield'=>'name'));
+		$groups = CHostGroup::get(array('extendoutput' => 1, 'sortfield'=>'name'));
 		foreach($groups as $gnum => $group){
 			$host_groups->addItem($group['groupid'],$group['name']);
 		}
@@ -245,7 +245,7 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 		$options = array('extendoutput' => 1,
 						'editable' => 1,
 						'select_groups' => 1);
-		$scripts = API::Script()->get($options);
+		$scripts = CScript::get($options);
 
 		$table = new CTableInfo(S_NO_SCRIPTS_DEFINED);
 		$table->setHeader(array(
@@ -272,7 +272,7 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 			$user_group_name = S_ALL_S;
 
 			if($script['usrgrpid'] > 0){
-				$user_group = API::UserGroup()->get(array('usrgrpids' => $script['usrgrpid'], 'extendoutput' => 1));
+				$user_group = CUserGroup::get(array('usrgrpids' => $script['usrgrpid'], 'extendoutput' => 1));
 				$user_group = reset($user_group);
 
 				$user_group_name = $user_group['name'];

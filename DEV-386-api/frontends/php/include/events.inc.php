@@ -275,10 +275,10 @@ function make_small_eventlist($eventid, $trigger_data){
 	$rows = array();
 	$count = 1;
 
-	$curevent = API::Event()->get(array('eventids' => $eventid, 'extendoutput' => 1, 'select_triggers' => 1));
+	$curevent = CEvent::get(array('eventids' => $eventid, 'extendoutput' => 1, 'select_triggers' => 1));
 	$curevent = reset($curevent);
 
-	$events = API::Event()->get(array(
+	$events = CEvent::get(array(
 		'time_till' => $curevent['clock'],
 		'triggerids' => $trigger_data['triggerid'],
 		'extendoutput' => 1,

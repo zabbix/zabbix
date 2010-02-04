@@ -110,7 +110,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',get_profile('web.actionconf
 //--------
 
 	if(isset($_REQUEST['actionid'])){
-		$aa = API::Action()->get(array('actionids' => $_REQUEST['actionid'], 'editable' => 1));
+		$aa = CAction::get(array('actionids' => $_REQUEST['actionid'], 'editable' => 1));
 		if(empty($aa)){
 			access_deny();
 		}
@@ -497,7 +497,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',get_profile('web.actionconf
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-		$actions = API::Action()->get($options);
+		$actions = CAction::get($options);
 
 		$tblActions = new CTableInfo(S_NO_ACTIONS_DEFINED);
 		$tblActions->setHeader(array(

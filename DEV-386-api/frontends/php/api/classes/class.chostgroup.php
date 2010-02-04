@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with HostGroups
  */
-class CAPIHostGroup extends CZBXAPI{
+class CHostGroup extends CZBXAPI{
 /**
  * Get HostGroups
  *
@@ -75,8 +75,10 @@ class CAPIHostGroup extends CZBXAPI{
 			'with_graphs'				=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
+
 // filter
 			'pattern' 					=> '',
+
 // output
 			'output'					=> API_OUTPUT_REFER,
 			'extendoutput'				=> null,
@@ -349,7 +351,7 @@ class CAPIHostGroup extends CZBXAPI{
 				'templated_hosts' => 1,
 				'preservekeys' => 1
 			);
-			$hosts = API::Host()->get($obj_params);
+			$hosts = CHost::get($obj_params);
 
 			foreach($hosts as $hostid => $host){
 				$hgroups = $host['groups'];
@@ -705,7 +707,7 @@ class CAPIHostGroup extends CZBXAPI{
 				'hostids' => $hostids,
 			'editable' => 1,
 				'preservekeys' => 1);
-			$allowed_hosts = API::Host()->get($options);
+			$allowed_hosts = CHost::get($options);
 			foreach($hosts as $num => $host){
 				if(!isset($allowed_hosts[$host['hostid']])){
 					self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -719,7 +721,7 @@ class CAPIHostGroup extends CZBXAPI{
 				'templateids' => $templateids,
 				'editable' => 1,
 				'preservekeys' => 1);
-			$allowed_templates = API::Template()->get($options);
+			$allowed_templates = CTemplate::get($options);
 			foreach($templates as $num => $template){
 				if(!isset($allowed_templates[$template['templateid']])){
 					self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -813,7 +815,7 @@ class CAPIHostGroup extends CZBXAPI{
 				'hostids' => $hostids,
 			'editable' => 1,
 				'preservekeys' => 1);
-			$allowed_hosts = API::Host()->get($options);
+			$allowed_hosts = CHost::get($options);
 			foreach($hosts as $num => $host){
 				if(!isset($allowed_hosts[$host['hostid']])){
 					self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -827,7 +829,7 @@ class CAPIHostGroup extends CZBXAPI{
 				'templateids' => $templateids,
 				'editable' => 1,
 				'preservekeys' => 1);
-			$allowed_templates = API::Template()->get($options);
+			$allowed_templates = CTemplate::get($options);
 			foreach($templates as $num => $template){
 				if(!isset($allowed_templates[$template['templateid']])){
 					self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -899,14 +901,14 @@ class CAPIHostGroup extends CZBXAPI{
 			// 'editable' => 1
 		);
 		if(!is_null($hosts)){
-			$groups_hosts = API::Host()->get($options);
+			$groups_hosts = CHost::get($options);
 			$hosts_to_unlink = array_diff(array_keys($groups_hosts), $hostids);
 			$hosts_to_link = array_diff($hostids, array_keys($groups_hosts));
 		}
 
 		$templates_to_unlink = $templates_to_link = array();
 		if(!is_null($templates)){
-			$groups_templates = API::Template()->get($options);
+			$groups_templates = CTemplate::get($options);
 			$templates_to_unlink = array_diff(array_keys($groups_templates), $templateids);
 			$templates_to_link = array_diff($templateids, array_keys($groups_templates));
 		}
@@ -933,7 +935,7 @@ class CAPIHostGroup extends CZBXAPI{
 				'hostids' => $hosts_to_check,
 				'editable' => 1,
 				'preservekeys' => 1);
-			$allowed_hosts = API::Host()->get($options);
+			$allowed_hosts = CHost::get($options);
 			foreach($hosts_to_check as $num => $hostid){
 				if(!isset($allowed_hosts[$hostid])){
 					self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -948,7 +950,7 @@ class CAPIHostGroup extends CZBXAPI{
 				'templateids' => $templates_to_check,
 				'editable' => 1,
 				'preservekeys' => 1);
-			$allowed_templates = API::Template()->get($options);
+			$allowed_templates = CTemplate::get($options);
 			foreach($templates_to_check as $num => $templateid){
 				if(!isset($allowed_templates[$templateid])){
 					self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);

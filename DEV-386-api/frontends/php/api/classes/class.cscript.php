@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
  * Class containing methods for operations with Scripts
  *
  */
-class CAPIscript extends CZBXAPI{
+class Cscript extends CZBXAPI{
 /**
  * Get Scripts data
  *
@@ -285,7 +285,7 @@ class CAPIscript extends CZBXAPI{
 					$obj_params['groupids'] = $script['groupid'];
 				}
 
-				$groups = API::HostGroup()->get($obj_params);
+				$groups = CHostGroup::get($obj_params);
 
 				$result[$scriptid]['groups'] = $groups;
 			}
@@ -306,7 +306,7 @@ class CAPIscript extends CZBXAPI{
 					$obj_params['groupids'] = $script['groupid'];
 				}
 
-				$hosts = API::Host()->get($obj_params);
+				$hosts = CHost::get($obj_params);
 
 				$result[$scriptid]['hosts'] = $hosts;
 
@@ -537,11 +537,11 @@ class CAPIscript extends CZBXAPI{
 		zbx_value2array($hostids);
 
 		$obj_params = array('hostids' => $hostids, 'preservekeys' => 1);
-		$hosts_read_only  = API::Host()->get($obj_params);
+		$hosts_read_only  = CHost::get($obj_params);
 		$hosts_read_only = zbx_objectValues($hosts_read_only, 'hostid');
 
 		$obj_params = array('editable' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
-		$hosts_read_write = API::Host()->get($obj_params);
+		$hosts_read_write = CHost::get($obj_params);
 		$hosts_read_write = zbx_objectValues($hosts_read_write, 'hostid');
 
 // initialize array
@@ -555,13 +555,13 @@ class CAPIscript extends CZBXAPI{
 						'extendoutput' => 1,
 						'preservekeys' => 1
 					);
-		$groups = API::HostGroup()->get($options);
+		$groups = CHostGroup::get($options);
 
 		$obj_params = array('extendoutput' => 1,
 							'hostids' => $hostids,
 							'preservekeys' => 1
 						);
-		$scripts  = API::Script()->get($obj_params);
+		$scripts  = CScript::get($obj_params);
 
 		foreach($scripts as $num => $script){
 			$add_to_hosts = array();

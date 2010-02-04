@@ -140,7 +140,7 @@ include_once('include/page_header.php');
 
 		$currentmacros = array_keys(get_request('macros', array()));
 
-		if(!API::UserMacro()->validate(zbx_toObject($macro_new, 'macro'))){
+		if(!CUserMacro::validate(zbx_toObject($macro_new, 'macro'))){
 			error(S_WRONG_MACRO.' : '.$macro_new);
 			show_messages(false, '', S_CANNOT_ADD_MACRO);
 		}
@@ -245,19 +245,19 @@ include_once('include/page_header.php');
 
 			$groups = array();
 			if(isset($visible['newgroup']) && !empty($_REQUEST['newgroup'])){
-				$groups = API::HostGroup()->create(array('name' => $_REQUEST['newgroup']));
+				$groups = CHostGroup::create(array('name' => $_REQUEST['newgroup']));
 				if($groups === false) throw new Exception();
 			}
 			if(isset($visible['groups'])){
 				$hosts['groups'] = array_merge(zbx_toObject($_REQUEST['groups'], 'groupid'), $groups);
 			}
-			$result = API::Host()->massUpdate(array_merge($hosts, $new_values));
+			$result = CHost::massUpdate(array_merge($hosts, $new_values));
 			if($result === false) throw new Exception();
 
 
 			if(isset($visible['template_table'])){
 				$tplids = array_keys($_REQUEST['templates']);
-				$result = API::Host()->massAdd(array('hosts' => $hosts['hosts'], 'templates' => zbx_toObject($tplids, 'templateid')));
+				$result = CHost::massAdd(array('hosts' => $hosts['hosts'], 'templates' => zbx_toObject($tplids, 'templateid')));
 				if($result === false) throw new Exception();
 			}
 
@@ -317,7 +317,7 @@ include_once('include/page_header.php');
 
 		$groups = zbx_toObject($groups, 'groupid');
 		if(!empty($_REQUEST['newgroup'])){
-			if($newgroup = API::HostGroup()->create(array('name' => $_REQUEST['newgroup']))){
+			if($newgroup = CHostGroup::create(array('name' => $_REQUEST['newgroup']))){
 				$groups = array_merge($groups, $newgroup);
 			}
 			else{
@@ -328,7 +328,7 @@ include_once('include/page_header.php');
 		if($result){
 			if(isset($_REQUEST['hostid'])){
 				if($result){
-					$result = API::Host()->update(array(
+					$result = CHost::update(array(
 						'hostid' => $_REQUEST['hostid'],
 						'host' => $_REQUEST['host'],
 						'port' => $_REQUEST['port'],
@@ -354,7 +354,7 @@ include_once('include/page_header.php');
 				}
 			}
 			else{
-				$host = API::Host()->create(array(
+				$host = CHost::create(array(
 					'host' => $_REQUEST['host'],
 					'port' => $_REQUEST['port'],
 					'status' => $_REQUEST['status'],
@@ -406,14 +406,14 @@ include_once('include/page_header.php');
 			}
 
 // Host triggers
-			$triggers = API::Trigger()->get(array('hostids' => $clone_hostid, 'inherited' => 0));
+			$triggers = CTrigger::get(array('hostids' => $clone_hostid, 'inherited' => 0));
 			$triggers = zbx_objectValues($triggers, 'triggerid');
 			foreach($triggers as $trigger){
 				$result &= (bool) copy_trigger_to_host($trigger, $hostid, true);
 			}
 
 // Host graphs
-			$graphs = API::Graph()->get(array('hostids' => $clone_hostid, 'inherited' => 0));
+			$graphs = CGraph::get(array('hostids' => $clone_hostid, 'inherited' => 0));
 
 			foreach($graphs as $graph){
 				$result &= (bool) copy_graph_to_host($graph['graphid'], $hostid, true);
@@ -501,7 +501,7 @@ include_once('include/page_header.php');
 		$go_result = true;
 		DBstart();
 		foreach($hosts as $num => $host){
-			$go_result = API::Host()->delete($host);
+			$go_result = CHost::delete($host);
 
 			if(!$go_result) break;
 			$go_result = reset($go_result);
@@ -510,7 +510,7 @@ include_once('include/page_header.php');
 		$go_result = DBend($go_result);
 
 		if(!$go_result){
-			error(API::Host()->resetErrors());
+			error(CHost::resetErrors());
 		}
 
 		show_messages($go_result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
@@ -630,7 +630,7 @@ $_REQUEST['hostid'] = $thid;
 			$options['groupids'] = $PAGE_GROUPS['selected'];
 		}
 
-		$hosts = API::Host()->get($options);
+		$hosts = CHost::get($options);
 
 // sorting && paging
 		order_result($hosts, $sortfield, $sortorder);
@@ -647,7 +647,7 @@ $_REQUEST['hostid'] = $thid;
 			'select_applications' => API_OUTPUT_REFER,
 			'nopermissions' => 1
 		);
-		$hosts = API::Host()->get($options);
+		$hosts = CHost::get($options);
 // sorting && paging
 		order_result($hosts, $sortfield, $sortorder);
 //---------

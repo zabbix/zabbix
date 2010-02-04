@@ -152,7 +152,7 @@ include_once('include/page_header.php');
 		'sortorder' => ZBX_SORT_UP
 	);
 
-	$screens = API::Screen()->get($options);
+	$screens = CScreen::get($options);
 	foreach($screens as $snum => $screen){
 		$screen['elementid'] = $screen['screenid'];
 
@@ -174,7 +174,7 @@ include_once('include/page_header.php');
 			'extendoutput' => 1
 		);
 
-		$screens = API::Screen()->get($options);
+		$screens = CScreen::get($options);
 		if(empty($screens)) access_deny();
 
 		$element = reset($screens); //get_screen_by_screenid($elementid);

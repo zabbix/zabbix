@@ -48,7 +48,7 @@ function check_authorisation(){
 	$sessionid = get_cookie('zbx_sessionid');
 
 	$user = array('sessionid'=>$sessionid);
-	if(!$auth = API::User()->checkAuthentication($user)){
+	if(!$auth = CUser::checkAuthentication($user)){
 		
 		include_once('include/locales/en_gb.inc.php');
 		process_locales();
@@ -199,7 +199,7 @@ function available_groups($groupids, $editable=null){
 	$options['groupids'] = $groupids;
 	$options['editable'] = $editable;
 
-	$groups = API::HostGroup()->get($options);
+	$groups = CHostGroup::get($options);
 return zbx_objectValues($groups, 'groupid');
 }
 function available_hosts($hostids, $editable=null){
@@ -208,7 +208,7 @@ function available_hosts($hostids, $editable=null){
 	$options['editable'] = $editable;
 	$options['templated_hosts'] = 1;
 
-	$hosts = API::Host()->get($options);
+	$hosts = CHost::get($options);
 
 return zbx_objectValues($hosts, 'hostid');
 }
@@ -219,7 +219,7 @@ function available_triggers($triggerids, $editable=null){
 	$options['editable'] = $editable;
 	$options['nodes'] = get_current_nodeid(true);
 
-	$triggers = API::Trigger()->get($options);
+	$triggers = CTrigger::get($options);
 return zbx_objectValues($triggers, 'triggerid');
 }
 
@@ -229,7 +229,7 @@ function available_graphs($graphids, $editable=null){
 	$options['editable'] = $editable;
 	$options['nodes'] = get_current_nodeid(true);
 
-	$graphs = API::Graph()->get($options);
+	$graphs = CGraph::get($options);
 return zbx_objectValues($graphs, 'graphid');
 }
 

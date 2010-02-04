@@ -191,7 +191,7 @@ include_once('include/page_header.php');
 			'templated_hosts' => 1,
 			'editable' => 1
 		);
-		$hosts = API::Host()->get($options);
+		$hosts = CHost::get($options);
 		if(empty($hosts)) access_deny();
 	}
 ?>
@@ -274,9 +274,9 @@ include_once('include/page_header.php');
 	}
 
 	if(isset($_REQUEST['filter_host']) && !zbx_empty($_REQUEST['filter_host'])){
-		$hostid = API::Host()->getObjects(array('host' => $_REQUEST['filter_host']));
+		$hostid = CHost::getObjects(array('host' => $_REQUEST['filter_host']));
 		if(empty($hostid))
-			$hostid = API::Template()->getObjects(array('host' => $_REQUEST['filter_host']));
+			$hostid = CTemplate::getObjects(array('host' => $_REQUEST['filter_host']));
 
 		$hostid = reset($hostid);
 
@@ -855,7 +855,7 @@ include_once('include/page_header.php');
 		if($preFilter == $afterFilter)
 			$items = array();
 		else
-			$items = API::Item()->get($options);
+			$items = CItem::get($options);
 
 // Header Host
 		if($hostid > 0){

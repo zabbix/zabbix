@@ -68,7 +68,7 @@
 //--------
 
 
-	$trigger = API::Trigger()->get(array('triggerids' => $_REQUEST['triggerid'], 'extendoutput' => 1, 'select_hosts' => 1));
+	$trigger = CTrigger::get(array('triggerids' => $_REQUEST['triggerid'], 'extendoutput' => 1, 'select_hosts' => 1));
 	if(!$trigger){
 		access_deny();
 	}

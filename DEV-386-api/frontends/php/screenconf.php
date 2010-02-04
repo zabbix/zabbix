@@ -94,14 +94,14 @@ include_once('include/page_header.php');
 			if(isset($_REQUEST['screenid'])){
 				// TODO check permission by new value.
 //				$result=update_screen($_REQUEST['screenid'],$_REQUEST['name'],$_REQUEST['hsize'],$_REQUEST['vsize']);
-				$result = API::Screen()->update(array(
+				$result = CScreen::update(array(
 					'screenid' => $_REQUEST['screenid'],
 					'name' => $_REQUEST['name'],
 					'hsize' => $_REQUEST['hsize'],
 					'vsize' => $_REQUEST['vsize']
 				));
 				if(!$result){
-					error(API::Screen()->resetErrors());
+					error(CScreen::resetErrors());
 				}
 				$audit_action = AUDIT_ACTION_UPDATE;
 				show_messages($result, S_SCREEN_UPDATED, S_CANNOT_UPDATE_SCREEN);
@@ -111,9 +111,9 @@ include_once('include/page_header.php');
 					access_deny();
 
 //				DBstart();
-				$result = API::Screen()->create(array('name' => $_REQUEST['name'], 'hsize' => $_REQUEST['hsize'], 'vsize' => $_REQUEST['vsize']));
+				$result = CScreen::create(array('name' => $_REQUEST['name'], 'hsize' => $_REQUEST['hsize'], 'vsize' => $_REQUEST['vsize']));
 				if(!$result){
-					error(API::Screen()->resetErrors());
+					error(CScreen::resetErrors());
 				}
 //				add_screen($_REQUEST['name'],$_REQUEST['hsize'],$_REQUEST['vsize']);
 //				$result = DBend();
@@ -319,7 +319,7 @@ include_once('include/page_header.php');
 				'limit' => ($config['search_limit']+1)
 			);
 
-			$screens = API::Screen()->get($options);
+			$screens = CScreen::get($options);
 
 			order_result($screens, $sortfield, $sortorder);
 			$paging = getPagingLine($screens);

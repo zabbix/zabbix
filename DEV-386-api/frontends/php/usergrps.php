@@ -160,7 +160,7 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 		}
 	}
 	else if(isset($_REQUEST['delete'])){
-		$group = API::UserGroup()->get(array('usrgrpids' => $_REQUEST['usrgrpid'], 'extendoutput' => 1));
+		$group = CUserGroup::get(array('usrgrpids' => $_REQUEST['usrgrpid'], 'extendoutput' => 1));
 		$group = reset($group);
 
 		DBstart();
@@ -367,7 +367,7 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 						 'select_users' => 1,
 						 'limit' => ($config['search_limit']+1)
 					);
-		$usrgrps = API::UserGroup()->get($options);
+		$usrgrps = CUserGroup::get($options);
 
 		$form = new CForm();
 		$form->setName('usrgrp_form');

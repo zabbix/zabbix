@@ -108,11 +108,11 @@ if(isset($_REQUEST['save_trigger'])){
 			$trigger['url'] = $_REQUEST['url'];
 
 			DBstart();
-			$result = API::Trigger()->update($trigger);
+			$result = CTrigger::update($trigger);
 //			update_trigger($_REQUEST['triggerid'],$expression,$_REQUEST["description"],$type,$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],$deps, $trigger_data['templateid']);
 
-			$result &= API::Trigger()->deleteDependencies($trigger);
-			$result &= API::Trigger()->addDependencies($deps);
+			$result &= CTrigger::deleteDependencies($trigger);
+			$result &= CTrigger::addDependencies($deps);
 
 //REVERT
 			$result = DBend($result);
@@ -133,7 +133,7 @@ if(isset($_REQUEST['save_trigger'])){
 			$trigger['url'] = $_REQUEST['url'];
 
 			DBstart();
-			if($db_triggers = API::Trigger()->create($trigger)){
+			if($db_triggers = CTrigger::create($trigger)){
 				if($db_triggers !== false){
 					$result = true;
 					$db_triggers = reset($db_triggers);
@@ -146,7 +146,7 @@ if(isset($_REQUEST['save_trigger'])){
 
 //			$triggerid=add_trigger($expression,$_REQUEST["description"],$type,$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],$deps);
 
-			$result &= API::Trigger()->addDependencies($deps);
+			$result &= CTrigger::addDependencies($deps);
 
 
 			$result = DBend($result);

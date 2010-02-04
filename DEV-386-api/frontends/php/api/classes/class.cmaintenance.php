@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
  * Class containing methods for operations with maintenances
  *
  */
-class CAPIMaintenance extends CZBXAPI{
+class CMaintenance extends CZBXAPI{
 /**
  * Get maintenances data
  *

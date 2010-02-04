@@ -165,7 +165,7 @@
 		global $USER_DETAILS;
 
 		$result = true;
-		$group = API::UserGroup()->get(array('usrgrpids' => $usrgrpid,  'extendoutput' => 1));
+		$group = CUserGroup::get(array('usrgrpids' => $usrgrpid,  'extendoutput' => 1));
 		$group = reset($group);
 
 		if(($group['gui_access'] == GROUP_GUI_ACCESS_DISABLED) || ($group['users_status'] == GROUP_STATUS_DISABLED)){

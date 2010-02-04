@@ -110,7 +110,7 @@ include_once('include/page_header.php');
 		'limit' => $rows_per_page,
 		'select_groups' => 1
 	);
-	$db_hosts = API::Host()->get($params);
+	$db_hosts = CHost::get($params);
 
 	order_result($db_hosts, 'host', null);
 
@@ -122,7 +122,7 @@ include_once('include/page_header.php');
 		'hostids' => $hostids,
 		'editable' => 1
 	);
-	$rw_hosts = API::Host()->get($params);
+	$rw_hosts = CHost::get($params);
 	$rw_hosts = zbx_toHash($rw_hosts,'hostid');
 
 	$params = array(
@@ -131,7 +131,7 @@ include_once('include/page_header.php');
 		'extend_pattern' => true,
 		'count' => 1,
 	);
-	$hosts_count = API::Host()->get($params);
+	$hosts_count = CHost::get($params);
 
 	$params = array(
 		'nodeids'=> get_current_nodeid(),
@@ -139,7 +139,7 @@ include_once('include/page_header.php');
 		'extend_pattern' => true,
 		'count' => 1,
 	);
-	$hosts_count = API::Host()->get($params);
+	$hosts_count = CHost::get($params);
 	$overalCount = $hosts_count['rowscount'];
 	$viewCount = count($hosts);
 
@@ -218,7 +218,7 @@ include_once('include/page_header.php');
 		'limit' => $rows_per_page,
 	);
 
-	$db_hostGroups = API::HostGroup()->get($params);
+	$db_hostGroups = CHostGroup::get($params);
 	order_result($db_hostGroups, 'name');
 
 	$hostGroups = selectByPattern($db_hostGroups, 'name', $search, $rows_per_page);
@@ -230,7 +230,7 @@ include_once('include/page_header.php');
 		'editable' => 1
 	);
 
-	$rw_hostGroups = API::HostGroup()->get($params);
+	$rw_hostGroups = CHostGroup::get($params);
 	$rw_hostGroups = zbx_toHash($rw_hostGroups, 'groupid');
 
 	$params = array(
@@ -238,7 +238,7 @@ include_once('include/page_header.php');
 		'pattern' => $search,
 		'count' => 1,
 	);
-	$groups_count = API::HostGroup()->get($params);
+	$groups_count = CHostGroup::get($params);
 
 	$overalCount = $groups_count['rowscount'];
 	$viewCount = count($hostGroups);
@@ -298,7 +298,7 @@ include_once('include/page_header.php');
 			'sortfield' => 'host'
 		);
 
-		$db_templates = API::Template()->get($params);
+		$db_templates = CTemplate::get($params);
 		order_result($db_templates, 'host');
 
 		$templates = selectByPattern($db_templates, 'host', $search, $rows_per_page);
@@ -309,7 +309,7 @@ include_once('include/page_header.php');
 			'templateids' => $templateids,
 			'editable' => 1
 		);
-		$rw_templates = API::Template()->get($params);
+		$rw_templates = CTemplate::get($params);
 		$rw_templates = zbx_toHash($rw_templates,'templateid');
 
 		$params = array(
@@ -318,7 +318,7 @@ include_once('include/page_header.php');
 					'count' => 1,
 					'editable' => 1
 					);
-		$hosts_count = API::Template()->get($params);
+		$hosts_count = CTemplate::get($params);
 
 		$overalCount = $hosts_count['rowscount'];
 		$viewCount = count($templates);

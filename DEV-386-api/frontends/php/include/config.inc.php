@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,26 +38,26 @@ function __autoload($class_name){
 	$api = array(
 		'czbxapi' => 1,
 		'capiinfo' => 1,
-		'capiaction' => 1,
-		'capialert' => 1,
-		'capiapplication' => 1,
-		'capievent' => 1,
-		'capigraph' => 1,
-		'capihost' => 1,
-		'capihostgroup' => 1,
-		'capiitem' => 1,
-		'capimaintenance' => 1,
-		'capiproxy' => 1,
-		'capiscript' => 1,
-		'capitemplate' => 1,
-		'capitrigger' => 1,
-		'capiuser' => 1,
-		'capiusergroup' => 1,
-		'capiusermacro' => 1,
-		'capiscreen' => 1,
-		'capimap' => 1,
-		'capigraphitem' => 1,
-		'capiproxy' => 1,
+		'caction' => 1,
+		'calert' => 1,
+		'capplication' => 1,
+		'cevent' => 1,
+		'cgraph' => 1,
+		'chost' => 1,
+		'chostgroup' => 1,
+		'citem' => 1,
+		'cmaintenance' => 1,
+		'cproxy' => null,
+		'cscript' => 1,
+		'ctemplate' => 1,
+		'ctrigger' => 1,
+		'cuser' => 1,
+		'cusergroup' => 1,
+		'cusermacro' => 1,
+		'cscreen' => 1,
+		'cmap' => 1,
+		'cgraphitem' => 1,
+		'cproxy' => 1,
 		'apiexception' => 1,
 	);
 
@@ -69,7 +69,7 @@ function __autoload($class_name){
 		'csoapjr' => null);
 
 	if(isset($api[$class_name]))
-		require_once('api/classes/'.$class_name.'.php');
+		require_once('api/classes/class.'.$class_name.'.php');
 	else if(isset($rpc[$class_name]))
 		require_once('api/rpc/class.'.$class_name.'.php');
 	else
@@ -78,8 +78,6 @@ function __autoload($class_name){
 ?>
 <?php
 
-	require_once('include/api.inc.php');
-	
 	require_once('include/defines.inc.php');
 	require_once('include/func.inc.php');
 	require_once('include/html.inc.php');

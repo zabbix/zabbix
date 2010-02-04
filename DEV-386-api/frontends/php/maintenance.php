@@ -463,7 +463,7 @@ include_once('include/page_header.php');
 			$options['groupids'] = $PAGE_GROUPS['selected'];
 		}
 
-		$maintenances = API::Maintenance()->get($options);
+		$maintenances = CMaintenance::get($options);
 
 		$form = new CForm(null,'post');
 		$form->setName('maintenances');

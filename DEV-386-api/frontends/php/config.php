@@ -227,7 +227,7 @@ include_once('include/page_header.php');
 			if(!is_null($val = get_request('work_period')))
 				$msg[] = S_WORKING_TIME.' ['.$val.']';
 			if(!is_null($val = get_request('discovery_groupid'))){
-				$val = API::HostGroup()->get(array('groupids' => $val, 'editable' => 1, 'extendoutput' => 1));
+				$val = CHostGroup::get(array('groupids' => $val, 'editable' => 1, 'extendoutput' => 1));
 				if(!empty($val)){
 
 					$val = array_pop($val);
@@ -476,7 +476,7 @@ include_once('include/page_header.php');
 	else if($_REQUEST['config'] == 11){ // Macros
 	/* REMOVE MACROS */
 		if(isset($_REQUEST['macros_del']) && isset($_REQUEST['macros_rem'])){
-			$result = API::UserMacro()->deleteGlobalMacro(zbx_toObject($_REQUEST['macros_rem'], 'globalmacroid'));
+			$result = CUserMacro::deleteGlobalMacro(zbx_toObject($_REQUEST['macros_rem'], 'globalmacroid'));
 			show_messages($result, S_MACROS_DELETED, S_CANNOT_DELETE_MACROS);
 		}
 	/* ADD MACRO */
@@ -485,7 +485,7 @@ include_once('include/page_header.php');
 			$macro_new = get_request('macro_new');
 			$value_new = get_request('value_new', null);
 
-			if(!API::UserMacro()->validate(zbx_toObject($macro_new, 'macro'))){
+			if(!CUserMacro::validate(zbx_toObject($macro_new, 'macro'))){
 				error(S_WRONG_MACRO.' : '.$macro_new);
 				$result = false;
 			}
@@ -493,7 +493,7 @@ include_once('include/page_header.php');
 				error(S_EMPTY_MACRO_VALUE);
 				$result = false;
 			}
-			else if(API::UserMacro()->getGlobalMacroId(array('macro' => $macro_new))){
+			else if(CUserMacro::getGlobalMacroId(array('macro' => $macro_new))){
 				error(S_MACRO_EXISTS);
 				$result = false;
 			}
@@ -507,7 +507,7 @@ include_once('include/page_header.php');
 			}
 			else{
 				$macro = array('macro' => $macro_new, 'value' => $value_new);
-				$result = API::UserMacro()->addGlobal($macro);
+				$result = CUserMacro::addGlobal($macro);
 			}
 
 
@@ -713,7 +713,7 @@ include_once('include/page_header.php');
 			new CNumericBox('refresh_unsupported', $config['refresh_unsupported'], 5));
 
 		$cmbGrp = new CComboBox('discovery_groupid', $config['discovery_groupid']);
-		$groups = API::HostGroup()->get(array('sortfield'=>'name', 'editable' => 1, 'extendoutput' => 1));
+		$groups = CHostGroup::get(array('sortfield'=>'name', 'editable' => 1, 'extendoutput' => 1));
 		foreach($groups as $gnum => $group){
 			$cmbGrp->addItem($group['groupid'], $group['name']);
 		}
@@ -1058,7 +1058,7 @@ include_once('include/page_header.php');
 		$frmGUI = new CFormTable(S_MACROS, 'config.php');
 		$frmGUI->addVar('config', get_request('config', 11));
 
-		$macros = API::UserMacro()->get(array('extendoutput' => 1, 'globalmacro' => 1));
+		$macros = CUserMacro::get(array('extendoutput' => 1, 'globalmacro' => 1));
 
 		order_result($macros, 'macro');
 

@@ -100,7 +100,11 @@ private static $transaction = array('counter' => 0);
 // TRANSACTION METHODS}
 
 // ERROR METHODS{
-	protected static function setMethodErrors($method, $errno, $errors){
+	protected static function setError($method, $errno=ZBX_API_ERROR_INTERNAL, $error='Unknown Zabbix internal error'){
+		CZBXAPI::$error[] = array('error' => $errno, 'data' => '[ '.$method.' ] '.$error);
+	}
+
+	protected static function setMethodErrors($method, $errors){
 		global $ZBX_MESSAGES;
 
 		if(empty($errors)){
@@ -112,15 +116,15 @@ private static $transaction = array('counter' => 0);
 			$php_error = $php_error ? $php_error['message'] : null;
 
 			if(is_null($php_error)){
-				CZBXAPI::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => '[ '.$method.' ] Unknown Zabbix internal error');
+				self::setError($method);
 			}
 			else{
-				CZBXAPI::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => '[ '.$method.' ] '.$php_error);
+				self::setError($method, ZBX_API_ERROR_INTERNAL, $php_error);
 			}
 		}
 		else{
 			foreach($errors as $enum => $error){
-				CZBXAPI::$error[] = array('error' => $errno, 'data' => '[ '.$method.' ] '.$error);
+				self::setError($method, $error['errno'], $error['error']);
 			}
 		}
 
@@ -146,9 +150,4 @@ private static $transaction = array('counter' => 0);
 	return $errors;
 	}
 // ERROR METHODS}
-
-	protected static function exception($code, $errors){
-		throw new APIException($code, $errors);	
-	}
-	
 }

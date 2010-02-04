@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+** Copyright (C) 2000-2009 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with Screens
  */
-class CAPIScreen extends CZBXAPI{
+class CScreen extends CZBXAPI{
 /**
  * Get Screen data
  *
@@ -74,7 +74,7 @@ class CAPIScreen extends CZBXAPI{
 			'pattern'					=> '',
 // OutPut
 			'extendoutput'				=> null,
-			'output'					=> API_OUTPUT_REFER,
+			'output'				=> API_OUTPUT_REFER,
 			'select_groups'				=> null,
 			'select_templates'			=> null,
 			'select_items'				=> null,
@@ -249,28 +249,28 @@ sdii($screens_to_check);
 									'nodeids' => $nodeids,
 									'graphids' => $graphs_to_check,
 									'editable' => $options['editable']);
-				$allowed_graphs = API::Graph()->get($graph_options);
+				$allowed_graphs = CGraph::get($graph_options);
 				$allowed_graphs = zbx_objectValues($allowed_graphs, 'graphid');
 
 				$item_options = array(
 									'nodeids' => $nodeids,
 									'itemids' => $items_to_check,
 									'editable' => $options['editable']);
-				$allowed_items = API::Item()->get($item_options);
+				$allowed_items = CItem::get($item_options);
 				$allowed_items = zbx_objectValues($allowed_items, 'itemid');
 
 				$map_options = array(
 									'nodeids' => $nodeids,
 									'sysmapids' => $maps_to_check,
 									'editable' => $options['editable']);
-				$allowed_maps = API::Map()->get($map_options);
+				$allowed_maps = CMap::get($map_options);
 				$allowed_maps = zbx_objectValues($allowed_maps, 'sysmapid');
 
 				$screens_options = array(
 									'nodeids' => $nodeids,
 									'screenids' => $screens_to_check,
 									'editable' => $options['editable']);
-				$allowed_screens = API::Screen()->get($screens_options);
+				$allowed_screens = CScreen::get($screens_options);
 				$allowed_screens = zbx_objectValues($allowed_screens, 'screenid');
 
 
@@ -463,7 +463,7 @@ SDI('/////////////////////////////////');
 		self::BeginTransaction(__METHOD__);
 		foreach($screens as $snum => $screen){
 
-			$screen_db_fields = API::Screen()->get(array('screenids' => $screen['screenid'], 'editable' => 1, 'extendoutput' => 1));
+			$screen_db_fields = CScreen::get(array('screenids' => $screen['screenid'], 'editable' => 1, 'extendoutput' => 1));
 			$screen_db_fields = reset($screen_db_fields);
 
 			if(!$screen_db_fields){

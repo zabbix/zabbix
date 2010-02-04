@@ -27,7 +27,7 @@
  * Class containing methods for operations with Triggers
  *
  */
-class CAPITrigger extends CZBXAPI{
+class CTrigger extends CZBXAPI{
 
 	public static $error = array();
 
@@ -98,6 +98,7 @@ class CAPITrigger extends CZBXAPI{
 			'min_severity'			=> null,
 //
 			'pattern'				=> '',
+
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
 			'extendoutput'			=> null,
@@ -521,7 +522,7 @@ class CAPITrigger extends CZBXAPI{
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			$hosts = API::Host()->get($obj_params);
+			$hosts = CHost::get($obj_params);
 			foreach($hosts as $hostid => $host){
 				$htriggers = $host['triggers'];
 				unset($host['triggers']);
@@ -540,7 +541,7 @@ class CAPITrigger extends CZBXAPI{
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			$items = API::Item()->get($obj_params);
+			$items = CItem::get($obj_params);
 			foreach($items as $itemid => $item){
 				$itriggers = $item['triggers'];
 				unset($item['triggers']);
@@ -736,7 +737,7 @@ class CAPITrigger extends CZBXAPI{
 			$trigger_db_fields = $upd_triggers[$trigger['triggerid']];
 
 			if(!check_db_fields($trigger_db_fields, $trigger)){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Incorrect arguments pasted to function [API::Trigger()->update]');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Incorrect arguments pasted to function [CTrigger::update]');
 				$result = false;
 				break;
 			}
