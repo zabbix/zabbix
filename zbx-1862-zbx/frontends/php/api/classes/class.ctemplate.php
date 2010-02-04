@@ -826,6 +826,66 @@ class CTemplate extends CZBXAPI{
 
 
 /**
+ * Link Template to Hosts
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $data
+ * @param string $data['templates']
+ * @param string $data['hosts']
+ * @param string $data['groups']
+ * @param string $data['templates_link']
+ * @return boolean
+ */
+	public static function massAdd($data){
+		$transaction = false;
+
+		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : null;
+		$templateids = is_null($templates) ? array() : zbx_objectValues($templates, 'templateid');
+
+
+		$transaction = self::BeginTransaction(__METHOD__);
+
+		try{
+			if(isset($data['groups'])){
+				$options = array('groups' => $data['groups'], 'templates' => $templates);
+				$result = CHostGroup::massAdd($options);
+				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t link groups');
+			}
+
+			if(isset($data['hosts'])){
+				$hostids = zbx_objectValues($data['hosts'], 'hostid');
+				self::link($templateids, $hostids);
+			}
+
+			if(isset($data['templates_link'])){
+				$templates_linkids = zbx_objectValues($data['templates_link'], 'templateid');
+				self::link($templates_linkids, $templateids);
+			}
+
+			if(isset($data['macros'])){
+				$options = array('templates' => zbx_toArray($data['templates']), 'macros' => $data['macros']);
+				$result = CUserMacro::massAdd($options);
+				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t link macros');
+			}
+
+			$result = self::EndTransaction(true, __METHOD__);
+			return true;
+		}
+		catch(APIException $e){
+			if($transaction) self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
+			return false;
+		}
+	}
+
+/**
  * Mass update hosts
  *
  * {@source}
@@ -1066,66 +1126,6 @@ class CTemplate extends CZBXAPI{
 	}
 
 /**
- * Link Template to Hosts
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param array $data
- * @param string $data['templates']
- * @param string $data['hosts']
- * @param string $data['groups']
- * @param string $data['templates_link']
- * @return boolean
- */
-	public static function massAdd($data){
-		$transaction = false;
-
-		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : null;
-		$templateids = is_null($templates) ? array() : zbx_objectValues($templates, 'templateid');
-
-
-		$transaction = self::BeginTransaction(__METHOD__);
-
-		try{
-			if(isset($data['groups'])){
-				$options = array('groups' => $data['groups'], 'templates' => $templates);
-				$result = CHostGroup::massAdd($options);
-				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t link groups');
-			}
-
-			if(isset($data['hosts'])){
-				$hostsids = zbx_objectValues($data['hosts'], 'hostid');
-				self::link($templateids, $hostsids);
-			}
-
-			if(isset($data['templates_link'])){
-				$templates_linkids = zbx_objectValues($data['templates_link'], 'templateid');
-				self::link($templates_linkids, $templateids);
-			}
-
-			if(isset($data['macros'])){
-				$options = array('templates' => zbx_toArray($data['templates']), 'macros' => $data['macros']);
-				$result = CUserMacro::massAdd($options);
-				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t link macros');
-			}
-
-			$result = self::EndTransaction(true, __METHOD__);
-			return true;
-		}
-		catch(APIException $e){
-			if($transaction) self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
-	}
-
-	/**
  * remove Hosts to HostGroups. All Hosts are added to all HostGroups.
  *
  * {@source}
@@ -1263,7 +1263,7 @@ class CTemplate extends CZBXAPI{
 			self::BeginTransaction(__METHOD__);
 
 // CHECK TEMPLATE TRIGGERS DEPENDENCIES {{{
-			foreach($templateids as $templateid){
+			foreach($templateids as $tnum => $templateid){
 				$triggerids = array();
 				$db_triggers = get_triggers_by_hostid($templateid);
 				while($trigger = DBfetch($db_triggers)){
@@ -1276,13 +1276,18 @@ class CTemplate extends CZBXAPI{
 							' OR ('.DBcondition('td.triggerid_up',$triggerids).' AND f.triggerid=td.triggerid_down)) '.
 							' AND i.itemid=f.itemid '.
 							' AND h.hostid=i.hostid '.
-							' AND h.hostid<>'.$templateid.
+							' AND '.DBcondition('h.hostid', $templateids, true).
 							' AND h.status='.HOST_STATUS_TEMPLATE;
 
 				if($db_dephost = DBfetch(DBselect($sql))){
-					$tmp_tpls = self::getObjects(array('templateid'=>$templateid));
+					$options = array(
+							'templateids' => $templateid,
+							'output'=> API_OUTPUT_EXTEND
+						);
+
+					$tmp_tpls = self::get($options);
 					$tmp_tpl = reset($tmp_tpls);
-					
+
 					throw new APIException(ZBX_API_ERROR_PARAMETERS,
 						'Trigger in template [ '.$tmp_tpl['host'].' ] has dependency with trigger in template [ '.$db_dephost['host'].' ]');
 				}
@@ -1291,14 +1296,16 @@ class CTemplate extends CZBXAPI{
 
 
 			$linked = array();
-			$sql = 'SELECT hostid, templateid FROM hosts_templates WHERE '.DBcondition('hostid', $targetids).
-				' AND '.DBcondition('templateid', $templateids);
+			$sql = 'SELECT hostid, templateid '.
+					' FROM hosts_templates '.
+					' WHERE '.DBcondition('hostid', $targetids).
+						' AND '.DBcondition('templateid', $templateids);
 			$linked_db = DBselect($sql);
 			while($pair = DBfetch($linked_db)){
 				$linked[] = array($pair['hostid'] => $pair['templateid']);
 			}
 
-// add template linkages, if problems rollback later			
+// add template linkages, if problems rollback later
 			foreach($targetids as $targetid){
 				foreach($templateids as $tnum => $templateid){
 					foreach($linked as $lnum => $link){
@@ -1316,15 +1323,15 @@ class CTemplate extends CZBXAPI{
 // CHECK CIRCULAR LINKAGE {{{
 
 // get template linkage graph
+			$graph = array();
 			$sql = 'SELECT ht.hostid, ht.templateid'.
 				' FROM hosts_templates ht, hosts h'.
 				' WHERE ht.hostid=h.hostid'.
-					' AND h.status=3';
+					' AND h.status='.HOST_STATUS_TEMPLATE;
 			$db_graph = DBselect($sql);
-			$graph = array();
 			while($branch = DBfetch($db_graph)){
 				if(!isset($graph[$branch['hostid']])) $graph[$branch['hostid']] = array();
-				$graph[$branch['hostid']][] = $branch['templateid'];
+				$graph[$branch['hostid']][$branch['templateid']] = $branch['templateid'];
 			}
 
 // get points that have more than one parent templates			
@@ -1341,13 +1348,15 @@ class CTemplate extends CZBXAPI{
 				' GROUP BY ht.templateid';
 			$db_start_points = DBselect($sql);
 			while($start_point = DBfetch($db_start_points)){				
-				$start_points[$start_point['hostid']] = $start_point['hostid'];
-				$graph[$start_point['hostid']][] = $start_point['templateid'];
+				$start_points[] = $start_point['hostid'];
+				$graph[$start_point['hostid']][$start_point['templateid']] = $start_point['templateid'];
 			}
+
 // add to the start points also points which we add current templates
 			$start_points = array_merge($start_points, $targetids);
-			
-			foreach($start_points as $start){
+			$start_points = array_unique($start_points);
+
+			foreach($start_points as $spnum => $start){
 				$path = array();
 				if(!self::checkCircularLink($graph, $start, $path)){
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Circular link can not be created');
@@ -1380,6 +1389,7 @@ class CTemplate extends CZBXAPI{
 			return false;
 		}
 	}
+
 	private static function checkCircularLink(&$graph, $current, &$path){
 		
 		if(isset($path[$current])) return false;

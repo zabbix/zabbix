@@ -956,6 +956,69 @@ class CHost extends CZBXAPI{
 	}
 
 /**
+ * Add Hosts to HostGroups. All Hosts are added to all HostGroups.
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $data
+ * @param array $data['groups']
+ * @param array $data['hosts']
+ * @return boolean
+ */
+	public static function massAdd($data){
+		$errors = array();
+		$result = true;
+
+		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : null;
+		$hostids = is_null($hosts) ? array() : zbx_objectValues($hosts, 'hostid');
+
+		try{
+			$transaction = self::BeginTransaction(__METHOD__);
+	
+			if(isset($data['groups'])){
+				$options = array(
+					'groups' => zbx_toArray($data['groups']), 
+					'hosts' => zbx_toArray($data['hosts'])
+				);
+				$result = CHostGroup::massAdd($options);
+			}
+	
+			if(isset($data['templates'])){
+				$options = array(
+					'hosts' => zbx_toArray($data['hosts']), 
+					'templates' => zbx_toArray($data['templates'])
+				);
+				$result = CTemplate::massAdd($options);
+			}
+	
+			if(isset($data['macros'])){
+				$options = array(
+					'hosts' => zbx_toArray($data['hosts']), 
+					'macros' => $data['macros']
+				);
+				$result = CUserMacro::massAdd($options);
+			}
+	
+			$result = self::EndTransaction($result, __METHOD__);
+		}
+		catch(APIException $e){
+			if($transaction) self::EndTransaction(false, __METHOD__);
+
+			$error = $e->getErrors();
+			$error = reset($error);
+
+			self::setError(__METHOD__, $e->getCode(), $error);
+			return false;
+		}
+
+	return $result;
+	}
+
+/**
  * Mass update hosts
  *
  * {@source}
@@ -1286,60 +1349,6 @@ class CHost extends CZBXAPI{
 			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
-	}
-
-/**
- * Add Hosts to HostGroups. All Hosts are added to all HostGroups.
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param array $data
- * @param array $data['groups']
- * @param array $data['hosts']
- * @return boolean
- */
-	public static function massAdd($data){
-		$errors = array();
-		$result = true;
-
-		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : null;
-		$hostids = is_null($hosts) ? array() : zbx_objectValues($hosts, 'hostid');
-
-		try{
-			$transaction = self::BeginTransaction(__METHOD__);
-	
-			if(isset($data['groups'])){
-				$options = array('groups' => zbx_toArray($data['groups']), 'hosts' => zbx_toArray($data['hosts']));
-				$result = CHostGroup::massAdd($options);
-			}
-	
-			if(isset($data['templates'])){
-				$options = array('hosts' => zbx_toArray($data['hosts']), 'templates' => zbx_toArray($data['templates']));
-				$result = CTemplate::massAdd($options);
-			}
-	
-			if(isset($data['macros'])){
-				$options = array('hosts' => zbx_toArray($data['hosts']), 'macros' => $data['macros']);
-				$result = CUserMacro::massAdd($options);
-			}
-	
-			$result = self::EndTransaction($result, __METHOD__);
-		}
-		catch(APIException $e){
-			if($transaction) self::EndTransaction(false, __METHOD__);
-
-			$error = $e->getErrors();
-			$error = reset($error);
-
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
-
-	return $result;
 	}
 
 /**
