@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1938] fixed permission check inefficiency in charts (Aly)
  - [ZBX-1871] made zabbix not require mbstring_overload to be enabled (Vedmak)
  - [ZBX-1862] fixed host creation with link to templates with trigger dependencies (Aly)
  - [ZBX-1879] fixed unnecessary line brakes in IE7 (Vedmak)
