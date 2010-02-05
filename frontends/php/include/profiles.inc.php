@@ -330,7 +330,7 @@ function select_config($cache = true){
 		return $row;
 	}
 	elseif($page['title'] != S_INSTALLATION){
-		error('Unable to select configuration');
+		error(S_UNABLE_TO_SELECT_CONFIGURATION);
 	}
 return $row;
 }
