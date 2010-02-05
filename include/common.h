@@ -922,5 +922,5 @@ int	is_key_char(const char c);
 int	is_function_char(const char c);
 int	parse_function(char **exp, char **func, char **params);
 int	parse_host_key(char *exp, char **host, char **key);
-void	make_hostname(char const *host);
+void	make_hostname(char *host);
 #endif
