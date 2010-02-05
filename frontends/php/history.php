@@ -134,6 +134,7 @@ include_once('include/page_header.php');
 
 	
 	$options = array(
+		'nodeids' => get_current_nodeid(),
 		'itemids' => $_REQUEST['itemid'],
 		'webitems' => 1,
 	);
