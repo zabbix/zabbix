@@ -482,10 +482,7 @@ class CAPIAlert extends CZBXAPI{
 	public static function create($alerts){
 		$alerts = zbx_toArray($alerts);
 		$alertids = array();
-		$result = false;
-//------
 
-		self::BeginTransaction(__METHOD__);
 		foreach($alerts as $anum => $alert){
 			$alert_db_fields = array(
 				'actionid'		=> null,
@@ -505,8 +502,7 @@ class CAPIAlert extends CZBXAPI{
 			);
 
 			if(!check_db_fields($alert_db_fields, $alert)){
-				$result = false;
-				break;
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'wrong fields');
 			}
 
 			$alertid = get_dbid('alerts', 'alertid');
@@ -517,21 +513,14 @@ class CAPIAlert extends CZBXAPI{
 								$alert['status'].','.$alert['retries'].','.zbx_dbstr($alert['error']).','.$alert['nextcheck'].','.
 								$alert['esc_step'].','.$alert['alerttype'].' )';
 			$result = DBexecute($sql);
-			if(!$result) break;
+			if(!$result)
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'wrong fields');
 
 			$alertids[] = $alertid;
 		}
 
-		$result = self::EndTransaction($result, __METHOD__);
-
-		if($result){
-			$upd_alerts = self::get(array('alertids'=>$alertids, 'extendoutput'=>1));
-			return $upd_alerts;
-		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
-			return false;
-		}
+		$upd_alerts = self::get(array('alertids'=>$alertids, 'extendoutput'=>1));
+		return $upd_alerts;
 	}
 
 /**
@@ -550,8 +539,6 @@ class CAPIAlert extends CZBXAPI{
 	public static function delete($alertids){
 		$alerts = zbx_toArray($alerts);
 		$alertids = array();
-		$result = false;
-//------
 
 		$del_alerts = self::get(array('alertids'=>zbx_objectValues($alerts, 'alertid'),
 											'editable'=>1,
@@ -559,8 +546,7 @@ class CAPIAlert extends CZBXAPI{
 											'preservekeys'=>1));
 		foreach($alerts as $snum => $alert){
 			if(!isset($del_alerts[$alert['alertid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				return false;
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSION);
 			}
 
 			$alertids[] = $alert['alertid'];
@@ -572,17 +558,10 @@ class CAPIAlert extends CZBXAPI{
 			$result = DBexecute($sql);
 		}
 		else{
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ alertids ]');
-			$result = false;
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ alertids ]');
 		}
 
-		if($result){
-			return zbx_cleanHashes($del_alerts);
-		}
-		else{
-			self::setError(__METHOD__);
-			return false;
-		}
+		return zbx_cleanHashes($del_alerts);
 	}
 }
 ?>

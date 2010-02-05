@@ -481,61 +481,49 @@ class CAPIAction extends CZBXAPI{
 	public static function create($actions){
 		$actions = zbx_toArray($actions);
 		$actionids = array();
+		
+		foreach($actions as $anum => $action){
+			$action_db_fields = array(
+				'name'				=> null,
+				'eventsource'		=> null,
+				'evaltype'			=> null,
+				'status'			=> 0,
+				'esc_period'		=> 0,
+				'def_shortdata'		=> '',
+				'def_longdata'		=> '',
+				'recovery_msg'		=> 0,
+				'r_shordata'		=> '',
+				'r_londata'			=> ''
+			);
 
-		try{
-			self::BeginTransaction(__METHOD__);
-			
-			foreach($actions as $anum => $action){
-				$action_db_fields = array(
-					'name'				=> null,
-					'eventsource'		=> null,
-					'evaltype'			=> null,
-					'status'			=> 0,
-					'esc_period'		=> 0,
-					'def_shortdata'		=> '',
-					'def_longdata'		=> '',
-					'recovery_msg'		=> 0,
-					'r_shordata'		=> '',
-					'r_londata'			=> ''
-				);
-
-				if(!check_db_fields($action_db_fields, $action)){
-					CZBXAPI::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for action');
-				}
-
-				$actionids[] = $actionid = get_dbid('actions', 'actionid');
-				$values = array(
-					'actionid' => $actionid,
-					'name' => zbx_dbstr($action['name']),
-					'eventsource' => $action['eventsource'],
-					'esc_period' => $action['esc_period'],
-					'def_shortdata' => zbx_dbstr($action['def_shortdata']),
-					'def_longdata' => zbx_dbstr($action['def_longdata']),
-					'recovery_msg' => $action['recovery_msg'],
-					'r_shortdata' => zbx_dbstr($action['r_shortdata']),
-					'r_longdata' => zbx_dbstr($action['r_longdata']),
-					'evaltype' => $action['evaltype'],
-					'status' => $action['status']
-				);
-				
-				$sql = 'INSERT INTO actions ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
-				$sql .= '/* '.__METHOD__.' */';
-
-				if(!DBexecute($sql)) 
-					CZBXAPI::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for action');
+			if(!check_db_fields($action_db_fields, $action)){
+				CZBXAPI::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for action');
 			}
 
-			self::EndTransaction(true, __METHOD__);
+			$actionids[] = $actionid = get_dbid('actions', 'actionid');
+			$values = array(
+				'actionid' => $actionid,
+				'name' => zbx_dbstr($action['name']),
+				'eventsource' => $action['eventsource'],
+				'esc_period' => $action['esc_period'],
+				'def_shortdata' => zbx_dbstr($action['def_shortdata']),
+				'def_longdata' => zbx_dbstr($action['def_longdata']),
+				'recovery_msg' => $action['recovery_msg'],
+				'r_shortdata' => zbx_dbstr($action['r_shortdata']),
+				'r_longdata' => zbx_dbstr($action['r_longdata']),
+				'evaltype' => $action['evaltype'],
+				'status' => $action['status']
+			);
 			
+			$sql = 'INSERT INTO actions ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
+			$sql .= '/* '.__METHOD__.' */';
+
+			if(!DBexecute($sql)) 
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for action');
+			
+		}
 			$new_actions = API::Action()->get(array('actionids'=>$actionids, 'extendoutput'=>1, 'nopermissions'=>1));
 			return $new_actions;
-		}
-		catch(APIException $e){
-			self::EndTransaction(false, __METHOD__);
-			
-			self::setMethodErrors(__METHOD__, $e->getCode(), $e->getErrors());
-			return false;
-		}
 	}
 
 /**
@@ -568,40 +556,28 @@ class CAPIAction extends CZBXAPI{
 											'preservekeys'=>1));
 		foreach($actions as $anum => $action){
 			if(!isset($upd_actions[$action['actionid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				return false;
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 			$actionids[] = $action['actionid'];
 		}
 
-		$result = true;
-
-		self::BeginTransaction(__METHOD__);
 		foreach($actions as $anum => $action){
 			$action_db_fields = $upd_actions[$action['actionid']];
 
 			if(!check_db_fields($action_db_fields, $action)){
-				$result = false;
-				break;
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'wrong fields');
 			}
 
 			$result = update_action($action['actionid'], $action['name'], $action['eventsource'], $action['esc_period'],
 				$action['def_shortdata'], $action['def_longdata'], $action['recovery_msg'], $action['r_shortdata'],
 				$action['r_longdata'], $action['evaltype'], $action['status'], $action['conditions'], $action['operations']);
 
-			if(!$result) break;
+			if(!$result) 
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 		}
 
-		$result = self::EndTransaction($result, __METHOD__);
-
-		if($result){
-			$upd_actions = API::Action()->get(array('actionids'=>$actionids, 'extendoutput'=>1, 'nopermissions'=>1));
-			return $upd_actions;
-		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
-			return false;
-		}
+		$upd_actions = API::Action()->get(array('actionids'=>$actionids, 'extendoutput'=>1, 'nopermissions'=>1));
+		return $upd_actions;	
 	}
 
 /**
@@ -622,35 +598,25 @@ class CAPIAction extends CZBXAPI{
  */
 	public static function addConditions($conditions){
 		$conditions = zbx_toArray($conditions);
-		$result = true;
 
 		if(!check_permission_for_action_conditions($conditions)){
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
-			return false;
+			self::exception(ZBX_API_ERROR_INTERNAL, 'Internal zabbix error');
 		}
 
 		foreach($conditions as $cnum => $condition){
 			if( !validate_condition($condition['type'],$condition['value']) ){
-				self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
-				return false;
+				self::exception(ZBX_API_ERROR_INTERNAL, 'Internal zabbix error');
 			}
 		}
 
-		self::BeginTransaction(__METHOD__);
 		foreach($conditions as $cnum => $condition){
 
 			$result = add_action_condition($condition['actionid'], $condition);
-			if(!$result) break;
+			if(!$result) 
+				self::exception(ZBX_API_ERROR_INTERNAL, 'Internal zabbix error');
 		}
-		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result){
-			return $conditions;
-		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
-			return false;
-		}
+		return $conditions;
 	}
 
 /**
@@ -683,29 +649,20 @@ class CAPIAction extends CZBXAPI{
  */
 	public static function addOperations($operations){
 		$operations = zbx_toArray($operations);
-		$result = true;
 
 		foreach($operations as $onum => $operation){
 			if(!validate_operation($operation)){
-				self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
-				return false;
+				self::exception(ZBX_API_ERROR_INTERNAL, 'Internal zabbix error');
 			}
 		}
 
-		self::BeginTransaction(__METHOD__);
 		foreach($operations as $onum => $operation){
 			$result = add_action_operation($operation['actionid'], $operation);
-			if(!$result) break;
+			if(!$result) 
+				self::exception(ZBX_API_ERROR_INTERNAL, 'Internal zabbix error');
 		}
-		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result){
-			return $operations;
-		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
-			return false;
-		}
+		return $operations;
 	}
 
 /**
@@ -729,35 +686,26 @@ class CAPIAction extends CZBXAPI{
 											'editable'=>1,
 											'extendoutput'=>1,
 											'preservekeys'=>1));
+											
 		foreach($actions as $anum => $action){
 			if(!isset($del_actions[$action['actionid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				return false;
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 
 			$actionids[] = $action['actionid'];
 			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ACTION, 'Action ['.$action['name'].']');
 		}
 
-		self::BeginTransaction(__METHOD__);
 		if(!empty($actionids)){
 			$sql = 'DELETE FROM actions WHERE '.DBcondition('actionid', $actionids);
 			$result = DBexecute($sql);
 		}
 		else{
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ actionids ]');
-			$result = false;
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ actionids ]');
 		}
 
-		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result){
-			return zbx_cleanHashes($del_actions);
-		}
-		else{
-			self::setError(__METHOD__);
-			return false;
-		}
+		return zbx_cleanHashes($del_actions);
 	}
 }
 ?>

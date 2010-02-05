@@ -507,8 +507,7 @@ class CAPIEvent extends CZBXAPI{
 			);
 
 			if(!check_db_fields($event_db_fields, $event)){
-				$result = false;
-				break;
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'wrong fields');
 			}
 
 			$eventid = get_dbid('events','eventid');

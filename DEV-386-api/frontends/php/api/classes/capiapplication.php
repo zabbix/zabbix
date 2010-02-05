@@ -395,23 +395,16 @@ class CAPIApplication extends CZBXAPI{
 
 		$result = false;
 
-		self::BeginTransaction(__METHOD__);
 		foreach($applications as $anum => $application){
 			$result = add_application($application['name'], $application['hostid']);
 
-			if(!$result) break;
+			if(!$result) 
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'error');
 			$applicationids[] = $result;
 		}
-		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result){
-			$new_applications = self::get(array('applicationids'=>$applicationids, 'extendoutput'=>1, 'nopermissions'=>1));
-			return $new_applications;
-		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
-			return false;
-		}
+		$new_applications = self::get(array('applicationids'=>$applicationids, 'extendoutput'=>1, 'nopermissions'=>1));
+		return $new_applications;
 	}
 
 /**
@@ -438,38 +431,25 @@ class CAPIApplication extends CZBXAPI{
 											'preservekeys'=>1));
 		foreach($applications as $anum => $application){
 			if(!isset($upd_applications[$application['applicationid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				return false;
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 			$applicationids[] = $application['applicationid'];
 		}
 
-		$result = false;
-
-		self::BeginTransaction(__METHOD__);
 		foreach($applications as $anum => $application){
 			$application_db_fields = $upd_applications[$application['applicationid']];
 
 			if(!check_db_fields($application_db_fields, $application)){
-				error('Incorrect arguments pasted to function [API::Application()->update]');
-				$result = false;
-				break;
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect arguments pasted to function [API::Application()->update]');
 			}
 
 			$result = update_application($application['applicationid'], $application['name'], $application['hostid']);
 
-			if(!$result) break;
+			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'error');
 		}
-		$result = self::EndTransaction($result, __METHOD__);
 
-		if($result){
-			$upd_applications = self::get(array('applicationids'=>$applicationids, 'extendoutput'=>1, 'nopermissions'=>1));
-			return $upd_applications;
-		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
-			return false;
-		}
+		$upd_applications = self::get(array('applicationids'=>$applicationids, 'extendoutput'=>1, 'nopermissions'=>1));
+		return $upd_applications;
 	}
 
 /**
@@ -507,17 +487,10 @@ class CAPIApplication extends CZBXAPI{
 			$result = delete_application($applicationids);
 		}
 		else{
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ applicationids ]');
-			$result = false;
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ applicationids ]');
 		}
 
-		if($result){
-			return zbx_cleanHashes($del_applications);
-		}
-		else{
-			self::setError(__METHOD__);
-			return false;
-		}
+		return zbx_cleanHashes($del_applications);
 	}
 
 
@@ -556,8 +529,7 @@ class CAPIApplication extends CZBXAPI{
 		);
 		foreach($applications as $num => $application){
 			if(!isset($allowed_applications[$application['applicationid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				return false;
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 			$applicationids[] = $application['applicationid'];
 		}
@@ -570,15 +542,12 @@ class CAPIApplication extends CZBXAPI{
 		);
 		foreach($items as $num => $item){
 			if(!isset($allowed_items[$item['itemid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				return false;
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 			$itemids[] = $item['itemid'];
 		}
 // }}} PERMISSION
 
-
-		self::BeginTransaction(__METHOD__);
 
 		$sql = 'SELECT itemid, applicationid FROM items_applications WHERE '.
 			DBcondition('itemid', $itemids).' AND '.DBcondition('applicationid', $applicationids);
@@ -594,7 +563,7 @@ class CAPIApplication extends CZBXAPI{
 				$itemappid = get_dbid('items_applications', 'itemappid');
 				$result = DBexecute("INSERT INTO items_applications (itemappid, itemid, applicationid) VALUES ($itemappid, $itemid, $applicationid)");
 				if(!$result){
-					break 2;
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'error');
 				}
 			}
 		}
@@ -616,27 +585,18 @@ class CAPIApplication extends CZBXAPI{
 					}
 					$result = self::addItems(array('items' => $child, 'applications' => $child_applications));
 					if(!$result){
-						break;
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'error');
 					}
 				}
 			}
 		}
 
-
-		$result = self::EndTransaction($result, __METHOD__);
-
-		if($result){
-			$result = self::get(array(
-				'applicationids' => $applicationids,
-				'extendoutput' => 1,
-				'select_items' => 1,
-				'nopermission' => 1));
-			return $result;
-		}
-		else{
-			self::setMethodErrors(__METHOD__, $errors);
-			return false;
-		}
+		$result = self::get(array(
+			'applicationids' => $applicationids,
+			'extendoutput' => 1,
+			'select_items' => 1,
+			'nopermission' => 1));
+		return $result;
 	}
 
 

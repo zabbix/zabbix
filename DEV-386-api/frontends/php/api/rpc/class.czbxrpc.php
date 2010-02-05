@@ -96,7 +96,7 @@ class czbxrpc{
 	private static function callAPI($method, $params){	
 		list($resource, $action) = explode('.', $method);
 		
-		$class_name = 'CAPI'.$resource;
+		$class_name = 'C'.$resource;
 		
 		if(!class_exists($class_name)){
 			return array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Resource ('.$resource.') does not exist');
@@ -107,10 +107,16 @@ class czbxrpc{
 		}
 
 		try{
+			DBstart();
+			
 			$result = call_user_func(array($class_name, $action), $params);
+			
+			DBend(true);
+			
 			return array('result' => $result);
 		}
 		catch(APIException $e){
+			DBend(false);
 			return array('error' => $e->getCode(), 'data' => $e->getErrors(), 'trace' => $e->getTrace());
 		}		
 	}
