@@ -1804,6 +1804,9 @@
 	'S_Y'=>			'Y',
 	'S_YOTTA'=>		'Yotta',
 
+//	profiles.inc.php
+	'S_UNABLE_TO_SELECT_CONFIGURATION'=>	'Unable to select configuration',
+
 //	maintenances.inc.php
 	'S_ON_SMALL'=>			'on',
 	'S_EVERY_SMALL'=>		'every',
