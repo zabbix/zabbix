@@ -6,6 +6,7 @@ bin/win32/zabbix_sender.exe -text
 bin/win64/zabbix_agentd.exe -text
 bin/win64/zabbix_get.exe -text
 bin/win64/zabbix_sender.exe -text
+/bootstrap.sh -text
 build/win32/project/Makefile_agent -text
 build/win32/project/Makefile_agent_x64 -text
 build/win32/project/Makefile_get -text
