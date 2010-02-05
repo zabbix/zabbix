@@ -822,36 +822,27 @@ require_once('include/js.inc.php');
 		$result=DBselect('SELECT name,hsize,vsize FROM screens WHERE screenid='.$screenid);
 		$row=DBfetch($result);
 		if(!$row) return new CTableInfo(S_NO_SCREENS_DEFINED);
-
-		for($r=0;$r<$row['vsize'];$r++){
-			for($c=0;$c<$row['hsize'];$c++){
-				if(isset($skip_field[$r][$c]))	continue;
-
-				$sql='SELECT * FROM screens_items WHERE screenid='.$screenid.' AND x='.$c.' AND y='.$r;
-				$iresult=DBSelect($sql);
-				$irow=DBfetch($iresult);
-
-				if($irow){
-					$colspan=$irow['colspan'];
-					$rowspan=$irow['rowspan'];
-				}
-				else {
-					$colspan=0;
-					$rowspan=0;
-				}
-
-				for($i=0; $i < $rowspan || $i==0; $i++){
-					for($j=0; $j < $colspan || $j==0; $j++){
-						if($i!=0 || $j!=0)
-							$skip_field[$r+$i][$c+$j]=1;
+				
+		$sql = 'SELECT * FROM screens_items WHERE screenid='.$screenid;
+		$iresult = DBSelect($sql);
+		
+		$skip_field = array();
+		$irows = array();
+		while($irow = DBfetch($iresult)){
+			$irows[] = $irow;
+			for($i=0; $i < $irow['rowspan'] || $i==0; $i++){
+				for($j=0; $j < $irow['colspan'] || $j==0; $j++){
+					if($i!=0 || $j!=0){
+						if(!isset($skip_field[$irow['y']+$i])) $skip_field[$irow['y']+$i] = array();
+						$skip_field[$irow['y']+$i][$irow['x']+$j] = 1;
 					}
 				}
-			}
+			}				
 		}
-		$table = new CTable(
-			new CLink('No rows in screen '.$row['name'],'screenconf.php?config=0&form=update&screenid='.$screenid),
+	
+		$table = new CTable(new CLink('No rows in screen '.$row['name'],'screenconf.php?config=0&form=update&screenid='.$screenid),
 			($editmode == 0 || $editmode == 2) ? 'screen_view' : 'screen_edit');
-		$table->setAttribute('id','iframe');
+		$table->setAttribute('id', 'iframe');
 
 		if($editmode == 1){
 			$add_col_link = 'screenedit.php?config=1&screenid='.$screenid.'&add_col=';
@@ -864,7 +855,7 @@ require_once('include/js.inc.php');
 
 		$empty_screen_col = array();
 
-		for($r=0;$r<$row['vsize'];$r++){
+		for($r=0; $r < $row['vsize']; $r++){
 			$new_cols = array();
 			$empty_screen_row = true;
 
@@ -873,13 +864,19 @@ require_once('include/js.inc.php');
 				array_push($new_cols, new Ccol(new Clink(new Cimg('images/general/closed.gif'),$add_row_link.$r)));
 			}
 
-			for($c=0;$c<$row['hsize'];$c++){
+			for($c=0; $c < $row['hsize']; $c++){
 				$item = array();
-				if(isset($skip_field[$r][$c]))		continue;
+				if(isset($skip_field[$r][$c])) continue;
 				$item_form = false;
 
-				$iresult=DBSelect('SELECT * FROM screens_items WHERE screenid='.$screenid.' AND x='.$c.' AND y='.$r);
-				$irow = DBfetch($iresult);
+				$irow = false;
+				foreach($irows as $tmprow){
+					if(($tmprow['x'] == $c) && ($tmprow['y'] == $r)){
+						$irow = $tmprow;
+						break;
+					}
+				}
+				
 				if($irow){
 					$screenitemid	= $irow['screenitemid'];
 					$resourcetype	= $irow['resourcetype'];
@@ -927,17 +924,13 @@ require_once('include/js.inc.php');
 				else
 					$action = NULL;
 
-				if(($editmode == 1) && isset($_REQUEST['form']) &&
-					isset($_REQUEST['x']) && $_REQUEST['x']==$c &&
-					isset($_REQUEST['y']) && $_REQUEST['y']==$r)
-				{ // click on empty field
+				if(($editmode == 1) && isset($_REQUEST['form']) && isset($_REQUEST['x']) && $_REQUEST['x']==$c &&
+					isset($_REQUEST['y']) && $_REQUEST['y']==$r){ // click on empty field
 					$item = get_screen_item_form();
 					$item_form = true;
 				}
-				else if(($editmode == 1) && isset($_REQUEST['form']) &&
-							isset($_REQUEST['screenitemid']) &&
-							(bccomp($_REQUEST['screenitemid'], $screenitemid)==0))
-				{ // click on element
+				else if(($editmode == 1) && isset($_REQUEST['form']) &&	isset($_REQUEST['screenitemid']) &&
+					(bccomp($_REQUEST['screenitemid'], $screenitemid)==0)){ // click on element
 					$item = get_screen_item_form();
 					$item_form = true;
 				}
