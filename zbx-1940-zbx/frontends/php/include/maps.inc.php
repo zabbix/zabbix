@@ -747,7 +747,7 @@
 		$image = get_image_by_imageid($info['iconid']);
 
 		if(!$image){
-			return FALSE;
+			return get_default_image(true);
 		}
 
 	return imagecreatefromstring($image['image']);

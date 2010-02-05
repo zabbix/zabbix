@@ -161,73 +161,79 @@ include_once('include/page_header.php');
 					$links = $json->decode($links, true);
 
 					@ob_start();
-					$db_selementids = array();
-					$res = DBselect('SELECT selementid FROM sysmaps_elements WHERE sysmapid='.$sysmapid);
-					while($db_selement = DBfetch($res)){
-						$db_selementids[$db_selement['selementid']] = $db_selement['selementid'];
-					}
 
-					DBstart();
-					foreach($selements as $id => $selement){
-						if($selement['elementid'] == 0){
-							$selement['elementtype'] = SYSMAP_ELEMENT_TYPE_IMAGE;
+					try{
+						$db_selementids = array();
+						$res = DBselect('SELECT selementid FROM sysmaps_elements WHERE sysmapid='.$sysmapid);
+						while($db_selement = DBfetch($res)){
+							$db_selementids[$db_selement['selementid']] = $db_selement['selementid'];
 						}
 
-						if(isset($selement['new'])){
-							$selement['sysmapid'] = $sysmapid;
-							$selementid = add_element_to_sysmap($selement);
+						DBstart();
+						foreach($selements as $id => $selement){
+							if($selement['elementid'] == 0){
+								$selement['elementtype'] = SYSMAP_ELEMENT_TYPE_IMAGE;
+							}
 
-							foreach($links as $id => $link){
-								if($link['selementid1'] == $selement['selementid']) $links[$id]['selementid1']=$selementid;
-								else if($link['selementid2'] == $selement['selementid']) $links[$id]['selementid2']=$selementid;
+							if($selement['iconid_off'] == 0){
+								throw new Exception('Cannot save map. Map element "'.$selement['label'].'" contains no icon.');
+							}
+							if(isset($selement['new'])){
+								$selement['sysmapid'] = $sysmapid;
+								$selementid = add_element_to_sysmap($selement);
+
+								foreach($links as $id => $link){
+									if($link['selementid1'] == $selement['selementid']) $links[$id]['selementid1']=$selementid;
+									else if($link['selementid2'] == $selement['selementid']) $links[$id]['selementid2']=$selementid;
+								}
+							}
+							else{
+//SDII($selement);
+								$selement['sysmapid'] = $sysmapid;
+								$result = update_sysmap_element($selement);
+								unset($db_selementids[$selement['selementid']]);
 							}
 						}
-						else{
-//SDII($selement);
-							$selement['sysmapid'] = $sysmapid;
-							$result = update_sysmap_element($selement);
-							unset($db_selementids[$selement['selementid']]);
+
+						foreach($db_selementids as $id => $selementid){
+							delete_sysmaps_element($selementid);
 						}
-					}
 
-					foreach($db_selementids as $id => $selementid){
-						delete_sysmaps_element($selementid);
-					}
-
-					$db_linkids = array();
-					$res = DBselect('SELECT linkid FROM sysmaps_links WHERE sysmapid='.$sysmapid);
-					while($db_link = DBfetch($res)){
-						$db_linkids[$db_link['linkid']] = $db_link['linkid'];
-					}
-
-					foreach($links as $id => $link){
-						if(isset($link['new'])){
-							$link['sysmapid'] = $sysmapid;
-							$result = add_link($link);
+						$db_linkids = array();
+						$res = DBselect('SELECT linkid FROM sysmaps_links WHERE sysmapid='.$sysmapid);
+						while($db_link = DBfetch($res)){
+							$db_linkids[$db_link['linkid']] = $db_link['linkid'];
 						}
-						else{
-							$link['sysmapid'] = $sysmapid;
-							$result = update_link($link);
-							unset($db_linkids[$link['linkid']]);
+
+						foreach($links as $id => $link){
+							if(isset($link['new'])){
+								$link['sysmapid'] = $sysmapid;
+								$result = add_link($link);
+							}
+							else{
+								$link['sysmapid'] = $sysmapid;
+								$result = update_link($link);
+								unset($db_linkids[$link['linkid']]);
+							}
 						}
-					}
 
-					foreach($db_linkids as $id => $linkid){
-						delete_link($linkid);
-					}
+						foreach($db_linkids as $id => $linkid){
+							delete_link($linkid);
+						}
+						$result = DBend(true);
 
-					$result = DBend(true);
-
-					if($result){
-						print('if(Confirm("'.S_MAP_SAVED_RETURN_Q.'")){ location.href = "sysmaps.php"; }');
-						ob_flush();
+						if($result)
+							print('if(Confirm("'.S_MAP_SAVED_RETURN_Q.'")){ location.href = "sysmaps.php"; }');
+						else
+							throw new Exception(S_MAP_SAVE_OPERATION_FAILED."\n\r");
 					}
-					else{
-						$msg = S_MAP_SAVE_OPERATION_FAILED."\n\r";
+					catch(Exception $e){
+						$msg =  $e->getMessage();
 						$msg.= ob_get_contents();
 						ob_get_clean();
-						print('INFO('.zbx_jsvalue($msg).');');
+						print('alert('.zbx_jsvalue($msg).');');
 					}
+					ob_flush();
 					break;
 			}
 		}
@@ -258,8 +264,7 @@ include_once('include/page_header.php');
 					}
 				break;
 				case 'new_selement':
-					$sql = 'SELECT i.* FROM images i WHERE '.dbin_node('i.imageid', false).' AND i.imagetype='.IMAGE_TYPE_ICON;
-					$default_icon = DBfetch(DBselect($sql,1));
+					$default_icon = get_default_image(false);
 
 					$selements = get_request('selements', '[]');
 					$selements = $json->decode($selements, true);

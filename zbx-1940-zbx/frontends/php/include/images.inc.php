@@ -19,6 +19,27 @@
 **/
 ?>
 <?php
+	function get_default_image($image=false){
+		if($image){
+			$image = imagecreate(50, 50);
+			$color = imagecolorallocate($image, 250, 50, 50);
+			imagefill($image, 0, 0, $color);
+		}
+		else{
+			$sql = 'SELECT i.imageid '.
+				' FROM images i '.
+				' WHERE '.dbin_node('i.imageid', false);
+			$result = DBselect($sql,1);
+			if($image = DBfetch($result)) return $image;
+			else{
+				$image = array();
+				$image['imageid'] = 0;
+			}
+		}
+
+	return $image;
+	}
+
 	function get_image_by_imageid($imageid){
 
 		$sql = 'SELECT * FROM images WHERE imageid='.$imageid;
@@ -173,23 +194,42 @@
 	}
 
 	function delete_image($imageid){
-		$sql = 'SELECT i.imageid '.
-				' FROM images i '.
-				' WHERE '.dbin_node('i.imageid', false).
-					' AND i.imagetype='.IMAGE_TYPE_ICON;
-		$default_icon = DBfetch(DBselect($sql,1));
-		
-// icons
-		DBexecute('UPDATE sysmaps_elements SET iconid_off='.$default_icon['imageid'].' WHERE iconid_off='.$imageid);
-		DBexecute('UPDATE sysmaps_elements SET iconid_on='.$default_icon['imageid'].' WHERE iconid_on='.$imageid);
-		DBexecute('UPDATE sysmaps_elements SET iconid_unknown='.$default_icon['imageid'].' WHERE iconid_unknown='.$imageid);
-		DBexecute('UPDATE sysmaps_elements SET iconid_disabled='.$default_icon['imageid'].' WHERE iconid_disabled='.$imageid);
-		DBexecute('UPDATE sysmaps_elements SET iconid_maintenance='.$default_icon['imageid'].' WHERE iconid_maintenance='.$imageid);
+		if(checkImagesToDelete($imageid)) return false;
+		$result = DBexecute('DELETE FROM images WHERE imageid='.$imageid);
 
-//background
-		DBexecute('UPDATE sysmaps SET backgroundid=0 WHERE backgroundid='.$imageid);
-		
-	return	DBexecute('DELETE FROM images WHERE imageid='.$imageid);
+	return $result;
 	}
 
+	function checkImagesToDelete($imageids){
+		zbx_value2array($imageids);
+
+		$saveToDelete = true;
+		$sql = 'SELECT DISTINCT sm.* '.
+				' FROM sysmaps_elements se, sysmaps sm '.
+				' WHERE sm.sysmapid=se.sysmapid '.
+					' AND ('.
+						DBCondition('se.iconid_off',$imageids).
+						' OR '.DBCondition('se.iconid_on',$imageids).
+						' OR '.DBCondition('se.iconid_unknown',$imageids).
+						' OR '.DBCondition('se.iconid_disabled',$imageids).
+						' OR '.DBCondition('se.iconid_maintenance',$imageids).
+					')';
+		$db_sysmaps = DBselect($sql);
+		while($sysmap = DBfetch($db_sysmaps)){
+			$saveToDelete = false;
+//			error('Image is used as icon in ZABBIX map "'.$sysmap['name'].'" on node "'.get_node_name_by_elid($sysmap['sysmapid'],true).'"');
+			error('Image is used as icon in ZABBIX map "'.get_node_name_by_elid($sysmap['sysmapid'],true,':').$sysmap['name'].'"');
+		}
+
+		$sql = 'SELECT DISTINCT sm.* '.
+				' FROM sysmaps sm '.
+				' WHERE '.DBCondition('sm.backgroundid',$imageids);
+		$db_sysmaps = DBselect($sql);
+		while($sysmap = DBfetch($db_sysmaps)){
+			$saveToDelete = false;
+			error('Image is used as background in ZABBIX map "'.get_node_name_by_elid($sysmap['sysmapid'],true,':').$sysmap['name'].'"');
+		}
+
+	return $saveToDelete;
+	}
 ?>
