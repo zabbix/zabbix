@@ -129,7 +129,7 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['replace_expression'])){
 		$_REQUEST['expr_action'] = 'r';
 	}
-	else if(isset($_REQUEST['remove_expression']) && strlen($_REQUEST['remove_expression'])){
+	else if(isset($_REQUEST['remove_expression']) && zbx_strlen($_REQUEST['remove_expression'])){
 		$_REQUEST['expr_action'] = 'R';
 		$_REQUEST['expr_target_single'] = $_REQUEST['remove_expression'];
 	}

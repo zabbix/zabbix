@@ -280,29 +280,6 @@
 		return $result;
 	}
 
-	function check_php_mb_overload(){
-
-		$current = defined('ZBX_MBSTRINGS_OVERLOADED');
-
-		if($current){
-			$req = 1;
-		}
-		else{
-			$req = 0;
-		}
-
-		$result = array(
-			'name' => 'PHP MB string overload',
-			'current' => $req ? 'yes' : 'no',
-			'required' => null,
-			'recommended' => null,
-			'result' => $req,
-			'error' => 'MB String overload PHP is not set. Please set "mbstring.func_overload" to 2 in php.ini.'
-		);
-
-		return $result;
-	}
-
 	function check_php_sockets(){
 
 		$current = function_exists('socket_create');
@@ -459,7 +436,6 @@
 		$result[] = check_php_databases();
 		$result[] = check_php_bc();
 		$result[] = check_php_mbstring();
-		$result[] = check_php_mb_overload();
 		$result[] = check_php_sockets();
 		$result[] = check_php_gd();
 		$result[] = check_php_gd_png();

@@ -551,10 +551,10 @@ return $result;
 		$value = trim($value);
 		if( !empty($value) && '"' == $value[0] ){
 /* open quotes and unescape chars */
-			$value = substr($value, 1, strlen($value)-2);
+			$value = substr($value, 1, zbx_strlen($value)-2);
 
 			$new_val = '';
-			for ( $i=0, $max=strlen($value); $i < $max; $i++){
+			for ( $i=0, $max=zbx_strlen($value); $i < $max; $i++){
 				if( $i+1 < $max && $value[$i] == '\\' && ($value[$i+1] == '\\' || $value[$i+1] == '"') )
 					$new_val .= $value[++$i];
 				else
@@ -582,7 +582,7 @@ return $result;
 		$params = array();
 		$quoted = false;
 
-		for( $param_s = $i = 0, $len = strlen($string); $i < $len; $i++){
+		for( $param_s = $i = 0, $len = zbx_strlen($string); $i < $len; $i++){
 			switch ( $string[$i] ){
 				case '"':
 					$quoted = !$quoted;
@@ -751,7 +751,7 @@ return $result;
 		$expr_format = '(('.$expt_term.ZBX_PREG_SPACES.ZBX_PREG_SIGN.ZBX_PREG_SPACES.$expt_term.')|(\('.$expt_term.'\)))';
 		$expr_full_format = '((\('.$expr_format.'\))|('.$expr_format.'))';
 		while($res = preg_match('/'.$expr_full_format.'(.*)$/u', $expr, $arr)){
-			$expr = substr($expr, 0, strpos($expr, $arr[1])).$ZBX_TR_EXPR_REPLACE_TO.$arr[82];
+			$expr = substr($expr, 0, zbx_strpos($expr, $arr[1])).$ZBX_TR_EXPR_REPLACE_TO.$arr[82];
 		}
 
 /* OLD EREG
@@ -763,7 +763,7 @@ return $result;
 		$expr_full_format = '((\('.$expr_format.'\))|('.$expr_format.'))';
 
 		while($res = ereg($expr_full_format.'([[:print:]]*)$', $expr, $arr)){
-			$expr = substr($expr, 0, strpos($expr, $arr[1])).$ZBX_TR_EXPR_REPLACE_TO.$arr[58];
+			$expr = substr($expr, 0, zbx_strpos($expr, $arr[1])).$ZBX_TR_EXPR_REPLACE_TO.$arr[58];
 		}
 */
 
@@ -980,7 +980,7 @@ return $result;
 					$complite_expr.=' | ';
 				}
 				if($cexpor == 0){
-					 $startpos = strlen($complite_expr);
+					 $startpos = zbx_strlen($complite_expr);
 				}
 				$cexpor++;
 				$eq_global = '#0';
@@ -1010,7 +1010,7 @@ return $result;
 
 //			while(mb_eregi($ZBX_EREG_EXPESSION_FUNC_FORMAT, $expr, $arr)){
 			while(preg_match('/'.$ZBX_PREG_EXPESSION_FUNC_FORMAT.'/i', $expr, $arr)){
-				$arr[4] = strtolower($arr[4]);
+				$arr[4] = zbx_strtolower($arr[4]);
 
 				if(!isset($functions[$arr[4]])){
 					error('Incorrect function is used. ['.$expression['value'].']');
@@ -1018,7 +1018,7 @@ return $result;
 				}
 
 				$expr_array[$sub_expr_count]['eq'] = trim($arr[2]);
-				$expr_array[$sub_expr_count]['regexp'] = strtolower($arr[4]).$arr[5];
+				$expr_array[$sub_expr_count]['regexp'] = zbx_strtolower($arr[4]).$arr[5];
 
 				$sub_expr_count++;
 				$expr = $arr[1];
@@ -1082,7 +1082,7 @@ return $result;
 
 		$trigger=array();
 		$state='';
-		for($i=0,$max=strlen($expression); $i<$max; $i++){
+		for($i=0,$max=zbx_strlen($expression); $i<$max; $i++){
 			if(($expression[$i] == '{') && ($expression[$i+1] == '$')){
 				$functionid='';
 				$macros='';
@@ -2210,7 +2210,7 @@ return $result;
 			$row['host'] = get_node_name_by_elid($row['hostid'], null, ': ').$row['host'];
 			$row['description'] = expand_trigger_description_constants($row['description'], $row);
 
-			$hosts[strtolower($row['host'])] = $row['host'];
+			$hosts[zbx_strtolower($row['host'])] = $row['host'];
 
 			// A little tricky check for attempt to overwrite active trigger (value=1) with
 			// inactive or active trigger with lower priority.
@@ -2342,7 +2342,7 @@ return $result;
 						break;
 				}
 
-				if(strlen($description) > 25) $description = substr($description,0,22).'...';
+				if(zbx_strlen($description) > 25) $description = substr($description,0,22).'...';
 
 				$item_menu[$action][] = array(
 					$description,
@@ -2791,11 +2791,11 @@ return $result;
 // outline
 		$outline = $expr;
 		$mark = ord('A');
-		while(($pos = strpos($outline, $expr_full_replace_to)) !== false) {
-			$outline = substr_replace($outline, chr($mark++), $pos, strlen($expr_full_replace_to));
+		while(($pos = zbx_strpos($outline, $expr_full_replace_to)) !== false) {
+			$outline = substr_replace($outline, chr($mark++), $pos, zbx_strlen($expr_full_replace_to));
 		}
 
-		if(strpos($outline, $ZBX_TR_EXPR_REPLACE_TO) !== false) return false; /* analyze failure */
+		if(zbx_strpos($outline, $ZBX_TR_EXPR_REPLACE_TO) !== false) return false; /* analyze failure */
 
 // tree
 		$expr = str_replace(' ', '', $outline);
@@ -2901,7 +2901,7 @@ return $result;
  *
  */
 	function trim_extra_bracket($expr){
-		$len = strlen($expr);
+		$len = zbx_strlen($expr);
 
 		if($expr[0] == '(' || $expr[$len - 1] == ')'){
 			$open = substr_count($expr, '(');
@@ -2961,7 +2961,7 @@ return $result;
 			}
 
 			$key = null;
-			if(strlen($n['expr']) == 1){
+			if(zbx_strlen($n['expr']) == 1){
 				$key = $n['expr'];
 				$tgt = $map[$key];
 
@@ -3138,7 +3138,7 @@ return $result;
 			'regexp' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,			'validation' => IN('0,1')),
 			'str' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,			'validation' => IN('0,1')),
 			'sum' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
-			'time' =>		array( 'value_type' => 'HHMMSS',	'type' => T_ZBX_INT,			'validation' => 'strlen({})==6'));
+			'time' =>		array( 'value_type' => 'HHMMSS',	'type' => T_ZBX_INT,			'validation' => 'zbx_strlen({})==6'));
 
 		if(isset($ZBX_TR_EXPR_SIMPLE_MACROS[$expr])){
 			$result = array(
@@ -3195,7 +3195,7 @@ return $result;
 		$val = trim($value);
 		if(!preg_match(ZBX_PREG_NUMBER, $val)) return $value;
 
-		$last = strtolower($val{strlen($val)-1});
+		$last = zbx_strtolower($val{zbx_strlen($val)-1});
 		switch($last){
 			case 't': $val *= 1024 * 1024 * 1024 * 1024;
 			case 'g': $val *= 1024 * 1024 * 1024;

@@ -133,7 +133,7 @@ class CTree{
 		$tr = new CRow();
 		$td = new CCol();
 
-		$count=(isset($this->tree[$id]['nodeimg']))?(strlen($this->tree[$id]['nodeimg'])):(0);
+		$count=(isset($this->tree[$id]['nodeimg']))?(zbx_strlen($this->tree[$id]['nodeimg'])):(0);
 		for($i=0; $i<$count; $i++){
 			switch($this->tree[$id]['nodeimg'][$i]){
 				case 'O':

@@ -224,7 +224,7 @@ class zbxXML{
 	);
 
 	private static function space2tab($matches){
-		return str_repeat("\t", strlen($matches[0]) / 2 );
+		return str_repeat("\t", zbx_strlen($matches[0]) / 2 );
 	}
 
 	public static function arrayToXML($array, $root = 'root', $xml = null){

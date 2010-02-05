@@ -542,8 +542,8 @@
 				url_param($s['status_codes'],false,'status_codes').
 				'");');
 
-			if(strlen($s['url']) > 70){
-				$url = new CTag('span','yes', substr($s['url'],0,35).SPACE.'...'.SPACE.substr($s['url'],strlen($s['url'])-25,25));
+			if(zbx_strlen($s['url']) > 70){
+				$url = new CTag('span','yes', substr($s['url'],0,35).SPACE.'...'.SPACE.substr($s['url'],zbx_strlen($s['url'])-25,25));
 				$url->setHint($s['url']);
 			}
 			else{
