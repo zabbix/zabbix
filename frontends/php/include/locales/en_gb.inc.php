@@ -1805,6 +1805,21 @@
 	'S_Y'=>			'Y',
 	'S_YOTTA'=>		'Yotta',
 
+//	graphs.inc.php
+	'S_NO_GRAPH_WITH'=>					'No graph item with',
+	'S_MISSING_KEY'=>					'Missing key',
+	'S_MISSING_ITEMS_FOR_GRAPH'=>				'Missing items for graph',
+	'S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL'=>'with template host can not contain items from other hosts.',
+	'S_CANNOT_USE_MULTIPLE_HOST_ITEMS_TEMPLATE_GRAPH'=>	'Can not use multiple host items for template graph',
+	'S_MUST_USE_ITEMS_ONLY_FROM_HOST'=>			'You must use items only from host',
+	'S_FOR_TEMPLATE_GRAPH_SMALL'=>				'for template graph',
+	'S_FOR_HOST_SMALL'=>					'for host',
+	'S_UPDATED_FOR_HOSTS'=>					'updated for hosts',
+	'S_UNLINKED_SMALL'=>					'unlinked',
+	'S_SKIPPED_COPYING_OF_GRAPH'=>				'Skipped copying of graph',
+	'S_TO_HOST_SMALL'=>					'to host',
+	
+
 //	profiles.inc.php
 	'S_UNABLE_TO_SELECT_CONFIGURATION'=>	'Unable to select configuration',
 
