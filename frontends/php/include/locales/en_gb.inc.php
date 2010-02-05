@@ -1768,6 +1768,7 @@
 // page_header.php
 	'S_REFRESHED_EVERY_SMALL'=>		'refreshed every',
 	'S_PAGE_RECEIVED_INCORRECT_DATA'=>	'Page received incorrect data',
+	'S_TIMEZONE_FOR_PHP_IS_NOT_SET_PLEASE_SET'=>'Timezone for PHP is not set. Please set "date.timezone" option in php.ini.',
 
 //	copt.inc.php
 	'S_STATS_FOR'=>			'Stats for',
