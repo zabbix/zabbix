@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBXNEXT-225] update Brazilian Portuguese translation; thanks to murilex (Richlv)
  - [DEV-137] add basic bootstrap script (Richlv)
  - [ZBX-1944] fixed no permission error when try to view simple graph from childnodes (Vedmak)
  - [ZBX-1871] made zabbix not require mbstring_overload to be enabled (Vedmak)
