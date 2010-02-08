@@ -22,12 +22,18 @@ AC_TRY_LINK(
 #ifdef HAVE_RESOLV_H
 #	include <resolv.h>
 #endif
+#ifndef C_IN
+#	define C_IN	ns_c_in
+#endif	/* C_IN */
+#ifndef T_SOA
+#	define T_SOA	ns_t_soa
+#endif	/* T_SOA */
 ],
 [
 	char	*buf;
 
 	res_init();
-	res_query("", ns_c_in, ns_t_soa, buf, 0);
+	res_query("", C_IN, T_SOA, buf, 0);
 ],
 found_resolv="yes"
 RESOLV_LIBS="$1")
