@@ -1850,6 +1850,15 @@
 	'S_SELECT_IMAGE_TO_DOWNLOAD'=>		'Select image to download',
 	'S_INCORRECT_IMAGE'=>			'Incorrect Image',
 	
+//	nodes.inc.php
+	'S_INCORRECT_CHARACTERS_USED_FOR_NODE_NAME'=>		'Incorrect characters used for Node name',
+	'S_MASTER_NODE_ALREADY_EXISTS'=>			'Master node already exists',
+	'S_INCORRECT_NODE_TYPE'=>				'Incorrect node type',
+	'S_NODE_WITH_SAME_ID_ALREADY_EXISTS'=>			'Node with same ID already exists',
+	'S_UNABLE_TO_REMOVE_LOCAL_NODE'=>			'Unable to remove local node',	
+	'S_DATABASE_STILL_CONTAINS_DATA_RELATED_DELETED_NODE'=>	'Please be aware that database still contains data related to the deleted Node',
+	
+
 //	regexp.inc.php
 	'S_INCORRECT_ARGUMENTS_PASTED_TO_FUNCTION'=>	'Incorrect arguments pasted to function',
 
