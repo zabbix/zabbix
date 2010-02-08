@@ -1805,6 +1805,11 @@
 	'S_Y'=>			'Y',
 	'S_YOTTA'=>		'Yotta',
 
+//	maps.inc.php
+	'S_NO_SYSTEM_MAP_WITH'=>		'No system map with',
+	'S_NO_SYSMAP_ELEMENT_WITH'=>		'No sysmap element with',
+	'S_CIRCULAR_LINK_CANNOT_BE_CREATED'=>	'Circular link cannot be created',
+	
 //	screens.inc.php
 	'S_NO_ROWS_IN_SCREEN'=>				'No rows in screen',
 	'S_DELETE_IT_Q'=>				'Delete it?',
