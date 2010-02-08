@@ -114,7 +114,7 @@
 
 // reset profiles if node is different than local
 		if($ZBX_CURRENT_NODEID != $ZBX_LOCALNODEID){
-			get_profile(null, null, null, null, true);
+			CProfile::init();
 		}
 	}
 
