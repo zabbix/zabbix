@@ -134,16 +134,16 @@
 		}
 
 		if($yaxis == 2){
-			$graphDims['shiftXleft'] = 75;
-			$graphDims['shiftXright'] = 75;
+			$graphDims['shiftXleft'] = 85;
+			$graphDims['shiftXright'] = 85;
 		}
 		else if($yaxis == 0){
-			$graphDims['shiftXleft'] = 75;
+			$graphDims['shiftXleft'] = 85;
 			$graphDims['shiftXright'] = 30;
 		}
 		else{
 			$graphDims['shiftXleft'] = 30;
-			$graphDims['shiftXright'] = 75;
+			$graphDims['shiftXright'] = 85;
 		}
 //-------------
 

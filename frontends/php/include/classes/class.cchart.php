@@ -77,16 +77,16 @@ class CChart extends CGraphDraw{
 /********************************************************************************************************/
 	public function updateShifts(){
 		if( ($this->yaxisleft == 1) && ($this->yaxisright == 1)){
-			$this->shiftXleft = 75;
-			$this->shiftXright = 75;
+			$this->shiftXleft = 85;
+			$this->shiftXright = 85;
 		}
 		else if($this->yaxisleft == 1){
-			$this->shiftXleft = 75;
+			$this->shiftXleft = 85;
 			$this->shiftXright = 30;
 		}
 		else if($this->yaxisright == 1){
 			$this->shiftXleft = 30;
-			$this->shiftXright = 75;
+			$this->shiftXright = 85;
 		}
 //			$this->sizeX = $this->sizeX - $this->shiftXleft-$this->shiftXright;
 	}
@@ -769,13 +769,10 @@ class CChart extends CGraphDraw{
 			$t = abs($int - $col_interval);
 
 			if($t<$dist){
-
 				$dist = $t;
 				$interval = $int;
 			}
 		}
-
-
 //------
 
 // correctin MIN & MAX
@@ -784,7 +781,6 @@ class CChart extends CGraphDraw{
 //--------------------
 
 //SDI($this->m_minY[$side].' - '.$this->m_maxY[$side].' : '.$interval);
-
 		$this->gridLinesCount[$side] = ceil(($this->m_maxY[$side] - $this->m_minY[$side]) / $interval);
 		$this->m_maxY[$side] = $this->m_minY[$side] + $interval * $this->gridLinesCount[$side];
 
@@ -794,10 +790,18 @@ class CChart extends CGraphDraw{
 
 		$intervalX = ($interval * $this->sizeY) / $diff_val;
 
+//SDII(array($this->m_maxY[$side],$tmp_maxY[$side]));
+
+// we add 1 interval so max Y woun't be at most top
+		if($this->m_maxY[$side] == $tmp_maxY[$side]){
+			$this->gridLinesCount[$side]++;
+			$this->m_maxY[$side] += $interval;
+		}
 //SDI($this->m_maxY[$other_side].' - '.$this->m_minY[$other_side]);
 		if(isset($this->axis_valuetype[$other_side])){
 			$dist = ($this->m_maxY[$other_side] - $this->m_minY[$other_side]);
 			$interval = 1;
+
 			foreach($intervals as $num => $int){
 //SDI($dist.' < '.bcmul($this->gridLinesCount[$side],$int));
 				if($dist < bcmul($this->gridLinesCount[$side],$int)){
@@ -806,18 +810,13 @@ class CChart extends CGraphDraw{
 				}
 			}
 
-// diff check
-			$diff_min = ($this->m_minY[$other_side] - floor($this->m_minY[$other_side] / $interval) * $interval);
-			$diff_max = ($this->m_maxY[$other_side] - ceil($this->m_maxY[$other_side] / $interval) * $interval);
-
 // correcting MIN & MAX
 			$this->m_minY[$other_side] = floor($this->m_minY[$other_side] / $interval) * $interval;
 			$this->m_maxY[$other_side] = ceil($this->m_maxY[$other_side] / $interval) * $interval;
 //--------------------
 
 // if we lowered min more than highed max - need additional recalculating
-//			if($diff_min > $diff_max){
-			if(($tmp_maxY[$other_side] < $this->m_maxY[$other_side]) || ($tmp_minY[$other_side] > $this->m_minY[$other_side])){
+			if(($tmp_maxY[$other_side] > $this->m_maxY[$other_side]) || ($tmp_minY[$other_side] < $this->m_minY[$other_side])){
 				$dist = ($this->m_maxY[$other_side] - $this->m_minY[$other_side]);
 				$interval = 0;
 				foreach($intervals as $num => $int){
@@ -1298,10 +1297,10 @@ class CChart extends CGraphDraw{
 
 			$str = convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units, false);
 
-			$dims = imageTextSize(7, 0, $str);
+			$dims = imageTextSize(8, 0, $str);
 
 			imageText($this->im,
-				7,
+				8,
 				0,
 				$this->shiftXleft - $dims['width'] - 6,
 				$this->sizeY-$this->sizeY*$i/$hstr_count+$this->shiftY + 4,
@@ -1371,7 +1370,7 @@ class CChart extends CGraphDraw{
 
 			$str = convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units, false);
 			imageText($this->im,
-				7,
+				8,
 				0,
 				$this->sizeX+$this->shiftXleft+12,
 				$this->sizeY-$this->sizeY*$i/$hstr_count+$this->shiftY + 4,
