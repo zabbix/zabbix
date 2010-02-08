@@ -780,10 +780,11 @@ function zbx_substr($string, $start, $length=null){
 function zbx_str_revert($str){
 	if(defined('ZBX_MBSTRINGS_ENABLED')){
 		$result = '';
-		$str_rep = mb_split($str);
-		foreach($str_rep as $num => $symb){
-			$result = $symb.$result;
-		}
+		
+		$stop = mb_strlen($str);
+		for($idx=0; $idx<$stop; $idx++){ 
+			$result = mb_substr($str, $idx, 1) . $result; 
+		} 
 	}
 	else{
 		$result = strrev($str);
