@@ -214,7 +214,7 @@ char	*get_config_data(int nodeid, int dest_nodetype)
 	c[0] = '1';	/* for new and updated records */
 	c[1] = '2';	/* for deleted records */
 
-	zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 16, "Data%c%d%c%d\n",
+	zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 16, "Data%c%d%c%d",
 			ZBX_DM_DELIMITER, CONFIG_NODEID, ZBX_DM_DELIMITER, nodeid);
 
 	/* Find updated records */
@@ -263,7 +263,7 @@ char	*get_config_data(int nodeid, int dest_nodetype)
 		{
 			if((dest_nodetype == ZBX_NODE_SLAVE && *s != c[1]) || (dest_nodetype == ZBX_NODE_MASTER && *(s + 1) != c[1]))
 			{
-				zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "%s%c%s%c%d\n",
+				zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "\n%s%c%s%c%d",
 					row[0],
 					ZBX_DM_DELIMITER,
 					row[1],
@@ -324,7 +324,7 @@ char	*get_config_data(int nodeid, int dest_nodetype)
 		if (NULL == (row2=DBfetch(result2)))
 			goto out;
 
-		zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "%s%c%s%c%d",
+		zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "\n%s%c%s%c%d",
 			row[0],
 			ZBX_DM_DELIMITER,
 			row[1],
@@ -389,7 +389,6 @@ char	*get_config_data(int nodeid, int dest_nodetype)
 			} else
 				r[1] = NULL;
 		} while (d[0] != NULL || d[1] != NULL);
-		zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "\n");
 out:
 		DBfree_result(result2);
 	}

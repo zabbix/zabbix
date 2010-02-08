@@ -715,7 +715,7 @@ int	node_sync(char *data, int *sender_nodeid, int *nodeid)
 
 	if (0 != *sender_nodeid && 0 != *nodeid)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Received data from %s node %d for node %d datalen %d",
+		zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Received configuration changes from %s node %d for node %d datalen %d",
 				CONFIG_NODEID, (sender_nodetype == ZBX_NODE_SLAVE) ? "slave" : "master",
 				*sender_nodeid, *nodeid, datalen);
 
