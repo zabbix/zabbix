@@ -318,10 +318,10 @@
 		}
 		else
 		{
-			$housekeeperid = get_dbid('housekeeper','housekeeperid');
+			// $housekeeperid = get_dbid('housekeeper','housekeeperid');
 			$result = (
-				DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
-					" values ($housekeeperid,'nodes','nodeid',$nodeid)") &&
+				// DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
+					// " values ($housekeeperid,'nodes','nodeid',$nodeid)") &&
 				DBexecute('delete from nodes where nodeid='.$nodeid) &&
 				DBexecute('update nodes set masterid=0 where masterid='.$nodeid)
 				);
@@ -330,12 +330,12 @@
 		return $result;
 	}
 
-	function	get_node_by_nodeid($nodeid)
+	function get_node_by_nodeid($nodeid)
 	{
 		return DBfetch(DBselect('select * from nodes where nodeid='.$nodeid));
 	}
 
-	function	get_node_path($nodeid, $result='/')
+	function get_node_path($nodeid, $result='/')
 	{
 		if($node_data = get_node_by_nodeid($nodeid))
 		{
