@@ -840,7 +840,7 @@ require_once('include/js.inc.php');
 			}				
 		}
 	
-		$table = new CTable(new CLink('No rows in screen '.$row['name'],'screenconf.php?config=0&form=update&screenid='.$screenid),
+		$table = new CTable(new CLink(S_NO_ROWS_IN_SCREEN.SPACE.$row['name'],'screenconf.php?config=0&form=update&screenid='.$screenid),
 			($editmode == 0 || $editmode == 2) ? 'screen_view' : 'screen_edit');
 		$table->setAttribute('id', 'iframe');
 
@@ -1306,7 +1306,7 @@ require_once('include/js.inc.php');
 					$rmv_row_link = 'javascript: location.href = '."'screenedit.php?config=1&screenid=".$screenid.'&rmv_row='.$r."';";
 				}
 				else{
-					$rmv_row_link = "javascript: if(Confirm('This screen-row is not empty. Delete it?')){".
+					$rmv_row_link = "javascript: if(Confirm('".S_THIS_SCREEN_ROW_NOT_EMPTY.'. '.S_DELETE_IT_Q."')){".
 									" location.href = 'screenedit.php?config=1&screenid=".$screenid."&rmv_row=".$r."';}";
 				}
 				$rmv_icon->addAction('onclick',$rmv_row_link);
@@ -1322,7 +1322,7 @@ require_once('include/js.inc.php');
 			for($c=0;$c<$row['hsize'];$c++){
 				$rmv_icon = new Cimg('images/general/opened.gif');
 				if(isset($empty_screen_col[$c])){
-					$rmv_col_link = "javascript: if(Confirm('This screen-column is not empty. Delete it?')){".
+					$rmv_col_link = "javascript: if(Confirm('".S_THIS_SCREEN_COLUMN_NOT_EMPTY.'. '.S_DELETE_IT_Q."')){".
 										" location.href = 'screenedit.php?config=1&screenid=".$screenid."&rmv_col=".$c."';}";
 				}
 				else{
