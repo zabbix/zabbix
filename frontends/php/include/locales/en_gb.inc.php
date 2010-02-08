@@ -1805,6 +1805,12 @@
 	'S_Y'=>			'Y',
 	'S_YOTTA'=>		'Yotta',
 
+//	screens.inc.php
+	'S_NO_ROWS_IN_SCREEN'=>				'No rows in screen',
+	'S_DELETE_IT_Q'=>				'Delete it?',
+	'S_THIS_SCREEN_ROW_NOT_EMPTY'=>	'This screen-row is not empty',
+	'S_THIS_SCREEN_COLUMN_NOT_EMPTY'=>		'This screen-column is not empty',
+	
 //	graphs.inc.php
 	'S_NO_GRAPH_WITH'=>					'No graph item with',
 	'S_MISSING_KEY'=>					'Missing key',
