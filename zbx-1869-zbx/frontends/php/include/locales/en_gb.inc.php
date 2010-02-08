@@ -1805,6 +1805,17 @@
 	'S_Y'=>			'Y',
 	'S_YOTTA'=>		'Yotta',
 
+//	maps.inc.php
+	'S_NO_SYSTEM_MAP_WITH'=>		'No system map with',
+	'S_NO_SYSMAP_ELEMENT_WITH'=>		'No sysmap element with',
+	'S_CIRCULAR_LINK_CANNOT_BE_CREATED'=>	'Circular link cannot be created',
+	
+//	screens.inc.php
+	'S_NO_ROWS_IN_SCREEN'=>				'No rows in screen',
+	'S_DELETE_IT_Q'=>				'Delete it?',
+	'S_THIS_SCREEN_ROW_NOT_EMPTY'=>	'This screen-row is not empty',
+	'S_THIS_SCREEN_COLUMN_NOT_EMPTY'=>		'This screen-column is not empty',
+	
 //	graphs.inc.php
 	'S_NO_GRAPH_WITH'=>					'No graph item with',
 	'S_MISSING_KEY'=>					'Missing key',
@@ -1850,6 +1861,15 @@
 	'S_SELECT_IMAGE_TO_DOWNLOAD'=>		'Select image to download',
 	'S_INCORRECT_IMAGE'=>			'Incorrect Image',
 	
+//	nodes.inc.php
+	'S_INCORRECT_CHARACTERS_USED_FOR_NODE_NAME'=>		'Incorrect characters used for Node name',
+	'S_MASTER_NODE_ALREADY_EXISTS'=>			'Master node already exists',
+	'S_INCORRECT_NODE_TYPE'=>				'Incorrect node type',
+	'S_NODE_WITH_SAME_ID_ALREADY_EXISTS'=>			'Node with same ID already exists',
+	'S_UNABLE_TO_REMOVE_LOCAL_NODE'=>			'Unable to remove local node',	
+	'S_DATABASE_STILL_CONTAINS_DATA_RELATED_DELETED_NODE'=>	'Please be aware that database still contains data related to the deleted Node',
+	
+
 //	regexp.inc.php
 	'S_INCORRECT_ARGUMENTS_PASTED_TO_FUNCTION'=>	'Incorrect arguments pasted to function',
 
