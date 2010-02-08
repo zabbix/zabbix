@@ -633,7 +633,7 @@ initialize: function(sbid, timelineid, width){ // where to put bar on start(time
 	this.scrollbarid = sbid;
 	this.debug('initialize', sbid);
 
-//	try{
+	try{
 // Checks
 		if(!isset(timelineid,ZBX_TIMELINES)) throw('Failed to initialize ScrollBar with given TimeLine');
 		if(empty(this.dom.scrollbar)) this.scrollcreate(width);
@@ -669,7 +669,7 @@ initialize: function(sbid, timelineid, width){ // where to put bar on start(time
 //---------------
 		this.disabled = 0;
 
-	try{
+//	try{
 	} 
 	catch(e){
 		throw "ERROR: ScrollBar initialization failed!";
@@ -1424,7 +1424,7 @@ deselectall: function(){
 	}	
 },
 
-formatStampByDHM: function(timestamp, double, extend){
+formatStampByDHM: function(timestamp, tsDouble, extend){
 	this.debug('formatStampByDHM');
 	
 	timestamp = timestamp || 0;
@@ -1441,7 +1441,7 @@ formatStampByDHM: function(timestamp, double, extend){
 	var hours =  parseInt((timestamp - years*365*86400 - months*30*86400 - weeks*7*86400 - days*86400)/3600);
 	var minutes = parseInt((timestamp - years*365*86400 - months*30*86400 - weeks*7*86400 - days*86400 - hours*3600)/60);
 	
-	if(double){
+	if(tsDouble){
 		if(months.toString().length == 1) months = '0'+months;
 		if(weeks.toString().length == 1) weeks = '0'+weeks;
 		if(days.toString().length == 1) days = '0'+days;
@@ -1454,7 +1454,7 @@ formatStampByDHM: function(timestamp, double, extend){
 	str+=(months == 0)?(''):(months+'m ');
 	str+=(weeks == 0)?(''):(weeks+'w ');
 	
-	if(extend && double) str+=days+'d ';
+	if(extend && tsDouble) str+=days+'d ';
 	else str+=(days == 0)?(''):(days+'d ');
 	
 	str+=hours+'h '+minutes+'m ';
