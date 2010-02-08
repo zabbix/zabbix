@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with UserMacro
  */
-class CAPIUserMacro extends CZBXAPI{
+class CUserMacro extends CZBXAPI{
 /**
  * Get UserMacros data
  *

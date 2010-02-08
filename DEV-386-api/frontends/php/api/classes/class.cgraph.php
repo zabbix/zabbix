@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with graphs
  */
-class CAPIGraph extends CZBXAPI{
+class CGraph extends CZBXAPI{
 /**
 * Get graph data
 *

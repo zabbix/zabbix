@@ -59,6 +59,7 @@ function __autoload($class_name){
 		'cgraphitem' => 1,
 		'cproxy' => 1,
 		'apiexception' => 1,
+		'cvalidate' => 1,
 	);
 
 	$rpc = array(

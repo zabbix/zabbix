@@ -27,7 +27,7 @@
  * Class containing methods for operations with Applications
  *
  */
-class CAPIApplication extends CZBXAPI{
+class CApplication extends CZBXAPI{
 /**
  * Get Applications data
  *
@@ -393,8 +393,6 @@ class CAPIApplication extends CZBXAPI{
 		$applications = zbx_toArray($applications);
 		$applicationids = array();
 
-		$result = false;
-
 		foreach($applications as $anum => $application){
 			$result = add_application($application['name'], $application['hostid']);
 
@@ -475,8 +473,7 @@ class CAPIApplication extends CZBXAPI{
 											'preservekeys'=>1));
 		foreach($applications as $anum => $application){
 			if(!isset($del_applications[$application['applicationid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				return false;
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 
 			$applicationids[] = $application['applicationid'];
@@ -598,8 +595,7 @@ class CAPIApplication extends CZBXAPI{
 			'nopermission' => 1));
 		return $result;
 	}
-
-
+	
 }
 
 ?>

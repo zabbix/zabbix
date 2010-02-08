@@ -27,7 +27,7 @@
  * Class containing methods for operations with Scripts
  *
  */
-class CAPIscript extends CZBXAPI{
+class Cscript extends CZBXAPI{
 /**
  * Get Scripts data
  *

@@ -33,6 +33,7 @@ class CAPIObject{
 		else{
 			$errors = zbx_toArray($result['data']);
 			error($result['data']);
+			error($result['trace']);
 			return false;
 		}
 	}

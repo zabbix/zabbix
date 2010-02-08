@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with Proxies
  */
-class CAPIProxy extends CZBXAPI{
+class CProxy extends CZBXAPI{
 /**
  * Get Proxy data
  *

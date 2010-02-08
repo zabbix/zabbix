@@ -27,7 +27,7 @@
  * Class containing methods for operations with Items
  *
  */
-class CAPIItem extends CZBXAPI{
+class CItem extends CZBXAPI{
 /**
  * Get items data
  *

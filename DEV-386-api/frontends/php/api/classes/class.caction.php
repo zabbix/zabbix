@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with Actions
  */
-class CAPIAction extends CZBXAPI{
+class CAction extends CZBXAPI{
 /**
  * Get Actions data
  *
@@ -516,14 +516,13 @@ class CAPIAction extends CZBXAPI{
 			);
 			
 			$sql = 'INSERT INTO actions ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
-			$sql .= '/* '.__METHOD__.' */';
 
 			if(!DBexecute($sql)) 
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for action');
-			
 		}
-			$new_actions = API::Action()->get(array('actionids'=>$actionids, 'extendoutput'=>1, 'nopermissions'=>1));
-			return $new_actions;
+		
+		$new_actions = API::Action()->get(array('actionids'=>$actionids, 'extendoutput'=>1, 'nopermissions'=>1));
+		return $new_actions;
 	}
 
 /**
@@ -548,17 +547,20 @@ class CAPIAction extends CZBXAPI{
  */
 	public static function update($actions){
 		$actions = zbx_toArray($actions);
-		$actionids = array();
+		$actionids = zbx_objectValues($actions, 'actionid');
 
-		$upd_actions = API::Action()->get(array('actionids'=>zbx_objectValues($actions, 'actionid'),
-											'editable'=>1,
-											'extendoutput'=>1,
-											'preservekeys'=>1));
+		$options = array(
+			'actionids' => $actionids,
+			'editable' => 1,
+			'extendoutput' => 1,
+			'preservekeys' => 1
+		);
+		$upd_actions = self::get($options);
+		
 		foreach($actions as $anum => $action){
 			if(!isset($upd_actions[$action['actionid']])){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
-			$actionids[] = $action['actionid'];
 		}
 
 		foreach($actions as $anum => $action){
@@ -600,12 +602,12 @@ class CAPIAction extends CZBXAPI{
 		$conditions = zbx_toArray($conditions);
 
 		if(!check_permission_for_action_conditions($conditions)){
-			self::exception(ZBX_API_ERROR_INTERNAL, 'Internal zabbix error');
+			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 		}
 
 		foreach($conditions as $cnum => $condition){
 			if( !validate_condition($condition['type'],$condition['value']) ){
-				self::exception(ZBX_API_ERROR_INTERNAL, 'Internal zabbix error');
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect condition');
 			}
 		}
 
@@ -682,11 +684,14 @@ class CAPIAction extends CZBXAPI{
 		$actions = zbx_toArray($actions);
 		$actionids = array();
 
-		$del_actions = API::Action()->get(array('actionids'=>zbx_objectValues($actions, 'actionid'),
-											'editable'=>1,
-											'extendoutput'=>1,
-											'preservekeys'=>1));
-											
+		$options = array(
+			'actionids'=>zbx_objectValues($actions, 'actionid'),
+			'editable'=>1,
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$del_actions = API::Action()->get($options);
+		
 		foreach($actions as $anum => $action){
 			if(!isset($del_actions[$action['actionid']])){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);

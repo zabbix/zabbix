@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with UserGroups.
  */
-class CAPIUserGroup extends CZBXAPI{
+class CUserGroup extends CZBXAPI{
 /**
  * Get UserGroups
  *

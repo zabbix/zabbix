@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with Users
  */
-class CAPIUser extends CZBXAPI{
+class CUser extends CZBXAPI{
 /**
  * Get Users data
  *

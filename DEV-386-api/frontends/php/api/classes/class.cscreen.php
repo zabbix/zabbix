@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with Screens
  */
-class CAPIScreen extends CZBXAPI{
+class CScreen extends CZBXAPI{
 /**
  * Get Screen data
  *

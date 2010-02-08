@@ -27,7 +27,7 @@
  * Class containing methods for operations with Templates
  *
  */
-class CAPITemplate extends CZBXAPI{
+class CTemplate extends CZBXAPI{
 /**
  * Get Template data
  *

@@ -27,7 +27,7 @@
  * Class containing methods for operations with Triggers
  *
  */
-class CAPITrigger extends CZBXAPI{
+class CTrigger extends CZBXAPI{
 
 	public static $error = array();
 

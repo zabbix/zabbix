@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with Alerts
  */
-class CAPIAlert extends CZBXAPI{
+class CAlert extends CZBXAPI{
 /**
  * Get Alerts data
  *
@@ -58,7 +58,7 @@ class CAPIAlert extends CZBXAPI{
 		$user_type = $USER_DETAILS['type'];
 		$userid = $USER_DETAILS['userid'];
 
-		$sort_columns = array('alertid','clock','eventid','status'); // allowed columns for sorting
+		$sort_columns = array('alertid', 'clock', 'eventid', 'status'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 

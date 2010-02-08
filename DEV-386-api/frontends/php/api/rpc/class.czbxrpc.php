@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ class czbxrpc{
 		);
 		
 		if(is_null($params) && !isset($notifications[$method])){
-			return array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Resource ('.$resource.') does not exist');
+			return array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Empty parameters');
 		}
 
 		switch($source){
@@ -108,9 +108,7 @@ class czbxrpc{
 
 		try{
 			DBstart();
-			
 			$result = call_user_func(array($class_name, $action), $params);
-			
 			DBend(true);
 			
 			return array('result' => $result);

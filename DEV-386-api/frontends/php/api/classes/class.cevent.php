@@ -27,7 +27,7 @@
  * Class containing methods for operations with events
  *
  */
-class CAPIEvent extends CZBXAPI{
+class CEvent extends CZBXAPI{
 /**
  * Get events data
  *
@@ -495,7 +495,6 @@ class CAPIEvent extends CZBXAPI{
 		$result = false;
 		$triggers = array();
 
-		self::BeginTransaction(__METHOD__);
 		foreach($events as $num => $event){
 			$event_db_fields = array(
 				'source'		=> null,
@@ -521,9 +520,13 @@ class CAPIEvent extends CZBXAPI{
 								$event['acknowledged'].
 							')';
 			$result = DBexecute($sql);
-			if(!$result) break;
+			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
-			$triggers[] = array('triggerid' => $event['objectid'], 'value'=> $event['value'], 'lastchange'=> $event['clock']);
+			$triggers[] = array(
+				'triggerid' => $event['objectid'], 
+				'value'=> $event['value'], 
+				'lastchange'=> $event['clock']
+			);
 
 			$eventids[$eventid] = $eventid;
 		}
@@ -532,14 +535,7 @@ class CAPIEvent extends CZBXAPI{
 			$result = API::Trigger()->update($triggers);
 		}
 
-		$result = self::EndTransaction($result, __METHOD__);
-		if($result){
-			return $eventids;
-		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
-			return false;
-		}
+		return $eventids;
 	}
 
 /**
@@ -551,7 +547,7 @@ class CAPIEvent extends CZBXAPI{
  * @since 1.8
  * @version 1
  *
- * @param _array $eventids
+ * @param array $eventids
  * @param array $eventids['eventids']
  * @return boolean
  */
@@ -564,16 +560,10 @@ class CAPIEvent extends CZBXAPI{
 			$result = DBexecute($sql);
 		}
 		else{
-			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ eventids ]');
-			$result = false;
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ eventids ]');
 		}
 
-		if($result)
-			return true;
-		else{
-			self::setError(__METHOD__);
-			return false;
-		}
+		return true;
 	}
 
 	/**
@@ -626,36 +616,34 @@ class CAPIEvent extends CZBXAPI{
 		}
 // }}} PERMISSIONS
 
-		self::BeginTransaction(__METHOD__);
-
 		$result = DBexecute('UPDATE events SET acknowledged=1 WHERE '.DBcondition('eventid', $eventids));
-		if($result){
-			$time = time();
-			$message = zbx_dbstr($message);
-
-			foreach($events as $enum => $event){
-				$acknowledgeid = get_dbid('acknowledges', 'acknowledgeid');
-				$result = DBexecute('INSERT INTO acknowledges (acknowledgeid, userid, eventid, clock, message)'.
-					' VALUES ('.$acknowledgeid.','.$USER_DETAILS['userid'].','.$event['eventid'].','.$time.','.$message.')');
-
-				if(!$result)
-					break;
-			}
+		if(!$result){
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 		}
+		
+		$values = array(
+			'userid' => $USER_DETAILS['userid'],
+			'clock' => time(),
+			'message' => zbx_dbstr($message))
+		);
 
-		$result = self::EndTransaction($result, __METHOD__);
+		foreach($events as $enum => $event){
+			$values['acknowledgeid'] = get_dbid('acknowledges', 'acknowledgeid');
+			$values['eventid'] = $event['eventid'];
+			
+			$result = DBexecute('INSERT INTO acknowledges ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')');
 
-		if($result){
-			$result = self::get(array(
-				'eventids' => $eventids,
-				'extendoutput' => 1,
-				'nopermission' => 1));
-			return $result;
+			if(!$result)
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 		}
-		else{
-			self::setMethodErrors(__METHOD__, $errors);
-			return false;
-		}
+		
+
+		$result = self::get(array(
+			'eventids' => $eventids,
+			'extendoutput' => 1,
+			'nopermission' => 1)
+		);
+		return $result;
 	}
 
 

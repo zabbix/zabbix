@@ -27,7 +27,7 @@
  * Class containing methods for operations with maintenances
  *
  */
-class CAPIMaintenance extends CZBXAPI{
+class CMaintenance extends CZBXAPI{
 /**
  * Get maintenances data
  *
