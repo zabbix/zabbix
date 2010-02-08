@@ -121,7 +121,7 @@
 		if($row){
 			return	$row;
 		}
-		error('No system map with sysmapid=['.$sysmapid.']');
+		error(S_NO_SYSTEM_MAP_WITH.' sysmapid=['.$sysmapid.']');
 		return false;
 	}
 
@@ -133,7 +133,7 @@
 			return	$row;
 		}
 		else{
-			error('No sysmap element with selementid=['.$selementid.']');
+			error(S_NO_SYSMAP_ELEMENT_WITH.' selementid=['.$selementid.']');
 		}
 	return	$result;
 	}
@@ -355,7 +355,7 @@
 
 		if($selement['label_location']<0) $selement['label_location']='null';
 		if(check_circle_elements_link($selement['sysmapid'],$selement['elementid'],$selement['elementtype'])){
-			error("Circular link can't be created");
+			error(S_CIRCULAR_LINK_CANNOT_BE_CREATED);
 			return false;
 		}
 
@@ -402,7 +402,7 @@
 		}
 
 		if(check_circle_elements_link($selement['sysmapid'],$selement['elementid'],$selement['elementtype'])){
-			error("Circular link can't be created");
+			error(S_CIRCULAR_LINK_CANNOT_BE_CREATED);
 			return false;
 		}
 
@@ -922,14 +922,14 @@
 			}
 		}
 
-		while(false !== ($pos = strpos($label, '{'))){
+		while(false !== ($pos = zbx_strpos($label, '{'))){
 			$expr = substr($label, $pos);
 
-			if(false === ($pos = strpos($expr, '}'))) break;
+			if(false === ($pos = zbx_strpos($expr, '}'))) break;
 
 			$expr = substr($expr, 1, $pos - 1);
 
-			if(false === ($pos = strpos($expr, ':'))){
+			if(false === ($pos = zbx_strpos($expr, ':'))){
 				$label = str_replace('{'.$expr.'}', '???', $label);
 				continue;
 			}
@@ -937,7 +937,7 @@
 			$host = substr($expr, 0, $pos);
 			$key = substr($expr, $pos + 1);
 
-			if(false === ($pos = strrpos($key, '.'))){
+			if(false === ($pos = zbx_strrpos($key, '.'))){
 				$label = str_replace('{'.$expr.'}', '???', $label);
 				continue;
 			}
@@ -945,7 +945,7 @@
 			$function = substr($key, $pos + 1);
 			$key = substr($key, 0, $pos);
 
-			if(false === ($pos = strpos($function, '('))){
+			if(false === ($pos = zbx_strpos($function, '('))){
 				$label = str_replace('{'.$expr.'}', '???', $label);
 				continue;
 			}
@@ -953,7 +953,7 @@
 			$parameter = substr($function, $pos + 1);
 			$function = substr($function, 0, $pos);
 
-			if(false === ($pos = strrpos($parameter, ')'))){
+			if(false === ($pos = zbx_strrpos($parameter, ')'))){
 				$label = str_replace('{'.$expr.'}', '???', $label);
 				continue;
 			}

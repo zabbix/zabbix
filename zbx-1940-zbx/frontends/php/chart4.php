@@ -94,7 +94,7 @@ include_once('include/page_header.php');
 	$str = expand_trigger_description_by_data($db_data);
 
 	$str = $str.' (year '.date('Y').')';
-	$x = imagesx($im)/2-imagefontwidth(4)*strlen($str)/2;
+	$x = imagesx($im)/2-imagefontwidth(4)*zbx_strlen($str)/2;
 	//imagestring($im, 4,$x,1, $str , $darkred);
 	imageText($im, 10, 0, $x, 14, $darkred, $str);
 

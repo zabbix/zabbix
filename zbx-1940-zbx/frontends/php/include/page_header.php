@@ -166,7 +166,7 @@
 
 	if(isset($_REQUEST['print'])){
 		define('ZBX_PAGE_NO_MENU', 1);
-		$req = substr($_SERVER['REQUEST_URI'],0,strpos($_SERVER['REQUEST_URI'],'print')-1);
+		$req = substr($_SERVER['REQUEST_URI'],0,zbx_strpos($_SERVER['REQUEST_URI'],'print')-1);
 
 		$link = new CLink(bold('&laquo;'.S_BACK_BIG), $req, 'small_font');
 		$link->setAttribute('style','padding-left: 10px;');
@@ -445,7 +445,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 	if(version_compare(phpversion(), '5.1.0RC1', '>=') && $page['type'] == PAGE_TYPE_HTML){
 		$tmezone = ini_get('date.timezone');
 		if(empty($tmezone)) {
-			info('Timezone for PHP is not set. Please set "date.timezone" option in php.ini.');
+			info(S_TIMEZONE_FOR_PHP_IS_NOT_SET_PLEASE_SET);
 			date_default_timezone_set('UTC');
 		}
 		unset($tmezone);

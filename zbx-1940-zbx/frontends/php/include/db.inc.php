@@ -49,7 +49,7 @@ if(!isset($DB)){
 			$result = false;
 		}
 		else{
-			$DB['TYPE'] = strtoupper($DB['TYPE']);
+			$DB['TYPE'] = zbx_strtoupper($DB['TYPE']);
 
 			switch($DB['TYPE']){
 				case 'MYSQL':
@@ -558,14 +558,14 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 				if(ocifetchinto($cursor, $row, (OCI_ASSOC+OCI_RETURN_NULLS))){
 					$result = array();
 					foreach($row as $key => $value){
-						$field_type = strtolower(oci_field_type($cursor,$key));
+						$field_type = zbx_strtolower(oci_field_type($cursor,$key));
 						$value = (str_in_array($field_type,array('varchar','varchar2','blob','clob')) && is_null($value))?'':$value;
 
-						if(is_object($value) && (stristr($field_type, 'lob') !== false)){
+						if(is_object($value) && (zbx_stristr($field_type, 'lob') !== false)){
 							$value = $value->load();
 						}
 
-						$result[strtolower($key)] = $value;
+						$result[zbx_strtolower($key)] = $value;
 					}
 				}
 				break;

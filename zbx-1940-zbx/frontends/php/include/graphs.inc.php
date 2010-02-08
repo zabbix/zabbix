@@ -394,7 +394,7 @@
 		if($row){
 			return	$row;
 		}
-		error("No graph item with gitemid=[$gitemid]");
+		error(S_NO_GRAPH_WITH." gitemid=[$gitemid]");
 
 	return	$result;
 	}
@@ -416,7 +416,7 @@
 		if($row){
 			return	$row;
 		}
-		error("No graph with graphid=[$graphid]");
+		error(S_NO_GRAPH_WITH." graphid=[$graphid]");
 		return	false;
 	}
 
@@ -451,7 +451,7 @@
 			if (!$db_item && $error){
 				$item = get_item_by_itemid($gitem['itemid']);
 				$host = get_host_by_hostid($dest_hostid);
-				error('Missing key "'.$item['key_'].'" for host "'.$host['host'].'"');
+				error(S_MISSING_KEY.SPACE.'"'.$item['key_'].'"'.SPACE.S_FOR_HOST_SMALL.SPACE.'"'.$host['host'].'"');
 				return false;
 			}
 			else if(!$db_item){
@@ -509,7 +509,7 @@
 		$result = false;
 
 		if(!is_array($gitems) || count($gitems)<1){
-			error('Missing items for graph "'.$name.'"');
+			error(S_MISSING_ITEMS_FOR_GRAPH.SPACE.'"'.$name.'"');
 			return $result;
 		}
 
@@ -534,7 +534,7 @@
 		}
 
 		if(isset($new_host_is_template) && count($host_list)>1){
-			error('Graph "'.$name.'" with template host can not contain items from other hosts.');
+			error(S_GRAPH.SPACE.'"'.$name.'"'.SPACE.S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL);
 			return $result;
 		}
 
@@ -640,7 +640,7 @@
 		$result = false;
 
 		if(!is_array($gitems) || count($gitems) < 1){
-			error('Missing items for graph "'.$name.'"');
+			error(S_MISSING_ITEMS_FOR_GRAPH.SPACE.'"'.$name.'"');
 			return $result;
 		}
 
@@ -657,7 +657,7 @@
 			$db_item_hosts = DBselect('SELECT DISTINCT hostid from items where itemid in ('.implode(',', $itemid).')');
 			while($db_item = DBfetch($db_item_hosts)){
 				if ( isset($new_hostid) ){
-					error('Can not use multiple host items for template graph "'.$name.'"');
+					error(S_CANNOT_USE_MULTIPLE_HOST_ITEMS_TEMPLATE_GRAPH.SPACE.'"'.$name.'"');
 					return $result;
 				}
 
@@ -665,7 +665,7 @@
 			}
 
 			if ( (bccomp($host['hostid'] ,$new_hostid ) != 0)){
-				error('You must use items only from host "'.$host['host'].'" for template graph "'.$name.'"');
+				error(S_MUST_USE_ITEMS_ONLY_FROM_HOST.SPACE.'"'.$host['host'].'"'.SPACE.S_FOR_TEMPLATE_GRAPH_SMALL.SPACE.'"'.$name.'"');
 				return $result;
 			}
 		}
@@ -677,7 +677,7 @@
 			$chd_host = DBfetch($tmp_hosts);
 
 			if(!$new_gitems = get_same_graphitems_for_host($gitems, $chd_host['hostid'])){ /* skip host with missing items */
-				error('Can not update graph "'.$name.'" for host "'.$chd_host['host'].'"');
+				error(S_CANNOT_UPDATE_GRAPH.SPACE.'"'.$name.'"'.SPACE.S_FOR_HOST_SMALL.SPACE.'"'.$chd_host['host'].'"');
 				return $result;
 			}
 
@@ -716,7 +716,7 @@
 				$host_list[] = '"'.$db_host["host"].'"';
 			}
 
-			info('Graph "'.$name.'" updated for hosts '.implode(',',$host_list));
+			info(S_GRAPH.SPACE.'"'.$name.'"'.SPACE.S_UPDATED_FOR_HOSTS.SPACE.implode(',',$host_list));
 		}
 
 		return $result;
@@ -856,7 +856,7 @@
 
 			if($unlink_mode){
 				if(DBexecute('UPDATE graphs SET templateid=0 WHERE graphid='.$db_graph['graphid'])){
-					info('Graph "'.$db_graph['name'].'" unlinked');
+					info(S_GRAPH.SPACE.'"'.$db_graph['name'].'"'.SPACE.S_UNLINKED_SMALL);
 				}
 			}
 			else{
@@ -984,7 +984,7 @@
 		}
 		else{
 			$host = get_host_by_hostid($hostid);
-			info('Skipped copying of graph "'.$db_graph["name"].'" to host "'.$host['host'].'"');
+			info(S_SKIPPED_COPYING_OF_GRAPH.SPACE.'"'.$db_graph["name"].'"'.SPACE.S_TO_HOST_SMALL.SPACE.'"'.$host['host'].'"');
 		}
 
 	return $result;
@@ -1010,12 +1010,12 @@
 		$_REQUEST['stime'] = get_request('stime', null);
 
 		if($_REQUEST['period']<ZBX_MIN_PERIOD){
-			show_message(S_WARNING.'. '.S_TIME_PERIOD.SPACE.S_MIN_VALUE_SMALL.': '.ZBX_MIN_PERIOD.' ('.(int)(ZBX_MIN_PERIOD/3600).'h)');
+			show_message(S_WARNING.'. '.S_TIME_PERIOD.SPACE.S_MIN_VALUE_SMALL.': '.ZBX_MIN_PERIOD.' ('.(int)(ZBX_MIN_PERIOD/3600).S_HOUR_SHORT.')');
 			$_REQUEST['period'] = ZBX_MIN_PERIOD;
 
 		}
 		else if($_REQUEST['period'] > ZBX_MAX_PERIOD){
-			show_message(S_WARNING.'. '.S_TIME_PERIOD.SPACE.S_MAX_VALUE_SMALL.': '.ZBX_MAX_PERIOD.' ('.(int)(ZBX_MAX_PERIOD/86400).'d)');
+			show_message(S_WARNING.'. '.S_TIME_PERIOD.SPACE.S_MAX_VALUE_SMALL.': '.ZBX_MAX_PERIOD.' ('.(int)(ZBX_MAX_PERIOD/86400).S_DAY_SHORT.')');
 			$_REQUEST['period'] = ZBX_MAX_PERIOD;
 		}
 
@@ -1297,11 +1297,11 @@
 
 			if($angle){
 				$result['width'] = imagefontheight($fontsize);
-				$result['height'] = imagefontwidth($fontsize) * strlen($string);
+				$result['height'] = imagefontwidth($fontsize) * zbx_strlen($string);
 			}
 			else{
 				$result['height'] = imagefontheight($fontsize);
-				$result['width'] = imagefontwidth($fontsize) * strlen($string);
+				$result['width'] = imagefontwidth($fontsize) * zbx_strlen($string);
 			}
 		}
 

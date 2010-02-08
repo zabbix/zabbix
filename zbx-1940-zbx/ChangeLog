@@ -1,6 +1,14 @@
 Changes for 1.8.2
 
  - [ZBX-1940] fixed map creation if zabbix doesn't contain images (Aly)
+ - [ZBX-1948] fixed node disappearing after node deleted and then created with same ID (Vedmak)
+ - [ZBXNEXT-225] update Brazilian Portuguese translation; thanks to murilex (Richlv)
+ - [DEV-137] add basic bootstrap script (Richlv)
+ - [ZBX-1944] fixed no permission error when try to view simple graph from childnodes (Vedmak)
+ - [ZBX-1871] made zabbix not require mbstring_overload to be enabled (Vedmak)
+ - [ZBX-1862] fixed host creation with link to templates with trigger dependencies (Aly)
+ - [ZBX-1879] fixed unnecessary line brakes in IE7 (Vedmak)
+ - [ZBX-1931] fixed process of sending active checks to ensure every active item is located in the server cache (Dmitry)
  - [ZBX-1935] remove incorrect item and fix minor typo in the default Windows template (Richlv)
  - [ZBX-1650] allowed to pass "-" (dash) in parameters for "UserParameter" flexible parameters (Dmitry)
  - [ZBX-1923] fixed processing of data sent by 1.4, 1.6 agents not allowing wrong "eventid" values (Dmitry)

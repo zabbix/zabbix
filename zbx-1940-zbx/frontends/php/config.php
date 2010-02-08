@@ -496,11 +496,11 @@ include_once('include/page_header.php');
 				error(S_MACRO_EXISTS);
 				$result = false;
 			}
-			else if(strlen($macro_new) > 64){
+			else if(zbx_strlen($macro_new) > 64){
 				error(S_MACRO_TOO_LONG.' : '.$macro_new);
 				$result = false;
 			}
-			else if(strlen($value_new) > 255){
+			else if(zbx_strlen($value_new) > 255){
 				error(S_MACRO_VALUE_TOO_LONG.' : '.$value_new);
 				$result = false;
 			}
