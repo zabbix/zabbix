@@ -251,7 +251,7 @@
 
 //		if(!eregi('^'.ZBX_EREG_NODE_FORMAT.'$', $name) ){
 		if(!preg_match('/^'.ZBX_PREG_NODE_FORMAT.'$/i', $name) ){
-			error('Incorrect characters used for Node name');
+			error(S_INCORRECT_CHARACTERS_USED_FOR_NODE_NAME);
 			return false;
 		}
 
@@ -262,19 +262,19 @@
 			case ZBX_NODE_MASTER:
 				$masterid = 0;
 				if($ZBX_LOCMASTERID){
-					error('Master node already exists');
+					error(S_MASTER_NODE_ALREADY_EXISTS);
 					return false;
 				}
 			break;
 			default:
-				error('Incorrect node type');
+				error(S_INCORRECT_NODE_TYPE);
 				return false;
 			break;
 		}
 
 
 		if(DBfetch(DBselect('SELECT nodeid FROM nodes WHERE nodeid='.$new_nodeid))){
-			error('Node with same ID already exists');
+			error(S_NODE_WITH_SAME_ID_ALREADY_EXISTS);
 			return false;
 		}
 
@@ -295,7 +295,7 @@
 	function update_node($nodeid,$new_nodeid,$name,$timezone,$ip,$port,$slave_history,$slave_trends){
 //		if( !eregi('^'.ZBX_EREG_NODE_FORMAT.'$', $name) ){
 		if(!preg_match('/^'.ZBX_PREG_NODE_FORMAT.'$/i', $name)){
-			error('Incorrect characters used for Node name');
+			error(S_INCORRECT_CHARACTERS_USED_FOR_NODE_NAME);
 			return false;
 		}
 
@@ -314,28 +314,28 @@
 
 		if($node_type == ZBX_NODE_LOCAL)
 		{
-			error('Unable to remove local node');
+			error(S_UNABLE_TO_REMOVE_LOCAL_NODE);
 		}
 		else
 		{
-			$housekeeperid = get_dbid('housekeeper','housekeeperid');
+			// $housekeeperid = get_dbid('housekeeper','housekeeperid');
 			$result = (
-				DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
-					" values ($housekeeperid,'nodes','nodeid',$nodeid)") &&
+				// DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
+					// " values ($housekeeperid,'nodes','nodeid',$nodeid)") &&
 				DBexecute('delete from nodes where nodeid='.$nodeid) &&
 				DBexecute('update nodes set masterid=0 where masterid='.$nodeid)
 				);
-			error('Please be aware that database still contains data related to the deleted Node');
+			error(S_DATABASE_STILL_CONTAINS_DATA_RELATED_DELETED_NODE);
 		}
 		return $result;
 	}
 
-	function	get_node_by_nodeid($nodeid)
+	function get_node_by_nodeid($nodeid)
 	{
 		return DBfetch(DBselect('select * from nodes where nodeid='.$nodeid));
 	}
 
-	function	get_node_path($nodeid, $result='/')
+	function get_node_path($nodeid, $result='/')
 	{
 		if($node_data = get_node_by_nodeid($nodeid))
 		{

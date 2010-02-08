@@ -121,7 +121,7 @@
 		if($row){
 			return	$row;
 		}
-		error('No system map with sysmapid=['.$sysmapid.']');
+		error(S_NO_SYSTEM_MAP_WITH.' sysmapid=['.$sysmapid.']');
 		return false;
 	}
 
@@ -133,7 +133,7 @@
 			return	$row;
 		}
 		else{
-			error('No sysmap element with selementid=['.$selementid.']');
+			error(S_NO_SYSMAP_ELEMENT_WITH.' selementid=['.$selementid.']');
 		}
 	return	$result;
 	}
@@ -355,7 +355,7 @@
 
 		if($selement['label_location']<0) $selement['label_location']='null';
 		if(check_circle_elements_link($selement['sysmapid'],$selement['elementid'],$selement['elementtype'])){
-			error("Circular link can't be created");
+			error(S_CIRCULAR_LINK_CANNOT_BE_CREATED);
 			return false;
 		}
 
@@ -402,7 +402,7 @@
 		}
 
 		if(check_circle_elements_link($selement['sysmapid'],$selement['elementid'],$selement['elementtype'])){
-			error("Circular link can't be created");
+			error(S_CIRCULAR_LINK_CANNOT_BE_CREATED);
 			return false;
 		}
 
