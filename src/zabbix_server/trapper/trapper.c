@@ -528,6 +528,12 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 			else {
 				res = calculate_checksums(nodeid, NULL, 0);
 				if (SUCCEED == res && NULL != (data = get_config_data(nodeid, ZBX_NODE_SLAVE))) {
+					zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Sending configuration changes"
+							" to slave node %d for node %d datalen %d",
+							CONFIG_NODEID,
+							sender_nodeid,
+							nodeid,
+							strlen(data));
 					alarm(CONFIG_TRAPPER_TIMEOUT);
 					res = send_data_to_node(sender_nodeid, sock, data);
 					zbx_free(data);

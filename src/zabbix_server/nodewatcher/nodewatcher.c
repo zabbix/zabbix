@@ -86,14 +86,15 @@ int main_nodewatcher_loop()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_nodeupdater_loop()");
 
+	zbx_setproctitle("connecting to the database");
+
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
 	for(;;)
 	{
 		start = time(NULL);
 
-		zbx_setproctitle("connecting to the database");
 		zabbix_log( LOG_LEVEL_DEBUG, "Starting sync with nodes");
-
-		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 		if(lastrun + 120 < start)
 		{
@@ -104,8 +105,6 @@ int main_nodewatcher_loop()
 
 		/* Send new history data to master node */
 		main_historysender();
-
-		DBclose();
 
 		end = time(NULL);
 
@@ -118,4 +117,6 @@ int main_nodewatcher_loop()
 			sleep(10-(end-start));
 		}
 	}
+
+	DBclose();
 }
