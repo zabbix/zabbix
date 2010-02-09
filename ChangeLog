@@ -462,9 +462,18 @@ Changes for 1.7.0
  - [DEV-247] added enhancement to the Graph function (Aly)
  - [DEV-233,DEV-237] added support of scheduled maintenance periods (Aly,Sasha)
 
+Changes for 1.6.9
+
+ - [ZBX-1030] fixed security vulnerability in server allowing remote unauthenticated users to execute scripts. Thanks to Nicob (Sasha)
+
 Changes for 1.6.8
 
  - [ZBX-1063] fixed checking for the maximal possible value of the zabbix_agentd loglevel (Dmitry)
+ - [ZBX-1544] fixed showing discoveries from all nodes in dashboard (Vedmak)
+ - [ZBX-1539] fixed reseting graph time when go to fullscreen mode (Vedmak)
+ - [ZBX-1470] fixed importing triggers with ':' in description (Vedmak)
+ - [ZBX-1530] fixed wrong host selected clicking simple graph with dynamic item on screen (Vedmak)
+ - [ZBX-1408] fixed adding images for postgresql (Aly)
  - [ZBX-3] remove a comment saying syslog is used until it works (Richlv)
  - [ZBX-1184] fixed support of more than 10 CPU's for system.cpu.util under Linux (Sasha)
  - [ZBX-1365] fixed housekeeper to process trends_uint table (Sasha)
