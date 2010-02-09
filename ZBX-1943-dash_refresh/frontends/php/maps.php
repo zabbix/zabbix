@@ -67,7 +67,7 @@ include_once('include/page_header.php');
 				}
 			}
 			else if('remove' == $_REQUEST['action']){
-				$result = rm4favorites('web.favorite.sysmapids',$_REQUEST['favid'],ZBX_FAVORITES_ALL,$_REQUEST['favobj']);
+				$result = rm4favorites('web.favorite.sysmapids',$_REQUEST['favid'],$_REQUEST['favobj']);
 
 				if($result){
 					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVOURITES.'";'."\n");

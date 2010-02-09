@@ -96,7 +96,7 @@ include_once "include/page_header.php";
 		}
 
 		if('set_rf_rate' == $_REQUEST['favobj']){
-			if(str_in_array($_REQUEST['favid'],array('hat_syssum','hat_stszbx','hat_lastiss','hat_webovr','hat_dscvry'))){
+			if(str_in_array($_REQUEST['favid'],array('hat_syssum','hat_stszbx','hat_lastiss','hat_webovr','hat_dscvry','hat_hoststat'))){
 
 				CProfile::update('web.dahsboard.rf_rate.'.$_REQUEST['favid'],$_REQUEST['favcnt'], PROFILE_TYPE_INT);
 				$_REQUEST['favcnt'] = CProfile::get('web.dahsboard.rf_rate.'.$_REQUEST['favid'], 60);
@@ -121,7 +121,7 @@ include_once "include/page_header.php";
 				$result = add2favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
 			}
 			else if('remove' == $_REQUEST['action']){
-				$result = rm4favorites('web.favorite.graphids',$_REQUEST['favid'],get_request('favcnt',0),$_REQUEST['favobj']);
+				$result = rm4favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
 			}
 
 			if((PAGE_TYPE_JS == $page['type']) && $result){
@@ -141,7 +141,7 @@ include_once "include/page_header.php";
 				$result = add2favorites('web.favorite.sysmapids',$_REQUEST['favid'],$_REQUEST['favobj']);
 			}
 			else if('remove' == $_REQUEST['action']){
-				$result = rm4favorites('web.favorite.sysmapids',$_REQUEST['favid'],get_request('favcnt',0),$_REQUEST['favobj']);
+				$result = rm4favorites('web.favorite.sysmapids',$_REQUEST['favid'],$_REQUEST['favobj']);
 			}
 
 			if((PAGE_TYPE_JS == $page['type']) && $result){
@@ -160,7 +160,7 @@ include_once "include/page_header.php";
 				$result = add2favorites('web.favorite.screenids',$_REQUEST['favid'],$_REQUEST['favobj']);
 			}
 			else if('remove' == $_REQUEST['action']){
-				$result = rm4favorites('web.favorite.screenids',$_REQUEST['favid'],get_request('favcnt',0),$_REQUEST['favobj']);
+				$result = rm4favorites('web.favorite.screenids',$_REQUEST['favid'],$_REQUEST['favobj']);
 			}
 
 			if(PAGE_TYPE_JS == $page['type'] && $result){

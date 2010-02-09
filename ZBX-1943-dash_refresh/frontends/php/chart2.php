@@ -65,7 +65,7 @@ include_once('include/page_header.php');
 
 	$effectiveperiod = navigation_bar_calc();
 
-	CProfile::update('web.charts.graphid',$_REQUEST['graphid']);
+	CProfile::update('web.charts.graphid',$_REQUEST['graphid'], PROFILE_TYPE_ID);
 
 	$chart_header = '';
 	if(id2nodeid($db_data['graphid']) != get_current_nodeid()){

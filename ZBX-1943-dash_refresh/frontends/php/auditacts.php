@@ -77,7 +77,7 @@ include_once('include/page_header.php');
 	$_REQUEST['nav_time'] = get_request('nav_time',CProfile::get('web.auditacts.filter.nav_time',time()));
 
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
-		CProfile::update('web.auditacts.filter.alias',$_REQUEST['alias']);
+		CProfile::update('web.auditacts.filter.alias',$_REQUEST['alias'], PROFILE_TYPE_STR);
 		CProfile::update('web.auditacts.filter.nav_time',$_REQUEST['nav_time'], PROFILE_TYPE_INT);
 	}
 	$nav_time = $_REQUEST['nav_time'];

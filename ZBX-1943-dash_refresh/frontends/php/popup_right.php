@@ -41,7 +41,7 @@ include_once "include/page_header.php";
 	$permission	= get_request("permission",	PERM_DENY);		// right
 	$nodeid		= get_request('nodeid', 	CProfile::get('web.popup_right.nodeid.last',get_current_nodeid(false)));
 
-	CProfile::update('web.popup_right.nodeid.last', $nodeid);
+	CProfile::update('web.popup_right.nodeid.last', $nodeid, PROFILE_TYPE_ID);
 
 	$frmTitle = new CForm();
 	$frmTitle->AddVar('dstfrm',$dstfrm);

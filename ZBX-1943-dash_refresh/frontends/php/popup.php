@@ -345,7 +345,7 @@ include_once('include/page_header.php');
 			}
 
 			$frmTitle->addItem(array(S_GROUP,SPACE,$cmbGroups));
-			CProfile::update('web.popup.groupid',$groupid);
+			CProfile::update('web.popup.groupid',$groupid,PROFILE_TYPE_ID);
 		}
 
 		if(str_in_array($srctbl,array('help_items'))){
@@ -365,7 +365,7 @@ include_once('include/page_header.php');
 			}
 
 			$frmTitle->addItem(array(SPACE,S_HOST,SPACE,$cmbHosts));
-			CProfile::update('web.popup.hostid',$hostid);
+			CProfile::update('web.popup.hostid',$hostid,PROFILE_TYPE_ID);
 		}
 
 		if(str_in_array($srctbl,array('triggers','hosts'))){

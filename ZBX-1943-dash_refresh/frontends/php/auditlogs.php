@@ -82,7 +82,7 @@ include_once('include/page_header.php');
 	$_REQUEST['nav_time'] = get_request('nav_time', CProfile::get('web.auditlogs.filter.nav_time',time()));
 
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
-		CProfile::update('web.auditlogs.filter.alias', $_REQUEST['alias']);
+		CProfile::update('web.auditlogs.filter.alias', $_REQUEST['alias'], PROFILE_TYPE_STR);
 		CProfile::update('web.auditlogs.filter.action', $_REQUEST['action'], PROFILE_TYPE_INT);
 		CProfile::update('web.auditlogs.filter.resourcetype', $_REQUEST['resourcetype'], PROFILE_TYPE_INT);
 

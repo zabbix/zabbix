@@ -48,10 +48,12 @@ class CProfile{
 	}
 	
 	public static function flush(){
+		
 		foreach(self::$insert as $profile){
 			$result = self::insertDB($profile['idx'], $profile['value'], $profile['type'], $profile['idx2']);
 		}
 		
+		order_result(self::$update, 'idx');
 		foreach(self::$update as $profile){			
 			self::updateDB($profile['idx'], $profile['value'], $profile['type'], $profile['idx2']);
 		}		
@@ -108,7 +110,7 @@ class CProfile{
 			'userid' => $USER_DETAILS['userid'],
 			'idx' => zbx_dbstr($idx),
 			$value_type => ($value_type == 'value_str') ? zbx_dbstr($value) : $value,
-			'type' => $type
+			'type' => $type,
 			'idx2' => $idx2
 		);
 		$sql = 'INSERT INTO profiles ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
@@ -127,7 +129,7 @@ class CProfile{
 		$value_type = self::getFieldByType($type);
 		$value = ($value_type == 'value_str') ? zbx_dbstr($value) : $value;
 
-		$sql='UPDATE profiles SET '.
+		$sql = 'UPDATE profiles SET '.
 				$value_type.'='.$value.','.
 				' type='.$type.
 			' WHERE userid='.$USER_DETAILS['userid'].
@@ -343,9 +345,10 @@ function add2favorites($favobj, $favid, $source=null){
 		'userid' => $USER_DETAILS['userid'],
 		'idx' => zbx_dbstr($favobj),
 		'value_id' =>  $favid,
-		'type' => PROFILE_TYPE_ID
-		'source' => $source
+		'type' => PROFILE_TYPE_ID,
 	);
+	if(!is_null($source)) $values['source'] = zbx_dbstr($source);
+	
 	$sql = 'INSERT INTO profiles ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
 	
 	return DBexecute($sql);
@@ -353,13 +356,14 @@ function add2favorites($favobj, $favid, $source=null){
 }
 
 // Author: Aly
-function rm4favorites($favobj, $favid=null, $source=null){
-
-	$sql='DELETE FROM profiles '.
+function rm4favorites($favobj, $favid=0, $source=null){
+	global $USER_DETAILS;
+	
+	$sql = 'DELETE FROM profiles '.
 		' WHERE userid='.$USER_DETAILS['userid'].
 			' AND idx='.zbx_dbstr($favobj).
-			(is_null($favid) ? '' : ' AND value_id='.$favid).
-			(is_null($source) ? '' : ' AND source='.$source).
+			(($favid > 0) ? ' AND value_id='.$favid : '').
+			(is_null($source) ? '' : ' AND source='.zbx_dbstr($source));
 	
 	return DBexecute($sql);
 }
