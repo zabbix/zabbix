@@ -1089,7 +1089,6 @@
 	'S_LINK'=>				'Link',
 	'S_LABEL'=>				'Label',
 	'S_X'=>					'X',
-	'S_Y'=>					'Y',
 	'S_ICON_PROBLEM'=>			'Icon (problem)',
 	'S_ICON_OK'=>				'Icon (ok)',
 	'S_ICON_UNKNOWN'=>			'Icon (unknown)',
