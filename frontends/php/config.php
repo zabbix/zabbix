@@ -149,15 +149,14 @@ include_once('include/page_header.php');
 
 			DBstart();
 			$result = delete_image($_REQUEST['imageid']);
-			$result = DBend($result);
+			$result = DBend(false);//$result);
 
 			show_messages($result, S_IMAGE_DELETED, S_CANNOT_DELETE_IMAGE);
 			if($result){
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_IMAGE,'Image ['.$image['name'].'] deleted');
 				unset($_REQUEST['form']);
+				unset($image, $_REQUEST['imageid']);
 			}
-
-			unset($image, $_REQUEST['imageid']);
 		}
 	}
 	else if(isset($_REQUEST['save']) && ($_REQUEST['config']==8)){ // GUI
