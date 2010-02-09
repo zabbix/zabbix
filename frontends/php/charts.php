@@ -156,12 +156,20 @@ include_once('include/page_header.php');
 	$available_groups= $PAGE_GROUPS['groupids'];
 	$available_hosts = $PAGE_HOSTS['hostids'];
 
-	if(($_REQUEST['graphid']>0) && ($row=DBfetch(DBselect('SELECT DISTINCT graphid, name FROM graphs WHERE graphid='.$_REQUEST['graphid'])))){
-		if(!graph_accessible($_REQUEST['graphid'])){
+	if($_REQUEST['graphid']>0){
+		$options = array(
+			'graphids' => $_REQUEST['graphid'],
+			'output' => API_OUTPUT_EXTEND,
+			'nodeids' => get_current_nodeid(true)
+		);
+		$db_data = CGraph::get($options);
+		if(empty($db_data)){
 			update_profile('web.charts.graphid',0);
 			access_deny();
 		}
-		array_push($h1, $row['name']);
+
+		$db_data = reset($db_data);
+		array_push($h1, $db_data['name']);
 	}
 	else{
 		$_REQUEST['graphid'] = 0;

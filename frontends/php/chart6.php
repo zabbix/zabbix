@@ -19,12 +19,12 @@
 **/
 ?>
 <?php
-	require_once 'include/config.inc.php';
-	require_once 'include/graphs.inc.php';
+require_once 'include/config.inc.php';
+require_once 'include/graphs.inc.php';
 
-	$page['file']	= 'chart6.php';
-	$page['title']	= "S_CHART";
-	$page['type']	= PAGE_TYPE_IMAGE;
+$page['file']	= 'chart6.php';
+$page['title']	= "S_CHART";
+$page['type']	= PAGE_TYPE_IMAGE;
 
 include_once 'include/page_header.php';
 
