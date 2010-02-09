@@ -674,7 +674,7 @@ class CTemplate extends CZBXAPI{
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 
-				$host_exists = CHost::getObjects(array('host' => $host['host']));
+				$host_exists = CHost::getObjects(array('host' => $template['host']));
 				if(!empty($host_exists)){
 					$result = false;
 					$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_HOST.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);

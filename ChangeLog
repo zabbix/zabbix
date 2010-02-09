@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1938] fixed permission check inefficiency in charts (Aly)
  - [ZBX-1957] fixed compilation errors under OpenBSD (Sasha)
  - [ZBX-1869] fixed graph max Y most top value calculation (Aly)
  - [ZBX-1948] fixed node disappearing after node deleted and then created with same ID (Vedmak)

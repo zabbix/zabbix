@@ -48,18 +48,19 @@ include_once('include/page_header.php');
 	check_fields($fields);
 ?>
 <?php
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_RES_IDS_ARRAY, get_current_nodeid(true));
 
 	$items = get_request('items', array());
 	asort_by_key($items, 'sortorder');
 
-	foreach($items as $gitem){
-		if(!$host=DBfetch(DBselect('SELECT h.* FROM hosts h,items i WHERE h.hostid=i.hostid AND i.itemid='.$gitem['itemid']))){
-			fatal_error(S_NO_ITEM_DEFINED);
-		}
-		if(!isset($available_hosts[$host['hostid']])){
-			access_deny();
-		}
+	$options = array(
+		'itemids' => zbx_objectValues($items, 'itemid'),
+		'nodeids' => get_current_nodeid(true)
+	);
+
+	$db_data = CItem::get($options);
+	$db_data = zbx_toHash($db_data, 'itemid');
+	foreach($items as $id => $gitem){
+		if(!isset($db_data[$gitem['itemid']])) access_deny();
 	}
 
 	$effectiveperiod = navigation_bar_calc();
