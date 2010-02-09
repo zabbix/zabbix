@@ -1568,7 +1568,7 @@
 	'S_END_OF'=>			'Fin de',
 	'S_MEMORY_LIMIT_REACHED'=>			'LIMITE MEMOIRE ATTEINTE ! Profilage arrêté pour économiser la mémoire pour exécuter les scripts.',
 	'S_WRONG_TYPE'=>			'Type incorrect',
-	'S_INCOORECT_TYPE_OF_ASORT_BY_KEY'=>			'Type incorrect de asort_by_key',
+	'S_INCORRECT_TYPE_OF_ASORT_BY_KEY'=>			'Type incorrect de asort_by_key',
 	'S_DAYS_SMALL'=>			'jours',
 	'S_B'=>			'B',
 	'S_M'=>			'M',
