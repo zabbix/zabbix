@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1940] fixed map creation if zabbix doesn't contain images (Aly)
  - [ZBX-1938] fixed permission check inefficiency in charts (Aly)
  - [ZBX-1957] fixed compilation errors under OpenBSD (Sasha)
  - [ZBX-1869] fixed graph max Y most top value calculation (Aly)

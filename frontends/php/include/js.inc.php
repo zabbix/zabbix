@@ -21,7 +21,8 @@ function zbx_jsvalue($value, $object = null){
 	return strval($value);
 	}
 
-	if(count($value) == 0) return '[]';
+	if(count($value) == 0) return ($object)?'{}':'[]';
+
 
 	foreach($value as $id => $v){
 		if((!isset($is_object) && is_string($id)) || $object) $is_object = true;
