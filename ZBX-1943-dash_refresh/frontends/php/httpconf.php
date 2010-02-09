@@ -104,7 +104,8 @@ include_once('include/page_header.php');
 	CProfile::update('web.httpconf.showdisabled',$showdisabled, PROFILE_TYPE_STR);
 ?>
 <?php
-	$_REQUEST['applications'] = get_request('applications',CProfile::get('web.httpconf.applications',array()));
+	$_REQUEST['applications'] = get_request('applications', get_favorites('web.httpconf.applications'));
+	$_REQUEST['applications'] = zbx_objectValues($_REQUEST['applications'], 'value');
 
 	if(isset($_REQUEST['open'])){
 		if(!isset($_REQUEST['applicationid'])){
@@ -124,12 +125,19 @@ include_once('include/page_header.php');
 		}
 	}
 
-/* limit opened application count */
-	while(count($_REQUEST['applications']) > 25){
-		array_shift($_REQUEST['applications']);
+	if(count($_REQUEST['applications']) > 25){
+		$_REQUEST['applications'] = array_slice($_REQUEST['applications'], -25);
 	}
+/* limit opened application count */
+	// while(count($_REQUEST['applications']) > 25){
+		// array_shift($_REQUEST['applications']);
+	// }
 
-	CProfile::update('web.httpconf.applications',$_REQUEST['applications'],PROFILE_TYPE_ARRAY_ID);
+	rm4favorites('web.httpconf.applications');
+	foreach($_REQUEST['applications'] as $application){
+		add2favorites('web.httpconf.applications', $application);
+	}
+	// CProfile::update('web.httpconf.applications',$_REQUEST['applications'],PROFILE_TYPE_ARRAY_ID);
 
 	if(isset($_REQUEST['del_sel_step'])&&isset($_REQUEST['sel_step'])&&is_array($_REQUEST['sel_step'])){
 		foreach($_REQUEST['sel_step'] as $sid)

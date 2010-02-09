@@ -118,7 +118,7 @@ include_once('include/page_header.php');
 	$_REQUEST['elementid'] = get_request('elementid',CProfile::get('web.screens.elementid', null));
 
 	if( 2 != $_REQUEST['fullscreen'] )
-		CProfile::update('web.screens.elementid',$_REQUEST['elementid']);
+		CProfile::update('web.screens.elementid',$_REQUEST['elementid'], PROFILE_TYPE_ID);
 
 	$effectiveperiod = navigation_bar_calc('web.screens', true);
 ?>
