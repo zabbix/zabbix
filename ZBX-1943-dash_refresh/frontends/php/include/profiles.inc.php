@@ -44,7 +44,7 @@ class CProfile{
 				self::$profiles[$profile['idx']] = array();
 				
 			self::$profiles[$profile['idx']][$profile['idx2']] = $profile[$value_type];
-		}		
+		}	
 	}
 	
 	public static function flush(){
@@ -56,7 +56,7 @@ class CProfile{
 		order_result(self::$update, 'idx');
 		foreach(self::$update as $profile){			
 			self::updateDB($profile['idx'], $profile['value'], $profile['type'], $profile['idx2']);
-		}		
+		}	
 	}
 	
 	public static function clear(){
@@ -78,6 +78,10 @@ class CProfile{
 	public static function update($idx, $value, $type, $idx2=0){
 		global $USER_DETAILS;
 		
+		if(is_null(self::$profiles)){	
+			self::init();
+		}
+		
 		if($USER_DETAILS['alias'] == ZBX_GUEST_USER) return false;		
 		if(!self::checkValueType($value, $type)) return false;
 
@@ -88,6 +92,7 @@ class CProfile{
 			'type' => $type,
 			'idx2' => $idx2,
 		);
+
 		if(CProfile::get($idx, false, $idx2) === false){
 			self::$insert[] = $profile;
 		}
@@ -104,7 +109,7 @@ class CProfile{
 		global $USER_DETAILS;
 		
 		$value_type = self::getFieldByType($type);
-		
+	
 		$values = array(
 			'profileid' => get_dbid('profiles', 'profileid'),
 			'userid' => $USER_DETAILS['userid'],

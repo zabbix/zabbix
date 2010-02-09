@@ -105,6 +105,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		require_once('include/page_footer.php');
 		exit();
 	}
 //--------
