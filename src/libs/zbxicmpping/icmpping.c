@@ -39,13 +39,9 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	int		i;
 	ZBX_FPING_HOST	*host;
 	double		sec;
-	int		family;
 #ifdef HAVE_IPV6
 	char		*fping;
-	char		fping_fping6_combination = 0;
-#define	FPING_EXISTS		1
-#define	FPING6_EXISTS		2
-#define	FPING_FPING6_EXIST	3
+	int		family;
 #endif
 
 	assert(hosts);
@@ -63,28 +59,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 	if (access(CONFIG_FPING_LOCATION, F_OK|X_OK) == -1)
 	{
-#ifndef HAVE_IPV6
 		zbx_snprintf(error, max_error_len, "%s: [%d] %s", CONFIG_FPING_LOCATION, errno, strerror(errno));
 		return NOTSUPPORTED;
-#endif /* #ifndef HAVE_IPV6 */
-	}
-	else
-	{
-#ifdef HAVE_IPV6
-		fping_fping6_combination |= FPING_EXISTS;
-#else /* #ifdef HAVE_IPV6 */
-		if (NULL != CONFIG_SOURCE_IP)
-		{
-			if (SUCCEED != get_address_family(CONFIG_SOURCE_IP, &family, error, max_error_len))
-				return NOTSUPPORTED;
-			if (family != PF_INET) /* we have IPv6 family address in CONFIG_SOURCE_IP */
-			{
-				zbx_snprintf(error, max_error_len, 
-					"You should enable IPv6 support to use IPv6 family address for SourceIP '%s'.", CONFIG_SOURCE_IP);
-				return NOTSUPPORTED;
-			}
-		}		
-#endif /* #ifdef HAVE_IPV6 */
 	}
 
 	zbx_snprintf(filename, sizeof(filename), "%s/zabbix_server_%li.pinger",
@@ -94,80 +70,34 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 #ifdef HAVE_IPV6
 	if (access(CONFIG_FPING6_LOCATION, F_OK|X_OK) == -1)
 	{
-		if ( !(fping_fping6_combination & FPING_EXISTS) )
-		{
-			zbx_snprintf(error, max_error_len, "At least one of '%s', '%s' must exist. Both are missing in the system.",
-					CONFIG_FPING_LOCATION,
-					CONFIG_FPING6_LOCATION);
-			return NOTSUPPORTED;
-		}
+		zbx_snprintf(error, max_error_len, "%s: [%d] %s", CONFIG_FPING6_LOCATION, errno, strerror(errno));
+		return NOTSUPPORTED;
 	}
-	else
-	{
-		fping_fping6_combination |= FPING6_EXISTS;
-	}
-	
+
 	if (NULL != CONFIG_SOURCE_IP)
 	{
 		if (SUCCEED != get_address_family(CONFIG_SOURCE_IP, &family, error, max_error_len))
 			return NOTSUPPORTED;
 
 		if (family == PF_INET)
-		{
-			if ( !(fping_fping6_combination & FPING_EXISTS) )
-			{
-				zbx_snprintf(error, max_error_len, "File '%s' cannot be found in the system.", 
-						CONFIG_FPING_LOCATION);
-				return NOTSUPPORTED;
-			}
-			else
-				fping = CONFIG_FPING_LOCATION;
-		}
+			fping = CONFIG_FPING_LOCATION;
 		else
-		{
-			if ( !(fping_fping6_combination & FPING6_EXISTS) )
-			{
-				zbx_snprintf(error, max_error_len, "File '%s' cannot be found in the system.", 
-						CONFIG_FPING6_LOCATION);
-				return NOTSUPPORTED;
-			}
-			else
-				fping = CONFIG_FPING6_LOCATION;
-		}
+			fping = CONFIG_FPING6_LOCATION;
 
 		zbx_snprintf(tmp, sizeof(tmp), "%s %s 2>&1 <%s",
 				fping,
 				params,
 				filename);
 	}
-	else /* CONFIG_SOURCE_IP has no value */	
-	{
-		if (fping_fping6_combination & FPING_FPING6_EXIST)
-		{
-			zbx_snprintf(tmp, sizeof(tmp), "%s %s 2>&1 <%s;%s %s 2>&1 <%s",
+	else
+		zbx_snprintf(tmp, sizeof(tmp), "%s %s 2>&1 <%s;%s %s 2>&1 <%s",
 				CONFIG_FPING_LOCATION,
 				params,
 				filename,
 				CONFIG_FPING6_LOCATION,
 				params,
 				filename);
-		}
-		else if (fping_fping6_combination & FPING_EXISTS)
-		{
-			zbx_snprintf(tmp, sizeof(tmp), "%s %s 2>&1 <%s",
-				CONFIG_FPING_LOCATION,
-				params,
-				filename);
-		}
-		else /* fping6 must surely exist */
-		{
-			zbx_snprintf(tmp, sizeof(tmp), "%s %s 2>&1 <%s",
-				CONFIG_FPING6_LOCATION,
-				params,
-				filename);
-		}
-	}
-#else /* HAVE_IPV6 */				
+#else /* HAVE_IPV6 */
 	zbx_snprintf(tmp, sizeof(tmp), "%s %s 2>&1 <%s",
 			CONFIG_FPING_LOCATION,
 			params,
