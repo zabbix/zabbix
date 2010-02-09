@@ -77,9 +77,9 @@ int     zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags);
 
 void    zbx_tcp_close(zbx_sock_t *s);
 
-/*#if defined(HAVE_IPV6)*/
+#if defined(HAVE_IPV6)
 int	get_address_family(const char *addr, int *family, char *error, int max_error_len);
-/*#endif*/ /* HAVE_IPV6 */
+#endif /* HAVE_IPV6 */
 
 int zbx_tcp_listen(
 	zbx_sock_t		*s,

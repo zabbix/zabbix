@@ -582,7 +582,7 @@ void	zbx_tcp_close(zbx_sock_t *s)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-/*#ifdef HAVE_IPV6*/
+#ifdef HAVE_IPV6
 int	get_address_family(const char *addr, int *family, char *error, int max_error_len)
 {
 	struct	addrinfo hints, *ai = NULL;
@@ -614,7 +614,7 @@ out:
 
 	return res;
 }
-/*#endif*/ /* HAVE_IPV6 */
+#endif /* HAVE_IPV6 */
 
 /******************************************************************************
  *                                                                            *
