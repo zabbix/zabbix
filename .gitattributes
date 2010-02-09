@@ -149,6 +149,7 @@ frontends/php/images/general/ipmi_available.png -text
 frontends/php/images/general/ipmi_available_bb.png -text
 frontends/php/images/general/ipmi_unavailable.png -text
 frontends/php/images/general/ipmi_unknown.png -text
+frontends/php/images/general/no_icon.png -text
 frontends/php/images/general/ok.png -text
 frontends/php/images/general/ok_bb.png -text
 frontends/php/images/general/ok_icon.png -text

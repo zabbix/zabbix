@@ -155,6 +155,7 @@ include_once('include/page_header.php');
 		$links = zbx_toHash($map['links'],'linkid');
 	}
 
+	$map_info = getSelementsInfo($selements, $expandProblem);
 
 	$map_info = getSelementsInfo($selements, $map['expandproblem']);
 
