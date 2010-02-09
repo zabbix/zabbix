@@ -117,7 +117,7 @@ include_once('include/page_header.php');
 
 						$element = get_screen($screen['screenid'],2,$effectiveperiod);
 
-						$refresh = get_profile('web.slides.rf_rate.hat_slides', 0, null, $elementid);
+						$refresh = CProfile::get('web.slides.rf_rate.hat_slides', 0, null, $elementid);
 						if($refresh == 0){
 							if($screen['delay'] > 0) $refresh = $screen['delay'];
 							else $refresh = $slideshow['delay'];
@@ -142,7 +142,7 @@ include_once('include/page_header.php');
 			if(str_in_array($_REQUEST['favid'],array('hat_slides'))){
 				$elementid = $_REQUEST['elementid'];
 
-				update_profile('web.slides.rf_rate.hat_slides', $_REQUEST['favcnt'], PROFILE_TYPE_INT, $elementid);
+				CProfile::update('web.slides.rf_rate.hat_slides', $_REQUEST['favcnt'], PROFILE_TYPE_INT, $elementid);
 
 				$script= get_update_doll_script('mainpage', $_REQUEST['favid'], 'frequency', $_REQUEST['favcnt'])."\n";
 				$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'stopDoll')."\n";
@@ -168,9 +168,9 @@ include_once('include/page_header.php');
 <?php
 	$config = $_REQUEST['config'];
 
-	$elementid = get_request('elementid',get_profile('web.slides.elementid', null));
+	$elementid = get_request('elementid',CProfile::get('web.slides.elementid', null));
 	if( 2 != $_REQUEST['fullscreen'] )
-		update_profile('web.slides.elementid',$elementid);
+		CProfile::update('web.slides.elementid',$elementid);
 
 	$effectiveperiod = navigation_bar_calc('web.slides', true);
 ?>
@@ -274,7 +274,7 @@ include_once('include/page_header.php');
 		$screen = get_slideshow($elementid, 0);
 		if($screen['delay'] > 0) $element['delay'] = $screen['delay'];
 
-		update_profile('web.slides.rf_rate.hat_slides', 0, PROFILE_TYPE_INT, $elementid);
+		CProfile::update('web.slides.rf_rate.hat_slides', 0, PROFILE_TYPE_INT, $elementid);
 		
 		if(infavorites('web.favorite.screenids',$elementid,'slideshowid')){
 			$icon = new CDiv(SPACE,'iconminus');

@@ -69,8 +69,8 @@ include_once 'include/page_header.php';
 	check_fields($fields);
 
 // HEADER REQUEST
-	$_REQUEST['select'] = get_request('select',get_profile('web.latest.filter.select', ''));
-	update_profile('web.latest.filter.select', $_REQUEST['select'], PROFILE_TYPE_STR);
+	$_REQUEST['select'] = get_request('select',CProfile::get('web.latest.filter.select', ''));
+	CProfile::update('web.latest.filter.select', $_REQUEST['select'], PROFILE_TYPE_STR);
 
 	$options = array('allow_all_hosts','monitored_hosts','with_historical_items');
 	//if(!$ZBX_WITH_ALL_NODES)	array_push($options,'only_current_node');
@@ -90,7 +90,7 @@ include_once 'include/page_header.php';
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			update_profile('web.latest.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.latest.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 /*
 		else if('refresh' == $_REQUEST['favobj']){
@@ -113,10 +113,10 @@ include_once 'include/page_header.php';
 		$_REQUEST['select'] = '';
 	}
 
-	$_REQUEST['select'] = get_request('select',get_profile('web.latest.filter.select',''));
+	$_REQUEST['select'] = get_request('select',CProfile::get('web.latest.filter.select',''));
 
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
-		update_profile('web.latest.filter.select',$_REQUEST['select'], PROFILE_TYPE_STR);
+		CProfile::update('web.latest.filter.select',$_REQUEST['select'], PROFILE_TYPE_STR);
 	}
 // --------------
 
@@ -173,15 +173,15 @@ include_once 'include/page_header.php';
 	$filterForm->addItemToBottomRow(new CButton("filter_set",S_FILTER));
 	$filterForm->addItemToBottomRow($reset);
 
-	$latest_wdgt->addFlicker($filterForm, get_profile('web.latest.filter.state',1));
+	$latest_wdgt->addFlicker($filterForm, CProfile::get('web.latest.filter.state',1));
 //-------
 
 	validate_sort_and_sortorder('i.description',ZBX_SORT_UP);
 
-	$_REQUEST['groupbyapp'] = get_request('groupbyapp',get_profile('web.latest.groupbyapp',1));
-	update_profile('web.latest.groupbyapp',$_REQUEST['groupbyapp'],PROFILE_TYPE_INT);
+	$_REQUEST['groupbyapp'] = get_request('groupbyapp',CProfile::get('web.latest.groupbyapp',1));
+	CProfile::update('web.latest.groupbyapp',$_REQUEST['groupbyapp'],PROFILE_TYPE_INT);
 
-	$_REQUEST['applications'] = get_request('applications',get_profile('web.latest.applications',array()));
+	$_REQUEST['applications'] = get_request('applications',CProfile::get('web.latest.applications',array()));
 
 	if(isset($_REQUEST['open'])){
 		if(!isset($_REQUEST['applicationid'])){
@@ -207,7 +207,7 @@ include_once 'include/page_header.php';
 		array_shift($_REQUEST['applications']);
 	}
 
-	update_profile('web.latest.applications',$_REQUEST['applications'],PROFILE_TYPE_ARRAY_ID);
+	CProfile::update('web.latest.applications',$_REQUEST['applications'],PROFILE_TYPE_ARRAY_ID);
 ?>
 <?php
 	if(isset($show_all_apps)){

@@ -60,7 +60,7 @@ include_once('include/page_header.php');
 
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
-			update_profile('web.charts.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.charts.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 
 		if('timeline' == $_REQUEST['favobj']){
@@ -98,7 +98,7 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-	$_REQUEST['graphid'] = get_request('graphid', get_profile('web.charts.graphid', 0));
+	$_REQUEST['graphid'] = get_request('graphid', CProfile::get('web.charts.graphid', 0));
 	if(!in_node($_REQUEST['graphid'])) $_REQUEST['graphid'] = 0;
 
 	if($_REQUEST['graphid']>0){
@@ -139,7 +139,7 @@ include_once('include/page_header.php');
 
 	$effectiveperiod = navigation_bar_calc('web.graph');
 
-	update_profile('web.charts.graphid',$_REQUEST['graphid']);
+	CProfile::update('web.charts.graphid',$_REQUEST['graphid']);
 
 	$h1 = array();
 
@@ -158,7 +158,7 @@ include_once('include/page_header.php');
 
 	if(($_REQUEST['graphid']>0) && ($row=DBfetch(DBselect('SELECT DISTINCT graphid, name FROM graphs WHERE graphid='.$_REQUEST['graphid'])))){
 		if(!graph_accessible($_REQUEST['graphid'])){
-			update_profile('web.charts.graphid',0);
+			CProfile::update('web.charts.graphid',0);
 			access_deny();
 		}
 		array_push($h1, $row['name']);

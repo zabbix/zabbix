@@ -35,7 +35,7 @@ $page['hist_arg']	= array();
 
 include_once('include/page_header.php');
 
-$_REQUEST['eventsource'] = get_request('eventsource',get_profile('web.actionconf.eventsource',EVENT_SOURCE_TRIGGERS));
+$_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionconf.eventsource',EVENT_SOURCE_TRIGGERS));
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -100,7 +100,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',get_profile('web.actionconf
 // for future use
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			update_profile('web.audit.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.audit.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
 
@@ -117,7 +117,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',get_profile('web.actionconf
 	}
 ?>
 <?php
-	update_profile('web.actionconf.eventsource',$_REQUEST['eventsource'], PROFILE_TYPE_INT);
+	CProfile::update('web.actionconf.eventsource',$_REQUEST['eventsource'], PROFILE_TYPE_INT);
 ?>
 <?php
 	if(inarr_isset(array('clone','actionid'))){

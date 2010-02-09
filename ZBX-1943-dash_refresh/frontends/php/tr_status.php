@@ -110,10 +110,10 @@ include_once('include/page_header.php');
 
 	if(isset($_REQUEST['favobj'])){
 		if(str_in_array($_REQUEST['favobj'] ,array('sound'))){
-			update_profile('web.tr_status.mute',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.tr_status.mute',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 		else if('filter' == $_REQUEST['favobj']){
-			update_profile('web.tr_status.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.tr_status.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
 
@@ -147,19 +147,19 @@ include_once('include/page_header.php');
 		$_REQUEST['show_details'] = get_request('show_details',	0);
 	}
 	else{
-		$_REQUEST['show_details'] = get_request('show_details',	get_profile('web.tr_status.filter.show_details', 0));
+		$_REQUEST['show_details'] = get_request('show_details',	CProfile::get('web.tr_status.filter.show_details', 0));
 	}
 
-	if(get_request('show_events') != get_profile('web.tr_status.filter.show_events')){
+	if(get_request('show_events') != CProfile::get('web.tr_status.filter.show_events')){
 		$url = new CUrl();
 		$path = $url->getPath();
 		insert_js('cookie.eraseArray("'.$path.'")');
 	}
 	
-	$_REQUEST['show_triggers'] = get_request('show_triggers', get_profile('web.tr_status.filter.show_triggers', TRIGGERS_OPTION_ONLYTRUE));
-	$_REQUEST['show_events'] = get_request('show_events', get_profile('web.tr_status.filter.show_events', EVENTS_OPTION_NOEVENT));
-	$_REQUEST['show_severity'] = get_request('show_severity', get_profile('web.tr_status.filter.show_severity', -1));
-	$_REQUEST['txt_select'] = get_request('txt_select', get_profile('web.tr_status.filter.txt_select', ''));
+	$_REQUEST['show_triggers'] = get_request('show_triggers', CProfile::get('web.tr_status.filter.show_triggers', TRIGGERS_OPTION_ONLYTRUE));
+	$_REQUEST['show_events'] = get_request('show_events', CProfile::get('web.tr_status.filter.show_events', EVENTS_OPTION_NOEVENT));
+	$_REQUEST['show_severity'] = get_request('show_severity', CProfile::get('web.tr_status.filter.show_severity', -1));
+	$_REQUEST['txt_select'] = get_request('txt_select', CProfile::get('web.tr_status.filter.txt_select', ''));
 
 	
 	
@@ -171,11 +171,11 @@ include_once('include/page_header.php');
 	$_REQUEST['show_triggers'] = (($_REQUEST['groupid'] == 0) && ($_REQUEST['hostid'] == 0) && ($_REQUEST['show_triggers'] == TRIGGERS_OPTION_ALL))
 		? TRIGGERS_OPTION_ONLYTRUE : $_REQUEST['show_triggers'];
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
-		update_profile('web.tr_status.filter.show_details', $_REQUEST['show_details'], PROFILE_TYPE_INT);
-		update_profile('web.tr_status.filter.show_triggers', $_REQUEST['show_triggers'], PROFILE_TYPE_INT);
-		update_profile('web.tr_status.filter.show_events', $_REQUEST['show_events'], PROFILE_TYPE_INT);
-		update_profile('web.tr_status.filter.show_severity', $_REQUEST['show_severity'], PROFILE_TYPE_INT);
-		update_profile('web.tr_status.filter.txt_select', $_REQUEST['txt_select'], PROFILE_TYPE_STR);
+		CProfile::update('web.tr_status.filter.show_details', $_REQUEST['show_details'], PROFILE_TYPE_INT);
+		CProfile::update('web.tr_status.filter.show_triggers', $_REQUEST['show_triggers'], PROFILE_TYPE_INT);
+		CProfile::update('web.tr_status.filter.show_events', $_REQUEST['show_events'], PROFILE_TYPE_INT);
+		CProfile::update('web.tr_status.filter.show_severity', $_REQUEST['show_severity'], PROFILE_TYPE_INT);
+		CProfile::update('web.tr_status.filter.txt_select', $_REQUEST['txt_select'], PROFILE_TYPE_STR);
 	}
 
 	$show_triggers = $_REQUEST['show_triggers'];
@@ -185,7 +185,7 @@ include_once('include/page_header.php');
 	validate_sort_and_sortorder('lastchange', ZBX_SORT_DOWN);
 
 
-	$mute = get_profile('web.tr_status.mute', 0);
+	$mute = CProfile::get('web.tr_status.mute', 0);
 	if(isset($audio) && !$mute){
 		play_sound($audio);
 	}
@@ -292,7 +292,7 @@ include_once('include/page_header.php');
 	$filterForm->addItemToBottomRow(new CButton('filter_set', S_FILTER));
 	$filterForm->addItemToBottomRow(new CButton('filter_rst', S_RESET));
 
-	$trigg_wdgt->addFlicker($filterForm, get_profile('web.tr_status.filter.state', 0));
+	$trigg_wdgt->addFlicker($filterForm, CProfile::get('web.tr_status.filter.state', 0));
 /*************** FILTER END ******************/
 
   	if($_REQUEST['fullscreen']){

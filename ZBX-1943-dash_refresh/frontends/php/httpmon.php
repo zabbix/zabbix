@@ -57,7 +57,7 @@ include_once('include/page_header.php');
 /* AJAX	*/
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
-			update_profile('web.httpmon.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.httpmon.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
 
@@ -80,7 +80,7 @@ include_once('include/page_header.php');
 //SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
 ?>
 <?php
-	$_REQUEST['applications'] = get_request('applications',get_profile('web.httpmon.applications',array()));
+	$_REQUEST['applications'] = get_request('applications',CProfile::get('web.httpmon.applications',array()));
 
 	if(isset($_REQUEST['open'])){
 		if(!isset($_REQUEST['applicationid'])){
@@ -106,7 +106,7 @@ include_once('include/page_header.php');
 		array_shift($_REQUEST['applications']);
 	}
 
-	update_profile('web.httpmon.applications',$_REQUEST['applications'],PROFILE_TYPE_ARRAY_ID);
+	CProfile::update('web.httpmon.applications',$_REQUEST['applications'],PROFILE_TYPE_ARRAY_ID);
 ?>
 <?php
 

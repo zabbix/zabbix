@@ -74,7 +74,7 @@ include_once('include/page_header.php');
 <?php
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
-			update_profile('web.screens.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.screens.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 
 		if('timeline' == $_REQUEST['favobj']){
@@ -114,10 +114,10 @@ include_once('include/page_header.php');
 <?php
 	$config = $_REQUEST['config'];
 
-	$_REQUEST['elementid'] = get_request('elementid',get_profile('web.screens.elementid', null));
+	$_REQUEST['elementid'] = get_request('elementid',CProfile::get('web.screens.elementid', null));
 
 	if( 2 != $_REQUEST['fullscreen'] )
-		update_profile('web.screens.elementid',$_REQUEST['elementid']);
+		CProfile::update('web.screens.elementid',$_REQUEST['elementid']);
 
 	$effectiveperiod = navigation_bar_calc('web.screens', true);
 ?>
