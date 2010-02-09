@@ -129,23 +129,27 @@ include_once 'include/page_header.php';
 			$available_hosts = $PAGE_HOSTS['hostids'];
 	}
 
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, $available_hosts);
-
 	$rep2_wdgt->addPageHeader(S_AVAILABILITY_REPORT_BIG);
 //	show_report2_header($config, $PAGE_GROUPS, $PAGE_HOSTS);
 
 	if(isset($_REQUEST['triggerid'])){
-		if(isset($available_triggers[$_REQUEST['triggerid']])){
-			$sql = 'SELECT DISTINCT t.*, h.host, h.hostid '.
-					' FROM triggers t, functions f, items i, hosts h '.
-					' WHERE t.triggerid='.$_REQUEST['triggerid'].
-						' AND t.triggerid=f.triggerid '.
-						' AND f.itemid=i.itemid '.
-						' AND i.hostid=h.hostid ';
-			$trigger_data = DBfetch(DBselect($sql));
+		$options = array(
+			'triggerids' => $_REQUEST['triggerid'],
+			'output' => API_OUTPUT_EXTEND,
+			'select_hosts' => API_OUTPUT_EXTEND,
+			'nodeids' => get_current_nodeid(true)
+		);
+
+		$trigger_data = CTrigger::get($options);
+		if(empty($trigger_data)){
+			unset($_REQUEST['triggerid']);
 		}
 		else{
-			unset($_REQUEST['triggerid']);
+			$trigger_data = reset($trigger_data);
+
+			$host = reset($db_data['hosts']);
+			$trigger_data['hostid'] = $host['hostid'];
+			$trigger_data['host'] = $host['host'];
 		}
 	}
 
@@ -252,6 +256,9 @@ include_once 'include/page_header.php';
 		$rep2_wdgt->addItem($table);
 		$rep2_wdgt->show();
 	}
+?>
+<?php
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
+
 ?>
