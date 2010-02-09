@@ -287,6 +287,10 @@ void	init_config(void)
 #ifndef	HAVE_LIBCURL
 	CONFIG_HTTPPOLLER_FORKS = 0;
 #endif
+	if (CONFIG_NODEID == 0)
+	{
+		CONFIG_NODEWATCHER_FORKS = 0;
+	}
 }
 
 /******************************************************************************
