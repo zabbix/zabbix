@@ -5215,7 +5215,7 @@
 		$newgroup = get_request('newgroup', '');
 
 		$host 		= get_request('host',	'');
-		$port 		= get_request('port',	get_profile('HOST_PORT',10050));
+		$port 		= get_request('port',	CProfile::get('HOST_PORT',10050));
 		$status		= get_request('status',	HOST_STATUS_MONITORED);
 		$useip		= get_request('useip',	1);
 		$dns		= get_request('dns',	'');
@@ -5564,7 +5564,7 @@
 		$newgroup	= get_request('newgroup','');
 
 		$host 		= get_request('host',	'');
-		$port 		= get_request('port',	get_profile('HOST_PORT',10050));
+		$port 		= get_request('port',	CProfile::get('HOST_PORT',10050));
 		$status		= get_request('status',	HOST_STATUS_MONITORED);
 		$useip		= get_request('useip',	1);
 		$dns		= get_request('dns',	'');

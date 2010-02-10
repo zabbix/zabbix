@@ -426,7 +426,7 @@ include_once('include/page_header.php');
 
 //HOSTS PROFILE Section
 		if($result){
-			update_profile('HOST_PORT', $_REQUEST['port'], PROFILE_TYPE_INT);
+			CProfile::update('HOST_PORT', $_REQUEST['port'], PROFILE_TYPE_INT);
 
 			if(isset($_REQUEST['hostid'])){
 				delete_host_profile($hostid);
