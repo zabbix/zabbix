@@ -170,6 +170,8 @@ int	CONFIG_NODE_NOHISTORY		= 0;
 
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
+int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
+
 /* Global variable to control if we should write warnings to log[] */
 int	CONFIG_ENABLE_LOG		= 1;
 
@@ -259,6 +261,7 @@ void	init_config(void)
 		{"DBSocket",&CONFIG_DBSOCKET,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBPort",&CONFIG_DBPORT,0,TYPE_INT,PARM_OPT,1024,65535},
 		{"SSHKeyLocation",&CONFIG_SSH_KEY_LOCATION,0,TYPE_STRING,PARM_OPT,0,0},
+		{"LogSlowQueries",&CONFIG_LOG_SLOW_QUERIES,0,TYPE_INT,PARM_OPT,0,3600000},
 		{0}
 	};
 
