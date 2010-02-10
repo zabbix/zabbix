@@ -78,7 +78,7 @@ include_once('include/page_header.php');
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	null,	null,	null)
 	);
 
-	$_REQUEST['showdisabled'] = get_request('showdisabled', get_profile('web.httpconf.showdisabled', 0));
+	$_REQUEST['showdisabled'] = get_request('showdisabled', CProfile::get('web.httpconf.showdisabled', 0));
 
 	check_fields($fields);
 	validate_sort_and_sortorder('wt.name',ZBX_SORT_UP);
@@ -101,10 +101,11 @@ include_once('include/page_header.php');
 	$available_groups = $PAGE_GROUPS['groupids'];
 	$available_hosts = $PAGE_HOSTS['hostids'];
 
-	update_profile('web.httpconf.showdisabled',$showdisabled, PROFILE_TYPE_STR);
+	CProfile::update('web.httpconf.showdisabled',$showdisabled, PROFILE_TYPE_STR);
 ?>
 <?php
-	$_REQUEST['applications'] = get_request('applications',get_profile('web.httpconf.applications',array()));
+	$_REQUEST['applications'] = get_request('applications', get_favorites('web.httpconf.applications'));
+	$_REQUEST['applications'] = zbx_objectValues($_REQUEST['applications'], 'value');
 
 	if(isset($_REQUEST['open'])){
 		if(!isset($_REQUEST['applicationid'])){
@@ -124,12 +125,19 @@ include_once('include/page_header.php');
 		}
 	}
 
-/* limit opened application count */
-	while(count($_REQUEST['applications']) > 25){
-		array_shift($_REQUEST['applications']);
+	if(count($_REQUEST['applications']) > 25){
+		$_REQUEST['applications'] = array_slice($_REQUEST['applications'], -25);
 	}
+/* limit opened application count */
+	// while(count($_REQUEST['applications']) > 25){
+		// array_shift($_REQUEST['applications']);
+	// }
 
-	update_profile('web.httpconf.applications',$_REQUEST['applications'],PROFILE_TYPE_ARRAY_ID);
+	rm4favorites('web.httpconf.applications');
+	foreach($_REQUEST['applications'] as $application){
+		add2favorites('web.httpconf.applications', $application);
+	}
+	// CProfile::update('web.httpconf.applications',$_REQUEST['applications'],PROFILE_TYPE_ARRAY_ID);
 
 	if(isset($_REQUEST['del_sel_step'])&&isset($_REQUEST['sel_step'])&&is_array($_REQUEST['sel_step'])){
 		foreach($_REQUEST['sel_step'] as $sid)

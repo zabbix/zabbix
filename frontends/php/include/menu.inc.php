@@ -294,7 +294,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 				$row['selected'] = true;
 
 				if(!defined('ZBX_PAGE_NO_MENU')){
-					update_profile('web.menu.'.$label.'.last', $sub_page['url'], PROFILE_TYPE_STR);
+					CProfile::update('web.menu.'.$label.'.last', $sub_page['url'], PROFILE_TYPE_STR);
 				}
 			}
 
@@ -316,7 +316,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 			continue;
 		}
 
-//		$menu_url = get_profile('web.menu.'.$label.'.last',false);
+//		$menu_url = CProfile::get('web.menu.'.$label.'.last',false);
 		$menu_url = $menu['pages'][$menu['default_page_id']]['url'];
 
 		$mmenu_entry = new CCol($menu['label'], $menu_class);

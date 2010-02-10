@@ -2185,7 +2185,7 @@ return $result;
 	function get_triggers_overview($hostids,$view_style=null){
 		$available_triggers = get_accessible_triggers(PERM_READ_ONLY,$hostids);
 
-		if(is_null($view_style)) $view_style = get_profile('web.overview.view.style',STYLE_TOP);
+		if(is_null($view_style)) $view_style = CProfile::get('web.overview.view.style',STYLE_TOP);
 
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
 
