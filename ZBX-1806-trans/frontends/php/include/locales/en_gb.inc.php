@@ -1818,7 +1818,7 @@
 	'S_OF_KEY_SMALL'=>					'of key',
 	'S_AVAILABLE_ONLY_FOR_ITEMS_WITH_VALUE_TYPES_SMALL'=>	'available only for items with value types',
 	'S_MISSING_MANDATORY_PARAMETER_FOR_FUNCTION'=>		'Missing mandatory parameter for function',
-	'S_NOT_FLOAT_OR_MACRO_FOR_FUNCTION_SMALL'=>'		is not a float or macro for function',
+	'S_NOT_FLOAT_OR_MACRO_FOR_FUNCTION_SMALL'=> 'is not a float or macro for function',
 	'S_NOT_FLOAT_OR_MACRO_OR_COUNTER_FOR_FUNCTION_SMALL'=>	'is not a float or counter or macro for function',
 	'S_ITEM_KEY_MUST_BE_USED_IN_TRIGGER_EXPRESSION'=>	'An item key must be used in trigger expression',
 	'S_INCORRECT_TRIGGER_EXPRESSION'=>			'Incorrect trigger expression',	
