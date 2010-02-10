@@ -108,7 +108,7 @@ include_once('include/page_header.php');
 			$first_map = reset($maps);
 			$_REQUEST['sysmapid'] = $first_map['sysmapid'];
 		}
-		CProfile::update('web.maps.sysmapid', $_REQUEST['sysmapid']);
+		CProfile::update('web.maps.sysmapid', $_REQUEST['sysmapid'], PROFILE_TYPE_ID);
 
 
 		$form = new CForm(null, 'get');
