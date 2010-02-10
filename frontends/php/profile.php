@@ -91,7 +91,7 @@ $fields=array(
 
 //Primary Actions
 	elseif(isset($_REQUEST['cancel'])){
-		$url = get_profile('web.menu.view.last', 'index.php');
+		$url = CProfile::get('web.menu.view.last', 'index.php');
 		redirect($url);
 	}
 	elseif(isset($_REQUEST['save'])){

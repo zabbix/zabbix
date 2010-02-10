@@ -57,11 +57,12 @@ include_once('include/page_header.php');
 /* AJAX	*/
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
-			update_profile('web.httpmon.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.httpmon.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -80,8 +81,11 @@ include_once('include/page_header.php');
 //SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
 ?>
 <?php
-	$_REQUEST['applications'] = get_request('applications',get_profile('web.httpmon.applications',array()));
+	// $_REQUEST['applications'] = get_request('applications',CProfile::get('web.httpmon.applications',array()));
 
+	$_REQUEST['applications'] = get_request('applications', get_favorites('web.httpmon.applications'));
+	$_REQUEST['applications'] = zbx_objectValues($_REQUEST['applications'], 'value');
+	
 	if(isset($_REQUEST['open'])){
 		if(!isset($_REQUEST['applicationid'])){
 			$_REQUEST['applications'] = array();
@@ -102,11 +106,18 @@ include_once('include/page_header.php');
 	}
 
 	/* limit opened application count */
-	while(count($_REQUEST['applications']) > 25){
-		array_shift($_REQUEST['applications']);
-	}
+	// while(count($_REQUEST['applications']) > 25){
+		// array_shift($_REQUEST['applications']);
+	// }
 
-	update_profile('web.httpmon.applications',$_REQUEST['applications'],PROFILE_TYPE_ARRAY_ID);
+	if(count($_REQUEST['applications']) > 25){
+		$_REQUEST['applications'] = array_slice($_REQUEST['applications'], -25);
+	}
+	rm4favorites('web.httpmon.applications');
+	foreach($_REQUEST['applications'] as $application){
+		add2favorites('web.httpmon.applications', $application);
+	}
+	// CProfile::update('web.httpmon.applications',$_REQUEST['applications'],PROFILE_TYPE_ARRAY_ID);
 ?>
 <?php
 

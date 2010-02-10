@@ -50,10 +50,10 @@
 
 
 	if(isset($_REQUEST['groupid'])){
-		update_profile('web.'.$page['menu'].'.groupid', $_REQUEST['groupid'], PROFILE_TYPE_ID);
+		CProfile::update('web.'.$page['menu'].'.groupid', $_REQUEST['groupid'], PROFILE_TYPE_ID);
 	}
 	else{
-		$_REQUEST['groupid'] = get_profile('web.'.$page['menu'].'.groupid', 0);
+		$_REQUEST['groupid'] = CProfile::get('web.'.$page['menu'].'.groupid', 0);
 	}
 
 	$_REQUEST['prof_type'] = get_request('prof_type', 0);

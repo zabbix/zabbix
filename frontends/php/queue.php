@@ -43,8 +43,8 @@ include_once "include/page_header.php";
 ?>
 
 <?php
-	$_REQUEST['config'] = get_request('config', get_profile('web.queue.config', 0));
-	update_profile('web.queue.config',$_REQUEST['config'], PROFILE_TYPE_INT);
+	$_REQUEST['config'] = get_request('config', CProfile::get('web.queue.config', 0));
+	CProfile::update('web.queue.config',$_REQUEST['config'], PROFILE_TYPE_INT);
 
 	$form = new CForm();
 	$form->SetMethod('get');

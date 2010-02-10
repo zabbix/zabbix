@@ -948,10 +948,6 @@ function make_graph_menu(&$menu,&$submenu){
 
 function make_graph_submenu(){
 	$graphids = array();
-
-	$fav_graphs = get_favorites('web.favorite.graphids');
-
-	$graphids = array();
 	$itemids = array();
 
 	$fav_graphs = get_favorites('web.favorite.graphids');
@@ -982,6 +978,8 @@ function make_graph_submenu(){
 	$items = CItem::get($options);
 	$items = zbx_toHash($items, 'itemid');
 
+	$graphids = array();
+	
 	foreach($fav_graphs as $key => $favorite){
 		$source = $favorite['source'];
 		$sourceid = $favorite['value'];
