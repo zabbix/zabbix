@@ -516,8 +516,7 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 {
 	char	*sql = NULL;
 	int	ret = ZBX_DB_OK;
-
-/*	double	sec;*/
+	double	sec = 0;
 
 #ifdef	HAVE_POSTGRESQL
 	PGresult	*result;
@@ -530,14 +529,14 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 	int		status;
 #endif
 
-/*	sec = zbx_time();*/
+	if (CONFIG_LOG_SLOW_QUERIES)
+		sec = zbx_time();
 
 	sql = zbx_dvsprintf(sql, fmt, args);
 
 	if (0 == txn_init && 0 == txn_level)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Query without transaction detected [%s]", sql);
-	}
+		zabbix_log(LOG_LEVEL_DEBUG, "Query without transaction detected");
+
 	zabbix_log( LOG_LEVEL_DEBUG, "Query [txnlev:%d] [%s]", txn_level, sql);
 #ifdef	HAVE_MYSQL
 	if(!conn)
@@ -685,9 +684,12 @@ lbl_exec:
 	}
 #endif
 
-/*	sec = zbx_time() - sec;
-	if(sec > 0.1)
-		zabbix_log( LOG_LEVEL_WARNING, "Long query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);*/
+	if (CONFIG_LOG_SLOW_QUERIES)
+	{
+		sec = zbx_time() - sec;
+		if(sec > (double)CONFIG_LOG_SLOW_QUERIES / 1000.0)
+			zabbix_log( LOG_LEVEL_WARNING, "Slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
+	}
 
 	zbx_free(sql);
 
@@ -852,8 +854,7 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 {
 	char	*sql = NULL;
 	DB_RESULT result;
-
-/*	double	sec;*/
+	double	sec = 0;
 
 #ifdef	HAVE_ORACLE
 	sword err = OCI_SUCCESS;
@@ -867,7 +868,8 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 	char	*error = NULL;
 #endif
 
-/*	sec = zbx_time();*/
+	if (CONFIG_LOG_SLOW_QUERIES)
+		sec = zbx_time();
 
 	sql = zbx_dvsprintf(sql, fmt, args);
 
@@ -1059,9 +1061,12 @@ lbl_get_table:
 	}
 #endif
 
-/*	sec = zbx_time() - sec;
-	if(sec > 0.1)
-		zabbix_log( LOG_LEVEL_WARNING, "Long query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);*/
+	if (CONFIG_LOG_SLOW_QUERIES)
+	{
+		sec = zbx_time() - sec;
+		if(sec > (double)CONFIG_LOG_SLOW_QUERIES / 1000.0)
+			zabbix_log( LOG_LEVEL_WARNING, "Slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
+	}
 
 	zbx_free(sql);
 	return result;
