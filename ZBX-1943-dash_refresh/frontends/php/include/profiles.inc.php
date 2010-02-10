@@ -52,13 +52,18 @@ class CProfile{
 		if(!empty(self::$insert) || !empty(self::$update)){
 			
 			DBstart();
-			foreach(self::$insert as $profile){
-				$result = self::insertDB($profile['idx'], $profile['value'], $profile['type'], $profile['idx2']);
+			foreach(self::$insert as $idx => $profile){
+				foreach($profile as $idx2 => $data){
+					$result = self::insertDB($idx, $data['value'], $data['type'], $idx2);
+				}
 			}
 			
-			order_result(self::$update, 'idx');
-			foreach(self::$update as $profile){			
-				self::updateDB($profile['idx'], $profile['value'], $profile['type'], $profile['idx2']);
+			ksort(self::$update);
+			foreach(self::$update as $idx => $profile){
+				ksort($profile);
+				foreach($profile as $idx2 => $data){			
+					self::updateDB($idx, $data['value'], $data['type'], $idx2);
+				}
 			}
 			DBend();
 		}
@@ -99,10 +104,16 @@ class CProfile{
 		);
 
 		if(CProfile::get($idx, false, $idx2) === false){
-			self::$insert[] = $profile;
+			if(!isset(self::$insert[$idx])) 
+				self::$insert[$idx] = array();
+				
+			self::$insert[$idx][$idx2] = $profile;
 		}
 		else{
-			self::$update[] = $profile;
+			if(!isset(self::$update[$idx])) 
+				self::$update[$idx] = array();
+				
+			self::$update[$idx][$idx2] = $profile;
 		}
 		
 		if(!isset(self::$profiles[$idx])) 
