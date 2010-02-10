@@ -1156,7 +1156,7 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 		if(bccomp($_REQUEST['groupid'],$group['groupid']) == 0) $result['selected'] = $group['groupid'];
 	}
 
-	$profile_groupid = get_profile('web.'.$page['menu'].'.groupid');
+	$profile_groupid = CProfile::get('web.'.$page['menu'].'.groupid');
 //-----
 	if($def_options['do_not_select']){
 		$result['selected'] = $_REQUEST['groupid'] = 0;
@@ -1412,7 +1412,7 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 		if(bccomp($_REQUEST['hostid'],$host['hostid']) == 0) $result['selected'] = $host['hostid'];
 	}
 
-	$profile_hostid = get_profile('web.'.$page['menu'].'.hostid');
+	$profile_hostid = CProfile::get('web.'.$page['menu'].'.hostid');
 
 //-----
 	if($def_options['do_not_select']){
@@ -1477,8 +1477,8 @@ return $result;
 		$group_var = 'web.latest.groupid';
 		$host_var = 'web.latest.hostid';
 
-		$_REQUEST['groupid']    = get_request('groupid', get_profile($group_var, -1));
-		$_REQUEST['hostid']     = get_request('hostid', get_profile($host_var, -1));
+		$_REQUEST['groupid']    = get_request('groupid', CProfile::get($group_var, -1));
+		$_REQUEST['hostid']     = get_request('hostid', CProfile::get($host_var, -1));
 
 		if($_REQUEST['groupid'] > 0){
 			if($_REQUEST['hostid'] > 0){
@@ -1511,13 +1511,13 @@ return $result;
 		}
 
 		if($PAGE_GROUPS['original'] > -1)
-			update_profile('web.'.$page['menu'].'.groupid', $_REQUEST['groupid'], PROFILE_TYPE_ID);
+			CProfile::update('web.'.$page['menu'].'.groupid', $_REQUEST['groupid'], PROFILE_TYPE_ID);
 
 		if($PAGE_HOSTS['original'] > -1)
-			update_profile('web.'.$page['menu'].'.hostid', $_REQUEST['hostid'], PROFILE_TYPE_ID);
+			CProfile::update('web.'.$page['menu'].'.hostid', $_REQUEST['hostid'], PROFILE_TYPE_ID);
 
-		update_profile($group_var, $_REQUEST['groupid'], PROFILE_TYPE_ID);
-		update_profile($host_var, $_REQUEST['hostid'], PROFILE_TYPE_ID);
+		CProfile::update($group_var, $_REQUEST['groupid'], PROFILE_TYPE_ID);
+		CProfile::update($host_var, $_REQUEST['hostid'], PROFILE_TYPE_ID);
 	}
 
 /*
@@ -1545,7 +1545,7 @@ return $result;
 		$group_var = 'web.latest.groupid';
 		$host_var = 'web.latest.hostid';
 
-		$_REQUEST['groupid']    = get_request('groupid', get_profile($group_var, -1));
+		$_REQUEST['groupid']    = get_request('groupid', CProfile::get($group_var, -1));
 
 		if($_REQUEST['groupid'] < 0){
 			$PAGE_GROUPS['selected'] = $_REQUEST['groupid'] = 0;
@@ -1563,13 +1563,13 @@ return $result;
 		$PAGE_GROUPS['selected'] = $_REQUEST['groupid'];
 
 		if($PAGE_GROUPS['original'] > -1)
-			update_profile('web.'.$page['menu'].'.groupid', $_REQUEST['groupid'], PROFILE_TYPE_ID);
+			CProfile::update('web.'.$page['menu'].'.groupid', $_REQUEST['groupid'], PROFILE_TYPE_ID);
 
 		if($PAGE_HOSTS['original'] > -1)
-			update_profile('web.'.$page['menu'].'.hostid', $_REQUEST['hostid'], PROFILE_TYPE_ID);
+			CProfile::update('web.'.$page['menu'].'.hostid', $_REQUEST['hostid'], PROFILE_TYPE_ID);
 
-		update_profile($group_var, $_REQUEST['groupid'], PROFILE_TYPE_ID);
-		update_profile($host_var, $_REQUEST['hostid'], PROFILE_TYPE_ID);
+		CProfile::update($group_var, $_REQUEST['groupid'], PROFILE_TYPE_ID);
+		CProfile::update($host_var, $_REQUEST['hostid'], PROFILE_TYPE_ID);
 	}
 
 /* APPLICATIONS */

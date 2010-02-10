@@ -99,11 +99,11 @@ include_once('include/page_header.php');
 	);
 ?>
 <?php
-	$_REQUEST['config'] = get_request('config',get_profile('web.config.config',0));
+	$_REQUEST['config'] = get_request('config',CProfile::get('web.config.config',0));
 
 	check_fields($fields);
 
-	update_profile('web.config.config',$_REQUEST['config'],PROFILE_TYPE_INT);
+	CProfile::update('web.config.config',$_REQUEST['config'],PROFILE_TYPE_INT);
 
 	$orig_config = select_config();
 
@@ -934,7 +934,7 @@ include_once('include/page_header.php');
 					get_regexp_form(),//null,
 					null,
 					'hat_regexp'
-					//get_profile('web.config.hats.hat_regexp.state',1)
+					//CProfile::get('web.config.hats.hat_regexp.state',1)
 				));
 
 			$right_tab = new CTable();
@@ -948,7 +948,7 @@ include_once('include/page_header.php');
 					get_expressions_tab(),//null,
 					null,
 					'hat_expressions'
-//					get_profile('web.config.hats.hat_expressions.state',1)
+//					CProfile::get('web.config.hats.hat_expressions.state',1)
 				));
 
 			if(isset($_REQUEST['new_expression'])){
@@ -957,7 +957,7 @@ include_once('include/page_header.php');
 						get_expression_form(),//null
 						null,
 						'hat_new_expression'
-//						get_profile('web.config.hats.hat_new_expression.state',1)
+//						CProfile::get('web.config.hats.hat_new_expression.state',1)
 					));
 			}
 

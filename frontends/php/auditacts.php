@@ -58,11 +58,12 @@ include_once('include/page_header.php');
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			update_profile('web.auditacts.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.auditacts.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -73,12 +74,12 @@ include_once('include/page_header.php');
 		$_REQUEST['nav_time'] = time();
 	}
 
-	$_REQUEST['alias'] = get_request('alias',get_profile('web.auditacts.filter.alias', ''));
-	$_REQUEST['nav_time'] = get_request('nav_time',get_profile('web.auditacts.filter.nav_time',time()));
+	$_REQUEST['alias'] = get_request('alias',CProfile::get('web.auditacts.filter.alias', ''));
+	$_REQUEST['nav_time'] = get_request('nav_time',CProfile::get('web.auditacts.filter.nav_time',time()));
 
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
-		update_profile('web.auditacts.filter.alias',$_REQUEST['alias']);
-		update_profile('web.auditacts.filter.nav_time',$_REQUEST['nav_time'], PROFILE_TYPE_INT);
+		CProfile::update('web.auditacts.filter.alias',$_REQUEST['alias'], PROFILE_TYPE_STR);
+		CProfile::update('web.auditacts.filter.nav_time',$_REQUEST['nav_time'], PROFILE_TYPE_INT);
 	}
 	$nav_time = $_REQUEST['nav_time'];
 // -------------
@@ -161,7 +162,7 @@ include_once('include/page_header.php');
 	$filterForm->addItemToBottomRow(new CButton("filter_set", S_FILTER));
 	$filterForm->addItemToBottomRow($reset);
 
-	$alerts_wdgt->addFlicker($filterForm, get_profile('web.auditacts.filter.state',1));
+	$alerts_wdgt->addFlicker($filterForm, CProfile::get('web.auditacts.filter.state',1));
 //-------
 
 	$options = array(

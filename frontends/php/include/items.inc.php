@@ -1115,7 +1115,7 @@
  */
 	function get_items_data_overview($hostids,$view_style=null){
 
-		if(is_null($view_style)) $view_style = get_profile('web.overview.view.style',STYLE_TOP);
+		if(is_null($view_style)) $view_style = CProfile::get('web.overview.view.style',STYLE_TOP);
 
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 

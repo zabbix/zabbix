@@ -74,7 +74,7 @@ include_once('include/page_header.php');
 <?php
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
-			update_profile('web.screens.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.screens.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 
 		if('timeline' == $_REQUEST['favobj']){
@@ -93,7 +93,7 @@ include_once('include/page_header.php');
 				}
 			}
 			else if('remove' == $_REQUEST['action']){
-				$result = rm4favorites('web.favorite.screenids',$_REQUEST['favid'],ZBX_FAVORITES_ALL,$_REQUEST['favobj']);
+				$result = rm4favorites('web.favorite.screenids',$_REQUEST['favid'],$_REQUEST['favobj']);
 
 				if($result){
 					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVOURITES.'";'."\n");
@@ -108,16 +108,17 @@ include_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 ?>
 <?php
 	$config = $_REQUEST['config'];
 
-	$_REQUEST['elementid'] = get_request('elementid',get_profile('web.screens.elementid', null));
+	$_REQUEST['elementid'] = get_request('elementid',CProfile::get('web.screens.elementid', null));
 
 	if( 2 != $_REQUEST['fullscreen'] )
-		update_profile('web.screens.elementid',$_REQUEST['elementid']);
+		CProfile::update('web.screens.elementid',$_REQUEST['elementid'], PROFILE_TYPE_ID);
 
 	$effectiveperiod = navigation_bar_calc('web.screens', true);
 ?>
