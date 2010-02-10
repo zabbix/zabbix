@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1974] removed "Dropdown first entry" "1.6.2 comp mode" option (Vedmak)
  - [ZBX-1826] fixed error when change node in monitoring web (Vedmak)
  - [ZBX-1943] fixed refresh time selection in dashboard widgets (Vedmak)
  - [ZBX-1929] include eventlog.c and eventlog.h files in distribution package (Richlv)
