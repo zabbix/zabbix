@@ -41,7 +41,8 @@ zabbix_agentd_SOURCES = \
 	logfiles.c logfiles.h \
 	zabbix_agentd.c \
 	zbxconf.c zbxconf.h \
-	listener.c listener.h
+	listener.c listener.h \
+	eventlog.c eventlog.h
 
 zabbix_agentd_LDADD = $(agents_ldadd)
 
