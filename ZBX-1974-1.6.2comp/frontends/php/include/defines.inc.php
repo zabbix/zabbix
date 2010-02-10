@@ -70,7 +70,6 @@
 
 	define('ZBX_DROPDOWN_FIRST_NONE',	0);
 	define('ZBX_DROPDOWN_FIRST_ALL',	1);
-	define('ZBX_DROPDOWN_FIRST_ZBX162',	2);
 
 	define('T_ZBX_STR',			0);
 	define('T_ZBX_INT',			1);

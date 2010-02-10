@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1974] removed "Dropdown first entry" "1.6.2 comp mode" option (Vedmak)
  - [ZBXNEXT-229] further updates for Brazilian Portuguese translation; thanks to murilex (Richlv)
  - [ZBX-1945] speed improvement for synchronization between nodes (Sasha)
  - [ZBX-1940] fixed map creation if zabbix doesn't contain images (Aly)

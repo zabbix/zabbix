@@ -884,7 +884,6 @@ include_once('include/page_header.php');
 		$combo_dd_first_entry = new CComboBox('dropdown_first_entry');
 		$combo_dd_first_entry->addItem(ZBX_DROPDOWN_FIRST_NONE, S_NONE, ($config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_NONE)?'yes':'no');
 		$combo_dd_first_entry->addItem(ZBX_DROPDOWN_FIRST_ALL, S_ALL_S, ($config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_ALL)?'yes':'no');
-		$combo_dd_first_entry->addItem(ZBX_DROPDOWN_FIRST_ZBX162, S_ZBX162_MODE, ($config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_ZBX162)?'yes':'no');
 
 		$check_dd_first_remember = new CCheckBox('dropdown_first_remember', $config['dropdown_first_remember'], null, 1);
 
