@@ -49,14 +49,19 @@ class CProfile{
 	
 	public static function flush(){
 		
-		foreach(self::$insert as $profile){
-			$result = self::insertDB($profile['idx'], $profile['value'], $profile['type'], $profile['idx2']);
+		if(!empty(self::$insert) || !empty(self::$update)){
+			
+			DBstart();
+			foreach(self::$insert as $profile){
+				$result = self::insertDB($profile['idx'], $profile['value'], $profile['type'], $profile['idx2']);
+			}
+			
+			order_result(self::$update, 'idx');
+			foreach(self::$update as $profile){			
+				self::updateDB($profile['idx'], $profile['value'], $profile['type'], $profile['idx2']);
+			}
+			DBend();
 		}
-		
-		order_result(self::$update, 'idx');
-		foreach(self::$update as $profile){			
-			self::updateDB($profile['idx'], $profile['value'], $profile['type'], $profile['idx2']);
-		}	
 	}
 	
 	public static function clear(){
