@@ -1805,6 +1805,11 @@
 	'S_Y'=>			'Y',
 	'S_YOTTA'=>		'Yotta',
 
+//	media.inc.php
+	'S_NO_MEDIA_WITH'=>			'No media with',
+	'S_NO_MEDIA_TYPE_WITH'=>		'No media type with',
+	'S_AN_ACTION_TYPE_WITH_DESCRIPTION'=>	'An action type with description',
+	
 //	hosts.inc.php
 	'S_CANNOT_EXISTS_WITHOUT_GROUP'=>		'can not exist without group',
 	'S_ADDED_HOST_GROUP'=>				'Added host group',
