@@ -171,7 +171,7 @@ include_once('include/page_header.php');
 
 	$elementid = get_request('elementid',CProfile::get('web.slides.elementid', null));
 	if( 2 != $_REQUEST['fullscreen'] )
-		CProfile::update('web.slides.elementid',$elementid);
+		CProfile::update('web.slides.elementid',$elementid, PROFILE_TYPE_ID);
 
 	$effectiveperiod = navigation_bar_calc('web.slides', true);
 ?>
