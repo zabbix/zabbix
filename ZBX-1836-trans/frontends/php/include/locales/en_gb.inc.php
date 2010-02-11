@@ -1805,6 +1805,17 @@
 	'S_Y'=>			'Y',
 	'S_YOTTA'=>		'Yotta',
 
+//	httptest.inc.php
+	'S_SCENARIO_STEP_NUMBER_CANNOT_BE_LESS_ONE'=>	'Scenario step number cannot be less then 1',
+	'S_SCENARIO_STEP_NAME_SHOULD_CONTAIN'=>		'Scenario step name should contain',
+	'S_CHARACTERS_ONLY_SMALL'=>			'characters only',
+	'S_ONLY_CHARACTERS_ARE_ALLOWED'=>		'Only characters are allowed',
+	'S_CANNOT_ADD_NEW_APPLICATION'=>		'Cannot add new application',
+	'S_SCENARIO_WITH_NAME'=>			'Scenario with name',
+	'S_ADDED_SMALL'=>				'added',
+	'S_UPDATED_SMALL'=>				'updated',
+	'S_DELETED_SMALL'=>				'deleted',
+
 //	media.inc.php
 	'S_NO_MEDIA_WITH'=>			'No media with',
 	'S_NO_MEDIA_TYPE_WITH'=>		'No media type with',
