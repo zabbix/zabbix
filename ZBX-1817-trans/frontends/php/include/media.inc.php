@@ -62,7 +62,7 @@
 		}
 		else
 		{
-			error(S_NO_MEDIA_WITH.SPACE."=[$mediaid]");
+			error(S_NO_MEDIA_WITH_MEDIAID.SPACE."=[$mediaid]");
 		}
 		return	$result;
 	}
@@ -164,7 +164,7 @@
 					' AND '.DBin_node('mediatypeid');
 		$result=DBselect($sql);
 		if(DBfetch($result)){
-			error(S_AN_ACTION_TYPE_WITH_DESCRIPTION.SPACE."'".$description."'".SPACE.S_NO_MEDIA_TYPE_WITH);
+			error(S_AN_ACTION_TYPE_WITH_DESCRIPTION.SPACE."'".$description."'".SPACE.S_ALREADY_EXISTS_SMALL.'.');
 		}
 		else{
 			$mediatypeid=get_dbid("media_type","mediatypeid");
