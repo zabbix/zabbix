@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -548,7 +548,7 @@
 
 //	Footer
 	'S_ZABBIX'=>				'Zabbix',
-	'S_COPYRIGHT_BY'=>			'Copyright 2001-2009 by',
+	'S_COPYRIGHT_BY'=>			'Copyright 2001-2010 by',
 	'S_CONNECTED_AS'=>			'Connected as',
 	'S_NOT_CONNECTED'=>			'Not connected',
 	'S_SIA_ZABBIX'=>			'SIA Zabbix',
