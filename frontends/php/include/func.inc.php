@@ -730,7 +730,7 @@ function zbx_stristr($haystack, $needle){
 		$needle = mb_strtoupper($needle);
 
 		$pos = mb_strpos($haystack_B, $needle);
-		if($pos !== true){
+		if($pos !== false){
 			$pos = mb_substr($haystack, $pos);
 		}
 		return $pos;
