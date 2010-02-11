@@ -726,6 +726,7 @@
 	'S_ENABLE_SELECTED_HOST_GROUPS'=>	'Enable selected Host Groups?',
 	'S_DISABLE_SELECTED_HOST_GROUPS'=>	'Disable selected Host Groups?',
 	'S_DELETE_SELECTED_HOST_GROUPS'=>	'Delete selected Host Groups?',
+	'S_DELETE_SELECTED_GROUPS'=>		'Delete selected groups',
 
 //	hosts.php
 	'S_MACROS'=>					'Macros',
