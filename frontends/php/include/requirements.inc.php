@@ -313,6 +313,9 @@
 			preg_match('/(\d\.?)+/', $gd_info['GD Version'], $current);
 			$current = $current[0];
 		}
+		else{
+			$current = 'unknown';
+		}
 
 		if(version_compare($current, $recommended, '>=')){
 			$req = 2;
