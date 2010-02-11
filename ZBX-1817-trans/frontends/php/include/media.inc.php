@@ -62,7 +62,7 @@
 		}
 		else
 		{
-			error(S_NO_MEDIA_WITH_MEDIAID.SPACE."=[$mediaid]");
+			error(S_NO_MEDIA_WITH.SPACE."mediaid=[$mediaid]");
 		}
 		return	$result;
 	}

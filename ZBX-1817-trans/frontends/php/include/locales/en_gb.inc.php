@@ -1806,7 +1806,7 @@
 	'S_YOTTA'=>		'Yotta',
 
 //	media.inc.php
-	'S_NO_MEDIA_WITH_MEDIAID'=>			'No media with mediaid',
+	'S_NO_MEDIA_WITH'=>			'No media with',
 	'S_NO_MEDIA_TYPE_WITH'=>		'No media type with',
 	'S_AN_ACTION_TYPE_WITH_DESCRIPTION'=>	'An action type with description',
 	
