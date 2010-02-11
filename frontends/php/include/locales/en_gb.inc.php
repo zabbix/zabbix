@@ -1805,6 +1805,22 @@
 	'S_Y'=>			'Y',
 	'S_YOTTA'=>		'Yotta',
 
+//	validate.inc.php
+	'S_CRITICAL_ERROR'=>				'Critical error',
+	'S_FIELD'=>					'Field',
+	'S_IS_NOT_IP_RANGE_SMALL'=>			'is not IP range',
+	'S_IS_NOT_INTEGER_RANGE_SMALL'=>		'is not integer range',
+	'S_IS_NOT_INTEGER_SMALL'=>			'is not integer',
+	'S_IS_NOT_DOUBLE_SMALL'=>			'is not double',
+	'S_IS_NOT_STRING_SMALL'=>			'is not string',
+	'S_CONTAINS_MULTIBYTE_CHARS_SMALL'=>		'contains Multibyte chars',
+	'S_MULTIBYTE_CHARS_ARE_RESTRICTED_SMALL'=>	'multibyte chars are restricted',
+	'S_IS_NOT_A_COLOUR_SMALL'=>			'is not a colour',
+	'S_IS_MANDATORY_SMALL'=>			'is mandatory',
+	'S_MUST_BE_MISSING_SMALL'=>			'must be missing',
+	'S_OPERATION_CANNOT_PERFORMED_UNAUTH_REQUEST'=>	'Operation cannot be performed due to unauthorized request',
+	'S_INCORRECT_VALUE_FOR'=>			'Incorrect value for',
+	
 //	triggers.inc.php
 	'S_NO_TRIGGER_WITH'=>					'No trigger with',
 	'S_INCORRECT_USAGE_OF_QUOTES'=>				'Incorrect usage of quotes',
