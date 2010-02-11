@@ -1269,10 +1269,9 @@ class CTemplate extends CZBXAPI{
 					$triggerids[$trigger['triggerid']] = $trigger['triggerid'];
 				}
 
-				$sql = 'SELECT DISTINCT h.hostid, h.host '.
+				$sql = 'SELECT DISTINCT h.host '.
 						' FROM trigger_depends td, functions f, items i, hosts h '.
-						' WHERE (('.DBcondition('td.triggerid_down',$triggerids).' AND f.triggerid=td.triggerid_up) '.
-							' OR ('.DBcondition('td.triggerid_up',$triggerids).' AND f.triggerid=td.triggerid_down)) '.
+						' WHERE ('.DBcondition('td.triggerid_down', $triggerids).' AND f.triggerid=td.triggerid_up) '.
 							' AND i.itemid=f.itemid '.
 							' AND h.hostid=i.hostid '.
 							' AND '.DBcondition('h.hostid', $templateids, true).
