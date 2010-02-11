@@ -1829,6 +1829,7 @@
 	'S_NO_APPLICATION_WITH'=>			'No application with',
 	'S_UNLINKED_SMALL'=>				'unlinked',
 	'S_TEMPLATE_WITH_ITEM_KEY'=>			'Template with item key',
+	'S_TEMPLATE_WITH_APPLICATION '=>			'Template with application',
 
 //	validate.inc.php
 	'S_CRITICAL_ERROR'=>				'Critical error',
