@@ -40,13 +40,16 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	ZBX_FPING_HOST	*host;
 	double		sec;
 	int		family;
+	
 #ifdef HAVE_IPV6
+
 	char		*fping;
 	char		fping_fping6_combination = 0;
-#define	FPING_EXISTS		1
-#define	FPING6_EXISTS		2
-#define	FPING_FPING6_EXIST	3
-#endif
+#define	FPING_EXISTS		0x1
+#define	FPING6_EXISTS		0x2
+#define	FPING_FPING6_EXIST	0x3
+
+#endif /* #ifdef HAVE_IPV6 */
 
 	assert(hosts);
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_ping() [hosts_count:%d]", hosts_count);
@@ -94,7 +97,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 #ifdef HAVE_IPV6
 	if (access(CONFIG_FPING6_LOCATION, F_OK|X_OK) == -1)
 	{
-		if ( !(fping_fping6_combination & FPING_EXISTS) )
+		if (FPING_EXISTS != (fping_fping6_combination & FPING_EXISTS))
 		{
 			zbx_snprintf(error, max_error_len, "At least one of '%s', '%s' must exist. Both are missing in the system.",
 					CONFIG_FPING_LOCATION,
@@ -114,7 +117,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 		if (family == PF_INET)
 		{
-			if ( !(fping_fping6_combination & FPING_EXISTS) )
+			if (FPING_EXISTS != (fping_fping6_combination & FPING_EXISTS))
 			{
 				zbx_snprintf(error, max_error_len, "File '%s' cannot be found in the system.", 
 						CONFIG_FPING_LOCATION);
@@ -125,7 +128,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		}
 		else
 		{
-			if ( !(fping_fping6_combination & FPING6_EXISTS) )
+			if (FPING6_EXISTS != (fping_fping6_combination & FPING6_EXISTS))
 			{
 				zbx_snprintf(error, max_error_len, "File '%s' cannot be found in the system.", 
 						CONFIG_FPING6_LOCATION);
@@ -142,7 +145,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	}
 	else /* CONFIG_SOURCE_IP has no value */	
 	{
-		if (fping_fping6_combination & FPING_FPING6_EXIST)
+		if (FPING_FPING6_EXIST == (fping_fping6_combination & FPING_FPING6_EXIST))
 		{
 			zbx_snprintf(tmp, sizeof(tmp), "%s %s 2>&1 <%s;%s %s 2>&1 <%s",
 				CONFIG_FPING_LOCATION,
@@ -152,7 +155,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 				params,
 				filename);
 		}
-		else if (fping_fping6_combination & FPING_EXISTS)
+		else if (FPING_EXISTS == (fping_fping6_combination & FPING_EXISTS))
 		{
 			zbx_snprintf(tmp, sizeof(tmp), "%s %s 2>&1 <%s",
 				CONFIG_FPING_LOCATION,
