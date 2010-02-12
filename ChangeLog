@@ -4,6 +4,7 @@ Changes for 1.9
 
 Changes for 1.8.2
 
+ - [ZBX-1961] added support of '%' prompt for telnet.run[] check (Sasha)
  - [ZBX-1939] fixed errors when unicode chars are used in item keys (Vedmak)
  - [ZBX-1996] fixed JS error in IE7 in maps (Aly)
  - [ZBX-1328] improved host group mass deletion caption (Richlv)
