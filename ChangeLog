@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1996] fixed JS error in IE7 in maps (Aly)
  - [ZBX-1328] improved host group mass deletion caption (Richlv)
  - [DEV-450] added support of LogSlowQueries option (Sasha)
  - [ZBX-1974] removed "Dropdown first entry" "1.6.2 comp mode" option (Vedmak)

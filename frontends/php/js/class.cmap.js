@@ -2930,7 +2930,7 @@ updateForm_link: function(e, linkid){
 	this.linkForm.linklabel.value = maplink.label;
 
 // SELEMENTID1
-	this.linkForm.selementid1.update();
+	$(this.linkForm.selementid1).update();
 	for(var selementid in this.selements){
 		if(empty(this.selements[selementid])) continue;
 
@@ -2951,7 +2951,7 @@ updateForm_link: function(e, linkid){
 
 
 // SELEMENTID2
-	this.linkForm.selementid2.update();
+	$(this.linkForm.selementid2).update();
 	for(var selementid in this.selements){
 		if(empty(this.selements[selementid])) continue;
 
