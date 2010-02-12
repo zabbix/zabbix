@@ -581,7 +581,7 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('ZBX_PREG_SPACES', '(\s+){0,1}');
 	define('ZBX_PREG_MACRO_NAME', '([A-Z0-9\._]+)');
 	define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_\. \-]+)');	/* !!! Don't forget sync code with C !!! */
-	define('ZBX_PREG_KEY_NAME', '([0-9a-zA-Z_\.,]+)');	/* !!! Don't forget sync code with C !!! */
+	define('ZBX_PREG_KEY_NAME', '([0-9a-zA-Z_\.]+)');	/* !!! Don't forget sync code with C !!! */
 	define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+){0,1}');
 	define('ZBX_PREG_SIGN', '([&|><=+*\/#\-])');
 	define('ZBX_PREG_NUMBER', '([\-+]?[0-9]+[.]{0,1}[0-9]*[A-Z]{0,1})');
@@ -593,8 +593,12 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('ZBX_PREG_HOST_FORMAT', ZBX_PREG_INTERNAL_NAMES);
 
 	define('ZBX_PREG_NODE_FORMAT', ZBX_PREG_INTERNAL_NAMES);
-	define('ZBX_PREG_ITEM_KEY_FORMAT', '('.ZBX_PREG_KEY_NAME.'(\['.ZBX_PREG_PARAMS.'\]){0,1})');
+	
+	
+	define('ZBX_PREG_ITEM_KEY_FORMAT', '('.ZBX_PREG_KEY_NAME.'(?(?=,)('.ZBX_PREG_PARAMS.')?|(\['.ZBX_PREG_PARAMS.'\])?))');
+	//define('ZBX_PREG_ITEM_KEY_FORMAT', '('.ZBX_PREG_KEY_NAME.'(\['.ZBX_PREG_PARAMS.'\]){0,1})');
 
+	
 	define('ZBX_PREG_FUNCTION_FORMAT', '('.ZBX_PREG_INTERNAL_NAMES.'(\('.ZBX_PREG_PARAMS.'\)))');
 
 	define('ZBX_PREG_SIMPLE_EXPRESSION_FORMAT','(\{'.ZBX_PREG_HOST_FORMAT.'\:'.ZBX_PREG_ITEM_KEY_FORMAT.'\.'.ZBX_PREG_FUNCTION_FORMAT.'\})');
@@ -608,7 +612,7 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 // REGEXP IDS
 	define('ZBX_KEY_ID', 1);
 	define('ZBX_KEY_NAME_ID', 2);
-	define('ZBX_KEY_PARAM_ID', 4);
+	define('ZBX_KEY_PARAM_ID', 6);
 
 	define('ZBX_SIMPLE_EXPRESSION_HOST_ID', 2);
 	define('ZBX_SIMPLE_EXPRESSION_KEY_ID', 2 + ZBX_KEY_ID);
