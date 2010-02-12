@@ -583,7 +583,8 @@ return $result;
 		$quoted = false;
 
 		for( $param_s = $i = 0, $len = zbx_strlen($string); $i < $len; $i++){
-			switch ( $string[$i] ){
+			$char = zbx_substr($string, $i, 1);
+			switch ( $char ){
 				case '"':
 					$quoted = !$quoted;
 					break;
