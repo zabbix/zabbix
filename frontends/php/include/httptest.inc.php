@@ -46,13 +46,13 @@ require_once('include/items.inc.php');
 
 	function db_save_step($hostid, $applicationid, $httptestid, $testname, $name, $no, $timeout, $url, $posts, $required, $status_codes, $delay, $history, $trends){
 		if($no <= 0){
-			error('Scenario step number can\'t be less then 1');
+			error(S_SCENARIO_STEP_NUMBER_CANNOT_BE_LESS_ONE);
 			return false;
 		}
 
 //		if(!eregi('^([0-9a-zA-Z\_\.[.-.]\$ ]+)$', $name)){
 		if(!preg_match('/^([0-9a-z_\.\-\$\s]+)$/i', $name)){
-			error("Scenario step name should contain '0-9a-zA-Z_ .$'- characters only");
+			error(S_SCENARIO_STEP_NAME_SHOULD_CONTAIN.SPACE."'0-9a-zA-Z_ .$'-".SPACE.S_CHARACTERS_ONLY_SMALL);
 			return false;
 		}
 
@@ -182,7 +182,7 @@ require_once('include/items.inc.php');
 		$trends = 90; // TODO !!! Allow user to set this parameter
 
 		if(!preg_match('/^(['.ZBX_PREG_PRINT.'])+$/u', $name)) {
-			error("Only characters are allowed");
+			error(S_ONLY_CHARACTERS_ARE_ALLOWED);
 			return false;
 		}
 
@@ -197,7 +197,7 @@ require_once('include/items.inc.php');
 		else{
 			$applicationid = add_application($application, $hostid);
 			if(!$applicationid){
-				error('Can\'t add new application. ['.$application.']');
+				error(S_CANNOT_ADD_NEW_APPLICATION.'. ['.$application.']');
 				return false;
 			}
 		}
@@ -216,7 +216,7 @@ require_once('include/items.inc.php');
 			if(DBfetch(DBselect('select t.httptestid from httptest t, applications a where t.applicationid=a.applicationid '.
 				' and a.hostid='.$hostid.' and t.name='.zbx_dbstr($name))))
 			{
-				error('Scenario with name ['.$name.'] already exist');
+				error(S_SCENARIO_WITH_NAME.SPACE.'['.$name.']'.SPACE.S_ALREADY_EXISTS_SMALL);
 				return false;
 			}
 
@@ -369,7 +369,7 @@ require_once('include/items.inc.php');
 	function add_httptest($hostid, $application, $name, $authentication, $http_user, $http_password, $delay, $status, $agent, $macros, $steps){
 		$result = db_save_httptest(null, $hostid, $application, $name, $authentication, $http_user, $http_password, $delay, $status, $agent, $macros, $steps);
 
-		if($result) info("Scenario '".$name."' added");
+		if($result) info(S_SCENARIO.SPACE."'".$name."'".SPACE.S_ADDED_SMALL);
 
 	return $result;
 	}
@@ -377,7 +377,7 @@ require_once('include/items.inc.php');
 	function update_httptest($httptestid, $hostid, $application, $name, $authentication, $http_user, $http_password, $delay, $status, $agent, $macros, $steps){
 		$result = db_save_httptest($httptestid, $hostid, $application, $name, $authentication, $http_user, $http_password, $delay, $status, $agent, $macros, $steps);
 
-		if($result)	info("Scenario '".$name."' updated");
+		if($result)	info(S_SCENARIO.SPACE."'".$name."'".SPACE.S_UPDATED_SMALL);
 
 	return $result;
 	}
@@ -429,7 +429,7 @@ require_once('include/items.inc.php');
 		if(!DBexecute('DELETE FROM httptest WHERE '.DBcondition('httptestid',$httptestids))) return false;
 
 		foreach($httptests as $id => $httptest){
-			info("Scenario '".$httptest["name"]."' deleted");
+			info(S_SCENARIO.SPACE."'".$httptest["name"]."'".SPACE.S_DELETED_SMALL);
 		}
 
 	return true;
