@@ -39,10 +39,9 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 	int		i;
 	ZBX_FPING_HOST	*host;
 	double		sec;
-	int		family;
 	
 #ifdef HAVE_IPV6
-
+	int		family;
 	char		*fping;
 	char		fping_fping6_combination = 0;
 #define	FPING_EXISTS		0x1
@@ -78,9 +77,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 #else /* #ifdef HAVE_IPV6 */
 		if (NULL != CONFIG_SOURCE_IP)
 		{
-			if (SUCCEED != get_address_family(CONFIG_SOURCE_IP, &family, error, max_error_len))
-				return NOTSUPPORTED;
-			if (family != PF_INET) /* we have IPv6 family address in CONFIG_SOURCE_IP */
+			if (FAIL == is_ip4(CONFIG_SOURCE_IP)) /* we do not have IPv4 family address in CONFIG_SOURCE_IP */
 			{
 				zbx_snprintf(error, max_error_len, 
 					"You should enable IPv6 support to use IPv6 family address for SourceIP '%s'.", CONFIG_SOURCE_IP);
