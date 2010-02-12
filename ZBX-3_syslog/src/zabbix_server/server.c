@@ -49,7 +49,7 @@
 #include "escalator/escalator.h"
 
 char *progname = NULL;
-char title_message[] = "Zabbix Server (daemon)";
+char title_message[] = "Zabbix Server";
 char usage_message[] = "[-hV] [-c <file>] [-n <nodeid>]";
 
 #ifndef HAVE_GETOPT_LONG
@@ -421,7 +421,7 @@ int MAIN_ZABBIX_ENTRY(void)
 #	define IPV6_FEATURE_STATUS " NO"
 #endif
 
-	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. Zabbix %s (revision %s).",
+	zabbix_log( LOG_LEVEL_WARNING, "Starting Zabbix Server. Zabbix %s (revision %s).",
 			ZABBIX_VERSION,
 			ZABBIX_REVISION);
 

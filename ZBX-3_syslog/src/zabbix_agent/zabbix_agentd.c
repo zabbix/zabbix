@@ -239,7 +239,7 @@ int MAIN_ZABBIX_ENTRY(void)
 		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 	}
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd started. Zabbix %s (revision %s).",
+	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent started. Zabbix %s (revision %s).",
 			ZABBIX_VERSION,
 			ZABBIX_REVISION);
 
