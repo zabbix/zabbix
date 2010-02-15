@@ -170,9 +170,11 @@
 
 	if(isset($_REQUEST['print'])){
 		define('ZBX_PAGE_NO_MENU', 1);
-		$req = substr($_SERVER['REQUEST_URI'],0,strpos($_SERVER['REQUEST_URI'],'print')-1);
-
-		$link = new CLink(bold('&laquo;'.S_BACK_BIG), $req, 'small_font');
+		
+		$req = new CUrl();
+		$req->setArgument('print', null);
+		
+		$link = new CLink(bold('&laquo;'.S_BACK_BIG), $req->getUrl(), 'small_font');
 		$link->setAttribute('style','padding-left: 10px;');
 
 		$printview = new CDiv($link,'printless');
