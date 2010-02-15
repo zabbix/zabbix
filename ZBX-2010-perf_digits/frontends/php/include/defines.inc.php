@@ -719,6 +719,6 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	$_REQUEST = $_POST + $_GET;
 
 /* init precision */
-	ini_set("precision", 21);
+	ini_set("precision", 16);
 
 ?>
