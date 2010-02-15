@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1679] fixed error sometimes happen when use print button (Vedmak)
  - [ZBX-1980] added requirements check for php upload_max_filesize (Vedmak)
  - [ZBX-2002] refresh timer is now restarted instead of stopped when checkbox is checked(Vedmak)
  - [ZBX-1961] added support of '%' prompt for telnet.run[] check (Sasha)
