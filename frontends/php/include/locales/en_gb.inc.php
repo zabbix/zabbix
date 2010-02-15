@@ -1805,6 +1805,26 @@
 	'S_Y'=>			'Y',
 	'S_YOTTA'=>		'Yotta',
 
+//	items.inc.php
+	'S_INCORRECT_ARGUMENTS_PASTED_TO_FUNCTION'=>	'Incorrect arguments pasted to function',
+	'S_INCORRECT_KEY_FORMAT'=>			'Incorrect key format',
+	'S_DELAY_CANNOT_BE_LESS_THAN_ONE_SECOND'=>	'Delay cannot be less than 1 second',
+	'S_INVALID_SNMP_PORT'=>				'Invalid SNMP port',
+	'S_TYPE_INFORMATION_BUST_LOG_FOR_LOG_KEY'=>	'Type of information must be Log for log key',
+	'S_VALUE_TYPE_MUST_FLOAT_FOR_AGGREGATE_ITEMS'=>	'Value type must be Float for aggregate items',
+	'S_GROUP_FUNCTION'=>				'Group function',
+	'S_IS_NOT_ONE_OF'=>				'is not one of',
+	'S_ITEM_FUNCTION'=>				'Item function',
+	'S_KEY_DOES_NOT_MATCH'=>			'Key does not match',
+	'S_AN_ITEM_WITH_THE_KEY'=>			'An item with the Key',
+	'S_ALREADY_EXISTS_FOR_HOST_SMALL'=>		'already exists for host',
+	'S_THE_KEY_MUST_BE_UNIQUE'=>			'The key must be unique.',
+	'S_ADDED_NEW_ITEM'=>				'Added new item',
+	'S_UPDATED_SMALL'=>				'updated',
+	'S_NO_ITEM_WITH'=>				'No item with',
+	'S_DELETED_SMALL'=>				'deleted',
+	'S_UNKNOWN_VALUE_TYPE'=>			'Unknown value type',
+
 //	httptest.inc.php
 	'S_SCENARIO_STEP_NUMBER_CANNOT_BE_LESS_ONE'=>	'Scenario step number cannot be less then 1',
 	'S_SCENARIO_STEP_NAME_SHOULD_CONTAIN'=>		'Scenario step name should contain',
