@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1299] added check for the minimal (1.0.0) libssh2 library version (Dmitry)
  - [ZBX-1961] added support of '%' prompt for telnet.run[] check (Sasha)
  - [ZBX-1939] fixed errors when unicode chars are used in item keys (Vedmak)
  - [ZBX-1996] fixed JS error in IE7 in maps (Aly)

@@ -1,10 +1,14 @@
 # LIBSSH2_CHECK_CONFIG ([DEFAULT-ACTION])
 # ----------------------------------------------------------
 #    Alexander Vladishev                      Oct-26-2009
+#    Dmitry Borovikov                         Feb-13-2010
+#          --version control added (1.0.0)
 #
 # Checks for ssh2.  DEFAULT-ACTION is the string yes or no to
 # specify whether to default to --with-ssh2 or --without-ssh2.
 # If not supplied, DEFAULT-ACTION is no.
+#
+# The minimal supported SSH2 library version is 1.0.0.
 #
 # This macro #defines HAVE_SSH2 if a required header files are
 # found, and sets @SSH2_LDFLAGS@, @SSH2_CFLAGS@ and @SSH2_LIBS@
@@ -30,6 +34,24 @@ AC_TRY_LINK(
 found_ssh2="yes",)
 ])dnl
 
+AC_DEFUN([LIBSSH2_ACCEPT_VERSION],
+[
+	# get the version from the header file as a hex without "0x"
+	found_ssh2_version=`cat $1 | grep \#define.*LIBSSH2_VERSION_NUM | awk '{print substr(@S|@3,3,6);}'`
+	
+	# convert hex into decimal for comparison
+	found_ssh2_version=`echo "ibase=16;@S|@found_ssh2_version" | bc`
+	
+	# Zabbix minimal supported version of libssh2 in decimal is "65536" (0x010000)
+	minimal_libssh2_version=65536
+	
+	if test $found_ssh2_version -ge $minimal_libssh2_version; then
+		accept_ssh2_version="yes"
+	else
+		accept_ssh2_version="no"
+	fi;
+])dnl
+
 AC_DEFUN([LIBSSH2_CHECK_CONFIG],
 [
   AC_ARG_WITH(ssh2,[
@@ -46,6 +68,7 @@ AC_HELP_STRING([--with-ssh2@<:@=DIR@:>@],[use SSH2 package @<:@default=no@:>@, D
 	    want_ssh2="yes"
 	    _libssh2_dir=$withval
 	fi
+	accept_ssh2_version="no"
     ],[want_ssh2=ifelse([$1],,[no],[$1])]
   )
 
@@ -57,11 +80,13 @@ AC_HELP_STRING([--with-ssh2@<:@=DIR@:>@],[use SSH2 package @<:@default=no@:>@, D
          SSH2_LDFLAGS=-L$/usr/lib
          SSH2_LIBS="-lssh2"
          found_ssh2="yes"
+	 LIBSSH2_ACCEPT_VERSION([/usr/include/libssh2.h])
        elif test -f /usr/local/include/libssh2.h; then
          SSH2_CFLAGS=-I$/usr/local/include
          SSH2_LDFLAGS=-L$/usr/local/lib
          SSH2_LIBS="-lssh2"
          found_ssh2="yes"
+	 LIBSSH2_ACCEPT_VERSION([/usr/local/include/libssh2.h])
        else #libraries are not found in default directories
          found_ssh2="no"
          AC_MSG_RESULT(no)
@@ -72,6 +97,7 @@ AC_HELP_STRING([--with-ssh2@<:@=DIR@:>@],[use SSH2 package @<:@default=no@:>@, D
          SSH2_LDFLAGS=-L$_libssh2_dir/lib
          SSH2_LIBS="-lssh2"
          found_ssh2="yes"
+	 LIBSSH2_ACCEPT_VERSION([$_libssh2_dir/include/libssh2.h])
        else #if test -f $_libssh2_dir/include/libssh2.h; then
          found_ssh2="no"
          AC_MSG_RESULT(no)
