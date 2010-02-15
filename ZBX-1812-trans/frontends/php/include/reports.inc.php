@@ -367,7 +367,7 @@ function bar_report_form2(){
 
 	$config = get_request('config',1);
 
-	$title = get_request('title',S_REPORT.SPACE.'2');
+	$title = get_request('title',S_REPORT.' 2');
 	$xlabel = get_request('xlabel','');
 	$ylabel = get_request('ylabel','');
 
@@ -512,7 +512,7 @@ function bar_report_form3(){
 
 	$config = get_request('config',1);
 
-	$title = get_request('title',S_REPORT.SPACE.'2');
+	$title = get_request('title',S_REPORT.' 3');
 	$xlabel = get_request('xlabel','');
 	$ylabel = get_request('ylabel','');
 
