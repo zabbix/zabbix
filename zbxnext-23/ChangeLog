@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-2023] improved configuration triggers page (Aly)
  - [DEV-453] implemented import/export of zabbix maps (Aly)
  - [ZBX-1945] speed improvement for synchronization between nodes (Sasha)
  - [ZBX-1940] fixed map creation if zabbix doesn't contain images (Aly)
