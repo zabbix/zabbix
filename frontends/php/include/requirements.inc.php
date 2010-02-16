@@ -157,6 +157,34 @@
 
 		return $result;
 	}
+	
+	function check_php_max_input_time(){
+		$required = 300;
+		$recommended = 600;
+
+		$current = ini_get('max_input_time');
+
+		if($current >= $recommended){
+			$req = 2;
+		}
+		else if($current >= $required){
+			$req = 1;
+		}
+		else{
+			$req = 0;
+		}
+
+		$result = array(
+			'name' => 'PHP max input time',
+			'current' => $current,
+			'required' => $required,
+			'recommended' => $recommended,
+			'result' => $req,
+			'error' => '300 sec is a minimal limitation on input parse time for PHP scripts'
+		);
+
+		return $result;
+	}
 
 	function check_php_timezone(){
 		$current = ini_get('date.timezone');
@@ -464,6 +492,7 @@
 		$result[] = check_php_post_max_size();
 		$result[] = check_php_upload_max_filesize();
 		$result[] = check_php_max_execution_time();
+		$result[] = check_php_max_input_time();
 		$result[] = check_php_timezone();
 		$result[] = check_php_databases();
 		$result[] = check_php_bc();
