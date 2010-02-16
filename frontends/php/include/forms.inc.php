@@ -931,7 +931,7 @@
 		$frmUser->addItemToBottomRow(new CButton('save',S_SAVE));
 		if(isset($userid) && $profile == 0){
 			$frmUser->addItemToBottomRow(SPACE);
-			$delete_b = new CButtonDelete("Delete selected user?",url_param("form").url_param("config").url_param("userid"));
+			$delete_b = new CButtonDelete(S_DELETE_SELECTED_USER_Q,url_param("form").url_param("config").url_param("userid"));
 			if(bccomp($USER_DETAILS['userid'],$userid) == 0){
 				$delete_b->setAttribute('disabled','disabled');
 			}
@@ -1476,7 +1476,7 @@
 // } FORM FOR FILTER DISPLAY
 
 // SUBFILTERS {
-		$header = get_thin_table_header('Subfilter [affects only filtered data!]');
+		$header = get_thin_table_header(S_SUBFILTER.SPACE.'['.S_AFFECTS_ONLY_FILTERED_DATA_SMALL.']');
 		$form->addItem($header);
 		$table_subfilter = new Ctable();
 		$table_subfilter->setClass('filter');
@@ -2192,7 +2192,7 @@
 						);
 			}
 
-			$link = new CLink('throw map','config.php?config=6');
+			$link = new CLink(S_THROW_MAP_SMALL,'config.php?config=6');
 			$link->setAttribute('target','_blank');
 			$frmItem->addRow(array(S_SHOW_VALUE.SPACE,$link),$cmbMap);
 
@@ -2242,7 +2242,7 @@
 			if(!isset($limited)){
 				array_push($frmRow,
 					SPACE,
-					new CButtonDelete('Delete selected item?',
+					new CButtonDelete(S_DELETE_SELECTED_ITEM_Q,
 						url_param('form').url_param('groupid').url_param('itemid'))
 				);
 			}
@@ -2276,7 +2276,7 @@
 		}
 		$frmItem->addItemToBottomRow($cmbAction);
 		$frmItem->addItemToBottomRow(SPACE);
-		$frmItem->addItemToBottomRow(new CButton('register','do'));
+		$frmItem->addItemToBottomRow(new CButton('register',S_DO_SMALL));
 
 		$frmItem->show();
 	}
@@ -2347,7 +2347,7 @@
 		}
 
 		if(count($delay_flex_el)==0)
-			array_push($delay_flex_el, "No flexible intervals");
+			array_push($delay_flex_el, S_NO_FLEXIBLE_INTERVALS);
 		else
 			array_push($delay_flex_el, new CButton('del_delay_flex',S_DELETE_SELECTED));
 
@@ -2454,7 +2454,7 @@
 					get_node_name_by_elid($db_valuemap["valuemapid"], null, ': ').$db_valuemap["name"]
 					);
 
-		$link = new CLink("throw map","config.php?config=6");
+		$link = new CLink(S_THROW_MAP_SMALL,"config.php?config=6");
 		$link->setAttribute("target","_blank");
 		$frmItem->addRow(array( new CVisibilityBox('valuemapid_visible', get_request('valuemapid_visible'), 'valuemapid', S_ORIGINAL),
 			S_SHOW_VALUE, SPACE, $link),$cmbMap);
@@ -2493,7 +2493,7 @@
 		$copy_targetid = get_request('copy_targetid', array());
 
 		if(!is_array($group_itemid) || (is_array($group_itemid) && count($group_itemid) < 1)){
-			error("Incorrect list of items.");
+			error(S_INCORRECT_LIST_OF_ITEMS);
 			return;
 		}
 
@@ -2798,7 +2798,7 @@
 				foreach($exprs as $i => $e){
 					$tgt_chk = new CCheckbox('expr_target_single', ($i==0)?'yes':'no', 'check_target(this);', $e['id']);
 					$del_url = new CSpan(S_DELETE,'link');
-					$del_url->setAttribute('onclick', 'javascript: if(confirm("Delete expression?")) {'.
+					$del_url->setAttribute('onclick', 'javascript: if(confirm("'.S_DELETE_EXPRESSION_Q.'")) {'.
 										 	' delete_expression('.$e['id'] .');'.
 										 	' document.forms["config_triggers.php"].submit(); '.
 										'}');
@@ -2886,7 +2886,7 @@
 			$frmTrig->addItemToBottomRow(new CButton("clone",S_CLONE));
 			$frmTrig->addItemToBottomRow(SPACE);
 			if( !$limited ){
-				$frmTrig->addItemToBottomRow(new CButtonDelete("Delete trigger?",
+				$frmTrig->addItemToBottomRow(new CButtonDelete(S_DELETE_TRIGGER_Q,
 					url_param("form").url_param('groupid').url_param("hostid").
 					url_param("triggerid")));
 			}
@@ -6083,7 +6083,7 @@
 			}
 		}
 		else{
-			$frmHostP->addSpanRow("Profile for this host is missing","form_row_c");
+			$frmHostP->addSpanRow(S_PROFILE_FOR_THIS_HOST_IS_MISSING,"form_row_c");
 		}
 		$frmHostP->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param('prof_type')));
 	return $frmHostP;
@@ -6274,7 +6274,7 @@
 		$frmMap->addRow(S_HEIGHT,new CNumericBox('height',$height,5));
 
 		$cmbImg = new CComboBox('backgroundid',$backgroundid);
-		$cmbImg->addItem(0,'No image...');
+		$cmbImg->addItem(0,S_NO_IMAGE.'...');
 
 		$result=DBselect('SELECT * FROM images WHERE imagetype=2 AND '.DBin_node('imageid').' order by name');
 		while($row=DBfetch($result)){
@@ -6310,7 +6310,7 @@
 
 		if(isset($_REQUEST['sysmapid'])){
 			$frmMap->addItemToBottomRow(SPACE);
-			$frmMap->addItemToBottomRow(new CButtonDelete('Delete system map?',
+			$frmMap->addItemToBottomRow(new CButtonDelete(S_DELETE_SYSTEM_MAP_Q,
 					url_param('form').url_param('sysmapid')));
 		}
 
