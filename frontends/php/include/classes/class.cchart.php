@@ -24,7 +24,7 @@ class CChart extends CGraphDraw{
 
 	public function __construct($type = GRAPH_TYPE_NORMAL){
 		parent::__construct($type);
-
+		
 		$this->yaxismin = null;
 		$this->yaxismax = null;
 
@@ -368,7 +368,7 @@ class CChart extends CGraphDraw{
 							}
 
 							$dy = $var[$ci] - $var[$first_idx];
-							$var[$ci - ($dx - $cj)] = $var[$first_idx] + ($cj * $dy) / $dx;
+							$var[$ci - ($dx - $cj)] = bcadd($var[$first_idx] , bcdiv(($cj * $dy) , $dx));
 						}
 					}
 				}
@@ -600,8 +600,8 @@ class CChart extends CGraphDraw{
 				if($this->type == GRAPH_TYPE_STACKED){
 					$min_val_shift = min(count($val), count($shift_val));
 					for($ci=0; $ci < $min_val_shift; $ci++){
-						if($shift_val[$ci] < 0){
-							$val[$ci] += $shift_val[$ci];
+						if($shift_val[$ci] < 0){						
+							$val[$ci] += bcadd($shift_val[$ci], $val[$ci]);
 						}
 					}
 
@@ -669,7 +669,7 @@ class CChart extends CGraphDraw{
 				if(!isset($val)) continue;
 
 				for($ci=0; $ci < min(count($val),count($shift_val)); $ci++){
-					$val[$ci] += $shift_val[$ci];
+					$val[$ci] = bcadd($shift_val[$ci], $val[$ci]);
 				}
 //SDII($val);
 				if(!isset($maxY)){
@@ -762,8 +762,6 @@ class CChart extends CGraphDraw{
 
 		$dist = bcmul(5, bcpow(10, 18));
 		
-
-
 		$interval = 0;
 		foreach($intervals as $num => $int){
 			$t = abs($int - $col_interval);
@@ -774,28 +772,24 @@ class CChart extends CGraphDraw{
 			}
 		}
 //------
-
 // correctin MIN & MAX
-		$this->m_minY[$side] = floor($this->m_minY[$side] / $interval) * $interval;
-		$this->m_maxY[$side] = ceil($this->m_maxY[$side] / $interval) * $interval;
+		$this->m_minY[$side] = bcmul(floor(bcdiv($this->m_minY[$side], $interval)), $interval);
+		$this->m_maxY[$side] = bcmul(ceil(bcdiv($this->m_maxY[$side], $interval)), $interval);
 //--------------------
-
 //SDI($this->m_minY[$side].' - '.$this->m_maxY[$side].' : '.$interval);
 		$this->gridLinesCount[$side] = ceil(($this->m_maxY[$side] - $this->m_minY[$side]) / $interval);
-		$this->m_maxY[$side] = $this->m_minY[$side] + $interval * $this->gridLinesCount[$side];
+		$this->m_maxY[$side] = bcadd($this->m_minY[$side], bcmul($interval, $this->gridLinesCount[$side]));
 
 // division by zero
 		$diff_val = ($this->m_maxY[$side] - $this->m_minY[$side]);
 		if($diff_val == 0) $diff_val = 1;
 
 		$intervalX = ($interval * $this->sizeY) / $diff_val;
-
 //SDII(array($this->m_maxY[$side],$tmp_maxY[$side]));
 
 // we add 1 interval so max Y woun't be at most top
-		if($this->m_maxY[$side] == $tmp_maxY[$side]){
+		if(bccomp($this->m_maxY[$side], $tmp_maxY[$side], 6) == 0){
 			$this->gridLinesCount[$side]++;
-			$this->m_maxY[$side] += $interval;
 		}
 //SDI($this->m_maxY[$other_side].' - '.$this->m_minY[$other_side]);
 		if(isset($this->axis_valuetype[$other_side])){
@@ -811,8 +805,8 @@ class CChart extends CGraphDraw{
 			}
 
 // correcting MIN & MAX
-			$this->m_minY[$other_side] = floor($this->m_minY[$other_side] / $interval) * $interval;
-			$this->m_maxY[$other_side] = ceil($this->m_maxY[$other_side] / $interval) * $interval;
+			$this->m_minY[$other_side] = bcmul(floor(bcdiv($this->m_minY[$side], $interval)), $interval);
+			$this->m_maxY[$other_side] = bcmul(ceil(bcdiv($this->m_maxY[$side], $interval)), $interval);
 //--------------------
 
 // if we lowered min more than highed max - need additional recalculating
@@ -828,11 +822,10 @@ class CChart extends CGraphDraw{
 				}
 
 // recorrecting MIN & MAX
-				$this->m_minY[$other_side] = floor($this->m_minY[$other_side] / $interval) * $interval;
-				$this->m_maxY[$other_side] = ceil($this->m_maxY[$other_side] / $interval) * $interval;
+				$this->m_minY[$other_side] = bcmul(floor(bcdiv($this->m_minY[$side], $interval)), $interval);
+				$this->m_maxY[$other_side] = bcmul(ceil(bcdiv($this->m_maxY[$side], $interval)), $interval);
 //--------------------
 			}
-
 			$this->gridLinesCount[$other_side] = $this->gridLinesCount[$side];
 			$this->m_maxY[$other_side] = $this->m_minY[$other_side] + $interval * $this->gridLinesCount[$other_side];
 
@@ -1294,8 +1287,7 @@ class CChart extends CGraphDraw{
 		for($i=0; $i<=$hstr_count; $i++){
 // division by zero
 			$hstr_count = ($hstr_count == 0)?1:$hstr_count;
-
-			$str = convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units, false);
+			$str = convert_units(bcadd(bcdiv(bcmul(bcdiv(bcmul($this->sizeY, $i), $hstr_count), bcsub($maxY, $minY)), $this->sizeY), $minY), $units, false);
 
 			$dims = imageTextSize(8, 0, $str);
 
@@ -1368,7 +1360,8 @@ class CChart extends CGraphDraw{
 		for($i=0;$i<=$hstr_count;$i++){
 			if($hstr_count == 0) continue;
 
-			$str = convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units, false);
+			$str = convert_units(bcadd(bcdiv(bcmul(bcdiv(bcmul($this->sizeY, $i), $hstr_count), bcsub($maxY, $minY)), $this->sizeY), $minY), $units, false);
+			// $str = convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units, false);
 			imageText($this->im,
 				8,
 				0,
