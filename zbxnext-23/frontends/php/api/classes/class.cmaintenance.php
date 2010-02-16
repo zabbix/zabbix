@@ -92,9 +92,6 @@ class CMaintenance extends CZBXAPI{
 		$options = zbx_array_merge($def_options, $options);
 
 // editable + PERMISSION CHECK
-		if(defined('ZBX_API_REQUEST')){
-			$options['nopermissions'] = false;
-		}
 
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 			$maintenanceids = array();

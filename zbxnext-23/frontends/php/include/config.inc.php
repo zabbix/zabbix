@@ -33,32 +33,33 @@ function SDI($msg='SDI') { echo 'DEBUG INFO: '; var_dump($msg); echo SBR; } // D
 function SDII($msg='SDII') { echo 'DEBUG INFO: '; echo '<pre>'.print_r($msg, true).'</pre>'; echo SBR; } // DEBUG INFO!!!
 function VDP($var, $msg=null) { echo 'DEBUG DUMP: '; if(isset($msg)) echo '"'.$msg.'"'.SPACE; var_dump($var); echo SBR; } // DEBUG INFO!!!
 function TODO($msg) { echo 'TODO: '.$msg.SBR; }  // DEBUG INFO!!!
+
 function __autoload($class_name){
 	$class_name = zbx_strtolower($class_name);
 	$api = array(
-		'czbxapi' => 1,
-		'capiinfo' => 1,
+		'apiexception' => 1,
 		'caction' => 1,
 		'calert' => 1,
+		'capiinfo' => 1,
 		'capplication' => 1,
 		'cevent' => 1,
 		'cgraph' => 1,
+		'cgraphitem' => 1,
 		'chost' => 1,
 		'chostgroup' => 1,
+		'cimage' => 1,
 		'citem' => 1,
 		'cmaintenance' => 1,
-		'cproxy' => null,
+		'cmap' => 1,
+		'cproxy' => 1,
+		'cscreen' => 1,
 		'cscript' => 1,
 		'ctemplate' => 1,
 		'ctrigger' => 1,
 		'cuser' => 1,
 		'cusergroup' => 1,
 		'cusermacro' => 1,
-		'cscreen' => 1,
-		'cmap' => 1,
-		'cgraphitem' => 1,
-		'cproxy' => 1,
-		'apiexception' => 1,
+		'czbxapi' => 1
 	);
 
 	$rpc = array(
@@ -540,24 +541,25 @@ function __autoload($class_name){
 				' WHERE t.value='.TRIGGER_VALUE_TRUE.
 					' AND '.DBin_node('t.triggerid').
 					' AND exists('.
-							'SELECT e.eventid '.
-							' FROM events e '.
-							' WHERE e.object='.EVENT_OBJECT_TRIGGER.
-								' AND e.objectid=t.triggerid '.
-								' AND e.acknowledged=0'.
-							')';
+						'SELECT e.eventid '.
+						' FROM events e '.
+						' WHERE e.object='.EVENT_OBJECT_TRIGGER.
+							' AND e.objectid=t.triggerid '.
+							' AND e.acknowledged=0'.
+						')';
        	$result=DBselect($sql);
 		while($row=DBfetch($result)){
-			$triggerids = $triggerids.','.$row['triggerid'];
+			$triggerids.= ','.$row['triggerid'];
 			$priority[$row['priority']]++;
 		}
 
-		$md5sum=md5($triggerids);
+		$md5sum = md5($triggerids);
 
-		$priorities=0;
-		for($i=0;$i<=5;$i++)	$priorities += pow(100,$i)*$priority[$i];
+		$priorities = 0;
+		for($i=0; $i<=5; $i++)
+			$priorities += pow(100,$i)*$priority[$i];
 
-		return	"$priorities,$md5sum";
+	return	$priorities.','.$md5sum;
 	}
 
 	function parse_period($str){

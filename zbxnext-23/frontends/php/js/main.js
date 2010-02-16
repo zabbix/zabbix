@@ -51,6 +51,12 @@ start: function(){
 
 stop: function(){
 	clearTimeout(this.timeout);	
+},
+
+restart: function(){
+	this.stop();
+	this.delayLeft = this.delay;
+	this.start();
 }
 }
 

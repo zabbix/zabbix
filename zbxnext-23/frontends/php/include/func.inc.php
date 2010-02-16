@@ -939,7 +939,7 @@ return $result;
 
 // function: zbx_toArray
 // author: Aly
-function zbx_toArray(&$value){
+function zbx_toArray($value){
 	if(is_null($value)) return $value;
 	$result = array();
 

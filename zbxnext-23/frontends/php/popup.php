@@ -871,10 +871,12 @@ include_once('include/page_header.php');
 		$options = array(
 				'nodeids' => $nodeid,
 				'hostids'=>$hostid,
-				'extendoutput' => 1,
-				'select_hosts' => 1,
-				'filter' => 1,
-				'valuetype' => ITEM_VALUE_TYPE_LOG,
+				'output' => API_OUTPUT_EXTEND,
+				'select_hosts' => API_OUTPUT_EXTEND,
+				'filter' => array(
+					'value_type' => ITEM_VALUE_TYPE_LOG,
+				),
+				
 				'sortfield'=>'description'
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
@@ -921,8 +923,8 @@ include_once('include/page_header.php');
 				'nodeids' => $nodeid,
 				'hostids' => $hostid,
 				'webitems' => 1,
-				'extendoutput' => 1,
-				'select_hosts' => 1,
+				'output' => API_OUTPUT_EXTEND,
+				'select_hosts' => API_OUTPUT_EXTEND,
 				'sortfield'=>'description'
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
@@ -1094,13 +1096,14 @@ include_once('include/page_header.php');
 
 		$options = array(
 				'nodeids' => $nodeid,
-				'hostids'=>$hostid,
-				'extendoutput' => 1,
-				'select_hosts' => 1,
+				'hostids' => $hostid,
+				'output' => API_OUTPUT_EXTEND,
+				'select_hosts' => API_OUTPUT_EXTEND,
 				'templated' => 0,
-				'filter' => 1,
-				'valuetype' => array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64),
-				'status' => ITEM_STATUS_ACTIVE,
+				'filter' => array(
+					'value_type' => array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64),
+					'status' => ITEM_STATUS_ACTIVE
+				),
 				'sortfield'=>'description'
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
@@ -1196,11 +1199,12 @@ include_once('include/page_header.php');
 		$options = array(
 				'nodeids' => $nodeid,
 				'hostids'=> $hostid,
-				'extendoutput' => 1,
-				'select_hosts' => 1,
+				'output' => API_OUTPUT_EXTEND,
+				'select_hosts' => API_OUTPUT_EXTEND,
 				'templated' => 0,
-				'filter' => 1,
-				'status' => ITEM_STATUS_ACTIVE,
+				'filter' => array(
+					'status' => ITEM_STATUS_ACTIVE
+				),
 				'sortfield'=>'description'
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;

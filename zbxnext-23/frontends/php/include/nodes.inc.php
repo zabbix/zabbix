@@ -211,10 +211,20 @@
 
 		$nodeid = id2nodeid($id_val);
 //SDI($nodeid.' - '.$ZBX_NODES[$nodeid]['name']);
-		if ( !isset($ZBX_NODES[$nodeid]) )
-			return null;
+
+		if(!isset($ZBX_NODES[$nodeid]))	return null;
 
 		return $ZBX_NODES[$nodeid]['name'].$delimiter;
+	}
+
+	function getNodeIdByNodeName($nodeName){
+		global $ZBX_NODES, $ZBX_LOCALNODEID;
+
+		foreach($ZBX_NODES as $nodeid => $node){
+			if($node['name'] == $nodeName) return $nodeid;
+		}
+
+	return ZBX_DISTRIBUTED?$ZBX_LOCALNODEID:0;
 	}
 
 	function is_show_all_nodes(){

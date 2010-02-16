@@ -158,7 +158,7 @@ include_once('include/page_header.php');
 //SDI($selements);
 
 	$expandProblem = ($map['highlight'] > 1)? 0 : 1;
-	$map_info = getSelementsInfo($selements, $expandProblem);
+	$map_info = getSelementsInfo(array('selements' => $selements), $expandProblem);
 
 //SDI($links); exit;
 // Draw connectors

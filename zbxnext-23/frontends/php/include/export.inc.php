@@ -21,7 +21,7 @@
 <?php
 
 class zbxXML{
-
+	private static $xml = null;
 	private static $ZBX_EXPORT_MAP = array(
 		XML_TAG_HOST => array(
 			'attributes' => array(
@@ -240,11 +240,11 @@ class zbxXML{
 			}
 			if(is_array($value)){
 				$node = $xml->addChild($key);
-				self::toXml($value, $root, $node);
+				self::arrayToXML($value, $root, $node);
 			}
 			else{
 				$value = htmlentities($value);
-				$xml->addChild($key, $value);
+				$xml->addChild(htmlspecialchars($key), htmlspecialchars($value));
 			}
 		}
 
@@ -254,6 +254,26 @@ class zbxXML{
 		$doc->formatOutput = true;
 
 		return preg_replace_callback('/^( {2,})/m', 'self::callback', $doc->saveXML());
+	}
+
+	public static function XMLtoArray($parentNode){
+		$array = array();
+
+		foreach($parentNode->childNodes as $node){
+			if($node->nodeType == 3){
+				if($node->nextSibling) continue;
+				if(!$node->isWhitespaceInElementContent()) return $node->nodeValue;
+			}
+
+			if($node->hasChildNodes()){
+				if(strpos($node->nodeName, 'node_') !== false)
+					$array[] = self::XMLtoArray($node);
+				else
+					$array[$node->nodeName] = self::XMLtoArray($node);
+			}
+		}
+
+	return $array;
 	}
 
 	private static function addChildData($node, $child_name, $data){
@@ -270,6 +290,744 @@ class zbxXML{
 		}
 
 	return $child_node;
+	}
+
+
+
+	private static function mapXML2arr($xml, $tag){
+		$array = array();
+
+		foreach(self::$ZBX_EXPORT_MAP[$tag]['attributes'] as $attr => $value){
+			if($value == '') $value = $attr;
+
+			if($xml->getAttribute($value) != ''){
+				$array[$attr] = $xml->getAttribute($value);
+			}
+		}
+
+// fill empty values with key if empty
+		$map = self::$ZBX_EXPORT_MAP[$tag]['elements'];
+		foreach($map as $db_name => $xml_name){
+			if($xml_name == '')
+				$map[$db_name] = $db_name;
+			else
+				$map[$xml_name] = $db_name;
+		}
+
+		foreach($xml->childNodes as $node){
+			if(isset($map[$node->nodeName]))
+				$array[$map[$node->nodeName]] = $node->nodeValue;
+		}
+
+		return $array;
+	}
+
+	public static function import($file){
+
+		$result = true;
+
+		libxml_use_internal_errors(true);
+
+		self::$xml = new DOMDocument();
+		$result = self::$xml->load($file);
+
+		if(!$result){
+			foreach(libxml_get_errors() as $error){
+				$text = '';
+
+				switch($error->level){
+					case LIBXML_ERR_WARNING:
+						$text .= 'Warning '.$error->code.': ';
+					break;
+					case LIBXML_ERR_ERROR:
+						$text .= 'Error '.$error->code.': ';
+					break;
+					case LIBXML_ERR_FATAL:
+						$text .= 'Fatal Error '.$error->code.': ';
+					break;
+				}
+
+				$text .= trim($error->message) . ' [ Line: '.$error->line.' | Column: '.$error->column.' ]';
+				error($text);
+			}
+
+			libxml_clear_errors();
+			return false;
+		}
+	}
+
+	public static function parseMap($rules){
+		$importMaps = self::XMLtoArray(self::$xml);
+		$importMaps = $importMaps['root']['sysmaps'];
+
+		if(!isset($rules['map']['exist']) && !isset($rules['map']['missed'])) return true;
+
+		$result = true;
+		$sysmaps = array();
+		foreach($importMaps as $mnum => &$sysmap){
+			$db_maps = CMap::checkObjects(array('name' => $sysmap['name']));
+
+			if(!empty($db_maps) && isset($rules['map']['exist'])){
+				CMap::delete($db_maps);
+				info('Map ['.$sysmap['name'].'] removed for update - user rule');
+			}
+			else if(!empty($db_maps) || !isset($rules['map']['missed'])){
+				info('Map ['.$sysmap['name'].'] skipped - user rule');
+				unset($importMaps[$mnum]);
+				continue; // break if not update exist
+			}
+
+			if(isset($sysmap['backgroundid'])){
+				$image = getImageByIdent($sysmap['backgroundid']);
+
+				if(!$image){
+					error('Cannot find image "'.$sysmap['backgroundid']['name'].'" used in exported map "'.$sysmap['name'].'"');
+					$sysmap['backgroundid'] = 0;
+				}
+				else{
+					$sysmap['backgroundid'] = $image['imageid'];
+				}
+			}
+			else{
+				$sysmap['backgroundid'] = 0;
+			}
+
+			foreach($sysmap['selements'] as $snum => &$selement){
+				switch($selement['elementtype']){
+					case SYSMAP_ELEMENT_TYPE_MAP:
+						$db_sysmaps = CMap::getObjects($selement['elementid']);
+						if(empty($db_sysmaps)){
+							error('Cannot find map "'.$selement['elementid']['name'].'" used in exported map "'.$sysmap['name'].'"');
+							return false;
+						}
+
+						$tmp = reset($db_sysmaps);
+						$selement['elementid'] = $tmp['sysmapid'];
+					break;
+					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+						$db_hostgroups = CHostgroup::getObjects($selement['elementid']);
+						if(empty($db_hostgroups)){
+							error('Cannot find hostgroup "'.$selement['elementid']['name'].'" used in exported map "'.$sysmap['name'].'"');
+							return false;
+						}
+
+						$tmp = reset($db_hostgroups);
+						$selement['elementid'] = $tmp['groupid'];
+					break;
+					case SYSMAP_ELEMENT_TYPE_HOST:
+						$db_hosts = CHost::getObjects($selement['elementid']);
+						if(empty($db_hosts)){
+							error('Cannot find host "'.$selement['elementid']['host'].'" used in exported map "'.$sysmap['name'].'"');
+							return false;
+						}
+
+						$tmp = reset($db_hosts);
+						$selement['elementid'] = $tmp['hostid'];
+					break;
+					case SYSMAP_ELEMENT_TYPE_TRIGGER:
+						$db_triggers = CTrigger::getObjects($selement['elementid']);
+						if(empty($db_triggers)){
+							error('Cannot find trigger "'.$selement['elementid']['host'].':'.$selement['elementid']['description'].'" used in exported map "'.$sysmap['name'].'"');
+							return false;
+						}
+
+						$tmp = reset($db_triggers);
+						$selement['elementid'] = $tmp['triggerid'];
+					break;
+					case SYSMAP_ELEMENT_TYPE_IMAGE:
+					default:
+						$db_images = CImage::getObjects($selement['elementid']);
+						if(empty($db_images)){
+							error('Cannot find image "'.$selement['elementid']['name'].'" used in exported map "'.$sysmap['name'].'"');
+							return false;
+						}
+
+						$tmp = reset($db_images);
+						$selement['elementid'] = $tmp['imageid'];
+				}
+
+				$icons = array('iconid_off','iconid_on','iconid_unknown','iconid_disabled','iconid_maintenance');
+				foreach($icons as $icon){
+					if(isset($selement[$icon])){
+						$image = getImageByIdent($selement[$icon]);
+						if(!$image){
+							error('Cannot find image "'.$selement[$icon]['name'].'" used in exported map "'.$sysmap['name'].'"');
+							return false;
+						}
+						$selement[$icon] = $image['imageid'];
+					}
+					else{
+						$selement[$icon] = 0;
+					}
+				}
+			}
+			unset($selement);
+
+			foreach($sysmap['links'] as $lnum => &$link){
+				if(!isset($link['linktriggers'])) continue;
+
+				foreach($link['linktriggers'] as $ltnum => &$linktrigger){
+					$db_triggers = CTrigger::getObjects($linktrigger['triggerid']);
+					if(empty($db_triggers)){
+						error('Cannot find trigger "'.$linktrigger['triggerid']['host'].':'.$linktrigger['triggerid']['description'].'" used in exported map "'.$sysmap['name'].'"');
+						return false;
+					}
+					$tmp = reset($db_triggers);
+					$linktrigger['triggerid'] = $tmp['triggerid'];
+				}
+				unset($linktrigger);
+			}
+			unset($link);
+
+			$sysmaps[] = $sysmap;
+//SDII($sysmap);
+		}
+		unset($sysmap);
+
+		$importMaps = $sysmaps;
+
+//SDII($importMaps);
+		try{
+			foreach($importMaps as $mnum => $importMap){
+				$sysmaps = CMap::create($importMap);
+				$sysmap = reset($sysmaps);
+
+				$selements = $importMap['selements'];
+				$links = $importMap['links'];
+
+				foreach($selements as $id => $selement){
+					if($selement['elementid'] == 0){
+						$selement['elementtype'] = SYSMAP_ELEMENT_TYPE_IMAGE;
+					}
+
+					if($selement['iconid_off'] == 0){
+						throw new Exception('Cannot save map. Map element "'.$selement['label'].'" contains no icon.');
+					}
+
+					$selement['sysmapid'] = $sysmap['sysmapid'];
+					$selementid = add_element_to_sysmap($selement);
+					foreach($links as $id => &$link){
+						if($link['selementid1'] == $selement['selementid']) $links[$id]['selementid1'] = $selementid;
+						else if($link['selementid2'] == $selement['selementid']) $links[$id]['selementid2'] = $selementid;
+					}
+				}
+
+
+				foreach($links as $id => $link){
+					if(!isset($link['linktriggers'])) $link['linktriggers'] = array();
+					$link['sysmapid'] = $sysmap['sysmapid'];
+					$result = add_link($link);
+				}
+
+				info('Map ['.$sysmap['name'].'] added');
+			}
+		}
+		catch(Exception $e){
+			error($e->getMessage());
+			return false;
+		}
+
+	return $result;
+	}
+
+	public static function parseMain($rules){
+		$triggers_for_dependencies = array();
+		$result = true;
+
+		if(isset($rules['host']['exist']) || isset($rules['host']['missed'])){
+			$xpath = new DOMXPath(self::$xml);
+			$hosts = $xpath->query('hosts/host');
+
+			foreach($hosts as $hnum => $host){
+// IMPORT RULES
+				$host_db = self::mapXML2arr($host, XML_TAG_HOST);
+
+				if(isset($host_db['proxy_hostid'])){
+					$proxy_exists = CHost::get(array('hostids' => $host_db['proxy_hostid']));
+					if(empty($proxy_exists))
+						$host_db['proxy_hostid'] = 0;
+				}
+
+				if(!isset($host_db['status'])) $host_db['status'] = HOST_STATUS_TEMPLATE;
+				if($host_db['status'] == HOST_STATUS_TEMPLATE){
+					$current_host = CTemplate::getObjects(array('host' => $host_db['host']));
+				}
+				else{
+					$current_host = CHost::getObjects(array('host' => $host_db['host']));
+				}
+
+				$current_host = reset($current_host);
+
+				if(!$current_host && !isset($rules['host']['missed'])){
+					info('Host ['.$host_db['host'].'] skipped - user rule');
+					continue; // break if update nonexist
+				}
+				if($current_host && !isset($rules['host']['exist'])){
+					info('Host ['.$host_db['host'].'] skipped - user rule');
+					continue; // break if not update exist
+				}
+
+
+// HOST GROUPS {{{
+				$xpath = new DOMXPath(self::$xml);
+				$groups = $xpath->query('groups/group', $host);
+				$host_groups = array();
+				if($groups->length == 0){
+					$default_group = CHostGroup::getObjects(array('name' => ZBX_DEFAULT_IMPORT_HOST_GROUP));
+
+					if(empty($default_group)){
+						$default_group = CHostGroup::create(array('name' => ZBX_DEFAULT_IMPORT_HOST_GROUP));
+						if($default_group === false){
+							error(CHostGroup::resetErrors());
+							$result = false;
+							break;
+						}
+					}
+					$host_groups = $default_group;
+				}
+				else{
+					$groups_to_add = array();
+					foreach($groups as $gnum => $group){
+						$current_group = CHostGroup::getObjects(array('name' => $group->nodeValue));
+
+						if(empty($current_group)){
+							$groups_to_add[] = array('name' => $group->nodeValue);
+						}
+						else{
+							$host_groups = array_merge($host_groups, $current_group);
+						}
+					}
+
+					if(!empty($groups_to_add)){
+						$new_groups = CHostGroup::create($groups_to_add);
+						if($new_groups === false){
+							error(CHostGroup::resetErrors());
+							$result = false;
+							break;
+						}
+
+						$host_groups = array_merge($host_groups, $new_groups);
+					}
+				}
+// }}} HOST GROUPS
+
+
+// MACROS
+				$xpath = new DOMXPath(self::$xml);
+				$macros = $xpath->query('macros/macro', $host);
+
+				$host_macros = array();
+				if($macros->length > 0){
+					foreach($macros as $macro){
+						$host_macros[] = self::mapXML2arr($macro, XML_TAG_MACRO);
+					}
+				}
+// }}} MACROS
+
+
+// TEMPLATES {{{
+				if(isset($rules['template']['exist'])){
+					$xpath = new DOMXPath(self::$xml);
+					$templates = $xpath->query('templates/template', $host);
+
+					$host_templates = array();
+					foreach($templates as $template){
+						$current_template = CTemplate::getObjects(array('host' => $template->nodeValue));
+						$current_template = reset($current_template);
+
+						if(!$current_template && !isset($rules['template']['missed'])){
+							info('Template ['.$template->nodeValue.'] skipped - user rule');
+							continue; // break if update nonexist
+						}
+						if($current_template && !isset($rules['template']['exist'])){
+							info('Template ['.$template->nodeValue.'] skipped - user rule');
+							continue; // break if not update exist
+						}
+
+						$host_templates[] = $current_template;
+					}
+					
+					$host_db['templates'] = $host_templates;
+				}
+// }}} TEMPLATES
+
+
+// HOSTS
+				$host_db['groups'] = $host_groups;
+				$host_db['macros'] = $host_macros;
+
+				if($current_host && isset($rules['host']['exist'])){
+
+					$current_host = array_merge($current_host, $host_db);
+
+					if($host_db['status'] == HOST_STATUS_TEMPLATE){
+						$r = CTemplate::update($current_host);
+					}
+					else{
+						$r = CHost::update($current_host);
+					}
+					if($r === false){
+						error(CHost::resetErrors());
+						$result = false;
+						break;
+					}
+				}
+
+				if(!$current_host && isset($rules['host']['missed'])){
+
+					if($host_db['status'] == HOST_STATUS_TEMPLATE){
+						$current_host = CTemplate::create($host_db);
+					}
+					else{
+						$current_host = CHost::create($host_db);
+					}
+
+					if(empty($current_host)){
+						error(CHostGroup::resetErrors());
+						$result = false;
+						break;
+					}
+
+					$current_host = reset($current_host);
+				}
+
+
+// HOST PROFILES {{{
+				$xpath = new DOMXPath(self::$xml);
+				$profile_node = $xpath->query('host_profile/*', $host);
+
+				if($profile_node->length > 0){
+					$profile = array();
+					foreach($profile_node as $num => $field){
+						$profile[$field->nodeName] = $field->nodeValue;
+					}
+
+					delete_host_profile($current_host['hostid']);
+					add_host_profile($current_host['hostid'],
+						$profile['devicetype'],
+						$profile['name'],
+						$profile['os'],
+						$profile['serialno'],
+						$profile['tag'],
+						$profile['macaddress'],
+						$profile['hardware'],
+						$profile['software'],
+						$profile['contact'],
+						$profile['location'],
+						$profile['notes']
+					);
+				}
+
+				$xpath = new DOMXPath(self::$xml);
+				$profile_ext_node = $xpath->query('host_profiles_ext/*', $host);
+
+				if($profile_ext_node->length > 0){
+					$profile_ext = array();
+					foreach($profile_ext_node as $num => $field){
+						$profile_ext[$field->nodeName] = $field->nodeValue;
+					}
+
+					delete_host_profile_ext($current_host['hostid']);
+					add_host_profile_ext($current_host['hostid'], $profile_ext);
+				}
+// }}} HOST PROFILES
+
+
+// ITEMS {{{
+				if(isset($rules['item']['exist']) || isset($rules['item']['missed'])){
+					$xpath = new DOMXPath(self::$xml);
+					$items = $xpath->query('items/item', $host);
+
+
+					$items_to_add = array();
+					$items_to_upd = array();
+					foreach($items as $inum => $item){
+						$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
+
+						$item_db['hostid'] = $current_host['hostid'];
+
+						$current_item = CItem::getObjects($item_db);
+						$current_item = reset($current_item);
+
+						if(!$current_item && !isset($rules['item']['missed'])){
+							info('Item ['.$item_db['key_'].'] skipped - user rule');
+							continue; // break if not update exist
+						}
+						if($current_item && !isset($rules['item']['exist'])){
+							info('Item ['.$item_db['key_'].'] skipped - user rule');
+							continue; // break if not update exist
+						}
+
+
+
+// ITEM APPLICATIONS {{{
+						$xpath = new DOMXPath(self::$xml);
+						$applications = $xpath->query('applications/application', $item);
+
+						$item_applications = array();
+						$applications_to_add = array();
+
+						foreach($applications as $application){
+							$application_name = $application->nodeValue;
+							$application_db = array('name' => $application_name, 'hostid' => $current_host['hostid']);
+
+							$current_application = CApplication::getObjects($application_db);
+
+							if(empty($current_application)){
+								$applications_to_add = array_merge($applications_to_add, $application_db);
+							}
+							else{
+								$item_applications = array_merge($item_applications, $current_application);
+							}
+						}
+
+						if(!empty($applications_to_add)){
+							$new_applications = CApplication::create($applications_to_add);
+							if($new_applications === false){
+								error(CApplication::resetErrors());
+								$result = false;
+								break 2;
+							}
+							$item_applications = array_merge($item_applications, $new_applications);
+						}
+// }}} ITEM APPLICATIONS
+
+						if($current_item && isset($rules['item']['exist'])){
+							$current_item = CItem::update($current_item);
+							if($current_item === false){
+								error(CItem::resetErrors());
+								$result = false;
+								break;
+							}
+						}
+						if(!$current_item && isset($rules['item']['missed'])){
+							$item_db['hostid'] = $current_host['hostid'];
+
+							$current_item = CItem::create($item_db);
+							if($current_item === false){
+								error(CItem::resetErrors());
+								$result = false;
+								break;
+							}
+						}
+
+						$options = array(
+							'applications' => $item_applications,
+							'items' => $current_item
+						);
+						$r = CApplication::addItems($options);
+						if($r === false){
+							error(CApplication::resetErrors());
+							$result = false;
+							break;
+						}
+					}
+				}
+// }}} ITEMS
+
+
+// TRIGGERS {{{
+				if(isset($rules['trigger']['exist']) || isset($rules['trigger']['missed'])){
+					$xpath = new DOMXPath(self::$xml);
+					$triggers = $xpath->query('triggers/trigger', $host);
+
+					$added_triggers = array();
+					$triggers_to_add = array();
+					$triggers_to_upd = array();
+
+					foreach($triggers as $trigger){
+						$trigger_db = self::mapXML2arr($trigger, XML_TAG_TRIGGER);
+						$trigger_db['expression'] = str_replace('{{HOSTNAME}:', '{'.$host_db['host'].':', $trigger_db['expression']);
+						$trigger_db['hostid'] = $current_host['hostid'];
+
+						$current_trigger = CTrigger::getObjects($trigger_db);
+						$current_trigger = reset($current_trigger);
+
+						if(!$current_trigger && !isset($rules['trigger']['missed'])){
+							info('Trigger ['.$trigger_db['description'].'] skipped - user rule');
+							continue; // break if not update exist
+						}
+						if($current_trigger && !isset($rules['trigger']['exist'])){
+							info('Trigger ['.$trigger_db['description'].'] skipped - user rule');
+							continue; // break if not update exist
+						}
+
+						if($current_trigger && isset($rules['trigger']['exist'])){
+							$triggers_for_dependencies[] = $current_trigger;
+							$current_trigger['expression'] = explode_exp($current_trigger['expression'], false);
+							$triggers_to_upd[] = $current_trigger;
+						}
+						if(!$current_trigger && isset($rules['trigger']['missed'])){
+							$trigger_db['hostid'] = $current_host['hostid'];
+							$triggers_to_add[] = $trigger_db;
+						}
+					}
+
+					if(!empty($triggers_to_add)){
+						$added_triggers = CTrigger::create($triggers_to_add);
+						if($added_triggers === false){
+							error(CTrigger::resetErrors());
+							$result = false;
+							break;
+						}
+					}
+					if(!empty($triggers_to_upd)){
+						$r = CTrigger::update($triggers_to_upd);
+						if($r === false){
+							error(CTrigger::resetErrors());
+							$result = false;
+							break;
+						}
+					}
+
+					$triggers_for_dependencies = array_merge($triggers_for_dependencies, $added_triggers);
+				}
+// }}} TRIGGERS
+
+
+// GRAPHS {{{
+				if(isset($rules['graph']['exist']) || isset($rules['graph']['missed'])){
+					$xpath = new DOMXPath(self::$xml);
+					$graphs = $xpath->query('graphs/graph', $host);
+
+					$graphs_to_add = array();
+					foreach($graphs as $gnum=> $graph){
+						$graph_db = self::mapXML2arr($graph, XML_TAG_GRAPH);
+						$graph_db['hostid'] = $current_host['hostid'];
+
+						$current_graph = CGraph::getObjects($graph_db);
+						$current_graph = reset($current_graph);
+
+						if(!$current_graph && !isset($rules['graph']['missed'])){
+							info('Graph ['.$graph_db['name'].'] skipped - user rule');
+							continue; // break if not update exist
+						}
+						if($current_graph && !isset($rules['graph']['exist'])){
+							info('Graph ['.$graph_db['name'].'] skipped - user rule');
+							continue; // break if not update exist
+						}
+
+						if($current_graph){
+							if(!empty($graph_db['ymin_item_key'])){
+								$graph_db['ymin_item_key'] = explode(':', $graph_db['ymin_item_key']);
+								if(count($graph_db['ymin_item_key']) < 2){
+									error('Incorrect y min item for graph ['.$graph_db['name'].']');
+								}
+
+								$current_graph['host']	= array_shift($graph_db['ymin_item_key']);
+								$current_graph['ymin_item_key']	= implode(':', $graph_db['ymin_item_key']);
+
+								if(!$item = get_item_by_key($current_graph['ymin_item_key'], $current_graph['host'])){
+									error('Missed item ['.$current_graph['ymin_item_key'].'] for host ['.$current_graph['host'].']');
+								}
+
+								$current_graph['ymin_itemid'] = $item['itemid'];
+							}
+
+							if(!empty($graph_db['ymax_item_key'])){
+								$graph_db['ymax_item_key'] = explode(':', $graph_db['ymax_item_key']);
+								if(count($graph_db['ymax_item_key']) < 2){
+									error('Incorrect y max item for graph ['.$graph_db['name'].']');
+								}
+
+								$current_graph['host']	= array_shift($graph_db['ymax_item_key']);
+								$current_graph['ymax_item_key']	= implode(':', $graph_db['ymax_item_key']);
+
+								if(!$item = get_item_by_key($current_graph['ymax_item_key'], $current_graph['host'])){
+									error('Missed item ['.$current_graph['ymax_item_key'].'] for host ['.$current_graph['host'].']');
+								}
+
+								$current_graph['ymax_itemid'] = $item['itemid'];
+							}
+						}
+						if($current_graph){ // if exists, delete graph to add then new
+							CGraph::delete($current_graph);
+						}
+// GRAPH ITEMS {{{
+						$xpath = new DOMXPath(self::$xml);
+						$gitems = $xpath->query('graph_elements/graph_element', $graph);
+
+						$gitems_to_add = array();
+						foreach($gitems as $ginum => $gitem){
+							$gitem_db = self::mapXML2arr($gitem, XML_TAG_GRAPH_ELEMENT);
+
+							$data = explode(':', $gitem_db['host_key_']);
+							$gitem_host = array_shift($data);
+							if($gitem_host == '{HOSTNAME}'){
+								$gitem_host = $host_db['host'];
+							}
+
+							$gitem_hostid = CHost::getObjects(array('host' => $gitem_host));
+							$gitem_templateid = CTemplate::getObjects(array('host' => $gitem_host));
+							$gitem_hostid = array_merge($gitem_hostid, $gitem_templateid);
+
+							if(!empty($gitem_hostid)){
+
+								$gitem_hostid = reset($gitem_hostid);
+
+								$gitem_db['hostid'] = $gitem_hostid['hostid'];
+								$gitem_db['key_'] = implode(':', $data);
+
+								$current_gitem = CItem::getObjects($gitem_db);
+								$current_gitem = reset($current_gitem);
+								if($current_gitem){ // if item exists, add graph item to graph
+									$gitem_db['itemid'] = $current_gitem['itemid'];
+									$graph_db['gitems'][$current_gitem['itemid']] = $gitem_db;
+								}
+							}
+						}
+
+						$graphs_to_add[] = $graph_db;
+					}
+					$r = CGraph::create($graphs_to_add);
+					if($r === false){
+						error(CGraph::resetErrors());
+						$result = false;
+						break;
+					}
+				}
+			}
+
+			if(!$result) return false;
+// DEPENDENCIES
+			$xpath = new DOMXPath(self::$xml);
+			$dependencies = $xpath->query('dependencies/dependency');
+
+			if($dependencies->length > 0){
+				$triggers_for_dependencies = zbx_objectValues($triggers_for_dependencies, 'triggerid');
+				$triggers_for_dependencies = array_flip($triggers_for_dependencies);
+
+				foreach($dependencies as $dependency){
+					$triggers_to_add_dep = array();
+
+					$trigger_description = $dependency->getAttribute('description');
+					$current_triggerid = get_trigger_by_description($trigger_description);
+
+// sdi('<b><u>Trigger Description: </u></b>'.$trigger_description.' | <b>Current_triggerid: </b>'. $current_triggerid['triggerid']);
+
+					if($current_triggerid && isset($triggers_for_dependencies[$current_triggerid['triggerid']])){
+						$xpath = new DOMXPath(self::$xml);
+						$depends_on_list = $xpath->query('depends', $dependency);
+
+						foreach($depends_on_list as $depends_on){
+							$depends_triggerid = get_trigger_by_description($depends_on->nodeValue);;
+// sdi('<b>depends on description: </b>'.$depends_on->nodeValue.' | <b>depends_triggerid: </b>'. $depends_triggerid['triggerid']);
+							if($depends_triggerid['triggerid']){
+								$triggers_to_add_dep[] = $depends_triggerid['triggerid'];
+							}
+						}
+						$r = update_trigger($current_triggerid['triggerid'],null,null,null,null,null,null,null,$triggers_to_add_dep,null);
+						if($r === false){
+							$result = false;
+							break;
+						}
+					}
+				}
+			}
+
+			if(!$result) return false;
+			else return true;
+		}
 	}
 
 	public static function export($data){
@@ -433,533 +1191,6 @@ class zbxXML{
 
 		return preg_replace_callback('/^( {2,})/m', array('zbxXML', 'space2tab'), $doc->saveXML());
 	}
-
-	private static function mapXML2arr($xml, $tag){
-		$array = array();
-
-		foreach(self::$ZBX_EXPORT_MAP[$tag]['attributes'] as $attr => $value){
-			if($value == '') $value = $attr;
-
-			if($xml->getAttribute($value) != ''){
-				$array[$attr] = $xml->getAttribute($value);
-			}
-		}
-
-// fill empty values with key if empty
-		$map = self::$ZBX_EXPORT_MAP[$tag]['elements'];
-		foreach($map as $db_name => $xml_name){
-			if($xml_name == '')
-				$map[$db_name] = $db_name;
-			else
-				$map[$xml_name] = $db_name;
-		}
-
-		foreach($xml->childNodes as $node){
-			if(isset($map[$node->nodeName]))
-				$array[$map[$node->nodeName]] = $node->nodeValue;
-		}
-
-		return $array;
-	}
-
-	public static function import($rules, $file){
-
-		$result = true;
-
-		libxml_use_internal_errors(true);
-
-		$xml = new DOMDocument();
-		$result = $xml->load($file);
-
-		if(!$result){
-			foreach(libxml_get_errors() as $error){
-				$text = '';
-
-				switch($error->level){
-					case LIBXML_ERR_WARNING:
-						$text .= 'Warning $error->code: ';
-					break;
-					case LIBXML_ERR_ERROR:
-						$text .= 'Error $error->code: ';
-					break;
-					case LIBXML_ERR_FATAL:
-						$text .= 'Fatal Error $error->code: ';
-					break;
-				}
-
-				$text .= trim($error->message) . ' [ Line: '.$error->line.' | Column: '.$error->column.' ]';
-				error($text);
-			}
-
-			libxml_clear_errors();
-			return false;
-		}
-
-		$triggers_for_dependencies = array();
-
-		if(isset($rules['host']['exist']) || isset($rules['host']['missed'])){
-			$xpath = new DOMXPath($xml);
-			$hosts = $xpath->query('hosts/host');
-
-			foreach($hosts as $hnum => $host){
-// IMPORT RULES
-				$host_db = self::mapXML2arr($host, XML_TAG_HOST);
-
-				if(isset($host_db['proxy_hostid'])){
-					$proxy_exists = CHost::get(array('hostids' => $host_db['proxy_hostid']));
-					if(empty($proxy_exists))
-						$host_db['proxy_hostid'] = 0;
-				}
-
-				if(!isset($host_db['status'])) $host_db['status'] = HOST_STATUS_TEMPLATE;
-				if($host_db['status'] == HOST_STATUS_TEMPLATE){
-					$current_host = CTemplate::getObjects(array('host' => $host_db['host']));
-				}
-				else{
-					$current_host = CHost::getObjects(array('host' => $host_db['host']));
-				}
-
-				$current_host = reset($current_host);
-
-				if(!$current_host && !isset($rules['host']['missed'])) continue; // break if update nonexist
-				if($current_host && !isset($rules['host']['exist'])) continue; // break if not update exist
-
-
-// HOST GROUPS {{{
-				$xpath = new DOMXPath($xml);
-				$groups = $xpath->query('groups/group', $host);
-				$host_groups = array();
-				if($groups->length == 0){
-					$default_group = CHostGroup::getObjects(array('name' => ZBX_DEFAULT_IMPORT_HOST_GROUP));
-
-					if(empty($default_group)){
-						$default_group = CHostGroup::create(array('name' => ZBX_DEFAULT_IMPORT_HOST_GROUP));
-						if($default_group === false){
-							error(CHostGroup::resetErrors());
-							$result = false;
-							break;
-						}
-					}
-					$host_groups = $default_group;
-				}
-				else{
-					$groups_to_add = array();
-					foreach($groups as $gnum => $group){
-						$current_group = CHostGroup::getObjects(array('name' => $group->nodeValue));
-
-						if(empty($current_group)){
-							$groups_to_add[] = array('name' => $group->nodeValue);
-						}
-						else{
-							$host_groups = array_merge($host_groups, $current_group);
-						}
-					}
-
-					if(!empty($groups_to_add)){
-						$new_groups = CHostGroup::create($groups_to_add);
-						if($new_groups === false){
-							error(CHostGroup::resetErrors());
-							$result = false;
-							break;
-						}
-
-						$host_groups = array_merge($host_groups, $new_groups);
-					}
-				}
-// }}} HOST GROUPS
-
-
-// MACROS
-				$xpath = new DOMXPath($xml);
-				$macros = $xpath->query('macros/macro', $host);
-
-				$host_macros = array();
-				if($macros->length > 0){
-					foreach($macros as $macro){
-						$host_macros[] = self::mapXML2arr($macro, XML_TAG_MACRO);
-					}
-				}
-// }}} MACROS
-
-
-// TEMPLATES {{{
-				if(isset($rules['template']['exist'])){
-					$xpath = new DOMXPath($xml);
-					$templates = $xpath->query('templates/template', $host);
-
-					$host_templates = array();
-					foreach($templates as $template){
-						$current_template = CTemplate::getObjects(array('host' => $template->nodeValue));
-						$current_template = reset($current_template);
-
-						if(!$current_template && !isset($rules['template']['missed'])) continue; // break if update nonexist
-						if($current_template && !isset($rules['template']['exist'])) continue; // break if not update exist
-
-						$host_templates[] = $current_template;
-					}
-					
-					$host_db['templates'] = $host_templates;
-				}
-// }}} TEMPLATES
-
-
-// HOSTS
-				$host_db['groups'] = $host_groups;
-				$host_db['macros'] = $host_macros;
-
-				if($current_host && isset($rules['host']['exist'])){
-
-					$current_host = array_merge($current_host, $host_db);
-
-					if($host_db['status'] == HOST_STATUS_TEMPLATE){
-						$r = CTemplate::update($current_host);
-					}
-					else{
-						$r = CHost::update($current_host);
-					}
-					if($r === false){
-						error(CHost::resetErrors());
-						$result = false;
-						break;
-					}
-				}
-
-				if(!$current_host && isset($rules['host']['missed'])){
-
-					if($host_db['status'] == HOST_STATUS_TEMPLATE){
-						$current_host = CTemplate::create($host_db);
-					}
-					else{
-						$current_host = CHost::create($host_db);
-					}
-
-					if(empty($current_host)){
-						error(CHostGroup::resetErrors());
-						$result = false;
-						break;
-					}
-
-					$current_host = reset($current_host);
-				}
-
-
-// HOST PROFILES {{{
-				$xpath = new DOMXPath($xml);
-				$profile_node = $xpath->query('host_profile/*', $host);
-
-				if($profile_node->length > 0){
-					$profile = array();
-					foreach($profile_node as $num => $field){
-						$profile[$field->nodeName] = $field->nodeValue;
-					}
-
-					delete_host_profile($current_host['hostid']);
-					add_host_profile($current_host['hostid'],
-						$profile['devicetype'],
-						$profile['name'],
-						$profile['os'],
-						$profile['serialno'],
-						$profile['tag'],
-						$profile['macaddress'],
-						$profile['hardware'],
-						$profile['software'],
-						$profile['contact'],
-						$profile['location'],
-						$profile['notes']
-					);
-				}
-
-				$xpath = new DOMXPath($xml);
-				$profile_ext_node = $xpath->query('host_profiles_ext/*', $host);
-
-				if($profile_ext_node->length > 0){
-					$profile_ext = array();
-					foreach($profile_ext_node as $num => $field){
-						$profile_ext[$field->nodeName] = $field->nodeValue;
-					}
-
-					delete_host_profile_ext($current_host['hostid']);
-					add_host_profile_ext($current_host['hostid'], $profile_ext);
-				}
-// }}} HOST PROFILES
-
-
-// ITEMS {{{
-				if(isset($rules['item']['exist']) || isset($rules['item']['missed'])){
-					$xpath = new DOMXPath($xml);
-					$items = $xpath->query('items/item', $host);
-
-
-					$items_to_add = array();
-					$items_to_upd = array();
-					foreach($items as $inum => $item){
-						$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
-
-						$item_db['hostid'] = $current_host['hostid'];
-
-						$current_item = CItem::getObjects($item_db);
-						$current_item = reset($current_item);
-
-						if(!$current_item && !isset($rules['item']['missed'])) continue; // break if update nonexist
-						if($current_item && !isset($rules['item']['exist'])) continue; // break if not update exist
-
-
-// ITEM APPLICATIONS {{{
-						$xpath = new DOMXPath($xml);
-						$applications = $xpath->query('applications/application', $item);
-
-						$item_applications = array();
-						$applications_to_add = array();
-
-						foreach($applications as $application){
-							$application_name = $application->nodeValue;
-							$application_db = array('name' => $application_name, 'hostid' => $current_host['hostid']);
-
-							$current_application = CApplication::getObjects($application_db);
-
-							if(empty($current_application)){
-								$applications_to_add = array_merge($applications_to_add, $application_db);
-							}
-							else{
-								$item_applications = array_merge($item_applications, $current_application);
-							}
-						}
-
-						if(!empty($applications_to_add)){
-							$new_applications = CApplication::create($applications_to_add);
-							if($new_applications === false){
-								error(CApplication::resetErrors());
-								$result = false;
-								break 2;
-							}
-							$item_applications = array_merge($item_applications, $new_applications);
-						}
-// }}} ITEM APPLICATIONS
-
-						if($current_item && isset($rules['item']['exist'])){
-							$current_item = CItem::update($current_item);
-							if($current_item === false){
-								error(CItem::resetErrors());
-								$result = false;
-								break;
-							}
-						}
-						if(!$current_item && isset($rules['item']['missed'])){
-							$item_db['hostid'] = $current_host['hostid'];
-
-							$current_item = CItem::create($item_db);
-							if($current_item === false){
-								error(CItem::resetErrors());
-								$result = false;
-								break;
-							}
-						}
-
-						$r = CApplication::addItems(array('applications' => $item_applications, 'items' => $current_item));
-						if($r === false){
-							error(CApplication::resetErrors());
-							$result = false;
-							break;
-						}
-					}
-				}
-// }}} ITEMS
-
-
-// TRIGGERS {{{
-				if(isset($rules['trigger']['exist']) || isset($rules['trigger']['missed'])){
-					$xpath = new DOMXPath($xml);
-					$triggers = $xpath->query('triggers/trigger', $host);
-
-					$added_triggers = array();
-					$triggers_to_add = array();
-					$triggers_to_upd = array();
-
-					foreach($triggers as $trigger){
-						$trigger_db = self::mapXML2arr($trigger, XML_TAG_TRIGGER);
-						$trigger_db['expression'] = str_replace('{{HOSTNAME}:', '{'.$host_db['host'].':', $trigger_db['expression']);
-						$trigger_db['hostid'] = $current_host['hostid'];
-
-						$current_trigger = CTrigger::getObjects($trigger_db);
-						$current_trigger = reset($current_trigger);
-
-
-						if(!$current_trigger && !isset($rules['trigger']['missed'])) continue; // break if update nonexist
-						if($current_trigger && !isset($rules['trigger']['exist'])) continue; // break if not update exist
-
-
-						if($current_trigger && isset($rules['trigger']['exist'])){
-							$triggers_for_dependencies[] = $current_trigger;
-							$current_trigger['expression'] = explode_exp($current_trigger['expression'], false);
-							$triggers_to_upd[] = $current_trigger;
-						}
-						if(!$current_trigger && isset($rules['trigger']['missed'])){
-							$trigger_db['hostid'] = $current_host['hostid'];
-							$triggers_to_add[] = $trigger_db;
-						}
-					}
-
-					if(!empty($triggers_to_add)){
-						$added_triggers = CTrigger::create($triggers_to_add);
-						if($added_triggers === false){
-							error(CTrigger::resetErrors());
-							$result = false;
-							break;
-						}
-					}
-					if(!empty($triggers_to_upd)){
-						$r = CTrigger::update($triggers_to_upd);
-						if($r === false){
-							error(CTrigger::resetErrors());
-							$result = false;
-							break;
-						}
-					}
-
-					$triggers_for_dependencies = array_merge($triggers_for_dependencies, $added_triggers);
-				}
-// }}} TRIGGERS
-
-
-// GRAPHS {{{
-				if(isset($rules['graph']['exist']) || isset($rules['graph']['missed'])){
-					$xpath = new DOMXPath($xml);
-					$graphs = $xpath->query('graphs/graph', $host);
-
-					$graphs_to_add = array();
-					foreach($graphs as $gnum=> $graph){
-						$graph_db = self::mapXML2arr($graph, XML_TAG_GRAPH);
-						$graph_db['hostid'] = $current_host['hostid'];
-
-						$current_graph = CGraph::getObjects($graph_db);
-						$current_graph = reset($current_graph);
-
-						if(!$current_graph && !isset($rules['graph']['missed'])) continue; // break if update nonexist
-						if($current_graph && !isset($rules['graph']['exist'])) continue; // break if not update exist
-
-						if($current_graph){
-							if(!empty($graph_db['ymin_item_key'])){
-								$graph_db['ymin_item_key'] = explode(':', $graph_db['ymin_item_key']);
-								if(count($graph_db['ymin_item_key']) < 2){
-									error('Incorrect y min item for graph ['.$graph_db['name'].']');
-								}
-
-								$current_graph['host']	= array_shift($graph_db['ymin_item_key']);
-								$current_graph['ymin_item_key']	= implode(':', $graph_db['ymin_item_key']);
-
-								if(!$item = get_item_by_key($current_graph['ymin_item_key'], $current_graph['host'])){
-									error('Missed item ['.$current_graph['ymin_item_key'].'] for host ['.$current_graph['host'].']');
-								}
-
-								$current_graph['ymin_itemid'] = $item['itemid'];
-							}
-
-							if(!empty($graph_db['ymax_item_key'])){
-								$graph_db['ymax_item_key'] = explode(':', $graph_db['ymax_item_key']);
-								if(count($graph_db['ymax_item_key']) < 2){
-									error('Incorrect y max item for graph ['.$graph_db['name'].']');
-								}
-
-								$current_graph['host']	= array_shift($graph_db['ymax_item_key']);
-								$current_graph['ymax_item_key']	= implode(':', $graph_db['ymax_item_key']);
-
-								if(!$item = get_item_by_key($current_graph['ymax_item_key'], $current_graph['host'])){
-									error('Missed item ['.$current_graph['ymax_item_key'].'] for host ['.$current_graph['host'].']');
-								}
-
-								$current_graph['ymax_itemid'] = $item['itemid'];
-							}
-						}
-						if($current_graph){ // if exists, delete graph to add then new
-							CGraph::delete($current_graph);
-						}
-// GRAPH ITEMS {{{
-						$xpath = new DOMXPath($xml);
-						$gitems = $xpath->query('graph_elements/graph_element', $graph);
-
-						$gitems_to_add = array();
-						foreach($gitems as $ginum => $gitem){
-							$gitem_db = self::mapXML2arr($gitem, XML_TAG_GRAPH_ELEMENT);
-
-							$data = explode(':', $gitem_db['host_key_']);
-							$gitem_host = array_shift($data);
-							if($gitem_host == '{HOSTNAME}'){
-								$gitem_host = $host_db['host'];
-							}
-
-							$gitem_hostid = CHost::getObjects(array('host' => $gitem_host));
-							$gitem_templateid = CTemplate::getObjects(array('host' => $gitem_host));
-							$gitem_hostid = array_merge($gitem_hostid, $gitem_templateid);
-
-							if(!empty($gitem_hostid)){
-
-								$gitem_hostid = reset($gitem_hostid);
-
-								$gitem_db['hostid'] = $gitem_hostid['hostid'];
-								$gitem_db['key_'] = implode(':', $data);
-
-								$current_gitem = CItem::getObjects($gitem_db);
-								$current_gitem = reset($current_gitem);
-								if($current_gitem){ // if item exists, add graph item to graph
-									$gitem_db['itemid'] = $current_gitem['itemid'];
-									$graph_db['gitems'][$current_gitem['itemid']] = $gitem_db;
-								}
-							}
-						}
-
-						$graphs_to_add[] = $graph_db;
-					}
-					$r = CGraph::create($graphs_to_add);
-					if($r === false){
-						error(CGraph::resetErrors());
-						$result = false;
-						break;
-					}
-				}
-			}
-
-			if(!$result) return false;
-// DEPENDENCIES
-			$xpath = new DOMXPath($xml);
-			$dependencies = $xpath->query('dependencies/dependency');
-
-			if($dependencies->length > 0){
-				$triggers_for_dependencies = zbx_objectValues($triggers_for_dependencies, 'triggerid');
-				$triggers_for_dependencies = array_flip($triggers_for_dependencies);
-
-				foreach($dependencies as $dependency){
-					$triggers_to_add_dep = array();
-
-					$trigger_description = $dependency->getAttribute('description');
-					$current_triggerid = get_trigger_by_description($trigger_description);
-
-// sdi('<b><u>Trigger Description: </u></b>'.$trigger_description.' | <b>Current_triggerid: </b>'. $current_triggerid['triggerid']);
-
-					if($current_triggerid && isset($triggers_for_dependencies[$current_triggerid['triggerid']])){
-						$xpath = new DOMXPath($xml);
-						$depends_on_list = $xpath->query('depends', $dependency);
-
-						foreach($depends_on_list as $depends_on){
-							$depends_triggerid = get_trigger_by_description($depends_on->nodeValue);;
-// sdi('<b>depends on description: </b>'.$depends_on->nodeValue.' | <b>depends_triggerid: </b>'. $depends_triggerid['triggerid']);
-							if($depends_triggerid['triggerid']){
-								$triggers_to_add_dep[] = $depends_triggerid['triggerid'];
-							}
-						}
-						$r = update_trigger($current_triggerid['triggerid'],null,null,null,null,null,null,null,$triggers_to_add_dep,null);
-						if($r === false){
-							$result = false;
-							break;
-						}
-					}
-				}
-			}
-
-			if(!$result) return false;
-			else return true;
-		}
-	}
-
 }
 
 ?>
