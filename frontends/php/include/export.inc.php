@@ -477,13 +477,13 @@ class zbxXML{
 
 				switch($error->level){
 					case LIBXML_ERR_WARNING:
-						$text .= 'Warning $error->code: ';
+						$text .= "Warning $error->code: ";
 					break;
 					case LIBXML_ERR_ERROR:
-						$text .= 'Error $error->code: ';
+						$text .= "Error $error->code: ";
 					break;
 					case LIBXML_ERR_FATAL:
-						$text .= 'Fatal Error $error->code: ';
+						$text .= "Fatal Error $error->code: ";
 					break;
 				}
 
