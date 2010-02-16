@@ -410,7 +410,7 @@ createBox: function(obj, hint_text, width, className, byClick){
 	else obj.parentNode.appendChild(box);
 	
 	box.setAttribute('id', boxid);
-	box.style.visibility = 'hidden';
+	box.style.display = 'none';
 	box.className = 'hintbox';
 	
 	if(!empty(className)){
@@ -533,7 +533,8 @@ show: function(e, obj, hintbox){
 	this.debug('show');
 	
 	var hintid = hintbox.id;
-	var body_width = get_bodywidth();
+	// var body_width = get_bodywidth();
+	var body_width = document.viewport.getDimensions().width;
 	
 //	pos = getPosition(obj);
 // this.debug('body width: ' + body_width);
@@ -552,12 +553,16 @@ show: function(e, obj, hintbox){
 	hintbox.x	= pos.left;
 //*/
 	
+	hintbox.style.visibility = 'hidden';
+	hintbox.style.display = 'block';
+
 	posit = $(obj).positionedOffset();
 	cumoff = $(obj).cumulativeOffset();
 	if(parseInt(cumoff.left+10+hintbox.offsetWidth) > body_width){
-		posit.left-=parseInt(hintbox.offsetWidth);
+		posit.left = posit.left - parseInt((cumoff.left+10+hintbox.offsetWidth) - body_width) + document.viewport.getScrollOffsets().left;
+		// posit.left-=parseInt(hintbox.offsetWidth);
 		posit.left-=10;
-		//posit.left=(pos.left < 0)?0:posit.left;
+		posit.left = (posit.left < 0) ? 0 : posit.left;
 	}
 	else{
 		posit.left+=10;
