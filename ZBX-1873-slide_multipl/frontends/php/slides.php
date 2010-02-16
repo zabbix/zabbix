@@ -117,15 +117,13 @@ include_once('include/page_header.php');
 
 						$element = get_screen($screen['screenid'],2,$effectiveperiod);
 
-						$refresh = CProfile::get('web.slides.rf_rate.hat_slides', 0, null, $elementid);
-						if($refresh == 0){
-							if($screen['delay'] > 0) $refresh = $screen['delay'];
-							else $refresh = $slideshow['delay'];
-						}
+						$refresh = CProfile::get('web.slides.rf_rate.hat_slides', 1, $elementid);
+						
+						$delay = ($screen['delay'] > 0) ? $screen['delay'] : $slideshow['delay'];
 
 						$element->show();
 
-						$script = get_update_doll_script('mainpage', $_REQUEST['favid'], 'frequency', $refresh)."\n";
+						$script = get_update_doll_script('mainpage', $_REQUEST['favid'], 'frequency', $refresh*$delay)."\n";
 						$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'restartDoll')."\n";
 						$script.= 'timeControl.processObjects();';
 						insert_js($script);
