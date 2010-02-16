@@ -3206,4 +3206,71 @@ return $result;
 
 	return $val;
 	}
+
+	function copy_triggers($srcid, $destid){
+		try{
+			$options = array(
+				'hostids' => $srcid,
+				'output' => API_OUTPUT_EXTEND,
+				'templated_hosts' => 1
+			);
+			$src = CHost::get($options);
+			if(empty($src)) throw new Exception();
+			$src = reset($src);
+			
+			
+			$options = array(
+				'hostids' => $destid,
+				'output' => API_OUTPUT_EXTEND,
+				'templated_hosts' => 1
+			);
+			$dest = CHost::get($options);
+			if(empty($dest)) throw new Exception();
+			$dest = reset($dest);
+			
+			
+			$options = array(
+				'hostids' => $srcid,
+				'output' => API_OUTPUT_EXTEND,
+				'inherited' => 0,
+				'select_dependencies' => API_OUTPUT_EXTEND
+			);
+			$triggers = CTrigger::get($options);
+		
+			
+			$hash = array();
+			
+			foreach($triggers as $trigger){	
+				$expr = explode_exp($trigger['expression'], 0);
+				$expr = str_replace($src['host'].':', $dest['host'].':', $expr);
+				$trigger['expression'] = $expr;
+				
+				$newtriggerid = CTrigger::create($trigger);
+				if(!$newtriggerid) throw new Exception();
+				
+				$hash[$trigger['triggerid']] = $newtriggerid[0]['triggerid'];
+			}
+
+			foreach($triggers as $trigger){	
+				foreach($trigger['dependencies'] as $dep){
+					if(isset($hash[$dep['triggerid']])){
+						$dep = $hash[$dep['triggerid']];
+					}
+					else{
+						$dep = $dep['triggerid'];
+					}
+
+					$res = add_trigger_dependency($hash[$trigger['triggerid']], $dep);
+					if(!$res) throw new Exception();
+				}
+			}
+			
+			return true;
+		}
+		catch(Exception $e){
+			return false;
+		}		
+	}
+	
+	
 ?>
