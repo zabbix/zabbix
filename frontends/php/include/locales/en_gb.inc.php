@@ -1805,6 +1805,19 @@
 	'S_Y'=>			'Y',
 	'S_YOTTA'=>		'Yotta',
 
+//	forms.inc.php
+	'S_DELETE_SELECTED_USER_Q'=>		'Delete selected user?',
+	'S_SUBFILTER'=>				'Subfilter',
+	'S_AFFECTS_ONLY_FILTERED_DATA_SMALL'=>	'affects only filtered data!',
+	'S_THROW_MAP_SMALL'=>			'throw map',
+	'S_DELETE_SELECTED_ITEM_Q'=>		'Delete selected item?',
+	'S_DO_SMALL'=>				'do',
+	'S_INCORRECT_LIST_OF_ITEMS'=>		'Incorrect list of items.',
+	'S_DELETE_TRIGGER_Q'=>			'Delete trigger?',
+	'S_PROFILE_FOR_THIS_HOST_IS_MISSING'=>	'Profile for this host is missing',
+        'S_NO_IMAGE'=>				'No image',
+	'S_DELETE_SYSTEM_MAP_Q'=>		'Delete system map?',
+	
 //	items.inc.php
 	'S_INCORRECT_ARGUMENTS_PASTED_TO_FUNCTION'=>	'Incorrect arguments pasted to function',
 	'S_INCORRECT_KEY_FORMAT'=>			'Incorrect key format',
