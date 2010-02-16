@@ -3232,7 +3232,7 @@ return $result;
 				'hostids' => $srcid,
 				'output' => API_OUTPUT_EXTEND,
 				'inherited' => 0,
-				'select_dependencies' => 1
+				'select_dependencies' => API_OUTPUT_EXTEND
 			);
 			$triggers = CTrigger::get($options);
 		
@@ -3249,12 +3249,16 @@ return $result;
 				
 				$hash[$trigger['triggerid']] = $newtriggerid[0]['triggerid'];
 			}
-			
-			foreach($triggers as $trigger){
+
+			foreach($triggers as $trigger){	
 				foreach($trigger['dependencies'] as $dep){
-					if(isset($hash[$dep])) 
-						$dep = $hash[$dep];
-						
+					if(isset($hash[$dep['triggerid']])){
+						$dep = $hash[$dep['triggerid']];
+					}
+					else{
+						$dep = $dep['triggerid'];
+					}
+
 					$res = add_trigger_dependency($hash[$trigger['triggerid']], $dep);
 					if(!$res) throw new Exception();
 				}
