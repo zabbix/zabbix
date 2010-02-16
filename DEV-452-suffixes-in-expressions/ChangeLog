@@ -1,6 +1,6 @@
 Changes for 1.8.2
 
- - [DEV-452] support of s,m,h,d suffixes in trigger expressions and functions (Aleksandrs)
+ - [DEV-452] support of s,m,h,d suffixes in trigger expressions and functions (asaveljevs)
  - [ZBX-1929] include eventlog.c and eventlog.h files in distribution package (Richlv)
  - [ZBX-1897] include CREDITS file in distribution package (Richlv)
  - [ZBXNEXT-229] further updates for Brazilian Portuguese translation; thanks to murilex (Richlv)

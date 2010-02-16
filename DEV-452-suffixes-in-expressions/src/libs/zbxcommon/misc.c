@@ -1037,7 +1037,7 @@ int	cmp_double(double a,double b)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: the functions supports suffixes K,M,G                            *
+ * Comments: the function supports suffixes K,M,G,s,m,h,d                     *
  *                                                                            *
  ******************************************************************************/
 int	is_double_prefix(char *c)
@@ -1063,8 +1063,8 @@ int	is_double_prefix(char *c)
 			dot=i;
 			continue;
 		}
-		/* Last digit is suffix 'K', 'M', 'G' */
-		if( ((c[i]=='K')||(c[i]=='M')||(c[i]=='G')) && (i == (int)strlen(c)-1))
+		/* Last character is suffix 'K', 'M', 'G', 's', 'm', 'h', 'd' */
+		if(strchr("KMGsmhd", c[i])!=NULL && c[i+1]=='\0')
 		{
 			continue;
 		}
