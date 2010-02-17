@@ -358,6 +358,10 @@ class zbxXML{
 
 	public static function parseMap($rules){
 		$importMaps = self::XMLtoArray(self::$xml);
+		if(!isset($importMaps['sysmaps'])){
+			info('Export does not contain ZABBIX maps');
+			return false;
+		}
 		$importMaps = $importMaps['sysmaps'];
 
 		if(!isset($rules['maps']['exist']) && !isset($rules['maps']['missed'])) return true;
@@ -542,6 +546,7 @@ class zbxXML{
 		}
 		catch(Exception $e){
 			error($e->getMessage());
+			info('Rollback!');
 			return false;
 		}
 
