@@ -383,7 +383,7 @@ class zbxXML{
 					$image = getImageByIdent($sysmap['backgroundid']);
 
 					if(!$image){
-						error('Cannot find image "'.$sysmap['backgroundid']['name'].'" used in exported map "'.$sysmap['name'].'"');
+						error('Cannot find background image "'.$sysmap['backgroundid']['name'].'" used in exported map "'.$sysmap['name'].'"');
 						$sysmap['backgroundid'] = 0;
 					}
 					else{
@@ -473,7 +473,7 @@ class zbxXML{
 						$db_triggers = CTrigger::getObjects($linktrigger['triggerid']);
 						if(empty($db_triggers)){
 							$error = 'Cannot find trigger "'.$nodeCaption.$linktrigger['triggerid']['host'].':'.$linktrigger['triggerid']['description'].'" used in exported map "'.$sysmap['name'].'"';
-							throw new Exception('MAP EXPORT FAILED', $error);
+							throw new Exception($error);
 						}
 
 						$tmp = reset($db_triggers);
