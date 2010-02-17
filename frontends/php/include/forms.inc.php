@@ -2509,8 +2509,11 @@
 		$target_list = array();
 
 		$groups = CHostGroup::get(array('extendoutput'=>1, 'order'=>'name'));
+		order_result($groups, 'name');
+		
 		if(0 == $copy_type){
 			$cmbGroup = new CComboBox('filter_groupid',$filter_groupid,'submit()');
+			
 			foreach($groups as $gnum => $group){
 				if(empty($filter_groupid)) $filter_groupid = $group['groupid'];
 				$cmbGroup->addItem($group['groupid'],$group['name']);
@@ -2518,10 +2521,14 @@
 
 			$frmCopy->addRow('Group', $cmbGroup);
 
-			$options = array('extendoutput'=>1,
-							'order'=>'host',
-							'groupids'=> $filter_groupid);
+			$options = array(
+				'extendoutput'=>1,
+				'groupids' => $filter_groupid,
+				'templated_hosts' => 1
+			);
 			$hosts = CHost::get($options);
+			order_result($hosts, 'host');
+			
 			foreach($hosts as $num => $host){
 				$hostid = $host['hostid'];
 
@@ -2532,21 +2539,6 @@
 						$hostid),
 					SPACE,
 					$host['host'],
-					BR()
-				));
-			}
-
-			$templates = CTemplate::get($options);
-
-			foreach($templates as $num => $template){
-				$templateid = $template['templateid'];
-				array_push($target_list,array(
-					new CCheckBox('copy_targetid['.$templateid.']',
-						uint_in_array($templateid, $copy_targetid),
-						null,
-						$templateid),
-					SPACE,
-					$template['host'],
 					BR()
 				));
 			}
