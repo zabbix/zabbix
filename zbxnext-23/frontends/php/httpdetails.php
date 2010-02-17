@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ require_once('include/hosts.inc.php');
 require_once('include/httptest.inc.php');
 require_once('include/forms.inc.php');
 
-$page['title'] = "S_DETAILS_OF_SCENARIO";
+$page['title'] = 'S_DETAILS_OF_SCENARIO';
 $page['file'] = 'httpdetails.php';
 $page['hist_arg'] = array('hostid','grouid','graphid');
 $page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.calendar.js','gtlc.js');
@@ -41,24 +41,19 @@ include_once('include/page_header.php');
 	$fields=array(
 		'period'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		'stime'=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
-
 		'reset'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-
 		'httptestid'=>	array(T_ZBX_INT, O_MAND,	null,	DB_ID,		null),
-
 		'groupid'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		'hostid'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 
 		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
-
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
-
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
 	);
 
-	check_fields($fields);
+	if(!check_fields($fields)) exit();;
 ?>
 <?php
 	if(isset($_REQUEST['favobj'])){
@@ -70,12 +65,14 @@ include_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 ?>
 <?php
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 
+	
 	$sql = 'SELECT ht.* '.
 		' FROM httptest ht, applications a '.
 		' WHERE '.DBcondition('a.hostid',$available_hosts).

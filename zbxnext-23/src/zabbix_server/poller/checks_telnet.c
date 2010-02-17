@@ -276,7 +276,7 @@ static int	telnet_login(int socket_fd, const char *username,
 	sz = sizeof(buf);
 	offset = 0;
 	while (-1 != (rc = telnet_read(socket_fd, buf, &sz, &offset)))
-		if ('$' == (c = telnet_lastchar(buf, offset)) || '#' == c || '>' == c)
+		if ('$' == (c = telnet_lastchar(buf, offset)) || '#' == c || '>' == c || '%' == c)
 		{
 			prompt_char = c;
 			break;

@@ -99,11 +99,11 @@ include_once('include/page_header.php');
 	);
 ?>
 <?php
-	$_REQUEST['config'] = get_request('config',get_profile('web.config.config',0));
+	$_REQUEST['config'] = get_request('config',CProfile::get('web.config.config',0));
 
 	check_fields($fields);
 
-	update_profile('web.config.config',$_REQUEST['config'],PROFILE_TYPE_INT);
+	CProfile::update('web.config.config',$_REQUEST['config'],PROFILE_TYPE_INT);
 
 	$orig_config = select_config();
 
@@ -739,7 +739,7 @@ include_once('include/page_header.php');
 //  config = 6 // Value Mapping  //
 ///////////////////////////////////
 	elseif($_REQUEST['config']==6){ // Value Mapping
-		if(isset($_REQUEST['form'])) {
+		if(isset($_REQUEST['form'])){
 			$frmValmap = new CFormTable(S_VALUE_MAP);
 			$frmValmap->setHelp("web.mapping.php");
 			$frmValmap->addVar("config",get_request("config",6));
@@ -819,30 +819,45 @@ include_once('include/page_header.php');
 		}
 		else{
 			$cnf_wdgt->addItem(BR());
-
 			$cnf_wdgt->addHeader(S_VALUE_MAPPING_BIG);
 
 			$table = new CTableInfo();
 			$table->setHeader(array(S_NAME, S_VALUE_MAP));
 
-			$db_valuemaps = DBselect('SELECT * FROM valuemaps WHERE '.DBin_node('valuemapid'));
+			$valueamaps = array();
+// get value maps
+			$db_valuemaps = DBselect('SELECT valuemapid, name FROM valuemaps WHERE '.DBin_node('valuemapid'));
 			while($db_valuemap = DBfetch($db_valuemaps)){
+				$valueamaps[$db_valuemap['valuemapid']] = $db_valuemap;
+				$valueamaps[$db_valuemap['valuemapid']]['maps'] = array();
+			}
+			
+			$db_maps = DBselect('SELECT valuemapid, value, newvalue FROM mappings WHERE '.DBin_node('mappingid'));
+			while($db_map = DBfetch($db_maps)){
+				$valueamaps[$db_map['valuemapid']]['maps'][] = array(
+					'value' => $db_map['value'],
+					'newvalue' => $db_map['newvalue']
+				);
+			}
+			
+
+			order_result($valueamaps, 'name');
+			foreach($valueamaps as $valuemap){
 				$mappings_row = array();
 
-				$sql = 'SELECT * '.
-						' FROM mappings'.
-						' WHERE valuemapid='.$db_valuemap['valuemapid'];
-				$db_maps = DBselect($sql);
-				while($db_map = DBfetch($db_maps)){
+				$maps = $valuemap['maps'];
+				order_result($maps, 'value');
+				foreach($maps as $map){
 					array_push($mappings_row,
-						$db_map['value'],
+						$map['value'],
 						SPACE.RARR.SPACE,
-						$db_map['newvalue'],
-						BR());
+						$map['newvalue'],
+						BR()
+					);
 				}
 				$table->addRow(array(
-					new CLink($db_valuemap['name'],'config.php?form=update&valuemapid='.$db_valuemap['valuemapid'].url_param('config')),
-					empty($mappings_row)?SPACE:$mappings_row
+					new CLink($valuemap['name'],'config.php?form=update&valuemapid='.$valuemap['valuemapid'].url_param('config')),
+					empty($mappings_row) ? SPACE : $mappings_row
 				));
 			}
 
@@ -884,7 +899,6 @@ include_once('include/page_header.php');
 		$combo_dd_first_entry = new CComboBox('dropdown_first_entry');
 		$combo_dd_first_entry->addItem(ZBX_DROPDOWN_FIRST_NONE, S_NONE, ($config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_NONE)?'yes':'no');
 		$combo_dd_first_entry->addItem(ZBX_DROPDOWN_FIRST_ALL, S_ALL_S, ($config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_ALL)?'yes':'no');
-		$combo_dd_first_entry->addItem(ZBX_DROPDOWN_FIRST_ZBX162, S_ZBX162_MODE, ($config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_ZBX162)?'yes':'no');
 
 		$check_dd_first_remember = new CCheckBox('dropdown_first_remember', $config['dropdown_first_remember'], null, 1);
 
@@ -934,7 +948,7 @@ include_once('include/page_header.php');
 					get_regexp_form(),//null,
 					null,
 					'hat_regexp'
-					//get_profile('web.config.hats.hat_regexp.state',1)
+					//CProfile::get('web.config.hats.hat_regexp.state',1)
 				));
 
 			$right_tab = new CTable();
@@ -948,7 +962,7 @@ include_once('include/page_header.php');
 					get_expressions_tab(),//null,
 					null,
 					'hat_expressions'
-//					get_profile('web.config.hats.hat_expressions.state',1)
+//					CProfile::get('web.config.hats.hat_expressions.state',1)
 				));
 
 			if(isset($_REQUEST['new_expression'])){
@@ -957,7 +971,7 @@ include_once('include/page_header.php');
 						get_expression_form(),//null
 						null,
 						'hat_new_expression'
-//						get_profile('web.config.hats.hat_new_expression.state',1)
+//						CProfile::get('web.config.hats.hat_new_expression.state',1)
 					));
 			}
 

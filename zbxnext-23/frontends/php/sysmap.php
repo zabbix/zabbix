@@ -85,7 +85,7 @@ include_once('include/page_header.php');
 <?php
 // ACTION /////////////////////////////////////////////////////////////////////////////
 	if(isset($_REQUEST['favobj'])){
-		@ob_flush();
+
 		$json = new CJSON();
 		if('sysmap' == $_REQUEST['favobj']){
 			$sysmapid = get_request('sysmapid',0);
@@ -294,6 +294,7 @@ include_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 ?>

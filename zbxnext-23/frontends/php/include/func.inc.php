@@ -659,10 +659,10 @@ function zbx_avg($values){
 
 	$sum = 0;
 	foreach($values as $num => $value){
-		$sum += $value;
+		$sum = bcadd($sum, $value);
 	}
 
-return ($sum / count($values));
+return bcdiv($sum, count($values));
 }
 
 // accepts parametr as integer either
@@ -730,7 +730,7 @@ function zbx_stristr($haystack, $needle){
 		$needle = mb_strtoupper($needle);
 
 		$pos = mb_strpos($haystack_B, $needle);
-		if($pos !== true){
+		if($pos !== false){
 			$pos = mb_substr($haystack, $pos);
 		}
 		return $pos;

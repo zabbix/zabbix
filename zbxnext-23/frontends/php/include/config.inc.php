@@ -819,13 +819,12 @@ function __autoload($class_name){
 
 
 		/* Comments: !!! Don't forget sync code with C !!! */
-		$result=DBselect('SELECT i.type, i.delay, count(*),count(*)/i.delay as qps '.
+		$result=DBselect('SELECT i.type, i.delay, count(*)/i.delay as qps '.
 							' FROM items i,hosts h '.
 							' WHERE i.status='.ITEM_STATUS_ACTIVE.
 								' AND i.hostid=h.hostid '.
 								' AND h.status='.HOST_STATUS_MONITORED.
-							' GROUP BY i.type,i.delay '.
-							' ORDER BY i.type, i.delay');
+							' GROUP BY i.type,i.delay ');
 
 		$status['qps_total']=0;
 		while($row=DBfetch($result)){
@@ -1133,19 +1132,19 @@ function __autoload($class_name){
 	function validate_sort_and_sortorder($sort=NULL,$sortorder=ZBX_SORT_UP){
 		global $page;
 
-		$_REQUEST['sort'] = get_request('sort',get_profile('web.'.$page['file'].'.sort',$sort));
-		$_REQUEST['sortorder'] = get_request('sortorder',get_profile('web.'.$page['file'].'.sortorder',$sortorder));
+		$_REQUEST['sort'] = get_request('sort',CProfile::get('web.'.$page['file'].'.sort',$sort));
+		$_REQUEST['sortorder'] = get_request('sortorder',CProfile::get('web.'.$page['file'].'.sortorder',$sortorder));
 
 		if(!is_null($_REQUEST['sort'])){
 //			$_REQUEST['sort'] = eregi_replace('[^a-z\.\_]','',$_REQUEST['sort']);
 			$_REQUEST['sort'] = preg_replace('/[^a-z\.\_]/i','',$_REQUEST['sort']);
-			update_profile('web.'.$page['file'].'.sort', $_REQUEST['sort'], PROFILE_TYPE_STR);
+			CProfile::update('web.'.$page['file'].'.sort', $_REQUEST['sort'], PROFILE_TYPE_STR);
 		}
 
 		if(!str_in_array($_REQUEST['sortorder'],array(ZBX_SORT_DOWN,ZBX_SORT_UP)))
 			$_REQUEST['sortorder'] = ZBX_SORT_UP;
 
-		update_profile('web.'.$page['file'].'.sortorder', $_REQUEST['sortorder'], PROFILE_TYPE_STR);
+		CProfile::update('web.'.$page['file'].'.sortorder', $_REQUEST['sortorder'], PROFILE_TYPE_STR);
 	}
 
 /* function:
@@ -1242,14 +1241,14 @@ function __autoload($class_name){
 
 	function getPageSortField($def){
 		global $page;
-		$tabfield = get_request('sort',get_profile('web.'.$page['file'].'.sort',$def));
+		$tabfield = get_request('sort',CProfile::get('web.'.$page['file'].'.sort',$def));
 
 	return $tabfield;
 	}
 
 	function getPageSortOrder($def=ZBX_SORT_UP){
 		global $page;
-		$sortorder = get_request('sortorder',get_profile('web.'.$page['file'].'.sortorder',$def));
+		$sortorder = get_request('sortorder',CProfile::get('web.'.$page['file'].'.sortorder',$def));
 
 	return $sortorder;
 	}
@@ -1284,8 +1283,8 @@ function __autoload($class_name){
 
 		if(empty($data)) return false;
 
-		$sortfield = get_request('sort',get_profile('web.'.$page['file'].'.sort',$def_field));
-		$sortorder = get_request('sortorder',get_profile('web.'.$page['file'].'.sortorder',$def_order));
+		$sortfield = get_request('sort',CProfile::get('web.'.$page['file'].'.sort',$def_field));
+		$sortorder = get_request('sortorder',CProfile::get('web.'.$page['file'].'.sortorder',$def_order));
 
 	return order_result($data, $sortfield, $sortorder, true);
 	}
@@ -1296,12 +1295,12 @@ function __autoload($class_name){
 		if(!empty($allways)) $allways = ','.$allways;
 		$sortable = explode(',',$def);
 
-		$tabfield = get_request('sort',get_profile('web.'.$page["file"].'.sort',null));
+		$tabfield = get_request('sort',CProfile::get('web.'.$page["file"].'.sort',null));
 
 		if(is_null($tabfield)) return ' ORDER BY '.$def.$allways;
 		if(!str_in_array($tabfield,$sortable)) return ' ORDER BY '.$def.$allways;
 
-		$sortorder = get_request('sortorder',get_profile('web.'.$page["file"].'.sortorder',ZBX_SORT_UP));
+		$sortorder = get_request('sortorder',CProfile::get('web.'.$page["file"].'.sortorder',ZBX_SORT_UP));
 
 	return ' ORDER BY '.$tabfield.' '.$sortorder.$allways;
 	}

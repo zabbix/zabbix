@@ -200,7 +200,7 @@ function bar_report_form(){
 	$function_type = get_request('function_type',CALC_FNC_AVG);
 	$scaletype = get_request('scaletype',TIMEPERIOD_TYPE_WEEKLY);
 
-	$title = get_request('title','Report 1');
+	$title = get_request('title',S_REPORT.' 1');
 	$xlabel = get_request('xlabel','');
 	$ylabel = get_request('ylabel','');
 	$showlegend = get_request('showlegend',0);
@@ -367,7 +367,7 @@ function bar_report_form2(){
 
 	$config = get_request('config',1);
 
-	$title = get_request('title','Report 2');
+	$title = get_request('title',S_REPORT.' 2');
 	$xlabel = get_request('xlabel','');
 	$ylabel = get_request('ylabel','');
 
@@ -512,7 +512,7 @@ function bar_report_form3(){
 
 	$config = get_request('config',1);
 
-	$title = get_request('title','Report 2');
+	$title = get_request('title',S_REPORT.' 3');
 	$xlabel = get_request('xlabel','');
 	$ylabel = get_request('ylabel','');
 

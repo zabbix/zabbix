@@ -996,14 +996,14 @@
 		if(!is_null($idx)){
 			if($update){
 				if(isset($_REQUEST['period']) && ($_REQUEST['period'] >= ZBX_MIN_PERIOD))
-					update_profile($idx.'.period',$_REQUEST['period'],PROFILE_TYPE_INT);
+					CProfile::update($idx.'.period',$_REQUEST['period'],PROFILE_TYPE_INT);
 					
 				if(isset($_REQUEST['stime']))
-					update_profile($idx.'.stime',$_REQUEST['stime'], PROFILE_TYPE_STR);
+					CProfile::update($idx.'.stime',$_REQUEST['stime'], PROFILE_TYPE_STR);
 			}
 
-			$_REQUEST['period'] = get_request('period', get_profile($idx.'.period', ZBX_PERIOD_DEFAULT));
-			$_REQUEST['stime'] = get_request('stime', get_profile($idx.'.stime'));
+			$_REQUEST['period'] = get_request('period', CProfile::get($idx.'.period', ZBX_PERIOD_DEFAULT));
+			$_REQUEST['stime'] = get_request('stime', CProfile::get($idx.'.stime'));
 		}
 
 		$_REQUEST['period'] = get_request('period', ZBX_PERIOD_DEFAULT);

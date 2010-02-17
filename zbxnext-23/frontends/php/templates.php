@@ -218,7 +218,7 @@ include_once('include/page_header.php');
 			));
 			if($result){
 				$template = reset($result);
-				$templateid = $template['hostid'];
+				$templateid = $template['templateid'];
 			}
 			else{
 				error(CTemplate::resetErrors());
@@ -251,15 +251,23 @@ include_once('include/page_header.php');
 			}
 
 // Host triggers
-			$options = array(
-				'hostids' => $clone_templateid,
-				'inherited' => 0,
-				'output' => API_OUTPUT_REFER
-			);
-			$db_triggers = CTrigger::get($options);
-			foreach($db_triggers as $tnum => $db_trig){
-				$result &= (bool) copy_trigger_to_host($db_trig['triggerid'], $templateid, true);
-			}
+			$result &= copy_triggers($clone_templateid, $templateid);
+			
+			// $available_triggers = get_accessible_triggers(PERM_READ_ONLY, array($clone_templateid), PERM_RES_IDS_ARRAY);
+
+			// $sql = 'SELECT DISTINCT t.triggerid, t.description '.
+					// ' FROM triggers t, items i, functions f'.
+					// ' WHERE i.hostid='.$clone_templateid.
+						// ' AND f.itemid=i.itemid '.
+						// ' AND t.triggerid=f.triggerid '.
+						// ' AND '.DBcondition('t.triggerid', $available_triggers).
+						// ' AND t.templateid=0 '.
+					// ' ORDER BY t.description';
+
+			// $res = DBselect($sql);
+			// while($db_trig = DBfetch($res)){
+				// $result &= (bool) copy_trigger_to_host($db_trig['triggerid'], $templateid, true);
+			// }
 
 // Host graphs
 			$options = array(

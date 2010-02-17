@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -726,6 +726,7 @@
 	'S_ENABLE_SELECTED_HOST_GROUPS'=>	'Enable selected Host Groups?',
 	'S_DISABLE_SELECTED_HOST_GROUPS'=>	'Disable selected Host Groups?',
 	'S_DELETE_SELECTED_HOST_GROUPS'=>	'Delete selected Host Groups?',
+	'S_DELETE_SELECTED_GROUPS'=>		'Delete selected groups',
 
 //	hosts.php
 	'S_MACROS'=>					'Macros',
@@ -1804,6 +1805,134 @@
 	'S_ZETTA'=>		'Zetta',
 	'S_Y'=>			'Y',
 	'S_YOTTA'=>		'Yotta',
+
+//	forms.inc.php
+	'S_DELETE_SELECTED_USER_Q'=>		'Delete selected user?',
+	'S_SUBFILTER'=>				'Subfilter',
+	'S_AFFECTS_ONLY_FILTERED_DATA_SMALL'=>	'affects only filtered data!',
+	'S_THROW_MAP_SMALL'=>			'throw map',
+	'S_DELETE_SELECTED_ITEM_Q'=>		'Delete selected item?',
+	'S_DO_SMALL'=>				'do',
+	'S_INCORRECT_LIST_OF_ITEMS'=>		'Incorrect list of items.',
+	'S_DELETE_TRIGGER_Q'=>			'Delete trigger?',
+	'S_PROFILE_FOR_THIS_HOST_IS_MISSING'=>	'Profile for this host is missing',
+        'S_NO_IMAGE'=>				'No image',
+	'S_DELETE_SYSTEM_MAP_Q'=>		'Delete system map?',
+	
+//	items.inc.php
+	'S_INCORRECT_ARGUMENTS_PASTED_TO_FUNCTION'=>	'Incorrect arguments pasted to function',
+	'S_INCORRECT_KEY_FORMAT'=>			'Incorrect key format',
+	'S_DELAY_CANNOT_BE_LESS_THAN_ONE_SECOND'=>	'Delay cannot be less than 1 second',
+	'S_INVALID_SNMP_PORT'=>				'Invalid SNMP port',
+	'S_TYPE_INFORMATION_BUST_LOG_FOR_LOG_KEY'=>	'Type of information must be Log for log key',
+	'S_VALUE_TYPE_MUST_FLOAT_FOR_AGGREGATE_ITEMS'=>	'Value type must be Float for aggregate items',
+	'S_GROUP_FUNCTION'=>				'Group function',
+	'S_IS_NOT_ONE_OF'=>				'is not one of',
+	'S_ITEM_FUNCTION'=>				'Item function',
+	'S_KEY_DOES_NOT_MATCH'=>			'Key does not match',
+	'S_AN_ITEM_WITH_THE_KEY'=>			'An item with the Key',
+	'S_ALREADY_EXISTS_FOR_HOST_SMALL'=>		'already exists for host',
+	'S_THE_KEY_MUST_BE_UNIQUE'=>			'The key must be unique.',
+	'S_ADDED_NEW_ITEM'=>				'Added new item',
+	'S_UPDATED_SMALL'=>				'updated',
+	'S_NO_ITEM_WITH'=>				'No item with',
+	'S_DELETED_SMALL'=>				'deleted',
+	'S_UNKNOWN_VALUE_TYPE'=>			'Unknown value type',
+
+//	httptest.inc.php
+	'S_SCENARIO_STEP_NUMBER_CANNOT_BE_LESS_ONE'=>	'Scenario step number cannot be less then 1',
+	'S_SCENARIO_STEP_NAME_SHOULD_CONTAIN'=>		'Scenario step name should contain',
+	'S_CHARACTERS_ONLY_SMALL'=>			'characters only',
+	'S_ONLY_CHARACTERS_ARE_ALLOWED'=>		'Only characters are allowed',
+	'S_CANNOT_ADD_NEW_APPLICATION'=>		'Cannot add new application',
+	'S_SCENARIO_WITH_NAME'=>			'Scenario with name',
+	'S_ADDED_SMALL'=>				'added',
+	'S_UPDATED_SMALL'=>				'updated',
+	'S_DELETED_SMALL'=>				'deleted',
+
+//	media.inc.php
+	'S_NO_MEDIA_WITH'=>			'No media with',
+	'S_NO_MEDIA_TYPE_WITH'=>		'No media type with',
+	'S_AN_ACTION_TYPE_WITH_DESCRIPTION'=>	'An action type with description',
+	
+//	hosts.inc.php
+	'S_CANNOT_EXISTS_WITHOUT_GROUP'=>		'can not exist without group',
+	'S_ADDED_HOST_GROUP'=>				'Added host group',
+	'S_UPDATED_HOST_GROUP'=>			'Updated host group',
+	'S_INCORRECT_CHARACTERS_USED_FOR_HOSTNAME'=>	'Incorrect characters used for Hostname',
+	'S_INCORRECT_CHARACTERS_USED_FOR_DNS'=>		'Incorrect characters used for DNS',
+	'S_CIRCULAR_LINK_CANNOT_BE_CREATED'=>		'Circular link can not be created',
+	'S_MUST_LINKED_LEAST_ONE_HOST_GROUPS_SMALL'=>	'must be linked to at least one host group',
+	'S_ADDED_NEW_HOST'=>				'Added new host',
+	'S_INTERNAL_AND_CANNOT_DELETED_SMALL'=>		'is internal and can not be deleted',
+	'S_CANNOT_DELETED_INNER_HOSTS_CANNOT_UNLINKED_SMALL'=>'can not be deleted, due to inner hosts can not be unlinked',
+	'S_NO_HOST_GROUPS_WITH'=>			'No host groups with',
+	'S_INCORRECT_PARAMETERS_FOR'=>			'incorrect parameters for',
+	'S_NO_HOST_WITH'=>				'No host with',
+	'S_UPDATED_STATUS_FOR_HOST'=>			'Updated status of host',
+	'S_ALREADY_EXISTS_IN_LINKED_HOSTS_SMALL'=>	'already exist in linked hosts',
+	'S_ADDED_NEW_APPLICATION'=>			'Added new application',
+	'S_UPDATED_APPLICATION'=>			'Updated application',
+	'S_USED_BY_ITEM_SMALL'=>			'used by item',
+	'S_DELETED_SMALL'=>				'deleted',
+	'S_USED_BY_SCENARIO_SMALL'=>			'used by scenario',
+	'S_NO_APPLICATION_WITH'=>			'No application with',
+	'S_UNLINKED_SMALL'=>				'unlinked',
+	'S_TEMPLATE_WITH_ITEM_KEY'=>			'Template with item key',
+	'S_TEMPLATE_WITH_APPLICATION '=>			'Template with application',
+
+//	validate.inc.php
+	'S_CRITICAL_ERROR'=>				'Critical error',
+	'S_FIELD'=>					'Field',
+	'S_IS_NOT_IP_RANGE_SMALL'=>			'is not IP range',
+	'S_IS_NOT_INTEGER_RANGE_SMALL'=>		'is not integer range',
+	'S_IS_NOT_INTEGER_SMALL'=>			'is not integer',
+	'S_IS_NOT_DOUBLE_SMALL'=>			'is not double',
+	'S_IS_NOT_STRING_SMALL'=>			'is not string',
+	'S_CONTAINS_MULTIBYTE_CHARS_SMALL'=>		'contains Multibyte chars',
+	'S_MULTIBYTE_CHARS_ARE_RESTRICTED_SMALL'=>	'multibyte chars are restricted',
+	'S_IS_NOT_A_COLOUR_SMALL'=>			'is not a colour',
+	'S_IS_MANDATORY_SMALL'=>			'is mandatory',
+	'S_MUST_BE_MISSING_SMALL'=>			'must be missing',
+	'S_OPERATION_CANNOT_PERFORMED_UNAUTH_REQUEST'=>	'Operation cannot be performed due to unauthorized request',
+	'S_INCORRECT_VALUE_FOR'=>			'Incorrect value for',
+	
+//	triggers.inc.php
+	'S_NO_TRIGGER_WITH'=>					'No trigger with',
+	'S_INCORRECT_USAGE_OF_QUOTES'=>				'Incorrect usage of quotes',
+	'S_EXPRESSION_CANNOT_BE_EMPTY'=>			'Expression cannot be empty',
+	'S_NO_SUCH_HOST'=>					'No such host',
+	'S_TOO_MANY_HOSTS'=>					'Too many hosts',
+	'S_NO_SUCH_MONITORED_PARAMETER'=>			'No such monitored parameter',
+	'S_FOR_HOST_SMALL'=>					'for host',
+	'S_UNKNOWN_FUNCTION'=>					'Unknown function',
+	'S_INCORRECT_VALUE_TYPE'=>				'Incorrect value type',
+	'S_FOR_FUNCTION_SMALL'=>				'for function',
+	'S_OF_KEY_SMALL'=>					'of key',
+	'S_AVAILABLE_ONLY_FOR_ITEMS_WITH_VALUE_TYPES_SMALL'=>	'available only for items with value types',
+	'S_MISSING_MANDATORY_PARAMETER_FOR_FUNCTION'=>		'Missing mandatory parameter for function',
+	'S_NOT_FLOAT_OR_MACRO_FOR_FUNCTION_SMALL'=> 'is not a float or macro for function',
+	'S_NOT_FLOAT_OR_MACRO_OR_COUNTER_FOR_FUNCTION_SMALL'=>	'is not a float or counter or macro for function',
+	'S_ITEM_KEY_MUST_BE_USED_IN_TRIGGER_EXPRESSION'=>	'An item key must be used in trigger expression',
+	'S_INCORRECT_TRIGGER_EXPRESSION'=>			'Incorrect trigger expression',	
+	'S_YOU_CAN_NOT_USE_TEMPLATE_HOSTS_MIXED_EXPR'=>		'You can not use template hosts in mixed expressions.',
+	'S_ADDED_TRIGGER'=>					'Added trigger',
+	'S_TO_HOST_SMALL'=>					'to host',
+	'S_MISSING_KEY'=>					'Missing key',
+	'S_INCORRECT_FUNCTION_IS_USED'=>			'Incorrect function is used',
+	'S_UNKNOWN_MACRO'=>					'Unknown macro',
+	'S_DELETED_SMALL'=>					'deleted',
+	'S_FROM_HOST_SMALL'=>					'from host',
+	'S_UPDATED_SMALL'=>					'updated',
+	'S_TRIGGER_IN_TEMPLATE'=>				'Trigger in template',
+	'S_HAS_DEPENDENCY_WITH_TRIGGER_IN_TEMPLATE'=>		'has dependency with trigger in template',
+	'S_IS_NOT_THE_HIGHEST_LEVEL_TEMPLATE'=>			'is not the highest level template',
+	'S_NO_FUNCTION_WITH'=>					'No function with',
+	'S_SPECIFY_THE_CONDITIONAL_EXPR_FOR_THE_TARGET'=>	'Specify the conditional expression for the target.',
+	
+
+//	page_footer.php
+	'S_TRANSACTION_HAVE_NOT_BEEN_CLOSED_ABORTING'=>	'Transaction have not been closed. Aborting..',
 
 //	maps.inc.php
 	'S_NO_SYSTEM_MAP_WITH'=>		'No system map with',

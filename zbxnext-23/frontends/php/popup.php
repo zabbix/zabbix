@@ -345,11 +345,11 @@ include_once('include/page_header.php');
 			}
 
 			$frmTitle->addItem(array(S_GROUP,SPACE,$cmbGroups));
-			update_profile('web.popup.groupid',$groupid);
+			CProfile::update('web.popup.groupid',$groupid,PROFILE_TYPE_ID);
 		}
 
 		if(str_in_array($srctbl,array('help_items'))){
-			$itemtype = get_request('itemtype',get_profile('web.popup.itemtype',0));
+			$itemtype = get_request('itemtype',CProfile::get('web.popup.itemtype',0));
 			$cmbTypes = new CComboBox('itemtype',$itemtype,'javascript: submit();');
 			foreach($allowed_item_types as $type)
 				$cmbTypes->addItem($type, item_type2str($type));
@@ -365,7 +365,7 @@ include_once('include/page_header.php');
 			}
 
 			$frmTitle->addItem(array(SPACE,S_HOST,SPACE,$cmbHosts));
-			update_profile('web.popup.hostid',$hostid);
+			CProfile::update('web.popup.hostid',$hostid,PROFILE_TYPE_ID);
 		}
 
 		if(str_in_array($srctbl,array('triggers','hosts'))){

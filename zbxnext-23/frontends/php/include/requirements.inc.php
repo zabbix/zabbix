@@ -101,6 +101,34 @@
 
 		return $result;
 	}
+	
+	function check_php_upload_max_filesize(){
+		$required = 2*1024*1024;
+		$recommended = 16*1024*1024;
+
+		$current = ini_get('upload_max_filesize');
+
+		if(str2mem($current) >= $recommended){
+			$req = 2;
+		}
+		else if(str2mem($current) >= $required){
+			$req = 1;
+		}
+		else{
+			$req = 0;
+		}
+
+		$result = array(
+			'name' => 'PHP upload max filesize ',
+			'current' => $current,
+			'required' => mem2str($required),
+			'recommended' => mem2str($recommended),
+			'result' => $req,
+			'error' => '2M is minimum for PHP upload filesize'
+		);
+
+		return $result;
+	}
 
 	function check_php_max_execution_time(){
 		$required = 300;
@@ -125,6 +153,34 @@
 			'recommended' => $recommended,
 			'result' => $req,
 			'error' => '300 sec is a minimal limitation on execution time of PHP scripts'
+		);
+
+		return $result;
+	}
+	
+	function check_php_max_input_time(){
+		$required = 300;
+		$recommended = 600;
+
+		$current = ini_get('max_input_time');
+
+		if($current >= $recommended){
+			$req = 2;
+		}
+		else if($current >= $required){
+			$req = 1;
+		}
+		else{
+			$req = 0;
+		}
+
+		$result = array(
+			'name' => 'PHP max input time',
+			'current' => $current,
+			'required' => $required,
+			'recommended' => $recommended,
+			'result' => $req,
+			'error' => '300 sec is a minimal limitation on input parse time for PHP scripts'
 		);
 
 		return $result;
@@ -313,6 +369,9 @@
 			preg_match('/(\d\.?)+/', $gd_info['GD Version'], $current);
 			$current = $current[0];
 		}
+		else{
+			$current = 'unknown';
+		}
 
 		if(version_compare($current, $recommended, '>=')){
 			$req = 2;
@@ -431,7 +490,9 @@
 		$result[] = check_php_version();
 		$result[] = check_php_memory_limit();
 		$result[] = check_php_post_max_size();
+		$result[] = check_php_upload_max_filesize();
 		$result[] = check_php_max_execution_time();
+		$result[] = check_php_max_input_time();
 		$result[] = check_php_timezone();
 		$result[] = check_php_databases();
 		$result[] = check_php_bc();
