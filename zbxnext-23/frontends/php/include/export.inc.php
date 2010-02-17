@@ -236,13 +236,13 @@ class zbxXML{
  		foreach($array as $key => $value){
 
 			if(is_numeric($key)){
-				$key = 'node_'. $key;
+				$key = rtrim($root, 's');
 			}
 			if(is_array($value)){
 				$node = $xml->addChild($key);
-				self::arrayToXML($value, $root, $node);
+				self::arrayToXML($value, $key, $node);
 			}
-			else{
+			else if(!zbx_empty($value)){
 				$value = htmlentities($value);
 				$xml->addChild($key, $value);
 			}
@@ -266,10 +266,10 @@ class zbxXML{
 			}
 
 			if($node->hasChildNodes()){
-				if(strpos($node->nodeName, 'node_') !== false)
-					$array[] = self::XMLtoArray($node);
-				else
-					$array[$node->nodeName] = self::XMLtoArray($node);
+				$nodeName = $node->nodeName;
+
+				if(isset($array[$nodeName])) $nodeName.= count($array);
+				$array[$nodeName] = self::XMLtoArray($node);
 			}
 		}
 
@@ -358,136 +358,159 @@ class zbxXML{
 
 	public static function parseMap($rules){
 		$importMaps = self::XMLtoArray(self::$xml);
-		$importMaps = $importMaps['root']['sysmaps'];
+		$importMaps = $importMaps['sysmaps'];
 
 		if(!isset($rules['maps']['exist']) && !isset($rules['maps']['missed'])) return true;
 
 		$result = true;
 		$sysmaps = array();
-		foreach($importMaps as $mnum => &$sysmap){
-			$db_maps = CMap::checkObjects(array('name' => $sysmap['name']));
+		try{
+			foreach($importMaps as $mnum => &$sysmap){
+				unset($sysmap['sysmapid']);
+				$db_maps = CMap::checkObjects(array('name' => $sysmap['name']));
 
-			if(!empty($db_maps) && isset($rules['maps']['exist'])){
-				CMap::delete($db_maps);
-				info('Map ['.$sysmap['name'].'] removed for update - user rule');
-			}
-			else if(!empty($db_maps) || !isset($rules['maps']['missed'])){
-				info('Map ['.$sysmap['name'].'] skipped - user rule');
-				unset($importMaps[$mnum]);
-				continue; // break if not update exist
-			}
+				if(!empty($db_maps) && isset($rules['maps']['exist'])){
+					$db_map = reset($db_maps);
+					$sysmap['sysmapid'] = $db_map['sysmapid'];
+				}
+				else if(!empty($db_maps) || !isset($rules['maps']['missed'])){
+					info('Map ['.$sysmap['name'].'] skipped - user rule');
+					unset($importMaps[$mnum]);
+					continue; // break if not update exist
+				}
 
-			if(isset($sysmap['backgroundid'])){
-				$image = getImageByIdent($sysmap['backgroundid']);
+				if(isset($sysmap['backgroundid'])){
+					$image = getImageByIdent($sysmap['backgroundid']);
 
-				if(!$image){
-					error('Cannot find image "'.$sysmap['backgroundid']['name'].'" used in exported map "'.$sysmap['name'].'"');
-					$sysmap['backgroundid'] = 0;
+					if(!$image){
+						error('Cannot find image "'.$sysmap['backgroundid']['name'].'" used in exported map "'.$sysmap['name'].'"');
+						$sysmap['backgroundid'] = 0;
+					}
+					else{
+						$sysmap['backgroundid'] = $image['imageid'];
+					}
 				}
 				else{
-					$sysmap['backgroundid'] = $image['imageid'];
+					$sysmap['backgroundid'] = 0;
 				}
-			}
-			else{
-				$sysmap['backgroundid'] = 0;
-			}
 
-			foreach($sysmap['selements'] as $snum => &$selement){
-				$nodeCaption = isset($selement['elementid']['node'])?$selement['elementid']['node'].':':'';
-				switch($selement['elementtype']){
-					case SYSMAP_ELEMENT_TYPE_MAP:
-						$db_sysmaps = CMap::getObjects($selement['elementid']);
-						if(empty($db_sysmaps)){
-							error('Cannot find map "'.$nodeCaption.$selement['elementid']['name'].'" used in exported map "'.$sysmap['name'].'"');
-							return false;
+				if(!isset($sysmap['selements'])) $sysmap['selements'] = array();
+				if(!isset($sysmap['links'])) $sysmap['links'] = array();
+
+				foreach($sysmap['selements'] as $snum => &$selement){
+					$nodeCaption = isset($selement['elementid']['node'])?$selement['elementid']['node'].':':'';
+
+					if(!isset($selement['elementid'])) $selement['elementid'] = 0;
+					switch($selement['elementtype']){
+						case SYSMAP_ELEMENT_TYPE_MAP:
+							$db_sysmaps = CMap::getObjects($selement['elementid']);
+							if(empty($db_sysmaps)){
+								$error = 'Cannot find map "'.$nodeCaption.$selement['elementid']['name'].'" used in exported map "'.$sysmap['name'].'"';
+								throw new Exception($error);
+							}
+
+							$tmp = reset($db_sysmaps);
+							$selement['elementid'] = $tmp['sysmapid'];
+						break;
+						case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+							$db_hostgroups = CHostgroup::getObjects($selement['elementid']);
+							if(empty($db_hostgroups)){
+								$error = 'Cannot find hostgroup "'.$nodeCaption.$selement['elementid']['name'].'" used in exported map "'.$sysmap['name'].'"';
+								throw new Exception($error);
+							}
+
+							$tmp = reset($db_hostgroups);
+							$selement['elementid'] = $tmp['groupid'];
+						break;
+						case SYSMAP_ELEMENT_TYPE_HOST:
+							$db_hosts = CHost::getObjects($selement['elementid']);
+							if(empty($db_hosts)){
+								$error = 'Cannot find host "'.$nodeCaption.$selement['elementid']['host'].'" used in exported map "'.$sysmap['name'].'"';
+								throw new Exception($error);
+							}
+
+							$tmp = reset($db_hosts);
+							$selement['elementid'] = $tmp['hostid'];
+						break;
+						case SYSMAP_ELEMENT_TYPE_TRIGGER:
+							$db_triggers = CTrigger::getObjects($selement['elementid']);
+							if(empty($db_triggers)){
+								$error = 'Cannot find trigger "'.$nodeCaption.$selement['elementid']['host'].':'.$selement['elementid']['description'].'" used in exported map "'.$sysmap['name'].'"';
+								throw new Exception($error);
+							}
+
+							$tmp = reset($db_triggers);
+							$selement['elementid'] = $tmp['triggerid'];
+						break;
+						case SYSMAP_ELEMENT_TYPE_IMAGE:
+						default:
+						break;
+					}
+
+					$icons = array('iconid_off','iconid_on','iconid_unknown','iconid_disabled','iconid_maintenance');
+					foreach($icons as $icon){
+						if(isset($selement[$icon])){
+							$image = getImageByIdent($selement[$icon]);
+							if(!$image){
+								$error = 'Cannot find image "'.$selement[$icon]['name'].'" used in exported map "'.$sysmap['name'].'"';
+								throw new Exception($error);
+							}
+							$selement[$icon] = $image['imageid'];
 						}
-
-						$tmp = reset($db_sysmaps);
-						$selement['elementid'] = $tmp['sysmapid'];
-					break;
-					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-						$db_hostgroups = CHostgroup::getObjects($selement['elementid']);
-						if(empty($db_hostgroups)){
-							error('Cannot find hostgroup "'.$nodeCaption.$selement['elementid']['name'].'" used in exported map "'.$sysmap['name'].'"');
-							return false;
+						else{
+							$selement[$icon] = 0;
 						}
+					}
+				}
+				unset($selement);
 
-						$tmp = reset($db_hostgroups);
-						$selement['elementid'] = $tmp['groupid'];
-					break;
-					case SYSMAP_ELEMENT_TYPE_HOST:
-						$db_hosts = CHost::getObjects($selement['elementid']);
-						if(empty($db_hosts)){
-							error('Cannot find host "'.$nodeCaption.$selement['elementid']['host'].'" used in exported map "'.$sysmap['name'].'"');
-							return false;
-						}
+				foreach($sysmap['links'] as $lnum => &$link){
+					if(!isset($link['linktriggers'])) continue;
 
-						$tmp = reset($db_hosts);
-						$selement['elementid'] = $tmp['hostid'];
-					break;
-					case SYSMAP_ELEMENT_TYPE_TRIGGER:
-						$db_triggers = CTrigger::getObjects($selement['elementid']);
+					foreach($link['linktriggers'] as $ltnum => &$linktrigger){
+						$nodeCaption = isset($linktrigger['triggerid']['node'])?$linktrigger['triggerid']['node'].':':'';
+
+						$db_triggers = CTrigger::getObjects($linktrigger['triggerid']);
 						if(empty($db_triggers)){
-							error('Cannot find trigger "'.$nodeCaption.$selement['elementid']['host'].':'.$selement['elementid']['description'].'" used in exported map "'.$sysmap['name'].'"');
-							return false;
+							$error = 'Cannot find trigger "'.$nodeCaption.$linktrigger['triggerid']['host'].':'.$linktrigger['triggerid']['description'].'" used in exported map "'.$sysmap['name'].'"';
+							throw new Exception('MAP EXPORT FAILED', $error);
 						}
 
 						$tmp = reset($db_triggers);
-						$selement['elementid'] = $tmp['triggerid'];
-					break;
-					case SYSMAP_ELEMENT_TYPE_IMAGE:
-					default:
-						$selement['elementid'] = 0;
-				}
-
-				$icons = array('iconid_off','iconid_on','iconid_unknown','iconid_disabled','iconid_maintenance');
-				foreach($icons as $icon){
-					if(isset($selement[$icon])){
-						$image = getImageByIdent($selement[$icon]);
-						if(!$image){
-							error('Cannot find image "'.$selement[$icon]['name'].'" used in exported map "'.$sysmap['name'].'"');
-							return false;
-						}
-						$selement[$icon] = $image['imageid'];
+						$linktrigger['triggerid'] = $tmp['triggerid'];
 					}
-					else{
-						$selement[$icon] = 0;
-					}
+					unset($linktrigger);
 				}
-			}
-			unset($selement);
+				unset($link);
 
-			foreach($sysmap['links'] as $lnum => &$link){
-				if(!isset($link['linktriggers'])) continue;
-
-				foreach($link['linktriggers'] as $ltnum => &$linktrigger){
-					$nodeCaption = isset($linktrigger['triggerid']['node'])?$linktrigger['triggerid']['node'].':':'';
-
-					$db_triggers = CTrigger::getObjects($linktrigger['triggerid']);
-					if(empty($db_triggers)){
-						error('Cannot find trigger "'.$nodeCaption.$linktrigger['triggerid']['host'].':'.$linktrigger['triggerid']['description'].'" used in exported map "'.$sysmap['name'].'"');
-						return false;
-					}
-
-					$tmp = reset($db_triggers);
-					$linktrigger['triggerid'] = $tmp['triggerid'];
-				}
-				unset($linktrigger);
-			}
-			unset($link);
-
-			$sysmaps[] = $sysmap;
+				$sysmaps[] = $sysmap;
 //SDII($sysmap);
-		}
-		unset($sysmap);
+			}
+			unset($sysmap);
 
-		$importMaps = $sysmaps;
 
-//SDII($importMaps);
-		try{
+			$importMaps = $sysmaps;
 			foreach($importMaps as $mnum => $importMap){
-				$sysmaps = CMap::create($importMap);
-				$sysmap = reset($sysmaps);
+				if(isset($importMap['sysmapid'])){
+					$sysmaps = CMap::update($importMap);
+					$sysmap = reset($sysmaps);
+
+// Deleteing all selements (with links)
+					$db_selementids = array();
+					$res = DBselect('SELECT selementid FROM sysmaps_elements WHERE sysmapid='.$sysmap['sysmapid']);
+					while($db_selement = DBfetch($res)){
+						$db_selementids[$db_selement['selementid']] = $db_selement['selementid'];
+					}
+					delete_sysmaps_element($db_selementids);
+//----
+					info('Map ['.$sysmap['name'].'] updated');
+				}
+				else{
+					$sysmaps = CMap::create($importMap);
+					$sysmap = reset($sysmaps);
+
+					info('Map ['.$sysmap['name'].'] added');
+				}
 
 				$selements = $importMap['selements'];
 				$links = $importMap['links'];
@@ -515,8 +538,6 @@ class zbxXML{
 					$link['sysmapid'] = $sysmap['sysmapid'];
 					$result = add_link($link);
 				}
-
-				info('Map ['.$sysmap['name'].'] added');
 			}
 		}
 		catch(Exception $e){

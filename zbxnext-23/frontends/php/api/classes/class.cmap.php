@@ -542,13 +542,20 @@ SDI('///////////////////////////////////////');
 		$result = array();
 
 		$maps = zbx_toArray($maps);
+		$sysmapids = array();
+
+		$options = array(
+			'sysmapids' => zbx_objectValues($maps,'sysmapid'),
+			'preservekeys' => 1,
+			'output' => API_OUTPUT_EXTEND
+		);
+		$db_sysmaps = self::get($options);
 
 		self::BeginTransaction(__METHOD__);
-		foreach($maps as $map){
+		foreach($maps as $mnum => $map){
 
-			$map_db_fields = self::get(array('sysmapids' => $map['sysmapid'], 'extendoutput' => 1));
-			$map_db_fields = reset($map_db_fields);
-
+			$sysmapids[] = $map['sysmapid'];
+			$map_db_fields = $db_sysmaps[$map['sysmapid']];
 
 			if(!$map_db_fields){
 				$result = false;
@@ -578,7 +585,12 @@ SDI('///////////////////////////////////////');
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return true;
+			$options = array(
+				'sysmapids' => $sysmapids,
+				'nopermissions' => 1,
+				'output' => API_OUTPUT_EXTEND,
+			);
+			return self::get($options);
 		}
 		else{
 			self::setMethodErrors(__METHOD__, $errors);

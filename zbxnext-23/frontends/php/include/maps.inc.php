@@ -261,9 +261,11 @@
 	return	$result;
 	}
 
-	function delete_link($linkid){
-		$result = delete_all_link_triggers($linkid);
-		$result&= (bool) DBexecute('DELETE FROM sysmaps_links WHERE linkid='.$linkid);
+	function delete_link($linkids){
+		zbx_value2array($linkids);
+		$result = delete_all_link_triggers($linkids);
+
+		$result&= (bool) DBexecute('DELETE FROM sysmaps_links WHERE '.DBcondition('linkid',$linkids));
 
 	return $result;
 	}
@@ -297,8 +299,8 @@
 	return DBexecute('DELETE FROM sysmaps_link_triggers WHERE linkid='.$linkid.' AND triggerid='.$triggerid);
 	}
 
-	function delete_all_link_triggers($linkid){
-	return DBexecute('DELETE FROM sysmaps_link_triggers WHERE linkid='.$linkid);
+	function delete_all_link_triggers($linkids){
+	return DBexecute('DELETE FROM sysmaps_link_triggers WHERE '.DBcondition('linkid',$linkids));
 	}
 
 /*
@@ -431,16 +433,19 @@
 		zbx_value2array($selementids);
 		if(empty($selementids)) return true;
 
-		$result=TRUE;
-		$sql = 'SELECT linkid FROM sysmaps_links '.
+		$result = true;
+		$linkids = array();
+
+		$sql = 'SELECT linkid '.
+				' FROM sysmaps_links '.
 				' WHERE '.DBcondition('selementid1',$selementids).
 					' OR '.DBcondition('selementid2',$selementids);
-
 		$res=DBselect($sql);
 		while($rows = DBfetch($res)){
-			$result&=delete_link($rows['linkid']);
+			$linkids[] = $rows['linkid'];
 		}
-//		$result=DBexecute('DELETE FROM sysmaps_links WHERE selementid1=$selementid OR selementid2=$selementid');
+
+		if(!empty($linkids)) $result &= delete_link($linkids);
 
 		if(!$result) return	$result;
 

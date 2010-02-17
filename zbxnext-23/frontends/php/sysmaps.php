@@ -23,8 +23,7 @@ require_once('include/config.inc.php');
 require_once('include/maps.inc.php');
 require_once('include/forms.inc.php');
 
-$_REQUEST['go'] = get_request('go', 'none');
-if(($_REQUEST['go'] == 'export') && isset($_REQUEST['maps'])){
+if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['maps'])){
 	$EXPORT_DATA = true;
 
 	$page['type'] = $page['type'] = detect_page_type(PAGE_TYPE_XML);
@@ -106,11 +105,7 @@ include_once('include/page_header.php');
 
 		prepareMapExport($sysmaps);
 
-		$data = array(
-			'sysmaps' => $sysmaps,
-		);
-
-		$xml = zbxXML::arrayToXML($data);
+		$xml = zbxXML::arrayToXML($sysmaps, 'sysmaps');
 
 		print($xml);
 		exit();
@@ -138,6 +133,8 @@ include_once('include/page_header.php');
 
 ?>
 <?php
+	$_REQUEST['go'] = get_request('go', 'none');
+
 	if(isset($_REQUEST["save"])){
 		if(isset($_REQUEST["sysmapid"])){
 // TODO check permission by new value.
