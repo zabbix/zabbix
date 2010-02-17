@@ -363,7 +363,6 @@ include_once('include/page_header.php');
 
 			if(!isset($_REQUEST['plaintext'])){
 				$table = new CTableInfo('...','log_history_table');
-				$table->setAttribute('id','graph');
 				$table->setHeader(array(S_TIMESTAMP,
 						($item_cout>1)?S_ITEM:null,
 						S_LOCAL_TIME,
@@ -498,7 +497,6 @@ include_once('include/page_header.php');
 			if(!isset($_REQUEST['plaintext'])){
 				$table = new CTableInfo();
 				$table->setHeader(array(S_TIMESTAMP, S_VALUE));
-				$table->setAttribute('id','graph');
 			}
 			else{
 				echo '<span class="textcolorstyles"><pre>'."\n";
