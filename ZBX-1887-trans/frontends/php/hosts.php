@@ -406,11 +406,13 @@ include_once('include/page_header.php');
 			}
 
 // Host triggers
-			$triggers = CTrigger::get(array('hostids' => $clone_hostid, 'inherited' => 0));
-			$triggers = zbx_objectValues($triggers, 'triggerid');
-			foreach($triggers as $trigger){
-				$result &= (bool) copy_trigger_to_host($trigger, $hostid, true);
-			}
+			$result &= copy_triggers($clone_hostid, $hostid);
+			
+			// $triggers = CTrigger::get(array('hostids' => $clone_hostid, 'inherited' => 0));
+			// $triggers = zbx_objectValues($triggers, 'triggerid');
+			// foreach($triggers as $trigger){
+				// $result &= (bool) copy_trigger_to_host($trigger, $hostid, true);
+			// }
 
 // Host graphs
 			$graphs = CGraph::get(array('hostids' => $clone_hostid, 'inherited' => 0));

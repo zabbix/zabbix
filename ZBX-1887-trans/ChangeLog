@@ -1,5 +1,11 @@
 Changes for 1.8.2
 
+ - [ZBX-1968] fixed error in log item history in ie8 (Vedmak)
+ - [ZBX-2020] added requirements check for PHP input_max_time (Vedmak)
+ - [ZBX-1958] fixed problem with a lot of digits in float values (Vedmak)
+ - [ZBX-1853] fixed template\host full clone with triggers with dependencies (Vedmak)
+ - [ZBX-1999] fixed bug when cannot create simple check item with macro in parameters (Vedmak)
+ - [ZBX-1269] fixed offscreen popups (Vedmak)
  - [ZBX-1679] fixed error sometimes happen when use print button (Vedmak)
  - [ZBX-1980] added requirements check for php upload_max_filesize (Vedmak)
  - [ZBX-2002] refresh timer is now restarted instead of stopped when checkbox is checked(Vedmak)

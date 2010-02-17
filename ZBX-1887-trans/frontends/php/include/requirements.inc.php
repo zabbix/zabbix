@@ -40,7 +40,7 @@
 			'required' => $required,
 			'recommended' => $recommended,
 			'result' => $req,
-			'error' => S_MINIMAL_VERSION_OF_PHP_IS.' 5.1.0'
+			'error' => S_MINIMAL_VERSION_OF_PHP_IS.SPACE.$required
 		);
 
 		return $result;
@@ -68,7 +68,7 @@
 			'required' => mem2str($required),
 			'recommended' => mem2str($recommended),
 			'result' => $req,
-			'error' => '128'.S_M.SPACE.S_IS_A_MINIMAL_PHP_MEMORY_LIMITATION_SMALL
+			'error' => mem2str($required).SPACE.S_IS_A_MINIMAL_PHP_MEMORY_LIMITATION_SMALL
 		);
 
 		return $result;
@@ -96,7 +96,7 @@
 			'required' => mem2str($required),
 			'recommended' => mem2str($recommended),
 			'result' => $req,
-			'error' => '16'.S_M.SPACE.S_IS_A_MINIMUM_SIZE_OF_PHP_POST_SMALL
+			'error' => mem2str($required).SPACE.S_IS_A_MINIMUM_SIZE_OF_PHP_POST_SMALL
 		);
 
 		return $result;
@@ -124,7 +124,7 @@
 			'required' => mem2str($required),
 			'recommended' => mem2str($recommended),
 			'result' => $req,
-			'error' => '2'.S_M.SPACE.S_IS_MINIMAL_FOR_PHP_ULOAD_FILESIZE_SMALL
+			'error' => mem2str($required).SPACE.S_IS_MINIMAL_FOR_PHP_ULOAD_FILESIZE_SMALL
 		);
 
 		return $result;
@@ -152,7 +152,35 @@
 			'required' => $required,
 			'recommended' => $recommended,
 			'result' => $req,
-			'error' => '300'.SPACE.S_SEC_SMALL.SPACE.S_IS_A_MINIMAL_LIMITATION_EXECTUTION_TIME_SMALL
+			'error' => $required.SPACE.S_SEC_SMALL.SPACE.S_IS_A_MINIMAL_LIMITATION_EXECTUTION_TIME_SMALL
+		);
+
+		return $result;
+	}
+	
+	function check_php_max_input_time(){
+		$required = 300;
+		$recommended = 600;
+
+		$current = ini_get('max_input_time');
+
+		if($current >= $recommended){
+			$req = 2;
+		}
+		else if($current >= $required){
+			$req = 1;
+		}
+		else{
+			$req = 0;
+		}
+
+		$result = array(
+			'name' => S_PHP_MAX_INPUT_TIME,
+			'current' => $current,
+			'required' => $required,
+			'recommended' => $recommended,
+			'result' => $req,
+			'error' => $required.SPACE.S_SEC_SMALL.SPACE.S_IS_A_MINIMAL_LIMITATION_INPUT_PARSE_TIME_SMALL
 		);
 
 		return $result;
@@ -464,6 +492,7 @@
 		$result[] = check_php_post_max_size();
 		$result[] = check_php_upload_max_filesize();
 		$result[] = check_php_max_execution_time();
+		$result[] = check_php_max_input_time();
 		$result[] = check_php_timezone();
 		$result[] = check_php_databases();
 		$result[] = check_php_bc();
