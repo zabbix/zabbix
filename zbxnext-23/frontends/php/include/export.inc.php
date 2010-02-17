@@ -364,8 +364,6 @@ class zbxXML{
 		}
 		$importMaps = $importMaps['sysmaps'];
 
-		if(!isset($rules['maps']['exist']) && !isset($rules['maps']['missed'])) return true;
-
 		$result = true;
 		$sysmaps = array();
 		try{
