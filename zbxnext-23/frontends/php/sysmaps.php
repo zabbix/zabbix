@@ -106,8 +106,8 @@ include_once('include/page_header.php');
 		prepareMapExport($sysmaps);
 
 		$xml = zbxXML::arrayToXML($sysmaps, 'sysmaps');
-
 		print($xml);
+
 		exit();
 	}
 

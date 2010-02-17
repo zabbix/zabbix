@@ -227,33 +227,36 @@ class zbxXML{
 		return str_repeat("\t", zbx_strlen($matches[0]) / 2 );
 	}
 
-	public static function arrayToXML($array, $root = 'root', $xml = null){
-
-		if($xml == null){
-			$xml = simplexml_load_string("<?xml version='1.0' encoding='utf-8'?><$root />");
-		}
-
- 		foreach($array as $key => $value){
-
-			if(is_numeric($key)){
-				$key = rtrim($root, 's');
-			}
-			if(is_array($value)){
-				$node = $xml->addChild($key);
-				self::arrayToXML($value, $key, $node);
-			}
-			else if(!zbx_empty($value)){
-				$value = htmlentities($value);
-				$xml->addChild($key, $value);
-			}
-		}
-
-		$doc = new DOMDocument();
+	public static function arrayToXML($array, $root = 'root'){
+		$doc = new DOMDocument('1.0');
 		$doc->preserveWhiteSpace = false;
-		$doc->loadXML($xml->asXML());
+
+		self::arrayToDOM($doc, $array, $root);
+
 		$doc->formatOutput = true;
 
-		return preg_replace_callback('/^( {2,})/m', 'self::callback', $doc->saveXML());
+	return $doc->saveXML();
+	}
+
+	public static function arrayToDOM(&$dom, $array, $parentKey=null){
+		$parentNode = $dom->createElement($parentKey);
+		$parentNode = $dom->appendChild($parentNode);
+
+ 		foreach($array as $key => $value){
+			if(is_numeric($key)) $key = rtrim($parentKey, 's');
+
+			if(is_array($value)){
+				$child = self::arrayToDOM($dom, $value, $key);
+				$parentNode->appendChild($child);
+//SDI($dom->saveXML($parentNode));
+			}
+			else if(!zbx_empty($value)){
+				$child = $dom->createElement($key, $value);
+				$parentNode->appendChild($child);
+			}
+		}
+
+	return $parentNode;
 	}
 
 	public static function XMLtoArray($parentNode){

@@ -263,8 +263,8 @@
 
 	function delete_link($linkids){
 		zbx_value2array($linkids);
-		$result = delete_all_link_triggers($linkids);
 
+		$result = delete_all_link_triggers($linkids);
 		$result&= (bool) DBexecute('DELETE FROM sysmaps_links WHERE '.DBcondition('linkid',$linkids));
 
 	return $result;
@@ -300,7 +300,10 @@
 	}
 
 	function delete_all_link_triggers($linkids){
-	return DBexecute('DELETE FROM sysmaps_link_triggers WHERE '.DBcondition('linkid',$linkids));
+		zbx_value2array($linkids);
+
+		$result = (bool) DBexecute('DELETE FROM sysmaps_link_triggers WHERE '.DBcondition('linkid',$linkids));
+	return $result;
 	}
 
 /*
