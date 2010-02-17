@@ -1950,6 +1950,7 @@
 				$sysmap['backgroundid'] = ($sysmap['backgroundid'] > 0)?$images[$sysmap['backgroundid']]:'';
 
 				foreach($sysmap['selements'] as $snum => &$selement){
+					unset($selement['sysmapid']);
 					switch($selement['elementtype']){
 						case SYSMAP_ELEMENT_TYPE_MAP:
 							$selement['elementid'] = $sysmaps[$selement['elementid']];
@@ -1977,7 +1978,10 @@
 				unset($selement);
 
 				foreach($sysmap['links'] as $lnum => &$link){
+					unset($link['sysmapid']);
+					unset($link['linkid']);
 					foreach($link['linktriggers'] as $ltnum => &$linktrigger){
+						unset($linktrigger['linktriggerid']);
 						$linktrigger['triggerid'] = $triggers[$linktrigger['triggerid']];
 					}
 				}
