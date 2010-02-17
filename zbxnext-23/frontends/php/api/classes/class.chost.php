@@ -189,7 +189,7 @@ class CHost extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
 
 // groupids
 		if(!is_null($options['groupids'])){
@@ -820,14 +820,14 @@ class CHost extends CZBXAPI{
 				break;
 			}
 
-			$host_exists = self::getObjects(array('host' => $host['host']));
+			$host_exists = self::checkObjects(array('host' => $host['host']));
 			if(!empty($host_exists)){
 				$result = false;
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_HOST.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				break;
 			}
 
-			$host_exists = CTemplate::getObjects(array('host' => $host['host']));
+			$host_exists = CTemplate::checkObjects(array('host' => $host['host']));
 			if(!empty($host_exists)){
 				$result = false;
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_TEMPLATE.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
@@ -1106,7 +1106,7 @@ class CHost extends CZBXAPI{
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cannot mass update host name');
 				}
 
-				$host_exists = self::getObjects(array('host' => $data['host']));
+				$host_exists = self::checkObjects(array('host' => $data['host']));
 				$host_exists = reset($host_exists);
 				$cur_host = reset($hosts);
 
@@ -1115,7 +1115,7 @@ class CHost extends CZBXAPI{
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 				
-				$host_exists = CTemplate::getObjects(array('host' => $host['host']));
+				$host_exists = CTemplate::checkObjects(array('host' => $host['host']));
 				if(!empty($host_exists)){
 					$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);

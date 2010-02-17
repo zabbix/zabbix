@@ -169,7 +169,7 @@ class CTrigger extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid();
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 // groupids
 		if(!is_null($options['groupids'])){
@@ -636,7 +636,8 @@ class CTrigger extends CZBXAPI{
 		if(isset($triggerData['expression'])){
 			foreach($result as $tnum => $trigger){
 				$tmp_exp = explode_exp($trigger['expression'], false);
-				if(strcmp(trim(' ',$tmp_exp), trim(' ',$triggerData['expression'])) != 0) {
+
+				if(strcmp(trim($tmp_exp,' '), trim($triggerData['expression'],' ')) != 0) {
 					unset($result[$tnum]);
 				}
 			}

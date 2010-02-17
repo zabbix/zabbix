@@ -1914,6 +1914,7 @@
 			$hostgroups += zbx_objectValues($selements['hostgroups'], 'elementid');
 			$hosts += zbx_objectValues($selements['hosts'], 'elementid');
 			$triggers += zbx_objectValues($selements['triggers'], 'elementid');
+			$images += zbx_objectValues($selements['images'], 'elementid');
 
 			foreach($sysmap['selements'] as $snum => $selement){
 				if($selement['iconid_off'] > 0) $images[$selement['iconid_off']] = $selement['iconid_off'];
@@ -1982,8 +1983,7 @@
 		catch(Exception $e){
 			throw new exception($e->show_message());
 		}
-
-	//return $sysmap;
+//SDII($exportMaps);
 	}
 
 	function sysmapIdents($sysmapids){

@@ -119,7 +119,7 @@ class CScreen extends CZBXAPI{
 // editable + PERMISSION CHECK
 
 // nodeids
-		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
 
 // screenids
 		if(!is_null($options['screenids'])){

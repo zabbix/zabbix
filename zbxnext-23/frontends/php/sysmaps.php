@@ -132,7 +132,7 @@ include_once('include/page_header.php');
 		$result = zbxXML::import($_FILES['import_file']['tmp_name']);
 		$result = zbxXML::parseMap($rules);
 
-		$result = DBend(false);//$result);
+		$result = DBend($result);
 		show_messages($result, S_IMPORTED.SPACE.S_SUCCESSEFULLY_SMALL, S_IMPORT.SPACE.S_FAILED_SMALL);
 	}
 
@@ -247,7 +247,7 @@ include_once('include/page_header.php');
 		if($_REQUEST['form'] == S_CREATE_MAP)
 			insert_map_form();
 		else if($_REQUEST['form'] == S_IMPORT_MAP)
-			import_map_form();
+			import_map_form($rules);
 	}
 	else{
 		$map_wdgt = new CWidget();

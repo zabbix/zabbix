@@ -224,7 +224,7 @@
 			if($node['name'] == $nodeName) return $nodeid;
 		}
 
-	return ZBX_DISTRIBUTED?$ZBX_LOCALNODEID:0;
+	return 0;
 	}
 
 	function is_show_all_nodes(){

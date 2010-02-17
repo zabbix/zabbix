@@ -127,7 +127,7 @@ class CHostGroup extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
 
 // groupids
 		if(!is_null($options['groupids'])){
@@ -467,7 +467,7 @@ class CHostGroup extends CZBXAPI{
 				break;
 			}
 
-			$group_exist = self::getObjects(array('name' => $group['name']));
+			$group_exist = self::checkObjects(array('name' => $group['name']));
 			if(!empty($group_exist)){
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'HostGroup [ '.$group['name'].' ] already exists');
 				$result = false;
@@ -534,7 +534,7 @@ class CHostGroup extends CZBXAPI{
 		self::BeginTransaction(__METHOD__);
 		foreach($groups as $num => $group){
 
-			$group_exist = self::getObjects(array('name' => $group['name']));
+			$group_exist = self::checkObjects(array('name' => $group['name']));
 			$group_exist = reset($group_exist);
 
 			if($group_exist && ($group_exist['groupid'] != $group['groupid'])){

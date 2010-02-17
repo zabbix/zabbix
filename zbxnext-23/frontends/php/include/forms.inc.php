@@ -6236,8 +6236,7 @@
  		$frmHostT->show();
 	}
 
-	function import_map_form(){
-
+	function import_map_form($rules){
 
 		$form = new CFormTable(S_IMPORT, null, 'post', 'multipart/form-data');
 		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
@@ -6245,7 +6244,7 @@
 		$table = new CTable();
 		$table->setHeader(array(S_ELEMENT, S_UPDATE.SPACE.S_EXISTING, S_ADD.SPACE.S_MISSING), 'bold');
 
-		$titles = array('map' => S_MAP);
+		$titles = array('maps' => S_MAP);
 
 		foreach($titles as $key => $title){
 			$cbExist = new CCheckBox('rules['.$key.'][exist]', isset($rules[$key]['exist']));

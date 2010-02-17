@@ -116,7 +116,7 @@ class CMap extends CZBXAPI{
 // editable + PERMISSION CHECK
 
 // nodeids
-		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid();
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 // sysmapids
 		if(!is_null($options['sysmapids'])){

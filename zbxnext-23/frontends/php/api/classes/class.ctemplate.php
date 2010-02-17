@@ -151,7 +151,7 @@ class CTemplate extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
 
 // groupids
 		if(!is_null($options['groupids'])){
@@ -685,13 +685,13 @@ class CTemplate extends CZBXAPI{
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for Template name [ '.$template['host'].' ]');
 				}
 
-				$template_exists = self::getObjects(array('host' => $template['host']));
+				$template_exists = self::checkObjects(array('host' => $template['host']));
 				if(!empty($template_exists)){
 					$result = false;
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 
-				$host_exists = CHost::getObjects(array('host' => $template['host']));
+				$host_exists = CHost::checkObjects(array('host' => $template['host']));
 				if(!empty($host_exists)){
 					$result = false;
 					$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_HOST.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
@@ -967,7 +967,7 @@ class CTemplate extends CZBXAPI{
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Wrong fields');
 				}
 
-				$template_exists = self::getObjects(array('host' => $data['host']));
+				$template_exists = self::checkObjects(array('host' => $data['host']));
 				$template_exists = reset($template_exists);
 				$cur_template = reset($templates);
 
@@ -975,7 +975,7 @@ class CTemplate extends CZBXAPI{
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 				
-				$host_exists = CHost::getObjects(array('host' => $data['host']));
+				$host_exists = CHost::checkObjects(array('host' => $data['host']));
 				if(!empty($host_exists)){
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
