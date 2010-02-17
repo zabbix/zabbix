@@ -241,10 +241,10 @@ include_once('include/page_header.php');
 <?php
 //	COpt::savesqlrequest(0,'/////////////////////////////////////////////////////////////////////////////////////////////////////////');
 	if(isset($_REQUEST['form'])){
-		if($_REQUEST['form'] == S_CREATE_MAP)
-			insert_map_form();
-		else if($_REQUEST['form'] == S_IMPORT_MAP)
+		if($_REQUEST['form'] == S_IMPORT_MAP)
 			import_map_form($rules);
+		else if(($_REQUEST['form'] == 'Create Map') || ($_REQUEST['form'] == 'update'))
+			insert_map_form();
 	}
 	else{
 		$map_wdgt = new CWidget();
