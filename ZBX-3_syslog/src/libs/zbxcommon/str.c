@@ -146,7 +146,7 @@ void __zbx_zbx_error(const char *fmt, ...)
 #else
 	f = stderr;
 #endif /* ZBX_STDERR_FILE */
-	
+
 	va_start(args, fmt);
 
 	fprintf(f, "%s [%li]: ",progname, zbx_get_thread_id());
