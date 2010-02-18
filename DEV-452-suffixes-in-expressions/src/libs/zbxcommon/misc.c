@@ -1037,7 +1037,7 @@ int	cmp_double(double a,double b)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: the function supports suffixes K,M,G,s,m,h,d                     *
+ * Comments: the function supports suffixes K,M,G,T,s,m,h,d,w                 *
  *                                                                            *
  ******************************************************************************/
 int	is_double_prefix(char *c)
@@ -1063,8 +1063,8 @@ int	is_double_prefix(char *c)
 			dot=i;
 			continue;
 		}
-		/* Last character is suffix 'K', 'M', 'G', 's', 'm', 'h', 'd' */
-		if(strchr("KMGsmhd", c[i])!=NULL && c[i+1]=='\0')
+		/* Last character is suffix 'K', 'M', 'G', 'T', 's', 'm', 'h', 'd', 'w' */
+		if(strchr("KMGTsmhdw", c[i])!=NULL && c[i+1]=='\0')
 		{
 			continue;
 		}
@@ -1162,7 +1162,7 @@ int	is_double(char *c)
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
- * Comments: the function supports suffixes 's', 'm', 'h', and 'd'            *
+ * Comments: the function supports suffixes 's', 'm', 'h', 'd', and 'w'       *
  *                                                                            *
  ******************************************************************************/
 int	is_uint_prefix(const char *c)
@@ -1178,7 +1178,7 @@ int	is_uint_prefix(const char *c)
 			i++;
 		while (isdigit(c[i]));
 
-	if (c[i]=='s' || c[i]=='m' || c[i]=='h' || c[i]=='d') /* check suffix */
+	if (c[i]=='s' || c[i]=='m' || c[i]=='h' || c[i]=='d' || c[i]=='w') /* check suffix */
 		i++;
 
 	while (c[i]==' ') /* trim right spaces */
@@ -1614,7 +1614,7 @@ void	uint64_array_rm(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, in
  *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
- * Comments: the function automatically processes suffixes 's', 'm', 'h', 'd' *
+ * Comments: the function automatically processes suffixes s, m, h, d, w      *
  *                                                                            *
  ******************************************************************************/
 int	str2uint(const char *str)
@@ -1623,10 +1623,11 @@ int	str2uint(const char *str)
 	int	factor = 1;
 
 	switch (str[sz]) {
-		case 's': factor = 1;       break;
-		case 'm': factor = 60;      break;
-		case 'h': factor = 3600;    break;
-		case 'd': factor = 3600*24; break;
+		case 's': factor = 1;         break;
+		case 'm': factor = 60;        break;
+		case 'h': factor = 3600;      break;
+		case 'd': factor = 3600*24;   break;
+		case 'w': factor = 3600*24*7; break;
 	}
 
 	return atoi(str) * factor;
@@ -1646,14 +1647,15 @@ int	str2uint(const char *str)
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
- * Comments: the function automatically processes suffixes 'K','M','G'        *
+ * Comments: the function automatically processes suffixes 'K','M','G','T'    *
  *                                                                            *
  ******************************************************************************/
 int	str2uint64(char *str, zbx_uint64_t *value)
 {
-	size_t	sz;
-	int	factor = 1, ret;
-	char	c = '\0';
+	size_t		sz;
+	int		ret;
+	zbx_uint64_t	factor = 1;
+	char		c = '\0';
 
 	sz = strlen(str) - 1;
 
@@ -1671,6 +1673,12 @@ int	str2uint64(char *str, zbx_uint64_t *value)
 	{
 		c = str[sz];
 		factor = 1024 * 1024 * 1024;
+	}
+	else if (str[sz] == 'T')
+	{
+		c = str[sz];
+		factor = 1024 * 1024 * 1024;
+		factor *= 1024;
 	}
 
 	if ('\0' != c)
@@ -1697,8 +1705,8 @@ int	str2uint64(char *str, zbx_uint64_t *value)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: the function automatically processes suffixes 'K','M','G' and    *
- *           's', 'm', 'h', 'd'                                               *
+ * Comments: the function automatically processes suffixes 'K','M','G','T'    *
+ *           and 's','m','h','d','w'                                          *
  *                                                                            *
  ******************************************************************************/
 double	str2double(const char *str)
@@ -1708,13 +1716,15 @@ double	str2double(const char *str)
 
 	switch (str[sz])
 	{
-		case 'K': factor = 1024;		break;
-		case 'M': factor = 1024*1024;		break;
-		case 'G': factor = 1024*1024*1024;	break;
-		case 's': factor = 1;			break;
-		case 'm': factor = 60;			break;
-		case 'h': factor = 3600;		break;
-		case 'd': factor = 3600*24;		break;
+		case 'K': factor = 1024;			break;
+		case 'M': factor = 1024*1024;			break;
+		case 'G': factor = 1024*1024*1024;		break;
+		case 'T': factor = 1024*1024*1024*(double)1024;	break;
+		case 's': factor = 1;				break;
+		case 'm': factor = 60;				break;
+		case 'h': factor = 3600;			break;
+		case 'd': factor = 3600*24;			break;
+		case 'w': factor = 3600*24*7;			break;
 	}
 
 	return atof(str) * factor;
