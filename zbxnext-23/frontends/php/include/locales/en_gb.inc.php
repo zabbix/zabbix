@@ -1114,6 +1114,7 @@
 	'S_EDIT_MAP_ELEMENT'=>			'Edit map element',
 	'S_ICON_DEFAULT'=>			'Icon (default)',
 	'S_APPLY'=>					'Apply',
+	'S_MAP_ELEMENT'=>			'Map element',
 	'S_MAP_ELEMENTS'=>			'Map elements',
 	'S_MAP_DELETED'=>			'Network map deleted',
 	'S_CANNOT_DELETE_MAP'=>			'Cannot delete network map',
@@ -1142,6 +1143,14 @@
 	'S_ADD_LINK'=>					'Add link',
 	'S_REMOVE_LINK'=>				'Remove link',
 
+	'S_CANNOT_FIND_IMAGE'=>			'Cannot find image',
+	'S_CANNOT_FIND_TRIGGER'=>		'Cannot find trigger',
+	'S_CANNOT_FIND_HOST'=>			'Cannot find host',
+	'S_CANNOT_FIND_HOSTGROUP'=>		'Cannot find hostgroup',
+	'S_CANNOT_FIND_MAP'=>			'Cannot find map',
+	'S_USED_IN_EXPORTED_MAP_SMALL'=>'used in exported map',
+	'S_NO_ICON_FOR_MAP_ELEMENT'=>	'No icon for map element',
+	'S_ROLLING_BACK_CHANGES'=>		'Rolling back changes',
 
 //	map.php
 	'S_OK_BIG'=>			'OK',

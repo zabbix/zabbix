@@ -388,7 +388,7 @@ class zbxXML{
 					$image = getImageByIdent($sysmap['backgroundid']);
 
 					if(!$image){
-						error('Cannot find background image "'.$sysmap['backgroundid']['name'].'" used in exported map "'.$sysmap['name'].'"');
+						error('Cannot find background image "'.$sysmap['backgroundid']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"');
 						$sysmap['backgroundid'] = 0;
 					}
 					else{
@@ -410,7 +410,7 @@ class zbxXML{
 						case SYSMAP_ELEMENT_TYPE_MAP:
 							$db_sysmaps = CMap::getObjects($selement['elementid']);
 							if(empty($db_sysmaps)){
-								$error = 'Cannot find map "'.$nodeCaption.$selement['elementid']['name'].'" used in exported map "'.$sysmap['name'].'"';
+								$error = S_CANNOT_FIND_MAP.' "'.$nodeCaption.$selement['elementid']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
 								throw new Exception($error);
 							}
 
@@ -420,7 +420,7 @@ class zbxXML{
 						case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 							$db_hostgroups = CHostgroup::getObjects($selement['elementid']);
 							if(empty($db_hostgroups)){
-								$error = 'Cannot find hostgroup "'.$nodeCaption.$selement['elementid']['name'].'" used in exported map "'.$sysmap['name'].'"';
+								$error = S_CANNOT_FIND_HOSTGROUP.' "'.$nodeCaption.$selement['elementid']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
 								throw new Exception($error);
 							}
 
@@ -430,7 +430,7 @@ class zbxXML{
 						case SYSMAP_ELEMENT_TYPE_HOST:
 							$db_hosts = CHost::getObjects($selement['elementid']);
 							if(empty($db_hosts)){
-								$error = 'Cannot find host "'.$nodeCaption.$selement['elementid']['host'].'" used in exported map "'.$sysmap['name'].'"';
+								$error = S_CANNOT_FIND_HOST.' "'.$nodeCaption.$selement['elementid']['host'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
 								throw new Exception($error);
 							}
 
@@ -440,7 +440,7 @@ class zbxXML{
 						case SYSMAP_ELEMENT_TYPE_TRIGGER:
 							$db_triggers = CTrigger::getObjects($selement['elementid']);
 							if(empty($db_triggers)){
-								$error = 'Cannot find trigger "'.$nodeCaption.$selement['elementid']['host'].':'.$selement['elementid']['description'].'" used in exported map "'.$sysmap['name'].'"';
+								$error = S_CANNOT_FIND_TRIGGER.' "'.$nodeCaption.$selement['elementid']['host'].':'.$selement['elementid']['description'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
 								throw new Exception($error);
 							}
 
@@ -457,7 +457,7 @@ class zbxXML{
 						if(isset($selement[$icon])){
 							$image = getImageByIdent($selement[$icon]);
 							if(!$image){
-								$error = 'Cannot find image "'.$selement[$icon]['name'].'" used in exported map "'.$sysmap['name'].'"';
+								$error = S_CANNOT_FIND_IMAGE.' "'.$selement[$icon]['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
 								throw new Exception($error);
 							}
 							$selement[$icon] = $image['imageid'];
@@ -477,7 +477,7 @@ class zbxXML{
 
 						$db_triggers = CTrigger::getObjects($linktrigger['triggerid']);
 						if(empty($db_triggers)){
-							$error = 'Cannot find trigger "'.$nodeCaption.$linktrigger['triggerid']['host'].':'.$linktrigger['triggerid']['description'].'" used in exported map "'.$sysmap['name'].'"';
+							$error = S_CANNOT_FIND_TRIGGER.' "'.$nodeCaption.$linktrigger['triggerid']['host'].':'.$linktrigger['triggerid']['description'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
 							throw new Exception($error);
 						}
 
@@ -508,25 +508,23 @@ class zbxXML{
 					}
 					delete_sysmaps_element($db_selementids);
 //----
-					info('Map ['.$sysmap['name'].'] updated');
 				}
 				else{
 					$sysmaps = CMap::create($importMap);
 					$sysmap = reset($sysmaps);
-
-					info('Map ['.$sysmap['name'].'] added');
 				}
 
 				$selements = $importMap['selements'];
 				$links = $importMap['links'];
 
 				foreach($selements as $id => $selement){
-					if($selement['elementid'] == 0){
+					if(!isset($selement['elementid']) || ($selement['elementid'] == 0)){
+						$selement['elementid'] = 0;
 						$selement['elementtype'] = SYSMAP_ELEMENT_TYPE_IMAGE;
 					}
 
-					if($selement['iconid_off'] == 0){
-						throw new Exception('Cannot save map. Map element "'.$selement['label'].'" contains no icon.');
+					if(!isset($selement['iconid_off']) || ($selement['iconid_off'] == 0)){
+						throw new Exception(S_NO_ICON_FOR_MAP_ELEMENT.' '.$sysmap['name'].':'.$selement['label']);
 					}
 
 					$selement['sysmapid'] = $sysmap['sysmapid'];
@@ -543,11 +541,18 @@ class zbxXML{
 					$link['sysmapid'] = $sysmap['sysmapid'];
 					$result = add_link($link);
 				}
+
+				if(isset($importMap['sysmapid'])){
+					info(S_MAP.' ['.$sysmap['name'].'] '.S_UPDATED_SMALL);
+				}
+				else{
+					info(S_MAP.' ['.$sysmap['name'].'] '.S_ADDED_SMALL);
+				}
+
 			}
 		}
 		catch(Exception $e){
 			error($e->getMessage());
-			info('Rollback!');
 			return false;
 		}
 

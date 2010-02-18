@@ -351,8 +351,8 @@ function __autoload($class_name){
 					$row[] = $msg_col;
 
 					if(isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)){
-						$msg_details = new CDiv(array(S_DETAILS),'pointer');
-						$msg_details->addAction('onclick',new CJSscript("javascript: ShowHide('msg_messages', IE?'block':'table');"));
+						$msg_details = new CDiv(S_DETAILS,'blacklink');
+						$msg_details->setAttribute('onclick',new CJSscript("javascript: ShowHide('msg_messages', IE?'block':'table');"));
 						$msg_details->setAttribute('title',S_MAXIMIZE.'/'.S_MINIMIZE);
 						array_unshift($row, new CCol($msg_details,'clr'));
 					}
