@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1995] fixed errors when save/update web scenario with existing name (Vedmak)
  - [ZBX-1968] fixed error in log item history in ie8 (Vedmak)
  - [ZBX-2020] added requirements check for PHP input_max_time (Vedmak)
  - [ZBX-1958] fixed problem with a lot of digits in float values (Vedmak)
