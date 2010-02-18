@@ -189,7 +189,7 @@ $ZBX_MENU = array(
 					),
 				array('url'=>'usergrps.php',
 						'label'=>S_USERS,
-						'sub_pages'=>array('users.php','popup_media.php','popup_usrgrp.php','popup_right.php','popup_users.php')
+						'sub_pages'=>array('users.php','popup_usrgrp.php','popup_right.php','popup_users.php')
 					),
 				array('url'=>'media_types.php',
 						'label'=>S_MEDIA_TYPES
@@ -223,7 +223,7 @@ $ZBX_MENU = array(
 			'hide_node_selection' => 1,
 			'forse_disable_all_nodes'=> true,
 			'pages'=>array(
-				array('url'=>'index.php','sub_pages'=>array('profile.php'))
+				array('url'=>'index.php','sub_pages'=>array('profile.php', 'popup_media.php'))
 				)
 			)
 	);
