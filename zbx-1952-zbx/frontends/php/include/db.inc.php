@@ -251,6 +251,8 @@ if(!isset($DB)){
 		$DB['TRANSACTION_STATE'] = true;
 
 		$result = false;
+		$time_start=microtime(true);
+
 		if(isset($DB['DB']) && !empty($DB['DB']))
 		switch($DB['TYPE']){
 			case 'MYSQL':
@@ -270,6 +272,7 @@ if(!isset($DB)){
 				}
 				break;
 		}
+
 	return $result;
 	}
 
@@ -320,6 +323,8 @@ if(!isset($DB)){
 		global $DB;
 
 		$result = false;
+		$time_start=microtime(true);
+		
 		if( isset($DB['DB']) && !empty($DB['DB']) )
 		switch($DB['TYPE']){
 			case 'MYSQL':
@@ -345,6 +350,8 @@ if(!isset($DB)){
 		global $DB;
 
 		$result = false;
+		$time_start=microtime(true);
+
 		if( isset($DB['DB']) && !empty($DB['DB']) )
 		switch($DB['TYPE']){
 			case 'MYSQL':
