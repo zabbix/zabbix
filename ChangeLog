@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-3] fixed logging into syslog, Zabbix log levels are properly linked to syslog levels (Dmitry)
  - [ZBX-2022] fixed link color picker in maps in IE7 (Vednak)
  - [ZBX-1968] fixed error in log item history in ie8 (Vedmak)
  - [ZBX-2020] added requirements check for PHP input_max_time (Vedmak)
