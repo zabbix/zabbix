@@ -20,13 +20,13 @@
 #ifndef ZABBIX_LOG_H
 #define ZABBIX_LOG_H
 
-#define LOG_LEVEL_EMPTY		0
+#define LOG_LEVEL_EMPTY		0	/* printing nothing (if not LOG_LEVEL_INFORMATION set) */
 #define LOG_LEVEL_CRIT		1
 #define LOG_LEVEL_ERR		2
 #define LOG_LEVEL_WARNING	3
 #define LOG_LEVEL_DEBUG		4
 
-#define LOG_LEVEL_INFORMATION	127
+#define LOG_LEVEL_INFORMATION	127	/* printing in any case no matter what level set */
 
 #define LOG_TYPE_UNDEFINED	0
 #define LOG_TYPE_SYSLOG		1
@@ -43,7 +43,7 @@ typedef enum {
 
 extern int	CONFIG_LOG_FILE_SIZE;
 
-/* Type - 0 (syslog), 1 - file */
+/* Type - 1 (syslog), 2 - file */
 int zabbix_open_log(int type,int level, const char *filename);
 
 #ifdef HAVE___VA_ARGS__
