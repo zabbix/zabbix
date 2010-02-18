@@ -86,7 +86,7 @@ mlink: {
 	label:			'',				// Link label
 	selementid1:	0,				// ALWAYS must be a STRING (js doesn't support uint64)
 	selementid2:	0,				// ALWAYS must be a STRING (js doesn't support uint64)
-	linktriggers:	{},				// ALWAYS must be a STRING (js doesn't support uint64)
+	linktriggers:	null,			// ALWAYS must be a STRING (js doesn't support uint64)
 	tr_desc:		'Select',		// default trigger caption
 	drawtype:		0,
 	color:			'0000CC',
@@ -253,6 +253,8 @@ add_empty_link: function(e){
 	
 	mlink['selementid1'] = selementid1;
 	mlink['selementid2'] = selementid2;
+
+	mlink['linktriggers'] = {};
 
 	this.add_link(mlink,1);
 	this.update_linkContainer(e);
