@@ -2847,7 +2847,8 @@ this.linkForm.colorPicker = e_div_6;
 	e_div_6.setAttribute('id',"lbl_color");
 	e_div_6.setAttribute('name',"lbl_color");
 	e_div_6.className = "pointer";
-	e_div_6.setAttribute('onclick',"javascript: show_color_picker('color')");
+	addListener(e_div_6, 'click', function(){ show_color_picker('color');});
+	// e_div_6.setAttribute('onclick',"javascript: show_color_picker('color')");
 
 	e_div_6.style.marginLeft = '2px';
 	e_div_6.style.border = '1px solid black';
