@@ -311,6 +311,7 @@ class CTrigger extends CZBXAPI{
 // expand_data
 		if(!is_null($options['expand_data'])){
 			$sql_parts['select']['host'] = 'h.host';
+			$sql_parts['select']['hostid'] = 'h.hostid';
 			$sql_parts['from']['f'] = 'functions f';
 			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['from']['h'] = 'hosts h';

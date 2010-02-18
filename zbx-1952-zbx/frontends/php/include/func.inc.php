@@ -554,8 +554,8 @@ function mem2str($size){
 	return round($size, 6).$prefix;
 }
 
-// showUnits:  0/false - units off, 1/true - units short, 2 - units long
-function convert_units($value, $units, $showUnits=1){
+// convert:
+function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 // Special processing for unix timestamps
 	if($units=='unixtime'){
 		$ret=date('Y.m.d H:i:s',$value);
@@ -593,15 +593,20 @@ function convert_units($value, $units, $showUnits=1){
 
 // Any other unit
 //-------------------
+
 	switch($units){
 		case 'B':
 			$step=1024;
+			$convert = $convert?$convert:ITEM_CONVERT_NO_UNITS;
 			break;
 		case 'b':
 		case 'bps':
+			$convert = $convert?$convert:ITEM_CONVERT_NO_UNITS;
 		default:
 			$step = 1000;
 	}
+
+	if($convert == ITEM_CONVERT_WITH_UNITS) return $value;
 
 // INIT intervals
 	static $digitUnits;
@@ -641,7 +646,7 @@ function convert_units($value, $units, $showUnits=1){
 	if(round($valUnit['value'],2) == round($valUnit['value'],0)) $format = '%.0f %s%s';
 	else $format = '%.2f %s%s';
 	
-	switch($showUnits){
+	switch($convert){
 		case 0: $units = ''; 
 		case 1: $desc = $valUnit['short']; break;
 		case 2: $desc = $valUnit['long']; break;

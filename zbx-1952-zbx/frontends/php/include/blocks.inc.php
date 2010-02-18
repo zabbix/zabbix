@@ -343,7 +343,7 @@ function make_system_summary(){
 					);
 
 					$event = array();
-					//$event = CEvent::get($options);
+					$event = CEvent::get($options);
 					$event = reset($event);
 
 					$actions = S_NO_DATA_SMALL;
@@ -356,7 +356,7 @@ function make_system_summary(){
 						}
 
 						// $description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock' => $event['clock'])), ZBX_FLAG_EVENT);
-						$actions = '';//get_event_actions_status($event['eventid']);
+						$actions = get_event_actions_status($event['eventid']);
 					}
 					else{
 						$ack = '-';
@@ -370,8 +370,8 @@ function make_system_summary(){
 						get_node_name_by_elid($trigger['triggerid']),
 						$trigger_hosts,
 						new CCol($description, get_severity_style($trigger['priority'])),
-//						zbx_date2age($event['clock']),
-						zbx_date2age($trigger['lastchange']),
+						zbx_date2age($event['clock']),
+//						zbx_date2age($trigger['lastchange']),
 						($config['event_ack_enable']) ? (new CCol($ack, 'center')) : NULL,
 						$actions
 					));
@@ -408,11 +408,11 @@ function make_hoststat_summary(){
 	$options = array(
 		'nodeids' => get_current_nodeid(),
 		'monitored_hosts' => 1,
-		'with_monitored_triggers' => 1,
-		'select_hosts' => API_OUTPUT_REFER,
 		'output' => API_OUTPUT_EXTEND
 	);
+
 	$groups = CHostGroup::get($options);
+	$groups = zbx_toHash($groups, 'groupid');
 
 	order_result($groups, 'name');
 // }}} SELECT HOST GROUPS
@@ -423,7 +423,6 @@ function make_hoststat_summary(){
 		'groupids' => zbx_objectValues($groups, 'groupid'),
 		'monitored_hosts' => 1,
 		'with_monitored_triggers' => 1,
-		'select_groups' => API_OUTPUT_REFER,
 		'output' => API_OUTPUT_EXTEND
 	);
 	$hosts = CHost::get($options);
@@ -435,7 +434,8 @@ function make_hoststat_summary(){
 		'nodeids' => get_current_nodeid(),
 		'monitored' => 1,
 		'only_problems' => 1,
-		'select_hosts' => API_OUTPUT_REFER,
+		'expand_data' => 1,
+//		'select_hosts' => API_OUTPUT_REFER,
 		'output' => API_OUTPUT_EXTEND,
 	);
 	$triggers = CTrigger::get($options);
@@ -486,6 +486,9 @@ function make_hoststat_summary(){
 
 	foreach($hosts as $hnum => $host){
 		foreach($host['groups'] as $gnum => $group){
+			if(!isset($groups[$group['groupid']]['hosts'])) $groups[$group['groupid']]['hosts'] = array();
+			$groups[$group['groupid']]['hosts'][$host['hostid']] = $host['hostid'];
+
 			if(!isset($highest_severity[$group['groupid']]))
 				$highest_severity[$group['groupid']] = array('severity' => 0, 'hostids' => array());
 
@@ -498,6 +501,8 @@ function make_hoststat_summary(){
 	}
 
 	foreach($groups as $gnum => $group){
+		if(!isset($hosts_data[$group['groupid']])) continue;
+
 		$group_row = new CRow();
 		if(is_show_all_nodes())
 			$group_row->addItem(get_node_name_by_elid($group['groupid']));
