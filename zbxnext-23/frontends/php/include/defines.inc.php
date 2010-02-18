@@ -724,4 +724,5 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 
 /* init precision */
 	ini_set('precision', 14);
+
 ?>
