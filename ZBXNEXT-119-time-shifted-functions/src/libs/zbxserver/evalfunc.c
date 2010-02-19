@@ -770,7 +770,7 @@ static int	evaluate_AVG(char *value, DB_ITEM *item, const char *function, const 
  *                                                                            *
  * Parameters: value - require size 'MAX_STRING_LEN'                          *
  *             item - item (performance metric)                               *
- *             num - Nth last value                                           *
+ *             parameters - Nth last value and time shift (optional)          *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -785,7 +785,7 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 	const char	*__function_name = "evaluate_LAST";
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		arg1, flag, res = FAIL, rows = 0;
+	int		arg1, flag, time_shift = 0, time_shift_flag, res = FAIL, rows = 0;
 	char		sql[128];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -798,6 +798,15 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 			flag = ZBX_FLAG_VALUES;
 		}
 
+		if (num_param(parameters) == 2)
+			if (SUCCEED == get_function_parameter_uint(item, parameters, 2, &time_shift, &time_shift_flag) &&
+				time_shift_flag == ZBX_FLAG_SEC)
+			{
+				now -= time_shift;
+				time_shift = 1;
+			}
+			else
+				goto clean;
 	}
 	else if (0 == strcmp(function, "prev"))
 	{
@@ -807,8 +816,8 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 	else
 		goto clean;
 
-	switch (arg1) {
-	case 1:
+	if (time_shift == 0 && arg1 == 1)
+	{
 		if (1 != item->lastvalue_null)
 		{
 			switch (item->value_type) {
@@ -824,8 +833,9 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 			}
 			res = SUCCEED;
 		}
-		break;
-	case 2:
+	}
+	else if (time_shift == 0 && arg1 == 2)
+	{
 		if (1 != item->prevvalue_null)
 		{
 			switch (item->value_type) {
@@ -841,15 +851,18 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 			}
 			res = SUCCEED;
 		}
-		break;
-	default:
+	}
+	else
+	{
 		zbx_snprintf(sql, sizeof(sql),
 				"select value,clock"
 				" from %s"
 				" where itemid=" ZBX_FS_UI64
+					" and clock<=%d"
 				" order by %s desc",
 				get_table_by_value_type(item->value_type),
 				item->itemid,
+				now,
 				get_key_by_value_type(item->value_type));
 
 		result = DBselectN(sql, arg1);
@@ -865,6 +878,7 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 
 		DBfree_result(result);
 	}
+
 clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
