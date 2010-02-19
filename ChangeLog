@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1876] fixed processing of ICMP pings when "fping" or "fping6" binaries are missing (Dmitry)
  - [ZBX-1995] fixed errors when save/update web scenario with existing name (Vedmak)
  - [ZBX-2014] fixed pie chart in screen renders last hour of data only (Vedmak)
  - [ZBX-2025] fixed deletion of actions (Vedmak)
