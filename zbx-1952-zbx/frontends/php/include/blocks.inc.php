@@ -241,8 +241,7 @@ function make_system_summary(){
 	$options = array(
 		'nodeids' => get_current_nodeid(),
 		'monitored_hosts' => 1,
-		'with_monitored_triggers' => 1,
-		'select_hosts' => 1,
+		'select_hosts' => API_OUTPUT_SHORTEN,
 		'output' => API_OUTPUT_EXTEND,
 	);
 	$groups = CHostGroup::get($options);
@@ -270,10 +269,8 @@ function make_system_summary(){
 		'groupids' => $groupids,
 		'monitored' => 1,
 		'only_problems' => 1,
-		'select_hosts' => API_OUTPUT_EXTEND,
+		'expand_data' => 1,
 		'select_dependencies' => API_OUTPUT_SHORTEN,
-		'select_items' => API_OUTPUT_EXTEND,
-		'select_functions' => API_OUTPUT_EXTEND,
 		'output' => API_OUTPUT_EXTEND,
 	);
 	$triggers = CTrigger::get($options);
@@ -283,13 +280,8 @@ function make_system_summary(){
 		if(!empty($trigger['dependencies'])) continue;
 
 		$trigger['groups'] = zbx_toHash($trigger['groups'], 'groupid');
-		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
-		$trigger['items'] = zbx_toHash($trigger['items'], 'itemid');
-		$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
 
 		foreach($groups as $groupid => $group){
-//			if(!trigger_dependent($trigger['triggerid'])){
-
 			if(isset($trigger['groups'][$group['groupid']])){
 				if($groups[$groupid]['tab_priority'][$trigger['priority']]['count'] < 30){
 					$groups[$groupid]['tab_priority'][$trigger['priority']]['triggers'][] = $trigger;
@@ -297,8 +289,10 @@ function make_system_summary(){
 				$groups[$groupid]['tab_priority'][$trigger['priority']]['count']++;
 			}
 		}
+		unset($triggers[$tnum]);
 	}
 // }}} SELECT TRIGGERS
+
 	foreach($groups as $gnum => $group){
 		$group_row = new CRow();
 		if(is_show_all_nodes())
@@ -323,11 +317,7 @@ function make_system_summary(){
 				));
 
 				foreach($data['triggers'] as $tnum => $trigger){
-					$trigger_hosts = array();
-					foreach($trigger['hosts'] as $host){
-						$trigger_hosts[] = $host['host'];
-					}
-					$trigger_hosts = implode(', ', $trigger_hosts);
+					$trigger_hosts = $trigger['host'];
 
 
 					$options = array(
@@ -364,7 +354,8 @@ function make_system_summary(){
 						$event['clock'] = $trigger['lastchange'];
 					}
 //*/
-					$description = expandTriggerDescription($trigger, ZBX_FLAG_EVENT);
+//					$description = expandTriggerDescription($trigger, ZBX_FLAG_EVENT);
+					$description = expand_trigger_description_by_data($trigger);
 
 					$table_inf->addRow(array(
 						get_node_name_by_elid($trigger['triggerid']),
@@ -422,7 +413,6 @@ function make_hoststat_summary(){
 		'nodeids' => get_current_nodeid(),
 		'groupids' => zbx_objectValues($groups, 'groupid'),
 		'monitored_hosts' => 1,
-		'with_monitored_triggers' => 1,
 		'output' => API_OUTPUT_EXTEND
 	);
 	$hosts = CHost::get($options);
@@ -435,7 +425,6 @@ function make_hoststat_summary(){
 		'monitored' => 1,
 		'only_problems' => 1,
 		'expand_data' => 1,
-//		'select_hosts' => API_OUTPUT_REFER,
 		'output' => API_OUTPUT_EXTEND,
 	);
 	$triggers = CTrigger::get($options);
@@ -467,30 +456,32 @@ function make_hoststat_summary(){
 
 			foreach($host['groups'] as $gnum => $group){
 				if(!isset($highest_severity[$group['groupid']]))
-					$highest_severity[$group['groupid']] = array('severity' => 0, 'hostids' => array());
+					$highest_severity[$group['groupid']] = 0;
 				
-				if($trigger['priority'] > $highest_severity[$group['groupid']]['severity']){
-					if(!isset($highest_severity[$group['groupid']]['hostids'][$host['hostid']])){
-						$highest_severity[$group['groupid']]['hostids'][$host['hostid']] = $host['hostid'];
-						$highest_severity[$group['groupid']]['severity'] = $trigger['priority'];
-					}
+				if($trigger['priority'] > $highest_severity[$group['groupid']]){
+					$highest_severity[$group['groupid']] = $trigger['priority'];
 				}
 
 				if(!isset($hosts_data[$group['groupid']]))
-					$hosts_data[$group['groupid']] = array('problematic' => 0,'ok' => 0);
+					$hosts_data[$group['groupid']] = array('problematic' => 0, 'ok' => 0, 'hostids' => array());
 
-				$hosts_data[$group['groupid']]['problematic']++;
+				if(!isset($hosts_data[$group['groupid']]['hostids'][$host['hostid']])){
+					$hosts_data[$group['groupid']]['hostids'][$host['hostid']] = $host['hostid'];
+					$hosts_data[$group['groupid']]['problematic']++;
+				}
 			}
 		}
 	}
 
 	foreach($hosts as $hnum => $host){
 		foreach($host['groups'] as $gnum => $group){
-			if(!isset($groups[$group['groupid']]['hosts'])) $groups[$group['groupid']]['hosts'] = array();
-			$groups[$group['groupid']]['hosts'][$host['hostid']] = $host['hostid'];
+			if(!isset($groups[$group['groupid']]['hosts'])) 
+				$groups[$group['groupid']]['hosts'] = array();
+
+			$groups[$group['groupid']]['hosts'][$host['hostid']] = array('hostid'=> $host['hostid']);
 
 			if(!isset($highest_severity[$group['groupid']]))
-				$highest_severity[$group['groupid']] = array('severity' => 0, 'hostids' => array());
+				$highest_severity[$group['groupid']] = 0;
 
 			if(!isset($hosts_data[$group['groupid']]))
 				$hosts_data[$group['groupid']] = array('problematic' => 0,'ok' => 0);
@@ -525,6 +516,7 @@ function make_hoststat_summary(){
 			));
 
 			$popup_rows = 0;
+
 			foreach($group['hosts'] as $hnum => $host){
 				$hostid = $host['hostid'];
 				if(!isset($problematic_host_list[$hostid])) continue;
@@ -535,7 +527,8 @@ function make_hoststat_summary(){
 
 				$r = new CRow();
 				$r->addItem(new CLink($host_data['host'], 'tr_status.php?groupid='.$group['groupid'].'&hostid='.$hostid.'&show_triggers='.TRIGGERS_OPTION_ONLYTRUE));
-				foreach($host_data['severities'] as $severity => $trigger_count){
+
+				foreach($problematic_host_list[$host['hostid']]['severities'] as $severity => $trigger_count){
 					$r->addItem(new CCol($trigger_count, get_severity_style($severity, $trigger_count)));
 				}
 
@@ -554,13 +547,13 @@ function make_hoststat_summary(){
 		$group_row->addItem(
 				new CCol(
 					$hosts_data[$group['groupid']]['ok'],
-					get_severity_style($highest_severity[$group['groupid']]['severity'], 0)
+					get_severity_style($highest_severity[$group['groupid']], 0)
 				)
 			);
 		$group_row->addItem(
 				new CCol(
 					$problematic_count,
-					get_severity_style($highest_severity[$group['groupid']]['severity'], $hosts_data[$group['groupid']]['problematic'])
+					get_severity_style($highest_severity[$group['groupid']], $hosts_data[$group['groupid']]['problematic'])
 				)
 			);
 		$group_row->addItem($hosts_data[$group['groupid']]['problematic'] + $hosts_data[$group['groupid']]['ok']);
@@ -678,6 +671,7 @@ function make_latest_issues($params = array()){
 	$options = array(
 		'output' => API_OUTPUT_EXTEND,
 		'select_hosts' => API_OUTPUT_EXTEND,
+		'select_dependencies' => API_OUTPUT_REFER,
 		'monitored' => 1,
 		'only_problems' => 1,
 		'sortfield' => 'lastchange',
@@ -700,7 +694,7 @@ function make_latest_issues($params = array()){
 	$triggers_hostids = array_keys($triggers_hosts);
 // }}} GATHER HOSTS FOR SELECTED TRIGGERS
 
-	$scripts_by_hosts = Cscript::getScriptsByHosts($triggers_hostids);
+	$scripts_by_hosts = CScript::getScriptsByHosts($triggers_hostids);
 
 	$table  = new CTableInfo();
 	$table->setHeader(array(
@@ -715,7 +709,7 @@ function make_latest_issues($params = array()){
 
 	foreach($triggers as $tnum => $trigger){
 // Check for dependencies
-		if(trigger_dependent($trigger["triggerid"]))	continue;
+		if(!empty($trigger['dependencies']))	continue;
 
 		$host = reset($trigger['hosts']);
 		$trigger['hostid'] = $host['hostid'];
@@ -752,7 +746,6 @@ function make_latest_issues($params = array()){
 						' AND e.value='.TRIGGER_VALUE_TRUE.
 					' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
 		$res_events = DBSelect($event_sql,1);
-
 		while($row_event=DBfetch($res_events)){
 			$ack = NULL;
 			if($config['event_ack_enable']){
