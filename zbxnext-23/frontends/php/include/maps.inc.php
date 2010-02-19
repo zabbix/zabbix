@@ -1985,6 +1985,7 @@
 					unset($link['linkid']);
 					foreach($link['linktriggers'] as $ltnum => &$linktrigger){
 						unset($linktrigger['linktriggerid']);
+						unset($linktrigger['linkid']);
 						$linktrigger['triggerid'] = $triggers[$linktrigger['triggerid']];
 					}
 				}
