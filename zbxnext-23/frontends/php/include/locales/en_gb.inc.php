@@ -170,6 +170,7 @@
 	'S_IMPORT'=>				'Import',
 	'S_IMPORT_BIG'=>			'IMPORT',
 	'S_EXPORT'=>				'Export',
+	'S_EXPORT_SELECTED'=>		'Export selected',
 	'S_EXPORT_BIG'=>			'EXPORT',
 	'S_PREVIEW'=>				'Preview',
 	'S_BACK'=>				'Back',

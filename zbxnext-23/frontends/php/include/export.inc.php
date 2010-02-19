@@ -251,7 +251,7 @@ class zbxXML{
 //SDI($dom->saveXML($parentNode));
 			}
 			else if(!zbx_empty($value)){
-				$child = $dom->createElement($key, htmlentities($value));
+				$child = $dom->createElement($key, htmlspecialchars($value));
 				$parentNode->appendChild($child);
 			}
 		}

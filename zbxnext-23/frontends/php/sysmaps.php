@@ -296,7 +296,7 @@ include_once('include/page_header.php');
 
 // goBox
 		$goBox = new CComboBox('go');
-		$goBox->addItem('export', S_EXPORT);
+		$goBox->addItem('export', S_EXPORT_SELECTED);
 
 		$goOption = new CComboItem('delete', S_DELETE_SELECTED);
 		$goOption->setAttribute('confirm',S_DELETE_SELECTED_MAPS_Q);
