@@ -2997,9 +2997,9 @@ this.linkForm.linkIndicatorsBody = e_tbody_7;
 
 	var e_input_10 = document.createElement('input');
 	e_input_10.setAttribute('type',"checkbox");
-	e_input_10.setAttribute('onclick',"javascript: checkAll('linkForm','all_triggers','triggers');");
-	e_input_10.setAttribute('id',"all_triggers");
-	e_input_10.setAttribute('name',"all_triggers");
+	e_input_10.setAttribute('onclick',"javascript: checkLocalAll('linkForm','all_link_triggerids','link_triggerids');");
+	e_input_10.setAttribute('id',"all_link_triggerids");
+	e_input_10.setAttribute('name',"all_link_triggerids");
 	e_input_10.setAttribute('value',"yes");
 	e_input_10.className = "checkbox";
 	e_td_9.appendChild(e_input_10);
