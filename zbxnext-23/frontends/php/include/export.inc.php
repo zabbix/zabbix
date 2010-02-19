@@ -251,7 +251,7 @@ class zbxXML{
 //SDI($dom->saveXML($parentNode));
 			}
 			else if(!zbx_empty($value)){
-				$child = $dom->createElement($key, $value);
+				$child = $dom->createElement($key, htmlentities($value));
 				$parentNode->appendChild($child);
 			}
 		}
@@ -489,10 +489,8 @@ class zbxXML{
 				unset($link);
 
 				$sysmaps[] = $sysmap;
-//SDII($sysmap);
 			}
 			unset($sysmap);
-
 
 			$importMaps = $sysmaps;
 			foreach($importMaps as $mnum => $importMap){
@@ -533,12 +531,13 @@ class zbxXML{
 						if($link['selementid1'] == $selement['selementid']) $links[$id]['selementid1'] = $selementid;
 						else if($link['selementid2'] == $selement['selementid']) $links[$id]['selementid2'] = $selementid;
 					}
+					unset($link);
 				}
-
 
 				foreach($links as $id => $link){
 					if(!isset($link['linktriggers'])) $link['linktriggers'] = array();
 					$link['sysmapid'] = $sysmap['sysmapid'];
+
 					$result = add_link($link);
 				}
 

@@ -223,11 +223,8 @@ include_once('include/page_header.php');
 	}
 	else if($templated_hosts){
 		$templated = 1;
-	}
-	else{
 		$host_status = 'templated_hosts';
 	}
-
 ?>
 <?php
 	global $USER_DETAILS;
@@ -293,7 +290,7 @@ include_once('include/page_header.php');
 	$validation_param = array('deny_all','select_first_group_if_empty','select_first_host_if_empty','select_host_on_group_switch');
 	if($monitored_hosts) array_push($validation_param, 'monitored_hosts');
 	if($real_hosts) 	array_push($validation_param, 'real_hosts');
-	if(isset($templated_hosts)) array_push($validation_param, 'templated_hosts');
+//	if(isset($templated_hosts)) array_push($validation_param, 'templated_hosts');
 
 	$nodeid = get_request('nodeid', get_current_nodeid(false));
 
