@@ -36,19 +36,36 @@ found_ssh2="yes",)
 
 AC_DEFUN([LIBSSH2_ACCEPT_VERSION],
 [
-	# get the version from the header file as a hex without "0x"
-	found_ssh2_version=`cat $1 | grep \#define.*LIBSSH2_VERSION_NUM | awk '{print substr(@S|@3,3,6);}'`
+	# Zabbix minimal major supported version of libssh2:
+	minimal_libssh2_major_version=1
 	
-	# convert hex into decimal for comparison
-	found_ssh2_version=`echo "ibase=16;@S|@found_ssh2_version" | bc`
+	# Zabbix minimal minor supported version of libssh2:
+	minimal_libssh2_minor_version=0
 	
-	# Zabbix minimal supported version of libssh2 in decimal is "65536" (0x010000)
-	minimal_libssh2_version=65536
+	# Zabbix minimal patch supported version of libssh2:
+	minimal_libssh2_patch_version=0
 	
-	if test $found_ssh2_version -ge $minimal_libssh2_version; then
+	# get the major version
+	found_ssh2_version_major=`cat $1 | $EGREP \#define.*LIBSSH2_VERSION_MAJOR | $AWK '{print @S|@3;}'`
+	
+	# get the minor version
+	found_ssh2_version_minor=`cat $1 | $EGREP \#define.*LIBSSH2_VERSION_MINOR | $AWK '{print @S|@3;}'`
+	
+	# get the patch version
+	found_ssh2_version_patch=`cat $1 | $EGREP \#define.*LIBSSH2_VERSION_PATCH | $AWK '{print @S|@3;}'`
+	
+	accept_ssh2_version="no"
+	
+	if test $found_ssh2_version_major -gt $minimal_libssh2_major_version; then
 		accept_ssh2_version="yes"
-	else
-		accept_ssh2_version="no"
+	elif test $found_ssh2_version_major -eq $minimal_libssh2_major_version; then
+		if test $found_ssh2_version_minor -gt $minimal_libssh2_minor_version; then
+			accept_ssh2_version="yes"
+		elif test $found_ssh2_version_minor -eq $minimal_libssh2_minor_version; then
+			if test $found_ssh2_version_patch -ge $minimal_libssh2_patch_version; then
+				accept_ssh2_version="yes"
+			fi
+		fi
 	fi;
 ])dnl
 

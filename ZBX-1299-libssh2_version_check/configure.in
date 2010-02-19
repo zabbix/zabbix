@@ -1055,7 +1055,7 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 		if test "x$found_ssh2" != "xyes"; then
 			AC_MSG_ERROR([SSH2 library not found])
 		elif test "x$accept_ssh2_version" != "xyes"; then
-			AC_MSG_ERROR([SSH2 library version does not meet (>= 1.0.0).])
+			AC_MSG_ERROR([SSH2 library version requirement not met (>= 1.0.0)])
 		else
 			have_ssh2="yes"
 		fi
