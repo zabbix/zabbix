@@ -350,13 +350,13 @@
 			'y' => 50,
 			'url' => ''
 		);
-
+//SDII($selement);
 		if(!check_db_fields($selement_db_fields, $selement)){
 			$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields for element');
 			return false;
 		}
 
-		if($selement['label_location']<0) $selement['label_location']='null';
+//		if($selement['label_location']<0) $selement['label_location']='null';
 		if(check_circle_elements_link($selement['sysmapid'],$selement['elementid'],$selement['elementtype'])){
 			error(S_CIRCULAR_LINK_CANNOT_BE_CREATED);
 			return false;

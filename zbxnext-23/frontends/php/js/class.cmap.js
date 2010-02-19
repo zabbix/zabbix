@@ -1315,6 +1315,8 @@ update_linkContainer: function(e){
 		}
 	}
 
+	this.linkContainer.container.style.height = 'auto';
+
 	var count = 0;
 	var maplink = null;
 	for(var linkid in linkids){
@@ -1324,7 +1326,6 @@ update_linkContainer: function(e){
 		maplink = this.links[linkid];
 		
 		if(count > 4) this.linkContainer.container.style.height = '120px';
-		else this.linkContainer.container.style.height = 'auto';
 
 		var e_tr_3 = document.createElement('tr');
 		e_tr_3.className = "even_row";
