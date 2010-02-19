@@ -694,7 +694,6 @@ class zbxXML{
 					$items_to_upd = array();
 					foreach($items as $inum => $item){
 						$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
-
 						$item_db['hostid'] = $current_host['hostid'];
 
 						$current_item = CItem::getObjects($item_db);
@@ -737,7 +736,8 @@ class zbxXML{
 // }}} ITEM APPLICATIONS
 
 						if($current_item && isset($rules['item']['exist'])){
-							$current_item = CItem::update($current_item);
+							$item_db['itemid'] = $current_item['itemid'];
+							$current_item = CItem::update($item_db);
 							if($current_item === false){
 								error(CItem::resetErrors());
 								$result = false;
@@ -745,8 +745,6 @@ class zbxXML{
 							}
 						}
 						if(!$current_item && isset($rules['item']['missed'])){
-							$item_db['hostid'] = $current_host['hostid'];
-
 							$current_item = CItem::create($item_db);
 							if($current_item === false){
 								error(CItem::resetErrors());
@@ -783,15 +781,14 @@ class zbxXML{
 						$current_trigger = CTrigger::getObjects($trigger_db);
 						$current_trigger = reset($current_trigger);
 
-
 						if(!$current_trigger && !isset($rules['trigger']['missed'])) continue; // break if update nonexist
 						if($current_trigger && !isset($rules['trigger']['exist'])) continue; // break if not update exist
 
 
 						if($current_trigger && isset($rules['trigger']['exist'])){
 							$triggers_for_dependencies[] = $current_trigger;
-							$current_trigger['expression'] = explode_exp($current_trigger['expression'], false);
-							$triggers_to_upd[] = $current_trigger;
+							$trigger_db['triggerid'] = $current_trigger['triggerid'];
+							$triggers_to_upd[] = $trigger_db;
 						}
 						if(!$current_trigger && isset($rules['trigger']['missed'])){
 							$trigger_db['hostid'] = $current_host['hostid'];
