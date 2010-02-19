@@ -75,6 +75,7 @@ class CApplication extends CZBXAPI{
 			'hostids'				=> null,
 			'itemids'				=> null,
 			'applicationids'		=> null,
+			'templated'				=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
 // Filter
@@ -144,6 +145,7 @@ class CApplication extends CZBXAPI{
 			$sql_parts['where']['ahg'] = 'a.hostid=hg.hostid';
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 		}
+
 // hostids
 		if(!is_null($options['hostids'])){
 			zbx_value2array($options['hostids']);
@@ -154,12 +156,14 @@ class CApplication extends CZBXAPI{
 
 			$sql_parts['where']['hostid'] = DBcondition('a.hostid', $options['hostids']);
 		}
+
 // expand_data
 		if(!is_null($options['expand_data'])){
 			$sql_parts['select']['host'] = 'h.host';
 			$sql_parts['from']['h'] = 'hosts h';
 			$sql_parts['where']['ah'] = 'a.hostid=h.hostid';
 		}
+
 // itemids
 		if(!is_null($options['itemids'])){
 			zbx_value2array($options['itemids']);
@@ -182,6 +186,17 @@ class CApplication extends CZBXAPI{
 			}
 			$sql_parts['where'][] = DBcondition('a.applicationid', $options['applicationids']);
 
+		}
+
+// templated
+		if(!is_null($options['templated'])){
+			$sql_parts['from']['h'] = 'hosts h';
+			$sql_parts['where']['ah'] = 'a.hostid=h.hostid';
+
+			if($options['templated'])
+				$sql_parts['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
+			else
+				$sql_parts['where'][] = 'h.status<>'.HOST_STATUS_TEMPLATE;
 		}
 
 // extendoutput

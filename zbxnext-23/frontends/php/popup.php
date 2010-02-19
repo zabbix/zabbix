@@ -208,18 +208,26 @@ include_once('include/page_header.php');
 	$excludeids = get_request('excludeids', null);
 
 
-
-	$monitored_hosts	= get_request('monitored_hosts', 0);
 	$real_hosts			= get_request('real_hosts', 0);
+	$monitored_hosts	= get_request('monitored_hosts', 0);
+	$templated_hosts	= get_request('templated_hosts', 0);
 	$only_hostid		= get_request('only_hostid', null);
 
-	$host_status = array();
-	if ($monitored_hosts)
-		array_push($host_status, HOST_STATUS_MONITORED);
-	else if ($real_hosts)
-		array_push($host_status, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
-	else
-		array_push($host_status, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE);
+	$host_status = null;
+	$templated = null;
+	if($real_hosts){
+		$templated = 0;
+	}
+	else if($monitored_hosts){
+		$host_status = 'monitored_hosts';
+	}
+	else if($templated_hosts){
+		$templated = 1;
+	}
+	else{
+		$host_status = 'templated_hosts';
+	}
+
 ?>
 <?php
 	global $USER_DETAILS;
@@ -394,6 +402,7 @@ include_once('include/page_header.php');
 				'sortfield'=>'host'
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
+		if(!is_null($host_status)) $options[$host_status] = 1;
 
 		$hosts = CHost::get($options);
 
@@ -762,6 +771,7 @@ include_once('include/page_header.php');
 				'select_dependencies' => 1
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
+		if(!is_null($templated)) $options['templated'] = $templated;
 
 		$triggers = CTrigger::get($options);
 		order_result($triggers, 'description');
@@ -772,7 +782,6 @@ include_once('include/page_header.php');
 
 			$exp_desc = expand_trigger_description_by_data($row);
 			$description = new CSpan($exp_desc, 'link');
-
 
 			if($multiselect) {
 				$js_action = 'add_selected_values("'.S_TRIGGERS.'", "'.$dstfrm.'", "'.$dstfld1.'", "'.$dstact.'", "'.$row["triggerid"].'");';
@@ -880,6 +889,7 @@ include_once('include/page_header.php');
 				'sortfield'=>'description'
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
+		if(!is_null($templated)) $options['templated'] = $templated;
 
 		$items = CItem::get($options);
 
@@ -928,6 +938,7 @@ include_once('include/page_header.php');
 				'sortfield'=>'description'
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
+		if(!is_null($templated)) $options['templated'] = $templated;
 
 		$items = CItem::get($options);
 
@@ -966,6 +977,15 @@ include_once('include/page_header.php');
 		$table->setHeader(array(
 			($hostid>0)?null:S_HOST,
 			S_NAME));
+
+		$options = array(
+			'nodeids' => $nodeid,
+			'hostids' => $hostid,
+			'output' => API_PUTPUT_EXTEND
+		);
+
+		if(!is_null($writeonly)) $options['editable'] = 1;
+		if(!is_null($templated)) $options['templated'] = $templated;
 
 		$sql = 'SELECT DISTINCT h.host,a.* '.
 				' FROM hosts h,applications a '.
@@ -1030,11 +1050,12 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'hostids' => $hostid,
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 			'nodeids' => $nodeid,
-			'select_hosts' => 1
+			'select_hosts' => API_OUTPUT_EXTEND
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
+		if(!is_null($templated)) $options['templated'] = $templated;
 
 		$graphs = CGraph::get($options);
 		order_result($graphs, 'name');
@@ -1107,6 +1128,7 @@ include_once('include/page_header.php');
 				'sortfield'=>'description'
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
+		if(!is_null($templated)) $options['templated'] = $templated;
 
 		$items = CItem::get($options);
 
@@ -1208,6 +1230,7 @@ include_once('include/page_header.php');
 				'sortfield'=>'description'
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
+		if(!is_null($templated)) $options['templated'] = $templated;
 
 		$items = CItem::get($options);
 

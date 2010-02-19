@@ -1144,6 +1144,7 @@
 	'S_REMOVE_LINK'=>				'Remove link',
 
 	'S_CANNOT_FIND_IMAGE'=>			'Cannot find image',
+	'S_CANNOT_FIND_BACKGROUND_IMAGE'=>	'Cannot find background image',
 	'S_CANNOT_FIND_TRIGGER'=>		'Cannot find trigger',
 	'S_CANNOT_FIND_HOST'=>			'Cannot find host',
 	'S_CANNOT_FIND_HOSTGROUP'=>		'Cannot find hostgroup',
@@ -1151,6 +1152,7 @@
 	'S_USED_IN_EXPORTED_MAP_SMALL'=>'used in exported map',
 	'S_NO_ICON_FOR_MAP_ELEMENT'=>	'No icon for map element',
 	'S_ROLLING_BACK_CHANGES'=>		'Rolling back changes',
+	'S_EXPORT_HAVE_NO_MAPS'=>		'Export does not contain ZABBIX maps',
 
 //	map.php
 	'S_OK_BIG'=>			'OK',

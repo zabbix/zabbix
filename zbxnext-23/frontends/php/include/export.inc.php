@@ -362,7 +362,7 @@ class zbxXML{
 	public static function parseMap($rules){
 		$importMaps = self::XMLtoArray(self::$xml);
 		if(!isset($importMaps['sysmaps'])){
-			info('Export does not contain ZABBIX maps');
+			info(S_EXPORT_HAVE_NO_MAPS);
 			return false;
 		}
 		$importMaps = $importMaps['sysmaps'];
@@ -388,7 +388,7 @@ class zbxXML{
 					$image = getImageByIdent($sysmap['backgroundid']);
 
 					if(!$image){
-						error('Cannot find background image "'.$sysmap['backgroundid']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"');
+						error(S_CANNOT_FIND_BACKGROUND_IMAGE.' "'.$sysmap['backgroundid']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"');
 						$sysmap['backgroundid'] = 0;
 					}
 					else{
