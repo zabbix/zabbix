@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-2016] fixed "cpustat.c" to avoid possible run-time memory corruption. Thanks to Takanori Suzuki. (Dmitry)
  - [ZBX-2041] minor configuration comment change about LogFile parameter for Windows agent (Dmitry)
  - [ZBX-1876] added remarks to configuration files of Zabbix server and proxy about fping6 (Dmitry)
  - [ZBX-1876] fixed processing of ICMP pings when "fping" or "fping6" binaries are missing (Dmitry)

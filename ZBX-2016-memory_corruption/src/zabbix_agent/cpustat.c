@@ -73,7 +73,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 		if (i == 0)
 			zbx_wsnprintf(cpu, sizeof(cpu), TEXT("_Total"));
 		else
-			_itow_s(i - 1, cpu, sizeof(cpu), 10);
+			_itow_s(i - 1, cpu, sizeof(cpu)/sizeof(TCHAR), 10);
 
 		dwSize = PDH_MAX_COUNTER_PATH;
 		if (ERROR_SUCCESS != (status = PdhMakeCounterPath(&cpe, counter_path, &dwSize, 0)))
