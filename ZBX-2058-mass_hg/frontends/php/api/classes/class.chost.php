@@ -701,6 +701,8 @@ class CHost extends CZBXAPI{
 
 	public static function checkObjects($hostsData){
 
+		$hostsData = zbx_toArray($hostsData);
+		
 		$result = array();
 		foreach($hostsData as $hnum => $hostData){
 			$options = array(
