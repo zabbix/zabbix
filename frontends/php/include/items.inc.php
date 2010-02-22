@@ -255,7 +255,7 @@
 				'templateid'		=> 0);
 
 		if(!check_db_fields($item_db_fields, $item)){
-			error(S_INCORRECT_ARGUMENTS_PASTED_TO_FUNCTION.SPACE.'[add_item]');
+			error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.SPACE.'[add_item]');
 			return false;
 		}
 
@@ -498,7 +498,7 @@
 
 
 		if(!check_db_fields($item_data, $item)){
-			error(S_INCORRECT_ARGUMENTS_PASTED_TO_FUNCTION.SPACE.'[update_item]');
+			error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.SPACE.'[update_item]');
 			return false;
 		}
 
@@ -568,7 +568,7 @@
 			}
 
 			if(!check_db_fields($db_tmp_item, $child_item_params)){
-				error(S_INCORRECT_ARGUMENTS_PASTED_TO_FUNCTION.SPACE.'[update_item]');
+				error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.SPACE.'[update_item]');
 				return false;
 			}
 

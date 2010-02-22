@@ -1830,9 +1830,9 @@
 	'S_PROFILE_FOR_THIS_HOST_IS_MISSING'=>	'Profile for this host is missing',
         'S_NO_IMAGE'=>				'No image',
 	'S_DELETE_SYSTEM_MAP_Q'=>		'Delete system map?',
-	
+
 //	items.inc.php
-	'S_INCORRECT_ARGUMENTS_PASTED_TO_FUNCTION'=>	'Incorrect arguments pasted to function',
+	'S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION'=>	'Incorrect arguments passed to function',
 	'S_INCORRECT_KEY_FORMAT'=>			'Incorrect key format',
 	'S_DELAY_CANNOT_BE_LESS_THAN_ONE_SECOND'=>	'Delay cannot be less than 1 second',
 	'S_INVALID_SNMP_PORT'=>				'Invalid SNMP port',
@@ -1868,7 +1868,7 @@
 	'S_AN_ACTION_TYPE_WITH_DESCRIPTION'=>	'An action type with description',
 
 //	hosts.inc.php
-	'S_CANNOT_EXISTS_WITHOUT_GROUP'=>		'can not exist without group',
+	'S_CANNOT_EXIST_WITHOUT_GROUP'=>		'can not exist without group',
 	'S_ADDED_HOST_GROUP'=>				'Added host group',
 	'S_UPDATED_HOST_GROUP'=>			'Updated host group',
 	'S_INCORRECT_CHARACTERS_USED_FOR_HOSTNAME'=>	'Incorrect characters used for Hostname',
@@ -1957,7 +1957,7 @@
 	'S_DELETE_IT_Q'=>				'Delete it?',
 	'S_THIS_SCREEN_ROW_NOT_EMPTY'=>	'This screen-row is not empty',
 	'S_THIS_SCREEN_COLUMN_NOT_EMPTY'=>		'This screen-column is not empty',
-	
+
 //	graphs.inc.php
 	'S_NO_GRAPH_WITH'=>					'No graph item with',
 	'S_MISSING_KEY'=>					'Missing key',
@@ -1985,7 +1985,7 @@
 	'S_WEEK_SMALL'=>		'week',
 
 //	services.inc.php
-	'S_SERVICE_CANNOT_PARENT_AND_CHILD_IN_ONETIME'=>	'Service cannot be parent and child in onetime.',
+	'S_SERVICE_CANNOT_BE_PARENT_AND_CHILD_AT_THE_SAME_TIME'=>	'Service cannot be parent and child at the same time.',
 	'S_CANNOT_LINK_HARDLINKED_SERVICE'=>			'Cannot link hardlinked service.',
 	'S_CANNOT_LINK_SERVICE_TO_ITSELF'=>			'Cannot link service to itself.',
 	'S_NO_SERVICE_WITH'=>					'No service with',
@@ -1994,7 +1994,7 @@
 
 //	perm.inc.php
 	'S_INCORRECT_USER_DATA_IN'=>		'Incorrect user data in',
-	
+
 //	images.inc.php
 	'S_COULD_NOT_SAVE_IMAGE'=>		'Could not save image!',
 	'S_EXECUTE_SQL_ERROR'=>			'Execute SQL error',
@@ -2002,7 +2002,7 @@
 	'S_IMAGE_SIZE_MUST_BE_LESS_THAN_MB'=>	'Image size must be less than 1Mb',
 	'S_SELECT_IMAGE_TO_DOWNLOAD'=>		'Select image to download',
 	'S_INCORRECT_IMAGE'=>			'Incorrect Image',
-	
+
 //	nodes.inc.php
 	'S_INCORRECT_CHARACTERS_USED_FOR_NODE_NAME'=>		'Incorrect characters used for Node name',
 	'S_MASTER_NODE_ALREADY_EXISTS'=>			'Master node already exists',
@@ -2010,10 +2010,6 @@
 	'S_NODE_WITH_SAME_ID_ALREADY_EXISTS'=>			'Node with same ID already exists',
 	'S_UNABLE_TO_REMOVE_LOCAL_NODE'=>			'Unable to remove local node',	
 	'S_DATABASE_STILL_CONTAINS_DATA_RELATED_DELETED_NODE'=>	'Please be aware that database still contains data related to the deleted Node',
-
-
-//	regexp.inc.php
-	'S_INCORRECT_ARGUMENTS_PASTED_TO_FUNCTION'=>	'Incorrect arguments pasted to function',
 
 //     requirements.inc.php
 	'S_PHP_VERSION' => 'PHP version',
