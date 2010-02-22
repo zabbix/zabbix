@@ -1,5 +1,8 @@
 Changes for 1.8.2
 
+ - [ZBX-1975] fixed permission check in graphs with web ites (Aly)
+ - [ZBX-2023] improved configuration triggers page (Aly)
+ - [DEV-453] implemented import/export of zabbix maps (Aly)
  - [ZBX-1320] fixed graph header alignment (Vedmak)
  - [ZBX-2041] minor configuration comment change about LogFile parameter for Windows agent (Dmitry)
  - [ZBX-1876] added remarks to configuration files of Zabbix server and proxy about fping6 (Dmitry)
