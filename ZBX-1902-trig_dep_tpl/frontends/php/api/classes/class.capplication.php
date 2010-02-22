@@ -398,6 +398,8 @@ class CApplication extends CZBXAPI{
 	}
 
 	public static function checkObjects($applicationsData){
+		$applicationsData = zbx_toArray($applicationsData);
+		
 		$result = array();
 		foreach($applicationsData as $inum => $applicationData){
 			$options = array(

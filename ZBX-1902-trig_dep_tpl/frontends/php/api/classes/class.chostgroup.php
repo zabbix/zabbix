@@ -411,7 +411,9 @@ class CHostGroup extends CZBXAPI{
 	}
 
 	public static function checkObjects($hostgroupsData){
-
+		
+		$hostgroupsData = zbx_toArray($hostgroupsData);
+		
 		$result = array();
 		foreach($hostgroupsData as $hnum => $hostgroupData){
 			$options = array(

@@ -649,6 +649,8 @@ class CTrigger extends CZBXAPI{
 	public static function checkObjects($triggersData){
 		$result = array();
 
+		$triggersData = zbx_toArray($triggersData);
+		
 		foreach($triggersData as $tnum => $triggerData){
 			$options = array(
 				'filter' => $triggerData,
