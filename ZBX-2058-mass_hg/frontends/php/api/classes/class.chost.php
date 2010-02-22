@@ -1094,7 +1094,6 @@ class CHost extends CZBXAPI{
 			if(isset($data['groups']) && empty($data['groups'])){
 				throw new APIException(ZBX_API_ERROR_PARAMETERS, 'No groups for hosts');
 			}
-			$data['groups'] = zbx_toArray($data['groups']);
 // }}} CHECK IF HOSTS HAVE AT LEAST 1 GROUP
 
 			$transaction = self::BeginTransaction(__METHOD__);
@@ -1156,6 +1155,8 @@ class CHost extends CZBXAPI{
 
 // UPDATE HOSTGROUPS LINKAGE {{{
 			if(isset($data['groups']) && !is_null($data['groups'])){
+				$data['groups'] = zbx_toArray($data['groups']);
+				
 				$host_groups = CHostGroup::get(array('hostids' => $hostids));
 				$host_groupids = zbx_objectValues($host_groups, 'groupid');
 				$new_groupids = zbx_objectValues($data['groups'], 'groupid');
