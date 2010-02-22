@@ -316,7 +316,7 @@ include_once 'include/page_header.php';
 		else
 			$lastclock = ' - ';
 
-		$lastvalue=format_lastvalue($db_item);
+		$lastvalue = format_lastvalue($db_item);
 
 		if(isset($db_item['lastvalue']) && isset($db_item['prevvalue']) && ($db_item['value_type'] == 0) && ($db_item['lastvalue']-$db_item['prevvalue'] != 0)){
 			if($db_item['lastvalue']-$db_item['prevvalue']<0){
@@ -461,7 +461,7 @@ include_once 'include/page_header.php';
 			}
 
 			$digits = ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? 2 : 0;
-			$change = $change . convert_units(bcsub($db_item['lastvalue'], $db_item['prevvalue'], $digits), $db_item['units']);
+			$change = $change . convert_units(bcsub($db_item['lastvalue'], $db_item['prevvalue'], $digits), $db_item['units'], 0);
 			$change = nbsp($change);
 		}
 		else{
