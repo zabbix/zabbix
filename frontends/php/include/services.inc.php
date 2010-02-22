@@ -23,7 +23,7 @@
 
 		foreach($childs as $id => $child){		//add childs
 			if((bccomp($parentid , $child['serviceid'])==0)){
-				error(S_SERVICE_CANNOT_PARENT_AND_CHILD_IN_ONETIME);
+				error(S_SERVICE_CANNOT_BE_PARENT_AND_CHILD_AT_THE_SAME_TIME);
 				return FALSE;
 			}
 		}
@@ -71,7 +71,7 @@
 	function	update_service($serviceid,$name,$triggerid,$algorithm,$showsla,$goodsla,$sortorder,$service_times=array(),$parentid,$childs){
 		foreach($childs as $id => $child){		//add childs
 			if((bccomp($parentid , $child['serviceid'])==0)){
-				error(S_SERVICE_CANNOT_PARENT_AND_CHILD_IN_ONETIME);
+				error(S_SERVICE_CANNOT_BE_PARENT_AND_CHILD_AT_THE_SAME_TIME);
 				return FALSE;
 			}
 		}

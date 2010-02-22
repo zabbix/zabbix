@@ -45,7 +45,7 @@ require_once('include/httptest.inc.php');
 
 		foreach($err_hostids as $num => $hostid){
 			$host = get_host_by_hostid($hostid);
-			error(S_HOST.SPACE.'"'.$host['host'].'"'.SPACE.S_CANNOT_EXISTS_WITHOUT_GROUP);
+			error(S_HOST.SPACE.'"'.$host['host'].'"'.SPACE.S_CANNOT_EXIST_WITHOUT_GROUP);
 
 			return false;
 		}

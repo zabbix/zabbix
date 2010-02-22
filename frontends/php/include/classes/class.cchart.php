@@ -333,10 +333,10 @@ class CChart extends CGraphDraw{
 			/* calculate missed points */
 			$first_idx = 0;
 			/*
-				first_idx - last existed point
+				first_idx - last existing point
 				ci - current index
-				cj - count of missed in onetime
-				dx - offset to first value (count to last existed point)
+				cj - count of missed in one go
+				dx - offset to first value (count to last existing point)
 			//*/
 
 			for($ci = 0, $cj=0; $ci < $this->sizeX; $ci++){
