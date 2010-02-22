@@ -595,6 +595,7 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 //-------------------
 
 	switch($units){
+		case 'Bps':
 		case 'B':
 			$step=1024;
 			$convert = $convert?$convert:ITEM_CONVERT_NO_UNITS;
