@@ -607,7 +607,12 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 			$step = 1000;
 	}
 
-	if($convert == ITEM_CONVERT_WITH_UNITS) return $value;
+	if(zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS)){
+		if(round($value,2) == round($value,0)) $format = '%.0f %s';
+		else $format = '%.2f %s';
+
+		return sprintf($format, $value, $units);
+	}
 
 // INIT intervals
 	static $digitUnits;
