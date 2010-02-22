@@ -297,6 +297,8 @@ class CImage extends CZBXAPI{
 	public static function checkObjects($imagesData){
 		$result = array();
 
+		$imagesData = zbx_toArray($imagesData);
+		
 		foreach($imagesData as $inum => $imageData){
 			$options = array(
 				'filter' => $imageData,
