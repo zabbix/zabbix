@@ -388,36 +388,11 @@ include_once('include/page_header.php');
 		'extendoutput' => 1,
 		'select_hosts' => 1,
 		'select_items' => 1,
-		'select_dependencies' => 1
+		'select_dependencies' => 1,
+		'skipDependent' => 1
 	);
 	$triggers = CTrigger::get($options);
 	$triggers = zbx_toHash($triggers, 'triggerid');
-
-
-// checking dependencies {{{
-	$deps = array();
-	foreach($triggers as $trigger){
-		$deps = array_merge($deps, $trigger['dependencies']);	
-	}
-
-	$options = array(
-		'nodeids' => get_current_nodeid(),
-		'triggerids' => zbx_objectValues($deps, 'triggerid'),
-		'output' => API_OUTPUT_SHORTEN,
-		'only_true' => 1
-	);
-	$deps = CTrigger::get($options);
-	$deps = zbx_toHash($deps, 'triggerid');
-	
-	foreach($triggers as $trigger){
-		foreach($trigger['dependencies'] as $dep){
-			if(isset($deps[$dep['triggerid']])){
-				unset($triggers[$trigger['triggerid']]);
-				break;
-			}
-		}
-	}
-// }}} checking dependencies	
 	
 	order_result($triggers, $sortfield, $sortorder);
 //---------
