@@ -573,7 +573,7 @@ include_once('include/page_header.php');
 				$description[] = ':';
 			}
 
-			$description[] = new CLink(expand_trigger_description_by_data2($trigger), 'triggers.php?form=update&triggerid='.$triggerid);
+			$description[] = new CLink(expandTriggerDescription($trigger), 'triggers.php?form=update&triggerid='.$triggerid);
 
 //add dependencies{
 			$deps = $trigger['dependencies'];

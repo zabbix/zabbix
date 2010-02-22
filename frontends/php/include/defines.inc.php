@@ -102,6 +102,11 @@
 	define('IMAGE_TYPE_ICON',		1);
 	define('IMAGE_TYPE_BACKGROUND',		2);
 
+	define('ITEM_CONVERT_WITH_UNITS',	0);		// - do not convert empty units
+	define('ITEM_CONVERT_NO_UNITS',		1);		// - no units
+	define('ITEM_CONVERT_SHORT_UNITS',	2);		// - to short units
+	define('ITEM_CONVERT_LONG_UNITS',	3);		// - to long units
+
 
 	define('ZBX_SORT_UP',			'ASC');
 	define('ZBX_SORT_DOWN',			'DESC');
