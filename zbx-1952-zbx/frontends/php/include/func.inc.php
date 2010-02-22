@@ -651,13 +651,13 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 //------
 	if(round($valUnit['value'],2) == round($valUnit['value'],0)) $format = '%.0f %s%s';
 	else $format = '%.2f %s%s';
-	
+
 	switch($convert){
-		case 0: $units = ''; 
+		case 0: $units = trim($units); 
 		case 1: $desc = $valUnit['short']; break;
 		case 2: $desc = $valUnit['long']; break;
 	}
-	
+
 return sprintf($format, $valUnit['value'], $desc, $units);
 }
 
