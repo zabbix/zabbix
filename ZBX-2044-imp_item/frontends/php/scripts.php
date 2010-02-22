@@ -313,7 +313,7 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 
 		$jsLocale = array(
 			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTES'
+			'S_NO_ELEMENTS_SELECTED'
 		);
 
 		zbx_addJSLocale($jsLocale);

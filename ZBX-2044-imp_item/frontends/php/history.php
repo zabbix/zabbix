@@ -137,7 +137,7 @@ include_once('include/page_header.php');
 	$options = array(
 		'nodeids' => get_current_nodeid(),
 		'itemids' => $_REQUEST['itemid'],
-		'webitems' => 1,
+		'webitems' => 1
 	);
 	$request_items = zbx_toArray($_REQUEST['itemid']);
 	$allowed_items = CItem::get($options);

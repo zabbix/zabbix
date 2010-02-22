@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -64,10 +64,8 @@ include_once('include/page_header.php');
 		'group_httptestid'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
 
 		'showdisabled'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	null),
-
 // Actions
 		'go'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
-
 // form
 		'clone'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -194,13 +192,11 @@ include_once('include/page_header.php');
 		$db_delay_flex = trim($db_delay_flex,';');
 		// for future use */
 
-		if ($_REQUEST['authentication'] != HTTPTEST_AUTH_NONE)
-		{
+		if($_REQUEST['authentication'] != HTTPTEST_AUTH_NONE){
 			$http_user = htmlspecialchars($_REQUEST['http_user']);
 			$http_password = htmlspecialchars($_REQUEST['http_password']);
 		}
-		else
-		{
+		else{
 			$http_user = '';
 			$http_password = '';
 		}
@@ -567,7 +563,7 @@ include_once('include/page_header.php');
 
 		$jsLocale = array(
 			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTES'
+			'S_NO_ELEMENTS_SELECTED'
 		);
 
 		zbx_addJSLocale($jsLocale);
@@ -582,9 +578,6 @@ include_once('include/page_header.php');
 		$http_wdgt->show();
 	}
 
-?>
-<?php
 
 include_once('include/page_footer.php');
-
 ?>
