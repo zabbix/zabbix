@@ -1049,11 +1049,13 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 
 	PROXY_LDFLAGS="${PROXY_LDFLAGS} ${SNMP_LDFLAGS}"
 
-	dnl Check for LIBSSH2 [by default - skip]
+	dnl Check for LIBSSH2 [by default - skip] at least of version 1.0.0.
 	LIBSSH2_CHECK_CONFIG([no])
 	if test "x$want_ssh2" = "xyes"; then
 		if test "x$found_ssh2" != "xyes"; then
 			AC_MSG_ERROR([SSH2 library not found])
+		elif test "x$accept_ssh2_version" != "xyes"; then
+			AC_MSG_ERROR([SSH2 library version requirement not met (>= 1.0.0)])
 		else
 			have_ssh2="yes"
 		fi
