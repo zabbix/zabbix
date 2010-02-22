@@ -1503,6 +1503,86 @@ return $result;
 
 		return $description;
 	}
+/*
+ * Function: expandTriggerDescription
+ *
+ * Description:
+ *	 substitute simple macros in data string with real values
+ *
+ * Author:
+ *	 Aly
+ *
+ * Comments: !!! Don't forget sync code with C !!!
+ *
+ */
+	function expandTriggerDescription($trigger, $flag = ZBX_FLAG_TRIGGER){
+		if($trigger){
+			$description = expand_trigger_description_constants($trigger['description'], $trigger);
+
+			for($i=0; $i<10; $i++){
+				$macro = '{HOSTNAME'.($i ? $i : '').'}';
+				if(zbx_strstr($description, $macro)) {
+					$functionid = trigger_get_N_functionid($trigger['expression'], $i ? $i : 1);
+
+					if(isset($functionid)) {
+						if(!isset($trigger['functions'][$functionid])) $triggerData = array('host' => $macro);
+					else
+						$triggerData = $trigger['functions'][$functionid];
+						$triggerData+= $trigger['items'][$triggerData['itemid']];
+						$triggerData+= $trigger['hosts'][$triggerData['hostid']];
+
+						$description = str_replace($macro, $triggerData['host'], $description);
+					}
+				}
+			}
+
+			for($i=0; $i<10; $i++){
+				$macro = '{ITEM.LASTVALUE'.($i ? $i : '').'}';
+				if(zbx_strstr($description, $macro)) {
+					$functionid = trigger_get_N_functionid($trigger['expression'], $i ? $i : 1);
+
+					if(isset($functionid)){
+						$triggerData = $trigger['functions'][$functionid];
+						$triggerData+= $trigger['items'][$triggerData['itemid']];
+						$triggerData+= $trigger['hosts'][$triggerData['hostid']];
+
+						if($triggerData['value_type']!=ITEM_VALUE_TYPE_LOG){
+							$description = str_replace($macro, $triggerData['lastvalue'], $description);
+						}
+						else{
+							$sql = 'SELECT MAX(clock) as max FROM history_log WHERE itemid='.$triggerData['itemid'];
+							$trigger3=DBfetch(DBselect($sql));
+							if($trigger3 && !is_null($trigger3['max'])){
+								$sql = 'SELECT value '.
+										' FROM history_log '.
+										' WHERE itemid='.$triggerData['itemid'].
+											' AND clock='.$trigger3['max'];
+								$trigger4=DBfetch(DBselect($sql));
+								$description = str_replace($macro, $trigger4['value'], $description);
+							}
+						}
+					}
+				}
+			}
+
+			for($i=0; $i<10; $i++){
+				$macro = '{ITEM.VALUE'.($i ? $i : '').'}';
+				if(zbx_strstr($description, $macro)){
+					$value=($flag==ZBX_FLAG_TRIGGER)?
+							trigger_get_func_value($trigger['expression'],ZBX_FLAG_TRIGGER,$i ? $i : 1, 1):
+							trigger_get_func_value($trigger['expression'],ZBX_FLAG_EVENT,$i ? $i : 1, $trigger['clock']);
+
+					$description = str_replace($macro, $value, $description);
+				}
+
+			}
+		}
+		else{
+			$description = '*ERROR*';
+		}
+	return $description;
+	}
+
 	/*
 	 * Function: expand_trigger_description_by_data
 	 *

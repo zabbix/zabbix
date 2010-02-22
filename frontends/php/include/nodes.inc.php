@@ -23,6 +23,7 @@
 	function update_node_profile($nodeids){
 		global $USER_DETAILS;
 
+		DBstart();
 		$sql = 'DELETE FROM profiles WHERE userid='.$USER_DETAILS['userid'].' AND idx='.zbx_dbstr('web.nodes.selected');
 		DBexecute($sql);
 
@@ -32,6 +33,8 @@
 				' VALUES ('.$profileid.','.$USER_DETAILS['userid'].', '.zbx_dbstr('web.nodes.selected').','.$nodeid.', 4)';
 			DBexecute($sql);
 		}
+
+		DBend();
 	}
 
 	function get_node_profile($default=null){
