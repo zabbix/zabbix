@@ -127,7 +127,6 @@ function get_user_auth($userid){
 
 	if(!zbx_empty($acc['gui_access'])){
 		$result = $acc['gui_access'];
-		$USER_DETAILS['gui_access'] = $acc['gui_access'];
 	}
 
 return $result;
@@ -170,21 +169,24 @@ return false;
 function get_user_system_auth($userid){
 	$config = select_config();
 	
-	if($config['authentication_type'] == ZBX_AUTH_HTTP){
-		$result = ZBX_AUTH_HTTP;
-	}
-	else{
-		$result = get_user_auth($userid);
-		switch($result){
-			case GROUP_GUI_ACCESS_SYSTEM:
-				$config = select_config();
-				$result = $config['authentication_type'];
-				break;
-			case GROUP_GUI_ACCESS_INTERNAL:
-			case GROUP_GUI_ACCESS_DISABLED:
-			default:
-				break;
-		}
+	$result = get_user_auth($userid);
+
+	switch($result){
+		case GROUP_GUI_ACCESS_SYSTEM:
+			$result = $config['authentication_type'];
+		break;
+		case GROUP_GUI_ACCESS_INTERNAL:
+			if($config['authentication_type'] == ZBX_AUTH_HTTP){
+				$result = ZBX_AUTH_HTTP;
+			}
+			else{
+				$result = ZBX_AUTH_INTERNAL;
+			}
+		break;
+		case GROUP_GUI_ACCESS_DISABLED:
+			$result = $config['authentication_type'];
+		default:
+			break;
 	}
 
 return $result;
