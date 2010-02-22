@@ -1763,7 +1763,7 @@
 	'S_INCORRECT_TIME_PERIOD'=>	'Incorrect time period',
 
 // main.js
-	'S_NO_ELEMENTS_SELECTES'=>	'No elements selected!',
+	'S_NO_ELEMENTS_SELECTED'=>	'No elements selected!',
 
 // page_header.php
 	'S_REFRESHED_EVERY_SMALL'=>		'refreshed every',
@@ -1839,7 +1839,7 @@
 	'S_UNKNOWN_VALUE_TYPE'=>			'Unknown value type',
 
 //	httptest.inc.php
-	'S_SCENARIO_STEP_NUMBER_CANNOT_BE_LESS_ONE'=>	'Scenario step number cannot be less then 1',
+	'S_SCENARIO_STEP_NUMBER_CANNOT_BE_LESS_ONE'=>	'Scenario step number cannot be less than 1',
 	'S_SCENARIO_STEP_NAME_SHOULD_CONTAIN'=>		'Scenario step name should contain',
 	'S_CHARACTERS_ONLY_SMALL'=>			'characters only',
 	'S_ONLY_CHARACTERS_ARE_ALLOWED'=>		'Only characters are allowed',
@@ -1853,7 +1853,7 @@
 	'S_NO_MEDIA_WITH'=>			'No media with',
 	'S_NO_MEDIA_TYPE_WITH'=>		'No media type with',
 	'S_AN_ACTION_TYPE_WITH_DESCRIPTION'=>	'An action type with description',
-	
+
 //	hosts.inc.php
 	'S_CANNOT_EXISTS_WITHOUT_GROUP'=>		'can not exist without group',
 	'S_ADDED_HOST_GROUP'=>				'Added host group',
@@ -1932,13 +1932,13 @@
 	
 
 //	page_footer.php
-	'S_TRANSACTION_HAVE_NOT_BEEN_CLOSED_ABORTING'=>	'Transaction have not been closed. Aborting..',
+	'S_TRANSACTION_HAVE_NOT_BEEN_CLOSED_ABORTING'=>	'Transaction has not been closed. Aborting..',
 
 //	maps.inc.php
 	'S_NO_SYSTEM_MAP_WITH'=>		'No system map with',
 	'S_NO_SYSMAP_ELEMENT_WITH'=>		'No sysmap element with',
 	'S_CIRCULAR_LINK_CANNOT_BE_CREATED'=>	'Circular link cannot be created',
-	
+
 //	screens.inc.php
 	'S_NO_ROWS_IN_SCREEN'=>				'No rows in screen',
 	'S_DELETE_IT_Q'=>				'Delete it?',
@@ -1958,7 +1958,7 @@
 	'S_UNLINKED_SMALL'=>					'unlinked',
 	'S_SKIPPED_COPYING_OF_GRAPH'=>				'Skipped copying of graph',
 	'S_TO_HOST_SMALL'=>					'to host',
-	
+
 
 //	profiles.inc.php
 	'S_UNABLE_TO_SELECT_CONFIGURATION'=>	'Unable to select configuration',
@@ -1997,7 +1997,7 @@
 	'S_NODE_WITH_SAME_ID_ALREADY_EXISTS'=>			'Node with same ID already exists',
 	'S_UNABLE_TO_REMOVE_LOCAL_NODE'=>			'Unable to remove local node',	
 	'S_DATABASE_STILL_CONTAINS_DATA_RELATED_DELETED_NODE'=>	'Please be aware that database still contains data related to the deleted Node',
-	
+
 
 //	regexp.inc.php
 	'S_INCORRECT_ARGUMENTS_PASTED_TO_FUNCTION'=>	'Incorrect arguments pasted to function',
