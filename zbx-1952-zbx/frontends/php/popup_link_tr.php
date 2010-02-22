@@ -106,7 +106,7 @@ return true;
 		}
 
 		$btnSelect = new CButton('btn1', S_SELECT,
-			"return PopUp('popup.php?dstfrm=".$frmCnct->getName().
+			"return PopUp('popup.php?real_hosts=1&dstfrm=".$frmCnct->getName().
 			"&dstfld1=triggerid&dstfld2=desc_exp&srctbl=triggers&srcfld1=triggerid&srcfld2=description');",
 			'T');
 		$btnSelect->setType('button');

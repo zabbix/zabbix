@@ -56,10 +56,12 @@ require_once('include/js.inc.php');
 						if(!isset($itemid))
 							$itemid = $ac_data['resourceid'];
 
-						$options = array();
-						$options['count'] = 1;
-						$options['itemids'] = $itemid;
-						$options['nodeids'] = get_current_nodeid(true);
+						$options = array(
+							'count' => 1,
+							'itemids' => $itemid,
+							'nodeids' => get_current_nodeid(true)
+						);
+
 						if($perm == PERM_READ_WRITE) $options['editable'] = 1;
 
 						$items = CItem::get($options);
@@ -1009,7 +1011,8 @@ require_once('include/js.inc.php');
 							$timeline['usertime'] += $timeline['period'];
 						}
 
-						$src = $url.'&width='.$width.'&height='.$height.'&legend='.$legend.'&graph3d='.$graph3d;
+						// $src = $url.'&width='.$width.'&height='.$height.'&legend='.$legend.'&graph3d='.$graph3d;
+						$src = $url.'&width='.$width.'&height='.$height.'&legend='.$legend.'&graph3d='.$graph3d.'&period='.$effectiveperiod.url_param('stime');
 
 						$objData['src'] = $src;
 

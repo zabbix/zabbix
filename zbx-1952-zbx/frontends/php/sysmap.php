@@ -107,7 +107,7 @@ include_once('include/page_header.php');
 					$db_map = reset($sysmaps);
 
 					$expandProblem = ($db_map['highlight'] > 1)? 0 : 1;
-					$map_info = getSelementsInfo($db_map['selements'], $expandProblem);
+					$map_info = getSelementsInfo($db_map, $expandProblem);
 //SDII($db_map);
 					add_elementNames($db_map['selements']);
 
@@ -195,9 +195,7 @@ include_once('include/page_header.php');
 							}
 						}
 
-						foreach($db_selementids as $id => $selementid){
-							delete_sysmaps_element($selementid);
-						}
+						delete_sysmaps_element($db_selementids);
 
 						$db_linkids = array();
 						$res = DBselect('SELECT linkid FROM sysmaps_links WHERE sysmapid='.$sysmapid);
@@ -217,9 +215,8 @@ include_once('include/page_header.php');
 							}
 						}
 
-						foreach($db_linkids as $id => $linkid){
-							delete_link($linkid);
-						}
+						delete_link($db_linkids);
+
 						$result = DBend(true);
 
 						if($result)

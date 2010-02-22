@@ -1,5 +1,18 @@
 Changes for 1.8.2
 
+ - [ZBX-1299] added check for the minimal (1.0.0) libssh2 library version (Dmitry)
+ - [ZBX-1975] fixed permission check in graphs with web ites (Aly)
+ - [ZBX-2023] improved configuration triggers page (Aly)
+ - [DEV-453] implemented import/export of zabbix maps (Aly)
+ - [ZBX-1320] fixed graph header alignment (Vedmak)
+ - [ZBX-2041] minor configuration comment change about LogFile parameter for Windows agent (Dmitry)
+ - [ZBX-1876] added remarks to configuration files of Zabbix server and proxy about fping6 (Dmitry)
+ - [ZBX-1876] fixed processing of ICMP pings when "fping" or "fping6" binaries are missing (Dmitry)
+ - [ZBX-1995] fixed errors when save/update web scenario with existing name (Vedmak)
+ - [ZBX-2014] fixed pie chart in screen renders last hour of data only (Vedmak)
+ - [ZBX-2025] fixed deletion of actions (Vedmak)
+ - [ZBX-3] fixed logging into syslog, Zabbix log levels are properly linked to syslog levels (Dmitry)
+ - [ZBX-2022] fixed link color picker in maps in IE7 (Vednak)
  - [ZBX-1968] fixed error in log item history in ie8 (Vedmak)
  - [ZBX-2020] added requirements check for PHP input_max_time (Vedmak)
  - [ZBX-1958] fixed problem with a lot of digits in float values (Vedmak)

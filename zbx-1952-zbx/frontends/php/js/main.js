@@ -57,6 +57,12 @@ restart: function(){
 
 stop: function(){
 	clearTimeout(this.timeout);	
+},
+
+restart: function(){
+	this.stop();
+	this.delayLeft = this.delay;
+	this.start();
 }
 }
 
@@ -346,7 +352,7 @@ submitGo: function(e){
 		return true;
 	}
 	else{
-		alert(locale['S_NO_ELEMENTS_SELECTES']);
+		alert(locale['S_NO_ELEMENTS_SELECTED']);
 		Event.stop(e);
 		return false;
 	}
