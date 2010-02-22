@@ -416,9 +416,14 @@ if(!isset($DB)){
 						$query = 'SELECT * FROM ('.$query.') WHERE rownum BETWEEN '.intval($offset).' AND '.intval($till);
 					}
 
-					$result = DBexecute($query);
+					$result=OCIParse($DB['DB'],$query);
 					if(!$result){
-						$e = ocierror($result);
+						$e=@ocierror();
+						error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+					}
+					else if(!@OCIExecute($result,($DB['TRANSACTIONS']?OCI_DEFAULT:OCI_COMMIT_ON_SUCCESS)))
+					{
+						$e=ocierror($result);
 						error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 					}
 
@@ -474,7 +479,7 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 
 		$time_start=microtime(true);
 		if( isset($DB['DB']) && !empty($DB['DB']) ){
-			$DB['EXECUTE_COUNT']++;	// WRONG FOR ORACLE!!
+			$DB['EXECUTE_COUNT']++;
 //SDI('SQL xec: '.$query);
 
 			switch($DB['TYPE']){
@@ -493,19 +498,20 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 					}
 					break;
 				case 'ORACLE':
-					$stid=OCIParse($DB['DB'],$query);
-					if(!$stid){
+					$result=OCIParse($DB['DB'],$query);
+					if(!$result){
 						$e=@ocierror();
 						error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 					}
-
-					$result=@OCIExecute($stid,($DB['TRANSACTIONS']?OCI_DEFAULT:OCI_COMMIT_ON_SUCCESS));
-					if(!$result){
-						$e=ocierror($stid);
+					else if(!@OCIExecute($result,($DB['TRANSACTIONS']?OCI_DEFAULT:OCI_COMMIT_ON_SUCCESS)))
+					{
+						$e=ocierror($result);
 						error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 					}
-					else{
-						$result = $stid;
+					else
+					{
+						/* It should be here. The function must return boolen */
+						$result = true;
 					}
 
 					break;
