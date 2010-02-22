@@ -233,7 +233,7 @@ static int	svc_install_event_source(const char *path)
 	svc_get_fullpath(path, execName, MAX_PATH);
 
 	wevent_source = zbx_utf8_to_unicode(ZABBIX_EVENT_SOURCE);
-	zbx_wsnprintf(regkey, sizeof(regkey), EVENTLOG_REG_PATH TEXT("System\\%s"), wevent_source);
+	zbx_wsnprintf(regkey, sizeof(regkey)/sizeof(TCHAR), EVENTLOG_REG_PATH TEXT("System\\%s"), wevent_source);
 	zbx_free(wevent_source);
 
 	if (ERROR_SUCCESS != RegCreateKeyEx(HKEY_LOCAL_MACHINE, regkey, 0, NULL, REG_OPTION_NON_VOLATILE,
@@ -319,7 +319,7 @@ static int	svc_RemoveEventSource()
 	int	ret = FAIL;
 
 	wevent_source = zbx_utf8_to_unicode(ZABBIX_EVENT_SOURCE);
-	zbx_wsnprintf(regkey, sizeof(regkey), EVENTLOG_REG_PATH TEXT("System\\%s"), wevent_source);
+	zbx_wsnprintf(regkey, sizeof(regkey)/sizeof(TCHAR), EVENTLOG_REG_PATH TEXT("System\\%s"), wevent_source);
 	zbx_free(wevent_source);
 
 	if (ERROR_SUCCESS == RegDeleteKey(HKEY_LOCAL_MACHINE, regkey))

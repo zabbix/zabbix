@@ -71,7 +71,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 
 	for(i = 0 /* 0 : _Total; >0 : cpu */; i <= pcpus->count; i++) {
 		if (i == 0)
-			zbx_wsnprintf(cpu, sizeof(cpu), TEXT("_Total"));
+			zbx_wsnprintf(cpu, sizeof(cpu)/sizeof(TCHAR), TEXT("_Total"));
 		else
 			_itow_s(i - 1, cpu, sizeof(cpu)/sizeof(TCHAR), 10);
 
