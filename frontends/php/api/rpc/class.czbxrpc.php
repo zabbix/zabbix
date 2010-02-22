@@ -97,6 +97,7 @@ class czbxrpc{
 			return self::$result;
 		}
 
+		unset($params['nopermissions']);
 		call_user_func(array('czbxrpc', $resource), $action, $params);
 
 		if(self::$result !== false){

@@ -118,10 +118,6 @@ class CAction extends CZBXAPI{
 
 
 // editable + PERMISSION CHECK
-		if(defined('ZBX_API_REQUEST')){
-			$options['nopermissions'] = null;
-		}
-
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || !is_null($options['nopermissions'])){
 		}
 		else{
@@ -218,7 +214,7 @@ class CAction extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
 
 // groupids
 		if(!is_null($options['groupids'])){
