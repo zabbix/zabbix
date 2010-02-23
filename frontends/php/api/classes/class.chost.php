@@ -965,8 +965,13 @@ class CHost extends CZBXAPI{
 	
 			$result = self::EndTransaction($result, __METHOD__);
 			
-		
-			$upd_hosts = self::get(array('hostids' => $hostids, 'extendoutput' => 1, 'nopermissions' => 1));
+
+			$options = array(
+				'hostids' => $hostids,
+				'extendoutput' => 1,
+				'nopermissions' => 1
+			);
+			$upd_hosts = self::get($options);
 			return $upd_hosts;
 		}
 		catch(APIException $e){

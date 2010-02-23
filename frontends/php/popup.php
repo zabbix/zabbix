@@ -1171,6 +1171,9 @@ include_once('include/page_header.php');
 		$table = new CTableInfo(S_NO_MAPS_DEFINED);
 		$table->setHeader(array(S_NAME));
 
+		$excludeids = get_request('excludeids', array());
+		$excludeids = zbx_toHash($excludeids);
+
 		$options = array(
 			'nodeids' => $nodeid,
 			'extendoutput' => 1
@@ -1181,6 +1184,8 @@ include_once('include/page_header.php');
 		order_result($maps, 'name');
 
 		foreach($maps as $mnum => $row){
+			if(isset($excludeids[$row['sysmapid']])) continue;
+
 			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
 			$name = $row['node_name'].$row['name'];
 
