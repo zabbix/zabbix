@@ -881,19 +881,22 @@ require_once('include/httptest.inc.php');
 		zbx_value2array($hostids);
 
 //		$hosts = array();
-		$result = DBselect('SELECT * FROM hosts WHERE '.DBcondition('hostid', $hostids).
-				' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')');
+		$sql = 'SELECT * '.
+			' FROM hosts '.
+			' WHERE '.DBcondition('hostid', $hostids).
+				' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
+		$result = DBselect($sql);
 		while($host=DBfetch($result)){
 			if($status != $host['status']){
 //				$hosts[$host['hostid']] = $host['hostid'];
 				update_trigger_value_to_unknown_by_hostid($host['hostid']);
 				$res = DBexecute('UPDATE hosts SET status='.$status.' WHERE hostid='.$host['hostid']);
-				if ($res){
+				if($res){
 					$host_new = $host;//get_host_by_hostid($host['hostid']);
 					$host_new['status'] = $status;
 					add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['host'], 'hosts', $host, $host_new);
 				}
-				info(S_UPDATED_STATUS_OF_HOST.SPACE.$host['host']);
+				info(S_UPDATED_STATUS_OF_HOST.' "'.$host['host'].'"');
 			}
 		}
 

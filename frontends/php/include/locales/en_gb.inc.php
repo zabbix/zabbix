@@ -844,6 +844,7 @@
 	'S_ENABLE_SELECTED_HOSTS'=>			'Enable selected hosts?',
 	'S_DISABLE_SELECTED_HOSTS_Q'=>			'Disable selected hosts?',
 	'S_DELETE_SELECTED_HOSTS'=>			'Delete selected hosts?',
+	'S_UPDATED_STATUS_OF_HOST' =>		'Updated status of host',
 
 // templates.php
 	'S_TEMPLATE_LIST'=>			'Templates list',
