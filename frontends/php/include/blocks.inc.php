@@ -270,15 +270,13 @@ function make_system_summary(){
 		'monitored' => 1,
 		'only_problems' => 1,
 		'expand_data' => 1,
-		'select_dependencies' => API_OUTPUT_SHORTEN,
+		'skipDependent' => 1,
 		'output' => API_OUTPUT_EXTEND,
 	);
 	$triggers = CTrigger::get($options);
 	order_result($triggers, 'lastchange', ZBX_SORT_DOWN);
 
 	foreach($triggers as $tnum => $trigger){
-		if(!empty($trigger['dependencies'])) continue;
-
 		$trigger['groups'] = zbx_toHash($trigger['groups'], 'groupid');
 
 		foreach($groups as $groupid => $group){
@@ -671,7 +669,7 @@ function make_latest_issues($params = array()){
 	$options = array(
 		'output' => API_OUTPUT_EXTEND,
 		'select_hosts' => API_OUTPUT_EXTEND,
-		'select_dependencies' => API_OUTPUT_REFER,
+		'skipDependent' => 1,
 		'monitored' => 1,
 		'only_problems' => 1,
 		'sortfield' => 'lastchange',
@@ -709,8 +707,6 @@ function make_latest_issues($params = array()){
 
 	foreach($triggers as $tnum => $trigger){
 // Check for dependencies
-		if(!empty($trigger['dependencies']))	continue;
-
 		$host = reset($trigger['hosts']);
 		$trigger['hostid'] = $host['hostid'];
 		$trigger['host'] = $host['host'];
