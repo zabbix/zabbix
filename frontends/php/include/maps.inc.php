@@ -877,8 +877,8 @@
  *     Aleksander Vladishev
  *
  */
-	function expand_map_element_label_by_data($db_element, $link_label = null){
-		$label = (null != $db_element) ? $db_element['label'] : $link_label;
+	function expand_map_element_label_by_data($db_element, $link = null){
+		$label = (null != $db_element) ? $db_element['label'] : $link['label'];
 
 		if (null != $db_element){
 			switch($db_element['elementtype']){
