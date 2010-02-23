@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX2]
  - [ZBX1]
  - [ZBX-2045] fixed trigger editor does not preserve element ordering (Vedmak)
  - [ZBX-2003] fixed evaluation of division and subtraction (asaveljevs)
