@@ -756,6 +756,7 @@ class CChart extends CGraphDraw{
 		$tmp_maxY[GRAPH_YAXIS_SIDE_LEFT] = $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT];
 		$tmp_maxY[GRAPH_YAXIS_SIDE_RIGHT] = $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT];
 //------
+
 // CALC interval
 		$col_interval = ($this->gridPixelsVert*($this->m_maxY[$side] - $this->m_minY[$side]))/$this->sizeY;
 		$max = $this->m_maxY[$side];
@@ -808,13 +809,13 @@ class CChart extends CGraphDraw{
 			}
 
 // correcting MIN & MAX
-			$this->m_minY[$other_side] = bcmul(floor(bcdiv($this->m_minY[$side], $interval)), $interval);
-			$this->m_maxY[$other_side] = bcmul(ceil(bcdiv($this->m_maxY[$side], $interval)), $interval);
+			$this->m_minY[$other_side] = bcmul(floor(bcdiv($this->m_minY[$other_side], $interval)), $interval);
+			$this->m_maxY[$other_side] = bcmul(ceil(bcdiv($this->m_maxY[$other_side], $interval)), $interval);
 //--------------------
 
 // if we lowered min more than highed max - need additional recalculating
 			if(($tmp_maxY[$other_side] > $this->m_maxY[$other_side]) || ($tmp_minY[$other_side] < $this->m_minY[$other_side])){
-				$dist = ($this->m_maxY[$other_side] - $this->m_minY[$other_side]);
+				$dist = bcsub($this->m_maxY[$other_side],$this->m_minY[$other_side]);
 				$interval = 0;
 				foreach($intervals as $num => $int){
 //SDI($dist.' < '.bcmul($this->gridLinesCount[$side],$int));
@@ -825,13 +826,13 @@ class CChart extends CGraphDraw{
 				}
 
 // recorrecting MIN & MAX
-				$this->m_minY[$other_side] = bcmul(floor(bcdiv($this->m_minY[$side], $interval)), $interval);
-				$this->m_maxY[$other_side] = bcmul(ceil(bcdiv($this->m_maxY[$side], $interval)), $interval);
+				$this->m_minY[$other_side] = bcmul(floor(bcdiv($this->m_minY[$other_side], $interval)), $interval);
+				$this->m_maxY[$other_side] = bcmul(ceil(bcdiv($this->m_maxY[$other_side], $interval)), $interval);
 //--------------------
 			}
-			$this->gridLinesCount[$other_side] = $this->gridLinesCount[$side];
-			$this->m_maxY[$other_side] = $this->m_minY[$other_side] + $interval * $this->gridLinesCount[$other_side];
 
+			$this->gridLinesCount[$other_side] = $this->gridLinesCount[$side];
+			$this->m_maxY[$other_side] = $this->m_minY[$other_side] + bcmul($interval,$this->gridLinesCount[$other_side]);
 //SDI($this->m_minY[$other_side].' - '.$this->m_maxY[$other_side].' : '.$interval.' x '.$this->gridLinesCount[$side]);
 		}
 
