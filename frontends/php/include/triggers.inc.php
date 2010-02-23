@@ -2280,8 +2280,8 @@ return $result;
 			$templates = array();
 			$templateids = array();
 			$db_triggerhosts = get_hosts_by_expression($expression);
-			while($triggerhost = DBfetch($db_triggerhosts)) {
-				if($triggerhost['status'] == HOST_STATUS_TEMPLATE) { //template
+			while($triggerhost = DBfetch($db_triggerhosts)){
+				if($triggerhost['status'] == HOST_STATUS_TEMPLATE){ //template
 					$templates[$triggerhost['hostid']] = $triggerhost;
 					$templateids[$triggerhost['hostid']] = $triggerhost['hostid'];
 				}
@@ -2290,22 +2290,23 @@ return $result;
 			$dep_templateids = array();
 			$db_dephosts = get_hosts_by_triggerid($deps);
 			while($dephost = DBfetch($db_dephosts)) {
-				if($dephost['status'] == HOST_STATUS_TEMPLATE) { //template
+				if($dephost['status'] == HOST_STATUS_TEMPLATE){ //template
 					$templates[$dephost['hostid']] = $dephost;
 					$dep_templateids[$dephost['hostid']] = $dephost['hostid'];
 				}
 			}
 
-			if(!empty($templateids) && !empty($dep_templateids)) {
+			$tdiff = array_diff($dep_templateids, $templateids);
+			if(!empty($templateids) && !empty($dep_templateids) && !empty($tdiff)){
 				$tpls = zbx_array_merge($templateids, $dep_templateids);
-				$sql = 'SELECT DISTINCT h.host, h.hostid, ht.templateid '.
+				$sql = 'SELECT DISTINCT ht.templateid '.
 						' FROM hosts h, hosts_templates ht '.
 						' WHERE h.hostid=ht.hostid '.
 							' AND h.status='.HOST_STATUS_TEMPLATE.
 							' AND '.DBcondition('ht.templateid', $tpls);
 
 				$db_lowlvltpl = DBselect($sql);
-				while($lovlvltpl = DBfetch($db_lowlvltpl)) {
+				while($lovlvltpl = DBfetch($db_lowlvltpl)){
 					error($templates[$lovlvltpl['templateid']]['host'].SPACE.S_IS_NOT_THE_HIGHEST_LEVEL_TEMPLATE);
 					$result = false;
 				}
