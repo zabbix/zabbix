@@ -180,7 +180,7 @@ class CItem extends CZBXAPI{
 				$sql_parts['select']['hostid'] = 'i.hostid';
 			}
 
-			$sql_parts['where'][] = DBcondition('i.hostid', $options['hostids']);
+			$sql_parts['where']['hostid'] = DBcondition('i.hostid', $options['hostids']);
 		}
 
 // itemids
@@ -272,7 +272,10 @@ class CItem extends CZBXAPI{
 			zbx_value2array($options['filter']);
 
 			if(isset($options['filter']['itemid']))
-				$sql_parts['where']['itemid'] = 'i.itemid='.zbx_dbstr($options['filter']['itemid']);
+				$sql_parts['where']['itemid'] = 'i.itemid='.$options['filter']['itemid'];
+				
+			if(isset($options['filter']['hostid']))
+				$sql_parts['where']['hostid'] = 'i.hostid='.$options['filter']['hostid'];
 
 			if(isset($options['filter']['description']))
 				$sql_parts['where']['description'] = 'i.description='.zbx_dbstr($options['filter']['description']);
