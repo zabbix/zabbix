@@ -300,6 +300,7 @@ frontends/php/include/classes/class.cvar.php -text
 frontends/php/include/classes/class.cvartag.php -text
 frontends/php/include/classes/class.cvisibilitybox.php -text
 frontends/php/include/classes/class.cwidget.php -text
+frontends/php/include/debug.inc.php -text
 frontends/php/include/func.inc.php -text
 frontends/php/include/js.inc.php -text
 frontends/php/include/locales/hu_hu.inc.php -text
