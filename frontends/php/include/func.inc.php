@@ -902,7 +902,7 @@ function zbx_value2array(&$values){
 // fuunction: zbx_toHash
 // object or array of objects to hash
 // author: Aly
-function zbx_toHash(&$value, $field){
+function zbx_toHash(&$value, $field=null){
 	if(is_null($value)) return $value;
 	$result = array();
 
