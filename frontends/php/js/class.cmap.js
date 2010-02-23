@@ -2422,6 +2422,8 @@ updateForm_selementByType: function(e, multi){
 		popup_url+= '&srctbl='+srctbl;
 		popup_url+= '&srcfld1='+srcfld1;
 		popup_url+= '&srcfld2='+srcfld2;
+
+		if(elementtype.toString() == '1') popup_url+= '&excludeids[]='+this.sysmapid;
 		
 		this.selementForm.elementTypeSelect.onclick =  function(){ PopUp(popup_url,450,450);};
 	}

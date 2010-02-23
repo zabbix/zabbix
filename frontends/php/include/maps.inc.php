@@ -358,7 +358,7 @@
 
 //		if($selement['label_location']<0) $selement['label_location']='null';
 		if(check_circle_elements_link($selement['sysmapid'],$selement['elementid'],$selement['elementtype'])){
-			error(S_CIRCULAR_LINK_CANNOT_BE_CREATED);
+			throw new Exception(S_CIRCULAR_LINK_CANNOT_BE_CREATED.' "'.$selement['label'].'"');
 			return false;
 		}
 
@@ -405,7 +405,7 @@
 		}
 
 		if(check_circle_elements_link($selement['sysmapid'],$selement['elementid'],$selement['elementtype'])){
-			error(S_CIRCULAR_LINK_CANNOT_BE_CREATED);
+			throw new Exception(S_CIRCULAR_LINK_CANNOT_BE_CREATED.' "'.$selement['label'].'"');
 			return false;
 		}
 
