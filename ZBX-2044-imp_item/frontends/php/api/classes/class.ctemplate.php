@@ -587,6 +587,8 @@ class CTemplate extends CZBXAPI{
 
 	public static function checkObjects($templatesData){
 
+		$templatesData = zbx_toArray($templatesData);
+		
 		$result = array();
 		foreach($templatesData as $tnum => $templateData){
 			$options = array(

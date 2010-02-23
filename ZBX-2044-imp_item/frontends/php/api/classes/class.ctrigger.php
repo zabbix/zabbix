@@ -89,6 +89,7 @@ class CTrigger extends CZBXAPI{
 			'editable'				=> null,
 			'nopermissions'			=> null,
 			'only_problems'			=> null,
+			'skipDependent'			=> null,
 			'with_unacknowledged_events' => null,
 // filter
 			'filter'				=> null,
@@ -98,7 +99,6 @@ class CTrigger extends CZBXAPI{
 			'min_severity'			=> null,
 //
 			'pattern'				=> '',
-
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
 			'extendoutput'			=> null,
@@ -311,6 +311,7 @@ class CTrigger extends CZBXAPI{
 // expand_data
 		if(!is_null($options['expand_data'])){
 			$sql_parts['select']['host'] = 'h.host';
+			$sql_parts['select']['hostid'] = 'h.hostid';
 			$sql_parts['from']['f'] = 'functions f';
 			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['from']['h'] = 'hosts h';
@@ -497,10 +498,57 @@ class CTrigger extends CZBXAPI{
 			}
 		}
 
+// skipDependent		
+		if(!is_null($options['skipDependent'])){
+			$tids = $triggerids;
+			$map = array();
+			
+			do{
+				$sql = 'SELECT d.triggerid_down, d.triggerid_up, t.value '.
+						' FROM trigger_depends d, triggers t '.
+						' WHERE '.DBcondition('d.triggerid_down', $tids).
+							' AND d.triggerid_up=t.triggerid';
+				$db_result = DBselect($sql);
+				
+				$tids = array();
+				while($row = DBfetch($db_result)){
+					if(TRIGGER_VALUE_TRUE == $row['value']){
+						if(isset($map[$row['triggerid_down']])){
+							foreach($map[$row['triggerid_down']] as $triggerid => $state){
+								unset($result[$triggerid]);
+								unset($triggerids[$triggerid]);
+							}
+						}
+						else{
+							unset($result[$row['triggerid_down']]);
+							unset($triggerids[$row['triggerid_down']]);
+						}
+					}
+					else{
+						if(isset($map[$row['triggerid_down']])){
+							if(!isset($map[$row['triggerid_up']]))
+								$map[$row['triggerid_up']] = array();
+
+							$map[$row['triggerid_up']] += $map[$row['triggerid_down']];
+						}
+						else{
+							if(!isset($map[$row['triggerid_up']]))
+								$map[$row['triggerid_up']] = array();
+
+							$map[$row['triggerid_up']][$row['triggerid_down']] = 1;
+						}
+						$tids[] = $row['triggerid_up'];
+					}
+				}
+			}while(!empty($tids));
+		}
+
+
 		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
+		
 
 // Adding Objects
 // Adding trigger dependencies
@@ -649,6 +697,8 @@ class CTrigger extends CZBXAPI{
 	public static function checkObjects($triggersData){
 		$result = array();
 
+		$triggersData = zbx_toArray($triggersData);
+		
 		foreach($triggersData as $tnum => $triggerData){
 			$options = array(
 				'filter' => $triggerData,

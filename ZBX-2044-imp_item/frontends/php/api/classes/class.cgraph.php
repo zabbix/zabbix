@@ -473,6 +473,7 @@ class CGraph extends CZBXAPI{
 
 	public static function checkObjects($graphsData){
 
+		$graphsData = zbx_toArray($graphsData);
 		$result = array();
 		foreach($graphsData as $inum => $graphData){
 			$options = array(

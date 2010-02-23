@@ -607,6 +607,7 @@ class CItem extends CZBXAPI{
 
 	public static function checkObjects($itemsData){
 
+		$itemsData = zbx_toArray($itemsData);
 		$result = array();
 		foreach($itemsData as $inum => $itemData){
 			$options = array(
