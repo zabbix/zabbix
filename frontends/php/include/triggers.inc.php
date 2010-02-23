@@ -3089,7 +3089,7 @@ return $result;
  * Comments:
  *
  */
-	function  analyze_expression($expression){
+	function analyze_expression($expression){
 		global $ZBX_TR_EXPR_SIMPLE_MACROS, $ZBX_TR_EXPR_REPLACE_TO, $ZBX_TR_EXPR_ALLOWED_FUNCTIONS;
 		if(empty($expression)) return array('', null, null);
 
@@ -3141,11 +3141,11 @@ return $result;
 
 // mark => expression map
 		$map = array();
-// sdii($temp);
+
 		for($i = 0, $size = $mark - ord('A'); $i < $size; ++$i){
-			$map[chr($i + ord('A'))] = array('expression'   => $temp[$size - $i - 1],
-											 'sign'		 => $temp[$size*2 - $i - 1]['sign'],
-											 'value'		=> $temp[$size*2 - $i -1]['value']);
+			$map[chr($i + ord('A'))] = array('expression'   => $temp[$i],
+											 'sign'		 => $temp[$size + $i]['sign'],
+											 'value'		=> $temp[$size + $i]['value']);
 
 		}
 		return array($outline, $root, $map);
