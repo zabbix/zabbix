@@ -652,7 +652,9 @@ upgrades/dbpatches/1.8/oracle/patch/help_items.sql -text
 upgrades/dbpatches/1.8/oracle/patch/history_log.sql -text
 upgrades/dbpatches/1.8/oracle/patch/history_str.sql -text
 upgrades/dbpatches/1.8/oracle/patch/history_str_sync.sql -text
+upgrades/dbpatches/1.8/oracle/patch/history_sync.sql -text
 upgrades/dbpatches/1.8/oracle/patch/history_text.sql -text
+upgrades/dbpatches/1.8/oracle/patch/history_uint_sync.sql -text
 upgrades/dbpatches/1.8/oracle/patch/hostmacro.sql -text
 upgrades/dbpatches/1.8/oracle/patch/hosts.sql -text
 upgrades/dbpatches/1.8/oracle/patch/hosts_groups.sql -text
