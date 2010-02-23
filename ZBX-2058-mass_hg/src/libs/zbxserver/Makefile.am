@@ -1,8 +1,0 @@
-## Process this file with automake to produce Makefile.in
-
-noinst_LIBRARIES = libzbxserver.a
-
-libzbxserver_a_SOURCES = \
-	functions.c \
-	evalfunc.c evalfunc.h \
-	expression.c expression.h
