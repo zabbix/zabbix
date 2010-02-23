@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -856,6 +856,15 @@
 	return imagecolorallocate($im,$RGB[0],$RGB[1],$RGB[2]);
 	}
 
+	function expandMapLabels(&$map){
+		foreach($map['selements'] as $snum => $selement){
+			$map['selements'][$snum]['label_expanded'] = expand_map_element_label_by_data($selement);
+		}
+
+		foreach($map['links'] as $lnum => $link){
+			$map['links'][$lnum]['label_expanded'] = expand_map_element_label_by_data(null, $link);
+		}
+	}
 /*
  * Function: expand_map_element_label_by_data
  *

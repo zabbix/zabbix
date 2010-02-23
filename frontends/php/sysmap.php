@@ -106,6 +106,8 @@ include_once('include/page_header.php');
 					$sysmaps = CMap::get($options);
 					$db_map = reset($sysmaps);
 
+					expandMapLabels($db_map);
+
 					$expandProblem = ($db_map['highlight'] > 1)? 0 : 1;
 					$map_info = getSelementsInfo($db_map, $expandProblem);
 //SDII($db_map);
@@ -249,6 +251,7 @@ include_once('include/page_header.php');
 
 //						$selement['image'] = get_base64_icon($element);
 						$selement['image'] = get_selement_iconid($selement);
+						$selement['label_expanded'] = expand_map_element_label_by_data($selement);
 
 						$action = '';
 						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement).',1);';
