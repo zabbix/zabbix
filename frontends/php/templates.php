@@ -417,6 +417,9 @@ include_once('include/page_header.php');
 		}
 		else{
 			$groups = get_request('groups', array());
+			if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0) && !uint_in_array($_REQUEST['groupid'], $host_groups)){
+				array_push($groups, $_REQUEST['groupid']);
+			}
 			$hosts_linked_to = get_request('hosts', array());
 		}
 
