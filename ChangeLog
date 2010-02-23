@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1902] fixed error when create dependency for trigger that belongs to same template (Vedmak)
  - [ZBX-1705] fixed various front-end problems with Oracle database (Alexei)
  - [ZBX-1299] added check for the minimal (1.0.0) libssh2 library version (Dmitry)
  - [ZBX-1975] fixed permission check in graphs with web ites (Aly)
