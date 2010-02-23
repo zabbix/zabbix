@@ -251,7 +251,7 @@ clean:
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -264,7 +264,8 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 #define OP_GE 3
 #define OP_LT 4
 #define OP_LE 5
-#define OP_MAX 6
+#define OP_LIKE 6
+#define OP_MAX 7
 
 	const char	*__function_name = "evaluate_COUNT";
 	DB_RESULT	result;
@@ -272,89 +273,103 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 
 	char		tmp[MAX_STRING_LEN];
 
-	int		arg1, flag, op = OP_EQ, offset,
+	int		numeric_search = (item->value_type == ITEM_VALUE_TYPE_UINT64 ||
+						item->value_type == ITEM_VALUE_TYPE_FLOAT);
+
+	int		arg1, flag, op = (numeric_search ? OP_EQ : OP_LIKE), offset,
 			nparams, count, res = FAIL;
 	zbx_uint64_t	value_uint64 = 0, dbvalue_uint64;
 	double		value_double = 0, dbvalue_double;
-	char		*operators[OP_MAX] = {"=", "<>", ">", ">=", "<", "<="};
+	char		*operators[OP_MAX] = {"=", "<>", ">", ">=", "<", "<=", "like"};
 	char		*arg2 = NULL, *arg3 = NULL, *arg2_esc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	nparams = num_param(parameters);
-	switch (item->value_type)
-	{
-	case ITEM_VALUE_TYPE_FLOAT:
-	case ITEM_VALUE_TYPE_UINT64:
-		if (!(1 <= nparams && nparams <= 4))
-			return res;
-		break;
-	case ITEM_VALUE_TYPE_LOG:
-	case ITEM_VALUE_TYPE_STR:
-	case ITEM_VALUE_TYPE_TEXT:
-		if (!(1 <= nparams && nparams <= 3))
-			return res;
-		break;
-	default:
+	if (!(1 <= nparams && nparams <= 4))
 		return res;
-	}
 
 	if (FAIL == get_function_parameter_uint(item, parameters, 1, &arg1, &flag))
 		return res;
 
-	if (SUCCEED == get_function_parameter_str(item, parameters, 2, &arg2))
-	{
-		if ((item->value_type == ITEM_VALUE_TYPE_UINT64 || item->value_type == ITEM_VALUE_TYPE_FLOAT) &&
-				SUCCEED == get_function_parameter_str(item, parameters, 3, &arg3))
+	if (nparams >= 2)
+		if (FAIL == get_function_parameter_str(item, parameters, 2, &arg2))
+			return res;
+		else
+			switch (item->value_type)
+			{
+				case ITEM_VALUE_TYPE_UINT64:
+					ZBX_STR2UINT64(value_uint64, arg2);
+					break;
+				case ITEM_VALUE_TYPE_FLOAT:
+					value_double = atof(arg2);
+					break;
+				default:
+					;	/* nothing */
+			}
+
+	if (nparams >= 3)
+		if (FAIL == get_function_parameter_str(item, parameters, 3, &arg3))
 		{
-			if (0 == strcmp(arg3, "eq") || '\0' == *arg3) op = OP_EQ;
+			zbx_free(arg2);
+			return res;
+		}
+		else
+		{
+			int fail = 0;
+
+			if ('\0' == *arg3 && numeric_search) op = OP_EQ;
+			else if ('\0' == *arg3 && !numeric_search) op = OP_LIKE;
+			else if (0 == strcmp(arg3, "eq")) op = OP_EQ;
 			else if (0 == strcmp(arg3, "ne")) op = OP_NE;
 			else if (0 == strcmp(arg3, "gt")) op = OP_GT;
 			else if (0 == strcmp(arg3, "ge")) op = OP_GE;
 			else if (0 == strcmp(arg3, "lt")) op = OP_LT;
 			else if (0 == strcmp(arg3, "le")) op = OP_LE;
+			else if (0 == strcmp(arg3, "like")) op = OP_LIKE;
 			else
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Parameter \"%s\" is not supported for function COUNT",
-						arg3);
+				zabbix_log(LOG_LEVEL_DEBUG, "Operator \"%s\" is not supported for function COUNT", arg3);
+				fail = 1;
+			}
+
+			if (!fail && numeric_search && op == OP_LIKE)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "Operator \"like\" is not supported for counting numeric values");
+				fail = 1;
+			}
+
+			if (!fail && !numeric_search && !(op == OP_LIKE || op == OP_EQ || op == OP_NE))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "Operator \"%s\" is not supported for counting textual values", arg3);
+				fail = 1;
+			}
+			
+			if (fail)
+			{
 				zbx_free(arg2);
 				zbx_free(arg3);
 				return res;
 			}
+
 			zbx_free(arg3);
 		}
 
-		switch (item->value_type) {
-		case ITEM_VALUE_TYPE_UINT64:
-			ZBX_STR2UINT64(value_uint64, arg2);
-			break;
-		case ITEM_VALUE_TYPE_FLOAT:
-			value_double = atof(arg2);
-			break;
-		default:
-			;	/* nothing */
-		}
+	if (nparams >= 4)
+	{
+		int time_shift, time_shift_flag;
 
-		if (	(nparams == 4 && (item->value_type == ITEM_VALUE_TYPE_UINT64 ||
-					item->value_type == ITEM_VALUE_TYPE_FLOAT)) ||
-			(nparams == 3 && (item->value_type == ITEM_VALUE_TYPE_LOG ||
-					item->value_type == ITEM_VALUE_TYPE_STR ||
-					item->value_type == ITEM_VALUE_TYPE_TEXT)))
+		if (FAIL == get_function_parameter_uint(item, parameters, 4, &time_shift, &time_shift_flag) ||
+			time_shift_flag != ZBX_FLAG_SEC)
 		{
-			int time_shift, time_shift_flag;
-
-			if (FAIL == get_function_parameter_uint(item, parameters, nparams, &time_shift, &time_shift_flag) ||
-				time_shift_flag != ZBX_FLAG_SEC)
-			{
-				zbx_free(arg2);
-				return res;
-			}
-
-			now -= time_shift;
+			zbx_free(arg2);
+			return res;
 		}
+
+		now -= time_shift;
 	}
 	
-	if (arg2 != NULL && strcmp(arg2, "") == 0)
+	if (arg2 != NULL && strcmp(arg2, "") == 0 && (numeric_search || op == OP_LIKE))
 		zbx_free(arg2);
 
 	if (flag == ZBX_FLAG_SEC)
@@ -400,7 +415,8 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 			default:
 				arg2_esc = DBdyn_escape_string(arg2);
 				offset += zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
-						" and value like '%s'",
+						" and value %s '%s'",
+						operators[op],
 						arg2_esc);
 				zbx_free(arg2_esc);
 			}
@@ -510,8 +526,20 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 				}
 				break;
 			default:
-				if (NULL != strstr(row[0], arg2))
-					goto count_inc;
+				switch (op) {
+				case OP_EQ:
+					if (0 == strcmp(row[0], arg2))
+						goto count_inc;
+					break;
+				case OP_NE:
+					if (0 != strcmp(row[0], arg2))
+						goto count_inc;
+					break;
+				case OP_LIKE:
+					if (NULL != strstr(row[0], arg2))
+						goto count_inc;
+					break;
+				}
 				break;
 			}
 
