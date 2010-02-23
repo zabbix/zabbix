@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1823] improved map element labels expansion in map editing screen (Aly)
  - [ZBX-1869] fixed graph max Y most top value calculation (Aly)
  - [ZBX-1948] fixed node disappearing after node deleted and then created with same ID (Vedmak)
  - [ZBXNEXT-225] update Brazilian Portuguese translation; thanks to murilex (Richlv)

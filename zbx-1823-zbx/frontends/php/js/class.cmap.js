@@ -71,7 +71,8 @@ mselement: {
 	iconid_unknown:	0,			// ALWAYS must be a STRING (js doesn't support uint64)
 	iconid_maintenance:0,		// ALWAYS must be a STRING (js doesn't support uint64)
 	iconid_disabled:0,			// ALWAYS must be a STRING (js doesn't support uint64)
-	label:			'New Element',
+	label:			'New Element',	// Element label
+	label_expanded: 'New Element',	// Element label macros expanded
 	label_location:	3,
 	x:				0,
 	y:				0,
@@ -84,6 +85,7 @@ mselement: {
 mlink: {
 	linkid:			0,				// ALWAYS must be a STRING (js doesn't support uint64)
 	label:			'',				// Link label
+	label_expanded: '',				// Link label (Expand macros)
 	selementid1:	0,				// ALWAYS must be a STRING (js doesn't support uint64)
 	selementid2:	0,				// ALWAYS must be a STRING (js doesn't support uint64)
 	linktriggers:	{},				// ALWAYS must be a STRING (js doesn't support uint64)
@@ -827,7 +829,9 @@ update_mapimg: function(){
 
 set_mapimg: function(resp){
 	this.debug('set_mapimg');
+//--
 
+//SDI(resp.responseText);
 	if(is_null(this.mapimg)){
 		this.mapimg = $('sysmap_img');
 //		this.container.appendChild(this.mapimg);
@@ -1174,7 +1178,7 @@ update_multiContainer: function(e){
 //		e_span_5.className = "link";
 		e_td_4.appendChild(e_span_5);
 		
-		e_span_5.appendChild(document.createTextNode(selement.label));
+		e_span_5.appendChild(document.createTextNode(selement.label_expanded));
 
 		var elementtypeText = '';
 		switch(selement.elementtype){
@@ -1339,12 +1343,12 @@ update_linkContainer: function(e){
 
 
 		var e_td_4 = document.createElement('td');
-		e_td_4.appendChild(document.createTextNode(this.selements[maplink.selementid1].label));
+		e_td_4.appendChild(document.createTextNode(this.selements[maplink.selementid1].label_expanded));
 		e_tr_3.appendChild(e_td_4);		
 
 
 		var e_td_4 = document.createElement('td');
-		e_td_4.appendChild(document.createTextNode(this.selements[maplink.selementid2].label));
+		e_td_4.appendChild(document.createTextNode(this.selements[maplink.selementid2].label_expanded));
 		e_tr_3.appendChild(e_td_4);
 
 
@@ -2942,7 +2946,7 @@ updateForm_link: function(e, linkid){
 		}
 
 		e_option_7.setAttribute('value', selementid);
-		e_option_7.appendChild(document.createTextNode(this.selements[selementid].label));
+		e_option_7.appendChild(document.createTextNode(this.selements[selementid].label_expanded));
 		
 		this.linkForm.selementid1.appendChild(e_option_7);
 	}
@@ -2963,7 +2967,7 @@ updateForm_link: function(e, linkid){
 		}
 
 		e_option_7.setAttribute('value', selementid);
-		e_option_7.appendChild(document.createTextNode(this.selements[selementid].label));
+		e_option_7.appendChild(document.createTextNode(this.selements[selementid].label_expanded));
 		
 		this.linkForm.selementid2.appendChild(e_option_7);
 	}	
