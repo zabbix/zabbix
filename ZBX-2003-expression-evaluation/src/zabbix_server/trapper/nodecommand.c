@@ -120,7 +120,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, char **res
 
 	if (NULL == (command = get_command_by_scriptid(scriptid)))
 	{
-		*result = zbx_dsprintf(*result, "NODE %d: Unknowh Script ID [" ZBX_FS_UI64 "]",
+		*result = zbx_dsprintf(*result, "NODE %d: Unknown Script ID [" ZBX_FS_UI64 "]",
 				CONFIG_NODEID, scriptid);
 		return ret;
 	}

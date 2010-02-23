@@ -151,12 +151,12 @@ include_once('include/page_header.php');
 		if(infavorites('web.favorite.sysmapids',$_REQUEST['sysmapid'], 'sysmapid')){
 			$icon = new CDiv(SPACE, 'iconminus');
 			$icon->setAttribute('title', S_REMOVE_FROM.' '.S_FAVOURITES);
-			$icon->addAction('onclick', new CJSscript('javascript: rm4favorites("sysmapid","'.$_REQUEST['sysmapid'].'",0);'));
+			$icon->addAction('onclick', new CJSscript("javascript: rm4favorites('sysmapid','".$_REQUEST["sysmapid"]."',0);"));
 		}
 		else{
 			$icon = new CDiv(SPACE, 'iconplus');
 			$icon->setAttribute('title', S_ADD_TO.' '.S_FAVOURITES);
-			$icon->addAction('onclick', new CJSscript('javascript: add2favorites("sysmapid","'.$_REQUEST['sysmapid'].'");'));
+			$icon->addAction('onclick', new CJSscript("javascript: add2favorites('sysmapid','".$_REQUEST["sysmapid"]."');"));
 		}
 		$icon->setAttribute('id', 'addrm_fav');
 

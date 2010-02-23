@@ -423,6 +423,16 @@ div.icon_sortdown{
 	text-decoration: underline;
 }
 
+.blacklink{
+	color:#1A1A1A;
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+.blacklink:hover{
+	color:#3A3A3A;
+}
+
 .link_menu{
 	color: #3C3089;
 	cursor: pointer;
