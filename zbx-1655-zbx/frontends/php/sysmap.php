@@ -169,7 +169,8 @@ include_once('include/page_header.php');
 							$db_selementids[$db_selement['selementid']] = $db_selement['selementid'];
 						}
 
-						DBstart();
+						$transaction = DBstart();
+
 						foreach($selements as $id => $selement){
 							if($selement['elementid'] == 0){
 								$selement['elementtype'] = SYSMAP_ELEMENT_TYPE_IMAGE;
@@ -225,12 +226,13 @@ include_once('include/page_header.php');
 							throw new Exception(S_MAP_SAVE_OPERATION_FAILED."\n\r");
 					}
 					catch(Exception $e){
-						$msg =  $e->getMessage();
-						$msg.= ob_get_contents();
-						ob_get_clean();
+						if(isset($transaction)) DBend(false);
+						$msg =  $e->getMessage()."\n\r";
+
+						ob_clean();
 						print('alert('.zbx_jsvalue($msg).');');
 					}
-					ob_flush();
+					@ob_flush();
 					break;
 			}
 		}
