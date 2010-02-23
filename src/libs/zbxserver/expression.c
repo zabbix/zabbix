@@ -480,7 +480,7 @@ static int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
 		*result=value1+value2;
 		return SUCCEED;
 	}
-	if((p = strchr(exp,'-')) != NULL)
+	if((p = strrchr(exp,'-')) != NULL)
 	{
 		*p=0;
 		strscpy( first, exp);
@@ -532,7 +532,7 @@ static int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
 		*result=value1*value2;
 		return SUCCEED;
 	}
-	if((p = strchr(exp,'/')) != NULL)
+	if((p = strrchr(exp,'/')) != NULL)
 	{
 		*p=0;
 		strscpy( first, exp);
