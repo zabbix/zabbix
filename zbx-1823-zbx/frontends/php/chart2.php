@@ -47,10 +47,11 @@ include_once('include/page_header.php');
 		show_error_message(S_NO_GRAPH_DEFINED);
 	}
 
-	$options = array();
-	$options['graphids'] = $_REQUEST['graphid'];
-	$options['extendoutput'] = 1;
-
+	$options = array(
+		'graphids' => $_REQUEST['graphid'],
+		'extendoutput' => 1,
+		'nodeids' => get_current_nodeid(true)
+	);
 	$db_data = CGraph::get($options);
 	if(empty($db_data)) access_deny();
 	else $db_data = reset($db_data);
@@ -65,7 +66,7 @@ include_once('include/page_header.php');
 
 	$effectiveperiod = navigation_bar_calc();
 
-	update_profile('web.charts.graphid',$_REQUEST['graphid']);
+	CProfile::update('web.charts.graphid',$_REQUEST['graphid'], PROFILE_TYPE_ID);
 
 	$chart_header = '';
 	if(id2nodeid($db_data['graphid']) != get_current_nodeid()){

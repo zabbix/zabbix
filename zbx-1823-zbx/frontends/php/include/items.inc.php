@@ -255,7 +255,7 @@
 				'templateid'		=> 0);
 
 		if(!check_db_fields($item_db_fields, $item)){
-			error('Incorrect arguments pasted to function [add_item]');
+			error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.SPACE.'[add_item]');
 			return false;
 		}
 
@@ -268,12 +268,12 @@
 			unset($item['applications'][$i]);
 
 		if(!preg_match('/^'.ZBX_PREG_ITEM_KEY_FORMAT.'$/u', $item['key_']) ){
-			error("Incorrect key format 'key_name[param1,param2,...]'");
+			error(S_INCORRECT_KEY_FORMAT.SPACE."'key_name[param1,param2,...]'");
 			return false;
 		}
 
 		if($item['delay']<1){
-			error("Delay cannot be less than 1 second");
+			error(S_DELAY_CANNOT_BE_LESS_THAN_ONE_SECOND);
 			return FALSE;
 		}
 
@@ -283,19 +283,19 @@
 			foreach($arr_of_delay as $one_delay_flex){
 				$arr = explode('/', $one_delay_flex);
 				if($arr[0] < 1){
-					error('Delay cannot be less than 1 second ');
+					error(S_DELAY_CANNOT_BE_LESS_THAN_ONE_SECOND);
 					return FALSE;
 				}
 			}
 		}
 
 		if(($item['snmp_port']<1)||($item['snmp_port']>65535)){
-			error('Invalid SNMP port');
+			error(S_INVALID_SNMP_PORT);
 			return FALSE;
 		}
 
 		if(preg_match('/^log\[|eventlog\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
-			error('Type of information must be Log for log key');
+			error(S_TYPE_INFORMATION_BUST_LOG_FOR_LOG_KEY);
 			return FALSE;
 		}
 
@@ -308,7 +308,7 @@
 		}
 
 		if(($item['type'] == ITEM_TYPE_AGGREGATE) && ($item['value_type'] != ITEM_VALUE_TYPE_FLOAT)){
-			error('Value type must be Float for aggregate items');
+			error(S_VALUE_TYPE_MUST_FLOAT_FOR_AGGREGATE_ITEMS);
 			return FALSE;
 		}
 
@@ -318,7 +318,7 @@
 			if(preg_match('/^((.)*)(\[\"((.)*)\"\,\"((.)*)\"\,\"((.)*)\"\,\"([0-9]+)\"\])$/i', $item['key_'], $arr)){
 				$g=$arr[1];
 				if(!str_in_array($g,array("grpmax","grpmin","grpsum","grpavg"))){
-					error("Group function [$g] is not one of [grpmax,grpmin,grpsum,grpavg]");
+					error(S_GROUP_FUNCTION.SPACE."[$g]".SPACE.S_IS_NOT_ONE_OF.SPACE."[grpmax,grpmin,grpsum,grpavg]");
 					return FALSE;
 				}
 				// Group
@@ -328,14 +328,14 @@
 				// Item function
 				$g=$arr[8];
 				if(!str_in_array($g,array('last', 'min', 'max', 'avg', 'sum','count'))){
-					error('Item function ['.$g.'] is not one of [last, min, max, avg, sum,count]');
+					error(S_ITEM_FUNCTION.SPACE.'['.$g.']'.SPACE.S_IS_NOT_ONE_OF.SPACE.'[last, min, max, avg, sum,count]');
 					return FALSE;
 				}
 				// Parameter
 				$g=$arr[10];
 			}
 			else{
-				error('Key does not match grpfunc["group","key","itemfunc","numeric param"]');
+				error(S_KEY_DOES_NOT_MATCH.SPACE.'grpfunc["group","key","itemfunc","numeric param"]');
 				return FALSE;
 			}
 		}
@@ -346,7 +346,7 @@
 					' AND key_='.zbx_dbstr($item['key_']);
 		$db_item = DBfetch(DBselect($sql));
 		if($db_item && $item['templateid'] == 0){
-			error('An item with the Key ['.$item['key_'].'] already exists for host ['.$host['host'].']. The key must be unique.');
+			error(S_AN_ITEM_WITH_THE_KEY.SPACE.'['.$item['key_'].']'.SPACE.S_ALREADY_EXISTS_FOR_HOST_SMALL.SPACE.'['.$host['host'].'].'.SPACE.S_THE_KEY_MUST_BE_UNIQUE);
 			return FALSE;
 		}
 		else if ($db_item && $item['templateid'] != 0){
@@ -390,7 +390,7 @@
 			DBexecute('INSERT INTO items_applications (itemappid,itemid,applicationid) VALUES('.$itemappid.','.$itemid.','.$appid.')');
 		}
 
-		info('Added new item '.$host['host'].':'.$item['key_']);
+		info(S_ADDED_NEW_ITEM.SPACE.$host['host'].':'.$item['key_']);
 
 // add items to child hosts
 
@@ -498,7 +498,7 @@
 
 
 		if(!check_db_fields($item_data, $item)){
-			error('Incorrect arguments pasted to function [update_item]');
+			error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.SPACE.'[update_item]');
 			return false;
 		}
 
@@ -507,12 +507,12 @@
 		if(($i = array_search(0,$item['applications'])) !== FALSE) unset($item['applications'][$i]);
 
 		if( !preg_match('/^'.ZBX_PREG_ITEM_KEY_FORMAT.'$/u', $item['key_']) ){
-			error("Incorrect key format 'key_name[param1,param2,...]'");
+			error(S_INCORRECT_KEY_FORMAT.SPACE."'key_name[param1,param2,...]'");
 			return false;
 		}
 
 		if($item['delay']<1){
-			error('Delay cannot be less than 1 second');
+			error(S_DELAY_CANNOT_BE_LESS_THAN_ONE_SECOND);
 			return FALSE;
 		}
 
@@ -522,14 +522,14 @@
 			foreach($arr_of_delay as $one_delay_flex){
 				$arr = explode('/', $one_delay_flex);
 				if ($arr[0] < 1){
-					error('Delay cannot be less than 1 second ');
+					error(S_DELAY_CANNOT_BE_LESS_THAN_ONE_SECOND);
 					return FALSE;
 				}
 			}
 		}
 
 		if(($item['snmp_port']<1)||($item['snmp_port']>65535)){
-			error('Invalid SNMP port');
+			error(S_INVALID_SNMP_PORT);
 			return FALSE;
 		}
 
@@ -538,7 +538,7 @@
 		}
 
 		if(preg_match('/^log\[|eventlog\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
-			error('Type of information must be Log for log key');
+			error(S_TYPE_INFORMATION_BUST_LOG_FOR_LOG_KEY);
 			return FALSE;
 		}
 
@@ -548,7 +548,7 @@
 
 		$db_item = DBfetch(DBselect('SELECT itemid FROM items WHERE hostid='.$item['hostid'].' and itemid<>'.$itemid.' and key_='.zbx_dbstr($item['key_'])));
 		if($db_item && $item['templateid'] == 0){
-			error('An item with the same Key already exists for host '.$host['host'].'. The key must be unique.');
+			error(S_AN_ITEM_WITH_THE_KEY.SPACE.'['.$item['key_'].']'.SPACE.S_ALREADY_EXISTS_FOR_HOST_SMALL.SPACE.'['.$host['host'].'].'.SPACE.S_THE_KEY_MUST_BE_UNIQUE);
 			return FALSE;
 		}
 
@@ -568,7 +568,7 @@
 			}
 
 			if(!check_db_fields($db_tmp_item, $child_item_params)){
-				error('Incorrect arguments pasted to function [update_item]');
+				error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.SPACE.'[update_item]');
 				return false;
 			}
 
@@ -582,7 +582,7 @@
 		if($db_item && $item['templateid'] != 0){
 			$result = delete_item($db_item['itemid']);
 			if(!$result) {
-				error("Can't update item '".$host["host"].':'.$item['key_']."'");
+				error(S_CANNOT_UPDATE_ITEM.SPACE."'".$host["host"].':'.$item['key_']."'");
 				return FALSE;
 			}
 		}
@@ -646,7 +646,7 @@
 		update_item_status($itemid, $item['status']);
 
 		if($result){
-			info("Item '".$host['host'].':'.$item['key_']."' updated");
+			info(S_ITEM.SPACE."'".$host['host'].':'.$item['key_']."'".SPACE.S_UPDATED_SMALL);
 		}
 
 	return $result;
@@ -878,7 +878,7 @@
 		if($row){
 			return	$row;
 		}
-		error("No item with itemid=[$itemid]");
+		error(S_NO_ITEM_WITH.SPACE.'itemid=['.$itemid.']');
 	return	FALSE;
 	}
 
@@ -894,7 +894,7 @@
 		if($row){
 			return	$row;
 		}
-		error('No item with itemid=['.$itemid.']');
+		error(S_NO_ITEM_WITH.SPACE.'itemid=['.$itemid.']');
 	return	FALSE;
 	}
 
@@ -1017,7 +1017,7 @@
 /*		$result = DBexecute('DELETE FROM items WHERE '.DBcondition('itemid',$itemids));*/
 		if($result){
 			foreach($items as $itemid => $item){
-				info("Item '".$hosts[$itemid]['host'].':'.$item['key_']."' deleted");
+				info(S_ITEM.SPACE."'".$hosts[$itemid]['host'].':'.$item['key_']."'".S_DELETED_SMALL);
 			}
 		}
 	return $result;
@@ -1115,7 +1115,7 @@
  */
 	function get_items_data_overview($hostids,$view_style=null){
 
-		if(is_null($view_style)) $view_style = get_profile('web.overview.view.style',STYLE_TOP);
+		if(is_null($view_style)) $view_style = CProfile::get('web.overview.view.style',STYLE_TOP);
 
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
@@ -1395,7 +1395,7 @@
 				$lastvalue = nbsp(htmlspecialchars($lastvalue));
 			}
 			else{
-				$lastvalue="Unknown value type";
+				$lastvalue=S_UNKNOWN_VALUE_TYPE;
 			}
 			if($db_item["valuemapid"] > 0);
 				$lastvalue = replace_value_by_map($lastvalue, $db_item["valuemapid"]);

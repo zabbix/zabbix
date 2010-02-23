@@ -44,20 +44,24 @@ include_once('include/page_header.php');
 	define("YEAR_LEFT_SHIFT", 5);
 ?>
 <?php
-	if(!DBfetch(DBselect('SELECT serviceid FROM services WHERE serviceid='.$_REQUEST['serviceid']))){
+	$sql = 'SELECT s.* FROM services s  WHERE s.serviceid='.$_REQUEST['serviceid'];
+	if(!$service = DBfetch(DBselect($sql,1))){
 		fatal_error(S_NO_IT_SERVICE_DEFINED);
 	}
 
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY);
+	if(!is_null($service['triggerid'])){
+		$options = array(
+			'triggerids' => $service['triggerid'],
+			'output' => API_OUTPUT_SHORTEN,
+			'nodeids' => get_current_nodeid(true)
+		);
 
-	$sql = 'SELECT s.* '.
-			' FROM services s '.
-			' WHERE s.serviceid='.$_REQUEST['serviceid'].
-				' AND (s.triggerid IS NULL OR '.DBcondition('s.triggerid',$available_triggers).') '.
-				' AND '.DBin_node('s.serviceid');
+		$db_data = CTrigger::get($options);
+		if(empty($db_data)) access_deny();
+	}
 
-	if(!$service = DBfetch(DBselect($sql))){
-		access_deny();
+	if(!DBfetch(DBselect('SELECT serviceid FROM services WHERE serviceid='.$_REQUEST['serviceid']))){
+		fatal_error(S_NO_IT_SERVICE_DEFINED);
 	}
 ?>
 <?php
@@ -83,7 +87,7 @@ include_once('include/page_header.php');
 	show_table_header(array(
 			S_IT_SERVICES_AVAILABILITY_REPORT_BIG,
 			SPACE.'"',
-			new CLink($service['name'],'srv_status.php?serviceid='.$service['serviceid']),
+			new CLink($service['name'],'srv_status.php?showgraph=1&serviceid='.$service['serviceid']),
 			'"'
 		),
 		$form);

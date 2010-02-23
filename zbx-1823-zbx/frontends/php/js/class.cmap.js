@@ -66,7 +66,7 @@ mselement: {
 	elementtype:	4,			// 5-UNDEFINED
 	elementid: 		0,			// ALWAYS must be a STRING (js doesn't support uint64) 
 	elementName:	'',			// element name
-	iconid_off:		19,			// ALWAYS must be a STRING (js doesn't support uint64)
+	iconid_off:		0,			// ALWAYS must be a STRING (js doesn't support uint64)
 	iconid_on:		0,			// ALWAYS must be a STRING (js doesn't support uint64)
 	iconid_unknown:	0,			// ALWAYS must be a STRING (js doesn't support uint64)
 	iconid_maintenance:0,		// ALWAYS must be a STRING (js doesn't support uint64)
@@ -88,7 +88,7 @@ mlink: {
 	label_expanded: '',				// Link label (Expand macros)
 	selementid1:	0,				// ALWAYS must be a STRING (js doesn't support uint64)
 	selementid2:	0,				// ALWAYS must be a STRING (js doesn't support uint64)
-	linktriggers:	{},				// ALWAYS must be a STRING (js doesn't support uint64)
+	linktriggers:	null,			// ALWAYS must be a STRING (js doesn't support uint64)
 	tr_desc:		'Select',		// default trigger caption
 	drawtype:		0,
 	color:			'0000CC',
@@ -255,6 +255,8 @@ add_empty_link: function(e){
 	
 	mlink['selementid1'] = selementid1;
 	mlink['selementid2'] = selementid2;
+
+	mlink['linktriggers'] = {};
 
 	this.add_link(mlink,1);
 	this.update_linkContainer(e);
@@ -1315,6 +1317,8 @@ update_linkContainer: function(e){
 		}
 	}
 
+	this.linkContainer.container.style.height = 'auto';
+
 	var count = 0;
 	var maplink = null;
 	for(var linkid in linkids){
@@ -1324,7 +1328,6 @@ update_linkContainer: function(e){
 		maplink = this.links[linkid];
 		
 		if(count > 4) this.linkContainer.container.style.height = '120px';
-		else this.linkContainer.container.style.height = 'auto';
 
 		var e_tr_3 = document.createElement('tr');
 		e_tr_3.className = "even_row";
@@ -2415,7 +2418,7 @@ updateForm_selementByType: function(e, multi){
 	}
 	
 	if(!empty(srctbl)){
-		var popup_url = 'popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementName';
+		var popup_url = 'popup.php?writeonly=1&real_hosts=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementName';
 		popup_url+= '&srctbl='+srctbl;
 		popup_url+= '&srcfld1='+srcfld1;
 		popup_url+= '&srcfld2='+srcfld2;
@@ -2849,7 +2852,8 @@ this.linkForm.colorPicker = e_div_6;
 	e_div_6.setAttribute('id',"lbl_color");
 	e_div_6.setAttribute('name',"lbl_color");
 	e_div_6.className = "pointer";
-	e_div_6.setAttribute('onclick',"javascript: show_color_picker('color')");
+	addListener(e_div_6, 'click', function(){ show_color_picker('color');});
+	// e_div_6.setAttribute('onclick',"javascript: show_color_picker('color')");
 
 	e_div_6.style.marginLeft = '2px';
 	e_div_6.style.border = '1px solid black';
@@ -2932,7 +2936,7 @@ updateForm_link: function(e, linkid){
 	this.linkForm.linklabel.value = maplink.label;
 
 // SELEMENTID1
-	this.linkForm.selementid1.update();
+	$(this.linkForm.selementid1).update();
 	for(var selementid in this.selements){
 		if(empty(this.selements[selementid])) continue;
 
@@ -2953,7 +2957,7 @@ updateForm_link: function(e, linkid){
 
 
 // SELEMENTID2
-	this.linkForm.selementid2.update();
+	$(this.linkForm.selementid2).update();
 	for(var selementid in this.selements){
 		if(empty(this.selements[selementid])) continue;
 
@@ -2997,9 +3001,9 @@ this.linkForm.linkIndicatorsBody = e_tbody_7;
 
 	var e_input_10 = document.createElement('input');
 	e_input_10.setAttribute('type',"checkbox");
-	e_input_10.setAttribute('onclick',"javascript: checkAll('linkForm','all_triggers','triggers');");
-	e_input_10.setAttribute('id',"all_triggers");
-	e_input_10.setAttribute('name',"all_triggers");
+	e_input_10.setAttribute('onclick',"javascript: checkLocalAll('linkForm','all_link_triggerids','link_triggerids');");
+	e_input_10.setAttribute('id',"all_link_triggerids");
+	e_input_10.setAttribute('name',"all_link_triggerids");
 	e_input_10.setAttribute('value',"yes");
 	e_input_10.className = "checkbox";
 	e_td_9.appendChild(e_input_10);

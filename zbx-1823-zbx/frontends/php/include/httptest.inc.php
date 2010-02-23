@@ -46,13 +46,13 @@ require_once('include/items.inc.php');
 
 	function db_save_step($hostid, $applicationid, $httptestid, $testname, $name, $no, $timeout, $url, $posts, $required, $status_codes, $delay, $history, $trends){
 		if($no <= 0){
-			error('Scenario step number can\'t be less then 1');
+			error(S_SCENARIO_STEP_NUMBER_CANNOT_BE_LESS_ONE);
 			return false;
 		}
 
 //		if(!eregi('^([0-9a-zA-Z\_\.[.-.]\$ ]+)$', $name)){
 		if(!preg_match('/^([0-9a-z_\.\-\$\s]+)$/i', $name)){
-			error("Scenario step name should contain '0-9a-zA-Z_ .$'- characters only");
+			error(S_SCENARIO_STEP_NAME_SHOULD_CONTAIN.SPACE."'0-9a-zA-Z_ .$'-".SPACE.S_CHARACTERS_ONLY_SMALL);
 			return false;
 		}
 
@@ -181,56 +181,81 @@ require_once('include/items.inc.php');
 		$history = 30; // TODO !!! Allow user to set this parameter
 		$trends = 90; // TODO !!! Allow user to set this parameter
 
-		if(!preg_match('/^(['.ZBX_PREG_PRINT.'])+$/u', $name)) {
-			error("Only characters are allowed");
+		if(!preg_match('/^(['.ZBX_PREG_PRINT.'])+$/u', $name)){
+			error(S_ONLY_CHARACTERS_ARE_ALLOWED);
 			return false;
 		}
 
 		DBstart();
-
-		if($applicationid = DBfetch(DBselect('select applicationid from applications '.
-			' where name='.zbx_dbstr($application).
-			' and hostid='.$hostid)))
-		{
-			$applicationid = $applicationid['applicationid'];
-		}
-		else{
-			$applicationid = add_application($application, $hostid);
-			if(!$applicationid){
-				error('Can\'t add new application. ['.$application.']');
-				return false;
+		
+		try{
+		
+			$sql = 'SELECT t.httptestid'.
+					' FROM httptest t, applications a'.
+					' WHERE t.applicationid=a.applicationid'.
+						' AND a.hostid='.$hostid.
+						' AND t.name='.zbx_dbstr($name);
+			$t = DBfetch(DBselect($sql));
+			if((isset($httptestid) && $t && ($t['httptestid'] != $httptestid)) || ($t && !isset($httptestid))){
+				throw new Exception(S_SCENARIO_WITH_NAME.' [ '.$name.' ] '.S_ALREADY_EXISTS_SMALL);
 			}
-		}
-
-		if(isset($httptestid)){
-			$result = DBexecute('update httptest'.
-				' set applicationid='.$applicationid.', name='.zbx_dbstr($name).','.
-					' authentication='.$authentication.','.' http_user='.zbx_dbstr($http_user).','.' http_password='.zbx_dbstr($http_password).','.
-					' delay='.$delay.','.' status='.$status.', agent='.zbx_dbstr($agent).', macros='.zbx_dbstr($macros).','.
-					' error='.zbx_dbstr('').', curstate='.HTTPTEST_STATE_UNKNOWN.
-				' where httptestid='.$httptestid);
-		}
-		else{
-			$httptestid = get_dbid("httptest","httptestid");
-
-			if(DBfetch(DBselect('select t.httptestid from httptest t, applications a where t.applicationid=a.applicationid '.
-				' and a.hostid='.$hostid.' and t.name='.zbx_dbstr($name))))
-			{
-				error('Scenario with name ['.$name.'] already exist');
-				return false;
+			
+			
+			$sql = 'SELECT applicationid FROM applications WHERE name='.zbx_dbstr($application).' AND hostid='.$hostid;
+			if($applicationid = DBfetch(DBselect($sql))){
+				$applicationid = $applicationid['applicationid'];
+			}
+			else{
+				$applicationid = Capplication::create(array('name' => $application, 'hostid' => $hostid));
+				if(!$applicationid){
+					throw new Exception(S_CANNOT_ADD_NEW_APPLICATION.' [ '.$application.' ]');
+				}
+				else{
+					$applicationid = reset($applicationid);
+					$applicationid = $applicationid['applicationid'];
+				}
 			}
 
-			$result = DBexecute('insert into httptest'.
-				' (httptestid, applicationid, name, authentication, http_user, http_password, delay, status, agent, macros, curstate) '.
-				' values ('.$httptestid.','.$applicationid.','.zbx_dbstr($name).','.
-				$authentication.','.zbx_dbstr($http_user).','.zbx_dbstr($http_password).','.
-				$delay.','.$status.','.zbx_dbstr($agent).','.zbx_dbstr($macros).','.HTTPTEST_STATE_UNKNOWN.')'
+			if(isset($httptestid)){
+				$sql = 'UPDATE httptest SET '.
+					' applicationid='.$applicationid.', '.
+					' name='.zbx_dbstr($name).', '.
+					' authentication='.$authentication.', '.
+					' http_user='.zbx_dbstr($http_user).', '.
+					' http_password='.zbx_dbstr($http_password).', '.
+					' delay='.$delay.', '.
+					' status='.$status.', '.
+					' agent='.zbx_dbstr($agent).', '.
+					' macros='.zbx_dbstr($macros).', '.
+					' error='.zbx_dbstr('').', '.
+					' curstate='.HTTPTEST_STATE_UNKNOWN.
+				' WHERE httptestid='.$httptestid;
+				if(!DBexecute($sql)){
+					throw new Exception('DBerror');
+				}
+			}
+			else{
+				$httptestid = get_dbid('httptest', 'httptestid');
+
+				$values = array(
+					'httptestid' => $httptestid,
+					'applicationid' => $applicationid,
+					'name' => zbx_dbstr($name),
+					'authentication' => $authentication,
+					'http_user' => zbx_dbstr($http_user),
+					'http_password' => zbx_dbstr($http_password),
+					'delay' => $delay,
+					'status' => $status,
+					'agent' => zbx_dbstr($agent),
+					'macros' => zbx_dbstr($macros),
+					'curstate' => HTTPTEST_STATE_UNKNOWN,
 				);
+				$sql = 'INSERT INTO httptest ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
+				if(!DBexecute($sql)){
+					throw new Exception('DBerror');
+				}
+			}
 
-			$test_added = true;
-		}
-
-		if($result){
 			$httpstepids = array();
 			foreach($steps as $sid => $s){
 				if(!isset($s['name']))		$s['name'] = '';
@@ -240,25 +265,25 @@ require_once('include/items.inc.php');
 				if(!isset($s['required']))	$s['required'] = '';
 				if(!isset($s['status_codes']))	$s['status_codes'] = '';
 
-				$result = db_save_step($hostid, $applicationid, $httptestid,
-						$name, $s['name'], $sid+1, $s['timeout'], $s['url'], $s['posts'], $s['required'],$s['status_codes'],
-						$delay, $history, $trends);
+				$result = db_save_step($hostid, $applicationid, $httptestid, $name, $s['name'], $sid+1, $s['timeout'], 
+					$s['url'], $s['posts'], $s['required'],$s['status_codes'], $delay, $history, $trends);
 
-				if(!$result) break;
+				if(!$result){
+					throw new Exception('Cannot create web step');
+				}
 
 				$httpstepids[$result] = $result;
 			}
-			if($result){
-				/* clean unneeded steps */
-				$db_steps = DBselect('select httpstepid from httpstep where httptestid='.$httptestid);
-				while($step_data = DBfetch($db_steps)){
-					if(isset($httpstepids[$step_data['httpstepid']]))	continue;
+			
+/* clean unneeded steps */
+			$sql = 'SELECT httpstepid FROM httpstep WHERE httptestid='.$httptestid;
+			$db_steps = DBselect($sql);
+			while($step_data = DBfetch($db_steps)){
+				if(!isset($httpstepids[$step_data['httpstepid']])){
 					delete_httpstep($step_data['httpstepid']);
 				}
 			}
-		}
 
-		if($result){
 			$monitored_items = array(
 				array(
 					'description'	=> 'Download speed for scenario \'$1\'',
@@ -272,7 +297,7 @@ require_once('include/items.inc.php');
 					'type'		=> ITEM_VALUE_TYPE_UINT64,
 					'units'		=> '',
 					'httptestitemtype'=> HTTPSTEP_ITEM_TYPE_LASTSTEP)
-				);
+			);
 
 			foreach($monitored_items as $item){
 				$item_data = DBfetch(DBselect('select i.itemid,i.history,i.trends,i.status,i.delta,i.valuemapid '.
@@ -323,8 +348,7 @@ require_once('include/items.inc.php');
 					$item_args['valuemapid'] = 0;
 
 					if(!$itemid = add_item($item_args)){
-						$result = false;
-						break;
+						throw new Exception('Cannot add item');
 					}
 				}
 				else{
@@ -337,39 +361,32 @@ require_once('include/items.inc.php');
 					$item_args['valuemapid'] = $item_data['valuemapid'];
 
 					if(!update_item($itemid, $item_args)){
-						$result = false;
-						break;
+						throw new Exception('Cannot update item');
 					}
 				}
-
 
 				$httptestitemid = get_dbid('httptestitem', 'httptestitemid');
 
 				DBexecute('delete from httptestitem where itemid='.$itemid);
 
-				if (!DBexecute('insert into httptestitem'.
-					' (httptestitemid, httptestid, itemid, type) '.
-					' values ('.$httptestitemid.','.$httptestid.','.$itemid.','.$item['httptestitemtype'].')'
-					))
-				{
-					$result = false;
-					break;
+				if(!DBexecute('insert into httptestitem (httptestitemid, httptestid, itemid, type) '.
+					' values ('.$httptestitemid.','.$httptestid.','.$itemid.','.$item['httptestitemtype'].')')){
+					throw new Exception('DBerror');
 				}
 			}
+
+			return DBend(true);
 		}
-
-		if(!$result && isset($test_added))	delete_httptest($httptestid);
-		else	$restult = $httptestid;
-
-		DBend($result);
-
-		return $result;
+		catch(Exception $e){
+			error($e->getMessage());
+			return DBend(false);
+		}
 	}
 
 	function add_httptest($hostid, $application, $name, $authentication, $http_user, $http_password, $delay, $status, $agent, $macros, $steps){
 		$result = db_save_httptest(null, $hostid, $application, $name, $authentication, $http_user, $http_password, $delay, $status, $agent, $macros, $steps);
 
-		if($result) info("Scenario '".$name."' added");
+		if($result) info(S_SCENARIO.SPACE."'".$name."'".SPACE.S_ADDED_SMALL);
 
 	return $result;
 	}
@@ -377,7 +394,7 @@ require_once('include/items.inc.php');
 	function update_httptest($httptestid, $hostid, $application, $name, $authentication, $http_user, $http_password, $delay, $status, $agent, $macros, $steps){
 		$result = db_save_httptest($httptestid, $hostid, $application, $name, $authentication, $http_user, $http_password, $delay, $status, $agent, $macros, $steps);
 
-		if($result)	info("Scenario '".$name."' updated");
+		if($result)	info(S_SCENARIO.SPACE."'".$name."'".SPACE.S_UPDATED_SMALL);
 
 	return $result;
 	}
@@ -429,7 +446,7 @@ require_once('include/items.inc.php');
 		if(!DBexecute('DELETE FROM httptest WHERE '.DBcondition('httptestid',$httptestids))) return false;
 
 		foreach($httptests as $id => $httptest){
-			info("Scenario '".$httptest["name"]."' deleted");
+			info(S_SCENARIO.SPACE."'".$httptest["name"]."'".SPACE.S_DELETED_SMALL);
 		}
 
 	return true;

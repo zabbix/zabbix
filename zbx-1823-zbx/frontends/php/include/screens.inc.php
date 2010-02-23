@@ -56,10 +56,12 @@ require_once('include/js.inc.php');
 						if(!isset($itemid))
 							$itemid = $ac_data['resourceid'];
 
-						$options = array();
-						$options['count'] = 1;
-						$options['itemids'] = $itemid;
-						$options['nodeids'] = get_current_nodeid(true);
+						$options = array(
+							'count' => 1,
+							'itemids' => $itemid,
+							'nodeids' => get_current_nodeid(true)
+						);
+
 						if($perm == PERM_READ_WRITE) $options['editable'] = 1;
 
 						$items = CItem::get($options);
@@ -1009,7 +1011,8 @@ require_once('include/js.inc.php');
 							$timeline['usertime'] += $timeline['period'];
 						}
 
-						$src = $url.'&width='.$width.'&height='.$height.'&legend='.$legend.'&graph3d='.$graph3d;
+						// $src = $url.'&width='.$width.'&height='.$height.'&legend='.$legend.'&graph3d='.$graph3d;
+						$src = $url.'&width='.$width.'&height='.$height.'&legend='.$legend.'&graph3d='.$graph3d.'&period='.$effectiveperiod.url_param('stime');
 
 						$objData['src'] = $src;
 
@@ -1144,12 +1147,12 @@ require_once('include/js.inc.php');
 				}
 				else if(($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_STATUS_OF_TRIGGERS)){
 					$params = array();
-					$params['groupid'] = get_request('tr_groupid',get_profile('web.screens.tr_groupid',0));
-					$params['hostid'] = get_request('tr_hostid',get_profile('web.screens.tr_hostid',0));
+					$params['groupid'] = get_request('tr_groupid',CProfile::get('web.screens.tr_groupid',0));
+					$params['hostid'] = get_request('tr_hostid',CProfile::get('web.screens.tr_hostid',0));
 					$params['limit'] = $elements;
 
-					update_profile('web.screens.tr_groupid',$params['groupid'], PROFILE_TYPE_ID);
-					update_profile('web.screens.tr_hostid',$params['hostid'], PROFILE_TYPE_ID);
+					CProfile::update('web.screens.tr_groupid',$params['groupid'], PROFILE_TYPE_ID);
+					CProfile::update('web.screens.tr_hostid',$params['hostid'], PROFILE_TYPE_ID);
 
 					$tr_form = new CForm();
 

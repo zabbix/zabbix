@@ -57,10 +57,11 @@ include_once 'include/page_header.php';
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			update_profile('web.avail_report.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.avail_report.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 
@@ -75,8 +76,8 @@ include_once 'include/page_header.php';
 	else{
 		$_REQUEST['filter_groupid'] = get_request('filter_groupid', 0);
 		$_REQUEST['filter_hostid'] = get_request('filter_hostid', 0);
-		$_REQUEST['filter_timesince'] = get_request('filter_timesince', get_profile('web.avail_report.filter.timesince', 0));
-		$_REQUEST['filter_timetill'] = get_request('filter_timetill', get_profile('web.avail_report.filter.timetill', 0));
+		$_REQUEST['filter_timesince'] = get_request('filter_timesince', CProfile::get('web.avail_report.filter.timesince', 0));
+		$_REQUEST['filter_timetill'] = get_request('filter_timetill', CProfile::get('web.avail_report.filter.timetill', 0));
 	}
 
 	if(($_REQUEST['filter_timetill'] > 0) && ($_REQUEST['filter_timesince'] > $_REQUEST['filter_timetill'])){
@@ -86,16 +87,16 @@ include_once 'include/page_header.php';
 	}
 
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
-		update_profile('web.avail_report.filter.timesince', $_REQUEST['filter_timesince'], PROFILE_TYPE_INT);
-		update_profile('web.avail_report.filter.timetill', $_REQUEST['filter_timetill'], PROFILE_TYPE_INT);
+		CProfile::update('web.avail_report.filter.timesince', $_REQUEST['filter_timesince'], PROFILE_TYPE_INT);
+		CProfile::update('web.avail_report.filter.timetill', $_REQUEST['filter_timetill'], PROFILE_TYPE_INT);
 	}
 
 	$_REQUEST['groupid'] = $_REQUEST['filter_groupid'];
 	$_REQUEST['hostid'] = $_REQUEST['filter_hostid'];
 // --------------
 
-	$config = get_request('config', get_profile('web.avail_report.config', 0));
-	update_profile('web.avail_report.config', $config, PROFILE_TYPE_INT);
+	$config = get_request('config', CProfile::get('web.avail_report.config', 0));
+	CProfile::update('web.avail_report.config', $config, PROFILE_TYPE_INT);
 
 	$params = array();
 	$options = array('allow_all_hosts', 'with_items');
@@ -129,23 +130,27 @@ include_once 'include/page_header.php';
 			$available_hosts = $PAGE_HOSTS['hostids'];
 	}
 
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, $available_hosts);
-
 	$rep2_wdgt->addPageHeader(S_AVAILABILITY_REPORT_BIG);
 //	show_report2_header($config, $PAGE_GROUPS, $PAGE_HOSTS);
 
 	if(isset($_REQUEST['triggerid'])){
-		if(isset($available_triggers[$_REQUEST['triggerid']])){
-			$sql = 'SELECT DISTINCT t.*, h.host, h.hostid '.
-					' FROM triggers t, functions f, items i, hosts h '.
-					' WHERE t.triggerid='.$_REQUEST['triggerid'].
-						' AND t.triggerid=f.triggerid '.
-						' AND f.itemid=i.itemid '.
-						' AND i.hostid=h.hostid ';
-			$trigger_data = DBfetch(DBselect($sql));
+		$options = array(
+			'triggerids' => $_REQUEST['triggerid'],
+			'output' => API_OUTPUT_EXTEND,
+			'select_hosts' => API_OUTPUT_EXTEND,
+			'nodeids' => get_current_nodeid(true)
+		);
+
+		$trigger_data = CTrigger::get($options);
+		if(empty($trigger_data)){
+			unset($_REQUEST['triggerid']);
 		}
 		else{
-			unset($_REQUEST['triggerid']);
+			$trigger_data = reset($trigger_data);
+
+			$host = reset($db_data['hosts']);
+			$trigger_data['hostid'] = $host['hostid'];
+			$trigger_data['host'] = $host['host'];
 		}
 	}
 
@@ -178,7 +183,7 @@ include_once 'include/page_header.php';
 
 // FILTER
 		$filterForm = get_report2_filter($config, $PAGE_GROUPS, $PAGE_HOSTS);
-		$rep2_wdgt->addFlicker($filterForm, get_profile('web.avail_report.filter.state', 0));
+		$rep2_wdgt->addFlicker($filterForm, CProfile::get('web.avail_report.filter.state', 0));
 //-------
 
 		$sql_from = '';
@@ -252,6 +257,9 @@ include_once 'include/page_header.php';
 		$rep2_wdgt->addItem($table);
 		$rep2_wdgt->show();
 	}
+?>
+<?php
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
+
 ?>

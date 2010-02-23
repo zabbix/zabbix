@@ -242,22 +242,35 @@ include_once('include/page_header.php');
 			}
 // }}} PROFILES
 
+		
+			if(isset($visible['groups'])){
+				$hosts['groups'] = zbx_toObject($_REQUEST['groups'], 'groupid');
+			}
+			$result = CHost::massUpdate(array_merge($hosts, $new_values));
+			if($result === false) throw new Exception();
 
+			
 			$groups = array();
 			if(isset($visible['newgroup']) && !empty($_REQUEST['newgroup'])){
 				$groups = CHostGroup::create(array('name' => $_REQUEST['newgroup']));
 				if($groups === false) throw new Exception();
 			}
-			if(isset($visible['groups'])){
-				$hosts['groups'] = array_merge(zbx_toObject($_REQUEST['groups'], 'groupid'), $groups);
-			}
-			$result = CHost::massUpdate(array_merge($hosts, $new_values));
-			if($result === false) throw new Exception();
 
-
+			$templates = array();
 			if(isset($visible['template_table'])){
 				$tplids = array_keys($_REQUEST['templates']);
-				$result = CHost::massAdd(array('hosts' => $hosts['hosts'], 'templates' => zbx_toObject($tplids, 'templateid')));
+				$templates = zbx_toObject($tplids, 'templateid');
+			}
+			
+			$add = array();
+			if(!empty($templates))
+				$add['templates'] = $templates;
+			if(!empty($groups))
+				$add['groups'] = $groups;
+			if(!empty($add)){
+				$add['hosts'] = $hosts['hosts'];
+				
+				$result = CHost::massAdd($add);
 				if($result === false) throw new Exception();
 			}
 
@@ -406,11 +419,13 @@ include_once('include/page_header.php');
 			}
 
 // Host triggers
-			$triggers = CTrigger::get(array('hostids' => $clone_hostid, 'inherited' => 0));
-			$triggers = zbx_objectValues($triggers, 'triggerid');
-			foreach($triggers as $trigger){
-				$result &= (bool) copy_trigger_to_host($trigger, $hostid, true);
-			}
+			$result &= copy_triggers($clone_hostid, $hostid);
+			
+			// $triggers = CTrigger::get(array('hostids' => $clone_hostid, 'inherited' => 0));
+			// $triggers = zbx_objectValues($triggers, 'triggerid');
+			// foreach($triggers as $trigger){
+				// $result &= (bool) copy_trigger_to_host($trigger, $hostid, true);
+			// }
 
 // Host graphs
 			$graphs = CGraph::get(array('hostids' => $clone_hostid, 'inherited' => 0));
@@ -426,7 +441,7 @@ include_once('include/page_header.php');
 
 //HOSTS PROFILE Section
 		if($result){
-			update_profile('HOST_PORT', $_REQUEST['port'], PROFILE_TYPE_INT);
+			CProfile::update('HOST_PORT', $_REQUEST['port'], PROFILE_TYPE_INT);
 
 			if(isset($_REQUEST['hostid'])){
 				delete_host_profile($hostid);
@@ -778,7 +793,7 @@ $_REQUEST['hostid'] = $thid;
 
 		$jsLocale = array(
 			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTES'
+			'S_NO_ELEMENTS_SELECTED'
 		);
 
 		zbx_addJSLocale($jsLocale);

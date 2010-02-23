@@ -208,6 +208,9 @@ table.tablestripped {
 }
 
 table.tablestripped tr > td:first-child{
+	width: 1%;
+}
+table.tablestripped tr >/**/ td:first-child{
 	width: 1px;
 }
 
@@ -503,6 +506,9 @@ table.tableinfo tr.footer td {
 
 table.tableinfo tr > td:first-child{
 	width: 1%;
+}
+table.tableinfo tr >/**/ td:first-child{
+	width: 1px;
 }
 
 table.tableinfo tr td.wraptext {
@@ -1252,6 +1258,9 @@ table.filter{
 table.filter tr > td:first-child{
 	width: 1%;
 	white-space: nowrap;
+}
+table.filter tr >/**/ td:first-child{
+	width: 1px;
 }
 
 table.filter tr td {

@@ -334,6 +334,7 @@ function delete_action( $actionid ){
 
 	$opers = get_operations_by_actionid($actionid);
 	while($operation = DBFetch($opers)){
+		DBexecute('DELETE FROM opmediatypes WHERE operationid='.$operation['operationid']);
 		DBexecute('DELETE FROM opconditions WHERE operationid='.$operation['operationid']);
 	}
 

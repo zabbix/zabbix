@@ -53,7 +53,7 @@ include_once('include/page_header.php');
 
 	if(isset($_REQUEST['cancel'])){
 		$last_page = $USER_DETAILS['last_page'];
-		$url = $last_page ? new CUrl($last_page['url']) : new CUrl('tr_status.php?hostid='.get_profile('web.tr_status.hostid', 0));
+		$url = $last_page ? new CUrl($last_page['url']) : new CUrl('tr_status.php?hostid='.CProfile::get('web.tr_status.hostid', 0));
 		redirect($url->getUrl());
 		exit;
 	}
@@ -116,7 +116,7 @@ include_once('include/page_header.php');
 			$last_page = $USER_DETAILS['last_page'];
 
 			if(!$last_page){
-				$url = new CUrl('tr_status.php?hostid='.get_profile('web.tr_status.hostid', 0));
+				$url = new CUrl('tr_status.php?hostid='.CProfile::get('web.tr_status.hostid', 0));
 			}
 			else{
 				$url = new CUrl($last_page['url']);

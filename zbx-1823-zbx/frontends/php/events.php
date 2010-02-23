@@ -70,18 +70,19 @@ include_once('include/page_header.php');
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 	);
 
-	$_REQUEST['source'] = get_request('source', get_profile('web.events.source', 0));
+	$_REQUEST['source'] = get_request('source', CProfile::get('web.events.source', 0));
 
 	check_fields($fields);
 //SDI($_REQUEST);
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			update_profile('web.events.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.events.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -93,22 +94,22 @@ include_once('include/page_header.php');
 		$_REQUEST['hide_unknown'] = 0;
 	}
 
-	$_REQUEST['nav_time'] = get_request('nav_time',get_profile('web.events.filter.nav_time',time()));
-	$_REQUEST['triggerid'] = get_request('triggerid',get_profile('web.events.filter.triggerid',0));
-	$_REQUEST['hide_unknown'] = get_request('hide_unknown',get_profile('web.events.filter.hide_unknown',0));
+	$_REQUEST['nav_time'] = get_request('nav_time',CProfile::get('web.events.filter.nav_time',time()));
+	$_REQUEST['triggerid'] = get_request('triggerid',CProfile::get('web.events.filter.triggerid',0));
+	$_REQUEST['hide_unknown'] = get_request('hide_unknown',CProfile::get('web.events.filter.hide_unknown',0));
 	$hide_unknown = $_REQUEST['hide_unknown'];
 
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
-		update_profile('web.events.filter.nav_time',$_REQUEST['nav_time'], PROFILE_TYPE_INT);
-		update_profile('web.events.filter.triggerid',$_REQUEST['triggerid'], PROFILE_TYPE_ID);
-		update_profile('web.events.filter.hide_unknown',$hide_unknown, PROFILE_TYPE_INT);
+		CProfile::update('web.events.filter.nav_time',$_REQUEST['nav_time'], PROFILE_TYPE_INT);
+		CProfile::update('web.events.filter.triggerid',$_REQUEST['triggerid'], PROFILE_TYPE_ID);
+		CProfile::update('web.events.filter.hide_unknown',$hide_unknown, PROFILE_TYPE_INT);
 	}
 // --------------
 
 	validate_sort_and_sortorder('clock',ZBX_SORT_DOWN);
 
 	$source = get_request('source', EVENT_SOURCE_TRIGGERS);
-	update_profile('web.events.source',$source, PROFILE_TYPE_INT);
+	CProfile::update('web.events.source',$source, PROFILE_TYPE_INT);
 
 ?>
 <?php
@@ -518,7 +519,7 @@ include_once('include/page_header.php');
 	$filterForm->addItemToBottomRow($reset);
 //-------
 
-	$events_wdgt->addFlicker($filterForm, get_profile('web.events.filter.state',0));
+	$events_wdgt->addFlicker($filterForm, CProfile::get('web.events.filter.state',0));
 	$events_wdgt->show();
 
 	$jsmenu = new CPUMenu(null,170);

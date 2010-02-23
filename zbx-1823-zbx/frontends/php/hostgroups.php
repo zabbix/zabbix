@@ -416,7 +416,7 @@ include_once('include/page_header.php');
 		$goOption->setAttribute('confirm',S_DISABLE_SELECTED_HOST_GROUPS);
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
+		$goOption = new CComboItem('delete',S_DELETE_SELECTED_GROUPS);
 		$goOption->setAttribute('confirm',S_DELETE_SELECTED_HOST_GROUPS);
 		$goBox->addItem($goOption);
 
@@ -426,7 +426,7 @@ include_once('include/page_header.php');
 
 		$jsLocale = array(
 			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTES'
+			'S_NO_ELEMENTS_SELECTED'
 		);
 
 		zbx_addJSLocale($jsLocale);

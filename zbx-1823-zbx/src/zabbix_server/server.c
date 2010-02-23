@@ -49,7 +49,7 @@
 #include "escalator/escalator.h"
 
 char *progname = NULL;
-char title_message[] = "Zabbix Server (daemon)";
+char title_message[] = "Zabbix Server";
 char usage_message[] = "[-hV] [-c <file>] [-n <nodeid>]";
 
 #ifndef HAVE_GETOPT_LONG
@@ -167,6 +167,8 @@ int	CONFIG_NODE_NOHISTORY		= 0;
 
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
+int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
+
 /* Global variable to control if we should write warnings to log[] */
 int	CONFIG_ENABLE_LOG		= 1;
 
@@ -245,6 +247,7 @@ void	init_config(void)
 		{"NodeNoEvents",&CONFIG_NODE_NOEVENTS,0,TYPE_INT,PARM_OPT,0,1},
 		{"NodeNoHistory",&CONFIG_NODE_NOHISTORY,0,TYPE_INT,PARM_OPT,0,1},
 		{"SSHKeyLocation",&CONFIG_SSH_KEY_LOCATION,0,TYPE_STRING,PARM_OPT,0,0},
+		{"LogSlowQueries",&CONFIG_LOG_SLOW_QUERIES,0,TYPE_INT,PARM_OPT,0,3600000},
 		{0}
 	};
 
@@ -287,6 +290,10 @@ void	init_config(void)
 #ifndef	HAVE_LIBCURL
 	CONFIG_HTTPPOLLER_FORKS = 0;
 #endif
+	if (CONFIG_NODEID == 0)
+	{
+		CONFIG_NODEWATCHER_FORKS = 0;
+	}
 }
 
 /******************************************************************************
@@ -376,7 +383,7 @@ int MAIN_ZABBIX_ENTRY(void)
 
 	int		server_num = 0;
 
-	if(CONFIG_LOG_FILE == NULL)
+	if(CONFIG_LOG_FILE == NULL || ('\0' == *CONFIG_LOG_FILE))
 	{
 		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
 	}
@@ -421,7 +428,7 @@ int MAIN_ZABBIX_ENTRY(void)
 #	define IPV6_FEATURE_STATUS " NO"
 #endif
 
-	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. Zabbix %s (revision %s).",
+	zabbix_log( LOG_LEVEL_WARNING, "Starting Zabbix Server. Zabbix %s (revision %s).",
 			ZABBIX_VERSION,
 			ZABBIX_REVISION);
 

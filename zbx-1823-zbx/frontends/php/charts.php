@@ -60,7 +60,7 @@ include_once('include/page_header.php');
 
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
-			update_profile('web.charts.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.charts.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 
 		if('timeline' == $_REQUEST['favobj']){
@@ -72,14 +72,14 @@ include_once('include/page_header.php');
 		if(str_in_array($_REQUEST['favobj'],array('itemid','graphid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
-				$result = add2favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
+				$result = add2favorites('web.favorite.graphids', $_REQUEST['favid'], $_REQUEST['favobj']);
 				if($result){
 					print('$("addrm_fav").title = "'.S_REMOVE_FROM.' '.S_FAVOURITES.'";'."\n");
 					print('$("addrm_fav").onclick = function(){rm4favorites("graphid","'.$_REQUEST['favid'].'",0);}'."\n");
 				}
 			}
 			else if('remove' == $_REQUEST['action']){
-				$result = rm4favorites('web.favorite.graphids',$_REQUEST['favid'],ZBX_FAVORITES_ALL,$_REQUEST['favobj']);
+				$result = rm4favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
 
 				if($result){
 					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVOURITES.'";'."\n");
@@ -94,11 +94,12 @@ include_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 ?>
 <?php
-	$_REQUEST['graphid'] = get_request('graphid', get_profile('web.charts.graphid', 0));
+	$_REQUEST['graphid'] = get_request('graphid', CProfile::get('web.charts.graphid', 0));
 	if(!in_node($_REQUEST['graphid'])) $_REQUEST['graphid'] = 0;
 
 	if($_REQUEST['graphid']>0){
@@ -139,7 +140,7 @@ include_once('include/page_header.php');
 
 	$effectiveperiod = navigation_bar_calc('web.graph');
 
-	update_profile('web.charts.graphid',$_REQUEST['graphid']);
+	CProfile::update('web.charts.graphid',$_REQUEST['graphid'], PROFILE_TYPE_ID);
 
 	$h1 = array();
 
@@ -156,12 +157,20 @@ include_once('include/page_header.php');
 	$available_groups= $PAGE_GROUPS['groupids'];
 	$available_hosts = $PAGE_HOSTS['hostids'];
 
-	if(($_REQUEST['graphid']>0) && ($row=DBfetch(DBselect('SELECT DISTINCT graphid, name FROM graphs WHERE graphid='.$_REQUEST['graphid'])))){
-		if(!graph_accessible($_REQUEST['graphid'])){
-			update_profile('web.charts.graphid',0);
+	if($_REQUEST['graphid']>0){
+		$options = array(
+			'graphids' => $_REQUEST['graphid'],
+			'output' => API_OUTPUT_EXTEND,
+			'nodeids' => get_current_nodeid(true)
+		);
+		$db_data = CGraph::get($options);
+		if(empty($db_data)){
+			CProfile::update('web.charts.graphid',0,PROFILE_TYPE_ID);
 			access_deny();
 		}
-		array_push($h1, $row['name']);
+
+		$db_data = reset($db_data);
+		array_push($h1, $db_data['name']);
 	}
 	else{
 		$_REQUEST['graphid'] = 0;
@@ -194,7 +203,6 @@ include_once('include/page_header.php');
 
 	$options = array(
 		'extendoutput' => 1,
-		'sortfield' => 'name',
 		'templated' => 0
 	);
 
@@ -207,6 +215,7 @@ include_once('include/page_header.php');
 	}
 
 	$db_graphs = CGraph::get($options);
+	order_result($db_graphs, 'name');
 	foreach($db_graphs as $num => $db_graph){
 		$cmbGraphs->addItem($db_graph['graphid'], get_node_name_by_elid($db_graph['graphid'], null, ': ').$db_graph['name']);
 	}
