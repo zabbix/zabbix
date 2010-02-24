@@ -256,12 +256,12 @@ int	check_time_period(char *period, time_t now)
  ******************************************************************************/
 static int	get_current_delay(int delay, char *flex_intervals, time_t now)
 {
-	if (NULL == flex_intervals || '\0' == *flex_intervals)
-		return delay;
-
 	char	*s, *c;
 	char	flex_period[30];
 	int	flex_delay, current_delay = SEC_PER_YEAR;
+
+	if (NULL == flex_intervals || '\0' == *flex_intervals)
+		return delay;
 
 	for (s = flex_intervals; '\0' != *s; s = c + 1)
 	{
@@ -311,13 +311,13 @@ static int	get_current_delay(int delay, char *flex_intervals, time_t now)
  ******************************************************************************/
 static int	get_next_delay_interval(char *flex_intervals, time_t now, time_t *next_interval)
 {
-	if (NULL == flex_intervals || '\0' == *flex_intervals)
-		return FAIL;
-
 	char		*s, *c = NULL;
 	struct tm	*tm;
 	int		day, sec, sec1, sec2, delay, d1, d2, h1, h2, m1, m2, flag;
 	time_t		next = 0;
+
+	if (NULL == flex_intervals || '\0' == *flex_intervals)
+		return FAIL;
 
 	tm = localtime(&now);
 	day = 0 == tm->tm_wday ? 7 : tm->tm_wday;
@@ -359,7 +359,8 @@ static int	get_next_delay_interval(char *flex_intervals, time_t now, time_t *nex
 			}
 			else
 			{
-				int	next_day = (day + 1 <= 7 ? day + 1 : 1);
+				int	next_day;
+				next_day = (day + 1 <= 7 ? day + 1 : 1);
 
 				if (next_day >= d1 && next_day <= d2)                   /* will be active tomorrow */
 				{
@@ -368,7 +369,7 @@ static int	get_next_delay_interval(char *flex_intervals, time_t now, time_t *nex
 				}
 				else                                                    /* later in the future */
 				{
-					int day_diff;
+					int day_diff = (-1);
 
 					if (day < d1)
 						day_diff = d1 - day;
@@ -430,13 +431,13 @@ static int	get_next_delay_interval(char *flex_intervals, time_t now, time_t *nex
  ******************************************************************************/
 int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char *flex_intervals, time_t now)
 {
+	int	nextcheck;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In calculate_item_nextcheck (" ZBX_FS_UI64 ",%d,\"%s\",%d)",
 			itemid, delay, NULL == flex_intervals ? "" : flex_intervals, now);
 
 	if (0 == delay)
 		delay = SEC_PER_YEAR;
-
-	int	nextcheck;
 
 	/* Special processing of active items to see better view in queue */
 	if (item_type == ITEM_TYPE_ZABBIX_ACTIVE)
