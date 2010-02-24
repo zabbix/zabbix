@@ -413,10 +413,21 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 				break;
 			default:
 				arg2_esc = DBdyn_escape_string(arg2);
-				offset += zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
-						" and value %s '%s'",
-						operators[op],
-						arg2_esc);
+				switch (op) {
+				case OP_EQ:
+				case OP_NE:
+					offset += zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
+							" and value %s '%s'",
+							operators[op],
+							arg2_esc);
+					break;
+				case OP_LIKE:
+				default:
+					offset += zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
+							" and value like '%%%s%%'",
+							arg2_esc);
+					break;
+				}
 				zbx_free(arg2_esc);
 			}
 		}
