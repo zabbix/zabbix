@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -437,10 +437,12 @@ include_once('include/page_header.php');
 		}
 
 //		imagerectangle($im, $x_rec-2-1, $y_rec-1, $x_rec+$w+2+1, $y_rec+($oc*4)+$h+1, $black);
-		imagefilledrectangle($im, $x_rec-2, $y_rec-2, $x_rec+$w+2, $y_rec+($oc*4)+$h-2, $white);
+//		imagefilledrectangle($im, $x_rec-2, $y_rec-2, $x_rec+$w+2, $y_rec+($oc*4)+$h-2, $white);
 
 		$increasey = 0;
 		foreach($strings as $num => $str){
+			if(zbx_empty($str)) continue;
+
 			$dims = imageTextSize(8,0,$str);
 
 			$color = ($num >= $cnt)?$el_info['info'][$num-$cnt]['color']:$label_color;
@@ -454,6 +456,12 @@ include_once('include/page_header.php');
 				$x_label = $x_rec;
 
 
+			imagefilledrectangle(
+				$im,
+				$x_label-2, $y_rec+$increasey-2,
+				$x_label+$dims['width']+2, $y_rec+$increasey+$dims['height']+2,
+				$white
+			);
 			imagetext($im, 8, 0, $x_label, $y_rec+$dims['height']+$increasey, $color, $str);
 
 			$increasey+= $dims['height']+4;
