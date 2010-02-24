@@ -4,6 +4,7 @@ Changes for 1.9
 
 Changes for 1.8.2
 
+ - [ZBX-2016] fixed code with "_itow_s()" and "zbx_wsnprintf" to avoid possible run-time memory corruption. Thanks to Takanori Suzuki. (Dmitry)
  - [ZBX-2059] fixed special char treatment in XML export (Aly)
  - [ZBX-1655] improved error message on map save with circular reference (Aly)
  - [ZBX-1823] improved map element labels expansion in map editing screen (Aly)
