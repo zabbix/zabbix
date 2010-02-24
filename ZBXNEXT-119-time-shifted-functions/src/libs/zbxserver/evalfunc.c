@@ -273,17 +273,16 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 
 	char		tmp[MAX_STRING_LEN];
 
-	int		numeric_search = (item->value_type == ITEM_VALUE_TYPE_UINT64 ||
-						item->value_type == ITEM_VALUE_TYPE_FLOAT);
-
-	int		arg1, flag, op = (numeric_search ? OP_EQ : OP_LIKE), offset,
-			nparams, count, res = FAIL;
+	int		arg1, flag, op, offset, numeric_search, nparams, count, res = FAIL;
 	zbx_uint64_t	value_uint64 = 0, dbvalue_uint64;
 	double		value_double = 0, dbvalue_double;
 	char		*operators[OP_MAX] = {"=", "<>", ">", ">=", "<", "<=", "like"};
 	char		*arg2 = NULL, *arg3 = NULL, *arg2_esc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	numeric_search = (item->value_type == ITEM_VALUE_TYPE_UINT64 || item->value_type == ITEM_VALUE_TYPE_FLOAT);
+	op = (numeric_search ? OP_EQ : OP_LIKE);
 
 	nparams = num_param(parameters);
 	if (!(1 <= nparams && nparams <= 4))
