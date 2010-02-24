@@ -1594,6 +1594,13 @@ int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64
 {
 	zbx_uint64_t	escalationid;
 
+	/* removing older active escalations */
+	DBexecute("delete from escalations"
+			" where actionid=" ZBX_FS_UI64
+				" and triggerid=" ZBX_FS_UI64,
+			actionid,
+			triggerid);
+
 	escalationid = DBget_maxid("escalations", "escalationid");
 
 	DBexecute("insert into escalations (escalationid,actionid,triggerid,eventid,status)"
@@ -1609,12 +1616,37 @@ int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64
 
 int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid)
 {
-	DBexecute("update escalations set r_eventid=" ZBX_FS_UI64 ",status=%d,nextcheck=0"
-			" where actionid=" ZBX_FS_UI64 " and triggerid=" ZBX_FS_UI64,
-			eventid,
-			ESCALATION_STATUS_RECOVERY,
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	escalationid;
+	char		sql[256];
+
+	/* stopping only last active escalation */
+	zbx_snprintf(sql, sizeof(sql),
+			"select escalationid"
+			" from escalations"
+			" where actionid=" ZBX_FS_UI64
+				" and triggerid=" ZBX_FS_UI64
+			" order by escalationid desc",
 			actionid,
 			triggerid);
+
+	result = DBselectN(sql, 1);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(escalationid, row[0]);
+
+		DBexecute("update escalations"
+				" set r_eventid=" ZBX_FS_UI64 ","
+					"status=%d,"
+					"nextcheck=0"
+				" where escalationid=" ZBX_FS_UI64,
+				eventid,
+				ESCALATION_STATUS_RECOVERY,
+				escalationid);
+	}
+	DBfree_result(result);
 
 	return SUCCEED;
 }

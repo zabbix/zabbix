@@ -1,5 +1,6 @@
 Changes for 1.6.9
 
+ - [ZBX-2062] fixed sending of recovery messages multiple times (Sasha)
  - [ZBX-1030] fixed security vulnerability in server allowing remote unauthenticated users to execute scripts. Thanks to Nicob (Sasha)
 
 Changes for 1.6.8
