@@ -107,7 +107,7 @@ include_once('include/page_header.php');
 
 					expandMapLabels($db_map);
 
-					$map_info = getSelementsInfo($db_map['selements'], $db_map['expandproblem']);
+					$map_info = getSelementsInfo($db_map, $db_map['expandproblem']);
 //SDII($db_map);
 					add_elementNames($db_map['selements']);
 
