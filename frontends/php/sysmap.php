@@ -212,7 +212,7 @@ include_once "include/page_header.php";
 //						$element['image'] = get_base64_icon($element);
 //SDI($element);						
 						if($element['iconid_off'] == 0){
-							$sql = 'SELECT i.* FROM images i WHERE '.dbin_node('i.imageid', false).' AND i.imagetype=1 ORDER BY imageid ASC';
+							$sql = 'SELECT i.* FROM images i WHERE '.dbin_node('i.imageid').' AND i.imagetype=1 ORDER BY imageid ASC';
 							$default_icon = DBfetch(DBselect($sql,1));
 // SDI($sql);
 							$element['iconid_off'] = $default_icon['imageid'];
