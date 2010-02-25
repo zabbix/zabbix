@@ -704,6 +704,12 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('API_OUTPUT_REFER', 'refer');
 	define('API_OUTPUT_EXTEND', 'extend');
 
+
+	define('SEC_PER_MIN', 60);
+	define('SEC_PER_HOUR', 3600);
+	define('SEC_PER_DAY', 86400);
+	define('SEC_PER_WEEK', (7*SEC_PER_DAY));
+	define('SEC_PER_YEAR', (365*SEC_PER_DAY));
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
 	if(!function_exists('version_compare')){
 		$_GET		= $HTTP_GET_VARS;

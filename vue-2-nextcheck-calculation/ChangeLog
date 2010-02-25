@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBXNEXT-257] added support of time-based disabling of data collection for items (asaveljevs,Sasha)
  - [ZBX-1958] fixed problem with a lot of digits in float values (Vedmak)
  - [ZBX-1853] fixed template\host full clone with triggers with dependencies (Vedmak)
  - [ZBX-1999] fixed bug when cannot create simple check item with macro in parameters (Vedmak)

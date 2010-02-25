@@ -1821,7 +1821,7 @@
 //	items.inc.php
 	'S_INCORRECT_ARGUMENTS_PASTED_TO_FUNCTION'=>	'Incorrect arguments pasted to function',
 	'S_INCORRECT_KEY_FORMAT'=>			'Incorrect key format',
-	'S_DELAY_CANNOT_BE_LESS_THAN_ONE_SECOND'=>	'Delay cannot be less than 1 second',
+	'S_ITEM_WILL_NOT_BE_REFRESHED_PLEASE_ENTER_A_CORRECT_UPDATE_INTERVAL'=>	'Item will not be refreshed. Please enter a correct update interval.',
 	'S_INVALID_SNMP_PORT'=>				'Invalid SNMP port',
 	'S_TYPE_INFORMATION_BUST_LOG_FOR_LOG_KEY'=>	'Type of information must be Log for log key',
 	'S_VALUE_TYPE_MUST_FLOAT_FOR_AGGREGATE_ITEMS'=>	'Value type must be Float for aggregate items',

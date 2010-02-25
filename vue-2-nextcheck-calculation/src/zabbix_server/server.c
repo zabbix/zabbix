@@ -318,6 +318,31 @@ int main(int argc, char **argv)
 
 	int	nodeid = 0;
 
+/*	{
+		int	i, from, to, nextcheck, num = 0;
+		int	delay = 300;
+		char	delay_flex[256];
+	       
+		strcpy(delay_flex, "0/1-5,0:00-8:00;0/1-5,18:00-24:00;0/6-7,0:00-24:00");
+
+		from = time(NULL);
+		to = from + SEC_PER_WEEK;
+		printf("delay: %d\n", delay);
+		printf("flex : '%s'\n", delay_flex);
+		printf("from : %d (%s %s)\n", from, zbx_date2str(from), zbx_time2str(from));
+		printf("to   : %d (%s %s)\n", to, zbx_date2str(to), zbx_time2str(to));
+
+		for (i = from; i < to;)
+		{
+			nextcheck = calculate_item_nextcheck(5563601, 1, delay, delay_flex, i);
+			printf("%d: %d (%s %s) %d\n", ++num, nextcheck, zbx_date2str(nextcheck), zbx_time2str(nextcheck),
+					nextcheck - i);
+			i = nextcheck;
+		}
+
+		exit(-1);
+	}*/
+
 	progname = argv[0];
 
 	/* Parse the command-line. */
