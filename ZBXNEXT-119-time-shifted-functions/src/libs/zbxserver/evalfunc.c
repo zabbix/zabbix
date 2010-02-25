@@ -417,7 +417,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 				case OP_EQ:
 				case OP_NE:
 					offset += zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
-							" and value %s '%s'",
+							" and value%s'%s'",
 							operators[op],
 							arg2_esc);
 					break;
