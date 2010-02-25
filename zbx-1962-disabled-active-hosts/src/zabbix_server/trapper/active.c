@@ -56,7 +56,7 @@ static int	get_hostid_by_host(const char *host, zbx_uint64_t *hostid, char *erro
 			"select hostid,status"
 			" from hosts"
 			" where host='%s'"
-				" and status in (%d, %d)"
+				" and status in (%d,%d)"
 		       		" and proxy_hostid=0"
 				DB_NODE,
 			host_esc,
@@ -68,7 +68,7 @@ static int	get_hostid_by_host(const char *host, zbx_uint64_t *hostid, char *erro
 	{
 		if (HOST_STATUS_MONITORED == atoi(row[1]))
 		{
-			*hostid = zbx_atoui64(row[0]);
+			ZBX_STR2UINT64(*hostid, row[0]);
 			res = SUCCEED;
 		}
 		else
