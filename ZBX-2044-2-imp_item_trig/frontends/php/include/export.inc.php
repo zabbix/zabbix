@@ -377,7 +377,7 @@ class zbxXML{
 				if($db_maps && isset($rules['maps']['exist'])){
 					$options = array(
 						'filter' => array(
-							'name' => $sysmap['name'],
+							'name' => $sysmap['name']),
 						'output' => API_OUTPUT_EXTEND,
 						'editable' => 1
 					);								
