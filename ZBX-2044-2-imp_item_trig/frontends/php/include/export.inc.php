@@ -384,7 +384,7 @@ class zbxXML{
 					$current_map = CMap::get($options);
 					
 					if(empty($current_map)){
-						throw new Exception('No permission for Map ['.$current_map['name'].']');
+						throw new Exception(S_NO_PERMISSIONS.' ['.$sysmap['name'].']');
 					}
 					else{
 						$current_map = reset($current_map);
