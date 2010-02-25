@@ -1,5 +1,9 @@
 Changes for 1.8.2
 
+ - [ZBX-1962] explicit 'not monitored' response for active agents on disabled hosts (asaveljevs)
+ - [ZBX-1522] fixed server crash on an undefined user macro (asaveljevs)
+ - [ZBX-2039] fixed pattern matching in function count (asaveljevs)
+ - [ZBXNEXT-119] added support for time shifted functions (asaveljevs)
  - [ZBX-2062] fixed sending of recovery messages multiple times (Sasha)
  - [ZBX-1878] reverted map label background drawing (Aly)
  - [ZBX-2016] fixed code with "_itow_s()" and "zbx_wsnprintf" to avoid possible run-time memory corruption. Thanks to Takanori Suzuki. (Dmitry)
