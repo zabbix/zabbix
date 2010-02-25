@@ -198,7 +198,7 @@
 		}
 
 		$result = array(
-			'name' => 'PHP timezone',
+			'name' => S_PHP_TIMEZONE,
 			'current' => $req ? ini_get('date.timezone') : S_NO_SMALL,
 			'required' => null,
 			'recommended' => null,
