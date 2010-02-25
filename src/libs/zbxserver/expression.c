@@ -2094,7 +2094,7 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
 					zbxmacros_get_value_by_triggerid(macros, event->objectid, m, &replace_to);
-					if (FAIL == (res = is_double_prefix(replace_to)) && NULL != error)
+					if (NULL != replace_to && FAIL == (res = is_double_prefix(replace_to)) && NULL != error)
 						zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
 				}
 			}
@@ -2140,7 +2140,7 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 			{
 				zbxmacros_get_value(macros, &dc_item->host.hostid, 1, m, &replace_to);
-				if (FAIL == (res = is_double_prefix(replace_to)) && NULL != error)
+				if (NULL != replace_to && FAIL == (res = is_double_prefix(replace_to)) && NULL != error)
 					zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
 			}
 		}
