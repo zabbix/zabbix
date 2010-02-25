@@ -50,6 +50,7 @@ include_once('include/page_header.php');
 
 	$options = array(
 		'itemids' => $_REQUEST['itemid'],
+		'webitems' => 1,
 		'nodeids' => get_current_nodeid(true)
 	);
 

@@ -376,7 +376,7 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	is_ip4(const char *ip)
+int	is_ip4(const char *ip)
 {
 	const char	*p = ip;
 	int		nums, dots, res = FAIL;

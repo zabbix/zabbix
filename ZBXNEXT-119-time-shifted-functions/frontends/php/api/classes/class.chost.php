@@ -108,6 +108,7 @@ class CHost extends CZBXAPI{
 			'editable'					=> null,
 			'nopermissions'				=> null,
 // filter
+			'filter'					=> null,
 			'pattern'					=> '',
 			'extend_pattern'			=> null,
 
@@ -164,10 +165,6 @@ class CHost extends CZBXAPI{
 
 
 // editable + PERMISSION CHECK
-		if(defined('ZBX_API_REQUEST')){
-			$options['nopermissions'] = false;
-		}
-
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
 		else{
@@ -192,7 +189,7 @@ class CHost extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
 
 // groupids
 		if(!is_null($options['groupids'])){
@@ -200,6 +197,7 @@ class CHost extends CZBXAPI{
 			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
+
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sql_parts['where']['hgh'] = 'hg.hostid=h.hostid';
@@ -208,7 +206,7 @@ class CHost extends CZBXAPI{
 // hostids
 		if(!is_null($options['hostids'])){
 			zbx_value2array($options['hostids']);
-			$sql_parts['where'][] = DBcondition('h.hostid', $options['hostids']);
+			$sql_parts['where']['hostid'] = DBcondition('h.hostid', $options['hostids']);
 		}
 
 // templateids
@@ -266,16 +264,16 @@ class CHost extends CZBXAPI{
 
 // monitored_hosts, templated_hosts
 		if(!is_null($options['monitored_hosts'])){
-			$sql_parts['where'][] = 'h.status='.HOST_STATUS_MONITORED;
+			$sql_parts['where']['status'] = 'h.status='.HOST_STATUS_MONITORED;
 		}
 		else if(!is_null($options['templated_hosts'])){
-			$sql_parts['where'][] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')';
+			$sql_parts['where']['status'] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')';
 		}
 		else if(!is_null($options['proxy_hosts'])){
-			$sql_parts['where'][] = 'h.status IN ('.HOST_STATUS_PROXY.')';
+			$sql_parts['where']['status'] = 'h.status IN ('.HOST_STATUS_PROXY.')';
 		}
 		else{
-			$sql_parts['where'][] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
+			$sql_parts['where']['status'] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
 		}
 
 // with_items, with_monitored_items, with_historical_items
@@ -357,7 +355,19 @@ class CHost extends CZBXAPI{
 										' ) ';
 			}
 			else{
-				$sql_parts['where'][] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+				$sql_parts['where']['host'] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+			}
+		}
+
+// filter
+		if(!is_null($options['filter'])){
+			zbx_value2array($options['filter']);
+
+			if(isset($options['filter']['hostid'])){
+				$sql_parts['where']['hostid'] = 'h.hostid='.$options['filter']['hostid'];
+			}
+			if(isset($options['filter']['host'])){
+				$sql_parts['where']['host'] = 'h.host='.zbx_dbstr($options['filter']['host']);
 			}
 		}
 
@@ -673,27 +683,42 @@ class CHost extends CZBXAPI{
  * @param string $host_data['host']
  * @return int|boolean
  */
-	public static function getObjects($host_data){
+	public static function getObjects($hostData){
+		$options = array(
+			'filter' => $hostData,
+			'output'=>API_OUTPUT_EXTEND
+		);
+
+		if(isset($hostData['node']))
+			$options['nodeids'] = getNodeIdByNodeName($hostData['node']);
+		else if(isset($hostData['nodeids']))
+			$options['nodeids'] = $hostData['nodeids'];
+
+		$result = self::get($options);
+
+	return $result;
+	}
+
+	public static function checkObjects($hostsData){
+
+		$hostsData = zbx_toArray($hostsData);
+		
 		$result = array();
-		$hostids = array();
-
-		$sql = 'SELECT hostid '.
-				' FROM hosts '.
-				' WHERE host='.zbx_dbstr($host_data['host']).
-					' AND '.DBin_node('hostid', false);
-
-		$res = DBselect($sql);
-		while($host = DBfetch($res)){
-			$hostids[$host['hostid']] = $host['hostid'];
-		}
-
-		if(!empty($hostids)){
+		foreach($hostsData as $hnum => $hostData){
 			$options = array(
-				'hostids'=>$hostids, 
-				'output'=>API_OUTPUT_EXTEND
+				'filter' => $hostData,
+				'output' => API_OUTPUT_SHORTEN,
+				'nopermissions' => 1
 			);
 
-			$result = self::get($options);
+			if(isset($hostData['node']))
+				$options['nodeids'] = getNodeIdByNodeName($hostData['node']);
+			else if(isset($hostData['nodeids']))
+				$options['nodeids'] = $hostData['nodeids'];
+
+			$hosts = self::get($options);
+
+			$result+= $hosts;
 		}
 
 	return $result;
@@ -797,14 +822,14 @@ class CHost extends CZBXAPI{
 				break;
 			}
 
-			$host_exists = self::getObjects(array('host' => $host['host']));
+			$host_exists = self::checkObjects(array('host' => $host['host']));
 			if(!empty($host_exists)){
 				$result = false;
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_HOST.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				break;
 			}
 
-			$host_exists = CTemplate::getObjects(array('host' => $host['host']));
+			$host_exists = CTemplate::checkObjects(array('host' => $host['host']));
 			if(!empty($host_exists)){
 				$result = false;
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_TEMPLATE.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
@@ -940,12 +965,17 @@ class CHost extends CZBXAPI{
 	
 			$result = self::EndTransaction($result, __METHOD__);
 			
-		
-			$upd_hosts = self::get(array('hostids' => $hostids, 'extendoutput' => 1, 'nopermissions' => 1));
+
+			$options = array(
+				'hostids' => $hostids,
+				'extendoutput' => 1,
+				'nopermissions' => 1
+			);
+			$upd_hosts = self::get($options);
 			return $upd_hosts;
 		}
 		catch(APIException $e){
-			if($transaction) self::EndTransaction(false, __METHOD__);
+			if(isset($transaction)) self::EndTransaction(false, __METHOD__);
 
 			$error = $e->getErrors();
 			$error = reset($error);
@@ -1071,7 +1101,6 @@ class CHost extends CZBXAPI{
 			if(isset($data['groups']) && empty($data['groups'])){
 				throw new APIException(ZBX_API_ERROR_PARAMETERS, 'No groups for hosts');
 			}
-			$data['groups'] = zbx_toArray($data['groups']);
 // }}} CHECK IF HOSTS HAVE AT LEAST 1 GROUP
 
 			$transaction = self::BeginTransaction(__METHOD__);
@@ -1083,7 +1112,7 @@ class CHost extends CZBXAPI{
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cannot mass update host name');
 				}
 
-				$host_exists = self::getObjects(array('host' => $data['host']));
+				$host_exists = self::checkObjects(array('host' => $data['host']));
 				$host_exists = reset($host_exists);
 				$cur_host = reset($hosts);
 
@@ -1092,7 +1121,7 @@ class CHost extends CZBXAPI{
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 				
-				$host_exists = CTemplate::getObjects(array('host' => $host['host']));
+				$host_exists = CTemplate::checkObjects(array('host' => $host['host']));
 				if(!empty($host_exists)){
 					$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
@@ -1133,6 +1162,8 @@ class CHost extends CZBXAPI{
 
 // UPDATE HOSTGROUPS LINKAGE {{{
 			if(isset($data['groups']) && !is_null($data['groups'])){
+				$data['groups'] = zbx_toArray($data['groups']);
+				
 				$host_groups = CHostGroup::get(array('hostids' => $hostids));
 				$host_groupids = zbx_objectValues($host_groups, 'groupid');
 				$new_groupids = zbx_objectValues($data['groups'], 'groupid');

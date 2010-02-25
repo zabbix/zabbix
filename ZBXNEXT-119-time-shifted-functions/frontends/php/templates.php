@@ -417,6 +417,9 @@ include_once('include/page_header.php');
 		}
 		else{
 			$groups = get_request('groups', array());
+			if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0) && !uint_in_array($_REQUEST['groupid'], $host_groups)){
+				array_push($groups, $_REQUEST['groupid']);
+			}
 			$hosts_linked_to = get_request('hosts', array());
 		}
 
@@ -518,7 +521,11 @@ include_once('include/page_header.php');
 			$items_lbx = new CListBox('items', null, 8);
 			$items_lbx->setAttribute('disabled', 'disabled');
 
-			$options = array('editable' => 1, 'hostids' => $templateid, 'extendoutput' => 1);
+			$options = array(
+				'editable' => 1,
+				'hostids' => $templateid,
+				'output' => API_OUTPUT_EXTEND
+			);
 			$template_items = CItem::get($options);
 
 			if(empty($template_items)){
@@ -795,7 +802,7 @@ include_once('include/page_header.php');
 
 		$jsLocale = array(
 			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTES'
+			'S_NO_ELEMENTS_SELECTED'
 		);
 
 		zbx_addJSLocale($jsLocale);

@@ -67,6 +67,7 @@ include_once('include/page_header.php');
 	asort_by_key($items, 'sortorder');
 
 	$options = array(
+		'webitems' => 1,
 		'itemids' => zbx_objectValues($items, 'itemid'),
 		'nodeids' => get_current_nodeid(true)
 	);

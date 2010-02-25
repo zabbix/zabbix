@@ -71,6 +71,7 @@ class CTemplate extends CZBXAPI{
 			'editable' 					=> null,
 			'nopermissions'				=> null,
 // filter
+			'filter'					=> null,
 			'pattern'					=> '',
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
@@ -125,9 +126,6 @@ class CTemplate extends CZBXAPI{
 
 
 // editable + PERMISSION CHECK
-		if(defined('ZBX_API_REQUEST')){
-			$options['nopermissions'] = false;
-		}
 
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
@@ -153,7 +151,7 @@ class CTemplate extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
 
 // groupids
 		if(!is_null($options['groupids'])){
@@ -172,7 +170,7 @@ class CTemplate extends CZBXAPI{
 		if(!is_null($options['templateids'])){
 			zbx_value2array($options['templateids']);
 
-			$sql_parts['where'][] = DBcondition('h.hostid', $options['templateids']);
+			$sql_parts['where']['templateid'] = DBcondition('h.hostid', $options['templateids']);
 		}
 
 // hostids
@@ -254,7 +252,19 @@ class CTemplate extends CZBXAPI{
 
 // pattern
 		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where'][] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+			$sql_parts['where']['host'] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+		}
+
+// filter
+		if(!is_null($options['filter'])){
+			zbx_value2array($options['filter']);
+
+			if(isset($options['filter']['templateid'])){
+				$sql_parts['where']['templateid'] = 'h.hostid='.$options['filter']['templateid'];
+			}
+			if(isset($options['filter']['host'])){
+				$sql_parts['where']['host'] = 'h.host='.zbx_dbstr($options['filter']['host']);
+			}
 		}
 
 // order
@@ -555,37 +565,46 @@ class CTemplate extends CZBXAPI{
  *
  * @param array $template_data
  * @param array $template_data['host']
+ * @param array $template_data['templateid']
  * @return string templateid
  */
+
 	public static function getObjects($templateData){
+		$options = array(
+			'filter' => $templateData,
+			'output'=>API_OUTPUT_EXTEND
+		);
+
+		if(isset($templateData['node']))
+			$options['nodeids'] = getNodeIdByNodeName($templateData['node']);
+		else if(isset($templateData['nodeids']))
+			$options['nodeids'] = $templateData['nodeids'];
+
+		$result = self::get($options);
+
+	return $result;
+	}
+
+	public static function checkObjects($templatesData){
+
+		$templatesData = zbx_toArray($templatesData);
+		
 		$result = array();
-		$templateid = array();
-
-		$sql_where = '';
-		if(isset($templateData['host']))
-			$sql_where.= ' AND host='.zbx_dbstr($templateData['host']);
-			
-		if(isset($templateData['templateid']))
-			$sql_where.= ' AND hostid='.zbx_dbstr($templateData['templateid']);
-
-
-		$sql = 'SELECT hostid '.
-				' FROM hosts '.
-				' WHERE status='.HOST_STATUS_TEMPLATE.
-					' AND '.DBin_node('hostid', false).
-					$sql_where;
-		$res = DBselect($sql);
-		while($template = DBfetch($res)){
-			$templateids[$template['hostid']] = $template['hostid'];
-		}
-
-		if(!empty($templateids)){
+		foreach($templatesData as $tnum => $templateData){
 			$options = array(
-				'templateids'=>$templateids, 
-				'output'=>API_OUTPUT_EXTEND
+				'filter' => $templateData,
+				'output' => API_OUTPUT_SHORTEN,
+				'nopermissions' => 1
 			);
 
-			$result = self::get($options);
+			if(isset($templateData['node']))
+				$options['nodeids'] = getNodeIdByNodeName($templateData['node']);
+			else if(isset($templateData['nodeids']))
+				$options['nodeids'] = $templateData['nodeids'];
+
+			$templates = self::get($options);
+
+			$result+= $templates;
 		}
 
 	return $result;
@@ -668,13 +687,13 @@ class CTemplate extends CZBXAPI{
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for Template name [ '.$template['host'].' ]');
 				}
 
-				$template_exists = self::getObjects(array('host' => $template['host']));
+				$template_exists = self::checkObjects(array('host' => $template['host']));
 				if(!empty($template_exists)){
 					$result = false;
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 
-				$host_exists = CHost::getObjects(array('host' => $template['host']));
+				$host_exists = CHost::checkObjects(array('host' => $template['host']));
 				if(!empty($host_exists)){
 					$result = false;
 					$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_HOST.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
@@ -950,7 +969,7 @@ class CTemplate extends CZBXAPI{
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Wrong fields');
 				}
 
-				$template_exists = self::getObjects(array('host' => $data['host']));
+				$template_exists = self::checkObjects(array('host' => $data['host']));
 				$template_exists = reset($template_exists);
 				$cur_template = reset($templates);
 
@@ -958,7 +977,7 @@ class CTemplate extends CZBXAPI{
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 				
-				$host_exists = CHost::getObjects(array('host' => $data['host']));
+				$host_exists = CHost::checkObjects(array('host' => $data['host']));
 				if(!empty($host_exists)){
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}

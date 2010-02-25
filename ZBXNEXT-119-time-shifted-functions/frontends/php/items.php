@@ -800,7 +800,7 @@ include_once('include/page_header.php');
 		$sortfield = getPageSortField('description');
 		$sortorder = getPageSortOrder();
 		$options = array(
-			'filter' => 1,
+			'filter' => array(),
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1,
 			'select_hosts' => API_OUTPUT_EXTEND,
@@ -817,36 +817,52 @@ include_once('include/page_header.php');
 			$options['hostids'] = $hostid;
 		if(isset($_REQUEST['filter_group']) && !zbx_empty($_REQUEST['filter_group']))
 			$options['group'] = $_REQUEST['filter_group'];
+
 		if(isset($_REQUEST['filter_host']) && !zbx_empty($_REQUEST['filter_host']))
 			$options['host'] = $_REQUEST['filter_host'];
+
 		if(isset($_REQUEST['filter_application']) && !zbx_empty($_REQUEST['filter_application']))
 			$options['application'] = $_REQUEST['filter_application'];
+
 		if(isset($_REQUEST['filter_description']) && !zbx_empty($_REQUEST['filter_description']))
 			$options['pattern'] = $_REQUEST['filter_description'];
+
 		if(isset($_REQUEST['filter_type']) && !zbx_empty($_REQUEST['filter_type']) && ($_REQUEST['filter_type'] != -1))
-			$options['type'] = $_REQUEST['filter_type'];
+			$options['filter']['type'] = $_REQUEST['filter_type'];
+
 		if(isset($_REQUEST['filter_key']) && !zbx_empty($_REQUEST['filter_key']))
-			$options['key'] = $_REQUEST['filter_key'];
+			$options['patternKey'] = $_REQUEST['filter_key'];
+
 		if(isset($_REQUEST['filter_snmp_community']) && !zbx_empty($_REQUEST['filter_snmp_community']))
-			$options['snmp_community'] = $_REQUEST['filter_snmp_community'];
+			$options['filter']['snmp_community'] = $_REQUEST['filter_snmp_community'];
+
 		if(isset($_REQUEST['filter_snmp_oid']) && !zbx_empty($_REQUEST['filter_snmp_oid']))
-			$options['snmp_oid'] = $_REQUEST['filter_snmp_oid'];
+			$options['filter']['snmp_oid'] = $_REQUEST['filter_snmp_oid'];
+
 		if(isset($_REQUEST['filter_snmp_port']) && !zbx_empty($_REQUEST['filter_snmp_port']))
-			$options['snmp_port'] = $_REQUEST['filter_snmp_port'];
+			$options['filter']['snmp_port'] = $_REQUEST['filter_snmp_port'];
+
 		if(isset($_REQUEST['filter_value_type']) && !zbx_empty($_REQUEST['filter_value_type']) && $_REQUEST['filter_value_type'] != -1)
-			$options['valuetype'] = $_REQUEST['filter_value_type'];
+			$options['filter']['value_type'] = $_REQUEST['filter_value_type'];
+
 		if(isset($_REQUEST['filter_data_type']) && !zbx_empty($_REQUEST['filter_data_type']) && $_REQUEST['filter_data_type'] != -1)
-			$options['data_type'] = $_REQUEST['filter_data_type'];
+			$options['filter']['data_type'] = $_REQUEST['filter_data_type'];
+
 		if(isset($_REQUEST['filter_delay']) && !zbx_empty($_REQUEST['filter_delay']))
-			$options['delay'] = $_REQUEST['filter_delay'];
+			$options['filter']['delay'] = $_REQUEST['filter_delay'];
+
 		if(isset($_REQUEST['filter_history']) && !zbx_empty($_REQUEST['filter_history']))
-			$options['history'] = $_REQUEST['filter_history'];
+			$options['filter']['history'] = $_REQUEST['filter_history'];
+
 		if(isset($_REQUEST['filter_trends']) && !zbx_empty($_REQUEST['filter_trends']))
-			$options['trends'] = $_REQUEST['filter_trends'];
+			$options['filter']['trends'] = $_REQUEST['filter_trends'];
+
 		if(isset($_REQUEST['filter_status']) && !zbx_empty($_REQUEST['filter_status']) && $_REQUEST['filter_status'] != -1)
-			$options['status'] = $_REQUEST['filter_status'];
+			$options['filter']['status'] = $_REQUEST['filter_status'];
+
 		if(isset($_REQUEST['filter_templated_items']) && !zbx_empty($_REQUEST['filter_templated_items']) && $_REQUEST['filter_templated_items'] != -1)
 			$options['inherited'] = $_REQUEST['filter_templated_items'];
+
 		if(isset($_REQUEST['filter_with_triggers']) && !zbx_empty($_REQUEST['filter_with_triggers']) && $_REQUEST['filter_with_triggers'] != -1)
 			$options['with_triggers'] = $_REQUEST['filter_with_triggers'];
 
@@ -1153,7 +1169,7 @@ include_once('include/page_header.php');
 
 		$jsLocale = array(
 			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTES'
+			'S_NO_ELEMENTS_SELECTED'
 		);
 
 		zbx_addJSLocale($jsLocale);
