@@ -4,6 +4,7 @@ Changes for 1.9
 
 Changes for 1.8.2
 
+ - [ZBX-886] removed duplicate and outdated strings from locales (Richlv)
  - [ZBX-1790] restored support of the hyphen (-) in item key names (Sasha)
  - [ZBX-1962] explicit 'not monitored' response for active agents on disabled hosts (asaveljevs)
  - [ZBX-1522] fixed server crash on an undefined user macro (asaveljevs)
