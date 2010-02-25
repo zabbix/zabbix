@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-2053] fixed evaluating of case sensitivity on the server/agent side of regular expressions (Dmitry)
  - [ZBX-1790] restored support of the hyphen (-) in item key names (Sasha)
  - [ZBX-1962] explicit 'not monitored' response for active agents on disabled hosts (asaveljevs)
  - [ZBX-1522] fixed server crash on an undefined user macro (asaveljevs)
