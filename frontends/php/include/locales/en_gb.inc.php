@@ -383,7 +383,6 @@
 
 //	config.php
 	'S_GUI'=>					'GUI',
-	'S_ZBX162_MODE'=>				'Zabbix 1.6.2 comp. mode',
 	'S_DROPDOWN_FIRST_ENTRY'=>			'Dropdown first entry',
 	'S_DROPDOWN_REMEMBER_SELECTED'=>		'remember selected',
 	'S_MAX_IN_TABLE' =>				'Max count of elements to show inside table cell',
@@ -1880,7 +1879,6 @@
 	'S_NO_HOST_GROUPS_WITH'=>			'No host groups with',
 	'S_INCORRECT_PARAMETERS_FOR_SMALL'=>			'incorrect parameters for',
 	'S_NO_HOST_WITH'=>				'No host with',
-	'S_UPDATED_STATUS_FOR_HOST'=>			'Updated status of host',
 	'S_ALREADY_EXISTS_IN_LINKED_HOSTS_SMALL'=>	'already exists in linked hosts',
 	'S_ADDED_NEW_APPLICATION'=>			'Added new application',
 	'S_UPDATED_APPLICATION'=>			'Updated application',
