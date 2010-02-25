@@ -1860,8 +1860,6 @@
 	'S_CANNOT_ADD_NEW_APPLICATION'=>		'Cannot add new application',
 	'S_SCENARIO_WITH_NAME'=>			'Scenario with name',
 	'S_ADDED_SMALL'=>				'added',
-	'S_UPDATED_SMALL'=>				'updated',
-	'S_DELETED_SMALL'=>				'deleted',
 
 //	media.inc.php
 	'S_NO_MEDIA_WITH'=>			'No media with',
@@ -1887,7 +1885,6 @@
 	'S_ADDED_NEW_APPLICATION'=>			'Added new application',
 	'S_UPDATED_APPLICATION'=>			'Updated application',
 	'S_USED_BY_ITEM_SMALL'=>			'used by item',
-	'S_DELETED_SMALL'=>				'deleted',
 	'S_USED_BY_SCENARIO_SMALL'=>			'used by scenario',
 	'S_NO_APPLICATION_WITH'=>			'No application with',
 	'S_UNLINKED_SMALL'=>				'unlinked',
@@ -1910,7 +1907,7 @@
 	'S_MUST_BE_MISSING_SMALL'=>			'must be missing',
 	'S_OPERATION_CANNOT_PERFORMED_UNAUTH_REQUEST'=>	'Operation cannot be performed due to unauthorized request',
 	'S_INCORRECT_VALUE_FOR'=>			'Incorrect value for',
-	
+
 //	triggers.inc.php
 	'S_NO_TRIGGER_WITH'=>					'No trigger with',
 	'S_INCORRECT_USAGE_OF_QUOTES'=>				'Incorrect usage of quotes',
@@ -1935,15 +1932,13 @@
 	'S_MISSING_KEY'=>					'Missing key',
 	'S_INCORRECT_FUNCTION_IS_USED'=>			'Incorrect function is used',
 	'S_UNKNOWN_MACRO'=>					'Unknown macro',
-	'S_DELETED_SMALL'=>					'deleted',
 	'S_FROM_HOST_SMALL'=>					'from host',
-	'S_UPDATED_SMALL'=>					'updated',
 	'S_TRIGGER_IN_TEMPLATE'=>				'Trigger in template',
 	'S_HAS_DEPENDENCY_WITH_TRIGGER_IN_TEMPLATE'=>		'has dependency with trigger in template',
 	'S_IS_NOT_THE_HIGHEST_LEVEL_TEMPLATE'=>			'is not the highest level template',
 	'S_NO_FUNCTION_WITH'=>					'No function with',
 	'S_SPECIFY_THE_CONDITIONAL_EXPR_FOR_THE_TARGET'=>	'Specify the conditional expression for the target.',
-	
+
 
 //	page_footer.php
 	'S_TRANSACTION_HAVE_NOT_BEEN_CLOSED_ABORTING'=>	'Transaction has not been closed. Aborting..',
@@ -1951,7 +1946,6 @@
 //	maps.inc.php
 	'S_NO_SYSTEM_MAP_WITH'=>		'No system map with',
 	'S_NO_SYSMAP_ELEMENT_WITH'=>		'No sysmap element with',
-	'S_CIRCULAR_LINK_CANNOT_BE_CREATED'=>	'Circular link cannot be created',
 
 //	screens.inc.php
 	'S_NO_ROWS_IN_SCREEN'=>				'No rows in screen',
@@ -1961,18 +1955,13 @@
 
 //	graphs.inc.php
 	'S_NO_GRAPH_WITH'=>					'No graph item with',
-	'S_MISSING_KEY'=>					'Missing key',
 	'S_MISSING_ITEMS_FOR_GRAPH'=>				'Missing items for graph',
 	'S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL'=>'with template host can not contain items from other hosts.',
 	'S_CANNOT_USE_MULTIPLE_HOST_ITEMS_TEMPLATE_GRAPH'=>	'Can not use multiple host items for template graph',
 	'S_MUST_USE_ITEMS_ONLY_FROM_HOST'=>			'You must use items only from host',
 	'S_FOR_TEMPLATE_GRAPH_SMALL'=>				'for template graph',
-	'S_FOR_HOST_SMALL'=>					'for host',
 	'S_UPDATED_FOR_HOSTS'=>					'updated for hosts',
-	'S_UNLINKED_SMALL'=>					'unlinked',
 	'S_SKIPPED_COPYING_OF_GRAPH'=>				'Skipped copying of graph',
-	'S_TO_HOST_SMALL'=>					'to host',
-
 
 //	profiles.inc.php
 	'S_UNABLE_TO_SELECT_CONFIGURATION'=>	'Unable to select configuration',
