@@ -397,27 +397,23 @@ class CApplication extends CZBXAPI{
 	return $result;
 	}
 
-	public static function checkObjects($applicationsData){
-		$applicationsData = zbx_toArray($applicationsData);
-		
-		$result = array();
-		foreach($applicationsData as $inum => $applicationData){
-			$options = array(
-				'filter' => $applicationData,
-				'output' => API_OUTPUT_SHORTEN,
-				'nopermissions' => 1
-			);
+	public static function exists($object){
+		$keyFields = array(array('hostid', 'host'), 'name');
 
-			if(isset($applicationData['node']))
-				$options['nodeids'] = getNodeIdByNodeName($applicationData['node']);
-			else if(isset($applicationData['nodeids']))
-				$options['nodeids'] = $applicationData['nodeids'];
+		$options = array(
+			'filter' => zbx_array_mintersect($keyFields, $object),
+			'output' => API_OUTPUT_SHORTEN,
+			'nopermissions' => 1,
+			'limit' => 1
+		);
+		if(isset($object['node']))
+			$options['nodeids'] = getNodeIdByNodeName($object['node']);
+		else if(isset($object['nodeids']))
+			$options['nodeids'] = $object['nodeids'];
 
-			$applications = self::get($options);
-			$result+= $applications;
-		}
+		$objs = self::get($options);
 
-	return $result;
+	return !empty($objs);
 	}
 
 /**

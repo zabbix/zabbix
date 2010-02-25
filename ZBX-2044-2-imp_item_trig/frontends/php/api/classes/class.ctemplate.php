@@ -585,29 +585,23 @@ class CTemplate extends CZBXAPI{
 	return $result;
 	}
 
-	public static function checkObjects($templatesData){
+	public static function exists($object){
+		$keyFields = array(array('hostid', 'host'));
 
-		$templatesData = zbx_toArray($templatesData);
-		
-		$result = array();
-		foreach($templatesData as $tnum => $templateData){
-			$options = array(
-				'filter' => $templateData,
-				'output' => API_OUTPUT_SHORTEN,
-				'nopermissions' => 1
-			);
+		$options = array(
+			'filter' => zbx_array_mintersect($keyFields, $object),
+			'output' => API_OUTPUT_SHORTEN,
+			'nopermissions' => 1,
+			'limit' => 1
+		);
+		if(isset($object['node']))
+			$options['nodeids'] = getNodeIdByNodeName($object['node']);
+		else if(isset($object['nodeids']))
+			$options['nodeids'] = $object['nodeids'];
 
-			if(isset($templateData['node']))
-				$options['nodeids'] = getNodeIdByNodeName($templateData['node']);
-			else if(isset($templateData['nodeids']))
-				$options['nodeids'] = $templateData['nodeids'];
+		$objs = self::get($options);
 
-			$templates = self::get($options);
-
-			$result+= $templates;
-		}
-
-	return $result;
+	return !empty($objs);
 	}
 
 /**
@@ -687,17 +681,11 @@ class CTemplate extends CZBXAPI{
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for Template name [ '.$template['host'].' ]');
 				}
 
-				$template_exists = self::checkObjects(array('host' => $template['host']));
-				if(!empty($template_exists)){
-					$result = false;
+				if(self::exists(array('host' => $template['host']))){
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
-
-				$host_exists = CHost::checkObjects(array('host' => $template['host']));
-				if(!empty($host_exists)){
-					$result = false;
-					$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_HOST.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
-					break;
+				if(CHost::exists(array('host' => $template['host']))){
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 
 				$templateid = get_dbid('hosts', 'hostid');
@@ -764,11 +752,11 @@ class CTemplate extends CZBXAPI{
 				'preservekeys' => 1
 			));
 			foreach($templates as $tnum => $template){
-	// PERMISSIONS {{{
+// PERMISSIONS {{{
 				if(!isset($upd_templates[$template['templateid']])){
 					throw new APIException(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
-	// }}} PERMISSIONS
+// }}} PERMISSIONS
 			}
 
 			self::BeginTransaction(__METHOD__);
@@ -964,23 +952,28 @@ class CTemplate extends CZBXAPI{
 
 
 // UPDATE TEMPLATES PROPERTIES {{{
+
 			if(isset($data['host'])){
 				if(count($templates) > 1){
-					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Wrong fields');
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cannot mass update template name');
 				}
 
-				$template_exists = self::checkObjects(array('host' => $data['host']));
-				$template_exists = reset($template_exists);
 				$cur_template = reset($templates);
+				
+				$options = array(
+					'filter' => array(
+						'host' => $cur_template['host']),
+					'output' => API_OUTPUT_SHORTEN,
+					'editable' => 1,
+					'nopermissions' => 1
+				);
+				$template_exists = self::get($options);
+				
+				$template_exists = reset($template_exists);
 
 				if(!empty($template_exists) && ($template_exists['templateid'] != $cur_template['templateid'])){
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
-				}
-				
-				$host_exists = CHost::checkObjects(array('host' => $data['host']));
-				if(!empty($host_exists)){
-					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
-				}
+				}				
 			}
 
 			if(isset($data['host']) && !preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $data['host'])){

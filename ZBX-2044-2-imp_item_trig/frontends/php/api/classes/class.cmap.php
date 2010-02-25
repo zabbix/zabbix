@@ -428,31 +428,25 @@ SDI('///////////////////////////////////////');
 	return $result;
 	}
 
-	public static function checkObjects($sysmapsData){
-		$sysmapsData = zbx_toArray($sysmapsData);
-		
-		$result = array();
+	public static function exists($object){
+		$keyFields = array(array('sysmapid', 'name'));
 
-		foreach($sysmapsData as $snum => $sysmapData){
-			$options = array(
-				'filter' => $sysmapData,
-				'output' => API_OUTPUT_SHORTEN,
-				'nopermissions' => 1
-			);
+		$options = array(
+			'filter' => zbx_array_mintersect($keyFields, $object),
+			'output' => API_OUTPUT_SHORTEN,
+			'nopermissions' => 1,
+			'limit' => 1
+		);
+		if(isset($object['node']))
+			$options['nodeids'] = getNodeIdByNodeName($object['node']);
+		else if(isset($object['nodeids']))
+			$options['nodeids'] = $object['nodeids'];
 
-			if(isset($sysmapData['node']))
-				$options['nodeids'] = getNodeIdByNodeName($sysmapData['node']);
-			else if(isset($sysmapData['nodeids']))
-				$options['nodeids'] = $sysmapData['nodeids'];
+		$objs = self::get($options);
 
-			$sysmaps = self::get($options);
-
-			$result+= $sysmaps;
-		}
-
-	return $result;
+	return !empty($objs);
 	}
-
+	
 /**
  * Add Map
  *
@@ -495,6 +489,12 @@ SDI('///////////////////////////////////////');
 			if(!check_db_fields($map_db_fields, $map)){
 				$result = false;
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields for map');
+				break;
+			}
+			
+			if(self::exists(array('name' => $map['name']))){
+				$result = false;
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Map [ '.$map['name'].' ] already exists.');
 				break;
 			}
 
@@ -569,6 +569,22 @@ SDI('///////////////////////////////////////');
 				break;
 			}
 
+			$options = array(
+				'filter' => array(
+					'name' => $map['name']),
+				'output' => API_OUTPUT_SHORTEN,
+				'editable' => 1,
+				'nopermissions' => 1
+			);
+			$map_exists = self::get($options);
+			$map_exists = reset($map_exists);
+
+			if(!empty($map_exists) && ($map_exists['sysmapid'] != $map['sysmapid'])){
+				$result = false;
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Map [ '.$map['name'].' ] '.S_ALREADY_EXISTS_SMALL);
+				break;
+			}				
+			
 			$sql = 'UPDATE sysmaps '.
 					' SET name='.zbx_dbstr($map['name']).','.
 						' width='.$map['width'].','.

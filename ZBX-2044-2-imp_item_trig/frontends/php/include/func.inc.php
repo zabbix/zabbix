@@ -1018,5 +1018,24 @@ return $value;
 */
 }
 
+function zbx_array_mintersect($keys, $array){
+	$result = array();
+
+	foreach($keys as $field){
+		if(is_array($field)){
+			foreach($field as $sub_field){
+				if(isset($array[$sub_field])){
+					$result[$sub_field] = $array[$sub_field];
+					break;
+				}
+			}				
+		}
+		else if(isset($array[$field])){
+			$result[$field] = $array[$field];
+		}
+	}
+	return $result;
+}
+
 /************* END ZBX MISC *************/
 ?>

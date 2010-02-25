@@ -699,29 +699,23 @@ class CHost extends CZBXAPI{
 	return $result;
 	}
 
-	public static function checkObjects($hostsData){
+	public static function exists($object){
+		$keyFields = array(array('hostid', 'host'));
 
-		$hostsData = zbx_toArray($hostsData);
-		
-		$result = array();
-		foreach($hostsData as $hnum => $hostData){
-			$options = array(
-				'filter' => $hostData,
-				'output' => API_OUTPUT_SHORTEN,
-				'nopermissions' => 1
-			);
+		$options = array(
+			'filter' => zbx_array_mintersect($keyFields, $object),
+			'output' => API_OUTPUT_SHORTEN,
+			'nopermissions' => 1,
+			'limit' => 1
+		);
+		if(isset($object['node']))
+			$options['nodeids'] = getNodeIdByNodeName($object['node']);
+		else if(isset($object['nodeids']))
+			$options['nodeids'] = $object['nodeids'];
 
-			if(isset($hostData['node']))
-				$options['nodeids'] = getNodeIdByNodeName($hostData['node']);
-			else if(isset($hostData['nodeids']))
-				$options['nodeids'] = $hostData['nodeids'];
+		$objs = self::get($options);
 
-			$hosts = self::get($options);
-
-			$result+= $hosts;
-		}
-
-	return $result;
+	return !empty($objs);
 	}
 
 /**
@@ -822,15 +816,12 @@ class CHost extends CZBXAPI{
 				break;
 			}
 
-			$host_exists = self::checkObjects(array('host' => $host['host']));
-			if(!empty($host_exists)){
+			if(self::exists(array('host' => $host['host']))){
 				$result = false;
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_HOST.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				break;
 			}
-
-			$host_exists = CTemplate::checkObjects(array('host' => $host['host']));
-			if(!empty($host_exists)){
+			if(CTemplate::exists(array('host' => $host['host']))){
 				$result = false;
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_TEMPLATE.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				break;
@@ -1103,24 +1094,25 @@ class CHost extends CZBXAPI{
 // UPDATE HOSTS PROPERTIES {{{
 			if(isset($data['host'])){
 				if(count($hosts) > 1){
-					$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields');
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cannot mass update host name');
 				}
 
-				$host_exists = self::checkObjects(array('host' => $data['host']));
-				$host_exists = reset($host_exists);
 				$cur_host = reset($hosts);
+				
+				$options = array(
+					'filter' => array(
+						'host' => $cur_host['host']),
+					'output' => API_OUTPUT_SHORTEN,
+					'editable' => 1,
+					'nopermissions' => 1
+				);
+				$host_exists = self::get($options);
+				
+				$host_exists = reset($host_exists);
 
 				if(!empty($host_exists) && ($host_exists['hostid'] != $cur_host['hostid'])){
-					$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
-				}
-				
-				$host_exists = CTemplate::checkObjects(array('host' => $host['host']));
-				if(!empty($host_exists)){
-					$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
-					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
-				}
+				}				
 			}
 
 			if(isset($data['host']) && !preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $data['host'])){

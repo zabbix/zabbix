@@ -258,7 +258,23 @@ class CGraph extends CZBXAPI{
 			zbx_value2array($options['filter']);
 
 			if(isset($options['filter']['name']))
-				$sql_parts['where']['name'] = zbx_dbstr($options['filter']['name']);
+				$sql_parts['where']['name'] = 'g.name='.zbx_dbstr($options['filter']['name']);
+			
+			if(isset($options['filter']['host']) || isset($options['filter']['hostid'])){
+				$sql_parts['from']['gi'] = 'graphs_items gi';
+				$sql_parts['from']['i'] = 'items i';
+				$sql_parts['where']['gig'] = 'gi.graphid=g.graphid';
+				$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
+
+				if(isset($options['filter']['host'])){
+					$sql_parts['from']['h'] = 'hosts h';
+					$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+					$sql_parts['where']['host'] = 'h.host='.zbx_dbstr($options['filter']['host']);
+				}
+
+				if(isset($options['filter']['hostid']))
+					$sql_parts['where']['hostid'] = 'i.hostid='.zbx_dbstr($options['filter']['hostid']);
+			}
 		}
 
 // order
@@ -471,52 +487,27 @@ class CGraph extends CZBXAPI{
 	return $result;
 	}
 
-	public static function checkObjects($graphsData){
+	public static function exists($object){
+		$keyFields = array(array('hostid', 'host'), 'name');
 
-		$graphsData = zbx_toArray($graphsData);
-		$result = array();
-		foreach($graphsData as $inum => $graphData){
-			$options = array(
-				'filter' => $graphData,
-				'hostids' => isset($graphData['hostid'])?$graphData['hostid']:null,
-				'output' => API_OUTPUT_SHORTEN,
-				'nopermissions' => 1
-			);
+		$options = array(
+			'filter' => zbx_array_mintersect($keyFields, $object),
+			'output' => API_OUTPUT_SHORTEN,
+			'nopermissions' => 1,
+			'limit' => 1
+		);
+		if(isset($object['node']))
+			$options['nodeids'] = getNodeIdByNodeName($object['node']);
+		else if(isset($object['nodeids']))
+			$options['nodeids'] = $object['nodeids'];
 
-			if(isset($hostData['node']))
-				$options['nodeids'] = getNodeIdByNodeName($hostData['node']);
-			else if(isset($hostData['nodeids']))
-				$options['nodeids'] = $hostData['nodeids'];
+		$objs = self::get($options);
 
-			$graphs = self::get($options);
-			$result+= $graphs;
-		}
-
-	return $result;
+	return !empty($objs);
 	}
+	
 /**
  * Add graph
- *
- * <code>
- * $graphs = array(
- * 	*string 'name'			=> null,
- * 	int 'width'			=> 900,
- * 	int 'height'			=> 200,
- * 	int 'ymin_type'			=> 0,
- * 	int 'ymax_type'			=> 0,
- * 	int 'yaxismin'			=> 0,
- * 	int 'yaxismax'			=> 100,
- * 	int 'ymin_itemid'		=> 0,
- * 	int 'ymax_itemid'		=> 0,
- * 	int 'show_work_period'		=> 1,
- * 	int 'show_triggers'		=> 1,
- * 	int 'graphtype'			=> 0,
- * 	int 'show_legend'		=> 0,
- * 	int 'show_3d'			=> 0,
- * 	int 'percent_left'		=> 0,
- * 	int 'percent_right'		=> 0
- * );
- * </code>
  *
  * @static
  * @param array $graphs multidimensional array with graphs data

@@ -410,30 +410,25 @@ class CHostGroup extends CZBXAPI{
 	return $result;
 	}
 
-	public static function checkObjects($hostgroupsData){
-		
-		$hostgroupsData = zbx_toArray($hostgroupsData);
-		
-		$result = array();
-		foreach($hostgroupsData as $hnum => $hostgroupData){
-			$options = array(
-				'filter' => $hostgroupData,
-				'output' => API_OUTPUT_SHORTEN,
-				'nopermissions' => 1
-			);
+	public static function exists($object){
+		$keyFields = array('name');
 
-			if(isset($hostgroupData['node']))
-				$options['nodeids'] = getNodeIdByNodeName($hostgroupData['node']);
-			else if(isset($hostgroupData['nodeids']))
-				$options['nodeids'] = $hostgroupData['nodeids'];
+		$options = array(
+			'filter' => zbx_array_mintersect($keyFields, $object),
+			'output' => API_OUTPUT_SHORTEN,
+			'nopermissions' => 1,
+			'limit' => 1
+		);
+		if(isset($object['node']))
+			$options['nodeids'] = getNodeIdByNodeName($object['node']);
+		else if(isset($object['nodeids']))
+			$options['nodeids'] = $object['nodeids'];
 
-			$hostgroups = self::get($options);
+		$objs = self::get($options);
 
-			$result+= $hostgroups;
-		}
-
-	return $result;
+	return !empty($objs);
 	}
+	
 /**
  * Add hostgroupGroups
  *
@@ -469,8 +464,7 @@ class CHostGroup extends CZBXAPI{
 				break;
 			}
 
-			$group_exist = self::checkObjects(array('name' => $group['name']));
-			if(!empty($group_exist)){
+			if(self::exists(array('name' => $group['name']))){
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'HostGroup [ '.$group['name'].' ] already exists');
 				$result = false;
 				break;
@@ -535,9 +529,17 @@ class CHostGroup extends CZBXAPI{
 
 		self::BeginTransaction(__METHOD__);
 		foreach($groups as $num => $group){
-
-			$group_exist = self::checkObjects(array('name' => $group['name']));
+			
+			$options = array(
+				'filter' => array(
+					'name' => $group['name']),
+				'output' => API_OUTPUT_SHORTEN,
+				'editable' => 1,
+				'nopermissions' => 1
+			);
+			$group_exist = self::get($options);
 			$group_exist = reset($group_exist);
+				
 
 			if($group_exist && ($group_exist['groupid'] != $group['groupid'])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'HostGroup [ '.$group['name'].' ] already exists');

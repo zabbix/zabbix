@@ -694,35 +694,30 @@ class CTrigger extends CZBXAPI{
 	return $result;
 	}
 
-	public static function checkObjects($triggersData){
-		$result = array();
+	public static function exists($object){
+		$keyFields = array(array('hostid', 'host'), 'description');
 
-		$triggersData = zbx_toArray($triggersData);
+		$result = false;
 		
-		foreach($triggersData as $tnum => $triggerData){
-			$options = array(
-				'filter' => $triggerData,
-				'output' => API_OUTPUT_EXTEND,
-				'nopermissions' => 1
-			);
+		$options = array(
+			'filter' => zbx_array_mintersect($keyFields, $object),
+			'output' => API_OUTPUT_EXTEND,
+			'nopermissions' => 1,
+			'limit' => 1
+		);
+		if(isset($object['node']))
+			$options['nodeids'] = getNodeIdByNodeName($object['node']);
+		else if(isset($object['nodeids']))
+			$options['nodeids'] = $object['nodeids'];
 
-			if(isset($triggerData['node']))
-				$options['nodeids'] = getNodeIdByNodeName($triggerData['node']);
-			else if(isset($triggerData['nodeids']))
-				$options['nodeids'] = $triggerData['nodeids'];
-
-			$triggers = self::get($options);
-
-			if(isset($triggerData['expression'])){
-				foreach($triggers as $tnum => $trigger){
-					$tmp_exp = explode_exp($trigger['expression'], false);
-					if(strcmp($tmp_exp, $triggerData['expression']) != 0) {
-						unset($triggers[$tnum]);
-					}
-				}
+		$triggers = self::get($options);
+		
+		foreach($triggers as $tnum => $trigger){
+			$tmp_exp = explode_exp($trigger['expression'], false);
+			if(strcmp($tmp_exp, $object['expression']) == 0) {
+				$result = true;
+				break;
 			}
-			$triggers = zbx_objectValues($triggers,'triggerid');
-			$result += zbx_toHash($triggers, 'triggerid');
 		}
 
 	return $result;
