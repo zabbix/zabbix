@@ -1460,7 +1460,7 @@
  *        !!! Don't forget sync code with C !!!
  */
 	function check_time_period($period, $now){
-		$tm = localtime($now, TRUE);
+		$tm = localtime($now, true);
 		$day = (0 == $tm['tm_wday']) ? 7 : $tm['tm_wday'];
 		$sec = 3600 * $tm['tm_hour'] + 60 * $tm['tm_min'] + $tm['tm_sec'];
 
@@ -1477,14 +1477,14 @@
 		else{
 			if(($day >= $d1) &&
 				($day <= $d2) &&
-				($sec >= 3600*$h1+60*$m1) &&
-				($sec <= 3600*$h2+60*$m2))
+				($sec >= (3600*$h1+60*$m1)) &&
+				($sec <= (3600*$h2+60*$m2)))
 			{
-				return 1;
+				return true;
 			}
 		}
 
-	return 0;
+	return false;
 	}
 
 	function getItemDelay($delay, $flexIntervals){
@@ -1493,8 +1493,9 @@
 		$minDelay = SEC_PER_YEAR;
 		$flexIntervals = explode(';', $flexIntervals);
 		foreach($flexIntervals as $fnum => $flexInterval){
-			if(2 == sscanf($flexInterval, "%d/%29s", $flexDelay, $flexPeriod))
-				$minDelay = min($minDelay, $flexDelay);
+			if(2 != sscanf($flexInterval, "%d/%29s", $flexDelay, $flexPeriod)) continue;
+
+			$minDelay = min($minDelay, $flexDelay);
 		}
 
 	return $minDelay;
@@ -1531,12 +1532,10 @@
 		$arr_of_flex_intervals = explode(';', $flex_intervals);
 
 		foreach($arr_of_flex_intervals as $fnum => $flex_interval){
-			if(2 == sscanf($flex_interval, "%d/%29s", $flex_delay, $flex_period)){
-				if(($flex_delay < $current_delay) && (0 != check_time_period($flex_period, $now)))
-					$current_delay = $flex_delay;
-			}
-			else{
-// Delay period format is wrong
+			if(2 != sscanf($flex_interval, "%d/%29s", $flex_delay, $flex_period)) continue;
+			
+			if(($flex_delay < $current_delay) && check_time_period($flex_period, $now)){
+				$current_delay = $flex_delay;
 			}
 		}
 
@@ -1568,58 +1567,53 @@
  * Author: Alexei Vladishev, Alexander Vladishev
  */
 	function get_next_delay_interval($flex_intervals, $now, &$next_interval){
-		if (is_null($flex_intervals) || '' == $flex_intervals) return FALSE;
+		if(zbx_empty($flex_intervals)) return false;
 
 		$next = 0;
-		$tm = localtime($now, TRUE);
+		$tm = localtime($now, true);
 		$day = (0 == $tm['tm_wday']) ? 7 : $tm['tm_wday'];
 		$sec = 3600 * $tm['tm_hour'] + 60 * $tm['tm_min'] + $tm['tm_sec'];
 
 		$arr_of_flex_intervals = explode(';', $flex_intervals);
 
 		foreach($arr_of_flex_intervals as $flex_interval){
-			$flag = (7 == sscanf($flex_interval, "%d/%d-%d,%d:%d-%d:%d", $delay, $d1, $d2, $h1, $m1, $h2, $m2));
+			if(7 != sscanf($flex_interval, "%d/%d-%d,%d:%d-%d:%d", $delay, $d1, $d2, $h1, $m1, $h2, $m2)){
+				if(6 != sscanf($flex_interval, "%d/%d,%d:%d-%d:%d", $delay, $d1, $h1, $m1, $h2, $m2)) continue;
 
-			if(!$flag){
-				$flag = (6 == sscanf($flex_interval, "%d/%d,%d:%d-%d:%d", $delay, $d1, $h1, $m1, $h2, $m2));
 				$d2 = $d1;
 			}
 
-			if(!$flag)
-				/* Delay period format is wrong - skip */;
-			else{
-				$sec1 = 3600 * $h1 + 60 * $m1;
-				$sec2 = 3600 * $h2 + 60 * $m2;
+			$sec1 = 3600 * $h1 + 60 * $m1;
+			$sec2 = 3600 * $h2 + 60 * $m2;
 
-				if($day >= $d1 && $day <= $d2 && $sec >= $sec1 && $sec <= $sec2){
+			if(($day >= $d1) && ($day <= $d2) && ($sec >= $sec1) && ($sec <= $sec2)){
 // current period
-					if($next == 0 || $next > $now - $sec + $sec2)	$next = $now - $sec + $sec2;
-				}
-				else if ($day >= $d1 && $day <= $d2 && $sec < $sec1){
+				if(($next == 0) || ($next > ($now - $sec + $sec2)))	$next = $now - $sec + $sec2;
+			}
+			else if(($day >= $d1) && ($day <= $d2) && ($sec < $sec1)){
 // will be active today
-					if ($next == 0 || $next > $now - $sec + $sec1) $next = $now - $sec + $sec1;
+				if (($next == 0) || ($next > ($now - $sec + $sec1))) $next = $now - $sec + $sec1;
+			}
+			else{
+				$next_day = (($day + 1 <= 7) ? ($day + 1) : 1);
+
+				if(($next_day >= $d1) && ($next_day <= $d2)){
+// will be active tomorrow
+					if(($next == 0) || ($next > ($now - $sec + SEC_PER_DAY + $sec1)))
+						$next = $now - $sec + SEC_PER_DAY + $sec1;
 				}
 				else{
-					$next_day = ($day + 1 <= 7 ? $day + 1 : 1);
-
-					if($next_day >= $d1 && $next_day <= $d2){
-// will be active tomorrow
-						if(($next == 0) || ($next > ($now - $sec + SEC_PER_DAY + $sec1)))
-							$next = $now - $sec + SEC_PER_DAY + $sec1;
-					}
-					else{
-						if($day < $d1) $day_diff = $d1 - $day;
-						if($day >= $d2) $day_diff = ($d1 + 7) - $day;
-						if($day >= $d1 && $day < $d2){
+					if($day < $d1) $day_diff = $d1 - $day;
+					if($day >= $d2) $day_diff = ($d1 + 7) - $day;
+					if(($day >= $d1) && ($day < $d2)){
 // should never happen
 // Could not deduce day difference
-							$day_diff = (-1);
-						}
+						$day_diff = -1;
+					}
 
-						if($day_diff != (-1)){
-							if($next == 0 || $next > $now - $sec + SEC_PER_DAY * $day_diff + $sec1)
-								$next = $now - $sec + SEC_PER_DAY * $day_diff + $sec1;
-						}
+					if($day_diff != -1){
+						if(($next == 0) || ($next > ($now - $sec + SEC_PER_DAY * $day_diff + $sec1)))
+							$next = $now - $sec + SEC_PER_DAY * $day_diff + $sec1;
 					}
 				}
 			}
