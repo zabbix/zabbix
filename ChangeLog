@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1522] fixed server crash on an undefined user macro (asaveljevs)
  - [ZBX-2039] fixed pattern matching in function count (asaveljevs)
  - [ZBXNEXT-119] added support for time shifted functions (asaveljevs)
  - [ZBX-2062] fixed sending of recovery messages multiple times (Sasha)
