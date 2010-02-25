@@ -267,7 +267,7 @@
 	'S_STATUS_OF_ZABBIX'=>			'Status of ZABBIX',
 	'S_STATUS_OF_ZABBIX_BIG'=>			'STATUS OF ZABBIX',
 	'S_VALUE'=>			'Value',
-	'S_ZABBIX_SERVER_IS_RUNNING'=>			'ZABBIX server is running',
+	'S_ZABBIX_SERVER_IS_RUNNING'=>			'Zabbix server is running',
 	'S_NUMBER_OF_ALERTS'=>			'Number of alerts',
 	'S_NUMBER_OF_USERS'=>			'Number of users',
 	'S_YES'=>			'Yes',
