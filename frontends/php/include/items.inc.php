@@ -318,7 +318,7 @@
 			if(preg_match('/^((.)*)(\[\"((.)*)\"\,\"((.)*)\"\,\"((.)*)\"\,\"([0-9]+)\"\])$/i', $item['key_'], $arr)){
 				$g=$arr[1];
 				if(!str_in_array($g,array("grpmax","grpmin","grpsum","grpavg"))){
-					error(S_GROUP_FUNCTION.SPACE."[$g]".SPACE.S_IS_NOT_ONE_OF.SPACE."[grpmax,grpmin,grpsum,grpavg]");
+					error(S_GROUP_FUNCTION.SPACE."[$g]".SPACE.S_IS_NOT_ONE_OF.SPACE."[grpmax, grpmin, grpsum, grpavg]");
 					return FALSE;
 				}
 				// Group
@@ -328,7 +328,7 @@
 				// Item function
 				$g=$arr[8];
 				if(!str_in_array($g,array('last', 'min', 'max', 'avg', 'sum','count'))){
-					error(S_ITEM_FUNCTION.SPACE.'['.$g.']'.SPACE.S_IS_NOT_ONE_OF.SPACE.'[last, min, max, avg, sum,count]');
+					error(S_ITEM_FUNCTION.SPACE.'['.$g.']'.SPACE.S_IS_NOT_ONE_OF.SPACE.'[last, min, max, avg, sum, count]');
 					return FALSE;
 				}
 				// Parameter
