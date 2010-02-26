@@ -1115,7 +1115,6 @@
 	'S_EDIT_MAP_ELEMENT'=>			'Edit map element',
 	'S_ICON_DEFAULT'=>			'Icon (default)',
 	'S_APPLY'=>					'Apply',
-	'S_MAP_ELEMENT'=>			'Map element',
 	'S_MAP_ELEMENTS'=>			'Map elements',
 	'S_MAP_DELETED'=>			'Network map deleted',
 	'S_CANNOT_DELETE_MAP'=>			'Cannot delete network map',
@@ -1152,7 +1151,6 @@
 	'S_CANNOT_FIND_MAP'=>			'Cannot find map',
 	'S_USED_IN_EXPORTED_MAP_SMALL'=>'used in exported map',
 	'S_NO_ICON_FOR_MAP_ELEMENT'=>	'No icon for map element',
-	'S_ROLLING_BACK_CHANGES'=>		'Rolling back changes',
 	'S_EXPORT_HAVE_NO_MAPS'=>		'Export does not contain Zabbix maps',
 
 //	map.php
@@ -1936,7 +1934,7 @@
 	'S_IS_NOT_THE_HIGHEST_LEVEL_TEMPLATE'=>			'is not the highest level template',
 	'S_NO_FUNCTION_WITH'=>					'No function with',
 	'S_SPECIFY_THE_CONDITIONAL_EXPR_FOR_THE_TARGET'=>	'Specify the conditional expression for the target.',
-
+	'S_0_OR_1'=>						'0 or 1',
 
 //	page_footer.php
 	'S_TRANSACTION_HAVE_NOT_BEEN_CLOSED_ABORTING'=>	'Transaction has not been closed. Aborting..',
@@ -1944,6 +1942,7 @@
 //	maps.inc.php
 	'S_NO_SYSTEM_MAP_WITH'=>		'No system map with',
 	'S_NO_SYSMAP_ELEMENT_WITH'=>		'No sysmap element with',
+	'S_TEMPLATE_SMALL'=>			'template',
 
 //	screens.inc.php
 	'S_NO_ROWS_IN_SCREEN'=>				'No rows in screen',
