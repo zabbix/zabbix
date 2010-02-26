@@ -1745,9 +1745,15 @@ class CChart extends CGraphDraw{
 				$a[4] = $x2;		$a[5] = $y2min;
 				$a[6] = $x2;		$a[7] = $y2max;
 //SDI('2: '.$x2.' - '.$x1.' : '.$y2min.' - '.$y1min);
-				imagefilledpolygon($this->im,$a,4,$minmax_color);
-				imageline($this->im,$x1,$y1max,$x2,$y2max,$max_color);
-				imageline($this->im,$x1,$y1min,$x2,$y2min,$min_color);
+				if($drawtype == GRAPH_ITEM_DRAWTYPE_BOLD_DOT){
+					imagefilledrectangle($this->im,$x1,$y1max-1,$x1+1,$y1max,$max_color);
+					imagefilledrectangle($this->im,$x1,$y1min-1,$x1+1,$y1min,$min_color);
+				}
+				else{
+					imagefilledpolygon($this->im,$a,4,$minmax_color);
+					imageline($this->im,$x1,$y1max,$x2,$y2max,$max_color);
+					imageline($this->im,$x1,$y1min,$x2,$y2min,$min_color);
+				}
 
 				/* don't use break, avg must be drawed in this statement */
 				// break;
@@ -1821,8 +1827,7 @@ class CChart extends CGraphDraw{
 				break;
 			case GRAPH_ITEM_DRAWTYPE_DASHED_LINE:
 				if( function_exists('imagesetstyle') ){
-
-					/* Use imagesetstyle+imageline instead of bugged imagedashedline */
+// Use imagesetstyle+imageline instead of bugged imagedashedline
 					$style = array($avg_color, $avg_color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
 					imagesetstyle($this->im, $style);
 					imageline($this->im,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
@@ -2017,7 +2022,7 @@ class CChart extends CGraphDraw{
 					$draw = $i - $j < 5;
 
 				if($this->items[$item]['type'] == ITEM_TYPE_TRAPPER) $draw = true;
-//SDI($draw);
+
 				if(!$draw && !$prevDraw){
 					$draw = true;
 					$valueDrawType = GRAPH_ITEM_DRAWTYPE_BOLD_DOT;

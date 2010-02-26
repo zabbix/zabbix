@@ -999,7 +999,6 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 
 	$first_entry = ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE)?S_NOT_SELECTED_SMALL:S_ALL_SMALL;
 	$groups['0'] = $first_entry;
-	$groupids['0'] = '0';
 
 	$_REQUEST['groupid'] = $result['original'] = get_request('groupid', -1);
 	$_REQUEST['hostid'] = get_request('hostid', -1);
@@ -1252,7 +1251,6 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 
 	$first_entry = ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE)?S_NOT_SELECTED_SMALL:S_ALL_SMALL;
 	$hosts['0'] = $first_entry;
-	$hostids['0'] = '0';
 
 	if(!is_array($groupid) && ($groupid == 0)){
 		if($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE){
