@@ -547,6 +547,15 @@ typedef enum
 } zbx_trigger_severity_t;
 char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity);
 
+typedef enum
+{
+	ITEM_LOGTYPE_INFORMATION = 1,
+	ITEM_LOGTYPE_WARNING,
+	ITEM_LOGTYPE_ERROR = 4,
+	ITEM_LOGTYPE_FAILURE_AUDIT = 7,
+	ITEM_LOGTYPE_SUCCESS_AUDIT
+} zbx_item_logtype_t;
+char	*zbx_item_logtype_string(zbx_item_logtype_t logtype);
 /* Media statuses */
 #define MEDIA_STATUS_ACTIVE	0
 #define MEDIA_STATUS_DISABLED	1

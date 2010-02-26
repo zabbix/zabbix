@@ -21,6 +21,52 @@
 <?php
 
 /*
+ * Function: get_item_logtype_description
+ *
+ * Description:
+ *	 convert windows events type constant in to the string representation
+ *
+ * Author:
+ *	 Alexander Vladishev
+ *
+ * Comments:
+ *
+ */
+	function get_item_logtype_description($logtype){
+		switch ($logtype){
+			case ITEM_LOGTYPE_INFORMATION:		return S_INFORMATION;
+			case ITEM_LOGTYPE_WARNING:		return S_WARNING;
+			case ITEM_LOGTYPE_ERROR:		return S_ERROR;
+			case ITEM_LOGTYPE_FAILURE_AUDIT:	return S_FAILURE_AUDIT;
+			case ITEM_LOGTYPE_SUCCESS_AUDIT:	return S_SUCCESS_AUDIT;
+			default:				return S_UNKNOWN;
+		}
+	}
+
+/*
+ * Function: get_item_logtype_style
+ *
+ * Description:
+ *	 convert windows events type constant in to the CSS style name
+ *
+ * Author:
+ *	 Alexander Vladishev
+ *
+ * Comments:
+ *
+ */
+	function get_item_logtype_style($logtype){
+		switch($logtype){
+			case ITEM_LOGTYPE_INFORMATION:		return 'information';
+			case ITEM_LOGTYPE_WARNING:		return 'warning';
+			case ITEM_LOGTYPE_ERROR:		return 'high';
+			case ITEM_LOGTYPE_FAILURE_AUDIT:	return 'high';
+			case ITEM_LOGTYPE_SUCCESS_AUDIT:	return 'information';
+			default:				return 'normal';
+		}
+	}
+
+/*
  * Function: item_type2str
  *
  * Description:

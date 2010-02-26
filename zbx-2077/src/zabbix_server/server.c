@@ -320,6 +320,11 @@ int main(int argc, char **argv)
 
 	progname = argv[0];
 
+	int i;
+	for (i = 0; i< 10; i++)
+		printf("%d %s\n", i, zbx_item_logtype_string(i));
+	exit(1);
+
 	/* Parse the command-line. */
 	while ((ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts,NULL)) != (char)EOF)
 	switch (ch) {

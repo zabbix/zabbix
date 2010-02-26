@@ -1950,7 +1950,7 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 					if (SUCCEED == (ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to,
 									N_functionid, "severity")))
 						replace_to = zbx_dsprintf(replace_to, "%s",
-								zbx_trigger_severity_string((zbx_trigger_severity_t)atoi(replace_to)));
+								zbx_item_logtype_string((zbx_item_logtype_t)atoi(replace_to)));
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_NSEVERITY))
 					ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to, N_functionid, "severity");
