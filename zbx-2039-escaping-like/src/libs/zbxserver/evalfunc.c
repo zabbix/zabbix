@@ -277,7 +277,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 	zbx_uint64_t	value_uint64 = 0, dbvalue_uint64;
 	double		value_double = 0, dbvalue_double;
 	char		*operators[OP_MAX] = {"=", "<>", ">", ">=", "<", "<=", "like"};
-	char		*arg2 = NULL, *arg3 = NULL, *arg2_esc;
+	char		*arg2 = NULL, *arg3 = NULL, *arg2_esc = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -412,10 +412,10 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 				}
 				break;
 			default:
-				arg2_esc = DBdyn_escape_string(arg2);
 				switch (op) {
 				case OP_EQ:
 				case OP_NE:
+					arg2_esc = DBdyn_escape_string(arg2);
 					offset += zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
 							" and value%s'%s'",
 							operators[op],
@@ -423,9 +423,11 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 					break;
 				case OP_LIKE:
 				default:
+					arg2_esc = DBdyn_escape_like_pattern(arg2);
 					offset += zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
-							" and value like '%%%s%%'",
-							arg2_esc);
+							" and value like '%%%s%%' escape '%s'",
+							arg2_esc,
+							DBget_like_escape_char());
 					break;
 				}
 				zbx_free(arg2_esc);

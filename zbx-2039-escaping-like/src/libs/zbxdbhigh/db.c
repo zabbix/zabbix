@@ -1667,6 +1667,9 @@ char*	DBdyn_escape_like_pattern(const char *src)
  *           ... LIKE '%\\_%' ESCAPE '\\' (works for MySQL and PostgreSQL)    *
  *           ... LIKE '%\_%' ESCAPE '\'   (works for SQLite3 and Oracle)      *
  *                                                                            *
+ *           Note that, when escaping, use of ESCAPE is obligatory in SQLite3 *
+ *           and Oracle.                                                      *
+ *                                                                            *
  ******************************************************************************/
 const char*	DBget_like_escape_char()
 {
@@ -2380,14 +2383,15 @@ char	*DBget_unique_hostname_by_sample(char *host_name_sample)
 	zabbix_log(LOG_LEVEL_DEBUG, "In DBget_unique_hostname_by_sample() sample:'%s'",
 			host_name_sample);
 
-	host_name_sample_esc = DBdyn_escape_string(host_name_sample);
+	host_name_sample_esc = DBdyn_escape_like_pattern(host_name_sample);
 	result = DBselect(
 			"select host"
 			" from hosts"
-			" where host like '%s%%'"
+			" where host like '%s%%' escape '%s'"
 		                 DB_NODE
 			" group by host",
 			host_name_sample_esc,
+			DBget_like_escape_char(),
 			DBnode_local("hostid"));
 
 	host_name_temp = strdup(host_name_sample);
