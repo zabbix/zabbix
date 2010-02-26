@@ -266,7 +266,7 @@ require_once('include/httptest.inc.php');
 						$newgroup,$groups)
 	{
 		if(zbx_empty($newgroup) && (count($groups) == 0)){
-			info(S_HOST.SPACE.S__MUST_LINKED_LEAST_ONE_HOST_GROUP_SMALL);
+			info(S_HOST.SPACE.S_MUST_LINKED_LEAST_ONE_HOST_GROUP_SMALL);
 			return false;
 		}
 

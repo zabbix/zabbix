@@ -1334,7 +1334,7 @@
 				$info['type'] = TRIGGER_VALUE_UNKNOWN;
 				$info[TRIGGER_VALUE_UNKNOWN]['count']	= 0;
 				$info[TRIGGER_VALUE_UNKNOWN]['priority'] = 0;
-				$info[TRIGGER_VALUE_UNKNOWN]['info']	=  S_TEMPLATE_SMALL;
+				$info[TRIGGER_VALUE_UNKNOWN]['info']	= S_TEMPLATE_SMALL;
 			}
 			else if($host['status'] == HOST_STATUS_NOT_MONITORED){
 				$info['type'] = TRIGGER_VALUE_UNKNOWN;
@@ -1349,7 +1349,7 @@
 			}
 
 //----
-// Host unavalable
+// Host unavailable
 
 			if(isset($info['disabled']) && $info['disabled'] == 1){
 // Disabled

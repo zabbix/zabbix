@@ -27,8 +27,6 @@ $page['file'] = 'tr_testexpr.php';
 
 define('ZBX_PAGE_NO_MENU', 1);
 
-
-define('S_0_OR_1', '0 or 1');
 define('VALUE_TYPE_UNKNOWN', '#ERROR#');
 define('COMBO_PATTERN', 'str_in_array({},array(');
 define('COMBO_PATTERN_LENGTH', zbx_strlen(COMBO_PATTERN));
