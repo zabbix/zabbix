@@ -425,9 +425,9 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 				default:
 					arg2_esc = DBdyn_escape_like_pattern(arg2);
 					offset += zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
-							" and value like '%%%s%%' escape '%s'",
+							" and value like '%%%s%%' escape '%c'",
 							arg2_esc,
-							DBget_like_escape_char());
+							ZBX_SQL_LIKE_ESCAPE_CHAR);
 					break;
 				}
 				zbx_free(arg2_esc);

@@ -1542,15 +1542,8 @@ int	DBget_escape_like_pattern_len(const char *src)
 
 	for (s = src; s && *s; s++)
 	{
-		if (*s == '_' || *s == '%')
-		{
-#if !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
-			len += 2; /* two backslashes */
-#else
-			len += 1; /* one backslash */
-#endif
-		}
-		len++;
+		len += (*s == '_' || *s == '%' || *s == ZBX_SQL_LIKE_ESCAPE_CHAR);
+		len += 1;
 	}
 
 	len++; /* '\0' */
@@ -1572,10 +1565,21 @@ int	DBget_escape_like_pattern_len(const char *src)
  *                                                                            *
  * Comments: sync changes with 'DBget_escape_like_pattern_len'                *
  *                                                                            *
- *           For instance, escaping '_' in LIKE:                              *
+ *           For instance, we wish to find string a_b%c\d'e!f in our database *
+ *           using '!' as escape character. Our queries then become:          *
  *                                                                            *
- *           ... LIKE '%\\_%' ESCAPE '\\' (works for MySQL and PostgreSQL)    *
- *           ... LIKE '%\_%' ESCAPE '\'   (works for SQLite3 and Oracle)      *
+ *           ... LIKE 'a!_b!%c\\d\'e!!f' ESCAPE '!' (MySQL, PostgreSQL)       *
+ *           ... LIKE 'a!_b!%c\d''e!!f' ESCAPE '!' (SQLite3, Oracle)          *
+ *                                                                            *
+ *           Using backslash as escape character in LIKE would be too much    *
+ *           trouble, because escaping backslashes would have to be escaped   *
+ *           as well, like so:                                                *
+ *                                                                            *
+ *           ... LIKE 'a\\_b\\%c\\\\d\'e!f' ESCAPE '\\' or                    *
+ *           ... LIKE 'a\\_b\\%c\\\\d\\\'e!f' ESCAPE '\\' (MySQL, PostgreSQL) *
+ *           ... LIKE 'a\_b\%c\\d''e!f' ESCAPE '\' (SQLite3, Oracle)          *
+ *                                                                            *
+ *           Hence '!' instead of backslash.                                  *
  *                                                                            *
  ******************************************************************************/
 void	DBescape_like_pattern(const char *src, char *dst, int len)
@@ -1594,20 +1598,12 @@ void	DBescape_like_pattern(const char *src, char *dst, int len)
 
 	for (t = tmp, d = dst; t && *t && len; t++)
 	{
-		if (*t == '_' || *t == '%')
+		if (*t == '_' || *t == '%' || *t == ZBX_SQL_LIKE_ESCAPE_CHAR)
 		{
-#if !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
-			if (len <= 2)
-				break;
-			*d++ = '\\';
-			*d++ = '\\';
-			len -= 2;
-#else
 			if (len <= 1)
 				break;
-			*d++ = '\\';
-			len -= 1;
-#endif
+			*d++ = ZBX_SQL_LIKE_ESCAPE_CHAR;
+			len--;
 		}
 		*d++ = *t;
 		len--;
@@ -1645,39 +1641,6 @@ char*	DBdyn_escape_like_pattern(const char *src)
 	DBescape_like_pattern(src, dst, len);
 
 	return dst;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBget_like_escape_char                                           *
- *                                                                            *
- * Purpose: return a properly formatted character to be used in SQL's ESCAPE  *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: properly formatted character as a string                     *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- * Comments: sync changes with 'DBescape_like_pattern'                        *
- *           and 'DBget_escape_like_pattern_len'                              *
- *                                                                            *
- *           For instance, escaping '_' in LIKE:                              *
- *                                                                            *
- *           ... LIKE '%\\_%' ESCAPE '\\' (works for MySQL and PostgreSQL)    *
- *           ... LIKE '%\_%' ESCAPE '\'   (works for SQLite3 and Oracle)      *
- *                                                                            *
- *           Note that, when escaping, use of ESCAPE is obligatory in SQLite3 *
- *           and Oracle.                                                      *
- *                                                                            *
- ******************************************************************************/
-const char*	DBget_like_escape_char()
-{
-#if !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
-	return "\\\\";
-#else
-	return "\\";
-#endif
 }
 
 void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
@@ -2387,11 +2350,11 @@ char	*DBget_unique_hostname_by_sample(char *host_name_sample)
 	result = DBselect(
 			"select host"
 			" from hosts"
-			" where host like '%s%%' escape '%s'"
+			" where host like '%s%%' escape '%c'"
 		                 DB_NODE
 			" group by host",
 			host_name_sample_esc,
-			DBget_like_escape_char(),
+			ZBX_SQL_LIKE_ESCAPE_CHAR,
 			DBnode_local("hostid"));
 
 	host_name_temp = strdup(host_name_sample);
