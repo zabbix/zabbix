@@ -2181,6 +2181,18 @@ char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity)
 	}
 }
 
+char	*zbx_item_logtype_string(zbx_item_logtype_t logtype)
+{
+	switch (logtype) {
+	case ITEM_LOGTYPE_INFORMATION: return "Information";
+	case ITEM_LOGTYPE_WARNING: return "Warning";
+	case ITEM_LOGTYPE_ERROR: return "Error";
+	case ITEM_LOGTYPE_FAILURE_AUDIT: return "Failure Audit";
+	case ITEM_LOGTYPE_SUCCESS_AUDIT: return "Success Audit";
+	default: return "unknown";
+	}
+}
+
 char	*zbx_dservice_type_string(zbx_dservice_type_t service)
 {
 	switch (service) {
