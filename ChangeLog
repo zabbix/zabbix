@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-2077] added support of Failure/Success Audit eventlog severity (Sasha)
  - [ZBXNEXT-257] added support of time-based disabling of data collection for items (asaveljevs,Aly,Sasha)
  - [ZBX-2051] fixed memory leak in processing of calculated items (Alexei)
  - [ZBX-886] removed duplicate and outdated strings from locales (Richlv)
