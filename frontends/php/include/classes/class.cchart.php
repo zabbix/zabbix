@@ -115,16 +115,18 @@ class CChart extends CGraphDraw{
 		if($this->type == GRAPH_TYPE_STACKED /* stacked graph */)
 			$drawtype = GRAPH_ITEM_DRAWTYPE_FILLED_REGION;
 
-		$this->items[$this->num] = get_item_by_itemid($itemid);
-		$this->items[$this->num]['description']=item_description($this->items[$this->num]);
+		$item = get_item_by_itemid($itemid);
+		$this->items[$this->num] = $item;
+		$this->items[$this->num]['description'] = item_description($item);
+		$this->items[$this->num]['delay'] = getItemDelay($item['delay'], $item['delay_flex']);
 
-		if(strpos($this->items[$this->num]['units'], ',') !== false)
-			list($this->items[$this->num]['units'], $this->items[$this->num]['unitsLong']) = explode(',', $this->items[$this->num]['units']);
+		if(strpos($item['units'], ',') !== false)
+			list($this->items[$this->num]['units'], $this->items[$this->num]['unitsLong']) = explode(',', $item['units']);
 		else
 			$this->items[$this->num]['unitsLong'] = '';
 
 
-		$host=get_host_by_hostid($this->items[$this->num]['hostid']);
+		$host = get_host_by_hostid($item['hostid']);
 
 		$this->items[$this->num]['host'] = $host['host'];
 		$this->items[$this->num]['color'] = is_null($color) ? 'Dark Green' : $color;
@@ -303,6 +305,7 @@ class CChart extends CGraphDraw{
 			$curr_data['clock'] = NULL;
 
 			foreach($sql_arr as $sql){
+//SDI($sql);
 				$result=DBselect($sql);
 
 				while($row=DBfetch($result)){
@@ -1687,7 +1690,7 @@ class CChart extends CGraphDraw{
 		$legend->draw();
 	}
 
-	protected function drawElement(&$data, $from, $to, $minX, $maxX, $minY, $maxY, $drawtype, $max_color, $avg_color, $min_color, $minmax_color,$calc_fnc, $axisside){
+	protected function drawElement(&$data, $from, $to, $minX, $maxX, $minY, $maxY, $drawtype, $max_color, $avg_color, $min_color, $minmax_color, $calc_fnc, $axisside){
 		if(!isset($data['max'][$from]) || !isset($data['max'][$to])) return;
 
 		$oxy = $this->oxy[$axisside];
@@ -1748,9 +1751,15 @@ class CChart extends CGraphDraw{
 				$a[4] = $x2;		$a[5] = $y2min;
 				$a[6] = $x2;		$a[7] = $y2max;
 //SDI('2: '.$x2.' - '.$x1.' : '.$y2min.' - '.$y1min);
-				imagefilledpolygon($this->im,$a,4,$minmax_color);
-				imageline($this->im,$x1,$y1max,$x2,$y2max,$max_color);
-				imageline($this->im,$x1,$y1min,$x2,$y2min,$min_color);
+				if($drawtype == GRAPH_ITEM_DRAWTYPE_BOLD_DOT){
+					imagefilledrectangle($this->im,$x1,$y1max-1,$x1+1,$y1max,$max_color);
+					imagefilledrectangle($this->im,$x1,$y1min-1,$x1+1,$y1min,$min_color);
+				}
+				else{
+					imagefilledpolygon($this->im,$a,4,$minmax_color);
+					imageline($this->im,$x1,$y1max,$x2,$y2max,$max_color);
+					imageline($this->im,$x1,$y1min,$x2,$y2min,$min_color);
+				}
 
 				/* don't use break, avg must be drawed in this statement */
 				// break;
@@ -1796,7 +1805,7 @@ class CChart extends CGraphDraw{
 		}
 //--------
 
-		/* draw main line */
+// draw main line
 		switch($drawtype){
 			case GRAPH_ITEM_DRAWTYPE_BOLD_LINE:
 				imageline($this->im,$x1,$y1+1,$x2,$y2+1,$avg_color);
@@ -1815,13 +1824,16 @@ class CChart extends CGraphDraw{
 //				imageline($this->im,$x1,$y1,$x2,$y2,$this->getShadow('333333',50));
 				break;
 			case GRAPH_ITEM_DRAWTYPE_DOT:
-				imagefilledrectangle($this->im,$x1-1,$y1-1,$x1+1,$y1+1,$avg_color);
+				imagefilledrectangle($this->im,$x1-1,$y1-1,$x1,$y1,$avg_color);
+//				imagefilledrectangle($this->im,$x2-1,$y2-1,$x2,$y2,$avg_color);
+				break;
+			case GRAPH_ITEM_DRAWTYPE_BOLD_DOT:
+//				imagefilledrectangle($this->im,$x1-1,$y1-1,$x1+1,$y1+1,$avg_color);
 				imagefilledrectangle($this->im,$x2-1,$y2-1,$x2+1,$y2+1,$avg_color);
 				break;
 			case GRAPH_ITEM_DRAWTYPE_DASHED_LINE:
 				if( function_exists('imagesetstyle') ){
-
-					/* Use imagesetstyle+imageline instead of bugged imagedashedline */
+// Use imagesetstyle+imageline instead of bugged imagedashedline
 					$style = array($avg_color, $avg_color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
 					imagesetstyle($this->im, $style);
 					imageline($this->im,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
@@ -1999,6 +2011,7 @@ class CChart extends CGraphDraw{
 			}
 
 // For each X
+			$draw = true;
 			for($i = 1, $j = 0; $i < $maxX; $i++){  // new point
 				if(($data['count'][$i] == 0) && ($i != ($maxX-1))) continue;
 
@@ -2014,9 +2027,16 @@ class CChart extends CGraphDraw{
 				if(($draw == false) && ($this->items[$item]['calc_type'] == GRAPH_ITEM_AGGREGATED))
 					$draw = $i - $j < 5;
 
-				if($this->items[$item]['type'] == ITEM_TYPE_TRAPPER)
+				if($this->items[$item]['type'] == ITEM_TYPE_TRAPPER) $draw = true;
+
+				if(!$draw && !$prevDraw){
 					$draw = true;
-//SDI($draw);
+					$valueDrawType = GRAPH_ITEM_DRAWTYPE_BOLD_DOT;
+				}
+				else{
+					$valueDrawType = $drawtype;
+					$prevDraw = $draw;
+				}
 
 				if($draw){
 					$this->drawElement(
@@ -2024,14 +2044,15 @@ class CChart extends CGraphDraw{
 						$i, $j,
 						0, $this->sizeX,
 						$minY, $maxY,
-						$drawtype,
+//						$drawtype,
+						$valueDrawType,
 						$max_color,
 						$avg_color,
 						$min_color,
 						$minmax_color,
 						$calc_fnc,
 						$this->items[$item]['axisside']
-						);
+					);
 				}
 //echo '\nDraw II \n'; printf('%0.4f',(getmicrotime()-$start_time));
 
