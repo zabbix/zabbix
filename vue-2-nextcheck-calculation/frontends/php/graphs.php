@@ -210,7 +210,12 @@ include_once('include/page_header.php');
 		}
 	}
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['graphid'])){
-		$options = array('graphids'=>$_REQUEST['graphid'], 'extendoutput'=>1, 'editable'=>1, 'nopermissions'=>1);
+		$options = array(
+			'graphids'=>$_REQUEST['graphid'],
+			'output'=>API_OUTPUT_EXTEND,
+			'editable'=>1,
+			'nopermissions'=>1
+		);
 		$graphs = CGraph::get($options);
 		$graph = reset($graphs);
 
@@ -269,7 +274,11 @@ include_once('include/page_header.php');
 	}
 //------ GO -------
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_graphid'])){
-		$options = array('graphids'=>$_REQUEST['group_graphid'], 'extendoutput'=>1, 'editable'=>1);
+		$options = array(
+			'graphids'=>$_REQUEST['group_graphid'],
+			'output'=>API_OUTPUT_EXTEND,
+			'editable'=>1
+		);
 		$graphs = CGraph::get($options);
 
 		$go_result = false;
@@ -518,9 +527,9 @@ include_once('include/page_header.php');
 		$graphids = zbx_objectValues($graphs, 'graphid');
 		$options = array(
 			'graphids' => $graphids,
-			'extendoutput' => 1,
-			'select_hosts' => 1,
-			'select_templates' => 1
+			'output' => API_OUTPUT_EXTEND,
+			'select_hosts' => API_OUTPUT_EXTEND,
+			'select_templates' => API_OUTPUT_EXTEND
 		);
 		$graphs = CGraph::get($options);
 
@@ -600,7 +609,7 @@ include_once('include/page_header.php');
 
 		$jsLocale = array(
 			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTES'
+			'S_NO_ELEMENTS_SELECTED'
 		);
 
 		zbx_addJSLocale($jsLocale);

@@ -35,12 +35,12 @@
 		}
 
 		$result = array(
-			'name' => 'PHP version',
+			'name' => S_PHP_VERSION,
 			'current' => phpversion(),
 			'required' => $required,
 			'recommended' => $recommended,
 			'result' => $req,
-			'error' => 'Minimal version of PHP is 5.1.0'
+			'error' => S_MINIMAL_VERSION_OF_PHP_IS.SPACE.$required
 		);
 
 		return $result;
@@ -63,12 +63,12 @@
 		}
 
 		$result = array(
-			'name' => 'PHP memory limit',
+			'name' => S_PHP_MEMORY_LIMIT,
 			'current' => $current,
 			'required' => mem2str($required),
 			'recommended' => mem2str($recommended),
 			'result' => $req,
-			'error' => '128M is a minimal PHP memory limitation'
+			'error' => mem2str($required).SPACE.S_IS_A_MINIMAL_PHP_MEMORY_LIMITATION_SMALL
 		);
 
 		return $result;
@@ -91,12 +91,12 @@
 		}
 
 		$result = array(
-			'name' => 'PHP post max size',
+			'name' => S_PHP_POST_MAX_SIZE,
 			'current' => $current,
 			'required' => mem2str($required),
 			'recommended' => mem2str($recommended),
 			'result' => $req,
-			'error' => '16M is minimum size of PHP post'
+			'error' => mem2str($required).SPACE.S_IS_A_MINIMUM_SIZE_OF_PHP_POST_SMALL
 		);
 
 		return $result;
@@ -119,12 +119,12 @@
 		}
 
 		$result = array(
-			'name' => 'PHP upload max filesize ',
+			'name' => S_PHP_UPLOAD_MAX_FILESIZE,
 			'current' => $current,
 			'required' => mem2str($required),
 			'recommended' => mem2str($recommended),
 			'result' => $req,
-			'error' => '2M is minimum for PHP upload filesize'
+			'error' => mem2str($required).SPACE.S_IS_MINIMAL_FOR_PHP_ULOAD_FILESIZE_SMALL
 		);
 
 		return $result;
@@ -147,12 +147,40 @@
 		}
 
 		$result = array(
-			'name' => 'PHP max execution time',
+			'name' => S_PHP_MAX_EXECUTION_TIME,
 			'current' => $current,
 			'required' => $required,
 			'recommended' => $recommended,
 			'result' => $req,
-			'error' => '300 sec is a minimal limitation on execution time of PHP scripts'
+			'error' => $required.SPACE.S_SEC_SMALL.SPACE.S_IS_A_MINIMAL_LIMITATION_EXECTUTION_TIME_SMALL
+		);
+
+		return $result;
+	}
+	
+	function check_php_max_input_time(){
+		$required = 300;
+		$recommended = 600;
+
+		$current = ini_get('max_input_time');
+
+		if($current >= $recommended){
+			$req = 2;
+		}
+		else if($current >= $required){
+			$req = 1;
+		}
+		else{
+			$req = 0;
+		}
+
+		$result = array(
+			'name' => S_PHP_MAX_INPUT_TIME,
+			'current' => $current,
+			'required' => $required,
+			'recommended' => $recommended,
+			'result' => $req,
+			'error' => $required.SPACE.S_SEC_SMALL.SPACE.S_IS_A_MINIMAL_LIMITATION_INPUT_PARSE_TIME_SMALL
 		);
 
 		return $result;
@@ -170,12 +198,12 @@
 		}
 
 		$result = array(
-			'name' => 'PHP timezone',
-			'current' => $req ? ini_get('date.timezone') : 'no',
+			'name' => S_PHP_TIMEZONE,
+			'current' => $req ? ini_get('date.timezone') : S_NO_SMALL,
 			'required' => null,
 			'recommended' => null,
 			'result' => $req,
-			'error' => 'Timezone for PHP is not set. Please set "date.timezone" option in php.ini.'
+			'error' => S_TIMEZONE_FOR_PHP_IS_NOT_SET.'.'.SPACE.S_PLEASE_SET.SPACE.'"date.timezone"'.SPACE.S_OPTION_IN_SMALL.SPACE.'php.ini.'
 		);
 
 		return $result;
@@ -233,12 +261,12 @@
 		}
 
 		$result = array(
-			'name' => 'PHP databases support',
-			'current' => empty($current) ? 'no' : new CJSscript(implode(SBR, $current)),
+			'name' => S_PHP_DATABASES_SUPPORT,
+			'current' => empty($current) ? S_NO_SMALL : new CJSscript(implode(SBR, $current)),
 			'required' => null,
 			'recommended' => null,
 			'result' => $req,
-			'error' => 'Requires any database support [MySQL or PostgreSQL or Oracle or SQLite3]'
+			'error' => S_REQUIRES_ANY_DATABASE_SUPPORT
 		);
 
 		return $result;
@@ -266,11 +294,11 @@
 
 		$result = array(
 			'name' => 'PHP BC math',
-			'current' => $req ? 'yes' : 'no',
+			'current' => $req ? S_YES_SMALL : S_NO_SMALL,
 			'required' => null,
 			'recommended' => null,
 			'result' => $req,
-			'error' => 'Requires bcmath module [configure PHP with --enable-bcmath]'
+			'error' => S_REQUIRES_BCMATH_MODULE.SPACE.'['.S_CONFIGURE_PHP_WITH_SMALL.SPACE.'--enable-bcmath]'
 		);
 
 		return $result;
@@ -298,11 +326,11 @@
 
 		$result = array(
 			'name' => 'PHP MB string',
-			'current' => $req ? 'yes' : 'no',
+			'current' => $req ? S_YES_SMALL : S_NO_SMALL,
 			'required' => null,
 			'recommended' => null,
 			'result' => $req,
-			'error' => 'Requires mb string module [configure PHP with --enable-mbstring]'
+			'error' => S_REQUIRES_MB_STRING_MODULE.SPACE.'['.S_CONFIGURE_PHP_WITH_SMALL.SPACE.'--enable-mbstring]'
 		);
 
 		return $result;
@@ -320,12 +348,12 @@
 		}
 
 		$result = array(
-			'name' => 'PHP Sockets',
-			'current' => $req ? 'yes' : 'no',
+			'name' => S_PHP_SOCKETS,
+			'current' => $req ? S_YES_SMALL : S_NO_SMALL,
 			'required' => null,
 			'recommended' => null,
 			'result' => $req,
-			'error' => 'Required Sockets module [configured PHP with --enable-sockets]'
+			'error' => S_REQUIRED_SOCKETS_MODULE.SPACE.'['.S_CONFIGURE_PHP_WITH_SMALL.SPACE.'--enable-sockets]'
 		);
 
 		return $result;
@@ -361,7 +389,7 @@
 			'required' => $required,
 			'recommended' => $recommended,
 			'result' => $req,
-			'error' => 'The GD extension isn\'t loaded.'
+			'error' => S_THE_GD_EXTENSION_IS_NOT_LOADED
 		);
 
 		return $result;
@@ -385,12 +413,12 @@
 		}
 
 		$result = array(
-			'name' => 'GD PNG Support',
-			'current' => $req ? 'yes' : 'no',
+			'name' => S_GD_PNG_SUPPORT,
+			'current' => $req ? S_YES_SMALL : S_NO_SMALL,
 			'required' => null,
 			'recommended' => null,
 			'result' => $req,
-			'error' => 'Requires images generation support [PNG]'
+			'error' => S_REQUIRES_IMAGES_GENERATION_SUPPORT.SPACE.'[PNG]'
 		);
 
 		return $result;
@@ -412,12 +440,12 @@
 		}
 
 		$result = array(
-			'name' => 'libxml module',
+			'name' => S_LIBXML_MODULE,
 			'current' => $current,
 			'required' => $required,
 			'recommended' => $recommended,
 			'result' => $req,
-			'error' => 'php-xml module is not installed'
+			'error' => S_PHPXML_MODULE_IS_NOT_INSTALLED
 		);
 
 		return $result;
@@ -445,12 +473,12 @@
 		}
 
 		$result = array(
-			'name' => 'ctype module',
-			'current' => $req ? 'yes' : 'no',
+			'name' => S_CTYPE_MODULE,
+			'current' => $req ? S_YES_SMALL : S_NO_SMALL,
 			'required' => null,
 			'recommended' => null,
 			'result' => $req,
-			'error' => 'Requires ctype module [configure PHP with --enable-ctype]'
+			'error' => S_REQUIRES_CTYPE_MODULE.SPACE.'['.S_CONFIGURE_PHP_WITH_SMALL.SPACE.'--enable-ctype]'
 		);
 
 		return $result;
@@ -464,6 +492,7 @@
 		$result[] = check_php_post_max_size();
 		$result[] = check_php_upload_max_filesize();
 		$result[] = check_php_max_execution_time();
+		$result[] = check_php_max_input_time();
 		$result[] = check_php_timezone();
 		$result[] = check_php_databases();
 		$result[] = check_php_bc();

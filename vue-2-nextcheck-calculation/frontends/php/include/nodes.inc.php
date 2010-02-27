@@ -23,6 +23,7 @@
 	function update_node_profile($nodeids){
 		global $USER_DETAILS;
 
+		DBstart();
 		$sql = 'DELETE FROM profiles WHERE userid='.$USER_DETAILS['userid'].' AND idx='.zbx_dbstr('web.nodes.selected');
 		DBexecute($sql);
 
@@ -32,6 +33,8 @@
 				' VALUES ('.$profileid.','.$USER_DETAILS['userid'].', '.zbx_dbstr('web.nodes.selected').','.$nodeid.', 4)';
 			DBexecute($sql);
 		}
+
+		DBend();
 	}
 
 	function get_node_profile($default=null){
@@ -211,10 +214,20 @@
 
 		$nodeid = id2nodeid($id_val);
 //SDI($nodeid.' - '.$ZBX_NODES[$nodeid]['name']);
-		if ( !isset($ZBX_NODES[$nodeid]) )
-			return null;
+
+		if(!isset($ZBX_NODES[$nodeid]))	return null;
 
 		return $ZBX_NODES[$nodeid]['name'].$delimiter;
+	}
+
+	function getNodeIdByNodeName($nodeName){
+		global $ZBX_NODES, $ZBX_LOCALNODEID;
+
+		foreach($ZBX_NODES as $nodeid => $node){
+			if($node['name'] == $nodeName) return $nodeid;
+		}
+
+	return 0;
 	}
 
 	function is_show_all_nodes(){

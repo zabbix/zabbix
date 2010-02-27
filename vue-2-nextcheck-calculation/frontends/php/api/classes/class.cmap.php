@@ -83,6 +83,7 @@ class CMap extends CZBXAPI{
 			'editable'					=> null,
 			'nopermissions'				=> null,
 // filtet
+			'filter'					=> null,
 			'pattern'					=> '',
 // OutPut
 			'extendoutput'				=> null,
@@ -113,17 +114,14 @@ class CMap extends CZBXAPI{
 
 
 // editable + PERMISSION CHECK
-		if(defined('ZBX_API_REQUEST')){
-			$options['nopermissions'] = false;
-		}
 
 // nodeids
-		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid();
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 // sysmapids
 		if(!is_null($options['sysmapids'])){
 			zbx_value2array($options['sysmapids']);
-			$sql_parts['where'][] = DBcondition('s.sysmapid', $options['sysmapids']);
+			$sql_parts['where']['sysmapid'] = DBcondition('s.sysmapid', $options['sysmapids']);
 		}
 
 // extendoutput
@@ -141,6 +139,18 @@ class CMap extends CZBXAPI{
 // pattern
 		if(!zbx_empty($options['pattern'])){
 			$sql_parts['where'][] = ' UPPER(s.name) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+		}
+
+// filter
+		if(!is_null($options['filter'])){
+			zbx_value2array($options['filter']);
+
+			if(isset($options['filter']['sysmapid'])){
+				$sql_parts['where']['sysmapid'] = 's.sysmapid='.$options['filter']['sysmapid'];
+			}
+			if(isset($options['filter']['name'])){
+				$sql_parts['where']['name'] = 's.name='.zbx_dbstr($options['filter']['name']);
+			}
 		}
 
 // order
@@ -329,7 +339,7 @@ SDI('///////////////////////////////////////');
 		}
 
 // Adding Elements
-		if(!is_null($options['select_selements'])){
+		if(!is_null($options['select_selements']) && str_in_array($options['select_selements'], $subselects_allowed_outputs)){
 			if(!isset($map_selements)){
 				$map_selements = array();
 
@@ -363,10 +373,10 @@ SDI('///////////////////////////////////////');
 					$linkids[$link['linkid']] = $link['linkid'];
 				}
 
-				$sql = 'SELECT slt.* FROM sysmaps_link_triggers slt WHERE '.DBcondition('slt.linkid', $linkids);
+				$sql = 'SELECT DISTINCT slt.* FROM sysmaps_link_triggers slt WHERE '.DBcondition('slt.linkid', $linkids);
 				$db_link_triggers = DBselect($sql);
 				while($link_trigger = DBfetch($db_link_triggers)){
-					$map_links[$link_trigger['linkid']]['linktriggers'][$link_trigger['linktriggerid']] = $link_trigger;
+					$map_links[$link_trigger['linkid']]['linktriggers'][] = $link_trigger;
 				}
 			}
 
@@ -387,6 +397,61 @@ SDI('///////////////////////////////////////');
 	return $result;
 	}
 
+/**
+ * Get Sysmap IDs by Sysmap params
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $sysmap_data
+ * @param array $sysmap_data['name']
+ * @param array $sysmap_data['sysmapid']
+ * @return string sysmapid
+ */
+
+	public static function getObjects($sysmapData){
+		$options = array(
+			'filter' => $sysmapData,
+			'output'=>API_OUTPUT_EXTEND
+		);
+
+		if(isset($sysmapData['node']))
+			$options['nodeids'] = getNodeIdByNodeName($sysmapData['node']);
+		else if(isset($sysmapData['nodeids']))
+			$options['nodeids'] = $sysmapData['nodeids'];
+
+		$result = self::get($options);
+
+	return $result;
+	}
+
+	public static function checkObjects($sysmapsData){
+		$sysmapsData = zbx_toArray($sysmapsData);
+		
+		$result = array();
+
+		foreach($sysmapsData as $snum => $sysmapData){
+			$options = array(
+				'filter' => $sysmapData,
+				'output' => API_OUTPUT_SHORTEN,
+				'nopermissions' => 1
+			);
+
+			if(isset($sysmapData['node']))
+				$options['nodeids'] = getNodeIdByNodeName($sysmapData['node']);
+			else if(isset($sysmapData['nodeids']))
+				$options['nodeids'] = $sysmapData['nodeids'];
+
+			$sysmaps = self::get($options);
+
+			$result+= $sysmaps;
+		}
+
+	return $result;
+	}
 
 /**
  * Add Map
@@ -441,7 +506,7 @@ SDI('///////////////////////////////////////');
 			if(!$result) break;
 
 			$new_map = array('sysmapid' => $sysmapid);
-			$result_maps[] = array_merge($new_map, $map);
+			$result_maps[] = array_merge($map, $new_map);
 		}
 		$result = self::EndTransaction($result, __METHOD__);
 
@@ -477,13 +542,20 @@ SDI('///////////////////////////////////////');
 		$result = array();
 
 		$maps = zbx_toArray($maps);
+		$sysmapids = array();
+
+		$options = array(
+			'sysmapids' => zbx_objectValues($maps,'sysmapid'),
+			'preservekeys' => 1,
+			'output' => API_OUTPUT_EXTEND
+		);
+		$db_sysmaps = self::get($options);
 
 		self::BeginTransaction(__METHOD__);
-		foreach($maps as $map){
+		foreach($maps as $mnum => $map){
 
-			$map_db_fields = self::get(array('sysmapids' => $map['sysmapid'], 'extendoutput' => 1));
-			$map_db_fields = reset($map_db_fields);
-
+			$sysmapids[] = $map['sysmapid'];
+			$map_db_fields = $db_sysmaps[$map['sysmapid']];
 
 			if(!$map_db_fields){
 				$result = false;
@@ -513,7 +585,12 @@ SDI('///////////////////////////////////////');
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return true;
+			$options = array(
+				'sysmapids' => $sysmapids,
+				'nopermissions' => 1,
+				'output' => API_OUTPUT_EXTEND,
+			);
+			return self::get($options);
 		}
 		else{
 			self::setMethodErrors(__METHOD__, $errors);

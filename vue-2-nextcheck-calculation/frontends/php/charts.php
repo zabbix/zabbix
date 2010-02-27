@@ -209,7 +209,6 @@ include_once('include/page_header.php');
 
 	$options = array(
 		'extendoutput' => 1,
-		'sortfield' => 'name',
 		'templated' => 0
 	);
 
@@ -225,6 +224,7 @@ include_once('include/page_header.php');
 	}
 
 	$db_graphs = CGraph::get($options);
+	order_result($db_graphs, 'name');
 	foreach($db_graphs as $num => $db_graph){
 		$cmbGraphs->addItem($db_graph['graphid'], get_node_name_by_elid($db_graph['graphid'], null, ': ').$db_graph['name']);
 	}

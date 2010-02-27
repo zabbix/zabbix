@@ -119,9 +119,6 @@ class CEvent extends CZBXAPI{
 
 
 // editable + PERMISSION CHECK
-		if(defined('ZBX_API_REQUEST')){
-			$options['nopermissions'] = false;
-		}
 
 		if(is_null($options['source']) && is_null($options['object'])){
 			$options['object'] = EVENT_OBJECT_TRIGGER;
@@ -130,7 +127,7 @@ class CEvent extends CZBXAPI{
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
 		else if(($options['object'] == EVENT_OBJECT_TRIGGER) || ($options['source'] == EVENT_SOURCE_TRIGGER)){
-
+/*
 			$tr_options = array();
 
 			if(!is_null($options['triggerids']))
@@ -140,8 +137,8 @@ class CEvent extends CZBXAPI{
 			$triggerids = zbx_objectValues($triggers, 'triggerid');
 
 			$options['triggerids'] = $triggerids;
-
-/*
+//*/
+//*
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
 			$sql_parts['from']['f'] = 'functions f';
@@ -174,7 +171,7 @@ class CEvent extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
 
 // Permission hack
 

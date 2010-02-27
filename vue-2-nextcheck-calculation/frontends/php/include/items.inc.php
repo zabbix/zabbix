@@ -255,7 +255,7 @@
 				'templateid'		=> 0);
 
 		if(!check_db_fields($item_db_fields, $item)){
-			error(S_INCORRECT_ARGUMENTS_PASTED_TO_FUNCTION.SPACE.'[add_item]');
+			error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.SPACE.'[add_item]');
 			return false;
 		}
 
@@ -307,7 +307,7 @@
 			if(preg_match('/^((.)*)(\[\"((.)*)\"\,\"((.)*)\"\,\"((.)*)\"\,\"([0-9]+)\"\])$/i', $item['key_'], $arr)){
 				$g=$arr[1];
 				if(!str_in_array($g,array("grpmax","grpmin","grpsum","grpavg"))){
-					error(S_GROUP_FUNCTION.SPACE."[$g]".SPACE.S_IS_NOT_ONE_OF.SPACE."[grpmax,grpmin,grpsum,grpavg]");
+					error(S_GROUP_FUNCTION.SPACE."[$g]".SPACE.S_IS_NOT_ONE_OF.SPACE."[grpmax, grpmin, grpsum, grpavg]");
 					return FALSE;
 				}
 				// Group
@@ -317,7 +317,7 @@
 				// Item function
 				$g=$arr[8];
 				if(!str_in_array($g,array('last', 'min', 'max', 'avg', 'sum','count'))){
-					error(S_ITEM_FUNCTION.SPACE.'['.$g.']'.SPACE.S_IS_NOT_ONE_OF.SPACE.'[last, min, max, avg, sum,count]');
+					error(S_ITEM_FUNCTION.SPACE.'['.$g.']'.SPACE.S_IS_NOT_ONE_OF.SPACE.'[last, min, max, avg, sum, count]');
 					return FALSE;
 				}
 				// Parameter
@@ -487,7 +487,7 @@
 
 
 		if(!check_db_fields($item_data, $item)){
-			error(S_INCORRECT_ARGUMENTS_PASTED_TO_FUNCTION.SPACE.'[update_item]');
+			error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.SPACE.'[update_item]');
 			return false;
 		}
 
@@ -546,7 +546,7 @@
 			}
 
 			if(!check_db_fields($db_tmp_item, $child_item_params)){
-				error(S_INCORRECT_ARGUMENTS_PASTED_TO_FUNCTION.SPACE.'[update_item]');
+				error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.SPACE.'[update_item]');
 				return false;
 			}
 

@@ -526,9 +526,12 @@ include_once('include/page_header.php');
 		$sortfield = getPageSortField('description');
 		$sortorder = getPageSortOrder();
 		$options = array(
-			'select_hosts' => 1,
 			'editable' => 1,
-			'extendoutput' => 1,
+			'select_hosts' => API_OUTPUT_EXTEND,
+			'select_items' => API_OUTPUT_EXTEND,
+			'select_functions' => API_OUTPUT_EXTEND,
+			'select_dependencies' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
@@ -552,27 +555,34 @@ include_once('include/page_header.php');
 		$paging = getPagingLine($triggers);
 //---------
 
+		$realHosts = getParentHostsByTriggers($triggers);
+
 		foreach($triggers as $tnum => $trigger){
 			$triggerid = $trigger['triggerid'];
 
+			$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
+			$trigger['items'] = zbx_toHash($trigger['items'], 'itemid');
+			$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
+
 			$description = array();
 			if($trigger['templateid'] > 0){
-				$real_hosts = get_realhosts_by_triggerid($triggerid);
-				$real_host = DBfetch($real_hosts);
+
+				$real_hosts = $realHosts[$triggerid];
+				$real_host = reset($real_hosts);
 				$description[] = new CLink($real_host['host'], 'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
 				$description[] = ':';
 			}
 
-			$description[] = new CLink(expand_trigger_description($triggerid), 'triggers.php?form=update&triggerid='.$triggerid);
+			$description[] = new CLink(expandTriggerDescription($trigger), 'triggers.php?form=update&triggerid='.$triggerid);
 
 //add dependencies{
-			$deps = get_trigger_dependencies_by_triggerid($triggerid);
+			$deps = $trigger['dependencies'];
 			if(count($deps) > 0){
 				$description[] = array(BR(), bold(S_DEPENDS_ON.' : '));
-				foreach($deps as $dnum => $dep_triggerid) {
+				foreach($deps as $dnum => $dep_trigger) {
 					$description[] = BR();
 
-					$hosts = get_hosts_by_triggerid($dep_triggerid);
+					$hosts = get_hosts_by_triggerid($dep_trigger['triggerid']);
 					while($host = DBfetch($hosts)){
 						$description[] = $host['host'];
 						$description[] = ', ';
@@ -580,7 +590,7 @@ include_once('include/page_header.php');
 
 					array_pop($description);
 					$description[] = ' : ';
-					$description[] = expand_trigger_description($dep_triggerid);
+					$description[] = expand_trigger_description_by_data($dep_trigger);
 				}
 			}
 // } add dependencies
@@ -638,7 +648,8 @@ include_once('include/page_header.php');
 				$status,
 				$hosts,
 				$description,
-				explode_exp($trigger['expression'], 1),
+				triggerExpression($trigger,1),
+//				explode_exp($trigger['expression'], 1),
 				$error
 			));
 
@@ -673,7 +684,7 @@ include_once('include/page_header.php');
 
 		$jsLocale = array(
 			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTES'
+			'S_NO_ELEMENTS_SELECTED'
 		);
 
 		zbx_addJSLocale($jsLocale);

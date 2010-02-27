@@ -45,7 +45,7 @@ require_once('include/httptest.inc.php');
 
 		foreach($err_hostids as $num => $hostid){
 			$host = get_host_by_hostid($hostid);
-			error(S_HOST.SPACE.'"'.$host['host'].'"'.SPACE.S_CANNOT_EXISTS_WITHOUT_GROUP);
+			error(S_HOST.SPACE.'"'.$host['host'].'"'.SPACE.S_CANNOT_EXIST_WITHOUT_GROUP);
 
 			return false;
 		}
@@ -266,7 +266,7 @@ require_once('include/httptest.inc.php');
 						$newgroup,$groups)
 	{
 		if(zbx_empty($newgroup) && (count($groups) == 0)){
-			info(S_HOST.SPACE.S__MUST_LINKED_LEAST_ONE_HOST_GROUP_SMALL);
+			info(S_HOST.SPACE.S_MUST_LINKED_LEAST_ONE_HOST_GROUP_SMALL);
 			return false;
 		}
 
@@ -353,7 +353,7 @@ require_once('include/httptest.inc.php');
 							$newgroup,$groups)
 	{
 		if(zbx_empty($newgroup) && (count($groups) == 0)){
-			info(S_HOST.SPACE.'"'.$host.'"'.SPACE.S_MUST_LINKED_LEAST_ONE_HOST_GROUPS_SMALL);
+			info(S_HOST.SPACE.'"'.$host.'"'.SPACE.S_MUST_LINKED_LEAST_ONE_HOST_GROUP_SMALL);
 			return false;
 		}
 
@@ -731,7 +731,7 @@ require_once('include/httptest.inc.php');
 
 	function db_save_proxy($name,$proxyid=null){
 		if(!is_string($name)){
-			error(S_INCORRECT_PARAMETERS_FOR." 'db_save_proxy'");
+			error(S_INCORRECT_PARAMETERS_FOR_SMALL." 'db_save_proxy'");
 			return false;
 		}
 
@@ -881,19 +881,22 @@ require_once('include/httptest.inc.php');
 		zbx_value2array($hostids);
 
 //		$hosts = array();
-		$result = DBselect('SELECT * FROM hosts WHERE '.DBcondition('hostid', $hostids).
-				' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')');
+		$sql = 'SELECT * '.
+			' FROM hosts '.
+			' WHERE '.DBcondition('hostid', $hostids).
+				' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
+		$result = DBselect($sql);
 		while($host=DBfetch($result)){
 			if($status != $host['status']){
 //				$hosts[$host['hostid']] = $host['hostid'];
 				update_trigger_value_to_unknown_by_hostid($host['hostid']);
 				$res = DBexecute('UPDATE hosts SET status='.$status.' WHERE hostid='.$host['hostid']);
-				if ($res){
+				if($res){
 					$host_new = $host;//get_host_by_hostid($host['hostid']);
 					$host_new['status'] = $status;
 					add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['host'], 'hosts', $host, $host_new);
 				}
-				info(S_UPDATED_STATUS_FOR_HOST.SPACE.$host['host']);
+				info(S_UPDATED_STATUS_OF_HOST.' "'.$host['host'].'"');
 			}
 		}
 

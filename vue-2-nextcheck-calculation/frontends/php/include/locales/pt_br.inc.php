@@ -1558,7 +1558,7 @@
 	'S_COMBINED_RESULT'=>			'Resultado combinado',
 	'S_DELETE_APPLICATION'=>			'Deletar esta aplicação?',
 	'S_INCORRECT_TIME_PERIOD'=>			'Período incorreto',
-	'S_NO_ELEMENTS_SELECTES'=>			'Nenhum elemento selecionado!',
+	'S_NO_ELEMENTS_SELECTED'=>			'Nenhum elemento selecionado!',
 	'S_REFRESHED_EVERY_SMALL'=>			'atualizado a cada',
 	'S_PAGE_RECEIVED_INCORRECT_DATA'=>			'Página recebeu dados incorretos',
 	'S_STATS_FOR'=>			'Estatísticas de',

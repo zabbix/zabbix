@@ -102,6 +102,11 @@
 	define('IMAGE_TYPE_ICON',		1);
 	define('IMAGE_TYPE_BACKGROUND',		2);
 
+	define('ITEM_CONVERT_WITH_UNITS',	0);		// - do not convert empty units
+	define('ITEM_CONVERT_NO_UNITS',		1);		// - no units
+	define('ITEM_CONVERT_SHORT_UNITS',	2);		// - to short units
+	define('ITEM_CONVERT_LONG_UNITS',	3);		// - to long units
+
 
 	define('ZBX_SORT_UP',			'ASC');
 	define('ZBX_SORT_DOWN',			'DESC');
@@ -582,7 +587,7 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('ZBX_PREG_SPACES', '(\s+){0,1}');
 	define('ZBX_PREG_MACRO_NAME', '([A-Z0-9\._]+)');
 	define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_\. \-]+)');	/* !!! Don't forget sync code with C !!! */
-	define('ZBX_PREG_KEY_NAME', '([0-9a-zA-Z_\.]+)');	/* !!! Don't forget sync code with C !!! */
+	define('ZBX_PREG_KEY_NAME', '([0-9a-zA-Z_\.\-]+)');	/* !!! Don't forget sync code with C !!! */
 	define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+){0,1}');
 	define('ZBX_PREG_SIGN', '([&|><=+*\/#\-])');
 	define('ZBX_PREG_NUMBER', '([\-+]?[0-9]+[.]{0,1}[0-9]*[A-Z]{0,1})');

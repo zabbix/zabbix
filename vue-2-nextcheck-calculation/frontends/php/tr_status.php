@@ -387,11 +387,13 @@ include_once('include/page_header.php');
 		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 		'extendoutput' => 1,
 		'select_hosts' => 1,
-		'select_items' => 1
+		'select_items' => 1,
+		'select_dependencies' => 1,
+		'skipDependent' => 1
 	);
 	$triggers = CTrigger::get($options);
 	$triggers = zbx_toHash($triggers, 'triggerid');
-
+	
 	order_result($triggers, $sortfield, $sortorder);
 //---------
 
@@ -500,26 +502,21 @@ include_once('include/page_header.php');
 		}
 
 // DEPENDENCIES {{{
-		$dependency = false;
-		$dep_table = new CTableInfo();
-		$dep_table->setAttribute('style', 'width: 200px;');
-		$dep_table->addRow(bold(S_DEPENDS_ON.':'));
+		if(!empty($trigger['dependencies'])){
+			$dep_table = new CTableInfo();
+			$dep_table->setAttribute('style', 'width: 200px;');
+			$dep_table->addRow(bold(S_DEPENDS_ON.':'));
 
-		$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_down='.$trigger['triggerid'];
-		$dep_res = DBselect($sql_dep);
-		while($dep_row = DBfetch($dep_res)){
-			$dep_table->addRow(SPACE.'-'.SPACE.expand_trigger_description($dep_row['triggerid_up']));
-			$dependency = true;
-		}
+			foreach($trigger['dependencies'] as $dep){
+				$dep_table->addRow(' - '.expand_trigger_description($dep['triggerid']));
+			}
 
-		if($dependency){
-			$img = new Cimg('images/general/down_icon.png','DEP_DOWN');
-			$img->setAttribute('style','vertical-align: middle; border: 0px;');
+			$img = new Cimg('images/general/down_icon.png', 'DEP_UP');
+			$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
 			$img->setHint($dep_table);
 
-			$description = array($img,SPACE,$description);
+			$description = array($img, SPACE, $description);
 		}
-		unset($img, $dep_table, $dependency);
 
 		$dependency = false;
 		$dep_table = new CTableInfo();
@@ -723,7 +720,7 @@ include_once('include/page_header.php');
 
 		$jsLocale = array(
 			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTES'
+			'S_NO_ELEMENTS_SELECTED'
 		);
 
 		zbx_addJSLocale($jsLocale);
@@ -734,12 +731,8 @@ include_once('include/page_header.php');
 	}
 //----
 
-// PAGING FOOTER
 	$table = array($paging, $table, $paging, $footer);
-//---------
-
 	$m_form->addItem($table);
-
 	$trigg_wdgt->addItem($m_form);
 	$trigg_wdgt->show();
 

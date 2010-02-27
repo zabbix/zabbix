@@ -35,9 +35,9 @@ class CGraph extends CZBXAPI{
 *	array 'graphids'				=> array(graphid1, graphid2, ...),
 *	array 'itemids'					=> array(itemid1, itemid2, ...),
 *	array 'hostids'					=> array(hostid1, hostid2, ...),
-*	int 'type'					=> 'graph type, chart/pie'
-*	boolean 'templated_graphs'			=> 'only templated graphs',
-*	int 'count'					=> 'count',
+*	int 'type'						=> 'graph type, chart/pie'
+*	boolean 'templated_graphs'		=> 'only templated graphs',
+*	int 'count'						=> 'count',
 *	string 'pattern'				=> 'search hosts by pattern in graph names',
 *	integer 'limit'					=> 'limit selection',
 *	string 'order'					=> 'deprecated parameter (for now)'
@@ -79,6 +79,7 @@ class CGraph extends CZBXAPI{
 			'editable'				=> null,
 			'nopermissions'			=> null,
 // filter
+			'filter'				=> '',
 			'pattern'				=> '',
 // output
 			'output'				=> API_OUTPUT_REFER,
@@ -117,9 +118,6 @@ class CGraph extends CZBXAPI{
 
 
 // editable + PERMISSION CHECK
-		if(defined('ZBX_API_REQUEST')){
-			$options['nopermissions'] = false;
-		}
 
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
@@ -155,7 +153,7 @@ class CGraph extends CZBXAPI{
 
 
 // nodeids
-		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid();
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 // groupids
 		if(!is_null($options['groupids'])){
@@ -252,7 +250,15 @@ class CGraph extends CZBXAPI{
 
 // pattern
 		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where'][] = ' UPPER(g.name) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+			$sql_parts['where']['name'] = ' UPPER(g.name) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+		}
+
+// filter
+		if(!is_null($options['filter'])){
+			zbx_value2array($options['filter']);
+
+			if(isset($options['filter']['name']))
+				$sql_parts['where']['name'] = zbx_dbstr($options['filter']['name']);
 		}
 
 // order
@@ -449,27 +455,45 @@ class CGraph extends CZBXAPI{
  * @param array $graph_data
  * @return string|boolean graphid
  */
-	public static function getObjects($graph_data){
-		$result = array();
-		$graphids = array();
+	public static function getObjects($graphData){
+		$options = array(
+			'filter' => $graphData,
+			'output'=>API_OUTPUT_EXTEND
+		);
 
-		$sql = 'SELECT g.graphid '.
-				' FROM graphs g, graphs_items gi, items i'.
-				' WHERE g.graphid=gi.graphid '.
-					' AND gi.itemid=i.itemid'.
-					' AND g.name='.zbx_dbstr($graph_data['name']).
-					' AND i.hostid='.$graph_data['hostid'];
-		$db_res = DBselect($sql);
-		while($graph = DBfetch($db_res)){
-			$graphids[$graph['graphid']] = $graph['graphid'];
-		}
+		if(isset($graphData['node']))
+			$options['nodeids'] = getNodeIdByNodeName($graphData['node']);
+		else if(isset($graphData['nodeids']))
+			$options['nodeids'] = $graphData['nodeids'];
 
-		if(!empty($graphids))
-			$result = self::get(array('graphids'=>$graphids, 'extendoutput'=>1));
+		$result = self::get($options);
 
 	return $result;
 	}
 
+	public static function checkObjects($graphsData){
+
+		$graphsData = zbx_toArray($graphsData);
+		$result = array();
+		foreach($graphsData as $inum => $graphData){
+			$options = array(
+				'filter' => $graphData,
+				'hostids' => isset($graphData['hostid'])?$graphData['hostid']:null,
+				'output' => API_OUTPUT_SHORTEN,
+				'nopermissions' => 1
+			);
+
+			if(isset($hostData['node']))
+				$options['nodeids'] = getNodeIdByNodeName($hostData['node']);
+			else if(isset($hostData['nodeids']))
+				$options['nodeids'] = $hostData['nodeids'];
+
+			$graphs = self::get($options);
+			$result+= $graphs;
+		}
+
+	return $result;
+	}
 /**
  * Add graph
  *

@@ -125,7 +125,7 @@ class CProfile{
 		global $USER_DETAILS;
 		
 		$value_type = self::getFieldByType($type);
-	
+
 		$values = array(
 			'profileid' => get_dbid('profiles', 'profileid'),
 			'userid' => $USER_DETAILS['userid'],
@@ -360,7 +360,8 @@ function add2favorites($favobj, $favid, $source=null){
 			return true;
 		}
 	}
-	
+
+	DBstart();
 	$values = array(
 		'profileid' => get_dbid('profiles', 'profileid'),
 		'userid' => $USER_DETAILS['userid'],
@@ -371,9 +372,11 @@ function add2favorites($favobj, $favid, $source=null){
 	if(!is_null($source)) $values['source'] = zbx_dbstr($source);
 	
 	$sql = 'INSERT INTO profiles ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
-	
-	return DBexecute($sql);
-	
+	$result = DBexecute($sql);
+
+	$result = DBend($result);
+
+return $result;
 }
 
 // Author: Aly

@@ -336,10 +336,10 @@ class CChart extends CGraphDraw{
 			/* calculate missed points */
 			$first_idx = 0;
 			/*
-				first_idx - last existed point
+				first_idx - last existing point
 				ci - current index
-				cj - count of missed in onetime
-				dx - offset to first value (count to last existed point)
+				cj - count of missed in one go
+				dx - offset to first value (count to last existing point)
 			//*/
 
 			for($ci = 0, $cj=0; $ci < $this->sizeX; $ci++){
@@ -759,6 +759,7 @@ class CChart extends CGraphDraw{
 		$tmp_maxY[GRAPH_YAXIS_SIDE_LEFT] = $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT];
 		$tmp_maxY[GRAPH_YAXIS_SIDE_RIGHT] = $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT];
 //------
+
 // CALC interval
 		$col_interval = ($this->gridPixelsVert*($this->m_maxY[$side] - $this->m_minY[$side]))/$this->sizeY;
 		$max = $this->m_maxY[$side];
@@ -775,12 +776,19 @@ class CChart extends CGraphDraw{
 			}
 		}
 //------
+
 // correctin MIN & MAX
 		$this->m_minY[$side] = bcmul(floor(bcdiv($this->m_minY[$side], $interval)), $interval);
 		$this->m_maxY[$side] = bcmul(ceil(bcdiv($this->m_maxY[$side], $interval)), $interval);
 //--------------------
 //SDI($this->m_minY[$side].' - '.$this->m_maxY[$side].' : '.$interval);
 		$this->gridLinesCount[$side] = ceil(($this->m_maxY[$side] - $this->m_minY[$side]) / $interval);
+
+// we add 1 interval so max Y woun't be at most top
+		if(bccomp($this->m_maxY[$side], $tmp_maxY[$side], 2) == 0){
+			$this->gridLinesCount[$side]++;
+		}
+
 		$this->m_maxY[$side] = bcadd($this->m_minY[$side], bcmul($interval, $this->gridLinesCount[$side]));
 
 // division by zero
@@ -790,10 +798,6 @@ class CChart extends CGraphDraw{
 		$intervalX = ($interval * $this->sizeY) / $diff_val;
 //SDII(array($this->m_maxY[$side],$tmp_maxY[$side]));
 
-// we add 1 interval so max Y woun't be at most top
-		if(bccomp($this->m_maxY[$side], $tmp_maxY[$side], 6) == 0){
-			$this->gridLinesCount[$side]++;
-		}
 //SDI($this->m_maxY[$other_side].' - '.$this->m_minY[$other_side]);
 		if(isset($this->axis_valuetype[$other_side])){
 			$dist = ($this->m_maxY[$other_side] - $this->m_minY[$other_side]);
@@ -808,13 +812,13 @@ class CChart extends CGraphDraw{
 			}
 
 // correcting MIN & MAX
-			$this->m_minY[$other_side] = bcmul(floor(bcdiv($this->m_minY[$side], $interval)), $interval);
-			$this->m_maxY[$other_side] = bcmul(ceil(bcdiv($this->m_maxY[$side], $interval)), $interval);
+			$this->m_minY[$other_side] = bcmul(floor(bcdiv($this->m_minY[$other_side], $interval)), $interval);
+			$this->m_maxY[$other_side] = bcmul(ceil(bcdiv($this->m_maxY[$other_side], $interval)), $interval);
 //--------------------
 
 // if we lowered min more than highed max - need additional recalculating
 			if(($tmp_maxY[$other_side] > $this->m_maxY[$other_side]) || ($tmp_minY[$other_side] < $this->m_minY[$other_side])){
-				$dist = ($this->m_maxY[$other_side] - $this->m_minY[$other_side]);
+				$dist = bcsub($this->m_maxY[$other_side],$this->m_minY[$other_side]);
 				$interval = 0;
 				foreach($intervals as $num => $int){
 //SDI($dist.' < '.bcmul($this->gridLinesCount[$side],$int));
@@ -825,13 +829,13 @@ class CChart extends CGraphDraw{
 				}
 
 // recorrecting MIN & MAX
-				$this->m_minY[$other_side] = bcmul(floor(bcdiv($this->m_minY[$side], $interval)), $interval);
-				$this->m_maxY[$other_side] = bcmul(ceil(bcdiv($this->m_maxY[$side], $interval)), $interval);
+				$this->m_minY[$other_side] = bcmul(floor(bcdiv($this->m_minY[$other_side], $interval)), $interval);
+				$this->m_maxY[$other_side] = bcmul(ceil(bcdiv($this->m_maxY[$other_side], $interval)), $interval);
 //--------------------
 			}
-			$this->gridLinesCount[$other_side] = $this->gridLinesCount[$side];
-			$this->m_maxY[$other_side] = $this->m_minY[$other_side] + $interval * $this->gridLinesCount[$other_side];
 
+			$this->gridLinesCount[$other_side] = $this->gridLinesCount[$side];
+			$this->m_maxY[$other_side] = $this->m_minY[$other_side] + bcmul($interval,$this->gridLinesCount[$other_side]);
 //SDI($this->m_minY[$other_side].' - '.$this->m_maxY[$other_side].' : '.$interval.' x '.$this->gridLinesCount[$side]);
 		}
 
@@ -1290,7 +1294,8 @@ class CChart extends CGraphDraw{
 		for($i=0; $i<=$hstr_count; $i++){
 // division by zero
 			$hstr_count = ($hstr_count == 0)?1:$hstr_count;
-			$str = convert_units(bcadd(bcdiv(bcmul(bcdiv(bcmul($this->sizeY, $i), $hstr_count), bcsub($maxY, $minY)), $this->sizeY), $minY), $units, false);
+			$val = bcadd(bcdiv(bcmul(bcdiv(bcmul($this->sizeY, $i), $hstr_count), bcsub($maxY, $minY)), $this->sizeY), $minY);
+			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS);
 
 			$dims = imageTextSize(8, 0, $str);
 
@@ -1363,8 +1368,9 @@ class CChart extends CGraphDraw{
 		for($i=0;$i<=$hstr_count;$i++){
 			if($hstr_count == 0) continue;
 
-			$str = convert_units(bcadd(bcdiv(bcmul(bcdiv(bcmul($this->sizeY, $i), $hstr_count), bcsub($maxY, $minY)), $this->sizeY), $minY), $units, false);
-			// $str = convert_units($this->sizeY*$i/$hstr_count*($maxY-$minY)/$this->sizeY+$minY,$units, false);
+			$val = bcadd(bcdiv(bcmul(bcdiv(bcmul($this->sizeY, $i), $hstr_count), bcsub($maxY, $minY)), $this->sizeY), $minY);
+			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS);
+
 			imageText($this->im,
 				8,
 				0,
@@ -1553,10 +1559,10 @@ class CChart extends CGraphDraw{
 
 				$legend->addCell($colNum, array('text' => $item_caption));
 				$legend->addCell($colNum, array('text' => '['.$fnc_name.']'));
-				$legend->addCell($colNum, array('text' => convert_units($this->getLastValue($i),$this->items[$i]['units']), 'align'=> 2));
-				$legend->addCell($colNum, array('text' => convert_units(min($data['min']),$this->items[$i]['units']), 'align'=> 2));
-				$legend->addCell($colNum, array('text' => convert_units(zbx_avg($data['avg']),$this->items[$i]['units']), 'align'=> 2));
-				$legend->addCell($colNum, array('text' => convert_units(max($data['max']),$this->items[$i]['units']), 'align'=> 2));
+				$legend->addCell($colNum, array('text' => convert_units($this->getLastValue($i),$this->items[$i]['units'],ITEM_CONVERT_NO_UNITS), 'align'=> 2));
+				$legend->addCell($colNum, array('text' => convert_units(min($data['min']),$this->items[$i]['units']),ITEM_CONVERT_NO_UNITS, 'align'=> 2));
+				$legend->addCell($colNum, array('text' => convert_units(zbx_avg($data['avg']),$this->items[$i]['units'],ITEM_CONVERT_NO_UNITS), 'align'=> 2));
+				$legend->addCell($colNum, array('text' => convert_units(max($data['max']),$this->items[$i]['units'],ITEM_CONVERT_NO_UNITS), 'align'=> 2));
 			}
 			else{
 				$legend->addCell($colNum,array('text' => $item_caption));
@@ -1608,7 +1614,7 @@ class CChart extends CGraphDraw{
 
 					$str = '%sth percentile: %s';
 					$percentile['percent'] = (float) $percentile['percent'];
-					$legend->addCell($colNum,array('text' => $percentile['percent'].'th percentile: '.convert_units($percentile['value'],$units[$side]).'  ('.$side.')'));
+					$legend->addCell($colNum,array('text' => $percentile['percent'].'th percentile: '.convert_units($percentile['value'], $units[$side]).'  ('.$side.')', ITEM_CONVERT_NO_UNITS));
 					if($side == 'left'){
 						$color = $this->graphtheme['leftpercentilecolor'];
 					}
