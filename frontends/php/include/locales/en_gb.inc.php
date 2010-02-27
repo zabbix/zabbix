@@ -646,6 +646,9 @@
 	'S_AS_GREEN'=>				'as Green',
 	'S_AS_BLUE'=>				'as Blue',
 
+	'S_FAILURE_AUDIT'=>			'Failure Audit',
+	'S_SUCCESS_AUDIT'=>			'Success Audit',
+
 // maintenance.php
 	'S_MAINTENANCE'=>				'Maintenance',
 	'S_MAINTENANCE_ADDED'=>			'Maintenance added',
