@@ -427,8 +427,8 @@ include_once('include/page_header.php');
 
 				array_push($new_row,
 						new CCol(
-							get_severity_description($row['severity']),
-							get_severity_style($row['severity'])
+							get_item_logtype_description($row['severity']),
+							get_item_logtype_style($row['severity'])
 							)
 					);
 
