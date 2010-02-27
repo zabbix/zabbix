@@ -784,6 +784,11 @@ int	str_in_list(char *list, const char *value, const char delimiter);
 #endif /* HAVE___VA_ARGS__ */
 void	__zbx_zbx_setproctitle(const char *fmt, ...);
 
+#define SEC_PER_MIN 60
+#define SEC_PER_HOUR 3600
+#define SEC_PER_DAY 86400
+#define SEC_PER_WEEK (7*SEC_PER_DAY)
+#define SEC_PER_YEAR (365*SEC_PER_DAY)
 #define ZBX_JAN_1970_IN_SEC   2208988800.0        /* 1970 - 1900 in seconds */
 double	zbx_time(void);
 double	zbx_current_time (void);
