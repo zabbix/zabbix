@@ -3575,8 +3575,7 @@ return $result;
 				'select_dependencies' => API_OUTPUT_EXTEND
 			);
 			$triggers = CTrigger::get($options);
-		
-			
+
 			$hash = array();
 			
 			foreach($triggers as $trigger){	
@@ -3590,7 +3589,7 @@ return $result;
 				$hash[$trigger['triggerid']] = $newtriggerid[0]['triggerid'];
 			}
 
-			foreach($triggers as $trigger){	
+			foreach($triggers as $trigger){
 				foreach($trigger['dependencies'] as $dep){
 					if(isset($hash[$dep['triggerid']])){
 						$dep = $hash[$dep['triggerid']];
@@ -3608,8 +3607,7 @@ return $result;
 		}
 		catch(Exception $e){
 			return false;
-		}		
+		}
 	}
-	
-	
+
 ?>

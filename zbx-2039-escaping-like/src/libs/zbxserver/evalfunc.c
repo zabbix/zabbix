@@ -292,6 +292,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 		return res;
 
 	if (nparams >= 2)
+	{
 		if (FAIL == get_function_parameter_str(item, parameters, 2, &arg2))
 			return res;
 		else
@@ -306,8 +307,10 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 				default:
 					;	/* nothing */
 			}
+	}
 
 	if (nparams >= 3)
+	{
 		if (FAIL == get_function_parameter_str(item, parameters, 3, &arg3))
 		{
 			zbx_free(arg2);
@@ -353,6 +356,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 
 			zbx_free(arg3);
 		}
+	}
 
 	if (nparams >= 4)
 	{
@@ -839,6 +843,7 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 		}
 
 		if (num_param(parameters) == 2)
+		{
 			if (SUCCEED == get_function_parameter_uint(item, parameters, 2, &time_shift, &time_shift_flag) &&
 				time_shift_flag == ZBX_FLAG_SEC)
 			{
@@ -847,6 +852,7 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 			}
 			else
 				goto clean;
+		}
 	}
 	else if (0 == strcmp(function, "prev"))
 	{
