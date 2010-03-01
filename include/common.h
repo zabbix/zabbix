@@ -486,8 +486,8 @@ typedef enum
 
 typedef enum
 {
-	ZBX_CASE_SENSITIVE = 0,
-	ZBX_IGNORE_CASE
+	ZBX_IGNORE_CASE = 0,
+	ZBX_CASE_SENSITIVE	
 } zbx_case_sensitive_t;
 
 /* HTTP Tests statuses */
