@@ -190,7 +190,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (PQstatus(conn) != CONNECTION_OK)
 	{
 		zabbix_errlog(ERR_Z3001, dbname, 0, PQerrorMessage(conn));
-		ret = ZBX_DB_FAIL;
+		ret = ZBX_DB_DOWN;
 	}
 
 	result = DBselect("select oid from pg_type where typname = 'bytea'");
@@ -927,6 +927,9 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 				PQresultErrorMessage(result->pg_result));
 		zabbix_errlog(ERR_Z3005, 0, error, sql);
 		zbx_free(error);
+
+		zbx_free(result);
+		result = (DB_RESULT)ZBX_DB_DOWN;
 	}
 	else	/* init rownum */
 		result->row_num = PQntuples(result->pg_result);
