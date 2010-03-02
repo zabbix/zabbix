@@ -928,7 +928,7 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 		zabbix_errlog(ERR_Z3005, 0, error, sql);
 		zbx_free(error);
 
-		zbx_free(result);
+		DBfree_result(result);
 		result = (DB_RESULT)ZBX_DB_DOWN;
 	}
 	else	/* init rownum */
