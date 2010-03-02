@@ -197,14 +197,16 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		zabbix_errlog(ERR_Z3001, dbname, 0, PQerrorMessage(conn));
 		ret = ZBX_DB_DOWN;
 	}
-
-	result = DBselect("select oid from pg_type where typname = 'bytea'");
-	row = DBfetch(result);
-	if(row)
+	else
 	{
-		ZBX_PG_BYTEAOID = atoi(row[0]);
+		result = DBselect("select oid from pg_type where typname = 'bytea'");
+		row = DBfetch(result);
+		if(row)
+		{
+			ZBX_PG_BYTEAOID = atoi(row[0]);
+		}
+		DBfree_result(result);
 	}
-	DBfree_result(result);
 
 #ifdef	HAVE_FUNCTION_PQSERVERVERSION
 	sversion = PQserverVersion(conn);
