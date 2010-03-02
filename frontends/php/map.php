@@ -155,7 +155,7 @@ include_once('include/page_header.php');
 		$links = zbx_toHash($map['links'],'linkid');
 	}
 
-	$map_info = getSelementsInfo($map, $map['expandproblem']);
+	$map_info = getSelementsInfo(array('selements' => $selements), $map['expandproblem']);
 
 //SDI($links); exit;
 // Draw connectors
