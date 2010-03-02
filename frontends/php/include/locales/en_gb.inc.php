@@ -196,7 +196,7 @@
 	'S_NEW_INSTALLATION'=>			'New installation',
 	'S_NEW_INSTALLATION_BIG'=>		'NEW INSTALLATION',
 	'S_INSTALLATION_UPDATE'=>		'Installation/Update',
-	'S_ZABBIX_IS_UNAVAILABLE'=>		'Zabbix is temporary unavailable',
+	'S_ZABBIX_IS_UNAVAILABLE'=>		'Zabbix is temporarily unavailable',
 	'S_REQUIRE_MB_STRING_MODULE'=>		'Multibyte String module required to run FrontEnd',
 
 //	node.php
