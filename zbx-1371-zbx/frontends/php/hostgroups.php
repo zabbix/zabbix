@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -331,7 +331,7 @@ include_once('include/page_header.php');
 		$sortorder =  getPageSortOrder();
 		$options = array(
 			'editable' => 1,
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
@@ -344,8 +344,9 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'groupids' => zbx_objectValues($groups, 'groupid'),
-			'extendoutput' => 1,
-			'select_hosts' => 1,
+			'output' => API_OUTPUT_EXTEND,
+			'select_hosts' => API_OUTPUT_COUNT,
+//			'select_hosts' => array('hostid','host','status'),
 			'nopermissions' => 1
 		);
 
@@ -357,14 +358,18 @@ include_once('include/page_header.php');
 		foreach($groups as $num => $group){
 			$tpl_count = 0;
 			$host_count = 0;
-			$i = 0;
 			$hosts_output = array();
 
-			order_result($group['hosts'], 'host');
-			foreach($group['hosts'] as $hnum => $host){
-				$i++;
+			$options = array(
+				'groupids' => $group['groupid'],
+				'output' => array('hostid','host','status'),
+				'limit' => $config['max_in_table']+1,
+				'sortfield' => 'host'
+			);
+			$hosts = CHost::get($options);
 
-				if($i > $config['max_in_table']){
+			foreach($hosts as $hnum => $host){
+				if($hnum > $config['max_in_table']){
 					$hosts_output[] = '...';
 					$hosts_output[] = '//empty for array_pop';
 					break;
@@ -390,9 +395,8 @@ include_once('include/page_header.php');
 			}
 			array_pop($hosts_output);
 
-			foreach($group['hosts'] as $host){
-				$host['status'] == HOST_STATUS_TEMPLATE ? $tpl_count++ : $host_count++;
-			}
+			$tpl_count = 0;
+			$host_count = $group['hosts']['rowscount'];
 
 			$table->addRow(array(
 				new CCheckBox('groups['.$group['groupid'].']', NULL, NULL, $group['groupid']),

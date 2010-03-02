@@ -634,7 +634,7 @@ $_REQUEST['hostid'] = $thid;
 		$sortfield = getPageSortField('host');
 		$sortorder = getPageSortOrder();
 		$options = array(
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
@@ -663,10 +663,11 @@ $_REQUEST['hostid'] = $thid;
 			'nopermissions' => 1
 		);
 		$hosts = CHost::get($options);
+
 // sorting && paging
 		order_result($hosts, $sortfield, $sortorder);
 //---------
-
+		//$hosts = array();
 		foreach($hosts as $num => $host){
 			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$host['hostid']),
 				' ('.count($host['applications']).')');

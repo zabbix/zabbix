@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,18 +32,18 @@ include_once('include/page_header.php');
 <?php
 //		VAR						TYPE		OPTIONAL FLAGS			VALIDATION	EXCEPTION
 	$fields=array(
-		'hosts'				=> array(T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID, 		NULL),
-		'groups'			=> array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID, 		NULL),
+		'hosts'				=> array(T_ZBX_INT,	O_OPT,	P_SYS,		DB_ID, 		NULL),
+		'groups'			=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID, 		NULL),
 		'clear_templates'	=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID, 		NULL),
-		'templates'			=> array(T_ZBX_STR, O_OPT,	NULL,			NULL,		NULL),
+		'templates'			=> array(T_ZBX_STR, O_OPT,	NULL,		NULL,		NULL),
 		'templateid'		=> array(T_ZBX_INT,	O_OPT,	P_SYS,		DB_ID,		'isset({form})&&({form}=="update")'),
 		'template_name'		=> array(T_ZBX_STR,	O_OPT,	NOT_EMPTY,	NULL,		'isset({save})'),
-		'groupid'			=> array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID,		NULL),
+		'groupid'			=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,		NULL),
 		'twb_groupid'		=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,		NULL),
-		'newgroup'			=> array(T_ZBX_STR, O_OPT,	NULL,			NULL,		NULL),
+		'newgroup'			=> array(T_ZBX_STR, O_OPT,	NULL,		NULL,		NULL),
 
 		'macros_rem'		=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'macros'			=> array(T_ZBX_STR, O_OPT, P_SYS,			NULL,	NULL),
+		'macros'			=> array(T_ZBX_STR, O_OPT, P_SYS,		NULL,	NULL),
 		'macro_new'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	'isset({macro_add})'),
 		'value_new'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	'isset({macro_add})'),
 		'macro_add'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -674,7 +674,6 @@ include_once('include/page_header.php');
 		$sortfield = getPageSortField('host');
 		$sortorder = getPageSortOrder();
 		$options = array(
-			'extendoutput' => 1,
 			'editable' => 1,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
@@ -693,6 +692,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'templateids' => zbx_objectValues($templates, 'templateid'),
 			'output' => API_OUTPUT_EXTEND,
+//			'select_hosts' => array('hostid','host','status'),
 			'select_hosts' => API_OUTPUT_EXTEND,
 			'select_templates' => API_OUTPUT_EXTEND,
 			'select_items' => API_OUTPUT_REFER,
@@ -744,7 +744,7 @@ include_once('include/page_header.php');
 			$i = 0;
 			$linked_to_hosts_output = array();
 			order_result($template['hosts'], 'host');
-			foreach($template['hosts'] as $snum => $linked_to_host){
+			foreach($template['hosts'] as $snum => $linked_to_host){ 
 				$i++;
 				if($i > $config['max_in_table']){
 					$linked_to_hosts_output[] = '...';

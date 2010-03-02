@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2001-2009 SIA Zabbix
+** Copyright (C) 2001-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -241,7 +241,7 @@ function make_system_summary(){
 	$options = array(
 		'nodeids' => get_current_nodeid(),
 		'monitored_hosts' => 1,
-		'select_hosts' => API_OUTPUT_SHORTEN,
+//		'select_hosts' => API_OUTPUT_REFER,
 		'output' => API_OUTPUT_EXTEND,
 	);
 	$groups = CHostGroup::get($options);
@@ -411,6 +411,7 @@ function make_hoststat_summary(){
 		'nodeids' => get_current_nodeid(),
 		'groupids' => zbx_objectValues($groups, 'groupid'),
 		'monitored_hosts' => 1,
+//		'output' => array('hostid','host','status'),
 		'output' => API_OUTPUT_EXTEND
 	);
 	$hosts = CHost::get($options);

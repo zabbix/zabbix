@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -83,6 +83,7 @@ class CHost extends CZBXAPI{
 			'select' => array('hosts' => 'h.hostid'),
 			'from' => array('hosts h'),
 			'where' => array(),
+			'group' => array(),
 			'order' => array(),
 			'limit' => null);
 
@@ -123,7 +124,8 @@ class CHost extends CZBXAPI{
 			'select_applications'		=> null,
 			'select_macros'				=> null,
 			'select_profile'			=> null,
-			'count'						=> null,
+			'countOutput'				=> null,
+			'groupOutput'				=> null,
 			'preservekeys'				=> null,
 
 			'sortfield'					=> '',
@@ -132,7 +134,6 @@ class CHost extends CZBXAPI{
 		);
 
 		$options = zbx_array_merge($def_options, $options);
-
 
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
@@ -163,6 +164,10 @@ class CHost extends CZBXAPI{
 			}
 		}
 
+		if(is_array($options['output'])){
+			$sql_parts['select']['hosts'] = ' h.'.implode(',h.', $options['output']);
+			$options['output'] = API_OUTPUT_REFER;
+		}
 
 // editable + PERMISSION CHECK
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
@@ -333,17 +338,35 @@ class CHost extends CZBXAPI{
 						' AND i.itemid=gi.itemid)';
 		}
 
-// extendoutput
+// output
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['hosts'] = 'h.*';
 		}
 
-// count
-		if(!is_null($options['count'])){
+// countOutput
+		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
 
 			$sql_parts['select'] = array('count(DISTINCT h.hostid) as rowscount');
+
+			if(!is_null($options['groupOutput'])){
+				if(!is_null($options['groupids'])){
+					$sql_parts['select']['hg'] = 'hg.groupid';
+					$sql_parts['group']['hg'] = 'hg.groupid';
+				}
+				else if(!is_null($options['templateids'])){
+					$sql_parts['select']['ht'] = 'ht.hostid';
+					$sql_parts['group']['ht'] = 'ht.hostid';
+				}
+				else if(!is_null($options['graphids'])){
+					$sql_parts['select']['g'] = 'g.graphid';
+					$sql_parts['group']['g'] = 'g.graphid';
+				}
+			}
+
 		}
+
+// groupOutput
 
 // pattern
 		if(!zbx_empty($options['pattern'])){
@@ -395,15 +418,18 @@ class CHost extends CZBXAPI{
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
 		$sql_parts['where'] = array_unique($sql_parts['where']);
+		$sql_parts['group'] = array_unique($sql_parts['group']);
 		$sql_parts['order'] = array_unique($sql_parts['order']);
 
 		$sql_select = '';
 		$sql_from = '';
 		$sql_where = '';
+		$sql_group = '';
 		$sql_order = '';
 		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
 		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
 		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
+		if(!empty($sql_parts['group']))		$sql_where.= ' GROUP BY '.implode(',',$sql_parts['group']);
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
@@ -411,12 +437,14 @@ class CHost extends CZBXAPI{
 				FROM '.$sql_from.'
 				WHERE '.DBin_node('h.hostid', $nodeids).
 					$sql_where.
+				$sql_group.
 				$sql_order;
-// sdi($sql);
+ //sdi($sql);
 		$res = DBselect($sql, $sql_limit);
 		while($host = DBfetch($res)){
-			if($options['count'])
-				$result = $host;
+			if($options['countOutput']){
+				$result[] = $host;
+			}
 			else{
 				$hostids[$host['hostid']] = $host['hostid'];
 
@@ -508,7 +536,8 @@ class CHost extends CZBXAPI{
 			}
 		}
 
-		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
+Copt::memoryPick();
+		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['countOutput'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
@@ -662,6 +691,7 @@ class CHost extends CZBXAPI{
 			}
 		}
 
+Copt::memoryPick();
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
 			$result = zbx_cleanHashes($result);

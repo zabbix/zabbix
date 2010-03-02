@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -346,31 +346,44 @@ class CHostGroup extends CZBXAPI{
 			}
 		}
 
+COpt::memoryPick();
 		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
 // Adding hosts
-		if(!is_null($options['select_hosts']) && str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+		if(!is_null($options['select_hosts'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'output' => $options['select_hosts'],
 				'groupids' => $groupids,
 				'templated_hosts' => 1,
 				'preservekeys' => 1
 			);
-			$hosts = CHost::get($obj_params);
+			
+			if(is_array($options['select_hosts']) || str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['select_hosts'];
+				$hosts = CHost::get($obj_params);
+				foreach($hosts as $hostid => $host){
+					$hgroups = $host['groups'];
+					unset($host['groups']);
+					foreach($hgroups as $num => $group){
+						$result[$group['groupid']]['hosts'][] = $hosts[$hostid];
+					}
+				}
+			}
+			else if(API_OUTPUT_COUNT == $options['select_hosts']){
+				$obj_params['countOutput'] = 1;
+				$obj_params['groupOutput'] = 1;
 
-			foreach($hosts as $hostid => $host){
-				$hgroups = $host['groups'];
-				unset($host['groups']);
-				foreach($hgroups as $num => $group){
-					$result[$group['groupid']]['hosts'][] = $host;
+				$hosts = CHost::get($obj_params);
+				foreach($hosts as $hnum => $hostCount){
+					$result[$hostCount['groupid']]['hosts'] = $hostCount;
 				}
 			}
 		}
 
+COpt::memoryPick();
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
 			$result = zbx_cleanHashes($result);
