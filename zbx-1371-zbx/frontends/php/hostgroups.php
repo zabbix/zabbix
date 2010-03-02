@@ -367,6 +367,7 @@ include_once('include/page_header.php');
 				'sortfield' => 'host'
 			);
 			$hosts = CHost::get($options);
+			order_result($hosts, 'host');
 
 			foreach($hosts as $hnum => $host){
 				if($hnum > $config['max_in_table']){
