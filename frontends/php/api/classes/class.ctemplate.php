@@ -813,10 +813,13 @@ class CTemplate extends CZBXAPI{
 		$templates = zbx_toArray($templates);
 		$templateids = array();
 
-		$del_templates = self::get(array('templateids'=>zbx_objectValues($templates, 'templateid'),
-											'editable'=>1,
-											'extendoutput'=>1,
-											'preservekeys'=>1));
+		$options = array(
+			'templateids'=>zbx_objectValues($templates, 'templateid'),
+			'editable'=>1,
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$del_templates = self::get($options);
 		foreach($templates as $gnum => $template){
 			if(!isset($del_templates[$template['templateid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);

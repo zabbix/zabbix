@@ -964,7 +964,6 @@ class CHost extends CZBXAPI{
 			}
 	
 			$result = self::EndTransaction($result, __METHOD__);
-			
 
 			$options = array(
 				'hostids' => $hostids,
