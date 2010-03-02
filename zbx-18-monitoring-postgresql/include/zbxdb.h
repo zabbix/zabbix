@@ -42,6 +42,7 @@ typedef struct zbx_oracle_db_handle_s {
 	OCIEnv *envhp;
 	OCIError *errhp;
 	OCISvcCtx *svchp;
+	OCIServer *srvhp;
 } zbx_oracle_db_handle_t;
 
 extern zbx_oracle_db_handle_t oracle;
@@ -126,6 +127,7 @@ void	PG_DBfree_result(DB_RESULT result);
 	} ZBX_OCI_DB_RESULT;
 
 	void	OCI_DBfree_result(DB_RESULT result);
+	ub4	OCI_DBserver_status();
 	char*	zbx_oci_error(sword status);
 #endif
 

@@ -73,6 +73,11 @@ void	zbx_db_close(void)
 		(void) OCIHandleFree((dvoid *) oracle.envhp, OCI_HTYPE_ENV);
 		oracle.envhp = NULL;
 	}
+
+	if (oracle.srvhp) {
+		(void) OCIHandleFree(oracle.srvhp, OCI_HTYPE_SERVER);
+		oracle.srvhp = NULL;
+	}
 #endif /* HAVE_ORACLE */
 #ifdef	HAVE_SQLITE3
 	sqlite_transaction_started = 0;
@@ -260,9 +265,19 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 				(text *)password, (ub4)strlen(password),
 				(text *)connect, (ub4)strlen(connect),
 				OCI_DEFAULT);
+
 		if (OCI_SUCCESS != err) {
 			zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err));
-			ret = ZBX_DB_FAIL;
+			ret = ZBX_DB_DOWN;
+		}
+		else {
+			err = OCIAttrGet((void *)oracle.svchp, OCI_HTYPE_SVCCTX,
+						(void *)&oracle.srvhp, (ub4 *)0,
+						OCI_ATTR_SERVER, oracle.errhp);
+			if (OCI_SUCCESS != err) {
+				zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err));
+				ret = ZBX_DB_DOWN;
+			}
 		}
 	}
 
@@ -596,14 +611,15 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 		zabbix_errlog(ERR_Z3005, 0, "Result is NULL", sql);
 		ret = ZBX_DB_FAIL;
 	}
-	else if( PQresultStatus(result) != PGRES_COMMAND_OK)
+	if( PQresultStatus(result) != PGRES_COMMAND_OK)
 	{
 		error = zbx_dsprintf(error, "%s:%s",
 				PQresStatus(PQresultStatus(result)),
 				PQresultErrorMessage(result));
 		zabbix_errlog(ERR_Z3005, 0, error, sql);
 		zbx_free(error);
-		ret = ZBX_DB_FAIL;
+
+		ret = (CONNECTION_OK == PQstatus(conn) ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
 
 	if(ret == ZBX_DB_OK)
@@ -643,7 +659,7 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 
 	if (err != OCI_SUCCESS) {
 		zabbix_errlog(ERR_Z3005, err, zbx_oci_error(err), sql);
-		ret = ZBX_DB_FAIL;
+		ret = (OCI_SERVER_NORMAL == OCI_DBserver_status() ? ZBX_DB_FAIL : ZBX_DB_DOWN);
 	}
 
 	if (stmthp)
@@ -762,6 +778,25 @@ void	OCI_DBfree_result(DB_RESULT result)
 		(void) OCIHandleFree((dvoid *) result->stmthp, OCI_HTYPE_STMT);
 
 	zbx_free (result);
+}
+#endif
+
+#ifdef	HAVE_ORACLE
+/* server status: OCI_SERVER_NORMAL or OCI_SERVER_NOT_CONNECTED */
+ub4	OCI_DBserver_status()
+{
+	sword	err;
+	ub4	server_status = OCI_SERVER_NOT_CONNECTED; 
+
+	err = OCIAttrGet((void *)oracle.srvhp, OCI_HTYPE_SERVER, (void *)&server_status,
+			(ub4 *)0, OCI_ATTR_SERVER_STATUS, (OCIError *)oracle.errhp);
+	
+	if (OCI_SUCCESS != err)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Could not determine Oracle server status, assuming not connected");
+	}
+
+	return server_status;
 }
 #endif
 
@@ -928,12 +963,11 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 		zabbix_errlog(ERR_Z3005, 0, error, sql);
 		zbx_free(error);
 
-		DBfree_result(result);
-		result = (DB_RESULT)ZBX_DB_DOWN;
+		PG_DBfree_result(result);
+		result = (CONNECTION_OK == PQstatus(conn) ? NULL : (DB_RESULT)ZBX_DB_DOWN);
 	}
 	else	/* init rownum */
 		result->row_num = PQntuples(result->pg_result);
-
 #endif
 #ifdef	HAVE_ORACLE
 	result = zbx_malloc(NULL, sizeof(ZBX_OCI_DB_RESULT));
@@ -951,11 +985,13 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 	if (err == OCI_SUCCESS) {
 		err = OCIStmtExecute(oracle.svchp, result->stmthp, oracle.errhp, (ub4) 0, (ub4) 0,
 			(CONST OCISnapshot *) NULL, (OCISnapshot *) NULL, OCI_COMMIT_ON_SUCCESS);
+		/*
 		if (err == OCI_NO_DATA) {
 			OCI_DBfree_result (result);
 			result = NULL;
 			err = OCI_SUCCESS;
 		}
+		*/
 	}
 
 	if (err == OCI_SUCCESS) {
@@ -964,10 +1000,8 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 				  (ub4 *)0, OCI_ATTR_PARAM_COUNT, oracle.errhp);
 	}
 
-	if (err != OCI_SUCCESS) {
-		zabbix_errlog(ERR_Z3005, err, zbx_oci_error(err), sql);
-		exit(FAIL);
-	}
+	if (err != OCI_SUCCESS)
+		goto error;
 
 	assert(result->ncolumn > 0);
 
@@ -1025,11 +1059,14 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 		parmdp = NULL;
 	}
 
+error:
 	if (err != OCI_SUCCESS) {
 		zabbix_errlog(ERR_Z3005, err, zbx_oci_error(err), sql);
-		exit(FAIL);
-	}
 
+		OCI_DBfree_result(result);
+
+		result = (OCI_SERVER_NORMAL == OCI_DBserver_status() ? NULL : (DB_RESULT)ZBX_DB_DOWN);
+	}
 #endif /* HAVE_ORACLE */
 #ifdef HAVE_SQLITE3
 	if(!sqlite_transaction_started)
