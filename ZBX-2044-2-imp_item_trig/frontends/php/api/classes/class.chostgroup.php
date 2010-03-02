@@ -539,7 +539,6 @@ class CHostGroup extends CZBXAPI{
 			);
 			$group_exist = self::get($options);
 			$group_exist = reset($group_exist);
-				
 
 			if($group_exist && ($group_exist['groupid'] != $group['groupid'])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'HostGroup [ '.$group['name'].' ] already exists');

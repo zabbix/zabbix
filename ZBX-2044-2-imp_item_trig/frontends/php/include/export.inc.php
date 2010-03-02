@@ -892,14 +892,15 @@ class zbxXML{
 							$trigger_db = self::mapXML2arr($trigger, XML_TAG_TRIGGER);
 
 							$trigger_db['expression'] = str_replace('{{HOSTNAME}:', '{'.$host_db['host'].':', $trigger_db['expression']);
+							$trigger_db['hostid'] = $current_host['hostid'];
 							
 							if($current_trigger = CTrigger::exists($trigger_db)){
 								$options = array(
 									'filter' => array(
 										'expression' => $trigger_db['expression'],
-										'description' => $trigger_db['description'],
-										'hostid' => $current_host['hostid']
+										'description' => $trigger_db['description']
 									),
+									'hostids' => $current_host['hostid'],
 									'output' => API_OUTPUT_EXTEND,
 									'editable' => 1
 								);								
@@ -955,16 +956,54 @@ class zbxXML{
 						$graphs = $xpath->query('graphs/graph', $host);
 
 						$graphs_to_add = array();
-						foreach($graphs as $gnum=> $graph){
+						foreach($graphs as $gnum => $graph){
+// GRAPH ITEMS {{{
+							$gitems = $xpath->query('graph_elements/graph_element', $graph);
+
+							$graph_hostids = array();
+							$graph_items = array();
+							foreach($gitems as $ginum => $gitem){
+								$gitem_db = self::mapXML2arr($gitem, XML_TAG_GRAPH_ELEMENT);
+
+								$data = explode(':', $gitem_db['host_key_']);
+								$gitem_host = array_shift($data);
+								$gitem_db['host'] = ($gitem_host == '{HOSTNAME}') ? $host_db['host'] : $gitem_host;
+								$gitem_db['key_'] = implode(':', $data);
+								
+								if($current_item = CItem::exists($gitem_db)){
+									$options = array(
+										'filter' => array(
+											'host' => $gitem_db['host'],
+											'key_' => $gitem_db['key_']
+										),
+										'output' => API_OUTPUT_EXTEND,
+										'editable' => 1
+									);								
+									$current_item = CItem::get($options);
+									
+									if(empty($current_item)){
+										throw new APIException(1, 'No permission for Item ['.$gitem_db['key_'].']');
+									}
+									else{
+										$current_item = reset($current_item);
+									}
+									
+									$graph_hostids[] = $current_item['hostid'];
+									$gitem_db['itemid'] = $current_item['itemid'];
+									$graph_items[] = $gitem_db;
+								}
+								else{
+									throw new APIException(1, 'Item ['.$gitem_db['host_key_'].']');
+								}
+							}
+// }}} GRAPH ITEMS
 							$graph_db = self::mapXML2arr($graph, XML_TAG_GRAPH);
-							$graph_db['hostid'] = $current_host['hostid'];
+							$graph_db['hostids'] = $graph_hostids;
 
 							if($current_graph = CGraph::exists($graph_db)){
 								$options = array(
-									'filter' => array(
-										'name' => $graph_db['name'],
-										'hostid' => $graph_db['hostid']
-									),
+									'filter' => array('name' => $graph_db['name']),
+									'hostids' => $graph_db['hostids'],
 									'output' => API_OUTPUT_EXTEND,
 									'editable' => 1
 								);
@@ -1023,43 +1062,8 @@ class zbxXML{
 							if($current_graph){ // if exists, delete graph to add then new
 								CGraph::delete($current_graph);
 							}
-// GRAPH ITEMS {{{
-							$gitems = $xpath->query('graph_elements/graph_element', $graph);
-
-							foreach($gitems as $ginum => $gitem){
-								$gitem_db = self::mapXML2arr($gitem, XML_TAG_GRAPH_ELEMENT);
-
-								$data = explode(':', $gitem_db['host_key_']);
-								$gitem_host = array_shift($data);
-								$gitem_db['host'] = ($gitem_host == '{HOSTNAME}') ? $host_db['host'] : $gitem_host;
-								$gitem_db['key_'] = implode(':', $data);
-								
-								if($current_item = CItem::exists($gitem_db)){
-									$options = array(
-										'filter' => array(
-											'host' => $gitem_db['host'],
-											'key_' => $gitem_db['key_']
-										),
-										'output' => API_OUTPUT_EXTEND,
-										'editable' => 1
-									);								
-									$current_item = CItem::get($options);
-									
-									if(empty($current_item)){
-										throw new APIException(1, 'No permission for Item ['.$gitem_db['key_'].']');
-									}
-									else{
-										$current_item = reset($current_item);
-									}
-									
-									$gitem_db['itemid'] = $current_item['itemid'];
-									$graph_db['gitems'][] = $gitem_db;
-								}
-								else{
-									throw new APIException(1, 'Item ['.$gitem_db['host_key_'].']');
-								}
-							}
-// }}} GRAPH ITEMS
+							
+							$graph_db['gitems'] = $graph_items;
 							$graphs_to_add[] = $graph_db;
 						}
 						$r = CGraph::create($graphs_to_add);

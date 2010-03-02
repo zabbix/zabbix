@@ -77,6 +77,7 @@ class CApplication extends CZBXAPI{
 			'applicationids'		=> null,
 			'templated'				=> null,
 			'editable'				=> null,
+			'inherited' 			=> null,
 			'nopermissions'			=> null,
 // Filter
 			'filter'				=> null,
@@ -197,6 +198,16 @@ class CApplication extends CZBXAPI{
 				$sql_parts['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
 			else
 				$sql_parts['where'][] = 'h.status<>'.HOST_STATUS_TEMPLATE;
+		}
+		
+// inherited
+		if(!is_null($options['inherited'])){
+			if($options['inherited']){
+				$sql_parts['where'][] = 'a.templateid<>0';
+			}
+			else{
+				$sql_parts['where'][] = 'a.templateid=0';
+			}
 		}
 
 // extendoutput

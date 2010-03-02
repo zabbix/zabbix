@@ -699,11 +699,15 @@ class CTrigger extends CZBXAPI{
 
 		$result = false;
 		
+		if(!isset($object['hostid']) && !isset($object['host'])){
+			preg_match('/^{(.+?):/u', $object['expression'], $host);
+			$object['host'] = $host[1];
+		}
+
 		$options = array(
 			'filter' => zbx_array_mintersect($keyFields, $object),
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => 1,
-			'limit' => 1
 		);
 		if(isset($object['node']))
 			$options['nodeids'] = getNodeIdByNodeName($object['node']);
@@ -711,10 +715,9 @@ class CTrigger extends CZBXAPI{
 			$options['nodeids'] = $object['nodeids'];
 
 		$triggers = self::get($options);
-		
 		foreach($triggers as $tnum => $trigger){
 			$tmp_exp = explode_exp($trigger['expression'], false);
-			if(strcmp($tmp_exp, $object['expression']) == 0) {
+			if(strcmp($tmp_exp, $object['expression']) == 0){
 				$result = true;
 				break;
 			}
@@ -818,6 +821,7 @@ class CTrigger extends CZBXAPI{
  * @param array $triggers[0,...]['priority'] OPTIONAL
  * @param array $triggers[0,...]['status'] OPTIONAL
  * @param array $triggers[0,...]['comments'] OPTIONAL
+ * @param array $triggers[0,...]['dependencies'] OPTIONAL
  * @param array $triggers[0,...]['url'] OPTIONAL
  * @param array $triggers[0,...]['templateid'] OPTIONAL
  * @return boolean
@@ -825,52 +829,60 @@ class CTrigger extends CZBXAPI{
 	public static function update($triggers){
 		$triggers = zbx_toArray($triggers);
 		$triggerids = array();
-
-		$upd_triggers = self::get(array('triggerids'=>zbx_objectValues($triggers, 'triggerid'),
-											'editable'=>1,
-											'extendoutput'=>1,
-											'preservekeys'=>1));
-		foreach($triggers as $gnum => $trigger){
-			if(!isset($upd_triggers[$trigger['triggerid']])){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				return false;
-			}
-			$triggerids[] = $trigger['triggerid'];
-		}
-
-		$result = true;
-
-		self::BeginTransaction(__METHOD__);
-		foreach($triggers as $tnum => $trigger){
-			$trigger_db_fields = $upd_triggers[$trigger['triggerid']];
-
-			if(!check_db_fields($trigger_db_fields, $trigger)){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Incorrect arguments pasted to function [CTrigger::update]');
-				$result = false;
-				break;
+		
+		try{
+			self::BeginTransaction(__METHOD__);
+			
+			$upd_triggers = self::get(array(
+				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
+				'editable' => 1,
+				'extendoutput' => 1,
+				'preservekeys' => 1
+			));
+			foreach($triggers as $gnum => $trigger){
+				if(!isset($upd_triggers[$trigger['triggerid']])){
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+				}
+				$triggerids[] = $trigger['triggerid'];
 			}
 
-			//$trigger['expression'] = explode_exp($trigger['expression'], false);
-			$result = update_trigger($trigger['triggerid'],
-									$trigger['expression'],
-									$trigger['description'],
-									$trigger['type'],
-									$trigger['priority'],
-									$trigger['status'],
-									$trigger['comments'],
-									$trigger['url'],
-									array(),
-									$trigger['templateid']);
-			if(!$result) break;
-		}
-		$result = self::EndTransaction($result, __METHOD__);
-
-		if($result){
-			$upd_triggers = self::get(array('triggerids'=>$triggerids, 'extendoutput'=>1, 'nopermissions'=>1));
+			
+			foreach($triggers as $tnum => $trigger){
+			
+				$trigger_db_fields = $upd_triggers[$trigger['triggerid']];
+				if(!check_db_fields($trigger_db_fields, $trigger)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for trigger');
+				}
+				
+				update_trigger(
+					$trigger['triggerid'],
+					$trigger['expression'],
+					$trigger['description'],
+					$trigger['type'],
+					$trigger['priority'],
+					$trigger['status'],
+					$trigger['comments'],
+					$trigger['url'],
+					array(),
+					$trigger['templateid']
+				) or self::exception();
+			}
+			
+			
+			self::EndTransaction(true, __METHOD__);
+			
+			$upd_triggers = self::get(array(
+				'triggerids' => $triggerids, 
+				'extendoutput' => 1, 
+				'nopermissions' => 1
+			));
 			return $upd_triggers;
 		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, $error);
 			return false;
 		}
 	}

@@ -526,8 +526,10 @@
 							' WHERE h.hostid=i.hostid '.
 								' AND '.DBcondition('i.itemid',$itemid));
 
+		$graph_hostids = array();
 		while($db_item_host = DBfetch($db_item_hosts)){
 			$host_list[] = '"'.$db_item_host['host'].'"';
+			$graph_hostids[] = $db_item_host['hostid'];
 
 			if(HOST_STATUS_TEMPLATE ==  $db_item_host['status'])
 				$new_host_is_template = true;
@@ -535,6 +537,16 @@
 
 		if(isset($new_host_is_template) && count($host_list)>1){
 			error(S_GRAPH.SPACE.'"'.$name.'"'.SPACE.S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL);
+			return $result;
+		}
+		
+		$filter = array(
+			'name' => $name,
+			'hostids' => $graph_hostids
+		);
+		if(CGraph::exists($filter)){
+			$result = false;
+			error('Graph already exists [ '.$name.' ]');
 			return $result;
 		}
 
