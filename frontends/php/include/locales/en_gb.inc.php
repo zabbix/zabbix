@@ -1535,7 +1535,7 @@
 	'S_DISABLE_SELECTED_TRIGGERS_Q'=>	'Disable selected triggers?',
 	'S_MASS_UPDATE_SELECTED_TRIGGERS_Q'=>	'Mass update selected triggers?',
 	'S_COPY_SELECTED_TRIGGERS_Q'=>		'Copy selected triggers?',
-	'S_DELETE_SELECTED_TRIGGERS_Q'=>	'Delete selected triggerers?',
+	'S_DELETE_SELECTED_TRIGGERS_Q'=>	'Delete selected triggers?',
 
 //	tr_comments.php
 	'S_TRIGGER_COMMENTS'=>			'Trigger comments',
