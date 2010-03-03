@@ -80,10 +80,10 @@ void	zbx_db_close(void)
 	}
 #endif /* HAVE_ORACLE */
 #ifdef	HAVE_SQLITE3
-	sqlite_transaction_started = 0;
+/*	sqlite_transaction_started = 0; */ /* see comment near sqlite_transaction_started in zbx_db_connect() */
 	sqlite3_close(conn);
 	conn = NULL;
-/*	php_sem_remove(&sqlite_access);*/
+/*	php_sem_remove(&sqlite_access); */
 #endif
 }
 #if HAVE_ORACLE
@@ -290,30 +290,42 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	}
 #endif
 #ifdef	HAVE_SQLITE3
-	char	*p, *path;
-
 	/* check to see that the backend connection was successfully made */
-	if (SQLITE_OK != (ret = sqlite3_open(dbname, &conn))) {
+	if (SQLITE_OK != (ret = sqlite3_open_v2(dbname, &conn, SQLITE_OPEN_READWRITE, NULL)))
+	{
 		zabbix_errlog(ERR_Z3001, dbname, 0, sqlite3_errmsg(conn));
-		exit(FAIL);
+		sqlite3_close(conn);
+		ret = ZBX_DB_DOWN;
 	}
-
-	/* Do not return SQLITE_BUSY immediately, wait for N ms */
-	sqlite3_busy_timeout(conn, 60*1000);
-
-	sqlite_transaction_started = 0;
-
-	path = strdup(dbname);
-	if (NULL != (p = strrchr(path, '/')))
-		*++p = '\0';
 	else
-		*path = '\0';
+	{
+		char	*p, *path;
 
-	DBexecute("PRAGMA synchronous = 0"); /* OFF */
-	DBexecute("PRAGMA temp_store = 2"); /* MEMORY */
-	DBexecute("PRAGMA temp_store_directory = '%s'", path);
+		/* Do not return SQLITE_BUSY immediately, wait for N ms */
+		sqlite3_busy_timeout(conn, 60*1000);
 
-	zbx_free(path);
+		/* Variable sqlite_transaction_started must not be reset to 0 in zbx_db_connect() and zbx_db_close().
+		 *
+		 * Consider the following scenario. We begin a transaction (sqlite_transaction_started becomes non-zero),
+		 * acquire a semaphore in zbx_db_vexecute() or zbx_db_vselect(), database comes down (e.g., we run out of
+		 * disk space), in which case we zbx_db_close() and zbx_db_connect() again. If we were to reset variable
+		 * sqlite_transaction_started to 0, in zbx_db_vexecute() or zbx_db_vselect() we would try to acquire the
+		 * semaphore again (which we never released), and we would hang there forever.
+		 */
+		/* sqlite_transaction_started = 0; */
+
+		path = strdup(dbname);
+		if (NULL != (p = strrchr(path, '/')))
+			*++p = '\0';
+		else
+			*path = '\0';
+
+		DBexecute("PRAGMA synchronous = 0"); /* OFF */
+		DBexecute("PRAGMA temp_store = 2"); /* MEMORY */
+		DBexecute("PRAGMA temp_store_directory = '%s'", path);
+
+		zbx_free(path);
+	}
 #endif
 	txn_init = 0;
 
@@ -411,7 +423,7 @@ void	zbx_db_begin(void)
 		if(PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
 		{
 			zabbix_log( LOG_LEVEL_CRIT, "ERROR: Unable to create lock on SQLite database.");
-			exit(-1);
+			exit(FAIL);
 		}
 
 		zbx_db_execute("%s","begin;");
@@ -540,6 +552,7 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 	char		*error = NULL;
 #endif
 #ifdef	HAVE_SQLITE3
+	int err;
 	char *error=0;
 #endif
 #ifdef HAVE_MYSQL
@@ -673,22 +686,35 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 #ifdef	HAVE_SQLITE3
 	if (!sqlite_transaction_started)
 	{
-		if(PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
+		if (PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
 		{
-			zabbix_log( LOG_LEVEL_CRIT, "ERROR: Unable to create lock on SQLite database.");
-			exit(-1);
+			zabbix_log(LOG_LEVEL_CRIT, "ERROR: Unable to create lock on SQLite database.");
+			exit(FAIL);
 		}
 	}
 
 lbl_exec:
-	if (SQLITE_OK != (ret = sqlite3_exec(conn, sql, NULL, 0, &error)))
+	if (SQLITE_OK != (err = sqlite3_exec(conn, sql, NULL, 0, &error)))
 	{
-		if (ret == SQLITE_BUSY)
-			goto lbl_exec; /* attention deadlock!!! */
+		if (err == SQLITE_BUSY) goto lbl_exec; /* attention deadlock!!! */
 
 		zabbix_errlog(ERR_Z3005, 0, error, sql);
 		sqlite3_free(error);
-		ret = ZBX_DB_FAIL;
+
+		switch (err)
+		{
+			case SQLITE_ERROR:	/* SQL error or missing database; assuming SQL error, because if we
+						   are this far into execution, zbx_db_connect() was successful */
+			case SQLITE_NOMEM:	/* A malloc() failed */
+			case SQLITE_TOOBIG:	/* String or BLOB exceeds size limit */
+			case SQLITE_CONSTRAINT:	/* Abort due to constraint violation */
+			case SQLITE_MISMATCH:	/* Data type mismatch */
+				ret = ZBX_DB_FAIL;
+				break;
+			default:
+				ret = ZBX_DB_DOWN;
+				break;
+		}
 	}
 
 	if (ret == ZBX_DB_OK)
@@ -890,7 +916,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 {
 	char	*sql = NULL;
-	DB_RESULT result;
+	DB_RESULT result = NULL;
 	double	sec = 0;
 
 #ifdef	HAVE_ORACLE
@@ -899,7 +925,7 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 #endif /* HAVE_ORACLE */
 #ifdef	HAVE_SQLITE3
 	int ret = FAIL;
-	char *error=NULL;
+	char *error = NULL;
 #endif
 #ifdef	HAVE_POSTGRESQL
 	char	*error = NULL;
@@ -1071,12 +1097,12 @@ error:
 	}
 #endif /* HAVE_ORACLE */
 #ifdef HAVE_SQLITE3
-	if(!sqlite_transaction_started)
+	if (!sqlite_transaction_started)
 	{
-		if(PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
+		if (PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
 		{
-			zabbix_log( LOG_LEVEL_CRIT, "ERROR: Unable to create lock on SQLite database.");
-			exit(-1);
+			zabbix_log(LOG_LEVEL_CRIT, "ERROR: Unable to create lock on SQLite database.");
+			exit(FAIL);
 		}
 	}
 
@@ -1084,20 +1110,30 @@ error:
 	result->curow = 0;
 
 lbl_get_table:
-	if(SQLITE_OK != (ret = sqlite3_get_table(conn,sql,&result->data,&result->nrow, &result->ncolumn, &error)))
+	if (SQLITE_OK != (ret = sqlite3_get_table(conn,sql, &result->data, &result->nrow, &result->ncolumn, &error)))
 	{
-		if(ret == SQLITE_BUSY) goto lbl_get_table; /* attention deadlock!!! */
+		if (ret == SQLITE_BUSY) goto lbl_get_table; /* attention deadlock!!! */
 
 		zabbix_errlog(ERR_Z3005, 0, error, sql);
 		sqlite3_free(error);
-		if(!sqlite_transaction_started)
+
+		SQ_DBfree_result(result);
+
+		switch (ret)
 		{
-			php_sem_release(&sqlite_access);
+			case SQLITE_ERROR:	/* SQL error or missing database; assuming SQL error, because if we
+						   are this far into execution, zbx_db_connect() was successful */
+			case SQLITE_NOMEM:	/* A malloc() failed */
+			case SQLITE_MISMATCH:	/* Data type mismatch */
+				result = NULL;
+				break;
+			default:
+				result = (DB_RESULT)ZBX_DB_DOWN;
+				break;
 		}
-		exit(FAIL);
 	}
 
-	if(!sqlite_transaction_started)
+	if (!sqlite_transaction_started)
 	{
 		php_sem_release(&sqlite_access);
 	}
