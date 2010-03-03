@@ -700,7 +700,7 @@ class CTrigger extends CZBXAPI{
 		$result = false;
 		
 		if(!isset($object['hostid']) && !isset($object['host'])){
-			preg_match('/^{(.+?):/u', $object['expression'], $host);
+			preg_match('/^.*?{(.+?):/u', $object['expression'], $host);
 			$object['host'] = $host[1];
 		}
 
