@@ -560,7 +560,6 @@ class CGraph extends CZBXAPI{
 					'output' => API_OUTPUT_EXTEND,
 					'editable' => 1,
 					'templated_hosts' => 1,
-					'preservekeys' => 1
 				));
 			
 // check - already exists
@@ -863,7 +862,6 @@ class CGraph extends CZBXAPI{
 					'output' => API_OUTPUT_EXTEND,
 					'editable' => 1,
 					'templated_hosts' => 1,
-					'preservekeys' =>1
 				));
 			
 				$graph_exists = self::get(array(
