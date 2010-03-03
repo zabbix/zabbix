@@ -404,12 +404,19 @@ include_once('include/page_header.php');
 
 		if(($templateid > 0) && !isset($_REQUEST['form_refresh'])){
 // get template groups from db
-			$options = array('hostids' => $templateid, 'editable' => 1);
+			$options = array(
+				'hostids' => $templateid,
+				'editable' => 1
+			);
 			$groups = CHostGroup::get($options);
 			$groups = zbx_objectValues($groups, 'groupid');
 
 // get template hosts from db
-			$params = array('templateids' => $templateid, 'editable' => 1, 'templated_hosts' => 1);
+			$params = array(
+				'templateids' => $templateid,
+				'editable' => 1,
+				'templated_hosts' => 1
+			);
 			$hosts_linked_to = CHost::get($params);
 			$hosts_linked_to = zbx_objectValues($hosts_linked_to, 'hostid');
 			$hosts_linked_to = zbx_toHash($hosts_linked_to, 'hostid');
@@ -636,7 +643,11 @@ include_once('include/page_header.php');
 		$frmForm->setMethod('get');
 
 // combo for group selection
-		$groups = CHostGroup::get(array('editable' => 1, 'extendoutput' => 1));
+		$options = array(
+			'editable' => 1,
+			'extendoutput' => 1
+		);
+		$groups = CHostGroup::get($options);
 		order_result($groups, 'name');
 
 		$cmbGroups = new CComboBox('groupid', $PAGE_GROUPS['selected'], 'javascript: submit();');

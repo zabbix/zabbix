@@ -61,6 +61,7 @@ class CHostGroup extends CZBXAPI{
 			'nodeids'					=> null,
 			'groupids'					=> null,
 			'hostids'					=> null,
+			'templateids'				=> null,
 			'monitored_hosts'			=> null,
 			'templated_hosts' 			=> null,
 			'real_hosts' 				=> null,

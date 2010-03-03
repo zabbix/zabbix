@@ -45,7 +45,7 @@ function make_favorite_graphs(){
 
 	$options = array(
 			'graphids' => $graphids,
-			'select_hosts' => 1,
+			'select_hosts' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND,
 		);
 	$graphs = CGraph::get($options);
