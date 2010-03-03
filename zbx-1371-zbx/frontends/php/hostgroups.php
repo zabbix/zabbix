@@ -386,6 +386,11 @@ include_once('include/page_header.php');
 				$hosts_output[] = new CLink($template['host'], $url, 'unknown');
 				$hosts_output[] = ', ';
 			}
+			if(!empty($hosts_output)){
+				array_pop($hosts_output);
+				$hosts_output[] = BR();
+				$hosts_output[] = BR();
+			}
 
 			foreach($group['hosts'] as $hnum => $host){
 				$i++;
@@ -418,9 +423,9 @@ include_once('include/page_header.php');
 				new CCheckBox('groups['.$group['groupid'].']', NULL, NULL, $group['groupid']),
 				new CLink($group['name'], 'hostgroups.php?form=update&groupid='.$group['groupid']),
 				array(
-					array(new CLink(S_HOSTS, 'hosts.php?groupid='.$group['groupid']),' ('.$hostCount.')'),
-					BR(),
 					array(new CLink(S_TEMPLATES, 'templates.php?groupid='.$group['groupid'], 'unknown'), ' ('.$templateCount.')'),
+					BR(),
+					array(new CLink(S_HOSTS, 'hosts.php?groupid='.$group['groupid']),' ('.$hostCount.')'),
 				),
 				new CCol((empty($hosts_output) ? '-' : $hosts_output), 'wraptext')
 			));
