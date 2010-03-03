@@ -3192,17 +3192,21 @@ return $result;
 	}
 
 	function convert($value){
-		$val = trim($value);
-		if(!preg_match(ZBX_PREG_NUMBER, $val)) return $value;
+		$value = trim($value);
+		if(!preg_match('/(?P<value>[\-+]?[0-9]+[\.]?[0-9]*)(?P<mult>[TGMKsmhdw]?)/', $value, $arr)) return $value;
 
-		$last = zbx_strtolower($val{zbx_strlen($val)-1});
-		switch($last){
-			case 't': $val *= 1024 * 1024 * 1024 * 1024;
-			case 'g': $val *= 1024 * 1024 * 1024;
-			case 'm': $val *= 1024 * 1024;
-			case 'k': $val *= 1024;
+		$value = $arr['value'];
+		switch($arr['mult']){
+			case 'T': $value *= 1024 * 1024 * 1024 * 1024; break;
+			case 'G': $value *= 1024 * 1024 * 1024; break;
+			case 'M': $value *= 1024 * 1024; break;
+			case 'K': $value *= 1024; break;
+			case 'm': $value *= 60; break;
+			case 'h': $value *= 60 * 60; break;
+			case 'd': $value *= 60 * 60 * 24; break;
+			case 'w': $value *= 60 * 60 * 24 * 7; break;
 		}
 
-	return $val;
+		return $value;
 	}
 ?>
