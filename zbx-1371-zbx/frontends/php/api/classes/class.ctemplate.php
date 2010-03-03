@@ -55,6 +55,7 @@ class CTemplate extends CZBXAPI{
 			'select' => array('templates' => 'h.hostid'),
 			'from' => array('hosts h'),
 			'where' => array('h.status='.HOST_STATUS_TEMPLATE),
+			'group' => array(),
 			'order' => array(),
 			'limit' => null);
 
@@ -84,12 +85,14 @@ class CTemplate extends CZBXAPI{
 			'select_graphs'				=> null,
 			'select_applications'		=> null,
 			'select_macros'				=> null,
-			'count'						=> null,
+			'countOutput'				=> null,
+			'groupCount'				=> null,
 			'preservekeys'				=> null,
 
 			'sortfield'					=> '',
 			'sortorder'					=> '',
-			'limit'						=> null
+			'limit'						=> null,
+			'limitSelects'				=> null,
 		);
 
 		$options = zbx_array_merge($def_options, $options);
@@ -124,7 +127,10 @@ class CTemplate extends CZBXAPI{
 			}
 		}
 
-
+		if(is_array($options['output'])){
+			$sql_parts['select']['hosts'] = ' h.'.implode(',h.', $options['output']);
+			$options['output'] = API_OUTPUT_REFER;
+		}
 // editable + PERMISSION CHECK
 
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
@@ -164,6 +170,10 @@ class CTemplate extends CZBXAPI{
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sql_parts['where']['hgh'] = 'hg.hostid=h.hostid';
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['hg'] = 'hg.groupid';
+			}
 		}
 
 // templateids
@@ -184,6 +194,10 @@ class CTemplate extends CZBXAPI{
 			$sql_parts['from']['ht'] = 'hosts_templates ht';
 			$sql_parts['where'][] = DBcondition('ht.hostid', $options['hostids']);
 			$sql_parts['where']['hht'] = 'h.hostid=ht.templateid';
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['ht'] = 'ht.hostid';
+			}
 		}
 
 // itemids
@@ -221,21 +235,21 @@ class CTemplate extends CZBXAPI{
 
 // with_triggers
 		if(!is_null($options['with_triggers'])){
-			$sql_parts['where'][] = 'EXISTS(
-					SELECT i.itemid
-					FROM items i, functions f, triggers t
-					WHERE i.hostid=h.hostid
-						AND i.itemid=f.itemid
-						AND f.triggerid=t.triggerid)';
+			$sql_parts['where'][] = 'EXISTS( '.
+						' SELECT i.itemid '.
+						' FROM items i, functions f, triggers t '.
+						' WHERE i.hostid=h.hostid '.
+							' AND i.itemid=f.itemid '.
+							' AND f.triggerid=t.triggerid)';
 		}
 
 // with_graphs
 		if(!is_null($options['with_graphs'])){
-			$sql_parts['where'][] = 'EXISTS(
-					SELECT DISTINCT i.itemid
-					FROM items i, graphs_items gi
-					WHERE i.hostid=h.hostid
-						AND i.itemid=gi.itemid)';
+			$sql_parts['where'][] = 'EXISTS('.
+					'SELECT DISTINCT i.itemid '.
+					' FROM items i, graphs_items gi '.
+					' WHERE i.hostid=h.hostid '.
+						' AND i.itemid=gi.itemid)';
 		}
 
 // extendoutput
@@ -243,11 +257,17 @@ class CTemplate extends CZBXAPI{
 			$sql_parts['select']['templates'] = 'h.*';
 		}
 
-// count
-		if(!is_null($options['count'])){
+// countOutput
+		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
+			$sql_parts['select'] = array('count(DISTINCT h.hostid) as rowscount');
 
-			$sql_parts['select'] = array('count(h.hostid) as rowscount');
+//groupCount
+			if(!is_null($options['groupCount'])){
+				foreach($sql_parts['group'] as $key => $fields){
+					$sql_parts['select'][$key] = $fields;
+				}
+			}
 		}
 
 // pattern
@@ -291,27 +311,35 @@ class CTemplate extends CZBXAPI{
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
 		$sql_parts['where'] = array_unique($sql_parts['where']);
+		$sql_parts['group'] = array_unique($sql_parts['group']);
 		$sql_parts['order'] = array_unique($sql_parts['order']);
 
 		$sql_select = '';
 		$sql_from = '';
 		$sql_where = '';
+		$sql_group = '';
 		$sql_order = '';
-		if(!empty($sql_parts['select']))	$sql_select.= implode(',', $sql_parts['select']);
-		if(!empty($sql_parts['from']))		$sql_from.= implode(',', $sql_parts['from']);
-		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ', $sql_parts['where']);
-		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',', $sql_parts['order']);
+		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
+		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
+		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
+		if(!empty($sql_parts['group']))		$sql_where.= ' GROUP BY '.implode(',',$sql_parts['group']);
+		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.'
-				FROM '.$sql_from.'
-				WHERE '.DBin_node('h.hostid', $nodeids).
+		$sql = 'SELECT DISTINCT '.$sql_select.
+				' FROM '.$sql_from.
+				' WHERE '.DBin_node('h.hostid', $nodeids).
 					$sql_where.
+				$sql_group.
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
 		while($template = DBfetch($res)){
-			if($options['count'])
-				$result = $template;
+			if(!is_null($options['countOutput'])){
+				if(!is_null($options['groupCount']))
+					$result[] = $template;
+				else
+					$result = $template['rowscount'];
+			}
 			else{
 				$template['templateid'] = $template['hostid'];
 				$templateids[$template['templateid']] = $template['templateid'];
@@ -395,7 +423,7 @@ class CTemplate extends CZBXAPI{
 
 
 COpt::memoryPick();
-		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
+		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['countOutput'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}

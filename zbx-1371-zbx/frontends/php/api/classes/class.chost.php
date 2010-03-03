@@ -125,12 +125,13 @@ class CHost extends CZBXAPI{
 			'select_macros'				=> null,
 			'select_profile'			=> null,
 			'countOutput'				=> null,
-			'groupOutput'				=> null,
+			'groupCount'				=> null,
 			'preservekeys'				=> null,
 
 			'sortfield'					=> '',
 			'sortorder'					=> '',
-			'limit'						=> null
+			'limit'						=> null,
+			'limitSelects'				=> null
 		);
 
 		$options = zbx_array_merge($def_options, $options);
@@ -206,6 +207,10 @@ class CHost extends CZBXAPI{
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sql_parts['where']['hgh'] = 'hg.hostid=h.hostid';
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['hg'] = 'hg.groupid';
+			}
 		}
 
 // hostids
@@ -224,6 +229,10 @@ class CHost extends CZBXAPI{
 			$sql_parts['from']['ht'] = 'hosts_templates ht';
 			$sql_parts['where'][] = DBcondition('ht.templateid', $options['templateids']);
 			$sql_parts['where']['hht'] = 'h.hostid=ht.hostid';
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['ht'] = 'ht.templateid';
+			}
 		}
 
 // itemids
@@ -346,27 +355,15 @@ class CHost extends CZBXAPI{
 // countOutput
 		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
-
 			$sql_parts['select'] = array('count(DISTINCT h.hostid) as rowscount');
 
-			if(!is_null($options['groupOutput'])){
-				if(!is_null($options['groupids'])){
-					$sql_parts['select']['hg'] = 'hg.groupid';
-					$sql_parts['group']['hg'] = 'hg.groupid';
-				}
-				else if(!is_null($options['templateids'])){
-					$sql_parts['select']['ht'] = 'ht.hostid';
-					$sql_parts['group']['ht'] = 'ht.hostid';
-				}
-				else if(!is_null($options['graphids'])){
-					$sql_parts['select']['g'] = 'g.graphid';
-					$sql_parts['group']['g'] = 'g.graphid';
+//groupCount
+			if(!is_null($options['groupCount'])){
+				foreach($sql_parts['group'] as $key => $fields){
+					$sql_parts['select'][$key] = $fields;
 				}
 			}
-
 		}
-
-// groupOutput
 
 // pattern
 		if(!zbx_empty($options['pattern'])){
@@ -433,17 +430,20 @@ class CHost extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT DISTINCT '.$sql_select.'
-				FROM '.$sql_from.'
-				WHERE '.DBin_node('h.hostid', $nodeids).
+		$sql = 'SELECT DISTINCT '.$sql_select.
+				' FROM '.$sql_from.
+				' WHERE '.DBin_node('h.hostid', $nodeids).
 					$sql_where.
 				$sql_group.
 				$sql_order;
  //sdi($sql);
 		$res = DBselect($sql, $sql_limit);
 		while($host = DBfetch($res)){
-			if($options['countOutput']){
-				$result[] = $host;
+			if(!is_null($options['countOutput'])){
+				if(!is_null($options['groupCount']))
+					$result[] = $host;
+				else
+					$result = $host['rowscount'];
 			}
 			else{
 				$hostids[$host['hostid']] = $host['hostid'];
@@ -537,7 +537,7 @@ class CHost extends CZBXAPI{
 		}
 
 Copt::memoryPick();
-		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['countOutput'])){
+		if(!is_null($options['countOutput'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
@@ -556,24 +556,24 @@ Copt::memoryPick();
 				$ghosts = $group['hosts'];
 				unset($group['hosts']);
 				foreach($ghosts as $num => $host){
-					$result[$host['hostid']]['groups'][] = $group;
+					$result[$host['hostid']]['groups'][] = $groups[$num];
 				}
 			}
 		}
 
 // Adding Profiles
 		if(!is_null($options['select_profile']) && str_in_array($options['select_profile'], $subselects_allowed_outputs)){
-			$sql = 'SELECT hp.*
-				FROM hosts_profiles hp
-				WHERE '.DBcondition('hp.hostid', $hostids);
+			$sql = 'SELECT hp.* '.
+				' FROM hosts_profiles hp '.
+				' WHERE '.DBcondition('hp.hostid', $hostids);
 			$db_profile = DBselect($sql);
 			while($profile = DBfetch($db_profile))
 				$result[$profile['hostid']]['profile'] = $profile;
 
 
-			$sql = 'SELECT hpe.*
-				FROM hosts_profiles_ext hpe
-				WHERE '.DBcondition('hpe.hostid', $hostids);
+			$sql = 'SELECT hpe.* '.
+				' FROM hosts_profiles_ext hpe '.
+				' WHERE '.DBcondition('hpe.hostid', $hostids);
 			$db_profile_ext = DBselect($sql);
 			while($profile_ext = DBfetch($db_profile_ext))
 				$result[$profile_ext['hostid']]['profile_ext'] = $profile_ext;
