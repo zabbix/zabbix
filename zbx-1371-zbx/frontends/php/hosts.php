@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -655,11 +655,11 @@ $_REQUEST['hostid'] = $thid;
 		$options = array(
 			'hostids' => zbx_objectValues($hosts, 'hostid'),
 			'output' => API_OUTPUT_EXTEND,
-			'select_templates' => API_OUTPUT_EXTEND,
-			'select_items' => API_OUTPUT_REFER,
-			'select_triggers' => API_OUTPUT_REFER,
-			'select_graphs' => API_OUTPUT_REFER,
-			'select_applications' => API_OUTPUT_REFER,
+			'select_templates' => array('hostid','host'),
+			'select_items' => API_OUTPUT_COUNT,
+			'select_triggers' => API_OUTPUT_COUNT,
+			'select_graphs' => API_OUTPUT_COUNT,
+			'select_applications' => API_OUTPUT_COUNT,
 			'nopermissions' => 1
 		);
 		$hosts = CHost::get($options);
@@ -670,13 +670,13 @@ $_REQUEST['hostid'] = $thid;
 		//$hosts = array();
 		foreach($hosts as $num => $host){
 			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$host['hostid']),
-				' ('.count($host['applications']).')');
+				' ('.$host['applications'].')');
 			$items = array(new CLink(S_ITEMS, 'items.php?filter_set=1&hostid='.$host['hostid']),
-				' ('.count($host['items']).')');
+				' ('.$host['items'].')');
 			$triggers = array(new CLink(S_TRIGGERS, 'triggers.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$host['hostid']),
-				' ('.count($host['triggers']).')');
+				' ('.$host['triggers'].')');
 			$graphs = array(new CLink(S_GRAPHS, 'graphs.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$host['hostid']),
-				' ('.count($host['graphs']).')');
+				' ('.$host['graphs'].')');
 
 			$description = array();
 			if($host['proxy_hostid']){

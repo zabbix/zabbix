@@ -54,10 +54,10 @@ include_once "include/page_header.php";
 	if(!isset($_REQUEST['triggerid'])) fatal_error(S_NO_TRIGGER_DEFINED);
 
 	$options = array(
+		'nodeids' => get_current_nodeid(true),
 		'triggerids' => $_REQUEST['triggerid'],
 		'output' => API_OUTPUT_EXTEND,
-		'select_hosts' => API_OUTPUT_EXTEND,
-		'nodeids' => get_current_nodeid(true)
+		'select_hosts' => API_OUTPUT_EXTEND
 	);
 
 	$db_data = CTrigger::get($options);

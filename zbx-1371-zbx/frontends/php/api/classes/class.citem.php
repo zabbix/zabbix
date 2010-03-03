@@ -66,6 +66,7 @@ class CItem extends CZBXAPI{
 			'select' => array('items' => 'i.itemid'),
 			'from' => array('items i'),
 			'where' => array('webtype' => 'i.type<>9'),
+			'group' => array(),
 			'order' => array(),
 			'limit' => null);
 
@@ -101,7 +102,8 @@ class CItem extends CZBXAPI{
 			'select_triggers'		=> null,
 			'select_graphs'			=> null,
 			'select_applications'	=> null,
-			'count'					=> null,
+			'countOutput'			=> null,
+			'groupCount'			=> null,
 			'preservekeys'			=> null,
 
 			'sortfield'				=> '',
@@ -170,6 +172,10 @@ class CItem extends CZBXAPI{
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sql_parts['where'][] = 'hg.hostid=i.hostid';
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['hg'] = 'hg.groupid';
+			}
 		}
 
 // hostids
@@ -181,6 +187,10 @@ class CItem extends CZBXAPI{
 			}
 
 			$sql_parts['where'][] = DBcondition('i.hostid', $options['hostids']);
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['i'] = 'i.hostid';
+			}
 		}
 
 // itemids
@@ -362,13 +372,19 @@ class CItem extends CZBXAPI{
 				$sql_parts['where'][] = 'NOT EXISTS ( SELECT functionid FROM functions ff WHERE ff.itemid=i.itemid )';
 		}
 
-// count
-		if(!is_null($options['count'])){
+// countOutput
+		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
-
 			$sql_parts['select'] = array('count(DISTINCT i.itemid) as rowscount');
-		}
 
+//groupCount
+			if(!is_null($options['groupCount'])){
+				foreach($sql_parts['group'] as $key => $fields){
+					$sql_parts['select'][$key] = $fields;
+				}
+			}
+		}
+		
 // order
 // restrict not allowed columns for sorting
 		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
@@ -393,15 +409,18 @@ class CItem extends CZBXAPI{
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
 		$sql_parts['where'] = array_unique($sql_parts['where']);
+		$sql_parts['group'] = array_unique($sql_parts['group']);
 		$sql_parts['order'] = array_unique($sql_parts['order']);
 
 		$sql_select = '';
 		$sql_from = '';
 		$sql_where = '';
+		$sql_group = '';
 		$sql_order = '';
 		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
 		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
 		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
+		if(!empty($sql_parts['group']))		$sql_where.= ' GROUP BY '.implode(',',$sql_parts['group']);
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
@@ -409,12 +428,17 @@ class CItem extends CZBXAPI{
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('i.itemid', $nodeids).
 					$sql_where.
+				$sql_group.
 				$sql_order;
 //sdi($sql);
 		$res = DBselect($sql, $sql_limit);
 		while($item = DBfetch($res)){
-			if($options['count'])
-				$result = $item;
+			if(!is_null($options['countOutput'])){
+				if(!is_null($options['groupCount']))
+					$result[] = $item;
+				else
+					$result = $item['rowscount'];
+			}
 			else{
 				$itemids[$item['itemid']] = $item['itemid'];
 
@@ -476,7 +500,7 @@ class CItem extends CZBXAPI{
 		}
 
 COpt::memoryPick();
-		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
+		if(!is_null($options['countOutput'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}

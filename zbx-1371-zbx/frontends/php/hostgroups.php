@@ -360,7 +360,7 @@ include_once('include/page_header.php');
 			'select_templates' => array('hostid','host','status'),
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => 1,
-			'limitSelects'=> $config['max_in_table']+1
+			'limitSelects' => $config['max_in_table']+1
 		);
 
 // sorting && paging

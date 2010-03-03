@@ -70,6 +70,7 @@ class CTrigger extends CZBXAPI{
 			'select' => array('triggers' => 't.triggerid'),
 			'from' => array('t' => 'triggers t'),
 			'where' => array(),
+			'group' => array(),
 			'order' => array(),
 			'limit' => null,
 			);
@@ -100,6 +101,7 @@ class CTrigger extends CZBXAPI{
 //
 			'pattern'				=> '',
 // OutPut
+			'expand_data'			=> null,
 			'output'				=> API_OUTPUT_REFER,
 			'extendoutput'			=> null,
 			'select_groups'			=> null,
@@ -107,8 +109,8 @@ class CTrigger extends CZBXAPI{
 			'select_items'			=> null,
 			'select_functions'		=> null,
 			'select_dependencies'	=> null,
-			'count'					=> null,
-			'expand_data'			=> null,
+			'countOutput'			=> null,
+			'groupCount'			=> null,
 			'preservekeys'			=> null,
 
 			'sortfield'				=> '',
@@ -186,6 +188,10 @@ class CTrigger extends CZBXAPI{
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 			$sql_parts['where']['groupid'] = DBcondition('hg.groupid', $options['groupids']);
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['hg'] = 'hg.groupid';
+			}
 		}
 
 // hostids
@@ -201,6 +207,10 @@ class CTrigger extends CZBXAPI{
 			$sql_parts['where']['hostid'] = DBcondition('i.hostid', $options['hostids']);
 			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['i'] = 'i.hostid';
+			}
 		}
 
 // triggerids
@@ -395,11 +405,17 @@ class CTrigger extends CZBXAPI{
 			$sql_parts['where'][] = 't.priority>='.$options['min_severity'];
 		}
 
-// count
-		if(!is_null($options['count'])){
+// countOutput
+		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
-
 			$sql_parts['select'] = array('COUNT(DISTINCT t.triggerid) as rowscount');
+
+//groupCount
+			if(!is_null($options['groupCount'])){
+				foreach($sql_parts['group'] as $key => $fields){
+					$sql_parts['select'][$key] = $fields;
+				}
+			}
 		}
 
 // order
@@ -426,15 +442,18 @@ class CTrigger extends CZBXAPI{
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
 		$sql_parts['where'] = array_unique($sql_parts['where']);
+		$sql_parts['group'] = array_unique($sql_parts['group']);
 		$sql_parts['order'] = array_unique($sql_parts['order']);
 
 		$sql_select = '';
 		$sql_from = '';
 		$sql_where = '';
+		$sql_group = '';
 		$sql_order = '';
 		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
 		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
 		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
+		if(!empty($sql_parts['group']))		$sql_where.= ' GROUP BY '.implode(',',$sql_parts['group']);
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
@@ -442,11 +461,16 @@ class CTrigger extends CZBXAPI{
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('t.triggerid', $nodeids).
 					$sql_where.
+				$sql_group.
 				$sql_order;
 		$db_res = DBselect($sql, $sql_limit);
 		while($trigger = DBfetch($db_res)){
-			if($options['count'])
-				$result = $trigger;
+			if(!is_null($options['countOutput'])){
+				if(!is_null($options['groupCount']))
+					$result[] = $trigger;
+				else
+					$result = $trigger['rowscount'];
+			}
 			else{
 				$triggerids[$trigger['triggerid']] = $trigger['triggerid'];
 
@@ -498,6 +522,12 @@ class CTrigger extends CZBXAPI{
 			}
 		}
 
+COpt::memoryPick();
+		if(!is_null($options['countOutput'])){
+			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
+			return $result;
+		}
+
 // skipDependent		
 		if(!is_null($options['skipDependent'])){
 			$tids = $triggerids;
@@ -542,13 +572,6 @@ class CTrigger extends CZBXAPI{
 				}
 			}while(!empty($tids));
 		}
-
-COpt::memoryPick();
-		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
-			return $result;
-		}
-		
 
 // Adding Objects
 // Adding trigger dependencies

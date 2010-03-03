@@ -692,13 +692,12 @@ include_once('include/page_header.php');
 		$options = array(
 			'templateids' => zbx_objectValues($templates, 'templateid'),
 			'output' => API_OUTPUT_EXTEND,
-//			'select_hosts' => array('hostid','host','status'),
-			'select_hosts' => API_OUTPUT_EXTEND,
-			'select_templates' => API_OUTPUT_EXTEND,
-			'select_items' => API_OUTPUT_REFER,
-			'select_triggers' => API_OUTPUT_REFER,
-			'select_graphs' => API_OUTPUT_REFER,
-			'select_applications' => API_OUTPUT_REFER,
+			'select_hosts' => array('hostid','host','status'),
+			'select_templates' => array('hostid','host','status'),
+			'select_items' => API_OUTPUT_COUNT,
+			'select_triggers' => API_OUTPUT_COUNT,
+			'select_graphs' => API_OUTPUT_COUNT,
+			'select_applications' => API_OUTPUT_COUNT,
 			'nopermissions' => 1
 		);
 
@@ -715,13 +714,13 @@ include_once('include/page_header.php');
 			$templates_output[] = new CLink($template['host'], 'templates.php?form=update&templateid='.$template['templateid'].url_param('groupid'));
 
 			$applications = array(new CLink(S_APPLICATIONS,'applications.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$template['templateid']),
-				' ('.count($template['applications']).')');
+				' ('.$template['applications'].')');
 			$items = array(new CLink(S_ITEMS,'items.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$template['templateid']),
-				' ('.count($template['items']).')');
+				' ('.$template['items'].')');
 			$triggers = array(new CLink(S_TRIGGERS,'triggers.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$template['templateid']),
-				' ('.count($template['triggers']).')');
+				' ('.$template['triggers'].')');
 			$graphs = array(new CLink(S_GRAPHS,'graphs.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$template['templateid']),
-				' ('.count($template['graphs']).')');
+				' ('.$template['graphs'].')');
 
 			$i = 0;
 			$linked_templates_output = array();
