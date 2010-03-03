@@ -964,13 +964,12 @@ class zbxXML{
 								if($current_item = CItem::exists($gitem_db)){							
 									$current_item = CItem::get(array(
 										'filter' => array(
-											'host' => $gitem_db['host'],
 											'key_' => $gitem_db['key_']
 										),
+										'host' => $gitem_db['host'],
 										'output' => API_OUTPUT_EXTEND,
 										'editable' => 1
 									));
-									
 									if(empty($current_item)){
 										throw new APIException(1, 'No permission for Item ['.$gitem_db['key_'].']');
 									}
@@ -1044,6 +1043,7 @@ class zbxXML{
 									$current_graph['ymax_itemid'] = $item['itemid'];
 								}
 							}
+
 							if($current_graph){ // if exists, delete graph to add then new
 								CGraph::delete($current_graph);
 							}
@@ -1051,6 +1051,7 @@ class zbxXML{
 							$graph_db['gitems'] = $graph_items;
 							$graphs_to_add[] = $graph_db;
 						}
+
 						$r = CGraph::create($graphs_to_add);
 						if($r === false){
 							throw new APIException(1, CGraph::resetErrors());
