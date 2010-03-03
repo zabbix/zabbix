@@ -871,7 +871,7 @@ class CGraph extends CZBXAPI{
 				));
 				$graph_exists = reset($graph_exists);
 
-				if($graph_exists && ($graph_exists['graphid'] != $graph_exists['graphid'])){
+				if($graph_exists && ($graph_exists['graphid'] != $graph['graphid'])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph already exists [ '.$graph['name'].' ]');
 				}
 // }}} EXCEPTION: GRAPH EXISTS

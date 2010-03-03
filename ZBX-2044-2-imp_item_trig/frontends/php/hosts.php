@@ -468,7 +468,7 @@ include_once('include/page_header.php');
 			}
 		}
 
-// }}} START SAVE TRANSACTION
+// }}} SAVE TRANSACTION
 		$result	= DBend($result);
 
 		show_messages($result, $msg_ok, $msg_fail);

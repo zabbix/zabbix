@@ -540,15 +540,14 @@
 			return $result;
 		}
 		
-		$filter = array(
-			'name' => $name,
-			'hostids' => $graph_hostids
-		);
-		if(CGraph::exists($filter)){
-			$result = false;
-			error('Graph already exists [ '.$name.' ]');
-			return $result;
-		}
+		// $filter = array(
+			// 'name' => $name,
+			// 'hostids' => $graph_hostids
+		// );
+		// if(CGraph::exists($filter)){
+			// error('Graph already exists [ '.$name.' ]');
+			// return false;
+		// }
 
 		if($graphid = add_graph($name,$width,$height,$ymin_type,$ymax_type,$yaxismin,$yaxismax,$ymin_itemid,$ymax_itemid,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$percent_left,$percent_right,$templateid)){
 			$result = true;

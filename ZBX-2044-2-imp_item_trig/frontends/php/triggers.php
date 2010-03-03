@@ -183,7 +183,6 @@ include_once('include/page_header.php');
 		if(!check_right_on_trigger_by_expression(PERM_READ_WRITE, $_REQUEST['expression']))
 			access_deny();
 
-		$now = time();
 		$status = isset($_REQUEST['status'])?TRIGGER_STATUS_DISABLED:TRIGGER_STATUS_ENABLED;
 
 		$type = $_REQUEST['type'];

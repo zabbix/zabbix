@@ -530,14 +530,13 @@ class CHostGroup extends CZBXAPI{
 		self::BeginTransaction(__METHOD__);
 		foreach($groups as $num => $group){
 			
-			$options = array(
+			$group_exist = self::get(array(
 				'filter' => array(
 					'name' => $group['name']),
 				'output' => API_OUTPUT_SHORTEN,
 				'editable' => 1,
 				'nopermissions' => 1
-			);
-			$group_exist = self::get($options);
+			));
 			$group_exist = reset($group_exist);
 
 			if($group_exist && ($group_exist['groupid'] != $group['groupid'])){
