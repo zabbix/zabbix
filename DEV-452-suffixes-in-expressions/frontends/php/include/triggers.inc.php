@@ -3193,7 +3193,7 @@ return $result;
 
 	function convert($value){
 		$value = trim($value);
-		if(!preg_match('/(?P<value>[\-+]?[0-9]+[\.]?[0-9]*)(?P<mult>[TGMKsmhdw]?)/', $value, $arr)) return $value;
+		if(!preg_match('/(?P<value>[\-+]?[0-9]+[.]?[0-9]*)(?P<mult>[TGMKsmhdw]?)/', $value, $arr)) return $value;
 
 		$value = $arr['value'];
 		switch($arr['mult']){
