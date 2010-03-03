@@ -559,7 +559,8 @@ class CGraph extends CZBXAPI{
 					'itemids' => $itemids,
 					'output' => API_OUTPUT_EXTEND,
 					'editable' => 1,
-					'templated_hosts' => 1
+					'templated_hosts' => 1,
+					'preservekeys' => 1
 				));
 			
 // check - already exists
@@ -568,7 +569,7 @@ class CGraph extends CZBXAPI{
 					'hostids' => zbx_objectValues($graph_hosts, 'hostid')
 				);
 				if(self::exists($filter)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph already exists [ '.$graph['name'].' ]');
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph already exists [ '.$graph['name'].' ] on Host [ '.$graph_hosts[0]['host'].' ]');
 				}
 
 // check - items from one template
@@ -861,7 +862,8 @@ class CGraph extends CZBXAPI{
 					'itemids' => $itemids,
 					'output' => API_OUTPUT_EXTEND,
 					'editable' => 1,
-					'templated_hosts' => 1
+					'templated_hosts' => 1,
+					'preservekeys' =>1
 				));
 			
 				$graph_exists = self::get(array(
@@ -872,7 +874,7 @@ class CGraph extends CZBXAPI{
 				$graph_exists = reset($graph_exists);
 
 				if($graph_exists && ($graph_exists['graphid'] != $graph['graphid'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph already exists [ '.$graph['name'].' ]');
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph already exists [ '.$graph['name'].' ] on Host [ '.$graph_hosts[0]['host'].' ]');
 				}
 // }}} EXCEPTION: GRAPH EXISTS
 
