@@ -69,17 +69,19 @@
 //--------
 
 
-	$trigger = CTrigger::get(array('triggerids' => $_REQUEST['triggerid'], 'extendoutput' => 1, 'select_hosts' => 1));
-	if(!$trigger){
-		access_deny();
-	}
-	else{
-		$trigger = reset($trigger);
-		$trigger['host'] = reset($trigger['hosts']);
-		$trigger['host'] = $trigger['host']['host'];
-	}
+	$options = array(
+		'triggerids' => $_REQUEST['triggerid'],
+		'output' => API_OUTPUT_EXTEND,
+		'select_hosts' => API_OUTPUT_EXTEND
+	);
+	$trigger = CTrigger::get($options);
+	if(empty($trigger)) access_deny();
 
-	$trigger['exp_expr'] = explode_exp($trigger['expression'], 1, false, true);
+	$trigger = reset($trigger);
+	$trigger['host'] = reset($trigger['hosts']);
+	$trigger['host'] = $trigger['host']['host'];
+
+	$trigger['exp_expr'] = explode_exp($trigger['expression'], false, false, true);
 	$trigger['exp_desc'] = expand_trigger_description_by_data($trigger);
 
 	$tr_event_wdgt = new CWidget();
