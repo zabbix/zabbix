@@ -745,6 +745,7 @@ void	del_zeroes(char *s);
 int	find_char(char *str,char c);
 int	is_double_prefix(char *str);
 int	is_double(char *c);
+int	is_uint_prefix(const char *c);
 int	is_uint(char *c);
 int	is_uint64(register char *str, zbx_uint64_t *value);
 int	is_uoct(char *str);
@@ -915,7 +916,9 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
 
 void	win2unix_eol(char *text);
+int	str2uint(const char *str);
 int	str2uint64(char *str, zbx_uint64_t *value);
+double	str2double(const char *str);
 
 #if defined(_WINDOWS) && defined(_UNICODE)
 int	__zbx_stat(const char *path, struct stat *buf);
