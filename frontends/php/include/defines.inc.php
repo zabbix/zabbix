@@ -456,6 +456,8 @@
 	define('ZBX_EREG_PARAMS', '([[:print:]]+){0,1}');
 	define('ZBX_EREG_SIGN', '([&|><=+*/#[.-.]])');
 	define('ZBX_EREG_NUMBER', '([[.-.]+]*[0-9]+[.]{0,1}[0-9]*[A-Z]{0,1})');
+	define('ZBX_PREG_SIGN', '([&|><=+*\/#\-])');
+	define('ZBX_PREG_NUMBER', '([\-+]?[0-9]+[.]{0,1}[0-9]*[A-Z]{0,1})');
 
 	/* Character '-' must be last in the list of symbols, otherwise it won't be accepted */
 	define('ZBX_EREG_DNS_FORMAT', '([0-9a-zA-Z\_\.\$[.-.]]+)');
