@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1949] fixed "housekeeping" procedure for the table "housekeeper", records are processed only once if there is no need for repeated processing (Dmitry)
  - [ZBX-2051] fixed memory leak in processing of calculated items (Alexei)
  - [ZBX-886] removed duplicate and outdated strings from locales (Richlv)
  - [ZBX-1790] restored support of the hyphen (-) in item key names (Sasha)

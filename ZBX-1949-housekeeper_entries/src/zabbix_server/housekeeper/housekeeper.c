@@ -79,7 +79,7 @@ static int housekeeping_process_log()
 			housekeeper.field,
 			housekeeper.value);
 #endif
-		if(deleted == 0)
+		if(500 > deleted)
 		{
 			DBexecute("delete from housekeeper where housekeeperid=" ZBX_FS_UI64,
 				housekeeper.housekeeperid);
