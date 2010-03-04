@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -399,6 +399,7 @@ class CAlert extends CZBXAPI{
 			}
 		}
 
+COpt::memoryPick();
 		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
@@ -452,6 +453,7 @@ class CAlert extends CZBXAPI{
 			}
 		}
 
+COpt::memoryPick();
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
 			$result = zbx_cleanHashes($result);
