@@ -75,10 +75,10 @@ static int	get_function_parameter_uint(DB_ITEM *item, const char *parameters, in
 				res = SUCCEED;
 			}
 		}
-		else if (SUCCEED == is_uint(parameter))
+		else if (SUCCEED == is_uint_prefix(parameter))
 		{
 			*flag = ZBX_FLAG_SEC;
-			sscanf(parameter, "%u", value);
+			*value = str2uint(parameter);
 			res = SUCCEED;
 		}
 	}
