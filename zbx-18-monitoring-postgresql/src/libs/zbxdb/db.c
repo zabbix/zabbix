@@ -25,26 +25,25 @@
 #include "zlog.h"
 
 /* Transaction level. Must be 1 for all queries. */
-int	txn_level = 0;
-int	txn_init = 0;
+static int	txn_level = 0;
+static int	txn_init = 0;
 
 #ifdef	HAVE_SQLITE3
-	int		sqlite_transaction_started = 0;
 	sqlite3		*conn = NULL;
 	PHP_MUTEX	sqlite_access;
 #endif
 
 #ifdef	HAVE_MYSQL
-	MYSQL	*conn = NULL;
+	MYSQL		*conn = NULL;
 #endif
 
 #ifdef	HAVE_POSTGRESQL
-	PGconn	*conn = NULL;
-	int     ZBX_PG_BYTEAOID = 0;
+	PGconn		*conn = NULL;
+	static int	ZBX_PG_BYTEAOID = 0;
 #endif
 
 #ifdef	HAVE_ORACLE
-	zbx_oracle_db_handle_t oracle;
+	zbx_oracle_db_handle_t	oracle;
 #endif /* HAVE_ORACLE */
 
 void	zbx_db_close(void)
@@ -80,7 +79,6 @@ void	zbx_db_close(void)
 	}
 #endif /* HAVE_ORACLE */
 #ifdef	HAVE_SQLITE3
-/*	sqlite_transaction_started = 0; */ /* see comment near sqlite_transaction_started in zbx_db_connect() */
 	sqlite3_close(conn);
 	conn = NULL;
 /*	php_sem_remove(&sqlite_access); */
@@ -304,16 +302,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		/* Do not return SQLITE_BUSY immediately, wait for N ms */
 		sqlite3_busy_timeout(conn, 60*1000);
 
-		/* Variable sqlite_transaction_started must not be reset to 0 in zbx_db_connect() and zbx_db_close().
-		 *
-		 * Consider the following scenario. We begin a transaction (sqlite_transaction_started becomes non-zero),
-		 * acquire a semaphore in zbx_db_vexecute() or zbx_db_vselect(), database comes down (e.g., we run out of
-		 * disk space), in which case we zbx_db_close() and zbx_db_connect() again. If we were to reset variable
-		 * sqlite_transaction_started to 0, in zbx_db_vexecute() or zbx_db_vselect() we would try to acquire the
-		 * semaphore again (which we never released), and we would hang there forever.
-		 */
-		/* sqlite_transaction_started = 0; */
-
 		path = strdup(dbname);
 		if (NULL != (p = strrchr(path, '/')))
 			*++p = '\0';
@@ -416,22 +404,12 @@ void	zbx_db_begin(void)
 	zbx_db_execute("%s","begin;");
 #endif
 #ifdef	HAVE_SQLITE3
-	sqlite_transaction_started++;
-
-	if(sqlite_transaction_started == 1)
+	if(PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
 	{
-		if(PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
-		{
-			zabbix_log( LOG_LEVEL_CRIT, "ERROR: Unable to create lock on SQLite database.");
-			exit(FAIL);
-		}
-
-		zbx_db_execute("%s","begin;");
+		zabbix_log( LOG_LEVEL_CRIT, "ERROR: Unable to create lock on SQLite database.");
+		exit(FAIL);
 	}
-	else
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "POSSIBLE ERROR: Used incorect logic in database processing started subtransaction!");
-	}
+	zbx_db_execute("%s","begin;");
 #endif
 }
 
@@ -467,21 +445,8 @@ void zbx_db_commit(void)
 	(void) OCITransCommit (oracle.svchp, oracle.errhp, OCI_DEFAULT);
 #endif /* HAVE_ORACLE */
 #ifdef	HAVE_SQLITE3
-
-	if(sqlite_transaction_started > 1)
-	{
-		sqlite_transaction_started--;
-	}
-
-	if(sqlite_transaction_started == 1)
-	{
-		zbx_db_execute("%s","commit;");
-
-		sqlite_transaction_started = 0;
-
-		php_sem_release(&sqlite_access);
-	}
-
+	zbx_db_execute("%s","commit;");
+	php_sem_release(&sqlite_access);
 #endif
 	txn_level--;
 }
@@ -518,21 +483,8 @@ void zbx_db_rollback(void)
 	(void) OCITransRollback (oracle.svchp, oracle.errhp, OCI_DEFAULT);
 #endif /* HAVE_ORACLE */
 #ifdef	HAVE_SQLITE3
-
-	if(sqlite_transaction_started > 1)
-	{
-		sqlite_transaction_started--;
-	}
-
-	if(sqlite_transaction_started == 1)
-	{
-		zbx_db_execute("rollback;");
-
-		sqlite_transaction_started = 0;
-
-		php_sem_release(&sqlite_access);
-	}
-
+	zbx_db_execute("rollback;");
+	php_sem_release(&sqlite_access);
 #endif
 	txn_level--;
 }
@@ -684,7 +636,7 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 	}
 #endif /* HAVE_ORACLE */
 #ifdef	HAVE_SQLITE3
-	if (!sqlite_transaction_started)
+	if (0 == txn_level)
 	{
 		if (PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
 		{
@@ -722,7 +674,7 @@ lbl_exec:
 		ret = sqlite3_changes(conn);
 	}
 
-	if (!sqlite_transaction_started)
+	if (0 == txn_level)
 	{
 		php_sem_release(&sqlite_access);
 	}
@@ -1097,7 +1049,7 @@ error:
 	}
 #endif /* HAVE_ORACLE */
 #ifdef HAVE_SQLITE3
-	if (!sqlite_transaction_started)
+	if (0 == txn_level)
 	{
 		if (PHP_MUTEX_OK != php_sem_acquire(&sqlite_access))
 		{
@@ -1133,7 +1085,7 @@ lbl_get_table:
 		}
 	}
 
-	if (!sqlite_transaction_started)
+	if (0 == txn_level)
 	{
 		php_sem_release(&sqlite_access);
 	}
