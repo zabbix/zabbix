@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1371] improved performance of the configuration screens hostgroups, templates, hosts (Aly)
  - [DEV-452] support of s,m,h,d,w,T suffixes in trigger expressions and functions (asaveljevs,Vedmak)
  - [ZBX-1357] added Ukrainian translation; thanks to zalex_ua (Richlv)
  - [ZBX-2013] fixed error in trigger test screen (Vedmak)
