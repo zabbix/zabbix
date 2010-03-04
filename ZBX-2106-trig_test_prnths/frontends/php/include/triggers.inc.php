@@ -3119,10 +3119,10 @@ return $result;
 							ZBX_PREG_NUMBER.'[\)]?)(['.ZBX_PREG_PRINT.']*)$';
 							
 
-		$expr_full_token2 = '\s*(?P<leftp>\(*?)[\(]?('.$ZBX_TR_EXPR_REPLACE_TO.'\s*[\)]?'.
+		$expr_full_token2 = '\s*(?P<leftp>\(*)('.$ZBX_TR_EXPR_REPLACE_TO.'\s*'.
 			'(?P<sign>'.ZBX_PREG_SIGN.')\s*'.
 			'(?P<value>'.ZBX_PREG_NUMBER.'))(?P<rightp>\)*)\s*'.
-			'(?P<sign2>'.ZBX_PREG_SIGN.')?';	
+			'(?P<sign2>'.ZBX_PREG_SIGN.')?';
 	
 		preg_match_all('/'.$expr_full_token2.'/u', $expr, $arr);
 
