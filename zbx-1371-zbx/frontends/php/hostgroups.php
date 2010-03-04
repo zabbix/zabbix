@@ -382,7 +382,7 @@ include_once('include/page_header.php');
 					break;
 				}
 
-				$url = 'templates.php?form=update&templateid='.$host['hostid'].'&groupid='.$group['groupid'];
+				$url = 'templates.php?form=update&templateid='.$template['hostid'].'&groupid='.$group['groupid'];
 				$hosts_output[] = new CLink($template['host'], $url, 'unknown');
 				$hosts_output[] = ', ';
 			}

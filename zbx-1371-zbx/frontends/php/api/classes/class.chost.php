@@ -166,8 +166,12 @@ class CHost extends CZBXAPI{
 		}
 
 		if(is_array($options['output'])){
-			$sql_parts['select']['hosts'] = ' h.'.implode(',h.', $options['output']);
-			$options['output'] = API_OUTPUT_REFER;
+			unset($sql_parts['select']['hosts']);
+			foreach($options['output'] as $key => $field){
+				$sql_parts['select'][$field] = ' h.'.$field;
+			}
+
+			$options['output'] = API_OUTPUT_CUSTOM;
 		}
 
 // editable + PERMISSION CHECK
@@ -209,7 +213,7 @@ class CHost extends CZBXAPI{
 			$sql_parts['where']['hgh'] = 'hg.hostid=h.hostid';
 
 			if(!is_null($options['groupCount'])){
-				$sql_parts['group']['hg'] = 'hg.groupid';
+				$sql_parts['group']['groupid'] = 'hg.groupid';
 			}
 		}
 
@@ -231,7 +235,7 @@ class CHost extends CZBXAPI{
 			$sql_parts['where']['hht'] = 'h.hostid=ht.hostid';
 
 			if(!is_null($options['groupCount'])){
-				$sql_parts['group']['ht'] = 'ht.templateid';
+				$sql_parts['group']['templateid'] = 'ht.templateid';
 			}
 		}
 
@@ -397,10 +401,10 @@ class CHost extends CZBXAPI{
 		if(!zbx_empty($options['sortfield'])){
 			$sortorder = ($options['sortorder'] == ZBX_SORT_DOWN)?ZBX_SORT_DOWN:ZBX_SORT_UP;
 
-			$sql_parts['order'][] = 'h.'.$options['sortfield'].' '.$sortorder;
+			$sql_parts['order'][$options['sortfield']] = 'h.'.$options['sortfield'].' '.$sortorder;
 
 			if(!str_in_array('h.'.$options['sortfield'], $sql_parts['select']) && !str_in_array('h.*', $sql_parts['select'])){
-				$sql_parts['select'][] = 'h.'.$options['sortfield'];
+				$sql_parts['select'][$options['sortfield']] = 'h.'.$options['sortfield'];
 			}
 		}
 
