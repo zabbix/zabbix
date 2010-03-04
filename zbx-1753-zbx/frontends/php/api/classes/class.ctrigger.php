@@ -133,6 +133,14 @@ class CTrigger extends CZBXAPI{
 			}
 		}
 
+		if(is_array($options['output'])){
+			unset($sql_parts['select']['triggers']);
+			foreach($options['output'] as $key => $field){
+				$sql_parts['select'][$field] = ' t.'.$field;
+			}
+
+			$options['output'] = API_OUTPUT_CUSTOM;
+		}
 
 // editable + PERMISSION CHECK
 
