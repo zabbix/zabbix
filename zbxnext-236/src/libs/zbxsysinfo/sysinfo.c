@@ -252,49 +252,56 @@ void	init_result(AGENT_RESULT *result)
 	result->msg = NULL;
 }
 
-int parse_command( /* return value: 0 - error; 1 - command without parameters; 2 - command with parameters */
-		const char *command,
-		char *cmd,
-		int cmd_max_len,
-		char *param,
-		int param_max_len
-		)
+/*
+ * return value: 0 - error;
+ *               1 - command without parameters;
+ *               2 - command with parameters
+ */
+int	parse_command(const char *command, char *cmd, int cmd_max_len,
+		char *param, int param_max_len)
 {
-	char *pl, *pr;
-	char localstr[MAX_STRING_LEN];
-	int ret = 2;
+	char	*pl, *pr;
+	size_t	sz;
 
-	zbx_strlcpy(localstr, command, MAX_STRING_LEN);
+	pl = strchr(command, '[');
+	pr = strrchr(command, ']');
 
-	if(cmd)
-		zbx_strlcpy(cmd, "", cmd_max_len);
-	if(param)
-		zbx_strlcpy(param, "", param_max_len);
-
-	pl = strchr(localstr, '[');
-	pr = strrchr(localstr, ']');
-
-	if(pl > pr)
+	if (pl > pr)
 		return 0;
 
-	if((pl && !pr) || (!pl && pr))
+	if (NULL != pl && NULL == pr)
 		return 0;
 
-	if(pl != NULL)
-		pl[0] = 0;
-	if(pr != NULL)
-		pr[0] = 0;
+	if (NULL == pl && NULL != pr)
+		return 0;
 
-	if(cmd)
-		zbx_strlcpy(cmd, localstr, cmd_max_len);
+	if (NULL != cmd)
+	{
+		if (NULL != pl)
+		{
+			if (cmd_max_len < (sz = (size_t)(pl - command) + 1))
+				sz = cmd_max_len;
+			memcpy(cmd, command, sz - 1);
+			cmd[sz - 1] = '\0';
+		}
+		else
+			zbx_strlcpy(cmd, command, cmd_max_len);
+	}
 
-	if(pl && pr && param)
-		zbx_strlcpy(param, &pl[1] , param_max_len);
+	if (NULL != pl && NULL != pr)
+	{
+		if (NULL != param)
+		{
+			if (param_max_len < (sz = (size_t)(pr - pl)))
+				sz = param_max_len;
+			memcpy(param, pl + 1, sz - 1);
+			param[sz - 1] = '\0';
+		}
+	}
+	else
+		return 1;
 
-	if(!pl && !pr)
-		ret = 1;
-
-	return ret;
+	return 2;
 }
 
 void	test_parameter(const char* key, unsigned flags)
