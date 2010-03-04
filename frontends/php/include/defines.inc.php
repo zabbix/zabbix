@@ -718,6 +718,8 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('API_OUTPUT_SHORTEN', 'shorten');
 	define('API_OUTPUT_REFER', 'refer');
 	define('API_OUTPUT_EXTEND', 'extend');
+	define('API_OUTPUT_COUNT', 'count');
+	define('API_OUTPUT_CUSTOM', 'custom');
 
 
 	define('SEC_PER_MIN', 60);
