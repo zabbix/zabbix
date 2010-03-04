@@ -60,7 +60,7 @@ include_once('include/page_header.php');
 
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
-			update_profile('web.charts.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.charts.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 
 		if('timeline' == $_REQUEST['favobj']){
@@ -72,14 +72,14 @@ include_once('include/page_header.php');
 		if(str_in_array($_REQUEST['favobj'],array('itemid','graphid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
-				$result = add2favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
+				$result = add2favorites('web.favorite.graphids', $_REQUEST['favid'], $_REQUEST['favobj']);
 				if($result){
 					print('$("addrm_fav").title = "'.S_REMOVE_FROM.' '.S_FAVOURITES.'";'."\n");
 					print('$("addrm_fav").onclick = function(){rm4favorites("graphid","'.$_REQUEST['favid'].'",0);}'."\n");
 				}
 			}
 			else if('remove' == $_REQUEST['action']){
-				$result = rm4favorites('web.favorite.graphids',$_REQUEST['favid'],ZBX_FAVORITES_ALL,$_REQUEST['favobj']);
+				$result = rm4favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
 
 				if($result){
 					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVOURITES.'";'."\n");
@@ -94,11 +94,12 @@ include_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 ?>
 <?php
-	$_REQUEST['graphid'] = get_request('graphid', get_profile('web.charts.graphid', 0));
+	$_REQUEST['graphid'] = get_request('graphid', CProfile::get('web.charts.graphid', 0));
 	if(!in_node($_REQUEST['graphid'])) $_REQUEST['graphid'] = 0;
 
 	if($_REQUEST['graphid']>0){
@@ -139,7 +140,7 @@ include_once('include/page_header.php');
 
 	$effectiveperiod = navigation_bar_calc('web.graph');
 
-	update_profile('web.charts.graphid',$_REQUEST['graphid']);
+	CProfile::update('web.charts.graphid',$_REQUEST['graphid'], PROFILE_TYPE_ID);
 
 	$h1 = array();
 
@@ -148,13 +149,19 @@ include_once('include/page_header.php');
 
 	$params = array();
 	foreach($options as $option) $params[$option] = 1;
+
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
+
 	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
 //SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
 
 	$available_groups= $PAGE_GROUPS['groupids'];
 	$available_hosts = $PAGE_HOSTS['hostids'];
+
+	if(empty($PAGE_GROUPS['groupids']) || empty($PAGE_HOSTS['hostids'])){
+		$_REQUEST['graphid'] = 0;
+	}
 
 	if($_REQUEST['graphid']>0){
 		$options = array(
@@ -164,7 +171,7 @@ include_once('include/page_header.php');
 		);
 		$db_data = CGraph::get($options);
 		if(empty($db_data)){
-			update_profile('web.charts.graphid',0);
+			CProfile::update('web.charts.graphid',0,PROFILE_TYPE_ID);
 			access_deny();
 		}
 
@@ -202,23 +209,26 @@ include_once('include/page_header.php');
 
 	$options = array(
 		'extendoutput' => 1,
-		'sortfield' => 'name',
 		'templated' => 0
 	);
 
-	if($_REQUEST['groupid'] > 0){
-		$options['groupids'] = $_REQUEST['groupid'];
+// Filtering
+	if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
+		$options['hostids'] = $PAGE_HOSTS['selected'];
 	}
-
-	if($_REQUEST['hostid'] > 0){
-		$options['hostids'] = $_REQUEST['hostid'];
+	else if(($PAGE_GROUPS['selected'] > 0) && !empty($PAGE_HOSTS['hostids'])){
+		$options['hostids'] = $PAGE_HOSTS['hostids'];
+	}
+	else if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
+		$options['groupids'] = $PAGE_GROUPS['selected'];
 	}
 
 	$db_graphs = CGraph::get($options);
+	order_result($db_graphs, 'name');
 	foreach($db_graphs as $num => $db_graph){
 		$cmbGraphs->addItem($db_graph['graphid'], get_node_name_by_elid($db_graph['graphid'], null, ': ').$db_graph['name']);
 	}
-
+	
 	$r_form->addItem(array(SPACE.S_GRAPH.SPACE,$cmbGraphs));
 
 //	show_table_header(S_GRAPHS_BIG, $r_form);

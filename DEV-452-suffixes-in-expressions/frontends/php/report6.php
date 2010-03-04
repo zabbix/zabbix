@@ -81,11 +81,12 @@ include_once('include/page_header.php');
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			update_profile('web.report6.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.report6.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -177,7 +178,7 @@ include_once('include/page_header.php');
 		default: $rep_form = bar_report_form();
 	}
 
-	$rep6_wdgt->addFlicker($rep_form, get_profile('web.report6.filter.state',1));
+	$rep6_wdgt->addFlicker($rep_form, CProfile::get('web.report6.filter.state',1));
 
 	if(isset($_REQUEST['report_show'])){
 		$src = 'chart_bar.php?config='.$_REQUEST['config'].

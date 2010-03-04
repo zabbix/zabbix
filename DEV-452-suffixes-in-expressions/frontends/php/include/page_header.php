@@ -166,9 +166,11 @@
 
 	if(isset($_REQUEST['print'])){
 		define('ZBX_PAGE_NO_MENU', 1);
-		$req = substr($_SERVER['REQUEST_URI'],0,zbx_strpos($_SERVER['REQUEST_URI'],'print')-1);
-
-		$link = new CLink(bold('&laquo;'.S_BACK_BIG), $req, 'small_font');
+		
+		$req = new CUrl();
+		$req->setArgument('print', null);
+		
+		$link = new CLink(bold('&laquo;'.S_BACK_BIG), $req->getUrl(), 'small_font');
 		$link->setAttribute('style','padding-left: 10px;');
 
 		$printview = new CDiv($link,'printless');
@@ -184,7 +186,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$help->setTarget('_blank');
 		$support = new CLink(S_GET_SUPPORT, 'http://www.zabbix.com/support.php', 'small_font', null, 'nosid');
 		$support->setTarget('_blank');
-		$printview = new CLink(S_PRINT, $_SERVER['REQUEST_URI'].(empty($_GET)?'?':'&').'print=1', 'small_font', null, 'nosid');
+		$printview = new CLink(S_PRINT, $_SERVER['REQUEST_URI'].(empty($_GET)?'?':'&').'print=1', 'small_font');
 
 		$page_header_r_col = array($help,'|',$support,'|',$printview);
 

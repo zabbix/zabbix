@@ -77,6 +77,7 @@ class CHostGroup extends CZBXAPI{
 			'nopermissions'				=> null,
 
 // filter
+			'filter'					=> null,
 			'pattern' 					=> '',
 
 // output
@@ -104,9 +105,6 @@ class CHostGroup extends CZBXAPI{
 
 
 // editable + PERMISSION CHECK
-		if(defined('ZBX_API_REQUEST')){
-			$options['nopermissions'] = false;
-		}
 
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
@@ -129,12 +127,12 @@ class CHostGroup extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
 
 // groupids
 		if(!is_null($options['groupids'])){
 			zbx_value2array($options['groupids']);
-			$sql_parts['where'][] = DBcondition('g.groupid', $options['groupids']);
+			$sql_parts['where']['groupid'] = DBcondition('g.groupid', $options['groupids']);
 		}
 
 // hostids
@@ -263,9 +261,19 @@ class CHostGroup extends CZBXAPI{
 
 // pattern
 		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where'][] = ' UPPER(g.name) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+			$sql_parts['where']['name'] = ' UPPER(g.name) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
 		}
 
+// filter
+		if(!is_null($options['filter'])){
+			zbx_value2array($options['filter']);
+
+			if(isset($options['filter']['groupid']))
+				$sql_parts['where']['groupid'] = 'g.groupid='.$options['filter']['groupid'];
+
+			if(isset($options['filter']['name']))
+				$sql_parts['where']['name'] = 'g.name='.zbx_dbstr($options['filter']['name']);
+		}
 // order
 // restrict not allowed columns for sorting
 		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
@@ -383,27 +391,51 @@ class CHostGroup extends CZBXAPI{
  * @param array $data['name']
  * @return string|boolean HostGroup ID or false if error
  */
-	public static function getObjects($data){
-		$result = array();
-		$groupids = array();
+	public static function getObjects($hostgroupData){
+		$options = array(
+			'filter' => $hostgroupData,
+			'output'=>API_OUTPUT_EXTEND
+		);
 
-		$sql = 'SELECT groupid '.
-				' FROM groups '.
-				' WHERE name='.zbx_dbstr($data['name']).
-					' AND '.DBin_node('groupid', false);
-		$res = DBselect($sql);
-		while($group=DBfetch($res)){
-			$groupids[$group['groupid']] = $group['groupid'];
-		}
+		if(isset($hostgroupData['node']))
+			$options['nodeids'] = getNodeIdByNodeName($hostgroupData['node']);
+		else if(isset($hostgroupData['nodeids']))
+			$options['nodeids'] = $hostgroupData['nodeids'];
+		else
+			$options['nodeids'] = get_current_nodeid(false);
 
-		if(!empty($groupids))
-			$result = self::get(array('groupids'=>$groupids, 'extendoutput'=>1));
+
+		$result = self::get($options);
 
 	return $result;
 	}
 
+	public static function checkObjects($hostgroupsData){
+		
+		$hostgroupsData = zbx_toArray($hostgroupsData);
+		
+		$result = array();
+		foreach($hostgroupsData as $hnum => $hostgroupData){
+			$options = array(
+				'filter' => $hostgroupData,
+				'output' => API_OUTPUT_SHORTEN,
+				'nopermissions' => 1
+			);
+
+			if(isset($hostgroupData['node']))
+				$options['nodeids'] = getNodeIdByNodeName($hostgroupData['node']);
+			else if(isset($hostgroupData['nodeids']))
+				$options['nodeids'] = $hostgroupData['nodeids'];
+
+			$hostgroups = self::get($options);
+
+			$result+= $hostgroups;
+		}
+
+	return $result;
+	}
 /**
- * Add HostGroups
+ * Add hostgroupGroups
  *
  * {@source}
  * @access public
@@ -437,7 +469,7 @@ class CHostGroup extends CZBXAPI{
 				break;
 			}
 
-			$group_exist = self::getObjects(array('name' => $group['name']));
+			$group_exist = self::checkObjects(array('name' => $group['name']));
 			if(!empty($group_exist)){
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'HostGroup [ '.$group['name'].' ] already exists');
 				$result = false;
@@ -504,7 +536,7 @@ class CHostGroup extends CZBXAPI{
 		self::BeginTransaction(__METHOD__);
 		foreach($groups as $num => $group){
 
-			$group_exist = self::getObjects(array('name' => $group['name']));
+			$group_exist = self::checkObjects(array('name' => $group['name']));
 			$group_exist = reset($group_exist);
 
 			if($group_exist && ($group_exist['groupid'] != $group['groupid'])){

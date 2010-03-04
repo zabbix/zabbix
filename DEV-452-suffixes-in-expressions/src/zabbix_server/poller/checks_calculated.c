@@ -51,6 +51,7 @@ static void	zbx_free_expression(expression_t *exp)
 		zbx_free(f->params);
 	}
 	zbx_free(exp->exp);
+	zbx_free(exp->functions);
 }
 
 /*

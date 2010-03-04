@@ -63,10 +63,10 @@ include_once('include/page_header.php');
 ?>
 
 <?php
-	$_REQUEST['config'] = get_request('config',get_profile('web.authentication.config',ZBX_AUTH_LDAP));
+	$_REQUEST['config'] = get_request('config',CProfile::get('web.authentication.config',ZBX_AUTH_LDAP));
 	check_fields($fields);
 
-	update_profile('web.authentication.config',$_REQUEST['config'], PROFILE_TYPE_INT);
+	CProfile::update('web.authentication.config',$_REQUEST['config'], PROFILE_TYPE_INT);
 
 	$_REQUEST['authentication_type'] = get_request('authentication_type',ZBX_AUTH_INTERNAL);
 

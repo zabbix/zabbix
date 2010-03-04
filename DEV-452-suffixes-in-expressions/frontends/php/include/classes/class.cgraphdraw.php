@@ -25,6 +25,8 @@ require_once('include/hosts.inc.php');
 class CGraphDraw{
 	public function __construct($type = GRAPH_TYPE_NORMAL){
 
+		bcscale(6);
+		
 		$this->stime = null;
 		$this->fullSizeX = null;
 		$this->fullSizeY = null;
@@ -258,11 +260,12 @@ class CGraphDraw{
 		}
 
 		$str.=$this->period2str($this->period);
-
+		
 		$fontnum = 11;
 		if(($this->sizeX < 500) && ($this->type == GRAPH_TYPE_NORMAL || $this->type == GRAPH_TYPE_BAR)) $fontnum = 8;
-
-		$x=$this->fullSizeX/2-imagefontwidth($fontnum)*zbx_strlen($str)/2;
+		$dims = imageTextSize( $fontnum, 0, $str );
+		$x = $this->fullSizeX/2-($dims['width']/2);
+		
 		imagetext($this->im, $fontnum, 0, $x, 24, $this->getColor($this->graphtheme['textcolor'], 0), $str);
 	}
 

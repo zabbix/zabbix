@@ -554,8 +554,8 @@ function mem2str($size){
 	return round($size, 6).$prefix;
 }
 
-// showUnits:  0/false - units off, 1/true - units short, 2 - units long
-function convert_units($value, $units, $showUnits=1){
+// convert:
+function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 // Special processing for unix timestamps
 	if($units=='unixtime'){
 		$ret=date('Y.m.d H:i:s',$value);
@@ -593,14 +593,25 @@ function convert_units($value, $units, $showUnits=1){
 
 // Any other unit
 //-------------------
+
 	switch($units){
+		case 'Bps':
 		case 'B':
 			$step=1024;
+			$convert = $convert?$convert:ITEM_CONVERT_NO_UNITS;
 			break;
 		case 'b':
 		case 'bps':
+			$convert = $convert?$convert:ITEM_CONVERT_NO_UNITS;
 		default:
 			$step = 1000;
+	}
+
+	if(zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS)){
+		if(round($value,2) == round($value,0)) $format = '%.0f %s';
+		else $format = '%.2f %s';
+
+		return sprintf($format, $value, $units);
 	}
 
 // INIT intervals
@@ -640,13 +651,13 @@ function convert_units($value, $units, $showUnits=1){
 //------
 	if(round($valUnit['value'],2) == round($valUnit['value'],0)) $format = '%.0f %s%s';
 	else $format = '%.2f %s%s';
-	
-	switch($showUnits){
-		case 0: $units = ''; 
+
+	switch($convert){
+		case 0: $units = trim($units); 
 		case 1: $desc = $valUnit['short']; break;
 		case 2: $desc = $valUnit['long']; break;
 	}
-	
+
 return sprintf($format, $valUnit['value'], $desc, $units);
 }
 
@@ -659,10 +670,10 @@ function zbx_avg($values){
 
 	$sum = 0;
 	foreach($values as $num => $value){
-		$sum += $value;
+		$sum = bcadd($sum, $value);
 	}
 
-return ($sum / count($values));
+return bcdiv($sum, count($values));
 }
 
 // accepts parametr as integer either
@@ -730,7 +741,7 @@ function zbx_stristr($haystack, $needle){
 		$needle = mb_strtoupper($needle);
 
 		$pos = mb_strpos($haystack_B, $needle);
-		if($pos !== true){
+		if($pos !== false){
 			$pos = mb_substr($haystack, $pos);
 		}
 		return $pos;
@@ -891,7 +902,7 @@ function zbx_value2array(&$values){
 // fuunction: zbx_toHash
 // object or array of objects to hash
 // author: Aly
-function zbx_toHash(&$value, $field){
+function zbx_toHash(&$value, $field=null){
 	if(is_null($value)) return $value;
 	$result = array();
 
@@ -939,7 +950,7 @@ return $result;
 
 // function: zbx_toArray
 // author: Aly
-function zbx_toArray(&$value){
+function zbx_toArray($value){
 	if(is_null($value)) return $value;
 	$result = array();
 

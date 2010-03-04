@@ -93,7 +93,7 @@ include_once('include/page_header.php');
 				}
 			}
 			else if('remove' == $_REQUEST['action']){
-				$result = rm4favorites('web.favorite.graphids',$_REQUEST['favid'],ZBX_FAVORITES_ALL,$_REQUEST['favobj']);
+				$result = rm4favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
 
 				if($result){
 					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVOURITES.'";'."\n");
@@ -108,6 +108,7 @@ include_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 
@@ -136,7 +137,7 @@ include_once('include/page_header.php');
 	$options = array(
 		'nodeids' => get_current_nodeid(),
 		'itemids' => $_REQUEST['itemid'],
-		'webitems' => 1,
+		'webitems' => 1
 	);
 	$request_items = zbx_toArray($_REQUEST['itemid']);
 	$allowed_items = CItem::get($options);
@@ -160,9 +161,9 @@ include_once('include/page_header.php');
 		if(isset($_REQUEST['plaintext']))
 			echo $main_header.SBR;
 
-		$_REQUEST['period'] = get_request('period',get_profile('web.item.graph.period', ZBX_PERIOD_DEFAULT, $_REQUEST['itemid']));
+		$_REQUEST['period'] = get_request('period',CProfile::get('web.item.graph.period', ZBX_PERIOD_DEFAULT, $_REQUEST['itemid']));
 		if($_REQUEST['period'] >= ZBX_MIN_PERIOD){
-			update_profile('web.item.graph.period',$_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['itemid']);
+			CProfile::update('web.item.graph.period',$_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['itemid']);
 		}
 
 		$l_header = array(new CLink($item_data['host'],'latest.php?hostid='.$item_data['hostid']),': ',
@@ -362,7 +363,6 @@ include_once('include/page_header.php');
 
 			if(!isset($_REQUEST['plaintext'])){
 				$table = new CTableInfo('...','log_history_table');
-				$table->setAttribute('id','graph');
 				$table->setHeader(array(S_TIMESTAMP,
 						($item_cout>1)?S_ITEM:null,
 						S_LOCAL_TIME,
@@ -427,8 +427,8 @@ include_once('include/page_header.php');
 
 				array_push($new_row,
 						new CCol(
-							get_severity_description($row['severity']),
-							get_severity_style($row['severity'])
+							get_item_logtype_description($row['severity']),
+							get_item_logtype_style($row['severity'])
 							)
 					);
 
@@ -497,7 +497,6 @@ include_once('include/page_header.php');
 			if(!isset($_REQUEST['plaintext'])){
 				$table = new CTableInfo();
 				$table->setHeader(array(S_TIMESTAMP, S_VALUE));
-				$table->setAttribute('id','graph');
 			}
 			else{
 				echo '<span class="textcolorstyles"><pre>'."\n";

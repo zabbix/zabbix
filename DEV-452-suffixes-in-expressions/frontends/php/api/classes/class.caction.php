@@ -118,10 +118,6 @@ class CAction extends CZBXAPI{
 
 
 // editable + PERMISSION CHECK
-		if(defined('ZBX_API_REQUEST')){
-			$options['nopermissions'] = null;
-		}
-
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || !is_null($options['nopermissions'])){
 		}
 		else{
@@ -139,20 +135,22 @@ class CAction extends CZBXAPI{
 						' AND cc.actionid=c.actionid'.
 						' AND ('.
 							' NOT EXISTS('.
-							' SELECT rr.id'.
-							' FROM rights rr, users_groups ug'.
-							' WHERE rr.id='.zbx_dbcast_2bigint('cc.value').
-								' AND rr.groupid=ug.usrgrpid'.
-								' AND ug.userid='.$userid.
-								' AND rr.permission>='.$permission.')'.
-							' OR EXISTS('.
-							' SELECT rr.id'.
-							' FROM rights rr, users_groups ugg'.
-							' WHERE rr.id='.zbx_dbcast_2bigint('cc.value').
-								' AND rr.groupid=ugg.usrgrpid'.
-								' AND ugg.userid='.$userid.
-								' AND rr.permission<'.$permission.')'.
+								' SELECT rr.id'.
+								' FROM rights rr, users_groups ug'.
+								' WHERE rr.id='.zbx_dbcast_2bigint('cc.value').
+									' AND rr.groupid=ug.usrgrpid'.
+									' AND ug.userid='.$userid.
+									' AND rr.permission>='.$permission.
 							' )'.
+							' OR EXISTS('.
+								' SELECT rr.id'.
+								' FROM rights rr, users_groups ugg'.
+								' WHERE rr.id='.zbx_dbcast_2bigint('cc.value').
+									' AND rr.groupid=ugg.usrgrpid'.
+									' AND ugg.userid='.$userid.
+									' AND rr.permission<'.$permission.
+							' )'.
+						' )'.
 				' )';
 
 // condition host or template
@@ -218,7 +216,7 @@ class CAction extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
 
 // groupids
 		if(!is_null($options['groupids'])){
@@ -408,6 +406,10 @@ class CAction extends CZBXAPI{
 						$result[$action['actionid']]['conditions'] = array();
 					}
 
+					if(!is_null($options['select_operations']) && !isset($result[$action['actionid']]['operations'])){
+						$result[$action['actionid']]['operations'] = array();
+					}
+
 					$result[$action['actionid']] += $action;
 				}
 			}
@@ -487,43 +489,102 @@ class CAction extends CZBXAPI{
 
 		$result = false;
 
-		self::BeginTransaction(__METHOD__);
-		foreach($actions as $anum => $action){
-			$action_db_fields = array(
-				'name'				=> null,
-				'eventsource'		=> null,
-				'evaltype'			=> null,
-				'status'			=> 0,
-				'esc_period'		=> 0,
-				'def_shortdata'		=> '',
-				'def_longdata'		=> '',
-				'recovery_msg'		=> 0,
-				'r_shordata'		=> '',
-				'r_londata'			=> ''
-			);
+		try{
 
-			if(!check_db_fields($action_db_fields, $action)){
-				$result = false;
-				break;
+			foreach($actions as $anum => $action){
+				if(!isset($action['operations']) || !is_array($action['operations']) || count($action['operations']) == 0){
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_NO_OPERATIONS_DEFINED);
+				}
+
+				if(!isset($action['conditions'])){
+					$action['conditions'] = array();
+					continue;
+				}
+
+				if(!check_permission_for_action_conditions($action['conditions'])){
+					throw new APIException(ZBX_API_ERROR_PERMISSIONS, 'You do not have enough rights for operation');
+				}
+
+				foreach($action['conditions'] as $condition)
+					if(!validate_condition($condition['type'], $condition['value'])){
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Action condition validation failed');
+					}
 			}
 
-			$actionid = get_dbid('actions', 'actionid');
-			$sql = 'INSERT INTO actions '.
-						'(actionid,name,eventsource,esc_period,def_shortdata,def_longdata,recovery_msg,r_shortdata,r_longdata,evaltype,status)'.
-					' VALUES ('.$actionid.','.zbx_dbstr($action['name']).','.$action['eventsource'].','.$action['esc_period'].','.zbx_dbstr($action['def_shortdata']).','.zbx_dbstr($action['def_longdata']).','.$action['recovery_msg'].','.zbx_dbstr($action['r_shortdata']).','.zbx_dbstr($action['r_longdata']).','.$action['evaltype'].','.$action['status'].')';
-			$result = DBexecute($sql);
+			$transaction = self::BeginTransaction(__METHOD__);
+			foreach($actions as $anum => $action){
+				$action_db_fields = array(
+					'name'				=> null,
+					'eventsource'		=> null,
+					'evaltype'			=> null,
+					'status'			=> 0,
+					'esc_period'		=> 0,
+					'def_shortdata'		=> '',
+					'def_longdata'		=> '',
+					'recovery_msg'		=> 0,
+					'r_shortdata'		=> '',
+					'r_longdata'		=> '',
+				);
 
-			if(!$result) break;
-			$actionids[] = $actionid;
-		}
+				if(!check_db_fields($action_db_fields, $action)){
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Incorrect parameters used for Action [ '.$action['name'].' ]');
+				}
 
-		$result = self::EndTransaction($result, __METHOD__);
-		if($result){
-			$new_actions = CAction::get(array('actionids'=>$actionids, 'extendoutput'=>1, 'nopermissions'=>1));
+				$actionid = get_dbid('actions', 'actionid');
+				$values = array(
+					'actionid' => $actionid,
+					'name' => zbx_dbstr($action['name']),
+					'eventsource' => $action['eventsource'],
+					'esc_period' => $action['esc_period'],
+					'def_shortdata' => zbx_dbstr($action['def_shortdata']),
+					'def_longdata' => zbx_dbstr($action['def_longdata']),
+					'recovery_msg' => zbx_dbstr($action['recovery_msg']),
+					'r_shortdata' => zbx_dbstr($action['r_shortdata']),
+					'r_longdata' => zbx_dbstr($action['r_longdata']),
+					'evaltype' => $action['evaltype'],
+					'status' => $action['status']
+				);
+
+
+				$sql = 'INSERT INTO actions ('.implode(',', array_keys($values)).')'.
+						' VALUES ('.implode(',', array_values($values)).')';
+				$result = DBexecute($sql);
+
+				if(!$result) throw new APIException(ZBX_API_ERROR_INTERNAL, 'Failed to add Action [ '.$action['name'].' ]');
+				$actionids[] = $actionid;
+
+				foreach($action['operations'] as $onum => &$operation) $operation['actionid'] = $actionid;
+				unset($operation);
+
+				$result = self::addOperations($action['operations']);
+				if(!$result) 
+					throw new APIException(ZBX_API_ERROR_INTERNAL, 'Failed to add Action operation [ '.$action['name'].' ]');
+
+				foreach($action['conditions'] as $cnum => &$condition) $condition['actionid'] = $actionid;
+				unset($condition);
+
+				if(!empty($action['conditions'])){
+					$result = self::addConditions($action['conditions']);
+					if(!$result)
+						throw new APIException(ZBX_API_ERROR_INTERNAL, 'Failed to add Action condition [ '.$action['name'].' ]');
+				}
+			}
+
+			$result = self::EndTransaction($result, __METHOD__);
+			$options = array(
+				'actionids'=>$actionids,
+				'nopermissions'=>1
+			);
+
+			$new_actions = CAction::get($options);
 			return $new_actions;
 		}
-		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+		catch(APIException $e){
+			if(isset($transaction)) self::EndTransaction(false, __METHOD__);
+//SDII($e);
+			$errors = $e->getErrors();
+			$error = reset($errors);
+			self::$error[] = array('error' => $e->getCode(), 'data' => $error);
 			return false;
 		}
 	}
@@ -552,10 +613,13 @@ class CAction extends CZBXAPI{
 		$actions = zbx_toArray($actions);
 		$actionids = array();
 
-		$upd_actions = CAction::get(array('actionids'=>zbx_objectValues($actions, 'actionid'),
-											'editable'=>1,
-											'extendoutput'=>1,
-											'preservekeys'=>1));
+		$options = array(
+			'actionids'=>zbx_objectValues($actions, 'actionid'),
+			'editable'=>1,
+			'output'=> API_OUTPUT_EXTEND,
+			'preservekeys'=>1
+		);
+		$upd_actions = CAction::get($options);
 		foreach($actions as $anum => $action){
 			if(!isset($upd_actions[$action['actionid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -615,13 +679,13 @@ class CAction extends CZBXAPI{
 		$result = true;
 
 		if(!check_permission_for_action_conditions($conditions)){
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_PERMISSIONS, 'data' => 'You do not have enough rights for operation');
 			return false;
 		}
 
 		foreach($conditions as $cnum => $condition){
-			if( !validate_condition($condition['type'],$condition['value']) ){
-				self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			if(!validate_condition($condition['type'],$condition['value']) ){
+				self::$error[] = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Action condition validation failed');
 				return false;
 			}
 		}
@@ -629,7 +693,18 @@ class CAction extends CZBXAPI{
 		self::BeginTransaction(__METHOD__);
 		foreach($conditions as $cnum => $condition){
 
-			$result = add_action_condition($condition['actionid'], $condition);
+			$conditionid = get_dbid('conditions','conditionid');
+			$values = array(
+				'conditionid' => $conditionid,
+				'actionid' => $condition['actionid'],
+				'conditiontype' => $condition['conditiontype'],
+				'operator' => $condition['operator'],
+				'value' => zbx_dbstr($condition['value'])
+			);
+
+			$result = DBexecute('INSERT INTO conditions ('.implode(',', array_keys($values)).')'.
+					' VALUES ('.implode(',', array_values($values)).')');
+
 			if(!$result) break;
 		}
 		$result = self::EndTransaction($result, __METHOD__);
@@ -677,16 +752,78 @@ class CAction extends CZBXAPI{
 
 		foreach($operations as $onum => $operation){
 			if(!validate_operation($operation)){
-				self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+				self::$error[] = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Action operation validation failed');
 				return false;
 			}
 		}
 
 		self::BeginTransaction(__METHOD__);
 		foreach($operations as $onum => $operation){
-			$result = add_action_operation($operation['actionid'], $operation);
+			$operation_db_fields = array(
+				'operationid' => get_dbid('operations','operationid'),
+				'actionid' => null,
+				'operationtype' => null,
+				'object' => 0,
+				'objectid' => 0,
+				'shortdata' => '',
+				'longdata' => '',
+				'esc_period' => 0,
+				'esc_step_from' => 0,
+				'esc_step_to' => 0,
+				'default_msg' => 0,
+				'evaltype' => 0,
+				'mediatypeid' => 0,
+				'opconditions' => array()
+			);
+
+			if(!check_db_fields($operation_db_fields, $operation)){
+				$result = false;
+				break;
+			}
+
+			$operationid = get_dbid('operations','operationid');
+			$values = array(
+				'operationid' => $operationid,
+				'actionid' => $operation['actionid'],
+				'operationtype' => $operation['operationtype'],
+				'object' => $operation['object'],
+				'objectid' => $operation['objectid'],
+				'shortdata' => zbx_dbstr($operation['shortdata']),
+				'longdata' => zbx_dbstr($operation['longdata']),
+				'esc_period' => $operation['esc_period'],
+				'esc_step_from' => $operation['esc_step_from'],
+				'esc_step_to' => $operation['esc_step_to'],
+				'default_msg' => $operation['default_msg'],
+				'evaltype' => $operation['evaltype']
+			);
+
+			$result = DBexecute('INSERT INTO operations ('.implode(',', array_keys($values)).')'.
+					' VALUES ('.implode(',', array_values($values)).')');
+
+			if(!$result) return $result;
+
+			foreach($operation['opconditions'] as $num => $opcondition){
+				$opconditionid = get_dbid("opconditions","opconditionid");
+
+				$result &= (bool) DBexecute('INSERT INTO opconditions (opconditionid,operationid,conditiontype,operator,value)'.
+					' values ('.$opconditionid.','.
+						$operationid.','.
+						$opcondition['conditiontype'].','.
+						$opcondition['operator'].','.
+						zbx_dbstr($opcondition['value']).
+					')');
+			}
+
+			if($operation['mediatypeid'] > 0){
+				$opmediatypeid = get_dbid('opmediatypes', 'opmediatypeid');
+
+				$result &= (bool) DBexecute('INSERT INTO opmediatypes (opmediatypeid,operationid,mediatypeid)'.
+					' VALUES ('.$opmediatypeid.','.$operationid.','.$mediatypeid.')');
+			}
+
 			if(!$result) break;
 		}
+
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){

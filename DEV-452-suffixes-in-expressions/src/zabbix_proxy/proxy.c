@@ -47,7 +47,7 @@
 #include "heart/heart.h"
 
 char *progname = NULL;
-char title_message[] = "Zabbix Proxy (daemon)";
+char title_message[] = "Zabbix Proxy";
 char usage_message[] = "[-hV] [-c <file>]";
 
 #ifndef HAVE_GETOPT_LONG
@@ -389,7 +389,7 @@ int MAIN_ZABBIX_ENTRY(void)
 
 	int		server_num = 0;
 
-	if(CONFIG_LOG_FILE == NULL)
+	if(CONFIG_LOG_FILE == NULL || '\0' == *CONFIG_LOG_FILE)
 	{
 		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
 	}
@@ -429,7 +429,7 @@ int MAIN_ZABBIX_ENTRY(void)
 #       define IPV6_FEATURE_STATUS " NO"
 #endif
 
-	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_proxy. Zabbix %s (revision %s).",
+	zabbix_log( LOG_LEVEL_WARNING, "Starting Zabbix Proxy. Zabbix %s (revision %s).",
 			ZABBIX_VERSION,
 			ZABBIX_REVISION);
 

@@ -87,7 +87,7 @@ include_once('include/page_header.php');
 	show_table_header(array(
 			S_IT_SERVICES_AVAILABILITY_REPORT_BIG,
 			SPACE.'"',
-			new CLink($service['name'],'srv_status.php?serviceid='.$service['serviceid']),
+			new CLink($service['name'],'srv_status.php?showgraph=1&serviceid='.$service['serviceid']),
 			'"'
 		),
 		$form);

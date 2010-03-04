@@ -59,11 +59,12 @@ include_once('include/page_header.php');
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			update_profile('web.auditlogs.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.auditlogs.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -76,17 +77,17 @@ include_once('include/page_header.php');
 		$_REQUEST['nav_time'] = time();
 	}
 
-	$_REQUEST['alias'] = get_request('alias', get_profile('web.auditlogs.filter.alias', ''));
-	$_REQUEST['action'] = get_request('action', get_profile('web.auditlogs.filter.action',-1));
-	$_REQUEST['resourcetype'] = get_request('resourcetype', get_profile('web.auditlogs.filter.resourcetype',-1));
-	$_REQUEST['nav_time'] = get_request('nav_time', get_profile('web.auditlogs.filter.nav_time',time()));
+	$_REQUEST['alias'] = get_request('alias', CProfile::get('web.auditlogs.filter.alias', ''));
+	$_REQUEST['action'] = get_request('action', CProfile::get('web.auditlogs.filter.action',-1));
+	$_REQUEST['resourcetype'] = get_request('resourcetype', CProfile::get('web.auditlogs.filter.resourcetype',-1));
+	$_REQUEST['nav_time'] = get_request('nav_time', CProfile::get('web.auditlogs.filter.nav_time',time()));
 
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
-		update_profile('web.auditlogs.filter.alias', $_REQUEST['alias']);
-		update_profile('web.auditlogs.filter.action', $_REQUEST['action'], PROFILE_TYPE_INT);
-		update_profile('web.auditlogs.filter.resourcetype', $_REQUEST['resourcetype'], PROFILE_TYPE_INT);
+		CProfile::update('web.auditlogs.filter.alias', $_REQUEST['alias'], PROFILE_TYPE_STR);
+		CProfile::update('web.auditlogs.filter.action', $_REQUEST['action'], PROFILE_TYPE_INT);
+		CProfile::update('web.auditlogs.filter.resourcetype', $_REQUEST['resourcetype'], PROFILE_TYPE_INT);
 
-		update_profile('web.auditlogs.filter.nav_time', $_REQUEST['nav_time'], PROFILE_TYPE_INT);
+		CProfile::update('web.auditlogs.filter.nav_time', $_REQUEST['nav_time'], PROFILE_TYPE_INT);
 	}
 // --------------
 
@@ -216,7 +217,7 @@ include_once('include/page_header.php');
 	$filterForm->addItemToBottomRow(new CButton("filter_set",S_FILTER));
 	$filterForm->addItemToBottomRow($reset);
 
-	$audit_wdgt->addFlicker($filterForm, get_profile('web.auditlogs.filter.state',1));
+	$audit_wdgt->addFlicker($filterForm, CProfile::get('web.auditlogs.filter.state',1));
 //-------
 
 	$sql_cond = '';

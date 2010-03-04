@@ -75,9 +75,11 @@ class CApplication extends CZBXAPI{
 			'hostids'				=> null,
 			'itemids'				=> null,
 			'applicationids'		=> null,
+			'templated'				=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
 // Filter
+			'filter'				=> null,
 			'pattern'				=> '',
 
 // OutPut
@@ -107,9 +109,6 @@ class CApplication extends CZBXAPI{
 
 
 // editable + PERMISSION CHECK
-		if(defined('ZBX_API_REQUEST')){
-			$options['nopermissions'] = false;
-		}
 
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
@@ -135,7 +134,7 @@ class CApplication extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
 // groupids
 		if(!is_null($options['groupids'])){
 			zbx_value2array($options['groupids']);
@@ -146,6 +145,7 @@ class CApplication extends CZBXAPI{
 			$sql_parts['where']['ahg'] = 'a.hostid=hg.hostid';
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 		}
+
 // hostids
 		if(!is_null($options['hostids'])){
 			zbx_value2array($options['hostids']);
@@ -154,14 +154,16 @@ class CApplication extends CZBXAPI{
 				$sql_parts['select']['hostid'] = 'a.hostid';
 			}
 
-			$sql_parts['where'][] = DBcondition('a.hostid', $options['hostids']);
+			$sql_parts['where']['hostid'] = DBcondition('a.hostid', $options['hostids']);
 		}
+
 // expand_data
 		if(!is_null($options['expand_data'])){
 			$sql_parts['select']['host'] = 'h.host';
 			$sql_parts['from']['h'] = 'hosts h';
 			$sql_parts['where']['ah'] = 'a.hostid=h.hostid';
 		}
+
 // itemids
 		if(!is_null($options['itemids'])){
 			zbx_value2array($options['itemids']);
@@ -186,6 +188,17 @@ class CApplication extends CZBXAPI{
 
 		}
 
+// templated
+		if(!is_null($options['templated'])){
+			$sql_parts['from']['h'] = 'hosts h';
+			$sql_parts['where']['ah'] = 'a.hostid=h.hostid';
+
+			if($options['templated'])
+				$sql_parts['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
+			else
+				$sql_parts['where'][] = 'h.status<>'.HOST_STATUS_TEMPLATE;
+		}
+
 // extendoutput
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['apps'] = 'a.*';
@@ -201,7 +214,18 @@ class CApplication extends CZBXAPI{
 
 // pattern
 		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where'][] = ' UPPER(a.name) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+			$sql_parts['where']['name'] = ' UPPER(a.name) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+		}
+
+// filter
+		if(!is_null($options['filter'])){
+			zbx_value2array($options['filter']);
+
+			if(isset($options['filter']['name']))
+				$sql_parts['where']['name'] = 'a.name='.zbx_dbstr($options['filter']['name']);
+
+			if(isset($options['filter']['hostid']))
+				$sql_parts['where']['hostid'] = 'a.hostid='.$options['filter']['hostid'];
 		}
 
 // order
@@ -357,21 +381,41 @@ class CApplication extends CZBXAPI{
  * @param array $app_data['hostid']
  * @return int|boolean
  */
-	public static function getObjects($app_data){
+	public static function getObjects($applicationData){
+		$options = array(
+			'filter' => $applicationData,
+			'output'=>API_OUTPUT_EXTEND
+		);
+
+		if(isset($applicationData['node']))
+			$options['nodeids'] = getNodeIdByNodeName($applicationData['node']);
+		else if(isset($applicationData['nodeids']))
+			$options['nodeids'] = $applicationData['nodeids'];
+
+		$result = self::get($options);
+
+	return $result;
+	}
+
+	public static function checkObjects($applicationsData){
+		$applicationsData = zbx_toArray($applicationsData);
+		
 		$result = array();
-		$applicationids = array();
+		foreach($applicationsData as $inum => $applicationData){
+			$options = array(
+				'filter' => $applicationData,
+				'output' => API_OUTPUT_SHORTEN,
+				'nopermissions' => 1
+			);
 
-		$sql = 'SELECT applicationid '.
-				' FROM applications '.
-				' WHERE hostid='.$app_data['hostid'].
-					' AND name='.zbx_dbstr($app_data['name']);
-		$res = DBselect($sql);
-		while($app = DBfetch($res)){
-			$applicationids[$app['applicationid']] = $app['applicationid'];
+			if(isset($applicationData['node']))
+				$options['nodeids'] = getNodeIdByNodeName($applicationData['node']);
+			else if(isset($applicationData['nodeids']))
+				$options['nodeids'] = $applicationData['nodeids'];
+
+			$applications = self::get($options);
+			$result+= $applications;
 		}
-
-		if(!empty($applicationids))
-			$result = self::get(array('applicationids'=>$applicationids, 'extendoutput'=>1));
 
 	return $result;
 	}
@@ -549,12 +593,13 @@ class CApplication extends CZBXAPI{
 		if(empty($applications)) return true;
 
 // PERMISSION {{{
-		$allowed_applications = self::get(array(
+		$app_options = array(
 			'applicationids' => zbx_objectValues($applications, 'applicationid'),
 			'editable' => 1,
 			'extendoutput' => 1,
-			'preservekeys' => 1)
+			'preservekeys' => 1
 		);
+		$allowed_applications = self::get($app_options);
 		foreach($applications as $num => $application){
 			if(!isset($allowed_applications[$application['applicationid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -563,12 +608,13 @@ class CApplication extends CZBXAPI{
 			$applicationids[] = $application['applicationid'];
 		}
 
-		$allowed_items = CItem::get(array(
+		$item_options = array(
 			'itemids' => zbx_objectValues($items, 'itemid'),
 			'editable' => 1,
 			'extendoutput' => 1,
-			'preservekeys' => 1)
+			'preservekeys' => 1
 		);
+		$allowed_items = CItem::get($item_options);
 		foreach($items as $num => $item){
 			if(!isset($allowed_items[$item['itemid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -581,8 +627,10 @@ class CApplication extends CZBXAPI{
 
 		self::BeginTransaction(__METHOD__);
 
-		$sql = 'SELECT itemid, applicationid FROM items_applications WHERE '.
-			DBcondition('itemid', $itemids).' AND '.DBcondition('applicationid', $applicationids);
+		$sql = 'SELECT itemid, applicationid '.
+				' FROM items_applications '.
+				' WHERE '.DBcondition('itemid', $itemids).
+					' AND '.DBcondition('applicationid', $applicationids);
 		$linked_db = DBselect($sql);
 		while($pair = DBfetch($linked_db)){
 			$linked[$pair['applicationid']] = array($pair['itemid'] => $pair['itemid']);
@@ -627,11 +675,13 @@ class CApplication extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$result = self::get(array(
+			$options = array(
 				'applicationids' => $applicationids,
-				'extendoutput' => 1,
-				'select_items' => 1,
-				'nopermission' => 1));
+				'output' => API_OUTPUT_EXTEND,
+				'select_items' => API_OUTPUT_EXTEND,
+				'nopermission' => 1
+			);
+			$result = self::get($options);
 			return $result;
 		}
 		else{

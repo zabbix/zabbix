@@ -49,8 +49,20 @@ start: function(){
 	this.timeout = setTimeout('PageRefresh.check()', 1000);
 },
 
+restart: function(){
+	this.stop();
+	this.delayLeft = this.delay;
+	this.start();
+},
+
 stop: function(){
 	clearTimeout(this.timeout);	
+},
+
+restart: function(){
+	this.stop();
+	this.delayLeft = this.delay;
+	this.start();
 }
 }
 
@@ -69,19 +81,18 @@ timeout_change:	null,
 mouseOver: function(show_label){
 	clearTimeout(this.timeout_reset);
 	this.timeout_change = setTimeout('MMenu.showSubMenu("'+show_label+'")', 200);
-	PageRefresh.stop();
+	PageRefresh.restart();
 },
 
 submenu_mouseOver: function(){
 	clearTimeout(this.timeout_reset);
 	clearTimeout(this.timeout_change);
-	PageRefresh.stop();
+	PageRefresh.restart();
 },
 
 mouseOut: function(){
 	clearTimeout(this.timeout_change);
 	this.timeout_reset = setTimeout('MMenu.showSubMenu("'+this.def_label+'")', 2500);
-	PageRefresh.start();
 },
 
 showSubMenu: function(show_label){
@@ -161,7 +172,7 @@ check: function(e){
 	var e = e || window.event;
 	var obj = eventTarget(e);
 
-	PageRefresh.stop();
+	PageRefresh.restart();
 	
 	if((typeof(obj) == 'undefined') || (obj.type.toLowerCase() != 'checkbox')){
 		return true;
@@ -341,7 +352,7 @@ submitGo: function(e){
 		return true;
 	}
 	else{
-		alert(locale['S_NO_ELEMENTS_SELECTES']);
+		alert(locale['S_NO_ELEMENTS_SELECTED']);
 		Event.stop(e);
 		return false;
 	}
@@ -405,7 +416,7 @@ createBox: function(obj, hint_text, width, className, byClick){
 	else obj.parentNode.appendChild(box);
 	
 	box.setAttribute('id', boxid);
-	box.style.visibility = 'hidden';
+	box.style.display = 'none';
 	box.className = 'hintbox';
 	
 	if(!empty(className)){
@@ -528,7 +539,8 @@ show: function(e, obj, hintbox){
 	this.debug('show');
 	
 	var hintid = hintbox.id;
-	var body_width = get_bodywidth();
+	// var body_width = get_bodywidth();
+	var body_width = document.viewport.getDimensions().width;
 	
 //	pos = getPosition(obj);
 // this.debug('body width: ' + body_width);
@@ -547,12 +559,16 @@ show: function(e, obj, hintbox){
 	hintbox.x	= pos.left;
 //*/
 	
+	hintbox.style.visibility = 'hidden';
+	hintbox.style.display = 'block';
+
 	posit = $(obj).positionedOffset();
 	cumoff = $(obj).cumulativeOffset();
 	if(parseInt(cumoff.left+10+hintbox.offsetWidth) > body_width){
-		posit.left-=parseInt(hintbox.offsetWidth);
+		posit.left = posit.left - parseInt((cumoff.left+10+hintbox.offsetWidth) - body_width) + document.viewport.getScrollOffsets().left;
+		// posit.left-=parseInt(hintbox.offsetWidth);
 		posit.left-=10;
-		//posit.left=(pos.left < 0)?0:posit.left;
+		posit.left = (posit.left < 0) ? 0 : posit.left;
 	}
 	else{
 		posit.left+=10;

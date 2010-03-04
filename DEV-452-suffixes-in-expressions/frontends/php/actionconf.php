@@ -35,7 +35,7 @@ $page['hist_arg']	= array();
 
 include_once('include/page_header.php');
 
-$_REQUEST['eventsource'] = get_request('eventsource',get_profile('web.actionconf.eventsource',EVENT_SOURCE_TRIGGERS));
+$_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionconf.eventsource',EVENT_SOURCE_TRIGGERS));
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -60,10 +60,10 @@ $_REQUEST['eventsource'] = get_request('eventsource',get_profile('web.actionconf
 		'operations'=>		array(null, O_OPT, null, null, 'isset({save})'),
 		'g_operationid'=>	array(null, O_OPT, null, null, null),
 		'edit_operationid'=>	array(null, O_OPT, P_ACT, DB_ID, null),
-		'new_operation'=>	array(null, O_OPT, null, null, 'isset({add_operation})'),
+		'new_operation'=>		array(null, O_OPT, null, null, 'isset({add_operation})'),
 		'opconditions'=>		array(null, O_OPT, null, null, null),
-		'g_opconditionid'=>	array(null, O_OPT, null, null, null),
-		'new_opcondition'=>	array(null,	O_OPT,  null,	null,	'isset({add_opcondition})'),
+		'g_opconditionid'=>		array(null, O_OPT, null, null, null),
+		'new_opcondition'=>		array(null,	O_OPT,  null,	null,	'isset({add_opcondition})'),
 // Actions
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
 // form
@@ -82,7 +82,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',get_profile('web.actionconf
 		'delete'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 /* other */
-		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'form'=>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	null,	null,	null),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL, NULL),
@@ -100,11 +100,12 @@ $_REQUEST['eventsource'] = get_request('eventsource',get_profile('web.actionconf
 // for future use
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			update_profile('web.audit.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.audit.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		require_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -117,7 +118,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',get_profile('web.actionconf
 	}
 ?>
 <?php
-	update_profile('web.actionconf.eventsource',$_REQUEST['eventsource'], PROFILE_TYPE_INT);
+	CProfile::update('web.actionconf.eventsource',$_REQUEST['eventsource'], PROFILE_TYPE_INT);
 ?>
 <?php
 	if(inarr_isset(array('clone','actionid'))){
@@ -162,20 +163,34 @@ $_REQUEST['eventsource'] = get_request('eventsource',get_profile('web.actionconf
 			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
 		}
 		else {
+			foreach($conditions as $cnum => &$condition){
+				$condition['conditiontype'] = $condition['type'];
+			}
+			unset($condition);
 
-			$result = $actionid = add_action(
-				$_REQUEST['name'],$_REQUEST['eventsource'],$_REQUEST['esc_period'],
-				$_REQUEST['def_shortdata'],$_REQUEST['def_longdata'],
-				$_REQUEST['recovery_msg'],$_REQUEST['r_shortdata'],$_REQUEST['r_longdata'],
-				$_REQUEST['evaltype'],$_REQUEST['status'],
-				$conditions, $operations
+			$action = array(
+					'name'				=> get_request('name'),
+					'eventsource'		=> get_request('eventsource',0),
+					'evaltype'			=> get_request('evaltype',0),
+					'status'			=> get_request('status',0),
+					'esc_period'		=> get_request('esc_period',0),
+					'def_shortdata'		=> get_request('def_shortdata',''),
+					'def_longdata'		=> get_request('def_longdata',''),
+					'recovery_msg'		=> get_request('recovery_msg',0),
+					'r_shortdata'		=> get_request('r_shortdata',''),
+					'r_longdata'			=> get_request('r_longdata',''),
+					'conditions'		=> $conditions,
+					'operations'		=> $operations
 				);
 
-			$result = DBend($result);
+			$actions = CAction::create($action);
+
+			$result = DBend($actions);
 			show_messages($result,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
 		}
 
-		if($result){ // result - OK
+		if($result){
+// result - OK
 			add_audit(!isset($_REQUEST['actionid'])?AUDIT_ACTION_ADD:AUDIT_ACTION_UPDATE,
 				AUDIT_RESOURCE_ACTION,
 				S_NAME.': '.$_REQUEST['name']);
@@ -576,7 +591,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',get_profile('web.actionconf
 
 		$jsLocale = array(
 			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTES'
+			'S_NO_ELEMENTS_SELECTED'
 		);
 
 		zbx_addJSLocale($jsLocale);

@@ -931,7 +931,7 @@
 		$frmUser->addItemToBottomRow(new CButton('save',S_SAVE));
 		if(isset($userid) && $profile == 0){
 			$frmUser->addItemToBottomRow(SPACE);
-			$delete_b = new CButtonDelete("Delete selected user?",url_param("form").url_param("config").url_param("userid"));
+			$delete_b = new CButtonDelete(S_DELETE_SELECTED_USER_Q,url_param("form").url_param("config").url_param("userid"));
 			if(bccomp($USER_DETAILS['userid'],$userid) == 0){
 				$delete_b->setAttribute('disabled','disabled');
 			}
@@ -1476,7 +1476,7 @@
 // } FORM FOR FILTER DISPLAY
 
 // SUBFILTERS {
-		$header = get_thin_table_header('Subfilter [affects only filtered data!]');
+		$header = get_thin_table_header(S_SUBFILTER.SPACE.'['.S_AFFECTS_ONLY_FILTERED_DATA_SMALL.']');
 		$form->addItem($header);
 		$table_subfilter = new Ctable();
 		$table_subfilter->setClass('filter');
@@ -1822,7 +1822,12 @@
 
 		if(isset($_REQUEST['itemid'])){
 			$frmItem->addVar('itemid', $_REQUEST['itemid']);
-			$item_data = CItem::get(array('itemids' => $_REQUEST['itemid'],  'extendoutput' => 1));
+
+			$options = array(
+				'itemids' => $_REQUEST['itemid'],
+				'output' => API_OUTPUT_EXTEND
+			);
+			$item_data = CItem::get($options);
 			$item_data = reset($item_data);
 
 			$hostid	= ($hostid > 0) ? $hostid : $item_data['hostid'];
@@ -2192,7 +2197,7 @@
 						);
 			}
 
-			$link = new CLink('throw map','config.php?config=6');
+			$link = new CLink(S_THROW_MAP_SMALL,'config.php?config=6');
 			$link->setAttribute('target','_blank');
 			$frmItem->addRow(array(S_SHOW_VALUE.SPACE,$link),$cmbMap);
 
@@ -2242,7 +2247,7 @@
 			if(!isset($limited)){
 				array_push($frmRow,
 					SPACE,
-					new CButtonDelete('Delete selected item?',
+					new CButtonDelete(S_DELETE_SELECTED_ITEM_Q,
 						url_param('form').url_param('groupid').url_param('itemid'))
 				);
 			}
@@ -2276,7 +2281,7 @@
 		}
 		$frmItem->addItemToBottomRow($cmbAction);
 		$frmItem->addItemToBottomRow(SPACE);
-		$frmItem->addItemToBottomRow(new CButton('register','do'));
+		$frmItem->addItemToBottomRow(new CButton('register',S_DO_SMALL));
 
 		$frmItem->show();
 	}
@@ -2347,7 +2352,7 @@
 		}
 
 		if(count($delay_flex_el)==0)
-			array_push($delay_flex_el, "No flexible intervals");
+			array_push($delay_flex_el, S_NO_FLEXIBLE_INTERVALS);
 		else
 			array_push($delay_flex_el, new CButton('del_delay_flex',S_DELETE_SELECTED));
 
@@ -2454,7 +2459,7 @@
 					get_node_name_by_elid($db_valuemap["valuemapid"], null, ': ').$db_valuemap["name"]
 					);
 
-		$link = new CLink("throw map","config.php?config=6");
+		$link = new CLink(S_THROW_MAP_SMALL,"config.php?config=6");
 		$link->setAttribute("target","_blank");
 		$frmItem->addRow(array( new CVisibilityBox('valuemapid_visible', get_request('valuemapid_visible'), 'valuemapid', S_ORIGINAL),
 			S_SHOW_VALUE, SPACE, $link),$cmbMap);
@@ -2493,7 +2498,7 @@
 		$copy_targetid = get_request('copy_targetid', array());
 
 		if(!is_array($group_itemid) || (is_array($group_itemid) && count($group_itemid) < 1)){
-			error("Incorrect list of items.");
+			error(S_INCORRECT_LIST_OF_ITEMS);
 			return;
 		}
 
@@ -2509,8 +2514,11 @@
 		$target_list = array();
 
 		$groups = CHostGroup::get(array('extendoutput'=>1, 'order'=>'name'));
+		order_result($groups, 'name');
+		
 		if(0 == $copy_type){
 			$cmbGroup = new CComboBox('filter_groupid',$filter_groupid,'submit()');
+			
 			foreach($groups as $gnum => $group){
 				if(empty($filter_groupid)) $filter_groupid = $group['groupid'];
 				$cmbGroup->addItem($group['groupid'],$group['name']);
@@ -2518,10 +2526,14 @@
 
 			$frmCopy->addRow('Group', $cmbGroup);
 
-			$options = array('extendoutput'=>1,
-							'order'=>'host',
-							'groupids'=> $filter_groupid);
+			$options = array(
+				'extendoutput'=>1,
+				'groupids' => $filter_groupid,
+				'templated_hosts' => 1
+			);
 			$hosts = CHost::get($options);
+			order_result($hosts, 'host');
+			
 			foreach($hosts as $num => $host){
 				$hostid = $host['hostid'];
 
@@ -2532,21 +2544,6 @@
 						$hostid),
 					SPACE,
 					$host['host'],
-					BR()
-				));
-			}
-
-			$templates = CTemplate::get($options);
-
-			foreach($templates as $num => $template){
-				$templateid = $template['templateid'];
-				array_push($target_list,array(
-					new CCheckBox('copy_targetid['.$templateid.']',
-						uint_in_array($templateid, $copy_targetid),
-						null,
-						$templateid),
-					SPACE,
-					$template['host'],
 					BR()
 				));
 			}
@@ -2798,7 +2795,7 @@
 				foreach($exprs as $i => $e){
 					$tgt_chk = new CCheckbox('expr_target_single', ($i==0)?'yes':'no', 'check_target(this);', $e['id']);
 					$del_url = new CSpan(S_DELETE,'link');
-					$del_url->setAttribute('onclick', 'javascript: if(confirm("Delete expression?")) {'.
+					$del_url->setAttribute('onclick', 'javascript: if(confirm("'.S_DELETE_EXPRESSION_Q.'")) {'.
 										 	' delete_expression('.$e['id'] .');'.
 										 	' document.forms["config_triggers.php"].submit(); '.
 										'}');
@@ -2886,7 +2883,7 @@
 			$frmTrig->addItemToBottomRow(new CButton("clone",S_CLONE));
 			$frmTrig->addItemToBottomRow(SPACE);
 			if( !$limited ){
-				$frmTrig->addItemToBottomRow(new CButtonDelete("Delete trigger?",
+				$frmTrig->addItemToBottomRow(new CButtonDelete(S_DELETE_TRIGGER_Q,
 					url_param("form").url_param('groupid').url_param("hostid").
 					url_param("triggerid")));
 			}
@@ -4001,7 +3998,6 @@
 			if($esc_period) $_REQUEST['escalation'] = 1;
 		}
 		else{
-
 			if(isset($_REQUEST['escalation']) && (0 == $_REQUEST['esc_period']))
 				$_REQUEST['esc_period'] = 3600;
 
@@ -4270,7 +4266,7 @@
 				$rowCondition[] = array(
 					new CTextBox('group','',20,'yes'),
 					new CButton('btn1',S_SELECT,
-						"return PopUp('popup.php?dstfrm=".S_ACTION.
+						"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=group&srctbl=host_group".
 						"&srcfld1=groupid&srcfld2=name',450,450);",
 						'T')
@@ -4281,7 +4277,7 @@
 				$rowCondition[] = array(
 					new CTextBox('host','',20,'yes'),
 					new CButton('btn1',S_SELECT,
-						"return PopUp('popup.php?dstfrm=".S_ACTION.
+						"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=host_templates".
 						"&srcfld1=hostid&srcfld2=host',450,450);",
 						'T')
@@ -4292,7 +4288,7 @@
 				$rowCondition[] = array(
 					new CTextBox('host','',20,'yes'),
 					new CButton('btn1',S_SELECT,
-						"return PopUp('popup.php?dstfrm=".S_ACTION.
+						"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=hosts".
 						"&srcfld1=hostid&srcfld2=host',450,450);",
 						'T')
@@ -4304,7 +4300,7 @@
 				$rowCondition[] = array(
 					new CTextBox('trigger','',20,'yes'),
 					new CButton('btn1',S_SELECT,
-						"return PopUp('popup.php?dstfrm=".S_ACTION.
+						"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=trigger&srctbl=triggers".
 						"&srcfld1=triggerid&srcfld2=description');",
 						'T')
@@ -4342,7 +4338,7 @@
 				$rowCondition[] = array(
 					new CTextBox('node','',20,'yes'),
 					new CButton('btn1',S_SELECT,
-						"return PopUp('popup.php?dstfrm=".S_ACTION.
+						"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=node&srctbl=nodes".
 						"&srcfld1=nodeid&srcfld2=name',450,450);",
 						'T')
@@ -4364,7 +4360,7 @@
 				$rowCondition[] = array(
 					new CTextBox('dcheck','',50,'yes'),
 					new CButton('btn1',S_SELECT,
-						"return PopUp('popup.php?dstfrm=".S_ACTION.
+						"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=dcheck&srctbl=dchecks".
 						"&srcfld1=dcheckid&srcfld2=name',450,450);",
 						'T')
@@ -4375,7 +4371,7 @@
 				$rowCondition[] = array(
 					new CTextBox('proxy','',20,'yes'),
 					new CButton('btn1',S_SELECT,
-						"return PopUp('popup.php?dstfrm=".S_ACTION.
+						"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=proxy&srctbl=proxies".
 						"&srcfld1=hostid&srcfld2=host',450,450);",
 						'T')
@@ -5215,7 +5211,7 @@
 		$newgroup = get_request('newgroup', '');
 
 		$host 		= get_request('host',	'');
-		$port 		= get_request('port',	get_profile('HOST_PORT',10050));
+		$port 		= get_request('port',	CProfile::get('HOST_PORT',10050));
 		$status		= get_request('status',	HOST_STATUS_MONITORED);
 		$useip		= get_request('useip',	1);
 		$dns		= get_request('dns',	'');
@@ -5564,7 +5560,7 @@
 		$newgroup	= get_request('newgroup','');
 
 		$host 		= get_request('host',	'');
-		$port 		= get_request('port',	get_profile('HOST_PORT',10050));
+		$port 		= get_request('port',	CProfile::get('HOST_PORT',10050));
 		$status		= get_request('status',	HOST_STATUS_MONITORED);
 		$useip		= get_request('useip',	1);
 		$dns		= get_request('dns',	'');
@@ -6083,7 +6079,7 @@
 			}
 		}
 		else{
-			$frmHostP->addSpanRow("Profile for this host is missing","form_row_c");
+			$frmHostP->addSpanRow(S_PROFILE_FOR_THIS_HOST_IS_MISSING,"form_row_c");
 		}
 		$frmHostP->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param('prof_type')));
 	return $frmHostP;
@@ -6231,6 +6227,33 @@
  		$frmHostT->show();
 	}
 
+	function import_map_form($rules){
+
+		$form = new CFormTable(S_IMPORT, null, 'post', 'multipart/form-data');
+		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
+
+		$table = new CTable();
+		$table->setHeader(array(S_ELEMENT, S_UPDATE.SPACE.S_EXISTING, S_ADD.SPACE.S_MISSING), 'bold');
+
+		$titles = array('maps' => S_MAP);
+
+		foreach($titles as $key => $title){
+			$cbExist = new CCheckBox('rules['.$key.'][exist]', isset($rules[$key]['exist']));
+
+			if($key == 'template')
+				$cbMissed = null;
+			else
+				$cbMissed = new CCheckBox('rules['.$key.'][missed]', isset($rules[$key]['missed']));
+
+			$table->addRow(array($title, $cbExist, $cbMissed));
+		}
+
+		$form->addRow(S_RULES, $table);
+
+		$form->addItemToBottomRow(new CButton('import', S_IMPORT));
+		$form->show();
+	}
+
 	function insert_map_form(){
 		$frm_title = 'New system map';
 
@@ -6274,7 +6297,7 @@
 		$frmMap->addRow(S_HEIGHT,new CNumericBox('height',$height,5));
 
 		$cmbImg = new CComboBox('backgroundid',$backgroundid);
-		$cmbImg->addItem(0,'No image...');
+		$cmbImg->addItem(0,S_NO_IMAGE.'...');
 
 		$result=DBselect('SELECT * FROM images WHERE imagetype=2 AND '.DBin_node('imageid').' order by name');
 		while($row=DBfetch($result)){
@@ -6310,7 +6333,7 @@
 
 		if(isset($_REQUEST['sysmapid'])){
 			$frmMap->addItemToBottomRow(SPACE);
-			$frmMap->addItemToBottomRow(new CButtonDelete('Delete system map?',
+			$frmMap->addItemToBottomRow(new CButtonDelete(S_DELETE_SYSTEM_MAP_Q,
 					url_param('form').url_param('sysmapid')));
 		}
 

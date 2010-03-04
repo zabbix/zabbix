@@ -486,8 +486,8 @@ typedef enum
 
 typedef enum
 {
-	ZBX_CASE_SENSITIVE = 0,
-	ZBX_IGNORE_CASE
+	ZBX_IGNORE_CASE = 0,
+	ZBX_CASE_SENSITIVE	
 } zbx_case_sensitive_t;
 
 /* HTTP Tests statuses */
@@ -547,6 +547,15 @@ typedef enum
 } zbx_trigger_severity_t;
 char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity);
 
+typedef enum
+{
+	ITEM_LOGTYPE_INFORMATION = 1,
+	ITEM_LOGTYPE_WARNING,
+	ITEM_LOGTYPE_ERROR = 4,
+	ITEM_LOGTYPE_FAILURE_AUDIT = 7,
+	ITEM_LOGTYPE_SUCCESS_AUDIT
+} zbx_item_logtype_t;
+char	*zbx_item_logtype_string(zbx_item_logtype_t logtype);
 /* Media statuses */
 #define MEDIA_STATUS_ACTIVE	0
 #define MEDIA_STATUS_DISABLED	1
@@ -776,6 +785,11 @@ int	str_in_list(char *list, const char *value, const char delimiter);
 #endif /* HAVE___VA_ARGS__ */
 void	__zbx_zbx_setproctitle(const char *fmt, ...);
 
+#define SEC_PER_MIN 60
+#define SEC_PER_HOUR 3600
+#define SEC_PER_DAY 86400
+#define SEC_PER_WEEK (7*SEC_PER_DAY)
+#define SEC_PER_YEAR (365*SEC_PER_DAY)
 #define ZBX_JAN_1970_IN_SEC   2208988800.0        /* 1970 - 1900 in seconds */
 double	zbx_time(void);
 double	zbx_current_time (void);
@@ -857,6 +871,8 @@ int	regexp_match_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, co
 		zbx_case_sensitive_t cs);
 
 /* Misc functions */
+int	is_ip4(const char *ip);
+
 int	cmp_double(double a,double b);
 int     zbx_get_field(char *line, char *result, int num, char delim);
 

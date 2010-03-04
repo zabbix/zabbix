@@ -19,27 +19,26 @@
 **/
 ?>
 <?php
+require_once('include/config.inc.php');
+require_once('include/forms.inc.php');
 
-	require_once('include/config.inc.php');
-	require_once('include/forms.inc.php');
-
-	$_REQUEST['go'] = get_request('go', 'none');
-	if(($_REQUEST['go'] == 'export') && isset($_REQUEST['hosts'])){
-		$EXPORT_DATA = true;
-		$page['type'] = PAGE_TYPE_XML;
-		$page['file'] = 'zabbix_export.xml';
-		require_once('include/export.inc.php');
-	}
-	else{
-		$EXPORT_DATA = false;
-		$page['title'] = 'S_EXPORT_IMPORT';
-		$page['file'] = 'export.php';
-		$page['hist_arg'] = array('groupid');
-	}
+$_REQUEST['go'] = get_request('go', 'none');
+if(($_REQUEST['go'] == 'export') && isset($_REQUEST['hosts'])){
+	$EXPORT_DATA = true;
+	$page['type'] = PAGE_TYPE_XML;
+	$page['file'] = 'zabbix_export.xml';
+	require_once('include/export.inc.php');
+}
+else{
+	$EXPORT_DATA = false;
+	$page['title'] = 'S_EXPORT_IMPORT';
+	$page['file'] = 'export.php';
+	$page['hist_arg'] = array('groupid');
+}
 
 include_once('include/page_header.php');
-
-
+?>
+<?php
 	$fields = array(
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 		'groupid' =>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
@@ -202,7 +201,8 @@ include_once('include/page_header.php');
 
 		$xml = zbxXML::export($data);
 
-		die($xml);
+		print($xml);
+		exit();
 	}
 
 	$form = new CForm();
@@ -289,7 +289,7 @@ include_once('include/page_header.php');
 
 		$jsLocale = array(
 			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTES'
+			'S_NO_ELEMENTS_SELECTED'
 		);
 
 		zbx_addJSLocale($jsLocale);
@@ -426,8 +426,8 @@ include_once('include/page_header.php');
 
 // goBox {
 		$goBox = new CComboBox('go');
-		$goBox->addItem('preview', S_PREVIEW);
 		$goBox->addItem('export', S_EXPORT);
+		$goBox->addItem('preview', S_PREVIEW);
 
 		// goButton name is necessary!!!
 		$goButton = new CButton('goButton', S_GO.' ('.$count_chkbx.')');
@@ -435,7 +435,7 @@ include_once('include/page_header.php');
 
                 $jsLocale = array(
                                 'S_CLOSE',
-                                'S_NO_ELEMENTS_SELECTES'
+                                'S_NO_ELEMENTS_SELECTED'
                 );
 
                 zbx_addJSLocale($jsLocale);

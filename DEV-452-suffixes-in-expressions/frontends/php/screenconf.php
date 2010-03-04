@@ -32,7 +32,7 @@ include_once('include/page_header.php');
 
 ?>
 <?php
-	$_REQUEST['config'] = get_request('config',get_profile('web.screenconf.config',0));
+	$_REQUEST['config'] = get_request('config',CProfile::get('web.screenconf.config',0));
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
@@ -75,7 +75,7 @@ include_once('include/page_header.php');
 
 	$config_scr = $_REQUEST['config'] = get_request('config', 0);
 
-	update_profile('web.screenconf.config', $_REQUEST['config'],PROFILE_TYPE_INT);
+	CProfile::update('web.screenconf.config', $_REQUEST['config'],PROFILE_TYPE_INT);
 ?>
 <?php
 	$_REQUEST['go'] = get_request('go', 'none');
@@ -345,7 +345,7 @@ include_once('include/page_header.php');
 
 			$jsLocale = array(
 				'S_CLOSE',
-				'S_NO_ELEMENTS_SELECTES'
+				'S_NO_ELEMENTS_SELECTED'
 			);
 
 			zbx_addJSLocale($jsLocale);
@@ -429,7 +429,7 @@ include_once('include/page_header.php');
 
             		$jsLocale = array(
                             		'S_CLOSE',
-                            		'S_NO_ELEMENTS_SELECTES'
+                            		'S_NO_ELEMENTS_SELECTED'
         	        );
 
             		zbx_addJSLocale($jsLocale);

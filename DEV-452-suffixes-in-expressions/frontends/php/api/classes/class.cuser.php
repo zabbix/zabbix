@@ -120,7 +120,7 @@ class CUser extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
 
 // usrgrpids
 		if(!is_null($options['usrgrpids'])){
@@ -401,7 +401,7 @@ class CUser extends CZBXAPI{
 			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER,'Correct login ['.$name.']');
 
 			if(empty($user['url'])){
-				$user['url'] = get_profile('web.menu.view.last','index.php');
+				$user['url'] = CProfile::get('web.menu.view.last','index.php');
 			}
 
 

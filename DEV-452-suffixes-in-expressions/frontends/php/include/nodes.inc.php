@@ -23,6 +23,7 @@
 	function update_node_profile($nodeids){
 		global $USER_DETAILS;
 
+		DBstart();
 		$sql = 'DELETE FROM profiles WHERE userid='.$USER_DETAILS['userid'].' AND idx='.zbx_dbstr('web.nodes.selected');
 		DBexecute($sql);
 
@@ -32,6 +33,8 @@
 				' VALUES ('.$profileid.','.$USER_DETAILS['userid'].', '.zbx_dbstr('web.nodes.selected').','.$nodeid.', 4)';
 			DBexecute($sql);
 		}
+
+		DBend();
 	}
 
 	function get_node_profile($default=null){
@@ -99,10 +102,10 @@
 			}
 
 			// if(isset($_REQUEST['select_nodes']))
-				// update_profile('web.nodes.selected', $ZBX_VIEWED_NODES['nodeids'], PROFILE_TYPE_ARRAY_ID);
+				// CProfile::update('web.nodes.selected', $ZBX_VIEWED_NODES['nodeids'], PROFILE_TYPE_ARRAY_ID);
 			update_node_profile($ZBX_VIEWED_NODES['nodeids']);
 			if(isset($_REQUEST['switch_node']))
-				update_profile('web.nodes.switch_node', $ZBX_VIEWED_NODES['selected'], PROFILE_TYPE_ID);
+				CProfile::update('web.nodes.switch_node', $ZBX_VIEWED_NODES['selected'], PROFILE_TYPE_ID);
 		}
 		else {
 			$ZBX_CURRENT_NODEID = $ZBX_LOCALNODEID;
@@ -114,7 +117,7 @@
 
 // reset profiles if node is different than local
 		if($ZBX_CURRENT_NODEID != $ZBX_LOCALNODEID){
-			get_profile(null, null, null, null, true);
+			CProfile::init();
 		}
 	}
 
@@ -169,7 +172,7 @@
 		$available_nodes = get_tree_by_parentid($ZBX_LOCALNODEID, $available_nodes, 'masterid'); //remove parent nodes
 
 
-		// $selected_nodeids = get_request('selected_nodes', get_profile('web.nodes.selected', array($USER_DETAILS['node']['nodeid'])));
+		// $selected_nodeids = get_request('selected_nodes', CProfile::get('web.nodes.selected', array($USER_DETAILS['node']['nodeid'])));
 		$selected_nodeids = get_request('selected_nodes', get_node_profile(array($USER_DETAILS['node']['nodeid'])));
 
 // +++ Fill $result['NODEIDS'], $result['NODES'] +++
@@ -186,7 +189,7 @@
 		}
 // --- ---
 
-		$switch_node = get_request('switch_node', get_profile('web.nodes.switch_node', -1));
+		$switch_node = get_request('switch_node', CProfile::get('web.nodes.switch_node', -1));
 
 		if(!isset($available_nodes[$switch_node]) || !uint_in_array($switch_node, $selected_nodeids)) { //check switch_node
 			$switch_node = 0;
@@ -211,10 +214,20 @@
 
 		$nodeid = id2nodeid($id_val);
 //SDI($nodeid.' - '.$ZBX_NODES[$nodeid]['name']);
-		if ( !isset($ZBX_NODES[$nodeid]) )
-			return null;
+
+		if(!isset($ZBX_NODES[$nodeid]))	return null;
 
 		return $ZBX_NODES[$nodeid]['name'].$delimiter;
+	}
+
+	function getNodeIdByNodeName($nodeName){
+		global $ZBX_NODES, $ZBX_LOCALNODEID;
+
+		foreach($ZBX_NODES as $nodeid => $node){
+			if($node['name'] == $nodeName) return $nodeid;
+		}
+
+	return 0;
 	}
 
 	function is_show_all_nodes(){

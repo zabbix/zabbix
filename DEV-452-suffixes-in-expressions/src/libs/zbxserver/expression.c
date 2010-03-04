@@ -435,7 +435,7 @@ static int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
 		*result=value1+value2;
 		return SUCCEED;
 	}
-	if((p = strchr(exp,'-')) != NULL)
+	if((p = strrchr(exp,'-')) != NULL)
 	{
 		*p=0;
 		strscpy( first, exp);
@@ -487,7 +487,7 @@ static int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
 		*result=value1*value2;
 		return SUCCEED;
 	}
-	if((p = strchr(exp,'/')) != NULL)
+	if((p = strrchr(exp,'/')) != NULL)
 	{
 		*p=0;
 		strscpy( first, exp);
@@ -1905,7 +1905,7 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 					if (SUCCEED == (ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to,
 									N_functionid, "severity")))
 						replace_to = zbx_dsprintf(replace_to, "%s",
-								zbx_trigger_severity_string((zbx_trigger_severity_t)atoi(replace_to)));
+								zbx_item_logtype_string((zbx_item_logtype_t)atoi(replace_to)));
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_NSEVERITY))
 					ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to, N_functionid, "severity");
@@ -2049,7 +2049,7 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
 					zbxmacros_get_value_by_triggerid(macros, event->objectid, m, &replace_to);
-					if (FAIL == (res = is_double_prefix(replace_to)) && NULL != error)
+					if (NULL != replace_to && FAIL == (res = is_double_prefix(replace_to)) && NULL != error)
 						zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
 				}
 			}
@@ -2095,7 +2095,7 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 			{
 				zbxmacros_get_value(macros, &dc_item->host.hostid, 1, m, &replace_to);
-				if (FAIL == (res = is_double_prefix(replace_to)) && NULL != error)
+				if (NULL != replace_to && FAIL == (res = is_double_prefix(replace_to)) && NULL != error)
 					zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
 			}
 		}

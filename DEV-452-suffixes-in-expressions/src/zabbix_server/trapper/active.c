@@ -53,18 +53,26 @@ static int	get_hostid_by_host(const char *host, zbx_uint64_t *hostid, char *erro
 	host_esc = DBdyn_escape_string(host);
 
 	result = DBselect(
-			"select hostid"
+			"select hostid,status"
 			" from hosts"
 			" where host='%s'"
+				" and status in (%d,%d)"
 		       		" and proxy_hostid=0"
 				DB_NODE,
 			host_esc,
+			HOST_STATUS_MONITORED,
+			HOST_STATUS_NOT_MONITORED,
 			DBnode_local("hostid"));
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		*hostid = zbx_atoui64(row[0]);
-		res = SUCCEED;
+		if (HOST_STATUS_MONITORED == atoi(row[1]))
+		{
+			ZBX_STR2UINT64(*hostid, row[0]);
+			res = SUCCEED;
+		}
+		else
+			zbx_snprintf(error, MAX_STRING_LEN, "host [%s] not monitored", host);
 	}
 	else
 	{
