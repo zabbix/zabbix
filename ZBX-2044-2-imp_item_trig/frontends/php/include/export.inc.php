@@ -947,6 +947,7 @@ class zbxXML{
 						$graphs = $xpath->query('graphs/graph', $host);
 
 						$graphs_to_add = array();
+						$graphs_to_upd = array();
 						foreach($graphs as $gnum => $graph){
 // GRAPH ITEMS {{{
 							$gitems = $xpath->query('graph_elements/graph_element', $graph);
@@ -1044,18 +1045,30 @@ class zbxXML{
 								}
 							}
 
-							if($current_graph){ // if exists, delete graph to add then new
-								CGraph::delete($current_graph);
-							}
 							
 							$graph_db['gitems'] = $graph_items;
-							$graphs_to_add[] = $graph_db;
+							if($current_graph){
+								$graph_db['graphid'] = $current_graph['graphid'];
+								$graphs_to_upd[] = $graph_db;
+							}
+							else{
+								$graphs_to_add[] = $graph_db;
+							}
 						}
 
-						$r = CGraph::create($graphs_to_add);
-						if($r === false){
-							throw new APIException(1, CGraph::resetErrors());
+						if(!empty($graphs_to_add)){
+							$r = CGraph::create($graphs_to_add);
+							if($r === false){
+								throw new APIException(1, CGraph::resetErrors());
+							}
 						}
+						if(!empty($graphs_to_upd)){
+							$r = CGraph::update($graphs_to_upd);
+							if($r === false){
+								throw new APIException(1, CGraph::resetErrors());
+							}
+						}
+						
 					}
 				}
 
