@@ -138,7 +138,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res, char *grpfunc,
 {
 	const char	*__function_name = "evaluate_aggregate";
 	char		*sql = NULL;
-	int		sql_alloc = 1024, sql_offset = 0;
+	int		sql_alloc = 1024, sql_offset;
 	zbx_uint64_t	*ids = NULL;
 	int		ids_alloc = 0, ids_num = 0;
 
@@ -174,7 +174,8 @@ static int	evaluate_aggregate(AGENT_RESULT *res, char *grpfunc,
 
 	if (0 == strcmp(itemfunc, "last"))
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128,
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
 				"select itemid,value_type,lastvalue"
 				" from items"
 				" where lastvalue is not NULL"
@@ -187,7 +188,6 @@ static int	evaluate_aggregate(AGENT_RESULT *res, char *grpfunc,
 
 		while (NULL != (row = DBfetch(result)))
 		{
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() %s", __function_name, row[2]);
 			valuetype = (unsigned char)atoi(row[1]);
 			value = row[2];
 
@@ -206,7 +206,8 @@ static int	evaluate_aggregate(AGENT_RESULT *res, char *grpfunc,
 			0 == strcmp(itemfunc,"avg") || 0 == strcmp(itemfunc,"count") ||
 			0 == strcmp(itemfunc,"sum"))
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128,
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
 				"select i.itemid,i.value_type,%s(h.value)"
 				" from items i,history h"
 				" where h.itemid=i.itemid"
@@ -236,7 +237,8 @@ static int	evaluate_aggregate(AGENT_RESULT *res, char *grpfunc,
 		}
 		DBfree_result(result);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128,
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
 				"select i.itemid,i.value_type,%s(h.value)"
 				" from items i,history_uint h"
 				" where h.itemid=i.itemid"
