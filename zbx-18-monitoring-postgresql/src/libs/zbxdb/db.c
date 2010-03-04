@@ -1100,66 +1100,6 @@ lbl_get_table:
 }
 
 /*
- * Get value of autoincrement field for last insert or update statement
- */
-zbx_uint64_t	zbx_db_insert_id(int exec_result, const char *table, const char *field)
-{
-#ifdef	HAVE_MYSQL
-	zabbix_log(LOG_LEVEL_DEBUG, "In DBinsert_id()" );
-
-	if(exec_result == FAIL) return 0;
-
-	return mysql_insert_id(conn);
-#endif
-
-#ifdef	HAVE_POSTGRESQL
-	DB_RESULT	tmp_res;
-	zbx_uint64_t	id_res = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In DBinsert_id()" );
-
-	if(exec_result < 0) return 0;
-	if(exec_result == FAIL) return 0;
-	if((Oid)exec_result == InvalidOid) return 0;
-
-	tmp_res = zbx_db_select("select %s from %s where oid=%i", field, table, exec_result);
-
-	ZBX_STR2UINT64(id_res, PQgetvalue(tmp_res->pg_result, 0, 0));
-/*	id_res = atoi(PQgetvalue(tmp_res->pg_result, 0, 0));*/
-
-	DBfree_result(tmp_res);
-
-	return id_res;
-#endif
-
-#ifdef	HAVE_ORACLE
-	DB_ROW	row;
-	char    sql[MAX_STRING_LEN];
-	DB_RESULT       result;
-	zbx_uint64_t	id;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In DBinsert_id()" );
-
-	if(exec_result == FAIL) return 0;
-
-	zbx_snprintf(sql, sizeof(sql), "select %s_%s.currval from dual", table, field);
-
-	result=DBselect("%s", sql);
-
-	row = DBfetch(result);
-
-	ZBX_STR2UINT64(id, row[0]);
-/*	id = atoi(row[0]);*/
-	DBfree_result(result);
-
-	return id;
-#endif /* HAVE_ORACLE */
-#ifdef	HAVE_SQLITE3
-	return (zbx_uint64_t)sqlite3_last_insert_rowid(conn);
-#endif
-}
-
-/*
  * Execute SQL statement. For select statements only.
  */
 DB_RESULT zbx_db_select_n(char *query, int n)

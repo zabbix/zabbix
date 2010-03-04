@@ -284,14 +284,6 @@ DB_RESULT DBselectN(char *query, int n)
 }
 
 /*
- * Get value of autoincrement field for last insert or update statement
- */
-zbx_uint64_t	DBinsert_id(int exec_result, const char *table, const char *field)
-{
-	return zbx_db_insert_id(exec_result, table, field);
-}
-
-/*
  * Get function value.
  */
 int     DBget_function_result(char **result, char *functionid, char *error, int maxerrlen)

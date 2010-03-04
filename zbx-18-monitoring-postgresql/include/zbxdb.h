@@ -149,7 +149,6 @@ int	__zbx_zbx_db_execute(const char *fmt, ...);
 DB_RESULT	zbx_db_vselect(const char *fmt, va_list args);
 DB_RESULT	zbx_db_select_n(char *query, int n);
 DB_ROW		zbx_db_fetch(DB_RESULT result);
-zbx_uint64_t	zbx_db_insert_id(int exec_result, const char *table, const char *field);
 int		zbx_db_is_null(char *field);
 void		zbx_db_begin();
 void		zbx_db_commit();
