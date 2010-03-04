@@ -123,7 +123,6 @@ char* zbx_oci_error(sword status)
 
 /*
  * Connect to the database.
- * If fails, program terminates.
  */
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbsocket, int port)
 {
@@ -491,7 +490,6 @@ void zbx_db_rollback(void)
 
 /*
  * Execute SQL statement. For non-select statements only.
- * If fails, program terminates.
  */
 int zbx_db_vexecute(const char *fmt, va_list args)
 {
@@ -863,7 +861,6 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 /*
  * Execute SQL statement. For select statements only.
- * If fails, program terminates.
  */
 DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 {
@@ -1164,7 +1161,6 @@ zbx_uint64_t	zbx_db_insert_id(int exec_result, const char *table, const char *fi
 
 /*
  * Execute SQL statement. For select statements only.
- * If fails, program terminates.
  */
 DB_RESULT zbx_db_select_n(char *query, int n)
 {

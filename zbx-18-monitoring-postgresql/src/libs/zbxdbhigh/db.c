@@ -265,7 +265,22 @@ DB_RESULT __zbx_DBselect(const char *fmt, ...)
  */
 DB_RESULT DBselectN(char *query, int n)
 {
-	return zbx_db_select_n(query,n);
+	DB_RESULT result = (DB_RESULT)ZBX_DB_DOWN;
+
+	while(result == (DB_RESULT)ZBX_DB_DOWN)
+	{
+		result = zbx_db_select_n(query, n);
+
+		if( result == (DB_RESULT)ZBX_DB_DOWN)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds");
+			sleep(10);
+			DBclose();
+			DBconnect(ZBX_DB_CONNECT_NORMAL);
+		}
+	}
+
+	return result;
 }
 
 /*
