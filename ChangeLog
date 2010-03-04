@@ -4,6 +4,7 @@ Changes for 1.9
 
 Changes for 1.8.2
 
+ - [DEV-452] support of s,m,h,d,w,T suffixes in trigger expressions and functions (asaveljevs,Vedmak)
  - [ZBX-1357] added Ukrainian translation; thanks to zalex_ua (Richlv)
  - [ZBX-2013] fixed error in trigger test screen (Vedmak)
  - [ZBX-2087] fixed permission scheme in actions (Aly)
