@@ -106,14 +106,15 @@ define('TOTAL_TIME',1.0);
 if(!defined('OBR')) define('OBR',"<br/>\n");
 
 if(defined('USE_PROFILING')){
-	$starttime=array();
-	$memorystamp=array();
+	$starttime = array();
+	$memorystamp = array();
 	$sqlrequests = defined('SHOW_SQLREQUEST_DETAILS') ? array() : 0;
 	$sqlmark = array();
 	$perf_counter = array();
 	$var_list = array();
 
 	class COpt{
+		public static $memoryPick = 0;
 		protected static $memory_limit_reached = false;
 		protected static $max_memory_bytes = null;
 		protected static $debug_info = array();
@@ -136,10 +137,35 @@ if(defined('USE_PROFILING')){
 			}
 		}
 
+		public static function memoryPick(){
+			$memory_usage = COpt::getmemoryusage();
+			if($memory_usage>self::$memoryPick) self::$memoryPick = $memory_usage;
+		}
+
+		public static function getMemoryPick(){
+			if(defined('USE_MEM_PROF')) {
+				return self::$memoryPick;
+			}
+			else {
+				return 0;
+			}
+		}
+
+		public static function showMemoryPick($descr=null){
+			if(defined('USE_MEM_PROF')) {
+				$memory_usage = self::$memoryPick;
+				$memory_usage = $memory_usage.'b | '.($memory_usage>>10).'K | '.($memory_usage>>20).'M';
+				SDI('PHP memory PICK ['.$descr.'] '.$memory_usage);
+			}
+		}
+
 		protected static function getmemoryusage() {
 			if(defined('USE_MEM_PROF')) {
-				return memory_get_usage('memory_limit');
-			} else {
+				$memory_usage = memory_get_usage('memory_limit');
+				if($memory_usage>self::$memoryPick) self::$memoryPick = $memory_usage;
+				return $memory_usage;
+			}
+			else {
 				return 0;
 			}
 		}
@@ -234,6 +260,7 @@ if(defined('USE_PROFILING')){
 
 			$endtime = COpt::getmicrotime();
 			$memory = COpt::getmemoryusage();
+			$pickMemory = COpt::getMemoryPick();
 
 			if(is_null($type)) $type='global';
 
@@ -254,6 +281,7 @@ if(defined('USE_PROFILING')){
 				$debug_str.= S_MEMORY_LIMIT.'	: '.ini_get('memory_limit').OBR;
 				$debug_str.= S_MEMORY_USAGE.'	: '.mem2str($memorystamp[$type]).' - '.mem2str($memory).OBR;
 				$debug_str.= S_MEMORY_LEAK.'	: '.mem2str($memory - $memorystamp[$type]).OBR;
+				$debug_str.= 'Memory Pick	: '.mem2str($pickMemory).OBR;
 			}
 
 			if(defined('USE_VAR_MON')){
