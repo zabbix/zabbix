@@ -282,13 +282,9 @@ static int	evaluate_aggregate(AGENT_RESULT *res, char *grpfunc,
 	}
 
 	if (0 == strcmp(grpfunc, "grpavg"))
-	{
-		SET_DBL_RESULT(res, d / num);
-	}
-	else
-	{
-		SET_DBL_RESULT(res, d);
-	}
+		d = d / num;
+
+	SET_DBL_RESULT(res, d);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() result:" ZBX_FS_DBL, __function_name, d);
 
