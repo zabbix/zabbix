@@ -913,8 +913,21 @@
 					'graphids' => $db_graph['graphid'],
 					'output' => API_OUTPUT_EXTEND
 				));
-				$db_graph['gitems'] = get_same_graphitems_for_host($gitems, $hostid);
-				$res = CGraph::create($db_graph);
+				
+				
+				$filter = array(
+					'name' => $db_graph['name'],
+					'hostids' => $hostid
+				);
+
+				if(CGraph::exists($filter)){
+					$db_graph['gitems'] = $gitems;
+					$res = CGraph::update($db_graph);
+				}
+				else{
+					$db_graph['gitems'] = get_same_graphitems_for_host($gitems, $hostid);
+					$res = CGraph::create($db_graph);
+				}
 				if($res === false) return false;
 			}
 		}

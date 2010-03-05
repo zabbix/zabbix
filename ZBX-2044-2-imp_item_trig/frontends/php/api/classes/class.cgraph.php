@@ -517,7 +517,7 @@ class CGraph extends CZBXAPI{
 	public static function create($graphs){
 		$graphs = zbx_toArray($graphs);
 		$graphids = array();
-
+unset($graphs['templateid']);
 		try{
 			self::BeginTransaction(__METHOD__);
 			
@@ -793,7 +793,7 @@ class CGraph extends CZBXAPI{
 	public static function update($graphs){
 		$graphs = zbx_toArray($graphs);
 		$graphids = array();
-		
+unset($graphs['templateid']);		
 		try{
 			self::BeginTransaction(__METHOD__);
 
