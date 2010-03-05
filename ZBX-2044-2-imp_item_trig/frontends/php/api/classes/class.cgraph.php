@@ -727,7 +727,7 @@ class CGraph extends CZBXAPI{
 				'hostids' => $chd_host['hostid']
 			));
 			if($chd_graph = reset($chd_graph)){
-				if(($graph['name'] != $chd_graph['name']) &&self::exists(array('name' => $graph['name'], 'hostids' => $chd_host['hostid']))){
+				if(($graph['name'] != $chd_graph['name']) && self::exists(array('name' => $graph['name'], 'hostids' => $chd_host['hostid']))){
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$graph['name'].' ] already exists. Cannot inherit it.');
 				}
 				

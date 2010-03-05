@@ -902,9 +902,24 @@
 
 		$db_graphs = get_graphs_by_hostid($templateid);
 
-		while($db_graph = DBfetch($db_graphs)){
-			copy_graph_to_host($db_graph["graphid"], $hostid, $copy_mode);
+		if($copy_mode){
+			while($db_graph = DBfetch($db_graphs)){
+				copy_graph_to_host($db_graph["graphid"], $hostid, $copy_mode);
+			}
 		}
+		else{
+			while($db_graph = DBfetch($db_graphs)){
+				$gitems = CGraphItem::get(array(
+					'graphids' => $db_graph['graphid'],
+					'output' => API_OUTPUT_EXTEND
+				));
+				$db_graph['gitems'] = get_same_graphitems_for_host($gitems, $hostid);
+				$res = CGraph::create($db_graph);
+				if($res === false) return false;
+			}
+		}
+		
+		return true;
 	}
 
 /*

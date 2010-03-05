@@ -1384,7 +1384,7 @@ class CTemplate extends CZBXAPI{
 							continue 2;
 						}
 					}
-					sync_host_with_templates($targetid, $templateid);
+					sync_host_with_templates($targetid, $templateid) or self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot link template');
 				}
 			}
 

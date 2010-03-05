@@ -463,7 +463,8 @@ require_once('include/httptest.inc.php');
 		copy_template_applications($hostid, $templateid, $copy_mode);
 		copy_template_items($hostid, $templateid, $copy_mode);
 		copy_template_triggers($hostid, $templateid, $copy_mode);
-		copy_template_graphs($hostid, $templateid, $copy_mode);
+		$res = copy_template_graphs($hostid, $templateid, $copy_mode);
+		return $res;
 	}
 
 /*
@@ -480,7 +481,8 @@ require_once('include/httptest.inc.php');
  */
 	function sync_host_with_templates($hostid, $templateid = null){
 		delete_template_elements($hostid, $templateid);
-		copy_template_elements($hostid, $templateid);
+		$res = copy_template_elements($hostid, $templateid);
+		return $res;
 	}
 
 	function delete_groups_by_hostid($hostids){
