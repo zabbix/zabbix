@@ -84,14 +84,14 @@ int	add_user_parameter(char *key, char *command)
 
 	if (0 == (i = parse_command(key, usr_cmd, MAX_STRING_LEN, usr_param, MAX_STRING_LEN)))
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Can't add user specifed key \"%s\". Can't parse key!", key);
+		zabbix_log(LOG_LEVEL_WARNING, "Can't add user specified key \"%s\". Can't parse key!", key);
 		return FAIL;
 	}
 	else if (2 == i)				/* with specified parameters */
 	{
 		if (0 != strcmp(usr_param, "*"))	/* must be '*' parameters */
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Can't add user specifed key \"%s\". Incorrect key!", key);
+			zabbix_log(LOG_LEVEL_WARNING, "Can't add user specified key \"%s\". Incorrect key!", key);
 			return FAIL;
 		}
 		flag |= CF_USEUPARAM;

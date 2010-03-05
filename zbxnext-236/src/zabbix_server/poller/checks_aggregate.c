@@ -130,7 +130,7 @@ static void	aggregate_get_items(zbx_uint64_t **ids, int *ids_alloc, int *ids_num
 
 /*
  * grpfunc: grpmax, grpmin, grpsum, grpavg
- * itemfunc: last, min, max, avg, sum,count
+ * itemfunc: last, min, max, avg, sum, count
  */
 static int	evaluate_aggregate(AGENT_RESULT *res, char *grpfunc,
 		const char *groups, const char *itemkey,
@@ -153,7 +153,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res, char *grpfunc,
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() grpfunc:'%s' groups:'%s'"
-			" itekey:'%s' function:'%s(%s)'",
+			" itemkey:'%s' function:'%s(%s)'",
 			__function_name, grpfunc, groups, itemkey,
 			itemfunc, param);
 
