@@ -1163,13 +1163,9 @@ error:
 int	parse_host_key(char *exp, char **host, char **key)
 {
 	char	*p, *s;
-	int	state;
 
-	for (p = exp, s = exp, state = 0; '\0' != *p; p++)	/* check for optional hostname */
+	for (p = exp, s = exp; '\0' != *p; p++)	/* check for optional hostname */
 	{
-		if (SUCCEED == is_hostname_char(*p))
-			continue;
-
 		if (':' == *p)	/* hostname:vfs.fs.size[/,total]
 				 * --------^
 				 */
@@ -1181,74 +1177,14 @@ int	parse_host_key(char *exp, char **host, char **key)
 			s = p;
 			break;
 		}
+
+		if (SUCCEED != is_hostname_char(*p))
+			break;
 	}
 
-	for (p = s; '\0' != *p; p++)	/* check for key */
-	{
-		if (SUCCEED == is_key_char(*p))
-			continue;
-
-		if ('[' == *p)	/* vfs.fs.size[/,total]
-				 * -----------^
-				 */
-		{
-			for (state = 0; '\0' != *p; p++)
-			{
-				switch (state) {
-				case 0:
-					if (',' == *p)
-						;
-					else if ('"' == *p)
-						state = 1;
-					else if (']' == *p)
-					{
-						state = 3;
-						p++;
-					}
-					else if (' ' != *p)
-						state = 2;
-					break;
-				case 1:
-					if ('"' == *p)
-						state = 0;
-					else if('\\' == *p && '"' == p[1])
-						p++;
-					break;
-				case 2:
-					if (',' == *p)
-						state = 0;
-					else if (']' == *p)
-					{
-						state = 3;
-						p++;
-					}
-					break;
-				}
-
-				if (3 == state)
-					break;
-			}
-
-			if (3 != state)
-				goto error;
-		}
-		else
-			goto error;
-		break;
-	}
-
-	if ('\0' == *p)
-		*key = strdup(s);
-	else
-		goto error;
+	*key = strdup(s);
 
 	return SUCCEED;
-error:
-
-	zbx_free(*host);
-	zbx_free(*key);
-
-	return FAIL;
 }
 
 /******************************************************************************
@@ -1270,40 +1206,72 @@ error:
 int	num_param(const char *p)
 {
 /* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
-	int	ret = 1, state;
+	int	ret = 1, state, array;
 
 	if (p == NULL)
 		return 0;
 
-	for (state = 0; '\0' != *p; p++)
+	for (state = 0, array = 0; '\0' != *p; p++)
 	{
 		switch (state) {
 		/* Init state */
 		case 0:
 			if (',' == *p)
-				ret++;
+			{
+				if (0 == array)
+					ret++;
+			}
 			else if ('"' == *p)
 				state = 1;
+			else if ('[' == *p)
+				array++;
+			else if (']' == *p && 0 != array)
+			{
+				array--;
+
+				/* skip spaces */
+				while (' ' == p[1])
+					p++;
+
+				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
+					return 0;	/* incorrect syntax */
+			}
 			else if (' ' != *p)
 				state = 2;
 			break;
 		/* Quoted */
 		case 1:
 			if ('"' == *p)
+			{
+				/* skip spaces */
+				while (' ' == p[1])
+					p++;
+
+				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
+					return 0;	/* incorrect syntax */
 				state = 0;
+			}
 			else if ('\\' == *p && '"' == p[1])
 				p++;
 			break;
 		/* Unquoted */
 		case 2:
-			if (',' == *p)
+			if (',' == *p || (']' == *p && 0 != array))
 			{
-				ret++;
+				p--;
 				state = 0;
 			}
 			break;
 		}
 	}
+
+	/* missing terminating '"' character */
+	if (state == 1)
+		return 0;
+
+	/* missing terminating ']' character */
+	if (array != 0)
+		return 0;
 
 	return ret;
 }
@@ -1332,24 +1300,47 @@ int	num_param(const char *p)
 int	get_param(const char *p, int num, char *buf, int maxlen)
 {
 /* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
-	int	ret = 1, state;
-	int	idx = 1;
-	int	buf_i = 0;
+	int	state, array, idx = 1, buf_i = 0;
 
 	*buf = '\0';
 
-	for (state = 0; '\0' != *p && idx <= num && buf_i < maxlen; p++)
+	for (state = 0, array = 0; '\0' != *p && idx <= num && buf_i < maxlen; p++)
 	{
-		if (idx == num)
-			ret = 0;
-
 		switch (state) {
 		/* Init state */
 		case 0:
 			if (',' == *p)
-				idx++;
+			{
+				if (0 == array)
+					idx++;
+				else if (idx == num)
+					buf[buf_i++] = *p;
+			}
 			else if ('"' == *p)
+			{
 				state = 1;
+				if (0 != array && idx == num)
+					buf[buf_i++] = *p;
+			}
+			else if ('[' == *p)
+			{
+				if (0 != array && idx == num)
+					buf[buf_i++] = *p;
+				array++;
+			}
+			else if (']' == *p && 0 != array)
+			{
+				array--;
+				if (0 != array && idx == num)
+					buf[buf_i++] = *p;
+
+				/* skip spaces */
+				while (' ' == p[1])
+					p++;
+
+				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
+					return 1;	/* incorrect syntax */
+			}
 			else if (' ' != *p)
 			{
 				if (idx == num)
@@ -1360,8 +1351,19 @@ int	get_param(const char *p, int num, char *buf, int maxlen)
 		/* Quoted */
 		case 1:
 			if ('"' == *p)
+			{
+				if (0 != array && idx == num)
+					buf[buf_i++] = *p;
+
+				/* skip spaces */
+				while (' ' == p[1])
+					p++;
+
+				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
+					return 1;	/* incorrect syntax */
 				state = 0;
-			else if ('\\' == *p && '"' == p[1])
+			}
+			else if ('\\' == *p && '"' == p[1] && 0 == array)
 			{
 				p++;
 				if (idx == num)
@@ -1372,24 +1374,34 @@ int	get_param(const char *p, int num, char *buf, int maxlen)
 			break;
 		/* Unquoted */
 		case 2:
-			if (',' == *p)
+			if (',' == *p || (']' == *p && 0 != array))
 			{
-				idx++;
+				p--;
 				state = 0;
 			}
 			else if (idx == num)
 				buf[buf_i++] = *p;
 			break;
 		}
+
+		if (idx > num)
+			break;
 	}
+
+	/* missing terminating '"' character */
+	if (state == 1)
+		return 1;
+
+	/* missing terminating ']' character */
+	if (array != 0)
+		return 1;
 
 	buf[buf_i] = '\0';
 
-	/* Missing first parameter will return OK */
-	if (num == 1)
-		ret = 0;
+	if (idx >= num)
+		return 0;
 
-	return ret;
+	return 1;
 }
 
 /******************************************************************************
@@ -1417,22 +1429,47 @@ int	get_param(const char *p, int num, char *buf, int maxlen)
 static int	get_param_len(const char *p, int num, size_t *sz)
 {
 /* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
-	int	ret = 1, state, idx = 1;
+	int	state, array, idx = 1;
 
 	*sz = 0;
 
-	for (state = 0; '\0' != *p && idx <= num; p++)
+	for (state = 0, array = 0; '\0' != *p && idx <= num; p++)
 	{
-		if (idx == num)
-			ret = 0;
-
 		switch (state) {
 		/* Init state */
 		case 0:
 			if (',' == *p)
-				idx++;
+			{
+				if (0 == array)
+					idx++;
+				else if (idx == num)
+					(*sz)++;
+			}
 			else if ('"' == *p)
+			{
 				state = 1;
+				if (0 != array && idx == num)
+					(*sz)++;
+			}
+			else if ('[' == *p)
+			{
+				if (0 != array && idx == num)
+					(*sz)++;
+				array++;
+			}
+			else if (']' == *p && 0 != array)
+			{
+				array--;
+				if (0 != array && idx == num)
+					(*sz)++;
+
+				/* skip spaces */
+				while (' ' == p[1])
+					p++;
+
+				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
+					return 1;	/* incorrect syntax */
+			}
 			else if (' ' != *p)
 			{
 				if (idx == num)
@@ -1443,8 +1480,19 @@ static int	get_param_len(const char *p, int num, size_t *sz)
 		/* Quoted */
 		case 1:
 			if ('"' == *p)
+			{
+				if (0 != array && idx == num)
+					(*sz)++;
+
+				/* skip spaces */
+				while (' ' == p[1])
+					p++;
+
+				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
+					return 1;	/* incorrect syntax */
 				state = 0;
-			else if ('\\' == *p && '"' == p[1])
+			}
+			else if ('\\' == *p && '"' == p[1] && 0 == array)
 			{
 				p++;
 				if (idx == num)
@@ -1455,22 +1503,32 @@ static int	get_param_len(const char *p, int num, size_t *sz)
 			break;
 		/* Unquoted */
 		case 2:
-			if (',' == *p)
+			if (',' == *p || (']' == *p && 0 != array))
 			{
-				idx++;
+				p--;
 				state = 0;
 			}
 			else if (idx == num)
 				(*sz)++;
 			break;
 		}
+
+		if (idx > num)
+			break;
 	}
 
-	/* Missing first parameter will return OK */
-	if (num == 1)
-		ret = 0;
+	/* missing terminating '"' character */
+	if (state == 1)
+		return 1;
 
-	return ret;
+	/* missing terminating ']' character */
+	if (array != 0)
+		return 1;
+
+	if (idx >= num)
+		return 0;
+
+	return 1;
 }
 
 /******************************************************************************
