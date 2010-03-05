@@ -17,8 +17,8 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#ifndef ZABBIX_FUNCTIONS_H
-#define ZABBIX_FUNCTIONS_H
+#ifndef ZABBIX_ZBXSERVER_H
+#define ZABBIX_ZBXSERVER_H
 
 #include "common.h"
 #include "comms.h"

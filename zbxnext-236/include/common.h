@@ -486,8 +486,8 @@ typedef enum
 
 typedef enum
 {
-	ZBX_CASE_SENSITIVE = 0,
-	ZBX_IGNORE_CASE
+	ZBX_IGNORE_CASE = 0,
+	ZBX_CASE_SENSITIVE	
 } zbx_case_sensitive_t;
 
 /* HTTP Tests statuses */
@@ -547,6 +547,15 @@ typedef enum
 } zbx_trigger_severity_t;
 char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity);
 
+typedef enum
+{
+	ITEM_LOGTYPE_INFORMATION = 1,
+	ITEM_LOGTYPE_WARNING,
+	ITEM_LOGTYPE_ERROR = 4,
+	ITEM_LOGTYPE_FAILURE_AUDIT = 7,
+	ITEM_LOGTYPE_SUCCESS_AUDIT
+} zbx_item_logtype_t;
+char	*zbx_item_logtype_string(zbx_item_logtype_t logtype);
 /* Media statuses */
 #define MEDIA_STATUS_ACTIVE	0
 #define MEDIA_STATUS_DISABLED	1
@@ -736,6 +745,7 @@ void	del_zeroes(char *s);
 int	find_char(char *str,char c);
 int	is_double_prefix(char *str);
 int	is_double(char *c);
+int	is_uint_prefix(const char *c);
 int	is_uint(char *c);
 int	is_uint64(register char *str, zbx_uint64_t *value);
 int	is_uoct(char *str);
@@ -906,7 +916,9 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
 
 void	win2unix_eol(char *text);
+int	str2uint(const char *str);
 int	str2uint64(char *str, zbx_uint64_t *value);
+double	str2double(const char *str);
 
 #if defined(_WINDOWS) && defined(_UNICODE)
 int	__zbx_stat(const char *path, struct stat *buf);

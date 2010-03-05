@@ -3111,43 +3111,38 @@ return $result;
 		}
 
 //  Replace all '$ZBX_TR_EXPR_REPLACE_TO $ZBX_EREG_SIGN $ZBX_EREG_NUMBER' number with '$expr_full_replace_to'
-		$expr_full_replace_to = $ZBX_TR_EXPR_REPLACE_TO . '_full';
 		$expr_full_token = '^(['.ZBX_PREG_PRINT.']*?)([\(]{0,2}'.
 							$ZBX_TR_EXPR_REPLACE_TO.
 							ZBX_PREG_SPACES.'[\)]?'.
 							ZBX_PREG_SIGN.
 							ZBX_PREG_SPACES.
 							ZBX_PREG_NUMBER.'[\)]?)(['.ZBX_PREG_PRINT.']*)$';
+							
 
-		while(preg_match('/'.$expr_full_token.'/u', $expr, $arr)){
-			$temp[] = array('sign' => $arr[4], 'value' => $arr[6]);
-			$expr = $arr[1] . $expr_full_replace_to . $arr[7];
+		$expr_full_token2 = '\s*(?P<leftp>\(*)('.$ZBX_TR_EXPR_REPLACE_TO.'\s*'.
+			'(?P<sign>'.ZBX_PREG_SIGN.')\s*'.
+			'(?P<value>'.ZBX_PREG_NUMBER.'))(?P<rightp>\)*)\s*'.
+			'(?P<sign2>'.ZBX_PREG_SIGN.')?';
+	
+		preg_match_all('/'.$expr_full_token2.'/u', $expr, $arr);
+
+		$outline = '';
+		$map = array();
+		for($i=0, $mark = ord('A'); $i < count($arr[0]); $i++, $mark++){
+			$outline .= ' ' . $arr['leftp'][$i]. ' ' . chr($mark) . ' ' . $arr['rightp'][$i] . ' ' .$arr['sign2'][$i];
+			
+			$map[chr($mark)] = array(
+				'expression' => $temp[$i],
+				'sign' => $arr['sign'][$i],
+				'value' => $arr['value'][$i]
+			);
 		}
 
-// outline
-		$outline = $expr;
-		$mark = ord('A');
-		while(($pos = zbx_strpos($outline, $expr_full_replace_to)) !== false) {
-			$outline = substr_replace($outline, chr($mark++), $pos, zbx_strlen($expr_full_replace_to));
-		}
-
-		if(zbx_strpos($outline, $ZBX_TR_EXPR_REPLACE_TO) !== false) return false; /* analyze failure */
-
-// tree
 		$expr = str_replace(' ', '', $outline);
 		$nodeid = 0;
 		$root = array('id' => $nodeid++, 'expr' => $expr);
 		make_expression_tree($root, $nodeid);
-
-// mark => expression map
-		$map = array();
-
-		for($i = 0, $size = $mark - ord('A'); $i < $size; ++$i){
-			$map[chr($i + ord('A'))] = array('expression'   => $temp[$i],
-											 'sign'		 => $temp[$size + $i]['sign'],
-											 'value'		=> $temp[$size + $i]['value']);
-
-		}
+		
 		return array($outline, $root, $map);
 	}
 
@@ -3532,18 +3527,22 @@ return $result;
 	}
 
 	function convert($value){
-		$val = trim($value);
-		if(!preg_match(ZBX_PREG_NUMBER, $val)) return $value;
+		$value = trim($value);
+		if(!preg_match('/(?P<value>[\-+]?[0-9]+[.]?[0-9]*)(?P<mult>[TGMKsmhdw]?)/', $value, $arr)) return $value;
 
-		$last = zbx_strtolower($val{zbx_strlen($val)-1});
-		switch($last){
-			case 't': $val *= 1024 * 1024 * 1024 * 1024;
-			case 'g': $val *= 1024 * 1024 * 1024;
-			case 'm': $val *= 1024 * 1024;
-			case 'k': $val *= 1024;
+		$value = $arr['value'];
+		switch($arr['mult']){
+			case 'T': $value *= 1024 * 1024 * 1024 * 1024; break;
+			case 'G': $value *= 1024 * 1024 * 1024; break;
+			case 'M': $value *= 1024 * 1024; break;
+			case 'K': $value *= 1024; break;
+			case 'm': $value *= 60; break;
+			case 'h': $value *= 60 * 60; break;
+			case 'd': $value *= 60 * 60 * 24; break;
+			case 'w': $value *= 60 * 60 * 24 * 7; break;
 		}
 
-	return $val;
+		return $value;
 	}
 
 	function copy_triggers($srcid, $destid){

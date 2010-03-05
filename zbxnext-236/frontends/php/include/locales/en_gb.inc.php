@@ -196,7 +196,7 @@
 	'S_NEW_INSTALLATION'=>			'New installation',
 	'S_NEW_INSTALLATION_BIG'=>		'NEW INSTALLATION',
 	'S_INSTALLATION_UPDATE'=>		'Installation/Update',
-	'S_ZABBIX_IS_UNAVAILABLE'=>		'Zabbix is temporary unavailable',
+	'S_ZABBIX_IS_UNAVAILABLE'=>		'Zabbix is temporarily unavailable',
 	'S_REQUIRE_MB_STRING_MODULE'=>		'Multibyte String module required to run FrontEnd',
 
 //	node.php
@@ -645,6 +645,9 @@
 	'S_AS_RED'=>				'as Red',
 	'S_AS_GREEN'=>				'as Green',
 	'S_AS_BLUE'=>				'as Blue',
+
+	'S_FAILURE_AUDIT'=>			'Failure Audit',
+	'S_SUCCESS_AUDIT'=>			'Success Audit',
 
 // maintenance.php
 	'S_MAINTENANCE'=>				'Maintenance',
@@ -1532,7 +1535,7 @@
 	'S_DISABLE_SELECTED_TRIGGERS_Q'=>	'Disable selected triggers?',
 	'S_MASS_UPDATE_SELECTED_TRIGGERS_Q'=>	'Mass update selected triggers?',
 	'S_COPY_SELECTED_TRIGGERS_Q'=>		'Copy selected triggers?',
-	'S_DELETE_SELECTED_TRIGGERS_Q'=>	'Delete selected triggerers?',
+	'S_DELETE_SELECTED_TRIGGERS_Q'=>	'Delete selected triggers?',
 
 //	tr_comments.php
 	'S_TRIGGER_COMMENTS'=>			'Trigger comments',
@@ -1719,6 +1722,7 @@
 	'S_DUTCH_NL'=>				'Dutch (NL)',
 	'S_HUNGARY_HU'=>			'Hungary (HU)',
 	'S_POLISH_PL'=>				'Polish (PL)',
+	'S_UKRAINIAN_UA'=>			'Ukrainian (UA)',
 
 //	index.php
 	'S_ZABBIX_BIG'=>			'ZABBIX',

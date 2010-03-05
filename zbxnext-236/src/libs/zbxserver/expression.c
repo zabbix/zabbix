@@ -18,15 +18,10 @@
 **/
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-
+#include "common.h"
 #include "zbxserver.h"
 #include "expression.h"
 #include "evalfunc.h"
-#include "common.h"
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
@@ -140,46 +135,6 @@ static int	DBget_trigger_expression_by_triggerid(zbx_uint64_t triggerid, char *e
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: str2double                                                       *
- *                                                                            *
- * Purpose: convert string to double                                          *
- *                                                                            *
- * Parameters: str - string to convert                                        *
- *                                                                            *
- * Return value: converted double value                                       *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments: the function automatically processes prefixes 'K','M','G'        *
- *                                                                            *
- ******************************************************************************/
-double	str2double(char *str)
-{
-	size_t	l;
-
-	l = strlen(str) - 1;
-
-	if (str[l] == 'K')
-	{
-		str[l] = '\0';
-		return (double)1024 * atof(str);
-	}
-	else if (str[l] == 'M')
-	{
-		str[l] = '\0';
-		return (double)1024 * 1024 * atof(str);
-	}
-	else if (str[l] == 'G')
-	{
-		str[l] = '\0';
-		return (double)1024 * 1024 * 1024 * atof(str);
-	}
-
-	return atof(str);
 }
 
 /******************************************************************************
@@ -1950,7 +1905,7 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, DB_ITEM *item, 
 					if (SUCCEED == (ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to,
 									N_functionid, "severity")))
 						replace_to = zbx_dsprintf(replace_to, "%s",
-								zbx_trigger_severity_string((zbx_trigger_severity_t)atoi(replace_to)));
+								zbx_item_logtype_string((zbx_item_logtype_t)atoi(replace_to)));
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_NSEVERITY))
 					ret = DBget_history_log_value_by_triggerid(event->objectid, &replace_to, N_functionid, "severity");
