@@ -45,6 +45,7 @@ class CTemplate extends CZBXAPI{
 		global $USER_DETAILS;
 
 		$result = array();
+		$nodeCheck = false;
 		$user_type = $USER_DETAILS['type'];
 		$userid = $USER_DETAILS['userid'];
 
@@ -66,6 +67,7 @@ class CTemplate extends CZBXAPI{
 			'hostids'					=> null,
 			'graphids'					=> null,
 			'itemids'					=> null,
+			'triggerids'				=> null,
 			'with_items'				=> null,
 			'with_triggers'				=> null,
 			'with_graphs'				=> null,
@@ -174,6 +176,11 @@ class CTemplate extends CZBXAPI{
 			if(!is_null($options['groupCount'])){
 				$sql_parts['group']['hg'] = 'hg.groupid';
 			}
+
+			if(!$nodeCheck){
+				$nodeCheck = true;
+				$sql_parts['where'][] = DBin_node('hg.groupid', $nodeids);
+			}
 		}
 
 // templateids
@@ -181,6 +188,11 @@ class CTemplate extends CZBXAPI{
 			zbx_value2array($options['templateids']);
 
 			$sql_parts['where']['templateid'] = DBcondition('h.hostid', $options['templateids']);
+
+			if(!$nodeCheck){
+				$nodeCheck = true;
+				$sql_parts['where'][] = DBin_node('h.hostid', $nodeids);
+			}
 		}
 
 // hostids
@@ -198,6 +210,11 @@ class CTemplate extends CZBXAPI{
 			if(!is_null($options['groupCount'])){
 				$sql_parts['group']['ht'] = 'ht.hostid';
 			}
+
+			if(!$nodeCheck){
+				$nodeCheck = true;
+				$sql_parts['where'][] = DBin_node('ht.hostid', $nodeids);
+			}
 		}
 
 // itemids
@@ -211,6 +228,30 @@ class CTemplate extends CZBXAPI{
 			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['where'][] = DBcondition('i.itemid', $options['itemids']);
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+
+			if(!$nodeCheck){
+				$nodeCheck = true;
+				$sql_parts['where'][] = DBin_node('i.itemid', $nodeids);
+			}
+		}
+
+// triggerids
+		if(!is_null($options['triggerids'])){
+			zbx_value2array($options['triggerids']);
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['triggerid'] = 'f.triggerid';
+			}
+
+			$sql_parts['from']['f'] = 'functions f';
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
+			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
+
+			if(!$nodeCheck){
+				$nodeCheck = true;
+				$sql_parts['where'][] = DBin_node('f.triggerid', $nodeids);
+			}
 		}
 
 // graphids
@@ -226,6 +267,18 @@ class CTemplate extends CZBXAPI{
 			$sql_parts['where'][] = DBcondition('gi.graphid', $options['graphids']);
 			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+
+			if(!$nodeCheck){
+				$nodeCheck = true;
+				$sql_parts['where'][] = DBin_node('gi.graphid', $nodeids);
+			}
+		}
+
+// node check !!!!
+// should last, after all ****IDS checks
+		if(!$nodeCheck){
+			$nodeCheck = true;
+			$sql_parts['where'][] = DBin_node('h.hostid', $nodeids);
 		}
 
 // with_items
@@ -405,6 +458,15 @@ class CTemplate extends CZBXAPI{
 
 						$result[$template['templateid']]['items'][] = array('itemid' => $template['itemid']);
 						unset($template['itemid']);
+					}
+
+// triggerids
+					if(isset($template['triggerid']) && is_null($options['select_triggers'])){
+						if(!isset($result[$template['hostid']]['triggers']))
+							$result[$template['hostid']]['triggers'] = array();
+
+						$result[$template['hostid']]['triggers'][] = array('triggerid' => $template['triggerid']);
+						unset($template['triggerid']);
 					}
 
 // graphids

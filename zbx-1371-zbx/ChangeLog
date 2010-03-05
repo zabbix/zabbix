@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1371] improved performance of the configuration screens hostgroups, templates, hosts (Aly)
  - [ZBX-2087] fixed permission scheme in actions (Aly)
  - [ZBX-2067] fixed undefined variable errors in actions screen (Aly)
  - [ZBX-2053] fixed evaluating of case sensitivity on the server/agent side of regular expressions (Dmitry)

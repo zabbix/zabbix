@@ -72,11 +72,12 @@ class CHost extends CZBXAPI{
 		global $USER_DETAILS;
 
 		$result = array();
+		$nodeCheck = false;
 		$user_type = $USER_DETAILS['type'];
 		$userid = $USER_DETAILS['userid'];
 
 		$sort_columns = array('hostid', 'host', 'status', 'dns', 'ip'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
+		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM); // allowed output options for [ select_* ] params
 
 
 		$sql_parts = array(
@@ -215,12 +216,22 @@ class CHost extends CZBXAPI{
 			if(!is_null($options['groupCount'])){
 				$sql_parts['group']['groupid'] = 'hg.groupid';
 			}
+
+			if(!$nodeCheck){
+				$nodeCheck = true;
+				$sql_parts['where'][] = DBin_node('hg.groupid', $nodeids);
+			}
 		}
 
 // hostids
 		if(!is_null($options['hostids'])){
 			zbx_value2array($options['hostids']);
 			$sql_parts['where']['hostid'] = DBcondition('h.hostid', $options['hostids']);
+
+			if(!$nodeCheck){
+				$nodeCheck = true;
+				$sql_parts['where'][] = DBin_node('h.hostid', $nodeids);
+			}
 		}
 
 // templateids
@@ -237,6 +248,11 @@ class CHost extends CZBXAPI{
 			if(!is_null($options['groupCount'])){
 				$sql_parts['group']['templateid'] = 'ht.templateid';
 			}
+
+			if(!$nodeCheck){
+				$nodeCheck = true;
+				$sql_parts['where'][] = DBin_node('ht.templateid', $nodeids);
+			}
 		}
 
 // itemids
@@ -249,6 +265,11 @@ class CHost extends CZBXAPI{
 			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['where'][] = DBcondition('i.itemid', $options['itemids']);
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+
+			if(!$nodeCheck){
+				$nodeCheck = true;
+				$sql_parts['where'][] = DBin_node('i.itemid', $nodeids);
+			}
 		}
 
 // triggerids
@@ -263,6 +284,11 @@ class CHost extends CZBXAPI{
 			$sql_parts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
+
+			if(!$nodeCheck){
+				$nodeCheck = true;
+				$sql_parts['where'][] = DBin_node('f.triggerid', $nodeids);
+			}
 		}
 
 // graphids
@@ -278,6 +304,17 @@ class CHost extends CZBXAPI{
 			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
 
+			if(!$nodeCheck){
+				$nodeCheck = true;
+				$sql_parts['where'][] = DBin_node('gi.graphid', $nodeids);
+			}
+		}
+
+// node check !!!!!
+// should last, after all ****IDS checks
+		if(!$nodeCheck){
+			$nodeCheck = true;
+			$sql_parts['where'][] = DBin_node('h.hostid', $nodeids);
 		}
 
 // monitored_hosts, templated_hosts
@@ -414,6 +451,7 @@ class CHost extends CZBXAPI{
 		}
 //-------
 
+
 		$hostids = array();
 
 		$sql_parts['select'] = array_unique($sql_parts['select']);
@@ -429,15 +467,14 @@ class CHost extends CZBXAPI{
 		$sql_order = '';
 		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
 		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
-		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
+		if(!empty($sql_parts['where']))		$sql_where.= implode(' AND ',$sql_parts['where']);
 		if(!empty($sql_parts['group']))		$sql_where.= ' GROUP BY '.implode(',',$sql_parts['group']);
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
 		$sql = 'SELECT DISTINCT '.$sql_select.
 				' FROM '.$sql_from.
-				' WHERE '.DBin_node('h.hostid', $nodeids).
-					$sql_where.
+				' WHERE '.$sql_where.
 				$sql_group.
 				$sql_order;
  //sdi($sql);
