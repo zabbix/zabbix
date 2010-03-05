@@ -1265,6 +1265,14 @@ int	num_param(const char *p)
 		}
 	}
 
+	/* missing terminating '"' character */
+	if (state == 1)
+		return 0;
+
+	/* missing terminating ']' character */
+	if (array != 0)
+		return 0;
+
 	return ret;
 }
 
@@ -1380,6 +1388,14 @@ int	get_param(const char *p, int num, char *buf, int maxlen)
 			break;
 	}
 
+	/* missing terminating '"' character */
+	if (state == 1)
+		return 1;
+
+	/* missing terminating ']' character */
+	if (array != 0)
+		return 1;
+
 	buf[buf_i] = '\0';
 
 	if (idx >= num)
@@ -1413,7 +1429,7 @@ int	get_param(const char *p, int num, char *buf, int maxlen)
 static int	get_param_len(const char *p, int num, size_t *sz)
 {
 /* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
-	int	ret = 1, state, array, idx = 1;
+	int	state, array, idx = 1;
 
 	*sz = 0;
 
@@ -1501,10 +1517,18 @@ static int	get_param_len(const char *p, int num, size_t *sz)
 			break;
 	}
 
-	if (idx >= num)
-		ret = 0;
+	/* missing terminating '"' character */
+	if (state == 1)
+		return 1;
 
-	return ret;
+	/* missing terminating ']' character */
+	if (array != 0)
+		return 1;
+
+	if (idx >= num)
+		return 0;
+
+	return 1;
 }
 
 /******************************************************************************

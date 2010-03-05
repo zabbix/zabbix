@@ -1,5 +1,7 @@
 Changes for 1.8.2
 
+ - [ZBXNEXT-236] added support of comma delimited list of host groups in aggregate checks (Sasha)
+ - [ZBXNEXT-236] added support of item keys with brackets ("") in aggregate checks (Sasha)
  - [ZBXNEXT-257] added support of time-based disabling of data collection for items (asaveljevs,Aly,Sasha)
  - [ZBX-2051] fixed memory leak in processing of calculated items (Alexei)
  - [ZBX-886] removed duplicate and outdated strings from locales (Richlv)
