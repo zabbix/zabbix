@@ -196,7 +196,7 @@
 	'S_NEW_INSTALLATION'=>			'New installation',
 	'S_NEW_INSTALLATION_BIG'=>		'NEW INSTALLATION',
 	'S_INSTALLATION_UPDATE'=>		'Installation/Update',
-	'S_ZABBIX_IS_UNAVAILABLE'=>		'Zabbix is temporary unavailable',
+	'S_ZABBIX_IS_UNAVAILABLE'=>		'Zabbix is temporarily unavailable',
 	'S_REQUIRE_MB_STRING_MODULE'=>		'Multibyte String module required to run FrontEnd',
 
 //	node.php
@@ -1722,6 +1722,7 @@
 	'S_DUTCH_NL'=>				'Dutch (NL)',
 	'S_HUNGARY_HU'=>			'Hungary (HU)',
 	'S_POLISH_PL'=>				'Polish (PL)',
+	'S_UKRAINIAN_UA'=>			'Ukrainian (UA)',
 
 //	index.php
 	'S_ZABBIX_BIG'=>			'ZABBIX',
