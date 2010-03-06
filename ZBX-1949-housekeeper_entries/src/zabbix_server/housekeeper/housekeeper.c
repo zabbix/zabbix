@@ -63,23 +63,26 @@ static int housekeeping_process_log()
 		ZBX_STR2UINT64(housekeeper.value,row[3]);
 
 #ifdef HAVE_ORACLE
-		deleted = DBexecute("delete from %s where %s=" ZBX_FS_UI64 " and rownum<500",
+		deleted = DBexecute("delete from %s where %s=" ZBX_FS_UI64 " and rownum<%d",
 			housekeeper.tablename,
 			housekeeper.field,
-			housekeeper.value);
+			housekeeper.value,
+			CONFIG_MAX_HOUSEKEEPER_DELETE);
 #elif defined(HAVE_POSTGRESQL)
-		deleted = DBexecute("delete from %s where oid in (select oid from %s where %s=" ZBX_FS_UI64 " limit 500)",
+		deleted = DBexecute("delete from %s where oid in (select oid from %s where %s=" ZBX_FS_UI64 " limit %d)",
 				housekeeper.tablename,
 				housekeeper.tablename,
 				housekeeper.field,
-				housekeeper.value);
+				housekeeper.value,
+				CONFIG_MAX_HOUSEKEEPER_DELETE);
 #else
-		deleted = DBexecute("delete from %s where %s=" ZBX_FS_UI64 " limit 500",
+		deleted = DBexecute("delete from %s where %s=" ZBX_FS_UI64 " limit %d",
 			housekeeper.tablename,
 			housekeeper.field,
-			housekeeper.value);
+			housekeeper.value,
+			CONFIG_MAX_HOUSEKEEPER_DELETE);
 #endif
-		if(500 > deleted)
+		if(CONFIG_MAX_HOUSEKEEPER_DELETE > deleted)
 		{
 			DBexecute("delete from housekeeper where housekeeperid=" ZBX_FS_UI64,
 				housekeeper.housekeeperid);
