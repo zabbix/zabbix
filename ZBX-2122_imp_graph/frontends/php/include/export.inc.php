@@ -993,10 +993,10 @@ class zbxXML{
 
 								$gitem_hostid = reset($gitem_hostid);
 
-								$gitem_db['hostid'] = $gitem_hostid['hostid'];
-								$gitem_db['key_'] = implode(':', $data);
-
-								$current_gitem = CItem::getObjects($gitem_db);
+								$current_gitem = CItem::getObjects(array(
+									'hostid' => $gitem_hostid['hostid'],
+									'key_' => implode(':', $data)
+								));
 								$current_gitem = reset($current_gitem);
 								if($current_gitem){ // if item exists, add graph item to graph
 									$gitem_db['itemid'] = $current_gitem['itemid'];
