@@ -288,6 +288,9 @@ int	parse_command(const char *command, char *cmd, int cmd_max_len,
 			zbx_strlcpy(cmd, command, cmd_max_len);
 	}
 
+	if (NULL != param)
+		*param = '\0';
+
 	if (NULL != pl && NULL != pr)
 	{
 		if (NULL != param)
