@@ -654,6 +654,7 @@ COpt::memoryPick();
 				'nodeids' => $nodeids,
 				'output' => $options['select_items'],
 				'triggerids' => $triggerids,
+				'webitems' => 1,
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
