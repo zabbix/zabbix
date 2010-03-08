@@ -1,5 +1,9 @@
 Changes for 1.8.2
 
+ - [ZBX-1994] using /proc/sys instead of the deprecated sysctl() on Linux (asaveljevs)
+ - [ZBXNEXT-236] added support of comma delimited list of host groups in aggregate checks (Sasha)
+ - [ZBXNEXT-236] added support of item keys with brackets ("") in aggregate checks (Sasha)
+ - [ZBXNEXT-236] added support of arrays in item key parameters (Sasha)
  - [ZBX-1371] improved performance of the configuration screens hostgroups, templates, hosts (Aly)
  - [DEV-452] support of s,m,h,d,w,T suffixes in trigger expressions and functions (asaveljevs,Vedmak)
  - [ZBX-1357] added Ukrainian translation; thanks to zalex_ua (Richlv)
