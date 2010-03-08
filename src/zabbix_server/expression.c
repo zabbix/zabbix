@@ -675,6 +675,59 @@ static void	zbx_free_numbers(char ***numbers, int count)
 
 /******************************************************************************
  *                                                                            *
+ * Function: item_description                                                 *
+ *                                                                            *
+ * Purpose: substitute key parameters in the item description string          *
+ *          with real values                                                  *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	item_description(char **data, const char *key)
+{
+	char	*p, *m, *str_out = NULL, params[MAX_STRING_LEN], param[MAX_STRING_LEN];
+
+	if (2 /* key with parameters */ != parse_command(key, NULL, 0, params, sizeof(params)))
+		return;
+
+	p = *data;
+	while (NULL != (m = strchr(p, '$')))
+	{
+		*m = '\0';
+		str_out = zbx_strdcat(str_out, p);
+		*m++ = '$';
+
+		if (*m >= '1' && *m <= '9')
+		{
+			if (0 != get_param(params, *m - '0', param, sizeof(param)))
+				*param = '\0';
+
+			str_out = zbx_strdcat(str_out, param);
+			p = m + 1;
+		}
+		else
+		{
+			str_out = zbx_strdcat(str_out, "$");
+			p = m;
+		}
+	}
+
+	if (NULL != str_out)
+	{
+		str_out = zbx_strdcat(str_out, p);
+		zbx_free(*data);
+		*data = str_out;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: expand_trigger_description_constants                             *
  *                                                                            *
  * Purpose: substitute simple macros in data string with real values          *
@@ -1162,7 +1215,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char **data, i
 		{
 			var_len = strlen(MVAR_ITEM_NAME);
 
-			result = DBselect("select distinct i.description from triggers t, functions f,items i, hosts h"
+			result = DBselect("select distinct i.description,i.key_ from triggers t,functions f,items i,hosts h"
 				" where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid"
 				" order by i.description",
 				event->objectid);
@@ -1181,6 +1234,8 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char **data, i
 			{
 				replace_to = zbx_dsprintf(replace_to, "%s",
 					row[0]);
+
+				item_description(&replace_to, row[1]);
 			}
 
 			DBfree_result(result);
