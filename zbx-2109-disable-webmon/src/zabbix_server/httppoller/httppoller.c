@@ -36,13 +36,13 @@ int httppoller_num;
  *                                                                            *
  * Purpose: calculate when we have to process earliest httptest               *
  *                                                                            *
- * Parameters: now - current timestamp                                        *
+ * Parameters: now - current timestamp (not used)                             *
  *                                                                            *
  * Return value: timestamp of earliest check or -1 if not found               *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: never returns                                                    *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int get_minnextcheck(int now)
@@ -52,11 +52,17 @@ static int get_minnextcheck(int now)
 
 	int		res;
 
-	result = DBselect("select count(*),min(nextcheck) from httptest t where t.status=%d and " ZBX_SQL_MOD(t.httptestid,%d) "=%d" DB_NODE,
+	result = DBselect("select count(*),min(t.nextcheck)"
+			" from httptest t,applications a,hosts h"
+			" where t.status=%d and " ZBX_SQL_MOD(t.httptestid,%d) "=%d" DB_NODE
+			" and t.applicationid=a.applicationid"
+			" and a.hostid=h.hostid"
+			" and h.status=%d",
 		HTTPTEST_STATUS_MONITORED,
 		CONFIG_HTTPPOLLER_FORKS,
 		httppoller_num-1,
-		DBnode_local("t.httptestid"));
+		DBnode_local("t.httptestid"),
+		HOST_STATUS_MONITORED);
 
 	row=DBfetch(result);
 
