@@ -978,7 +978,7 @@ include_once('include/page_header.php');
 		$options = array(
 			'nodeids' => $nodeid,
 			'hostids' => $hostid,
-			'output' => API_PUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND
 		);
 
 		if(!is_null($writeonly)) $options['editable'] = 1;
@@ -989,7 +989,7 @@ include_once('include/page_header.php');
 				' WHERE h.hostid=a.hostid '.
 					' AND '.DBin_node('a.applicationid', $nodeid).
 					' AND '.DBcondition('h.hostid',$available_hosts).
-					' AND h.status in ('.implode(',', $host_status).')'.
+					// ' AND h.status in ('.implode(',', $host_status).')'.
 					' AND h.hostid='.$hostid.
 				' ORDER BY h.host,a.name';
 
