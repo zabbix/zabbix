@@ -43,18 +43,31 @@
 	$text = get_request('text', ' ');;
 	$font = get_request('font', 9);
 
-	$size = imageTextSize($font, 0, $text);
+	if(!function_exists('imagerotate')){
+		$angle = 0;
+	}
+	else{
+		$angle = 90;
+	}
 
-	$im = imagecreatetruecolor($size['width']+2, $size['height']+2);
+	$size = imageTextSize($font, $angle, $text);
+
+	$im = imagecreatetruecolor($size['width']+4, $size['height']+4);
 
 	$transparentColor = imagecolorallocatealpha($im, 200, 200, 200, 127);
 	imagefill($im, 0, 0, $transparentColor);
 
 	$text_color = imagecolorallocate($im, 0, 0, 0);
 
-	imageText($im, $font, 0, 0, $size['height'], $text_color, $text);
-
-	$im = imagerotate($im, 90, $transparentColor);
+	
+	if(!function_exists('imagerotate')){
+		imageText($im, $font, $angle, 0, $size['height']+1, $text_color, $text);
+		$im = imagerotate($im, 90, $transparentColor);
+	}
+	else{
+		imageText($im, $font, $angle, $size['width'], $size['height'], $text_color, $text);
+	}
+	
 	ImageAlphaBlending($im, false);
 	imageSaveAlpha($im, true);
 
