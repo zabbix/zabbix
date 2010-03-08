@@ -4,6 +4,7 @@ Changes for 1.9
 
 Changes for 1.8.2
 
+ - [ZBX-2121] events from Windows eventlog with type 'EVENTLOG_SUCCESS' are treated as 'Information' in Zabbix as in Windows (Dmitry)
  - [ZBX-1994] using /proc/sys instead of the deprecated sysctl() on Linux (asaveljevs)
  - [ZBXNEXT-236] added support of comma delimited list of host groups in aggregate checks (Sasha)
  - [ZBXNEXT-236] added support of item keys with brackets ("") in aggregate checks (Sasha)
