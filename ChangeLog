@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-2089] fixed computing calculated items for proxied hosts (asaveljevs,Sasha)
  - [ZBX-2109] disabled Web monitoring for disabled hosts and hosts under maintenance (asaveljevs,Sasha)
  - [ZBX-2121] events from Windows eventlog with type 'EVENTLOG_SUCCESS' are treated as 'Information' in Zabbix as in Windows (Dmitry)
  - [ZBX-1994] using /proc/sys instead of the deprecated sysctl() on Linux (asaveljevs)
