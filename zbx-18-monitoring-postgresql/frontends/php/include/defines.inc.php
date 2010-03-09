@@ -268,12 +268,19 @@
 	define('ITEM_AUTHTYPE_PASSWORD',	0);
 	define('ITEM_AUTHTYPE_PUBLICKEY',	1);
 
-	define('GRAPH_ITEM_DRAWTYPE_LINE',		0);
+	define('ITEM_LOGTYPE_INFORMATION',	1);
+	define('ITEM_LOGTYPE_WARNING',		2);
+	define('ITEM_LOGTYPE_ERROR',		4);
+	define('ITEM_LOGTYPE_FAILURE_AUDIT',	7);
+	define('ITEM_LOGTYPE_SUCCESS_AUDIT',	8);
+
+	define('GRAPH_ITEM_DRAWTYPE_LINE',			0);
 	define('GRAPH_ITEM_DRAWTYPE_FILLED_REGION',	1);
 	define('GRAPH_ITEM_DRAWTYPE_BOLD_LINE',		2);
-	define('GRAPH_ITEM_DRAWTYPE_DOT',		3);
+	define('GRAPH_ITEM_DRAWTYPE_DOT',			3);
 	define('GRAPH_ITEM_DRAWTYPE_DASHED_LINE',	4);
 	define('GRAPH_ITEM_DRAWTYPE_GRADIENT_LINE',	5);
+	define('GRAPH_ITEM_DRAWTYPE_BOLD_DOT',		6);
 
 	define('MAP_LINK_DRAWTYPE_LINE',		0);
 	define('MAP_LINK_DRAWTYPE_BOLD_LINE',		2);
@@ -589,7 +596,7 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('ZBX_PREG_KEY_NAME', '([0-9a-zA-Z_\.\-]+)');	/* !!! Don't forget sync code with C !!! */
 	define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+){0,1}');
 	define('ZBX_PREG_SIGN', '([&|><=+*\/#\-])');
-	define('ZBX_PREG_NUMBER', '([\-+]?[0-9]+[.]{0,1}[0-9]*[A-Z]{0,1})');
+	define('ZBX_PREG_NUMBER', '([\-+]?[0-9]+[.]?[0-9]*[KMGTsmhdw]?)');
 	
 	define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
 //--
@@ -708,7 +715,15 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('API_OUTPUT_SHORTEN', 'shorten');
 	define('API_OUTPUT_REFER', 'refer');
 	define('API_OUTPUT_EXTEND', 'extend');
+	define('API_OUTPUT_COUNT', 'count');
+	define('API_OUTPUT_CUSTOM', 'custom');
 
+
+	define('SEC_PER_MIN', 60);
+	define('SEC_PER_HOUR', 3600);
+	define('SEC_PER_DAY', 86400);
+	define('SEC_PER_WEEK', (7*SEC_PER_DAY));
+	define('SEC_PER_YEAR', (365*SEC_PER_DAY));
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
 	if(!function_exists('version_compare')){
 		$_GET		= $HTTP_GET_VARS;

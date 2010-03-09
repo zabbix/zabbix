@@ -63,6 +63,7 @@ class CGraph extends CZBXAPI{
 			'select' => array('graphs' => 'g.graphid'),
 			'from' => array('graphs g'),
 			'where' => array(),
+			'group' => array(),
 			'order' => array(),
 			'limit' => null,
 			);
@@ -88,7 +89,8 @@ class CGraph extends CZBXAPI{
 			'select_items'			=> null,
 			'select_graph_items'	=> null,
 			'extendoutput'			=> null,
-			'count'					=> null,
+			'countOutput'			=> null,
+			'groupCount'			=> null,
 			'preservekeys'			=> null,
 
 			'sortfield'				=> '',
@@ -172,6 +174,10 @@ class CGraph extends CZBXAPI{
 			$sql_parts['where']['gig'] = 'gi.graphid=g.graphid';
 			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
 			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['hg'] = 'hg.groupid';
+			}
 		}
 
 // hostids
@@ -186,6 +192,10 @@ class CGraph extends CZBXAPI{
 			$sql_parts['where'][] = DBcondition('i.hostid', $options['hostids']);
 			$sql_parts['where']['gig'] = 'gi.graphid=g.graphid';
 			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['i'] = 'i.hostid';
+			}
 		}
 
 // graphids
@@ -243,9 +253,17 @@ class CGraph extends CZBXAPI{
 			$sql_parts['select']['graphs'] = 'g.*';
 		}
 
-// count
-		if(!is_null($options['count'])){
-			$sql_parts['select'] = array('count(g.graphid) as rowscount');
+// countOutput
+		if(!is_null($options['countOutput'])){
+			$options['sortfield'] = '';
+			$sql_parts['select'] = array('count(DISTINCT g.graphid) as rowscount');
+
+//groupCount
+			if(!is_null($options['groupCount'])){
+				foreach($sql_parts['group'] as $key => $fields){
+					$sql_parts['select'][$key] = $fields;
+				}
+			}
 		}
 
 // pattern
@@ -285,15 +303,18 @@ class CGraph extends CZBXAPI{
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
 		$sql_parts['where'] = array_unique($sql_parts['where']);
+		$sql_parts['group'] = array_unique($sql_parts['group']);
 		$sql_parts['order'] = array_unique($sql_parts['order']);
 
 		$sql_select = '';
 		$sql_from = '';
 		$sql_where = '';
+		$sql_group = '';
 		$sql_order = '';
 		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
 		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
 		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
+		if(!empty($sql_parts['group']))		$sql_where.= ' GROUP BY '.implode(',',$sql_parts['group']);
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
@@ -301,11 +322,16 @@ class CGraph extends CZBXAPI{
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('g.graphid', $nodeids).
 					$sql_where.
+				$sql_group.
 				$sql_order;
 		$db_res = DBselect($sql, $sql_limit);
 		while($graph = DBfetch($db_res)){
-			if($options['count'])
-				$result = $graph;
+			if(!is_null($options['countOutput'])){
+				if(!is_null($options['groupCount']))
+					$result[] = $graph;
+				else
+					$result = $graph['rowscount'];
+			}
 			else{
 				if($options['output'] == API_OUTPUT_SHORTEN){
 					$result[$graph['graphid']] = array('graphid' => $graph['graphid']);
@@ -351,11 +377,11 @@ class CGraph extends CZBXAPI{
 			}
 		}
 
-		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
+COpt::memoryPick();
+		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['countOutput'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
-
 
 // Adding GraphItems
 		if(!is_null($options['select_graph_items']) && str_in_array($options['select_graph_items'], $subselects_allowed_outputs)){
@@ -433,6 +459,7 @@ class CGraph extends CZBXAPI{
 			}
 		}
 
+COpt::memoryPick();
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
 			$result = zbx_cleanHashes($result);

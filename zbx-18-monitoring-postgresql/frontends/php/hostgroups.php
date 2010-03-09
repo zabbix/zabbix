@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -331,7 +331,7 @@ include_once('include/page_header.php');
 		$sortorder =  getPageSortOrder();
 		$options = array(
 			'editable' => 1,
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
@@ -342,11 +342,25 @@ include_once('include/page_header.php');
 		$paging = getPagingLine($groups);
 //-----
 
+// COUNT hosts, templates
 		$options = array(
 			'groupids' => zbx_objectValues($groups, 'groupid'),
-			'extendoutput' => 1,
-			'select_hosts' => 1,
+			'select_hosts' => API_OUTPUT_COUNT,
+			'select_templates' => API_OUTPUT_COUNT,
 			'nopermissions' => 1
+		);
+		$groupCounts = CHostGroup::get($options);
+		$groupCounts = zbx_toHash($groupCounts, 'groupid');
+//-----
+
+// Data
+		$options = array(
+			'groupids' => zbx_objectValues($groups, 'groupid'),
+			'select_hosts' => array('hostid','host','status'),
+			'select_templates' => array('hostid','host','status'),
+			'output' => API_OUTPUT_EXTEND,
+			'nopermissions' => 1,
+			'limitSelects' => $config['max_in_table']+1
 		);
 
 // sorting && paging
@@ -357,13 +371,29 @@ include_once('include/page_header.php');
 		foreach($groups as $num => $group){
 			$tpl_count = 0;
 			$host_count = 0;
-			$i = 0;
 			$hosts_output = array();
+			$i = 0;
 
-			order_result($group['hosts'], 'host');
+			foreach($group['templates'] as $hnum => $template){
+				$i++;
+				if($i > $config['max_in_table']){
+					$hosts_output[] = '...';
+					$hosts_output[] = '//empty for array_pop';
+					break;
+				}
+
+				$url = 'templates.php?form=update&templateid='.$template['hostid'].'&groupid='.$group['groupid'];
+				$hosts_output[] = new CLink($template['host'], $url, 'unknown');
+				$hosts_output[] = ', ';
+			}
+			if(!empty($hosts_output)){
+				array_pop($hosts_output);
+				$hosts_output[] = BR();
+				$hosts_output[] = BR();
+			}
+
 			foreach($group['hosts'] as $hnum => $host){
 				$i++;
-
 				if($i > $config['max_in_table']){
 					$hosts_output[] = '...';
 					$hosts_output[] = '//empty for array_pop';
@@ -374,10 +404,6 @@ include_once('include/page_header.php');
 					case HOST_STATUS_NOT_MONITORED:
 						$style = 'on';
 						$url = 'hosts.php?form=update&hostid='.$host['hostid'].'&groupid='.$group['groupid'];
-					break;
-					case HOST_STATUS_TEMPLATE:
-						$style = 'unknown';
-						$url = 'templates.php?form=update&templateid='.$host['hostid'].'&groupid='.$group['groupid'];
 					break;
 					default:
 						$style = null;
@@ -390,17 +416,16 @@ include_once('include/page_header.php');
 			}
 			array_pop($hosts_output);
 
-			foreach($group['hosts'] as $host){
-				$host['status'] == HOST_STATUS_TEMPLATE ? $tpl_count++ : $host_count++;
-			}
+			$hostCount = $groupCounts[$group['groupid']]['hosts'];
+			$templateCount = $groupCounts[$group['groupid']]['templates'];
 
 			$table->addRow(array(
 				new CCheckBox('groups['.$group['groupid'].']', NULL, NULL, $group['groupid']),
 				new CLink($group['name'], 'hostgroups.php?form=update&groupid='.$group['groupid']),
 				array(
-					array(new CLink(S_HOSTS, 'hosts.php?groupid='.$group['groupid']),' ('.$host_count.')'),
+					array(new CLink(S_TEMPLATES, 'templates.php?groupid='.$group['groupid'], 'unknown'), ' ('.$templateCount.')'),
 					BR(),
-					array(new CLink(S_TEMPLATES, 'templates.php?groupid='.$group['groupid'], 'unknown'), ' ('.$tpl_count.')'),
+					array(new CLink(S_HOSTS, 'hosts.php?groupid='.$group['groupid']),' ('.$hostCount.')'),
 				),
 				new CCol((empty($hosts_output) ? '-' : $hosts_output), 'wraptext')
 			));

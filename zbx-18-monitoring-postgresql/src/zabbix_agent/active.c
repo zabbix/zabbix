@@ -956,6 +956,7 @@ static void	process_active_checks(char *server, unsigned short port)
 
 					switch ( severity )
 					{
+						case EVENTLOG_SUCCESS:
 						case EVENTLOG_INFORMATION_TYPE:
 							severity = 1;
 							zbx_snprintf(str_severity, sizeof(str_severity), INFORMATION_TYPE);
