@@ -560,14 +560,13 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 static int	DBchk_double(double value)
 {
-#if defined(HAVE_POSTGRESQL) || defined(HAVE_ORACLE) || defined(HAVE_SQLITE3)
 	/* field with precision 16, scale 4 [NUMERIC(16,4)] */
 	register double	pg_min_numeric = (double)-1E12;
 	register double	pg_max_numeric = (double)1E12;
 
 	if (value <= pg_min_numeric || value >= pg_max_numeric)
 		return FAIL;
-#endif
+
 	return SUCCEED;
 }
 
