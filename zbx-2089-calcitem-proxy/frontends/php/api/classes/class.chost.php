@@ -556,11 +556,12 @@ Copt::memoryPick();
 					'preservekeys' => 1
 				);
 			$groups = CHostgroup::get($obj_params);
+
 			foreach($groups as $groupid => $group){
 				$ghosts = $group['hosts'];
 				unset($group['hosts']);
 				foreach($ghosts as $num => $host){
-					$result[$host['hostid']]['groups'][] = $groups[$num];
+					$result[$host['hostid']]['groups'][] = $group;
 				}
 			}
 		}
