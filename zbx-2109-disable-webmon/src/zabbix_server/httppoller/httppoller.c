@@ -52,17 +52,21 @@ static int get_minnextcheck(int now)
 
 	int		res;
 
-	result = DBselect("select count(*),min(t.nextcheck)"
+	result = DBselect(
+			"select count(*),min(t.nextcheck)"
 			" from httptest t,applications a,hosts h"
-			" where t.status=%d and " ZBX_SQL_MOD(t.httptestid,%d) "=%d" DB_NODE
-			" and t.applicationid=a.applicationid"
-			" and a.hostid=h.hostid"
-			" and h.status=%d",
-		HTTPTEST_STATUS_MONITORED,
-		CONFIG_HTTPPOLLER_FORKS,
-		httppoller_num-1,
-		DBnode_local("t.httptestid"),
-		HOST_STATUS_MONITORED);
+			" where t.applicationid=a.applicationid"
+				" and a.hostid=h.hostid"
+				" and " ZBX_SQL_MOD(t.httptestid,%d) "=%d"
+				" and t.status=%d"
+				" and h.status=%d"
+				" and (h.maintenance_status=%d or h.maintenance_type=%d)"
+				DB_NODE,
+			CONFIG_HTTPPOLLER_FORKS, httppoller_num - 1,
+			HTTPTEST_STATUS_MONITORED,
+			HOST_STATUS_MONITORED,
+			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
+			DBnode_local("t.httptestid"));
 
 	row=DBfetch(result);
 

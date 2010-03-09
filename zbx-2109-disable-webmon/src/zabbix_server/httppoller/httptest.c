@@ -561,20 +561,24 @@ void process_httptests(int now)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_httptests()");
 
-	result = DBselect("select t.httptestid,t.name,t.applicationid,t.nextcheck,t.status,t.delay,"
+	result = DBselect(
+			"select t.httptestid,t.name,t.applicationid,t.nextcheck,t.status,t.delay,"
 				"t.macros,t.agent,t.authentication,t.http_user,t.http_password"
 			" from httptest t,applications a,hosts h"
-			" where t.status=%d and t.nextcheck<=%d"
-			" and " ZBX_SQL_MOD(t.httptestid,%d) "=%d" DB_NODE
-			" and t.applicationid=a.applicationid"
-			" and a.hostid=h.hostid"
-			" and h.status=%d",
-		HTTPTEST_STATUS_MONITORED,
-		now,
-		CONFIG_HTTPPOLLER_FORKS,
-		httppoller_num-1,
-		DBnode_local("t.httptestid"),
-		HOST_STATUS_MONITORED);
+			" where t.applicationid=a.applicationid"
+				" and a.hostid=h.hostid"
+				" and t.nextcheck<=%d"
+				" and " ZBX_SQL_MOD(t.httptestid,%d) "=%d"
+				" and t.status=%d"
+				" and h.status=%d"
+				" and (h.maintenance_status=%d or h.maintenance_type=%d)"
+				DB_NODE,
+			now,
+			CONFIG_HTTPPOLLER_FORKS, httppoller_num - 1,
+			HTTPTEST_STATUS_MONITORED,
+			HOST_STATUS_MONITORED,
+			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
+			DBnode_local("t.httptestid"));
 
 	while((row=DBfetch(result)))
 	{
