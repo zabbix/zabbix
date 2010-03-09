@@ -975,21 +975,12 @@ include_once('include/page_header.php');
 			($hostid>0)?null:S_HOST,
 			S_NAME));
 
-		$options = array(
-			'nodeids' => $nodeid,
-			'hostids' => $hostid,
-			'output' => API_PUTPUT_EXTEND
-		);
-
-		if(!is_null($writeonly)) $options['editable'] = 1;
-		if(!is_null($templated)) $options['templated'] = $templated;
-
 		$sql = 'SELECT DISTINCT h.host,a.* '.
 				' FROM hosts h,applications a '.
 				' WHERE h.hostid=a.hostid '.
 					' AND '.DBin_node('a.applicationid', $nodeid).
 					' AND '.DBcondition('h.hostid',$available_hosts).
-					' AND h.status in ('.implode(',', $host_status).')'.
+					// ' AND h.status in ('.implode(',', $host_status).')'.
 					' AND h.hostid='.$hostid.
 				' ORDER BY h.host,a.name';
 
