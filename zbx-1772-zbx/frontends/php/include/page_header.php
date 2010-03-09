@@ -146,6 +146,8 @@
 ?>
 <script type="text/javascript" src="js/prototype.js"></script>
 <script type="text/javascript" src="js/common.js"></script>
+<script type="text/javascript">	var PHP_TZ_OFFSET = <?php echo date('Z'); ?>;</script>
+<script type="text/javascript" src="js/class.cdate.js"></script>
 <script type="text/javascript" src="js/class.cookie.js"></script>
 <script type="text/javascript" src="js/class.curl.js"></script>
 <script type="text/javascript" src="js/main.js"></script>
