@@ -129,7 +129,7 @@ int	DBping(void)
 {
 	int ret;
 
-	ret = (ZBX_DB_DOWN == zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBSOCKET, CONFIG_DBPORT))? FAIL:SUCCEED;
+	ret = (ZBX_DB_OK != zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBSOCKET, CONFIG_DBPORT)) ? FAIL : SUCCEED;
 	DBclose();
 
 	return ret;
@@ -265,15 +265,22 @@ DB_RESULT __zbx_DBselect(const char *fmt, ...)
  */
 DB_RESULT DBselectN(char *query, int n)
 {
-	return zbx_db_select_n(query,n);
-}
+	DB_RESULT result = (DB_RESULT)ZBX_DB_DOWN;
 
-/*
- * Get value of autoincrement field for last insert or update statement
- */
-zbx_uint64_t	DBinsert_id(int exec_result, const char *table, const char *field)
-{
-	return zbx_db_insert_id(exec_result, table, field);
+	while(result == (DB_RESULT)ZBX_DB_DOWN)
+	{
+		result = zbx_db_select_n(query, n);
+
+		if( result == (DB_RESULT)ZBX_DB_DOWN)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds");
+			sleep(10);
+			DBclose();
+			DBconnect(ZBX_DB_CONNECT_NORMAL);
+		}
+	}
+
+	return result;
 }
 
 /*
