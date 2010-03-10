@@ -382,15 +382,18 @@ static int	replace_param(const char *cmd, const char *param, char *out, int outl
 			{
 				get_param(param, (int)(pr[1] - '0'), buf, MAX_STRING_LEN);
 
-				for (c = suppressed_chars; '\0' != *c; c++)
-					if (NULL != strchr(buf, *c))
-					{
-						zbx_snprintf(error, max_err_len, "Special characters '%s'"
-								" are not allowed in the parameters",
-								suppressed_chars);
-						ret = FAIL;
-						break;
-					}
+				if (0 == CONFIG_UNSAFE_USER_PARAMETERS)
+				{
+					for (c = suppressed_chars; '\0' != *c; c++)
+						if (NULL != strchr(buf, *c))
+						{
+							zbx_snprintf(error, max_err_len, "Special characters '%s'"
+									" are not allowed in the parameters",
+									suppressed_chars);
+							ret = FAIL;
+							break;
+						}
+				}
 			}
 
 			if (FAIL == ret)

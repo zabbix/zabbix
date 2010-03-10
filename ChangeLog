@@ -4,6 +4,7 @@ Changes for 1.9
 
 Changes for 1.8.2
 
+ - [ZBX-1575] added UnsafeUserParameters configuration option for agents (asaveljevs)
  - [ZBX-2108] added checking double values for "out of range" errors for the MySQL (Sasha)
  - [ZBX-2114] improvements in sql filtering of hosts and templates by nodes (Aly)
  - [ZBX-18,ZBX-1018,ZBX-1070,ZBX-1123,ZBXNEXT-96] dealing with database problems in a uniform way for all database engines (asaveljevs,Sasha)
