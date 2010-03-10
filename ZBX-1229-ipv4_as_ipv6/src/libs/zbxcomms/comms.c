@@ -1105,6 +1105,7 @@ int	zbx_tcp_check_security(
 #if defined(HAVE_IPV6)
 	struct		addrinfo hints, *ai = NULL, *ai_alt = NULL; /* for mapped IPv4 addresses */
 	char		*alt = NULL; /* for mapped IPv4 addresses with "::" or "::ffff" prefixes */
+	char		*alt_static = NULL; /* a pointer to a static buffer */
 #else
 	struct		hostent *hp;
 	char		*sip;
@@ -1170,7 +1171,13 @@ int	zbx_tcp_check_security(
 						}
 						else if(AF_INET6 == name.ss_family) /* should map our IPv4 address from the list */
 						{
-							if(NULL == inet_ntop(AF_INET, &(((struct sockaddr_in *)(ai->ai_addr))->sin_addr), sname, MAX_STRING_LEN))
+							/*if(NULL == inet_ntop(AF_INET, &(((struct sockaddr_in *)(ai->ai_addr))->sin_addr), sname, MAX_STRING_LEN))
+							{
+								freeaddrinfo(ai);
+								ai = NULL;
+								continue;
+							}*/
+							if(NULL == (alt_static = inet_ntoa((((struct sockaddr_in *)(ai->ai_addr))->sin_addr))))
 							{
 								freeaddrinfo(ai);
 								ai = NULL;
@@ -1178,7 +1185,7 @@ int	zbx_tcp_check_security(
 							}
 							freeaddrinfo(ai);
 							ai = NULL;
-							alt = zbx_dsprintf(alt, "::%s", sname);
+							alt = zbx_dsprintf(alt, "::%s", alt_static);
 							zabbix_log(LOG_LEVEL_DEBUG, "The allowed server address '%s' was mapped into '%s' for comparison.", start, alt);
 							memset(&hints, 0, sizeof(hints));
 							hints.ai_family = PF_INET6;
@@ -1200,7 +1207,7 @@ int	zbx_tcp_check_security(
 								ai = NULL;
 							}
 							zbx_free(alt);
-							alt = zbx_dsprintf(alt, "::ffff:%s", sname);
+							alt = zbx_dsprintf(alt, "::ffff:%s", alt_static);
 							zabbix_log(LOG_LEVEL_DEBUG, "The allowed server address '%s' was mapped into '%s' for comparison.", start, alt);
 							if(0 == getaddrinfo(alt, NULL, &hints, &ai))
 							{
@@ -1237,14 +1244,20 @@ int	zbx_tcp_check_security(
 						}
 						else if(AF_INET == name.ss_family) /* should map incoming IPv4 address */
 						{
-							if(NULL == inet_ntop(AF_INET, &((struct sockaddr_in*)&name)->sin_addr, sname, MAX_STRING_LEN))
+							/*if(NULL == inet_ntop(AF_INET, &((struct sockaddr_in*)&name)->sin_addr, sname, MAX_STRING_LEN))
+							{
+								freeaddrinfo(ai);
+								ai = NULL;
+								continue;
+							}*/
+							if(NULL == (alt_static = inet_ntoa(((struct sockaddr_in*)&name)->sin_addr)))
 							{
 								freeaddrinfo(ai);
 								ai = NULL;
 								continue;
 							}
-							alt = zbx_dsprintf(alt, "::%s", sname);
-							zabbix_log(LOG_LEVEL_DEBUG, "The incoming server address '%s' was mapped into '%s' for comparison.", sname, alt);
+							alt = zbx_dsprintf(alt, "::%s", alt_static);
+							zabbix_log(LOG_LEVEL_DEBUG, "The incoming server address '%s' was mapped into '%s' for comparison.", alt_static, alt);
 							memset(&hints, 0, sizeof(hints));
 							hints.ai_family = PF_INET6;
 							hints.ai_flags = AI_NUMERICHOST;
@@ -1266,8 +1279,8 @@ int	zbx_tcp_check_security(
 								ai_alt = NULL;
 							}
 							zbx_free(alt);
-							alt = zbx_dsprintf(alt, "::ffff:%s", sname);
-							zabbix_log(LOG_LEVEL_DEBUG, "The incoming server address '%s' was mapped into '%s' for comparison.", sname, alt);
+							alt = zbx_dsprintf(alt, "::ffff:%s", alt_static);
+							zabbix_log(LOG_LEVEL_DEBUG, "The incoming server address '%s' was mapped into '%s' for comparison.", alt_static, alt);
 							if(0 == getaddrinfo(alt, NULL, &hints, &ai_alt))
 							{
 								if(0 == memcmp(((struct sockaddr_in6*)ai_alt)->sin6_addr.s6_addr,
