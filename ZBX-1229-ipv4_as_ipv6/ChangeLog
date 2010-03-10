@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1229] added comparison between IPv4 and IPv4-mapped allowed server addresses (Dmitry)
  - [ZBX-2053] fixed evaluating of case sensitivity on the server/agent side of regular expressions (Dmitry)
  - [ZBX-2077] added support of Failure/Success Audit eventlog severity (Sasha)
  - [ZBXNEXT-257] added support of time-based disabling of data collection for items (asaveljevs,Aly,Sasha)

@@ -1086,9 +1086,13 @@ char	*get_ip_by_socket(zbx_sock_t *s)
  * Return value: SUCCEED - connection allowed                                 *
  *               FAIL - connection is not allowed                             *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Alexei Vladishev, Dmitry Borovikov                                 *
  *                                                                            *
- * Comments:                                                                  *
+ * Comments: only one of 127.0.0.1, ::127.0.0.1 or ::ffff:127.0.0.1           *
+ *           can be allowed and other two will be also allowed without        *
+ *           mentioning both for listed and incoming addresses                *
+ *           code can be improved by making only one return point             *
+ *                                                  so no messing with memory *
  *                                                                            *
  ******************************************************************************/
 
@@ -1099,7 +1103,8 @@ int	zbx_tcp_check_security(
 	)
 {
 #if defined(HAVE_IPV6)
-	struct		addrinfo hints, *ai = NULL;
+	struct		addrinfo hints, *ai = NULL, *ai_alt = NULL; /* for mapped IPv4 addresses */
+	char		*alt = NULL; /* for mapped IPv4 addresses with "::" or "::ffff" prefixes */
 #else
 	struct		hostent *hp;
 	char		*sip;
@@ -1151,18 +1156,77 @@ int	zbx_tcp_check_security(
 			memset(&hints, 0, sizeof(hints));
 			hints.ai_family = PF_UNSPEC;
 			if(0 == getaddrinfo(start, NULL, &hints, &ai))
-			{
-				if(ai->ai_family == name.ss_family)
+			{				
+				switch(ai->ai_family)
 				{
-					switch(ai->ai_family)
-					{
-						case AF_INET  :
+					case AF_INET:
+						if(AF_INET == name.ss_family)
+						{
 							if(((struct sockaddr_in*)&name)->sin_addr.s_addr == ((struct sockaddr_in*)ai->ai_addr)->sin_addr.s_addr)
 							{
 								freeaddrinfo(ai);
 								return SUCCEED;
 							}
-						case AF_INET6 :
+						}
+						else if(AF_INET6 == name.ss_family) /* should map our IPv4 address from the list */
+						{
+							if(NULL == inet_ntop(AF_INET, &(((struct sockaddr_in *)(ai->ai_addr))->sin_addr), sname, MAX_STRING_LEN))
+							{
+								freeaddrinfo(ai);
+								ai = NULL;
+								continue;
+							}
+							freeaddrinfo(ai);
+							ai = NULL;
+							alt = zbx_dsprintf(alt, "::%s", sname);
+							zabbix_log(LOG_LEVEL_DEBUG, "The allowed server address '%s' was mapped into '%s' for comparison.", start, alt);
+							memset(&hints, 0, sizeof(hints));
+							hints.ai_family = PF_INET6;
+							hints.ai_flags = AI_NUMERICHOST;
+							if(0 == getaddrinfo(alt, NULL, &hints, &ai))
+							{
+								if(0 == memcmp(((struct sockaddr_in6*)&name)->sin6_addr.s6_addr,
+									((struct sockaddr_in6*)ai->ai_addr)->sin6_addr.s6_addr,
+									sizeof(struct in6_addr)))
+								{
+									freeaddrinfo(ai);
+									zbx_free(alt);
+									return SUCCEED;
+								}
+							}
+							if(ai)
+							{
+								freeaddrinfo(ai);
+								ai = NULL;
+							}
+							zbx_free(alt);
+							alt = zbx_dsprintf(alt, "::ffff:%s", sname);
+							zabbix_log(LOG_LEVEL_DEBUG, "The allowed server address '%s' was mapped into '%s' for comparison.", start, alt);
+							if(0 == getaddrinfo(alt, NULL, &hints, &ai))
+							{
+								if(0 == memcmp(((struct sockaddr_in6*)&name)->sin6_addr.s6_addr,
+									((struct sockaddr_in6*)ai->ai_addr)->sin6_addr.s6_addr,
+									sizeof(struct in6_addr)))
+								{				
+									freeaddrinfo(ai);
+									zbx_free(alt);
+									return SUCCEED;
+								}
+							}
+							if(ai)
+							{
+								freeaddrinfo(ai);
+								ai = NULL;
+							}
+							zbx_free(alt);
+						}
+						break;
+					
+					/* case AF_INET */
+					
+					case AF_INET6:
+						if(AF_INET6 == name.ss_family)
+						{
 							if(0 == memcmp(((struct sockaddr_in6*)&name)->sin6_addr.s6_addr,
 									((struct sockaddr_in6*)ai->ai_addr)->sin6_addr.s6_addr,
 									sizeof(struct in6_addr)))
@@ -1170,9 +1234,68 @@ int	zbx_tcp_check_security(
 								freeaddrinfo(ai);
 								return SUCCEED;
 							}
-					}
+						}
+						else if(AF_INET == name.ss_family) /* should map incoming IPv4 address */
+						{
+							if(NULL == inet_ntop(AF_INET, &((struct sockaddr_in*)&name)->sin_addr, sname, MAX_STRING_LEN))
+							{
+								freeaddrinfo(ai);
+								ai = NULL;
+								continue;
+							}
+							alt = zbx_dsprintf(alt, "::%s", sname);
+							zabbix_log(LOG_LEVEL_DEBUG, "The incoming server address '%s' was mapped into '%s' for comparison.", sname, alt);
+							memset(&hints, 0, sizeof(hints));
+							hints.ai_family = PF_INET6;
+							hints.ai_flags = AI_NUMERICHOST;
+							if(0 == getaddrinfo(alt, NULL, &hints, &ai_alt))
+							{
+								if(0 == memcmp(((struct sockaddr_in6*)ai_alt)->sin6_addr.s6_addr,
+									((struct sockaddr_in6*)ai->ai_addr)->sin6_addr.s6_addr,
+									sizeof(struct in6_addr)))
+								{
+									freeaddrinfo(ai);
+									freeaddrinfo(ai_alt);
+									zbx_free(alt);
+									return SUCCEED;
+								}
+							}
+							if(ai_alt)
+							{
+								freeaddrinfo(ai_alt);
+								ai_alt = NULL;
+							}
+							zbx_free(alt);
+							alt = zbx_dsprintf(alt, "::ffff:%s", sname);
+							zabbix_log(LOG_LEVEL_DEBUG, "The incoming server address '%s' was mapped into '%s' for comparison.", sname, alt);
+							if(0 == getaddrinfo(alt, NULL, &hints, &ai_alt))
+							{
+								if(0 == memcmp(((struct sockaddr_in6*)ai_alt)->sin6_addr.s6_addr,
+									((struct sockaddr_in6*)ai->ai_addr)->sin6_addr.s6_addr,
+									sizeof(struct in6_addr)))
+								{
+									freeaddrinfo(ai);
+									freeaddrinfo(ai_alt);
+									zbx_free(alt);
+									return SUCCEED;
+								}
+							}
+							if(ai_alt)
+							{
+								freeaddrinfo(ai_alt);
+								ai_alt = NULL;
+							}
+							zbx_free(alt);
+						}
+						break;
+						
+					/* case AF_INET6 */
 				}
-				freeaddrinfo(ai);
+				if(ai)
+				{
+					freeaddrinfo(ai);
+					ai = NULL;
+				}
 			}
 #else
 			if( 0 != (hp = zbx_gethost(start)))
