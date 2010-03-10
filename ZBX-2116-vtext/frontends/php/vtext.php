@@ -43,7 +43,7 @@
 	$text = get_request('text', ' ');;
 	$font = get_request('font', 9);
 
-	if(!function_exists('imagerotate')){
+	if(function_exists('imagerotate')){
 		$angle = 0;
 	}
 	else{
@@ -60,7 +60,7 @@
 	$text_color = imagecolorallocate($im, 0, 0, 0);
 
 	
-	if(!function_exists('imagerotate')){
+	if(function_exists('imagerotate')){
 		imageText($im, $font, $angle, 0, $size['height']+1, $text_color, $text);
 		$im = imagerotate($im, 90, $transparentColor);
 	}
