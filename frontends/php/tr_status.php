@@ -649,7 +649,7 @@ include_once('include/page_header.php');
 
 
 		if($show_events != EVENTS_OPTION_NOEVENT){
-			$i = 0;
+			$i = 1;
 
 			foreach($trigger['events'] as $enum => $row_event){
 				$i++;
