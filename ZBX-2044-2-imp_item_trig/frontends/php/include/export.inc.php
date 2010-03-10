@@ -1068,7 +1068,6 @@ class zbxXML{
 								throw new APIException(1, CGraph::resetErrors());
 							}
 						}
-						
 					}
 				}
 

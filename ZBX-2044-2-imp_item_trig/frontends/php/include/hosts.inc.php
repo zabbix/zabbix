@@ -460,11 +460,18 @@ require_once('include/httptest.inc.php');
  *
  */
 	function copy_template_elements($hostid, $templateid = null, $copy_mode = false){
+		$result = true;
 		copy_template_applications($hostid, $templateid, $copy_mode);
 		copy_template_items($hostid, $templateid, $copy_mode);
 		copy_template_triggers($hostid, $templateid, $copy_mode);
-		$res = copy_template_graphs($hostid, $templateid, $copy_mode);
-		return $res;
+		// razvilka $copy
+		if($copy_mode){
+			copy_template_graphs($hostid, $templateid, $copy_mode);
+		}
+		else{
+			$result = CGraph::syncTemplates(array('hostids' => $hostid, 'templateids' => $templateid));
+		}
+		return $result;
 	}
 
 /*

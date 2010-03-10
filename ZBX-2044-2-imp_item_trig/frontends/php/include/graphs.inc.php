@@ -442,7 +442,7 @@
 		$result = array();
 
 		foreach($gitems as $gitem){
-			$sql = 'SELECT src.itemid '.
+			$sql = 'SELECT src.itemid, dest.key_ '.
 					' FROM items src, items dest '.
 					' WHERE dest.itemid='.$gitem['itemid'].
 						' AND src.key_=dest.key_ '.
@@ -460,6 +460,7 @@
 			}
 			else{
 				$gitem['itemid'] = $db_item['itemid'];
+				$gitem['key_'] = $db_item['key_'];
 			}
 
 			$result[] = $gitem;
@@ -919,12 +920,12 @@
 					'name' => $db_graph['name'],
 					'hostids' => $hostid
 				);
-
 				if(CGraph::exists($filter)){
 					$db_graph['gitems'] = $gitems;
 					$res = CGraph::update($db_graph);
 				}
 				else{
+					$db_graph['templateid'] = $db_graph['graphid'];
 					$db_graph['gitems'] = get_same_graphitems_for_host($gitems, $hostid);
 					$res = CGraph::create($db_graph);
 				}
