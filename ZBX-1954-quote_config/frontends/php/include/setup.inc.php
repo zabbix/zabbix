@@ -735,7 +735,7 @@
 '<?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -754,14 +754,14 @@
 
 global $DB;
 
-$DB["TYPE"]		= "'.$this->getConfig('DB_TYPE'		,'unknown').'";
-$DB["SERVER"]		= "'.$this->getConfig('DB_SERVER'	,'unknown').'";
-$DB["PORT"]		= "'.$this->getConfig('DB_PORT'		,'0').'";
-$DB["DATABASE"]		= "'.$this->getConfig('DB_DATABASE'	,'unknown').'";
-$DB["USER"]		= "'.$this->getConfig('DB_USER'		,'unknown').'";
-$DB["PASSWORD"]		= "'.$this->getConfig('DB_PASSWORD'	,'').'";
-$ZBX_SERVER		= "'.$this->getConfig('ZBX_SERVER'	,'').'";
-$ZBX_SERVER_PORT	= "'.$this->getConfig('ZBX_SERVER_PORT'	,'0').'";
+$DB["TYPE"]		= \''.$this->getConfig('DB_TYPE' ,'unknown').'\';
+$DB["SERVER"]		= \''.$this->getConfig('DB_SERVER' ,'unknown').'\';
+$DB["PORT"]		= \''.$this->getConfig('DB_PORT' ,'0').'\';
+$DB["DATABASE"]		= \''.$this->getConfig('DB_DATABASE' ,'unknown').'\';
+$DB["USER"]		= \''.$this->getConfig('DB_USER' ,'unknown').'\';
+$DB["PASSWORD"]		= \''.$this->getConfig('DB_PASSWORD' ,'').'\';
+$ZBX_SERVER		= \''.$this->getConfig('ZBX_SERVER' ,'').'\';
+$ZBX_SERVER_PORT	= \''.$this->getConfig('ZBX_SERVER_PORT' ,'0').'\';
 
 
 $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
