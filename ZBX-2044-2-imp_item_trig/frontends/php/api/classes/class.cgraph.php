@@ -826,7 +826,7 @@ COpt::memoryPick();
 					}
 					
 					$graph['graphid'] = $chd_graph['graphid'];
-					self::updateReal($graph) or self::exception();
+					self::updateReal($graph);
 				}
 // check if graph with same name and items exists
 				else{
@@ -862,14 +862,14 @@ COpt::memoryPick();
 							}
 							
 							$graph['graphid'] = $chd_graph['graphid'];
-							self::updateReal($graph) or self::exception();
+							self::updateReal($graph);
 						}
 						else{
 							self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$graph['name'].' ]: already exists on [ '.$chd_host['host'].' ] (items are not identical)');
 						}
 					}
 					else{
-						$graphid = self::createReal($graph) or self::exception();
+						$graphid = self::createReal($graph);
 						$graph['graphid'] = $graphid;
 					}
 				}

@@ -752,78 +752,69 @@ COpt::memoryPick();
 /**
  * Add triggers
  *
+ * Trigger params: expression, description, type, priority, status, comments, url, templateid
+ *
  * {@source}
  * @access public
  * @static
  * @since 1.8
  * @version 1
  *
- * @param _array $triggers multidimensional array with triggers data
- * @param array $triggers[0,...]['expression']
- * @param array $triggers[0,...]['description']
- * @param array $triggers[0,...]['type'] OPTIONAL
- * @param array $triggers[0,...]['priority'] OPTIONAL
- * @param array $triggers[0,...]['status'] OPTIONAL
- * @param array $triggers[0,...]['comments'] OPTIONAL
- * @param array $triggers[0,...]['url'] OPTIONAL
- * @param array $triggers[0,...]['templateid'] OPTIONAL
+ * @param array $triggers
  * @return boolean
  */
 	public static function create($triggers){
 		$triggers = zbx_toArray($triggers);
 		$triggerids = array();
 
-		$result = true;
+		try{
+			self::BeginTransaction(__METHOD__);
+			
+			foreach($triggers as $num => $trigger){
+				$trigger_db_fields = array(
+					'description'	=> null,
+					'expression'	=> null,
+					'type'		=> 0,
+					'priority'	=> 0,
+					'status'	=> TRIGGER_STATUS_DISABLED,
+					'comments'	=> '',
+					'url'		=> '',
+					'templateid'=> 0
+				);
 
-		self::BeginTransaction(__METHOD__);
-		foreach($triggers as $num => $trigger){
-			$trigger_db_fields = array(
-				'description'	=> null,
-				'expression'	=> null,
-				'type'		=> 0,
-				'priority'	=> 0,
-				'status'	=> TRIGGER_STATUS_DISABLED,
-				'comments'	=> '',
-				'url'		=> '',
-				'templateid'=> 0
-			);
+				if(!check_db_fields($trigger_db_fields, $trigger)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for trigger');
+				}
 
-			if(!check_db_fields($trigger_db_fields, $trigger)){
-				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Wrong fields for trigger');
-				$result = false;
-				break;
+				$result = add_trigger(
+					$trigger['expression'],
+					$trigger['description'],
+					$trigger['type'],
+					$trigger['priority'],
+					$trigger['status'],
+					$trigger['comments'],
+					$trigger['url'],
+					array(),
+					$trigger['templateid']
+				);
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Trigger ['.$trigger['description'].' ]: cannot create');
+
+				$triggerids[] = $result;
 			}
 
-			$result = add_trigger(
-				$trigger['expression'],
-				$trigger['description'],
-				$trigger['type'],
-				$trigger['priority'],
-				$trigger['status'],
-				$trigger['comments'],
-				$trigger['url'],
-				array(),
-				$trigger['templateid']
-			);
-
-			if(!$result) break;
-
-			$triggerids[] = $result;
+			self::EndTransaction(true, __METHOD__);
+			
+			return self::get(array(
+				'triggerids' => $triggerids,
+				'output' => API_OUTPUT_EXTEND,
+				'nopermissions' => 1
+			));
 		}
-
-		$result = self::EndTransaction($result, __METHOD__);
-		if($result){
-			$options = array(
-				'triggerids'=>$triggerids,
-				'output'=>API_OUTPUT_EXTEND,
-				'nopermissions'=>1
-			);
-
-			$new_triggers = self::get($options);
-			return $new_triggers;
-		}
-		else{
-			self::setError(__METHOD__);
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, $error);
 			return false;
 		}
 	}
@@ -831,22 +822,15 @@ COpt::memoryPick();
 /**
  * Update triggers
  *
+ * Trigger params: expression, description, type, priority, status, comments, url, templateid
+ *
  * {@source}
  * @access public
  * @static
  * @since 1.8
  * @version 1
  *
- * @param _array $triggers multidimensional array with triggers data
- * @param array $triggers[0,...]['expression']
- * @param array $triggers[0,...]['description'] OPTIONAL
- * @param array $triggers[0,...]['type'] OPTIONAL
- * @param array $triggers[0,...]['priority'] OPTIONAL
- * @param array $triggers[0,...]['status'] OPTIONAL
- * @param array $triggers[0,...]['comments'] OPTIONAL
- * @param array $triggers[0,...]['dependencies'] OPTIONAL
- * @param array $triggers[0,...]['url'] OPTIONAL
- * @param array $triggers[0,...]['templateid'] OPTIONAL
+ * @param array $triggers
  * @return boolean
  */
 	public static function update($triggers){
@@ -877,7 +861,7 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for trigger');
 				}
 				
-				update_trigger(
+				$result = update_trigger(
 					$trigger['triggerid'],
 					$trigger['expression'],
 					$trigger['description'],
@@ -888,18 +872,17 @@ COpt::memoryPick();
 					$trigger['url'],
 					array(),
 					$trigger['templateid']
-				) or self::exception();
+				);
+				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Trigger ['.$trigger['description'].' ]: cannot update');
 			}
-			
 			
 			self::EndTransaction(true, __METHOD__);
 			
-			$upd_triggers = self::get(array(
+			return self::get(array(
 				'triggerids' => $triggerids, 
 				'extendoutput' => 1, 
 				'nopermissions' => 1
 			));
-			return $upd_triggers;
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
@@ -919,7 +902,7 @@ COpt::memoryPick();
  * @since 1.8
  * @version 1
  *
- * @param _array $triggers multidimensional array with trigger objects
+ * @param array $triggers multidimensional array with trigger objects
  * @param array $triggers[0,...]['triggerid']
  * @return deleted triggers
  */
