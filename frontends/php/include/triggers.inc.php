@@ -597,8 +597,8 @@
 	 * Comments:
 	 *
 	 */
-    function    analyze_expression($expression)
-    {
+    function analyze_expression($expression){
+	
 		global $ZBX_TR_EXPR_ALLOWED_MACROS, $ZBX_TR_EXPR_REPLACE_TO, $ZBX_TR_EXPR_ALLOWED_FUNCTIONS;
 		if (empty($expression)) return array('', null, null);
 
@@ -632,6 +632,7 @@
 			'(?P<sign2>'.ZBX_PREG_SIGN.')?';
 	
 		preg_match_all('/'.$expr_full_token2.'/u', $expr, $arr);
+		$temp = array_reverse($temp);	
 
 		$outline = '';
 		$map = array();
