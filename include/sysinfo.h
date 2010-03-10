@@ -145,6 +145,7 @@ void    *get_result_value_by_type(AGENT_RESULT *result, int require_type);
 
 extern int	CONFIG_ENABLE_REMOTE_COMMANDS;
 extern int	CONFIG_LOG_REMOTE_COMMANDS;
+extern int	CONFIG_UNSAFE_USER_PARAMETERS;
 
 /* #define TEST_PARAMETERS */
 
