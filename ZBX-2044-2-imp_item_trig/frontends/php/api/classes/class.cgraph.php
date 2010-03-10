@@ -599,8 +599,6 @@ COpt::memoryPick();
 	public static function update($graphs){
 		$graphs = zbx_toArray($graphs);
 		$graphids = array();
-		
-unset($graphs['templateid']);
 
 		try{
 			self::BeginTransaction(__METHOD__);
@@ -622,6 +620,9 @@ unset($graphs['templateid']);
 			self::checkInput($graphs);
 
 			foreach($graphs as $gnum => $graph){
+			
+				unset($graph['templateid']);
+				
 // EXCEPTION: GRAPH EXISTS {{{
 				$graph_hosts = CHost::get(array(
 					'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
@@ -638,7 +639,7 @@ unset($graphs['templateid']);
 				$graph_exists = reset($graph_exists);
 
 				if($graph_exists && ($graph_exists['graphid'] != $graph['graphid'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph already exists [ '.$graph['name'].' ] on Host [ '.$graph_hosts[0]['host'].' ]');
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$graph['name'].' ]: already exists on [ '.$graph_hosts[0]['host'].' ]');
 				}
 // }}} EXCEPTION: GRAPH EXISTS
 
@@ -778,7 +779,7 @@ unset($graphs['templateid']);
 		return $graph['graphid'];
 	}
 	
-	protected static function inherit($graph, $hostid=null){
+	protected static function inherit($graph, $hostids=null){
 	
 		$graph_template = CTemplate::get(array(
 			'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
@@ -789,9 +790,9 @@ unset($graphs['templateid']);
 		if(!empty($graph_template)){
 			$chd_hosts = CHost::get(array(
 				'templateids' => $graph_template[0]['templateid'],
-				'output' => API_OUTPUT_SHORTEN,
+				'output' => array('hostid', 'host'),
 				'preservekeys' => 1,
-				'hostids' => $hostid,
+				'hostids' => $hostids,
 				'nopermissions' => 1,
 				'templated_hosts' => 1,
 			));
@@ -806,11 +807,13 @@ unset($graphs['templateid']);
 					'output' => API_OUTPUT_EXTEND
 					
 				));
-				$graph= reset($graph);
+				$graph = reset($graph);
+				$graph['templateid'] = $graph['graphid'];
 				
-				$graph['gitems'] = get_same_graphitems_for_host($graph['gitems'], $chd_host['hostid']) or self::exception();
+				$graph['gitems'] = get_same_graphitems_for_host($graph['gitems'], $chd_host['hostid'])
+					or self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$graph['name'].' ]: cannot inherit, no required items on [ '.$chd_host['host'].' ]');
 				
-	// check if templated graph exists
+// check if templated graph exists
 				$chd_graph = self::get(array(
 					'filter' => array('templateid' => $graph['graphid']),
 					'output' => API_OUTPUT_EXTEND,
@@ -819,24 +822,29 @@ unset($graphs['templateid']);
 				));
 				if($chd_graph = reset($chd_graph)){
 					if(($graph['name'] != $chd_graph['name']) && self::exists(array('name' => $graph['name'], 'hostids' => $chd_host['hostid']))){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$graph['name'].' ] already exists. Cannot inherit it.');
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$graph['name'].' ]: already exists on [ '.$chd_host['host'].' ]');
 					}
 					
 					$graph['graphid'] = $chd_graph['graphid'];
 					self::updateReal($graph) or self::exception();
 				}
-	// check if graph with same name and items exists
+// check if graph with same name and items exists
 				else{
-					$graph['templateid'] = $graph['graphid'];
+					
+					
 					$chd_graph = self::get(array(
 						'filter' => array('name' => $graph['name']),
-						'output' => API_OUTPUT_SHORTEN,
+						'output' => API_OUTPUT_EXTEND,
 						'preservekeys' => 1,
 						'nopermissions' => 1,
 						'hostids' => $chd_host['hostid']
 					));
 					
 					if($chd_graph = reset($chd_graph)){
+						if($chd_graph['templateid'] != 0){
+							self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$graph['name'].' ]: already exists on [ '.$chd_host['host'].' ] (inherited from another template)');
+						}
+				
 						$chd_graph_items = CGraphItem::get(array(
 							'graphids' => $chd_graph['graphid'],
 							'output' => API_OUTPUT_EXTEND,
@@ -850,14 +858,14 @@ unset($graphs['templateid']);
 								foreach($chd_graph_items as $chd_item){
 									if($gitem['key_'] == $chd_item['key_']) continue 2;
 								}
-								self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$graph['name'].' ] already exists. Cannot inherit it.');
+								self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$graph['name'].' ]: already exists on [ '.$chd_host['host'].' ] (items are not identical)');
 							}
 							
 							$graph['graphid'] = $chd_graph['graphid'];
 							self::updateReal($graph) or self::exception();
 						}
 						else{
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$graph['name'].' ] already exists. Cannot inherit it.');
+							self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$graph['name'].' ]: already exists on [ '.$chd_host['host'].' ] (items are not identical)');
 						}
 					}
 					else{
