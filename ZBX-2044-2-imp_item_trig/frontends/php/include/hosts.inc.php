@@ -266,7 +266,7 @@ require_once('include/httptest.inc.php');
 						$newgroup,$groups)
 	{
 		if(zbx_empty($newgroup) && (count($groups) == 0)){
-			info(S_HOST.SPACE.S__MUST_LINKED_LEAST_ONE_HOST_GROUP_SMALL);
+			info(S_HOST.SPACE.S_MUST_LINKED_LEAST_ONE_HOST_GROUP_SMALL);
 			return false;
 		}
 
@@ -890,19 +890,22 @@ require_once('include/httptest.inc.php');
 		zbx_value2array($hostids);
 
 //		$hosts = array();
-		$result = DBselect('SELECT * FROM hosts WHERE '.DBcondition('hostid', $hostids).
-				' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')');
+		$sql = 'SELECT * '.
+			' FROM hosts '.
+			' WHERE '.DBcondition('hostid', $hostids).
+				' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
+		$result = DBselect($sql);
 		while($host=DBfetch($result)){
 			if($status != $host['status']){
 //				$hosts[$host['hostid']] = $host['hostid'];
 				update_trigger_value_to_unknown_by_hostid($host['hostid']);
 				$res = DBexecute('UPDATE hosts SET status='.$status.' WHERE hostid='.$host['hostid']);
-				if ($res){
+				if($res){
 					$host_new = $host;//get_host_by_hostid($host['hostid']);
 					$host_new['status'] = $status;
 					add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['host'], 'hosts', $host, $host_new);
 				}
-				info(S_UPDATED_STATUS_OF_HOST.SPACE.$host['host']);
+				info(S_UPDATED_STATUS_OF_HOST.' "'.$host['host'].'"');
 			}
 		}
 
@@ -1008,7 +1011,6 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 
 	$first_entry = ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE)?S_NOT_SELECTED_SMALL:S_ALL_SMALL;
 	$groups['0'] = $first_entry;
-	$groupids['0'] = '0';
 
 	$_REQUEST['groupid'] = $result['original'] = get_request('groupid', -1);
 	$_REQUEST['hostid'] = get_request('hostid', -1);
@@ -1261,7 +1263,6 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 
 	$first_entry = ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE)?S_NOT_SELECTED_SMALL:S_ALL_SMALL;
 	$hosts['0'] = $first_entry;
-	$hostids['0'] = '0';
 
 	if(!is_array($groupid) && ($groupid == 0)){
 		if($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE){

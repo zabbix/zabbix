@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -975,21 +975,12 @@ include_once('include/page_header.php');
 			($hostid>0)?null:S_HOST,
 			S_NAME));
 
-		$options = array(
-			'nodeids' => $nodeid,
-			'hostids' => $hostid,
-			'output' => API_PUTPUT_EXTEND
-		);
-
-		if(!is_null($writeonly)) $options['editable'] = 1;
-		if(!is_null($templated)) $options['templated'] = $templated;
-
 		$sql = 'SELECT DISTINCT h.host,a.* '.
 				' FROM hosts h,applications a '.
 				' WHERE h.hostid=a.hostid '.
 					' AND '.DBin_node('a.applicationid', $nodeid).
 					' AND '.DBcondition('h.hostid',$available_hosts).
-					' AND h.status in ('.implode(',', $host_status).')'.
+					// ' AND h.status in ('.implode(',', $host_status).')'.
 					' AND h.hostid='.$hostid.
 				' ORDER BY h.host,a.name';
 
@@ -1171,6 +1162,9 @@ include_once('include/page_header.php');
 		$table = new CTableInfo(S_NO_MAPS_DEFINED);
 		$table->setHeader(array(S_NAME));
 
+		$excludeids = get_request('excludeids', array());
+		$excludeids = zbx_toHash($excludeids);
+
 		$options = array(
 			'nodeids' => $nodeid,
 			'extendoutput' => 1
@@ -1181,6 +1175,8 @@ include_once('include/page_header.php');
 		order_result($maps, 'name');
 
 		foreach($maps as $mnum => $row){
+			if(isset($excludeids[$row['sysmapid']])) continue;
+
 			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
 			$name = $row['node_name'].$row['name'];
 

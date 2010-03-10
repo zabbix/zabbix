@@ -479,7 +479,7 @@
 	'S_MINUS_OTHER_MINUS'=>			'- прочее -',
 	'S_NOT_SELECTED_SMALL'=>			'нет выбранного',
 	'S_GRAPH'=>			'График',
-	'S_ZABBIX'=>			'ZABBIX',
+	'S_ZABBIX'=>			'Zabbix',
 	'S_COPYRIGHT_BY'=>			'Copyright 2001-2010 by',
 	'S_CONNECTED_AS'=>			'Подключен как',
 	'S_NOT_CONNECTED'=>			'Не подключен',

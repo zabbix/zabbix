@@ -84,14 +84,14 @@ int	add_user_parameter(char *key, char *command)
 
 	if (0 == (i = parse_command(key, usr_cmd, MAX_STRING_LEN, usr_param, MAX_STRING_LEN)))
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Can't add user specifed key \"%s\". Can't parse key!", key);
+		zabbix_log(LOG_LEVEL_WARNING, "Can't add user specified key \"%s\". Can't parse key!", key);
 		return FAIL;
 	}
 	else if (2 == i)				/* with specified parameters */
 	{
 		if (0 != strcmp(usr_param, "*"))	/* must be '*' parameters */
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Can't add user specifed key \"%s\". Incorrect key!", key);
+			zabbix_log(LOG_LEVEL_WARNING, "Can't add user specified key \"%s\". Incorrect key!", key);
 			return FAIL;
 		}
 		flag |= CF_USEUPARAM;
@@ -252,49 +252,59 @@ void	init_result(AGENT_RESULT *result)
 	result->msg = NULL;
 }
 
-int parse_command( /* return value: 0 - error; 1 - command without parameters; 2 - command with parameters */
-		const char *command,
-		char *cmd,
-		int cmd_max_len,
-		char *param,
-		int param_max_len
-		)
+/*
+ * return value: 0 - error;
+ *               1 - command without parameters;
+ *               2 - command with parameters
+ */
+int	parse_command(const char *command, char *cmd, int cmd_max_len,
+		char *param, int param_max_len)
 {
-	char *pl, *pr;
-	char localstr[MAX_STRING_LEN];
-	int ret = 2;
+	char	*pl, *pr;
+	size_t	sz;
 
-	zbx_strlcpy(localstr, command, MAX_STRING_LEN);
+	pl = strchr(command, '[');
+	pr = strrchr(command, ']');
 
-	if(cmd)
-		zbx_strlcpy(cmd, "", cmd_max_len);
-	if(param)
-		zbx_strlcpy(param, "", param_max_len);
-
-	pl = strchr(localstr, '[');
-	pr = strrchr(localstr, ']');
-
-	if(pl > pr)
+	if (pl > pr)
 		return 0;
 
-	if((pl && !pr) || (!pl && pr))
+	if (NULL != pl && NULL == pr)
 		return 0;
 
-	if(pl != NULL)
-		pl[0] = 0;
-	if(pr != NULL)
-		pr[0] = 0;
+	if (NULL == pl && NULL != pr)
+		return 0;
 
-	if(cmd)
-		zbx_strlcpy(cmd, localstr, cmd_max_len);
+	if (NULL != cmd)
+	{
+		if (NULL != pl)
+		{
+			if (cmd_max_len < (sz = (size_t)(pl - command) + 1))
+				sz = cmd_max_len;
+			memcpy(cmd, command, sz - 1);
+			cmd[sz - 1] = '\0';
+		}
+		else
+			zbx_strlcpy(cmd, command, cmd_max_len);
+	}
 
-	if(pl && pr && param)
-		zbx_strlcpy(param, &pl[1] , param_max_len);
+	if (NULL != param)
+		*param = '\0';
 
-	if(!pl && !pr)
-		ret = 1;
+	if (NULL != pl && NULL != pr)
+	{
+		if (NULL != param)
+		{
+			if (param_max_len < (sz = (size_t)(pr - pl)))
+				sz = param_max_len;
+			memcpy(param, pl + 1, sz - 1);
+			param[sz - 1] = '\0';
+		}
+	}
+	else
+		return 1;
 
-	return ret;
+	return 2;
 }
 
 void	test_parameter(const char* key, unsigned flags)
@@ -550,14 +560,13 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 static int	DBchk_double(double value)
 {
-#if defined(HAVE_POSTGRESQL) || defined(HAVE_ORACLE) || defined(HAVE_SQLITE3)
 	/* field with precision 16, scale 4 [NUMERIC(16,4)] */
 	register double	pg_min_numeric = (double)-1E12;
 	register double	pg_max_numeric = (double)1E12;
 
 	if (value <= pg_min_numeric || value >= pg_max_numeric)
 		return FAIL;
-#endif
+
 	return SUCCEED;
 }
 

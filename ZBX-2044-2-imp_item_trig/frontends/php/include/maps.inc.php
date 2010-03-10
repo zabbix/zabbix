@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -358,7 +358,7 @@
 
 //		if($selement['label_location']<0) $selement['label_location']='null';
 		if(check_circle_elements_link($selement['sysmapid'],$selement['elementid'],$selement['elementtype'])){
-			error(S_CIRCULAR_LINK_CANNOT_BE_CREATED);
+			throw new Exception(S_CIRCULAR_LINK_CANNOT_BE_CREATED.' "'.$selement['label'].'"');
 			return false;
 		}
 
@@ -405,7 +405,7 @@
 		}
 
 		if(check_circle_elements_link($selement['sysmapid'],$selement['elementid'],$selement['elementtype'])){
-			error(S_CIRCULAR_LINK_CANNOT_BE_CREATED);
+			throw new Exception(S_CIRCULAR_LINK_CANNOT_BE_CREATED.' "'.$selement['label'].'"');
 			return false;
 		}
 
@@ -856,6 +856,15 @@
 	return imagecolorallocate($im,$RGB[0],$RGB[1],$RGB[2]);
 	}
 
+	function expandMapLabels(&$map){
+		foreach($map['selements'] as $snum => $selement){
+			$map['selements'][$snum]['label_expanded'] = expand_map_element_label_by_data($selement);
+		}
+
+		foreach($map['links'] as $lnum => $link){
+			$map['links'][$lnum]['label_expanded'] = expand_map_element_label_by_data(null, $link);
+		}
+	}
 /*
  * Function: expand_map_element_label_by_data
  *
@@ -868,8 +877,8 @@
  *     Aleksander Vladishev
  *
  */
-	function expand_map_element_label_by_data($db_element, $link_label = null){
-		$label = (null != $db_element) ? $db_element['label'] : $link_label;
+	function expand_map_element_label_by_data($db_element, $link = null){
+		$label = (null != $db_element) ? $db_element['label'] : $link['label'];
 
 		if (null != $db_element){
 			switch($db_element['elementtype']){
@@ -1368,7 +1377,7 @@
 				$info['type'] = TRIGGER_VALUE_UNKNOWN;
 				$info[TRIGGER_VALUE_UNKNOWN]['count']	= 0;
 				$info[TRIGGER_VALUE_UNKNOWN]['priority'] = 0;
-				$info[TRIGGER_VALUE_UNKNOWN]['info']	=  S_TEMPLATE_SMALL;
+				$info[TRIGGER_VALUE_UNKNOWN]['info']	= S_TEMPLATE_SMALL;
 			}
 			else if($host['status'] == HOST_STATUS_NOT_MONITORED){
 				$info['type'] = TRIGGER_VALUE_UNKNOWN;
@@ -1383,7 +1392,7 @@
 			}
 
 //----
-// Host unavalable
+// Host unavailable
 
 			if(isset($info['disabled']) && $info['disabled'] == 1){
 // Disabled

@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -228,7 +228,7 @@ class zbxXML{
 	}
 
 	public static function arrayToXML($array, $root = 'root'){
-		$doc = new DOMDocument('1.0');
+		$doc = new DOMDocument('1.0', 'UTF-8');
 		$doc->preserveWhiteSpace = false;
 
 		self::arrayToDOM($doc, $array, $root);
@@ -251,8 +251,8 @@ class zbxXML{
 //SDI($dom->saveXML($parentNode));
 			}
 			else if(!zbx_empty($value)){
-				$child = $dom->createElement($key, htmlspecialchars($value));
-				$parentNode->appendChild($child);
+				$n = $parentNode->appendChild($dom->createElement($key));
+				$n->appendChild(new DOMText($value));
 			}
 		}
 
@@ -1139,7 +1139,8 @@ class zbxXML{
 				foreach($data['hosts_groups'] as $gnum => $group){
 					$group['hosts'] = zbx_toHash($group['hosts'], 'hostid');
 					if(isset($group['hosts'][$host['hostid']])){
-						$groups_node->appendChild(new DOMElement(XML_TAG_GROUP, $group['name']));
+						$n = $groups_node->appendChild(new DOMElement(XML_TAG_GROUP));
+						$n->appendChild(new DOMText($group['name']));
 					}
 				}
 			}
@@ -1168,7 +1169,8 @@ class zbxXML{
 							foreach($data['items_applications'] as $application){
 								$application['items'] = zbx_toHash($application['items'], 'itemid');
 								if(isset($application['items'][$item['itemid']])){
-									$applications_node->appendChild(new DOMElement(XML_TAG_APPLICATION, $application['name']));
+									$n = $applications_node->appendChild(new DOMElement(XML_TAG_APPLICATION));
+									$n->appendChild(new DOMText($application['name']));
 								}
 							}
 						}
@@ -1182,7 +1184,8 @@ class zbxXML{
 				foreach($data['templates'] as $template){
 					$template['hosts'] = zbx_toHash($template['hosts'], 'hostid');
 					if(isset($template['hosts'][$host['hostid']])){
-						$templates_node->appendChild(new DOMElement(XML_TAG_TEMPLATE, $template['host']));
+						$n = $templates_node->appendChild(new DOMElement(XML_TAG_TEMPLATE));
+						$n->appendChild(new DOMText($template['host']));
 					}
 				}
 			}
@@ -1265,7 +1268,8 @@ class zbxXML{
 					$dependeny_node = $dependencies_node->appendChild(new DOMElement(XML_TAG_DEPENDENCY));
 					$dependeny_node->setAttributeNode(new DOMAttr('description', $dep_data['trigger']['host_description']));
 					foreach($dep_data['depends_on'] as $dtnum => $dep_trigger){
-						$dependeny_node->appendChild(new DOMElement('depends', $dep_trigger['host_description']));
+						$n = $dependeny_node->appendChild(new DOMElement('depends'));
+						$n->appendChild(new DOMText($dep_trigger['host_description']));
 					};
 				}
 			}
