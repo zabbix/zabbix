@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2007 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,26 +19,26 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/graphs.inc.php');
-require_once('include/screens.inc.php');
-require_once('include/blocks.inc.php');
+	require_once('include/config.inc.php');
+	require_once('include/graphs.inc.php');
+	require_once('include/screens.inc.php');
+	require_once('include/blocks.inc.php');
 
-$page['title'] = "S_CUSTOM_SCREENS";
-$page['file'] = 'screens.php';
-$page['hist_arg'] = array('config','elementid');
-$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.calendar.js','gtlc.js');
+	$page['title'] = 'S_CUSTOM_SCREENS';
+	$page['file'] = 'screens.php';
+	$page['hist_arg'] = array('config','elementid');
+	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.calendar.js','gtlc.js');
 
-$_REQUEST['config'] = get_request('config',0);
-if($_REQUEST['config'] == 1) redirect('slides.php');
+	$_REQUEST['config'] = get_request('config',0);
+	if($_REQUEST['config'] == 1) redirect('slides.php');
 
-$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-if((1 != $_REQUEST['config']) && (PAGE_TYPE_HTML == $page['type'])){
-	define('ZBX_PAGE_DO_REFRESH', 1);
-}
+	if((1 != $_REQUEST['config']) && (PAGE_TYPE_HTML == $page['type'])){
+		define('ZBX_PAGE_DO_REFRESH', 1);
+	}
 
-include_once('include/page_header.php');
+	include_once('include/page_header.php');
 
 ?>
 <?php
@@ -140,28 +140,27 @@ include_once('include/page_header.php');
 	$cmbConfig = new CComboBox('config', $config, "javascript: redirect('slides.php?config=1');");
 	$cmbConfig->addItem(0, S_SCREENS);
 	$cmbConfig->addItem(1, S_SLIDESHOWS);
-
 	$form->addItem(array(S_SHOW.SPACE,$cmbConfig));
 
-	$cmbElements = new CComboBox('elementid',$elementid,'submit()');
+	$cmbElements = new CComboBox('elementid', $elementid, 'submit()');
 	unset($screen_correct);
 	unset($first_screen);
 
 	$options = array(
-		'nodeids' => get_current_nodeid(true),
+		'nodeids' => get_current_nodeid(),
 		'extendoutput' => 1,
 		'sortfield' => 'name',
 		'sortorder' => ZBX_SORT_UP
 	);
-
 	$screens = CScreen::get($options);
+	
 	foreach($screens as $snum => $screen){
 		$screen['elementid'] = $screen['screenid'];
 
 		$cmbElements->addItem(
-				$screen['screenid'],
-				get_node_name_by_elid($screen['screenid'], null, ': ').$screen['name']
-				);
+			$screen['screenid'],
+			get_node_name_by_elid($screen['screenid'], null, ': ').$screen['name']
+		);
 		if((bccomp($elementid, $screen['screenid']) == 0)) $element_correct = 1;
 		if(!isset($first_element)) $first_element = $screen['screenid'];
 	}
@@ -172,10 +171,10 @@ include_once('include/page_header.php');
 
 	if(isset($elementid)){
 		$options = array(
+			'nodeids' => get_current_nodeid(),
 			'screenids' => $elementid,
 			'extendoutput' => 1
 		);
-
 		$screens = CScreen::get($options);
 		if(empty($screens)) access_deny();
 
@@ -300,9 +299,7 @@ include_once('include/page_header.php');
 	$jsmenu = new CPUMenu(null,170);
 	$jsmenu->InsertJavaScript();
 	echo SBR;
-?>
-<?php
 
+	
 include_once('include/page_footer.php');
-
 ?>
