@@ -21,6 +21,7 @@
 <?php
 require_once('include/config.inc.php');
 require_once('include/maps.inc.php');
+require_once('include/ident.inc.php');
 require_once('include/forms.inc.php');
 
 if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['maps'])){

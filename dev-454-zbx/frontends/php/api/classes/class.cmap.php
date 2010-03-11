@@ -478,7 +478,7 @@ COpt::memoryPick();
  */
 	public static function create($maps){
 		$errors = array();
-		$result_maps = array();
+		$sysmapids = array();
 		$result = true;
 
 		$maps = zbx_toArray($maps);
@@ -509,13 +509,12 @@ COpt::memoryPick();
 
 			if(!$result) break;
 
-			$new_map = array('sysmapid' => $sysmapid);
-			$result_maps[] = array_merge($map, $new_map);
+			$sysmapids[] = $sysmapid;
 		}
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return $result_maps;
+			return $sysmapids;
 		}
 		else{
 			self::setMethodErrors(__METHOD__, $errors);
@@ -589,12 +588,7 @@ COpt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$options = array(
-				'sysmapids' => $sysmapids,
-				'nopermissions' => 1,
-				'output' => API_OUTPUT_EXTEND,
-			);
-			return self::get($options);
+			return $sysmapids;
 		}
 		else{
 			self::setMethodErrors(__METHOD__, $errors);

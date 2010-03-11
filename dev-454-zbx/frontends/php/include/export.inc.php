@@ -359,6 +359,137 @@ class zbxXML{
 		}
 	}
 
+	public static function parseScreen($rules){
+		$importScreens = self::XMLtoArray(self::$xml);
+		if(!isset($importScreens['screens'])){
+			info(S_EXPORT_HAVE_NO_MAPS);
+			return false;
+		}
+		$importScreens = $importScreens['screens'];
+
+		$result = true;
+		$screens = array();
+		try{
+			foreach($importScreens as $mnum => &$screen){
+				unset($screen['screenid']);
+				$exists = CScreen::checkObjects(array('name' => $screen['name']));
+
+				if($exists && isset($rules['screens']['exist'])){
+					$db_screens = CScreen::getObjects(array('name' => $screen['name']));
+					if(empty($db_screens)) throw new Exception('No permisssions for screen['.$screen['name'].'] import');
+
+					$db_screen = reset($db_screens);
+
+					$screen['screenid'] = $db_screen['screenid'];
+				}
+				else if($exists || !isset($rules['screens']['missed'])){
+					info('Screen ['.$screen['name'].'] skipped - user rule');
+					unset($importScreens[$mnum]);
+					continue; // break if not update exist
+				}
+
+				if(!isset($screen['screenitems'])) $screen['screenitems'] = array();
+
+				foreach($screen['screenitems'] as $snum => &$screenitem){
+					$nodeCaption = isset($screenitem['resourceid']['node'])?$screenitem['resourceid']['node'].':':'';
+
+					if(!isset($screenitem['resourceid'])) $screenitem['resourceid'] = 0;
+					if(is_array($screenitem['resourceid'])){
+						switch($screenitem['resourcetype']){
+							case SCREEN_RESOURCE_HOSTS_INFO:
+							case SCREEN_RESOURCE_TRIGGERS_INFO:
+							case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
+							case SCREEN_RESOURCE_DATA_OVERVIEW:
+								$db_hostgroups = CHostgroup::getObjects($screenitem['resourceid']);
+								if(empty($db_hostgroups)){
+									$error = S_CANNOT_FIND_HOSTGROUP.' "'.$nodeCaption.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+									throw new Exception($error);
+								}
+
+								$tmp = reset($db_hostgroups);
+								$screenitem['resourceid'] = $tmp['groupid'];
+							break;
+							case SCREEN_RESOURCE_GRAPH:
+								$db_graphs = CGraph::getObjects($screenitem['resourceid']);
+								if(empty($db_graphs)){
+									$error = S_CANNOT_FIND_GRAPH.' "'.$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+									throw new Exception($error);
+								}
+
+								$tmp = reset($db_graphs);
+								$screenitem['resourceid'] = $tmp['graphid'];
+							break;
+							case SCREEN_RESOURCE_SIMPLE_GRAPH:
+							case SCREEN_RESOURCE_PLAIN_TEXT:
+								$db_items = CItem::getObjects($screenitem['resourceid']);
+//SDII($db_items);
+								if(empty($db_items)){
+									$error = S_CANNOT_FIND_ITEM.' "'.$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['key_'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+									throw new Exception($error);
+								}
+
+								$tmp = reset($db_items);
+								$screenitem['resourceid'] = $tmp['itemid'];
+							break;
+							case SCREEN_RESOURCE_MAP:
+								$db_sysmaps = CMap::getObjects($screenitem['resourceid']);
+								if(empty($db_sysmaps)){
+									$error = S_CANNOT_FIND_MAP.' "'.$nodeCaption.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+									throw new Exception($error);
+								}
+
+								$tmp = reset($db_sysmaps);
+								$screenitem['resourceid'] = $tmp['sysmapid'];
+							break;
+							case SCREEN_RESOURCE_SCREEN:
+								$db_screens = CScreen::getObjects($screenitem['resourceid']);
+								if(empty($db_screens)){
+									$error = S_CANNOT_FIND_screen.' "'.$nodeCaption.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+									throw new Exception($error);
+								}
+
+								$tmp = reset($db_screens);
+								$screenitem['resourceid'] = $tmp['screenid'];
+							break;
+							default:
+								$screenitem['resourceid'] = 0;
+							break;
+						}
+					}
+				}
+				unset($screenitem);
+
+				$screens[] = $screen;
+			}
+			unset($screen);
+
+			$importScreens = $screens;
+
+			foreach($importScreens as $mnum => $screen){
+				if(isset($screen['screenid'])){
+					$screenids = CScreen::update($screen);
+				}
+				else{
+					$screenids = CScreen::create($screen);
+				}
+
+				if(isset($screen['screenid'])){
+					info(S_SCREEN.' ['.$screen['name'].'] '.S_UPDATED_SMALL);
+				}
+				else{
+					info(S_SCREEN.' ['.$screen['name'].'] '.S_ADDED_SMALL);
+				}
+
+			}
+		}
+		catch(Exception $e){
+			error($e->getMessage());
+			return false;
+		}
+
+	return $result;
+	}
+
 	public static function parseMap($rules){
 		$importMaps = self::XMLtoArray(self::$xml);
 		if(!isset($importMaps['sysmaps'])){
@@ -372,13 +503,16 @@ class zbxXML{
 		try{
 			foreach($importMaps as $mnum => &$sysmap){
 				unset($sysmap['sysmapid']);
-				$db_maps = CMap::checkObjects(array('name' => $sysmap['name']));
+				$exists = CMap::checkObjects(array('name' => $sysmap['name']));
 
-				if(!empty($db_maps) && isset($rules['maps']['exist'])){
+				if($exists && isset($rules['maps']['exist'])){
+					$db_maps = CMap::getObjects(array('name' => $sysmap['name']));
+					if(empty($db_maps)) throw new Exception('No permisssions for map['.$sysmap['name'].'] import');
+
 					$db_map = reset($db_maps);
 					$sysmap['sysmapid'] = $db_map['sysmapid'];
 				}
-				else if(!empty($db_maps) || !isset($rules['maps']['missed'])){
+				else if($exists || !isset($rules['maps']['missed'])){
 					info('Map ['.$sysmap['name'].'] skipped - user rule');
 					unset($importMaps[$mnum]);
 					continue; // break if not update exist
@@ -494,9 +628,9 @@ class zbxXML{
 
 			$importMaps = $sysmaps;
 			foreach($importMaps as $mnum => $importMap){
+				$sysmap = $importMap;
 				if(isset($importMap['sysmapid'])){
-					$sysmaps = CMap::update($importMap);
-					$sysmap = reset($sysmaps);
+					$sysmapids = CMap::update($importMap);
 
 // Deleteing all selements (with links)
 					$db_selementids = array();
@@ -508,8 +642,8 @@ class zbxXML{
 //----
 				}
 				else{
-					$sysmaps = CMap::create($importMap);
-					$sysmap = reset($sysmaps);
+					$sysmapids = CMap::create($importMap);
+					$sysmap['sysmapid'] = reset($sysmapids);
 				}
 
 				$selements = $importMap['selements'];

@@ -272,11 +272,32 @@ class CGraph extends CZBXAPI{
 		}
 
 // filter
+
+// filter
 		if(!is_null($options['filter'])){
 			zbx_value2array($options['filter']);
 
 			if(isset($options['filter']['name']))
-				$sql_parts['where']['name'] = zbx_dbstr($options['filter']['name']);
+				$sql_parts['where']['name'] = 'g.name='.zbx_dbstr($options['filter']['name']);
+
+			if(isset($options['filter']['templateid']))
+				$sql_parts['where']['templateid'] = 'g.templateid='.$options['filter']['templateid'];
+
+			if(isset($options['filter']['host']) || isset($options['filter']['hostid'])){
+				$sql_parts['from']['gi'] = 'graphs_items gi';
+				$sql_parts['from']['i'] = 'items i';
+				$sql_parts['where']['gig'] = 'gi.graphid=g.graphid';
+				$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
+
+				if(isset($options['filter']['host'])){
+					$sql_parts['from']['h'] = 'hosts h';
+					$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+					$sql_parts['where']['host'] = 'h.host='.zbx_dbstr($options['filter']['host']);
+				}
+
+				if(isset($options['filter']['hostid']))
+					$sql_parts['where']['hostid'] = 'i.hostid='.$options['filter']['hostid'];
+			}
 		}
 
 // order
@@ -403,20 +424,22 @@ COpt::memoryPick();
 		}
 
 // Adding Hosts
-		if(!is_null($options['select_hosts']) && str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
-			$obj_params = array(
-				'nodeids' => $nodeids,
-				'output' => $options['select_hosts'],
-				'graphids' => $graphids,
-				'nopermissions' => 1,
-				'preservekeys' => 1
-			);
-			$hosts = CHost::get($obj_params);
-			foreach($hosts as $hostid => $host){
-				$hgraphs = $host['graphs'];
-				unset($host['graphs']);
-				foreach($hgraphs as $num => $graph){
-					$result[$graph['graphid']]['hosts'][] = $host;
+		if(!is_null($options['select_hosts'])){
+			if(is_array($options['select_hosts']) || str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+				$obj_params = array(
+					'nodeids' => $nodeids,
+					'output' => $options['select_hosts'],
+					'graphids' => $graphids,
+					'nopermissions' => 1,
+					'preservekeys' => 1
+				);
+				$hosts = CHost::get($obj_params);
+				foreach($hosts as $hostid => $host){
+					$hgraphs = $host['graphs'];
+					unset($host['graphs']);
+					foreach($hgraphs as $num => $graph){
+						$result[$graph['graphid']]['hosts'][] = $host;
+					}
 				}
 			}
 		}
@@ -628,8 +651,7 @@ COpt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_graphs = self::get(array('graphids'=>$graphids, 'extendoutput'=>1, 'nopermissions'=>1, 'select_graph_items'=>1));
-			return $new_graphs;
+			return $graphids;
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);//'Internal Zabbix error');
@@ -682,8 +704,7 @@ COpt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_graphs = self::get(array('graphids'=>$graphids, 'extendoutput'=>1, 'nopermissions'=>1));
-			return $upd_graphs;
+			return $graphids;
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal Zabbix error');
