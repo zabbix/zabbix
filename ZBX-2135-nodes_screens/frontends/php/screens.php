@@ -132,6 +132,7 @@
 		'extendoutput' => 1
 	));
 	$screens = zbx_toHash($screens, 'screenid');
+	order_result($screens, 'name');
 	
 	if(empty($screens)){
 		$screens_wdgt->addPageHeader(S_SCREENS_BIG, $formHeader);
@@ -177,7 +178,6 @@
 		$form->addVar('fullscreen', $_REQUEST['fullscreen']);
 		
 		$cmbElements = new CComboBox('elementid', $elementid, 'submit()');
-		order_result($screens, 'name');
 		foreach($screens as $snum => $screen){
 			$cmbElements->addItem($screen['screenid'], get_node_name_by_elid($screen['screenid'], null, ': ').$screen['name']);
 		}
