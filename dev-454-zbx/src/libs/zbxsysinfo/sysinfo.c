@@ -382,15 +382,18 @@ static int	replace_param(const char *cmd, const char *param, char *out, int outl
 			{
 				get_param(param, (int)(pr[1] - '0'), buf, MAX_STRING_LEN);
 
-				for (c = suppressed_chars; '\0' != *c; c++)
-					if (NULL != strchr(buf, *c))
-					{
-						zbx_snprintf(error, max_err_len, "Special characters '%s'"
-								" are not allowed in the parameters",
-								suppressed_chars);
-						ret = FAIL;
-						break;
-					}
+				if (0 == CONFIG_UNSAFE_USER_PARAMETERS)
+				{
+					for (c = suppressed_chars; '\0' != *c; c++)
+						if (NULL != strchr(buf, *c))
+						{
+							zbx_snprintf(error, max_err_len, "Special characters '%s'"
+									" are not allowed in the parameters",
+									suppressed_chars);
+							ret = FAIL;
+							break;
+						}
+				}
 			}
 
 			if (FAIL == ret)
@@ -560,14 +563,13 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 static int	DBchk_double(double value)
 {
-#if defined(HAVE_POSTGRESQL) || defined(HAVE_ORACLE) || defined(HAVE_SQLITE3)
 	/* field with precision 16, scale 4 [NUMERIC(16,4)] */
 	register double	pg_min_numeric = (double)-1E12;
 	register double	pg_max_numeric = (double)1E12;
 
 	if (value <= pg_min_numeric || value >= pg_max_numeric)
 		return FAIL;
-#endif
+
 	return SUCCEED;
 }
 
