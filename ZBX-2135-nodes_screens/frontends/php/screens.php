@@ -148,6 +148,7 @@ include_once('include/page_header.php');
 	unset($first_screen);
 
 	$options = array(
+		'nodeids' => get_current_nodeid(true),
 		'extendoutput' => 1,
 		'sortfield' => 'name',
 		'sortorder' => ZBX_SORT_UP
