@@ -35,7 +35,7 @@
  * Return value: SUCCEED - information removed successfully                   *
  *               FAIL - otherwise                                             *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Alexei Vladishev, Dmitry Borovikov                                 *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -62,8 +62,18 @@ static int housekeeping_process_log()
 		housekeeper.field=row[2];
 		ZBX_STR2UINT64(housekeeper.value,row[3]);
 
+		if(0 == CONFIG_MAX_HOUSEKEEPER_DELETE)
+		{
+
+			deleted = DBexecute("delete from %s where %s=" ZBX_FS_UI64,
+				housekeeper.tablename,
+				housekeeper.field,
+				housekeeper.value);
+		}
+		else
+		{
 #ifdef HAVE_ORACLE
-		deleted = DBexecute("delete from %s where %s=" ZBX_FS_UI64 " and rownum<%d",
+		deleted = DBexecute("delete from %s where %s=" ZBX_FS_UI64 " and rownum<=%d",
 			housekeeper.tablename,
 			housekeeper.field,
 			housekeeper.value,
@@ -82,6 +92,8 @@ static int housekeeping_process_log()
 			housekeeper.value,
 			CONFIG_MAX_HOUSEKEEPER_DELETE);
 #endif
+		}
+
 		if(CONFIG_MAX_HOUSEKEEPER_DELETE > deleted)
 		{
 			DBexecute("delete from housekeeper where housekeeperid=" ZBX_FS_UI64,
