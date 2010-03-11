@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@
 		$im = imagerotate($im, 90, $transparentColor);
 	}
 	else{
-		imageText($im, $font, $angle, $size['width'], $size['height'], $text_color, $text);
+		imageText($im, $font, $angle, $size['width']+2, $size['height']+2, $text_color, $text);
 	}
 	
 	ImageAlphaBlending($im, false);
