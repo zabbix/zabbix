@@ -507,6 +507,7 @@ COpt::memoryPick();
 			'limit' => 1
 		);
 		if(isset($object['name'])) $options['filter']['name'] = $object['name'];
+		if(isset($object['host'])) $options['filter']['host'] = $object['host'];
 		if(isset($object['hostids'])) $options['hostids'] = zbx_toArray($object['hostids']);
 
 		if(isset($object['node']))
