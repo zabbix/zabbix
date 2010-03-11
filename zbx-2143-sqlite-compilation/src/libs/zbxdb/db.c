@@ -288,7 +288,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #endif
 #ifdef	HAVE_SQLITE3
 	/* check to see that the backend connection was successfully made */
-	if (SQLITE_OK != (ret = sqlite3_open_v2(dbname, &conn, SQLITE_OPEN_READWRITE, NULL)))
+	if (SQLITE_OK != (ret = sqlite3_open(dbname, &conn)))
 	{
 		zabbix_errlog(ERR_Z3001, dbname, 0, sqlite3_errmsg(conn));
 		sqlite3_close(conn);
