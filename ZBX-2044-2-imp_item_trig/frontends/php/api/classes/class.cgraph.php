@@ -798,7 +798,7 @@ COpt::memoryPick();
 				'templated_hosts' => 1,
 			));
 
-			foreach($chd_hosts as $chd_host){	
+			foreach($chd_hosts as $chd_host){
 			
 				$graph = self::get(array(
 					'graphids' => $graph['graphid'],
@@ -830,9 +830,7 @@ COpt::memoryPick();
 					self::updateReal($graph);
 				}
 // check if graph with same name and items exists
-				else{
-					
-					
+				else{				
 					$chd_graph = self::get(array(
 						'filter' => array('name' => $graph['name']),
 						'output' => API_OUTPUT_EXTEND,
