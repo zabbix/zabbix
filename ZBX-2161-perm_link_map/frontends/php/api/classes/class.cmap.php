@@ -223,6 +223,32 @@ class CMap extends CZBXAPI{
 		}
 		else{
 			if(!empty($result)){
+			
+				$link_triggers = array();
+				$sql = 'SELECT slt.triggerid, sl.sysmapid'.
+					' FROM sysmaps_link_triggers slt, sysmaps_links sl'.
+					' WHERE '.DBcondition('sl.sysmapid', $sysmapids).
+						' AND sl.linkid=slt.linkid';
+				$db_link_triggers = DBselect($sql);
+
+				while($link_trigger = DBfetch($db_link_triggers)){
+					$link_triggers[$link_trigger['sysmapid']] = $link_trigger['triggerid'];
+				}
+				
+				$all_triggers = CTrigger::get(array(
+					'triggerids' => $link_triggers,
+					'editable' => $options['editable'],
+					'output' => API_OUTPUT_SHORTEN,
+					'preservekeys' => 1
+				));
+				foreach($link_triggers as $id => $triggerid){
+					if(!isset($all_triggers[$triggerid])){
+						unset($result[$id]);
+						unset($sysmapids[$id]);
+					}
+				}
+		
+				
 				$hosts_to_check = array();
 				$maps_to_check = array();
 				$triggers_to_check = array();
