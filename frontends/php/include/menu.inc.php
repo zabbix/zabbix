@@ -317,7 +317,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 		}
 
 //		$menu_url = CProfile::get('web.menu.'.$label.'.last',false);
-		$menu_url = $menu['pages'][$menu['default_page_id']]['url'];
+		$menu_url = $sub_menus[$label][$menu['default_page_id']]['menu_url'];
 
 		$mmenu_entry = new CCol($menu['label'], $menu_class);
 		$mmenu_entry->setAttribute('id', $label);
