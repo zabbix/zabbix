@@ -656,8 +656,8 @@ Copt::memoryPick();
 				$templates = CTemplate::get($obj_params);
 				$templates = zbx_toHash($templates, 'hostid');
 				foreach($result as $hostid => $host){
-					if(isset($hosts[$groupid]))
-						$result[$hostid]['hosts'] = $templates[$templateid]['rowscount'];
+					if(isset($templates[$hostid]))
+						$result[$hostid]['templates'] = $templates[$hostid]['rowscount'];
 					else
 						$result[$hostid]['templates'] = 0;
 				}
