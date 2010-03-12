@@ -38,6 +38,7 @@
 #include "log.h"
 #include "zlog.h"
 #include "comms.h"
+#include "base64.h"
 
 #include "email.h"
 
@@ -73,7 +74,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	int		ret = FAIL;
 	zbx_sock_t	s;
 	int		e;
-	char		c[MAX_STRING_LEN], *cp = NULL;
+	char		c[MAX_STRING_LEN], *cp = NULL, c_base64[ZBX_MAX_B64_LEN];
 
 	char		str_time[MAX_STRING_LEN];
 	struct		tm *local_time = NULL;
@@ -192,17 +193,30 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	cp = string_replace(mailsubject, "\r\n", "\n");
 	mailsubject = string_replace(cp, "\n", "\r\n");
 	zbx_free(cp);
+	str_base64_encode((const char *)mailsubject, c_base64, strlen(mailsubject));
+	zbx_free(mailsubject);
+	mailsubject = strdup(c_base64);
 
 	cp = string_replace(mailbody, "\r\n", "\n");
 	mailbody = string_replace(cp, "\n", "\r\n");
 	zbx_free(cp);
+	str_base64_encode((const char *)mailbody, c_base64, strlen(mailbody));
+	zbx_free(mailbody);
+	mailbody = strdup(c_base64);
 
 	memset(c,0,MAX_STRING_LEN);
 	time(&email_time);
 	local_time = localtime(&email_time);
 	strftime( str_time, MAX_STRING_LEN, "%a, %d %b %Y %H:%M:%S %z", local_time );
-	cp = zbx_dsprintf(cp, "From:<%s>\r\nTo:<%s>\r\nDate: %s\r\nSubject: %s\r\n"
-			"Content-Type: text/plain; charset=\"UTF-8\"\r\n\r\n%s",
+	/* e-mail header and content format is based on MIME standard since UTF-8 is used both in mailsubject and mailbody */
+	/* =?charset?encoding?encoded text?= format must be used for subject field */
+	/* e-mails are sent in 'SMTP/MIME e-mail' format, this should be documented */
+	cp = zbx_dsprintf(cp, "From:<%s>\r\nTo:<%s>\r\nDate: %s\r\n"
+			"Subject: =?UTF-8?B?%s?=\r\n"
+			"MIME-Version: 1.0\r\n"
+			"Content-Type: text/plain; charset=\"UTF-8\"\r\n"
+			"Content-Transfer-Encoding: base64\r\n"
+			"\r\n%s",
 			smtp_email, mailto, str_time, mailsubject, mailbody);
 	e=write(s.socket,cp,strlen(cp));
 	zbx_free(cp);
