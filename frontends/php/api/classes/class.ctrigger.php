@@ -463,6 +463,7 @@ class CTrigger extends CZBXAPI{
 					$sql_where.
 				$sql_group.
 				$sql_order;
+//SDI($sql);
 		$db_res = DBselect($sql, $sql_limit);
 		while($trigger = DBfetch($db_res)){
 			if(!is_null($options['countOutput'])){
@@ -506,7 +507,8 @@ class CTrigger extends CZBXAPI{
 						if(!isset($result[$trigger['triggerid']]['hosts'])) $result[$trigger['triggerid']]['hosts'] = array();
 
 						$result[$trigger['triggerid']]['hosts'][] = array('hostid' => $trigger['hostid']);
-						unset($trigger['hostid']);
+
+						if(is_null($options['expand_data'])) unset($trigger['hostid']);
 					}
 // itemids
 					if(isset($trigger['itemid']) && is_null($options['select_items'])){
