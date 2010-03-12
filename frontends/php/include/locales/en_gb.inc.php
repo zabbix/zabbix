@@ -1773,6 +1773,9 @@
 
 //  applications.php
 	'S_DELETE_APPLICATION'=>	'Delete this application?',
+	'S_ACTIVATE_SELECTED_APPLICATIONS' => 'Activate selected applications?',
+	'S_DISABLE_SELECTED_APPLICATIONS' => 'Disable selected applications?',
+	'S_DELETE_SELECTED_APPLICATIONS'  => 'Delete selected applications?',
 
 // popup_media.php
 	'S_INCORRECT_TIME_PERIOD'=>	'Incorrect time period',

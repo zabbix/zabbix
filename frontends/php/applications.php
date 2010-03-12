@@ -391,10 +391,18 @@ include_once('include/page_header.php');
 
 // goBox
 		$goBox = new CComboBox('go');
-		$goBox->addItem('activate',S_ACTIVATE_ITEMS);
-		$goBox->addItem('disable',S_DISABLE_ITEMS);
-		$goBox->addItem('delete',S_DELETE_SELECTED);
+		$goOption = new CComboItem('activate', S_ACTIVATE_SELECTED);
+		$goOption->setAttribute('confirm', S_ACTIVATE_SELECTED_APPLICATIONS);
+		$goBox->addItem($goOption);
 
+		$goOption = new CComboItem('disable', S_DISABLE_SELECTED);
+		$goOption->setAttribute('confirm', S_DISABLE_SELECTED_APPLICATIONS);
+		$goBox->addItem($goOption);
+		
+		$goOption = new CComboItem('delete', S_DELETE_SELECTED);
+		$goOption->setAttribute('confirm', S_DELETE_SELECTED_APPLICATIONS);
+		$goBox->addItem($goOption);
+		
 		// goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO.' (0)');
 		$goButton->setAttribute('id','goButton');
