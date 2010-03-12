@@ -855,8 +855,10 @@ COpt::memoryPick();
 						if(count($chd_graph_items) == count($graph['gitems'])){
 							foreach($graph['gitems'] as $gitem){
 								foreach($chd_graph_items as $chd_item){
-									if($gitem['key_'] == $chd_item['key_']) continue 2;
+									if(($gitem['key_'] == $chd_item['key_']) && (bccomp($chd_host['hostid'], $chd_item['hostid']) == 0)) 
+										continue 2;
 								}
+								
 								self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$graph['name'].' ]: already exists on [ '.$chd_host['host'].' ] (items are not identical)');
 							}
 							
