@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [DEV-455] added configurable filter to "Status of triggers" screen element (Aly)
  - [ZBX-1346] explicitly note that hostname in configuration files is case sensitive (Richlv)
  - [ZBX-2006] added explicit dependency on "lber" library to gain better portability on upcoming Fedora "ld" changes. Thanks to Dan Horak. (Dmitry)
  - [ZBX-1575] added UnsafeUserParameters configuration option for agents (asaveljevs)

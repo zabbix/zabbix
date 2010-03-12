@@ -1542,12 +1542,14 @@
 	'S_TRIGGER_COMMENTS_BIG'=>		'TRIGGER COMMENTS',
 	'S_COMMENT_UPDATED'=>			'Comment updated',
 	'S_CANNOT_UPDATE_COMMENT'=>		'Cannot update comment',
-	'S_ADD'=>				'Add',
+	'S_ADD'=>						'Add',
 
 //	tr_status.php
-	'S_SOUND'=>				'Sound',
-	'S_STATUS_OF_TRIGGERS'=>		'Status of triggers',
+	'S_SOUND'=>							'Sound',
+	'S_STATUS_OF_TRIGGERS'=>			'Status of triggers',
 	'S_STATUS_OF_TRIGGERS_BIG'=>		'STATUS OF TRIGGERS',
+	'S_STATUS_OF_HOSTGROUP_TRIGGERS'=>	'Status of hostgroup triggers',
+	'S_STATUS_OF_HOST_TRIGGERS'=>		'Status of host triggers',
 	'S_HIDE_ALL'=>				'Hide all',
 	'S_SHOW_ONLY_PROBLEMS'=>		'Show only problems',
 	'S_SHOW_UNACKNOWLEDGED'=>		'Show unacknowledged',

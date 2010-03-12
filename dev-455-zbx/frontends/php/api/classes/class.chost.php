@@ -1649,10 +1649,13 @@ Copt::memoryPick();
 		$hosts = zbx_toArray($hosts);
 		$hostids = array();
 
-		$del_hosts = self::get(array('hostids'=> zbx_objectValues($hosts, 'hostid'),
-									'editable'=>1,
-									'extendoutput'=>1,
-									'preservekeys'=>1));
+		$options = array(
+			'hostids'=> zbx_objectValues($hosts, 'hostid'),
+			'editable'=>1,
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$del_hosts = self::get($options);
 		if(empty($del_hosts)){
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Host does not exist');
 			return false;
