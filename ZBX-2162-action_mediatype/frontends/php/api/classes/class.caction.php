@@ -820,7 +820,7 @@ COpt::memoryPick();
 				$opmediatypeid = get_dbid('opmediatypes', 'opmediatypeid');
 
 				$result &= (bool) DBexecute('INSERT INTO opmediatypes (opmediatypeid,operationid,mediatypeid)'.
-					' VALUES ('.$opmediatypeid.','.$operationid.','.$mediatypeid.')');
+					' VALUES ('.$opmediatypeid.','.$operationid.','.$operation['mediatypeid'].')');
 			}
 
 			if(!$result) break;
