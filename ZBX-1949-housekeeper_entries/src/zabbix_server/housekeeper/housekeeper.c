@@ -79,8 +79,10 @@ static int housekeeping_process_log()
 			housekeeper.value,
 			CONFIG_MAX_HOUSEKEEPER_DELETE);
 #elif defined(HAVE_POSTGRESQL)
-		deleted = DBexecute("delete from %s where oid in (select oid from %s where %s=" ZBX_FS_UI64 " limit %d)",
+		deleted = DBexecute("delete from %s where %s=" ZBX_FS_UI64 " and oid in (select oid from %s where %s=" ZBX_FS_UI64 " limit %d)",
 				housekeeper.tablename,
+				housekeeper.field,
+				housekeeper.value,
 				housekeeper.tablename,
 				housekeeper.field,
 				housekeeper.value,
