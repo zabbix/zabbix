@@ -194,7 +194,7 @@
 	}
 
 	function delete_image($imageid){
-		if(checkImagesToDelete($imageid)) return false;
+		if(!checkImagesToDelete($imageid)) return false;
 		$result = DBexecute('DELETE FROM images WHERE imageid='.$imageid);
 
 	return $result;
