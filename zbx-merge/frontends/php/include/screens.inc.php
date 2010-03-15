@@ -65,9 +65,7 @@ require_once('include/js.inc.php');
 						if($perm == PERM_READ_WRITE) $options['editable'] = 1;
 
 						$items = CItem::get($options);
-						if($items['rowscount'] == 0){
-							$result = false;
-						}
+						if($items == 0) $result = false;
 
 						unset($itemid);
 						break;
@@ -1341,5 +1339,109 @@ require_once('include/js.inc.php');
 
 
 	return $table;
+	}
+
+	function separateScreenElements($screen){
+		$elements = array(
+			'sysmaps' => array(),
+			'screens' => array(),
+			'hostgroups' => array(),
+			'graphs' => array(),
+			'items' => array()
+		);
+
+
+		foreach($screen['screenitems'] as $snum => $screenItem){
+			if($screenItem['resourceid'] == 0) continue;
+
+			switch($screenItem['resourcetype']){
+				case SCREEN_RESOURCE_HOSTS_INFO:
+				case SCREEN_RESOURCE_TRIGGERS_INFO:
+				case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
+				case SCREEN_RESOURCE_DATA_OVERVIEW:
+					$elements['hostgroups'][] = $screenItem['resourceid'];
+				break;
+				case SCREEN_RESOURCE_GRAPH:
+					$elements['graphs'][] = $screenItem['resourceid'];
+				break;
+				case SCREEN_RESOURCE_SIMPLE_GRAPH:
+				case SCREEN_RESOURCE_PLAIN_TEXT:
+					$elements['items'][] = $screenItem['resourceid'];
+				break;
+				case SCREEN_RESOURCE_MAP:
+					$elements['sysmaps'][] = $screenItem['resourceid'];
+				break;
+				case SCREEN_RESOURCE_SCREEN:
+					$elements['screens'][] = $screenItem['resourceid'];
+				break;
+			}
+		}
+
+	return $elements;
+	}
+
+	function prepareScreenExport(&$exportScreens){
+
+		$screens = array();
+		$sysmaps = array();
+		$hostgroups = array();
+		$graphs = array();
+		$items = array();
+
+		foreach($exportScreens as $snum => $screen){
+			$screenItems = separateScreenElements($screen);
+
+			$screens += zbx_objectValues($screenItems['screens'], 'resourceid');
+			$sysmaps += zbx_objectValues($screenItems['sysmaps'], 'resourceid');
+			$hostgroups += zbx_objectValues($screenItems['hostgroups'], 'resourceid');
+			$graphs += zbx_objectValues($screenItems['graphs'], 'resourceid');
+			$items += zbx_objectValues($screenItems['items'], 'resourceid');
+		}
+
+		$screens = screenIdents($screens);
+		$sysmaps = sysmapIdents($sysmaps);
+		$hostgroups = hostgroupIdents($hostgroups);
+		$graphs = graphIdents($graphs);
+		$items = itemIdents($items);
+
+		try{
+			foreach($exportScreens as $snum => &$screen){
+				unset($screen['screenid']);
+				$screen['backgroundid'] = ($screen['backgroundid'] > 0)?$images[$screen['backgroundid']]:'';
+
+				foreach($screen['screenitems'] as $snum => &$screenItem){
+					unset($screenItem['screenid']);
+					unset($screenItem['screenitemid']);
+					if($screenItem['resourceid'] == 0) continue;
+
+					switch($screenItem['resourcetype']){
+						case SCREEN_RESOURCE_HOSTS_INFO:
+						case SCREEN_RESOURCE_TRIGGERS_INFO:
+						case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
+						case SCREEN_RESOURCE_DATA_OVERVIEW:
+							$screenItem['resourceid'] = $hostgroups[$screenItem['resourceid']];
+						break;
+						case SCREEN_RESOURCE_GRAPH:
+							$screenItem['resourceid'] = $graphs[$screenItem['resourceid']];
+						break;
+						case SCREEN_RESOURCE_SIMPLE_GRAPH:
+						case SCREEN_RESOURCE_PLAIN_TEXT:
+							$screenItem['resourceid'] = $items[$screenItem['resourceid']];
+						break;
+						case SCREEN_RESOURCE_MAP:
+							$screenItem['resourceid'] = $sysmaps[$screenItem['resourceid']];
+						break;
+						case SCREEN_RESOURCE_SCREEN:
+							$screenItem['resourceid'] = $screens[$screenItem['resourceid']];
+						break;
+					}
+				}
+				unset($screenItem);
+			}
+			unset($screen);
+		}
+		catch(Exception $e){
+			throw new exception($e->show_message());
+		}
 	}
 ?>

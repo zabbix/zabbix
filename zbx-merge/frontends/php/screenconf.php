@@ -21,12 +21,26 @@
 <?php
 require_once('include/config.inc.php');
 require_once('include/screens.inc.php');
+require_once('include/ident.inc.php');
 require_once('include/forms.inc.php');
 require_once('include/maps.inc.php');
 
-$page['title'] = 'S_SCREENS';
-$page['file'] = 'screenconf.php';
-$page['hist_arg'] = array('config');
+if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['screens'])){
+	$EXPORT_DATA = true;
+
+	$page['type'] = $page['type'] = detect_page_type(PAGE_TYPE_XML);
+	$page['file'] = 'zbx_screens_export.xml';
+
+	require_once('include/export.inc.php');
+}
+else{
+	$EXPORT_DATA = false;
+
+	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+	$page['title'] = 'S_SCREENS';
+	$page['file'] = 'screenconf.php';
+	$page['hist_arg'] = array('config');
+}
 
 include_once('include/page_header.php');
 
@@ -67,7 +81,10 @@ include_once('include/page_header.php');
 		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	null,	null,	null)
+		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	null,	null,	null),
+// Import
+		'rules' =>			array(T_ZBX_STR, O_OPT,	null,	DB_ID,		null),
+		'import' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL)
 	);
 
 	check_fields($fields);
@@ -76,16 +93,60 @@ include_once('include/page_header.php');
 	$config_scr = $_REQUEST['config'] = get_request('config', 0);
 
 	CProfile::update('web.screenconf.config', $_REQUEST['config'],PROFILE_TYPE_INT);
+
+	if(isset($_REQUEST['screenid'])){
+		if(!screen_accessible($_REQUEST['screenid'], PERM_READ_WRITE))
+			access_deny();
+	}
+?>
+<?php
+// EXPORT ///////////////////////////////////
+
+	if($EXPORT_DATA){
+// SELECT SCREENS
+		$screens = get_request('screens', array());
+
+		$options = array(
+			'screenids' => $screens,
+			'select_screenitems' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND
+		);
+
+		$screens = CScreen::get($options);
+
+		prepareScreenExport($screens);
+
+		$xml = zbxXML::arrayToXML($screens, 'screens');
+		print($xml);
+
+		exit();
+	}
+
+// IMPORT ///////////////////////////////////
+	$rules = get_request('rules', array());
+	if(!isset($_REQUEST['form_refresh'])){
+		foreach(array('screen') as $key){
+			$rules[$key]['exist'] = 1;
+			$rules[$key]['missed'] = 1;
+		}
+	}
+
+	if(isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])){
+		require_once('include/export.inc.php');
+		DBstart();
+
+		$result = zbxXML::import($_FILES['import_file']['tmp_name']);
+		$result = zbxXML::parseScreen($rules);
+
+		$result = DBend($result);
+		show_messages($result, S_IMPORTED.SPACE.S_SUCCESSEFULLY_SMALL, S_IMPORT.SPACE.S_FAILED_SMALL);
+	}
+
 ?>
 <?php
 	$_REQUEST['go'] = get_request('go', 'none');
 
 	if( 0 == $config_scr ){
-		if(isset($_REQUEST["screenid"])){
-			if(!screen_accessible($_REQUEST["screenid"], PERM_READ_WRITE))
-				access_deny();
-		}
-
 		if(isset($_REQUEST['clone']) && isset($_REQUEST['screenid'])){
 			unset($_REQUEST['screenid']);
 			$_REQUEST['form'] = 'clone';
@@ -280,14 +341,26 @@ include_once('include/page_header.php');
 	$cmbConfig->addItem(1, S_SLIDESHOWS);
 
 	$form->addItem($cmbConfig);
-	$form->addItem(new CButton("form", 0 == $config_scr ? S_CREATE_SCREEN : S_SLIDESHOW));
+
+	if(0 == $config_scr){
+//screen
+		$form->addItem(new CButton("form", S_CREATE_SCREEN));
+		$form->addItem(new CButton('form', S_IMPORT_SCREEN));
+	}
+	else{
+//slide
+		$form->addItem(new CButton("form", S_SLIDESHOW));
+	}
 
 	show_table_header(0 == $config_scr ? S_CONFIGURATION_OF_SCREENS_BIG : S_CONFIGURATION_OF_SLIDESHOWS_BIG, $form);
 	echo SBR;
 
 	if(0 == $config_scr){
 		if(isset($_REQUEST['form'])){
-			insert_screen_form();
+			if($_REQUEST['form'] == S_IMPORT_SCREEN)
+				import_screen_form($rules);
+			else if(($_REQUEST['form'] == S_CREATE_SCREEN) || ($_REQUEST['form'] == 'update'))
+				insert_screen_form();
 		}
 		else{
 			$screen_wdgt = new CWidget();
@@ -302,7 +375,7 @@ include_once('include/page_header.php');
 			$screen_wdgt->addHeader($numrows);
 
 			$table = new CTableInfo(S_NO_SCREENS_DEFINED);
-			$table->SetHeader(array(
+			$table->setHeader(array(
 				new CCheckBox('all_screens', NULL, "checkAll('".$form->getName()."','all_screens','screens');"),
 				make_sorting_header(S_NAME, 'name'),
 				S_DIMENSION_COLS_ROWS,
@@ -312,8 +385,9 @@ include_once('include/page_header.php');
 			$sortfield = getPageSortField('name');
 			$sortorder = getPageSortOrder();
 			$options = array(
+				'select_screenitems' => API_OUTPUT_EXTEND,
 				'editable' => 1,
-				'extendoutput' => 1,
+				'output' => API_OUTPUT_EXTEND,
 				'sortfield' => $sortfield,
 				'sortorder' => $sortorder,
 				'limit' => ($config['search_limit']+1)
@@ -335,6 +409,8 @@ include_once('include/page_header.php');
 
 //goBox
 			$goBox = new CComboBox('go');
+			$goBox->addItem('export', S_EXPORT_SELECTED);
+			
 			$goOption = new CComboItem('delete', S_DELETE_SELECTED);
 			$goOption->setAttribute('confirm', 'Delete selected screens?');
 			$goBox->addItem($goOption);
@@ -419,6 +495,7 @@ include_once('include/page_header.php');
 
 // goBox
 			$goBox = new CComboBox('go');
+
 			$goOption = new CComboItem('delete', S_DELETE_SELECTED);
 			$goOption->setAttribute('confirm',S_DELETE_SELECTED_SLIDESHOWS_Q);
 			$goBox->addItem($goOption);

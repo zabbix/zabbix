@@ -148,9 +148,9 @@ include_once('include/page_header.php');
 	unset($first_screen);
 
 	$options = array(
-		'extendoutput' => 1,
 		'sortfield' => 'name',
-		'sortorder' => ZBX_SORT_UP
+		'sortorder' => ZBX_SORT_UP,
+		'output' => API_OUTPUT_EXTEND
 	);
 
 	$screens = CScreen::get($options);
@@ -172,7 +172,7 @@ include_once('include/page_header.php');
 	if(isset($elementid)){
 		$options = array(
 			'screenids' => $elementid,
-			'extendoutput' => 1
+			'output' => API_OUTPUT_EXTEND
 		);
 
 		$screens = CScreen::get($options);

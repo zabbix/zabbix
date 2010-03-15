@@ -254,7 +254,7 @@ class CItem extends CZBXAPI{
 
 // templated
 		if(!is_null($options['templated'])){
-			$sql_parts['from'][] = 'hosts h';
+			$sql_parts['from']['h'] = 'hosts h';
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
 
 			if($options['templated'])
@@ -281,12 +281,19 @@ class CItem extends CZBXAPI{
 		if(!is_null($options['filter'])){
 			zbx_value2array($options['filter']);
 
-			if(isset($options['filter']['itemid']))
-				$sql_parts['where']['itemid'] = 'i.itemid='.$options['filter']['itemid'];
-				
+			if(isset($options['filter']['host'])){
+				$sql_parts['from']['h'] = 'hosts h';
+
+				$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+				$sql_parts['where']['h'] = 'h.host='.zbx_dbstr($options['filter']['host']);
+			}
+
 			if(isset($options['filter']['hostid']))
 				$sql_parts['where']['hostid'] = 'i.hostid='.$options['filter']['hostid'];
 
+			if(isset($options['filter']['itemid']))
+				$sql_parts['where']['itemid'] = 'i.itemid='.$options['filter']['itemid'];
+				
 			if(isset($options['filter']['description']))
 				$sql_parts['where']['description'] = 'i.description='.zbx_dbstr($options['filter']['description']);
 
@@ -433,7 +440,6 @@ class CItem extends CZBXAPI{
 					$sql_where.
 				$sql_group.
 				$sql_order;
-//sdi($sql);
 		$res = DBselect($sql, $sql_limit);
 		while($item = DBfetch($res)){
 			if(!is_null($options['countOutput'])){
@@ -510,31 +516,33 @@ COpt::memoryPick();
 
 // Adding Objects
 // Adding hosts
-		if(!is_null($options['select_hosts']) && str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
-			$obj_params = array(
-				'nodeids' => $nodeids,
-				'templated_hosts' => 1,
-				'output' => $options['select_hosts'],
-				'itemids' => $itemids,
-				'nopermissions' => 1,
-				'preservekeys' => 1
-			);
-			$hosts = CHost::get($obj_params);
+		if(!is_null($options['select_hosts'])){
+			if(is_array($options['select_hosts']) || str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+				$obj_params = array(
+					'nodeids' => $nodeids,
+					'itemids' => $itemids,
+					'templated_hosts' => 1,
+					'output' => $options['select_hosts'],
+					'nopermissions' => 1,
+					'preservekeys' => 1
+				);
+				$hosts = CHost::get($obj_params);
 
-			foreach($hosts as $hostid => $host){
-				$hitems = $host['items'];
-				unset($host['items']);
-				foreach($hitems as $inum => $item){
-					$result[$item['itemid']]['hosts'][] = $host;
+				foreach($hosts as $hostid => $host){
+					$hitems = $host['items'];
+					unset($host['items']);
+					foreach($hitems as $inum => $item){
+						$result[$item['itemid']]['hosts'][] = $host;
+					}
 				}
-			}
 
-			$templates = CTemplate::get($obj_params);
-			foreach($templates as $templateid => $template){
-				$titems = $template['items'];
-				unset($template['items']);
-				foreach($titems as $inum => $item){
-					$result[$item['itemid']]['hosts'][] = $template;
+				$templates = CTemplate::get($obj_params);
+				foreach($templates as $templateid => $template){
+					$titems = $template['items'];
+					unset($template['items']);
+					foreach($titems as $inum => $item){
+						$result[$item['itemid']]['hosts'][] = $template;
+					}
 				}
 			}
 		}

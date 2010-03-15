@@ -82,7 +82,7 @@ include_once('include/page_header.php');
 	$options = array(
 		'screenids' => $_REQUEST['screenid'],
 		'editable' => 1,
-		'extendoutput' => 1,
+		'output' => API_OUTPUT_EXTEND
 	);
 	$screens = CScreen::get($options);
 	if(empty($screens)) access_deny();
@@ -120,7 +120,7 @@ include_once('include/page_header.php');
 				if(!$result) throw new Exception();
 			}
 			else{
-				$result=add_screen_item(
+				$result = add_screen_item(
 					$_REQUEST['resourcetype'],$_REQUEST['screenid'],
 					$_REQUEST['x'],$_REQUEST['y'],$_REQUEST['resourceid'],
 					$_REQUEST['width'],$_REQUEST['height'],$_REQUEST['colspan'],

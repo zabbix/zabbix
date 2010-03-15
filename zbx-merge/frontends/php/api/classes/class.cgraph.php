@@ -258,15 +258,17 @@ class CGraph extends CZBXAPI{
 		}
 
 // filter
+
+// filter
 		if(!is_null($options['filter'])){
 			zbx_value2array($options['filter']);
 
 			if(isset($options['filter']['name']))
 				$sql_parts['where']['name'] = 'g.name='.zbx_dbstr($options['filter']['name']);
-				
+
 			if(isset($options['filter']['templateid']))
 				$sql_parts['where']['templateid'] = 'g.templateid='.$options['filter']['templateid'];
-			
+
 			if(isset($options['filter']['host']) || isset($options['filter']['hostid'])){
 				$sql_parts['from']['gi'] = 'graphs_items gi';
 				$sql_parts['from']['i'] = 'items i';
@@ -408,20 +410,22 @@ COpt::memoryPick();
 		}
 
 // Adding Hosts
-		if(!is_null($options['select_hosts']) && str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
-			$obj_params = array(
-				'nodeids' => $nodeids,
-				'output' => $options['select_hosts'],
-				'graphids' => $graphids,
-				'nopermissions' => 1,
-				'preservekeys' => 1
-			);
-			$hosts = CHost::get($obj_params);
-			foreach($hosts as $hostid => $host){
-				$hgraphs = $host['graphs'];
-				unset($host['graphs']);
-				foreach($hgraphs as $num => $graph){
-					$result[$graph['graphid']]['hosts'][] = $host;
+		if(!is_null($options['select_hosts'])){
+			if(is_array($options['select_hosts']) || str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+				$obj_params = array(
+					'nodeids' => $nodeids,
+					'output' => $options['select_hosts'],
+					'graphids' => $graphids,
+					'nopermissions' => 1,
+					'preservekeys' => 1
+				);
+				$hosts = CHost::get($obj_params);
+				foreach($hosts as $hostid => $host){
+					$hgraphs = $host['graphs'];
+					unset($host['graphs']);
+					foreach($hgraphs as $num => $graph){
+						$result[$graph['graphid']]['hosts'][] = $host;
+					}
 				}
 			}
 		}
