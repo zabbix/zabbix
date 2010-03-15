@@ -4,6 +4,7 @@ Changes for 1.9
 
 Changes for 1.8.2
 
+ - [ZBX-2135] fixed screens ignore nodes "All" option in selection dropdown (Vedmak)
  - [ZBX-1954] fixed config file errors if special chars are used in db password (Vedmak)
  - [ZBX-2075] admins now have access only to users they share usergroup with [action operations] (Vedmak)
  - [ZBX-2147] fixed permission check for item configuration (Vedmak)
