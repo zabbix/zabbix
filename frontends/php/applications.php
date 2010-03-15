@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -209,8 +209,7 @@ include_once('include/page_header.php');
 ?>
 <?php
 
-	$frmForm = new CForm();
-	$frmForm->setMethod('get');
+	$frmForm = new CForm(null, 'get');
 
 // Config
 	$cmbConf = new CComboBox('config', 'applications.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
@@ -231,7 +230,6 @@ include_once('include/page_header.php');
 	show_table_header(S_CONFIGURATION_OF_APPLICATIONS, $frmForm);
 ?>
 <?php
-
 	echo SBR;
 
 	if(isset($_REQUEST['form'])){
@@ -298,8 +296,7 @@ include_once('include/page_header.php');
 	else {
 		$app_wdgt = new CWidget();
 
-		$form = new CForm();
-		$form->setMethod('get');
+		$form = new CForm(null, 'get');
 
 		$cmbGroups = new CComboBox('groupid', $PAGE_GROUPS['selected'],'javascript: submit();');
 		$cmbHosts = new CComboBox('hostid', $PAGE_HOSTS['selected'],'javascript: submit();');
@@ -337,11 +334,9 @@ include_once('include/page_header.php');
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-
 		if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
 			$options['hostids'] = $PAGE_HOSTS['selected'];
 		}
-
 		if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
 			$options['groupids'] = $PAGE_GROUPS['selected'];
 		}
@@ -384,7 +379,7 @@ include_once('include/page_header.php');
 				new CCheckBox('applications['.$applicationid.']',NULL,NULL,$applicationid),
 				(($PAGE_HOSTS['selected'] > 0) ? null : $application['host']),
 				$name,
-				array(new CLink(S_ITEMS,'items.php?hostid='.$PAGE_HOSTS['selected'].'&filter_set=1&filter_application='.$application['name']),
+				array(new CLink(S_ITEMS,'items.php?hostid='.$PAGE_HOSTS['selected'].'&filter_set=1&filter_application='.urlencode($application['name'])),
 				SPACE.'('.count($application['items']).')')
 			));
 		}
@@ -428,9 +423,7 @@ include_once('include/page_header.php');
 		$app_wdgt->addItem($form);
 		$app_wdgt->show();
 	}
-?>
-<?php
 
+	
 include_once('include/page_footer.php');
-
 ?>
