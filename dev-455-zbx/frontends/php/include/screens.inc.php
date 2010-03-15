@@ -65,7 +65,7 @@ require_once('include/js.inc.php');
 						if($perm == PERM_READ_WRITE) $options['editable'] = 1;
 
 						$items = CItem::get($options);
-						if($items['rowscount'] == 0){
+						if($items == 0){
 							$result = false;
 						}
 
