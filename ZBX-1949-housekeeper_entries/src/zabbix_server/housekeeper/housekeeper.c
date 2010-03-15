@@ -101,7 +101,8 @@ static int housekeeping_process_log()
 			DBexecute("delete from housekeeper where housekeeperid=" ZBX_FS_UI64,
 				housekeeper.housekeeperid);
 		}
-		else
+
+		if (deleted > 0)
 		{
 			zabbix_log( LOG_LEVEL_DEBUG, "Deleted [%ld] records from table [%s]",
 				deleted,
