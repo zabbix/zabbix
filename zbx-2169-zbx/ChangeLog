@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-2169] fixed adding dependencies to triggers on mass update (Aly)
  - [ZBX-2163] fixed possibility to acknowledge events regradless of GUI events settings (Aly)
  - [ZBX-2160] fixed permission issue in reports when accessing by user or admin (Aly)
  - [ZBX-1346] explicitly note that hostname in configuration files is case sensitive (Richlv)
