@@ -57,7 +57,7 @@ require_once('include/js.inc.php');
 							$itemid = $ac_data['resourceid'];
 
 						$options = array(
-							'count' => 1,
+							'countOutput' => 1,
 							'itemids' => $itemid,
 							'nodeids' => get_current_nodeid(true)
 						);
