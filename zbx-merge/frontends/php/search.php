@@ -119,7 +119,7 @@ include_once('include/page_header.php');
 	$hostids = zbx_objectValues($hosts, 'hostid');
 
 	$params = array(
-		'nodeids'=> get_current_nodeid(),
+		'nodeids'=> get_current_nodeid(true),
 		'hostids' => $hostids,
 		'editable' => 1
 	);
@@ -127,7 +127,7 @@ include_once('include/page_header.php');
 	$rw_hosts = zbx_toHash($rw_hosts,'hostid');
 
 	$params = array(
-		'nodeids'=> get_current_nodeid(),
+		'nodeids'=> get_current_nodeid(true),
 		'pattern' => $search,
 		'extend_pattern' => true,
 		'count' => 1,
@@ -135,7 +135,7 @@ include_once('include/page_header.php');
 	$hosts_count = CHost::get($params);
 
 	$params = array(
-		'nodeids'=> get_current_nodeid(),
+		'nodeids'=> get_current_nodeid(true),
 		'pattern' => $search,
 		'extend_pattern' => true,
 		'countOutput' => 1,
@@ -162,7 +162,7 @@ include_once('include/page_header.php');
 		$hostid = $host['hostid'];
 
 		$group = reset($host['groups']);
-		$link = 'groupid='.$group['groupid'].'&hostid='.$hostid;
+		$link = 'groupid='.$group['groupid'].'&hostid='.$hostid.'&switch_node='.id2nodeid($hostid);
 
 		if($admin){
 			$pageBox = new CComboBox('hostpages_'.$hostid);
@@ -226,7 +226,7 @@ include_once('include/page_header.php');
 	$groupids = zbx_objectValues($hostGroups, 'groupid');
 
 	$params = array(
-		'nodeids'=> get_current_nodeid(),
+		'nodeids'=> get_current_nodeid(true),
 		'groupids' => $groupids,
 		'editable' => 1
 	);
@@ -235,7 +235,7 @@ include_once('include/page_header.php');
 	$rw_hostGroups = zbx_toHash($rw_hostGroups, 'groupid');
 
 	$params = array(
-		'nodeids'=> get_current_nodeid(),
+		'nodeids'=> get_current_nodeid(true),
 		'pattern' => $search,
 		'count' => 1,
 	);
@@ -260,10 +260,11 @@ include_once('include/page_header.php');
 		$hostgroupid = $group['groupid'];
 
 		$caption = make_decoration($group['name'], $search);
+		$link = 'groupid='.$hostgroupid.'&hostid=0&switch_node='.id2nodeid($hostgroupid);
 
 		if($admin){
 			if(isset($rw_hostGroups[$hostgroupid]))
-				$admin_link = new CLink(S_GO,'hosts.php?config=1&groupid='.$hostgroupid.'&hostid=0');
+				$admin_link = new CLink(S_GO,'hosts.php?config=1&groupid='.$hostgroupid.'&hostid=0'.'&switch_node='.id2nodeid($hostgroupid));
 			else
 				$admin_link = new CSpan(S_GO,'unknown');
 		}
@@ -274,9 +275,9 @@ include_once('include/page_header.php');
 		$table->addRow(array(
 			get_node_name_by_elid($hostgroupid, true),
 			$caption,
-			new CLink(S_GO,'latest.php?groupid='.$hostgroupid.'&hostid=0'),
-			new CLink(S_GO,'tr_status.php?groupid='.$hostgroupid.'&hostid=0'),
-			new CLink(S_GO,'events.php?groupid='.$hostgroupid.'&hostid=0'),
+			new CLink(S_GO,'latest.php?'.$link),
+			new CLink(S_GO,'tr_status.php?'.$link),
+			new CLink(S_GO,'events.php?'.$link),
 			$admin_link,
 		));
 	}
@@ -339,7 +340,7 @@ include_once('include/page_header.php');
 			$templateid = $template['hostid'];
 
 			$group = reset($template['groups']);
-			$link = 'groupid='.$group['groupid'].'&hostid='.$templateid;
+			$link = 'groupid='.$group['groupid'].'&hostid='.$templateid.'&switch_node='.id2nodeid($templateid);
 
 			$caption = make_decoration($template['host'], $search);
 

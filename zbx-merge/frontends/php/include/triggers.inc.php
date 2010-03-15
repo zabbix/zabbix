@@ -1962,8 +1962,6 @@ return $result;
 			}
 
 			if($trigger_exist && ($trigger_exist['triggerid'] != $trigger['triggerid'])){
-//SDII($trigger);
-//SDII($trigger_exist);
 				error('Trigger [ '.$trigger['description'].' ] already exists');
 				return false;
 			}
