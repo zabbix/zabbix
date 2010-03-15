@@ -932,16 +932,26 @@
 
 			$parameter = substr($parameter, 0, $pos);
 
-			$sql = 'SELECT itemid,value_type,units '.
-					' FROM items i,hosts h '.
-					' WHERE i.hostid=h.hostid '.
-						' AND h.host='.zbx_dbstr($host).
-						' AND i.key_='.zbx_dbstr($key);
-			$db_items = DBselect($sql);
-			if(NULL == ($db_item = DBfetch($db_items))){
+			$db_item = CItem::get(array(
+				'filter' => array('host' => $host, 'key_' => $key),
+				'output' => API_OUTPUT_EXTEND
+			));
+			$db_item = reset($db_item);
+			if(!$db_item){
 				$label = str_replace('{'.$expr.'}', '???', $label);
 				continue;
 			}
+			
+			// $sql = 'SELECT itemid,value_type,units '.
+					// ' FROM items i,hosts h '.
+					// ' WHERE i.hostid=h.hostid '.
+						// ' AND h.host='.zbx_dbstr($host).
+						// ' AND i.key_='.zbx_dbstr($key);
+			// $db_items = DBselect($sql);
+			// if(NULL == ($db_item = DBfetch($db_items))){
+				// $label = str_replace('{'.$expr.'}', '???', $label);
+				// continue;
+			// }
 
 			switch($db_item['value_type']){
 				case ITEM_VALUE_TYPE_FLOAT:
