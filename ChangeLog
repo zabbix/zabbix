@@ -4,6 +4,7 @@ Changes for 1.9
 
 Changes for 1.8.2
 
+ - [ZBX-2146] fixed error when try to view slideshow without slides (Vedmak)
  - [ZBX-2161] added permission checks for map link triggers (Vedmak)
  - [ZBX-2169] fixed adding dependencies to triggers on mass update (Aly)
  - [ZBX-2157] fixed script permissions (Vedmak)
