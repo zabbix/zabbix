@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-2157] fixed script permissions (Vedmak)
  - [ZBX-2135] fixed screens ignore nodes "All" option in selection dropdown (Vedmak)
  - [ZBX-1954] fixed config file errors if special chars are used in db password (Vedmak)
  - [ZBX-2075] admins now have access only to users they share usergroup with [action operations] (Vedmak)
