@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-2158] fixed map image deletion (Vedmak)
  - [ZBX-2155] ipv6 addresses are now case insensitive (Vedmak)
  - [ZBX-2005] fixed graph being deleted when any of its items are deleted (Vedmak)
  - [ZBX-2163] fixed possibility to acknowledge events regradless of GUI events settings (Aly)
