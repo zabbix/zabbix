@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-2075] admins now have access only to users they share usergroup with [action operations] (Vedmak)
  - [ZBX-2147] fixed permission check for item configuration (Vedmak)
  - [ZBX-2158] fixed map image deletion (Vedmak)
  - [ZBX-2155] ipv6 addresses are now case insensitive (Vedmak)
