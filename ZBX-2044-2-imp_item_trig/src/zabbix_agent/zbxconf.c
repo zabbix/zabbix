@@ -49,6 +49,7 @@ int	CONFIG_DISABLE_ACTIVE		= 0;
 int	CONFIG_DISABLE_PASSIVE		= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
+int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
 int	CONFIG_LISTEN_PORT	= 10050;
 int	CONFIG_SERVER_PORT	= 10051;
 int	CONFIG_REFRESH_ACTIVE_CHECKS	= 120;
@@ -158,6 +159,7 @@ void    load_user_parameters(void)
 */
 		{"EnableRemoteCommands",&CONFIG_ENABLE_REMOTE_COMMANDS,	0,TYPE_INT,	PARM_OPT,0,1},
 		{"LogRemoteCommands",&CONFIG_LOG_REMOTE_COMMANDS,	0,TYPE_INT,	PARM_OPT,0,1},
+		{"UnsafeUserParameters",&CONFIG_UNSAFE_USER_PARAMETERS,	0,TYPE_INT,	PARM_OPT,0,1},
 
 		{"Alias",		0,	&add_alias_from_config,	TYPE_STRING,PARM_OPT,0,0},
 		{"UserParameter",	0,	&add_parameter,		0,	0,	0,	0},

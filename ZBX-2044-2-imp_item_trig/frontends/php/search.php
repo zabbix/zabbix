@@ -138,7 +138,7 @@ include_once('include/page_header.php');
 		'nodeids'=> get_current_nodeid(),
 		'pattern' => $search,
 		'extend_pattern' => true,
-		'count' => 1,
+		'countOutput' => 1,
 	);
 	$hosts_count = CHost::get($params);
 	$overalCount = $hosts_count['rowscount'];
@@ -316,7 +316,7 @@ include_once('include/page_header.php');
 		$params = array(
 					'nodeids'=> get_current_nodeid(),
 					'pattern' => $search,
-					'count' => 1,
+					'countOutput' => 1,
 					'editable' => 1
 					);
 		$hosts_count = CTemplate::get($params);

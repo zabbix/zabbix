@@ -213,6 +213,36 @@ class CAction extends CZBXAPI{
 											' AND rr.permission<'.$permission.'))'.
 					  ' )'.
 				' )';
+// condition users
+			$sql_parts['where'][] =
+				' NOT EXISTS('.
+					' SELECT o.operationid '.
+					' FROM operations o '.
+					' WHERE o.operationtype='.OPERATION_TYPE_MESSAGE.
+						' AND o.actionid=a.actionid'.
+						' AND (('.
+								' o.object='.OPERATION_OBJECT_USER.
+								' AND o.objectid NOT IN ('.
+									' SELECT DISTINCT ug.userid'.
+									' FROM users_groups ug'.
+									' WHERE ug.usrgrpid IN ('.
+										' SELECT uug.usrgrpid'.
+										' FROM users_groups uug'.
+										' WHERE uug.userid='.$USER_DETAILS['userid'].
+										' )'.
+									' )'.
+							' ) OR ('. 
+								' o.object='.OPERATION_OBJECT_GROUP.
+								' AND o.objectid NOT IN ('.
+									' SELECT ug.usrgrpid'.
+									' FROM users_groups ug'.
+									' WHERE ug.userid='.$USER_DETAILS['userid'].
+									' )'.
+								' )'.
+						' )'.
+				' )';
+						
+				
 		}
 
 // nodeids
@@ -820,7 +850,7 @@ COpt::memoryPick();
 				$opmediatypeid = get_dbid('opmediatypes', 'opmediatypeid');
 
 				$result &= (bool) DBexecute('INSERT INTO opmediatypes (opmediatypeid,operationid,mediatypeid)'.
-					' VALUES ('.$opmediatypeid.','.$operationid.','.$mediatypeid.')');
+					' VALUES ('.$opmediatypeid.','.$operationid.','.$operation['mediatypeid'].')');
 			}
 
 			if(!$result) break;

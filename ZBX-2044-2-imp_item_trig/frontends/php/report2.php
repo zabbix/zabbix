@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -148,7 +148,7 @@ include_once 'include/page_header.php';
 		else{
 			$trigger_data = reset($trigger_data);
 
-			$host = reset($db_data['hosts']);
+			$host = reset($trigger_data['hosts']);
 			$trigger_data['hostid'] = $host['hostid'];
 			$trigger_data['host'] = $host['host'];
 		}
@@ -157,7 +157,7 @@ include_once 'include/page_header.php';
 
 	if(isset($_REQUEST['triggerid'])){
 		$rep2_wdgt->addHeader(array(
-			new CLink($trigger_data['host'],'?filter_groupid='.$_REQUEST['groupid'].'&filter_hostid='.$_REQUEST['hostid']),
+			new CLink($trigger_data['host'],'?filter_groupid='.$_REQUEST['groupid'].'&filter_hostid='.$trigger_data['hostid']),
 			' : ',
 			expand_trigger_description_by_data($trigger_data)
 			),SPACE);

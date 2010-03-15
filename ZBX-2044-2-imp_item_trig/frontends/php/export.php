@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -217,7 +217,6 @@ include_once('include/page_header.php');
 	echo SBR;
 
 	if($preview){
-
 		$table = new CTableInfo(S_NO_DATA_FOR_EXPORT);
 		$table->setHeader(array(S_HOST, S_ELEMENTS));
 
@@ -297,7 +296,6 @@ include_once('include/page_header.php');
 		zbx_add_post_js('chkbxRange.pageGoCount = 1;');
 	}
 	else{
-	
 		$export_wdgt = new CWidget();
 
 // Page header {
@@ -346,55 +344,73 @@ include_once('include/page_header.php');
 		));
 
 // get hosts
-		$params = array(
+		$sortfield = getPageSortField('host');
+		$sortorder = getPageSortOrder();
+		
+		$options = array(
 			'templated_hosts' => 1,
-			'extendoutput' => 1,
-			'preservekeys' => 1,
+			'output' => array('hostid', 'status', $sortfield),
+			'editable' => 1,
+			'groupids' => ($selected_groupid > 0) ? $selected_groupid : null
 		);
-		if($selected_groupid > 0){
-			$params += array('groupids' => $selected_groupid);
-		}
-		$hosts_all = CHost::get($params);
+		$hosts_all = CHost::get($options);
 
+// workaround for correct sorting...
+		if(in_array($sortfield, array('dns', 'ip', 'port'))){
+			foreach($hosts_all as $hnum => $host){
+				if($host['status'] == HOST_STATUS_TEMPLATE){
+					$hosts_all[$hnum][$sortfield] = '';
+				}
+			}
+		}
+		
 // sorting
-		order_page_result($hosts_all, 'host');
+		order_result($hosts_all, $sortfield, $sortorder);
 		$paging = getPagingLine($hosts_all);
 //-------
 
+		$options = array(
+			'hostids' => zbx_objectValues($hosts_all, 'hostid'),
+			'output' => array('hostid', 'host', 'dns', 'ip', 'port', 'status', 'useip'),
+			'templated_hosts' => 1,
+			'select_templates' => API_OUTPUT_COUNT,
+			'select_items' => API_OUTPUT_COUNT,
+			'select_triggers' => API_OUTPUT_COUNT,
+			'select_graphs' => API_OUTPUT_COUNT,
+		);
+		$hosts_all = CHost::get($options);
+
+// workaround for correct sorting... 
+		if(in_array($sortfield, array('dns', 'ip', 'port'))){
+			foreach($hosts_all as $hnum => $host){
+				if($host['status'] == HOST_STATUS_TEMPLATE){
+					$hosts_all[$hnum][$sortfield] = '';
+				}
+			}
+		}
+		
+		order_result($hosts_all, $sortfield, $sortorder);
+		
 		$count_chkbx = 0;
 		foreach($hosts_all as $hnum => $host){
 			$hostid = $host['hostid'];
 
 			$status = new CCol(host_status2str($host['status']), host_status2style($host['status']));
 
-			$params = array('hostids' => $hostid, 'count' => 1);
-// get item count
-			$item_cnt = CItem::get($params);
-			$item_cnt = $item_cnt['rowscount'];
-// get template count
-			$template_cnt = CTemplate::get($params);
-			$template_cnt = $template_cnt['rowscount'];
-// get trigger count
-			$trigger_cnt = CTrigger::get($params);
-			$trigger_cnt = $trigger_cnt['rowscount'];
-// get graph count
-			$graph_cnt = CGraph::get($params);
-			$graph_cnt = $graph_cnt['rowscount'];
-
-			$template_cnt = ($template_cnt > 0)
-				? array(new CCheckBox('templates['.$hostid.']', (isset($hostids_templates[$hostid]) || !isset($update)), NULL, $hostid), $template_cnt)
+			$template_cnt = ($host['templates'] > 0)
+				? array(new CCheckBox('templates['.$hostid.']', (isset($hostids_templates[$hostid]) || !isset($update)), NULL, $hostid), $host['templates'])
 				: '-';
 
-			$item_cnt = ($item_cnt > 0)
-				? array(new CCheckBox('items['.$hostid.']', (isset($hostids_items[$hostid]) || !isset($update)), NULL, $hostid), $item_cnt)
+			$item_cnt = ($host['items'] > 0)
+				? array(new CCheckBox('items['.$hostid.']', (isset($hostids_items[$hostid]) || !isset($update)), NULL, $hostid), $host['items'])
 				: '-';
 
-			$trigger_cnt = ($trigger_cnt > 0)
-				? array(new CCheckBox('triggers['.$hostid.']', (isset($hostids_triggers[$hostid]) || !isset($update)), NULL, $hostid), $trigger_cnt)
+			$trigger_cnt = ($host['triggers'] > 0)
+				? array(new CCheckBox('triggers['.$hostid.']', (isset($hostids_triggers[$hostid]) || !isset($update)), NULL, $hostid), $host['triggers'])
 				: '-';
 
-			$graph_cnt = ($graph_cnt > 0)
-				? array(new CCheckBox('graphs['.$hostid.']', (isset($hostids_graphs[$hostid]) || !isset($update)), NULL, $hostid), $graph_cnt)
+			$graph_cnt = ($host['graphs'] > 0)
+				? array(new CCheckBox('graphs['.$hostid.']', (isset($hostids_graphs[$hostid]) || !isset($update)), NULL, $hostid), $host['graphs'])
 				: '-';
 
 			if($host['status'] == HOST_STATUS_TEMPLATE){
@@ -433,12 +449,11 @@ include_once('include/page_header.php');
 		$goButton = new CButton('goButton', S_GO.' ('.$count_chkbx.')');
 		$goButton->setAttribute('id','goButton');
 
-                $jsLocale = array(
-                                'S_CLOSE',
-                                'S_NO_ELEMENTS_SELECTED'
-                );
-
-                zbx_addJSLocale($jsLocale);
+		$jsLocale = array(
+			'S_CLOSE',
+			'S_NO_ELEMENTS_SELECTED'
+		);
+		zbx_addJSLocale($jsLocale);
 
 		zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
 
@@ -453,9 +468,6 @@ include_once('include/page_header.php');
 		$export_wdgt->show();
 	}
 
-?>
-<?php
 
 include_once('include/page_footer.php');
-
 ?>
