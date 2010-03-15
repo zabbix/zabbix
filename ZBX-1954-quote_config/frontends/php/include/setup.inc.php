@@ -404,7 +404,7 @@
 		}
 
 		function CheckConnection(){
-			global $DB;
+			global $DB, $ZBX_MESSAGES;
 
 //			$old_DB		= $DB['DB'];
 			if(!empty($DB) ){
@@ -428,6 +428,7 @@
 
 			$error = '';
 			if(!$result = DBconnect($error)){
+				array_pop($ZBX_MESSAGES);
 				error($error);
 			}
 			else{
