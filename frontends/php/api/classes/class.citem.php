@@ -280,9 +280,16 @@ class CItem extends CZBXAPI{
 // --- FILTER ---
 		if(!is_null($options['filter'])){
 			zbx_value2array($options['filter']);
+			
+			if(isset($options['filter']['host'])){
+				$sql_parts['from']['h'] = 'hosts h';
+				$sql_parts['from']['i'] = 'items i';
+				$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+				$sql_parts['where'][] = 'h.host='.zbx_dbstr($options['filter']['host']);
+			}
 
 			if(isset($options['filter']['itemid']))
-				$sql_parts['where']['itemid'] = 'i.itemid='.zbx_dbstr($options['filter']['itemid']);
+				$sql_parts['where']['itemid'] = 'i.itemid='.$options['filter']['itemid'];
 
 			if(isset($options['filter']['description']))
 				$sql_parts['where']['description'] = 'i.description='.zbx_dbstr($options['filter']['description']);
