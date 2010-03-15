@@ -541,13 +541,14 @@ COpt::memoryPick();
 			self::checkInput($graphs);
 			
 			foreach($graphs as $gnum => $graph){
-				
-				$graph_hosts = CHost::get(array(
+
+				$options = array(
 					'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
 					'output' => API_OUTPUT_EXTEND,
 					'editable' => 1,
 					'templated_hosts' => 1,
-				));
+				);
+				$graph_hosts = CHost::get($options);
 			
 // check - already exists
 				$filter = array(
@@ -609,12 +610,13 @@ COpt::memoryPick();
 			self::BeginTransaction(__METHOD__);
 		
 // GRAPHS PERMISSIONS {{{
-			$upd_graphs = self::get(array(
+			$options = array(
 				'graphids' => zbx_objectValues($graphs, 'graphid'),
 				'editable' => 1,
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_SHORTEN
-			));
+			);
+			$upd_graphs = self::get($options);
 			foreach($graphs as $gnum => $graph){
 				if(!isset($upd_graphs[$graph['graphid']])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
@@ -629,18 +631,20 @@ COpt::memoryPick();
 				unset($graph['templateid']);
 				
 // EXCEPTION: GRAPH EXISTS {{{
-				$graph_hosts = CHost::get(array(
+				$options = array(
 					'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
 					'output' => API_OUTPUT_EXTEND,
 					'editable' => 1,
 					'templated_hosts' => 1,
-				));
-		
-				$graph_exists = self::get(array(
+				);
+				$graph_hosts = CHost::get($options);
+
+				$options = array(
 					'filter' => array('name' => $graph['name']),
 					'hostids' => zbx_objectValues($graph_hosts, 'hostid'),
 					'nopermissions' => 1
-				));
+				);
+				$graph_exists = self::get($options);
 				$graph_exists = reset($graph_exists);
 
 				if($graph_exists && ($graph_exists['graphid'] != $graph['graphid'])){
@@ -793,25 +797,25 @@ COpt::memoryPick();
 		));
 		
 		if(!empty($graph_template)){
-			$chd_hosts = CHost::get(array(
+			$options = array(
 				'templateids' => $graph_template[0]['templateid'],
 				'output' => array('hostid', 'host'),
 				'preservekeys' => 1,
 				'hostids' => $hostids,
 				'nopermissions' => 1,
 				'templated_hosts' => 1,
-			));
+			);
+			$chd_hosts = CHost::get($options);
 
 			foreach($chd_hosts as $chd_host){
-			
-				$graph = self::get(array(
+				$options = array(
 					'graphids' => $graph['graphid'],
 					'nopermissions' => 1,
 					'select_items' => API_OUTPUT_EXTEND,
 					'select_graph_items' => API_OUTPUT_EXTEND,
 					'output' => API_OUTPUT_EXTEND
-					
-				));
+				);
+				$graph = self::get($options);
 				$graph = reset($graph);
 				$graph['templateid'] = $graph['graphid'];
 				
@@ -834,27 +838,29 @@ COpt::memoryPick();
 					self::updateReal($graph);
 				}
 // check if graph with same name and items exists
-				else{				
-					$chd_graph = self::get(array(
+				else{
+					$options = array(
 						'filter' => array('name' => $graph['name']),
 						'output' => API_OUTPUT_EXTEND,
 						'preservekeys' => 1,
 						'nopermissions' => 1,
 						'hostids' => $chd_host['hostid']
-					));
+					);
+					$chd_graph = self::get($options);
 					
 					if($chd_graph = reset($chd_graph)){
 						if($chd_graph['templateid'] != 0){
 							self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$graph['name'].' ]: already exists on [ '.$chd_host['host'].' ] (inherited from another template)');
 						}
-				
-						$chd_graph_items = CGraphItem::get(array(
+
+						$options = array(
 							'graphids' => $chd_graph['graphid'],
 							'output' => API_OUTPUT_EXTEND,
 							'preservekeys' => 1,
 							'expand_data' => 1,
 							'nopermissions' => 1
-						));
+						);
+						$chd_graph_items = CGraphItem::get($options);
 						
 						if(count($chd_graph_items) == count($graph['gitems'])){
 							foreach($graph['gitems'] as $gitem){
@@ -901,13 +907,14 @@ COpt::memoryPick();
 			$data['hostids'] = zbx_toArray($data['hostids']);
 			
 			$objectids = array_merge($data['templateids'], $data['hostids']);
-			$allowedObjects = CHost::get(array(
+			$options = array(
 				'hostids' => $objectids,
 				'editable' => 1,
 				'preservekeys' => 1,
 				'templated_hosts' => 1,
-				'output' => API_OUTPUT_SHORTEN			
-			));
+				'output' => API_OUTPUT_SHORTEN
+			);
+			$allowedObjects = CHost::get($options);
 			foreach($objectids as $objectid){
 				if(!isset($allowedObjects[$objectid])){
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -925,13 +932,14 @@ COpt::memoryPick();
 				$linkage[$link['templateid']][$link['hostid']] = 1;		
 			}
 
-			$graphs = self::get(array(
+			$options = array(
 				'hostids' => $data['templateids'],
 				'editable' => 1,
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_EXTEND,
 				'select_graph_items' => API_OUTPUT_EXTEND
-			));
+			);
+			$graphs = self::get($options);
 			
 			foreach($graphs as $graph){
 				foreach($data['hostids'] as $hostid){
@@ -967,22 +975,26 @@ COpt::memoryPick();
 		try{
 			self::BeginTransaction(__METHOD__);
 			
-			$graphids = zbx_objectValues($graphs, 'graphid');
-			$del_graphs = self::get(array(
-				'graphids' => $graphids,
+			$graphids = array();
+			$options = array(
+				'graphids' => zbx_objectValues($graphs, 'graphid'),
 				'editable' => 1,
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1
-			));
+			);
+			$del_graphs = self::get($options);
 			foreach($graphs as $gnum => $graph){
 				if(!isset($del_graphs[$graph['graphid']]))
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+
+				$graphids[] = $graph['graphid'];
 			}
 
 			if(!delete_graph($graphids))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete Graphs');
 				
 			self::EndTransaction(true, __METHOD__);
+			return array('graphids' => $graphids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);

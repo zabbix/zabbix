@@ -1089,8 +1089,7 @@ Copt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_hosts = self::get(array('hostids' => $hostids, 'editable' => 1, 'extendoutput' => 1, 'nopermissions' => 1));
-			return $new_hosts;
+			return array('hostids' => $hostids);
 		}
 		else{
 			self::setMethodErrors(__METHOD__, $errors);
@@ -1157,13 +1156,7 @@ Copt::memoryPick();
 	
 			$result = self::EndTransaction($result, __METHOD__);
 
-			$options = array(
-				'hostids' => $hostids,
-				'extendoutput' => 1,
-				'nopermissions' => 1
-			);
-			$upd_hosts = self::get($options);
-			return $upd_hosts;
+			return array('hostids' => $hostids);
 		}
 		catch(APIException $e){
 			if(isset($transaction)) self::EndTransaction(false, __METHOD__);
@@ -1641,10 +1634,13 @@ Copt::memoryPick();
 		$hosts = zbx_toArray($hosts);
 		$hostids = array();
 
-		$del_hosts = self::get(array('hostids'=> zbx_objectValues($hosts, 'hostid'),
-									'editable'=>1,
-									'extendoutput'=>1,
-									'preservekeys'=>1));
+		$options = array(
+			'hostids'=> zbx_objectValues($hosts, 'hostid'),
+			'editable'=>1,
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$del_hosts = self::get($options);
 		if(empty($del_hosts)){
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Host does not exist');
 			return false;
@@ -1672,7 +1668,7 @@ Copt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return zbx_cleanHashes($del_hosts);
+			return array('hostids' => $hostids);
 		}
 		else{
 			self::setError(__METHOD__);

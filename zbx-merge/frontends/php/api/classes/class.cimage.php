@@ -414,13 +414,7 @@ class CImage extends CZBXAPI{
 
 			$result = self::EndTransaction($result, __METHOD__);
 
-			$otions = array(
-				'imageids' => $imageids,
-				'output '=> API_OUTPUT_EXTEND
-			);
-
-			$new_images = self::get();
-			return $new_images;
+			return array('imageids' => $imageids);
 		}
 		catch(APIException $e){
 			if(isset($transaction)) self::EndTransaction(false, __METHOD__);
@@ -483,7 +477,7 @@ class CImage extends CZBXAPI{
 
 			$result = self::EndTransaction($result, __METHOD__);
 
-			return $images;
+			return array('imageids' => $imageids);
 		}
 		catch(APIException $e){
 			if(isset($transaction)) self::EndTransaction(false, __METHOD__);
@@ -544,7 +538,7 @@ class CImage extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return zbx_cleanHashes($del_images);
+			return array('imageids' => $imageids);
 		}
 		else{
 			self::setError(__METHOD__);

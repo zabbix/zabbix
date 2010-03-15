@@ -559,8 +559,7 @@ COpt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_groups = self::get(array('groupids'=>$groupids, 'extendoutput'=>1, 'nopermissions'=>1));
-			return $new_groups;
+			return $groupids;
 		}
 		else{
 			self::setMethodErrors(__METHOD__, $errors);
@@ -635,8 +634,7 @@ COpt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_groups = self::get(array('groupids'=>$groupids, 'extendoutput'=>1, 'nopermissions'=>1));
-			return $upd_groups;
+			return $groupids;
 		}
 		else{
 			self::setError(__METHOD__);
@@ -661,10 +659,13 @@ COpt::memoryPick();
 		$groups = zbx_toArray($groups);
 		$groupids = array();
 
-		$del_groups = self::get(array('groupids'=>zbx_objectValues($groups, 'groupid'),
-											'editable'=>1,
-											'extendoutput'=>1,
-											'preservekeys'=>1));
+		$options = array(
+			'groupids'=>zbx_objectValues($groups, 'groupid'),
+			'editable'=>1,
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$del_groups = self::get($options);
 		foreach($groups as $gnum => $group){
 			if(!isset($del_groups[$group['groupid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -764,7 +765,7 @@ COpt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return zbx_cleanHashes($del_groups);
+			return $groupids;
 		}
 		else{
 			self::setError(__METHOD__);

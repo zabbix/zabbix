@@ -494,7 +494,7 @@ SDI('/////////////////////////////////');
 			$result = self::EndTransaction($result, __METHOD__);
 			if(!$result) throw new APIException(ZBX_API_ERROR_INTERNAL, 'Transaction failed on screens creation');
 
-			return $screenids;
+			return array('screenids' => $screenids);
 		}
 		catch(APIException $e){
 			if(isset($transaction)) self::EndTransaction(false, __METHOD__);
@@ -597,7 +597,7 @@ SDI('/////////////////////////////////');
 			$result = self::EndTransaction($result, __METHOD__);
 			if(!$result) throw new APIException(ZBX_API_ERROR_INTERNAL, 'Transaction failed on screens update');
 
-			return $screenids;
+			return array('screenids' => $screenids);
 		}
 		catch(APIException $e){
 			if(isset($transaction)) self::EndTransaction(false, __METHOD__);
@@ -664,7 +664,7 @@ SDI('/////////////////////////////////');
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return zbx_cleanHashes($del_screens);
+			return array('screenids' => $screenids);
 		}
 		else{
 			self::setError(__METHOD__);

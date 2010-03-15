@@ -807,11 +807,7 @@ COpt::memoryPick();
 
 			self::EndTransaction(true, __METHOD__);
 			
-			return self::get(array(
-				'triggerids' => $triggerids,
-				'output' => API_OUTPUT_EXTEND,
-				'nopermissions' => 1
-			));
+			return array('triggerids' => $triggerids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
@@ -842,13 +838,14 @@ COpt::memoryPick();
 		
 		try{
 			self::BeginTransaction(__METHOD__);
-			
-			$upd_triggers = self::get(array(
+
+			$options = array(
 				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 				'editable' => 1,
 				'extendoutput' => 1,
 				'preservekeys' => 1
-			));
+			);
+			$upd_triggers = self::get($options);
 			foreach($triggers as $gnum => $trigger){
 				if(!isset($upd_triggers[$trigger['triggerid']])){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
@@ -881,11 +878,7 @@ COpt::memoryPick();
 			
 			self::EndTransaction(true, __METHOD__);
 			
-			return self::get(array(
-				'triggerids' => $triggerids, 
-				'extendoutput' => 1, 
-				'nopermissions' => 1
-			));
+			return array('triggerids' => $triggerids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
@@ -913,10 +906,13 @@ COpt::memoryPick();
 		$triggers = zbx_toArray($triggers);
 		$triggerids = array();
 
-		$del_triggers = self::get(array('triggerids'=>zbx_objectValues($triggers, 'triggerid'),
-											'editable'=>1,
-											'extendoutput'=>1,
-											'preservekeys'=>1));
+		$options = array(
+			'triggerids'=>zbx_objectValues($triggers, 'triggerid'),
+			'editable'=>1,
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$del_triggers = self::get($options);
 		foreach($triggers as $gnum => $trigger){
 			if(!isset($del_triggers[$trigger['triggerid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -939,7 +935,7 @@ COpt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return zbx_cleanHashes($del_triggers);
+			return array('triggerids' => $triggerids);
 		}
 		else{
 			self::setError(__METHOD__);

@@ -514,7 +514,7 @@ COpt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return $sysmapids;
+			return array('sysmapids' => $sysmapids);
 		}
 		else{
 			self::setMethodErrors(__METHOD__, $errors);
@@ -604,7 +604,7 @@ COpt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return $sysmapids;
+			return array('sysmapids' => $sysmapids);
 		}
 		else{
 			self::setMethodErrors(__METHOD__, $errors);
@@ -678,7 +678,7 @@ COpt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
-			return true;
+			return array('sysmapids' => $sysmapids);
 		else{
 			self::setMethodErrors(__METHOD__, $errors);
 			return false;

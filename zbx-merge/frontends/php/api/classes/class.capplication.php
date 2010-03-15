@@ -481,8 +481,7 @@ COpt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_applications = self::get(array('applicationids'=>$applicationids, 'extendoutput'=>1, 'nopermissions'=>1));
-			return $new_applications;
+			return array('applicationids'=>$applicationids);
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
@@ -508,10 +507,13 @@ COpt::memoryPick();
 		$applications = zbx_toArray($applications);
 		$applicationids = array();
 
-		$upd_applications = self::get(array('applicationids'=>zbx_objectValues($applications, 'applicationid'),
-											'editable'=>1,
-											'extendoutput'=>1,
-											'preservekeys'=>1));
+		$options = array(
+			'applicationids'=>zbx_objectValues($applications, 'applicationid'),
+			'editable'=>1,
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$upd_applications = self::get($options);
 		foreach($applications as $anum => $application){
 			if(!isset($upd_applications[$application['applicationid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -539,8 +541,7 @@ COpt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_applications = self::get(array('applicationids'=>$applicationids, 'extendoutput'=>1, 'nopermissions'=>1));
-			return $upd_applications;
+			return array('applicationids'=>$applicationids);
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
@@ -565,10 +566,13 @@ COpt::memoryPick();
 		$applications = zbx_toArray($applications);
 		$applicationids = array();
 
-		$del_applications = self::get(array('applicationids'=>zbx_objectValues($applications, 'applicationid'),
-											'editable'=>1,
-											'extendoutput'=>1,
-											'preservekeys'=>1));
+		$options = array(
+			'applicationids'=>zbx_objectValues($applications, 'applicationid'),
+			'editable'=>1,
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$del_applications = self::get($options);
 		foreach($applications as $anum => $application){
 			if(!isset($del_applications[$application['applicationid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -588,7 +592,7 @@ COpt::memoryPick();
 		}
 
 		if($result){
-			return zbx_cleanHashes($del_applications);
+			return array('applicationids'=>$applicationids);
 		}
 		else{
 			self::setError(__METHOD__);

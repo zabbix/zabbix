@@ -694,8 +694,7 @@ COpt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_items = self::get(array('itemids'=>$itemids, 'extendoutput'=>1, 'nopermissions'=>1));
-			return $new_items;
+			return array('itemids' => $itemids);
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
@@ -757,8 +756,7 @@ COpt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_items = self::get(array('itemids'=>$itemids, 'extendoutput'=>1, 'nopermissions'=>1));
-			return $upd_items;
+			return array('itemids' => $itemids);
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
@@ -782,7 +780,12 @@ COpt::memoryPick();
 		$items = zbx_toArray($items);
 		$itemids = array();
 
-		$del_items = self::get(array('itemids'=> zbx_objectValues($items, 'itemid'), 'editable'=>1, 'extendoutput'=>1, 'preservekeys'=>1));
+		$options = array(
+			'itemids'=> zbx_objectValues($items, 'itemid'),
+			'editable'=>1,
+			'preservekeys'=>1
+		);
+		$del_items = self::get($options);
 		foreach($items as $num => $item){
 			if(!isset($del_items[$item['itemid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -802,7 +805,7 @@ COpt::memoryPick();
 		}
 
 		if($result){
-			return zbx_cleanHashes($del_items);
+			return array('itemids' => $itemids);
 		}
 		else{
 			self::setError(__METHOD__);

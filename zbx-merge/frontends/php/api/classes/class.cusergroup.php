@@ -370,8 +370,7 @@ class CUserGroup extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_usrgrps = self::get(array('usrgrpids'=>$usrgrpids, 'extendoutput'=>1));
-			return $new_usrgrps;
+			return array('usrgrpids'=>$usrgrpids);
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
@@ -404,9 +403,12 @@ class CUserGroup extends CZBXAPI{
 		$result = false;
 
 //-----
-		$upd_usrgrps = self::get(array('usrgrpids'=>zbx_objectValues($usrgrps, 'usrgrpid'),
-											'extendoutput'=>1,
-											'preservekeys'=>1));
+		$options = array(
+			'usrgrpids'=>zbx_objectValues($usrgrps, 'usrgrpid'),
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$upd_usrgrps = self::get($options);
 
 		foreach($usrgrps as $ugnum => $usrgrp){
 			if(($usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED) || ($usrgrp['users_status'] == GROUP_STATUS_DISABLED)){
@@ -433,8 +435,7 @@ class CUserGroup extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_usrgrps = self::get(array('usrgrpids'=>$usrgrpids, 'extendoutput'=>1));
-			return $upd_usrgrps;
+			return array('usrgrpids'=>$usrgrpids);
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
@@ -706,9 +707,12 @@ class CUserGroup extends CZBXAPI{
 		$result = false;
 
 //-----
-		$del_usrgrps = self::get(array('usrgrpids'=>zbx_objectValues($usrgrps, 'usrgrpid'),
-											'extendoutput'=>1,
-											'preservekeys'=>1));
+		$options = array(
+			'usrgrpids'=>zbx_objectValues($usrgrps, 'usrgrpid'),
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$del_usrgrps = self::get($options);
 		foreach($usrgrps as $gnum => $usrgrp){
 			$usrgrpids[] = $usrgrp['usrgrpid'];
 			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER_GROUP, 'User group ['.$usrgrp['name'].']');
@@ -729,7 +733,7 @@ class CUserGroup extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return zbx_cleanHashes($del_users);
+			return array('usrgrpids'=>$usrgrpids);
 		}
 		else{
 			self::setError(__METHOD__);

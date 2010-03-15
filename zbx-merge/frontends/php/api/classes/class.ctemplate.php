@@ -901,10 +901,12 @@ COpt::memoryPick();
 
 
 // PERMISSIONS {{{
-			$upd_groups = CHostGroup::get(array(
+			$options = array(
 				'groupids' => $groupids,
 				'editable' => 1,
-				'preservekeys' => 1));
+				'preservekeys' => 1
+			);
+			$upd_groups = CHostGroup::get($options);
 			foreach($groupids as $gnum => $groupid){
 				if(!isset($upd_groups[$groupid])){
 					throw new APIException(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -960,9 +962,7 @@ COpt::memoryPick();
 
 			self::EndTransaction(true, __METHOD__);
 
-			$new_templates = self::get(array('templateids' => $templateids, 'extendoutput' => 1, 'nopermissions' => 1));
-			return $new_templates;
-
+			return array('templateids' => $templateids);
 		}
 		catch(APIException $e){
 			if($transaction) self::EndTransaction(false, __METHOD__);
@@ -1017,9 +1017,7 @@ COpt::memoryPick();
 			}
 
 			self::EndTransaction(true, __METHOD__);
-			$upd_templates = self::get(array('templateids'=>$templateids, 'extendoutput'=>1, 'nopermissions'=>1));
-			return $upd_templates;
-
+			return array('templateids' => $templateids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
@@ -1073,7 +1071,7 @@ COpt::memoryPick();
 		}
 
 		if($result){
-			return zbx_cleanHashes($del_templates);
+			return array('templateids' => $templateids);
 		}
 		else{
 			self::setError(__METHOD__);

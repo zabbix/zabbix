@@ -574,7 +574,7 @@ class CUserMacro extends CZBXAPI{
 
 	}
 
-	public static function addGlobal($macros){
+	public static function createGlobal($macros){
 
 	}
 
