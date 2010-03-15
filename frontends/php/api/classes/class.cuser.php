@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,14 +29,6 @@
 class CUser extends CZBXAPI{
 /**
  * Get Users data
- *
- * First part of parameters are filters which limits the output result set, these filters are set only if appropriate parameter is set.
- * For example if "type" is set, then method returns only users of given type.
- * Second part of parameters extends result data, adding data about others objects that are related to objects we get.
- * For example if "select_usrgrps" parameter is set, resulting objects will have additional property 'usrgrps' containing object with
- * data about User UserGroups.
- * Third part of parameters affect output. For example "sortfield" will be set to 'alias', result will be sorted by User alias.
- * All Parameters are optional!
  *
  * {@source}
  * @access public
@@ -87,7 +79,7 @@ class CUser extends CZBXAPI{
 			'pattern'					=> '',
 // OutPut
 			'extendoutput'				=> null,
-			'output'				=> API_OUTPUT_REFER,
+			'output'					=> API_OUTPUT_REFER,
 			'editable'					=> null,
 			'select_usrgrps'			=> null,
 			'get_access'				=> null,
@@ -114,6 +106,15 @@ class CUser extends CZBXAPI{
 // PERMISSION CHECK
 		if(USER_TYPE_SUPER_ADMIN == $user_type){
 
+		}
+		else if(is_null($options['editable']) && ($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN)){
+			$sql_parts['from']['ug'] = 'users_groups ug';
+			$sql_parts['where']['uug'] = 'u.userid=ug.userid';
+			$sql_parts['where'][] = 'ug.usrgrpid IN ('.
+				' SELECT uug.usrgrpid'.
+				' FROM users_groups uug'.
+				' WHERE uug.userid='.$USER_DETAILS['userid'].
+				' )';
 		}
 		else if(!is_null($options['editable']) && ($USER_DETAILS['type']!=USER_TYPE_SUPER_ADMIN)){
 			return array();

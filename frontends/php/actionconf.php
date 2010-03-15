@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -116,8 +116,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			access_deny();
 		}
 	}
-?>
-<?php
+
 	CProfile::update('web.actionconf.eventsource',$_REQUEST['eventsource'], PROFILE_TYPE_INT);
 ?>
 <?php
@@ -367,29 +366,22 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 	$action_wdgt = new CWidget();
 
 /* header */
-	$form = new CForm();
-	$form->setMethod('get');
+	$form = new CForm(null, 'get');
 
 	$form->addVar('eventsource', $_REQUEST['eventsource']);
 	if(!isset($_REQUEST['form'])){
-		$form->addItem(new CButton('form',S_CREATE_ACTION));
-	}
-	else {
-
+		$form->addItem(new CButton('form', S_CREATE_ACTION));
 	}
 
 	$action_wdgt->addPageHeader(S_CONFIGURATION_OF_ACTIONS_BIG, $form);
 
 	if(isset($_REQUEST['form'])){
-/* form */
-//		insert_action_form();
-//* NEW Form
-		$frmAction = new CForm('actionconf.php','post');
+		$frmAction = new CForm('actionconf.php', 'post');
 		$frmAction->setName(S_ACTION);
 
-		$frmAction->addVar('form',get_request('form',1));
-		$from_rfr = get_request('form_refresh',0);
-		$frmAction->addVar('form_refresh',$from_rfr+1);
+		$frmAction->addVar('form', get_request('form', 1));
+		$from_rfr = get_request('form_refresh', 0);
+		$frmAction->addVar('form_refresh', $from_rfr+1);
 
 		$action = null;
 		if(isset($_REQUEST['actionid'])){
@@ -478,9 +470,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 //*/
 	}
 	else{
-
-		$form = new CForm();
-		$form->setMethod('get');
+		$form = new CForm(null, 'get');
 
 		$cmbSource = new CComboBox('eventsource',$_REQUEST['eventsource'],'submit()');
 		$cmbSource->addItem(EVENT_SOURCE_TRIGGERS,S_TRIGGERS);
@@ -602,7 +592,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 //----
 
 // PAGING FOOTER
-		$tblActions = array($paging,$tblActions,$paging,$footer);
+		$tblActions = array($paging, $tblActions, $paging, $footer);
 //---------
 
 		$form->addItem($tblActions);
@@ -610,9 +600,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 	}
 
 	$action_wdgt->show();
-?>
-<?php
 
+	
 include_once('include/page_footer.php');
-
 ?>
