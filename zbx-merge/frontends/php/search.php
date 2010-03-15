@@ -104,7 +104,7 @@ include_once('include/page_header.php');
 
 // FIND Hosts
 	$params = array(
-		'nodeids'=> get_current_nodeid(),
+		'nodeids'=> get_current_nodeid(true),
 		'extendoutput' => true,
 		'pattern' => $search,
 		'extend_pattern' => true,
@@ -113,7 +113,7 @@ include_once('include/page_header.php');
 	);
 	$db_hosts = CHost::get($params);
 
-	order_result($db_hosts, 'host', null);
+	order_result($db_hosts, 'host');
 
 	$hosts = selectByPattern($db_hosts, 'host', $search, $rows_per_page);
 	$hostids = zbx_objectValues($hosts, 'hostid');
@@ -145,7 +145,7 @@ include_once('include/page_header.php');
 	$viewCount = count($hosts);
 
 	$header = array(
-		is_show_all_nodes()?new CCol(S_NODE):null,
+		ZBX_DISTRIBUTED?new CCol(S_NODE):null,
 		new CCol(S_HOSTS),
 		new CCol(S_IP),
 		new CCol(S_DNS),
@@ -190,7 +190,7 @@ include_once('include/page_header.php');
 		$hostdns = make_decoration($host['dns'], $search);
 
 		$table->addRow(array(
-			get_node_name_by_elid($hostid),
+			get_node_name_by_elid($hostid, true),
 			$caption,
 			$hostip,
 			$hostdns,
@@ -213,7 +213,7 @@ include_once('include/page_header.php');
 
 // Find Host groups
 	$params = array(
-		'nodeids'=> get_current_nodeid(),
+		'nodeids'=> get_current_nodeid(true),
 		'extendoutput' => 1,
 		'pattern' => $search,
 		'limit' => $rows_per_page,
@@ -245,7 +245,7 @@ include_once('include/page_header.php');
 	$viewCount = count($hostGroups);
 
 	$header = array(
-		is_show_all_nodes()?new CCol(S_NODE):null,
+		ZBX_DISTRIBUTED?new CCol(S_NODE):null,
 		new CCol(S_HOST_GROUP),
 		new CCol(S_LATEST_DATA),
 		new CCol(S_TRIGGERS),
@@ -272,7 +272,7 @@ include_once('include/page_header.php');
 		}
 
 		$table->addRow(array(
-			get_node_name_by_elid($hostgroupid),
+			get_node_name_by_elid($hostgroupid, true),
 			$caption,
 			new CLink(S_GO,'latest.php?groupid='.$hostgroupid.'&hostid=0'),
 			new CLink(S_GO,'tr_status.php?groupid='.$hostgroupid.'&hostid=0'),
@@ -291,7 +291,7 @@ include_once('include/page_header.php');
 // FIND Templates
 	if($admin){
 		$params = array(
-			'nodeids'=> get_current_nodeid(),
+			'nodeids'=> get_current_nodeid(true),
 			'extendoutput' => 1,
 			'select_groups' => 1,
 			'pattern' => $search,
@@ -306,7 +306,7 @@ include_once('include/page_header.php');
 		$templateids = zbx_objectValues($templates, 'templateid');
 
 		$params = array(
-			'nodeids'=> get_current_nodeid(),
+			'nodeids'=> get_current_nodeid(true),
 			'templateids' => $templateids,
 			'editable' => 1
 		);
@@ -314,7 +314,7 @@ include_once('include/page_header.php');
 		$rw_templates = zbx_toHash($rw_templates,'templateid');
 
 		$params = array(
-					'nodeids'=> get_current_nodeid(),
+					'nodeids'=> get_current_nodeid(true),
 					'pattern' => $search,
 					'countOutput' => 1,
 					'editable' => 1
@@ -325,7 +325,7 @@ include_once('include/page_header.php');
 		$viewCount = count($templates);
 
 		$header = array(
-			is_show_all_nodes()?new CCol(S_NODE):null,
+			ZBX_DISTRIBUTED?new CCol(S_NODE):null,
 			new CCol(S_TEMPLATES),
 			new CCol(S_ITEMS),
 			new CCol(S_TRIGGERS),
@@ -357,7 +357,7 @@ include_once('include/page_header.php');
 			}
 
 			$table->addRow(array(
-				get_node_name_by_elid($templateid),
+				get_node_name_by_elid($templateid, true),
 				$template_link,
 				$items_link,
 				$triggers_link,

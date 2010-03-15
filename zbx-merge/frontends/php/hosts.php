@@ -252,7 +252,12 @@ include_once('include/page_header.php');
 			
 			$groups = array();
 			if(isset($visible['newgroup']) && !empty($_REQUEST['newgroup'])){
-				$groups = CHostGroup::create(array('name' => $_REQUEST['newgroup']));
+				$result = CHostGroup::create(array('name' => $_REQUEST['newgroup']));
+				$options = array(
+					'groupids' => $result['groupids'],
+					'output' => API_OUTPUT_EXTEND
+				);
+				$groups = CHostGroup::get($options);
 				if($groups === false) throw new Exception();
 			}
 
@@ -330,7 +335,13 @@ include_once('include/page_header.php');
 
 		$groups = zbx_toObject($groups, 'groupid');
 		if(!empty($_REQUEST['newgroup'])){
-			if($newgroup = CHostGroup::create(array('name' => $_REQUEST['newgroup']))){
+			$result = CHostGroup::create(array('name' => $_REQUEST['newgroup']));
+			if($result){
+				$options = array(
+					'groupids' => $result['groupids'],
+					'output' => API_OUTPUT_EXTEND
+				);
+				$newgroup = CHostGroup::get($options);
 				$groups = array_merge($groups, $newgroup);
 			}
 			else{
@@ -339,59 +350,39 @@ include_once('include/page_header.php');
 		}
 
 		if($result){
-			if(isset($_REQUEST['hostid'])){
-				if($result){
-					$result = CHost::update(array(
-						'hostid' => $_REQUEST['hostid'],
-						'host' => $_REQUEST['host'],
-						'port' => $_REQUEST['port'],
-						'status' => $_REQUEST['status'],
-						'useip' => $_REQUEST['useip'],
-						'dns' => $_REQUEST['dns'],
-						'ip' => $_REQUEST['ip'],
-						'proxy_hostid' => $proxy_hostid,
-						'useipmi' => $useipmi,
-						'ipmi_ip' => $_REQUEST['ipmi_ip'],
-						'ipmi_port' => $_REQUEST['ipmi_port'],
-						'ipmi_authtype' => $_REQUEST['ipmi_authtype'],
-						'ipmi_privilege' => $_REQUEST['ipmi_privilege'],
-						'ipmi_username' => $_REQUEST['ipmi_username'],
-						'ipmi_password' => $_REQUEST['ipmi_password'],
-						'groups' => $groups,
-						'templates' => $templates,
-						'templates_clear' => $templates_clear,
-						'macros' => get_request('macros', array()),
-					));
+			$host = array(
+				'host' => $_REQUEST['host'],
+				'port' => $_REQUEST['port'],
+				'status' => $_REQUEST['status'],
+				'useip' => $_REQUEST['useip'],
+				'dns' => $_REQUEST['dns'],
+				'ip' => $_REQUEST['ip'],
+				'proxy_hostid' => $proxy_hostid,
+				'templates' => $templates,
+				'useipmi' => $useipmi,
+				'ipmi_ip' => $_REQUEST['ipmi_ip'],
+				'ipmi_port' => $_REQUEST['ipmi_port'],
+				'ipmi_authtype' => $_REQUEST['ipmi_authtype'],
+				'ipmi_privilege' => $_REQUEST['ipmi_privilege'],
+				'ipmi_username' => $_REQUEST['ipmi_username'],
+				'ipmi_password' => $_REQUEST['ipmi_password'],
+				'groups' => $groups,
+				'templates' => $templates,
+				'macros' => get_request('macros', array()),
+			);
 
-					$hostid = $_REQUEST['hostid'];
-				}
+			if(isset($_REQUEST['hostid'])){
+				$host['hostid'] = $_REQUEST['hostid'];
+				$result = CHost::update($host);
+
+				$hostid = $_REQUEST['hostid'];
 			}
 			else{
-				$host = CHost::create(array(
-					'host' => $_REQUEST['host'],
-					'port' => $_REQUEST['port'],
-					'status' => $_REQUEST['status'],
-					'useip' => $_REQUEST['useip'],
-					'dns' => $_REQUEST['dns'],
-					'ip' => $_REQUEST['ip'],
-					'proxy_hostid' => $proxy_hostid,
-					'templates' => $templates,
-					'useipmi' => $useipmi,
-					'ipmi_ip' => $_REQUEST['ipmi_ip'],
-					'ipmi_port' => $_REQUEST['ipmi_port'],
-					'ipmi_authtype' => $_REQUEST['ipmi_authtype'],
-					'ipmi_privilege' => $_REQUEST['ipmi_privilege'],
-					'ipmi_username' => $_REQUEST['ipmi_username'],
-					'ipmi_password' => $_REQUEST['ipmi_password'],
-					'groups' => $groups,
-					'templates' => $templates,
-					'macros' => get_request('macros', array()),
-				));
+				$host = CHost::create($host);
 
 				$result &= (bool) $host;
 				if($result){
-					$host = reset($host);
-					$hostid = $host['hostid'];
+					$hostid = reset($host['hostids']);
 				}
 			}
 

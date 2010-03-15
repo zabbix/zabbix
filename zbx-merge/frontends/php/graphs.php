@@ -517,11 +517,17 @@ include_once('include/page_header.php');
 			'extendoutput' => 1,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
-			'limit' => ($config['search_limit']+1));
-		if($PAGE_HOSTS['selected'] > 0){
+			'limit' => ($config['search_limit']+1)
+		);
+
+// Filtering
+		if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
 			$options['hostids'] = $PAGE_HOSTS['selected'];
 		}
-		else if($PAGE_GROUPS['selected'] > 0){
+		else if(($PAGE_GROUPS['selected'] > 0) && !empty($PAGE_HOSTS['hostids'])){
+			$options['hostids'] = $PAGE_HOSTS['hostids'];
+		}
+		else if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
 			$options['groupids'] = $PAGE_GROUPS['selected'];
 		}
 

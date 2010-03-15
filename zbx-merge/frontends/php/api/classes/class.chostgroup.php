@@ -559,7 +559,7 @@ COpt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return $groupids;
+			return array('groupids' => $groupids);
 		}
 		else{
 			self::setMethodErrors(__METHOD__, $errors);
@@ -634,7 +634,7 @@ COpt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return $groupids;
+			return array('groupids' => $groupids);
 		}
 		else{
 			self::setError(__METHOD__);
@@ -765,7 +765,7 @@ COpt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return $groupids;
+			return array('groupids' => $groupids);
 		}
 		else{
 			self::setError(__METHOD__);

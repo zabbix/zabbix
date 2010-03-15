@@ -1945,11 +1945,12 @@ return $result;
 		if(CTrigger::exists(array('description' => $description, 'expression' => $expression))){
 			preg_match('/^{(.+?):/u', $expression, $host);
 
-			$triggers_exist = CTrigger::get(array(
+			$options = array(
 				'filter' => array('description' => $description, 'host' => $host[1]),
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => 1,
-			));
+			);
+			$triggers_exist = CTrigger::get($options);
 			
 			$trigger_exist = false;
 			foreach($triggers_exist as $tnum => $tr){
@@ -1959,7 +1960,10 @@ return $result;
 					break;
 				}
 			}
+
 			if($trigger_exist && ($trigger_exist['triggerid'] != $trigger['triggerid'])){
+//SDII($trigger);
+//SDII($trigger_exist);
 				error('Trigger [ '.$trigger['description'].' ] already exists');
 				return false;
 			}
@@ -3622,10 +3626,11 @@ return $result;
 				$expr = str_replace($src['host'].':', $dest['host'].':', $expr);
 				$trigger['expression'] = $expr;
 				
-				$newtriggerid = CTrigger::create($trigger);
-				if(!$newtriggerid) throw new Exception();
-				
-				$hash[$trigger['triggerid']] = $newtriggerid[0]['triggerid'];
+				$result = CTrigger::create($trigger);
+
+				if(!$result) throw new Exception();
+
+				$hash[$trigger['triggerid']] = reset($result['triggerids']);
 			}
 
 			foreach($triggers as $trigger){

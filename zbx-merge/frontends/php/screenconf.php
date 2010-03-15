@@ -155,12 +155,13 @@ include_once('include/page_header.php');
 			if(isset($_REQUEST['screenid'])){
 				// TODO check permission by new value.
 //				$result=update_screen($_REQUEST['screenid'],$_REQUEST['name'],$_REQUEST['hsize'],$_REQUEST['vsize']);
-				$result = CScreen::update(array(
+				$screen = array(
 					'screenid' => $_REQUEST['screenid'],
 					'name' => $_REQUEST['name'],
 					'hsize' => $_REQUEST['hsize'],
 					'vsize' => $_REQUEST['vsize']
-				));
+				);
+				$result = CScreen::update($screen);
 				if(!$result){
 					error(CScreen::resetErrors());
 				}
@@ -172,7 +173,12 @@ include_once('include/page_header.php');
 					access_deny();
 
 //				DBstart();
-				$result = CScreen::create(array('name' => $_REQUEST['name'], 'hsize' => $_REQUEST['hsize'], 'vsize' => $_REQUEST['vsize']));
+				$screen = array(
+					'name' => $_REQUEST['name'],
+					'hsize' => $_REQUEST['hsize'],
+					'vsize' => $_REQUEST['vsize']
+				);
+				$result = CScreen::create();
 				if(!$result){
 					error(CScreen::resetErrors());
 				}

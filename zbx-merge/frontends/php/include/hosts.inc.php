@@ -85,14 +85,13 @@ require_once('include/httptest.inc.php');
 	}
 
 	function add_host_group($name, $hosts=array()){
-		$group = CHostGroup::create(array('name' => $name));
-		if(!$group){
+		$result = CHostGroup::create(array('name' => $name));
+		if(!$result){
 			error(CHostgroup::resetErrors());
 			return false;
 		}
 
-		$group = reset($group);
-		$groupid = $group['groupid'];
+		$groupid = reset($result['groupids']);
 
 		add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $groupid, $name, 'groups', NULL, NULL);
 
@@ -284,9 +283,16 @@ require_once('include/httptest.inc.php');
 			info(S_ADDED_NEW_HOST.'['.$host.']');
 
 		if(!zbx_empty($newgroup)){
-			$newgroup = CHostGroup::create(array('name' => $newgroup));
+			$result = CHostGroup::create(array('name' => $newgroup));
 
-			if($newgroup !== false) $newgroup = reset($newgroup);
+			if($result !== false){
+				$options = array(
+					'groupids' => $result['groupids'],
+					'output' => API_OUTPUT_EXTEND
+				);
+				$newgroups = CHostGroups::get($options);
+				$newgroup = reset($newgroups);
+			}
 			else return false;
 
 			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $newgroup['groupid'], $newgroup['name'], 'groups', NULL, NULL);
@@ -378,11 +384,19 @@ require_once('include/httptest.inc.php');
 			return $result;
 
 		if(!zbx_empty($newgroup)){
-			if(!$newgroup = CHostGroup::create(array('name' => $newgroup))){
+			$result = CHostGroup::create(array('name' => $newgroup));
+			if(!$result){
 				error(CHostGroup::resetErrors());
 				return false;
 			}
-			$groups = array_merge($groups, $newgroup);
+
+			$options = array(
+				'groupids' => $result['groupids'],
+				'output' => API_OUTPUT_EXTEND
+			);
+			$newgroups = CHostGroups::get($options);
+
+			$groups = array_merge($groups, $newgroups);
 		}
 
 		$hosts = array('hostid' => $hostid);

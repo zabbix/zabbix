@@ -647,13 +647,14 @@ COpt::memoryPick();
 
 		$options = array(
 			'filter' => array('key_' => $object['key_']),
+			'webitems' => 1,
 			'output' => API_OUTPUT_SHORTEN,
 			'nopermissions' => 1,
 			'limit' => 1
 		);
 		
 		if(isset($object['hostid'])) $options['hostids'] = $object['hostid'];
-		if(isset($object['host'])) $options['host'] = $object['host'];
+		if(isset($object['host'])) $options['filter']['host'] = $object['host'];
 		
 		if(isset($object['node']))
 			$options['nodeids'] = getNodeIdByNodeName($object['node']);
@@ -721,6 +722,7 @@ COpt::memoryPick();
 		$options = array(
 			'itemids'=> zbx_objectValues($items, 'itemid'),
 			'editable'=>1,
+			'webitems' => 1,
 			'extendoutput'=>1,
 			'preservekeys'=>1
 		);
