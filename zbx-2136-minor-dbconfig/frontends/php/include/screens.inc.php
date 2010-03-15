@@ -57,7 +57,7 @@ require_once('include/js.inc.php');
 							$itemid = $ac_data['resourceid'];
 
 						$options = array(
-							'count' => 1,
+							'countOutput' => 1,
 							'itemids' => $itemid,
 							'nodeids' => get_current_nodeid(true)
 						);
@@ -179,7 +179,7 @@ require_once('include/js.inc.php');
 				' WHERE slideshowid='.$slideshowid;
 		$slide_data = DBfetch(DBselect($sql));
 		if(!$slide_data || is_null($slide_data['min_step'])){
-			return new CTableInfo(S_NO_SLIDES_DEFINED);
+			return false;
 		}
 
 		$step = $step % ($slide_data['max_step']+1);

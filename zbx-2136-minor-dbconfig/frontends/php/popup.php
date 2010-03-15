@@ -137,7 +137,7 @@
 			break;
 	}
 
-	$page['file'] = "popup.php";
+	$page['file'] = 'popup.php';
 	$page['scripts'] = array();
 
 	define('ZBX_PAGE_NO_MENU', 1);
@@ -806,7 +806,7 @@ include_once('include/page_header.php');
 					}
 				}
 				else{
-					$js_action = 'add_value("'.$dstfld1.'", "'.$dstfld2.'", "'.$row["triggerid"].'", "'.$row['host'].':'.$exp_desc.'");';
+					$js_action = 'add_value("'.$dstfld1.'", "'.$dstfld2.'", "'.$row["triggerid"].'", '.zbx_jsvalue($row['host'].':'.$exp_desc).');';
 				}
 			}
 

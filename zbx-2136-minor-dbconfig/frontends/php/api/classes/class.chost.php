@@ -656,8 +656,8 @@ Copt::memoryPick();
 				$templates = CTemplate::get($obj_params);
 				$templates = zbx_toHash($templates, 'hostid');
 				foreach($result as $hostid => $host){
-					if(isset($hosts[$groupid]))
-						$result[$hostid]['hosts'] = $templates[$templateid]['rowscount'];
+					if(isset($templates[$hostid]))
+						$result[$hostid]['templates'] = $templates[$hostid]['rowscount'];
 					else
 						$result[$hostid]['templates'] = 0;
 				}
@@ -734,7 +734,7 @@ Copt::memoryPick();
 							if($count[$host['hostid']] > $options['limitSelects']) continue;
 						}
 
-						$result[$host['hostid']]['triggers'][] = &$trigger[$triggerid];
+						$result[$host['hostid']]['triggers'][] = &$triggers[$triggerid];
 					}
 				}
 			}
@@ -1408,12 +1408,6 @@ Copt::memoryPick();
 				$host_templateids = zbx_objectValues($host_templates, 'templateid');
 				$new_templateids = zbx_objectValues($data['templates'], 'templateid');
 
-				$result = self::massAdd(array('hosts' => $hosts, 'templates' => $new_templateids));
-				if(!$result){
-					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t link template');
-				}
-
-
 				$templates_to_del = array_diff($host_templateids, $new_templateids);
 				$templates_to_del = array_diff($templates_to_del, $cleared_templateids);
 
@@ -1422,6 +1416,11 @@ Copt::memoryPick();
 					if(!$result){
 						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t unlink template');
 					}
+				}
+				
+				$result = self::massAdd(array('hosts' => $hosts, 'templates' => $new_templateids));
+				if(!$result){
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t link template');
 				}
 			}
 // }}} UPDATE TEMPLATE LINKAGE

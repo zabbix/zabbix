@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -107,6 +107,13 @@ class CUserGroup extends CZBXAPI{
 // PERMISSION CHECK
 		if(USER_TYPE_SUPER_ADMIN == $user_type){
 
+		}
+		else if(is_null($options['editable']) && ($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN)){
+			$sql_parts['where'][] = 'g.usrgrpid IN ('.
+				' SELECT uug.usrgrpid'.
+				' FROM users_groups uug'.
+				' WHERE uug.userid='.$USER_DETAILS['userid'].
+				' )';
 		}
 		else if(!is_null($options['editable']) && ($USER_DETAILS['type']!=USER_TYPE_SUPER_ADMIN)){
 			return array();

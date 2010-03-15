@@ -2519,30 +2519,27 @@ return $result;
  *
  */
 	function get_triggers_overview($hostids,$view_style=null){
-		$available_triggers = get_accessible_triggers(PERM_READ_ONLY,$hostids);
-
 		if(is_null($view_style)) $view_style = CProfile::get('web.overview.view.style',STYLE_TOP);
 
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
 
-		$result=DBselect('SELECT DISTINCT t.triggerid,t.description,t.expression,t.value,t.priority,t.lastchange,h.hostid,h.host'.
-			' FROM hosts h,items i,triggers t, functions f '.
-			' WHERE h.status='.HOST_STATUS_MONITORED.
-				' AND h.hostid=i.hostid '.
-				' AND i.itemid=f.itemid '.
-				' AND f.triggerid=t.triggerid'.
-				' AND '.DBcondition('t.triggerid',$available_triggers).
-				' AND t.status='.TRIGGER_STATUS_ENABLED.
-				' AND i.status='.ITEM_STATUS_ACTIVE.
-			' ORDER BY t.description');
+		$options = array(
+			'hostids' => $hostids,
+			'monitored' => 1,
+			'expand_data' => 1,
+			'skipDependent' => 1,
+			'output' => API_OUTPUT_EXTEND,
+			'sortfield' => 'description'
+		);
+
+		$db_triggers = CTrigger::get($options);
+
 		unset($triggers);
 		unset($hosts);
 
 		$triggers = array();
 
-		while($row = DBfetch($result)){
-			if(trigger_dependent($row['triggerid']))	continue;
-
+		foreach($db_triggers as $tnum => $row){
 			$row['host'] = get_node_name_by_elid($row['hostid'], null, ': ').$row['host'];
 			$row['description'] = expand_trigger_description_constants($row['description'], $row);
 
@@ -2610,6 +2607,7 @@ return $result;
 
 	function get_trigger_overview_cells(&$table_row,&$trhosts,&$hostname){
 		$css_class = NULL;
+		$config = select_config();
 
 		unset($tr_ov_menu);
 		$ack = null;
@@ -2619,14 +2617,21 @@ return $result;
 			switch($trhosts[$hostname]['value']){
 				case TRIGGER_VALUE_TRUE:
 					$css_class = get_severity_style($trhosts[$hostname]['priority']);
-					if($ack = get_last_event_by_triggerid($trhosts[$hostname]['triggerid']))
-						$ack_menu = array(S_ACKNOWLEDGE, 'acknow.php?eventid='.$ack['eventid'], array('tw'=>'_blank'));
+					$ack = null;
 
-					if( 1 == $ack['acknowledged'] )
-						$ack = new CImg('images/general/tick.png','ack');
-					else
-						$ack = null;
+					if($config['event_ack_enable'] == 1){
+						$event = get_last_event_by_triggerid($trhosts[$hostname]['triggerid']);
+						if($event){
+							$ack_menu = array(
+											S_ACKNOWLEDGE,
+											'acknow.php?eventid='.$event['eventid'],
+											array('tw'=>'_blank')
+										);
 
+							if(1 == $event['acknowledged'])
+								$ack = new CImg('images/general/tick.png','ack');
+						}
+					}
 					break;
 				case TRIGGER_VALUE_FALSE:
 					$css_class = 'normal';
@@ -2657,10 +2662,11 @@ return $result;
 
 			if(isset($ack_menu)) $tr_ov_menu[] = $ack_menu;
 
-			$db_items = DBselect('select distinct i.itemid, i.description, i.key_, i.value_type '.
-				' from items i, functions f '.
-				' where f.itemid=i.itemid and f.triggerid='.$trhosts[$hostname]['triggerid']);
-
+			$sql = 'SELECT DISTINCT i.itemid, i.description, i.key_, i.value_type '.
+					' FROM items i, functions f '.
+					' WHERE f.itemid=i.itemid '.
+						' AND f.triggerid='.$trhosts[$hostname]['triggerid'];
+			$db_items = DBselect($sql);
 			while($item_data = DBfetch($db_items)){
 				$description = item_description($item_data);
 				switch($item_data['value_type']){
