@@ -245,15 +245,17 @@ sdii($screens_to_check);
 								'nodeids' => $nodeids,
 								'groupids' => $groups_to_check,
 								'editable' => $options['editable']);
-			$allowed_groups = CHostgroup::get($graph_options);
+			$allowed_groups = CHostgroup::get($group_options);
 			$allowed_groups = zbx_objectValues($allowed_groups, 'groupid');
+
 // graph
 			$graph_options = array(
 								'nodeids' => $nodeids,
 								'graphids' => $graphs_to_check,
 								'editable' => $options['editable']);
-			$allowed_graphs = CGraph::get($graph_options);
+			$allowed_graphs = CGraph::get($graph_options);		
 			$allowed_graphs = zbx_objectValues($allowed_graphs, 'graphid');
+
 // item
 			$item_options = array(
 								'nodeids' => $nodeids,
