@@ -421,8 +421,7 @@ if(!isset($DB)){
 						$e=@ocierror();
 						error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 					}
-					else if(!@OCIExecute($result,($DB['TRANSACTIONS']?OCI_DEFAULT:OCI_COMMIT_ON_SUCCESS)))
-					{
+					else if(!@OCIExecute($result,($DB['TRANSACTIONS']?OCI_DEFAULT:OCI_COMMIT_ON_SUCCESS))){
 						$e=ocierror($result);
 						error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 					}
@@ -465,12 +464,11 @@ if(!isset($DB)){
 
 			if($DB['TRANSACTIONS'] && !$result){
 				$DB['TRANSACTION_STATE'] &= $result;
-	//			SDI($query);
-	//			SDI($DB['TRANSACTION_STATE']);
 			}
 		}
 COpt::savesqlrequest(microtime(true)-$time_start,$query);
-		return $result;
+
+	return $result;
 	}
 
 	function DBexecute($query, $skip_error_messages=0){
@@ -484,15 +482,13 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 
 			switch($DB['TYPE']){
 				case 'MYSQL':
-					$result=mysql_query($query,$DB['DB']);
-
+					$result = mysql_query($query,$DB['DB']);
 					if(!$result){
 						error('Error in query ['.$query.'] ['.mysql_error().']');
 					}
 					break;
 				case 'POSTGRESQL':
 					$result = (bool) pg_query($DB['DB'],$query);
-
 					if(!$result){
 						error('Error in query ['.$query.'] ['.pg_last_error().']');
 					}
@@ -503,13 +499,11 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 						$e=@ocierror();
 						error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 					}
-					else if(!@OCIExecute($result,($DB['TRANSACTIONS']?OCI_DEFAULT:OCI_COMMIT_ON_SUCCESS)))
-					{
+					else if(!@OCIExecute($result,($DB['TRANSACTIONS']?OCI_DEFAULT:OCI_COMMIT_ON_SUCCESS))){
 						$e=ocierror($result);
 						error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 					}
-					else
-					{
+					else{
 						/* It should be here. The function must return boolen */
 						$result = true;
 					}
@@ -533,12 +527,10 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 
 			if($DB['TRANSACTIONS'] && !$result){
 				$DB['TRANSACTION_STATE'] &= $result;
-	//			SDI($query);
-	//			SDI($DB['TRANSACTION_STATE']);
 			}
 		}
 COpt::savesqlrequest(microtime(true)-$time_start,$query);
-	return $result;
+	return (bool) $result;
 	}
 
 	function DBfetch(&$cursor){

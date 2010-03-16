@@ -133,8 +133,14 @@ if(isset($_REQUEST['save_trigger'])){
 			$trigger['url'] = $_REQUEST['url'];
 
 			DBstart();
-			if($db_triggers = CTrigger::create($trigger)){
-				if($db_triggers !== false){
+			if($result = CTrigger::create($trigger)){
+				if($result !== false){
+					$options = array(
+						'triggerids' => $result['triggerids'],
+						'output' => API_OUTPUT_EXTEND
+					);
+					$db_triggers = CTrigger::get($options);
+
 					$result = true;
 					$db_triggers = reset($db_triggers);
 					$triggerid = $db_triggers['triggerid'];
