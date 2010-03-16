@@ -629,6 +629,7 @@ require_once('include/js.inc.php');
 // Status of triggers
 			$caption = '';
 			$id=0;
+
 			if(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS == $resourcetype){
 				if($resourceid > 0){
 					$options = array(
@@ -1197,10 +1198,9 @@ require_once('include/js.inc.php');
 				}
 				else if(($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_HOSTGROUP_TRIGGERS)){
 					$params = array('limit' => $elements);
-					$text = S_ALL_S;
+					$tr_form = S_ALL_S;
 
 					if($resourceid > 0){
-
 						$options = array(
 							'groupids' => $resourceid,
 							'output' => API_OUTPUT_EXTEND
@@ -1208,18 +1208,69 @@ require_once('include/js.inc.php');
 						$hostgroups = CHostgroup::get($options);
 						$hostgroup = reset($hostgroups);
 
-						$text = S_GROUP.': '.$hostgroup['name'];
+						$tr_form = S_GROUP.': '.$hostgroup['name'];
 						$params['groupid'] = $hostgroup['groupid'];
 					}
+///-----------------------
+					else{
+						$params['groupid'] = get_request('tr_groupid',CProfile::get('web.screens.tr_groupid',0));
+						$params['hostid'] = get_request('tr_hostid',CProfile::get('web.screens.tr_hostid',0));
 
-					$item = array(get_table_header(array(S_STATUS_OF_TRIGGERS_BIG,SPACE,date('[H:i:s]',time())), $text));
+						CProfile::update('web.screens.tr_groupid',$params['groupid'], PROFILE_TYPE_ID);
+						CProfile::update('web.screens.tr_hostid',$params['hostid'], PROFILE_TYPE_ID);
+
+						$tr_form = new CForm();
+
+						$cmbGroup = new CComboBox('tr_groupid',$params['groupid'],'submit()');
+						$cmbHosts = new CComboBox('tr_hostid',$params['hostid'],'submit()');
+
+						$cmbGroup->addItem(0,S_ALL_SMALL);
+						$cmbHosts->addItem(0,S_ALL_SMALL);
+
+						$options = array(
+							'monitored_hosts' => 1,
+							'output' => API_OUTPUT_EXTEND
+						);
+						$groups = CHostGroup::get($options);
+						foreach($groups as $gnum => $group){
+							$cmbGroup->addItem(
+								$group['groupid'],
+								get_node_name_by_elid($group['groupid'], null, ': ').$group['name']
+							);
+						}
+						$tr_form->addItem(array(S_GROUP.SPACE,$cmbGroup));
+
+						$options = array(
+							'monitored_hosts' => 1,
+							'output' => API_OUTPUT_EXTEND
+						);
+						if($params['groupid'] > 0)
+							$options['groupids'] = $params['groupid'];
+
+						$hosts = CHost::get($options);
+						foreach($hosts as $hnum => $host){
+							$cmbHosts->addItem(
+								$host['hostid'],
+								get_node_name_by_elid($host['hostid'], null, ': ').$host['host']
+							);
+						}
+
+						$tr_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
+
+						$item[] = make_latest_issues($params);
+
+						if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
+					}
+///-----------------------
+
+					$item = array(get_table_header(array(S_STATUS_OF_TRIGGERS_BIG,SPACE,date('[H:i:s]',time())), $tr_form));
 					$item[] = make_latest_issues($params);
 
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				else if(($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_HOST_TRIGGERS)){
 					$params = array('limit' => $elements);
-					$text = S_ALL_S;
+					$tr_form = S_ALL_S;
 
 					if($resourceid > 0){
 						$options = array(
@@ -1229,11 +1280,62 @@ require_once('include/js.inc.php');
 						$hosts = CHost::get($options);
 						$host = reset($hosts);
 
-						$text = S_HOST.': '.$host['host'];
+						$tr_form = S_HOST.': '.$host['host'];
 						$params['hostid'] = $host['hostid'];
 					}
+///-----------------------
+					else{
+						$params['groupid'] = get_request('tr_groupid',CProfile::get('web.screens.tr_groupid',0));
+						$params['hostid'] = get_request('tr_hostid',CProfile::get('web.screens.tr_hostid',0));
 
-					$item = array(get_table_header(array(S_STATUS_OF_TRIGGERS_BIG,SPACE,date('[H:i:s]',time())), $text));
+						CProfile::update('web.screens.tr_groupid',$params['groupid'], PROFILE_TYPE_ID);
+						CProfile::update('web.screens.tr_hostid',$params['hostid'], PROFILE_TYPE_ID);
+
+						$tr_form = new CForm();
+
+						$cmbGroup = new CComboBox('tr_groupid',$params['groupid'],'submit()');
+						$cmbHosts = new CComboBox('tr_hostid',$params['hostid'],'submit()');
+
+						$cmbGroup->addItem(0,S_ALL_SMALL);
+						$cmbHosts->addItem(0,S_ALL_SMALL);
+
+						$options = array(
+							'monitored_hosts' => 1,
+							'output' => API_OUTPUT_EXTEND
+						);
+						$groups = CHostGroup::get($options);
+						foreach($groups as $gnum => $group){
+							$cmbGroup->addItem(
+								$group['groupid'],
+								get_node_name_by_elid($group['groupid'], null, ': ').$group['name']
+							);
+						}
+						$tr_form->addItem(array(S_GROUP.SPACE,$cmbGroup));
+
+						$options = array(
+							'monitored_hosts' => 1,
+							'output' => API_OUTPUT_EXTEND
+						);
+						if($params['groupid'] > 0)
+							$options['groupids'] = $params['groupid'];
+
+						$hosts = CHost::get($options);
+						foreach($hosts as $hnum => $host){
+							$cmbHosts->addItem(
+								$host['hostid'],
+								get_node_name_by_elid($host['hostid'], null, ': ').$host['host']
+							);
+						}
+
+						$tr_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
+
+						$item[] = make_latest_issues($params);
+
+						if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
+					}
+///-----------------------
+
+					$item = array(get_table_header(array(S_STATUS_OF_TRIGGERS_BIG,SPACE,date('[H:i:s]',time())), $tr_form));
 					$item[] = make_latest_issues($params);
 
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
