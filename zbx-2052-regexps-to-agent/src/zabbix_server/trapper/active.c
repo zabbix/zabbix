@@ -222,9 +222,9 @@ static	void	add_regexp_name(char ***regexp, int *regexp_alloc, int *regexp_num, 
 	if (i == *regexp_num) {
 		if (*regexp_num == *regexp_alloc) {
 			*regexp_alloc += 32;
-			*regexp = zbx_realloc(*regexp, *regexp_alloc);
+			*regexp = zbx_realloc(*regexp, sizeof(char *) * *regexp_alloc);
 		}
-		*regexp[*regexp_num++] = strdup(regexp_name);
+		*regexp[(*regexp_num)++] = strdup(regexp_name);
 	}
 }
 
@@ -278,7 +278,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 	if (FAIL == get_hostid_by_host(host, &hostid, error, zbx_process))
 		goto error;
 
-	regexp = zbx_malloc(regexp, regexp_alloc);
+	regexp = zbx_malloc(regexp, sizeof(char *) * regexp_alloc);
 	sql = zbx_malloc(sql, sql_alloc);
 
 	name_esc = DBdyn_escape_string(host);
