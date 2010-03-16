@@ -4,6 +4,7 @@ Changes for 1.9
 
 Changes for 1.8.2
 
+ - [ZBX-1772] changed frontend timezone to match PHP server (Aly)
  - [DEV-455] added configurable filter to "Status of triggers" screen element (Aly)
  - [DEV-454] implemented screen export (Aly)
  - [ZBX-2144] fixed internal and aggregate checks for hosts monitored by a proxy (asaveljevs)
