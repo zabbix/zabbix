@@ -352,6 +352,7 @@ class zbxXML{
 
 				$text .= trim($error->message) . ' [ Line: '.$error->line.' | Column: '.$error->column.' ]';
 				error($text);
+				break;
 			}
 
 			libxml_clear_errors();
