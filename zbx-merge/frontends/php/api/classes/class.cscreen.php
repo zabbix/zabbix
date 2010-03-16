@@ -575,6 +575,7 @@ SDI('/////////////////////////////////');
 				throw new APIException(ZBX_API_ERROR_PERMISSIONS, 'No permisssions for screen update');
 			}
 
+			$upd_screens[$screen['screenid']]['screenitems'] = array();
 			$screenids[] = $screen['screenid'];
 		}
 
