@@ -395,8 +395,7 @@ class CMaintenance extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_maintenances = self::get(array('maintenanceids'=>$maintenanceids, 'extendoutput'=>1));
-			return $new_maintenances;
+			return array('maintenanceids'=>$maintenanceids);
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
@@ -424,10 +423,13 @@ class CMaintenance extends CZBXAPI{
 		$result = false;
 //------
 
-		$upd_maintenances = self::get(array('maintenanceids'=>zbx_objectValues($maintenances, 'maintenanceid'),
-											'editable'=>1,
-											'extendoutput'=>1,
-											'preservekeys'=>1));
+		$options = array(
+			'maintenanceids'=>zbx_objectValues($maintenances, 'maintenanceid'),
+			'editable'=>1,
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$upd_maintenances = self::get($options);
 		foreach($maintenances as $snum => $maintenance){
 			if(!isset($upd_maintenances[$maintenance['maintenanceid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -447,8 +449,7 @@ class CMaintenance extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_maintenances = self::get(array('maintenanceids'=>$maintenanceids, 'extendoutput'=>1));
-			return $upd_maintenances;
+			return array('maintenanceids'=>$maintenanceids);
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
@@ -475,10 +476,13 @@ class CMaintenance extends CZBXAPI{
 		$result = false;
 //------
 
-		$del_maintenances = self::get(array('maintenanceids'=>zbx_objectValues($maintenances, 'maintenanceid'),
-											'editable'=>1,
-											'extendoutput'=>1,
-											'preservekeys'=>1));
+		$options = array(
+			'maintenanceids'=>zbx_objectValues($maintenances, 'maintenanceid'),
+			'editable'=>1,
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$del_maintenances = self::get($options);
 		foreach($maintenances as $snum => $maintenance){
 			if(!isset($del_maintenances[$maintenance['maintenanceid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -498,7 +502,7 @@ class CMaintenance extends CZBXAPI{
 		}
 
 		if($result){
-			return zbx_cleanHashes($del_maintenances);
+			return array('maintenanceids'=>$maintenanceids);
 		}
 		else{
 			self::setError(__METHOD__);

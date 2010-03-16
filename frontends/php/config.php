@@ -506,7 +506,7 @@ include_once('include/page_header.php');
 			}
 			else{
 				$macro = array('macro' => $macro_new, 'value' => $value_new);
-				$result = CUserMacro::addGlobal($macro);
+				$result = CUserMacro::createGlobal($macro);
 			}
 
 

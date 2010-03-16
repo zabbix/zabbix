@@ -85,14 +85,13 @@ require_once('include/httptest.inc.php');
 	}
 
 	function add_host_group($name, $hosts=array()){
-		$group = CHostGroup::create(array('name' => $name));
-		if(!$group){
+		$result = CHostGroup::create(array('name' => $name));
+		if(!$result){
 			error(CHostgroup::resetErrors());
 			return false;
 		}
 
-		$group = reset($group);
-		$groupid = $group['groupid'];
+		$groupid = reset($result['groupids']);
 
 		add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $groupid, $name, 'groups', NULL, NULL);
 
@@ -284,9 +283,16 @@ require_once('include/httptest.inc.php');
 			info(S_ADDED_NEW_HOST.'['.$host.']');
 
 		if(!zbx_empty($newgroup)){
-			$newgroup = CHostGroup::create(array('name' => $newgroup));
+			$result = CHostGroup::create(array('name' => $newgroup));
 
-			if($newgroup !== false) $newgroup = reset($newgroup);
+			if($result !== false){
+				$options = array(
+					'groupids' => $result['groupids'],
+					'output' => API_OUTPUT_EXTEND
+				);
+				$newgroups = CHostGroups::get($options);
+				$newgroup = reset($newgroups);
+			}
 			else return false;
 
 			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $newgroup['groupid'], $newgroup['name'], 'groups', NULL, NULL);
@@ -378,11 +384,19 @@ require_once('include/httptest.inc.php');
 			return $result;
 
 		if(!zbx_empty($newgroup)){
-			if(!$newgroup = CHostGroup::create(array('name' => $newgroup))){
+			$result = CHostGroup::create(array('name' => $newgroup));
+			if(!$result){
 				error(CHostGroup::resetErrors());
 				return false;
 			}
-			$groups = array_merge($groups, $newgroup);
+
+			$options = array(
+				'groupids' => $result['groupids'],
+				'output' => API_OUTPUT_EXTEND
+			);
+			$newgroups = CHostGroups::get($options);
+
+			$groups = array_merge($groups, $newgroups);
 		}
 
 		$hosts = array('hostid' => $hostid);
@@ -460,10 +474,18 @@ require_once('include/httptest.inc.php');
  *
  */
 	function copy_template_elements($hostid, $templateid = null, $copy_mode = false){
+		$result = true;
 		copy_template_applications($hostid, $templateid, $copy_mode);
 		copy_template_items($hostid, $templateid, $copy_mode);
 		copy_template_triggers($hostid, $templateid, $copy_mode);
-		copy_template_graphs($hostid, $templateid, $copy_mode);
+		// razvilka $copy
+		if($copy_mode){
+			copy_template_graphs($hostid, $templateid, $copy_mode);
+		}
+		else{
+			$result = CGraph::syncTemplates(array('hostids' => $hostid, 'templateids' => $templateid));
+		}
+		return $result;
 	}
 
 /*
@@ -480,7 +502,8 @@ require_once('include/httptest.inc.php');
  */
 	function sync_host_with_templates($hostid, $templateid = null){
 		delete_template_elements($hostid, $templateid);
-		copy_template_elements($hostid, $templateid);
+		$res = copy_template_elements($hostid, $templateid);
+		return $res;
 	}
 
 	function delete_groups_by_hostid($hostids){
@@ -548,6 +571,9 @@ require_once('include/httptest.inc.php');
 		}
 
 		delete_item($del_items);
+
+// delete screen items
+		DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid',$hostids)).' AND resourcetype='.SCREEN_RESOURCE_HOST_TRIGGERS;
 
 // delete host from maps
 		delete_sysmaps_elements_with_hostid($hostids);
@@ -643,6 +669,18 @@ require_once('include/httptest.inc.php');
 			}
 			return false;
 		}
+// delete screens items
+		$resources = array(
+			SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
+			SCREEN_RESOURCE_HOSTS_INFO,
+			SCREEN_RESOURCE_TRIGGERS_INFO,
+			SCREEN_RESOURCE_TRIGGERS_OVERVIEW,
+			SCREEN_RESOURCE_DATA_OVERVIEW
+		);
+		$sql = 'DELETE FROM screens_items '.
+				' WHERE '.DBcondition('resourceid',$groupids).
+					' AND '.DBcondition('resourcetype',$resources);
+		DBexecute($sql);
 
 // delete sysmap element
 		if(!delete_sysmaps_elements_with_groupid($groupids))

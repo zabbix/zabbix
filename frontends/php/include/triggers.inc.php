@@ -444,6 +444,7 @@ return $result;
 						if(!isset($triggerParent[$trigger['templateid']]))
 							$triggerParent[$trigger['templateid']] = array();
 
+						$triggerParent[$trigger['templateid']][$trigger['triggerid']] = 1;
 						$triggerParent[$trigger['templateid']] += $triggerParent[$trigger['triggerid']];
 					}
 					else{
@@ -841,6 +842,11 @@ return $result;
 		if( !validate_trigger_dependency($expression, $deps))
 			return false;
 
+		if(CTrigger::exists(array('description' => $description, 'expression' => $expression))){
+			error('Trigger '.$description.' already exists');
+			return false;
+		}
+		
 		$triggerid=get_dbid('triggers','triggerid');
 
 		$result=DBexecute('INSERT INTO triggers '.
@@ -1935,6 +1941,37 @@ return $result;
 
 		if(!validate_expression($expression)) return false;
 		if(!validate_trigger_dependency($expression, $deps)) return false;
+		
+		
+		if(CTrigger::exists(array('description' => $description, 'expression' => $expression))){
+			preg_match('/^{(.+?):/u', $expression, $host);
+
+			$options = array(
+				'filter' => array('description' => $description, 'host' => $host[1]),
+				'output' => API_OUTPUT_EXTEND,
+				'editable' => 1,
+			);
+			$triggers_exist = CTrigger::get($options);
+			
+			$trigger_exist = false;
+			foreach($triggers_exist as $tnum => $tr){
+				$tmp_exp = explode_exp($tr['expression'], false);
+				if(strcmp($tmp_exp, $expression) == 0){
+					$trigger_exist = $tr;
+					break;
+				}
+			}
+
+			if($trigger_exist && ($trigger_exist['triggerid'] != $trigger['triggerid'])){
+				error('Trigger [ '.$trigger['description'].' ] already exists');
+				return false;
+			}
+			else if(!$trigger_exist){
+				error('No Permissions');
+				return false;
+			}
+		}
+		
 
 		$exp_hosts 	= get_hosts_by_expression($expression);
 
@@ -3588,10 +3625,11 @@ return $result;
 				$expr = str_replace($src['host'].':', $dest['host'].':', $expr);
 				$trigger['expression'] = $expr;
 				
-				$newtriggerid = CTrigger::create($trigger);
-				if(!$newtriggerid) throw new Exception();
-				
-				$hash[$trigger['triggerid']] = $newtriggerid[0]['triggerid'];
+				$result = CTrigger::create($trigger);
+
+				if(!$result) throw new Exception();
+
+				$hash[$trigger['triggerid']] = reset($result['triggerids']);
 			}
 
 			foreach($triggers as $trigger){
