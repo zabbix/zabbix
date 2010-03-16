@@ -740,8 +740,7 @@ class CUser extends CZBXAPI{
 		}
 		$result = self::EndTransaction($result, __METHOD__);
 		if($result){
-			$upd_users = self::get(array('userids' => $userids, 'extendoutput' => 1));
-			return $upd_users;
+			return array('userids' => $userids);
 		}
 		else{
 			self::setMethodErrors(__METHOD__, $errors);
@@ -794,10 +793,12 @@ class CUser extends CZBXAPI{
 		$users = zbx_toArray($users);
 		$userids = zbx_objectValues($users, 'userid');
 
-		$upd_users = self::get(array(
+		$options = array(
 			'userids' => zbx_objectValues($users, 'userid'),
 			'extendoutput' => 1,
-			'preservekeys' => 1));
+			'preservekeys' => 1
+		);
+		$upd_users = self::get($options);
 		foreach($users as $gnum => $user){
 			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User ['.$user['alias'].']');
 		}
@@ -928,8 +929,7 @@ class CUser extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_users = self::get(array('userids' => $userids, 'extendoutput' => 1, 'nopermissions' => 1));
-			return $upd_users;
+			return array('userids' => $userids);
 		}
 		else{
 			self::setMethodErrors(__METHOD__, $errors);
@@ -1063,10 +1063,12 @@ class CUser extends CZBXAPI{
 		$userids = array();
 		$result = true;
 
-		$del_users = self::get(array(
+		$options = array(
 			'userids'=>zbx_objectValues($users, 'userid'),
 			'extendoutput'=>1,
-			'preservekeys'=>1));
+			'preservekeys'=>1
+		);
+		$del_users = self::get($options);
 
 		foreach($del_users as $gnum => $user){
 			if(bccomp($USER_DETAILS['userid'], $user['userid']) == 0){
@@ -1095,7 +1097,7 @@ class CUser extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return zbx_cleanHashes($del_users);
+			return array('userids' => $userids);
 		}
 		else{
 			self::setMethodErrors(__METHOD__, $errors);

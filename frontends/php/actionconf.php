@@ -182,9 +182,8 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 					'operations'		=> $operations
 				);
 
-			$actions = CAction::create($action);
-
-			$result = DBend($actions);
+			$result = CAction::create($action);
+			$result = DBend($result);
 			show_messages($result,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
 		}
 

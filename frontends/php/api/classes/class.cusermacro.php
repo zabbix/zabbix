@@ -546,8 +546,7 @@ class CUserMacro extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_macros = self::get(array('hostmacroids' => $hostmacroids, 'extendoutput' => 1, 'nopermissions' => 1));
-			return $new_macros;
+			return array('hostmacroids' => $hostmacroids);
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
@@ -692,7 +691,7 @@ class CUserMacro extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return $hostmacroids;
+			return array('hostmacroids' => $hostmacroids);
 		}
 		else{
 			self::setError(__METHOD__);
@@ -713,7 +712,7 @@ class CUserMacro extends CZBXAPI{
  * @param string $macros[0..]['value']
  * @return array|boolean
  */
-	public static function addGlobal($macros){
+	public static function createGlobal($macros){
 		$macros = zbx_toArray($macros);
 		$globalmacroids = array();
 
@@ -736,8 +735,7 @@ class CUserMacro extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_macros = self::get(array('globalmacroids'=>$globalmacroids, 'extendoutput'=>1, 'nopermissions'=>1, 'globalmacro' => 1));
-			return $new_macros;
+			return array('globalmacroids'=>$globalmacroids);
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => null);
@@ -775,7 +773,7 @@ class CUserMacro extends CZBXAPI{
 		}
 
 		if($result){
-			return $globalmacroids;
+			return array('globalmacroids' => $globalmacroids);
 		}
 		else{
 			self::setError(__METHOD__);

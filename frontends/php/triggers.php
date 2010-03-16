@@ -144,7 +144,6 @@ include_once('include/page_header.php');
 		if(!check_right_on_trigger_by_expression(PERM_READ_WRITE, $_REQUEST['expression']))
 			access_deny();
 
-		$now = time();
 		$status = isset($_REQUEST['status'])?TRIGGER_STATUS_DISABLED:TRIGGER_STATUS_ENABLED;
 
 		$type = $_REQUEST['type'];
@@ -572,11 +571,16 @@ include_once('include/page_header.php');
 
 			$description = array();
 			if($trigger['templateid'] > 0){
-
-				$real_hosts = $realHosts[$triggerid];
-				$real_host = reset($real_hosts);
-				$description[] = new CLink($real_host['host'], 'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
-				$description[] = ':';
+				if(!isset($realHosts[$triggerid])){
+					$description[] = new CSpan('HOST','unknown');
+					$description[] = ':';
+				}
+				else{
+					$real_hosts = $realHosts[$triggerid];
+					$real_host = reset($real_hosts);
+					$description[] = new CLink($real_host['host'], 'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
+					$description[] = ':';
+				}
 			}
 
 			$description[] = new CLink(expandTriggerDescription($trigger), 'triggers.php?form=update&triggerid='.$triggerid);
