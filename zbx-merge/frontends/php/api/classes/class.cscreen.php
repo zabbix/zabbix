@@ -200,6 +200,7 @@ class CScreen extends CZBXAPI{
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){}
 		else if(!empty($result)){
 			$groups_to_check = array();
+			$hosts_to_check = array();
 			$graphs_to_check = array();
 			$items_to_check = array();
 			$maps_to_check = array();
@@ -217,7 +218,11 @@ class CScreen extends CZBXAPI{
 					case SCREEN_RESOURCE_TRIGGERS_INFO:
 					case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
 					case SCREEN_RESOURCE_DATA_OVERVIEW:
+					case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
 						$groups_to_check[] = $sitem['resourceid'];
+					break;
+					case SCREEN_RESOURCE_HOST_TRIGGERS:
+						$hosts_to_check[] = $sitem['resourceid'];
 					break;
 					case SCREEN_RESOURCE_GRAPH:
 						$graphs_to_check[] = $sitem['resourceid'];
@@ -247,6 +252,14 @@ sdii($screens_to_check);
 								'editable' => $options['editable']);
 			$allowed_groups = CHostgroup::get($group_options);
 			$allowed_groups = zbx_objectValues($allowed_groups, 'groupid');
+
+// host
+			$host_options = array(
+								'nodeids' => $nodeids,
+								'hostids' => $hosts_to_check,
+								'editable' => $options['editable']);
+			$allowed_hosts = CHost::get($host_options);
+			$allowed_hosts = zbx_objectValues($allowed_hosts, 'hostid');
 
 // graph
 			$graph_options = array(
@@ -280,6 +293,7 @@ sdii($screens_to_check);
 
 
 			$restr_groups = array_diff($groups_to_check, $allowed_groups);
+			$restr_hosts = array_diff($hosts_to_check, $allowed_hosts);
 			$restr_graphs = array_diff($graphs_to_check, $allowed_graphs);
 			$restr_items = array_diff($items_to_check, $allowed_items);
 			$restr_maps = array_diff($maps_to_check, $allowed_maps);
@@ -294,16 +308,29 @@ SDII($restr_maps);
 SDII($restr_screens);
 SDI('/////////////////////////////////');
 //*/
+// group
 			foreach($restr_groups as $resourceid){
 				foreach($screens_items as $screen_itemid => $screen_item){
 					if(($screen_item['resourceid'] == $resourceid) &&
-						uint_in_array($screen_item['resourcetype'], array(SCREEN_RESOURCE_HOSTS_INFO,SCREEN_RESOURCE_TRIGGERS_INFO,SCREEN_RESOURCE_TRIGGERS_OVERVIEW,SCREEN_RESOURCE_DATA_OVERVIEW))
+						uint_in_array($screen_item['resourcetype'], array(SCREEN_RESOURCE_HOSTS_INFO,SCREEN_RESOURCE_TRIGGERS_INFO,SCREEN_RESOURCE_TRIGGERS_OVERVIEW,SCREEN_RESOURCE_DATA_OVERVIEW,SCREEN_RESOURCE_HOSTGROUP_TRIGGERS))
 					){
 						unset($result[$screen_item['screenid']]);
 						unset($screens_items[$screen_itemid]);
 					}
 				}
 			}
+// host
+			foreach($restr_hosts as $resourceid){
+				foreach($screens_items as $screen_itemid => $screen_item){
+					if(($screen_item['resourceid'] == $resourceid) &&
+						uint_in_array($screen_item['resourcetype'], array(SCREEN_RESOURCE_HOST_TRIGGERS))
+					){
+						unset($result[$screen_item['screenid']]);
+						unset($screens_items[$screen_itemid]);
+					}
+				}
+			}
+// graph
 			foreach($restr_graphs as $resourceid){
 				foreach($screens_items as $screen_itemid => $screen_item){
 					if(($screen_item['resourceid'] == $resourceid) && ($screen_item['resourcetype'] == SCREEN_RESOURCE_GRAPH)){
@@ -312,6 +339,7 @@ SDI('/////////////////////////////////');
 					}
 				}
 			}
+// item
 			foreach($restr_items as $resourceid){
 				foreach($screens_items as $screen_itemid => $screen_item){
 					if(($screen_item['resourceid'] == $resourceid) &&
@@ -322,6 +350,7 @@ SDI('/////////////////////////////////');
 					}
 				}
 			}
+// map
 			foreach($restr_maps as $resourceid){
 				foreach($screens_items as $screen_itemid => $screen_item){
 					if($screen_item['resourceid'] == $resourceid && ($screen_item['resourcetype'] == SCREEN_RESOURCE_MAP)){
@@ -330,6 +359,7 @@ SDI('/////////////////////////////////');
 					}
 				}
 			}
+// screen
 			foreach($restr_screens as $resourceid){
 				foreach($screens_items as $screen_itemid => $screen_item){
 					if($screen_item['resourceid'] == $resourceid && ($screen_item['resourcetype'] == SCREEN_RESOURCE_SCREEN)){

@@ -572,6 +572,9 @@ require_once('include/httptest.inc.php');
 
 		delete_item($del_items);
 
+// delete screen items
+		DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid',$hostids)).' AND resourcetype='.SCREEN_RESOURCE_HOST_TRIGGERS;
+
 // delete host from maps
 		delete_sysmaps_elements_with_hostid($hostids);
 
@@ -666,6 +669,18 @@ require_once('include/httptest.inc.php');
 			}
 			return false;
 		}
+// delete screens items
+		$resources = array(
+			SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
+			SCREEN_RESOURCE_HOSTS_INFO,
+			SCREEN_RESOURCE_TRIGGERS_INFO,
+			SCREEN_RESOURCE_TRIGGERS_OVERVIEW,
+			SCREEN_RESOURCE_DATA_OVERVIEW
+		);
+		$sql = 'DELETE FROM screens_items '.
+				' WHERE '.DBcondition('resourceid',$groupids).
+					' AND '.DBcondition('resourcetype',$resources);
+		DBexecute($sql);
 
 // delete sysmap element
 		if(!delete_sysmaps_elements_with_groupid($groupids))
