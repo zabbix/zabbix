@@ -340,13 +340,13 @@ class zbxXML{
 
 				switch($error->level){
 					case LIBXML_ERR_WARNING:
-						$text .= 'Warning '.$error->code.': ';
+						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Warning '.$error->code.': ';
 					break;
 					case LIBXML_ERR_ERROR:
-						$text .= 'Error '.$error->code.': ';
+						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Error '.$error->code.': ';
 					break;
 					case LIBXML_ERR_FATAL:
-						$text .= 'Fatal Error '.$error->code.': ';
+						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Fatal Error '.$error->code.': ';
 					break;
 				}
 
@@ -376,7 +376,7 @@ class zbxXML{
 
 				if($exists && isset($rules['screens']['exist'])){
 					$db_screens = CScreen::getObjects(array('name' => $screen['name']));
-					if(empty($db_screens)) throw new Exception('No permisssions for screen "'.$screen['name'].'" import');
+					if(empty($db_screens)) throw new Exception(S_NO_PERMISSIONS_FOR_SCREEN.' "'.$screen['name'].'" import');
 
 					$db_screen = reset($db_screens);
 
@@ -518,7 +518,7 @@ class zbxXML{
 
 				if($exists && isset($rules['maps']['exist'])){
 					$db_maps = CMap::getObjects(array('name' => $sysmap['name']));
-					if(empty($db_maps)) throw new Exception('No permisssions for map['.$sysmap['name'].'] import');
+					if(empty($db_maps)) throw new Exception(S_NO_PERMISSIONS_FOR_MAP.' ['.$sysmap['name'].'] import');
 
 					$db_map = reset($db_maps);
 					$sysmap['sysmapid'] = $db_map['sysmapid'];

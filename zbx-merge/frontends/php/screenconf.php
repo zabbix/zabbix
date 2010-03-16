@@ -136,7 +136,7 @@ include_once('include/page_header.php');
 		DBstart();
 
 		$result = zbxXML::import($_FILES['import_file']['tmp_name']);
-		$result = zbxXML::parseScreen($rules);
+		if($result) $result = zbxXML::parseScreen($rules);
 
 		$result = DBend($result);
 		show_messages($result, S_IMPORTED.SPACE.S_SUCCESSEFULLY_SMALL, S_IMPORT.SPACE.S_FAILED_SMALL);

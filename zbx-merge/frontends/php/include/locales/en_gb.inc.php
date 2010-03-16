@@ -2072,6 +2072,9 @@
 //	Errors
 	'S_INCORRECT_DESCRIPTION'=>		'Incorrect description',
 	'S_CANT_FORMAT_TREE'=>			'Can\'t format Tree',
-	'S_NO_PERMISSION'=>			'You do not have permission to perform this operation'
+	'S_NO_PERMISSION'=>				'You do not have permission to perform this operation',
+	'S_NO_PERMISSIONS_FOR_SCREEN'=> 'No permissions for screen',
+	'S_NO_PERMISSIONS_FOR_MAP'=>	'No permissions for map',
+	'S_XML_FILE_CONTAINS_ERRORS'=>	'XML file contains errors'
 	);
 ?>
