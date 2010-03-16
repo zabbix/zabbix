@@ -213,18 +213,20 @@ out:
 	return res;
 }
 
-static	void	add_regexp_name(char ***regexp, int *regexp_alloc, int *regexp_num, const char *regexp_name)
+static void	add_regexp_name(char ***regexp, int *regexp_alloc, int *regexp_num, const char *regexp_name)
 {
-	int i = 0;
-	for (; i < *regexp_num; i++)
-		if (0 == strcmp(*regexp[i], regexp_name))
+	int	i;
+
+	for (i = 0; i < *regexp_num; i++)
+		if (0 == strcmp((*regexp)[i], regexp_name))
 			return;
+
 	if (i == *regexp_num) {
 		if (*regexp_num == *regexp_alloc) {
 			*regexp_alloc += 32;
 			*regexp = zbx_realloc(*regexp, sizeof(char *) * *regexp_alloc);
 		}
-		*regexp[(*regexp_num)++] = strdup(regexp_name);
+		(*regexp)[(*regexp_num)++] = strdup(regexp_name);
 	}
 }
 
@@ -260,7 +262,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 	DC_ITEM		dc_item;
 
 	char		**regexp = NULL;
-	int		regexp_alloc = 32;
+	int		regexp_alloc = 0;
 	int		regexp_num = 0, n;
 
 	char		*sql = NULL;
@@ -278,7 +280,6 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 	if (FAIL == get_hostid_by_host(host, &hostid, error, zbx_process))
 		goto error;
 
-	regexp = zbx_malloc(regexp, sizeof(char *) * regexp_alloc);
 	sql = zbx_malloc(sql, sql_alloc);
 
 	name_esc = DBdyn_escape_string(host);
@@ -338,7 +339,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 			/* log[filename,pattern,encoding,maxlinespersec] */
 			/* logrt[filename_format,pattern,encoding,maxlinespersec] */
 
-			if (0 != strncmp(item.key, "log[", 4) && 0 != strncmp(item.key, "logrt[", 11))
+			if (0 != strncmp(item.key, "log[", 4) && 0 != strncmp(item.key, "logrt[", 6))
 				break;
 
 			if (2 != parse_command(item.key, NULL, 0, params, MAX_STRING_LEN))
