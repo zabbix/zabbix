@@ -489,30 +489,25 @@ COpt::memoryPick();
 	return $result;
 	}
 
-	public static function checkObjects($hostgroupsData){
-		
-		$hostgroupsData = zbx_toArray($hostgroupsData);
-		
-		$result = array();
-		foreach($hostgroupsData as $hnum => $hostgroupData){
-			$options = array(
-				'filter' => $hostgroupData,
-				'output' => API_OUTPUT_SHORTEN,
-				'nopermissions' => 1
-			);
+	public static function exists($object){
+		$keyFields = array('name');
 
-			if(isset($hostgroupData['node']))
-				$options['nodeids'] = getNodeIdByNodeName($hostgroupData['node']);
-			else if(isset($hostgroupData['nodeids']))
-				$options['nodeids'] = $hostgroupData['nodeids'];
+		$options = array(
+			'filter' => zbx_array_mintersect($keyFields, $object),
+			'output' => API_OUTPUT_SHORTEN,
+			'nopermissions' => 1,
+			'limit' => 1
+		);
+		if(isset($object['node']))
+			$options['nodeids'] = getNodeIdByNodeName($object['node']);
+		else if(isset($object['nodeids']))
+			$options['nodeids'] = $object['nodeids'];
 
-			$hostgroups = self::get($options);
+		$objs = self::get($options);
 
-			$result+= $hostgroups;
-		}
-
-	return $result;
+	return !empty($objs);
 	}
+	
 /**
  * Add hostgroupGroups
  *
@@ -548,8 +543,7 @@ COpt::memoryPick();
 				break;
 			}
 
-			$group_exist = self::checkObjects(array('name' => $group['name']));
-			if(!empty($group_exist)){
+			if(self::exists(array('name' => $group['name']))){
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'HostGroup [ '.$group['name'].' ] already exists');
 				$result = false;
 				break;
@@ -565,8 +559,7 @@ COpt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_groups = self::get(array('groupids'=>$groupids, 'extendoutput'=>1, 'nopermissions'=>1));
-			return $new_groups;
+			return array('groupids' => $groupids);
 		}
 		else{
 			self::setMethodErrors(__METHOD__, $errors);
@@ -614,8 +607,14 @@ COpt::memoryPick();
 
 		self::BeginTransaction(__METHOD__);
 		foreach($groups as $num => $group){
-
-			$group_exist = self::checkObjects(array('name' => $group['name']));
+			
+			$group_exist = self::get(array(
+				'filter' => array(
+					'name' => $group['name']),
+				'output' => API_OUTPUT_SHORTEN,
+				'editable' => 1,
+				'nopermissions' => 1
+			));
 			$group_exist = reset($group_exist);
 
 			if($group_exist && ($group_exist['groupid'] != $group['groupid'])){
@@ -635,8 +634,7 @@ COpt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_groups = self::get(array('groupids'=>$groupids, 'extendoutput'=>1, 'nopermissions'=>1));
-			return $upd_groups;
+			return array('groupids' => $groupids);
 		}
 		else{
 			self::setError(__METHOD__);
@@ -661,10 +659,13 @@ COpt::memoryPick();
 		$groups = zbx_toArray($groups);
 		$groupids = array();
 
-		$del_groups = self::get(array('groupids'=>zbx_objectValues($groups, 'groupid'),
-											'editable'=>1,
-											'extendoutput'=>1,
-											'preservekeys'=>1));
+		$options = array(
+			'groupids'=>zbx_objectValues($groups, 'groupid'),
+			'editable'=>1,
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$del_groups = self::get($options);
 		foreach($groups as $gnum => $group){
 			if(!isset($del_groups[$group['groupid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -764,7 +765,7 @@ COpt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return zbx_cleanHashes($del_groups);
+			return array('groupids' => $groupids);
 		}
 		else{
 			self::setError(__METHOD__);

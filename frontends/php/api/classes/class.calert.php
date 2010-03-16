@@ -527,8 +527,7 @@ COpt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_alerts = self::get(array('alertids'=>$alertids, 'extendoutput'=>1));
-			return $upd_alerts;
+			return array('alertids'=>$alertids);
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
@@ -555,10 +554,13 @@ COpt::memoryPick();
 		$result = false;
 //------
 
-		$del_alerts = self::get(array('alertids'=>zbx_objectValues($alerts, 'alertid'),
-											'editable'=>1,
-											'extendoutput'=>1,
-											'preservekeys'=>1));
+		$options = array(
+			'alertids'=>zbx_objectValues($alerts, 'alertid'),
+			'editable'=>1,
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$del_alerts = self::get($options);
 		foreach($alerts as $snum => $alert){
 			if(!isset($del_alerts[$alert['alertid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -579,7 +581,7 @@ COpt::memoryPick();
 		}
 
 		if($result){
-			return zbx_cleanHashes($del_alerts);
+			return array('alertids'=>$alertids);
 		}
 		else{
 			self::setError(__METHOD__);

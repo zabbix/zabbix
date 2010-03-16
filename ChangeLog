@@ -1,5 +1,7 @@
 Changes for 1.8.2
 
+ - [DEV-455] added configurable filter to "Status of triggers" screen element (Aly)
+ - [DEV-454] implemented screen export (Aly)
  - [ZBX-2144] fixed internal and aggregate checks for hosts monitored by a proxy (asaveljevs)
  - [ZBX-2052] fixed sending of regexps to agents (asaveljevs,Sasha)
  - [ZBX-2129] fixed links from monitoring to configuration when All nodes are selected (Vedmak)
