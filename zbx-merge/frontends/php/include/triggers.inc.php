@@ -1214,7 +1214,7 @@ return $result;
 
 						$link = new CLink(
 									$function_data['host'].':'.$function_data['key_'],
-									'items.php?form=update&itemid='.$function_data['itemid'],
+									'items.php?form=update&itemid='.$function_data['itemid'].'&switch_node='.id2nodeid($function_data['itemid']),
 									$style
 								);
 

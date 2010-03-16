@@ -214,12 +214,14 @@ return zbx_objectValues($hosts, 'hostid');
 }
 
 function available_triggers($triggerids, $editable=null){
-	$options = array();
-	$options['triggerids'] = $triggerids;
-	$options['editable'] = $editable;
-	$options['nodes'] = get_current_nodeid(true);
+	$options = array(
+		'triggerids' => $triggerids,
+		'editable' => $editable,
+		'nodes' => get_current_nodeid(true)
+	);
 
 	$triggers = CTrigger::get($options);
+
 return zbx_objectValues($triggers, 'triggerid');
 }
 

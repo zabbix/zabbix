@@ -476,7 +476,7 @@ include_once('include/page_header.php');
 //-------*/
 			$screen_wdgt->addItem(BR());
 
-			$sql = 'SELECT s.slideshowid, s.name, s.delay, count(*) as cnt '.
+			$sql = 'SELECT s.slideshowid, s.name, s.delay, count(sl.slideshowid) as cnt '.
 					' FROM slideshows s '.
 						' LEFT JOIN slides sl ON sl.slideshowid=s.slideshowid '.
 					' WHERE '.DBin_node('s.slideshowid').

@@ -132,7 +132,7 @@ class Cscript extends CZBXAPI{
 		if(!is_null($options['groupids'])){
 			zbx_value2array($options['groupids']);
 
-			$options['groupids'][0] = 0;		// include ALL groups scripts
+			$options['groupids'][] = 0;		// include ALL groups scripts
 
 			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['scripts'] = 's.scriptid, s.groupid';

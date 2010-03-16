@@ -138,45 +138,6 @@ include_once('include/page_header.php');
 		unset($_REQUEST['triggerid']);
 		$_REQUEST['form'] = 'clone';
 	}
-	else if(isset($_REQUEST['mass_save']) && isset($_REQUEST['g_triggerid'])){
-		show_messages();
-
-		$result = false;
-
-		$visible = get_request('visible',array());
-		$_REQUEST['dependencies'] = get_request('dependencies',array());
-
-		$triggers = available_triggers($_REQUEST['g_triggerid'], 1);
-
-		DBstart();
-		foreach($triggers as $tnum => $triggerid){
-			$db_trig = get_trigger_by_triggerid($triggerid);
-			$db_trig['dependencies'] = get_trigger_dependencies_by_triggerid($triggerid);
-
-			foreach($db_trig as $key => $value){
-				if(isset($visible[$key])){
-					$db_trig[$key] = $_REQUEST[$key];
-				}
-			}
-
-			$result2=update_trigger($db_trig['triggerid'],
-				null,null,null,
-				$db_trig['priority'],null,null,null,
-				$db_trig['dependencies'],null);
-
-			$result |= $result2;
-		}
-		$result = DBend($result);
-
-		show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
-		if($result){
-			unset($_REQUEST['massupdate']);
-			unset($_REQUEST['form']);
-			$url = new CUrl();
-			$path = $url->getPath();
-			insert_js('cookie.eraseArray("'.$path.'")');
-		}
-	}
 	else if(isset($_REQUEST['save'])){
 		show_messages();
 
@@ -262,6 +223,50 @@ include_once('include/page_header.php');
 		}
 	}
 // ------- GO ---------
+	else if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['mass_save']) && isset($_REQUEST['g_triggerid'])){
+		show_messages();
+
+		$result = false;
+
+		$visible = get_request('visible',array());
+		$_REQUEST['dependencies'] = get_request('dependencies',array());
+
+		$options = array(
+			'triggerids' => $_REQUEST['g_triggerid'],
+			'select_dependencies' => 1,
+			'output' => API_OUTPUT_EXTEND,
+			'editable' => 1
+		);
+		$triggers = CTrigger::get($options);
+
+		DBstart();
+		foreach($triggers as $tnum => $db_trig){
+			foreach($db_trig as $key => $value){
+				if(isset($visible[$key])){
+					$db_trig[$key] = $_REQUEST[$key];
+				}
+			}
+
+			$result = update_trigger($db_trig['triggerid'],
+				null,null,null,
+				$db_trig['priority'],null,null,null,
+				$db_trig['dependencies'],null);
+
+			if(!$result) break;
+		}
+		$result = DBend($result);
+
+		show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
+		if($result){
+			unset($_REQUEST['massupdate']);
+			unset($_REQUEST['form']);
+			$url = new CUrl();
+			$path = $url->getPath();
+			insert_js('cookie.eraseArray("'.$path.'")');
+		}
+
+		$go_result = $result;
+	}
 	else if(str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_triggerid'])){
 
 		$options = array('extendoutput'=>1, 'editable'=>1);
@@ -302,7 +307,7 @@ include_once('include/page_header.php');
 		$go_result = DBend($go_result);
 		show_messages($go_result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
 	}
-	else if(isset($_REQUEST['copy']) && isset($_REQUEST['g_triggerid']) && ($_REQUEST['go'] == 'copy_to')){
+	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['copy']) && isset($_REQUEST['g_triggerid'])){
 		if(isset($_REQUEST['copy_targetid']) && ($_REQUEST['copy_targetid'] > 0) && isset($_REQUEST['copy_type'])){
 			if(0 == $_REQUEST['copy_type']){ /* hosts */
 				$hosts_ids = $_REQUEST['copy_targetid'];
@@ -378,6 +383,7 @@ include_once('include/page_header.php');
 		$url = new CUrl();
 		$path = $url->getPath();
 		insert_js('cookie.eraseArray("'.$path.'")');
+		$_REQUEST['go'] = 'none';
 	}
 
 ?>

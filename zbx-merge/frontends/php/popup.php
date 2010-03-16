@@ -137,7 +137,7 @@
 			break;
 	}
 
-	$page['file'] = "popup.php";
+	$page['file'] = 'popup.php';
 	$page['scripts'] = array();
 
 	define('ZBX_PAGE_NO_MENU', 1);
