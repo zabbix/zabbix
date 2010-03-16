@@ -565,7 +565,6 @@ include_once('include/page_header.php');
 
 			$description = array();
 			if($trigger['templateid'] > 0){
-
 				if(!isset($realHosts[$triggerid])){
 					$description[] = new CSpan('HOST','unknown');
 					$description[] = ':';

@@ -373,7 +373,7 @@ include_once('include/page_header.php');
 			CProfile::update('web.popup.hostid',$hostid,PROFILE_TYPE_ID);
 		}
 
-		if(str_in_array($srctbl,array('triggers','hosts'))){
+		if(str_in_array($srctbl,array('triggers','hosts','host_group'))){
 			$btnEmpty = new CButton('empty',S_EMPTY,
 				get_window_opener($dstfrm, $dstfld1, 0).
 				get_window_opener($dstfrm, $dstfld2, '').
