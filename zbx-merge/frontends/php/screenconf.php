@@ -178,7 +178,7 @@ include_once('include/page_header.php');
 					'hsize' => $_REQUEST['hsize'],
 					'vsize' => $_REQUEST['vsize']
 				);
-				$result = CScreen::create();
+				$result = CScreen::create($screen);
 				if(!$result){
 					error(CScreen::resetErrors());
 				}

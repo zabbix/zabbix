@@ -566,10 +566,16 @@ include_once('include/page_header.php');
 			$description = array();
 			if($trigger['templateid'] > 0){
 
-				$real_hosts = $realHosts[$triggerid];
-				$real_host = reset($real_hosts);
-				$description[] = new CLink($real_host['host'], 'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
-				$description[] = ':';
+				if(!isset($realHosts[$triggerid])){
+					$description[] = new CSpan('HOST','unknown');
+					$description[] = ':';
+				}
+				else{
+					$real_hosts = $realHosts[$triggerid];
+					$real_host = reset($real_hosts);
+					$description[] = new CLink($real_host['host'], 'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
+					$description[] = ':';
+				}
 			}
 
 			$description[] = new CLink(expandTriggerDescription($trigger), 'triggers.php?form=update&triggerid='.$triggerid);

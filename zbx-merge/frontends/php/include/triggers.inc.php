@@ -444,6 +444,7 @@ return $result;
 						if(!isset($triggerParent[$trigger['templateid']]))
 							$triggerParent[$trigger['templateid']] = array();
 
+						$triggerParent[$trigger['templateid']][$trigger['triggerid']] = 1;
 						$triggerParent[$trigger['templateid']] += $triggerParent[$trigger['triggerid']];
 					}
 					else{
