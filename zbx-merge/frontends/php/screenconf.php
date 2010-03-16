@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -391,7 +391,7 @@ include_once('include/page_header.php');
 			$sortfield = getPageSortField('name');
 			$sortorder = getPageSortOrder();
 			$options = array(
-				'select_screenitems' => API_OUTPUT_EXTEND,
+//				'select_screenitems' => API_OUTPUT_EXTEND,
 				'editable' => 1,
 				'output' => API_OUTPUT_EXTEND,
 				'sortfield' => $sortfield,
