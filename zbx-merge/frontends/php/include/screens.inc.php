@@ -646,7 +646,7 @@ require_once('include/js.inc.php');
 				$form->addVar('resourceid',$id);
 
 				$textfield = new CTextbox('caption',$caption,60,'yes');
-				$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=overview&srcfld1=groupid&srcfld2=name',800,450);");
+				$selectbtn = new CButton('select',S_SELECT,"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=host_group&srcfld1=groupid&srcfld2=name',800,450);");
 				$selectbtn->setAttribute('onmouseover',"javascript: this.style.cursor = 'pointer';");
 
 				$form->addRow(S_GROUP,array($textfield,SPACE,$selectbtn));
