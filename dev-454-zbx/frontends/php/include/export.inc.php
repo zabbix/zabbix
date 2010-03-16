@@ -362,7 +362,7 @@ class zbxXML{
 	public static function parseScreen($rules){
 		$importScreens = self::XMLtoArray(self::$xml);
 		if(!isset($importScreens['screens'])){
-			info(S_EXPORT_HAVE_NO_MAPS);
+			info(S_EXPORT_HAVE_NO_SCREENS);
 			return false;
 		}
 		$importScreens = $importScreens['screens'];
@@ -376,7 +376,7 @@ class zbxXML{
 
 				if($exists && isset($rules['screens']['exist'])){
 					$db_screens = CScreen::getObjects(array('name' => $screen['name']));
-					if(empty($db_screens)) throw new Exception('No permisssions for screen['.$screen['name'].'] import');
+					if(empty($db_screens)) throw new Exception('No permisssions for screen "'.$screen['name'].'" import');
 
 					$db_screen = reset($db_screens);
 

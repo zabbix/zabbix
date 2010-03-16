@@ -1155,6 +1155,7 @@
 	'S_USED_IN_EXPORTED_MAP_SMALL'=>'used in exported map',
 	'S_NO_ICON_FOR_MAP_ELEMENT'=>	'No icon for map element',
 	'S_EXPORT_HAVE_NO_MAPS'=>		'Export does not contain Zabbix maps',
+	'S_EXPORT_HAVE_NO_SCREENS'=>	'Export does not contain Zabbix screens',
 
 //	map.php
 	'S_OK_BIG'=>			'OK',
