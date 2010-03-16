@@ -58,36 +58,26 @@ class CTriggersInfo extends CTable{
 	}
 
 	public function bodyToString(){
-		$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY, get_current_nodeid(true));
-
-		foreach($available_triggers as $id => $triggerid){
-			if(trigger_dependent($triggerid))	unset($available_triggers[$id]);
-		}
-
 		$this->cleanItems();
 
 		$ok = $uncn = $info = $warn = $avg = $high = $dis = 0;
 
-		$sql_from = '';
-		$sql_where = '';
+		$options = array(
+			'monitored' => 1,
+			'skipDependent' => 1
+		);
 		if($this->groupid > 0){
-			$sql_from = ', hosts_groups hg ';
-			$sql_where = ' AND hg.groupid='.$this->groupid.
-							' AND h.hostid=hg.hostid ';
-		}
 
-		$db_priority = DBselect('SELECT t.priority,t.value,count(DISTINCT t.triggerid) as cnt '.
-						' FROM triggers t,hosts h,items i,functions f '.$sql_from.
-						' WHERE t.status='.TRIGGER_STATUS_ENABLED.
-							' AND f.itemid=i.itemid '.
-							' AND h.hostid=i.hostid '.
-//								' AND '.DBin_node('h.hostid').
-							' AND h.status='.HOST_STATUS_MONITORED.
-							' AND t.triggerid=f.triggerid '.
-							' AND i.status='.ITEM_STATUS_ACTIVE.
-							' AND '.DBcondition('t.triggerid',$available_triggers).
-							$sql_where.
-						' GROUP BY t.priority,t.value');
+			$options['groupids'] = $this->groupid;
+		}
+		$triggers = CTrigger::get($options);
+		$triggers = zbx_objectValues($triggers, 'triggerid');
+
+		$sql = 'SELECT t.priority,t.value,count(DISTINCT t.triggerid) as cnt '.
+				' FROM triggers t '.
+				' WHERE '.DBcondition('t.triggerid',$triggers).
+				' GROUP BY t.priority,t.value';
+		$db_priority = DBselect($sql);
 		while($row=DBfetch($db_priority)){
 
 			switch($row["value"]){
