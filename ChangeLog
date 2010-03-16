@@ -4,6 +4,7 @@ Changes for 1.9
 
 Changes for 1.8.2
 
+ - [ZBX-2052] fixed sending of regexps to agents (asaveljevs,Sasha)
  - [ZBX-2129] fixed links from monitoring to configuration when All nodes are selected (Vedmak)
  - [ZBX-2146] fixed error when try to view slideshow without slides (Vedmak)
  - [ZBX-2161] added permission checks for map link triggers (Vedmak)
