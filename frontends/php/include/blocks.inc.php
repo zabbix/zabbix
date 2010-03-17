@@ -735,6 +735,34 @@ function make_latest_issues($params = array()){
 
 		$host = new CSpan($trigger['host'],'link_menu pointer');
 		$host->setAttribute('onclick','javascript: '.$menus);
+		//$host = new CSpan($trigger['host'],'link_menu pointer');
+		//$host->setAttribute('onclick','javascript: '.$menus);
+
+// Maintenance {{{
+
+		$trigger_host = $triggers_hosts[$trigger['hostid']];
+
+		$text = null;
+		$style = 'link_menu';
+		if($trigger_host['maintenance_status']){
+			$style.= ' orange';
+
+			$options = array(
+				'maintenanceids' => $trigger_host['maintenanceid'],
+				'output' => API_OUTPUT_EXTEND
+			);
+			$maintenances = CMaintenance::get($options);
+			$maintenance = reset($maintenances);
+
+			$text = $maintenance['name'];
+			$text.=' ['.($trigger_host['maintenance_type'] ? S_NO_DATA_MAINTENANCE : S_NORMAL_MAINTENANCE).']';
+		}
+
+		$host = new CSpan($trigger['host'], $style.' pointer');
+		$host->setAttribute('onclick','javascript: '.$menus);
+		if(!is_null($text)) $host->setHint($text);
+
+// }}} Maintenance
 
 		$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged'.
 					' FROM events e'.
