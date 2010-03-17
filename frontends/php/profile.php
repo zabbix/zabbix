@@ -95,19 +95,20 @@ $fields=array(
 		redirect($url);
 	}
 	elseif(isset($_REQUEST['save'])){
-		$_REQUEST['password1'] = get_request('password1', null);
-		$_REQUEST['password2'] = get_request('password2', null);
-
-		if(($config['authentication_type'] != ZBX_AUTH_INTERNAL) && zbx_empty($_REQUEST['password1'])) {
-			if(($config['authentication_type'] == ZBX_AUTH_LDAP) && isset($_REQUEST['userid'])) {
-				if(GROUP_GUI_ACCESS_INTERNAL != get_user_auth($_REQUEST['userid'])) {
-//					$_REQUEST['password1'] = $_REQUEST['password2'] = 'zabbix';
-				}
-			}
-			else{
-				$_REQUEST['password1'] = $_REQUEST['password2'] = 'zabbix';
-			}
+		$config = select_config();		
+		$auth_type = isset($_REQUEST['userid']) ? get_user_system_auth($_REQUEST['userid']) : $config['authentication_type'];
+		
+		if(isset($_REQUEST['userid']) && (ZBX_AUTH_INTERNAL != $auth_type)){
+			$_REQUEST['password1'] = $_REQUEST['password2'] = null;
 		}
+		else if(!isset($_REQUEST['userid']) && (ZBX_AUTH_INTERNAL != $auth_type)){
+			$_REQUEST['password1'] = $_REQUEST['password2'] = 'zabbix';
+		}
+		else{
+			$_REQUEST['password1'] = get_request('password1', null);
+			$_REQUEST['password2'] = get_request('password2', null);
+		}
+		
 		if($_REQUEST['password1'] != $_REQUEST['password2']) {
 			show_error_message(S_CANNOT_UPDATE_USER_BOTH_PASSWORDS);
 		}
@@ -160,12 +161,10 @@ $fields=array(
 	}
 ?>
 <?php
+
 	show_table_header(S_USER_PROFILE_BIG.' : '.$USER_DETAILS['name'].' '.$USER_DETAILS['surname']);
 	echo '<br>';
 	insert_user_form($USER_DETAILS['userid'],1);
-?>
-<?php
 
 include_once ('include/page_footer.php');
-
 ?>
