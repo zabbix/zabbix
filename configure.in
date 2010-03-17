@@ -848,6 +848,20 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 
 		if test "x$found_sqlite3" = "xyes"; then
 			have_db="SQLite v3.x"
+
+			saved_CPPFLAGS="$CPPFLAGS"
+			CPPFLAGS="$CPPFLAGS $SQLITE3_CPPFLAGS $SQLITE3_LDFLAGS"
+
+			AC_MSG_CHECKING([for function sqlite3_open_v2() in sqlite3.h])
+			AC_TRY_LINK([#include <sqlite3.h>],
+				[sqlite3 *conn = 0;
+				sqlite3_open_v2("dbname", &conn, SQLITE_OPEN_READWRITE, 0);
+				],
+				AC_DEFINE(HAVE_FUNCTION_SQLITE3_OPEN_V2,1,[Define to 1 if function 'sqlite3_open_v2' exist.])
+				AC_MSG_RESULT(yes),
+				AC_MSG_RESULT(no))
+
+			CPPFLAGS="$saved_CPPFLAGS"
 		else
 			AC_MSG_ERROR([SQLite3 library not found])
 		fi
