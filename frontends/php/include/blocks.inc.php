@@ -760,7 +760,7 @@ function make_latest_issues($params = array()){
 
 		$host = new CSpan($trigger['host'], $style.' pointer');
 		$host->setAttribute('onclick','javascript: '.$menus);
-		if(!is_null($text)) $host->setHint($text);
+		if(!is_null($text)) $host->setHint($text, '', '', false);
 
 // }}} Maintenance
 
