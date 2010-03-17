@@ -105,13 +105,15 @@ static void	add_check(const char *key, const char *key_orig, int refresh, long l
 
 	for (i = 0; NULL != active_metrics[i].key; i++)
 	{
-		if (0 != strcmp(active_metrics[i].key, key))
+		if (0 != strcmp(active_metrics[i].key_orig, key_orig))
 			continue;
 
 		/* replace metric */
 		if (active_metrics[i].refresh != refresh)
+		{
 			active_metrics[i].nextcheck = 0;
-		active_metrics[i].refresh = refresh;
+			active_metrics[i].refresh = refresh;
+		}
 		active_metrics[i].status = ITEM_STATUS_ACTIVE;
 
 		return;

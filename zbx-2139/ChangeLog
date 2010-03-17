@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-2139] fixed collecting of active checks after configured with user macro (Sasha)
  - [ZBX-2179] fixed errors connected with Triggers Info screen element (Vedmak)
  - [ZBX-2184] added maintenance info to dashboard latest issues (Aly)
  - [ZBX-1772] changed frontend timezone to match PHP server (Aly)
