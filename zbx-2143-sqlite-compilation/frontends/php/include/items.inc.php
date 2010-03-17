@@ -1008,16 +1008,28 @@
 		if(!$result)	return	$result;
 //--
 
-// delete graphs
+// delete graphs		
 		$del_graphs = array();
-		$db_gitems = DBselect('SELECT DISTINCT graphid FROM graphs_items WHERE '.DBcondition('itemid',$itemids));
-		while($db_gitem = DBfetch($db_gitems)){
-			$del_graphs[$db_gitem['graphid']] = $db_gitem['graphid'];
+		$sql = 'SELECT gi.graphid'.
+			' FROM graphs_items gi'.
+			' WHERE '.DBcondition('gi.itemid', $itemids).
+				' AND NOT EXISTS ('.
+					' SELECT gii.gitemid'.
+					' FROM graphs_items gii'.
+					' WHERE gii.graphid=gi.graphid'.
+						' AND '.DBcondition('gii.itemid', $itemids, true, false).
+					' )';
+		$db_graphs = DBselect($sql);
+		while($db_graph = DBfetch($db_graphs)){
+			$del_graphs[$db_graph['graphid']] = $db_graph['graphid'];
 		}
+		
 		if(!empty($del_graphs)){
 			$result = delete_graph($del_graphs);
 			if(!$result)	return	$result;
 		}
+		
+		DBexecute('DELETE FROM graphs_items WHERE '.DBcondition('itemid', $itemids));
 //--
 
 		$result = delete_history_by_itemid($itemids, 1 /* use housekeeper */);

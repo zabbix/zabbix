@@ -146,6 +146,8 @@
 ?>
 <script type="text/javascript" src="js/prototype.js"></script>
 <script type="text/javascript" src="js/common.js"></script>
+<script type="text/javascript">	var PHP_TZ_OFFSET = <?php echo date('Z'); ?>;</script>
+<script type="text/javascript" src="js/class.cdate.js"></script>
 <script type="text/javascript" src="js/class.cookie.js"></script>
 <script type="text/javascript" src="js/class.curl.js"></script>
 <script type="text/javascript" src="js/main.js"></script>
@@ -388,7 +390,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$search_form = new CForm('search.php');
 		$search_form->setMethod('get');
 		$search_form->setAttribute('class','thin');
-		$search_form->addItem(new CDiv(array(S_SEARCH_BIG.': ', new CTextBox('search','',15))));
+		$search_form->addItem(new CDiv(array(S_SEARCH_BIG.': ', new CTextBox('search',get_request('search',''),15))));
 
 		$search_div = new CDiv($search_form);
 		$search_div->setAttribute('id','zbx_search');

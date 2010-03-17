@@ -82,9 +82,22 @@ include_once('include/page_header.php');
 
 		if(isset($_REQUEST['groupid'])){
 			DBstart();
-			$result = CHostgroup::update(array('groupid' => $_REQUEST['groupid'], 'name' => $_REQUEST['gname']));
+			$result = CHostGroup::update(array('groupid' => $_REQUEST['groupid'], 'name' => $_REQUEST['gname']));
 			if($result === false) error(CHostGroup::resetErrors());
-			if($result) $result = CHostGroup::massUpdate(array('hosts' => $hosts, 'templates' => $templates, 'groups' => $result));
+			if($result){
+				$options = array(
+					'groupids' => $result['groupids'],
+					'output' => API_OUTPUT_EXTEND
+				);
+				$groups = CHostGroup::get($options);
+
+				$data = array(
+					'hosts' => $hosts, 
+					'templates' => $templates, 
+					'groups' => $groups
+				);
+				$result = CHostGroup::massUpdate($data);
+			}
 			if($result === false) error(CHostGroup::resetErrors());
 			$result = ($result) ? true : false;
 			$result = DBend($result);
@@ -98,8 +111,22 @@ include_once('include/page_header.php');
 
 			DBstart();
 			$result = CHostgroup::create(array('name' => $_REQUEST['gname']));
+
 			if($result === false) error(CHostGroup::resetErrors());
-			if($result) $result = CHostGroup::massAdd(array('hosts' => $hosts, 'templates' => $templates, 'groups' => $result));
+			if($result){
+				$options = array(
+					'groupids' => $result['groupids'],
+					'output' => API_OUTPUT_EXTEND
+				);
+				$groups = CHostGroup::get($options);
+
+				$data = array(
+					'hosts' => $hosts, 
+					'templates' => $templates, 
+					'groups' => $groups
+				);
+				$result = CHostGroup::massAdd($data);
+			}
 			if($result === false) error(CHostGroup::resetErrors());
 			$result = ($result) ? true : false;
 			$result = DBend($result);

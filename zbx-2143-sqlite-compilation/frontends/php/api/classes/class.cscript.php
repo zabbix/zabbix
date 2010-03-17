@@ -132,7 +132,7 @@ class Cscript extends CZBXAPI{
 		if(!is_null($options['groupids'])){
 			zbx_value2array($options['groupids']);
 
-			$options['groupids'][0] = 0;		// include ALL groups scripts
+			$options['groupids'][] = 0;		// include ALL groups scripts
 
 			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['scripts'] = 's.scriptid, s.groupid';
@@ -400,8 +400,7 @@ class Cscript extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_scripts = self::get(array('scriptids'=>$scriptids, 'extendoutput'=>1));
-			return $new_scripts;
+			return array('scriptids'=>$scriptids);
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
@@ -429,10 +428,13 @@ class Cscript extends CZBXAPI{
 
 		$result = false;
 //------
-		$upd_scripts = self::get(array('scriptids'=>zbx_objectValues($scripts, 'scriptid'),
-											'editable'=>1,
-											'extendoutput'=>1,
-											'preservekeys'=>1));
+		$options = array(
+			'scriptids'=>zbx_objectValues($scripts, 'scriptid'),
+			'editable'=>1,
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$upd_scripts = self::get($options);
 		foreach($scripts as $snum => $script){
 			if(!isset($upd_scripts[$script['scriptid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -460,8 +462,7 @@ class Cscript extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_scripts = self::get(array('scriptids'=>$scriptids, 'extendoutput'=>1));
-			return $upd_scripts;
+			return array('scriptids'=>$scriptids);
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
@@ -488,10 +489,13 @@ class Cscript extends CZBXAPI{
 
 		$result = false;
 //------
-		$del_scripts = self::get(array('scriptids'=>zbx_objectValues($scripts, 'scriptid'),
-											'editable'=>1,
-											'extendoutput'=>1,
-											'preservekeys'=>1));
+		$options = array(
+			'scriptids'=>zbx_objectValues($scripts, 'scriptid'),
+			'editable'=>1,
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$del_scripts = self::get($options);
 		foreach($scripts as $snum => $script){
 			if(!isset($del_scripts[$script['scriptid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -514,7 +518,7 @@ class Cscript extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return zbx_cleanHashes($del_scripts);
+			return array('scriptids'=>$scriptids);
 		}
 		else{
 			self::setError(__METHOD__);

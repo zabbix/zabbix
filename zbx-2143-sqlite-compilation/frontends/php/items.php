@@ -194,6 +194,16 @@ include_once('include/page_header.php');
 		$hosts = CHost::get($options);
 		if(empty($hosts)) access_deny();
 	}
+	
+	if(get_request('itemid', false)){
+		$options = array(
+			'itemids' => $_REQUEST['itemid'],
+			'output' => API_OUTPUT_SHORTEN,
+			'editable' => 1
+		);
+		$item = CItem::get($options);
+		if(empty($item)) access_deny();
+	}
 ?>
 <?php
 /* AJAX */

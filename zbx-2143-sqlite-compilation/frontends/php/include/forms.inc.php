@@ -2590,6 +2590,7 @@
 
 		$frmMTrig = new CFormTable(S_TRIGGERS_MASSUPDATE, 'triggers.php');
 		$frmMTrig->addVar('massupdate',get_request('massupdate',1));
+		$frmMTrig->addVar('go',get_request('go','massupdate'));
 		$frmMTrig->setAttribute('id', 'massupdate');
 
 		$triggers = $_REQUEST['g_triggerid'];
@@ -4605,13 +4606,13 @@
 			$action = get_action_by_actionid($_REQUEST['actionid']);
 		}
 
-		$operations	= get_request("operations",array());
+		$operations	= get_request('operations', array());
 
 		if(isset($_REQUEST['actionid']) && !isset($_REQUEST['form_refresh'])){
-			$eventsource	= $action['eventsource'];
+			$eventsource = $action['eventsource'];
 		}
 		else{
-			$eventsource	= get_request('eventsource');
+			$eventsource = get_request('eventsource');
 		}
 
 		$allowed_operations = get_operations_by_eventsource($eventsource);
@@ -4684,6 +4685,7 @@
 		$cmbOpType = new CComboBox('new_operation[operationtype]', $new_operation['operationtype'],'submit()');
 		foreach($allowed_operations as $oper)
 			$cmbOpType->addItem($oper, operation_type2str($oper));
+			
 		$tblNewOperation->addRow(array(S_OPERATION_TYPE, $cmbOpType));
 
 		switch($new_operation['operationtype']){
@@ -4709,7 +4711,7 @@
 
 				$tblOper->addItem(new CVar('new_operation[objectid]', $new_operation['objectid']));
 
-				if($object_name)	$object_name = $object_name[$display_name];
+				if($object_name) $object_name = $object_name[$display_name];
 
 				$cmbObject = new CComboBox('new_operation[object]', $new_operation['object'],'submit()');
 				$cmbObject->addItem(OPERATION_OBJECT_USER,S_SINGLE_USER);
@@ -5152,6 +5154,33 @@
 		$frmMeadia->addItemToBottomRow(new CButtonCancel());
 
 	return $frmMeadia;
+	}
+
+	function import_screen_form($rules){
+
+		$form = new CFormTable(S_IMPORT, null, 'post', 'multipart/form-data');
+		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
+
+		$table = new CTable();
+		$table->setHeader(array(S_ELEMENT, S_UPDATE.SPACE.S_EXISTING, S_ADD.SPACE.S_MISSING), 'bold');
+
+		$titles = array('screens' => S_SCREEN);
+
+		foreach($titles as $key => $title){
+			$cbExist = new CCheckBox('rules['.$key.'][exist]', isset($rules[$key]['exist']));
+
+			if($key == 'template')
+				$cbMissed = null;
+			else
+				$cbMissed = new CCheckBox('rules['.$key.'][missed]', isset($rules[$key]['missed']));
+
+			$table->addRow(array($title, $cbExist, $cbMissed));
+		}
+
+		$form->addRow(S_RULES, $table);
+
+		$form->addItemToBottomRow(new CButton('import', S_IMPORT));
+		$form->show();
 	}
 
 	function insert_screen_form(){

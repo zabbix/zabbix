@@ -276,9 +276,7 @@ params: function(params_){
 check4Update: function(){
 	this.debug('check4Update');
 	
-	var dt = new Date();
-	var now = parseInt(dt.getTime()/1000);
-
+	var now = parseInt(new Date().getTime()/1000);
 
 //SDI((this._lastupdate + this._frequency)+' < '+(now + this.min_freq));
 	if(this._ready && ((this._lastupdate + this._frequency) < (now + this.min_freq))){ //

@@ -108,7 +108,7 @@
 		$pattern9 = '([a-f0-9]{1,4}:){1,7}:';
 		$pattern10 = '::';
 
-		$full = "/^($pattern1)$|^($pattern2)$|^($pattern3)$|^($pattern4)$|^($pattern5)$|^($pattern6)$|^($pattern7)$|^($pattern8)$|^($pattern9)$|^($pattern10)$/";
+		$full = "/^($pattern1)$|^($pattern2)$|^($pattern3)$|^($pattern4)$|^($pattern5)$|^($pattern6)$|^($pattern7)$|^($pattern8)$|^($pattern9)$|^($pattern10)$/i";
 
 		if(!preg_match($full, $str)) return false;
 

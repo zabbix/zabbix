@@ -169,33 +169,40 @@ include_once('include/page_header.php');
 				$_REQUEST['yaxismax']=0;
 			}
 
+			$graph = array(
+				'name' => $_REQUEST['name'],
+				'width' => $_REQUEST['width'],
+				'height' => $_REQUEST['height'],
+				'ymin_type' => $_REQUEST['ymin_type'],
+				'ymax_type' => $_REQUEST['ymax_type'],
+				'yaxismin' => $_REQUEST['yaxismin'],
+				'yaxismax' => $_REQUEST['yaxismax'],
+				'ymin_itemid' => $_REQUEST['ymin_itemid'],
+				'ymax_itemid' => $_REQUEST['ymax_itemid'],
+				'show_work_period' => (isset($_REQUEST['showworkperiod']) ? 1 : 0),
+				'show_triggers' => (isset($_REQUEST['showtriggers']) ? 1 : 0),
+				'graphtype' => $_REQUEST['graphtype'],
+				'legend' => $_REQUEST['legend'],
+				'graph3d' => $_REQUEST['graph3d'],
+				'percent_left' => $percent_left,
+				'percent_right' => $percent_right,
+				'gitems' => $items
+			);
+				
 			if(isset($_REQUEST['graphid'])){
-
-				DBstart();
-				$gr = get_graph_by_graphid($_REQUEST['graphid']);
-				update_graph_with_items($_REQUEST['graphid'],
-					$_REQUEST['name'],$_REQUEST['width'],$_REQUEST['height'],
-					$_REQUEST['ymin_type'],$_REQUEST['ymax_type'],$_REQUEST['yaxismin'],$_REQUEST['yaxismax'],
-					$_REQUEST['ymin_itemid'],$_REQUEST['ymax_itemid'],
-					$showworkperiod,$showtriggers,$_REQUEST['graphtype'],$_REQUEST['legend'],
-					$_REQUEST['graph3d'],$percent_left,$percent_right,$items, $gr['templateid']);
-				$result = DBend();
-
+				$graph['graphid'] = $_REQUEST['graphid'];
+				
+				$result = CGraph::update($graph);
+				
 				if($result){
 					add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_GRAPH,'Graph ID ['.$_REQUEST['graphid'].'] Graph ['.$_REQUEST['name'].']');
 				}
 			}
 			else{
-				DBstart();
-				add_graph_with_items($_REQUEST['name'],$_REQUEST['width'],$_REQUEST['height'],
-					$_REQUEST['ymin_type'],$_REQUEST['ymax_type'],$_REQUEST['yaxismin'],$_REQUEST['yaxismax'],
-					$_REQUEST['ymin_itemid'],$_REQUEST['ymax_itemid'],
-					$showworkperiod,$showtriggers,$_REQUEST['graphtype'],$_REQUEST['legend'],
-					$_REQUEST['graph3d'],$percent_left,$percent_right,$items);
-				$result = DBend();
+				$result = CGraph::create($graph);
 
 				if($result){
-					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,'Graph ['.$_REQUEST['name'].']');
+					add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_GRAPH, 'Graph ['.$_REQUEST['name'].']');
 				}
 			}
 			if($result){
@@ -205,7 +212,7 @@ include_once('include/page_header.php');
 		if(isset($_REQUEST['graphid'])){
 			show_messages($result, S_GRAPH_UPDATED, S_CANNOT_UPDATE_GRAPH);
 		}
-		else {
+		else{
 			show_messages($result, S_GRAPH_ADDED, S_CANNOT_ADD_GRAPH);
 		}
 	}
@@ -510,11 +517,17 @@ include_once('include/page_header.php');
 			'extendoutput' => 1,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
-			'limit' => ($config['search_limit']+1));
-		if($PAGE_HOSTS['selected'] > 0){
+			'limit' => ($config['search_limit']+1)
+		);
+
+// Filtering
+		if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
 			$options['hostids'] = $PAGE_HOSTS['selected'];
 		}
-		else if($PAGE_GROUPS['selected'] > 0){
+		else if(($PAGE_GROUPS['selected'] > 0) && !empty($PAGE_HOSTS['hostids'])){
+			$options['hostids'] = $PAGE_HOSTS['hostids'];
+		}
+		else if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
 			$options['groupids'] = $PAGE_GROUPS['selected'];
 		}
 
@@ -627,9 +640,7 @@ include_once('include/page_header.php');
 		$graphs_wdgt->addItem($form);
 		$graphs_wdgt->show();
 	}
-?>
-<?php
 
+	
 include_once('include/page_footer.php');
-
 ?>

@@ -1155,6 +1155,7 @@
 	'S_USED_IN_EXPORTED_MAP_SMALL'=>'used in exported map',
 	'S_NO_ICON_FOR_MAP_ELEMENT'=>	'No icon for map element',
 	'S_EXPORT_HAVE_NO_MAPS'=>		'Export does not contain Zabbix maps',
+	'S_EXPORT_HAVE_NO_SCREENS'=>	'Export does not contain Zabbix screens',
 
 //	map.php
 	'S_OK_BIG'=>			'OK',
@@ -1345,36 +1346,43 @@
 	'S_DELETE_SCREEN_Q'=>			'Delete screen?',
 	'S_CONFIGURATION_OF_SCREEN_BIG'=>	'CONFIGURATION OF SCREEN',
 	'S_SCREEN_CELL_CONFIGURATION'=>		'Screen cell configuration',
-	'S_RESOURCE'=>				'Resource',
+	'S_RESOURCE'=>					'Resource',
 	'S_RIGHTS_OF_RESOURCES'=>		'User rights',
 	'S_NO_RESOURCES_DEFINED'=>		'No resources defined',
-	'S_SIMPLE_GRAPH'=>			'Simple graph',
-	'S_SIMPLE_GRAPHS'=>			'Simple graphs',
+	'S_SIMPLE_GRAPH'=>				'Simple graph',
+	'S_SIMPLE_GRAPHS'=>				'Simple graphs',
 	'S_SIMPLE_GRAPH_BIG'=>			'SIMPLE GRAPH',
-	'S_GRAPH_NAME'=>			'Graph name',
-	'S_WIDTH'=>				'Width',
-	'S_HEIGHT'=>				'Height',
-	'S_CREATE_SCREEN'=>			'Create Screen',
-	'S_EDIT'=>				'Edit',
-	'S_DYNAMIC_ITEM'=>			'Dynamic item',
+	'S_GRAPH_NAME'=>				'Graph name',
+	'S_WIDTH'=>						'Width',
+	'S_HEIGHT'=>					'Height',
+	'S_CREATE_SCREEN'=>				'Create Screen',
+	'S_EDIT'=>						'Edit',
+	'S_DYNAMIC_ITEM'=>				'Dynamic item',
 	'S_DIMENSION_COLS_ROWS'=>		'Dimension (cols x rows)',
 	'S_DELETE_SELECTED_SLIDESHOWS_Q'=>	'Delete selected slideshows?',
 
-	'S_SLIDESHOWS'=>			'Slide shows',
-	'S_SLIDESHOW'=>				'Slide show',
+	'S_SLIDESHOWS'=>				'Slide shows',
+	'S_SLIDESHOW'=>					'Slide show',
 	'S_CONFIGURATION_OF_SLIDESHOWS_BIG'=>	'CONFIGURATION OF SLIDE SHOWS',
 	'S_SLIDESHOWS_BIG'=>			'SLIDE SHOWS',
 	'S_NO_SLIDESHOWS_DEFINED'=>		'No slide shows defined',
 	'S_COUNT_OF_SLIDES'=>			'Count of slides',
 	'S_NO_SLIDES_DEFINED'=>			'No slides defined',
-	'S_SLIDES'=>				'Slides',
-	'S_NEW_SLIDE'=>				'New slide',
+	'S_SLIDES'=>					'Slides',
+	'S_NEW_SLIDE'=>					'New slide',
 	'S_SHOW_TEXT_AS_HTML'=>			'Show text as HTML',
 
-	'S_WITH_ID_SMALL'=>			'with ID',
+	'S_WITH_ID_SMALL'=>				'with ID',
+	'S_IMPORT_SCREEN'=>				'Import screen',
+
+	'S_CANNOT_FIND_GRAPH'=>			'Cannot find graph',
+	'S_CANNOT_FIND_ITEM'=>			'Cannot find item',
+	'S_CANNOT_FIND_SCREEN'=>		'Cannot find screen',
+	'S_USED_IN_EXPORTED_SCREEN_SMALL'=>'used in exported screen',
+	'S_EXPORT_HAVE_NO_SCREENS'=>	'Export does not contain Zabbix screens',
 
 //	screenedit.php
-	'S_MAP'=>				'Map',
+	'S_MAP'=>					'Map',
 	'S_AS_PLAIN_TEXT'=>			'As plain text',
 	'S_PLAIN_TEXT'=>			'Plain text',
 	'S_PLAIN_TEXT_BIG'=>			'PLAINT TEXT',
@@ -1542,12 +1550,14 @@
 	'S_TRIGGER_COMMENTS_BIG'=>		'TRIGGER COMMENTS',
 	'S_COMMENT_UPDATED'=>			'Comment updated',
 	'S_CANNOT_UPDATE_COMMENT'=>		'Cannot update comment',
-	'S_ADD'=>				'Add',
+	'S_ADD'=>						'Add',
 
 //	tr_status.php
-	'S_SOUND'=>				'Sound',
-	'S_STATUS_OF_TRIGGERS'=>		'Status of triggers',
+	'S_SOUND'=>							'Sound',
+	'S_STATUS_OF_TRIGGERS'=>			'Status of triggers',
 	'S_STATUS_OF_TRIGGERS_BIG'=>		'STATUS OF TRIGGERS',
+	'S_STATUS_OF_HOSTGROUP_TRIGGERS'=>	'Status of hostgroup triggers',
+	'S_STATUS_OF_HOST_TRIGGERS'=>		'Status of host triggers',
 	'S_HIDE_ALL'=>				'Hide all',
 	'S_SHOW_ONLY_PROBLEMS'=>		'Show only problems',
 	'S_SHOW_UNACKNOWLEDGED'=>		'Show unacknowledged',
@@ -1773,6 +1783,9 @@
 
 //  applications.php
 	'S_DELETE_APPLICATION'=>	'Delete this application?',
+	'S_ACTIVATE_SELECTED_APPLICATIONS' => 'Activate selected applications?',
+	'S_DISABLE_SELECTED_APPLICATIONS' => 'Disable selected applications?',
+	'S_DELETE_SELECTED_APPLICATIONS'  => 'Delete selected applications?',
 
 // popup_media.php
 	'S_INCORRECT_TIME_PERIOD'=>	'Incorrect time period',
@@ -2059,6 +2072,9 @@
 //	Errors
 	'S_INCORRECT_DESCRIPTION'=>		'Incorrect description',
 	'S_CANT_FORMAT_TREE'=>			'Can\'t format Tree',
-	'S_NO_PERMISSION'=>			'You do not have permission to perform this operation'
+	'S_NO_PERMISSION'=>				'You do not have permission to perform this operation',
+	'S_NO_PERMISSIONS_FOR_SCREEN'=> 'No permissions for screen',
+	'S_NO_PERMISSIONS_FOR_MAP'=>	'No permissions for map',
+	'S_XML_FILE_CONTAINS_ERRORS'=>	'XML file contains errors'
 	);
 ?>
