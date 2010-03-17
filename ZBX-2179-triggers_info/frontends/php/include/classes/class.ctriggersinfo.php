@@ -60,14 +60,15 @@ class CTriggersInfo extends CTable{
 	public function bodyToString(){
 		$this->cleanItems();
 
-		$ok = $uncn = $info = $warn = $avg = $high = $dis = 0;
+		$ok = $uncn = $uncl = $info = $warn = $avg = $high = $dis = 0;
 
 		$options = array(
+			'nodeids' => $this->nodeid,
 			'monitored' => 1,
-			'skipDependent' => 1
+			'skipDependent' => 1,
+			'output' => API_OUTPUT_SHORTEN
 		);
 		if($this->groupid > 0){
-
 			$options['groupids'] = $this->groupid;
 		}
 		$triggers = CTrigger::get($options);
@@ -77,25 +78,26 @@ class CTriggersInfo extends CTable{
 				' FROM triggers t '.
 				' WHERE '.DBcondition('t.triggerid',$triggers).
 				' GROUP BY t.priority,t.value';
-		$db_priority = DBselect($sql);
-		while($row=DBfetch($db_priority)){
 
-			switch($row["value"]){
+		$db_priority = DBselect($sql);
+		while($row = DBfetch($db_priority)){
+			switch($row['value']){
 				case TRIGGER_VALUE_TRUE:
-					switch($row["priority"]){
-						case TRIGGER_SEVERITY_INFORMATION:	$info	+= $row["cnt"];	break;
-						case TRIGGER_SEVERITY_WARNING:		$warn	+= $row["cnt"];	break;
-						case TRIGGER_SEVERITY_AVERAGE:		$avg	+= $row["cnt"];	break;
-						case TRIGGER_SEVERITY_HIGH:			$high	+= $row["cnt"];	break;
-						case TRIGGER_SEVERITY_DISASTER:		$dis	+= $row["cnt"];	break;
-						default:
-							$uncn	+= $row["cnt"];	break;
+					switch($row['priority']){
+						case TRIGGER_SEVERITY_NOT_CLASSIFIED:	$uncl	+= $row['cnt'];	break;
+						case TRIGGER_SEVERITY_INFORMATION:	$info	+= $row['cnt'];	break;
+						case TRIGGER_SEVERITY_WARNING:		$warn	+= $row['cnt'];	break;
+						case TRIGGER_SEVERITY_AVERAGE:		$avg	+= $row['cnt'];	break;
+						case TRIGGER_SEVERITY_HIGH:			$high	+= $row['cnt'];	break;
+						case TRIGGER_SEVERITY_DISASTER:		$dis	+= $row['cnt'];	break;
 					}
-					break;
+				break;
 				case TRIGGER_VALUE_FALSE:
-					$ok	+= $row["cnt"];	break;
+					$ok	+= $row['cnt'];
+				break;
 				default:
-					$uncn	+= $row["cnt"];	break;
+					$uncn += $row['cnt'];
+				break;
 			}
 		}
 
@@ -113,14 +115,15 @@ class CTriggersInfo extends CTable{
 				$header_str.= S_ALL_GROUPS;
 			}
 
-			$header = new CCol($header_str,"header");
+			$header = new CCol($header_str,'header');
 			if($this->style == STYLE_HORISONTAL)
 				$header->SetColspan(7);
 			$this->addRow($header);
 		}
 
 		$trok	= new CCol($ok.SPACE.S_OK,					get_severity_style('ok',false));
-		$uncn	= new CCol($uncn.SPACE.S_NOT_CLASSIFIED,	get_severity_style(TRIGGER_SEVERITY_NOT_CLASSIFIED,$uncn));
+		$uncn	= new CCol($uncn.SPACE.S_UNKNOWN, 'unknown');
+		$uncl	= new CCol($uncl.SPACE.S_NOT_CLASSIFIED,	get_severity_style(TRIGGER_SEVERITY_NOT_CLASSIFIED,$uncl));
 		$info	= new CCol($info.SPACE.S_INFORMATION,		get_severity_style(TRIGGER_SEVERITY_INFORMATION,$info));
 		$warn	= new CCol($warn.SPACE.S_WARNING,			get_severity_style(TRIGGER_SEVERITY_WARNING,$warn));
 		$avg	= new CCol($avg.SPACE.S_AVERAGE,			get_severity_style(TRIGGER_SEVERITY_AVERAGE,$avg));
