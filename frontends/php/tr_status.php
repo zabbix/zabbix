@@ -346,6 +346,7 @@ include_once('include/page_header.php');
 		'filter' => 1,
 		'monitored' => 1,
 		'extendoutput' => 1,
+		'skipDependent' => 1,
 		'sortfield' => $sortfield,
 		'sortorder' => $sortorder,
 		'limit' => ($config['search_limit']+1)
@@ -388,8 +389,7 @@ include_once('include/page_header.php');
 		'extendoutput' => 1,
 		'select_hosts' => 1,
 		'select_items' => 1,
-		'select_dependencies' => 1,
-		'skipDependent' => 1
+		'select_dependencies' => 1
 	);
 	$triggers = CTrigger::get($options);
 	$triggers = zbx_toHash($triggers, 'triggerid');
