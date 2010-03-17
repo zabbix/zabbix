@@ -61,11 +61,11 @@
 
 	
 	if(function_exists('imagerotate')){
-		imageText($im, $font, $angle, 0, $size['height']+1, $text_color, $text);
+		imageText($im, $font, $angle, 0, $size['height'], $text_color, $text);
 		$im = imagerotate($im, 90, $transparentColor);
 	}
 	else{
-		imageText($im, $font, $angle, $size['width']+2, $size['height']+2, $text_color, $text);
+		imageText($im, $font, $angle, $size['width'], $size['height'], $text_color, $text);
 	}
 	
 	ImageAlphaBlending($im, false);
