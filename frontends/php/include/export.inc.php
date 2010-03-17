@@ -829,7 +829,7 @@ class zbxXML{
 							$current_template = CTemplate::get($options);
 							
 							if(empty($current_template)){
-								throw new APIException(1, 'No permission for host ['.$host_db['host'].']');
+								throw new APIException(1, 'No permission for Template ['.$template->nodeValue.']');
 							}
 							
 							$current_template = reset($current_template);
