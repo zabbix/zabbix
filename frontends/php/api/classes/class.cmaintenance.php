@@ -64,6 +64,7 @@ class CMaintenance extends CZBXAPI{
 			'select' => array('maintenance' => 'm.maintenanceid'),
 			'from' => array('maintenances m'),
 			'where' => array(),
+			'group' => array(),
 			'order' => array(),
 			'limit' => null);
 
@@ -78,10 +79,12 @@ class CMaintenance extends CZBXAPI{
 			'pattern'				=> '',
 
 // OutPut
+			'output'				=> API_OUTPUT_REFER,
 			'extendoutput'			=> null,
 			'select_groups'			=> null,
 			'select_hosts'			=> null,
-			'count'					=> null,
+			'countOutput'			=> null,
+			'groupCount'			=> null,
 			'preservekeys'			=> null,
 
 			'sortfield'				=> '',
@@ -91,6 +94,16 @@ class CMaintenance extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
+		if(!is_null($options['extendoutput'])){
+			$options['output'] = API_OUTPUT_EXTEND;
+
+			if(!is_null($options['select_groups'])){
+				$options['select_groups'] = API_OUTPUT_EXTEND;
+			}
+			if(!is_null($options['select_hosts'])){
+				$options['select_hosts'] = API_OUTPUT_EXTEND;
+			}
+		}
 // editable + PERMISSION CHECK
 
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
@@ -209,23 +222,25 @@ class CMaintenance extends CZBXAPI{
 		if(!is_null($options['maintenanceids'])){
 			zbx_value2array($options['maintenanceids']);
 
-			if(!is_null($options['extendoutput'])){
-				$sql_parts['select']['maintenanceid'] = 'm.maintenanceid';
-			}
-
 			$sql_parts['where'][] = DBcondition('m.maintenanceid', $options['maintenanceids']);
 		}
 
-// extendoutput
-		if(!is_null($options['extendoutput'])){
+// output
+		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['maintenance'] = 'm.*';
 		}
 
-// count
-		if(!is_null($options['count'])){
+// countOutput
+		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
+			$sql_parts['select'] = array('count(DISTINCT m.maintenanceid) as rowscount');
 
-			$sql_parts['select'] = array('count(m.maintenanceid) as rowscount');
+//groupCount
+			if(!is_null($options['groupCount'])){
+				foreach($sql_parts['group'] as $key => $fields){
+					$sql_parts['select'][$key] = $fields;
+				}
+			}
 		}
 
 // pattern
@@ -257,15 +272,18 @@ class CMaintenance extends CZBXAPI{
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
 		$sql_parts['where'] = array_unique($sql_parts['where']);
+		$sql_parts['group'] = array_unique($sql_parts['group']);
 		$sql_parts['order'] = array_unique($sql_parts['order']);
 
 		$sql_select = '';
 		$sql_from = '';
 		$sql_where = '';
+		$sql_group = '';
 		$sql_order = '';
 		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
 		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
 		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
+		if(!empty($sql_parts['group']))		$sql_where.= ' GROUP BY '.implode(',',$sql_parts['group']);
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
@@ -276,12 +294,16 @@ class CMaintenance extends CZBXAPI{
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
 		while($maintenance = DBfetch($res)){
-			if($options['count'])
-				$result = $maintenance;
+			if(!is_null($options['countOutput'])){
+				if(!is_null($options['groupCount']))
+					$result[] = $maintenance;
+				else
+					$result = $maintenance['rowscount'];
+			}
 			else{
 				$maintenanceids[$maintenance['maintenanceid']] = $maintenance['maintenanceid'];
 
-				if(is_null($options['extendoutput'])){
+				if($options['output'] == API_OUTPUT_SHORTEN){
 					$result[$maintenance['maintenanceid']] = array('maintenanceid' => $maintenance['maintenanceid']);
 				}
 				else{
@@ -311,7 +333,9 @@ class CMaintenance extends CZBXAPI{
 			}
 		}
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+
+Copt::memoryPick();
+		if(!is_null($options['countOutput'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
