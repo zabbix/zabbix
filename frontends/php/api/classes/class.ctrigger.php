@@ -257,15 +257,23 @@ class CTrigger extends CZBXAPI{
 
 // monitored
 		if(!is_null($options['monitored'])){
-			$sql_parts['from']['f'] = 'functions f';
-			$sql_parts['from']['i'] = 'items i';
-			$sql_parts['from']['h'] = 'hosts h';
-			$sql_parts['where']['ih'] = 'i.hostid=h.hostid';
-			$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
-			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
-			$sql_parts['where'][] = 'i.status='.ITEM_STATUS_ACTIVE;
+			$sql_parts['where'][] = ''.
+				' NOT EXISTS ('.
+					' SELECT ff.functionid'.
+					' FROM functions ff'.
+					' WHERE ff.triggerid=t.triggerid'.
+						' AND EXISTS ('.
+								' SELECT ii.itemid'.
+								' FROM items ii, hosts hh'.
+								' WHERE ff.itemid=ii.itemid'.
+									' AND hh.hostid=ii.hostid'.
+									' AND ('.
+										' ii.status<>'.ITEM_STATUS_ACTIVE.
+										' OR hh.status<>'.HOST_STATUS_MONITORED.
+									' )'.
+						' )'.
+				' )';
 			$sql_parts['where'][] = 't.status='.TRIGGER_STATUS_ENABLED;
-			$sql_parts['where'][] = 'h.status='.HOST_STATUS_MONITORED;
 		}
 
 // severity
