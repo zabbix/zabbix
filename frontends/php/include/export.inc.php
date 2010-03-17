@@ -786,14 +786,16 @@ class zbxXML{
 						}
 						else{
 							$result = CHostGroup::create($group);
+							if(!$result){
+								throw new APIException(1, CHostGroup::resetErrors());
+							}
+							
 							$options = array(
 								'groupids' => $result['groupids'],
 								'output' => API_OUTPUT_EXTEND
 							);
 							$new_group = CHostgroup::get($options);
-							if($new_group === false){
-								throw new APIException(1, CHostGroup::resetErrors());
-							}
+							
 							$host_db['groups'][] = reset($new_group);
 						}
 					}
@@ -854,22 +856,28 @@ class zbxXML{
 							$host_db['templateid'] = $current_host['hostid'];
 
 							$result = CTemplate::update($host_db);
+							if(!$result){
+								throw new APIException(1, CTemplate::resetErrors);
+							}
+							
 							$options = array(
 								'templateids' => $result['templateids'],
 								'output' => API_OUTPUT_EXTEND
 							);
-
 							$current_host = CTemplate::get($options);
 						}
 						else{
 							$host_db['hostid'] = $current_host['hostid'];
 
 							$result = CHost::update($host_db);
+							if(!$result){
+								throw new APIException(1, CHost::resetErrors);
+							}
+							
 							$options = array(
 								'hostids' => $result['hostids'],
 								'output' => API_OUTPUT_EXTEND
 							);
-
 							$current_host = CHost::get($options);
 						}
 						if($current_host === false){
@@ -1022,44 +1030,45 @@ class zbxXML{
 
 							if(!empty($applications_to_add)){
 								$result = CApplication::create($applications_to_add);
+								if(!$result){
+									throw new APIException(1, CApplication::resetErrors());
+								}
+								
 								$options = array(
-									'applicationids' => $applicationids,
+									'applicationids' => $result['applicationids'],
 									'output' => API_OUTPUT_EXTEND
 								);
 								$new_applications = CApplication::get($options);
 								
-								if($new_applications === false){
-									throw new APIException(1, CApplication::resetErrors());
-								}
 								$item_applications = array_merge($item_applications, $new_applications);
 							}
 // }}} ITEM APPLICATIONS
 							if($current_item && isset($rules['item']['exist'])){
 								$item_db['itemid'] = $current_item['itemid'];
 								$result = CItem::update($item_db);
+								if(!$result){
+									throw new APIException(1, CItem::resetErrors());
+								}
+								
 								$options = array(
 									'itemids' => $result['itemids'],
 									'webitems' => 1,
 									'output' => API_OUTPUT_EXTEND
 								);
-
 								$current_item = CItem::get($options);
-								if($current_item === false){
-									throw new APIException(1, CItem::resetErrors());
-								}
 							}
 							if(!$current_item && isset($rules['item']['missed'])){
 								$result = CItem::create($item_db);
+								if(!$result){
+									throw new APIException(1, CItem::resetErrors());
+								}
+								
 								$options = array(
 									'itemids' => $result['itemids'],
 									'webitems' => 1,
 									'output' => API_OUTPUT_EXTEND
 								);
-
 								$current_item = CItem::get($options);
-								if($current_item === false){
-									throw new APIException(1, CItem::resetErrors());
-								}
 							}
 
 							$r = CApplication::addItems(array(
@@ -1125,27 +1134,29 @@ class zbxXML{
 						
 						if(!empty($triggers_to_upd)){
 							$result = CTrigger::update($triggers_to_upd);
+							if(!$result){
+								throw new APIException(1, CTrigger::resetErrors());
+							}
+							
 							$options = array(
 								'triggerids' => $result['triggerids'],
 								'output' => API_OUTPUT_EXTEND
 							);
 							$r = CTrigger::get($options);
 
-							if($r === false){
-								throw new APIException(1, CTrigger::resetErrors());
-							}
 							$triggers_for_dependencies[] = array_merge($triggers_for_dependencies, $r);
 						}
-						if(!empty($triggers_to_add)){						
+						if(!empty($triggers_to_add)){
 							$result = CTrigger::create($triggers_to_add);
+							if(!$result){
+								throw new APIException(1, CTrigger::resetErrors());
+							}
+							
 							$options = array(
 								'triggerids' => $result['triggerids'],
 								'output' => API_OUTPUT_EXTEND
 							);
 							$r = CTrigger::get($options);
-							if($r === false){
-								throw new APIException(1, CTrigger::resetErrors());
-							}
 							$triggers_for_dependencies[] = array_merge($triggers_for_dependencies, $r);
 						}
 					}
