@@ -260,7 +260,7 @@
 	}
 
 	function add_node($new_nodeid,$name,$timezone,$ip,$port,$slave_history,$slave_trends,$node_type, $masterid){
-		global $ZBX_LOCMASTERID, $ZBX_LOCALNODEID;
+		global $ZBX_LOCMASTERID, $ZBX_LOCALNODEID, $ZBX_CURMASTERID;
 
 //		if(!eregi('^'.ZBX_EREG_NODE_FORMAT.'$', $name) ){
 		if(!preg_match('/^'.ZBX_PREG_NODE_FORMAT.'$/i', $name) ){
@@ -270,10 +270,8 @@
 
 		switch($node_type){
 			case ZBX_NODE_CHILD:
-				$masterid = $masterid;
 			break;
 			case ZBX_NODE_MASTER:
-				$masterid = 0;
 				if($ZBX_LOCMASTERID){
 					error(S_MASTER_NODE_ALREADY_EXISTS);
 					return false;
@@ -325,19 +323,16 @@
 
 		$node_type = detect_node_type($node_data);
 
-		if($node_type == ZBX_NODE_LOCAL)
-		{
+		if($node_type == ZBX_NODE_LOCAL){
 			error(S_UNABLE_TO_REMOVE_LOCAL_NODE);
 		}
-		else
-		{
+		else{
 			// $housekeeperid = get_dbid('housekeeper','housekeeperid');
 			$result = (
-				// DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
-					// " values ($housekeeperid,'nodes','nodeid',$nodeid)") &&
 				DBexecute('delete from nodes where nodeid='.$nodeid) &&
 				DBexecute('update nodes set masterid=0 where masterid='.$nodeid)
 				);
+			
 			error(S_DATABASE_STILL_CONTAINS_DATA_RELATED_DELETED_NODE);
 		}
 		return $result;

@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@
 /* add */
 			$audit_action = AUDIT_ACTION_ADD;
 
-			$_REQUEST['masterid'] = isset($_REQUEST['masterid']) ? $_REQUEST['masterid'] : null;
+			$_REQUEST['masterid'] = isset($_REQUEST['masterid']) ? $_REQUEST['masterid'] : 0;
 			DBstart();
 			$nodeid = add_node($_REQUEST['new_nodeid'],
 				$_REQUEST['name'], $_REQUEST['timezone'], $_REQUEST['ip'], $_REQUEST['port'],
@@ -100,17 +100,16 @@
 		DBstart();
 		$result = delete_node($_REQUEST['nodeid']);
 		$result = DBend($result);
+		
 		show_messages($result, S_NODE_DELETED, S_CANNOT_DELETE_NODE);
 
 		add_audit_if($result,AUDIT_ACTION_DELETE,AUDIT_RESOURCE_NODE,'Node ['.$node_data['name'].'] id ['.$node_data['nodeid'].']');
 		if($result){
-			unset($_REQUEST['form'],$node_data);
+			unset($_REQUEST['form'], $node_data);
 		}
 	}
 ?>
 <?php
-
-	$nodes_wdgt = new CWidget();
 
 	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST, null, null, false);
 
@@ -124,6 +123,7 @@
 		$frmForm->addItem(new CButton('form', S_NEW_NODE));
 	}
 
+	$nodes_wdgt = new CWidget();
 	$nodes_wdgt->addPageHeader(S_CONFIGURATION_OF_NODES, $frmForm);
 
 	if(ZBX_DISTRIBUTED){
@@ -240,15 +240,14 @@
 			$db_nodes = DBselect($sql);
 
 			while($node = DBfetch($db_nodes)){
-
 				$table->addRow(array(
 					$node['nodeid'],
 					array(
 						get_node_path($node['masterid']),
-						new CLink(($node['nodetype'] ? new CSpan($node['name'], 'bold') : $node['name']), '?&form=update&nodeid='.$node['nodeid'])),
-					new CSpan('GMT'.sprintf('%+03d:00', $node['timezone']), $node['nodetype'] ? 'bold' : null),
-					new CSpan($node['ip'].':'.$node['port'],
-					$node['nodetype'] ? 'bold' : null)
+						new CLink(($node['nodetype'] ? new CSpan($node['name'], 'bold') : $node['name']), '?&form=update&nodeid='.$node['nodeid'])
+					),
+					new CSpan('GMT'.sprintf('%+03d:00', $node['timezone']), ($node['nodetype'] ? 'bold' : null)),
+					new CSpan($node['ip'].':'.$node['port'], ($node['nodetype'] ? 'bold' : null))
 				));
 			}
 
@@ -261,8 +260,7 @@
 	}
 
 	$nodes_wdgt->show();
-?>
-<?php
 
+	
 include_once('include/page_footer.php');
 ?>
