@@ -74,7 +74,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	int		ret = FAIL;
 	zbx_sock_t	s;
 	int		e;
-	char		c[MAX_STRING_LEN], *cp = NULL, c_base64[ZBX_MAX_B64_LEN];
+	char		c[MAX_STRING_LEN], *cp = NULL, *pc_base64;
 
 	char		str_time[MAX_STRING_LEN];
 	struct		tm *local_time = NULL;
@@ -193,16 +193,18 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	cp = string_replace(mailsubject, "\r\n", "\n");
 	mailsubject = string_replace(cp, "\n", "\r\n");
 	zbx_free(cp);
-	str_base64_encode((const char *)mailsubject, c_base64, strlen(mailsubject));
+	str_base64_encode_dyn((const char *)mailsubject, &pc_base64, strlen(mailsubject));
 	zbx_free(mailsubject);
-	mailsubject = strdup(c_base64);
+	mailsubject = pc_base64;
+	pc_base64 = NULL;
 
 	cp = string_replace(mailbody, "\r\n", "\n");
 	mailbody = string_replace(cp, "\n", "\r\n");
 	zbx_free(cp);
-	str_base64_encode((const char *)mailbody, c_base64, strlen(mailbody));
+	str_base64_encode_dyn((const char *)mailbody, &pc_base64, strlen(mailbody));
 	zbx_free(mailbody);
-	mailbody = strdup(c_base64);
+	mailbody = pc_base64;
+	pc_base64 = NULL;
 
 	memset(c,0,MAX_STRING_LEN);
 	time(&email_time);
