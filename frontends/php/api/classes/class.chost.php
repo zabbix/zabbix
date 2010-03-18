@@ -635,9 +635,8 @@ Copt::memoryPick();
 
 				if(!is_null($options['limitSelects'])) order_result($templates, 'host');
 				foreach($templates as $templateid => $template){
-					$thosts = $template['hosts'];
-					unset($template['hosts']);
-					foreach($thosts as $hnum => $host){
+					unset($templates[$templateid]['hosts']);
+					foreach($template['hosts'] as $hnum => $host){
 						if(!is_null($options['limitSelects'])){
 							if(!isset($count[$host['hostid']])) $count[$host['hostid']] = 0;
 							$count[$host['hostid']]++;
@@ -679,9 +678,8 @@ Copt::memoryPick();
 
 				if(!is_null($options['limitSelects'])) order_result($items, 'description');
 				foreach($items as $itemid => $item){
-					$ihosts = $item['hosts'];
-					unset($item['hosts']);
-					foreach($ihosts as $hnum => $host){
+					unset($items[$itemid]['hosts']);
+					foreach($item['hosts'] as $hnum => $host){
 						if(!is_null($options['limitSelects'])){
 							if(!isset($count[$host['hostid']])) $count[$host['hostid']] = 0;
 							$count[$host['hostid']]++;
@@ -723,10 +721,9 @@ Copt::memoryPick();
 
 				if(!is_null($options['limitSelects'])) order_result($triggers, 'description');
 				foreach($triggers as $triggerid => $trigger){
-					$thosts = $trigger['hosts'];
-					unset($trigger['hosts']);
+					unset($triggers[$triggerid]['hosts']);
 
-					foreach($thosts as $hnum => $host){
+					foreach($trigger['hosts'] as $hnum => $host){
 						if(!is_null($options['limitSelects'])){
 							if(!isset($count[$host['hostid']])) $count[$host['hostid']] = 0;
 							$count[$host['hostid']]++;
@@ -768,10 +765,9 @@ Copt::memoryPick();
 
 				if(!is_null($options['limitSelects'])) order_result($graphs, 'name');
 				foreach($graphs as $graphid => $graph){
-					$ghosts = $graph['hosts'];
-					unset($graph['hosts']);
+					unset($graph[$graphid]['hosts']);
 
-					foreach($ghosts as $hnum => $host){
+					foreach($graph['hosts'] as $hnum => $host){
 						if(!is_null($options['limitSelects'])){
 							if(!isset($count[$host['hostid']])) $count[$host['hostid']] = 0;
 							$count[$host['hostid']]++;
@@ -813,10 +809,9 @@ Copt::memoryPick();
 
 				if(!is_null($options['limitSelects'])) order_result($applications, 'name');
 				foreach($applications as $applicationid => $application){
-					$ghosts = $application['hosts'];
-					unset($application['hosts']);
+					unset($application[$applicationid]['hosts']);
 
-					foreach($ghosts as $hnum => $host){
+					foreach($application['hosts'] as $hnum => $host){
 						if(!is_null($options['limitSelects'])){
 							if(!isset($count[$host['hostid']])) $count[$host['hostid']] = 0;
 							$count[$host['hostid']]++;

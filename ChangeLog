@@ -4,6 +4,7 @@ Changes for 1.9
 
 Changes for 1.8.2
 
+ - [ZBX-2185] added view of parent template of linked template to host (Aly)
  - [ZBX-2179] fixed errors connected with Triggers Info screen element (Vedmak)
  - [ZBX-2184] added maintenance info to dashboard latest issues (Aly)
  - [ZBX-1772] changed frontend timezone to match PHP server (Aly)
