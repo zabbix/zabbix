@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,26 +19,25 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/events.inc.php');
-require_once('include/actions.inc.php');
-require_once('include/discovery.inc.php');
-require_once('include/html.inc.php');
+	require_once('include/config.inc.php');
+	require_once('include/hosts.inc.php');
+	require_once('include/events.inc.php');
+	require_once('include/actions.inc.php');
+	require_once('include/discovery.inc.php');
+	require_once('include/html.inc.php');
 
-$page['title'] = "S_LATEST_EVENTS";
-$page['file'] = 'events.php';
-$page['hist_arg'] = array('groupid','hostid');
-$page['scripts'] = array('class.calendar.js','scriptaculous.js?load=effects');
+	$page['title'] = 'S_LATEST_EVENTS';
+	$page['file'] = 'events.php';
+	$page['hist_arg'] = array('groupid','hostid');
+	$page['scripts'] = array('class.calendar.js','scriptaculous.js?load=effects,dragdrop','gtlc.js');
 
-$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-if(PAGE_TYPE_HTML == $page['type']){
-	define('ZBX_PAGE_DO_REFRESH', 1);
-}
+	if(PAGE_TYPE_HTML == $page['type']){
+		define('ZBX_PAGE_DO_REFRESH', 1);
+	}
 
-include_once('include/page_header.php');
-
+	include_once('include/page_header.php');
 ?>
 <?php
 	$allow_discovery = check_right_on_discovery(PERM_READ_ONLY);
@@ -53,17 +52,20 @@ include_once('include/page_header.php');
 		'hostid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
 		'triggerid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
 
-		'nav_time'=>		array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
-
+		'period'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'dec'=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'inc'=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'left'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'right'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'stime'=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
+		
 		'load'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
 		'fullscreen'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
-
 // filter
 		'filter_rst'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
 		'filter_set'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
 
 		'hide_unknown'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
-
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			'isset({favid})'),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
@@ -73,6 +75,7 @@ include_once('include/page_header.php');
 	$_REQUEST['source'] = get_request('source', CProfile::get('web.events.source', 0));
 
 	check_fields($fields);
+	
 //SDI($_REQUEST);
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
@@ -89,35 +92,27 @@ include_once('include/page_header.php');
 
 // FILTER
 	if(isset($_REQUEST['filter_rst'])){
-		$_REQUEST['nav_time'] = time();
 		$_REQUEST['triggerid'] = 0;
 		$_REQUEST['hide_unknown'] = 0;
 	}
 
-	$_REQUEST['nav_time'] = get_request('nav_time',CProfile::get('web.events.filter.nav_time',time()));
 	$_REQUEST['triggerid'] = get_request('triggerid',CProfile::get('web.events.filter.triggerid',0));
 	$_REQUEST['hide_unknown'] = get_request('hide_unknown',CProfile::get('web.events.filter.hide_unknown',0));
 	$hide_unknown = $_REQUEST['hide_unknown'];
 
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
-		CProfile::update('web.events.filter.nav_time',$_REQUEST['nav_time'], PROFILE_TYPE_INT);
 		CProfile::update('web.events.filter.triggerid',$_REQUEST['triggerid'], PROFILE_TYPE_ID);
 		CProfile::update('web.events.filter.hide_unknown',$hide_unknown, PROFILE_TYPE_INT);
 	}
 // --------------
 
-	validate_sort_and_sortorder('clock',ZBX_SORT_DOWN);
-
 	$source = get_request('source', EVENT_SOURCE_TRIGGERS);
 	CProfile::update('web.events.source',$source, PROFILE_TYPE_INT);
-
 ?>
 <?php
-	$source = get_request('source', EVENT_SOURCE_TRIGGERS);
 
-	$r_form = new CForm();
-	$r_form->setMethod('get');
-	$r_form->setAttribute('name','events_menu');
+	$r_form = new CForm(null, 'get');
+	$r_form->setAttribute('name', 'events_menu');
 
 	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
 //	$r_form->addVar('nav_time',$_REQUEST['nav_time']);
@@ -138,22 +133,18 @@ include_once('include/page_header.php');
 			}
 		}
 
-		$options = array('allow_all_hosts','monitored_hosts','with_items');
-		if(!$ZBX_WITH_ALL_NODES)	array_push($options,'only_current_node');
+		$options = array(
+			'allow_all_hosts' => 1,
+			'monitored_hosts' => 1,
+			'with_items' => 1
+		);
+		if(!$ZBX_WITH_ALL_NODES) $options['only_current_node'] = 1;
 
-//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
-		$params = array();
-		foreach($options as $option) $params[$option] = 1;
-
-		$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
-		$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
-//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
+		$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $options);
+		$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $options);
 		validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
-//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
 
-	    $available_groups= $PAGE_GROUPS['groupids'];
-		$available_hosts = $PAGE_HOSTS['hostids'];
-
+		
 		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
 			$triggers = CTrigger::get(array( 'triggerids' => $_REQUEST['triggerid'] ));
 			if(empty($triggers)){
@@ -162,15 +153,13 @@ include_once('include/page_header.php');
 		}
 
 		$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
-		$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
-
 		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
 			$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid, null, ': ').$name);
 		}
+		$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
 		foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
 			$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
 		}
-
 		$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
 		$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 	}
@@ -185,15 +174,12 @@ include_once('include/page_header.php');
 // Header
 	$events_wdgt = new CWidget();
 
-	$text = array(S_HISTORY_OF_EVENTS_BIG.SPACE.S_ON.SPACE,date(S_DATE_FORMAT_YMDHMS,time()));
-
 	$url = '?fullscreen='.($_REQUEST['fullscreen']?'0':'1');
-
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
 
-	$events_wdgt->addPageHeader($text,$fs_icon);
+	$events_wdgt->addPageHeader(array(S_HISTORY_OF_EVENTS_BIG.SPACE.S_ON.SPACE, date(S_DATE_FORMAT_YMDHMS,time())), $fs_icon);
 
 	$numrows = new CDiv();
 	$numrows->setAttribute('name', 'numrows');
@@ -202,27 +188,49 @@ include_once('include/page_header.php');
 	$events_wdgt->addHeader($numrows);
 //-------------
 
+	$effectiveperiod = navigation_bar_calc('web.events.timeline', true);
+	$bstime = $_REQUEST['stime'];
+	$from = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
+	$till = $from + $effectiveperiod;
+	
 	if($source == EVENT_SOURCE_DISCOVERY){
 		$options = array(
-						'source' => EVENT_SOURCE_DISCOVERY,
-						'time_from' => $_REQUEST['nav_time'],
-						'time_till' => null,
-						'extendoutput' => 1,
-						'select_hosts' => 1,
-						'select_triggers' => 1,
-						'select_items' => 1,
-						'sortfield' => 'clock',
-						'sortorder' => getPageSortOrder(),
-						'limit' => ($config['search_limit']+1)
-					);
-
+			'source' => EVENT_SOURCE_DISCOVERY,
+			'time_from' => $from,
+			'time_till' => $till,
+			'output' => API_OUTPUT_SHORTEN,
+			'sortfield' => 'eventid',
+			'sortorder' => ZBX_SORT_DOWN,
+			'limit' => ($config['search_limit']+1)
+		);
 		$dsc_events = CEvent::get($options);
 
-// PAGING UPPER && SORTING
-		order_page_result($dsc_events, 'clock', ZBX_SORT_DOWN);
+		order_result($dsc_events, 'eventid', ZBX_SORT_DOWN);
 		$paging = getPagingLine($dsc_events);
-//------
 
+// get first event for selected filters, to get starttime for timeline bar
+		unset($options['time_from']);
+		unset($options['time_till']);
+		$options['limit'] = 1;
+		$options['sortorder'] = ZBX_SORT_UP;
+		$options['output'] = API_OUTPUT_EXTEND;
+		$firstEvent = CEvent::get($options);
+		
+		$starttime = !empty($firstEvent) ? $firstEvent[0]['clock'] : time()-3600;
+
+		
+		$options = array(
+			'source' => EVENT_SOURCE_DISCOVERY,
+			'eventids' => zbx_objectValues($dsc_events,'eventid'),
+			'output' => API_OUTPUT_EXTEND,
+			'select_hosts' => API_OUTPUT_EXTEND,
+			'select_triggers' => API_OUTPUT_EXTEND,
+			'select_items' => API_OUTPUT_EXTEND,
+		);
+		$dsc_events = CEvent::get($options);
+		order_result($dsc_events, 'eventid', ZBX_SORT_DOWN);
+
+		
 		$objectids = array();
 		foreach($dsc_events as $enum => $event_data){
 			$objectids[$event_data['objectid']] = $event_data['objectid'];
@@ -251,10 +259,11 @@ include_once('include/page_header.php');
 // TABLE
 		$table = new CTableInfo(S_NO_EVENTS_FOUND);
 		$table->setHeader(array(
-				make_sorting_header(S_TIME, 'clock'),
-				S_IP,
-				S_DESCRIPTION,
-				S_STATUS));
+			S_TIME,
+			S_IP,
+			S_DESCRIPTION,
+			S_STATUS
+		));
 
 		foreach($dsc_events as $num => $event_data){
 			switch($event_data['object']){
@@ -278,7 +287,7 @@ include_once('include/page_header.php');
 					}
 
 					$event_data['description'] = S_SERVICE.': '.discovery_check_type2str($event_data['object_data']['type']).'; '.
-												S_PORT.': '.$event_data['object_data']['port'];
+						S_PORT.': '.$event_data['object_data']['port'];
 					break;
 				default:
 					continue;
@@ -292,40 +301,29 @@ include_once('include/page_header.php');
 				date('Y.M.d H:i:s',$event_data['clock']),
 				$event_data['object_data']['ip'],
 				$event_data['description'],
-				$value));
+				$value
+			));
 		}
 
 		$table = array($paging, $table, $paging);
 	}
 	else{
-
 		$table = new CTableInfo(S_NO_EVENTS_FOUND);
 		$table->setHeader(array(
-				make_sorting_header(S_TIME,'clock'),
-				is_show_all_nodes()?S_NODE:null,
-				($_REQUEST['hostid'] == 0)?S_HOST:null,
-				S_DESCRIPTION,
-				S_STATUS,
-				S_SEVERITY,
-				S_DURATION,
-				($config['event_ack_enable'])?S_ACK:NULL,
-				S_ACTIONS
-			));
-
-		$options = array(
-			'nodeids' => get_current_nodeid(),
-			'object' => EVENT_OBJECT_TRIGGER,
-			'time_from' => $_REQUEST['nav_time'],
-			'time_till' => null,
-			'extendoutput' => 1,
-			'sortfield' => 'clock',
-			'sortorder' => getPageSortOrder(),
-			'nopermissions' => 1,
-			'limit' => ($config['search_limit']+1)
-		);
+			S_TIME,
+			is_show_all_nodes()?S_NODE:null,
+			($_REQUEST['hostid'] == 0)?S_HOST:null,
+			S_DESCRIPTION,
+			S_STATUS,
+			S_SEVERITY,
+			S_DURATION,
+			($config['event_ack_enable'])?S_ACK:NULL,
+			S_ACTIONS
+		));
 
 		$trigOpt = array(
 			'nodeids' => get_current_nodeid(),
+			'output' => API_OUTPUT_SHORTEN
 		);
 		if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
 			$trigOpt['hostids'] = $PAGE_HOSTS['selected'];
@@ -336,44 +334,53 @@ include_once('include/page_header.php');
 		else if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
 			$trigOpt['groupids'] = $PAGE_GROUPS['selected'];
 		}
-
 		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
 			$trigOpt['triggerids'] = $_REQUEST['triggerid'];
 		}
-
-		if(!empty($trigOpt)){
-			$triggers = CTrigger::get($trigOpt);
-			$triggerids = zbx_objectValues($triggers, 'triggerid');
-			$options['triggerids'] = $triggerids;
-		}
-
+		$triggers = CTrigger::get($trigOpt);
+		
+		$options = array(
+			'nodeids' => get_current_nodeid(),
+			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
+			'object' => EVENT_OBJECT_TRIGGER,
+			'time_from' => $from,
+			'time_till' => $till,
+			'output' => API_OUTPUT_SHORTEN,
+			'sortfield' => 'eventid',
+			'sortorder' => ZBX_SORT_DOWN,
+			'nopermissions' => 1,
+			'limit' => ($config['search_limit']+1)
+		);
 		if($hide_unknown) $options['hide_unknown'] = 1;
 
 		$events = CEvent::get($options);
-
-// sorting & paging
-		order_page_result($events, 'eventid');
+		order_result($events, 'eventid', ZBX_SORT_DOWN);
 		$paging = getPagingLine($events);
-//------
+		
+// get first event for selected filters, to get starttime for timeline bar
+		unset($options['time_from']);
+		unset($options['time_till']);
+		$options['limit'] = 1;
+		$options['sortorder'] = ZBX_SORT_UP;
+		$options['output'] = API_OUTPUT_EXTEND;
+		$firstEvent = CEvent::get($options);
+		
+		$starttime = !empty($firstEvent) ? $firstEvent[0]['clock'] : time()-3600;
 
+		
 		$options = array(
 			'nodeids' => get_current_nodeid(),
 			'eventids' => zbx_objectValues($events,'eventid'),
-			'extendoutput' => 1,
-			'select_hosts' => 1,
-			'select_triggers' => 1,
-			'select_items' => 1,
+			'output' => API_OUTPUT_EXTEND,
+			'select_hosts' => API_OUTPUT_EXTEND,
+			'select_triggers' => API_OUTPUT_EXTEND,
+			'select_items' => API_OUTPUT_EXTEND,
 			'nopermissions' => 1
 		);
 		$events = CEvent::get($options);
-
-// sorting & paging
-		order_page_result($events, 'eventid');
-//------
+		order_result($events, 'eventid', ZBX_SORT_DOWN);
 
 		foreach($events as $enum => $event){
-			$eventid = $event['eventid'];
-
 			$trigger = reset($event['triggers']);
 
 			$event['desc'] = expand_trigger_description_by_data($trigger);
@@ -391,7 +398,6 @@ include_once('include/page_header.php');
 		}
 
 		foreach($events as $enum => $event){
-			$eventid = $event['eventid'];
 // Host
 			$host = array_pop($event['hosts']);
 
@@ -406,7 +412,6 @@ include_once('include/page_header.php');
 				$item['description'] = item_description($item);
 				$items[] = $item;
 			}
-
 
 // Actions
 			$actions = get_event_actions_status($event['eventid']);
@@ -451,56 +456,27 @@ include_once('include/page_header.php');
 /************************* FILTER **************************/
 /***********************************************************/
 
-	$filterForm = new CFormTable(null, null, 'get');//,'events.php?filter_set=1','POST',null,'sform');
-	$filterForm->setAttribute('name','zbx_filter');
-	$filterForm->setAttribute('id','zbx_filter');
-//	$filterForm->setMethod('get');
-
-	$filterForm->addVar('nav_time',$_REQUEST['nav_time']);
-
-	$script = new CJSscript("javascript: if(CLNDR['nav_time'].clndr.setSDateFromOuterObj()){".
-							"$('nav_time').value = parseInt(CLNDR['nav_time'].clndr.sdt.getTime()/1000); }"
-							);
-	$filterForm->addAction('onsubmit',$script);
-
-	$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
-	$clndr_icon->addAction('onclick',"javascript: var pos = getPosition(this); pos.top+=14; pos.left-=174; CLNDR['nav_time'].clndr.clndrshow(pos.top,pos.left);");
-	$clndr_icon->setAttribute('style','vertical-align: middle;');
-
-	$nav_clndr =  array(
-					new CNumericBox('nav_day',(($_REQUEST['nav_time']>0)?date('d',$_REQUEST['nav_time']):''),2),
-					new CNumericBox('nav_month',(($_REQUEST['nav_time']>0)?date('m',$_REQUEST['nav_time']):''),2),
-					new CNumericBox('nav_year',(($_REQUEST['nav_time']>0)?date('Y',$_REQUEST['nav_time']):''),4),
-					SPACE,
-					new CNumericBox('nav_hour',(($_REQUEST['nav_time']>0)?date('H',$_REQUEST['nav_time']):''),2),
-					':',
-					new CNumericBox('nav_minute',(($_REQUEST['nav_time']>0)?date('i',$_REQUEST['nav_time']):''),2),
-
-					$clndr_icon
-				);
-	zbx_add_post_js('create_calendar(null,["nav_day","nav_month","nav_year","nav_hour","nav_minute"],"nav_time");');
-
-	$filterForm->addRow(S_EVENTS_SINCE,$nav_clndr);
-
 	if(EVENT_SOURCE_TRIGGERS == $source){
-
+		$filterForm = new CFormTable(null, null, 'get');//,'events.php?filter_set=1','POST',null,'sform');
+		$filterForm->setAttribute('name', 'zbx_filter');
+		$filterForm->setAttribute('id', 'zbx_filter');
+	
 		$filterForm->addVar('triggerid', get_request('triggerid'));
 
 		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
 			$trigger = expand_trigger_description($_REQUEST['triggerid']);
 		}
 		else{
-			$trigger = "";
+			$trigger = '';
 		}
 
 		$row = new CRow(array(
-						new CCol(S_TRIGGER,'form_row_l'),
-						new CCol(array(
-									new CTextBox("trigger",$trigger,96,'yes'),
-									new CButton("btn1",S_SELECT,"return PopUp('popup.php?"."dstfrm=".$filterForm->GetName()."&dstfld1=triggerid&dstfld2=trigger"."&srctbl=triggers&srcfld1=triggerid&srcfld2=description&real_hosts=1');",'T')
-								),'form_row_r')
-							));
-
+			new CCol(S_TRIGGER,'form_row_l'),
+			new CCol(array(
+				new CTextBox('trigger',$trigger,96,'yes'),
+				new CButton("btn1",S_SELECT,"return PopUp('popup.php?"."dstfrm=".$filterForm->GetName()."&dstfld1=triggerid&dstfld2=trigger"."&srctbl=triggers&srcfld1=triggerid&srcfld2=description&real_hosts=1');",'T')
+			),'form_row_r')
+		));
 		$filterForm->addRow($row);
 
 		$filterForm->addVar('hide_unknown',$hide_unknown);
@@ -509,24 +485,54 @@ include_once('include/page_header.php');
 		$unkcbx->setAction('javascript: create_var("'.$filterForm->GetName().'", "hide_unknown", (this.checked?1:0), 0); ');
 
 		$filterForm->addRow(S_HIDE_UNKNOWN,$unkcbx);
+		
+		$reset = new CButton('filter_rst',S_RESET);
+		$reset->setType('button');
+		$reset->setAction('javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
+
+		$filterForm->addItemToBottomRow(new CButton('filter_set',S_FILTER));
+		$filterForm->addItemToBottomRow($reset);
+
+		$events_wdgt->addFlicker($filterForm, CProfile::get('web.events.filter.state',0));
 	}
 
-	$reset = new CButton("filter_rst",S_RESET);
-	$reset->setType('button');
-	$reset->setAction('javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
-
-	$filterForm->addItemToBottomRow(new CButton('filter_set',S_FILTER));
-	$filterForm->addItemToBottomRow($reset);
-//-------
-
-	$events_wdgt->addFlicker($filterForm, CProfile::get('web.events.filter.state',0));
 	$events_wdgt->show();
 
 	$jsmenu = new CPUMenu(null,170);
 	$jsmenu->InsertJavaScript();
-?>
-<?php
+	
+	
+// NAV BAR
+	$timeline = array(
+		'period' => $effectiveperiod,
+		'starttime' => $starttime,
+		'usertime' => null
+	);
 
+	if(isset($_REQUEST['stime'])){
+		$bstime = $_REQUEST['stime'];
+		$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
+		$timeline['usertime'] += $timeline['period'];
+	}
+
+	$dom_graph_id = 'events';
+	$objData = array(
+		'id' => 'timeline_1',
+		'domid' => $dom_graph_id,
+		'loadSBox' => 0,
+		'loadImage' => 0,
+		'loadScroll' => 1,
+		'dynamic' => 0,
+		'mainObject' => 1
+	);
+
+	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
+	zbx_add_post_js('timeControl.processObjects();');
+
+	$scroll_div = new CDiv();
+	$scroll_div->setAttribute('id','scrollbar_cntr');
+	$scroll_div->show();
+
+	
 include_once('include/page_footer.php');
-
 ?>

@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -600,7 +600,7 @@ include_once('include/page_header.php');
 		}
 		$lastchange = new CLink(
 			zbx_date2str(S_DATE_FORMAT_YMDHMS, $trigger['lastchange']),
-			'events.php?triggerid='.$trigger['triggerid'].'&nav_time='.$trigger['lastchange']
+			'events.php?triggerid='.$trigger['triggerid'].'&stime='.date('YmdHi', $trigger['lastchange'])
 		);
 
 
