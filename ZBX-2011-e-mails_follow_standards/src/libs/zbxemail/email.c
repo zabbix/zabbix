@@ -74,7 +74,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	int		ret = FAIL;
 	zbx_sock_t	s;
 	int		e;
-	char		c[MAX_STRING_LEN], *cp = NULL, *pc_base64;
+	char		c[MAX_STRING_LEN], *cp = NULL, *pc_base64 = NULL;
 
 	char		str_time[MAX_STRING_LEN];
 	struct		tm *local_time = NULL;

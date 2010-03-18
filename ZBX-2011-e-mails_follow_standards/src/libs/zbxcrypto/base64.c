@@ -213,7 +213,6 @@ void str_base64_encode(const char *p_str, char *p_b64str, int in_size)
  *----------------------------------------------------------------------*/
  void	str_base64_encode_dyn(const char *p_str, char **p_b64str, int in_size)
  {
-	char		c_block[ZBX_MAX_B64_LEN];
 	const char 	*pc;			/* for walking in the source data */
 	char		*pc_r;			/* for writing in the dest data */
 	int		c_per_block = 0;	/* number of bytes which can be encoded to place in the static buffer per time */
@@ -225,32 +224,22 @@ void str_base64_encode(const char *p_str, char *p_b64str, int in_size)
 	assert(p_b64str);
 	assert(!*p_b64str);	/* expect a pointer will NULL value, do not know whether allowed to free that memory */
 	
-	if (0 >= in_size)
-	{
-		*p_b64str = zbx_malloc(*p_b64str, 1);
-		**p_b64str = '\0';
-		return;
-	}
-	
 	*p_b64str = zbx_malloc(*p_b64str, in_size / 3 * 4 + ((in_size % 3) ? 4 + 1 : 1));
 	c_per_block = (ZBX_MAX_B64_LEN - 1) / 4 * 3;
-	c_per_block -= c_per_block % 3; /* do not produce padding ("...=...") in the middle */
 	b_per_block = c_per_block / 3 * 4;
 	
-	for ( pc = p_str, pc_r = *p_b64str; pc - p_str < in_size; pc += c_per_block )
+	for (pc = p_str, pc_r = *p_b64str; pc - p_str < in_size; pc += c_per_block)
 	{
 		left = in_size - (pc - p_str);
-		if(left > c_per_block)
+		if (left >= c_per_block)
 		{
-			str_base64_encode(pc, c_block, c_per_block);			
-			pc_r = memcpy(pc_r, c_block, b_per_block);
+			str_base64_encode(pc, pc_r, c_per_block);			
 			pc_r += b_per_block;
 		}
 		else
 		{
-			str_base64_encode(pc, c_block, left);
+			str_base64_encode(pc, pc_r, left);
 			b_cpy = left / 3 * 4 + ((left % 3) ? 4 : 0);
-			pc_r = memcpy(pc_r, c_block, b_cpy);
 			pc_r += b_cpy;
 		}
 	}
