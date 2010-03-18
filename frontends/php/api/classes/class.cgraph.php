@@ -795,10 +795,11 @@ COpt::memoryPick();
 			'output' => API_OUTPUT_SHORTEN,
 			'nopermissions' => 1,
 		));
+		$graph_template = reset($graph_template);
 		
-		if(!empty($graph_template)){
+		if($graph_template){
 			$options = array(
-				'templateids' => $graph_template[0]['templateid'],
+				'templateids' => $graph_template['templateid'],
 				'output' => array('hostid', 'host'),
 				'preservekeys' => 1,
 				'hostids' => $hostids,
