@@ -683,7 +683,6 @@ function make_latest_issues($params = array()){
 		$options['hostids'] = $params['hostid'];
 
 	$triggers = CTrigger::get($options);
-
 // GATHER HOSTS FOR SELECTED TRIGGERS {{{
 	$triggers_hosts = array();
 	foreach($triggers as $tnum => $trigger){
@@ -709,6 +708,7 @@ function make_latest_issues($params = array()){
 	foreach($triggers as $tnum => $trigger){
 // Check for dependencies
 		$host = reset($trigger['hosts']);
+
 		$trigger['hostid'] = $host['hostid'];
 		$trigger['host'] = $host['host'];
 
@@ -716,7 +716,6 @@ function make_latest_issues($params = array()){
 		$menus = '';
 
 		$host_nodeid = id2nodeid($trigger['hostid']);
-
 		foreach($scripts_by_hosts[$trigger['hostid']] as $id => $script){
 			$script_nodeid = id2nodeid($script['scriptid']);
 			if( (bccomp($host_nodeid ,$script_nodeid ) == 0))
