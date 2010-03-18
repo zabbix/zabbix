@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ require_once('include/blocks.inc.php');
 $page['title'] = "S_DASHBOARD";
 $page['file'] = 'dashboard.php';
 $page['hist_arg'] = array();
-$page['scripts'] = array('class.pmaster.js','scriptaculous.js?load=effects');
+$page['scripts'] = array('class.pmaster.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 

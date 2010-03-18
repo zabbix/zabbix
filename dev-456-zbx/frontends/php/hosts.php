@@ -501,18 +501,21 @@ include_once('include/page_header.php');
 // -------- GO ---------------
 // DELETE HOST
 	else if($_REQUEST['go'] == 'delete'){
-		$hosts = get_request('hosts', array());
-		$hosts = zbx_toObject($hosts,'hostid');
+		$hostids = get_request('hosts', array());
+		$hosts = zbx_toObject($hostids,'hostid');
 
-		$go_result = true;
 		DBstart();
-		foreach($hosts as $num => $host){
-			$go_result = CHost::delete($host);
+		$options = array(
+			'hostids' => $hostids,
+			'output' => array('hostid', 'host')
+		);
+		$delHosts = CHost::get($options);
 
-			if(!$go_result) break;
-			$go_result = reset($go_result);
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$go_result['host'].']');
+		$go_result = CHost::delete($hosts);
+		foreach($delHosts as $hnum => $host){
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$host['host'].']');
 		}
+
 		$go_result = DBend($go_result);
 
 		if(!$go_result){
