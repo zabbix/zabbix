@@ -108,6 +108,14 @@ static void	add_check(const char *key, const char *key_orig, int refresh, long l
 		if (0 != strcmp(active_metrics[i].key_orig, key_orig))
 			continue;
 
+		if (0 != strcmp(active_metrics[i].key, key))
+		{
+			zbx_free(active_metrics[i].key);
+			active_metrics[i].key		= strdup(key);
+			active_metrics[i].lastlogsize	= lastlogsize;
+			active_metrics[i].mtime		= mtime;
+		}
+
 		/* replace metric */
 		if (active_metrics[i].refresh != refresh)
 		{
