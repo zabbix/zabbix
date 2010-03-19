@@ -237,10 +237,11 @@
 	}
 
 	function detect_node_type($node_data){
-		global $ZBX_CURMASTERID;
+		global $ZBX_CURMASTERID, $ZBX_LOCALNODEID;
 
-		if(bccomp($node_data['nodeid'],get_current_nodeid(false)) == 0)		$node_type = ZBX_NODE_LOCAL;
-		else if(bccomp($node_data['nodeid'] ,$ZBX_CURMASTERID)==0)		$node_type = ZBX_NODE_MASTER;
+		if(bccomp($node_data['nodeid'],$ZBX_LOCALNODEID) == 0)		$node_type = ZBX_NODE_LOCAL;
+		else if(bccomp($node_data['nodeid'],get_current_nodeid(false)) == 0)		$node_type = ZBX_NODE_LOCAL;
+		else if(bccomp($node_data['nodeid'] , $ZBX_CURMASTERID)==0)		$node_type = ZBX_NODE_MASTER;
 		else if(bccomp($node_data['masterid'], get_current_nodeid(false))==0)	$node_type = ZBX_NODE_CHILD;
 		else $node_type = -1;
 
@@ -325,12 +326,10 @@
 
 		$node_type = detect_node_type($node_data);
 
-		if($node_type == ZBX_NODE_LOCAL)
-		{
+		if($node_type == ZBX_NODE_LOCAL){
 			error(S_UNABLE_TO_REMOVE_LOCAL_NODE);
 		}
-		else
-		{
+		else{
 			// $housekeeperid = get_dbid('housekeeper','housekeeperid');
 			$result = (
 				// DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
@@ -340,7 +339,8 @@
 				);
 			error(S_DATABASE_STILL_CONTAINS_DATA_RELATED_DELETED_NODE);
 		}
-		return $result;
+
+	return $result;
 	}
 
 	function get_node_by_nodeid($nodeid)
