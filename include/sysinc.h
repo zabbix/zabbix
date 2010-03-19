@@ -109,11 +109,10 @@
 #	include <linux/kernel.h>
 #endif
 
-#ifdef HAVE_ARPA_NAMESER_COMPAT_H
-#	include <arpa/nameser_compat.h>
-#endif
-
 #ifdef HAVE_ARPA_NAMESER_H
+#ifdef MAC_OS_X
+#	define BIND_8_COMPAT 1
+#endif
 #	include <arpa/nameser.h>
 #endif
 
