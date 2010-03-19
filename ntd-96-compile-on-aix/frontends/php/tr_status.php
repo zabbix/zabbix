@@ -346,6 +346,7 @@ include_once('include/page_header.php');
 		'filter' => 1,
 		'monitored' => 1,
 		'extendoutput' => 1,
+		'skipDependent' => 1,
 		'sortfield' => $sortfield,
 		'sortorder' => $sortorder,
 		'limit' => ($config['search_limit']+1)
@@ -388,8 +389,7 @@ include_once('include/page_header.php');
 		'extendoutput' => 1,
 		'select_hosts' => 1,
 		'select_items' => 1,
-		'select_dependencies' => 1,
-		'skipDependent' => 1
+		'select_dependencies' => 1
 	);
 	$triggers = CTrigger::get($options);
 	$triggers = zbx_toHash($triggers, 'triggerid');
@@ -477,7 +477,8 @@ include_once('include/page_header.php');
 
 		$menu_trigger_conf = 'null';
 		if($admin_links){
-			$menu_trigger_conf = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript: redirect('triggers.php?form=update&triggerid=".$trigger['triggerid']."')\",
+			$menu_trigger_conf = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript: 
+				redirect('triggers.php?form=update&triggerid=".$trigger['triggerid'].'&switch_node='.id2nodeid($trigger['triggerid'])."')\",
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
 		$menu_trigger_url = 'null';

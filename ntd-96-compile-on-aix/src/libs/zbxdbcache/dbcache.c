@@ -2076,7 +2076,7 @@ int	DCsync_history(int sync_type)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alekasander Vladishev                                              *
+ * Author: Aleksander Vladishev                                               *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -2166,7 +2166,7 @@ retry:
 	{
 		if (text_len > CONFIG_TEXT_CACHE_SIZE)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "Insufficient shared memory");
+			zabbix_log(LOG_LEVEL_ERR, "Insufficient shared memory for text cache");
 			exit(-1);
 		}
 
@@ -2641,7 +2641,7 @@ zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int nu
 
 	if (i == ZBX_IDS_SIZE)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Insufficient shared memory");
+		zabbix_log(LOG_LEVEL_ERR, "Insufficient shared memory for ids");
 		exit(-1);
 	}
 
@@ -2696,7 +2696,7 @@ zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int nu
  *                                                                            *
  * Return value: last clock or FAIL if item not found in dbcache              *
  *                                                                            *
- * Author: Alekasander Vladishev                                              *
+ * Author: Aleksander Vladishev                                               *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -2705,7 +2705,7 @@ int	DCget_item_lastclock(zbx_uint64_t itemid)
 {
 	int	i, index;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCvacuum_text()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In DCget_item_lastclock()");
 
 	LOCK_CACHE;
 

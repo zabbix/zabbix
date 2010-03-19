@@ -41,7 +41,7 @@ static int		snmpidx_count = 0, snmpidx_alloc = 16;
  *                                                                            *
  * Return value: index of new record                                          *
  *                                                                            *
- * Author: Alekasander Vladishev                                              *
+ * Author: Aleksander Vladishev                                               *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *

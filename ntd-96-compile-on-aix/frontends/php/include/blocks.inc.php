@@ -683,7 +683,6 @@ function make_latest_issues($params = array()){
 		$options['hostids'] = $params['hostid'];
 
 	$triggers = CTrigger::get($options);
-
 // GATHER HOSTS FOR SELECTED TRIGGERS {{{
 	$triggers_hosts = array();
 	foreach($triggers as $tnum => $trigger){
@@ -709,6 +708,7 @@ function make_latest_issues($params = array()){
 	foreach($triggers as $tnum => $trigger){
 // Check for dependencies
 		$host = reset($trigger['hosts']);
+
 		$trigger['hostid'] = $host['hostid'];
 		$trigger['host'] = $host['host'];
 
@@ -716,7 +716,6 @@ function make_latest_issues($params = array()){
 		$menus = '';
 
 		$host_nodeid = id2nodeid($trigger['hostid']);
-
 		foreach($scripts_by_hosts[$trigger['hostid']] as $id => $script){
 			$script_nodeid = id2nodeid($script['scriptid']);
 			if( (bccomp($host_nodeid ,$script_nodeid ) == 0))
@@ -735,6 +734,34 @@ function make_latest_issues($params = array()){
 
 		$host = new CSpan($trigger['host'],'link_menu pointer');
 		$host->setAttribute('onclick','javascript: '.$menus);
+		//$host = new CSpan($trigger['host'],'link_menu pointer');
+		//$host->setAttribute('onclick','javascript: '.$menus);
+
+// Maintenance {{{
+
+		$trigger_host = $triggers_hosts[$trigger['hostid']];
+
+		$text = null;
+		$style = 'link_menu';
+		if($trigger_host['maintenance_status']){
+			$style.= ' orange';
+
+			$options = array(
+				'maintenanceids' => $trigger_host['maintenanceid'],
+				'output' => API_OUTPUT_EXTEND
+			);
+			$maintenances = CMaintenance::get($options);
+			$maintenance = reset($maintenances);
+
+			$text = $maintenance['name'];
+			$text.=' ['.($trigger_host['maintenance_type'] ? S_NO_DATA_MAINTENANCE : S_NORMAL_MAINTENANCE).']';
+		}
+
+		$host = new CSpan($trigger['host'], $style.' pointer');
+		$host->setAttribute('onclick','javascript: '.$menus);
+		if(!is_null($text)) $host->setHint($text, '', '', false);
+
+// }}} Maintenance
 
 		$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged'.
 					' FROM events e'.

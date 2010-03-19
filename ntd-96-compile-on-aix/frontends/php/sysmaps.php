@@ -21,6 +21,7 @@
 <?php
 require_once('include/config.inc.php');
 require_once('include/maps.inc.php');
+require_once('include/ident.inc.php');
 require_once('include/forms.inc.php');
 
 if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['maps'])){
@@ -125,7 +126,7 @@ include_once('include/page_header.php');
 		DBstart();
 
 		$result = zbxXML::import($_FILES['import_file']['tmp_name']);
-		$result = zbxXML::parseMap($rules);
+		if($result) $result = zbxXML::parseMap($rules);
 
 		$result = DBend($result);
 		show_messages($result, S_IMPORTED.SPACE.S_SUCCESSEFULLY_SMALL, S_IMPORT.SPACE.S_FAILED_SMALL);

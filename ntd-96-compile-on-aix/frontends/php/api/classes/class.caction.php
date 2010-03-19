@@ -603,13 +603,7 @@ COpt::memoryPick();
 			}
 
 			$result = self::EndTransaction($result, __METHOD__);
-			$options = array(
-				'actionids'=>$actionids,
-				'nopermissions'=>1
-			);
-
-			$new_actions = CAction::get($options);
-			return $new_actions;
+			return array('actionids'=>$actionids);
 		}
 		catch(APIException $e){
 			if(isset($transaction)) self::EndTransaction(false, __METHOD__);
@@ -681,8 +675,7 @@ COpt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_actions = CAction::get(array('actionids'=>$actionids, 'extendoutput'=>1, 'nopermissions'=>1));
-			return $upd_actions;
+			return array('actionids'=>$actionids);
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
@@ -884,10 +877,13 @@ COpt::memoryPick();
 		$actions = zbx_toArray($actions);
 		$actionids = array();
 
-		$del_actions = Caction::get(array('actionids'=>zbx_objectValues($actions, 'actionid'),
-											'editable'=>1,
-											'extendoutput'=>1,
-											'preservekeys'=>1));
+		$options = array(
+			'actionids'=>zbx_objectValues($actions, 'actionid'),
+			'editable'=>1,
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$del_actions = Caction::get($options);
 		foreach($actions as $anum => $action){
 			if(!isset($del_actions[$action['actionid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -911,7 +907,7 @@ COpt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return zbx_cleanHashes($del_actions);
+			return array('actionids'=>$actionids);
 		}
 		else{
 			self::setError(__METHOD__);
