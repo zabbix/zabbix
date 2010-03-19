@@ -542,7 +542,7 @@ int	is_ip4(const char *ip)
  * Return value: SUCCEED - is IPv6 address                                    *
  *               FAIL - otherwise                                             *
  *                                                                            *
- * Author: Aleksader Vladishev                                                *
+ * Author: Aleksander Vladishev                                               *
  *                                                                            *
  * Comments: could be improved (not supported x:x:x:x:x:x:d.d.d.d addresses)  *
  *                                                                            *
@@ -597,7 +597,7 @@ static int	is_ip6(const char *ip)
  * Return value: SUCCEED - is IP address                                      *
  *               FAIL - otherwise                                             *
  *                                                                            *
- * Author: Aleksader Vladishev                                                *
+ * Author: Aleksander Vladishev                                               *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -628,7 +628,7 @@ int	is_ip(const char *ip)
  *                                                                            *
  * Return value: FAIL - invalid IP address, SUCCEED - conversion OK           *
  *                                                                            *
- * Author: Alksander Vladishev                                                *
+ * Author: Aleksander Vladishev                                               *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -711,7 +711,7 @@ int	expand_ipv6(const char *ip, char *str, size_t str_len )
  *                                                                            *
  * Return value: pointer to result buffer                                     *
  *                                                                            *
- * Author: Alksander Vladishev                                                *
+ * Author: Aleksander Vladishev                                               *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
