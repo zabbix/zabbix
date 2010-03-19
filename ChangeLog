@@ -4,6 +4,8 @@ Changes for 1.9
 
 Changes for 1.8.2
 
+ - [ZBXNEXT-238] added a command line option to zabbix_sender to send metrics in real time when reading from stdin (asaveljevs)
+ - [ZBX-1000] enabled zabbix_sender to read its input from stdin; thanks to leo (asaveljevs)
  - [ZBX-2011] fixed e-mail sending format to meet 'SMTP/MIME e-mail' standards since UTF-8 is used. Thanks to Olexiy Zagorskiy. (Dmitry)
  - [ZBX-2136] fixed handling of logitems with logtimefmt in db cache (asaveljevs)
  - [ZBX-2193] updated Russian translation; thanks to dotneft (Richlv)
