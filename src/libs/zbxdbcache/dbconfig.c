@@ -1258,6 +1258,7 @@ static void	DCallocate_logitem(int index)
 		memmove(dst, config->dbitems, sizeof(ZBX_DC_DBITEM) * config->dbitems_num);
 		config->dbitems = (ZBX_DC_DBITEM *)dst;
 
+		config->logitems_alloc += LOGITEM_ALLOC_STEP;
 		config->free_mem -= sz;
 	}
 
@@ -1554,7 +1555,6 @@ static void	DCremove_item(int index)
 
 	/* update records in 'idxitem02' index */
 	for (i = 0; i < config->idxitem02_num; i++)
-		if (config->idxitem02[i] > index)
 		if (config->idxitem02[i] > index)
 			config->idxitem02[i]--;
 
