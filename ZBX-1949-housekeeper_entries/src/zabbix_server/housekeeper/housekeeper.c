@@ -108,6 +108,7 @@ static int housekeeping_process_log()
 				
 #if !defined(HAVE_SQLITE3)
 		}
+#endif /* HAVE_SQLITE3 is not defined */
 
 		if (deleted > 0)
 		{
@@ -115,7 +116,6 @@ static int housekeeping_process_log()
 				deleted,
 				housekeeper.tablename);
 		}
-#endif /* HAVE_SQLITE3 is not defined */
 	}
 	DBfree_result(result);
 
