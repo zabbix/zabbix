@@ -52,8 +52,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h regex.h \
   stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
   sys/timeb.h Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
-  net/if_mib.h sys/user.h sys/ucontext.h libperfstat.h devstat.h \
-  arpa/nameser_compat.h)
+  net/if_mib.h sys/user.h sys/ucontext.h libperfstat.h devstat.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -1141,6 +1140,7 @@ darwin*|rhapsody*)
 	ARCH="osx"
 
 	AC_MSG_RESULT([ok (${host_os})])
+	AC_DEFINE([MAC_OS_X], 1, [Define to 1 if you're using Mac OS X])
 ;;
 *solaris*)
 	ARCH="solaris"
