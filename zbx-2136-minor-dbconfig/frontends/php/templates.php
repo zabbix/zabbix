@@ -174,7 +174,13 @@ include_once('include/page_header.php');
 // CREATE NEW GROUP
 		$groups = zbx_toObject($groups, 'groupid');
 		if(!empty($newgroup)){
-			if($newgroup = CHostGroup::create(array('name' => $newgroup))){
+			$result = CHostGroup::create(array('name' => $newgroup));
+			$options = array(
+				'groupids' => $result['groupids'],
+				'output' => API_OUTPUT_EXTEND
+			);
+			$newgroup = CHostGroup::get($options);
+			if($newgroup){
 				$groups = array_merge($groups, $newgroup);
 			}
 			else{
@@ -190,16 +196,17 @@ include_once('include/page_header.php');
 
 // CREATE/UPDATE TEMPLATE {{{
 		if($templateid){
-			$template = array('templateid' => $templateid);
-			$result = CTemplate::update(array(
+			$template = array(
 				'templateid' => $templateid,
 				'host' => $template_name,
 				'groups' => $groups,
 				'templates' => $templates,
 				'templates_clear' => $templates_clear,
 				'hosts' => $hosts,
-				'macros' => get_request('macros', array()),
-			));
+				'macros' => get_request('macros', array())
+			);
+
+			$result = CTemplate::update($template);
 			if(!$result){
 				error(CTemplate::resetErrors());
 				$result = false;
@@ -209,16 +216,17 @@ include_once('include/page_header.php');
 			$msg_fail = S_CANNOT_UPDATE_TEMPLATE;
 		}
 		else{
-			$result = CTemplate::create(array(
+			$template = array(
 				'host' => $template_name,
 				'groups' => $groups,
 				'templates' => $templates,
 				'hosts' => $hosts,
 				'macros' => get_request('macros', array())
-			));
+			);
+			$result = CTemplate::create($template);
+
 			if($result){
-				$template = reset($result);
-				$templateid = $template['templateid'];
+				$templateid = reset($result['templateids']);
 			}
 			else{
 				error(CTemplate::resetErrors());

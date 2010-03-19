@@ -252,7 +252,12 @@ include_once('include/page_header.php');
 			
 			$groups = array();
 			if(isset($visible['newgroup']) && !empty($_REQUEST['newgroup'])){
-				$groups = CHostGroup::create(array('name' => $_REQUEST['newgroup']));
+				$result = CHostGroup::create(array('name' => $_REQUEST['newgroup']));
+				$options = array(
+					'groupids' => $result['groupids'],
+					'output' => API_OUTPUT_EXTEND
+				);
+				$groups = CHostGroup::get($options);
 				if($groups === false) throw new Exception();
 			}
 
@@ -330,7 +335,13 @@ include_once('include/page_header.php');
 
 		$groups = zbx_toObject($groups, 'groupid');
 		if(!empty($_REQUEST['newgroup'])){
-			if($newgroup = CHostGroup::create(array('name' => $_REQUEST['newgroup']))){
+			$result = CHostGroup::create(array('name' => $_REQUEST['newgroup']));
+			if($result){
+				$options = array(
+					'groupids' => $result['groupids'],
+					'output' => API_OUTPUT_EXTEND
+				);
+				$newgroup = CHostGroup::get($options);
 				$groups = array_merge($groups, $newgroup);
 			}
 			else{
@@ -339,59 +350,39 @@ include_once('include/page_header.php');
 		}
 
 		if($result){
-			if(isset($_REQUEST['hostid'])){
-				if($result){
-					$result = CHost::update(array(
-						'hostid' => $_REQUEST['hostid'],
-						'host' => $_REQUEST['host'],
-						'port' => $_REQUEST['port'],
-						'status' => $_REQUEST['status'],
-						'useip' => $_REQUEST['useip'],
-						'dns' => $_REQUEST['dns'],
-						'ip' => $_REQUEST['ip'],
-						'proxy_hostid' => $proxy_hostid,
-						'useipmi' => $useipmi,
-						'ipmi_ip' => $_REQUEST['ipmi_ip'],
-						'ipmi_port' => $_REQUEST['ipmi_port'],
-						'ipmi_authtype' => $_REQUEST['ipmi_authtype'],
-						'ipmi_privilege' => $_REQUEST['ipmi_privilege'],
-						'ipmi_username' => $_REQUEST['ipmi_username'],
-						'ipmi_password' => $_REQUEST['ipmi_password'],
-						'groups' => $groups,
-						'templates' => $templates,
-						'templates_clear' => $templates_clear,
-						'macros' => get_request('macros', array()),
-					));
+			$host = array(
+				'host' => $_REQUEST['host'],
+				'port' => $_REQUEST['port'],
+				'status' => $_REQUEST['status'],
+				'useip' => $_REQUEST['useip'],
+				'dns' => $_REQUEST['dns'],
+				'ip' => $_REQUEST['ip'],
+				'proxy_hostid' => $proxy_hostid,
+				'templates' => $templates,
+				'useipmi' => $useipmi,
+				'ipmi_ip' => $_REQUEST['ipmi_ip'],
+				'ipmi_port' => $_REQUEST['ipmi_port'],
+				'ipmi_authtype' => $_REQUEST['ipmi_authtype'],
+				'ipmi_privilege' => $_REQUEST['ipmi_privilege'],
+				'ipmi_username' => $_REQUEST['ipmi_username'],
+				'ipmi_password' => $_REQUEST['ipmi_password'],
+				'groups' => $groups,
+				'templates' => $templates,
+				'macros' => get_request('macros', array()),
+			);
 
-					$hostid = $_REQUEST['hostid'];
-				}
+			if(isset($_REQUEST['hostid'])){
+				$host['hostid'] = $_REQUEST['hostid'];
+				$result = CHost::update($host);
+
+				$hostid = $_REQUEST['hostid'];
 			}
 			else{
-				$host = CHost::create(array(
-					'host' => $_REQUEST['host'],
-					'port' => $_REQUEST['port'],
-					'status' => $_REQUEST['status'],
-					'useip' => $_REQUEST['useip'],
-					'dns' => $_REQUEST['dns'],
-					'ip' => $_REQUEST['ip'],
-					'proxy_hostid' => $proxy_hostid,
-					'templates' => $templates,
-					'useipmi' => $useipmi,
-					'ipmi_ip' => $_REQUEST['ipmi_ip'],
-					'ipmi_port' => $_REQUEST['ipmi_port'],
-					'ipmi_authtype' => $_REQUEST['ipmi_authtype'],
-					'ipmi_privilege' => $_REQUEST['ipmi_privilege'],
-					'ipmi_username' => $_REQUEST['ipmi_username'],
-					'ipmi_password' => $_REQUEST['ipmi_password'],
-					'groups' => $groups,
-					'templates' => $templates,
-					'macros' => get_request('macros', array()),
-				));
+				$host = CHost::create($host);
 
 				$result &= (bool) $host;
 				if($result){
-					$host = reset($host);
-					$hostid = $host['hostid'];
+					$hostid = reset($host['hostids']);
 				}
 			}
 
@@ -468,7 +459,7 @@ include_once('include/page_header.php');
 			}
 		}
 
-// }}} START SAVE TRANSACTION
+// }}} SAVE TRANSACTION
 		$result	= DBend($result);
 
 		show_messages($result, $msg_ok, $msg_fail);
@@ -510,18 +501,21 @@ include_once('include/page_header.php');
 // -------- GO ---------------
 // DELETE HOST
 	else if($_REQUEST['go'] == 'delete'){
-		$hosts = get_request('hosts', array());
-		$hosts = zbx_toObject($hosts,'hostid');
+		$hostids = get_request('hosts', array());
+		$hosts = zbx_toObject($hostids,'hostid');
 
-		$go_result = true;
 		DBstart();
-		foreach($hosts as $num => $host){
-			$go_result = CHost::delete($host);
+		$options = array(
+			'hostids' => $hostids,
+			'output' => array('hostid', 'host')
+		);
+		$delHosts = CHost::get($options);
 
-			if(!$go_result) break;
-			$go_result = reset($go_result);
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$go_result['host'].']');
+		$go_result = CHost::delete($hosts);
+		foreach($delHosts as $hnum => $host){
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$host['host'].']');
 		}
+
 		$go_result = DBend($go_result);
 
 		if(!$go_result){
@@ -667,7 +661,22 @@ $_REQUEST['hostid'] = $thid;
 // sorting && paging
 		order_result($hosts, $sortfield, $sortorder);
 //---------
-		//$hosts = array();
+
+// Selecting linked templates to templates linked to hosts
+		$templateids = array();
+		foreach($hosts as $num => $host){
+			$templateids = array_merge($templateids, zbx_objectValues($host['templates'], 'templateid'));
+		}
+		$templateids = array_unique($templateids);
+
+		$options = array(
+			'templateids' => $templateids,
+			'select_templates' => array('hostid', 'host')
+		);
+
+		$templates = CTemplate::get($options);
+		$templates = zbx_toHash($templates, 'templateid');
+//---------
 		foreach($hosts as $num => $host){
 			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$host['hostid']),
 				' ('.$host['applications'].')');
@@ -745,15 +754,30 @@ $_REQUEST['hostid'] = $thid;
 			$av_table->addRow(array($zbx_available, $snmp_available, $ipmi_available));
 
 			if(empty($host['templates'])){
-				$templates = '-';
+				$hostTemplates = '-';
 			}
 			else{
-				$templates = array();
-				foreach($host['templates'] as $templateid => $template){
-					$templates[] = $template['host'];
+				$hostTemplates = array();
+				foreach($host['templates'] as $htnum => $template){
+					$caption = array();
+					$caption[] = new CLink($template['host'],'templates.php?form=update&templateid='.$template['hostid']);
+
+					if(!empty($templates[$template['templateid']]['templates'])){
+						$caption[] = ' (';
+						foreach($templates[$template['templateid']]['templates'] as $tnum => $tpl){
+							$caption[] = new CLink($tpl['host'],'templates.php?form=update&templateid='.$tpl['hostid']);
+							$caption[] = ', ';
+						}
+						array_pop($caption);
+
+						$caption[] = ')';
+					}
+
+					$hostTemplates[] = $caption;
+					$hostTemplates[] = ', ';
 				}
-				order_result($templates, 'host');
-				$templates = implode(', ', $templates);
+
+				if(!empty($hostTemplates)) array_pop($hostTemplates);
 			}
 
 			$table->addRow(array(
@@ -766,7 +790,7 @@ $_REQUEST['hostid'] = $thid;
 				$dns,
 				$ip,
 				empty($host['port']) ? '-' : $host['port'],
-				new CCol($templates, 'wraptext'),
+				new CCol($hostTemplates, 'wraptext'),
 				$status,
 				$av_table
 			));

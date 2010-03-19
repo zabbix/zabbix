@@ -229,7 +229,9 @@ static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t hostid, zbx_uint64_
 {
 	char	*p;
 
-	if (0 != proxy_hostid && ITEM_TYPE_CALCULATED != item_type)
+	if (0 != proxy_hostid && (ITEM_TYPE_INTERNAL != item_type &&
+				ITEM_TYPE_AGGREGATE != item_type &&
+				ITEM_TYPE_CALCULATED != item_type))
 	{
 		*poller_type = (unsigned char)255;
 		*poller_num = (unsigned char)255;

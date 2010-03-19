@@ -406,70 +406,6 @@ return $str;
 /************* END DATE *************/
 
 
-/************* SORT *************/
-function natksort(&$array) {
-	$keys = array_keys($array);
-	natcasesort($keys);
-
-	$new_array = array();
-
-	foreach ($keys as $k) {
-		$new_array[$k] = $array[$k];
-	}
-
-	$array = $new_array;
-	return true;
-}
-
-function asort_by_key(&$array, $key){
-	if(!is_array($array)) {
-		error(S_INCORRECT_TYPE_OF_ASORT_BY_KEY);
-		return array();
-	}
-
-	$key = htmlspecialchars($key);
-	uasort($array, create_function('$a,$b', 'return $a[\''.$key.'\'] - $b[\''.$key.'\'];'));
-return $array;
-}
-
-
-/* function:
- *	zbx_rksort
- *
- * description:
- *	Recursively sort an array by key
- *
- * author: Eugene Grigorjev
- */
-function zbx_rksort(&$array, $flags=NULL){
-	if(is_array($array)){
-		foreach($array as $id => $data)
-			zbx_rksort($array[$id]);
-
-		ksort($array,$flags);
-	}
-	return $array;
-}
-
-// This function will preserve keys!!!
-// author: Aly
-function zbx_array_merge(){
-	$args = func_get_args();
-
-	$result = array();
-	foreach($args as &$array){
-		if(!is_array($array)) return false;
-
-		foreach($array as $key => $value){
-			$result[$key] = $value;
-		}
-	}
-
-return $result;
-}
-/************* END SORT *************/
-
-
 /*************** CONVERTING ******************/
 function rgb2hex($color){
 	$HEX = array(
@@ -700,6 +636,15 @@ return false;
 
 // STRING FUNCTIONS {{{
 
+function zbx_nl2br(&$str){
+	$str_res = array();
+	$str_arr = explode("\n",$str);
+	foreach($str_arr as $id => $str_line){
+		array_push($str_res,$str_line,BR());
+	}
+return $str_res;
+}
+
 function zbx_strlen($str){
 	if(defined('ZBX_MBSTRINGS_ENABLED')){
 		return mb_strlen($str);
@@ -708,7 +653,8 @@ function zbx_strlen($str){
 		return strlen($str);
 	}
 	
-/* 	if(!$zbx_strlen = zbx_strlen($str)) return $zbx_strlen;
+/*
+	$zbx_strlen = strlen($zbx_strlen);
 
 	$reallen = 0;
 	$fbin= 1 << 7;
@@ -720,7 +666,8 @@ function zbx_strlen($str){
 	}
 
 return $reallen;
- */}
+//*/
+}
 
 function zbx_strstr($haystack, $needle){
 	if(defined('ZBX_MBSTRINGS_ENABLED')){
@@ -843,12 +790,89 @@ function zbx_strrpos($haystack, $needle){
 // }}} STRING FUNCTIONS
 
 
+// {{{ ARRAY UNCTIONS
+/************* SORT *************/
+function natksort(&$array) {
+	$keys = array_keys($array);
+	natcasesort($keys);
+
+	$new_array = array();
+
+	foreach ($keys as $k) {
+		$new_array[$k] = $array[$k];
+	}
+
+	$array = $new_array;
+	return true;
+}
+
+function asort_by_key(&$array, $key){
+	if(!is_array($array)) {
+		error(S_INCORRECT_TYPE_OF_ASORT_BY_KEY);
+		return array();
+	}
+
+	$key = htmlspecialchars($key);
+	uasort($array, create_function('$a,$b', 'return $a[\''.$key.'\'] - $b[\''.$key.'\'];'));
+return $array;
+}
+
+
+/* function:
+ *	zbx_rksort
+ *
+ * description:
+ *	Recursively sort an array by key
+ *
+ * author: Eugene Grigorjev
+ */
+function zbx_rksort(&$array, $flags=NULL){
+	if(is_array($array)){
+		foreach($array as $id => $data)
+			zbx_rksort($array[$id]);
+
+		ksort($array,$flags);
+	}
+	return $array;
+}
+/************* END SORT *************/
+
+function zbx_implodeHash($glue1, $glue2, $hash){
+	if(is_null($glue2)) $glue2 = $glue1;
+	$str = '';
+
+	foreach($hash as $key => $value){
+		if(!empty($str)) $str.= $glue1;
+		$str.= $key.$glue2.$value;
+	}
+
+return $str;
+}
+
+// This function will preserve keys!!!
+// author: Aly
+function zbx_array_merge(){
+	$args = func_get_args();
+
+	$result = array();
+	foreach($args as &$array){
+		if(!is_array($array)) return false;
+
+		foreach($array as $key => $value){
+			$result[$key] = $value;
+		}
+	}
+
+return $result;
+}
+
 function uint_in_array($needle,$haystack){
 //TODO: REMOVE
-	if(!empty($haystack) && !isset($haystack[0])){
+	if(!empty($haystack) && !is_numeric(key($haystack))){
 //		info('uint_in_array: possible pasted associated array');
 	}
 //----
+
 	foreach($haystack as $id => $value)
 		if(bccomp($needle,$value) == 0) return true;
 
@@ -875,15 +899,6 @@ function str_in_array($needle,$haystack,$strict=false){
 			if(strcmp($needle,$value) == 0) return true;
 	}
 return false;
-}
-
-function zbx_nl2br(&$str){
-	$str_res = array();
-	$str_arr = explode("\n",$str);
-	foreach($str_arr as $id => $str_line){
-		array_push($str_res,$str_line,BR());
-	}
-return $str_res;
 }
 
 function zbx_value2array(&$values){
@@ -995,27 +1010,30 @@ return $result;
 }
 
 function zbx_cleanHashes(&$value){
-
 	if(is_array($value) && ctype_digit((string) key($value))){
 		$value = array_values($value);
 	}
-	return $value;
-/*
-	$level++;
-//	if($level > 3) return $value;
-	if(is_array($value)){
-		if(ctype_digit((string) key($value))){
-			$value = array_values($value);
-		}
-
-		foreach($value as $key => $val){
-			if(!is_array($val)) continue;
-				$value[$key] = zbx_cleanHashes($val, $level);
-		}
-	}
 
 return $value;
-*/
+}
+// }}} ARRAY FUNCTION
+function zbx_array_mintersect($keys, $array){
+	$result = array();
+
+	foreach($keys as $field){
+		if(is_array($field)){
+			foreach($field as $sub_field){
+				if(isset($array[$sub_field])){
+					$result[$sub_field] = $array[$sub_field];
+					break;
+				}
+			}				
+		}
+		else if(isset($array[$field])){
+			$result[$field] = $array[$field];
+		}
+	}
+	return $result;
 }
 
 /************* END ZBX MISC *************/

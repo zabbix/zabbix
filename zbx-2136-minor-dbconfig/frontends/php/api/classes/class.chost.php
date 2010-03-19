@@ -200,7 +200,7 @@ class CHost extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 // groupids
 		if(!is_null($options['groupids'])){
@@ -635,9 +635,8 @@ Copt::memoryPick();
 
 				if(!is_null($options['limitSelects'])) order_result($templates, 'host');
 				foreach($templates as $templateid => $template){
-					$thosts = $template['hosts'];
-					unset($template['hosts']);
-					foreach($thosts as $hnum => $host){
+					unset($templates[$templateid]['hosts']);
+					foreach($template['hosts'] as $hnum => $host){
 						if(!is_null($options['limitSelects'])){
 							if(!isset($count[$host['hostid']])) $count[$host['hostid']] = 0;
 							$count[$host['hostid']]++;
@@ -679,9 +678,8 @@ Copt::memoryPick();
 
 				if(!is_null($options['limitSelects'])) order_result($items, 'description');
 				foreach($items as $itemid => $item){
-					$ihosts = $item['hosts'];
-					unset($item['hosts']);
-					foreach($ihosts as $hnum => $host){
+					unset($items[$itemid]['hosts']);
+					foreach($item['hosts'] as $hnum => $host){
 						if(!is_null($options['limitSelects'])){
 							if(!isset($count[$host['hostid']])) $count[$host['hostid']] = 0;
 							$count[$host['hostid']]++;
@@ -723,10 +721,9 @@ Copt::memoryPick();
 
 				if(!is_null($options['limitSelects'])) order_result($triggers, 'description');
 				foreach($triggers as $triggerid => $trigger){
-					$thosts = $trigger['hosts'];
-					unset($trigger['hosts']);
+					unset($triggers[$triggerid]['hosts']);
 
-					foreach($thosts as $hnum => $host){
+					foreach($trigger['hosts'] as $hnum => $host){
 						if(!is_null($options['limitSelects'])){
 							if(!isset($count[$host['hostid']])) $count[$host['hostid']] = 0;
 							$count[$host['hostid']]++;
@@ -768,10 +765,9 @@ Copt::memoryPick();
 
 				if(!is_null($options['limitSelects'])) order_result($graphs, 'name');
 				foreach($graphs as $graphid => $graph){
-					$ghosts = $graph['hosts'];
-					unset($graph['hosts']);
+					unset($graph[$graphid]['hosts']);
 
-					foreach($ghosts as $hnum => $host){
+					foreach($graph['hosts'] as $hnum => $host){
 						if(!is_null($options['limitSelects'])){
 							if(!isset($count[$host['hostid']])) $count[$host['hostid']] = 0;
 							$count[$host['hostid']]++;
@@ -813,10 +809,9 @@ Copt::memoryPick();
 
 				if(!is_null($options['limitSelects'])) order_result($applications, 'name');
 				foreach($applications as $applicationid => $application){
-					$ghosts = $application['hosts'];
-					unset($application['hosts']);
+					unset($application[$applicationid]['hosts']);
 
-					foreach($ghosts as $hnum => $host){
+					foreach($application['hosts'] as $hnum => $host){
 						if(!is_null($options['limitSelects'])){
 							if(!isset($count[$host['hostid']])) $count[$host['hostid']] = 0;
 							$count[$host['hostid']]++;
@@ -900,29 +895,23 @@ Copt::memoryPick();
 	return $result;
 	}
 
-	public static function checkObjects($hostsData){
+	public static function exists($object){
+		$keyFields = array(array('hostid', 'host'));
 
-		$hostsData = zbx_toArray($hostsData);
-		
-		$result = array();
-		foreach($hostsData as $hnum => $hostData){
-			$options = array(
-				'filter' => $hostData,
-				'output' => API_OUTPUT_SHORTEN,
-				'nopermissions' => 1
-			);
+		$options = array(
+			'filter' => zbx_array_mintersect($keyFields, $object),
+			'output' => API_OUTPUT_SHORTEN,
+			'nopermissions' => 1,
+			'limit' => 1
+		);
+		if(isset($object['node']))
+			$options['nodeids'] = getNodeIdByNodeName($object['node']);
+		else if(isset($object['nodeids']))
+			$options['nodeids'] = $object['nodeids'];
 
-			if(isset($hostData['node']))
-				$options['nodeids'] = getNodeIdByNodeName($hostData['node']);
-			else if(isset($hostData['nodeids']))
-				$options['nodeids'] = $hostData['nodeids'];
+		$objs = self::get($options);
 
-			$hosts = self::get($options);
-
-			$result+= $hosts;
-		}
-
-	return $result;
+	return !empty($objs);
 	}
 
 /**
@@ -1023,15 +1012,12 @@ Copt::memoryPick();
 				break;
 			}
 
-			$host_exists = self::checkObjects(array('host' => $host['host']));
-			if(!empty($host_exists)){
+			if(self::exists(array('host' => $host['host']))){
 				$result = false;
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_HOST.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				break;
 			}
-
-			$host_exists = CTemplate::checkObjects(array('host' => $host['host']));
-			if(!empty($host_exists)){
+			if(CTemplate::exists(array('host' => $host['host']))){
 				$result = false;
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_TEMPLATE.' [ '.$host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				break;
@@ -1098,8 +1084,7 @@ Copt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_hosts = self::get(array('hostids' => $hostids, 'editable' => 1, 'extendoutput' => 1, 'nopermissions' => 1));
-			return $new_hosts;
+			return array('hostids' => $hostids);
 		}
 		else{
 			self::setMethodErrors(__METHOD__, $errors);
@@ -1166,13 +1151,7 @@ Copt::memoryPick();
 	
 			$result = self::EndTransaction($result, __METHOD__);
 
-			$options = array(
-				'hostids' => $hostids,
-				'extendoutput' => 1,
-				'nopermissions' => 1
-			);
-			$upd_hosts = self::get($options);
-			return $upd_hosts;
+			return array('hostids' => $hostids);
 		}
 		catch(APIException $e){
 			if(isset($transaction)) self::EndTransaction(false, __METHOD__);
@@ -1308,24 +1287,25 @@ Copt::memoryPick();
 // UPDATE HOSTS PROPERTIES {{{
 			if(isset($data['host'])){
 				if(count($hosts) > 1){
-					$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields');
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cannot mass update host name');
 				}
 
-				$host_exists = self::checkObjects(array('host' => $data['host']));
-				$host_exists = reset($host_exists);
 				$cur_host = reset($hosts);
+				
+				$options = array(
+					'filter' => array(
+						'host' => $cur_host['host']),
+					'output' => API_OUTPUT_SHORTEN,
+					'editable' => 1,
+					'nopermissions' => 1
+				);
+				$host_exists = self::get($options);
+				
+				$host_exists = reset($host_exists);
 
 				if(!empty($host_exists) && ($host_exists['hostid'] != $cur_host['hostid'])){
-					$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
-				}
-				
-				$host_exists = CTemplate::checkObjects(array('host' => $host['host']));
-				if(!empty($host_exists)){
-					$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
-					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
-				}
+				}				
 			}
 
 			if(isset($data['host']) && !preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $data['host'])){
@@ -1649,10 +1629,13 @@ Copt::memoryPick();
 		$hosts = zbx_toArray($hosts);
 		$hostids = array();
 
-		$del_hosts = self::get(array('hostids'=> zbx_objectValues($hosts, 'hostid'),
-									'editable'=>1,
-									'extendoutput'=>1,
-									'preservekeys'=>1));
+		$options = array(
+			'hostids'=> zbx_objectValues($hosts, 'hostid'),
+			'editable'=>1,
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$del_hosts = self::get($options);
 		if(empty($del_hosts)){
 			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Host does not exist');
 			return false;
@@ -1680,7 +1663,7 @@ Copt::memoryPick();
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return zbx_cleanHashes($del_hosts);
+			return array('hostids' => $hostids);
 		}
 		else{
 			self::setError(__METHOD__);
