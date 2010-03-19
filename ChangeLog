@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-2011] fixed e-mail sending format to meet 'SMTP/MIME e-mail' standards since UTF-8 is used. Thanks to Olexiy Zagorskiy. (Dmitry)
  - [ZBX-2136] fixed handling of logitems with logtimefmt in db cache (asaveljevs)
  - [ZBX-2193] updated Russian translation; thanks to dotneft (Richlv)
  - [ZBX-2185] added view of parent template of linked template to host (Aly)
