@@ -37,7 +37,7 @@
  *                                                                            *
  * Author: Alexei Vladishev, Dmitry Borovikov                                 *
  *                                                                            *
- * Comments:                                                                  *
+ * Comments: sqlite3 does not use CONFIG_MAX_HOUSEKEEPER_DELETE, deletes all  *
  *                                                                            *
  ******************************************************************************/
 static int housekeeping_process_log()
@@ -46,7 +46,6 @@ static int housekeeping_process_log()
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		res = SUCCEED;
 
 	long		deleted;
 
@@ -62,13 +61,17 @@ static int housekeeping_process_log()
 		housekeeper.field=row[2];
 		ZBX_STR2UINT64(housekeeper.value,row[3]);
 
+#if !defined(HAVE_SQLITE3)
 		if(0 == CONFIG_MAX_HOUSEKEEPER_DELETE)
 		{
+#endif /* HAVE_SQLITE3 is not defined */
 
 			deleted = DBexecute("delete from %s where %s=" ZBX_FS_UI64,
 				housekeeper.tablename,
 				housekeeper.field,
 				housekeeper.value);
+
+#if !defined(HAVE_SQLITE3)
 		}
 		else
 		{
@@ -87,7 +90,7 @@ static int housekeeping_process_log()
 				housekeeper.field,
 				housekeeper.value,
 				CONFIG_MAX_HOUSEKEEPER_DELETE);
-#else
+#elif defined(HAVE_MYSQL)
 		deleted = DBexecute("delete from %s where %s=" ZBX_FS_UI64 " limit %d",
 			housekeeper.tablename,
 			housekeeper.field,
@@ -96,10 +99,14 @@ static int housekeeping_process_log()
 #endif
 		}
 
-		if(CONFIG_MAX_HOUSEKEEPER_DELETE > deleted)
+		if(0 == deleted || 0 == CONFIG_MAX_HOUSEKEEPER_DELETE || CONFIG_MAX_HOUSEKEEPER_DELETE > deleted)
 		{
+#endif /* HAVE_SQLITE3 is not defined */
+
 			DBexecute("delete from housekeeper where housekeeperid=" ZBX_FS_UI64,
 				housekeeper.housekeeperid);
+				
+#if !defined(HAVE_SQLITE3)
 		}
 
 		if (deleted > 0)
@@ -108,10 +115,11 @@ static int housekeeping_process_log()
 				deleted,
 				housekeeper.tablename);
 		}
+#endif /* HAVE_SQLITE3 is not defined */
 	}
 	DBfree_result(result);
 
-	return res;
+	return SUCCEED;
 }
 
 
