@@ -1086,9 +1086,10 @@ char	*get_ip_by_socket(zbx_sock_t *s)
  * Return value: SUCCEED - connection allowed                                 *
  *               FAIL - connection is not allowed                             *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Alexei Vladishev, Dmitry Borovikov                                 *
  *                                                                            *
- * Comments:                                                                  *
+ * Comments: standard, compatible and IPv4-mapped addresses are treated       *
+ *           the same: 127.0.0.1 == ::127.0.0.1 == ::ffff:127.0.0.1           *
  *                                                                            *
  ******************************************************************************/
 
@@ -1100,6 +1101,9 @@ int	zbx_tcp_check_security(
 {
 #if defined(HAVE_IPV6)
 	struct		addrinfo hints, *ai = NULL;
+	/* Network Byte Order is ensured */
+	unsigned char	ipv4_cmp_mask[12] = {0};				/* IPv4-Compatible, the first 96 bits are zeros */
+	unsigned char	ipv4_mpd_mask[12] = {0,0,0,0,0,0,0,0,0,0,255,255};	/* IPv4-Mapped, the first 80 bits are zeros, 16 next - ones */
 #else
 	struct		hostent *hp;
 	char		*sip;
@@ -1162,6 +1166,7 @@ int	zbx_tcp_check_security(
 								freeaddrinfo(ai);
 								return SUCCEED;
 							}
+							break;
 						case AF_INET6 :
 							if(0 == memcmp(((struct sockaddr_in6*)&name)->sin6_addr.s6_addr,
 									((struct sockaddr_in6*)ai->ai_addr)->sin6_addr.s6_addr,
@@ -1170,6 +1175,35 @@ int	zbx_tcp_check_security(
 								freeaddrinfo(ai);
 								return SUCCEED;
 							}
+							break;
+					}
+				}
+				else
+				{
+					switch(ai->ai_family)
+					{
+						case AF_INET  :
+							/* incoming AF_INET6, must see whether it is comp or mapped */
+							if((0 == memcmp(((struct sockaddr_in6*)&name)->sin6_addr.s6_addr, ipv4_cmp_mask, 12) ||
+								0 == memcmp(((struct sockaddr_in6*)&name)->sin6_addr.s6_addr, ipv4_mpd_mask, 12)) && 
+								0 == memcmp(&((struct sockaddr_in6*)&name)->sin6_addr.s6_addr[12],
+									(unsigned char*)&((struct sockaddr_in*)ai->ai_addr)->sin_addr.s_addr, 4))
+							{
+								freeaddrinfo(ai);
+								return SUCCEED;
+							}
+							break;
+						case AF_INET6 :
+							/* incoming AF_INET, must see whether the given is comp or mapped */
+							if((0 == memcmp(((struct sockaddr_in6*)ai->ai_addr)->sin6_addr.s6_addr, ipv4_cmp_mask, 12) ||
+								0 == memcmp(((struct sockaddr_in6*)ai->ai_addr)->sin6_addr.s6_addr, ipv4_mpd_mask, 12)) &&
+								0 == memcmp(&((struct sockaddr_in6*)ai->ai_addr)->sin6_addr.s6_addr[12],
+									(unsigned char*)&((struct sockaddr_in*)&name)->sin_addr.s_addr, 4))
+							{
+								freeaddrinfo(ai);
+								return SUCCEED;
+							}
+							break;
 					}
 				}
 				freeaddrinfo(ai);
