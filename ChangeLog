@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1949] fixed "housekeeping" procedure for the table "housekeeper" itself, added configuration parameter "MaxHousekeeperDelete" for the server (Dmitry)
  - [ZBX-2173] fixed too long url for webgraph when many websteps are defined (Vedmak)
  - [ZBX-2139] fixed collecting of active checks after configured with user macro (Sasha)
  - [ZBXNEXT-238] added a command line option to zabbix_sender to send metrics in real time when reading from stdin (asaveljevs)
