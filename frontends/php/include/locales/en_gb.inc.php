@@ -750,8 +750,6 @@
 	'S_APPLICATIONS'=>				'Applications',
 	'S_APPLICATIONS_BIG'=>				'APPLICATIONS',
 	'S_CREATE_APPLICATION'=>			'Create application',
-	'S_ACTIVATE_ITEMS'=>				'Activate Items',
-	'S_DISABLE_ITEMS'=>				'Disable Items',
 	'S_APPLICATION_UPDATED'=>			'Application updated',
 	'S_CANNOT_UPDATE_APPLICATION'=>			'Cannot update application',
 	'S_APPLICATION_ADDED'=>				'Application added',
@@ -1095,7 +1093,7 @@
 	'S_LABEL'=>				'Label',
 	'S_X'=>					'X',
 	'S_ICON_PROBLEM'=>			'Icon (problem)',
-	'S_ICON_OK'=>				'Icon (ok)',
+	'S_ICON_OK'=>				'Icon (OK)',
 	'S_ICON_UNKNOWN'=>			'Icon (unknown)',
 	'S_ICON_MAINTENANCE'=>			'Icon (maintenance)',
 	'S_ICON_DISABLED'=>			'Icon (disabled)',
@@ -1372,14 +1370,11 @@
 	'S_NEW_SLIDE'=>					'New slide',
 	'S_SHOW_TEXT_AS_HTML'=>			'Show text as HTML',
 
-	'S_WITH_ID_SMALL'=>				'with ID',
 	'S_IMPORT_SCREEN'=>				'Import screen',
 
 	'S_CANNOT_FIND_GRAPH'=>			'Cannot find graph',
 	'S_CANNOT_FIND_ITEM'=>			'Cannot find item',
-	'S_CANNOT_FIND_SCREEN'=>		'Cannot find screen',
 	'S_USED_IN_EXPORTED_SCREEN_SMALL'=>'used in exported screen',
-	'S_EXPORT_HAVE_NO_SCREENS'=>	'Export does not contain Zabbix screens',
 
 //	screenedit.php
 	'S_MAP'=>					'Map',
@@ -1407,7 +1402,7 @@
 	'S_HORIZONTAL'=>			'Horizontal',
 
 	'S_HORIZONTAL_ALIGN'=>			'Horizontal align',
-	'S_CENTRE'=>				'Center',
+	'S_CENTRE'=>				'Centre',
 	'S_RIGHT'=>				'Right',
 
 	'S_VERTICAL_ALIGN'=>			'Vertical align',
