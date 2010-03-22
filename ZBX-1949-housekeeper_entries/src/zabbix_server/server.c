@@ -215,7 +215,7 @@ void	init_config(void)
 		{"HistoryTextCacheSize",&CONFIG_TEXT_CACHE_SIZE,0,TYPE_INT,PARM_OPT,128*1024,1024*1024*1024},
 		{"CacheUpdateFrequency",&CONFIG_DBCONFIG_FREQUENCY,0,TYPE_INT,PARM_OPT,1,3600},
 		{"HousekeepingFrequency",&CONFIG_HOUSEKEEPING_FREQUENCY,0,TYPE_INT,PARM_OPT,1,24},
-		{"MaxHousekeeperDelete",&CONFIG_MAX_HOUSEKEEPER_DELETE,0,TYPE_INT,PARM_OPT,0,1024*1024},
+		{"MaxHousekeeperDelete",&CONFIG_MAX_HOUSEKEEPER_DELETE,0,TYPE_INT,PARM_OPT,0,1000000},
 		{"SenderFrequency",&CONFIG_SENDER_FREQUENCY,0,TYPE_INT,PARM_OPT,5,3600},
 		{"TmpDir",&CONFIG_TMPDIR,0,TYPE_STRING,PARM_OPT,0,0},
 		{"FpingLocation",&CONFIG_FPING_LOCATION,0,TYPE_STRING,PARM_OPT,0,0},
@@ -296,6 +296,9 @@ void	init_config(void)
 	{
 		CONFIG_NODEWATCHER_FORKS = 0;
 	}
+#ifdef HAVE_SQLITE3
+	CONFIG_MAX_HOUSEKEEPER_DELETE = 0;
+#endif
 }
 
 /******************************************************************************
