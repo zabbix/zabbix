@@ -175,8 +175,7 @@ include_once('include/page_header.php');
 		$severity = get_request('trgSeverity');
 		if(is_null($severity)){
 			$severity = CProfile::get('web.dashconf.triggers.severity', array());
-
-			if(!empty($severity)) $severity = explode(';', $severity);
+			if(!is_array($severity)) $severity = explode(';', $severity);
 		}
 		else{
 			$severity = array_keys($severity);
