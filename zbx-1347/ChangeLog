@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-1347] added support of hostnames and keys with spaces in sender input file (Sasha)
  - [ZBX-1229] added comparison between IPv4, IPv4-mapped and IPv4-compatible allowed server addresses (Dmitry)
  - [ZBX-1949] fixed "housekeeping" procedure for the table "housekeeper" itself, added configuration parameter "MaxHousekeeperDelete" for the server (Dmitry)
  - [ZBX-2173] fixed too long URL for webgraph when many websteps are defined (Vedmak)
