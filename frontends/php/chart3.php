@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,8 +33,10 @@ include_once('include/page_header.php');
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'period'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	BETWEEN(ZBX_MIN_PERIOD,ZBX_MAX_PERIOD),	null),
-		'from'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	null,			null),
 		'stime'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	null,			null),
+		
+		'httptestid'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	null,			null),
+		'http_item_type'=>	array(T_ZBX_INT, O_OPT,	null,	null,			null),
 
 		'name'=>	array(T_ZBX_STR, O_OPT,	NULL,		null,			null),
 		'width'=>	array(T_ZBX_INT, O_OPT,	NULL,		BETWEEN(0,65535),	null),
@@ -63,37 +65,62 @@ include_once('include/page_header.php');
 	check_fields($fields);
 ?>
 <?php
-	$items = get_request('items', array());
-	asort_by_key($items, 'sortorder');
+	if($httptestid = get_request('httptestid', false)){
 
-	$options = array(
-		'webitems' => 1,
-		'itemids' => zbx_objectValues($items, 'itemid'),
-		'nodeids' => get_current_nodeid(true)
-	);
+		$color = array(
+			'current' => 0,
+			0  => array('next' => '1'),
+			1  => array('color' => 'Red', 			'next' => '2'),
+			2  => array('color' => 'Dark Green',	'next' => '3'),
+			3  => array('color' => 'Blue', 			'next' => '4'),
+			4  => array('color' => 'Dark Yellow', 	'next' => '5'),
+			5  => array('color' => 'Cyan', 			'next' => '6'),
+			6  => array('color' => 'Gray',			'next' => '7'),
+			7  => array('color' => 'Dark Red',		'next' => '8'),
+			8  => array('color' => 'Green',			'next' => '9'),
+			9  => array('color' => 'Dark Blue', 	'next' => '10'),
+			10 => array('color' => 'Yellow', 		'next' => '11'),
+			11 => array('color' => 'Black',	 		'next' => '1')
+		);
 
-	$db_data = CItem::get($options);
-	$db_data = zbx_toHash($db_data, 'itemid');
-	foreach($items as $id => $gitem){
-		if(!isset($db_data[$gitem['itemid']])) access_deny();
-	}
+		$items = array();
+		$sql = 'SELECT i.*'.
+				' FROM httpstepitem hi, items i, httpstep hs'.
+				' WHERE i.itemid=hi.itemid'.
+					' AND hs.httptestid='.$httptestid.
+					' AND hs.httpstepid=hi.httpstepid'.
+					' AND hi.type='.get_request('http_item_type', HTTPSTEP_ITEM_TYPE_TIME).
+				' ORDER BY hs.no ASC';
 
-	$effectiveperiod = navigation_bar_calc();
-
-	$graph = new CChart(get_request('graphtype'	,GRAPH_TYPE_NORMAL));
-
-	$chart_header = '';
-	if(isset($host)){
-		if(id2nodeid($host['hostid']) != get_current_nodeid()){
-			$chart_header = get_node_name_by_elid($host['hostid'],true, ': ');
+		$db_items = DBselect($sql);
+		while($item_data = DBfetch($db_items)){
+			$item_color = $color[$color['current'] = $color[$color['current']]['next']]['color'];
+			
+			$items[] = array(
+				'itemid' => $item_data['itemid'],
+				'color' => $item_color
+			);
 		}
-		$chart_header.= $host['host'].':';
 	}
-	$chart_header.=get_request('name','');
+	else{
+		$items = get_request('items', array());
+		asort_by_key($items, 'sortorder');
 
-	$graph->setHeader($chart_header);
+		$options = array(
+			'webitems' => 1,
+			'itemids' => zbx_objectValues($items, 'itemid'),
+			'nodeids' => get_current_nodeid(true)
+		);
 
-	unset($host);
+		$db_data = CItem::get($options);
+		$db_data = zbx_toHash($db_data, 'itemid');
+		foreach($items as $id => $gitem){
+			if(!isset($db_data[$gitem['itemid']])) access_deny();
+		}
+	}
+
+	$graph = new CChart(get_request('graphtype', GRAPH_TYPE_NORMAL));
+	$graph->setHeader(get_request('name', ''));
 
 	navigation_bar_calc();
 
@@ -130,12 +157,10 @@ include_once('include/page_header.php');
 			isset($gitem['periods_cnt'])?$gitem['periods_cnt']:null
 			);
 
-		unset($items[$id]);
+		unset($items[$gnum]);
 	}
 	$graph->draw();
-?>
-<?php
 
+	
 include_once('include/page_footer.php');
-
 ?>
