@@ -462,8 +462,6 @@
 	'S_APPLICATIONS'=>			'Applikationen',
 	'S_APPLICATIONS_BIG'=>			'APPLIKATIONEN',
 	'S_CREATE_APPLICATION'=>			'Applikation hinzufügen',
-	'S_ACTIVATE_ITEMS'=>			'Elemente aktivieren',
-	'S_DISABLE_ITEMS'=>			'Elemente deaktivieren',
 	'S_APPLICATION_UPDATED'=>			'Applikation aktualisiert',
 	'S_CANNOT_UPDATE_APPLICATION'=>			'Applikation konnte nicht aktualisiert werden',
 	'S_APPLICATION_ADDED'=>			'Applikation hinzugefügt',
