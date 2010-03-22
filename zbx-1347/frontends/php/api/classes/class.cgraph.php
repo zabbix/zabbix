@@ -789,16 +789,19 @@ COpt::memoryPick();
 	}
 	
 	protected static function inherit($graph, $hostids=null){
-	
-		$graph_template = CTemplate::get(array(
+
+		$options = array(
 			'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
 			'output' => API_OUTPUT_SHORTEN,
 			'nopermissions' => 1,
-		));
+		);
+		$graph_templates = CTemplate::get($options);
 		
-		if(!empty($graph_template)){
+		if(!empty($graph_templates)){
+			$graph_template = reset($graph_templates);
+
 			$options = array(
-				'templateids' => $graph_template[0]['templateid'],
+				'templateids' => $graph_template['templateid'],
 				'output' => array('hostid', 'host'),
 				'preservekeys' => 1,
 				'hostids' => $hostids,
