@@ -1150,6 +1150,7 @@
 	'S_CANNOT_FIND_HOST'=>			'Cannot find host',
 	'S_CANNOT_FIND_HOSTGROUP'=>		'Cannot find hostgroup',
 	'S_CANNOT_FIND_MAP'=>			'Cannot find map',
+	'S_CANNOT_FIND_SCREEN'=>		'Cannot find screen',
 	'S_USED_IN_EXPORTED_MAP_SMALL'=>'used in exported map',
 	'S_NO_ICON_FOR_MAP_ELEMENT'=>	'No icon for map element',
 	'S_EXPORT_HAVE_NO_MAPS'=>		'Export does not contain Zabbix maps',
