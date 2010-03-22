@@ -457,7 +457,7 @@ class zbxXML{
 							case SCREEN_RESOURCE_SCREEN:
 								$db_screens = CScreen::getObjects($screenitem['resourceid']);
 								if(empty($db_screens)){
-									$error = S_CANNOT_FIND_screen.' "'.$nodeCaption.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+									$error = S_CANNOT_FIND_SCREEN.' "'.$nodeCaption.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
 									throw new Exception($error);
 								}
 
