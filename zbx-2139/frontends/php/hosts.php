@@ -501,18 +501,21 @@ include_once('include/page_header.php');
 // -------- GO ---------------
 // DELETE HOST
 	else if($_REQUEST['go'] == 'delete'){
-		$hosts = get_request('hosts', array());
-		$hosts = zbx_toObject($hosts,'hostid');
+		$hostids = get_request('hosts', array());
+		$hosts = zbx_toObject($hostids,'hostid');
 
-		$go_result = true;
 		DBstart();
-		foreach($hosts as $num => $host){
-			$go_result = CHost::delete($host);
+		$options = array(
+			'hostids' => $hostids,
+			'output' => array('hostid', 'host')
+		);
+		$delHosts = CHost::get($options);
 
-			if(!$go_result) break;
-			$go_result = reset($go_result);
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$go_result['host'].']');
+		$go_result = CHost::delete($hosts);
+		foreach($delHosts as $hnum => $host){
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, 'Host ['.$host['host'].']');
 		}
+
 		$go_result = DBend($go_result);
 
 		if(!$go_result){
@@ -658,7 +661,22 @@ $_REQUEST['hostid'] = $thid;
 // sorting && paging
 		order_result($hosts, $sortfield, $sortorder);
 //---------
-		//$hosts = array();
+
+// Selecting linked templates to templates linked to hosts
+		$templateids = array();
+		foreach($hosts as $num => $host){
+			$templateids = array_merge($templateids, zbx_objectValues($host['templates'], 'templateid'));
+		}
+		$templateids = array_unique($templateids);
+
+		$options = array(
+			'templateids' => $templateids,
+			'select_templates' => array('hostid', 'host')
+		);
+
+		$templates = CTemplate::get($options);
+		$templates = zbx_toHash($templates, 'templateid');
+//---------
 		foreach($hosts as $num => $host){
 			$applications = array(new CLink(S_APPLICATIONS, 'applications.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$host['hostid']),
 				' ('.$host['applications'].')');
@@ -736,15 +754,30 @@ $_REQUEST['hostid'] = $thid;
 			$av_table->addRow(array($zbx_available, $snmp_available, $ipmi_available));
 
 			if(empty($host['templates'])){
-				$templates = '-';
+				$hostTemplates = '-';
 			}
 			else{
-				$templates = array();
-				foreach($host['templates'] as $templateid => $template){
-					$templates[] = $template['host'];
+				$hostTemplates = array();
+				foreach($host['templates'] as $htnum => $template){
+					$caption = array();
+					$caption[] = new CLink($template['host'],'templates.php?form=update&templateid='.$template['hostid']);
+
+					if(!empty($templates[$template['templateid']]['templates'])){
+						$caption[] = ' (';
+						foreach($templates[$template['templateid']]['templates'] as $tnum => $tpl){
+							$caption[] = new CLink($tpl['host'],'templates.php?form=update&templateid='.$tpl['hostid']);
+							$caption[] = ', ';
+						}
+						array_pop($caption);
+
+						$caption[] = ')';
+					}
+
+					$hostTemplates[] = $caption;
+					$hostTemplates[] = ', ';
 				}
-				order_result($templates, 'host');
-				$templates = implode(', ', $templates);
+
+				if(!empty($hostTemplates)) array_pop($hostTemplates);
 			}
 
 			$table->addRow(array(
@@ -757,7 +790,7 @@ $_REQUEST['hostid'] = $thid;
 				$dns,
 				$ip,
 				empty($host['port']) ? '-' : $host['port'],
-				new CCol($templates, 'wraptext'),
+				new CCol($hostTemplates, 'wraptext'),
 				$status,
 				$av_table
 			));
