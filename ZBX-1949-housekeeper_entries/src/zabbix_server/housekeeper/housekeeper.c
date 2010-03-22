@@ -60,7 +60,6 @@ static int	housekeeping_process_log()
 			" from housekeeper"
 			" order by tablename");
 
-printf("%d\n", CONFIG_MAX_HOUSEKEEPER_DELETE);
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(housekeeper.housekeeperid, row[0]);
@@ -68,7 +67,6 @@ printf("%d\n", CONFIG_MAX_HOUSEKEEPER_DELETE);
 		housekeeper.field = row[2];
 		ZBX_STR2UINT64(housekeeper.value, row[3]);
 
-printf(ZBX_FS_UI64 "|%s|%s|" ZBX_FS_UI64 "\n", housekeeper.housekeeperid, housekeeper.tablename, housekeeper.field, housekeeper.value);
 		if (0 == CONFIG_MAX_HOUSEKEEPER_DELETE)
 		{
 			deleted = DBexecute(
