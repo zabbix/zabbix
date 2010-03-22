@@ -129,6 +129,10 @@ include_once('include/page_header.php');
 	$filterForm->addItemToBottomRow($reset);
 
 	$alerts_wdgt->addFlicker($filterForm, CProfile::get('web.auditacts.filter.state',1));
+	
+	$scroll_div = new CDiv();
+	$scroll_div->setAttribute('id','scrollbar_cntr');
+	$alerts_wdgt->addFlicker($scroll_div, CProfile::get('web.auditacts.filter.state',1));
 //-------
 
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
@@ -250,10 +254,6 @@ include_once('include/page_header.php');
 	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 	zbx_add_post_js('timeControl.processObjects();');
 
-	$scroll_div = new CDiv();
-	$scroll_div->setAttribute('id','scrollbar_cntr');
-	$scroll_div->show();
-
-
+	
 include_once('include/page_footer.php');
 ?>

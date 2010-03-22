@@ -77,7 +77,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 	show_table_header(S_CONFIGURATION_OF_SCREEN_BIG);
-	echo SBR;
 
 	$options = array(
 		'screenids' => $_REQUEST['screenid'],

@@ -598,11 +598,8 @@ include_once('include/page_header.php');
 		if((time() - $trigger['lastchange']) < TRIGGER_BLINK_PERIOD){
 			$status->setAttribute('name', 'blink');
 		}
-		$lastchange = new CLink(
-			zbx_date2str(S_DATE_FORMAT_YMDHMS, $trigger['lastchange']),
-			'events.php?triggerid='.$trigger['triggerid'].'&stime='.date('YmdHi', $trigger['lastchange'])
-		);
-
+		$lastchange = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS, $trigger['lastchange']), 'events.php?triggerid='.$trigger['triggerid']);
+		//.'&stime='.date('YmdHi', $trigger['lastchange']
 
 		if($config['event_ack_enable']){
 			if($trigger['event_count']){

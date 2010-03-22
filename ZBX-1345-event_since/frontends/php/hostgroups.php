@@ -217,8 +217,6 @@ include_once('include/page_header.php');
 	}
 	show_table_header(S_CONFIGURATION_OF_GROUPS, $frmForm);
 
-	echo SBR;
-
 	if(isset($_REQUEST['form'])){
 		global $USER_DETAILS;
 

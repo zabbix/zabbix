@@ -72,6 +72,9 @@
 			CProfile::update('web.screens.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 
+		if('filter' == $_REQUEST['favobj']){
+			CProfile::update('web.screens.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+		}
 		if('timeline' == $_REQUEST['favobj']){
 			if(isset($_REQUEST['elementid']) && isset($_REQUEST['period'])){
 				navigation_bar_calc('web.screens', true);
@@ -118,7 +121,10 @@
 <?php
 
 	$screens_wdgt = new CWidget();
-
+	
+	$scroll_div = new CDiv();
+	$scroll_div->setAttribute('id','scrollbar_cntr');
+	$screens_wdgt->addFlicker($scroll_div, CProfile::get('web.screens.filter.state',1));
 	
 	$formHeader = new CForm();
 	$cmbConfig = new CComboBox('config', 'screens.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
@@ -248,11 +254,6 @@
 
 		$screens_wdgt->addItem($element);
 		$screens_wdgt->show();
-
-		$scroll_div = new CDiv();
-		$scroll_div->setAttribute('id','scrollbar_cntr');
-		$scroll_div->setAttribute('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
-		$scroll_div->show();
 
 		$jsmenu = new CPUMenu(null,170);
 		$jsmenu->InsertJavaScript();

@@ -575,7 +575,7 @@ $thid = get_request('hostid', 0);
 $_REQUEST['hostid'] = $thid;
 ?>
 <?php
-	echo SBR;
+	// echo SBR;
 
 	if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['hosts'])){
 		insert_mass_update_host_form();

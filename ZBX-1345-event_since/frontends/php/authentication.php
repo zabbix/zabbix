@@ -216,7 +216,6 @@ include_once('include/page_header.php');
 	}
 
 	show_table_header(S_AUTHENTICATION_TO_ZABBIX, $auth);
-	echo SBR;
 
 	if(ZBX_AUTH_INTERNAL==$_REQUEST['config']){
 

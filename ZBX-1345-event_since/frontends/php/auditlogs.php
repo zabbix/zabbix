@@ -183,10 +183,14 @@ include_once('include/page_header.php');
 	$reset->setType('button');
 	$reset->setAction('javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
 
-	$filterForm->addItemToBottomRow(new CButton("filter_set",S_FILTER));
+	$filterForm->addItemToBottomRow(new CButton('filter_set',S_FILTER));
 	$filterForm->addItemToBottomRow($reset);
 
 	$audit_wdgt->addFlicker($filterForm, CProfile::get('web.auditlogs.filter.state',1));
+	
+	$scroll_div = new CDiv();
+	$scroll_div->setAttribute('id','scrollbar_cntr');
+	$audit_wdgt->addFlicker($scroll_div, CProfile::get('web.auditlogs.filter.state',1));
 //-------
 
 	$effectiveperiod = navigation_bar_calc('web.auditlogs.timeline', true);
@@ -329,10 +333,6 @@ include_once('include/page_header.php');
 
 	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 	zbx_add_post_js('timeControl.processObjects();');
-
-	$scroll_div = new CDiv();
-	$scroll_div->setAttribute('id','scrollbar_cntr');
-	$scroll_div->show();
 
 
 include_once('include/page_footer.php');
