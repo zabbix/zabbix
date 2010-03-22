@@ -326,7 +326,6 @@ class zbxXML{
 	}
 
 	public static function import($file){
-
 		$result = true;
 
 		libxml_use_internal_errors(true);
@@ -340,23 +339,168 @@ class zbxXML{
 
 				switch($error->level){
 					case LIBXML_ERR_WARNING:
-						$text .= 'Warning '.$error->code.': ';
+						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Warning '.$error->code.': ';
 					break;
 					case LIBXML_ERR_ERROR:
-						$text .= 'Error '.$error->code.': ';
+						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Error '.$error->code.': ';
 					break;
 					case LIBXML_ERR_FATAL:
-						$text .= 'Fatal Error '.$error->code.': ';
+						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Fatal Error '.$error->code.': ';
 					break;
 				}
 
 				$text .= trim($error->message) . ' [ Line: '.$error->line.' | Column: '.$error->column.' ]';
 				error($text);
+				break;
 			}
 
 			libxml_clear_errors();
 			return false;
 		}
+
+	return true;
+	}
+
+	public static function parseScreen($rules){
+		$importScreens = self::XMLtoArray(self::$xml);
+		if(!isset($importScreens['screens'])){
+			info(S_EXPORT_HAVE_NO_SCREENS);
+			return false;
+		}
+		$importScreens = $importScreens['screens'];
+
+		$result = true;
+		$screens = array();
+		try{
+			foreach($importScreens as $mnum => &$screen){
+				unset($screen['screenid']);
+				$exists = CScreen::exists(array('name' => $screen['name']));
+
+				if($exists && isset($rules['screens']['exist'])){
+					$db_screens = CScreen::getObjects(array('name' => $screen['name']));
+					if(empty($db_screens)) throw new Exception(S_NO_PERMISSIONS_FOR_SCREEN.' "'.$screen['name'].'" import');
+
+					$db_screen = reset($db_screens);
+
+					$screen['screenid'] = $db_screen['screenid'];
+				}
+				else if($exists || !isset($rules['screens']['missed'])){
+					info('Screen ['.$screen['name'].'] skipped - user rule');
+					unset($importScreens[$mnum]);
+					continue; // break if not update exist
+				}
+
+				if(!isset($screen['screenitems'])) $screen['screenitems'] = array();
+
+				foreach($screen['screenitems'] as $snum => &$screenitem){
+					$nodeCaption = isset($screenitem['resourceid']['node'])?$screenitem['resourceid']['node'].':':'';
+
+					if(!isset($screenitem['resourceid'])) $screenitem['resourceid'] = 0;
+					if(is_array($screenitem['resourceid'])){
+						switch($screenitem['resourcetype']){
+							case SCREEN_RESOURCE_HOSTS_INFO:
+							case SCREEN_RESOURCE_TRIGGERS_INFO:
+							case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
+							case SCREEN_RESOURCE_DATA_OVERVIEW:
+							case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
+								$db_hostgroups = CHostgroup::getObjects($screenitem['resourceid']);
+								if(empty($db_hostgroups)){
+									$error = S_CANNOT_FIND_HOSTGROUP.' "'.$nodeCaption.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+									throw new Exception($error);
+								}
+
+								$tmp = reset($db_hostgroups);
+								$screenitem['resourceid'] = $tmp['groupid'];
+							break;
+							case SCREEN_RESOURCE_HOST_TRIGGERS:
+								$db_hosts = CHost::getObjects($screenitem['resourceid']);
+								if(empty($db_hosts)){
+									$error = S_CANNOT_FIND_HOST.' "'.$nodeCaption.$screenitem['resourceid']['host'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+									throw new Exception($error);
+								}
+
+								$tmp = reset($db_hosts);
+								$screenitem['resourceid'] = $tmp['hostid'];
+							break;
+							case SCREEN_RESOURCE_GRAPH:
+								$db_graphs = CGraph::getObjects($screenitem['resourceid']);
+								if(empty($db_graphs)){
+									$error = S_CANNOT_FIND_GRAPH.' "'.$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+									throw new Exception($error);
+								}
+
+								$tmp = reset($db_graphs);
+								$screenitem['resourceid'] = $tmp['graphid'];
+							break;
+							case SCREEN_RESOURCE_SIMPLE_GRAPH:
+							case SCREEN_RESOURCE_PLAIN_TEXT:
+								$db_items = CItem::getObjects($screenitem['resourceid']);
+//SDII($db_items);
+								if(empty($db_items)){
+									$error = S_CANNOT_FIND_ITEM.' "'.$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['key_'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+									throw new Exception($error);
+								}
+
+								$tmp = reset($db_items);
+								$screenitem['resourceid'] = $tmp['itemid'];
+							break;
+							case SCREEN_RESOURCE_MAP:
+								$db_sysmaps = CMap::getObjects($screenitem['resourceid']);
+								if(empty($db_sysmaps)){
+									$error = S_CANNOT_FIND_MAP.' "'.$nodeCaption.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+									throw new Exception($error);
+								}
+
+								$tmp = reset($db_sysmaps);
+								$screenitem['resourceid'] = $tmp['sysmapid'];
+							break;
+							case SCREEN_RESOURCE_SCREEN:
+								$db_screens = CScreen::getObjects($screenitem['resourceid']);
+								if(empty($db_screens)){
+									$error = S_CANNOT_FIND_screen.' "'.$nodeCaption.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+									throw new Exception($error);
+								}
+
+								$tmp = reset($db_screens);
+								$screenitem['resourceid'] = $tmp['screenid'];
+							break;
+							default:
+								$screenitem['resourceid'] = 0;
+							break;
+						}
+					}
+				}
+				unset($screenitem);
+
+				$screens[] = $screen;
+			}
+			unset($screen);
+
+			$importScreens = $screens;
+
+			foreach($importScreens as $mnum => $screen){
+				if(isset($screen['screenid'])){
+					$result = CScreen::update($screen);
+				}
+				else{
+					$result = CScreen::create($screen);
+				}
+
+				if(isset($screen['screenid'])){
+					info(S_SCREEN.' ['.$screen['name'].'] '.S_UPDATED_SMALL);
+				}
+				else{
+					info(S_SCREEN.' ['.$screen['name'].'] '.S_ADDED_SMALL);
+				}
+
+			}
+		}
+		catch(Exception $e){
+			error($e->getMessage());
+			return false;
+		}
+
+	return $result;
 	}
 
 	public static function parseMap($rules){
@@ -372,13 +516,16 @@ class zbxXML{
 		try{
 			foreach($importMaps as $mnum => &$sysmap){
 				unset($sysmap['sysmapid']);
-				$db_maps = CMap::checkObjects(array('name' => $sysmap['name']));
+				$exists = CMap::exists(array('name' => $sysmap['name']));
 
-				if(!empty($db_maps) && isset($rules['maps']['exist'])){
+				if($exists && isset($rules['maps']['exist'])){
+					$db_maps = CMap::getObjects(array('name' => $sysmap['name']));
+					if(empty($db_maps)) throw new Exception(S_NO_PERMISSIONS_FOR_MAP.' ['.$sysmap['name'].'] import');
+
 					$db_map = reset($db_maps);
 					$sysmap['sysmapid'] = $db_map['sysmapid'];
 				}
-				else if(!empty($db_maps) || !isset($rules['maps']['missed'])){
+				else if($exists || !isset($rules['maps']['missed'])){
 					info('Map ['.$sysmap['name'].'] skipped - user rule');
 					unset($importMaps[$mnum]);
 					continue; // break if not update exist
@@ -494,9 +641,10 @@ class zbxXML{
 
 			$importMaps = $sysmaps;
 			foreach($importMaps as $mnum => $importMap){
+				$sysmap = $importMap;
 				if(isset($importMap['sysmapid'])){
-					$sysmaps = CMap::update($importMap);
-					$sysmap = reset($sysmaps);
+					$result = CMap::update($importMap);
+					$sysmapids = $result['sysmapids'];
 
 // Deleteing all selements (with links)
 					$db_selementids = array();
@@ -508,8 +656,9 @@ class zbxXML{
 //----
 				}
 				else{
-					$sysmaps = CMap::create($importMap);
-					$sysmap = reset($sysmaps);
+					$result = CMap::create($importMap);
+					$sysmapids = $result['sysmapids'];
+					$sysmap['sysmapid'] = reset($sysmapids);
 				}
 
 				$selements = $importMap['selements'];
@@ -560,501 +709,631 @@ class zbxXML{
 
 	public static function parseMain($rules){
 		$triggers_for_dependencies = array();
-		$result = true;
 
-		if(isset($rules['host']['exist']) || isset($rules['host']['missed'])){
-			$xpath = new DOMXPath(self::$xml);
-			$hosts = $xpath->query('hosts/host');
-
-			foreach($hosts as $hnum => $host){
-// IMPORT RULES
-				$host_db = self::mapXML2arr($host, XML_TAG_HOST);
-
-				if(isset($host_db['proxy_hostid'])){
-					$proxy_exists = CHost::get(array('hostids' => $host_db['proxy_hostid']));
-					if(empty($proxy_exists))
-						$host_db['proxy_hostid'] = 0;
-				}
-
-				if(!isset($host_db['status'])) $host_db['status'] = HOST_STATUS_TEMPLATE;
-				if($host_db['status'] == HOST_STATUS_TEMPLATE){
-					$current_host = CTemplate::getObjects(array('host' => $host_db['host']));
-				}
-				else{
-					$current_host = CHost::getObjects(array('host' => $host_db['host']));
-				}
-
-				$current_host = reset($current_host);
-
-				if(!$current_host && !isset($rules['host']['missed'])){
-					info('Host ['.$host_db['host'].'] skipped - user rule');
-					continue; // break if update nonexist
-				}
-				if($current_host && !isset($rules['host']['exist'])){
-					info('Host ['.$host_db['host'].'] skipped - user rule');
-					continue; // break if not update exist
-				}
-
-
-// HOST GROUPS {{{
+		try{
+			if(isset($rules['host']['exist']) || isset($rules['host']['missed'])){
 				$xpath = new DOMXPath(self::$xml);
-				$groups = $xpath->query('groups/group', $host);
-				$host_groups = array();
-				if($groups->length == 0){
-					$default_group = CHostGroup::getObjects(array('name' => ZBX_DEFAULT_IMPORT_HOST_GROUP));
+				
+				$hosts = $xpath->query('hosts/host');
 
-					if(empty($default_group)){
-						$default_group = CHostGroup::create(array('name' => ZBX_DEFAULT_IMPORT_HOST_GROUP));
-						if($default_group === false){
-							error(CHostGroup::resetErrors());
-							$result = false;
-							break;
-						}
+				foreach($hosts as $hnum => $host){
+					$host_db = self::mapXML2arr($host, XML_TAG_HOST);
+
+					if(!isset($host_db['status'])) $host_db['status'] = HOST_STATUS_TEMPLATE;		
+					$current_host = ($host_db['status'] == HOST_STATUS_TEMPLATE) ? CTemplate::exists($host_db) : CHost::exists($host_db);
+
+					if(!$current_host && !isset($rules['host']['missed'])){
+						info('Host ['.$host_db['host'].'] skipped - user rule');
+						continue; // break if update nonexist
 					}
-					$host_groups = $default_group;
-				}
-				else{
-					$groups_to_add = array();
-					foreach($groups as $gnum => $group){
-						$current_group = CHostGroup::getObjects(array('name' => $group->nodeValue));
+					if($current_host && !isset($rules['host']['exist'])){
+						info('Host ['.$host_db['host'].'] skipped - user rule');
+						continue; // break if not update exist
+					}
+					
+					if(isset($host_db['proxy_hostid'])){
+						$proxy_exists = CProxy::get(array('proxyids' => $host_db['proxy_hostid']));
+						if(empty($proxy_exists))
+							$host_db['proxy_hostid'] = 0;
+					}
 
-						if(empty($current_group)){
-							$groups_to_add[] = array('name' => $group->nodeValue);
+					if($current_host){
+						$options = array(
+							'filter' => array('host' => $host_db['host']),
+							'output' => API_OUTPUT_EXTEND,
+							'editable' => 1
+						);
+						if($host_db['status'] == HOST_STATUS_TEMPLATE)
+							$current_host = CTemplate::get($options);
+						else
+							$current_host = CHost::get($options);
+
+						if(empty($current_host)){
+							throw new APIException(1, 'No permission for host ['.$host_db['host'].']');
 						}
 						else{
-							$host_groups = array_merge($host_groups, $current_group);
+							$current_host = reset($current_host);
 						}
 					}
 
-					if(!empty($groups_to_add)){
-						$new_groups = CHostGroup::create($groups_to_add);
-						if($new_groups === false){
-							error(CHostGroup::resetErrors());
-							$result = false;
-							break;
-						}
-
-						$host_groups = array_merge($host_groups, $new_groups);
+// HOST GROUPS {{{
+					$groups = $xpath->query('groups/group', $host);
+					
+					$host_db['groups'] = array();
+					$groups_to_parse = array();
+					foreach($groups as $gnum => $group){
+						$groups_to_parse[] = array('name' => $group->nodeValue);
 					}
-				}
+					if(empty($groups_to_parse)){
+						$groups_to_parse[] = array('name' => ZBX_DEFAULT_IMPORT_HOST_GROUP);
+					}
+					
+					foreach($groups_to_parse as $group){
+						$current_group = CHostGroup::exists($group);
+
+						if($current_group){
+							$options = array(
+								'filter' => $group,
+								'output' => API_OUTPUT_EXTEND,
+								'editable' => 1
+							);
+							$current_group = CHostGroup::get($options);
+							if(empty($current_group)){
+								throw new APIException(1, 'No permissions for group '. $group['name']);
+							}
+							
+							$host_db['groups'][] = reset($current_group);
+						}
+						else{
+							$result = CHostGroup::create($group);
+							if(!$result){
+								throw new APIException(1, CHostGroup::resetErrors());
+							}
+							
+							$options = array(
+								'groupids' => $result['groupids'],
+								'output' => API_OUTPUT_EXTEND
+							);
+							$new_group = CHostgroup::get($options);
+							
+							$host_db['groups'][] = reset($new_group);
+						}
+					}
 // }}} HOST GROUPS
 
 
 // MACROS
-				$xpath = new DOMXPath(self::$xml);
-				$macros = $xpath->query('macros/macro', $host);
+					$macros = $xpath->query('macros/macro', $host);
 
-				$host_macros = array();
-				if($macros->length > 0){
-					foreach($macros as $macro){
-						$host_macros[] = self::mapXML2arr($macro, XML_TAG_MACRO);
+					$host_db['macros'] = array();
+					if($macros->length > 0){
+						foreach($macros as $macro){
+							$host_db['macros'][] = self::mapXML2arr($macro, XML_TAG_MACRO);
+						}
 					}
-				}
 // }}} MACROS
 
 
 // TEMPLATES {{{
-				if(isset($rules['template']['exist'])){
-					$xpath = new DOMXPath(self::$xml);
-					$templates = $xpath->query('templates/template', $host);
+					if(isset($rules['template']['exist'])){
+						$templates = $xpath->query('templates/template', $host);
 
-					$host_templates = array();
-					foreach($templates as $template){
-						$current_template = CTemplate::getObjects(array('host' => $template->nodeValue));
-						$current_template = reset($current_template);
+						$host_db['templates'] = array();
+						foreach($templates as $tnum => $template){
 
-						if(!$current_template && !isset($rules['template']['missed'])){
-							info('Template ['.$template->nodeValue.'] skipped - user rule');
-							continue; // break if update nonexist
+							$options = array(
+								'filter' => array('host' => $template->nodeValue),
+								'output' => API_OUTPUT_EXTEND,
+								'editable' => 1
+							);
+							$current_template = CTemplate::get($options);
+							
+							if(empty($current_template)){
+								throw new APIException(1, 'No permission for Template ['.$template->nodeValue.']');
+							}
+							
+							$current_template = reset($current_template);
+							
+							
+							if(!$current_template && !isset($rules['template']['missed'])){
+								info('Template ['.$template->nodeValue.'] skipped - user rule');
+								continue; // break if update nonexist
+							}
+							if($current_template && !isset($rules['template']['exist'])){
+								info('Template ['.$template->nodeValue.'] skipped - user rule');
+								continue; // break if not update exist
+							}
+
+							$host_db['templates'][] = $current_template;
 						}
-						if($current_template && !isset($rules['template']['exist'])){
-							info('Template ['.$template->nodeValue.'] skipped - user rule');
-							continue; // break if not update exist
-						}
-
-						$host_templates[] = $current_template;
 					}
-					
-					$host_db['templates'] = $host_templates;
-				}
 // }}} TEMPLATES
 
 
 // HOSTS
-				$host_db['groups'] = $host_groups;
-				$host_db['macros'] = $host_macros;
+					if($current_host && isset($rules['host']['exist'])){					
+						if($host_db['status'] == HOST_STATUS_TEMPLATE){
+							$host_db['templateid'] = $current_host['hostid'];
 
-				if($current_host && isset($rules['host']['exist'])){
+							$result = CTemplate::update($host_db);
+							if(!$result){
+								throw new APIException(1, CTemplate::resetErrors);
+							}
+							
+							$options = array(
+								'templateids' => $result['templateids'],
+								'output' => API_OUTPUT_EXTEND
+							);
+							$current_host = CTemplate::get($options);
+						}
+						else{
+							$host_db['hostid'] = $current_host['hostid'];
 
-					$current_host = array_merge($current_host, $host_db);
-
-					if($host_db['status'] == HOST_STATUS_TEMPLATE){
-						$r = CTemplate::update($current_host);
+							$result = CHost::update($host_db);
+							if(!$result){
+								throw new APIException(1, CHost::resetErrors);
+							}
+							
+							$options = array(
+								'hostids' => $result['hostids'],
+								'output' => API_OUTPUT_EXTEND
+							);
+							$current_host = CHost::get($options);
+						}
+						if($current_host === false){
+							throw new APIException(1, ($host_db['status'] == HOST_STATUS_TEMPLATE ? CTemplate::resetErrors() : CHost::resetErrors()));
+						}
 					}
-					else{
-						$r = CHost::update($current_host);
-					}
-					if($r === false){
-						error(CHost::resetErrors());
-						$result = false;
-						break;
-					}
-				}
 
-				if(!$current_host && isset($rules['host']['missed'])){
+					if(!$current_host && isset($rules['host']['missed'])){
+						if($host_db['status'] == HOST_STATUS_TEMPLATE){
+							$result = CTemplate::create($host_db);
+							$options = array(
+								'templateids' => $result['templateids'],
+								'output' => API_OUTPUT_EXTEND
+							);
 
-					if($host_db['status'] == HOST_STATUS_TEMPLATE){
-						$current_host = CTemplate::create($host_db);
-					}
-					else{
-						$current_host = CHost::create($host_db);
-					}
+							$current_host = CTemplate::get($options);
+						}
+						else{
+							$result = CHost::create($host_db);
+							$options = array(
+								'hostids' => $result['hostids'],
+								'output' => API_OUTPUT_EXTEND
+							);
 
-					if(empty($current_host)){
-						error(CHostGroup::resetErrors());
-						$result = false;
-						break;
+							$current_host = CHost::get($options);
+						}
+
+						if(empty($current_host)){
+							throw new APIException(1, CHost::resetErrors());
+						}
 					}
 
 					$current_host = reset($current_host);
-				}
-
-
+					
 // HOST PROFILES {{{
-				$xpath = new DOMXPath(self::$xml);
-				$profile_node = $xpath->query('host_profile/*', $host);
+					$profile_node = $xpath->query('host_profile/*', $host);
 
-				if($profile_node->length > 0){
-					$profile = array();
-					foreach($profile_node as $num => $field){
-						$profile[$field->nodeName] = $field->nodeValue;
+					if($profile_node->length > 0){
+						$profile = array();
+						foreach($profile_node as $num => $field){
+							$profile[$field->nodeName] = $field->nodeValue;
+						}
+
+						delete_host_profile($current_host['hostid']);
+						add_host_profile($current_host['hostid'],
+							$profile['devicetype'],
+							$profile['name'],
+							$profile['os'],
+							$profile['serialno'],
+							$profile['tag'],
+							$profile['macaddress'],
+							$profile['hardware'],
+							$profile['software'],
+							$profile['contact'],
+							$profile['location'],
+							$profile['notes']
+						);
 					}
 
-					delete_host_profile($current_host['hostid']);
-					add_host_profile($current_host['hostid'],
-						$profile['devicetype'],
-						$profile['name'],
-						$profile['os'],
-						$profile['serialno'],
-						$profile['tag'],
-						$profile['macaddress'],
-						$profile['hardware'],
-						$profile['software'],
-						$profile['contact'],
-						$profile['location'],
-						$profile['notes']
-					);
-				}
+					$profile_ext_node = $xpath->query('host_profiles_ext/*', $host);
 
-				$xpath = new DOMXPath(self::$xml);
-				$profile_ext_node = $xpath->query('host_profiles_ext/*', $host);
+					if($profile_ext_node->length > 0){
+						$profile_ext = array();
+						foreach($profile_ext_node as $num => $field){
+							$profile_ext[$field->nodeName] = $field->nodeValue;
+						}
 
-				if($profile_ext_node->length > 0){
-					$profile_ext = array();
-					foreach($profile_ext_node as $num => $field){
-						$profile_ext[$field->nodeName] = $field->nodeValue;
+						delete_host_profile_ext($current_host['hostid']);
+						add_host_profile_ext($current_host['hostid'], $profile_ext);
 					}
-
-					delete_host_profile_ext($current_host['hostid']);
-					add_host_profile_ext($current_host['hostid'], $profile_ext);
-				}
 // }}} HOST PROFILES
 
 
 // ITEMS {{{
-				if(isset($rules['item']['exist']) || isset($rules['item']['missed'])){
-					$xpath = new DOMXPath(self::$xml);
-					$items = $xpath->query('items/item', $host);
+					if(isset($rules['item']['exist']) || isset($rules['item']['missed'])){
+						$items = $xpath->query('items/item', $host);
 
+						$items_to_add = array();
+						$items_to_upd = array();
+						foreach($items as $inum => $item){
+							$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
 
-					$items_to_add = array();
-					$items_to_upd = array();
-					foreach($items as $inum => $item){
-						$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
-
-						$item_db['hostid'] = $current_host['hostid'];
-
-						$current_item = CItem::getObjects($item_db);
-						$current_item = reset($current_item);
-
-						if(!$current_item && !isset($rules['item']['missed'])){
-							info('Item ['.$item_db['key_'].'] skipped - user rule');
-							continue; // break if not update exist
-						}
-						if($current_item && !isset($rules['item']['exist'])){
-							info('Item ['.$item_db['key_'].'] skipped - user rule');
-							continue; // break if not update exist
-						}
-
-
-
-// ITEM APPLICATIONS {{{
-						$xpath = new DOMXPath(self::$xml);
-						$applications = $xpath->query('applications/application', $item);
-
-						$item_applications = array();
-						$applications_to_add = array();
-
-						foreach($applications as $application){
-							$application_name = $application->nodeValue;
-							$application_db = array('name' => $application_name, 'hostid' => $current_host['hostid']);
-
-							$current_application = CApplication::getObjects($application_db);
-
-							if(empty($current_application)){
-								$applications_to_add = array_merge($applications_to_add, $application_db);
-							}
-							else{
-								$item_applications = array_merge($item_applications, $current_application);
-							}
-						}
-
-						if(!empty($applications_to_add)){
-							$new_applications = CApplication::create($applications_to_add);
-							if($new_applications === false){
-								error(CApplication::resetErrors());
-								$result = false;
-								break 2;
-							}
-							$item_applications = array_merge($item_applications, $new_applications);
-						}
-// }}} ITEM APPLICATIONS
-
-						if($current_item && isset($rules['item']['exist'])){
-							$current_item = CItem::update($current_item);
-							if($current_item === false){
-								error(CItem::resetErrors());
-								$result = false;
-								break;
-							}
-						}
-						if(!$current_item && isset($rules['item']['missed'])){
 							$item_db['hostid'] = $current_host['hostid'];
 
-							$current_item = CItem::create($item_db);
-							if($current_item === false){
-								error(CItem::resetErrors());
-								$result = false;
-								break;
+							
+							if($current_item = CItem::exists($item_db)){
+								$options = array(
+									'filter' => array(
+										'hostid' => $item_db['hostid'],
+										'key_' => $item_db['key_']
+									),
+									'webitems' => 1,
+									'output' => API_OUTPUT_EXTEND,
+									'editable' => 1
+								);								
+								$current_item = CItem::get($options);
+								
+								if(empty($current_item)){
+									throw new APIException(1, 'No permission for Item ['.$item_db['key_'].']');
+								}
+								
+								$current_item = reset($current_item);
+								
+							}
+
+							if(!$current_item && !isset($rules['item']['missed'])){
+								info('Item ['.$item_db['key_'].'] skipped - user rule');
+								continue; // break if not update exist
+							}
+							if($current_item && !isset($rules['item']['exist'])){
+								info('Item ['.$item_db['key_'].'] skipped - user rule');
+								continue; // break if not update exist
+							}
+
+							
+// ITEM APPLICATIONS {{{
+							$applications = $xpath->query('applications/application', $item);
+
+							$item_applications = array();
+							$applications_to_add = array();
+
+							foreach($applications as $application){
+								$application_db = array(
+									'name' => $application->nodeValue,
+									'hostid' => $current_host['hostid']
+								);
+
+								if($current_application = CApplication::exists($application_db)){
+
+									$current_application = CApplication::get(array(
+										'filter' => $application_db,
+										'output' => API_OUTPUT_EXTEND
+									));
+									
+									if(empty($current_application)){
+										throw new APIException(1, 'No permission for Application ['.$application_db['name'].']');
+									}
+									else{
+										$current_application = reset($current_application);
+									}
+								}
+								
+								if($current_application){
+									$item_applications = array_merge($item_applications, $current_application);
+								}
+								else{
+									$applications_to_add = array_merge($applications_to_add, $application_db);
+								}
+							}
+
+							if(!empty($applications_to_add)){
+								$result = CApplication::create($applications_to_add);
+								if(!$result){
+									throw new APIException(1, CApplication::resetErrors());
+								}
+								
+								$options = array(
+									'applicationids' => $result['applicationids'],
+									'output' => API_OUTPUT_EXTEND
+								);
+								$new_applications = CApplication::get($options);
+								
+								$item_applications = array_merge($item_applications, $new_applications);
+							}
+// }}} ITEM APPLICATIONS
+							if($current_item && isset($rules['item']['exist'])){
+								$item_db['itemid'] = $current_item['itemid'];
+								$result = CItem::update($item_db);
+								if(!$result){
+									throw new APIException(1, CItem::resetErrors());
+								}
+								
+								$options = array(
+									'itemids' => $result['itemids'],
+									'webitems' => 1,
+									'output' => API_OUTPUT_EXTEND
+								);
+								$current_item = CItem::get($options);
+							}
+							if(!$current_item && isset($rules['item']['missed'])){
+								$result = CItem::create($item_db);
+								if(!$result){
+									throw new APIException(1, CItem::resetErrors());
+								}
+								
+								$options = array(
+									'itemids' => $result['itemids'],
+									'webitems' => 1,
+									'output' => API_OUTPUT_EXTEND
+								);
+								$current_item = CItem::get($options);
+							}
+
+							$r = CApplication::addItems(array(
+								'applications' => $item_applications,
+								'items' => $current_item
+							));
+							if($r === false){
+								throw new APIException(1, CApplication::resetErrors());
 							}
 						}
-
-						$options = array(
-							'applications' => $item_applications,
-							'items' => $current_item
-						);
-						$r = CApplication::addItems($options);
-						if($r === false){
-							error(CApplication::resetErrors());
-							$result = false;
-							break;
-						}
 					}
-				}
 // }}} ITEMS
 
 
 // TRIGGERS {{{
-				if(isset($rules['trigger']['exist']) || isset($rules['trigger']['missed'])){
-					$xpath = new DOMXPath(self::$xml);
-					$triggers = $xpath->query('triggers/trigger', $host);
+					if(isset($rules['trigger']['exist']) || isset($rules['trigger']['missed'])){
+						$triggers = $xpath->query('triggers/trigger', $host);
 
-					$added_triggers = array();
-					$triggers_to_add = array();
-					$triggers_to_upd = array();
+						$triggers_to_add = array();
+						$triggers_to_upd = array();
 
-					foreach($triggers as $trigger){
-						$trigger_db = self::mapXML2arr($trigger, XML_TAG_TRIGGER);
-						$trigger_db['expression'] = str_replace('{{HOSTNAME}:', '{'.$host_db['host'].':', $trigger_db['expression']);
-						$trigger_db['hostid'] = $current_host['hostid'];
+						foreach($triggers as $trigger){
+							$trigger_db = self::mapXML2arr($trigger, XML_TAG_TRIGGER);
 
-						$current_trigger = CTrigger::getObjects($trigger_db);
-						$current_trigger = reset($current_trigger);
-
-						if(!$current_trigger && !isset($rules['trigger']['missed'])){
-							info('Trigger ['.$trigger_db['description'].'] skipped - user rule');
-							continue; // break if not update exist
-						}
-						if($current_trigger && !isset($rules['trigger']['exist'])){
-							info('Trigger ['.$trigger_db['description'].'] skipped - user rule');
-							continue; // break if not update exist
-						}
-
-						if($current_trigger && isset($rules['trigger']['exist'])){
-							$triggers_for_dependencies[] = $current_trigger;
-							$current_trigger['expression'] = explode_exp($current_trigger['expression'], false);
-							$triggers_to_upd[] = $current_trigger;
-						}
-						if(!$current_trigger && isset($rules['trigger']['missed'])){
+							$trigger_db['expression'] = str_replace('{{HOSTNAME}:', '{'.$host_db['host'].':', $trigger_db['expression']);
 							$trigger_db['hostid'] = $current_host['hostid'];
-							$triggers_to_add[] = $trigger_db;
-						}
-					}
+							
+							if($current_trigger = CTrigger::exists($trigger_db)){
+								$current_trigger = CTrigger::get(array(
+									'filter' => array(
+										'expression' => $trigger_db['expression'],
+										'description' => $trigger_db['description']
+									),
+									'hostids' => $current_host['hostid'],
+									'output' => API_OUTPUT_EXTEND,
+									'editable' => 1
+								));
+								
+								if(empty($current_trigger)){
+									throw new APIException(1, 'No permission for Trigger ['.$trigger_db['description'].']');
+								}
+								$current_trigger = reset($current_trigger);
+							}
+							
+						
+							if(!$current_trigger && !isset($rules['trigger']['missed'])){
+								info('Trigger ['.$trigger_db['description'].'] skipped - user rule');
+								continue; // break if not update exist
+							}
+							if($current_trigger && !isset($rules['trigger']['exist'])){
+								info('Trigger ['.$trigger_db['description'].'] skipped - user rule');
+								continue; // break if not update exist
+							}
 
-					if(!empty($triggers_to_add)){
-						$added_triggers = CTrigger::create($triggers_to_add);
-						if($added_triggers === false){
-							error(CTrigger::resetErrors());
-							$result = false;
-							break;
+							if($current_trigger && isset($rules['trigger']['exist'])){
+								$trigger_db['triggerid'] = $current_trigger['triggerid'];
+								$triggers_to_upd[] = $trigger_db;
+							}
+							if(!$current_trigger && isset($rules['trigger']['missed'])){
+								$triggers_to_add[] = $trigger_db;
+							}
 						}
-					}
-					if(!empty($triggers_to_upd)){
-						$r = CTrigger::update($triggers_to_upd);
-						if($r === false){
-							error(CTrigger::resetErrors());
-							$result = false;
-							break;
-						}
-					}
+						
+						if(!empty($triggers_to_upd)){
+							$result = CTrigger::update($triggers_to_upd);
+							if(!$result){
+								throw new APIException(1, CTrigger::resetErrors());
+							}
+							
+							$options = array(
+								'triggerids' => $result['triggerids'],
+								'output' => API_OUTPUT_EXTEND
+							);
+							$r = CTrigger::get($options);
 
-					$triggers_for_dependencies = array_merge($triggers_for_dependencies, $added_triggers);
-				}
+							$triggers_for_dependencies[] = array_merge($triggers_for_dependencies, $r);
+						}
+						if(!empty($triggers_to_add)){
+							$result = CTrigger::create($triggers_to_add);
+							if(!$result){
+								throw new APIException(1, CTrigger::resetErrors());
+							}
+							
+							$options = array(
+								'triggerids' => $result['triggerids'],
+								'output' => API_OUTPUT_EXTEND
+							);
+							$r = CTrigger::get($options);
+							$triggers_for_dependencies[] = array_merge($triggers_for_dependencies, $r);
+						}
+					}
 // }}} TRIGGERS
 
 
 // GRAPHS {{{
-				if(isset($rules['graph']['exist']) || isset($rules['graph']['missed'])){
-					$xpath = new DOMXPath(self::$xml);
-					$graphs = $xpath->query('graphs/graph', $host);
+					if(isset($rules['graph']['exist']) || isset($rules['graph']['missed'])){
+						$graphs = $xpath->query('graphs/graph', $host);
 
-					$graphs_to_add = array();
-					foreach($graphs as $gnum=> $graph){
-						$graph_db = self::mapXML2arr($graph, XML_TAG_GRAPH);
-						$graph_db['hostid'] = $current_host['hostid'];
-
-						$current_graph = CGraph::getObjects($graph_db);
-						$current_graph = reset($current_graph);
-
-						if(!$current_graph && !isset($rules['graph']['missed'])){
-							info('Graph ['.$graph_db['name'].'] skipped - user rule');
-							continue; // break if not update exist
-						}
-						if($current_graph && !isset($rules['graph']['exist'])){
-							info('Graph ['.$graph_db['name'].'] skipped - user rule');
-							continue; // break if not update exist
-						}
-
-						if($current_graph){
-							if(!empty($graph_db['ymin_item_key'])){
-								$graph_db['ymin_item_key'] = explode(':', $graph_db['ymin_item_key']);
-								if(count($graph_db['ymin_item_key']) < 2){
-									error('Incorrect y min item for graph ['.$graph_db['name'].']');
-								}
-
-								$current_graph['host']	= array_shift($graph_db['ymin_item_key']);
-								$current_graph['ymin_item_key']	= implode(':', $graph_db['ymin_item_key']);
-
-								if(!$item = get_item_by_key($current_graph['ymin_item_key'], $current_graph['host'])){
-									error('Missed item ['.$current_graph['ymin_item_key'].'] for host ['.$current_graph['host'].']');
-								}
-
-								$current_graph['ymin_itemid'] = $item['itemid'];
-							}
-
-							if(!empty($graph_db['ymax_item_key'])){
-								$graph_db['ymax_item_key'] = explode(':', $graph_db['ymax_item_key']);
-								if(count($graph_db['ymax_item_key']) < 2){
-									error('Incorrect y max item for graph ['.$graph_db['name'].']');
-								}
-
-								$current_graph['host']	= array_shift($graph_db['ymax_item_key']);
-								$current_graph['ymax_item_key']	= implode(':', $graph_db['ymax_item_key']);
-
-								if(!$item = get_item_by_key($current_graph['ymax_item_key'], $current_graph['host'])){
-									error('Missed item ['.$current_graph['ymax_item_key'].'] for host ['.$current_graph['host'].']');
-								}
-
-								$current_graph['ymax_itemid'] = $item['itemid'];
-							}
-						}
-						if($current_graph){ // if exists, delete graph to add then new
-							CGraph::delete($current_graph);
-						}
+						$graphs_to_add = array();
+						$graphs_to_upd = array();
+						foreach($graphs as $gnum => $graph){
 // GRAPH ITEMS {{{
-						$xpath = new DOMXPath(self::$xml);
-						$gitems = $xpath->query('graph_elements/graph_element', $graph);
+							$gitems = $xpath->query('graph_elements/graph_element', $graph);
 
-						$gitems_to_add = array();
-						foreach($gitems as $ginum => $gitem){
-							$gitem_db = self::mapXML2arr($gitem, XML_TAG_GRAPH_ELEMENT);
+							$graph_hostids = array();
+							$graph_items = array();
+							foreach($gitems as $ginum => $gitem){
+								$gitem_db = self::mapXML2arr($gitem, XML_TAG_GRAPH_ELEMENT);
 
-							$data = explode(':', $gitem_db['host_key_']);
-							$gitem_host = array_shift($data);
-							if($gitem_host == '{HOSTNAME}'){
-								$gitem_host = $host_db['host'];
-							}
-
-							$gitem_hostid = CHost::getObjects(array('host' => $gitem_host));
-							$gitem_templateid = CTemplate::getObjects(array('host' => $gitem_host));
-							$gitem_hostid = array_merge($gitem_hostid, $gitem_templateid);
-
-							if(!empty($gitem_hostid)){
-
-								$gitem_hostid = reset($gitem_hostid);
-
-								$gitem_db['hostid'] = $gitem_hostid['hostid'];
+								$data = explode(':', $gitem_db['host_key_']);
+								$gitem_host = array_shift($data);
+								$gitem_db['host'] = ($gitem_host == '{HOSTNAME}') ? $host_db['host'] : $gitem_host;
 								$gitem_db['key_'] = implode(':', $data);
-
-								$current_gitem = CItem::getObjects($gitem_db);
-								$current_gitem = reset($current_gitem);
-								if($current_gitem){ // if item exists, add graph item to graph
-									$gitem_db['itemid'] = $current_gitem['itemid'];
-									$graph_db['gitems'][$current_gitem['itemid']] = $gitem_db;
+								
+								if($current_item = CItem::exists($gitem_db)){							
+									$current_item = CItem::get(array(
+										'filter' => array(
+											'key_' => $gitem_db['key_']
+										),
+										'webitems' => 1,
+										'host' => $gitem_db['host'],
+										'output' => API_OUTPUT_EXTEND,
+										'editable' => 1
+									));
+									if(empty($current_item)){
+										throw new APIException(1, 'No permission for Item ['.$gitem_db['key_'].']');
+									}
+									$current_item = reset($current_item);
+									
+									$graph_hostids[] = $current_item['hostid'];
+									$gitem_db['itemid'] = $current_item['itemid'];
+									$graph_items[] = $gitem_db;
+								}
+								else{
+									throw new APIException(1, 'Item ['.$gitem_db['host_key_'].'] does not exists');
 								}
 							}
-						}
+// }}} GRAPH ITEMS
 
-						$graphs_to_add[] = $graph_db;
-					}
-					$r = CGraph::create($graphs_to_add);
-					if($r === false){
-						error(CGraph::resetErrors());
-						$result = false;
-						break;
-					}
-				}
-			}
+							$graph_db = self::mapXML2arr($graph, XML_TAG_GRAPH);
+							$graph_db['hostids'] = $graph_hostids;
 
-			if(!$result) return false;
-// DEPENDENCIES
-			$xpath = new DOMXPath(self::$xml);
-			$dependencies = $xpath->query('dependencies/dependency');
+							if($current_graph = CGraph::exists($graph_db)){
+								$current_graph = CGraph::get(array(
+									'filter' => array('name' => $graph_db['name']),
+									'hostids' => $graph_db['hostids'],
+									'output' => API_OUTPUT_EXTEND,
+									'editable' => 1
+								));
+								
+								if(empty($current_graph)){
+									throw new APIException(1, 'No permission for Graph ['.$graph_db['name'].']');
+								}
+								$current_graph = reset($current_graph);
+							}
 
-			if($dependencies->length > 0){
-				$triggers_for_dependencies = zbx_objectValues($triggers_for_dependencies, 'triggerid');
-				$triggers_for_dependencies = array_flip($triggers_for_dependencies);
+							if(!$current_graph && !isset($rules['graph']['missed'])){
+								info('Graph ['.$graph_db['name'].'] skipped - user rule');
+								continue; // break if not update exist
+							}
+							if($current_graph && !isset($rules['graph']['exist'])){
+								info('Graph ['.$graph_db['name'].'] skipped - user rule');
+								continue; // break if not update exist
+							}
 
-				foreach($dependencies as $dependency){
-					$triggers_to_add_dep = array();
+							if($current_graph){
+								if(!empty($graph_db['ymin_item_key'])){
+									$graph_db['ymin_item_key'] = explode(':', $graph_db['ymin_item_key']);
+									if(count($graph_db['ymin_item_key']) < 2){
+										error('Incorrect y min item for graph ['.$graph_db['name'].']');
+									}
 
-					$trigger_description = $dependency->getAttribute('description');
-					$current_triggerid = get_trigger_by_description($trigger_description);
+									$current_graph['host']	= array_shift($graph_db['ymin_item_key']);
+									$current_graph['ymin_item_key']	= implode(':', $graph_db['ymin_item_key']);
 
-// sdi('<b><u>Trigger Description: </u></b>'.$trigger_description.' | <b>Current_triggerid: </b>'. $current_triggerid['triggerid']);
+									if(!$item = get_item_by_key($current_graph['ymin_item_key'], $current_graph['host'])){
+										error('Missed item ['.$current_graph['ymin_item_key'].'] for host ['.$current_graph['host'].']');
+									}
 
-					if($current_triggerid && isset($triggers_for_dependencies[$current_triggerid['triggerid']])){
-						$xpath = new DOMXPath(self::$xml);
-						$depends_on_list = $xpath->query('depends', $dependency);
+									$current_graph['ymin_itemid'] = $item['itemid'];
+								}
 
-						foreach($depends_on_list as $depends_on){
-							$depends_triggerid = get_trigger_by_description($depends_on->nodeValue);;
-// sdi('<b>depends on description: </b>'.$depends_on->nodeValue.' | <b>depends_triggerid: </b>'. $depends_triggerid['triggerid']);
-							if($depends_triggerid['triggerid']){
-								$triggers_to_add_dep[] = $depends_triggerid['triggerid'];
+								if(!empty($graph_db['ymax_item_key'])){
+									$graph_db['ymax_item_key'] = explode(':', $graph_db['ymax_item_key']);
+									if(count($graph_db['ymax_item_key']) < 2){
+										error('Incorrect y max item for graph ['.$graph_db['name'].']');
+									}
+
+									$current_graph['host']	= array_shift($graph_db['ymax_item_key']);
+									$current_graph['ymax_item_key']	= implode(':', $graph_db['ymax_item_key']);
+
+									if(!$item = get_item_by_key($current_graph['ymax_item_key'], $current_graph['host'])){
+										error('Missed item ['.$current_graph['ymax_item_key'].'] for host ['.$current_graph['host'].']');
+									}
+
+									$current_graph['ymax_itemid'] = $item['itemid'];
+								}
+							}
+
+							
+							$graph_db['gitems'] = $graph_items;
+							if($current_graph){
+								$graph_db['graphid'] = $current_graph['graphid'];
+								$graphs_to_upd[] = $graph_db;
+							}
+							else{
+								$graphs_to_add[] = $graph_db;
 							}
 						}
-						$r = update_trigger($current_triggerid['triggerid'],null,null,null,null,null,null,null,$triggers_to_add_dep,null);
-						if($r === false){
-							$result = false;
-							break;
+
+						if(!empty($graphs_to_add)){
+							$r = CGraph::create($graphs_to_add);
+							if($r === false){
+								throw new APIException(1, CGraph::resetErrors());
+							}
+						}
+						if(!empty($graphs_to_upd)){
+							$r = CGraph::update($graphs_to_upd);
+							if($r === false){
+								throw new APIException(1, CGraph::resetErrors());
+							}
+						}
+					}
+				}
+
+// DEPENDENCIES
+				$dependencies = $xpath->query('dependencies/dependency');
+
+				if($dependencies->length > 0){
+					$triggers_for_dependencies = zbx_objectValues($triggers_for_dependencies, 'triggerid');
+					$triggers_for_dependencies = array_flip($triggers_for_dependencies);
+
+					foreach($dependencies as $dependency){
+						$triggers_to_add_dep = array();
+
+						$trigger_description = $dependency->getAttribute('description');
+						$current_triggerid = get_trigger_by_description($trigger_description);
+
+	// sdi('<b><u>Trigger Description: </u></b>'.$trigger_description.' | <b>Current_triggerid: </b>'. $current_triggerid['triggerid']);
+
+						if($current_triggerid && isset($triggers_for_dependencies[$current_triggerid['triggerid']])){
+							$xpath = new DOMXPath(self::$xml);
+							$depends_on_list = $xpath->query('depends', $dependency);
+
+							foreach($depends_on_list as $depends_on){
+								$depends_triggerid = get_trigger_by_description($depends_on->nodeValue);;
+	// sdi('<b>depends on description: </b>'.$depends_on->nodeValue.' | <b>depends_triggerid: </b>'. $depends_triggerid['triggerid']);
+								if($depends_triggerid['triggerid']){
+									$triggers_to_add_dep[] = $depends_triggerid['triggerid'];
+								}
+							}
+							$r = update_trigger($current_triggerid['triggerid'],null,null,null,null,null,null,null,$triggers_to_add_dep,null);
+							if($r === false){
+								throw new APIException();
+							}
 						}
 					}
 				}
 			}
-
-			if(!$result) return false;
-			else return true;
+			
+			return true;
+		}
+		catch(APIException $e){
+			error($e->getErrors());
+			return false;
 		}
 	}
 

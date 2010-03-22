@@ -61,7 +61,7 @@ addObject: function(domid, time, objData){
 		if(isset(key, objData)) this.objectList[domid][key] = objData[key];
 	}
 	
-	var now = new Date();
+	var now = new CDate();
 	now = parseInt(now.getTime() / 1000);
 	if(!isset('period', time))		time.period = 3600;
 	if(!isset('endtime', time))		time.endtime = now;
@@ -341,9 +341,8 @@ debug: function(fnc_name, id){
 
 function datetoarray(unixtime){
 
-	var date = new Date();
-	date.setTime(unixtime*1000);
-	
+	var date = new CDate(unixtime*1000);
+
 	var thedate = new Array();
 	thedate[0] = date.getDate();
 	thedate[1] = date.getMonth()+1;
@@ -386,7 +385,7 @@ function create_timeline(tlid, period, starttime, usertime, endtime){
 		var tlid = ZBX_TIMELINES.length;
 	}
 	
-	var now = new Date();
+	var now = new CDate();
 	now = parseInt(now.getTime() / 1000);
 
 	if('undefined' == typeof(usertime)) usertime = now;
@@ -431,7 +430,7 @@ initialize: function(id, period, starttime, usertime, endtime){
 },
 
 timeNow: function(){
-	var tmp_date = new Date();
+	var tmp_date = new CDate();
 return parseInt(tmp_date.getTime()/1000);
 },
 
@@ -1265,8 +1264,7 @@ syncTZOffset: function(time){
 	this.debug('syncTZOffset');
 
 	if(time > 86400){
-		var date = new Date();
-		date.setTime(time*1000);
+		var date = new CDate(time*1000);
 		var TimezoneOffset = date.getTimezoneOffset();
 		time -= (TimezoneOffset*60);
 	}
@@ -1277,8 +1275,7 @@ return time;
 getTZdiff: function(time1, time2){
 	this.debug('getTZdiff');
 
-	var date = new Date();
-	date.setTime(time1*1000);
+	var date = new CDate(time1*1000);
 	var TimezoneOffset = date.getTimezoneOffset();
 	
 	date.setTime(time2*1000);
@@ -1294,7 +1291,7 @@ roundTime: function(usertime){
 //---------------
 //	if((this._period % 86400) == 0){
 	if(time > 86400){
-		var dd = new Date();
+		var dd = new CDate();
 		dd.setTime(time*1000);
 		dd.setHours(0);
 		dd.setMinutes(0);
@@ -1370,7 +1367,7 @@ setTabInfo: function(){
 
 // beating Timezone offsets
 // USERTIME
-	var date = new Date();
+	var date = new CDate();
 	date.setTime(usertime*1000);
 	var TimezoneOffset = date.getTimezoneOffset();
 	

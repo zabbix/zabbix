@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,6 +61,7 @@ class CHostGroup extends CZBXAPI{
 			'nodeids'					=> null,
 			'groupids'					=> null,
 			'hostids'					=> null,
+			'templateids'				=> null,
 			'monitored_hosts'			=> null,
 			'templated_hosts' 			=> null,
 			'real_hosts' 				=> null,
@@ -84,12 +85,14 @@ class CHostGroup extends CZBXAPI{
 			'output'					=> API_OUTPUT_REFER,
 			'extendoutput'				=> null,
 			'select_hosts'				=> null,
+			'select_templates'			=> null,
 			'count'						=> null,
 			'preservekeys'				=> null,
 
 			'sortfield'					=> '',
 			'sortorder'					=> '',
-			'limit'						=> null
+			'limit'						=> null,
+			'limitSelects'				=> null
 		);
 
 		$options = zbx_array_merge($def_options, $params);
@@ -328,6 +331,10 @@ class CHostGroup extends CZBXAPI{
 
 					if(!isset($result[$group['groupid']])) $result[$group['groupid']]= array();
 
+					if(!is_null($options['select_templates']) && !isset($result[$group['groupid']]['templates'])){
+						$result[$group['groupid']]['templates'] = array();
+					}
+
 					if(!is_null($options['select_hosts']) && !isset($result[$group['groupid']]['hosts'])){
 						$result[$group['groupid']]['hosts'] = array();
 					}
@@ -346,31 +353,103 @@ class CHostGroup extends CZBXAPI{
 			}
 		}
 
-		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
+COpt::memoryPick();
+		if(!is_null($options['count'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
 // Adding hosts
-		if(!is_null($options['select_hosts']) && str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+		if(!is_null($options['select_hosts'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'output' => $options['select_hosts'],
 				'groupids' => $groupids,
-				'templated_hosts' => 1,
 				'preservekeys' => 1
 			);
-			$hosts = CHost::get($obj_params);
 
-			foreach($hosts as $hostid => $host){
-				$hgroups = $host['groups'];
-				unset($host['groups']);
-				foreach($hgroups as $num => $group){
-					$result[$group['groupid']]['hosts'][] = $host;
+			if(is_array($options['select_hosts']) || str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['select_hosts'];
+				$hosts = CHost::get($obj_params);
+
+				if(!is_null($options['limitSelects'])) order_result($hosts, 'host');
+
+				$count = array();
+				foreach($hosts as $hostid => $host){
+					$hgroups = $host['groups'];
+					unset($host['groups']);
+					foreach($hgroups as $num => $group){
+						if(!is_null($options['limitSelects'])){
+							if(!isset($count[$group['groupid']])) $count[$group['groupid']] = 0;
+							$count[$group['groupid']]++;
+
+							if($count[$group['groupid']] > $options['limitSelects']) continue;
+						}
+
+						$result[$group['groupid']]['hosts'][] = $hosts[$hostid];
+					}
+				}
+			}
+			else if(API_OUTPUT_COUNT == $options['select_hosts']){
+				$obj_params['countOutput'] = 1;
+				$obj_params['groupCount'] = 1;
+
+				$hosts = CHost::get($obj_params);
+				$hosts = zbx_toHash($hosts, 'groupid');
+				foreach($result as $groupid => $group){
+					if(isset($hosts[$groupid]))
+						$result[$groupid]['hosts'] = $hosts[$groupid]['rowscount'];
+					else
+						$result[$groupid]['hosts'] = 0;
 				}
 			}
 		}
 
+// Adding templates
+		if(!is_null($options['select_templates'])){
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'groupids' => $groupids,
+				'preservekeys' => 1
+			);
+
+			if(is_array($options['select_templates']) || str_in_array($options['select_templates'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['select_templates'];
+				$templates = CTemplate::get($obj_params);
+				if(!is_null($options['limitSelects'])) order_result($templates, 'host');
+
+				$count = array();
+				foreach($templates as $templateid => $template){
+					$hgroups = $template['groups'];
+					unset($template['groups']);
+					foreach($hgroups as $num => $group){
+						if(!is_null($options['limitSelects'])){
+							if(!isset($count[$group['groupid']])) $count[$group['groupid']] = 0;
+							$count[$group['groupid']]++;
+
+							if($count[$group['groupid']] > $options['limitSelects']) continue;
+						}
+
+						$result[$group['groupid']]['templates'][] = $templates[$templateid];
+					}
+				}
+			}
+			else if(API_OUTPUT_COUNT == $options['select_templates']){
+				$obj_params['countOutput'] = 1;
+				$obj_params['groupCount'] = 1;
+
+				$templates = CTemplate::get($obj_params);
+				$templates = zbx_toHash($templates, 'groupid');
+				foreach($result as $groupid => $group){
+					if(isset($templates[$groupid]))
+						$result[$groupid]['templates'] = $templates[$groupid]['rowscount'];
+					else
+						$result[$groupid]['templates'] = 0;
+				}
+			}
+		}
+
+
+COpt::memoryPick();
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
 			$result = zbx_cleanHashes($result);
@@ -410,30 +489,25 @@ class CHostGroup extends CZBXAPI{
 	return $result;
 	}
 
-	public static function checkObjects($hostgroupsData){
-		
-		$hostgroupsData = zbx_toArray($hostgroupsData);
-		
-		$result = array();
-		foreach($hostgroupsData as $hnum => $hostgroupData){
-			$options = array(
-				'filter' => $hostgroupData,
-				'output' => API_OUTPUT_SHORTEN,
-				'nopermissions' => 1
-			);
+	public static function exists($object){
+		$keyFields = array('name');
 
-			if(isset($hostgroupData['node']))
-				$options['nodeids'] = getNodeIdByNodeName($hostgroupData['node']);
-			else if(isset($hostgroupData['nodeids']))
-				$options['nodeids'] = $hostgroupData['nodeids'];
+		$options = array(
+			'filter' => zbx_array_mintersect($keyFields, $object),
+			'output' => API_OUTPUT_SHORTEN,
+			'nopermissions' => 1,
+			'limit' => 1
+		);
+		if(isset($object['node']))
+			$options['nodeids'] = getNodeIdByNodeName($object['node']);
+		else if(isset($object['nodeids']))
+			$options['nodeids'] = $object['nodeids'];
 
-			$hostgroups = self::get($options);
+		$objs = self::get($options);
 
-			$result+= $hostgroups;
-		}
-
-	return $result;
+	return !empty($objs);
 	}
+	
 /**
  * Add hostgroupGroups
  *
@@ -469,8 +543,7 @@ class CHostGroup extends CZBXAPI{
 				break;
 			}
 
-			$group_exist = self::checkObjects(array('name' => $group['name']));
-			if(!empty($group_exist)){
+			if(self::exists(array('name' => $group['name']))){
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'HostGroup [ '.$group['name'].' ] already exists');
 				$result = false;
 				break;
@@ -486,8 +559,7 @@ class CHostGroup extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_groups = self::get(array('groupids'=>$groupids, 'extendoutput'=>1, 'nopermissions'=>1));
-			return $new_groups;
+			return array('groupids' => $groupids);
 		}
 		else{
 			self::setMethodErrors(__METHOD__, $errors);
@@ -535,8 +607,14 @@ class CHostGroup extends CZBXAPI{
 
 		self::BeginTransaction(__METHOD__);
 		foreach($groups as $num => $group){
-
-			$group_exist = self::checkObjects(array('name' => $group['name']));
+			
+			$group_exist = self::get(array(
+				'filter' => array(
+					'name' => $group['name']),
+				'output' => API_OUTPUT_SHORTEN,
+				'editable' => 1,
+				'nopermissions' => 1
+			));
 			$group_exist = reset($group_exist);
 
 			if($group_exist && ($group_exist['groupid'] != $group['groupid'])){
@@ -556,8 +634,7 @@ class CHostGroup extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_groups = self::get(array('groupids'=>$groupids, 'extendoutput'=>1, 'nopermissions'=>1));
-			return $upd_groups;
+			return array('groupids' => $groupids);
 		}
 		else{
 			self::setError(__METHOD__);
@@ -582,10 +659,13 @@ class CHostGroup extends CZBXAPI{
 		$groups = zbx_toArray($groups);
 		$groupids = array();
 
-		$del_groups = self::get(array('groupids'=>zbx_objectValues($groups, 'groupid'),
-											'editable'=>1,
-											'extendoutput'=>1,
-											'preservekeys'=>1));
+		$options = array(
+			'groupids'=>zbx_objectValues($groups, 'groupid'),
+			'editable'=>1,
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$del_groups = self::get($options);
 		foreach($groups as $gnum => $group){
 			if(!isset($del_groups[$group['groupid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -685,7 +765,7 @@ class CHostGroup extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return zbx_cleanHashes($del_groups);
+			return array('groupids' => $groupids);
 		}
 		else{
 			self::setError(__METHOD__);

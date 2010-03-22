@@ -206,13 +206,12 @@ require_once('include/items.inc.php');
 				$applicationid = $applicationid['applicationid'];
 			}
 			else{
-				$applicationid = Capplication::create(array('name' => $application, 'hostid' => $hostid));
-				if(!$applicationid){
+				$result = CApplication::create(array('name' => $application, 'hostid' => $hostid));
+				if(!$result){
 					throw new Exception(S_CANNOT_ADD_NEW_APPLICATION.' [ '.$application.' ]');
 				}
 				else{
-					$applicationid = reset($applicationid);
-					$applicationid = $applicationid['applicationid'];
+					$applicationid = reset($result['applicationids']);
 				}
 			}
 

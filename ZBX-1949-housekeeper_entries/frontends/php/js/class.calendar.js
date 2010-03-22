@@ -40,9 +40,9 @@ var calendar = Class.create();
 
 calendar.prototype = {
 id:	null,				//Personal ID
-dt: new Date(),			//Date object on load time
-cdt: new Date(),		//Date object of current(viewed) date
-sdt: new Date(),		//Date object of a selected date
+dt: new CDate(),			//Date object on load time
+cdt: new CDate(),		//Date object of current(viewed) date
+sdt: new CDate(),		//Date object of a selected date
 
 //day: 1, 				//represents day number
 month: 0,				//represents month number

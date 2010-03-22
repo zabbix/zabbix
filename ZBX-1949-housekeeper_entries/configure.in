@@ -52,8 +52,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h regex.h \
   stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
   sys/timeb.h Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
-  net/if_mib.h sys/user.h sys/ucontext.h libperfstat.h devstat.h \
-  arpa/nameser_compat.h)
+  net/if_mib.h sys/user.h sys/ucontext.h libperfstat.h devstat.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -593,31 +592,6 @@ AC_DEFINE(HAVE_FUNCTION_SYSCTL_KERN_MAXPROC,1,[Define to 1 if 'KERN_MAXPROC' exi
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
-dnl Check for function sysctl (KERN_PIDMAX)
-AC_MSG_CHECKING(for function sysctl (KERN_PIDMAX))
-AC_TRY_COMPILE(
-[
-#ifdef HAVE_SYS_TYPES_H
-#include <sys/types.h>
-#endif /* HAVE_SYS_TYPES_H */
-
-#ifdef HAVE_SYS_PARAM_H
-#include <sys/param.h>
-#endif /* HAVE_SYS_PARAM_H */ 
-
-#include <sys/sysctl.h>
-],
-[
-	size_t	len;
-	int	mib[2] = {CTL_KERN, KERN_PIDMAX}, maxproc;
-
-        len = sizeof(maxproc);
-        sysctl(mib, 2, &maxproc, &len, 0, 0);
-],
-AC_DEFINE(HAVE_FUNCTION_SYSCTL_KERN_PIDMAX,1,[Define to 1 if 'KERN_PIDMAX' exist.])
-AC_MSG_RESULT(yes),
-AC_MSG_RESULT(no))
-
 dnl Check for function sysctl (KERN_CPTIME,KERN_CPTIME2)
 AC_MSG_CHECKING(for function sysctl (KERN_CPTIME,KERN_CPTIME2))
 AC_TRY_COMPILE(
@@ -873,6 +847,20 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 
 		if test "x$found_sqlite3" = "xyes"; then
 			have_db="SQLite v3.x"
+
+			saved_CPPFLAGS="$CPPFLAGS"
+			CPPFLAGS="$CPPFLAGS $SQLITE3_CPPFLAGS $SQLITE3_LDFLAGS"
+
+			AC_MSG_CHECKING([for function sqlite3_open_v2() in sqlite3.h])
+			AC_TRY_LINK([#include <sqlite3.h>],
+				[sqlite3 *conn = 0;
+				sqlite3_open_v2("dbname", &conn, SQLITE_OPEN_READWRITE, 0);
+				],
+				AC_DEFINE(HAVE_FUNCTION_SQLITE3_OPEN_V2,1,[Define to 1 if function 'sqlite3_open_v2' exist.])
+				AC_MSG_RESULT(yes),
+				AC_MSG_RESULT(no))
+
+			CPPFLAGS="$saved_CPPFLAGS"
 		else
 			AC_MSG_ERROR([SQLite3 library not found])
 		fi
@@ -1152,6 +1140,7 @@ darwin*|rhapsody*)
 	ARCH="osx"
 
 	AC_MSG_RESULT([ok (${host_os})])
+	AC_DEFINE([MAC_OS_X], 1, [Define to 1 if you're using Mac OS X])
 ;;
 *solaris*)
 	ARCH="solaris"

@@ -14,9 +14,10 @@ function zbx_jsvalue($value, $object = null){
 		if(is_object($value)) return unpack_object($value);
 		if(is_string($value)) return '\''.str_replace('\'','\\\'',			/*  '	=> \'	*/
 							str_replace("\n", '\n', 		/*  LF	=> \n	*/
-								str_replace("\\", "\\\\", 	/*  \	=> \\	*/
-									str_replace("\r", '', 	/*  CR	=> remove */
-										($value))))).'\'';
+								str_replace('"', '\"', 	/*  "	=> \" */
+									str_replace("\\", "\\\\", 	/*  \	=> \\	*/
+										str_replace("\r", '', 	/*  CR	=> remove */
+										($value)))))).'\'';
 		if(is_null($value)) return 'null';
 	return strval($value);
 	}

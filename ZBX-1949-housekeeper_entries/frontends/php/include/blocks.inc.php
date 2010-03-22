@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2001-2009 SIA Zabbix
+** Copyright (C) 2001-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ function make_favorite_graphs(){
 
 	$options = array(
 			'graphids' => $graphids,
-			'select_hosts' => 1,
+			'select_hosts' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND,
 		);
 	$graphs = CGraph::get($options);
@@ -241,7 +241,7 @@ function make_system_summary(){
 	$options = array(
 		'nodeids' => get_current_nodeid(),
 		'monitored_hosts' => 1,
-		'select_hosts' => API_OUTPUT_SHORTEN,
+//		'select_hosts' => API_OUTPUT_REFER,
 		'output' => API_OUTPUT_EXTEND,
 	);
 	$groups = CHostGroup::get($options);
@@ -411,6 +411,7 @@ function make_hoststat_summary(){
 		'nodeids' => get_current_nodeid(),
 		'groupids' => zbx_objectValues($groups, 'groupid'),
 		'monitored_hosts' => 1,
+//		'output' => array('hostid','host','status'),
 		'output' => API_OUTPUT_EXTEND
 	);
 	$hosts = CHost::get($options);
@@ -682,7 +683,6 @@ function make_latest_issues($params = array()){
 		$options['hostids'] = $params['hostid'];
 
 	$triggers = CTrigger::get($options);
-
 // GATHER HOSTS FOR SELECTED TRIGGERS {{{
 	$triggers_hosts = array();
 	foreach($triggers as $tnum => $trigger){
@@ -708,6 +708,7 @@ function make_latest_issues($params = array()){
 	foreach($triggers as $tnum => $trigger){
 // Check for dependencies
 		$host = reset($trigger['hosts']);
+
 		$trigger['hostid'] = $host['hostid'];
 		$trigger['host'] = $host['host'];
 
@@ -715,7 +716,6 @@ function make_latest_issues($params = array()){
 		$menus = '';
 
 		$host_nodeid = id2nodeid($trigger['hostid']);
-
 		foreach($scripts_by_hosts[$trigger['hostid']] as $id => $script){
 			$script_nodeid = id2nodeid($script['scriptid']);
 			if( (bccomp($host_nodeid ,$script_nodeid ) == 0))
@@ -734,6 +734,34 @@ function make_latest_issues($params = array()){
 
 		$host = new CSpan($trigger['host'],'link_menu pointer');
 		$host->setAttribute('onclick','javascript: '.$menus);
+		//$host = new CSpan($trigger['host'],'link_menu pointer');
+		//$host->setAttribute('onclick','javascript: '.$menus);
+
+// Maintenance {{{
+
+		$trigger_host = $triggers_hosts[$trigger['hostid']];
+
+		$text = null;
+		$style = 'link_menu';
+		if($trigger_host['maintenance_status']){
+			$style.= ' orange';
+
+			$options = array(
+				'maintenanceids' => $trigger_host['maintenanceid'],
+				'output' => API_OUTPUT_EXTEND
+			);
+			$maintenances = CMaintenance::get($options);
+			$maintenance = reset($maintenances);
+
+			$text = $maintenance['name'];
+			$text.=' ['.($trigger_host['maintenance_type'] ? S_NO_DATA_MAINTENANCE : S_NORMAL_MAINTENANCE).']';
+		}
+
+		$host = new CSpan($trigger['host'], $style.' pointer');
+		$host->setAttribute('onclick','javascript: '.$menus);
+		if(!is_null($text)) $host->setHint($text, '', '', false);
+
+// }}} Maintenance
 
 		$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged'.
 					' FROM events e'.

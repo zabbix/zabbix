@@ -292,33 +292,26 @@ class CImage extends CZBXAPI{
  * @param array $images Data
  * @param array $image['name']
  * @param array $image['hostid']
+ * @param array $image['host']
  * @return array
  */
-	public static function checkObjects($imagesData){
-		$result = array();
+	public static function exists($object){
+		$keyFields = array(array('hostid', 'host'), 'name');
 
-		$imagesData = zbx_toArray($imagesData);
-		
-		foreach($imagesData as $inum => $imageData){
-			$options = array(
-				'filter' => $imageData,
-				'output' => API_OUTPUT_SHORTEN,
-				'nopermissions' => 1
-			);
+		$options = array(
+			'filter' => zbx_array_mintersect($keyFields, $object),
+			'output' => API_OUTPUT_SHORTEN,
+			'nopermissions' => 1,
+			'limit' => 1
+		);
+		if(isset($object['node']))
+			$options['nodeids'] = getNodeIdByNodeName($object['node']);
+		else if(isset($object['nodeids']))
+			$options['nodeids'] = $object['nodeids'];
 
-			if(isset($imageData['node']))
-				$options['nodeids'] = getNodeIdByNodeName($imageData['node']);
-			else if(isset($imageData['nodeids']))
-				$options['nodeids'] = $imageData['nodeids'];
-			else
-				$options['nodeids'] = get_current_nodeid(true);
+		$objs = self::get($options);
 
-			$images = self::get($options);
-
-			$result += $images;
-		}
-
-	return $result;
+	return !empty($objs);
 	}
 
 /**
@@ -421,13 +414,7 @@ class CImage extends CZBXAPI{
 
 			$result = self::EndTransaction($result, __METHOD__);
 
-			$otions = array(
-				'imageids' => $imageids,
-				'output '=> API_OUTPUT_EXTEND
-			);
-
-			$new_images = self::get();
-			return $new_images;
+			return array('imageids' => $imageids);
 		}
 		catch(APIException $e){
 			if(isset($transaction)) self::EndTransaction(false, __METHOD__);
@@ -490,7 +477,7 @@ class CImage extends CZBXAPI{
 
 			$result = self::EndTransaction($result, __METHOD__);
 
-			return $images;
+			return array('imageids' => $imageids);
 		}
 		catch(APIException $e){
 			if(isset($transaction)) self::EndTransaction(false, __METHOD__);
@@ -551,7 +538,7 @@ class CImage extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return zbx_cleanHashes($del_images);
+			return array('imageids' => $imageids);
 		}
 		else{
 			self::setError(__METHOD__);

@@ -687,7 +687,7 @@ function __autoload($class_name){
 	function validate_float($str){
 //		echo "Validating float:$str<br>";
 //		if (eregi('^[ ]*([0-9]+)((\.)?)([0-9]*[KMG]{0,1})[ ]*$', $str, $arr)) {
-		if(preg_match('/^[ ]*([0-9]+)((\.)?)([0-9]*[KMG]{0,1})[ ]*$/i', $str, $arr)) {
+		if(preg_match('/^[ ]*([0-9]+)((\.)?)([0-9]*[KMGTsmhdw]{0,1})[ ]*$/i', $str, $arr)) {
 			return 0;
 		}
 		else{

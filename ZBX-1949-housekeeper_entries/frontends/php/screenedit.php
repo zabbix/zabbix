@@ -38,7 +38,7 @@ include_once('include/page_header.php');
 		'screenid'=>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
 
 		'screenitemid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))&&(!isset({x})||!isset({y}))'),
-		'resourcetype'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,15),	'isset({save})'),
+		'resourcetype'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,16),	'isset({save})'),
 		'caption'=>		array(T_ZBX_STR, O_OPT,  null,  null,	null),
 		'resourceid'=>	array(T_ZBX_INT, O_OPT,  null,  DB_ID, 	'isset({save})'),
 		'width'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	null),
@@ -82,7 +82,7 @@ include_once('include/page_header.php');
 	$options = array(
 		'screenids' => $_REQUEST['screenid'],
 		'editable' => 1,
-		'extendoutput' => 1,
+		'output' => API_OUTPUT_EXTEND
 	);
 	$screens = CScreen::get($options);
 	if(empty($screens)) access_deny();
@@ -120,7 +120,7 @@ include_once('include/page_header.php');
 				if(!$result) throw new Exception();
 			}
 			else{
-				$result=add_screen_item(
+				$result = add_screen_item(
 					$_REQUEST['resourcetype'],$_REQUEST['screenid'],
 					$_REQUEST['x'],$_REQUEST['y'],$_REQUEST['resourceid'],
 					$_REQUEST['width'],$_REQUEST['height'],$_REQUEST['colspan'],

@@ -2590,6 +2590,7 @@
 
 		$frmMTrig = new CFormTable(S_TRIGGERS_MASSUPDATE, 'triggers.php');
 		$frmMTrig->addVar('massupdate',get_request('massupdate',1));
+		$frmMTrig->addVar('go',get_request('go','massupdate'));
 		$frmMTrig->setAttribute('id', 'massupdate');
 
 		$triggers = $_REQUEST['g_triggerid'];
@@ -3998,7 +3999,6 @@
 			if($esc_period) $_REQUEST['escalation'] = 1;
 		}
 		else{
-
 			if(isset($_REQUEST['escalation']) && (0 == $_REQUEST['esc_period']))
 				$_REQUEST['esc_period'] = 3600;
 
@@ -4267,7 +4267,7 @@
 				$rowCondition[] = array(
 					new CTextBox('group','',20,'yes'),
 					new CButton('btn1',S_SELECT,
-						"return PopUp('popup.php?dstfrm=".S_ACTION.
+						"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=group&srctbl=host_group".
 						"&srcfld1=groupid&srcfld2=name',450,450);",
 						'T')
@@ -4278,7 +4278,7 @@
 				$rowCondition[] = array(
 					new CTextBox('host','',20,'yes'),
 					new CButton('btn1',S_SELECT,
-						"return PopUp('popup.php?dstfrm=".S_ACTION.
+						"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=host_templates".
 						"&srcfld1=hostid&srcfld2=host',450,450);",
 						'T')
@@ -4289,7 +4289,7 @@
 				$rowCondition[] = array(
 					new CTextBox('host','',20,'yes'),
 					new CButton('btn1',S_SELECT,
-						"return PopUp('popup.php?dstfrm=".S_ACTION.
+						"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=hosts".
 						"&srcfld1=hostid&srcfld2=host',450,450);",
 						'T')
@@ -4301,7 +4301,7 @@
 				$rowCondition[] = array(
 					new CTextBox('trigger','',20,'yes'),
 					new CButton('btn1',S_SELECT,
-						"return PopUp('popup.php?dstfrm=".S_ACTION.
+						"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=trigger&srctbl=triggers".
 						"&srcfld1=triggerid&srcfld2=description');",
 						'T')
@@ -4339,7 +4339,7 @@
 				$rowCondition[] = array(
 					new CTextBox('node','',20,'yes'),
 					new CButton('btn1',S_SELECT,
-						"return PopUp('popup.php?dstfrm=".S_ACTION.
+						"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=node&srctbl=nodes".
 						"&srcfld1=nodeid&srcfld2=name',450,450);",
 						'T')
@@ -4361,7 +4361,7 @@
 				$rowCondition[] = array(
 					new CTextBox('dcheck','',50,'yes'),
 					new CButton('btn1',S_SELECT,
-						"return PopUp('popup.php?dstfrm=".S_ACTION.
+						"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=dcheck&srctbl=dchecks".
 						"&srcfld1=dcheckid&srcfld2=name',450,450);",
 						'T')
@@ -4372,7 +4372,7 @@
 				$rowCondition[] = array(
 					new CTextBox('proxy','',20,'yes'),
 					new CButton('btn1',S_SELECT,
-						"return PopUp('popup.php?dstfrm=".S_ACTION.
+						"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=proxy&srctbl=proxies".
 						"&srcfld1=hostid&srcfld2=host',450,450);",
 						'T')
@@ -4606,13 +4606,13 @@
 			$action = get_action_by_actionid($_REQUEST['actionid']);
 		}
 
-		$operations	= get_request("operations",array());
+		$operations	= get_request('operations', array());
 
 		if(isset($_REQUEST['actionid']) && !isset($_REQUEST['form_refresh'])){
-			$eventsource	= $action['eventsource'];
+			$eventsource = $action['eventsource'];
 		}
 		else{
-			$eventsource	= get_request('eventsource');
+			$eventsource = get_request('eventsource');
 		}
 
 		$allowed_operations = get_operations_by_eventsource($eventsource);
@@ -4685,6 +4685,7 @@
 		$cmbOpType = new CComboBox('new_operation[operationtype]', $new_operation['operationtype'],'submit()');
 		foreach($allowed_operations as $oper)
 			$cmbOpType->addItem($oper, operation_type2str($oper));
+			
 		$tblNewOperation->addRow(array(S_OPERATION_TYPE, $cmbOpType));
 
 		switch($new_operation['operationtype']){
@@ -4710,7 +4711,7 @@
 
 				$tblOper->addItem(new CVar('new_operation[objectid]', $new_operation['objectid']));
 
-				if($object_name)	$object_name = $object_name[$display_name];
+				if($object_name) $object_name = $object_name[$display_name];
 
 				$cmbObject = new CComboBox('new_operation[object]', $new_operation['object'],'submit()');
 				$cmbObject->addItem(OPERATION_OBJECT_USER,S_SINGLE_USER);
@@ -5153,6 +5154,33 @@
 		$frmMeadia->addItemToBottomRow(new CButtonCancel());
 
 	return $frmMeadia;
+	}
+
+	function import_screen_form($rules){
+
+		$form = new CFormTable(S_IMPORT, null, 'post', 'multipart/form-data');
+		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
+
+		$table = new CTable();
+		$table->setHeader(array(S_ELEMENT, S_UPDATE.SPACE.S_EXISTING, S_ADD.SPACE.S_MISSING), 'bold');
+
+		$titles = array('screens' => S_SCREEN);
+
+		foreach($titles as $key => $title){
+			$cbExist = new CCheckBox('rules['.$key.'][exist]', isset($rules[$key]['exist']));
+
+			if($key == 'template')
+				$cbMissed = null;
+			else
+				$cbMissed = new CCheckBox('rules['.$key.'][missed]', isset($rules[$key]['missed']));
+
+			$table->addRow(array($title, $cbExist, $cbMissed));
+		}
+
+		$form->addRow(S_RULES, $table);
+
+		$form->addItemToBottomRow(new CButton('import', S_IMPORT));
+		$form->show();
 	}
 
 	function insert_screen_form(){

@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -137,7 +137,7 @@
 			break;
 	}
 
-	$page['file'] = "popup.php";
+	$page['file'] = 'popup.php';
 	$page['scripts'] = array();
 
 	define('ZBX_PAGE_NO_MENU', 1);
@@ -373,7 +373,7 @@ include_once('include/page_header.php');
 			CProfile::update('web.popup.hostid',$hostid,PROFILE_TYPE_ID);
 		}
 
-		if(str_in_array($srctbl,array('triggers','hosts'))){
+		if(str_in_array($srctbl,array('triggers','hosts','host_group'))){
 			$btnEmpty = new CButton('empty',S_EMPTY,
 				get_window_opener($dstfrm, $dstfld1, 0).
 				get_window_opener($dstfrm, $dstfld2, '').
@@ -560,8 +560,12 @@ include_once('include/page_header.php');
 		$hostgroups = CHostGroup::get($options);
 		order_result($hostgroups, 'name');
 
-		foreach($hostgroups as $tnu => $row){
+		foreach($hostgroups as $gnum => $row){
+			$row['node_name'] = get_node_name_by_elid($row['groupid'], true);
 			$name = new CSpan($row['name'],'link');
+
+			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
+			$row['name'] = $row['node_name'].$row['name'];
 
 			if(isset($_REQUEST['reference'])){
 				$cmapid = get_request('cmapid',0);
@@ -806,7 +810,7 @@ include_once('include/page_header.php');
 					}
 				}
 				else{
-					$js_action = 'add_value("'.$dstfld1.'", "'.$dstfld2.'", "'.$row["triggerid"].'", "'.$row['host'].':'.$exp_desc.'");';
+					$js_action = 'add_value("'.$dstfld1.'", "'.$dstfld2.'", "'.$row["triggerid"].'", '.zbx_jsvalue($row['host'].':'.$exp_desc).');';
 				}
 			}
 
@@ -975,21 +979,12 @@ include_once('include/page_header.php');
 			($hostid>0)?null:S_HOST,
 			S_NAME));
 
-		$options = array(
-			'nodeids' => $nodeid,
-			'hostids' => $hostid,
-			'output' => API_PUTPUT_EXTEND
-		);
-
-		if(!is_null($writeonly)) $options['editable'] = 1;
-		if(!is_null($templated)) $options['templated'] = $templated;
-
 		$sql = 'SELECT DISTINCT h.host,a.* '.
 				' FROM hosts h,applications a '.
 				' WHERE h.hostid=a.hostid '.
 					' AND '.DBin_node('a.applicationid', $nodeid).
 					' AND '.DBcondition('h.hostid',$available_hosts).
-					' AND h.status in ('.implode(',', $host_status).')'.
+					// ' AND h.status in ('.implode(',', $host_status).')'.
 					' AND h.hostid='.$hostid.
 				' ORDER BY h.host,a.name';
 
@@ -1367,18 +1362,21 @@ include_once('include/page_header.php');
 		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
 		$table->setHeader(S_NAME);
 
-		$result = DBselect('SELECT DISTINCT n.name as node_name,g.groupid,g.name '.
-						' FROM hosts_groups hg,hosts h,groups g '.
-							' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('g.groupid').
-						' WHERE '.DBin_node('g.groupid',$nodeid).
-							' AND g.groupid=hg.groupid '.
-							' AND hg.hostid=h.hostid '.
-							' AND h.status='.HOST_STATUS_MONITORED.
-						' ORDER BY g.name');
-		while($row=DBfetch($result)){
-			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
+		$options = array(
+				'nodeids' => $nodeid,
+				'monitored_hosts' => 1,
+				'extendoutput' => 1
+			);
+		if(!is_null($writeonly)) $options['editable'] = 1;
 
-			$name = new CLink($row['name'],'#');
+		$hostgroups = CHostGroup::get($options);
+		order_result($hostgroups, 'name');
+
+		foreach($hostgroups as $gnum => $row){
+			$row['node_name'] = get_node_name_by_elid($row['groupid']);
+			$name = new CSpan($row['name'],'link');
+
+			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
 			$row['name'] = $row['node_name'].$row['name'];
 
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
