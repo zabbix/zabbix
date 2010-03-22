@@ -70,6 +70,7 @@ include_once('include/page_header.php');
 			CProfile::update('web.dashconf.hosts.maintenance', $_REQUEST['maintenance'], PROFILE_TYPE_INT);
 		}
 		else if(2 == $config){
+			$_REQUEST['trgSeverity'] = get_request('trgSeverity', array());
 			$trgSeverity = implode(';', array_keys($_REQUEST['trgSeverity']));
 			CProfile::update('web.dashconf.triggers.severity', $trgSeverity, PROFILE_TYPE_STR);
 		}
