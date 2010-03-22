@@ -197,12 +197,12 @@ if(isset($_REQUEST['sform'])){
 
 		$sql = 'SELECT DISTINCT f.functionid, f.function, f.parameter, t.expression, '.
 								' t.description, t.priority, t.comments, t.url, t.status, t.type'.
-					' FROM functions as f, triggers as t, items as i '.
+					' FROM functions f, triggers t, items i '.
 					' WHERE t.triggerid='.$_REQUEST['triggerid'].
 						' AND i.itemid=f.itemid '.
 						' AND f.triggerid = t.triggerid '.
 						' AND i.value_type IN ('.ITEM_VALUE_TYPE_LOG.' , '.ITEM_VALUE_TYPE_TEXT.', '.ITEM_VALUE_TYPE_STR.')'.
-						' AND i.key_ LIKE (\''.$matchkey.'\')';
+						' AND i.key_ LIKE \''.$matchkey.'\'';
 		$res = DBselect($sql);
 		while($rows = DBfetch($res)){
 			$description = $rows['description'];
