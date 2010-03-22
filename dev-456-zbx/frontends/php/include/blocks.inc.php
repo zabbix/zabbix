@@ -220,7 +220,7 @@ return $table;
 }
 
 // Author: Aly
-function make_system_summary(){
+function make_system_summary($filter){
 	global $USER_DETAILS;
 
 	$config = select_config();
@@ -241,7 +241,7 @@ function make_system_summary(){
 	$options = array(
 		'nodeids' => get_current_nodeid(),
 		'monitored_hosts' => 1,
-//		'select_hosts' => API_OUTPUT_REFER,
+		'groupids' => $filter['groupids'],
 		'output' => API_OUTPUT_EXTEND,
 	);
 	$groups = CHostGroup::get($options);
@@ -271,8 +271,12 @@ function make_system_summary(){
 		'only_problems' => 1,
 		'expand_data' => 1,
 		'skipDependent' => 1,
+		'filter' => array('priority' => $filter['severity']),
 		'output' => API_OUTPUT_EXTEND,
 	);
+	if(isset($filter['maintenance']))
+		$options['maintenance'] = $filter['maintenance'];
+
 	$triggers = CTrigger::get($options);
 	order_result($triggers, 'lastchange', ZBX_SORT_DOWN);
 
@@ -381,7 +385,7 @@ function make_system_summary(){
 return $table;
 }
 
-function make_hoststat_summary(){
+function make_hoststat_summary($filter){
 	global $USER_DETAILS;
 
 	$table = new CTableInfo();
@@ -396,6 +400,7 @@ function make_hoststat_summary(){
 // SELECT HOST GROUPS {{{
 	$options = array(
 		'nodeids' => get_current_nodeid(),
+		'groupids' => $filter['groupids'],
 		'monitored_hosts' => 1,
 		'output' => API_OUTPUT_EXTEND
 	);
@@ -411,9 +416,12 @@ function make_hoststat_summary(){
 		'nodeids' => get_current_nodeid(),
 		'groupids' => zbx_objectValues($groups, 'groupid'),
 		'monitored_hosts' => 1,
-//		'output' => array('hostid','host','status'),
 		'output' => API_OUTPUT_EXTEND
 	);
+
+	if(isset($filter['maintenance']))
+		$options['filter'] = array('maintenance_status' => $filter['maintenance']);
+
 	$hosts = CHost::get($options);
 	$hosts = zbx_toHash($hosts, 'hostid');
 // }}} SELECT HOSTS
@@ -424,8 +432,13 @@ function make_hoststat_summary(){
 		'monitored' => 1,
 		'only_problems' => 1,
 		'expand_data' => 1,
+		'filter' => array('priority' => $filter['severity']),
 		'output' => API_OUTPUT_EXTEND,
 	);
+
+	if(isset($dashconf['maintenance']))
+		$options['maintenance'] = $dashconf['maintenance'];
+
 	$triggers = CTrigger::get($options);
 // }}} SELECT TRIGGERS
 
@@ -660,27 +673,31 @@ return $table;
 
 
 // author Aly
-function make_latest_issues($params = array()){
+function make_latest_issues($filter = array()){
 	global $USER_DETAILS;
 
 
 	$config = select_config();
 
-	$limit = isset($params['limit']) ? $params['limit'] : 20;
+	$limit = isset($filter['limit']) ? $filter['limit'] : 20;
 	$options = array(
 		'output' => API_OUTPUT_EXTEND,
 		'select_hosts' => API_OUTPUT_EXTEND,
 		'skipDependent' => 1,
 		'monitored' => 1,
 		'only_problems' => 1,
+		'groupids' => $filter['groupids'],
+		'filter' => array('priority' => $filter['severity']),
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => $limit
 	);
-	if(isset($params['groupid']) && ($params['groupid'] > 0))
-		$options['groupids'] = $params['groupid'];
-	if(isset($params['hostid']) && ($params['hostid'] > 0))
-		$options['hostids'] = $params['hostid'];
+	if(isset($filter['groupid']) && ($filter['groupid'] > 0))
+		$options['groupids'] = $filter['groupid'];
+	if(isset($filter['hostid']) && ($filter['hostid'] > 0))
+		$options['hostids'] = $filter['hostid'];
+	if(isset($filter['maintenance']))
+		$options['maintenance'] = $filter['maintenance'];
 
 	$triggers = CTrigger::get($options);
 // GATHER HOSTS FOR SELECTED TRIGGERS {{{

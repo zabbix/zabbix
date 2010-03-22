@@ -367,7 +367,7 @@ function add2favorites($favobj, $favid, $source=null){
 		'userid' => $USER_DETAILS['userid'],
 		'idx' => zbx_dbstr($favobj),
 		'value_id' =>  $favid,
-		'type' => PROFILE_TYPE_ID,
+		'type' => PROFILE_TYPE_ID
 	);
 	if(!is_null($source)) $values['source'] = zbx_dbstr($source);
 	

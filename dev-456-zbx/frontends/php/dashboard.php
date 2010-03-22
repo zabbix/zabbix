@@ -34,7 +34,7 @@ $page['scripts'] = array('class.pmaster.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-include_once "include/page_header.php";
+include_once('include/page_header.php');
 
 //		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
@@ -58,6 +58,30 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 
+// FILTER
+//
+// groups
+	$dashconf = array();
+	$dashconf['grpswitch'] = CProfile::get('web.dashconf.groups.grpswitch', 0);
+
+	if($dashconf['grpswitch'] == 0){
+		$dashconf['groupids'] = null;
+	}
+	else{
+		$groupids = get_favorites('web.dashconf.groups.groupids');
+		$dashconf['groupids'] = zbx_objectValues($groupids, 'value');
+	}
+
+// hosts
+	$maintenance = CProfile::get('web.dashconf.hosts.maintenance', 0);
+	if($maintenance == 1) $dashconf['maintenance'] = 0;
+
+// triggers
+	$severity = CProfile::get('web.dashconf.triggers.severity', array());
+
+	$dashconf['severity'] = !empty($severity)?explode(';', $severity):$severity;
+// ------
+
 // ACTION /////////////////////////////////////////////////////////////////////////////
 	if(isset($_REQUEST['favobj'])){
 		$_REQUEST['pmasterid'] = get_request('pmasterid','mainpage');
@@ -69,11 +93,11 @@ include_once "include/page_header.php";
 		if('refresh' == $_REQUEST['favobj']){
 			switch($_REQUEST['favid']){
 				case 'hat_syssum':
-					$syssum = make_system_summary();
+					$syssum = make_system_summary($dashconf);
 					$syssum->show();
 					break;
 				case 'hat_hoststat':
-					$hoststat = make_hoststat_summary();
+					$hoststat = make_hoststat_summary($dashconf);
 					$hoststat->show();
 					break;
 				case 'hat_stszbx':
@@ -81,7 +105,7 @@ include_once "include/page_header.php";
 					$stszbx->show();
 					break;
 				case 'hat_lastiss':
-					$lastiss = make_latest_issues();
+					$lastiss = make_latest_issues($dashconf);
 					$lastiss->show();
 					break;
 				case 'hat_webovr':
@@ -192,8 +216,13 @@ include_once "include/page_header.php";
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url->getUrl()."';"));
 
+	$dc_icon = new CDiv(SPACE,'iconconfig');
+	$dc_icon->setAttribute('title', S_CONFIGURE);
+	$dc_icon->addAction('onclick',new CJSscript("javascript: document.location = 'dashconf.php';"));
+
+
 	$dashboard_wdgt->setClass('header');
-	$dashboard_wdgt->addHeader(S_DASHBOARD_BIG, $fs_icon);
+	$dashboard_wdgt->addHeader(S_DASHBOARD_BIG, array($dc_icon,$fs_icon));
 //-------------
 
 	$left_tab = new CTable();

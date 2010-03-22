@@ -31,6 +31,7 @@ $ZBX_MENU = array(
 				array(
 						'url'=>'dashboard.php',
 						'label'=>S_DASHBOARD,
+						'sub_pages'=>array('dashconf.php')
 					),
 				array(
 						'url'=>'overview.php',

@@ -427,8 +427,16 @@ class CHost extends CZBXAPI{
 			if(isset($options['filter']['hostid'])){
 				$sql_parts['where']['hostid'] = 'h.hostid='.$options['filter']['hostid'];
 			}
+
 			if(isset($options['filter']['host'])){
-				$sql_parts['where']['host'] = 'h.host='.zbx_dbstr($options['filter']['host']);
+				zbx_value2array($options['filter']['host']);
+
+				$sql_parts['where']['host'] = DBcondition('h.host', zbx_dbstr($options['filter']['host']), false, true);
+			}
+
+			if(isset($options['filter']['maintenance_status'])){
+				zbx_value2array($options['filter']['maintenance_status']);
+				$sql_parts['where']['maintenance_status'] = DBcondition('h.maintenance_status', $options['filter']['maintenance_status']);
 			}
 		}
 

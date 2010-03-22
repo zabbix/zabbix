@@ -1204,9 +1204,13 @@
 	'S_MAXIMIZE'=>				'Maximize',
 	'S_MINIMIZE'=>				'Minimize',
 	'S_LOADING_P'=>				'Loading...',
-// dashconf.php
 
+// dashconf.php
 	'S_DASHBOARD_CONFIGURATION' =>	'Dashboard configuration',
+	'S_DASHBOARD_CONFIGURATION_BIG' =>	'DASHBOARD CONFIGURATION',
+	'S_CONFIGURE' => 'Configure',
+	'S_SELECTED' => 'Selected',
+
 //	overview.php
 	'S_OVERVIEW'=>				'Overview',
 	'S_OVERVIEW_BY_PROXY'=>			'Overview by proxy',

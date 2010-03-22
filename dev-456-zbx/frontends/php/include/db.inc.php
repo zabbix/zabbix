@@ -588,8 +588,12 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 
 // string value prepearing
 if(isset($DB['TYPE']) && $DB['TYPE'] == 'ORACLE') {
-	function zbx_dbstr($var)	{
-		return "'".preg_replace('/\'/','\'\'',$var)."'";
+	function zbx_dbstr($var){
+		if(is_string($var)) return "'".preg_replace('/\'/','\'\'',$var)."'";
+		else if(is_array($var)){
+			foreach($var as $vnum => $value) $var[$vnum] = preg_replace('/\'/','\'\'',$value);
+			return $var;
+		}
 	}
 
 	function zbx_dbcast_2bigint($field){
@@ -598,7 +602,11 @@ if(isset($DB['TYPE']) && $DB['TYPE'] == 'ORACLE') {
 }
 else if(isset($DB['TYPE']) && $DB['TYPE'] == "MYSQL") {
 	function zbx_dbstr($var)	{
-		return "'".mysql_real_escape_string($var)."'";
+		if(is_string($var)) return "'".mysql_real_escape_string($var)."'";
+		else if(is_array($var)){
+			foreach($var as $vnum => $value) $var[$vnum] = mysql_real_escape_string($value);
+			return $var;
+		}
 	}
 
 	function zbx_dbcast_2bigint($field){
@@ -606,8 +614,12 @@ else if(isset($DB['TYPE']) && $DB['TYPE'] == "MYSQL") {
 	}
 }
 else if(isset($DB['TYPE']) && $DB['TYPE'] == "POSTGRESQL") {
-	function zbx_dbstr($var)	{
-		return "'".pg_escape_string($var)."'";
+	function zbx_dbstr($var){
+		if(is_string($var)) return "'".pg_escape_string($var)."'";
+		else if(is_array($var)){
+			foreach($var as $vnum => $value) $var[$vnum] = pg_escape_string($value);
+			return $var;
+		}
 	}
 
 	function zbx_dbcast_2bigint($field){
@@ -615,8 +627,12 @@ else if(isset($DB['TYPE']) && $DB['TYPE'] == "POSTGRESQL") {
 	}
 }
 else {
-	function zbx_dbstr($var)	{
-		return "'".addslashes($var)."'";
+	function zbx_dbstr($var){
+		if(is_string($var)) return "'".addslashes($var)."'";
+		else if(is_array($var)){
+			foreach($var as $vnum => $value) $var[$vnum] = addslashes($value);
+			return $var;
+		}
 	}
 
 	function zbx_dbcast_2bigint($field){

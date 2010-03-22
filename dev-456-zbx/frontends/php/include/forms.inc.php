@@ -2126,6 +2126,8 @@
 		else{
 			$frmItem->addVar('formula',$formula);
 		}
+
+
 		if($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_HTTPTEST){
 			$frmItem->addRow(S_UPDATE_INTERVAL_IN_SEC, new CNumericBox('delay',$delay,5));
 			$frmItem->addRow(S_FLEXIBLE_INTERVALS, $delay_flex_el);
@@ -3922,12 +3924,6 @@
 												"CLNDR['mntc_active_till'].clndr.clndrshow(pos.top,pos.left);");
 
 			$tblPeriod->addRow(array(S_DATE,$filtertimetab));
-
-
-			zbx_add_post_js('if("undefined" != typeof(CLNDR["new_timeperiod_date"]))'.
-									' addListener($("hat_new_timeperiod_icon"),'.
-												'"click",'.
-												'CLNDR["new_timeperiod_date"].clndr.clndrhide.bindAsEventListener(CLNDR["new_timeperiod_date"].clndr));');
 
 //-------
 		}
