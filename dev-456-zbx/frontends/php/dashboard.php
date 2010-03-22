@@ -79,7 +79,7 @@ include_once('include/page_header.php');
 // triggers
 	$severity = CProfile::get('web.dashconf.triggers.severity', array());
 
-	$dashconf['severity'] = !empty($severity)?explode(';', $severity):$severity;
+	$dashconf['severity'] = !empty($severity)?explode(';', $severity):array();
 // ------
 
 // ACTION /////////////////////////////////////////////////////////////////////////////
