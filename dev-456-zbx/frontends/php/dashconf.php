@@ -57,26 +57,28 @@ include_once('include/page_header.php');
 		$filterEnable = get_request('filterEnable', 0);
 		CProfile::update('web.dashconf.filter.enable', $filterEnable, PROFILE_TYPE_INT);
 
+		if($filterEnable == 1){
 // GROUPS
-		$groupids = get_request('groupids', array());
+			$groupids = get_request('groupids', array());
 
-		CProfile::update('web.dashconf.groups.grpswitch', $_REQUEST['grpswitch'], PROFILE_TYPE_INT);
+			CProfile::update('web.dashconf.groups.grpswitch', $_REQUEST['grpswitch'], PROFILE_TYPE_INT);
 
-		if($_REQUEST['grpswitch'] == 1){
-			$result = rm4favorites('web.dashconf.groups.groupids');
-			foreach($groupids as $gnum => $groupid){
-				$result &= add2favorites('web.dashconf.groups.groupids', $groupid);
+			if($_REQUEST['grpswitch'] == 1){
+				$result = rm4favorites('web.dashconf.groups.groupids');
+				foreach($groupids as $gnum => $groupid){
+					$result &= add2favorites('web.dashconf.groups.groupids', $groupid);
+				}
 			}
-		}
 
 // HOSTS
-		$_REQUEST['maintenance'] = get_request('maintenance', 0);
-		CProfile::update('web.dashconf.hosts.maintenance', $_REQUEST['maintenance'], PROFILE_TYPE_INT);
+			$_REQUEST['maintenance'] = get_request('maintenance', 0);
+			CProfile::update('web.dashconf.hosts.maintenance', $_REQUEST['maintenance'], PROFILE_TYPE_INT);
 
 // TRIGGERS
-		$_REQUEST['trgSeverity'] = get_request('trgSeverity', array());
-		$trgSeverity = implode(';', array_keys($_REQUEST['trgSeverity']));
-		CProfile::update('web.dashconf.triggers.severity', $trgSeverity, PROFILE_TYPE_STR);
+			$_REQUEST['trgSeverity'] = get_request('trgSeverity', array());
+			$trgSeverity = implode(';', array_keys($_REQUEST['trgSeverity']));
+			CProfile::update('web.dashconf.triggers.severity', $trgSeverity, PROFILE_TYPE_STR);
+		}
 
 		redirect('dashboard.php');
 	}
@@ -121,7 +123,7 @@ include_once('include/page_header.php');
 
 		$maintenance = get_request('maintenance', 0);
 
-		$severity = get_request('trgSeverity');
+		$severity = get_request('trgSeverity', array());
 		$severity = array_keys($severity);
 	}
 	else{
@@ -146,7 +148,7 @@ include_once('include/page_header.php');
 	}
 	else{
 		$cbFilter = new CSpan(S_DISABLED, 'red underline pointer');
-		$cbFilter->setAttribute('onclick', "create_var('".$dashForm->getName()."', 'filterEnable', 1, true);");
+		$cbFilter->setAttribute('onclick', "$('dashform').enable(); create_var('".$dashForm->getName()."', 'filterEnable', 1, true);");
 	}
 	
 	$dashForm->addRow(S_DASHBOARD_FILTER, $cbFilter);
@@ -156,6 +158,8 @@ include_once('include/page_header.php');
 	$cmbGroups = new CComboBox('grpswitch', $grpswitch, 'submit();');
 	$cmbGroups->addItem(0, S_ALL_S);
 	$cmbGroups->addItem(1, S_SELECTED);
+	
+	if(!$filterEnable) $cmbGroups->setAttribute('disabled', 'disabled');
 
 	$dashForm->addRow(S_HOST_GROUPS, $cmbGroups);
 
@@ -174,55 +178,59 @@ include_once('include/page_header.php');
 			$lstGroups->addItem($group['groupid'], get_node_name_by_elid($group['groupid'], null, ':').$group['name']);
 		}
 
+		if(!$filterEnable) $lstGroups->setAttribute('disabled', 'disabled');
+
+		$addButton = new CButton('add',S_ADD, "return PopUp('popup_right.php?dstfrm=".$dashForm->getName()."&permission=".PERM_READ_WRITE."',450,450);");
+		if(!$filterEnable) $addButton->setAttribute('disabled', 'disabled');
+
+		$delButton = new CButton('delete',S_DELETE_SELECTED);
+		if(!$filterEnable) $delButton->setAttribute('disabled', 'disabled');
+
 		$dashForm->addRow(
 				S_GROUPS,
-				array(
-					$lstGroups,
-					BR(),
-					new CButton('add',S_ADD, "return PopUp('popup_right.php?dstfrm=".$dashForm->getName()."&permission=".PERM_READ_WRITE."',450,450);"),
-					new CButton('delete',S_DELETE_SELECTED)
-				)
+				array($lstGroups,BR(),$addButton, $delButton)
 			);
 	}
 
 //HOSTS
 // SPACE added to extend CB width in Chrome
-	$cmbMain = new CComboBox('maintenance', $maintenance);
-	$cmbMain->addItem(0, S_SHOW.SPACE);
-	$cmbMain->addItem(1, S_HIDE);
-
-//	$dashForm->addRow(S_HOSTS_IN_MAINTENANCE, $cmbMain);
-
 	$cbMain = new CCheckBox('maintenance', $maintenance, null, '1');
-	$dashForm->addRow(S_HOSTS, array($cbMain, S_SHOW_HOSTS_IN_MAINTENANCE));
+	if(!$filterEnable) $cbMain->setAttribute('disabled', 'disabled');
 
+	$dashForm->addRow(S_HOSTS, array($cbMain, S_SHOW_HOSTS_IN_MAINTENANCE));
 
 // Trigger
 	$severity = zbx_toHash($severity);
 	$trgSeverities = array();
 
-	$checked = isset($severity[TRIGGER_SEVERITY_NOT_CLASSIFIED]);
-	$trgSeverities[] = array(new CCheckBox('trgSeverity['.TRIGGER_SEVERITY_NOT_CLASSIFIED.']', $checked, '', 1), S_NOT_CLASSIFIED);
+	$cb = new CCheckBox('trgSeverity['.TRIGGER_SEVERITY_NOT_CLASSIFIED.']', isset($severity[TRIGGER_SEVERITY_NOT_CLASSIFIED]), '', 1);
+	$cb->setEnabled($filterEnable);
+	$trgSeverities[] = array($cb, S_NOT_CLASSIFIED);
 	$trgSeverities[] = BR();
 
-	$checked = isset($severity[TRIGGER_SEVERITY_INFORMATION]);
-	$trgSeverities[] = array(new CCheckBox('trgSeverity['.TRIGGER_SEVERITY_INFORMATION.']', $checked, '', 1), S_INFORMATION);
+	$cb = new CCheckBox('trgSeverity['.TRIGGER_SEVERITY_INFORMATION.']', isset($severity[TRIGGER_SEVERITY_INFORMATION]), '', 1);
+	$cb->setEnabled($filterEnable);
+	$trgSeverities[] = array($cb, S_INFORMATION);
 	$trgSeverities[] = BR();
 
-	$checked = isset($severity[TRIGGER_SEVERITY_WARNING]);
-	$trgSeverities[] = array(new CCheckBox('trgSeverity['.TRIGGER_SEVERITY_WARNING.']', $checked, '', 1), S_WARNING);
+	$cb = new CCheckBox('trgSeverity['.TRIGGER_SEVERITY_WARNING.']', isset($severity[TRIGGER_SEVERITY_WARNING]), '', 1);
+	$cb->setEnabled($filterEnable);
+	$trgSeverities[] = array($cb, S_WARNING);
 	$trgSeverities[] = BR();
 
-	$checked = isset($severity[TRIGGER_SEVERITY_AVERAGE]);
-	$trgSeverities[] = array(new CCheckBox('trgSeverity['.TRIGGER_SEVERITY_AVERAGE.']', $checked, '', 1), S_AVERAGE);
+	$cb = new CCheckBox('trgSeverity['.TRIGGER_SEVERITY_AVERAGE.']', isset($severity[TRIGGER_SEVERITY_AVERAGE]), '', 1);
+	$cb->setEnabled($filterEnable);
+	$trgSeverities[] = array($cb, S_AVERAGE);
 	$trgSeverities[] = BR();
 
-	$checked = isset($severity[TRIGGER_SEVERITY_HIGH]);
-	$trgSeverities[] = array(new CCheckBox('trgSeverity['.TRIGGER_SEVERITY_HIGH.']', $checked, '', 1), S_HIGH);
+	$cb = new CCheckBox('trgSeverity['.TRIGGER_SEVERITY_HIGH.']', isset($severity[TRIGGER_SEVERITY_HIGH]), '', 1);
+	$cb->setEnabled($filterEnable);
+	$trgSeverities[] = array($cb, S_HIGH);
 	$trgSeverities[] = BR();
 
-	$checked = isset($severity[TRIGGER_SEVERITY_DISASTER]);
-	$trgSeverities[] = array(new CCheckBox('trgSeverity['.TRIGGER_SEVERITY_DISASTER.']', $checked, '', 1), S_DISASTER);
+	$cb = new CCheckBox('trgSeverity['.TRIGGER_SEVERITY_DISASTER.']', isset($severity[TRIGGER_SEVERITY_DISASTER]), '', 1);
+	$cb->setEnabled($filterEnable);
+	$trgSeverities[] = array($cb, S_DISASTER);
 
 	$dashForm->addRow(S_TRIGGERS_WITH_SEVERITY, $trgSeverities);
 //-----
