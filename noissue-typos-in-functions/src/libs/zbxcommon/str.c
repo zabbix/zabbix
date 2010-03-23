@@ -343,7 +343,7 @@ void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src)
 	(*str)[*offset] = '\0';
 }
 
-/* Has to be rewritten to avoi malloc */
+/* Has to be rewritten to avoid malloc */
 char *string_replace(char *str, char *sub_str1, char *sub_str2)
 {
         char *new_str = NULL;
@@ -361,7 +361,7 @@ char *string_replace(char *str, char *sub_str1, char *sub_str2)
 
         len = (long)strlen(sub_str1);
 
-        /* count the number of occurances of sub_str1 */
+        /* count the number of occurences of sub_str1 */
         for ( p=str; (p = strstr(p, sub_str1)); p+=len, count++ );
 
 	if ( 0 == count )	return strdup(str);
@@ -373,7 +373,7 @@ char *string_replace(char *str, char *sub_str1, char *sub_str2)
 
         for (q=str,t=new_str,p=str; (p = strstr(p, sub_str1)); )
         {
-                /* copy until next occurance of sub_str1 */
+                /* copy until next occurence of sub_str1 */
                 for ( ; q < p; *t++ = *q++);
                 q += len;
                 p = q;
