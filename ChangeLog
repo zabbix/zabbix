@@ -146,7 +146,7 @@ Changes for 1.8.2
  - [DEV-163] improved the description of "perf_counter" check in the "help_items" table (Dmitry)
  - [ZBX-1324] replaced more user visible strings ZABBIX with Zabbix (Richlv)
  - [ZBX-1859] fixed map element image (Aly)
- - [ZBX-954] fix minor typos (Richlv)
+ - [ZBX-954] fix minor typos and removed // comments (asaveljevs,Richlv)
 
 Changes for 1.8.1
 

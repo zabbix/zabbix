@@ -59,14 +59,14 @@ static int	zbx_get_process_username(HANDLE hProcess, char *userName)
 
 	assert(userName);
 
-	//clean result;
+	/* clean result; */
 	*userName = '\0';
 
-	//open the processes token
+	/* open the processes token */
 	if (0 == OpenProcessToken(hProcess, TOKEN_QUERY, &tok))
 		return res;
 
-	// Get required buffer size and allocate the TOKEN_USER buffer
+	/* Get required buffer size and allocate the TOKEN_USER buffer */
 	if (0 == GetTokenInformation(tok, (TOKEN_INFORMATION_CLASS)1, (LPVOID)ptu, 0, &sz))
 	{
 		if (GetLastError() != ERROR_INSUFFICIENT_BUFFER)
@@ -74,11 +74,11 @@ static int	zbx_get_process_username(HANDLE hProcess, char *userName)
 		ptu = (PTOKEN_USER)zbx_malloc(ptu, sz);
 	}
 
-	// Get the token user information from the access token.
+	/* Get the token user information from the access token. */
 	if (0 == GetTokenInformation(tok, (TOKEN_INFORMATION_CLASS)1, (LPVOID)ptu, sz, &sz))
 		goto lbl_err;
 
-	//get the account/domain name of the SID
+	/* get the account/domain name of the SID */
 	nlen = MAX_NAME;
 	dlen = MAX_NAME;
 	if (0 == LookupAccountSid(NULL, ptu->User.Sid, name, &nlen, dom, &dlen, (PSID_NAME_USE)&iUse))
