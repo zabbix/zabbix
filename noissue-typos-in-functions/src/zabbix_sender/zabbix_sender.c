@@ -257,7 +257,7 @@ static ZBX_THREAD_ENTRY(send_value, args)
 		zabbix_log(LOG_LEVEL_DEBUG, "Send value error: %s", zbx_tcp_strerror());
 	}
 
-	zbx_tread_exit(ret);
+	zbx_thread_exit(ret);
 }
 
 static void    init_config(const char* config_file)
