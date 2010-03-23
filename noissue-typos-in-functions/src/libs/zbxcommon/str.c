@@ -1687,7 +1687,7 @@ u_char	zbx_hex2num(char c)
  *	ilen - binary data length                                             *
  *	output - pointer to output buffer                                     *
  *	olen - output buffer length                                           *
- 	*                                                                            *
+ *                                                                            *
  * Return value:                                                              *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
