@@ -683,9 +683,8 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 			TRIGGER_STATUS_ENABLED);
 
 	for (i = 0; i < history_num; i++)
-		if (0 != history[i].functions)
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32, ZBX_FS_UI64 ",",
-					history[i].itemid);
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32, ZBX_FS_UI64 ",",
+				history[i].itemid);
 
 	if (sql[sql_offset - 1] == ',')
 	{
