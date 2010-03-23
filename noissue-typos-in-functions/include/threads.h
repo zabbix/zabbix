@@ -68,7 +68,7 @@
 
 ZBX_THREAD_HANDLE zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), void *args);
 int zbx_thread_wait(ZBX_THREAD_HANDLE thread);
-/* zbx_thread_exit(status) // declared as define !!! */
+/* zbx_thread_exit(status) -- declared as define !!! */
 long int zbx_get_thread_id(void);
 
 #endif /* ZABBIX_THREADS_H */

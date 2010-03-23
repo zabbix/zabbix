@@ -45,7 +45,7 @@
 int	main_dbconfig_loop()
 {
 	double	sec;
-//zabbix_set_log_level(LOG_LEVEL_DEBUG);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_dbconfig_loop()");
 
 	zbx_setproctitle("db config [connecting to the database]");
