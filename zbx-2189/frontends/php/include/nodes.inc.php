@@ -101,9 +101,10 @@
 				$ZBX_CURMASTERID = $ZBX_LOCMASTERID;
 			}
 
-			// if(isset($_REQUEST['select_nodes']))
+			if(isset($_REQUEST['select_nodes']))
 				// CProfile::update('web.nodes.selected', $ZBX_VIEWED_NODES['nodeids'], PROFILE_TYPE_ARRAY_ID);
-			update_node_profile($ZBX_VIEWED_NODES['nodeids']);
+				update_node_profile($ZBX_VIEWED_NODES['nodeids']);
+			
 			if(isset($_REQUEST['switch_node']))
 				CProfile::update('web.nodes.switch_node', $ZBX_VIEWED_NODES['selected'], PROFILE_TYPE_ID);
 		}
