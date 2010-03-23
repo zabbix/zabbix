@@ -180,7 +180,7 @@ addScroll: function(e, objid){
 	
 	var g_width = null;
 	if(obj.scrollWidthByImage == 0){
-		g_width = get_bodywidth() - 10;	
+		g_width = get_bodywidth() - 30;	
 		if(!is_number(g_width)) g_width = 900;
 	}
 
@@ -928,8 +928,8 @@ calendarShowLeft: function(){
 //---
 
 	var pos = getPosition(this.dom.info_left); 
-	pos.top-=204; 
-	pos.left-=142; 
+	pos.top+=34; 
+	pos.left-=145; 
 	
 	if(CR) pos.top-=20;
 	this.clndrLeft.clndr.clndrshow(pos.top,pos.left);
@@ -941,8 +941,9 @@ calendarShowRight: function(){
 //---
 
 	var pos = getPosition(this.dom.info_right); 
-	pos.top-=204; 
-	pos.left-=78; 
+
+	pos.top+=34; 
+	pos.left-=77; 
 	
 	if(CR) pos.top-=20;
 	this.clndrRight.clndr.clndrshow(pos.top,pos.left);
