@@ -46,8 +46,8 @@ char *help_message[] = {
 	"  -o --value <Key value>               Specify value of the key",
 	"",
 	"  -i --input-file <Input file>         Load values from input file. Specify - for standard input",
-	"                                       Each line of file contains space delimited: <hostname> <key> <value>",
-	"  -T --with-timestamps                 Each line of file contains space delimited: <hostname> <key> <timestamp> <value>",
+	"                                       Each line of file contains blanks delimited: <hostname> <key> <value>",
+	"  -T --with-timestamps                 Each line of file contains blanks delimited: <hostname> <key> <timestamp> <value>",
 	"                                       This can be used with --input-file option",
 	"  -r --real-time                       Send metrics one by one as soon as they are received",
 	"                                       This can be used when reading from standard input",
@@ -73,8 +73,8 @@ char *help_message[] = {
 	"  -o <Key value>               Specify value of the key",
 	"",
 	"  -i <Input file>              Load values from input file. Specify - for standard input",
-	"                               Each line of file contains space delimited: <hostname> <key> <value>",
-	"  -T                           Each line of file contains space delimited: <hostname> <key> <timestamp> <value>",
+	"                               Each line of file contains blanks delimited: <hostname> <key> <value>",
+	"  -T                           Each line of file contains blanks delimited: <hostname> <key> <timestamp> <value>",
 	"                               This can be used with -i option",
 	"  -r                           Send metrics one by one as soon as they are received",
 	"                               This can be used when reading from standard input",
@@ -393,16 +393,17 @@ int main(int argc, char **argv)
 	FILE	*in;
 
 	char	in_line[MAX_BUF_LEN],
-		*hostname,
-		*key,
-		*key_value,
-		*clock;
+		hostname[MAX_STRING_LEN],
+		key[MAX_STRING_LEN],
+		key_value[MAX_BUF_LEN],
+		clock[32];
 
 	int	task = ZBX_TASK_START,
 		total_count = 0,
 		succeed_count = 0,
 		buffer_count = 0,
 		ret = SUCCEED;
+	const char	*p;
 
 	ZBX_THREAD_SENDVAL_ARGS sentdval_args;
 
@@ -460,35 +461,36 @@ int main(int argc, char **argv)
 
 			zbx_rtrim(in_line, "\r\n");
 
-			hostname = in_line;
+			p = in_line;
 
-			if (NULL == (key = strchr(hostname, ' ')))
+			if ('\0' == *p || NULL == (p = get_string(p, hostname, sizeof(hostname))) || '\0' == *hostname)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "[line %d] 'Hostname' required", total_count);
+				continue;
+			}
+
+			if ('\0' == *p || NULL == (p = get_string(p, key, sizeof(key))) || '\0' == *key)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "[line %d] 'Key' required", total_count);
 				continue;
 			}
 
-			*key++ = '\0';
-
 			if (1 == WITH_TIMESTAMPS)
 			{
-				if (NULL == (clock = strchr(key, ' ')))
+				if ('\0' == *p || NULL == (p = get_string(p, clock, sizeof(clock))) || '\0' == *clock)
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "[line %d] 'Timestamp' required", total_count);
 					continue;
 				}
-
-				*clock++ = '\0';
 			}
-			else
-				clock = key;
 
-			if (NULL == (key_value = strchr(clock, ' ')))
+			if ('\0' != *p && '"' != *p)
+				zbx_strlcpy(key_value, p, sizeof(key_value));
+			else if ('\0' == *p || NULL == (p = get_string(p, key_value, sizeof(key_value))) || '\0' == *key_value)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "[line %d] 'Key value' required", total_count);
 				continue;
 			}
-			*key_value++ = '\0';
 
 			zbx_rtrim(key_value, "\r\n");
 
@@ -510,6 +512,7 @@ int main(int argc, char **argv)
 				if (1 == WITH_TIMESTAMPS)
 					zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
 
+
 				ret = zbx_thread_wait(zbx_thread_start(send_value, &sentdval_args));
 
 				buffer_count = 0;
@@ -525,6 +528,7 @@ int main(int argc, char **argv)
 		{
 			if (1 == WITH_TIMESTAMPS)
 				zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
+
 
 			ret = zbx_thread_wait(zbx_thread_start(send_value, &sentdval_args));
 		}
@@ -554,14 +558,10 @@ int main(int argc, char **argv)
 				break;
 			}
 
-			hostname	= ZABBIX_HOSTNAME;
-			key		= ZABBIX_KEY;
-			key_value	= ZABBIX_KEY_VALUE;
-
 			zbx_json_addobject(&sentdval_args.json, NULL);
-			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_HOST, hostname, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_KEY, key, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_VALUE, key_value, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_HOST, ZABBIX_HOSTNAME, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_KEY, ZABBIX_KEY, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_VALUE, ZABBIX_KEY_VALUE, ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&sentdval_args.json);
 
 			succeed_count++;
