@@ -103,15 +103,19 @@ class CProfile{
 			'idx2' => $idx2,
 		);
 
-		if(CProfile::get($idx, false, $idx2) === false){
+		$current = CProfile::get($idx, null, $idx2);
+		if(is_null($current)){
 			if(!isset(self::$insert[$idx])) self::$insert[$idx] = array();
 				
 			self::$insert[$idx][$idx2] = $profile;
 		}
 		else{
-			if(!isset(self::$update[$idx])) self::$update[$idx] = array();
-				
-			self::$update[$idx][$idx2] = $profile;
+			if($current != $value){
+				if(!isset(self::$update[$idx])) 
+					self::$update[$idx] = array();
+					
+				self::$update[$idx][$idx2] = $profile;
+			}
 		}
 		
 		if(!isset(self::$profiles[$idx])) self::$profiles[$idx] = array();

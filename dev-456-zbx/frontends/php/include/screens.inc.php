@@ -896,10 +896,11 @@ require_once('include/js.inc.php');
 		$table->setAttribute('id', 'iframe');
 
 		if($editmode == 1){
-			$add_col_link = 'screenedit.php?config=1&screenid='.$screenid.'&add_col=';
 			$new_cols = array(new Ccol(new Cimg('images/general/zero.gif','zero',1,1)));
 			for($c=0;$c<$row['hsize']+1;$c++){
-				array_push($new_cols, new Ccol(new Clink(new Cimg('images/general/closed.gif'),$add_col_link.$c)));
+				$add_icon = new Cimg('images/general/closed.gif', NULL, NULL, NULL, 'pointer');
+            $add_icon->addAction('onclick', "javascript: location.href = 'screenedit.php?config=1&screenid=$screenid&add_col=$c';");
+				array_push($new_cols, new Ccol($add_icon));
 			}
 			$table->addRow($new_cols);
 		}
@@ -911,8 +912,9 @@ require_once('include/js.inc.php');
 			$empty_screen_row = true;
 
 			if($editmode == 1){
-				$add_row_link = 'screenedit.php?config=1&screenid='.$screenid.'&add_row=';
-				array_push($new_cols, new Ccol(new Clink(new Cimg('images/general/closed.gif'),$add_row_link.$r)));
+				$add_icon = new Cimg('images/general/closed.gif', NULL, NULL, NULL, 'pointer');
+            $add_icon->addAction('onclick', "javascript: location.href = 'screenedit.php?config=1&screenid=$screenid&add_row=$r';");
+				array_push($new_cols, new Ccol($add_icon));
 			}
 
 			for($c=0; $c < $row['hsize']; $c++){
@@ -1424,13 +1426,13 @@ require_once('include/js.inc.php');
 			}
 
 			if($editmode == 1){
-				$rmv_icon = new Cimg('images/general/opened.gif');
+				$rmv_icon = new Cimg('images/general/opened.gif', NULL, NULL, NULL, 'pointer');
 				if($empty_screen_row){
-					$rmv_row_link = 'javascript: location.href = '."'screenedit.php?config=1&screenid=".$screenid.'&rmv_row='.$r."';";
+					$rmv_row_link = "javascript: location.href = 'screenedit.php?config=1&screenid=$screenid&rmv_row=$r';";
 				}
 				else{
 					$rmv_row_link = "javascript: if(Confirm('".S_THIS_SCREEN_ROW_NOT_EMPTY.'. '.S_DELETE_IT_Q."')){".
-									" location.href = 'screenedit.php?config=1&screenid=".$screenid."&rmv_row=".$r."';}";
+									" location.href = 'screenedit.php?config=1&screenid=$screenid&rmv_row=$r';}";
 				}
 				$rmv_icon->addAction('onclick',$rmv_row_link);
 
@@ -1440,16 +1442,17 @@ require_once('include/js.inc.php');
 		}
 
 		if($editmode == 1){
-			$add_row_link = 'screenedit.php?config=1&screenid='.$screenid.'&add_row=';
-			$new_cols = array(new Ccol(new Clink(new Cimg('images/general/closed.gif'), $add_row_link.$row['vsize'])));
+         $add_icon = new Cimg('images/general/closed.gif', NULL, NULL, NULL, 'pointer');
+         $add_icon->addAction('onclick', "javascript: location.href = 'screenedit.php?config=1&screenid=$screenid&add_row={$row['vsize']}';");
+			$new_cols = array(new Ccol($add_icon));
 			for($c=0;$c<$row['hsize'];$c++){
-				$rmv_icon = new Cimg('images/general/opened.gif');
+				$rmv_icon = new Cimg('images/general/opened.gif', NULL, NULL, NULL, 'pointer');
 				if(isset($empty_screen_col[$c])){
 					$rmv_col_link = "javascript: if(Confirm('".S_THIS_SCREEN_COLUMN_NOT_EMPTY.'. '.S_DELETE_IT_Q."')){".
-										" location.href = 'screenedit.php?config=1&screenid=".$screenid."&rmv_col=".$c."';}";
+										" location.href = 'screenedit.php?config=1&screenid=$screenid&rmv_col=$c';}";
 				}
 				else{
-					$rmv_col_link = "javascript: location.href = 'screenedit.php?config=1&screenid=".$screenid."&rmv_col=".$c."';";
+					$rmv_col_link = "javascript: location.href = 'screenedit.php?config=1&screenid=$screenid&rmv_col=$c';";
 				}
 				$rmv_icon->addAction('onclick',$rmv_col_link);
 				array_push($new_cols, new Ccol($rmv_icon));

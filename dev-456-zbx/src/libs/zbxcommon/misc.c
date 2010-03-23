@@ -542,7 +542,7 @@ int	is_ip4(const char *ip)
  * Return value: SUCCEED - is IPv6 address                                    *
  *               FAIL - otherwise                                             *
  *                                                                            *
- * Author: Aleksader Vladishev                                                *
+ * Author: Aleksander Vladishev                                               *
  *                                                                            *
  * Comments: could be improved (not supported x:x:x:x:x:x:d.d.d.d addresses)  *
  *                                                                            *
@@ -597,7 +597,7 @@ static int	is_ip6(const char *ip)
  * Return value: SUCCEED - is IP address                                      *
  *               FAIL - otherwise                                             *
  *                                                                            *
- * Author: Aleksader Vladishev                                                *
+ * Author: Aleksander Vladishev                                               *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -628,7 +628,7 @@ int	is_ip(const char *ip)
  *                                                                            *
  * Return value: FAIL - invalid IP address, SUCCEED - conversion OK           *
  *                                                                            *
- * Author: Alksander Vladishev                                                *
+ * Author: Aleksander Vladishev                                               *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -711,7 +711,7 @@ int	expand_ipv6(const char *ip, char *str, size_t str_len )
  *                                                                            *
  * Return value: pointer to result buffer                                     *
  *                                                                            *
- * Author: Alksander Vladishev                                                *
+ * Author: Aleksander Vladishev                                               *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -1620,7 +1620,7 @@ int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value)
  *                                                                            *
  * Function: uint64_array_remove                                              *
  *                                                                            *
- * Purpose: add uint64 value to dynamic array                                 *
+ * Purpose: remove uint64 values from array                                   *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -1631,7 +1631,7 @@ int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	uint64_array_rm(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int rm_num)
+void	uint64_array_remove(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int rm_num)
 {
 	int	rindex, index;
 

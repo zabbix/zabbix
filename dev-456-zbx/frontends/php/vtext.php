@@ -39,39 +39,39 @@
 	check_fields($fields);
 ?>
 <?php
-
+  
 	$text = get_request('text', ' ');;
 	$font = get_request('font', 9);
-
-	if(function_exists('imagerotate')){
-		$angle = 0;
-	}
-	else{
-		$angle = 90;
-	}
 
 	$size = imageTextSize($font, $angle, $text);
 
 	$im = imagecreatetruecolor($size['width']+4, $size['height']+4);
 
-	$transparentColor = imagecolorallocatealpha($im, 200, 200, 200, 127);
-	imagefill($im, 0, 0, $transparentColor);
+	$width = imagesx($im);
+	$height = imagesy($im);
+	
+	$white = imagecolorallocate($im, 205, 205, 205);
+	imagefilledrectangle($im, 0 ,0, $width-1, $height-1, $white);	
 
 	$text_color = imagecolorallocate($im, 0, 0, 0);
-
+	imageText($im, $font, 0, 0, $size['height'], $text_color, $text);
 	
-	if(function_exists('imagerotate')){
-		imageText($im, $font, $angle, 0, $size['height'], $text_color, $text);
-		$im = imagerotate($im, 90, $transparentColor);
-	}
-	else{
-		imageText($im, $font, $angle, $size['width'], $size['height'], $text_color, $text);
-	}
 	
-	ImageAlphaBlending($im, false);
-	imageSaveAlpha($im, true);
-
-	imageOut($im);
+	$newImage = imagecreatetruecolor($height, $width);	
+	$white = imagecolorallocate($newImage, 205, 205, 205);
+	
+	// imagealphablending($newImage, false);
+	// imagesavealpha($newImage, true);
+	for($w=0; $w<$width; $w++){
+		for($h=0; $h<$height; $h++){
+			$ref = imagecolorat($im, $w, $h);
+			imagesetpixel($newImage, $h, ($width-1)-$w, $ref);
+		}
+	}
+	imagecolortransparent($newImage, $white);
+	
+	imageOut($newImage);
+	imagedestroy($newImage);
 	imagedestroy($im);
 
 
