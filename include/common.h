@@ -762,6 +762,7 @@ int	get_param(const char *param, int num, char *buf, int maxlen);
 int	num_param(const char *param);
 char	*get_param_dyn(const char *param, int num);
 void	remove_param(char *param, int num);
+const char	*get_string(const char *p, char *buf, size_t bufsize);
 int	get_key_param(char *param, int num, char *buf, int maxlen);
 int	num_key_param(char *param);
 int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char *delay_flex, time_t now);
