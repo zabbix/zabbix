@@ -2112,7 +2112,7 @@ static void	DCsync_hosts()
 
 /******************************************************************************
  *                                                                            *
- * Function: DCsync_confguration                                              *
+ * Function: DCsync_configuration                                             *
  *                                                                            *
  * Purpose: Synchronize configuration data from database                      *
  *                                                                            *
@@ -2125,9 +2125,9 @@ static void	DCsync_hosts()
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	DCsync_confguration()
+void	DCsync_configuration()
 {
-	const char	*__function_name = "DCsync_confguration";
+	const char	*__function_name = "DCsync_configuration";
 	double		sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
