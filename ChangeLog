@@ -1,5 +1,7 @@
 Changes for 1.8.2
 
+ - [ZBX-1956] fixed deletion of last row or col in screen (AM)
+ - [ZBX-1956] added cursor pointer on minus (remove) icons in screens (AM)
  - [ZBX-1347] added support of hostnames and keys with spaces in sender input file (Sasha)
  - [ZBX-2189] fixed compilation under AIX 5.3 (Sasha)
  - [ZBX-1229] added comparison between IPv4, IPv4-mapped and IPv4-compatible allowed server addresses (Dmitry)
