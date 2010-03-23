@@ -75,8 +75,7 @@ function is_string(obj){
 }
 
 function is_array(obj) {
-	return obj != null && typeof obj == "object" &&
-	'splice' in obj && 'join' in obj;
+	return (obj != null) && (typeof obj == "object") && ('splice' in obj) && ('join' in obj);
 }
 
 function SDI(msg){
