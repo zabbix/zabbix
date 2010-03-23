@@ -240,7 +240,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
 #endif
 
-	uint64_array_rm(old, &old_num, new, new_num);
+	uint64_array_remove(old, &old_num, new, new_num);
 
 	if (old_num > 0)
 	{
@@ -264,7 +264,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 
 	return SUCCEED;
 json_error:
-	zabbix_log(LOG_LEVEL_DEBUG, "Can't proceed table \"%s\". %s",
+	zabbix_log(LOG_LEVEL_DEBUG, "Can't process table \"%s\". %s",
 			tablename,
 			zbx_json_strerror());
 db_error:
@@ -312,7 +312,7 @@ static void	process_proxyconfig(struct zbx_json_parse *jp)
  *          ^-----------------------------------------------------------------^
  */		if (FAIL == zbx_json_brackets_open(p, &jp_obj))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Can't proceed table \"%s\". %s",
+			zabbix_log(LOG_LEVEL_DEBUG, "Can't process table \"%s\". %s",
 					buf,
 					zbx_json_strerror());
 			res = FAIL;

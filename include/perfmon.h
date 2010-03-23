@@ -24,9 +24,9 @@
 #	error "This module allowed only for Windows OS"
 #endif /* _WINDOWS */
 
-//
-// Performance Counter Indexes
-//
+/*
+ * Performance Counter Indexes
+ */
 
 #define PCI_SYSTEM			(2)
 #define PCI_PROCESSOR			(238)
@@ -36,18 +36,18 @@
 #define PCI_TERMINAL_SERVICES		(2176)
 #define PCI_TOTAL_SESSIONS		(2178)
 
-//
-// Performance Countername structure
-//
+/*
+ * Performance Countername structure
+ */
 
 struct perfcounter
 {
 	struct perfcounter *next;
 	unsigned long	pdhIndex;
 	TCHAR		name[PDH_MAX_COUNTER_NAME];
-	/* must be caracter array! if you want to rewrite */
-	/* to dinacal memory allocation CHECK for usage   */
-	/* of sizeof function                             */
+	/* must be character array! if you want to rewrite  */
+	/* to use dynamic memory allocation CHECK for usage */
+	/* of sizeof function                               */
 };
 
 typedef struct perfcounter PERFCOUNTER;
