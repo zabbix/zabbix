@@ -225,7 +225,7 @@ include_once('include/page_header.php');
 	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url->getUrl()."';"));
 
 	$style = $dashconf['filterEnable']?'iconconfig_hl':'iconconfig';
-	$state = $dashconf['filterEnable']?S_ENABLED:S_DISABLED;
+	$state = S_FILTER.' '.($dashconf['filterEnable']?S_ENABLED:S_DISABLED);
 	$dc_icon = new CDiv(SPACE,$style);
 	$dc_icon->setAttribute('title', S_CONFIGURE.' ('.$state.')');
 	$dc_icon->addAction('onclick',new CJSscript("javascript: document.location = 'dashconf.php';"));
