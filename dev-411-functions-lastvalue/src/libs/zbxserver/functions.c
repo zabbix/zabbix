@@ -59,7 +59,7 @@ void	update_triggers(zbx_uint64_t itemid)
 
 	result = DBselect(
 		"select distinct t.triggerid,t.expression,t.description,"
-		"t.url,t.comments,t.status,t.value,t.priority,t.type"
+			"t.url,t.comments,t.status,t.value,t.priority,t.type"
 		" from triggers t,functions f,items i"
 		" where i.status<>%d"
 			" and i.itemid=f.itemid"
