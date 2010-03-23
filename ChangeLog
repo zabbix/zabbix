@@ -4,6 +4,7 @@ Changes for 1.9
 
 Changes for 1.8.2
 
+ - [ZBX-2217] fixed JS error in status of triggers page in IE (Aly)
  - [ZBX-2199] fixed time output format when time is less then 1 ms (AM)
  - [ZBX-1956] fixed deletion of last row or col in screen (AM)
  - [ZBX-1956] added cursor pointer on minus (remove) icons in screens (AM)
