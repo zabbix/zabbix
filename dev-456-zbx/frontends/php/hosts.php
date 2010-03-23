@@ -575,7 +575,7 @@ $thid = get_request('hostid', 0);
 
 	validate_group($PAGE_GROUPS,$PAGE_HOSTS);
 
-$_REQUEST['hostid'] = $thid;
+	$_REQUEST['hostid'] = $thid;
 ?>
 <?php
 	echo SBR;

@@ -193,6 +193,17 @@ div.iconconfig{
 div.iconconfig:hover{
 }
 
+div.iconconfig_hl{
+	height: 18px;
+	width: 18px;
+	background-image: url('../images/general/bttn/config_hl.png');
+	background-repeat:no-repeat;
+	cursor:pointer;
+}
+
+div.iconconfig_hl:hover{
+}
+
 div.filterclosed{
 	height: 9px;
 	width: 9px;

@@ -59,28 +59,36 @@ include_once('include/page_header.php');
 	check_fields($fields);
 
 // FILTER
-//
-// groups
 	$dashconf = array();
-	$dashconf['grpswitch'] = CProfile::get('web.dashconf.groups.grpswitch', 0);
+	$dashconf['groupids'] = null;
+	$dashconf['maintenance'] = null;
+	$dashconf['severity'] = array(0,1,2,3,4,5);
 
-	if($dashconf['grpswitch'] == 0){
-		$dashconf['groupids'] = null;
-	}
-	else{
-		$groupids = get_favorites('web.dashconf.groups.groupids');
-		$dashconf['groupids'] = zbx_objectValues($groupids, 'value');
-	}
+	$dashconf['filterEnable'] = CProfile::get('web.dashconf.filter.enable', 0);
+	if($dashconf['filterEnable'] == 1){
+// groups
+		$dashconf['grpswitch'] = CProfile::get('web.dashconf.groups.grpswitch', 0);
+
+		if($dashconf['grpswitch'] == 0){
+			$dashconf['groupids'] = null;
+		}
+		else{
+			$groupids = get_favorites('web.dashconf.groups.groupids');
+			$dashconf['groupids'] = zbx_objectValues($groupids, 'value');
+		}
 
 // hosts
-	$maintenance = CProfile::get('web.dashconf.hosts.maintenance', 0);
-	if($maintenance == 1) $dashconf['maintenance'] = 0;
+		$maintenance = CProfile::get('web.dashconf.hosts.maintenance', 1);
+		$dashconf['maintenance'] = ($maintenance == 0)?0:null;
 
 // triggers
-	$severity = CProfile::get('web.dashconf.triggers.severity', array());
+		$severity = CProfile::get('web.dashconf.triggers.severity', '0;1;2;3;4;5');
+		$dashconf['severity'] = zbx_empty($severity)?array():explode(';', $severity);
+	}
 
-	$dashconf['severity'] = !empty($severity)?explode(';', $severity):array();
+	$dashconf['severity'] = zbx_toHash($dashconf['severity']);
 // ------
+
 
 // ACTION /////////////////////////////////////////////////////////////////////////////
 	if(isset($_REQUEST['favobj'])){
@@ -109,7 +117,7 @@ include_once('include/page_header.php');
 					$lastiss->show();
 					break;
 				case 'hat_webovr':
-					$webovr = make_webmon_overview();
+					$webovr = make_webmon_overview($dashconf);
 					$webovr->show();
 					break;
 				case 'hat_dscvry':
@@ -216,8 +224,10 @@ include_once('include/page_header.php');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url->getUrl()."';"));
 
-	$dc_icon = new CDiv(SPACE,'iconconfig');
-	$dc_icon->setAttribute('title', S_CONFIGURE);
+	$style = $dashconf['filterEnable']?'iconconfig_hl':'iconconfig';
+	$state = $dashconf['filterEnable']?S_ENABLED:S_DISABLED;
+	$dc_icon = new CDiv(SPACE,$style);
+	$dc_icon->setAttribute('title', S_CONFIGURE.' ('.$state.')');
 	$dc_icon->addAction('onclick',new CJSscript("javascript: document.location = 'dashconf.php';"));
 
 

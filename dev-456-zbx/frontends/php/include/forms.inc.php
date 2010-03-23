@@ -5764,8 +5764,8 @@
 
 		$frmHost = new CForm('hosts.php', 'post');
 		$frmHost->setName('web.hosts.host.php.');
-		//$frmHost->setHelp('web.hosts.host.php');
-		//$frmHost->addVar('config',get_request('config',0));
+//		$frmHost->setHelp('web.hosts.host.php');
+//		$frmHost->addVar('config',get_request('config',0));
 		$frmHost->addVar('form', get_request('form', 1));
 		$from_rfr = get_request('form_refresh',0);
 		$frmHost->addVar('form_refresh', $from_rfr+1);
