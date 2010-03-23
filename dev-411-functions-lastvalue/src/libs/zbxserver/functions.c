@@ -95,8 +95,8 @@ void	update_triggers(zbx_uint64_t itemid)
 				itemid,
 				zbx_host_key_string(itemid),
 				error);
-/*			We shouldn't update trigger value if expressions failed		*/
-/*			DBupdate_trigger_value(&trigger, exp_value, time(NULL), error);	*/
+/*			We shouldn't update trigger value if expressions failed	*/
+			DBupdate_trigger_value(&trigger, TRIGGER_VALUE_UNKNOWN, time(NULL), error);
 		}
 		else
 		{
