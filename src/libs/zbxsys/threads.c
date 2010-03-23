@@ -61,7 +61,7 @@ int	zbx_fork()
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments:                                                                  *
- *          The zbx_tread_exit must be called from the handler!               *
+ *          The zbx_thread_exit must be called from the handler!              *
  *                                                                            *
  ******************************************************************************/
 
@@ -87,9 +87,9 @@ ZBX_THREAD_HANDLE zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), void *args
 	{
 		(*handler)(args);
 
-		/* The zbx_tread_exit must be called from the handler */
+		/* The zbx_thread_exit must be called from the handler */
 		/* And in normal case the program will never reach this point. */
-		zbx_tread_exit(0);
+		zbx_thread_exit(0);
 		/* Program will never reach this point. */
 	}
 	else if(thread < 0)
