@@ -1409,6 +1409,9 @@
 	'S_VERTICAL_ALIGN'=>			'Vertical align',
 	'S_MIDDLE'=>				'Middle',
 
+	'S_CANNOT_REMOVE_ROW_OR_COL'=>			'Imposible to remove last row and last col',
+	'S_SCREEN_SHOULD_CONTAIN_ONE_ROW_AND_COL'=>				'Screen should contain at least one row and one col',
+
 //	screens.php
 	'S_CUSTOM_SCREENS'=>			'Custom screens',
 	'S_SCREENS_BIG'=>			'SCREENS',
