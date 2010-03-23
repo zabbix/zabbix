@@ -4,6 +4,7 @@ Changes for 1.9
 
 Changes for 1.8.2
 
+ - [ZBX-2189] fixed compilation under AIX 5.3 (Sasha)
  - [ZBX-1229] added comparison between IPv4, IPv4-mapped and IPv4-compatible allowed server addresses (Dmitry)
  - [ZBX-1949] fixed "housekeeping" procedure for the table "housekeeper" itself, added configuration parameter "MaxHousekeeperDelete" for the server (Dmitry)
  - [ZBX-2173] fixed too long URL for webgraph when many websteps are defined (Vedmak)
