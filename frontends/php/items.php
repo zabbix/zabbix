@@ -771,7 +771,6 @@ include_once('include/page_header.php');
 
 //$items_wdgt->addPageHeader(S_CONFIGURATION_OF_ITEMS_BIG, $form);
 	show_table_header(S_CONFIGURATION_OF_ITEMS_BIG, $form);
-	echo SBR;
 
 	if(isset($_REQUEST['form'])){
 		if(str_in_array($_REQUEST['form'], array(S_CREATE_ITEM, 'update', 'clone')) ||

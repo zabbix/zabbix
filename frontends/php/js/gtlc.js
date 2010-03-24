@@ -63,9 +63,10 @@ addObject: function(domid, time, objData){
 	
 	var now = new CDate();
 	now = parseInt(now.getTime() / 1000);
+
 	if(!isset('period', time))		time.period = 3600;
 	if(!isset('endtime', time))		time.endtime = now;
-	if(!isset('starttime', time))	time.starttime = time.endtime - 3*time.period;
+	if(!isset('starttime', time) || is_null(time['starttime']))	time.starttime = time.endtime - 3*((time.period<86400)?86400:time.period);
 	if(!isset('usertime', time))	time.usertime = time.endtime;
 	
 	this.objectList[domid].time = time;
@@ -179,7 +180,7 @@ addScroll: function(e, objid){
 	
 	var g_width = null;
 	if(obj.scrollWidthByImage == 0){
-		g_width = get_bodywidth() - 25;	
+		g_width = get_bodywidth() - 30;	
 		if(!is_number(g_width)) g_width = 900;
 	}
 
@@ -534,13 +535,14 @@ function scrollCreate(sbid, w, timelineid){
 		throw "Parameters haven't been sent properly";
 		return false;
 	}
-	
+
 	if(is_null(w)){
 		var dims = getDimensions(sbid);
 		if($(sbid).nodeName.toLowerCase() == 'img')
 			w = dims.width + 5;
-		else 
+		else{
 			w = dims.width - 5;
+		}
 	}
 	
 	if(w < 600) w = 600;
@@ -926,8 +928,8 @@ calendarShowLeft: function(){
 //---
 
 	var pos = getPosition(this.dom.info_left); 
-	pos.top-=204; 
-	pos.left-=142; 
+	pos.top+=34; 
+	pos.left-=145; 
 	
 	if(CR) pos.top-=20;
 	this.clndrLeft.clndr.clndrshow(pos.top,pos.left);
@@ -939,8 +941,9 @@ calendarShowRight: function(){
 //---
 
 	var pos = getPosition(this.dom.info_right); 
-	pos.top-=204; 
-	pos.left-=78; 
+
+	pos.top+=34; 
+	pos.left-=77; 
 	
 	if(CR) pos.top-=20;
 	this.clndrRight.clndr.clndrshow(pos.top,pos.left);
@@ -1481,8 +1484,8 @@ appendCalendars: function(){
 	this.debug('appendCalendars');
 //---
 	
-	this.clndrLeft = create_calendar((this.timeline.usertime() - this.timeline.period()), this.dom.info_left);
-	this.clndrRight = create_calendar(this.timeline.usertime(), this.dom.info_right);
+	this.clndrLeft = create_calendar((this.timeline.usertime() - this.timeline.period()), this.dom.info_left, null, null, 'scrollbar_cntr');
+	this.clndrRight = create_calendar(this.timeline.usertime(), this.dom.info_right, null, null, 'scrollbar_cntr');
 
 	this.clndrLeft.clndr.onselect = this.setCalendarLeft.bind(this);
 	addListener(this.dom.info_left, 'click', this.calendarShowLeft.bindAsEventListener(this));
@@ -1616,7 +1619,8 @@ scrollcreate: function(w){
 	
 	scr_cntr.style.paddingRight = '2px';
 	scr_cntr.style.paddingLeft = '2px';
-	scr_cntr.style.backgroundColor = '#DDDDDD';
+	scr_cntr.style.backgroundColor = '#E5E5E5';
+	scr_cntr.style.margin = '5px 0 0 0 ';
 
 	this.dom.scrollbar = document.createElement('div');
 	scr_cntr.appendChild(this.dom.scrollbar);
