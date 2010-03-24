@@ -1136,7 +1136,8 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 		$def_sql['from'][] = 'hosts_groups hg';
 
 		$def_sql['where'][] = 'hg.groupid=g.groupid';
-		$def_sql['where'][] = 'EXISTS( SELECT a.applicationid '.
+		$def_sql['where'][] = 'EXISTS( '.
+								' SELECT a.applicationid '.
 								' FROM applications a, httptest ht '.
 								' WHERE a.hostid=hg.hostid '.
 									' AND ht.applicationid=a.applicationid '.

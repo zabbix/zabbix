@@ -859,35 +859,30 @@ function make_webmon_overview($filter){
 		S_UNKNOWN
 		));
 
-	$sql = 'SELECT DISTINCT g.groupid, g.name '.
-			' FROM httptest ht, applications a, groups g, hosts_groups hg '.
-			' WHERE '.DBcondition('hg.hostid',$available_hosts).
-				' AND hg.hostid=a.hostid '.
-				' AND g.groupid=hg.groupid '.
-				' AND a.applicationid=ht.applicationid '.
-				' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
-			' ORDER BY g.name';
-	$host_groups = DBSelect($sql);
-
-	while($group = DBFetch($host_groups)){
-
+	$options = array(
+		'monitored_hosts' => 1,
+		'with_monitored_httptests' => 1,
+		'output' => API_OUTPUT_EXTEND
+	);
+	$groups = CHostGroup::get($options);
+	foreach($groups as $gnum => $group){
+		$showGroup = false;
 		$apps['ok'] = 0;
 		$apps['failed'] = 0;
 		$apps[HTTPTEST_STATE_BUSY] = 0;
 		$apps[HTTPTEST_STATE_UNKNOWN] = 0;
 
-		$sql = 'SELECT DISTINCT ht.httptestid, ht.curstate, ht.lastfailedstep '.
+		$sql = 'SELECT DISTINCT ht.name, ht.httptestid, ht.curstate, ht.lastfailedstep '.
 				' FROM httptest ht, applications a, hosts_groups hg, groups g '.
 				' WHERE g.groupid='.$group['groupid'].
+					' AND '.DBcondition('hg.hostid',$available_hosts).
 					' AND hg.groupid=g.groupid '.
 					' AND a.hostid=hg.hostid '.
 					' AND ht.applicationid=a.applicationid '.
 					' AND ht.status='.HTTPTEST_STATUS_ACTIVE;
-
 		$db_httptests = DBselect($sql);
-
 		while($httptest_data = DBfetch($db_httptests)){
-
+			$showGroup = true;
 			if( HTTPTEST_STATE_BUSY == $httptest_data['curstate'] ){
 				$apps[HTTPTEST_STATE_BUSY]++;
 			}
@@ -903,6 +898,8 @@ function make_webmon_overview($filter){
 				$apps[HTTPTEST_STATE_UNKNOWN]++;
 			}
 		}
+
+		if(!$showGroup) continue;
 
 		$table->addRow(array(
 			is_show_all_nodes() ? get_node_name_by_elid($group['groupid']) : null,
