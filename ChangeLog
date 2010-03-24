@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-2151] fixed header sorting in overview for items and triggers (AM)
  - [DEV-456] added filter to dashboard (Aly)
  - [ZBX-2191] remove broken trigger from the default dataset (Richlv)
  - [ZBX-2172] fixed object available scripts sorting alphabetically (AM)
