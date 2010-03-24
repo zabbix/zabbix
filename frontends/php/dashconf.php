@@ -202,7 +202,7 @@ include_once('include/page_header.php');
 // Trigger
 	$severity = zbx_toHash($severity);
 	$trgSeverities = array();
-SDI($filterEnable);
+
 	$cb = new CCheckBox('trgSeverity['.TRIGGER_SEVERITY_NOT_CLASSIFIED.']', isset($severity[TRIGGER_SEVERITY_NOT_CLASSIFIED]), '', 1);
 	$cb->setEnabled($filterEnable);
 	$trgSeverities[] = array($cb, S_NOT_CLASSIFIED);
