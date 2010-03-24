@@ -4,6 +4,7 @@ Changes for 1.9
 
 Changes for 1.8.2
 
+ - [ZBX-2219] fixed graphs data in data.sql (Aly)
  - [ZBX-1345] time filter redesigned, sliders moved to top inside filter (Vedmak)
  - [ZBX-2151] fixed header sorting in overview for items and triggers (AM)
  - [DEV-456] added filter to dashboard (Aly)
