@@ -1484,8 +1484,8 @@ appendCalendars: function(){
 	this.debug('appendCalendars');
 //---
 	
-	this.clndrLeft = create_calendar((this.timeline.usertime() - this.timeline.period()), this.dom.info_left);
-	this.clndrRight = create_calendar(this.timeline.usertime(), this.dom.info_right);
+	this.clndrLeft = create_calendar((this.timeline.usertime() - this.timeline.period()), this.dom.info_left, null, null, 'scrollbar_cntr');
+	this.clndrRight = create_calendar(this.timeline.usertime(), this.dom.info_right, null, null, 'scrollbar_cntr');
 
 	this.clndrLeft.clndr.onselect = this.setCalendarLeft.bind(this);
 	addListener(this.dom.info_left, 'click', this.calendarShowLeft.bindAsEventListener(this));

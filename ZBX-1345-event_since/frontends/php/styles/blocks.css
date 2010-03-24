@@ -185,7 +185,7 @@ div.scrollbar .overlevel .left_arr{
 
 	background-image: url(../images/general/bar/left_arr.png);
 	
-	z-index: 1000;
+	z-index: 99;
 	cursor:e-resize;
 }
 
@@ -198,7 +198,7 @@ div.scrollbar .overlevel .right_arr{
 
 	background-image: url(../images/general/bar/right_arr.png);
 	
-	z-index: 1000;
+	z-index: 99;
 	cursor:e-resize;
 }
 
