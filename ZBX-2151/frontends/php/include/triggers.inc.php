@@ -2606,7 +2606,7 @@ return $result;
 		if(!isset($hosts)){
 			return $table;
 		}
-		ksort($hosts);
+		ksort($hosts, SORT_STRING);
 
 		if($view_style == STYLE_TOP){
 			$header=array(new CCol(S_TRIGGERS,'center'));
