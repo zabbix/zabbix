@@ -1353,9 +1353,16 @@ require_once('include/js.inc.php');
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				else if(($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_SYSTEM_STATUS)){
+					$params = array(
+						'groupids' => null,
+						'hostids' => null,
+						'maintenance' => null,
+						'severity' => null,
+						'limit' => null
+					);
 
 					$item = array(get_table_header(array(S_SYSTEM_STATUS,SPACE,date('[H:i:s]',time()))));
-					$item[] = make_system_summary();
+					$item[] = make_system_summary($params);
 
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
