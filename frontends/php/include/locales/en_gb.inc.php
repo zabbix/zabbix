@@ -803,6 +803,7 @@
 	'S_DNS_NAME'=>					'DNS name',
 	'S_IP_ADDRESS'=>				'IP address',
 	'S_LINK_ADDITIONAL_TEMPLATES'=>			'Link additional templates',
+	'S_RELINK_TEMPLATES'=>			'Replace linked templates',
 	'S_USEIPMI'=>					'Use IPMI',
 	'S_IPMI_IP_ADDRESS'=>				'IPMI IP address',
 	'S_IPMI_PORT'=>					'IPMI port',
@@ -883,6 +884,8 @@
 	'S_TEMPLATES'=>				'Templates',
 	'S_TEMPLATES_BIG'=>			'TEMPLATES',
 	'S_UNLINK'=>				'Unlink',
+	'S_CANNOT_UNLINK_TEMPLATE'=>	'Cannot unlink template',
+	'S_CANNOT_LINK_TEMPLATE'=>	'Cannot link template',
 	'S_UNLINK_AND_CLEAR'=>			'Unlink and clear',
 	'S_MONITORED_BY_PROXY'=>		'Monitored by proxy',
 
