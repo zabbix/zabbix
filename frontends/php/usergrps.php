@@ -347,7 +347,6 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 
 	$frmForm->addItem(array($cmbConf,SPACE,new CButton('form', S_CREATE_GROUP)));
 	show_table_header(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
-	echo SBR;
 
 
 	if(isset($_REQUEST['form'])){

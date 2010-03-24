@@ -237,7 +237,6 @@ include_once('include/page_header.php');
 	$form->addItem(new CButton('form', S_IMPORT_MAP));
 
 	show_table_header(S_CONFIGURATION_OF_NETWORK_MAPS, $form);
-	echo SBR;
 ?>
 <?php
 //	COpt::savesqlrequest(0,'/////////////////////////////////////////////////////////////////////////////////////////////////////////');

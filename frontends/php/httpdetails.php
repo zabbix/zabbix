@@ -55,6 +55,9 @@
 ?>
 <?php
 	if(isset($_REQUEST['favobj'])){
+		if('filter' == $_REQUEST['favobj']){
+			CProfile::update('web.httpdetails.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+		}
 		if('timeline' == $_REQUEST['favobj']){
 			if(isset($_REQUEST['httptestid']) && isset($_REQUEST['period'])){
 				navigation_bar_calc('web.httptest', $_REQUEST['httptestid']);
@@ -207,11 +210,16 @@
 
 	$details_wdgt->addItem($table);
 	$details_wdgt->show();
-
+	
 	echo SBR;
 
-	show_table_header(array(S_HISTORY.SPACE, bold($httptest_data['name'])));
-
+	$graphsWidget = new CWidget();
+	
+	$scroll_div = new CDiv();
+	$scroll_div->setAttribute('id','scrollbar_cntr');
+	$graphsWidget->addFlicker($scroll_div, CProfile::get('web.httpdetails.filter.state',0));
+	$graphsWidget->addItem(SPACE);
+	
 	$graphTable = new CTableInfo();
 	$graphTable->setAttribute('id','graph');
 
@@ -223,7 +231,9 @@
 	$graph_cont->setAttribute('id', 'graph_2');
 	$graphTable->addRow(array(bold(S_RESPONSE_TIME), $graph_cont));
 	
-	$graphTable->show();
+	$graphsWidget->addItem($graphTable);
+	
+	$graphsWidget->addPageHeader(SPACE);
 
 // NAV BAR
 	$timeline = array(
@@ -294,10 +304,6 @@
 	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 //-------------
 
-	$scroll_div = new CDiv();
-	$scroll_div->setAttribute('id','scrollbar_cntr');
-	$scroll_div->show();
-
 	$dom_graph_id = 'none';
 	$objData = array(
 		'id' => $_REQUEST['httptestid'],
@@ -313,6 +319,8 @@
 	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 	zbx_add_post_js('timeControl.processObjects();');
 
-
+	$graphsWidget->show();
+	
+	
 include_once('include/page_footer.php');
 ?>
