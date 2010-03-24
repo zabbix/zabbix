@@ -5533,8 +5533,8 @@
 		);
 // END:   HOSTS PROFILE EXTENDED Section
 
-		if($useprofile=='yes'){	
-			if($useprofile == 'yes'){
+		if($useprofile==='yes'){
+			if($useprofile === 'yes'){
 				foreach($profile_fields as $field => $caption){
 					$frmHost->addRow(array(
 						new CVisibilityBox('visible['.$field.']', isset($visible[$field]), 'host_profile['.$field.']', S_ORIGINAL), $caption),
