@@ -242,9 +242,17 @@ include_once('include/page_header.php');
 			}
 // }}} PROFILES
 
+			$templates = array();
+			if(isset($visible['template_table']) || isset($visible['template_table_r'])){
+				$tplids = array_keys($_REQUEST['templates']);
+				$templates = zbx_toObject($tplids, 'templateid');
+			}
 		
 			if(isset($visible['groups'])){
 				$hosts['groups'] = zbx_toObject($_REQUEST['groups'], 'groupid');
+			}
+			if(isset($visible['template_table_r'])){
+				$hosts['templates'] = $templates;
 			}
 			$result = CHost::massUpdate(array_merge($hosts, $new_values));
 			if($result === false) throw new Exception();
@@ -261,15 +269,12 @@ include_once('include/page_header.php');
 				if($groups === false) throw new Exception();
 			}
 
-			$templates = array();
-			if(isset($visible['template_table'])){
-				$tplids = array_keys($_REQUEST['templates']);
-				$templates = zbx_toObject($tplids, 'templateid');
-			}
+			
 			
 			$add = array();
-			if(!empty($templates))
+			if(!empty($templates) && isset($visible['template_table'])){
 				$add['templates'] = $templates;
+			}
 			if(!empty($groups))
 				$add['groups'] = $groups;
 			if(!empty($add)){
@@ -373,6 +378,7 @@ include_once('include/page_header.php');
 
 			if(isset($_REQUEST['hostid'])){
 				$host['hostid'] = $_REQUEST['hostid'];
+				$host['templates_clear'] = $templates_clear;
 				$result = CHost::update($host);
 
 				$hostid = $_REQUEST['hostid'];
