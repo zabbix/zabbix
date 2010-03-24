@@ -106,7 +106,7 @@ include_once('include/page_header.php');
 		}
 	}
 
-	/* limit opened application count */
+// limit opened application count
 	// while(count($_REQUEST['applications']) > 25){
 		// array_shift($_REQUEST['applications']);
 	// }

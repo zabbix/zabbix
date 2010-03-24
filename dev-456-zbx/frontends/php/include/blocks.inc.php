@@ -701,6 +701,13 @@ function make_latest_issues($filter = array()){
 // GATHER HOSTS FOR SELECTED TRIGGERS {{{
 	$triggers_hosts = array();
 	foreach($triggers as $tnum => $trigger){
+
+// if trigger is lost(broken expression) we skippit
+		if(empty($trigger['hosts'])){
+			unset($triggers[$tnum]);
+			continue;
+		}
+
 		$triggers_hosts = array_merge($triggers_hosts, $trigger['hosts']);
 	}
 	$triggers_hosts = zbx_toHash($triggers_hosts, 'hostid');
@@ -721,7 +728,6 @@ function make_latest_issues($filter = array()){
 	));
 
 	foreach($triggers as $tnum => $trigger){
-// Check for dependencies
 		$host = reset($trigger['hosts']);
 
 		$trigger['hostid'] = $host['hostid'];
