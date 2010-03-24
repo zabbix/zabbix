@@ -1204,6 +1204,15 @@
 	'S_MINIMIZE'=>				'Minimize',
 	'S_LOADING_P'=>				'Loading...',
 
+// dashconf.php
+	'S_DASHBOARD_CONFIGURATION' =>	'Dashboard configuration',
+	'S_DASHBOARD_CONFIGURATION_BIG' =>	'DASHBOARD CONFIGURATION',
+	'S_CONFIGURE' => 'Configure',
+	'S_SELECTED' => 'Selected',
+	'S_SHOW_HOSTS_IN_MAINTENANCE' => 'Show hosts in maintenance',
+	'S_TRIGGERS_WITH_SEVERITY' => 'Triggers with severity',
+	'S_DASHBOARD_FILTER' => 'Dashboard filter',
+
 //	overview.php
 	'S_OVERVIEW'=>				'Overview',
 	'S_OVERVIEW_BY_PROXY'=>			'Overview by proxy',

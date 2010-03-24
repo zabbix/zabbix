@@ -309,7 +309,7 @@ setSDateDMY: function(d,m,y){
 		result = true;
 	}
 	else if((d>28) && result){
-		if(d <= this.daysInMonth(this.sdt.getMonth(), this.sdt.getYear())){
+		if(d <= this.daysInMonth(this.sdt.getMonth(), this.sdt.getFullYear())){
 			this.sdt.setDate(d);
 			result = true;
 		}
