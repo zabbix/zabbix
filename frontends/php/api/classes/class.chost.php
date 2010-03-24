@@ -1402,13 +1402,13 @@ Copt::memoryPick();
 				if(!empty($templates_to_del)){
 					$result = self::massRemove(array('hosts' => $hosts, 'templates' => $templates_to_del));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t unlink template');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, S_CANNOT_UNLINK_TEMPLATE);
 					}
 				}
 				
 				$result = self::massAdd(array('hosts' => $hosts, 'templates' => $new_templateids));
 				if(!$result){
-					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t link template');
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_CANNOT_LINK_TEMPLATE);
 				}
 			}
 // }}} UPDATE TEMPLATE LINKAGE
