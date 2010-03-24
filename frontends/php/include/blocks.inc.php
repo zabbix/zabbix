@@ -229,12 +229,12 @@ function make_system_summary($filter){
 	$table->setHeader(array(
 		is_show_all_nodes() ? S_NODE : null,
 		S_HOST_GROUP,
-		isset($filter['severity'][TRIGGER_SEVERITY_DISASTER])?S_DISASTER:null,
-		isset($filter['severity'][TRIGGER_SEVERITY_HIGH])?S_HIGH:null,
-		isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE])?S_AVERAGE:null,
-		isset($filter['severity'][TRIGGER_SEVERITY_WARNING])?S_WARNING:null,
-		isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION])?S_INFORMATION:null,
-		isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED])?S_NOT_CLASSIFIED:null
+		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_DISASTER])?S_DISASTER:null,
+		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_HIGH])?S_HIGH:null,
+		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE])?S_AVERAGE:null,
+		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_WARNING])?S_WARNING:null,
+		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION])?S_INFORMATION:null,
+		is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED])?S_NOT_CLASSIFIED:null
 	));
 
 // SELECT HOST GROUPS {{{
@@ -303,7 +303,7 @@ function make_system_summary($filter){
 		$group_row->addItem($name);
 
 		foreach($group['tab_priority'] as $severity => $data){
-			if(!isset($filter['severity'][$severity])) continue;
+			if(!is_null($filter['severity']) && !isset($filter['severity'][$severity])) continue;
 			
 			$trigger_count = $data['count'];
 
@@ -515,12 +515,12 @@ function make_hoststat_summary($filter){
 			$table_inf->setAttribute('style', 'width: 400px;');
 			$table_inf->setHeader(array(
 				S_HOST,
-				isset($filter['severity'][TRIGGER_SEVERITY_DISASTER])?S_DISASTER:null,
-				isset($filter['severity'][TRIGGER_SEVERITY_HIGH])?S_HIGH:null,
-				isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE])?S_AVERAGE:null,
-				isset($filter['severity'][TRIGGER_SEVERITY_WARNING])?S_WARNING:null,
-				isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION])?S_INFORMATION:null,
-				isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED])?S_NOT_CLASSIFIED:null
+				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_DISASTER])?S_DISASTER:null,
+				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_HIGH])?S_HIGH:null,
+				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE])?S_AVERAGE:null,
+				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_WARNING])?S_WARNING:null,
+				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION])?S_INFORMATION:null,
+				is_null($filter['severity'])||isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED])?S_NOT_CLASSIFIED:null
 			));
 
 			$popup_rows = 0;
@@ -538,7 +538,7 @@ function make_hoststat_summary($filter){
 				$r->addItem(new CLink($host_data['host'], 'tr_status.php?groupid='.$group['groupid'].'&hostid='.$hostid.'&show_triggers='.TRIGGERS_OPTION_ONLYTRUE));
 
 				foreach($problematic_host_list[$host['hostid']]['severities'] as $severity => $trigger_count){
-					if(!isset($filter['severity'][$severity])) continue;
+					if(!is_null($filter['severity'])&&!isset($filter['severity'][$severity])) continue;
 
 					$r->addItem(new CCol($trigger_count, get_severity_style($severity, $trigger_count)));
 				}
@@ -680,7 +680,6 @@ function make_latest_issues($filter = array()){
 	$limit = isset($filter['limit']) ? $filter['limit'] : 20;
 	$options = array(
 		'groupids' => $filter['groupids'],
-		'hostids' => $filter['hostids'],
 		'only_problems' => 1,
 		'monitored' => 1,
 		'maintenance' => $filter['maintenance'],
@@ -692,6 +691,7 @@ function make_latest_issues($filter = array()){
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => $limit
 	);
+	if(isset($filter['hostids'])) $options['hostids'] = $filter['hostids'];
 	$triggers = CTrigger::get($options);
 
 // GATHER HOSTS FOR SELECTED TRIGGERS {{{

@@ -62,7 +62,7 @@ include_once('include/page_header.php');
 	$dashconf = array();
 	$dashconf['groupids'] = null;
 	$dashconf['maintenance'] = null;
-	$dashconf['severity'] = array(0,1,2,3,4,5);
+	$dashconf['severity'] = null;
 
 	$dashconf['filterEnable'] = CProfile::get('web.dashconf.filter.enable', 0);
 	if($dashconf['filterEnable'] == 1){
@@ -82,11 +82,11 @@ include_once('include/page_header.php');
 		$dashconf['maintenance'] = ($maintenance == 0)?0:null;
 
 // triggers
-		$severity = CProfile::get('web.dashconf.triggers.severity', '0;1;2;3;4;5');
-		$dashconf['severity'] = zbx_empty($severity)?array():explode(';', $severity);
+		$severity = CProfile::get('web.dashconf.triggers.severity', null);
+		$dashconf['severity'] = zbx_empty($severity)?null:explode(';', $severity);
+		$dashconf['severity'] = zbx_toHash($dashconf['severity']);
 	}
 
-	$dashconf['severity'] = zbx_toHash($dashconf['severity']);
 // ------
 
 
