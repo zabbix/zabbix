@@ -114,7 +114,6 @@ private $items;
 			$flicker_tab->setAttribute('width','100%');
 			$flicker_tab->setCellPadding(0);
 			$flicker_tab->setCellSpacing(0);
-			$flicker_tab->setAttribute('border',0);
 
 			$div = new CDiv($this->flicker);
 			$div->setAttribute('id',$flicker_domid);
@@ -175,7 +174,7 @@ private $items;
 			$pageHeader[] = $this->createPageHeaderRow($header['left'], $header['right']);
 		}
 
-		$pageHeader[] = BR();
+		// $pageHeader[] = BR();
 
 	return $pageHeader;
 	}

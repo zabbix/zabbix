@@ -141,7 +141,6 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
 
 	show_table_header(S_OVERVIEW_BIG, array($fs_icon, $help));
-	echo SBR;
 
 // 2nd heder
 	$form_l = new CForm();
