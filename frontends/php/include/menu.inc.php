@@ -31,6 +31,7 @@ $ZBX_MENU = array(
 				array(
 						'url'=>'dashboard.php',
 						'label'=>S_DASHBOARD,
+						'sub_pages'=>array('dashconf.php')
 					),
 				array(
 						'url'=>'overview.php',
@@ -120,7 +121,8 @@ $ZBX_MENU = array(
 						'label'=>S_BAR_REPORTS,
 						'sub_pages'=>array('popup_period.php','popup_bitem.php','chart_bar.php')
 					),
-				array('url'=>'popup.php')
+				array('url'=>'popup.php'),
+				array('url'=>'popup_right.php')
 				),
 			),
 	'config'=>array(
@@ -189,7 +191,7 @@ $ZBX_MENU = array(
 					),
 				array('url'=>'usergrps.php',
 						'label'=>S_USERS,
-						'sub_pages'=>array('users.php','popup_usrgrp.php','popup_right.php','popup_users.php')
+						'sub_pages'=>array('users.php','popup_usrgrp.php','popup_users.php')
 					),
 				array('url'=>'media_types.php',
 						'label'=>S_MEDIA_TYPES
