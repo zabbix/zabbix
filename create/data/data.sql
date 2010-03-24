@@ -5862,7 +5862,6 @@ INSERT INTO triggers VALUES (12197,'{11197}>0','icmpOutDesUnreachs on {HOSTNAME}
 INSERT INTO triggers VALUES (12198,'{11198}>1000','icmpOutTimeExcds on {HOSTNAME} is too High','',0,1,3,0,0,' ','',0,0);
 INSERT INTO triggers VALUES (12199,'{11199}>0','icmpOutParmProbs on {HOSTNAME} is too High','',0,1,3,0,0,' ','',0,0);
 INSERT INTO triggers VALUES (12200,'{11200}>0','icmpOutSrcQuenchs on {HOSTNAME} is too High','',0,1,3,0,0,' ','',0,0);
-INSERT INTO triggers VALUES (12201,'{11201}>150000','icmpOutRedirects on {HOSTNAME} is too High','',0,1,3,0,0,' ','',0,0);
 INSERT INTO triggers VALUES (12202,'{11202}>100','icmpOutEchos on {HOSTNAME} is too High','',0,1,3,0,0,' ','',0,0);
 INSERT INTO triggers VALUES (12203,'{11203}>100','icmpOutEchoReps on {HOSTNAME} is too High','',0,1,3,0,0,' ','',0,0);
 INSERT INTO triggers VALUES (12204,'{11204}>100','icmpOutTimestamps on {HOSTNAME} is too High','',0,1,3,0,0,' ','',0,0);
@@ -6900,7 +6899,6 @@ INSERT INTO functions VALUES (11197,17197,12197,NULL,'delta','0');
 INSERT INTO functions VALUES (11198,17198,12198,NULL,'delta','0');
 INSERT INTO functions VALUES (11199,17199,12199,NULL,'delta','0');
 INSERT INTO functions VALUES (11200,17200,12200,NULL,'delta','0');
-INSERT INTO functions VALUES (11201,17201,12201,NULL,'delta','0');
 INSERT INTO functions VALUES (11202,17202,12202,NULL,'delta','0');
 INSERT INTO functions VALUES (11203,17203,12203,NULL,'delta','0');
 INSERT INTO functions VALUES (11204,17204,12204,NULL,'delta','0');
