@@ -359,7 +359,6 @@ include_once('include/page_header.php');
 	}
 
 	show_table_header(0 == $config_scr ? S_CONFIGURATION_OF_SCREENS_BIG : S_CONFIGURATION_OF_SLIDESHOWS_BIG, $form);
-	echo SBR;
 
 	if(0 == $config_scr){
 		if(isset($_REQUEST['form'])){

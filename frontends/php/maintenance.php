@@ -428,7 +428,6 @@ include_once('include/page_header.php');
 //			insert_maintenance_form();
 	}
 	else {
-		echo SBR;
 // Table HEADER
 		$maintenance_wdgt = new CWidget();
 
