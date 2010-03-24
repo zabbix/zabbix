@@ -1197,9 +1197,15 @@ require_once('include/js.inc.php');
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				else if(($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_HOSTGROUP_TRIGGERS)){
-					$params = array('limit' => $elements);
-					$tr_form = S_ALL_S;
+					$params = array(
+						'groupids' => null,
+						'hostids' => null,
+						'maintenance' => null,
+						'severity' => null,
+						'limit' => $elements
+					);
 
+					$tr_form = S_ALL_S;
 					if($resourceid > 0){
 						$options = array(
 							'groupids' => $resourceid,
@@ -1213,8 +1219,8 @@ require_once('include/js.inc.php');
 					}
 ///-----------------------
 					else{
-						$params['groupid'] = get_request('tr_groupid',CProfile::get('web.screens.tr_groupid',0));
-						$params['hostid'] = get_request('tr_hostid',CProfile::get('web.screens.tr_hostid',0));
+						$params['groupid'] = get_request('tr_groupid', CProfile::get('web.screens.tr_groupid',0));
+						$params['hostid'] = get_request('tr_hostid', CProfile::get('web.screens.tr_hostid',0));
 
 						CProfile::update('web.screens.tr_groupid',$params['groupid'], PROFILE_TYPE_ID);
 						CProfile::update('web.screens.tr_hostid',$params['hostid'], PROFILE_TYPE_ID);
@@ -1269,7 +1275,13 @@ require_once('include/js.inc.php');
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				else if(($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_HOST_TRIGGERS)){
-					$params = array('limit' => $elements);
+					$params = array(
+						'groupids' => null,
+						'hostids' => null,
+						'maintenance' => null,
+						'severity' => null,
+						'limit' => $elements
+					);
 					$tr_form = S_ALL_S;
 
 					if($resourceid > 0){
