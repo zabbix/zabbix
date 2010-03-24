@@ -220,7 +220,7 @@ return $table;
 }
 
 // Author: Aly
-function make_system_summary(){
+function make_system_summary($filter){
 	global $USER_DETAILS;
 
 	$config = select_config();
@@ -229,19 +229,19 @@ function make_system_summary(){
 	$table->setHeader(array(
 		is_show_all_nodes() ? S_NODE : null,
 		S_HOST_GROUP,
-		S_DISASTER,
-		S_HIGH,
-		S_AVERAGE,
-		S_WARNING,
-		S_INFORMATION,
-		S_NOT_CLASSIFIED
+		isset($filter['severity'][TRIGGER_SEVERITY_DISASTER])?S_DISASTER:null,
+		isset($filter['severity'][TRIGGER_SEVERITY_HIGH])?S_HIGH:null,
+		isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE])?S_AVERAGE:null,
+		isset($filter['severity'][TRIGGER_SEVERITY_WARNING])?S_WARNING:null,
+		isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION])?S_INFORMATION:null,
+		isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED])?S_NOT_CLASSIFIED:null
 	));
 
 // SELECT HOST GROUPS {{{
 	$options = array(
 		'nodeids' => get_current_nodeid(),
 		'monitored_hosts' => 1,
-//		'select_hosts' => API_OUTPUT_REFER,
+		'groupids' => $filter['groupids'],
 		'output' => API_OUTPUT_EXTEND,
 	);
 	$groups = CHostGroup::get($options);
@@ -268,11 +268,14 @@ function make_system_summary(){
 		'nodeids' => get_current_nodeid(),
 		'groupids' => $groupids,
 		'monitored' => 1,
+		'maintenance' => $filter['maintenance'],
 		'only_problems' => 1,
 		'expand_data' => 1,
 		'skipDependent' => 1,
+		'filter' => array('priority' => $filter['severity']),
 		'output' => API_OUTPUT_EXTEND,
 	);
+
 	$triggers = CTrigger::get($options);
 	order_result($triggers, 'lastchange', ZBX_SORT_DOWN);
 
@@ -300,6 +303,8 @@ function make_system_summary(){
 		$group_row->addItem($name);
 
 		foreach($group['tab_priority'] as $severity => $data){
+			if(!isset($filter['severity'][$severity])) continue;
+			
 			$trigger_count = $data['count'];
 
 			if($trigger_count){
@@ -316,7 +321,6 @@ function make_system_summary(){
 
 				foreach($data['triggers'] as $tnum => $trigger){
 					$trigger_hosts = $trigger['host'];
-
 
 					$options = array(
 						'nodeids' => get_current_nodeid(),
@@ -368,8 +372,8 @@ function make_system_summary(){
 
 				$trigger_count = new CSpan($trigger_count, 'pointer');
 				$trigger_count->setHint($table_inf);
-
 			}
+
 			$group_row->addItem(new CCol($trigger_count, get_severity_style($severity, $trigger_count)));
 			unset($table_inf);
 		}
@@ -381,7 +385,7 @@ function make_system_summary(){
 return $table;
 }
 
-function make_hoststat_summary(){
+function make_hoststat_summary($filter){
 	global $USER_DETAILS;
 
 	$table = new CTableInfo();
@@ -396,6 +400,7 @@ function make_hoststat_summary(){
 // SELECT HOST GROUPS {{{
 	$options = array(
 		'nodeids' => get_current_nodeid(),
+		'groupids' => $filter['groupids'],
 		'monitored_hosts' => 1,
 		'output' => API_OUTPUT_EXTEND
 	);
@@ -411,9 +416,10 @@ function make_hoststat_summary(){
 		'nodeids' => get_current_nodeid(),
 		'groupids' => zbx_objectValues($groups, 'groupid'),
 		'monitored_hosts' => 1,
-//		'output' => array('hostid','host','status'),
+		'filter' => array('maintenance_status' => $filter['maintenance']),
 		'output' => API_OUTPUT_EXTEND
 	);
+
 	$hosts = CHost::get($options);
 	$hosts = zbx_toHash($hosts, 'hostid');
 // }}} SELECT HOSTS
@@ -422,10 +428,13 @@ function make_hoststat_summary(){
 	$options = array(
 		'nodeids' => get_current_nodeid(),
 		'monitored' => 1,
+		'maintenance' => $filter['maintenance'],
 		'only_problems' => 1,
 		'expand_data' => 1,
+		'filter' => array('priority' => $filter['severity']),
 		'output' => API_OUTPUT_EXTEND,
 	);
+
 	$triggers = CTrigger::get($options);
 // }}} SELECT TRIGGERS
 
@@ -506,12 +515,12 @@ function make_hoststat_summary(){
 			$table_inf->setAttribute('style', 'width: 400px;');
 			$table_inf->setHeader(array(
 				S_HOST,
-				S_DISASTER,
-				S_HIGH,
-				S_AVERAGE,
-				S_WARNING,
-				S_INFORMATION,
-				S_NOT_CLASSIFIED
+				isset($filter['severity'][TRIGGER_SEVERITY_DISASTER])?S_DISASTER:null,
+				isset($filter['severity'][TRIGGER_SEVERITY_HIGH])?S_HIGH:null,
+				isset($filter['severity'][TRIGGER_SEVERITY_AVERAGE])?S_AVERAGE:null,
+				isset($filter['severity'][TRIGGER_SEVERITY_WARNING])?S_WARNING:null,
+				isset($filter['severity'][TRIGGER_SEVERITY_INFORMATION])?S_INFORMATION:null,
+				isset($filter['severity'][TRIGGER_SEVERITY_NOT_CLASSIFIED])?S_NOT_CLASSIFIED:null
 			));
 
 			$popup_rows = 0;
@@ -519,6 +528,7 @@ function make_hoststat_summary(){
 			foreach($group['hosts'] as $hnum => $host){
 				$hostid = $host['hostid'];
 				if(!isset($problematic_host_list[$hostid])) continue;
+
 				if($popup_rows >= ZBX_POPUP_MAX_ROWS) break;
 				$popup_rows++;
 
@@ -528,6 +538,8 @@ function make_hoststat_summary(){
 				$r->addItem(new CLink($host_data['host'], 'tr_status.php?groupid='.$group['groupid'].'&hostid='.$hostid.'&show_triggers='.TRIGGERS_OPTION_ONLYTRUE));
 
 				foreach($problematic_host_list[$host['hostid']]['severities'] as $severity => $trigger_count){
+					if(!isset($filter['severity'][$severity])) continue;
+
 					$r->addItem(new CCol($trigger_count, get_severity_style($severity, $trigger_count)));
 				}
 
@@ -660,32 +672,41 @@ return $table;
 
 
 // author Aly
-function make_latest_issues($params = array()){
+function make_latest_issues($filter = array()){
 	global $USER_DETAILS;
 
 
 	$config = select_config();
 
-	$limit = isset($params['limit']) ? $params['limit'] : 20;
+	$limit = isset($filter['limit']) ? $filter['limit'] : 20;
 	$options = array(
 		'output' => API_OUTPUT_EXTEND,
 		'select_hosts' => API_OUTPUT_EXTEND,
 		'skipDependent' => 1,
 		'monitored' => 1,
+		'maintenance' => $filter['maintenance'],
 		'only_problems' => 1,
+		'groupids' => $filter['groupids'],
+		'filter' => array('priority' => $filter['severity']),
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => $limit
 	);
-	if(isset($params['groupid']) && ($params['groupid'] > 0))
-		$options['groupids'] = $params['groupid'];
-	if(isset($params['hostid']) && ($params['hostid'] > 0))
-		$options['hostids'] = $params['hostid'];
+	if(isset($filter['groupid']) && ($filter['groupid'] > 0))
+		$options['groupids'] = $filter['groupid'];
+	if(isset($filter['hostid']) && ($filter['hostid'] > 0))
+		$options['hostids'] = $filter['hostid'];
 
 	$triggers = CTrigger::get($options);
 // GATHER HOSTS FOR SELECTED TRIGGERS {{{
 	$triggers_hosts = array();
 	foreach($triggers as $tnum => $trigger){
+// if trigger is lost(broken expression) we skip it
+		if(empty($trigger['hosts'])){
+			unset($triggers[$tnum]);
+			continue;
+		}
+
 		$triggers_hosts = array_merge($triggers_hosts, $trigger['hosts']);
 	}
 	$triggers_hosts = zbx_toHash($triggers_hosts, 'hostid');
@@ -822,10 +843,17 @@ return $table;
 }
 
 // author Aly
-function make_webmon_overview(){
+function make_webmon_overview($filter){
 	global $USER_DETAILS;
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+	$options = array(
+		'groupids' => $filter['groupids'],
+		'monitored_hosts' => 1,
+		'filter' => array('maintenance_status' => $filter['maintenance'])
+	);
+
+	$available_hosts = CHost::get($options);
+	$available_hosts = zbx_objectValues($available_hosts,'hostid');
 
 	$table  = new CTableInfo();
 	$table->setHeader(array(
@@ -837,35 +865,30 @@ function make_webmon_overview(){
 		S_UNKNOWN
 		));
 
-	$sql = 'SELECT DISTINCT g.groupid, g.name '.
-			' FROM httptest ht, applications a, groups g, hosts_groups hg '.
-			' WHERE '.DBcondition('hg.hostid',$available_hosts).
-				' AND hg.hostid=a.hostid '.
-				' AND g.groupid=hg.groupid '.
-				' AND a.applicationid=ht.applicationid '.
-				' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
-			' ORDER BY g.name';
-	$host_groups = DBSelect($sql);
-
-	while($group = DBFetch($host_groups)){
-
+	$options = array(
+		'monitored_hosts' => 1,
+		'with_monitored_httptests' => 1,
+		'output' => API_OUTPUT_EXTEND
+	);
+	$groups = CHostGroup::get($options);
+	foreach($groups as $gnum => $group){
+		$showGroup = false;
 		$apps['ok'] = 0;
 		$apps['failed'] = 0;
 		$apps[HTTPTEST_STATE_BUSY] = 0;
 		$apps[HTTPTEST_STATE_UNKNOWN] = 0;
 
-		$sql = 'SELECT DISTINCT ht.httptestid, ht.curstate, ht.lastfailedstep '.
+		$sql = 'SELECT DISTINCT ht.name, ht.httptestid, ht.curstate, ht.lastfailedstep '.
 				' FROM httptest ht, applications a, hosts_groups hg, groups g '.
 				' WHERE g.groupid='.$group['groupid'].
+					' AND '.DBcondition('hg.hostid',$available_hosts).
 					' AND hg.groupid=g.groupid '.
 					' AND a.hostid=hg.hostid '.
 					' AND ht.applicationid=a.applicationid '.
 					' AND ht.status='.HTTPTEST_STATUS_ACTIVE;
-
 		$db_httptests = DBselect($sql);
-
 		while($httptest_data = DBfetch($db_httptests)){
-
+			$showGroup = true;
 			if( HTTPTEST_STATE_BUSY == $httptest_data['curstate'] ){
 				$apps[HTTPTEST_STATE_BUSY]++;
 			}
@@ -881,6 +904,8 @@ function make_webmon_overview(){
 				$apps[HTTPTEST_STATE_UNKNOWN]++;
 			}
 		}
+
+		if(!$showGroup) continue;
 
 		$table->addRow(array(
 			is_show_all_nodes() ? get_node_name_by_elid($group['groupid']) : null,
