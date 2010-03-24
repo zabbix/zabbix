@@ -575,7 +575,7 @@ $thid = get_request('hostid', 0);
 
 	validate_group($PAGE_GROUPS,$PAGE_HOSTS);
 
-$_REQUEST['hostid'] = $thid;
+	$_REQUEST['hostid'] = $thid;
 ?>
 <?php
 	echo SBR;
@@ -760,12 +760,12 @@ $_REQUEST['hostid'] = $thid;
 				$hostTemplates = array();
 				foreach($host['templates'] as $htnum => $template){
 					$caption = array();
-					$caption[] = new CLink($template['host'],'templates.php?form=update&templateid='.$template['hostid']);
+					$caption[] = new CLink($template['host'],'templates.php?form=update&templateid='.$template['hostid'],'unknown');
 
 					if(!empty($templates[$template['templateid']]['templates'])){
 						$caption[] = ' (';
 						foreach($templates[$template['templateid']]['templates'] as $tnum => $tpl){
-							$caption[] = new CLink($tpl['host'],'templates.php?form=update&templateid='.$tpl['hostid']);
+							$caption[] = new CLink($tpl['host'],'templates.php?form=update&templateid='.$tpl['hostid'], 'unknown');
 							$caption[] = ', ';
 						}
 						array_pop($caption);

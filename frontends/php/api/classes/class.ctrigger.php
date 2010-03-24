@@ -84,8 +84,8 @@ class CTrigger extends CZBXAPI{
 			'applicationids'		=> null,
 			'status'				=> null,
 			'monitored' 			=> null,
-			'severity'				=> null,
 			'templated'				=> null,
+			'maintenance'			=> null,
 			'inherited'				=> null,
 			'editable'				=> null,
 			'nopermissions'			=> null,
@@ -276,10 +276,24 @@ class CTrigger extends CZBXAPI{
 			$sql_parts['where'][] = 't.status='.TRIGGER_STATUS_ENABLED;
 		}
 
-// severity
-		if(!is_null($options['severity'])){
-			$sql_parts['where'][] = 't.priority='.$options['severity'];
+// maintenance
+		if(!is_null($options['maintenance'])){
+			$sql_parts['where'][] = (($options['maintenance'] == 0)?' NOT ':'').
+				' EXISTS ('.
+					' SELECT ff.functionid'.
+					' FROM functions ff'.
+					' WHERE ff.triggerid=t.triggerid'.
+						' AND EXISTS ('.
+								' SELECT ii.itemid'.
+								' FROM items ii, hosts hh'.
+								' WHERE ff.itemid=ii.itemid'.
+									' AND hh.hostid=ii.hostid'.
+									' AND hh.maintenance_status=1'.
+						' )'.
+				' )';
+			$sql_parts['where'][] = 't.status='.TRIGGER_STATUS_ENABLED;
 		}
+
 // only_problems
 		if(!is_null($options['only_problems'])){
 			$sql_parts['where']['ot'] = 't.value='.TRIGGER_VALUE_TRUE;
@@ -348,8 +362,9 @@ class CTrigger extends CZBXAPI{
 		if(!is_null($options['filter'])){
 			zbx_value2array($options['filter']);
 			
-			if(isset($options['filter']['description']))
+			if(isset($options['filter']['description']) && !is_null($options['filter']['description'])){
 				$sql_parts['where']['description'] = 't.description='.zbx_dbstr($options['filter']['description']);
+			}
 			
 			if(isset($options['filter']['host']) || isset($options['filter']['hostid'])){
 				$sql_parts['from']['f'] = 'functions f';
@@ -357,14 +372,21 @@ class CTrigger extends CZBXAPI{
 				$sql_parts['where']['ft'] = 'f.triggerid=t.triggerid';
 				$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 
-				if(isset($options['filter']['host'])){
+				if(isset($options['filter']['host']) && !is_null($options['filter']['host'])){
 					$sql_parts['from']['h'] = 'hosts h';
 					$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
 					$sql_parts['where']['host'] = 'h.host='.zbx_dbstr($options['filter']['host']);
 				}
 
-				if(isset($options['filter']['hostid']))
+				if(isset($options['filter']['hostid']) && !is_null($options['filter']['hostid']))
 					$sql_parts['where']['hostid'] = 'i.hostid='.zbx_dbstr($options['filter']['hostid']);
+			}
+
+// severity
+			if(isset($options['filter']['priority']) && !is_null($options['filter']['priority'])){
+				zbx_value2array($options['filter']['priority']);
+
+				$sql_parts['where']['priority'] = DBcondition('t.priority', $options['filter']['priority']);
 			}
 		}
 // group
