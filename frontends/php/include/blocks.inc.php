@@ -675,29 +675,25 @@ return $table;
 function make_latest_issues($filter = array()){
 	global $USER_DETAILS;
 
-
 	$config = select_config();
 
 	$limit = isset($filter['limit']) ? $filter['limit'] : 20;
 	$options = array(
-		'output' => API_OUTPUT_EXTEND,
-		'select_hosts' => API_OUTPUT_EXTEND,
-		'skipDependent' => 1,
+		'groupids' => $filter['groupids'],
+		'hostids' => $filter['hostids'],
+		'only_problems' => 1,
 		'monitored' => 1,
 		'maintenance' => $filter['maintenance'],
-		'only_problems' => 1,
-		'groupids' => $filter['groupids'],
+		'skipDependent' => 1,
 		'filter' => array('priority' => $filter['severity']),
+		'select_hosts' => API_OUTPUT_EXTEND,
+		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => $limit
 	);
-	if(isset($filter['groupid']) && ($filter['groupid'] > 0))
-		$options['groupids'] = $filter['groupid'];
-	if(isset($filter['hostid']) && ($filter['hostid'] > 0))
-		$options['hostids'] = $filter['hostid'];
-
 	$triggers = CTrigger::get($options);
+
 // GATHER HOSTS FOR SELECTED TRIGGERS {{{
 	$triggers_hosts = array();
 	foreach($triggers as $tnum => $trigger){
