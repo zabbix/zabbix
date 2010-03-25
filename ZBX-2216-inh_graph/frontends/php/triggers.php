@@ -431,7 +431,7 @@ include_once('include/page_header.php');
 	}
 
 	$params=array();
-	$options = array('with_items','only_current_node','not_proxy_hosts');
+	$options = array('only_current_node','not_proxy_hosts');
 	foreach($options as $option) $params[$option] = 1;
 
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
