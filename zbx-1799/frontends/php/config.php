@@ -149,7 +149,7 @@ include_once('include/page_header.php');
 
 			DBstart();
 			$result = delete_image($_REQUEST['imageid']);
-			$result = DBend(false);//$result);
+			$result = DBend($result);
 
 			show_messages($result, S_IMAGE_DELETED, S_CANNOT_DELETE_IMAGE);
 			if($result){
@@ -506,7 +506,7 @@ include_once('include/page_header.php');
 			}
 			else{
 				$macro = array('macro' => $macro_new, 'value' => $value_new);
-				$result = CUserMacro::addGlobal($macro);
+				$result = CUserMacro::createGlobal($macro);
 			}
 
 

@@ -1086,9 +1086,10 @@ char	*get_ip_by_socket(zbx_sock_t *s)
  * Return value: SUCCEED - connection allowed                                 *
  *               FAIL - connection is not allowed                             *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Alexei Vladishev, Dmitry Borovikov                                 *
  *                                                                            *
- * Comments:                                                                  *
+ * Comments: standard, compatible and IPv4-mapped addresses are treated       *
+ *           the same: 127.0.0.1 == ::127.0.0.1 == ::ffff:127.0.0.1           *
  *                                                                            *
  ******************************************************************************/
 
@@ -1100,6 +1101,9 @@ int	zbx_tcp_check_security(
 {
 #if defined(HAVE_IPV6)
 	struct		addrinfo hints, *ai = NULL;
+	/* Network Byte Order is ensured */
+	unsigned char	ipv4_cmp_mask[12] = {0};				/* IPv4-Compatible, the first 96 bits are zeros */
+	unsigned char	ipv4_mpd_mask[12] = {0,0,0,0,0,0,0,0,0,0,255,255};	/* IPv4-Mapped, the first 80 bits are zeros, 16 next - ones */
 #else
 	struct		hostent *hp;
 	char		*sip;
@@ -1111,8 +1115,7 @@ int	zbx_tcp_check_security(
 	char	tmp[MAX_STRING_LEN],
 		sname[MAX_STRING_LEN],
 		*start = NULL,
-		*end = NULL,
-		c = '\0';
+		*end = NULL;
 
 	if( (1 == allow_if_empty) && ( !ip_list || !*ip_list ) )
 	{
@@ -1136,15 +1139,10 @@ int	zbx_tcp_check_security(
 #endif /*HAVE_IPV6*/
 		strscpy(tmp,ip_list);
 
-		for(start = tmp; start[0] != '\0';)
+		for (start = tmp; *start != '\0';)
 		{
-			end = strchr(start, ',');
-
-			if(end != NULL)
-			{
-				c = end[0];
-				end[0] = '\0';
-			}
+			if (NULL != (end = strchr(start, ',')))
+				*end = '\0';
 
 			/* Allow IP addresses or DNS names for authorization */
 #if defined(HAVE_IPV6)
@@ -1162,6 +1160,7 @@ int	zbx_tcp_check_security(
 								freeaddrinfo(ai);
 								return SUCCEED;
 							}
+							break;
 						case AF_INET6 :
 							if(0 == memcmp(((struct sockaddr_in6*)&name)->sin6_addr.s6_addr,
 									((struct sockaddr_in6*)ai->ai_addr)->sin6_addr.s6_addr,
@@ -1170,12 +1169,41 @@ int	zbx_tcp_check_security(
 								freeaddrinfo(ai);
 								return SUCCEED;
 							}
+							break;
+					}
+				}
+				else
+				{
+					switch(ai->ai_family)
+					{
+						case AF_INET  :
+							/* incoming AF_INET6, must see whether it is comp or mapped */
+							if((0 == memcmp(((struct sockaddr_in6*)&name)->sin6_addr.s6_addr, ipv4_cmp_mask, 12) ||
+								0 == memcmp(((struct sockaddr_in6*)&name)->sin6_addr.s6_addr, ipv4_mpd_mask, 12)) && 
+								0 == memcmp(&((struct sockaddr_in6*)&name)->sin6_addr.s6_addr[12],
+									(unsigned char*)&((struct sockaddr_in*)ai->ai_addr)->sin_addr.s_addr, 4))
+							{
+								freeaddrinfo(ai);
+								return SUCCEED;
+							}
+							break;
+						case AF_INET6 :
+							/* incoming AF_INET, must see whether the given is comp or mapped */
+							if((0 == memcmp(((struct sockaddr_in6*)ai->ai_addr)->sin6_addr.s6_addr, ipv4_cmp_mask, 12) ||
+								0 == memcmp(((struct sockaddr_in6*)ai->ai_addr)->sin6_addr.s6_addr, ipv4_mpd_mask, 12)) &&
+								0 == memcmp(&((struct sockaddr_in6*)ai->ai_addr)->sin6_addr.s6_addr[12],
+									(unsigned char*)&((struct sockaddr_in*)&name)->sin_addr.s_addr, 4))
+							{
+								freeaddrinfo(ai);
+								return SUCCEED;
+							}
+							break;
 					}
 				}
 				freeaddrinfo(ai);
 			}
 #else
-			if( 0 != (hp = zbx_gethost(start)))
+			if (0 != (hp = zbx_gethost(start)))
 			{
 				sip = inet_ntoa(*((struct in_addr *)hp->h_addr));
 				if(sscanf(sip, "%d.%d.%d.%d", &j[0], &j[1], &j[2], &j[3]) == 4)
@@ -1187,21 +1215,17 @@ int	zbx_tcp_check_security(
 				}
 			}
 #endif /*HAVE_IPV6*/
-			if(end != NULL)
+			if (NULL != end)
 			{
-				end[0] = c;
+				*end = ',';
 				start = end + 1;
 			}
 			else
-			{
 				break;
-			}
 		}
 
-		if(end != NULL)
-		{
-			end[0] = c;
-		}
+		if (NULL != end)
+			*end = ',';
 	}
 #if defined(HAVE_IPV6)
 	if(0 == getnameinfo((struct sockaddr*)&name, sizeof(name), sname, sizeof(sname), NULL, 0, NI_NUMERICHOST))

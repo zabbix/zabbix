@@ -45,7 +45,7 @@ require_once('include/httptest.inc.php');
 
 		foreach($err_hostids as $num => $hostid){
 			$host = get_host_by_hostid($hostid);
-			error(S_HOST.SPACE.'"'.$host['host'].'"'.SPACE.S_CANNOT_EXISTS_WITHOUT_GROUP);
+			error(S_HOST.SPACE.'"'.$host['host'].'"'.SPACE.S_CANNOT_EXIST_WITHOUT_GROUP);
 
 			return false;
 		}
@@ -85,14 +85,13 @@ require_once('include/httptest.inc.php');
 	}
 
 	function add_host_group($name, $hosts=array()){
-		$group = CHostGroup::create(array('name' => $name));
-		if(!$group){
+		$result = CHostGroup::create(array('name' => $name));
+		if(!$result){
 			error(CHostgroup::resetErrors());
 			return false;
 		}
 
-		$group = reset($group);
-		$groupid = $group['groupid'];
+		$groupid = reset($result['groupids']);
 
 		add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $groupid, $name, 'groups', NULL, NULL);
 
@@ -266,7 +265,7 @@ require_once('include/httptest.inc.php');
 						$newgroup,$groups)
 	{
 		if(zbx_empty($newgroup) && (count($groups) == 0)){
-			info(S_HOST.SPACE.S__MUST_LINKED_LEAST_ONE_HOST_GROUP_SMALL);
+			info(S_HOST.SPACE.S_MUST_LINKED_LEAST_ONE_HOST_GROUP_SMALL);
 			return false;
 		}
 
@@ -284,9 +283,16 @@ require_once('include/httptest.inc.php');
 			info(S_ADDED_NEW_HOST.'['.$host.']');
 
 		if(!zbx_empty($newgroup)){
-			$newgroup = CHostGroup::create(array('name' => $newgroup));
+			$result = CHostGroup::create(array('name' => $newgroup));
 
-			if($newgroup !== false) $newgroup = reset($newgroup);
+			if($result !== false){
+				$options = array(
+					'groupids' => $result['groupids'],
+					'output' => API_OUTPUT_EXTEND
+				);
+				$newgroups = CHostGroups::get($options);
+				$newgroup = reset($newgroups);
+			}
 			else return false;
 
 			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $newgroup['groupid'], $newgroup['name'], 'groups', NULL, NULL);
@@ -353,7 +359,7 @@ require_once('include/httptest.inc.php');
 							$newgroup,$groups)
 	{
 		if(zbx_empty($newgroup) && (count($groups) == 0)){
-			info(S_HOST.SPACE.'"'.$host.'"'.SPACE.S_MUST_LINKED_LEAST_ONE_HOST_GROUPS_SMALL);
+			info(S_HOST.SPACE.'"'.$host.'"'.SPACE.S_MUST_LINKED_LEAST_ONE_HOST_GROUP_SMALL);
 			return false;
 		}
 
@@ -378,11 +384,19 @@ require_once('include/httptest.inc.php');
 			return $result;
 
 		if(!zbx_empty($newgroup)){
-			if(!$newgroup = CHostGroup::create(array('name' => $newgroup))){
+			$result = CHostGroup::create(array('name' => $newgroup));
+			if(!$result){
 				error(CHostGroup::resetErrors());
 				return false;
 			}
-			$groups = array_merge($groups, $newgroup);
+
+			$options = array(
+				'groupids' => $result['groupids'],
+				'output' => API_OUTPUT_EXTEND
+			);
+			$newgroups = CHostGroups::get($options);
+
+			$groups = array_merge($groups, $newgroups);
 		}
 
 		$hosts = array('hostid' => $hostid);
@@ -460,10 +474,18 @@ require_once('include/httptest.inc.php');
  *
  */
 	function copy_template_elements($hostid, $templateid = null, $copy_mode = false){
+		$result = true;
 		copy_template_applications($hostid, $templateid, $copy_mode);
 		copy_template_items($hostid, $templateid, $copy_mode);
 		copy_template_triggers($hostid, $templateid, $copy_mode);
-		copy_template_graphs($hostid, $templateid, $copy_mode);
+		// razvilka $copy
+		if($copy_mode){
+			copy_template_graphs($hostid, $templateid, $copy_mode);
+		}
+		else{
+			$result = CGraph::syncTemplates(array('hostids' => $hostid, 'templateids' => $templateid));
+		}
+		return $result;
 	}
 
 /*
@@ -480,7 +502,8 @@ require_once('include/httptest.inc.php');
  */
 	function sync_host_with_templates($hostid, $templateid = null){
 		delete_template_elements($hostid, $templateid);
-		copy_template_elements($hostid, $templateid);
+		$res = copy_template_elements($hostid, $templateid);
+		return $res;
 	}
 
 	function delete_groups_by_hostid($hostids){
@@ -548,6 +571,9 @@ require_once('include/httptest.inc.php');
 		}
 
 		delete_item($del_items);
+
+// delete screen items
+		DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid',$hostids)).' AND resourcetype='.SCREEN_RESOURCE_HOST_TRIGGERS;
 
 // delete host from maps
 		delete_sysmaps_elements_with_hostid($hostids);
@@ -643,6 +669,18 @@ require_once('include/httptest.inc.php');
 			}
 			return false;
 		}
+// delete screens items
+		$resources = array(
+			SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
+			SCREEN_RESOURCE_HOSTS_INFO,
+			SCREEN_RESOURCE_TRIGGERS_INFO,
+			SCREEN_RESOURCE_TRIGGERS_OVERVIEW,
+			SCREEN_RESOURCE_DATA_OVERVIEW
+		);
+		$sql = 'DELETE FROM screens_items '.
+				' WHERE '.DBcondition('resourceid',$groupids).
+					' AND '.DBcondition('resourcetype',$resources);
+		DBexecute($sql);
 
 // delete sysmap element
 		if(!delete_sysmaps_elements_with_groupid($groupids))
@@ -731,7 +769,7 @@ require_once('include/httptest.inc.php');
 
 	function db_save_proxy($name,$proxyid=null){
 		if(!is_string($name)){
-			error(S_INCORRECT_PARAMETERS_FOR." 'db_save_proxy'");
+			error(S_INCORRECT_PARAMETERS_FOR_SMALL." 'db_save_proxy'");
 			return false;
 		}
 
@@ -881,19 +919,22 @@ require_once('include/httptest.inc.php');
 		zbx_value2array($hostids);
 
 //		$hosts = array();
-		$result = DBselect('SELECT * FROM hosts WHERE '.DBcondition('hostid', $hostids).
-				' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')');
+		$sql = 'SELECT * '.
+			' FROM hosts '.
+			' WHERE '.DBcondition('hostid', $hostids).
+				' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
+		$result = DBselect($sql);
 		while($host=DBfetch($result)){
 			if($status != $host['status']){
 //				$hosts[$host['hostid']] = $host['hostid'];
 				update_trigger_value_to_unknown_by_hostid($host['hostid']);
 				$res = DBexecute('UPDATE hosts SET status='.$status.' WHERE hostid='.$host['hostid']);
-				if ($res){
+				if($res){
 					$host_new = $host;//get_host_by_hostid($host['hostid']);
 					$host_new['status'] = $status;
 					add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['host'], 'hosts', $host, $host_new);
 				}
-				info(S_UPDATED_STATUS_FOR_HOST.SPACE.$host['host']);
+				info(S_UPDATED_STATUS_OF_HOST.' "'.$host['host'].'"');
 			}
 		}
 
@@ -999,7 +1040,6 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 
 	$first_entry = ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE)?S_NOT_SELECTED_SMALL:S_ALL_SMALL;
 	$groups['0'] = $first_entry;
-	$groupids['0'] = '0';
 
 	$_REQUEST['groupid'] = $result['original'] = get_request('groupid', -1);
 	$_REQUEST['hostid'] = get_request('hostid', -1);
@@ -1096,7 +1136,8 @@ function get_viewed_groups($perm, $options=array(), $nodeid=null, $sql=array()){
 		$def_sql['from'][] = 'hosts_groups hg';
 
 		$def_sql['where'][] = 'hg.groupid=g.groupid';
-		$def_sql['where'][] = 'EXISTS( SELECT a.applicationid '.
+		$def_sql['where'][] = 'EXISTS( '.
+								' SELECT a.applicationid '.
 								' FROM applications a, httptest ht '.
 								' WHERE a.hostid=hg.hostid '.
 									' AND ht.applicationid=a.applicationid '.
@@ -1252,7 +1293,6 @@ function get_viewed_hosts($perm, $groupid=0, $options=array(), $nodeid=null, $sq
 
 	$first_entry = ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE)?S_NOT_SELECTED_SMALL:S_ALL_SMALL;
 	$hosts['0'] = $first_entry;
-	$hostids['0'] = '0';
 
 	if(!is_array($groupid) && ($groupid == 0)){
 		if($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE){

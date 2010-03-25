@@ -198,7 +198,7 @@
 		}
 
 		$result = array(
-			'name' => 'PHP timezone',
+			'name' => S_PHP_TIMEZONE,
 			'current' => $req ? ini_get('date.timezone') : S_NO_SMALL,
 			'required' => null,
 			'recommended' => null,
@@ -306,16 +306,7 @@
 
 	function check_php_mbstring(){
 
-		$current = function_exists('bcadd') &&
-			function_exists('bccomp') &&
-			function_exists('bcdiv') &&
-			function_exists('bcmod') &&
-			function_exists('bcmul') &&
-			function_exists('bcpow') &&
-			function_exists('bcpowmod') &&
-			function_exists('bcscale') &&
-			function_exists('bcsqrt') &&
-			function_exists('bcsub');
+		$current = mbstrings_available();
 
 		if($current){
 			$req = 1;

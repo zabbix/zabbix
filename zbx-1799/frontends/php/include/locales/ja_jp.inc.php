@@ -610,8 +610,6 @@
 	'S_APPLICATIONS'=>			'アプリケーション',
 	'S_APPLICATIONS_BIG'=>			'アプリケーション',
 	'S_CREATE_APPLICATION'=>			'アプリケーションの作成',
-	'S_ACTIVATE_ITEMS'=>			'アイテムを有効にする',
-	'S_DISABLE_ITEMS'=>			'アイテムを無効にする',
 	'S_APPLICATION_UPDATED'=>			'アプリケーションを更新しました',
 	'S_CANNOT_UPDATE_APPLICATION'=>			'アプリケーションを更新できません',
 	'S_APPLICATION_ADDED'=>			'アプリケーションを追加しました',

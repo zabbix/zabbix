@@ -59,6 +59,9 @@ include_once('include/page_header.php');
 <?php
 
 	if(isset($_REQUEST['favobj'])){
+		if('filter' == $_REQUEST['favobj']){
+			CProfile::update('web.charts.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+		}
 		if('hat' == $_REQUEST['favobj']){
 			CProfile::update('web.charts.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
@@ -149,13 +152,19 @@ include_once('include/page_header.php');
 
 	$params = array();
 	foreach($options as $option) $params[$option] = 1;
+
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
+
 	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
 //SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
 
 	$available_groups= $PAGE_GROUPS['groupids'];
 	$available_hosts = $PAGE_HOSTS['hostids'];
+
+	if(empty($PAGE_GROUPS['groupids']) || empty($PAGE_HOSTS['hostids'])){
+		$_REQUEST['graphid'] = 0;
+	}
 
 	if($_REQUEST['graphid']>0){
 		$options = array(
@@ -178,6 +187,11 @@ include_once('include/page_header.php');
 	}
 
 	$charts_wdgt = new CWidget('hat_charts');
+	
+	$scroll_div = new CDiv();
+	$scroll_div->setAttribute('id','scrollbar_cntr');
+	$charts_wdgt->addFlicker($scroll_div, CProfile::get('web.charts.filter.state',1));
+
 // HEADER
 
 	$r_form = new CForm();
@@ -206,12 +220,15 @@ include_once('include/page_header.php');
 		'templated' => 0
 	);
 
-	if($_REQUEST['groupid'] > 0){
-		$options['groupids'] = $_REQUEST['groupid'];
+// Filtering
+	if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
+		$options['hostids'] = $PAGE_HOSTS['selected'];
 	}
-
-	if($_REQUEST['hostid'] > 0){
-		$options['hostids'] = $_REQUEST['hostid'];
+	else if(($PAGE_GROUPS['selected'] > 0) && !empty($PAGE_HOSTS['hostids'])){
+		$options['hostids'] = $PAGE_HOSTS['hostids'];
+	}
+	else if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
+		$options['groupids'] = $PAGE_GROUPS['selected'];
 	}
 
 	$db_graphs = CGraph::get($options);
@@ -219,7 +236,7 @@ include_once('include/page_header.php');
 	foreach($db_graphs as $num => $db_graph){
 		$cmbGraphs->addItem($db_graph['graphid'], get_node_name_by_elid($db_graph['graphid'], null, ': ').$db_graph['name']);
 	}
-
+	
 	$r_form->addItem(array(SPACE.S_GRAPH.SPACE,$cmbGraphs));
 
 //	show_table_header(S_GRAPHS_BIG, $r_form);
@@ -315,10 +332,6 @@ include_once('include/page_header.php');
 		zbx_add_post_js('timeControl.processObjects();');
 //-------------
 	}
-
-	$scroll_div = new CDiv();
-	$scroll_div->setAttribute('id','scrollbar_cntr');
-	$scroll_div->show();
 ?>
 <?php
 

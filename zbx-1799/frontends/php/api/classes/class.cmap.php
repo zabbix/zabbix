@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -223,6 +223,32 @@ class CMap extends CZBXAPI{
 		}
 		else{
 			if(!empty($result)){
+			
+				$link_triggers = array();
+				$sql = 'SELECT slt.triggerid, sl.sysmapid'.
+					' FROM sysmaps_link_triggers slt, sysmaps_links sl'.
+					' WHERE '.DBcondition('sl.sysmapid', $sysmapids).
+						' AND sl.linkid=slt.linkid';
+				$db_link_triggers = DBselect($sql);
+
+				while($link_trigger = DBfetch($db_link_triggers)){
+					$link_triggers[$link_trigger['sysmapid']] = $link_trigger['triggerid'];
+				}
+				
+				$all_triggers = CTrigger::get(array(
+					'triggerids' => $link_triggers,
+					'editable' => $options['editable'],
+					'output' => API_OUTPUT_SHORTEN,
+					'preservekeys' => 1
+				));
+				foreach($link_triggers as $id => $triggerid){
+					if(!isset($all_triggers[$triggerid])){
+						unset($result[$id]);
+						unset($sysmapids[$id]);
+					}
+				}
+		
+				
 				$hosts_to_check = array();
 				$maps_to_check = array();
 				$triggers_to_check = array();
@@ -333,6 +359,7 @@ SDI('///////////////////////////////////////');
 			}
 		}
 
+COpt::memoryPick();
 		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
@@ -343,7 +370,9 @@ SDI('///////////////////////////////////////');
 			if(!isset($map_selements)){
 				$map_selements = array();
 
-				$sql = 'SELECT se.* FROM sysmaps_elements se WHERE '.DBcondition('se.sysmapid', $sysmapids);
+				$sql = 'SELECT se.* '.
+						' FROM sysmaps_elements se '.
+						' WHERE '.DBcondition('se.sysmapid', $sysmapids);
 				$db_selements = DBselect($sql);
 				while($selement = DBfetch($db_selements)){
 					$map_selements[$selement['selementid']] = $selement;
@@ -389,6 +418,7 @@ SDI('///////////////////////////////////////');
 			}
 		}
 
+COpt::memoryPick();
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
 			$result = zbx_cleanHashes($result);
@@ -428,31 +458,25 @@ SDI('///////////////////////////////////////');
 	return $result;
 	}
 
-	public static function checkObjects($sysmapsData){
-		$sysmapsData = zbx_toArray($sysmapsData);
-		
-		$result = array();
+	public static function exists($object){
+		$keyFields = array(array('sysmapid', 'name'));
 
-		foreach($sysmapsData as $snum => $sysmapData){
-			$options = array(
-				'filter' => $sysmapData,
-				'output' => API_OUTPUT_SHORTEN,
-				'nopermissions' => 1
-			);
+		$options = array(
+			'filter' => zbx_array_mintersect($keyFields, $object),
+			'output' => API_OUTPUT_SHORTEN,
+			'nopermissions' => 1,
+			'limit' => 1
+		);
+		if(isset($object['node']))
+			$options['nodeids'] = getNodeIdByNodeName($object['node']);
+		else if(isset($object['nodeids']))
+			$options['nodeids'] = $object['nodeids'];
 
-			if(isset($sysmapData['node']))
-				$options['nodeids'] = getNodeIdByNodeName($sysmapData['node']);
-			else if(isset($sysmapData['nodeids']))
-				$options['nodeids'] = $sysmapData['nodeids'];
+		$objs = self::get($options);
 
-			$sysmaps = self::get($options);
-
-			$result+= $sysmaps;
-		}
-
-	return $result;
+	return !empty($objs);
 	}
-
+	
 /**
  * Add Map
  *
@@ -474,7 +498,7 @@ SDI('///////////////////////////////////////');
  */
 	public static function create($maps){
 		$errors = array();
-		$result_maps = array();
+		$sysmapids = array();
 		$result = true;
 
 		$maps = zbx_toArray($maps);
@@ -497,6 +521,12 @@ SDI('///////////////////////////////////////');
 				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields for map');
 				break;
 			}
+			
+			if(self::exists(array('name' => $map['name']))){
+				$result = false;
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Map [ '.$map['name'].' ] already exists.');
+				break;
+			}
 
 			$sysmapid=get_dbid('sysmaps','sysmapid');
 			$result=DBexecute('INSERT INTO sysmaps (sysmapid,name,width,height,backgroundid,highlight,label_type,label_location)'.
@@ -505,13 +535,12 @@ SDI('///////////////////////////////////////');
 
 			if(!$result) break;
 
-			$new_map = array('sysmapid' => $sysmapid);
-			$result_maps[] = array_merge($map, $new_map);
+			$sysmapids[] = $sysmapid;
 		}
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return $result_maps;
+			return array('sysmapids' => $sysmapids);
 		}
 		else{
 			self::setMethodErrors(__METHOD__, $errors);
@@ -569,6 +598,22 @@ SDI('///////////////////////////////////////');
 				break;
 			}
 
+			$options = array(
+				'filter' => array(
+					'name' => $map['name']),
+				'output' => API_OUTPUT_SHORTEN,
+				'editable' => 1,
+				'nopermissions' => 1
+			);
+			$map_exists = self::get($options);
+			$map_exists = reset($map_exists);
+
+			if(!empty($map_exists) && ($map_exists['sysmapid'] != $map['sysmapid'])){
+				$result = false;
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Map [ '.$map['name'].' ] '.S_ALREADY_EXISTS_SMALL);
+				break;
+			}				
+			
 			$sql = 'UPDATE sysmaps '.
 					' SET name='.zbx_dbstr($map['name']).','.
 						' width='.$map['width'].','.
@@ -585,12 +630,7 @@ SDI('///////////////////////////////////////');
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$options = array(
-				'sysmapids' => $sysmapids,
-				'nopermissions' => 1,
-				'output' => API_OUTPUT_EXTEND,
-			);
-			return self::get($options);
+			return array('sysmapids' => $sysmapids);
 		}
 		else{
 			self::setMethodErrors(__METHOD__, $errors);
@@ -664,7 +704,7 @@ SDI('///////////////////////////////////////');
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result)
-			return true;
+			return array('sysmapids' => $sysmapids);
 		else{
 			self::setMethodErrors(__METHOD__, $errors);
 			return false;

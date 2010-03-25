@@ -343,7 +343,7 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 				break;
 		}
 
-		zbx_wsnprintf(thread_id, sizeof(thread_id), TEXT("[%li]: "),
+		zbx_wsnprintf(thread_id, sizeof(thread_id)/sizeof(wchar_t), TEXT("[%li]: "),
 				zbx_get_thread_id());
 		strings[0] = thread_id;
 		strings[1] = zbx_utf8_to_unicode(message);

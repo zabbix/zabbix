@@ -21,6 +21,7 @@
 <?php
 require_once('include/config.inc.php');
 require_once('include/maps.inc.php');
+require_once('include/ident.inc.php');
 require_once('include/forms.inc.php');
 
 if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['maps'])){
@@ -125,7 +126,7 @@ include_once('include/page_header.php');
 		DBstart();
 
 		$result = zbxXML::import($_FILES['import_file']['tmp_name']);
-		$result = zbxXML::parseMap($rules);
+		if($result) $result = zbxXML::parseMap($rules);
 
 		$result = DBend($result);
 		show_messages($result, S_IMPORTED.SPACE.S_SUCCESSEFULLY_SMALL, S_IMPORT.SPACE.S_FAILED_SMALL);
@@ -236,14 +237,13 @@ include_once('include/page_header.php');
 	$form->addItem(new CButton('form', S_IMPORT_MAP));
 
 	show_table_header(S_CONFIGURATION_OF_NETWORK_MAPS, $form);
-	echo SBR;
 ?>
 <?php
 //	COpt::savesqlrequest(0,'/////////////////////////////////////////////////////////////////////////////////////////////////////////');
 	if(isset($_REQUEST['form'])){
 		if($_REQUEST['form'] == S_IMPORT_MAP)
 			import_map_form($rules);
-		else if(($_REQUEST['form'] == 'Create Map') || ($_REQUEST['form'] == 'update'))
+		else if(($_REQUEST['form'] == S_CREATE_MAP) || ($_REQUEST['form'] == 'update'))
 			insert_map_form();
 	}
 	else{

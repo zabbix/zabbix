@@ -106,6 +106,8 @@ include_once('include/page_header.php');
 					$sysmaps = CMap::get($options);
 					$db_map = reset($sysmaps);
 
+					expandMapLabels($db_map);
+
 					$expandProblem = ($db_map['highlight'] > 1)? 0 : 1;
 					$map_info = getSelementsInfo($db_map, $expandProblem);
 //SDII($db_map);
@@ -169,7 +171,8 @@ include_once('include/page_header.php');
 							$db_selementids[$db_selement['selementid']] = $db_selement['selementid'];
 						}
 
-						DBstart();
+						$transaction = DBstart();
+
 						foreach($selements as $id => $selement){
 							if($selement['elementid'] == 0){
 								$selement['elementtype'] = SYSMAP_ELEMENT_TYPE_IMAGE;
@@ -225,12 +228,13 @@ include_once('include/page_header.php');
 							throw new Exception(S_MAP_SAVE_OPERATION_FAILED."\n\r");
 					}
 					catch(Exception $e){
-						$msg =  $e->getMessage();
-						$msg.= ob_get_contents();
-						ob_get_clean();
+						if(isset($transaction)) DBend(false);
+						$msg =  $e->getMessage()."\n\r";
+
+						ob_clean();
 						print('alert('.zbx_jsvalue($msg).');');
 					}
-					ob_flush();
+					@ob_flush();
 					break;
 			}
 		}
@@ -249,6 +253,7 @@ include_once('include/page_header.php');
 
 //						$selement['image'] = get_base64_icon($element);
 						$selement['image'] = get_selement_iconid($selement);
+						$selement['label_expanded'] = expand_map_element_label_by_data($selement);
 
 						$action = '';
 						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement).',1);';

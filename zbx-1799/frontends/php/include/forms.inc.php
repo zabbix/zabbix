@@ -2126,6 +2126,8 @@
 		else{
 			$frmItem->addVar('formula',$formula);
 		}
+
+
 		if($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_HTTPTEST){
 			$frmItem->addRow(S_UPDATE_INTERVAL_IN_SEC, new CNumericBox('delay',$delay,5));
 			$frmItem->addRow(S_FLEXIBLE_INTERVALS, $delay_flex_el);
@@ -2590,6 +2592,7 @@
 
 		$frmMTrig = new CFormTable(S_TRIGGERS_MASSUPDATE, 'triggers.php');
 		$frmMTrig->addVar('massupdate',get_request('massupdate',1));
+		$frmMTrig->addVar('go',get_request('go','massupdate'));
 		$frmMTrig->setAttribute('id', 'massupdate');
 
 		$triggers = $_REQUEST['g_triggerid'];
@@ -3922,12 +3925,6 @@
 
 			$tblPeriod->addRow(array(S_DATE,$filtertimetab));
 
-
-			zbx_add_post_js('if("undefined" != typeof(CLNDR["new_timeperiod_date"]))'.
-									' addListener($("hat_new_timeperiod_icon"),'.
-												'"click",'.
-												'CLNDR["new_timeperiod_date"].clndr.clndrhide.bindAsEventListener(CLNDR["new_timeperiod_date"].clndr));');
-
 //-------
 		}
 
@@ -3998,7 +3995,6 @@
 			if($esc_period) $_REQUEST['escalation'] = 1;
 		}
 		else{
-
 			if(isset($_REQUEST['escalation']) && (0 == $_REQUEST['esc_period']))
 				$_REQUEST['esc_period'] = 3600;
 
@@ -4267,7 +4263,7 @@
 				$rowCondition[] = array(
 					new CTextBox('group','',20,'yes'),
 					new CButton('btn1',S_SELECT,
-						"return PopUp('popup.php?dstfrm=".S_ACTION.
+						"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=group&srctbl=host_group".
 						"&srcfld1=groupid&srcfld2=name',450,450);",
 						'T')
@@ -4278,7 +4274,7 @@
 				$rowCondition[] = array(
 					new CTextBox('host','',20,'yes'),
 					new CButton('btn1',S_SELECT,
-						"return PopUp('popup.php?dstfrm=".S_ACTION.
+						"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=host_templates".
 						"&srcfld1=hostid&srcfld2=host',450,450);",
 						'T')
@@ -4289,7 +4285,7 @@
 				$rowCondition[] = array(
 					new CTextBox('host','',20,'yes'),
 					new CButton('btn1',S_SELECT,
-						"return PopUp('popup.php?dstfrm=".S_ACTION.
+						"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=hosts".
 						"&srcfld1=hostid&srcfld2=host',450,450);",
 						'T')
@@ -4301,7 +4297,7 @@
 				$rowCondition[] = array(
 					new CTextBox('trigger','',20,'yes'),
 					new CButton('btn1',S_SELECT,
-						"return PopUp('popup.php?dstfrm=".S_ACTION.
+						"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=trigger&srctbl=triggers".
 						"&srcfld1=triggerid&srcfld2=description');",
 						'T')
@@ -4339,7 +4335,7 @@
 				$rowCondition[] = array(
 					new CTextBox('node','',20,'yes'),
 					new CButton('btn1',S_SELECT,
-						"return PopUp('popup.php?dstfrm=".S_ACTION.
+						"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=node&srctbl=nodes".
 						"&srcfld1=nodeid&srcfld2=name',450,450);",
 						'T')
@@ -4361,7 +4357,7 @@
 				$rowCondition[] = array(
 					new CTextBox('dcheck','',50,'yes'),
 					new CButton('btn1',S_SELECT,
-						"return PopUp('popup.php?dstfrm=".S_ACTION.
+						"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=dcheck&srctbl=dchecks".
 						"&srcfld1=dcheckid&srcfld2=name',450,450);",
 						'T')
@@ -4372,7 +4368,7 @@
 				$rowCondition[] = array(
 					new CTextBox('proxy','',20,'yes'),
 					new CButton('btn1',S_SELECT,
-						"return PopUp('popup.php?dstfrm=".S_ACTION.
+						"return PopUp('popup.php?writeonly=1&dstfrm=".S_ACTION.
 						"&dstfld1=new_condition%5Bvalue%5D&dstfld2=proxy&srctbl=proxies".
 						"&srcfld1=hostid&srcfld2=host',450,450);",
 						'T')
@@ -4606,13 +4602,13 @@
 			$action = get_action_by_actionid($_REQUEST['actionid']);
 		}
 
-		$operations	= get_request("operations",array());
+		$operations	= get_request('operations', array());
 
 		if(isset($_REQUEST['actionid']) && !isset($_REQUEST['form_refresh'])){
-			$eventsource	= $action['eventsource'];
+			$eventsource = $action['eventsource'];
 		}
 		else{
-			$eventsource	= get_request('eventsource');
+			$eventsource = get_request('eventsource');
 		}
 
 		$allowed_operations = get_operations_by_eventsource($eventsource);
@@ -4685,6 +4681,7 @@
 		$cmbOpType = new CComboBox('new_operation[operationtype]', $new_operation['operationtype'],'submit()');
 		foreach($allowed_operations as $oper)
 			$cmbOpType->addItem($oper, operation_type2str($oper));
+			
 		$tblNewOperation->addRow(array(S_OPERATION_TYPE, $cmbOpType));
 
 		switch($new_operation['operationtype']){
@@ -4710,7 +4707,7 @@
 
 				$tblOper->addItem(new CVar('new_operation[objectid]', $new_operation['objectid']));
 
-				if($object_name)	$object_name = $object_name[$display_name];
+				if($object_name) $object_name = $object_name[$display_name];
 
 				$cmbObject = new CComboBox('new_operation[object]', $new_operation['object'],'submit()');
 				$cmbObject->addItem(OPERATION_OBJECT_USER,S_SINGLE_USER);
@@ -5155,6 +5152,33 @@
 	return $frmMeadia;
 	}
 
+	function import_screen_form($rules){
+
+		$form = new CFormTable(S_IMPORT, null, 'post', 'multipart/form-data');
+		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
+
+		$table = new CTable();
+		$table->setHeader(array(S_ELEMENT, S_UPDATE.SPACE.S_EXISTING, S_ADD.SPACE.S_MISSING), 'bold');
+
+		$titles = array('screens' => S_SCREEN);
+
+		foreach($titles as $key => $title){
+			$cbExist = new CCheckBox('rules['.$key.'][exist]', isset($rules[$key]['exist']));
+
+			if($key == 'template')
+				$cbMissed = null;
+			else
+				$cbMissed = new CCheckBox('rules['.$key.'][missed]', isset($rules[$key]['missed']));
+
+			$table->addRow(array($title, $cbExist, $cbMissed));
+		}
+
+		$form->addRow(S_RULES, $table);
+
+		$form->addItemToBottomRow(new CButton('import', S_IMPORT));
+		$form->show();
+	}
+
 	function insert_screen_form(){
 
 		$frm_title = S_SCREEN;
@@ -5319,15 +5343,9 @@
 // END:   HOSTS PROFILE EXTENDED Section
 
 		$templates	= get_request('templates',array());
-		$clear_templates = get_request('clear_templates',array());
+		natsort($templates);
 
 		$frm_title	= S_HOST.SPACE.S_MASS_UPDATE;
-
-		$original_templates = array();
-
-		$clear_templates = array_intersect($clear_templates, array_keys($original_templates));
-		$clear_templates = array_diff($clear_templates,array_keys($templates));
-		asort($templates);
 
 		$frmHost = new CFormTable($frm_title,'hosts.php');
 		$frmHost->setHelp('web.hosts.host.php');
@@ -5337,8 +5355,6 @@
 		foreach($hosts as $id => $hostid){
 			$frmHost->addVar('hosts['.$hostid.']',$hostid);
 		}
-
-		$frmHost->addVar('clear_templates',$clear_templates);
 
 //		$frmItem->addRow(array( new CVisibilityBox('visible[type]', isset($visible['type']), 'type', S_ORIGINAL),S_TYPE), $cmbType);
 
@@ -5409,47 +5425,80 @@
 		$cmbStatus->addItem(HOST_STATUS_MONITORED,	S_MONITORED);
 		$cmbStatus->addItem(HOST_STATUS_NOT_MONITORED,	S_NOT_MONITORED);
 
-		$frmHost->addRow(array(new CVisibilityBox('visible[status]', isset($visible['status']), 'status', S_ORIGINAL),S_STATUS),
-						$cmbStatus
-					);
+		$frmHost->addRow(array(new CVisibilityBox('visible[status]', isset($visible['status']), 'status', S_ORIGINAL),S_STATUS), $cmbStatus);
 
 // LINK TEMPLATES {{{
 		$template_table = new CTable();
-
 		$template_table->setAttribute('name','template_table');
 		$template_table->setAttribute('id','template_table');
 
 		$template_table->setCellPadding(0);
 		$template_table->setCellSpacing(0);
 
-//		$template_table->setAttribute('style','border: 1px black solid;');
-
 		foreach($templates as $id => $temp_name){
 			$frmHost->addVar('templates['.$id.']',$temp_name);
 			$template_table->addRow(array(
-					$temp_name,
-					new CButton('unlink['.$id.']',S_UNLINK),
-					isset($original_templates[$id]) ? new CButton('unlink_and_clear['.$id.']',S_UNLINK_AND_CLEAR) : SPACE
-					)
-				);
+				new CCheckBox('templates_rem['.$id.']', 'no', null, $id),
+				$temp_name,
+			));
 		}
 
-		$template_table->addRow(new CButton('add_template',S_ADD,
-					"return PopUp('popup.php?dstfrm=".$frmHost->GetName().
-					"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
-					url_param($templates,false,'existed_templates')."',450,450)"));
+		$template_table->addRow(array(
+			new CButton('add_template', S_ADD, "return PopUp('popup.php?dstfrm=".$frmHost->GetName().
+				"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
+				url_param($templates,false,'existed_templates')."',450,450)"),
+			new CButton('unlink', S_REMOVE)
+		));
 
-		$frmHost->addRow(array(
-					new CVisibilityBox('visible[template_table]', isset($visible['template_table']), 'template_table', S_ORIGINAL),S_LINK_ADDITIONAL_TEMPLATES),
-					$template_table, 'T'
-				);
+		$vbox = new CVisibilityBox('visible[template_table]', isset($visible['template_table']), 'template_table', S_ORIGINAL);
+		$vbox->setAttribute('id', 'cb_tpladd');
+		if(isset($visible['template_table_r'])) $vbox->setAttribute('disabled', 'disabled');
+		$action = $vbox->getAttribute('onclick');
+		$action .= 'if($("cb_tplrplc").disabled) $("cb_tplrplc").enable(); else $("cb_tplrplc").disable();';
+		$vbox->setAttribute('onclick', $action);
+		
+		$frmHost->addRow(array($vbox, S_LINK_ADDITIONAL_TEMPLATES), $template_table, 'T');
 // }}} LINK TEMPLATES
 
 
+// RELINK TEMPLATES {{{
+		$template_table_r = new CTable();
+		$template_table_r->setAttribute('name','template_table_r');
+		$template_table_r->setAttribute('id','template_table_r');
+
+		$template_table_r->setCellPadding(0);
+		$template_table_r->setCellSpacing(0);
+
+		foreach($templates as $id => $temp_name){
+			$frmHost->addVar('templates['.$id.']',$temp_name);
+			$template_table_r->addRow(array(
+				new CCheckBox('templates_rem['.$id.']', 'no', null, $id),
+				$temp_name,
+			));
+		}
+
+		$template_table_r->addRow(array(
+			new CButton('add_template', S_ADD, "return PopUp('popup.php?dstfrm=".$frmHost->GetName().
+				"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
+				url_param($templates,false,'existed_templates')."',450,450)"),
+			new CButton('unlink', S_REMOVE)
+		));
+		
+		$vbox = new CVisibilityBox('visible[template_table_r]', isset($visible['template_table_r']), 'template_table_r', S_ORIGINAL);
+		$vbox->setAttribute('id', 'cb_tplrplc');
+		if(isset($visible['template_table'])) $vbox->setAttribute('disabled', 'disabled');
+		$action = $vbox->getAttribute('onclick');
+		$action .= 'if($("cb_tpladd").disabled) $("cb_tpladd").enable(); else $("cb_tpladd").disable();';	
+		$vbox->setAttribute('onclick', $action);
+
+		$frmHost->addRow(array($vbox, S_RELINK_TEMPLATES),	$template_table_r, 'T');
+// }}} RELINK TEMPLATES
+
+
 		$frmHost->addRow(array(
-					new CVisibilityBox('visible[useipmi]', isset($visible['useipmi']), 'useipmi', S_ORIGINAL), S_USEIPMI),
-					new CCheckBox('useipmi', $useipmi, 'submit()')
-				);
+			new CVisibilityBox('visible[useipmi]', isset($visible['useipmi']), 'useipmi', S_ORIGINAL), S_USEIPMI),
+			new CCheckBox('useipmi', $useipmi, 'submit()')
+		);
 
 		if($useipmi == 'yes'){
 			$frmHost->addRow(array(
@@ -5509,8 +5558,8 @@
 		);
 // END:   HOSTS PROFILE EXTENDED Section
 
-		if($useprofile=='yes'){	
-			if($useprofile == 'yes'){
+		if($useprofile==='yes'){
+			if($useprofile === 'yes'){
 				foreach($profile_fields as $field => $caption){
 					$frmHost->addRow(array(
 						new CVisibilityBox('visible['.$field.']', isset($visible[$field]), 'host_profile['.$field.']', S_ORIGINAL), $caption),
@@ -5740,8 +5789,8 @@
 
 		$frmHost = new CForm('hosts.php', 'post');
 		$frmHost->setName('web.hosts.host.php.');
-		//$frmHost->setHelp('web.hosts.host.php');
-		//$frmHost->addVar('config',get_request('config',0));
+//		$frmHost->setHelp('web.hosts.host.php');
+//		$frmHost->addVar('config',get_request('config',0));
 		$frmHost->addVar('form', get_request('form', 1));
 		$from_rfr = get_request('form_refresh',0);
 		$frmHost->addVar('form_refresh', $from_rfr+1);

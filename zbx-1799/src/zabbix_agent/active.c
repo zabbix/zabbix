@@ -105,13 +105,23 @@ static void	add_check(const char *key, const char *key_orig, int refresh, long l
 
 	for (i = 0; NULL != active_metrics[i].key; i++)
 	{
-		if (0 != strcmp(active_metrics[i].key, key))
+		if (0 != strcmp(active_metrics[i].key_orig, key_orig))
 			continue;
+
+		if (0 != strcmp(active_metrics[i].key, key))
+		{
+			zbx_free(active_metrics[i].key);
+			active_metrics[i].key		= strdup(key);
+			active_metrics[i].lastlogsize	= lastlogsize;
+			active_metrics[i].mtime		= mtime;
+		}
 
 		/* replace metric */
 		if (active_metrics[i].refresh != refresh)
+		{
 			active_metrics[i].nextcheck = 0;
-		active_metrics[i].refresh = refresh;
+			active_metrics[i].refresh = refresh;
+		}
 		active_metrics[i].status = ITEM_STATUS_ACTIVE;
 
 		return;
@@ -956,6 +966,7 @@ static void	process_active_checks(char *server, unsigned short port)
 
 					switch ( severity )
 					{
+						case EVENTLOG_SUCCESS:
 						case EVENTLOG_INFORMATION_TYPE:
 							severity = 1;
 							zbx_snprintf(str_severity, sizeof(str_severity), INFORMATION_TYPE);
@@ -1160,6 +1171,6 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	ZBX_DO_EXIT();
 
-	zbx_tread_exit(0);
+	zbx_thread_exit(0);
 
 }

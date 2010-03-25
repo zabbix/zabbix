@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -346,6 +346,7 @@ include_once('include/page_header.php');
 		'filter' => 1,
 		'monitored' => 1,
 		'extendoutput' => 1,
+		'skipDependent' => 1,
 		'sortfield' => $sortfield,
 		'sortorder' => $sortorder,
 		'limit' => ($config['search_limit']+1)
@@ -387,11 +388,12 @@ include_once('include/page_header.php');
 		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 		'extendoutput' => 1,
 		'select_hosts' => 1,
-		'select_items' => 1
+		'select_items' => 1,
+		'select_dependencies' => 1
 	);
 	$triggers = CTrigger::get($options);
 	$triggers = zbx_toHash($triggers, 'triggerid');
-
+	
 	order_result($triggers, $sortfield, $sortorder);
 //---------
 
@@ -475,7 +477,8 @@ include_once('include/page_header.php');
 
 		$menu_trigger_conf = 'null';
 		if($admin_links){
-			$menu_trigger_conf = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript: redirect('triggers.php?form=update&triggerid=".$trigger['triggerid']."')\",
+			$menu_trigger_conf = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript: 
+				redirect('triggers.php?form=update&triggerid=".$trigger['triggerid'].'&switch_node='.id2nodeid($trigger['triggerid'])."')\",
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
 		$menu_trigger_url = 'null';
@@ -487,7 +490,7 @@ include_once('include/page_header.php');
 		$description->addAction('onclick',
 			"javascript: create_mon_trigger_menu(event, new Array({'triggerid': '".$trigger['triggerid'].
 				"', 'lastchange': '".$trigger['lastchange']."'}, ".$menu_trigger_conf.", ".$menu_trigger_url."),".
-			zbx_jsvalue($items).");"
+			zbx_jsvalue($items, true).");"
 		);
 // }}} trigger description js menu
 
@@ -500,26 +503,21 @@ include_once('include/page_header.php');
 		}
 
 // DEPENDENCIES {{{
-		$dependency = false;
-		$dep_table = new CTableInfo();
-		$dep_table->setAttribute('style', 'width: 200px;');
-		$dep_table->addRow(bold(S_DEPENDS_ON.':'));
+		if(!empty($trigger['dependencies'])){
+			$dep_table = new CTableInfo();
+			$dep_table->setAttribute('style', 'width: 200px;');
+			$dep_table->addRow(bold(S_DEPENDS_ON.':'));
 
-		$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_down='.$trigger['triggerid'];
-		$dep_res = DBselect($sql_dep);
-		while($dep_row = DBfetch($dep_res)){
-			$dep_table->addRow(SPACE.'-'.SPACE.expand_trigger_description($dep_row['triggerid_up']));
-			$dependency = true;
-		}
+			foreach($trigger['dependencies'] as $dep){
+				$dep_table->addRow(' - '.expand_trigger_description($dep['triggerid']));
+			}
 
-		if($dependency){
-			$img = new Cimg('images/general/down_icon.png','DEP_DOWN');
-			$img->setAttribute('style','vertical-align: middle; border: 0px;');
+			$img = new Cimg('images/general/down_icon.png', 'DEP_UP');
+			$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
 			$img->setHint($dep_table);
 
-			$description = array($img,SPACE,$description);
+			$description = array($img, SPACE, $description);
 		}
-		unset($img, $dep_table, $dependency);
 
 		$dependency = false;
 		$dep_table = new CTableInfo();
@@ -600,11 +598,8 @@ include_once('include/page_header.php');
 		if((time() - $trigger['lastchange']) < TRIGGER_BLINK_PERIOD){
 			$status->setAttribute('name', 'blink');
 		}
-		$lastchange = new CLink(
-			zbx_date2str(S_DATE_FORMAT_YMDHMS, $trigger['lastchange']),
-			'events.php?triggerid='.$trigger['triggerid'].'&nav_time='.$trigger['lastchange']
-		);
-
+		$lastchange = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS, $trigger['lastchange']), 'events.php?triggerid='.$trigger['triggerid']);
+		//.'&stime='.date('YmdHi', $trigger['lastchange']
 
 		if($config['event_ack_enable']){
 			if($trigger['event_count']){
@@ -652,7 +647,7 @@ include_once('include/page_header.php');
 
 
 		if($show_events != EVENTS_OPTION_NOEVENT){
-			$i = 0;
+			$i = 1;
 
 			foreach($trigger['events'] as $enum => $row_event){
 				$i++;
@@ -734,12 +729,8 @@ include_once('include/page_header.php');
 	}
 //----
 
-// PAGING FOOTER
 	$table = array($paging, $table, $paging, $footer);
-//---------
-
 	$m_form->addItem($table);
-
 	$trigg_wdgt->addItem($m_form);
 	$trigg_wdgt->show();
 

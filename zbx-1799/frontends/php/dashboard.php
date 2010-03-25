@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,11 +30,11 @@ require_once('include/blocks.inc.php');
 $page['title'] = "S_DASHBOARD";
 $page['file'] = 'dashboard.php';
 $page['hist_arg'] = array();
-$page['scripts'] = array('class.pmaster.js','scriptaculous.js?load=effects');
+$page['scripts'] = array('class.pmaster.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-include_once "include/page_header.php";
+include_once('include/page_header.php');
 
 //		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
@@ -58,6 +58,38 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 
+// FILTER
+	$dashconf = array();
+	$dashconf['groupids'] = null;
+	$dashconf['maintenance'] = null;
+	$dashconf['severity'] = null;
+
+	$dashconf['filterEnable'] = CProfile::get('web.dashconf.filter.enable', 0);
+	if($dashconf['filterEnable'] == 1){
+// groups
+		$dashconf['grpswitch'] = CProfile::get('web.dashconf.groups.grpswitch', 0);
+
+		if($dashconf['grpswitch'] == 0){
+			$dashconf['groupids'] = null;
+		}
+		else{
+			$groupids = get_favorites('web.dashconf.groups.groupids');
+			$dashconf['groupids'] = zbx_objectValues($groupids, 'value');
+		}
+
+// hosts
+		$maintenance = CProfile::get('web.dashconf.hosts.maintenance', 1);
+		$dashconf['maintenance'] = ($maintenance == 0)?0:null;
+
+// triggers
+		$severity = CProfile::get('web.dashconf.triggers.severity', null);
+		$dashconf['severity'] = zbx_empty($severity)?null:explode(';', $severity);
+		$dashconf['severity'] = zbx_toHash($dashconf['severity']);
+	}
+
+// ------
+
+
 // ACTION /////////////////////////////////////////////////////////////////////////////
 	if(isset($_REQUEST['favobj'])){
 		$_REQUEST['pmasterid'] = get_request('pmasterid','mainpage');
@@ -69,11 +101,11 @@ include_once "include/page_header.php";
 		if('refresh' == $_REQUEST['favobj']){
 			switch($_REQUEST['favid']){
 				case 'hat_syssum':
-					$syssum = make_system_summary();
+					$syssum = make_system_summary($dashconf);
 					$syssum->show();
 					break;
 				case 'hat_hoststat':
-					$hoststat = make_hoststat_summary();
+					$hoststat = make_hoststat_summary($dashconf);
 					$hoststat->show();
 					break;
 				case 'hat_stszbx':
@@ -81,11 +113,11 @@ include_once "include/page_header.php";
 					$stszbx->show();
 					break;
 				case 'hat_lastiss':
-					$lastiss = make_latest_issues();
+					$lastiss = make_latest_issues($dashconf);
 					$lastiss->show();
 					break;
 				case 'hat_webovr':
-					$webovr = make_webmon_overview();
+					$webovr = make_webmon_overview($dashconf);
 					$webovr->show();
 					break;
 				case 'hat_dscvry':
@@ -192,8 +224,15 @@ include_once "include/page_header.php";
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url->getUrl()."';"));
 
+	$style = $dashconf['filterEnable']?'iconconfig_hl':'iconconfig';
+	$state = S_FILTER.' '.($dashconf['filterEnable']?S_ENABLED:S_DISABLED);
+	$dc_icon = new CDiv(SPACE,$style);
+	$dc_icon->setAttribute('title', S_CONFIGURE.' ('.$state.')');
+	$dc_icon->addAction('onclick',new CJSscript("javascript: document.location = 'dashconf.php';"));
+
+
 	$dashboard_wdgt->setClass('header');
-	$dashboard_wdgt->addHeader(S_DASHBOARD_BIG, $fs_icon);
+	$dashboard_wdgt->addHeader(S_DASHBOARD_BIG, array($dc_icon,$fs_icon));
 //-------------
 
 	$left_tab = new CTable();

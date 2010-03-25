@@ -17,23 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-function SDB($return=false){
-	$backtrace = debug_backtrace();
-	array_shift($backtrace);
-	$result = 'DEBUG BACKTRACE: <br/>';
-	foreach($backtrace as $n => $bt){
-		$result .= '  --['.$n.']-- '.$bt['file'].' : '.$bt['line'].' | ';
-		$result .= isset($bt['class']) ? $bt['class'].$bt['type'].$bt['function'] : $bt['function'];
-		$result .= '( '.print_r($bt['args'], true).' ) <br/>';
-	}
-	if($return) return $result;
-	else echo $result;
-}
-function SDI($msg='SDI') { echo 'DEBUG INFO: '; var_dump($msg); echo SBR; } // DEBUG INFO!!!
-function SDII($msg='SDII') { echo 'DEBUG INFO: '; echo '<pre>'.print_r($msg, true).'</pre>'; echo SBR; } // DEBUG INFO!!!
-function VDP($var, $msg=null) { echo 'DEBUG DUMP: '; if(isset($msg)) echo '"'.$msg.'"'.SPACE; var_dump($var); echo SBR; } // DEBUG INFO!!!
-function TODO($msg) { echo 'TODO: '.$msg.SBR; }  // DEBUG INFO!!!
-
+	require_once('include/debug.inc.php');
+	
 function __autoload($class_name){
 	$class_name = zbx_strtolower($class_name);
 	$api = array(
@@ -702,7 +687,7 @@ function __autoload($class_name){
 	function validate_float($str){
 //		echo "Validating float:$str<br>";
 //		if (eregi('^[ ]*([0-9]+)((\.)?)([0-9]*[KMG]{0,1})[ ]*$', $str, $arr)) {
-		if(preg_match('/^[ ]*([0-9]+)((\.)?)([0-9]*[KMG]{0,1})[ ]*$/i', $str, $arr)) {
+		if(preg_match('/^[ ]*([0-9]+)((\.)?)([0-9]*[KMGTsmhdw]{0,1})[ ]*$/i', $str, $arr)) {
 			return 0;
 		}
 		else{

@@ -446,8 +446,6 @@
 	'S_APPLICATIONS'=>			'애플리케이션',
 	'S_APPLICATIONS_BIG'=>			'애플리케이션',
 	'S_CREATE_APPLICATION'=>		'애플리케이션 작성',
-	'S_ACTIVATE_ITEMS'=>			'아이템 활성화',
-	'S_DISABLE_ITEMS'=>			'아이템 비활성화',
 	'S_APPLICATION_UPDATED'=>		'애플리케이션을 갱신하였습니다',
 	'S_CANNOT_UPDATE_APPLICATION'=>		'애플리케이션을 갱신할 수 없습니다',
 	'S_APPLICATION_ADDED'=>			'애플리케이션을 추가하였습니다',

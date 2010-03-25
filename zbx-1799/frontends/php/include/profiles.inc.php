@@ -40,6 +40,7 @@ class CProfile{
 		$db_profiles = DBselect($sql);
 		while($profile = DBfetch($db_profiles)){
 			$value_type = self::getFieldByType($profile['type']);
+
 			if(!isset(self::$profiles[$profile['idx']])) 
 				self::$profiles[$profile['idx']] = array();
 				
@@ -95,7 +96,6 @@ class CProfile{
 		if($USER_DETAILS['alias'] == ZBX_GUEST_USER) return false;		
 		if(!self::checkValueType($value, $type)) return false;
 
-		
 		$profile = array(
 			'idx' => $idx,
 			'value' => $value,
@@ -103,21 +103,23 @@ class CProfile{
 			'idx2' => $idx2,
 		);
 
-		if(CProfile::get($idx, false, $idx2) === false){
-			if(!isset(self::$insert[$idx])) 
-				self::$insert[$idx] = array();
+		$current = CProfile::get($idx, null, $idx2);
+		if(is_null($current)){
+			if(!isset(self::$insert[$idx])) self::$insert[$idx] = array();
 				
 			self::$insert[$idx][$idx2] = $profile;
 		}
 		else{
-			if(!isset(self::$update[$idx])) 
-				self::$update[$idx] = array();
-				
-			self::$update[$idx][$idx2] = $profile;
+			if($current != $value){
+				if(!isset(self::$update[$idx])) 
+					self::$update[$idx] = array();
+					
+				self::$update[$idx][$idx2] = $profile;
+			}
 		}
 		
-		if(!isset(self::$profiles[$idx])) 
-			self::$profiles[$idx] = array();
+		if(!isset(self::$profiles[$idx])) self::$profiles[$idx] = array();
+
 		self::$profiles[$idx][$idx2] = $value;
 	}
 	
@@ -125,7 +127,7 @@ class CProfile{
 		global $USER_DETAILS;
 		
 		$value_type = self::getFieldByType($type);
-	
+
 		$values = array(
 			'profileid' => get_dbid('profiles', 'profileid'),
 			'userid' => $USER_DETAILS['userid'],
@@ -134,8 +136,10 @@ class CProfile{
 			'type' => $type,
 			'idx2' => $idx2
 		);
+
 		$sql = 'INSERT INTO profiles ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
-		return DBexecute($sql);
+
+	return DBexecute($sql);
 	}
 		
 	private static function updateDB($idx, $value, $type, $idx2){
@@ -151,12 +155,15 @@ class CProfile{
 		$value = ($value_type == 'value_str') ? zbx_dbstr($value) : $value;
 
 		$sql = 'UPDATE profiles SET '.
-				$value_type.'='.$value.','.
-				' type='.$type.
-			' WHERE userid='.$USER_DETAILS['userid'].
-				' AND idx='.zbx_dbstr($idx).
-				$sql_cond;
+					$value_type.'='.$value.','.
+					' type='.$type.
+				' WHERE userid='.$USER_DETAILS['userid'].
+					' AND idx='.zbx_dbstr($idx).
+					$sql_cond;
+
 		$result = DBexecute($sql);
+
+	return $result;
 	}
 	
 	public static function getFieldByType($type){
@@ -360,20 +367,23 @@ function add2favorites($favobj, $favid, $source=null){
 			return true;
 		}
 	}
-	
+
+	DBstart();
 	$values = array(
 		'profileid' => get_dbid('profiles', 'profileid'),
 		'userid' => $USER_DETAILS['userid'],
 		'idx' => zbx_dbstr($favobj),
 		'value_id' =>  $favid,
-		'type' => PROFILE_TYPE_ID,
+		'type' => PROFILE_TYPE_ID
 	);
 	if(!is_null($source)) $values['source'] = zbx_dbstr($source);
 	
 	$sql = 'INSERT INTO profiles ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
-	
-	return DBexecute($sql);
-	
+	$result = DBexecute($sql);
+
+	$result = DBend($result);
+
+return $result;
 }
 
 // Author: Aly
