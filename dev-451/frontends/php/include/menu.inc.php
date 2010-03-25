@@ -31,6 +31,7 @@ $ZBX_MENU = array(
 				array(
 						'url'=>'dashboard.php',
 						'label'=>S_DASHBOARD,
+						'sub_pages'=>array('dashconf.php')
 					),
 				array(
 						'url'=>'overview.php',
@@ -120,7 +121,8 @@ $ZBX_MENU = array(
 						'label'=>S_BAR_REPORTS,
 						'sub_pages'=>array('popup_period.php','popup_bitem.php','chart_bar.php')
 					),
-				array('url'=>'popup.php')
+				array('url'=>'popup.php'),
+				array('url'=>'popup_right.php')
 				),
 			),
 	'config'=>array(
@@ -189,7 +191,7 @@ $ZBX_MENU = array(
 					),
 				array('url'=>'usergrps.php',
 						'label'=>S_USERS,
-						'sub_pages'=>array('users.php','popup_media.php','popup_usrgrp.php','popup_right.php','popup_users.php')
+						'sub_pages'=>array('users.php','popup_usrgrp.php','popup_users.php')
 					),
 				array('url'=>'media_types.php',
 						'label'=>S_MEDIA_TYPES
@@ -223,7 +225,7 @@ $ZBX_MENU = array(
 			'hide_node_selection' => 1,
 			'forse_disable_all_nodes'=> true,
 			'pages'=>array(
-				array('url'=>'index.php','sub_pages'=>array('profile.php'))
+				array('url'=>'index.php','sub_pages'=>array('profile.php', 'popup_media.php'))
 				)
 			)
 	);
@@ -294,7 +296,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 				$row['selected'] = true;
 
 				if(!defined('ZBX_PAGE_NO_MENU')){
-					update_profile('web.menu.'.$label.'.last', $sub_page['url'], PROFILE_TYPE_STR);
+					CProfile::update('web.menu.'.$label.'.last', $sub_page['url'], PROFILE_TYPE_STR);
 				}
 			}
 
@@ -316,8 +318,8 @@ function zbx_construct_menu(&$main_menu, &$sub_menus) {
 			continue;
 		}
 
-//		$menu_url = get_profile('web.menu.'.$label.'.last',false);
-		$menu_url = $menu['pages'][$menu['default_page_id']]['url'];
+//		$menu_url = CProfile::get('web.menu.'.$label.'.last',false);
+		$menu_url = $sub_menus[$label][$menu['default_page_id']]['menu_url'];
 
 		$mmenu_entry = new CCol($menu['label'], $menu_class);
 		$mmenu_entry->setAttribute('id', $label);

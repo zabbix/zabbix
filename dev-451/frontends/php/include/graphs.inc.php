@@ -442,7 +442,7 @@
 		$result = array();
 
 		foreach($gitems as $gitem){
-			$sql = 'SELECT src.itemid '.
+			$sql = 'SELECT src.itemid, dest.key_ '.
 					' FROM items src, items dest '.
 					' WHERE dest.itemid='.$gitem['itemid'].
 						' AND src.key_=dest.key_ '.
@@ -460,6 +460,7 @@
 			}
 			else{
 				$gitem['itemid'] = $db_item['itemid'];
+				$gitem['key_'] = $db_item['key_'];
 			}
 
 			$result[] = $gitem;
@@ -526,8 +527,10 @@
 							' WHERE h.hostid=i.hostid '.
 								' AND '.DBcondition('i.itemid',$itemid));
 
+		$graph_hostids = array();
 		while($db_item_host = DBfetch($db_item_hosts)){
 			$host_list[] = '"'.$db_item_host['host'].'"';
+			$graph_hostids[] = $db_item_host['hostid'];
 
 			if(HOST_STATUS_TEMPLATE ==  $db_item_host['status'])
 				$new_host_is_template = true;
@@ -537,6 +540,15 @@
 			error(S_GRAPH.SPACE.'"'.$name.'"'.SPACE.S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL);
 			return $result;
 		}
+		
+		// $filter = array(
+			// 'name' => $name,
+			// 'hostids' => $graph_hostids
+		// );
+		// if(CGraph::exists($filter)){
+			// error('Graph already exists [ '.$name.' ]');
+			// return false;
+		// }
 
 		if($graphid = add_graph($name,$width,$height,$ymin_type,$ymax_type,$yaxismin,$yaxismax,$ymin_itemid,$ymax_itemid,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$percent_left,$percent_right,$templateid)){
 			$result = true;
@@ -891,9 +903,37 @@
 
 		$db_graphs = get_graphs_by_hostid($templateid);
 
-		while($db_graph = DBfetch($db_graphs)){
-			copy_graph_to_host($db_graph["graphid"], $hostid, $copy_mode);
+		if($copy_mode){
+			while($db_graph = DBfetch($db_graphs)){
+				copy_graph_to_host($db_graph["graphid"], $hostid, $copy_mode);
+			}
 		}
+		else{
+			while($db_graph = DBfetch($db_graphs)){
+				$gitems = CGraphItem::get(array(
+					'graphids' => $db_graph['graphid'],
+					'output' => API_OUTPUT_EXTEND
+				));
+				
+				
+				$filter = array(
+					'name' => $db_graph['name'],
+					'hostids' => $hostid
+				);
+				if(CGraph::exists($filter)){
+					$db_graph['gitems'] = $gitems;
+					$res = CGraph::update($db_graph);
+				}
+				else{
+					$db_graph['templateid'] = $db_graph['graphid'];
+					$db_graph['gitems'] = get_same_graphitems_for_host($gitems, $hostid);
+					$res = CGraph::create($db_graph);
+				}
+				if($res === false) return false;
+			}
+		}
+		
+		return true;
 	}
 
 /*
@@ -996,14 +1036,14 @@
 		if(!is_null($idx)){
 			if($update){
 				if(isset($_REQUEST['period']) && ($_REQUEST['period'] >= ZBX_MIN_PERIOD))
-					update_profile($idx.'.period',$_REQUEST['period'],PROFILE_TYPE_INT);
+					CProfile::update($idx.'.period',$_REQUEST['period'],PROFILE_TYPE_INT);
 					
 				if(isset($_REQUEST['stime']))
-					update_profile($idx.'.stime',$_REQUEST['stime'], PROFILE_TYPE_STR);
+					CProfile::update($idx.'.stime',$_REQUEST['stime'], PROFILE_TYPE_STR);
 			}
 
-			$_REQUEST['period'] = get_request('period', get_profile($idx.'.period', ZBX_PERIOD_DEFAULT));
-			$_REQUEST['stime'] = get_request('stime', get_profile($idx.'.stime'));
+			$_REQUEST['period'] = get_request('period', CProfile::get($idx.'.period', ZBX_PERIOD_DEFAULT));
+			$_REQUEST['stime'] = get_request('stime', CProfile::get($idx.'.stime'));
 		}
 
 		$_REQUEST['period'] = get_request('period', ZBX_PERIOD_DEFAULT);

@@ -146,6 +146,8 @@
 ?>
 <script type="text/javascript" src="js/prototype.js"></script>
 <script type="text/javascript" src="js/common.js"></script>
+<script type="text/javascript">	var PHP_TZ_OFFSET = <?php echo date('Z'); ?>;</script>
+<script type="text/javascript" src="js/class.cdate.js"></script>
 <script type="text/javascript" src="js/class.cookie.js"></script>
 <script type="text/javascript" src="js/class.curl.js"></script>
 <script type="text/javascript" src="js/main.js"></script>
@@ -166,9 +168,11 @@
 
 	if(isset($_REQUEST['print'])){
 		define('ZBX_PAGE_NO_MENU', 1);
-		$req = substr($_SERVER['REQUEST_URI'],0,zbx_strpos($_SERVER['REQUEST_URI'],'print')-1);
-
-		$link = new CLink(bold('&laquo;'.S_BACK_BIG), $req, 'small_font');
+		
+		$req = new CUrl();
+		$req->setArgument('print', null);
+		
+		$link = new CLink(bold('&laquo;'.S_BACK_BIG), $req->getUrl(), 'small_font');
 		$link->setAttribute('style','padding-left: 10px;');
 
 		$printview = new CDiv($link,'printless');
@@ -184,7 +188,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$help->setTarget('_blank');
 		$support = new CLink(S_GET_SUPPORT, 'http://www.zabbix.com/support.php', 'small_font', null, 'nosid');
 		$support->setTarget('_blank');
-		$printview = new CLink(S_PRINT, $_SERVER['REQUEST_URI'].(empty($_GET)?'?':'&').'print=1', 'small_font', null, 'nosid');
+		$printview = new CLink(S_PRINT, $_SERVER['REQUEST_URI'].(empty($_GET)?'?':'&').'print=1', 'small_font');
 
 		$page_header_r_col = array($help,'|',$support,'|',$printview);
 
@@ -386,7 +390,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$search_form = new CForm('search.php');
 		$search_form->setMethod('get');
 		$search_form->setAttribute('class','thin');
-		$search_form->addItem(new CDiv(array(S_SEARCH_BIG.': ', new CTextBox('search','',15))));
+		$search_form->addItem(new CDiv(array(S_SEARCH_BIG.': ', new CTextBox('search',get_request('search',''),15))));
 
 		$search_div = new CDiv($search_form);
 		$search_div->setAttribute('id','zbx_search');

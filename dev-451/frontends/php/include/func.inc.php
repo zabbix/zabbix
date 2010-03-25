@@ -334,7 +334,7 @@ function zbx_date2age($start_date,$end_date=0,$utime = false){
 			$end_date = time();
 	}
 
-	$time = abs($end_date-$start_date);
+	$original_time = $time = abs($end_date-$start_date);
 //SDI($start_date.' - '.$end_date.' = '.$time);
 
 	$years = (int) ($time / (365*86400));
@@ -372,7 +372,8 @@ function zbx_date2age($start_date,$end_date=0,$utime = false){
 			(($hours && !$years && !$months)?$hours.S_HOUR_SHORT.' ':'').
 			(($minutes && !$years && !$months && !$weeks)?$minutes.S_MINUTE_SHORT.' ':'').
 			((!$years && !$months && !$weeks && !$days && ($ms || $seconds))?$seconds.S_SECOND_SHORT.' ':'').
-			(($ms && !$years && !$months && !$weeks && !$days && !$hours)?$ms.S_MILLISECOND_SHORT:'');
+			(($ms && !$years && !$months && !$weeks && !$days && !$hours)?$ms.S_MILLISECOND_SHORT:'').
+         (!$ms && $original_time < 0.001 ? '< 1'.S_MILLISECOND_SHORT:'');
 
 return trim($str,' ');
 }
@@ -404,70 +405,6 @@ function getDateStringByType($type, $timestamp){
 return $str;
 }
 /************* END DATE *************/
-
-
-/************* SORT *************/
-function natksort(&$array) {
-	$keys = array_keys($array);
-	natcasesort($keys);
-
-	$new_array = array();
-
-	foreach ($keys as $k) {
-		$new_array[$k] = $array[$k];
-	}
-
-	$array = $new_array;
-	return true;
-}
-
-function asort_by_key(&$array, $key){
-	if(!is_array($array)) {
-		error(S_INCORRECT_TYPE_OF_ASORT_BY_KEY);
-		return array();
-	}
-
-	$key = htmlspecialchars($key);
-	uasort($array, create_function('$a,$b', 'return $a[\''.$key.'\'] - $b[\''.$key.'\'];'));
-return $array;
-}
-
-
-/* function:
- *	zbx_rksort
- *
- * description:
- *	Recursively sort an array by key
- *
- * author: Eugene Grigorjev
- */
-function zbx_rksort(&$array, $flags=NULL){
-	if(is_array($array)){
-		foreach($array as $id => $data)
-			zbx_rksort($array[$id]);
-
-		ksort($array,$flags);
-	}
-	return $array;
-}
-
-// This function will preserve keys!!!
-// author: Aly
-function zbx_array_merge(){
-	$args = func_get_args();
-
-	$result = array();
-	foreach($args as &$array){
-		if(!is_array($array)) return false;
-
-		foreach($array as $key => $value){
-			$result[$key] = $value;
-		}
-	}
-
-return $result;
-}
-/************* END SORT *************/
 
 
 /*************** CONVERTING ******************/
@@ -554,8 +491,8 @@ function mem2str($size){
 	return round($size, 6).$prefix;
 }
 
-// showUnits:  0/false - units off, 1/true - units short, 2 - units long
-function convert_units($value, $units, $showUnits=1){
+// convert:
+function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 // Special processing for unix timestamps
 	if($units=='unixtime'){
 		$ret=date('Y.m.d H:i:s',$value);
@@ -593,14 +530,25 @@ function convert_units($value, $units, $showUnits=1){
 
 // Any other unit
 //-------------------
+
 	switch($units){
+		case 'Bps':
 		case 'B':
 			$step=1024;
+			$convert = $convert?$convert:ITEM_CONVERT_NO_UNITS;
 			break;
 		case 'b':
 		case 'bps':
+			$convert = $convert?$convert:ITEM_CONVERT_NO_UNITS;
 		default:
 			$step = 1000;
+	}
+
+	if(zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS)){
+		if(round($value,2) == round($value,0)) $format = '%.0f %s';
+		else $format = '%.2f %s';
+
+		return sprintf($format, $value, $units);
 	}
 
 // INIT intervals
@@ -640,13 +588,13 @@ function convert_units($value, $units, $showUnits=1){
 //------
 	if(round($valUnit['value'],2) == round($valUnit['value'],0)) $format = '%.0f %s%s';
 	else $format = '%.2f %s%s';
-	
-	switch($showUnits){
-		case 0: $units = ''; 
+
+	switch($convert){
+		case 0: $units = trim($units); 
 		case 1: $desc = $valUnit['short']; break;
 		case 2: $desc = $valUnit['long']; break;
 	}
-	
+
 return sprintf($format, $valUnit['value'], $desc, $units);
 }
 
@@ -659,10 +607,10 @@ function zbx_avg($values){
 
 	$sum = 0;
 	foreach($values as $num => $value){
-		$sum += $value;
+		$sum = bcadd($sum, $value);
 	}
 
-return ($sum / count($values));
+return bcdiv($sum, count($values));
 }
 
 // accepts parametr as integer either
@@ -689,6 +637,15 @@ return false;
 
 // STRING FUNCTIONS {{{
 
+function zbx_nl2br(&$str){
+	$str_res = array();
+	$str_arr = explode("\n",$str);
+	foreach($str_arr as $id => $str_line){
+		array_push($str_res,$str_line,BR());
+	}
+return $str_res;
+}
+
 function zbx_strlen($str){
 	if(defined('ZBX_MBSTRINGS_ENABLED')){
 		return mb_strlen($str);
@@ -697,7 +654,8 @@ function zbx_strlen($str){
 		return strlen($str);
 	}
 	
-/* 	if(!$zbx_strlen = zbx_strlen($str)) return $zbx_strlen;
+/*
+	$zbx_strlen = strlen($zbx_strlen);
 
 	$reallen = 0;
 	$fbin= 1 << 7;
@@ -709,7 +667,8 @@ function zbx_strlen($str){
 	}
 
 return $reallen;
- */}
+//*/
+}
 
 function zbx_strstr($haystack, $needle){
 	if(defined('ZBX_MBSTRINGS_ENABLED')){
@@ -730,7 +689,7 @@ function zbx_stristr($haystack, $needle){
 		$needle = mb_strtoupper($needle);
 
 		$pos = mb_strpos($haystack_B, $needle);
-		if($pos !== true){
+		if($pos !== false){
 			$pos = mb_substr($haystack, $pos);
 		}
 		return $pos;
@@ -832,12 +791,89 @@ function zbx_strrpos($haystack, $needle){
 // }}} STRING FUNCTIONS
 
 
+// {{{ ARRAY UNCTIONS
+/************* SORT *************/
+function natksort(&$array) {
+	$keys = array_keys($array);
+	natcasesort($keys);
+
+	$new_array = array();
+
+	foreach ($keys as $k) {
+		$new_array[$k] = $array[$k];
+	}
+
+	$array = $new_array;
+	return true;
+}
+
+function asort_by_key(&$array, $key){
+	if(!is_array($array)) {
+		error(S_INCORRECT_TYPE_OF_ASORT_BY_KEY);
+		return array();
+	}
+
+	$key = htmlspecialchars($key);
+	uasort($array, create_function('$a,$b', 'return $a[\''.$key.'\'] - $b[\''.$key.'\'];'));
+return $array;
+}
+
+
+/* function:
+ *	zbx_rksort
+ *
+ * description:
+ *	Recursively sort an array by key
+ *
+ * author: Eugene Grigorjev
+ */
+function zbx_rksort(&$array, $flags=NULL){
+	if(is_array($array)){
+		foreach($array as $id => $data)
+			zbx_rksort($array[$id]);
+
+		ksort($array,$flags);
+	}
+	return $array;
+}
+/************* END SORT *************/
+
+function zbx_implodeHash($glue1, $glue2, $hash){
+	if(is_null($glue2)) $glue2 = $glue1;
+	$str = '';
+
+	foreach($hash as $key => $value){
+		if(!empty($str)) $str.= $glue1;
+		$str.= $key.$glue2.$value;
+	}
+
+return $str;
+}
+
+// This function will preserve keys!!!
+// author: Aly
+function zbx_array_merge(){
+	$args = func_get_args();
+
+	$result = array();
+	foreach($args as &$array){
+		if(!is_array($array)) return false;
+
+		foreach($array as $key => $value){
+			$result[$key] = $value;
+		}
+	}
+
+return $result;
+}
+
 function uint_in_array($needle,$haystack){
 //TODO: REMOVE
-	if(!empty($haystack) && !isset($haystack[0])){
+	if(!empty($haystack) && !is_numeric(key($haystack))){
 //		info('uint_in_array: possible pasted associated array');
 	}
 //----
+
 	foreach($haystack as $id => $value)
 		if(bccomp($needle,$value) == 0) return true;
 
@@ -866,15 +902,6 @@ function str_in_array($needle,$haystack,$strict=false){
 return false;
 }
 
-function zbx_nl2br(&$str){
-	$str_res = array();
-	$str_arr = explode("\n",$str);
-	foreach($str_arr as $id => $str_line){
-		array_push($str_res,$str_line,BR());
-	}
-return $str_res;
-}
-
 function zbx_value2array(&$values){
 	if(!is_array($values) && !is_null($values)){
 		$tmp = array();
@@ -891,7 +918,7 @@ function zbx_value2array(&$values){
 // fuunction: zbx_toHash
 // object or array of objects to hash
 // author: Aly
-function zbx_toHash(&$value, $field){
+function zbx_toHash(&$value, $field=null){
 	if(is_null($value)) return $value;
 	$result = array();
 
@@ -939,7 +966,7 @@ return $result;
 
 // function: zbx_toArray
 // author: Aly
-function zbx_toArray(&$value){
+function zbx_toArray($value){
 	if(is_null($value)) return $value;
 	$result = array();
 
@@ -984,27 +1011,30 @@ return $result;
 }
 
 function zbx_cleanHashes(&$value){
-
 	if(is_array($value) && ctype_digit((string) key($value))){
 		$value = array_values($value);
 	}
-	return $value;
-/*
-	$level++;
-//	if($level > 3) return $value;
-	if(is_array($value)){
-		if(ctype_digit((string) key($value))){
-			$value = array_values($value);
-		}
-
-		foreach($value as $key => $val){
-			if(!is_array($val)) continue;
-				$value[$key] = zbx_cleanHashes($val, $level);
-		}
-	}
 
 return $value;
-*/
+}
+// }}} ARRAY FUNCTION
+function zbx_array_mintersect($keys, $array){
+	$result = array();
+
+	foreach($keys as $field){
+		if(is_array($field)){
+			foreach($field as $sub_field){
+				if(isset($array[$sub_field])){
+					$result[$sub_field] = $array[$sub_field];
+					break;
+				}
+			}				
+		}
+		else if(isset($array[$field])){
+			$result[$field] = $array[$field];
+		}
+	}
+	return $result;
 }
 
 /************* END ZBX MISC *************/

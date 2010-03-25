@@ -588,6 +588,7 @@ table.header{
 	border-right-style: solid;
 	border-bottom-style: solid;
 	vertical-align: middle;
+	margin-bottom: 5px;
 }
 
 table.header tr td.header_l{

@@ -49,7 +49,7 @@
 #include "escalator/escalator.h"
 
 char *progname = NULL;
-char title_message[] = "Zabbix Server (daemon)";
+char title_message[] = "Zabbix Server";
 char usage_message[] = "[-hV] [-c <file>] [-n <nodeid>]";
 
 #ifndef HAVE_GETOPT_LONG
@@ -129,6 +129,7 @@ int	CONFIG_TRAPPER_TIMEOUT		= ZABBIX_TRAPPER_TIMEOUT;
 /**/
 /*int	CONFIG_NOTIMEWAIT		=0;*/
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
+int	CONFIG_MAX_HOUSEKEEPER_DELETE	= 500;		/* applies for every separate field value */
 int	CONFIG_SENDER_FREQUENCY		= 30;
 int	CONFIG_DBSYNCER_FORKS		= 1;
 int	CONFIG_DBSYNCER_FREQUENCY	= 5;
@@ -159,6 +160,7 @@ char	*CONFIG_DBSOCKET		= NULL;
 int	CONFIG_DBPORT			= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
+int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
 
 int	CONFIG_NODEID			= 0;
 int	CONFIG_MASTER_NODEID		= 0;
@@ -166,6 +168,8 @@ int	CONFIG_NODE_NOEVENTS		= 0;
 int	CONFIG_NODE_NOHISTORY		= 0;
 
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
+
+int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
 
 /* Global variable to control if we should write warnings to log[] */
 int	CONFIG_ENABLE_LOG		= 1;
@@ -212,6 +216,7 @@ void	init_config(void)
 		{"HistoryTextCacheSize",&CONFIG_TEXT_CACHE_SIZE,0,TYPE_INT,PARM_OPT,128*1024,1024*1024*1024},
 		{"CacheUpdateFrequency",&CONFIG_DBCONFIG_FREQUENCY,0,TYPE_INT,PARM_OPT,1,3600},
 		{"HousekeepingFrequency",&CONFIG_HOUSEKEEPING_FREQUENCY,0,TYPE_INT,PARM_OPT,1,24},
+		{"MaxHousekeeperDelete",&CONFIG_MAX_HOUSEKEEPER_DELETE,0,TYPE_INT,PARM_OPT,0,1000000},
 		{"SenderFrequency",&CONFIG_SENDER_FREQUENCY,0,TYPE_INT,PARM_OPT,5,3600},
 		{"TmpDir",&CONFIG_TMPDIR,0,TYPE_STRING,PARM_OPT,0,0},
 		{"FpingLocation",&CONFIG_FPING_LOCATION,0,TYPE_STRING,PARM_OPT,0,0},
@@ -245,6 +250,7 @@ void	init_config(void)
 		{"NodeNoEvents",&CONFIG_NODE_NOEVENTS,0,TYPE_INT,PARM_OPT,0,1},
 		{"NodeNoHistory",&CONFIG_NODE_NOHISTORY,0,TYPE_INT,PARM_OPT,0,1},
 		{"SSHKeyLocation",&CONFIG_SSH_KEY_LOCATION,0,TYPE_STRING,PARM_OPT,0,0},
+		{"LogSlowQueries",&CONFIG_LOG_SLOW_QUERIES,0,TYPE_INT,PARM_OPT,0,3600000},
 		{0}
 	};
 
@@ -291,6 +297,9 @@ void	init_config(void)
 	{
 		CONFIG_NODEWATCHER_FORKS = 0;
 	}
+#ifdef HAVE_SQLITE3
+	CONFIG_MAX_HOUSEKEEPER_DELETE = 0;
+#endif
 }
 
 /******************************************************************************
@@ -380,7 +389,7 @@ int MAIN_ZABBIX_ENTRY(void)
 
 	int		server_num = 0;
 
-	if(CONFIG_LOG_FILE == NULL)
+	if(CONFIG_LOG_FILE == NULL || ('\0' == *CONFIG_LOG_FILE))
 	{
 		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
 	}
@@ -425,7 +434,7 @@ int MAIN_ZABBIX_ENTRY(void)
 #	define IPV6_FEATURE_STATUS " NO"
 #endif
 
-	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. Zabbix %s (revision %s).",
+	zabbix_log( LOG_LEVEL_WARNING, "Starting Zabbix Server. Zabbix %s (revision %s).",
 			ZABBIX_VERSION,
 			ZABBIX_REVISION);
 

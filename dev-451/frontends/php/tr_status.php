@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -110,14 +110,15 @@ include_once('include/page_header.php');
 
 	if(isset($_REQUEST['favobj'])){
 		if(str_in_array($_REQUEST['favobj'] ,array('sound'))){
-			update_profile('web.tr_status.mute',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.tr_status.mute',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 		else if('filter' == $_REQUEST['favobj']){
-			update_profile('web.tr_status.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.tr_status.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -147,19 +148,19 @@ include_once('include/page_header.php');
 		$_REQUEST['show_details'] = get_request('show_details',	0);
 	}
 	else{
-		$_REQUEST['show_details'] = get_request('show_details',	get_profile('web.tr_status.filter.show_details', 0));
+		$_REQUEST['show_details'] = get_request('show_details',	CProfile::get('web.tr_status.filter.show_details', 0));
 	}
 
-	if(get_request('show_events') != get_profile('web.tr_status.filter.show_events')){
+	if(get_request('show_events') != CProfile::get('web.tr_status.filter.show_events')){
 		$url = new CUrl();
 		$path = $url->getPath();
 		insert_js('cookie.eraseArray("'.$path.'")');
 	}
 	
-	$_REQUEST['show_triggers'] = get_request('show_triggers', get_profile('web.tr_status.filter.show_triggers', TRIGGERS_OPTION_ONLYTRUE));
-	$_REQUEST['show_events'] = get_request('show_events', get_profile('web.tr_status.filter.show_events', EVENTS_OPTION_NOEVENT));
-	$_REQUEST['show_severity'] = get_request('show_severity', get_profile('web.tr_status.filter.show_severity', -1));
-	$_REQUEST['txt_select'] = get_request('txt_select', get_profile('web.tr_status.filter.txt_select', ''));
+	$_REQUEST['show_triggers'] = get_request('show_triggers', CProfile::get('web.tr_status.filter.show_triggers', TRIGGERS_OPTION_ONLYTRUE));
+	$_REQUEST['show_events'] = get_request('show_events', CProfile::get('web.tr_status.filter.show_events', EVENTS_OPTION_NOEVENT));
+	$_REQUEST['show_severity'] = get_request('show_severity', CProfile::get('web.tr_status.filter.show_severity', -1));
+	$_REQUEST['txt_select'] = get_request('txt_select', CProfile::get('web.tr_status.filter.txt_select', ''));
 
 	
 	
@@ -171,11 +172,11 @@ include_once('include/page_header.php');
 	$_REQUEST['show_triggers'] = (($_REQUEST['groupid'] == 0) && ($_REQUEST['hostid'] == 0) && ($_REQUEST['show_triggers'] == TRIGGERS_OPTION_ALL))
 		? TRIGGERS_OPTION_ONLYTRUE : $_REQUEST['show_triggers'];
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
-		update_profile('web.tr_status.filter.show_details', $_REQUEST['show_details'], PROFILE_TYPE_INT);
-		update_profile('web.tr_status.filter.show_triggers', $_REQUEST['show_triggers'], PROFILE_TYPE_INT);
-		update_profile('web.tr_status.filter.show_events', $_REQUEST['show_events'], PROFILE_TYPE_INT);
-		update_profile('web.tr_status.filter.show_severity', $_REQUEST['show_severity'], PROFILE_TYPE_INT);
-		update_profile('web.tr_status.filter.txt_select', $_REQUEST['txt_select'], PROFILE_TYPE_STR);
+		CProfile::update('web.tr_status.filter.show_details', $_REQUEST['show_details'], PROFILE_TYPE_INT);
+		CProfile::update('web.tr_status.filter.show_triggers', $_REQUEST['show_triggers'], PROFILE_TYPE_INT);
+		CProfile::update('web.tr_status.filter.show_events', $_REQUEST['show_events'], PROFILE_TYPE_INT);
+		CProfile::update('web.tr_status.filter.show_severity', $_REQUEST['show_severity'], PROFILE_TYPE_INT);
+		CProfile::update('web.tr_status.filter.txt_select', $_REQUEST['txt_select'], PROFILE_TYPE_STR);
 	}
 
 	$show_triggers = $_REQUEST['show_triggers'];
@@ -185,7 +186,7 @@ include_once('include/page_header.php');
 	validate_sort_and_sortorder('lastchange', ZBX_SORT_DOWN);
 
 
-	$mute = get_profile('web.tr_status.mute', 0);
+	$mute = CProfile::get('web.tr_status.mute', 0);
 	if(isset($audio) && !$mute){
 		play_sound($audio);
 	}
@@ -292,7 +293,7 @@ include_once('include/page_header.php');
 	$filterForm->addItemToBottomRow(new CButton('filter_set', S_FILTER));
 	$filterForm->addItemToBottomRow(new CButton('filter_rst', S_RESET));
 
-	$trigg_wdgt->addFlicker($filterForm, get_profile('web.tr_status.filter.state', 0));
+	$trigg_wdgt->addFlicker($filterForm, CProfile::get('web.tr_status.filter.state', 0));
 /*************** FILTER END ******************/
 
   	if($_REQUEST['fullscreen']){
@@ -345,6 +346,7 @@ include_once('include/page_header.php');
 		'filter' => 1,
 		'monitored' => 1,
 		'extendoutput' => 1,
+		'skipDependent' => 1,
 		'sortfield' => $sortfield,
 		'sortorder' => $sortorder,
 		'limit' => ($config['search_limit']+1)
@@ -386,11 +388,12 @@ include_once('include/page_header.php');
 		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 		'extendoutput' => 1,
 		'select_hosts' => 1,
-		'select_items' => 1
+		'select_items' => 1,
+		'select_dependencies' => 1
 	);
 	$triggers = CTrigger::get($options);
 	$triggers = zbx_toHash($triggers, 'triggerid');
-
+	
 	order_result($triggers, $sortfield, $sortorder);
 //---------
 
@@ -474,7 +477,8 @@ include_once('include/page_header.php');
 
 		$menu_trigger_conf = 'null';
 		if($admin_links){
-			$menu_trigger_conf = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript: redirect('triggers.php?form=update&triggerid=".$trigger['triggerid']."')\",
+			$menu_trigger_conf = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript: 
+				redirect('triggers.php?form=update&triggerid=".$trigger['triggerid'].'&switch_node='.id2nodeid($trigger['triggerid'])."')\",
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
 		$menu_trigger_url = 'null';
@@ -486,7 +490,7 @@ include_once('include/page_header.php');
 		$description->addAction('onclick',
 			"javascript: create_mon_trigger_menu(event, new Array({'triggerid': '".$trigger['triggerid'].
 				"', 'lastchange': '".$trigger['lastchange']."'}, ".$menu_trigger_conf.", ".$menu_trigger_url."),".
-			zbx_jsvalue($items).");"
+			zbx_jsvalue($items, true).");"
 		);
 // }}} trigger description js menu
 
@@ -499,26 +503,21 @@ include_once('include/page_header.php');
 		}
 
 // DEPENDENCIES {{{
-		$dependency = false;
-		$dep_table = new CTableInfo();
-		$dep_table->setAttribute('style', 'width: 200px;');
-		$dep_table->addRow(bold(S_DEPENDS_ON.':'));
+		if(!empty($trigger['dependencies'])){
+			$dep_table = new CTableInfo();
+			$dep_table->setAttribute('style', 'width: 200px;');
+			$dep_table->addRow(bold(S_DEPENDS_ON.':'));
 
-		$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_down='.$trigger['triggerid'];
-		$dep_res = DBselect($sql_dep);
-		while($dep_row = DBfetch($dep_res)){
-			$dep_table->addRow(SPACE.'-'.SPACE.expand_trigger_description($dep_row['triggerid_up']));
-			$dependency = true;
-		}
+			foreach($trigger['dependencies'] as $dep){
+				$dep_table->addRow(' - '.expand_trigger_description($dep['triggerid']));
+			}
 
-		if($dependency){
-			$img = new Cimg('images/general/down_icon.png','DEP_DOWN');
-			$img->setAttribute('style','vertical-align: middle; border: 0px;');
+			$img = new Cimg('images/general/down_icon.png', 'DEP_UP');
+			$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
 			$img->setHint($dep_table);
 
-			$description = array($img,SPACE,$description);
+			$description = array($img, SPACE, $description);
 		}
-		unset($img, $dep_table, $dependency);
 
 		$dependency = false;
 		$dep_table = new CTableInfo();
@@ -599,11 +598,8 @@ include_once('include/page_header.php');
 		if((time() - $trigger['lastchange']) < TRIGGER_BLINK_PERIOD){
 			$status->setAttribute('name', 'blink');
 		}
-		$lastchange = new CLink(
-			zbx_date2str(S_DATE_FORMAT_YMDHMS, $trigger['lastchange']),
-			'events.php?triggerid='.$trigger['triggerid'].'&nav_time='.$trigger['lastchange']
-		);
-
+		$lastchange = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS, $trigger['lastchange']), 'events.php?triggerid='.$trigger['triggerid']);
+		//.'&stime='.date('YmdHi', $trigger['lastchange']
 
 		if($config['event_ack_enable']){
 			if($trigger['event_count']){
@@ -651,7 +647,7 @@ include_once('include/page_header.php');
 
 
 		if($show_events != EVENTS_OPTION_NOEVENT){
-			$i = 0;
+			$i = 1;
 
 			foreach($trigger['events'] as $enum => $row_event){
 				$i++;
@@ -722,7 +718,7 @@ include_once('include/page_header.php');
 
 		$jsLocale = array(
 			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTES'
+			'S_NO_ELEMENTS_SELECTED'
 		);
 
 		zbx_addJSLocale($jsLocale);
@@ -733,12 +729,8 @@ include_once('include/page_header.php');
 	}
 //----
 
-// PAGING FOOTER
 	$table = array($paging, $table, $paging, $footer);
-//---------
-
 	$m_form->addItem($table);
-
 	$trigg_wdgt->addItem($m_form);
 	$trigg_wdgt->show();
 

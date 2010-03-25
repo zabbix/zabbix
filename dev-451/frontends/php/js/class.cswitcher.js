@@ -73,6 +73,8 @@ open : function(switcherid){
 
 showHide : function(e){
 //	var e = event || e;
+	PageRefresh.restart();
+	
 	var obj = e.currentTarget;
 
 	var switcherid = $(obj).readAttribute('data-switcherid');

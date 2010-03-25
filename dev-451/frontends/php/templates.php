@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,18 +32,18 @@ include_once('include/page_header.php');
 <?php
 //		VAR						TYPE		OPTIONAL FLAGS			VALIDATION	EXCEPTION
 	$fields=array(
-		'hosts'				=> array(T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID, 		NULL),
-		'groups'			=> array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID, 		NULL),
+		'hosts'				=> array(T_ZBX_INT,	O_OPT,	P_SYS,		DB_ID, 		NULL),
+		'groups'			=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID, 		NULL),
 		'clear_templates'	=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID, 		NULL),
-		'templates'			=> array(T_ZBX_STR, O_OPT,	NULL,			NULL,		NULL),
+		'templates'			=> array(T_ZBX_STR, O_OPT,	NULL,		NULL,		NULL),
 		'templateid'		=> array(T_ZBX_INT,	O_OPT,	P_SYS,		DB_ID,		'isset({form})&&({form}=="update")'),
 		'template_name'		=> array(T_ZBX_STR,	O_OPT,	NOT_EMPTY,	NULL,		'isset({save})'),
-		'groupid'			=> array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID,		NULL),
+		'groupid'			=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,		NULL),
 		'twb_groupid'		=> array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,		NULL),
-		'newgroup'			=> array(T_ZBX_STR, O_OPT,	NULL,			NULL,		NULL),
+		'newgroup'			=> array(T_ZBX_STR, O_OPT,	NULL,		NULL,		NULL),
 
 		'macros_rem'		=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'macros'			=> array(T_ZBX_STR, O_OPT, P_SYS,			NULL,	NULL),
+		'macros'			=> array(T_ZBX_STR, O_OPT, P_SYS,		NULL,	NULL),
 		'macro_new'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	'isset({macro_add})'),
 		'value_new'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	'isset({macro_add})'),
 		'macro_add'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -174,7 +174,13 @@ include_once('include/page_header.php');
 // CREATE NEW GROUP
 		$groups = zbx_toObject($groups, 'groupid');
 		if(!empty($newgroup)){
-			if($newgroup = CHostGroup::create(array('name' => $newgroup))){
+			$result = CHostGroup::create(array('name' => $newgroup));
+			$options = array(
+				'groupids' => $result['groupids'],
+				'output' => API_OUTPUT_EXTEND
+			);
+			$newgroup = CHostGroup::get($options);
+			if($newgroup){
 				$groups = array_merge($groups, $newgroup);
 			}
 			else{
@@ -190,16 +196,17 @@ include_once('include/page_header.php');
 
 // CREATE/UPDATE TEMPLATE {{{
 		if($templateid){
-			$template = array('templateid' => $templateid);
-			$result = CTemplate::update(array(
+			$template = array(
 				'templateid' => $templateid,
 				'host' => $template_name,
 				'groups' => $groups,
 				'templates' => $templates,
 				'templates_clear' => $templates_clear,
 				'hosts' => $hosts,
-				'macros' => get_request('macros', array()),
-			));
+				'macros' => get_request('macros', array())
+			);
+
+			$result = CTemplate::update($template);
 			if(!$result){
 				error(CTemplate::resetErrors());
 				$result = false;
@@ -209,16 +216,17 @@ include_once('include/page_header.php');
 			$msg_fail = S_CANNOT_UPDATE_TEMPLATE;
 		}
 		else{
-			$result = CTemplate::create(array(
+			$template = array(
 				'host' => $template_name,
 				'groups' => $groups,
 				'templates' => $templates,
 				'hosts' => $hosts,
 				'macros' => get_request('macros', array())
-			));
+			);
+			$result = CTemplate::create($template);
+
 			if($result){
-				$template = reset($result);
-				$templateid = $template['hostid'];
+				$templateid = reset($result['templateids']);
 			}
 			else{
 				error(CTemplate::resetErrors());
@@ -251,15 +259,23 @@ include_once('include/page_header.php');
 			}
 
 // Host triggers
-			$options = array(
-				'hostids' => $clone_templateid,
-				'inherited' => 0,
-				'output' => API_OUTPUT_REFER
-			);
-			$db_triggers = CTrigger::get($options);
-			foreach($db_triggers as $tnum => $db_trig){
-				$result &= (bool) copy_trigger_to_host($db_trig['triggerid'], $templateid, true);
-			}
+			$result &= copy_triggers($clone_templateid, $templateid);
+			
+			// $available_triggers = get_accessible_triggers(PERM_READ_ONLY, array($clone_templateid), PERM_RES_IDS_ARRAY);
+
+			// $sql = 'SELECT DISTINCT t.triggerid, t.description '.
+					// ' FROM triggers t, items i, functions f'.
+					// ' WHERE i.hostid='.$clone_templateid.
+						// ' AND f.itemid=i.itemid '.
+						// ' AND t.triggerid=f.triggerid '.
+						// ' AND '.DBcondition('t.triggerid', $available_triggers).
+						// ' AND t.templateid=0 '.
+					// ' ORDER BY t.description';
+
+			// $res = DBselect($sql);
+			// while($db_trig = DBfetch($res)){
+				// $result &= (bool) copy_trigger_to_host($db_trig['triggerid'], $templateid, true);
+			// }
 
 // Host graphs
 			$options = array(
@@ -357,7 +373,6 @@ include_once('include/page_header.php');
 	}
 
 	show_table_header(S_CONFIGURATION_OF_TEMPLATES, $frmForm);
-	echo SBR;
 ?>
 <?php
 	if(isset($_REQUEST['form'])){
@@ -396,12 +411,19 @@ include_once('include/page_header.php');
 
 		if(($templateid > 0) && !isset($_REQUEST['form_refresh'])){
 // get template groups from db
-			$options = array('hostids' => $templateid, 'editable' => 1);
+			$options = array(
+				'hostids' => $templateid,
+				'editable' => 1
+			);
 			$groups = CHostGroup::get($options);
 			$groups = zbx_objectValues($groups, 'groupid');
 
 // get template hosts from db
-			$params = array('templateids' => $templateid, 'editable' => 1, 'templated_hosts' => 1);
+			$params = array(
+				'templateids' => $templateid,
+				'editable' => 1,
+				'templated_hosts' => 1
+			);
 			$hosts_linked_to = CHost::get($params);
 			$hosts_linked_to = zbx_objectValues($hosts_linked_to, 'hostid');
 			$hosts_linked_to = zbx_toHash($hosts_linked_to, 'hostid');
@@ -409,6 +431,9 @@ include_once('include/page_header.php');
 		}
 		else{
 			$groups = get_request('groups', array());
+			if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid']>0) && !uint_in_array($_REQUEST['groupid'], $groups)){
+				array_push($groups, $_REQUEST['groupid']);
+			}
 			$hosts_linked_to = get_request('hosts', array());
 		}
 
@@ -510,7 +535,11 @@ include_once('include/page_header.php');
 			$items_lbx = new CListBox('items', null, 8);
 			$items_lbx->setAttribute('disabled', 'disabled');
 
-			$options = array('editable' => 1, 'hostids' => $templateid, 'extendoutput' => 1);
+			$options = array(
+				'editable' => 1,
+				'hostids' => $templateid,
+				'output' => API_OUTPUT_EXTEND
+			);
 			$template_items = CItem::get($options);
 
 			if(empty($template_items)){
@@ -621,7 +650,11 @@ include_once('include/page_header.php');
 		$frmForm->setMethod('get');
 
 // combo for group selection
-		$groups = CHostGroup::get(array('editable' => 1, 'extendoutput' => 1));
+		$options = array(
+			'editable' => 1,
+			'extendoutput' => 1
+		);
+		$groups = CHostGroup::get($options);
 		order_result($groups, 'name');
 
 		$cmbGroups = new CComboBox('groupid', $PAGE_GROUPS['selected'], 'javascript: submit();');
@@ -659,7 +692,6 @@ include_once('include/page_header.php');
 		$sortfield = getPageSortField('host');
 		$sortorder = getPageSortOrder();
 		$options = array(
-			'extendoutput' => 1,
 			'editable' => 1,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
@@ -678,12 +710,12 @@ include_once('include/page_header.php');
 		$options = array(
 			'templateids' => zbx_objectValues($templates, 'templateid'),
 			'output' => API_OUTPUT_EXTEND,
-			'select_hosts' => API_OUTPUT_EXTEND,
-			'select_templates' => API_OUTPUT_EXTEND,
-			'select_items' => API_OUTPUT_REFER,
-			'select_triggers' => API_OUTPUT_REFER,
-			'select_graphs' => API_OUTPUT_REFER,
-			'select_applications' => API_OUTPUT_REFER,
+			'select_hosts' => array('hostid','host','status'),
+			'select_templates' => array('hostid','host','status'),
+			'select_items' => API_OUTPUT_COUNT,
+			'select_triggers' => API_OUTPUT_COUNT,
+			'select_graphs' => API_OUTPUT_COUNT,
+			'select_applications' => API_OUTPUT_COUNT,
 			'nopermissions' => 1
 		);
 
@@ -700,13 +732,13 @@ include_once('include/page_header.php');
 			$templates_output[] = new CLink($template['host'], 'templates.php?form=update&templateid='.$template['templateid'].url_param('groupid'));
 
 			$applications = array(new CLink(S_APPLICATIONS,'applications.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$template['templateid']),
-				' ('.count($template['applications']).')');
+				' ('.$template['applications'].')');
 			$items = array(new CLink(S_ITEMS,'items.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$template['templateid']),
-				' ('.count($template['items']).')');
+				' ('.$template['items'].')');
 			$triggers = array(new CLink(S_TRIGGERS,'triggers.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$template['templateid']),
-				' ('.count($template['triggers']).')');
+				' ('.$template['triggers'].')');
 			$graphs = array(new CLink(S_GRAPHS,'graphs.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$template['templateid']),
-				' ('.count($template['graphs']).')');
+				' ('.$template['graphs'].')');
 
 			$i = 0;
 			$linked_templates_output = array();
@@ -729,7 +761,7 @@ include_once('include/page_header.php');
 			$i = 0;
 			$linked_to_hosts_output = array();
 			order_result($template['hosts'], 'host');
-			foreach($template['hosts'] as $snum => $linked_to_host){
+			foreach($template['hosts'] as $snum => $linked_to_host){ 
 				$i++;
 				if($i > $config['max_in_table']){
 					$linked_to_hosts_output[] = '...';
@@ -787,7 +819,7 @@ include_once('include/page_header.php');
 
 		$jsLocale = array(
 			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTES'
+			'S_NO_ELEMENTS_SELECTED'
 		);
 
 		zbx_addJSLocale($jsLocale);

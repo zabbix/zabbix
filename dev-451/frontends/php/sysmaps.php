@@ -21,14 +21,27 @@
 <?php
 require_once('include/config.inc.php');
 require_once('include/maps.inc.php');
+require_once('include/ident.inc.php');
 require_once('include/forms.inc.php');
 
-$page['title'] = 'S_NETWORK_MAPS';
-$page['file'] = 'sysmaps.php';
-$page['hist_arg'] = array();
+if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['maps'])){
+	$EXPORT_DATA = true;
+
+	$page['type'] = $page['type'] = detect_page_type(PAGE_TYPE_XML);
+	$page['file'] = 'zbx_maps_export.xml';
+
+	require_once('include/export.inc.php');
+}
+else{
+	$EXPORT_DATA = false;
+
+	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+	$page['title'] = 'S_NETWORK_MAPS';
+	$page['file'] = 'sysmaps.php';
+	$page['hist_arg'] = array();
+}
 
 include_once('include/page_header.php');
-
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -43,18 +56,24 @@ include_once('include/page_header.php');
 		'highlight'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
 		'label_type'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,4),		'isset({save})'),
 		'label_location'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,3),		'isset({save})'),
-/* Actions */
+
+// Actions
 		'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS, NULL,	NULL),
 		'go'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
-/* Form */
+
+// Form
 		'form'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
+		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL),
+
+// Import
+		'rules' =>			array(T_ZBX_STR, O_OPT,	null,	DB_ID,		null),
+		'import' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL)
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('name',ZBX_SORT_UP);
+	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 	if(isset($_REQUEST['sysmapid'])){
 		$options = array(
@@ -70,7 +89,51 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
+// EXPORT ///////////////////////////////////
 
+	if($EXPORT_DATA){
+// SELECT MAPS
+		$maps = get_request('maps', array());
+
+		$options = array(
+			'sysmapids' => $maps,
+			'select_selements' => API_OUTPUT_EXTEND,
+			'select_links' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND
+		);
+
+		$sysmaps = CMap::get($options);
+
+		prepareMapExport($sysmaps);
+
+		$xml = zbxXML::arrayToXML($sysmaps, 'sysmaps');
+		print($xml);
+
+		exit();
+	}
+
+// IMPORT ///////////////////////////////////
+	$rules = get_request('rules', array());
+	if(!isset($_REQUEST['form_refresh'])){
+		foreach(array('map') as $key){
+			$rules[$key]['exist'] = 1;
+			$rules[$key]['missed'] = 1;
+		}
+	}
+
+	if(isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])){
+		require_once('include/export.inc.php');
+		DBstart();
+
+		$result = zbxXML::import($_FILES['import_file']['tmp_name']);
+		if($result) $result = zbxXML::parseMap($rules);
+
+		$result = DBend($result);
+		show_messages($result, S_IMPORTED.SPACE.S_SUCCESSEFULLY_SMALL, S_IMPORT.SPACE.S_FAILED_SMALL);
+	}
+
+?>
+<?php
 	$_REQUEST['go'] = get_request('go', 'none');
 
 	if(isset($_REQUEST["save"])){
@@ -171,13 +234,17 @@ include_once('include/page_header.php');
 	$form->setMethod('get');
 
 	$form->addItem(new CButton('form', S_CREATE_MAP));
+	$form->addItem(new CButton('form', S_IMPORT_MAP));
+
 	show_table_header(S_CONFIGURATION_OF_NETWORK_MAPS, $form);
-	echo SBR;
 ?>
 <?php
 //	COpt::savesqlrequest(0,'/////////////////////////////////////////////////////////////////////////////////////////////////////////');
-	if(isset($_REQUEST["form"])){
-		insert_map_form();
+	if(isset($_REQUEST['form'])){
+		if($_REQUEST['form'] == S_IMPORT_MAP)
+			import_map_form($rules);
+		else if(($_REQUEST['form'] == S_CREATE_MAP) || ($_REQUEST['form'] == 'update'))
+			insert_map_form();
 	}
 	else{
 		$map_wdgt = new CWidget();
@@ -229,8 +296,11 @@ include_once('include/page_header.php');
 
 // goBox
 		$goBox = new CComboBox('go');
+		$goBox->addItem('export', S_EXPORT_SELECTED);
+
 		$goOption = new CComboItem('delete', S_DELETE_SELECTED);
 		$goOption->setAttribute('confirm',S_DELETE_SELECTED_MAPS_Q);
+
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
@@ -239,7 +309,7 @@ include_once('include/page_header.php');
 
 		$jsLocale = array(
 			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTES'
+			'S_NO_ELEMENTS_SELECTED'
 		);
 
 		zbx_addJSLocale($jsLocale);

@@ -27,8 +27,6 @@ $page['file'] = 'tr_testexpr.php';
 
 define('ZBX_PAGE_NO_MENU', 1);
 
-
-define('S_0_OR_1', '0 or 1');
 define('VALUE_TYPE_UNKNOWN', '#ERROR#');
 define('COMBO_PATTERN', 'str_in_array({},array(');
 define('COMBO_PATTERN_LENGTH', zbx_strlen(COMBO_PATTERN));
@@ -99,7 +97,7 @@ include_once('include/page_header.php');
 	$frm_test->setHelp('web.testexpr.service.php');
 	$frm_test->setTableClass('formlongtable formtable');
 	$frm_test->addVar('form_refresh', get_request('form_refresh', 1));
-	$frm_test->addVar('expression', $expression);
+	$frm_test->addVar('expression', urlencode($expression));
 
 /* test data */
 	$frm_test->addRow(S_TEST_DATA, $data_table);

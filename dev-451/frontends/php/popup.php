@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -137,7 +137,7 @@
 			break;
 	}
 
-	$page['file'] = "popup.php";
+	$page['file'] = 'popup.php';
 	$page['scripts'] = array();
 
 	define('ZBX_PAGE_NO_MENU', 1);
@@ -208,18 +208,23 @@ include_once('include/page_header.php');
 	$excludeids = get_request('excludeids', null);
 
 
-
-	$monitored_hosts	= get_request('monitored_hosts', 0);
 	$real_hosts			= get_request('real_hosts', 0);
+	$monitored_hosts	= get_request('monitored_hosts', 0);
+	$templated_hosts	= get_request('templated_hosts', 0);
 	$only_hostid		= get_request('only_hostid', null);
 
-	$host_status = array();
-	if ($monitored_hosts)
-		array_push($host_status, HOST_STATUS_MONITORED);
-	else if ($real_hosts)
-		array_push($host_status, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
-	else
-		array_push($host_status, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE);
+	$host_status = null;
+	$templated = null;
+	if($real_hosts){
+		$templated = 0;
+	}
+	else if($monitored_hosts){
+		$host_status = 'monitored_hosts';
+	}
+	else if($templated_hosts){
+		$templated = 1;
+		$host_status = 'templated_hosts';
+	}
 ?>
 <?php
 	global $USER_DETAILS;
@@ -285,7 +290,7 @@ include_once('include/page_header.php');
 	$validation_param = array('deny_all','select_first_group_if_empty','select_first_host_if_empty','select_host_on_group_switch');
 	if($monitored_hosts) array_push($validation_param, 'monitored_hosts');
 	if($real_hosts) 	array_push($validation_param, 'real_hosts');
-	if(isset($templated_hosts)) array_push($validation_param, 'templated_hosts');
+//	if(isset($templated_hosts)) array_push($validation_param, 'templated_hosts');
 
 	$nodeid = get_request('nodeid', get_current_nodeid(false));
 
@@ -345,11 +350,11 @@ include_once('include/page_header.php');
 			}
 
 			$frmTitle->addItem(array(S_GROUP,SPACE,$cmbGroups));
-			update_profile('web.popup.groupid',$groupid);
+			CProfile::update('web.popup.groupid',$groupid,PROFILE_TYPE_ID);
 		}
 
 		if(str_in_array($srctbl,array('help_items'))){
-			$itemtype = get_request('itemtype',get_profile('web.popup.itemtype',0));
+			$itemtype = get_request('itemtype',CProfile::get('web.popup.itemtype',0));
 			$cmbTypes = new CComboBox('itemtype',$itemtype,'javascript: submit();');
 			foreach($allowed_item_types as $type)
 				$cmbTypes->addItem($type, item_type2str($type));
@@ -365,10 +370,10 @@ include_once('include/page_header.php');
 			}
 
 			$frmTitle->addItem(array(SPACE,S_HOST,SPACE,$cmbHosts));
-			update_profile('web.popup.hostid',$hostid);
+			CProfile::update('web.popup.hostid',$hostid,PROFILE_TYPE_ID);
 		}
 
-		if(str_in_array($srctbl,array('triggers','hosts'))){
+		if(str_in_array($srctbl,array('triggers','hosts','host_group'))){
 			$btnEmpty = new CButton('empty',S_EMPTY,
 				get_window_opener($dstfrm, $dstfld1, 0).
 				get_window_opener($dstfrm, $dstfld2, '').
@@ -394,6 +399,7 @@ include_once('include/page_header.php');
 				'sortfield'=>'host'
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
+		if(!is_null($host_status)) $options[$host_status] = 1;
 
 		$hosts = CHost::get($options);
 
@@ -554,8 +560,12 @@ include_once('include/page_header.php');
 		$hostgroups = CHostGroup::get($options);
 		order_result($hostgroups, 'name');
 
-		foreach($hostgroups as $tnu => $row){
+		foreach($hostgroups as $gnum => $row){
+			$row['node_name'] = get_node_name_by_elid($row['groupid'], true);
 			$name = new CSpan($row['name'],'link');
+
+			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
+			$row['name'] = $row['node_name'].$row['name'];
 
 			if(isset($_REQUEST['reference'])){
 				$cmapid = get_request('cmapid',0);
@@ -762,6 +772,7 @@ include_once('include/page_header.php');
 				'select_dependencies' => 1
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
+		if(!is_null($templated)) $options['templated'] = $templated;
 
 		$triggers = CTrigger::get($options);
 		order_result($triggers, 'description');
@@ -772,7 +783,6 @@ include_once('include/page_header.php');
 
 			$exp_desc = expand_trigger_description_by_data($row);
 			$description = new CSpan($exp_desc, 'link');
-
 
 			if($multiselect) {
 				$js_action = 'add_selected_values("'.S_TRIGGERS.'", "'.$dstfrm.'", "'.$dstfld1.'", "'.$dstact.'", "'.$row["triggerid"].'");';
@@ -800,7 +810,7 @@ include_once('include/page_header.php');
 					}
 				}
 				else{
-					$js_action = 'add_value("'.$dstfld1.'", "'.$dstfld2.'", "'.$row["triggerid"].'", "'.$row['host'].':'.$exp_desc.'");';
+					$js_action = 'add_value("'.$dstfld1.'", "'.$dstfld2.'", "'.$row["triggerid"].'", '.zbx_jsvalue($row['host'].':'.$exp_desc).');';
 				}
 			}
 
@@ -871,13 +881,16 @@ include_once('include/page_header.php');
 		$options = array(
 				'nodeids' => $nodeid,
 				'hostids'=>$hostid,
-				'extendoutput' => 1,
-				'select_hosts' => 1,
-				'filter' => 1,
-				'valuetype' => ITEM_VALUE_TYPE_LOG,
+				'output' => API_OUTPUT_EXTEND,
+				'select_hosts' => API_OUTPUT_EXTEND,
+				'filter' => array(
+					'value_type' => ITEM_VALUE_TYPE_LOG,
+				),
+				
 				'sortfield'=>'description'
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
+		if(!is_null($templated)) $options['templated'] = $templated;
 
 		$items = CItem::get($options);
 
@@ -921,11 +934,12 @@ include_once('include/page_header.php');
 				'nodeids' => $nodeid,
 				'hostids' => $hostid,
 				'webitems' => 1,
-				'extendoutput' => 1,
-				'select_hosts' => 1,
+				'output' => API_OUTPUT_EXTEND,
+				'select_hosts' => API_OUTPUT_EXTEND,
 				'sortfield'=>'description'
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
+		if(!is_null($templated)) $options['templated'] = $templated;
 
 		$items = CItem::get($options);
 
@@ -970,7 +984,7 @@ include_once('include/page_header.php');
 				' WHERE h.hostid=a.hostid '.
 					' AND '.DBin_node('a.applicationid', $nodeid).
 					' AND '.DBcondition('h.hostid',$available_hosts).
-					' AND h.status in ('.implode(',', $host_status).')'.
+					// ' AND h.status in ('.implode(',', $host_status).')'.
 					' AND h.hostid='.$hostid.
 				' ORDER BY h.host,a.name';
 
@@ -1028,11 +1042,12 @@ include_once('include/page_header.php');
 
 		$options = array(
 			'hostids' => $hostid,
-			'extendoutput' => 1,
+			'output' => API_OUTPUT_EXTEND,
 			'nodeids' => $nodeid,
-			'select_hosts' => 1
+			'select_hosts' => API_OUTPUT_EXTEND
 		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
+		if(!is_null($templated)) $options['templated'] = $templated;
 
 		$graphs = CGraph::get($options);
 		order_result($graphs, 'name');
@@ -1094,16 +1109,18 @@ include_once('include/page_header.php');
 
 		$options = array(
 				'nodeids' => $nodeid,
-				'hostids'=>$hostid,
-				'extendoutput' => 1,
-				'select_hosts' => 1,
+				'hostids' => $hostid,
+				'output' => API_OUTPUT_EXTEND,
+				'select_hosts' => API_OUTPUT_EXTEND,
 				'templated' => 0,
-				'filter' => 1,
-				'valuetype' => array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64),
-				'status' => ITEM_STATUS_ACTIVE,
+				'filter' => array(
+					'value_type' => array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64),
+					'status' => ITEM_STATUS_ACTIVE
+				),
 				'sortfield'=>'description'
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
+		if(!is_null($templated)) $options['templated'] = $templated;
 
 		$items = CItem::get($options);
 
@@ -1149,6 +1166,9 @@ include_once('include/page_header.php');
 		$table = new CTableInfo(S_NO_MAPS_DEFINED);
 		$table->setHeader(array(S_NAME));
 
+		$excludeids = get_request('excludeids', array());
+		$excludeids = zbx_toHash($excludeids);
+
 		$options = array(
 			'nodeids' => $nodeid,
 			'extendoutput' => 1
@@ -1159,6 +1179,8 @@ include_once('include/page_header.php');
 		order_result($maps, 'name');
 
 		foreach($maps as $mnum => $row){
+			if(isset($excludeids[$row['sysmapid']])) continue;
+
 			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
 			$name = $row['node_name'].$row['name'];
 
@@ -1196,14 +1218,16 @@ include_once('include/page_header.php');
 		$options = array(
 				'nodeids' => $nodeid,
 				'hostids'=> $hostid,
-				'extendoutput' => 1,
-				'select_hosts' => 1,
+				'output' => API_OUTPUT_EXTEND,
+				'select_hosts' => API_OUTPUT_EXTEND,
 				'templated' => 0,
-				'filter' => 1,
-				'status' => ITEM_STATUS_ACTIVE,
+				'filter' => array(
+					'status' => ITEM_STATUS_ACTIVE
+				),
 				'sortfield'=>'description'
 			);
 		if(!is_null($writeonly)) $options['editable'] = 1;
+		if(!is_null($templated)) $options['templated'] = $templated;
 
 		$items = CItem::get($options);
 
@@ -1338,18 +1362,21 @@ include_once('include/page_header.php');
 		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
 		$table->setHeader(S_NAME);
 
-		$result = DBselect('SELECT DISTINCT n.name as node_name,g.groupid,g.name '.
-						' FROM hosts_groups hg,hosts h,groups g '.
-							' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('g.groupid').
-						' WHERE '.DBin_node('g.groupid',$nodeid).
-							' AND g.groupid=hg.groupid '.
-							' AND hg.hostid=h.hostid '.
-							' AND h.status='.HOST_STATUS_MONITORED.
-						' ORDER BY g.name');
-		while($row=DBfetch($result)){
-			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
+		$options = array(
+				'nodeids' => $nodeid,
+				'monitored_hosts' => 1,
+				'extendoutput' => 1
+			);
+		if(!is_null($writeonly)) $options['editable'] = 1;
 
-			$name = new CLink($row['name'],'#');
+		$hostgroups = CHostGroup::get($options);
+		order_result($hostgroups, 'name');
+
+		foreach($hostgroups as $gnum => $row){
+			$row['node_name'] = get_node_name_by_elid($row['groupid']);
+			$name = new CSpan($row['name'],'link');
+
+			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
 			$row['name'] = $row['node_name'].$row['name'];
 
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){

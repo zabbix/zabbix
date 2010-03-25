@@ -35,6 +35,8 @@
 	}
 //------------------------------------- </HISTORY> --------------------------------------
 
+	CProfile::flush();
+	
 // END Transactions if havn't been -----------------
 	if(isset($DB) && isset($DB['TRANSACTIONS']) && ($DB['TRANSACTIONS'] != 0)){
 		error(S_TRANSACTION_HAVE_NOT_BEEN_CLOSED_ABORTING);

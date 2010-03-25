@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,8 +106,8 @@ return true;
 		}
 
 		$btnSelect = new CButton('btn1', S_SELECT,
-			"return PopUp('popup.php?dstfrm=".$frmCnct->getName().
-			"&dstfld1=triggerid&dstfld2=desc_exp&srctbl=triggers&srcfld1=triggerid&srcfld2=description');",
+			"return PopUp('popup.php?real_hosts=1&dstfrm=".$frmCnct->getName().
+			"&dstfld1=triggerid&dstfld2=desc_exp&srctbl=triggers&srcfld1=triggerid&srcfld2=description&writeonly=1');",
 			'T');
 		$btnSelect->setType('button');
 
@@ -124,9 +124,7 @@ return true;
 
 		$frmCnct->Show();
 	}
-?>
-<?php
 
+	
 	require_once('include/page_footer.php');
-
 ?>

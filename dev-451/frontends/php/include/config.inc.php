@@ -17,48 +17,34 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-function SDB($return=false){
-	$backtrace = debug_backtrace();
-	array_shift($backtrace);
-	$result = 'DEBUG BACKTRACE: <br/>';
-	foreach($backtrace as $n => $bt){
-		$result .= '  --['.$n.']-- '.$bt['file'].' : '.$bt['line'].' | ';
-		$result .= isset($bt['class']) ? $bt['class'].$bt['type'].$bt['function'] : $bt['function'];
-		$result .= '( '.print_r($bt['args'], true).' ) <br/>';
-	}
-	if($return) return $result;
-	else echo $result;
-}
-function SDI($msg='SDI') { echo 'DEBUG INFO: '; var_dump($msg); echo SBR; } // DEBUG INFO!!!
-function SDII($msg='SDII') { echo 'DEBUG INFO: '; echo '<pre>'.print_r($msg, true).'</pre>'; echo SBR; } // DEBUG INFO!!!
-function VDP($var, $msg=null) { echo 'DEBUG DUMP: '; if(isset($msg)) echo '"'.$msg.'"'.SPACE; var_dump($var); echo SBR; } // DEBUG INFO!!!
-function TODO($msg) { echo 'TODO: '.$msg.SBR; }  // DEBUG INFO!!!
+	require_once('include/debug.inc.php');
+	
 function __autoload($class_name){
 	$class_name = zbx_strtolower($class_name);
 	$api = array(
-		'czbxapi' => 1,
-		'capiinfo' => 1,
+		'apiexception' => 1,
 		'caction' => 1,
 		'calert' => 1,
+		'capiinfo' => 1,
 		'capplication' => 1,
 		'cevent' => 1,
 		'cgraph' => 1,
+		'cgraphitem' => 1,
 		'chost' => 1,
 		'chostgroup' => 1,
+		'cimage' => 1,
 		'citem' => 1,
 		'cmaintenance' => 1,
-		'cproxy' => null,
+		'cmap' => 1,
+		'cproxy' => 1,
+		'cscreen' => 1,
 		'cscript' => 1,
 		'ctemplate' => 1,
 		'ctrigger' => 1,
 		'cuser' => 1,
 		'cusergroup' => 1,
 		'cusermacro' => 1,
-		'cscreen' => 1,
-		'cmap' => 1,
-		'cgraphitem' => 1,
-		'cproxy' => 1,
-		'apiexception' => 1,
+		'czbxapi' => 1
 	);
 
 	$rpc = array(
@@ -350,8 +336,8 @@ function __autoload($class_name){
 					$row[] = $msg_col;
 
 					if(isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)){
-						$msg_details = new CDiv(array(S_DETAILS),'pointer');
-						$msg_details->addAction('onclick',new CJSscript("javascript: ShowHide('msg_messages', IE?'block':'table');"));
+						$msg_details = new CDiv(S_DETAILS,'blacklink');
+						$msg_details->setAttribute('onclick',new CJSscript("javascript: ShowHide('msg_messages', IE?'block':'table');"));
 						$msg_details->setAttribute('title',S_MAXIMIZE.'/'.S_MINIMIZE);
 						array_unshift($row, new CCol($msg_details,'clr'));
 					}
@@ -540,24 +526,25 @@ function __autoload($class_name){
 				' WHERE t.value='.TRIGGER_VALUE_TRUE.
 					' AND '.DBin_node('t.triggerid').
 					' AND exists('.
-							'SELECT e.eventid '.
-							' FROM events e '.
-							' WHERE e.object='.EVENT_OBJECT_TRIGGER.
-								' AND e.objectid=t.triggerid '.
-								' AND e.acknowledged=0'.
-							')';
+						'SELECT e.eventid '.
+						' FROM events e '.
+						' WHERE e.object='.EVENT_OBJECT_TRIGGER.
+							' AND e.objectid=t.triggerid '.
+							' AND e.acknowledged=0'.
+						')';
        	$result=DBselect($sql);
 		while($row=DBfetch($result)){
-			$triggerids = $triggerids.','.$row['triggerid'];
+			$triggerids.= ','.$row['triggerid'];
 			$priority[$row['priority']]++;
 		}
 
-		$md5sum=md5($triggerids);
+		$md5sum = md5($triggerids);
 
-		$priorities=0;
-		for($i=0;$i<=5;$i++)	$priorities += pow(100,$i)*$priority[$i];
+		$priorities = 0;
+		for($i=0; $i<=5; $i++)
+			$priorities += pow(100,$i)*$priority[$i];
 
-		return	"$priorities,$md5sum";
+	return	$priorities.','.$md5sum;
 	}
 
 	function parse_period($str){
@@ -700,7 +687,7 @@ function __autoload($class_name){
 	function validate_float($str){
 //		echo "Validating float:$str<br>";
 //		if (eregi('^[ ]*([0-9]+)((\.)?)([0-9]*[KMG]{0,1})[ ]*$', $str, $arr)) {
-		if(preg_match('/^[ ]*([0-9]+)((\.)?)([0-9]*[KMG]{0,1})[ ]*$/i', $str, $arr)) {
+		if(preg_match('/^[ ]*([0-9]+)((\.)?)([0-9]*[KMGTsmhdw]{0,1})[ ]*$/i', $str, $arr)) {
 			return 0;
 		}
 		else{
@@ -817,13 +804,12 @@ function __autoload($class_name){
 
 
 		/* Comments: !!! Don't forget sync code with C !!! */
-		$result=DBselect('SELECT i.type, i.delay, count(*),count(*)/i.delay as qps '.
+		$result=DBselect('SELECT i.type, i.delay, count(*)/i.delay as qps '.
 							' FROM items i,hosts h '.
 							' WHERE i.status='.ITEM_STATUS_ACTIVE.
 								' AND i.hostid=h.hostid '.
 								' AND h.status='.HOST_STATUS_MONITORED.
-							' GROUP BY i.type,i.delay '.
-							' ORDER BY i.type, i.delay');
+							' GROUP BY i.type,i.delay ');
 
 		$status['qps_total']=0;
 		while($row=DBfetch($result)){
@@ -1131,19 +1117,19 @@ function __autoload($class_name){
 	function validate_sort_and_sortorder($sort=NULL,$sortorder=ZBX_SORT_UP){
 		global $page;
 
-		$_REQUEST['sort'] = get_request('sort',get_profile('web.'.$page['file'].'.sort',$sort));
-		$_REQUEST['sortorder'] = get_request('sortorder',get_profile('web.'.$page['file'].'.sortorder',$sortorder));
+		$_REQUEST['sort'] = get_request('sort',CProfile::get('web.'.$page['file'].'.sort',$sort));
+		$_REQUEST['sortorder'] = get_request('sortorder',CProfile::get('web.'.$page['file'].'.sortorder',$sortorder));
 
 		if(!is_null($_REQUEST['sort'])){
 //			$_REQUEST['sort'] = eregi_replace('[^a-z\.\_]','',$_REQUEST['sort']);
 			$_REQUEST['sort'] = preg_replace('/[^a-z\.\_]/i','',$_REQUEST['sort']);
-			update_profile('web.'.$page['file'].'.sort', $_REQUEST['sort'], PROFILE_TYPE_STR);
+			CProfile::update('web.'.$page['file'].'.sort', $_REQUEST['sort'], PROFILE_TYPE_STR);
 		}
 
 		if(!str_in_array($_REQUEST['sortorder'],array(ZBX_SORT_DOWN,ZBX_SORT_UP)))
 			$_REQUEST['sortorder'] = ZBX_SORT_UP;
 
-		update_profile('web.'.$page['file'].'.sortorder', $_REQUEST['sortorder'], PROFILE_TYPE_STR);
+		CProfile::update('web.'.$page['file'].'.sortorder', $_REQUEST['sortorder'], PROFILE_TYPE_STR);
 	}
 
 /* function:
@@ -1240,14 +1226,14 @@ function __autoload($class_name){
 
 	function getPageSortField($def){
 		global $page;
-		$tabfield = get_request('sort',get_profile('web.'.$page['file'].'.sort',$def));
+		$tabfield = get_request('sort',CProfile::get('web.'.$page['file'].'.sort',$def));
 
 	return $tabfield;
 	}
 
 	function getPageSortOrder($def=ZBX_SORT_UP){
 		global $page;
-		$sortorder = get_request('sortorder',get_profile('web.'.$page['file'].'.sortorder',$def));
+		$sortorder = get_request('sortorder',CProfile::get('web.'.$page['file'].'.sortorder',$def));
 
 	return $sortorder;
 	}
@@ -1282,8 +1268,8 @@ function __autoload($class_name){
 
 		if(empty($data)) return false;
 
-		$sortfield = get_request('sort',get_profile('web.'.$page['file'].'.sort',$def_field));
-		$sortorder = get_request('sortorder',get_profile('web.'.$page['file'].'.sortorder',$def_order));
+		$sortfield = get_request('sort',CProfile::get('web.'.$page['file'].'.sort',$def_field));
+		$sortorder = get_request('sortorder',CProfile::get('web.'.$page['file'].'.sortorder',$def_order));
 
 	return order_result($data, $sortfield, $sortorder, true);
 	}
@@ -1294,12 +1280,12 @@ function __autoload($class_name){
 		if(!empty($allways)) $allways = ','.$allways;
 		$sortable = explode(',',$def);
 
-		$tabfield = get_request('sort',get_profile('web.'.$page["file"].'.sort',null));
+		$tabfield = get_request('sort',CProfile::get('web.'.$page["file"].'.sort',null));
 
 		if(is_null($tabfield)) return ' ORDER BY '.$def.$allways;
 		if(!str_in_array($tabfield,$sortable)) return ' ORDER BY '.$def.$allways;
 
-		$sortorder = get_request('sortorder',get_profile('web.'.$page["file"].'.sortorder',ZBX_SORT_UP));
+		$sortorder = get_request('sortorder',CProfile::get('web.'.$page["file"].'.sortorder',ZBX_SORT_UP));
 
 	return ' ORDER BY '.$tabfield.' '.$sortorder.$allways;
 	}

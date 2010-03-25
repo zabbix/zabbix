@@ -28,7 +28,7 @@ static char	prompt_char = '\0';
 
 static int	telnet_waitsocket(int socket_fd, int mode/* 1 - read; 0 - write */)
 {
-//	const char	*__function_name = "telnet_waitsocket";
+/*	const char	*__function_name = "telnet_waitsocket"; */
 	struct timeval	tv;
 	int		rc;
 	fd_set		fd, *writefd = NULL, *readfd = NULL;
@@ -46,14 +46,14 @@ static int	telnet_waitsocket(int socket_fd, int mode/* 1 - read; 0 - write */)
 
 	rc = select(socket_fd + 1, readfd, writefd, NULL, &tv);
 
-//	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, rc);
+/*	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, rc); */
 
 	return rc;
 }
 
 static ssize_t	telnet_socket_read(int socket_fd, void *buf, size_t count)
 {
-//	const char	*__function_name = "telnet_socket_read";
+/*	const char	*__function_name = "telnet_socket_read"; */
 	ssize_t		rc;
 
 	while (-1 == (rc = read(socket_fd, buf, count)))
@@ -67,14 +67,14 @@ static ssize_t	telnet_socket_read(int socket_fd, void *buf, size_t count)
 		break;
 	}
 
-//	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, rc);
+/*	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, rc); */
 
 	return rc;
 }
 
 static ssize_t	telnet_socket_write(int socket_fd, const void *buf, size_t count)
 {
-//	const char	*__function_name = "telnet_socket_write";
+/*	const char	*__function_name = "telnet_socket_write"; */
 	ssize_t		rc;
 
 	while (-1 == (rc = write(socket_fd, buf, count)))
@@ -87,7 +87,7 @@ static ssize_t	telnet_socket_write(int socket_fd, const void *buf, size_t count)
 		break;
 	}
 
-//	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, rc);
+/*	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, rc); */
 
 	return rc;
 }
@@ -129,7 +129,7 @@ static ssize_t	telnet_read(int socket_fd, char *buf, size_t *buf_left, size_t *b
 			case 252:	/* Option code (WON'T) */
 			case 253:	/* Option code (DO) */
 			case 254:	/* Option code (DON'T) */
-				// reply to all commands with "WONT", unless it is SGA (suppres go ahead)
+				/* reply to all commands with "WONT", unless it is SGA (suppres go ahead) */
 				while (0 == (rc = telnet_socket_read(socket_fd, &c3, 1)))
 					;
 
@@ -276,7 +276,7 @@ static int	telnet_login(int socket_fd, const char *username,
 	sz = sizeof(buf);
 	offset = 0;
 	while (-1 != (rc = telnet_read(socket_fd, buf, &sz, &offset)))
-		if ('$' == (c = telnet_lastchar(buf, offset)) || '#' == c || '>' == c)
+		if ('$' == (c = telnet_lastchar(buf, offset)) || '#' == c || '>' == c || '%' == c)
 		{
 			prompt_char = c;
 			break;

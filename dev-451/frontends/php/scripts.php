@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2007 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,9 +24,9 @@ require_once('include/hosts.inc.php');
 require_once('include/scripts.inc.php');
 require_once('include/users.inc.php');
 
-$page['title'] = "S_SCRIPTS";
+$page['title'] = 'S_SCRIPTS';
 $page['file'] = 'scripts.php';
-$page['hist_arg'] = array('scriptid','form');
+$page['hist_arg'] = array('scriptid', 'form');
 
 include_once('include/page_header.php');
 
@@ -38,15 +38,12 @@ include_once('include/page_header.php');
 $fields=array(
 		'scriptid'=>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,	null),
 		'scripts'=>				array(T_ZBX_INT, O_OPT,	P_SYS,			DB_ID,	null),
-
 // Actions
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
-
 // form
 		'action'=>				array(T_ZBX_INT, O_OPT,  P_ACT, 		IN('0,1'),	null),
 		'save'=>				array(T_ZBX_STR, O_OPT,	 P_SYS|P_ACT,	NULL,		null),
 		'delete'=>				array(T_ZBX_STR, O_OPT,  P_ACT, 		null,	null),
-
 // form
 		'name'=>				array(T_ZBX_STR, O_OPT,  NULL,			NOT_EMPTY,	'isset({save})'),
 		'command'=>				array(T_ZBX_STR, O_OPT,  NULL,			NOT_EMPTY,	'isset({save})'),
@@ -106,7 +103,7 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 		else if(isset($_REQUEST['delete'])){
 			$scriptid = get_request('scriptid', 0);
 
-			$result &= delete_script($scriptid);
+			$result = delete_script($scriptid);
 
 			if($result){
 				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCRIPT, S_SCRIPT.' ['.$scriptid.']');
@@ -230,11 +227,10 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 		$scripts_wdgt->addItem($frmScr);
 	}
 	else {
-
 		$form = new CForm();
 		$form->setName('frm_scripts');
-		$form->setAttribute('id','scripts');
-		$form->addVar('action','1');
+		$form->setAttribute('id', 'scripts');
+		$form->addVar('action', '1');
 
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
@@ -242,9 +238,11 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 		$scripts_wdgt->addHeader(S_SCRIPTS_BIG);
 		$scripts_wdgt->addHeader($numrows);
 
-		$options = array('extendoutput' => 1,
-						'editable' => 1,
-						'select_groups' => 1);
+		$options = array(
+			'extendoutput' => 1,
+			'editable' => 1,
+			'select_groups' => 1
+		);
 		$scripts = CScript::get($options);
 
 		$table = new CTableInfo(S_NO_SCRIPTS_DEFINED);
@@ -313,7 +311,7 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 
 		$jsLocale = array(
 			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTES'
+			'S_NO_ELEMENTS_SELECTED'
 		);
 
 		zbx_addJSLocale($jsLocale);
@@ -329,9 +327,6 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 
 	$scripts_wdgt->show();
 
-?>
-<?php
 
 include_once('include/page_footer.php');
-
 ?>

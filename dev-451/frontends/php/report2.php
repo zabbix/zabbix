@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,10 +57,11 @@ include_once 'include/page_header.php';
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			update_profile('web.avail_report.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.avail_report.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 
@@ -75,8 +76,8 @@ include_once 'include/page_header.php';
 	else{
 		$_REQUEST['filter_groupid'] = get_request('filter_groupid', 0);
 		$_REQUEST['filter_hostid'] = get_request('filter_hostid', 0);
-		$_REQUEST['filter_timesince'] = get_request('filter_timesince', get_profile('web.avail_report.filter.timesince', 0));
-		$_REQUEST['filter_timetill'] = get_request('filter_timetill', get_profile('web.avail_report.filter.timetill', 0));
+		$_REQUEST['filter_timesince'] = get_request('filter_timesince', CProfile::get('web.avail_report.filter.timesince', 0));
+		$_REQUEST['filter_timetill'] = get_request('filter_timetill', CProfile::get('web.avail_report.filter.timetill', 0));
 	}
 
 	if(($_REQUEST['filter_timetill'] > 0) && ($_REQUEST['filter_timesince'] > $_REQUEST['filter_timetill'])){
@@ -86,16 +87,16 @@ include_once 'include/page_header.php';
 	}
 
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
-		update_profile('web.avail_report.filter.timesince', $_REQUEST['filter_timesince'], PROFILE_TYPE_INT);
-		update_profile('web.avail_report.filter.timetill', $_REQUEST['filter_timetill'], PROFILE_TYPE_INT);
+		CProfile::update('web.avail_report.filter.timesince', $_REQUEST['filter_timesince'], PROFILE_TYPE_INT);
+		CProfile::update('web.avail_report.filter.timetill', $_REQUEST['filter_timetill'], PROFILE_TYPE_INT);
 	}
 
 	$_REQUEST['groupid'] = $_REQUEST['filter_groupid'];
 	$_REQUEST['hostid'] = $_REQUEST['filter_hostid'];
 // --------------
 
-	$config = get_request('config', get_profile('web.avail_report.config', 0));
-	update_profile('web.avail_report.config', $config, PROFILE_TYPE_INT);
+	$config = get_request('config', CProfile::get('web.avail_report.config', 0));
+	CProfile::update('web.avail_report.config', $config, PROFILE_TYPE_INT);
 
 	$params = array();
 	$options = array('allow_all_hosts', 'with_items');
@@ -147,7 +148,7 @@ include_once 'include/page_header.php';
 		else{
 			$trigger_data = reset($trigger_data);
 
-			$host = reset($db_data['hosts']);
+			$host = reset($trigger_data['hosts']);
 			$trigger_data['hostid'] = $host['hostid'];
 			$trigger_data['host'] = $host['host'];
 		}
@@ -156,7 +157,7 @@ include_once 'include/page_header.php';
 
 	if(isset($_REQUEST['triggerid'])){
 		$rep2_wdgt->addHeader(array(
-			new CLink($trigger_data['host'],'?filter_groupid='.$_REQUEST['groupid'].'&filter_hostid='.$_REQUEST['hostid']),
+			new CLink($trigger_data['host'],'?filter_groupid='.$_REQUEST['groupid'].'&filter_hostid='.$trigger_data['hostid']),
 			' : ',
 			expand_trigger_description_by_data($trigger_data)
 			),SPACE);
@@ -182,7 +183,7 @@ include_once 'include/page_header.php';
 
 // FILTER
 		$filterForm = get_report2_filter($config, $PAGE_GROUPS, $PAGE_HOSTS);
-		$rep2_wdgt->addFlicker($filterForm, get_profile('web.avail_report.filter.state', 0));
+		$rep2_wdgt->addFlicker($filterForm, CProfile::get('web.avail_report.filter.state', 0));
 //-------
 
 		$sql_from = '';

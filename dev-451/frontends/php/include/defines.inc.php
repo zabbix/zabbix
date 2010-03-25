@@ -20,7 +20,7 @@
 ?>
 <?php
 	define('ZABBIX_VERSION','1.8.2');
-	define('ZABBIX_API_VERSION','1.1');
+	define('ZABBIX_API_VERSION','1.2');
 /* USER DEFINES */
 
 	define('ZBX_LOGIN_ATTEMPTS',			5);
@@ -70,7 +70,6 @@
 
 	define('ZBX_DROPDOWN_FIRST_NONE',	0);
 	define('ZBX_DROPDOWN_FIRST_ALL',	1);
-	define('ZBX_DROPDOWN_FIRST_ZBX162',	2);
 
 	define('T_ZBX_STR',			0);
 	define('T_ZBX_INT',			1);
@@ -102,6 +101,11 @@
 	define('IMAGE_TYPE_UNKNOWN',		0);
 	define('IMAGE_TYPE_ICON',		1);
 	define('IMAGE_TYPE_BACKGROUND',		2);
+
+	define('ITEM_CONVERT_WITH_UNITS',	0);		// - do not convert empty units
+	define('ITEM_CONVERT_NO_UNITS',		1);		// - no units
+	define('ITEM_CONVERT_SHORT_UNITS',	2);		// - to short units
+	define('ITEM_CONVERT_LONG_UNITS',	3);		// - to long units
 
 
 	define('ZBX_SORT_UP',			'ASC');
@@ -264,12 +268,19 @@
 	define('ITEM_AUTHTYPE_PASSWORD',	0);
 	define('ITEM_AUTHTYPE_PUBLICKEY',	1);
 
-	define('GRAPH_ITEM_DRAWTYPE_LINE',		0);
+	define('ITEM_LOGTYPE_INFORMATION',	1);
+	define('ITEM_LOGTYPE_WARNING',		2);
+	define('ITEM_LOGTYPE_ERROR',		4);
+	define('ITEM_LOGTYPE_FAILURE_AUDIT',	7);
+	define('ITEM_LOGTYPE_SUCCESS_AUDIT',	8);
+
+	define('GRAPH_ITEM_DRAWTYPE_LINE',			0);
 	define('GRAPH_ITEM_DRAWTYPE_FILLED_REGION',	1);
 	define('GRAPH_ITEM_DRAWTYPE_BOLD_LINE',		2);
-	define('GRAPH_ITEM_DRAWTYPE_DOT',		3);
+	define('GRAPH_ITEM_DRAWTYPE_DOT',			3);
 	define('GRAPH_ITEM_DRAWTYPE_DASHED_LINE',	4);
 	define('GRAPH_ITEM_DRAWTYPE_GRADIENT_LINE',	5);
+	define('GRAPH_ITEM_DRAWTYPE_BOLD_DOT',		6);
 
 	define('MAP_LINK_DRAWTYPE_LINE',		0);
 	define('MAP_LINK_DRAWTYPE_BOLD_LINE',		2);
@@ -347,22 +358,23 @@
 	define('SCREEN_SIMPLE_ITEM',		0);
 	define('SCREEN_DYNAMIC_ITEM',		1);
 
-	define('SCREEN_RESOURCE_GRAPH',			0);
+	define('SCREEN_RESOURCE_GRAPH',				0);
 	define('SCREEN_RESOURCE_SIMPLE_GRAPH',		1);
-	define('SCREEN_RESOURCE_MAP',			2);
+	define('SCREEN_RESOURCE_MAP',				2);
 	define('SCREEN_RESOURCE_PLAIN_TEXT',		3);
 	define('SCREEN_RESOURCE_HOSTS_INFO',		4);
 	define('SCREEN_RESOURCE_TRIGGERS_INFO',		5);
 	define('SCREEN_RESOURCE_SERVER_INFO',		6);
-	define('SCREEN_RESOURCE_CLOCK',			7);
-	define('SCREEN_RESOURCE_SCREEN',		8);
+	define('SCREEN_RESOURCE_CLOCK',				7);
+	define('SCREEN_RESOURCE_SCREEN',			8);
 	define('SCREEN_RESOURCE_TRIGGERS_OVERVIEW',	9);
 	define('SCREEN_RESOURCE_DATA_OVERVIEW',		10);
-	define('SCREEN_RESOURCE_URL',			11);
-	define('SCREEN_RESOURCE_ACTIONS',		12);
-	define('SCREEN_RESOURCE_EVENTS',		13);
-	define('SCREEN_RESOURCE_STATUS_OF_TRIGGERS',	14);
+	define('SCREEN_RESOURCE_URL',				11);
+	define('SCREEN_RESOURCE_ACTIONS',			12);
+	define('SCREEN_RESOURCE_EVENTS',			13);
+	define('SCREEN_RESOURCE_HOSTGROUP_TRIGGERS',14);
 	define('SCREEN_RESOURCE_SYSTEM_STATUS',		15);
+	define('SCREEN_RESOURCE_HOST_TRIGGERS',		16);
 
 /* alignes */
 	define('HALIGN_DEFAULT',0);
@@ -582,10 +594,10 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('ZBX_PREG_SPACES', '(\s+){0,1}');
 	define('ZBX_PREG_MACRO_NAME', '([A-Z0-9\._]+)');
 	define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_\. \-]+)');	/* !!! Don't forget sync code with C !!! */
-	define('ZBX_PREG_KEY_NAME', '([0-9a-zA-Z_\.,]+)');	/* !!! Don't forget sync code with C !!! */
+	define('ZBX_PREG_KEY_NAME', '([0-9a-zA-Z_\.\-]+)');	/* !!! Don't forget sync code with C !!! */
 	define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+){0,1}');
 	define('ZBX_PREG_SIGN', '([&|><=+*\/#\-])');
-	define('ZBX_PREG_NUMBER', '([\-+]?[0-9]+[.]{0,1}[0-9]*[A-Z]{0,1})');
+	define('ZBX_PREG_NUMBER', '([\-+]?[0-9]+[.]?[0-9]*[KMGTsmhdw]?)');
 	
 	define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
 //--
@@ -594,8 +606,12 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('ZBX_PREG_HOST_FORMAT', ZBX_PREG_INTERNAL_NAMES);
 
 	define('ZBX_PREG_NODE_FORMAT', ZBX_PREG_INTERNAL_NAMES);
-	define('ZBX_PREG_ITEM_KEY_FORMAT', '('.ZBX_PREG_KEY_NAME.'(\['.ZBX_PREG_PARAMS.'\]){0,1})');
+	
+	
+	define('ZBX_PREG_ITEM_KEY_FORMAT', '('.ZBX_PREG_KEY_NAME.'(?(?=,)('.ZBX_PREG_PARAMS.')?|(\['.ZBX_PREG_PARAMS.'\])?))');
+	// define('ZBX_PREG_ITEM_KEY_FORMAT', '('.ZBX_PREG_KEY_NAME.'(\['.ZBX_PREG_PARAMS.'\]){0,1})');
 
+	
 	define('ZBX_PREG_FUNCTION_FORMAT', '('.ZBX_PREG_INTERNAL_NAMES.'(\('.ZBX_PREG_PARAMS.'\)))');
 
 	define('ZBX_PREG_SIMPLE_EXPRESSION_FORMAT','(\{'.ZBX_PREG_HOST_FORMAT.'\:'.ZBX_PREG_ITEM_KEY_FORMAT.'\.'.ZBX_PREG_FUNCTION_FORMAT.'\})');
@@ -609,20 +625,20 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 // REGEXP IDS
 	define('ZBX_KEY_ID', 1);
 	define('ZBX_KEY_NAME_ID', 2);
-	define('ZBX_KEY_PARAM_ID', 4);
+	define('ZBX_KEY_PARAM_ID', 6);
 
 	define('ZBX_SIMPLE_EXPRESSION_HOST_ID', 2);
 	define('ZBX_SIMPLE_EXPRESSION_KEY_ID', 2 + ZBX_KEY_ID);
 	define('ZBX_SIMPLE_EXPRESSION_KEY_NAME_ID', 2 + ZBX_KEY_NAME_ID);
 	define('ZBX_SIMPLE_EXPRESSION_KEY_PARAM_ID', 2 + ZBX_KEY_PARAM_ID);
-	define('ZBX_SIMPLE_EXPRESSION_FUNCTION_ID', 7);
-	define('ZBX_SIMPLE_EXPRESSION_FUNCTION_NAME_ID', 8);
-	define('ZBX_SIMPLE_EXPRESSION_FUNCTION_PARAM_ID', 10);
+	define('ZBX_SIMPLE_EXPRESSION_FUNCTION_ID', 3+ZBX_KEY_PARAM_ID);
+	define('ZBX_SIMPLE_EXPRESSION_FUNCTION_NAME_ID', 4+ZBX_KEY_PARAM_ID);
+	define('ZBX_SIMPLE_EXPRESSION_FUNCTION_PARAM_ID', 6+ZBX_KEY_PARAM_ID);
 
 	define('ZBX_EXPRESSION_LEFT_ID', 1);
 	define('ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID', 2);
-	define('ZBX_EXPRESSION_MACRO_ID', 13);
-	define('ZBX_EXPRESSION_RIGHT_ID', 14);
+	define('ZBX_EXPRESSION_MACRO_ID', 9+ZBX_KEY_PARAM_ID);
+	define('ZBX_EXPRESSION_RIGHT_ID', 10+ZBX_KEY_PARAM_ID);
 //--------
 
 	define('ZBX_HISTORY_COUNT',5);
@@ -700,7 +716,15 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	define('API_OUTPUT_SHORTEN', 'shorten');
 	define('API_OUTPUT_REFER', 'refer');
 	define('API_OUTPUT_EXTEND', 'extend');
+	define('API_OUTPUT_COUNT', 'count');
+	define('API_OUTPUT_CUSTOM', 'custom');
 
+
+	define('SEC_PER_MIN', 60);
+	define('SEC_PER_HOUR', 3600);
+	define('SEC_PER_DAY', 86400);
+	define('SEC_PER_WEEK', (7*SEC_PER_DAY));
+	define('SEC_PER_YEAR', (365*SEC_PER_DAY));
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
 	if(!function_exists('version_compare')){
 		$_GET		= $HTTP_GET_VARS;
@@ -720,6 +744,6 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 	$_REQUEST = $_POST + $_GET;
 
 /* init precision */
-	ini_set("precision", 21);
+	ini_set('precision', 14);
 
 ?>

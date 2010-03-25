@@ -22,6 +22,7 @@
 
 extern	int	CONFIG_DISABLE_HOUSEKEEPING;
 extern	int	CONFIG_HOUSEKEEPING_FREQUENCY;
+extern	int	CONFIG_MAX_HOUSEKEEPER_DELETE;
 
 int main_housekeeper_loop();
 

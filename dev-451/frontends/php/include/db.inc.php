@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -416,9 +416,13 @@ if(!isset($DB)){
 						$query = 'SELECT * FROM ('.$query.') WHERE rownum BETWEEN '.intval($offset).' AND '.intval($till);
 					}
 
-					$result = DBexecute($query);
+					$result=OCIParse($DB['DB'],$query);
 					if(!$result){
-						$e = ocierror($result);
+						$e=@ocierror();
+						error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+					}
+					else if(!@OCIExecute($result,($DB['TRANSACTIONS']?OCI_DEFAULT:OCI_COMMIT_ON_SUCCESS))){
+						$e=ocierror($result);
 						error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 					}
 
@@ -460,12 +464,11 @@ if(!isset($DB)){
 
 			if($DB['TRANSACTIONS'] && !$result){
 				$DB['TRANSACTION_STATE'] &= $result;
-	//			SDI($query);
-	//			SDI($DB['TRANSACTION_STATE']);
 			}
 		}
 COpt::savesqlrequest(microtime(true)-$time_start,$query);
-		return $result;
+
+	return $result;
 	}
 
 	function DBexecute($query, $skip_error_messages=0){
@@ -474,38 +477,35 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 
 		$time_start=microtime(true);
 		if( isset($DB['DB']) && !empty($DB['DB']) ){
-			$DB['EXECUTE_COUNT']++;	// WRONG FOR ORACLE!!
+			$DB['EXECUTE_COUNT']++;
 //SDI('SQL xec: '.$query);
 
 			switch($DB['TYPE']){
 				case 'MYSQL':
-					$result=mysql_query($query,$DB['DB']);
-
+					$result = mysql_query($query,$DB['DB']);
 					if(!$result){
 						error('Error in query ['.$query.'] ['.mysql_error().']');
 					}
 					break;
 				case 'POSTGRESQL':
 					$result = (bool) pg_query($DB['DB'],$query);
-
 					if(!$result){
 						error('Error in query ['.$query.'] ['.pg_last_error().']');
 					}
 					break;
 				case 'ORACLE':
-					$stid=OCIParse($DB['DB'],$query);
-					if(!$stid){
+					$result=OCIParse($DB['DB'],$query);
+					if(!$result){
 						$e=@ocierror();
 						error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 					}
-
-					$result=@OCIExecute($stid,($DB['TRANSACTIONS']?OCI_DEFAULT:OCI_COMMIT_ON_SUCCESS));
-					if(!$result){
-						$e=ocierror($stid);
+					else if(!@OCIExecute($result,($DB['TRANSACTIONS']?OCI_DEFAULT:OCI_COMMIT_ON_SUCCESS))){
+						$e=ocierror($result);
 						error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 					}
 					else{
-						$result = $stid;
+						/* It should be here. The function must return boolen */
+						$result = true;
 					}
 
 					break;
@@ -527,12 +527,10 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 
 			if($DB['TRANSACTIONS'] && !$result){
 				$DB['TRANSACTION_STATE'] &= $result;
-	//			SDI($query);
-	//			SDI($DB['TRANSACTION_STATE']);
 			}
 		}
 COpt::savesqlrequest(microtime(true)-$time_start,$query);
-	return $result;
+	return (bool) $result;
 	}
 
 	function DBfetch(&$cursor){
@@ -590,8 +588,13 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 
 // string value prepearing
 if(isset($DB['TYPE']) && $DB['TYPE'] == 'ORACLE') {
-	function zbx_dbstr($var)	{
-		return "'".preg_replace('/\'/','\'\'',$var)."'";
+	function zbx_dbstr($var){
+		if(is_array($var)){
+			foreach($var as $vnum => $value) $var[$vnum] = "'".preg_replace('/\'/','\'\'',$value)."'";
+			return $var;
+		}
+
+	return "'".preg_replace('/\'/','\'\'',$var)."'";
 	}
 
 	function zbx_dbcast_2bigint($field){
@@ -599,8 +602,13 @@ if(isset($DB['TYPE']) && $DB['TYPE'] == 'ORACLE') {
 	}
 }
 else if(isset($DB['TYPE']) && $DB['TYPE'] == "MYSQL") {
-	function zbx_dbstr($var)	{
-		return "'".mysql_real_escape_string($var)."'";
+	function zbx_dbstr($var){
+		if(is_array($var)){
+			foreach($var as $vnum => $value) $var[$vnum] = "'".mysql_real_escape_string($value)."'";
+			return $var;
+		}
+
+	return "'".mysql_real_escape_string($var)."'";
 	}
 
 	function zbx_dbcast_2bigint($field){
@@ -608,8 +616,13 @@ else if(isset($DB['TYPE']) && $DB['TYPE'] == "MYSQL") {
 	}
 }
 else if(isset($DB['TYPE']) && $DB['TYPE'] == "POSTGRESQL") {
-	function zbx_dbstr($var)	{
-		return "'".pg_escape_string($var)."'";
+	function zbx_dbstr($var){
+		if(is_array($var)){
+			foreach($var as $vnum => $value) $var[$vnum] = "'".pg_escape_string($value)."'";
+			return $var;
+		}
+
+	return "'".pg_escape_string($var)."'";
 	}
 
 	function zbx_dbcast_2bigint($field){
@@ -617,8 +630,13 @@ else if(isset($DB['TYPE']) && $DB['TYPE'] == "POSTGRESQL") {
 	}
 }
 else {
-	function zbx_dbstr($var)	{
-		return "'".addslashes($var)."'";
+	function zbx_dbstr($var){
+		if(is_array($var)){
+			foreach($var as $vnum => $value) $var[$vnum] = "'".addslashes($value)."'";
+			return $var;
+		}
+		
+	return "'".addslashes($var)."'";
 	}
 
 	function zbx_dbcast_2bigint($field){
@@ -723,9 +741,8 @@ else {
 	function get_dbid($table,$field){
 // PGSQL on transaction failure on all queries returns false..
 		global $DB, $ZBX_LOCALNODEID;
-		if(($DB['TYPE'] == 'POSTGRESQL') && $DB['TRANSACTIONS'] && !$DB['TRANSACTION_STATE']) return 1;
+		if(($DB['TYPE'] == 'POSTGRESQL') && $DB['TRANSACTIONS'] && !$DB['TRANSACTION_STATE']) return 0;
 //------
-
 		$nodeid = get_current_nodeid(false);
 
 		$found = false;
@@ -734,7 +751,7 @@ else {
 			$max=bcadd(bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000')),'99999999999');
 			$row = DBfetch(DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid .' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field)));
 			if(!$row){
-				$row=DBfetch(DBselect('SELECT max('.$field.') AS id FROM '.$table.' WHERE '.$field.'>='.$min.' AND '.$field.'<='.$max));
+				$row = DBfetch(DBselect('SELECT max('.$field.') AS id FROM '.$table.' WHERE '.$field.'>='.$min.' AND '.$field.'<='.$max));
 				if(!$row || is_null($row['id'])){
 					DBexecute("INSERT INTO ids (nodeid,table_name,field_name,nextid) VALUES ($nodeid,'$table','$field',$min)");
 				}
@@ -756,7 +773,9 @@ else {
 					continue;
 				}
 
-				DBexecute('UPDATE ids SET nextid=nextid+1 WHERE nodeid='.$nodeid.' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field));
+				$sql = 'UPDATE ids SET nextid=nextid+1 WHERE nodeid='.$nodeid.' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field);
+				DBexecute($sql);
+
 				$row = DBfetch(DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid.' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field)));
 				if(!$row || is_null($row["nextid"])){
 // Should never be here
@@ -764,7 +783,7 @@ else {
 				}
 				else{
 					$ret2 = $row["nextid"];
-					if(bccomp(bcadd($ret1,1),$ret2) ==0){
+					if(bccomp(bcadd($ret1,1),$ret2) == 0){
 						$found = true;
 					}
 				}
@@ -772,7 +791,7 @@ else {
 		}
 		while(false == $found);
 
-		return $ret2;
+	return $ret2;
 	}
 
 	function create_id_by_nodeid($id,$nodeid=0){
@@ -818,7 +837,6 @@ else {
 
 		$in = 		$notin?' NOT IN ':' IN ';
 		$concat = 	$notin?' AND ':' OR ';
-		$glue = 	$string?"','":',';
 
 		switch($DB['TYPE']) {
 			case 'SQLITE3':
@@ -828,10 +846,10 @@ else {
 			default:
 				$items = array_chunk($array, 950);
 				foreach($items as $id => $values){
-					$condition.=!empty($condition)?')'.$concat.$fieldname.$in.'(':'';
+					if($string) $values = zbx_dbstr($values);
 
-					if($string)	$condition.= "'".implode($glue,$values)."'";
-					else		$condition.= implode($glue,$values);
+					$condition.=!empty($condition)?')'.$concat.$fieldname.$in.'(':'';
+					$condition.= implode(',',$values);
 				}
 				break;
 		}

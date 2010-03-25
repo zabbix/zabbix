@@ -41,6 +41,7 @@ extern	int	CONFIG_DBSYNCER_FORKS;
 extern	int	CONFIG_NODE_NOHISTORY;
 extern  int     CONFIG_REFRESH_UNSUPPORTED;
 extern	int	CONFIG_UNAVAILABLE_DELAY;
+extern	int	CONFIG_LOG_SLOW_QUERIES;
 
 typedef enum {
 	GRAPH_TYPE_NORMAL = 0,
@@ -543,7 +544,6 @@ DB_RESULT	__zbx_DBselect(const char *fmt, ...);
 
 DB_RESULT	DBselectN(char *query, int n);
 DB_ROW		DBfetch(DB_RESULT result);
-zbx_uint64_t	DBinsert_id(int exec_result, const char *table, const char *field);
 int		DBis_null(char *field);
 void		DBbegin();
 void		DBcommit();
@@ -575,9 +575,15 @@ int	DBget_queue_count(void);
 double	DBget_requiredperformance(void);
 zbx_uint64_t DBget_proxy_lastaccess(const char *hostname);
 
-void    DBescape_string(const char *from, char *to, int maxlen);
-char*   DBdyn_escape_string(const char *str);
+int	DBget_escape_string_len(const char *src);
+void    DBescape_string(const char *src, char *dst, int len);
+char*	DBdyn_escape_string(const char *src);
 char*	DBdyn_escape_string_len(const char *src, int max_src_len);
+
+#define ZBX_SQL_LIKE_ESCAPE_CHAR '!'
+int	DBget_escape_like_pattern_len(const char *src);
+void	DBescape_like_pattern(const char *src, char *dst, int len);
+char*	DBdyn_escape_like_pattern(const char *src);
 
 void    DBget_item_from_db(DB_ITEM *item, DB_ROW row);
 

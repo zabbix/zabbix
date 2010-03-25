@@ -75,8 +75,7 @@ function is_string(obj){
 }
 
 function is_array(obj) {
-	return obj != null && typeof obj == "object" &&
-	'splice' in obj && 'join' in obj;
+	return (obj != null) && (typeof obj == "object") && ('splice' in obj) && ('join' in obj);
 }
 
 function SDI(msg){
@@ -211,9 +210,21 @@ function checkAll(form_name, chkMain, shkName){
 	var value = frmForm.elements[chkMain].checked;
 
 	chkbxRange.checkAll(shkName, value);
-	return true;
+return true;
 }
 
+function checkLocalAll(form_name, chkMain, chkName){
+	var frmForm = document.forms[form_name];
+
+	var checkboxes = $$('input[name='+chkName+']');
+	for(var i=0; i<checkboxes.length; i++){
+		if(isset('type', checkboxes[i]) && (checkboxes[i].type == 'checkbox')){
+			checkboxes[i].checked = frmForm.elements[chkMain].checked;
+		}
+	}
+
+return true;
+}
 
 function clearAllForm(form){
 	form = $(form);

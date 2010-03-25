@@ -388,7 +388,7 @@ function get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0){
 	global $USER_DETAILS;
 	$config = select_config();
 
-	$hide_unknown = get_profile('web.events.filter.hide_unknown',0);
+	$hide_unknown = CProfile::get('web.events.filter.hide_unknown',0);
 
 	$sql_from = $sql_cond = '';
 

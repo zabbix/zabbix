@@ -330,8 +330,8 @@ include_once('include/page_header.php');
 
 ?>
 <?php
-	$_REQUEST['filter_usrgrpid'] = get_request('filter_usrgrpid', get_profile('web.users.filter.usrgrpid', 0));
-	update_profile('web.users.filter.usrgrpid', $_REQUEST['filter_usrgrpid'], PROFILE_TYPE_ID);
+	$_REQUEST['filter_usrgrpid'] = get_request('filter_usrgrpid', CProfile::get('web.users.filter.usrgrpid', 0));
+	CProfile::update('web.users.filter.usrgrpid', $_REQUEST['filter_usrgrpid'], PROFILE_TYPE_ID);
 
 	$frmForm = new CForm(null, 'get');
 	$cmbConf = new CComboBox('config', 'users.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
@@ -506,7 +506,7 @@ include_once('include/page_header.php');
 
 		$jsLocale = array(
 			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTES'
+			'S_NO_ELEMENTS_SELECTED'
 		);
 
 		zbx_addJSLocale($jsLocale);

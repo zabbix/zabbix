@@ -97,7 +97,7 @@ include_once('include/page_header.php');
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
 
-	$_REQUEST['showdisabled'] = get_request('showdisabled', get_profile('web.triggers.showdisabled', 0));
+	$_REQUEST['showdisabled'] = get_request('showdisabled', CProfile::get('web.triggers.showdisabled', 0));
 
 	check_fields($fields);
 	validate_sort_and_sortorder('description',ZBX_SORT_UP);
@@ -113,7 +113,7 @@ include_once('include/page_header.php');
 <?php
 
 	$showdisabled = get_request('showdisabled', 0);
-	update_profile('web.triggers.showdisabled',$showdisabled,PROFILE_TYPE_INT);
+	CProfile::update('web.triggers.showdisabled',$showdisabled,PROFILE_TYPE_INT);
 
 // EXPRESSION ACTIONS
 	if(isset($_REQUEST['add_expression'])){
@@ -138,52 +138,12 @@ include_once('include/page_header.php');
 		unset($_REQUEST['triggerid']);
 		$_REQUEST['form'] = 'clone';
 	}
-	else if(isset($_REQUEST['mass_save']) && isset($_REQUEST['g_triggerid'])){
-		show_messages();
-
-		$result = false;
-
-		$visible = get_request('visible',array());
-		$_REQUEST['dependencies'] = get_request('dependencies',array());
-
-		$triggers = available_triggers($_REQUEST['g_triggerid'], 1);
-
-		DBstart();
-		foreach($triggers as $tnum => $triggerid){
-			$db_trig = get_trigger_by_triggerid($triggerid);
-			$db_trig['dependencies'] = get_trigger_dependencies_by_triggerid($triggerid);
-
-			foreach($db_trig as $key => $value){
-				if(isset($visible[$key])){
-					$db_trig[$key] = $_REQUEST[$key];
-				}
-			}
-
-			$result2=update_trigger($db_trig['triggerid'],
-				null,null,null,
-				$db_trig['priority'],null,null,null,
-				$db_trig['dependencies'],null);
-
-			$result |= $result2;
-		}
-		$result = DBend($result);
-
-		show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
-		if($result){
-			unset($_REQUEST['massupdate']);
-			unset($_REQUEST['form']);
-			$url = new CUrl();
-			$path = $url->getPath();
-			insert_js('cookie.eraseArray("'.$path.'")');
-		}
-	}
 	else if(isset($_REQUEST['save'])){
 		show_messages();
 
 		if(!check_right_on_trigger_by_expression(PERM_READ_WRITE, $_REQUEST['expression']))
 			access_deny();
 
-		$now = time();
 		$status = isset($_REQUEST['status'])?TRIGGER_STATUS_DISABLED:TRIGGER_STATUS_ENABLED;
 
 		$type = $_REQUEST['type'];
@@ -263,6 +223,50 @@ include_once('include/page_header.php');
 		}
 	}
 // ------- GO ---------
+	else if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['mass_save']) && isset($_REQUEST['g_triggerid'])){
+		show_messages();
+
+		$result = false;
+
+		$visible = get_request('visible',array());
+		$_REQUEST['dependencies'] = get_request('dependencies',array());
+
+		$options = array(
+			'triggerids' => $_REQUEST['g_triggerid'],
+			'select_dependencies' => 1,
+			'output' => API_OUTPUT_EXTEND,
+			'editable' => 1
+		);
+		$triggers = CTrigger::get($options);
+
+		DBstart();
+		foreach($triggers as $tnum => $db_trig){
+			foreach($db_trig as $key => $value){
+				if(isset($visible[$key])){
+					$db_trig[$key] = $_REQUEST[$key];
+				}
+			}
+
+			$result = update_trigger($db_trig['triggerid'],
+				null,null,null,
+				$db_trig['priority'],null,null,null,
+				$db_trig['dependencies'],null);
+
+			if(!$result) break;
+		}
+		$result = DBend($result);
+
+		show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
+		if($result){
+			unset($_REQUEST['massupdate']);
+			unset($_REQUEST['form']);
+			$url = new CUrl();
+			$path = $url->getPath();
+			insert_js('cookie.eraseArray("'.$path.'")');
+		}
+
+		$go_result = $result;
+	}
 	else if(str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_REQUEST['g_triggerid'])){
 
 		$options = array('extendoutput'=>1, 'editable'=>1);
@@ -303,7 +307,7 @@ include_once('include/page_header.php');
 		$go_result = DBend($go_result);
 		show_messages($go_result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
 	}
-	else if(isset($_REQUEST['copy']) && isset($_REQUEST['g_triggerid']) && ($_REQUEST['go'] == 'copy_to')){
+	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['copy']) && isset($_REQUEST['g_triggerid'])){
 		if(isset($_REQUEST['copy_targetid']) && ($_REQUEST['copy_targetid'] > 0) && isset($_REQUEST['copy_type'])){
 			if(0 == $_REQUEST['copy_type']){ /* hosts */
 				$hosts_ids = $_REQUEST['copy_targetid'];
@@ -379,6 +383,7 @@ include_once('include/page_header.php');
 		$url = new CUrl();
 		$path = $url->getPath();
 		insert_js('cookie.eraseArray("'.$path.'")');
+		$_REQUEST['go'] = 'none';
 	}
 
 ?>
@@ -458,7 +463,6 @@ include_once('include/page_header.php');
 	}
 
 	show_table_header(S_CONFIGURATION_OF_TRIGGERS_BIG, $form);
-	echo SBR;
 ?>
 <?php
 	if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['g_triggerid'])){
@@ -526,9 +530,12 @@ include_once('include/page_header.php');
 		$sortfield = getPageSortField('description');
 		$sortorder = getPageSortOrder();
 		$options = array(
-			'select_hosts' => 1,
 			'editable' => 1,
-			'extendoutput' => 1,
+			'select_hosts' => API_OUTPUT_EXTEND,
+			'select_items' => API_OUTPUT_EXTEND,
+			'select_functions' => API_OUTPUT_EXTEND,
+			'select_dependencies' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
@@ -552,27 +559,39 @@ include_once('include/page_header.php');
 		$paging = getPagingLine($triggers);
 //---------
 
+		$realHosts = getParentHostsByTriggers($triggers);
+
 		foreach($triggers as $tnum => $trigger){
 			$triggerid = $trigger['triggerid'];
 
+			$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
+			$trigger['items'] = zbx_toHash($trigger['items'], 'itemid');
+			$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
+
 			$description = array();
 			if($trigger['templateid'] > 0){
-				$real_hosts = get_realhosts_by_triggerid($triggerid);
-				$real_host = DBfetch($real_hosts);
-				$description[] = new CLink($real_host['host'], 'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
-				$description[] = ':';
+				if(!isset($realHosts[$triggerid])){
+					$description[] = new CSpan('HOST','unknown');
+					$description[] = ':';
+				}
+				else{
+					$real_hosts = $realHosts[$triggerid];
+					$real_host = reset($real_hosts);
+					$description[] = new CLink($real_host['host'], 'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
+					$description[] = ':';
+				}
 			}
 
-			$description[] = new CLink(expand_trigger_description($triggerid), 'triggers.php?form=update&triggerid='.$triggerid);
+			$description[] = new CLink(expandTriggerDescription($trigger), 'triggers.php?form=update&triggerid='.$triggerid);
 
 //add dependencies{
-			$deps = get_trigger_dependencies_by_triggerid($triggerid);
+			$deps = $trigger['dependencies'];
 			if(count($deps) > 0){
 				$description[] = array(BR(), bold(S_DEPENDS_ON.' : '));
-				foreach($deps as $dnum => $dep_triggerid) {
+				foreach($deps as $dnum => $dep_trigger) {
 					$description[] = BR();
 
-					$hosts = get_hosts_by_triggerid($dep_triggerid);
+					$hosts = get_hosts_by_triggerid($dep_trigger['triggerid']);
 					while($host = DBfetch($hosts)){
 						$description[] = $host['host'];
 						$description[] = ', ';
@@ -580,7 +599,7 @@ include_once('include/page_header.php');
 
 					array_pop($description);
 					$description[] = ' : ';
-					$description[] = expand_trigger_description($dep_triggerid);
+					$description[] = expand_trigger_description_by_data($dep_trigger);
 				}
 			}
 // } add dependencies
@@ -638,7 +657,8 @@ include_once('include/page_header.php');
 				$status,
 				$hosts,
 				$description,
-				explode_exp($trigger['expression'], 1),
+				triggerExpression($trigger,1),
+//				explode_exp($trigger['expression'], 1),
 				$error
 			));
 
@@ -673,7 +693,7 @@ include_once('include/page_header.php');
 
 		$jsLocale = array(
 			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTES'
+			'S_NO_ELEMENTS_SELECTED'
 		);
 
 		zbx_addJSLocale($jsLocale);

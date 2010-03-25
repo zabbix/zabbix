@@ -64,6 +64,7 @@ include_once('include/page_header.php');
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
 /* actions */
 		'remove_log'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'reset'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -82,7 +83,9 @@ include_once('include/page_header.php');
 		if('timeline' == $_REQUEST['favobj']){
 			navigation_bar_calc('web.item.graph', true);
 		}
-
+		if('filter' == $_REQUEST['favobj']){
+			CProfile::update('web.history.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+		}
 		if(str_in_array($_REQUEST['favobj'],array('itemid','graphid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
@@ -93,7 +96,7 @@ include_once('include/page_header.php');
 				}
 			}
 			else if('remove' == $_REQUEST['action']){
-				$result = rm4favorites('web.favorite.graphids',$_REQUEST['favid'],ZBX_FAVORITES_ALL,$_REQUEST['favobj']);
+				$result = rm4favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
 
 				if($result){
 					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVOURITES.'";'."\n");
@@ -108,6 +111,7 @@ include_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 
@@ -136,7 +140,7 @@ include_once('include/page_header.php');
 	$options = array(
 		'nodeids' => get_current_nodeid(),
 		'itemids' => $_REQUEST['itemid'],
-		'webitems' => 1,
+		'webitems' => 1
 	);
 	$request_items = zbx_toArray($_REQUEST['itemid']);
 	$allowed_items = CItem::get($options);
@@ -160,9 +164,9 @@ include_once('include/page_header.php');
 		if(isset($_REQUEST['plaintext']))
 			echo $main_header.SBR;
 
-		$_REQUEST['period'] = get_request('period',get_profile('web.item.graph.period', ZBX_PERIOD_DEFAULT, $_REQUEST['itemid']));
+		$_REQUEST['period'] = get_request('period',CProfile::get('web.item.graph.period', ZBX_PERIOD_DEFAULT, $_REQUEST['itemid']));
 		if($_REQUEST['period'] >= ZBX_MIN_PERIOD){
-			update_profile('web.item.graph.period',$_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['itemid']);
+			CProfile::update('web.item.graph.period',$_REQUEST['period'], PROFILE_TYPE_INT, $_REQUEST['itemid']);
 		}
 
 		$l_header = array(new CLink($item_data['host'],'latest.php?hostid='.$item_data['hostid']),': ',
@@ -191,6 +195,14 @@ include_once('include/page_header.php');
 	unset($item_data);
 
 	$to_save_request = null;
+	
+	$historyWidget = new CWidget();
+	$historyWidget->addItem(SPACE);
+	
+	$scroll_div = new CDiv();
+	$scroll_div->setAttribute('id','scrollbar_cntr');
+	$historyWidget->addFlicker($scroll_div, CProfile::get('web.history.filter.state',1));
+
 
 	if( !isset($_REQUEST['plaintext']) && ($_REQUEST['fullscreen']==0) ){
 		if($item_type == ITEM_VALUE_TYPE_LOG){
@@ -253,7 +265,7 @@ include_once('include/page_header.php');
 		if($_REQUEST['action']!='showgraph')
 			$form->addItem(array(SPACE,new CButton('plaintext',S_AS_PLAIN_TEXT)));
 
-		show_table_header($l_header, $form);
+		$historyWidget->addPageHeader($l_header, $form);
 	}
 ?>
 <?php
@@ -262,6 +274,7 @@ include_once('include/page_header.php');
 	$effectiveperiod = navigation_bar_calc('web.item.graph');
 
 	$bstime = $_REQUEST['stime'];
+	
 
 	if($_REQUEST['action']=='showgraph' && ($item_type != ITEM_VALUE_TYPE_LOG)){
 		$dom_graph_id = 'graph';
@@ -272,7 +285,7 @@ include_once('include/page_header.php');
 		$graph_cont = new CCol();
 		$graph_cont->setAttribute('id', $containerid);
 		$table->addRow($graph_cont);
-		$table->show();
+		$historyWidget->addItem($table);
 	}
 	else if($_REQUEST['action']=='showvalues' || $_REQUEST['action']=='showlatest'){
 
@@ -322,7 +335,7 @@ include_once('include/page_header.php');
 			}
 
 			if(($l_header || $r_header) &&	($_REQUEST['fullscreen']==0))
-				show_table_header($l_header,$r_header);
+				$historyWidget->addPageHeader($l_header, $r_header);
 		}
 		else{
 			$txt = new CTag('p','yes',$l_header);
@@ -362,7 +375,6 @@ include_once('include/page_header.php');
 
 			if(!isset($_REQUEST['plaintext'])){
 				$table = new CTableInfo('...','log_history_table');
-				$table->setAttribute('id','graph');
 				$table->setHeader(array(S_TIMESTAMP,
 						($item_cout>1)?S_ITEM:null,
 						S_LOCAL_TIME,
@@ -370,8 +382,6 @@ include_once('include/page_header.php');
 						S_SEVERITY,
 						S_EVENT_ID,
 						S_VALUE),'header');
-
-				$table->showStart(); // to solve memory leak we call 'Show' method by steps
 			}
 			else{
 				echo '<span class="textcolorstyles"><pre>'."\n";
@@ -427,8 +437,8 @@ include_once('include/page_header.php');
 
 				array_push($new_row,
 						new CCol(
-							get_severity_description($row['severity']),
-							get_severity_style($row['severity'])
+							get_item_logtype_description($row['severity']),
+							get_item_logtype_style($row['severity'])
 							)
 					);
 
@@ -459,8 +469,7 @@ include_once('include/page_header.php');
 					else {
 						$crow->setClass($color_style);
 					}
-
-					$crow->Show();	// to solve memory leak we call 'Show' method for each element
+					$table->addItem($crow);
 				}
 				else{
 					echo date('Y-m-d H:i:s',$row['clock']);
@@ -469,7 +478,7 @@ include_once('include/page_header.php');
 			}
 
 			if(!isset($_REQUEST['plaintext']))
-				$table->ShowEnd();	// to solve memory leak we call 'Show' method by steps
+				$historyWidget->addItem($table);
 			else
 				echo '</pre></span>';
 		}
@@ -497,7 +506,6 @@ include_once('include/page_header.php');
 			if(!isset($_REQUEST['plaintext'])){
 				$table = new CTableInfo();
 				$table->setHeader(array(S_TIMESTAMP, S_VALUE));
-				$table->setAttribute('id','graph');
 			}
 			else{
 				echo '<span class="textcolorstyles"><pre>'."\n";
@@ -549,8 +557,7 @@ include_once('include/page_header.php');
 			}
 
 			if(!isset($_REQUEST['plaintext'])){
-				$table->Show();
-				echo SBR;
+				$historyWidget->addItem($table);
 			}
 			else{
 				echo '</pre></span>';
@@ -620,12 +627,10 @@ include_once('include/page_header.php');
 			}
 //*/
 //-------------
-
-			$scroll_div = new CDiv();
-			$scroll_div->setAttribute('id','scrollbar_cntr');
-			$scroll_div->show();
 		}
 	}
+	
+	$historyWidget->show();
 	
 
 require_once('include/page_footer.php');

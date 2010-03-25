@@ -45,7 +45,7 @@
 int	main_dbconfig_loop()
 {
 	double	sec;
-//zabbix_set_log_level(LOG_LEVEL_DEBUG);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_dbconfig_loop()");
 
 	zbx_setproctitle("db config [connecting to the database]");
@@ -56,7 +56,7 @@ int	main_dbconfig_loop()
 		zabbix_log(LOG_LEVEL_DEBUG, "Syncing ...");
 
 		sec = zbx_time();
-		DCsync_confguration();
+		DCsync_configuration();
 		sec = zbx_time() - sec;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "DB config spent " ZBX_FS_DBL " second while processing configuration data. "

@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -108,12 +108,19 @@ class CUserGroup extends CZBXAPI{
 		if(USER_TYPE_SUPER_ADMIN == $user_type){
 
 		}
+		else if(is_null($options['editable']) && ($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN)){
+			$sql_parts['where'][] = 'g.usrgrpid IN ('.
+				' SELECT uug.usrgrpid'.
+				' FROM users_groups uug'.
+				' WHERE uug.userid='.$USER_DETAILS['userid'].
+				' )';
+		}
 		else if(!is_null($options['editable']) && ($USER_DETAILS['type']!=USER_TYPE_SUPER_ADMIN)){
 			return array();
 		}
 
 // nodeids
-		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
 
 // usrgrpids
 		if(!is_null($options['usrgrpids'])){
@@ -363,8 +370,7 @@ class CUserGroup extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_usrgrps = self::get(array('usrgrpids'=>$usrgrpids, 'extendoutput'=>1));
-			return $new_usrgrps;
+			return array('usrgrpids'=>$usrgrpids);
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => $error);
@@ -397,9 +403,12 @@ class CUserGroup extends CZBXAPI{
 		$result = false;
 
 //-----
-		$upd_usrgrps = self::get(array('usrgrpids'=>zbx_objectValues($usrgrps, 'usrgrpid'),
-											'extendoutput'=>1,
-											'preservekeys'=>1));
+		$options = array(
+			'usrgrpids'=>zbx_objectValues($usrgrps, 'usrgrpid'),
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$upd_usrgrps = self::get($options);
 
 		foreach($usrgrps as $ugnum => $usrgrp){
 			if(($usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED) || ($usrgrp['users_status'] == GROUP_STATUS_DISABLED)){
@@ -426,8 +435,7 @@ class CUserGroup extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_usrgrps = self::get(array('usrgrpids'=>$usrgrpids, 'extendoutput'=>1));
-			return $upd_usrgrps;
+			return array('usrgrpids'=>$usrgrpids);
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
@@ -699,9 +707,12 @@ class CUserGroup extends CZBXAPI{
 		$result = false;
 
 //-----
-		$del_usrgrps = self::get(array('usrgrpids'=>zbx_objectValues($usrgrps, 'usrgrpid'),
-											'extendoutput'=>1,
-											'preservekeys'=>1));
+		$options = array(
+			'usrgrpids'=>zbx_objectValues($usrgrps, 'usrgrpid'),
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$del_usrgrps = self::get($options);
 		foreach($usrgrps as $gnum => $usrgrp){
 			$usrgrpids[] = $usrgrp['usrgrpid'];
 			//add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER_GROUP, 'User group ['.$usrgrp['name'].']');
@@ -722,7 +733,7 @@ class CUserGroup extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return zbx_cleanHashes($del_users);
+			return array('usrgrpids'=>$usrgrpids);
 		}
 		else{
 			self::setError(__METHOD__);

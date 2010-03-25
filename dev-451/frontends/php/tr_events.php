@@ -58,17 +58,23 @@
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
-			update_profile('web.tr_events.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.tr_events.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 //--------
 
 
-	$trigger = CTrigger::get(array('triggerids' => $_REQUEST['triggerid'], 'extendoutput' => 1, 'select_hosts' => 1));
+	$options = array(
+		'triggerids' => $_REQUEST['triggerid'],
+		'output' => API_OUTPUT_EXTEND,
+		'select_hosts' => API_OUTPUT_EXTEND
+	);
+	$trigger = CTrigger::get($options);
 	if(!$trigger){
 		access_deny();
 	}
@@ -125,7 +131,7 @@
 	$event_ack = new CWidget(
 		'hat_eventack',
 		make_acktab_by_eventid($_REQUEST['eventid']),
-		get_profile('web.tr_events.hats.hat_eventack.state', 1)
+		CProfile::get('web.tr_events.hats.hat_eventack.state', 1)
 	);
 	$event_ack->addHeader(S_ACKNOWLEDGES);
 	$right_tab->addRow($event_ack);
@@ -135,7 +141,7 @@
 	$actions_sms = new CWidget(
 		'hat_eventactionmsgs',
 		get_action_msgs_for_event($_REQUEST['eventid']),
-		get_profile('web.tr_events.hats.hat_eventactionmsgs.state',1)
+		CProfile::get('web.tr_events.hats.hat_eventactionmsgs.state',1)
 	);
 	$actions_sms->addHeader(S_MESSAGE_ACTIONS);
 	$right_tab->addRow($actions_sms);
@@ -145,7 +151,7 @@
 	$actions_cmd = new CWidget(
 		'hat_eventactionmcmds',
 		get_action_cmds_for_event($_REQUEST['eventid']),//null,
-		get_profile('web.tr_events.hats.hat_eventactioncmds.state',1)
+		CProfile::get('web.tr_events.hats.hat_eventactioncmds.state',1)
 	);
 	$actions_cmd->addHeader(S_COMMAND_ACTIONS);
 	$right_tab->addRow($actions_cmd);
@@ -155,7 +161,7 @@
 	$events_histry = new CWidget(
 		'hat_eventlist',
 		make_small_eventlist($_REQUEST['eventid'], $trigger),
-		get_profile('web.tr_events.hats.hat_eventlist.state',1)
+		CProfile::get('web.tr_events.hats.hat_eventlist.state',1)
 	);
 	$events_histry->addHeader(S_EVENTS.SPACE.S_LIST.SPACE.'['.S_PREVIOUS.' 20]');
 	$right_tab->addRow($events_histry);
