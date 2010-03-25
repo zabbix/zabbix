@@ -4,6 +4,8 @@ Changes for 1.9
 
 Changes for 1.8.2
 
+ - [ZBX-2225] fixed linkage if templated items are used in graphs as Y axis min and max values (Sasha)
+ - [ZBX-2225] complete rewrite of the server code for template linkage (Sasha)
  - [ZBX-2210] added template replace option for hosts mass update (Vedmak)
  - [ZBX-2219] fixed graphs data in data.sql (Aly)
  - [ZBX-1345] time filter redesigned, sliders moved to top inside filter (Vedmak)
