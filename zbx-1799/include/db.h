@@ -599,8 +599,7 @@ int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid);
 void	get_latest_event_status(zbx_uint64_t triggerid, int *prev_status, int *latest_status);
 
 
-int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid,
-		unsigned char unlink_mode);
+int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid);
 int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid);
 int	DBdelete_host(zbx_uint64_t hostid);
 void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock);
