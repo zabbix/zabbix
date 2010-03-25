@@ -1,5 +1,7 @@
 Changes for 1.8.2
 
+ - [ZBX-2225] fixed linkage if templated items are used in graphs as Y axis min and max values (Sasha)
+ - [ZBX-2225] complete rewrite of the server code for template linkage (Sasha)
  - [ZBX-1975] fixed permission check in graphs with web ites (Aly)
  - [ZBX-2023] improved configuration triggers page (Aly)
  - [DEV-453] implemented import/export of zabbix maps (Aly)
