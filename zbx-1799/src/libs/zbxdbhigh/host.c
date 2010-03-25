@@ -2556,6 +2556,53 @@ static int	DBcopy_template_triggers(zbx_uint64_t hostid, zbx_uint64_t templateid
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBget_same_itemid                                                *
+ *                                                                            *
+ * Purpose: get same itemid for selected host by itemid from template         *
+ *                                                                            *
+ * Parameters: hostid - host identificator from database                      *
+ *             itemid - item identificator from database (from template)      *
+ *                                                                            *
+ * Return value: new item identificator or zero if item not found             *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_uint64_t	DBget_same_itemid(zbx_uint64_t hostid, zbx_uint64_t titemid)
+{
+	const char	*__function_name = "DBget_same_itemid";
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	itemid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64
+			" titemid:" ZBX_FS_UI64,
+			__function_name, hostid, titemid);
+
+	result = DBselect(
+			"select hi.itemid"
+			" from items hi,items ti"
+			" where hi.key_=ti.key_"
+				" and hi.hostid=" ZBX_FS_UI64
+				" and ti.itemid=" ZBX_FS_UI64,
+			hostid, titemid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(itemid, row[0]);
+	}
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64,
+			__function_name, itemid);
+
+	return itemid;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBcopy_graph_to_host                                             *
  *                                                                            *
  * Purpose: copy specified graph to host                                      *
@@ -2651,6 +2698,16 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
 #endif
+
+	if (GRAPH_YAXIS_TYPE_ITEM_VALUE == ymin_type)
+		ymin_itemid = DBget_same_itemid(hostid, ymin_itemid);
+	else
+		ymin_itemid = 0;
+
+	if (GRAPH_YAXIS_TYPE_ITEM_VALUE == ymax_type)
+		ymax_itemid = DBget_same_itemid(hostid, ymax_itemid);
+	else
+		ymax_itemid = 0;
 
 	if (0 != hst_graphid)
 	{
