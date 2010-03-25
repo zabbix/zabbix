@@ -919,11 +919,9 @@ return $result;
 	 ******************************************************************************/
 	function copy_trigger_to_host($triggerid, $hostid, $copy_mode = false){
 		$trigger = get_trigger_by_triggerid($triggerid);
-
-		$deps = replace_template_dependencies(
-					get_trigger_dependencies_by_triggerid($triggerid),
-					$hostid);
-
+		// $deps = replace_template_dependencies(
+					// get_trigger_dependencies_by_triggerid($triggerid),
+					// $hostid);
 		$sql='SELECT t2.triggerid, t2.expression '.
 				' FROM triggers t2, functions f1, functions f2, items i1, items i2 '.
 				' WHERE f1.triggerid='.$triggerid.
@@ -934,6 +932,7 @@ return $result;
 					' AND i2.key_=i1.key_ '.
 					' AND i2.hostid='.$hostid.
 					' AND t2.triggerid=f2.triggerid '.
+					' AND t2.description='.zbx_dbstr($trigger['description']).
 					' AND t2.templateid=0 ';
 
 		$host_triggers = DBSelect($sql);
@@ -950,7 +949,7 @@ return $result;
 				NULL,	// status
 				$trigger['comments'],
 				$trigger['url'],
-				$deps,
+				array(),
 				$copy_mode ? 0 : $triggerid);
 		}
 
@@ -994,7 +993,8 @@ return $result;
 
 		DBexecute('UPDATE triggers SET expression='.zbx_dbstr($newexpression).' WHERE triggerid='.$newtriggerid);
 // copy dependencies
-		delete_dependencies_by_triggerid($newtriggerid);
+		// delete_dependencies_by_triggerid($newtriggerid);
+		$deps = replace_template_dependencies(get_trigger_dependencies_by_triggerid($triggerid),$hostid);
 		foreach($deps as $dep_id){
 			add_trigger_dependency($newtriggerid, $dep_id);
 		}
@@ -1951,8 +1951,8 @@ return $result;
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => 1,
 			);
-			$triggers_exist = CTrigger::get($options);
-			
+
+			$triggers_exist = CTrigger::get($options);		
 			$trigger_exist = false;
 			foreach($triggers_exist as $tnum => $tr){
 				$tmp_exp = explode_exp($tr['expression'], false);
@@ -1961,7 +1961,6 @@ return $result;
 					break;
 				}
 			}
-
 			if($trigger_exist && ($trigger_exist['triggerid'] != $trigger['triggerid'])){
 				error('Trigger [ '.$trigger['description'].' ] already exists');
 				return false;
@@ -2606,7 +2605,7 @@ return $result;
 		if(!isset($hosts)){
 			return $table;
 		}
-		ksort($hosts, SORT_STRING);
+		ksort($hosts);
 
 		if($view_style == STYLE_TOP){
 			$header=array(new CCol(S_TRIGGERS,'center'));
