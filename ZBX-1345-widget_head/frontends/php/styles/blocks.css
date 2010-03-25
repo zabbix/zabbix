@@ -24,7 +24,7 @@
 /************************************************************/
 div.scrollbar{
 	position: relative;
-	border: 2px #4F6FA8 solid;
+	border: 1px #4F6FA8 solid;
 	height: 56px;
 	background-color: #DDDDDD;
 	margin: 0 auto;

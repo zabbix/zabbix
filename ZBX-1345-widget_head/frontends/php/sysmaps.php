@@ -236,19 +236,20 @@ include_once('include/page_header.php');
 	$form->addItem(new CButton('form', S_CREATE_MAP));
 	$form->addItem(new CButton('form', S_IMPORT_MAP));
 
-	show_table_header(S_CONFIGURATION_OF_NETWORK_MAPS, $form);
+	$map_wdgt = new CWidget();
+	$map_wdgt->addPageHeader(S_CONFIGURATION_OF_NETWORK_MAPS, $form);
 ?>
 <?php
 //	COpt::savesqlrequest(0,'/////////////////////////////////////////////////////////////////////////////////////////////////////////');
 	if(isset($_REQUEST['form'])){
 		if($_REQUEST['form'] == S_IMPORT_MAP)
-			import_map_form($rules);
+			$map_wdgt->addItem(import_map_form($rules));
 		else if(($_REQUEST['form'] == S_CREATE_MAP) || ($_REQUEST['form'] == 'update'))
-			insert_map_form();
+			$map_wdgt->addItem(insert_map_form());
+			
 	}
 	else{
-		$map_wdgt = new CWidget();
-
+		
 		$form = new CForm();
 		$form->setName('frm_maps');
 
@@ -326,12 +327,10 @@ include_once('include/page_header.php');
 		$form->addItem($table);
 
 		$map_wdgt->addItem($form);
-		$map_wdgt->show();
 	}
+	
+	$map_wdgt->show();
 
-?>
-<?php
 
 include_once('include/page_footer.php');
-
 ?>

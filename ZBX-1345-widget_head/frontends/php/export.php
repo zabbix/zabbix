@@ -213,8 +213,8 @@ include_once('include/page_header.php');
 		$cmbConf->addItem('import.php',S_IMPORT);
 	$form->addItem($cmbConf);
 
-	show_table_header(S_EXPORT_BIG, $form);
-	echo SBR;
+	$export_wdgt = new CWidget();
+	$export_wdgt->addPageHeader(S_EXPORT_BIG, $form);
 
 	if($preview){
 		$table = new CTableInfo(S_NO_DATA_FOR_EXPORT);
@@ -284,7 +284,7 @@ include_once('include/page_header.php');
 		$form->addItem(array($goBox, $goButton));
 // } GO box
 		$table->setFooter(new CCol($form));
-		$table->show();
+		$export_wdgt->addItem($table);
 
 		$jsLocale = array(
 			'S_CLOSE',
@@ -296,8 +296,6 @@ include_once('include/page_header.php');
 		zbx_add_post_js('chkbxRange.pageGoCount = 1;');
 	}
 	else{
-		$export_wdgt = new CWidget();
-
 // Page header {
 		$form = new CForm(null, 'post');
 		$form->setName('export_hosts_frm');
@@ -465,9 +463,9 @@ include_once('include/page_header.php');
 		$table = array($paging, $table, $paging, $footer);
 		$form->addItem($table);
 		$export_wdgt->addItem($form);
-		$export_wdgt->show();
 	}
 
+	$export_wdgt->show();
 
 include_once('include/page_footer.php');
 ?>

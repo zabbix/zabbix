@@ -151,7 +151,7 @@
 		$form->addItemToBottomRow(SPACE);
 		$form->addItemToBottomRow(new CButtonCancel());
 
-		$form->show();
+		return $form;
 	}
 
 	function insert_drule_form(){
@@ -347,7 +347,7 @@
 		$form->addItemToBottomRow(SPACE);
 		$form->addItemToBottomRow(new CButtonCancel());
 
-		$form->show();
+		return $form;
 	}
 
 	function	insert_httpstep_form()
@@ -579,7 +579,7 @@
 		$form->addItemToBottomRow(SPACE);
 		$form->addItemToBottomRow(new CButtonCancel());
 
-		$form->show();
+		return $form;
 	}
 
 	function insert_configuration_form($file){
@@ -940,7 +940,8 @@
 		}
 		$frmUser->addItemToBottomRow(SPACE);
 		$frmUser->addItemToBottomRow(new CButtonCancel(url_param("config")));
-		$frmUser->show();
+		
+		return $frmUser;
 	}
 
 // Insert form for User Groups
@@ -1169,7 +1170,8 @@
 		}
 		$frmUserG->addItemToBottomRow(SPACE);
 		$frmUserG->addItemToBottomRow(new CButtonCancel(url_param("config")));
-		$frmUserG->show();
+		
+		return($frmUserG);
 	}
 
 	function get_rights_of_elements_table($rights=array(),$user_type=USER_TYPE_ZABBIX_USER){
@@ -5176,7 +5178,7 @@
 		$form->addRow(S_RULES, $table);
 
 		$form->addItemToBottomRow(new CButton('import', S_IMPORT));
-		$form->show();
+		return $form;
 	}
 
 	function insert_screen_form(){
@@ -5222,7 +5224,8 @@
 		}
 		$frmScr->addItemToBottomRow(SPACE);
 		$frmScr->addItemToBottomRow(new CButtonCancel());
-		$frmScr->show();
+		
+		return $frmScr;
 	}
 
 // HOSTS
@@ -5593,7 +5596,8 @@
 		$frmHost->addItemToBottomRow(new CButton('save',S_SAVE));
 		$frmHost->addItemToBottomRow(SPACE);
 		$frmHost->addItemToBottomRow(new CButtonCancel(url_param('config').url_param('groupid')));
-		$frmHost->show();
+		
+		return $frmHost;
 	}
 
 // Host form
@@ -6102,7 +6106,7 @@
 		$outer_table->addRow(array($td_l, $td_r));
 
 		$frmHost->addItem($outer_table);
-		$frmHost->show();
+		return $frmHost;
 	}
 
 // Insert host profile ReadOnly form
@@ -6301,7 +6305,7 @@
 		$form->addRow(S_RULES, $table);
 
 		$form->addItemToBottomRow(new CButton('import', S_IMPORT));
-		$form->show();
+		return $form;
 	}
 
 	function insert_map_form(){
@@ -6390,7 +6394,7 @@
 		$frmMap->addItemToBottomRow(SPACE);
 		$frmMap->addItemToBottomRow(new CButtonCancel());
 
-		$frmMap->show();
+		return $frmMap;
 	}
 
 	function insert_command_result_form($scriptid,$hostid){

@@ -269,7 +269,7 @@
 
 		$right_tab->addRow($right_row);
 
-		$table = new CTable(NULL,'header bottom_space');
+		$table = new CTable(NULL,'header');
 //		$table->setAttribute('border',0);
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);

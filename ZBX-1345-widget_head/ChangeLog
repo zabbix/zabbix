@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-2048] fixed sorting in screens dropdown (Vedmak)
  - [ZBX-2210] added template replace option for hosts mass update (Vedmak)
  - [ZBX-2219] fixed graphs data in data.sql (Aly)
  - [ZBX-1345] time filter redesigned, sliders moved to top inside filter (Vedmak)
