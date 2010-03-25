@@ -511,68 +511,6 @@ static int	DBget_same_applications_by_itemid(zbx_uint64_t hostid,
 
 /******************************************************************************
  *                                                                            *
- * Function: DBdelete_dependencies_by_triggerid                               *
- *                                                                            *
- * Purpose: delete dependencies from triggers                                 *
- *                                                                            *
- * Parameters: triggerid - trigger identificator from database                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
- *                                                                            *
- ******************************************************************************/
-static void	DBdelete_dependencies_by_triggerid(zbx_uint64_t triggerid)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	triggerid_up;
-	char		*sql = NULL;
-	int		sql_offset = 0, sql_alloc = 256;
-
-	sql = zbx_malloc(sql, sql_alloc);
-
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
-#endif
-
-	result = DBselect(
-			"select triggerid_up"
-			" from trigger_depends"
-			" where triggerid_down=" ZBX_FS_UI64,
-			triggerid);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(triggerid_up, row[0]);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
-				"update triggers"
-				" set dep_level=dep_level-1"
-				" where triggerid=" ZBX_FS_UI64 ";\n",
-				triggerid_up);
-	}
-	DBfree_result(result);
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
-			"delete from trigger_depends"
-			" where triggerid_down=" ZBX_FS_UI64 ";\n",
-			triggerid);
-
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
-#endif
-
-	if (sql_offset > 16)
-		DBexecute("%s", sql);
-
-	zbx_free(sql);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DBclear_parents_from_trigger                                     *
  *                                                                            *
  * Purpose: removes any links between trigger and service if service          *
@@ -1053,34 +991,57 @@ static void DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
  ******************************************************************************/
 static void	DBdelete_trigger(zbx_uint64_t triggerid)
 {
-	DBdelete_dependencies_by_triggerid(triggerid);
+	char	*sql = NULL;
+	int	sql_offset = 0, sql_alloc = 256;
+
 	DBdelete_services_by_triggerid(triggerid);
 	DBdelete_sysmaps_elements(SYSMAP_ELEMENT_TYPE_TRIGGER, triggerid);
-
-	DBexecute("delete from trigger_depends"
-			" where triggerid_up=" ZBX_FS_UI64,
-			triggerid);
-
-	DBexecute("delete from functions"
-			" where triggerid=" ZBX_FS_UI64,
-			triggerid);
-
-	DBexecute("delete from events"
-			" where object=%d"
-				" and objectid=" ZBX_FS_UI64,
-			EVENT_OBJECT_TRIGGER, triggerid);
-
-	DBexecute("delete from sysmaps_link_triggers"
-			" where triggerid=" ZBX_FS_UI64,
-			triggerid);
-
 	DBdelete_action_conditions(CONDITION_TYPE_TRIGGER, triggerid);
 
-	DBexecute("delete from triggers"
-			" where triggerid=" ZBX_FS_UI64,
+	sql = zbx_malloc(sql, sql_alloc);
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
+#endif
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
+			"delete from trigger_depends"
+			" where triggerid_down=" ZBX_FS_UI64 ";\n",
 			triggerid);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Trigger [" ZBX_FS_UI64 "] deleted", triggerid);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
+			"delete from trigger_depends"
+			" where triggerid_up=" ZBX_FS_UI64 ";\n",
+			triggerid);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
+			"delete from functions"
+			" where triggerid=" ZBX_FS_UI64 ";\n",
+			triggerid);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
+			"delete from events"
+			" where object=%d"
+				" and objectid=" ZBX_FS_UI64 ";\n",
+			EVENT_OBJECT_TRIGGER, triggerid);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
+			"delete from sysmaps_link_triggers"
+			" where triggerid=" ZBX_FS_UI64 ";\n",
+			triggerid);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
+			"delete from triggers"
+			" where triggerid=" ZBX_FS_UI64 ";\n",
+			triggerid);
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
+#endif
+
+	DBexecute("%s", sql);
+
+	zbx_free(sql);
 }
 
 /******************************************************************************
@@ -2057,12 +2018,6 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t *trids, int
 					" (triggerdepid,triggerid_down,triggerid_up)"
 					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ");\n",
 					triggerdepid, triggerid_down, triggerid_up);
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 92,
-					"update triggers"
-					" set dep_level=dep_level+1"
-					" where triggerid=" ZBX_FS_UI64 ";\n",
-					triggerid_up);
 		}
 	}
 	DBfree_result(result);
