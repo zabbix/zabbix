@@ -1505,7 +1505,7 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
 	}
 	DBfree_result(result);
 
-	uint64_array_rm(applicationids, &applicationids_num, ids, ids_num);
+	uint64_array_remove(applicationids, &applicationids_num, ids, ids_num);
 
 	sql_offset = 0;
 #ifdef HAVE_ORACLE
@@ -2114,7 +2114,7 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid)
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(graphid, row[0]);
-			uint64_array_rm(graphids, &graphids_num, &graphid, 1);
+			uint64_array_remove(graphids, &graphids_num, &graphid, 1);
 		}
 		DBfree_result(result);
 
@@ -3101,7 +3101,7 @@ int	DBdelete_host(zbx_uint64_t hostid)
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(elementid, row[0]);
-			uint64_array_rm(graphids, &graphids_num, &elementid, 1);
+			uint64_array_remove(graphids, &graphids_num, &elementid, 1);
 		}
 		DBfree_result(result);
 
