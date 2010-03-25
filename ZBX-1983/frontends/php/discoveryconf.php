@@ -51,7 +51,7 @@ include_once('include/page_header.php');
 			IN(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2, SVC_SNMPv3, SVC_ICMPPING)),
 										'isset({add_check})'),
 
-		'new_check_ports'=>	array(T_ZBX_PORTS, O_OPT,  null,	REGEXP("/^\d+(-\d+)?(,\d+(-\d+)?)*$/is"),	'isset({add_check})'),
+		'new_check_ports'=>	array(T_ZBX_PORTS, O_OPT,  null,	"validate_port_list({})&&",	'isset({add_check})'),
 		'new_check_key'=>	array(T_ZBX_STR, O_OPT,  null,	null,	'isset({add_check})'),
 		'new_check_snmp_community'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({add_check})'),
 		'new_check_snmpv3_securitylevel'=>	array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2'),	'isset({add_check})'),
