@@ -57,7 +57,7 @@ typedef struct {
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
  * Parameters: templateids - array of templates identificators from database  *
- *             templateids_num - templates count in hostids array             *
+ *             templateids_num - templates count in templateids array         *
  *                                                                            *
  * Return value: SUCCEED if no collisions found                               *
  *                                                                            *
@@ -388,7 +388,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_uint64_t templateid,
 				" and i.hostid=" ZBX_FS_UI64,
 			templateid);
 
-	while (NULL != (trow = DBfetch(tresult)) && SUCCEED == res)
+	while (SUCCEED == res && NULL != (trow = DBfetch(tresult)))
 	{
 		ZBX_STR2UINT64(graphid, trow[0]);
 
@@ -517,7 +517,7 @@ static int	DBget_same_applications_by_itemid(zbx_uint64_t hostid,
  *                                                                            *
  * Parameters: triggerid - trigger identificator from database                *
  *                                                                            *
- * Return value: always SUCCEED                                               *
+ * Return value:                                                              *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -687,7 +687,7 @@ static int	DBget_service_status(
  *                                                                            *
  * Function: DBupdate_services_rec                                            *
  *                                                                            *
- * Purpose: re-calculate and updates status of the service and its childs     *
+ * Purpose: re-calculate and update status of the service and its children    *
  *                                                                            *
  * Parameters: serviceid - item to update services for                        *
  *                                                                            *
@@ -817,7 +817,7 @@ static void DBupdate_services_status_all(void)
  *                                                                            *
  * Function: DBupdate_services                                                *
  *                                                                            *
- * Purpose: re-calculate and update status of the service and its childs      *
+ * Purpose: re-calculate and update status of the service and its children    *
  *                                                                            *
  * Parameters: serviceid - item to update services for                        *
  *             status - new status of the service                             *
@@ -861,7 +861,7 @@ void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock)
  *                                                                            *
  * Parameters: triggerid - trigger identificator from database                *
  *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
+ * Return value:                                                              *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -935,7 +935,7 @@ static void	DBdelete_services_by_triggerid(zbx_uint64_t triggerid)
  *                                                                            *
  * Parameters: selementid - map element identificator from database           *
  *                                                                            *
- * Return value: always return SUCCEED                                        *
+ * Return value:                                                              *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -973,7 +973,7 @@ static void	DBdelete_sysmaps_element(zbx_uint64_t selementid)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
+ * Return value:                                                              *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -1010,7 +1010,7 @@ static void	DBdelete_sysmaps_elements(int elementtype, zbx_uint64_t elementid)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
+ * Return value:                                                              *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -1042,9 +1042,9 @@ static void DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
  *                                                                            *
  * Purpose: delete trigger from database                                      *
  *                                                                            *
- * Parameters: triggerid - trigger dentificator from database                 *
+ * Parameters: triggerid - trigger identificator from database                *
  *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
+ * Return value:                                                              *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -1074,7 +1074,6 @@ static void	DBdelete_trigger(zbx_uint64_t triggerid)
 			" where triggerid=" ZBX_FS_UI64,
 			triggerid);
 
-	/* delete action conditions */
 	DBdelete_action_conditions(CONDITION_TYPE_TRIGGER, triggerid);
 
 	DBexecute("delete from triggers"
@@ -1093,7 +1092,7 @@ static void	DBdelete_trigger(zbx_uint64_t triggerid)
  * Parameters: itemids     - [IN] item identificators from database           *
  *             itemids_num - [IN] number of items                             *
  *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
+ * Return value:                                                              *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -1147,7 +1146,7 @@ static void	DBdelete_triggers_by_itemids(zbx_uint64_t *itemids, int itemids_num)
  * Parameters: itemids     - [IN] item identificators from database           *
  *             itemids_num - [IN] number of items                             *
  *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
+ * Return value:                                                              *
  *                                                                            *
  * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
@@ -1280,7 +1279,7 @@ static void	DBdelete_graphs(zbx_uint64_t *graphids, int graphids_num)
  * Parameters: itemids     - [IN] array of item identificators from database  *
  *             itemids_num - [IN] number of item ids                          *
  *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
+ * Return value:                                                              *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -1504,7 +1503,7 @@ static void	DBdelete_httptests(zbx_uint64_t *htids, int htids_num)
  *                                                                            *
  * Parameters: applicationid - [IN] application identificator from database   *
  *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
+ * Return value:                                                              *
  *                                                                            *
  * Author: Eugene Grigorjev, Alexander Vladishev                              *
  *                                                                            *
@@ -1594,8 +1593,6 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
  *                                                                            *
  * Parameters: hostid - host identificator from database                      *
  *             templateid - template identificator from database              *
- *             unlink_mode - 1 - only unlink elements without deletion        *
- *                           0 - delete elements                              *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
@@ -1689,8 +1686,6 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, zbx_uint64_t templat
  *                                                                            *
  * Parameters: hostid - host identificator from database                      *
  *             templateid - template identificator from database              *
- *             unlink_mode - 1 - only unlink elements without deletion        *
- *                           0 - delete elements                              *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
@@ -1965,7 +1960,8 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
  *                                                                            *
  * Purpose: update trigger dependencies for specified host                    *
  *                                                                            *
- * Parameters: hostid - host identificator from database                      *
+ * Parameters: trids - array of trigger identifiers from database             *
+ *             trids_num - trigger count in trids array                       *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
@@ -2093,8 +2089,7 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t *trids, int
  *                                                                            *
  * Parameters: hostid - host identificator from database                      *
  *             templateid - template identificator from database              *
- *             unlink_mode - 1 - only unlink elements without deletion        *
- *                           0 - delete elements                              *
+ *                                                                            *
  * Return value:                                                              *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
@@ -2189,8 +2184,6 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid)
  *                                                                            *
  * Parameters: hostid - host identificator from database                      *
  *             templateid - template identificator from database              *
- *             copy_mode - 1 - only copy elements without linkage             *
- *                         0 - copy and link elements                         *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
@@ -2232,7 +2225,7 @@ static int	DBcopy_template_applications(zbx_uint64_t hostid,
 	{
 		ZBX_STR2UINT64(template_applicationid, row[0]);
 
-		if (SUCCEED != (DBis_null(row[2])))
+		if (SUCCEED != DBis_null(row[2]))
 		{
 			ZBX_STR2UINT64(applicationid, row[2]);
 
@@ -2283,8 +2276,6 @@ static int	DBcopy_template_applications(zbx_uint64_t hostid,
  *                                                                            *
  * Parameters: hostid - host identificator from database                      *
  *             templateid - template identificator from database              *
- *             copy_mode - 1 - only copy elements without linkage             *
- *                         0 - copy and link elements                         *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
@@ -2827,8 +2818,6 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
  *                                                                            *
  * Parameters: hostid - host identificator from database                      *
  *             templateid - template identificator from database              *
- *             copy_mode - 1 - only copy elements without linkage             *
- *                         0 - copy and link elements                         *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
@@ -2895,7 +2884,7 @@ static int	DBcopy_template_graphs(zbx_uint64_t hostid, zbx_uint64_t templateid)
  *                                                                            *
  * Function: get_templates_by_hostid                                          *
  *                                                                            *
- * Description: Retrive already linked templates for specified host           *
+ * Description: Retrieve already linked templates for specified host          *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
