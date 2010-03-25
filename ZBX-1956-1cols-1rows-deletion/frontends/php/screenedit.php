@@ -179,8 +179,8 @@ include_once('include/page_header.php');
 			DBexecute('UPDATE screens_items SET y=(y-1) WHERE screenid='.$screen['screenid'].' AND y>'.$rmv_row);
          add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN,' Name ['.$screen['name'].'] Row deleted');
 		} else {
-			error(S_SCREEN_SHOULD_CONTAIN_ONE_ROW_AND_COL);
-			show_messages(false, '', S_CANNOT_REMOVE_ROW_OR_COL);
+			error(S_SCREEN_SHOULD_CONTAIN_ONE_ROW_AND_COLUMN);
+			show_messages(false, '', S_CANNOT_REMOVE_ROW_OR_COLUMN);
       }
 	}
 	else if(isset($_REQUEST['rmv_col'])){
@@ -191,8 +191,8 @@ include_once('include/page_header.php');
 			DBexecute('UPDATE screens_items SET x=(x-1) WHERE screenid='.$screen['screenid'].' AND x>'.$rmv_col);
          add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN,' Name ['.$screen['name'].'] Column deleted');
 		} else {
-			error(S_SCREEN_SHOULD_CONTAIN_ONE_ROW_AND_COL);
-			show_messages(false, '', S_CANNOT_REMOVE_ROW_OR_COL);
+			error(S_SCREEN_SHOULD_CONTAIN_ONE_ROW_AND_COLUMN);
+			show_messages(false, '', S_CANNOT_REMOVE_ROW_OR_COLUMN);
       }
 	}
 	else if(isset($_REQUEST['sw_pos'])){
