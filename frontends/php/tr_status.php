@@ -402,6 +402,7 @@ include_once('include/page_header.php');
 			$options = array(
 				'count' => 1,
 				'triggerids' => $trigger['triggerid'],
+				'object' => EVENT_OBJECT_TRIGGER,
 				'acknowledged' => 0,
 				'value' => TRIGGER_VALUE_TRUE,
 				'nopermissions' => 1
