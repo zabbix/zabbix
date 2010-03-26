@@ -580,10 +580,6 @@
 	define('SPACE',	'&nbsp;');
 	define('RARR',	'&rArr;');
 
-// affects multibyte strings [in mb_ereg char "-" must be backslashed]!!!
-if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
-	define('ZBX_MBSTRINGS_OVERLOADED',1);
-}
 
 	define('REGEXP_INCLUDE',0);
 	define('REGEXP_EXCLUDE',1);
