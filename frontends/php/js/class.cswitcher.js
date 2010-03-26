@@ -20,15 +20,16 @@
 var CSwitcher = Class.create();
 
 CSwitcher.prototype = {
-
+initProc: null,		// on if init method is running
 switchers_name : '',
 switchers : {},
-imgOpened : 'images/general/opened.gif',  
-imgClosed : 'images/general/closed.gif',
+classOpened : 'filteropened',
+classClosed : 'filterclosed',
 
 initialize : function(name){
+	this.init = true;
 	this.switchers_name = name;
-	
+
 	var element = $(this.switchers_name);
 
 	if(!is_null(element))
@@ -39,7 +40,7 @@ initialize : function(name){
 		if(!isset(i, divs)) continue;
 		addListener(divs[i], 'click', this.showHide.bindAsEventListener(this));
 		
-		var switcherid = $(divs[i]).readAttribute('data-switcherid');
+		var switcherid = divs[i].getAttribute('data-switcherid');
 		this.switchers[switcherid] = {};
 		this.switchers[switcherid]['object'] = divs[i];
 
@@ -52,13 +53,13 @@ initialize : function(name){
 			this.open(to_change[i]);
 		}	
 	}
-
+	
+	this.init = false;
 },
 
 open : function(switcherid){
-
 	if(isset(switcherid, this.switchers)){
-		$(this.switchers[switcherid]['object']).firstDescendant().writeAttribute('src', this.imgOpened);
+		$(this.switchers[switcherid]['object']).className = this.classOpened;
 		var elements = $$('tr[data-parentid='+switcherid+']');
 		for(var i=0; i<elements.length; i++){
 			if(!isset(i, elements)) continue;
@@ -66,39 +67,35 @@ open : function(switcherid){
 		}
 		
 		this.switchers[switcherid]['state'] = 1;
-		
-		this.storeCookie();
+
+		if(this.init === false) this.storeCookie();
 	}
 },
 
 showHide : function(e){
-//	var e = event || e;
 	PageRefresh.restart();
 	
-	var obj = e.currentTarget;
+	var obj = eventTarget(e);
+	var switcherid = obj.getAttribute('data-switcherid');
 
-	var switcherid = $(obj).readAttribute('data-switcherid');
-
-	var img = $(obj).firstDescendant();
-	
-	if(img.readAttribute('src') == this.imgClosed){
+	if(obj.getAttribute('class') == this.classClosed){
 		var state = 1;
-		var newImgPath = this.imgOpened;
-		var oldImgPath = this.imgClosed;
+		var newClassName = this.classOpened;
+		var oldClassName = this.classClosed;
 	}
 	else{
 		var state = 0;
-		var newImgPath = this.imgClosed;
-		var oldImgPath = this.imgOpened;
+		var newClassName = this.classClosed;
+		var oldClassName = this.classOpened;
 	}
-	img.writeAttribute('src', newImgPath);
-	
+	obj.className = newClassName;
 	
 	if(empty(switcherid)){
-		var imgs = $$('img[src='+oldImgPath+']');
-		for(var i=0; i < imgs.length; i++){
-			if(empty(imgs[i])) continue;
-			imgs[i].src = newImgPath;
+
+		var divs = $$('div.'+oldClassName);
+		for(var i=0; i < divs.length; i++){
+			if(empty(divs[i])) continue;
+			divs[i].className = newClassName;
 		}
 	}
 	
@@ -129,8 +126,7 @@ showHide : function(e){
 },
 
 storeCookie : function(){
-
-	cookie.erase(this.switchers_name);
+//	cookie.erase(this.switchers_name);
 	
 	var storeArray = new Array();
 	
@@ -143,6 +139,3 @@ storeCookie : function(){
 	cookie.createArray(this.switchers_name, storeArray);
 }
 }
-
-
-
