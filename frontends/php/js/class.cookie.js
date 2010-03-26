@@ -40,8 +40,7 @@ init: function(){
 		}
 		else{
 			this.cookies[cookiePair[0]] = cookiePair[1];
-//SDI(cookiePair[0] + ' ' + cookiePair[1]);
-			
+//SDI(cookiePair[0] + ' ' + cookiePair[1]);			
 		}
 	}
 },
@@ -55,7 +54,7 @@ create: function(name,value,days){
 	else{ 
 		var expires = "";
 	}
-	
+
 	document.cookie = name+"="+value+expires+"; path=/";
 
 	if(document.cookie.length > 8000){
