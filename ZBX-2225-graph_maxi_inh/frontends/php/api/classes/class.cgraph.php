@@ -806,18 +806,17 @@ COpt::memoryPick();
 				'nopermissions' => 1,
 				'templated_hosts' => 1,
 			);
-
 			$chd_hosts = CHost::get($options);
 
 			$options = array(
-					'graphids' => $graph['graphid'],
-					'nopermissions' => 1,
-					'select_items' => API_OUTPUT_EXTEND,
-					'select_graph_items' => API_OUTPUT_EXTEND,
-					'output' => API_OUTPUT_EXTEND
-				);
-				$graph = self::get($options);
-				$graph = reset($graph);
+				'graphids' => $graph['graphid'],
+				'nopermissions' => 1,
+				'select_items' => API_OUTPUT_EXTEND,
+				'select_graph_items' => API_OUTPUT_EXTEND,
+				'output' => API_OUTPUT_EXTEND
+			);
+			$graph = self::get($options);
+			$graph = reset($graph);
 				
 			foreach($chd_hosts as $chd_host){
 				$tmp_graph = $graph;
@@ -825,6 +824,17 @@ COpt::memoryPick();
 				
 				$tmp_graph['gitems'] = get_same_graphitems_for_host($tmp_graph['gitems'], $chd_host['hostid'])
 					or self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: cannot inherit, no required items on [ '.$chd_host['host'].' ]');
+			
+				if($tmp_graph['ymax_itemid'] > 0){
+					$ymax_itemid = get_same_graphitems_for_host(array(array('itemid' => $tmp_graph['ymax_itemid'])), $chd_host['hostid']);
+					$ymax_itemid = reset($ymax_itemid);
+					$tmp_graph['ymax_itemid'] = $ymax_itemid['itemid'];
+				}
+				if($tmp_graph['ymin_itemid'] > 0){
+					$ymin_itemid = get_same_graphitems_for_host(array(array('itemid' => $tmp_graph['ymin_itemid'])), $chd_host['hostid']);
+					$ymin_itemid = reset($ymin_itemid);
+					$tmp_graph['ymin_itemid'] = $ymin_itemid['itemid'];
+				}
 				
 // check if templated graph exists
 				$chd_graph = self::get(array(
