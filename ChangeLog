@@ -4,6 +4,7 @@ Changes for 1.9
 
 Changes for 1.8.2
 
+ - [ZBX-1983] fixed port validation in host agent port, ipmi port and in discovery checks ports (now supports for ports ranges like "21-80,465") (AM)
  - [ZBX-1357] updated French translation; thanks to alixen (Richlv)
  - [ZBX-2048] fixed sorting in screens dropdown (Vedmak)
  - [ZBX-2221] fixed expanding/collapsing categories in "Latest Data" (Aly)
