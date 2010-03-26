@@ -251,7 +251,7 @@
 			$options['triggerids'] = $_REQUEST['triggerid'];
 		}
 	}
-	
+
 	$firstEvent = CEvent::get($options);
 // }}} CHECK IF EVENTS EXISTS
 
