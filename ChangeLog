@@ -4,6 +4,7 @@ Changes for 1.9
 
 Changes for 1.8.2
 
+ - [ZBX-2048] fixed sorting in screens dropdown (Vedmak)
  - [ZBX-2221] fixed expanding/collapsing categories in "Latest Data" (Aly)
  - [ZBX-2225] fixed linkage if templated items are used in graphs as Y axis min and max values (Sasha)
  - [ZBX-2225] complete rewrite of the server code for template linkage (Sasha)
