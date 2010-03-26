@@ -151,18 +151,16 @@ include_once('include/page_header.php');
 		$_REQUEST['show_details'] = get_request('show_details',	CProfile::get('web.tr_status.filter.show_details', 0));
 	}
 
-	if(get_request('show_events') != CProfile::get('web.tr_status.filter.show_events')){
-		$url = new CUrl();
-		$path = $url->getPath();
-		insert_js('cookie.eraseArray("'.$path.'")');
-	}
-	
 	$_REQUEST['show_triggers'] = get_request('show_triggers', CProfile::get('web.tr_status.filter.show_triggers', TRIGGERS_OPTION_ONLYTRUE));
 	$_REQUEST['show_events'] = get_request('show_events', CProfile::get('web.tr_status.filter.show_events', EVENTS_OPTION_NOEVENT));
 	$_REQUEST['show_severity'] = get_request('show_severity', CProfile::get('web.tr_status.filter.show_severity', -1));
 	$_REQUEST['txt_select'] = get_request('txt_select', CProfile::get('web.tr_status.filter.txt_select', ''));
 
-	
+	if(get_request('show_events') != CProfile::get('web.tr_status.filter.show_events')){
+		$url = new CUrl();
+		$path = $url->getPath();
+		insert_js('cookie.eraseArray("'.$path.'")');
+	}	
 	
 	if((EVENT_ACK_DISABLED == $config['event_ack_enable']) && !str_in_array($_REQUEST['show_events'],array(EVENTS_OPTION_NOEVENT,EVENTS_OPTION_ALL))){
 		$_REQUEST['show_events'] = EVENTS_OPTION_NOEVENT;
@@ -315,7 +313,9 @@ include_once('include/page_header.php');
 		: new CCheckBox('all_triggers', false, "checkAll('".$m_form->GetName()."','all_triggers', 'triggers');");
 
 	if($show_events != EVENTS_OPTION_NOEVENT){
-		$whow_hide_all = new CDiv(new CImg('images/general/closed.gif'), 'pointer');
+		//$whow_hide_all = new CDiv(new CImg('images/general/closed.gif'), 'pointer');
+		$whow_hide_all = new CDiv(SPACE, 'filterclosed');
+
 		$whow_hide_all->setAttribute('id', $switchers_name);
 	}
 	else{
@@ -616,7 +616,7 @@ include_once('include/page_header.php');
 
 
 		if(($show_events != EVENTS_OPTION_NOEVENT) && !empty($trigger['events'])){
-			$open_close = new CDiv(new CImg('images/general/closed.gif'), 'pointer');
+			$open_close = new CDiv(SPACE, 'filterclosed');
 			$open_close->setAttribute('data-switcherid', $trigger['triggerid']);
 		}
 		else if($show_events == EVENTS_OPTION_NOEVENT){
