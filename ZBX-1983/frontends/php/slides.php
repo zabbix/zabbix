@@ -70,7 +70,7 @@
 
 		if('timeline' == $_REQUEST['favobj']){
 			if(isset($_REQUEST['elementid']) && isset($_REQUEST['period'])){
-				navigation_bar_calc('web.slides', true);
+				navigation_bar_calc('web.slides', $_REQUEST['elementid'],true);
 			}
 		}
 
@@ -166,7 +166,7 @@
 		CProfile::update('web.slides.elementid', $elementid, PROFILE_TYPE_ID);
 	}
 
-	$effectiveperiod = navigation_bar_calc('web.slides', true);
+	$effectiveperiod = navigation_bar_calc('web.slides',$elementid, true);
 
 	$slides_wdgt = new CWidget('hat_slides');
 

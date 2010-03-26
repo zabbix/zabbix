@@ -23,7 +23,7 @@ require_once('include/config.inc.php');
 require_once('include/maps.inc.php');
 require_once('include/forms.inc.php');
 
-$page['title'] = "S_CONFIGURATION_OF_NETWORK_MAPS";
+$page['title'] = 'S_CONFIGURATION_OF_NETWORK_MAPS';
 $page['file'] = 'sysmap.php';
 $page['hist_arg'] = array('sysmapid');
 $page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.cmap.js');
@@ -304,6 +304,7 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
+
 	show_table_header(S_CONFIGURATION_OF_NETWORK_MAPS_BIG);
 
 	if(isset($_REQUEST['sysmapid'])){

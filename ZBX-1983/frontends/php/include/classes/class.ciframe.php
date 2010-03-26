@@ -70,7 +70,7 @@ class CIFrame extends CTag{
 	public function setScrolling($value){
 		if(is_null($value)) $value = 'no';
 
-		if($value=='no' && $value=='yes' && $value=='auto'){
+		if(($value!=='no') && ($value!=='yes') && ($value!=='auto')){
 			return $this->error('Incorrect value for setScrolling ['.$value.']');
 		}
 

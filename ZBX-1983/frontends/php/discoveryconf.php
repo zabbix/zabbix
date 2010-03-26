@@ -191,20 +191,18 @@ include_once('include/page_header.php');
 ?>
 <?php
 /* header */
-	$form = new CForm();
-	$form->setMethod('get');
+	$form = new CForm(null, 'get');
 
 	if(!isset($_REQUEST['form']))
 		$form->addItem(new CButton('form', S_CREATE_RULE));
-	show_table_header(S_CONFIGURATION_OF_DISCOVERY_BIG, $form);
-	echo SBR;
+		
+	$dscry_wdgt = new CWidget();
+	$dscry_wdgt->addPageHeader(S_CONFIGURATION_OF_DISCOVERY_BIG, $form);
 
 	if(isset($_REQUEST['form'])){
-		insert_drule_form();
+		$dscry_wdgt->addItem(insert_drule_form());
 	}
 	else{
-		$dscry_wdgt = new CWidget();
-
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 
@@ -308,12 +306,9 @@ include_once('include/page_header.php');
 		$form->addItem($tblDiscovery);
 
 		$dscry_wdgt->addItem($form);
-		$dscry_wdgt->show();
 	}
 
-?>
-<?php
+	$dscry_wdgt->show();
 
 include_once('include/page_footer.php');
-
 ?>

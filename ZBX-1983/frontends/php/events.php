@@ -238,6 +238,7 @@
 		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'eventid',
 		'sortorder' => ZBX_SORT_UP,
+		'nopermissions' => 1,
 		'limit' => 1
 	);
 	
@@ -245,13 +246,12 @@
 		$options['source'] = EVENT_SOURCE_DISCOVERY;
 	}
 	else{			
-		$options['nodeids'] = get_current_nodeid();
-		$options['object'] = EVENT_OBJECT_TRIGGER;
-		$options['nopermissions'] = 1;
-		if($_REQUEST['hide_unknown']) $options['hide_unknown'] = 1;
-		if($_REQUEST['triggerid']) $options['triggerids'] = $_REQUEST['triggerid'];
+		if($_REQUEST['triggerid']){
+			$options['object'] = EVENT_OBJECT_TRIGGER;
+			$options['triggerids'] = $_REQUEST['triggerid'];
+		}
 	}
-	
+
 	$firstEvent = CEvent::get($options);
 // }}} CHECK IF EVENTS EXISTS
 
@@ -503,27 +503,27 @@
 	}
 	
 // NAV BAR
-		$timeline = array(
-			'period' => $effectiveperiod,
-			'starttime' => $starttime,
-			'usertime' => $till
-		);
+	$timeline = array(
+		'period' => $effectiveperiod,
+		'starttime' => $starttime,
+		'usertime' => $till
+	);
 
-		$dom_graph_id = 'scrollbar_cntr';
-		$objData = array(
-			'id' => 'timeline_1',
-			'domid' => $dom_graph_id,
-			'loadSBox' => 0,
-			'loadImage' => 0,
-			'loadScroll' => 1,
-			'dynamic' => 0,
-			'mainObject' => 1
-		);
+	$dom_graph_id = 'scroll_events_id';
+	$objData = array(
+		'id' => 'timeline_1',
+		'loadSBox' => 0,
+		'loadImage' => 0,
+		'loadScroll' => 1,
+		'dynamic' => 0,
+		'mainObject' => 1
+	);
 
-		zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
-		zbx_add_post_js('timeControl.processObjects();');
+	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
+	zbx_add_post_js('timeControl.processObjects();');
 	
 	$events_wdgt->show();
+	
 	
 include_once('include/page_footer.php');
 ?>

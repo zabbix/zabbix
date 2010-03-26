@@ -193,7 +193,7 @@ include_once('include/page_header.php');
 	$audit_wdgt->addFlicker($scroll_div, CProfile::get('web.auditlogs.filter.state',1));
 //-------
 
-	$effectiveperiod = navigation_bar_calc('web.auditlogs.timeline', true);
+	$effectiveperiod = navigation_bar_calc('web.auditlogs.timeline', 0, true);
 	$bstime = $_REQUEST['stime'];
 	$from = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
 	$till = $from + $effectiveperiod;

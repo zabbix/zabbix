@@ -351,6 +351,13 @@ typedef enum
 
 typedef enum
 {
+	GRAPH_YAXIS_TYPE_CALCULATED = 0,
+	GRAPH_YAXIS_TYPE_FIXED,
+	GRAPH_YAXIS_TYPE_ITEM_VALUE
+} zbx_graph_yaxis_types_t;
+
+typedef enum
+{
 	AUDIT_RESOURCE_USER = 0,
 /*	AUDIT_RESOURCE_ZABBIX,*/
 	AUDIT_RESOURCE_ZABBIX_CONFIG = 2,

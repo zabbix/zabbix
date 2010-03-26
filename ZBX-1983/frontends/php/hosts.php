@@ -242,9 +242,17 @@ include_once('include/page_header.php');
 			}
 // }}} PROFILES
 
+			$templates = array();
+			if(isset($visible['template_table']) || isset($visible['template_table_r'])){
+				$tplids = array_keys($_REQUEST['templates']);
+				$templates = zbx_toObject($tplids, 'templateid');
+			}
 		
 			if(isset($visible['groups'])){
 				$hosts['groups'] = zbx_toObject($_REQUEST['groups'], 'groupid');
+			}
+			if(isset($visible['template_table_r'])){
+				$hosts['templates'] = $templates;
 			}
 			$result = CHost::massUpdate(array_merge($hosts, $new_values));
 			if($result === false) throw new Exception();
@@ -261,15 +269,12 @@ include_once('include/page_header.php');
 				if($groups === false) throw new Exception();
 			}
 
-			$templates = array();
-			if(isset($visible['template_table'])){
-				$tplids = array_keys($_REQUEST['templates']);
-				$templates = zbx_toObject($tplids, 'templateid');
-			}
+			
 			
 			$add = array();
-			if(!empty($templates))
+			if(!empty($templates) && isset($visible['template_table'])){
 				$add['templates'] = $templates;
+			}
 			if(!empty($groups))
 				$add['groups'] = $groups;
 			if(!empty($add)){
@@ -373,6 +378,7 @@ include_once('include/page_header.php');
 
 			if(isset($_REQUEST['hostid'])){
 				$host['hostid'] = $_REQUEST['hostid'];
+				$host['templates_clear'] = $templates_clear;
 				$result = CHost::update($host);
 
 				$hostid = $_REQUEST['hostid'];
@@ -561,7 +567,9 @@ include_once('include/page_header.php');
 		$frmForm->addItem(new CButton('form',S_CREATE_HOST));
 	}
 
-	show_table_header(S_CONFIGURATION_OF_HOSTS, $frmForm);
+	$hosts_wdgt = new CWidget();
+	$hosts_wdgt->addPageHeader(S_CONFIGURATION_OF_HOSTS, $frmForm);
+	
 
 // TODO: neponjatno pochemu hostid sbrasivaetsja no on nuzhen dlja formi
 $thid = get_request('hostid', 0);
@@ -581,13 +589,13 @@ $thid = get_request('hostid', 0);
 	// echo SBR;
 
 	if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['hosts'])){
-		insert_mass_update_host_form();
+		$hosts_wdgt->addItem(insert_mass_update_host_form());
 	}
 	else if(isset($_REQUEST['form'])){
-		insert_host_form(false);
+		$hosts_wdgt->addItem(insert_host_form(false));
 	}
 	else{
-		$hosts_wdgt = new CWidget();
+		
 
 		$frmForm = new CForm();
 		$frmForm->setMethod('get');
@@ -833,8 +841,9 @@ $thid = get_request('hostid', 0);
 //---------
 		$form->addItem($table);
 		$hosts_wdgt->addItem($form);
-		$hosts_wdgt->show();
 	}
+	
+	$hosts_wdgt->show();
 
 include_once('include/page_footer.php');
 ?>

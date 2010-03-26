@@ -721,7 +721,6 @@ class zbxXML{
 
 					if(!isset($host_db['status'])) $host_db['status'] = HOST_STATUS_TEMPLATE;		
 					$current_host = ($host_db['status'] == HOST_STATUS_TEMPLATE) ? CTemplate::exists($host_db) : CHost::exists($host_db);
-
 					if(!$current_host && !isset($rules['host']['missed'])){
 						info('Host ['.$host_db['host'].'] skipped - user rule');
 						continue; // break if update nonexist
@@ -888,25 +887,26 @@ class zbxXML{
 					if(!$current_host && isset($rules['host']['missed'])){
 						if($host_db['status'] == HOST_STATUS_TEMPLATE){
 							$result = CTemplate::create($host_db);
+							if(!$result)
+								throw new APIException(1, CTemplate::resetErrors());
+								
 							$options = array(
 								'templateids' => $result['templateids'],
 								'output' => API_OUTPUT_EXTEND
 							);
-
 							$current_host = CTemplate::get($options);
 						}
 						else{
 							$result = CHost::create($host_db);
+							if(!$result)
+								throw new APIException(1, CHost::resetErrors());
+								
 							$options = array(
 								'hostids' => $result['hostids'],
 								'output' => API_OUTPUT_EXTEND
 							);
 
 							$current_host = CHost::get($options);
-						}
-
-						if(empty($current_host)){
-							throw new APIException(1, CHost::resetErrors());
 						}
 					}
 
@@ -1097,9 +1097,8 @@ class zbxXML{
 							$trigger_db['hostid'] = $current_host['hostid'];
 							
 							if($current_trigger = CTrigger::exists($trigger_db)){
-								$current_trigger = CTrigger::get(array(
+								$ctriggers = CTrigger::get(array(
 									'filter' => array(
-										'expression' => $trigger_db['expression'],
 										'description' => $trigger_db['description']
 									),
 									'hostids' => $current_host['hostid'],
@@ -1107,10 +1106,17 @@ class zbxXML{
 									'editable' => 1
 								));
 								
-								if(empty($current_trigger)){
+								$current_trigger = false;
+								foreach($ctriggers as $tnum => $ct){
+									$tmp_exp = explode_exp($ct['expression'], false);
+									if(strcmp($trigger_db['expression'], $tmp_exp) == 0){
+										$current_trigger = $ct;
+										break;
+									}
+								}							
+								if(!$current_trigger){
 									throw new APIException(1, 'No permission for Trigger ['.$trigger_db['description'].']');
 								}
-								$current_trigger = reset($current_trigger);
 							}
 							
 						
@@ -1131,7 +1137,7 @@ class zbxXML{
 								$triggers_to_add[] = $trigger_db;
 							}
 						}
-						
+					
 						if(!empty($triggers_to_upd)){
 							$result = CTrigger::update($triggers_to_upd);
 							if(!$result){
@@ -1144,7 +1150,7 @@ class zbxXML{
 							);
 							$r = CTrigger::get($options);
 
-							$triggers_for_dependencies[] = array_merge($triggers_for_dependencies, $r);
+							$triggers_for_dependencies = array_merge($triggers_for_dependencies, $r);
 						}
 						if(!empty($triggers_to_add)){
 							$result = CTrigger::create($triggers_to_add);
@@ -1157,7 +1163,7 @@ class zbxXML{
 								'output' => API_OUTPUT_EXTEND
 							);
 							$r = CTrigger::get($options);
-							$triggers_for_dependencies[] = array_merge($triggers_for_dependencies, $r);
+							$triggers_for_dependencies = array_merge($triggers_for_dependencies, $r);
 						}
 					}
 // }}} TRIGGERS
@@ -1300,27 +1306,24 @@ class zbxXML{
 				if($dependencies->length > 0){
 					$triggers_for_dependencies = zbx_objectValues($triggers_for_dependencies, 'triggerid');
 					$triggers_for_dependencies = array_flip($triggers_for_dependencies);
-
 					foreach($dependencies as $dependency){
 						$triggers_to_add_dep = array();
 
 						$trigger_description = $dependency->getAttribute('description');
 						$current_triggerid = get_trigger_by_description($trigger_description);
-
-	// sdi('<b><u>Trigger Description: </u></b>'.$trigger_description.' | <b>Current_triggerid: </b>'. $current_triggerid['triggerid']);
+// sdi('<b><u>Trigger Description: </u></b>'.$trigger_description.' | <b>Current_triggerid: </b>'. $current_triggerid['triggerid']);
 
 						if($current_triggerid && isset($triggers_for_dependencies[$current_triggerid['triggerid']])){
-							$xpath = new DOMXPath(self::$xml);
 							$depends_on_list = $xpath->query('depends', $dependency);
 
 							foreach($depends_on_list as $depends_on){
 								$depends_triggerid = get_trigger_by_description($depends_on->nodeValue);;
-	// sdi('<b>depends on description: </b>'.$depends_on->nodeValue.' | <b>depends_triggerid: </b>'. $depends_triggerid['triggerid']);
+// sdi('<b>depends on description: </b>'.$depends_on->nodeValue.' | <b>depends_triggerid: </b>'. $depends_triggerid['triggerid']);
 								if($depends_triggerid['triggerid']){
 									$triggers_to_add_dep[] = $depends_triggerid['triggerid'];
 								}
 							}
-							$r = update_trigger($current_triggerid['triggerid'],null,null,null,null,null,null,null,$triggers_to_add_dep,null);
+							$r = update_trigger($current_triggerid['triggerid'],null,$current_triggerid['description'],null,null,null,null,null,$triggers_to_add_dep,null);
 							if($r === false){
 								throw new APIException();
 							}

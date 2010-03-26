@@ -1,5 +1,12 @@
-Changes for 1.8.2
+Changes for 1.8.1
 
+ - [ZBX-1983] fixed port validation in host agent port, ipmi port and in discovery checks ports (now supports for ports ranges like "21-80,465") (AM)
+ - [ZBX-1357] updated French translation; thanks to alixen (Richlv)
+ - [ZBX-2048] fixed sorting in screens dropdown (Vedmak)
+ - [ZBX-2221] fixed expanding/collapsing categories in "Latest Data" (Aly)
+ - [ZBX-2225] fixed linkage if templated items are used in graphs as Y axis min and max values (Sasha)
+ - [ZBX-2225] complete rewrite of the server code for template linkage (Sasha)
+ - [ZBX-2210] added template replace option for hosts mass update (Vedmak)
  - [ZBX-2219] fixed graphs data in data.sql (Aly)
  - [ZBX-1345] time filter redesigned, sliders moved to top inside filter (Vedmak)
  - [ZBX-2151] fixed header sorting in overview for items and triggers (AM)
