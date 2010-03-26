@@ -503,27 +503,27 @@
 	}
 	
 // NAV BAR
-		$timeline = array(
-			'period' => $effectiveperiod,
-			'starttime' => $starttime,
-			'usertime' => $till
-		);
+	$timeline = array(
+		'period' => $effectiveperiod,
+		'starttime' => $starttime,
+		'usertime' => $till
+	);
 
-		$dom_graph_id = 'scrollbar_cntr';
-		$objData = array(
-			'id' => 'timeline_1',
-			'domid' => $dom_graph_id,
-			'loadSBox' => 0,
-			'loadImage' => 0,
-			'loadScroll' => 1,
-			'dynamic' => 0,
-			'mainObject' => 1
-		);
+	$dom_graph_id = 'scroll_events_id';
+	$objData = array(
+		'id' => 'timeline_1',
+		'loadSBox' => 0,
+		'loadImage' => 0,
+		'loadScroll' => 1,
+		'dynamic' => 0,
+		'mainObject' => 1
+	);
 
-		zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
-		zbx_add_post_js('timeControl.processObjects();');
+	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
+	zbx_add_post_js('timeControl.processObjects();');
 	
 	$events_wdgt->show();
+	
 	
 include_once('include/page_footer.php');
 ?>
