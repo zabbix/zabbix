@@ -215,7 +215,9 @@ include_once('include/page_header.php');
 		$frmForm = new CForm();
 		$frmForm->addItem(new CButton('form', S_CREATE_GROUP));
 	}
-	show_table_header(S_CONFIGURATION_OF_GROUPS, $frmForm);
+	
+	$groups_wdgt = new CWidget();
+	$groups_wdgt->addPageHeader(S_CONFIGURATION_OF_GROUPS, $frmForm);
 
 	if(isset($_REQUEST['form'])){
 		global $USER_DETAILS;
@@ -329,11 +331,9 @@ include_once('include/page_header.php');
 		}
 		$frmHostG->addItemToBottomRow(SPACE);
 		$frmHostG->addItemToBottomRow(new CButtonCancel());
-		$frmHostG->show();
+		$groups_wdgt->addItem($frmHostG);
 	}
 	else{
-		$groups_wdgt = new CWidget();
-
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
 
@@ -493,8 +493,8 @@ include_once('include/page_header.php');
 		$form->addItem($table);
 
 		$groups_wdgt->addItem($form);
-		$groups_wdgt->show();
 	}
+	$groups_wdgt->show();
 
 include_once('include/page_footer.php');
 ?>

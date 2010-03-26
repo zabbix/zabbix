@@ -567,7 +567,9 @@ include_once('include/page_header.php');
 		$frmForm->addItem(new CButton('form',S_CREATE_HOST));
 	}
 
-	show_table_header(S_CONFIGURATION_OF_HOSTS, $frmForm);
+	$hosts_wdgt = new CWidget();
+	$hosts_wdgt->addPageHeader(S_CONFIGURATION_OF_HOSTS, $frmForm);
+	
 
 // TODO: neponjatno pochemu hostid sbrasivaetsja no on nuzhen dlja formi
 $thid = get_request('hostid', 0);
@@ -587,13 +589,13 @@ $thid = get_request('hostid', 0);
 	// echo SBR;
 
 	if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['hosts'])){
-		insert_mass_update_host_form();
+		$hosts_wdgt->addItem(insert_mass_update_host_form());
 	}
 	else if(isset($_REQUEST['form'])){
-		insert_host_form(false);
+		$hosts_wdgt->addItem(insert_host_form(false));
 	}
 	else{
-		$hosts_wdgt = new CWidget();
+		
 
 		$frmForm = new CForm();
 		$frmForm->setMethod('get');
@@ -839,8 +841,9 @@ $thid = get_request('hostid', 0);
 //---------
 		$form->addItem($table);
 		$hosts_wdgt->addItem($form);
-		$hosts_wdgt->show();
 	}
+	
+	$hosts_wdgt->show();
 
 include_once('include/page_footer.php');
 ?>

@@ -60,7 +60,7 @@
 		}
 		if('timeline' == $_REQUEST['favobj']){
 			if(isset($_REQUEST['httptestid']) && isset($_REQUEST['period'])){
-				navigation_bar_calc('web.httptest', $_REQUEST['httptestid']);
+				navigation_bar_calc('web.httptest', $_REQUEST['httptestid'], true);
 			}
 		}
 	}
@@ -82,11 +82,10 @@
 		access_deny();
 	}
 
-	navigation_bar_calc('web.httptest', $_REQUEST['httptestid']);
+	navigation_bar_calc('web.httptest', $_REQUEST['httptestid'], true);
 ?>
 <?php
 	$details_wdgt = new CWidget();
-	$details_wdgt->setClass('header');
 
 // Header
 	$url = '?httptestid='.$_REQUEST['httptestid'].'&fullscreen='.($_REQUEST['fullscreen']?'0':'1');
@@ -98,7 +97,7 @@
 	$rst_icon->setAttribute('title', S_RESET);
 	$rst_icon->addAction('onclick', new CJSscript("javascript: timeControl.objectReset('".$_REQUEST['httptestid']."');"));
 
-	$details_wdgt->addHeader(
+	$details_wdgt->addPageHeader(
 		array(S_DETAILS_OF_SCENARIO_BIG.SPACE, bold($httptest_data['name']),' ['.date(S_DATE_FORMAT_YMDHMS, $httptest_data['lastcheck']).']'),
 		array($rst_icon, $fs_icon)
 	);
@@ -233,8 +232,6 @@
 	
 	$graphsWidget->addItem($graphTable);
 	
-	$graphsWidget->addPageHeader(SPACE);
-
 // NAV BAR
 	$timeline = array(
 		'period' => get_request('period',ZBX_PERIOD_DEFAULT),

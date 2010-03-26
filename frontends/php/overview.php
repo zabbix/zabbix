@@ -140,7 +140,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
 
-	show_table_header(S_OVERVIEW_BIG, array($fs_icon, $help));
+	$over_wdgt->addPageHeader(S_OVERVIEW_BIG, array($fs_icon, $help));
 
 // 2nd heder
 	$form_l = new CForm();
