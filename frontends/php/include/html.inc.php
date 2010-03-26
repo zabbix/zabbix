@@ -111,9 +111,8 @@
 	function url_param($parameter,$request=true,$name=null){
 		$result = '';
 		if(!is_array($parameter)){
-			if(!isset($name)){
-				if(!$request)
-					fatal_error('not request variable require url name [url_param]');
+			if(is_null($name)){
+				if(!$request) fatal_error('not request variable require url name [url_param]');
 
 				$name = $parameter;
 			}
