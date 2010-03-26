@@ -1619,7 +1619,7 @@ scrollcreate: function(w){
 	
 	scr_cntr.style.paddingRight = '2px';
 	scr_cntr.style.paddingLeft = '2px';
-	scr_cntr.style.backgroundColor = '#E5E5E5';
+	// scr_cntr.style.backgroundColor = '#E5E5E5';
 	scr_cntr.style.margin = '5px 0 0 0 ';
 
 	this.dom.scrollbar = document.createElement('div');

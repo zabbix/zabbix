@@ -77,7 +77,7 @@
 		}
 		if('timeline' == $_REQUEST['favobj']){
 			if(isset($_REQUEST['elementid']) && isset($_REQUEST['period'])){
-				navigation_bar_calc('web.screens', true);
+				navigation_bar_calc('web.screens', $_REQUEST['elementid'],true);
 			}
 		}
 
@@ -116,7 +116,6 @@
 	if(2 != $_REQUEST['fullscreen'])
 		CProfile::update('web.screens.elementid',$_REQUEST['elementid'], PROFILE_TYPE_ID);
 
-	$effectiveperiod = navigation_bar_calc('web.screens', true);
 ?>
 <?php
 
@@ -151,6 +150,8 @@
 			$screen = reset($screens);
 			$elementid = $screen['screenid'];	
 		}
+		
+		$effectiveperiod = navigation_bar_calc('web.screens', $_REQUEST['elementid'], true);
 		
 		$element_name = $screens[$elementid]['name'];
 		
