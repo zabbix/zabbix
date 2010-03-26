@@ -60,7 +60,7 @@
 		}
 		if('timeline' == $_REQUEST['favobj']){
 			if(isset($_REQUEST['httptestid']) && isset($_REQUEST['period'])){
-				navigation_bar_calc('web.httptest', $_REQUEST['httptestid']);
+				navigation_bar_calc('web.httptest', $_REQUEST['httptestid'], true);
 			}
 		}
 	}
@@ -82,7 +82,7 @@
 		access_deny();
 	}
 
-	navigation_bar_calc('web.httptest', $_REQUEST['httptestid']);
+	navigation_bar_calc('web.httptest', $_REQUEST['httptestid'], true);
 ?>
 <?php
 	$details_wdgt = new CWidget();

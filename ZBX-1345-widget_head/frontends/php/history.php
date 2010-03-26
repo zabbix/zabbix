@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@ include_once('include/page_header.php');
 <?php
 	if(isset($_REQUEST['favobj'])){
 		if('timeline' == $_REQUEST['favobj']){
-			navigation_bar_calc('web.item.graph', 0, true);
+			navigation_bar_calc('web.item.graph', $_REQUEST['itemid'], true);
 		}
 		if('filter' == $_REQUEST['favobj']){
 			CProfile::update('web.history.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
@@ -271,8 +271,8 @@ include_once('include/page_header.php');
 <?php
 	if(is_array($_REQUEST['itemid'])) $itemid = reset($_REQUEST['itemid']);
 	else $itemid = $_REQUEST['itemid'];
-	$effectiveperiod = navigation_bar_calc('web.item.graph', $itemid);
-
+	
+	$effectiveperiod = navigation_bar_calc('web.item.graph', $itemid, true);
 	$bstime = $_REQUEST['stime'];
 	
 
