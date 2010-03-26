@@ -49,6 +49,9 @@
 
 	define('ZBX_FONTPATH',					realpath('fonts'));	// where to search for font (GD > 2.0.18)
 	define('ZBX_GRAPH_FONT_NAME',			'DejaVuSans');		// font file name
+
+	define('ZBX_SCRIPT_TIMEOUT',			360); // in seconds
+	define('ZBX_SCRIPT_BYTES_LIMIT',		1073741824); // 1073741824 is 1MB in bytes
 /* END OF USERS DEFINES */
 
 	define('ZBX_FONT_NAME',			'DejaVuSans');
