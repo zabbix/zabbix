@@ -1,4 +1,4 @@
-Changes for 1.8.1
+Changes for 1.8.2
 
  - [ZBX-1983] fixed port validation in host agent port, ipmi port and in discovery checks ports (now supports for ports ranges like "21-80,465") (AM)
  - [ZBX-1357] updated French translation; thanks to alixen (Richlv)
