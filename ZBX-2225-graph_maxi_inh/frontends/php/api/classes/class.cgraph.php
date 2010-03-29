@@ -563,13 +563,43 @@ COpt::memoryPick();
 				$templated_graph = false;
 				foreach($graph_hosts as $host){
 					if(HOST_STATUS_TEMPLATE == $host['status']){
-						$templated_graph = true;
+						$templated_graph = $host['hostid'];
 						break;
 					}
 				}
 				if($templated_graph && (count($graph_hosts) > 1)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_GRAPH.' [ '.$graph['name'].' ] '.S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL);
 				}
+				
+// check ymin, ymax items
+				if($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
+					$options = array(
+						'itemids' => $graph['ymin_itemid'],
+						'output' => API_OUTPUT_SHORTEN,
+						'templated_hosts' => 1
+					);
+					if($templated_graph)
+						$options['hostids'] = $templated_graph;
+					else
+						$options['monitored_hosts'] = 1;
+						
+					$yminhost = CHost::get($options);
+					if(empty($yminhost)) self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$graph['name'].' ]: Incorrect item for Ymin value');
+				}
+				if($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
+					$options = array(
+						'itemids' => $graph['ymax_itemid'],
+						'output' => API_OUTPUT_SHORTEN
+					);
+					if($templated_graph)
+						$options['hostids'] = $templated_graph;
+					else
+						$options['monitored_hosts'] = 1;
+						
+					$ymaxhost = CHost::get($options);
+					if(empty($ymaxhost)) self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$graph['name'].' ]: Incorrect item for Ymax value');
+				}			
+				
 	
 				$graphid = self::createReal($graph);
 
@@ -657,7 +687,7 @@ COpt::memoryPick();
 				$templated_graph = false;
 				foreach($graph_hosts as $host){
 					if(HOST_STATUS_TEMPLATE == $host['status']){
-						$templated_graph = true;
+						$templated_graph = $host['hostid'];
 						break;
 					}
 				}
@@ -666,6 +696,34 @@ COpt::memoryPick();
 				}
 // }}} EXCEPTION: MESS TEMPLATED ITEMS
 
+// check ymin, ymax items
+				if($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
+					$options = array(
+						'itemids' => $graph['ymin_itemid'],
+						'output' => API_OUTPUT_SHORTEN,
+						'templated_hosts' => 1
+					);
+					if($templated_graph)
+						$options['hostids'] = $templated_graph;
+					else
+						$options['monitored_hosts'] = 1;
+						
+					$yminhost = CHost::get($options);
+					if(empty($yminhost)) self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$graph['name'].' ]: Incorrect item for Ymin value');
+				}
+				if($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
+					$options = array(
+						'itemids' => $graph['ymax_itemid'],
+						'output' => API_OUTPUT_SHORTEN
+					);
+					if($templated_graph)
+						$options['hostids'] = $templated_graph;
+					else
+						$options['monitored_hosts'] = 1;
+						
+					$ymaxhost = CHost::get($options);
+					if(empty($ymaxhost)) self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$graph['name'].' ]: Incorrect item for Ymax value');
+				}
 
 				self::updateReal($graph);
 
