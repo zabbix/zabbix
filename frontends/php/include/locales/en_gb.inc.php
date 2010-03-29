@@ -1707,6 +1707,15 @@
 	'S_CLOSE'=>				'Close',
 	'S_CONNECT_TO_SERVER_ERROR'=>		'Cannot connect to Zabbix server',
 	'S_DELETE_SELECTED_SCRIPTS_Q'=>		'Delete selected scripts?',
+	
+	'S_SCRIPT_ERROR'=>			'SCRIPT ERROR',
+	'S_SCRIPT_ERROR_DESCRIPTION'=>		'Error Description',
+	'S_SCRIPT_SEND_ERROR'=>			'Can\'t send command, check connection',
+	'S_SCRIPT_READ_ERROR'=>			'Can\'t read script response, check connection',
+	'S_SCRIPT_TIMEOUT_ERROR'=>		'Defined in "include/defines.inc.php" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value',
+	'S_SCRIPT_BYTES_LIMIT_ERROR'=>		'Defined in "include/defines.inc.php" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value',
+	'S_SCRIPT_UNKNOWN_ERROR'=>		'Unknown error happend reading script answer, report to the developers, please',
+	'S_SCRIPT_ERROR_EMPTY_RESPONSE' =>	'Empty response received',
 
 //	audit.php
 	'S_AUDIT'=>				'Audit',
