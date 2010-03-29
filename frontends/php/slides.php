@@ -166,8 +166,6 @@
 		CProfile::update('web.slides.elementid', $elementid, PROFILE_TYPE_ID);
 	}
 
-	$effectiveperiod = navigation_bar_calc('web.slides',$elementid, true);
-
 	$slides_wdgt = new CWidget('hat_slides');
 
 	$formHeader = new CForm(null, 'get');
@@ -202,7 +200,9 @@
 			$elementid = $slideshow['slideshowid'];	
 		}
 		
-// PAGE HEADER {{{		
+		$effectiveperiod = navigation_bar_calc('web.slides',$elementid, true);
+		
+// PAGE HEADER {{{
 		if(infavorites('web.favorite.screenids', $elementid, 'slideshowid')){
 			$icon = new CDiv(SPACE, 'iconminus');
 			$icon->setAttribute('title', S_REMOVE_FROM.' '.S_FAVOURITES);
