@@ -307,7 +307,7 @@ include_once('include/page_header.php');
 	$show_event_col = ($config['event_ack_enable'] && ($_REQUEST['show_events'] != EVENTS_OPTION_NOEVENT));
 
 	$table = new CTableInfo();
-	$switchers_name = 'trigger_switchers';
+	$switcherName = 'trigger_switchers';
 
 	$header_cb = ($show_event_col) ? new CCheckBox('all_events', false, "checkAll('".$m_form->GetName()."','all_events','events');")
 		: new CCheckBox('all_triggers', false, "checkAll('".$m_form->GetName()."','all_triggers', 'triggers');");
@@ -316,7 +316,7 @@ include_once('include/page_header.php');
 		//$whow_hide_all = new CDiv(new CImg('images/general/closed.gif'), 'pointer');
 		$whow_hide_all = new CDiv(SPACE, 'filterclosed');
 
-		$whow_hide_all->setAttribute('id', $switchers_name);
+		$whow_hide_all->setAttribute('id', $switcherName);
 	}
 	else{
 		$whow_hide_all = NULL;
@@ -682,7 +682,7 @@ include_once('include/page_header.php');
 					'tr_events.php?triggerid='.$trigger['triggerid'].'&eventid='.$row_event['eventid']);
 				$next_clock = isset($trigger['events'][$enum-1]) ? $trigger['events'][$enum-1]['clock'] : time();
 
-				$empty_col = new CCol();
+				$empty_col = new CCol(SPACE);
 				$empty_col->setColSpan(3);
 				$ack_cb_col = new CCol($ack_cb);
 				$ack_cb_col->setColSpan(2);
@@ -736,11 +736,14 @@ include_once('include/page_header.php');
 	$trigg_wdgt->show();
 
 	zbx_add_post_js('blink.init();');
-	zbx_add_post_js("var switcher = new CSwitcher('$switchers_name');");
+	zbx_add_post_js("var switcher = new CSwitcher('$switcherName');");
 
 	$jsmenu = new CPUMenu(null, 170);
 	$jsmenu->InsertJavaScript();
 
+?>
+<?php
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
+
 ?>

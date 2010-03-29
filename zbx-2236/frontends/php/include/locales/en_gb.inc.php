@@ -1920,6 +1920,7 @@
 	'S_CRITICAL_ERROR'=>				'Critical error',
 	'S_FIELD'=>					'Field',
 	'S_IS_NOT_IP_RANGE_SMALL'=>			'is not IP range',
+	'S_IS_NOT_PORT_RANGE_SMALL'=>			'is not PORT range',
 	'S_IS_NOT_INTEGER_RANGE_SMALL'=>		'is not integer range',
 	'S_IS_NOT_INTEGER_SMALL'=>			'is not integer',
 	'S_IS_NOT_DOUBLE_SMALL'=>			'is not double',
