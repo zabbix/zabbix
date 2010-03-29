@@ -5593,7 +5593,7 @@
 		}
 // END:   HOSTS PROFILE EXTENDED Section
 
-		$frmHost->addItemToBottomRow(new CButton('save',S_SAVE));
+		$frmHost->addItemToBottomRow(new CButton('masssave',S_SAVE));
 		$frmHost->addItemToBottomRow(SPACE);
 		$frmHost->addItemToBottomRow(new CButtonCancel(url_param('config').url_param('groupid')));
 		
