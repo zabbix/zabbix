@@ -63,9 +63,10 @@ function script_make_command($scriptid,$hostid){
 }
 
 function execute_script($scriptid,$hostid){
-	global $ZBX_SERVER, $ZBX_SERVER_PORT;
-
-	if(!$socket = fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errorCode, $errorMsg, ZBX_SCRIPT_TIMEOUT)) {
+	global $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_MESSAGES;
+	
+	if(!$socket = fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errorCode, $errorMsg, ZBX_SCRIPT_TIMEOUT)){
+		array_pop($ZBX_MESSAGES);
 		error(S_SCRIPT_ERROR_DESCRIPTION.': '.$errorMsg);
 		show_messages(false, '', S_SCRIPT_ERROR);
 		return false;
@@ -125,7 +126,9 @@ function execute_script($scriptid,$hostid){
 		$json = new CJSON();
 		$rcv = $json->decode($response, true);
 	}else{
-		$rcv = '';
+		error(S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_ERROR_EMPTY_RESPONSE);
+		show_messages(false, '', S_SCRIPT_ERROR);
+		return false;
 	}
 
 	fclose($socket);
