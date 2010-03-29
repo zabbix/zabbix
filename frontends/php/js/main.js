@@ -96,7 +96,7 @@ mouseOut: function(){
 },
 
 showSubMenu: function(show_label){
-	var menu_div  = $('sub_'+show_label);
+	var menu_div = $('sub_'+show_label);
 	if(!is_null(menu_div)){
 		$(show_label).className = 'active';
 		menu_div.show();
