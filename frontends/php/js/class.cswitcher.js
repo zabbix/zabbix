@@ -44,8 +44,10 @@ initialize : function(name){
 	}
 	
 	var divs = $$('div[data-switcherid]');
+
 	for(var i=0; i<divs.length; i++){
 		if(!isset(i, divs)) continue;
+
 		addListener(divs[i], 'click', this.showHide.bindAsEventListener(this));
 		
 		var switcherid = divs[i].getAttribute('data-switcherid');
@@ -85,7 +87,7 @@ showHide : function(e){
 	var obj = eventTarget(e);
 	var switcherid = obj.getAttribute('data-switcherid');
 
-	if(obj.getAttribute('class') == this.classClosed){
+	if(obj.className == this.classClosed){
 		var state = 1;
 		var newClassName = this.classOpened;
 		var oldClassName = this.classClosed;
@@ -96,7 +98,7 @@ showHide : function(e){
 		var oldClassName = this.classOpened;
 	}
 	obj.className = newClassName;
-	
+
 	if(empty(switcherid)){
 		cookie.create(this.switcherName+'_all', state);
 
@@ -108,10 +110,9 @@ showHide : function(e){
 	}
 	
 	var elements = $$('tr[data-parentid]');
-
 	for(var i=0; i<elements.length; i++){
 		if(empty(elements[i])) continue;
-		
+
 		if(empty(switcherid) || elements[i].getAttribute('data-parentid') == switcherid){
 			if(state){
 				elements[i].style.display = '';
