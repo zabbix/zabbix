@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -151,18 +151,16 @@ include_once('include/page_header.php');
 		$_REQUEST['show_details'] = get_request('show_details',	CProfile::get('web.tr_status.filter.show_details', 0));
 	}
 
-	if(get_request('show_events') != CProfile::get('web.tr_status.filter.show_events')){
-		$url = new CUrl();
-		$path = $url->getPath();
-		insert_js('cookie.eraseArray("'.$path.'")');
-	}
-	
 	$_REQUEST['show_triggers'] = get_request('show_triggers', CProfile::get('web.tr_status.filter.show_triggers', TRIGGERS_OPTION_ONLYTRUE));
 	$_REQUEST['show_events'] = get_request('show_events', CProfile::get('web.tr_status.filter.show_events', EVENTS_OPTION_NOEVENT));
 	$_REQUEST['show_severity'] = get_request('show_severity', CProfile::get('web.tr_status.filter.show_severity', -1));
 	$_REQUEST['txt_select'] = get_request('txt_select', CProfile::get('web.tr_status.filter.txt_select', ''));
 
-	
+	if(get_request('show_events') != CProfile::get('web.tr_status.filter.show_events')){
+		$url = new CUrl();
+		$path = $url->getPath();
+		insert_js('cookie.eraseArray("'.$path.'")');
+	}	
 	
 	if((EVENT_ACK_DISABLED == $config['event_ack_enable']) && !str_in_array($_REQUEST['show_events'],array(EVENTS_OPTION_NOEVENT,EVENTS_OPTION_ALL))){
 		$_REQUEST['show_events'] = EVENTS_OPTION_NOEVENT;
@@ -309,14 +307,16 @@ include_once('include/page_header.php');
 	$show_event_col = ($config['event_ack_enable'] && ($_REQUEST['show_events'] != EVENTS_OPTION_NOEVENT));
 
 	$table = new CTableInfo();
-	$switchers_name = 'trigger_switchers';
+	$switcherName = 'trigger_switchers';
 
 	$header_cb = ($show_event_col) ? new CCheckBox('all_events', false, "checkAll('".$m_form->GetName()."','all_events','events');")
 		: new CCheckBox('all_triggers', false, "checkAll('".$m_form->GetName()."','all_triggers', 'triggers');");
 
 	if($show_events != EVENTS_OPTION_NOEVENT){
-		$whow_hide_all = new CDiv(new CImg('images/general/closed.gif'), 'pointer');
-		$whow_hide_all->setAttribute('id', $switchers_name);
+		//$whow_hide_all = new CDiv(new CImg('images/general/closed.gif'), 'pointer');
+		$whow_hide_all = new CDiv(SPACE, 'filterclosed');
+
+		$whow_hide_all->setAttribute('id', $switcherName);
 	}
 	else{
 		$whow_hide_all = NULL;
@@ -402,6 +402,7 @@ include_once('include/page_header.php');
 			$options = array(
 				'count' => 1,
 				'triggerids' => $trigger['triggerid'],
+				'object' => EVENT_OBJECT_TRIGGER,
 				'acknowledged' => 0,
 				'value' => TRIGGER_VALUE_TRUE,
 				'nopermissions' => 1
@@ -490,7 +491,7 @@ include_once('include/page_header.php');
 		$description->addAction('onclick',
 			"javascript: create_mon_trigger_menu(event, new Array({'triggerid': '".$trigger['triggerid'].
 				"', 'lastchange': '".$trigger['lastchange']."'}, ".$menu_trigger_conf.", ".$menu_trigger_url."),".
-			zbx_jsvalue($items).");"
+			zbx_jsvalue($items, true).");"
 		);
 // }}} trigger description js menu
 
@@ -598,11 +599,8 @@ include_once('include/page_header.php');
 		if((time() - $trigger['lastchange']) < TRIGGER_BLINK_PERIOD){
 			$status->setAttribute('name', 'blink');
 		}
-		$lastchange = new CLink(
-			zbx_date2str(S_DATE_FORMAT_YMDHMS, $trigger['lastchange']),
-			'events.php?triggerid='.$trigger['triggerid'].'&nav_time='.$trigger['lastchange']
-		);
-
+		$lastchange = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS, $trigger['lastchange']), 'events.php?triggerid='.$trigger['triggerid']);
+		//.'&stime='.date('YmdHi', $trigger['lastchange']
 
 		if($config['event_ack_enable']){
 			if($trigger['event_count']){
@@ -618,7 +616,7 @@ include_once('include/page_header.php');
 
 
 		if(($show_events != EVENTS_OPTION_NOEVENT) && !empty($trigger['events'])){
-			$open_close = new CDiv(new CImg('images/general/closed.gif'), 'pointer');
+			$open_close = new CDiv(SPACE, 'filterclosed');
 			$open_close->setAttribute('data-switcherid', $trigger['triggerid']);
 		}
 		else if($show_events == EVENTS_OPTION_NOEVENT){
@@ -684,7 +682,7 @@ include_once('include/page_header.php');
 					'tr_events.php?triggerid='.$trigger['triggerid'].'&eventid='.$row_event['eventid']);
 				$next_clock = isset($trigger['events'][$enum-1]) ? $trigger['events'][$enum-1]['clock'] : time();
 
-				$empty_col = new CCol();
+				$empty_col = new CCol(SPACE);
 				$empty_col->setColSpan(3);
 				$ack_cb_col = new CCol($ack_cb);
 				$ack_cb_col->setColSpan(2);
@@ -738,11 +736,14 @@ include_once('include/page_header.php');
 	$trigg_wdgt->show();
 
 	zbx_add_post_js('blink.init();');
-	zbx_add_post_js("var switcher = new CSwitcher('$switchers_name');");
+	zbx_add_post_js("var switcher = new CSwitcher('$switcherName');");
 
 	$jsmenu = new CPUMenu(null, 170);
 	$jsmenu->InsertJavaScript();
 
+?>
+<?php
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
+
 ?>

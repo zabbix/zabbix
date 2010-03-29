@@ -19,16 +19,16 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/hosts.inc.php');
-	require_once('include/httptest.inc.php');
-	require_once('include/forms.inc.php');
+require_once('include/config.inc.php');
+require_once('include/hosts.inc.php');
+require_once('include/httptest.inc.php');
+require_once('include/forms.inc.php');
 
-	$page['title'] = "S_STATUS_OF_WEB_MONITORING";
-	$page['file'] = 'httpmon.php';
-	$page['hist_arg'] = array('open','groupid','hostid');
+$page['title'] = "S_STATUS_OF_WEB_MONITORING";
+$page['file'] = 'httpmon.php';
+$page['hist_arg'] = array('open','groupid','hostid');
 
-	define('ZBX_PAGE_DO_REFRESH', 1);
+define('ZBX_PAGE_DO_REFRESH', 1);
 
 include_once('include/page_header.php');
 
@@ -76,6 +76,7 @@ include_once('include/page_header.php');
 	foreach($options as  $option) $params[$option] = 1;
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
+
 //SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
 	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
 //SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
@@ -130,8 +131,7 @@ include_once('include/page_header.php');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
 
-	show_table_header(S_STATUS_OF_WEB_MONITORING_BIG, $fs_icon);
-	echo SBR;
+	$httpmon_wdgt->addPageHeader(S_STATUS_OF_WEB_MONITORING_BIG, $fs_icon);
 
 // 2nd header
 	$r_form = new CForm();

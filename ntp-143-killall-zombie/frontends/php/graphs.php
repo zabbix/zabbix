@@ -55,7 +55,9 @@ include_once('include/page_header.php');
 		'yaxismax'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	null,	'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
 		'graph3d'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
 		'legend'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
-		"ymin_itemid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	'isset({save})&&isset({ymin_type})&&({ymin_type}==3)'),		"ymax_itemid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	'isset({save})&&isset({ymax_type})&&({ymax_type}==3)'),				'percent_left'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(0,100),	null),
+		"ymin_itemid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	'isset({save})&&isset({ymin_type})&&({ymin_type}==3)'),
+		"ymax_itemid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	'isset({save})&&isset({ymax_type})&&({ymax_type}==3)'),
+		'percent_left'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(0,100),	null),
 		'percent_right'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(0,100),	null),
 		'visible'=>			array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),	null),
 		'items'=>		array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
@@ -435,7 +437,6 @@ include_once('include/page_header.php');
 		$form->addItem(new CButton('form', S_CREATE_GRAPH));
 
 	show_table_header(S_CONFIGURATION_OF_GRAPHS_BIG,$form);
-	echo SBR;
 
 	if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['group_graphid'])){
 		insert_copy_elements_to_forms('group_graphid');

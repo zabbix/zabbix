@@ -77,7 +77,6 @@ include_once('include/page_header.php');
 ?>
 <?php
 	show_table_header(S_CONFIGURATION_OF_SCREEN_BIG);
-	echo SBR;
 
 	$options = array(
 		'screenids' => $_REQUEST['screenid'],
@@ -173,21 +172,27 @@ include_once('include/page_header.php');
 	}
 	else if(isset($_REQUEST['rmv_row'])){
 		$rmv_row = get_request('rmv_row',0);
-		if($screen['vsize'] > 0){
+		if($screen['vsize'] > 1){
 			DBexecute('UPDATE screens SET vsize=(vsize-1) WHERE screenid='.$screen['screenid']);
 			DBexecute('DELETE FROM screens_items WHERE screenid='.$screen['screenid'].' AND y='.$rmv_row);
 			DBexecute('UPDATE screens_items SET y=(y-1) WHERE screenid='.$screen['screenid'].' AND y>'.$rmv_row);
-		}
-		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN,' Name ['.$screen['name'].'] Row deleted');
+         add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN,' Name ['.$screen['name'].'] Row deleted');
+		} else {
+			error(S_SCREEN_SHOULD_CONTAIN_ONE_ROW_AND_COLUMN);
+			show_messages(false, '', S_CANNOT_REMOVE_ROW_OR_COLUMN);
+      }
 	}
 	else if(isset($_REQUEST['rmv_col'])){
 		$rmv_col = get_request('rmv_col',0);
-		if($screen['hsize'] > 0){
+		if($screen['hsize'] > 1){
 			DBexecute('UPDATE screens SET hsize=(hsize-1) WHERE screenid='.$screen['screenid']);
 			DBexecute('DELETE FROM screens_items WHERE screenid='.$screen['screenid'].' AND x='.$rmv_col);
 			DBexecute('UPDATE screens_items SET x=(x-1) WHERE screenid='.$screen['screenid'].' AND x>'.$rmv_col);
-		}
-		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN,' Name ['.$screen['name'].'] Column deleted');
+         add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN,' Name ['.$screen['name'].'] Column deleted');
+		} else {
+			error(S_SCREEN_SHOULD_CONTAIN_ONE_ROW_AND_COLUMN);
+			show_messages(false, '', S_CANNOT_REMOVE_ROW_OR_COLUMN);
+      }
 	}
 	else if(isset($_REQUEST['sw_pos'])){
 		$sw_pos = get_request('sw_pos', array());

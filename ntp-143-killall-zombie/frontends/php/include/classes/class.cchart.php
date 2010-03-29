@@ -845,7 +845,6 @@ class CChart extends CGraphDraw{
 
 			if($this->type == GRAPH_TYPE_STACKED){
 				$this->m_minY[$side] = min($tmp_minY[GRAPH_YAXIS_SIDE_LEFT], 0);
-				continue;
 			}
 
 			if($this->ymax_type == GRAPH_YAXIS_TYPE_FIXED){

@@ -69,6 +69,10 @@ getMonth: function(){
 	return this.serverDate.getMonth();
 },
 
+getYear: function(){
+	return this.serverDate.getYear();
+},
+
 getFullYear: function(){
 	return this.serverDate.getFullYear();
 },

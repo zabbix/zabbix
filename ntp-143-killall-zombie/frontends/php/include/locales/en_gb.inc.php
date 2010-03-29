@@ -587,6 +587,7 @@
 	'S_AGGREGATED_PERIODS_COUNT'=>		'Aggregated periods count',
 
 //	graphs.php
+	'S_ADD_GRAPH_ITEMS' => 'add graph items first',
 	'S_TITLE'=>				'Title',
 	'S_PERCENTILE_LINE'=>			'Percentile line',
 	'S_CONFIGURATION_OF_GRAPHS'=>		'Configuration of graphs',
@@ -803,6 +804,7 @@
 	'S_DNS_NAME'=>					'DNS name',
 	'S_IP_ADDRESS'=>				'IP address',
 	'S_LINK_ADDITIONAL_TEMPLATES'=>			'Link additional templates',
+	'S_RELINK_TEMPLATES'=>			'Replace linked templates',
 	'S_USEIPMI'=>					'Use IPMI',
 	'S_IPMI_IP_ADDRESS'=>				'IPMI IP address',
 	'S_IPMI_PORT'=>					'IPMI port',
@@ -883,6 +885,8 @@
 	'S_TEMPLATES'=>				'Templates',
 	'S_TEMPLATES_BIG'=>			'TEMPLATES',
 	'S_UNLINK'=>				'Unlink',
+	'S_CANNOT_UNLINK_TEMPLATE'=>	'Cannot unlink template',
+	'S_CANNOT_LINK_TEMPLATE'=>	'Cannot link template',
 	'S_UNLINK_AND_CLEAR'=>			'Unlink and clear',
 	'S_MONITORED_BY_PROXY'=>		'Monitored by proxy',
 
@@ -1204,6 +1208,15 @@
 	'S_MINIMIZE'=>				'Minimize',
 	'S_LOADING_P'=>				'Loading...',
 
+// dashconf.php
+	'S_DASHBOARD_CONFIGURATION' =>	'Dashboard configuration',
+	'S_DASHBOARD_CONFIGURATION_BIG' =>	'DASHBOARD CONFIGURATION',
+	'S_CONFIGURE' => 'Configure',
+	'S_SELECTED' => 'Selected',
+	'S_SHOW_HOSTS_IN_MAINTENANCE' => 'Show hosts in maintenance',
+	'S_TRIGGERS_WITH_SEVERITY' => 'Triggers with severity',
+	'S_DASHBOARD_FILTER' => 'Dashboard filter',
+
 //	overview.php
 	'S_OVERVIEW'=>				'Overview',
 	'S_OVERVIEW_BY_PROXY'=>			'Overview by proxy',
@@ -1408,6 +1421,9 @@
 
 	'S_VERTICAL_ALIGN'=>			'Vertical align',
 	'S_MIDDLE'=>				'Middle',
+
+	'S_CANNOT_REMOVE_ROW_OR_COLUMN'=>			'Impossible to remove last row and column',
+	'S_SCREEN_SHOULD_CONTAIN_ONE_ROW_AND_COLUMN'=>				'Screen should contain at least one row and column',
 
 //	screens.php
 	'S_CUSTOM_SCREENS'=>			'Custom screens',
@@ -1905,6 +1921,7 @@
 	'S_CRITICAL_ERROR'=>				'Critical error',
 	'S_FIELD'=>					'Field',
 	'S_IS_NOT_IP_RANGE_SMALL'=>			'is not IP range',
+	'S_IS_NOT_PORT_RANGE_SMALL'=>			'is not PORT range',
 	'S_IS_NOT_INTEGER_RANGE_SMALL'=>		'is not integer range',
 	'S_IS_NOT_INTEGER_SMALL'=>			'is not integer',
 	'S_IS_NOT_DOUBLE_SMALL'=>			'is not double',

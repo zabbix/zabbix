@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ require_once('include/users.inc.php');
 	$page['title'] = 'S_AUDIT';
 	$page['file'] = 'auditlogs.php';
 	$page['hist_arg'] = array();
-	$page['scripts'] = array('class.calendar.js','scriptaculous.js?load=effects');
+	$page['scripts'] = array('class.calendar.js','scriptaculous.js?load=effects,dragdrop','gtlc.js');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -45,7 +45,13 @@ include_once('include/page_header.php');
 		'filter_rst'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
 		'filter_set'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
 		'alias' =>			array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
-		'nav_time'=>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
+		
+		'period'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'dec'=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'inc'=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'left'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'right'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		'stime'=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
@@ -53,7 +59,6 @@ include_once('include/page_header.php');
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('clock',ZBX_SORT_DOWN);
 ?>
 <?php
 /* AJAX */
@@ -74,26 +79,18 @@ include_once('include/page_header.php');
 		$_REQUEST['alias'] = '';
 		$_REQUEST['action'] = -1;
 		$_REQUEST['resourcetype'] = -1;
-		$_REQUEST['nav_time'] = time();
 	}
 
 	$_REQUEST['alias'] = get_request('alias', CProfile::get('web.auditlogs.filter.alias', ''));
 	$_REQUEST['action'] = get_request('action', CProfile::get('web.auditlogs.filter.action',-1));
 	$_REQUEST['resourcetype'] = get_request('resourcetype', CProfile::get('web.auditlogs.filter.resourcetype',-1));
-	$_REQUEST['nav_time'] = get_request('nav_time', CProfile::get('web.auditlogs.filter.nav_time',time()));
 
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
 		CProfile::update('web.auditlogs.filter.alias', $_REQUEST['alias'], PROFILE_TYPE_STR);
 		CProfile::update('web.auditlogs.filter.action', $_REQUEST['action'], PROFILE_TYPE_INT);
 		CProfile::update('web.auditlogs.filter.resourcetype', $_REQUEST['resourcetype'], PROFILE_TYPE_INT);
-
-		CProfile::update('web.auditlogs.filter.nav_time', $_REQUEST['nav_time'], PROFILE_TYPE_INT);
 	}
 // --------------
-
-// Navigation initialization
-	$nav_time = $_REQUEST['nav_time'];
-// -------------
 ?>
 <?php
 
@@ -124,11 +121,6 @@ include_once('include/page_header.php');
 	$filterForm = new CFormTable();
 	$filterForm->setAttribute('name', 'zbx_filter');
 	$filterForm->setAttribute('id', 'zbx_filter');
-
-	$script = new CJSscript("javascript: if(CLNDR['audit_since'].clndr.setSDateFromOuterObj()){".
-							"$('nav_time').value = parseInt(CLNDR['audit_since'].clndr.sdt.getTime()/1000);}");
-	$filterForm->addAction('onsubmit', $script);
-	$filterForm->addVar('nav_time', ($_REQUEST['nav_time']>0)?$_REQUEST['nav_time']:'');
 
 	$row = new CRow(array(
 		new CCol(S_USER,'form_row_l'),
@@ -186,73 +178,76 @@ include_once('include/page_header.php');
 
 	$filterForm->addRow(S_RESOURCE, $cmbResource);
 
-	$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
-	$clndr_icon->addAction('onclick',"javascript: var pos = getPosition(this); pos.top+=10; pos.left+=16; CLNDR['audit_since'].clndr.clndrshow(pos.top,pos.left);");
-	$clndr_icon->setAttribute('style','vertical-align: middle;');
 
-	$nav_clndr =  array(
-		new CNumericBox('nav_day',(($_REQUEST['nav_time']>0)?date('d',$_REQUEST['nav_time']):''),2),
-		new CNumericBox('nav_month',(($_REQUEST['nav_time']>0)?date('m',$_REQUEST['nav_time']):''),2),
-		new CNumericBox('nav_year',(($_REQUEST['nav_time']>0)?date('Y',$_REQUEST['nav_time']):''),4),
-		new CNumericBox('nav_hour',(($_REQUEST['nav_time']>0)?date('H',$_REQUEST['nav_time']):''),2),
-		':',
-		new CNumericBox('nav_minute',(($_REQUEST['nav_time']>0)?date('i',$_REQUEST['nav_time']):''),2),
-		$clndr_icon
-	);
-
-	$filterForm->addRow(S_ACTIONS_SINCE,$nav_clndr);
-
-	zbx_add_post_js('create_calendar(null,'.
-				'["nav_day","nav_month","nav_year","nav_hour","nav_minute"],'.
-				'"audit_since");');
-
-	zbx_add_post_js('addListener($("filter_icon"),'.
-				'"click",CLNDR[\'audit_since\'].clndr.clndrhide.bindAsEventListener(CLNDR[\'audit_since\'].clndr));');
-
-//*/
 	$reset = new CButton('filter_rst',S_RESET);
 	$reset->setType('button');
 	$reset->setAction('javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
 
-	$filterForm->addItemToBottomRow(new CButton("filter_set",S_FILTER));
+	$filterForm->addItemToBottomRow(new CButton('filter_set',S_FILTER));
 	$filterForm->addItemToBottomRow($reset);
 
 	$audit_wdgt->addFlicker($filterForm, CProfile::get('web.auditlogs.filter.state',1));
+	
+	$scroll_div = new CDiv();
+	$scroll_div->setAttribute('id','scrollbar_cntr');
+	$audit_wdgt->addFlicker($scroll_div, CProfile::get('web.auditlogs.filter.state',1));
 //-------
 
-	$sql_cond = '';
+	$effectiveperiod = navigation_bar_calc('web.auditlogs.timeline', 0, true);
+	$bstime = $_REQUEST['stime'];
+	$from = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
+	$till = $from + $effectiveperiod;
+	
+	
+	$sql_cond = array();
 	if($_REQUEST['alias'])
-		$sql_cond.=' AND u.alias='.zbx_dbstr($_REQUEST['alias']);
+		$sql_cond['alias'] = ' AND u.alias='.zbx_dbstr($_REQUEST['alias']);
 
 	if(($_REQUEST['action']>-1))
-		$sql_cond.=' AND a.action='.$_REQUEST['action'].' ';
+		$sql_cond['action'] = ' AND a.action='.$_REQUEST['action'].' ';
 
 	if(($_REQUEST['resourcetype']>-1))
-		$sql_cond.=' AND a.resourcetype='.$_REQUEST['resourcetype'].' ';
+		$sql_cond['resourcetype'] = ' AND a.resourcetype='.$_REQUEST['resourcetype'].' ';
 
-	$sql_cond.=' AND a.clock>'.$nav_time;
+	$sql_cond['from'] = ' AND a.clock>'.$from;
+	$sql_cond['till'] = ' AND a.clock<'.$till;
 
 	$actions = array();
 
 	$table = new CTableInfo();
 	$table->setHeader(array(
-			make_sorting_header(S_TIME,'clock'),
-			make_sorting_header(S_USER,'alias'),
-			make_sorting_header(S_IP,'ip'),
-			make_sorting_header(S_RESOURCE,'resourcetype'),
-			make_sorting_header(S_ACTION,'action'),
-			S_ID,
-			S_DESCRIPTION,
-			S_DETAILS));
+		S_TIME,
+		S_USER,
+		S_IP,
+		S_RESOURCE,
+		S_ACTION,
+		S_ID,
+		S_DESCRIPTION,
+		S_DETAILS
+	));
 
 	$sql = 'SELECT a.auditid, a.clock, u.alias, a.ip, a.resourcetype, a.action, a.resourceid, a.resourcename, a.details '.
-					' FROM auditlog a, users u '.
-					' WHERE u.userid=a.userid '.
-						$sql_cond.
-						' AND '.DBin_node('u.userid', get_current_nodeid(null, PERM_READ_ONLY)).
-					' ORDER BY a.clock DESC';
+			' FROM auditlog a, users u '.
+			' WHERE u.userid=a.userid '.
+				implode('', $sql_cond).
+				' AND '.DBin_node('u.userid', get_current_nodeid(null, PERM_READ_ONLY)).
+			' ORDER BY a.clock DESC';
 	$result = DBselect($sql, ($config['search_limit']+1));
-	while($row=DBfetch($result)){
+	
+// get first log for timeline starttime
+	unset($sql_cond['from']);
+	unset($sql_cond['till']);
+	
+	$sql = 'SELECT a.auditid, a.clock'.
+			' FROM auditlog a, users u '.
+			' WHERE u.userid=a.userid '.
+				implode('', $sql_cond).
+				' AND '.DBin_node('u.userid', get_current_nodeid(null, PERM_READ_ONLY)).
+			' ORDER BY a.clock ASC';
+	$firstAudit = DBfetch(DBselect($sql, ($config['search_limit']+1)));
+	$starttime = $firstAudit['clock'];
+	
+	while($row = DBfetch($result)){
 		switch($row['action']){
 			case AUDIT_ACTION_ADD:		$action = S_ADDED; break;
 			case AUDIT_ACTION_UPDATE:	$action = S_UPDATED; break;
@@ -271,7 +266,7 @@ include_once('include/page_header.php');
 	}
 
 // sorting && paging
-	order_page_result($actions, 'clock');
+	order_result($actions, 'clock', ZBX_SORT_DOWN);
 	$paging = getPagingLine($actions);
 //---------
 
@@ -283,10 +278,10 @@ include_once('include/page_header.php');
 					' WHERE auditid='.$row['auditid'];
 			$db_details = DBselect($sql);
 			while($db_detail = DBfetch($db_details)){
-				$details[] = array($db_detail['table_name'].'.'.
-									$db_detail['field_name'].': '.
-									$db_detail['oldvalue'].' => '.
-									$db_detail['newvalue'],BR());
+				$details[] = array(
+					$db_detail['table_name'].'.'.$db_detail['field_name'].': '.	$db_detail['oldvalue'].' => '.$db_detail['newvalue'],
+					BR()
+				);
 			}
 		}
 		else{
@@ -311,8 +306,34 @@ include_once('include/page_header.php');
 
 	$audit_wdgt->addItem($table);
 	$audit_wdgt->show();
-?>
-<?php
+
+// NAV BAR
+	$timeline = array(
+		'period' => $effectiveperiod,
+		'starttime' => $starttime,
+		'usertime' => null
+	);
+
+	if(isset($_REQUEST['stime'])){
+		$bstime = $_REQUEST['stime'];
+		$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
+		$timeline['usertime'] += $timeline['period'];
+	}
+
+	$dom_graph_id = 'events';
+	$objData = array(
+		'id' => 'timeline_1',
+		'domid' => $dom_graph_id,
+		'loadSBox' => 0,
+		'loadImage' => 0,
+		'loadScroll' => 1,
+		'dynamic' => 0,
+		'mainObject' => 1
+	);
+
+	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
+	zbx_add_post_js('timeControl.processObjects();');
+
 
 include_once('include/page_footer.php');
 ?>

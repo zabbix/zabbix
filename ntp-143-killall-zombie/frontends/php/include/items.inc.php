@@ -1206,7 +1206,7 @@
 			return $table;
 		}
 
-		ksort($hosts);
+		ksort($hosts, SORT_STRING);
 // COpt::profiling_stop('prepare_data');
 // COpt::profiling_start('prepare_table');
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -64,6 +64,7 @@ include_once('include/page_header.php');
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
 /* actions */
 		'remove_log'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'reset'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -80,9 +81,11 @@ include_once('include/page_header.php');
 <?php
 	if(isset($_REQUEST['favobj'])){
 		if('timeline' == $_REQUEST['favobj']){
-			navigation_bar_calc('web.item.graph', true);
+			navigation_bar_calc('web.item.graph', $_REQUEST['itemid'], true);
 		}
-
+		if('filter' == $_REQUEST['favobj']){
+			CProfile::update('web.history.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+		}
 		if(str_in_array($_REQUEST['favobj'],array('itemid','graphid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
@@ -192,6 +195,14 @@ include_once('include/page_header.php');
 	unset($item_data);
 
 	$to_save_request = null;
+	
+	$historyWidget = new CWidget();
+	$historyWidget->addItem(SPACE);
+	
+	$scroll_div = new CDiv();
+	$scroll_div->setAttribute('id','scrollbar_cntr');
+	$historyWidget->addFlicker($scroll_div, CProfile::get('web.history.filter.state',1));
+
 
 	if( !isset($_REQUEST['plaintext']) && ($_REQUEST['fullscreen']==0) ){
 		if($item_type == ITEM_VALUE_TYPE_LOG){
@@ -254,15 +265,16 @@ include_once('include/page_header.php');
 		if($_REQUEST['action']!='showgraph')
 			$form->addItem(array(SPACE,new CButton('plaintext',S_AS_PLAIN_TEXT)));
 
-		show_table_header($l_header, $form);
+		$historyWidget->addPageHeader($l_header, $form);
 	}
 ?>
 <?php
 	if(is_array($_REQUEST['itemid'])) $itemid = reset($_REQUEST['itemid']);
 	else $itemid = $_REQUEST['itemid'];
-	$effectiveperiod = navigation_bar_calc('web.item.graph');
-
+	
+	$effectiveperiod = navigation_bar_calc('web.item.graph', $itemid, true);
 	$bstime = $_REQUEST['stime'];
+	
 
 	if($_REQUEST['action']=='showgraph' && ($item_type != ITEM_VALUE_TYPE_LOG)){
 		$dom_graph_id = 'graph';
@@ -273,7 +285,7 @@ include_once('include/page_header.php');
 		$graph_cont = new CCol();
 		$graph_cont->setAttribute('id', $containerid);
 		$table->addRow($graph_cont);
-		$table->show();
+		$historyWidget->addItem($table);
 	}
 	else if($_REQUEST['action']=='showvalues' || $_REQUEST['action']=='showlatest'){
 
@@ -323,7 +335,7 @@ include_once('include/page_header.php');
 			}
 
 			if(($l_header || $r_header) &&	($_REQUEST['fullscreen']==0))
-				show_table_header($l_header,$r_header);
+				$historyWidget->addPageHeader($l_header, $r_header);
 		}
 		else{
 			$txt = new CTag('p','yes',$l_header);
@@ -370,8 +382,6 @@ include_once('include/page_header.php');
 						S_SEVERITY,
 						S_EVENT_ID,
 						S_VALUE),'header');
-
-				$table->showStart(); // to solve memory leak we call 'Show' method by steps
 			}
 			else{
 				echo '<span class="textcolorstyles"><pre>'."\n";
@@ -459,8 +469,7 @@ include_once('include/page_header.php');
 					else {
 						$crow->setClass($color_style);
 					}
-
-					$crow->Show();	// to solve memory leak we call 'Show' method for each element
+					$table->addItem($crow);
 				}
 				else{
 					echo date('Y-m-d H:i:s',$row['clock']);
@@ -469,7 +478,7 @@ include_once('include/page_header.php');
 			}
 
 			if(!isset($_REQUEST['plaintext']))
-				$table->ShowEnd();	// to solve memory leak we call 'Show' method by steps
+				$historyWidget->addItem($table);
 			else
 				echo '</pre></span>';
 		}
@@ -548,8 +557,7 @@ include_once('include/page_header.php');
 			}
 
 			if(!isset($_REQUEST['plaintext'])){
-				$table->Show();
-				echo SBR;
+				$historyWidget->addItem($table);
 			}
 			else{
 				echo '</pre></span>';
@@ -619,12 +627,10 @@ include_once('include/page_header.php');
 			}
 //*/
 //-------------
-
-			$scroll_div = new CDiv();
-			$scroll_div->setAttribute('id','scrollbar_cntr');
-			$scroll_div->show();
 		}
 	}
+	
+	$historyWidget->show();
 	
 
 require_once('include/page_footer.php');

@@ -151,7 +151,7 @@
 		$form->addItemToBottomRow(SPACE);
 		$form->addItemToBottomRow(new CButtonCancel());
 
-		$form->show();
+		return $form;
 	}
 
 	function insert_drule_form(){
@@ -347,7 +347,7 @@
 		$form->addItemToBottomRow(SPACE);
 		$form->addItemToBottomRow(new CButtonCancel());
 
-		$form->show();
+		return $form;
 	}
 
 	function	insert_httpstep_form()
@@ -579,7 +579,7 @@
 		$form->addItemToBottomRow(SPACE);
 		$form->addItemToBottomRow(new CButtonCancel());
 
-		$form->show();
+		return $form;
 	}
 
 	function insert_configuration_form($file){
@@ -940,7 +940,8 @@
 		}
 		$frmUser->addItemToBottomRow(SPACE);
 		$frmUser->addItemToBottomRow(new CButtonCancel(url_param("config")));
-		$frmUser->show();
+		
+		return $frmUser;
 	}
 
 // Insert form for User Groups
@@ -1169,7 +1170,8 @@
 		}
 		$frmUserG->addItemToBottomRow(SPACE);
 		$frmUserG->addItemToBottomRow(new CButtonCancel(url_param("config")));
-		$frmUserG->show();
+		
+		return($frmUserG);
 	}
 
 	function get_rights_of_elements_table($rights=array(),$user_type=USER_TYPE_ZABBIX_USER){
@@ -2126,6 +2128,8 @@
 		else{
 			$frmItem->addVar('formula',$formula);
 		}
+
+
 		if($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_HTTPTEST){
 			$frmItem->addRow(S_UPDATE_INTERVAL_IN_SEC, new CNumericBox('delay',$delay,5));
 			$frmItem->addRow(S_FLEXIBLE_INTERVALS, $delay_flex_el);
@@ -3066,7 +3070,94 @@
 		zbx_add_post_js('graphs.graphtype = '.$graphtype.";\n");
 
 		$frmGraph->addRow(S_GRAPH_TYPE, $cmbGType);
+		
+		
+// items beforehead, to get only_hostid for miny maxy items
+		$only_hostid = null;
+		$monitored_hosts = null;
 
+		if(count($items)){
+			$frmGraph->addVar('items', $items);
+
+			$keys = array_keys($items);
+			$first = reset($keys);
+			$last = end($keys);
+
+			$items_table = new CTableInfo();
+			foreach($items as $gid => $gitem){
+				//if($graphtype == GRAPH_TYPE_STACKED && $gitem['type'] == GRAPH_ITEM_AGGREGATED) continue;
+				$host = get_host_by_itemid($gitem['itemid']);
+				$item = get_item_by_itemid($gitem['itemid']);
+
+				if($host['status'] == HOST_STATUS_TEMPLATE)
+					$only_hostid = $host['hostid'];
+				else
+					$monitored_hosts = 1;
+
+				if($gitem['type'] == GRAPH_ITEM_AGGREGATED)
+					$color = '-';
+				else
+					$color = new CColorCell(null,$gitem['color']);
+
+
+				if($gid == $first){
+					$do_up = null;
+				}
+				else{
+					$do_up = new CSpan(S_UP,'link');
+					$do_up->onClick("return create_var('".$frmGraph->getName()."','move_up',".$gid.", true);");
+				}
+
+				if($gid == $last){
+					$do_down = null;
+				}
+				else{
+					$do_down = new CSpan(S_DOWN,'link');
+					$do_down->onClick("return create_var('".$frmGraph->getName()."','move_down',".$gid.", true);");
+				}
+
+				$description = new CSpan($host['host'].': '.item_description($item),'link');
+				$description->onClick(
+					'return PopUp("popup_gitem.php?list_name=items&dstfrm='.$frmGraph->getName().
+					url_param($only_hostid, false, 'only_hostid').
+					url_param($monitored_hosts, false, 'monitored_hosts').
+					url_param($graphtype, false, 'graphtype').
+					url_param($gitem, false).
+					url_param($gid,false,'gid').
+					url_param(get_request('graphid',0),false,'graphid').
+					'",550,400,"graph_item_form");'
+				);
+
+				if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
+					$items_table->addRow(array(
+							new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
+							$description,
+							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
+							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
+							$color,
+							array( $do_up, SPACE."|".SPACE, $do_down )
+						));
+				}
+				else{
+					$items_table->addRow(array(
+							new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
+//							$gitem['sortorder'],
+							$description,
+							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
+							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
+							($gitem['yaxisside']==GRAPH_YAXIS_SIDE_LEFT)?S_LEFT:S_RIGHT,
+							graph_item_drawtype2str($gitem["drawtype"],$gitem["type"]),
+							$color,
+							array( $do_up, ((!is_null($do_up) && !is_null($do_down)) ? SPACE."|".SPACE : ''), $do_down )
+						));
+				}
+			}
+			$dedlete_button = new CButton('delete_item', S_DELETE_SELECTED);
+		}
+		else{
+			$items_table = $dedlete_button = null;
+		}
+		
 		if(($graphtype == GRAPH_TYPE_NORMAL) || ($graphtype == GRAPH_TYPE_STACKED)){
 			$frmGraph->addRow(S_SHOW_WORKING_TIME,new CCheckBox('showworkperiod',$showworkperiod,null,1));
 			$frmGraph->addRow(S_SHOW_TRIGGERS,new CCheckBox('showtriggers',$showtriggers,null,1));
@@ -3116,14 +3207,21 @@
 					$ymin_name = $min_host['host'].':'.item_description($min_item);
 				}
 
-				$yaxis_min[] = new CTextBox("ymin_name",$ymin_name,80,'yes');
-				$yaxis_min[] = new CButton('yaxis_min',S_SELECT,'javascript: '.
-												"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
-													"&dstfld1=ymin_itemid".
-													"&dstfld2=ymin_name".
-													"&srctbl=items".
-													"&srcfld1=itemid".
-													"&srcfld2=description',0,0,'zbx_popup_item');");
+				if(count($items)){
+					$yaxis_min[] = new CTextBox("ymin_name",$ymin_name,80,'yes');
+					$yaxis_min[] = new CButton('yaxis_min',S_SELECT,'javascript: '.
+													"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
+													url_param($only_hostid, false, 'only_hostid').
+													url_param($monitored_hosts, false, 'monitored_hosts').
+														"&dstfld1=ymin_itemid".
+														"&dstfld2=ymin_name".
+														"&srctbl=items".
+														"&srcfld1=itemid".
+														"&srcfld2=description',0,0,'zbx_popup_item');");
+				}
+				else{
+					$yaxis_min[] = SPACE.S_ADD_GRAPH_ITEMS;
+				}
 			}
 			else{
 				$frmGraph->addVar('yaxismin', $yaxismin);
@@ -3141,7 +3239,7 @@
 			$yaxis_max[] = $cmbYType;
 
 			if($ymax_type == GRAPH_YAXIS_TYPE_FIXED){
-				$yaxis_max[] = new CTextBox("yaxismax",$yaxismax,9);
+				$yaxis_max[] = new CTextBox('yaxismax',$yaxismax,9);
 			}
 			else if($ymax_type == GRAPH_YAXIS_TYPE_ITEM_VALUE){
 				$frmGraph->addVar('yaxismax',$yaxismax);
@@ -3152,15 +3250,22 @@
 					$max_item = get_item_by_itemid($ymax_itemid);
 					$ymax_name = $max_host['host'].':'.item_description($max_item);
 				}
-
-				$yaxis_max[] = new CTextBox("ymax_name",$ymax_name,80,'yes');
-				$yaxis_max[] = new CButton('yaxis_max',S_SELECT,'javascript: '.
-												"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
-													"&dstfld1=ymax_itemid".
-													"&dstfld2=ymax_name".
-													"&srctbl=items".
-													"&srcfld1=itemid".
-													"&srcfld2=description',0,0,'zbx_popup_item');");
+	
+				if(count($items)){
+					$yaxis_max[] = new CTextBox("ymax_name",$ymax_name,80,'yes');
+					$yaxis_max[] = new CButton('yaxis_max',S_SELECT,'javascript: '.
+													"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
+													url_param($only_hostid, false, 'only_hostid').
+													url_param($monitored_hosts, false, 'monitored_hosts').
+														"&dstfld1=ymax_itemid".
+														"&dstfld2=ymax_name".
+														"&srctbl=items".
+														"&srcfld1=itemid".
+														"&srcfld2=description',0,0,'zbx_popup_item');");
+				}
+				else{
+					$yaxis_max[] = SPACE.S_ADD_GRAPH_ITEMS;
+				}
 			}
 			else{
 				$frmGraph->addVar('yaxismax',$yaxismax);
@@ -3168,97 +3273,11 @@
 
 			$frmGraph->addRow(S_YAXIS_MAX_VALUE, $yaxis_max);
 		}
-		else {
+		else{
 			$frmGraph->addRow(S_3D_VIEW,new CCheckBox('graph3d',$graph3d,'javascript: graphs.submit(this);',1));
 			$frmGraph->addRow(S_LEGEND,new CCheckBox('legend',$legend,'javascript: graphs.submit(this);',1));
 		}
 
-		$only_hostid = null;
-		$monitored_hosts = null;
-
-		if(count($items)){
-			$frmGraph->addVar('items', $items);
-
-			$keys = array_keys($items);
-			$first = reset($keys);
-			$last = end($keys);
-
-			$items_table = new CTableInfo();
-			foreach($items as $gid => $gitem){
-				//if($graphtype == GRAPH_TYPE_STACKED && $gitem['type'] == GRAPH_ITEM_AGGREGATED) continue;
-				$host = get_host_by_itemid($gitem['itemid']);
-				$item = get_item_by_itemid($gitem['itemid']);
-
-				if($host['status'] == HOST_STATUS_TEMPLATE)
-					$only_hostid = $host['hostid'];
-				else
-					$monitored_hosts = 1;
-
-				if($gitem['type'] == GRAPH_ITEM_AGGREGATED)
-					$color = '-';
-				else
-					$color = new CColorCell(null,$gitem['color']);
-
-
-				if($gid == $first){
-					$do_up = null;
-				}
-				else{
-					$do_up = new CSpan(S_UP,'link');
-					$do_up->onClick("return create_var('".$frmGraph->getName()."','move_up',".$gid.", true);");
-				}
-
-				if($gid == $last){
-					$do_down = null;
-				}
-				else{
-					$do_down = new CSpan(S_DOWN,'link');
-					$do_down->onClick("return create_var('".$frmGraph->getName()."','move_down',".$gid.", true);");
-				}
-
-
-
-				$description = new CSpan($host['host'].': '.item_description($item),'link');
-				$description->onClick(
-					'return PopUp("popup_gitem.php?list_name=items&dstfrm='.$frmGraph->getName().
-					url_param($only_hostid, false, 'only_hostid').
-					url_param($monitored_hosts, false, 'monitored_hosts').
-					url_param($graphtype, false, 'graphtype').
-					url_param($gitem, false).
-					url_param($gid,false,'gid').
-					url_param(get_request('graphid',0),false,'graphid').
-					'",550,400,"graph_item_form");'
-				);
-
-				if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
-					$items_table->addRow(array(
-							new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
-							$description,
-							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
-							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
-							$color,
-							array( $do_up, SPACE."|".SPACE, $do_down )
-						));
-				}
-				else{
-					$items_table->addRow(array(
-							new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
-//							$gitem['sortorder'],
-							$description,
-							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
-							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
-							($gitem['yaxisside']==GRAPH_YAXIS_SIDE_LEFT)?S_LEFT:S_RIGHT,
-							graph_item_drawtype2str($gitem["drawtype"],$gitem["type"]),
-							$color,
-							array( $do_up, ((!is_null($do_up) && !is_null($do_down)) ? SPACE."|".SPACE : ''), $do_down )
-						));
-				}
-			}
-			$dedlete_button = new CButton('delete_item', S_DELETE_SELECTED);
-		}
-		else{
-			$items_table = $dedlete_button = null;
-		}
 		$frmGraph->addRow(S_ITEMS,
 				array(
 					$items_table,
@@ -3272,16 +3291,16 @@
 				));
 		unset($items_table, $dedlete_button);
 
-		$frmGraph->addItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["graphid"])){
+		$frmGraph->addItemToBottomRow(new CButton('save',S_SAVE));
+		if(isset($_REQUEST['graphid'])){
 			$frmGraph->addItemToBottomRow(SPACE);
-			$frmGraph->addItemToBottomRow(new CButton("clone",S_CLONE));
+			$frmGraph->addItemToBottomRow(new CButton('clone',S_CLONE));
 			$frmGraph->addItemToBottomRow(SPACE);
-			$frmGraph->addItemToBottomRow(new CButtonDelete(S_DELETE_GRAPH_Q,url_param("graphid").
-				url_param('groupid').url_param("hostid")));
+			$frmGraph->addItemToBottomRow(new CButtonDelete(S_DELETE_GRAPH_Q,url_param('graphid').
+				url_param('groupid').url_param('hostid')));
 		}
 		$frmGraph->addItemToBottomRow(SPACE);
-		$frmGraph->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param("hostid")));
+		$frmGraph->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param('hostid')));
 
 		$frmGraph->show();
 	}
@@ -3922,12 +3941,6 @@
 												"CLNDR['mntc_active_till'].clndr.clndrshow(pos.top,pos.left);");
 
 			$tblPeriod->addRow(array(S_DATE,$filtertimetab));
-
-
-			zbx_add_post_js('if("undefined" != typeof(CLNDR["new_timeperiod_date"]))'.
-									' addListener($("hat_new_timeperiod_icon"),'.
-												'"click",'.
-												'CLNDR["new_timeperiod_date"].clndr.clndrhide.bindAsEventListener(CLNDR["new_timeperiod_date"].clndr));');
 
 //-------
 		}
@@ -5180,7 +5193,7 @@
 		$form->addRow(S_RULES, $table);
 
 		$form->addItemToBottomRow(new CButton('import', S_IMPORT));
-		$form->show();
+		return $form;
 	}
 
 	function insert_screen_form(){
@@ -5226,7 +5239,8 @@
 		}
 		$frmScr->addItemToBottomRow(SPACE);
 		$frmScr->addItemToBottomRow(new CButtonCancel());
-		$frmScr->show();
+		
+		return $frmScr;
 	}
 
 // HOSTS
@@ -5347,15 +5361,9 @@
 // END:   HOSTS PROFILE EXTENDED Section
 
 		$templates	= get_request('templates',array());
-		$clear_templates = get_request('clear_templates',array());
+		natsort($templates);
 
 		$frm_title	= S_HOST.SPACE.S_MASS_UPDATE;
-
-		$original_templates = array();
-
-		$clear_templates = array_intersect($clear_templates, array_keys($original_templates));
-		$clear_templates = array_diff($clear_templates,array_keys($templates));
-		asort($templates);
 
 		$frmHost = new CFormTable($frm_title,'hosts.php');
 		$frmHost->setHelp('web.hosts.host.php');
@@ -5365,8 +5373,6 @@
 		foreach($hosts as $id => $hostid){
 			$frmHost->addVar('hosts['.$hostid.']',$hostid);
 		}
-
-		$frmHost->addVar('clear_templates',$clear_templates);
 
 //		$frmItem->addRow(array( new CVisibilityBox('visible[type]', isset($visible['type']), 'type', S_ORIGINAL),S_TYPE), $cmbType);
 
@@ -5437,47 +5443,80 @@
 		$cmbStatus->addItem(HOST_STATUS_MONITORED,	S_MONITORED);
 		$cmbStatus->addItem(HOST_STATUS_NOT_MONITORED,	S_NOT_MONITORED);
 
-		$frmHost->addRow(array(new CVisibilityBox('visible[status]', isset($visible['status']), 'status', S_ORIGINAL),S_STATUS),
-						$cmbStatus
-					);
+		$frmHost->addRow(array(new CVisibilityBox('visible[status]', isset($visible['status']), 'status', S_ORIGINAL),S_STATUS), $cmbStatus);
 
 // LINK TEMPLATES {{{
 		$template_table = new CTable();
-
 		$template_table->setAttribute('name','template_table');
 		$template_table->setAttribute('id','template_table');
 
 		$template_table->setCellPadding(0);
 		$template_table->setCellSpacing(0);
 
-//		$template_table->setAttribute('style','border: 1px black solid;');
-
 		foreach($templates as $id => $temp_name){
 			$frmHost->addVar('templates['.$id.']',$temp_name);
 			$template_table->addRow(array(
-					$temp_name,
-					new CButton('unlink['.$id.']',S_UNLINK),
-					isset($original_templates[$id]) ? new CButton('unlink_and_clear['.$id.']',S_UNLINK_AND_CLEAR) : SPACE
-					)
-				);
+				new CCheckBox('templates_rem['.$id.']', 'no', null, $id),
+				$temp_name,
+			));
 		}
 
-		$template_table->addRow(new CButton('add_template',S_ADD,
-					"return PopUp('popup.php?dstfrm=".$frmHost->GetName().
-					"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
-					url_param($templates,false,'existed_templates')."',450,450)"));
+		$template_table->addRow(array(
+			new CButton('add_template', S_ADD, "return PopUp('popup.php?dstfrm=".$frmHost->GetName().
+				"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
+				url_param($templates,false,'existed_templates')."',450,450)"),
+			new CButton('unlink', S_REMOVE)
+		));
 
-		$frmHost->addRow(array(
-					new CVisibilityBox('visible[template_table]', isset($visible['template_table']), 'template_table', S_ORIGINAL),S_LINK_ADDITIONAL_TEMPLATES),
-					$template_table, 'T'
-				);
+		$vbox = new CVisibilityBox('visible[template_table]', isset($visible['template_table']), 'template_table', S_ORIGINAL);
+		$vbox->setAttribute('id', 'cb_tpladd');
+		if(isset($visible['template_table_r'])) $vbox->setAttribute('disabled', 'disabled');
+		$action = $vbox->getAttribute('onclick');
+		$action .= 'if($("cb_tplrplc").disabled) $("cb_tplrplc").enable(); else $("cb_tplrplc").disable();';
+		$vbox->setAttribute('onclick', $action);
+		
+		$frmHost->addRow(array($vbox, S_LINK_ADDITIONAL_TEMPLATES), $template_table, 'T');
 // }}} LINK TEMPLATES
 
 
+// RELINK TEMPLATES {{{
+		$template_table_r = new CTable();
+		$template_table_r->setAttribute('name','template_table_r');
+		$template_table_r->setAttribute('id','template_table_r');
+
+		$template_table_r->setCellPadding(0);
+		$template_table_r->setCellSpacing(0);
+
+		foreach($templates as $id => $temp_name){
+			$frmHost->addVar('templates['.$id.']',$temp_name);
+			$template_table_r->addRow(array(
+				new CCheckBox('templates_rem['.$id.']', 'no', null, $id),
+				$temp_name,
+			));
+		}
+
+		$template_table_r->addRow(array(
+			new CButton('add_template', S_ADD, "return PopUp('popup.php?dstfrm=".$frmHost->GetName().
+				"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
+				url_param($templates,false,'existed_templates')."',450,450)"),
+			new CButton('unlink', S_REMOVE)
+		));
+		
+		$vbox = new CVisibilityBox('visible[template_table_r]', isset($visible['template_table_r']), 'template_table_r', S_ORIGINAL);
+		$vbox->setAttribute('id', 'cb_tplrplc');
+		if(isset($visible['template_table'])) $vbox->setAttribute('disabled', 'disabled');
+		$action = $vbox->getAttribute('onclick');
+		$action .= 'if($("cb_tpladd").disabled) $("cb_tpladd").enable(); else $("cb_tpladd").disable();';	
+		$vbox->setAttribute('onclick', $action);
+
+		$frmHost->addRow(array($vbox, S_RELINK_TEMPLATES),	$template_table_r, 'T');
+// }}} RELINK TEMPLATES
+
+
 		$frmHost->addRow(array(
-					new CVisibilityBox('visible[useipmi]', isset($visible['useipmi']), 'useipmi', S_ORIGINAL), S_USEIPMI),
-					new CCheckBox('useipmi', $useipmi, 'submit()')
-				);
+			new CVisibilityBox('visible[useipmi]', isset($visible['useipmi']), 'useipmi', S_ORIGINAL), S_USEIPMI),
+			new CCheckBox('useipmi', $useipmi, 'submit()')
+		);
 
 		if($useipmi == 'yes'){
 			$frmHost->addRow(array(
@@ -5537,8 +5576,8 @@
 		);
 // END:   HOSTS PROFILE EXTENDED Section
 
-		if($useprofile=='yes'){	
-			if($useprofile == 'yes'){
+		if($useprofile==='yes'){
+			if($useprofile === 'yes'){
 				foreach($profile_fields as $field => $caption){
 					$frmHost->addRow(array(
 						new CVisibilityBox('visible['.$field.']', isset($visible[$field]), 'host_profile['.$field.']', S_ORIGINAL), $caption),
@@ -5572,7 +5611,8 @@
 		$frmHost->addItemToBottomRow(new CButton('save',S_SAVE));
 		$frmHost->addItemToBottomRow(SPACE);
 		$frmHost->addItemToBottomRow(new CButtonCancel(url_param('config').url_param('groupid')));
-		$frmHost->show();
+		
+		return $frmHost;
 	}
 
 // Host form
@@ -5768,8 +5808,8 @@
 
 		$frmHost = new CForm('hosts.php', 'post');
 		$frmHost->setName('web.hosts.host.php.');
-		//$frmHost->setHelp('web.hosts.host.php');
-		//$frmHost->addVar('config',get_request('config',0));
+//		$frmHost->setHelp('web.hosts.host.php');
+//		$frmHost->addVar('config',get_request('config',0));
 		$frmHost->addVar('form', get_request('form', 1));
 		$from_rfr = get_request('form_refresh',0);
 		$frmHost->addVar('form_refresh', $from_rfr+1);
@@ -6081,7 +6121,7 @@
 		$outer_table->addRow(array($td_l, $td_r));
 
 		$frmHost->addItem($outer_table);
-		$frmHost->show();
+		return $frmHost;
 	}
 
 // Insert host profile ReadOnly form
@@ -6280,7 +6320,7 @@
 		$form->addRow(S_RULES, $table);
 
 		$form->addItemToBottomRow(new CButton('import', S_IMPORT));
-		$form->show();
+		return $form;
 	}
 
 	function insert_map_form(){
@@ -6369,7 +6409,7 @@
 		$frmMap->addItemToBottomRow(SPACE);
 		$frmMap->addItemToBottomRow(new CButtonCancel());
 
-		$frmMap->show();
+		return $frmMap;
 	}
 
 	function insert_command_result_form($scriptid,$hostid){

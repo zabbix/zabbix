@@ -121,7 +121,7 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"27 January 2010"
+#define	ZABBIX_REVDATE		"29 March 2010"
 #define	ZABBIX_VERSION		"1.8.2"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
@@ -348,6 +348,13 @@ typedef enum
 	SYSMAP_ELEMENT_TYPE_HOST_GROUP,
 	SYSMAP_ELEMENT_TYPE_IMAGE
 } zbx_sysmap_element_types_t;
+
+typedef enum
+{
+	GRAPH_YAXIS_TYPE_CALCULATED = 0,
+	GRAPH_YAXIS_TYPE_FIXED,
+	GRAPH_YAXIS_TYPE_ITEM_VALUE
+} zbx_graph_yaxis_types_t;
 
 typedef enum
 {
