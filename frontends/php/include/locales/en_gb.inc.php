@@ -587,6 +587,7 @@
 	'S_AGGREGATED_PERIODS_COUNT'=>		'Aggregated periods count',
 
 //	graphs.php
+	'S_ADD_GRAPH_ITEMS' => 'add graph items first',
 	'S_TITLE'=>				'Title',
 	'S_PERCENTILE_LINE'=>			'Percentile line',
 	'S_CONFIGURATION_OF_GRAPHS'=>		'Configuration of graphs',
