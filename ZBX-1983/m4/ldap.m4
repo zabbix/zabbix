@@ -79,7 +79,7 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
 	       AC_DEFINE(LDAP_DEPRECATED, 1, [Define to 1 if LDAP depricated functions is used.])
                AC_MSG_RESULT(yes)
 
-               AC_CHECK_LIB(lber, main, , AC_MSG_ERROR([Not found LBER library]))
+#               AC_CHECK_LIB(lber, main, , AC_MSG_ERROR([Not found LBER library]))
 	       
 	       if test "x$enable_static" = "xyes"; then
                        AC_CHECK_LIB(gnutls, main, , AC_MSG_ERROR([Not found GnuTLS library]))
