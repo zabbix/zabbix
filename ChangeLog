@@ -4,6 +4,7 @@ Changes for 1.9
 
 Changes for 1.8.2
 
+ - [ZBX-2228] fixed compilation under FreeBSD with enabled LDAP (Sasha)
  - [ZBX-2236] fixed processing of Telnet checks by Zabbix proxy (Sasha)
  - [ZBX-2234] fixed icon for mass open action in status of triggers (Aly)
  - [ZBX-2233] fixed processing of action condition 'Trigger <>' (Sasha)
