@@ -68,6 +68,9 @@
 	if(isset($_REQUEST['favobj'])){
 		$_REQUEST['pmasterid'] = get_request('pmasterid','mainpage');
 
+		if('filter' == $_REQUEST['favobj']){
+			CProfile::update('web.slides.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+		}
 		if('timeline' == $_REQUEST['favobj']){
 			if(isset($_REQUEST['elementid']) && isset($_REQUEST['period'])){
 				navigation_bar_calc('web.slides', $_REQUEST['elementid'],true);
@@ -166,8 +169,6 @@
 		CProfile::update('web.slides.elementid', $elementid, PROFILE_TYPE_ID);
 	}
 
-	$effectiveperiod = navigation_bar_calc('web.slides',$elementid, true);
-
 	$slides_wdgt = new CWidget('hat_slides');
 
 	$formHeader = new CForm(null, 'get');
@@ -202,7 +203,9 @@
 			$elementid = $slideshow['slideshowid'];	
 		}
 		
-// PAGE HEADER {{{		
+		$effectiveperiod = navigation_bar_calc('web.slides',$elementid, true);
+		
+// PAGE HEADER {{{
 		if(infavorites('web.favorite.screenids', $elementid, 'slideshowid')){
 			$icon = new CDiv(SPACE, 'iconminus');
 			$icon->setAttribute('title', S_REMOVE_FROM.' '.S_FAVOURITES);
@@ -227,7 +230,6 @@
 		$refresh_icon->setAttribute('title',S_MENU);
 		
 		$slides_wdgt->addPageHeader(S_SLIDESHOWS_BIG, array($formHeader, SPACE, $icon, $refresh_icon, $fs_icon));
-		$slides_wdgt->addItem(BR());
 // }}} PAGE HEADER
 
 // HEADER {{{
@@ -291,13 +293,6 @@
 			insert_js('var page_menu='.zbx_jsvalue($menu).";\n".'var page_submenu='.zbx_jsvalue($submenu).";\n");
 	// --------------
 
-			$tab = new CTable();
-			$tab->setCellPadding(0);
-			$tab->setCellSpacing(0);
-
-			$tab->setAttribute('border', 0);
-			$tab->setAttribute('width', '100%');
-
 			$refresh_tab = array(
 				array(
 					'id' => 'hat_slides',
@@ -322,10 +317,14 @@
 					$timeline['usertime'] += $timeline['period'];
 				}
 
-				$dom_graph_id = 'iframe';
+				$scroll_div = new CDiv();
+				$scroll_div->setAttribute('id','scrollbar_cntr');
+				$slides_wdgt->addFlicker($scroll_div, CProfile::get('web.slides.filter.state',1));
+				$slides_wdgt->addFlicker(BR(), CProfile::get('web.slides.filter.state',1));
+				
+			
 				$objData = array(
 					'id' => $elementid,
-					'domid' => $dom_graph_id,
 					'loadSBox' => 0,
 					'loadImage' => 0,
 					'loadScroll' => 1,
@@ -334,7 +333,7 @@
 					'mainObject' => 1
 				);
 
-				zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
+				zbx_add_post_js('timeControl.addObject("iframe",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 				zbx_add_post_js('timeControl.processObjects();');
 			}
 			
@@ -343,23 +342,15 @@
 
 			$slides_wdgt->addItem(new CSpan(S_LOADING_P, 'textcolorstyles'));
 
-			$tab->addRow($slides_wdgt, 'center');
-			$tab->show();
-
-			$scroll_div = new CDiv();
-			$scroll_div->setAttribute('id','scrollbar_cntr');
-			$scroll_div->setAttribute('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
-			$scroll_div->show();
-
-			print(SBR);
-
+			
 			$jsmenu = new CPUMenu(null, 170);
 			$jsmenu->InsertJavaScript();
 		}
 		else{
 			$slides_wdgt->addItem(new CTableInfo(S_NO_SLIDES_DEFINED));
-			$slides_wdgt->show();
 		}
+		
+		$slides_wdgt->show();
 	}
 
 

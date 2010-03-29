@@ -3070,7 +3070,94 @@
 		zbx_add_post_js('graphs.graphtype = '.$graphtype.";\n");
 
 		$frmGraph->addRow(S_GRAPH_TYPE, $cmbGType);
+		
+		
+// items beforehead, to get only_hostid for miny maxy items
+		$only_hostid = null;
+		$monitored_hosts = null;
 
+		if(count($items)){
+			$frmGraph->addVar('items', $items);
+
+			$keys = array_keys($items);
+			$first = reset($keys);
+			$last = end($keys);
+
+			$items_table = new CTableInfo();
+			foreach($items as $gid => $gitem){
+				//if($graphtype == GRAPH_TYPE_STACKED && $gitem['type'] == GRAPH_ITEM_AGGREGATED) continue;
+				$host = get_host_by_itemid($gitem['itemid']);
+				$item = get_item_by_itemid($gitem['itemid']);
+
+				if($host['status'] == HOST_STATUS_TEMPLATE)
+					$only_hostid = $host['hostid'];
+				else
+					$monitored_hosts = 1;
+
+				if($gitem['type'] == GRAPH_ITEM_AGGREGATED)
+					$color = '-';
+				else
+					$color = new CColorCell(null,$gitem['color']);
+
+
+				if($gid == $first){
+					$do_up = null;
+				}
+				else{
+					$do_up = new CSpan(S_UP,'link');
+					$do_up->onClick("return create_var('".$frmGraph->getName()."','move_up',".$gid.", true);");
+				}
+
+				if($gid == $last){
+					$do_down = null;
+				}
+				else{
+					$do_down = new CSpan(S_DOWN,'link');
+					$do_down->onClick("return create_var('".$frmGraph->getName()."','move_down',".$gid.", true);");
+				}
+
+				$description = new CSpan($host['host'].': '.item_description($item),'link');
+				$description->onClick(
+					'return PopUp("popup_gitem.php?list_name=items&dstfrm='.$frmGraph->getName().
+					url_param($only_hostid, false, 'only_hostid').
+					url_param($monitored_hosts, false, 'monitored_hosts').
+					url_param($graphtype, false, 'graphtype').
+					url_param($gitem, false).
+					url_param($gid,false,'gid').
+					url_param(get_request('graphid',0),false,'graphid').
+					'",550,400,"graph_item_form");'
+				);
+
+				if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
+					$items_table->addRow(array(
+							new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
+							$description,
+							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
+							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
+							$color,
+							array( $do_up, SPACE."|".SPACE, $do_down )
+						));
+				}
+				else{
+					$items_table->addRow(array(
+							new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
+//							$gitem['sortorder'],
+							$description,
+							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
+							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
+							($gitem['yaxisside']==GRAPH_YAXIS_SIDE_LEFT)?S_LEFT:S_RIGHT,
+							graph_item_drawtype2str($gitem["drawtype"],$gitem["type"]),
+							$color,
+							array( $do_up, ((!is_null($do_up) && !is_null($do_down)) ? SPACE."|".SPACE : ''), $do_down )
+						));
+				}
+			}
+			$dedlete_button = new CButton('delete_item', S_DELETE_SELECTED);
+		}
+		else{
+			$items_table = $dedlete_button = null;
+		}
+		
 		if(($graphtype == GRAPH_TYPE_NORMAL) || ($graphtype == GRAPH_TYPE_STACKED)){
 			$frmGraph->addRow(S_SHOW_WORKING_TIME,new CCheckBox('showworkperiod',$showworkperiod,null,1));
 			$frmGraph->addRow(S_SHOW_TRIGGERS,new CCheckBox('showtriggers',$showtriggers,null,1));
@@ -3120,14 +3207,21 @@
 					$ymin_name = $min_host['host'].':'.item_description($min_item);
 				}
 
-				$yaxis_min[] = new CTextBox("ymin_name",$ymin_name,80,'yes');
-				$yaxis_min[] = new CButton('yaxis_min',S_SELECT,'javascript: '.
-												"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
-													"&dstfld1=ymin_itemid".
-													"&dstfld2=ymin_name".
-													"&srctbl=items".
-													"&srcfld1=itemid".
-													"&srcfld2=description',0,0,'zbx_popup_item');");
+				if(count($items)){
+					$yaxis_min[] = new CTextBox("ymin_name",$ymin_name,80,'yes');
+					$yaxis_min[] = new CButton('yaxis_min',S_SELECT,'javascript: '.
+													"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
+													url_param($only_hostid, false, 'only_hostid').
+													url_param($monitored_hosts, false, 'monitored_hosts').
+														"&dstfld1=ymin_itemid".
+														"&dstfld2=ymin_name".
+														"&srctbl=items".
+														"&srcfld1=itemid".
+														"&srcfld2=description',0,0,'zbx_popup_item');");
+				}
+				else{
+					$yaxis_min[] = SPACE.S_ADD_GRAPH_ITEMS;
+				}
 			}
 			else{
 				$frmGraph->addVar('yaxismin', $yaxismin);
@@ -3145,7 +3239,7 @@
 			$yaxis_max[] = $cmbYType;
 
 			if($ymax_type == GRAPH_YAXIS_TYPE_FIXED){
-				$yaxis_max[] = new CTextBox("yaxismax",$yaxismax,9);
+				$yaxis_max[] = new CTextBox('yaxismax',$yaxismax,9);
 			}
 			else if($ymax_type == GRAPH_YAXIS_TYPE_ITEM_VALUE){
 				$frmGraph->addVar('yaxismax',$yaxismax);
@@ -3156,15 +3250,22 @@
 					$max_item = get_item_by_itemid($ymax_itemid);
 					$ymax_name = $max_host['host'].':'.item_description($max_item);
 				}
-
-				$yaxis_max[] = new CTextBox("ymax_name",$ymax_name,80,'yes');
-				$yaxis_max[] = new CButton('yaxis_max',S_SELECT,'javascript: '.
-												"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
-													"&dstfld1=ymax_itemid".
-													"&dstfld2=ymax_name".
-													"&srctbl=items".
-													"&srcfld1=itemid".
-													"&srcfld2=description',0,0,'zbx_popup_item');");
+	
+				if(count($items)){
+					$yaxis_max[] = new CTextBox("ymax_name",$ymax_name,80,'yes');
+					$yaxis_max[] = new CButton('yaxis_max',S_SELECT,'javascript: '.
+													"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
+													url_param($only_hostid, false, 'only_hostid').
+													url_param($monitored_hosts, false, 'monitored_hosts').
+														"&dstfld1=ymax_itemid".
+														"&dstfld2=ymax_name".
+														"&srctbl=items".
+														"&srcfld1=itemid".
+														"&srcfld2=description',0,0,'zbx_popup_item');");
+				}
+				else{
+					$yaxis_max[] = SPACE.S_ADD_GRAPH_ITEMS;
+				}
 			}
 			else{
 				$frmGraph->addVar('yaxismax',$yaxismax);
@@ -3172,97 +3273,11 @@
 
 			$frmGraph->addRow(S_YAXIS_MAX_VALUE, $yaxis_max);
 		}
-		else {
+		else{
 			$frmGraph->addRow(S_3D_VIEW,new CCheckBox('graph3d',$graph3d,'javascript: graphs.submit(this);',1));
 			$frmGraph->addRow(S_LEGEND,new CCheckBox('legend',$legend,'javascript: graphs.submit(this);',1));
 		}
 
-		$only_hostid = null;
-		$monitored_hosts = null;
-
-		if(count($items)){
-			$frmGraph->addVar('items', $items);
-
-			$keys = array_keys($items);
-			$first = reset($keys);
-			$last = end($keys);
-
-			$items_table = new CTableInfo();
-			foreach($items as $gid => $gitem){
-				//if($graphtype == GRAPH_TYPE_STACKED && $gitem['type'] == GRAPH_ITEM_AGGREGATED) continue;
-				$host = get_host_by_itemid($gitem['itemid']);
-				$item = get_item_by_itemid($gitem['itemid']);
-
-				if($host['status'] == HOST_STATUS_TEMPLATE)
-					$only_hostid = $host['hostid'];
-				else
-					$monitored_hosts = 1;
-
-				if($gitem['type'] == GRAPH_ITEM_AGGREGATED)
-					$color = '-';
-				else
-					$color = new CColorCell(null,$gitem['color']);
-
-
-				if($gid == $first){
-					$do_up = null;
-				}
-				else{
-					$do_up = new CSpan(S_UP,'link');
-					$do_up->onClick("return create_var('".$frmGraph->getName()."','move_up',".$gid.", true);");
-				}
-
-				if($gid == $last){
-					$do_down = null;
-				}
-				else{
-					$do_down = new CSpan(S_DOWN,'link');
-					$do_down->onClick("return create_var('".$frmGraph->getName()."','move_down',".$gid.", true);");
-				}
-
-
-
-				$description = new CSpan($host['host'].': '.item_description($item),'link');
-				$description->onClick(
-					'return PopUp("popup_gitem.php?list_name=items&dstfrm='.$frmGraph->getName().
-					url_param($only_hostid, false, 'only_hostid').
-					url_param($monitored_hosts, false, 'monitored_hosts').
-					url_param($graphtype, false, 'graphtype').
-					url_param($gitem, false).
-					url_param($gid,false,'gid').
-					url_param(get_request('graphid',0),false,'graphid').
-					'",550,400,"graph_item_form");'
-				);
-
-				if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
-					$items_table->addRow(array(
-							new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
-							$description,
-							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
-							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
-							$color,
-							array( $do_up, SPACE."|".SPACE, $do_down )
-						));
-				}
-				else{
-					$items_table->addRow(array(
-							new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
-//							$gitem['sortorder'],
-							$description,
-							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
-							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
-							($gitem['yaxisside']==GRAPH_YAXIS_SIDE_LEFT)?S_LEFT:S_RIGHT,
-							graph_item_drawtype2str($gitem["drawtype"],$gitem["type"]),
-							$color,
-							array( $do_up, ((!is_null($do_up) && !is_null($do_down)) ? SPACE."|".SPACE : ''), $do_down )
-						));
-				}
-			}
-			$dedlete_button = new CButton('delete_item', S_DELETE_SELECTED);
-		}
-		else{
-			$items_table = $dedlete_button = null;
-		}
 		$frmGraph->addRow(S_ITEMS,
 				array(
 					$items_table,
@@ -3276,16 +3291,16 @@
 				));
 		unset($items_table, $dedlete_button);
 
-		$frmGraph->addItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["graphid"])){
+		$frmGraph->addItemToBottomRow(new CButton('save',S_SAVE));
+		if(isset($_REQUEST['graphid'])){
 			$frmGraph->addItemToBottomRow(SPACE);
-			$frmGraph->addItemToBottomRow(new CButton("clone",S_CLONE));
+			$frmGraph->addItemToBottomRow(new CButton('clone',S_CLONE));
 			$frmGraph->addItemToBottomRow(SPACE);
-			$frmGraph->addItemToBottomRow(new CButtonDelete(S_DELETE_GRAPH_Q,url_param("graphid").
-				url_param('groupid').url_param("hostid")));
+			$frmGraph->addItemToBottomRow(new CButtonDelete(S_DELETE_GRAPH_Q,url_param('graphid').
+				url_param('groupid').url_param('hostid')));
 		}
 		$frmGraph->addItemToBottomRow(SPACE);
-		$frmGraph->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param("hostid")));
+		$frmGraph->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param('hostid')));
 
 		$frmGraph->show();
 	}
@@ -5593,7 +5608,7 @@
 		}
 // END:   HOSTS PROFILE EXTENDED Section
 
-		$frmHost->addItemToBottomRow(new CButton('save',S_SAVE));
+		$frmHost->addItemToBottomRow(new CButton('masssave',S_SAVE));
 		$frmHost->addItemToBottomRow(SPACE);
 		$frmHost->addItemToBottomRow(new CButtonCancel(url_param('config').url_param('groupid')));
 		
