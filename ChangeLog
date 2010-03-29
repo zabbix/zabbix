@@ -1,3 +1,5 @@
+Changes for 1.8.3
+
 Changes for 1.8.2
 
  - [ZBX-2084] fixed JSON decoding class, which didn't worked due to PCRE backtrace limit, enabled native PHP JSON functions, rewrited code with sockets (AM)
