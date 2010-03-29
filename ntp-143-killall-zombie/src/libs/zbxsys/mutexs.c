@@ -213,7 +213,7 @@ int zbx_mutex_lock(ZBX_MUTEX *mutex)
 
 #else /* not _WINDOWS */
 
-	struct sembuf sem_lock = { *mutex, -1, 0 };
+	struct sembuf sem_lock = { *mutex, -1, SEM_UNDO };
 
 	if(!*mutex) return ZBX_MUTEX_OK;
 
