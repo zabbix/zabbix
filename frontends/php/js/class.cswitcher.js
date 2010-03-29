@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,19 +21,27 @@ var CSwitcher = Class.create();
 
 CSwitcher.prototype = {
 initProc: null,		// on if init method is running
-switchers_name : '',
+switcherName : '',
 switchers : {},
 classOpened : 'filteropened',
 classClosed : 'filterclosed',
 
 initialize : function(name){
 	this.init = true;
-	this.switchers_name = name;
+	this.switcherName = name;
 
-	var element = $(this.switchers_name);
+	var element = $(this.switcherName);
 
-	if(!is_null(element))
+	if(!is_null(element)){
 		addListener(element, 'click', this.showHide.bindAsEventListener(this));
+
+		var state_all = cookie.read(this.switcherName+'_all');
+		if(!is_null(state_all)){
+			if(state_all == 1){
+				element.className = this.classOpened;
+			}
+		}
+	}
 	
 	var divs = $$('div[data-switcherid]');
 	for(var i=0; i<divs.length; i++){
@@ -43,10 +51,9 @@ initialize : function(name){
 		var switcherid = divs[i].getAttribute('data-switcherid');
 		this.switchers[switcherid] = {};
 		this.switchers[switcherid]['object'] = divs[i];
-
 	}
 		
-	if((to_change = cookie.readArray(this.switchers_name)) != null){
+	if((to_change = cookie.readArray(this.switcherName)) != null){
 		for(var i=0; i<to_change.length; i++){
 			if(!isset(i, to_change)) continue;
 
@@ -74,7 +81,7 @@ open : function(switcherid){
 
 showHide : function(e){
 	PageRefresh.restart();
-	
+
 	var obj = eventTarget(e);
 	var switcherid = obj.getAttribute('data-switcherid');
 
@@ -91,6 +98,7 @@ showHide : function(e){
 	obj.className = newClassName;
 	
 	if(empty(switcherid)){
+		cookie.create(this.switcherName+'_all', state);
 
 		var divs = $$('div.'+oldClassName);
 		for(var i=0; i < divs.length; i++){
@@ -126,7 +134,7 @@ showHide : function(e){
 },
 
 storeCookie : function(){
-//	cookie.erase(this.switchers_name);
+//	cookie.erase(this.switcherName);
 	
 	var storeArray = new Array();
 	
@@ -136,6 +144,6 @@ storeCookie : function(){
 		}
 	}
 
-	cookie.createArray(this.switchers_name, storeArray);
+	cookie.createArray(this.switcherName, storeArray);
 }
 }
