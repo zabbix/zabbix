@@ -45,7 +45,7 @@ include_once('include/page_header.php');
 		'name'=>			array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,	'isset({save_service})'),
 		'algorithm'=>		array(T_ZBX_INT, O_OPT,  NULL,	IN('0,1,2'),	'isset({save_service})'),
 		'showsla'=>			array(T_ZBX_INT, O_OPT,  NULL,  IN('0,1'),null),
-		'goodsla'=>			array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,100),		null),
+		'goodsla'=>			array(T_ZBX_DBL, O_OPT,  NULL,  BETWEEN(0,100),		null),
 		'sortorder'=>		array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),	null),
 		'service_times'=>	array(T_ZBX_STR, O_OPT,  null,  null,			null),
 
