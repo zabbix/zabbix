@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-2084] fixed JSON decoding class, which didn't worked due to PCRE backtrace limit, enabled native PHP JSON functions, rewrited code with sockets (AM)
  - [ZBX-2239] fixed mutex (un)locking so that zabbix_server does not become forever defunct when killed (asaveljevs)
  - [ZBX-1983] fixed port validation in host agent port, ipmi port and in discovery checks ports (now supports for ports ranges like "21-80,465") (AM)
  - [ZBX-2228] fixed compilation under FreeBSD with enabled LDAP (Sasha)
