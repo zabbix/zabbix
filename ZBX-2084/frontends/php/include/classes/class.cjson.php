@@ -58,7 +58,7 @@ class CJSON{
 	 *
 	 */
 	protected $_config = array(
-		'bypass_ext' => true,
+		'bypass_ext' => false,
 		'bypass_mb'  => false,
 		'noerror'	=> false
 	);
@@ -240,6 +240,8 @@ class CJSON{
 		}
 
 // Fall back to PHP-only method
+		ini_set('pcre.backtrack_limit', '10000000');
+		
 		$this->_level = 0;
 		if($this->isValid($encodedValue)){
 			$result = $this->_json_decode($encodedValue, (bool) $asArray);
