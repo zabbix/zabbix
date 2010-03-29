@@ -1318,3 +1318,4 @@ class CJSON{
 	return true;
 	}
 }
+?>
