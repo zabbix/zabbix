@@ -682,7 +682,7 @@ include_once('include/page_header.php');
 					'tr_events.php?triggerid='.$trigger['triggerid'].'&eventid='.$row_event['eventid']);
 				$next_clock = isset($trigger['events'][$enum-1]) ? $trigger['events'][$enum-1]['clock'] : time();
 
-				$empty_col = new CCol();
+				$empty_col = new CCol(SPACE);
 				$empty_col->setColSpan(3);
 				$ack_cb_col = new CCol($ack_cb);
 				$ack_cb_col->setColSpan(2);
@@ -741,6 +741,9 @@ include_once('include/page_header.php');
 	$jsmenu = new CPUMenu(null, 170);
 	$jsmenu->InsertJavaScript();
 
+?>
+<?php
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
+
 ?>
