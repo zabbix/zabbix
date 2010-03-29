@@ -823,15 +823,17 @@ COpt::memoryPick();
 				$tmp_graph['templateid'] = $graph['graphid'];
 				
 				$tmp_graph['gitems'] = get_same_graphitems_for_host($tmp_graph['gitems'], $chd_host['hostid'])
-					or self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: cannot inherit, no required items on [ '.$chd_host['host'].' ]');
+					or self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: cannot inherit. No required items on [ '.$chd_host['host'].' ]');
 			
 				if($tmp_graph['ymax_itemid'] > 0){
 					$ymax_itemid = get_same_graphitems_for_host(array(array('itemid' => $tmp_graph['ymax_itemid'])), $chd_host['hostid']);
+					if(!$ymax_itemid) self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: cannot inherit. No required items on [ '.$chd_host['host'].' ] (Ymax value item)');
 					$ymax_itemid = reset($ymax_itemid);
 					$tmp_graph['ymax_itemid'] = $ymax_itemid['itemid'];
 				}
 				if($tmp_graph['ymin_itemid'] > 0){
 					$ymin_itemid = get_same_graphitems_for_host(array(array('itemid' => $tmp_graph['ymin_itemid'])), $chd_host['hostid']);
+					if(!$ymin_itemid) self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: cannot inherit. No required items on [ '.$chd_host['host'].' ] (Ymin value item)');				
 					$ymin_itemid = reset($ymin_itemid);
 					$tmp_graph['ymin_itemid'] = $ymin_itemid['itemid'];
 				}
