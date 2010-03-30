@@ -614,6 +614,7 @@
 	'S_SHOW_TRIGGERS'=>			'Show triggers',
 	'S_3D_VIEW'=>				'3D view',
 	'S_LEGEND'=>				'Legend',
+	'S_SHOW_LEGEND'=>			'Show legend',
 	'S_GRAPH_SUM'=>				'Graph sum',
 	'S_GRAPH_ITEM'=>			'Graph item',
 	'S_REQUIRED_ITEMS_FOR_GRAPH'=>		'Items required for graph',

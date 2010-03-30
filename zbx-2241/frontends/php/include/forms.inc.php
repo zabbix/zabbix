@@ -3053,13 +3053,8 @@
 
 		$frmGraph->addRow(S_NAME, new CTextBox('name', $name, 32));
 
-		$g_width = new CNumericBox('width', $width, 5);
-		$g_width->setAttribute('onblur', 'javascript: submit();');
-		$frmGraph->addRow(S_WIDTH, $g_width);
-
-		$g_height = new CNumericBox('height', $height, 5);
-		$g_height->setAttribute('onblur','javascript: submit();');
-		$frmGraph->addRow(S_HEIGHT, $g_height);
+		$frmGraph->addRow(S_WIDTH, new CNumericBox('width', $width, 5));
+		$frmGraph->addRow(S_HEIGHT, new CNumericBox('height', $height, 5));
 
 		$cmbGType = new CComboBox('graphtype', $graphtype, 'graphs.submit(this)');
 		$cmbGType->addItem(GRAPH_TYPE_NORMAL, S_NORMAL);
@@ -3157,10 +3152,13 @@
 		else{
 			$items_table = $dedlete_button = null;
 		}
-		
+
+//		$frmGraph->addRow(S_SHOW_LEGEND, new CCheckBox('legend',$legend, null, 1));
+
 		if(($graphtype == GRAPH_TYPE_NORMAL) || ($graphtype == GRAPH_TYPE_STACKED)){
 			$frmGraph->addRow(S_SHOW_WORKING_TIME,new CCheckBox('showworkperiod',$showworkperiod,null,1));
 			$frmGraph->addRow(S_SHOW_TRIGGERS,new CCheckBox('showtriggers',$showtriggers,null,1));
+
 
 			if($graphtype == GRAPH_TYPE_NORMAL){
 				$percent_left = sprintf("%2.2f",$percent_left);
@@ -3274,8 +3272,8 @@
 			$frmGraph->addRow(S_YAXIS_MAX_VALUE, $yaxis_max);
 		}
 		else{
-			$frmGraph->addRow(S_3D_VIEW,new CCheckBox('graph3d',$graph3d,'javascript: graphs.submit(this);',1));
-			$frmGraph->addRow(S_LEGEND,new CCheckBox('legend',$legend,'javascript: graphs.submit(this);',1));
+			$frmGraph->addRow(S_SHOW_LEGEND, new CCheckBox('legend',$legend, null, 1));
+			$frmGraph->addRow(S_3D_VIEW,new CCheckBox('graph3d',$graph3d,null,1));
 		}
 
 		$frmGraph->addRow(S_ITEMS,
@@ -3291,6 +3289,11 @@
 				));
 		unset($items_table, $dedlete_button);
 
+		$preView = new CButton('preview',S_PREVIEW);
+		//$preView->setAttribute('style', 'float: left;');
+
+		$frmGraph->addItemToBottomRow($preView);
+		$frmGraph->addItemToBottomRow(SPACE);
 		$frmGraph->addItemToBottomRow(new CButton('save',S_SAVE));
 		if(isset($_REQUEST['graphid'])){
 			$frmGraph->addItemToBottomRow(SPACE);

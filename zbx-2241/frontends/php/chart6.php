@@ -81,7 +81,7 @@ include_once 'include/page_header.php';
 	$graph->setHeader($host['host'].':'.$db_data['name']);
 
 	if($db_data['show_3d'] == 1) $graph->switchPie3D();
-	$graph->switchLegend($db_data['show_legend']);
+	$graph->showLegend($db_data['show_legend']);
 
 	$sql = 'SELECT gi.* '.
 			' FROM graphs_items gi '.

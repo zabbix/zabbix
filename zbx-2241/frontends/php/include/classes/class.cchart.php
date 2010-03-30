@@ -1593,7 +1593,7 @@ class CChart extends CGraphDraw{
 
 		$legend->draw();
 
-		if($this->sizeY < 100){
+		if($this->sizeY < 120){
 			return true;
 		}
 
@@ -1938,7 +1938,12 @@ class CChart extends CGraphDraw{
 
 		$this->fullSizeX = $this->sizeX+$this->shiftXleft+$this->shiftXright+1;
 		$this->fullSizeY = $this->sizeY+$this->shiftY+$this->legendOffsetY;
-		$this->fullSizeY += 14*($this->num+1+(($this->sizeY < 120)?0:count($this->triggers)))+8;
+
+		if($this->drawLegend){
+			$trCount = $this->m_showTriggers?count($this->triggers):0;
+			$this->fullSizeY += 14 * ($this->num+1+(($this->sizeY < 120)?0:count($this->triggers))) + 8;
+		}
+
 
 		foreach($this->percentile as $side => $percentile){
 			if(($percentile['percent']>0) && $percentile['value']){
@@ -2062,12 +2067,14 @@ class CChart extends CGraphDraw{
 		$this->drawLeftSide();
 		$this->drawRightSide();
 
-		$this->drawTriggers();
-		$this->drawPercentile();
+		if($this->drawLegend){
+			$this->drawTriggers();
+			$this->drawPercentile();
+
+			$this->drawLegend();
+		}
 
 		$this->drawLogo();
-
-		$this->drawLegend();
 
 		$end_time=getmicrotime();
 		$str=sprintf('%0.2f',(getmicrotime()-$start_time));
