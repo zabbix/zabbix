@@ -1714,7 +1714,7 @@
 	'S_SCRIPT_READ_ERROR'=>			'Can\'t read script response, check connection',
 	'S_SCRIPT_TIMEOUT_ERROR'=>		'Defined in "include/defines.inc.php" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value',
 	'S_SCRIPT_BYTES_LIMIT_ERROR'=>		'Defined in "include/defines.inc.php" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value',
-	'S_SCRIPT_UNKNOWN_ERROR'=>		'Unknown error happend reading script answer, report to the developers, please',
+	'S_SCRIPT_UNKNOWN_ERROR'=>		'Unknown error happened reading script answer, please report to the developers',
 	'S_SCRIPT_ERROR_EMPTY_RESPONSE' =>	'Empty response received',
 
 //	audit.php
@@ -2095,7 +2095,7 @@
 	'S_INCORRECT_DESCRIPTION'=>		'Incorrect description',
 	'S_CANT_FORMAT_TREE'=>			'Can\'t format Tree',
 	'S_NO_PERMISSION'=>				'You do not have permission to perform this operation',
-	'S_NO_PERMISSIONS_FOR_SCREEN'=> 'No permissions for screen',
+	'S_NO_PERMISSIONS_FOR_SCREEN'=>	'No permissions for screen',
 	'S_NO_PERMISSIONS_FOR_MAP'=>	'No permissions for map',
 	'S_XML_FILE_CONTAINS_ERRORS'=>	'XML file contains errors'
 	);
