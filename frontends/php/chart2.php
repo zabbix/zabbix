@@ -82,19 +82,19 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['stime']))		$graph->setSTime($_REQUEST['stime']);
 	if(isset($_REQUEST['border']))		$graph->setBorder(0);
 
-	$width = get_request('width', 0);
+	$width = get_request('width', 900);
 
 	if($width <= 0) $width = $db_data['width'];
 
-	$height = get_request('height', 0);
+	$height = get_request('height', 200);
 	if($height <= 0) $height = $db_data['height'];
 
+//	$graph->showLegend($db_data['show_legend']);
 	$graph->showWorkPeriod($db_data['show_work_period']);
 	$graph->showTriggers($db_data['show_triggers']);
 
 	$graph->setWidth($width);
 	$graph->setHeight($height);
-
 
 	$graph->setYMinAxisType($db_data['ymin_type']);
 	$graph->setYMaxAxisType($db_data['ymax_type']);
