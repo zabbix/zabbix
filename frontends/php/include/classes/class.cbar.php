@@ -31,7 +31,7 @@ class CBar extends CGraphDraw{
 		$this->shiftlegendright = 0;	// count of static chars * px/char + for color rectangle + space
 		$this->shiftCaption = 0;
 		$this->maxCaption = 0;
-		$this->drawlegendallow = 0;
+		$this->drawLegend = 0;
 
 		$this->series = array();
 		$this->stacked = false;
@@ -86,17 +86,17 @@ class CBar extends CGraphDraw{
 
 	public function showLegend($type=null){
 		if(!is_null($type)){
-			$this->drawlegendallow = $type;
-			return $this->drawlegendallow;
+			$this->drawLegend = $type;
+			return $this->drawLegend;
 		}
-		else if($this->drawlegendallow == 0){
-			$this->drawlegendallow = 1;
+		else if($this->drawLegend == 0){
+			$this->drawLegend = 1;
 		}
 		else {
-			$this->drawlegendallow = 0;
+			$this->drawLegend = 0;
 		}
 
-	return $this->drawlegendallow;
+	return $this->drawLegend;
 	}
 
 	public function setXLabel($label){
@@ -153,7 +153,7 @@ class CBar extends CGraphDraw{
 		$this->shiftXleft = 10 + (is_null($this->xLabel)?0:16);
 		$this->shiftXright = 10;
 
-		if($this->drawlegendallow == 0){
+		if($this->drawLegend == 0){
 			$this->shiftlegendright = 0;
 		}
 
@@ -595,7 +595,7 @@ class CBar extends CGraphDraw{
 	}
 
 	protected function drawLegend(){
-		if(!$this->drawlegendallow) return;
+		if(!$this->drawLegend) return;
 
 		$shiftY = $this->shiftY;
 		$shiftX = $this->fullSizeX - $this->shiftlegendright - $this->shiftXright;
@@ -645,7 +645,7 @@ class CBar extends CGraphDraw{
 		$this->fullSizeX = $this->sizeX;
 		$this->fullSizeY = $this->sizeY;
 
-		if(($this->sizeX < 300) || ($this->sizeY < 200)) $this->switchlegend(0);
+		if(($this->sizeX < 300) || ($this->sizeY < 200)) $this->showLegend(0);
 
 		$this->calcShifts();
 

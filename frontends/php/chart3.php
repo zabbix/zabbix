@@ -48,6 +48,7 @@ include_once('include/page_header.php');
 		'ymin_itemid'=>	array(T_ZBX_INT, O_OPT,	NULL,		DB_ID,	null),
 		'ymax_itemid'=>	array(T_ZBX_INT, O_OPT,	NULL,		DB_ID,	null),
 
+		'legend'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1'),	NULL),
 		'showworkperiod'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1'),	NULL),
 		'showtriggers'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1'),	NULL),
 
@@ -130,6 +131,8 @@ include_once('include/page_header.php');
 
 	$graph->setWidth(get_request('width',		900));
 	$graph->setHeight(get_request('height',		200));
+
+//	$graph->showLegend(get_request('legend'	,1));
 
 	$graph->showWorkPeriod(get_request('showworkperiod'	,1));
 	$graph->showTriggers(get_request('showtriggers'		,1));
