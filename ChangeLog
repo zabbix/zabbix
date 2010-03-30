@@ -1,5 +1,9 @@
 Changes for 1.9
 
+ - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
+
+Changes for 1.8.3
+
  - [ZBX-954] fix minor typos (Richlv)
 
 Changes for 1.8.2
