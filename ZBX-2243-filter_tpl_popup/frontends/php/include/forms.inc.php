@@ -1361,7 +1361,7 @@
 		$col_table1->addRow(array(bold(S_HOST.': '),
 				array(new CTextBox('filter_host', $filter_host, 20),
 					new CButton('btn_host', S_SELECT, 'return PopUp("popup.php?dstfrm='.$form->GetName().
-						'&dstfld1=filter_host&srctbl=hosts&srcfld1=host",450,450);', 'H'))
+						'&dstfld1=filter_host&srctbl=hosts_and_templates&srcfld1=host",450,450);', 'H'))
 		));
 		$col_table1->addRow(array(bold(S_APPLICATION.': '),
 				array(new CTextBox('filter_application', $filter_application, 20),
