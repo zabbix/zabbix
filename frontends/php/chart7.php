@@ -66,14 +66,14 @@ include_once('include/page_header.php');
 
 	$effectiveperiod = navigation_bar_calc();
 
-	$graph = new CPie(get_request('graphtype'	,GRAPH_TYPE_NORMAL));
-	$graph->setHeader($host['host'].':'.get_request('name',''));
+	$graph = new CPie(get_request('graphtype', GRAPH_TYPE_NORMAL));
+	$graph->setHeader(get_request('name', ''));
 
 	$graph3d = get_request('graph3d',0);
 	$legend = get_request('legend',0);
 
 	if($graph3d == 1) $graph->switchPie3D();
-	$graph->switchLegend($legend);
+	$graph->showLegend($legend);
 
 	unset($host);
 
