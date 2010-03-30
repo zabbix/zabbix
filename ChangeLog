@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2240] fixed "undefined index" in monitoring latest data (Vedmak)
  - [ZBX-954] fix minor typos (Richlv)
 
 Changes for 1.8.2
