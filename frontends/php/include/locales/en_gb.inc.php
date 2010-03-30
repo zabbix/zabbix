@@ -1798,7 +1798,7 @@
 
 //  tr_testexpr.php
 	'S_TEST_DATA'=>		'Test data',
-	'S_ITEM_FUNCTION'=>	'Item / Function',
+	'S_ITEM_SLASH_FUNCTION'=>	'Item / Function',
 	'S_RESULT_TYPE'=>	'Result type',
 	'S_COMBINED_RESULT'=>	'Combined result',
 
