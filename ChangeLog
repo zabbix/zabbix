@@ -1,12 +1,12 @@
 Changes for 1.9
 
- - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
+ - [ZBX-954] fix minor typos (Richlv)
 
 Changes for 1.8.2
 
- - [ZBX-2084] fixed JSON decoding class, which didn't worked due to PCRE backtrace limit, enabled native PHP JSON functions, rewrited code with sockets (AM)
+ - [ZBX-2084] fixed JSON decoding class, which didn't work due to PCRE backtrace limit, enabled native PHP JSON functions, rewrote code with sockets (AM)
  - [ZBX-2239] fixed mutex (un)locking so that zabbix_server does not become forever defunct when killed (asaveljevs)
- - [ZBX-1983] fixed port validation in host agent port, ipmi port and in discovery checks ports (now supports for ports ranges like "21-80,465") (AM)
+ - [ZBX-1983] fixed port validation in host agent port, IPMI port and in discovery checks ports (now supports port ranges like "21-80,465") (AM)
  - [ZBX-2228] fixed compilation under FreeBSD with enabled LDAP (Sasha)
  - [ZBX-2236] fixed processing of Telnet checks by Zabbix proxy (Sasha)
  - [ZBX-2234] fixed icon for mass open action in status of triggers (Aly)
@@ -115,7 +115,7 @@ Changes for 1.8.2
  - [ZBX-3] fixed logging into syslog, Zabbix log levels are properly linked to syslog levels (Dmitry)
  - [ZBX-2022] fixed link colour picker in maps in IE7 (Vedmak)
  - [ZBX-1968] fixed error in log item history in IE8 (Vedmak)
- - [ZBX-2020] added requirements check for PHP input_max_time (Vedmak)
+ - [ZBX-2020] added requirements check for PHP max_input_time (Vedmak)
  - [ZBX-1958] fixed problem with a lot of digits in float values (Vedmak)
  - [ZBX-1853] fixed template/host full clone with triggers with dependencies (Vedmak)
  - [ZBX-1999] fixed bug when cannot create simple check item with macro in parameters (Vedmak)
