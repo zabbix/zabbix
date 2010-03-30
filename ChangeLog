@@ -4,6 +4,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2243] fixed bug when cannot select template for item filter by host (Vedmak)
  - [ZBX-2240] fixed "undefined index" in monitoring latest data (Vedmak)
  - [ZBX-954] fix minor typos (Richlv)
 
