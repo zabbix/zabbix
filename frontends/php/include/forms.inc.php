@@ -2251,7 +2251,7 @@
 	}
 
 	# Insert form for Trigger
-	function	insert_trigger_form()
+	function insert_trigger_form()
 	{
 		global $_REQUEST;
 
@@ -2313,17 +2313,14 @@
 
 		$frmTrig->AddRow(S_NAME, new CTextBox("description",$description,90, $limited));
 
-        if ($input_method == IM_TREE)
-        {
+        if ($input_method == IM_TREE){
             $alz = analyze_expression($expression);
-            if ($alz !== false)
-            {
+            if ($alz !== false){
                 list($outline, $node, $map) = $alz;
-                if (isset($_REQUEST['expr_action']) && $node != null)
-                {
-                    $new_expr = remake_expression($node, $_REQUEST['expr_target'], $_REQUEST['expr_action'], $expr_temp, $map);
-                    if ($new_expr !== false)
-                    {
+				
+                if (isset($_REQUEST['expr_action']) && $node != null){
+                    $new_expr = remake_expression($node, $_REQUEST['expr_target'], $_REQUEST['expr_action'], $expr_temp, $map);					
+                    if ($new_expr !== false){
                         $expression = $new_expr;
                         list($outline, $node, $map) = analyze_expression($expression);
                         $expr_temp = '';
@@ -2343,8 +2340,7 @@
             else $input_method = IM_FORCED;
         }
 
-        if ($input_method != IM_TREE)
-        {
+        if ($input_method != IM_TREE){
             $exprfname = 'expression';
             $exprtxt = new CTextBox($exprfname,$expression,75,$limited);
             $exprparam = "GetSelectedText(this.form.elements['$exprfname'])";
@@ -2370,8 +2366,7 @@
         $frmTrig->AddVar('input_method', $input_method);
         $frmTrig->AddVar('toggle_input_method', '');
         $exprtitle = array(S_EXPRESSION);
-        if ($input_method != IM_FORCED)
-        {
+        if ($input_method != IM_FORCED){
             $btn_im = new CLink(S_TOGGLE_INPUT_METHOD,'#','action',
                                 'document.getElementsByName("toggle_input_method")[0].value="1";' .
                                 'document.getElementsByName("input_method")[0].value=' .
@@ -2381,8 +2376,7 @@
         }
         $frmTrig->AddRow($exprtitle, $row);
 
-        if ($input_method == IM_TREE)
-        {
+        if($input_method == IM_TREE){
             $exp_table = new CTable();
             $exp_table->SetClass('tableinfo');
             $exp_table->AddOption('id','exp_list');
@@ -2394,11 +2388,9 @@
             $exp_table->footerClass = 'footer';
             $exp_table->SetHeader(array(S_TARGET, S_EXPRESSION, S_DELETE));
 
-            if ($node != null)
-            {
+            if ($node != null){
                 $exprs = make_disp_tree($tree, $map, true);
-                foreach ($exprs as $i => $e)
-                {
+                foreach ($exprs as $i => $e){
                     $tgt_chk = new CCheckbox('expr_target', $i == 0 ? 'yes' : 'no', 'check_target(this);', $e['id']);
                     $del_url = new CLink(S_DELETE,'#','action',
                                          'javascript: if(confirm("Delete expression?")) { delete_expression('.
