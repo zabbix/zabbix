@@ -3029,6 +3029,7 @@
 			}
 		}
 
+		$items = array_values($items);
 		$icount = count($items);
 		for($i=0; $i < $icount-1;){
 // check if we deletd an item
