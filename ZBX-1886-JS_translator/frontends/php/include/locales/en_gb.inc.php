@@ -2131,6 +2131,11 @@
 	'S_EDIT_SERVICE'=>				'Edit Service',
 	'S_DELETE_SERVICE'=>				'Delete Service',
 	'S_DELETE_SELECTED_SERVICES_Q'=>		'Delete selected services?',
+
+//	js.inc.php
+	'S_CANNOT_FIND_OBJECTS_WITH_NAME'=>	'Can not find objects with name',
+	'S_CANNOT_CREATE_NEW_ELEMENT'=>		'Can not create new element',
+	'S_OTHER_SMALL'=>			'other',
 	
 );
 ?>
