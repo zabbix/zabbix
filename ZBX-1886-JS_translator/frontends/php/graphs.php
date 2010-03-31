@@ -181,11 +181,11 @@ include_once('include/page_header.php');
 				'yaxismax' => $_REQUEST['yaxismax'],
 				'ymin_itemid' => $_REQUEST['ymin_itemid'],
 				'ymax_itemid' => $_REQUEST['ymax_itemid'],
-				'show_work_period' => (isset($_REQUEST['showworkperiod']) ? 1 : 0),
-				'show_triggers' => (isset($_REQUEST['showtriggers']) ? 1 : 0),
+				'show_work_period' => get_request('showworkperiod',0),
+				'show_triggers' => get_request('showtriggers',0),
 				'graphtype' => $_REQUEST['graphtype'],
-				'legend' => $_REQUEST['legend'],
-				'graph3d' => $_REQUEST['graph3d'],
+				'show_legend' => get_request('legend', 0),
+				'show_3d' => get_request('graph3d', 0),
 				'percent_left' => $percent_left,
 				'percent_right' => $percent_right,
 				'gitems' => $items
@@ -446,17 +446,17 @@ include_once('include/page_header.php');
 		echo SBR;
 		$table = new CTable(NULL,'graph');
 		if(($_REQUEST['graphtype'] == GRAPH_TYPE_PIE) || ($_REQUEST['graphtype'] == GRAPH_TYPE_EXPLODED)){
-			$table->addRow(new CImg('chart7.php?period=3600'.url_param('items').
-				url_param('name').url_param('legend').url_param('graph3d').url_param('width').url_param('height').url_param('graphtype')));
+			$table->addRow(new CImg('chart7.php?period=3600'.url_param('name').
+					url_param('legend').url_param('graph3d').url_param('width').
+					url_param('height').url_param('graphtype').url_param('items')));
 			$table->show();
 		}
 		else{
-			$table->addRow(new CImg('chart3.php?period=3600'.url_param('items').
-				url_param('name').url_param('width').url_param('height').
+			$table->addRow(new CImg('chart3.php?period=3600'.url_param('name').url_param('width').url_param('height').
 				url_param('ymin_type').url_param('ymax_type').url_param('yaxismin').url_param('yaxismax').
 				url_param('ymin_itemid').url_param('ymax_itemid').
-				url_param('showworkperiod').url_param('showtriggers').url_param('graphtype').
-				url_param('percent_left').url_param('percent_right')));
+				url_param('showworkperiod').url_param('legend').url_param('showtriggers').url_param('graphtype').
+				url_param('percent_left').url_param('percent_right').url_param('items')));
 			$table->show();
 		}
 	}
