@@ -329,7 +329,7 @@
 			return FALSE;
 		}
 
-		if(preg_match('/^log\[|eventlog\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
+		if(preg_match('/^(log|logrt|eventlog)\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
 			error(S_TYPE_INFORMATION_BUST_LOG_FOR_LOG_KEY);
 			return FALSE;
 		}
@@ -561,7 +561,7 @@
 			$item['delta']=0;
 		}
 
-		if(preg_match('/^log\[|eventlog\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
+		if(preg_match('/^(log|logrt|eventlog)\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
 			error(S_TYPE_INFORMATION_BUST_LOG_FOR_LOG_KEY);
 			return FALSE;
 		}
