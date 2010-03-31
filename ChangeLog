@@ -4,6 +4,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2246] added trigger wizard for logrt item (AM)
  - [ZBX-2241] fixed graph X axis for big periods (Aly)
  - [ZBX-2241] fixed text collide in graphs (Aly)
  - [ZBX-2232] fixed bug with last event duration time in event details (AM)
