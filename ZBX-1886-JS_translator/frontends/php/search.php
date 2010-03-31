@@ -24,7 +24,7 @@ require_once('include/html.inc.php');
 $page['title'] = 'S_SEARCH';
 $page['file'] = 'search.php';
 $page['hist_arg'] = array();
-$page['scripts'] = array('class.pmaster.js','scriptaculous.js?load=effects');
+$page['scripts'] = array('class.pmaster.js','scriptaculous/effects.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 

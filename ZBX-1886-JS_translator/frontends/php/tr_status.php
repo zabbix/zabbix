@@ -28,7 +28,7 @@
 
 	$page['file'] = 'tr_status.php';
 	$page['title'] = 'S_STATUS_OF_TRIGGERS';
-	$page['scripts'] = array('scriptaculous.js?load=effects');
+	$page['scripts'] = array('scriptaculous/effects.js');
 	$page['hist_arg'] = array('groupid', 'hostid');
 	$page['scripts'] = array('class.cswitcher.js');
 

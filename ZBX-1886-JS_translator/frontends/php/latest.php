@@ -26,7 +26,7 @@ require_once('include/items.inc.php');
 $page['title'] = S_LATEST_DATA;
 $page['file'] = 'latest.php';
 $page['hist_arg'] = array('groupid','hostid','show','select','open','applicationid');
-$page['scripts'] = array('scriptaculous.js?load=effects');
+$page['scripts'] = array('scriptaculous/effects.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 

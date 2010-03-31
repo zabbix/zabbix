@@ -26,7 +26,7 @@
 	$page['title']	= 'S_AVAILABILITY_REPORT';
 	$page['file']	= 'report2.php';
 	$page['hist_arg'] = array('config', 'groupid', 'hostid', 'tpl_triggerid');
-	$page['scripts'] = array('class.calendar.js', 'scriptaculous.js?load=effects');
+	$page['scripts'] = array('class.calendar.js', 'scriptaculous/effects.js');
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 include_once 'include/page_header.php';
