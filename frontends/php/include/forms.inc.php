@@ -1838,7 +1838,12 @@
 
 		if(is_null($host)){
 			if($hostid > 0){
-				$host_info = CHost::get(array('hostids' => $hostid, 'extendoutput' => 1, 'templated_hosts' => 1));
+				$options = array(
+					'hostids' => $hostid,
+					'output' => API_OUTPUT_EXTEND,
+					'templated_hosts' => 1
+				);
+				$host_info = CHost::get($options);
 				$host_info = reset($host_info);
 				$host = $host_info['host'];
 			}
@@ -2224,7 +2229,6 @@
 			$frmItem->addVar('applications',$applications,6);
 		}
 		else{
-
 			$new_app = new CTextBox('new_application',$new_application,40);
 			$frmItem->addRow(S_NEW_APPLICATION,$new_app);
 

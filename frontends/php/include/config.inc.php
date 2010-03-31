@@ -521,19 +521,14 @@ function __autoload($class_name){
 		$priority = array(0=>0, 1=>0, 2=>0, 3=>0, 4=>0, 5=>0);
 		$triggerids='';
 
-		$sql = 'SELECT t.triggerid, t.priority '.
-				' FROM triggers t '.
-				' WHERE t.value='.TRIGGER_VALUE_TRUE.
-					' AND '.DBin_node('t.triggerid').
-					' AND exists('.
-						'SELECT e.eventid '.
-						' FROM events e '.
-						' WHERE e.object='.EVENT_OBJECT_TRIGGER.
-							' AND e.objectid=t.triggerid '.
-							' AND e.acknowledged=0'.
-						')';
-       	$result=DBselect($sql);
-		while($row=DBfetch($result)){
+		$options = array(
+			'only_problems' => 1,
+			'with_unacknowledged_events' => 1,
+			'output' => array('triggerid', 'priority')
+		);
+		$triggers = CTrigger::get($options);
+
+		foreach($triggers as $tnum => $row){
 			$triggerids.= ','.$row['triggerid'];
 			$priority[$row['priority']]++;
 		}
