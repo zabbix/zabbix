@@ -40,13 +40,11 @@
  * Comments: Memory for "part1" and "part2" is allocated only on SUCCEED.     *
  *                                                                            *
  ******************************************************************************/
-static int split_string(const char *str, const char *del, char **part1, char **part2)
+static int	split_string(const char *str, const char *del, char **part1, char **part2)
 {
-	int str_length = 0;
-	int part1_length = 0;
-	int part2_length = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In split_string(): str [%s] del [%s]", str, del);
+	int	str_length = 0;
+	int	part1_length = 0;
+	int	part2_length = 0;
 
 	assert(str);
 	assert(*str);/* why to split an empty string */
@@ -56,6 +54,8 @@ static int split_string(const char *str, const char *del, char **part1, char **p
 	assert(NULL == *part1);/* target 1 must be empty */
 	assert(part2);
 	assert(NULL == *part2);/* target 2 must be empty */
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In split_string(): str [%s] del [%s]", str, del);
 
 	str_length = strlen(str);
 
@@ -257,8 +257,10 @@ static void init_logfiles(struct st_logfile **logfiles, int *logfiles_alloc, int
  ******************************************************************************/
 static void free_logfiles(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num)
 {
-	int i;
-	zabbix_log(LOG_LEVEL_DEBUG, "In free_logfiles() number of logfiles [%i]", *logfiles_num);
+	int	i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In free_logfiles() number of logfiles [%d]", *logfiles_num);
+
 	for (i = 0; i < *logfiles_num; i++)
 	{
 		zbx_free((*logfiles)[i].filename);
@@ -305,7 +307,7 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 	/* must be done in any case */
 	if (*logfiles_alloc == *logfiles_num)
 	{
-		*logfiles_alloc = *logfiles_alloc * 2;
+		*logfiles_alloc += 64;
 		*logfiles = zbx_realloc(*logfiles, *logfiles_alloc * sizeof(struct st_logfile));
 	}
 
@@ -658,12 +660,12 @@ int	process_log(char *filename, long *lastlogsize, char **value, const char *enc
 	int		nbytes, ret = FAIL;
 	char		buffer[MAX_BUF_LEN];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_log() filename:'%s' lastlogsize:%li", filename, *lastlogsize);
-
 	assert(filename);
 	assert(lastlogsize);
 	assert(value);
 	assert(encoding);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_log() filename:'%s' lastlogsize:%li", filename, *lastlogsize);
 
 	/* Handling of file shrinking */
 	if (0 != zbx_stat(filename, &buf))
