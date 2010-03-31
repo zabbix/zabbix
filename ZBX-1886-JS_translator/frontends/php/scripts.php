@@ -309,13 +309,6 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 		$goButton = new CButton('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 
-		$jsLocale = array(
-			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTED'
-		);
-
-		zbx_addJSLocale($jsLocale);
-
 		zbx_add_post_js('chkbxRange.pageGoName = "scripts";');
 
 		$table->setFooter(new CCol(array($goBox, $goButton)));

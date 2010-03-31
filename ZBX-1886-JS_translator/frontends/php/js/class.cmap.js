@@ -71,8 +71,8 @@ mselement: {
 	iconid_unknown:	0,			// ALWAYS must be a STRING (js doesn't support uint64)
 	iconid_maintenance:0,		// ALWAYS must be a STRING (js doesn't support uint64)
 	iconid_disabled:0,			// ALWAYS must be a STRING (js doesn't support uint64)
-	label:			'New Element',	// Element label
-	label_expanded: 'New Element',	// Element label macros expanded
+	label:			locale['S_NEW_ELEMENT'],	// Element label
+	label_expanded: locale['S_NEW_ELEMENT'],	// Element label macros expanded
 	label_location:	3,
 	x:				0,
 	y:				0,
@@ -89,7 +89,7 @@ mlink: {
 	selementid1:	0,				// ALWAYS must be a STRING (js doesn't support uint64)
 	selementid2:	0,				// ALWAYS must be a STRING (js doesn't support uint64)
 	linktriggers:	null,			// ALWAYS must be a STRING (js doesn't support uint64)
-	tr_desc:		'Select',		// default trigger caption
+	tr_desc:		locale['S_SELECT'],		// default trigger caption
 	drawtype:		0,
 	color:			'0000CC',
 	status:			1				// status of link 1 - active, 2 - passive
@@ -99,7 +99,7 @@ mlink: {
 mlinktrigger: {
 	linktriggerid:	0,					// ALWAYS must be a STRING (js doesn't support uint64)
 	triggerid:		0,					// ALWAYS must be a STRING (js doesn't support uint64)
-	desc_exp:		'Set Trigger',		// default trigger caption
+	desc_exp:		locale['S_SET_TRIGGER'],		// default trigger caption
 	drawtype:		0,
 	color:			'CC0000'
 },
@@ -244,7 +244,7 @@ add_empty_link: function(e){
 		}
 	}
 	else{
-		this.info('Two elements should be selected');
+		this.info(locale['S_TWO_ELEMENTS_SHOULD_BE_SELECTED']);
 		return false;
 	}
 		
@@ -448,7 +448,7 @@ remove_selements: function(e){
 	this.debug('remove_selements');
 //--
 
-	if(Confirm('Delete selected elements?')){
+	if(Confirm(locale['S_DELETE_SELECTED_ELEMENTS_Q'])){
 		for(var i=0; i<this.selection.position; i++){
 			if(!isset(i, this.selection.selements)) continue;
 
@@ -611,14 +611,14 @@ remove_links: function(e){
 		}
 	}
 	else{
-		this.info('Please select two elements');
+		this.info(locale['S_PLEASE_SELECT_TWO_ELEMENTS']);
 		return false;
 	}
 	
 	var linkids = this.get_linkid_by_selementids(selementid1,selementid2);
 
 	if(linkids !== false){
-		if(Confirm('Delete Links between selected elements?')){			
+		if(Confirm(locale['S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'])){			
 			for(var linkid in linkids){
 				this.remove_link(linkid);
 			}
@@ -1341,7 +1341,7 @@ update_linkContainer: function(e){
 		var e_span_5 = document.createElement('span');
 		e_span_5.className = "link";
 		addListener(e_span_5, 'click', this.updateForm_link.bindAsEventListener(this, linkid));
-		e_span_5.appendChild(document.createTextNode('Link '+count));
+		e_span_5.appendChild(document.createTextNode(locale['S_LINK']+' '+count));
 		e_td_4.appendChild(e_span_5);
 
 
@@ -1373,7 +1373,7 @@ update_linkContainer: function(e){
 		var e_td_4 = document.createElement('td');
 		e_td_4.setAttribute('colSpan',4);
 		e_td_4.setAttribute('class','center');
-		e_td_4.appendChild(document.createTextNode('No links'));
+		e_td_4.appendChild(document.createTextNode(locale['S_NO_LINKS']));
 		e_tr_3.appendChild(e_td_4);
 	}
 
