@@ -1015,9 +1015,6 @@ class zbxXML{
 									if(empty($current_application)){
 										throw new APIException(1, 'No permission for Application ['.$application_db['name'].']');
 									}
-									else{
-										$current_application = reset($current_application);
-									}
 								}
 								
 								if($current_application){
