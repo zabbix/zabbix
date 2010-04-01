@@ -27,7 +27,7 @@
 	$page['title'] = 'S_CUSTOM_SCREENS';
 	$page['file'] = 'slides.php';
 	$page['hist_arg'] = array('elementid');
-	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.pmaster.js','class.calendar.js','gtlc.js');
+	$page['scripts'] = array('effects.js','dragdrop.js','class.pmaster.js','class.calendar.js','gtlc.js');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 

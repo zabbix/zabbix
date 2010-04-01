@@ -58,7 +58,9 @@
 		$post_script.= 'var page_refresh = null;'."\n";
 
 		if(isset($JS_TRANSLATE)){
-			$post_script.='var locale = '.zbx_jsvalue($JS_TRANSLATE)."\n";
+			$post_script.='var newLocale = '.zbx_jsvalue($JS_TRANSLATE)."\n";
+			$post_script.='var locale = (typeof(locale) == "undefined" ? {} : locale);'."\n";
+			$post_script.='for(key in newLocale){locale[key] = newLocale[key];}'."\n";
 		}
 
 		$post_script.= 'function zbxCallPostScripts(){'."\n";

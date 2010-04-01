@@ -97,7 +97,7 @@ function inseret_javascript_for_editable_combobox(){
 
 		opt = document.createElement("option");
 		opt.value = -1;
-		opt.text = "(other ...)";
+		opt.text = "('.S_OTHER_SMALL.' ...)";
 
 		if(!obj.options.add)
 			obj.insertBefore(opt, obj.options.item(0));
@@ -272,7 +272,7 @@ function insert_javascript_for_visibilitybox(){
 				obj = new Array(document.getElementById(obj_name));
 			}
 
-			if((obj.length <= 0) || is_null(obj[0])) throw "Can not find objects with name [" + obj_name +"]";
+			if((obj.length <= 0) || is_null(obj[0])) throw "'.S_CANNOT_FIND_OBJECTS_WITH_NAME.' [" + obj_name +"]";
 
 			for(i = obj.length-1; i>=0; i--){
 				if(replace_to && replace_to != ""){
@@ -288,7 +288,7 @@ function insert_javascript_for_visibilitybox(){
 							new_obj.setAttribute("id",obj[i].id);
 						}
 						catch(e){
-							throw "Can not create new element";
+							throw "'.S_CANNOT_CREATE_NEW_ELEMENT.'";
 						}
 
 						new_obj.style.textDecoration = "none";
