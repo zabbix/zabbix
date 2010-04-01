@@ -851,7 +851,7 @@ size_t zbx_strlcpy(char *dst, const char *src, size_t siz)
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
- */
+ ******************************************************************************/
 size_t zbx_strlcat(char *dst, const char *src, size_t siz)
 {
 	char *d = dst;
@@ -881,11 +881,11 @@ size_t zbx_strlcat(char *dst, const char *src, size_t siz)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dvsprintf                                                     *
+ * Function: zbx_dvsprintf                                                    *
  *                                                                            *
- * Purpose: dinamical formatted output conversion                             *
+ * Purpose: dynamical formatted output conversion                             *
  *                                                                            *
- * Return value: formated string                                              *
+ * Return value: formatted string                                             *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
