@@ -683,9 +683,8 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 			TRIGGER_STATUS_ENABLED);
 
 	for (i = 0; i < history_num; i++)
-		if (0 != history[i].functions)
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32, ZBX_FS_UI64 ",",
-					history[i].itemid);
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32, ZBX_FS_UI64 ",",
+				history[i].itemid);
 
 	if (sql[sql_offset - 1] == ',')
 	{
@@ -732,7 +731,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 
 		exp = strdup(trigger.expression);
 
-		if (SUCCEED != evaluate_expression(&exp_value, &exp, &trigger, error, sizeof(error)))
+		if (SUCCEED != evaluate_expression(&exp_value, &exp, h->clock, &trigger, error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Expression [%s] for item [" ZBX_FS_UI64 "][%s] cannot be evaluated: %s",
 					trigger.expression,
@@ -744,7 +743,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 					itemid,
 					zbx_host_key_string(itemid),
 					error);
-/*			We shouldn't update triggervalue if expressions failed */
+/*			We shouldn't update trigger value if expressions failed */
 			DBupdate_trigger_value(&trigger, TRIGGER_VALUE_UNKNOWN, h->clock, error);
 		}
 		else
@@ -757,7 +756,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCmass_update_item                                               *
+ * Function: DCmass_update_items                                              *
  *                                                                            *
  * Purpose: update items info after new value is received                     *
  *                                                                            *
@@ -769,7 +768,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
+static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -780,7 +779,7 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 	zbx_uint64_t	*ids = NULL;
 	int		ids_alloc, ids_num = 0;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In DCmass_update_item()");
+	zabbix_log( LOG_LEVEL_DEBUG, "In DCmass_update_items()");
 
 	ids_alloc = history_num;
 	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
@@ -1012,7 +1011,7 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCmass_proxy_update_item                                         *
+ * Function: DCmass_proxy_update_items                                        *
  *                                                                            *
  * Purpose: update items info after new value is received                     *
  *                                                                            *
@@ -1024,14 +1023,14 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	DCmass_proxy_update_item(ZBX_DC_HISTORY *history, int history_num)
+static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 {
 	int		sql_offset = 0, i, j;
 	zbx_uint64_t	*ids = NULL;
 	int		ids_alloc, ids_num = 0;
 	int		lastlogsize, mtime;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCmass_proxy_update_item()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In DCmass_proxy_update_items()");
 
 	ids_alloc = history_num;
 	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
@@ -1079,134 +1078,6 @@ static void	DCmass_proxy_update_item(ZBX_DC_HISTORY *history, int history_num)
 #endif
 
 	zbx_free(ids);
-
-	if (sql_offset > 16) /* In ORACLE always present begin..end; */
-		DBexecute("%s", sql);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DCmass_function_update                                           *
- *                                                                            *
- * Purpose: update functions lastvalue after new value is received            *
- *                                                                            *
- * Parameters: history - array of history data                                *
- *             history_num - number of history structures                     *
- *                                                                            *
- * Author: Alexei Vladishev, Aleksander Vladishev                             *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static void DCmass_function_update(ZBX_DC_HISTORY *history, int history_num)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	DB_FUNCTION	function;
-	DB_ITEM		item;
-	ZBX_DC_HISTORY	*h;
-	char		*lastvalue;
-	char		value[MAX_STRING_LEN], *value_esc, *function_esc, *parameter_esc;
-	int		sql_offset = 0, i;
-	zbx_uint64_t	*ids = NULL;
-	int		ids_alloc, ids_num = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCmass_function_update()");
-
-	ids_alloc = history_num;
-	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
-
-	for (i = 0; i < history_num; i++)
-	{
-		history[i].functions = 0;
-		if (0 == history[i].value_null)
-			uint64_array_add(&ids, &ids_alloc, &ids_num, history[i].itemid, 64);
-	}
-
-	if (0 == ids_num)
-	{
-		zbx_free(ids);
-		return;
-	}
-
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 1024,
-			"select distinct %s,f.function,f.parameter,f.itemid,f.lastvalue from %s,functions f,triggers t"
-			" where f.itemid=i.itemid and h.hostid=i.hostid and f.triggerid=t.triggerid and t.status in (%d)"
-			" and",
-			ZBX_SQL_ITEM_FIELDS,
-			ZBX_SQL_ITEM_TABLES,
-			TRIGGER_STATUS_ENABLED);
-
-	DBadd_condition_alloc(&sql, &sql_allocated, &sql_offset, "f.itemid", ids, ids_num);
-
-	zbx_free(ids);
-
-	result = DBselect("%s", sql);
-
-	sql_offset = 0;
-
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
-#endif
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		DBget_item_from_db(&item, row);
-
-		h = NULL;
-
-		for (i = 0; i < history_num; i++)
-		{
-			if (item.itemid == history[i].itemid)
-			{
-				h = &history[i];
-				break;
-			}
-		}
-
-		if (NULL == h)
-			continue;
-
-		h->functions		= 1;
-
-		function.function	= row[ZBX_SQL_ITEM_FIELDS_NUM];
-		function.parameter	= row[ZBX_SQL_ITEM_FIELDS_NUM + 1];
-		ZBX_STR2UINT64(function.itemid, row[ZBX_SQL_ITEM_FIELDS_NUM + 2]);
-/*		It is not required to check lastvalue for NULL here */
-		lastvalue		= row[ZBX_SQL_ITEM_FIELDS_NUM + 3];
-
-		if (FAIL == evaluate_function(value, &item, function.function, function.parameter, h->clock))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Evaluation failed for function:%s",
-					function.function);
-			continue;
-		}
-
-		/* Update only if lastvalue differs from new one */
-		if (DBis_null(lastvalue) == SUCCEED || strcmp(lastvalue, value) != 0)
-		{
-			value_esc = DBdyn_escape_string_len(value, FUNCTION_LASTVALUE_LEN);
-			function_esc = DBdyn_escape_string(function.function);
-			parameter_esc = DBdyn_escape_string(function.parameter);
-
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 1280,
-					"update functions set lastvalue='%s' where itemid=" ZBX_FS_UI64
-					" and function='%s' and parameter='%s';\n",
-					value_esc,
-					function.itemid,
-					function_esc,
-					parameter_esc);
-
-			zbx_free(parameter_esc);
-			zbx_free(function_esc);
-			zbx_free(value_esc);
-		}
-	}
-	DBfree_result(result);
-
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
-#endif
 
 	if (sql_offset > 16) /* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
@@ -2024,16 +1895,15 @@ int	DCsync_history(int sync_type)
 
 		if (zbx_process == ZBX_PROCESS_SERVER)
 		{
-			DCmass_update_item(history, history_num);
+			DCmass_update_items(history, history_num);
 			DCmass_add_history(history, history_num);
-			DCmass_function_update(history, history_num);
 			DCmass_update_triggers(history, history_num);
 			DCmass_update_trends(history, history_num);
 		}
 		else
 		{
 			DCmass_proxy_add_history(history, history_num);
-			DCmass_proxy_update_item(history, history_num);
+			DCmass_proxy_update_items(history, history_num);
 		}
 
 		DBcommit();
