@@ -3055,7 +3055,7 @@ this.linkForm.linkIndicatorsBody = e_tbody_7;
 	this.linkForm.linkIndicatorsTable.appendChild(e_input_6);
 
 	var url = 'popup_link_tr.php?form=1&mapid='+this.id;
-	addListener(e_input_6, 'click', function(){ PopUp(url,640, 360, 'ZBX_Link_Indicator'); });
+	addListener(e_input_6, 'click', function(){ PopUp(url,640, 420, 'ZBX_Link_Indicator'); });
 
 
 	var e_input_6 = document.createElement('input');
