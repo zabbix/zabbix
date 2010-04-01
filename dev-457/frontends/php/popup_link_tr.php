@@ -147,7 +147,7 @@ include_once('include/page_header.php');
 // END preparation
 
 		$trList = new CListBox('del_linktriggers[]', null, 15);
-		if(empty($triggers)) $trList->setAttribute('style', 'width: 250px;');
+		if(empty($triggers)) $trList->setAttribute('style', 'width: 300px;');
 
 		foreach($triggers as $tnum => $trigger){
 			$dbTriggers = CTrigger::get($options);

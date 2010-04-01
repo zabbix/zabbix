@@ -663,6 +663,14 @@ add_linktrigger: function(linkid, linktrigger, update_map){
 
 	if(!isset(linkid,this.links) || empty(this.links[linkid])) return false;
 
+	for(var ltid in this.links[linkid].linktriggers){
+		if(!isset(ltid, this.links[linkid].linktriggers)) continue;
+		if(this.links[linkid].linktriggers[ltid].triggerid === linktrigger.triggerid){
+			linktrigger.linktriggerid = ltid;
+			break;
+		}
+	}
+
 	var linktriggerid = 0;
 	if(!isset('linktriggerid',linktrigger) || (linktrigger['linktriggerid'] == 0)){
 		do{
@@ -3079,13 +3087,22 @@ linkForm_addLinktrigger: function(linktrigger){
 	this.debug('linkForm_addLinktrigger');
 //--
 
+	var triggerid = linktrigger.triggerid;
+
 	if(!isset('linkIndicatorsBody', this.linkForm) || empty(this.linkForm.linkIndicatorsBody)) return false;
 	if(!isset('form', this.linkForm) || is_null(this.linkForm.form)) return false;
 
+// If allready exsts just rewrite
+	if($('link_triggers['+triggerid+'][triggerid]') != null){
+		$('link_triggers['+triggerid+'][drawtype]').selectedIndex = (linktrigger.drawtype > 0)?(linktrigger.drawtype - 1):0;
+
+		$('link_triggers['+triggerid+'][color]').value = linktrigger.color;
+		$('lbl_link_triggers['+triggerid+'][color]').style.backgroundColor = '#'+linktrigger.color;
+		return false;
+	}
+
 
 // ADD Linktrigger
-	var triggerid = linktrigger.triggerid;
-	
 	var e_tr_8 = document.createElement('tr');
 	e_tr_8.className = "even_row";
 	this.linkForm.linkIndicatorsBody.appendChild(e_tr_8);
@@ -3093,6 +3110,7 @@ linkForm_addLinktrigger: function(linktrigger){
 
 	var e_td_9 = document.createElement('td');
 	e_tr_8.appendChild(e_td_9);
+
 
 // HIDDEN initialization
 	if(isset('linktriggerid', linktrigger)){
