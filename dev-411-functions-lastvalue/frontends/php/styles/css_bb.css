@@ -340,6 +340,14 @@ div.iconhelp{
 	background-image: url('../images/general/bttn/help_bb.png');
 }
 
+div.iconconfig{
+	background-image: url('../images/general/bttn/config_bb.png');
+}
+
+div.iconconfig_hl{
+	background-image: url('../images/general/bttn/config_hl_bb.png');
+}
+
 div.iconsound{
 	background-image: url('../images/general/bttn/sound_bb.png');
 }

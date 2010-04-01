@@ -198,7 +198,8 @@ class CChart extends CGraphDraw{
 			$this->stime	= $now - $this->period;
 		}
 
-		$this->diffTZ = (date('I',$this->stime) - date('I',$this->stime + $this->period)) * 3600;
+		$this->diffTZ = (date('Z',$this->stime) - date('Z',$this->stime + $this->period));
+
 //		$this->stime += $this->diffTZ;
 
 		$this->from_time	= $this->stime; // + timeZone offset
@@ -845,7 +846,6 @@ class CChart extends CGraphDraw{
 
 			if($this->type == GRAPH_TYPE_STACKED){
 				$this->m_minY[$side] = min($tmp_minY[GRAPH_YAXIS_SIDE_LEFT], 0);
-				continue;
 			}
 
 			if($this->ymax_type == GRAPH_YAXIS_TYPE_FIXED){
@@ -882,10 +882,13 @@ class CChart extends CGraphDraw{
 			array('main'=> 86400,'sub' => 43200),			// 12 hours
 			array('main'=> 604800,'sub' => 86400),			// 1 day
 			array('main'=> 1209600,'sub' => 604800),		// 1 week
-			array('main'=> 1209600,'sub' => 1209600)		// 2 weeks
+			array('main'=> 2419200,'sub' => 1209600),		// 2 weeks
+			array('main'=> 4838400,'sub' => 2419200),		// 4 weeks
+			array('main'=> 9676800,'sub' => 4838400),		// 8 weeks
+			array('main'=> 19353600,'sub' => 9676800)		// 16 weeks
 		);
 
-		$dist = 604800; //def week;
+		$dist = 19353600; //def week;
 		$sub_interval = 0;
 		$main_interval = 0;
 
@@ -1133,7 +1136,10 @@ class CChart extends CGraphDraw{
 			$new_pos = $i*$intervalX+$offsetX;
 
 // DayLightSave
-			if(($interval > 3600) && date('I',$this->to_time) == date('I',$new_time)) $new_time+=$this->diffTZ;
+			if($interval > 3600){
+				$tz = date('Z',$this->to_time) - date('Z',$new_time);
+				$new_time+=$tz;
+			}
 
 // MAIN Interval Checks
 			if(($interval < 3600) && (date('i',$new_time) == 0)){
@@ -1215,7 +1221,6 @@ class CChart extends CGraphDraw{
 
 	private function drawMainPeriod($new_time, $new_pos){
 		if(date('H',$new_time) == 0){
-
 			if(date('Hi', $new_time) == 0) $date_format = 'd.m';
 			else $date_format = 'd.m H:i';
 
@@ -1594,7 +1599,7 @@ class CChart extends CGraphDraw{
 
 		$legend->draw();
 
-		if($this->sizeY < 100){
+		if($this->sizeY < 120){
 			return true;
 		}
 
@@ -1939,7 +1944,12 @@ class CChart extends CGraphDraw{
 
 		$this->fullSizeX = $this->sizeX+$this->shiftXleft+$this->shiftXright+1;
 		$this->fullSizeY = $this->sizeY+$this->shiftY+$this->legendOffsetY;
-		$this->fullSizeY += 14*($this->num+1+(($this->sizeY < 120)?0:count($this->triggers)))+8;
+
+		if($this->drawLegend){
+			$trCount = $this->m_showTriggers?count($this->triggers):0;
+			$this->fullSizeY += 14 * ($this->num+1+(($this->sizeY < 120)?0:count($this->triggers))) + 8;
+		}
+
 
 		foreach($this->percentile as $side => $percentile){
 			if(($percentile['percent']>0) && $percentile['value']){
@@ -2063,12 +2073,14 @@ class CChart extends CGraphDraw{
 		$this->drawLeftSide();
 		$this->drawRightSide();
 
-		$this->drawTriggers();
-		$this->drawPercentile();
+		if($this->drawLegend){
+			$this->drawTriggers();
+			$this->drawPercentile();
+
+			$this->drawLegend();
+		}
 
 		$this->drawLogo();
-
-		$this->drawLegend();
 
 		$end_time=getmicrotime();
 		$str=sprintf('%0.2f',(getmicrotime()-$start_time));

@@ -373,7 +373,6 @@ include_once('include/page_header.php');
 	}
 
 	show_table_header(S_CONFIGURATION_OF_TEMPLATES, $frmForm);
-	echo SBR;
 ?>
 <?php
 	if(isset($_REQUEST['form'])){

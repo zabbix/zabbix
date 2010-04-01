@@ -26,12 +26,12 @@
 
 var CLNDR = new Array();			// calendar obj reference
 
-function create_calendar(time, timeobjects, id, utime_field_id){
+function create_calendar(time, timeobjects, id, utime_field_id, parentNodeid){
 	id = id || CLNDR.length;
 	if('undefined' == typeof(utime_field_id)) utime_field_id = null;
 	
 	CLNDR[id] = new Object;
-	CLNDR[id].clndr = new calendar(id, time, timeobjects, utime_field_id);
+	CLNDR[id].clndr = new calendar(id, time, timeobjects, utime_field_id, parentNodeid);
 	
 return CLNDR[id];
 }
@@ -77,7 +77,7 @@ visible: 0,				//GMenu style state
 
 monthname: new Array('January','February','March','April','May','June','July','August','September','October','November','December'), // months
 
-initialize: function(id, stime, timeobjects, utime_field_id){
+initialize: function(id, stime, timeobjects, utime_field_id, parentNodeid){
 	this.id = id;
 	this.timeobjects = new Array();
 
@@ -86,7 +86,7 @@ initialize: function(id, stime, timeobjects, utime_field_id){
 		return false;
 	}
 	
-	this.calendarcreate();
+	this.calendarcreate(parentNodeid);
 
 	addListener(this.clndr_monthdown,'click',this.monthdown.bindAsEventListener(this));
 	addListener(this.clndr_monthup,'click',this.monthup.bindAsEventListener(this));
@@ -309,7 +309,7 @@ setSDateDMY: function(d,m,y){
 		result = true;
 	}
 	else if((d>28) && result){
-		if(d <= this.daysInMonth(this.sdt.getMonth(), this.sdt.getYear())){
+		if(d <= this.daysInMonth(this.sdt.getMonth(), this.sdt.getFullYear())){
 			this.sdt.setDate(d);
 			result = true;
 		}
@@ -619,14 +619,19 @@ createDaysTab: function(){
 /*-------------------------------------------------------------------------------------------------*\
 *										CALENDAR CREATION											*
 \*-------------------------------------------------------------------------------------------------*/
-calendarcreate: function(){
+calendarcreate: function(parentNodeid){
 		this.clndr_calendar = document.createElement('div');
 		
 		Element.extend(this.clndr_calendar);
 		this.clndr_calendar.className = 'calendar';
 		this.clndr_calendar.hide();
 		
-	document.body.appendChild(this.clndr_calendar);
+		if(typeof(parentNodeid) == 'undefined'){
+			document.body.appendChild(this.clndr_calendar);
+		}
+		else{
+			$(parentNodeid).appendChild(this.clndr_calendar);
+		}
 		
 		// addListener(this.clndr_calendar,'mousemove', deselectAll);
 	

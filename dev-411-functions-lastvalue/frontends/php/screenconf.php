@@ -339,8 +339,7 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-	$form = new CForm();
-	$form->SetMethod('get');
+	$form = new CForm(null, 'get');
 
 	$cmbConfig = new CComboBox('config', $config_scr, 'submit()');
 	$cmbConfig->addItem(0, S_SCREENS);
@@ -358,19 +357,17 @@ include_once('include/page_header.php');
 		$form->addItem(new CButton("form", S_SLIDESHOW));
 	}
 
-	show_table_header(0 == $config_scr ? S_CONFIGURATION_OF_SCREENS_BIG : S_CONFIGURATION_OF_SLIDESHOWS_BIG, $form);
-	echo SBR;
+	$screen_wdgt = new CWidget();
+	$screen_wdgt->addPageHeader(0 == $config_scr ? S_CONFIGURATION_OF_SCREENS_BIG : S_CONFIGURATION_OF_SLIDESHOWS_BIG, $form);
 
 	if(0 == $config_scr){
 		if(isset($_REQUEST['form'])){
 			if($_REQUEST['form'] == S_IMPORT_SCREEN)
-				import_screen_form($rules);
+				$screen_wdgt->addItem(import_screen_form($rules));
 			else if(($_REQUEST['form'] == S_CREATE_SCREEN) || ($_REQUEST['form'] == 'update'))
-				insert_screen_form();
+				$screen_wdgt->addItem(insert_screen_form());
 		}
 		else{
-			$screen_wdgt = new CWidget();
-
 			$form = new CForm();
 			$form->setName('frm_screens');
 
@@ -440,15 +437,14 @@ include_once('include/page_header.php');
 			$form->addItem($table);
 
 			$screen_wdgt->addItem($form);
-			$screen_wdgt->show();
+			
 		}
 	}
 	else{
-		if(isset($_REQUEST["form"])){
-			insert_slideshow_form();
+		if(isset($_REQUEST['form'])){
+			$screen_wdgt->addItem(insert_slideshow_form());
 		}
 		else{
-			$screen_wdgt = new CWidget();
 
 			$form = new CForm();
 			$form->setName('frm_shows');
@@ -524,14 +520,12 @@ include_once('include/page_header.php');
 			$form->addItem($table);
 
 			$screen_wdgt->addItem($form);
-			$screen_wdgt->show();
 		}
 
 	}
+	
+	$screen_wdgt->show();
 
-?>
-<?php
-
+	
 include_once('include/page_footer.php');
-
 ?>

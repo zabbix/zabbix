@@ -587,6 +587,7 @@
 	'S_AGGREGATED_PERIODS_COUNT'=>		'Aggregated periods count',
 
 //	graphs.php
+	'S_ADD_GRAPH_ITEMS' => 'add graph items first',
 	'S_TITLE'=>				'Title',
 	'S_PERCENTILE_LINE'=>			'Percentile line',
 	'S_CONFIGURATION_OF_GRAPHS'=>		'Configuration of graphs',
@@ -613,6 +614,7 @@
 	'S_SHOW_TRIGGERS'=>			'Show triggers',
 	'S_3D_VIEW'=>				'3D view',
 	'S_LEGEND'=>				'Legend',
+	'S_SHOW_LEGEND'=>			'Show legend',
 	'S_GRAPH_SUM'=>				'Graph sum',
 	'S_GRAPH_ITEM'=>			'Graph item',
 	'S_REQUIRED_ITEMS_FOR_GRAPH'=>		'Items required for graph',
@@ -750,8 +752,6 @@
 	'S_APPLICATIONS'=>				'Applications',
 	'S_APPLICATIONS_BIG'=>				'APPLICATIONS',
 	'S_CREATE_APPLICATION'=>			'Create application',
-	'S_ACTIVATE_ITEMS'=>				'Activate Items',
-	'S_DISABLE_ITEMS'=>				'Disable Items',
 	'S_APPLICATION_UPDATED'=>			'Application updated',
 	'S_CANNOT_UPDATE_APPLICATION'=>			'Cannot update application',
 	'S_APPLICATION_ADDED'=>				'Application added',
@@ -805,6 +805,7 @@
 	'S_DNS_NAME'=>					'DNS name',
 	'S_IP_ADDRESS'=>				'IP address',
 	'S_LINK_ADDITIONAL_TEMPLATES'=>			'Link additional templates',
+	'S_RELINK_TEMPLATES'=>			'Replace linked templates',
 	'S_USEIPMI'=>					'Use IPMI',
 	'S_IPMI_IP_ADDRESS'=>				'IPMI IP address',
 	'S_IPMI_PORT'=>					'IPMI port',
@@ -885,6 +886,8 @@
 	'S_TEMPLATES'=>				'Templates',
 	'S_TEMPLATES_BIG'=>			'TEMPLATES',
 	'S_UNLINK'=>				'Unlink',
+	'S_CANNOT_UNLINK_TEMPLATE'=>	'Cannot unlink template',
+	'S_CANNOT_LINK_TEMPLATE'=>	'Cannot link template',
 	'S_UNLINK_AND_CLEAR'=>			'Unlink and clear',
 	'S_MONITORED_BY_PROXY'=>		'Monitored by proxy',
 
@@ -1095,7 +1098,7 @@
 	'S_LABEL'=>				'Label',
 	'S_X'=>					'X',
 	'S_ICON_PROBLEM'=>			'Icon (problem)',
-	'S_ICON_OK'=>				'Icon (ok)',
+	'S_ICON_OK'=>				'Icon (OK)',
 	'S_ICON_UNKNOWN'=>			'Icon (unknown)',
 	'S_ICON_MAINTENANCE'=>			'Icon (maintenance)',
 	'S_ICON_DISABLED'=>			'Icon (disabled)',
@@ -1152,6 +1155,7 @@
 	'S_CANNOT_FIND_HOST'=>			'Cannot find host',
 	'S_CANNOT_FIND_HOSTGROUP'=>		'Cannot find hostgroup',
 	'S_CANNOT_FIND_MAP'=>			'Cannot find map',
+	'S_CANNOT_FIND_SCREEN'=>		'Cannot find screen',
 	'S_USED_IN_EXPORTED_MAP_SMALL'=>'used in exported map',
 	'S_NO_ICON_FOR_MAP_ELEMENT'=>	'No icon for map element',
 	'S_EXPORT_HAVE_NO_MAPS'=>		'Export does not contain Zabbix maps',
@@ -1204,6 +1208,15 @@
 	'S_MAXIMIZE'=>				'Maximize',
 	'S_MINIMIZE'=>				'Minimize',
 	'S_LOADING_P'=>				'Loading...',
+
+// dashconf.php
+	'S_DASHBOARD_CONFIGURATION' =>	'Dashboard configuration',
+	'S_DASHBOARD_CONFIGURATION_BIG' =>	'DASHBOARD CONFIGURATION',
+	'S_CONFIGURE' => 'Configure',
+	'S_SELECTED' => 'Selected',
+	'S_SHOW_HOSTS_IN_MAINTENANCE' => 'Show hosts in maintenance',
+	'S_TRIGGERS_WITH_SEVERITY' => 'Triggers with severity',
+	'S_DASHBOARD_FILTER' => 'Dashboard filter',
 
 //	overview.php
 	'S_OVERVIEW'=>				'Overview',
@@ -1372,14 +1385,11 @@
 	'S_NEW_SLIDE'=>					'New slide',
 	'S_SHOW_TEXT_AS_HTML'=>			'Show text as HTML',
 
-	'S_WITH_ID_SMALL'=>				'with ID',
 	'S_IMPORT_SCREEN'=>				'Import screen',
 
 	'S_CANNOT_FIND_GRAPH'=>			'Cannot find graph',
 	'S_CANNOT_FIND_ITEM'=>			'Cannot find item',
-	'S_CANNOT_FIND_SCREEN'=>		'Cannot find screen',
 	'S_USED_IN_EXPORTED_SCREEN_SMALL'=>'used in exported screen',
-	'S_EXPORT_HAVE_NO_SCREENS'=>	'Export does not contain Zabbix screens',
 
 //	screenedit.php
 	'S_MAP'=>					'Map',
@@ -1407,11 +1417,14 @@
 	'S_HORIZONTAL'=>			'Horizontal',
 
 	'S_HORIZONTAL_ALIGN'=>			'Horizontal align',
-	'S_CENTRE'=>				'Center',
+	'S_CENTRE'=>				'Centre',
 	'S_RIGHT'=>				'Right',
 
 	'S_VERTICAL_ALIGN'=>			'Vertical align',
 	'S_MIDDLE'=>				'Middle',
+
+	'S_CANNOT_REMOVE_ROW_OR_COLUMN'=>			'Impossible to remove last row and column',
+	'S_SCREEN_SHOULD_CONTAIN_ONE_ROW_AND_COLUMN'=>				'Screen should contain at least one row and column',
 
 //	screens.php
 	'S_CUSTOM_SCREENS'=>			'Custom screens',
@@ -1695,6 +1708,15 @@
 	'S_CLOSE'=>				'Close',
 	'S_CONNECT_TO_SERVER_ERROR'=>		'Cannot connect to Zabbix server',
 	'S_DELETE_SELECTED_SCRIPTS_Q'=>		'Delete selected scripts?',
+	
+	'S_SCRIPT_ERROR'=>			'SCRIPT ERROR',
+	'S_SCRIPT_ERROR_DESCRIPTION'=>		'Error Description',
+	'S_SCRIPT_SEND_ERROR'=>			'Can\'t send command, check connection',
+	'S_SCRIPT_READ_ERROR'=>			'Can\'t read script response, check connection',
+	'S_SCRIPT_TIMEOUT_ERROR'=>		'Defined in "include/defines.inc.php" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value',
+	'S_SCRIPT_BYTES_LIMIT_ERROR'=>		'Defined in "include/defines.inc.php" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value',
+	'S_SCRIPT_UNKNOWN_ERROR'=>		'Unknown error happened reading script answer, please report to the developers',
+	'S_SCRIPT_ERROR_EMPTY_RESPONSE' =>	'Empty response received',
 
 //	audit.php
 	'S_AUDIT'=>				'Audit',
@@ -1777,7 +1799,7 @@
 
 //  tr_testexpr.php
 	'S_TEST_DATA'=>		'Test data',
-	'S_ITEM_FUNCTION'=>	'Item / Function',
+	'S_ITEM_SLASH_FUNCTION'=>	'Item / Function',
 	'S_RESULT_TYPE'=>	'Result type',
 	'S_COMBINED_RESULT'=>	'Combined result',
 
@@ -1909,6 +1931,7 @@
 	'S_CRITICAL_ERROR'=>				'Critical error',
 	'S_FIELD'=>					'Field',
 	'S_IS_NOT_IP_RANGE_SMALL'=>			'is not IP range',
+	'S_IS_NOT_PORT_RANGE_SMALL'=>			'is not PORT range',
 	'S_IS_NOT_INTEGER_RANGE_SMALL'=>		'is not integer range',
 	'S_IS_NOT_INTEGER_SMALL'=>			'is not integer',
 	'S_IS_NOT_DOUBLE_SMALL'=>			'is not double',
@@ -2073,7 +2096,7 @@
 	'S_INCORRECT_DESCRIPTION'=>		'Incorrect description',
 	'S_CANT_FORMAT_TREE'=>			'Can\'t format Tree',
 	'S_NO_PERMISSION'=>				'You do not have permission to perform this operation',
-	'S_NO_PERMISSIONS_FOR_SCREEN'=> 'No permissions for screen',
+	'S_NO_PERMISSIONS_FOR_SCREEN'=>	'No permissions for screen',
 	'S_NO_PERMISSIONS_FOR_MAP'=>	'No permissions for map',
 	'S_XML_FILE_CONTAINS_ERRORS'=>	'XML file contains errors'
 	);

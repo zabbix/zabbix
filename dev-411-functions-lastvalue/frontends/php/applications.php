@@ -230,8 +230,6 @@ include_once('include/page_header.php');
 	show_table_header(S_CONFIGURATION_OF_APPLICATIONS, $frmForm);
 ?>
 <?php
-	echo SBR;
-
 	if(isset($_REQUEST['form'])){
 		$frm_title = S_NEW_APPLICATION;
 

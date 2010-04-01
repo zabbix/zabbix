@@ -393,11 +393,11 @@ include_once('include/page_header.php');
 		$table->setHeader(array(S_HOST,S_DNS,S_IP,S_PORT,S_STATUS,S_AVAILABILITY));
 
 		$options = array(
-				'nodeids' => $nodeid,
-				'groupids'=>$groupid,
-				'extendoutput' => 1,
-				'sortfield'=>'host'
-			);
+			'nodeids' => $nodeid,
+			'groupids'=>$groupid,
+			'extendoutput' => 1,
+			'sortfield'=>'host'
+		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($host_status)) $options[$host_status] = 1;
 
@@ -629,7 +629,7 @@ include_once('include/page_header.php');
 		}
 		$table->show();
 	}
-	else if(str_in_array($srctbl,array('hosts_and_templates'))){
+	else if($srctbl == 'hosts_and_templates'){
 		$table = new CTableInfo(S_NO_TEMPLATES_DEFINED);
 		$table->setHeader(array(S_NAME));
 
@@ -1295,13 +1295,17 @@ include_once('include/page_header.php');
 		require_once('include/screens.inc.php');
 
 		$table = new CTableInfo(S_NO_NODES_DEFINED);
-		$table->SetHeader(S_NAME);
+		$table->setHeader(S_NAME);
 
-		$result = DBselect('select screenid,name from screens where '.DBin_node('screenid',$nodeid).' ORDER BY name');
-		while($row=DBfetch($result)){
-			if(!screen_accessible($row["screenid"], PERM_READ_ONLY))
-				continue;
+		$options = array(
+			'nodeids' => $nodeid,
+			'output' => API_OUTPUT_EXTEND
+		);
 
+		$screens = CScreen::get($options);
+		order_result($screens, 'name');
+
+		foreach($screens as $snum => $row){
 			$name = new CSpan($row["name"],'link');
 
 			if(isset($_REQUEST['reference']) && ($_REQUEST['reference'] =='dashboard')){
@@ -1325,15 +1329,19 @@ include_once('include/page_header.php');
 		require_once('include/screens.inc.php');
 
 		$table = new CTableInfo(S_NO_NODES_DEFINED);
-		$table->SetHeader(S_NAME);
+		$table->setHeader(S_NAME);
 
-		$result = DBselect('SELECT DISTINCT n.name as node_name,s.screenid,s.name '.
-							' FROM screens s '.
-								' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('s.screenid').
-							' WHERE '.DBin_node('s.screenid',$nodeid).
-							' ORDER BY s.name');
-		while($row=DBfetch($result)){
-			if(!screen_accessible($row["screenid"], PERM_READ_ONLY)) continue;
+		$options = array(
+			'nodeids' => $nodeid,
+			'output' => API_OUTPUT_EXTEND
+		);
+
+		$screens = CScreen::get($options);
+		order_result($screens, 'name');
+
+		foreach($screens as $snum => $row){
+			$row['node_name'] = get_node_name_by_elid($row['screenid'], true);
+
 			if(check_screen_recursion($_REQUEST['screenid'],$row['screenid'])) continue;
 
 			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';

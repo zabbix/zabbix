@@ -66,8 +66,6 @@ include_once('include/page_header.php');
 	$bulk = !isset($_REQUEST['eventid']);
 ?>
 <?php
-
-
 	if(!$bulk){
 		$options = array(
 			'extendoutput' => 1,

@@ -919,8 +919,6 @@ void	op_group_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
 void	op_template_add(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
 {
 	const char	*__function_name = "op_template_add";
-	DB_RESULT	result;
-	DB_ROW		row;
 	zbx_uint64_t	hostid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(object:%d)", __function_name, event->object);
@@ -937,17 +935,7 @@ void	op_template_add(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation
 	if (0 == (hostid = add_discovered_host(event)))
 		return;
 
-	result = DBselect(
-			"select hosttemplateid"
-			" from hosts_templates"
-			" where hostid=" ZBX_FS_UI64
-				" and templateid=" ZBX_FS_UI64,
-			hostid,
-			operation->objectid);
-
-	if (NULL == (row = DBfetch(result)))
-		DBcopy_template_elements(hostid, operation->objectid);
-	DBfree_result(result);
+	DBcopy_template_elements(hostid, operation->objectid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -970,8 +958,6 @@ void	op_template_add(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation
 void	op_template_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
 {
 	const char	*__function_name = "op_template_del";
-	DB_RESULT	result;
-	DB_ROW		row;
 	zbx_uint64_t	hostid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(object:%d)", __function_name, event->object);
@@ -988,26 +974,7 @@ void	op_template_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation
 	if (0 == (hostid = select_discovered_host(event)))
 		return;
 
-	result = DBselect(
-			"select hosttemplateid"
-			" from hosts_templates"
-			" where templateid=" ZBX_FS_UI64
-				" and hostid=" ZBX_FS_UI64,
-			operation->objectid,
-			hostid);
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		DBdelete_template_elements(hostid, operation->objectid, 0 /* not an unlink mode */);
-
-		DBexecute(
-				"delete from hosts_templates"
-				" where hostid=" ZBX_FS_UI64
-					" and templateid=" ZBX_FS_UI64,
-				hostid,
-				operation->objectid);
-	}
-	DBfree_result(result);
+	DBdelete_template_elements(hostid, operation->objectid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

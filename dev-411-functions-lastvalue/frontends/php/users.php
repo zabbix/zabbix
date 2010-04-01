@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -339,16 +339,15 @@ include_once('include/page_header.php');
 		$cmbConf->addItem('users.php', S_USERS);
 	$frmForm->addItem(array($cmbConf, new CButton('form', S_CREATE_USER)));
 
-	show_table_header(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
+	$user_wdgt = new CWidget();
+	$user_wdgt->addPageHeader(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
 	//echo SBR;
 
 
 	if(isset($_REQUEST['form'])){
-		insert_user_form(get_request('userid', null));
+		$user_wdgt->addItem(insert_user_form(get_request('userid', null)));
 	}
 	else{
-		$user_wdgt = new CWidget();
-
 		$form = new CForm(null, 'get');
 
 		$cmbUGrp = new CComboBox('filter_usrgrpid',$_REQUEST['filter_usrgrpid'],'submit()');
@@ -522,12 +521,10 @@ include_once('include/page_header.php');
 		$form->addItem($table);
 
 		$user_wdgt->addItem($form);
-		$user_wdgt->show();
 	}
+	
+	$user_wdgt->show();
 
-?>
-<?php
 
 include_once('include/page_footer.php');
-
 ?>

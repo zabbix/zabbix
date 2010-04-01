@@ -447,7 +447,7 @@ lbl_exit:
 		zabbix_log(LOG_LEVEL_WARNING, "fork failed for command '%s'",command);
 		return SYSINFO_RET_FAIL;
 	case 0:
-		pid = zbx_fork(); /* run new tread 2 to replace by command */
+		pid = zbx_fork(); /* run new thread 2 to replace by command */
 		switch(pid)
 		{
 		case -1:

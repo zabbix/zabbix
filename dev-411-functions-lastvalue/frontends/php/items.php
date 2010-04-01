@@ -771,7 +771,6 @@ include_once('include/page_header.php');
 
 //$items_wdgt->addPageHeader(S_CONFIGURATION_OF_ITEMS_BIG, $form);
 	show_table_header(S_CONFIGURATION_OF_ITEMS_BIG, $form);
-	echo SBR;
 
 	if(isset($_REQUEST['form'])){
 		if(str_in_array($_REQUEST['form'], array(S_CREATE_ITEM, 'update', 'clone')) ||
@@ -788,11 +787,13 @@ include_once('include/page_header.php');
 	}
 	else{
 		$logtype['log']=0;
-		$logtype['eventlog']=1;
-		$logtype['snmptraps']=2;
+		$logtype['logrt']=1;
+		$logtype['eventlog']=2;
+		$logtype['snmptraps']=3;
 		$dbkey[0]='log[%';
-		$dbkey[1]='eventlog[%';
-		$dbkey[2]='snmptraps';
+		$dbkey[1]='logrt[%';
+		$dbkey[2]='eventlog[%';
+		$dbkey[3]='snmptraps';
 
 		$show_host = true;
 
@@ -1097,8 +1098,8 @@ include_once('include/page_header.php');
 			}
 //-------
 
-			if(preg_match('/^(log\[.*\]|eventlog\[.*\]|snmptraps).*$/',$item['key_'],$matchkeys)){
-				preg_match('/(log|eventlog|snmptraps)/', $matchkeys[0], $matchkey);
+			if(preg_match('/^(log|logrt|eventlog|snmptraps)(\[.*\])?$/',$item['key_'],$matchkey)){
+				//preg_match('/(log|logrt|eventlog|snmptraps)/', $matchkeys[0], $matchkey);
 				$ltype = $logtype[$matchkey[1]];
 
 				$triggers_flag = false;

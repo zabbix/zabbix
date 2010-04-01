@@ -334,7 +334,7 @@ function zbx_date2age($start_date,$end_date=0,$utime = false){
 			$end_date = time();
 	}
 
-	$time = abs($end_date-$start_date);
+	$original_time = $time = abs($end_date-$start_date);
 //SDI($start_date.' - '.$end_date.' = '.$time);
 
 	$years = (int) ($time / (365*86400));
@@ -372,7 +372,8 @@ function zbx_date2age($start_date,$end_date=0,$utime = false){
 			(($hours && !$years && !$months)?$hours.S_HOUR_SHORT.' ':'').
 			(($minutes && !$years && !$months && !$weeks)?$minutes.S_MINUTE_SHORT.' ':'').
 			((!$years && !$months && !$weeks && !$days && ($ms || $seconds))?$seconds.S_SECOND_SHORT.' ':'').
-			(($ms && !$years && !$months && !$weeks && !$days && !$hours)?$ms.S_MILLISECOND_SHORT:'');
+			(($ms && !$years && !$months && !$weeks && !$days && !$hours) || $original_time == 0 ?$ms.S_MILLISECOND_SHORT:'').
+			(!$ms && $original_time > 0 && $original_time < 0.001 ? '< 1'.S_MILLISECOND_SHORT:'');
 
 return trim($str,' ');
 }

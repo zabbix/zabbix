@@ -341,7 +341,8 @@ include_once('include/page_header.php');
 		$frmForm->addItem(new CButton('form',S_CREATE_MAINTENANCE_PERIOD));
 	}
 
-	show_table_header(S_CONFIGURATION_OF_MAINTENANCE_PERIODS, $frmForm);
+	$maintenance_wdgt = new CWidget();
+	$maintenance_wdgt->addPageHeader(S_CONFIGURATION_OF_MAINTENANCE_PERIODS, $frmForm);
 ?>
 <?php
 	if(isset($_REQUEST['form'])){
@@ -424,13 +425,10 @@ include_once('include/page_header.php');
 		$frmMaintenance->additem($outer_table);
 
 		show_messages();
-		$frmMaintenance->show();
-//			insert_maintenance_form();
+		$maintenance_wdgt->addItem($frmMaintenance);
 	}
 	else {
-		echo SBR;
 // Table HEADER
-		$maintenance_wdgt = new CWidget();
 
 		$form = new CForm();
 		$form->setMethod('get');
@@ -526,9 +524,9 @@ include_once('include/page_header.php');
 		$form->addItem($table);
 
 		$maintenance_wdgt->addItem($form);
-		$maintenance_wdgt->show();
 	}
 
+	$maintenance_wdgt->show();
 
 include_once('include/page_footer.php');
 ?>

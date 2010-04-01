@@ -551,11 +551,9 @@ include_once('include/page_header.php');
 		}
 	}
 
-	show_table_header(S_CONFIGURATION_OF_ZABBIX_BIG, $form);
-	print SBR;
-?>
-<?php
 	$cnf_wdgt = new CWidget();
+	$cnf_wdgt->addPageHeader(S_CONFIGURATION_OF_ZABBIX_BIG, $form);
+	
 
 	if(isset($_REQUEST['config'])){
 		$config = select_config(false);

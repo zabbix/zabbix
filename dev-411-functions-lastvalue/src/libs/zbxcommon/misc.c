@@ -1620,7 +1620,7 @@ int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value)
  *                                                                            *
  * Function: uint64_array_remove                                              *
  *                                                                            *
- * Purpose: add uint64 value to dynamic array                                 *
+ * Purpose: remove uint64 values from array                                   *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -1631,7 +1631,7 @@ int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	uint64_array_rm(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int rm_num)
+void	uint64_array_remove(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int rm_num)
 {
 	int	rindex, index;
 

@@ -19,8 +19,8 @@
 **/
 ?>
 <?php
-	define('ZABBIX_VERSION','1.8.2');
-	define('ZABBIX_API_VERSION','1.1');
+	define('ZABBIX_VERSION','1.8.3');
+	define('ZABBIX_API_VERSION','1.2');
 /* USER DEFINES */
 
 	define('ZBX_LOGIN_ATTEMPTS',			5);
@@ -49,6 +49,9 @@
 
 	define('ZBX_FONTPATH',					realpath('fonts'));	// where to search for font (GD > 2.0.18)
 	define('ZBX_GRAPH_FONT_NAME',			'DejaVuSans');		// font file name
+
+	define('ZBX_SCRIPT_TIMEOUT',			360); // in seconds
+	define('ZBX_SCRIPT_BYTES_LIMIT',		1073741824); // 1073741824 is 1MB in bytes
 /* END OF USERS DEFINES */
 
 	define('ZBX_FONT_NAME',			'DejaVuSans');

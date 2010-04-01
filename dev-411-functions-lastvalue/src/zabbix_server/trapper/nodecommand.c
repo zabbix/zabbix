@@ -17,22 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
-//#include <stdio.h>
-//#include <stdlib.h>
-//#include <unistd.h>
-//#include <sys/types.h>
-//#include <sys/stat.h>
-//#include <netinet/in.h>
-//#include <netdb.h>
-
-//#include <string.h>
-
-//#include <time.h>
-
-//#include <sys/socket.h>
-//#include <errno.h>
-
 #include "common.h"
 #include "nodecommand.h"
 #include "comms.h"

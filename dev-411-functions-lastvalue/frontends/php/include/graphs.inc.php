@@ -1030,20 +1030,20 @@
 	return $result;
 	}
 
-	function navigation_bar_calc($idx=null, $update=false){
+	function navigation_bar_calc($idx=null, $idx2=0, $update=false){
 //SDI($_REQUEST['stime']);
 
 		if(!is_null($idx)){
 			if($update){
 				if(isset($_REQUEST['period']) && ($_REQUEST['period'] >= ZBX_MIN_PERIOD))
-					CProfile::update($idx.'.period',$_REQUEST['period'],PROFILE_TYPE_INT);
+					CProfile::update($idx.'.period',$_REQUEST['period'],PROFILE_TYPE_INT, $idx2);
 					
 				if(isset($_REQUEST['stime']))
-					CProfile::update($idx.'.stime',$_REQUEST['stime'], PROFILE_TYPE_STR);
+					CProfile::update($idx.'.stime',$_REQUEST['stime'], PROFILE_TYPE_STR, $idx2);
 			}
 
-			$_REQUEST['period'] = get_request('period', CProfile::get($idx.'.period', ZBX_PERIOD_DEFAULT));
-			$_REQUEST['stime'] = get_request('stime', CProfile::get($idx.'.stime'));
+			$_REQUEST['period'] = get_request('period', CProfile::get($idx.'.period', ZBX_PERIOD_DEFAULT, $idx2));
+			$_REQUEST['stime'] = get_request('stime', CProfile::get($idx.'.stime', null, $idx2));
 		}
 
 		$_REQUEST['period'] = get_request('period', ZBX_PERIOD_DEFAULT);

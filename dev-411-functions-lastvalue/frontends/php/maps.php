@@ -25,7 +25,7 @@
 	$page['title'] = 'S_NETWORK_MAPS';
 	$page['file'] = 'maps.php';
 	$page['hist_arg'] = array('sysmapid');
-	$page['scripts'] = array('prototype.js');
+	$page['scripts'] = array();
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 

@@ -89,6 +89,10 @@
 #	include <sys/types.h>
 #endif
 
+#ifdef HAVE_SYS_SYSTEMCFG_H
+#	include <sys/systemcfg.h>
+#endif
+
 #ifdef HAVE_INTTYPES_H
 #	include <inttypes.h>
 #endif

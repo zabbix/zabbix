@@ -42,13 +42,13 @@ include_once('include/page_header.php');
 // host
 		'groupid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,			null),
 		'hostid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,			'isset({form})&&({form}=="update")'),
-		'host'=>			array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,		'isset({save})&&isset({go})&&({go}!="massupdate")'),
-		'proxy_hostid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			'isset({save})&&isset({go})&&({go}!="massupdate")'),
-		'dns'=>				array(T_ZBX_STR, O_OPT,	NULL,	NULL,			'isset({save})&&isset({go})&&({go}!="massupdate")'),
-		'useip'=>			array(T_ZBX_STR, O_OPT, NULL,	IN('0,1'),		'isset({save})&&isset({go})&&({go}!="massupdate")'),
-		'ip'=>				array(T_ZBX_IP,  O_OPT, NULL,	NULL,			'isset({save})&&isset({go})&&({go}!="massupdate")'),
-		'port'=>			array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,65535),	'isset({save})&&isset({go})&&({go}!="massupdate")'),
-		'status'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1,3'),		'isset({save})&&isset({go})&&({go}!="massupdate")'),
+		'host'=>			array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,		'isset({save})'),
+		'proxy_hostid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			'isset({save})'),
+		'dns'=>				array(T_ZBX_STR, O_OPT,	NULL,	NULL,			'isset({save})'),
+		'useip'=>			array(T_ZBX_STR, O_OPT, NULL,	IN('0,1'),		'isset({save})'),
+		'ip'=>				array(T_ZBX_IP,  O_OPT, NULL,	NULL,			'isset({save})'),
+		'port'=>			array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,65535),	'isset({save})'),
+		'status'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1,3'),		'isset({save})'),
 
 		'newgroup'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
 		'templates'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	NULL),
@@ -56,25 +56,25 @@ include_once('include/page_header.php');
 		'clear_templates'=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,	NULL),
 
 		'useipmi'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,				NULL),
-		'ipmi_ip'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,				'isset({useipmi})&&isset({go})&&({go}!="massupdate")'),
-		'ipmi_port'=>		array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,65535),	'isset({useipmi})&&isset({go})&&({go}!="massupdate")'),
-		'ipmi_authtype'=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(-1,6),		'isset({useipmi})&&isset({go})&&({go}!="massupdate")'),
-		'ipmi_privilege'=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(1,5),		'isset({useipmi})&&isset({go})&&({go}!="massupdate")'),
-		'ipmi_username'=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,				'isset({useipmi})&&isset({go})&&({go}!="massupdate")'),
-		'ipmi_password'=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,				'isset({useipmi})&&isset({go})&&({go}!="massupdate")'),
+		'ipmi_ip'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,				'isset({useipmi})'),
+		'ipmi_port'=>		array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,65535),	'isset({useipmi})'),
+		'ipmi_authtype'=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(-1,6),		'isset({useipmi})'),
+		'ipmi_privilege'=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(1,5),		'isset({useipmi})'),
+		'ipmi_username'=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,				'isset({useipmi})'),
+		'ipmi_password'=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,				'isset({useipmi})'),
 
 		'useprofile'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
-		'devicetype'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
-		'name'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
-		'os'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
-		'serialno'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
-		'tag'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
-		'macaddress'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
-		'hardware'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
-		'software'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
-		'contact'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
-		'location'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
-		'notes'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})&&isset({go})&&({go}!="massupdate")'),
+		'devicetype'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+		'name'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+		'os'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+		'serialno'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+		'tag'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+		'macaddress'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+		'hardware'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+		'software'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+		'contact'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+		'location'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+		'notes'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
 		'host_profile'=> 	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY,   NULL,   NULL),
 
 		'useprofile_ext'=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
@@ -97,6 +97,7 @@ include_once('include/page_header.php');
 		'unlink'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
 		'unlink_and_clear'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
 		'save'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		'masssave'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'clone'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'full_clone'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -188,7 +189,7 @@ include_once('include/page_header.php');
 		$_REQUEST['form'] = 'full_clone';
 	}
 // HOST MASS UPDATE
-	else if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['save'])){
+	else if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['masssave'])){
 		$hosts = get_request('hosts', array());
 		$visible = get_request('visible', array());
 		$_REQUEST['groups'] = get_request('groups', array());
@@ -242,9 +243,17 @@ include_once('include/page_header.php');
 			}
 // }}} PROFILES
 
+			$templates = array();
+			if(isset($visible['template_table']) || isset($visible['template_table_r'])){
+				$tplids = array_keys($_REQUEST['templates']);
+				$templates = zbx_toObject($tplids, 'templateid');
+			}
 		
 			if(isset($visible['groups'])){
 				$hosts['groups'] = zbx_toObject($_REQUEST['groups'], 'groupid');
+			}
+			if(isset($visible['template_table_r'])){
+				$hosts['templates'] = $templates;
 			}
 			$result = CHost::massUpdate(array_merge($hosts, $new_values));
 			if($result === false) throw new Exception();
@@ -261,15 +270,12 @@ include_once('include/page_header.php');
 				if($groups === false) throw new Exception();
 			}
 
-			$templates = array();
-			if(isset($visible['template_table'])){
-				$tplids = array_keys($_REQUEST['templates']);
-				$templates = zbx_toObject($tplids, 'templateid');
-			}
+			
 			
 			$add = array();
-			if(!empty($templates))
+			if(!empty($templates) && isset($visible['template_table'])){
 				$add['templates'] = $templates;
+			}
 			if(!empty($groups))
 				$add['groups'] = $groups;
 			if(!empty($add)){
@@ -373,6 +379,7 @@ include_once('include/page_header.php');
 
 			if(isset($_REQUEST['hostid'])){
 				$host['hostid'] = $_REQUEST['hostid'];
+				$host['templates_clear'] = $templates_clear;
 				$result = CHost::update($host);
 
 				$hostid = $_REQUEST['hostid'];
@@ -561,7 +568,9 @@ include_once('include/page_header.php');
 		$frmForm->addItem(new CButton('form',S_CREATE_HOST));
 	}
 
-	show_table_header(S_CONFIGURATION_OF_HOSTS, $frmForm);
+	$hosts_wdgt = new CWidget();
+	$hosts_wdgt->addPageHeader(S_CONFIGURATION_OF_HOSTS, $frmForm);
+	
 
 // TODO: neponjatno pochemu hostid sbrasivaetsja no on nuzhen dlja formi
 $thid = get_request('hostid', 0);
@@ -575,19 +584,19 @@ $thid = get_request('hostid', 0);
 
 	validate_group($PAGE_GROUPS,$PAGE_HOSTS);
 
-$_REQUEST['hostid'] = $thid;
+	$_REQUEST['hostid'] = $thid;
 ?>
 <?php
-	echo SBR;
+	// echo SBR;
 
 	if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['hosts'])){
-		insert_mass_update_host_form();
+		$hosts_wdgt->addItem(insert_mass_update_host_form());
 	}
 	else if(isset($_REQUEST['form'])){
-		insert_host_form(false);
+		$hosts_wdgt->addItem(insert_host_form(false));
 	}
 	else{
-		$hosts_wdgt = new CWidget();
+		
 
 		$frmForm = new CForm();
 		$frmForm->setMethod('get');
@@ -760,12 +769,12 @@ $_REQUEST['hostid'] = $thid;
 				$hostTemplates = array();
 				foreach($host['templates'] as $htnum => $template){
 					$caption = array();
-					$caption[] = new CLink($template['host'],'templates.php?form=update&templateid='.$template['hostid']);
+					$caption[] = new CLink($template['host'],'templates.php?form=update&templateid='.$template['hostid'],'unknown');
 
 					if(!empty($templates[$template['templateid']]['templates'])){
 						$caption[] = ' (';
 						foreach($templates[$template['templateid']]['templates'] as $tnum => $tpl){
-							$caption[] = new CLink($tpl['host'],'templates.php?form=update&templateid='.$tpl['hostid']);
+							$caption[] = new CLink($tpl['host'],'templates.php?form=update&templateid='.$tpl['hostid'], 'unknown');
 							$caption[] = ', ';
 						}
 						array_pop($caption);
@@ -833,8 +842,9 @@ $_REQUEST['hostid'] = $thid;
 //---------
 		$form->addItem($table);
 		$hosts_wdgt->addItem($form);
-		$hosts_wdgt->show();
 	}
+	
+	$hosts_wdgt->show();
 
 include_once('include/page_footer.php');
 ?>

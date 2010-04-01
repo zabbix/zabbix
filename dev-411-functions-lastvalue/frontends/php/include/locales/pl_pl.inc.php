@@ -468,8 +468,6 @@
 	'S_APPLICATIONS'=>				'Aplikacje',
 	'S_APPLICATIONS_BIG'=>				'APLIKACJE',
 	'S_CREATE_APPLICATION'=>			'Utwórz aplikację',
-	'S_ACTIVATE_ITEMS'=>				'Aktywuj Elementy',
-	'S_DISABLE_ITEMS'=>				'Wyłącz Elementy',
 	'S_APPLICATION_UPDATED'=>			'Aplikacja uaktualniona',
 	'S_CANNOT_UPDATE_APPLICATION'=>			'Nie można uaktualnić aplikacji',
 	'S_APPLICATION_ADDED'=>				'Dodano aplikację',
