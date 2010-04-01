@@ -28,10 +28,12 @@ static char	prompt_char = '\0';
 
 static int	telnet_waitsocket(int socket_fd, int mode/* 1 - read; 0 - write */)
 {
-/*	const char	*__function_name = "telnet_waitsocket"; */
+	const char	*__function_name = "telnet_waitsocket";
 	struct timeval	tv;
 	int		rc;
 	fd_set		fd, *writefd = NULL, *readfd = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	tv.tv_sec = 0;
 	tv.tv_usec = 100000;	/* 1/10 sec. */
@@ -46,36 +48,45 @@ static int	telnet_waitsocket(int socket_fd, int mode/* 1 - read; 0 - write */)
 
 	rc = select(socket_fd + 1, readfd, writefd, NULL, &tv);
 
-/*	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, rc); */
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, rc);
 
 	return rc;
 }
 
 static ssize_t	telnet_socket_read(int socket_fd, void *buf, size_t count)
 {
-/*	const char	*__function_name = "telnet_socket_read"; */
+	const char	*__function_name = "telnet_socket_read";
 	ssize_t		rc;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	while (-1 == (rc = read(socket_fd, buf, count)))
 	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d errno:%d", __function_name, rc, errno);
+
 		if (errno == EAGAIN)
 		{
 			if (0 >= (rc = telnet_waitsocket(socket_fd, count)))
 				break;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%d", __function_name, rc);
+
 			continue;
 		}
 		break;
 	}
 
-/*	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, rc); */
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, rc);
 
 	return rc;
 }
 
 static ssize_t	telnet_socket_write(int socket_fd, const void *buf, size_t count)
 {
-/*	const char	*__function_name = "telnet_socket_write"; */
+	const char	*__function_name = "telnet_socket_write";
 	ssize_t		rc;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	while (-1 == (rc = write(socket_fd, buf, count)))
 	{
@@ -87,7 +98,7 @@ static ssize_t	telnet_socket_write(int socket_fd, const void *buf, size_t count)
 		break;
 	}
 
-/*	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, rc); */
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, rc);
 
 	return rc;
 }
@@ -109,6 +120,8 @@ static ssize_t	telnet_read(int socket_fd, char *buf, size_t *buf_left, size_t *b
 		if (1 != (rc = telnet_socket_read(socket_fd, &c1, 1)))
 			break;
 
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() c1:%x", __function_name, c1);
+
 		switch (c1) {
 		case 255:	/* Interpret as Command (IAC) */
 			while (0 == (rc = telnet_socket_read(socket_fd, &c2, 1)))
@@ -116,6 +129,8 @@ static ssize_t	telnet_read(int socket_fd, char *buf, size_t *buf_left, size_t *b
 
 			if (-1 == rc)
 				goto end;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() c2:%x", __function_name, c2);
 
 			switch (c2){
 			case 255: 	/* Only the IAC need be doubled to be sent as data */
@@ -135,6 +150,8 @@ static ssize_t	telnet_read(int socket_fd, char *buf, size_t *buf_left, size_t *b
 
 				if (-1 == rc)
 					goto end;
+
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() c3:%x", __function_name, c3);
 
 				c = 255;
 				telnet_socket_write(socket_fd, &c, 1);	/* IAC */
