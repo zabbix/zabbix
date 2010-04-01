@@ -97,7 +97,7 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['form'])){
 		echo SBR;
 
-		$frmCnct = new CFormTable(S_NEW_CONNECTOR, 'popup_link_tr.php');
+		$frmCnct = new CFormTable(S_NEW_INDICATORS, 'popup_link_tr.php');
 		$frmCnct->setName('connector_form');
 
 		$triggers = array();

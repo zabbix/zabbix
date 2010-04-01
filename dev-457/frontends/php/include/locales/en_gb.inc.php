@@ -1785,9 +1785,7 @@
 
 //	forms.inc.php
 //	popup_link_tr.php
-	'S_NEW_CONNECTOR'=>			'New connector',
-	'S_EDIT_CONNECTOR'=>			'Edit connector',
-
+	'S_NEW_INDICATORS'=>			'New indicators',
 
 //	tr_logform.php
 	'S_INCLUDE'=>		'Include',
