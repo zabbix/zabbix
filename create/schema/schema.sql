@@ -443,7 +443,6 @@ TABLE|functions|functionid|ZBX_SYNC
 FIELD		|functionid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|items
 FIELD		|triggerid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|triggers
-FIELD		|lastvalue	|t_varchar(255)	|	|		|0
 FIELD		|function	|t_varchar(12)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|parameter	|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|triggerid
