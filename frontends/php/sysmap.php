@@ -26,7 +26,7 @@ require_once('include/forms.inc.php');
 $page['title'] = 'S_CONFIGURATION_OF_NETWORK_MAPS';
 $page['file'] = 'sysmap.php';
 $page['hist_arg'] = array('sysmapid');
-$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.cmap.js');
+$page['scripts'] = array('effects.js', 'dragdrop.js','class.cmap.js');
 $page['type'] = detect_page_type();
 
 include_once('include/page_header.php');
@@ -380,33 +380,11 @@ include_once('include/page_header.php');
 	$container->setAttribute('style','position: absolute;');
 	$container->Show();
 
-	$jsLocale = array(
-			'S_EDIT_MAP_ELEMENT',
-			'S_TYPE','S_LABEL',
-			'S_LABEL_LOCATION','S_HOST',
-			'S_MAP','S_TRIGGER','S_SELECT',
-			'S_HOST_GROUP','S_IMAGE','S_ICON_OK',
-			'S_ICON_PROBLEM','S_ICON_UNKNOWN',
-			'S_ICON_MAINTENANCE','S_ICON_DISABLED','S_ICON_DEFAULT',
-			'S_COORDINATE_X','S_COORDINATE_Y',
-			'S_URL','S_BOTTOM','S_TOP','S_LEFT','S_RIGHT','S_DEFAULT',
-			'S_APPLY','S_REMOVE','S_CLOSE',
-			'S_MAP_ELEMENTS','S_MAP_LINKS','S_CONNECTORS',
-			'S_ELEMENT','S_LINK_STATUS_INDICATOR',
-			'S_LINK','S_EDIT_CONNECTOR','S_TRIGGERS','S_COLOR',
-			'S_ADD','S_TYPE_OK','S_COLOR_OK','S_LINK_INDICATORS',
-			'S_TYPE_PROBLEM','S_COLOR_PROBLEM','S_DESCRIPTION',
-			'S_LINE','S_BOLD_LINE','S_DOT','S_DASHED_LINE','S_USE_ADVANCED_ICONS'
-		);
-
-	zbx_addJSLocale($jsLocale);
 	insert_js(get_selement_icons());
 	insert_show_color_picker_javascript();
 
 	zbx_add_post_js('create_map("sysmap_cnt", "'.$sysmap['sysmapid'].'");');
-?>
-<?php
+
 
 include_once('include/page_footer.php');
-
 ?>
