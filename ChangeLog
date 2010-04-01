@@ -4,6 +4,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2245] added missing functions in trigger expression builder (Vedmak)
  - [ZBX-2190] fixed trigger expression check for syntax (AM)
  - [ZBX-2242] fixed agent crash on HP-UX when processing logrt[] items (asaveljevs,Sasha)
  - [ZBXNEXT-288] improved server performance by not storing function lastvalue in database (asaveljevs,Sasha)
