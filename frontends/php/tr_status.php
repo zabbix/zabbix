@@ -190,8 +190,6 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-
-
 	$trigg_wdgt = new CWidget();
 
 	$r_form = new CForm();
@@ -222,7 +220,7 @@ include_once('include/page_header.php');
 	$mute_icon->addAction('onclick',new CJSscript("javascript: switch_mute(this);"));
 
 //	show_table_header(S_STATUS_OF_TRIGGERS_BIG,array($mute_icon,$fs_icon));
-	$trigg_wdgt->addPageHeader(S_STATUS_OF_TRIGGERS_BIG, array($mute_icon, $fs_icon));
+	$trigg_wdgt->addPageHeader(S_STATUS_OF_TRIGGERS_BIG.' ['.date(S_DATE_FORMAT_YMDHMS).']', array($mute_icon, $fs_icon));
 
 	$numrows = new CDiv();
 	$numrows->setAttribute('name','numrows');
