@@ -43,12 +43,20 @@
 	$metrics = array(
 		PARAM_TYPE_SECONDS => S_SECONDS,
 		PARAM_TYPE_COUNTS => S_COUNT);
+	$limited_metrics = array(
+		PARAM_TYPE_SECONDS => S_SECONDS);
 
 	$param1_sec_count = array(
 			array(
 				'C' => S_LAST_OF.' T',	/* caption */
 				'T' => T_ZBX_INT,	/* type */
 				'M' => $metrics		/* metrcis */
+			     ));
+	$param1_sec = array(
+			array(
+				'C' => S_LAST_OF.' T',	/* caption */
+				'T' => T_ZBX_INT,	/* type */
+				'M' => $limited_metrics		/* metrcis */
 			     ));
 
 	$param1_str = array(
@@ -178,7 +186,7 @@
 		'nodata' => array(
 			'description' => 'N {OP} X, where X is 1 - no data received during period of T seconds, 0 - otherwise',
 			'operators' => $operators,
-			'params' => $param1_sec_count
+			'params' => $param1_sec
 		),
 	);
 
