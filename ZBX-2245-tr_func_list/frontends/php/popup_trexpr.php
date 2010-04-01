@@ -43,8 +43,6 @@
 	$metrics = array(
 		PARAM_TYPE_SECONDS => S_SECONDS,
 		PARAM_TYPE_COUNTS => S_COUNT);
-	$limited_metrics = array(
-		PARAM_TYPE_SECONDS => S_SECONDS);
 
 	$param1_sec_count = array(
 			array(
@@ -56,7 +54,6 @@
 			array(
 				'C' => S_LAST_OF.' T',	/* caption */
 				'T' => T_ZBX_INT,	/* type */
-				'M' => $limited_metrics		/* metrcis */
 			     ));
 
 	$param1_str = array(
