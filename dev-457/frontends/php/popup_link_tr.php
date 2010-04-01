@@ -70,10 +70,7 @@ include_once('include/page_header.php');
 				$host = reset($trigger['hosts']);
 
 				$triggers[$trigger['triggerid']] = $host['host'].':'.expand_trigger_description_by_data($trigger);
-//				$triggers[$trigger['triggerid']] = expand_trigger_description_by_data($trigger);
 			}
-
-			natsort($triggers);
 		}
 
 		$script = 'addLinkTriggers('.zbx_jsvalue($_REQUEST['mapid']).','.
@@ -109,6 +106,7 @@ include_once('include/page_header.php');
 					'nodeids' => get_current_nodeid(true),
 					'triggerids'=> $_REQUEST['linktriggers'],
 					'editable'=> 1,
+					'select_hosts' => array('hostid', 'host'),
 					'output' => API_OUTPUT_EXTEND
 				);
 
@@ -152,7 +150,11 @@ include_once('include/page_header.php');
 		if(empty($triggers)) $trList->setAttribute('style', 'width: 250px;');
 
 		foreach($triggers as $tnum => $trigger){
-			$trList->addItem($trigger['triggerid'], expand_trigger_description_by_data($trigger));
+			$dbTriggers = CTrigger::get($options);
+			order_result($dbTriggers, 'description');
+
+			$host = reset($trigger['hosts']);
+			$trList->addItem($trigger['triggerid'], $host['host'].':'.expand_trigger_description_by_data($trigger));
 		}
 
 		$frmCnct->addRow(S_TRIGGERS, array($trList, BR(), $btnSelect, $btnRemove));
