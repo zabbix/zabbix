@@ -1944,7 +1944,7 @@ return $result;
 		
 		
 		if(CTrigger::exists(array('description' => $description, 'expression' => $expression))){
-			preg_match('/^{(.+?):/u', $expression, $host);
+			preg_match('/{(.+?):/u', $expression, $host);
 
 			$options = array(
 				'filter' => array('description' => $description, 'host' => $host[1]),
