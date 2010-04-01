@@ -393,11 +393,11 @@ include_once('include/page_header.php');
 		$table->setHeader(array(S_HOST,S_DNS,S_IP,S_PORT,S_STATUS,S_AVAILABILITY));
 
 		$options = array(
-				'nodeids' => $nodeid,
-				'groupids'=>$groupid,
-				'extendoutput' => 1,
-				'sortfield'=>'host'
-			);
+			'nodeids' => $nodeid,
+			'groupids'=>$groupid,
+			'extendoutput' => 1,
+			'sortfield'=>'host'
+		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($host_status)) $options[$host_status] = 1;
 
@@ -629,7 +629,7 @@ include_once('include/page_header.php');
 		}
 		$table->show();
 	}
-	else if(str_in_array($srctbl,array('hosts_and_templates'))){
+	else if($srctbl == 'hosts_and_templates'){
 		$table = new CTableInfo(S_NO_TEMPLATES_DEFINED);
 		$table->setHeader(array(S_NAME));
 

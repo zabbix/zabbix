@@ -1361,7 +1361,7 @@
 		$col_table1->addRow(array(bold(S_HOST.': '),
 				array(new CTextBox('filter_host', $filter_host, 20),
 					new CButton('btn_host', S_SELECT, 'return PopUp("popup.php?dstfrm='.$form->GetName().
-						'&dstfld1=filter_host&srctbl=hosts&srcfld1=host",450,450);', 'H'))
+						'&dstfld1=filter_host&srctbl=hosts_and_templates&srcfld1=host",450,450);', 'H'))
 		));
 		$col_table1->addRow(array(bold(S_APPLICATION.': '),
 				array(new CTextBox('filter_application', $filter_application, 20),
@@ -1838,7 +1838,12 @@
 
 		if(is_null($host)){
 			if($hostid > 0){
-				$host_info = CHost::get(array('hostids' => $hostid, 'extendoutput' => 1, 'templated_hosts' => 1));
+				$options = array(
+					'hostids' => $hostid,
+					'output' => API_OUTPUT_EXTEND,
+					'templated_hosts' => 1
+				);
+				$host_info = CHost::get($options);
 				$host_info = reset($host_info);
 				$host = $host_info['host'];
 			}
@@ -2224,7 +2229,6 @@
 			$frmItem->addVar('applications',$applications,6);
 		}
 		else{
-
 			$new_app = new CTextBox('new_application',$new_application,40);
 			$frmItem->addRow(S_NEW_APPLICATION,$new_app);
 
@@ -3029,6 +3033,7 @@
 			}
 		}
 
+		$items = array_values($items);
 		$icount = count($items);
 		for($i=0; $i < $icount-1;){
 // check if we deletd an item
@@ -3053,13 +3058,8 @@
 
 		$frmGraph->addRow(S_NAME, new CTextBox('name', $name, 32));
 
-		$g_width = new CNumericBox('width', $width, 5);
-		$g_width->setAttribute('onblur', 'javascript: submit();');
-		$frmGraph->addRow(S_WIDTH, $g_width);
-
-		$g_height = new CNumericBox('height', $height, 5);
-		$g_height->setAttribute('onblur','javascript: submit();');
-		$frmGraph->addRow(S_HEIGHT, $g_height);
+		$frmGraph->addRow(S_WIDTH, new CNumericBox('width', $width, 5));
+		$frmGraph->addRow(S_HEIGHT, new CNumericBox('height', $height, 5));
 
 		$cmbGType = new CComboBox('graphtype', $graphtype, 'graphs.submit(this)');
 		$cmbGType->addItem(GRAPH_TYPE_NORMAL, S_NORMAL);
@@ -3157,10 +3157,13 @@
 		else{
 			$items_table = $dedlete_button = null;
 		}
-		
+
+//		$frmGraph->addRow(S_SHOW_LEGEND, new CCheckBox('legend',$legend, null, 1));
+
 		if(($graphtype == GRAPH_TYPE_NORMAL) || ($graphtype == GRAPH_TYPE_STACKED)){
 			$frmGraph->addRow(S_SHOW_WORKING_TIME,new CCheckBox('showworkperiod',$showworkperiod,null,1));
 			$frmGraph->addRow(S_SHOW_TRIGGERS,new CCheckBox('showtriggers',$showtriggers,null,1));
+
 
 			if($graphtype == GRAPH_TYPE_NORMAL){
 				$percent_left = sprintf("%2.2f",$percent_left);
@@ -3274,8 +3277,8 @@
 			$frmGraph->addRow(S_YAXIS_MAX_VALUE, $yaxis_max);
 		}
 		else{
-			$frmGraph->addRow(S_3D_VIEW,new CCheckBox('graph3d',$graph3d,'javascript: graphs.submit(this);',1));
-			$frmGraph->addRow(S_LEGEND,new CCheckBox('legend',$legend,'javascript: graphs.submit(this);',1));
+			$frmGraph->addRow(S_SHOW_LEGEND, new CCheckBox('legend',$legend, null, 1));
+			$frmGraph->addRow(S_3D_VIEW,new CCheckBox('graph3d',$graph3d,null,1));
 		}
 
 		$frmGraph->addRow(S_ITEMS,
@@ -3291,6 +3294,11 @@
 				));
 		unset($items_table, $dedlete_button);
 
+		$preView = new CButton('preview',S_PREVIEW);
+		//$preView->setAttribute('style', 'float: left;');
+
+		$frmGraph->addItemToBottomRow($preView);
+		$frmGraph->addItemToBottomRow(SPACE);
 		$frmGraph->addItemToBottomRow(new CButton('save',S_SAVE));
 		if(isset($_REQUEST['graphid'])){
 			$frmGraph->addItemToBottomRow(SPACE);

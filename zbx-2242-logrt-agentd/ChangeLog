@@ -1,5 +1,14 @@
 Changes for 1.8.3
 
+ - [ZBX-2242] fixed agent crash on HP-UX when processing logrt[] items (asaveljevs,Sasha)
+ - [ZBXNEXT-288] improved server performance by not storing function lastvalue in database (asaveljevs,Sasha)
+ - [ZBX-1753] added permission check for trigger sound notifications (Aly)
+ - [ZBX-2246] added trigger wizard for logrt item (AM)
+ - [ZBX-2241] fixed graph X axis for big periods (Aly)
+ - [ZBX-2241] fixed text collide in graphs (Aly)
+ - [ZBX-2232] fixed bug with last event duration time in event details (AM)
+ - [ZBX-2243] fixed bug when cannot select template for item filter by host (Vedmak)
+ - [ZBX-2240] fixed "undefined index" in monitoring latest data (Vedmak)
  - [ZBX-954] fix minor typos (Richlv)
 
 Changes for 1.8.2

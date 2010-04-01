@@ -198,19 +198,20 @@ include_once('include/page_header.php');
 	
 	$historyWidget = new CWidget();
 	$historyWidget->addItem(SPACE);
-	
-	$scroll_div = new CDiv();
-	$scroll_div->setAttribute('id','scrollbar_cntr');
-	$historyWidget->addFlicker($scroll_div, CProfile::get('web.history.filter.state',1));
+
+	if(($_REQUEST['action'] == 'showvalues') || ($_REQUEST['action'] == 'showgraph')){
+		$scroll_div = new CDiv();
+		$scroll_div->setAttribute('id','scrollbar_cntr');
+		$historyWidget->addFlicker($scroll_div, CProfile::get('web.history.filter.state',1));
+	}
 
 
 	if( !isset($_REQUEST['plaintext']) && ($_REQUEST['fullscreen']==0) ){
 		if($item_type == ITEM_VALUE_TYPE_LOG){
-			$l_header = new CForm();
+			$l_header = new CForm(null, 'get');
 			$l_header->setName('loglist');
-			$l_header->setMethod('get');
 			$l_header->addVar('action',$_REQUEST['action']);
-			$l_header->addVar('period',$_REQUEST['period']);
+//			$l_header->addVar('period',$_REQUEST['period']);
 			$l_header->addVar('itemid',$_REQUEST['itemid']);
 
 			if(isset($_REQUEST['filter_task']))	$l_header->addVar('filter_task',$_REQUEST['filter_task']);
