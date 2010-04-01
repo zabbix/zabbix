@@ -2136,6 +2136,19 @@
 	'S_CANNOT_FIND_OBJECTS_WITH_NAME'=>	'Can not find objects with name',
 	'S_CANNOT_CREATE_NEW_ELEMENT'=>		'Can not create new element',
 	'S_OTHER_SMALL'=>			'other',
-	
+
+//	db.inc.php
+	'S_ERROR_CONNECTING_TO_DATABASE'=>	'Error connecting to database',
+	'S_UNKNOWN_DATABASE_TYPE'=>		'Unknown database type.',
+	'S_ERROR_DATABASE_SELECTION'=>		'Error database selection',
+	'S_MISSING_DATABASE'=>			'Missing database',
+	'S_UNSUPPORTED_DATABASE'=>		'Unsupported database',
+	'S_MISSING_FILE'=>			'Missing file',
+	'S_POSSIBLE_ERROR_BIG'=>		'POSSIBLE ERROR',
+	'S_USED_INCORRECT_DATABASE_PROCESSION'=>'Used incorrect logic in database processing, started subtransaction!',
+	'S_USED_INCORRECT_DATABASE_PROCESSION_NOT_STARTED'=>'Used incorrect logic in database processing, transaction not started!',
+	'S_ERROR_IN_QUERY'=>			'Error in query',
+	'S_SQL_ERROR'=>				'SQL error',
+
 );
 ?>

@@ -45,7 +45,7 @@ if(!isset($DB)){
 //SDI('type: '.$DB['TYPE'].'; server: '.$DB['SERVER'].'; port: '.$DB['PORT'].'; db: '.$DB['DATABASE'].'; usr: '.$DB['USER'].'; pass: '.$DB['PASSWORD']);
 
 		if(!isset($DB['TYPE'])){
-			$error = "Unknown database type.";
+			$error = S_UNKNOWN_DATABASE_TYPE;
 			$result = false;
 		}
 		else{
@@ -56,12 +56,12 @@ if(!isset($DB)){
 					$mysql_server = $DB['SERVER'].( !empty($DB['PORT']) ? ':'.$DB['PORT'] : '');
 
 					if (!$DB['DB']= mysql_connect($mysql_server,$DB['USER'],$DB['PASSWORD'])){
-						$error = 'Error connecting to database ['.mysql_error().']';
+						$error = S_ERROR_CONNECTING_TO_DATABASE.' ['.mysql_error().']';
 						$result = false;
 					}
 					else{
 						if (!mysql_select_db($DB['DATABASE'])){
-							$error = 'Error database selection ['.mysql_error().']';
+							$error = S_ERROR_DATABASE_SELECTION.' ['.mysql_error().']';
 							$result = false;
 						}
 						else{
@@ -80,7 +80,7 @@ if(!isset($DB)){
 
 					$DB['DB']= pg_connect($pg_connection_string);
 					if(!$DB['DB']){
-						$error = 'Error connecting to database';
+						$error = S_ERROR_CONNECTING_TO_DATABASE;
 						$result = false;
 					}
 					break;
@@ -99,7 +99,7 @@ if(!isset($DB)){
 					$DB['DB']= ociplogon($DB['USER'], $DB['PASSWORD'], $connect);
 //					$DB['DB']= ociplogon($DB['USER'], $DB['PASSWORD'], '(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST='.$DB['SERVER'].')(PORT=1521))(CONNECT_DATA=(SERVICE_NAME='.$DB['DATABASE'].')))');
 					if(!$DB['DB']){
-						$error = 'Error connecting to database';
+						$error = S_ERROR_CONNECTING_TO_DATABASE;
 						$result = false;
 					}
 					break;
@@ -150,19 +150,19 @@ if(!isset($DB)){
 					if(file_exists($DB['DATABASE'])){
 						$DB['DB']= sqlite3_open($DB['DATABASE']);
 						if(!$DB['DB']){
-							$error = 'Error connecting to database';
+							$error = S_ERROR_CONNECTING_TO_DATABASE;
 							$result = false;
 						}
 					}
 					else{
-						$error = 'Missing database';
+						$error = S_MISSING_DATABASE;
 						$result = false;
 					}
 
 					init_db_access();
 					break;
 				default:
-					$error = 'Unsupported database';
+					$error = S_UNSUPPORTED_DATABASE;
 					$result = false;
 			}
 		}
@@ -214,7 +214,7 @@ if(!isset($DB)){
 		global $DB;
 
 		if(!file_exists($file)){
-			$error = 'DBloadfile. Missing file['.$file.']';
+			$error = 'DBloadfile. '.S_MISSING_FILE.' ['.$file.']';
 			return false;
 		}
 
@@ -244,7 +244,7 @@ if(!isset($DB)){
 		$DB['TRANSACTIONS']++;
 
 		if($DB['TRANSACTIONS']>1){
-			info('POSSIBLE ERROR: Used incorrect logic in database processing, started subtransaction!');
+			info(S_POSSIBLE_ERROR_BIG.': '.S_USED_INCORRECT_DATABASE_PROCESSION);
 		return $DB['TRANSACTION_STATE'];
 		}
 
@@ -283,7 +283,7 @@ if(!isset($DB)){
 			if($DB['TRANSACTIONS'] < 1){
 				$DB['TRANSACTIONS'] = 0;
 				$DB['TRANSACTION_STATE'] = false;
-				info('POSSIBLE ERROR: Used incorrect logic in database processing, transaction not started!');
+				info(S_POSSIBLE_ERROR_BIG.': '.S_USED_INCORRECT_DATABASE_PROCESSION_NOT_STARTED);
 			}
 
 		if(!is_null($result))
@@ -397,7 +397,7 @@ if(!isset($DB)){
 
 					$result=mysql_query($query,$DB['DB']);
 					if(!$result){
-						error('Error in query ['.$query.'] ['.mysql_error().']');
+						error(S_ERROR_IN_QUERY.' ['.$query.'] ['.mysql_error().']');
 					}
 					break;
 				case 'POSTGRESQL':
@@ -407,7 +407,7 @@ if(!isset($DB)){
 
 					$result = pg_query($DB['DB'],$query);
 					if(!$result){
-						error('Error in query ['.$query.'] ['.pg_last_error().']');
+						error(S_ERROR_IN_QUERY.' ['.$query.'] ['.pg_last_error().']');
 					}
 					break;
 				case 'ORACLE':
@@ -419,7 +419,7 @@ if(!isset($DB)){
 					$result=OCIParse($DB['DB'],$query);
 					if(!$result){
 						$e=@ocierror();
-						error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+						error(S_SQL_ERROR.' ['.$e['message'].'] '.S_IN_SMALL.' ['.$e['sqltext'].']');
 					}
 					else if(!@OCIExecute($result,($DB['TRANSACTIONS']?OCI_DEFAULT:OCI_COMMIT_ON_SUCCESS))){
 						$e=ocierror($result);
@@ -437,7 +437,7 @@ if(!isset($DB)){
 					}
 
 					if(!$result = sqlite3_query($DB['DB'],$query)){
-						error('Error in query ['.$query.'] ['.sqlite3_error($DB['DB']).']');
+						error(S_ERROR_IN_QUERY.' ['.$query.'] ['.sqlite3_error($DB['DB']).']');
 					}
 					else{
 						$data = array();
@@ -484,24 +484,24 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 				case 'MYSQL':
 					$result = mysql_query($query,$DB['DB']);
 					if(!$result){
-						error('Error in query ['.$query.'] ['.mysql_error().']');
+						error(S_ERROR_IN_QUERY.SPACE.'['.$query.'] ['.mysql_error().']');
 					}
 					break;
 				case 'POSTGRESQL':
 					$result = (bool) pg_query($DB['DB'],$query);
 					if(!$result){
-						error('Error in query ['.$query.'] ['.pg_last_error().']');
+						error(S_ERROR_IN_QUERY.SPACE.'['.$query.'] ['.pg_last_error().']');
 					}
 					break;
 				case 'ORACLE':
 					$result=OCIParse($DB['DB'],$query);
 					if(!$result){
 						$e=@ocierror();
-						error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+						error(S_SQL_ERROR.' ['.$e['message'].']'.SPACE.S_IN_SMALL.SPACE.'['.$e['sqltext'].']');
 					}
 					else if(!@OCIExecute($result,($DB['TRANSACTIONS']?OCI_DEFAULT:OCI_COMMIT_ON_SUCCESS))){
 						$e=ocierror($result);
-						error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+						error(S_SQL_ERROR.'['.$e['message'].']'.SPACE.S_IN_SMALL.SPACE.'['.$e['sqltext'].']');
 					}
 					else{
 						/* It should be here. The function must return boolen */
@@ -516,7 +516,7 @@ COpt::savesqlrequest(microtime(true)-$time_start,$query);
 
 					$result = sqlite3_exec($DB['DB'], $query);
 					if(!$result){
-						error('Error in query ['.$query.'] ['.sqlite3_error($DB['DB']).']');
+						error(S_ERROR_IN_QUERY.SPACE.'['.$query.'] ['.sqlite3_error($DB['DB']).']');
 					}
 
 					if(!$DB['TRANSACTIONS']){
