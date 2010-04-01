@@ -19,79 +19,106 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/maps.inc.php');
-	require_once('include/forms.inc.php');
+require_once('include/config.inc.php');
+require_once('include/maps.inc.php');
+require_once('include/forms.inc.php');
 
-	$page['title'] = 'S_LINK_STATUS_INDICATORS';
-	$page['file'] = 'popup_link_tr.php';
+$page['title'] = 'S_LINK_STATUS_INDICATORS';
+$page['file'] = 'popup_link_tr.php';
 
-	define('ZBX_PAGE_NO_MENU', 1);
+define('ZBX_PAGE_NO_MENU', 1);
 
-	include_once('include/page_header.php');
-
+include_once('include/page_header.php');
 ?>
 <?php
 //			VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields = array(
-		'mapid'=>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
-		'triggerid'=>	array(T_ZBX_INT, O_OPT,  NULL, 	DB_ID, 			'isset({save})'),
-		'desc_exp'=>	array(T_ZBX_STR, O_OPT,  NULL, 	NOT_EMPTY,		'isset({save})'),
-		'drawtype'=>	array(T_ZBX_INT, O_OPT,  NULL, 	IN('0,1,2,3,4'),'isset({save})'),
-		'color'=>		array(T_ZBX_STR, O_OPT,  NULL, 	NOT_EMPTY,		'isset({save})'),
-/* actions */
-		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-/* other */
-		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		'mapid'=>				array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
+		'linktriggers'=>		array(T_ZBX_INT, O_OPT,  P_SYS, DB_ID, 			'isset({save})'),
+		'new_linktriggers'=>	array(T_ZBX_INT, O_OPT,  P_SYS, DB_ID, 			null),
+		'del_linktriggers'=>	array(T_ZBX_INT, O_OPT,  NULL, 	DB_ID, 			null),
+		'drawtype'=>			array(T_ZBX_INT, O_OPT,  NULL, 	IN('0,1,2,3,4'),'isset({save})'),
+		'color'=>				array(T_ZBX_STR, O_OPT,  NULL, 	NOT_EMPTY,		'isset({save})'),
+// actions
+		'save'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'remove'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+// other
+		'form'=>				array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 	);
 
 	check_fields($fields);
 ?>
-<script type="text/javascript">
-<!--<![CDATA[
-function add_linktrigger(mapid,triggerid,desc_exp,drawtype,color){
-	var parent = window.opener.document;
-
-	if(typeof(parent) == 'undefined'){
-		close_window();
-		return false;
-	}
-
-	var linktrigger = {
-		'triggerid': triggerid,
-		'desc_exp': desc_exp,
-		'drawtype': drawtype,
-		'color': color
-	};
-
-	window.opener.ZBX_SYSMAPS[mapid].map.linkForm_addLinktrigger(linktrigger);
-	window.close();
-
-return true;
-}
-//]]>
--->
-</script>
 <?php
-	if(isset($_REQUEST['save']) && isset($_REQUEST['triggerid'])){
-		$script = 'add_linktrigger("'.$_REQUEST['mapid'].'","'.
-								$_REQUEST['triggerid'].'","'.
-								$_REQUEST['desc_exp'].'","'.
-								$_REQUEST['drawtype'].'","'.
-								$_REQUEST['color'].'");';
-		insert_js($script);
+	$_REQUEST['linktriggers'] = get_request('linktriggers', array());
+
+	if(isset($_REQUEST['save']) && isset($_REQUEST['linktriggers'])){
+
+		if(!empty($_REQUEST['linktriggers'])){
+			$triggers = array();
+			$options = array(
+					'nodeids' => get_current_nodeid(true),
+					'triggerids'=> $_REQUEST['linktriggers'],
+					'editable'=> 1,
+					'select_hosts' => array('hostid', 'host'),
+					'output' => API_OUTPUT_EXTEND
+				);
+
+			$dbTriggers = CTrigger::get($options);
+			order_result($dbTriggers, 'description');
+
+			foreach($dbTriggers as $tnum => $trigger){
+				$host = reset($trigger['hosts']);
+
+//				$triggers[$trigger['triggerid']] = $host['host'].':'.expand_trigger_description_by_data($trigger);
+				$triggers[$trigger['triggerid']] = expand_trigger_description_by_data($trigger);
+			}
+		}
+
+		$script = 'addLinkTriggers('.zbx_jsvalue($_REQUEST['mapid']).','.
+								zbx_jsvalue($triggers, true).','.
+								zbx_jsvalue($_REQUEST['drawtype']).','.
+								zbx_jsvalue($_REQUEST['color']).');';
+
+		zbx_add_post_js($script);
 	}
-	else if(isset($_REQUEST['form'])){
+	else if(isset($_REQUEST['new_linktriggers'])){
+		$_REQUEST['linktriggers'] = array_merge($_REQUEST['linktriggers'], $_REQUEST['new_linktriggers']);
+		array_unique($_REQUEST['linktriggers']);
+
+		unset($_REQUEST['new_linktriggers']);
+	}
+	else if(isset($_REQUEST['remove']) && isset($_REQUEST['del_linktriggers'])){
+		$_REQUEST['linktriggers'] = array_diff($_REQUEST['linktriggers'], $_REQUEST['del_linktriggers']);
+		array_unique($_REQUEST['linktriggers']);
+
+		unset($_REQUEST['new_linktriggers']);
+	}
+
+
+	if(isset($_REQUEST['form'])){
 		echo SBR;
 
 		$frmCnct = new CFormTable(S_NEW_CONNECTOR, 'popup_link_tr.php');
 		$frmCnct->setName('connector_form');
-//		$frmCnct->SetHelp('web.sysmap.connector.php');
 
+		$triggers = array();
+		if(!empty($_REQUEST['linktriggers'])){
+			$options = array(
+					'nodeids' => get_current_nodeid(true),
+					'triggerids'=> $_REQUEST['linktriggers'],
+					'editable'=> 1,
+					'output' => API_OUTPUT_EXTEND
+				);
+
+			$triggers = CTrigger::get($options);
+			order_result($triggers, 'description');
+		}
+		$triggerids = zbx_objectValues($triggers, 'triggerid');
+		$frmCnct->addVar('linktriggers', $triggerids);
 
 		$triggerid = get_request('triggerid', 0);
 		$drawtype = get_request('drawtype', 0);
-		$color = get_request('color', 0);
+		$color = get_request('color', 'DD0000');
 
 		$frmCnct->addVar('mapid', $_REQUEST['mapid']);
 		$frmCnct->addVar('triggerid', $triggerid);
@@ -104,17 +131,29 @@ return true;
 			$value = map_link_drawtype2str($i);
 			$cmbType->addItem($i, $value);
 		}
-
+//---
 		$btnSelect = new CButton('btn1', S_SELECT,
-			"return PopUp('popup.php?real_hosts=1&dstfrm=".$frmCnct->getName().
-			"&dstfld1=triggerid&dstfld2=desc_exp&srctbl=triggers&srcfld1=triggerid&srcfld2=description&writeonly=1');",
-			'T');
+			"return PopUp('popup.php?srctbl=triggers".
+				'&srcfld1=triggerid'.
+				'&real_hosts=1'.
+				'&reference=linktrigger'.
+				'&multiselect=1'.
+				"&writeonly=1');",
+				'T');
 		$btnSelect->setType('button');
 
-// END preparation
-		$description = ($triggerid > 0) ? expand_trigger_description($triggerid) : '';
+		$btnRemove = new CButton('remove', S_REMOVE);
 
-		$frmCnct->addRow(S_TRIGGER, array(new CTextBox('desc_exp', $description, 70, 'yes'), SPACE, $btnSelect));
+// END preparation
+
+		$trList = new CListBox('del_linktriggers[]', null, 15);
+		if(empty($triggers)) $trList->setAttribute('style', 'width: 250px;');
+
+		foreach($triggers as $tnum => $trigger){
+			$trList->addItem($trigger['triggerid'], expand_trigger_description_by_data($trigger));
+		}
+
+		$frmCnct->addRow(S_TRIGGERS, array($trList, BR(), $btnSelect, $btnRemove));
 		$frmCnct->addRow(S_TYPE.' ('.S_PROBLEM_BIG.')', $cmbType);
 		$frmCnct->addRow(S_COLOR.' ('.S_PROBLEM_BIG.')', new CColor('color', $color));
 
@@ -122,9 +161,53 @@ return true;
 		$frmCnct->addItemToBottomRow(SPACE);
 		$frmCnct->addItemToBottomRow(new CButton('cancel', S_CANCEL, 'javascript: window.close();'));
 
-		$frmCnct->Show();
+		$frmCnct->show();
 	}
 
+?>
+<script type="text/javascript">
+//<!--<![CDATA[
+function addPopupValues(list){
+	if(!isset('object', list)) return false;
+
+	if(list.object == 'linktrigger'){
+		for(var i=0; i < list.values.length; i++){
+			create_var('connector_form', 'new_linktriggers['+i+']', list.values[i], false);
+		}
+
+		create_var('connector_form','add_dependence', 1, true);
+	}
+}
+
+function addLinkTriggers(mapid,triggers,drawtype,color){
+	var parent = window.opener.document;
+
+	if(typeof(parent) == 'undefined'){
+		close_window();
+		return false;
+	}
+
+	for(var triggerid in triggers){
+		if(!isset(triggerid, triggers)) continue;
+
+		var linktrigger = {
+			'triggerid': triggerid,
+			'desc_exp': triggers[triggerid],
+			'drawtype': drawtype,
+			'color': color
+		};
+
+		window.opener.ZBX_SYSMAPS[mapid].map.linkForm_addLinktrigger(linktrigger);
+	}
 	
-	require_once('include/page_footer.php');
+	window.close();
+
+return true;
+}
+//]]> -->
+</script>
+<?php
+
+require_once('include/page_footer.php');
+
 ?>

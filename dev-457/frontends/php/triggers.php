@@ -205,7 +205,7 @@ include_once('include/page_header.php');
 		}
 	}
 // DEPENDENCE ACTIONS
-	else if(isset($_REQUEST['add_dependence'])&&isset($_REQUEST['new_dependence'])){
+	else if(isset($_REQUEST['add_dependence']) && isset($_REQUEST['new_dependence'])){
 		if(!isset($_REQUEST['dependencies']))
 			$_REQUEST['dependencies'] = array();
 

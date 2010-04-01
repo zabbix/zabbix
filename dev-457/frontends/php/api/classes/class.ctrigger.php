@@ -335,7 +335,7 @@ class CTrigger extends CZBXAPI{
 			}
 		}
 
-// extendoutput
+// output
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['triggers'] = 't.*';
 		}

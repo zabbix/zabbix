@@ -290,7 +290,7 @@ save_sysmap: function(){
 	}
 	
 	params = this.get_update_params(params);
-//SDJ(params);
+
 	new Ajax.Request(url.getPath()+'?output=ajax'+'&sid='+url.getArgument('sid'),
 					{
 						'method': 'post',
@@ -2647,7 +2647,7 @@ this.linkForm.form = e_form_1;
 	e_span_6.setAttribute('target',"_blank");
 	e_span_6.setAttribute('style',"padding-left: 5px; float: right; text-decoration: none;");
 	e_span_6.setAttribute('onclick','window.open("http://www.zabbix.com/documentation.php");');
-	e_span_6.setAttribute('class',"http://www.zabbix.com/documentation.php");
+	
 	e_td_5.appendChild(e_span_6);
 
 
@@ -3047,7 +3047,7 @@ this.linkForm.linkIndicatorsBody = e_tbody_7;
 	this.linkForm.linkIndicatorsTable.appendChild(e_input_6);
 
 	var url = 'popup_link_tr.php?form=1&mapid='+this.id;
-	addListener(e_input_6, 'click', function(){ PopUp(url,640, 260, 'ZBX_Link_Indicator'); });
+	addListener(e_input_6, 'click', function(){ PopUp(url,640, 360, 'ZBX_Link_Indicator'); });
 
 
 	var e_input_6 = document.createElement('input');
@@ -3097,42 +3097,35 @@ linkForm_addLinktrigger: function(linktrigger){
 // HIDDEN initialization
 	if(isset('linktriggerid', linktrigger)){
 		var e_input_10 = document.createElement('input');
+		e_input_10.setAttribute('name',"link_triggers["+triggerid+"][linktriggerid]");
 		e_input_10.setAttribute('type',"hidden");
 		e_input_10.setAttribute('value',linktrigger.linktriggerid);
 		e_input_10.setAttribute('id',"link_triggers["+triggerid+"][linktriggerid]");
-		e_input_10.setAttribute('name',"link_triggers["+triggerid+"][linktriggerid]");
 		e_td_9.appendChild(e_input_10);
 	}
 
 	var e_input_10 = document.createElement('input');
+	e_input_10.setAttribute('name',"link_triggers["+triggerid+"][triggerid]");
+	e_input_10.setAttribute('id',"link_triggers["+triggerid+"][triggerid]");
 	e_input_10.setAttribute('type',"hidden");
 	e_input_10.setAttribute('value',linktrigger.triggerid);
-	e_input_10.setAttribute('id',"link_triggers["+triggerid+"][triggerid]");
-	e_input_10.setAttribute('name',"link_triggers["+triggerid+"][triggerid]");
 	e_td_9.appendChild(e_input_10);
 
 	var e_input_10 = document.createElement('input');
+	e_input_10.setAttribute('name',"link_triggers["+triggerid+"][desc_exp]");
+	e_input_10.setAttribute('id',"link_triggers["+triggerid+"][desc_exp]");
 	e_input_10.setAttribute('type',"hidden");
 	e_input_10.setAttribute('value',linktrigger.desc_exp);
-	e_input_10.setAttribute('id',"link_triggers["+triggerid+"][desc_exp]");
-	e_input_10.setAttribute('name',"link_triggers["+triggerid+"][desc_exp]");
 	e_td_9.appendChild(e_input_10);
 
 	var e_input_10 = document.createElement('input');
-	e_input_10.setAttribute('type',"hidden");
-	e_input_10.setAttribute('value',linktrigger.drawtype);
-	e_input_10.setAttribute('id',"link_triggers["+triggerid+"][drawtype]");
-	e_input_10.setAttribute('name',"link_triggers["+triggerid+"][drawtype]");
-	e_td_9.appendChild(e_input_10);
-
-	var e_input_10 = document.createElement('input');
-	e_input_10.setAttribute('type','hidden');
-	e_input_10.setAttribute('value',linktrigger.color);
-	e_input_10.setAttribute('id',"link_triggers["+triggerid+"][color]");
 	e_input_10.setAttribute('name',"link_triggers["+triggerid+"][color]");
-	e_td_9.appendChild(e_input_10);	
-//-----
+	e_input_10.setAttribute('id',"link_triggers["+triggerid+"][color]");
+	e_input_10.setAttribute('type',"hidden");
+	e_input_10.setAttribute('value',linktrigger.color);
+	e_td_9.appendChild(e_input_10);
 
+//-----
 	var linktriggerid = isset('linktriggerid', linktrigger)?linktrigger.linktriggerid:0;
 
 	var e_input_10 = document.createElement('input');
@@ -3156,18 +3149,36 @@ linkForm_addLinktrigger: function(linktrigger){
 //	addListener(e_span_10, 'click', function(){ PopUp(url,640, 480, 'ZBX_Link_Indicator'); });
 
 // LINE
-	var lineName = '';
-	switch(linktrigger.drawtype.toString()){
-		case '0': lineName = locale['S_LINE']; break;
-		case '2': lineName = locale['S_BOLD_LINE']; break;
-		case '3': lineName = locale['S_DOT']; break;
-		case '4': lineName = locale['S_DASHED_LINE']; break;
-	}
-	
+	var e_select_10 = document.createElement('select');
+
 	var e_td_9 = document.createElement('td');
 	e_tr_8.appendChild(e_td_9);
-	e_td_9.appendChild(document.createTextNode(lineName));
-	
+	e_td_9.appendChild(e_select_10);
+
+	e_select_10.setAttribute('id',"link_triggers["+triggerid+"][drawtype]");
+	e_select_10.setAttribute('name', 'link_triggers['+triggerid+'][drawtype]');
+// items
+	var e_option_11 = document.createElement('option');
+	e_option_11.setAttribute('value', 0);
+	e_option_11.appendChild(document.createTextNode(locale['S_LINE']));
+	e_select_10.appendChild(e_option_11);
+
+	var e_option_11 = document.createElement('option');
+	e_option_11.setAttribute('value', 2);
+	e_option_11.appendChild(document.createTextNode(locale['S_BOLD_LINE']));
+	e_select_10.appendChild(e_option_11);
+
+	var e_option_11 = document.createElement('option');
+	e_option_11.setAttribute('value', 3);
+	e_option_11.appendChild(document.createTextNode(locale['S_DOT']));
+	e_select_10.appendChild(e_option_11);
+
+	var e_option_11 = document.createElement('option');
+	e_option_11.setAttribute('value', 4);
+	e_option_11.appendChild(document.createTextNode(locale['S_DASHED_LINE']));
+	e_select_10.appendChild(e_option_11);
+//--
+	e_select_10.selectedIndex = (linktrigger.drawtype > 0)?(linktrigger.drawtype - 1):0;
 
 // COLOR
 	var e_td_9 = document.createElement('td');
@@ -3175,11 +3186,24 @@ linkForm_addLinktrigger: function(linktrigger){
 
 
 	var e_div_10 = document.createElement('div');
-	e_div_10.style.textDecoration = 'none'; 
-	e_div_10.style.outline = '1px black solid';
+//this.linkForm.colorPicker = e_div_10;
+
+	e_div_10.setAttribute('title', '#'+linktrigger.color);
+	e_div_10.setAttribute('id',"lbl_link_triggers["+triggerid+"][color]");
+	e_div_10.setAttribute('name',"lbl_link_triggers["+triggerid+"][color]");
+	e_div_10.className = "pointer";
+	addListener(e_div_10, 'click', function(){ show_color_picker("link_triggers["+triggerid+"][color]");});
+	// e_div_10.setAttribute('onclick',"javascript: show_color_picker('color')");
+
+	e_div_10.style.marginLeft = '2px';
+	e_div_10.style.border = '1px solid black';
+	e_div_10.style.display = 'inline';
 	e_div_10.style.width = '10px';
 	e_div_10.style.height = '10px';
+	e_div_10.style.textDecoration = 'none';
 	e_div_10.style.backgroundColor = '#'+linktrigger.color;
+
+	e_div_10.innerHTML = '&nbsp;&nbsp;&nbsp;';
 	e_td_9.appendChild(e_div_10);
 },
 
@@ -3229,7 +3253,11 @@ saveForm_link: function(e){
 
 		linktrigger.triggerid = $('link_triggers['+triggerid+'][triggerid]').value;
 		linktrigger.desc_exp = $('link_triggers['+triggerid+'][desc_exp]').value;
-		linktrigger.drawtype = $('link_triggers['+triggerid+'][drawtype]').value;
+
+		var dom_drawtype = $('link_triggers['+triggerid+'][drawtype]');
+
+		linktrigger.drawtype = dom_drawtype.options[dom_drawtype.selectedIndex].value;
+
 		linktrigger.color = $('link_triggers['+triggerid+'][color]').value;
 
 		linktriggerid = $('link_triggers['+triggerid+'][linktriggerid]');

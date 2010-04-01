@@ -2853,13 +2853,10 @@
 //		$txtCondVal = new CTextBox('trigger','',75,'yes');
 
 		$btnSelect = new CButton('btn1',S_ADD,
-				"return PopUp('popup.php?dstfrm=".$frmTrig->GetName().
-							'&dstfld1=new_dependence[]'.
-							'&srctbl=triggers'.
+				"return PopUp('popup.php?srctbl=triggers".
+							'&srcfld1=triggerid'.
+							'&reference=deptrigger'.
 							'&multiselect=1'.
-							'&dstact=add_dependence'.
-							'&objname=triggers'.
-							'&srcfld1=1'.
 						"',750,450);",'T');
 
 
@@ -2899,6 +2896,19 @@
 
 		$jsmenu = new CPUMenu(null,170);
 		$jsmenu->InsertJavaScript();
+
+		$script = "function addPopupValues(list){
+						if(!isset('object', list)) return false;
+
+						if(list.object == 'deptrigger'){
+							for(var i=0; i < list.values.length; i++){
+								create_var('".$frmTrig->getName()."', 'new_dependence['+i+']', list.values[i], false);
+							}
+
+							create_var('".$frmTrig->getName()."','add_dependence', 1, true);
+						}
+					}";
+		insert_js($script);
 	}
 
 	function insert_trigger_comment_form($triggerid){
