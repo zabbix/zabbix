@@ -63,6 +63,7 @@ foreach($files as $file){
 	}
 }
 if(!empty($js)){
+	$js = rtrim($js, ',');
 	$js = 'var locale = {'. $js .'};'."\n";
 }
 
