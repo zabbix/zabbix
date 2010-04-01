@@ -17,7 +17,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **
 */
-<!--
+// [!CDATA[
 /************************************************************************************/
 // GRAPHS TIMELINE CONTROLS (GTLC)
 // author: Aly
@@ -1256,10 +1256,10 @@ switchPeriodState: function(){
 	this.fixedperiod = (this.fixedperiod == 1)?0:1;
 	
 	if(this.fixedperiod){
-		this.dom.period_state.innerHTML = 'fixed';
+		this.dom.period_state.innerHTML = locale['S_FIXED_SMALL'];
 	}
 	else{
-		this.dom.period_state.innerHTML = 'dynamic';
+		this.dom.period_state.innerHTML = locale['S_DYNAMIC_SMALL'];
 	}
 },
 
@@ -1392,7 +1392,7 @@ setTabInfo: function(){
 	var right_info = date[0]+'.'+date[1]+'.'+date[2]+' '+date[3]+':'+date[4];//+':'+date[5];
 
 	if(this.timeline.now()){
-		right_info += '  (now!)  ';
+		right_info += '  ('+locale['S_NOW_SMALL']+'!)  ';
 	}
 	
 	this.dom.info_right.innerHTML = right_info;
@@ -1450,14 +1450,14 @@ formatStampByDHM: function(timestamp, tsDouble, extend){
 	}
 
 	var str = "";
-	str+=(years == 0)?(''):(years+'y ');
-	str+=(months == 0)?(''):(months+'m ');
-	str+=(weeks == 0)?(''):(weeks+'w ');
+	str+=(years == 0)?(''):(years+locale['S_YEAR_SHORT']+' ');
+	str+=(months == 0)?(''):(months+locale['S_MONTH_SHORT']+' ');
+	str+=(weeks == 0)?(''):(weeks+locale['S_WEEK_SHORT']+' ');
 	
-	if(extend && tsDouble) str+=days+'d ';
-	else str+=(days == 0)?(''):(days+'d ');
+	if(extend && tsDouble) str+=days+locale['S_DAY_SHORT']+' ';
+	else str+=(days == 0)?(''):(days+locale['S_DAY_SHORT']+' ');
 	
-	str+=hours+'h '+minutes+'m ';
+	str+=hours+locale['S_HOUR_SHORT']+' '+minutes+locale['S_MINUTE_SHORT']+' ';
 	
 return str;
 },
@@ -1647,7 +1647,7 @@ scrollcreate: function(w){
 	this.dom.zoom.appendChild(this.dom.text);
 	this.dom.text.className = 'text';
 	
-	this.dom.text.appendChild(document.createTextNode('Zoom:'));
+	this.dom.text.appendChild(document.createTextNode(locale['S_ZOOM']+':'));
 	
 	this.dom.links = document.createElement('span');
 	this.dom.zoom.appendChild(this.dom.links);
@@ -2342,4 +2342,4 @@ function moveSBoxes(){
 			ZBX_SBOX[key].sbox.moveSBoxByObj();
 	}
 }
--->
+//]]

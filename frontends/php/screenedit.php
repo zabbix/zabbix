@@ -27,7 +27,7 @@
 	$page['title'] = 'S_CONFIGURATION_OF_SCREENS';
 	$page['file'] = 'screenedit.php';
 	$page['hist_arg'] = array('screenid');
-	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.cscreen.js','class.calendar.js','gtlc.js');
+	$page['scripts'] = array('effects.js','dragdrop.js','class.cscreen.js','class.calendar.js','gtlc.js');
 
 include_once('include/page_header.php');
 

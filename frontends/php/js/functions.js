@@ -46,7 +46,7 @@ return p;
 function call_ins_macro_menu(ev){
 	show_popup_menu(ev,
 					[
-						['Insert macro',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],
+						[locale['S_INSERT_MACRO'],null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],
 						['TRIGGER.VALUE=0', 'javascript: set_macro(0);',
 						 null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
 						['TRIGGER.VALUE=1', 'javascript: set_macro(1);',
@@ -64,13 +64,13 @@ function call_ins_macro_menu(ev){
 }
 
 function call_triggerlog_menu(evnt,id,name,ltype,menu_options){
- 	var tname = 'Create Log Trigger';
+ 	var tname = locale['S_CREATE_LOG_TRIGGER'];
 
 	if(typeof(menu_options) != 'undefined'){
 		show_popup_menu(evnt,
 					[
 						[name,null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],
-						['Create Log Trigger', "javascript: openWinCentered('tr_logform.php?sform=1&itemid="+id+"&ltype="+ltype+"','TriggerLog',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');",{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
+						[tname, "javascript: openWinCentered('tr_logform.php?sform=1&itemid="+id+"&ltype="+ltype+"','TriggerLog',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');",{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
 						menu_options
 					],240);
 	}
@@ -78,7 +78,7 @@ function call_triggerlog_menu(evnt,id,name,ltype,menu_options){
 		show_popup_menu(evnt,
 					[
 						[name,null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],
-						['Create Log Trigger', "javascript: openWinCentered('tr_logform.php?sform=1&itemid="+id+"&ltype="+ltype+"','ServiceForm',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');", {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]
+						[tname, "javascript: openWinCentered('tr_logform.php?sform=1&itemid="+id+"&ltype="+ltype+"','ServiceForm',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');", {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]
 					],140);
 	}
 return false;
@@ -215,9 +215,9 @@ function add_logexpr(){
 	tr.appendChild(td);
 	
 	var url = document.createElement('a');
-	url.setAttribute('href','javascript: if(confirm("Delete expression?")) remove_expression("logtr'+logexpr_count+'");');
+	url.setAttribute('href','javascript: if(confirm("'+locale['S_DELETE_EXPRESSION_Q']+'")) remove_expression("logtr'+logexpr_count+'");');
 	url.setAttribute(classattr,'action');
-	url.appendChild(document.createTextNode('Delete'));
+	url.appendChild(document.createTextNode(locale['S_DELETE']));
 	
 	td.appendChild(url);
 	
@@ -395,9 +395,9 @@ function add_keyword(bt_type){
 	tr.appendChild(td);
 	
 	var url = document.createElement('a');
-	url.setAttribute('href','javascript: if(confirm("Delete keyword?")) remove_keyword("keytr'+key_count+'");');
+	url.setAttribute('href','javascript: if(confirm("'+locale['S_DELETE_KEYWORD_Q']+'")) remove_keyword("keytr'+key_count+'");');
 	url.setAttribute(classattr,'action');
-	url.appendChild(document.createTextNode('Delete'));
+	url.appendChild(document.createTextNode(locale['S_DELETE']));
 	
 	td.appendChild(url);
 	
@@ -464,7 +464,7 @@ function delete_expression(expr_id){
 
 function copy_expression(id){
 	var expr_temp = document.getElementsByName('expr_temp')[0];
-	if (expr_temp.value.length > 0 && !confirm('Do you replace the conditional expression?')) return;
+	if (expr_temp.value.length > 0 && !confirm(locale['DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q'])) return;
 
 	var src = document.getElementById(id);
 	if (typeof src.textContent != 'undefined') expr_temp.value = src.textContent;
@@ -473,7 +473,7 @@ function copy_expression(id){
 
 function set_macro(v){
 	var expr_temp = document.getElementsByName('expr_temp')[0];
-	if (expr_temp.value.length > 0 && !confirm('Do you replace the conditional expression?')) return;
+	if (expr_temp.value.length > 0 && !confirm(locale['DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q'])) return;
 
 	var sign = '=';
 	if(v >= 10) {

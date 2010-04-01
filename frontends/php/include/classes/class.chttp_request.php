@@ -28,12 +28,14 @@ class CHTTP_request{
 			$this->add_headers = array_merge($this->add_headers, $add_headers);
 		}
 
-	if (isset($_SERVER['HTTP_METHOD'])) {
+		if (isset($_SERVER['HTTP_METHOD'])) {
 			$this->method = $_SERVER['HTTP_METHOD'];
 			unset($_SERVER['HTTP_METHOD']);
-		} else {
+		}
+		else {
 			$this->method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : false;
 		}
+
 		$this->protocol = isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : false;
 		$this->request_method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : false;
 

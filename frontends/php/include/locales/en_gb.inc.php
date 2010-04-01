@@ -1140,6 +1140,15 @@
 	'S_MAP_UPDATED'=>				'Network map updated',
 	'S_CANNOT_UPDATE_MAP'=>			'Cannot update network map',
 	'S_EXPAND_SINGLE_PROBLEM'=>		'Expand single problem',
+	'S_GET_SELEMENTS_FAILED'=>			'Get selements FAILED.',
+	'S_TWO_ELEMENTS_SHOULD_BE_SELECTED'=>		'Two elements should be selected',
+	'S_DELETE_SELECTED_ELEMENTS_Q'=>		'Delete selected elements?',
+	'S_PLEASE_SELECT_TWO_ELEMENTS'=>		'Please select two elements',
+	'S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'=>	'Delete Links between selected elements?',
+	'S_NO_LINKS'=>					'No links',
+	'S_WRONG_TYPE_OF_ARGUMENTS_PASSED_TO_FUNCTION'=>'Wrong type of arguments passed to function',
+	'S_NEW_ELEMENT'=>				'New element',
+	'S_SET_TRIGGER'=>				'Set trigger',
 
 	'S_BOTTOM'=>					'Bottom',
 	'S_TOP'=>						'Top',
@@ -2098,6 +2107,35 @@
 	'S_NO_PERMISSION'=>				'You do not have permission to perform this operation',
 	'S_NO_PERMISSIONS_FOR_SCREEN'=>	'No permissions for screen',
 	'S_NO_PERMISSIONS_FOR_MAP'=>	'No permissions for map',
-	'S_XML_FILE_CONTAINS_ERRORS'=>	'XML file contains errors'
-	);
+	'S_XML_FILE_CONTAINS_ERRORS'=>	'XML file contains errors',
+
+//	class.calendar.js
+	'S_MONDAY_SHORT_BIG'=>		'M',
+	'S_TUESDAY_SHORT_BIG'=>		'T',
+	'S_WEDNESDAY_SHORT_BIG'=>	'W',
+	'S_THURSDAY_SHORT_BIG'=>	'T',
+	'S_FRIDAY_SHORT_BIG'=>		'F',
+	'S_SATURDAY_SHORT_BIG'=>	'S',
+	'S_SUNDAY_SHORT_BIG'=>		'S',
+
+//	gtlc.js
+	'S_ZOOM'=>			'Zoom',
+	'S_FIXED_SMALL'=>		'fixed',
+	'S_DYNAMIC_SMALL'=>		'dynamic',
+	'S_NOW_SMALL'=>			'now',
+
+//	functions.js
+	'S_CREATE_LOG_TRIGGER'=>			'Create Log Trigger',
+	'DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q'=>	'Do you replace the conditional expression?',
+	'S_ADD_SERVICE'=>				'Add Service',
+	'S_EDIT_SERVICE'=>				'Edit Service',
+	'S_DELETE_SERVICE'=>				'Delete Service',
+	'S_DELETE_SELECTED_SERVICES_Q'=>		'Delete selected services?',
+
+//	js.inc.php
+	'S_CANNOT_FIND_OBJECTS_WITH_NAME'=>	'Can not find objects with name',
+	'S_CANNOT_CREATE_NEW_ELEMENT'=>		'Can not create new element',
+	'S_OTHER_SMALL'=>			'other',
+	
+);
 ?>
