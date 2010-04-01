@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [DEV-457] improvements in dynamic map link indicators form (Aly)
  - [ZBX-2242] fixed agent crash on HP-UX when processing logrt[] items (asaveljevs,Sasha)
  - [ZBXNEXT-288] improved server performance by not storing function lastvalue in database (asaveljevs,Sasha)
  - [ZBX-1753] added permission check for trigger sound notifications (Aly)
