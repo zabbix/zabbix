@@ -35,21 +35,16 @@
  * Return value: SUCCEED - on splitting without errors                        *
  *               FAIL - on splitting with errors                              *
  *                                                                            *
- * Author: Dmitry Borovikov                                                   *
+ * Author: Dmitry Borovikov, Aleksandrs Saveljevs                             *
  *                                                                            *
  * Comments: Memory for "part1" and "part2" is allocated only on SUCCEED.     *
  *                                                                            *
  ******************************************************************************/
-static int split_string(const char *str, char const *del, char **part1, char **part2)
+static int	split_string(const char *str, const char *del, char **part1, char **part2)
 {
-	int i = 0;
-	int str_length = 0;
-	int part1_length = 0;
-	int part2_length = 0;
-	int bytes_offset_tmp = 0;
-	int bytes_allocated_tmp = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In split_string()");
+	int	str_length = 0;
+	int	part1_length = 0;
+	int	part2_length = 0;
 
 	assert(str);
 	assert(*str);/* why to split an empty string */
@@ -60,44 +55,28 @@ static int split_string(const char *str, char const *del, char **part1, char **p
 	assert(part2);
 	assert(NULL == *part2);/* target 2 must be empty */
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In split_string(): str [%s] del [%s]", str, del);
+
 	str_length = strlen(str);
-	if (del <= str || del >= (str + str_length - 1))
+
+	/* since the purpose of this function is to be used in split_filename(), we allow part1 to be */
+	/* just *del (e.g., "/" - file system root), but we do not allow part2 (filename) to be empty */
+	if (del < str || del >= (str + str_length - 1))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Delimiter is out of range. Cannot proceed.");
 		return FAIL;
 	}
+
 	part1_length = del - str + 1;
-	/*zabbix_log(LOG_LEVEL_DEBUG, "\"part1\" length [%i]", part1_length);*/
-	if (0 == part1_length)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "\"part1\" length is zero bytes long. Cannot proceed.");
-		return FAIL;
-	}
 	part2_length = str_length - part1_length;
-	/*zabbix_log(LOG_LEVEL_DEBUG, "\"part2\" length [%i]", part2_length);*/
-	if (0 == part2_length)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "\"part2\" length is zero bytes long. Cannot proceed.");
-		return FAIL;
-	}
-	/* copying part1 */
-	for ( ; i < part1_length; i++)
-	{
-		/*zabbix_log(LOG_LEVEL_DEBUG, "bytes_allocated_tmp [%i] bytes_offset_tmp [%i] character [%c]",
-				bytes_allocated_tmp, bytes_offset_tmp, str[i]);*/
-		zbx_chrcpy_alloc(part1, &bytes_allocated_tmp, &bytes_offset_tmp, str[i]);
-	}
-	zabbix_log(LOG_LEVEL_DEBUG, "\"part1\" [%s]", *part1);
-	bytes_allocated_tmp = 0;
-	bytes_offset_tmp = 0;
-	i = part1_length;
-	for ( ; i < str_length; i++)
-	{
-		/*zabbix_log(LOG_LEVEL_DEBUG, "bytes_allocated_tmp [%i] bytes_offset_tmp [%i] character [%c]",
-				bytes_allocated_tmp, bytes_offset_tmp, str[i]);*/
-		zbx_chrcpy_alloc(part2, &bytes_allocated_tmp, &bytes_offset_tmp, str[i]);
-	}
-	zabbix_log(LOG_LEVEL_DEBUG, "\"part2\" [%s]", *part2);
+
+	*part1 = zbx_malloc(*part1, part1_length + 1);
+	zbx_strlcpy(*part1, str, part1_length + 1);
+
+	*part2 = zbx_malloc(*part2, part2_length + 1);
+	zbx_strlcpy(*part2, str + part1_length, part2_length + 1);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End split_string(): part1 [%s] part2 [%s]", *part1, *part2);
 
 	return SUCCEED;
 }
@@ -129,10 +108,10 @@ static int split_filename(const char *filename, char **directory, char **format)
 	char *separator_tmp = NULL;
 #endif/*_WINDOWS*/
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In split_filename(): filename [%s]", filename);
+
 	assert(directory && !*directory);
 	assert(format && !*format);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In split_filename()");
 
 	if (!filename || *filename == '\0')
 	{
@@ -191,7 +170,7 @@ static int split_filename(const char *filename, char **directory, char **format)
 
 #else/* _WINDOWS */
 	separator = strrchr(filename, (int)PATH_SEPARATOR);
-	if (separator == NULL )
+	if (separator == NULL)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Filename [%s] does not contain any path separator [%c].", filename, PATH_SEPARATOR);
 		return FAIL;
@@ -202,7 +181,8 @@ static int split_filename(const char *filename, char **directory, char **format)
 		return FAIL;
 	}
 	/* Checking whether directory exists. */
-	if (-1 == zbx_stat(*directory, &buf)) {
+	if (-1 == zbx_stat(*directory, &buf))
+	{
 		zabbix_log(LOG_LEVEL_WARNING, "Directory [%s] cannot be found on the file system.", *directory);
 		zbx_free(*directory);
 		zbx_free(*format);
@@ -217,6 +197,8 @@ static int split_filename(const char *filename, char **directory, char **format)
 		return FAIL;
 	}
 #endif/* _WINDOWS */
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End split_filename(): directory [%s] format [%s]", *directory, *format);
 
 	return SUCCEED;
 }
@@ -246,11 +228,11 @@ struct st_logfile
  ******************************************************************************/
 static void init_logfiles(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num)
 {
+	zabbix_log(LOG_LEVEL_DEBUG, "In init_logfiles()");
+
 	assert(logfiles && NULL == *logfiles);
 	assert(logfiles_alloc && 0 == *logfiles_alloc);
 	assert(logfiles_num && 0 == *logfiles_num);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In init_logfiles()");
 
 	*logfiles_alloc = 64;
 	*logfiles = zbx_malloc(*logfiles, *logfiles_alloc * sizeof(struct st_logfile));
@@ -275,9 +257,11 @@ static void init_logfiles(struct st_logfile **logfiles, int *logfiles_alloc, int
  ******************************************************************************/
 static void free_logfiles(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num)
 {
-	int i = 0;
-	zabbix_log(LOG_LEVEL_DEBUG, "In free_logfiles() number of logfiles [%i]", *logfiles_num);
-	for (; i < *logfiles_num; i++)
+	int	i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In free_logfiles() number of logfiles [%d]", *logfiles_num);
+
+	for (i = 0; i < *logfiles_num; i++)
 	{
 		zbx_free((*logfiles)[i].filename);
 	}
@@ -323,8 +307,8 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 	/* must be done in any case */
 	if (*logfiles_alloc == *logfiles_num)
 	{
-		*logfiles_alloc = *logfiles_alloc * 2;
-		*logfiles = zbx_realloc(*logfiles, *logfiles_alloc);
+		*logfiles_alloc += 64;
+		*logfiles = zbx_realloc(*logfiles, *logfiles_alloc * sizeof(struct st_logfile));
 	}
 
 	/*from the start go those, which mtimes are smaller*/
@@ -371,12 +355,10 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 		break;
 	}
 
-	/*zabbix_log(LOG_LEVEL_DEBUG, "Decide whether to move memory.");*/
 	if (!(0 == i && 0 == *logfiles_num) && !(0 < *logfiles_num && *logfiles_num == i))
 	{
 		/* do not move if there are not logfiles yet */
 		/* do not move if we are appending the logfile */
-		/*zabbix_log(LOG_LEVEL_DEBUG, " MEMORY MOVE WILL NOW OCCUR! ");*/
 		memmove((void *)&(*logfiles)[i + 1], (const void *)&(*logfiles)[i],
 				(size_t)((*logfiles_num - i) * sizeof(struct st_logfile)));
 	}
@@ -405,7 +387,6 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
  * Comments:                                                                  *
  *    This function allocates memory for 'value', because use zbx_free.       *
  *    Return SUCCEED and NULL value if end of file received.                  *
- *                                                                            *
  *                                                                            *
  ******************************************************************************/
 int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, const char *encoding)
@@ -446,7 +427,7 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 #ifdef _WINDOWS
 
 	/* try to "open" Windows directory */
-	find_path = zbx_dsprintf(find_path, "%s%c*", directory, PATH_SEPARATOR);
+	find_path = zbx_dsprintf(find_path, "%s*", directory);
 	find_handle = _findfirst((const char *)find_path, &find_data);
 	if (-1 == find_handle)
 	{
@@ -462,7 +443,7 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 
 	if (NULL == (dir = opendir(directory)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot open directory [%s] for reading. Error: %s", directory, strerror(errno));
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot open directory [%s] for reading. Error: [%s]", directory, strerror(errno));
 		zbx_free(directory);
 		zbx_free(format);
 		return FAIL;
@@ -473,24 +454,19 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 	/* allocating memory for logfiles */
 	init_logfiles(&logfiles, &logfiles_alloc, &logfiles_num);
 
-	/*zabbix_log(LOG_LEVEL_WARNING, "Starting reading the directory. logfiles_alloc [%i], logfiles_num [%i]",
-			logfiles_alloc, logfiles_num);*/
-
 #ifdef _WINDOWS
-
-	/* reading Windows directory */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "We are in the Windows directory reading cycle.");
 	do {
-		logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%c%s", directory, PATH_SEPARATOR, find_data.name);
+		logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, find_data.name);
+
 		if (-1 == zbx_stat(logfile_candidate, &file_buf) || !S_ISREG(file_buf.st_mode))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot process read entry [%s].", logfile_candidate);
-			continue;
 		}
-		if (NULL != zbx_regexp_match(find_data.name, format, &length))
+		else if (NULL != zbx_regexp_match(find_data.name, format, &length))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Addint the file [%s] to logfiles.", logfile_candidate);
+			zabbix_log(LOG_LEVEL_DEBUG, "Adding the file [%s] to logfiles.", logfile_candidate);
 			add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, find_data.name, file_buf.st_mtime);
 		}
 		else
@@ -507,14 +483,13 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 	zabbix_log(LOG_LEVEL_DEBUG, "We are in the *nix directory reading cycle.");
 	while (NULL != (d_ent = readdir(dir)))
 	{
-		logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%c%s", directory, PATH_SEPARATOR, d_ent->d_name);
+		logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, d_ent->d_name);
+
 		if (-1 == zbx_stat(logfile_candidate, &file_buf) || !S_ISREG(file_buf.st_mode))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot process read entry [%s].", logfile_candidate);
-			continue;
 		}
-
-		if (NULL != zbx_regexp_match(d_ent->d_name, format, &length))
+		else if (NULL != zbx_regexp_match(d_ent->d_name, format, &length))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Adding the file [%s] to logfiles.", logfile_candidate);
 			add_logfile(&logfiles, &logfiles_alloc, &logfiles_num, d_ent->d_name, file_buf.st_mtime);
@@ -564,10 +539,10 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 	/* processing matched or moving to the newer one and repeating the cycle */
 	for ( ; i < logfiles_num; i++)
 	{
-		logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%c%s", directory, PATH_SEPARATOR, logfiles[i]);
+		logfile_candidate = zbx_dsprintf(logfile_candidate, "%s%s", directory, logfiles[i].filename);
 		if (0 != zbx_stat(logfile_candidate, &file_buf))/* situation could have changed */
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot open [%s]. Error: [%s]", logfile_candidate, strerror(errno));
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot stat [%s]. Error: [%s]", logfile_candidate, strerror(errno));
 			break;/* must return, situation could have changed */
 		}
 		*mtime = file_buf.st_mtime;/* must contain the latest mtime as possible */
@@ -577,7 +552,7 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 		}
 		if (-1 == (fd = zbx_open(logfile_candidate, O_RDONLY)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot open [%s] [%s]", logfile_candidate, strerror(errno));
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot open [%s]. Error: [%s]", logfile_candidate, strerror(errno));
 			break;/* must return, situation could have changed */
 		}
 		if ((off_t)-1 != lseek(fd, (off_t)*lastlogsize, SEEK_SET))
@@ -677,7 +652,6 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
  *    This function allocates memory for 'value', because use zbx_free.       *
  *    Return SUCCEED and NULL value if end of file received.                  *
  *                                                                            *
- *                                                                            *
  ******************************************************************************/
 int	process_log(char *filename, long *lastlogsize, char **value, const char *encoding)
 {
@@ -696,7 +670,7 @@ int	process_log(char *filename, long *lastlogsize, char **value, const char *enc
 	/* Handling of file shrinking */
 	if (0 != zbx_stat(filename, &buf))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot open [%s] [%s]", filename, strerror(errno));
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot stat [%s] [%s]", filename, strerror(errno));
 		return ret;
 	}
 
