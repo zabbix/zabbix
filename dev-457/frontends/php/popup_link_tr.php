@@ -69,9 +69,11 @@ include_once('include/page_header.php');
 			foreach($dbTriggers as $tnum => $trigger){
 				$host = reset($trigger['hosts']);
 
-//				$triggers[$trigger['triggerid']] = $host['host'].':'.expand_trigger_description_by_data($trigger);
-				$triggers[$trigger['triggerid']] = expand_trigger_description_by_data($trigger);
+				$triggers[$trigger['triggerid']] = $host['host'].':'.expand_trigger_description_by_data($trigger);
+//				$triggers[$trigger['triggerid']] = expand_trigger_description_by_data($trigger);
 			}
+
+			natsort($triggers);
 		}
 
 		$script = 'addLinkTriggers('.zbx_jsvalue($_REQUEST['mapid']).','.
