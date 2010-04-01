@@ -1021,7 +1021,7 @@ class zbxXML{
 									$item_applications = array_merge($item_applications, $current_application);
 								}
 								else{
-									$applications_to_add = array_merge($applications_to_add, $application_db);
+									$applications_to_add[] = $application_db;
 								}
 							}
 
