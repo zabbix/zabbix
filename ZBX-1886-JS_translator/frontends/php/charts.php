@@ -26,7 +26,7 @@ require_once('include/graphs.inc.php');
 $page['title'] = 'S_CUSTOM_GRAPHS';
 $page['file'] = 'charts.php';
 $page['hist_arg'] = array('hostid','groupid','graphid');
-$page['scripts'] = array('scriptaculous/effects.js', 'scriptaculous/dragdrop.js','class.calendar.js','gtlc.js');
+$page['scripts'] = array('effects.js', 'dragdrop.js','class.calendar.js','gtlc.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 

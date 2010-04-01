@@ -26,7 +26,7 @@ require_once('include/forms.inc.php');
 
 $page['title'] = 'S_CONFIGURATION_OF_ITEMS';
 $page['file'] = 'items.php';
-$page['scripts'] = array('scriptaculous/effects.js');
+$page['scripts'] = array('effects.js');
 $page['hist_arg'] = array();
 
 include_once('include/page_header.php');

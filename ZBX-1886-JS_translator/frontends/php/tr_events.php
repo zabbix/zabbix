@@ -30,7 +30,7 @@
 	$page['title']		= 'S_EVENT_DETAILS';
 	$page['file']		= 'tr_events.php';
 	$page['hist_arg'] = array('triggerid', 'eventid');
-	$page['scripts'] = array('class.calendar.js', 'scriptaculous/effects.js');
+	$page['scripts'] = array('class.calendar.js', 'effects.js');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 

@@ -26,7 +26,7 @@ require_once('include/graphs.inc.php');
 $page['file']	= 'history.php';
 $page['title']	= 'S_HISTORY';
 $page['hist_arg'] = array('itemid', 'hostid', 'grouid', 'graphid', 'period', 'dec', 'inc', 'left', 'right', 'stime');
-$page['scripts'] = array('scriptaculous/effects.js','scriptaculous/dragdrop.js','class.calendar.js','gtlc.js');
+$page['scripts'] = array('effects.js','dragdrop.js','class.calendar.js','gtlc.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
