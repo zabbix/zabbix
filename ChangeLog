@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2254] added update time for monitorin triggers screen (Vedmak)
  - [ZBX-1886] added js translations (Vedmak)
  - [ZBX-2245] added missing functions in trigger expression builder (Vedmak)
  - [ZBX-2190] fixed trigger expression check for syntax (AM)
