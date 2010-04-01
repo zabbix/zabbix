@@ -825,13 +825,6 @@ $thid = get_request('hostid', 0);
 		$goButton = new CButton('goButton', S_GO);
 		$goButton->setAttribute('id', 'goButton');
 
-		$jsLocale = array(
-			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTED'
-		);
-
-		zbx_addJSLocale($jsLocale);
-
 		zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
 
 		$footer = get_table_header(array($goBox, $goButton));

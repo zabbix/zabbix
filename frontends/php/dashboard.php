@@ -456,13 +456,6 @@ include_once('include/page_header.php');
 	$dashboard_wdgt->addItem($fav_form);
 	$dashboard_wdgt->show();
 
-	$jsLocale = array(
-		'S_CLOSE',
-		'S_NO_ELEMENTS_SELECTED'
-	);
-
-	zbx_addJSLocale($jsLocale);
-
 	$jsmenu = new CPUMenu(null,170);
 	$jsmenu->InsertJavaScript();
 

@@ -335,13 +335,13 @@ frontends/php/js/gtlc.js -text
 frontends/php/js/main.js -text
 frontends/php/js/menu.js -text
 frontends/php/js/prototype.js -text
-frontends/php/js/scriptaculous.js -text
 frontends/php/js/scriptaculous/builder.js -text
 frontends/php/js/scriptaculous/controls.js -text
 frontends/php/js/scriptaculous/dragdrop.js -text
 frontends/php/js/scriptaculous/effects.js -text
 frontends/php/js/scriptaculous/slider.js -text
 frontends/php/js/scriptaculous/sound.js -text
+frontends/php/jsLoader.php -text
 frontends/php/locales.php -text
 frontends/php/maintenance.php -text
 frontends/php/popup_bitem.php -text

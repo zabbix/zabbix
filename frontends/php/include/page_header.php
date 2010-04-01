@@ -144,19 +144,17 @@
 	if($page['file'] == 'sysmap.php')
 		print('<link rel="stylesheet" type="text/css" href="imgstore.php?css=1&output=css" />');
 ?>
-<script type="text/javascript" src="js/prototype.js"></script>
-<script type="text/javascript" src="js/common.js"></script>
 <script type="text/javascript">	var PHP_TZ_OFFSET = <?php echo date('Z'); ?>;</script>
-<script type="text/javascript" src="js/class.cdate.js"></script>
-<script type="text/javascript" src="js/class.cookie.js"></script>
-<script type="text/javascript" src="js/class.curl.js"></script>
-<script type="text/javascript" src="js/main.js"></script>
-<script type="text/javascript" src="js/functions.js"></script>
 <?php
+
+	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&lang='.$USER_DETAILS['lang'];
+	print('<script type="text/javascript" src="'.$path.'"></script>'."\n");
+
 	if(isset($page['scripts']) && is_array($page['scripts'])){
 		foreach($page['scripts'] as $id => $script){
-			print('    <script type="text/javascript" src="js/'.$script.'"></script>'."\n");
+			$path .= '&files[]='.$script;
 		}
+		print('<script type="text/javascript" src="'.$path.'"></script>'."\n");
 	}
 ?>
 </head>
