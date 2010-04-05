@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-1357] update Brazilian Portuguese translation; thanks to edson (Richlv)
  - [ZBX-2254] added update time for monitorin triggers screen (Vedmak)
  - [ZBX-1886] added js translations (Vedmak)
  - [ZBX-2245] added missing functions in trigger expression builder (Vedmak)
