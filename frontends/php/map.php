@@ -173,6 +173,7 @@ include_once('include/page_header.php');
 		$color = convertColor($im,$link['color']);
 
 		$linktriggers = $link['linktriggers'];
+		order_result($linktriggers, 'triggerid');
 		if(!empty($linktriggers)){
 			$max_severity=0;
 			$options = array();

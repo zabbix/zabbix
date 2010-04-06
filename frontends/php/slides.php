@@ -19,23 +19,19 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/graphs.inc.php');
-	require_once('include/screens.inc.php');
-	require_once('include/blocks.inc.php');
+require_once('include/config.inc.php');
+require_once('include/graphs.inc.php');
+require_once('include/screens.inc.php');
+require_once('include/blocks.inc.php');
 
-	$page['title'] = 'S_CUSTOM_SCREENS';
-	$page['file'] = 'slides.php';
-	$page['hist_arg'] = array('elementid');
-	$page['scripts'] = array('effects.js','dragdrop.js','class.pmaster.js','class.calendar.js','gtlc.js');
+$page['title'] = 'S_CUSTOM_SCREENS';
+$page['file'] = 'slides.php';
+$page['hist_arg'] = array('elementid');
+$page['scripts'] = array('effects.js','dragdrop.js','class.pmaster.js','class.calendar.js','gtlc.js');
 
-	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-	if(PAGE_TYPE_HTML == $page['type']){
-		define('ZBX_PAGE_DO_REFRESH', 1);
-	}
-
-	include_once('include/page_header.php');
+include_once('include/page_header.php');
 
 ?>
 <?php
@@ -54,12 +50,13 @@
 		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN('0,1,2'),		NULL),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NULL,			NULL),
 		'favcnt'=>		array(T_ZBX_INT, O_OPT,	null,	null,			null),
 		'pmasterid'=>	array(T_ZBX_STR, O_OPT,	P_SYS,	null,			NULL),
 
-		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),NULL),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("hat"=={favobj})'),
+		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove','refresh','flop'"),	NULL),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({action}) && ("flop"=={action})'),
 		'upd_counter'=> array(T_ZBX_INT, O_OPT, P_ACT,  null,		null),
 	);
 
@@ -100,8 +97,8 @@
 			}
 		}
 
-		if('refresh' == $_REQUEST['favobj']){
-			switch($_REQUEST['favid']){
+		if('hat' == $_REQUEST['favobj']){
+			switch($_REQUEST['favref']){
 				case 'hat_slides':
 					$elementid = get_request('elementid');
 
@@ -122,8 +119,8 @@
 
 						$element->show();
 
-						$script = get_update_doll_script('mainpage', $_REQUEST['favid'], 'frequency', $refresh)."\n";
-						$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'restartDoll')."\n";
+						$script = get_update_doll_script('mainpage', $_REQUEST['favobj'], 'frequency', $refresh)."\n";
+						$script.= get_update_doll_script('mainpage', $_REQUEST['favobj'], 'restartDoll')."\n";
 						$script.= 'timeControl.processObjects();';
 						insert_js($script);
 					}
@@ -136,22 +133,22 @@
 		}
 
 		if('set_rf_rate' == $_REQUEST['favobj']){
-			if(str_in_array($_REQUEST['favid'],array('hat_slides'))){
+			if(str_in_array($_REQUEST['favref'],array('hat_slides'))){
 				$elementid = $_REQUEST['elementid'];
 
 				CProfile::update('web.slides.rf_rate.hat_slides', $_REQUEST['favcnt'], PROFILE_TYPE_INT, $elementid);
 
-				$script= get_update_doll_script('mainpage', $_REQUEST['favid'], 'frequency', $_REQUEST['favcnt'])."\n";
-				$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'stopDoll')."\n";
-				$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'startDoll')."\n";
+				$script= get_update_doll_script('mainpage', $_REQUEST['favref'], 'frequency', $_REQUEST['favcnt'])."\n";
+				$script.= get_update_doll_script('mainpage', $_REQUEST['favref'], 'stopDoll')."\n";
+				$script.= get_update_doll_script('mainpage', $_REQUEST['favref'], 'startDoll')."\n";
 
 
 				$menu = array();
 				$submenu = array();
 
-				make_refresh_menu('mainpage', $_REQUEST['favid'],$_REQUEST['favcnt'],array('elementid'=> $elementid),$menu,$submenu);
+				make_refresh_menu('mainpage', $_REQUEST['favref'],$_REQUEST['favcnt'],array('elementid'=> $elementid),$menu,$submenu);
 
-				$script.= 'page_menu["menu_'.$_REQUEST['favid'].'"] = '.zbx_jsvalue($menu['menu_'.$_REQUEST['favid']]).';'."\n";
+				$script.= 'page_menu["menu_'.$_REQUEST['favref'].'"] = '.zbx_jsvalue($menu['menu_'.$_REQUEST['favref']]).';'."\n";
 				
 				print($script);
 			}
