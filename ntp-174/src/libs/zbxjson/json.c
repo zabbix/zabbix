@@ -366,7 +366,7 @@ int	zbx_json_close(struct zbx_json *j)
  * Parameters:                                                                *
  *                                                                            *
  * Return value: position of right bracket                                    *
- *               NULL - an error occured                                      *
+ *               NULL - an error occurred                                     *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -424,8 +424,8 @@ static const char	*__zbx_json_rbracket(const char *p)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: SUCCESS - processed succesfully                              *
- *               FAIL - an error occured                                      *
+ * Return value: SUCCESS - processed successfully                             *
+ *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -709,8 +709,8 @@ int	zbx_json_value_by_name(struct zbx_json_parse *jp, const char *name, char *st
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: SUCCESS - processed succesfully                              *
- *               FAIL - an error occured                                      *
+ * Return value: SUCCESS - processed successfully                             *
+ *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
@@ -738,8 +738,8 @@ int	zbx_json_brackets_open(const char *p, struct zbx_json_parse *jp)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: SUCCESS - processed succesfully                              *
- *               FAIL - an error occured                                      *
+ * Return value: SUCCESS - processed successfully                             *
+ *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *

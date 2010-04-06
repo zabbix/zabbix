@@ -168,7 +168,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, long l
  *                                                                            *
  * Parameters: str - NULL terminated string received from server              *
  *                                                                            *
- * Return value: returns SUCCEED on succesful parsing,                        *
+ * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on an incorrect format of string                        *
  *                                                                            *
  * Author: Eugene Grigorjev, Alexei Vladishev (new json protocol)             *
@@ -336,7 +336,7 @@ json_error:
  * Parameters: host - IP or Hostname of ZABBIX server                         *
  *             port - port of ZABBIX server                                   *
  *                                                                            *
- * Return value: returns SUCCEED on succesful parsing,                        *
+ * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on other cases                                          *
  *                                                                            *
  * Author: Eugene Grigorjev, Alexei Vladishev (new json protocol)             *
@@ -392,7 +392,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
  * Parameters: result SUCCEED or FAIL                                         *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occured                                     *
+ *                FAIL - an error occurred                                    *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -445,7 +445,7 @@ static int	check_response(char *response)
  * Parameters: host - IP or Hostname of ZABBIX server                         *
  *             port - port number                                             *
  *                                                                            *
- * Return value: returns SUCCEED on succesful parsing,                        *
+ * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on other cases                                          *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -587,7 +587,7 @@ ret:
  *             severity - severity of logged data sources                     *
  *             persistent - do not overwrite old values                       *
  *                                                                            *
- * Return value: returns SUCCEED on succesful parsing,                        *
+ * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on other cases                                          *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
