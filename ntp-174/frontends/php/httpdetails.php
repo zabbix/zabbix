@@ -27,7 +27,7 @@
 	$page['title'] = 'S_DETAILS_OF_SCENARIO';
 	$page['file'] = 'httpdetails.php';
 	$page['hist_arg'] = array('httptestid');
-	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.calendar.js','gtlc.js');
+	$page['scripts'] = array('effects.js','dragdrop.js','class.calendar.js','gtlc.js');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 

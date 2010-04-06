@@ -26,7 +26,7 @@ require_once('include/forms.inc.php');
 
 $page['title'] = 'S_CONFIGURATION_OF_ITEMS';
 $page['file'] = 'items.php';
-$page['scripts'] = array('scriptaculous.js?load=effects');
+$page['scripts'] = array('effects.js');
 $page['hist_arg'] = array();
 
 include_once('include/page_header.php');
@@ -787,11 +787,13 @@ include_once('include/page_header.php');
 	}
 	else{
 		$logtype['log']=0;
-		$logtype['eventlog']=1;
-		$logtype['snmptraps']=2;
+		$logtype['logrt']=1;
+		$logtype['eventlog']=2;
+		$logtype['snmptraps']=3;
 		$dbkey[0]='log[%';
-		$dbkey[1]='eventlog[%';
-		$dbkey[2]='snmptraps';
+		$dbkey[1]='logrt[%';
+		$dbkey[2]='eventlog[%';
+		$dbkey[3]='snmptraps';
 
 		$show_host = true;
 
@@ -1096,8 +1098,8 @@ include_once('include/page_header.php');
 			}
 //-------
 
-			if(preg_match('/^(log\[.*\]|eventlog\[.*\]|snmptraps).*$/',$item['key_'],$matchkeys)){
-				preg_match('/(log|eventlog|snmptraps)/', $matchkeys[0], $matchkey);
+			if(preg_match('/^(log|logrt|eventlog|snmptraps)(\[.*\])?$/',$item['key_'],$matchkey)){
+				//preg_match('/(log|logrt|eventlog|snmptraps)/', $matchkeys[0], $matchkey);
 				$ltype = $logtype[$matchkey[1]];
 
 				$triggers_flag = false;
@@ -1175,13 +1177,6 @@ include_once('include/page_header.php');
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
-
-		$jsLocale = array(
-			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTED'
-		);
-
-		zbx_addJSLocale($jsLocale);
 
 		zbx_add_post_js('chkbxRange.pageGoName = "group_itemid";');
 

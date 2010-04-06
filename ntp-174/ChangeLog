@@ -1,11 +1,32 @@
-Changes for 1.8.2
+Changes for 1.8.3
 
  - [ZBX-2275] fixed loss of the log-data if Zabbix server is unavailable
+ - [ZBX-2258] fixed applications import (Vedmak)
+ - [ZBX-1357] update Brazilian Portuguese translation; thanks to edson (Richlv)
+ - [ZBX-2254] added update time for monitorin triggers screen (Vedmak)
+ - [ZBX-1886] added js translations (Vedmak)
+ - [ZBX-2245] added missing functions in trigger expression builder (Vedmak)
+ - [ZBX-2190] fixed trigger expression check for syntax (AM)
+ - [ZBX-2242] fixed agent crash on HP-UX when processing logrt[] items (asaveljevs,Sasha)
+ - [ZBXNEXT-288] improved server performance by not storing function lastvalue in database (asaveljevs,Sasha)
+ - [ZBX-1753] added permission check for trigger sound notifications (Aly)
+ - [ZBX-2246] added trigger wizard for logrt item (AM)
+ - [ZBX-2241] fixed graph X axis for big periods (Aly)
+ - [ZBX-2241] fixed text collide in graphs (Aly)
+ - [ZBX-2232] fixed bug with last event duration time in event details (AM)
+ - [ZBX-2243] fixed bug when cannot select template for item filter by host (Vedmak)
+ - [ZBX-2240] fixed "undefined index" in monitoring latest data (Vedmak)
+ - [ZBX-954] fix minor typos (Richlv)
+
+Changes for 1.8.2
+
+ - [ZBX-2084] fixed JSON decoding class, which didn't work due to PCRE backtrace limit, enabled native PHP JSON functions, rewrote code with sockets (AM)
+ - [ZBX-2239] fixed mutex (un)locking so that zabbix_server does not become forever defunct when killed (asaveljevs)
+ - [ZBX-1983] fixed port validation in host agent port, IPMI port and in discovery checks ports (now supports port ranges like "21-80,465") (AM)
  - [ZBX-2228] fixed compilation under FreeBSD with enabled LDAP (Sasha)
  - [ZBX-2236] fixed processing of Telnet checks by Zabbix proxy (Sasha)
  - [ZBX-2234] fixed icon for mass open action in status of triggers (Aly)
  - [ZBX-2233] fixed processing of action condition 'Trigger <>' (Sasha)
- - [ZBX-1983] fixed port validation in host agent port, ipmi port and in discovery checks ports (now supports for ports ranges like "21-80,465") (AM)
  - [ZBX-1357] updated French translation; thanks to alixen (Richlv)
  - [ZBX-2048] fixed sorting in screens dropdown (Vedmak)
  - [ZBX-2221] fixed expanding/collapsing categories in "Latest Data" (Aly)
@@ -110,7 +131,7 @@ Changes for 1.8.2
  - [ZBX-3] fixed logging into syslog, Zabbix log levels are properly linked to syslog levels (Dmitry)
  - [ZBX-2022] fixed link colour picker in maps in IE7 (Vedmak)
  - [ZBX-1968] fixed error in log item history in IE8 (Vedmak)
- - [ZBX-2020] added requirements check for PHP input_max_time (Vedmak)
+ - [ZBX-2020] added requirements check for PHP max_input_time (Vedmak)
  - [ZBX-1958] fixed problem with a lot of digits in float values (Vedmak)
  - [ZBX-1853] fixed template/host full clone with triggers with dependencies (Vedmak)
  - [ZBX-1999] fixed bug when cannot create simple check item with macro in parameters (Vedmak)

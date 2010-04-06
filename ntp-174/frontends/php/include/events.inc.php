@@ -293,6 +293,11 @@ function make_small_eventlist($eventid, $trigger_data){
 		$lclock = $clock;
 		$clock = $event['clock'];
 		$duration = zbx_date2age($lclock, $clock);
+		if($curevent['eventid'] == $event['eventid'] && ($nextevent = get_next_event($event))) {
+			$duration = zbx_date2age($nextevent['clock'], $clock);
+		}else if($curevent['eventid'] == $event['eventid']) {
+			$duration = zbx_date2age($clock);
+		}
 
 		$value = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value']));
 

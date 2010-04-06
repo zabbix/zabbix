@@ -49,6 +49,10 @@
 		return "({".$var."}>=".$min."&&{".$var."}<=".$max.")&&";
 	}
 
+	function REGEXP($regexp,$var=NULL){
+		return "(preg_match(\"".$regexp."\", {".$var."}))&&";
+	}
+
 	function GT($value,$var=''){
 		return "({".$var."}>=".$value.")&&";
 	}

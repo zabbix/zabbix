@@ -614,6 +614,7 @@
 	'S_SHOW_TRIGGERS'=>			'Show triggers',
 	'S_3D_VIEW'=>				'3D view',
 	'S_LEGEND'=>				'Legend',
+	'S_SHOW_LEGEND'=>			'Show legend',
 	'S_GRAPH_SUM'=>				'Graph sum',
 	'S_GRAPH_ITEM'=>			'Graph item',
 	'S_REQUIRED_ITEMS_FOR_GRAPH'=>		'Items required for graph',
@@ -1139,6 +1140,15 @@
 	'S_MAP_UPDATED'=>				'Network map updated',
 	'S_CANNOT_UPDATE_MAP'=>			'Cannot update network map',
 	'S_EXPAND_SINGLE_PROBLEM'=>		'Expand single problem',
+	'S_GET_SELEMENTS_FAILED'=>			'Get selected elements FAILED.',
+	'S_TWO_ELEMENTS_SHOULD_BE_SELECTED'=>		'Two elements should be selected',
+	'S_DELETE_SELECTED_ELEMENTS_Q'=>		'Delete selected elements?',
+	'S_PLEASE_SELECT_TWO_ELEMENTS'=>		'Please select two elements',
+	'S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'=>	'Delete Links between selected elements?',
+	'S_NO_LINKS'=>					'No links',
+	'S_WRONG_TYPE_OF_ARGUMENTS_PASSED_TO_FUNCTION'=>'Wrong type of arguments passed to function',
+	'S_NEW_ELEMENT'=>				'New element',
+	'S_SET_TRIGGER'=>				'Set trigger',
 
 	'S_BOTTOM'=>					'Bottom',
 	'S_TOP'=>						'Top',
@@ -1707,6 +1717,15 @@
 	'S_CLOSE'=>				'Close',
 	'S_CONNECT_TO_SERVER_ERROR'=>		'Cannot connect to Zabbix server',
 	'S_DELETE_SELECTED_SCRIPTS_Q'=>		'Delete selected scripts?',
+	
+	'S_SCRIPT_ERROR'=>			'SCRIPT ERROR',
+	'S_SCRIPT_ERROR_DESCRIPTION'=>		'Error Description',
+	'S_SCRIPT_SEND_ERROR'=>			'Can\'t send command, check connection',
+	'S_SCRIPT_READ_ERROR'=>			'Can\'t read script response, check connection',
+	'S_SCRIPT_TIMEOUT_ERROR'=>		'Defined in "include/defines.inc.php" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value',
+	'S_SCRIPT_BYTES_LIMIT_ERROR'=>		'Defined in "include/defines.inc.php" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value',
+	'S_SCRIPT_UNKNOWN_ERROR'=>		'Unknown error happened reading script answer, please report to the developers',
+	'S_SCRIPT_ERROR_EMPTY_RESPONSE' =>	'Empty response received',
 
 //	audit.php
 	'S_AUDIT'=>				'Audit',
@@ -1789,7 +1808,7 @@
 
 //  tr_testexpr.php
 	'S_TEST_DATA'=>		'Test data',
-	'S_ITEM_FUNCTION'=>	'Item / Function',
+	'S_ITEM_SLASH_FUNCTION'=>	'Item / Function',
 	'S_RESULT_TYPE'=>	'Result type',
 	'S_COMBINED_RESULT'=>	'Combined result',
 
@@ -2086,8 +2105,37 @@
 	'S_INCORRECT_DESCRIPTION'=>		'Incorrect description',
 	'S_CANT_FORMAT_TREE'=>			'Can\'t format Tree',
 	'S_NO_PERMISSION'=>				'You do not have permission to perform this operation',
-	'S_NO_PERMISSIONS_FOR_SCREEN'=> 'No permissions for screen',
+	'S_NO_PERMISSIONS_FOR_SCREEN'=>	'No permissions for screen',
 	'S_NO_PERMISSIONS_FOR_MAP'=>	'No permissions for map',
-	'S_XML_FILE_CONTAINS_ERRORS'=>	'XML file contains errors'
-	);
+	'S_XML_FILE_CONTAINS_ERRORS'=>	'XML file contains errors',
+
+//	class.calendar.js
+	'S_MONDAY_SHORT_BIG'=>		'M',
+	'S_TUESDAY_SHORT_BIG'=>		'T',
+	'S_WEDNESDAY_SHORT_BIG'=>	'W',
+	'S_THURSDAY_SHORT_BIG'=>	'T',
+	'S_FRIDAY_SHORT_BIG'=>		'F',
+	'S_SATURDAY_SHORT_BIG'=>	'S',
+	'S_SUNDAY_SHORT_BIG'=>		'S',
+
+//	gtlc.js
+	'S_ZOOM'=>			'Zoom',
+	'S_FIXED_SMALL'=>		'fixed',
+	'S_DYNAMIC_SMALL'=>		'dynamic',
+	'S_NOW_SMALL'=>			'now',
+
+//	functions.js
+	'S_CREATE_LOG_TRIGGER'=>			'Create Log Trigger',
+	'DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q'=>	'Do you replace the conditional expression?',
+	'S_ADD_SERVICE'=>				'Add Service',
+	'S_EDIT_SERVICE'=>				'Edit Service',
+	'S_DELETE_SERVICE'=>				'Delete Service',
+	'S_DELETE_SELECTED_SERVICES_Q'=>		'Delete selected services?',
+
+//	js.inc.php
+	'S_CANNOT_FIND_OBJECTS_WITH_NAME'=>	'Can not find objects with name',
+	'S_CANNOT_CREATE_NEW_ELEMENT'=>		'Can not create new element',
+	'S_OTHER_SMALL'=>			'other',
+	
+);
 ?>

@@ -86,7 +86,6 @@ ZBX_DC_HISTORY
 	int		mtime;
 	unsigned char	keep_history;
 	unsigned char	keep_trends;
-	int		functions;
 };
 
 ZBX_DC_TREND

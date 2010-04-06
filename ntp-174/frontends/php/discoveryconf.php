@@ -51,8 +51,8 @@ include_once('include/page_header.php');
 			IN(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2, SVC_SNMPv3, SVC_ICMPPING)),
 										'isset({add_check})'),
 
-		'new_check_ports'=>	array(T_ZBX_PORTS,	O_OPT,  null,	null,	'isset({add_check})'),
-		'new_check_key'=>	array(T_ZBX_STR,	O_OPT,  null,	null,		'isset({add_check})'),
+		'new_check_ports'=>	array(T_ZBX_PORTS,	O_OPT,  null,	"validate_port_list({})&&",	'isset({add_check})'),
+		'new_check_key'=>	array(T_ZBX_STR,	O_OPT,  null,	null,	'isset({add_check})'),
 		'new_check_snmp_community'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({add_check})'),
 		'new_check_snmpv3_securitylevel'=>	array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2'),	'isset({add_check})'),
 		'new_check_snmpv3_securityname'=>	array(T_ZBX_STR, O_OPT,  null,  null,		'isset({add_check})'),
@@ -290,13 +290,6 @@ include_once('include/page_header.php');
 		// goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO.' (0)');
 		$goButton->setAttribute('id','goButton');
-
-		$jsLocale = array(
-			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTED'
-		);
-
-		zbx_addJSLocale($jsLocale);
 
 		zbx_add_post_js('chkbxRange.pageGoName = "g_druleid";');
 
