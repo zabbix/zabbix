@@ -150,7 +150,7 @@
 	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&lang='.$USER_DETAILS['lang'];
 	print('<script type="text/javascript" src="'.$path.'"></script>'."\n");
 
-	if(isset($page['scripts']) && is_array($page['scripts'])){
+	if(isset($page['scripts']) && is_array($page['scripts']) && !empty($page['scripts'])){
 		foreach($page['scripts'] as $id => $script){
 			$path .= '&files[]='.$script;
 		}
