@@ -56,6 +56,7 @@ include_once('include/page_header.php');
 		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove','refresh','flop'"),	NULL),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({action}) && ("flop"=={action})'),
 	);
+
 	check_fields($fields);
 
 // FILTER
