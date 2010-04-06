@@ -1140,7 +1140,7 @@
 	'S_MAP_UPDATED'=>				'Network map updated',
 	'S_CANNOT_UPDATE_MAP'=>			'Cannot update network map',
 	'S_EXPAND_SINGLE_PROBLEM'=>		'Expand single problem',
-	'S_GET_SELEMENTS_FAILED'=>			'Get selements FAILED.',
+	'S_GET_SELEMENTS_FAILED'=>			'Get selected elements FAILED.',
 	'S_TWO_ELEMENTS_SHOULD_BE_SELECTED'=>		'Two elements should be selected',
 	'S_DELETE_SELECTED_ELEMENTS_Q'=>		'Delete selected elements?',
 	'S_PLEASE_SELECT_TWO_ELEMENTS'=>		'Please select two elements',
