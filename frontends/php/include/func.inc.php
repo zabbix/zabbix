@@ -165,8 +165,9 @@ function format_doll_init($doll){
 
 	$obj['url'].= (zbx_empty($obj['url'])?'?':'&').'output=html';
 
-	$obj['params']['favobj'] = 'refresh';
-	$obj['params']['favid'] = $doll['id'];
+	$obj['params']['favobj'] = 'hat';
+	$obj['params']['favref'] = $doll['id'];
+	$obj['params']['action'] = 'refresh';
 
 return $obj;
 }

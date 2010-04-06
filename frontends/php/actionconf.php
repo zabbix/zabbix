@@ -86,7 +86,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	null,	null,	null),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL, NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY, 'isset({favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY, 'isset({favobj})'),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY, 'isset({favobj}) && ("filter"=={favobj})'),
 	);
 

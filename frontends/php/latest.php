@@ -61,8 +61,8 @@ include_once('include/page_header.php');
 		'filter_set'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
 
 //ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			'isset({favid})'),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 	);
 
@@ -96,7 +96,7 @@ include_once('include/page_header.php');
 		}
 /*
 		else if('refresh' == $_REQUEST['favobj']){
-			switch($_REQUEST['favid']){
+			switch($_REQUEST['favref']){
 				case ZBX_PAGE_MAIN_HAT:
 					include_once('blocks/latest.page.php');
 					break;

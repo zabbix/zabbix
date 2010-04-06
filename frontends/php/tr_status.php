@@ -101,8 +101,8 @@ include_once('include/page_header.php');
 		'show_details'=>		array(T_ZBX_INT, O_OPT,  	null,	null, 	null),
 		'txt_select'=>			array(T_ZBX_STR, O_OPT,  	null,	null, 	null),
 //ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			'isset({favid})'),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 	);
 
