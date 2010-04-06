@@ -3175,6 +3175,7 @@ linkForm_addLinktrigger: function(linktrigger){
 
 	e_select_10.setAttribute('id',"link_triggers["+triggerid+"][drawtype]");
 	e_select_10.setAttribute('name', 'link_triggers['+triggerid+'][drawtype]');
+	e_select_10.className = 'biginput';
 // items
 	var e_option_11 = document.createElement('option');
 	e_option_11.setAttribute('value', 0);
