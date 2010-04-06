@@ -1015,16 +1015,13 @@ class zbxXML{
 									if(empty($current_application)){
 										throw new APIException(1, 'No permission for Application ['.$application_db['name'].']');
 									}
-									else{
-										$current_application = reset($current_application);
-									}
 								}
 								
 								if($current_application){
 									$item_applications = array_merge($item_applications, $current_application);
 								}
 								else{
-									$applications_to_add = array_merge($applications_to_add, $application_db);
+									$applications_to_add[] = $application_db;
 								}
 							}
 
