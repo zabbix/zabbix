@@ -75,12 +75,15 @@ static ssize_t	telnet_socket_read(int socket_fd, void *buf, size_t count)
 
 		if (errno == EAGAIN)
 		{
-			while (0 == (rc = telnet_waitsocket(socket_fd, WAIT_READ)))
-				;
+			/* Wait a bit. If there is still an error or there is no error, but still */
+			/* no input available, we assume the other side has nothing more to say.  */
+			if (0 >= (rc = telnet_waitsocket(socket_fd, WAIT_READ)))
+				break;
+
+			continue;
 		}
 
-		if (-1 == rc)
-			break;
+		break;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, rc);
@@ -101,12 +104,11 @@ static ssize_t	telnet_socket_write(int socket_fd, const void *buf, size_t count)
 
 		if (errno == EAGAIN)
 		{
-			while (0 == (rc = telnet_waitsocket(socket_fd, WAIT_WRITE)))
-				;
+			telnet_waitsocket(socket_fd, WAIT_WRITE);
+			continue;
 		}
 
-		if (-1 == rc)
-			break;
+		break;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, rc);
@@ -131,7 +133,7 @@ static ssize_t	telnet_read(int socket_fd, char *buf, size_t *buf_left, size_t *b
 		if (1 != (rc = telnet_socket_read(socket_fd, &c1, 1)))
 			break;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() c1:%x", __function_name, c1);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() c1:[%x=%c]", __function_name, c1, isprint(c1) ? c1 : ' ');
 
 		switch (c1) {
 		case 255:	/* Interpret as Command (IAC) */
