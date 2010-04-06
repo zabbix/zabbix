@@ -37,11 +37,11 @@ include_once('include/page_header.php');
 
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 		'favcnt'=>		array(T_ZBX_INT, O_OPT,	null,	null,			NULL),
 
-		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),NULL),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("hat"=={favobj})'),
+		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'flop','refresh'"),NULL),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({action}) && ("flop"=={action})'),
 	);
 
 	check_fields($fields);
@@ -51,19 +51,20 @@ include_once('include/page_header.php');
 		$_REQUEST['pmasterid'] = get_request('pmasterid','mainpage');
 
 		if('hat' == $_REQUEST['favobj']){
-			CProfile::update('web.dashboard.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
-		}
-
-		if('refresh' == $_REQUEST['favobj']){
-			switch($_REQUEST['favid']){
-				case 'hat_syssum':
-					$syssum = make_system_summary();
-					$syssum->show();
-					break;
-				case 'hat_stszbx':
-					$stszbx = make_status_of_zbx();
-					$stszbx->show();
-					break;
+			if('flop' == $_REQUEST['action']){
+				CProfile::update('web.dashboard.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			}
+			else if('refresh' == $_REQUEST['action']){
+				switch($_REQUEST['favref']){
+					case 'hat_syssum':
+						$syssum = make_system_summary();
+						$syssum->show();
+						break;
+					case 'hat_stszbx':
+						$stszbx = make_status_of_zbx();
+						$stszbx->show();
+						break;
+				}
 			}
 		}
 	}
