@@ -115,7 +115,8 @@ class CTrigger extends CZBXAPI{
 
 			'sortfield'				=> '',
 			'sortorder'				=> '',
-			'limit'					=> null
+			'limit'					=> null,
+			'limitSelects'				=> null
 		);
 
 		$options = zbx_array_merge($def_options, $options);
@@ -343,7 +344,7 @@ class CTrigger extends CZBXAPI{
 			}
 		}
 
-// extendoutput
+// output
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['triggers'] = 't.*';
 		}
@@ -562,7 +563,7 @@ class CTrigger extends CZBXAPI{
 			}
 		}
 
-COpt::memoryPick();
+Copt::memoryPick();
 		if(!is_null($options['countOutput'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
@@ -649,21 +650,47 @@ COpt::memoryPick();
 		}
 
 // Adding hosts
-		if(!is_null($options['select_hosts']) && str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+		if(!is_null($options['select_hosts'])){
+
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'templated_hosts' => 1,
-				'output' => $options['select_hosts'],
 				'triggerids' => $triggerids,
+				'templated_hosts' => 1,
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			$hosts = CHost::get($obj_params);
-			foreach($hosts as $hostid => $host){
-				$htriggers = $host['triggers'];
-				unset($host['triggers']);
-				foreach($htriggers as $num => $trigger){
-					$result[$trigger['triggerid']]['hosts'][] = $host;
+
+			if(is_array($options['select_hosts']) || str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['select_hosts'];
+				$hosts = CHost::get($obj_params);
+
+				if(!is_null($options['limitSelects'])) order_result($hosts, 'host');
+				foreach($hosts as $hostid => $host){
+					unset($hosts[$hostid]['triggers']);
+
+					foreach($host['triggers'] as $tnum => $trigger){
+						if(!is_null($options['limitSelects'])){
+							if(!isset($count[$trigger['triggerid']])) $count[$trigger['triggerid']] = 0;
+							$count[$trigger['triggerid']]++;
+
+							if($count[$trigger['triggerid']] > $options['limitSelects']) continue;
+						}
+
+						$result[$trigger['triggerid']]['hosts'][] = &$hosts[$hostid];
+					}
+				}
+			}
+			else if(API_OUTPUT_COUNT == $options['select_hosts']){
+				$obj_params['countOutput'] = 1;
+				$obj_params['groupCount'] = 1;
+
+				$hosts = CHost::get($obj_params);
+				$hosts = zbx_toHash($hosts, 'hostid');
+				foreach($result as $triggerid => $trigger){
+					if(isset($hosts[$triggerid]))
+						$result[$triggerid]['hosts'] = $hosts[$triggerid]['rowscount'];
+					else
+						$result[$triggerid]['hosts'] = 0;
 				}
 			}
 		}
