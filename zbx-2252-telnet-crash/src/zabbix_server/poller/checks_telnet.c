@@ -265,12 +265,12 @@ static void	telnet_rm_echo(char *buf, size_t *offset, const char *echo, size_t l
 
 static void	telnet_rm_prompt(const char *buf, size_t *offset)
 {
-	if (*offset == 0)
-		return;
-
-	while ((*offset)-- > 0)
-		if (buf[*offset] == '\n')
+	while (*offset > 0)
+	{
+		(*offset)--;
+		if (buf[*offset] == prompt_char)
 			break;
+	}
 }
 
 static int	telnet_login(int socket_fd, const char *username,
@@ -352,9 +352,9 @@ static int	telnet_execute(int socket_fd, const char *command,
 		AGENT_RESULT *result, const char *encoding)
 {
 	const char	*__function_name = "telnet_execute";
-	char	buf[MAX_BUF_LEN];
-	size_t	sz, offset;
-	int	rc, ret = FAIL;
+	char		buf[MAX_BUF_LEN];
+	size_t		sz, offset;
+	int		rc, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -382,6 +382,9 @@ static int	telnet_execute(int socket_fd, const char *command,
 	telnet_rm_echo(buf, &offset, command, strlen(command));
 	telnet_rm_echo(buf, &offset, "\n", 1);
 	telnet_rm_prompt(buf, &offset);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() stripped command output:'%.*s'",
+			__function_name, offset, buf);
 
 	if (MAX_BUF_LEN == offset)
 		offset--;
