@@ -236,12 +236,11 @@ if(isset($_REQUEST['sform'])){
 			$expr = preg_replace('/^\((.*)\)$/u','$1',$expr);
 
 			if(preg_match('/\([regexp|iregexp].+\)[=|#]0/U',$expr, $rr)){
-
 				$value = preg_replace('/(\(([regexp|iregexp].*)\)[=|#]0)/U','$2',$expr);
 			}
 
 			$value = preg_replace('/([=|#]0)/','',$expr);
-			$value = preg_replace('/^\((.*)\)$/u','$1',$value);
+			$value = preg_replace('/\((.*?)\)/u','$1',$value);
 
 			$expressions[$id]['value'] = trim($value);
 			$expressions[$id]['type'] = (zbx_strpos($expr,'#0',zbx_strlen($expr)-3) === false)?(REGEXP_EXCLUDE):(REGEXP_INCLUDE);
