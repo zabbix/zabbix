@@ -214,34 +214,35 @@ end:
  */
 static void	unix_eol(char *buf, size_t *offset)
 {
-	size_t	i, sz;
+	size_t	i, sz = *offset, new_offset;
 
-	if (*offset == 0)
-		return;
+	new_offset = 0;
 
-	sz = *offset - 1;
-
-	for (i = 0; i < *offset - 1; i++)
+	for (i = 0; i < sz; i++)
 	{
-		if ((buf[i] == '\r' && buf[i + 1] == '\n'))	/* CR+LF (Windows) */
+		if (i + 1 < sz && buf[i] == '\r' && buf[i + 1] == '\n')		/* CR+LF (Windows) */
 		{
-			buf[i] = '\n';	/* LF (Unix) */
-			(*offset)--; i++;
-			memmove(&buf[i], &buf[i + 1], (*offset - i) * sizeof(char));
+			buf[new_offset++] = '\n';
+			i++;
 		}
-		if (buf[i] == '\r' && buf[i + 1] == '\0')	/* CR+NUL */
+		else if (i + 1 < sz && buf[i] == '\r' && buf[i + 1] == '\0')	/* CR+NUL */
 		{
-			*offset -= 2;
-			memmove(&buf[i], &buf[i + 2], (*offset - i) * sizeof(char));
+			i++;
 		}
-		if ((buf[i] == '\n' && buf[i + 1] == '\r'))	/* LF+CR */
+		else if (i + 1 < sz && buf[i] == '\n' && buf[i + 1] == '\r')	/* LF+CR */
 		{
-			(*offset)--; i++;
-			memmove(&buf[i], &buf[i + 1], (*offset - i) * sizeof(char));
+			buf[new_offset++] = '\n';
+			i++;
 		}
-		else if (buf[i] == '\r')	/* CR */
-			buf[i] = '\n';	/* LF (Unix) */
+		else if (buf[i] == '\r')					/* CR */
+		{
+			buf[new_offset++] = '\n';
+		}
+		else
+			buf[new_offset++] = buf[i];
 	}
+
+	*offset = new_offset;
 }
 
 static char	telnet_lastchar(const char *buf, size_t offset)
