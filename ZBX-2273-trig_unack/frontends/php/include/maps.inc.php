@@ -1063,60 +1063,35 @@
 		$elements = array('hosts' => array(), 'hosts_groups' => array(), 'triggers' => array());
 
 		get_map_elements($db_element, $elements);
-
-		$elements['hosts_groups'] = array_unique($elements['hosts_groups']);
-
-		/* select all hosts linked to host groups */
-		if (!empty($elements['hosts_groups'])){
-			$db_hgroups = DBselect(
-					'select distinct hostid'.
-					' from hosts_groups'.
-					' where '.DBcondition('groupid', $elements['hosts_groups']));
-			while (NULL != ($db_hgroup = DBfetch($db_hgroups)))
-				$elements['hosts'][] = $db_hgroup['hostid'];
+		if(empty($elements['hosts_groups']) && empty($elements['hosts']) && empty($elements['triggers'])){
+			return 0;
 		}
 
-		$elements['hosts'] = array_unique($elements['hosts']);
-		$elements['triggers'] = array_unique($elements['triggers']);
+		$config = select_config();
+		$options = array(
+			'nodeids' => get_current_nodeid(),
+			'output' => API_OUTPUT_SHORTEN,
+			'monitored' => 1,
+			'skipDependent' => 1,
+			'limit' => ($config['search_limit']+1)
+		);
+		if(!empty($elements['hosts_groups'])) $options['groupids'] = array_unique($elements['hosts_groups']);
+		if(!empty($elements['hosts'])) $options['hostids'] = array_unique($elements['hosts']);
+		if(!empty($elements['triggers'])) $options['triggerids'] = array_unique($elements['triggers']);
+		$triggerids = CTrigger::get($options);
 
-/* select all triggers linked to hosts */
-		if (!empty($elements['hosts']) && !empty($elements['triggers']))
-			$cond = '('.DBcondition('h.hostid', $elements['hosts']).
-				' or '.DBcondition('t.triggerid', $elements['triggers']).')';
-		else if (!empty($elements['hosts']))
-			$cond = DBcondition('h.hostid', $elements['hosts']);
-		else if (!empty($elements['triggers']))
-			$cond = DBcondition('t.triggerid', $elements['triggers']);
-		else
-			return '0';
 
+		$options = array(
+			'count' => 1,
+			'triggerids' => zbx_objectValues($triggerids, 'triggerid'),
+			'object' => EVENT_OBJECT_TRIGGER,
+			'acknowledged' => 0,
+			'value' => TRIGGER_VALUE_TRUE,
+			'nopermissions' => 1
+		);
+		$event_count = CEvent::get($options);
 
-		$cnt = 0;
-		$sql = 'SELECT DISTINCT t.triggerid '.
-				' FROM triggers t,functions f,items i,hosts h '.
-				' WHERE t.triggerid=f.triggerid '.
-					' AND f.itemid=i.itemid '.
-					' AND i.hostid=h.hostid '.
-					' AND i.status='.ITEM_STATUS_ACTIVE.
-					' AND h.status='.HOST_STATUS_MONITORED.
-					' AND t.status='.TRIGGER_STATUS_ENABLED.
-					' AND t.value='.TRIGGER_VALUE_TRUE.
-					' AND '.$cond;
-		$db_triggers = DBselect($sql);
-		while($db_trigger = DBfetch($db_triggers)){
-			$sql = 'SELECT eventid,value,acknowledged '.
-					' FROM events'.
-					' WHERE object='.EVENT_OBJECT_TRIGGER.
-						' AND objectid='.$db_trigger['triggerid'].
-					' ORDER BY eventid DESC';
-			$db_events = DBselect($sql, 1);
-			if($db_event= DBfetch($db_events))
-				if(($db_event['value'] == TRIGGER_VALUE_TRUE) && ($db_event['acknowledged'] == 0)){
-					$cnt++;
-				}
-		}
-
-	return $cnt;
+	return $event_count['rowscount'];
 	}
 
 	function get_map_elements($db_element, &$elements){
