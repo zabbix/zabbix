@@ -116,6 +116,13 @@ static ssize_t	telnet_socket_write(int socket_fd, const void *buf, size_t count)
 	return rc;
 }
 
+#define	CMD_IAC		255
+#define	CMD_WILL	251
+#define	CMD_WONT	252
+#define	CMD_DO		253
+#define	CMD_DONT	254
+#define	OPT_SGA		3
+
 /*
  * Read data from the telnet server.
  * If succeed return 0, -1 if error occured
@@ -136,7 +143,7 @@ static ssize_t	telnet_read(int socket_fd, char *buf, size_t *buf_left, size_t *b
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() c1:[%x=%c]", __function_name, c1, isprint(c1) ? c1 : ' ');
 
 		switch (c1) {
-		case 255:	/* Interpret as Command (IAC) */
+		case CMD_IAC:
 			while (0 == (rc = telnet_socket_read(socket_fd, &c2, 1)))
 				;
 
@@ -145,19 +152,18 @@ static ssize_t	telnet_read(int socket_fd, char *buf, size_t *buf_left, size_t *b
 
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() c2:%x", __function_name, c2);
 
-			switch (c2){
-			case 255: 	/* Only the IAC need be doubled to be sent as data */
+			switch (c2) {
+			case CMD_IAC: 	/* Only IAC needs to be doubled to be sent as data */
 				if (*buf_left > 0)
 				{
 					buf[(*buf_offset)++] = (char)c2;
 					(*buf_left)--;
 				}
 				break;
-			case 251:	/* Option code (WILL) */
-			case 252:	/* Option code (WON'T) */
-			case 253:	/* Option code (DO) */
-			case 254:	/* Option code (DON'T) */
-				/* reply to all commands with "WONT", unless it is SGA (suppres go ahead) */
+			case CMD_WILL:
+			case CMD_WONT:
+			case CMD_DO:
+			case CMD_DONT:
 				while (0 == (rc = telnet_socket_read(socket_fd, &c3, 1)))
 					;
 
@@ -166,9 +172,20 @@ static ssize_t	telnet_read(int socket_fd, char *buf, size_t *buf_left, size_t *b
 
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() c3:%x", __function_name, c3);
 
-				c = 255;
-				telnet_socket_write(socket_fd, &c, 1);	/* IAC */
-				c = (c2 == 253) ? 252 : 254; /* DO ? WON'T : DON'T */
+				/* reply to all options with "WONT" or "DONT", */
+				/* unless it is Suppress Go Ahead (SGA)        */
+
+				c = CMD_IAC;
+				telnet_socket_write(socket_fd, &c, 1);
+
+				if (CMD_WONT == c2)
+					c = CMD_DONT; /* the only valid response */
+				else if (CMD_DONT == c2)
+					c = CMD_WONT; /* the only valid response */
+				else if (OPT_SGA == c3)
+					c = (c2 == CMD_DO ? CMD_WILL : CMD_DO);
+				else
+					c = (c2 == CMD_DO ? CMD_WONT : CMD_DONT);
 
 				telnet_socket_write(socket_fd, &c, 1);
 				telnet_socket_write(socket_fd, &c3, 1);
