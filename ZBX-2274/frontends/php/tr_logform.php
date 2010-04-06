@@ -254,12 +254,12 @@ if(isset($_REQUEST['sform'])){
 
 			if (zbx_strpos($expr,'#0',zbx_strlen($expr)-3) === false) {
 //REGEXP_EXCLUDE
-//				$value = str_replace('&', ' OR ', $value);
-//				$value = str_replace('|', ' AND ', $value);
+				$value = str_replace('&', ' OR ', $value);
+				$value = str_replace('|', ' AND ', $value);
 			} else {
 //EGEXP_INCLUDE
-//				$value = str_replace('&', ' AND ', $value);
-//				$value = str_replace('|', ' OR ', $value);
+				$value = str_replace('&', ' AND ', $value);
+				$value = str_replace('|', ' OR ', $value);
 			}
 
 			$value = preg_replace($functionid,$functions,$value);
