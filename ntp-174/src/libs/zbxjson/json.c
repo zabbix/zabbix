@@ -238,7 +238,7 @@ static void	__zbx_json_addobject(struct zbx_json *j, const char *name, int objec
 		len++; /* , */
 
 	if (NULL != name) {
-		len += __zbx_json_stringsize(name, 1);
+		len += __zbx_json_stringsize(name, ZBX_JSON_TYPE_STRING);
 		len += 1; /* : */
 	}
 
@@ -261,7 +261,7 @@ static void	__zbx_json_addobject(struct zbx_json *j, const char *name, int objec
 		*p++ = '\t';
 #endif
 	if (NULL != name) {
-		p = __zbx_json_insstring(p, name, 1);
+		p = __zbx_json_insstring(p, name, ZBX_JSON_TYPE_STRING);
 		*p++ = ':';
 	}
 
@@ -298,7 +298,7 @@ void	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string
 		len++; /* , */
 
 	if (NULL != name) {
-		len += __zbx_json_stringsize(name, 1);
+		len += __zbx_json_stringsize(name, ZBX_JSON_TYPE_STRING);
 		len += 1; /* : */
 #ifdef ZBX_JSON_READABLE
 		len += j->level + 1;
@@ -325,7 +325,7 @@ void	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string
 		for (i = 0; i < j->level; i ++)
 			*p++ = '\t';
 #endif
-		p = __zbx_json_insstring(p, name, 1);
+		p = __zbx_json_insstring(p, name, ZBX_JSON_TYPE_STRING);
 		*p++ = ':';
 	}
 	p = __zbx_json_insstring(p, string, type);

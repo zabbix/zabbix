@@ -84,12 +84,13 @@ typedef struct zbx_active_buffer_element_type
 	int	clock;
 	int	logeventid;
 	int	mtime;
+	unsigned char	persistent;
 } ZBX_ACTIVE_BUFFER_ELEMENT;
 
 typedef struct zbx_active_buffer_type
 {
 	ZBX_ACTIVE_BUFFER_ELEMENT	*data;
-	int	count;
+	int	count, pcount, lastsent;
 } ZBX_ACTIVE_BUFFER;
 
 ZBX_THREAD_ENTRY(active_checks_thread, args);
