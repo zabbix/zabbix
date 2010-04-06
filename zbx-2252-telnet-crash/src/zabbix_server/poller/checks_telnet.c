@@ -212,7 +212,7 @@ end:
 /*
  * Convert CR+LF to Unix LF and clear CR+NUL
  */
-static void	unix_eol(char *buf, size_t *offset)
+static void	convert_telnet_to_unix_eol(char *buf, size_t *offset)
 {
 	size_t	i, sz = *offset, new_offset;
 
@@ -245,6 +245,26 @@ static void	unix_eol(char *buf, size_t *offset)
 	*offset = new_offset;
 }
 
+static void	convert_unix_to_telnet_eol(const char *buf, size_t offset, char *out_buf, size_t *out_offset)
+{
+	size_t	i;
+	
+	*out_offset = 0;
+
+	for (i = 0; i < offset; i++)
+	{
+		if (buf[i] != '\n')
+		{
+			out_buf[(*out_offset)++] = buf[i];
+		}
+		else
+		{
+			out_buf[(*out_offset)++] = '\r';
+			out_buf[(*out_offset)++] = '\n';
+		}
+	}
+}
+
 static char	telnet_lastchar(const char *buf, size_t offset)
 {
 	while (offset-- > 0)
@@ -254,13 +274,17 @@ static char	telnet_lastchar(const char *buf, size_t offset)
 	return '\0';
 }
 
-static void	telnet_rm_echo(char *buf, size_t *offset, const char *echo, size_t len)
+static int	telnet_rm_echo(char *buf, size_t *offset, const char *echo, size_t len)
 {
 	if (0 == memcmp(buf, echo, len))
 	{
 		*offset -= len;
 		memmove(&buf[0], &buf[len], *offset * sizeof(char));
+		
+		return SUCCEED;
 	}
+	else
+		return FAIL;
 }
 
 static void	telnet_rm_prompt(const char *buf, size_t *offset)
@@ -289,7 +313,7 @@ static int	telnet_login(int socket_fd, const char *username,
 		if (':' == telnet_lastchar(buf, offset))
 			break;
 
-	unix_eol(buf, &offset);
+	convert_telnet_to_unix_eol(buf, &offset);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() login prompt:'%.*s'",
 			__function_name, offset, buf);
 
@@ -308,7 +332,7 @@ static int	telnet_login(int socket_fd, const char *username,
 		if (':' == telnet_lastchar(buf, offset))
 			break;
 
-	unix_eol(buf, &offset);
+	convert_telnet_to_unix_eol(buf, &offset);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() password prompt:'%.*s'",
 			__function_name, offset, buf);
 
@@ -330,7 +354,7 @@ static int	telnet_login(int socket_fd, const char *username,
 			break;
 		}
 
-	unix_eol(buf, &offset);
+	convert_telnet_to_unix_eol(buf, &offset);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() prompt:'%.*s'",
 			__function_name, offset, buf);
 
@@ -355,10 +379,23 @@ static int	telnet_execute(int socket_fd, const char *command,
 	char		buf[MAX_BUF_LEN];
 	size_t		sz, offset;
 	int		rc, ret = FAIL;
+	char		*command_lf = NULL, *command_crlf = NULL;
+	size_t		i, offset_lf, offset_crlf;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	telnet_socket_write(socket_fd, command, strlen(command));
+	/* `command' with multiple lines may contain CR+LF from the browser;	*/
+	/* it should be converted to plain LF to remove echo later on properly	*/
+	offset_lf = strlen(command);
+	command_lf = zbx_malloc(command_lf, offset_lf + 1);
+	zbx_strlcpy(command_lf, command, offset_lf + 1);
+	convert_telnet_to_unix_eol(command_lf, &offset_lf);
+
+	/* telnet protocol requires that end-of-line is transferred as CR+LF	*/
+	command_crlf = zbx_malloc(command_crlf, offset_lf * 2 + 1);
+	convert_unix_to_telnet_eol(command_lf, offset_lf, command_crlf, &offset_crlf);
+
+	telnet_socket_write(socket_fd, command_crlf, offset_crlf);
 	telnet_socket_write(socket_fd, "\r\n", 2);
 
 	sz = sizeof(buf);
@@ -367,7 +404,7 @@ static int	telnet_execute(int socket_fd, const char *command,
 		if (prompt_char == telnet_lastchar(buf, offset))
 			break;
 
-	unix_eol(buf, &offset);
+	convert_telnet_to_unix_eol(buf, &offset);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() command output:'%.*s'",
 			__function_name, offset, buf);
 
@@ -379,7 +416,23 @@ static int	telnet_execute(int socket_fd, const char *command,
 		goto fail;
 	}
 
-	telnet_rm_echo(buf, &offset, command, strlen(command));
+	telnet_rm_echo(buf, &offset, command_lf, offset_lf);
+
+	/* multi-line commands may have returned additional prompts;	*/
+	/* this is not a perfect solution, because in case of multiple	*/
+	/* multi-line shell statements these prompts might appear in	*/
+	/* the middle of the output, but we still try to be helpful by	*/
+	/* removing additional prompts at least from the beginning	*/
+	for (i = 0; i < offset_lf; i++)
+		if (command_lf[i] == '\n')
+			if (SUCCEED != telnet_rm_echo(buf, &offset, "$ ", 2) &&
+				SUCCEED != telnet_rm_echo(buf, &offset, "# ", 2) &&
+				SUCCEED != telnet_rm_echo(buf, &offset, "> ", 2) &&
+				SUCCEED != telnet_rm_echo(buf, &offset, "% ", 2))
+			{
+				break;
+			}
+
 	telnet_rm_echo(buf, &offset, "\n", 1);
 	telnet_rm_prompt(buf, &offset);
 
@@ -394,13 +447,18 @@ static int	telnet_execute(int socket_fd, const char *command,
 
 	ret = SUCCEED;
 fail:
+	zbx_free(command_lf);
+	zbx_free(command_crlf);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name,
 			zbx_result_string(ret));
 
 	return ret;
 }
 
-/* Example telnet.run["ls /"] */
+/*
+ * Example: telnet.run["ls /"]
+ */
 static int	telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 {
 	const char	*__function_name = "telnet_run";
