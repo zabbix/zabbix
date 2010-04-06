@@ -1,5 +1,6 @@
 Changes for 1.8.2
 
+ - [ZBX-2275] fixed loss of the log-data if Zabbix server is unavailable
  - [ZBX-2228] fixed compilation under FreeBSD with enabled LDAP (Sasha)
  - [ZBX-2236] fixed processing of Telnet checks by Zabbix proxy (Sasha)
  - [ZBX-2234] fixed icon for mass open action in status of triggers (Aly)
