@@ -4,6 +4,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2252] fixed server crash and infinite looping in telnet checks (asaveljevs)
  - [ZBX-2275] fixed loss of the log-data if Zabbix server is unavailable (Sasha)
  - [DEV-457] improved dashboard favorite selection (Aly)
  - [DEV-457] improvements in dynamic map link indicators form (Aly)
