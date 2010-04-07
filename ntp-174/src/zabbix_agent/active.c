@@ -611,7 +611,7 @@ static int	process_value(
 )
 {
 	const char			*__function_name = "process_value";
-	ZBX_ACTIVE_BUFFER_ELEMENT	*el;
+	ZBX_ACTIVE_BUFFER_ELEMENT	*el = NULL;
 	int				i, ret = SUCCEED;
 	size_t				sz;
 
@@ -641,8 +641,7 @@ static int	process_value(
 			for (i = 0; i < buffer.count; i++)
 			{
 				el = &buffer.data[i];
-				if (0 == strcmp(buffer.data[i].host, host) &&
-						0 == strcmp(buffer.data[i].key, key))
+				if (0 == strcmp(el->host, host) && 0 == strcmp(el->key, key))
 					break;
 			}
 		}
@@ -656,8 +655,6 @@ static int	process_value(
 					break;
 			}
 		}
-
-		el = &buffer.data[i];
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Remove element [%d] Key:'%s:%s'",
 				i, el->host, el->key);

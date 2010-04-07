@@ -66,7 +66,7 @@ typedef struct zbx_active_metric_type
 	int	mtime;
 } ZBX_ACTIVE_METRIC;
 
-typedef struct active_ckeck_args
+typedef struct active_check_args_type
 {
 	char		*host;
 	unsigned short	port;
