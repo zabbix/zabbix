@@ -376,7 +376,8 @@ static int	send_value(
 			*request = NULL;
 	int		ret;
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, host, port, CONFIG_TIMEOUT))) {
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, host, port, CONFIG_TIMEOUT)))
+	{
 		request = comms_create_request(hostname, key, value, lastlogsize, timestamp, source, severity);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "XML before sending [%s]",request);
@@ -385,26 +386,30 @@ static int	send_value(
 
 		zbx_free(request);
 
-		if( SUCCEED == ret )
+		if (SUCCEED == ret)
 		{
-			if( SUCCEED == (ret = zbx_tcp_recv(&s, &buf)) )
+			if (SUCCEED == zbx_tcp_recv(&s, &buf))
 			{
 				/* !!! REMOVE '\n' AT THE AND (always must be present) !!! */
 				zbx_rtrim(buf, "\r\n\0");
 				if(strcmp(buf,"OK") == 0)
 				{
-					zabbix_log( LOG_LEVEL_DEBUG, "OK");
+					zabbix_log(LOG_LEVEL_DEBUG, "OK");
 				}
 				else
 				{
-					zabbix_log( LOG_LEVEL_DEBUG, "NOT OK [%s:%s] [%s]", host, key, buf);
+					zabbix_log(LOG_LEVEL_DEBUG, "NOT OK [%s:%s] [%s]", host, key, buf);
 				}
-			} else
+			}
+			else
 				zabbix_log(LOG_LEVEL_DEBUG, "Send value error: [recv] %s", zbx_tcp_strerror());
-		} else
+		}
+		else
 			zabbix_log(LOG_LEVEL_DEBUG, "Send value error: [send] %s", zbx_tcp_strerror());
+
 		zbx_tcp_close(&s);
-	} else
+	}
+	else
 		zabbix_log(LOG_LEVEL_DEBUG, "Send value error: [connect] %s", zbx_tcp_strerror());
 
 	return ret;
