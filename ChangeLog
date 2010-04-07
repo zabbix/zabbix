@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2279] fixed error when changing graph name case (Vedmak)
  - [ZBX-2252] fixed server crash and infinite looping in telnet checks (asaveljevs)
  - [ZBX-2275] fixed loss of the log-data if Zabbix server is unavailable (Sasha)
  - [DEV-457] improved dashboard favorite selection (Aly)
