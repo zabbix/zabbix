@@ -379,7 +379,7 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
  *             mtime - last modification time of the file                     *
  *             value - pointer for logged message                             *
  *                                                                            *
- * Return value: returns SUCCEED on succesful reading,                        *
+ * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *
  *                                                                            *
  * Author: Dmitry Borovikov (logrotation)                                     *
@@ -656,7 +656,7 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
  *             lastlogsize - offset for message                               *
  *             value - pointer for logged message                             *
  *                                                                            *
- * Return value: returns SUCCEED on succesful reading,                        *
+ * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *

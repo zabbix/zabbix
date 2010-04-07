@@ -176,7 +176,7 @@ void	delete_spaces(char *c)
  *                                                                            *
  * Parameters: exp - expression string                                        *
  *                                                                            *
- * Return value:  SUCCEED - evaluated succesfully, result - value of the exp  *
+ * Return value:  SUCCEED - evaluated successfully, result - value of the exp *
  *                FAIL - otherwise                                            *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -549,7 +549,7 @@ static int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
  *                                                                            *
  * Parameters: exp - expression string                                        *
  *                                                                            *
- * Return value:  SUCCEED - evaluated succesfully, result - value of the exp  *
+ * Return value:  SUCCEED - evaluated successfully, result - value of the exp *
  *                FAIL - otherwise                                            *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -2283,7 +2283,7 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, DB_ESCALATION *escala
  *             error - place error message here if any                        *
  *             maxerrlen - max length of error msg                            *
  *                                                                            *
- * Return value:  SUCCEED - evaluated succesfully, exp - updated expression   *
+ * Return value:  SUCCEED - evaluated successfully, exp - updated expression  *
  *                FAIL - otherwise                                            *
  *                                                                            *
  * Author: Alexei Vladishev, Aleksander Vladishev, Aleksandrs Saveljevs       *
@@ -2402,7 +2402,7 @@ error:
  *             error - place error message if any                             *
  *             maxerrlen - max length of error message                        *
  *                                                                            *
- * Return value:  SUCCEED - evaluated succesfully, result - value of the exp  *
+ * Return value:  SUCCEED - evaluated successfully, result - value of the exp *
  *                FAIL - otherwise                                            *
  *                error - error message                                       *
  *                                                                            *
