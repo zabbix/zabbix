@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2274] fixed trigger expression corruption with trigger wizard (AM)
  - [ZBX-2273] add support of macro {TRIGGER.EVENTS.UNACK} for map labels (Vedmak)
  - [ZBX-2279] fixed error when changing graph name case (Vedmak)
  - [ZBX-2252] fixed server crash and infinite looping in telnet checks (asaveljevs)

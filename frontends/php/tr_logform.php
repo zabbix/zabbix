@@ -236,12 +236,11 @@ if(isset($_REQUEST['sform'])){
 			$expr = preg_replace('/^\((.*)\)$/u','$1',$expr);
 
 			if(preg_match('/\([regexp|iregexp].+\)[=|#]0/U',$expr, $rr)){
-
 				$value = preg_replace('/(\(([regexp|iregexp].*)\)[=|#]0)/U','$2',$expr);
 			}
 
 			$value = preg_replace('/([=|#]0)/','',$expr);
-			$value = preg_replace('/^\((.*)\)$/u','$1',$value);
+			$value = preg_replace('/\((.*?)\)/u','$1',$value);
 
 			$expressions[$id]['value'] = trim($value);
 			$expressions[$id]['type'] = (zbx_strpos($expr,'#0',zbx_strlen($expr)-3) === false)?(REGEXP_EXCLUDE):(REGEXP_INCLUDE);
@@ -254,12 +253,12 @@ if(isset($_REQUEST['sform'])){
 
 			if (zbx_strpos($expr,'#0',zbx_strlen($expr)-3) === false) {
 //REGEXP_EXCLUDE
-//				$value = str_replace('&', ' OR ', $value);
-//				$value = str_replace('|', ' AND ', $value);
+				$value = str_replace('&', ' OR ', $value);
+				$value = str_replace('|', ' AND ', $value);
 			} else {
 //EGEXP_INCLUDE
-//				$value = str_replace('&', ' AND ', $value);
-//				$value = str_replace('|', ' OR ', $value);
+				$value = str_replace('&', ' AND ', $value);
+				$value = str_replace('|', ' OR ', $value);
 			}
 
 			$value = preg_replace($functionid,$functions,$value);
@@ -360,7 +359,7 @@ if(isset($_REQUEST['sform'])){
 		$imgdn->setAttribute('onclick','javascript:  element_down("logtr'.$id.'");');
 		$imgdn->setAttribute('onmouseover','javascript: this.style.cursor = "pointer";');
 
-		$del_url = new CSpan('Delete','link');
+		$del_url = new CSpan(S_DELETE,'link');
 		$del_url->setAttribute('onclick', 'javascript: if(confirm("'.S_DELETE_EXPRESSION_Q.'")) remove_expression("logtr'.$id.'"); return false;');
 
 		$row = new CRow(array(htmlspecialchars($expr['view']),(($expr['type']==REGEXP_INCLUDE)?S_INCLUDE:S_EXCLUDE),array($imgup,SPACE,$imgdn),$del_url));
@@ -378,7 +377,7 @@ if(isset($_REQUEST['sform'])){
 	$maxid=0;
 	foreach($keys as $id => $val){
 
-	  $del_url = new CLink('Delete','#','action','javascript: if(confirm("'.S_DELETE_KEYWORD_Q.'")) remove_keyword("keytr'.$id.'"); return false;');
+	  $del_url = new CLink(S_DELETE,'#','action','javascript: if(confirm("'.S_DELETE_KEYWORD_Q.'")) remove_keyword("keytr'.$id.'"); return false;');
 	  $row = new CRow(array(htmlspecialchars($val['value']),$val['type'],$del_url));
 	  $row->setAttribute('id','keytr'.$id);
 	  $keyTable->addRow($row);
