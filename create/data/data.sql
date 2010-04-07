@@ -496,9 +496,9 @@ insert into help_items values(7,'web.page.regexp[host,&lt;path&gt;,&lt;port&gt;,
 insert into help_items values(7,'perf_counter[counter]','Value of any performance counter, where parameter is the counter path.');
 insert into help_items values(7,'service_state[service]','State of service. 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service');
 insert into help_items values(7,'proc_info[&lt;process&gt;,&lt;attribute&gt;,&lt;type&gt;]','Different information about specific process(es)');
-insert into help_items values(7,'log[file,&lt;pattern&gt;,&lt;encoding&gt;,&lt;maxlines&gt;]','Monitoring of log file. pattern - regular expression');
-insert into help_items values(7,'logrt[file_format,&lt;pattern&gt;,&lt;encoding&gt;,&lt;maxlines&gt;]', 'Monitoring of log file with rotation. fileformat - [path][regexp], pattern - regular expression');
-insert into help_items values(7,'eventlog[logtype,&lt;pattern&gt;,&lt;severity&gt;,&lt;source&gt;,&lt;eventid&gt;,&lt;maxlines&gt;]','Monitoring of Windows event logs. pattern, severity, eventid - regular expressions');
+insert into help_items values(7,'log[file,&lt;pattern&gt;,&lt;encoding&gt;,&lt;maxlines&gt;,&lt;mode&gt;]','Monitoring of log file. pattern - regular expression');
+insert into help_items values(7,'logrt[file_format,&lt;pattern&gt;,&lt;encoding&gt;,&lt;maxlines&gt;,&lt;mode&gt;]', 'Monitoring of log file with rotation. fileformat - [path][regexp], pattern - regular expression');
+insert into help_items values(7,'eventlog[logtype,&lt;pattern&gt;,&lt;severity&gt;,&lt;source&gt;,&lt;eventid&gt;,&lt;maxlines&gt;,&lt;mode&gt;]','Monitoring of Windows event logs. pattern, severity, eventid - regular expressions');
 
 --
 -- Dumping data for table items
