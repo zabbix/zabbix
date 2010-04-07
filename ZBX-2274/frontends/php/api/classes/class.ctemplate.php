@@ -64,6 +64,7 @@ class CTemplate extends CZBXAPI{
 			'nodeids'					=> null,
 			'groupids'					=> null,
 			'templateids'				=> null,
+			'parentTemplateids'			=> null,
 			'hostids'					=> null,
 			'graphids'					=> null,
 			'itemids'					=> null,
@@ -82,6 +83,7 @@ class CTemplate extends CZBXAPI{
 			'select_groups'				=> null,
 			'select_hosts'				=> null,
 			'select_templates'			=> null,
+			'selectParentTemplates'		=> null,
 			'select_items'				=> null,
 			'select_triggers'			=> null,
 			'select_graphs'				=> null,
@@ -94,7 +96,7 @@ class CTemplate extends CZBXAPI{
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null,
-			'limitSelects'				=> null,
+			'limitSelects'				=> null
 		);
 
 		$options = zbx_array_merge($def_options, $options);
@@ -108,6 +110,9 @@ class CTemplate extends CZBXAPI{
 			}
 			if(!is_null($options['select_templates'])){
 				$options['select_templates'] = API_OUTPUT_EXTEND;
+			}
+			if(!is_null($options['selectParentTemplates'])){
+				$options['selectParentTemplates'] = API_OUTPUT_EXTEND;
 			}
 			if(!is_null($options['select_hosts'])){
 				$options['select_hosts'] = API_OUTPUT_EXTEND;
@@ -192,6 +197,27 @@ class CTemplate extends CZBXAPI{
 			if(!$nodeCheck){
 				$nodeCheck = true;
 				$sql_parts['where'][] = DBin_node('h.hostid', $nodeids);
+			}
+		}
+
+// parentTemplateids
+		if(!is_null($options['parentTemplateids'])){
+			zbx_value2array($options['parentTemplateids']);
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['parentTemplateid'] = 'ht.templateid as parentTemplateid';
+			}
+
+			$sql_parts['from']['ht'] = 'hosts_templates ht';
+			$sql_parts['where'][] = DBcondition('ht.templateid', $options['parentTemplateids']);
+			$sql_parts['where']['hht'] = 'h.hostid=ht.hostid';
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['templateid'] = 'ht.templateid';
+			}
+
+			if(!$nodeCheck){
+				$nodeCheck = true;
+				$sql_parts['where'][] = DBin_node('ht.templateid', $nodeids);
 			}
 		}
 
@@ -414,6 +440,9 @@ class CTemplate extends CZBXAPI{
 					if(!is_null($options['select_hosts']) && !isset($result[$template['templateid']]['hosts'])){
 						$template['hosts'] = array();
 					}
+					if(!is_null($options['selectParentTemplates']) && !isset($result[$template['templateid']]['parentTemplates'])){
+						$template['parentTemplates'] = array();
+					}
 
 					if(!is_null($options['select_items']) && !isset($result[$template['templateid']]['items'])){
 						$template['items'] = array();
@@ -449,6 +478,14 @@ class CTemplate extends CZBXAPI{
 
 						$result[$template['templateid']]['hosts'][] = array('hostid' => $template['linked_hostid']);
 						unset($template['linked_hostid']);
+					}
+// parentTemplateids
+					if(isset($template['parentTemplateid']) && is_null($options['selectParentTemplates'])){
+						if(!isset($result[$template['templateid']]['parentTemplates']))
+							$result[$template['templateid']]['parentTemplates'] = array();
+
+						$result[$template['templateid']]['parentTemplates'][] = array('templateid' => $template['parentTemplateid']);
+						unset($template['parentTemplateid']);
 					}
 
 // itemids
@@ -513,7 +550,7 @@ Copt::memoryPick();
 		if(!is_null($options['select_templates'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'hostids' => $templateids,
+				'parentTemplateids' => $templateids,
 				'preservekeys' => 1
 			);
 
@@ -523,17 +560,17 @@ Copt::memoryPick();
 
 				if(!is_null($options['limitSelects'])) order_result($templates, 'host');
 				foreach($templates as $templateid => $template){
-					unset($templates[$templateid]['hosts']);
+					unset($templates[$templateid]['parentTemplates']);
 
-					foreach($template['hosts'] as $hnum => $host){
+					foreach($template['parentTemplates'] as $hnum => $parentTemplate){
 						if(!is_null($options['limitSelects'])){
-							if(!isset($count[$host['hostid']])) $count[$host['hostid']] = 0;
-							$count[$host['hostid']]++;
+							if(!isset($count[$parentTemplate['templateid']])) $count[$parentTemplate['templateid']] = 0;
+							$count[$parentTemplate['hostid']]++;
 
-							if($count[$host['hostid']] > $options['limitSelects']) continue;
+							if($count[$parentTemplate['templateid']] > $options['limitSelects']) continue;
 						}
 
-						$result[$host['hostid']]['templates'][] = &$templates[$templateid];
+						$result[$parentTemplate['templateid']]['templates'][] = &$templates[$templateid];
 					}
 				}
 			}
@@ -591,6 +628,49 @@ Copt::memoryPick();
 						$result[$templateid]['hosts'] = $hosts[$templateid]['rowscount'];
 					else
 						$result[$templateid]['hosts'] = 0;
+				}
+			}
+		}
+
+// Adding parentTemplates
+		if(!is_null($options['selectParentTemplates'])){
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'hostids' => $templateids,
+				'preservekeys' => 1
+			);
+
+			if(is_array($options['selectParentTemplates']) || str_in_array($options['selectParentTemplates'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectParentTemplates'];
+				$templates = CTemplate::get($obj_params);
+
+				if(!is_null($options['limitSelects'])) order_result($templates, 'host');
+				foreach($templates as $templateid => $template){
+					unset($templates[$templateid]['hosts']);
+
+					foreach($template['hosts'] as $hnum => $host){
+						if(!is_null($options['limitSelects'])){
+							if(!isset($count[$host['hostid']])) $count[$host['hostid']] = 0;
+							$count[$host['hostid']]++;
+
+							if($count[$host['hostid']] > $options['limitSelects']) continue;
+						}
+
+						$result[$host['hostid']]['parentTemplates'][] = &$templates[$templateid];
+					}
+				}
+			}
+			else if(API_OUTPUT_COUNT == $options['select_templates']){
+				$obj_params['countOutput'] = 1;
+				$obj_params['groupCount'] = 1;
+
+				$templates = CTemplate::get($obj_params);
+				$templates = zbx_toHash($templates, 'hostid');
+				foreach($result as $templateid => $template){
+					if(isset($templates[$groupid]))
+						$result[$templateid]['parentTemplates'] = $templates[$templateid]['rowscount'];
+					else
+						$result[$templateid]['parentTemplates'] = 0;
 				}
 			}
 		}

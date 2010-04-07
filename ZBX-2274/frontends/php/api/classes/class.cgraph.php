@@ -867,7 +867,8 @@ COpt::memoryPick();
 					'hostids' => $chd_host['hostid']
 				));
 				if($chd_graph = reset($chd_graph)){
-					if(($tmp_graph['name'] != $chd_graph['name']) && self::exists(array('name' => $tmp_graph['name'], 'hostids' => $chd_host['hostid']))){
+					if((zbx_strtolower($tmp_graph['name']) != zbx_strtolower($chd_graph['name']))
+						&& self::exists(array('name' => $tmp_graph['name'], 'hostids' => $chd_host['hostid']))){
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: already exists on [ '.$chd_host['host'].' ]');
 					}
 					

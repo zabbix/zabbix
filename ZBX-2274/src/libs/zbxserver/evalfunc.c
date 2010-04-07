@@ -127,7 +127,7 @@ clean:
  * Parameters: item - item (performance metric)                               *
  *             parameter - ignored                                            *
  *                                                                            *
- * Return value: SUCCEED - evaluated succesfully, result is stored in 'value' *
+ * Return value: SUCCEED - evaluated successfully, result is stored in value  *
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
