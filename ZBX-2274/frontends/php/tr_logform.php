@@ -377,7 +377,7 @@ if(isset($_REQUEST['sform'])){
 	$maxid=0;
 	foreach($keys as $id => $val){
 
-	  $del_url = new CLink('Delete','#','action','javascript: if(confirm("'.S_DELETE_KEYWORD_Q.'")) remove_keyword("keytr'.$id.'"); return false;');
+	  $del_url = new CLink(S_DELETE,'#','action','javascript: if(confirm("'.S_DELETE_KEYWORD_Q.'")) remove_keyword("keytr'.$id.'"); return false;');
 	  $row = new CRow(array(htmlspecialchars($val['value']),$val['type'],$del_url));
 	  $row->setAttribute('id','keytr'.$id);
 	  $keyTable->addRow($row);
