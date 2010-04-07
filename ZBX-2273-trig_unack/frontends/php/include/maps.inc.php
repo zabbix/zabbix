@@ -933,6 +933,9 @@
 					while(zbx_strstr($label, '{TRIGGERS.UNACK}')){
 						$label = str_replace('{TRIGGERS.UNACK}', get_triggers_unacknowledged($db_element), $label);
 					}
+					while(zbx_strstr($label, '{TRIGGER.EVENTS.UNACK}')){
+						$label = str_replace('{TRIGGER.EVENTS.UNACK}', get_unacknowledged_events($db_element), $label);
+					}
 					break;
 			}
 		}
@@ -1059,7 +1062,7 @@
 	return $label;
 	}
 
-	function get_triggers_unacknowledged($db_element){
+	function get_unacknowledged_events($db_element){
 		$elements = array('hosts' => array(), 'hosts_groups' => array(), 'triggers' => array());
 
 		get_map_elements($db_element, $elements);
@@ -1092,6 +1095,32 @@
 		$event_count = CEvent::get($options);
 
 	return $event_count['rowscount'];
+	}
+
+	function get_triggers_unacknowledged($db_element){
+		$elements = array('hosts' => array(), 'hosts_groups' => array(), 'triggers' => array());
+
+		get_map_elements($db_element, $elements);
+		if(empty($elements['hosts_groups']) && empty($elements['hosts']) && empty($elements['triggers'])){
+			return 0;
+		}
+
+		$config = select_config();
+		$options = array(
+			'nodeids' => get_current_nodeid(),
+			'monitored' => 1,
+			'countOutput' => 1,
+			'only_problems' => 1,
+			'with_unacknowledged_events' => 1,
+			'limit' => ($config['search_limit']+1)
+		);
+		if(!empty($elements['hosts_groups'])) $options['groupids'] = array_unique($elements['hosts_groups']);
+		if(!empty($elements['hosts'])) $options['hostids'] = array_unique($elements['hosts']);
+		if(!empty($elements['triggers'])) $options['triggerids'] = array_unique($elements['triggers']);
+		$triggers = CTrigger::get($options);
+
+
+	return $triggers;
 	}
 
 	function get_map_elements($db_element, &$elements){
