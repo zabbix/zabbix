@@ -71,7 +71,7 @@ void    load_config()
 */
 		{"Server",		&CONFIG_HOSTS_ALLOWED,	0,TYPE_STRING,	PARM_MAND,	0,0},
 		{"Hostname",		&CONFIG_HOSTNAME,	0,TYPE_STRING,	PARM_OPT,	0,0},
-		{"BufferSize",		&CONFIG_BUFFER_SIZE,	0,TYPE_INT,	PARM_OPT,	1,65535},
+		{"BufferSize",		&CONFIG_BUFFER_SIZE,	0,TYPE_INT,	PARM_OPT,	2,65535},
 		{"BufferSend",		&CONFIG_BUFFER_SEND,	0,TYPE_INT,	PARM_OPT,	1,3600},
 
 #ifdef USE_PID_FILE

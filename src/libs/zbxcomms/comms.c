@@ -182,7 +182,7 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: hostent or NULL - an error occured                           *
+ * Return value: hostent or NULL - an error occurred                          *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -314,7 +314,7 @@ void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o)
  * Parameters:                                                                *
  *                                                                            *
  * Return value: sockfd - open socket                                         *
- *               FAIL - an error occured                                      *
+ *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -480,7 +480,7 @@ int	zbx_tcp_connect(zbx_sock_t *s,
  * Parameters:                                                                *
  *                                                                            *
  * Return value: SUCCEED - success                                            *
- *               FAIL - an error occured                                      *
+ *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -625,7 +625,7 @@ out:
  * Parameters:                                                                *
  *                                                                            *
  * Return value: SUCCEED - success                                            *
- *               FAIL - an error occured                                      *
+ *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -921,7 +921,7 @@ void	zbx_tcp_free(zbx_sock_t *s)
  * Parameters:                                                                *
  *                                                                            *
  * Return value: SUCCEED - success                                            *
- *               FAIL - an error occured                                      *
+ *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
