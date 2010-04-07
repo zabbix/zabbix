@@ -1,5 +1,6 @@
 Changes for 1.0.0
 
+ - [NTP-200] fixed sending active items multiple times because of zbx_tcp_recv() timeout (asaveljevs,Sasha)
  - [NTP-194] fixed compilation under Solaris and FreeBSD (Sasha)
  - [NTD-95] fixed macro expansion in item names in notification messages (asaveljevs)
  - [NTP-90,ZBX-1777] fixed evaluating of the maintenance periods (Sasha)
