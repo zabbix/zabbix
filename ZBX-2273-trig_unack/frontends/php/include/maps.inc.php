@@ -1075,6 +1075,7 @@
 			'nodeids' => get_current_nodeid(),
 			'output' => API_OUTPUT_SHORTEN,
 			'monitored' => 1,
+			'only_problems' => 1,
 			'skipDependent' => 1,
 			'limit' => ($config['search_limit']+1)
 		);
