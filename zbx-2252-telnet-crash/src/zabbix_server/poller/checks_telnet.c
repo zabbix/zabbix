@@ -78,7 +78,7 @@ static ssize_t	telnet_socket_read(int socket_fd, void *buf, size_t count)
 			/* Wait a bit. If there is still an error or there is no error, but still */
 			/* no input available, we assume the other side has nothing more to say.  */
 			if (0 >= (rc = telnet_waitsocket(socket_fd, WAIT_READ)))
-				break;
+				goto ret;
 
 			continue;
 		}
@@ -86,6 +86,14 @@ static ssize_t	telnet_socket_read(int socket_fd, void *buf, size_t count)
 		break;
 	}
 
+	/* when read() returns 0, it means EOF */
+	/* let's consider it a permanent error */
+	/* note that if telnet_waitsocket() is */
+	/* zero, it is not a permanent condition */
+	if (0 == rc)
+		rc = -1;
+
+ret:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, rc);
 
 	return rc;
