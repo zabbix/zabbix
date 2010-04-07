@@ -4,6 +4,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-1346] use single quotes in example frontend configuration file (Richlv)
  - [ZBX-2274] fixed trigger expression corruption with trigger wizard (AM)
  - [ZBX-2273] add support of macro {TRIGGER.EVENTS.UNACK} for map labels (Vedmak)
  - [ZBX-2279] fixed error when changing graph name case (Vedmak)
