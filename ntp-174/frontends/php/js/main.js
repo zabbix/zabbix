@@ -676,7 +676,10 @@ function create_color_picker(){
 }
 
 function set_color(color){
-	if(curr_lbl)	curr_lbl.style.background = curr_lbl.style.color = "#" + color;
+	if(curr_lbl){
+		curr_lbl.style.background = curr_lbl.style.color = "#" + color;
+		curr_lbl.title = "#" + color;
+	}
 	if(curr_txt)	curr_txt.value = color;
 
 	hide_color_picker();
@@ -699,22 +702,14 @@ function add2favorites(favobj,favid){
 		return false;
 	}
 
-	if(typeof(favobj) == 'undefined'){
-		var fav_form = document.getElementById('fav_form');
-		if(!fav_form) throw "Object not found.";
-		
-		var favobj = fav_form.favobj.value;
-		var favid = fav_form.favid.value;
-	}
-	
 	if((typeof(favid) == 'undefined') || empty(favid)) return;
-	
+
 	var params = {
 		'favobj': 	favobj,
 		'favid': 	favid,
 		'action':	'add'
 	}
-	
+
 	send_params(params);
 //	json.onetime('dashboard.php?output=json&'+Object.toQueryString(params));
 }
@@ -735,8 +730,9 @@ function change_flicker_state(divid){
 	if(false === filter_state) return false;
 
 	var params = {
+		'action':	'flop',
 		'favobj': 	'filter',
-		'favid': 	divid,
+		'favref': 	divid,
 		'state':	filter_state
 	}
 	
@@ -759,8 +755,9 @@ function change_hat_state(icon, divid){
 	if(false === hat_state) return false;
 	
 	var params = {
+		'action':	'flop',
 		'favobj': 	'hat',
-		'favid': 	divid,
+		'favref': 	divid,
 		'state':	hat_state
 	}
 	
@@ -813,9 +810,9 @@ function setRefreshRate(pmasterid,dollid,interval,params){
 	}
 	
 	if((typeof(params) == 'undefined') || is_null(params))  var params = new Array();
-	params['favobj'] = 		'set_rf_rate';
 	params['pmasterid'] = 	pmasterid;
-	params['favid'] = 		dollid;
+	params['favobj'] = 		'set_rf_rate';
+	params['favref'] = 		dollid;
 	params['favcnt'] = 		interval;
 //SDJ($params);
 	send_params(params);
