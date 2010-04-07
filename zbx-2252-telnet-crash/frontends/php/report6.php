@@ -25,7 +25,7 @@
 	$page['title']	= "S_BAR_REPORTS";
 	$page['file']	= 'report6.php';
 	$page['hist_arg'] = array('period');
-	$page['scripts'] = array('class.calendar.js','scriptaculous.js?load=effects');
+	$page['scripts'] = array('class.calendar.js','effects.js');
 
 include_once('include/page_header.php');
 ?>
@@ -72,7 +72,7 @@ include_once('include/page_header.php');
 
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})'),
 	);
 

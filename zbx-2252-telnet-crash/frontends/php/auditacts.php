@@ -27,7 +27,7 @@ require_once('include/users.inc.php');
 $page['title'] = 'S_AUDIT';
 $page['file'] = 'auditacts.php';
 $page['hist_arg'] = array();
-$page['scripts'] = array('class.calendar.js','scriptaculous.js?load=effects,dragdrop','gtlc.js');
+$page['scripts'] = array('class.calendar.js','effects.js','dragdrop.js','gtlc.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -49,7 +49,7 @@ include_once('include/page_header.php');
 		'stime'=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})'),
 	);
 

@@ -26,7 +26,7 @@ require_once('include/graphs.inc.php');
 $page['file']	= 'history.php';
 $page['title']	= 'S_HISTORY';
 $page['hist_arg'] = array('itemid', 'hostid', 'grouid', 'graphid', 'period', 'dec', 'inc', 'left', 'right', 'stime');
-$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.calendar.js','gtlc.js');
+$page['scripts'] = array('effects.js','dragdrop.js','class.calendar.js','gtlc.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -63,7 +63,8 @@ include_once('include/page_header.php');
 		'action'=>	array(T_ZBX_STR, O_OPT,	 null,	IN('"showgraph","showvalues","showlatest","add","remove"'), null),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,		NULL),
+		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NULL,			NULL),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
 /* actions */
 		'remove_log'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),

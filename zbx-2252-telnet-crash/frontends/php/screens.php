@@ -27,7 +27,7 @@
 	$page['title'] = 'S_CUSTOM_SCREENS';
 	$page['file'] = 'screens.php';
 	$page['hist_arg'] = array('elementid');
-	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.calendar.js','gtlc.js');
+	$page['scripts'] = array('effects.js','dragdrop.js','class.calendar.js','gtlc.js');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -58,7 +58,8 @@
 		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN('0,1,2'),		NULL),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NULL,			NULL),
 
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
 		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),NULL)
@@ -69,12 +70,13 @@
 <?php
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
-			CProfile::update('web.screens.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.screens.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 
 		if('filter' == $_REQUEST['favobj']){
 			CProfile::update('web.screens.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
+
 		if('timeline' == $_REQUEST['favobj']){
 			if(isset($_REQUEST['elementid']) && isset($_REQUEST['period'])){
 				navigation_bar_calc('web.screens', $_REQUEST['elementid'],true);

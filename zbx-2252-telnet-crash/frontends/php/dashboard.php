@@ -48,12 +48,13 @@ include_once('include/page_header.php');
 
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NULL,			NULL),
 		'favcnt'=>		array(T_ZBX_INT, O_OPT,	null,	null,			NULL),
 		'pmasterid'=>	array(T_ZBX_STR, O_OPT,	P_SYS,	null,			NULL),
 
-		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),NULL),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("hat"=={favobj})'),
+		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove','refresh','flop'"),	NULL),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({action}) && ("flop"=={action})'),
 	);
 
 	check_fields($fields);
@@ -95,62 +96,67 @@ include_once('include/page_header.php');
 		$_REQUEST['pmasterid'] = get_request('pmasterid','mainpage');
 
 		if('hat' == $_REQUEST['favobj']){
-			CProfile::update('web.dashboard.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
-		}
-
-		if('refresh' == $_REQUEST['favobj']){
-			switch($_REQUEST['favid']){
-				case 'hat_syssum':
-					$syssum = make_system_summary($dashconf);
-					$syssum->show();
-					break;
-				case 'hat_hoststat':
-					$hoststat = make_hoststat_summary($dashconf);
-					$hoststat->show();
-					break;
-				case 'hat_stszbx':
-					$stszbx = make_status_of_zbx();
-					$stszbx->show();
-					break;
-				case 'hat_lastiss':
-					$lastiss = make_latest_issues($dashconf);
-					$lastiss->show();
-					break;
-				case 'hat_webovr':
-					$webovr = make_webmon_overview($dashconf);
-					$webovr->show();
-					break;
-				case 'hat_dscvry':
-					$dscvry = make_discovery_status();
-					$dscvry->show();
-					break;
+			if('flop' == $_REQUEST['action']){
+				CProfile::update('web.dashboard.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			}
+			else if('refresh' == $_REQUEST['action']){
+				switch($_REQUEST['favref']){
+					case 'hat_syssum':
+						$syssum = make_system_summary($dashconf);
+						$syssum->show();
+						break;
+					case 'hat_hoststat':
+						$hoststat = make_hoststat_summary($dashconf);
+						$hoststat->show();
+						break;
+					case 'hat_stszbx':
+						$stszbx = make_status_of_zbx();
+						$stszbx->show();
+						break;
+					case 'hat_lastiss':
+						$lastiss = make_latest_issues($dashconf);
+						$lastiss->show();
+						break;
+					case 'hat_webovr':
+						$webovr = make_webmon_overview($dashconf);
+						$webovr->show();
+						break;
+					case 'hat_dscvry':
+						$dscvry = make_discovery_status();
+						$dscvry->show();
+						break;
+				}
 			}
 		}
 
 		if('set_rf_rate' == $_REQUEST['favobj']){
-			if(str_in_array($_REQUEST['favid'],array('hat_syssum','hat_stszbx','hat_lastiss','hat_webovr','hat_dscvry','hat_hoststat'))){
+			if(str_in_array($_REQUEST['favref'],array('hat_syssum','hat_stszbx','hat_lastiss','hat_webovr','hat_dscvry','hat_hoststat'))){
 
-				CProfile::update('web.dahsboard.rf_rate.'.$_REQUEST['favid'],$_REQUEST['favcnt'], PROFILE_TYPE_INT);
-				$_REQUEST['favcnt'] = CProfile::get('web.dahsboard.rf_rate.'.$_REQUEST['favid'], 60);
+				CProfile::update('web.dahsboard.rf_rate.'.$_REQUEST['favref'],$_REQUEST['favcnt'], PROFILE_TYPE_INT);
+				$_REQUEST['favcnt'] = CProfile::get('web.dahsboard.rf_rate.'.$_REQUEST['favref'], 60);
 
-				$script = get_update_doll_script('mainpage', $_REQUEST['favid'], 'frequency', $_REQUEST['favcnt']);
-				$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'stopDoll');
-				$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'startDoll');
+				$script = get_update_doll_script('mainpage', $_REQUEST['favref'], 'frequency', $_REQUEST['favcnt']);
+				$script.= get_update_doll_script('mainpage', $_REQUEST['favref'], 'stopDoll');
+				$script.= get_update_doll_script('mainpage', $_REQUEST['favref'], 'startDoll');
 				echo $script;
 
 				$menu = array();
 				$submenu = array();
 
-				make_refresh_menu('mainpage',$_REQUEST['favid'],$_REQUEST['favcnt'],null,$menu,$submenu);
+				make_refresh_menu('mainpage',$_REQUEST['favref'],$_REQUEST['favcnt'],null,$menu,$submenu);
 
-				echo 'page_menu["menu_'.$_REQUEST['favid'].'"] = '.zbx_jsvalue($menu['menu_'.$_REQUEST['favid']]).';';
+				echo 'page_menu["menu_'.$_REQUEST['favref'].'"] = '.zbx_jsvalue($menu['menu_'.$_REQUEST['favref']]).';';
 			}
 		}
 
 		if(str_in_array($_REQUEST['favobj'],array('itemid','graphid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
-				$result = add2favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
+				zbx_value2array($_REQUEST['favid']);
+
+				foreach($_REQUEST['favid'] as  $num => $sourceid){
+					$result = add2favorites('web.favorite.graphids',$sourceid,$_REQUEST['favobj']);
+				}	
 			}
 			else if('remove' == $_REQUEST['action']){
 				$result = rm4favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
@@ -170,7 +176,11 @@ include_once('include/page_header.php');
 		if('sysmapid' == $_REQUEST['favobj']){
 			$result = false;
 			if('add' == $_REQUEST['action']){
-				$result = add2favorites('web.favorite.sysmapids',$_REQUEST['favid'],$_REQUEST['favobj']);
+				zbx_value2array($_REQUEST['favid']);
+
+				foreach($_REQUEST['favid'] as  $num => $sourceid){
+					$result = add2favorites('web.favorite.sysmapids',$sourceid,$_REQUEST['favobj']);
+				}
 			}
 			else if('remove' == $_REQUEST['action']){
 				$result = rm4favorites('web.favorite.sysmapids',$_REQUEST['favid'],$_REQUEST['favobj']);
@@ -186,10 +196,15 @@ include_once('include/page_header.php');
 				echo 'page_submenu["menu_sysmaps"] = '.zbx_jsvalue(make_sysmap_submenu()).';';
 			}
 		}
+
 		if(str_in_array($_REQUEST['favobj'],array('screenid','slideshowid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
-				$result = add2favorites('web.favorite.screenids',$_REQUEST['favid'],$_REQUEST['favobj']);
+				zbx_value2array($_REQUEST['favid']);
+
+				foreach($_REQUEST['favid'] as  $num => $sourceid){
+					$result = add2favorites('web.favorite.screenids',$sourceid,$_REQUEST['favobj']);
+				}
 			}
 			else if('remove' == $_REQUEST['action']){
 				$result = rm4favorites('web.favorite.screenids',$_REQUEST['favid'],$_REQUEST['favobj']);
@@ -444,33 +459,40 @@ include_once('include/page_header.php');
 	$outer_table->addRow(array($td_l,$td_r));
 
 	$dashboard_wdgt->addItem($outer_table);
-
-	$fav_form = new CForm();
-	$fav_form->setAttribute('name','fav_form');
-	$fav_form->setAttribute('id','fav_form');
-	$fav_form->setAttribute('style','display: inline; margin: 0px;');
-	$fav_form->addVar('favobj','');
-	$fav_form->addVar('favid','');
-	$fav_form->addVar('source','');
-
-	$dashboard_wdgt->addItem($fav_form);
 	$dashboard_wdgt->show();
-
-	$jsLocale = array(
-		'S_CLOSE',
-		'S_NO_ELEMENTS_SELECTED'
-	);
-
-	zbx_addJSLocale($jsLocale);
 
 	$jsmenu = new CPUMenu(null,170);
 	$jsmenu->InsertJavaScript();
 
-//	$link = new CLink('Click Me','javascript: callJSON();','highlight');
-//	$link->Show();
 ?>
+<script type="text/javascript">
+//<!--<![CDATA[
+function addPopupValues(list){
+	if(!isset('object', list)){
+		throw("Error hash attribute 'list' doesn't contain 'object' index");
+		return false;
+	}
+
+	if('undefined' == typeof(Ajax)){
+		throw("Prototype.js lib is required!");
+		return false;
+	}
+
+	var favorites = {'graphid': 1,'itemid': 1,'screenid': 1,'slideshowid': 1,'sysmapid': 1};
+	if(isset(list.object, favorites)){
+		var params = {
+			'favobj': 	list.object,
+			'favid[]': 	list.values,
+			'action':	'add'
+		}
+
+		send_params(params);
+	}
+}
+//]]> -->
+</script>
 <?php
 
-include_once("include/page_footer.php");
+include_once('include/page_footer.php');
 
 ?>

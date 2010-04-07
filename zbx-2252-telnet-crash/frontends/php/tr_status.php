@@ -28,7 +28,7 @@
 
 	$page['file'] = 'tr_status.php';
 	$page['title'] = 'S_STATUS_OF_TRIGGERS';
-	$page['scripts'] = array('scriptaculous.js?load=effects');
+	$page['scripts'] = array('effects.js');
 	$page['hist_arg'] = array('groupid', 'hostid');
 	$page['scripts'] = array('class.cswitcher.js');
 
@@ -101,8 +101,8 @@ include_once('include/page_header.php');
 		'show_details'=>		array(T_ZBX_INT, O_OPT,  	null,	null, 	null),
 		'txt_select'=>			array(T_ZBX_STR, O_OPT,  	null,	null, 	null),
 //ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			'isset({favid})'),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 	);
 
@@ -190,8 +190,6 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-
-
 	$trigg_wdgt = new CWidget();
 
 	$r_form = new CForm();
@@ -222,7 +220,7 @@ include_once('include/page_header.php');
 	$mute_icon->addAction('onclick',new CJSscript("javascript: switch_mute(this);"));
 
 //	show_table_header(S_STATUS_OF_TRIGGERS_BIG,array($mute_icon,$fs_icon));
-	$trigg_wdgt->addPageHeader(S_STATUS_OF_TRIGGERS_BIG, array($mute_icon, $fs_icon));
+	$trigg_wdgt->addPageHeader(S_STATUS_OF_TRIGGERS_BIG.' ['.date(S_DATE_FORMAT_YMDHMS).']', array($mute_icon, $fs_icon));
 
 	$numrows = new CDiv();
 	$numrows->setAttribute('name','numrows');
@@ -716,13 +714,6 @@ include_once('include/page_header.php');
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton', S_GO.' (0)');
 		$goButton->setAttribute('id', 'goButton');
-
-		$jsLocale = array(
-			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTED'
-		);
-
-		zbx_addJSLocale($jsLocale);
 
 		$show_event_col ? zbx_add_post_js('chkbxRange.pageGoName = "events";') : zbx_add_post_js('chkbxRange.pageGoName = "triggers";');
 

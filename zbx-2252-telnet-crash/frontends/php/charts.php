@@ -26,7 +26,7 @@ require_once('include/graphs.inc.php');
 $page['title'] = 'S_CUSTOM_GRAPHS';
 $page['file'] = 'charts.php';
 $page['hist_arg'] = array('hostid','groupid','graphid');
-$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.calendar.js','gtlc.js');
+$page['scripts'] = array('effects.js', 'dragdrop.js','class.calendar.js','gtlc.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -48,7 +48,8 @@ include_once('include/page_header.php');
 
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NULL,			NULL),
 
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
 		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),NULL)
@@ -63,7 +64,7 @@ include_once('include/page_header.php');
 			CProfile::update('web.charts.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 		if('hat' == $_REQUEST['favobj']){
-			CProfile::update('web.charts.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.charts.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 
 		if('timeline' == $_REQUEST['favobj']){

@@ -26,7 +26,7 @@ require_once('include/forms.inc.php');
 
 $page['title'] = 'S_CONFIGURATION_OF_ITEMS';
 $page['file'] = 'items.php';
-$page['scripts'] = array('scriptaculous.js?load=effects');
+$page['scripts'] = array('effects.js');
 $page['hist_arg'] = array();
 
 include_once('include/page_header.php');
@@ -174,7 +174,7 @@ include_once('include/page_header.php');
 		'subfilter_trends'=>				array(T_ZBX_INT, O_OPT,	 null,	null, null),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})')
 	);
 
@@ -1177,13 +1177,6 @@ include_once('include/page_header.php');
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
-
-		$jsLocale = array(
-			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTED'
-		);
-
-		zbx_addJSLocale($jsLocale);
 
 		zbx_add_post_js('chkbxRange.pageGoName = "group_itemid";');
 

@@ -493,13 +493,6 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 		$goButton = new CButton('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 
-		$jsLocale = array(
-			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTED'
-		);
-
-		zbx_addJSLocale($jsLocale);
-
 		zbx_add_post_js('chkbxRange.pageGoName = "group_groupid";');
 
 		$footer = get_table_header(array($goBox, $goButton));

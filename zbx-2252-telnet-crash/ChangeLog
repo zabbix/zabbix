@@ -1,5 +1,15 @@
 Changes for 1.8.3
 
+ - [ZBX-2252] fixed server crash and infinite looping in telnet checks (asaveljevs)
+ - [ZBX-2275] fixed loss of the log-data if Zabbix server is unavailable (Sasha)
+ - [DEV-457] improved dashboard favorite selection (Aly)
+ - [DEV-457] improvements in dynamic map link indicators form (Aly)
+ - [ZBX-2258] fixed applications import (Vedmak)
+ - [ZBX-1357] update Brazilian Portuguese translation; thanks to edson (Richlv)
+ - [ZBX-2254] added update time for monitorin triggers screen (Vedmak)
+ - [ZBX-1886] added js translations (Vedmak)
+ - [ZBX-2245] added missing functions in trigger expression builder (Vedmak)
+ - [ZBX-2190] fixed trigger expression check for syntax (AM)
  - [ZBX-2242] fixed agent crash on HP-UX when processing logrt[] items (asaveljevs,Sasha)
  - [ZBXNEXT-288] improved server performance by not storing function lastvalue in database (asaveljevs,Sasha)
  - [ZBX-1753] added permission check for trigger sound notifications (Aly)

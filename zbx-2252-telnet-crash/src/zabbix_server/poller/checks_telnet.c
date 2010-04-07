@@ -133,7 +133,7 @@ static ssize_t	telnet_socket_write(int socket_fd, const void *buf, size_t count)
 
 /*
  * Read data from the telnet server.
- * If succeed return 0, -1 if error occured
+ * If succeed return 0, -1 if error occurred
  */
 static ssize_t	telnet_read(int socket_fd, char *buf, size_t *buf_left, size_t *buf_offset)
 {

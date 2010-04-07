@@ -94,7 +94,7 @@ class CTemplate extends CZBXAPI{
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null,
-			'limitSelects'				=> null,
+			'limitSelects'				=> null
 		);
 
 		$options = zbx_array_merge($def_options, $options);

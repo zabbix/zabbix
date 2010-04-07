@@ -205,7 +205,7 @@ include_once('include/page_header.php');
 		}
 	}
 // DEPENDENCE ACTIONS
-	else if(isset($_REQUEST['add_dependence'])&&isset($_REQUEST['new_dependence'])){
+	else if(isset($_REQUEST['add_dependence']) && isset($_REQUEST['new_dependence'])){
 		if(!isset($_REQUEST['dependencies']))
 			$_REQUEST['dependencies'] = array();
 
@@ -691,13 +691,6 @@ include_once('include/page_header.php');
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
-
-		$jsLocale = array(
-			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTED'
-		);
-
-		zbx_addJSLocale($jsLocale);
 
 		zbx_add_post_js('chkbxRange.pageGoName = "g_triggerid";');
 
