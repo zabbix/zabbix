@@ -224,7 +224,7 @@ include_once('include/page_header.php');
 			'hostids' => $hostids,
 			'templated_hosts' => 1,
 			'extendoutput' => 1,
-			'select_templates' => 1,
+			'selectParentTemplates' => 1,
 			'select_items' => 1,
 			'select_triggers' => 1,
 			'select_graphs' => 1,
@@ -237,7 +237,7 @@ include_once('include/page_header.php');
 
 			$el_table = new CTableInfo(S_ONLY_HOST_INFO);
 
-			foreach($host['templates'] as $tnum => $template){
+			foreach($host['parentTemplates'] as $tnum => $template){
 				if(isset($hostids_templates[$hostid])){
 					$el_table->addRow(array(S_TEMPLATE, $template['host']));
 				}
@@ -364,7 +364,7 @@ include_once('include/page_header.php');
 			'hostids' => zbx_objectValues($hosts_all, 'hostid'),
 			'output' => array('hostid', 'host', 'dns', 'ip', 'port', 'status', 'useip'),
 			'templated_hosts' => 1,
-			'select_templates' => API_OUTPUT_COUNT,
+			'selectParentTemplates' => API_OUTPUT_COUNT,
 			'select_items' => API_OUTPUT_COUNT,
 			'select_triggers' => API_OUTPUT_COUNT,
 			'select_graphs' => API_OUTPUT_COUNT,
@@ -388,7 +388,7 @@ include_once('include/page_header.php');
 
 			$status = new CCol(host_status2str($host['status']), host_status2style($host['status']));
 
-			$template_cnt = ($host['templates'] > 0)
+			$template_cnt = ($host['parentTemplates'] > 0)
 				? array(new CCheckBox('templates['.$hostid.']', (isset($hostids_templates[$hostid]) || !isset($update)), NULL, $hostid), $host['templates'])
 				: '-';
 

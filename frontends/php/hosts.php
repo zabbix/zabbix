@@ -658,7 +658,7 @@ $thid = get_request('hostid', 0);
 		$options = array(
 			'hostids' => zbx_objectValues($hosts, 'hostid'),
 			'output' => API_OUTPUT_EXTEND,
-			'select_templates' => array('hostid','host'),
+			'selectParentTemplates' => array('hostid','host'),
 			'select_items' => API_OUTPUT_COUNT,
 			'select_triggers' => API_OUTPUT_COUNT,
 			'select_graphs' => API_OUTPUT_COUNT,
@@ -674,15 +674,14 @@ $thid = get_request('hostid', 0);
 // Selecting linked templates to templates linked to hosts
 		$templateids = array();
 		foreach($hosts as $num => $host){
-			$templateids = array_merge($templateids, zbx_objectValues($host['templates'], 'templateid'));
+			$templateids = array_merge($templateids, zbx_objectValues($host['parentTemplates'], 'templateid'));
 		}
 		$templateids = array_unique($templateids);
 
 		$options = array(
 			'templateids' => $templateids,
-			'select_templates' => array('hostid', 'host')
+			'selectParentTemplates' => array('hostid', 'host')
 		);
-
 		$templates = CTemplate::get($options);
 		$templates = zbx_toHash($templates, 'templateid');
 //---------
@@ -762,19 +761,19 @@ $thid = get_request('hostid', 0);
 			$av_table = new CTable(null, 'invisible');
 			$av_table->addRow(array($zbx_available, $snmp_available, $ipmi_available));
 
-			if(empty($host['templates'])){
+			if(empty($host['parentTemplates'])){
 				$hostTemplates = '-';
 			}
 			else{
 				$hostTemplates = array();
-				foreach($host['templates'] as $htnum => $template){
+				foreach($host['parentTemplates'] as $htnum => $template){
 					$caption = array();
-					$caption[] = new CLink($template['host'],'templates.php?form=update&templateid='.$template['hostid'],'unknown');
+					$caption[] = new CLink($template['host'],'templates.php?form=update&templateid='.$template['templateid'],'unknown');
 
-					if(!empty($templates[$template['templateid']]['templates'])){
+					if(!empty($templates[$template['templateid']]['parentTemplates'])){
 						$caption[] = ' (';
-						foreach($templates[$template['templateid']]['templates'] as $tnum => $tpl){
-							$caption[] = new CLink($tpl['host'],'templates.php?form=update&templateid='.$tpl['hostid'], 'unknown');
+						foreach($templates[$template['templateid']]['parentTemplates'] as $tnum => $tpl){
+							$caption[] = new CLink($tpl['host'],'templates.php?form=update&templateid='.$tpl['templateid'], 'unknown');
 							$caption[] = ', ';
 						}
 						array_pop($caption);
