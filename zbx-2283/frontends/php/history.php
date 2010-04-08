@@ -581,8 +581,7 @@ include_once('include/page_header.php');
 			$timeline['usertime'] = null;
 
 			if(isset($_REQUEST['stime'])){
-				$d = sscanf($_REQUEST['stime'], '%04d%02d%02d%02d%02d');
-				$timeline['usertime'] = date('YmdHi', (mktime($d[3],$d[4],0,$d[1],$d[2],$d[0]) + $timeline['period']));
+				$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 			}
 
 			$objData = array();

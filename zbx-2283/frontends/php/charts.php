@@ -40,7 +40,6 @@ include_once('include/page_header.php');
 		'groupid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,		DB_ID,NULL),
 		'hostid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,		DB_ID,NULL),
 		'graphid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,		DB_ID,NULL),
-		'from'=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
 		'period'=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	null,NULL),
 		'stime'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	NULL,NULL),
 		'action'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'go','add','remove'"),NULL),
@@ -311,8 +310,7 @@ include_once('include/page_header.php');
 		$timeline['starttime'] = date('YmdHi', get_min_itemclock_by_graphid($_REQUEST['graphid']));
 
 		if(isset($_REQUEST['stime'])){
-			$d = sscanf($_REQUEST['stime'], '%04d%02d%02d%02d%02d');
-			$timeline['usertime'] = date('YmdHi', (mktime($d[3],$d[4],0,$d[1],$d[2],$d[0]) + $timeline['period']));
+			$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 		}
 
 		$objData = array(

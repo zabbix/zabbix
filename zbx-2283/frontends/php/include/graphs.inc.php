@@ -1060,8 +1060,7 @@
 		}
 
 		if(isset($_REQUEST['stime'])){
-			$date = sscanf($_REQUEST['stime'], '%04d%02d%02d%02d%02d');
-			$time = mktime($date[3], $date[4], 0, $date[1], $date[2], $date[0]);
+			$time = zbxDateToTime($_REQUEST['stime']);
 
 			if(($time+$_REQUEST['period']) > time()) {
 				$_REQUEST['stime'] = date('YmdHi', time()-$_REQUEST['period']);

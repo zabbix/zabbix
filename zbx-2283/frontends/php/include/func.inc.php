@@ -405,6 +405,13 @@ function getDateStringByType($type, $timestamp){
 	}
 return $str;
 }
+
+function zbxDateToTime($strdate){
+	if(5 == sscanf($strdate, '%04d%02d%02d%02d%02d', $year, $month, $date, $hours, $minutes))
+		return mktime($hours,$minutes,0,$month,$date,$year);
+	else
+		return 0;
+}
 /************* END DATE *************/
 
 

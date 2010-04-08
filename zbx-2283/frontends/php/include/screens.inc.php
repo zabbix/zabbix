@@ -1057,8 +1057,7 @@ require_once('include/js.inc.php');
 						$timeline['starttime'] = date('YmdHi', get_min_itemclock_by_graphid($resourceid));
 
 						if(isset($_REQUEST['stime'])){
-							$d = sscanf($_REQUEST['stime'], '%04d%02d%02d%02d%02d');
-							$timeline['usertime'] = date('YmdHi', (mktime($d[3],$d[4],0,$d[1],$d[2],$d[0]) + $timeline['period']));
+							$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 						}
 
 						// $src = $url.'&width='.$width.'&height='.$height.'&legend='.$legend.'&graph3d='.$graph3d;
@@ -1081,8 +1080,7 @@ require_once('include/js.inc.php');
 							$timeline['starttime'] = date('YmdHi', time() - ZBX_MAX_PERIOD); //get_min_itemclock_by_graphid($graphid);
 
 							if(isset($_REQUEST['stime'])){
-								$d = sscanf($_REQUEST['stime'], '%04d%02d%02d%02d%02d');
-								$timeline['usertime'] = date('YmdHi', (mktime($d[3],$d[4],0,$d[1],$d[2],$d[0]) + $timeline['period']));
+								$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 							}
 
 							$objData['loadSBox'] = 1;
@@ -1147,8 +1145,7 @@ require_once('include/js.inc.php');
 						$timeline['period'] = $effectiveperiod;
 
 						if(isset($_REQUEST['stime'])){
-							$d = sscanf($_REQUEST['stime'], '%04d%02d%02d%02d%02d');
-							$timeline['usertime'] = date('YmdHi', (mktime($d[3],$d[4],0,$d[1],$d[2],$d[0]) + $timeline['period']));
+							$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 						}
 
 						$objData['loadSBox'] = 1;

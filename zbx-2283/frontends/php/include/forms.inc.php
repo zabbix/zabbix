@@ -3345,12 +3345,11 @@
 
 		}
 		else{
-
-			$mname			= get_request('mname','');
+			$mname				= get_request('mname','');
 			$maintenance_type	= get_request('maintenance_type',0);
 
-			$active_since		= get_request('active_since',time());
-			$active_till		= get_request('active_till',time()+86400);
+			$active_since		= zbxDateToTime(get_request('active_since',date('YmdHi')));
+			$active_till		= zbxDateToTime(get_request('active_till', date('YmdHi', time()+86400)));
 
 			$description		= get_request('description','');
 		}
@@ -3368,8 +3367,8 @@
 
 /***********************************************************/
 
-		$tblMntc->addItem(new Cvar('active_since',$active_since));
-		$tblMntc->addItem(new Cvar('active_till',$active_till));
+		$tblMntc->addItem(new Cvar('active_since', date('YmdHi', $active_since)));
+		$tblMntc->addItem(new Cvar('active_till', date('YmdHi', $active_till)));
 
 		$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
 
