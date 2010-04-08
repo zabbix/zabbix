@@ -340,7 +340,7 @@ include_once('include/page_header.php');
 	$sortorder = getPageSortOrder();
 	$options = array(
 		'nodeids' => get_current_nodeid(),
-		'status' => TRIGGER_STATUS_ENABLED,
+//		'status' => TRIGGER_STATUS_ENABLED,
 		'filter' => 1,
 		'monitored' => 1,
 		'extendoutput' => 1,
