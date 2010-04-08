@@ -1,0 +1,1 @@
+splint expression.c  +I/home/zabbix/trunk/include -I/usr/include/mysql -warnposix +sysdirs /usr/include +skip-sys-headers +I/usr/include/mysql +posixlib -DMYSQL_RES=int -DMYSQL_ROW="char *"
