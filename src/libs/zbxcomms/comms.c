@@ -89,7 +89,7 @@ static char zbx_tcp_strerror_message[ZBX_TCP_MAX_STRERROR];
 
 char*	zbx_tcp_strerror(void)
 {
-	zbx_tcp_strerror_message[ZBX_TCP_MAX_STRERROR - 1] = '\0'; /* forse terminate string */
+	zbx_tcp_strerror_message[ZBX_TCP_MAX_STRERROR - 1] = '\0'; /* force terminate string */
 	return (&zbx_tcp_strerror_message[0]);
 }
 
