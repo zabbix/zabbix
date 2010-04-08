@@ -764,9 +764,9 @@ $DB["PASSWORD"]		= \''.$this->getConfig('DB_PASSWORD' ,'').'\';
 $ZBX_SERVER		= \''.$this->getConfig('ZBX_SERVER' ,'').'\';
 $ZBX_SERVER_PORT	= \''.$this->getConfig('ZBX_SERVER_PORT' ,'0').'\';
 
-
 $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
-?>';
+?>
+';
 		}
 	}
 ?>
