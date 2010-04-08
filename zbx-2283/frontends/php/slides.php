@@ -306,12 +306,11 @@ include_once('include/page_header.php');
 // NAV BAR
 				$timeline = array();
 				$timeline['period'] = $effectiveperiod;
-				$timeline['starttime'] = time() - ZBX_MAX_PERIOD;
+				$timeline['starttime'] = date('YmdHi', time() - ZBX_MAX_PERIOD);
 
 				if(isset($_REQUEST['stime'])){
-					$bstime = $_REQUEST['stime'];
-					$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
-					$timeline['usertime'] += $timeline['period'];
+					$d = sscanf($_REQUEST['stime'], '%04d%02d%02d%02d%02d');
+					$timeline['usertime'] = date('YmdHi', (mktime($d[3],$d[4],0,$d[1],$d[2],$d[0]) + $timeline['period']));
 				}
 
 				$scroll_div = new CDiv();

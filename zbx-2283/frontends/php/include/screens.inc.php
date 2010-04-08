@@ -1054,12 +1054,11 @@ require_once('include/js.inc.php');
 
 						$timeline = array();
 						$timeline['period'] = $effectiveperiod;
-						$timeline['starttime'] = get_min_itemclock_by_graphid($resourceid);
+						$timeline['starttime'] = date('YmdHi', get_min_itemclock_by_graphid($resourceid));
 
 						if(isset($_REQUEST['stime'])){
-							$bstime = $_REQUEST['stime'];
-							$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
-							$timeline['usertime'] += $timeline['period'];
+							$d = sscanf($_REQUEST['stime'], '%04d%02d%02d%02d%02d');
+							$timeline['usertime'] = date('YmdHi', (mktime($d[3],$d[4],0,$d[1],$d[2],$d[0]) + $timeline['period']));
 						}
 
 						// $src = $url.'&width='.$width.'&height='.$height.'&legend='.$legend.'&graph3d='.$graph3d;
@@ -1079,12 +1078,11 @@ require_once('include/js.inc.php');
 						$timeline = array();
 						if(isset($graphid) && !is_null($graphid) && ($editmode != 1)){
 							$timeline['period'] = $effectiveperiod;
-							$timeline['starttime'] = time() - ZBX_MAX_PERIOD; //get_min_itemclock_by_graphid($graphid);
+							$timeline['starttime'] = date('YmdHi', time() - ZBX_MAX_PERIOD); //get_min_itemclock_by_graphid($graphid);
 
 							if(isset($_REQUEST['stime'])){
-								$bstime = $_REQUEST['stime'];
-								$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
-								$timeline['usertime'] += $timeline['period'];
+								$d = sscanf($_REQUEST['stime'], '%04d%02d%02d%02d%02d');
+								$timeline['usertime'] = date('YmdHi', (mktime($d[3],$d[4],0,$d[1],$d[2],$d[0]) + $timeline['period']));
 							}
 
 							$objData['loadSBox'] = 1;
@@ -1143,15 +1141,14 @@ require_once('include/js.inc.php');
 					if(($editmode == 0) && !empty($resourceid)) $action = 'history.php?action=showgraph&itemid='.$resourceid.url_param('period').url_param('stime');
 
 					$timeline = array();
-					$timeline['starttime'] = time() - ZBX_MAX_PERIOD;
+					$timeline['starttime'] = date('YmdHi', time() - ZBX_MAX_PERIOD);
 
 					if(!zbx_empty($resourceid) && ($editmode != 1)){
 						$timeline['period'] = $effectiveperiod;
 
 						if(isset($_REQUEST['stime'])){
-							$bstime = $_REQUEST['stime'];
-							$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
-							$timeline['usertime'] += $timeline['period'];
+							$d = sscanf($_REQUEST['stime'], '%04d%02d%02d%02d%02d');
+							$timeline['usertime'] = date('YmdHi', (mktime($d[3],$d[4],0,$d[1],$d[2],$d[0]) + $timeline['period']));
 						}
 
 						$objData['loadSBox'] = 1;

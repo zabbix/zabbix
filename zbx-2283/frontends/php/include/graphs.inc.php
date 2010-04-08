@@ -1060,8 +1060,9 @@
 		}
 
 		if(isset($_REQUEST['stime'])){
-			$bstime = $_REQUEST['stime'];
-			$time = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
+			$date = sscanf($_REQUEST['stime'], '%04d%02d%02d%02d%02d');
+			$time = mktime($date[3], $date[4], 0, $date[1], $date[2], $date[0]);
+
 			if(($time+$_REQUEST['period']) > time()) {
 				$_REQUEST['stime'] = date('YmdHi', time()-$_REQUEST['period']);
 			}

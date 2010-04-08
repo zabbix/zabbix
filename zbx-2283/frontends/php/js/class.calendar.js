@@ -478,7 +478,7 @@ yearup: function(){
 
 yeardown: function(){
 	
-	if((this.year-1) < 1971){  // shouldn't be lower
+	if((this.year-1) < 1970){  // shouldn't be lower
 		return ;
 	}
 
