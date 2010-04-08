@@ -521,7 +521,7 @@ static int	send_buffer(const char *host, unsigned short port)
 
 		if (SUCCEED == (ret = zbx_tcp_send(&s, json.buffer)))
 		{
-			if (SUCCEED == (ret = zbx_tcp_recv(&s, &buf)))
+			if (SUCCEED == zbx_tcp_recv(&s, &buf))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "JSON back [%s]",
 						buf);
