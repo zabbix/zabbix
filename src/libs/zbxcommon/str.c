@@ -1164,6 +1164,9 @@ int	parse_host_key(char *exp, char **host, char **key)
 {
 	char	*p, *s;
 
+	if (NULL == exp || '\0' == *exp)
+		return FAIL;
+
 	for (p = exp, s = exp; '\0' != *p; p++)	/* check for optional hostname */
 	{
 		if (':' == *p)	/* hostname:vfs.fs.size[/,total]
