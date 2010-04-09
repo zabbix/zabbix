@@ -546,12 +546,13 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 	}
 
 	if(zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS)){
-		if(abs($value) >= 1)
+		if((abs($value) >= 1) || ($value == 0))
 			$format = (round($value,2) == round($value,0)) ? '%.0f %s' : '%.2f %s';
 		else if(abs($value) >= 0.01)
 			$format = (round($value,4) == round($value,2)) ? '%.2f %s' : '%.4f %s';
 		else
 			$format = (round($value,6) == round($value,4)) ? '%.4f %s' : '%.6f %s';
+
 
 		return sprintf($format, $value, $units);
 	}
@@ -592,7 +593,10 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 			else break;
 		}
 
-		$valUnit['value'] = bcdiv($value, $valUnit['value'], 9);
+		if(round($valUnit['value'], 6) == 0)
+			$valUnit['value'] = bcdiv($value, $valUnit['value'], 6);
+		else
+			$valUnit['value'] = 0;
 	}
 
 //------
