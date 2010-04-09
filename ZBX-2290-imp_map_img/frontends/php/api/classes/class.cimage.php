@@ -345,6 +345,10 @@ class CImage extends CZBXAPI{
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for image [ '.$image['name'].' ]');
 				}
 
+				if(self::exists(array('name' => $image['name']))){
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_IMAGE.' [ '.$image['name'].' ] '.S_ALREADY_EXISTS_SMALL);
+				}
+
 				if(strlen($image['image']) > ZBX_MAX_IMAGE_SIZE)
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_IMAGE_SIZE_MUST_BE_LESS_THAN_MB);
 
@@ -434,6 +438,18 @@ class CImage extends CZBXAPI{
 			foreach($images as $num => $image){
 				if(!isset($image['imageid']))
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for image.');
+
+				$options = array(
+					'filter' => array('name' => $image['name']),
+					'output' => API_OUTPUT_SHORTEN,
+					'nopermissions' => 1
+				);
+				$image_exists = self::get($options);
+				$image_exists = reset($image_exists);
+
+				if(!empty($image_exists) && ($image_exists['imageid'] != $image['imageid'])){
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_IMAGE.' [ '.$image['name'].' ] '.S_ALREADY_EXISTS_SMALL);
+				}
 
 				$values = array();
 				if(isset($image['name'])) $values['name'] = zbx_dbstr($image['name']);
