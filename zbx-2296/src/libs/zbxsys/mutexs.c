@@ -44,8 +44,6 @@
 
 #endif /* not _WINDOWS */
 
-#include "log.h"
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_mutex_create_ext                                             *
@@ -79,19 +77,20 @@ int zbx_mutex_create_ext(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, unsigned char fo
 #else /* not _WINDOWS */
 
 #define ZBX_MAX_ATTEMPTS 10
-	int	attempts = 0;
+	int		attempts = 0, i;
+	key_t		sem_key;
+	union semun	semopts;
+	struct semid_ds	seminfo;
 
-	int	i;
-	key_t	sem_key;
-	union semun semopts;
-	struct semid_ds seminfo;
-
-	if( -1 == (sem_key = ftok(CONFIG_FILE, (int)'z') ))
+	if (-1 == (sem_key = ftok(CONFIG_FILE, (int)'z')))
 	{
-		zbx_error("Can not create IPC key for path '%s', try to create for path '.' [%s]", CONFIG_FILE, strerror(errno));
-		if( -1 == (sem_key = ftok(".", (int)'z') ))
+		zbx_error("Can not create IPC key for path '%s', try to create for path '.' [%s]",
+				CONFIG_FILE, strerror(errno));
+
+		if (-1 == (sem_key = ftok(".", (int)'z')))
 		{
-			zbx_error("Can not create IPC key for path '.' [%s]", strerror(errno));
+			zbx_error("Can not create IPC key for path '.' [%s]",
+					strerror(errno));
 			return ZBX_MUTEX_ERROR;
 		}
 	}
@@ -101,9 +100,9 @@ lbl_create:
 	{
 		/* set default semaphore value */
 		semopts.val = 1;
-		for ( i = 0; i < ZBX_MUTEX_COUNT; i++ )
+		for (i = 0; i < ZBX_MUTEX_COUNT; i++)
 		{
-			if(-1 == semctl(ZBX_SEM_LIST_ID, i, SETVAL, semopts))
+			if (-1 == semctl(ZBX_SEM_LIST_ID, i, SETVAL, semopts))
 			{
 				zbx_error("Semaphore [%i] error in semctl(SETVAL) [%s]",
 						name,
@@ -116,34 +115,30 @@ lbl_create:
 			zbx_mutex_unlock(&i);	/* release semaphore */
 		}
 	}
-	else if(errno == EEXIST)
+	else if (errno == EEXIST)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Zabbix semaphores already exist, trying to recreate.");
-
 		ZBX_SEM_LIST_ID = semget(sem_key, 0 /* get reference */, 0666 /* 0022 */);
 
-		if(forced) {
-			if( 0 != semctl(ZBX_SEM_LIST_ID, 0, IPC_RMID, 0))
+		if (forced)
+		{
+			if (0 != semctl(ZBX_SEM_LIST_ID, 0, IPC_RMID, 0))
 			{
-				zabbix_log(LOG_LEVEL_CRIT, "Can't recreate Zabbix semaphores for IPC key 0x%lx Semaphore ID %ld. %s.",
-					sem_key,
-					ZBX_SEM_LIST_ID,
-					strerror(errno));
-				exit(1);
+				zbx_error("Can't recreate Zabbix semaphores for IPC key 0x%lx Semaphore ID %ld. %s.",
+						sem_key, ZBX_SEM_LIST_ID, strerror(errno));
+				exit(FAIL);
 			}
 
 			/* Semaphore is successfully removed */
 			ZBX_SEM_LIST_ID = -1;
 
-			if ( ++attempts > ZBX_MAX_ATTEMPTS )
+			if (++attempts > ZBX_MAX_ATTEMPTS)
 			{
-				zabbix_log(LOG_LEVEL_CRIT, "Can't recreate Zabbix semaphores for IPC key 0x%lx. [too many attempts]",
-					sem_key);
-				exit(1);
+				zbx_error("Can't recreate Zabbix semaphores for IPC key 0x%lx. [too many attempts]",
+						sem_key);
+				exit(FAIL);
 			}
-			if ( attempts > (ZBX_MAX_ATTEMPTS / 2) )
+			if (attempts > (ZBX_MAX_ATTEMPTS / 2))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Wait 1 sec for next attempt of Zabbix semaphores creation.");
 				zbx_sleep(1);
 			}
 			goto lbl_create;
@@ -151,9 +146,9 @@ lbl_create:
 
 		semopts.buf = &seminfo;
 		/* wait for initialization */
-		for ( i = 0; i < ZBX_MUTEX_MAX_TRIES; i++)
+		for (i = 0; i < ZBX_MUTEX_MAX_TRIES; i++)
 		{
-			if( -1 == semctl(ZBX_SEM_LIST_ID, 0, IPC_STAT, semopts))
+			if (-1 == semctl(ZBX_SEM_LIST_ID, 0, IPC_STAT, semopts))
 			{
 				zbx_error("Semaphore [%i] error in semctl(IPC_STAT). %s.",
 					name,
@@ -191,41 +186,42 @@ lbl_return:
  *                                                                            *
  * Parameters: mutex - handle of mutex                                        *
  *                                                                            *
- * Return value: If the function succeeds, the return 1, 0 on an error        *
+ * Return value:                                                              *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
+ * Author: Eugene Grigorjev, Aleksander Vladishev                             *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-
-int zbx_mutex_lock(ZBX_MUTEX *mutex)
+void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
 {
 #if defined(_WINDOWS)
 
-	if(!*mutex) return ZBX_MUTEX_OK;
+	if (!*mutex)
+		return;
 
-	if(WaitForSingleObject(*mutex, INFINITE) != WAIT_OBJECT_0)
+	if (WAIT_OBJECT_0 != WaitForSingleObject(*mutex, INFINITE))
 	{
-		zbx_error("Error on mutex locking. [%s]", strerror_from_system(GetLastError()));
-		return ZBX_MUTEX_ERROR;
+		zbx_error("[file:'%s',line:%d] Lock failed [%s]",
+				filename, line, strerror_from_system(GetLastError()));
+		exit(FAIL);
 	}
 
 #else /* not _WINDOWS */
 
-	struct sembuf sem_lock = { *mutex, -1, SEM_UNDO };
+	struct sembuf	sem_lock = { *mutex, -1, SEM_UNDO };
 
-	if(!*mutex) return ZBX_MUTEX_OK;
+	if (!*mutex)
+		return;
 
-	if (-1 == (semop(ZBX_SEM_LIST_ID, &sem_lock, 1)))
+	if (-1 == semop(ZBX_SEM_LIST_ID, &sem_lock, 1))
 	{
-		zbx_error("Lock failed [%s]", strerror(errno));
-		return ZBX_MUTEX_ERROR;
+		zbx_error("[file:'%s',line:%d] Lock failed [%s]",
+				filename, line, strerror(errno));
+		exit(FAIL);
 	}
 
 #endif /* _WINDOWS */
-
-	return ZBX_MUTEX_OK;
 }
 
 /******************************************************************************
@@ -236,41 +232,42 @@ int zbx_mutex_lock(ZBX_MUTEX *mutex)
  *                                                                            *
  * Parameters: mutex - handle of mutex                                        *
  *                                                                            *
- * Return value: If the function succeeds, then return 1, 0 on an error       *
+ * Return value:                                                              *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
+ * Author: Eugene Grigorjev, Aleksander Vladishev                             *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-
-int zbx_mutex_unlock(ZBX_MUTEX *mutex)
+void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
 {
 #if defined(_WINDOWS)
 
-	if(!*mutex) return ZBX_MUTEX_OK;
+	if (!*mutex)
+		return;
 
-	if(ReleaseMutex(*mutex) == 0)
+	if (0 == ReleaseMutex(*mutex))
 	{
-		zbx_error("Error on mutex UNlocking. [%s]", strerror_from_system(GetLastError()));
-		return ZBX_MUTEX_ERROR;
+		zbx_error("[file:'%s',line:%d] Unlock failed [%s]",
+				filename, line, strerror_from_system(GetLastError()));
+		exit(FAIL);
 	}
 
 #else /* not _WINDOWS */
 
-	struct sembuf sem_unlock = { *mutex, 1, SEM_UNDO };
+	struct sembuf	sem_unlock = { *mutex, 1, SEM_UNDO };
 
-	if(!*mutex) return ZBX_MUTEX_OK;
+	if (!*mutex)
+		return;
 
-	if ((semop(ZBX_SEM_LIST_ID, &sem_unlock, 1)) == -1)
+	if (-1 == semop(ZBX_SEM_LIST_ID, &sem_unlock, 1))
 	{
-		zbx_error("Unlock failed [%s]", strerror(errno));
-		return ZBX_MUTEX_ERROR;
+		zbx_error("[file:'%s',line:%d] Lock failed [%s]",
+				filename, line, strerror(errno));
+		exit(FAIL);
 	}
 
 #endif /* _WINDOWS */
-
-	return ZBX_MUTEX_OK;
 }
 
 /******************************************************************************
