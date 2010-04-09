@@ -1087,7 +1087,8 @@ COpt::memoryPick();
 
 			foreach($templates as $tnum => $template){
 				$template['templates_link'] = isset($template['templates']) ? $template['templates'] : null;
-				$template['templates'] = $template;
+				$tpl_tmp = $template;
+				$template['templates'] = $tpl_tmp;
 
 				$result = self::massUpdate($template);
 				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Failed to update template');
