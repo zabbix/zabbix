@@ -66,7 +66,7 @@ function make_acktab_by_eventid($eventid){
 		$user = reset($user);
 
 		$table->addRow(array(
-			date(S_DATE_FORMAT_YMDHMS,$ack['clock']),
+			zbx_date2str(S_ACKNOWINC_BY_EVENTS_DATE_FORMAT,$ack['clock']),
 			$user['alias'],
 			new CCol(zbx_nl2br($ack['message']),'wraptext')
 		));

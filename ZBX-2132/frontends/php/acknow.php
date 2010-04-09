@@ -146,7 +146,7 @@ include_once('include/page_header.php');
 
 				$table->addRow(array(
 					new CCol($db_user['alias'], 'user'),
-					new CCol(date(S_DATE_FORMAT_YMDHMS, $db_ack['clock']), 'time')),
+					new CCol(zbx_date2str(S_ACKNOWLEDGE_DATE_FORMAT, $db_ack['clock']), 'time')),
 					'title');
 
 				$msgCol = new CCol(zbx_nl2br($db_ack['message']));

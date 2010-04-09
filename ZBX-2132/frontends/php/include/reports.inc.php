@@ -429,8 +429,8 @@ function bar_report_form2(){
 			$periods_table->addRow(array(
 					new CCheckBox('group_pid['.$pid.']'),
 					$caption,
-					date(S_DATE_FORMAT_YMDHMS, $period['report_timesince']),
-					date(S_DATE_FORMAT_YMDHMS, $period['report_timetill']),
+					zbx_date2str(S_REPORTS_BAR_REPORT_DATE_FORMAT, $period['report_timesince']),
+					zbx_date2str(S_REPORTS_BAR_REPORT_DATE_FORMAT, $period['report_timetill']),
 					$color,
 				));
 		}

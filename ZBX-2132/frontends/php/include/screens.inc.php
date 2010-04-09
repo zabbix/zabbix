@@ -387,7 +387,7 @@ require_once('include/js.inc.php');
 			$pre = new CTag('pre', true);
 			$pre->addItem($value);
 
-			$table->addRow(array(date(S_DATE_FORMAT_YMDHMS,$row['clock']),	$pre));
+			$table->addRow(array(zbx_date2str(S_SCREENS_PLAIN_TEXT_DATE_FORMAT,$row['clock']),	$pre));
 		}
 
 	return $table;
@@ -1269,7 +1269,7 @@ require_once('include/js.inc.php');
 					}
 ///-----------------------
 
-					$item = array(get_table_header(array(S_STATUS_OF_TRIGGERS_BIG,SPACE,date('[H:i:s]',time())), $tr_form));
+					$item = array(get_table_header(array(S_STATUS_OF_TRIGGERS_BIG,SPACE,zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT)), $tr_form));
 					$item[] = make_latest_issues($params);
 
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
@@ -1347,7 +1347,7 @@ require_once('include/js.inc.php');
 					}
 ///-----------------------
 
-					$item = array(get_table_header(array(S_STATUS_OF_TRIGGERS_BIG,SPACE,date('[H:i:s]',time())), $tr_form));
+					$item = array(get_table_header(array(S_STATUS_OF_TRIGGERS_BIG,SPACE,zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT)), $tr_form));
 					$item[] = make_latest_issues($params);
 
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
@@ -1361,7 +1361,7 @@ require_once('include/js.inc.php');
 						'limit' => null
 					);
 
-					$item = array(get_table_header(array(S_SYSTEM_STATUS,SPACE,date('[H:i:s]',time()))));
+					$item = array(get_table_header(array(S_SYSTEM_STATUS,SPACE,zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT))));
 					$item[] = make_system_summary($params);
 
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));

@@ -230,7 +230,7 @@ function make_event_details($eventid){
 	$table = new CTableInfo();
 
 	$table->AddRow(array(S_EVENT, expand_trigger_description($event['triggerid'])));
-	$table->AddRow(array(S_TIME, date('Y.M.d H:i:s',$event['clock'])));
+	$table->AddRow(array(S_TIME, zbx_date2str(S_EVENTS_EVENT_DETAILS_DATE_FORMAT,$event['clock'])));
 
 	$duration = zbx_date2age($event['clock']);
 	if($next_event = get_next_event($event)){
@@ -319,7 +319,7 @@ function make_small_eventlist($eventid, $trigger_data){
 
 		$table->addRow(array(
 			new CLink(
-				date('Y.M.d H:i:s',$event['clock']),
+				zbx_date2str(S_EVENTS_SMALL_EVENT_LIST_DATE_FORMAT,$event['clock']),
 				'tr_events.php?triggerid='.$trigger_data['triggerid'].'&eventid='.$event['eventid'],
 				'action'
 			),
@@ -378,7 +378,7 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 		}
 // ---
 		$table->addRow(array(
-			zbx_date2str(S_DATE_FORMAT_YMDHMS,$event['clock']),
+			zbx_date2str(S_EVENTS_POPUP_EVENT_LIST_DATE_FORMAT,$event['clock']),
 			$value,
 			$duration,
 			zbx_date2age($event['clock']),
@@ -471,7 +471,7 @@ function get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0){
 		if((1 == $hide_unknown) && (!event_initial_time($row,$hide_unknown))) continue;
 
 		$table->AddRow(array(
-			date("Y.M.d H:i:s",$row["clock"]),
+			zbx_date2str(S_EVENTS_TRIGGERS_EVENTS_HISTORY_LIST_DATE_FORMAT,$row["clock"]),
 			get_node_name_by_elid($row['triggerid']),
 			($hostid == 0)?$row['host']:null,
 			new CLink(

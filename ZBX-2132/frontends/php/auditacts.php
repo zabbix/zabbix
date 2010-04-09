@@ -211,7 +211,7 @@ include_once('include/page_header.php');
 
 		$table->addRow(array(
 			get_node_name_by_elid($row['alertid']),
-			new CCol(date(S_DATE_FORMAT_YMDHMS,$row['clock']), 'top'),
+			new CCol(zbx_date2str(S_AUDITACTS_DESCRIPTION_DATE_FORMAT,$row['clock']), 'top'),
 			new CCol($mediatype['description'], 'top'),
 			new CCol($status, 'top'),
 			new CCol($retries, 'top'),

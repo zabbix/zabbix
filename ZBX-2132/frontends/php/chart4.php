@@ -83,7 +83,7 @@ include_once('include/page_header.php');
 
 	$str = expand_trigger_description_by_data($db_data);
 
-	$str = $str.' (year '.date('Y').')';
+	$str = sprintf(S_CHART4_HEADER_TITLE, $str, zbx_date2str(S_CHART4_HEADER_DATE_FORMAT));
 	$x = imagesx($im)/2-imagefontwidth(4)*zbx_strlen($str)/2;
 	//imagestring($im, 4,$x,1, $str , $darkred);
 	imageText($im, 10, 0, $x, 14, $darkred, $str);
@@ -95,8 +95,7 @@ include_once('include/page_header.php');
 	$false = array();
 	$unknown = array();
 
-	$year=date('Y');
-	$start=mktime(0,0,0,1,1,$year);
+	$start=mktime(0,0,0,1,1,date('Y'));
 
 	$wday=date('w',$start);
 	if($wday==0) $wday=7;
@@ -123,8 +122,8 @@ include_once('include/page_header.php');
 
 	for($i=0, $period_start = $start; $i <= $sizeX; $i += $sizeX/52){
 		DashedLine($im,$i+$shiftX,$shiftYup,$i+$shiftX,$sizeY+$shiftYup,$gray);
-		//imagestringup($im, 1,$i+$shiftX-4, $sizeY+$shiftYup+32, date('d.M',$period_start) , $black);
-		imageText($im, 6, 90, $i+$shiftX+4, $sizeY+$shiftYup+30, $black, date('d.M',$period_start));
+		//imagestringup($im, 1,$i+$shiftX-4, $sizeY+$shiftYup+32, zbx_date2str(S_TIMELINE_DATE_FORMAT,$period_start) , $black);
+		imageText($im, 6, 90, $i+$shiftX+4, $sizeY+$shiftYup+30, $black, zbx_date2str(S_TIMELINE_DATE_FORMAT,$period_start));
 
 		$period_start += 7*24*3600;
 	}

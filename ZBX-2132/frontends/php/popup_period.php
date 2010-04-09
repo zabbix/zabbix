@@ -60,8 +60,8 @@ include_once 'include/page_header.php';
 
 	$_REQUEST['caption'] = get_request('caption','');
 	if(zbx_empty($_REQUEST['caption']) && isset($_REQUEST['report_timesince']) && isset($_REQUEST['report_timetill'])){
-		$_REQUEST['caption'] = date(S_DATE_FORMAT_YMDHMS,  $_REQUEST['report_timesince']).' - '.
-								date(S_DATE_FORMAT_YMDHMS, $_REQUEST['report_timetill']);
+		$_REQUEST['caption'] = zbx_date2str(S_POPUP_PERIOD_CAPTION_DATE_FORMAT,  $_REQUEST['report_timesince']).' - '.
+								zbx_date2str(S_POPUP_PERIOD_CAPTION_DATE_FORMAT, $_REQUEST['report_timetill']);
 	}
 
 	if(isset($_REQUEST['save'])){

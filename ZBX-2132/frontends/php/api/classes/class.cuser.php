@@ -502,7 +502,7 @@ class CUser extends CZBXAPI{
 							' failed login attempts logged. Last failed attempt was from ',
 							bold($login['attempt_ip']),
 							' on ',
-							bold(date('d.m.Y H:i',$login['attempt_clock'])),
+							bold(zbx_date2str(S_CUSER_ERROR_DATE_FORMAT,$login['attempt_clock'])),
 							'.')));
 
 				DBexecute('UPDATE users SET attempt_failed=0 WHERE userid='.$login['userid']);
