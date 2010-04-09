@@ -52,6 +52,9 @@
 
 	define('ZBX_SCRIPT_TIMEOUT',			360); // in seconds
 	define('ZBX_SCRIPT_BYTES_LIMIT',		1073741824); // 1073741824 is 1MB in bytes
+	
+	define('GRAPH_YAXIS_SIDE_DEFAULT', 		0); // 0 - LEFT SIDE, 1 - RIGHT SIDE
+	
 /* END OF USERS DEFINES */
 
 	define('ZBX_FONT_NAME',			'DejaVuSans');
