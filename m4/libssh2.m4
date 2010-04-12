@@ -39,33 +39,13 @@ AC_DEFUN([LIBSSH2_ACCEPT_VERSION],
 	# Zabbix minimal major supported version of libssh2:
 	minimal_libssh2_major_version=1
 	
-	# Zabbix minimal minor supported version of libssh2:
-	minimal_libssh2_minor_version=0
-	
-	# Zabbix minimal patch supported version of libssh2:
-	minimal_libssh2_patch_version=0
-	
 	# get the major version
 	found_ssh2_version_major=`cat $1 | $EGREP \#define.*LIBSSH2_VERSION_MAJOR | $AWK '{print @S|@3;}'`
 	
-	# get the minor version
-	found_ssh2_version_minor=`cat $1 | $EGREP \#define.*LIBSSH2_VERSION_MINOR | $AWK '{print @S|@3;}'`
-	
-	# get the patch version
-	found_ssh2_version_patch=`cat $1 | $EGREP \#define.*LIBSSH2_VERSION_PATCH | $AWK '{print @S|@3;}'`
-	
 	accept_ssh2_version="no"
 	
-	if test $found_ssh2_version_major -gt $minimal_libssh2_major_version; then
+	if test $found_ssh2_version_major -ge $minimal_libssh2_major_version; then
 		accept_ssh2_version="yes"
-	elif test $found_ssh2_version_major -eq $minimal_libssh2_major_version; then
-		if test $found_ssh2_version_minor -gt $minimal_libssh2_minor_version; then
-			accept_ssh2_version="yes"
-		elif test $found_ssh2_version_minor -eq $minimal_libssh2_minor_version; then
-			if test $found_ssh2_version_patch -ge $minimal_libssh2_patch_version; then
-				accept_ssh2_version="yes"
-			fi
-		fi
 	fi;
 ])dnl
 
