@@ -33,13 +33,7 @@
 #define	LOCK_CACHE_IDS		zbx_mutex_lock(&cache_ids_lock)
 #define	UNLOCK_CACHE_IDS	zbx_mutex_unlock(&cache_ids_lock)
 
-#define ZBX_GET_SHM_DBCACHE_KEY(smk_key)				\
-	if( -1 == (shm_key = zbx_ftok(CONFIG_FILE, (int)'c') ))		\
-	{								\
-		zbx_error("Cannot create IPC key for DB cache");	\
-		exit(1);						\
-	}
-
+static int		shm_id;
 ZBX_DC_CACHE		*cache = NULL;
 ZBX_DC_IDS		*ids = NULL;
 
@@ -1994,7 +1988,8 @@ static void DCvacuum_text()
 			}
 		}
 		cache->last_text -= offset;
-	} else
+	}
+	else
 		cache->last_text = cache->text;
 }
 
@@ -2176,7 +2171,7 @@ void	DCadd_history_str(zbx_uint64_t itemid, char *value_orig, int clock)
 	history->clock			= clock;
 	history->value_type		= ITEM_VALUE_TYPE_STR;
 	history->value_orig.value_str	= cache->last_text;
-	history->value.value_str	= cache->last_text;
+	history->value.value_str	= NULL;
 	zbx_strlcpy(cache->last_text, value_orig, len);
 	history->value_null		= 0;
 	cache->last_text		+= len;
@@ -2219,7 +2214,7 @@ void	DCadd_history_text(zbx_uint64_t itemid, char *value_orig, int clock)
 	history->clock			= clock;
 	history->value_type		= ITEM_VALUE_TYPE_TEXT;
 	history->value_orig.value_str	= cache->last_text;
-	history->value.value_str	= cache->last_text;
+	history->value.value_str	= NULL;
 	zbx_strlcpy(cache->last_text, value_orig, len);
 	history->value_null		= 0;
 	cache->last_text		+= len;
@@ -2265,13 +2260,14 @@ void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, int tim
 	history->clock			= clock;
 	history->value_type		= ITEM_VALUE_TYPE_LOG;
 	history->value_orig.value_str	= cache->last_text;
-	history->value.value_str	= cache->last_text;
+	history->value.value_str	= NULL;
 	zbx_strlcpy(cache->last_text, value_orig, len1);
 	history->value_null		= 0;
 	cache->last_text		+= len1;
 	history->timestamp		= timestamp;
 
-	if (0 != len2) {
+	if (0 != len2)
+	{
 		history->source		= cache->last_text;
 		zbx_strlcpy(cache->last_text, source, len2);
 		cache->last_text	+= len2;
@@ -2302,7 +2298,7 @@ void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, int tim
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -2310,13 +2306,16 @@ void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, int tim
 void	init_database_cache(zbx_process_t p)
 {
 	key_t	shm_key;
-	int	shm_id;
 	size_t	sz;
 	void	*ptr;
 
 	zbx_process = p;
 
-	ZBX_GET_SHM_DBCACHE_KEY(shm_key);
+	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, (int)'c')))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Can't create IPC key for database cache");
+		exit(FAIL);
+	}
 
 	ZBX_HISTORY_SIZE = CONFIG_HISTORY_CACHE_SIZE / sizeof(ZBX_DC_HISTORY);
 	ZBX_TREND_SIZE = CONFIG_TRENDS_CACHE_SIZE / sizeof(ZBX_DC_TREND);
@@ -2331,27 +2330,28 @@ void	init_database_cache(zbx_process_t p)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In init_database_cache() size:%d", (int)sz);
 
-	if ( -1 == (shm_id = zbx_shmget(shm_key, sz)))
+	if (-1 == (shm_id = zbx_shmget(shm_key, sz)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Can't allocate shared memory for database cache.");
-		exit(1);
+		zabbix_log(LOG_LEVEL_CRIT, "Can't allocate shared memory for database cache");
+		exit(FAIL);
 	}
 
 	ptr = shmat(shm_id, 0, 0);
 
 	if ((void*)(-1) == ptr)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Can't attach shared memory for database cache. [%s]",strerror(errno));
+		zabbix_log(LOG_LEVEL_CRIT, "Can't attach shared memory for database cache. [%s]",
+				strerror(errno));
 		exit(FAIL);
 	}
 
-	if(ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cache_lock, ZBX_MUTEX_CACHE))
+	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cache_lock, ZBX_MUTEX_CACHE))
 	{
 		zbx_error("Unable to create mutex for database cache");
 		exit(FAIL);
 	}
 
-	if(ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cache_ids_lock, ZBX_MUTEX_CACHE_IDS))
+	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cache_ids_lock, ZBX_MUTEX_CACHE_IDS))
 	{
 		zbx_error("Unable to create mutex for database cache");
 		exit(FAIL);
@@ -2416,38 +2416,28 @@ static void	DCsync_all()
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	free_database_cache()
 {
-	key_t	shm_key;
-	int	shm_id;
-	size_t	sz;
+	const char	*__function_name = "free_database_cache";
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In free_database_cache()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	DCsync_all();
 
 	LOCK_CACHE;
 	LOCK_CACHE_IDS;
 
-	ZBX_GET_SHM_DBCACHE_KEY(shm_key);
-
-	sz = sizeof(ZBX_DC_IDS);
-	sz += sizeof(ZBX_DC_CACHE);
-
-	shm_id = shmget(shm_key, sz, 0);
-
-	if (-1 == shm_id)
+	if (-1 == shmctl(shm_id, IPC_RMID, 0))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Can't find shared memory for database cache. [%s]",strerror(errno));
-		exit(1);
+		zabbix_log(LOG_LEVEL_WARNING, "Can't remove shared memory"
+				" for database cache. [%s]",
+				strerror(errno));
 	}
-
-	shmctl(shm_id, IPC_RMID, 0);
 
 	cache = NULL;
 
@@ -2457,7 +2447,7 @@ void	free_database_cache()
 	zbx_mutex_destroy(&cache_lock);
 	zbx_mutex_destroy(&cache_ids_lock);
 
-	zabbix_log(LOG_LEVEL_DEBUG,"End of free_database_cache()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
