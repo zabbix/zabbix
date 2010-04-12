@@ -2213,7 +2213,7 @@ void	init_configuration_cache()
 	config->hosts = ptr + sz;
 	config->ipmihosts = ptr + sz;
 	config->idxhost01 = ptr + sz;	/* proxy_hostid,host */
-	config->idxhost02 = ptr + sz;	/* poller_type,poller_num */
+	config->idxhost02 = ptr + sz;	/* poller_type,poller_num,nextcheck */
 }
 
 /******************************************************************************
