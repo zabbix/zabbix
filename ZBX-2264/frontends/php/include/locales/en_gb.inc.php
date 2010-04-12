@@ -2105,6 +2105,12 @@
 	'S_CUSER_ERROR_WRONG_PERIOD'=>				'Wrong period [ %1$s ]',
 	'S_CUSER_ERROR_INTERNAL_ZABBIX_ERROR'=>			'Internal zabbix error',
 
+//	config.inc.php
+	'S_CONFIG_NOT_LOGGED_IN_ACCESS_DENIED'=>		'You cannot view this URL as a %1$s. You must login to view this page.%2$s If you think this message is wrong, please consult your administrators about getting the necessary permissions.',
+	'S_CONFIG_ERROR_HEAD'=>					'ERROR',
+	'S_CONFIG_WARNING_WRONG_MONTH'=>			'[Wrong value for month: %1$s]',
+	'S_CONFIG_WARNING_WRONG_DOW'=>				'[Wrong value for day of week: %1$s]',
+
 //	Menu
 
 	'S_HELP'=>				'Help',

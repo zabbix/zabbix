@@ -347,7 +347,7 @@ class CUser extends CZBXAPI{
 
 		if($login){
 			if(($login['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) && ((time() - $login['attempt_clock']) < ZBX_LOGIN_BLOCK)){
-				$_REQUEST['message'] = sprint(S_CUSER_ACCOUNT_IS_BLOCKED_FOR_XX_MINUTES, (ZBX_LOGIN_BLOCK - (time() - $login['attempt_clock'])));
+				$_REQUEST['message'] = sprint(S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_MINUTES, (ZBX_LOGIN_BLOCK - (time() - $login['attempt_clock'])));
 				return false;
 			}
 
@@ -412,7 +412,7 @@ class CUser extends CZBXAPI{
 		else{
 			$user = NULL;
 
-			$_REQUEST['message'] = S_CUSER_LOGIN_OR_PASSWORD_INCORRECT;
+			$_REQUEST['message'] = S_CUSER_ERROR_LOGIN_OR_PASSWORD_INCORRECT;
 			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER,'Login failed ['.$name.']');
 
 			if($attempt){
@@ -569,7 +569,7 @@ class CUser extends CZBXAPI{
 
 		if(!$login || isset($incorrect_session) || isset($missed_user_guest)){
 
-			if(isset($incorrect_session))	$message = S_CUSER_SESSION_TERMINATED;
+			if(isset($incorrect_session))	$message = S_CUSER_ERROR_SESSION_TERMINATED;
 			else if(isset($missed_user_guest)){
 				$row = DBfetch(DBselect('SELECT count(u.userid) as user_cnt FROM users u'));
 				if(!$row || $row['user_cnt'] == 0){

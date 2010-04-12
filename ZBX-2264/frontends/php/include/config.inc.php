@@ -242,16 +242,11 @@ function __autoload($class_name){
 			$req = new Curl($_SERVER['REQUEST_URI']);
 			$req->setArgument('sid', null);
 
-			$warning_msg = array('You cannot view this URL as a ',bold(ZBX_GUEST_USER),'. ',
-								'You must login to view this page.', BR(),
-								'If you think this message is wrong, ',
-								' please consult your administrators about getting the necessary permissions.');
-
 			$table = new CTable(null, 'warning');
 			$table->setAlign('center');
 			$table->setHeader(new CCol('You are not logged in', 'left'),'header');
 
-			$table->addRow(new CCol($warning_msg));
+			$table->addRow(new CCol(sprintf(S_CONFIG_NOT_LOGGED_IN_ACCESS_DENIED, bold(ZBX_GUEST_USER), BR())));
 
 			$url = urlencode($req->toString());
 			$footer = new CCol(
@@ -303,7 +298,7 @@ function __autoload($class_name){
 		$height= 0;
 		$img_space = null;
 
-		if(!$bool && !is_null($errmsg))		$msg='ERROR: '.$errmsg;
+		if(!$bool && !is_null($errmsg))		$msg=S_CONFIG_ERROR_HEAD.': '.$errmsg;
 		else if($bool && !is_null($okmsg))	$msg=$okmsg;
 
 		$api_errors = CZBXAPI::resetErrors();
@@ -325,7 +320,7 @@ function __autoload($class_name){
 //				case PAGE_TYPE_JS: break;
 				case PAGE_TYPE_HTML:
 				default:
-					$msg_tab = new CTable($msg,($bool?'msgok':'msgerr'));
+					$msg_tab = new CTable($msg,($bool ? 'msgok':'msgerr'));
 					$msg_tab->setCellPadding(0);
 					$msg_tab->setCellSpacing(0);
 
@@ -395,7 +390,7 @@ function __autoload($class_name){
 				}
 
 
-				$tab = new CTable(null,($bool?'msgok':'msgerr'));
+				$tab = new CTable(null,($bool ? 'msgok':'msgerr'));
 
 				$tab->setCellPadding(0);
 				$tab->setCellSpacing(0);
@@ -988,7 +983,6 @@ function __autoload($class_name){
 	}
 
 	function get_str_month($num){
-		$month = '[Wrong value for month: '.$num.']';
 		switch($num){
 			case 1: $month = S_JANUARY; break;
 			case 2: $month = S_FEBRUARY; break;
@@ -1002,13 +996,13 @@ function __autoload($class_name){
 			case 10: $month = S_OCTOBER; break;
 			case 11: $month = S_NOVEMBER; break;
 			case 12: $month = S_DECEMBER; break;
+			default: $month = sprintf(S_CONFIG_WARNING_WRONG_MONTH, $num);
 		}
 
-	return $month;
+		return $month;
 	}
 
 	function get_str_dayofweek($num){
-		$day = '[Wrong value for day of week: '.$num.']';
 		switch($num){
 			case 1: $day = S_MONDAY; break;
 			case 2: $day = S_TUESDAY; break;
@@ -1017,6 +1011,7 @@ function __autoload($class_name){
 			case 5: $day = S_FRIDAY; break;
 			case 6: $day = S_SATURDAY; break;
 			case 7: $day = S_SUNDAY; break;
+			default: $day = sprintf(S_CONFIG_WARNING_WRONG_DOW, $num);
 		}
 
 	return $day;
