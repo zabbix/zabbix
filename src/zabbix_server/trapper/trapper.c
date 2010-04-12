@@ -404,13 +404,11 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *jp, const
 			total_num,
 			zbx_time() - sec);
 
-	alarm(CONFIG_TIMEOUT);
 	if (send_result(sock, ret, info) != SUCCEED)
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Error sending result back");
 		zabbix_syslog("Trapper: error sending result back");
 	}
-	alarm(0);
 
 	return ret;
 }
