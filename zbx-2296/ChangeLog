@@ -1,6 +1,7 @@
 Changes for 1.8.3
 
  - [ZBX-2296] fixed possible heavy loaded server crash when using internal checks (Sasha)
+ - [ZBX-2295] added additional units to graphs Y axis (Aly)
  - [ZBX-2285] fixed sending of active items multiple times (asaveljevs,Sasha)
  - [ZBX-2266] fixed server crash when processing malformed calculated items (asaveljevs)
  - [ZBX-1346] use single quotes in example frontend configuration file (Richlv)
