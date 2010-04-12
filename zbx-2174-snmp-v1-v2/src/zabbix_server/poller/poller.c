@@ -616,7 +616,7 @@ static int	get_values(int now)
 			}
 			break;
 		default:
-			/* nothink to do */;
+			/* nothing to do */;
 		}
 
 		init_result(&agent);
@@ -665,7 +665,7 @@ static int	get_values(int now)
 				uint64_array_add(&ipmiids, &ipmiids_alloc, &ipmiids_num, items[i].host.hostid, 1);
 				break;
 			default:
-				/* nothink to do */;
+				/* nothing to do */;
 			}
 		}
 		else

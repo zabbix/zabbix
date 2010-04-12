@@ -2741,7 +2741,7 @@ static int	DCconfig_get_normal_poller_items(unsigned char poller_type, unsigned 
 				continue;
 			break;
 		default:
-			/* nothink to do */;
+			/* nothing to do */;
 		}
 
 		DCget_host(&items[num].host, dc_host);
@@ -2954,7 +2954,7 @@ int	DCconfig_get_normal_poller_nextcheck(unsigned char poller_type, unsigned cha
 				continue;
 			break;
 		default:
-			/* nothink to do */;
+			/* nothing to do */;
 		}
 
 		nextcheck = dc_item->nextcheck;
