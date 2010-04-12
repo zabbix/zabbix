@@ -553,7 +553,8 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 		else
 			$format = '%.6f';
 
-		$value = rtrim(sprintf($format,$value), '.0');
+		if(round($value, 6) == 0) $value = 0;
+		else $value = rtrim(sprintf($format,$value), '.0');
 
 		return sprintf('%s %s', $value, $units);
 	}
@@ -599,7 +600,6 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 		}
 		else
 			$valUnit['value'] = 0;
-
 	}
 
 //------
