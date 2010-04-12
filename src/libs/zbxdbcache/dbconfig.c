@@ -1811,7 +1811,7 @@ static void	DCsync_items()
 		}
 
 		/* db items */
-		i = get_nearestindex(config->dbitems, sizeof(ZBX_DC_LOGITEM),
+		i = get_nearestindex(config->dbitems, sizeof(ZBX_DC_DBITEM),
 				config->dbitems_num, itemid);
 
 		if (ITEM_TYPE_DB_MONITOR == item->type && SUCCEED != DBis_null(row[19]) && '\0' != *row[19])
