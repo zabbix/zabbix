@@ -546,15 +546,16 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 	}
 
 	if(zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS)){
-		if((abs($value) >= 1) || ($value == 0))
-			$format = (round($value,2) == round($value,0)) ? '%.0f %s' : '%.2f %s';
+		if(abs($value) >= 1)
+			$format = '%.2f';
 		else if(abs($value) >= 0.01)
-			$format = (round($value,4) == round($value,2)) ? '%.2f %s' : '%.4f %s';
+			$format = '%.4f';
 		else
-			$format = (round($value,6) == round($value,4)) ? '%.4f %s' : '%.6f %s';
+			$format = '%.6f';
 
+		$value = rtrim(sprintf($format,$value), '.0');
 
-		return sprintf($format, $value, $units);
+		return sprintf('%s %s', $value, $units);
 	}
 
 // INIT intervals
@@ -593,10 +594,12 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 			else break;
 		}
 
-		if(round($valUnit['value'], 6) == 0)
-			$valUnit['value'] = bcdiv($value, $valUnit['value'], 6);
+		if(round($valUnit['value'], 6) > 0){
+			$valUnit['value'] = bcdiv(sprintf('%.6f',$value), sprintf('%.6f', $valUnit['value']), 6);
+		}
 		else
 			$valUnit['value'] = 0;
+
 	}
 
 //------
