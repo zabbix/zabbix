@@ -346,7 +346,7 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 				' AND object='.EVENT_OBJECT_TRIGGER.
 				' AND objectid='.$triggerid.
 			' ORDER BY eventid DESC';
-	$db_events = DBselect($sql, ZBX_POPUP_MAX_ROWS);
+	$db_events = DBselect($sql, ZBX_WIDGET_ROWS);
 
 	$count = 0;
 	while($event = DBfetch($db_events)){
