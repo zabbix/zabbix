@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2301] fixed "configure" script with libssh2-1.0.0 library (Sasha)
  - [ZBX-2285] fixed sending of active items multiple times (asaveljevs,Sasha)
  - [ZBX-2266] fixed server crash when processing malformed calculated items (asaveljevs)
  - [ZBX-1346] use single quotes in example frontend configuration file (Richlv)
