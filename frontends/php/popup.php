@@ -532,7 +532,7 @@ include_once('include/page_header.php');
 			$name = new CSpan($row['name'],'link');
 
 			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
-			$row['name'] = $row['node_name'].$row['name'];
+//			$row['name'] = $row['node_name'].$row['name'];
 
 			$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
