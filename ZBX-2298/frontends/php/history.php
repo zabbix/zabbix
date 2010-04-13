@@ -514,7 +514,6 @@ include_once('include/page_header.php');
 			}
 
 			while($row=DBfetch($result)){
-
 				if($DB['TYPE'] == 'ORACLE' && $item_type == ITEM_VALUE_TYPE_TEXT){
 					if(!isset($row['value']))
 						$row['value'] = '';
