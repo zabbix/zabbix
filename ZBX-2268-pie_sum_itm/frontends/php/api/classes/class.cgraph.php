@@ -1199,6 +1199,15 @@ COpt::memoryPick();
 			}
 // }}} EXCEPTION: NO ITEMS
 
+// EXCPETION: more than one sum type item for pie graph {{{
+			if($graph['graphtype'] == GRAPH_TYPE_PIE){
+				$sum_items = 0;
+				foreach($graph['gitems'] as $gitem){
+					if($gitem['type'] == GRAPH_ITEM_SUM) $sum_items++;
+				}
+				if($sum_items > 1) self::exception(ZBX_API_ERROR_PARAMETERS, S_ANOTHER_ITEM_SUM);
+			}
+// }}} EXCEPTION
 
 // EXCEPTION: GRAPH FIELDS {{{
 			$fields = array('name' => null);
