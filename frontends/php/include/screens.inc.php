@@ -59,6 +59,7 @@ require_once('include/js.inc.php');
 						$options = array(
 							'countOutput' => 1,
 							'itemids' => $itemid,
+							'webitems' => 1,
 							'nodeids' => get_current_nodeid(true)
 						);
 
