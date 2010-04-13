@@ -153,7 +153,7 @@
 			$elementid = $screen['screenid'];	
 		}
 		
-		$effectiveperiod = navigation_bar_calc('web.screens', $_REQUEST['elementid'], true);
+		$effectiveperiod = navigation_bar_calc('web.screens', $elementid, true);
 		
 		$element_name = $screens[$elementid]['name'];
 		
