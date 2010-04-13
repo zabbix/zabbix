@@ -61,8 +61,7 @@ initialize: function(screenid, obj_id, id){
 //	this.add_divs(this.screen_obj, 'td', 'draggable');
 	
 	var trs = this.screen_obj.getElementsByTagName("tr");
-	var c = 0;
-	
+
 	function wedge(event){ return false }
 	
 	for (var i = 0; i < trs.length; i++){
@@ -71,21 +70,21 @@ initialize: function(screenid, obj_id, id){
 			addListener(divs[j], 'mousedown', this.deactivate_drag.bindAsEventListener(this), false);
 			new Draggable(divs[j], {//revert: 'failure',
 //									handle:'handle'+c,
-									revert: function(){ 
-										if(IE){ 
-											Event.stopObserving(document.body, "drag", wedge, false); 
-											Event.stopObserving(document.body, "selectstart", wedge, false); 
-										} 
-									},
-									onStart: function(){ 
-										if(IE){ 
-											Event.observe(document.body, "drag", wedge, false); 
-											Event.observe(document.body, "selectstart", wedge, false); 
-										} 
-									},
-									onEnd: this.activate_drag.bind(this)
-									}); 
-			c++;
+				revert: true,
+//				function(){
+//					if(IE){
+//						Event.stopObserving(document.body, "drag", wedge, false);
+//						Event.stopObserving(document.body, "selectstart", wedge, false);
+//					}
+//				},
+				onStart: function(){
+					if(IE){
+						Event.observe(document.body, "drag", wedge, false);
+						Event.observe(document.body, "selectstart", wedge, false);
+					}
+				},
+				onEnd: this.activate_drag.bind(this)
+			});
 		}
 	}
 

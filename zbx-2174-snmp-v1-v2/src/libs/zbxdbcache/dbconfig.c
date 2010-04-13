@@ -26,15 +26,10 @@
 #include "ipc.h"
 #include "mutexs.h"
 
+static int	shm_id;
+
 #define	LOCK_CACHE	zbx_mutex_lock(&config_lock)
 #define	UNLOCK_CACHE	zbx_mutex_unlock(&config_lock)
-
-#define ZBX_GET_SHM_DBCONFIG_KEY(smk_key)				\
-	if( -1 == (shm_key = zbx_ftok(CONFIG_FILE, (int)'k') ))		\
-	{								\
-		zbx_error("Cannot create IPC key for DB configuration cache");	\
-		exit(1);						\
-	}
 
 /* *_ALLOC_STEP >= 1 */
 #define HOST_ALLOC_STEP 	16
@@ -1816,7 +1811,7 @@ static void	DCsync_items()
 		}
 
 		/* db items */
-		i = get_nearestindex(config->dbitems, sizeof(ZBX_DC_LOGITEM),
+		i = get_nearestindex(config->dbitems, sizeof(ZBX_DC_DBITEM),
 				config->dbitems_num, itemid);
 
 		if (ITEM_TYPE_DB_MONITOR == item->type && SUCCEED != DBis_null(row[19]) && '\0' != *row[19])
@@ -2159,11 +2154,10 @@ void	DCsync_configuration()
 void	init_configuration_cache()
 {
 	key_t	shm_key;
-	int	shm_id;
 	size_t	sz;
 	void	*ptr;
 
-	ZBX_GET_SHM_DBCONFIG_KEY(shm_key);
+	zabbix_log(LOG_LEVEL_DEBUG, "In init_configuration_cache() size:%d", CONFIG_DBCONFIG_SIZE);
 
 	sz = sizeof(ZBX_DC_CONFIG);
 
@@ -2173,12 +2167,16 @@ void	init_configuration_cache()
 		exit(FAIL);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In init_configuration_cache() size:%d", CONFIG_DBCONFIG_SIZE);
-
-	if ( -1 == (shm_id = zbx_shmget(shm_key, (size_t)CONFIG_DBCONFIG_SIZE)))
+	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, (int)'k')))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "ERROR: Can't allocate shared memory for configuration cache.");
-		exit(1);
+		zbx_error("Can't create IPC key for configuration cache");
+		exit(FAIL);
+	}
+
+	if (-1 == (shm_id = zbx_shmget(shm_key, (size_t)CONFIG_DBCONFIG_SIZE)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Can't allocate shared memory for configuration cache");
+		exit(FAIL);
 	}
 
 	ptr = shmat(shm_id, 0, 0);
@@ -2215,7 +2213,7 @@ void	init_configuration_cache()
 	config->hosts = ptr + sz;
 	config->ipmihosts = ptr + sz;
 	config->idxhost01 = ptr + sz;	/* proxy_hostid,host */
-	config->idxhost02 = ptr + sz;	/* poller_type,poller_num */
+	config->idxhost02 = ptr + sz;	/* poller_type,poller_num,nextcheck */
 }
 
 /******************************************************************************
@@ -2236,28 +2234,17 @@ void	init_configuration_cache()
 void	free_configuration_cache()
 {
 	const char	*__function_name = "free_configuration_cache";
-	key_t		shm_key;
-	int		shm_id;
-	size_t		sz;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	LOCK_CACHE;
 
-	ZBX_GET_SHM_DBCONFIG_KEY(shm_key);
-
-	sz = sizeof(ZBX_DC_CONFIG);
-
-	shm_id = shmget(shm_key, sz, 0);
-
-	if (-1 == shm_id)
+	if (-1 == shmctl(shm_id, IPC_RMID, 0))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Can't find shared memory for configuration cache. [%s]",
+		zabbix_log(LOG_LEVEL_WARNING, "Can't remove shared memory"
+				" for configuration cache. [%s]",
 				strerror(errno));
-		exit(FAIL);
 	}
-
-	shmctl(shm_id, IPC_RMID, 0);
 
 	config = NULL;
 

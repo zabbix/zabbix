@@ -1,5 +1,10 @@
 Changes for 1.8.3
 
+ - [ZBX-2174] fixed a small memory leak in SNMP checks (asaveljevs)
+ - [ZBX-2300] fixed caching of "Database monitor" items. Thanks to Kirill Fateev (Sasha)
+ - [ZBX-2290] fixed screen cells moving (Vedmak)
+ - [ZBX-2301] fixed "configure" script with libssh2-1.0.0 library (Sasha)
+ - [ZBX-2296] fixed possible heavy loaded server crash when using internal checks (Sasha)
  - [ZBX-2295] added additional units to graphs Y axis (Aly)
  - [ZBX-2285] fixed sending of active items multiple times (asaveljevs,Sasha)
  - [ZBX-2266] fixed server crash when processing malformed calculated items (asaveljevs)
