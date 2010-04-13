@@ -49,7 +49,7 @@ ZBX_USER_MSG
  *                                                                            *
  * Parameters: userid - user ID                                               *
  *                                                                            *
- * Return value: SUCCEED - prermission is positive, FAIL - otherwise          *
+ * Return value: SUCCEED - permission is positive, FAIL - otherwise           *
  *                                                                            *
  * Author:                                                                    *
  *                                                                            *
@@ -77,7 +77,7 @@ static int	check_perm2system(zbx_uint64_t userid)
 
 /******************************************************************************
  *                                                                            *
- * Function: get_host_permision                                               *
+ * Function: get_host_permission                                              *
  *                                                                            *
  * Purpose: Return user permissions for access to the host                    *
  *                                                                            *
@@ -91,13 +91,13 @@ static int	check_perm2system(zbx_uint64_t userid)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_host_permision(zbx_uint64_t userid, zbx_uint64_t hostid)
+static int	get_host_permission(zbx_uint64_t userid, zbx_uint64_t hostid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		user_type = -1, perm = PERM_DENY;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In get_host_permision()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In get_host_permission()");
 
 	result = DBselect("select type from users where userid=" ZBX_FS_UI64,
 			userid);
@@ -127,7 +127,7 @@ static int	get_host_permision(zbx_uint64_t userid, zbx_uint64_t hostid)
 
 	DBfree_result(result);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of get_host_permision():%s",
+	zabbix_log(LOG_LEVEL_DEBUG, "End of get_host_permission():%s",
 			zbx_permission_string(perm));
 
 	return perm;
@@ -135,7 +135,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: get_trigger_permision                                            *
+ * Function: get_trigger_permission                                           *
  *                                                                            *
  * Purpose: Return user permissions for access to trigger                     *
  *                                                                            *
@@ -149,14 +149,14 @@ out:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_trigger_permision(zbx_uint64_t userid, zbx_uint64_t triggerid)
+static int	get_trigger_permission(zbx_uint64_t userid, zbx_uint64_t triggerid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		perm = PERM_DENY, host_perm;
 	zbx_uint64_t	hostid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In get_trigger_permision()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In get_trigger_permission()");
 
 	result = DBselect("select distinct i.hostid from items i,functions f"
 			" where i.itemid=f.itemid and f.triggerid=" ZBX_FS_UI64,
@@ -165,7 +165,7 @@ static int	get_trigger_permision(zbx_uint64_t userid, zbx_uint64_t triggerid)
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(hostid, row[0]);
-		host_perm = get_host_permision(userid, hostid);
+		host_perm = get_host_permission(userid, hostid);
 
 		if (perm < host_perm)
 			perm = host_perm;
@@ -173,14 +173,14 @@ static int	get_trigger_permision(zbx_uint64_t userid, zbx_uint64_t triggerid)
 
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of get_trigger_permision():%s",
+	zabbix_log(LOG_LEVEL_DEBUG, "End of get_trigger_permission():%s",
 			zbx_permission_string(perm));
 
 	return perm;
 }
 
-static void	add_user_msg(int source, zbx_uint64_t userid, zbx_uint64_t mediatypeid, zbx_uint64_t triggerid, ZBX_USER_MSG **user_msg,
-		char *subject, char *message)
+static void	add_user_msg(int source, zbx_uint64_t userid, zbx_uint64_t mediatypeid,
+		zbx_uint64_t triggerid, ZBX_USER_MSG **user_msg, char *subject, char *message)
 {
 	ZBX_USER_MSG	*p;
 
@@ -189,7 +189,7 @@ static void	add_user_msg(int source, zbx_uint64_t userid, zbx_uint64_t mediatype
 	if (SUCCEED != check_perm2system(userid))
 		return;
 
-	if (EVENT_SOURCE_TRIGGERS == source && PERM_READ_ONLY > get_trigger_permision(userid, triggerid))
+	if (EVENT_SOURCE_TRIGGERS == source && PERM_READ_ONLY > get_trigger_permission(userid, triggerid))
 		return;
 
 	p = *user_msg;
@@ -403,7 +403,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
  * Purpose:                                                                   *
  *                                                                            *
  * Parameters: event - event to check                                         *
- *             actionid - action ID for matching                             *
+ *             actionid - action ID for matching                              *
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
  *                                                                            *
@@ -425,7 +425,7 @@ static int	check_operation_conditions(DB_EVENT *event, DB_OPERATION *operation)
 	int	num = 0;
 	int	exit = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In check_opeartion_conditions (operationid:" ZBX_FS_UI64 ")",
+	zabbix_log(LOG_LEVEL_DEBUG, "In check_operation_conditions (operationid:" ZBX_FS_UI64 ")",
 			operation->operationid);
 
 	result = DBselect("select conditiontype,operator,value from opconditions where operationid=" ZBX_FS_UI64 " order by conditiontype",
@@ -482,7 +482,7 @@ static int	check_operation_conditions(DB_EVENT *event, DB_OPERATION *operation)
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End check_opeartion_conditions():%s",
+	zabbix_log(LOG_LEVEL_DEBUG, "End check_operation_conditions():%s",
 			zbx_result_string(ret));
 
 	return ret;

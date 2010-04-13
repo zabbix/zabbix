@@ -76,7 +76,7 @@ static void	parent_signal_handler(int sig,  siginfo_t *siginfo, void *context)
  *                                                                            *
  * Purpose: init process as daemon                                            *
  *                                                                            *
- * Parameters: allow_root - allow root permision for application              *
+ * Parameters: allow_root - allow root permission for application             *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
