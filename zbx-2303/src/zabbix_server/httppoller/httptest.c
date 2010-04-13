@@ -26,7 +26,6 @@
 #include "zlog.h"
 #include "zbxserver.h"
 
-#	include <curl/easy.h>
 #include "httpmacro.h"
 #include "httptest.h"
 
@@ -484,7 +483,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 					lastfailedstep = httpstep.no;
 				}
 			}
-			free(page.data);
+			zbx_free(page.data);
 
 			if( !err_str )
 			{
