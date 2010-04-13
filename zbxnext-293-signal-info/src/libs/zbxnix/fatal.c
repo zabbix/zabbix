@@ -122,7 +122,7 @@ void	print_fatal_info(int sig, siginfo_t *siginfo, void *context)
 
 #endif	/* HAVE_EXECINFO_H */
 
-	zabbix_log(LOG_LEVEL_CRIT, "=== Memory map: ===", bcktrc_sz);
+	zabbix_log(LOG_LEVEL_CRIT, "=== Memory map: ===");
 
 	if (NULL != (fd = fopen("/proc/self/maps", "r")))
 	{
