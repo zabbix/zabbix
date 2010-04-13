@@ -747,6 +747,8 @@
 	'S_CANNOT_ADD_MACRO'=>				'Cannot add macro',
 	'S_CANNOT_DELETE_MACROS'=>			'Cannot delete macros',
 	'S_HOST_LIST'=>					'Hosts list',
+	'S_OTHER_GROUPS' => 'Other groups',
+	'S_IN_GROUPS' => 'In groups',
 	'S_IN'=>					'In',
 	'S_APPLICATION'=>				'Application',
 	'S_APPLICATIONS'=>				'Applications',
@@ -1226,6 +1228,9 @@
 	'S_SHOW_HOSTS_IN_MAINTENANCE' => 'Show hosts in maintenance',
 	'S_TRIGGERS_WITH_SEVERITY' => 'Triggers with severity',
 	'S_DASHBOARD_FILTER' => 'Dashboard filter',
+	'S_FAVOURITE_GRAPHS' => 'Favourite graphs',
+	'S_FAVOURITE_MAPS' => 'Favourite maps',
+	'S_FAVOURITE_SCREENS' => 'Favourite screens',
 
 //	overview.php
 	'S_OVERVIEW'=>				'Overview',
