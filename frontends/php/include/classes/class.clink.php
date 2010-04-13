@@ -20,6 +20,8 @@
 ?>
 <?php
 class CLink extends CTag{
+protected $sid = null;
+
 	public function __construct($item=NULL,$url=NULL,$class=NULL,$action=NULL, $nosid=NULL){
 		parent::__construct('a','yes');
 
@@ -44,8 +46,16 @@ class CLink extends CTag{
 
 	public function setUrl($value){
 		if(is_null($this->nosid)) {
-			$uri = new Curl($value);
-			$url = $uri->getUrl();
+			if(is_null($this->sid)) $this->sid = isset($_COOKIE['zbx_sessionid']) ? substr($_COOKIE['zbx_sessionid'],16,16) : null;
+
+			if(!is_null($this->sid)){
+				if((zbx_strstr($value,'&') !== false) || (zbx_strstr($value,'?') !== false)) $value.= '&sid='.$this->sid;
+				else $value.= '?sid='.$this->sid;
+
+//				$uri = new Curl($value);
+//				$url = $uri->getUrl();
+			}
+			$url = $value;
 		}
 		else {
 			$url = $value;

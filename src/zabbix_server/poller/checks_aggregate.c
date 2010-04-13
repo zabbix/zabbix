@@ -22,204 +22,280 @@
 
 #include "checks_aggregate.h"
 
-static	int	evaluate_one(double *result, int *num, char *grpfunc, char const *value_str, int valuetype)
+static	int	evaluate_one(double *result, int *num, char *grpfunc, char const *value_str, unsigned char valuetype)
 {
-	int	ret = SUCCEED;
-	double	value = 0;
+	int		ret = SUCCEED;
+	double		value = 0;
+	zbx_uint64_t	value_uint64;
 
-	if(valuetype == ITEM_VALUE_TYPE_FLOAT)
-	{
+	if (ITEM_VALUE_TYPE_FLOAT == valuetype)
 		value = zbx_atod(value_str);
-	}
-	else if(valuetype == ITEM_VALUE_TYPE_UINT64)
+	else if (ITEM_VALUE_TYPE_UINT64 == valuetype)
 	{
-		value = (double)zbx_atoui64(value_str);
+		ZBX_STR2UINT64(value_uint64, value_str);
+		value = (double)value_uint64;
 	}
 
-	if(strcmp(grpfunc,"grpsum") == 0)
+	if (0 == strcmp(grpfunc, "grpsum") || 0 == strcmp(grpfunc,"grpavg"))
 	{
-		*result+=value;
-		*num+=1;
+		*result += value;
+		*num += 1;
 	}
-	else if(strcmp(grpfunc,"grpavg") == 0)
+	else if (0 == strcmp(grpfunc, "grpmin"))
 	{
-		*result+=value;
-		*num+=1;
+		if (0 == *num || value < *result)
+			*result = value;
+		*num += 1;
 	}
-	else if(strcmp(grpfunc,"grpmin") == 0)
+	else if (0 == strcmp(grpfunc, "grpmax"))
 	{
-		if(*num==0)
-		{
-			*result=value;
-		}
-		else if(value<*result)
-		{
-			*result=value;
-		}
-		*num+=1;
-	}
-	else if(strcmp(grpfunc,"grpmax") == 0)
-	{
-		if(*num==0)
-		{
-			*result=value;
-		}
-		else if(value>*result)
-		{
-			*result=value;
-		}
-		*num+=1;
+		if (0 == *num || value > *result)
+			*result = value;
+		*num += 1;
 	}
 	else
-	{
 		ret = FAIL;
-	}
 
 	return ret;
 }
 
 /*
- * grpfunc: grpmax, grpmin, grpsum, grpavg
- * itemfunc: last, min, max, avg, sum,count
+ * get array of items with specified key for selected groups
  */
-static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, char *itemkey, char *itemfunc, char *param)
+static void	aggregate_get_items(zbx_uint64_t **ids, int *ids_alloc, int *ids_num, const char *groups, const char *itemkey)
 {
-	char		sql[MAX_STRING_LEN];
-	char		sql2[MAX_STRING_LEN];
-	char		hostgroup_esc[MAX_STRING_LEN],itemkey_esc[MAX_STRING_LEN];
+	char		*group, *esc;
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	itemid;
+	char		*sql = NULL;
+	int		sql_alloc = 1024, sql_offset = 0;
+	int		num, n;
+
+	esc = DBdyn_escape_string(itemkey);
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 192 + strlen(esc),
+			"select i.itemid"
+			" from items i,hosts_groups hg,hosts h,groups g"
+			" where hg.groupid=g.groupid"
+				" and i.hostid=h.hostid"
+				" and hg.hostid=h.hostid"
+				" and i.key_='%s'"
+				" and i.status=%d"
+				" and h.status=%d",
+			esc,
+			ITEM_STATUS_ACTIVE,
+			HOST_STATUS_MONITORED);
+
+	zbx_free(esc);
+
+	num = num_param(groups);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 32,
+				" and g.name in (");
+
+	for (n = 1; n <= num; n++)
+	{
+		if (NULL == (group = get_param_dyn(groups, n)))
+			continue;
+
+		esc = DBdyn_escape_string(group);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 3 + strlen(esc),
+					"'%s'", esc);
+		
+		if (n != num)
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 2, ",");
+
+		zbx_free(esc);
+		zbx_free(group);
+	}
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 128,
+			")" DB_NODE, DBnode_local("h.hostid"));
+
+	result = DBselect("%s", sql);
+
+	zbx_free(sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(itemid, row[0]);
+		uint64_array_add(ids, ids_alloc, ids_num, itemid, 64);
+	}
+	DBfree_result(result);
+}
+
+/*
+ * grpfunc: grpmax, grpmin, grpsum, grpavg
+ * itemfunc: last, min, max, avg, sum, count
+ */
+static int	evaluate_aggregate(AGENT_RESULT *res, char *grpfunc,
+		const char *groups, const char *itemkey,
+		const char *itemfunc, const char *param)
+{
+	const char	*__function_name = "evaluate_aggregate";
+	char		*sql = NULL;
+	int		sql_alloc = 1024, sql_offset;
+	zbx_uint64_t	*ids = NULL;
+	int		ids_alloc = 0, ids_num = 0;
 
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	int		valuetype;
+	unsigned char	valuetype;
 	double		d = 0;
 	const		char		*value;
 	int		num = 0;
 	int		now;
-	char		items[MAX_STRING_LEN],items2[MAX_STRING_LEN];
+	int		ret = FAIL;
 
-	now=time(NULL);
-
-	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_aggregate('%s','%s','%s','%s','%s')",
-		grpfunc,
-		hostgroup,
-		itemkey,
-		itemfunc,
-		param);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() grpfunc:'%s' groups:'%s'"
+			" itemkey:'%s' function:'%s(%s)'",
+			__function_name, grpfunc, groups, itemkey,
+			itemfunc, param);
 
 	init_result(res);
 
-	DBescape_string(itemkey,itemkey_esc,MAX_STRING_LEN);
-	DBescape_string(hostgroup,hostgroup_esc,MAX_STRING_LEN);
-/* Get list of affected item IDs */
-	strscpy(items,"0");
-	result = DBselect("select i.itemid from items i,hosts_groups hg,hosts h,groups g"
-			" where hg.groupid=g.groupid and i.hostid=h.hostid and hg.hostid=h.hostid"
-			" and g.name='%s' and i.key_='%s' and i.status=%d and h.status=%d" DB_NODE,
-		hostgroup_esc,
-		itemkey_esc,
-		ITEM_STATUS_ACTIVE,
-		HOST_STATUS_MONITORED,
-		DBnode_local("h.hostid"));
+	now = time(NULL);
 
-	while((row=DBfetch(result)))
+	aggregate_get_items(&ids, &ids_alloc, &ids_num, groups, itemkey);
+
+	if (0 == ids_num)
 	{
-		zbx_snprintf(items2,sizeof(items2),"%s,%s",
-			items,
-			row[0]);
-/*		zabbix_log( LOG_LEVEL_WARNING, "ItemIDs items2[%s])",items2);*/
-		strscpy(items,items2);
-/*		zabbix_log( LOG_LEVEL_WARNING, "ItemIDs items[%s])",items2);*/
+		SET_MSG_RESULT(res, zbx_dsprintf(NULL, "No items for key [%s] in group(s) [%s]",
+				itemkey, groups));
+		goto clean;
 	}
-	DBfree_result(result);
 
-	if(strcmp(itemfunc,"last") == 0)
+	sql = zbx_malloc(sql, sql_alloc);
+
+	if (0 == strcmp(itemfunc, "last"))
 	{
-		zbx_snprintf(sql,sizeof(sql),"select itemid,value_type,lastvalue from items where lastvalue is not NULL and items.itemid in (%s)",
-			items);
-		zbx_snprintf(sql2,sizeof(sql2),"select itemid,value_type,lastvalue from items where 0=1");
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+				"select itemid,value_type,lastvalue"
+				" from items"
+				" where lastvalue is not NULL"
+					" and value_type in (%d,%d)"
+					" and",
+				ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", ids, ids_num);
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			valuetype = (unsigned char)atoi(row[1]);
+			value = row[2];
+
+			if (FAIL == evaluate_one(&d, &num, grpfunc, value, valuetype))
+			{
+				SET_MSG_RESULT(res, strdup("Unsupported group function"));
+				DBfree_result(result);
+				goto clean;
+			}
+		}
+		DBfree_result(result);
 	}
 		/* The SQL works very very slow on MySQL 4.0. That's why it has been split into two. */
 /*		zbx_snprintf(sql,sizeof(sql),"select items.itemid,items.value_type,min(history.value) from items,hosts_groups,hosts,groups,history where history.itemid=items.itemid and hosts_groups.groupid=groups.groupid and items.hostid=hosts.hostid and hosts_groups.hostid=hosts.hostid and groups.name='%s' and items.key_='%s' and history.clock>%d group by 1,2",hostgroup_esc, itemkey_esc, now - atoi(param));*/
-	else if( (strcmp(itemfunc,"min") == 0) ||
-		(strcmp(itemfunc,"max") == 0) ||
-		(strcmp(itemfunc,"avg") == 0) ||
-		(strcmp(itemfunc,"count") == 0) ||
-		(strcmp(itemfunc,"sum") == 0)
-	)
+	else if (0 == strcmp(itemfunc,"min") || 0 == strcmp(itemfunc,"max") ||
+			0 == strcmp(itemfunc,"avg") || 0 == strcmp(itemfunc,"count") ||
+			0 == strcmp(itemfunc,"sum"))
 	{
-		zbx_snprintf(sql,sizeof(sql),"select h.itemid,i.value_type,%s(h.value) from items i,history h where h.itemid=i.itemid and h.itemid in (%s) and h.clock>%d group by h.itemid,i.value_type",
-			itemfunc,
-			items,
-			now - atoi(param));
-		zbx_snprintf(sql2,sizeof(sql),"select h.itemid,i.value_type,%s(h.value) from items i,history_uint h where h.itemid=i.itemid and h.itemid in (%s) and h.clock>%d group by h.itemid,i.value_type",
-			itemfunc,
-			items,
-			now - atoi(param));
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+				"select i.itemid,i.value_type,%s(h.value)"
+				" from items i,history h"
+				" where h.itemid=i.itemid"
+					" and h.clock>%d"
+					" and i.value_type=%d"
+					" and",
+				itemfunc,
+				now - atoi(param),
+				ITEM_VALUE_TYPE_FLOAT);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", ids, ids_num);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
+				" group by i.itemid,i.value_type");
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			valuetype = (unsigned char)atoi(row[1]);
+			value = row[2];
+
+			if (FAIL == evaluate_one(&d, &num, grpfunc, value, valuetype))
+			{
+				SET_MSG_RESULT(res, strdup("Unsupported group function"));
+				DBfree_result(result);
+				goto clean;
+			}
+		}
+		DBfree_result(result);
+
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+				"select i.itemid,i.value_type,%s(h.value)"
+				" from items i,history_uint h"
+				" where h.itemid=i.itemid"
+					" and h.clock>%d"
+					" and i.value_type=%d"
+					" and",
+				itemfunc,
+				now - atoi(param),
+				ITEM_VALUE_TYPE_UINT64);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", ids, ids_num);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 64,
+				" group by i.itemid,i.value_type");
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			valuetype = (unsigned char)atoi(row[1]);
+			value = row[2];
+
+			if (FAIL == evaluate_one(&d, &num, grpfunc, value, valuetype))
+			{
+				SET_MSG_RESULT(res, strdup("Unsupported group function"));
+				DBfree_result(result);
+				goto clean;
+			}
+		}
+		DBfree_result(result);
 	}
 	else
 	{
 		SET_MSG_RESULT(res, strdup("Unsupported item function"));
-		zabbix_log( LOG_LEVEL_WARNING, "Unsupported item function [%s])",
-			itemfunc);
-		return FAIL;
-	}
-	zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]",sql);
-	zabbix_log( LOG_LEVEL_DEBUG, "SQL2 [%s]",sql2);
-
-	result = DBselect("%s",sql);
-	while((row=DBfetch(result)))
-	{
-		valuetype = atoi(row[1]);
-		value = row[2];
-		if(FAIL == evaluate_one(&d, &num, grpfunc, value, valuetype))
-		{
-			SET_MSG_RESULT(res, strdup("Unsupported group function"));
-			zabbix_log( LOG_LEVEL_WARNING, "Unsupported group function [%s])",
-				grpfunc);
-			DBfree_result(result);
-			return FAIL;
-		}
-	}
-	DBfree_result(result);
-
-	result = DBselect("%s",sql2);
-	while((row=DBfetch(result)))
-	{
-		valuetype = atoi(row[1]);
-		value = row[2];
-		if(FAIL == evaluate_one(&d, &num, grpfunc, value, valuetype))
-		{
-			SET_MSG_RESULT(res, strdup("Unsupported group function"));
-			zabbix_log( LOG_LEVEL_WARNING, "Unsupported group function [%s])",
-				grpfunc);
-			DBfree_result(result);
-			return FAIL;
-		}
-	}
-	DBfree_result(result);
-
-	if(num==0)
-	{
-		SET_MSG_RESULT(res, strdup("No values"));
-		zabbix_log( LOG_LEVEL_WARNING, "No values for group[%s] key[%s])",
-			hostgroup,
-			itemkey);
-		return FAIL;
+		goto clean;
 	}
 
-	if(strcmp(grpfunc,"grpavg") == 0)
+	if (0 == num)
 	{
-		SET_DBL_RESULT(res, d/num);
-	}
-	else
-	{
-		SET_DBL_RESULT(res, d);
+		SET_MSG_RESULT(res, zbx_dsprintf(NULL, "No values for key [%s] in group [%s]",
+				itemkey, groups));
+		goto clean;
 	}
 
-	zabbix_log( LOG_LEVEL_DEBUG, "End evaluate_aggregate(result:" ZBX_FS_DBL ")",
-		d);
-	return SUCCEED;
+	if (0 == strcmp(grpfunc, "grpavg"))
+		d = d / num;
+
+	SET_DBL_RESULT(res, d);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() result:" ZBX_FS_DBL, __function_name, d);
+
+	ret = SUCCEED;
+clean:
+	zbx_free(ids);
+	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
@@ -241,133 +317,38 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
  ******************************************************************************/
 int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 {
-	char	function_grp[MAX_STRING_LEN];
-	char	key[MAX_STRING_LEN];
-	char	group[MAX_STRING_LEN];
-	char	itemkey[MAX_STRING_LEN];
-	char	function_item[MAX_STRING_LEN];
-	char	parameter[MAX_STRING_LEN];
-	char	*p,*p2;
+	const char	*__function_name = "get_value_aggregate";
+	char		key[8], params[MAX_STRING_LEN], groups[MAX_STRING_LEN],
+			itemkey[MAX_STRING_LEN],
+			func[8], funcp[32];
+	int		ret = SUCCEED;
 
-	int	ret = SUCCEED;
-
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In get_value_aggregate() key:'%s'",
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name,
 			item->key_orig);
 
 	init_result(result);
 
-	strscpy(key, item->key);
-	if((p=strchr(key,'[')) != NULL)
-	{
-		*p=0;
-		strscpy(function_grp,key);
-		*p='[';
-		p++;
-	}
-	else	ret = NOTSUPPORTED;
+	if (2/* command with parameters */ != parse_command(item->key, key,
+				sizeof(key), params, sizeof(params)))
+		return NOTSUPPORTED;
 
-	if(ret == SUCCEED)
-	{
-		if((p2=strchr(p,'"')) != NULL)
-		{
-			p2++;
-		}
-		else	ret = NOTSUPPORTED;
+	if (num_param(params) != 4)
+		return NOTSUPPORTED;
 
-		if((ret == SUCCEED) && (p=strchr(p2,'"')) != NULL)
-		{
-			*p=0;
-			strscpy(group,p2);
-			*p='"';
-			p++;
-		}
-		else	ret = NOTSUPPORTED;
-	}
+	if (0 != get_param(params, 1, groups, sizeof(groups)))
+		return NOTSUPPORTED;
 
-	if(ret == SUCCEED)
-	{
-		if(*p != ',')	ret = NOTSUPPORTED;
-	}
+	if (0 != get_param(params, 2, itemkey, sizeof(itemkey)))
+		return NOTSUPPORTED;
 
-	if(ret == SUCCEED)
-	{
-		if((p2=strchr(p,'"')) != NULL)
-		{
-			p2++;
-		}
-		else	ret = NOTSUPPORTED;
+	if (0 != get_param(params, 3, func, sizeof(func)))
+		return NOTSUPPORTED;
 
-		if((ret == SUCCEED) && (p=strchr(p2,'"')) != NULL)
-		{
-			*p=0;
-			strscpy(itemkey,p2);
-			*p='"';
-			p++;
-		}
-		else	ret = NOTSUPPORTED;
-	}
+	if (0 != get_param(params, 4, funcp, sizeof(funcp)))
+		return NOTSUPPORTED;
 
-	if(ret == SUCCEED)
-	{
-		if(*p != ',')	ret = NOTSUPPORTED;
-	}
-
-	if(ret == SUCCEED)
-	{
-		if((p2=strchr(p,'"')) != NULL)
-		{
-			p2++;
-		}
-		else	ret = NOTSUPPORTED;
-
-		if((ret == SUCCEED) && (p=strchr(p2,'"')) != NULL)
-		{
-			*p=0;
-			strscpy(function_item,p2);
-			*p='"';
-			p++;
-		}
-		else	ret = NOTSUPPORTED;
-	}
-
-	if(ret == SUCCEED)
-	{
-		if(*p != ',')	ret = NOTSUPPORTED;
-	}
-
-	if(ret == SUCCEED)
-	{
-		if((p2=strchr(p,'"')) != NULL)
-		{
-			p2++;
-		}
-		else	ret = NOTSUPPORTED;
-
-		if((ret == SUCCEED) && (p=strchr(p2,'"')) != NULL)
-		{
-			*p=0;
-			strscpy(parameter,p2);
-			*p='"';
-			p++;
-		}
-		else	ret = NOTSUPPORTED;
-	}
-
-	zabbix_log( LOG_LEVEL_DEBUG, "Evaluating aggregate[%s] grpfunc[%s] group[%s] itemkey[%s] itemfunc [%s] parameter [%s]",
-		item->key_orig,
-		function_grp,
-		group,
-		itemkey,
-		function_item,
-		parameter);
-
-	if( (ret == SUCCEED) &&
-		(evaluate_aggregate(result,function_grp, group, itemkey, function_item, parameter) != SUCCEED)
-	)
-	{
+	if (SUCCEED != evaluate_aggregate(result, key, groups, itemkey, func, funcp))
 		ret = NOTSUPPORTED;
-	}
 
 	return ret;
 }

@@ -37,7 +37,7 @@ function add_regexp($regexp=array()){
 					);
 
 	if(!check_db_fields($db_fields, $regexp)){
-		error('Incorrect arguments pasted to function [add_regexp]');
+		error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.' [add_regexp]');
 		return false;
 	}
 
@@ -65,7 +65,7 @@ function update_regexp($regexpid, $regexp=array()){
 					);
 
 	if(!check_db_fields($db_fields, $regexp)){
-		error('Incorrect arguments pasted to function [update_regexp]');
+		error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.' [update_regexp]');
 		return false;
 	}
 
@@ -107,7 +107,7 @@ function add_expression($regexpid, $expression = array()){
 					);
 
 	if(!check_db_fields($db_fields, $expression)){
-		error('Incorrect arguments pasted to function [add_expression]');
+		error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.' [add_expression]');
 		return false;
 	}
 

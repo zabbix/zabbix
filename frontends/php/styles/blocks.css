@@ -24,14 +24,14 @@
 /************************************************************/
 div.scrollbar{
 	position: relative;
-	border: 0px red solid;
+	border: 1px #4F6FA8 solid;
 	height: 56px;
 	background-color: #DDDDDD;
+	margin: 0 auto;
 /*	overflow: hidden; */
 }
 
 div.scrollbar .info{
-	width: 300px;
 	height: 14px;
 	font-size: 10px;
 	vertical-align:bottom;
@@ -103,7 +103,6 @@ div.scrollbar .info .timeline .info_right{
 }
 
 div.scrollbar .sublevel{
-	width: 500px;
 }
 
 div.scrollbar .sublevel .bg{
@@ -129,8 +128,8 @@ div.scrollbar .sublevel .right{
 }
 
 div.scrollbar .overlevel{
-	position:relative;
-	top: -27px;
+	position:absolute;
+	top: 14px;
 	border: 0px green solid;
 	height: 27px;
 	left: 17px;
@@ -186,7 +185,7 @@ div.scrollbar .overlevel .left_arr{
 
 	background-image: url(../images/general/bar/left_arr.png);
 	
-	z-index: 1000;
+	z-index: 99;
 	cursor:e-resize;
 }
 
@@ -199,15 +198,11 @@ div.scrollbar .overlevel .right_arr{
 
 	background-image: url(../images/general/bar/right_arr.png);
 	
-	z-index: 1000;
+	z-index: 99;
 	cursor:e-resize;
 }
 
-
 div.scrollbar .subline{
-	position: relative;
-	top: -26px;
-	width: 500px;
 	height: 14px;
 	border: 0px blue solid;
 }

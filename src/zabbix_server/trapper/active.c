@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "db.h"
+#include "dbcache.h"
 #include "log.h"
 
 #include "active.h"
@@ -52,18 +53,26 @@ static int	get_hostid_by_host(const char *host, zbx_uint64_t *hostid, char *erro
 	host_esc = DBdyn_escape_string(host);
 
 	result = DBselect(
-			"select hostid"
+			"select hostid,status"
 			" from hosts"
 			" where host='%s'"
+				" and status in (%d,%d)"
 		       		" and proxy_hostid=0"
 				DB_NODE,
 			host_esc,
+			HOST_STATUS_MONITORED,
+			HOST_STATUS_NOT_MONITORED,
 			DBnode_local("hostid"));
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		*hostid = zbx_atoui64(row[0]);
-		res = SUCCEED;
+		if (HOST_STATUS_MONITORED == atoi(row[1]))
+		{
+			ZBX_STR2UINT64(*hostid, row[0]);
+			res = SUCCEED;
+		}
+		else
+			zbx_snprintf(error, MAX_STRING_LEN, "host [%s] not monitored", host);
 	}
 	else
 	{
@@ -120,6 +129,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request, zbx_process_t zb
 	int		res = FAIL;
 	zbx_uint64_t	hostid;
 	char		error[MAX_STRING_LEN];
+	DC_ITEM		dc_item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In send_list_of_active_checks()");
 
@@ -166,10 +176,18 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request, zbx_process_t zb
 	buffer_offset = 0;
 	while (NULL != (row = DBfetch(result)))
 	{
+		if (FAIL == DCconfig_get_item_by_key(&dc_item, (zbx_uint64_t)0, host, row[0]))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Item '%s' was not found in the server cache. Not sending now.", row[0]);
+			continue;
+		}
+
+		zabbix_log(LOG_LEVEL_DEBUG, "Item '%s' was successfully found in the server cache. Sending.", row[0]);
+
 		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, 512, "%s:%s:%s\n",
-				row[0],
-				row[1],
-				row[2]);
+				row[0],		/* item key */
+				row[1],		/* item delay */
+				row[2]);	/* item lastlogsize */
 	}
 	DBfree_result(result);
 
@@ -195,18 +213,20 @@ out:
 	return res;
 }
 
-static	void	add_regexp_name(char ***regexp, int *regexp_alloc, int *regexp_num, const char *regexp_name)
+static void	add_regexp_name(char ***regexp, int *regexp_alloc, int *regexp_num, const char *regexp_name)
 {
-	int i = 0;
-	for (; i < *regexp_num; i++)
-		if (0 == strcmp(*regexp[i], regexp_name))
+	int	i;
+
+	for (i = 0; i < *regexp_num; i++)
+		if (0 == strcmp((*regexp)[i], regexp_name))
 			return;
+
 	if (i == *regexp_num) {
 		if (*regexp_num == *regexp_alloc) {
 			*regexp_alloc += 32;
-			*regexp = zbx_realloc(*regexp, *regexp_alloc);
+			*regexp = zbx_realloc(*regexp, sizeof(char *) * *regexp_alloc);
 		}
-		*regexp[*regexp_num++] = strdup(regexp_name);
+		(*regexp)[(*regexp_num)++] = strdup(regexp_name);
 	}
 }
 
@@ -239,9 +259,10 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 	int		res = FAIL;
 	zbx_uint64_t	hostid;
 	char		error[MAX_STRING_LEN];
+	DC_ITEM		dc_item;
 
 	char		**regexp = NULL;
-	int		regexp_alloc = 32;
+	int		regexp_alloc = 0;
 	int		regexp_num = 0, n;
 
 	char		*sql = NULL;
@@ -259,7 +280,6 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 	if (FAIL == get_hostid_by_host(host, &hostid, error, zbx_process))
 		goto error;
 
-	regexp = zbx_malloc(regexp, regexp_alloc);
 	sql = zbx_malloc(sql, sql_alloc);
 
 	name_esc = DBdyn_escape_string(host);
@@ -291,6 +311,14 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		if (FAIL == DCconfig_get_item_by_key(&dc_item, (zbx_uint64_t)0, host, row[1]))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Item '%s' was not found in the server cache. Not sending now.", row[1]);
+			continue;
+		}
+
+		zabbix_log(LOG_LEVEL_DEBUG, "Item '%s' was successfully found in the server cache. Sending.", row[1]);
+
 		DBget_item_from_db(&item, row);
 
 		zbx_json_addobject(&json, NULL);
@@ -311,7 +339,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp,
 			/* log[filename,pattern,encoding,maxlinespersec] */
 			/* logrt[filename_format,pattern,encoding,maxlinespersec] */
 
-			if (0 != strncmp(item.key, "log[", 4) && 0 != strncmp(item.key, "logrt[", 11))
+			if (0 != strncmp(item.key, "log[", 4) && 0 != strncmp(item.key, "logrt[", 6))
 				break;
 
 			if (2 != parse_command(item.key, NULL, 0, params, MAX_STRING_LEN))

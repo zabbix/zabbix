@@ -145,6 +145,7 @@ void    *get_result_value_by_type(AGENT_RESULT *result, int require_type);
 
 extern int	CONFIG_ENABLE_REMOTE_COMMANDS;
 extern int	CONFIG_LOG_REMOTE_COMMANDS;
+extern int	CONFIG_UNSAFE_USER_PARAMETERS;
 
 /* #define TEST_PARAMETERS */
 
@@ -251,6 +252,11 @@ int	PERF_MONITOR(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 int	SERVICE_STATE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	SERVICES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	PROC_INFO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	NET_IF_LIST(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 #endif /* _WINDOWS */
+
+#ifdef _AIX
+int	SYSTEM_STAT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+#endif	/* _AIX */
 
 #endif

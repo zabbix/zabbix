@@ -36,14 +36,16 @@ class CCheckBox extends CTag{
 	}
 
 	public function setEnabled($value='yes'){
-		if($value=='yes' || $value == true || $value === 1)
+		if($value === 'yes' || $value == true || $value == 1){
 			return $this->removeAttribute('disabled');
+		}
+		$this->attributes['disabled'] = 'disabled';
 
-		return $this->attributes['disabled'] = 'disabled';
+	return true;
 	}
 
 	public function setChecked($value='yes'){
-		if((is_string($value)&& ($value=='yes' || $value=='checked' || $value=='on') || $value=='1') || (is_int($value)&&$value<>0))
+		if((is_string($value) && ($value=='yes' || $value=='checked' || $value=='on') || $value=='1') || (is_int($value)&&$value<>0))
 			return $this->attributes['checked'] = 'checked';
 
 		$this->removeAttribute('checked');

@@ -201,8 +201,8 @@
 			$name = get_request('host', '');
 		}
 
-		$frmHostG = new CFormTable($frm_title,"proxies.php");
-		$frmHostG->setHelp("web.proxy.php");
+		$frmHostG = new CFormTable($frm_title, 'proxies.php');
+		$frmHostG->setHelp('web.proxy.php');
 
 		if($_REQUEST['hostid'] > 0){
 			$frmHostG->addVar('hostid',$_REQUEST['hostid']);
@@ -215,20 +215,21 @@
 		$sql = 'SELECT hostid,proxy_hostid,host '.
 				' FROM hosts '.
 				' WHERE status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.') '.
+				' AND '.DBin_node('hostid').
 				' ORDER BY host';
 		$db_hosts=DBselect($sql);
 		while($db_host=DBfetch($db_hosts)){
 			$cmbHosts->addItem($db_host['hostid'],
-				get_node_name_by_elid($db_host['hostid'], null, ': ').$db_host["host"],
+				$db_host['host'],
 				NULL,
-				($db_host["proxy_hostid"] == 0 || ($_REQUEST['hostid']>0) && ($db_host["proxy_hostid"] == $_REQUEST['hostid'])));
+				($db_host['proxy_hostid'] == 0 || ($_REQUEST['hostid']>0) && ($db_host['proxy_hostid'] == $_REQUEST['hostid'])));
 		}
 		$frmHostG->addRow(S_HOSTS,$cmbHosts->Get(S_PROXY.SPACE.S_HOSTS,S_OTHER.SPACE.S_HOSTS));
 
-		$frmHostG->addItemToBottomRow(new CButton("save",S_SAVE));
+		$frmHostG->addItemToBottomRow(new CButton('save',S_SAVE));
 		if($_REQUEST['hostid']>0){
 			$frmHostG->addItemToBottomRow(SPACE);
-			$frmHostG->addItemToBottomRow(new CButton("clone",S_CLONE));
+			$frmHostG->addItemToBottomRow(new CButton('clone',S_CLONE));
 			$frmHostG->addItemToBottomRow(SPACE);
 			$frmHostG->addItemToBottomRow(
 				new CButtonDelete(S_DELETE_SELECTED_PROXY_Q, url_param('form').url_param('hostid'))
@@ -304,12 +305,23 @@
 
 //----- GO ------
 		$goBox = new CComboBox('go');
-		$goBox->addItem('activate', S_ACTIVATE_SELECTED);
-		$goBox->addItem('disable', S_DISABLE_SELECTED);
-		$goBox->addItem('delete', S_DELETE_SELECTED);
+
+		$goOption = new CComboItem('activate',S_ACTIVATE_SELECTED);
+		$goOption->setAttribute('confirm',S_ENABLE_SELECTED_PROXIES);
+		$goBox->addItem($goOption);
+
+		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
+		$goOption->setAttribute('confirm',S_DISABLE_SELECTED_PROXIES);
+		$goBox->addItem($goOption);
+
+		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
+		$goOption->setAttribute('confirm',S_DELETE_SELECTED_PROXIES);
+		$goBox->addItem($goOption);
+
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton', S_GO.' (0)');
 		$goButton->setAttribute('id', 'goButton');
+
 		zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
 // --
 

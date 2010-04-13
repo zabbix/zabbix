@@ -58,10 +58,13 @@
 
 #define zbx_mutex_create(mutex, name)		zbx_mutex_create_ext(mutex, name, 0)
 #define zbx_mutex_create_force(mutex, name)	zbx_mutex_create_ext(mutex, name, 1)
-int zbx_mutex_create_ext(ZBX_MUTEX	*mutex, ZBX_MUTEX_NAME name, unsigned char forced);
-int zbx_mutex_lock(ZBX_MUTEX	*mutex);
-int zbx_mutex_unlock(ZBX_MUTEX	*mutex);
-int zbx_mutex_destroy(ZBX_MUTEX	*mutex);
+#define zbx_mutex_lock(mutex)			__zbx_mutex_lock(__FILE__, __LINE__, mutex)
+#define zbx_mutex_unlock(mutex)			__zbx_mutex_unlock(__FILE__, __LINE__, mutex)
+
+int	zbx_mutex_create_ext(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, unsigned char forced);
+void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex);
+void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex);
+int	zbx_mutex_destroy(ZBX_MUTEX *mutex);
 
 /*********************************************************/
 /*** PHP Semaphore functions using System V semaphores ***/

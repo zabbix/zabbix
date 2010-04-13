@@ -49,6 +49,10 @@
 		return "({".$var."}>=".$min."&&{".$var."}<=".$max.")&&";
 	}
 
+	function REGEXP($regexp,$var=NULL){
+		return "(preg_match(\"".$regexp."\", {".$var."}))&&";
+	}
+
 	function GT($value,$var=''){
 		return "({".$var."}>=".$value.")&&";
 	}
@@ -108,7 +112,7 @@
 		$pattern9 = '([a-f0-9]{1,4}:){1,7}:';
 		$pattern10 = '::';
 
-		$full = "/^($pattern1)$|^($pattern2)$|^($pattern3)$|^($pattern4)$|^($pattern5)$|^($pattern6)$|^($pattern7)$|^($pattern8)$|^($pattern9)$|^($pattern10)$/";
+		$full = "/^($pattern1)$|^($pattern2)$|^($pattern3)$|^($pattern4)$|^($pattern5)$|^($pattern6)$|^($pattern7)$|^($pattern8)$|^($pattern9)$|^($pattern10)$/i";
 
 		if(!preg_match($full, $str)) return false;
 
@@ -203,7 +207,7 @@
 
 	function validate_ip_range($str){
 		foreach(explode(',',$str) as $ip_range){
-			if(false !== strpos($ip_range, '/') ) {
+			if(false !== zbx_strpos($ip_range, '/') ) {
 				if(false === validate_ip_range_mask($ip_range) )
 					return false;
 			}
@@ -347,11 +351,11 @@
 		if($type == T_ZBX_IP_RANGE){
 			if( !validate_ip_range($var) ){
 				if($flags&P_SYS){
-					info('Critical error. Field ['.$field.'] is not IP range');
+					info(S_CRITICAL_ERROR.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_IS_NOT_IP_RANGE_SMALL);
 					return ZBX_VALID_ERROR;
 				}
 				else{
-					info('Warning. Field ['.$field.'] is not IP range');
+					info(S_WARNING.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_IS_NOT_IP_RANGE_SMALL);
 					return ZBX_VALID_WARNING;
 				}
 			}
@@ -360,66 +364,76 @@
 
 		if($type == T_ZBX_PORTS){
 			$err = ZBX_VALID_OK;
+
+			$type = ($flags&P_SYS)?ZBX_VALID_ERROR:ZBX_VALID_WARNING;
 			foreach(explode(',', $var) as $el)
-				foreach(explode('-', $el) as $p)
+				foreach(explode('-', $el) as $p){
 					$err |= check_type($field, $flags, $p, T_ZBX_INT);
+					if(($p > 65535) || ($p < 0))  $err |= $type;
+				}
+
+			if($err == ZBX_VALID_ERROR)
+				info(S_CRITICAL_ERROR.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_IS_NOT_PORT_RANGE_SMALL);
+			else if($err == ZBX_VALID_WARNING)
+				info(S_WARNING.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_IS_NOT_PORT_RANGE_SMALL);
+
 			return $err;
 		}
 
 		if($type == T_ZBX_INT_RANGE){
 			if( !is_int_range($var) ){
 				if($flags&P_SYS){
-					info('Critical error. Field ['.$field.'] is not integer range');
+					info(S_CRITICAL_ERROR.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_IS_NOT_INTEGER_RANGE_SMALL);
 					return ZBX_VALID_ERROR;
 				}
 				else{
-					info('Warning. Field ['.$field.'] is not integer range');
+					info(S_WARNING.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_IS_NOT_INTEGER_RANGE_SMALL);
 					return ZBX_VALID_WARNING;
 				}
 			}
 			return ZBX_VALID_OK;
 		}
 
-		if(($type == T_ZBX_INT) && !is_numeric($var)) {
+		if(($type == T_ZBX_INT) && !zbx_numeric($var)) {
 			if($flags&P_SYS){
-				info('Critical error. Field ['.$field.'] is not integer');
+				info(S_CRITICAL_ERROR.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_IS_NOT_INTEGER_SMALL);
 				return ZBX_VALID_ERROR;
 			}
 			else{
-				info('Warning. Field ['.$field.'] is not integer');
+				info(S_WARNING.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_IS_NOT_INTEGER_SMALL);
 				return ZBX_VALID_WARNING;
 			}
 		}
 
 		if(($type == T_ZBX_DBL) && !is_numeric($var)) {
 			if($flags&P_SYS){
-				info('Critical error. Field ['.$field.'] is not double');
+				info(S_CRITICAL_ERROR.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_IS_NOT_DOUBLE_SMALL);
 				return ZBX_VALID_ERROR;
 			}
 			else{
-				info('Warning. Field ['.$field.'] is not double');
+				info(S_WARNING.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_IS_NOT_DOUBLE_SMALL);
 				return ZBX_VALID_WARNING;
 			}
 		}
 
 		if(($type == T_ZBX_STR) && !is_string($var)) {
 			if($flags&P_SYS){
-				info('Critical error. Field ['.$field.'] is not string');
+				info(S_CRITICAL_ERROR.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_IS_NOT_STRING_SMALL);
 				return ZBX_VALID_ERROR;
 			}
 			else{
-				info('Warning. Field ['.$field.'] is not string');
+				info(S_WARNING.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_IS_NOT_STRING_SMALL);
 				return ZBX_VALID_WARNING;
 			}
 		}
 //*
-		if(($type == T_ZBX_STR) && !defined('ZBX_ALLOW_UNICODE') && (strlen($var) != zbx_strlen($var))){
+		if(($type == T_ZBX_STR) && !defined('ZBX_ALLOW_UNICODE') && (zbx_strlen($var) != zbx_strlen($var))){
 			if($flags&P_SYS){
-				info('Critical error. Field ['.$field.'] contains Multibyte chars');
+				info(S_CRITICAL_ERROR.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_CONTAINS_MULTIBYTE_CHARS_SMALL);
 				return ZBX_VALID_ERROR;
 			}
 			else{
-				info('Warning. Field ['.$field.'] - multibyte chars are restricted');
+				info(S_WARNING.'.'.SPACE.S_FIELD.SPACE.'['.$field.'] - '.S_MULTIBYTE_CHARS_ARE_RESTRICTED_SMALL);
 				return ZBX_VALID_ERROR;
 			}
 		}
@@ -427,11 +441,11 @@
 		if(($type == T_ZBX_CLR) && !is_hex_color($var)) {
 			$var = 'FFFFFF';
 			if($flags&P_SYS){
-				info('Critical error. Field ['.$field.'] is not a colour');
+				info(S_CRITICAL_ERROR.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_IS_NOT_A_COLOUR_SMALL);
 				return ZBX_VALID_ERROR;
 			}
 			else{
-				info('Warning. Field ['.$field.'] is not a colour');
+				info(S_WARNING.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_IS_NOT_A_COLOUR_SMALL);
 				return ZBX_VALID_WARNING;
 			}
 		}
@@ -450,8 +464,9 @@
 	}
 
 	function check_field(&$fields, &$field, $checks){
-		list($type,$opt,$flags,$validation,$exception)=$checks;
-
+		if(!isset($checks[5])) $checks[5] = $field;
+		list($type,$opt,$flags,$validation,$exception,$caption)=$checks;
+                                                            	
 		if($flags&P_UNSET_EMPTY && isset($_REQUEST[$field]) && $_REQUEST[$field]==''){
 			unset_request($field,'P_UNSET_EMPTY');
 		}
@@ -470,11 +485,11 @@
 		if($opt == O_MAND){
 			if(!isset($_REQUEST[$field])){
 				if($flags&P_SYS){
-					info('Critical error. Field ['.$field.'] is mandatory');
+					info(S_CRITICAL_ERROR.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_IS_MANDATORY_SMALL);
 					return ZBX_VALID_ERROR;
 				}
 				else{
-					info('Warning. Field ['.$field.'] is mandatory');
+					info(S_WARNING.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_IS_MANDATORY_SMALL);
 					return ZBX_VALID_WARNING;
 				}
 			}
@@ -486,11 +501,11 @@
 			unset_request($field,'O_NO');
 
 			if($flags&P_SYS){
-				info('Critical error. Field ['.$field.'] must be missing');
+				info(S_CRITICAL_ERROR.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_MUST_BE_MISSING_SMALL);
 				return ZBX_VALID_ERROR;
 			}
 			else{
-				info('Warning. Field ['.$field.'] must be missing');
+				info(S_WARNING.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_MUST_BE_MISSING_SMALL);
 				return ZBX_VALID_WARNING;
 			}
 		}
@@ -500,11 +515,11 @@
 			}
 			else if($flags&P_ACT){
 				if(!isset($_REQUEST['sid'])){
-					info('Operation cannot be performed due to unauthorized request');
+					info(S_OPERATION_CANNOT_PERFORMED_UNAUTH_REQUEST);
 					return ZBX_VALID_ERROR;
 				}
 				else if(isset($_COOKIE['zbx_sessionid']) && ($_REQUEST['sid'] != substr($_COOKIE['zbx_sessionid'],16,16))){
-					info('Operation cannot be performed due to unauthorized request');
+					info(S_OPERATION_CANNOT_PERFORMED_UNAUTH_REQUEST);
 					return ZBX_VALID_ERROR;
 				}
 			}
@@ -521,15 +536,15 @@
 		if(is_null($exception) || ($except == true)){
 
 			if(!$validation)	$valid = TRUE;
-			else			$valid = calc_exp($fields,$field,$validation);
+			else				$valid = calc_exp($fields,$field,$validation);
 
 			if(!$valid){
 				if($flags&P_SYS){
-					info('Critical error. Incorrect value for ['.$field.'] = "'.$_REQUEST[$field].'"');
+					info(S_CRITICAL_ERROR.'.'.SPACE.S_INCORRECT_VALUE_FOR.SPACE.'['.$caption.'] = "'.$_REQUEST[$field].'"');
 					return ZBX_VALID_ERROR;
 				}
 				else{
-					info('Warning. Incorrect value for ['.$field.']');
+					info(S_WARNING.'.'.SPACE.S_INCORRECT_VALUE_FOR.SPACE.'['.$caption.']');
 					return ZBX_VALID_WARNING;
 				}
 			}
@@ -583,8 +598,9 @@
 			invalid_url();
 		}
 
-		if($show_messages) show_messages();
+		if($show_messages && ($err!=ZBX_VALID_OK))
+			show_messages($err==ZBX_VALID_OK, NULL, S_PAGE_RECEIVED_INCORRECT_DATA);
 
-		return ($err==ZBX_VALID_OK ? 1 : 0);
+	return ($err==ZBX_VALID_OK ? 1 : 0);
 	}
 ?>

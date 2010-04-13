@@ -75,10 +75,10 @@ static int	get_function_parameter_uint(DB_ITEM *item, const char *parameters, in
 				res = SUCCEED;
 			}
 		}
-		else if (SUCCEED == is_uint(parameter))
+		else if (SUCCEED == is_uint_prefix(parameter))
 		{
 			*flag = ZBX_FLAG_SEC;
-			sscanf(parameter, "%u", value);
+			*value = str2uint(parameter);
 			res = SUCCEED;
 		}
 	}
@@ -127,7 +127,7 @@ clean:
  * Parameters: item - item (performance metric)                               *
  *             parameter - ignored                                            *
  *                                                                            *
- * Return value: SUCCEED - evaluated succesfully, result is stored in 'value' *
+ * Return value: SUCCEED - evaluated successfully, result is stored in value  *
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -242,12 +242,16 @@ clean:
  * Purpose: evaluate function 'count' for the item                            *
  *                                                                            *
  * Parameters: item - item (performance metric)                               *
- *             parameter - number of seconds                                  *
+ *             parameters - up to four comma-separated fields:                *
+ *                            (1) number of seconds/values                    *
+ *                            (2) value to compare with (optional)            *
+ *                            (3) comparison operator (optional)              *
+ *                            (4) time shift (optional)                       *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -260,7 +264,8 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 #define OP_GE 3
 #define OP_LT 4
 #define OP_LE 5
-#define OP_MAX 6
+#define OP_LIKE 6
+#define OP_MAX 7
 
 	const char	*__function_name = "evaluate_COUNT";
 	DB_RESULT	result;
@@ -268,68 +273,107 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 
 	char		tmp[MAX_STRING_LEN];
 
-	int		arg1, flag, op = OP_EQ, offset,
-			count, res = FAIL;
+	int		arg1, flag, op, offset, numeric_search, nparams, count, res = FAIL;
 	zbx_uint64_t	value_uint64 = 0, dbvalue_uint64;
 	double		value_double = 0, dbvalue_double;
-	char		*operators[OP_MAX] = {"=", "<>", ">", ">=", "<", "<="};
-	char		*arg2 = NULL, *arg3 = NULL, *arg2_esc;
+	char		*operators[OP_MAX] = {"=", "<>", ">", ">=", "<", "<=", "like"};
+	char		*arg2 = NULL, *arg3 = NULL, *arg2_esc = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	switch (item->value_type)
-	{
-	case ITEM_VALUE_TYPE_FLOAT:
-	case ITEM_VALUE_TYPE_UINT64:
-		if (num_param(parameters) > 3)
-			return res;
-		break;
-	case ITEM_VALUE_TYPE_LOG:
-	case ITEM_VALUE_TYPE_STR:
-	case ITEM_VALUE_TYPE_TEXT:
-		if (num_param(parameters) > 2)
-			return res;
-		break;
-	default:
+	numeric_search = (item->value_type == ITEM_VALUE_TYPE_UINT64 || item->value_type == ITEM_VALUE_TYPE_FLOAT);
+	op = (numeric_search ? OP_EQ : OP_LIKE);
+
+	nparams = num_param(parameters);
+	if (!(1 <= nparams && nparams <= 4))
 		return res;
-	}
 
 	if (FAIL == get_function_parameter_uint(item, parameters, 1, &arg1, &flag))
 		return res;
 
-	if (SUCCEED == get_function_parameter_str(item, parameters, 2, &arg2))
+	if (nparams >= 2)
 	{
-		if ((item->value_type == ITEM_VALUE_TYPE_UINT64 || item->value_type == ITEM_VALUE_TYPE_FLOAT) &&
-				SUCCEED == get_function_parameter_str(item, parameters, 3, &arg3))
+		if (FAIL == get_function_parameter_str(item, parameters, 2, &arg2))
+			return res;
+		else
+			switch (item->value_type)
+			{
+				case ITEM_VALUE_TYPE_UINT64:
+					ZBX_STR2UINT64(value_uint64, arg2);
+					break;
+				case ITEM_VALUE_TYPE_FLOAT:
+					value_double = atof(arg2);
+					break;
+				default:
+					;	/* nothing */
+			}
+	}
+
+	if (nparams >= 3)
+	{
+		if (FAIL == get_function_parameter_str(item, parameters, 3, &arg3))
 		{
-			if (0 == strcmp(arg3, "eq") || '\0' == *arg3) op = OP_EQ;
+			zbx_free(arg2);
+			return res;
+		}
+		else
+		{
+			int fail = 0;
+
+			if ('\0' == *arg3 && numeric_search) op = OP_EQ;
+			else if ('\0' == *arg3 && !numeric_search) op = OP_LIKE;
+			else if (0 == strcmp(arg3, "eq")) op = OP_EQ;
 			else if (0 == strcmp(arg3, "ne")) op = OP_NE;
 			else if (0 == strcmp(arg3, "gt")) op = OP_GT;
 			else if (0 == strcmp(arg3, "ge")) op = OP_GE;
 			else if (0 == strcmp(arg3, "lt")) op = OP_LT;
 			else if (0 == strcmp(arg3, "le")) op = OP_LE;
+			else if (0 == strcmp(arg3, "like")) op = OP_LIKE;
 			else
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Parameter \"%s\" is not supported for function COUNT",
-						arg3);
+				zabbix_log(LOG_LEVEL_DEBUG, "Operator \"%s\" is not supported for function COUNT", arg3);
+				fail = 1;
+			}
+
+			if (!fail && numeric_search && op == OP_LIKE)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "Operator \"like\" is not supported for counting numeric values");
+				fail = 1;
+			}
+
+			if (!fail && !numeric_search && !(op == OP_LIKE || op == OP_EQ || op == OP_NE))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "Operator \"%s\" is not supported for counting textual values", arg3);
+				fail = 1;
+			}
+			
+			if (fail)
+			{
 				zbx_free(arg2);
 				zbx_free(arg3);
 				return res;
 			}
+
 			zbx_free(arg3);
 		}
-
-		switch (item->value_type) {
-		case ITEM_VALUE_TYPE_UINT64:
-			ZBX_STR2UINT64(value_uint64, arg2);
-			break;
-		case ITEM_VALUE_TYPE_FLOAT:
-			value_double = atof(arg2);
-			break;
-		default:
-			;	/* nothing */
-		}
 	}
+
+	if (nparams >= 4)
+	{
+		int time_shift, time_shift_flag;
+
+		if (FAIL == get_function_parameter_uint(item, parameters, 4, &time_shift, &time_shift_flag) ||
+			time_shift_flag != ZBX_FLAG_SEC)
+		{
+			zbx_free(arg2);
+			return res;
+		}
+
+		now -= time_shift;
+	}
+	
+	if (arg2 != NULL && strcmp(arg2, "") == 0 && (numeric_search || op == OP_LIKE))
+		zbx_free(arg2);
 
 	if (flag == ZBX_FLAG_SEC)
 	{
@@ -372,15 +416,29 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 				}
 				break;
 			default:
-				arg2_esc = DBdyn_escape_string(arg2);
-				offset += zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
-						" and value like '%s'",
-						arg2_esc);
+				switch (op) {
+				case OP_EQ:
+				case OP_NE:
+					arg2_esc = DBdyn_escape_string(arg2);
+					offset += zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
+							" and value%s'%s'",
+							operators[op],
+							arg2_esc);
+					break;
+				case OP_LIKE:
+				default:
+					arg2_esc = DBdyn_escape_like_pattern(arg2);
+					offset += zbx_snprintf(tmp + offset, sizeof(tmp) - offset,
+							" and value like '%%%s%%' escape '%c'",
+							arg2_esc,
+							ZBX_SQL_LIKE_ESCAPE_CHAR);
+					break;
+				}
 				zbx_free(arg2_esc);
 			}
 		}
-		zbx_snprintf(tmp + offset, sizeof(tmp) - offset, " and clock>%d",
-				now - arg1);
+		zbx_snprintf(tmp + offset, sizeof(tmp) - offset, " and clock<=%d and clock>%d",
+				now, now - arg1);
 
 		result = DBselect("%s", tmp);
 
@@ -397,9 +455,11 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 		offset = zbx_snprintf(tmp, sizeof(tmp),
 				"select value"
 				" from %s"
-				" where itemid=" ZBX_FS_UI64,
+				" where itemid=" ZBX_FS_UI64
+					" and clock<=%d",
 				get_table_by_value_type(item->value_type),
-				item->itemid);
+				item->itemid,
+				now);
 
 		switch (item->value_type)
 		{
@@ -482,8 +542,20 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 				}
 				break;
 			default:
-				if (NULL != strstr(row[0], arg2))
-					goto count_inc;
+				switch (op) {
+				case OP_EQ:
+					if (0 == strcmp(row[0], arg2))
+						goto count_inc;
+					break;
+				case OP_NE:
+					if (0 != strcmp(row[0], arg2))
+						goto count_inc;
+					break;
+				case OP_LIKE:
+					if (NULL != strstr(row[0], arg2))
+						goto count_inc;
+					break;
+				}
 				break;
 			}
 
@@ -511,7 +583,7 @@ count_inc:
  * Purpose: evaluate function 'sum' for the item                              *
  *                                                                            *
  * Parameters: item - item (performance metric)                               *
- *             parameter - number of seconds                                  *
+ *             parameters - number of seconds/values and time shift (optional)*
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -527,7 +599,7 @@ static int	evaluate_SUM(char *value, DB_ITEM *item, const char *function, const 
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		sql[MAX_STRING_LEN];
-	int		arg1, flag, rows = 0, res = FAIL;
+	int		nparams, arg1, flag, rows = 0, res = FAIL;
 	double		sum = 0;
 	zbx_uint64_t	l, sum_uint64 = 0;
 
@@ -536,20 +608,35 @@ static int	evaluate_SUM(char *value, DB_ITEM *item, const char *function, const 
 	if (item->value_type != ITEM_VALUE_TYPE_FLOAT && item->value_type != ITEM_VALUE_TYPE_UINT64)
 		return res;
 
-	if (num_param(parameters) > 1)
+	nparams = num_param(parameters);
+	if (!(nparams == 1 || nparams == 2))
 		return res;
 
 	if (FAIL == get_function_parameter_uint(item, parameters, 1, &arg1, &flag))
 		return res;
+
+	if (nparams == 2)
+	{
+		int time_shift, time_shift_flag;
+
+		if (FAIL == get_function_parameter_uint(item, parameters, 2, &time_shift, &time_shift_flag))
+			return res;
+		if (time_shift_flag != ZBX_FLAG_SEC)
+			return res;
+
+		now -= time_shift;
+	}
 
 	if (flag == ZBX_FLAG_SEC)
 	{
 		result = DBselect(
 				"select sum(value)"
 				" from %s"
-				" where clock>%d"
+				" where clock<=%d"
+					" and clock>%d"
 					" and itemid=" ZBX_FS_UI64,
 				get_table_by_value_type(item->value_type),
+				now,
 				now - arg1,
 				item->itemid);
 
@@ -568,9 +655,11 @@ static int	evaluate_SUM(char *value, DB_ITEM *item, const char *function, const 
 				"select value"
 				" from %s"
 				" where itemid=" ZBX_FS_UI64
+					" and clock<=%d"
 				" order by clock desc",
 				get_table_by_value_type(item->value_type),
-				item->itemid);
+				item->itemid,
+				now);
 
 		result = DBselectN(sql, arg1);
 
@@ -617,7 +706,7 @@ static int	evaluate_SUM(char *value, DB_ITEM *item, const char *function, const 
  * Purpose: evaluate function 'avg' for the item                              *
  *                                                                            *
  * Parameters: item - item (performance metric)                               *
- *             parameter - number of seconds                                  *
+ *             parameters - number of seconds/values and time shift (optional)*
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -633,7 +722,7 @@ static int	evaluate_AVG(char *value, DB_ITEM *item, const char *function, const 
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		sql[MAX_STRING_LEN];
-	int		arg1, flag, rows = 0, res = FAIL;
+	int		nparams, arg1, flag, rows = 0, res = FAIL;
 	double		sum = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -641,20 +730,35 @@ static int	evaluate_AVG(char *value, DB_ITEM *item, const char *function, const 
 	if (item->value_type != ITEM_VALUE_TYPE_FLOAT && item->value_type != ITEM_VALUE_TYPE_UINT64)
 		return res;
 
-	if (num_param(parameters) > 1)
+	nparams = num_param(parameters);
+	if (!(nparams == 1 || nparams == 2))
 		return res;
 
 	if (FAIL == get_function_parameter_uint(item, parameters, 1, &arg1, &flag))
 		return res;
+
+	if (nparams == 2)
+	{
+		int time_shift, time_shift_flag;
+
+		if (FAIL == get_function_parameter_uint(item, parameters, 2, &time_shift, &time_shift_flag))
+			return res;
+		if (time_shift_flag != ZBX_FLAG_SEC)
+			return res;
+
+		now -= time_shift;
+	}
 
 	if (flag == ZBX_FLAG_SEC)
 	{
 		result = DBselect(
 				"select avg(value)"
 				" from %s"
-				" where clock>%d"
+				" where clock<=%d"
+					" and clock>%d"
 					" and itemid=" ZBX_FS_UI64,
 				get_table_by_value_type(item->value_type),
+				now,
 				now - arg1,
 				item->itemid);
 
@@ -673,9 +777,11 @@ static int	evaluate_AVG(char *value, DB_ITEM *item, const char *function, const 
 				"select value"
 				" from %s"
 				" where itemid=" ZBX_FS_UI64
+					" and clock<=%d"
 				" order by clock desc",
 				get_table_by_value_type(item->value_type),
-				item->itemid);
+				item->itemid,
+				now);
 
 		result = DBselectN(sql, arg1);
 
@@ -708,7 +814,7 @@ static int	evaluate_AVG(char *value, DB_ITEM *item, const char *function, const 
  *                                                                            *
  * Parameters: value - require size 'MAX_STRING_LEN'                          *
  *             item - item (performance metric)                               *
- *             num - Nth last value                                           *
+ *             parameters - Nth last value and time shift (optional)          *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -723,16 +829,10 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 	const char	*__function_name = "evaluate_LAST";
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		arg1, flag, res = FAIL, rows = 0;
+	int		arg1, flag, time_shift = 0, time_shift_flag, res = FAIL, rows = 0;
 	char		sql[128];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	if (item->value_type != ITEM_VALUE_TYPE_FLOAT && item->value_type != ITEM_VALUE_TYPE_UINT64 &&
-			item->value_type != ITEM_VALUE_TYPE_STR && item->value_type != ITEM_VALUE_TYPE_TEXT &&
-			item->value_type != ITEM_VALUE_TYPE_LOG)
-		goto clean;
-
 
 	if (0 == strcmp(function, "last"))
 	{
@@ -742,6 +842,17 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 			flag = ZBX_FLAG_VALUES;
 		}
 
+		if (num_param(parameters) == 2)
+		{
+			if (SUCCEED == get_function_parameter_uint(item, parameters, 2, &time_shift, &time_shift_flag) &&
+				time_shift_flag == ZBX_FLAG_SEC)
+			{
+				now -= time_shift;
+				time_shift = 1;
+			}
+			else
+				goto clean;
+		}
 	}
 	else if (0 == strcmp(function, "prev"))
 	{
@@ -751,8 +862,8 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 	else
 		goto clean;
 
-	switch (arg1) {
-	case 1:
+	if (time_shift == 0 && arg1 == 1)
+	{
 		if (1 != item->lastvalue_null)
 		{
 			switch (item->value_type) {
@@ -768,8 +879,9 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 			}
 			res = SUCCEED;
 		}
-		break;
-	case 2:
+	}
+	else if (time_shift == 0 && arg1 == 2)
+	{
 		if (1 != item->prevvalue_null)
 		{
 			switch (item->value_type) {
@@ -785,15 +897,18 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 			}
 			res = SUCCEED;
 		}
-		break;
-	default:
+	}
+	else
+	{
 		zbx_snprintf(sql, sizeof(sql),
 				"select value,clock"
 				" from %s"
 				" where itemid=" ZBX_FS_UI64
+					" and clock<=%d"
 				" order by %s desc",
 				get_table_by_value_type(item->value_type),
 				item->itemid,
+				now,
 				get_key_by_value_type(item->value_type));
 
 		result = DBselectN(sql, arg1);
@@ -809,6 +924,7 @@ static int	evaluate_LAST(char *value, DB_ITEM *item, const char *function, const
 
 		DBfree_result(result);
 	}
+
 clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
@@ -822,7 +938,7 @@ clean:
  * Purpose: evaluate function 'min' for the item                              *
  *                                                                            *
  * Parameters: item - item (performance metric)                               *
- *             parameter - number of seconds                                  *
+ *             parameters - number of seconds/values and time shift (optional)*
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -838,7 +954,7 @@ static int	evaluate_MIN(char *value, DB_ITEM *item, const char *function, const 
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		sql[MAX_STRING_LEN];
-	int		arg1, flag, rows = 0, res = FAIL;
+	int		nparams, arg1, flag, rows = 0, res = FAIL;
 	zbx_uint64_t	min_uint64 = 0, l;
 	double		min = 0, f;
 
@@ -847,20 +963,35 @@ static int	evaluate_MIN(char *value, DB_ITEM *item, const char *function, const 
 	if (item->value_type != ITEM_VALUE_TYPE_FLOAT && item->value_type != ITEM_VALUE_TYPE_UINT64)
 		return res;
 
-	if (num_param(parameters) > 1)
+	nparams = num_param(parameters);
+	if (!(nparams == 1 || nparams == 2))
 		return res;
 
 	if (FAIL == get_function_parameter_uint(item, parameters, 1, &arg1, &flag))
 		return res;
+
+	if (nparams == 2)
+	{
+		int time_shift, time_shift_flag;
+
+		if (FAIL == get_function_parameter_uint(item, parameters, 2, &time_shift, &time_shift_flag))
+			return res;
+		if (time_shift_flag != ZBX_FLAG_SEC)
+			return res;
+
+		now -= time_shift;
+	}
 
 	if (flag == ZBX_FLAG_SEC)
 	{
 		result = DBselect(
 				"select min(value)"
 				" from %s"
-				" where clock>%d"
+				" where clock<=%d"
+					" and clock>%d"
 					" and itemid=" ZBX_FS_UI64,
 				get_table_by_value_type(item->value_type),
+				now,
 				now - arg1,
 				item->itemid);
 
@@ -879,9 +1010,11 @@ static int	evaluate_MIN(char *value, DB_ITEM *item, const char *function, const 
 				"select value"
 				" from %s"
 				" where itemid=" ZBX_FS_UI64
+					" and clock<=%d"
 				" order by clock desc",
 				get_table_by_value_type(item->value_type),
-				item->itemid);
+				item->itemid,
+				now);
 
 		result = DBselectN(sql, arg1);
 
@@ -931,7 +1064,7 @@ static int	evaluate_MIN(char *value, DB_ITEM *item, const char *function, const 
  * Purpose: evaluate function 'max' for the item                              *
  *                                                                            *
  * Parameters: item - item (performance metric)                               *
- *             parameter - number of seconds                                  *
+ *             parameters - number of seconds/values and time shift (optional)*
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -947,7 +1080,7 @@ static int	evaluate_MAX(char *value, DB_ITEM *item, const char *function, const 
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		sql[MAX_STRING_LEN];
-	int		arg1, flag, rows = 0, res = FAIL;
+	int		nparams, arg1, flag, rows = 0, res = FAIL;
 	zbx_uint64_t	max_uint64 = 0, l;
 	double		max = 0, f;
 
@@ -956,20 +1089,35 @@ static int	evaluate_MAX(char *value, DB_ITEM *item, const char *function, const 
 	if (item->value_type != ITEM_VALUE_TYPE_FLOAT && item->value_type != ITEM_VALUE_TYPE_UINT64)
 		return res;
 
-	if (num_param(parameters) > 1)
+	nparams = num_param(parameters);
+	if (!(nparams == 1 || nparams == 2))
 		return res;
 
 	if (FAIL == get_function_parameter_uint(item, parameters, 1, &arg1, &flag))
 		return res;
+
+	if (nparams == 2)
+	{
+		int time_shift, time_shift_flag;
+
+		if (FAIL == get_function_parameter_uint(item, parameters, 2, &time_shift, &time_shift_flag))
+			return res;
+		if (time_shift_flag != ZBX_FLAG_SEC)
+			return res;
+
+		now -= time_shift;
+	}
 
 	if (flag == ZBX_FLAG_SEC)
 	{
 		result = DBselect(
 				"select max(value)"
 				" from %s"
-				" where clock>%d"
+				" where clock<=%d"
+					" and clock>%d"
 					" and itemid=" ZBX_FS_UI64,
 				get_table_by_value_type(item->value_type),
+				now,
 				now - arg1,
 				item->itemid);
 
@@ -988,9 +1136,11 @@ static int	evaluate_MAX(char *value, DB_ITEM *item, const char *function, const 
 				"select value"
 				" from %s"
 				" where itemid=" ZBX_FS_UI64
+					" and clock<=%d"
 				" order by clock desc",
 				get_table_by_value_type(item->value_type),
-				item->itemid);
+				item->itemid,
+				now);
 
 		result = DBselectN(sql, arg1);
 
@@ -1040,7 +1190,7 @@ static int	evaluate_MAX(char *value, DB_ITEM *item, const char *function, const 
  * Purpose: evaluate function 'delta' for the item                            *
  *                                                                            *
  * Parameters: item - item (performance metric)                               *
- *             parameter - number of seconds                                  *
+ *             parameters - number of seconds/values and time shift (optional)*
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -1056,7 +1206,7 @@ static int	evaluate_DELTA(char *value, DB_ITEM *item, const char *function, cons
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		sql[MAX_STRING_LEN];
-	int		arg1, flag, rows = 0, res = FAIL;
+	int		nparams, arg1, flag, rows = 0, res = FAIL;
 	zbx_uint64_t	min_uint64 = 0, max_uint64 = 0, l;
 	double		min = 0, max = 0, f;
 
@@ -1065,20 +1215,35 @@ static int	evaluate_DELTA(char *value, DB_ITEM *item, const char *function, cons
 	if (item->value_type != ITEM_VALUE_TYPE_FLOAT && item->value_type != ITEM_VALUE_TYPE_UINT64)
 		return res;
 
-	if (num_param(parameters) > 1)
+	nparams = num_param(parameters);
+	if (!(nparams == 1 || nparams == 2))
 		return res;
 
 	if (FAIL == get_function_parameter_uint(item, parameters, 1, &arg1, &flag))
 		return res;
+
+	if (nparams == 2)
+	{
+		int time_shift, time_shift_flag;
+
+		if (FAIL == get_function_parameter_uint(item, parameters, 2, &time_shift, &time_shift_flag))
+			return res;
+		if (time_shift_flag != ZBX_FLAG_SEC)
+			return res;
+
+		now -= time_shift;
+	}
 
 	if (flag == ZBX_FLAG_SEC)
 	{
 		result = DBselect(
 				"select max(value)-min(value)"
 				" from %s"
-				" where clock>%d"
+				" where clock<=%d"
+					" and clock>%d"
 					" and itemid=" ZBX_FS_UI64,
 				get_table_by_value_type(item->value_type),
+				now,
 				now - arg1,
 				item->itemid);
 
@@ -1097,9 +1262,11 @@ static int	evaluate_DELTA(char *value, DB_ITEM *item, const char *function, cons
 				"select value"
 				" from %s"
 				" where itemid=" ZBX_FS_UI64
+					" and clock<=%d"
 				" order by clock desc",
 				get_table_by_value_type(item->value_type),
-				item->itemid);
+				item->itemid,
+				now);
 
 		result = DBselectN(sql, arg1);
 
@@ -1608,7 +1775,7 @@ clean:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int evaluate_function(char *value, DB_ITEM *item, const char *function, char *parameter, time_t now)
+int evaluate_function(char *value, DB_ITEM *item, const char *function, const char *parameter, time_t now)
 {
 	int	ret;
 	struct  tm      *tm;

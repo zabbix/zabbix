@@ -26,7 +26,7 @@ require_once('include/graphs.inc.php');
 $page['title'] = 'S_CUSTOM_GRAPHS';
 $page['file'] = 'charts.php';
 $page['hist_arg'] = array('hostid','groupid','graphid');
-$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.calendar.js','gtlc.js');
+$page['scripts'] = array('effects.js', 'dragdrop.js','class.calendar.js','gtlc.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -48,7 +48,8 @@ include_once('include/page_header.php');
 
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NULL,			NULL),
 
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
 		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),NULL)
@@ -59,27 +60,30 @@ include_once('include/page_header.php');
 <?php
 
 	if(isset($_REQUEST['favobj'])){
+		if('filter' == $_REQUEST['favobj']){
+			CProfile::update('web.charts.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+		}
 		if('hat' == $_REQUEST['favobj']){
-			update_profile('web.charts.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.charts.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 
 		if('timeline' == $_REQUEST['favobj']){
 			if(isset($_REQUEST['graphid']) && isset($_REQUEST['period'])){
-				navigation_bar_calc('web.graph',$_REQUEST['graphid']);
+				navigation_bar_calc('web.graph',$_REQUEST['graphid'], true);
 			}
 		}
 
 		if(str_in_array($_REQUEST['favobj'],array('itemid','graphid'))){
 			$result = false;
 			if('add' == $_REQUEST['action']){
-				$result = add2favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
+				$result = add2favorites('web.favorite.graphids', $_REQUEST['favid'], $_REQUEST['favobj']);
 				if($result){
 					print('$("addrm_fav").title = "'.S_REMOVE_FROM.' '.S_FAVOURITES.'";'."\n");
 					print('$("addrm_fav").onclick = function(){rm4favorites("graphid","'.$_REQUEST['favid'].'",0);}'."\n");
 				}
 			}
 			else if('remove' == $_REQUEST['action']){
-				$result = rm4favorites('web.favorite.graphids',$_REQUEST['favid'],ZBX_FAVORITES_ALL,$_REQUEST['favobj']);
+				$result = rm4favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
 
 				if($result){
 					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVOURITES.'";'."\n");
@@ -94,11 +98,12 @@ include_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 ?>
 <?php
-	$_REQUEST['graphid'] = get_request('graphid', get_profile('web.charts.graphid', 0));
+	$_REQUEST['graphid'] = get_request('graphid', CProfile::get('web.charts.graphid', 0));
 	if(!in_node($_REQUEST['graphid'])) $_REQUEST['graphid'] = 0;
 
 	if($_REQUEST['graphid']>0){
@@ -139,7 +144,7 @@ include_once('include/page_header.php');
 
 	$effectiveperiod = navigation_bar_calc('web.graph',$_REQUEST['graphid']);
 
-	update_profile('web.charts.graphid',$_REQUEST['graphid']);
+	CProfile::update('web.charts.graphid',$_REQUEST['graphid'], PROFILE_TYPE_ID);
 
 	$h1 = array();
 
@@ -148,20 +153,34 @@ include_once('include/page_header.php');
 
 	$params = array();
 	foreach($options as $option) $params[$option] = 1;
+
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
+
 	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
 //SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
 
 	$available_groups= $PAGE_GROUPS['groupids'];
 	$available_hosts = $PAGE_HOSTS['hostids'];
 
-	if(($_REQUEST['graphid']>0) && ($row=DBfetch(DBselect('SELECT DISTINCT graphid, name FROM graphs WHERE graphid='.$_REQUEST['graphid'])))){
-		if(!graph_accessible($_REQUEST['graphid'])){
-			update_profile('web.charts.graphid',0);
+	if(empty($PAGE_GROUPS['groupids']) || empty($PAGE_HOSTS['hostids'])){
+		$_REQUEST['graphid'] = 0;
+	}
+
+	if($_REQUEST['graphid']>0){
+		$options = array(
+			'graphids' => $_REQUEST['graphid'],
+			'output' => API_OUTPUT_EXTEND,
+			'nodeids' => get_current_nodeid(true)
+		);
+		$db_data = CGraph::get($options);
+		if(empty($db_data)){
+			CProfile::update('web.charts.graphid',0,PROFILE_TYPE_ID);
 			access_deny();
 		}
-		array_push($h1, $row['name']);
+
+		$db_data = reset($db_data);
+		array_push($h1, $db_data['name']);
 	}
 	else{
 		$_REQUEST['graphid'] = 0;
@@ -169,6 +188,11 @@ include_once('include/page_header.php');
 	}
 
 	$charts_wdgt = new CWidget('hat_charts');
+	
+	$scroll_div = new CDiv();
+	$scroll_div->setAttribute('id','scrollbar_cntr');
+	$charts_wdgt->addFlicker($scroll_div, CProfile::get('web.charts.filter.state',1));
+
 // HEADER
 
 	$r_form = new CForm();
@@ -194,23 +218,26 @@ include_once('include/page_header.php');
 
 	$options = array(
 		'extendoutput' => 1,
-		'sortfield' => 'name',
 		'templated' => 0
 	);
 
-	if($_REQUEST['groupid'] > 0){
-		$options['groupids'] = $_REQUEST['groupid'];
+// Filtering
+	if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
+		$options['hostids'] = $PAGE_HOSTS['selected'];
 	}
-
-	if($_REQUEST['hostid'] > 0){
-		$options['hostids'] = $_REQUEST['hostid'];
+	else if(($PAGE_GROUPS['selected'] > 0) && !empty($PAGE_HOSTS['hostids'])){
+		$options['hostids'] = $PAGE_HOSTS['hostids'];
+	}
+	else if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
+		$options['groupids'] = $PAGE_GROUPS['selected'];
 	}
 
 	$db_graphs = CGraph::get($options);
+	order_result($db_graphs, 'name');
 	foreach($db_graphs as $num => $db_graph){
 		$cmbGraphs->addItem($db_graph['graphid'], get_node_name_by_elid($db_graph['graphid'], null, ': ').$db_graph['name']);
 	}
-
+	
 	$r_form->addItem(array(SPACE.S_GRAPH.SPACE,$cmbGraphs));
 
 //	show_table_header(S_GRAPHS_BIG, $r_form);
@@ -306,10 +333,6 @@ include_once('include/page_header.php');
 		zbx_add_post_js('timeControl.processObjects();');
 //-------------
 	}
-
-	$scroll_div = new CDiv();
-	$scroll_div->setAttribute('id','scrollbar_cntr');
-	$scroll_div->show();
 ?>
 <?php
 

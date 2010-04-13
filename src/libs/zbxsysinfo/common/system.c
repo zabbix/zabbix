@@ -138,40 +138,41 @@ int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	case VER_PLATFORM_WIN32_WINDOWS:
 		switch (versionInfo.dwMinorVersion) {
 		case 0:
-			zbx_wsnprintf(osVersion, sizeof(osVersion), TEXT("Windows 95-%s"), versionInfo.szCSDVersion);
+			zbx_wsnprintf(osVersion, sizeof(osVersion)/sizeof(TCHAR), TEXT("Windows 95-%s"), versionInfo.szCSDVersion);
 			break;
 		case 10:
-			zbx_wsnprintf(osVersion, sizeof(osVersion), TEXT("Windows 98-%s"), versionInfo.szCSDVersion);
+			zbx_wsnprintf(osVersion, sizeof(osVersion)/sizeof(TCHAR), TEXT("Windows 98-%s"), versionInfo.szCSDVersion);
 			break;
 		case 90:
-			zbx_wsnprintf(osVersion, sizeof(osVersion), TEXT("Windows Me-%s"), versionInfo.szCSDVersion);
+			zbx_wsnprintf(osVersion, sizeof(osVersion)/sizeof(TCHAR), TEXT("Windows Me-%s"), versionInfo.szCSDVersion);
 			break;
 		default:
-			zbx_wsnprintf(osVersion, sizeof(osVersion), TEXT("Windows [Unknown Version]"));
+			zbx_wsnprintf(osVersion, sizeof(osVersion)/sizeof(TCHAR), TEXT("Windows [Unknown Version]"));
 		}
 		break;
 	case VER_PLATFORM_WIN32_NT:
 		switch (versionInfo.dwMajorVersion) {
 		case 4:
-			zbx_wsnprintf(osVersion, sizeof(osVersion), TEXT("Windows NT 4.0 %s"), versionInfo.szCSDVersion);
+			zbx_wsnprintf(osVersion, sizeof(osVersion)/sizeof(TCHAR), TEXT("Windows NT 4.0 %s"), versionInfo.szCSDVersion);
 			break;
 		case 5:
 			switch (versionInfo.dwMinorVersion) {
 			case 1:
-				zbx_wsnprintf(osVersion, sizeof(osVersion), TEXT("Windows XP %s"), versionInfo.szCSDVersion);
+				zbx_wsnprintf(osVersion, sizeof(osVersion)/sizeof(TCHAR), TEXT("Windows XP %s"), versionInfo.szCSDVersion);
 				break;
 			case 2:
-				zbx_wsnprintf(osVersion, sizeof(osVersion), TEXT("Windows Server 2003 %s"), versionInfo.szCSDVersion);
+				zbx_wsnprintf(osVersion, sizeof(osVersion)/sizeof(TCHAR), TEXT("Windows Server 2003 %s"),
+						versionInfo.szCSDVersion);
 				break;
 			default:
-				zbx_wsnprintf(osVersion, sizeof(osVersion), TEXT("Windows [Unknown Version]"));
+				zbx_wsnprintf(osVersion, sizeof(osVersion)/sizeof(TCHAR), TEXT("Windows [Unknown Version]"));
 			}
 			break;
 		case 6:
-			zbx_wsnprintf(osVersion, sizeof(osVersion), TEXT("Windows Server 2008 %s"), versionInfo.szCSDVersion);
+			zbx_wsnprintf(osVersion, sizeof(osVersion)/sizeof(TCHAR), TEXT("Windows Server 2008 %s"), versionInfo.szCSDVersion);
 			break;
 		default:
-			zbx_wsnprintf(osVersion, sizeof(osVersion), TEXT("Windows [Unknown Version]"));
+			zbx_wsnprintf(osVersion, sizeof(osVersion)/sizeof(TCHAR), TEXT("Windows [Unknown Version]"));
 			break;
 		}
 	}
@@ -205,7 +206,7 @@ int	SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 			break;
 	}
 
-	zbx_wsnprintf(wide_buffer, sizeof(wide_buffer),
+	zbx_wsnprintf(wide_buffer, MAX_STRING_LEN,
 		TEXT("Windows %s %d.%d.%d %s %s"),
 		computerName,
 		versionInfo.dwMajorVersion,

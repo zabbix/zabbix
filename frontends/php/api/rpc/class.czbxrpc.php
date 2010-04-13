@@ -47,10 +47,10 @@ class czbxrpc{
 // Authentication {{{
 			if(($resource == 'user') && ($action == 'authenticate')){
 				$sessionid = null;
-				
+
 				$options = array(
-							'users' => $params['user'], 
-							'extendoutput' => 1, 
+							'users' => $params['user'],
+							'extendoutput' => 1,
 							'get_access' => 1
 						);
 				$users = CUser::get($options);
@@ -72,8 +72,8 @@ class czbxrpc{
 				}
 
 				$options = array(
-						'userids' => $USER_DETAILS['userid'], 
-						'extendoutput' => 1, 
+						'userids' => $USER_DETAILS['userid'],
+						'extendoutput' => 1,
 						'get_access' => 1
 					);
 				$users = CUser::get($options);
@@ -86,14 +86,19 @@ class czbxrpc{
 // }}} Authentication
 		}
 
-
-		$class_name = 'C'.$resource;
-		if(!method_exists($class_name, $action)){
-			self::$result = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Action does not exists');
+		if(!method_exists('czbxrpc', $resource)){
+			self::$result = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Resource ('.$resource.') does not exist');
 			return self::$result;
 		}
 
-		call_user_func(array('self', $resource), $action, $params);
+		$class_name = 'C'.$resource;
+		if(!method_exists($class_name, $action)){
+			self::$result = array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Action ('.$action.') does not exist');
+			return self::$result;
+		}
+
+		unset($params['nopermissions']);
+		call_user_func(array('czbxrpc', $resource), $action, $params);
 
 		if(self::$result !== false){
 			self::$result = array('result' => self::$result);

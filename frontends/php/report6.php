@@ -25,7 +25,7 @@
 	$page['title']	= "S_BAR_REPORTS";
 	$page['file']	= 'report6.php';
 	$page['hist_arg'] = array('period');
-	$page['scripts'] = array('class.calendar.js','scriptaculous.js?load=effects');
+	$page['scripts'] = array('class.calendar.js','effects.js');
 
 include_once('include/page_header.php');
 ?>
@@ -72,7 +72,7 @@ include_once('include/page_header.php');
 
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})'),
 	);
 
@@ -81,11 +81,12 @@ include_once('include/page_header.php');
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			update_profile('web.report6.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.report6.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -177,7 +178,7 @@ include_once('include/page_header.php');
 		default: $rep_form = bar_report_form();
 	}
 
-	$rep6_wdgt->addFlicker($rep_form, get_profile('web.report6.filter.state',1));
+	$rep6_wdgt->addFlicker($rep_form, CProfile::get('web.report6.filter.state',1));
 
 	if(isset($_REQUEST['report_show'])){
 		$src = 'chart_bar.php?config='.$_REQUEST['config'].

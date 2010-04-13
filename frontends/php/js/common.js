@@ -75,8 +75,7 @@ function is_string(obj){
 }
 
 function is_array(obj) {
-	return obj != null && typeof obj == "object" &&
-	'splice' in obj && 'join' in obj;
+	return (obj != null) && (typeof obj == "object") && ('splice' in obj) && ('join' in obj);
 }
 
 function SDI(msg){
@@ -211,9 +210,21 @@ function checkAll(form_name, chkMain, shkName){
 	var value = frmForm.elements[chkMain].checked;
 
 	chkbxRange.checkAll(shkName, value);
-	return true;
+return true;
 }
 
+function checkLocalAll(form_name, chkMain, chkName){
+	var frmForm = document.forms[form_name];
+
+	var checkboxes = $$('input[name='+chkName+']');
+	for(var i=0; i<checkboxes.length; i++){
+		if(isset('type', checkboxes[i]) && (checkboxes[i].type == 'checkbox')){
+			checkboxes[i].checked = frmForm.elements[chkMain].checked;
+		}
+	}
+
+return true;
+}
 
 function clearAllForm(form){
 	form = $(form);
@@ -414,6 +425,7 @@ function get_bodywidth(){
 	else{
 		w = (w2 > w)?w2:w;
 	}
+
 return w;
 }
 
@@ -452,6 +464,25 @@ function get_scroll_pos(){
 		scrOfX = document.documentElement.scrollLeft;
 	}
 	return [ scrOfX, scrOfY ];
+}
+
+function insert_in_element(element_name, text){
+	if(IE)
+		var elems = $$('[name='+element_name+']');
+	else
+		var elems = document.getElementsByName(element_name);
+
+	for(var key=0; key < elems.length; key++){
+		if((typeof(elems[key]) != 'undefined') && !is_null(elems[key])){
+			$(elems[key]).update(text);
+		}
+	}
+}
+
+function insert_sizeable_graph(graph_id,url){
+	if((typeof(ZBX_G_WIDTH) != 'undefined')) url += "&amp;width="+ZBX_G_WIDTH;
+
+	document.write('<img id="'+graph_id+'" src="'+url+'" alt="graph" /><br />');
 }
 
 function is_empty_form(id){
@@ -581,6 +612,23 @@ function ShowHide(obj,style){
 	}
 }
 
+function showHideByName(name, style){
+	if(typeof(style) == 'undefined') var style = 'none';
+
+	var objs = $$('[name='+name+']');
+
+	if(empty(objs)){
+		throw 'ShowHide(): Object not found.';
+		return false;
+	}
+	
+	for(var i=0; i<objs.length; i++){
+		var obj = objs[i];
+		obj.style.display = style;
+	}
+
+}
+
 function showHideEffect(obj, eff, time, cb_afterFinish){
 	obj = $(obj);
 	if(!obj){
@@ -659,25 +707,6 @@ function ScaleChartToParenElement(obj_name){
 	for(i = obj.length-1; i>=0; i--){
 		obj[i].src += "&width=" + (obj[i].parentNode.offsetWidth - obj[i].parentNode.offsetLeft - 10);
 	}
-}
-
-function insert_in_element(element_name, text){
-	if(IE)
-		var elems = $$('[name='+element_name+']');
-	else
-		var elems = document.getElementsByName(element_name);
-
-	for(var key=0; key < elems.length; key++){
-		if((typeof(elems[key]) != 'undefined') && !is_null(elems[key])){
-			$(elems[key]).update(text);
-		}
-	}
-}
-
-function insert_sizeable_graph(graph_id,url){
-	if((typeof(ZBX_G_WIDTH) != 'undefined')) url += "&amp;width="+ZBX_G_WIDTH;
-
-	document.write('<img id="'+graph_id+'" src="'+url+'" alt="graph" /><br />');
 }
 
 

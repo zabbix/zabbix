@@ -51,8 +51,8 @@ include_once('include/page_header.php');
 			IN(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2, SVC_SNMPv3, SVC_ICMPPING)),
 										'isset({add_check})'),
 
-		'new_check_ports'=>	array(T_ZBX_PORTS, O_OPT,  null,	NOT_EMPTY,	'isset({add_check})'),
-		'new_check_key'=>	array(T_ZBX_STR, O_OPT,  null,	null,	'isset({add_check})'),
+		'new_check_ports'=>	array(T_ZBX_PORTS,	O_OPT,  null,	"validate_port_list({})&&",	'isset({add_check})'),
+		'new_check_key'=>	array(T_ZBX_STR,	O_OPT,  null,	null,	'isset({add_check})'),
 		'new_check_snmp_community'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({add_check})'),
 		'new_check_snmpv3_securitylevel'=>	array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2'),	'isset({add_check})'),
 		'new_check_snmpv3_securityname'=>	array(T_ZBX_STR, O_OPT,  null,  null,		'isset({add_check})'),
@@ -191,20 +191,18 @@ include_once('include/page_header.php');
 ?>
 <?php
 /* header */
-	$form = new CForm();
-	$form->setMethod('get');
+	$form = new CForm(null, 'get');
 
 	if(!isset($_REQUEST['form']))
 		$form->addItem(new CButton('form', S_CREATE_RULE));
-	show_table_header(S_CONFIGURATION_OF_DISCOVERY_BIG, $form);
-	echo SBR;
+		
+	$dscry_wdgt = new CWidget();
+	$dscry_wdgt->addPageHeader(S_CONFIGURATION_OF_DISCOVERY_BIG, $form);
 
 	if(isset($_REQUEST['form'])){
-		insert_drule_form();
+		$dscry_wdgt->addItem(insert_drule_form());
 	}
 	else{
-		$dscry_wdgt = new CWidget();
-
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 
@@ -292,6 +290,7 @@ include_once('include/page_header.php');
 		// goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO.' (0)');
 		$goButton->setAttribute('id','goButton');
+
 		zbx_add_post_js('chkbxRange.pageGoName = "g_druleid";');
 
 		$tblDiscovery->setFooter(new CCol(array($goBox, $goButton)));
@@ -300,12 +299,9 @@ include_once('include/page_header.php');
 		$form->addItem($tblDiscovery);
 
 		$dscry_wdgt->addItem($form);
-		$dscry_wdgt->show();
 	}
 
-?>
-<?php
+	$dscry_wdgt->show();
 
 include_once('include/page_footer.php');
-
 ?>

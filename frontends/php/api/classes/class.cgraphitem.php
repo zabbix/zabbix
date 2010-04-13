@@ -74,16 +74,13 @@ class CGraphItem extends CZBXAPI{
 		);
 
 		$options = zbx_array_merge($def_options, $options);
-		
+
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
 		}
-		
+
 
 // editable + PERMISSION CHECK
-		if(defined('ZBX_API_REQUEST')){
-			$options['nopermissions'] = false;
-		}
 
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
@@ -111,7 +108,7 @@ class CGraphItem extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
 
 // graphids
 		if(!is_null($options['graphids'])){
@@ -142,6 +139,7 @@ class CGraphItem extends CZBXAPI{
 // expand_data
 		if(!is_null($options['expand_data'])){
 			$sql_parts['select']['key'] = 'i.key_';
+			$sql_parts['select']['hostid'] = 'i.hostid';
 			$sql_parts['select']['host'] = 'h.host';
 			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['from']['h'] = 'hosts h';
@@ -190,7 +188,7 @@ class CGraphItem extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.
+		$sql = 'SELECT DISTINCT '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('gi.gitemid', $nodeids).
 					$sql_where.

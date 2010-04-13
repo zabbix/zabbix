@@ -49,6 +49,7 @@ int	CONFIG_DISABLE_ACTIVE		= 0;
 int	CONFIG_DISABLE_PASSIVE		= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
+int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
 int	CONFIG_LISTEN_PORT	= 10050;
 int	CONFIG_SERVER_PORT	= 10051;
 int	CONFIG_REFRESH_ACTIVE_CHECKS	= 120;
@@ -70,7 +71,7 @@ void    load_config()
 */
 		{"Server",		&CONFIG_HOSTS_ALLOWED,	0,TYPE_STRING,	PARM_MAND,	0,0},
 		{"Hostname",		&CONFIG_HOSTNAME,	0,TYPE_STRING,	PARM_OPT,	0,0},
-		{"BufferSize",		&CONFIG_BUFFER_SIZE,	0,TYPE_INT,	PARM_OPT,	1,65535},
+		{"BufferSize",		&CONFIG_BUFFER_SIZE,	0,TYPE_INT,	PARM_OPT,	2,65535},
 		{"BufferSend",		&CONFIG_BUFFER_SEND,	0,TYPE_INT,	PARM_OPT,	1,3600},
 
 #ifdef USE_PID_FILE
@@ -87,7 +88,7 @@ void    load_config()
 		{"ListenIP",		&CONFIG_LISTEN_IP,	0,TYPE_STRING,	PARM_OPT,	0,0},
 		{"SourceIP",		&CONFIG_SOURCE_IP,	0,TYPE_STRING,	PARM_OPT,	0,0},
 
-		{"DebugLevel",		&CONFIG_LOG_LEVEL,	0,TYPE_INT,	PARM_OPT,	0,5},
+		{"DebugLevel",		&CONFIG_LOG_LEVEL,	0,TYPE_INT,	PARM_OPT,	0,4},
 
 		{"StartAgents",		&CONFIG_ZABBIX_FORKS,		0,TYPE_INT,	PARM_OPT,	1,16},
 		{"RefreshActiveChecks",	&CONFIG_REFRESH_ACTIVE_CHECKS,	0,TYPE_INT,	PARM_OPT,60,3600},
@@ -158,6 +159,7 @@ void    load_user_parameters(void)
 */
 		{"EnableRemoteCommands",&CONFIG_ENABLE_REMOTE_COMMANDS,	0,TYPE_INT,	PARM_OPT,0,1},
 		{"LogRemoteCommands",&CONFIG_LOG_REMOTE_COMMANDS,	0,TYPE_INT,	PARM_OPT,0,1},
+		{"UnsafeUserParameters",&CONFIG_UNSAFE_USER_PARAMETERS,	0,TYPE_INT,	PARM_OPT,0,1},
 
 		{"Alias",		0,	&add_alias_from_config,	TYPE_STRING,PARM_OPT,0,0},
 		{"UserParameter",	0,	&add_parameter,		0,	0,	0,	0},

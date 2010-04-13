@@ -242,11 +242,10 @@ void	DCflush_nextchecks()
 			ZBX_STR2UINT64(triggerid, row[0]);
 			ZBX_STR2UINT64(itemid, row[1]);
 
-			for (i = 0; i < nextcheck_num; i++)
-				if (nextchecks[i].itemid == itemid)
-					break;	/* index `i' will surely contain neccessary itemid */
+			/* index `i' will surely contain neccessary itemid */
+			i = get_nearestindex(nextchecks, sizeof(ZBX_DC_NEXTCHECK), nextcheck_num, itemid);
 
-			if (i >= nextcheck_num)
+			if (i == nextcheck_num || nextchecks[i].itemid != itemid)
 			{
 				/* this branch can never be reached */
 				zabbix_log(LOG_LEVEL_ERR, "Item [" ZBX_FS_UI64 "] was not found in `nextchecks' items list.", itemid);

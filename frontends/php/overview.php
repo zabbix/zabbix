@@ -46,8 +46,8 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1"),	NULL),
 
 //ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			'isset({favid})'),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 	);
 
@@ -56,20 +56,21 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 /* AJAX	*/
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
-			update_profile('web.overview.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.overview.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 //--------
 
-	$_REQUEST['view_style'] = get_request('view_style',get_profile('web.overview.view.style',STYLE_TOP));
-	update_profile('web.overview.view.style',$_REQUEST['view_style'],PROFILE_TYPE_INT);
+	$_REQUEST['view_style'] = get_request('view_style',CProfile::get('web.overview.view.style',STYLE_TOP));
+	CProfile::update('web.overview.view.style',$_REQUEST['view_style'],PROFILE_TYPE_INT);
 
-	$_REQUEST['type'] = get_request('type',get_profile('web.overview.type',SHOW_TRIGGERS));
-	update_profile('web.overview.type',$_REQUEST['type'],PROFILE_TYPE_INT);
+	$_REQUEST['type'] = get_request('type',CProfile::get('web.overview.type',SHOW_TRIGGERS));
+	CProfile::update('web.overview.type',$_REQUEST['type'],PROFILE_TYPE_INT);
 
 	$options = array('allow_all_hosts','monitored_hosts','with_monitored_items');
 	if($_REQUEST['type'] == SHOW_TRIGGERS) array_push($options,'with_monitored_triggers');
@@ -139,8 +140,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
 
-	show_table_header(S_OVERVIEW_BIG, array($fs_icon, $help));
-	echo SBR;
+	$over_wdgt->addPageHeader(S_OVERVIEW_BIG, array($fs_icon, $help));
 
 // 2nd heder
 	$form_l = new CForm();

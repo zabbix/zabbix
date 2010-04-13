@@ -129,7 +129,7 @@ int	DBping(void)
 {
 	int ret;
 
-	ret = (ZBX_DB_DOWN == zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBSOCKET, CONFIG_DBPORT))? FAIL:SUCCEED;
+	ret = (ZBX_DB_OK != zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBSOCKET, CONFIG_DBPORT)) ? FAIL : SUCCEED;
 	DBclose();
 
 	return ret;
@@ -265,52 +265,22 @@ DB_RESULT __zbx_DBselect(const char *fmt, ...)
  */
 DB_RESULT DBselectN(char *query, int n)
 {
-	return zbx_db_select_n(query,n);
-}
+	DB_RESULT result = (DB_RESULT)ZBX_DB_DOWN;
 
-/*
- * Get value of autoincrement field for last insert or update statement
- */
-zbx_uint64_t	DBinsert_id(int exec_result, const char *table, const char *field)
-{
-	return zbx_db_insert_id(exec_result, table, field);
-}
-
-/*
- * Get function value.
- */
-int     DBget_function_result(char **result, char *functionid, char *error, int maxerrlen)
-{
-	DB_RESULT dbresult;
-	DB_ROW	row;
-	int		res = SUCCEED;
-
-/* 0 is added to distinguish between lastvalue==NULL and empty result */
-	dbresult = DBselect("select 0,lastvalue from functions where functionid=%s",
-		functionid );
-
-	row = DBfetch(dbresult);
-
-	if (!row)
+	while(result == (DB_RESULT)ZBX_DB_DOWN)
 	{
-		zbx_snprintf(error, maxerrlen, "invalid functionid [%s]",
-				functionid);
-		res = FAIL;
-	}
-	else if(DBis_null(row[1]) == SUCCEED)
-	{
-		zbx_snprintf(error, maxerrlen, "lastvalue IS NULL for function [%s][%s]",
-				functionid,
-				zbx_host_key_function_string(zbx_atoui64(functionid)));
-		res = FAIL;
-	}
-	else
-	{
-		*result = strdup(row[1]);
-	}
-	DBfree_result(dbresult);
+		result = zbx_db_select_n(query, n);
 
-	return res;
+		if( result == (DB_RESULT)ZBX_DB_DOWN)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds");
+			sleep(10);
+			DBclose();
+			DBconnect(ZBX_DB_CONNECT_NORMAL);
+		}
+	}
+
+	return result;
 }
 
 /******************************************************************************
@@ -1198,9 +1168,9 @@ zbx_uint64_t DBget_proxy_lastaccess(const char *hostname)
 	zbx_free(host_esc);
 
 	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0])) {
-		zabbix_log(LOG_LEVEL_ERR, "Proxy \"%s\" not exists",
+		zabbix_log(LOG_LEVEL_ERR, "Proxy \"%s\" does not exist",
 				hostname);
-		zabbix_syslog("Proxy \"%s\" not exists",
+		zabbix_syslog("Proxy \"%s\" does not exist",
 				hostname);
 		DBfree_result(result);
 		return FAIL;
@@ -1250,6 +1220,13 @@ int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64
 {
 	zbx_uint64_t	escalationid;
 
+	/* removing older active escalations */
+	DBexecute("delete from escalations"
+			" where actionid=" ZBX_FS_UI64
+				" and triggerid=" ZBX_FS_UI64,
+			actionid,
+			triggerid);
+
 	escalationid = DBget_maxid("escalations", "escalationid");
 
 	DBexecute("insert into escalations (escalationid,actionid,triggerid,eventid,status)"
@@ -1265,12 +1242,37 @@ int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64
 
 int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t eventid)
 {
-	DBexecute("update escalations set r_eventid=" ZBX_FS_UI64 ",status=%d,nextcheck=0"
-			" where actionid=" ZBX_FS_UI64 " and triggerid=" ZBX_FS_UI64,
-			eventid,
-			ESCALATION_STATUS_RECOVERY,
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	escalationid;
+	char		sql[256];
+
+	/* stopping only last active escalation */
+	zbx_snprintf(sql, sizeof(sql),
+			"select escalationid"
+			" from escalations"
+			" where actionid=" ZBX_FS_UI64
+				" and triggerid=" ZBX_FS_UI64
+			" order by escalationid desc",
 			actionid,
 			triggerid);
+
+	result = DBselectN(sql, 1);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(escalationid, row[0]);
+
+		DBexecute("update escalations"
+				" set r_eventid=" ZBX_FS_UI64 ","
+					"status=%d,"
+					"nextcheck=0"
+				" where escalationid=" ZBX_FS_UI64,
+				eventid,
+				ESCALATION_STATUS_RECOVERY,
+				escalationid);
+	}
+	DBfree_result(result);
 
 	return SUCCEED;
 }
@@ -1310,7 +1312,64 @@ void	DBvacuum(void)
 #endif
 }
 
-/* NOTE: sync changes with 'DBdyn_escape_string' */
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_escape_string_len                                          *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: return length of escaped string with terminating '\0'        *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ * Comments: sync changes with 'DBescape_string'                              *
+ *           and 'DBdyn_escape_string_len'                                    *
+ *                                                                            *
+ ******************************************************************************/
+int	DBget_escape_string_len(const char *src)
+{
+	const char	*s;
+	int		len = 0;
+
+	len++;	/* '\0' */
+
+	for (s = src; s && *s; s++)
+	{
+		if (*s == '\r')
+			continue;
+
+		if (*s == '\''
+#if !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
+			|| *s == '\\'
+#endif
+			)
+		{
+			len++;
+		}
+		len++;
+	}
+
+	return len;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBescape_string                                                  *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: escaped string                                               *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments: sync changes with 'DBget_escape_string_len'                      *
+ *           and 'DBdyn_escape_string_len'                                    *
+ *                                                                            *
+ ******************************************************************************/
 void    DBescape_string(const char *src, char *dst, int len)
 {
 	const char	*s;
@@ -1350,30 +1409,27 @@ void    DBescape_string(const char *src, char *dst, int len)
 	*d = '\0';
 }
 
-/* NOTE: sync changes with 'DBdyn_escape_string' */
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdyn_escape_string                                              *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: escaped string                                               *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
 char*	DBdyn_escape_string(const char *src)
 {
-	const char	*s;
-	char		*dst = NULL;
-	int		len = 0;
+	int	len;
+	char	*dst = NULL;
 
-	len++;	/* '\0' */
-
-	for (s = src; s && *s; s++)
-	{
-		if (*s == '\r')
-			continue;
-
-		if (*s == '\''
-#if !defined(HAVE_ORACLE) && !defined(HAVE_SQLITE3)
-			|| *s == '\\'
-#endif
-			)
-		{
-			len++;
-		}
-		len++;
-	}
+	len = DBget_escape_string_len(src);
 
 	dst = zbx_malloc(dst, len);
 
@@ -1394,7 +1450,7 @@ char*	DBdyn_escape_string(const char *src)
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
- * Comments: sync changes with 'DBdyn_escape_string'                          *
+ * Comments: sync changes with 'DBescape_string', 'DBget_escape_string_len'   *
  *                                                                            *
  ******************************************************************************/
 char*	DBdyn_escape_string_len(const char *src, int max_src_len)
@@ -1428,6 +1484,131 @@ char*	DBdyn_escape_string_len(const char *src, int max_src_len)
 	dst = zbx_malloc(dst, len);
 
 	DBescape_string(src, dst, len);
+
+	return dst;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_escape_like_pattern_len                                    *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: return length of escaped LIKE pattern with terminating '\0'  *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ * Comments: sync changes with 'DBescape_like_pattern'                        *
+ *                                                                            *
+ ******************************************************************************/
+int	DBget_escape_like_pattern_len(const char *src)
+{
+	int		len;
+	const char	*s;
+
+	len = DBget_escape_string_len(src) - 1; /* minus '\0' */
+
+	for (s = src; s && *s; s++)
+	{
+		len += (*s == '_' || *s == '%' || *s == ZBX_SQL_LIKE_ESCAPE_CHAR);
+		len += 1;
+	}
+
+	len++; /* '\0' */
+
+	return len;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBescape_like_pattern                                            *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: escaped string to be used as pattern in LIKE                 *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ * Comments: sync changes with 'DBget_escape_like_pattern_len'                *
+ *                                                                            *
+ *           For instance, we wish to find string a_b%c\d'e!f in our database *
+ *           using '!' as escape character. Our queries then become:          *
+ *                                                                            *
+ *           ... LIKE 'a!_b!%c\\d\'e!!f' ESCAPE '!' (MySQL, PostgreSQL)       *
+ *           ... LIKE 'a!_b!%c\d''e!!f' ESCAPE '!' (SQLite3, Oracle)          *
+ *                                                                            *
+ *           Using backslash as escape character in LIKE would be too much    *
+ *           trouble, because escaping backslashes would have to be escaped   *
+ *           as well, like so:                                                *
+ *                                                                            *
+ *           ... LIKE 'a\\_b\\%c\\\\d\'e!f' ESCAPE '\\' or                    *
+ *           ... LIKE 'a\\_b\\%c\\\\d\\\'e!f' ESCAPE '\\' (MySQL, PostgreSQL) *
+ *           ... LIKE 'a\_b\%c\\d''e!f' ESCAPE '\' (SQLite3, Oracle)          *
+ *                                                                            *
+ *           Hence '!' instead of backslash.                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	DBescape_like_pattern(const char *src, char *dst, int len)
+{
+	char		*d;
+	char		*tmp = NULL;
+	const char	*t;
+
+	assert(dst);
+
+	tmp = zbx_malloc(tmp, len);
+
+	DBescape_string(src, tmp, len);
+
+	len--; /* '\0' */
+
+	for (t = tmp, d = dst; t && *t && len; t++)
+	{
+		if (*t == '_' || *t == '%' || *t == ZBX_SQL_LIKE_ESCAPE_CHAR)
+		{
+			if (len <= 1)
+				break;
+			*d++ = ZBX_SQL_LIKE_ESCAPE_CHAR;
+			len--;
+		}
+		*d++ = *t;
+		len--;
+	}
+
+	*d = '\0';
+
+	zbx_free(tmp);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdyn_escape_like_pattern                                        *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: escaped string to be used as pattern in LIKE                 *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+char*	DBdyn_escape_like_pattern(const char *src)
+{
+	int	len;
+	char	*dst = NULL;
+	
+	len = DBget_escape_like_pattern_len(src);
+
+	dst = zbx_malloc(dst, len);
+
+	DBescape_like_pattern(src, dst, len);
 
 	return dst;
 }
@@ -2135,14 +2316,15 @@ char	*DBget_unique_hostname_by_sample(char *host_name_sample)
 	zabbix_log(LOG_LEVEL_DEBUG, "In DBget_unique_hostname_by_sample() sample:'%s'",
 			host_name_sample);
 
-	host_name_sample_esc = DBdyn_escape_string(host_name_sample);
+	host_name_sample_esc = DBdyn_escape_like_pattern(host_name_sample);
 	result = DBselect(
 			"select host"
 			" from hosts"
-			" where host like '%s%%'"
+			" where host like '%s%%' escape '%c'"
 		                 DB_NODE
 			" group by host",
 			host_name_sample_esc,
+			ZBX_SQL_LIKE_ESCAPE_CHAR,
 			DBnode_local("hostid"));
 
 	host_name_temp = strdup(host_name_sample);

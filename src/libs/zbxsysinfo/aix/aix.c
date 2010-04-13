@@ -56,5 +56,7 @@ ZBX_METRIC	parameters_specific[]=
 
 	{"system.uptime",	0,		SYSTEM_UPTIME,		0,	0},
 
+	{"system.stat",		CF_USEUPARAM,	SYSTEM_STAT,		0,	"page,fi"},
+
 	{0}
 	};

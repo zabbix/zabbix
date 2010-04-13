@@ -171,11 +171,13 @@ static void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid, AGENT
 						item.type == ITEM_TYPE_AGGREGATE ||
 						item.type == ITEM_TYPE_DB_MONITOR))
 			continue;
-
-		if (item.type == ITEM_TYPE_ZABBIX_ACTIVE &&
+			
+		if (item.type == ITEM_TYPE_TRAPPER &&
 				FAIL == zbx_tcp_check_security(sock, item.trapper_hosts, 1))
-
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Process data failed: %s", zbx_tcp_strerror());
 			continue;
+		}
 
 		if (0 == strcmp(values[i].value, "ZBX_NOTSUPPORTED"))
 		{
@@ -402,13 +404,11 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *jp, const
 			total_num,
 			zbx_time() - sec);
 
-	alarm(CONFIG_TIMEOUT);
 	if (send_result(sock, ret, info) != SUCCEED)
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Error sending result back");
 		zabbix_syslog("Trapper: error sending result back");
 	}
-	alarm(0);
 
 	return ret;
 }
@@ -492,6 +492,8 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 	char		value[MAX_STRING_LEN];
 	AGENT_VALUE	av;
 
+	memset(&av, 0, sizeof(AGENT_VALUE));
+	
 	zbx_rtrim(s, " \r\n\0");
 
 	datalen = strlen(s);
@@ -524,6 +526,12 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 			else {
 				res = calculate_checksums(nodeid, NULL, 0);
 				if (SUCCEED == res && NULL != (data = get_config_data(nodeid, ZBX_NODE_SLAVE))) {
+					zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Sending configuration changes"
+							" to slave node %d for node %d datalen %d",
+							CONFIG_NODEID,
+							sender_nodeid,
+							nodeid,
+							strlen(data));
 					alarm(CONFIG_TRAPPER_TIMEOUT);
 					res = send_data_to_node(sender_nodeid, sock, data);
 					zbx_free(data);

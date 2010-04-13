@@ -23,10 +23,10 @@ require_once('include/config.inc.php');
 require_once('include/maps.inc.php');
 require_once('include/forms.inc.php');
 
-$page['title'] = "S_CONFIGURATION_OF_NETWORK_MAPS";
+$page['title'] = 'S_CONFIGURATION_OF_NETWORK_MAPS';
 $page['file'] = 'sysmap.php';
 $page['hist_arg'] = array('sysmapid');
-$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.cmap.js');
+$page['scripts'] = array('effects.js', 'dragdrop.js','class.cmap.js');
 $page['type'] = detect_page_type();
 
 include_once('include/page_header.php');
@@ -85,7 +85,6 @@ include_once('include/page_header.php');
 <?php
 // ACTION /////////////////////////////////////////////////////////////////////////////
 	if(isset($_REQUEST['favobj'])){
-		@ob_flush();
 		$json = new CJSON();
 		if('sysmap' == $_REQUEST['favobj']){
 			$sysmapid = get_request('sysmapid',0);
@@ -106,7 +105,9 @@ include_once('include/page_header.php');
 					$sysmaps = CMap::get($options);
 					$db_map = reset($sysmaps);
 
-					$map_info = getSelementsInfo($db_map['selements']);
+					expandMapLabels($db_map);
+
+					$map_info = getSelementsInfo($db_map, $db_map['expandproblem']);
 //SDII($db_map);
 					add_elementNames($db_map['selements']);
 
@@ -133,7 +134,7 @@ include_once('include/page_header.php');
 
 							$link['linktriggers'][$lnum]['desc_exp'] = $description;
 						}
-
+						order_result($link['linktriggers'], 'desc_exp');
 						$action .= 'ZBX_SYSMAPS['.$cmapid.'].map.add_link('.zbx_jsvalue($link).'); '."\n";
 					}
 
@@ -144,10 +145,10 @@ include_once('include/page_header.php');
 					break;
 				case 'save':
 					$options = array(
-							'sysmapids'=> $sysmapid, 
-							'editable'=>1, 
-							'extendoutput'=>1, 
-							'select_selements'=>1, 
+							'sysmapids'=> $sysmapid,
+							'editable'=>1,
+							'extendoutput'=>1,
+							'select_selements'=>1,
 							'select_links'=>1
 						);
 					$sysmaps = CMap::get($options);
@@ -160,73 +161,78 @@ include_once('include/page_header.php');
 					$links = $json->decode($links, true);
 
 					@ob_start();
-					$db_selementids = array();
-					$res = DBselect('SELECT selementid FROM sysmaps_elements WHERE sysmapid='.$sysmapid);
-					while($db_selement = DBfetch($res)){
-						$db_selementids[$db_selement['selementid']] = $db_selement['selementid'];
-					}
 
-					DBstart();
-					foreach($selements as $id => $selement){
-						if($selement['elementid'] == 0){
-							$selement['elementtype'] = SYSMAP_ELEMENT_TYPE_IMAGE;
+					try{
+						$db_selementids = array();
+						$res = DBselect('SELECT selementid FROM sysmaps_elements WHERE sysmapid='.$sysmapid);
+						while($db_selement = DBfetch($res)){
+							$db_selementids[$db_selement['selementid']] = $db_selement['selementid'];
 						}
 
-						if(isset($selement['new'])){
-							$selement['sysmapid'] = $sysmapid;
-							$selementid = add_element_to_sysmap($selement);
+						$transaction = DBstart();
 
-							foreach($links as $id => $link){
-								if($link['selementid1'] == $selement['selementid']) $links[$id]['selementid1']=$selementid;
-								else if($link['selementid2'] == $selement['selementid']) $links[$id]['selementid2']=$selementid;
+						foreach($selements as $id => $selement){
+							if($selement['elementid'] == 0){
+								$selement['elementtype'] = SYSMAP_ELEMENT_TYPE_IMAGE;
+							}
+
+							if($selement['iconid_off'] == 0){
+								throw new Exception('Cannot save map. Map element "'.$selement['label'].'" contains no icon.');
+							}
+							if(isset($selement['new'])){
+								$selement['sysmapid'] = $sysmapid;
+								$selementid = add_element_to_sysmap($selement);
+
+								foreach($links as $id => $link){
+									if($link['selementid1'] == $selement['selementid']) $links[$id]['selementid1']=$selementid;
+									else if($link['selementid2'] == $selement['selementid']) $links[$id]['selementid2']=$selementid;
+								}
+							}
+							else{
+//SDII($selement);
+								$selement['sysmapid'] = $sysmapid;
+								$result = update_sysmap_element($selement);
+								unset($db_selementids[$selement['selementid']]);
 							}
 						}
-						else{
-//SDII($selement);
-							$selement['sysmapid'] = $sysmapid;
-							$result = update_sysmap_element($selement);
-							unset($db_selementids[$selement['selementid']]);
+
+						delete_sysmaps_element($db_selementids);
+
+						$db_linkids = array();
+						$res = DBselect('SELECT linkid FROM sysmaps_links WHERE sysmapid='.$sysmapid);
+						while($db_link = DBfetch($res)){
+							$db_linkids[$db_link['linkid']] = $db_link['linkid'];
 						}
-					}
 
-					foreach($db_selementids as $id => $selementid){
-						delete_sysmaps_element($selementid);
-					}
-
-					$db_linkids = array();
-					$res = DBselect('SELECT linkid FROM sysmaps_links WHERE sysmapid='.$sysmapid);
-					while($db_link = DBfetch($res)){
-						$db_linkids[$db_link['linkid']] = $db_link['linkid'];
-					}
-
-					foreach($links as $id => $link){
-						if(isset($link['new'])){
-							$link['sysmapid'] = $sysmapid;
-							$result = add_link($link);
+						foreach($links as $id => $link){
+							if(isset($link['new'])){
+								$link['sysmapid'] = $sysmapid;
+								$result = add_link($link);
+							}
+							else{
+								$link['sysmapid'] = $sysmapid;
+								$result = update_link($link);
+								unset($db_linkids[$link['linkid']]);
+							}
 						}
-						else{
-							$link['sysmapid'] = $sysmapid;
-							$result = update_link($link);
-							unset($db_linkids[$link['linkid']]);
-						}
-					}
 
-					foreach($db_linkids as $id => $linkid){
-						delete_link($linkid);
-					}
+						delete_link($db_linkids);
 
-					$result = DBend(true);
+						$result = DBend(true);
 
-					if($result){
-						print('if(Confirm("Map is saved! Return?")){ location.href = "sysmaps.php"; }');
-						ob_flush();
+						if($result)
+							print('if(Confirm("'.S_MAP_SAVED_RETURN_Q.'")){ location.href = "sysmaps.php"; }');
+						else
+							throw new Exception(S_MAP_SAVE_OPERATION_FAILED."\n\r");
 					}
-					else{
-						$msg = 'Map save operation failed.'."\n\r";
-						$msg.= ob_get_contents();
-						ob_get_clean();
-						print('INFO('.zbx_jsvalue($msg).');');
+					catch(Exception $e){
+						if(isset($transaction)) DBend(false);
+						$msg =  $e->getMessage()."\n\r";
+
+						ob_clean();
+						print('alert('.zbx_jsvalue($msg).');');
 					}
+					@ob_flush();
 					break;
 			}
 		}
@@ -245,6 +251,7 @@ include_once('include/page_header.php');
 
 //						$selement['image'] = get_base64_icon($element);
 						$selement['image'] = get_selement_iconid($selement);
+						$selement['label_expanded'] = expand_map_element_label_by_data($selement);
 
 						$action = '';
 						$action.= 'ZBX_SYSMAPS['.$cmapid.'].map.add_selement('.zbx_jsvalue($selement).',1);';
@@ -253,12 +260,11 @@ include_once('include/page_header.php');
 						print($action);
 					}
 					else{
-						print('ZBX_SYSMAPS['.$cmapid.'].map.info("Get Img: Element data not found!"); ');
+						print('ZBX_SYSMAPS['.$cmapid.'].map.info("'.S_GET_IMG_ELEMENT_DATA_NOT_FOUND.'"); ');
 					}
 				break;
 				case 'new_selement':
-					$sql = 'SELECT i.* FROM images i WHERE '.dbin_node('i.imageid', false).' AND i.imagetype='.IMAGE_TYPE_ICON;
-					$default_icon = DBfetch(DBselect($sql,1));
+					$default_icon = get_default_image(false);
 
 					$selements = get_request('selements', '[]');
 					$selements = $json->decode($selements, true);
@@ -278,7 +284,7 @@ include_once('include/page_header.php');
 						print($action);
 					}
 					else{
-						print('ZBX_SYSMAPS['.$cmapid.'].map.info("Get Img: Element data not found!"); ');
+						print('ZBX_SYSMAPS['.$cmapid.'].map.info("'.S_GET_IMG_ELEMENT_DATA_NOT_FOUND.'"); ');
 					}
 				break;
 			}
@@ -291,10 +297,12 @@ include_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 ?>
 <?php
+
 	show_table_header(S_CONFIGURATION_OF_NETWORK_MAPS_BIG);
 
 	if(isset($_REQUEST['sysmapid'])){
@@ -370,33 +378,11 @@ include_once('include/page_header.php');
 	$container->setAttribute('style','position: absolute;');
 	$container->Show();
 
-	$jsLocale = array(
-			'S_EDIT_MAP_ELEMENT',
-			'S_TYPE','S_LABEL',
-			'S_LABEL_LOCATION','S_HOST',
-			'S_MAP','S_TRIGGER','S_SELECT',
-			'S_HOST_GROUP','S_IMAGE','S_ICON_OK',
-			'S_ICON_PROBLEM','S_ICON_UNKNOWN',
-			'S_ICON_MAINTENANCE','S_ICON_DISABLED','S_ICON_DEFAULT',
-			'S_COORDINATE_X','S_COORDINATE_Y',
-			'S_URL','S_BOTTOM','S_TOP','S_LEFT','S_RIGHT','S_DEFAULT',
-			'S_APPLY','S_REMOVE','S_CLOSE',
-			'S_MAP_ELEMENTS','S_MAP_LINKS','S_CONNECTORS',
-			'S_ELEMENT','S_LINK_STATUS_INDICATOR',
-			'S_LINK','S_EDIT_CONNECTOR','S_TRIGGERS','S_COLOR',
-			'S_ADD','S_TYPE_OK','S_COLOR_OK','S_LINK_INDICATORS',
-			'S_TYPE_PROBLEM','S_COLOR_PROBLEM','S_DESCRIPTION',
-			'S_LINE','S_BOLD_LINE','S_DOT','S_DASHED_LINE','S_USE_ADVANCED_ICONS'
-		);
-
-	zbx_addJSLocale($jsLocale);
 	insert_js(get_selement_icons());
 	insert_show_color_picker_javascript();
 
 	zbx_add_post_js('create_map("sysmap_cnt", "'.$sysmap['sysmapid'].'");');
-?>
-<?php
+
 
 include_once('include/page_footer.php');
-
 ?>

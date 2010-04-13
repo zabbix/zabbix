@@ -86,7 +86,6 @@ ZBX_DC_HISTORY
 	int		mtime;
 	unsigned char	keep_history;
 	unsigned char	keep_trends;
-	int		functions;
 };
 
 ZBX_DC_TREND
@@ -229,7 +228,7 @@ zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int nu
 
 int	DCget_item_lastclock(zbx_uint64_t itemid);
 
-void	DCsync_confguration();
+void	DCsync_configuration();
 void	init_configuration_cache();
 void	free_configuration_cache();
 

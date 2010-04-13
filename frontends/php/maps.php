@@ -25,7 +25,7 @@
 	$page['title'] = 'S_NETWORK_MAPS';
 	$page['file'] = 'maps.php';
 	$page['hist_arg'] = array('sysmapid');
-	$page['scripts'] = array('prototype.js');
+	$page['scripts'] = array();
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -43,7 +43,8 @@ include_once('include/page_header.php');
 		'fullscreen'=>		array(T_ZBX_INT, O_OPT,	P_SYS,		IN('0,1'),	NULL),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NULL,			NULL),
 
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
 		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),NULL)
@@ -55,7 +56,7 @@ include_once('include/page_header.php');
 <?php
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
-			update_profile('web.maps.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.maps.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 		else if('sysmapid' == $_REQUEST['favobj']){
 			$result = false;
@@ -67,7 +68,7 @@ include_once('include/page_header.php');
 				}
 			}
 			else if('remove' == $_REQUEST['action']){
-				$result = rm4favorites('web.favorite.sysmapids',$_REQUEST['favid'],ZBX_FAVORITES_ALL,$_REQUEST['favobj']);
+				$result = rm4favorites('web.favorite.sysmapids',$_REQUEST['favid'],$_REQUEST['favobj']);
 
 				if($result){
 					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVOURITES.'";'."\n");
@@ -82,10 +83,11 @@ include_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 
-	$_REQUEST['sysmapid'] = get_request('sysmapid', get_profile('web.maps.sysmapid', 0));
+	$_REQUEST['sysmapid'] = get_request('sysmapid', CProfile::get('web.maps.sysmapid', 0));
 
 	$map_wdgt = new CWidget('hat_maps');
 	$table = new CTable(S_NO_MAPS_DEFINED, 'map');
@@ -107,7 +109,7 @@ include_once('include/page_header.php');
 			$first_map = reset($maps);
 			$_REQUEST['sysmapid'] = $first_map['sysmapid'];
 		}
-		update_profile('web.maps.sysmapid', $_REQUEST['sysmapid']);
+		CProfile::update('web.maps.sysmapid', $_REQUEST['sysmapid'], PROFILE_TYPE_ID);
 
 
 		$form = new CForm(null, 'get');
@@ -150,12 +152,12 @@ include_once('include/page_header.php');
 		if(infavorites('web.favorite.sysmapids',$_REQUEST['sysmapid'], 'sysmapid')){
 			$icon = new CDiv(SPACE, 'iconminus');
 			$icon->setAttribute('title', S_REMOVE_FROM.' '.S_FAVOURITES);
-			$icon->addAction('onclick', new CJSscript('javascript: rm4favorites("sysmapid","'.$_REQUEST['sysmapid'].'",0);'));
+			$icon->addAction('onclick', new CJSscript("javascript: rm4favorites('sysmapid','".$_REQUEST["sysmapid"]."',0);"));
 		}
 		else{
 			$icon = new CDiv(SPACE, 'iconplus');
 			$icon->setAttribute('title', S_ADD_TO.' '.S_FAVOURITES);
-			$icon->addAction('onclick', new CJSscript('javascript: add2favorites("sysmapid","'.$_REQUEST['sysmapid'].'");'));
+			$icon->addAction('onclick', new CJSscript("javascript: add2favorites('sysmapid','".$_REQUEST["sysmapid"]."');"));
 		}
 		$icon->setAttribute('id', 'addrm_fav');
 

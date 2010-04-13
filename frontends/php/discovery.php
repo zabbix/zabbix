@@ -34,8 +34,8 @@ include_once('include/page_header.php');
 		'druleid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
 		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
 //ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			'isset({favid})'),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 	);
 
@@ -47,11 +47,12 @@ include_once('include/page_header.php');
 /* AJAX	*/
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
-			update_profile('web.discovery.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.discovery.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -82,11 +83,12 @@ include_once('include/page_header.php');
 				' AND status='.DRULE_STATUS_ACTIVE.
 			' ORDER BY name';
 	$db_drules = DBselect($sql);
-	while($drule = DBfetch($db_drules))
+	while($drule = DBfetch($db_drules)){
 		$cmbDRules->addItem(
-				$drule['druleid'],
-				get_node_name_by_elid($drule['druleid'], null, ': ').$drule['name']
-				);
+			$drule['druleid'],
+			get_node_name_by_elid($drule['druleid'], null, ': ').$drule['name']
+		);
+	}
 	$r_form->addVar('fullscreen', $fullscreen);
 	$r_form->addItem(array(S_DISCOVERY_RULE.SPACE,$cmbDRules));
 
@@ -95,7 +97,7 @@ include_once('include/page_header.php');
 	$numrows = new CDiv();
 	$numrows->setAttribute('name', 'numrows');
 
-	$dscvry_wdgt->addHeader(S_DISCOVERY_RULES_BIG,$r_form);
+	$dscvry_wdgt->addHeader(S_DISCOVERY_RULES_BIG, $r_form);
 //	$dscvry_wdgt->addHeader($numrows);
 //-------------
 
@@ -149,7 +151,7 @@ include_once('include/page_header.php');
 				' AND status='.DRULE_STATUS_ACTIVE.
 			' ORDER BY name';
 	$db_drules = DBselect($sql);
-	while($drule = DBfetch($db_drules)) {
+	while($drule = DBfetch($db_drules)){
 		$discovery_info = array();
 
 		$db_dhosts = DBselect('SELECT DISTINCT dhostid,druleid,status,lastup,lastdown'.
@@ -166,8 +168,7 @@ include_once('include/page_header.php');
 				$htime = $dhost['lastup'];
 			}
 
-			if (isset($primary_ip)) /* $primary_ip stores the primary host ip of the dhost */
-			{
+			if (isset($primary_ip)){ /* $primary_ip stores the primary host ip of the dhost */
 				unset($primary_ip);
 			}
 			$sql = 'SELECT DISTINCT ds.ip, ds.dserviceid'.
@@ -180,30 +181,32 @@ include_once('include/page_header.php');
 							' FROM hosts'.
 							' WHERE ip='.zbx_dbstr($dhost2['ip']).
 							' ORDER BY status', 1);
-				if ($host = DBfetch($db_hosts))
+				if($host = DBfetch($db_hosts))
 					$host = $host['host'];
 				else
 					$host = '';
 
-				if (isset($primary_ip))
-				{
-					if ($primary_ip === $dhost2['ip'])
-					{
+				if(isset($primary_ip)){
+					if ($primary_ip === $dhost2['ip']){
 						$htype = 'primary';
 					}
-					else
-					{
+					else{
 						$htype = 'slave';
 					}
 				}
-				else
-				{
+				else{
 					$primary_ip = $dhost2['ip'];
 					$htype = 'primary';
 				}
 
-				$discovery_info[$dhost2['ip']] = array('type' => $htype, 'class' => $hclass, 'host' => $host,
-						'time' => $htime, 'druleid' => $dhost['druleid']);
+				$discovery_info[$dhost2['ip']] = array(
+					'ip' => $dhost2['ip'],
+					'type' => $htype, 
+					'class' => $hclass, 
+					'host' => $host,
+					'time' => $htime, 
+					'druleid' => $dhost['druleid']
+				);
 
 				$db_dservices = DBselect('SELECT type,port,key_,status,lastup,lastdown FROM dservices '.
 						' WHERE dhostid='.$dhost['dhostid'].
@@ -222,21 +225,19 @@ include_once('include/page_header.php');
 							discovery_port2str($dservice['type'], $dservice['port']).
 							(empty($dservice['key_']) ? '' : ':'.$dservice['key_']);
 
-					$discovery_info
-						[$dhost2['ip']]
-						['services']
-						[$service_name] = array('class' => $class, 'time' => $dservice[$time]);
+					$discovery_info[$dhost2['ip']]['services'][$service_name] = array('class' => $class, 'time' => $dservice[$time]);
 				}
 			}
 		}
 
-		if ($druleid == 0 && !empty($discovery_info)) {
-			$col = new CCol(array(bold($drule['name']),
-				SPACE.'('.count($discovery_info).SPACE.S_ITEMS.')'));
+		if($druleid == 0 && !empty($discovery_info)){
+			$col = new CCol(array(bold($drule['name']),	SPACE.'('.count($discovery_info).SPACE.S_ITEMS.')'));
 			$col->setColSpan(count($services) + 3);
 
 			$table->addRow(array(get_node_name_by_elid($drule['druleid']),$col));
 		}
+
+		order_result($discovery_info, $_REQUEST['sort'], $_REQUEST['sortorder']);
 
 		foreach($discovery_info as $ip => $h_data){
 			$table_row = array(
@@ -287,9 +288,6 @@ include_once('include/page_header.php');
 	$dscvry_wdgt->addItem($table);
 	$dscvry_wdgt->show();
 
-?>
-<?php
 
 include_once('include/page_footer.php');
-
 ?>

@@ -45,6 +45,7 @@ class CTemplate extends CZBXAPI{
 		global $USER_DETAILS;
 
 		$result = array();
+		$nodeCheck = false;
 		$user_type = $USER_DETAILS['type'];
 		$userid = $USER_DETAILS['userid'];
 
@@ -55,6 +56,7 @@ class CTemplate extends CZBXAPI{
 			'select' => array('templates' => 'h.hostid'),
 			'from' => array('hosts h'),
 			'where' => array('h.status='.HOST_STATUS_TEMPLATE),
+			'group' => array(),
 			'order' => array(),
 			'limit' => null);
 
@@ -62,15 +64,18 @@ class CTemplate extends CZBXAPI{
 			'nodeids'					=> null,
 			'groupids'					=> null,
 			'templateids'				=> null,
+			'parentTemplateids'			=> null,
 			'hostids'					=> null,
 			'graphids'					=> null,
 			'itemids'					=> null,
+			'triggerids'				=> null,
 			'with_items'				=> null,
 			'with_triggers'				=> null,
 			'with_graphs'				=> null,
 			'editable' 					=> null,
 			'nopermissions'				=> null,
 // filter
+			'filter'					=> null,
 			'pattern'					=> '',
 // OutPut
 			'output'					=> API_OUTPUT_REFER,
@@ -78,30 +83,36 @@ class CTemplate extends CZBXAPI{
 			'select_groups'				=> null,
 			'select_hosts'				=> null,
 			'select_templates'			=> null,
+			'selectParentTemplates'		=> null,
 			'select_items'				=> null,
 			'select_triggers'			=> null,
 			'select_graphs'				=> null,
 			'select_applications'		=> null,
 			'select_macros'				=> null,
-			'count'						=> null,
+			'countOutput'				=> null,
+			'groupCount'				=> null,
 			'preservekeys'				=> null,
 
 			'sortfield'					=> '',
 			'sortorder'					=> '',
-			'limit'						=> null
+			'limit'						=> null,
+			'limitSelects'				=> null
 		);
 
 		$options = zbx_array_merge($def_options, $options);
 
-		
+
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
-			
+
 			if(!is_null($options['select_groups'])){
 				$options['select_groups'] = API_OUTPUT_EXTEND;
 			}
 			if(!is_null($options['select_templates'])){
 				$options['select_templates'] = API_OUTPUT_EXTEND;
+			}
+			if(!is_null($options['selectParentTemplates'])){
+				$options['selectParentTemplates'] = API_OUTPUT_EXTEND;
 			}
 			if(!is_null($options['select_hosts'])){
 				$options['select_hosts'] = API_OUTPUT_EXTEND;
@@ -122,12 +133,12 @@ class CTemplate extends CZBXAPI{
 				$options['select_macros'] = API_OUTPUT_EXTEND;
 			}
 		}
-		
-		
-// editable + PERMISSION CHECK
-		if(defined('ZBX_API_REQUEST')){
-			$options['nopermissions'] = false;
+
+		if(is_array($options['output'])){
+			$sql_parts['select']['hosts'] = ' h.'.implode(',h.', $options['output']);
+			$options['output'] = API_OUTPUT_REFER;
 		}
+// editable + PERMISSION CHECK
 
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
@@ -153,12 +164,12 @@ class CTemplate extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
 
 // groupids
 		if(!is_null($options['groupids'])){
 			zbx_value2array($options['groupids']);
-			
+
 			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
@@ -166,13 +177,48 @@ class CTemplate extends CZBXAPI{
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sql_parts['where']['hgh'] = 'hg.hostid=h.hostid';
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['hg'] = 'hg.groupid';
+			}
+
+			if(!$nodeCheck){
+				$nodeCheck = true;
+				$sql_parts['where'][] = DBin_node('hg.groupid', $nodeids);
+			}
 		}
 
 // templateids
 		if(!is_null($options['templateids'])){
 			zbx_value2array($options['templateids']);
 
-			$sql_parts['where'][] = DBcondition('h.hostid', $options['templateids']);
+			$sql_parts['where']['templateid'] = DBcondition('h.hostid', $options['templateids']);
+
+			if(!$nodeCheck){
+				$nodeCheck = true;
+				$sql_parts['where'][] = DBin_node('h.hostid', $nodeids);
+			}
+		}
+
+// parentTemplateids
+		if(!is_null($options['parentTemplateids'])){
+			zbx_value2array($options['parentTemplateids']);
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['parentTemplateid'] = 'ht.templateid as parentTemplateid';
+			}
+
+			$sql_parts['from']['ht'] = 'hosts_templates ht';
+			$sql_parts['where'][] = DBcondition('ht.templateid', $options['parentTemplateids']);
+			$sql_parts['where']['hht'] = 'h.hostid=ht.hostid';
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['templateid'] = 'ht.templateid';
+			}
+
+			if(!$nodeCheck){
+				$nodeCheck = true;
+				$sql_parts['where'][] = DBin_node('ht.templateid', $nodeids);
+			}
 		}
 
 // hostids
@@ -186,6 +232,15 @@ class CTemplate extends CZBXAPI{
 			$sql_parts['from']['ht'] = 'hosts_templates ht';
 			$sql_parts['where'][] = DBcondition('ht.hostid', $options['hostids']);
 			$sql_parts['where']['hht'] = 'h.hostid=ht.templateid';
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['ht'] = 'ht.hostid';
+			}
+
+			if(!$nodeCheck){
+				$nodeCheck = true;
+				$sql_parts['where'][] = DBin_node('ht.hostid', $nodeids);
+			}
 		}
 
 // itemids
@@ -199,6 +254,30 @@ class CTemplate extends CZBXAPI{
 			$sql_parts['from']['i'] = 'items i';
 			$sql_parts['where'][] = DBcondition('i.itemid', $options['itemids']);
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+
+			if(!$nodeCheck){
+				$nodeCheck = true;
+				$sql_parts['where'][] = DBin_node('i.itemid', $nodeids);
+			}
+		}
+
+// triggerids
+		if(!is_null($options['triggerids'])){
+			zbx_value2array($options['triggerids']);
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['triggerid'] = 'f.triggerid';
+			}
+
+			$sql_parts['from']['f'] = 'functions f';
+			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
+			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
+
+			if(!$nodeCheck){
+				$nodeCheck = true;
+				$sql_parts['where'][] = DBin_node('f.triggerid', $nodeids);
+			}
 		}
 
 // graphids
@@ -214,6 +293,18 @@ class CTemplate extends CZBXAPI{
 			$sql_parts['where'][] = DBcondition('gi.graphid', $options['graphids']);
 			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+
+			if(!$nodeCheck){
+				$nodeCheck = true;
+				$sql_parts['where'][] = DBin_node('gi.graphid', $nodeids);
+			}
+		}
+
+// node check !!!!
+// should last, after all ****IDS checks
+		if(!$nodeCheck){
+			$nodeCheck = true;
+			$sql_parts['where'][] = DBin_node('h.hostid', $nodeids);
 		}
 
 // with_items
@@ -223,21 +314,21 @@ class CTemplate extends CZBXAPI{
 
 // with_triggers
 		if(!is_null($options['with_triggers'])){
-			$sql_parts['where'][] = 'EXISTS(
-					SELECT i.itemid
-					FROM items i, functions f, triggers t
-					WHERE i.hostid=h.hostid
-						AND i.itemid=f.itemid
-						AND f.triggerid=t.triggerid)';
+			$sql_parts['where'][] = 'EXISTS( '.
+						' SELECT i.itemid '.
+						' FROM items i, functions f, triggers t '.
+						' WHERE i.hostid=h.hostid '.
+							' AND i.itemid=f.itemid '.
+							' AND f.triggerid=t.triggerid)';
 		}
 
 // with_graphs
 		if(!is_null($options['with_graphs'])){
-			$sql_parts['where'][] = 'EXISTS(
-					SELECT DISTINCT i.itemid
-					FROM items i, graphs_items gi
-					WHERE i.hostid=h.hostid
-						AND i.itemid=gi.itemid)';
+			$sql_parts['where'][] = 'EXISTS('.
+					'SELECT DISTINCT i.itemid '.
+					' FROM items i, graphs_items gi '.
+					' WHERE i.hostid=h.hostid '.
+						' AND i.itemid=gi.itemid)';
 		}
 
 // extendoutput
@@ -245,16 +336,34 @@ class CTemplate extends CZBXAPI{
 			$sql_parts['select']['templates'] = 'h.*';
 		}
 
-// count
-		if(!is_null($options['count'])){
+// countOutput
+		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
+			$sql_parts['select'] = array('count(DISTINCT h.hostid) as rowscount');
 
-			$sql_parts['select'] = array('count(h.hostid) as rowscount');
+//groupCount
+			if(!is_null($options['groupCount'])){
+				foreach($sql_parts['group'] as $key => $fields){
+					$sql_parts['select'][$key] = $fields;
+				}
+			}
 		}
 
 // pattern
 		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where'][] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
+			$sql_parts['where']['host'] = ' UPPER(h.host) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
+		}
+
+// filter
+		if(!is_null($options['filter'])){
+			zbx_value2array($options['filter']);
+
+			if(isset($options['filter']['templateid'])){
+				$sql_parts['where']['templateid'] = 'h.hostid='.$options['filter']['templateid'];
+			}
+			if(isset($options['filter']['host'])){
+				$sql_parts['where']['host'] = 'h.host='.zbx_dbstr($options['filter']['host']);
+			}
 		}
 
 // order
@@ -281,28 +390,35 @@ class CTemplate extends CZBXAPI{
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
 		$sql_parts['where'] = array_unique($sql_parts['where']);
+		$sql_parts['group'] = array_unique($sql_parts['group']);
 		$sql_parts['order'] = array_unique($sql_parts['order']);
 
 		$sql_select = '';
 		$sql_from = '';
 		$sql_where = '';
+		$sql_group = '';
 		$sql_order = '';
-		if(!empty($sql_parts['select']))	$sql_select.= implode(',', $sql_parts['select']);
-		if(!empty($sql_parts['from']))		$sql_from.= implode(',', $sql_parts['from']);
-		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ', $sql_parts['where']);
-		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',', $sql_parts['order']);
+		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
+		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
+		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
+		if(!empty($sql_parts['group']))		$sql_where.= ' GROUP BY '.implode(',',$sql_parts['group']);
+		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.'
-				FROM '.$sql_from.'
-				WHERE '.DBin_node('h.hostid', $nodeids).
+		$sql = 'SELECT DISTINCT '.$sql_select.
+				' FROM '.$sql_from.
+				' WHERE '.DBin_node('h.hostid', $nodeids).
 					$sql_where.
+				$sql_group.
 				$sql_order;
-
 		$res = DBselect($sql, $sql_limit);
 		while($template = DBfetch($res)){
-			if($options['count'])
-				$result = $template;
+			if(!is_null($options['countOutput'])){
+				if(!is_null($options['groupCount']))
+					$result[] = $template;
+				else
+					$result = $template['rowscount'];
+			}
 			else{
 				$template['templateid'] = $template['hostid'];
 				$templateids[$template['templateid']] = $template['templateid'];
@@ -323,6 +439,9 @@ class CTemplate extends CZBXAPI{
 
 					if(!is_null($options['select_hosts']) && !isset($result[$template['templateid']]['hosts'])){
 						$template['hosts'] = array();
+					}
+					if(!is_null($options['selectParentTemplates']) && !isset($result[$template['templateid']]['parentTemplates'])){
+						$template['parentTemplates'] = array();
 					}
 
 					if(!is_null($options['select_items']) && !isset($result[$template['templateid']]['items'])){
@@ -360,6 +479,14 @@ class CTemplate extends CZBXAPI{
 						$result[$template['templateid']]['hosts'][] = array('hostid' => $template['linked_hostid']);
 						unset($template['linked_hostid']);
 					}
+// parentTemplateids
+					if(isset($template['parentTemplateid']) && is_null($options['selectParentTemplates'])){
+						if(!isset($result[$template['templateid']]['parentTemplates']))
+							$result[$template['templateid']]['parentTemplates'] = array();
+
+						$result[$template['templateid']]['parentTemplates'][] = array('templateid' => $template['parentTemplateid']);
+						unset($template['parentTemplateid']);
+					}
 
 // itemids
 					if(isset($template['itemid']) && is_null($options['select_items'])){
@@ -368,6 +495,15 @@ class CTemplate extends CZBXAPI{
 
 						$result[$template['templateid']]['items'][] = array('itemid' => $template['itemid']);
 						unset($template['itemid']);
+					}
+
+// triggerids
+					if(isset($template['triggerid']) && is_null($options['select_triggers'])){
+						if(!isset($result[$template['hostid']]['triggers']))
+							$result[$template['hostid']]['triggers'] = array();
+
+						$result[$template['hostid']]['triggers'][] = array('triggerid' => $template['triggerid']);
+						unset($template['triggerid']);
 					}
 
 // graphids
@@ -384,7 +520,9 @@ class CTemplate extends CZBXAPI{
 
 		}
 
-		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
+
+Copt::memoryPick();
+		if(!is_null($options['countOutput'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
@@ -403,118 +541,312 @@ class CTemplate extends CZBXAPI{
 				$ghosts = $group['hosts'];
 				unset($group['hosts']);
 				foreach($ghosts as $hnum => $template){
-					$result[$template['templateid']]['groups'][] = $group;
+					$result[$template['hostid']]['groups'][] = $group;
 				}
 			}
 		}
 
 // Adding Templates
-		if(!is_null($options['select_templates']) && str_in_array($options['select_templates'], $subselects_allowed_outputs)){
+		if(!is_null($options['select_templates'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'output' => $options['select_templates'],
-				'hostids' => $templateids,
+				'parentTemplateids' => $templateids,
 				'preservekeys' => 1
 			);
-			$templates = self::get($obj_params);
-			foreach($templates as $templateid => $template){
-				$thosts = $template['hosts'];
-				unset($template['hosts']);
-				foreach($thosts as $hnum => $host){
-					$result[$host['hostid']]['templates'][] = $template;
+
+			if(is_array($options['select_templates']) || str_in_array($options['select_templates'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['select_templates'];
+				$templates = CTemplate::get($obj_params);
+
+				if(!is_null($options['limitSelects'])) order_result($templates, 'host');
+				foreach($templates as $templateid => $template){
+					unset($templates[$templateid]['parentTemplates']);
+
+					foreach($template['parentTemplates'] as $hnum => $parentTemplate){
+						if(!is_null($options['limitSelects'])){
+							if(!isset($count[$parentTemplate['templateid']])) $count[$parentTemplate['templateid']] = 0;
+							$count[$parentTemplate['hostid']]++;
+
+							if($count[$parentTemplate['templateid']] > $options['limitSelects']) continue;
+						}
+
+						$result[$parentTemplate['templateid']]['templates'][] = &$templates[$templateid];
+					}
+				}
+			}
+			else if(API_OUTPUT_COUNT == $options['select_templates']){
+				$obj_params['countOutput'] = 1;
+				$obj_params['groupCount'] = 1;
+
+				$templates = CTemplate::get($obj_params);
+				$templates = zbx_toHash($templates, 'hostid');
+				foreach($result as $templateid => $template){
+					if(isset($templates[$groupid]))
+						$result[$templateid]['templates'] = $templates[$templateid]['rowscount'];
+					else
+						$result[$templateid]['templates'] = 0;
 				}
 			}
 		}
 
 // Adding Hosts
-		if(!is_null($options['select_hosts']) && str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+		if(!is_null($options['select_hosts'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'output' => $options['select_hosts'],
 				'templateids' => $templateids,
-				'templated_hosts' => 1,
 				'preservekeys' => 1
 			);
-			$hosts = CHost::get($obj_params);
-			foreach($hosts as $hostid => $host){
-				$htemplates = $host['templates'];
-				unset($host['templates']);
-				foreach($htemplates as $tnum => $template){
-					$result[$template['templateid']]['hosts'][] = $host;
+
+			if(is_array($options['select_hosts']) || str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['select_hosts'];
+				$hosts = CHost::get($obj_params);
+
+				if(!is_null($options['limitSelects'])) order_result($hosts, 'host');
+				foreach($hosts as $hostid => $host){
+					unset($hosts[$hostid]['templates']);
+
+					foreach($host['templates'] as $tnum => $template){
+						if(!is_null($options['limitSelects'])){
+							if(!isset($count[$template['templateid']])) $count[$template['templateid']] = 0;
+							$count[$template['templateid']]++;
+
+							if($count[$template['templateid']] > $options['limitSelects']) continue;
+						}
+
+						$result[$template['templateid']]['hosts'][] = &$hosts[$hostid];
+					}
+				}
+			}
+			else if(API_OUTPUT_COUNT == $options['select_hosts']){
+				$obj_params['countOutput'] = 1;
+				$obj_params['groupCount'] = 1;
+
+				$hosts = CHost::get($obj_params);
+				$hosts = zbx_toHash($hosts, 'hostid');
+				foreach($result as $templateid => $template){
+					if(isset($hosts[$templateid]))
+						$result[$templateid]['hosts'] = $hosts[$templateid]['rowscount'];
+					else
+						$result[$templateid]['hosts'] = 0;
+				}
+			}
+		}
+
+// Adding parentTemplates
+		if(!is_null($options['selectParentTemplates'])){
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'hostids' => $templateids,
+				'preservekeys' => 1
+			);
+
+			if(is_array($options['selectParentTemplates']) || str_in_array($options['selectParentTemplates'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['selectParentTemplates'];
+				$templates = CTemplate::get($obj_params);
+
+				if(!is_null($options['limitSelects'])) order_result($templates, 'host');
+				foreach($templates as $templateid => $template){
+					unset($templates[$templateid]['hosts']);
+
+					foreach($template['hosts'] as $hnum => $host){
+						if(!is_null($options['limitSelects'])){
+							if(!isset($count[$host['hostid']])) $count[$host['hostid']] = 0;
+							$count[$host['hostid']]++;
+
+							if($count[$host['hostid']] > $options['limitSelects']) continue;
+						}
+
+						$result[$host['hostid']]['parentTemplates'][] = &$templates[$templateid];
+					}
+				}
+			}
+			else if(API_OUTPUT_COUNT == $options['select_templates']){
+				$obj_params['countOutput'] = 1;
+				$obj_params['groupCount'] = 1;
+
+				$templates = CTemplate::get($obj_params);
+				$templates = zbx_toHash($templates, 'hostid');
+				foreach($result as $templateid => $template){
+					if(isset($templates[$groupid]))
+						$result[$templateid]['parentTemplates'] = $templates[$templateid]['rowscount'];
+					else
+						$result[$templateid]['parentTemplates'] = 0;
 				}
 			}
 		}
 
 // Adding Items
-		if(!is_null($options['select_items']) && str_in_array($options['select_items'], $subselects_allowed_outputs)){
+		if(!is_null($options['select_items'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'output' => $options['select_items'],
 				'hostids' => $templateids,
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			$items = CItem::get($obj_params);
 
-			foreach($items as $itemid => $item){
-				$ihosts = $item['hosts'];
-				unset($item['hosts']);
-				foreach($ihosts as $hnum => $host){
-					$result[$host['hostid']]['items'][] = $item;
+			if(is_array($options['select_items']) || str_in_array($options['select_items'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['select_items'];
+				$items = CItem::get($obj_params);
+
+				if(!is_null($options['limitSelects'])) order_result($items, 'description');
+				foreach($items as $itemid => $item){
+					unset($items[$itemid]['hosts']);
+
+					foreach($item['hosts'] as $hnum => $host){
+						if(!is_null($options['limitSelects'])){
+							if(!isset($count[$host['hostid']])) $count[$host['hostid']] = 0;
+							$count[$host['hostid']]++;
+
+							if($count[$host['hostid']] > $options['limitSelects']) continue;
+						}
+
+						$result[$host['hostid']]['items'][] = &$items[$itemid];
+					}
+				}
+			}
+			else if(API_OUTPUT_COUNT == $options['select_items']){
+				$obj_params['countOutput'] = 1;
+				$obj_params['groupCount'] = 1;
+
+				$items = CItem::get($obj_params);
+				$items = zbx_toHash($items, 'hostid');
+				foreach($result as $templateid => $template){
+					if(isset($items[$templateid]))
+						$result[$templateid]['items'] = $items[$templateid]['rowscount'];
+					else
+						$result[$templateid]['items'] = 0;
 				}
 			}
 		}
 
 // Adding triggers
-		if(!is_null($options['select_triggers']) && str_in_array($options['select_triggers'], $subselects_allowed_outputs)){
+		if(!is_null($options['select_triggers'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'output' => $options['select_triggers'],
 				'hostids' => $templateids,
+				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			$triggers = CTrigger::get($obj_params);
-			foreach($triggers as $triggerid => $trigger){
-				$thosts = $trigger['hosts'];
-				unset($trigger['hosts']);
-				foreach($thosts as $hnum => $host){
-					$result[$host['hostid']]['triggers'][] = $trigger;
+
+			if(is_array($options['select_triggers']) || str_in_array($options['select_triggers'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['select_triggers'];
+				$triggers = CTrigger::get($obj_params);
+
+				if(!is_null($options['limitSelects'])) order_result($triggers, 'description');
+				foreach($triggers as $triggerid => $trigger){
+					unset($trigger[$triggerid]['hosts']);
+
+					foreach($trigger['hosts'] as $hnum => $host){
+						if(!is_null($options['limitSelects'])){
+							if(!isset($count[$host['hostid']])) $count[$host['hostid']] = 0;
+							$count[$host['hostid']]++;
+
+							if($count[$host['hostid']] > $options['limitSelects']) continue;
+						}
+
+						$result[$host['hostid']]['triggers'][] = &$trigger[$triggerid];
+					}
+				}
+			}
+			else if(API_OUTPUT_COUNT == $options['select_triggers']){
+				$obj_params['countOutput'] = 1;
+				$obj_params['groupCount'] = 1;
+
+				$triggers = CTrigger::get($obj_params);
+				$triggers = zbx_toHash($triggers, 'hostid');
+				foreach($result as $templateid => $template){
+					if(isset($triggers[$templateid]))
+						$result[$templateid]['triggers'] = $triggers[$templateid]['rowscount'];
+					else
+						$result[$templateid]['triggers'] = 0;
 				}
 			}
 		}
 
 // Adding graphs
-		if(!is_null($options['select_graphs']) && str_in_array($options['select_graphs'], $subselects_allowed_outputs)){
+		if(!is_null($options['select_graphs'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'output' => $options['select_graphs'],
 				'hostids' => $templateids,
+				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			$graphs = CGraph::get($obj_params);
-			foreach($graphs as $graphid => $graph){
-				$ghosts = $graph['hosts'];
-				unset($graph['hosts']);
-				foreach($ghosts as $hnum => $host){
-					$result[$host['hostid']]['graphs'][] = $graph;
+
+			if(is_array($options['select_graphs']) || str_in_array($options['select_graphs'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['select_graphs'];
+				$graphs = CGraph::get($obj_params);
+
+				if(!is_null($options['limitSelects'])) order_result($graphs, 'name');
+				foreach($graphs as $graphid => $graph){
+					unset($graph[$graphid]['hosts']);
+
+					foreach($graph['hosts'] as $hnum => $host){
+						if(!is_null($options['limitSelects'])){
+							if(!isset($count[$host['hostid']])) $count[$host['hostid']] = 0;
+							$count[$host['hostid']]++;
+
+							if($count[$host['hostid']] > $options['limitSelects']) continue;
+						}
+
+						$result[$host['hostid']]['graphs'][] = &$graph[$graphid];
+					}
+				}
+			}
+			else if(API_OUTPUT_COUNT == $options['select_graphs']){
+				$obj_params['countOutput'] = 1;
+				$obj_params['groupCount'] = 1;
+
+				$graphs = CGraph::get($obj_params);
+				$graphs = zbx_toHash($graphs, 'hostid');
+				foreach($result as $templateid => $template){
+					if(isset($graphs[$templateid]))
+						$result[$templateid]['graphs'] = $graphs[$templateid]['rowscount'];
+					else
+						$result[$templateid]['graphs'] = 0;
 				}
 			}
 		}
 
 // Adding applications
-		if(!is_null($options['select_applications']) && str_in_array($options['select_applications'], $subselects_allowed_outputs)){
+		if(!is_null($options['select_applications'])){
 			$obj_params = array(
 				'nodeids' => $nodeids,
-				'output' => $options['select_applications'],
 				'hostids' => $templateids,
+				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			$applications = Capplication::get($obj_params);
-			foreach($applications as $applicationid => $application){
-				$ahosts = $application['hosts'];
-				unset($application['hosts']);
-				foreach($ahosts as $hnum => $host){
-					$result[$host['hostid']]['applications'][] = $application;
+
+			if(is_array($options['select_applications']) || str_in_array($options['select_applications'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['select_applications'];
+				$applications = CApplication::get($obj_params);
+
+				if(!is_null($options['limitSelects'])) order_result($applications, 'name');
+				foreach($applications as $applicationid => $application){
+					unset($application[$applicationid]['hosts']);
+
+					foreach($application['hosts'] as $hnum => $host){
+						if(!is_null($options['limitSelects'])){
+							if(!isset($count[$host['hostid']])) $count[$host['hostid']] = 0;
+							$count[$host['hostid']]++;
+
+							if($count[$host['hostid']] > $options['limitSelects']) continue;
+						}
+
+						$result[$host['hostid']]['applications'][] = &$application[$applicationid];
+					}
+				}
+			}
+			else if(API_OUTPUT_COUNT == $options['select_applications']){
+				$obj_params['countOutput'] = 1;
+				$obj_params['groupCount'] = 1;
+
+				$applications = CApplication::get($obj_params);
+				$applications = zbx_toHash($applications, 'hostid');
+				foreach($result as $templateid => $template){
+					if(isset($applications[$templateid]))
+						$result[$templateid]['applications'] = $applications[$templateid]['rowscount'];
+					else
+						$result[$templateid]['applications'] = 0;
 				}
 			}
 		}
@@ -537,6 +869,7 @@ class CTemplate extends CZBXAPI{
 			}
 		}
 
+COpt::memoryPick();
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
 //			$result = zbx_cleanHashes($result);
@@ -556,26 +889,43 @@ class CTemplate extends CZBXAPI{
  *
  * @param array $template_data
  * @param array $template_data['host']
+ * @param array $template_data['templateid']
  * @return string templateid
  */
-	public static function getObjects($template_data){
-		$result = array();
-		$templateid = array();
 
-		$sql = 'SELECT hostid '.
-				' FROM hosts '.
-				' WHERE host='.zbx_dbstr($template_data['template']).
-					' AND status='.HOST_STATUS_TEMPLATE.
-					' AND '.DBin_node('hostid', false);
-		$res = DBselect($sql);
-		while($template = DBfetch($res)){
-			$templateids[$template['hostid']] = $template['hostid'];
-		}
+	public static function getObjects($templateData){
+		$options = array(
+			'filter' => $templateData,
+			'output'=>API_OUTPUT_EXTEND
+		);
 
-		if(!empty($templateids))
-			$result = self::get(array('templateids'=>$templateids, 'extendoutput'=>1));
+		if(isset($templateData['node']))
+			$options['nodeids'] = getNodeIdByNodeName($templateData['node']);
+		else if(isset($templateData['nodeids']))
+			$options['nodeids'] = $templateData['nodeids'];
+
+		$result = self::get($options);
 
 	return $result;
+	}
+
+	public static function exists($object){
+		$keyFields = array(array('hostid', 'host'));
+
+		$options = array(
+			'filter' => zbx_array_mintersect($keyFields, $object),
+			'output' => API_OUTPUT_SHORTEN,
+			'nopermissions' => 1,
+			'limit' => 1
+		);
+		if(isset($object['node']))
+			$options['nodeids'] = getNodeIdByNodeName($object['node']);
+		else if(isset($object['nodeids']))
+			$options['nodeids'] = $object['nodeids'];
+
+		$objs = self::get($options);
+
+	return !empty($objs);
 	}
 
 /**
@@ -628,10 +978,12 @@ class CTemplate extends CZBXAPI{
 
 
 // PERMISSIONS {{{
-			$upd_groups = CHostGroup::get(array(
+			$options = array(
 				'groupids' => $groupids,
 				'editable' => 1,
-				'preservekeys' => 1));
+				'preservekeys' => 1
+			);
+			$upd_groups = CHostGroup::get($options);
 			foreach($groupids as $gnum => $groupid){
 				if(!isset($upd_groups[$groupid])){
 					throw new APIException(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -643,31 +995,29 @@ class CTemplate extends CZBXAPI{
 
 			foreach($templates as $tnum => $template){
 
-	/* 			$template_db_fields = array(
-					'host' => null,
+	 			$template_db_fields = array(
+					'host' => null
 				);
+
 				if(!check_db_fields($template_db_fields, $template)){
-					$result = false;
-					break;
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Field "host" is mandatory');
 				}
-	 */
 
 				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $template['host'])){
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Incorrect characters used for Template name [ '.$template['host'].' ]');
 				}
 
-				$template_exists = self::getObjects(array('template' => $template['host']));
-				if(!empty($template_exists)){
-					$result = false;
+				if(self::exists(array('host' => $template['host']))){
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+				}
+				if(CHost::exists(array('host' => $template['host']))){
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$template['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
-
 
 				$templateid = get_dbid('hosts', 'hostid');
 				$templateids[] = $templateid;
 
-				$values = array($templateid, zbx_dbstr($template['host']), HOST_STATUS_TEMPLATE);
-				$sql = 'INSERT INTO hosts (hostid, host, status) VALUES ('. implode(', ', $values) .')';
+				$sql = 'INSERT INTO hosts (hostid, host, status) VALUES ('.$templateid.','.zbx_dbstr($template['host']).','.HOST_STATUS_TEMPLATE.')';
 				$result = DBexecute($sql);
 
 				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'DBError');
@@ -689,9 +1039,7 @@ class CTemplate extends CZBXAPI{
 
 			self::EndTransaction(true, __METHOD__);
 
-			$new_templates = self::get(array('templateids' => $templateids, 'extendoutput' => 1, 'nopermissions' => 1));
-			return $new_templates;
-
+			return array('templateids' => $templateids);
 		}
 		catch(APIException $e){
 			if($transaction) self::EndTransaction(false, __METHOD__);
@@ -728,11 +1076,11 @@ class CTemplate extends CZBXAPI{
 				'preservekeys' => 1
 			));
 			foreach($templates as $tnum => $template){
-	// PERMISSIONS {{{
+// PERMISSIONS {{{
 				if(!isset($upd_templates[$template['templateid']])){
 					throw new APIException(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
-	// }}} PERMISSIONS
+// }}} PERMISSIONS
 			}
 
 			self::BeginTransaction(__METHOD__);
@@ -742,13 +1090,11 @@ class CTemplate extends CZBXAPI{
 				$template['templates'] = $template;
 
 				$result = self::massUpdate($template);
-				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Failed update template');
+				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Failed to update template');
 			}
 
 			self::EndTransaction(true, __METHOD__);
-			$upd_templates = self::get(array('templateids'=>$templateids, 'extendoutput'=>1, 'nopermissions'=>1));
-			return $upd_templates;
-
+			return array('templateids' => $templateids);
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
@@ -759,80 +1105,6 @@ class CTemplate extends CZBXAPI{
 			return false;
 		}
 	}
-
-	private static function checkCircularLink($id, $templateids){
-		if(empty($templateids)) return true;
-$i = 0;
-// target_up_templateids
-		$next_templateids = array($id);
-		$target_up_templateids = array();
-		do{
-			$sql = 'SELECT hostid FROM hosts_templates WHERE '.DBcondition('templateid', $next_templateids);
-			$tpls_db = DBselect($sql);
-
-			$next_templateids = array();
-			while($tpl = DBfetch($tpls_db)){
-				$next_templateids[] = $tpl['hostid'];
-			}
-			$target_up_templateids = array_merge($target_up_templateids, $next_templateids);
-		}while(!empty($next_templateids));
-
-// target_down_templateids
-		$next_templateids = array($id);
-		$target_down_templateids = array();
-		do{
-			$sql = 'SELECT templateid FROM hosts_templates WHERE '.DBcondition('hostid', $next_templateids);
-			$tpls_db = DBselect($sql);
-
-			$next_templateids = array();
-			while($tpl = DBfetch($tpls_db)){
-				$next_templateids[] = $tpl['templateid'];
-			}
-			$target_down_templateids = array_merge($target_down_templateids, $next_templateids);
-		}while(!empty($next_templateids));
-
-		$target_templateids = array_merge($target_up_templateids, $target_down_templateids);
-		$target_templateids[] = $id;
-
-
-// source_up_templateids
-		$next_templateids = $templateids;
-		$source_up_templateids = array();
-		do{
-			$sql = 'SELECT hostid FROM hosts_templates WHERE '.DBcondition('templateid', $next_templateids);
-			$tpls_db = DBselect($sql);
-
-			$next_templateids = array();
-			while($tpl = DBfetch($tpls_db)){
-				$next_templateids[] = $tpl['hostid'];
-			}
-			$source_up_templateids = array_merge($source_up_templateids, $next_templateids);
-		}while(!empty($next_templateids));
-
-// source_down_templateids
-		$next_templateids = $templateids;
-		$source_down_templateids = array();
-		do{
-			$sql = 'SELECT templateid FROM hosts_templates WHERE '.DBcondition('hostid', $next_templateids);
-			$tpls_db = DBselect($sql);
-
-			$next_templateids = array();
-			while($tpl = DBfetch($tpls_db)){
-				$next_templateids[] = $tpl['templateid'];
-			}
-			$source_down_templateids = array_merge($source_down_templateids, $next_templateids);
-		}while(!empty($next_templateids));
-
-		$source_templateids = array_merge($source_up_templateids, $source_down_templateids, $templateids);
-
-
-		if(array_intersect($target_templateids, $source_templateids)){
-			return false;
-		}
-
-		return true;
-	}
-
 
 /**
  * Delete Template
@@ -851,10 +1123,13 @@ $i = 0;
 		$templates = zbx_toArray($templates);
 		$templateids = array();
 
-		$del_templates = self::get(array('templateids'=>zbx_objectValues($templates, 'templateid'),
-											'editable'=>1,
-											'extendoutput'=>1,
-											'preservekeys'=>1));
+		$options = array(
+			'templateids'=>zbx_objectValues($templates, 'templateid'),
+			'editable'=>1,
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$del_templates = self::get($options);
 		foreach($templates as $gnum => $template){
 			if(!isset($del_templates[$template['templateid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -873,7 +1148,7 @@ $i = 0;
 		}
 
 		if($result){
-			return zbx_cleanHashes($del_templates);
+			return array('templateids' => $templateids);
 		}
 		else{
 			self::setError(__METHOD__);
@@ -881,6 +1156,66 @@ $i = 0;
 		}
 	}
 
+
+/**
+ * Link Template to Hosts
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $data
+ * @param string $data['templates']
+ * @param string $data['hosts']
+ * @param string $data['groups']
+ * @param string $data['templates_link']
+ * @return boolean
+ */
+	public static function massAdd($data){
+		$transaction = false;
+
+		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : null;
+		$templateids = is_null($templates) ? array() : zbx_objectValues($templates, 'templateid');
+
+
+		$transaction = self::BeginTransaction(__METHOD__);
+
+		try{
+			if(isset($data['groups'])){
+				$options = array('groups' => $data['groups'], 'templates' => $templates);
+				$result = CHostGroup::massAdd($options);
+				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t link groups');
+			}
+
+			if(isset($data['hosts'])){
+				$hostids = zbx_objectValues($data['hosts'], 'hostid');
+				self::link($templateids, $hostids);
+			}
+
+			if(isset($data['templates_link'])){
+				$templates_linkids = zbx_objectValues($data['templates_link'], 'templateid');
+				self::link($templates_linkids, $templateids);
+			}
+
+			if(isset($data['macros'])){
+				$options = array('templates' => zbx_toArray($data['templates']), 'macros' => $data['macros']);
+				$result = CUserMacro::massAdd($options);
+				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t link macros');
+			}
+
+			$result = self::EndTransaction(true, __METHOD__);
+			return true;
+		}
+		catch(APIException $e){
+			if($transaction) self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
+			return false;
+		}
+	}
 
 /**
  * Mass update hosts
@@ -942,20 +1277,28 @@ $i = 0;
 
 
 // UPDATE TEMPLATES PROPERTIES {{{
+
 			if(isset($data['host'])){
 				if(count($templates) > 1){
-					$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields');
-					throw new APIException($error);
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cannot mass update template name');
 				}
 
-				$template_exists = self::getObjects(array('template' => $data['host']));
-				$template_exists = reset($template_exists);
 				$cur_template = reset($templates);
+				
+				$options = array(
+					'filter' => array(
+						'host' => $cur_template['host']),
+					'output' => API_OUTPUT_SHORTEN,
+					'editable' => 1,
+					'nopermissions' => 1
+				);
+				$template_exists = self::get($options);
+				
+				$template_exists = reset($template_exists);
 
 				if(!empty($template_exists) && ($template_exists['templateid'] != $cur_template['templateid'])){
-					$error = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
-					throw new APIException($error);
-				}
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+				}				
 			}
 
 			if(isset($data['host']) && !preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/i', $data['host'])){
@@ -983,7 +1326,7 @@ $i = 0;
 				if(!empty($groups_to_add)){
 					$result = self::massAdd(array('templates' => $templates, 'groups' => $groups_to_add));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant add grooup');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t add group');
 					}
 				}
 
@@ -992,7 +1335,7 @@ $i = 0;
 				if(!empty($groups_to_del)){
 					$result = self::massRemove(array('templates' => $templates, 'groups' => $groups_to_del));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant remove group');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t remove group');
 					}
 				}
 			}
@@ -1013,18 +1356,12 @@ $i = 0;
 
 
 // UPDATE TEMPLATE LINKAGE {{{
+// firstly need to unlink all things, to correctly check circulars
+
 			if(isset($data['hosts']) && !is_null($data['hosts'])){
 				$template_hosts = CHost::get(array('templateids' => $templateids, 'templated_hosts' => 1));
 				$template_hostids = zbx_objectValues($template_hosts, 'hostid');
 				$new_hostids = zbx_objectValues($data['hosts'], 'hostid');
-
-				$hosts_to_add = array_diff($new_hostids, $template_hostids);
-				if(!empty($hosts_to_add)){
-					$result = self::massAdd(array('templates' => $templates, 'hosts' => $hosts_to_add));
-					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant link template');
-					}
-				}
 
 				$hosts_to_del = array_diff($template_hostids, $new_hostids);
 				$hosts_to_del = array_diff($hosts_to_del, $cleared_templateids);
@@ -1032,35 +1369,49 @@ $i = 0;
 				if(!empty($hosts_to_del)){
 					$result = self::massRemove(array('hosts' => $hosts_to_del, 'templates' => $templates));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant unlink template');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t unlink template');
+					}
+				}			
+				}
+			
+			if(isset($data['templates_link']) && !is_null($data['templates_link'])){
+				$template_templates = CTemplate::get(array('hostids' => $templateids));
+				$template_templateids = zbx_objectValues($template_templates, 'templateid');
+				$new_templateids = zbx_objectValues($data['templates_link'], 'templateid');
+				
+				$templates_to_del = array_diff($template_templateids, $new_templateids);
+				$templates_to_del = array_diff($templates_to_del, $cleared_templateids);
+				if(!empty($templates_to_del)){
+					$result = self::massRemove(array('templates' => $templates, 'templates_link' => $templates_to_del));
+					if(!$result){
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t unlink template');
+					}
+				}	
+			}
+
+			if(isset($data['hosts']) && !is_null($data['hosts'])){
+			
+				$hosts_to_add = array_diff($new_hostids, $template_hostids);
+				if(!empty($hosts_to_add)){
+					$result = self::massAdd(array('templates' => $templates, 'hosts' => $hosts_to_add));
+					if(!$result){
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t link template');
+					}
+				}
+			}
+
+			if(isset($data['templates_link']) && !is_null($data['templates_link'])){
+			
+				$templates_to_add = array_diff($new_templateids, $template_templateids);
+				if(!empty($templates_to_add)){
+					$result = self::massAdd(array('templates' => $templates, 'templates_link' => $templates_to_add));
+					if(!$result){
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t link template');
 					}
 				}
 			}
 // }}} UPDATE TEMPLATE LINKAGE
 
-			if(isset($data['templates_link']) && !is_null($data['templates_link'])){
-				$template_templates = CTemplate::get(array('hostids' => $templateids));
-				$template_templateids = zbx_objectValues($template_templates, 'templateid');
-				$new_templateids = zbx_objectValues($data['templates_link'], 'templateid');
-
-				$templates_to_add = array_diff($new_templateids, $template_templateids);
-				if(!empty($templates_to_add)){
-					$result = self::massAdd(array('templates' => $templates, 'templates_link' => $templates_to_add));
-					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant link template');
-					}
-				}
-
-				$templates_to_del = array_diff($template_templateids, $new_templateids);
-				$templates_to_del = array_diff($templates_to_del, $cleared_templateids);
-
-				if(!empty($templates_to_del)){
-					$result = self::massRemove(array('templates' => $templates, 'templates_link' => $templates_to_del));
-					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant unlink template');
-					}
-				}
-			}
 
 // UPDATE MACROS {{{
 			if(isset($data['macros']) && !is_null($data['macros'])){
@@ -1068,7 +1419,7 @@ $i = 0;
 
 				$result = self::massAdd(array('templates' => $templates, 'macros' => $data['macros']));
 				if(!$result){
-					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant add macro');
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t add macro');
 				}
 
 				$macros_to_del = array();
@@ -1088,11 +1439,10 @@ $i = 0;
 				if(!empty($macros_to_del)){
 					$result = self::massRemove(array('templates' => $templates, 'macros' => $macros_to_del));
 					if(!$result){
-						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant remove macro');
+						throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t remove macro');
 					}
 				}
 			}
-
 // }}} UPDATE MACROS
 
 			self::EndTransaction(true, __METHOD__);
@@ -1112,66 +1462,6 @@ $i = 0;
 	}
 
 /**
- * Link Template to Hosts
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param array $data
- * @param string $data['templates']
- * @param string $data['hosts']
- * @param string $data['groups']
- * @param string $data['templates_link']
- * @return boolean
- */
-	public static function massAdd($data){
-		$transaction = false;
-
-		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : null;
-		$templateids = is_null($templates) ? array() : zbx_objectValues($templates, 'templateid');
-
-
-		$transaction = self::BeginTransaction(__METHOD__);
-
-		try{
-			if(isset($data['groups'])){
-				$options = array('groups' => $data['groups'], 'templates' => $templates);
-				$result = CHostGroup::massAdd($options);
-				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant link groups');
-			}
-
-			if(isset($data['hosts'])){
-				$hostsids = zbx_objectValues($data['hosts'], 'hostid');
-				self::link($templateids, $hostsids);
-			}
-
-			if(isset($data['templates_link'])){
-				$templates_linkids = zbx_objectValues($data['templates_link'], 'templateid');
-				self::link($templates_linkids, $templateids);
-			}
-
-			if(isset($data['macros'])){
-				$options = array('templates' => zbx_toArray($data['templates']), 'macros' => $data['macros']);
-				$result = CUserMacro::massAdd($options);
-				if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Cant link macros');
-			}
-
-			$result = self::EndTransaction(true, __METHOD__);
-			return true;
-		}
-		catch(APIException $e){
-			if($transaction) self::EndTransaction(false, __METHOD__);
-			$error = $e->getErrors();
-			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
-			return false;
-		}
-	}
-
-	/**
  * remove Hosts to HostGroups. All Hosts are added to all HostGroups.
  *
  * {@source}
@@ -1232,128 +1522,114 @@ $i = 0;
 	}
 
 
-/**
- * Link Host to Templates
- *
- * {@source}
- * @access public
- * @static
- * @since 1.8
- * @version 1
- *
- * @param array $data
- * @param string $data['hosts']
- * @param array $data['templats']
- * @return boolean
- */
-	public static function linkTemplates($data){
-		$result = true;
-		$errors = array();
-
-		$hosts = zbx_toArray($data['hosts']);
-		$hostids = zbx_objectValues($hosts, 'hostid');
-
-		$templates = zbx_toArray($data['templates']);
-		$templateids = zbx_objectValues($templates, 'templateid');
-
-		self::BeginTransaction(__METHOD__);
-
-		$sql = 'SELECT hostid, templateid FROM hosts_templates WHERE '.DBcondition('hostid', $hostids).' AND '.DBcondition('templateid', $templateids);
-		$linked_db = DBselect($sql);
-		$linked = array();
-		while($pair = DBfetch($linked_db)){
-			$linked[$pair['templateid']] = array($pair['hostid'] => $pair['hostid']);
-		}
-
-		foreach($templates as $tnum => $template){
-			$templateid = $template['templateid'];
-
-			$hosttemplateid = get_dbid('hosts_templates', 'hosttemplateid');
-			foreach($hosts as $hnum => $host){
-
-				if(isset($linked[$templateid]) && isset($linked[$templateid][$host['hostid']])) continue;
-
-				if(!$result = DBexecute('INSERT INTO hosts_templates VALUES ('.$hosttemplateid.','.$host['hostid'].','.$templateid.')'))
-				$result = false;
-				break;
-			}
-			if(!$result) break;
-		}
-
-		if($result){
-			foreach($templates as $tnum => $template){
-				foreach($hosts as $hnum => $host){
-//					$result = sync_host_with_templates($hostid, $templateid);
-					sync_host_with_templates($host['hostid'], $template['templateid']);
-				}
-//				if(!$result) break;
-			}
-		}
-
-		$result = self::EndTransaction($result, __METHOD__);
-
-		if($result){
-			return true;
-		}
-		else{
-			self::setMethodErrors(__METHOD__, $errors);
-			return false;
-		}
-	}
-
-
 	private static function link($templateids, $targetids){
+		if(empty($templateids)) return true;
+		
 		try{
 			self::BeginTransaction(__METHOD__);
 
 // CHECK TEMPLATE TRIGGERS DEPENDENCIES {{{
-			foreach($templateids as $templateid){
+			foreach($templateids as $tnum => $templateid){
 				$triggerids = array();
 				$db_triggers = get_triggers_by_hostid($templateid);
-				while($trigger = DBfetch($db_triggers)) {
+				while($trigger = DBfetch($db_triggers)){
 					$triggerids[$trigger['triggerid']] = $trigger['triggerid'];
 				}
 
-				$sql = 'SELECT DISTINCT h.hostid, h.host '.
+				$sql = 'SELECT DISTINCT h.host '.
 						' FROM trigger_depends td, functions f, items i, hosts h '.
-						' WHERE (('.DBcondition('td.triggerid_down',$triggerids).' AND f.triggerid=td.triggerid_up) '.
-							' OR ('.DBcondition('td.triggerid_up',$triggerids).' AND f.triggerid=td.triggerid_down)) '.
+						' WHERE ('.DBcondition('td.triggerid_down', $triggerids).' AND f.triggerid=td.triggerid_up) '.
 							' AND i.itemid=f.itemid '.
 							' AND h.hostid=i.hostid '.
-							' AND h.hostid<>'.$templateid.
+							' AND '.DBcondition('h.hostid', $templateids, true).
 							' AND h.status='.HOST_STATUS_TEMPLATE;
 
-				if($db_dephosts = DBfetch(DBselect($sql))){
+				if($db_dephost = DBfetch(DBselect($sql))){
+					$options = array(
+							'templateids' => $templateid,
+							'output'=> API_OUTPUT_EXTEND
+						);
+
+					$tmp_tpls = self::get($options);
+					$tmp_tpl = reset($tmp_tpls);
+
 					throw new APIException(ZBX_API_ERROR_PARAMETERS,
-						'Trigger in template [ '.$templateid.' ] has dependency with trigger in template [ '.$db_dephost['host'].' ]');
+						'Trigger in template [ '.$tmp_tpl['host'].' ] has dependency with trigger in template [ '.$db_dephost['host'].' ]');
 				}
 			}
 // }}} CHECK TEMPLATE TRIGGERS DEPENDENCIES
 
 
 			$linked = array();
-			$sql = 'SELECT hostid, templateid FROM hosts_templates WHERE '.DBcondition('hostid', $targetids).
-				' AND '.DBcondition('templateid', $templateids);
+			$sql = 'SELECT hostid, templateid '.
+					' FROM hosts_templates '.
+					' WHERE '.DBcondition('hostid', $targetids).
+						' AND '.DBcondition('templateid', $templateids);
 			$linked_db = DBselect($sql);
 			while($pair = DBfetch($linked_db)){
 				$linked[] = array($pair['hostid'] => $pair['templateid']);
 			}
 
-
-// for each host choose only templates that will be added, to check circulars
+// add template linkages, if problems rollback later
 			foreach($targetids as $targetid){
-				$templateids_to_check = array();
-				foreach($linked as $link){
-					if(isset($link[$targetid]))
-						$templateids_to_check[] = $link[$targetid];
+				foreach($templateids as $tnum => $templateid){
+					foreach($linked as $lnum => $link){
+						if(isset($link[$targetid]) && ($link[$targetid] == $templateid)) continue 2;
+					}
+
+					$values = array(get_dbid('hosts_templates', 'hosttemplateid'), $targetid, $templateid);
+					$sql = 'INSERT INTO hosts_templates VALUES ('. implode(', ', $values) .')';
+					$result = DBexecute($sql);
+
+					if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'DBError');
 				}
+			}
 
-				$templateids_to_check = array_diff($templateids, $templateids_to_check);
+// CHECK CIRCULAR LINKAGE {{{
 
-				if(!self::checkCircularLink($targetid, $templateids_to_check)){
+// get template linkage graph
+			$graph = array();
+			$sql = 'SELECT ht.hostid, ht.templateid'.
+				' FROM hosts_templates ht, hosts h'.
+				' WHERE ht.hostid=h.hostid'.
+					' AND h.status='.HOST_STATUS_TEMPLATE;
+			$db_graph = DBselect($sql);
+			while($branch = DBfetch($db_graph)){
+				if(!isset($graph[$branch['hostid']])) $graph[$branch['hostid']] = array();
+				$graph[$branch['hostid']][$branch['templateid']] = $branch['templateid'];
+			}
+
+// get points that have more than one parent templates			
+			$start_points = array();
+			$sql = 'SELECT max(ht.hostid) as hostid, ht.templateid'.
+				' FROM('.
+					' SELECT count(htt.templateid) as ccc, htt.hostid'.
+					' FROM hosts_templates htt'.
+					' WHERE htt.hostid NOT IN ( SELECT httt.templateid FROM hosts_templates httt )'.
+					' GROUP BY htt.hostid'.
+					' ) ggg, hosts_templates ht'.
+				' WHERE ggg.ccc>1'.
+					' AND ht.hostid=ggg.hostid'.
+				' GROUP BY ht.templateid';
+			$db_start_points = DBselect($sql);
+			while($start_point = DBfetch($db_start_points)){				
+				$start_points[] = $start_point['hostid'];
+				$graph[$start_point['hostid']][$start_point['templateid']] = $start_point['templateid'];
+			}
+
+// add to the start points also points which we add current templates
+			$start_points = array_merge($start_points, $targetids);
+			$start_points = array_unique($start_points);
+
+			foreach($start_points as $spnum => $start){
+				$path = array();
+				if(!self::checkCircularLink($graph, $start, $path)){
 					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Circular link can not be created');
 				}
 			}
+
+// }}} CHECK CIRCULAR LINKAGE
+
 
 			foreach($targetids as $targetid){
 				foreach($templateids as $tnum => $templateid){
@@ -1363,26 +1639,34 @@ $i = 0;
 							continue 2;
 						}
 					}
-
-					$values = array(get_dbid('hosts_templates', 'hosttemplateid'), $targetid, $templateid);
-					$sql = 'INSERT INTO hosts_templates VALUES ('. implode(', ', $values) .')';
-					$result = DBexecute($sql);
-
-					if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'DBError');
-
-					sync_host_with_templates($targetid, $templateid);
+					if(!sync_host_with_templates($targetid, $templateid))
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot sync template');
 				}
 			}
 
 			self::EndTransaction(true, __METHOD__);
-
+			
+			return true;
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
 			throw new APIException($e->getCode(), $e->getErrors());
+			
+			return false;
 		}
-
 	}
 
+	private static function checkCircularLink(&$graph, $current, &$path){
+		
+		if(isset($path[$current])) return false;
+		$path[$current] = $current;
+		if(!isset($graph[$current])) return true;
+		
+		foreach($graph[$current] as $step){
+			if(!self::checkCircularLink($graph, $step, $path)) return false;
+		}
+		
+		return true;
+	}
 }
 ?>

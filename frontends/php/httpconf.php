@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -64,10 +64,8 @@ include_once('include/page_header.php');
 		'group_httptestid'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
 
 		'showdisabled'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	null),
-
 // Actions
 		'go'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
-
 // form
 		'clone'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -78,7 +76,7 @@ include_once('include/page_header.php');
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	null,	null,	null)
 	);
 
-	$_REQUEST['showdisabled'] = get_request('showdisabled', get_profile('web.httpconf.showdisabled', 0));
+	$_REQUEST['showdisabled'] = get_request('showdisabled', CProfile::get('web.httpconf.showdisabled', 0));
 
 	check_fields($fields);
 	validate_sort_and_sortorder('wt.name',ZBX_SORT_UP);
@@ -101,10 +99,11 @@ include_once('include/page_header.php');
 	$available_groups = $PAGE_GROUPS['groupids'];
 	$available_hosts = $PAGE_HOSTS['hostids'];
 
-	update_profile('web.httpconf.showdisabled',$showdisabled, PROFILE_TYPE_STR);
+	CProfile::update('web.httpconf.showdisabled',$showdisabled, PROFILE_TYPE_STR);
 ?>
 <?php
-	$_REQUEST['applications'] = get_request('applications',get_profile('web.httpconf.applications',array()));
+	$_REQUEST['applications'] = get_request('applications', get_favorites('web.httpconf.applications'));
+	$_REQUEST['applications'] = zbx_objectValues($_REQUEST['applications'], 'value');
 
 	if(isset($_REQUEST['open'])){
 		if(!isset($_REQUEST['applicationid'])){
@@ -124,12 +123,19 @@ include_once('include/page_header.php');
 		}
 	}
 
-/* limit opened application count */
-	while(count($_REQUEST['applications']) > 25){
-		array_shift($_REQUEST['applications']);
+	if(count($_REQUEST['applications']) > 25){
+		$_REQUEST['applications'] = array_slice($_REQUEST['applications'], -25);
 	}
+/* limit opened application count */
+	// while(count($_REQUEST['applications']) > 25){
+		// array_shift($_REQUEST['applications']);
+	// }
 
-	update_profile('web.httpconf.applications',$_REQUEST['applications'],PROFILE_TYPE_ARRAY_ID);
+	rm4favorites('web.httpconf.applications');
+	foreach($_REQUEST['applications'] as $application){
+		add2favorites('web.httpconf.applications', $application);
+	}
+	// CProfile::update('web.httpconf.applications',$_REQUEST['applications'],PROFILE_TYPE_ARRAY_ID);
 
 	if(isset($_REQUEST['del_sel_step'])&&isset($_REQUEST['sel_step'])&&is_array($_REQUEST['sel_step'])){
 		foreach($_REQUEST['sel_step'] as $sid)
@@ -186,13 +192,11 @@ include_once('include/page_header.php');
 		$db_delay_flex = trim($db_delay_flex,';');
 		// for future use */
 
-		if ($_REQUEST['authentication'] != HTTPTEST_AUTH_NONE)
-		{
+		if($_REQUEST['authentication'] != HTTPTEST_AUTH_NONE){
 			$http_user = htmlspecialchars($_REQUEST['http_user']);
 			$http_password = htmlspecialchars($_REQUEST['http_password']);
 		}
-		else
-		{
+		else{
 			$http_user = '';
 			$http_password = '';
 		}
@@ -336,17 +340,17 @@ include_once('include/page_header.php');
 	if(!isset($_REQUEST['form']) && ($_REQUEST['hostid'] > 0))
 		$form->addItem(new CButton('form',S_CREATE_SCENARIO));
 
-	show_table_header(S_CONFIGURATION_OF_WEB_MONITORING_BIG, $form);
-	echo SBR;
+	$http_wdgt = new CWidget();
+	$http_wdgt->addPageHeader(S_CONFIGURATION_OF_WEB_MONITORING_BIG, $form);
 
 	$db_hosts=DBselect('select hostid from hosts where '.DBin_node('hostid'));
 	if(isset($_REQUEST['form'])&&isset($_REQUEST['hostid']) && DBfetch($db_hosts)){
 // FORM
-		insert_httptest_form();
+		$http_wdgt->addItem(insert_httptest_form());
 	}
 	else {
 // Table HEADER
-		$http_wdgt = new CWidget();
+		
 
 		$form = new CForm();
 		$form->setMethod('get');
@@ -479,7 +483,7 @@ include_once('include/page_header.php');
 
 			$status=new CCol(new CLink(httptest_status2str($httptest_data['status']),
 					'?group_httptestid[]='.$httptest_data['httptestid'].
-					'&group_task='.($httptest_data['status']?S_ACTIVATE_SELECTED:S_DISABLE_SELECTED),
+					'&go='.($httptest_data['status']?'activate':'disable'),
 					httptest_status2style($httptest_data['status'])));
 
 
@@ -556,6 +560,7 @@ include_once('include/page_header.php');
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO.' (0)');
 		$goButton->setAttribute('id','goButton');
+
 		zbx_add_post_js('chkbxRange.pageGoName = "group_httptestid";');
 
 		$table->setFooter(new CCol(array($goBox, $goButton)));
@@ -563,12 +568,10 @@ include_once('include/page_header.php');
 		$form->addItem($table);
 
 		$http_wdgt->addItem($form);
-		$http_wdgt->show();
 	}
+	
+	$http_wdgt->show();
 
-?>
-<?php
 
 include_once('include/page_footer.php');
-
 ?>

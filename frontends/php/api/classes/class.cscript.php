@@ -39,7 +39,7 @@ class Cscript extends CZBXAPI{
  *
  * @param array $options
  * @param array $options['itemids']
- * @param array $options['hostids']
+ * @param array $options['hostids'] - depricated (very slow)
  * @param array $options['groupids']
  * @param array $options['triggerids']
  * @param array $options['scriptids']
@@ -62,7 +62,7 @@ class Cscript extends CZBXAPI{
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 		$sql_parts = array(
-			'select' => array('scripts' => 's.*'),
+			'select' => array('scripts' => 's.scriptid'),
 			'from' => array('scripts s'),
 			'where' => array(),
 			'order' => array(),
@@ -92,10 +92,10 @@ class Cscript extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
-		
+
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
-			
+
 			if(!is_null($options['select_groups'])){
 				$options['select_groups'] = API_OUTPUT_EXTEND;
 			}
@@ -103,8 +103,8 @@ class Cscript extends CZBXAPI{
 				$options['select_hosts'] = API_OUTPUT_EXTEND;
 			}
 		}
-		
-		
+
+
 // editable + PERMISSION CHECK
 		if(USER_TYPE_SUPER_ADMIN == $user_type){
 
@@ -126,16 +126,16 @@ class Cscript extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 // groupids
 		if(!is_null($options['groupids'])){
 			zbx_value2array($options['groupids']);
 
-			$options['groupids'][0] = 0;		// include ALL groups scripts
+			$options['groupids'][] = 0;		// include ALL groups scripts
 
 			if($options['output'] != API_OUTPUT_SHORTEN){
-				$sql_parts['select']['groupid'] = 's.groupid';
+				$sql_parts['select']['scripts'] = 's.scriptid, s.groupid';
 			}
 
 			$sql_parts['where'][] = DBcondition('s.groupid', $options['groupids']);
@@ -176,7 +176,7 @@ class Cscript extends CZBXAPI{
 
 // pattern
 		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where'][] = ' UPPER(s.name) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
+			$sql_parts['where'][] = ' UPPER(s.name) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
 		}
 
 // order
@@ -215,7 +215,7 @@ class Cscript extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.
+		$sql = 'SELECT DISTINCT '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('s.scriptid', $nodeids).
 					$sql_where.
@@ -368,7 +368,7 @@ class Cscript extends CZBXAPI{
  * @param array $script['hostid']
  * @return boolean
  */
-	public static function add($scripts){
+	public static function create($scripts){
 		$scripts = zbx_toArray($scripts);
 		$scriptids = array();
 
@@ -400,8 +400,7 @@ class Cscript extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_scripts = self::get(array('scriptids'=>$scriptids, 'extendoutput'=>1));
-			return $new_scripts;
+			return array('scriptids'=>$scriptids);
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
@@ -429,10 +428,13 @@ class Cscript extends CZBXAPI{
 
 		$result = false;
 //------
-		$upd_scripts = self::get(array('scriptids'=>zbx_objectValues($scripts, 'scriptid'),
-											'editable'=>1,
-											'extendoutput'=>1,
-											'preservekeys'=>1));
+		$options = array(
+			'scriptids'=>zbx_objectValues($scripts, 'scriptid'),
+			'editable'=>1,
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$upd_scripts = self::get($options);
 		foreach($scripts as $snum => $script){
 			if(!isset($upd_scripts[$script['scriptid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -460,8 +462,7 @@ class Cscript extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_scripts = self::get(array('scriptids'=>$scriptids, 'extendoutput'=>1));
-			return $upd_scripts;
+			return array('scriptids'=>$scriptids);
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
@@ -488,10 +489,13 @@ class Cscript extends CZBXAPI{
 
 		$result = false;
 //------
-		$del_scripts = self::get(array('scriptids'=>zbx_objectValues($scripts, 'scriptid'),
-											'editable'=>1,
-											'extendoutput'=>1,
-											'preservekeys'=>1));
+		$options = array(
+			'scriptids'=>zbx_objectValues($scripts, 'scriptid'),
+			'editable'=>1,
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$del_scripts = self::get($options);
 		foreach($scripts as $snum => $script){
 			if(!isset($del_scripts[$script['scriptid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -514,7 +518,7 @@ class Cscript extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			return zbx_cleanHashes($del_scripts);
+			return array('scriptids'=>$scriptids);
 		}
 		else{
 			self::setError(__METHOD__);
@@ -536,11 +540,18 @@ class Cscript extends CZBXAPI{
 
 		zbx_value2array($hostids);
 
-		$obj_params = array('hostids' => $hostids, 'preservekeys' => 1);
+		$obj_params = array(
+			'hostids' => $hostids,
+			'preservekeys' => 1
+		);
 		$hosts_read_only  = CHost::get($obj_params);
 		$hosts_read_only = zbx_objectValues($hosts_read_only, 'hostid');
 
-		$obj_params = array('editable' => 1, 'hostids' => $hostids, 'preservekeys' => 1);
+		$obj_params = array(
+			'editable' => 1,
+			'hostids' => $hostids,
+			'preservekeys' => 1
+		);
 		$hosts_read_write = CHost::get($obj_params);
 		$hosts_read_write = zbx_objectValues($hosts_read_write, 'hostid');
 
@@ -550,17 +561,19 @@ class Cscript extends CZBXAPI{
 			$scripts_by_host[$hostid] = array();
 		}
 //-----
-		$options = array('hostids' => $hostids,
-						'select_hosts' => 1,
-						'extendoutput' => 1,
-						'preservekeys' => 1
-					);
+		$options = array(
+			'hostids' => $hostids,
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => 1
+		);
 		$groups = CHostGroup::get($options);
 
-		$obj_params = array('extendoutput' => 1,
-							'hostids' => $hostids,
-							'preservekeys' => 1
-						);
+		$obj_params = array(
+			'groupids' => zbx_objectValues($groups, 'groupid'),
+         'sortfield' => 'name',
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => 1
+		);
 		$scripts  = CScript::get($obj_params);
 
 		foreach($scripts as $num => $script){
@@ -584,8 +597,7 @@ class Cscript extends CZBXAPI{
 				$scripts_by_host[$hostid][] = $script;
 			}
 		}
-
-	//SDI($scripts_by_host);
+//SDII(count($scripts_by_host));
 	return $scripts_by_host;
 	}
 

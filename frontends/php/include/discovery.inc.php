@@ -168,21 +168,17 @@
 		return $dcheckid;
 	}
 
-	function	add_discovery_rule($proxy_hostid, $name, $iprange, $delay, $status, $dchecks, $uniqueness_criteria)
-	{
-		if( !validate_ip_range($iprange) )
-		{
-			error('Incorrect IP range.');
+	function add_discovery_rule($proxy_hostid, $name, $iprange, $delay, $status, $dchecks, $uniqueness_criteria){
+		if( !validate_ip_range($iprange) ){
+			error(S_INCORRECT_IP_RANGE);
 			return false;
-
 		}
 
 		$druleid = get_dbid('drules', 'druleid');
 		$result = DBexecute('insert into drules (druleid,proxy_hostid,name,iprange,delay,status) '.
 			' values ('.$druleid.','.$proxy_hostid.','.zbx_dbstr($name).','.zbx_dbstr($iprange).','.$delay.','.$status.')');
 
-		if($result && isset($dchecks))
-		{
+		if($result && isset($dchecks)){
 			$unique_dcheckid = 0;
 			foreach($dchecks as $id => $data){
 				$data['dcheckid'] = add_discovery_check($druleid, $data['type'], $data['ports'], $data['key'],
@@ -201,12 +197,9 @@
 		return $result;
 	}
 
-	function	update_discovery_rule($druleid, $proxy_hostid, $name, $iprange, $delay, $status, $dchecks,
-			$uniqueness_criteria, $dchecks_deleted)
-	{
-		if( !validate_ip_range($iprange) )
-		{
-			error('Incorrect IP range.');
+	function update_discovery_rule($druleid, $proxy_hostid, $name, $iprange, $delay, $status, $dchecks,	$uniqueness_criteria, $dchecks_deleted){
+		if( !validate_ip_range($iprange) ){
+			error(S_INCORRECT_IP_RANGE);
 			return false;
 
 		}
@@ -237,8 +230,7 @@
 		return $result;
 	}
 
-	function	delete_discovery_check($dcheckids)
-	{
+	function delete_discovery_check($dcheckids){
 		$actionids = array();
 // conditions
 		$sql = 'SELECT DISTINCT actionid '.

@@ -157,47 +157,68 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...)
 
 /******************************************************************************
  *                                                                            *
- * Function: get_flexible_interval                                            *
+ * Function: check_time_period                                                *
  *                                                                            *
- * Purpose: check for flexible delay value                                    *
+ * Purpose: check if current time is within given period                      *
  *                                                                            *
- * Parameters: delay_flex - [IN] separeated flexible intervals                *
- *                          [dd/d1-d2,hh:mm-hh:mm;]                           *
- *             delay_val - [OUT] delay value                                  *
+ * Parameters: period - time period in format [d1-d2,hh:mm-hh:mm]*            *
+ *             now    - timestamp for comparison                              *
+ *                      if NULL - use current timestamp.                      *
  *                                                                            *
- * Return value: nextcheck value                                              *
+ * Return value: 0 - out of period, 1 - within the period                     *
  *                                                                            *
- * Author: Alexei Vladishev, Alexander Vladishev                              *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *        !!! Don't forget to sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static int get_flexible_interval(char *delay_flex, int *delay_val, time_t now)
+int	check_time_period(char *period, time_t now)
 {
-	char	*s, *c = NULL, delay_period[30];
-	int	delay, ret = FAIL;
+	char		*s, *c = NULL;
+	int		d1, d2, h1, h2, m1, m2, flag;
+	int		day, sec;
+	struct tm	*tm;
+	int		ret = 0;
 
-	if (NULL == delay_flex || '\0' == *delay_flex)
-		return FAIL;
+	zabbix_log(LOG_LEVEL_DEBUG, "In check_time_period(%s)", period);
 
-	for (s = delay_flex; '\0' != *s;)
+	if (now == (time_t)NULL)
+		now = time(NULL);
+
+	tm = localtime(&now);
+	day = 0 == tm->tm_wday ? 7 : tm->tm_wday;
+	sec = 3600 * tm->tm_hour + 60 * tm->tm_min + tm->tm_sec;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%d,%d:%d", day, (int)tm->tm_hour, (int)tm->tm_min);
+
+	for (s = period; '\0' != *s;)
 	{
 		if (NULL != (c = strchr(s, ';')))
 			*c = '\0';
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Delay period [%s]", s);
+		zabbix_log(LOG_LEVEL_DEBUG, "Period [%s]", s);
 
-		if (2 == sscanf(s, "%d/%29s", &delay, delay_period))
+		flag = (6 == sscanf(s, "%d-%d,%d:%d-%d:%d", &d1, &d2, &h1, &m1, &h2, &m2));
+
+		if (!flag)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%d sec at %s", delay, delay_period);
+			flag = (5 == sscanf(s, "%d,%d:%d-%d:%d", &d1, &h1, &m1, &h2, &m2));
+			d2 = d1;
+		}
 
-			if (0 != check_time_period(delay_period, now))
+		if (!flag)
+			zabbix_log(LOG_LEVEL_ERR, "Time period format is wrong [%s]", period);
+		else
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%d-%d,%d:%d-%d:%d", d1, d2, h1, m1, h2, m2);
+
+			if (day >= d1 && day <= d2 && sec >= 3600 * h1 + 60 * m1 && sec <= 3600 * h2 + 60 * m2)
 			{
-				*delay_val = delay;
-				ret = SUCCEED;
+				ret = 1;
 				break;
 			}
 		}
-		else
-			zabbix_log(LOG_LEVEL_ERR, "Delay period format is wrong [%s]", s);
 
 		if (NULL != c)
 		{
@@ -210,73 +231,165 @@ static int get_flexible_interval(char *delay_flex, int *delay_val, time_t now)
 
 	if (NULL != c)
 		*c = ';';
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of check_time_period():%s", ret == 1 ? "SUCCEED" : "FAIL");
 
 	return ret;
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: get_next_flexible_interval                                       *
+ * Function: get_current_delay                                                *
  *                                                                            *
- * Purpose: return time of next flexible interval                             *
+ * Purpose: return delay value that is currently applicable                   *
  *                                                                            *
- * Parameters: delay_flex - [IN] ';' separeated flexible intervals            *
- *                          [dd/d1-d2,hh:mm-hh:mm]                            *
- *             now = [IN] current time                                        *
+ * Parameters: delay - [IN] default delay value, can be overridden            *
+ *             flex_intervals - [IN] descriptions of flexible intervals       *
+ *                                   in the form [dd/d1-d2,hh:mm-hh:mm;]      *
+ *             now - [IN] current time                                        *
  *                                                                            *
- * Return value: start of next interval                                       *
+ * Return value: delay value - either default or minimum delay value          *
+ *                             out of all applicable intervals                *
  *                                                                            *
- * Author: Alexei Vladishev, Alexander Vladishev                              *
+ * Author: Alexei Vladishev, Alexander Vladishev, Aleksandrs Saveljevs        *
  *                                                                            *
  ******************************************************************************/
-static time_t	get_next_flexible_interval(char *delay_flex, time_t now)
+static int	get_current_delay(int delay, char *flex_intervals, time_t now)
 {
-	char		*s, *c = NULL;
-	struct tm	*tm;
-	int		day, sec, sec1, sec2, delay, d1, d2, h1, h2, m1, m2;
-	time_t		next = 0;
+	char	*s, *c;
+	char	flex_period[30];
+	int	flex_delay, current_delay = SEC_PER_YEAR;
 
-	if (NULL == delay_flex || '\0' == *delay_flex)
-		return FAIL;
+	if (NULL == flex_intervals || '\0' == *flex_intervals)
+		return delay;
 
-	tm = localtime(&now);
-	day = 0 == tm->tm_wday ? 7 : tm->tm_wday;
-	sec = 3600 * tm->tm_hour + 60 * tm->tm_min + tm->tm_sec;
-
-	for (s = delay_flex; '\0' != *s;)
+	for (s = flex_intervals; '\0' != *s; s = c + 1)
 	{
 		if (NULL != (c = strchr(s, ';')))
 			*c = '\0';
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Delay period [%s]", s);
 
-		if (7 == sscanf(s, "%d/%d-%d,%d:%d-%d:%d", &delay, &d1, &d2, &h1, &m1, &h2, &m2))
+		if (2 == sscanf(s, "%d/%29s", &flex_delay, flex_period))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%d sec at %s", flex_delay, flex_period);
+			
+			if (flex_delay < current_delay && 0 != check_time_period(flex_period, now))
+				current_delay = flex_delay;
+		}
+		else
+			zabbix_log(LOG_LEVEL_ERR, "Delay period format is wrong [%s]", s);
+
+		if (NULL != c)
+			*c = ';';
+		else
+			break;
+	}
+	
+	if (current_delay == SEC_PER_YEAR)
+		return delay;
+
+	return current_delay == 0 ? SEC_PER_YEAR : current_delay;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_next_delay_interval                                          *
+ *                                                                            *
+ * Purpose: return time when next delay settings take effect                  *
+ *                                                                            *
+ * Parameters: flex_intervals - [IN] descriptions of flexible intervals       *
+ *                                   in the form [dd/d1-d2,hh:mm-hh:mm;]      *
+ *             now = [IN] current time                                        *
+ *             next_interval = [OUT] start of next delay interval             *
+ *                                                                            *
+ * Return value: SUCCEED - there is a next interval                           *
+ *               FAIL - otherwise (in this case, next_interval is unaffected) *
+ *                                                                            *
+ * Author: Alexei Vladishev, Alexander Vladishev, Aleksandrs Saveljevs        *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_next_delay_interval(char *flex_intervals, time_t now, time_t *next_interval)
+{
+	char		*s, *c = NULL;
+	struct tm	*tm;
+	int		day, sec, sec1, sec2, delay, d1, d2, h1, h2, m1, m2, flag;
+	time_t		next = 0;
+
+	if (NULL == flex_intervals || '\0' == *flex_intervals)
+		return FAIL;
+
+	tm = localtime(&now);
+	day = 0 == tm->tm_wday ? 7 : tm->tm_wday;
+	sec = 3600 * tm->tm_hour + 60 * tm->tm_min + tm->tm_sec;
+
+	for (s = flex_intervals; '\0' != *s;)
+	{
+		if (NULL != (c = strchr(s, ';')))
+			*c = '\0';
+
+		zabbix_log(LOG_LEVEL_DEBUG, "Delay period [%s]", s);
+
+		flag = (7 == sscanf(s, "%d/%d-%d,%d:%d-%d:%d", &delay, &d1, &d2, &h1, &m1, &h2, &m2));
+
+		if (!flag)
+		{
+			flag = (6 == sscanf(s, "%d/%d,%d:%d-%d:%d", &delay, &d1, &h1, &m1, &h2, &m2));
+			d2 = d1;
+		}
+		
+		if (!flag)
+			zabbix_log(LOG_LEVEL_ERR, "Delay period format is wrong [%s]", s);
+		else
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%d/%d-%d,%d:%d-%d:%d", delay, d1, d2, h1, m1, h2, m2);
 
 			sec1 = 3600 * h1 + 60 * m1;
 			sec2 = 3600 * h2 + 60 * m2;
 
-			if (day >= d1 && day <= d2 && sec >= sec1 && sec <= sec2)	/* working period */
+			if (day >= d1 && day <= d2 && sec >= sec1 && sec <= sec2)	/* current period */
 			{
 				if (next == 0 || next > now - sec + sec2)
 					next = now - sec + sec2;
-				break;
 			}
-
-			if (day >= d1 && day <= d2 && sec < sec1)			/* next period, same day */
+			else if (day >= d1 && day <= d2 && sec < sec1)			/* will be active today */
 			{
 				if (next == 0 || next > now - sec + sec1)
 					next = now - sec + sec1;
 			}
-			else if (day + 1 >= d1 && day + 1 <= d2 && sec < sec1)		/* next period, next  day */
+			else
 			{
-				if (next == 0 || next > now - sec + sec1)
-					next = now - sec + 86400 + sec1;
+				int	next_day;
+				next_day = (day + 1 <= 7 ? day + 1 : 1);
+
+				if (next_day >= d1 && next_day <= d2)                   /* will be active tomorrow */
+				{
+					if (next == 0 || next > now - sec + SEC_PER_DAY + sec1)
+						next = now - sec + SEC_PER_DAY + sec1;
+				}
+				else                                                    /* later in the future */
+				{
+					int day_diff = (-1);
+
+					if (day < d1)
+						day_diff = d1 - day;
+					if (day >= d2)
+						day_diff = (d1 + 7) - day;
+					if (day >= d1 && day < d2)
+					{
+						/* should never happen */
+						zabbix_log(LOG_LEVEL_ERR,
+								"Could not deduce day difference [%s, day=%d, time=%02d:%02d:%02d]",
+								s, day, tm->tm_hour, tm->tm_min, tm->tm_sec);
+						day_diff = (-1);
+					}
+					
+					if (day_diff != (-1))
+						if (next == 0 || next > now - sec + SEC_PER_DAY * day_diff + sec1)
+							next = now - sec + SEC_PER_DAY * day_diff + sec1;
+				}
 			}
 		}
-		else
-			zabbix_log(LOG_LEVEL_ERR, "Delay period format is wrong [%s]", s);
 
 		if (NULL != c)
 		{
@@ -287,77 +400,85 @@ static time_t	get_next_flexible_interval(char *delay_flex, time_t now)
 			break;
 	}
 
-	if (NULL != c)
-		*c = ';';
+	if (next != 0 && next_interval != NULL)
+		*next_interval = next;
 
-	return next ? next : FAIL;
+	return next != 0 ? SUCCEED : FAIL;
 }
+
 /******************************************************************************
  *                                                                            *
  * Function: calculate_item_nextcheck                                         *
  *                                                                            *
  * Purpose: calculate nextcheck timestamp for item                            *
  *                                                                            *
- * Parameters: delay - item's refresh rate in sec                             *
+ * Parameters: delay - [IN] default delay value, can be overridden            *
+ *             flex_intervals - [IN] descriptions of flexible intervals       *
+ *                                   in the form [dd/d1-d2,hh:mm-hh:mm;]      *
  *             now - current timestamp                                        *
  *                                                                            *
  * Return value: nextcheck value                                              *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Alexei Vladishev, Aleksandrs Saveljevs                             *
  *                                                                            *
- * Comments: Old algorithm: now+delay                                         *
+ * Comments: if item check is forbidden with delay=0 (default and flexible),  *
+ *           a timestamp approximately one year in the future is returned     *
+ *                                                                            *
+ *           Old algorithm: now+delay                                         *
  *           New one: preserve period, if delay==5, nextcheck = 0,5,10,15,... *
- *           !!! Don't forget sync code with PHP !!!                          *
+ *           !!! Don't forget to sync code with PHP !!!                       *
  *                                                                            *
  ******************************************************************************/
-int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char *delay_flex, time_t now)
+int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char *flex_intervals, time_t now)
 {
-	int	i, flex_delay2 = delay, flex_delay = delay;
-	time_t	next;
+	int	nextcheck;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In calculate_item_nextcheck (" ZBX_FS_UI64 ",%d,\"%s\",%d)",
-			itemid, delay, NULL == delay_flex ? "" : delay_flex, now);
+			itemid, delay, NULL == flex_intervals ? "" : flex_intervals, now);
 
 	if (0 == delay)
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Invalid item update interval [%d], using default [%d]", delay, 30);
-		delay = 30;
-	}
+		delay = SEC_PER_YEAR;
 
 	/* Special processing of active items to see better view in queue */
 	if (item_type == ITEM_TYPE_ZABBIX_ACTIVE)
 	{
-		i = (int)now + delay;
-		zabbix_log( LOG_LEVEL_DEBUG, "End calculate_item_nextcheck (result:%d)", i);
-
-		return i;
+		nextcheck = (int)now + delay;
 	}
-
-	get_flexible_interval(delay_flex, &flex_delay, now);
-
-	if (FAIL != (next = get_next_flexible_interval(delay_flex, now)) && now + flex_delay > next)
+	else
 	{
-		get_flexible_interval(delay_flex, &flex_delay2, next + 1);
+		int	current_delay;
+		time_t	next_interval;
 
-		now = next;
-		flex_delay = MIN(flex_delay, flex_delay2);
+		current_delay = get_current_delay(delay, flex_intervals, now);
+
+		if (FAIL != get_next_delay_interval(flex_intervals, now, &next_interval) && now + current_delay > next_interval)
+		{
+			/* next check falls out of the current interval */
+			do
+			{
+				current_delay = get_current_delay(delay, flex_intervals, next_interval + 1);
+
+				/* as soon as item check in the interval is not forbidden with delay=0, use it */
+				if (SEC_PER_YEAR != current_delay)
+					break;
+				
+				get_next_delay_interval(flex_intervals, next_interval + 1, &next_interval);
+			}
+			while (next_interval - now < SEC_PER_WEEK); /* checking the nearest week for delay!=0 */
+
+			now = next_interval;
+		}
+
+		delay = current_delay;
+		nextcheck = delay * (int)(now / (time_t)delay) + (int)(itemid % (zbx_uint64_t)delay);
+
+		while (nextcheck <= now)
+			nextcheck += delay;
 	}
 
-	if (0 == flex_delay)
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Invalid item update interval [%d], using default [%d]", flex_delay, 30);
-		flex_delay = 30;
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "End calculate_item_nextcheck (result:%d)", nextcheck);
 
-	delay = flex_delay;
-	i = delay * (int)(now / (time_t)delay) + (int)(itemid % (zbx_uint64_t)delay);
-
-	while (i <= now)
-		i += delay;
-
-	zabbix_log( LOG_LEVEL_DEBUG, "End calculate_item_nextcheck (result:%d)", i);
-
-	return i;
+	return nextcheck;
 }
 
 /******************************************************************************
@@ -376,7 +497,7 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	is_ip4(const char *ip)
+int	is_ip4(const char *ip)
 {
 	const char	*p = ip;
 	int		nums, dots, res = FAIL;
@@ -421,7 +542,7 @@ static int	is_ip4(const char *ip)
  * Return value: SUCCEED - is IPv6 address                                    *
  *               FAIL - otherwise                                             *
  *                                                                            *
- * Author: Aleksader Vladishev                                                *
+ * Author: Aleksander Vladishev                                               *
  *                                                                            *
  * Comments: could be improved (not supported x:x:x:x:x:x:d.d.d.d addresses)  *
  *                                                                            *
@@ -476,7 +597,7 @@ static int	is_ip6(const char *ip)
  * Return value: SUCCEED - is IP address                                      *
  *               FAIL - otherwise                                             *
  *                                                                            *
- * Author: Aleksader Vladishev                                                *
+ * Author: Aleksander Vladishev                                               *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -507,7 +628,7 @@ int	is_ip(const char *ip)
  *                                                                            *
  * Return value: FAIL - invalid IP address, SUCCEED - conversion OK           *
  *                                                                            *
- * Author: Alksander Vladishev                                                *
+ * Author: Aleksander Vladishev                                               *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -590,7 +711,7 @@ int	expand_ipv6(const char *ip, char *str, size_t str_len )
  *                                                                            *
  * Return value: pointer to result buffer                                     *
  *                                                                            *
- * Author: Alksander Vladishev                                                *
+ * Author: Aleksander Vladishev                                               *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -924,83 +1045,6 @@ int	int_in_list(char *list, int value)
 
 /******************************************************************************
  *                                                                            *
- * Function: check_time_period                                                *
- *                                                                            *
- * Purpose: check if current time is within given period                      *
- *                                                                            *
- * Parameters: period - time period in format [d1-d2,hh:mm-hh:mm]*            *
- *             now    - timestamp for comparison                             *
- *                      if NULL - use current timestamp.                      *
- *                                                                            *
- * Return value: 0 - out of period, 1 - within the period                     *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *        !!! Don't forget sync code with PHP !!!                             *
- *                                                                            *
- ******************************************************************************/
-int	check_time_period(char *period, time_t now)
-{
-	char		*s, *c = NULL;
-	int		d1, d2, h1, h2, m1, m2;
-	int		day, sec;
-	struct tm	*tm;
-	int		ret = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In check_time_period(%s)", period);
-
-	if (now == (time_t)NULL)
-		now = time(NULL);
-
-	tm = localtime(&now);
-
-	day = tm->tm_wday;
-	if(0 == day)
-		day=7;
-	sec = 3600 * tm->tm_hour + 60 * tm->tm_min + tm->tm_sec;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%d,%d:%d", day, (int)tm->tm_hour, (int)tm->tm_min);
-
-	for (s = period; '\0' != *s;)
-	{
-		if (NULL != (c = strchr(s, ';')))
-			*c = '\0';
-
-		zabbix_log(LOG_LEVEL_DEBUG, "Period [%s]", s);
-
-		if (6 == sscanf(s, "%d-%d,%d:%d-%d:%d", &d1, &d2, &h1, &m1, &h2, &m2))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%d-%d,%d:%d-%d:%d", d1, d2, h1, m1, h2, m2);
-
-			if (day >= d1 && day <= d2 && sec >= 3600 * h1 + 60 * m1 && sec <= 3600 * h2 + 60 * m2)
-			{
-				ret = 1;
-				break;
-			}
-		}
-		else
-			zabbix_log(LOG_LEVEL_ERR, "Time period format is wrong [%s]", period);
-
-		if (NULL != c)
-		{
-			*c = ';';
-			s = c + 1;
-		}
-		else
-			break;
-	}
-
-	if (NULL != c)
-		*c = ';';
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of check_time_period():%s", ret == 1 ? "SUCCEED" : "FAIL");
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: cmp_double                                                       *
  *                                                                            *
  * Purpose: compares two double values                                        *
@@ -1037,7 +1081,7 @@ int	cmp_double(double a,double b)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: the functions supports prefixes K,M,G                            *
+ * Comments: the function supports suffixes K,M,G,T,s,m,h,d,w                 *
  *                                                                            *
  ******************************************************************************/
 int	is_double_prefix(char *c)
@@ -1063,8 +1107,8 @@ int	is_double_prefix(char *c)
 			dot=i;
 			continue;
 		}
-		/* Last digit is prefix 'K', 'M', 'G' */
-		if( ((c[i]=='K')||(c[i]=='M')||(c[i]=='G')) && (i == (int)strlen(c)-1))
+		/* Last character is suffix 'K', 'M', 'G', 'T', 's', 'm', 'h', 'd', 'w' */
+		if(strchr("KMGTsmhdw", c[i])!=NULL && c[i+1]=='\0')
 		{
 			continue;
 		}
@@ -1147,6 +1191,44 @@ int	is_double(char *c)
 	if(len == 1 && dot!=-1) return FAIL;
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: is_uint_prefix                                                   *
+ *                                                                            *
+ * Purpose: check if the string is unsigned integer                           *
+ *                                                                            *
+ * Parameters: c - string to check                                            *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is unsigned integer                    *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ * Comments: the function supports suffixes 's', 'm', 'h', 'd', and 'w'       *
+ *                                                                            *
+ ******************************************************************************/
+int	is_uint_prefix(const char *c)
+{
+	int	i;
+
+	for (i=0; c[i]==' '; i++); /* trim left spaces */
+	
+	if (!isdigit(c[i]))
+		return FAIL;
+	else
+		do
+			i++;
+		while (isdigit(c[i]));
+
+	if (c[i]=='s' || c[i]=='m' || c[i]=='h' || c[i]=='d' || c[i]=='w') /* check suffix */
+		i++;
+
+	while (c[i]==' ') /* trim right spaces */
+		i++;
+
+	return c[i]=='\0' ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
@@ -1538,7 +1620,7 @@ int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value)
  *                                                                            *
  * Function: uint64_array_remove                                              *
  *                                                                            *
- * Purpose: add uint64 value to dynamic array                                 *
+ * Purpose: remove uint64 values from array                                   *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -1549,7 +1631,7 @@ int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	uint64_array_rm(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int rm_num)
+void	uint64_array_remove(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int rm_num)
 {
 	int	rindex, index;
 
@@ -1566,26 +1648,58 @@ void	uint64_array_rm(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, in
 
 /******************************************************************************
  *                                                                            *
+ * Function: str2uint                                                         *
+ *                                                                            *
+ * Purpose: convert string to unsigned integer (currently 31bit uint)         *
+ *                                                                            *
+ * Parameters: str - string to convert                                        *
+ *                                                                            *
+ * Return value: converted unsigned integer                                   *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ * Comments: the function automatically processes suffixes s, m, h, d, w      *
+ *                                                                            *
+ ******************************************************************************/
+int	str2uint(const char *str)
+{
+	size_t	sz = strlen(str) - 1;
+	int	factor = 1;
+
+	switch (str[sz]) {
+		case 's': factor = 1;         break;
+		case 'm': factor = 60;        break;
+		case 'h': factor = 3600;      break;
+		case 'd': factor = 3600*24;   break;
+		case 'w': factor = 3600*24*7; break;
+	}
+
+	return atoi(str) * factor;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: str2uint64                                                       *
  *                                                                            *
  * Purpose: convert string to 64bit unsigned integer                          *
  *                                                                            *
  * Parameters: str - string to convert                                        *
- *             value - pointer to retirned value                              *
+ *             value - pointer to returned value                              *
  *                                                                            *
  * Return value:  SUCCEED - the string is unsigned integer                    *
  *                FAIL - otherwise                                            *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
  *                                                                            *
- * Comments: the function automatically processes prefixes 'K','M','G'        *
+ * Comments: the function automatically processes suffixes 'K','M','G','T'    *
  *                                                                            *
  ******************************************************************************/
 int	str2uint64(char *str, zbx_uint64_t *value)
 {
-	size_t	sz;
-	int	factor = 1, ret;
-	char	c = '\0';
+	size_t		sz;
+	int		ret;
+	zbx_uint64_t	factor = 1;
+	char		c = '\0';
 
 	sz = strlen(str) - 1;
 
@@ -1604,6 +1718,12 @@ int	str2uint64(char *str, zbx_uint64_t *value)
 		c = str[sz];
 		factor = 1024 * 1024 * 1024;
 	}
+	else if (str[sz] == 'T')
+	{
+		c = str[sz];
+		factor = 1024 * 1024 * 1024;
+		factor *= 1024;
+	}
 
 	if ('\0' != c)
 		str[sz] = '\0';
@@ -1617,3 +1737,167 @@ int	str2uint64(char *str, zbx_uint64_t *value)
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: str2double                                                       *
+ *                                                                            *
+ * Purpose: convert string to double                                          *
+ *                                                                            *
+ * Parameters: str - string to convert                                        *
+ *                                                                            *
+ * Return value: converted double value                                       *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: the function automatically processes suffixes 'K','M','G','T'    *
+ *           and 's','m','h','d','w'                                          *
+ *                                                                            *
+ ******************************************************************************/
+double	str2double(const char *str)
+{
+	size_t	sz = strlen(str) - 1;
+	double	factor = 1;
+
+	switch (str[sz])
+	{
+		case 'K': factor = 1024;			break;
+		case 'M': factor = 1024*1024;			break;
+		case 'G': factor = 1024*1024*1024;		break;
+		case 'T': factor = 1024*1024*1024*(double)1024;	break;
+		case 's': factor = 1;				break;
+		case 'm': factor = 60;				break;
+		case 'h': factor = 3600;			break;
+		case 'd': factor = 3600*24;			break;
+		case 'w': factor = 3600*24*7;			break;
+	}
+
+	return atof(str) * factor;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: is_hostname_char                                                 *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:  SUCCEED - the char is allowed in the host name              *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments: in host name allowed characters: '0-9a-zA-Z_. -]'                *
+ *           !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+int	is_hostname_char(const char c)
+{
+	if (c >= 'a' && c <= 'z')
+		return SUCCEED;
+
+	if (c == '.' || c == '_' || c == '-' || c == ' ')
+		return SUCCEED;
+
+	if (c >= 'A' && c <= 'Z')
+		return SUCCEED;
+
+	if (c >= '0' && c <= '9')
+		return SUCCEED;
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: is_key_char                                                      *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:  SUCCEED - the char is allowed in the item key               *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments: in host name allowed characters: '0-9a-zA-Z_.,]'                 *
+ *           !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+int	is_key_char(const char c)
+{
+	if (c >= 'a' && c <= 'z')
+		return SUCCEED;
+
+	if (c == '.' || c == ',' || c == '_' || c == '-')
+		return SUCCEED;
+
+	if (c >= 'A' && c <= 'Z')
+		return SUCCEED;
+
+	if (c >= '0' && c <= '9')
+		return SUCCEED;
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: is_function_char                                                 *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:  SUCCEED - the char is allowed in the trigger function       *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments: in host name allowed characters: '0-9a-zA-Z_. -]'                *
+ *           !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+int	is_function_char(const char c)
+{
+	if (c >= 'a' && c <= 'z')
+		return SUCCEED;
+
+	if (c == '_')
+		return SUCCEED;
+
+	if (c >= 'A' && c <= 'Z')
+		return SUCCEED;
+
+	if (c >= '0' && c <= '9')
+		return SUCCEED;
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: make_hostname                                                    *
+ *                                                                            *
+ * Purpose: replace all not-allowed hostname symbols in the string            *
+ *                                                                            *
+ * Parameters: host - the target C-style string                               *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Dmitry Borovikov                                                   *
+ *                                                                            *
+ * Comments: the string must be null-terminated, otherwise not secure!        *
+ *                                                                            *
+ ******************************************************************************/
+void	make_hostname(char *host)
+{
+	char	*c = NULL;
+	
+	assert(host);
+	
+	for ( c = host; '\0' != *c; ++c)
+		if (FAIL == is_hostname_char(*c))
+			*c = '_';
+}

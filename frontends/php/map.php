@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -112,7 +112,7 @@ include_once('include/page_header.php');
 		imagecopy($im,$back,0,0,0,0,imagesx($back),imagesy($back));
 	}
 	else{
-		$x=imagesx($im)/2-ImageFontWidth(4)*strlen($name)/2;
+		$x=imagesx($im)/2-ImageFontWidth(4)*zbx_strlen($name)/2;
 		imagetext($im, 10, 0, $x, 25, $darkred, $name);
 	}
 	unset($db_image);
@@ -155,7 +155,7 @@ include_once('include/page_header.php');
 		$links = zbx_toHash($map['links'],'linkid');
 	}
 
-	$map_info = getSelementsInfo($selements);
+	$map_info = getSelementsInfo(array('selements' => $selements), $map['expandproblem']);
 
 //SDI($links); exit;
 // Draw connectors
@@ -173,6 +173,7 @@ include_once('include/page_header.php');
 		$color = convertColor($im,$link['color']);
 
 		$linktriggers = $link['linktriggers'];
+		order_result($linktriggers, 'triggerid');
 		if(!empty($linktriggers)){
 			$max_severity=0;
 			$options = array();
@@ -209,7 +210,7 @@ include_once('include/page_header.php');
 		$box_height = 0;
 
 		foreach($strings as $snum => $str)
-			$strings[$snum] = expand_map_element_label_by_data(null, $str);
+			$strings[$snum] = expand_map_element_label_by_data(null, array('label'=>$str));
 
 		foreach($strings as $snum => $str){
 			$dims = imageTextSize(8,0,$str);
@@ -437,10 +438,12 @@ include_once('include/page_header.php');
 		}
 
 //		imagerectangle($im, $x_rec-2-1, $y_rec-1, $x_rec+$w+2+1, $y_rec+($oc*4)+$h+1, $black);
-		imagefilledrectangle($im, $x_rec-2, $y_rec-2, $x_rec+$w+2, $y_rec+($oc*4)+$h-2, $white);
+//		imagefilledrectangle($im, $x_rec-2, $y_rec-2, $x_rec+$w+2, $y_rec+($oc*4)+$h-2, $white);
 
 		$increasey = 0;
 		foreach($strings as $num => $str){
+			if(zbx_empty($str)) continue;
+
 			$dims = imageTextSize(8,0,$str);
 
 			$color = ($num >= $cnt)?$el_info['info'][$num-$cnt]['color']:$label_color;
@@ -454,6 +457,12 @@ include_once('include/page_header.php');
 				$x_label = $x_rec;
 
 
+			imagefilledrectangle(
+				$im,
+				$x_label-2, $y_rec+$increasey-2,
+				$x_label+$dims['width']+2, $y_rec+$increasey+$dims['height']+2,
+				$white
+			);
 			imagetext($im, 8, 0, $x_label, $y_rec+$dims['height']+$increasey, $color, $str);
 
 			$increasey+= $dims['height']+4;

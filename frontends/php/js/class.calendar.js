@@ -22,16 +22,16 @@
 // Title: calendar
 // Author: Aly
 
-<!--
+// <![CDATA[
 
 var CLNDR = new Array();			// calendar obj reference
 
-function create_calendar(time, timeobjects, id, utime_field_id){
+function create_calendar(time, timeobjects, id, utime_field_id, parentNodeid){
 	id = id || CLNDR.length;
 	if('undefined' == typeof(utime_field_id)) utime_field_id = null;
 	
 	CLNDR[id] = new Object;
-	CLNDR[id].clndr = new calendar(id, time, timeobjects, utime_field_id);
+	CLNDR[id].clndr = new calendar(id, time, timeobjects, utime_field_id, parentNodeid);
 	
 return CLNDR[id];
 }
@@ -40,9 +40,9 @@ var calendar = Class.create();
 
 calendar.prototype = {
 id:	null,				//Personal ID
-dt: new Date(),			//Date object on load time
-cdt: new Date(),		//Date object of current(viewed) date
-sdt: new Date(),		//Date object of a selected date
+dt: new CDate(),			//Date object on load time
+cdt: new CDate(),		//Date object of current(viewed) date
+sdt: new CDate(),		//Date object of a selected date
 
 //day: 1, 				//represents day number
 month: 0,				//represents month number
@@ -75,9 +75,9 @@ status: false,					// status of timeobjects
 
 visible: 0,				//GMenu style state
 
-monthname: new Array('January','February','March','April','May','June','July','August','September','October','November','December'), // months
+monthname:  new Array(locale['S_JANUARY'],locale['S_FEBRUARY'],locale['S_MARCH'],locale['S_APRIL'],locale['S_MAY'],locale['S_JUNE'],locale['S_JULY'],locale['S_AUGUST'],locale['S_SEPTEMBER'],locale['S_OCTOBER'],locale['S_NOVEMBER'],locale['S_DECEMBER']), // months
 
-initialize: function(id, stime, timeobjects, utime_field_id){
+initialize: function(id, stime, timeobjects, utime_field_id, parentNodeid){
 	this.id = id;
 	this.timeobjects = new Array();
 
@@ -86,7 +86,7 @@ initialize: function(id, stime, timeobjects, utime_field_id){
 		return false;
 	}
 	
-	this.calendarcreate();
+	this.calendarcreate(parentNodeid);
 
 	addListener(this.clndr_monthdown,'click',this.monthdown.bindAsEventListener(this));
 	addListener(this.clndr_monthup,'click',this.monthup.bindAsEventListener(this));
@@ -309,7 +309,7 @@ setSDateDMY: function(d,m,y){
 		result = true;
 	}
 	else if((d>28) && result){
-		if(d <= this.daysInMonth(this.sdt.getMonth(), this.sdt.getYear())){
+		if(d <= this.daysInMonth(this.sdt.getMonth(), this.sdt.getFullYear())){
 			this.sdt.setDate(d);
 			result = true;
 		}
@@ -619,14 +619,19 @@ createDaysTab: function(){
 /*-------------------------------------------------------------------------------------------------*\
 *										CALENDAR CREATION											*
 \*-------------------------------------------------------------------------------------------------*/
-calendarcreate: function(){
+calendarcreate: function(parentNodeid){
 		this.clndr_calendar = document.createElement('div');
 		
 		Element.extend(this.clndr_calendar);
 		this.clndr_calendar.className = 'calendar';
 		this.clndr_calendar.hide();
 		
-	document.body.appendChild(this.clndr_calendar);
+		if(typeof(parentNodeid) == 'undefined'){
+			document.body.appendChild(this.clndr_calendar);
+		}
+		else{
+			$(parentNodeid).appendChild(this.clndr_calendar);
+		}
 		
 		// addListener(this.clndr_calendar,'mousemove', deselectAll);
 	
@@ -736,31 +741,31 @@ calendarcreate: function(){
 		
 		var td = document.createElement('td');
 	tr.appendChild(td);
-		td.appendChild(document.createTextNode('M'));
+		td.appendChild(document.createTextNode(locale['S_MONDAY_SHORT_BIG']));
 		
 		var td = document.createElement('td');
 	tr.appendChild(td);
-		td.appendChild(document.createTextNode('T'));
+		td.appendChild(document.createTextNode(locale['S_TUESDAY_SHORT_BIG']));
 		
 		var td = document.createElement('td');
 	tr.appendChild(td);
-		td.appendChild(document.createTextNode('W'));
+		td.appendChild(document.createTextNode(locale['S_WEDNESDAY_SHORT_BIG']));
 		
 		var td = document.createElement('td');
 	tr.appendChild(td);
-		td.appendChild(document.createTextNode('T'));
+		td.appendChild(document.createTextNode(locale['S_THURSDAY_SHORT_BIG']));
 		
 		var td = document.createElement('td');
 	tr.appendChild(td);
-		td.appendChild(document.createTextNode('F'));
+		td.appendChild(document.createTextNode(locale['S_FRIDAY_SHORT_BIG']));
 		
 		var td = document.createElement('td');
 	tr.appendChild(td);
-		td.appendChild(document.createTextNode('S'));
+		td.appendChild(document.createTextNode(locale['S_SATURDAY_SHORT_BIG']));
 		
 		var td = document.createElement('td');
 	tr.appendChild(td);
-		td.appendChild(document.createTextNode('S'));
+		td.appendChild(document.createTextNode(locale['S_SUNDAY_SHORT_BIG']));
 	//******************************************************
 	
 	//******** DAYS CALENDAR *************
@@ -803,7 +808,6 @@ calendarcreate: function(){
 		this.clndr_minute.className = 'calendar_textbox';
 }
 }
-
 
 /*
 <!--
@@ -860,3 +864,5 @@ calendarcreate: function(){
 </div>
 -->
 */
+
+// ]]

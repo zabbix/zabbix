@@ -1,10 +1,10 @@
 alter table items drop column nextcheck;
 alter table items add data_type  number(10)     DEFAULT '0' NOT NULL;
 alter table items add authtype   number(10)     DEFAULT '0' NOT NULL;
-alter table items add username   nvarchar2(64) DEFAULT ''  NOT NULL;
-alter table items add password   nvarchar2(64) DEFAULT ''  NOT NULL;
-alter table items add publickey  nvarchar2(64) DEFAULT ''  NOT NULL;
-alter table items add privatekey nvarchar2(64) DEFAULT ''  NOT NULL;
+alter table items add username   nvarchar2(64) DEFAULT '';
+alter table items add password   nvarchar2(64) DEFAULT '';
+alter table items add publickey  nvarchar2(64) DEFAULT '';
+alter table items add privatekey nvarchar2(64) DEFAULT '';
 alter table items add mtime      number(10)     DEFAULT '0' NOT NULL;
 
 alter table items modify snmp_community          nvarchar2(64)           DEFAULT '';

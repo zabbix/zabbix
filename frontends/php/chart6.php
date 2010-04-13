@@ -19,12 +19,12 @@
 **/
 ?>
 <?php
-	require_once 'include/config.inc.php';
-	require_once 'include/graphs.inc.php';
+require_once 'include/config.inc.php';
+require_once 'include/graphs.inc.php';
 
-	$page['file']	= 'chart6.php';
-	$page['title']	= "S_CHART";
-	$page['type']	= PAGE_TYPE_IMAGE;
+$page['file']	= 'chart6.php';
+$page['title']	= "S_CHART";
+$page['type']	= PAGE_TYPE_IMAGE;
 
 include_once 'include/page_header.php';
 
@@ -81,7 +81,7 @@ include_once 'include/page_header.php';
 	$graph->setHeader($host['host'].':'.$db_data['name']);
 
 	if($db_data['show_3d'] == 1) $graph->switchPie3D();
-	$graph->switchLegend($db_data['show_legend']);
+	$graph->showLegend($db_data['show_legend']);
 
 	$sql = 'SELECT gi.* '.
 			' FROM graphs_items gi '.

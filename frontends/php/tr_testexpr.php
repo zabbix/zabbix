@@ -27,11 +27,9 @@ $page['file'] = 'tr_testexpr.php';
 
 define('ZBX_PAGE_NO_MENU', 1);
 
-
-define('S_0_OR_1', '0 or 1');
 define('VALUE_TYPE_UNKNOWN', '#ERROR#');
 define('COMBO_PATTERN', 'str_in_array({},array(');
-define('COMBO_PATTERN_LENGTH', strlen(COMBO_PATTERN));
+define('COMBO_PATTERN_LENGTH', zbx_strlen(COMBO_PATTERN));
 
 include_once('include/page_header.php');
 
@@ -52,7 +50,7 @@ include_once('include/page_header.php');
 	$data_table->setAttribute('id', 'data_list');
 	$data_table->setOddRowClass('even_row');
 	$data_table->setEvenRowClass('even_row');
-	$data_table->setHeader(array('#', S_ITEM_FUNCTION, S_RESULT_TYPE, S_VALUE));
+	$data_table->setHeader(array('#', S_ITEM_SLASH_FUNCTION, S_RESULT_TYPE, S_VALUE));
 
 	$datas = array();
 	$fields = array();
@@ -68,7 +66,7 @@ include_once('include/page_header.php');
 		$validation = $info['validation'];
 
 		if(substr($validation, 0, COMBO_PATTERN_LENGTH) == COMBO_PATTERN){
-			$vals = explode(',', substr($validation, COMBO_PATTERN_LENGTH, strlen($validation) - COMBO_PATTERN_LENGTH - 4));
+			$vals = explode(',', substr($validation, COMBO_PATTERN_LENGTH, zbx_strlen($validation) - COMBO_PATTERN_LENGTH - 4));
 
 			$control = new CComboBox($fname, $datas[$expr]);
 			foreach ($vals as $v) $control->addItem($v, $v);
@@ -99,7 +97,7 @@ include_once('include/page_header.php');
 	$frm_test->setHelp('web.testexpr.service.php');
 	$frm_test->setTableClass('formlongtable formtable');
 	$frm_test->addVar('form_refresh', get_request('form_refresh', 1));
-	$frm_test->addVar('expression', $expression);
+	$frm_test->addVar('expression', urlencode($expression));
 
 /* test data */
 	$frm_test->addRow(S_TEST_DATA, $data_table);
@@ -138,7 +136,7 @@ include_once('include/page_header.php');
 	if($test){
 		$combine_expr = $outline;
 		foreach ($map as $key => $val){
-			$combine_expr = str_replace($key, strtolower($val['result']), $combine_expr);
+			$combine_expr = str_replace($key, zbx_strtolower($val['result']), $combine_expr);
 		}
 
 		eval("\$result = ".$combine_expr.';');

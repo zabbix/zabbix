@@ -153,7 +153,7 @@ FIELD		|recordid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|cksumtype	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|cksum		|t_cksum_text	|''	|NOT NULL	|0
 FIELD		|sync		|t_char(128)	|''	|NOT NULL	|0
-INDEX		|cksum_1	|nodeid,tablename,recordid,cksumtype
+INDEX		|1		|nodeid,cksumtype,tablename,recordid
 
 TABLE|services_times|timeid|ZBX_SYNC
 FIELD		|timeid		|t_id		|'0'	|NOT NULL	|0
@@ -443,7 +443,6 @@ TABLE|functions|functionid|ZBX_SYNC
 FIELD		|functionid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|items
 FIELD		|triggerid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|triggers
-FIELD		|lastvalue	|t_varchar(255)	|	|		|0
 FIELD		|function	|t_varchar(12)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|parameter	|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|triggerid
@@ -687,7 +686,7 @@ FIELD		|prevvalue	|t_varchar(255)	|	|NULL		|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|value_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|trapper_hosts	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
-FIELD		|units		|t_varchar(10)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|units		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|multiplier	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|delta		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|prevorgvalue	|t_varchar(255)	|	|NULL		|0
@@ -873,6 +872,7 @@ FIELD		|backgroundid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC		|images
 FIELD		|label_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|label_location	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|highlight	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
+FIELD		|expandproblem	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|name
 
 

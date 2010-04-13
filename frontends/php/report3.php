@@ -19,73 +19,76 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/services.inc.php";
+require_once('include/config.inc.php');
+require_once('include/services.inc.php');
 
-	$page["title"] = "S_IT_SERVICES_AVAILABILITY_REPORT";
-	$page["file"] = "report3.php";
-	$page['hist_arg'] = array();
+$page['title'] = "S_IT_SERVICES_AVAILABILITY_REPORT";
+$page['file'] = 'report3.php';
+$page['hist_arg'] = array();
 
-include_once "include/page_header.php";
-
+include_once('include/page_header.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"serviceid"=>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,						NULL),
-		"period"=>		array(T_ZBX_STR, O_OPT,	null,	IN('"dayly","weekly","monthly","yearly"'),	NULL),
-		"year"=>		array(T_ZBX_INT, O_OPT,	null,	null,						NULL)
+		'serviceid'=>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,						NULL),
+		'period'=>		array(T_ZBX_STR, O_OPT,	null,	IN('"dayly","weekly","monthly","yearly"'),	NULL),
+		'year'=>		array(T_ZBX_INT, O_OPT,	null,	null,						NULL)
 	);
 
 	check_fields($fields);
 
-	$period = get_request("period",	"weekly");
-	$year	= get_request("year",	date("Y"));
+	$period = get_request('period',	'weekly');
+	$year	= get_request('year',	date('Y'));
 
 	define("YEAR_LEFT_SHIFT", 5);
 ?>
 <?php
-	if(!DBfetch(DBselect('select serviceid from services where serviceid='.$_REQUEST["serviceid"]))){
+	$sql = 'SELECT s.* FROM services s  WHERE s.serviceid='.$_REQUEST['serviceid'];
+	if(!$service = DBfetch(DBselect($sql,1))){
 		fatal_error(S_NO_IT_SERVICE_DEFINED);
 	}
 
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY);
+	if(!is_null($service['triggerid'])){
+		$options = array(
+			'triggerids' => $service['triggerid'],
+			'output' => API_OUTPUT_SHORTEN,
+			'nodeids' => get_current_nodeid(true)
+		);
 
-	$sql = 'SELECT s.* '.
-			' FROM services s '.
-			' WHERE s.serviceid='.$_REQUEST['serviceid'].
-				' AND (s.triggerid IS NULL OR '.DBcondition('s.triggerid',$available_triggers).') '.
-				' AND '.DBin_node('s.serviceid');
+		$db_data = CTrigger::get($options);
+		if(empty($db_data)) access_deny();
+	}
 
-	if(!$service = DBfetch(DBselect($sql))){
-		access_deny();
+	if(!DBfetch(DBselect('SELECT serviceid FROM services WHERE serviceid='.$_REQUEST['serviceid']))){
+		fatal_error(S_NO_IT_SERVICE_DEFINED);
 	}
 ?>
 <?php
 	$form = new CForm();
-	$form->SetMethod('get');
-	$form->AddVar("serviceid", $_REQUEST["serviceid"]);
+	$form->setMethod('get');
+	$form->addVar('serviceid', $_REQUEST['serviceid']);
 
-	$cmbPeriod = new CComboBox("period", $period, "submit();");
-	$cmbPeriod->AddItem("dayly",S_DAILY);
-	$cmbPeriod->AddItem("weekly",S_WEEKLY);
-	$cmbPeriod->AddItem("monthly",S_MONTHLY);
-	$cmbPeriod->AddItem("yearly",S_YEARLY);
-	$form->AddItem(array(SPACE.S_PERIOD.SPACE, $cmbPeriod));
+	$cmbPeriod = new CComboBox('period', $period, 'submit();');
+	$cmbPeriod->addItem('dayly',S_DAILY);
+	$cmbPeriod->addItem('weekly',S_WEEKLY);
+	$cmbPeriod->addItem('monthly',S_MONTHLY);
+	$cmbPeriod->addItem('yearly',S_YEARLY);
+	$form->addItem(array(SPACE.S_PERIOD.SPACE, $cmbPeriod));
 
-	$cmbYear = new CComboBox("year", $year, "submit();");
+	$cmbYear = new CComboBox('year', $year, 'submit();');
 
-	for($y = (date("Y") - YEAR_LEFT_SHIFT); $y <= date("Y"); $y++){
-		$cmbYear->AddItem($y, $y);
+	for($y = (date('Y') - YEAR_LEFT_SHIFT); $y <= date('Y'); $y++){
+		$cmbYear->addItem($y, $y);
 	}
 
-	$form->AddItem(array(SPACE.S_YEAR.SPACE, $cmbYear));
+	$form->addItem(array(SPACE.S_YEAR.SPACE, $cmbYear));
 
 	show_table_header(array(
 			S_IT_SERVICES_AVAILABILITY_REPORT_BIG,
-			SPACE."\"",
-			new CLink($service["name"],"srv_status.php?serviceid=".$service["serviceid"]),
-			"\""
+			SPACE.'"',
+			new CLink($service['name'],'srv_status.php?showgraph=1&serviceid='.$service['serviceid']),
+			'"'
 		),
 		$form);
 ?>
@@ -95,92 +98,92 @@ include_once "include/page_header.php";
 	$header = array(S_OK,S_PROBLEMS,S_DOWNTIME,S_PERCENTAGE,S_SLA);
 
         switch($period){
-			case "yearly":
-				$from	= (date("Y") - YEAR_LEFT_SHIFT);
-				$to	= date("Y");
-				array_unshift($header, new CCol(S_YEAR,"center"));
+			case 'yearly':
+				$from	= (date('Y') - YEAR_LEFT_SHIFT);
+				$to	= date('Y');
+				array_unshift($header, new CCol(S_YEAR,'center'));
 				function get_time($y)	{	return mktime(0,0,0,1,1,$y);		}
-				function format_time($t){	return date("Y", $t);			}
+				function format_time($t){	return date('Y', $t);			}
 				function format_time2($t){	return null; };
 				break;
-			case "monthly":
+			case 'monthly':
 				$from	= 1;
 				$to	= 12;
-				array_unshift($header, new CCol(S_MONTH,"center"));
+				array_unshift($header, new CCol(S_MONTH,'center'));
 				function get_time($m)	{	global $year;	return mktime(0,0,0,$m,1,$year);	}
-				function format_time($t){	return date("M Y",$t);			}
+				function format_time($t){	return date('M Y',$t);			}
 				function format_time2($t){	return null; };
 				break;
-			case "dayly":
+			case 'dayly':
 				$from	= 1;
 				$to	= 365;
-				array_unshift($header, new CCol(S_DAY,"center"));
+				array_unshift($header, new CCol(S_DAY,'center'));
 				function get_time($d)	{	global $year;	return mktime(0,0,0,1,$d,$year);	}
-				function format_time($t){	return date("d M Y",$t);		}
+				function format_time($t){	return date('d M Y',$t);		}
 				function format_time2($t){	return null; };
 				break;
-			case "weekly":
+			case 'weekly':
 			default:
 				$from	= 0;
 				$to	= 52;
-				array_unshift($header,new CCol(S_FROM,"center"),new CCol(S_TILL,"center"));
+				array_unshift($header,new CCol(S_FROM,'center'),new CCol(S_TILL,'center'));
 				function get_time($w)	{
 					global $year;
 
 					$time	= mktime(0,0,0,1, 1, $year);
-					$wd	= date("w", $time);
+					$wd	= date('w', $time);
 					$wd	= $wd == 0 ? 6 : $wd - 1;
 
 					return ($time + ($w*7 - $wd)*24*3600);
 				}
-				function format_time($t){	return date("d M Y H:i",$t);	}
+				function format_time($t){	return date('d M Y H:i',$t);	}
 				function format_time2($t){	return format_time($t); };
 				break;
 	}
 
 	$table->SetHeader($header);
 
-	for($t = $from; $t <= $to; $t++)
-	{
+	for($t = $from; $t <= $to; $t++){
+
 		if(($start = get_time($t)) > time())
 			break;
 
 		if(($end = get_time($t+1)) > time())
 			$end = time();
 
-		$stat = calculate_service_availability($service["serviceid"],$start,$end);
+		$stat = calculate_service_availability($service['serviceid'],$start,$end);
 
 		$ok 		= new CSpan(
-					sprintf("%dd %dh %dm",
-						$stat["ok_time"]/(24*3600),
-						($stat["ok_time"]%(24*3600))/3600,
-						($stat["ok_time"]%(3600))/(60)),
-					"off");
+					sprintf('%dd %dh %dm',
+						$stat['ok_time']/(24*3600),
+						($stat['ok_time']%(24*3600))/3600,
+						($stat['ok_time']%(3600))/(60)),
+					'off');
 
 		$problems	= new CSpan(
-					sprintf("%dd %dh %dm",
-						$stat["problem_time"]/(24*3600),
-						($stat["problem_time"]%(24*3600))/3600,
-						($stat["problem_time"]%(3600))/(60)),
-					"on");
+					sprintf('%dd %dh %dm',
+						$stat['problem_time']/(24*3600),
+						($stat['problem_time']%(24*3600))/3600,
+						($stat['problem_time']%(3600))/(60)),
+					'on');
 
-		$downtime	= sprintf("%dd %dh %dm",
-					$stat["downtime_time"]/(24*3600),
-					($stat["downtime_time"]%(24*3600))/3600,
-					($stat["downtime_time"]%(3600))/(60));
+		$downtime	= sprintf('%dd %dh %dm',
+					$stat['downtime_time']/(24*3600),
+					($stat['downtime_time']%(24*3600))/3600,
+					($stat['downtime_time']%(3600))/(60));
 
-		$percentage	= new CSpan(sprintf("%2.2f%%",$stat["ok"]) , "off");
+		$percentage	= new CSpan(sprintf('%2.2f%%',$stat['ok']) , 'off');
 
-		$table->AddRow(array(
+		$table->addRow(array(
 			format_time($start),
 			format_time2($end),
 			$ok,
 			$problems,
 			$downtime,
 			$percentage,
-			($service["showsla"]==1) ?
-				new CSpan($service["goodsla"], ($stat["ok"] >= $service["goodsla"]) ? "off" : "on") :
-				"-"
+			($service['showsla']==1) ?
+				new CSpan($service['goodsla'], ($stat['ok'] >= $service['goodsla']) ? 'off' : 'on') :
+				'-'
 
 			));
 	}
@@ -189,6 +192,6 @@ include_once "include/page_header.php";
 ?>
 <?php
 
-include_once "include/page_footer.php";
+include_once('include/page_footer.php');
 
 ?>

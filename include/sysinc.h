@@ -45,6 +45,10 @@
 #	include "Wspiapi.h"
 #endif
 
+#ifdef HAVE_IPHLPAPI_H
+#	include <Iphlpapi.h>
+#endif
+
 #ifdef HAVE_WINDOWS_H
 #	include <windows.h>
 #endif
@@ -85,6 +89,10 @@
 #	include <sys/types.h>
 #endif
 
+#ifdef HAVE_SYS_SYSTEMCFG_H
+#	include <sys/systemcfg.h>
+#endif
+
 #ifdef HAVE_INTTYPES_H
 #	include <inttypes.h>
 #endif
@@ -105,11 +113,10 @@
 #	include <linux/kernel.h>
 #endif
 
-#ifdef HAVE_ARPA_NAMESER_COMPAT_H
-#	include <arpa/nameser_compat.h>
-#endif
-
 #ifdef HAVE_ARPA_NAMESER_H
+#ifdef MAC_OS_X
+#	define BIND_8_COMPAT 1
+#endif
 #	include <arpa/nameser.h>
 #endif
 

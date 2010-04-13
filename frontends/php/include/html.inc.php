@@ -77,7 +77,7 @@
 	function bfirst($str){
 // mark first symbol of string as bold
 		$res = bold($str[0]);
-		for($i=1,$max=strlen($str); $i<$max; $i++)	$res .= $str[$i];
+		for($i=1,$max=zbx_strlen($str); $i<$max; $i++)	$res .= $str[$i];
 		$str = $res;
 		return $str;
 	}
@@ -111,9 +111,8 @@
 	function url_param($parameter,$request=true,$name=null){
 		$result = '';
 		if(!is_array($parameter)){
-			if(!isset($name)){
-				if(!$request)
-					fatal_error('not request variable require url name [url_param]');
+			if(is_null($name)){
+				if(!$request) fatal_error('not request variable require url name [url_param]');
 
 				$name = $parameter;
 			}
@@ -200,7 +199,7 @@
 		}
 		else if(is_object($obj)){
 			$formObjects = array('cform','ccheckbox','cselect','cbutton','cbuttonqmessage','cbuttondelete','cbuttoncancel');
-			if(is_object($obj) && str_in_array(strtolower(get_class($obj)), $formObjects)){
+			if(is_object($obj) && str_in_array(zbx_strtolower(get_class($obj)), $formObjects)){
 				$obj=SPACE;
 			}
 
@@ -212,7 +211,7 @@
 		}
 		else{
 			foreach(array('<form','<input','<select') as $item){
-				if(strpos($obj,$item) !== FALSE) $obj = SPACE;
+				if(zbx_strpos($obj,$item) !== FALSE) $obj = SPACE;
 			}
 		}
 	}

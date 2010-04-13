@@ -1,4 +1,4 @@
-.TH ZABBIX_SENDER 8 "5 October 2009"
+.TH ZABBIX_SENDER 8 "22 March 2010"
 .if n .ad l
 .SH NAME
 zabbix_sender \- Zabbix Sender utility.
@@ -26,9 +26,11 @@ Specify metric name (key) we want to send.
 .IP "-o, --value \fI<value>\fR"
 Specify value of the key.
 .IP "-i, --input-file \fI<inputfile>\fR"
-Load values from input file. Each line of file contains space delimited: \fB<hostname> <key> <value>\fR.
+Load values from input file. Specify \fB-\fR for standard input. Each line of file contains space delimited: \fB<hostname> <key> <value>\fR.
 .IP "-T --with-timestamps"
 Each line of file contains space delimited: \fB<hostname> <key> <timestamp> <value>\fR. This can be used with \fB--input-file\fR option.
+.IP "-r --real-time"
+Send metrics one by one as soon as they are received. This can be used when reading from standard input.
 .IP "-v, --verbose"
 Verbose mode, -vv for more details.
 .IP "-h, --help"

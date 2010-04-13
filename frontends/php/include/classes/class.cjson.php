@@ -58,7 +58,7 @@ class CJSON{
 	 *
 	 */
 	protected $_config = array(
-		'bypass_ext' => true,
+		'bypass_ext' => false,
 		'bypass_mb'  => false,
 		'noerror'	=> false
 	);
@@ -229,7 +229,7 @@ class CJSON{
 	 */
 	public function decode($encodedValue, $asArray = false){
 		mb_internal_encoding('ASCII');
-		
+
 		$first_char = substr(ltrim($encodedValue), 0, 1);
 		if($first_char != '{' && $first_char != '['){
 			return null;
@@ -240,11 +240,13 @@ class CJSON{
 		}
 
 // Fall back to PHP-only method
+		ini_set('pcre.backtrack_limit', '10000000');
+		
 		$this->_level = 0;
 		if($this->isValid($encodedValue)){
 			$result = $this->_json_decode($encodedValue, (bool) $asArray);
 			mb_internal_encoding('UTF-8');
-			
+
 			return $result;
 		}
 		else {
@@ -289,7 +291,7 @@ class CJSON{
 			case 'string':
 				// STRINGS ARE EXPECTED TO BE IN ASCII OR UTF-8 FORMAT
 				$ascii = '';
-				$strlen_var = strlen($var);
+				$strlen_var = zbx_strlen($var);
 
 			   /**
 				* Iterate over every character in the string,
@@ -478,7 +480,7 @@ class CJSON{
 	protected function _json_decode($str, $asArray = false){
 		$str = $this->_reduce_string($str);
 
-		switch (strtolower($str)){
+		switch (zbx_strtolower($str)){
 			case 'true':
 				// JSON_checker test suite claims
 				// "A JSON payload should be an object or array, not a string."
@@ -530,7 +532,7 @@ class CJSON{
 					$delim = substr($str, 0, 1);
 					$chrs = substr($str, 1, -1);
 					$utf8 = '';
-					$strlen_chrs = strlen($chrs);
+					$strlen_chrs = zbx_strlen($chrs);
 
 					for ($c = 0; $c < $strlen_chrs; ++$c){
 
@@ -665,7 +667,7 @@ class CJSON{
 						}
 					}
 
-					$strlen_chrs = strlen($chrs);
+					$strlen_chrs = zbx_strlen($chrs);
 
 					for ($c = 0; $c <= $strlen_chrs; ++$c){
 
@@ -743,7 +745,7 @@ class CJSON{
 						}
 						else if(($chrs{$c} == $top['delim']) &&
 								 ($top['what'] == self::IN_STR) &&
-								 ((strlen(substr($chrs, 0, $c)) - strlen(rtrim(substr($chrs, 0, $c), '\\'))) % 2 != 1)){
+								 ((zbx_strlen(substr($chrs, 0, $c)) - zbx_strlen(rtrim(substr($chrs, 0, $c), '\\'))) % 2 != 1)){
 							// found a quote, we're in a string, and it's not escaped
 							// we know that it's not escaped becase there is _not_ an
 							// odd number of backslashes at the end of the string so far
@@ -897,7 +899,7 @@ class CJSON{
 				return mb_convert_encoding($utf8, 'UTF-16', 'UTF-8');
 		}
 
-		switch (strlen($utf8)){
+		switch (zbx_strlen($utf8)){
 			case 1:
 				// this case should never be reached, because we are in ASCII range
 				// see: http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
@@ -1066,7 +1068,7 @@ class CJSON{
 	 */
 	public function isValid($str){
 // string length
-		$len = strlen($str);
+		$len = zbx_strlen($str);
 
 // the next character
 //$b = 0;
@@ -1318,3 +1320,4 @@ class CJSON{
 	return true;
 	}
 }
+?>

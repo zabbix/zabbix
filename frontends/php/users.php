@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -111,22 +111,21 @@ include_once('include/page_header.php');
 		}
 	}
 	else if(isset($_REQUEST['save'])){
-		$config = select_config();
-
-		$_REQUEST['password1'] = get_request('password1', null);
-		$_REQUEST['password2'] = get_request('password2', null);
-
-		if(($config['authentication_type'] != ZBX_AUTH_INTERNAL) && zbx_empty($_REQUEST['password1'])){
-			if(($config['authentication_type'] == ZBX_AUTH_LDAP) && isset($_REQUEST['userid'])){
-				if(GROUP_GUI_ACCESS_INTERNAL != get_user_auth($_REQUEST['userid'])){
-//					$_REQUEST['password1'] = $_REQUEST['password2'] = 'zabbix';
-				}
-			}
-			else{
-				$_REQUEST['password1'] = $_REQUEST['password2'] = 'zabbix';
-			}
+		$config = select_config();		
+		$auth_type = isset($_REQUEST['userid']) ? get_user_system_auth($_REQUEST['userid']) : $config['authentication_type'];
+		
+		if(isset($_REQUEST['userid']) && (ZBX_AUTH_INTERNAL != $auth_type)){
+			$_REQUEST['password1'] = $_REQUEST['password2'] = null;
 		}
-		if($_REQUEST['password1']!=$_REQUEST['password2']){
+		else if(!isset($_REQUEST['userid']) && (ZBX_AUTH_INTERNAL != $auth_type)){
+			$_REQUEST['password1'] = $_REQUEST['password2'] = 'zabbix';
+		}
+		else{
+			$_REQUEST['password1'] = get_request('password1', null);
+			$_REQUEST['password2'] = get_request('password2', null);
+		}
+		
+		if($_REQUEST['password1'] != $_REQUEST['password2']){
 			if(isset($_REQUEST['userid']))
 				show_error_message(S_CANNOT_UPDATE_USER_BOTH_PASSWORDS);
 			else
@@ -180,7 +179,7 @@ include_once('include/page_header.php');
 				$action = AUDIT_ACTION_ADD;
 
 				DBstart();
-				$result = CUser::add($user);
+				$result = CUser::create($user);
 				if(!$result)
 					error(CUser::resetErrors());
 				// if($result) $result = CUserGroup::updateUsers(array('users' => $result, 'usrgrps' => $usrgrps));
@@ -331,8 +330,8 @@ include_once('include/page_header.php');
 
 ?>
 <?php
-	$_REQUEST['filter_usrgrpid'] = get_request('filter_usrgrpid', get_profile('web.users.filter.usrgrpid', 0));
-	update_profile('web.users.filter.usrgrpid', $_REQUEST['filter_usrgrpid'], PROFILE_TYPE_ID);
+	$_REQUEST['filter_usrgrpid'] = get_request('filter_usrgrpid', CProfile::get('web.users.filter.usrgrpid', 0));
+	CProfile::update('web.users.filter.usrgrpid', $_REQUEST['filter_usrgrpid'], PROFILE_TYPE_ID);
 
 	$frmForm = new CForm(null, 'get');
 	$cmbConf = new CComboBox('config', 'users.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
@@ -340,23 +339,22 @@ include_once('include/page_header.php');
 		$cmbConf->addItem('users.php', S_USERS);
 	$frmForm->addItem(array($cmbConf, new CButton('form', S_CREATE_USER)));
 
-	show_table_header(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
+	$user_wdgt = new CWidget();
+	$user_wdgt->addPageHeader(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
 	//echo SBR;
 
 
 	if(isset($_REQUEST['form'])){
-		insert_user_form(get_request('userid', null));
+		$user_wdgt->addItem(insert_user_form(get_request('userid', null)));
 	}
 	else{
-		$user_wdgt = new CWidget();
-
 		$form = new CForm(null, 'get');
 
 		$cmbUGrp = new CComboBox('filter_usrgrpid',$_REQUEST['filter_usrgrpid'],'submit()');
 		$cmbUGrp->addItem(0, S_ALL_S);
 
 		$options = array(
-			'extendoutput' => 1, 
+			'extendoutput' => 1,
 			'sortfield' => 'name'
 		);
 		$usrgrps = CUserGroup::get($options);
@@ -460,13 +458,13 @@ include_once('include/page_header.php');
 			$user_type_style = 'enabled';
 			if(USER_TYPE_ZABBIX_ADMIN == $user['type']) $user_type_style = 'orange';
 			if(USER_TYPE_SUPER_ADMIN == $user['type']) $user_type_style = 'disabled';
-			
+
 			$gui_access = user_auth_type2str($user['gui_access']);
 
 			$gui_access_style = 'green';
 			if(GROUP_GUI_ACCESS_INTERNAL == $user['gui_access']) $gui_access_style = 'orange';
 			if(GROUP_GUI_ACCESS_DISABLED == $user['gui_access']) $gui_access_style = 'disabled';
-			
+
 			$gui_access = new CSpan($gui_access, $gui_access_style);
 			$users_status = ($user['users_status'] == 1) ? new CSpan(S_DISABLED, 'red') : new CSpan(S_ENABLED, 'green');
 			$api_access = ($user['api_access'] == GROUP_API_ACCESS_ENABLED) ? new CSpan(S_ENABLED, 'orange') : new CSpan(S_DISABLED, 'green');
@@ -516,12 +514,10 @@ include_once('include/page_header.php');
 		$form->addItem($table);
 
 		$user_wdgt->addItem($form);
-		$user_wdgt->show();
 	}
+	
+	$user_wdgt->show();
 
-?>
-<?php
 
 include_once('include/page_footer.php');
-
 ?>

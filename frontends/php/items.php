@@ -26,7 +26,7 @@ require_once('include/forms.inc.php');
 
 $page['title'] = 'S_CONFIGURATION_OF_ITEMS';
 $page['file'] = 'items.php';
-$page['scripts'] = array('scriptaculous.js?load=effects');
+$page['scripts'] = array('effects.js');
 $page['hist_arg'] = array();
 
 include_once('include/page_header.php');
@@ -80,7 +80,7 @@ include_once('include/page_header.php');
 				IN(array(-1,ITEM_TYPE_ZABBIX,ITEM_TYPE_SNMPV1,ITEM_TYPE_TRAPPER,ITEM_TYPE_SIMPLE,
 					ITEM_TYPE_SNMPV2C,ITEM_TYPE_INTERNAL,ITEM_TYPE_SNMPV3,ITEM_TYPE_ZABBIX_ACTIVE,
 					ITEM_TYPE_AGGREGATE,ITEM_TYPE_HTTPTEST,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR,
-					ITEM_TYPE_IPMI,ITEM_TYPE_SSH,ITEM_TYPE_TELNET)),'isset({save})'),
+					ITEM_TYPE_IPMI,ITEM_TYPE_SSH,ITEM_TYPE_TELNET,ITEM_TYPE_CALCULATED)),'isset({save})'),
 		'trends'=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),		'isset({save})'),
 		'value_type'=>		array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2,3,4'),	'isset({save})'),
 		'data_type'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(ITEM_DATA_TYPE_DECIMAL,ITEM_DATA_TYPE_HEXADECIMAL),
@@ -148,7 +148,7 @@ include_once('include/page_header.php');
 				IN(array(-1,ITEM_TYPE_ZABBIX,ITEM_TYPE_SNMPV1,ITEM_TYPE_TRAPPER,ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_SNMPV2C,ITEM_TYPE_INTERNAL,ITEM_TYPE_SNMPV3,ITEM_TYPE_ZABBIX_ACTIVE,
 				ITEM_TYPE_AGGREGATE,ITEM_TYPE_HTTPTEST,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR,
-				ITEM_TYPE_IPMI,ITEM_TYPE_SSH,ITEM_TYPE_TELNET)),null),
+				ITEM_TYPE_IPMI,ITEM_TYPE_SSH,ITEM_TYPE_TELNET,ITEM_TYPE_CALCULATED)),null),
 		'filter_key'=>				array(T_ZBX_STR, O_OPT,  null,  null,		null),
 		'filter_snmp_community'=>	array(T_ZBX_STR, O_OPT,  null,  null,	null),
 		'filter_snmp_oid'=>			array(T_ZBX_STR, O_OPT,  null,  null,	null),
@@ -174,7 +174,7 @@ include_once('include/page_header.php');
 		'subfilter_trends'=>				array(T_ZBX_INT, O_OPT,	 null,	null, null),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})')
 	);
 
@@ -186,24 +186,35 @@ include_once('include/page_header.php');
 // PERMISSIONS
 	if(get_request('hostid', 0) > 0){
 		$options = array(
-			'hostids' => $_REQUEST['hostid'], 
-			'extendoutput' => 1, 
-			'templated_hosts' => 1, 
+			'hostids' => $_REQUEST['hostid'],
+			'extendoutput' => 1,
+			'templated_hosts' => 1,
 			'editable' => 1
 		);
 		$hosts = CHost::get($options);
 		if(empty($hosts)) access_deny();
+	}
+	
+	if(get_request('itemid', false)){
+		$options = array(
+			'itemids' => $_REQUEST['itemid'],
+			'output' => API_OUTPUT_SHORTEN,
+			'editable' => 1
+		);
+		$item = CItem::get($options);
+		if(empty($item)) access_deny();
 	}
 ?>
 <?php
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			update_profile('web.items.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.items.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -235,48 +246,48 @@ include_once('include/page_header.php');
 		$_REQUEST['filter_templated_items'] = get_request('filter_templated_items', -1);
 		$_REQUEST['filter_with_triggers'] = get_request('filter_with_triggers', -1);
 
-		update_profile('web.items.filter_group', $_REQUEST['filter_group'], PROFILE_TYPE_STR);
-		update_profile('web.items.filter_host', $_REQUEST['filter_host'], PROFILE_TYPE_STR);
-		update_profile('web.items.filter_application', $_REQUEST['filter_application'], PROFILE_TYPE_STR);
-		update_profile('web.items.filter_description', $_REQUEST['filter_description'], PROFILE_TYPE_STR);
-		update_profile('web.items.filter_type', $_REQUEST['filter_type'], PROFILE_TYPE_INT);
-		update_profile('web.items.filter_key', $_REQUEST['filter_key'], PROFILE_TYPE_STR);
-		update_profile('web.items.filter_snmp_community', $_REQUEST['filter_snmp_community'], PROFILE_TYPE_STR);
-		update_profile('web.items.filter_snmp_oid', $_REQUEST['filter_snmp_oid'], PROFILE_TYPE_STR);
-		update_profile('web.items.filter_snmp_port', $_REQUEST['filter_snmp_port'], PROFILE_TYPE_STR);
-		update_profile('web.items.filter_value_type', $_REQUEST['filter_value_type'], PROFILE_TYPE_INT);
-		update_profile('web.items.filter_data_type', $_REQUEST['filter_data_type'], PROFILE_TYPE_INT);
-		update_profile('web.items.filter_delay', $_REQUEST['filter_delay'], PROFILE_TYPE_STR);
-		update_profile('web.items.filter_history', $_REQUEST['filter_history'], PROFILE_TYPE_STR);
-		update_profile('web.items.filter_trends', $_REQUEST['filter_trends'], PROFILE_TYPE_STR);
-		update_profile('web.items.filter_status', $_REQUEST['filter_status'], PROFILE_TYPE_INT);
-		update_profile('web.items.filter_templated_items', $_REQUEST['filter_templated_items'], PROFILE_TYPE_INT);
-		update_profile('web.items.filter_with_triggers', $_REQUEST['filter_with_triggers'], PROFILE_TYPE_INT);
+		CProfile::update('web.items.filter_group', $_REQUEST['filter_group'], PROFILE_TYPE_STR);
+		CProfile::update('web.items.filter_host', $_REQUEST['filter_host'], PROFILE_TYPE_STR);
+		CProfile::update('web.items.filter_application', $_REQUEST['filter_application'], PROFILE_TYPE_STR);
+		CProfile::update('web.items.filter_description', $_REQUEST['filter_description'], PROFILE_TYPE_STR);
+		CProfile::update('web.items.filter_type', $_REQUEST['filter_type'], PROFILE_TYPE_INT);
+		CProfile::update('web.items.filter_key', $_REQUEST['filter_key'], PROFILE_TYPE_STR);
+		CProfile::update('web.items.filter_snmp_community', $_REQUEST['filter_snmp_community'], PROFILE_TYPE_STR);
+		CProfile::update('web.items.filter_snmp_oid', $_REQUEST['filter_snmp_oid'], PROFILE_TYPE_STR);
+		CProfile::update('web.items.filter_snmp_port', $_REQUEST['filter_snmp_port'], PROFILE_TYPE_STR);
+		CProfile::update('web.items.filter_value_type', $_REQUEST['filter_value_type'], PROFILE_TYPE_INT);
+		CProfile::update('web.items.filter_data_type', $_REQUEST['filter_data_type'], PROFILE_TYPE_INT);
+		CProfile::update('web.items.filter_delay', $_REQUEST['filter_delay'], PROFILE_TYPE_STR);
+		CProfile::update('web.items.filter_history', $_REQUEST['filter_history'], PROFILE_TYPE_STR);
+		CProfile::update('web.items.filter_trends', $_REQUEST['filter_trends'], PROFILE_TYPE_STR);
+		CProfile::update('web.items.filter_status', $_REQUEST['filter_status'], PROFILE_TYPE_INT);
+		CProfile::update('web.items.filter_templated_items', $_REQUEST['filter_templated_items'], PROFILE_TYPE_INT);
+		CProfile::update('web.items.filter_with_triggers', $_REQUEST['filter_with_triggers'], PROFILE_TYPE_INT);
 	}
 	else{
-		$_REQUEST['filter_group'] = get_profile('web.items.filter_group');
-		$_REQUEST['filter_host'] = get_profile('web.items.filter_host');
-		$_REQUEST['filter_application'] = get_profile('web.items.filter_application');
-		$_REQUEST['filter_description'] = get_profile('web.items.filter_description');
-		$_REQUEST['filter_type'] = get_profile('web.items.filter_type', -1);
-		$_REQUEST['filter_key'] = get_profile('web.items.filter_key');
-		$_REQUEST['filter_snmp_community'] = get_profile('web.items.filter_snmp_community');
-		$_REQUEST['filter_snmp_oid'] = get_profile('web.items.filter_snmp_oid');
-		$_REQUEST['filter_snmp_port'] = get_profile('web.items.filter_snmp_port');
-		$_REQUEST['filter_value_type'] = get_profile('web.items.filter_value_type', -1);
-		$_REQUEST['filter_data_type'] = get_profile('web.items.filter_data_type', -1);
-		$_REQUEST['filter_delay'] = get_profile('web.items.filter_delay');
-		$_REQUEST['filter_history'] = get_profile('web.items.filter_history');
-		$_REQUEST['filter_trends'] = get_profile('web.items.filter_trends');
-		$_REQUEST['filter_status'] = get_profile('web.items.filter_status');
-		$_REQUEST['filter_templated_items'] = get_profile('web.items.filter_templated_items', -1);
-		$_REQUEST['filter_with_triggers'] = get_profile('web.items.filter_with_triggers', -1);
+		$_REQUEST['filter_group'] = CProfile::get('web.items.filter_group');
+		$_REQUEST['filter_host'] = CProfile::get('web.items.filter_host');
+		$_REQUEST['filter_application'] = CProfile::get('web.items.filter_application');
+		$_REQUEST['filter_description'] = CProfile::get('web.items.filter_description');
+		$_REQUEST['filter_type'] = CProfile::get('web.items.filter_type', -1);
+		$_REQUEST['filter_key'] = CProfile::get('web.items.filter_key');
+		$_REQUEST['filter_snmp_community'] = CProfile::get('web.items.filter_snmp_community');
+		$_REQUEST['filter_snmp_oid'] = CProfile::get('web.items.filter_snmp_oid');
+		$_REQUEST['filter_snmp_port'] = CProfile::get('web.items.filter_snmp_port');
+		$_REQUEST['filter_value_type'] = CProfile::get('web.items.filter_value_type', -1);
+		$_REQUEST['filter_data_type'] = CProfile::get('web.items.filter_data_type', -1);
+		$_REQUEST['filter_delay'] = CProfile::get('web.items.filter_delay');
+		$_REQUEST['filter_history'] = CProfile::get('web.items.filter_history');
+		$_REQUEST['filter_trends'] = CProfile::get('web.items.filter_trends');
+		$_REQUEST['filter_status'] = CProfile::get('web.items.filter_status');
+		$_REQUEST['filter_templated_items'] = CProfile::get('web.items.filter_templated_items', -1);
+		$_REQUEST['filter_with_triggers'] = CProfile::get('web.items.filter_with_triggers', -1);
 	}
 
 	if(isset($_REQUEST['filter_host']) && !zbx_empty($_REQUEST['filter_host'])){
 		$hostid = CHost::getObjects(array('host' => $_REQUEST['filter_host']));
 		if(empty($hostid))
-			$hostid = CTemplate::getObjects(array('template' => $_REQUEST['filter_host']));
+			$hostid = CTemplate::getObjects(array('host' => $_REQUEST['filter_host']));
 
 		$hostid = reset($hostid);
 
@@ -760,7 +771,6 @@ include_once('include/page_header.php');
 
 //$items_wdgt->addPageHeader(S_CONFIGURATION_OF_ITEMS_BIG, $form);
 	show_table_header(S_CONFIGURATION_OF_ITEMS_BIG, $form);
-	echo SBR;
 
 	if(isset($_REQUEST['form'])){
 		if(str_in_array($_REQUEST['form'], array(S_CREATE_ITEM, 'update', 'clone')) ||
@@ -777,11 +787,13 @@ include_once('include/page_header.php');
 	}
 	else{
 		$logtype['log']=0;
-		$logtype['eventlog']=1;
-		$logtype['snmptraps']=2;
+		$logtype['logrt']=1;
+		$logtype['eventlog']=2;
+		$logtype['snmptraps']=3;
 		$dbkey[0]='log[%';
-		$dbkey[1]='eventlog[%';
-		$dbkey[2]='snmptraps';
+		$dbkey[1]='logrt[%';
+		$dbkey[2]='eventlog[%';
+		$dbkey[3]='snmptraps';
 
 		$show_host = true;
 
@@ -799,12 +811,12 @@ include_once('include/page_header.php');
 		$sortfield = getPageSortField('description');
 		$sortorder = getPageSortOrder();
 		$options = array(
-			'filter' => 1,
-			'extendoutput' => 1,
+			'filter' => array(),
+			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1,
-			'select_hosts' => 1,
-			'select_triggers' => 1,
-			'select_applications' => 1,
+			'select_hosts' => API_OUTPUT_EXTEND,
+			'select_triggers' => API_OUTPUT_EXTEND,
+			'select_applications' => API_OUTPUT_EXTEND,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
@@ -816,36 +828,52 @@ include_once('include/page_header.php');
 			$options['hostids'] = $hostid;
 		if(isset($_REQUEST['filter_group']) && !zbx_empty($_REQUEST['filter_group']))
 			$options['group'] = $_REQUEST['filter_group'];
+
 		if(isset($_REQUEST['filter_host']) && !zbx_empty($_REQUEST['filter_host']))
 			$options['host'] = $_REQUEST['filter_host'];
+
 		if(isset($_REQUEST['filter_application']) && !zbx_empty($_REQUEST['filter_application']))
 			$options['application'] = $_REQUEST['filter_application'];
+
 		if(isset($_REQUEST['filter_description']) && !zbx_empty($_REQUEST['filter_description']))
 			$options['pattern'] = $_REQUEST['filter_description'];
+
 		if(isset($_REQUEST['filter_type']) && !zbx_empty($_REQUEST['filter_type']) && ($_REQUEST['filter_type'] != -1))
-			$options['type'] = $_REQUEST['filter_type'];
+			$options['filter']['type'] = $_REQUEST['filter_type'];
+
 		if(isset($_REQUEST['filter_key']) && !zbx_empty($_REQUEST['filter_key']))
-			$options['key'] = $_REQUEST['filter_key'];
+			$options['patternKey'] = $_REQUEST['filter_key'];
+
 		if(isset($_REQUEST['filter_snmp_community']) && !zbx_empty($_REQUEST['filter_snmp_community']))
-			$options['snmp_community'] = $_REQUEST['filter_snmp_community'];
+			$options['filter']['snmp_community'] = $_REQUEST['filter_snmp_community'];
+
 		if(isset($_REQUEST['filter_snmp_oid']) && !zbx_empty($_REQUEST['filter_snmp_oid']))
-			$options['snmp_oid'] = $_REQUEST['filter_snmp_oid'];
+			$options['filter']['snmp_oid'] = $_REQUEST['filter_snmp_oid'];
+
 		if(isset($_REQUEST['filter_snmp_port']) && !zbx_empty($_REQUEST['filter_snmp_port']))
-			$options['snmp_port'] = $_REQUEST['filter_snmp_port'];
+			$options['filter']['snmp_port'] = $_REQUEST['filter_snmp_port'];
+
 		if(isset($_REQUEST['filter_value_type']) && !zbx_empty($_REQUEST['filter_value_type']) && $_REQUEST['filter_value_type'] != -1)
-			$options['valuetype'] = $_REQUEST['filter_value_type'];
+			$options['filter']['value_type'] = $_REQUEST['filter_value_type'];
+
 		if(isset($_REQUEST['filter_data_type']) && !zbx_empty($_REQUEST['filter_data_type']) && $_REQUEST['filter_data_type'] != -1)
-			$options['data_type'] = $_REQUEST['filter_data_type'];
+			$options['filter']['data_type'] = $_REQUEST['filter_data_type'];
+
 		if(isset($_REQUEST['filter_delay']) && !zbx_empty($_REQUEST['filter_delay']))
-			$options['delay'] = $_REQUEST['filter_delay'];
+			$options['filter']['delay'] = $_REQUEST['filter_delay'];
+
 		if(isset($_REQUEST['filter_history']) && !zbx_empty($_REQUEST['filter_history']))
-			$options['history'] = $_REQUEST['filter_history'];
+			$options['filter']['history'] = $_REQUEST['filter_history'];
+
 		if(isset($_REQUEST['filter_trends']) && !zbx_empty($_REQUEST['filter_trends']))
-			$options['trends'] = $_REQUEST['filter_trends'];
+			$options['filter']['trends'] = $_REQUEST['filter_trends'];
+
 		if(isset($_REQUEST['filter_status']) && !zbx_empty($_REQUEST['filter_status']) && $_REQUEST['filter_status'] != -1)
-			$options['status'] = $_REQUEST['filter_status'];
+			$options['filter']['status'] = $_REQUEST['filter_status'];
+
 		if(isset($_REQUEST['filter_templated_items']) && !zbx_empty($_REQUEST['filter_templated_items']) && $_REQUEST['filter_templated_items'] != -1)
 			$options['inherited'] = $_REQUEST['filter_templated_items'];
+
 		if(isset($_REQUEST['filter_with_triggers']) && !zbx_empty($_REQUEST['filter_with_triggers']) && $_REQUEST['filter_with_triggers'] != -1)
 			$options['with_triggers'] = $_REQUEST['filter_with_triggers'];
 
@@ -941,7 +969,7 @@ include_once('include/page_header.php');
 
 // Add filter form
 // !!! $items must contain all selected items with [subfilters] values !!!
-		$items_wdgt->addFlicker(get_item_filter_form($items), get_profile('web.items.filter.state', 0));
+		$items_wdgt->addFlicker(get_item_filter_form($items), CProfile::get('web.items.filter.state', 0));
 
 // Subfilter out items
 		foreach($items as $num => $item){
@@ -1070,8 +1098,8 @@ include_once('include/page_header.php');
 			}
 //-------
 
-			if(preg_match('/^(log\[.*\]|eventlog\[.*\]|snmptraps).*$/',$item['key_'],$matchkeys)){
-				preg_match('/(log|eventlog|snmptraps)/', $matchkeys[0], $matchkey);
+			if(preg_match('/^(log|logrt|eventlog|snmptraps)(\[.*\])?$/',$item['key_'],$matchkey)){
+				//preg_match('/(log|logrt|eventlog|snmptraps)/', $matchkeys[0], $matchkey);
 				$ltype = $logtype[$matchkey[1]];
 
 				$triggers_flag = false;
@@ -1149,6 +1177,7 @@ include_once('include/page_header.php');
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
+
 		zbx_add_post_js('chkbxRange.pageGoName = "group_itemid";');
 
 		$footer = get_table_header(array($goBox, $goButton));
@@ -1166,6 +1195,6 @@ include_once('include/page_header.php');
 	$jsmenu = new CPUMenu(null,200);
 	$jsmenu->InsertJavaScript();
 
-	
+
 include_once('include/page_footer.php');
 ?>

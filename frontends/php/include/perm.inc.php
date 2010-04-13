@@ -49,6 +49,10 @@ function check_authorisation(){
 
 	$user = array('sessionid'=>$sessionid);
 	if(!$auth = CUser::checkAuthentication($user)){
+		
+		include_once('include/locales/en_gb.inc.php');
+		process_locales();
+
 		include('index.php');
 		exit();
 	}
@@ -123,7 +127,6 @@ function get_user_auth($userid){
 
 	if(!zbx_empty($acc['gui_access'])){
 		$result = $acc['gui_access'];
-		$USER_DETAILS['gui_access'] = $acc['gui_access'];
 	}
 
 return $result;
@@ -164,17 +167,24 @@ return false;
  * Author: Aly
  */
 function get_user_system_auth($userid){
-	$result = ZBX_AUTH_INTERNAL;
+	$config = select_config();
+	
+	$result = get_user_auth($userid);
 
-	$user_auth = get_user_auth($userid);
-
-	switch($user_auth){
+	switch($result){
 		case GROUP_GUI_ACCESS_SYSTEM:
-			$config = select_config();
 			$result = $config['authentication_type'];
-			break;
+		break;
 		case GROUP_GUI_ACCESS_INTERNAL:
+			if($config['authentication_type'] == ZBX_AUTH_HTTP){
+				$result = ZBX_AUTH_HTTP;
+			}
+			else{
+				$result = ZBX_AUTH_INTERNAL;
+			}
+		break;
 		case GROUP_GUI_ACCESS_DISABLED:
+			$result = $config['authentication_type'];
 		default:
 			break;
 	}
@@ -206,12 +216,14 @@ return zbx_objectValues($hosts, 'hostid');
 }
 
 function available_triggers($triggerids, $editable=null){
-	$options = array();
-	$options['triggerids'] = $triggerids;
-	$options['editable'] = $editable;
-	$options['nodes'] = get_current_nodeid(true);
+	$options = array(
+		'triggerids' => $triggerids,
+		'editable' => $editable,
+		'nodes' => get_current_nodeid(true)
+	);
 
 	$triggers = CTrigger::get($options);
+
 return zbx_objectValues($triggers, 'triggerid');
 }
 
@@ -334,7 +346,7 @@ function get_accessible_groups_by_user($user_data,$perm,$perm_res=null,$nodeid=n
 	$result = array();
 
 	$userid =& $user_data['userid'];
-	if(!isset($userid)) fatal_error('Incorrect user data in "get_accessible_groups_by_user"');
+	if(!isset($userid)) fatal_error(S_INCORRECT_USER_DATA_IN.SPACE.'"get_accessible_groups_by_user"');
 	$user_type =& $user_data['type'];
 
 COpt::counter_up('perm_group['.$userid.','.$perm.','.$perm_res.','.$nodeid.']');
@@ -416,7 +428,7 @@ function get_accessible_nodes_by_user(&$user_data,$perm,$perm_res=null,$nodeid=n
 
 	$userid		=& $user_data['userid'];
 	$user_type	=& $user_data['type'];
-	if(!isset($userid)) fatal_error('Incorrect user data in "get_accessible_nodes_by_user"');
+	if(!isset($userid)) fatal_error(S_INCORRECT_USER_DATA_IN.SPACE.'"get_accessible_nodes_by_user"');
 
 
 	$nodeid_str =(is_array($nodeid))?md5(implode('',$nodeid)):strval($nodeid);

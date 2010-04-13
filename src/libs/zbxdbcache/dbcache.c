@@ -33,13 +33,7 @@
 #define	LOCK_CACHE_IDS		zbx_mutex_lock(&cache_ids_lock)
 #define	UNLOCK_CACHE_IDS	zbx_mutex_unlock(&cache_ids_lock)
 
-#define ZBX_GET_SHM_DBCACHE_KEY(smk_key)				\
-	if( -1 == (shm_key = zbx_ftok(CONFIG_FILE, (int)'c') ))		\
-	{								\
-		zbx_error("Cannot create IPC key for DB cache");	\
-		exit(1);						\
-	}
-
+static int		shm_id;
 ZBX_DC_CACHE		*cache = NULL;
 ZBX_DC_IDS		*ids = NULL;
 
@@ -683,9 +677,8 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 			TRIGGER_STATUS_ENABLED);
 
 	for (i = 0; i < history_num; i++)
-		if (0 != history[i].functions)
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32, ZBX_FS_UI64 ",",
-					history[i].itemid);
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 32, ZBX_FS_UI64 ",",
+				history[i].itemid);
 
 	if (sql[sql_offset - 1] == ',')
 	{
@@ -732,7 +725,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 
 		exp = strdup(trigger.expression);
 
-		if (SUCCEED != evaluate_expression(&exp_value, &exp, &trigger, error, sizeof(error)))
+		if (SUCCEED != evaluate_expression(&exp_value, &exp, h->clock, &trigger, error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Expression [%s] for item [" ZBX_FS_UI64 "][%s] cannot be evaluated: %s",
 					trigger.expression,
@@ -744,7 +737,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 					itemid,
 					zbx_host_key_string(itemid),
 					error);
-/*			We shouldn't update triggervalue if expressions failed */
+/*			We shouldn't update trigger value if expressions failed */
 			DBupdate_trigger_value(&trigger, TRIGGER_VALUE_UNKNOWN, h->clock, error);
 		}
 		else
@@ -757,7 +750,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCmass_update_item                                               *
+ * Function: DCmass_update_items                                              *
  *                                                                            *
  * Purpose: update items info after new value is received                     *
  *                                                                            *
@@ -769,7 +762,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
+static void	DCmass_update_items(ZBX_DC_HISTORY *history, int history_num)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -780,7 +773,7 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 	zbx_uint64_t	*ids = NULL;
 	int		ids_alloc, ids_num = 0;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In DCmass_update_item()");
+	zabbix_log( LOG_LEVEL_DEBUG, "In DCmass_update_items()");
 
 	ids_alloc = history_num;
 	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
@@ -1012,7 +1005,7 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCmass_proxy_update_item                                         *
+ * Function: DCmass_proxy_update_items                                        *
  *                                                                            *
  * Purpose: update items info after new value is received                     *
  *                                                                            *
@@ -1024,14 +1017,14 @@ static void	DCmass_update_item(ZBX_DC_HISTORY *history, int history_num)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	DCmass_proxy_update_item(ZBX_DC_HISTORY *history, int history_num)
+static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 {
 	int		sql_offset = 0, i, j;
 	zbx_uint64_t	*ids = NULL;
 	int		ids_alloc, ids_num = 0;
 	int		lastlogsize, mtime;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCmass_proxy_update_item()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In DCmass_proxy_update_items()");
 
 	ids_alloc = history_num;
 	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
@@ -1079,134 +1072,6 @@ static void	DCmass_proxy_update_item(ZBX_DC_HISTORY *history, int history_num)
 #endif
 
 	zbx_free(ids);
-
-	if (sql_offset > 16) /* In ORACLE always present begin..end; */
-		DBexecute("%s", sql);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DCmass_function_update                                           *
- *                                                                            *
- * Purpose: update functions lastvalue after new value is received            *
- *                                                                            *
- * Parameters: history - array of history data                                *
- *             history_num - number of history structures                     *
- *                                                                            *
- * Author: Alexei Vladishev, Aleksander Vladishev                             *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static void DCmass_function_update(ZBX_DC_HISTORY *history, int history_num)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	DB_FUNCTION	function;
-	DB_ITEM		item;
-	ZBX_DC_HISTORY	*h;
-	char		*lastvalue;
-	char		value[MAX_STRING_LEN], *value_esc, *function_esc, *parameter_esc;
-	int		sql_offset = 0, i;
-	zbx_uint64_t	*ids = NULL;
-	int		ids_alloc, ids_num = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCmass_function_update()");
-
-	ids_alloc = history_num;
-	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
-
-	for (i = 0; i < history_num; i++)
-	{
-		history[i].functions = 0;
-		if (0 == history[i].value_null)
-			uint64_array_add(&ids, &ids_alloc, &ids_num, history[i].itemid, 64);
-	}
-
-	if (0 == ids_num)
-	{
-		zbx_free(ids);
-		return;
-	}
-
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 1024,
-			"select distinct %s,f.function,f.parameter,f.itemid,f.lastvalue from %s,functions f,triggers t"
-			" where f.itemid=i.itemid and h.hostid=i.hostid and f.triggerid=t.triggerid and t.status in (%d)"
-			" and",
-			ZBX_SQL_ITEM_FIELDS,
-			ZBX_SQL_ITEM_TABLES,
-			TRIGGER_STATUS_ENABLED);
-
-	DBadd_condition_alloc(&sql, &sql_allocated, &sql_offset, "f.itemid", ids, ids_num);
-
-	zbx_free(ids);
-
-	result = DBselect("%s", sql);
-
-	sql_offset = 0;
-
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
-#endif
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		DBget_item_from_db(&item, row);
-
-		h = NULL;
-
-		for (i = 0; i < history_num; i++)
-		{
-			if (item.itemid == history[i].itemid)
-			{
-				h = &history[i];
-				break;
-			}
-		}
-
-		if (NULL == h)
-			continue;
-
-		h->functions		= 1;
-
-		function.function	= row[ZBX_SQL_ITEM_FIELDS_NUM];
-		function.parameter	= row[ZBX_SQL_ITEM_FIELDS_NUM + 1];
-		ZBX_STR2UINT64(function.itemid, row[ZBX_SQL_ITEM_FIELDS_NUM + 2]);
-/*		It is not required to check lastvalue for NULL here */
-		lastvalue		= row[ZBX_SQL_ITEM_FIELDS_NUM + 3];
-
-		if (FAIL == evaluate_function(value, &item, function.function, function.parameter, h->clock))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Evaluation failed for function:%s",
-					function.function);
-			continue;
-		}
-
-		/* Update only if lastvalue differs from new one */
-		if (DBis_null(lastvalue) == SUCCEED || strcmp(lastvalue, value) != 0)
-		{
-			value_esc = DBdyn_escape_string_len(value, FUNCTION_LASTVALUE_LEN);
-			function_esc = DBdyn_escape_string(function.function);
-			parameter_esc = DBdyn_escape_string(function.parameter);
-
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 1280,
-					"update functions set lastvalue='%s' where itemid=" ZBX_FS_UI64
-					" and function='%s' and parameter='%s';\n",
-					value_esc,
-					function.itemid,
-					function_esc,
-					parameter_esc);
-
-			zbx_free(parameter_esc);
-			zbx_free(function_esc);
-			zbx_free(value_esc);
-		}
-	}
-	DBfree_result(result);
-
-#ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
-#endif
 
 	if (sql_offset > 16) /* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
@@ -2024,16 +1889,15 @@ int	DCsync_history(int sync_type)
 
 		if (zbx_process == ZBX_PROCESS_SERVER)
 		{
-			DCmass_update_item(history, history_num);
+			DCmass_update_items(history, history_num);
 			DCmass_add_history(history, history_num);
-			DCmass_function_update(history, history_num);
 			DCmass_update_triggers(history, history_num);
 			DCmass_update_trends(history, history_num);
 		}
 		else
 		{
 			DCmass_proxy_add_history(history, history_num);
-			DCmass_proxy_update_item(history, history_num);
+			DCmass_proxy_update_items(history, history_num);
 		}
 
 		DBcommit();
@@ -2076,7 +1940,7 @@ int	DCsync_history(int sync_type)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alekasander Vladishev                                              *
+ * Author: Aleksander Vladishev                                               *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -2124,7 +1988,8 @@ static void DCvacuum_text()
 			}
 		}
 		cache->last_text -= offset;
-	} else
+	}
+	else
 		cache->last_text = cache->text;
 }
 
@@ -2166,7 +2031,7 @@ retry:
 	{
 		if (text_len > CONFIG_TEXT_CACHE_SIZE)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "Insufficient shared memory");
+			zabbix_log(LOG_LEVEL_ERR, "Insufficient shared memory for text cache");
 			exit(-1);
 		}
 
@@ -2306,7 +2171,7 @@ void	DCadd_history_str(zbx_uint64_t itemid, char *value_orig, int clock)
 	history->clock			= clock;
 	history->value_type		= ITEM_VALUE_TYPE_STR;
 	history->value_orig.value_str	= cache->last_text;
-	history->value.value_str	= cache->last_text;
+	history->value.value_str	= NULL;
 	zbx_strlcpy(cache->last_text, value_orig, len);
 	history->value_null		= 0;
 	cache->last_text		+= len;
@@ -2349,7 +2214,7 @@ void	DCadd_history_text(zbx_uint64_t itemid, char *value_orig, int clock)
 	history->clock			= clock;
 	history->value_type		= ITEM_VALUE_TYPE_TEXT;
 	history->value_orig.value_str	= cache->last_text;
-	history->value.value_str	= cache->last_text;
+	history->value.value_str	= NULL;
 	zbx_strlcpy(cache->last_text, value_orig, len);
 	history->value_null		= 0;
 	cache->last_text		+= len;
@@ -2395,13 +2260,14 @@ void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, int tim
 	history->clock			= clock;
 	history->value_type		= ITEM_VALUE_TYPE_LOG;
 	history->value_orig.value_str	= cache->last_text;
-	history->value.value_str	= cache->last_text;
+	history->value.value_str	= NULL;
 	zbx_strlcpy(cache->last_text, value_orig, len1);
 	history->value_null		= 0;
 	cache->last_text		+= len1;
 	history->timestamp		= timestamp;
 
-	if (0 != len2) {
+	if (0 != len2)
+	{
 		history->source		= cache->last_text;
 		zbx_strlcpy(cache->last_text, source, len2);
 		cache->last_text	+= len2;
@@ -2432,7 +2298,7 @@ void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, int tim
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -2440,13 +2306,16 @@ void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, int tim
 void	init_database_cache(zbx_process_t p)
 {
 	key_t	shm_key;
-	int	shm_id;
 	size_t	sz;
 	void	*ptr;
 
 	zbx_process = p;
 
-	ZBX_GET_SHM_DBCACHE_KEY(shm_key);
+	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, (int)'c')))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Can't create IPC key for database cache");
+		exit(FAIL);
+	}
 
 	ZBX_HISTORY_SIZE = CONFIG_HISTORY_CACHE_SIZE / sizeof(ZBX_DC_HISTORY);
 	ZBX_TREND_SIZE = CONFIG_TRENDS_CACHE_SIZE / sizeof(ZBX_DC_TREND);
@@ -2461,27 +2330,28 @@ void	init_database_cache(zbx_process_t p)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In init_database_cache() size:%d", (int)sz);
 
-	if ( -1 == (shm_id = zbx_shmget(shm_key, sz)))
+	if (-1 == (shm_id = zbx_shmget(shm_key, sz)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Can't allocate shared memory for database cache.");
-		exit(1);
+		zabbix_log(LOG_LEVEL_CRIT, "Can't allocate shared memory for database cache");
+		exit(FAIL);
 	}
 
 	ptr = shmat(shm_id, 0, 0);
 
 	if ((void*)(-1) == ptr)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Can't attach shared memory for database cache. [%s]",strerror(errno));
+		zabbix_log(LOG_LEVEL_CRIT, "Can't attach shared memory for database cache. [%s]",
+				strerror(errno));
 		exit(FAIL);
 	}
 
-	if(ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cache_lock, ZBX_MUTEX_CACHE))
+	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cache_lock, ZBX_MUTEX_CACHE))
 	{
 		zbx_error("Unable to create mutex for database cache");
 		exit(FAIL);
 	}
 
-	if(ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cache_ids_lock, ZBX_MUTEX_CACHE_IDS))
+	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cache_ids_lock, ZBX_MUTEX_CACHE_IDS))
 	{
 		zbx_error("Unable to create mutex for database cache");
 		exit(FAIL);
@@ -2546,38 +2416,28 @@ static void	DCsync_all()
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	free_database_cache()
 {
-	key_t	shm_key;
-	int	shm_id;
-	size_t	sz;
+	const char	*__function_name = "free_database_cache";
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In free_database_cache()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	DCsync_all();
 
 	LOCK_CACHE;
 	LOCK_CACHE_IDS;
 
-	ZBX_GET_SHM_DBCACHE_KEY(shm_key);
-
-	sz = sizeof(ZBX_DC_IDS);
-	sz += sizeof(ZBX_DC_CACHE);
-
-	shm_id = shmget(shm_key, sz, 0);
-
-	if (-1 == shm_id)
+	if (-1 == shmctl(shm_id, IPC_RMID, 0))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Can't find shared memory for database cache. [%s]",strerror(errno));
-		exit(1);
+		zabbix_log(LOG_LEVEL_WARNING, "Can't remove shared memory"
+				" for database cache. [%s]",
+				strerror(errno));
 	}
-
-	shmctl(shm_id, IPC_RMID, 0);
 
 	cache = NULL;
 
@@ -2587,7 +2447,7 @@ void	free_database_cache()
 	zbx_mutex_destroy(&cache_lock);
 	zbx_mutex_destroy(&cache_ids_lock);
 
-	zabbix_log(LOG_LEVEL_DEBUG,"End of free_database_cache()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -2641,7 +2501,7 @@ zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int nu
 
 	if (i == ZBX_IDS_SIZE)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Insufficient shared memory");
+		zabbix_log(LOG_LEVEL_ERR, "Insufficient shared memory for ids");
 		exit(-1);
 	}
 
@@ -2696,7 +2556,7 @@ zbx_uint64_t	DCget_nextid(const char *table_name, const char *field_name, int nu
  *                                                                            *
  * Return value: last clock or FAIL if item not found in dbcache              *
  *                                                                            *
- * Author: Alekasander Vladishev                                              *
+ * Author: Aleksander Vladishev                                               *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -2705,7 +2565,7 @@ int	DCget_item_lastclock(zbx_uint64_t itemid)
 {
 	int	i, index;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCvacuum_text()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In DCget_item_lastclock()");
 
 	LOCK_CACHE;
 

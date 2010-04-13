@@ -66,11 +66,11 @@
 
 		$auditid = get_dbid('auditlog','auditid');
 
-		if(strlen($details) > 128)
+		if(zbx_strlen($details) > 128)
 			$details = substr($details, 0, 125).'...';
 
 		$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];
-		
+
 		if(($result = DBexecute('INSERT INTO auditlog (auditid,userid,clock,action,resourcetype,details,ip) '.
 			' VALUES ('.$auditid.','.$USER_DETAILS['userid'].','.time().','.
 						$action.','.$resourcetype.','.zbx_dbstr($details).','.
@@ -101,7 +101,7 @@
 
 		$auditid = get_dbid('auditlog', 'auditid');
 
-		if (strlen($resourcename) > 255)
+		if (zbx_strlen($resourcename) > 255)
 			$details = substr($resourcename, 0, 252).'...';
 
 		$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];

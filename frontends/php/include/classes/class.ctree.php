@@ -133,7 +133,7 @@ class CTree{
 		$tr = new CRow();
 		$td = new CCol();
 
-		$count=(isset($this->tree[$id]['nodeimg']))?(strlen($this->tree[$id]['nodeimg'])):(0);
+		$count=(isset($this->tree[$id]['nodeimg']))?(zbx_strlen($this->tree[$id]['nodeimg'])):(0);
 		for($i=0; $i<$count; $i++){
 			switch($this->tree[$id]['nodeimg'][$i]){
 				case 'O':
@@ -154,7 +154,7 @@ class CTree{
 					if($this->tree[$id]['nodetype'] == 2){
 						$img= new CImg('images/general/tree/plus.gif','y','22','14');
 						$img->setAttribute('onclick','javascript: '.
-												$this->treename.'.closeSNodeX('.$id.',this);'.
+												$this->treename.'.closeSNodeX("'.$id.'",this);'.
 												" showPopupDiv('div_node_tree','select_iframe');"); // IE6 Fix
 
 						$img->setAttribute('id','idi_'.$id);
@@ -173,7 +173,7 @@ class CTree{
 						$img= new CImg('images/general/tree/plus.gif','t','22','14');
 
 						$img->setAttribute('onclick','javascript: '.
-												$this->treename.'.closeSNodeX('.$id.',this);'.
+												$this->treename.'.closeSNodeX("'.$id.'",this);'.
 												" showPopupDiv('div_node_tree','select_iframe');");	// IE6 Fix
 
 						$img->setAttribute('id','idi_'.$id);
@@ -227,7 +227,7 @@ class CTree{
 
 		foreach($this->tree as $id => $rows){
 			if($rows['nodetype'] == '2'){
-				$js .= $this->treename.'_tree['.$id.'] = { status: \'close\',  nodelist : \''.$rows['nodelist'].'\', parentid : \''.$rows['parentid'].'\'};';
+				$js .= $this->treename.'_tree[\''.$id.'\'] = { status: \'close\',  nodelist : \''.$rows['nodelist'].'\', parentid : \''.$rows['parentid'].'\'};';
 				$js .= "\n";
 			}
 		}
@@ -236,7 +236,6 @@ class CTree{
 		$js.= '</script>'."\n";
 
 		zbx_add_post_js($this->treename.' = new CTree("tree_'.$this->getUserAlias().'_'.$this->treename.'", '.$this->treename.'_tree);');
-
 	return new CJSscript($js);
 	}
 

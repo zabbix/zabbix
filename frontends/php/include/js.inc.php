@@ -14,14 +14,16 @@ function zbx_jsvalue($value, $object = null){
 		if(is_object($value)) return unpack_object($value);
 		if(is_string($value)) return '\''.str_replace('\'','\\\'',			/*  '	=> \'	*/
 							str_replace("\n", '\n', 		/*  LF	=> \n	*/
-								str_replace("\\", "\\\\", 	/*  \	=> \\	*/
-									str_replace("\r", '', 	/*  CR	=> remove */
-										($value))))).'\'';
+								str_replace('"', '\"', 	/*  "	=> \" */
+									str_replace("\\", "\\\\", 	/*  \	=> \\	*/
+										str_replace("\r", '', 	/*  CR	=> remove */
+										($value)))))).'\'';
 		if(is_null($value)) return 'null';
 	return strval($value);
 	}
 
-	if(count($value) == 0) return '[]';
+	if(count($value) == 0) return ($object)?'{}':'[]';
+
 
 	foreach($value as $id => $v){
 		if((!isset($is_object) && is_string($id)) || $object) $is_object = true;
@@ -95,7 +97,7 @@ function inseret_javascript_for_editable_combobox(){
 
 		opt = document.createElement("option");
 		opt.value = -1;
-		opt.text = "(other ...)";
+		opt.text = "('.S_OTHER_SMALL.' ...)";
 
 		if(!obj.options.add)
 			obj.insertBefore(opt, obj.options.item(0));
@@ -205,7 +207,8 @@ function insert_javascript_for_tweenbox(){
 	if(defined('SHOW_TWINBOX_SCRIPT_INSERTTED') || (PAGE_TYPE_HTML != $page['type'])) return;
 	define('SHOW_TWINBOX_SCRIPT_INSERTTED', 1);
 
-	$js = 'function moveListBoxSelectedItem(formname,objname,from,to,action){
+	$js = '
+		function moveListBoxSelectedItem(formname,objname,from,to,action){
 			var result = true
 
 			from = $(from);
@@ -215,7 +218,7 @@ function insert_javascript_for_tweenbox(){
 			var i = 0;
 			while(i<from.options.length){
 
-				if(from.options[i].selected == true) {
+				if((from.options[i].selected == true) && from.options[i].disabled != true) {
 					//	from.options[i].selected = false;
 
 					var temp = from.options[i].cloneNode(true);
@@ -255,6 +258,7 @@ function insert_javascript_for_tweenbox(){
 		}';
 
 	insert_js($js);
+	zbx_add_post_js('if(IE6 || IE7 ) $$("select option[disabled]").each(function(e){e.setStyle({color: "gray"});});');
 }
 
 function insert_javascript_for_visibilitybox(){
@@ -268,7 +272,7 @@ function insert_javascript_for_visibilitybox(){
 				obj = new Array(document.getElementById(obj_name));
 			}
 
-			if((obj.length <= 0) || is_null(obj[0])) throw "Can not find objects with name [" + obj_name +"]";
+			if((obj.length <= 0) || is_null(obj[0])) throw "'.S_CANNOT_FIND_OBJECTS_WITH_NAME.' [" + obj_name +"]";
 
 			for(i = obj.length-1; i>=0; i--){
 				if(replace_to && replace_to != ""){
@@ -284,7 +288,7 @@ function insert_javascript_for_visibilitybox(){
 							new_obj.setAttribute("id",obj[i].id);
 						}
 						catch(e){
-							throw "Can not create new element";
+							throw "'.S_CANNOT_CREATE_NEW_ELEMENT.'";
 						}
 
 						new_obj.style.textDecoration = "none";
@@ -513,44 +517,50 @@ function insert_js_function($fnct_name){
 				return true;
 			}');
 		break;
-		case 'add_selected_values':
+		case 'addSelectedValues':
 			insert_js('
-				function add_selected_values(objname, formname, dstfld, dstact, value) {
-					value = typeof(value) != "undefined" ? value : null;
-					dstact = ((typeof(dstact) != "undefined") && dstact) ? dstact : null;
+				function addSelectedValues(form, object){
+					form = $(form);
+					if(is_null(form)) return close_window();
 
-					var parent_document = window.opener.document;
+					var parent = window.opener;
+					if(!parent) return close_window();
 
-					if(!parent_document) return close_window();
+					var items = { "object": object, "values": new Array() };
 
-					if(is_null(value)) {
-						$(objname).getInputs("checkbox").each(
-							function(e){
-								if(e.checked && e.name != "check"){
-									add_variable("input", dstfld, e.value, formname, parent_document);
-								}
-							});
-					}
-					else {
-						add_variable("input", dstfld, value, formname, parent_document);
+					var chkBoxes = form.getInputs("checkbox");
+					for(var i=0; i < chkBoxes.length; i++){
+						if(chkBoxes[i].checked && (chkBoxes[i].name.indexOf("all_") < 0)){
+							items["values"].push(chkBoxes[i].value);
+						}
 					}
 
-					if(dstact)
-						add_variable("input", dstact, 1, formname, parent_document);
-
-					parent_document.forms[formname].submit();
+					parent.addPopupValues(items);
 					close_window();
 				}');
 		break;
-		case 'add_value':
+		case 'addValue':
 			insert_js('
-				function add_value(dstfld1, dstfld2, value1, value2) {
-					var parent_document = window.opener.document;
+				function addValue(object, singleValue) {
+					var parent = window.opener;
+					if(!parent) return close_window();
 
+					var items = { "object": object, "values": new Array(singleValue) };
+
+					parent.addPopupValues(items);
+					close_window();
+				}');
+		break;
+		case 'addValues':
+			insert_js('
+				function addValues(frame, values) {
+					var parent_document = window.opener.document;
 					if(!parent_document) return close_window();
 
-					parent_document.getElementById(dstfld1).value = value1;
-					parent_document.getElementById(dstfld2).value = value2;
+					for(var key in values){
+						if(is_null(values[key])) continue;
+						parent_document.getElementById(key).value = values[key];
+					}
 
 					close_window();
 				}');
@@ -562,6 +572,7 @@ function insert_js_function($fnct_name){
 				}');
 		break;
 		default:
+			insert_js('throw("JS function not found ['.$fnct_name.']");');
 			break;
 	}
 };

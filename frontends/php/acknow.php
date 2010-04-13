@@ -53,7 +53,7 @@ include_once('include/page_header.php');
 
 	if(isset($_REQUEST['cancel'])){
 		$last_page = $USER_DETAILS['last_page'];
-		$url = $last_page ? new CUrl($last_page['url']) : new CUrl('tr_status.php?hostid='.get_profile('web.tr_status.hostid', 0));
+		$url = $last_page ? new CUrl($last_page['url']) : new CUrl('tr_status.php?hostid='.CProfile::get('web.tr_status.hostid', 0));
 		redirect($url->getUrl());
 		exit;
 	}
@@ -66,10 +66,12 @@ include_once('include/page_header.php');
 	$bulk = !isset($_REQUEST['eventid']);
 ?>
 <?php
-
-
 	if(!$bulk){
-		$options = array('extendoutput' => 1, 'select_triggers' => 1, 'eventids' => $_REQUEST['eventid']);
+		$options = array(
+			'extendoutput' => 1,
+			'select_triggers' => 1,
+			'eventids' => $_REQUEST['eventid']
+		);
 		$events = CEvent::get($options);
 		$event = reset($events);
 		$event_trigger = reset($event['triggers']);
@@ -83,9 +85,20 @@ include_once('include/page_header.php');
 			$_REQUEST['message'] .= ($_REQUEST['message'] == '' ? '' : "\n\r") . S_SYS_BULK_ACKNOWLEDGE;
 		}
 
+		if(isset($_REQUEST['events'])){
+			$_REQUEST['events'] = zbx_toObject($_REQUEST['events'], 'eventid');
+		}
+		else if(isset($_REQUEST['triggers'])){
+			$options = array(
+				'output' => API_OUTPUT_SHORTEN,
+				'acknowledged' => 0,
+				'triggerids' => $_REQUEST['triggers']
+			);
+			$_REQUEST['events'] = CEvent::get($options);
+		}
+
 		$events_data = array(
-			'events' => zbx_toObject($_REQUEST['events'], 'eventid'),
-			'triggers' => zbx_toObject($_REQUEST['triggers'], 'triggerid'),
+			'events' => $_REQUEST['events'],
 			'message' => $_REQUEST['message']);
 		$result = CEvent::acknowledge($events_data);
 
@@ -101,7 +114,7 @@ include_once('include/page_header.php');
 			$last_page = $USER_DETAILS['last_page'];
 
 			if(!$last_page){
-				$url = new CUrl('tr_status.php?hostid='.get_profile('web.tr_status.hostid', 0));
+				$url = new CUrl('tr_status.php?hostid='.CProfile::get('web.tr_status.hostid', 0));
 			}
 			else{
 				$url = new CUrl($last_page['url']);

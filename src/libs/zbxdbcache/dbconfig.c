@@ -26,15 +26,10 @@
 #include "ipc.h"
 #include "mutexs.h"
 
+static int	shm_id;
+
 #define	LOCK_CACHE	zbx_mutex_lock(&config_lock)
 #define	UNLOCK_CACHE	zbx_mutex_unlock(&config_lock)
-
-#define ZBX_GET_SHM_DBCONFIG_KEY(smk_key)				\
-	if( -1 == (shm_key = zbx_ftok(CONFIG_FILE, (int)'k') ))		\
-	{								\
-		zbx_error("Cannot create IPC key for DB configuration cache");	\
-		exit(1);						\
-	}
 
 /* *_ALLOC_STEP >= 1 */
 #define HOST_ALLOC_STEP 	16
@@ -48,6 +43,7 @@
 #define DBITEM_ALLOC_STEP	64
 #define SSHITEM_ALLOC_STEP	64
 #define TELNETITEM_ALLOC_STEP	64
+#define CALCITEM_ALLOC_STEP	64
 
 #define ZBX_DC_CONFIG struct zbx_dc_config
 #define ZBX_DC_HOST struct zbx_dc_host
@@ -61,6 +57,7 @@
 #define ZBX_DC_DBITEM struct zbx_dc_dbitem
 #define ZBX_DC_SSHITEM struct zbx_dc_sshitem
 #define ZBX_DC_TELNETITEM struct zbx_dc_telnetitem
+#define ZBX_DC_CALCITEM struct zbx_dc_calcitem
 
 ZBX_DC_ITEM
 {
@@ -138,6 +135,12 @@ ZBX_DC_TELNETITEM
 	char		params[ITEM_PARAMS_LEN_MAX];
 };
 
+ZBX_DC_CALCITEM
+{
+	zbx_uint64_t	itemid;
+	char		params[ITEM_PARAMS_LEN_MAX];
+};
+
 ZBX_DC_HOST
 {
 	zbx_uint64_t	hostid;
@@ -181,11 +184,11 @@ ZBX_DC_CONFIG
 	int		items_alloc, snmpitems_alloc, ipmiitems_alloc,
 			flexitems_alloc, trapitems_alloc, logitems_alloc,
 			dbitems_alloc, sshitems_alloc, telnetitems_alloc,
-			hosts_alloc, ipmihosts_alloc;
+			calcitems_alloc, hosts_alloc, ipmihosts_alloc;
 	int		items_num, snmpitems_num, ipmiitems_num,
 			flexitems_num, trapitems_num, logitems_num,
 			dbitems_num, sshitems_num, telnetitems_num,
-			hosts_num, ipmihosts_num;
+			calcitems_num, hosts_num, ipmihosts_num;
 	int		idxitem01_alloc, idxitem02_alloc,
 			idxhost01_alloc, idxhost02_alloc;
 	int		idxitem01_num, idxitem02_num,
@@ -199,6 +202,7 @@ ZBX_DC_CONFIG
 	ZBX_DC_DBITEM	*dbitems;
 	ZBX_DC_SSHITEM	*sshitems;
 	ZBX_DC_TELNETITEM	*telnetitems;
+	ZBX_DC_CALCITEM	*calcitems;
 	int		*idxitem01;	/* hostid,key */
 	int		*idxitem02;	/* poller_type,poller_num,nextcheck */
 	ZBX_DC_HOST	*hosts;
@@ -220,7 +224,9 @@ static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t hostid, zbx_uint64_
 {
 	char	*p;
 
-	if (0 != proxy_hostid)
+	if (0 != proxy_hostid && (ITEM_TYPE_INTERNAL != item_type &&
+				ITEM_TYPE_AGGREGATE != item_type &&
+				ITEM_TYPE_CALCULATED != item_type))
 	{
 		*poller_type = (unsigned char)255;
 		*poller_num = (unsigned char)255;
@@ -258,6 +264,7 @@ static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t hostid, zbx_uint64_
 	case ITEM_TYPE_DB_MONITOR:
 	case ITEM_TYPE_SSH:
 	case ITEM_TYPE_TELNET:
+	case ITEM_TYPE_CALCULATED:
 		if (0 == CONFIG_POLLER_FORKS)
 			break;
 		*poller_type = (unsigned char)ZBX_POLLER_TYPE_NORMAL;
@@ -472,7 +479,7 @@ static void	DCcheck_freemem(size_t sz)
 {
 	if (config->free_mem < sz)
 	{
-		zbx_error("Configuration buffer is too small. Please increase CacheSize parameter.");
+		zbx_error("ERROR: Configuration buffer is too small. Please increase CacheSize parameter.");
 		exit(FAIL);
 	}
 }
@@ -859,6 +866,10 @@ static void	DCallocate_item(int index)
 		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
 		config->idxitem01 = (int *)dst;
 
+		dst = (void *)config->calcitems + sz;
+		memmove(dst, config->calcitems, sizeof(ZBX_DC_CALCITEM) * config->calcitems_num);
+		config->calcitems = (ZBX_DC_CALCITEM *)dst;
+
 		dst = (void *)config->telnetitems + sz;
 		memmove(dst, config->telnetitems, sizeof(ZBX_DC_TELNETITEM) * config->telnetitems_num);
 		config->telnetitems = (ZBX_DC_TELNETITEM *)dst;
@@ -946,6 +957,10 @@ static void	DCallocate_snmpitem(int index)
 		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
 		config->idxitem01 = (int *)dst;
 
+		dst = (void *)config->calcitems + sz;
+		memmove(dst, config->calcitems, sizeof(ZBX_DC_CALCITEM) * config->calcitems_num);
+		config->calcitems = (ZBX_DC_CALCITEM *)dst;
+
 		dst = (void *)config->telnetitems + sz;
 		memmove(dst, config->telnetitems, sizeof(ZBX_DC_TELNETITEM) * config->telnetitems_num);
 		config->telnetitems = (ZBX_DC_TELNETITEM *)dst;
@@ -1018,6 +1033,10 @@ static void	DCallocate_ipmiitem(int index)
 		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
 		config->idxitem01 = (int *)dst;
 
+		dst = (void *)config->calcitems + sz;
+		memmove(dst, config->calcitems, sizeof(ZBX_DC_CALCITEM) * config->calcitems_num);
+		config->calcitems = (ZBX_DC_CALCITEM *)dst;
+
 		dst = (void *)config->telnetitems + sz;
 		memmove(dst, config->telnetitems, sizeof(ZBX_DC_TELNETITEM) * config->telnetitems_num);
 		config->telnetitems = (ZBX_DC_TELNETITEM *)dst;
@@ -1086,6 +1105,10 @@ static void	DCallocate_flexitem(int index)
 		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
 		config->idxitem01 = (int *)dst;
 
+		dst = (void *)config->calcitems + sz;
+		memmove(dst, config->calcitems, sizeof(ZBX_DC_CALCITEM) * config->calcitems_num);
+		config->calcitems = (ZBX_DC_CALCITEM *)dst;
+
 		dst = (void *)config->telnetitems + sz;
 		memmove(dst, config->telnetitems, sizeof(ZBX_DC_TELNETITEM) * config->telnetitems_num);
 		config->telnetitems = (ZBX_DC_TELNETITEM *)dst;
@@ -1150,6 +1173,10 @@ static void	DCallocate_trapitem(int index)
 		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
 		config->idxitem01 = (int *)dst;
 
+		dst = (void *)config->calcitems + sz;
+		memmove(dst, config->calcitems, sizeof(ZBX_DC_CALCITEM) * config->calcitems_num);
+		config->calcitems = (ZBX_DC_CALCITEM *)dst;
+
 		dst = (void *)config->telnetitems + sz;
 		memmove(dst, config->telnetitems, sizeof(ZBX_DC_TELNETITEM) * config->telnetitems_num);
 		config->telnetitems = (ZBX_DC_TELNETITEM *)dst;
@@ -1210,6 +1237,10 @@ static void	DCallocate_logitem(int index)
 		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
 		config->idxitem01 = (int *)dst;
 
+		dst = (void *)config->calcitems + sz;
+		memmove(dst, config->calcitems, sizeof(ZBX_DC_CALCITEM) * config->calcitems_num);
+		config->calcitems = (ZBX_DC_CALCITEM *)dst;
+
 		dst = (void *)config->telnetitems + sz;
 		memmove(dst, config->telnetitems, sizeof(ZBX_DC_TELNETITEM) * config->telnetitems_num);
 		config->telnetitems = (ZBX_DC_TELNETITEM *)dst;
@@ -1222,6 +1253,7 @@ static void	DCallocate_logitem(int index)
 		memmove(dst, config->dbitems, sizeof(ZBX_DC_DBITEM) * config->dbitems_num);
 		config->dbitems = (ZBX_DC_DBITEM *)dst;
 
+		config->logitems_alloc += LOGITEM_ALLOC_STEP;
 		config->free_mem -= sz;
 	}
 
@@ -1264,6 +1296,10 @@ static void	DCallocate_dbitem(int index)
 		dst = (void *)config->idxitem01 + sz;
 		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
 		config->idxitem01 = (int *)dst;
+
+		dst = (void *)config->calcitems + sz;
+		memmove(dst, config->calcitems, sizeof(ZBX_DC_CALCITEM) * config->calcitems_num);
+		config->calcitems = (ZBX_DC_CALCITEM *)dst;
 
 		dst = (void *)config->telnetitems + sz;
 		memmove(dst, config->telnetitems, sizeof(ZBX_DC_TELNETITEM) * config->telnetitems_num);
@@ -1317,6 +1353,10 @@ static void	DCallocate_sshitem(int index)
 		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
 		config->idxitem01 = (int *)dst;
 
+		dst = (void *)config->calcitems + sz;
+		memmove(dst, config->calcitems, sizeof(ZBX_DC_CALCITEM) * config->calcitems_num);
+		config->calcitems = (ZBX_DC_CALCITEM *)dst;
+
 		dst = (void *)config->telnetitems + sz;
 		memmove(dst, config->telnetitems, sizeof(ZBX_DC_TELNETITEM) * config->telnetitems_num);
 		config->telnetitems = (ZBX_DC_TELNETITEM *)dst;
@@ -1365,6 +1405,10 @@ static void	DCallocate_telnetitem(int index)
 		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
 		config->idxitem01 = (int *)dst;
 
+		dst = (void *)config->calcitems + sz;
+		memmove(dst, config->calcitems, sizeof(ZBX_DC_CALCITEM) * config->calcitems_num);
+		config->calcitems = (ZBX_DC_CALCITEM *)dst;
+
 		config->telnetitems_alloc += TELNETITEM_ALLOC_STEP;
 		config->free_mem -= sz;
 	}
@@ -1372,6 +1416,50 @@ static void	DCallocate_telnetitem(int index)
 	if (0 != (sz = sizeof(ZBX_DC_TELNETITEM) * (config->telnetitems_num - index)))
 		memmove(&config->telnetitems[index + 1], &config->telnetitems[index], sz);
 	config->telnetitems_num++;
+}
+
+static void	DCallocate_calcitem(int index)
+{
+	size_t	sz;
+	void	*dst;
+
+	if (config->calcitems_num == config->calcitems_alloc)
+	{
+		sz = sizeof(ZBX_DC_CALCITEM) * CALCITEM_ALLOC_STEP;
+
+		DCcheck_freemem(sz);
+
+		dst = (void *)config->idxhost02 + sz;
+		memmove(dst, config->idxhost02, sizeof(int) * config->idxhost02_num);
+		config->idxhost02 = (int *)dst;
+
+		dst = (void *)config->idxhost01 + sz;
+		memmove(dst, config->idxhost01, sizeof(int) * config->idxhost01_num);
+		config->idxhost01 = (int *)dst;
+
+		dst = (void *)config->ipmihosts + sz;
+		memmove(dst, config->ipmihosts, sizeof(ZBX_DC_IPMIHOST) * config->ipmihosts_num);
+		config->ipmihosts = (ZBX_DC_IPMIHOST *)dst;
+
+		dst = (void *)config->hosts + sz;
+		memmove(dst, config->hosts, sizeof(ZBX_DC_HOST) * config->hosts_num);
+		config->hosts = (ZBX_DC_HOST *)dst;
+
+		dst = (void *)config->idxitem02 + sz;
+		memmove(dst, config->idxitem02, sizeof(int) * config->idxitem02_num);
+		config->idxitem02 = (int *)dst;
+
+		dst = (void *)config->idxitem01 + sz;
+		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
+		config->idxitem01 = (int *)dst;
+
+		config->calcitems_alloc += CALCITEM_ALLOC_STEP;
+		config->free_mem -= sz;
+	}
+
+	if (0 != (sz = sizeof(ZBX_DC_CALCITEM) * (config->calcitems_num - index)))
+		memmove(&config->calcitems[index + 1], &config->calcitems[index], sz);
+	config->calcitems_num++;
 }
 
 static void	DCallocate_host(int index)
@@ -1463,7 +1551,6 @@ static void	DCremove_item(int index)
 	/* update records in 'idxitem02' index */
 	for (i = 0; i < config->idxitem02_num; i++)
 		if (config->idxitem02[i] > index)
-		if (config->idxitem02[i] > index)
 			config->idxitem02[i]--;
 
 	/* remove record */
@@ -1508,6 +1595,7 @@ static void	DCsync_items()
 	ZBX_DC_DBITEM	*dbitem;
 	ZBX_DC_SSHITEM	*sshitem;
 	ZBX_DC_TELNETITEM	*telnetitem;
+	ZBX_DC_CALCITEM	*calcitem;
 	zbx_uint64_t	itemid, hostid, proxy_hostid;
 	int		i, new, delay, nextcheck;
 	unsigned char	poller_type, poller_num, type, status;
@@ -1723,7 +1811,7 @@ static void	DCsync_items()
 		}
 
 		/* db items */
-		i = get_nearestindex(config->dbitems, sizeof(ZBX_DC_LOGITEM),
+		i = get_nearestindex(config->dbitems, sizeof(ZBX_DC_DBITEM),
 				config->dbitems_num, itemid);
 
 		if (ITEM_TYPE_DB_MONITOR == item->type && SUCCEED != DBis_null(row[19]) && '\0' != *row[19])
@@ -1791,6 +1879,27 @@ static void	DCsync_items()
 			if (i < config->telnetitems_num && config->telnetitems[i].itemid == itemid)
 				DCremove_element(config->telnetitems, &config->telnetitems_num, sizeof(ZBX_DC_TELNETITEM), i);
 		}
+
+		/* CALCULATED items */
+		i = get_nearestindex(config->calcitems, sizeof(ZBX_DC_CALCITEM),
+				config->calcitems_num, itemid);
+
+		if (ITEM_TYPE_CALCULATED == item->type)
+		{
+			if (i == config->calcitems_num || config->calcitems[i].itemid != itemid)
+				DCallocate_calcitem(i);
+
+			calcitem = &config->calcitems[i];
+
+			calcitem->itemid = itemid;
+			zbx_strlcpy(calcitem->params, row[19], sizeof(calcitem->params));
+		}
+		else
+		{
+			/* remove CALCULATED item parameters */
+			if (i < config->calcitems_num && config->calcitems[i].itemid == itemid)
+				DCremove_element(config->calcitems, &config->calcitems_num, sizeof(ZBX_DC_CALCITEM), i);
+		}
 	}
 
 	/* remove deleted or disabled items from buffer */
@@ -1837,6 +1946,11 @@ static void	DCsync_items()
 	for (i = 0; i < config->telnetitems_num; i++)
 		if (FAIL == uint64_array_exists(ids, ids_num, config->telnetitems[i].itemid))
 			DCremove_element(config->telnetitems, &config->telnetitems_num, sizeof(ZBX_DC_TELNETITEM), i--);
+
+	/* remove deleted or disabled CALCULATED items from buffer */
+	for (i = 0; i < config->calcitems_num; i++)
+		if (FAIL == uint64_array_exists(ids, ids_num, config->calcitems[i].itemid))
+			DCremove_element(config->calcitems, &config->calcitems_num, sizeof(ZBX_DC_CALCITEM), i--);
 
 	UNLOCK_CACHE;
 
@@ -1993,7 +2107,7 @@ static void	DCsync_hosts()
 
 /******************************************************************************
  *                                                                            *
- * Function: DCsync_confguration                                              *
+ * Function: DCsync_configuration                                             *
  *                                                                            *
  * Purpose: Synchronize configuration data from database                      *
  *                                                                            *
@@ -2006,9 +2120,9 @@ static void	DCsync_hosts()
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	DCsync_confguration()
+void	DCsync_configuration()
 {
-	const char	*__function_name = "DCsync_confguration";
+	const char	*__function_name = "DCsync_configuration";
 	double		sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -2040,11 +2154,10 @@ void	DCsync_confguration()
 void	init_configuration_cache()
 {
 	key_t	shm_key;
-	int	shm_id;
 	size_t	sz;
 	void	*ptr;
 
-	ZBX_GET_SHM_DBCONFIG_KEY(shm_key);
+	zabbix_log(LOG_LEVEL_DEBUG, "In init_configuration_cache() size:%d", CONFIG_DBCONFIG_SIZE);
 
 	sz = sizeof(ZBX_DC_CONFIG);
 
@@ -2054,12 +2167,16 @@ void	init_configuration_cache()
 		exit(FAIL);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In init_configuration_cache() size:%d", CONFIG_DBCONFIG_SIZE);
-
-	if ( -1 == (shm_id = zbx_shmget(shm_key, (size_t)CONFIG_DBCONFIG_SIZE)))
+	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, (int)'k')))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Can't allocate shared memory for configuration cache.");
-		exit(1);
+		zbx_error("Can't create IPC key for configuration cache");
+		exit(FAIL);
+	}
+
+	if (-1 == (shm_id = zbx_shmget(shm_key, (size_t)CONFIG_DBCONFIG_SIZE)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Can't allocate shared memory for configuration cache");
+		exit(FAIL);
 	}
 
 	ptr = shmat(shm_id, 0, 0);
@@ -2090,12 +2207,13 @@ void	init_configuration_cache()
 	config->dbitems = ptr + sz;
 	config->sshitems = ptr + sz;
 	config->telnetitems = ptr + sz;
+	config->calcitems = ptr + sz;
 	config->idxitem01 = ptr + sz;	/* hostid,key */
 	config->idxitem02 = ptr + sz;	/* poller_type,poller_num,nextcheck */
 	config->hosts = ptr + sz;
 	config->ipmihosts = ptr + sz;
 	config->idxhost01 = ptr + sz;	/* proxy_hostid,host */
-	config->idxhost02 = ptr + sz;	/* poller_type,poller_num */
+	config->idxhost02 = ptr + sz;	/* poller_type,poller_num,nextcheck */
 }
 
 /******************************************************************************
@@ -2116,28 +2234,17 @@ void	init_configuration_cache()
 void	free_configuration_cache()
 {
 	const char	*__function_name = "free_configuration_cache";
-	key_t		shm_key;
-	int		shm_id;
-	size_t		sz;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	LOCK_CACHE;
 
-	ZBX_GET_SHM_DBCONFIG_KEY(shm_key);
-
-	sz = sizeof(ZBX_DC_CONFIG);
-
-	shm_id = shmget(shm_key, sz, 0);
-
-	if (-1 == shm_id)
+	if (-1 == shmctl(shm_id, IPC_RMID, 0))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Can't find shared memory for configuration cache. [%s]",
+		zabbix_log(LOG_LEVEL_WARNING, "Can't remove shared memory"
+				" for configuration cache. [%s]",
 				strerror(errno));
-		exit(FAIL);
 	}
-
-	shmctl(shm_id, IPC_RMID, 0);
 
 	config = NULL;
 
@@ -2334,6 +2441,7 @@ static void	DCget_item(DC_ITEM *dst_item, ZBX_DC_ITEM *src_item)
 	ZBX_DC_FLEXITEM	*dc_flexitem;
 	ZBX_DC_SSHITEM	*sshitem;
 	ZBX_DC_TELNETITEM	*telnetitem;
+	ZBX_DC_CALCITEM	*calcitem;
 
 	dst_item->itemid = src_item->itemid;
 	dst_item->type = src_item->type;
@@ -2438,6 +2546,16 @@ static void	DCget_item(DC_ITEM *dst_item, ZBX_DC_ITEM *src_item)
 			memcpy(dst_item->params_orig, telnetitem->params, sizeof(dst_item->params_orig));
 			dst_item->username = NULL;
 			dst_item->password = NULL;
+			dst_item->params = NULL;
+		}
+		break;
+	case ITEM_TYPE_CALCULATED:
+		index = get_nearestindex(config->calcitems, sizeof(ZBX_DC_CALCITEM),
+				config->calcitems_num, src_item->itemid);
+		if (index < config->calcitems_num && config->calcitems[index].itemid == src_item->itemid)
+		{
+			calcitem = &config->calcitems[index];
+			memcpy(dst_item->params_orig, calcitem->params, sizeof(dst_item->params_orig));
 			dst_item->params = NULL;
 		}
 		break;
@@ -2610,7 +2728,7 @@ static int	DCconfig_get_normal_poller_items(unsigned char poller_type, unsigned 
 				continue;
 			break;
 		default:
-			/* nothink to do */;
+			/* nothing to do */;
 		}
 
 		DCget_host(&items[num].host, dc_host);
@@ -2823,7 +2941,7 @@ int	DCconfig_get_normal_poller_nextcheck(unsigned char poller_type, unsigned cha
 				continue;
 			break;
 		default:
-			/* nothink to do */;
+			/* nothing to do */;
 		}
 
 		nextcheck = dc_item->nextcheck;

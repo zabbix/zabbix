@@ -58,54 +58,46 @@ class CTriggersInfo extends CTable{
 	}
 
 	public function bodyToString(){
-		$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY, get_current_nodeid(true));
-
-		foreach($available_triggers as $id => $triggerid){
-			if(trigger_dependent($triggerid))	unset($available_triggers[$id]);
-		}
-
 		$this->cleanItems();
 
-		$ok = $uncn = $info = $warn = $avg = $high = $dis = 0;
+		$ok = $uncn = $uncl = $info = $warn = $avg = $high = $dis = 0;
 
-		$sql_from = '';
-		$sql_where = '';
+		$options = array(
+			'nodeids' => $this->nodeid,
+			'monitored' => 1,
+			'skipDependent' => 1,
+			'output' => API_OUTPUT_SHORTEN
+		);
 		if($this->groupid > 0){
-			$sql_from = ', hosts_groups hg ';
-			$sql_where = ' AND hg.groupid='.$this->groupid.
-							' AND h.hostid=hg.hostid ';
+			$options['groupids'] = $this->groupid;
 		}
+		$triggers = CTrigger::get($options);
+		$triggers = zbx_objectValues($triggers, 'triggerid');
 
-		$db_priority = DBselect('SELECT t.priority,t.value,count(DISTINCT t.triggerid) as cnt '.
-						' FROM triggers t,hosts h,items i,functions f '.$sql_from.
-						' WHERE t.status='.TRIGGER_STATUS_ENABLED.
-							' AND f.itemid=i.itemid '.
-							' AND h.hostid=i.hostid '.
-//								' AND '.DBin_node('h.hostid').
-							' AND h.status='.HOST_STATUS_MONITORED.
-							' AND t.triggerid=f.triggerid '.
-							' AND i.status='.ITEM_STATUS_ACTIVE.
-							' AND '.DBcondition('t.triggerid',$available_triggers).
-							$sql_where.
-						' GROUP BY t.priority,t.value');
-		while($row=DBfetch($db_priority)){
+		$sql = 'SELECT t.priority,t.value,count(DISTINCT t.triggerid) as cnt '.
+				' FROM triggers t '.
+				' WHERE '.DBcondition('t.triggerid',$triggers).
+				' GROUP BY t.priority,t.value';
 
-			switch($row["value"]){
+		$db_priority = DBselect($sql);
+		while($row = DBfetch($db_priority)){
+			switch($row['value']){
 				case TRIGGER_VALUE_TRUE:
-					switch($row["priority"]){
-						case TRIGGER_SEVERITY_INFORMATION:	$info	+= $row["cnt"];	break;
-						case TRIGGER_SEVERITY_WARNING:		$warn	+= $row["cnt"];	break;
-						case TRIGGER_SEVERITY_AVERAGE:		$avg	+= $row["cnt"];	break;
-						case TRIGGER_SEVERITY_HIGH:			$high	+= $row["cnt"];	break;
-						case TRIGGER_SEVERITY_DISASTER:		$dis	+= $row["cnt"];	break;
-						default:
-							$uncn	+= $row["cnt"];	break;
+					switch($row['priority']){
+						case TRIGGER_SEVERITY_NOT_CLASSIFIED:	$uncl	+= $row['cnt'];	break;
+						case TRIGGER_SEVERITY_INFORMATION:	$info	+= $row['cnt'];	break;
+						case TRIGGER_SEVERITY_WARNING:		$warn	+= $row['cnt'];	break;
+						case TRIGGER_SEVERITY_AVERAGE:		$avg	+= $row['cnt'];	break;
+						case TRIGGER_SEVERITY_HIGH:			$high	+= $row['cnt'];	break;
+						case TRIGGER_SEVERITY_DISASTER:		$dis	+= $row['cnt'];	break;
 					}
-					break;
+				break;
 				case TRIGGER_VALUE_FALSE:
-					$ok	+= $row["cnt"];	break;
+					$ok	+= $row['cnt'];
+				break;
 				default:
-					$uncn	+= $row["cnt"];	break;
+					$uncn += $row['cnt'];
+				break;
 			}
 		}
 
@@ -122,15 +114,16 @@ class CTriggersInfo extends CTable{
 			else{
 				$header_str.= S_ALL_GROUPS;
 			}
-		
-			$header = new CCol($header_str,"header");
+
+			$header = new CCol($header_str,'header');
 			if($this->style == STYLE_HORISONTAL)
 				$header->SetColspan(7);
 			$this->addRow($header);
 		}
 
 		$trok	= new CCol($ok.SPACE.S_OK,					get_severity_style('ok',false));
-		$uncn	= new CCol($uncn.SPACE.S_NOT_CLASSIFIED,	get_severity_style(TRIGGER_SEVERITY_NOT_CLASSIFIED,$uncn));
+		$uncn	= new CCol($uncn.SPACE.S_UNKNOWN, 'unknown');
+		$uncl	= new CCol($uncl.SPACE.S_NOT_CLASSIFIED,	get_severity_style(TRIGGER_SEVERITY_NOT_CLASSIFIED,$uncl));
 		$info	= new CCol($info.SPACE.S_INFORMATION,		get_severity_style(TRIGGER_SEVERITY_INFORMATION,$info));
 		$warn	= new CCol($warn.SPACE.S_WARNING,			get_severity_style(TRIGGER_SEVERITY_WARNING,$warn));
 		$avg	= new CCol($avg.SPACE.S_AVERAGE,			get_severity_style(TRIGGER_SEVERITY_AVERAGE,$avg));

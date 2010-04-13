@@ -19,12 +19,12 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/graphs.inc.php');
+require_once('include/config.inc.php');
+require_once('include/graphs.inc.php');
 
-	$page['file']	= 'chart2.php';
-	$page['title']	= 'S_CHART';
-	$page['type']	= PAGE_TYPE_IMAGE;
+$page['file']	= 'chart2.php';
+$page['title']	= 'S_CHART';
+$page['type']	= PAGE_TYPE_IMAGE;
 
 include_once('include/page_header.php');
 
@@ -47,17 +47,18 @@ include_once('include/page_header.php');
 		show_error_message(S_NO_GRAPH_DEFINED);
 	}
 
-	$options = array();
-	$options['graphids'] = $_REQUEST['graphid'];
-	$options['extendoutput'] = 1;
-
+	$options = array(
+		'graphids' => $_REQUEST['graphid'],
+		'extendoutput' => 1,
+		'nodeids' => get_current_nodeid(true)
+	);
 	$db_data = CGraph::get($options);
 	if(empty($db_data)) access_deny();
 	else $db_data = reset($db_data);
 
 	$options = array(
-			'graphids' => $_REQUEST['graphid'], 
-			'extendoutput' => 1, 
+			'graphids' => $_REQUEST['graphid'],
+			'extendoutput' => 1,
 			'nodeids' => get_current_nodeid(true)
 		);
 	$host = CHost::get($options);
@@ -65,7 +66,7 @@ include_once('include/page_header.php');
 
 	$effectiveperiod = navigation_bar_calc();
 
-	update_profile('web.charts.graphid',$_REQUEST['graphid']);
+	CProfile::update('web.charts.graphid',$_REQUEST['graphid'], PROFILE_TYPE_ID);
 
 	$chart_header = '';
 	if(id2nodeid($db_data['graphid']) != get_current_nodeid()){
@@ -81,19 +82,19 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['stime']))		$graph->setSTime($_REQUEST['stime']);
 	if(isset($_REQUEST['border']))		$graph->setBorder(0);
 
-	$width = get_request('width', 0);
+	$width = get_request('width', 900);
 
 	if($width <= 0) $width = $db_data['width'];
 
-	$height = get_request('height', 0);
+	$height = get_request('height', 200);
 	if($height <= 0) $height = $db_data['height'];
 
+//	$graph->showLegend($db_data['show_legend']);
 	$graph->showWorkPeriod($db_data['show_work_period']);
 	$graph->showTriggers($db_data['show_triggers']);
 
 	$graph->setWidth($width);
 	$graph->setHeight($height);
-
 
 	$graph->setYMinAxisType($db_data['ymin_type']);
 	$graph->setYMaxAxisType($db_data['ymax_type']);

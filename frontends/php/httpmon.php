@@ -19,16 +19,16 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/hosts.inc.php');
-	require_once('include/httptest.inc.php');
-	require_once('include/forms.inc.php');
+require_once('include/config.inc.php');
+require_once('include/hosts.inc.php');
+require_once('include/httptest.inc.php');
+require_once('include/forms.inc.php');
 
-	$page['title'] = "S_STATUS_OF_WEB_MONITORING";
-	$page['file'] = 'httpmon.php';
-	$page['hist_arg'] = array('open','groupid','hostid');
+$page['title'] = "S_STATUS_OF_WEB_MONITORING";
+$page['file'] = 'httpmon.php';
+$page['hist_arg'] = array('open','groupid','hostid');
 
-	define('ZBX_PAGE_DO_REFRESH', 1);
+define('ZBX_PAGE_DO_REFRESH', 1);
 
 include_once('include/page_header.php');
 
@@ -46,8 +46,8 @@ include_once('include/page_header.php');
 		'groupid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,	null),
 		'hostid'=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,	null),
 //ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			'isset({favid})'),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 
 	);
@@ -57,11 +57,12 @@ include_once('include/page_header.php');
 /* AJAX	*/
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
-			update_profile('web.httpmon.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.httpmon.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -75,13 +76,17 @@ include_once('include/page_header.php');
 	foreach($options as  $option) $params[$option] = 1;
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
 	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
+
 //SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
 	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
 //SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
 ?>
 <?php
-	$_REQUEST['applications'] = get_request('applications',get_profile('web.httpmon.applications',array()));
+	// $_REQUEST['applications'] = get_request('applications',CProfile::get('web.httpmon.applications',array()));
 
+	$_REQUEST['applications'] = get_request('applications', get_favorites('web.httpmon.applications'));
+	$_REQUEST['applications'] = zbx_objectValues($_REQUEST['applications'], 'value');
+	
 	if(isset($_REQUEST['open'])){
 		if(!isset($_REQUEST['applicationid'])){
 			$_REQUEST['applications'] = array();
@@ -102,11 +107,18 @@ include_once('include/page_header.php');
 	}
 
 	/* limit opened application count */
-	while(count($_REQUEST['applications']) > 25){
-		array_shift($_REQUEST['applications']);
-	}
+	// while(count($_REQUEST['applications']) > 25){
+		// array_shift($_REQUEST['applications']);
+	// }
 
-	update_profile('web.httpmon.applications',$_REQUEST['applications'],PROFILE_TYPE_ARRAY_ID);
+	if(count($_REQUEST['applications']) > 25){
+		$_REQUEST['applications'] = array_slice($_REQUEST['applications'], -25);
+	}
+	rm4favorites('web.httpmon.applications');
+	foreach($_REQUEST['applications'] as $application){
+		add2favorites('web.httpmon.applications', $application);
+	}
+	// CProfile::update('web.httpmon.applications',$_REQUEST['applications'],PROFILE_TYPE_ARRAY_ID);
 ?>
 <?php
 
@@ -119,8 +131,7 @@ include_once('include/page_header.php');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
 
-	show_table_header(S_STATUS_OF_WEB_MONITORING_BIG, $fs_icon);
-	echo SBR;
+	$httpmon_wdgt->addPageHeader(S_STATUS_OF_WEB_MONITORING_BIG, $fs_icon);
 
 // 2nd header
 	$r_form = new CForm();

@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -390,7 +390,7 @@
 	'S_MINUS_ALL_MINUS'=>				'- wszystkie -',
 	'S_MINUS_OTHER_MINUS'=>				'- inne -',
 	'S_GRAPH'=>					'Wykres',
-	'S_COPYRIGHT_BY'=>				'Prawa autorskie 2001-2009 dla',
+	'S_COPYRIGHT_BY'=>				'Prawa autorskie 2001-2010 dla',
 	'S_CONNECTED_AS'=>				'Połączony jako',
 	'S_NOT_CONNECTED'=>				'Nie połączony',
 	'S_SIA_ZABBIX'=>				'SIA Zabbix',
@@ -468,8 +468,6 @@
 	'S_APPLICATIONS'=>				'Aplikacje',
 	'S_APPLICATIONS_BIG'=>				'APLIKACJE',
 	'S_CREATE_APPLICATION'=>			'Utwórz aplikację',
-	'S_ACTIVATE_ITEMS'=>				'Aktywuj Elementy',
-	'S_DISABLE_ITEMS'=>				'Wyłącz Elementy',
 	'S_APPLICATION_UPDATED'=>			'Aplikacja uaktualniona',
 	'S_CANNOT_UPDATE_APPLICATION'=>			'Nie można uaktualnić aplikacji',
 	'S_APPLICATION_ADDED'=>				'Dodano aplikację',

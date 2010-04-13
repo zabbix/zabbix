@@ -134,16 +134,16 @@
 		}
 
 		if($yaxis == 2){
-			$graphDims['shiftXleft'] = 100;
-			$graphDims['shiftXright'] = 100;
+			$graphDims['shiftXleft'] = 85;
+			$graphDims['shiftXright'] = 85;
 		}
 		else if($yaxis == 0){
-			$graphDims['shiftXleft'] = 100;
-			$graphDims['shiftXright'] = 50;
+			$graphDims['shiftXleft'] = 85;
+			$graphDims['shiftXright'] = 30;
 		}
 		else{
-			$graphDims['shiftXleft'] = 50;
-			$graphDims['shiftXright'] = 100;
+			$graphDims['shiftXleft'] = 30;
+			$graphDims['shiftXright'] = 85;
 		}
 //-------------
 
@@ -394,7 +394,7 @@
 		if($row){
 			return	$row;
 		}
-		error("No graph item with gitemid=[$gitemid]");
+		error(S_NO_GRAPH_WITH." gitemid=[$gitemid]");
 
 	return	$result;
 	}
@@ -416,7 +416,7 @@
 		if($row){
 			return	$row;
 		}
-		error("No graph with graphid=[$graphid]");
+		error(S_NO_GRAPH_WITH." graphid=[$graphid]");
 		return	false;
 	}
 
@@ -442,7 +442,7 @@
 		$result = array();
 
 		foreach($gitems as $gitem){
-			$sql = 'SELECT src.itemid '.
+			$sql = 'SELECT src.itemid, dest.key_ '.
 					' FROM items src, items dest '.
 					' WHERE dest.itemid='.$gitem['itemid'].
 						' AND src.key_=dest.key_ '.
@@ -451,7 +451,7 @@
 			if (!$db_item && $error){
 				$item = get_item_by_itemid($gitem['itemid']);
 				$host = get_host_by_hostid($dest_hostid);
-				error('Missing key "'.$item['key_'].'" for host "'.$host['host'].'"');
+				error(S_MISSING_KEY.SPACE.'"'.$item['key_'].'"'.SPACE.S_FOR_HOST_SMALL.SPACE.'"'.$host['host'].'"');
 				return false;
 			}
 			else if(!$db_item){
@@ -460,6 +460,7 @@
 			}
 			else{
 				$gitem['itemid'] = $db_item['itemid'];
+				$gitem['key_'] = $db_item['key_'];
 			}
 
 			$result[] = $gitem;
@@ -509,7 +510,7 @@
 		$result = false;
 
 		if(!is_array($gitems) || count($gitems)<1){
-			error('Missing items for graph "'.$name.'"');
+			error(S_MISSING_ITEMS_FOR_GRAPH.SPACE.'"'.$name.'"');
 			return $result;
 		}
 
@@ -526,17 +527,28 @@
 							' WHERE h.hostid=i.hostid '.
 								' AND '.DBcondition('i.itemid',$itemid));
 
+		$graph_hostids = array();
 		while($db_item_host = DBfetch($db_item_hosts)){
 			$host_list[] = '"'.$db_item_host['host'].'"';
+			$graph_hostids[] = $db_item_host['hostid'];
 
 			if(HOST_STATUS_TEMPLATE ==  $db_item_host['status'])
 				$new_host_is_template = true;
 		}
 
 		if(isset($new_host_is_template) && count($host_list)>1){
-			error('Graph "'.$name.'" with template host can not contain items from other hosts.');
+			error(S_GRAPH.SPACE.'"'.$name.'"'.SPACE.S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL);
 			return $result;
 		}
+		
+		// $filter = array(
+			// 'name' => $name,
+			// 'hostids' => $graph_hostids
+		// );
+		// if(CGraph::exists($filter)){
+			// error('Graph already exists [ '.$name.' ]');
+			// return false;
+		// }
 
 		if($graphid = add_graph($name,$width,$height,$ymin_type,$ymax_type,$yaxismin,$yaxismax,$ymin_itemid,$ymax_itemid,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$percent_left,$percent_right,$templateid)){
 			$result = true;
@@ -623,28 +635,28 @@
 		return $result;
 	}
 
-        /*
-         * Function: update_graph_with_items
-         *
-         * Description:
-         *     Update graph with items and recursion for template
-         *
-         * Author:
-         *     Eugene Grigorjev
-         *
-         * Comments: !!! Don't forget sync code with C !!!
-         *
-         */
+/*
+ * Function: update_graph_with_items
+ *
+ * Description:
+ *     Update graph with items and recursion for template
+ *
+ * Author:
+ *     Eugene Grigorjev
+ *
+ * Comments: !!! Don't forget sync code with C !!!
+ *
+ */
 	function update_graph_with_items($graphid,$name,$width,$height,$ymin_type,$ymax_type,$yaxismin,$yaxismax,$ymin_itemid,$ymax_itemid,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$percent_left,$percent_right,$gitems=array(),$templateid=0)
 	{
 		$result = false;
 
 		if(!is_array($gitems) || count($gitems) < 1){
-			error('Missing items for graph "'.$name.'"');
+			error(S_MISSING_ITEMS_FOR_GRAPH.SPACE.'"'.$name.'"');
 			return $result;
 		}
 
-		/* check items for template graph */
+// check items for template graph
 		$tmp_hosts = get_hosts_by_graphid($graphid);
 		$host = DBfetch($tmp_hosts);
 		if($host["status"] == HOST_STATUS_TEMPLATE ){
@@ -657,7 +669,7 @@
 			$db_item_hosts = DBselect('SELECT DISTINCT hostid from items where itemid in ('.implode(',', $itemid).')');
 			while($db_item = DBfetch($db_item_hosts)){
 				if ( isset($new_hostid) ){
-					error('Can not use multiple host items for template graph "'.$name.'"');
+					error(S_CANNOT_USE_MULTIPLE_HOST_ITEMS_TEMPLATE_GRAPH.SPACE.'"'.$name.'"');
 					return $result;
 				}
 
@@ -665,19 +677,19 @@
 			}
 
 			if ( (bccomp($host['hostid'] ,$new_hostid ) != 0)){
-				error('You must use items only from host "'.$host['host'].'" for template graph "'.$name.'"');
+				error(S_MUST_USE_ITEMS_ONLY_FROM_HOST.SPACE.'"'.$host['host'].'"'.SPACE.S_FOR_TEMPLATE_GRAPH_SMALL.SPACE.'"'.$name.'"');
 				return $result;
 			}
 		}
 
-		/* firstly update child graphs */
+// firstly update child graphs
 		$chd_graphs = get_graphs_by_templateid($graphid);
 		while($chd_graph = DBfetch($chd_graphs)){
 			$tmp_hosts = get_hosts_by_graphid($chd_graph['graphid']);
 			$chd_host = DBfetch($tmp_hosts);
 
 			if(!$new_gitems = get_same_graphitems_for_host($gitems, $chd_host['hostid'])){ /* skip host with missing items */
-				error('Can not update graph "'.$name.'" for host "'.$chd_host['host'].'"');
+				error(S_CANNOT_UPDATE_GRAPH.SPACE.'"'.$name.'"'.SPACE.S_FOR_HOST_SMALL.SPACE.'"'.$chd_host['host'].'"');
 				return $result;
 			}
 
@@ -692,7 +704,7 @@
 		DBexecute('DELETE FROM graphs_items WHERE graphid='.$graphid);
 
 		foreach($gitems as $gitem){
-			if ( ! ($result = add_item_to_graph(
+			if (!$result = add_item_to_graph(
 					$graphid,
 					$gitem['itemid'],
 					$gitem['color'],
@@ -701,7 +713,7 @@
 					$gitem['yaxisside'],
 					$gitem['calc_fnc'],
 					$gitem['type'],
-					$gitem['periods_cnt'])) )
+					$gitem['periods_cnt']))
 			{
 				return $result;
 			}
@@ -716,7 +728,7 @@
 				$host_list[] = '"'.$db_host["host"].'"';
 			}
 
-			info('Graph "'.$name.'" updated for hosts '.implode(',',$host_list));
+			info(S_GRAPH.SPACE.'"'.$name.'"'.SPACE.S_UPDATED_FOR_HOSTS.SPACE.implode(',',$host_list));
 		}
 
 		return $result;
@@ -856,7 +868,7 @@
 
 			if($unlink_mode){
 				if(DBexecute('UPDATE graphs SET templateid=0 WHERE graphid='.$db_graph['graphid'])){
-					info('Graph "'.$db_graph['name'].'" unlinked');
+					info(S_GRAPH.SPACE.'"'.$db_graph['name'].'"'.SPACE.S_UNLINKED_SMALL);
 				}
 			}
 			else{
@@ -891,9 +903,37 @@
 
 		$db_graphs = get_graphs_by_hostid($templateid);
 
-		while($db_graph = DBfetch($db_graphs)){
-			copy_graph_to_host($db_graph["graphid"], $hostid, $copy_mode);
+		if($copy_mode){
+			while($db_graph = DBfetch($db_graphs)){
+				copy_graph_to_host($db_graph["graphid"], $hostid, $copy_mode);
+			}
 		}
+		else{
+			while($db_graph = DBfetch($db_graphs)){
+				$gitems = CGraphItem::get(array(
+					'graphids' => $db_graph['graphid'],
+					'output' => API_OUTPUT_EXTEND
+				));
+				
+				
+				$filter = array(
+					'name' => $db_graph['name'],
+					'hostids' => $hostid
+				);
+				if(CGraph::exists($filter)){
+					$db_graph['gitems'] = $gitems;
+					$res = CGraph::update($db_graph);
+				}
+				else{
+					$db_graph['templateid'] = $db_graph['graphid'];
+					$db_graph['gitems'] = get_same_graphitems_for_host($gitems, $hostid);
+					$res = CGraph::create($db_graph);
+				}
+				if($res === false) return false;
+			}
+		}
+		
+		return true;
 	}
 
 /*
@@ -984,36 +1024,38 @@
 		}
 		else{
 			$host = get_host_by_hostid($hostid);
-			info('Skipped copying of graph "'.$db_graph["name"].'" to host "'.$host['host'].'"');
+			info(S_SKIPPED_COPYING_OF_GRAPH.SPACE.'"'.$db_graph["name"].'"'.SPACE.S_TO_HOST_SMALL.SPACE.'"'.$host['host'].'"');
 		}
 
 	return $result;
 	}
 
-	function navigation_bar_calc($idx=null, $idx2=null){
+	function navigation_bar_calc($idx=null, $idx2=0, $update=false){
 //SDI($_REQUEST['stime']);
-		if(!is_null($idx) && (is_null($idx2) || ($idx2 > 0))){
-			if(isset($_REQUEST['period']) && ($_REQUEST['period'] >= ZBX_MIN_PERIOD))
-				update_profile($idx.'.period',$_REQUEST['period'],PROFILE_TYPE_INT, $idx2);
-			else
-				$_REQUEST['period'] = get_profile($idx.'.period', ZBX_PERIOD_DEFAULT, $idx2);
 
-			if(isset($_REQUEST['stime']))
-				update_profile($idx.'.stime',$_REQUEST['stime'], PROFILE_TYPE_STR, $idx2);
-			else
-				$_REQUEST['stime'] = get_profile($idx.'.stime', null, $idx2);
+		if(!is_null($idx)){
+			if($update){
+				if(isset($_REQUEST['period']) && ($_REQUEST['period'] >= ZBX_MIN_PERIOD))
+					CProfile::update($idx.'.period',$_REQUEST['period'],PROFILE_TYPE_INT, $idx2);
+					
+				if(isset($_REQUEST['stime']))
+					CProfile::update($idx.'.stime',$_REQUEST['stime'], PROFILE_TYPE_STR, $idx2);
+			}
+
+			$_REQUEST['period'] = get_request('period', CProfile::get($idx.'.period', ZBX_PERIOD_DEFAULT, $idx2));
+			$_REQUEST['stime'] = get_request('stime', CProfile::get($idx.'.stime', null, $idx2));
 		}
 
 		$_REQUEST['period'] = get_request('period', ZBX_PERIOD_DEFAULT);
 		$_REQUEST['stime'] = get_request('stime', null);
 
 		if($_REQUEST['period']<ZBX_MIN_PERIOD){
-			show_message(S_WARNING.'. '.S_TIME_PERIOD.SPACE.S_MIN_VALUE_SMALL.': '.ZBX_MIN_PERIOD.' ('.(int)(ZBX_MIN_PERIOD/3600).'h)');
+			show_message(S_WARNING.'. '.S_TIME_PERIOD.SPACE.S_MIN_VALUE_SMALL.': '.ZBX_MIN_PERIOD.' ('.(int)(ZBX_MIN_PERIOD/3600).S_HOUR_SHORT.')');
 			$_REQUEST['period'] = ZBX_MIN_PERIOD;
 
 		}
 		else if($_REQUEST['period'] > ZBX_MAX_PERIOD){
-			show_message(S_WARNING.'. '.S_TIME_PERIOD.SPACE.S_MAX_VALUE_SMALL.': '.ZBX_MAX_PERIOD.' ('.(int)(ZBX_MAX_PERIOD/86400).'d)');
+			show_message(S_WARNING.'. '.S_TIME_PERIOD.SPACE.S_MAX_VALUE_SMALL.': '.ZBX_MAX_PERIOD.' ('.(int)(ZBX_MAX_PERIOD/86400).S_DAY_SHORT.')');
 			$_REQUEST['period'] = ZBX_MAX_PERIOD;
 		}
 
@@ -1025,7 +1067,7 @@
 			}
 		}
 		else{
-			$_REQUEST['stime'] = date('YmdHi');
+			$_REQUEST['stime'] = date('YmdHi', time()-$_REQUEST['period']);
 		}
 
 	return $_REQUEST['period'];
@@ -1190,14 +1232,41 @@
 		$gdinfo = gd_info();
 
 		if($gdinfo['FreeType Support'] && function_exists('imagettftext')){
-			$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
+		
+			if((preg_match(ZBX_PREG_DEF_FONT_STRING, $string) && ($angle != 0)) || (ZBX_FONT_NAME == ZBX_GRAPH_FONT_NAME)){
+				$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
+				imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
+			}
+			else if($angle == 0){
+				$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
+				imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
+			}
+			else{
+				$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
+				
+				$size = imageTextSize($fontsize, 0, $string);
+
+				$imgg = imagecreatetruecolor($size['width']+1, $size['height']);
+				$transparentColor = imagecolorallocatealpha($imgg, 200, 200, 200, 127);
+				imagefill($imgg, 0, 0, $transparentColor);
+
+				imagettftext($imgg, $fontsize, 0, 0, $size['height'], $color, $ttf, $string);
+				
+				$imgg = imagerotate($imgg, $angle, $transparentColor);
+				ImageAlphaBlending($imgg, false);
+				imageSaveAlpha($imgg, true);
+				
+				imagecopy($image, $imgg, $x - $size['height'], $y - $size['width'], 0, 0, $size['height'], $size['width']+1);
+				
+				imagedestroy($imgg);
+			}
 /*
 			$ar = imagettfbbox($fontsize, $angle, $ttf, $string);
 //sdii($ar);
 			if(!$angle)	imagerectangle($image, $x, $y+$ar[1], $x+abs($ar[0] - $ar[4]), $y+$ar[5], $color);
 			else imagerectangle($image, $x, $y, $x-abs($ar[0] - $ar[4]), $y+($ar[5]-$ar[1]), $color);
 //*/
-			imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
+			
 		}
 		else{
 			$dims = imageTextSize($fontsize, $angle, $string);
@@ -1236,8 +1305,15 @@
 		$gdinfo = gd_info();
 
 		$result = array();
+		
 		if($gdinfo['FreeType Support'] && function_exists('imagettfbbox')){
-			$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
+		
+			if(preg_match(ZBX_PREG_DEF_FONT_STRING, $string) && ($angle != 0)){
+				$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
+			}
+			else{
+				$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
+			}
 
 			$ar = imagettfbbox($fontsize, $angle, $ttf, $string);
 
@@ -1261,11 +1337,11 @@
 
 			if($angle){
 				$result['width'] = imagefontheight($fontsize);
-				$result['height'] = imagefontwidth($fontsize) * strlen($string);
+				$result['height'] = imagefontwidth($fontsize) * zbx_strlen($string);
 			}
 			else{
 				$result['height'] = imagefontheight($fontsize);
-				$result['width'] = imagefontwidth($fontsize) * strlen($string);
+				$result['width'] = imagefontwidth($fontsize) * zbx_strlen($string);
 			}
 		}
 

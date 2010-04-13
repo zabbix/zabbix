@@ -17,48 +17,34 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-function SDB($return=false){
-	$backtrace = debug_backtrace();
-	array_shift($backtrace);
-	$result = 'DEBUG BACKTRACE: ';
-	foreach($backtrace as $n => $bt){
-		$result .= '  --['.$n.']-- '.$bt['file'].' : '.$bt['line'].' | ';
-		$result .= isset($bt['class']) ? $bt['class'].$bt['type'].$bt['function'] : $bt['function'];
-		$result .= '( '.print_r($bt['args'], true).' ) ';
-	}
-	if($return) return $result;
-	else echo $result;
-}
-function SDI($msg='SDI') { echo 'DEBUG INFO: '; var_dump($msg); echo SBR; } // DEBUG INFO!!!
-function SDII($msg='SDII') { echo 'DEBUG INFO: '; echo '<pre>'.print_r($msg, true).'</pre>'; echo SBR; } // DEBUG INFO!!!
-function VDP($var, $msg=null) { echo 'DEBUG DUMP: '; if(isset($msg)) echo '"'.$msg.'"'.SPACE; var_dump($var); echo SBR; } // DEBUG INFO!!!
-function TODO($msg) { echo 'TODO: '.$msg.SBR; }  // DEBUG INFO!!!
+	require_once('include/debug.inc.php');
+	
 function __autoload($class_name){
-	$class_name = strtolower($class_name);
+	$class_name = zbx_strtolower($class_name);
 	$api = array(
-		'czbxapi' => 1,
-		'capiinfo' => 1,
+		'apiexception' => 1,
 		'caction' => 1,
 		'calert' => 1,
+		'capiinfo' => 1,
 		'capplication' => 1,
 		'cevent' => 1,
 		'cgraph' => 1,
+		'cgraphitem' => 1,
 		'chost' => 1,
 		'chostgroup' => 1,
+		'cimage' => 1,
 		'citem' => 1,
 		'cmaintenance' => 1,
-		'cproxy' => null,
+		'cmap' => 1,
+		'cproxy' => 1,
+		'cscreen' => 1,
 		'cscript' => 1,
 		'ctemplate' => 1,
 		'ctrigger' => 1,
 		'cuser' => 1,
 		'cusergroup' => 1,
 		'cusermacro' => 1,
-		'cscreen' => 1,
-		'cmap' => 1,
-		'cgraphitem' => 1,
-		'cproxy' => 1,
-		'apiexception' => 1,
+		'czbxapi' => 1
 	);
 
 	$rpc = array(
@@ -141,7 +127,9 @@ function __autoload($class_name){
 	}
 
 	if(file_exists($ZBX_CONFIGURATION_FILE) && !isset($_COOKIE['ZBX_CONFIG']) && !isset($DENY_GUI)){
+		ob_start();
 		include $ZBX_CONFIGURATION_FILE;
+		ob_end_clean ();
 		require_once('include/db.inc.php');
 
 		$error = '';
@@ -174,7 +162,9 @@ function __autoload($class_name){
 	}
 	else{
 		if(file_exists($ZBX_CONFIGURATION_FILE)){
+			ob_start();
 			include $ZBX_CONFIGURATION_FILE;
+			ob_end_clean ();
 		}
 
 		require_once('include/db.inc.php');
@@ -190,7 +180,7 @@ function __autoload($class_name){
 		if(file_exists('include/locales/'.$USER_DETAILS['lang'].'.inc.php')){
 			include_once('include/locales/'.$USER_DETAILS['lang'].'.inc.php');
 			process_locales();
-		}
+		}		
 	}
 	else{
 		$USER_DETAILS = array(
@@ -200,9 +190,14 @@ function __autoload($class_name){
 			'type'  =>'0',
 			'node'  =>array(
 				'name'  =>'- unknown -',
-				'nodeid'=>0));
+				'nodeid'=>0)
+			);
 	}
 
+	include_once('include/locales/en_gb.inc.php');
+	process_locales();
+	set_zbx_locales();
+	
 // INIT MB Strings if it's available
 	init_mbstrings();
 /*
@@ -321,7 +316,7 @@ function __autoload($class_name){
 						'text'	=> $msg,
 						'color'	=> (!$bool) ? array('R'=>255,'G'=>0,'B'=>0) : array('R'=>34,'G'=>51,'B'=>68),
 						'font'	=> 2));
-					$width = max($width, ImageFontWidth(2) * strlen($msg) + 1);
+					$width = max($width, ImageFontWidth(2) * zbx_strlen($msg) + 1);
 					$height += imagefontheight(2) + 1;
 					break;
 				case PAGE_TYPE_XML:
@@ -341,8 +336,8 @@ function __autoload($class_name){
 					$row[] = $msg_col;
 
 					if(isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)){
-						$msg_details = new CDiv(array(S_DETAILS),'pointer');
-						$msg_details->addAction('onclick',new CJSscript("javascript: ShowHide('msg_messages', IE?'block':'table');"));
+						$msg_details = new CDiv(S_DETAILS,'blacklink');
+						$msg_details->setAttribute('onclick',new CJSscript("javascript: ShowHide('msg_messages', IE?'block':'table');"));
 						$msg_details->setAttribute('title',S_MAXIMIZE.'/'.S_MINIMIZE);
 						array_unshift($row, new CCol($msg_details,'clr'));
 					}
@@ -371,7 +366,7 @@ function __autoload($class_name){
 							'color'	=> array('R'=>155,'G'=>155,'B'=>55),
 							'font'	=> $msg_font));
 					}
-					$width = max($width, imagefontwidth($msg_font) * strlen($msg['message']) + 1);
+					$width = max($width, imagefontwidth($msg_font) * zbx_strlen($msg['message']) + 1);
 					$height += imagefontheight($msg_font) + 1;
 				}
 			}
@@ -385,7 +380,7 @@ function __autoload($class_name){
 
 				foreach($ZBX_MESSAGES as $msg){
 					$lst_error->addItem($msg['message'], $msg['type']);
-					$bool = ($bool && ('error' != strtolower($msg['type'])));
+					$bool = ($bool && ('error' != zbx_strtolower($msg['type'])));
 				}
 
 //message scroll if needed
@@ -526,29 +521,25 @@ function __autoload($class_name){
 		$priority = array(0=>0, 1=>0, 2=>0, 3=>0, 4=>0, 5=>0);
 		$triggerids='';
 
-		$sql = 'SELECT t.triggerid, t.priority '.
-				' FROM triggers t '.
-				' WHERE t.value='.TRIGGER_VALUE_TRUE.
-					' AND '.DBin_node('t.triggerid').
-					' AND exists('.
-							'SELECT e.eventid '.
-							' FROM events e '.
-							' WHERE e.object='.EVENT_OBJECT_TRIGGER.
-								' AND e.objectid=t.triggerid '.
-								' AND e.acknowledged=0'.
-							')';
-       	$result=DBselect($sql);
-		while($row=DBfetch($result)){
-			$triggerids = $triggerids.','.$row['triggerid'];
+		$options = array(
+			'only_problems' => 1,
+			'with_unacknowledged_events' => 1,
+			'output' => array('triggerid', 'priority')
+		);
+		$triggers = CTrigger::get($options);
+
+		foreach($triggers as $tnum => $row){
+			$triggerids.= ','.$row['triggerid'];
 			$priority[$row['priority']]++;
 		}
 
-		$md5sum=md5($triggerids);
+		$md5sum = md5($triggerids);
 
-		$priorities=0;
-		for($i=0;$i<=5;$i++)	$priorities += pow(100,$i)*$priority[$i];
+		$priorities = 0;
+		for($i=0; $i<=5; $i++)
+			$priorities += pow(100,$i)*$priority[$i];
 
-		return	"$priorities,$md5sum";
+	return	$priorities.','.$md5sum;
 	}
 
 	function parse_period($str){
@@ -691,7 +682,7 @@ function __autoload($class_name){
 	function validate_float($str){
 //		echo "Validating float:$str<br>";
 //		if (eregi('^[ ]*([0-9]+)((\.)?)([0-9]*[KMG]{0,1})[ ]*$', $str, $arr)) {
-		if(preg_match('/^[ ]*([0-9]+)((\.)?)([0-9]*[KMG]{0,1})[ ]*$/i', $str, $arr)) {
+		if(preg_match('/^[ ]*([0-9]+)((\.)?)([0-9]*[KMGTsmhdw]{0,1})[ ]*$/i', $str, $arr)) {
 			return 0;
 		}
 		else{
@@ -808,13 +799,12 @@ function __autoload($class_name){
 
 
 		/* Comments: !!! Don't forget sync code with C !!! */
-		$result=DBselect('SELECT i.type, i.delay, count(*),count(*)/i.delay as qps '.
+		$result=DBselect('SELECT i.type, i.delay, count(*)/i.delay as qps '.
 							' FROM items i,hosts h '.
 							' WHERE i.status='.ITEM_STATUS_ACTIVE.
 								' AND i.hostid=h.hostid '.
 								' AND h.status='.HOST_STATUS_MONITORED.
-							' GROUP BY i.type,i.delay '.
-							' ORDER BY i.type, i.delay');
+							' GROUP BY i.type,i.delay ');
 
 		$status['qps_total']=0;
 		while($row=DBfetch($result)){
@@ -952,10 +942,11 @@ function __autoload($class_name){
 			imagepng($image);
 			$image_txt = ob_get_contents();
 			ob_end_clean();
-
+//SDI($image_txt);
 			session_start();
 			$id = md5($image_txt);
-			$_SESSION['imageid'][$id] = $image_txt;
+			$_SESSION['image_id'] = array();
+			$_SESSION['image_id'][$id] = $image_txt;
 			session_write_close();
 			print($id);
 
@@ -1088,25 +1079,24 @@ function __autoload($class_name){
 	return TRUE;
 	}
 
-	function replace_value_by_map($value, $valuemapid){
-		if($valuemapid < 1) return $value;
+	function replace_value_by_map($value, $valuemapid){ 
+		if($valuemapid < 1) return $value; 
 		
-		static $valuemaps = array();
-		if(isset($valuemaps[$valuemapid])) return $valuemaps[$valuemapid];
-
-		$sql = 'SELECT newvalue '.
-				' FROM mappings '.
-				' WHERE valuemapid='.$valuemapid.
-					' AND value='.zbx_dbstr($value);
-		$result = DBselect($sql);
-		if($row = DBfetch($result)){
-			$valuemaps[$valuemapid] = $row['newvalue'].' '.'('.$value.')';
-			
-			return $valuemaps[$valuemapid];
-		}
-
-	return $value;
-	}
+		static $valuemaps = array(); 
+		if(isset($valuemaps[$valuemapid][$value])) return $valuemaps[$valuemapid][$value]; 
+		
+		$sql = 'SELECT newvalue '. 
+				' FROM mappings '. 
+				' WHERE valuemapid='.$valuemapid. 
+					' AND value='.zbx_dbstr($value); 
+		$result = DBselect($sql); 
+		if($row = DBfetch($result)){ 
+			$valuemaps[$valuemapid][$value] = $row['newvalue'].' '.'('.$value.')'; 
+			return $valuemaps[$valuemapid][$value]; 
+		} 
+	
+	return $value; 
+	} 
 /*************** END VALUE MAPPING ******************/
 
 
@@ -1122,19 +1112,19 @@ function __autoload($class_name){
 	function validate_sort_and_sortorder($sort=NULL,$sortorder=ZBX_SORT_UP){
 		global $page;
 
-		$_REQUEST['sort'] = get_request('sort',get_profile('web.'.$page['file'].'.sort',$sort));
-		$_REQUEST['sortorder'] = get_request('sortorder',get_profile('web.'.$page['file'].'.sortorder',$sortorder));
+		$_REQUEST['sort'] = get_request('sort',CProfile::get('web.'.$page['file'].'.sort',$sort));
+		$_REQUEST['sortorder'] = get_request('sortorder',CProfile::get('web.'.$page['file'].'.sortorder',$sortorder));
 
 		if(!is_null($_REQUEST['sort'])){
 //			$_REQUEST['sort'] = eregi_replace('[^a-z\.\_]','',$_REQUEST['sort']);
 			$_REQUEST['sort'] = preg_replace('/[^a-z\.\_]/i','',$_REQUEST['sort']);
-			update_profile('web.'.$page['file'].'.sort', $_REQUEST['sort'], PROFILE_TYPE_STR);
+			CProfile::update('web.'.$page['file'].'.sort', $_REQUEST['sort'], PROFILE_TYPE_STR);
 		}
 
 		if(!str_in_array($_REQUEST['sortorder'],array(ZBX_SORT_DOWN,ZBX_SORT_UP)))
 			$_REQUEST['sortorder'] = ZBX_SORT_UP;
 
-		update_profile('web.'.$page['file'].'.sortorder', $_REQUEST['sortorder'], PROFILE_TYPE_STR);
+		CProfile::update('web.'.$page['file'].'.sortorder', $_REQUEST['sortorder'], PROFILE_TYPE_STR);
 	}
 
 /* function:
@@ -1231,14 +1221,14 @@ function __autoload($class_name){
 
 	function getPageSortField($def){
 		global $page;
-		$tabfield = get_request('sort',get_profile('web.'.$page['file'].'.sort',$def));
+		$tabfield = get_request('sort',CProfile::get('web.'.$page['file'].'.sort',$def));
 
 	return $tabfield;
 	}
 
 	function getPageSortOrder($def=ZBX_SORT_UP){
 		global $page;
-		$sortorder = get_request('sortorder',get_profile('web.'.$page['file'].'.sortorder',$def));
+		$sortorder = get_request('sortorder',CProfile::get('web.'.$page['file'].'.sortorder',$def));
 
 	return $sortorder;
 	}
@@ -1273,8 +1263,8 @@ function __autoload($class_name){
 
 		if(empty($data)) return false;
 
-		$sortfield = get_request('sort',get_profile('web.'.$page['file'].'.sort',$def_field));
-		$sortorder = get_request('sortorder',get_profile('web.'.$page['file'].'.sortorder',$def_order));
+		$sortfield = get_request('sort',CProfile::get('web.'.$page['file'].'.sort',$def_field));
+		$sortorder = get_request('sortorder',CProfile::get('web.'.$page['file'].'.sortorder',$def_order));
 
 	return order_result($data, $sortfield, $sortorder, true);
 	}
@@ -1285,12 +1275,12 @@ function __autoload($class_name){
 		if(!empty($allways)) $allways = ','.$allways;
 		$sortable = explode(',',$def);
 
-		$tabfield = get_request('sort',get_profile('web.'.$page["file"].'.sort',null));
+		$tabfield = get_request('sort',CProfile::get('web.'.$page["file"].'.sort',null));
 
 		if(is_null($tabfield)) return ' ORDER BY '.$def.$allways;
 		if(!str_in_array($tabfield,$sortable)) return ' ORDER BY '.$def.$allways;
 
-		$sortorder = get_request('sortorder',get_profile('web.'.$page["file"].'.sortorder',ZBX_SORT_UP));
+		$sortorder = get_request('sortorder',CProfile::get('web.'.$page["file"].'.sortorder',ZBX_SORT_UP));
 
 	return ' ORDER BY '.$tabfield.' '.$sortorder.$allways;
 	}
@@ -1302,7 +1292,7 @@ function __autoload($class_name){
 
 		$rsTable = array();
 		foreach($table as $num => $row){
-			if(strtoupper($row[$column]) == strtoupper($pattern))
+			if(zbx_strtoupper($row[$column]) == zbx_strtoupper($pattern))
 				$rsTable = array($num=>$row) + $rsTable;
 			else if($limit > 0)
 				$rsTable[$num] = $row;

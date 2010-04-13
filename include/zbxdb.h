@@ -42,6 +42,7 @@ typedef struct zbx_oracle_db_handle_s {
 	OCIEnv *envhp;
 	OCIError *errhp;
 	OCISvcCtx *svchp;
+	OCIServer *srvhp;
 } zbx_oracle_db_handle_t;
 
 extern zbx_oracle_db_handle_t oracle;
@@ -108,7 +109,6 @@ void	SQ_DBfree_result(DB_RESULT result);
 		DB_ROW		values;
 	} ZBX_PG_DB_RESULT;
 
-extern	int	ZBX_PG_BYTEAOID;
 void	PG_DBfree_result(DB_RESULT result);
 
 #endif
@@ -126,6 +126,7 @@ void	PG_DBfree_result(DB_RESULT result);
 	} ZBX_OCI_DB_RESULT;
 
 	void	OCI_DBfree_result(DB_RESULT result);
+	ub4	OCI_DBserver_status();
 	char*	zbx_oci_error(sword status);
 #endif
 
@@ -147,7 +148,6 @@ int	__zbx_zbx_db_execute(const char *fmt, ...);
 DB_RESULT	zbx_db_vselect(const char *fmt, va_list args);
 DB_RESULT	zbx_db_select_n(char *query, int n);
 DB_ROW		zbx_db_fetch(DB_RESULT result);
-zbx_uint64_t	zbx_db_insert_id(int exec_result, const char *table, const char *field);
 int		zbx_db_is_null(char *field);
 void		zbx_db_begin();
 void		zbx_db_commit();

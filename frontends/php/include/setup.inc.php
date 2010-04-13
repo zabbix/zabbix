@@ -157,31 +157,31 @@
 					'center')
 				);
 		}
-		
+
 		function stage2(){
 			$table = new CTable(null, 'requirements');
 			$table->setAlign('center');
 
 			$final_result = true;
-			
+
 			$row = new CRow(array(
 				SPACE,
 				new CCol('Current value', 'header'),
 				new CCol('Required', 'header'),
 				new CCol('Recommended', 'header'),
-				SPACE, 
+				SPACE,
 				SPACE
 			));
 			$table->addRow($row);
-				
+
 			$reqs = check_php_requirements();
 			foreach($reqs as $req){
-			
+
 				$result = null;
 				if(!is_null($req['recommended']) && ($req['result'] == 1)){
 					$result = new CSpan(S_OK, 'orange');
 				}
-				else if((!is_null($req['recommended']) && ($req['result'] == 2)) 
+				else if((!is_null($req['recommended']) && ($req['result'] == 2))
 					|| (is_null($req['recommended']) && ($req['result'] == 1))){
 					$result = new CSpan(S_OK, 'green');
 				}
@@ -189,7 +189,7 @@
 					$result = new CSpan(S_FAIL, 'link_menu fail');
 					$result->setHint($req['error']);
 				}
-				
+
 				$row = new CRow(array(
 					new CCol(
 						$req['name'], 'header'),
@@ -200,7 +200,7 @@
 					),
 					$req['result'] ? SPACE : 'fail'
 				);
-				
+
 				$table->addRow($row);
 
 				$final_result &= (bool) $req['result'];
@@ -404,7 +404,7 @@
 		}
 
 		function CheckConnection(){
-			global $DB;
+			global $DB, $ZBX_MESSAGES;
 
 //			$old_DB		= $DB['DB'];
 			if(!empty($DB) ){
@@ -428,6 +428,7 @@
 
 			$error = '';
 			if(!$result = DBconnect($error)){
+				array_pop($ZBX_MESSAGES);
 				error($error);
 			}
 			else{
@@ -735,7 +736,7 @@
 '<?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -754,18 +755,18 @@
 
 global $DB;
 
-$DB["TYPE"]		= "'.$this->getConfig('DB_TYPE'		,'unknown').'";
-$DB["SERVER"]		= "'.$this->getConfig('DB_SERVER'	,'unknown').'";
-$DB["PORT"]		= "'.$this->getConfig('DB_PORT'		,'0').'";
-$DB["DATABASE"]		= "'.$this->getConfig('DB_DATABASE'	,'unknown').'";
-$DB["USER"]		= "'.$this->getConfig('DB_USER'		,'unknown').'";
-$DB["PASSWORD"]		= "'.$this->getConfig('DB_PASSWORD'	,'').'";
-$ZBX_SERVER		= "'.$this->getConfig('ZBX_SERVER'	,'').'";
-$ZBX_SERVER_PORT	= "'.$this->getConfig('ZBX_SERVER_PORT'	,'0').'";
-
+$DB["TYPE"]		= \''.$this->getConfig('DB_TYPE' ,'unknown').'\';
+$DB["SERVER"]		= \''.$this->getConfig('DB_SERVER' ,'unknown').'\';
+$DB["PORT"]		= \''.$this->getConfig('DB_PORT' ,'0').'\';
+$DB["DATABASE"]		= \''.$this->getConfig('DB_DATABASE' ,'unknown').'\';
+$DB["USER"]		= \''.$this->getConfig('DB_USER' ,'unknown').'\';
+$DB["PASSWORD"]		= \''.$this->getConfig('DB_PASSWORD' ,'').'\';
+$ZBX_SERVER		= \''.$this->getConfig('ZBX_SERVER' ,'').'\';
+$ZBX_SERVER_PORT	= \''.$this->getConfig('ZBX_SERVER_PORT' ,'0').'\';
 
 $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
-?>';
+?>
+';
 		}
 	}
 ?>
