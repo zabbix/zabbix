@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2304] fixed "no permission" error when screen contains simple graphs with web item (Vedmak)
  - [ZBX-2268] denied creation of pie\exploded graphs with more than one sum items (Vedmak)
  - [ZBX-2298] added constant to defines to be able configure default Y axis position: left or right (AM)
  - [ZBX-2174] fixed a small memory leak in SNMP checks (asaveljevs)
