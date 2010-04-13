@@ -26,6 +26,7 @@
 #include "zlog.h"
 #include "zbxserver.h"
 
+#	include <curl/easy.h>
 #include "httpmacro.h"
 #include "httptest.h"
 
@@ -340,61 +341,84 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 		return;
 	}
 
-	lastfailedstep=0;
+	/* The pointed data are NOT copied by the library:
+	 * as a consequence, they must be preserved
+	 * by the calling application until the transfer finishes.
+	 */
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS,
+			httpstep.posts)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLOPT_POSTFIELDS [%s]",
+				curl_easy_strerror(err));
+		(void)curl_easy_cleanup(easyhandle);
+		return;
+	}
+
+	lastfailedstep = 0;
 	httptest->time = 0;
-	result = DBselect("select httpstepid,httptestid,no,name,url,timeout,posts,required,status_codes from httpstep where httptestid=" ZBX_FS_UI64 " order by no",
-		httptest->httptestid);
-	now=time(NULL);
-	while((row=DBfetch(result)) && !err_str)
+
+	result = DBselect(
+			"select httpstepid,no,name,url,timeout,"
+				"posts,required,status_codes"
+			" from httpstep"
+			" where httptestid=" ZBX_FS_UI64
+			" order by no",
+			httptest->httptestid);
+
+	now = time(NULL);
+
+	while (NULL != (row = DBfetch(result)) && NULL == err_str)
 	{
 		/* NOTE: do not use break or return for this block!
 		 *       process_step_data calling required!
 		 */
 		ZBX_STR2UINT64(httpstep.httpstepid, row[0]);
-		ZBX_STR2UINT64(httpstep.httptestid, row[1]);
-		httpstep.no=atoi(row[2]);
-		httpstep.name=row[3];
-		strscpy(httpstep.url,row[4]);
-		httpstep.timeout=atoi(row[5]);
-		strscpy(httpstep.posts,row[6]);
-		strscpy(httpstep.required,row[7]);
-		strscpy(httpstep.status_codes,row[8]);
+		httpstep.httptestid = httptest->httptestid;
+		httpstep.no = atoi(row[1]);
+		httpstep.name = row[2];
+		strscpy(httpstep.url, row[3]);
+		httpstep.timeout = atoi(row[4]);
+		strscpy(httpstep.posts, row[5]);
+		strscpy(httpstep.required, row[6]);
+		strscpy(httpstep.status_codes, row[7]);
 
-		DBexecute("update httptest set curstep=%d,curstate=%d where httptestid=" ZBX_FS_UI64,
-			httpstep.no,
-			HTTPTEST_STATE_BUSY,
-			httptest->httptestid);
+		DBexecute("update httptest"
+				" set curstep=%d,"
+					"curstate=%d"
+				" where httptestid=" ZBX_FS_UI64,
+				httpstep.no,
+				HTTPTEST_STATE_BUSY,
+				httptest->httptestid);
 
-		memset(&stat,0,sizeof(stat));
+		memset(&stat, 0, sizeof(stat));
 
 		/* Substitute macros */
-		http_substitute_macros(httptest,httpstep.url, sizeof(httpstep.url));
+		http_substitute_macros(httptest, httpstep.url, sizeof(httpstep.url));
+		http_substitute_macros(httptest, httpstep.posts, sizeof(httpstep.posts));
 
-		http_substitute_macros(httptest,httpstep.posts, sizeof(httpstep.posts));
-		/* zabbix_log(LOG_LEVEL_WARNING, "POSTS [%s]", httpstep.posts); */
-		if(httpstep.posts[0] != 0)
+		zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: use step [%s]",
+				httpstep.name);
+
+		if ('\0' != *httpstep.posts)
+			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: use post [%s]",
+					httpstep.posts);
+
+		if (NULL == err_str)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: use post [%s]", httpstep.posts);
-			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, httpstep.posts)))
-			{
-				zabbix_log(LOG_LEVEL_ERR, "Cannot set POST vars [%s]",
-					curl_easy_strerror(err));
-				err_str = strdup(curl_easy_strerror(err));
-				lastfailedstep = httpstep.no;
-			}
-		}
-		if( !err_str )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: Go to URL [%s]", httpstep.url);
-			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, httpstep.url)))
+			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: go to URL [%s]",
+					httpstep.url);
+
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle,
+					CURLOPT_URL, httpstep.url)))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "Cannot set URL [%s]",
-					curl_easy_strerror(err));
+						curl_easy_strerror(err));
+
 				err_str = strdup(curl_easy_strerror(err));
 				lastfailedstep = httpstep.no;
 			}
 		}
-		/*if( !err_str )*/
+
 		if( !err_str && httptest->authentication == HTTPTEST_AUTH_BASIC )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: Setting HTTPAUTH [%d]", httptest->authentication);
