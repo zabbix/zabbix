@@ -1200,7 +1200,7 @@ COpt::memoryPick();
 // }}} EXCEPTION: NO ITEMS
 
 // EXCPETION: more than one sum type item for pie graph {{{
-			if($graph['graphtype'] == GRAPH_TYPE_PIE){
+			if(($graph['graphtype'] == GRAPH_TYPE_PIE) || ($graph['graphtype'] == GRAPH_TYPE_EXPLODED)){
 				$sum_items = 0;
 				foreach($graph['gitems'] as $gitem){
 					if($gitem['type'] == GRAPH_ITEM_SUM) $sum_items++;
