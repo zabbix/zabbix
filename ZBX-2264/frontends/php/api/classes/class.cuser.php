@@ -347,7 +347,7 @@ class CUser extends CZBXAPI{
 
 		if($login){
 			if(($login['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) && ((time() - $login['attempt_clock']) < ZBX_LOGIN_BLOCK)){
-				$_REQUEST['message'] = sprint(S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_MINUTES, (ZBX_LOGIN_BLOCK - (time() - $login['attempt_clock'])));
+				$_REQUEST['message'] = sprintf(S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_MINUTES, (ZBX_LOGIN_BLOCK - (time() - $login['attempt_clock'])));
 				return false;
 			}
 
@@ -497,12 +497,12 @@ class CUser extends CZBXAPI{
 				$incorrect_session = true;
 			}
 			else if($login['attempt_failed']){
-				error(new CJSscript(sprintf(
+				/*error(new CJSscript(sprintf(
 								S_CUSER_ERROR_ATTEMP_FAILED,
 								bold($login['attempt_failed']),
 								bold($login['attempt_ip']),
 								bold(date('d.m.Y H:i',$login['attempt_clock']))
-								)));
+								)));*/
 
 				DBexecute('UPDATE users SET attempt_failed=0 WHERE userid='.$login['userid']);
 			}
@@ -569,11 +569,11 @@ class CUser extends CZBXAPI{
 
 		if(!$login || isset($incorrect_session) || isset($missed_user_guest)){
 
-			if(isset($incorrect_session))	$message = S_CUSER_ERROR_SESSION_TERMINATED;
+			if(isset($incorrect_session))	$message = 'Session terminated, re-login, please'; // S_CUSER_ERROR_SESSION_TERMINATED
 			else if(isset($missed_user_guest)){
 				$row = DBfetch(DBselect('SELECT count(u.userid) as user_cnt FROM users u'));
 				if(!$row || $row['user_cnt'] == 0){
-					$message = S_CUSER_ERROR_TABLE_USERS_EMPTY;
+					$message = 'Table users is empty. Possible database corruption.'; // S_CUSER_ERROR_TABLE_USERS_EMPTY
 				}
 			}
 

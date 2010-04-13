@@ -180,7 +180,18 @@ function __autoload($class_name){
 		if(file_exists('include/locales/'.$USER_DETAILS['lang'].'.inc.php')){
 			include_once('include/locales/'.$USER_DETAILS['lang'].'.inc.php');
 			process_locales();
-		}		
+		}
+		
+		if($USER_DETAILS['attempt_failed']) {
+			$attemps = bold($USER_DETAILS['attempt_failed']);
+			$attempip = bold($USER_DETAILS['attempt_ip']);
+			$attempdate = bold(date('d.m.Y H:i',$USER_DETAILS['attempt_clock']));
+			error(new CJSscript(sprintf(	S_CUSER_ERROR_ATTEMP_FAILED,
+							$attemps->toString(),
+							$attempip->toString(),
+							$attempdate->toString()
+							)));
+		}
 	}
 	else{
 		$USER_DETAILS = array(
