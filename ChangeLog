@@ -4,6 +4,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBXNEXT-293] processes now provide more information on why they terminate (asaveljevs)
  - [ZBX-2304] fixed "no permission" error when screen contains simple graphs with web item (Vedmak)
  - [ZBX-2268] denied creation of pie\exploded graphs with more than one sum items (Vedmak)
  - [ZBX-2298] added constant to defines to be able configure default Y axis position: left or right (AM)
