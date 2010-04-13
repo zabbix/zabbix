@@ -410,6 +410,8 @@ src/libs/zbxicmpping/Makefile.am -text
 src/libs/zbxicmpping/icmpping.c -text
 src/libs/zbxjson/Makefile.am -text
 src/libs/zbxjson/json.c -text
+src/libs/zbxnix/fatal.c -text
+src/libs/zbxnix/fatal.h -text
 src/libs/zbxnix/ipc.c -text
 src/libs/zbxserver/Makefile.am -text
 src/libs/zbxsysinfo/aix/vmstats.c -text
