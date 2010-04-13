@@ -384,8 +384,6 @@
 	'S_APPLICATIONS'=>			'Aplicaciones',
 	'S_APPLICATIONS_BIG'=>			'APLICACIONES',
 	'S_CREATE_APPLICATION'=>			'Crear aplicación',
-	'S_ACTIVATE_ITEMS'=>			'Activar',
-	'S_DISABLE_ITEMS'=>			'Desactivar',
 	'S_APPLICATION_UPDATED'=>			'Aplicación actualizada',
 	'S_CANNOT_UPDATE_APPLICATION'=>			'No es posible actualizar la aplicación',
 	'S_APPLICATION_ADDED'=>			'Aplicación añadida',

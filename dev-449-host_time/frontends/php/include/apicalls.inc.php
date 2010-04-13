@@ -340,11 +340,11 @@ class CScreen extends CZBXAPI{
 
 	}
 
-	public static function setItems($screen_items){
+	public static function addItems($data){
 
 	}
 
-	public static function deleteItems($screen_itemids){
+	public static function deleteItems($data){
 
 	}
 }
@@ -574,7 +574,7 @@ class CUserMacro extends CZBXAPI{
 
 	}
 
-	public static function addGlobal($macros){
+	public static function createGlobal($macros){
 
 	}
 

@@ -33,6 +33,9 @@
 
 include_once('include/page_header.php');
 
+	if($USER_DETAILS['alias'] == ZBX_GUEST_USER) {
+		access_deny();
+	}
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION

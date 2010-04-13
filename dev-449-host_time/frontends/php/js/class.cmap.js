@@ -1,7 +1,7 @@
 // JavaScript Document
 /*
 ** ZABBIX
-** Copyright (C) 2000-2008 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,12 +66,13 @@ mselement: {
 	elementtype:	4,			// 5-UNDEFINED
 	elementid: 		0,			// ALWAYS must be a STRING (js doesn't support uint64) 
 	elementName:	'',			// element name
-	iconid_off:		19,			// ALWAYS must be a STRING (js doesn't support uint64)
+	iconid_off:		0,			// ALWAYS must be a STRING (js doesn't support uint64)
 	iconid_on:		0,			// ALWAYS must be a STRING (js doesn't support uint64)
 	iconid_unknown:	0,			// ALWAYS must be a STRING (js doesn't support uint64)
 	iconid_maintenance:0,		// ALWAYS must be a STRING (js doesn't support uint64)
 	iconid_disabled:0,			// ALWAYS must be a STRING (js doesn't support uint64)
-	label:			'New Element',
+	label:			locale['S_NEW_ELEMENT'],	// Element label
+	label_expanded: locale['S_NEW_ELEMENT'],	// Element label macros expanded
 	label_location:	3,
 	x:				0,
 	y:				0,
@@ -84,10 +85,11 @@ mselement: {
 mlink: {
 	linkid:			0,				// ALWAYS must be a STRING (js doesn't support uint64)
 	label:			'',				// Link label
+	label_expanded: '',				// Link label (Expand macros)
 	selementid1:	0,				// ALWAYS must be a STRING (js doesn't support uint64)
 	selementid2:	0,				// ALWAYS must be a STRING (js doesn't support uint64)
-	linktriggers:	{},				// ALWAYS must be a STRING (js doesn't support uint64)
-	tr_desc:		'Select',		// default trigger caption
+	linktriggers:	null,			// ALWAYS must be a STRING (js doesn't support uint64)
+	tr_desc:		locale['S_SELECT'],		// default trigger caption
 	drawtype:		0,
 	color:			'0000CC',
 	status:			1				// status of link 1 - active, 2 - passive
@@ -97,7 +99,7 @@ mlink: {
 mlinktrigger: {
 	linktriggerid:	0,					// ALWAYS must be a STRING (js doesn't support uint64)
 	triggerid:		0,					// ALWAYS must be a STRING (js doesn't support uint64)
-	desc_exp:		'Set Trigger',		// default trigger caption
+	desc_exp:		locale['S_SET_TRIGGER'],		// default trigger caption
 	drawtype:		0,
 	color:			'CC0000'
 },
@@ -242,7 +244,7 @@ add_empty_link: function(e){
 		}
 	}
 	else{
-		this.info('Two elements should be selected');
+		this.info(locale['S_TWO_ELEMENTS_SHOULD_BE_SELECTED']);
 		return false;
 	}
 		
@@ -253,6 +255,8 @@ add_empty_link: function(e){
 	
 	mlink['selementid1'] = selementid1;
 	mlink['selementid2'] = selementid2;
+
+	mlink['linktriggers'] = {};
 
 	this.add_link(mlink,1);
 	this.update_linkContainer(e);
@@ -286,7 +290,7 @@ save_sysmap: function(){
 	}
 	
 	params = this.get_update_params(params);
-//SDJ(params);
+
 	new Ajax.Request(url.getPath()+'?output=ajax'+'&sid='+url.getArgument('sid'),
 					{
 						'method': 'post',
@@ -444,7 +448,7 @@ remove_selements: function(e){
 	this.debug('remove_selements');
 //--
 
-	if(Confirm('Delete selected elements?')){
+	if(Confirm(locale['S_DELETE_SELECTED_ELEMENTS_Q'])){
 		for(var i=0; i<this.selection.position; i++){
 			if(!isset(i, this.selection.selements)) continue;
 
@@ -607,14 +611,14 @@ remove_links: function(e){
 		}
 	}
 	else{
-		this.info('Please select two elements');
+		this.info(locale['S_PLEASE_SELECT_TWO_ELEMENTS']);
 		return false;
 	}
 	
 	var linkids = this.get_linkid_by_selementids(selementid1,selementid2);
 
 	if(linkids !== false){
-		if(Confirm('Delete Links between selected elements?')){			
+		if(Confirm(locale['S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'])){			
 			for(var linkid in linkids){
 				this.remove_link(linkid);
 			}
@@ -658,6 +662,14 @@ add_linktrigger: function(linkid, linktrigger, update_map){
 //--
 
 	if(!isset(linkid,this.links) || empty(this.links[linkid])) return false;
+
+	for(var ltid in this.links[linkid].linktriggers){
+		if(!isset(ltid, this.links[linkid].linktriggers)) continue;
+		if(this.links[linkid].linktriggers[ltid].triggerid === linktrigger.triggerid){
+			linktrigger.linktriggerid = ltid;
+			break;
+		}
+	}
 
 	var linktriggerid = 0;
 	if(!isset('linktriggerid',linktrigger) || (linktrigger['linktriggerid'] == 0)){
@@ -827,6 +839,7 @@ update_mapimg: function(){
 
 set_mapimg: function(resp){
 	this.debug('set_mapimg');
+//--
 
 //SDI(resp.responseText);
 	if(is_null(this.mapimg)){
@@ -1175,7 +1188,7 @@ update_multiContainer: function(e){
 //		e_span_5.className = "link";
 		e_td_4.appendChild(e_span_5);
 		
-		e_span_5.appendChild(document.createTextNode(selement.label));
+		e_span_5.appendChild(document.createTextNode(selement.label_expanded));
 
 		var elementtypeText = '';
 		switch(selement.elementtype){
@@ -1312,6 +1325,8 @@ update_linkContainer: function(e){
 		}
 	}
 
+	this.linkContainer.container.style.height = 'auto';
+
 	var count = 0;
 	var maplink = null;
 	for(var linkid in linkids){
@@ -1321,7 +1336,6 @@ update_linkContainer: function(e){
 		maplink = this.links[linkid];
 		
 		if(count > 4) this.linkContainer.container.style.height = '120px';
-		else this.linkContainer.container.style.height = 'auto';
 
 		var e_tr_3 = document.createElement('tr');
 		e_tr_3.className = "even_row";
@@ -1335,17 +1349,17 @@ update_linkContainer: function(e){
 		var e_span_5 = document.createElement('span');
 		e_span_5.className = "link";
 		addListener(e_span_5, 'click', this.updateForm_link.bindAsEventListener(this, linkid));
-		e_span_5.appendChild(document.createTextNode('Link '+count));
+		e_span_5.appendChild(document.createTextNode(locale['S_LINK']+' '+count));
 		e_td_4.appendChild(e_span_5);
 
 
 		var e_td_4 = document.createElement('td');
-		e_td_4.appendChild(document.createTextNode(this.selements[maplink.selementid1].label));
+		e_td_4.appendChild(document.createTextNode(this.selements[maplink.selementid1].label_expanded));
 		e_tr_3.appendChild(e_td_4);		
 
 
 		var e_td_4 = document.createElement('td');
-		e_td_4.appendChild(document.createTextNode(this.selements[maplink.selementid2].label));
+		e_td_4.appendChild(document.createTextNode(this.selements[maplink.selementid2].label_expanded));
 		e_tr_3.appendChild(e_td_4);
 
 
@@ -1367,7 +1381,7 @@ update_linkContainer: function(e){
 		var e_td_4 = document.createElement('td');
 		e_td_4.setAttribute('colSpan',4);
 		e_td_4.setAttribute('class','center');
-		e_td_4.appendChild(document.createTextNode('No links'));
+		e_td_4.appendChild(document.createTextNode(locale['S_NO_LINKS']));
 		e_tr_3.appendChild(e_td_4);
 	}
 
@@ -2412,10 +2426,12 @@ updateForm_selementByType: function(e, multi){
 	}
 	
 	if(!empty(srctbl)){
-		var popup_url = 'popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementName';
+		var popup_url = 'popup.php?writeonly=1&real_hosts=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementName';
 		popup_url+= '&srctbl='+srctbl;
 		popup_url+= '&srcfld1='+srcfld1;
 		popup_url+= '&srcfld2='+srcfld2;
+
+		if(elementtype.toString() == '1') popup_url+= '&excludeids[]='+this.sysmapid;
 		
 		this.selementForm.elementTypeSelect.onclick =  function(){ PopUp(popup_url,450,450);};
 	}
@@ -2446,6 +2462,23 @@ saveForm_selement: function(e){
 // Element
 		params.elementid = this.selementForm.elementid.value;
 		params.elementName = this.selementForm.elementName.value;
+
+		if((params.elementid == 0) && (params.elementtype != 4)){
+			switch(params.elementtype.toString()){
+//host
+				case '0': this.info('Host is not selected.'); return false; break;
+//map
+				case '1': this.info('Map is not selected.'); return false; break;
+//tr
+				case '2': this.info('Trigger is not selected.'); return false; break;
+//hg
+				case '3': this.info('Host group is not selected.'); return false; break;
+// image
+				case '4':
+				default:
+			}
+		}
+
 		
 // Icon OK
 		params.iconid_off = this.selementForm.iconid_off.options[this.selementForm.iconid_off.selectedIndex].value;
@@ -2622,7 +2655,7 @@ this.linkForm.form = e_form_1;
 	e_span_6.setAttribute('target',"_blank");
 	e_span_6.setAttribute('style',"padding-left: 5px; float: right; text-decoration: none;");
 	e_span_6.setAttribute('onclick','window.open("http://www.zabbix.com/documentation.php");');
-	e_span_6.setAttribute('class',"http://www.zabbix.com/documentation.php");
+	
 	e_td_5.appendChild(e_span_6);
 
 
@@ -2829,7 +2862,8 @@ this.linkForm.colorPicker = e_div_6;
 	e_div_6.setAttribute('id',"lbl_color");
 	e_div_6.setAttribute('name',"lbl_color");
 	e_div_6.className = "pointer";
-	e_div_6.setAttribute('onclick',"javascript: show_color_picker('color')");
+	addListener(e_div_6, 'click', function(){ show_color_picker('color');});
+	// e_div_6.setAttribute('onclick',"javascript: show_color_picker('color')");
 
 	e_div_6.style.marginLeft = '2px';
 	e_div_6.style.border = '1px solid black';
@@ -2912,7 +2946,7 @@ updateForm_link: function(e, linkid){
 	this.linkForm.linklabel.value = maplink.label;
 
 // SELEMENTID1
-	this.linkForm.selementid1.update();
+	$(this.linkForm.selementid1).update();
 	for(var selementid in this.selements){
 		if(empty(this.selements[selementid])) continue;
 
@@ -2926,14 +2960,14 @@ updateForm_link: function(e, linkid){
 		}
 
 		e_option_7.setAttribute('value', selementid);
-		e_option_7.appendChild(document.createTextNode(this.selements[selementid].label));
+		e_option_7.appendChild(document.createTextNode(this.selements[selementid].label_expanded));
 		
 		this.linkForm.selementid1.appendChild(e_option_7);
 	}
 
 
 // SELEMENTID2
-	this.linkForm.selementid2.update();
+	$(this.linkForm.selementid2).update();
 	for(var selementid in this.selements){
 		if(empty(this.selements[selementid])) continue;
 
@@ -2947,7 +2981,7 @@ updateForm_link: function(e, linkid){
 		}
 
 		e_option_7.setAttribute('value', selementid);
-		e_option_7.appendChild(document.createTextNode(this.selements[selementid].label));
+		e_option_7.appendChild(document.createTextNode(this.selements[selementid].label_expanded));
 		
 		this.linkForm.selementid2.appendChild(e_option_7);
 	}	
@@ -2977,9 +3011,9 @@ this.linkForm.linkIndicatorsBody = e_tbody_7;
 
 	var e_input_10 = document.createElement('input');
 	e_input_10.setAttribute('type',"checkbox");
-	e_input_10.setAttribute('onclick',"javascript: checkAll('linkForm','all_triggers','triggers');");
-	e_input_10.setAttribute('id',"all_triggers");
-	e_input_10.setAttribute('name',"all_triggers");
+	e_input_10.setAttribute('onclick',"javascript: checkLocalAll('linkForm','all_link_triggerids','link_triggerids');");
+	e_input_10.setAttribute('id',"all_link_triggerids");
+	e_input_10.setAttribute('name',"all_link_triggerids");
 	e_input_10.setAttribute('value',"yes");
 	e_input_10.className = "checkbox";
 	e_td_9.appendChild(e_input_10);
@@ -3021,7 +3055,7 @@ this.linkForm.linkIndicatorsBody = e_tbody_7;
 	this.linkForm.linkIndicatorsTable.appendChild(e_input_6);
 
 	var url = 'popup_link_tr.php?form=1&mapid='+this.id;
-	addListener(e_input_6, 'click', function(){ PopUp(url,640, 260, 'ZBX_Link_Indicator'); });
+	addListener(e_input_6, 'click', function(){ PopUp(url,640, 420, 'ZBX_Link_Indicator'); });
 
 
 	var e_input_6 = document.createElement('input');
@@ -3053,13 +3087,22 @@ linkForm_addLinktrigger: function(linktrigger){
 	this.debug('linkForm_addLinktrigger');
 //--
 
+	var triggerid = linktrigger.triggerid;
+
 	if(!isset('linkIndicatorsBody', this.linkForm) || empty(this.linkForm.linkIndicatorsBody)) return false;
 	if(!isset('form', this.linkForm) || is_null(this.linkForm.form)) return false;
 
+// If allready exsts just rewrite
+	if($('link_triggers['+triggerid+'][triggerid]') != null){
+		$('link_triggers['+triggerid+'][drawtype]').selectedIndex = (linktrigger.drawtype > 0)?(linktrigger.drawtype - 1):0;
+
+		$('link_triggers['+triggerid+'][color]').value = linktrigger.color;
+		$('lbl_link_triggers['+triggerid+'][color]').style.backgroundColor = '#'+linktrigger.color;
+		return false;
+	}
+
 
 // ADD Linktrigger
-	var triggerid = linktrigger.triggerid;
-	
 	var e_tr_8 = document.createElement('tr');
 	e_tr_8.className = "even_row";
 	this.linkForm.linkIndicatorsBody.appendChild(e_tr_8);
@@ -3068,45 +3111,39 @@ linkForm_addLinktrigger: function(linktrigger){
 	var e_td_9 = document.createElement('td');
 	e_tr_8.appendChild(e_td_9);
 
+
 // HIDDEN initialization
 	if(isset('linktriggerid', linktrigger)){
 		var e_input_10 = document.createElement('input');
+		e_input_10.setAttribute('name',"link_triggers["+triggerid+"][linktriggerid]");
 		e_input_10.setAttribute('type',"hidden");
 		e_input_10.setAttribute('value',linktrigger.linktriggerid);
 		e_input_10.setAttribute('id',"link_triggers["+triggerid+"][linktriggerid]");
-		e_input_10.setAttribute('name',"link_triggers["+triggerid+"][linktriggerid]");
 		e_td_9.appendChild(e_input_10);
 	}
 
 	var e_input_10 = document.createElement('input');
+	e_input_10.setAttribute('name',"link_triggers["+triggerid+"][triggerid]");
+	e_input_10.setAttribute('id',"link_triggers["+triggerid+"][triggerid]");
 	e_input_10.setAttribute('type',"hidden");
 	e_input_10.setAttribute('value',linktrigger.triggerid);
-	e_input_10.setAttribute('id',"link_triggers["+triggerid+"][triggerid]");
-	e_input_10.setAttribute('name',"link_triggers["+triggerid+"][triggerid]");
 	e_td_9.appendChild(e_input_10);
 
 	var e_input_10 = document.createElement('input');
+	e_input_10.setAttribute('name',"link_triggers["+triggerid+"][desc_exp]");
+	e_input_10.setAttribute('id',"link_triggers["+triggerid+"][desc_exp]");
 	e_input_10.setAttribute('type',"hidden");
 	e_input_10.setAttribute('value',linktrigger.desc_exp);
-	e_input_10.setAttribute('id',"link_triggers["+triggerid+"][desc_exp]");
-	e_input_10.setAttribute('name',"link_triggers["+triggerid+"][desc_exp]");
 	e_td_9.appendChild(e_input_10);
 
 	var e_input_10 = document.createElement('input');
-	e_input_10.setAttribute('type',"hidden");
-	e_input_10.setAttribute('value',linktrigger.drawtype);
-	e_input_10.setAttribute('id',"link_triggers["+triggerid+"][drawtype]");
-	e_input_10.setAttribute('name',"link_triggers["+triggerid+"][drawtype]");
-	e_td_9.appendChild(e_input_10);
-
-	var e_input_10 = document.createElement('input');
-	e_input_10.setAttribute('type','hidden');
-	e_input_10.setAttribute('value',linktrigger.color);
-	e_input_10.setAttribute('id',"link_triggers["+triggerid+"][color]");
 	e_input_10.setAttribute('name',"link_triggers["+triggerid+"][color]");
-	e_td_9.appendChild(e_input_10);	
-//-----
+	e_input_10.setAttribute('id',"link_triggers["+triggerid+"][color]");
+	e_input_10.setAttribute('type',"hidden");
+	e_input_10.setAttribute('value',linktrigger.color);
+	e_td_9.appendChild(e_input_10);
 
+//-----
 	var linktriggerid = isset('linktriggerid', linktrigger)?linktrigger.linktriggerid:0;
 
 	var e_input_10 = document.createElement('input');
@@ -3130,18 +3167,37 @@ linkForm_addLinktrigger: function(linktrigger){
 //	addListener(e_span_10, 'click', function(){ PopUp(url,640, 480, 'ZBX_Link_Indicator'); });
 
 // LINE
-	var lineName = '';
-	switch(linktrigger.drawtype.toString()){
-		case '0': lineName = locale['S_LINE']; break;
-		case '2': lineName = locale['S_BOLD_LINE']; break;
-		case '3': lineName = locale['S_DOT']; break;
-		case '4': lineName = locale['S_DASHED_LINE']; break;
-	}
-	
+	var e_select_10 = document.createElement('select');
+
 	var e_td_9 = document.createElement('td');
 	e_tr_8.appendChild(e_td_9);
-	e_td_9.appendChild(document.createTextNode(lineName));
-	
+	e_td_9.appendChild(e_select_10);
+
+	e_select_10.setAttribute('id',"link_triggers["+triggerid+"][drawtype]");
+	e_select_10.setAttribute('name', 'link_triggers['+triggerid+'][drawtype]');
+	e_select_10.className = 'biginput';
+// items
+	var e_option_11 = document.createElement('option');
+	e_option_11.setAttribute('value', 0);
+	e_option_11.appendChild(document.createTextNode(locale['S_LINE']));
+	e_select_10.appendChild(e_option_11);
+
+	var e_option_11 = document.createElement('option');
+	e_option_11.setAttribute('value', 2);
+	e_option_11.appendChild(document.createTextNode(locale['S_BOLD_LINE']));
+	e_select_10.appendChild(e_option_11);
+
+	var e_option_11 = document.createElement('option');
+	e_option_11.setAttribute('value', 3);
+	e_option_11.appendChild(document.createTextNode(locale['S_DOT']));
+	e_select_10.appendChild(e_option_11);
+
+	var e_option_11 = document.createElement('option');
+	e_option_11.setAttribute('value', 4);
+	e_option_11.appendChild(document.createTextNode(locale['S_DASHED_LINE']));
+	e_select_10.appendChild(e_option_11);
+//--
+	e_select_10.selectedIndex = (linktrigger.drawtype > 0)?(linktrigger.drawtype - 1):0;
 
 // COLOR
 	var e_td_9 = document.createElement('td');
@@ -3149,11 +3205,24 @@ linkForm_addLinktrigger: function(linktrigger){
 
 
 	var e_div_10 = document.createElement('div');
-	e_div_10.style.textDecoration = 'none'; 
-	e_div_10.style.outline = '1px black solid';
+//this.linkForm.colorPicker = e_div_10;
+
+	e_div_10.setAttribute('title', '#'+linktrigger.color);
+	e_div_10.setAttribute('id',"lbl_link_triggers["+triggerid+"][color]");
+	e_div_10.setAttribute('name',"lbl_link_triggers["+triggerid+"][color]");
+	e_div_10.className = "pointer";
+	addListener(e_div_10, 'click', function(){ show_color_picker("link_triggers["+triggerid+"][color]");});
+	// e_div_10.setAttribute('onclick',"javascript: show_color_picker('color')");
+
+	e_div_10.style.marginLeft = '2px';
+	e_div_10.style.border = '1px solid black';
+	e_div_10.style.display = 'inline';
 	e_div_10.style.width = '10px';
 	e_div_10.style.height = '10px';
+	e_div_10.style.textDecoration = 'none';
 	e_div_10.style.backgroundColor = '#'+linktrigger.color;
+
+	e_div_10.innerHTML = '&nbsp;&nbsp;&nbsp;';
 	e_td_9.appendChild(e_div_10);
 },
 
@@ -3203,7 +3272,11 @@ saveForm_link: function(e){
 
 		linktrigger.triggerid = $('link_triggers['+triggerid+'][triggerid]').value;
 		linktrigger.desc_exp = $('link_triggers['+triggerid+'][desc_exp]').value;
-		linktrigger.drawtype = $('link_triggers['+triggerid+'][drawtype]').value;
+
+		var dom_drawtype = $('link_triggers['+triggerid+'][drawtype]');
+
+		linktrigger.drawtype = dom_drawtype.options[dom_drawtype.selectedIndex].value;
+
 		linktrigger.color = $('link_triggers['+triggerid+'][color]').value;
 
 		linktriggerid = $('link_triggers['+triggerid+'][linktriggerid]');

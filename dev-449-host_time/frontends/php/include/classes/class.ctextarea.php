@@ -34,7 +34,7 @@ class CTextArea extends CTag{
 	}
 
 	public function setReadonly($value='yes'){
-		if($value=='yes')
+		if($value==='yes')
 			return $this->attributes['readonly'] = 'readonly';
 
 		$this->removeAttribute('readonly');

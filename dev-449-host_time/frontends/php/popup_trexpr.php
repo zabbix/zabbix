@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,15 +19,15 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/users.inc.php";
+	require_once('include/config.inc.php');
+	require_once('include/users.inc.php');
 
-	$page["title"] = "S_CONDITION";
-	$page["file"] = "popup_trexpr.php";
+	$page['title'] = 'S_CONDITION';
+	$page['file'] = 'popup_trexpr.php';
 
 	define('ZBX_PAGE_NO_MENU', 1);
 
-include_once "include/page_header.php";
+	include_once('include/page_header.php');
 
 ?>
 <?php
@@ -50,6 +50,11 @@ include_once "include/page_header.php";
 				'T' => T_ZBX_INT,	/* type */
 				'M' => $metrics		/* metrcis */
 			     ));
+	$param1_sec = array(
+			array(
+				'C' => S_LAST_OF.' T',	/* caption */
+				'T' => T_ZBX_INT,	/* type */
+			     ));
 
 	$param1_str = array(
 			array(
@@ -58,14 +63,26 @@ include_once "include/page_header.php";
 			     ));
 
 	$param2_sec_val = array(
-			array(
-				'C' => S_LAST_OF.' T',	/* caption */
-				'T' => T_ZBX_INT,
-			     ),
-			array(
-				'C' => 'V',		/* caption */
-				'T' => T_ZBX_STR,
-			     ));
+		array(
+			'C' => S_LAST_OF.' T',	/* caption */
+			'T' => T_ZBX_INT,
+			 ),
+		array(
+			'C' => 'V',		/* caption */
+			'T' => T_ZBX_STR,
+			 ));
+
+	$param2_val_sec = array(
+		array(
+			'C' => 'V', /* caption */
+			'T' => T_ZBX_STR,
+		),
+		array(
+			'C' => S_LAST_OF . ' T', /* caption */
+			'T' => T_ZBX_INT,
+		)
+	);
+
 
 	$functions = array(
 		'abschange'	=> array(
@@ -122,8 +139,52 @@ include_once "include/page_header.php";
 			'description'	=> 'Sum of values for period of time T {OP} N',
 			'operators'     => $operators,
 			'params'	=> $param1_sec_count
-			)
-
+			),
+		'date' => array(
+			'description' => 'Current date is {OP} N.',
+			'operators' => $operators,
+		),
+		'dayofweek' => array(
+			'description' => 'Day of week is {OP} N.',
+			'operators' => $operators,
+		),
+		'fuzzytime' => array(
+			'description' => 'N {OP} X, where X is 1 - if timestamp is equal with Zabbix server time for T seconds, 0 - otherwise',
+			'operators' => $limited_operators,
+			'params' => $param1_sec_count,
+		),
+		'regexp' => array(
+			'description' => 'N {OP} X, where X is 1 - last value matches regular expression V for last T seconds, 0 - otherwise.',
+			'operators' => $limited_operators,
+			'params' => $param2_val_sec,
+		),
+		'iregexp' => array(
+			'description' => 'N {OP} X, where X is 1 - last value matches regular expression V for last T seconds, 0 - otherwise. (non case-sensitive)',
+			'operators' => $limited_operators,
+			'params' => $param2_val_sec,
+		),
+		'logseverity' => array(
+			'description' => 'Log severity of the last log entry is {OP} N',
+			'operators' => $operators,
+		),
+		'logsource' => array(
+			'description' => 'N {OP} X, where X is 1 - last log source of the last log entry matches T',
+			'operators' => $limited_operators,
+			'params' => $param1_str,
+		),
+		'now' => array(
+			'description' => 'Number of seconds since the Epoch is {OP} N.',
+			'operators' => $operators,
+		),
+		'time' => array(
+			'description' => 'Current time is {OP} N.',
+			'operators' => $operators,
+		),
+		'nodata' => array(
+			'description' => 'N {OP} X, where X is 1 - no data received during period of T seconds, 0 - otherwise',
+			'operators' => $operators,
+			'params' => $param1_sec
+		),
 	);
 
 
@@ -146,7 +207,6 @@ include_once "include/page_header.php";
 	check_fields($fields);
 
 	if(isset($_REQUEST['expression'])){
-//		if(($res = ereg('^'.ZBX_EREG_SIMPLE_EXPRESSION_FORMAT.'(['.implode('',array_keys($operators)).'])'.'([[:print:]]{1,})',$_REQUEST['expression'],$expr_res))){
 		$res = preg_match('/^'.ZBX_PREG_SIMPLE_EXPRESSION_FORMAT.'(['.implode('',array_keys($operators)).'])'.'(['.ZBX_PREG_PRINT.']{1,})/',
 						$_REQUEST['expression'],
 						$expr_res);
@@ -181,37 +241,39 @@ include_once "include/page_header.php";
 
 	$dstfrm		= get_request("dstfrm",		0);	// destination form
 	$dstfld1	= get_request("dstfld1",	'');	// destination field
-	$itemid		= get_request("itemid",		0);
+	$itemid		= get_request('itemid', 0);
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
+	if($itemid){
+		$options = array(
+			'output' => API_OUTPUT_EXTEND,
+			'itemids' => $itemid,
+			'select_hosts' => API_OUTPUT_EXTEND
+		);
+		$item_data = CItem::get($options);
+		$item_data = reset($item_data);
 
-	if($item_data = DBfetch(DBselect('SELECT DISTINCT h.host,i.* '.
-						' FROM hosts h,items i '.
-						' WHERE h.hostid=i.hostid '.
-							' AND '.DBcondition('h.hostid',$available_hosts).
-							' AND i.itemid='.$itemid)))
-	{
-		$description = $item_data['host'].':'.item_description($item_data);
+		$item_host = reset($item_data['hosts']);
+		$item_host = $item_host['host'];
+		
+		$description = $item_host.':'.item_description($item_data);
 	}
 	else{
-		$itemid = 0;
 		$description = '';
 	}
 
-	$expr_type	= get_request("expr_type",	'last[=]');
-//	if(eregi('^([a-z]{1,})\[(['.implode('',array_keys($operators)).'])\]$',$expr_type,$expr_res)){
+	$expr_type	= get_request("expr_type", 'last[=]');
 	if(preg_match('/^([a-z]{1,})\[(['.implode('',array_keys($operators)).'])\]$/i',$expr_type,$expr_res)){
 		$function = $expr_res[1];
 		$operator = $expr_res[2];
 
-		if(!str_in_array($function, array_keys($functions)))	unset($function);
+		if(!str_in_array($function, array_keys($functions))) unset($function);
 	}
 	unset($expr_res);
 
-	if(!isset($function))	$function = 'last';
+	if(!isset($function)) $function = 'last';
 
-	if(!str_in_array($operator, array_keys($functions[$function]['operators'])))	unset($operator);
-	if(!isset($operator))	$operator = '=';
+	if(!str_in_array($operator, array_keys($functions[$function]['operators']))) unset($operator);
+	if(!isset($operator)) $operator = '=';
 
 	$expr_type = $function.'['.$operator.']';
 
@@ -219,7 +281,7 @@ include_once "include/page_header.php";
 	$paramtype	= get_request('paramtype',	PARAM_TYPE_SECONDS);
 	$value		= get_request('value',		0);
 
-	if( !is_array($param) ){
+	if(!is_array($param)){
 		if(isset($functions[$function]['params'])){
 			$param = explode(',', $param, count($functions[$function]['params']));
 		}
@@ -264,17 +326,16 @@ function InsertText(obj, value){
 <?php
 
 	if(isset($_REQUEST['insert'])){
-
 		$expression = sprintf("{%s:%s.%s(%s%s)}%s%s",
-			$item_data['host'],
+			$item_host,
 			$item_data['key_'],
 			$function,
 			$paramtype == PARAM_TYPE_COUNTS ? '#' : '',
 			rtrim(implode(',', $param),','),
 			$operator,
 			$value);
-
 ?>
+
 <script language="JavaScript" type="text/javascript">
 <!--
 var form = window.opener.document.forms['<?php echo $dstfrm; ?>'];
@@ -295,12 +356,11 @@ if(form){
 	echo SBR;
 
 	$form = new CFormTable(S_CONDITION);
-	$form->SetHelp('config_triggers.php');
 	$form->SetName('expression');
 	$form->addVar('dstfrm', $dstfrm);
 	$form->addVar('dstfld1', $dstfld1);
-
 	$form->addVar('itemid',$itemid);
+
 	$form->addRow(S_ITEM, array(
 		new CTextBox('description', $description, 50, 'yes'),
 		new CButton('select', S_SELECT, "return PopUp('popup.php?dstfrm=".$form->GetName().
@@ -358,9 +418,7 @@ if(form){
 
 	$form->addItemToBottomRow(new CButton('insert',S_INSERT));
 	$form->show();
-?>
-<?php
+
 
 include_once('include/page_footer.php');
-
 ?>

@@ -64,9 +64,10 @@ typedef struct zbx_active_metric_type
 /* Must be long for fseek() */
 	long	lastlogsize;
 	int	mtime;
+	unsigned char	skip_old_data;	/* for processing [event]log metrics */
 } ZBX_ACTIVE_METRIC;
 
-typedef struct active_ckeck_args
+typedef struct active_check_args_type
 {
 	char		*host;
 	unsigned short	port;
@@ -84,12 +85,13 @@ typedef struct zbx_active_buffer_element_type
 	int	clock;
 	int	logeventid;
 	int	mtime;
+	unsigned char	persistent;
 } ZBX_ACTIVE_BUFFER_ELEMENT;
 
 typedef struct zbx_active_buffer_type
 {
 	ZBX_ACTIVE_BUFFER_ELEMENT	*data;
-	int	count;
+	int	count, pcount, lastsent;
 } ZBX_ACTIVE_BUFFER;
 
 ZBX_THREAD_ENTRY(active_checks_thread, args);

@@ -40,14 +40,13 @@ init: function(){
 		}
 		else{
 			this.cookies[cookiePair[0]] = cookiePair[1];
-//SDI(cookiePair[0] + ' ' + cookiePair[1]);
-			
+//SDI(cookiePair[0] + ' ' + cookiePair[1]);			
 		}
 	}
 },
 
 create: function(name,value,days){
-	if(days) {
+	if(typeof(days) != "undefined") {
 		var date = new Date();
 		date.setTime(date.getTime()+(days*24*60*60*1000));
 		var expires = "; expires="+date.toGMTString();
@@ -55,7 +54,7 @@ create: function(name,value,days){
 	else{ 
 		var expires = "";
 	}
-	
+
 	document.cookie = name+"="+value+expires+"; path=/";
 
 	if(document.cookie.length > 8000){
@@ -178,6 +177,17 @@ eraseArray: function(name){
 			this.erase('cb_'+name+'_'+i);
 		}
 		this.erase('cb_'+name+'_parts');
+	}
+},
+
+eraseArrayByPattern: function(pattern){
+
+	for(var name in this.cookies) {
+		if(!isset(name, this.cookies) || empty(this.cookies[name])) continue;
+
+		if(name.indexOf('cb_'+pattern) == -1){
+			this.erase(name);
+		}
 	}
 }
 }

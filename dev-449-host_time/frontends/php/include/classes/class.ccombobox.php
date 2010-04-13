@@ -33,10 +33,10 @@ class CComboBox extends CTag{
 		$this->attributes['size'] = 1;
 
 		$this->value = $value;
-		$this->SetAction($action);
+		$this->setAction($action);
 	}
 
-	public function SetAction($value='submit()', $event='onchange'){
+	public function setAction($value='submit()', $event='onchange'){
 		$this->setAttribute($event,$value);
 	}
 
@@ -46,7 +46,7 @@ class CComboBox extends CTag{
 
 	public function addItem($value, $caption='', $selected=NULL, $enabled='yes'){
 //			if($enabled=='no') return;	/* disable item method 1 */
-		if(is_object($value) && strtolower(get_class($value))=='ccomboitem'){
+		if(is_object($value) && zbx_strtolower(get_class($value))=='ccomboitem'){
 			parent::addItem($value);
 		}
 		else{

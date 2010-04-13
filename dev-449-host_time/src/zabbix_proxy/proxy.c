@@ -47,7 +47,7 @@
 #include "heart/heart.h"
 
 char *progname = NULL;
-char title_message[] = "Zabbix Proxy (daemon)";
+char title_message[] = "Zabbix Proxy";
 char usage_message[] = "[-hV] [-c <file>]";
 
 #ifndef HAVE_GETOPT_LONG
@@ -160,6 +160,7 @@ char	*CONFIG_DBSOCKET		= NULL;
 int	CONFIG_DBPORT			= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 int	CONFIG_LOG_REMOTE_COMMANDS	= 0;
+int	CONFIG_UNSAFE_USER_PARAMETERS	= 0;
 
 char	*CONFIG_SERVER			= NULL;
 int	CONFIG_SERVER_PORT		= 10051;
@@ -169,6 +170,8 @@ int	CONFIG_MASTER_NODEID		= 0;
 int	CONFIG_NODE_NOHISTORY		= 0;
 
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
+
+int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
 
 /* Global variable to control if we should write warnings to log[] */
 int	CONFIG_ENABLE_LOG		= 1;
@@ -259,6 +262,7 @@ void	init_config(void)
 		{"DBSocket",&CONFIG_DBSOCKET,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBPort",&CONFIG_DBPORT,0,TYPE_INT,PARM_OPT,1024,65535},
 		{"SSHKeyLocation",&CONFIG_SSH_KEY_LOCATION,0,TYPE_STRING,PARM_OPT,0,0},
+		{"LogSlowQueries",&CONFIG_LOG_SLOW_QUERIES,0,TYPE_INT,PARM_OPT,0,3600000},
 		{0}
 	};
 
@@ -386,7 +390,7 @@ int MAIN_ZABBIX_ENTRY(void)
 
 	int		server_num = 0;
 
-	if(CONFIG_LOG_FILE == NULL)
+	if(CONFIG_LOG_FILE == NULL || '\0' == *CONFIG_LOG_FILE)
 	{
 		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
 	}
@@ -426,7 +430,7 @@ int MAIN_ZABBIX_ENTRY(void)
 #       define IPV6_FEATURE_STATUS " NO"
 #endif
 
-	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_proxy. Zabbix %s (revision %s).",
+	zabbix_log( LOG_LEVEL_WARNING, "Starting Zabbix Proxy. Zabbix %s (revision %s).",
 			ZABBIX_VERSION,
 			ZABBIX_REVISION);
 

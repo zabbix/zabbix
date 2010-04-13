@@ -65,7 +65,8 @@ class CItem extends CZBXAPI{
 		$sql_parts = array(
 			'select' => array('items' => 'i.itemid'),
 			'from' => array('items i'),
-			'where' => array('i.type<>9'),
+			'where' => array('webtype' => 'i.type<>9'),
+			'group' => array(),
 			'order' => array(),
 			'limit' => null);
 
@@ -77,6 +78,7 @@ class CItem extends CZBXAPI{
 			'graphids'				=> null,
 			'triggerids'			=> null,
 			'applicationids'		=> null,
+			'webitems'				=> null,
 			'inherited'				=> null,
 			'templated'				=> null,
 			'editable'				=> null,
@@ -87,17 +89,7 @@ class CItem extends CZBXAPI{
 			'group'					=> null,
 			'host'					=> null,
 			'application'			=> null,
-			'key'					=> null,
-			'type'					=> null,
-			'snmp_community'		=> null,
-			'snmp_oid'				=> null,
-			'snmp_port'				=> null,
-			'valuetype'				=> null,
-			'data_type'				=> null,
-			'delay'					=> null,
-			'history'				=> null,
-			'trends'				=> null,
-			'status'				=> null,
+
 			'belongs'				=> null,
 			'with_triggers'			=> null,
 //
@@ -110,7 +102,8 @@ class CItem extends CZBXAPI{
 			'select_triggers'		=> null,
 			'select_graphs'			=> null,
 			'select_applications'	=> null,
-			'count'					=> null,
+			'countOutput'			=> null,
+			'groupCount'			=> null,
 			'preservekeys'			=> null,
 
 			'sortfield'				=> '',
@@ -118,13 +111,13 @@ class CItem extends CZBXAPI{
 			'limit'					=> null
 		);
 
-		
+
 		$options = zbx_array_merge($def_options, $options);
 
-		
+
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
-			
+
 			if(!is_null($options['select_hosts'])){
 				$options['select_hosts'] = API_OUTPUT_EXTEND;
 			}
@@ -139,11 +132,8 @@ class CItem extends CZBXAPI{
 			}
 		}
 
-		
+
 // editable + PERMISSION CHECK
-		if(defined('ZBX_API_REQUEST')){
-			$options['nopermissions'] = false;
-		}
 
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
@@ -169,7 +159,7 @@ class CItem extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
 
 // groupids
 		if(!is_null($options['groupids'])){
@@ -182,6 +172,10 @@ class CItem extends CZBXAPI{
 			$sql_parts['from']['hg'] = 'hosts_groups hg';
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sql_parts['where'][] = 'hg.hostid=i.hostid';
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['hg'] = 'hg.groupid';
+			}
 		}
 
 // hostids
@@ -191,15 +185,19 @@ class CItem extends CZBXAPI{
 			if($options['output'] != API_OUTPUT_EXTEND){
 				$sql_parts['select']['hostid'] = 'i.hostid';
 			}
-			
-			$sql_parts['where'][] = DBcondition('i.hostid', $options['hostids']);
+
+			$sql_parts['where']['hostid'] = DBcondition('i.hostid', $options['hostids']);
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['i'] = 'i.hostid';
+			}
 		}
 
 // itemids
 		if(!is_null($options['itemids'])){
 			zbx_value2array($options['itemids']);
 
-			$sql_parts['where'][] = DBcondition('i.itemid', $options['itemids']);
+			$sql_parts['where']['itemid'] = DBcondition('i.itemid', $options['itemids']);
 		}
 
 // triggerids
@@ -241,6 +239,11 @@ class CItem extends CZBXAPI{
 			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
 		}
 
+// webitems
+		if(!is_null($options['webitems'])){
+			unset($sql_parts['where']['webtype']);
+		}
+
 // inherited
 		if(!is_null($options['inherited'])){
 			if($options['inherited'])
@@ -251,8 +254,9 @@ class CItem extends CZBXAPI{
 
 // templated
 		if(!is_null($options['templated'])){
-			$sql_parts['from'][] = 'hosts h';
+			$sql_parts['from']['h'] = 'hosts h';
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+
 			if($options['templated'])
 				$sql_parts['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
 			else
@@ -266,123 +270,131 @@ class CItem extends CZBXAPI{
 
 // pattern
 		if(!is_null($options['pattern'])){
-			$sql_parts['where'][] = ' UPPER(i.description) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
+			$sql_parts['where']['description'] = ' UPPER(i.description) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
 		}
+
+		if(isset($options['patternKey']))
+			$sql_parts['where']['key_'] = ' UPPER(i.key_) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['patternKey']).'%');
+
 
 // --- FILTER ---
 		if(!is_null($options['filter'])){
-// group
-			if(!is_null($options['group'])){
-				if($options['output'] != API_OUTPUT_SHORTEN){
-					$sql_parts['select']['name'] = 'g.name';
-				}
+			zbx_value2array($options['filter']);
 
-				$sql_parts['from']['g'] = 'groups g';
-				$sql_parts['from']['hg'] = 'hosts_groups hg';
+			if(isset($options['filter']['host'])){
+				$sql_parts['from']['h'] = 'hosts h';
 
-				$sql_parts['where']['ghg'] = 'g.groupid = hg.groupid';
-				$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
-				$sql_parts['where'][] = ' UPPER(g.name)='.zbx_dbstr(strtoupper($options['group']));
+				$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+				$sql_parts['where']['h'] = 'h.host='.zbx_dbstr($options['filter']['host']);
 			}
+
+			if(isset($options['filter']['hostid']))
+				$sql_parts['where']['hostid'] = 'i.hostid='.$options['filter']['hostid'];
+
+			if(isset($options['filter']['itemid']))
+				$sql_parts['where']['itemid'] = 'i.itemid='.$options['filter']['itemid'];
+				
+			if(isset($options['filter']['description']))
+				$sql_parts['where']['description'] = 'i.description='.zbx_dbstr($options['filter']['description']);
+
+			if(isset($options['filter']['key_']))
+				$sql_parts['where']['key_'] = 'i.key_='.zbx_dbstr($options['filter']['key_']);
+
+			if(isset($options['filter']['type']))
+				$sql_parts['where'][] = 'i.type='.$options['filter']['type'];
+
+			if(isset($options['filter']['snmp_community']))
+				$sql_parts['where'][] = 'i.snmp_community='.zbx_dbstr($options['filter']['snmp_community']);
+
+			if(isset($options['filter']['snmp_oid']))
+				$sql_parts['where'][] = 'i.snmp_oid='.zbx_dbstr($options['filter']['snmp_oid']);
+
+			if(isset($options['filter']['snmp_port']))
+				$sql_parts['where'][] = 'i.snmp_port='.$options['filter']['snmp_port'];
+
+			if(isset($options['filter']['value_type'])){
+				zbx_value2array($options['filter']['value_type']);
+
+				$sql_parts['where'][] = DBCondition('i.value_type', $options['filter']['value_type']);
+			}
+
+			if(isset($options['filter']['data_type']))
+				$sql_parts['where'][] = 'i.data_type='.$options['filter']['data_type'];
+
+			if(isset($options['filter']['delay']))
+				$sql_parts['where'][] = 'i.delay='.$options['filter']['delay'];
+
+			if(isset($options['filter']['trends']))
+				$sql_parts['where'][] = 'i.trends='.$options['filter']['trends'];
+
+			if(isset($options['filter']['history']))
+				$sql_parts['where'][] = 'i.history='.$options['filter']['history'];
+
+			if(isset($options['filter']['status']))
+				$sql_parts['where'][] = 'i.status='.$options['filter']['status'];
+		}
+
+// group
+		if(!is_null($options['group'])){
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['name'] = 'g.name';
+			}
+
+			$sql_parts['from']['g'] = 'groups g';
+			$sql_parts['from']['hg'] = 'hosts_groups hg';
+
+			$sql_parts['where']['ghg'] = 'g.groupid = hg.groupid';
+			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
+			$sql_parts['where'][] = ' UPPER(g.name)='.zbx_dbstr(zbx_strtoupper($options['group']));
+		}
 
 // host
-			if(!is_null($options['host'])){
-				if($options['output'] != API_OUTPUT_SHORTEN){
-					$sql_parts['select']['host'] = 'h.host';
-				}
-
-				$sql_parts['from']['h'] = 'hosts h';
-				$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
-				$sql_parts['where'][] = ' UPPER(h.host)='.zbx_dbstr(strtoupper($options['host']));
+		if(!is_null($options['host'])){
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['host'] = 'h.host';
 			}
+
+			$sql_parts['from']['h'] = 'hosts h';
+			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+			$sql_parts['where'][] = ' UPPER(h.host)='.zbx_dbstr(zbx_strtoupper($options['host']));
+		}
 
 // application
-			if(!is_null($options['application'])){
-				if($options['output'] != API_OUTPUT_SHORTEN){
-					$sql_parts['select']['application'] = 'a.name as application';
-				}
-
-				$sql_parts['from']['a'] = 'applications a';
-				$sql_parts['from']['ia'] = 'items_applications ia';
-
-				$sql_parts['where']['aia'] = 'a.applicationid = ia.applicationid';
-				$sql_parts['where']['iai'] = 'ia.itemid=i.itemid';
-				$sql_parts['where'][] = ' UPPER(a.name)='.zbx_dbstr(strtoupper($options['application']));
+		if(!is_null($options['application'])){
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['application'] = 'a.name as application';
 			}
 
-// key
-			if(!is_null($options['key'])){
-				$sql_parts['where'][] = ' UPPER(i.key_) LIKE '.zbx_dbstr('%'.strtoupper($options['key']).'%');
-			}
+			$sql_parts['from']['a'] = 'applications a';
+			$sql_parts['from']['ia'] = 'items_applications ia';
 
-// type
-			if(!is_null($options['type'])){
-				$sql_parts['where'][] = 'i.type='.$options['type'];
-			}
+			$sql_parts['where']['aia'] = 'a.applicationid = ia.applicationid';
+			$sql_parts['where']['iai'] = 'ia.itemid=i.itemid';
+			$sql_parts['where'][] = ' UPPER(a.name)='.zbx_dbstr(zbx_strtoupper($options['application']));
+		}
 
-// snmp community
-			if(!is_null($options['snmp_community'])){
-				$sql_parts['where'][] = 'i.snmp_community='.zbx_dbstr($options['snmp_community']);
-			}
-
-// snmp oid
-			if(!is_null($options['snmp_oid'])){
-				$sql_parts['where'][] = 'i.snmp_oid='.zbx_dbstr($options['snmp_oid']);
-			}
-
-// snmp port
-			if(!is_null($options['snmp_port'])){
-				$sql_parts['where'][] = 'i.snmp_port='.$options['snmp_port'];
-			}
-
-// valuetype
-			if(!is_null($options['valuetype'])){
-				zbx_value2array($options['valuetype']);
-
-				$sql_parts['where'][] = DBCondition('i.value_type', $options['valuetype']);
-			}
-
-// datatype
-			if(!is_null($options['data_type'])){
-				$sql_parts['where'][] = 'i.data_type='.$options['data_type'];
-			}
-
-// delay
-			if(!is_null($options['delay'])){
-				$sql_parts['where'][] = 'i.delay='.$options['delay'];
-			}
-
-// trends
-			if(!is_null($options['trends'])){
-				$sql_parts['where'][] = 'i.trends='.$options['trends'];
-			}
-
-// history
-			if(!is_null($options['history'])){
-				$sql_parts['where'][] = 'i.history='.$options['history'];
-			}
-
-// status
-			if(!is_null($options['status'])){
-				$sql_parts['where'][] = 'i.status='.$options['status'];
-			}
 
 // with_triggers
-			if(!is_null($options['with_triggers'])){
-				if($options['with_triggers'] == 1)
-					$sql_parts['where'][] = ' EXISTS ( SELECT functionid FROM functions ff WHERE ff.itemid=i.itemid )';
-				else
-					$sql_parts['where'][] = 'NOT EXISTS ( SELECT functionid FROM functions ff WHERE ff.itemid=i.itemid )';
+		if(!is_null($options['with_triggers'])){
+			if($options['with_triggers'] == 1)
+				$sql_parts['where'][] = ' EXISTS ( SELECT functionid FROM functions ff WHERE ff.itemid=i.itemid )';
+			else
+				$sql_parts['where'][] = 'NOT EXISTS ( SELECT functionid FROM functions ff WHERE ff.itemid=i.itemid )';
+		}
+
+// countOutput
+		if(!is_null($options['countOutput'])){
+			$options['sortfield'] = '';
+			$sql_parts['select'] = array('count(DISTINCT i.itemid) as rowscount');
+
+//groupCount
+			if(!is_null($options['groupCount'])){
+				foreach($sql_parts['group'] as $key => $fields){
+					$sql_parts['select'][$key] = $fields;
+				}
 			}
 		}
-
-// count
-		if(!is_null($options['count'])){
-			$options['sortfield'] = '';
-
-			$sql_parts['select'] = array('count(DISTINCT i.itemid) as rowscount');
-		}
-
+		
 // order
 // restrict not allowed columns for sorting
 		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
@@ -407,28 +419,36 @@ class CItem extends CZBXAPI{
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
 		$sql_parts['where'] = array_unique($sql_parts['where']);
+		$sql_parts['group'] = array_unique($sql_parts['group']);
 		$sql_parts['order'] = array_unique($sql_parts['order']);
 
 		$sql_select = '';
 		$sql_from = '';
 		$sql_where = '';
+		$sql_group = '';
 		$sql_order = '';
 		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
 		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
 		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
+		if(!empty($sql_parts['group']))		$sql_where.= ' GROUP BY '.implode(',',$sql_parts['group']);
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.
+		$sql = 'SELECT DISTINCT '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('i.itemid', $nodeids).
 					$sql_where.
+				$sql_group.
 				$sql_order;
-//sdi($sql);
+
 		$res = DBselect($sql, $sql_limit);
 		while($item = DBfetch($res)){
-			if($options['count'])
-				$result = $item;
+			if(!is_null($options['countOutput'])){
+				if(!is_null($options['groupCount']))
+					$result[] = $item;
+				else
+					$result = $item['rowscount'];
+			}
 			else{
 				$itemids[$item['itemid']] = $item['itemid'];
 
@@ -489,38 +509,41 @@ class CItem extends CZBXAPI{
 			}
 		}
 
-		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
+COpt::memoryPick();
+		if(!is_null($options['countOutput'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
 
 // Adding Objects
 // Adding hosts
-		if(!is_null($options['select_hosts']) && str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
-			$obj_params = array(
-				'nodeids' => $nodeids,
-				'templated_hosts' => 1,
-				'output' => $options['select_hosts'],
-				'itemids' => $itemids,
-				'nopermissions' => 1,
-				'preservekeys' => 1
-			);
-			$hosts = CHost::get($obj_params);
+		if(!is_null($options['select_hosts'])){
+			if(is_array($options['select_hosts']) || str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
+				$obj_params = array(
+					'nodeids' => $nodeids,
+					'itemids' => $itemids,
+					'templated_hosts' => 1,
+					'output' => $options['select_hosts'],
+					'nopermissions' => 1,
+					'preservekeys' => 1
+				);
+				$hosts = CHost::get($obj_params);
 
-			foreach($hosts as $hostid => $host){
-				$hitems = $host['items'];
-				unset($host['items']);
-				foreach($hitems as $inum => $item){
-					$result[$item['itemid']]['hosts'][] = $host;
+				foreach($hosts as $hostid => $host){
+					$hitems = $host['items'];
+					unset($host['items']);
+					foreach($hitems as $inum => $item){
+						$result[$item['itemid']]['hosts'][] = $host;
+					}
 				}
-			}
 
-			$templates = CTemplate::get($obj_params);
-			foreach($templates as $templateid => $template){
-				$titems = $template['items'];
-				unset($template['items']);
-				foreach($titems as $inum => $item){
-					$result[$item['itemid']]['hosts'][] = $template;
+				$templates = CTemplate::get($obj_params);
+				foreach($templates as $templateid => $template){
+					$titems = $template['items'];
+					unset($template['items']);
+					foreach($titems as $inum => $item){
+						$result[$item['itemid']]['hosts'][] = $template;
+					}
 				}
 			}
 		}
@@ -579,6 +602,7 @@ class CItem extends CZBXAPI{
 			}
 		}
 
+COpt::memoryPick();
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
 			$result = zbx_cleanHashes($result);
@@ -589,86 +613,73 @@ class CItem extends CZBXAPI{
 
 
 /**
-	 * Get itemid by host.name and item.key
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * @param array $item_data
-	 * @param array $item_data['key_']
-	 * @param array $item_data['hostid']
-	 * @return int|boolean
-	 */
-	public static function getObjects($item_data){
-		$result = array();
-		$itemids = array();
+ * Get itemid by host.name and item.key
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $item_data
+ * @param array $item_data['key_']
+ * @param array $item_data['hostid']
+ * @return int|boolean
+ */
 
-		$sql = 'SELECT DISTINCT i.itemid'.
-				' FROM items i'.
-				' WHERE i.key_='.zbx_dbstr($item_data['key_']).
-					' AND i.hostid='.$item_data['hostid'];
-		$res = DBselect($sql);
-		while($item = DBfetch($res)){
-			$itemids[$item['itemid']] = $item['itemid'];
-		}
+	public static function getObjects($itemData){
+		$options = array(
+			'filter' => $itemData,
+			'output'=>API_OUTPUT_EXTEND
+		);
 
-		if(!empty($itemids))
-			$result = self::get(array('itemids' => $itemids, 'output' => API_OUTPUT_EXTEND));
+		if(isset($itemData['node']))
+			$options['nodeids'] = getNodeIdByNodeName($itemData['node']);
+		else if(isset($itemData['nodeids']))
+			$options['nodeids'] = $itemData['nodeids'];
+
+		$result = self::get($options);
 
 	return $result;
 	}
 
+	public static function exists($object){
+		$keyFields = array(array('hostid', 'host'), 'key_');
+
+		$options = array(
+			'filter' => array('key_' => $object['key_']),
+			'webitems' => 1,
+			'output' => API_OUTPUT_SHORTEN,
+			'nopermissions' => 1,
+			'limit' => 1
+		);
+		
+		if(isset($object['hostid'])) $options['hostids'] = $object['hostid'];
+		if(isset($object['host'])) $options['filter']['host'] = $object['host'];
+		
+		if(isset($object['node']))
+			$options['nodeids'] = getNodeIdByNodeName($object['node']);
+		else if(isset($object['nodeids']))
+			$options['nodeids'] = $object['nodeids'];
+
+		$objs = self::get($options);
+
+	return !empty($objs);
+	}
+
 /**
-	 * Add item
-	 *
-	 * {@source}
-	 * @access public
-	 * @static
-	 * @since 1.8
-	 * @version 1
-	 *
-	 * Input array $items has following structure and default values :
-	 * <code>
-	 * array( array(
-	 * *'description'			=> *,
-	 * *'key_'				=> *,
-	 * *'hostid'				=> *,
-	 * 'delay'				=> 60,
-	 * 'history'				=> 7,
-	 * 'status'				=> ITEM_STATUS_ACTIVE,
-	 * 'type'				=> ITEM_TYPE_ZABBIX,
-	 * 'snmp_community'			=> '',
-	 * 'snmp_oid'				=> '',
-	 * 'value_type'				=> ITEM_VALUE_TYPE_STR,
-	 * 'data_type'				=> ITEM_DATA_TYPE_DECIMAL,
-	 * 'trapper_hosts'			=> 'localhost',
-	 * 'snmp_port'				=> 161,
-	 * 'units'				=> '',
-	 * 'multiplier'				=> 0,
-	 * 'delta'				=> 0,
-	 * 'snmpv3_securityname'		=> '',
-	 * 'snmpv3_securitylevel'		=> 0,
-	 * 'snmpv3_authpassphrase'		=> '',
-	 * 'snmpv3_privpassphrase'		=> '',
-	 * 'formula'				=> 0,
-	 * 'trends'				=> 365,
-	 * 'logtimefmt'				=> '',
-	 * 'valuemapid'				=> 0,
-	 * 'delay_flex'				=> '',
-	 * 'params'				=> '',
-	 * 'ipmi_sensor'			=> '',
-	 * 'applications'			=> array(),
-	 * 'templateid'				=> 0
-	 * ), ...);
-	 * </code>
-	 *
-	 * @param array $items multidimensional array with items data
-	 * @return array|boolean
-	 */
-	public static function add($items){
+ * Add item
+ *
+ * {@source}
+ * @access public
+ * @static
+ * @since 1.8
+ * @version 1
+ *
+ * @param array $items
+ * @return array|boolean
+ */
+	public static function create($items){
 		$items = zbx_toArray($items);
 		$itemids = array();
 
@@ -676,216 +687,6 @@ class CItem extends CZBXAPI{
 
 		$result = true;
 		foreach($items as $inum => $item){
-
-/*//////////////
-			$item_db_fields = array(
-				'description'		=> null,
-				'key_'			=> null,
-				'hostid'		=> null,
-				'delay'			=> 60,
-				'history'		=> 7,
-				'status'		=> ITEM_STATUS_ACTIVE,
-				'type'			=> ITEM_TYPE_ZABBIX,
-				'snmp_community'	=> '',
-				'snmp_oid'		=> '',
-				'value_type'		=> ITEM_VALUE_TYPE_STR,
-				'data_type'		=> ITEM_DATA_TYPE_DECIMAL,
-				'trapper_hosts'		=> 'localhost',
-				'snmp_port'		=> 161,
-				'units'			=> '',
-				'multiplier'		=> 0,
-				'delta'			=> 0,
-				'snmpv3_securityname'	=> '',
-				'snmpv3_securitylevel'	=> 0,
-				'snmpv3_authpassphrase'	=> '',
-				'snmpv3_privpassphrase'	=> '',
-				'formula'		=> 0,
-				'trends'		=> 365,
-				'logtimefmt'		=> '',
-				'valuemapid'		=> 0,
-				'delay_flex'		=> '',
-				'authtype'		=> 0,
-				'username'		=> '',
-				'password'		=> '',
-				'publickey'		=> '',
-				'privatekey'		=> '',
-				'params'		=> '',
-				'ipmi_sensor'		=> '',
-				'applications'		=> array(),
-				'templateid'		=> 0
-			);
-
-			if(!check_db_fields($item_db_fields, $item)){
-				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Wrong field for item');
-				$result = false;
-				break;
-			}
-
-			$host = CHost::get(array('hostids' => $item['hostid'], 'noprermissions' => 1, 'templated_hosts' => 1));
-			if(empty($host)){
-				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Host with HostID ['.$item['hostid'].'] does not exists');
-				$result = false;
-				break;
-			}
-
-			// if(($i = array_search(0, $item['applications'])) !== FALSE)
-				// unset($item['applications'][$i]);
-
-			if(!preg_match('/^'.ZBX_PREG_ITEM_KEY_FORMAT.'$/u', $item['key_']) ){
-				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Incorrect key format [ example: "key_name[param1,param2,...]" ]');
-				$result = false;
-				break;
-			}
-
-			if($item['delay'] < 1){
-				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Delay cannot be less than 1 second');
-				$result = false;
-				break;
-			}
-
-			if($item['delay_flex'] != ''){
-				$arr_of_delay = explode(';', $item['delay_flex']);
-
-				foreach($arr_of_delay as $one_delay_flex){
-					$arr = explode('/', $one_delay_flex);
-					if($arr[0] < 1){
-						self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Delay cannot be less than 1 second');
-						$result = false;
-						break 2;
-					}
-				}
-			}
-
-			if(($item['snmp_port'] < 1) || ($item['snmp_port'] > 65535)){
-				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Invalid SNMP port');
-				$result = false;
-				break;
-			}
-
-			if(preg_match('/^log|eventlog\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
-				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Type of information must be Log for log key');
-				$result = false;
-				break;
-			}
-
-			if($item['value_type'] == ITEM_VALUE_TYPE_STR){
-				$item['delta'] = 0;
-			}
-
-			if($item['value_type'] != ITEM_VALUE_TYPE_UINT64){
-				$item['data_type'] = 0;
-			}
-
-			if(($item['type'] == ITEM_TYPE_AGGREGATE) && ($item['value_type'] != ITEM_VALUE_TYPE_FLOAT)){
-				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Value type must be Float for aggregate items');
-				$result = false;
-				break;
-			}
-
-			if($item['type'] == ITEM_TYPE_AGGREGATE){
-				if(preg_match('/^((.)*)(\[\"((.)*)\"\,\"((.)*)\"\,\"((.)*)\"\,\"([0-9]+)\"\])$/i', $item['key_'], $arr)){
-					$g = $arr[1];
-					if(!str_in_array($g, array('grpmax', 'grpmin', 'grpsum', 'grpavg'))){
-						self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, "Group function [ $g ] is not one of [ grpmax, grpmin, grpsum, grpavg ]");
-						$result = false;
-						break;
-					}
-					// Group
-					$g = $arr[4];
-					// Key
-					$g = $arr[6];
-					// Item function
-					$g = $arr[8];
-					if(!str_in_array($g, array('last', 'min', 'max', 'avg', 'sum', 'count'))){
-						self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, "Item function [ $g ] is not one of [last, min, max, avg, sum, count]");
-						$result = false;
-						break;
-					}
-					// Parameter
-					$g = $arr[10];
-				}
-				else{
-					self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Key does not match grpfunc["group", "key", "itemfunc", "numeric param"]');
-					$result = false;
-					break;
-				}
-			}
-
-			$sql = 'SELECT itemid,hostid '.
-					' FROM items '.
-					' WHERE hostid='.$item['hostid'].
-						' AND key_='.zbx_dbstr($item['key_']);
-			$db_item = DBfetch(DBselect($sql));
-			if($db_item && $item['templateid'] == 0){
-				error('An item with the Key ['.$item['key_'].'] already exists for host ['.$host['host'].']. The key must be unique.');
-				return FALSE;
-			}
-			else if ($db_item && $item['templateid'] != 0){
-				$item['hostid'] = $db_item['hostid'];
-				$item['applications'] = get_same_applications_for_host($item['applications'], $db_item['hostid']);
-
-				$result = update_item($db_item['itemid'], $item);
-
-			return $result;
-			}
-
-			// first add mother item
-			$itemid=get_dbid('items','itemid');
-			$result=DBexecute('INSERT INTO items '.
-					' (itemid,description,key_,hostid,delay,history,status,type,'.
-						'snmp_community,snmp_oid,value_type,data_type,trapper_hosts,'.
-						'snmp_port,units,multiplier,'.
-						'delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,'.
-						'snmpv3_privpassphrase,formula,trends,logtimefmt,valuemapid,'.
-						'delay_flex,params,ipmi_sensor,templateid,authtype,username,password,publickey,privatekey)'.
-				' VALUES ('.$itemid.','.zbx_dbstr($item['description']).','.zbx_dbstr($item['key_']).','.$item['hostid'].','.
-							$item['delay'].','.$item['history'].','.$item['status'].','.$item['type'].','.
-							zbx_dbstr($item['snmp_community']).','.zbx_dbstr($item['snmp_oid']).','.$item['value_type'].','.$item['data_type'].','.
-							zbx_dbstr($item['trapper_hosts']).','.$item['snmp_port'].','.zbx_dbstr($item['units']).','.$item['multiplier'].','.
-							$item['delta'].','.zbx_dbstr($item['snmpv3_securityname']).','.$item['snmpv3_securitylevel'].','.
-							zbx_dbstr($item['snmpv3_authpassphrase']).','.zbx_dbstr($item['snmpv3_privpassphrase']).','.
-							zbx_dbstr($item['formula']).','.$item['trends'].','.zbx_dbstr($item['logtimefmt']).','.$item['valuemapid'].','.
-							zbx_dbstr($item['delay_flex']).','.zbx_dbstr($item['params']).','.
-							zbx_dbstr($item['ipmi_sensor']).','.$item['templateid'].','.$item['authtype'].','.
-							zbx_dbstr($item['username']).','.zbx_dbstr($item['password']).','.
-							zbx_dbstr($item['publickey']).','.zbx_dbstr($item['privatekey']).')'
-				);
-
-			if ($result)
-				//add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_ITEM, $itemid, $item['description'], NULL, NULL, NULL);
-			else
-				return $result;
-
-			foreach($item['applications'] as $key => $appid){
-				$itemappid=get_dbid('items_applications','itemappid');
-				DBexecute('INSERT INTO items_applications (itemappid,itemid,applicationid) VALUES('.$itemappid.','.$itemid.','.$appid.')');
-			}
-
-			info('Added new item '.$host['host'].':'.$item['key_']);
-
-	// add items to child hosts
-
-			$db_hosts = get_hosts_by_templateid($host['hostid']);
-			while($db_host = DBfetch($db_hosts)){
-	// recursion
-				$item['hostid'] = $db_host['hostid'];
-				$item['applications'] = get_same_applications_for_host($item['applications'], $db_host['hostid']);
-				$item['templateid'] = $itemid;
-
-				$result = add_item($item);
-				if(!$result) break;
-
-			}
-
-			if($result)
-				return $itemid;
-
-			if($item['templateid'] == 0){
-				delete_item($itemid);
-			}
-
-*///////////////
-
 			$result = add_item($item);
 
 			if(!$result) break;
@@ -895,8 +696,7 @@ class CItem extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_items = self::get(array('itemids'=>$itemids, 'extendoutput'=>1, 'nopermissions'=>1));
-			return $new_items;
+			return array('itemids' => $itemids);
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
@@ -913,14 +713,21 @@ class CItem extends CZBXAPI{
  * @since 1.8
  * @version 1
  *
- * @param array $items multidimensional array with items data
+ * @param array $items
  * @return boolean
  */
 	public static function update($items){
 		$items = zbx_toArray($items);
 		$itemids = array();
 
-		$upd_items = self::get(array('itemids'=> zbx_objectValues($items, 'itemid'), 'editable'=>1, 'extendoutput'=>1, 'preservekeys'=>1));
+		$options = array(
+			'itemids'=> zbx_objectValues($items, 'itemid'),
+			'editable'=>1,
+			'webitems' => 1,
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$upd_items = self::get($options);
 		foreach($items as $gnum => $item){
 			if(!isset($upd_items[$item['itemid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -952,8 +759,7 @@ class CItem extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_items = self::get(array('itemids'=>$itemids, 'extendoutput'=>1, 'nopermissions'=>1));
-			return $upd_items;
+			return array('itemids' => $itemids);
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
@@ -970,15 +776,19 @@ class CItem extends CZBXAPI{
  * @since 1.8
  * @version 1
  *
- * @param _array $items multidimensional array with item objects
- * @param array $items[0,...]['itemid']
+ * @param array $items
  * @return deleted items
  */
 	public static function delete($items){
 		$items = zbx_toArray($items);
 		$itemids = array();
 
-		$del_items = self::get(array('itemids'=> zbx_objectValues($items, 'itemid'), 'editable'=>1, 'extendoutput'=>1, 'preservekeys'=>1));
+		$options = array(
+			'itemids'=> zbx_objectValues($items, 'itemid'),
+			'editable'=>1,
+			'preservekeys'=>1
+		);
+		$del_items = self::get($options);
 		foreach($items as $num => $item){
 			if(!isset($del_items[$item['itemid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -998,7 +808,7 @@ class CItem extends CZBXAPI{
 		}
 
 		if($result){
-			return zbx_cleanHashes($del_items);
+			return array('itemids' => $itemids);
 		}
 		else{
 			self::setError(__METHOD__);

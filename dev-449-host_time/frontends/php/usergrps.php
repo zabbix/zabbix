@@ -337,8 +337,7 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 <?php
 
 // Config
-	$frmForm = new CForm();
-	$frmForm->setMethod('get');
+	$frmForm = new CForm(null, 'get');
 
 	$cmbConf = new CComboBox('config','usergrps.php','javascript: submit()');
 	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');
@@ -346,16 +345,15 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 		$cmbConf->addItem('users.php',S_USERS);
 
 	$frmForm->addItem(array($cmbConf,SPACE,new CButton('form', S_CREATE_GROUP)));
-	show_table_header(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
-	echo SBR;
+	
+	$usrgroup_wdgt = new CWidget();
+	$usrgroup_wdgt->addPageHeader(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
 
 
 	if(isset($_REQUEST['form'])){
-		insert_usergroups_form();
+		$usrgroup_wdgt->addItem(insert_usergroups_form());
 	}
 	else{
-		$usrgroup_wdgt = new CWidget();
-
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
 
@@ -409,9 +407,9 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 			if(granted2update_group($usrgrpid)){
 
 				$next_gui_auth = ($usrgrp['gui_access']+1 > GROUP_GUI_ACCESS_DISABLED)?GROUP_GUI_ACCESS_SYSTEM:($usrgrp['gui_access']+1);
-							
+
 				$gui_access = new CLink(
-									$gui_access, 
+									$gui_access,
 									'usergrps.php?go=set_gui_access&set_gui_access='.$next_gui_auth.'&usrgrpid='.$usrgrpid,
 									$gui_access_style
 								);
@@ -426,10 +424,10 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 			}
 
 			if(isset($usrgrp['users'])){
-			
+
 				$usrgrpusers = $usrgrp['users'];
 				order_result($usrgrpusers, 'alias');
-				
+
 				$users = array();
 				foreach($usrgrpusers as $unum => $user){
 				$user_type_style = 'enabled';
@@ -439,7 +437,7 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 				$user_status_style = 'enabled';
 				if(GROUP_GUI_ACCESS_DISABLED == $user['gui_access']) $user_status_style = 'disabled';
 				if(GROUP_STATUS_DISABLED == $user['users_status']) $user_status_style = 'disabled';
-				
+
 
 				$users[] = new CLink($user['alias'],'users.php?form=update&userid='.$user['userid'], $user_status_style);//, $user_type_style);
 					$users[] = ', ';
@@ -494,6 +492,7 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
+
 		zbx_add_post_js('chkbxRange.pageGoName = "group_groupid";');
 
 		$footer = get_table_header(array($goBox, $goButton));
@@ -506,11 +505,10 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 		$form->addItem($table);
 
 		$usrgroup_wdgt->addItem($form);
-		$usrgroup_wdgt->show();
 	}
-?>
-<?php
+	
+	$usrgroup_wdgt->show();
 
+	
 include_once('include/page_footer.php');
-
 ?>

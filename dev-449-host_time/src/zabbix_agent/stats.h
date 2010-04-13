@@ -25,6 +25,9 @@
 #include "perfstat.h"
 #include "interfaces.h"
 #include "diskdevices.h"
+#ifdef _AIX
+#	include "vmstats.h"
+#endif	/* _AIX */
 
 /* NOTE:
  *   Mandatory static structure,
@@ -41,6 +44,9 @@ typedef struct s_collector_data
 #ifdef _WINDOWS
 	ZBX_PERF_STAT_DATA	perfs;
 #endif /* _WINDOWS */
+#ifdef _AIX
+	ZBX_VMSTAT_DATA		vmstat;
+#endif	/* _AIX */
 } ZBX_COLLECTOR_DATA;
 
 extern ZBX_COLLECTOR_DATA *collector;

@@ -23,7 +23,7 @@
 
 		foreach($childs as $id => $child){		//add childs
 			if((bccomp($parentid , $child['serviceid'])==0)){
-				error('Service can\'t be parent and child in onetime.');
+				error(S_SERVICE_CANNOT_BE_PARENT_AND_CHILD_AT_THE_SAME_TIME);
 				return FALSE;
 			}
 		}
@@ -71,7 +71,7 @@
 	function	update_service($serviceid,$name,$triggerid,$algorithm,$showsla,$goodsla,$sortorder,$service_times=array(),$parentid,$childs){
 		foreach($childs as $id => $child){		//add childs
 			if((bccomp($parentid , $child['serviceid'])==0)){
-				error('Service can\'t be parent and child in onetime.');
+				error(S_SERVICE_CANNOT_BE_PARENT_AND_CHILD_AT_THE_SAME_TIME);
 				return FALSE;
 			}
 		}
@@ -271,12 +271,12 @@
 
 	function add_service_link($servicedownid,$serviceupid,$softlink){
 		if( ($softlink==0) && (is_service_hardlinked($servicedownid)==true) ){
-			error("cannot link hardlinked service.");
+			error(S_CANNOT_LINK_HARDLINKED_SERVICE);
 			return	false;
 		}
 
 		if((bccomp($servicedownid, $serviceupid)==0)){
-			error("cannot link service to itself.");
+			error(S_CANNOT_LINK_SERVICE_TO_ITSELF);
 			return	false;
 		}
 
@@ -297,7 +297,7 @@
 		}
 
 		if((bccomp($servicedownid, $serviceupid)==0)){
-			error("cannot link service to itself.");
+			error(S_CANNOT_LINK_SERVICE_TO_ITSELF);
 			return	false;
 		}
 
@@ -339,35 +339,43 @@ function VDI($time,$show=1){
 	$time = (is_array($time))?$time:getdate($time);
 return ($time['mon'].'/'.$time['mday'].'/'.$time['year'].' '.$time['hours'].':'.$time['minutes'].':'.$time['seconds']);
 }
-*/
+//*/
 	function expand_periodical_service_times(&$data,  $period_start, $period_end, $ts_from, $ts_to, $type='ut'){ /* 'ut' OR 'dt' */
-//SDI("PERIOD: ".VDI($period_start).' - '.VDI($period_end));
-//SDI('serv time: '.VDI($ts_from,0).' - '.VDI($ts_to,0));
+// sdii($data);
+// SDI("PERIOD: ".VDI($period_start).' - '.VDI($period_end));
+// SDI('serv time: '.VDI($ts_from,0).' - '.VDI($ts_to,0));
 			/* calculate period FROM '-1 week' to know period name for  $period_start */
 
 			for($curr = ($period_start - (7*24*3600)); $curr<=$period_end;$curr+=86400){
-
+// SDI('FROM00 '.date('d-M-Y H:i:s', $curr));
 				$curr_date = getdate($curr);
 				$from_date = getdate($ts_from);
 
+// SDI('FROM0 '.VDI($curr_date,0));
 				if($curr_date['wday'] == $from_date['wday']){
 					$curr_from = mktime(
 						$from_date['hours'],$from_date['minutes'],$from_date['seconds'],
 						$curr_date['mon'],$curr_date['mday'],$curr_date['year']
-						);
-//SDI('FROM '.VDI($curr_from,0));
-					$curr_to = $curr_from + ($ts_to - $ts_from);
+					);
+
 
 					$curr_from	= max($curr_from, $period_start);
 					$curr_from	= min($curr_from, $period_end);
-//SDI('FROM2 '.VDI($curr_from,0));
-//SDI('TO '.VDI($curr_to,0));
-					$curr_to	= max($curr_to, $period_start);
-					$curr_to	= min($curr_to, $period_end);
-//SDI('TO2 '.VDI($curr_to,0).' : '.VDI($curr,0));
-					$curr = $curr_to;
-//SDI('CURR '.VDI($curr,0));
 
+					$curr_to = $curr_from + ($ts_to - $ts_from);
+					
+// SDI('FROM2 '.VDI($curr_from,0));
+// SDI('TO '.VDI($curr_to,0));
+
+// SDI('FROM3 '.date('d-M-Y H:i:s', $curr_to));
+					$curr_to	= max($curr_to, $period_start);
+// SDI('FROM4 '.date('d-M-Y H:i:s', $curr_to));
+					$curr_to	= min($curr_to, $period_end);
+// SDI('FROM5 '.date('d-M-Y H:i:s', $curr_to));
+
+// SDI('TO2 '.VDI($curr_to,0).' : '.VDI($curr,0));
+					$curr = $curr_to;
+// SDI('CURR '.VDI($curr,0));
 					if(isset($data[$curr_from][$type.'_s']))
 						$data[$curr_from][$type.'_s'] ++;
 					else
@@ -588,7 +596,7 @@ if($serviceid == 1 || $serviceid == 2){
 		$res = DBfetch(DBselect("SELECT * FROM services WHERE serviceid=".$serviceid));
 		if(!$res)
 		{
-			error("No service with serviceid=[".$serviceid."]");
+			error(S_NO_SERVICE_WITH." serviceid=[".$serviceid."]");
 			return	FALSE;
 		}
 		return $res;
@@ -598,7 +606,7 @@ if($serviceid == 1 || $serviceid == 2){
 		$result=DBselect("SELECT * FROM services_links WHERE linkid=$linkid");
 		$res = DBfetch($result);
 		if(!$res){
-			error("No service linkage with linkid=[$linkid]");
+			error(S_NO_SERVICE_LINKAGE_WITH." linkid=[$linkid]");
 			return	FALSE;
 		}
 		return $res;
@@ -751,7 +759,7 @@ function update_services_rec($serviceid){
 			DBexecute('UPDATE services SET status='.$status.' WHERE serviceid='.$serviceupid);
 		}
 		else{
-			error('Unknown calculation algorithm of service status ['.$algorithm.']');
+			error(S_UNKNOWN_CALC_ALGORITHM_OF_SERVICE_STATUS.SPACE.'['.$algorithm.']');
 			return false;
 		}
 	}

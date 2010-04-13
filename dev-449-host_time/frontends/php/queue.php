@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,16 +19,16 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/items.inc.php";
+	require_once 'include/config.inc.php';
+	require_once 'include/items.inc.php';
 
-	$page["title"] = "S_QUEUE_BIG";
-	$page["file"] = "queue.php";
+	$page['title'] = 'S_QUEUE_BIG';
+	$page['file'] = 'queue.php';
 	$page['hist_arg'] = array('config');
 
 	define('ZBX_PAGE_DO_REFRESH', 1);
 
-include_once "include/page_header.php";
+include_once 'include/page_header.php';
 
 ?>
 <?php
@@ -43,8 +43,8 @@ include_once "include/page_header.php";
 ?>
 
 <?php
-	$_REQUEST['config'] = get_request('config', get_profile('web.queue.config', 0));
-	update_profile('web.queue.config',$_REQUEST['config'], PROFILE_TYPE_INT);
+	$_REQUEST['config'] = get_request('config', CProfile::get('web.queue.config', 0));
+	CProfile::update('web.queue.config',$_REQUEST['config'], PROFILE_TYPE_INT);
 
 	$form = new CForm();
 	$form->SetMethod('get');
@@ -55,12 +55,10 @@ include_once "include/page_header.php";
 	$cmbMode->AddItem(2, S_DETAILS);
 	$form->AddItem($cmbMode);
 
-	show_table_header(S_QUEUE_OF_ITEMS_TO_BE_UPDATED_BIG, $form);
-?>
+	$queue_wdgt = new CWidget();
+	$queue_wdgt->addPageHeader(S_QUEUE_OF_ITEMS_TO_BE_UPDATED_BIG, $form);
 
-<?php
 	$now = time();
-
 	$norm_item_types = array(
 			ITEM_TYPE_ZABBIX_ACTIVE,
 			ITEM_TYPE_SSH,
@@ -68,7 +66,8 @@ include_once "include/page_header.php";
 			ITEM_TYPE_SIMPLE,
 			ITEM_TYPE_INTERNAL,
 			ITEM_TYPE_AGGREGATE,
-			ITEM_TYPE_EXTERNAL);
+			ITEM_TYPE_EXTERNAL,
+			ITEM_TYPE_CALCULATED);
 	$zbx_item_types = array(
 			ITEM_TYPE_ZABBIX);
 	$snmp_item_types = array(
@@ -90,7 +89,8 @@ include_once "include/page_header.php";
 			ITEM_TYPE_SIMPLE,
 			ITEM_TYPE_INTERNAL,
 			ITEM_TYPE_AGGREGATE,
-			ITEM_TYPE_EXTERNAL);
+			ITEM_TYPE_EXTERNAL,
+			ITEM_TYPE_CALCULATED);
 
 	$result = DBselect('SELECT i.itemid,i.lastclock,i.description,i.key_,i.type,h.host,h.hostid,h.proxy_hostid,i.delay,i.delay_flex'.
 		' FROM items i,hosts h'.
@@ -267,14 +267,13 @@ include_once "include/page_header.php";
 		}
 	}
 
-	$table->Show();
-
+	$queue_wdgt->addItem($table);
+	$queue_wdgt->Show();
+	
 	if($_REQUEST["config"]!=0){
 		show_table_header(S_TOTAL.": ".$table->GetNumRows().($truncated ? ' ('.S_TRUNCATED.')' : ''));
 	}
-?>
-<?php
 
+	
 include_once "include/page_footer.php";
-
 ?>

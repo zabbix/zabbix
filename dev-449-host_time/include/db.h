@@ -41,6 +41,7 @@ extern	int	CONFIG_DBSYNCER_FORKS;
 extern	int	CONFIG_NODE_NOHISTORY;
 extern  int     CONFIG_REFRESH_UNSUPPORTED;
 extern	int	CONFIG_UNAVAILABLE_DELAY;
+extern	int	CONFIG_LOG_SLOW_QUERIES;
 
 typedef enum {
 	GRAPH_TYPE_NORMAL = 0,
@@ -168,8 +169,6 @@ typedef enum {
 #define ITEM_PRIVATEKEY_LEN		64
 #define ITEM_PRIVATEKEY_LEN_MAX		ITEM_PRIVATEKEY_LEN+1
 
-#define FUNCTION_LASTVALUE_LEN		255
-#define FUNCTION_LASTVALUE_LEN_MAX	FUNCTION_LASTVALUE_LEN+1
 #define FUNCTION_FUNCTION_LEN		12
 #define FUNCTION_FUNCTION_LEN_MAX	FUNCTION_FUNCTION_LEN+1
 #define FUNCTION_PARAMETER_LEN		255
@@ -351,10 +350,7 @@ DB_FUNCTION
 	zbx_uint64_t     functionid;
 	zbx_uint64_t     itemid;
 	zbx_uint64_t     triggerid;
-	double  lastvalue;
-	int	lastvalue_null;
 	char    *function;
-/*	int     parameter;*/
 	char	*parameter;
 };
 
@@ -543,7 +539,6 @@ DB_RESULT	__zbx_DBselect(const char *fmt, ...);
 
 DB_RESULT	DBselectN(char *query, int n);
 DB_ROW		DBfetch(DB_RESULT result);
-zbx_uint64_t	DBinsert_id(int exec_result, const char *table, const char *field);
 int		DBis_null(char *field);
 void		DBbegin();
 void		DBcommit();
@@ -554,7 +549,6 @@ const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
 #define DBget_maxid(table, field)	DBget_maxid_num(table, field, 1)
 zbx_uint64_t	DBget_maxid_num(char *table, char *field, int num);
 
-int     DBget_function_result(char **result,char *functionid, char *error, int maxerrlen);
 int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
 int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock);
 int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t eventid, zbx_uint64_t userid, zbx_uint64_t mediatypeid, char *sendto, char *subject, char *message);
@@ -575,9 +569,15 @@ int	DBget_queue_count(void);
 double	DBget_requiredperformance(void);
 zbx_uint64_t DBget_proxy_lastaccess(const char *hostname);
 
-void    DBescape_string(const char *from, char *to, int maxlen);
-char*   DBdyn_escape_string(const char *str);
+int	DBget_escape_string_len(const char *src);
+void    DBescape_string(const char *src, char *dst, int len);
+char*	DBdyn_escape_string(const char *src);
 char*	DBdyn_escape_string_len(const char *src, int max_src_len);
+
+#define ZBX_SQL_LIKE_ESCAPE_CHAR '!'
+int	DBget_escape_like_pattern_len(const char *src);
+void	DBescape_like_pattern(const char *src, char *dst, int len);
+char*	DBdyn_escape_like_pattern(const char *src);
 
 void    DBget_item_from_db(DB_ITEM *item, DB_ROW row);
 
@@ -598,8 +598,7 @@ int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid);
 void	get_latest_event_status(zbx_uint64_t triggerid, int *prev_status, int *latest_status);
 
 
-int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid,
-		unsigned char unlink_mode);
+int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid);
 int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid);
 int	DBdelete_host(zbx_uint64_t hostid);
 void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock);

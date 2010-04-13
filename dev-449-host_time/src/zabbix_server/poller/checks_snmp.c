@@ -41,7 +41,7 @@ static int		snmpidx_count = 0, snmpidx_alloc = 16;
  *                                                                            *
  * Return value: index of new record                                          *
  *                                                                            *
- * Author: Alekasander Vladishev                                              *
+ * Author: Aleksander Vladishev                                               *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -195,6 +195,8 @@ static void cache_del_snmp_index(const char *oid, const char *value)
 	i = get_snmpidx_nearestindex(oid, value);
 	if (i < snmpidx_count && 0 == strcmp(oid, snmpidx[i].oid) && 0 == strcmp(value, snmpidx[i].value))
 	{
+		zbx_free(snmpidx[i].oid);
+		zbx_free(snmpidx[i].value);
 		memmove(&snmpidx[i], &snmpidx[i + 1], sizeof(zbx_snmp_index_t) * (snmpidx_count - i - 1));
 		snmpidx_count--;
 	}
@@ -497,7 +499,7 @@ static int snmp_get_index(struct snmp_session *ss, DC_ITEM * item, char *OID, ch
 				running = 0;
 				ret = NOTSUPPORTED;
 			}
-			else if(status == STAT_TIMEOUT)
+			else if (status == STAT_TIMEOUT)
 			{
 				conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
 				zbx_snprintf(err, MAX_STRING_LEN, "Timeout while connecting to [%s:%d]",
@@ -528,7 +530,7 @@ static int snmp_get_index(struct snmp_session *ss, DC_ITEM * item, char *OID, ch
 }
 
 
-int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGENT_RESULT *value)
+static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGENT_RESULT *value)
 {
 	const char		*__function_name = "get_snmp";
 	struct snmp_pdu		*pdu, *response;
@@ -558,7 +560,7 @@ int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGENT_RESUL
 	snmp_add_null_var(pdu, anOID, anOID_len);
 
 	status = snmp_synch_response(ss, pdu, &response);
-	zabbix_log( LOG_LEVEL_DEBUG, "Status send [%d]", status);
+	zabbix_log(LOG_LEVEL_DEBUG, "Status send [%d]", status);
 
 	if (status == STAT_SUCCESS && response->errstat == SNMP_ERR_NOERROR)
 	{
@@ -645,7 +647,7 @@ int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGENT_RESUL
 					snmp_errstring(response->errstat)));
 			ret = NOTSUPPORTED;
 		}
-		else if(status == STAT_TIMEOUT)
+		else if (status == STAT_TIMEOUT)
 		{
 			conn = item->host.useip == 1 ? item->host.ip : item->host.dns;
 			SET_MSG_RESULT(value, zbx_dsprintf(NULL, "Timeout while connecting to [%s:%d]",

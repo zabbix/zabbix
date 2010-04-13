@@ -19,38 +19,37 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/images.inc.php');
-	require_once('include/regexp.inc.php');
-	require_once('include/forms.inc.php');
+require_once('include/config.inc.php');
+require_once('include/images.inc.php');
+require_once('include/regexp.inc.php');
+require_once('include/forms.inc.php');
 
 
-	$page['title'] = 'S_CONFIGURATION_OF_ZABBIX';
-	$page['file'] = 'config.php';
-	$page['hist_arg'] = array('config');
+$page['title'] = 'S_CONFIGURATION_OF_ZABBIX';
+$page['file'] = 'config.php';
+$page['hist_arg'] = array('config');
 
-	include_once('include/page_header.php');
-
+include_once('include/page_header.php');
 ?>
 <?php
 	$fields=array(
-//		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+//		VAR								TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 
-		'config'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN('0,3,5,6,7,8,9,10,11'),	NULL),
+		'config'=>				array(T_ZBX_INT, O_OPT,	NULL,	IN('0,3,5,6,7,8,9,10,11'),	NULL),
 // other form
 		'alert_history'=>		array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),	'isset({config})&&({config}==0)&&isset({save})'),
 		'event_history'=>		array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),	'isset({config})&&({config}==0)&&isset({save})'),
 		'work_period'=>			array(T_ZBX_STR, O_NO,	NULL,	NULL,			'isset({config})&&({config}==7)&&isset({save})'),
-		'refresh_unsupported'=>		array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),	'isset({config})&&({config}==5)&&isset({save})'),
+		'refresh_unsupported'=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),	'isset({config})&&({config}==5)&&isset({save})'),
 		'alert_usrgrpid'=>		array(T_ZBX_INT, O_NO,	NULL,	DB_ID,			'isset({config})&&({config}==5)&&isset({save})'),
-		'discovery_groupid'=>		array(T_ZBX_INT, O_NO,	NULL,	DB_ID,			'isset({config})&&({config}==5)&&isset({save})'),
+		'discovery_groupid'=>	array(T_ZBX_INT, O_NO,	NULL,	DB_ID,			'isset({config})&&({config}==5)&&isset({save})'),
 // image form
-		'imageid'=>			array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,			'isset({config})&&({config}==3)&&(isset({form})&&({form}=="update"))'),
-		'name'=>			array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==3)&&isset({save})'),
+		'imageid'=>				array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,			'isset({config})&&({config}==3)&&(isset({form})&&({form}=="update"))'),
+		'name'=>				array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==3)&&isset({save})'),
 		'imagetype'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN('1,2'),		'isset({config})&&({config}==3)&&(isset({save}))'),
 //value mapping
 		'valuemapid'=>			array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,			'isset({config})&&({config}==6)&&(isset({form})&&({form}=="update"))'),
-		'mapname'=>			array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY, 		'isset({config})&&({config}==6)&&isset({save})'),
+		'mapname'=>				array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY, 		'isset({config})&&({config}==6)&&isset({save})'),
 		'valuemap'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,	NULL),
 		'rem_value'=>			array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,65535), NULL),
 		'add_value'=>			array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY, 'isset({add_map})'),
@@ -81,30 +80,30 @@
 // regexp
 		'regexpids'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
 		'regexpid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			'isset({config})&&({config}==10)&&(isset({form})&&({form}=="update"))'),
-		'rename'=>			array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==10)&&isset({save})'),
-		'test_string'=>			array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==10)&&isset({save})'),
+		'rename'=>				array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==10)&&isset({save})', S_NAME),
+		'test_string'=>			array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,		'isset({config})&&({config}==10)&&isset({save})', S_TEST_STRING),
 		'delete_regexp'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		null),
 
-		'g_expressionid'=>		array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		null),
-		'expressions'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==10)&&isset({save})'),
-		'new_expression'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		null),
+		'g_expressionid'=>			array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		null),
+		'expressions'=>				array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({config})&&({config}==10)&&isset({save})'),
+		'new_expression'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,		null),
 		'cancel_new_expression'=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,		null),
 
-		'clone'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,		null),
-		'add_expression'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		null),
+		'clone'=>					array(T_ZBX_STR, O_OPT,	NULL,	NULL,		null),
+		'add_expression'=>			array(T_ZBX_STR, O_OPT,	NULL,	NULL,		null),
 		'edit_expressionid'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		null),
 		'delete_expression'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		null),
 /* other */
-		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		'form'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
 ?>
 <?php
-	$_REQUEST['config'] = get_request('config',get_profile('web.config.config',0));
+	$_REQUEST['config'] = get_request('config',CProfile::get('web.config.config',0));
 
 	check_fields($fields);
 
-	update_profile('web.config.config',$_REQUEST['config'],PROFILE_TYPE_INT);
+	CProfile::update('web.config.config',$_REQUEST['config'],PROFILE_TYPE_INT);
 
 	$orig_config = select_config();
 
@@ -156,9 +155,8 @@
 			if($result){
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_IMAGE,'Image ['.$image['name'].'] deleted');
 				unset($_REQUEST['form']);
+				unset($image, $_REQUEST['imageid']);
 			}
-
-			unset($image, $_REQUEST['imageid']);
 		}
 	}
 	else if(isset($_REQUEST['save']) && ($_REQUEST['config']==8)){ // GUI
@@ -498,17 +496,17 @@
 				error(S_MACRO_EXISTS);
 				$result = false;
 			}
-			else if(strlen($macro_new) > 64){
+			else if(zbx_strlen($macro_new) > 64){
 				error(S_MACRO_TOO_LONG.' : '.$macro_new);
 				$result = false;
 			}
-			else if(strlen($value_new) > 255){
+			else if(zbx_strlen($value_new) > 255){
 				error(S_MACRO_VALUE_TOO_LONG.' : '.$value_new);
 				$result = false;
 			}
 			else{
 				$macro = array('macro' => $macro_new, 'value' => $value_new);
-				$result = CUserMacro::addGlobal($macro);
+				$result = CUserMacro::createGlobal($macro);
 			}
 
 
@@ -553,11 +551,9 @@
 		}
 	}
 
-	show_table_header(S_CONFIGURATION_OF_ZABBIX_BIG, $form);
-	print SBR;
-?>
-<?php
 	$cnf_wdgt = new CWidget();
+	$cnf_wdgt->addPageHeader(S_CONFIGURATION_OF_ZABBIX_BIG, $form);
+	
 
 	if(isset($_REQUEST['config'])){
 		$config = select_config(false);
@@ -741,7 +737,7 @@
 //  config = 6 // Value Mapping  //
 ///////////////////////////////////
 	elseif($_REQUEST['config']==6){ // Value Mapping
-		if(isset($_REQUEST['form'])) {
+		if(isset($_REQUEST['form'])){
 			$frmValmap = new CFormTable(S_VALUE_MAP);
 			$frmValmap->setHelp("web.mapping.php");
 			$frmValmap->addVar("config",get_request("config",6));
@@ -821,30 +817,45 @@
 		}
 		else{
 			$cnf_wdgt->addItem(BR());
-
 			$cnf_wdgt->addHeader(S_VALUE_MAPPING_BIG);
 
 			$table = new CTableInfo();
 			$table->setHeader(array(S_NAME, S_VALUE_MAP));
 
-			$db_valuemaps = DBselect('SELECT * FROM valuemaps WHERE '.DBin_node('valuemapid'));
+			$valueamaps = array();
+// get value maps
+			$db_valuemaps = DBselect('SELECT valuemapid, name FROM valuemaps WHERE '.DBin_node('valuemapid'));
 			while($db_valuemap = DBfetch($db_valuemaps)){
+				$valueamaps[$db_valuemap['valuemapid']] = $db_valuemap;
+				$valueamaps[$db_valuemap['valuemapid']]['maps'] = array();
+			}
+			
+			$db_maps = DBselect('SELECT valuemapid, value, newvalue FROM mappings WHERE '.DBin_node('mappingid'));
+			while($db_map = DBfetch($db_maps)){
+				$valueamaps[$db_map['valuemapid']]['maps'][] = array(
+					'value' => $db_map['value'],
+					'newvalue' => $db_map['newvalue']
+				);
+			}
+			
+
+			order_result($valueamaps, 'name');
+			foreach($valueamaps as $valuemap){
 				$mappings_row = array();
 
-				$sql = 'SELECT * '.
-						' FROM mappings'.
-						' WHERE valuemapid='.$db_valuemap['valuemapid'];
-				$db_maps = DBselect($sql);
-				while($db_map = DBfetch($db_maps)){
+				$maps = $valuemap['maps'];
+				order_result($maps, 'value');
+				foreach($maps as $map){
 					array_push($mappings_row,
-						$db_map['value'],
+						$map['value'],
 						SPACE.RARR.SPACE,
-						$db_map['newvalue'],
-						BR());
+						$map['newvalue'],
+						BR()
+					);
 				}
 				$table->addRow(array(
-					new CLink($db_valuemap['name'],'config.php?form=update&valuemapid='.$db_valuemap['valuemapid'].url_param('config')),
-					empty($mappings_row)?SPACE:$mappings_row
+					new CLink($valuemap['name'],'config.php?form=update&valuemapid='.$valuemap['valuemapid'].url_param('config')),
+					empty($mappings_row) ? SPACE : $mappings_row
 				));
 			}
 
@@ -886,7 +897,6 @@
 		$combo_dd_first_entry = new CComboBox('dropdown_first_entry');
 		$combo_dd_first_entry->addItem(ZBX_DROPDOWN_FIRST_NONE, S_NONE, ($config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_NONE)?'yes':'no');
 		$combo_dd_first_entry->addItem(ZBX_DROPDOWN_FIRST_ALL, S_ALL_S, ($config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_ALL)?'yes':'no');
-		$combo_dd_first_entry->addItem(ZBX_DROPDOWN_FIRST_ZBX162, S_ZBX162_MODE, ($config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_ZBX162)?'yes':'no');
 
 		$check_dd_first_remember = new CCheckBox('dropdown_first_remember', $config['dropdown_first_remember'], null, 1);
 
@@ -936,7 +946,7 @@
 					get_regexp_form(),//null,
 					null,
 					'hat_regexp'
-					//get_profile('web.config.hats.hat_regexp.state',1)
+					//CProfile::get('web.config.hats.hat_regexp.state',1)
 				));
 
 			$right_tab = new CTable();
@@ -950,7 +960,7 @@
 					get_expressions_tab(),//null,
 					null,
 					'hat_expressions'
-//					get_profile('web.config.hats.hat_expressions.state',1)
+//					CProfile::get('web.config.hats.hat_expressions.state',1)
 				));
 
 			if(isset($_REQUEST['new_expression'])){
@@ -959,7 +969,7 @@
 						get_expression_form(),//null
 						null,
 						'hat_new_expression'
-//						get_profile('web.config.hats.hat_new_expression.state',1)
+//						CProfile::get('web.config.hats.hat_new_expression.state',1)
 					));
 			}
 

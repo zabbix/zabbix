@@ -35,65 +35,112 @@
  * Return value: SUCCEED - information removed successfully                   *
  *               FAIL - otherwise                                             *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Alexei Vladishev, Dmitry Borovikov                                 *
  *                                                                            *
- * Comments:                                                                  *
+ * Comments: sqlite3 does not use CONFIG_MAX_HOUSEKEEPER_DELETE, deletes all  *
  *                                                                            *
  ******************************************************************************/
-static int housekeeping_process_log()
+static int	housekeeping_process_log()
 {
+	const char	*__function_name = "housekeeping_process_log";
 	DB_HOUSEKEEPER	housekeeper;
-
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		res = SUCCEED;
-
 	long		deleted;
+	char		*sql = NULL;
+	int		sql_alloc = 512, sql_offset = 0;
+	zbx_uint64_t	*ids = NULL;
+	int		ids_alloc = 0, ids_num = 0;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In housekeeping_process_log()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/* order by tablename to effectively use DB cache */
-	result = DBselect("select housekeeperid, tablename, field, value from housekeeper order by tablename");
+	result = DBselect(
+			"select housekeeperid,tablename,field,value"
+			" from housekeeper"
+			" order by tablename");
 
-	while((row=DBfetch(result)))
+	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(housekeeper.housekeeperid,row[0]);
-		housekeeper.tablename=row[1];
-		housekeeper.field=row[2];
-		ZBX_STR2UINT64(housekeeper.value,row[3]);
+		ZBX_STR2UINT64(housekeeper.housekeeperid, row[0]);
+		housekeeper.tablename = row[1];
+		housekeeper.field = row[2];
+		ZBX_STR2UINT64(housekeeper.value, row[3]);
 
-#ifdef HAVE_ORACLE
-		deleted = DBexecute("delete from %s where %s=" ZBX_FS_UI64 " and rownum<500",
-			housekeeper.tablename,
-			housekeeper.field,
-			housekeeper.value);
-#elif defined(HAVE_POSTGRESQL)
-		deleted = DBexecute("delete from %s where oid in (select oid from %s where %s=" ZBX_FS_UI64 " limit 500)",
-				housekeeper.tablename,
-				housekeeper.tablename,
-				housekeeper.field,
-				housekeeper.value);
-#else
-		deleted = DBexecute("delete from %s where %s=" ZBX_FS_UI64 " limit 500",
-			housekeeper.tablename,
-			housekeeper.field,
-			housekeeper.value);
-#endif
-		if(deleted == 0)
+		if (0 == CONFIG_MAX_HOUSEKEEPER_DELETE)
 		{
-			DBexecute("delete from housekeeper where housekeeperid=" ZBX_FS_UI64,
-				housekeeper.housekeeperid);
+			deleted = DBexecute(
+					"delete from %s"
+					" where %s=" ZBX_FS_UI64,
+					housekeeper.tablename,
+					housekeeper.field,
+					housekeeper.value);
 		}
 		else
 		{
+#ifdef HAVE_ORACLE
+			deleted = DBexecute(
+					"delete from %s"
+					" where %s=" ZBX_FS_UI64
+						" and rownum<=%d",
+					housekeeper.tablename,
+					housekeeper.field,
+					housekeeper.value,
+					CONFIG_MAX_HOUSEKEEPER_DELETE);
+#elif defined(HAVE_POSTGRESQL)
+			deleted = DBexecute(
+					"delete from %s"
+					" where %s=" ZBX_FS_UI64
+						" and oid in (select oid from %s"
+							" where %s=" ZBX_FS_UI64 " limit %d)",
+					housekeeper.tablename,
+					housekeeper.field,
+					housekeeper.value,
+					housekeeper.tablename,
+					housekeeper.field,
+					housekeeper.value,
+					CONFIG_MAX_HOUSEKEEPER_DELETE);
+#elif defined(HAVE_MYSQL)
+			deleted = DBexecute(
+					"delete from %s"
+					" where %s=" ZBX_FS_UI64 " limit %d",
+					housekeeper.tablename,
+					housekeeper.field,
+					housekeeper.value,
+					CONFIG_MAX_HOUSEKEEPER_DELETE);
+#else	/* HAVE_SQLITE3 */
+			deleted = 0;
+#endif
+		}
+
+		if (0 == deleted || 0 == CONFIG_MAX_HOUSEKEEPER_DELETE ||
+				CONFIG_MAX_HOUSEKEEPER_DELETE > deleted)
+			uint64_array_add(&ids, &ids_alloc, &ids_num, housekeeper.housekeeperid, 64);
+
+		if (deleted > 0)
+		{
 			zabbix_log( LOG_LEVEL_DEBUG, "Deleted [%ld] records from table [%s]",
-				deleted,
-				housekeeper.tablename);
+					deleted, housekeeper.tablename);
 		}
 	}
 	DBfree_result(result);
 
-	return res;
+	if (NULL != ids)
+	{
+		sql = zbx_malloc(sql, sql_alloc * sizeof(char));
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 32,
+				"delete from housekeeper where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset,
+				"housekeeperid", ids, ids_num);
+
+		DBexecute("%s", sql);
+
+		zbx_free(sql);
+		zbx_free(ids);
+	}
+
+	return SUCCEED;
 }
 
 

@@ -223,7 +223,12 @@ var Class = (function() {
   }
 
   function isArray(object) {
-    return _toString.call(object) == "[object Array]";
+	if(IE)
+		if(_toString.call(object) == "[object Array]") return true;
+		else if(is_array(object)) return true;
+		else return false;
+	else
+		return _toString.call(object) == "[object Array]";
   }
 
 
@@ -1184,7 +1189,7 @@ var Hash = Class.create(Enumerable, (function() {
 
       if (values && typeof values == 'object') {
         if (Object.isArray(values))
-          return results.concat(values.map(toQueryPair.curry(key)));
+          return results.concat(values.map(toQueryPair.curry(key)).join('&'));
       } else results.push(toQueryPair(key, values));
       return results;
     }).join('&');

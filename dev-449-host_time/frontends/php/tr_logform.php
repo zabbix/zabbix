@@ -33,6 +33,7 @@ define('ZBX_PAGE_NO_MENU', 1);
 
 $strltype = array();
 $strltype[] = 'log[%';
+$strltype[] = 'logrt[%';
 $strltype[] = 'eventlog[%';
 $strltype[] = 'snmptraps';
 
@@ -133,8 +134,14 @@ if(isset($_REQUEST['save_trigger'])){
 			$trigger['url'] = $_REQUEST['url'];
 
 			DBstart();
-			if($db_triggers = CTrigger::add($trigger)){
-				if($db_triggers !== false){
+			if($result = CTrigger::create($trigger)){
+				if($result !== false){
+					$options = array(
+						'triggerids' => $result['triggerids'],
+						'output' => API_OUTPUT_EXTEND
+					);
+					$db_triggers = CTrigger::get($options);
+
 					$result = true;
 					$db_triggers = reset($db_triggers);
 					$triggerid = $db_triggers['triggerid'];
@@ -191,12 +198,13 @@ if(isset($_REQUEST['sform'])){
 
 		$sql = 'SELECT DISTINCT f.functionid, f.function, f.parameter, t.expression, '.
 								' t.description, t.priority, t.comments, t.url, t.status, t.type'.
-					' FROM functions as f, triggers as t, items as i '.
+					' FROM functions f, triggers t, items i '.
 					' WHERE t.triggerid='.$_REQUEST['triggerid'].
 						' AND i.itemid=f.itemid '.
 						' AND f.triggerid = t.triggerid '.
 						' AND i.value_type IN ('.ITEM_VALUE_TYPE_LOG.' , '.ITEM_VALUE_TYPE_TEXT.', '.ITEM_VALUE_TYPE_STR.')'.
-						' AND i.key_ LIKE (\''.$matchkey.'\')';
+						' AND i.key_ LIKE \''.$matchkey.'\'';
+
 		$res = DBselect($sql);
 		while($rows = DBfetch($res)){
 			$description = $rows['description'];
@@ -228,15 +236,14 @@ if(isset($_REQUEST['sform'])){
 			$expr = preg_replace('/^\((.*)\)$/u','$1',$expr);
 
 			if(preg_match('/\([regexp|iregexp].+\)[=|#]0/U',$expr, $rr)){
-
 				$value = preg_replace('/(\(([regexp|iregexp].*)\)[=|#]0)/U','$2',$expr);
 			}
 
 			$value = preg_replace('/([=|#]0)/','',$expr);
-			$value = preg_replace('/^\((.*)\)$/u','$1',$value);
+			$value = preg_replace('/\((.*?)\)/u','$1',$value);
 
 			$expressions[$id]['value'] = trim($value);
-			$expressions[$id]['type'] = (strpos($expr,'#0',strlen($expr)-3) === false)?(REGEXP_EXCLUDE):(REGEXP_INCLUDE);
+			$expressions[$id]['type'] = (zbx_strpos($expr,'#0',zbx_strlen($expr)-3) === false)?(REGEXP_EXCLUDE):(REGEXP_INCLUDE);
 		}
 
 		foreach($expr_v as $id => $expr) {
@@ -244,14 +251,14 @@ if(isset($_REQUEST['sform'])){
 			$value = preg_replace('/\((.*)\)[=|#]0/U','$1',$expr);
 			$value = preg_replace('/^\((.*)\)$/u','$1',$value);
 
-			if (strpos($expr,'#0',strlen($expr)-3) === false) {
+			if (zbx_strpos($expr,'#0',zbx_strlen($expr)-3) === false) {
 //REGEXP_EXCLUDE
-//				$value = str_replace('&', ' OR ', $value);
-//				$value = str_replace('|', ' AND ', $value);
+				$value = str_replace('&', ' OR ', $value);
+				$value = str_replace('|', ' AND ', $value);
 			} else {
 //EGEXP_INCLUDE
-//				$value = str_replace('&', ' AND ', $value);
-//				$value = str_replace('|', ' OR ', $value);
+				$value = str_replace('&', ' AND ', $value);
+				$value = str_replace('|', ' OR ', $value);
 			}
 
 			$value = preg_replace($functionid,$functions,$value);
@@ -324,11 +331,11 @@ if(isset($_REQUEST['sform'])){
 
 	$keyTable = new CTableInfo(null);
 	$keyTable->setAttribute('id','key_list');
-	$keyTable->setHeader(array(S_KEYWORD,S_TYPE, new CLink(S_DELETE,'#')));
+	$keyTable->setHeader(array(S_KEYWORD,S_TYPE, S_ACTION));
 
 	$table = new CTableInfo(null);
 	$table->setAttribute('id','exp_list');
-	$table->setHeader(array(S_EXPRESSION,S_TYPE, S_POSITION,new CLink(S_DELETE,'#')));
+	$table->setHeader(array(S_EXPRESSION,S_TYPE, S_POSITION, S_ACTION));
 
 	$maxid=0;
 
@@ -352,7 +359,8 @@ if(isset($_REQUEST['sform'])){
 		$imgdn->setAttribute('onclick','javascript:  element_down("logtr'.$id.'");');
 		$imgdn->setAttribute('onmouseover','javascript: this.style.cursor = "pointer";');
 
-		$del_url = new CLink('Delete','#','action','javascript: if(confirm("Delete expression?")) remove_expression("logtr'.$id.'"); return false;');
+		$del_url = new CSpan(S_DELETE,'link');
+		$del_url->setAttribute('onclick', 'javascript: if(confirm("'.S_DELETE_EXPRESSION_Q.'")) remove_expression("logtr'.$id.'"); return false;');
 
 		$row = new CRow(array(htmlspecialchars($expr['view']),(($expr['type']==REGEXP_INCLUDE)?S_INCLUDE:S_EXCLUDE),array($imgup,SPACE,$imgdn),$del_url));
 		$row->setAttribute('id','logtr'.$id);
@@ -369,7 +377,7 @@ if(isset($_REQUEST['sform'])){
 	$maxid=0;
 	foreach($keys as $id => $val){
 
-	  $del_url = new CLink('Delete','#','action','javascript: if(confirm("Delete keyword?")) remove_keyword("keytr'.$id.'"); return false;');
+	  $del_url = new CLink(S_DELETE,'#','action','javascript: if(confirm("'.S_DELETE_KEYWORD_Q.'")) remove_keyword("keytr'.$id.'"); return false;');
 	  $row = new CRow(array(htmlspecialchars($val['value']),$val['type'],$del_url));
 	  $row->setAttribute('id','keytr'.$id);
 	  $keyTable->addRow($row);

@@ -21,26 +21,22 @@
 
 #include "sysinfo.h"
 
-int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	read_uint64_from_procfs(const char *path, zbx_uint64_t *value)
 {
-	int ret = SYSINFO_RET_FAIL;
-	char line[MAX_STRING_LEN];
+	int	ret = SYSINFO_RET_FAIL;
+	char	line[MAX_STRING_LEN];
 
-	zbx_uint64_t value = 0;
+	zbx_uint64_t	tmp;
 
-	FILE 	*f;
+	FILE	*f;
 
-	assert(result);
-
-        init_result(result);
-
-	if(NULL != ( f = fopen("/proc/sys/fs/file-max","r") ))
+	if (NULL != (f = fopen(path, "r")))
 	{
-		if(fgets(line,MAX_STRING_LEN,f) != NULL);
+		if (NULL != fgets(line, sizeof(line), f))
 		{
-			if(sscanf(line,ZBX_FS_UI64 "\n", &value) == 1)
+			if (sscanf(line, ZBX_FS_UI64"\n", &tmp) == 1)
 			{
-				SET_UI64_RESULT(result, value);
+				*value = tmp;
 				ret = SYSINFO_RET_OK;
 			}
 		}
@@ -50,32 +46,38 @@ int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	return ret;
 }
 
-int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef HAVE_FUNCTION_SYSCTL_KERN_MAXPROC
-	int	mib[2],len;
-	int	maxproc;
+	int		ret = SYSINFO_RET_FAIL;
+	zbx_uint64_t	value = 0;
 
 	assert(result);
-
         init_result(result);
 
-	mib[0]=CTL_KERN;
-	mib[1]=KERN_MAXPROC;
-
-	len=sizeof(maxproc);
-
-	if(sysctl(mib,2,&maxproc,(size_t *)&len,NULL,0) != 0)
+	if (SYSINFO_RET_OK == read_uint64_from_procfs("/proc/sys/fs/file-max", &value))
 	{
-		return	SYSINFO_RET_FAIL;
-/*		printf("Errno [%m]");*/
+		SET_UI64_RESULT(result, value);
+		ret = SYSINFO_RET_OK;
 	}
 
-	SET_UI64_RESULT(result, maxproc);
-	return SYSINFO_RET_OK;
-#else
-	return	SYSINFO_RET_FAIL;
-#endif
+	return ret;
+}
+
+int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	int		ret = SYSINFO_RET_FAIL;
+	zbx_uint64_t	value = 0;
+
+	assert(result);
+        init_result(result);
+
+	if (SYSINFO_RET_OK == read_uint64_from_procfs("/proc/sys/kernel/pid_max", &value))
+	{
+		SET_UI64_RESULT(result, value);
+		ret = SYSINFO_RET_OK;
+	}
+
+	return ret;
 }
 
 int     OLD_KERNEL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)

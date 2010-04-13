@@ -53,7 +53,7 @@ LPTSTR	GetCounterName(DWORD pdhIndex)
 		counterName->pdhIndex = pdhIndex;
 		counterName->next = PerfCounterList;
 
-		dwSize = sizeof(counterName->name);
+		dwSize = PDH_MAX_COUNTER_NAME;
 		if (ERROR_SUCCESS == PdhLookupPerfNameByIndex(NULL, pdhIndex, counterName->name, &dwSize))
 			PerfCounterList = counterName;
 		else
@@ -112,6 +112,7 @@ int	check_counter_path(char *counterPath)
 			cpe->szCounterName = GetCounterName(_wtoi(cpe->szCounterName));
 
 		dwSize = PDH_MAX_COUNTER_PATH;
+		wcounterPath = zbx_realloc(wcounterPath, dwSize * sizeof(TCHAR));
 		if (ERROR_SUCCESS != (status = PdhMakeCounterPath(cpe, wcounterPath, &dwSize, 0))) {
 			zabbix_log(LOG_LEVEL_ERR, "Can't make counter path: %s",
 					strerror_from_module(status, L"PDH.DLL"));

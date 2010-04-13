@@ -343,7 +343,7 @@ void	zbx_chrcpy_alloc(char **str, int *alloc_len, int *offset, const char src)
 	(*str)[*offset] = '\0';
 }
 
-/* Has to be rewritten to avoi malloc */
+/* Has to be rewritten to avoid malloc */
 char *string_replace(char *str, char *sub_str1, char *sub_str2)
 {
         char *new_str = NULL;
@@ -361,7 +361,7 @@ char *string_replace(char *str, char *sub_str1, char *sub_str2)
 
         len = (long)strlen(sub_str1);
 
-        /* count the number of occurances of sub_str1 */
+        /* count the number of occurences of sub_str1 */
         for ( p=str; (p = strstr(p, sub_str1)); p+=len, count++ );
 
 	if ( 0 == count )	return strdup(str);
@@ -373,7 +373,7 @@ char *string_replace(char *str, char *sub_str1, char *sub_str2)
 
         for (q=str,t=new_str,p=str; (p = strstr(p, sub_str1)); )
         {
-                /* copy until next occurance of sub_str1 */
+                /* copy until next occurence of sub_str1 */
                 for ( ; q < p; *t++ = *q++);
                 q += len;
                 p = q;
@@ -851,7 +851,7 @@ size_t zbx_strlcpy(char *dst, const char *src, size_t siz)
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
- */
+ ******************************************************************************/
 size_t zbx_strlcat(char *dst, const char *src, size_t siz)
 {
 	char *d = dst;
@@ -881,11 +881,11 @@ size_t zbx_strlcat(char *dst, const char *src, size_t siz)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dvsprintf                                                     *
+ * Function: zbx_dvsprintf                                                    *
  *                                                                            *
- * Purpose: dinamical formatted output conversion                             *
+ * Purpose: dynamical formatted output conversion                             *
  *                                                                            *
- * Return value: formated string                                              *
+ * Return value: formatted string                                             *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -1027,6 +1027,171 @@ char* __zbx_zbx_strdcatf(char *dest, const char *f, ...)
 
 /******************************************************************************
  *                                                                            *
+ * Function: parse_function                                                   *
+ *                                                                            *
+ * Purpose: return function and function parameters                           *
+ *          func(param,...)                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *         exp - pointer to the first char of function                        *
+ *                last("host:key[key params]",#1)                             *
+ *                ^                                                           *
+ *                                                                            *
+ * Return value: return SUCCEED and pointer to the right round bracket ')'    *
+ *               or FAIL and pointer to incorrect char                        *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	parse_function(char **exp, char **func, char **params)
+{
+	char	*p, *s;
+	int	state;	/* 0 - init
+			 * 1 - function name/params
+			 */
+
+	for (p = *exp, s = *exp, state = 0; '\0' != *p; p++)	/* check for function */
+	{
+		if (SUCCEED == is_function_char(*p))
+		{
+			state = 1;
+			continue;
+		}
+
+		if (0 == state)
+			goto error;
+
+		if ('(' == *p)	/* key parameters
+				 * last("hostname:vfs.fs.size[\"/\",\"total\"]",0)}
+				 * ----^
+				 */
+		{
+			int	state;	/* 0 - init
+					 * 1 - inside quoted param
+					 * 2 - inside unquoted param
+					 * 3 - end of params
+					 */
+
+			*p = '\0';
+			*func = strdup(s);
+			*p++ = '(';
+
+			for (s = p, state = 0; '\0' != *p; p++)
+			{
+				switch (state) {
+				/* Init state */
+				case 0:
+					if (',' == *p)
+						;
+					else if ('"' == *p)
+						state = 1;
+					else if (')' == *p)
+						state = 3;
+					else if (' ' != *p)
+						state = 2;
+					break;
+				/* Quoted */
+				case 1:
+					if ('"' == *p)
+						state = 0;
+					else if('\\' == *p && '"' == p[1])
+						p++;
+					break;
+				/* Unquoted */
+				case 2:
+					if (',' == *p)
+						state = 0;
+					else if (')' == *p)
+						state = 3;
+					break;
+				}
+
+				if (3 == state)
+					break;
+			}
+
+			if (3 == state)
+			{
+				*p = '\0';
+				*params = strdup(s);
+				*p = ')';
+			}
+			else
+				goto error;
+		}
+		else
+			goto error;
+		break;
+	}
+
+	if (NULL == *func || NULL == *params)
+		goto error;
+
+	*exp = p;
+
+	return SUCCEED;
+error:
+	zbx_free(*func);
+	zbx_free(*params);
+
+	*exp = p;
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: parse_host_key                                                   *
+ *                                                                            *
+ * Purpose: return hostname and key                                           *
+ *          <hostname:>key                                                    *
+ *                                                                            *
+ * Parameters:                                                                *
+ *         exp - pointer to the first char of hostname                        *
+ *                host:key[key params]                                        *
+ *                ^                                                           *
+ *                                                                            *
+ * Return value: return SUCCEED or FAIL                                       *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	parse_host_key(char *exp, char **host, char **key)
+{
+	char	*p, *s;
+
+	if (NULL == exp || '\0' == *exp)
+		return FAIL;
+
+	for (p = exp, s = exp; '\0' != *p; p++)	/* check for optional hostname */
+	{
+		if (':' == *p)	/* hostname:vfs.fs.size[/,total]
+				 * --------^
+				 */
+		{
+			*p = '\0';
+			*host = strdup(s);
+			*p++ = ':';
+
+			s = p;
+			break;
+		}
+
+		if (SUCCEED != is_hostname_char(*p))
+			break;
+	}
+
+	*key = strdup(s);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: num_param                                                        *
  *                                                                            *
  * Purpose: calculate count of parameters from parameter list (param)         *
@@ -1041,61 +1206,75 @@ char* __zbx_zbx_strdcatf(char *dest, const char *f, ...)
  * Comments:  delimeter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
-int	num_param(const char *param)
+int	num_param(const char *p)
 {
-	int	i;
-	int	ret = 1;
-
 /* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
-	int	state = 0;
-	char	c;
+	int	ret = 1, state, array;
 
-	if(param == NULL)
+	if (p == NULL)
 		return 0;
 
-	for(i=0;param[i]!='\0';i++)
+	for (state = 0, array = 0; '\0' != *p; p++)
 	{
-		c=param[i];
-		switch(state)
-		{
-			case 0:
-				if(c==',')
-				{
+		switch (state) {
+		/* Init state */
+		case 0:
+			if (',' == *p)
+			{
+				if (0 == array)
 					ret++;
-				}
-				else if(c=='"')
-				{
-					state=1;
-				}
-				else if(c=='\\' && param[i+1]=='"')
-				{
-					state=2;
-				}
-				else if(c!=' ')
-				{
-					state=2;
-				}
-				break;
-			case 1:
-				if(c=='"')
-				{
-					state=0;
-				}
-				else if(c=='\\' && param[i+1]=='"')
-				{
-					i++;
-					state=2;
-				}
-				break;
-			case 2:
-				if(c==',')
-				{
-					ret++;
-					state=0;
-				}
-				break;
+			}
+			else if ('"' == *p)
+				state = 1;
+			else if ('[' == *p)
+				array++;
+			else if (']' == *p && 0 != array)
+			{
+				array--;
+
+				/* skip spaces */
+				while (' ' == p[1])
+					p++;
+
+				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
+					return 0;	/* incorrect syntax */
+			}
+			else if (' ' != *p)
+				state = 2;
+			break;
+		/* Quoted */
+		case 1:
+			if ('"' == *p)
+			{
+				/* skip spaces */
+				while (' ' == p[1])
+					p++;
+
+				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
+					return 0;	/* incorrect syntax */
+				state = 0;
+			}
+			else if ('\\' == *p && '"' == p[1])
+				p++;
+			break;
+		/* Unquoted */
+		case 2:
+			if (',' == *p || (']' == *p && 0 != array))
+			{
+				p--;
+				state = 0;
+			}
+			break;
 		}
 	}
+
+	/* missing terminating '"' character */
+	if (state == 1)
+		return 0;
+
+	/* missing terminating ']' character */
+	if (array != 0)
+		return 0;
 
 	return ret;
 }
@@ -1121,93 +1300,428 @@ int	num_param(const char *param)
  * Comments:  delimeter for parameters is ','                                 *
  *                                                                            *
  ******************************************************************************/
-int	get_param(const char *param, int num, char *buf, int maxlen)
+int	get_param(const char *p, int num, char *buf, int maxlen)
 {
-	int	ret = 1;
-	int	i = 0;
-	int	idx = 1;
-	int	buf_i = 0;
-
 /* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
-	int	state = 0;
-	char	c;
+	int	state, array, idx = 1, buf_i = 0;
 
-	buf[0]='\0';
+	*buf = '\0';
 
-	for(i=0; param[i] != '\0' && idx<=num && buf_i<maxlen; i++)
+	for (state = 0, array = 0; '\0' != *p && idx <= num && buf_i < maxlen; p++)
 	{
-		if(idx == num)	ret = 0;
-		c=param[i];
-		switch(state)
-		{
-			/* Init state */
-			case 0:
-				if(c==',')
-				{
+		switch (state) {
+		/* Init state */
+		case 0:
+			if (',' == *p)
+			{
+				if (0 == array)
 					idx++;
-				}
-				else if(c=='"')
-				{
-					state=1;
-				}
-				else if(idx == num)
-				{
-					if(c=='\\' && param[i+1]=='"')
-					{
-						buf[buf_i++]=c;
-						i++;
-						buf[buf_i++]=param[i];
-					}
-					else if(c!=' ')
-					{
-						buf[buf_i++]=c;
-					}
-					state=2;
-				}
-				break;
-			/* Quoted */
-			case 1:
-				if(c=='"')
-				{
-					state=0;
-				}
-				else if(idx == num)
-				{
-					if(c=='\\' && param[i+1]=='"')
-					{
-						i++;
-						buf[buf_i++]=param[i];
-					}
-					else
-					{
-						buf[buf_i++]=c;
-					}
-				}
-				break;
-			/* Unquoted */
-			case 2:
-				if(c==',')
-				{
+				else if (idx == num)
+					buf[buf_i++] = *p;
+			}
+			else if ('"' == *p)
+			{
+				state = 1;
+				if (0 != array && idx == num)
+					buf[buf_i++] = *p;
+			}
+			else if ('[' == *p)
+			{
+				if (0 != array && idx == num)
+					buf[buf_i++] = *p;
+				array++;
+			}
+			else if (']' == *p && 0 != array)
+			{
+				array--;
+				if (0 != array && idx == num)
+					buf[buf_i++] = *p;
+
+				/* skip spaces */
+				while (' ' == p[1])
+					p++;
+
+				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
+					return 1;	/* incorrect syntax */
+			}
+			else if (' ' != *p)
+			{
+				if (idx == num)
+					buf[buf_i++] = *p;
+				state = 2;
+			}
+			break;
+		/* Quoted */
+		case 1:
+			if ('"' == *p)
+			{
+				if (0 != array && idx == num)
+					buf[buf_i++] = *p;
+
+				/* skip spaces */
+				while (' ' == p[1])
+					p++;
+
+				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
+					return 1;	/* incorrect syntax */
+				state = 0;
+			}
+			else if ('\\' == *p && '"' == p[1] && 0 == array)
+			{
+				p++;
+				if (idx == num)
+					buf[buf_i++] = *p;
+			}
+			else if (idx == num)
+				buf[buf_i++] = *p;
+			break;
+		/* Unquoted */
+		case 2:
+			if (',' == *p || (']' == *p && 0 != array))
+			{
+				p--;
+				state = 0;
+			}
+			else if (idx == num)
+				buf[buf_i++] = *p;
+			break;
+		}
+
+		if (idx > num)
+			break;
+	}
+
+	/* missing terminating '"' character */
+	if (state == 1)
+		return 1;
+
+	/* missing terminating ']' character */
+	if (array != 0)
+		return 1;
+
+	buf[buf_i] = '\0';
+
+	if (idx >= num)
+		return 0;
+
+	return 1;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_param_len                                                    *
+ *                                                                            *
+ * Purpose: return length of the parameter by index (num)                     *
+ *          from parameter list (param)                                       *
+ *                                                                            *
+ * Parameters:                                                                *
+ * 	p   - [IN]  parameter list                                            *
+ *      num - [IN]  requested parameter index                                 *
+ *      sz  - [OUT] length of requested parameter                             *
+ *                                                                            *
+ * Return value:                                                              *
+ *      1 - requested parameter missing                                       *
+ *      0 - requested parameter found                                         *
+ *          (for first parameter result is always 0)                          *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments: delimeter for parameters is ','                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_param_len(const char *p, int num, size_t *sz)
+{
+/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
+	int	state, array, idx = 1;
+
+	*sz = 0;
+
+	for (state = 0, array = 0; '\0' != *p && idx <= num; p++)
+	{
+		switch (state) {
+		/* Init state */
+		case 0:
+			if (',' == *p)
+			{
+				if (0 == array)
 					idx++;
-					state=0;
-				}
-				else if(idx == num)
-				{
-					buf[buf_i++]=c;
-				}
-				break;
+				else if (idx == num)
+					(*sz)++;
+			}
+			else if ('"' == *p)
+			{
+				state = 1;
+				if (0 != array && idx == num)
+					(*sz)++;
+			}
+			else if ('[' == *p)
+			{
+				if (0 != array && idx == num)
+					(*sz)++;
+				array++;
+			}
+			else if (']' == *p && 0 != array)
+			{
+				array--;
+				if (0 != array && idx == num)
+					(*sz)++;
+
+				/* skip spaces */
+				while (' ' == p[1])
+					p++;
+
+				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
+					return 1;	/* incorrect syntax */
+			}
+			else if (' ' != *p)
+			{
+				if (idx == num)
+					(*sz)++;
+				state = 2;
+			}
+			break;
+		/* Quoted */
+		case 1:
+			if ('"' == *p)
+			{
+				if (0 != array && idx == num)
+					(*sz)++;
+
+				/* skip spaces */
+				while (' ' == p[1])
+					p++;
+
+				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
+					return 1;	/* incorrect syntax */
+				state = 0;
+			}
+			else if ('\\' == *p && '"' == p[1] && 0 == array)
+			{
+				p++;
+				if (idx == num)
+					(*sz)++;
+			}
+			else if (idx == num)
+				(*sz)++;
+			break;
+		/* Unquoted */
+		case 2:
+			if (',' == *p || (']' == *p && 0 != array))
+			{
+				p--;
+				state = 0;
+			}
+			else if (idx == num)
+				(*sz)++;
+			break;
+		}
+
+		if (idx > num)
+			break;
+	}
+
+	/* missing terminating '"' character */
+	if (state == 1)
+		return 1;
+
+	/* missing terminating ']' character */
+	if (array != 0)
+		return 1;
+
+	if (idx >= num)
+		return 0;
+
+	return 1;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_param_dyn                                                    *
+ *                                                                            *
+ * Purpose: return parameter by index (num) from parameter list (param)       *
+ *                                                                            *
+ * Parameters:                                                                *
+ * 	p   - [IN] parameter list                                             *
+ *      num - [IN] requested parameter index                                  *
+ *                                                                            *
+ * Return value:                                                              *
+ *      NULL - requested parameter missing                                    *
+ *      otherwise - requested parameter                                       *
+ *          (for first parameter result is not NULL)                          *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:  delimeter for parameters is ','                                 *
+ *                                                                            *
+ ******************************************************************************/
+char	*get_param_dyn(const char *p, int num)
+{
+	char	*buf = NULL;
+	size_t	sz;
+
+	if (0 != get_param_len(p, num, &sz))
+		return buf;
+
+	buf = zbx_malloc(buf, sz + 1);
+
+	if (0 != get_param(p, num, buf, sz + 1))
+		zbx_free(buf);
+
+	return buf;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: remove_param                                                     *
+ *                                                                            *
+ * Purpose: remove parameter by index (num) from parameter list (param)       *
+ *                                                                            *
+ * Parameters:                                                                *
+ * 	param  - parameter list                                               *
+ *      num    - requested parameter index                                    *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments: delimeter for parameters is ','                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	remove_param(char *p, int num)
+{
+/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
+	int	state, idx = 1;
+	char	*buf;
+
+	for (buf = p, state = 0; '\0' != *p; p++)
+	{
+		if (idx != num)
+			*buf++ = *p;
+
+		switch (state) {
+		/* Init state */
+		case 0:
+			if (',' == *p)
+				idx++;
+			else if ('"' == *p)
+				state = 1;
+			else if (' ' != *p)
+				state = 2;
+			break;
+		/* Quoted */
+		case 1:
+			if ('"' == *p)
+				state = 0;
+			else if ('\\' == *p && '"' == p[1])
+				p++;
+			break;
+		/* Unquoted */
+		case 2:
+			if (',' == *p)
+			{
+				idx++;
+				state = 0;
+			}
+			break;
 		}
 	}
 
-	buf[buf_i]='\0';
+	*buf = '\0';
+}
 
-	/* Missing first parameter will return OK */
-	if(num == 1)
+/******************************************************************************
+ *                                                                            *
+ * Function: get_string                                                       *
+ *                                                                            *
+ * Purpose: get current string from the quoted or unquoted string list,       *
+ *          delimited by blanks                                               *
+ *                                                                            *
+ * Parameters:                                                                *
+ * 	p       - [IN] parameter list, delimited by blanks (' ' or '\t')      *
+ *      buf     - [OUT] output buffer                                         *
+ *      bufsize - [IN] output buffer size                                     *
+ *                                                                            *
+ * Return value: pointer to the next string                                   *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments: delimeter for parameters is ','                                  *
+ *                                                                            *
+ ******************************************************************************/
+const char	*get_string(const char *p, char *buf, size_t bufsize)
+{
+/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
+	int	state;
+	size_t	buf_i = 0;
+
+	bufsize--;	/* '\0' */
+
+	for (state = 0; '\0' != *p; p++)
 	{
-		ret = 0;
+		switch (state) {
+		/* Init state */
+		case 0:
+			if (' ' == *p || '\t' == *p)
+				/* Skip of leading spaces */;
+			else if ('"' == *p)
+				state = 1;
+			else
+			{
+				state = 2;
+				p--;
+			}
+			break;
+		/* Quoted */
+		case 1:
+			if ('"' == *p)
+			{
+				if (' ' != p[1] && '\t' != p[1] && '\0' != p[1])
+					return NULL;	/* incorrect syntax */
+
+				while (' ' == p[1] || '\t' == p[1])
+					p++;
+
+				buf[buf_i] = '\0';
+				return ++p;
+			}
+			else if ('\\' == *p && ('"' == p[1] || '\\' == p[1]))
+			{
+				p++;
+				if (buf_i < bufsize)
+					buf[buf_i++] = *p;
+			}
+			else if ('\\' == *p && 'n' == p[1])
+			{
+				p++;
+				if (buf_i < bufsize)
+					buf[buf_i++] = 0x0a;
+			}
+			else if (buf_i < bufsize)
+				buf[buf_i++] = *p;
+			break;
+		/* Unquoted */
+		case 2:
+			if (' ' == *p || '\t' == *p)
+			{
+				while (' ' == *p || '\t' == *p)
+					p++;
+
+				buf[buf_i] = '\0';
+				return p;
+			}
+			else if (buf_i < bufsize)
+				buf[buf_i++] = *p;
+			break;
+		}
 	}
 
-	return ret;
+	/* missing terminating '"' character */
+	if (state == 1)
+		return NULL;
+
+	buf[buf_i] = '\0';
+
+	return p;
 }
 
 /******************************************************************************
@@ -1271,7 +1785,7 @@ u_char	zbx_hex2num(char c)
  *	ilen - binary data length                                             *
  *	output - pointer to output buffer                                     *
  *	olen - output buffer length                                           *
- 	*                                                                            *
+ *                                                                            *
  * Return value:                                                              *
  *                                                                            *
  * Author: Aleksander Vladishev                                               *
@@ -1819,6 +2333,18 @@ char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity)
 	case TRIGGER_SEVERITY_AVERAGE: return "Average";
 	case TRIGGER_SEVERITY_HIGH: return "High";
 	case TRIGGER_SEVERITY_DISASTER: return "Disaster";
+	default: return "unknown";
+	}
+}
+
+char	*zbx_item_logtype_string(zbx_item_logtype_t logtype)
+{
+	switch (logtype) {
+	case ITEM_LOGTYPE_INFORMATION: return "Information";
+	case ITEM_LOGTYPE_WARNING: return "Warning";
+	case ITEM_LOGTYPE_ERROR: return "Error";
+	case ITEM_LOGTYPE_FAILURE_AUDIT: return "Failure Audit";
+	case ITEM_LOGTYPE_SUCCESS_AUDIT: return "Success Audit";
 	default: return "unknown";
 	}
 }

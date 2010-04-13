@@ -19,6 +19,27 @@
 **/
 ?>
 <?php
+	function get_default_image($image=false){
+		if($image){
+			$image = imagecreate(50, 50);
+			$color = imagecolorallocate($image, 250, 50, 50);
+			imagefill($image, 0, 0, $color);
+		}
+		else{
+			$sql = 'SELECT i.imageid '.
+				' FROM images i '.
+				' WHERE '.dbin_node('i.imageid', false);
+			$result = DBselect($sql,1);
+			if($image = DBfetch($result)) return $image;
+			else{
+				$image = array();
+				$image['imageid'] = 0;
+			}
+		}
+
+	return $image;
+	}
+
 	function get_image_by_imageid($imageid){
 
 		$sql = 'SELECT * FROM images WHERE imageid='.$imageid;
@@ -55,7 +76,7 @@
 				$imageid = get_dbid('images','imageid');
 
 				$image = fread(fopen($file['tmp_name'],'r'),filesize($file['tmp_name']));
-
+    
 				if($DB['TYPE'] == 'POSTGRESQL'){
 					$image = pg_escape_bytea($image);
 					$sql = 'INSERT INTO images (imageid, name, imagetype, image) '.
@@ -71,7 +92,7 @@
 						' return image into :image');
 					if(!$stid){
 						$e = ocierror($stid);
-						error('Parse SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+						error(S_PARSE_SQL_ERROR.' ['.$e['message'].']'.SPACE.S_IN_SMALL.SPACE.'['.$e['sqltext'].']');
 						return false;
 					}
 
@@ -79,13 +100,13 @@
 
 					if(!OCIExecute($stid, OCI_DEFAULT)){
 						$e = ocierror($stid);
-						error('Execute SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+						error(S_EXECUTE_SQL_ERROR.SPACE.'['.$e['message'].']'.SPACE.S_IN_SMALL.SPACE.'['.$e['sqltext'].']');
 						return false;
 					}
 
 					$result = DBend($lobimage->save($image));
 					if(!$result){
-						error('Could not save image!');
+						error(S_COULD_NOT_SAVE_IMAGE);
 					return false;
 					}
 
@@ -102,11 +123,11 @@
 									' VALUES ('.$imageid.','.zbx_dbstr($name).','.$imagetype.','.zbx_dbstr($image).')');
 			}
 			else{
-				error('Image size must be less than 1Mb');
+				error(S_IMAGE_SIZE_MUST_BE_LESS_THAN_MB);
 			}
 		}
 		else{
-			error('Select image to download');
+			error(S_SELECT_IMAGE_TO_DOWNLOAD);
 		}
 		return false;
 	}
@@ -122,7 +143,7 @@
 			global $DB;
 
 			if($file['error'] != 0 || $file['size']==0){
-				error('Incorrect Image');
+				error(S_INCORRECT_IMAGE);
 				return FALSE;
 			}
 
@@ -166,14 +187,49 @@
 				return	DBexecute($sql);
 			}
 			else{
-				error('Image size must be less than 1MB');
+				error(S_IMAGE_SIZE_MUST_BE_LESS_THAN_MB);
 				return FALSE;
 			}
 		}
 	}
 
 	function delete_image($imageid){
-		return	DBexecute('DELETE FROM images WHERE imageid='.$imageid);
+		if(!checkImagesToDelete($imageid)) return false;
+		$result = DBexecute('DELETE FROM images WHERE imageid='.$imageid);
+
+	return $result;
 	}
 
+	function checkImagesToDelete($imageids){
+		zbx_value2array($imageids);
+
+		$saveToDelete = true;
+		$sql = 'SELECT DISTINCT sm.* '.
+				' FROM sysmaps_elements se, sysmaps sm '.
+				' WHERE sm.sysmapid=se.sysmapid '.
+					' AND ('.
+						DBCondition('se.iconid_off',$imageids).
+						' OR '.DBCondition('se.iconid_on',$imageids).
+						' OR '.DBCondition('se.iconid_unknown',$imageids).
+						' OR '.DBCondition('se.iconid_disabled',$imageids).
+						' OR '.DBCondition('se.iconid_maintenance',$imageids).
+					')';
+		$db_sysmaps = DBselect($sql);
+		while($sysmap = DBfetch($db_sysmaps)){
+			$saveToDelete = false;
+//			error('Image is used as icon in ZABBIX map "'.$sysmap['name'].'" on node "'.get_node_name_by_elid($sysmap['sysmapid'],true).'"');
+			error('Image is used as icon in ZABBIX map "'.get_node_name_by_elid($sysmap['sysmapid'],true,':').$sysmap['name'].'"');
+		}
+
+		$sql = 'SELECT DISTINCT sm.* '.
+				' FROM sysmaps sm '.
+				' WHERE '.DBCondition('sm.backgroundid',$imageids);
+		$db_sysmaps = DBselect($sql);
+		while($sysmap = DBfetch($db_sysmaps)){
+			$saveToDelete = false;
+			error('Image is used as background in ZABBIX map "'.get_node_name_by_elid($sysmap['sysmapid'],true,':').$sysmap['name'].'"');
+		}
+
+	return $saveToDelete;
+	}
 ?>

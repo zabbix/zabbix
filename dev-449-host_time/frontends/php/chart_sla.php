@@ -39,20 +39,20 @@ include_once 'include/page_header.php';
 	check_fields($fields);
 ?>
 <?php
-	if(!DBfetch(DBselect('select serviceid from services where serviceid='.$_REQUEST['serviceid'])) ){
+	$sql = 'SELECT s.* FROM services s  WHERE s.serviceid='.$_REQUEST['serviceid'];
+	if(!$service = DBfetch(DBselect($sql,1))){
 		fatal_error(S_NO_IT_SERVICE_DEFINED);
 	}
 
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array(), PERM_RES_IDS_ARRAY);
+	if(!is_null($service['triggerid'])){
+		$options = array(
+			'triggerids' => $service['triggerid'],
+			'output' => API_OUTPUT_SHORTEN,
+			'nodeids' => get_current_nodeid(true)
+		);
 
-	$sql = 'SELECT s.* '.
-			' FROM services s '.
-			' WHERE s.serviceid='.$_REQUEST['serviceid'].
-				' AND (s.triggerid IS NULL OR '.DBcondition('s.triggerid',$available_triggers).') '.
-				' AND '.DBin_node('s.serviceid');
-
-	if(!$service = DBfetch(DBselect($sql))){
-		access_deny();
+		$db_data = CTrigger::get($options);
+		if(empty($db_data)) access_deny();
 	}
 ?>
 <?php

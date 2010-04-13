@@ -147,82 +147,73 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 	{
 		ZBX_STR2UINT64(condition_value, condition->value);
 
-		result = DBselect(
-				"select distinct h.hostid"
-				" from hosts h,items i,functions f,triggers t"
-				" where h.hostid=i.hostid"
-					" and i.itemid=f.itemid"
-					" and f.triggerid=t.triggerid"
-					" and t.triggerid=" ZBX_FS_UI64
-					" and h.hostid=" ZBX_FS_UI64,
-				event->objectid,
-				condition_value);
-
 		switch (condition->operator)
 		{
 		case CONDITION_OPERATOR_EQUAL:
+		case CONDITION_OPERATOR_NOT_EQUAL:
+			result = DBselect(
+					"select distinct i.hostid"
+					" from items i,functions f,triggers t"
+					" where i.itemid=f.itemid"
+						" and f.triggerid=t.triggerid"
+						" and t.triggerid=" ZBX_FS_UI64
+						" and i.hostid=" ZBX_FS_UI64,
+					event->objectid,
+					condition_value);
+
 			if (NULL != DBfetch(result))
 				ret = SUCCEED;
-			break;
-		case CONDITION_OPERATOR_NOT_EQUAL:
-			if (NULL == DBfetch(result))
-				ret = SUCCEED;
+			DBfree_result(result);
+
+			if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator)
+				ret = (SUCCEED == ret) ? FAIL : SUCCEED;
 			break;
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-					condition->operator,
-					condition->conditionid);
+					condition->operator, condition->conditionid);
 		}
-		DBfree_result(result);
 	}
 	else if (condition->conditiontype == CONDITION_TYPE_TRIGGER)
 	{
+		zbx_uint64_t	triggerid;
+
 		ZBX_STR2UINT64(condition_value, condition->value);
 
 		switch (condition->operator)
 		{
 		case CONDITION_OPERATOR_EQUAL:
+		case CONDITION_OPERATOR_NOT_EQUAL:
 			if (event->objectid == condition_value)
 				ret = SUCCEED;
 			/* Processing of templated triggers */
 			else
 			{
-				result = DBselect(
-						"select triggerid"
-						" from triggers"
-						" where triggerid=" ZBX_FS_UI64
-							" and templateid=" ZBX_FS_UI64,
-						event->objectid,
-						condition_value);
+				for (triggerid = event->objectid; 0 != triggerid && FAIL == ret;)
+				{
+					result = DBselect(
+							"select templateid"
+							" from triggers"
+							" where triggerid=" ZBX_FS_UI64,
+							triggerid);
 
-				if (NULL != DBfetch(result))
-					ret = SUCCEED;
-				DBfree_result(result);
+					if (NULL == (row = DBfetch(result)))
+						triggerid = 0;
+					else
+					{
+						ZBX_STR2UINT64(triggerid, row[0]);
+						if (triggerid == condition_value)
+							ret = SUCCEED;
+					}
+					DBfree_result(result);
+				}
 			}
-			break;
-		case CONDITION_OPERATOR_NOT_EQUAL:
-			if (event->objectid != condition_value)
-				ret = SUCCEED;
-			/* Processing of templated triggers */
-			else
-			{
-				result = DBselect(
-						"select triggerid"
-						" from triggers"
-						" where triggerid=" ZBX_FS_UI64
-							" and templateid=" ZBX_FS_UI64,
-						event->objectid,
-						condition_value);
 
-				if (NULL == DBfetch(result))
-					ret = SUCCEED;
-				DBfree_result(result);
-			}
+			if (CONDITION_OPERATOR_NOT_EQUAL == condition->operator)
+				ret = (SUCCEED == ret) ? FAIL : SUCCEED;
 			break;
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
-					condition->operator,
-					condition->conditionid);
+					condition->operator, condition->conditionid);
 		}
 	}
 	else if (condition->conditiontype == CONDITION_TYPE_TRIGGER_NAME)
@@ -344,6 +335,7 @@ static int	check_trigger_condition(DB_EVENT *event, DB_CONDITION *condition)
 			if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]) && 0 != atoi(row[0]))
 				ret = SUCCEED;
 			DBfree_result(result);
+			break;
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
 					condition->operator,

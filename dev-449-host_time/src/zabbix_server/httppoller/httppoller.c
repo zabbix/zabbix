@@ -36,13 +36,13 @@ int httppoller_num;
  *                                                                            *
  * Purpose: calculate when we have to process earliest httptest               *
  *                                                                            *
- * Parameters: now - current timestamp                                        *
+ * Parameters: now - current timestamp (not used)                             *
  *                                                                            *
  * Return value: timestamp of earliest check or -1 if not found               *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: never returns                                                    *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static int get_minnextcheck(int now)
@@ -52,11 +52,21 @@ static int get_minnextcheck(int now)
 
 	int		res;
 
-	result = DBselect("select count(*),min(nextcheck) from httptest t where t.status=%d and " ZBX_SQL_MOD(t.httptestid,%d) "=%d" DB_NODE,
-		HTTPTEST_STATUS_MONITORED,
-		CONFIG_HTTPPOLLER_FORKS,
-		httppoller_num-1,
-		DBnode_local("t.httptestid"));
+	result = DBselect(
+			"select count(*),min(t.nextcheck)"
+			" from httptest t,applications a,hosts h"
+			" where t.applicationid=a.applicationid"
+				" and a.hostid=h.hostid"
+				" and " ZBX_SQL_MOD(t.httptestid,%d) "=%d"
+				" and t.status=%d"
+				" and h.status=%d"
+				" and (h.maintenance_status=%d or h.maintenance_type=%d)"
+				DB_NODE,
+			CONFIG_HTTPPOLLER_FORKS, httppoller_num - 1,
+			HTTPTEST_STATUS_MONITORED,
+			HOST_STATUS_MONITORED,
+			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
+			DBnode_local("t.httptestid"));
 
 	row=DBfetch(result);
 

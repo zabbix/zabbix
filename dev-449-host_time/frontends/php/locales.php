@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2007 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@ $output = '<?php
 
 		foreach($_REQUEST['langTo'] as $key => $value){
 			$value= addslashes($value);
-			$output.= "'".strtoupper($key)."'=>\t\t\t'".$value."',\n\t";
+			$output.= "'".zbx_strtoupper($key)."'=>\t\t\t'".$value."',\n\t";
 		}
 
 $output.='
@@ -102,7 +102,6 @@ $output.='
 
 if(isset($_REQUEST['make'])){
 	show_table_header(S_LOCALES);
-	echo SBR;
 
 	$frmLcls = new CFormTable(S_CREATE.SPACE.S_LOCALE_SMALL,'locales.php','post',null,'form');
 
@@ -175,7 +174,6 @@ else if(isset($_REQUEST['next'])){
 	$help->SetHint($help_table);
 
 	show_table_header(array($help,S_LOCALES));
-	echo SBR;
 
 	$frmLcls = new CFormTable(S_CREATE.SPACE.S_LOCALE_SMALL.SPACE.S_FROM_SMALL.SPACE.$ZBX_LOCALES[$_REQUEST['srclang']],'locales.php?action=1','post',null,'form');
 	$frmLcls->setAttribute('id','locales');
@@ -267,7 +265,7 @@ else{
 	$frmLcls->addItemToBottomRow(new CButton('next',S_NEXT.' >>'));
 	$frmLcls->Show();
 }
-?>
-<?php
+
+
 include_once "include/page_footer.php";
 ?>

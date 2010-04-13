@@ -1,19 +1,17 @@
-CREATE TABLE sysmaps_tmp
-(
-  sysmapid bigint NOT NULL DEFAULT 0,
-  name varchar(128) NOT NULL DEFAULT '',
-  width integer NOT NULL DEFAULT 0,
-  height integer NOT NULL DEFAULT 0,
-  backgroundid bigint NOT NULL DEFAULT 0,
-  label_type integer NOT NULL DEFAULT 0,
-  label_location integer NOT NULL DEFAULT 0,
-  highlight integer NOT NULL DEFAULT 1
-)
-WITH (
-  OIDS=TRUE
-);
+CREATE TABLE sysmaps_tmp (
+	sysmapid		bigint		DEFAULT '0'	NOT NULL,
+	name		varchar(128)		DEFAULT ''	NOT NULL,
+	width		integer		DEFAULT '0'	NOT NULL,
+	height		integer		DEFAULT '0'	NOT NULL,
+	backgroundid		bigint		DEFAULT '0'	NOT NULL,
+	label_type		integer		DEFAULT '0'	NOT NULL,
+	label_location		integer		DEFAULT '0'	NOT NULL,
+	highlight		integer		DEFAULT '1'	NOT NULL,
+	PRIMARY KEY (sysmapid)
+) with OIDS;
 
-
-insert into sysmaps_tmp select sysmapid,name,width,height,backgroundid,label_type,label_location from sysmaps;
+insert into sysmaps_tmp select sysmapid,name,width,height,backgroundid,label_type,label_location,1 from sysmaps;
 drop table sysmaps;
 alter table sysmaps_tmp rename to sysmaps;
+
+CREATE INDEX sysmaps_1 on sysmaps (name);

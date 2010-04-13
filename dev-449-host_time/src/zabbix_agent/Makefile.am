@@ -25,6 +25,7 @@ zabbix_agent_SOURCES = \
 	diskdevices.c diskdevices.h \
 	interfaces.c interfaces.h \
 	perfstat.c perfstat.h \
+	vmstats.c vmstats.h \
 	zbxconf.c zbxconf.h
 
 zabbix_agent_LDADD = $(agents_ldadd)
@@ -36,10 +37,12 @@ zabbix_agentd_SOURCES = \
 	diskdevices.c diskdevices.h \
 	interfaces.c interfaces.h \
 	perfstat.c perfstat.h \
+	vmstats.c vmstats.h \
 	logfiles.c logfiles.h \
 	zabbix_agentd.c \
 	zbxconf.c zbxconf.h \
-	listener.c listener.h
+	listener.c listener.h \
+	eventlog.c eventlog.h
 
 zabbix_agentd_LDADD = $(agents_ldadd)
 

@@ -105,7 +105,7 @@ class CEvent extends CZBXAPI{
 
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
-			
+
 			if(!is_null($options['select_hosts'])){
 				$options['select_hosts'] = API_OUTPUT_EXTEND;
 			}
@@ -116,65 +116,53 @@ class CEvent extends CZBXAPI{
 				$options['select_items'] = API_OUTPUT_EXTEND;
 			}
 		}
-		
-		
-// editable + PERMISSION CHECK
-		if(defined('ZBX_API_REQUEST')){
-			$options['nopermissions'] = false;
-		}
 
-		if(is_null($options['source']) && is_null($options['object'])){
-			$options['object'] = EVENT_OBJECT_TRIGGER;
-		}
+
+// editable + PERMISSION CHECK
+
 
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
-		else if(($options['object'] == EVENT_OBJECT_TRIGGER) || ($options['source'] == EVENT_SOURCE_TRIGGER)){
+		else{
+			if(is_null($options['source']) && is_null($options['object'])){
+				$options['object'] = EVENT_OBJECT_TRIGGER;
+			}
 
-			$tr_options = array();
+			if(($options['object'] == EVENT_OBJECT_TRIGGER) || ($options['source'] == EVENT_SOURCE_TRIGGER)){
 
-			if(!is_null($options['triggerids']))
-				$tr_options['triggerids'] = $options['triggerids'];
+				$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
-			$triggers = CTrigger::get($tr_options);
-			$triggerids = zbx_objectValues($triggers, 'triggerid');
-
-			$options['triggerids'] = $triggerids;
-
-/*
-			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
-
-			$sql_parts['from']['f'] = 'functions f';
-			$sql_parts['from']['i'] = 'items i';
-			$sql_parts['from']['hg'] = 'hosts_groups hg';
-			$sql_parts['from']['r'] = 'rights r';
-			$sql_parts['from']['ug'] = 'users_groups ug';
-			$sql_parts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
-			$sql_parts['where']['fe'] = 'f.triggerid=e.objectid';
-			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
-			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
-			$sql_parts['where'][] = 'r.id=hg.groupid ';
-			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sql_parts['where'][] = 'ug.userid='.$userid;
-			$sql_parts['where'][] = 'r.permission>='.$permission;
-			$sql_parts['where'][] = 'NOT EXISTS( '.
-											' SELECT ff.triggerid '.
-											' FROM functions ff, items ii '.
-											' WHERE ff.triggerid=e.objectid '.
-												' AND ff.itemid=ii.itemid '.
-												' AND EXISTS( '.
-													' SELECT hgg.groupid '.
-													' FROM hosts_groups hgg, rights rr, users_groups gg '.
-													' WHERE hgg.hostid=ii.hostid '.
-														' AND rr.id=hgg.groupid '.
-														' AND rr.groupid=gg.usrgrpid '.
-														' AND gg.userid='.$userid.
-														' AND rr.permission<'.$permission.'))';
-//*/
+				$sql_parts['from']['f'] = 'functions f';
+				$sql_parts['from']['i'] = 'items i';
+				$sql_parts['from']['hg'] = 'hosts_groups hg';
+				$sql_parts['from']['r'] = 'rights r';
+				$sql_parts['from']['ug'] = 'users_groups ug';
+				$sql_parts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
+				$sql_parts['where']['fe'] = 'f.triggerid=e.objectid';
+				$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
+				$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
+				$sql_parts['where'][] = 'r.id=hg.groupid ';
+				$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
+				$sql_parts['where'][] = 'ug.userid='.$userid;
+				$sql_parts['where'][] = 'r.permission>='.$permission;
+				$sql_parts['where'][] = 'NOT EXISTS( '.
+												' SELECT ff.triggerid '.
+												' FROM functions ff, items ii '.
+												' WHERE ff.triggerid=e.objectid '.
+													' AND ff.itemid=ii.itemid '.
+													' AND EXISTS( '.
+														' SELECT hgg.groupid '.
+														' FROM hosts_groups hgg, rights rr, users_groups gg '.
+														' WHERE hgg.hostid=ii.hostid '.
+															' AND rr.id=hgg.groupid '.
+															' AND rr.groupid=gg.usrgrpid '.
+															' AND gg.userid='.$userid.
+															' AND rr.permission<'.$permission.'))';
+			}
 		}
 
 // nodeids
-		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
 
 // Permission hack
 
@@ -303,7 +291,7 @@ class CEvent extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.
+		$sql = 'SELECT DISTINCT '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('e.eventid', $nodeids).
 					$sql_where.
@@ -333,7 +321,7 @@ class CEvent extends CZBXAPI{
 					if(!is_null($options['select_triggers']) && !isset($result[$event['eventid']]['triggers'])){
 						$result[$event['eventid']]['triggers'] = array();
 					}
-					
+
 					if(!is_null($options['select_items']) && !isset($result[$event['eventid']]['items'])){
 						$result[$event['eventid']]['items'] = array();
 					}
@@ -488,7 +476,7 @@ class CEvent extends CZBXAPI{
  * @param array $events[0,...]['acknowledged'] OPTIONAL
  * @return boolean
  */
-	public static function add($events){
+	public static function create($events){
 		$events = zbx_toArray($events);
 		$eventids = array();
 
@@ -608,13 +596,16 @@ class CEvent extends CZBXAPI{
 
 		$events = isset($events_data['events']) ? zbx_toArray($events_data['events']) : array();
 		$eventids = zbx_objectValues($events, 'eventid');
-		$triggers = isset($events_data['triggers']) ? zbx_toArray($events_data['triggers']) : array();
-		$triggerids = zbx_objectValues($triggers, 'triggerid');
 		$message = $events_data['message'];
 
 // PERMISSIONS {{{
 		if(!empty($events)){
-			$allowed_events = self::get(array('eventids' => $eventids, 'preservekeys' => 1));
+			$options = array(
+				'eventids' => $eventids,
+				'preservekeys' => 1,
+				'output' => API_OUTPUT_SHORTEN
+			);
+			$allowed_events = self::get($options);
 			foreach($events as $num => $event){
 				if(!isset($allowed_events[$event['eventid']])){
 					self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
@@ -622,18 +613,8 @@ class CEvent extends CZBXAPI{
 				}
 			}
 		}
-		if(!empty($triggers)){
-			$allowed_triggers = CTrigger::get(array('triggerids' => $triggerids, 'preservekeys' => 1));
-			foreach($triggers as $num => $trigger){
-				if(!isset($allowed_triggers[$trigger['triggerid']])){
-					self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
-					return false;
-				}
-			}
-			$events = array_merge($events, self::get(array('triggerids' => $triggerids, 'nopermissions' => 1, 'preservekeys' => 1)));
-			$eventids = zbx_objectValues($events, 'eventid');
-		}
 // }}} PERMISSIONS
+
 		self::BeginTransaction(__METHOD__);
 
 		$result = DBexecute('UPDATE events SET acknowledged=1 WHERE '.DBcondition('eventid', $eventids));

@@ -17,22 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
-//#include <stdio.h>
-//#include <stdlib.h>
-//#include <unistd.h>
-//#include <sys/types.h>
-//#include <sys/stat.h>
-//#include <netinet/in.h>
-//#include <netdb.h>
-
-//#include <string.h>
-
-//#include <time.h>
-
-//#include <sys/socket.h>
-//#include <errno.h>
-
 #include "common.h"
 #include "nodecommand.h"
 #include "comms.h"
@@ -120,7 +104,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, char **res
 
 	if (NULL == (command = get_command_by_scriptid(scriptid)))
 	{
-		*result = zbx_dsprintf(*result, "NODE %d: Unknowh Script ID [" ZBX_FS_UI64 "]",
+		*result = zbx_dsprintf(*result, "NODE %d: Unknown Script ID [" ZBX_FS_UI64 "]",
 				CONFIG_NODEID, scriptid);
 		return ret;
 	}

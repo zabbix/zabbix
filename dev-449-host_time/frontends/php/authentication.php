@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,10 +63,10 @@ include_once('include/page_header.php');
 ?>
 
 <?php
-	$_REQUEST['config'] = get_request('config',get_profile('web.authentication.config',ZBX_AUTH_LDAP));
+	$_REQUEST['config'] = get_request('config',CProfile::get('web.authentication.config',ZBX_AUTH_LDAP));
 	check_fields($fields);
 
-	update_profile('web.authentication.config',$_REQUEST['config'], PROFILE_TYPE_INT);
+	CProfile::update('web.authentication.config',$_REQUEST['config'], PROFILE_TYPE_INT);
 
 	$_REQUEST['authentication_type'] = get_request('authentication_type',ZBX_AUTH_INTERNAL);
 
@@ -216,7 +216,6 @@ include_once('include/page_header.php');
 	}
 
 	show_table_header(S_AUTHENTICATION_TO_ZABBIX, $auth);
-	echo SBR;
 
 	if(ZBX_AUTH_INTERNAL==$_REQUEST['config']){
 

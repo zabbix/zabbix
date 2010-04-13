@@ -165,8 +165,9 @@ function format_doll_init($doll){
 
 	$obj['url'].= (zbx_empty($obj['url'])?'?':'&').'output=html';
 
-	$obj['params']['favobj'] = 'refresh';
-	$obj['params']['favid'] = $doll['id'];
+	$obj['params']['favobj'] = 'hat';
+	$obj['params']['favref'] = $doll['id'];
+	$obj['params']['action'] = 'refresh';
 
 return $obj;
 }
@@ -334,7 +335,7 @@ function zbx_date2age($start_date,$end_date=0,$utime = false){
 			$end_date = time();
 	}
 
-	$time = abs($end_date-$start_date);
+	$original_time = $time = abs($end_date-$start_date);
 //SDI($start_date.' - '.$end_date.' = '.$time);
 
 	$years = (int) ($time / (365*86400));
@@ -372,9 +373,10 @@ function zbx_date2age($start_date,$end_date=0,$utime = false){
 			(($hours && !$years && !$months)?$hours.S_HOUR_SHORT.' ':'').
 			(($minutes && !$years && !$months && !$weeks)?$minutes.S_MINUTE_SHORT.' ':'').
 			((!$years && !$months && !$weeks && !$days && ($ms || $seconds))?$seconds.S_SECOND_SHORT.' ':'').
-			(($ms && !$years && !$months && !$weeks && !$days && !$hours)?$ms.S_MILLISECOND_SHORT:'');
+			(($ms && !$years && !$months && !$weeks && !$days && !$hours) || $original_time == 0 ?$ms.S_MILLISECOND_SHORT:'').
+			(!$ms && $original_time > 0 && $original_time < 0.001 ? '< 1'.S_MILLISECOND_SHORT:'');
 
-return trim($str,' ');			
+return trim($str,' ');
 }
 
 function getmicrotime(){
@@ -383,7 +385,7 @@ function getmicrotime(){
 }
 
 function getDateStringByType($type, $timestamp){
-	$str = 'Wrong type';
+	$str = S_WRONG_TYPE;
 	switch($type){
 		case TIMEPERIOD_TYPE_HOURLY:
 			$str = date('H:i', $timestamp);
@@ -406,70 +408,6 @@ return $str;
 /************* END DATE *************/
 
 
-/************* SORT *************/
-function natksort(&$array) {
-	$keys = array_keys($array);
-	natcasesort($keys);
-
-	$new_array = array();
-
-	foreach ($keys as $k) {
-		$new_array[$k] = $array[$k];
-	}
-
-	$array = $new_array;
-	return true;
-}
-
-function asort_by_key(&$array, $key){
-	if(!is_array($array)) {
-		error('Incorrect type of asort_by_key');
-		return array();
-	}
-
-	$key = htmlspecialchars($key);
-	uasort($array, create_function('$a,$b', 'return $a[\''.$key.'\'] - $b[\''.$key.'\'];'));
-return $array;
-}
-
-
-/* function:
- *	zbx_rksort
- *
- * description:
- *	Recursively sort an array by key
- *
- * author: Eugene Grigorjev
- */
-function zbx_rksort(&$array, $flags=NULL){
-	if(is_array($array)){
-		foreach($array as $id => $data)
-			zbx_rksort($array[$id]);
-
-		ksort($array,$flags);
-	}
-	return $array;
-}
-
-// This function will preserve keys!!!
-// author: Aly
-function zbx_array_merge(){
-	$args = func_get_args();
-
-	$result = array();
-	foreach($args as &$array){
-		if(!is_array($array)) return false;
-
-		foreach($array as $key => $value){
-			$result[$key] = $value;
-		}
-	}
-
-return $result;
-}
-/************* END SORT *************/
-
-
 /*************** CONVERTING ******************/
 function rgb2hex($color){
 	$HEX = array(
@@ -479,7 +417,7 @@ function rgb2hex($color){
 	);
 
 	foreach($HEX as $id => $value){
-		if(strlen($value) != 2) $HEX[$id] = '0'.$value;
+		if(zbx_strlen($value) != 2) $HEX[$id] = '0'.$value;
 	}
 
 return $HEX[0].$HEX[1].$HEX[2];
@@ -489,11 +427,11 @@ function hex2rgb($color){
 	if($color[0] == '#')
 		$color = substr($color, 1);
 
-	if(strlen($color) == 6)
+	if(zbx_strlen($color) == 6)
 		list($r, $g, $b) = array($color[0].$color[1],
 								 $color[2].$color[3],
 								 $color[4].$color[5]);
-	else if(strlen($color) == 3)
+	else if(zbx_strlen($color) == 3)
 		list($r, $g, $b) = array($color[0].$color[0], $color[1].$color[1], $color[2].$color[2]);
 	else
 		return false;
@@ -532,7 +470,8 @@ function empty2null($var){
 
 function str2mem($val){
 	$val = trim($val);
-	$last = strtolower($val{strlen($val)-1});
+	$last = zbx_strtolower(zbx_substr($val, -1, 1));
+
 	switch($last){
 		// The 'G' modifier is available since PHP 5.1.0
 		case 'g':
@@ -547,14 +486,14 @@ function str2mem($val){
 }
 
 function mem2str($size){
-	$prefix = 'B';
-	if($size > 1048576) {	$size = $size/1048576;	$prefix = 'M'; }
-	elseif($size > 1024) {	$size = $size/1024;	$prefix = 'K'; }
+	$prefix = S_B;
+	if($size > 1048576) {	$size = $size/1048576;	$prefix = S_M; }
+	elseif($size > 1024) {	$size = $size/1024;	$prefix = S_K; }
 	return round($size, 6).$prefix;
 }
 
-/* Do not forget to sync it with add_value_suffix in evalfunc.c! */
-function convert_units($value,$units){
+// convert:
+function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 // Special processing for unix timestamps
 	if($units=='unixtime'){
 		$ret=date('Y.m.d H:i:s',$value);
@@ -579,7 +518,7 @@ function convert_units($value,$units){
 			$ret = sprintf("%02d:%02d:%02d", $hours, $min, $value);
 		}
 		else{
-			$ret = sprintf("%d days, %02d:%02d:%02d", $days, $hours, $min, $value);
+			$ret = sprintf("%d ".S_DAYS_SMALL.", %02d:%02d:%02d", $days, $hours, $min, $value);
 		}
 		return $ret;
 	}
@@ -590,76 +529,90 @@ function convert_units($value,$units){
 
 	$u='';
 
-// Special processing for bits (kilo=1000, not 1024 for bits)
-	if( ($units=='b') || ($units=='bps')){
-		$abs=abs($value);
+// Any other unit
+//-------------------
 
-		if($abs<1000){
-			$u="";
+	switch($units){
+		case 'Bps':
+		case 'B':
+			$step=1024;
+			$convert = $convert?$convert:ITEM_CONVERT_NO_UNITS;
+			break;
+		case 'b':
+		case 'bps':
+			$convert = $convert?$convert:ITEM_CONVERT_NO_UNITS;
+		default:
+			$step = 1000;
+	}
+
+	if(zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS)){
+		if(abs($value) >= 1)
+			$format = '%.2f';
+		else if(abs($value) >= 0.01)
+			$format = '%.4f';
+		else
+			$format = '%.6f';
+
+		if(round($value, 6) == 0) $value = 0;
+		else $value = rtrim(sprintf($format,$value), '.0');
+
+		return sprintf('%s %s', $value, $units);
+	}
+
+// INIT intervals
+	static $digitUnits;
+	if(is_null($digitUnits)) $digitUnits = array();
+
+	if(!isset($digitUnits[$step])){
+		$digitUnits[$step] = array(
+//				array('pow'=>-3, 'short'=>S_N_SMALL, 'long'=>S_NANO),
+				array('pow'=>-2, 'short'=>S_U_MICRO, 'long'=>S_MICRO),
+				array('pow'=>-1, 'short'=>S_M_SMALL, 'long'=>S_MILLI),
+				array('pow'=>0, 'short'=>'', 'long'=>''),
+				array('pow'=>1, 'short'=>S_K, 'long'=>S_KILO),
+				array('pow'=>2, 'short'=>S_M, 'long'=>S_MEGA),
+				array('pow'=>3, 'short'=>S_G, 'long'=>S_GIGA),
+				array('pow'=>4, 'short'=>S_T, 'long'=>S_TERA),
+				array('pow'=>5, 'short'=>S_P, 'long'=>S_PETA),
+				array('pow'=>6, 'short'=>S_E, 'long'=>S_EXA),
+				array('pow'=>7, 'short'=>S_Z, 'long'=>S_ZETTA),
+				array('pow'=>8, 'short'=>S_Y, 'long'=>S_YOTTA)
+			);
+
+		foreach($digitUnits[$step] as $dunit => $data){
+			$digitUnits[$step][$dunit]['value'] = bcpow($step, $data['pow'], 9);
 		}
-		else if($abs<1000*1000){
-			$u='K';
-			$value=$value/1000;
-		}
-		else if($abs<1000*1000*1000){
-			$u='M';
-			$value=$value/(1000*1000);
-		}
-		else{
-			$u='G';
-			$value=$value/(1000*1000*1000);
-		}
+	}
+//---
 
-		if(round($value) == round($value,2)){
-			$s=sprintf('%.0f',$value);
-		}
-		else{
-			$s=sprintf('%.2f',$value);
+	if($value < 0) $abs = bcmul($value, '-1');
+	else $abs = $value;
+
+	$valUnit = array('pow'=>0, 'short'=>'', 'long'=>'', 'value'=>$value);
+	if($abs > 0){
+		foreach($digitUnits[$step] as $dnum => $data){
+			if(bccomp($abs, $data['value']) > -1) $valUnit = $data;
+			else break;
 		}
 
-	return "$s $u$units";
-	}
-
-
-	if($units==''){
-		if(round($value) == round($value,2)){
-			return sprintf('%.0f',$value);
+		if(round($valUnit['value'], 6) > 0){
+			$valUnit['value'] = bcdiv(sprintf('%.6f',$value), sprintf('%.6f', $valUnit['value']), 6);
 		}
-		else{
-			return sprintf('%.2f',$value);
-		}
+		else
+			$valUnit['value'] = 0;
 	}
 
-	$abs=abs($value);
+//------
+	if(round($valUnit['value'],2) == round($valUnit['value'],0)) $format = '%.0f %s%s';
+	else $format = '%.2f %s%s';
 
-	if($abs<1024){
-		$u='';
-	}
-	else if($abs<1024*1024){
-		$u='K';
-		$value=$value/1024;
-	}
-	else if($abs<1024*1024*1024){
-		$u='M';
-		$value=$value/(1024*1024);
-	}
-	else if($abs<1024*1024*1024*1024){
-		$u='G';
-		$value=$value/(1024*1024*1024);
-	}
-	else{
-		$u='T';
-		$value=$value/(1024*1024*1024*1024);
+	switch($convert){
+		case 0: $units = trim($units); 
+		case 1: $desc = $valUnit['short']; break;
+		case 2: $desc = $valUnit['long']; break;
 	}
 
-	if(round($value) == round($value,2)){
-		$s=sprintf('%.0f',$value);
-	}
-	else{
-		$s=sprintf('%.2f',$value);
-	}
-
-return "$s $u$units";
+return sprintf($format, $valUnit['value'], $desc, $units);
 }
 
 /*************** END CONVERTING ******************/
@@ -671,10 +624,10 @@ function zbx_avg($values){
 
 	$sum = 0;
 	foreach($values as $num => $value){
-		$sum += $value;
+		$sum = bcadd($sum, $value);
 	}
 
-return ($sum / count($values));
+return bcdiv($sum, count($values));
 }
 
 // accepts parametr as integer either
@@ -698,70 +651,246 @@ function zbx_empty($value){
 return false;
 }
 
-function zbx_strlen(&$str){
-	if(!$strlen = strlen($str)) return $strlen;
+
+// STRING FUNCTIONS {{{
+
+function zbx_nl2br(&$str){
+	$str_res = array();
+	$str_arr = explode("\n",$str);
+	foreach($str_arr as $id => $str_line){
+		array_push($str_res,$str_line,BR());
+	}
+return $str_res;
+}
+
+function zbx_strlen($str){
+	if(defined('ZBX_MBSTRINGS_ENABLED')){
+		return mb_strlen($str);
+	}
+	else{
+		return strlen($str);
+	}
+	
+/*
+	$zbx_strlen = strlen($zbx_strlen);
 
 	$reallen = 0;
 	$fbin= 1 << 7;
 	$sbin= 1 << 6;
 
 // check first byte for 11xxxxxx or 0xxxxxxx
-	for($i=0; $i < $strlen; $i++){
+	for($i=0; $i < $zbx_strlen; $i++){
 		if(((ord($str[$i]) & $fbin) && (ord($str[$i]) & $sbin)) || !(ord($str[$i]) & $fbin)) $reallen++;
 	}
 
 return $reallen;
+//*/
 }
 
-function zbx_strstr($haystack,$needle){
-	$pos = strpos($haystack,$needle);
-	if($pos !== FALSE){
-		$pos = substr($haystack,$pos);
+function zbx_strstr($haystack, $needle){
+	if(defined('ZBX_MBSTRINGS_ENABLED')){
+		$pos = mb_strpos($haystack, $needle);
+		if($pos !== false){
+			return mb_substr($haystack, $pos);
+		}
+		else return false;
 	}
-
-return $pos;
+	else{
+		return strstr($haystack, $needle);
+	}
 }
 
-function zbx_stristr($haystack,$needle){
-	$haystack_B = strtoupper($haystack);
-	$needle = strtoupper($needle);
+function zbx_stristr($haystack, $needle){
+	if(defined('ZBX_MBSTRINGS_ENABLED')){
+		$haystack_B = mb_strtoupper($haystack);
+		$needle = mb_strtoupper($needle);
 
-	$pos = strpos($haystack_B,$needle);
-	if($pos !== FALSE){
-		$pos = substr($haystack,$pos);
+		$pos = mb_strpos($haystack_B, $needle);
+		if($pos !== false){
+			$pos = mb_substr($haystack, $pos);
+		}
+		return $pos;
 	}
-
-return $pos;
+	else{
+		return stristr($haystack, $needle);
+	}
 }
 
 function zbx_substring($haystack, $start, $end=null){
 	if(!is_null($end) && ($end < $start)) return '';
-
-	if(is_null($end))
-		$result = substr($haystack, $start);
-	else
-		$result = substr($haystack, $start, ($end - $start));
-
-return $result;
-}
-
-function zbx_str_revert(&$str){
-	$result = '';
-
-	$str_rep = 	str_split($str);
-	foreach($str_rep as $num => $symb){
-		$result = $symb.$result;
+	
+	if(defined('ZBX_MBSTRINGS_ENABLED')){
+		if(is_null($end))
+			$result = mb_substr($haystack, $start);
+		else
+			$result = mb_substr($haystack, $start, ($end - $start));
 	}
-return $result;
+	else{
+		if(is_null($end))
+			$result = substr($haystack, $start);
+		else
+			$result = substr($haystack, $start, ($end - $start));
+	}
+	
+	return $result;
 }
 
+function zbx_substr($string, $start, $length=null){
+	
+	if(defined('ZBX_MBSTRINGS_ENABLED')){
+		if(is_null($length))
+			$result = mb_substr($string, $start);
+		else
+			$result = mb_substr($string, $start, $length);
+	}
+	else{
+		if(is_null($length))
+			$result = substr($string, $start);
+		else
+			$result = substr($string, $start, $length);
+	}
+	
+	return $result;
+}
+
+function zbx_str_revert($str){
+	if(defined('ZBX_MBSTRINGS_ENABLED')){
+		$result = '';
+		
+		$stop = mb_strlen($str);
+		for($idx=0; $idx<$stop; $idx++){ 
+			$result = mb_substr($str, $idx, 1) . $result; 
+		} 
+	}
+	else{
+		$result = strrev($str);
+	}
+	
+	return $result;
+}
+
+function zbx_strtoupper($str){
+	if(defined('ZBX_MBSTRINGS_ENABLED')){
+		return mb_strtoupper($str);
+	}
+	else{
+		return strtoupper($str);
+	}
+}
+
+function zbx_strtolower($str){
+	if(defined('ZBX_MBSTRINGS_ENABLED')){
+		return mb_strtolower($str);
+	}
+	else{
+		return strtolower($str);
+	}
+}
+
+function zbx_strpos($haystack, $needle){
+	if(defined('ZBX_MBSTRINGS_ENABLED')){
+		return mb_strpos($haystack, $needle);
+	}
+	else{
+		return strpos($haystack, $needle);
+	}
+}
+
+function zbx_strrpos($haystack, $needle){
+	if(defined('ZBX_MBSTRINGS_ENABLED')){
+		return mb_strrpos($haystack, $needle);
+	}
+	else{
+		return strrpos($haystack, $needle);
+	}
+}
+
+// }}} STRING FUNCTIONS
+
+
+// {{{ ARRAY UNCTIONS
+/************* SORT *************/
+function natksort(&$array) {
+	$keys = array_keys($array);
+	natcasesort($keys);
+
+	$new_array = array();
+
+	foreach ($keys as $k) {
+		$new_array[$k] = $array[$k];
+	}
+
+	$array = $new_array;
+	return true;
+}
+
+function asort_by_key(&$array, $key){
+	if(!is_array($array)) {
+		error(S_INCORRECT_TYPE_OF_ASORT_BY_KEY);
+		return array();
+	}
+
+	$key = htmlspecialchars($key);
+	uasort($array, create_function('$a,$b', 'return $a[\''.$key.'\'] - $b[\''.$key.'\'];'));
+return $array;
+}
+
+
+/* function:
+ *	zbx_rksort
+ *
+ * description:
+ *	Recursively sort an array by key
+ *
+ * author: Eugene Grigorjev
+ */
+function zbx_rksort(&$array, $flags=NULL){
+	if(is_array($array)){
+		foreach($array as $id => $data)
+			zbx_rksort($array[$id]);
+
+		ksort($array,$flags);
+	}
+	return $array;
+}
+/************* END SORT *************/
+
+function zbx_implodeHash($glue1, $glue2, $hash){
+	if(is_null($glue2)) $glue2 = $glue1;
+	$str = '';
+
+	foreach($hash as $key => $value){
+		if(!empty($str)) $str.= $glue1;
+		$str.= $key.$glue2.$value;
+	}
+
+return $str;
+}
+
+// This function will preserve keys!!!
+// author: Aly
+function zbx_array_merge(){
+	$args = func_get_args();
+
+	$result = array();
+	foreach($args as &$array){
+		if(!is_array($array)) return false;
+
+		foreach($array as $key => $value){
+			$result[$key] = $value;
+		}
+	}
+
+return $result;
+}
 
 function uint_in_array($needle,$haystack){
 //TODO: REMOVE
-	if(!empty($haystack) && !isset($haystack[0])){
+	if(!empty($haystack) && !is_numeric(key($haystack))){
 //		info('uint_in_array: possible pasted associated array');
 	}
 //----
+
 	foreach($haystack as $id => $value)
 		if(bccomp($needle,$value) == 0) return true;
 
@@ -790,15 +919,6 @@ function str_in_array($needle,$haystack,$strict=false){
 return false;
 }
 
-function zbx_nl2br(&$str){
-	$str_res = array();
-	$str_arr = explode("\n",$str);
-	foreach($str_arr as $id => $str_line){
-		array_push($str_res,$str_line,BR());
-	}
-return $str_res;
-}
-
 function zbx_value2array(&$values){
 	if(!is_array($values) && !is_null($values)){
 		$tmp = array();
@@ -815,7 +935,7 @@ function zbx_value2array(&$values){
 // fuunction: zbx_toHash
 // object or array of objects to hash
 // author: Aly
-function zbx_toHash(&$value, $field){
+function zbx_toHash(&$value, $field=null){
 	if(is_null($value)) return $value;
 	$result = array();
 
@@ -863,7 +983,7 @@ return $result;
 
 // function: zbx_toArray
 // author: Aly
-function zbx_toArray(&$value){
+function zbx_toArray($value){
 	if(is_null($value)) return $value;
 	$result = array();
 
@@ -908,27 +1028,30 @@ return $result;
 }
 
 function zbx_cleanHashes(&$value){
-
 	if(is_array($value) && ctype_digit((string) key($value))){
 		$value = array_values($value);
 	}
-	return $value;
-/*
-	$level++;
-//	if($level > 3) return $value;
-	if(is_array($value)){
-		if(ctype_digit((string) key($value))){
-			$value = array_values($value);
-		}
-
-		foreach($value as $key => $val){
-			if(!is_array($val)) continue;
-				$value[$key] = zbx_cleanHashes($val, $level);
-		}
-	}
 
 return $value;
-*/
+}
+// }}} ARRAY FUNCTION
+function zbx_array_mintersect($keys, $array){
+	$result = array();
+
+	foreach($keys as $field){
+		if(is_array($field)){
+			foreach($field as $sub_field){
+				if(isset($array[$sub_field])){
+					$result[$sub_field] = $array[$sub_field];
+					break;
+				}
+			}				
+		}
+		else if(isset($array[$field])){
+			$result[$field] = $array[$field];
+		}
+	}
+	return $result;
 }
 
 /************* END ZBX MISC *************/

@@ -64,6 +64,7 @@ class CMaintenance extends CZBXAPI{
 			'select' => array('maintenance' => 'm.maintenanceid'),
 			'from' => array('maintenances m'),
 			'where' => array(),
+			'group' => array(),
 			'order' => array(),
 			'limit' => null);
 
@@ -78,10 +79,12 @@ class CMaintenance extends CZBXAPI{
 			'pattern'				=> '',
 
 // OutPut
+			'output'				=> API_OUTPUT_REFER,
 			'extendoutput'			=> null,
 			'select_groups'			=> null,
 			'select_hosts'			=> null,
-			'count'					=> null,
+			'countOutput'			=> null,
+			'groupCount'			=> null,
 			'preservekeys'			=> null,
 
 			'sortfield'				=> '',
@@ -91,10 +94,17 @@ class CMaintenance extends CZBXAPI{
 
 		$options = zbx_array_merge($def_options, $options);
 
-// editable + PERMISSION CHECK
-		if(defined('ZBX_API_REQUEST')){
-			$options['nopermissions'] = false;
+		if(!is_null($options['extendoutput'])){
+			$options['output'] = API_OUTPUT_EXTEND;
+
+			if(!is_null($options['select_groups'])){
+				$options['select_groups'] = API_OUTPUT_EXTEND;
+			}
+			if(!is_null($options['select_hosts'])){
+				$options['select_hosts'] = API_OUTPUT_EXTEND;
+			}
 		}
+// editable + PERMISSION CHECK
 
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 			$maintenanceids = array();
@@ -196,7 +206,7 @@ class CMaintenance extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
 
 // groupids
 		if(!is_null($options['groupids'])){
@@ -212,28 +222,30 @@ class CMaintenance extends CZBXAPI{
 		if(!is_null($options['maintenanceids'])){
 			zbx_value2array($options['maintenanceids']);
 
-			if(!is_null($options['extendoutput'])){
-				$sql_parts['select']['maintenanceid'] = 'm.maintenanceid';
-			}
-
 			$sql_parts['where'][] = DBcondition('m.maintenanceid', $options['maintenanceids']);
 		}
 
-// extendoutput
-		if(!is_null($options['extendoutput'])){
+// output
+		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['maintenance'] = 'm.*';
 		}
 
-// count
-		if(!is_null($options['count'])){
+// countOutput
+		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
+			$sql_parts['select'] = array('count(DISTINCT m.maintenanceid) as rowscount');
 
-			$sql_parts['select'] = array('count(m.maintenanceid) as rowscount');
+//groupCount
+			if(!is_null($options['groupCount'])){
+				foreach($sql_parts['group'] as $key => $fields){
+					$sql_parts['select'][$key] = $fields;
+				}
+			}
 		}
 
 // pattern
 		if(!zbx_empty($options['pattern'])){
-			$sql_parts['where'][] = ' UPPER(m.name) LIKE '.zbx_dbstr('%'.strtoupper($options['pattern']).'%');
+			$sql_parts['where'][] = ' UPPER(m.name) LIKE '.zbx_dbstr('%'.zbx_strtoupper($options['pattern']).'%');
 		}
 
 // order
@@ -260,31 +272,38 @@ class CMaintenance extends CZBXAPI{
 		$sql_parts['select'] = array_unique($sql_parts['select']);
 		$sql_parts['from'] = array_unique($sql_parts['from']);
 		$sql_parts['where'] = array_unique($sql_parts['where']);
+		$sql_parts['group'] = array_unique($sql_parts['group']);
 		$sql_parts['order'] = array_unique($sql_parts['order']);
 
 		$sql_select = '';
 		$sql_from = '';
 		$sql_where = '';
+		$sql_group = '';
 		$sql_order = '';
 		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
 		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
 		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
+		if(!empty($sql_parts['group']))		$sql_where.= ' GROUP BY '.implode(',',$sql_parts['group']);
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.
+		$sql = 'SELECT DISTINCT '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('m.maintenanceid', $nodeids).
 					$sql_where.
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
 		while($maintenance = DBfetch($res)){
-			if($options['count'])
-				$result = $maintenance;
+			if(!is_null($options['countOutput'])){
+				if(!is_null($options['groupCount']))
+					$result[] = $maintenance;
+				else
+					$result = $maintenance['rowscount'];
+			}
 			else{
 				$maintenanceids[$maintenance['maintenanceid']] = $maintenance['maintenanceid'];
 
-				if(is_null($options['extendoutput'])){
+				if($options['output'] == API_OUTPUT_SHORTEN){
 					$result[$maintenance['maintenanceid']] = array('maintenanceid' => $maintenance['maintenanceid']);
 				}
 				else{
@@ -314,7 +333,9 @@ class CMaintenance extends CZBXAPI{
 			}
 		}
 
-		if(is_null($options['extendoutput']) || !is_null($options['count'])){
+
+Copt::memoryPick();
+		if(!is_null($options['countOutput'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}
@@ -382,7 +403,7 @@ class CMaintenance extends CZBXAPI{
  * @param array $maintenance['hostid']
  * @return boolean
  */
-	public static function add($maintenances){
+	public static function create($maintenances){
 		$maintenances = zbx_toArray($maintenances);
 		$maintenanceids = array();
 		$result = false;
@@ -398,8 +419,7 @@ class CMaintenance extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$new_maintenances = self::get(array('maintenanceids'=>$maintenanceids, 'extendoutput'=>1));
-			return $new_maintenances;
+			return array('maintenanceids'=>$maintenanceids);
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
@@ -427,10 +447,13 @@ class CMaintenance extends CZBXAPI{
 		$result = false;
 //------
 
-		$upd_maintenances = self::get(array('maintenanceids'=>zbx_objectValues($maintenances, 'maintenanceid'),
-											'editable'=>1,
-											'extendoutput'=>1,
-											'preservekeys'=>1));
+		$options = array(
+			'maintenanceids'=>zbx_objectValues($maintenances, 'maintenanceid'),
+			'editable'=>1,
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$upd_maintenances = self::get($options);
 		foreach($maintenances as $snum => $maintenance){
 			if(!isset($upd_maintenances[$maintenance['maintenanceid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -450,8 +473,7 @@ class CMaintenance extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_maintenances = self::get(array('maintenanceids'=>$maintenanceids, 'extendoutput'=>1));
-			return $upd_maintenances;
+			return array('maintenanceids'=>$maintenanceids);
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
@@ -478,10 +500,13 @@ class CMaintenance extends CZBXAPI{
 		$result = false;
 //------
 
-		$del_maintenances = self::get(array('maintenanceids'=>zbx_objectValues($maintenances, 'maintenanceid'),
-											'editable'=>1,
-											'extendoutput'=>1,
-											'preservekeys'=>1));
+		$options = array(
+			'maintenanceids'=>zbx_objectValues($maintenances, 'maintenanceid'),
+			'editable'=>1,
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$del_maintenances = self::get($options);
 		foreach($maintenances as $snum => $maintenance){
 			if(!isset($del_maintenances[$maintenance['maintenanceid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -501,7 +526,7 @@ class CMaintenance extends CZBXAPI{
 		}
 
 		if($result){
-			return zbx_cleanHashes($del_maintenances);
+			return array('maintenanceids'=>$maintenanceids);
 		}
 		else{
 			self::setError(__METHOD__);

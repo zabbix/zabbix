@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2007 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ include_once('include/page_header.php');
 		'fullscreen'=>		array(T_ZBX_INT, O_OPT,	P_SYS,			IN('0,1'),	NULL),
 // ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	IN('"hat"'),		NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
 	);
 
@@ -50,11 +50,12 @@ include_once('include/page_header.php');
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
-			update_profile('web.srv_status.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'],PROFILE_TYPE_INT);
+			CProfile::update('web.srv_status.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['state'],PROFILE_TYPE_INT);
 		}
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 //--------
@@ -157,21 +158,21 @@ include_once('include/page_header.php');
 			$row['caption'] = array(get_node_name_by_elid($row['serviceid'], null, ': '), $row['caption']);
 
 			if(empty($row['serviceupid'])) $row['serviceupid']='0';
-			if(empty($row['description'])) $row['description']='None';
+			if(empty($row['description'])) $row['description']=S_NONE;
 			$row['graph'] = new CLink(S_SHOW,'srv_status.php?serviceid='.$row['serviceid'].'&showgraph=1'.url_param('path'));
 
-			if(isset($row["triggerid"]) && !empty($row["triggerid"])){
+			if(isset($row['triggerid']) && !empty($row['triggerid'])){
 
 				$url = new CLink(expand_trigger_description($row['triggerid']),'events.php?source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$row['triggerid']);
 				$row['caption'] = array($row['caption'],' [',$url,']');
 
 			}
 
-			if($row["status"]==0 || (isset($service) && (bccomp($service["serviceid"] , $row["serviceid"]) == 0))){
-				$row['reason']='-';
+			if($row['status']==0 || (isset($service) && (bccomp($service['serviceid'] , $row['serviceid']) == 0))){
+				$row['reason'] = '-';
 			}
 			else {
-				$row['reason']='-';
+				$row['reason'] = '-';
 				$result2=DBselect('SELECT s.triggerid,s.serviceid '.
 								' FROM services s, triggers t '.
 								' WHERE s.status>0 '.
@@ -195,6 +196,7 @@ include_once('include/page_header.php');
 			if($row['showsla'] == 1){
 
 				$stat = calculate_service_availability($row['serviceid'], $period_start, $period_end);
+
 				$p = min($stat['problem'], 20);
 				$sla_style = ($row['goodsla'] > $stat['ok'])?'on':'off';
 
@@ -296,7 +298,7 @@ include_once('include/page_header.php');
 			$srv_wdgt->show();
 		}
 		else {
-			error('Can not format Tree. Check logik structure in service links');
+			error(S_CANNOT_FORMAT_TREE_CHECK_LOGIC);
 		}
 	}
 

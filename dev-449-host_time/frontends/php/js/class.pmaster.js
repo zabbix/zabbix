@@ -179,7 +179,7 @@ debug_prev:		'',			// don't log repeated fnc
 initialize: function(obj4update){
 	this._domid = obj4update.domid;	
 	this.debug('initialize');
-	
+
 	this._domobj = $(this._domid);
 	this.url(obj4update.url);
 	this.frequency(obj4update.frequency);
@@ -192,7 +192,7 @@ initialize: function(obj4update){
 
 startDoll: function(){
 	this.debug('startDoll');
-	
+
 	if(is_null(this.pexec)){
 		this.lastupdate(0);
 		this.pexec = new PeriodicalExecuter(this.check4Update.bind(this), this._frequency);
@@ -207,7 +207,7 @@ restartDoll: function(){
 		try{ delete(this.pexec); } catch(e){ this.pexec = null; }
 		this.pexec = null;
 	}
-	
+
 	this.pexec = new PeriodicalExecuter(this.check4Update.bind(this), this._frequency);
 },
 
@@ -276,9 +276,8 @@ params: function(params_){
 check4Update: function(){
 	this.debug('check4Update');
 	
-	var dt = new Date();
-	var now = parseInt(dt.getTime()/1000);
-	
+	var now = parseInt(new Date().getTime()/1000);
+
 //SDI((this._lastupdate + this._frequency)+' < '+(now + this.min_freq));
 	if(this._ready && ((this._lastupdate + this._frequency) < (now + this.min_freq))){ //
 		this.update();
@@ -320,7 +319,6 @@ onSuccess: function(resp){
 		return false;
 	}
 	else{
-//alert(resp.responseText);
 		this._domobj.update(resp.responseText);
 	}
 //SDI(resp.responseText);

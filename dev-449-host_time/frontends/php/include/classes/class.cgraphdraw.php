@@ -24,7 +24,8 @@ require_once('include/hosts.inc.php');
 
 class CGraphDraw{
 	public function __construct($type = GRAPH_TYPE_NORMAL){
-
+		bcscale(6);
+		
 		$this->stime = null;
 		$this->fullSizeX = null;
 		$this->fullSizeY = null;
@@ -63,6 +64,8 @@ class CGraphDraw{
 		$this->num=0;
 		$this->type = $type;			// graph type
 
+		$this->drawLegend = 1;
+
 		$this->axis_valuetype = array();		// overal items type (int/float)
 
 		$this->graphtheme = array(
@@ -85,40 +88,6 @@ class CGraphDraw{
 
 		$this->applyGraphTheme();
 	}
-
-
-	public function applyGraphTheme($description=null){
-		global $USER_DETAILS;
-
-		if(!is_null($description)){
-			$sql_where = ' AND gt.description='.zbx_dbstr($description);
-		}
-		else{
-			$config=select_config();
-			if(isset($config['default_theme']) && file_exists('styles/'.$config['default_theme'])){
-				$css = $config['default_theme'];
-			}
-
-			if(isset($USER_DETAILS['theme']) && ($USER_DETAILS['theme']!=ZBX_DEFAULT_CSS) && ($USER_DETAILS['alias']!=ZBX_GUEST_USER)){
-				if(file_exists('styles/'.$USER_DETAILS['theme'])){
-					$css = $USER_DETAILS['theme'];
-				}
-			}
-
-			$sql_where = ' AND gt.theme='.zbx_dbstr($css);
-		}
-
-		$sql = 'SELECT gt.* '.
-				' FROM graph_theme gt '.
-				' WHERE '.DBin_node('gt.graphthemeid').
-				$sql_where;
-//SDI($sql);
-		$res = DBselect($sql);
-		if($theme = DBfetch($res)){
-			$this->graphtheme = $theme;
-		}
-	}
-
 
 	public function initColors(){
 
@@ -168,6 +137,43 @@ class CGraphDraw{
 				$this->colors[$name]	= imagecolorallocate($this->im,$RGBA[0],$RGBA[1],$RGBA[2]);
 			}
 		}
+	}
+
+	public function applyGraphTheme($description=null){
+		global $USER_DETAILS;
+
+		if(!is_null($description)){
+			$sql_where = ' AND gt.description='.zbx_dbstr($description);
+		}
+		else{
+			$config=select_config();
+			if(isset($config['default_theme']) && file_exists('styles/'.$config['default_theme'])){
+				$css = $config['default_theme'];
+			}
+
+			if(isset($USER_DETAILS['theme']) && ($USER_DETAILS['theme']!=ZBX_DEFAULT_CSS) && ($USER_DETAILS['alias']!=ZBX_GUEST_USER)){
+				if(file_exists('styles/'.$USER_DETAILS['theme'])){
+					$css = $USER_DETAILS['theme'];
+				}
+			}
+
+			$sql_where = ' AND gt.theme='.zbx_dbstr($css);
+		}
+
+		$sql = 'SELECT gt.* '.
+				' FROM graph_theme gt '.
+				' WHERE '.DBin_node('gt.graphthemeid').
+				$sql_where;
+//SDI($sql);
+		$res = DBselect($sql);
+		if($theme = DBfetch($res)){
+			$this->graphtheme = $theme;
+		}
+	}
+
+	public function showLegend($type=true){
+		$this->drawLegend = $type;
+	return $this->drawLegend;
 	}
 
 	public function setPeriod($period){
@@ -258,11 +264,12 @@ class CGraphDraw{
 		}
 
 		$str.=$this->period2str($this->period);
-
+		
 		$fontnum = 11;
 		if(($this->sizeX < 500) && ($this->type == GRAPH_TYPE_NORMAL || $this->type == GRAPH_TYPE_BAR)) $fontnum = 8;
-
-		$x=$this->fullSizeX/2-imagefontwidth($fontnum)*strlen($str)/2;
+		$dims = imageTextSize( $fontnum, 0, $str );
+		$x = $this->fullSizeX/2-($dims['width']/2);
+		
 		imagetext($this->im, $fontnum, 0, $x, 24, $this->getColor($this->graphtheme['textcolor'], 0), $str);
 	}
 

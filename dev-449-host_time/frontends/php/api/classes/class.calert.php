@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -111,7 +111,7 @@ class CAlert extends CZBXAPI{
 
 		if(!is_null($options['extendoutput'])){
 			$options['output'] = API_OUTPUT_EXTEND;
-			
+
 			if(!is_null($options['select_mediatypes'])){
 				$options['select_mediatypes'] = API_OUTPUT_EXTEND;
 			}
@@ -119,12 +119,9 @@ class CAlert extends CZBXAPI{
 				$options['select_users'] = API_OUTPUT_EXTEND;
 			}
 		}
-		
-		
+
+
 // editable + PERMISSION CHECK
-		if(defined('ZBX_API_REQUEST')){
-			$options['nopermissions'] = false;
-		}
 
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
@@ -163,7 +160,7 @@ class CAlert extends CZBXAPI{
 		}
 
 // nodeids
-		$nodeids = $options['nodeids'] ? $options['nodeids'] : get_current_nodeid(false);
+		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
 
 // groupids
 		if(!is_null($options['groupids'])){
@@ -342,20 +339,23 @@ class CAlert extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT '.$sql_select.
+		$sql = 'SELECT DISTINCT '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('a.alertid', $nodeids).
 					$sql_where.
 				$sql_order;
-//SDI($sql);
 		$db_res = DBselect($sql, $sql_limit);
 		while($alert = DBfetch($db_res)){
 			if($options['count'])
 				$result = $alert;
 			else{
 				$alertids[$alert['alertid']] = $alert['alertid'];
-				$userids[$alert['userid']] = $alert['userid'];
-				$mediatypeids[$alert['mediatypeid']] = $alert['mediatypeid'];
+
+				if(isset($alert['userid']))
+					$userids[$alert['userid']] = $alert['userid'];
+
+				if(isset($alert['mediatypeid']))
+					$mediatypeids[$alert['mediatypeid']] = $alert['mediatypeid'];
 
 				if($options['output'] == API_OUTPUT_SHORTEN){
 					$result[$alert['alertid']] = array('alertid' => $alert['alertid']);
@@ -373,7 +373,7 @@ class CAlert extends CZBXAPI{
 
 // hostids
 					if(isset($alert['hostid']) && is_null($options['select_hosts'])){
-						if(!isset($result[$alert['alertid']]['hosts'])) 
+						if(!isset($result[$alert['alertid']]['hosts']))
 							$result[$alert['alertid']]['hosts'] = array();
 
 						$result[$alert['alertid']]['hosts'][] = array('hostid' => $alert['hostid']);
@@ -399,6 +399,7 @@ class CAlert extends CZBXAPI{
 			}
 		}
 
+COpt::memoryPick();
 		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
@@ -412,8 +413,8 @@ class CAlert extends CZBXAPI{
 // Adding hosts
 		if(!is_null($options['select_hosts']) && str_in_array($options['select_hosts'], $subselects_allowed_outputs)){
 			$obj_params = array(
-				'output' => $options['select_hosts'], 
-				'hostids' => $hostids, 
+				'output' => $options['select_hosts'],
+				'hostids' => $hostids,
 				'preservekeys' => 1
 			);
 			$hosts = CHost::get($obj_params);
@@ -422,8 +423,8 @@ class CAlert extends CZBXAPI{
 // Adding Users
 		if(!is_null($options['select_users']) && str_in_array($options['select_users'], $subselects_allowed_outputs)){
 			$obj_params = array(
-				'output' => $options['select_users'], 
-				'userids' => $userids, 
+				'output' => $options['select_users'],
+				'userids' => $userids,
 				'preservekeys' => 1
 			);
 			$users = CUser::get($obj_params);
@@ -452,6 +453,7 @@ class CAlert extends CZBXAPI{
 			}
 		}
 
+COpt::memoryPick();
 // removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
 			$result = zbx_cleanHashes($result);
@@ -479,7 +481,7 @@ class CAlert extends CZBXAPI{
  * @param array $alerts[0,...]['url'] OPTIONAL
  * @return boolean
  */
-	public static function add($alerts){
+	public static function create($alerts){
 		$alerts = zbx_toArray($alerts);
 		$alertids = array();
 		$result = false;
@@ -525,8 +527,7 @@ class CAlert extends CZBXAPI{
 		$result = self::EndTransaction($result, __METHOD__);
 
 		if($result){
-			$upd_alerts = self::get(array('alertids'=>$alertids, 'extendoutput'=>1));
-			return $upd_alerts;
+			return array('alertids'=>$alertids);
 		}
 		else{
 			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
@@ -553,10 +554,13 @@ class CAlert extends CZBXAPI{
 		$result = false;
 //------
 
-		$del_alerts = self::get(array('alertids'=>zbx_objectValues($alerts, 'alertid'),
-											'editable'=>1,
-											'extendoutput'=>1,
-											'preservekeys'=>1));
+		$options = array(
+			'alertids'=>zbx_objectValues($alerts, 'alertid'),
+			'editable'=>1,
+			'extendoutput'=>1,
+			'preservekeys'=>1
+		);
+		$del_alerts = self::get($options);
 		foreach($alerts as $snum => $alert){
 			if(!isset($del_alerts[$alert['alertid']])){
 				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -577,7 +581,7 @@ class CAlert extends CZBXAPI{
 		}
 
 		if($result){
-			return zbx_cleanHashes($del_alerts);
+			return array('alertids'=>$alertids);
 		}
 		else{
 			self::setError(__METHOD__);

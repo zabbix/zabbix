@@ -23,6 +23,7 @@
 	function update_node_profile($nodeids){
 		global $USER_DETAILS;
 
+		DBstart();
 		$sql = 'DELETE FROM profiles WHERE userid='.$USER_DETAILS['userid'].' AND idx='.zbx_dbstr('web.nodes.selected');
 		DBexecute($sql);
 
@@ -32,6 +33,8 @@
 				' VALUES ('.$profileid.','.$USER_DETAILS['userid'].', '.zbx_dbstr('web.nodes.selected').','.$nodeid.', 4)';
 			DBexecute($sql);
 		}
+
+		DBend();
 	}
 
 	function get_node_profile($default=null){
@@ -98,11 +101,12 @@
 				$ZBX_CURMASTERID = $ZBX_LOCMASTERID;
 			}
 
-			// if(isset($_REQUEST['select_nodes']))
-				// update_profile('web.nodes.selected', $ZBX_VIEWED_NODES['nodeids'], PROFILE_TYPE_ARRAY_ID);
-			update_node_profile($ZBX_VIEWED_NODES['nodeids']);
+			if(isset($_REQUEST['select_nodes']))
+				// CProfile::update('web.nodes.selected', $ZBX_VIEWED_NODES['nodeids'], PROFILE_TYPE_ARRAY_ID);
+				update_node_profile($ZBX_VIEWED_NODES['nodeids']);
+			
 			if(isset($_REQUEST['switch_node']))
-				update_profile('web.nodes.switch_node', $ZBX_VIEWED_NODES['selected'], PROFILE_TYPE_ID);
+				CProfile::update('web.nodes.switch_node', $ZBX_VIEWED_NODES['selected'], PROFILE_TYPE_ID);
 		}
 		else {
 			$ZBX_CURRENT_NODEID = $ZBX_LOCALNODEID;
@@ -114,7 +118,7 @@
 
 // reset profiles if node is different than local
 		if($ZBX_CURRENT_NODEID != $ZBX_LOCALNODEID){
-			get_profile(null, null, null, null, true);
+			CProfile::init();
 		}
 	}
 
@@ -169,7 +173,7 @@
 		$available_nodes = get_tree_by_parentid($ZBX_LOCALNODEID, $available_nodes, 'masterid'); //remove parent nodes
 
 
-		// $selected_nodeids = get_request('selected_nodes', get_profile('web.nodes.selected', array($USER_DETAILS['node']['nodeid'])));
+		// $selected_nodeids = get_request('selected_nodes', CProfile::get('web.nodes.selected', array($USER_DETAILS['node']['nodeid'])));
 		$selected_nodeids = get_request('selected_nodes', get_node_profile(array($USER_DETAILS['node']['nodeid'])));
 
 // +++ Fill $result['NODEIDS'], $result['NODES'] +++
@@ -186,7 +190,7 @@
 		}
 // --- ---
 
-		$switch_node = get_request('switch_node', get_profile('web.nodes.switch_node', -1));
+		$switch_node = get_request('switch_node', CProfile::get('web.nodes.switch_node', -1));
 
 		if(!isset($available_nodes[$switch_node]) || !uint_in_array($switch_node, $selected_nodeids)) { //check switch_node
 			$switch_node = 0;
@@ -211,10 +215,20 @@
 
 		$nodeid = id2nodeid($id_val);
 //SDI($nodeid.' - '.$ZBX_NODES[$nodeid]['name']);
-		if ( !isset($ZBX_NODES[$nodeid]) )
-			return null;
+
+		if(!isset($ZBX_NODES[$nodeid]))	return null;
 
 		return $ZBX_NODES[$nodeid]['name'].$delimiter;
+	}
+
+	function getNodeIdByNodeName($nodeName){
+		global $ZBX_NODES, $ZBX_LOCALNODEID;
+
+		foreach($ZBX_NODES as $nodeid => $node){
+			if($node['name'] == $nodeName) return $nodeid;
+		}
+
+	return 0;
 	}
 
 	function is_show_all_nodes(){
@@ -224,10 +238,11 @@
 	}
 
 	function detect_node_type($node_data){
-		global $ZBX_CURMASTERID;
+		global $ZBX_CURMASTERID, $ZBX_LOCALNODEID;
 
-		if(bccomp($node_data['nodeid'],get_current_nodeid(false)) == 0)		$node_type = ZBX_NODE_LOCAL;
-		else if(bccomp($node_data['nodeid'] ,$ZBX_CURMASTERID)==0)		$node_type = ZBX_NODE_MASTER;
+		if(bccomp($node_data['nodeid'],$ZBX_LOCALNODEID) == 0)		$node_type = ZBX_NODE_LOCAL;
+		else if(bccomp($node_data['nodeid'],get_current_nodeid(false)) == 0)		$node_type = ZBX_NODE_LOCAL;
+		else if(bccomp($node_data['nodeid'] , $ZBX_CURMASTERID)==0)		$node_type = ZBX_NODE_MASTER;
 		else if(bccomp($node_data['masterid'], get_current_nodeid(false))==0)	$node_type = ZBX_NODE_CHILD;
 		else $node_type = -1;
 
@@ -251,7 +266,7 @@
 
 //		if(!eregi('^'.ZBX_EREG_NODE_FORMAT.'$', $name) ){
 		if(!preg_match('/^'.ZBX_PREG_NODE_FORMAT.'$/i', $name) ){
-			error('Incorrect characters used for Node name');
+			error(S_INCORRECT_CHARACTERS_USED_FOR_NODE_NAME);
 			return false;
 		}
 
@@ -262,19 +277,19 @@
 			case ZBX_NODE_MASTER:
 				$masterid = 0;
 				if($ZBX_LOCMASTERID){
-					error('Master node already exists');
+					error(S_MASTER_NODE_ALREADY_EXISTS);
 					return false;
 				}
 			break;
 			default:
-				error('Incorrect node type');
+				error(S_INCORRECT_NODE_TYPE);
 				return false;
 			break;
 		}
 
 
 		if(DBfetch(DBselect('SELECT nodeid FROM nodes WHERE nodeid='.$new_nodeid))){
-			error('Node with same ID already exists');
+			error(S_NODE_WITH_SAME_ID_ALREADY_EXISTS);
 			return false;
 		}
 
@@ -295,7 +310,7 @@
 	function update_node($nodeid,$new_nodeid,$name,$timezone,$ip,$port,$slave_history,$slave_trends){
 //		if( !eregi('^'.ZBX_EREG_NODE_FORMAT.'$', $name) ){
 		if(!preg_match('/^'.ZBX_PREG_NODE_FORMAT.'$/i', $name)){
-			error('Incorrect characters used for Node name');
+			error(S_INCORRECT_CHARACTERS_USED_FOR_NODE_NAME);
 			return false;
 		}
 
@@ -312,30 +327,29 @@
 
 		$node_type = detect_node_type($node_data);
 
-		if($node_type == ZBX_NODE_LOCAL)
-		{
-			error('Unable to remove local node');
+		if($node_type == ZBX_NODE_LOCAL){
+			error(S_UNABLE_TO_REMOVE_LOCAL_NODE);
 		}
-		else
-		{
-			$housekeeperid = get_dbid('housekeeper','housekeeperid');
+		else{
+			// $housekeeperid = get_dbid('housekeeper','housekeeperid');
 			$result = (
-				DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
-					" values ($housekeeperid,'nodes','nodeid',$nodeid)") &&
+				// DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
+					// " values ($housekeeperid,'nodes','nodeid',$nodeid)") &&
 				DBexecute('delete from nodes where nodeid='.$nodeid) &&
 				DBexecute('update nodes set masterid=0 where masterid='.$nodeid)
 				);
-			error('Please be aware that database still contains data related to the deleted Node');
+			error(S_DATABASE_STILL_CONTAINS_DATA_RELATED_DELETED_NODE);
 		}
-		return $result;
+
+	return $result;
 	}
 
-	function	get_node_by_nodeid($nodeid)
+	function get_node_by_nodeid($nodeid)
 	{
 		return DBfetch(DBselect('select * from nodes where nodeid='.$nodeid));
 	}
 
-	function	get_node_path($nodeid, $result='/')
+	function get_node_path($nodeid, $result='/')
 	{
 		if($node_data = get_node_by_nodeid($nodeid))
 		{

@@ -1,0 +1,1 @@
+alter table items modify units           nvarchar2(255);

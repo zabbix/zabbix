@@ -51,25 +51,22 @@ include_once "include/page_header.php";
 ?>
 <?php
 
-	$sql = 'SELECT * '.
-			' FROM items i, functions f '.
-			' WHERE i.itemid=f.itemid '.
-				' AND f.triggerid='.$_REQUEST['triggerid'].
-				' AND '.DBin_node('f.triggerid');
-	if(!$db_data = DBfetch(DBselect($sql))){
-		fatal_error(S_NO_TRIGGER_DEFINED);
-	}
+	if(!isset($_REQUEST['triggerid'])) fatal_error(S_NO_TRIGGER_DEFINED);
 
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array($db_data['hostid']));
+	$options = array(
+		'nodeids' => get_current_nodeid(true),
+		'triggerids' => $_REQUEST['triggerid'],
+		'output' => API_OUTPUT_EXTEND,
+		'select_hosts' => API_OUTPUT_EXTEND
+	);
 
-	if(!isset($available_triggers[$_REQUEST['triggerid']])){
-		access_deny();
-	}
+	$db_data = CTrigger::get($options);
+	if(empty($db_data)) access_deny();
+	else $db_data = reset($db_data);
 
-	$trigger_hostid = $db_data['hostid'];
+	$host = reset($db_data['hosts']);
 
 	if(isset($_REQUEST["save"])){
-
 		$result = update_trigger_comments($_REQUEST["triggerid"],$_REQUEST["comments"]);
 		show_messages($result, S_COMMENT_UPDATED, S_CANNOT_UPDATE_COMMENT);
 
@@ -79,20 +76,18 @@ include_once "include/page_header.php";
 				S_COMMENTS." [".$_REQUEST["comments"]."]");
 		}
 	}
-	else if(isset($_REQUEST["cancel"]))
-	{
-		redirect('tr_status.php?hostid='.$trigger_hostid);
+	else if(isset($_REQUEST["cancel"])){
+		redirect('tr_status.php?hostid='.$host['hostid']);
 		exit;
 
 	}
 ?>
 <?php
 	show_table_header(S_TRIGGER_COMMENTS_BIG);
-	echo SBR;
 	insert_trigger_comment_form($_REQUEST["triggerid"]);
 ?>
 <?php
 
-include_once "include/page_footer.php";
+include_once('include/page_footer.php');
 
 ?>

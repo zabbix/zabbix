@@ -19,11 +19,11 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
+require_once('include/config.inc.php');
 
-	$page['file']	= 'chart.php';
-	$page['title']	= "S_CHART";
-	$page['type']	= PAGE_TYPE_IMAGE;
+$page['file']	= 'chart.php';
+$page['title']	= "S_CHART";
+$page['type']	= PAGE_TYPE_IMAGE;
 
 include_once('include/page_header.php');
 
@@ -48,18 +48,18 @@ include_once('include/page_header.php');
 //		show_message(S_NO_ITEM_DEFINED);
 	}
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY, get_current_nodeid(true));
+	$options = array(
+		'itemids' => $_REQUEST['itemid'],
+		'webitems' => 1,
+		'nodeids' => get_current_nodeid(true)
+	);
 
-	if(!$db_data = DBfetch(DBselect('SELECT i.itemid from items i '.
-					' WHERE '.DBcondition('i.hostid',$available_hosts).
-						' AND i.itemid='.$_REQUEST['itemid'])))
-	{
-		access_deny();
-	}
+	$db_data = CItem::get($options);
+	if(empty($db_data)) access_deny();
 
 	$graph = new CChart();
 
-	$effectiveperiod = navigation_bar_calc('web.item.graph',$_REQUEST['itemid']);
+	$effectiveperiod = navigation_bar_calc('web.item.graph',$_REQUEST['itemid'],false);
 
 	if(isset($_REQUEST['period']))		$graph->SetPeriod($_REQUEST['period']);
 	if(isset($_REQUEST['from']))		$graph->SetFrom($_REQUEST['from']);
@@ -70,9 +70,7 @@ include_once('include/page_header.php');
 
 	$graph->addItem($_REQUEST['itemid'], GRAPH_YAXIS_SIDE_LEFT, CALC_FNC_ALL);
 	$graph->draw();
-?>
-<?php
+
 
 include_once('include/page_footer.php');
-
 ?>

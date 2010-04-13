@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2001-2009 SIA Zabbix
+** Copyright (C) 2001-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,10 +21,10 @@ require_once('include/config.inc.php');
 require_once('include/hosts.inc.php');
 require_once('include/html.inc.php');
 
-$page["title"] = "S_SEARCH";
+$page['title'] = 'S_SEARCH';
 $page['file'] = 'search.php';
 $page['hist_arg'] = array();
-$page['scripts'] = array('class.pmaster.js','scriptaculous.js?load=effects');
+$page['scripts'] = array('class.pmaster.js','effects.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -37,11 +37,11 @@ include_once('include/page_header.php');
 
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 		'favcnt'=>		array(T_ZBX_INT, O_OPT,	null,	null,			NULL),
 
-		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),NULL),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("hat"=={favobj})'),
+		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'flop','refresh'"),NULL),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({action}) && ("flop"=={action})'),
 	);
 
 	check_fields($fields);
@@ -51,24 +51,26 @@ include_once('include/page_header.php');
 		$_REQUEST['pmasterid'] = get_request('pmasterid','mainpage');
 
 		if('hat' == $_REQUEST['favobj']){
-			update_profile('web.dashboard.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
-		}
-
-		if('refresh' == $_REQUEST['favobj']){
-			switch($_REQUEST['favid']){
-				case 'hat_syssum':
-					$syssum = make_system_summary();
-					$syssum->show();
-					break;
-				case 'hat_stszbx':
-					$stszbx = make_status_of_zbx();
-					$stszbx->show();
-					break;
+			if('flop' == $_REQUEST['action']){
+				CProfile::update('web.dashboard.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			}
+			else if('refresh' == $_REQUEST['action']){
+				switch($_REQUEST['favref']){
+					case 'hat_syssum':
+						$syssum = make_system_summary();
+						$syssum->show();
+						break;
+					case 'hat_stszbx':
+						$stszbx = make_status_of_zbx();
+						$stszbx->show();
+						break;
+				}
 			}
 		}
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+		include_once('include/page_footer.php');
 		exit();
 	}
 ?>
@@ -103,7 +105,7 @@ include_once('include/page_header.php');
 
 // FIND Hosts
 	$params = array(
-		'nodeids'=> get_current_nodeid(),
+		'nodeids'=> get_current_nodeid(true),
 		'extendoutput' => true,
 		'pattern' => $search,
 		'extend_pattern' => true,
@@ -111,40 +113,40 @@ include_once('include/page_header.php');
 		'select_groups' => 1
 	);
 	$db_hosts = CHost::get($params);
-	
-	order_result($db_hosts, 'host', null);
+
+	order_result($db_hosts, 'host');
 
 	$hosts = selectByPattern($db_hosts, 'host', $search, $rows_per_page);
 	$hostids = zbx_objectValues($hosts, 'hostid');
 
 	$params = array(
-		'nodeids'=> get_current_nodeid(),
+		'nodeids'=> get_current_nodeid(true),
 		'hostids' => $hostids,
 		'editable' => 1
 	);
 	$rw_hosts = CHost::get($params);
 	$rw_hosts = zbx_toHash($rw_hosts,'hostid');
-	
+
 	$params = array(
-		'nodeids'=> get_current_nodeid(),
+		'nodeids'=> get_current_nodeid(true),
 		'pattern' => $search,
 		'extend_pattern' => true,
 		'count' => 1,
 	);
 	$hosts_count = CHost::get($params);
-	
+
 	$params = array(
-		'nodeids'=> get_current_nodeid(),
+		'nodeids'=> get_current_nodeid(true),
 		'pattern' => $search,
 		'extend_pattern' => true,
-		'count' => 1,
+		'countOutput' => 1,
 	);
 	$hosts_count = CHost::get($params);
 	$overalCount = $hosts_count['rowscount'];
 	$viewCount = count($hosts);
 
 	$header = array(
-		is_show_all_nodes()?new CCol(S_NODE):null,
+		ZBX_DISTRIBUTED?new CCol(S_NODE):null,
 		new CCol(S_HOSTS),
 		new CCol(S_IP),
 		new CCol(S_DNS),
@@ -159,9 +161,9 @@ include_once('include/page_header.php');
 
 	foreach($hosts as $hnum => $host){
 		$hostid = $host['hostid'];
-		
+
 		$group = reset($host['groups']);
-		$link = 'groupid='.$group['groupid'].'&hostid='.$hostid;
+		$link = 'groupid='.$group['groupid'].'&hostid='.$hostid.'&switch_node='.id2nodeid($hostid);
 
 		if($admin){
 			$pageBox = new CComboBox('hostpages_'.$hostid);
@@ -189,7 +191,7 @@ include_once('include/page_header.php');
 		$hostdns = make_decoration($host['dns'], $search);
 
 		$table->addRow(array(
-			get_node_name_by_elid($hostid),
+			get_node_name_by_elid($hostid, true),
 			$caption,
 			$hostip,
 			$hostdns,
@@ -212,7 +214,7 @@ include_once('include/page_header.php');
 
 // Find Host groups
 	$params = array(
-		'nodeids'=> get_current_nodeid(),
+		'nodeids'=> get_current_nodeid(true),
 		'extendoutput' => 1,
 		'pattern' => $search,
 		'limit' => $rows_per_page,
@@ -225,16 +227,16 @@ include_once('include/page_header.php');
 	$groupids = zbx_objectValues($hostGroups, 'groupid');
 
 	$params = array(
-		'nodeids'=> get_current_nodeid(),
+		'nodeids'=> get_current_nodeid(true),
 		'groupids' => $groupids,
 		'editable' => 1
 	);
 
 	$rw_hostGroups = CHostGroup::get($params);
 	$rw_hostGroups = zbx_toHash($rw_hostGroups, 'groupid');
-	
+
 	$params = array(
-		'nodeids'=> get_current_nodeid(),
+		'nodeids'=> get_current_nodeid(true),
 		'pattern' => $search,
 		'count' => 1,
 	);
@@ -244,7 +246,7 @@ include_once('include/page_header.php');
 	$viewCount = count($hostGroups);
 
 	$header = array(
-		is_show_all_nodes()?new CCol(S_NODE):null,
+		ZBX_DISTRIBUTED?new CCol(S_NODE):null,
 		new CCol(S_HOST_GROUP),
 		new CCol(S_LATEST_DATA),
 		new CCol(S_TRIGGERS),
@@ -259,11 +261,12 @@ include_once('include/page_header.php');
 		$hostgroupid = $group['groupid'];
 
 		$caption = make_decoration($group['name'], $search);
-		
+		$link = 'groupid='.$hostgroupid.'&hostid=0&switch_node='.id2nodeid($hostgroupid);
+
 		if($admin){
 			if(isset($rw_hostGroups[$hostgroupid]))
-				$admin_link = new CLink(S_GO,'hosts.php?config=1&groupid='.$hostgroupid.'&hostid=0');
-			else			
+				$admin_link = new CLink(S_GO,'hosts.php?config=1&groupid='.$hostgroupid.'&hostid=0'.'&switch_node='.id2nodeid($hostgroupid));
+			else
 				$admin_link = new CSpan(S_GO,'unknown');
 		}
 		else{
@@ -271,11 +274,11 @@ include_once('include/page_header.php');
 		}
 
 		$table->addRow(array(
-			get_node_name_by_elid($hostgroupid),
+			get_node_name_by_elid($hostgroupid, true),
 			$caption,
-			new CLink(S_GO,'latest.php?groupid='.$hostgroupid.'&hostid=0'),
-			new CLink(S_GO,'tr_status.php?groupid='.$hostgroupid.'&hostid=0'),
-			new CLink(S_GO,'events.php?groupid='.$hostgroupid.'&hostid=0'),
+			new CLink(S_GO,'latest.php?'.$link),
+			new CLink(S_GO,'tr_status.php?'.$link),
+			new CLink(S_GO,'events.php?'.$link),
 			$admin_link,
 		));
 	}
@@ -290,7 +293,7 @@ include_once('include/page_header.php');
 // FIND Templates
 	if($admin){
 		$params = array(
-			'nodeids'=> get_current_nodeid(),
+			'nodeids'=> get_current_nodeid(true),
 			'extendoutput' => 1,
 			'select_groups' => 1,
 			'pattern' => $search,
@@ -305,17 +308,17 @@ include_once('include/page_header.php');
 		$templateids = zbx_objectValues($templates, 'templateid');
 
 		$params = array(
-			'nodeids'=> get_current_nodeid(),
+			'nodeids'=> get_current_nodeid(true),
 			'templateids' => $templateids,
 			'editable' => 1
 		);
 		$rw_templates = CTemplate::get($params);
 		$rw_templates = zbx_toHash($rw_templates,'templateid');
-		
+
 		$params = array(
-					'nodeids'=> get_current_nodeid(),
+					'nodeids'=> get_current_nodeid(true),
 					'pattern' => $search,
-					'count' => 1,
+					'countOutput' => 1,
 					'editable' => 1
 					);
 		$hosts_count = CTemplate::get($params);
@@ -324,7 +327,7 @@ include_once('include/page_header.php');
 		$viewCount = count($templates);
 
 		$header = array(
-			is_show_all_nodes()?new CCol(S_NODE):null,
+			ZBX_DISTRIBUTED?new CCol(S_NODE):null,
 			new CCol(S_TEMPLATES),
 			new CCol(S_ITEMS),
 			new CCol(S_TRIGGERS),
@@ -338,15 +341,15 @@ include_once('include/page_header.php');
 			$templateid = $template['hostid'];
 
 			$group = reset($template['groups']);
-			$link = 'groupid='.$group['groupid'].'&hostid='.$templateid;
+			$link = 'groupid='.$group['groupid'].'&hostid='.$templateid.'&switch_node='.id2nodeid($templateid);
 
 			$caption = make_decoration($template['host'], $search);
-			
+
 			if(isset($rw_templates[$templateid])){
 				$template_link = new CLink($caption,'hosts.php?hostid='.$templateid);
 				$items_link = new CLink(S_GO,'items.php?'.$link);
 				$triggers_link = new CLink(S_GO,'triggers.php?'.$link);
-				$graphs_link = new CLink(S_GO,'graphss.php?'.$link);
+				$graphs_link = new CLink(S_GO,'graphs.php?'.$link);
 			}
 			else{
 				$template_link = new CSpan($caption);
@@ -356,7 +359,7 @@ include_once('include/page_header.php');
 			}
 
 			$table->addRow(array(
-				get_node_name_by_elid($templateid),
+				get_node_name_by_elid($templateid, true),
 				$template_link,
 				$items_link,
 				$triggers_link,

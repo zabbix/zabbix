@@ -62,7 +62,7 @@
 		}
 		else
 		{
-			error("No media with mediaid=[$mediaid]");
+			error(S_NO_MEDIA_WITH.SPACE."mediaid=[$mediaid]");
 		}
 		return	$result;
 	}
@@ -87,7 +87,7 @@
 			return	$row;
 		}
 		else{
-			error("No media type with with mediatypeid=[$mediatypeid]");
+			error(S_NO_MEDIA_TYPE_WITH.SPACE."mediatypeid=[$mediatypeid]");
 		}
 	return $item;
 	}
@@ -115,9 +115,9 @@
 			' WHERE description='.zbx_dbstr($description).
 				' AND mediatypeid<>'.$mediatypeid.
 				' AND '.DBin_node('mediatypeid');
-		$result=DBexecute($sql);
+		$result=DBselect($sql);
 		if(DBfetch($result)){
-			error("An action type with description '$description' already exists.");
+			error(S_AN_ACTION_TYPE_WITH_DESCRIPTION.SPACE."'".$description."'".SPACE.S_ALREADY_EXISTS_SMALL.'.');
 		}
 		else{
 			$mediatype_old = get_mediatype_by_mediatypeid($mediatypeid);
@@ -162,9 +162,9 @@
 				' FROM media_type '.
 				' WHERE description='.zbx_dbstr($description).
 					' AND '.DBin_node('mediatypeid');
-		$result=DBexecute($sql);
+		$result=DBselect($sql);
 		if(DBfetch($result)){
-			error("An action type with description '$description' already exists.");
+			error(S_AN_ACTION_TYPE_WITH_DESCRIPTION.SPACE."'".$description."'".SPACE.S_ALREADY_EXISTS_SMALL.'.');
 		}
 		else{
 			$mediatypeid=get_dbid("media_type","mediatypeid");
@@ -185,7 +185,7 @@
 
 	function add_media( $userid, $mediatypeid, $sendto, $severity, $active, $period){
 		if(!validate_period($period)){
-			error("Incorrect time period");
+			error(S_INCORRECT_TIME_PERIOD);
 			return NULL;
 		}
 /*
@@ -215,7 +215,7 @@
 	{
 		if( !validate_period($period) )
 		{
-			error("Incorrect time period");
+			error(S_INCORRECT_TIME_PERIOD);
 			return NULL;
 		}
 

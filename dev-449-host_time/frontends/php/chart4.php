@@ -38,27 +38,17 @@ include_once('include/page_header.php');
 	check_fields($fields);
 ?>
 <?php
-	$sql = 'SELECT DISTINCT i.hostid '.
-			' FROM functions f, items i '.
-			' WHERE f.triggerid='.$_REQUEST['triggerid'].
-				' AND i.itemid=f.itemid';
-	if(!$host = DBfetch(DBselect($sql))){
-		fatal_error(S_NO_TRIGGER_DEFINED);
-	}
+	if(!isset($_REQUEST['triggerid'])) fatal_error(S_NO_TRIGGER_DEFINED);
 
-	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array($host['hostid']));
+	$options = array(
+		'triggerids' => $_REQUEST['triggerid'],
+		'output' => API_OUTPUT_EXTEND,
+		'nodeids' => get_current_nodeid(true)
+	);
 
-	$sql = 'SELECT DISTINCT t.triggerid,t.description,t.expression, h.host,h.hostid '.
-			' FROM hosts h, items i, functions f, triggers t'.
-			' WHERE h.hostid=i.hostid '.
-				' AND i.itemid=f.itemid '.
-				' AND f.triggerid=t.triggerid '.
-				' AND t.triggerid='.$_REQUEST['triggerid'].
-				' AND '.DBcondition('t.triggerid',$available_triggers);
-
-	if(!$db_data = DBfetch(DBselect($sql))){
-		access_deny();
-	}
+	$db_data = CTrigger::get($options);
+	if(empty($db_data)) access_deny();
+	else $db_data = reset($db_data);
 
 	$start_time = time(NULL);
 
@@ -94,7 +84,7 @@ include_once('include/page_header.php');
 	$str = expand_trigger_description_by_data($db_data);
 
 	$str = $str.' (year '.date('Y').')';
-	$x = imagesx($im)/2-imagefontwidth(4)*strlen($str)/2;
+	$x = imagesx($im)/2-imagefontwidth(4)*zbx_strlen($str)/2;
 	//imagestring($im, 4,$x,1, $str , $darkred);
 	imageText($im, 10, 0, $x, 14, $darkred, $str);
 

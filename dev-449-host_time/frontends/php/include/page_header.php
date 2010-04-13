@@ -32,10 +32,6 @@
 
 	if($_REQUEST['fullscreen']=get_request('fullscreen', 0)) define('ZBX_PAGE_NO_MENU', 1);
 
-	include_once('include/locales/en_gb.inc.php');
-	process_locales();
-	set_zbx_locales();
-
 	require_once('include/menu.inc.php');
 
 	zbx_define_menu_restrictions();
@@ -98,7 +94,7 @@
 			}
 
 			if((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && $USER_DETAILS['refresh']){
-				$page_title .= ' [refreshed every '.$USER_DETAILS['refresh'].' sec]';
+				$page_title .= ' ['.S_REFRESHED_EVERY_SMALL.SPACE.$USER_DETAILS['refresh'].SPACE.S_SEC_SMALL.']';
 			}
 		break;
 	}
@@ -148,17 +144,17 @@
 	if($page['file'] == 'sysmap.php')
 		print('<link rel="stylesheet" type="text/css" href="imgstore.php?css=1&output=css" />');
 ?>
-<script type="text/javascript" src="js/prototype.js"></script>
-<script type="text/javascript" src="js/common.js"></script>
-<script type="text/javascript" src="js/class.cookie.js"></script>
-<script type="text/javascript" src="js/class.curl.js"></script>
-<script type="text/javascript" src="js/main.js"></script>
-<script type="text/javascript" src="js/functions.js"></script>
+<script type="text/javascript">	var PHP_TZ_OFFSET = <?php echo date('Z'); ?>;</script>
 <?php
-	if(isset($page['scripts']) && is_array($page['scripts'])){
+
+	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&lang='.$USER_DETAILS['lang'];
+	print('<script type="text/javascript" src="'.$path.'"></script>'."\n");
+
+	if(isset($page['scripts']) && is_array($page['scripts']) && !empty($page['scripts'])){
 		foreach($page['scripts'] as $id => $script){
-			print('    <script type="text/javascript" src="js/'.$script.'"></script>'."\n");
+			$path .= '&files[]='.$script;
 		}
+		print('<script type="text/javascript" src="'.$path.'"></script>'."\n");
 	}
 ?>
 </head>
@@ -170,9 +166,11 @@
 
 	if(isset($_REQUEST['print'])){
 		define('ZBX_PAGE_NO_MENU', 1);
-		$req = substr($_SERVER['REQUEST_URI'],0,strpos($_SERVER['REQUEST_URI'],'print')-1);
-
-		$link = new CLink(bold('&laquo;'.S_BACK_BIG), $req, 'small_font');
+		
+		$req = new CUrl();
+		$req->setArgument('print', null);
+		
+		$link = new CLink(bold('&laquo;'.S_BACK_BIG), $req->getUrl(), 'small_font');
 		$link->setAttribute('style','padding-left: 10px;');
 
 		$printview = new CDiv($link,'printless');
@@ -188,7 +186,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$help->setTarget('_blank');
 		$support = new CLink(S_GET_SUPPORT, 'http://www.zabbix.com/support.php', 'small_font', null, 'nosid');
 		$support->setTarget('_blank');
-		$printview = new CLink(S_PRINT, $_SERVER['REQUEST_URI'].(empty($_GET)?'?':'&').'print=1', 'small_font', null, 'nosid');
+		$printview = new CLink(S_PRINT, $_SERVER['REQUEST_URI'].(empty($_GET)?'?':'&').'print=1', 'small_font');
 
 		$page_header_r_col = array($help,'|',$support,'|',$printview);
 
@@ -200,7 +198,13 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			if($USER_DETAILS['debug_mode'] == GROUP_DEBUG_MODE_ENABLED){
 
 				$debug = new CLink(S_DEBUG, '#debug', 'small_font', null, 'nosid');
-				$debug->setAttribute('onclick', "javascript: ShowHide('zbx_gebug_info', 'block');");
+
+				$d_script = " if(!isset('state', this)) this.state = 'none'; ".
+							" if(this.state == 'none') this.state = 'block'; ".
+							" else this.state = 'none'; ".
+							" showHideByName('zbx_gebug_info', this.state);";
+
+				$debug->setAttribute('onclick', 'javascript: '.$d_script);
 
 				array_push($page_header_r_col,$debug,'|');
 			}
@@ -384,7 +388,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$search_form = new CForm('search.php');
 		$search_form->setMethod('get');
 		$search_form->setAttribute('class','thin');
-		$search_form->addItem(new CDiv(array(S_SEARCH_BIG.': ', new CTextBox('search','',15))));
+		$search_form->addItem(new CDiv(array(S_SEARCH_BIG.': ', new CTextBox('search',get_request('search',''),15))));
 
 		$search_div = new CDiv($search_form);
 		$search_div->setAttribute('id','zbx_search');
@@ -443,7 +447,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 	if(version_compare(phpversion(), '5.1.0RC1', '>=') && $page['type'] == PAGE_TYPE_HTML){
 		$tmezone = ini_get('date.timezone');
 		if(empty($tmezone)) {
-			info('Timezone for PHP is not set. Please set "date.timezone" option in php.ini.');
+			info(S_TIMEZONE_FOR_PHP_IS_NOT_SET_PLEASE_SET);
 			date_default_timezone_set('UTC');
 		}
 		unset($tmezone);

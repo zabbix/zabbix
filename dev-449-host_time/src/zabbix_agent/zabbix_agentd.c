@@ -229,21 +229,17 @@ int MAIN_ZABBIX_ENTRY(void)
 	int	i = 0;
 
 	zbx_sock_t	listen_sock;
+	
+	if (NULL == CONFIG_LOG_FILE || ('\0' == *CONFIG_LOG_FILE))
+	{
+		zabbix_open_log(LOG_TYPE_SYSLOG, CONFIG_LOG_LEVEL, NULL);
+	}
+	else
+	{
+		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
+	}
 
-	zabbix_open_log(
-#if ON	/* !!! normal case must be ON !!! */
-		LOG_TYPE_FILE
-#elif OFF	/* !!! normal case must be OFF !!! */
-		LOG_TYPE_SYSLOG
-#else	/* !!! for debug only, print log with zbx_error !!! */
-		LOG_TYPE_UNDEFINED
-#endif
-		,
-		CONFIG_LOG_LEVEL,
-		CONFIG_LOG_FILE
-		);
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd started. Zabbix %s (revision %s).",
+	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent started. Zabbix %s (revision %s).",
 			ZABBIX_VERSION,
 			ZABBIX_REVISION);
 

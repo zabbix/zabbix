@@ -49,8 +49,20 @@ start: function(){
 	this.timeout = setTimeout('PageRefresh.check()', 1000);
 },
 
+restart: function(){
+	this.stop();
+	this.delayLeft = this.delay;
+	this.start();
+},
+
 stop: function(){
 	clearTimeout(this.timeout);	
+},
+
+restart: function(){
+	this.stop();
+	this.delayLeft = this.delay;
+	this.start();
 }
 }
 
@@ -69,23 +81,22 @@ timeout_change:	null,
 mouseOver: function(show_label){
 	clearTimeout(this.timeout_reset);
 	this.timeout_change = setTimeout('MMenu.showSubMenu("'+show_label+'")', 200);
-	PageRefresh.stop();
+	PageRefresh.restart();
 },
 
 submenu_mouseOver: function(){
 	clearTimeout(this.timeout_reset);
 	clearTimeout(this.timeout_change);
-	PageRefresh.stop();
+	PageRefresh.restart();
 },
 
 mouseOut: function(){
 	clearTimeout(this.timeout_change);
 	this.timeout_reset = setTimeout('MMenu.showSubMenu("'+this.def_label+'")', 2500);
-	PageRefresh.start();
 },
 
 showSubMenu: function(show_label){
-	var menu_div  = $('sub_'+show_label);
+	var menu_div = $('sub_'+show_label);
 	if(!is_null(menu_div)){
 		$(show_label).className = 'active';
 		menu_div.show();
@@ -161,7 +172,7 @@ check: function(e){
 	var e = e || window.event;
 	var obj = eventTarget(e);
 
-	PageRefresh.stop();
+	PageRefresh.restart();
 	
 	if((typeof(obj) == 'undefined') || (obj.type.toLowerCase() != 'checkbox')){
 		return true;
@@ -306,6 +317,7 @@ setGo: function(){
 		
 		var tmp_val = $('goButton').value.split(' ');
 		$('goButton').value = tmp_val[0]+' ('+countChecked+')';
+
 		cookie.createJSON('cb_'+this.page, this.selected_ids);
 
 		this.pageGoCount = countChecked;
@@ -341,7 +353,7 @@ submitGo: function(e){
 		return true;
 	}
 	else{
-		alert('No elements selected!');
+		alert(locale['S_NO_ELEMENTS_SELECTED']);
 		Event.stop(e);
 		return false;
 	}
@@ -405,7 +417,7 @@ createBox: function(obj, hint_text, width, className, byClick){
 	else obj.parentNode.appendChild(box);
 	
 	box.setAttribute('id', boxid);
-	box.style.visibility = 'hidden';
+	box.style.display = 'none';
 	box.className = 'hintbox';
 	
 	if(!empty(className)){
@@ -420,7 +432,7 @@ createBox: function(obj, hint_text, width, className, byClick){
 	if(byClick){
 		close_link = '<div class="link" '+
 						'style="text-align: right; border-bottom: 1px #333 solid;" '+
-						'onclick="javascript: hintBox.hide(event, \''+boxid+'\');">Close</div>';
+						'onclick="javascript: hintBox.hide(event, \''+boxid+'\');">'+locale['S_CLOSE']+'</div>';
 	}
 
 	box.innerHTML = close_link + hint_text;
@@ -528,7 +540,8 @@ show: function(e, obj, hintbox){
 	this.debug('show');
 	
 	var hintid = hintbox.id;
-	var body_width = get_bodywidth();
+	// var body_width = get_bodywidth();
+	var body_width = document.viewport.getDimensions().width;
 	
 //	pos = getPosition(obj);
 // this.debug('body width: ' + body_width);
@@ -547,12 +560,16 @@ show: function(e, obj, hintbox){
 	hintbox.x	= pos.left;
 //*/
 	
+	hintbox.style.visibility = 'hidden';
+	hintbox.style.display = 'block';
+
 	posit = $(obj).positionedOffset();
 	cumoff = $(obj).cumulativeOffset();
 	if(parseInt(cumoff.left+10+hintbox.offsetWidth) > body_width){
-		posit.left-=parseInt(hintbox.offsetWidth);
+		posit.left = posit.left - parseInt((cumoff.left+10+hintbox.offsetWidth) - body_width) + document.viewport.getScrollOffsets().left;
+		// posit.left-=parseInt(hintbox.offsetWidth);
 		posit.left-=10;
-		//posit.left=(pos.left < 0)?0:posit.left;
+		posit.left = (posit.left < 0) ? 0 : posit.left;
 	}
 	else{
 		posit.left+=10;
@@ -659,7 +676,10 @@ function create_color_picker(){
 }
 
 function set_color(color){
-	if(curr_lbl)	curr_lbl.style.background = curr_lbl.style.color = "#" + color;
+	if(curr_lbl){
+		curr_lbl.style.background = curr_lbl.style.color = "#" + color;
+		curr_lbl.title = "#" + color;
+	}
 	if(curr_txt)	curr_txt.value = color;
 
 	hide_color_picker();
@@ -682,22 +702,14 @@ function add2favorites(favobj,favid){
 		return false;
 	}
 
-	if(typeof(favobj) == 'undefined'){
-		var fav_form = document.getElementById('fav_form');
-		if(!fav_form) throw "Object not found.";
-		
-		var favobj = fav_form.favobj.value;
-		var favid = fav_form.favid.value;
-	}
-	
 	if((typeof(favid) == 'undefined') || empty(favid)) return;
-	
+
 	var params = {
 		'favobj': 	favobj,
 		'favid': 	favid,
 		'action':	'add'
 	}
-	
+
 	send_params(params);
 //	json.onetime('dashboard.php?output=json&'+Object.toQueryString(params));
 }
@@ -718,8 +730,9 @@ function change_flicker_state(divid){
 	if(false === filter_state) return false;
 
 	var params = {
+		'action':	'flop',
 		'favobj': 	'filter',
-		'favid': 	divid,
+		'favref': 	divid,
 		'state':	filter_state
 	}
 	
@@ -742,8 +755,9 @@ function change_hat_state(icon, divid){
 	if(false === hat_state) return false;
 	
 	var params = {
+		'action':	'flop',
 		'favobj': 	'hat',
-		'favid': 	divid,
+		'favref': 	divid,
 		'state':	hat_state
 	}
 	
@@ -796,9 +810,9 @@ function setRefreshRate(pmasterid,dollid,interval,params){
 	}
 	
 	if((typeof(params) == 'undefined') || is_null(params))  var params = new Array();
-	params['favobj'] = 		'set_rf_rate';
 	params['pmasterid'] = 	pmasterid;
-	params['favid'] = 		dollid;
+	params['favobj'] = 		'set_rf_rate';
+	params['favref'] = 		dollid;
 	params['favcnt'] = 		interval;
 //SDJ($params);
 	send_params(params);

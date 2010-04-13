@@ -120,7 +120,7 @@
 #define ON	1
 #define OFF	0
 
-#define	APPLICATION_NAME	"ZABBIX Agent"
+#define	APPLICATION_NAME	"Zabbix Agent"
 #define	ZABBIX_REVDATE		"7 December 2009"
 #define	ZABBIX_VERSION		"1.9"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
@@ -186,7 +186,8 @@ typedef enum
 	ITEM_TYPE_DB_MONITOR,
 	ITEM_TYPE_IPMI,
 	ITEM_TYPE_SSH,
-	ITEM_TYPE_TELNET
+	ITEM_TYPE_TELNET,
+	ITEM_TYPE_CALCULATED
 } zbx_item_type_t;
 
 typedef enum
@@ -350,6 +351,13 @@ typedef enum
 
 typedef enum
 {
+	GRAPH_YAXIS_TYPE_CALCULATED = 0,
+	GRAPH_YAXIS_TYPE_FIXED,
+	GRAPH_YAXIS_TYPE_ITEM_VALUE
+} zbx_graph_yaxis_types_t;
+
+typedef enum
+{
 	AUDIT_RESOURCE_USER = 0,
 /*	AUDIT_RESOURCE_ZABBIX,*/
 	AUDIT_RESOURCE_ZABBIX_CONFIG = 2,
@@ -389,7 +397,7 @@ typedef enum
 #define SERVER_ICMPPINGSEC_KEY	"icmppingsec"
 /* Special item key used for ICMP ping loss packages */
 #define SERVER_ICMPPINGLOSS_KEY	"icmppingloss"
-/* Special item key used for internal ZABBIX log */
+/* Special item key used for internal Zabbix log */
 #define SERVER_ZABBIXLOG_KEY	"zabbix[log]"
 
 /* Media types */
@@ -461,11 +469,10 @@ typedef enum
 typedef enum
 {
 	TIMEPERIOD_TYPE_ONETIME = 0,
-	TIMEPERIOD_TYPE_HOURLY,
-	TIMEPERIOD_TYPE_DAILY,
+/*	TIMEPERIOD_TYPE_HOURLY,*/
+	TIMEPERIOD_TYPE_DAILY = 2,
 	TIMEPERIOD_TYPE_WEEKLY,
 	TIMEPERIOD_TYPE_MONTHLY,
-	TIMEPERIOD_TYPE_YEARLY
 } zbx_timeperiod_type_t;
 
 typedef enum
@@ -486,8 +493,8 @@ typedef enum
 
 typedef enum
 {
-	ZBX_CASE_SENSITIVE = 0,
-	ZBX_IGNORE_CASE
+	ZBX_IGNORE_CASE = 0,
+	ZBX_CASE_SENSITIVE	
 } zbx_case_sensitive_t;
 
 /* HTTP Tests statuses */
@@ -547,6 +554,15 @@ typedef enum
 } zbx_trigger_severity_t;
 char	*zbx_trigger_severity_string(zbx_trigger_severity_t severity);
 
+typedef enum
+{
+	ITEM_LOGTYPE_INFORMATION = 1,
+	ITEM_LOGTYPE_WARNING,
+	ITEM_LOGTYPE_ERROR = 4,
+	ITEM_LOGTYPE_FAILURE_AUDIT = 7,
+	ITEM_LOGTYPE_SUCCESS_AUDIT
+} zbx_item_logtype_t;
+char	*zbx_item_logtype_string(zbx_item_logtype_t logtype);
 /* Media statuses */
 #define MEDIA_STATUS_ACTIVE	0
 #define MEDIA_STATUS_DISABLED	1
@@ -736,6 +752,7 @@ void	del_zeroes(char *s);
 int	find_char(char *str,char c);
 int	is_double_prefix(char *str);
 int	is_double(char *c);
+int	is_uint_prefix(const char *c);
 int	is_uint(char *c);
 int	is_uint64(register char *str, zbx_uint64_t *value);
 int	is_uoct(char *str);
@@ -750,6 +767,9 @@ void	rtrim_spaces(char *c);
 void	delete_reol(char *c);
 int	get_param(const char *param, int num, char *buf, int maxlen);
 int	num_param(const char *param);
+char	*get_param_dyn(const char *param, int num);
+void	remove_param(char *param, int num);
+const char	*get_string(const char *p, char *buf, size_t bufsize);
 int	get_key_param(char *param, int num, char *buf, int maxlen);
 int	num_key_param(char *param);
 int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char *delay_flex, time_t now);
@@ -773,6 +793,11 @@ int	str_in_list(char *list, const char *value, const char delimiter);
 #endif /* HAVE___VA_ARGS__ */
 void	__zbx_zbx_setproctitle(const char *fmt, ...);
 
+#define SEC_PER_MIN 60
+#define SEC_PER_HOUR 3600
+#define SEC_PER_DAY 86400
+#define SEC_PER_WEEK (7*SEC_PER_DAY)
+#define SEC_PER_YEAR (365*SEC_PER_DAY)
 #define ZBX_JAN_1970_IN_SEC   2208988800.0        /* 1970 - 1900 in seconds */
 double	zbx_time(void);
 double	zbx_current_time (void);
@@ -854,6 +879,8 @@ int	regexp_match_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, co
 		zbx_case_sensitive_t cs);
 
 /* Misc functions */
+int	is_ip4(const char *ip);
+
 int	cmp_double(double a,double b);
 int     zbx_get_field(char *line, char *result, int num, char delim);
 
@@ -881,7 +908,7 @@ int	get_nearestindex(void *p, size_t sz, int num, zbx_uint64_t id);
 int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t value, int alloc_step);
 void	uint64_array_merge(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t *value, int value_num, int alloc_step);
 int	uint64_array_exists(zbx_uint64_t *values, int num, zbx_uint64_t value);
-void	uint64_array_rm(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int rm_num);
+void	uint64_array_remove(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int rm_num);
 
 #ifdef _WINDOWS
 LPTSTR	zbx_acp_to_unicode(LPCSTR acp_string);
@@ -897,7 +924,9 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
 
 void	win2unix_eol(char *text);
+int	str2uint(const char *str);
 int	str2uint64(char *str, zbx_uint64_t *value);
+double	str2double(const char *str);
 
 #if defined(_WINDOWS) && defined(_UNICODE)
 int	__zbx_stat(const char *path, struct stat *buf);
@@ -914,4 +943,11 @@ zbx_uint64_t	zbx_letoh_uint64(
 zbx_uint64_t	zbx_htole_uint64(
 		zbx_uint64_t	data
 	);
+
+int	is_hostname_char(const char c);
+int	is_key_char(const char c);
+int	is_function_char(const char c);
+int	parse_function(char **exp, char **func, char **params);
+int	parse_host_key(char *exp, char **host, char **key);
+void	make_hostname(char *host);
 #endif

@@ -17,7 +17,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **
 */
-<!--
+// [!CDATA[
 /************************************************************************************/
 // GRAPHS TIMELINE CONTROLS (GTLC)
 // author: Aly
@@ -61,11 +61,12 @@ addObject: function(domid, time, objData){
 		if(isset(key, objData)) this.objectList[domid][key] = objData[key];
 	}
 	
-	var now = new Date();
+	var now = new CDate();
 	now = parseInt(now.getTime() / 1000);
+
 	if(!isset('period', time))		time.period = 3600;
 	if(!isset('endtime', time))		time.endtime = now;
-	if(!isset('starttime', time))	time.starttime = time.endtime - 3*time.period;
+	if(!isset('starttime', time) || is_null(time['starttime']))	time.starttime = time.endtime - 3*((time.period<86400)?86400:time.period);
 	if(!isset('usertime', time))	time.usertime = time.endtime;
 	
 	this.objectList[domid].time = time;
@@ -179,7 +180,7 @@ addScroll: function(e, objid){
 	
 	var g_width = null;
 	if(obj.scrollWidthByImage == 0){
-		g_width = get_bodywidth() - 25;	
+		g_width = get_bodywidth() - 30;	
 		if(!is_number(g_width)) g_width = 900;
 	}
 
@@ -341,9 +342,8 @@ debug: function(fnc_name, id){
 
 function datetoarray(unixtime){
 
-	var date = new Date();
-	date.setTime(unixtime*1000);
-	
+	var date = new CDate(unixtime*1000);
+
 	var thedate = new Array();
 	thedate[0] = date.getDate();
 	thedate[1] = date.getMonth()+1;
@@ -386,7 +386,7 @@ function create_timeline(tlid, period, starttime, usertime, endtime){
 		var tlid = ZBX_TIMELINES.length;
 	}
 	
-	var now = new Date();
+	var now = new CDate();
 	now = parseInt(now.getTime() / 1000);
 
 	if('undefined' == typeof(usertime)) usertime = now;
@@ -431,7 +431,7 @@ initialize: function(id, period, starttime, usertime, endtime){
 },
 
 timeNow: function(){
-	var tmp_date = new Date();
+	var tmp_date = new CDate();
 return parseInt(tmp_date.getTime()/1000);
 },
 
@@ -535,13 +535,14 @@ function scrollCreate(sbid, w, timelineid){
 		throw "Parameters haven't been sent properly";
 		return false;
 	}
-	
+
 	if(is_null(w)){
 		var dims = getDimensions(sbid);
 		if($(sbid).nodeName.toLowerCase() == 'img')
 			w = dims.width + 5;
-		else 
+		else{
 			w = dims.width - 5;
+		}
 	}
 	
 	if(w < 600) w = 600;
@@ -633,7 +634,7 @@ initialize: function(sbid, timelineid, width){ // where to put bar on start(time
 	this.scrollbarid = sbid;
 	this.debug('initialize', sbid);
 
-//	try{
+	try{
 // Checks
 		if(!isset(timelineid,ZBX_TIMELINES)) throw('Failed to initialize ScrollBar with given TimeLine');
 		if(empty(this.dom.scrollbar)) this.scrollcreate(width);
@@ -669,7 +670,7 @@ initialize: function(sbid, timelineid, width){ // where to put bar on start(time
 //---------------
 		this.disabled = 0;
 
-	try{
+//	try{
 	} 
 	catch(e){
 		throw "ERROR: ScrollBar initialization failed!";
@@ -927,8 +928,8 @@ calendarShowLeft: function(){
 //---
 
 	var pos = getPosition(this.dom.info_left); 
-	pos.top-=204; 
-	pos.left-=142; 
+	pos.top+=34; 
+	pos.left-=145; 
 	
 	if(CR) pos.top-=20;
 	this.clndrLeft.clndr.clndrshow(pos.top,pos.left);
@@ -940,8 +941,9 @@ calendarShowRight: function(){
 //---
 
 	var pos = getPosition(this.dom.info_right); 
-	pos.top-=204; 
-	pos.left-=78; 
+
+	pos.top+=34; 
+	pos.left-=77; 
 	
 	if(CR) pos.top-=20;
 	this.clndrRight.clndr.clndrshow(pos.top,pos.left);
@@ -1254,10 +1256,10 @@ switchPeriodState: function(){
 	this.fixedperiod = (this.fixedperiod == 1)?0:1;
 	
 	if(this.fixedperiod){
-		this.dom.period_state.innerHTML = 'fixed';
+		this.dom.period_state.innerHTML = locale['S_FIXED_SMALL'];
 	}
 	else{
-		this.dom.period_state.innerHTML = 'dynamic';
+		this.dom.period_state.innerHTML = locale['S_DYNAMIC_SMALL'];
 	}
 },
 
@@ -1265,8 +1267,7 @@ syncTZOffset: function(time){
 	this.debug('syncTZOffset');
 
 	if(time > 86400){
-		var date = new Date();
-		date.setTime(time*1000);
+		var date = new CDate(time*1000);
 		var TimezoneOffset = date.getTimezoneOffset();
 		time -= (TimezoneOffset*60);
 	}
@@ -1277,8 +1278,7 @@ return time;
 getTZdiff: function(time1, time2){
 	this.debug('getTZdiff');
 
-	var date = new Date();
-	date.setTime(time1*1000);
+	var date = new CDate(time1*1000);
 	var TimezoneOffset = date.getTimezoneOffset();
 	
 	date.setTime(time2*1000);
@@ -1294,7 +1294,7 @@ roundTime: function(usertime){
 //---------------
 //	if((this._period % 86400) == 0){
 	if(time > 86400){
-		var dd = new Date();
+		var dd = new CDate();
 		dd.setTime(time*1000);
 		dd.setHours(0);
 		dd.setMinutes(0);
@@ -1370,7 +1370,7 @@ setTabInfo: function(){
 
 // beating Timezone offsets
 // USERTIME
-	var date = new Date();
+	var date = new CDate();
 	date.setTime(usertime*1000);
 	var TimezoneOffset = date.getTimezoneOffset();
 	
@@ -1392,7 +1392,7 @@ setTabInfo: function(){
 	var right_info = date[0]+'.'+date[1]+'.'+date[2]+' '+date[3]+':'+date[4];//+':'+date[5];
 
 	if(this.timeline.now()){
-		right_info += '  (now!)  ';
+		right_info += '  ('+locale['S_NOW_SMALL']+'!)  ';
 	}
 	
 	this.dom.info_right.innerHTML = right_info;
@@ -1424,7 +1424,7 @@ deselectall: function(){
 	}	
 },
 
-formatStampByDHM: function(timestamp, double, extend){
+formatStampByDHM: function(timestamp, tsDouble, extend){
 	this.debug('formatStampByDHM');
 	
 	timestamp = timestamp || 0;
@@ -1441,7 +1441,7 @@ formatStampByDHM: function(timestamp, double, extend){
 	var hours =  parseInt((timestamp - years*365*86400 - months*30*86400 - weeks*7*86400 - days*86400)/3600);
 	var minutes = parseInt((timestamp - years*365*86400 - months*30*86400 - weeks*7*86400 - days*86400 - hours*3600)/60);
 	
-	if(double){
+	if(tsDouble){
 		if(months.toString().length == 1) months = '0'+months;
 		if(weeks.toString().length == 1) weeks = '0'+weeks;
 		if(days.toString().length == 1) days = '0'+days;
@@ -1450,14 +1450,14 @@ formatStampByDHM: function(timestamp, double, extend){
 	}
 
 	var str = "";
-	str+=(years == 0)?(''):(years+'y ');
-	str+=(months == 0)?(''):(months+'m ');
-	str+=(weeks == 0)?(''):(weeks+'w ');
+	str+=(years == 0)?(''):(years+locale['S_YEAR_SHORT']+' ');
+	str+=(months == 0)?(''):(months+locale['S_MONTH_SHORT']+' ');
+	str+=(weeks == 0)?(''):(weeks+locale['S_WEEK_SHORT']+' ');
 	
-	if(extend && double) str+=days+'d ';
-	else str+=(days == 0)?(''):(days+'d ');
+	if(extend && tsDouble) str+=days+locale['S_DAY_SHORT']+' ';
+	else str+=(days == 0)?(''):(days+locale['S_DAY_SHORT']+' ');
 	
-	str+=hours+'h '+minutes+'m ';
+	str+=hours+locale['S_HOUR_SHORT']+' '+minutes+locale['S_MINUTE_SHORT']+' ';
 	
 return str;
 },
@@ -1484,8 +1484,8 @@ appendCalendars: function(){
 	this.debug('appendCalendars');
 //---
 	
-	this.clndrLeft = create_calendar((this.timeline.usertime() - this.timeline.period()), this.dom.info_left);
-	this.clndrRight = create_calendar(this.timeline.usertime(), this.dom.info_right);
+	this.clndrLeft = create_calendar((this.timeline.usertime() - this.timeline.period()), this.dom.info_left, null, null, 'scrollbar_cntr');
+	this.clndrRight = create_calendar(this.timeline.usertime(), this.dom.info_right, null, null, 'scrollbar_cntr');
 
 	this.clndrLeft.clndr.onselect = this.setCalendarLeft.bind(this);
 	addListener(this.dom.info_left, 'click', this.calendarShowLeft.bindAsEventListener(this));
@@ -1619,7 +1619,8 @@ scrollcreate: function(w){
 	
 	scr_cntr.style.paddingRight = '2px';
 	scr_cntr.style.paddingLeft = '2px';
-	scr_cntr.style.backgroundColor = '#DDDDDD';
+	// scr_cntr.style.backgroundColor = '#E5E5E5';
+	scr_cntr.style.margin = '5px 0 0 0 ';
 
 	this.dom.scrollbar = document.createElement('div');
 	scr_cntr.appendChild(this.dom.scrollbar);
@@ -1646,7 +1647,7 @@ scrollcreate: function(w){
 	this.dom.zoom.appendChild(this.dom.text);
 	this.dom.text.className = 'text';
 	
-	this.dom.text.appendChild(document.createTextNode('Zoom:'));
+	this.dom.text.appendChild(document.createTextNode(locale['S_ZOOM']+':'));
 	
 	this.dom.links = document.createElement('span');
 	this.dom.zoom.appendChild(this.dom.links);
@@ -2213,7 +2214,7 @@ moveright: function(width){
 calcperiod: function(){
 	this.debug('calcperiod');
 
-	if(this.box.width >= this.obj.width){
+	if((this.box.width+1) >= this.obj.width){
 		var new_period = this.timeline.period();
 	}
 	else{
@@ -2341,4 +2342,4 @@ function moveSBoxes(){
 			ZBX_SBOX[key].sbox.moveSBoxByObj();
 	}
 }
--->
+//]]

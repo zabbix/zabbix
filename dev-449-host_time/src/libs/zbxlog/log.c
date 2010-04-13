@@ -46,6 +46,8 @@ static HANDLE system_log_handle = INVALID_HANDLE_VALUE;
 
 #endif /* _WINDOWS */
 
+extern	char title_message[]; /* for nice logging into syslog */
+
 #if !defined(_WINDOWS)
 
 void redirect_std(const char *filename)
@@ -111,8 +113,7 @@ int zabbix_open_log(int type, int level, const char *filename)
 		zbx_free(wevent_source);
 #else /* not _WINDOWS */
 
-		openlog("zabbix_suckerd", LOG_PID, LOG_USER);
-		setlogmask(LOG_UPTO(LOG_WARNING));
+		openlog(title_message, LOG_PID, LOG_DAEMON);
 
 #endif /* _WINDOWS */
 	}
@@ -141,7 +142,7 @@ int zabbix_open_log(int type, int level, const char *filename)
 		strscpy(log_filename,filename);
 		zbx_fclose(log_file);
 	}
-	else
+	else /* LOG_TYPE_UNDEFINED == type */
 	{
 		/* Not supported logging type */
 		/*
@@ -342,7 +343,7 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 				break;
 		}
 
-		zbx_wsnprintf(thread_id, sizeof(thread_id), TEXT("[%li]: "),
+		zbx_wsnprintf(thread_id, sizeof(thread_id)/sizeof(wchar_t), TEXT("[%li]: "),
 				zbx_get_thread_id());
 		strings[0] = thread_id;
 		strings[1] = zbx_utf8_to_unicode(message);
@@ -359,14 +360,35 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 			NULL);
 
 		zbx_free(strings[1]);
-
+		
 #else /* not _WINDOWS */
-
-		syslog(LOG_DEBUG, "%s", message);
+		
+		/* for nice printing into syslog */		
+		switch(level)
+		{
+			case LOG_LEVEL_CRIT:
+				syslog(LOG_CRIT, "%s", message);
+				break;
+			case LOG_LEVEL_ERR:
+				syslog(LOG_ERR, "%s", message);
+				break;
+			case LOG_LEVEL_WARNING:
+				syslog(LOG_WARNING, "%s", message);
+				break;
+			case LOG_LEVEL_DEBUG:
+				syslog(LOG_DEBUG, "%s", message);
+				break;
+			case LOG_LEVEL_INFORMATION:
+				syslog(LOG_INFO, "%s", message);
+				break;
+			default:
+				/* LOG_LEVEL_EMPTY - print nothing */
+				break;			
+		}
 
 #endif /* _WINDOWS */
 	}
-	else
+	else /* LOG_TYPE_UNDEFINED == log_type */
 	{
 		zbx_mutex_lock(&log_file_access);
 

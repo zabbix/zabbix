@@ -42,8 +42,15 @@ include_once('include/page_header.php');
 ?>
 <?php
 	if(isset($_REQUEST['css'])){
-		$css = '';
-		$sql = 'SELECT * FROM images WHERE imagetype=1';
+		$css= 'div.sysmap_iconid_0{'.
+				' height: 50px; '.
+				' width: 50px; '.
+				' background-image: url("images/general/no_icon.png"); }'."\n";
+
+		$sql = 'SELECT i.* '.
+				' FROM images i '.
+				' WHERE i.imagetype=1 '.
+					' AND '.dbin_node('i.imageid', false);
 		$res = DBselect($sql);
 		while($image = DBfetch($res)){
 //SDI($image['image']);
@@ -63,15 +70,24 @@ include_once('include/page_header.php');
 		print($css);
 	}
 	else if(isset($_REQUEST['iconid'])){
-		$image = get_image_by_imageid($_REQUEST['iconid']);
-		print($image['image']);
+		$iconid = get_request('iconid',0);
+
+		if($iconid > 0){
+			$image = get_image_by_imageid($iconid);
+			print($image['image']);
+		}
+		else{
+			$image = get_default_image(true);
+			ImageOut($image);
+		}
 	}
 	else if(isset($_REQUEST['imageid'])){
 		session_start();
 		$imageid = get_request('imageid',0);
-		if(isset($_SESSION['imageid'][$imageid])){
-			echo $_SESSION['imageid'][$imageid];
-			unset($_SESSION['imageid'][$imageid]);
+
+		if(isset($_SESSION['image_id'][$imageid])){
+			echo $_SESSION['image_id'][$imageid];
+			unset($_SESSION['image_id'][$imageid]);
 		}
 	}
 ?>

@@ -30,26 +30,11 @@ class CPie extends CGraphDraw{
 		$this->exploderad3d = 3;
 		$this->graphheight3d = 12;
 		$this->shiftlegendright = 17*7 + 7 + 10; // count of static chars * px/char + for color rectangle + space
-		$this->drawlegendallow = 1;
 	}
 
 /********************************************************************************************************/
 // PRE CONFIG:	ADD / SET / APPLY
 /********************************************************************************************************/
-
-	public function switchlegend($type=false){
-		if($type && is_numeric($type)){
-			$this->drawlegendallow = $type;
-			return $this->drawlegendallow;
-		}
-		else if($this->drawlegendallow == 0){
-			$this->drawlegendallow = 1;
-		}
-		else {
-			$this->drawlegendallow = 0;
-		}
-	return $this->drawlegendallow;
-	}
 
 	public function addItem($itemid, $calc_fnc=CALC_FNC_AVG,$color=null, $type=null, $periods_cnt=null){
 
@@ -277,7 +262,7 @@ class CPie extends CGraphDraw{
 			}
 
 			$this->sum += $item_value;
-			$strvaluelength = max($strvaluelength,strlen(convert_units($item_value,$this->items[$i]['unit'])));
+			$strvaluelength = max($strvaluelength,zbx_strlen(convert_units($item_value,$this->items[$i]['unit'])));
 		}
 
 		if(isset($graph_sum)) $this->sum = $graph_sum;
@@ -292,8 +277,8 @@ class CPie extends CGraphDraw{
 		$max_desc_len=0;
 
 		for($i=0;$i<$this->num;$i++){
-			if(strlen($this->items[$i]['host'])>$max_host_len)		$max_host_len=strlen($this->items[$i]['host']);
-			if(strlen($this->items[$i]['description'])>$max_desc_len)	$max_desc_len=strlen($this->items[$i]['description']);
+			if(zbx_strlen($this->items[$i]['host'])>$max_host_len)		$max_host_len=zbx_strlen($this->items[$i]['host']);
+			if(zbx_strlen($this->items[$i]['description'])>$max_desc_len)	$max_desc_len=zbx_strlen($this->items[$i]['description']);
 		}
 
 		for($i=0;$i<$this->num;$i++){
@@ -556,9 +541,9 @@ class CPie extends CGraphDraw{
 		$this->fullSizeX = $this->sizeX;
 		$this->fullSizeY = $this->sizeY;
 
-		if(($this->sizeX < 300) || ($this->sizeY < 200)) $this->switchlegend(0);
+		if(($this->sizeX < 300) || ($this->sizeY < 200)) $this->showLegend(0);
 
-		if($this->drawlegendallow == 1){
+		if($this->drawLegend == 1){
 			$this->sizeX -= ($this->shiftXleft+$this->shiftXright+$this->shiftlegendright);
 			$this->sizeY -= ($this->shiftY+$this->shiftYLegend+12*$this->num+8);
 		}
@@ -639,7 +624,7 @@ class CPie extends CGraphDraw{
 		}
 
 		$this->drawLogo();
-		if($this->drawlegendallow == 1)	$this->drawLegend();
+		if($this->drawLegend == 1)	$this->drawLegend();
 
 		$str=sprintf("%0.2f",(getmicrotime()-$start_time));
 		imagestring($this->im, 0,$this->fullSizeX-210,$this->fullSizeY-12,'Data from '.$this->dataFrom.'. Generated in '.$str.' sec', $this->getColor('Gray'));

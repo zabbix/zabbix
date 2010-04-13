@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,45 +20,55 @@
 var CSwitcher = Class.create();
 
 CSwitcher.prototype = {
-
-switchers_name : '',
+initProc: null,		// on if init method is running
+switcherName : '',
 switchers : {},
-imgOpened : 'images/general/opened.gif',  
-imgClosed : 'images/general/closed.gif',
+classOpened : 'filteropened',
+classClosed : 'filterclosed',
 
 initialize : function(name){
-	this.switchers_name = name;
-	
-	var element = $(this.switchers_name);
+	this.init = true;
+	this.switcherName = name;
 
-	if(!is_null(element))
+	var element = $(this.switcherName);
+
+	if(!is_null(element)){
 		addListener(element, 'click', this.showHide.bindAsEventListener(this));
+
+		var state_all = cookie.read(this.switcherName+'_all');
+		if(!is_null(state_all)){
+			if(state_all == 1){
+				element.className = this.classOpened;
+			}
+		}
+	}
 	
 	var divs = $$('div[data-switcherid]');
+
 	for(var i=0; i<divs.length; i++){
 		if(!isset(i, divs)) continue;
+
 		addListener(divs[i], 'click', this.showHide.bindAsEventListener(this));
 		
-		var switcherid = $(divs[i]).readAttribute('data-switcherid');
+		var switcherid = divs[i].getAttribute('data-switcherid');
 		this.switchers[switcherid] = {};
 		this.switchers[switcherid]['object'] = divs[i];
-
 	}
 		
-	if((to_change = cookie.readArray(this.switchers_name)) != null){
+	if((to_change = cookie.readArray(this.switcherName)) != null){
 		for(var i=0; i<to_change.length; i++){
 			if(!isset(i, to_change)) continue;
 
 			this.open(to_change[i]);
 		}	
 	}
-
+	
+	this.init = false;
 },
 
 open : function(switcherid){
-
 	if(isset(switcherid, this.switchers)){
-		$(this.switchers[switcherid]['object']).firstDescendant().writeAttribute('src', this.imgOpened);
+		$(this.switchers[switcherid]['object']).className = this.classOpened;
 		var elements = $$('tr[data-parentid='+switcherid+']');
 		for(var i=0; i<elements.length; i++){
 			if(!isset(i, elements)) continue;
@@ -66,45 +76,43 @@ open : function(switcherid){
 		}
 		
 		this.switchers[switcherid]['state'] = 1;
-		
-		this.storeCookie();
+
+		if(this.init === false) this.storeCookie();
 	}
 },
 
 showHide : function(e){
-//	var e = event || e;
-	var obj = e.currentTarget;
+	PageRefresh.restart();
 
-	var switcherid = $(obj).readAttribute('data-switcherid');
+	var obj = eventTarget(e);
+	var switcherid = obj.getAttribute('data-switcherid');
 
-	var img = $(obj).firstDescendant();
-	
-	if(img.readAttribute('src') == this.imgClosed){
+	if(obj.className == this.classClosed){
 		var state = 1;
-		var newImgPath = this.imgOpened;
-		var oldImgPath = this.imgClosed;
+		var newClassName = this.classOpened;
+		var oldClassName = this.classClosed;
 	}
 	else{
 		var state = 0;
-		var newImgPath = this.imgClosed;
-		var oldImgPath = this.imgOpened;
+		var newClassName = this.classClosed;
+		var oldClassName = this.classOpened;
 	}
-	img.writeAttribute('src', newImgPath);
-	
-	
+	obj.className = newClassName;
+
 	if(empty(switcherid)){
-		var imgs = $$('img[src='+oldImgPath+']');
-		for(var i=0; i < imgs.length; i++){
-			if(empty(imgs[i])) continue;
-			imgs[i].src = newImgPath;
+		cookie.create(this.switcherName+'_all', state);
+
+		var divs = $$('div.'+oldClassName);
+		for(var i=0; i < divs.length; i++){
+			if(empty(divs[i])) continue;
+			divs[i].className = newClassName;
 		}
 	}
 	
 	var elements = $$('tr[data-parentid]');
-
 	for(var i=0; i<elements.length; i++){
 		if(empty(elements[i])) continue;
-		
+
 		if(empty(switcherid) || elements[i].getAttribute('data-parentid') == switcherid){
 			if(state){
 				elements[i].style.display = '';
@@ -127,8 +135,7 @@ showHide : function(e){
 },
 
 storeCookie : function(){
-
-	cookie.erase(this.switchers_name);
+//	cookie.erase(this.switcherName);
 	
 	var storeArray = new Array();
 	
@@ -138,11 +145,6 @@ storeCookie : function(){
 		}
 	}
 
-	cookie.createArray(this.switchers_name, storeArray);
-},
-
-
+	cookie.createArray(this.switcherName, storeArray);
 }
-
-
-
+}

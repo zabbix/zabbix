@@ -298,33 +298,33 @@ function shedule2str($timeperiod){
 	if($timeperiod['minute'] < 10)	$timeperiod['minute']='0'.$timeperiod['minute'];
 
 
-	$str = 'At '.$timeperiod['hour'].':'.$timeperiod['minute'].' on ';
+	$str = S_AT.SPACE.$timeperiod['hour'].':'.$timeperiod['minute'].SPACE.S_ON_SMALL.SPACE;
 
 	if($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME){
-		$str= 'At '.date('H',$timeperiod['start_date']).':'.date('i',$timeperiod['start_date']).' on '.date(S_DATE_FORMAT_YMD,$timeperiod['start_date']);
+		$str = S_AT.SPACE.date('H',$timeperiod['start_date']).':'.date('i',$timeperiod['start_date']).SPACE.S_ON_SMALL.SPACE.date(S_DATE_FORMAT_YMD,$timeperiod['start_date']);
 	}
 	else if($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_DAILY){
-		$str.= 'every '.(($timeperiod['every']>1)?$timeperiod['every'].' days':'day');
+		$str .= S_EVERY_SMALL.SPACE.(($timeperiod['every'] > 1) ? $timeperiod['every'].SPACE.S_DAYS_SMALL : S_DAY_SMALL);
 	}
 	else if($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_WEEKLY){
 		$days = '';
 
 		$dayofweek = zbx_num2bitstr($timeperiod['dayofweek'],true);
-		$length = strlen($dayofweek);
+		$length = zbx_strlen($dayofweek);
 		for($i=0; $i < $length; $i++){
 			if($dayofweek[$i] == 1){
 				if(!zbx_empty($days)) $days.=', ';
 				$days.= get_str_dayofweek($i+1);
 			}
 		}
-		$str.= 'every '.$days.' of every '.(($timeperiod['every']>1)?$timeperiod['every'].' weeks':'week');
+		$str.= S_EVERY_SMALL.SPACE.$days.SPACE.S_OF_EVERY_SMALL.SPACE.(($timeperiod['every']>1)?$timeperiod['every'].SPACE.S_WEEKS_SMALL:S_WEEK_SMALL);
 	}
 	else if($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY){
 		$months = '';
 
 
 		$month = zbx_num2bitstr($timeperiod['month'],true);
-		$length = strlen($month);
+		$length = zbx_strlen($month);
 		for($i=0; $i < $length; $i++){
 			if($month[$i] == 1){
 				if(!zbx_empty($months)) $months.=', ';
@@ -335,7 +335,7 @@ function shedule2str($timeperiod){
 		if($timeperiod['dayofweek']>0){
 			$days = '';
 			$dayofweek = zbx_num2bitstr($timeperiod['dayofweek'],true);
-			$length = strlen($dayofweek);
+			$length = zbx_strlen($dayofweek);
 			for($i=0; $i < $length; $i++){
 				if($dayofweek[$i] == 1){
 					if(!zbx_empty($days)) $days.=', ';
@@ -352,10 +352,10 @@ function shedule2str($timeperiod){
 				case 5: $every = S_LAST; break;
 			}
 
-			$str.= $every.SPACE.$days.' of every '.$months;
+			$str.= $every.SPACE.$days.SPACE.S_OF_EVERY_SMALL.SPACE.$months;
 		}
 		else{
-			$str.= 'day '.$timeperiod['day'].' of every '.$months;
+			$str.= S_DAY_SMALL.SPACE.$timeperiod['day'].SPACE.S_OF_EVERY_SMALL.SPACE.$months;
 		}
 	}
 return $str;

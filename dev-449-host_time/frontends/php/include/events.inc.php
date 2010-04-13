@@ -293,6 +293,11 @@ function make_small_eventlist($eventid, $trigger_data){
 		$lclock = $clock;
 		$clock = $event['clock'];
 		$duration = zbx_date2age($lclock, $clock);
+		if($curevent['eventid'] == $event['eventid'] && ($nextevent = get_next_event($event))) {
+			$duration = zbx_date2age($nextevent['clock'], $clock);
+		}else if($curevent['eventid'] == $event['eventid']) {
+			$duration = zbx_date2age($clock);
+		}
 
 		$value = new CCol(trigger_value2str($event['value']), get_trigger_value_style($event['value']));
 
@@ -341,7 +346,7 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 				' AND object='.EVENT_OBJECT_TRIGGER.
 				' AND objectid='.$triggerid.
 			' ORDER BY eventid DESC';
-	$db_events = DBselect($sql, 20);
+	$db_events = DBselect($sql, ZBX_POPUP_MAX_ROWS);
 
 	$count = 0;
 	while($event = DBfetch($db_events)){
@@ -388,7 +393,7 @@ function get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0){
 	global $USER_DETAILS;
 	$config = select_config();
 
-	$hide_unknown = get_profile('web.events.filter.hide_unknown',0);
+	$hide_unknown = CProfile::get('web.events.filter.hide_unknown',0);
 
 	$sql_from = $sql_cond = '';
 

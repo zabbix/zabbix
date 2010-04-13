@@ -70,47 +70,68 @@ function action_accessible($actionid,$perm){
 function check_permission_for_action_conditions($conditions){
 	global $USER_DETAILS;
 
-	$result = true;
+	if(USER_TYPE_SUPER_ADMIN == $USER_DETAILS['type']) return true;
 
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
-	$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,null,get_current_nodeid(true));
+	$groupids = array();
+	$hostids = array();
+	$triggerids = array();
 
 	foreach($conditions as $ac_data){
 		if($ac_data['operator'] != 0) continue;
 
 		switch($ac_data['type']){
 			case CONDITION_TYPE_HOST_GROUP:
-				if(!isset($available_groups[$ac_data['value']])){
-					error(S_INCORRECT_GROUP);
-					$result = false;
-				}
+				$groupids[$ac_data['value']] = $ac_data['value'];
 				break;
 			case CONDITION_TYPE_HOST:
 			case CONDITION_TYPE_HOST_TEMPLATE:
-				if(!isset($available_hosts[$ac_data['value']])){
-					error(S_INCORRECT_HOST);
-					$result = false;
-				}
+				$hostids[$ac_data['value']] = $ac_data['value'];
 				break;
 			case CONDITION_TYPE_TRIGGER:
-				$sql = 'SELECT DISTINCT t.triggerid'.
-						' FROM triggers t,items i,functions f '. //,events e'.
-						' WHERE t.triggerid='.$ac_data['value'].
-							' AND f.triggerid=t.triggerid'.
-							' AND i.itemid=f.itemid '.
-							' AND '.DBcondition('i.hostid',$available_hosts, true);
-//								' AND e.eventid='.$ac_data['value'].
-//								' AND t.triggerid=e.objectid';
-
-				if(DBfetch(DBselect($sql,1))){
-					error(S_INCORRECT_TRIGGER);
-					$result = false;
-				}
+				$triggerids[$ac_data['value']] = $ac_data['value'];
 				break;
 		}
-		if(!$result) break;
 	}
-	return $result;
+
+	$options = array(
+		'groupids' => $groupids,
+		'editable' => 1
+	);
+
+	try{
+		$groups = CHostgroup::get($options);
+		$groups = zbx_toHash($groups, 'groupid');
+		foreach($groupids as $hgnum => $groupid){
+			if(!isset($groups[$groupid])) throw new Exception(S_INCORRECT_GROUP);
+		}
+
+		$options = array(
+			'hostids' => $hostids,
+			'editable' => 1
+		);
+		$hosts = CHost::get($options);
+		$hosts = zbx_toHash($hosts, 'hostid');
+		foreach($hostids as $hnum => $hostid){
+			if(!isset($hosts[$hostid])) throw new Exception(S_INCORRECT_HOST);
+		}
+
+		$options = array(
+			'triggerids' => $triggerids,
+			'editable' => 1
+		);
+		$triggers = CTrigger::get($options);
+		$triggers = zbx_toHash($triggers, 'triggerid');
+		foreach($triggerids as $hnum => $triggerid){
+			if(!isset($triggers[$triggerid])) throw new Exception(S_INCORRECT_TRIGGER);
+		}
+	}
+	catch(Exception $e){
+//		throw new Exception($e->getMessage());
+//		error($e->getMessage());
+		return false;
+	}
+
+return true;
 }
 
 function get_action_by_actionid($actionid){
@@ -265,7 +286,9 @@ return $actionid;
 
 // Update Action
 
-function update_action($actionid, $name, $eventsource, $esc_period, $def_shortdata, $def_longdata, $recovery_msg, $r_shortdata, $r_longdata, $evaltype, $status, $conditions, $operations){
+function update_action($actionid, $name, $eventsource, $esc_period, $def_shortdata, 
+		$def_longdata, $recovery_msg, $r_shortdata, $r_longdata, $evaltype, $status, $conditions, $operations
+		){
 
 	if(!is_array($conditions) || count($conditions) == 0){
 		/*
@@ -274,8 +297,7 @@ function update_action($actionid, $name, $eventsource, $esc_period, $def_shortda
 		*/
 	}
 	else{
-		if(!check_permission_for_action_conditions($conditions))
-			return false;
+		if(!check_permission_for_action_conditions($conditions)) return false;
 
 		foreach($conditions as $condition)
 			if( !validate_condition($condition['type'],$condition['value']) ) return false;
@@ -334,6 +356,7 @@ function delete_action( $actionid ){
 
 	$opers = get_operations_by_actionid($actionid);
 	while($operation = DBFetch($opers)){
+		DBexecute('DELETE FROM opmediatypes WHERE operationid='.$operation['operationid']);
 		DBexecute('DELETE FROM opconditions WHERE operationid='.$operation['operationid']);
 	}
 
@@ -972,19 +995,19 @@ function validate_commands($commands){
 		$cmd = trim($cmd, "\x00..\x1F");
 //		if(!ereg("^(({HOSTNAME})|".ZBX_EREG_INTERNAL_NAMES.")(:|#)[[:print:]]*$",$cmd,$cmd_items)){
 		if(!preg_match("/^(({HOSTNAME})|".ZBX_PREG_INTERNAL_NAMES.")(:|#)[".ZBX_PREG_PRINT."]*$/", $cmd, $cmd_items)){
-			error("Incorrect command: '$cmd'");
+			error(S_INCORRECT_COMMAND.": '$cmd'");
 			return FALSE;
 		}
 
-		if($cmd_items[4] == "#"){ // group
-			if(!DBfetch(DBselect("select groupid from groups where name=".zbx_dbstr($cmd_items[1])))){
-				error("Unknown group name: '".$cmd_items[1]."' in command ".$cmd."'");
+		if($cmd_items[4] == '#'){ // group
+			if(!DBfetch(DBselect('select groupid from groups where name='.zbx_dbstr($cmd_items[1])))){
+				error(S_UNKNOWN_GROUP_NAME.": '".$cmd_items[1]."' ".S_IN_COMMAND_SMALL." '".$cmd."'");
 				return FALSE;
 			}
 		}
-		else if($cmd_items[4] == ":"){ // host
-			if(($cmd_items[1] != '{HOSTNAME}') && !DBfetch(DBselect("select hostid from hosts where host=".zbx_dbstr($cmd_items[1])))){
-				error("Unknown host name '".$cmd_items[1]."' in command '".$cmd."'");
+		else if($cmd_items[4] == ':'){ // host
+			if(($cmd_items[1] != '{HOSTNAME}') && !DBfetch(DBselect('select hostid from hosts where host='.zbx_dbstr($cmd_items[1])))){
+				error(S_UNKNOWN_HOST_NAME.": '".$cmd_items[1]."' ".S_IN_COMMAND_SMALL." '".$cmd."'");
 				return FALSE;
 			}
 		}

@@ -28,18 +28,20 @@ class CHTTP_request{
 			$this->add_headers = array_merge($this->add_headers, $add_headers);
 		}
 
-	if (isset($_SERVER['HTTP_METHOD'])) {
+		if (isset($_SERVER['HTTP_METHOD'])) {
 			$this->method = $_SERVER['HTTP_METHOD'];
 			unset($_SERVER['HTTP_METHOD']);
-		} else {
+		}
+		else {
 			$this->method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : false;
 		}
+
 		$this->protocol = isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : false;
 		$this->request_method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : false;
 
 		$this->headers = array();
 		foreach($_SERVER as $i=>$val) {
-			if (strpos($i, 'HTTP_') === 0 || in_array($i, $this->add_headers)) {
+			if (zbx_strpos($i, 'HTTP_') === 0 || in_array($i, $this->add_headers)) {
 				$name = str_replace(array('HTTP_', '_'), array('', '-'), $i);
 				$this->headers[$name] = $val;
 			}
@@ -65,7 +67,7 @@ class CHTTP_request{
 	* @param string Case-Insensitive HTTP Header Name (eg: "User-Agent")
 	*/
 	function header($name) {
-		$name = strtoupper($name);
+		$name = zbx_strtoupper($name);
 		return isset($this->headers[$name]) ? $this->headers[$name] : false;
 	}
 
