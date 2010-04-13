@@ -115,13 +115,13 @@ class CImage extends CZBXAPI{
 			$sql_parts['where']['sm'] = DBcondition('sm.sysmapid', $options['sysmapids']);
 			$sql_parts['where']['smse'] = 'sm.sysmapid=se.sysmapid ';
 			$sql_parts['where']['se'] = '('.
-								'se.iconid_off=i.imageid'.
-								' OR se.iconid_on=i.imageid'.
-								' OR se.iconid_unknown=i.imageid'.
-								' OR se.iconid_disabled=i.imageid'.
-								' OR se.iconid_maintenance=i.imageid'.
-							')'.
-							' OR sm.backgroundid=i.imageid';
+				'se.iconid_off=i.imageid'.
+				' OR se.iconid_on=i.imageid'.
+				' OR se.iconid_unknown=i.imageid'.
+				' OR se.iconid_disabled=i.imageid'.
+				' OR se.iconid_maintenance=i.imageid'.
+				' OR sm.backgroundid=i.imageid'.
+				')';
 		}
 
 // output
