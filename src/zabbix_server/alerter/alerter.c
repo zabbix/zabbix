@@ -122,7 +122,6 @@ int execute_action(DB_ALERT *alert,DB_MEDIATYPE *mediatype, char *error, int max
 
 /*			if(-1 == execl(full_path,mediatype->exec_path,alert->sendto,alert->subject,alert->message,(char *)0))*/
 			if(-1 == execle(full_path,mediatype->exec_path,alert->sendto,alert->subject,alert->message,(char *)0, zbxenv))
-
 			{
 				zabbix_log( LOG_LEVEL_ERR, "Error executing [%s] [%s]",
 					full_path,
@@ -155,7 +154,7 @@ int execute_action(DB_ALERT *alert,DB_MEDIATYPE *mediatype, char *error, int max
 			alert->alertid);
 		zbx_snprintf(error,max_error_len,"Unsupported media type [%d]",
 			mediatype->type);
-		res=FAIL;
+		res = FAIL;
 	}
 
 	zabbix_log( LOG_LEVEL_DEBUG, "End execute_action()");

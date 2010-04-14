@@ -111,6 +111,7 @@ static void	add_trigger_info(DB_EVENT *event)
 				zabbix_log(LOG_LEVEL_DEBUG,"Skip actions");
 				event->skip_actions = 1;
 			}
+			break;
 		case	TRIGGER_TYPE_MULTIPLE_TRUE:
 			if(	(event->value == TRIGGER_VALUE_UNKNOWN) ||
 /*				(event_prev_status == TRIGGER_VALUE_TRUE && event_last_status == TRIGGER_VALUE_UNKNOWN && event->value == TRIGGER_VALUE_TRUE) ||*/
@@ -121,6 +122,7 @@ static void	add_trigger_info(DB_EVENT *event)
 				zabbix_log(LOG_LEVEL_DEBUG,"Skip actions");
 				event->skip_actions = 1;
 			}
+			break;
 		}
 	}
 }
@@ -172,6 +174,7 @@ int	process_event(DB_EVENT *event)
 
 	if (0 == event->eventid)
 		event->eventid = DBget_maxid("events", "eventid");
+
 	DBexecute("insert into events (eventid,source,object,objectid,clock,value)"
 			" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d)",
 			event->eventid,

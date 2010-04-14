@@ -1220,12 +1220,27 @@ int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64
 {
 	zbx_uint64_t	escalationid;
 
-	/* removing older active escalations */
+	/* remove older active escalations... */
 	DBexecute("delete from escalations"
 			" where actionid=" ZBX_FS_UI64
-				" and triggerid=" ZBX_FS_UI64,
+				" and triggerid=" ZBX_FS_UI64
+				" and (esc_step<>0 or (status<>%d and status<>%d)",
 			actionid,
-			triggerid);
+			triggerid,
+			ESCALATION_STATUS_ACTIVE,
+			ESCALATION_STATUS_SUPERSEDED);
+
+	/* ...except we should execute an escalation at least once before it is removed */
+	DBexecute("update escalations"
+			" set status=%d"
+			" where actionid=" ZBX_FS_UI64
+				" and triggerid=" ZBX_FS_UI64
+				" and esc_step=0"
+				" and status=%d",
+			ESCALATION_STATUS_SUPERSEDED,
+			actionid,
+			triggerid,
+			ESCALATION_STATUS_ACTIVE);
 
 	escalationid = DBget_maxid("escalations", "escalationid");
 
