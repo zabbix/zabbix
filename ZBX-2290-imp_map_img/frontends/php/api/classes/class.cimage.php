@@ -367,7 +367,7 @@ class CImage extends CZBXAPI{
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_PARSE_SQL_ERROR.' ['.$e['message'].']'.SPACE.S_IN_SMALL.SPACE.'['.$e['sqltext'].']');
 					}
 
-					oci_bind_by_name($stmt, ':imgdata', $image['image']);
+					oci_bind_by_name($stmt, ':imgdata', $image['image'], -1, OCI_B_BLOB);
 					if(!oci_execute($stmt)){
 						$e = oci_error($stid);
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_EXECUTE_SQL_ERROR.SPACE.'['.$e['message'].']'.SPACE.S_IN_SMALL.SPACE.'['.$e['sqltext'].']');
