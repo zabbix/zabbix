@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -6357,9 +6357,9 @@
 			$backgroundid	= $row['backgroundid'];
 			$label_type	= $row['label_type'];
 			$label_location	= $row['label_location'];
-			$highlight = ($row['highlight']%2);
-			
-			$expproblem = ($row['highlight'] > 1) ? 0 : 1;
+			$highlight = ($row['highlight'] & 1) ? 1: 0;
+			$markelements = ($row['highlight'] & 4) ? 1 : 0;
+			$expproblem = ($row['highlight'] & 2) ? 0 : 1;
 		}
 		else{
 			$name		= get_request('name','');
@@ -6369,8 +6369,8 @@
 			$label_type	= get_request('label_type',0);
 			$label_location	= get_request('label_location',0);
 			$highlight = get_request('highlight',0);
-			
-			$expproblem = isset($_REQUEST['form_refresh']) ? get_request('expproblem',0) : 1;
+			$markelements = get_request('markelements',0);
+			$expproblem = get_request('expproblem',0);
 		}
 
 		$frmMap = new CFormTable($frm_title,'sysmaps.php');
@@ -6397,8 +6397,11 @@
 		$frmMap->addRow(S_BACKGROUND_IMAGE,$cmbImg);
 
 		$frmMap->addRow(S_ICON_HIGHLIGHTING, new CCheckBox('highlight',$highlight,null,1));
+
+		$frmMap->addRow(S_MARK_ELEMENTS_ON_TRIGGER_STATUS_CHANGE, new CCheckBox('markelements',$markelements,null,1));
 		
 		$frmMap->addRow(S_EXPAND_SINGLE_PROBLEM, new CCheckBox('expproblem',$expproblem,null,1));
+
 
 		$cmbLabel = new CComboBox('label_type',$label_type);
 		$cmbLabel->addItem(0,S_LABEL);

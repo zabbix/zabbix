@@ -53,6 +53,7 @@ include_once('include/page_header.php');
 		'height'=>			array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
 		'backgroundid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,				'isset({save})'),
 		'expproblem'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
+		'markelements'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
 		'highlight'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
 		'label_type'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,4),		'isset({save})'),
 		'label_location'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,3),		'isset({save})'),
@@ -140,6 +141,7 @@ include_once('include/page_header.php');
 		if(isset($_REQUEST["sysmapid"])){
 // TODO check permission by new value.
 			$_REQUEST['highlight'] = get_request('highlight', 0);
+			$_REQUEST['markelements'] = get_request('markelements', 0);
 			$_REQUEST['expproblem'] = get_request('expproblem', 0);
 
 			$map = array(
@@ -153,7 +155,8 @@ include_once('include/page_header.php');
 					'label_location' => $_REQUEST['label_location']
 				);
 
-			if($_REQUEST['expproblem'] == 0) $map['highlight']+=2;
+			if($_REQUEST['markelements'] == 1) $map['highlight'] = $map['highlight'] | 4;
+			if($_REQUEST['expproblem'] == 0) $map['highlight'] = $map['highlight'] | 2;
 
 			DBstart();
 			$result = CMap::update($map);
@@ -323,7 +326,9 @@ include_once('include/page_header.php');
 	}
 	
 	$map_wdgt->show();
-
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>

@@ -229,8 +229,8 @@ function make_event_details($eventid){
 
 	$table = new CTableInfo();
 
-	$table->AddRow(array(S_EVENT, expand_trigger_description($event['triggerid'])));
-	$table->AddRow(array(S_TIME, date('Y.M.d H:i:s',$event['clock'])));
+	$table->addRow(array(S_EVENT, expand_trigger_description($event['triggerid'])));
+	$table->addRow(array(S_TIME, date('Y.M.d H:i:s',$event['clock'])));
 
 	$duration = zbx_date2age($event['clock']);
 	if($next_event = get_next_event($event)){
@@ -260,9 +260,9 @@ function make_event_details($eventid){
 			);
 	}
 
-	$table->AddRow(array(S_STATUS, $value));
-	$table->AddRow(array(S_DURATION, $duration));
-	$table->AddRow(array(S_ACKNOWLEDGED, $ack));
+	$table->addRow(array(S_STATUS, $value));
+	$table->addRow(array(S_DURATION, $duration));
+	$table->addRow(array(S_ACKNOWLEDGED, $ack));
 
 return $table;
 }
@@ -277,25 +277,32 @@ function make_small_eventlist($eventid, $trigger_data){
 
 	$curevent = CEvent::get(array('eventids' => $eventid, 'extendoutput' => 1, 'select_triggers' => 1));
 	$curevent = reset($curevent);
+	
+	$clock = $curevent['clock'];
 
-	$events = CEvent::get(array(
-		'time_till' => $curevent['clock'],
+	$options = array(
 		'triggerids' => $trigger_data['triggerid'],
-		'extendoutput' => 1,
+		'time_till' => $curevent['clock'],
+		'select_triggers' => API_OUTPUT_EXTEND,
+		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'clock',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => 20
-	));
+	);
+	$events = CEvent::get($options);
 
-	$clock = $curevent['clock'];
+	foreach($events as $enum => $event){
+		$trigger = reset($event['triggers']);
 
-	foreach($events as $eventid => $event){
+		$event['type'] = $trigger['type'];
+		
 		$lclock = $clock;
 		$clock = $event['clock'];
 		$duration = zbx_date2age($lclock, $clock);
 		if($curevent['eventid'] == $event['eventid'] && ($nextevent = get_next_event($event))) {
 			$duration = zbx_date2age($nextevent['clock'], $clock);
-		}else if($curevent['eventid'] == $event['eventid']) {
+		}
+		else if($curevent['eventid'] == $event['eventid']) {
 			$duration = zbx_date2age($clock);
 		}
 
@@ -470,7 +477,7 @@ function get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0){
 		$row = zbx_array_merge($triggers[$row['triggerid']],$row);
 		if((1 == $hide_unknown) && (!event_initial_time($row,$hide_unknown))) continue;
 
-		$table->AddRow(array(
+		$table->addRow(array(
 			date("Y.M.d H:i:s",$row["clock"]),
 			get_node_name_by_elid($row['triggerid']),
 			($hostid == 0)?$row['host']:null,
