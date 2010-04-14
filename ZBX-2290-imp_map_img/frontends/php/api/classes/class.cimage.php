@@ -200,7 +200,6 @@ class CImage extends CZBXAPI{
 					$sql_where.
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
-	sdi($sql);
 		while($image = DBfetch($res)){
 			if($options['count'])
 				$result = $image;
