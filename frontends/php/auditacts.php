@@ -169,6 +169,7 @@ include_once('include/page_header.php');
 	$alerts = CAlert::get($options);
 
 // get first event for selected filters, to get starttime for timeline bar
+	unset($options['userids']);
 	unset($options['time_from']);
 	unset($options['time_till']);
 	unset($options['select_mediatypes']);
@@ -230,14 +231,12 @@ include_once('include/page_header.php');
 // NAV BAR
 	$timeline = array(
 		'period' => $effectiveperiod,
-		'starttime' => $starttime,
+		'starttime' => date('YmdHi', $starttime),
 		'usertime' => null
 	);
 
 	if(isset($_REQUEST['stime'])){
-		$bstime = $_REQUEST['stime'];
-		$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
-		$timeline['usertime'] += $timeline['period'];
+		$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 	}
 
 	$dom_graph_id = 'events';

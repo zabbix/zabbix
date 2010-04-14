@@ -1137,7 +1137,7 @@ class CChart extends CGraphDraw{
 
 // DayLightSave
 			if($interval > 3600){
-				$tz = date('Z',$this->to_time) - date('Z',$new_time);
+				$tz = date('Z',$this->from_time) - date('Z',$new_time);
 				$new_time+=$tz;
 			}
 

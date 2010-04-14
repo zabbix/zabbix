@@ -4,6 +4,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2283] fixed incorrect time calculating in slidebar (Aly)
  - [ZBX-2261] fixed username hiding in acknowledge comments (AM)
  - [ZBX-2305] fixed actions getting lost in an event-busy environment (asaveljevs)
  - [ZBX-2303] fixed GET/POST methods in processing web scenario steps. Thanks to Hannu Ylitalo (Sasha)
