@@ -358,9 +358,12 @@ class CImage extends CZBXAPI{
 				);
 
 				if($DB['TYPE'] == 'ORACLE'){
-					$values['image'] = ':imgdata';
+					$values['image'] = 'EMPTY_BLOB()';
 					
-					$sql = 'INSERT INTO images ('.implode(' ,', array_keys($values)).') VALUES ('.implode(',', $values).')';
+					$lob = oci_new_descriptor($DB['DB'], OCI_D_LOB);
+
+					$sql = 'INSERT INTO images ('.implode(' ,', array_keys($values)).') VALUES ('.implode(',', $values).')'.
+						' returning image into :imgdata';
 					$stmt = oci_parse($DB['DB'], $sql);
 					if(!$stmt){
 						$e = oci_error($stmt);
