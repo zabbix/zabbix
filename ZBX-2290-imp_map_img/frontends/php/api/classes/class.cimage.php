@@ -107,21 +107,19 @@ class CImage extends CZBXAPI{
 // sysmapids
 		if(!is_null($options['sysmapids'])){
 			zbx_value2array($options['sysmapids']);
-			$sql_parts['select']['sm'] = 'sm.sysmapid';
 
-			$sql_parts['from']['sm'] = 'sysmaps sm';
-			$sql_parts['from']['se'] = 'sysmaps_elements se';
-
-			$sql_parts['where']['sm'] = DBcondition('sm.sysmapid', $options['sysmapids']);
-			$sql_parts['where']['smse'] = 'sm.sysmapid=se.sysmapid ';
-			$sql_parts['where']['se'] = '('.
-				'se.iconid_off=i.imageid'.
-				' OR se.iconid_on=i.imageid'.
-				' OR se.iconid_unknown=i.imageid'.
-				' OR se.iconid_disabled=i.imageid'.
-				' OR se.iconid_maintenance=i.imageid'.
-				' OR sm.backgroundid=i.imageid'.
-				')';
+			$sql_parts['where'][] = 'EXISTS('.
+				' SELECT ii.imageid'.
+				' FROM images ii,sysmaps sm,sysmaps_elements se'.
+				' WHERE i.imageid=ii.imageid'.
+					' AND '.DBcondition('sm.sysmapid', $options['sysmapids']).
+					' AND sm.sysmapid=se.sysmapid'.
+					' AND (se.iconid_off=ii.imageid'.
+						' OR se.iconid_on=ii.imageid'.
+						' OR se.iconid_unknown=ii.imageid'.
+						' OR se.iconid_disabled=ii.imageid'.
+						' OR se.iconid_maintenance=ii.imageid'.
+						' OR sm.backgroundid=ii.imageid))';
 		}
 
 // output
@@ -202,6 +200,7 @@ class CImage extends CZBXAPI{
 					$sql_where.
 				$sql_order;
 		$res = DBselect($sql, $sql_limit);
+	sdi($sql);
 		while($image = DBfetch($res)){
 			if($options['count'])
 				$result = $image;
