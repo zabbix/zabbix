@@ -317,7 +317,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 	}
 	if(CURLE_OK != (err = curl_easy_setopt(easyhandle,CURLOPT_HEADERFUNCTION ,HEADERFUNCTION2)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLOPT_WRITEFUNCTION [%s]",
+		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLOPT_HEADERFUNCTION [%s]",
 			curl_easy_strerror(err));
 		(void)curl_easy_cleanup(easyhandle);
 		return;
@@ -399,8 +399,14 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 				httpstep.name);
 
 		if ('\0' != *httpstep.posts)
+		{
 			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: use post [%s]",
 					httpstep.posts);
+
+			curl_easy_setopt(easyhandle, CURLOPT_POST, 1);
+		}
+		else
+			curl_easy_setopt(easyhandle, CURLOPT_POST, 0);
 
 		if (NULL == err_str)
 		{
