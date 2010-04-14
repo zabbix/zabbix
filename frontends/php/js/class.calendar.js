@@ -276,7 +276,7 @@ setSDateFromOuterObj: function(){
 	}
 	
 	if(!is_null(this.clndr_utime_field)){
-		this.clndr_utime_field.value = parseInt(this.sdt.getTime()/1000);
+		this.clndr_utime_field.value = this.sdt.getZBXDate();
 //alert(this.clndr_utime_field.value);
 	}
 	
@@ -396,7 +396,7 @@ setDateToOuterObj: function(){
 	}
 	
 	if(!is_null(this.clndr_utime_field)){
-		this.clndr_utime_field.value = parseInt(this.sdt.getTime()/1000);
+		this.clndr_utime_field.value = this.sdt.getZBXDate();
 //alert(this.clndr_utime_field.value);
 	}
 },
@@ -478,7 +478,7 @@ yearup: function(){
 
 yeardown: function(){
 	
-	if((this.year-1) < 1971){  // shouldn't be lower
+	if((this.year-1) < 1970){  // shouldn't be lower
 		return ;
 	}
 

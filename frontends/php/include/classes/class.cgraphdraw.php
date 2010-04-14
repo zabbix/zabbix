@@ -181,8 +181,11 @@ class CGraphDraw{
 	}
 
 	public function setSTime($stime){
-		if($stime>200000000000 && $stime<220000000000){
-			$this->stime=mktime(substr($stime,8,2),substr($stime,10,2),0,substr($stime,4,2),substr($stime,6,2),substr($stime,0,4));
+		if($stime>190000000000 && $stime<210000000000){
+			$this->stime = zbxDateToTime($stime);
+		}
+		else{
+			$this->stime=$stime;
 		}
 	}
 
