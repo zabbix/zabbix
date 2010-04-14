@@ -1050,17 +1050,18 @@ include_once('include/page_header.php');
 		$table->setHeader($header);
 		
 		$options = array(
-				'nodeids' => $nodeid,
-				'hostids' => $hostid,
-				'output' => API_OUTPUT_EXTEND,
-				'select_hosts' => API_OUTPUT_EXTEND,
-				'templated' => 0,
-				'filter' => array(
-					'value_type' => array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64),
-					'status' => ITEM_STATUS_ACTIVE
-				),
-				'sortfield'=>'description'
-			);
+			'nodeids' => $nodeid,
+			'hostids' => $hostid,
+			'output' => API_OUTPUT_EXTEND,
+			'select_hosts' => API_OUTPUT_EXTEND,
+			'webitems' => 1,
+			'templated' => 0,
+			'filter' => array(
+				'value_type' => array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64),
+				'status' => ITEM_STATUS_ACTIVE
+			),
+			'sortfield'=>'description'
+		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
 
