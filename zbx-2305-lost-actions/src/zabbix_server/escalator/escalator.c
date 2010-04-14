@@ -497,6 +497,8 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 	ZBX_USER_MSG	*user_msg = NULL, *p;
 	char		*shortdata, *longdata;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In execute_operations()");
+
 	if (0 == action->esc_period)
 	{
 		result = DBselect("select operationid,operationtype,object,objectid,default_msg,shortdata,longdata"
@@ -517,7 +519,8 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 				escalation->esc_step);
 	}
 
-	while (NULL != (row = DBfetch(result))) {
+	while (NULL != (row = DBfetch(result)))
+	{
 		memset(&operation, 0, sizeof(operation));
 		ZBX_STR2UINT64(operation.operationid, row[0]);
 		operation.actionid	= action->actionid;
@@ -530,7 +533,8 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 		operation.esc_period	= atoi(row[7]);
 		operation.evaltype	= atoi(row[8]);
 
-		if (SUCCEED == check_operation_conditions(event, &operation)) {
+		if (SUCCEED == check_operation_conditions(event, &operation))
+		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Conditions match our event. Execute operation.");
 
 			substitute_macros(event, action, NULL, &operation.shortdata);
@@ -541,10 +545,13 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 
 			switch (operation.operationtype) {
 				case	OPERATION_TYPE_MESSAGE:
-					if (0 == operation.default_msg) {
+					if (0 == operation.default_msg)
+					{
 						shortdata = operation.shortdata;
 						longdata = operation.longdata;
-					} else {
+					}
+					else
+					{
 						shortdata = action->shortdata;
 						longdata = action->longdata;
 					}
@@ -557,7 +564,8 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 				default:
 					break;
 			}
-		} else
+		}
+		else
 			zabbix_log(LOG_LEVEL_DEBUG, "Conditions do not match our event. Do not execute operation.");
 
 		zbx_free(operation.shortdata);
@@ -568,7 +576,8 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 
 	DBfree_result(result);
 
-	while (NULL != user_msg) {
+	while (NULL != user_msg)
+	{
 		p = user_msg;
 		user_msg = user_msg->next;
 
@@ -579,10 +588,14 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 		zbx_free(p);
 	}
 
-	if (0 == action->esc_period) {
+	if (0 == action->esc_period)
+	{
 		escalation->status = (action->recovery_msg == 1) ? ESCALATION_STATUS_SLEEP : ESCALATION_STATUS_COMPLETED;
-	} else {
-		if (0 == operations) {
+	}
+       	else
+	{
+		if (0 == operations)
+		{
 			result = DBselect("select operationid from operations where actionid=" ZBX_FS_UI64 " and esc_step_from>%d",
 					action->actionid,
 					escalation->esc_step);
@@ -593,12 +606,16 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 			DBfree_result(result);
 		}
 
-		if (1 == operations) {
+		if (1 == operations)
+		{
 			esc_period = (0 != esc_period) ? esc_period : action->esc_period;
 			escalation->nextcheck = time(NULL) + esc_period;
-		} else
+		}
+		else
 			escalation->status = (action->recovery_msg == 1) ? ESCALATION_STATUS_SLEEP : ESCALATION_STATUS_COMPLETED;
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of execute_operations()");
 }
 
 static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *r_event, DB_ACTION *action)
@@ -726,6 +743,8 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 	char		*error = NULL;
 	int		source;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In execute_escalation()");
+
 	result = DBselect("select source from events where eventid=" ZBX_FS_UI64,
 			escalation->eventid);
 	if (NULL == (row = DBfetch(result)))
@@ -840,7 +859,8 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 
 		zbx_free(action.shortdata);
 		zbx_free(action.longdata);
-	} else
+	}
+	else
 		error = zbx_dsprintf(error, "Action [" ZBX_FS_UI64 "] deleted",
 				escalation->actionid);
 	DBfree_result(result);
@@ -852,6 +872,8 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 				error);
 		zbx_free(error);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of execute_escalation()");
 }
 
 static void	process_escalations(int now)
@@ -859,17 +881,20 @@ static void	process_escalations(int now)
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ESCALATION	escalation;
+	int		superseded;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_escalations()");
 
 	result = DBselect("select escalationid,actionid,triggerid,eventid,r_eventid,esc_step,status"
-			" from escalations where status in (%d,%d) and nextcheck<=%d" DB_NODE,
+			" from escalations where status in (%d,%d,%d) and nextcheck<=%d" DB_NODE,
 			ESCALATION_STATUS_ACTIVE,
+			ESCALATION_STATUS_SUPERSEDED,
 			ESCALATION_STATUS_RECOVERY,
 			now,
 			DBnode_local("escalationid"));
 
-	while (NULL != (row = DBfetch(result))) {
+	while (NULL != (row = DBfetch(result)))
+	{
 		memset(&escalation, 0, sizeof(escalation));
 		ZBX_STR2UINT64(escalation.escalationid, row[0]);
 		ZBX_STR2UINT64(escalation.actionid, row[1]);
@@ -882,9 +907,17 @@ static void	process_escalations(int now)
 
 		DBbegin();
 
+		if (escalation.status == ESCALATION_STATUS_SUPERSEDED)
+		{
+			superseded = 1;
+			escalation.status = ESCALATION_STATUS_ACTIVE;
+		}
+		else
+			superseded = 0;
+
 		execute_escalation(&escalation);
 
-		if (escalation.status == ESCALATION_STATUS_COMPLETED)
+		if (escalation.status == ESCALATION_STATUS_COMPLETED || superseded == 1)
 			DBremove_escalation(escalation.escalationid);
 		else
 			DBexecute("update escalations set status=%d,esc_step=%d,nextcheck=%d"
@@ -898,6 +931,8 @@ static void	process_escalations(int now)
 	}
 
 	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of process_escalations()");
 }
 
 /******************************************************************************
