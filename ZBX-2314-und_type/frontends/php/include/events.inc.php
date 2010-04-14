@@ -290,6 +290,7 @@ function make_small_eventlist($eventid, $trigger_data){
 	$clock = $curevent['clock'];
 
 	foreach($events as $eventid => $event){
+		$event['type'] = $trigger_data['type'];
 		$lclock = $clock;
 		$clock = $event['clock'];
 		$duration = zbx_date2age($lclock, $clock);
