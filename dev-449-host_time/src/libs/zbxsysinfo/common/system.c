@@ -80,8 +80,10 @@ int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_R
 		gmtoff = -timezone;
 #endif /* HAVE_TM_TM_GMTOFF */
 
+#if defined(_WINDOWS)
 		if (tm->tm_isdst > 0)	/* Daylight saving time */
 			gmtoff += 3600;	/* Assume add one hour */
+#endif /* _WINDOWS */
 
 		h = (unsigned short)(abs(gmtoff) / 3600);
 		m = (unsigned short)((abs(gmtoff) - h * 3600) / 60);
