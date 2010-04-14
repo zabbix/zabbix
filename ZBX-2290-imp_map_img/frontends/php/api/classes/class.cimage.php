@@ -387,11 +387,9 @@ class CImage extends CZBXAPI{
 						$values['image'] = zbx_dbstr($image['image']);
 
 					$sql = 'INSERT INTO images ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
-					$result = DBexecute($sql);
-				}
-
-				if(!$result){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_COULD_NOT_SAVE_IMAGE);
+					if(!DBexecute($sql)){
+						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+					}
 				}
 
 				$imageids[] = $imageid;
