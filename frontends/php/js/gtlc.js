@@ -1756,7 +1756,7 @@ scrollcreate: function(w){
 	this.dom.period_state = document.createElement('span');
 	this.dom.period.appendChild(this.dom.period_state);
 	this.dom.period_state.className = 'period_state link';
-	this.dom.period_state.appendChild(document.createTextNode('fixed'));
+	this.dom.period_state.appendChild(document.createTextNode(locale['S_FIXED_SMALL']));
 	addListener(this.dom.period_state, 'click', this.switchPeriodState.bindAsEventListener(this));
 
 // State )
