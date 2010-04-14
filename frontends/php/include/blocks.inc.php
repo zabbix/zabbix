@@ -979,7 +979,7 @@ return 	$table;
 function make_graph_menu(&$menu,&$submenu){
 
 	$menu['menu_graphs'][] = array(
-				S_FAVOURITE.SPACE.S_GRAPHS,
+				S_FAVOURITE_GRAPHS,
 				null,
 				null,
 				array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
@@ -1109,7 +1109,7 @@ return $graphids;
 
 function make_sysmap_menu(&$menu,&$submenu){
 
-	$menu['menu_sysmaps'][] = array(S_FAVOURITE.SPACE.S_MAPS, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
+	$menu['menu_sysmaps'][] = array(S_FAVOURITE_MAPS, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
 	$menu['menu_sysmaps'][] = array(
 				S_ADD.SPACE.S_MAP,
 				'javascript: '.
@@ -1164,7 +1164,7 @@ return $maps;
 
 function make_screen_menu(&$menu,&$submenu){
 
-	$menu['menu_screens'][] = array(S_FAVOURITE.SPACE.S_SCREENS, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
+	$menu['menu_screens'][] = array(S_FAVOURITE_SCREENS, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
 	$menu['menu_screens'][] = array(
 				S_ADD.SPACE.S_SCREEN,
 				'javascript: '.
