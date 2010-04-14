@@ -1970,7 +1970,7 @@ static void DCvacuum_text()
 	if (NULL != first_text)
 	{
 		if (0 == (offset = first_text - cache->text))
-			return;
+			goto quit;
 
 		memmove(cache->text, first_text, CONFIG_TEXT_CACHE_SIZE - offset);
 
@@ -1991,6 +1991,9 @@ static void DCvacuum_text()
 	}
 	else
 		cache->last_text = cache->text;
+
+quit:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of DCvacuum_text()");
 }
 
 /******************************************************************************

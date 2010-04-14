@@ -2,4 +2,8 @@
 
 noinst_LIBRARIES = libzbxnix.a
 
-libzbxnix_a_SOURCES = daemon.c pid.c ipc.c
+libzbxnix_a_SOURCES = \
+	daemon.c \
+	pid.c \
+	ipc.c \
+	fatal.c fatal.h

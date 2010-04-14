@@ -273,6 +273,7 @@ sdii($screens_to_check);
 			$item_options = array(
 								'nodeids' => $nodeids,
 								'itemids' => $items_to_check,
+								'webitems' => 1,
 								'editable' => $options['editable']);
 			$allowed_items = CItem::get($item_options);
 			$allowed_items = zbx_objectValues($allowed_items, 'itemid');
