@@ -363,14 +363,14 @@ class CImage extends CZBXAPI{
 					$sql = 'INSERT INTO images ('.implode(' ,', array_keys($values)).') VALUES ('.implode(',', $values).')';
 					$stmt = oci_parse($DB['DB'], $sql);
 					if(!$stmt){
-						$e = ocierror($stmt);
-						self::exception(ZBX_API_ERROR_APPLICATION, S_PARSE_SQL_ERROR.' ['.$e['message'].']'.SPACE.S_IN_SMALL.SPACE.'['.$e['sqltext'].']');
+						$e = oci_error($stmt);
+						self::exception(ZBX_API_ERROR_PARAMETERS, S_PARSE_SQL_ERROR.' ['.$e['message'].']'.SPACE.S_IN_SMALL.SPACE.'['.$e['sqltext'].']');
 					}
 
 					oci_bind_by_name($stmt, ':imgdata', $image['image']);
 					if(!oci_execute($stmt)){
-						$e = ocierror($stid);
-						self::exception(ZBX_API_ERROR_APPLICATION, S_EXECUTE_SQL_ERROR.SPACE.'['.$e['message'].']'.SPACE.S_IN_SMALL.SPACE.'['.$e['sqltext'].']');
+						$e = oci_error($stid);
+						self::exception(ZBX_API_ERROR_PARAMETERS, S_EXECUTE_SQL_ERROR.SPACE.'['.$e['message'].']'.SPACE.S_IN_SMALL.SPACE.'['.$e['sqltext'].']');
 					}
 					oci_free_statement($stmt);
 
@@ -388,7 +388,7 @@ class CImage extends CZBXAPI{
 				}
 
 				if(!$result){
-					self::exception(ZBX_API_ERROR_APPLICATION, S_COULD_NOT_SAVE_IMAGE);
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_COULD_NOT_SAVE_IMAGE);
 				}
 
 				$imageids[] = $imageid;
