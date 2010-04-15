@@ -52,6 +52,7 @@ Changes for 1.8.3
 
 Changes for 1.8.2
 
+ - [ZBX-2116] fixed black images instead of vertical text in monitoring->overview (Vedmak)
  - [ZBX-2084] fixed JSON decoding class, which didn't work due to PCRE backtrace limit, enabled native PHP JSON functions, rewrote code with sockets (AM)
  - [ZBX-2239] fixed mutex (un)locking so that zabbix_server does not become forever defunct when killed (asaveljevs)
  - [ZBX-1983] fixed port validation in host agent port, IPMI port and in discovery checks ports (now supports port ranges like "21-80,465") (AM)
