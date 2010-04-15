@@ -458,21 +458,32 @@ class CImage extends CZBXAPI{
 					if($DB['TYPE'] == 'POSTGRESQL'){
 						$values['image'] = pg_escape_bytea($image['image']);
 					}
-					else if($DB['TYPE'] == 'ORACLE'){
-						$sql = 'SELECT image FROM images WHERE imageid = '.$image['imageid'].' FOR UPDATE';
-						if(!$stid = DBselect($sql))
-							self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-
-						$row = DBfetch($stid);
-						$row['image']->truncate();
-						$row['image']->save($image['image']);
-						$row['image']->free();
-					}
 					else if($DB['TYPE'] == 'SQLITE3'){
 						$values['image'] = zbx_dbstr(bin2hex($image['image']));
 					}
 					else if($DB['TYPE'] == 'MYSQL'){
 						$values['image'] = zbx_dbstr($image['image']);
+					}
+					else if($DB['TYPE'] == 'ORACLE'){
+						$sql = 'SELECT image FROM images WHERE imageid = '.$image['imageid'].' FOR UPDATE';
+
+						if(!$stmt = oci_parse($DB['DB'], $sql)){
+							$e = oci_error();
+							self::exception(ZBX_API_ERROR_PARAMETERS, 'SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+						}
+
+						if(!oci_execute($stmt, OCI_DEFAULT)){
+							$e = oci_error();
+							self::exception(ZBX_API_ERROR_PARAMETERS, 'SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
+						}
+
+						if(FALSE === ($row = oci_fetch_assoc($stmt))){
+							self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+						}
+
+						$row['image']->truncate();
+						$row['image']->save($image['image']);
+						$row['image']->free();
 					}
 				}
 
