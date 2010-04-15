@@ -1,6 +1,6 @@
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -310,6 +310,7 @@ loadDynamic: function(id, stime, period){
 		url = new Curl(obj.src);
 		url.setArgument('stime', stime);
 		url.setArgument('period', period);
+		url.setArgument('refresh', Math.floor(Math.random()*1000));
 
 		dom_object.src = url.getUrl();
 	}
@@ -479,7 +480,7 @@ usertime: function(usertime){
 
 	if('undefined' == typeof(usertime)) return this._usertime;
 
-	if((usertime + this.minperiod) < this._starttime) usertime = this._starttime + this.minperiod;
+	if((usertime - this._period) < this._starttime) usertime = this._starttime + this._period;
 	if(usertime > this._endtime) usertime = this._endtime;
 
 	this._usertime = usertime;
@@ -703,6 +704,23 @@ onchange: function(){			//  executed every time the bar period or bar time is ch
 //----------------------------------------------------------------
 //-------   MOVE   -----------------------------------------------
 //----------------------------------------------------------------
+setFullPeriod: function(e){
+	this.debug('setFullPeriod');
+	if(this.disabled) return false;
+//---
+	this.timeline.setNow();
+	this.timeline.period(this.timeline.endtime() - this.timeline.starttime());
+
+// bar
+	this.setBarPosition();
+	this.setGhostByBar();
+
+	this.setTabInfo();
+
+	this.onBarChange();
+
+},
+
 setZoom: function(e, zoom){
 	this.debug('setZoom', zoom);
 	if(this.disabled) return false;
@@ -1519,7 +1537,15 @@ appendZoomLinks: function(){
 		addListener(this.dom.linklist[links],'click',this.setZoom.bindAsEventListener(this, zooms[key]),true);
 		
 		links++;
-	}	
+	}
+
+	this.dom.linklist[links] = document.createElement('span');
+	this.dom.links.appendChild(this.dom.linklist[links]);
+	this.dom.linklist[links].className = 'link';
+	this.dom.linklist[links].setAttribute('zoom', zooms[key]);
+	this.dom.linklist[links].appendChild(document.createTextNode(locale['S_ALL_S']));
+
+	addListener(this.dom.linklist[links],'click',this.setFullPeriod.bindAsEventListener(this),true);
 },
 
 appendNavLinks: function(){
@@ -1610,6 +1636,14 @@ setZoomLinksStyle: function(){
 //			this.dom.linklist[i].style.color = '';
 		}
 		
+	}
+
+	i = this.dom.linklist.length - 1;
+	if(period == (this.timeline.endtime() - this.timeline.starttime())){
+
+		this.dom.linklist[i].style.textDecoration = 'none';
+		this.dom.linklist[i].style.fontWeight = 'bold';
+		this.dom.linklist[i].style.fontSize = '11px';
 	}
 },
 

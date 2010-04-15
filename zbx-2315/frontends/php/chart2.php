@@ -82,11 +82,11 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['stime']))		$graph->setSTime($_REQUEST['stime']);
 	if(isset($_REQUEST['border']))		$graph->setBorder(0);
 
-	$width = get_request('width', 900);
+	$width = get_request('width', 0);
 
 	if($width <= 0) $width = $db_data['width'];
 
-	$height = get_request('height', 200);
+	$height = get_request('height', 0);
 	if($height <= 0) $height = $db_data['height'];
 
 //	$graph->showLegend($db_data['show_legend']);

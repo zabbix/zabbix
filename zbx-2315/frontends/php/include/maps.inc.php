@@ -1524,12 +1524,12 @@
 
 		$selements_info = array();
 		$options = array(
+				'nodeids' => get_current_nodeid(true),
 				'groupids' => zbx_objectValues($selements, 'elementid'),
-				'extendoutput' => 1,
-				'nopermissions' => 1,
-				'select_hosts' => 1,
-				'select_triggers' => 1,
-				'nodeids' => get_current_nodeid(true)
+				'select_hosts' => API_OUTPUT_EXTEND,
+				'select_triggers' => API_OUTPUT_EXTEND,
+				'output' => API_OUTPUT_EXTEND,
+				'nopermissions' => 1
 			);
 		$hostgroups = CHostGroup::get($options);
 		$hostgroups = zbx_toHash($hostgroups, 'groupid');
@@ -1564,7 +1564,7 @@
 
 			$options = array(
 				'groupids' => $group['groupid'],
-				'extendoutput' => 1,
+				'output' => API_OUTPUT_EXTEND,
 				'nodeids' => get_current_nodeid(true)
 				);
 
