@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,17 +56,14 @@ include_once('include/page_header.php');
 		'highlight'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
 		'label_type'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,4),		'isset({save})'),
 		'label_location'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,3),		'isset({save})'),
-
 // Actions
 		'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'cancel'=>			array(T_ZBX_STR, O_OPT, P_SYS, NULL,	NULL),
 		'go'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
-
 // Form
 		'form'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL),
-
 // Import
 		'rules' =>			array(T_ZBX_STR, O_OPT,	null,	DB_ID,		null),
 		'import' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL)
@@ -81,7 +78,6 @@ include_once('include/page_header.php');
 			'editable' => 1,
 			'extendoutput' => 1,
 		);
-
 		$maps = CMap::get($options);
 
 		if(empty($maps)) access_deny();
@@ -92,7 +88,6 @@ include_once('include/page_header.php');
 // EXPORT ///////////////////////////////////
 
 	if($EXPORT_DATA){
-// SELECT MAPS
 		$maps = get_request('maps', array());
 
 		$options = array(
@@ -101,12 +96,21 @@ include_once('include/page_header.php');
 			'select_links' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND
 		);
-
 		$sysmaps = CMap::get($options);
 
-		prepareMapExport($sysmaps);
+		$options = array(
+			'sysmapids' => zbx_objectValues($sysmaps, 'sysmapid'),
+			'output' => API_OUTPUT_EXTEND,
+			'select_image' => 1
+		);
+		$images = CImage::get($options);
 
-		$xml = zbxXML::arrayToXML($sysmaps, 'sysmaps');
+
+		prepareMapExport($sysmaps);
+		$images = prepareImageExport($images);
+		$sysmaps = array('images' => $images, 'sysmaps' => $sysmaps);
+
+		$xml = zbxXML::arrayToXML($sysmaps);
 		print($xml);
 
 		exit();
@@ -115,8 +119,9 @@ include_once('include/page_header.php');
 // IMPORT ///////////////////////////////////
 	$rules = get_request('rules', array());
 	if(!isset($_REQUEST['form_refresh'])){
-		foreach(array('map') as $key){
-			$rules[$key]['exist'] = 1;
+		foreach(array('maps', 'icons', 'background') as $key){
+			if($key == 'maps')
+				$rules[$key]['exist'] = 1;
 			$rules[$key]['missed'] = 1;
 		}
 	}
@@ -228,26 +233,21 @@ include_once('include/page_header.php');
 
 ?>
 <?php
-	$form = new CForm();
-	$form->setMethod('get');
-
+	$form = new CForm(null, 'get');
 	$form->addItem(new CButton('form', S_CREATE_MAP));
 	$form->addItem(new CButton('form', S_IMPORT_MAP));
 
 	$map_wdgt = new CWidget();
 	$map_wdgt->addPageHeader(S_CONFIGURATION_OF_NETWORK_MAPS, $form);
-?>
-<?php
-//	COpt::savesqlrequest(0,'/////////////////////////////////////////////////////////////////////////////////////////////////////////');
+
+
 	if(isset($_REQUEST['form'])){
 		if($_REQUEST['form'] == S_IMPORT_MAP)
 			$map_wdgt->addItem(import_map_form($rules));
 		else if(($_REQUEST['form'] == S_CREATE_MAP) || ($_REQUEST['form'] == 'update'))
 			$map_wdgt->addItem(insert_map_form());
-			
 	}
-	else{
-		
+	else{		
 		$form = new CForm();
 		$form->setName('frm_maps');
 
@@ -296,7 +296,6 @@ include_once('include/page_header.php');
 // goBox
 		$goBox = new CComboBox('go');
 		$goBox->addItem('export', S_EXPORT_SELECTED);
-
 		$goOption = new CComboItem('delete', S_DELETE_SELECTED);
 		$goOption->setAttribute('confirm',S_DELETE_SELECTED_MAPS_Q);
 
@@ -309,14 +308,9 @@ include_once('include/page_header.php');
 		zbx_add_post_js('chkbxRange.pageGoName = "maps";');
 
 		$footer = get_table_header(array($goBox, $goButton));
-//------
-
-// PAGING FOOTER
 		$table = array($paging, $table, $paging, $footer);
-//---------
 
 		$form->addItem($table);
-
 		$map_wdgt->addItem($form);
 	}
 	
