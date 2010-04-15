@@ -55,6 +55,8 @@
 
 	define('GRAPH_YAXIS_SIDE_DEFAULT',		0); // 0 - LEFT SIDE, 1 - RIGHT SIDE
 
+	define('ZBX_MAX_IMAGE_SIZE',			1024*1024);
+
 /* END OF USERS DEFINES */
 
 	define('ZBX_FONT_NAME',			'DejaVuSans');
