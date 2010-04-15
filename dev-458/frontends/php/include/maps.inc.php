@@ -454,7 +454,7 @@
 	function get_action_map_by_sysmapid($sysmapid){
 		$options = array(
 				'sysmapids' => $sysmapid,
-				'extendoutput' => 1,
+				'output' => API_OUTPUT_EXTEND,
 				'select_selements' => 1,
 				'nopermissions' => 1
 			);

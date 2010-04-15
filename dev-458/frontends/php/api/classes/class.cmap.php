@@ -214,6 +214,12 @@ class CMap extends CZBXAPI{
 						$result[$sysmap['sysmapid']]['links'] = array();
 					}
 
+					if(isset($sysmap['highlight'])){
+						$sysmap['expandproblem'] = ($sysmap['highlight'] & 2)? 0 : 1;
+						$sysmap['markelements'] = ($sysmap['highlight'] & 4) ? 1 : 0;
+						$sysmap['highlight'] = ($sysmap['highlight'] & 1)? 1 : 0;
+					}
+
 					$result[$sysmap['sysmapid']] += $sysmap;
 				}
 			}
@@ -505,6 +511,8 @@ COpt::memoryPick();
 
 		self::BeginTransaction(__METHOD__);
 		foreach($maps as $mnum => $map){
+			if($map['markelements'] == 1) $map['highlight'] = $map['highlight'] | 4;
+			if($map['expandproblem'] == 0) $map['highlight'] = $map['highlight'] | 2;
 
 			$map_db_fields = array(
 				'name' => null,
@@ -579,18 +587,20 @@ COpt::memoryPick();
 			'output' => API_OUTPUT_EXTEND
 		);
 		$db_sysmaps = self::get($options);
+		foreach($maps as $mnum => $map){
+			if(!isset($db_sysmaps[$map['sysmapid']])){
+				self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Map with ID ['.$map['sysmapid'].'] does not exist');
+				return false;
+			}
+			$sysmapids[] = $map['sysmapid'];
+		}
 
 		self::BeginTransaction(__METHOD__);
 		foreach($maps as $mnum => $map){
-
-			$sysmapids[] = $map['sysmapid'];
 			$map_db_fields = $db_sysmaps[$map['sysmapid']];
 
-			if(!$map_db_fields){
-				$result = false;
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Map with ID ['.$map['sysmapid'].'] does not exist');
-				break;
-			}
+			if($map['markelements'] == 1) $map['highlight'] = $map['highlight'] | 4;
+			if($map['expandproblem'] == 0) $map['highlight'] = $map['highlight'] | 2;
 
 			if(!check_db_fields($map_db_fields, $map)){
 				$result = false;

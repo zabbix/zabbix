@@ -140,23 +140,18 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST["save"])){
 		if(isset($_REQUEST["sysmapid"])){
 // TODO check permission by new value.
-			$_REQUEST['highlight'] = get_request('highlight', 0);
-			$_REQUEST['markelements'] = get_request('markelements', 0);
-			$_REQUEST['expandproblem'] = get_request('expandproblem', 0);
-
 			$map = array(
 					'sysmapid' => $_REQUEST['sysmapid'],
 					'name' => $_REQUEST['name'],
 					'width' => $_REQUEST['width'],
 					'height' => $_REQUEST['height'],
 					'backgroundid' => $_REQUEST['backgroundid'],
-					'highlight' => $_REQUEST['highlight'],
+					'highlight' => get_request('highlight', 0),
+					'markelements' => get_request('markelements', 0),
+					'expandproblem' => get_request('expandproblem', 0),
 					'label_type' => $_REQUEST['label_type'],
 					'label_location' => $_REQUEST['label_location']
 				);
-
-			if($_REQUEST['markelements'] == 1) $map['highlight'] = $map['highlight'] | 4;
-			if($_REQUEST['expandproblem'] == 0) $map['highlight'] = $map['highlight'] | 2;
 
 			DBstart();
 			$result = CMap::update($map);
@@ -169,22 +164,17 @@ include_once('include/page_header.php');
 			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 				access_deny();
 
-			$_REQUEST['highlight'] = get_request('highlight', 0);
-			$_REQUEST['markelements'] = get_request('markelements', 0);
-			$_REQUEST['expandproblem'] = get_request('expandproblem', 0);
-			
 			$map = array(
 					'name' => $_REQUEST['name'],
 					'width' => $_REQUEST['width'],
 					'height' => $_REQUEST['height'],
 					'backgroundid' => $_REQUEST['backgroundid'],
-					'highlight' => $_REQUEST['highlight'],
+					'highlight' => get_request('highlight', 0),
+					'markelements' => get_request('markelements', 0),
+					'expandproblem' => get_request('expandproblem', 0),
 					'label_type' => $_REQUEST['label_type'],
 					'label_location' => $_REQUEST['label_location']
 				);
-
-			if($_REQUEST['markelements'] == 1) $map['highlight'] = $map['highlight'] | 4;
-			if($_REQUEST['expandproblem'] == 0) $map['highlight'] = $map['highlight'] | 2;
 
 			DBstart();
 			$result = CMap::create($map);

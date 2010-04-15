@@ -108,8 +108,6 @@ include_once('include/page_header.php');
 
 					expandMapLabels($db_map);
 
-					$db_map['expandproblem'] = ($db_map['highlight'] & 2)? 0 : 1;
-					$db_map['markelements'] = ($db_map['highlight'] & 4) ? 1 : 0;
 					$map_info = getSelementsInfo($db_map);
 //SDII($db_map);
 					add_elementNames($db_map['selements']);

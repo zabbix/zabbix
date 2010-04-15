@@ -143,8 +143,6 @@ include_once('include/page_header.php');
 
 //SDI($selements);
 
-	$map['expandproblem'] = ($map['highlight'] & 2)? 0 : 1;
-	$map['markelements'] = ($map['highlight'] & 4) ? 1 : 0;
 	$map_info = getSelementsInfo($map);
 
 // Draw MAP

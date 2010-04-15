@@ -6345,8 +6345,12 @@
 		$frm_title = 'New system map';
 
 		if(isset($_REQUEST['sysmapid'])){
-			$result=DBselect('SELECT * FROM sysmaps WHERE sysmapid='.$_REQUEST['sysmapid']);
-			$row=DBfetch($result);
+			$options = array(
+				'sysmapids' => $_REQUEST['sysmapid'],
+				'output' => API_OUTPUT_EXTEND
+			);
+			$sysmaps = CMap::get($options);
+			$row = reset($sysmaps);
 			$frm_title = 'System map: "'.$row['name'].'"';
 		}
 
@@ -6357,9 +6361,9 @@
 			$backgroundid	= $row['backgroundid'];
 			$label_type	= $row['label_type'];
 			$label_location	= $row['label_location'];
-			$highlight = ($row['highlight'] & 1) ? 1: 0;
-			$markelements = ($row['highlight'] & 4) ? 1 : 0;
-			$expandproblem = ($row['highlight'] & 2) ? 0 : 1;
+			$highlight =	$row['highlight'];
+			$markelements = $row['markelements'];
+			$expandproblem = $row['expandproblem'];
 		}
 		else{
 			$name		= get_request('name','');
