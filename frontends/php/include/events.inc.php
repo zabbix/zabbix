@@ -292,6 +292,7 @@ function make_small_eventlist($eventid, $trigger_data){
 	$events = CEvent::get($options);
 
 	foreach($events as $enum => $event){
+		$event['type'] = $trigger_data['type'];
 		$lclock = $clock;
 		$clock = $event['clock'];
 		$duration = zbx_date2age($lclock, $clock);
