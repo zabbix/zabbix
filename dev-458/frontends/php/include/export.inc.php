@@ -531,6 +531,9 @@ class zbxXML{
 					continue; // break if not update exist
 				}
 
+				if($sysmap['markelements'] == 1) $sysmap['highlight'] = $sysmap['highlight'] | 4;
+				if($sysmap['expandproblem'] == 0) $sysmap['highlight'] = $sysmap['highlight'] | 2;
+
 				if(isset($sysmap['backgroundid'])){
 					$image = getImageByIdent($sysmap['backgroundid']);
 
@@ -675,7 +678,9 @@ class zbxXML{
 					}
 
 					$selement['sysmapid'] = $sysmap['sysmapid'];
-					$selementid = add_element_to_sysmap($selement);
+					$selementids = CMap::addElements($selement);
+					$selementid = reset($selementids);
+
 					foreach($links as $id => &$link){
 						if($link['selementid1'] == $selement['selementid']) $links[$id]['selementid1'] = $selementid;
 						else if($link['selementid2'] == $selement['selementid']) $links[$id]['selementid2'] = $selementid;
@@ -687,7 +692,7 @@ class zbxXML{
 					if(!isset($link['linktriggers'])) $link['linktriggers'] = array();
 					$link['sysmapid'] = $sysmap['sysmapid'];
 
-					$result = add_link($link);
+					$result = CMap::addLinks($link);
 				}
 
 				if(isset($importMap['sysmapid'])){

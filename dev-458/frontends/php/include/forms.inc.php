@@ -6359,7 +6359,7 @@
 			$label_location	= $row['label_location'];
 			$highlight = ($row['highlight'] & 1) ? 1: 0;
 			$markelements = ($row['highlight'] & 4) ? 1 : 0;
-			$expproblem = ($row['highlight'] & 2) ? 0 : 1;
+			$expandproblem = ($row['highlight'] & 2) ? 0 : 1;
 		}
 		else{
 			$name		= get_request('name','');
@@ -6370,7 +6370,7 @@
 			$label_location	= get_request('label_location',0);
 			$highlight = get_request('highlight',0);
 			$markelements = get_request('markelements',0);
-			$expproblem = get_request('expproblem',0);
+			$expandproblem = get_request('expandproblem',0);
 		}
 
 		$frmMap = new CFormTable($frm_title,'sysmaps.php');
@@ -6400,7 +6400,7 @@
 
 		$frmMap->addRow(S_MARK_ELEMENTS_ON_TRIGGER_STATUS_CHANGE, new CCheckBox('markelements',$markelements,null,1));
 		
-		$frmMap->addRow(S_EXPAND_SINGLE_PROBLEM, new CCheckBox('expproblem',$expproblem,null,1));
+		$frmMap->addRow(S_EXPAND_SINGLE_PROBLEM, new CCheckBox('expandproblem',$expandproblem,null,1));
 
 
 		$cmbLabel = new CComboBox('label_type',$label_type);

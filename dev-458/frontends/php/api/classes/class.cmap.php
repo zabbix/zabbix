@@ -755,7 +755,7 @@ COpt::memoryPick();
 				break;
 			}
 
-			$linkid = add_link($link['sysmapid'], $link['label'], $link['selementid1'], $link['selementid2'], array(), $link['drawtype'], $link['color']);
+			$linkid = add_link($link);
 			if(!$linkid){
 				$result = false;
 				break;
@@ -798,7 +798,7 @@ COpt::memoryPick();
  */
 	public static function addElements($selements){
 		$errors = array();
-		$result_selements = array();
+		$selementids = array();
 		$selements = zbx_toArray($selements);
 
 		$sysmapids = zbx_objectValues($selements, 'sysmapid');
@@ -820,6 +820,7 @@ COpt::memoryPick();
 			}
 
 			foreach($selements as $snumm => $selement){
+
 				$selement_db_fields = array(
 					'sysmapid' => null,
 					'elementid' => null,
@@ -835,10 +836,8 @@ COpt::memoryPick();
 					'label_location' => 0
 				);
 
-				if(!check_db_fields($element_db_fields, $element)){
-					$result = false;
-					$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields for element');
-					break;
+				if(!check_db_fields($selement_db_fields, $selement)){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for element');
 				}
 
 				if(check_circle_elements_link($selement['sysmapid'],$selement['elementid'],$selement['elementtype'])){
@@ -846,6 +845,8 @@ COpt::memoryPick();
 				}
 
 				$selementid = get_dbid('sysmaps_elements','selementid');
+				$selementids[] = $selementid;
+
 				$values = array(
 					'selementid' => $selementid,
 					'sysmapid' => $selement['sysmapid'],
@@ -867,12 +868,11 @@ COpt::memoryPick();
 								' VALUES ('.implode(',', array_values($values)).')');
 
 				if(!$result) break;
-
-				$result_selements[] = $selementid;
 			}
 
 			$result = self::EndTransaction($result, __METHOD__);
-			return $result_selements;
+
+			return $selementids;
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
