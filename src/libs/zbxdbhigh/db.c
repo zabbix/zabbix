@@ -1224,7 +1224,7 @@ int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64
 	DBexecute("delete from escalations"
 			" where actionid=" ZBX_FS_UI64
 				" and triggerid=" ZBX_FS_UI64
-				" and (esc_step<>0 or (status<>%d and status<>%d)",
+				" and (esc_step<>0 or (status<>%d and status<>%d))",
 			actionid,
 			triggerid,
 			ESCALATION_STATUS_ACTIVE,
