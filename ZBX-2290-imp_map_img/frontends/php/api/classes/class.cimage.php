@@ -481,9 +481,9 @@ class CImage extends CZBXAPI{
 							self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 						}
 
-						$row['image']->truncate();
-						$row['image']->save($image['image']);
-						$row['image']->free();
+						$row['IMAGE']->truncate();
+						$row['IMAGE']->save($image['image']);
+						$row['IMAGE']->free();
 					}
 				}
 
