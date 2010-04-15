@@ -1966,8 +1966,21 @@
 			unset($sysmap);
 		}
 		catch(Exception $e){
-			throw new exception($e->show_message());
+			throw new Exception($e->getMessage());
 		}
 //SDII($exportMaps);
+	}
+
+	function prepareImageExport($images){
+		$formatted = array();
+
+		foreach($images as $inum => $image){
+			$formatted[] = array(
+				'name' => $image['name'],
+				'imagetype' => $image['imagetype'],
+				'encodedImage' => base64_encode($image['image']),
+			);
+		}
+		return $formatted;
 	}
 ?>

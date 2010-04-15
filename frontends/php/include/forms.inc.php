@@ -6314,6 +6314,7 @@
 	}
 
 	function import_map_form($rules){
+		global $USER_DETAILS;
 
 		$form = new CFormTable(S_IMPORT, null, 'post', 'multipart/form-data');
 		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
@@ -6322,14 +6323,17 @@
 		$table->setHeader(array(S_ELEMENT, S_UPDATE.SPACE.S_EXISTING, S_ADD.SPACE.S_MISSING), 'bold');
 
 		$titles = array('maps' => S_MAP);
-
+		if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN){
+			$titles += array('icons' => S_ICON, 'background' => S_BACKGROUND);
+		}
+		
 		foreach($titles as $key => $title){
 			$cbExist = new CCheckBox('rules['.$key.'][exist]', isset($rules[$key]['exist']));
 
-			if($key == 'template')
-				$cbMissed = null;
-			else
-				$cbMissed = new CCheckBox('rules['.$key.'][missed]', isset($rules[$key]['missed']));
+			if($key != 'maps')
+				$cbExist->setAttribute('onclick', 'javascript: if(this.checked) return confirm(\'Images for all maps will be updated\')');
+
+			$cbMissed = new CCheckBox('rules['.$key.'][missed]', isset($rules[$key]['missed']));
 
 			$table->addRow(array($title, $cbExist, $cbMissed));
 		}
