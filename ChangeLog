@@ -1,5 +1,7 @@
 Changes for 1.8.3
 
+ - [ZBX-2290] added export/import of map images (Vedmak)
+ - [ZBX-2290] fixed image update with oracle db (Vedmak)
  - [ZBX-2317] updated French translation; thanks to alixen (Richlv)
  - [ZBX-2283] fixed incorrect time calculating in slidebar (Aly)
  - [ZBX-2261] fixed username hiding in acknowledge comments (AM)
