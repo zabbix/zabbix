@@ -1,5 +1,7 @@
 Changes for 1.9
 
+ - [DEV-449] added display of host time in screens (Aly)
+ - [DEV-449] added system.localtime[local] check (Sasha)
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 Changes for 1.8.3

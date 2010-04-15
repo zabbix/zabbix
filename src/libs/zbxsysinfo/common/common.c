@@ -46,7 +46,7 @@ ZBX_METRIC	parameters_common[]=
 	{"agent.ping",		0,		AGENT_PING, 		0,	0},
 	{"agent.version",	0,		AGENT_VERSION,		0,	0},
 
-	{"system.localtime",	0,		SYSTEM_LOCALTIME,	0,	0},
+	{"system.localtime",	CF_USEUPARAM,	SYSTEM_LOCALTIME,	0,	"utc"},
 	{"system.run",		CF_USEUPARAM,	RUN_COMMAND,	 	0,	"echo test"},
 
 	{"web.page.get",	CF_USEUPARAM,	WEB_PAGE_GET,	 	0,	"localhost,,80"},
