@@ -407,6 +407,7 @@
 /* time module tipe */
 	define('TIME_TYPE_LOCAL',	0);
 	define('TIME_TYPE_SERVER',	1);
+	define('TIME_TYPE_HOST',	2);
 
 	define('FILTER_TAST_SHOW',		0);
 	define('FILTER_TAST_HIDE',		1);

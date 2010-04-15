@@ -28,11 +28,76 @@
 
 int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+	char		type[16], buf[32];
+	struct tm	*tm;
+	int		gmtoff, offset, ms;
+	unsigned short	h, m;
+#if defined(_WINDOWS)
+        struct _timeb	tv;
+#else /* not _WINDOWS */
+	struct timeval	tv;
+	struct timezone	tz;
+#endif /* _WINDOWS */
+
 	assert(result);
 
 	init_result(result);
 
-	SET_UI64_RESULT(result, time(NULL));
+	if (num_param(param) > 3)
+		return SYSINFO_RET_FAIL;
+
+	if (0 != get_param(param, 1, type, sizeof(type)))
+		return SYSINFO_RET_FAIL;
+
+	if ('\0' == *type || 0 == strcmp(type, "utc"))
+	{
+		SET_UI64_RESULT(result, time(NULL));
+	}
+	else if (0 == strcmp(type, "local"))
+	{
+#if defined(_WINDOWS)
+	        _ftime(&tv);
+
+		tm = localtime(&tv.time);
+
+		ms = tv.millitm;
+#else /* not _WINDOWS */
+		gettimeofday(&tv, &tz);
+
+		tm = localtime(&tv.tv_sec);
+
+		ms = (int)(tv.tv_usec / 1000);
+#endif /* _WINDOWS */
+
+		offset = zbx_snprintf(buf, sizeof(buf), "%d-%d-%d,%d:%d:%d.%d,",
+				1900 + tm->tm_year, 1 + tm->tm_mon, tm->tm_mday,
+				tm->tm_hour, tm->tm_min, tm->tm_sec, ms);
+
+		/* Timezone offset */
+#if defined(HAVE_TM_TM_GMTOFF)
+		gmtoff = tm->tm_gmtoff;
+#else
+		gmtoff = -timezone;
+#endif /* HAVE_TM_TM_GMTOFF */
+
+#if defined(_WINDOWS)
+		if (tm->tm_isdst > 0)	/* Daylight saving time */
+			gmtoff += 3600;	/* Assume add one hour */
+#endif /* _WINDOWS */
+
+		h = (unsigned short)(abs(gmtoff) / 3600);
+		m = (unsigned short)((abs(gmtoff) - h * 3600) / 60);
+
+		if (gmtoff >= 0)
+			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "+");
+		else
+			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "-");
+		offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "%d:%d", (int)h, (int)m);
+
+		SET_STR_RESULT(result, strdup(buf));
+	}
+	else
+		return SYSINFO_RET_FAIL;
 
 	return SYSINFO_RET_OK;
 }
