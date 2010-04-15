@@ -55,7 +55,6 @@ class CImage extends CZBXAPI{
 		global $USER_DETAILS;
 
 		$result = array();
-		$user_type = $USER_DETAILS['type'];
 
 		$sort_columns = array('imageid', 'name'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
@@ -78,7 +77,7 @@ class CImage extends CZBXAPI{
 			'output'				=> API_OUTPUT_REFER,
 			'select_image'			=> null,
 			'editable'				=> null,
-			'count'					=> null,
+			'countOutput'			=> null,
 			'preservekeys'			=> null,
 
 			'sortfield'				=> '',
@@ -90,7 +89,7 @@ class CImage extends CZBXAPI{
 
 
 // editable + PERMISSION CHECK
-		if(!is_null($options['editable']) && ($user_type < USER_TYPE_ZABBIX_ADMIN)){
+		if(!is_null($options['editable']) && ($USER_DETAILS['type'] < USER_TYPE_ZABBIX_ADMIN)){
 			return $result;
 		}
 
@@ -108,18 +107,20 @@ class CImage extends CZBXAPI{
 		if(!is_null($options['sysmapids'])){
 			zbx_value2array($options['sysmapids']);
 
-			$sql_parts['where'][] = 'EXISTS('.
-				' SELECT ii.imageid'.
-				' FROM images ii,sysmaps sm,sysmaps_elements se'.
-				' WHERE i.imageid=ii.imageid'.
-					' AND '.DBcondition('sm.sysmapid', $options['sysmapids']).
-					' AND sm.sysmapid=se.sysmapid'.
-					' AND (se.iconid_off=ii.imageid'.
-						' OR se.iconid_on=ii.imageid'.
-						' OR se.iconid_unknown=ii.imageid'.
-						' OR se.iconid_disabled=ii.imageid'.
-						' OR se.iconid_maintenance=ii.imageid'.
-						' OR sm.backgroundid=ii.imageid))';
+			$sql_parts['select']['sm'] = 'sm.sysmapid';
+
+			$sql_parts['from']['sm'] = 'sysmaps sm';
+			$sql_parts['from']['se'] = 'sysmaps_elements se';
+
+			$sql_parts['where']['sm'] = DBcondition('sm.sysmapid', $options['sysmapids']);
+			$sql_parts['where']['smse'] = 'sm.sysmapid=se.sysmapid ';
+			$sql_parts['where']['se'] = '('.
+				'se.iconid_off=i.imageid'.
+				' OR se.iconid_on=i.imageid'.
+				' OR se.iconid_unknown=i.imageid'.
+				' OR se.iconid_disabled=i.imageid'.
+				' OR se.iconid_maintenance=i.imageid'.
+				' OR sm.backgroundid=i.imageid)';
 		}
 
 // output
@@ -127,15 +128,9 @@ class CImage extends CZBXAPI{
 			$sql_parts['select']['images'] = 'i.imageid, i.imagetype, i.name';
 		}
 
-		if(!is_null($options['select_image'])){
-			if($options['output'] == API_OUTPUT_EXTEND) $sql_parts['select']['images'] = 'i.*';
-			else $sql_parts['select']['images'] = 'i.imageid, i.image';
-		}
-
 // count
-		if(!is_null($options['count'])){
+		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
-
 			$sql_parts['select'] = array('count(i.imageid) as rowscount');
 		}
 
@@ -188,21 +183,21 @@ class CImage extends CZBXAPI{
 		$sql_from = '';
 		$sql_where = '';
 		$sql_order = '';
-		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
-		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
-		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
-		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
-		$sql_limit = $sql_parts['limit'];
+		if(!empty($sql_parts['select'])) $sql_select.= implode(',',$sql_parts['select']);
+		if(!empty($sql_parts['from'])) $sql_from.= implode(',',$sql_parts['from']);
+		if(!empty($sql_parts['where'])) $sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
+		if(!empty($sql_parts['order'])) $sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 
 		$sql = 'SELECT DISTINCT '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('i.imageid', $nodeids).
 					$sql_where.
 				$sql_order;
-		$res = DBselect($sql, $sql_limit);
+		$res = DBselect($sql, $sql_parts['limit']);
 		while($image = DBfetch($res)){
-			if($options['count'])
-				$result = $image;
+			if($options['countOutput']){
+				return $image['rowscount'];
+			}
 			else{
 				$imageids[$image['imageid']] = $image['imageid'];
 
@@ -214,29 +209,28 @@ class CImage extends CZBXAPI{
 						$result[$image['imageid']] = array();
 
 // sysmapds
-					if(isset($image['sysmapid']) && is_null($options['select_sysmaps'])){
+					if(isset($image['sysmapid'])){
 						if(!isset($result[$image['imageid']]['sysmaps']))
 							$result[$image['imageid']]['sysmaps'] = array();
 
 						$result[$image['imageid']]['sysmaps'][] = array('sysmapid' => $image['sysmapid']);
 					}
 
-
 					$result[$image['imageid']] += $image;
 				}
 			}
 		}
 
-		if(!is_null($options['count'])){
-			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
-			return $result;
+// adding objects
+		if(!is_null($options['select_image'])){
+			$sql = 'SELECT imageid, image FROM images WHERE '.DBCondition('imageid', $imageids);
+			$db_img = DBselect($sql);
+
+			while($img = DBfetch($db_img)){
+				$result[$img['imageid']]['image'] = $img['image'];
+			}
 		}
 
-
-// Adding Objects
-//---------------
-
-// removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
 			$result = zbx_cleanHashes($result);
 		}
