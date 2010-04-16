@@ -608,7 +608,7 @@ SDI('/////////////////////////////////');
 				);
 
 				$sql = 'UPDATE screens '.
-						' SET '.zbx_implodeHash(',','=',$values).
+						' SET '.zbx_implodeHash('=',',',$values).
 						' WHERE	screenid='.$screen['screenid'];
 				$result = DBexecute($sql);
 

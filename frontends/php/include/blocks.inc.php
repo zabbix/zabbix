@@ -529,7 +529,7 @@ function make_hoststat_summary($filter){
 				$hostid = $host['hostid'];
 				if(!isset($problematic_host_list[$hostid])) continue;
 
-				if($popup_rows >= ZBX_POPUP_MAX_ROWS) break;
+				if($popup_rows >= ZBX_WIDGET_ROWS) break;
 				$popup_rows++;
 
 				$host_data = $problematic_host_list[$hostid];

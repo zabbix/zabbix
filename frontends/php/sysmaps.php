@@ -53,6 +53,7 @@ include_once('include/page_header.php');
 		'height'=>			array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
 		'backgroundid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,				'isset({save})'),
 		'expandproblem'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
+		'markelements'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
 		'highlight'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
 		'label_type'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,4),		'isset({save})'),
 		'label_location'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,3),		'isset({save})'),
@@ -144,17 +145,15 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST["save"])){
 		if(isset($_REQUEST["sysmapid"])){
 // TODO check permission by new value.
-			$_REQUEST['highlight'] = get_request('highlight', 0);
-			$_REQUEST['expandproblem'] = get_request('expandproblem', 0);
-
 			$map = array(
 					'sysmapid' => $_REQUEST['sysmapid'],
 					'name' => $_REQUEST['name'],
 					'width' => $_REQUEST['width'],
 					'height' => $_REQUEST['height'],
 					'backgroundid' => $_REQUEST['backgroundid'],
-					'highlight' => $_REQUEST['highlight'],
-					'expandproblem' => $_REQUEST['expandproblem'],
+					'highlight' => get_request('highlight', 0),
+					'markelements' => get_request('markelements', 0),
+					'expandproblem' => get_request('expandproblem', 0),
 					'label_type' => $_REQUEST['label_type'],
 					'label_location' => $_REQUEST['label_location']
 				);
@@ -170,16 +169,14 @@ include_once('include/page_header.php');
 			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 				access_deny();
 
-			$_REQUEST['highlight'] = get_request('highlight', 0);
-			$_REQUEST['expandproblem'] = get_request('expandproblem', 0);
-			
 			$map = array(
 					'name' => $_REQUEST['name'],
 					'width' => $_REQUEST['width'],
 					'height' => $_REQUEST['height'],
 					'backgroundid' => $_REQUEST['backgroundid'],
-					'highlight' => $_REQUEST['highlight'],
-					'expandproblem' => $_REQUEST['expandproblem'],
+					'highlight' => get_request('highlight', 0),
+					'markelements' => get_request('markelements', 0),
+					'expandproblem' => get_request('expandproblem', 0),
 					'label_type' => $_REQUEST['label_type'],
 					'label_location' => $_REQUEST['label_location']
 				);
@@ -315,7 +312,9 @@ include_once('include/page_header.php');
 	}
 	
 	$map_wdgt->show();
-
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>
