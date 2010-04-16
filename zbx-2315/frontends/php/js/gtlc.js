@@ -1527,6 +1527,7 @@ appendZoomLinks: function(){
 		if((timeline / zooms[key]) < 1) break;
 
 		caption = this.formatStampByDHM(zooms[key], false, true);
+//		caption = caption.split(' 0',2)[0].split(' ').join('');
 		caption = caption.split(' ',2)[0];
 
 		this.dom.linklist[links] = document.createElement('span');
@@ -1597,6 +1598,7 @@ appendNavLinks: function(){
 
 		caption = this.formatStampByDHM(moves[i], false, true);
 		caption = caption.split(' ',2)[0];
+		
 
 		this.dom.nav_linklist[links] = document.createElement('span');
 		this.dom.nav_links.appendChild(this.dom.nav_linklist[links]);

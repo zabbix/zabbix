@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2329] fixed screen renaming (Aly)
  - [ZBX-2315] fixed multiple issues with JS scrollbar (Aly)
  - [ZBX-2283] fixed incorrect time calculating in slidebar (Aly)
  - [ZBX-2261] fixed username hiding in acknowledge comments (AM)
