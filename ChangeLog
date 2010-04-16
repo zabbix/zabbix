@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2321] fixed log items appearing in the wrong order (Alexei,asaveljevs,Sasha)
  - [DEV-458] added marks on maps if elements trigger changed status recently (Aly)
  - [ZBX-2290] added export/import of map images (Vedmak)
  - [ZBX-2290] fixed image update with oracle db (Vedmak)
