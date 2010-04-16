@@ -1147,7 +1147,7 @@
 			if($trigger['value'] == TRIGGER_VALUE_UNKNOWN)
 				$info['latelyChanged'] = false;
 			else
-				$info['latelyChanged'] = (bool) ((time() - $trigger['lastchange']) < TRIGGER_FALSE_PERIOD);
+				$info['latelyChanged'] = (bool) ((time() - $trigger['lastchange']) < TRIGGER_BLINK_PERIOD);
 
 			$info['triggers'] = array();
 			$info['type'] = $trigger['value'];
@@ -1233,7 +1233,7 @@
 
 		$options = array(
 			'hostids' => array_keys($hosts),
-			'lastChangeSince' => (time() - TRIGGER_FALSE_PERIOD),
+			'lastChangeSince' => (time() - TRIGGER_BLINK_PERIOD),
 			'filter' => array('value' => array(TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE))
 		);
 		$latestTriggers = CTrigger::get($options);
@@ -1462,7 +1462,7 @@
 
 		$options = array(
 			'groupids' => array_keys($hostgroups),
-			'lastChangeSince' => (time() - TRIGGER_FALSE_PERIOD),
+			'lastChangeSince' => (time() - TRIGGER_BLINK_PERIOD),
 			'filter' => array('value' => array(TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE))
 		);
 		$latestTriggers = CTrigger::get($options);
