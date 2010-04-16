@@ -395,7 +395,7 @@ include_once('include/page_header.php');
 						' AND h.itemid=i.itemid'.$sql_filter.
 						' AND i.itemid in ('.$itemid_lst.')'.
 						$cond_clock.
-					' ORDER BY h.id DESC';
+					' ORDER BY h.clock desc, h.id DESC';
 			$result=DBselect($sql,$limit);
 			while($row=DBfetch($result)){
 //				$color_style = null;
