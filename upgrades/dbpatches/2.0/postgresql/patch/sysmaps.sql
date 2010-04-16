@@ -15,8 +15,8 @@ CREATE TABLE sysmaps_tmp (
 insert into sysmaps_tmp select sysmapid,name,width,height,backgroundid,label_type,label_location,highlight,1,0 from sysmaps;
 
 UPDATE sysmaps SET expandproblem=0 WHERE highlight>1 AND highlight<4;
-UPDATE sysmaps SET markelements=1 WHERE highlight>4;
-UPDATE sysmaps SET highlight=(highlight-4) WHERE highlight>4;
+UPDATE sysmaps SET markelements=1 WHERE highlight>3;
+UPDATE sysmaps SET highlight=(highlight-4) WHERE highlight>3;
 UPDATE sysmaps SET highlight=(highlight-2) WHERE highlight>1;
 
 drop table sysmaps;
