@@ -1147,7 +1147,7 @@
 			if($trigger['value'] == TRIGGER_VALUE_UNKNOWN)
 				$info['latelyChanged'] = false;
 			else
-				$info['latelyChanged'] = (bool) ((time() - $trigger['lastchange']) > TRIGGER_FALSE_PERIOD);
+				$info['latelyChanged'] = (bool) ((time() - $trigger['lastchange']) < TRIGGER_FALSE_PERIOD);
 
 			$info['triggers'] = array();
 			$info['type'] = $trigger['value'];
