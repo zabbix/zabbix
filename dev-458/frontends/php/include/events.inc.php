@@ -33,12 +33,12 @@
 	}
 
 	function get_tr_event_by_eventid($eventid){
-		$result = DBfetch(DBselect('SELECT e.*,t.triggerid, t.description,t.priority,t.status,t.type '.
-									' FROM events e,triggers t '.
-									' WHERE e.eventid='.$eventid.
-										' AND e.object='.EVENT_OBJECT_TRIGGER.
-										' AND t.triggerid=e.objectid '
-									));
+		$sql = 'SELECT e.*,t.triggerid, t.description,t.priority,t.status,t.type '.
+				' FROM events e,triggers t '.
+				' WHERE e.eventid='.$eventid.
+					' AND e.object='.EVENT_OBJECT_TRIGGER.
+					' AND t.triggerid=e.objectid';
+		$result = DBfetch(DBselect($sql));
 	return $result;
 	}
 
@@ -199,7 +199,7 @@ return $events;
 function get_next_event($row,$hide_unknown=0){
 	$sql_cond=($hide_unknown != 0)?' AND e.value<>'.TRIGGER_VALUE_UNKNOWN:'';
 
-	if((TRIGGER_MULT_EVENT_ENABLED == $row['type']) && (TRIGGER_VALUE_TRUE == $row['value'])){
+	if((TRIGGER_VALUE_TRUE == $row['value']) && (TRIGGER_MULT_EVENT_ENABLED == $row['type'])){
 		$sql = 'SELECT e.eventid, e.value, e.clock '.
 			' FROM events e'.
 			' WHERE e.objectid='.$row['objectid'].
@@ -233,6 +233,7 @@ function make_event_details($eventid){
 	$table->addRow(array(S_TIME, date('Y.M.d H:i:s',$event['clock'])));
 
 	$duration = zbx_date2age($event['clock']);
+
 	if($next_event = get_next_event($event)){
 		$duration = zbx_date2age($event['clock'],$next_event['clock']);
 	}
@@ -299,6 +300,7 @@ function make_small_eventlist($eventid, $trigger_data){
 		$lclock = $clock;
 		$clock = $event['clock'];
 		$duration = zbx_date2age($lclock, $clock);
+
 		if($curevent['eventid'] == $event['eventid'] && ($nextevent = get_next_event($event))) {
 			$duration = zbx_date2age($nextevent['clock'], $clock);
 		}
@@ -337,6 +339,7 @@ function make_small_eventlist($eventid, $trigger_data){
 			$actions
 		));
 	}
+
 return $table;
 }
 

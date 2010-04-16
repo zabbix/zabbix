@@ -25,50 +25,62 @@
 #include "cfg.h"
 #include "log.h"
 
+#include "fatal.h"
+
 char	*APP_PID_FILE	= NULL;
 
 static int	parent = 0;
 
 #define uninit() { if(parent == 1) zbx_on_exit(); }
 
-void	child_signal_handler(int sig,  siginfo_t *siginfo, void *context)
+void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
 	switch(sig)
 	{
 	case SIGALRM:
-/*		signal(SIGALRM , child_signal_handler);*/
-		zabbix_log( LOG_LEVEL_DEBUG, "Timeout while answering request");
+		zabbix_log(LOG_LEVEL_DEBUG, "Timeout while answering request");
+		break;
+	case SIGILL:
+	case SIGFPE:
+	case SIGSEGV:
+	case SIGBUS:
+		zabbix_log(LOG_LEVEL_CRIT, "Got signal [signal:%d(%s),reason:%d,refaddr:%p]. Crashing ...",
+			sig, get_signal_name(sig), siginfo->si_code, siginfo->si_addr);
+		print_fatal_info(sig, siginfo, context);
+		exit(FAIL);
 		break;
 	case SIGQUIT:
 	case SIGINT:
 	case SIGTERM:
+		zabbix_log(LOG_LEVEL_DEBUG, "Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,reason:%d]. Exiting ...",
+			sig, get_signal_name(sig), siginfo->si_pid, siginfo->si_uid, siginfo->si_code);
 		uninit();
-		exit( FAIL );
+		exit(FAIL);
 		break;
 	case SIGPIPE:
-		zabbix_log( LOG_LEVEL_DEBUG, "Got SIGPIPE from PID: %d.",
+		zabbix_log(LOG_LEVEL_DEBUG, "Got SIGPIPE from PID: %d.",
 			siginfo->si_pid);
 		break;
 	default:
-		zabbix_log( LOG_LEVEL_WARNING, "Got signal [%d]. Ignoring ...", sig);
+		zabbix_log(LOG_LEVEL_WARNING, "Got signal [signal:%d(%s)]. Ignoring ...",
+			sig, get_signal_name(sig));
 	}
 }
 
-static void	parent_signal_handler(int sig,  siginfo_t *siginfo, void *context)
+static void	parent_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
 	switch(sig)
 	{
 	case SIGCHLD:
-		zabbix_log( LOG_LEVEL_CRIT, "One child process died (PID:%d). Exiting ...",
-			siginfo->si_pid);
+		zabbix_log(LOG_LEVEL_CRIT, "One child process died (PID:%d,exitcode/signal:%d). Exiting ...",
+			siginfo->si_pid, siginfo->si_status);
 		uninit();
-		exit( FAIL );
+		exit(FAIL);
 		break;
 	default:
 		child_signal_handler(sig, siginfo, context);
 	}
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -76,7 +88,7 @@ static void	parent_signal_handler(int sig,  siginfo_t *siginfo, void *context)
  *                                                                            *
  * Purpose: init process as daemon                                            *
  *                                                                            *
- * Parameters: allow_root - allow root permision for application              *
+ * Parameters: allow_root - allow root permission for application             *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
@@ -186,6 +198,11 @@ int	daemon_start(int allow_root)
 	sigaction(SIGQUIT,	&phan, NULL);
 	sigaction(SIGTERM,	&phan, NULL);
 	sigaction(SIGPIPE,	&phan, NULL);
+
+	sigaction(SIGILL,	&phan, NULL);
+	sigaction(SIGFPE,	&phan, NULL);
+	sigaction(SIGSEGV,	&phan, NULL);
+	sigaction(SIGBUS,	&phan, NULL);
 
 	zbx_setproctitle("main process");
 

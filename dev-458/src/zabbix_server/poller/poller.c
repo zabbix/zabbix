@@ -104,9 +104,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			alarm(0);
 			break;
 		case ITEM_TYPE_INTERNAL:
-			alarm(CONFIG_TIMEOUT);
 			res = get_value_internal(item, result);
-			alarm(0);
 			break;
 		case ITEM_TYPE_DB_MONITOR:
 			alarm(CONFIG_TIMEOUT);
@@ -616,7 +614,7 @@ static int	get_values(int now)
 			}
 			break;
 		default:
-			/* nothink to do */;
+			/* nothing to do */;
 		}
 
 		init_result(&agent);
@@ -665,7 +663,7 @@ static int	get_values(int now)
 				uint64_array_add(&ipmiids, &ipmiids_alloc, &ipmiids_num, items[i].host.hostid, 1);
 				break;
 			default:
-				/* nothink to do */;
+				/* nothing to do */;
 			}
 		}
 		else

@@ -59,6 +59,7 @@ require_once('include/js.inc.php');
 						$options = array(
 							'countOutput' => 1,
 							'itemids' => $itemid,
+							'webitems' => 1,
 							'nodeids' => get_current_nodeid(true)
 						);
 
@@ -1054,12 +1055,10 @@ require_once('include/js.inc.php');
 
 						$timeline = array();
 						$timeline['period'] = $effectiveperiod;
-						$timeline['starttime'] = get_min_itemclock_by_graphid($resourceid);
+						$timeline['starttime'] = date('YmdHi', get_min_itemclock_by_graphid($resourceid));
 
 						if(isset($_REQUEST['stime'])){
-							$bstime = $_REQUEST['stime'];
-							$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
-							$timeline['usertime'] += $timeline['period'];
+							$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 						}
 
 						// $src = $url.'&width='.$width.'&height='.$height.'&legend='.$legend.'&graph3d='.$graph3d;
@@ -1079,12 +1078,10 @@ require_once('include/js.inc.php');
 						$timeline = array();
 						if(isset($graphid) && !is_null($graphid) && ($editmode != 1)){
 							$timeline['period'] = $effectiveperiod;
-							$timeline['starttime'] = time() - ZBX_MAX_PERIOD; //get_min_itemclock_by_graphid($graphid);
+							$timeline['starttime'] = date('YmdHi', time() - ZBX_MAX_PERIOD); //get_min_itemclock_by_graphid($graphid);
 
 							if(isset($_REQUEST['stime'])){
-								$bstime = $_REQUEST['stime'];
-								$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
-								$timeline['usertime'] += $timeline['period'];
+								$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 							}
 
 							$objData['loadSBox'] = 1;
@@ -1094,13 +1091,12 @@ require_once('include/js.inc.php');
 						$objData['src'] = $src;
 					}
 
-					if($default){
-						$item = new CLink(null, $action);
-						$item->setAttribute('id', $containerid);
-					}
-					else{
-						$item = new CDiv();
-						$item->setAttribute('id', $containerid);
+					$div = new CDiv();
+					$div->setAttribute('id', $containerid);
+					$item[] = $div;
+
+					if($default && ($editmode == 1)){
+						$item[] = new CLink(S_CHANGE, $action);
 					}
 
 //					zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
@@ -1143,15 +1139,13 @@ require_once('include/js.inc.php');
 					if(($editmode == 0) && !empty($resourceid)) $action = 'history.php?action=showgraph&itemid='.$resourceid.url_param('period').url_param('stime');
 
 					$timeline = array();
-					$timeline['starttime'] = time() - ZBX_MAX_PERIOD;
+					$timeline['starttime'] = date('YmdHi', time() - ZBX_MAX_PERIOD);
 
 					if(!zbx_empty($resourceid) && ($editmode != 1)){
 						$timeline['period'] = $effectiveperiod;
 
 						if(isset($_REQUEST['stime'])){
-							$bstime = $_REQUEST['stime'];
-							$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
-							$timeline['usertime'] += $timeline['period'];
+							$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 						}
 
 						$objData['loadSBox'] = 1;
@@ -1162,9 +1156,11 @@ require_once('include/js.inc.php');
 
 					$objData['src'] = $src;
 
-					$item = new CLink(null, $action);
-					$item->setAttribute('id', $containerid);
-
+					$div = new CDiv();
+					$div->setAttribute('id', $containerid);
+					$item[] = $div;
+					$item[] = new CLink(S_CHANGE, $action);
+					
 //					zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 					insert_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 				}

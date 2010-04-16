@@ -103,7 +103,6 @@ include_once('include/page_header.php');
 // EXPORT ///////////////////////////////////
 
 	if($EXPORT_DATA){
-// SELECT SCREENS
 		$screens = get_request('screens', array());
 
 		$options = array(
@@ -111,12 +110,11 @@ include_once('include/page_header.php');
 			'select_screenitems' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND
 		);
-
 		$screens = CScreen::get($options);
 
 		prepareScreenExport($screens);
 
-		$xml = zbxXML::arrayToXML($screens, 'screens');
+		$xml = zbxXML::arrayToXML(array('screens' => $screens));
 		print($xml);
 
 		exit();

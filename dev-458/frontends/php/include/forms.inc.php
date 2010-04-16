@@ -3345,12 +3345,11 @@
 
 		}
 		else{
-
-			$mname			= get_request('mname','');
+			$mname				= get_request('mname','');
 			$maintenance_type	= get_request('maintenance_type',0);
 
-			$active_since		= get_request('active_since',time());
-			$active_till		= get_request('active_till',time()+86400);
+			$active_since		= zbxDateToTime(get_request('active_since',date('YmdHi')));
+			$active_till		= zbxDateToTime(get_request('active_till', date('YmdHi', time()+86400)));
 
 			$description		= get_request('description','');
 		}
@@ -3368,8 +3367,8 @@
 
 /***********************************************************/
 
-		$tblMntc->addItem(new Cvar('active_since',$active_since));
-		$tblMntc->addItem(new Cvar('active_till',$active_till));
+		$tblMntc->addItem(new Cvar('active_since', date('YmdHi', $active_since)));
+		$tblMntc->addItem(new Cvar('active_till', date('YmdHi', $active_till)));
 
 		$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
 
@@ -5851,7 +5850,7 @@
 			$grp_tb->addItem($group['groupid'], $group['name']);
 		}
 
-		$host_tbl->addRow(array(S_GROUPS,$grp_tb->get(S_IN.SPACE.S_GROUPS,S_OTHER.SPACE.S_GROUPS)));
+		$host_tbl->addRow(array(S_GROUPS,$grp_tb->get(S_IN_GROUPS, S_OTHER_GROUPS)));
 
 		$host_tbl->addRow(array(S_NEW_GROUP, new CTextBox('newgroup',$newgroup)));
 
@@ -6315,6 +6314,7 @@
 	}
 
 	function import_map_form($rules){
+		global $USER_DETAILS;
 
 		$form = new CFormTable(S_IMPORT, null, 'post', 'multipart/form-data');
 		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
@@ -6323,14 +6323,17 @@
 		$table->setHeader(array(S_ELEMENT, S_UPDATE.SPACE.S_EXISTING, S_ADD.SPACE.S_MISSING), 'bold');
 
 		$titles = array('maps' => S_MAP);
-
+		if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN){
+			$titles += array('icons' => S_ICON, 'background' => S_BACKGROUND);
+		}
+		
 		foreach($titles as $key => $title){
 			$cbExist = new CCheckBox('rules['.$key.'][exist]', isset($rules[$key]['exist']));
 
-			if($key == 'template')
-				$cbMissed = null;
-			else
-				$cbMissed = new CCheckBox('rules['.$key.'][missed]', isset($rules[$key]['missed']));
+			if($key != 'maps')
+				$cbExist->setAttribute('onclick', 'javascript: if(this.checked) return confirm(\'Images for all maps will be updated\')');
+
+			$cbMissed = new CCheckBox('rules['.$key.'][missed]', isset($rules[$key]['missed']));
 
 			$table->addRow(array($title, $cbExist, $cbMissed));
 		}

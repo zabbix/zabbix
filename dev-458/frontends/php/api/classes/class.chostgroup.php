@@ -853,12 +853,12 @@ COpt::memoryPick();
 		$sql = 'SELECT hostid, groupid FROM hosts_groups WHERE '.DBcondition('hostid', $objectids).' AND '.DBcondition('groupid', $groupids);
 		$linked_db = DBselect($sql);
 		while($pair = DBfetch($linked_db)){
-			$linked[$pair['groupid']] = array($pair['hostid'] => $pair['hostid']);
+			$linked[$pair['groupid']][$pair['hostid']] = 1;
 		}
 
 		foreach($groupids as $gnum => $groupid){
 			foreach($objectids as $hostid){
-				if(isset($linked[$groupid]) && isset($linked[$groupid][$hostid])) continue;
+				if(isset($linked[$groupid][$hostid])) continue;
 				$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
 				$result = DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ($hostgroupid, $hostid, $groupid)");
 				if(!$result){

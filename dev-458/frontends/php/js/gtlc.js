@@ -61,14 +61,19 @@ addObject: function(domid, time, objData){
 		if(isset(key, objData)) this.objectList[domid][key] = objData[key];
 	}
 	
-	var now = new CDate();
-	now = parseInt(now.getTime() / 1000);
+	var nowDate = new CDate();
+	now = parseInt(nowDate.getTime() / 1000);
 
 	if(!isset('period', time))		time.period = 3600;
 	if(!isset('endtime', time))		time.endtime = now;
+
 	if(!isset('starttime', time) || is_null(time['starttime']))	time.starttime = time.endtime - 3*((time.period<86400)?86400:time.period);
+	else time.starttime = (nowDate.setZBXDate(time.starttime) / 1000);
+
+
 	if(!isset('usertime', time))	time.usertime = time.endtime;
-	
+	else time.usertime = (nowDate.setZBXDate(time.usertime) / 1000);
+
 	this.objectList[domid].time = time;
 	this.objectList[domid].timeline = create_timeline(this.objectList[domid].domid, 
 									  parseInt(time.period), 
@@ -207,9 +212,12 @@ objectUpdate: function(domid, timelineid){
 	
 	if(now) usertime += 86400*356;
 	
-	var date = datetoarray(usertime - period);
-	var url_stime = ''+date[2]+date[1]+date[0]+date[3]+date[4];
-	
+//	var date = datetoarray(usertime - period);
+//	var url_stime = ''+date[2]+date[1]+date[0]+date[3]+date[4];
+
+	var date = new CDate((usertime - period) * 1000);
+	var url_stime = date.getZBXDate();
+
 	if(obj.dynamic){
 // AJAX update of starttime and period
 		this.updateProfile(obj.id, url_stime, period);
@@ -538,11 +546,7 @@ function scrollCreate(sbid, w, timelineid){
 
 	if(is_null(w)){
 		var dims = getDimensions(sbid);
-		if($(sbid).nodeName.toLowerCase() == 'img')
-			w = dims.width + 5;
-		else{
-			w = dims.width - 5;
-		}
+		w = dims.width - 2;
 	}
 	
 	if(w < 600) w = 600;
@@ -740,7 +744,6 @@ navigateLeft: function(e, left){
 		var TZOffset = this.getTZdiff(usertime, new_usertime);
 		new_usertime -= TZOffset;
 //------------
-
 		this.timeline.usertime(new_usertime);
 	}
 	else{
@@ -1042,7 +1045,10 @@ barDragStart: function(dragable,e){
 
 barDragChange: function(dragable,e){
 	this.debug('barDragChange');
-	if(this.disabled) return false;
+	if(this.disabled){
+		dragable.endDrag(e);
+		return false;
+	}
 //---
 
 	var element = dragable.element;
@@ -1131,6 +1137,7 @@ leftArrowDragStart: function(dragable, e){
 	var element = dragable.element;
 	this.position.leftArr = getDimensions(element);
 
+	this.ghostBox.userstartime = this.timeline.usertime();
 	this.ghostBox.usertime = this.timeline.usertime();
 	this.ghostBox.startResize(0);
 	
@@ -1138,7 +1145,10 @@ leftArrowDragStart: function(dragable, e){
 
 leftArrowDragChange: function(dragable, e){
 	this.debug('leftArrowDragChange');
-	if(this.disabled) return false;
+	if(this.disabled){
+		dragable.endDrag(e);
+		return false;
+	}
 //---
 
 	var element = dragable.element;
@@ -1218,7 +1228,10 @@ rightArrowDragStart: function(dragable, e){
 
 rightArrowDragChange: function(dragable, e){
 	this.debug('rightArrowDragChange');
-	if(this.disabled) return false;
+	if(this.disabled){
+		dragable.endDrag(e);
+		return false;
+	}
 //---
 
 	var element = dragable.element;
@@ -1263,16 +1276,13 @@ switchPeriodState: function(){
 	}
 },
 
-syncTZOffset: function(time){
-	this.debug('syncTZOffset');
+getTZOffset: function(time){
+	this.debug('getTZOffset');
 
-	if(time > 86400){
-		var date = new CDate(time*1000);
-		var TimezoneOffset = date.getTimezoneOffset();
-		time -= (TimezoneOffset*60);
-	}
+	var date = new CDate(time*1000);
+	var TimezoneOffset = date.getTimezoneOffset();
 
-return time;
+return TimezoneOffset*60;
 },
 
 getTZdiff: function(time1, time2){
@@ -1292,7 +1302,6 @@ roundTime: function(usertime){
 
 	var time = parseInt(usertime);
 //---------------
-//	if((this._period % 86400) == 0){
 	if(time > 86400){
 		var dd = new CDate();
 		dd.setTime(time*1000);
@@ -1300,7 +1309,7 @@ roundTime: function(usertime){
 		dd.setMinutes(0);
 		dd.setSeconds(0);
 		dd.setMilliseconds(0);
-		
+//SDI(dd.getFormattedDate()+' : '+dd.getTime()+' : '+dd.tzDiff);
 		time = parseInt(dd.getTime() / 1000);
 	}
 
@@ -1317,8 +1326,11 @@ updateTimeLine: function(dim){
 
 	var new_usertime = parseInt(dim.right * this.px2sec,10) + starttime;	
 	var new_period = parseInt(dim.width * this.px2sec,10);
-	new_period = this.roundTime(new_period);
-	new_period = this.syncTZOffset(new_period);
+
+	if(new_period > 86400){
+		new_period = this.roundTime(new_period);
+		new_period -= this.getTZOffset(new_period);
+	}
 
 	var right = false;
 	var left = false;
@@ -1337,19 +1349,21 @@ updateTimeLine: function(dim){
 		this.timeline.setNow();
 	}
 	else{	
-		if(right){ 
+		if(right){
 			new_usertime = this.ghostBox.userstartime + new_period;
+
 		}
 		else if(left){
 			new_usertime = this.ghostBox.usertime;
 		}
-//SDI(new_usertime+' : '+this.roundTime(new_usertime));
+
+// To properly count TimeZone Diffs
 		new_usertime = this.roundTime(new_usertime);
 
 		if(dim.width != this.position.bar.width){
 			this.timeline.period(new_period);
 		}
-		
+
 		this.timeline.usertime(new_usertime);
 		
 		var	real_period = this.timeline.period();
@@ -1366,22 +1380,8 @@ setTabInfo: function(){
 	var period = this.timeline.period();
 	var usertime = this.timeline.usertime();
 
-//SDI((usertime-period)+' - '+usertime+' : '+period);
-
-// beating Timezone offsets
 // USERTIME
-	var date = new CDate();
-	date.setTime(usertime*1000);
-	var TimezoneOffset = date.getTimezoneOffset();
-	
 	var userstarttime = usertime-period;
-	date.setTime(userstarttime*1000);
-	
-	var offset = TimezoneOffset - date.getTimezoneOffset();
-	userstarttime -= offset * 60;
-
-//	SDI(usertime+' : '+userstarttime+' | '+offset+' | '+date.getTimezoneOffset()+' | '+TimezoneOffset);	
-//--
 
 	this.dom.info_period.innerHTML = this.formatStampByDHM(period, true, false);
 	
@@ -1756,7 +1756,7 @@ scrollcreate: function(w){
 	this.dom.period_state = document.createElement('span');
 	this.dom.period.appendChild(this.dom.period_state);
 	this.dom.period_state.className = 'period_state link';
-	this.dom.period_state.appendChild(document.createTextNode('fixed'));
+	this.dom.period_state.appendChild(document.createTextNode(locale['S_FIXED_SMALL']));
 	addListener(this.dom.period_state, 'click', this.switchPeriodState.bindAsEventListener(this));
 
 // State )
