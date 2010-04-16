@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 	$page['title']		= 'S_EVENT_DETAILS';
 	$page['file']		= 'tr_events.php';
 	$page['hist_arg'] = array('triggerid', 'eventid');
-	$page['scripts'] = array('class.calendar.js', 'scriptaculous.js?load=effects');
+	$page['scripts'] = array();
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -49,7 +49,7 @@
 		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 // ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	IN("'filter','hat'"),		NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})')
 	);
 
@@ -58,7 +58,7 @@
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
-			CProfile::update('web.tr_events.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.tr_events.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
 
@@ -120,12 +120,10 @@
 	$left_tab->addRow($event_dtl);
 //----------------
 
-
 	$right_tab = new CTable();
 	$right_tab->setCellPadding(3);
 	$right_tab->setCellSpacing(3);
 	$right_tab->setAttribute('border',0);
-
 
 // event ack
 	$event_ack = new CWidget(

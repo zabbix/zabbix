@@ -529,7 +529,7 @@ function make_hoststat_summary($filter){
 				$hostid = $host['hostid'];
 				if(!isset($problematic_host_list[$hostid])) continue;
 
-				if($popup_rows >= ZBX_POPUP_MAX_ROWS) break;
+				if($popup_rows >= ZBX_WIDGET_ROWS) break;
 				$popup_rows++;
 
 				$host_data = $problematic_host_list[$hostid];
@@ -979,35 +979,30 @@ return 	$table;
 function make_graph_menu(&$menu,&$submenu){
 
 	$menu['menu_graphs'][] = array(
-				S_FAVOURITE.SPACE.S_GRAPHS,
+				S_FAVOURITE_GRAPHS,
 				null,
 				null,
 				array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
 		);
+
 	$menu['menu_graphs'][] = array(
 				S_ADD.SPACE.S_GRAPH,
 				'javascript: '.
-				"PopUp('popup.php?srctbl=graphs&".
-					'reference=dashboard&'.
-					'dstfrm=fav_form&'.
-					'dstfld1=favobj&'.
-					'dstfld2=favid&'.
-					'srcfld1=name&'.
-					"srcfld2=graphid',800,450);".
-				'void(0);',
+				"PopUp('popup.php?srctbl=graphs".
+					'&srcfld1=graphid'.
+					'&reference=graphid'.
+					"&multiselect=1',800,450);".
+				"void(0);",
 				null,
 				array('outer' => 'pum_o_submenu', 'inner'=>array('pum_i_submenu'))
 		);
 	$menu['menu_graphs'][] = array(
 				S_ADD.SPACE.S_SIMPLE_GRAPH,
 				'javascript: '.
-				"PopUp('popup.php?srctbl=simple_graph&".
-					'reference=dashboard&'.
-					'dstfrm=fav_form&'.
-					'dstfld1=favobj&'.
-					'dstfld2=favid&'.
-					'srcfld1=description&'.
-					"srcfld2=itemid',800,450);".
+				"PopUp('popup.php?srctbl=simple_graph".
+					'&srcfld1=itemid'.
+					'&reference=itemid'.
+					"&multiselect=1',800,450);".
 				"void(0);",
 				null,
 				array('outer' => 'pum_o_submenu', 'inner'=>array('pum_i_submenu'))
@@ -1114,17 +1109,14 @@ return $graphids;
 
 function make_sysmap_menu(&$menu,&$submenu){
 
-	$menu['menu_sysmaps'][] = array(S_FAVOURITE.SPACE.S_MAPS, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
+	$menu['menu_sysmaps'][] = array(S_FAVOURITE_MAPS, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
 	$menu['menu_sysmaps'][] = array(
 				S_ADD.SPACE.S_MAP,
 				'javascript: '.
-				"PopUp('popup.php?srctbl=sysmaps&".
-					'reference=dashboard&'.
-					'dstfrm=fav_form&'.
-					'dstfld1=favobj&'.
-					'dstfld2=favid&'.
-					'srcfld1=name&'.
-					"srcfld2=sysmapid',800,450);".
+				"PopUp('popup.php?srctbl=sysmaps".
+					'&srcfld1=sysmapid'.
+					'&reference=sysmapid'.
+					"&multiselect=1',800,450);".
 				"void(0);",
 				null,
 				array('outer' => 'pum_o_submenu', 'inner'=>array('pum_i_submenu')
@@ -1172,17 +1164,14 @@ return $maps;
 
 function make_screen_menu(&$menu,&$submenu){
 
-	$menu['menu_screens'][] = array(S_FAVOURITE.SPACE.S_SCREENS, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
+	$menu['menu_screens'][] = array(S_FAVOURITE_SCREENS, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
 	$menu['menu_screens'][] = array(
 				S_ADD.SPACE.S_SCREEN,
 				'javascript: '.
-				"PopUp('popup.php?srctbl=screens&".
-					'reference=dashboard&'.
-					'dstfrm=fav_form&'.
-					'dstfld1=favobj&'.
-					'dstfld2=favid&'.
-					'srcfld1=name&'.
-					"srcfld2=screenid',800,450);".
+				"PopUp('popup.php?srctbl=screens".
+					'&srcfld1=screenid'.
+					'&reference=screenid'.
+					"&multiselect=1',800,450);".
 				"void(0);",
 				null,
 				array('outer' => 'pum_o_submenu', 'inner'=>array('pum_i_submenu')
@@ -1190,13 +1179,10 @@ function make_screen_menu(&$menu,&$submenu){
 	$menu['menu_screens'][] = array(
 				S_ADD.SPACE.S_SLIDESHOW,
 				'javascript: '.
-				"PopUp('popup.php?srctbl=slides&".
-					'reference=dashboard&'.
-					'dstfrm=fav_form&'.
-					'dstfld1=favobj&'.
-					'dstfld2=favid&'.
-					'srcfld1=name&'.
-					"srcfld2=slideshowid',800,450);".
+				"PopUp('popup.php?srctbl=slides".
+					'&srcfld1=slideshowid'.
+					'&reference=slideshowid'.
+					"&multiselect=1',800,450);".
 				"void(0);",
 				null,
 				array('outer' => 'pum_o_submenu', 'inner'=>array('pum_i_submenu')

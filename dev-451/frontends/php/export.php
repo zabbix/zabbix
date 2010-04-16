@@ -213,8 +213,8 @@ include_once('include/page_header.php');
 		$cmbConf->addItem('import.php',S_IMPORT);
 	$form->addItem($cmbConf);
 
-	show_table_header(S_EXPORT_BIG, $form);
-	echo SBR;
+	$export_wdgt = new CWidget();
+	$export_wdgt->addPageHeader(S_EXPORT_BIG, $form);
 
 	if($preview){
 		$table = new CTableInfo(S_NO_DATA_FOR_EXPORT);
@@ -224,7 +224,7 @@ include_once('include/page_header.php');
 			'hostids' => $hostids,
 			'templated_hosts' => 1,
 			'extendoutput' => 1,
-			'select_templates' => 1,
+			'selectParentTemplates' => 1,
 			'select_items' => 1,
 			'select_triggers' => 1,
 			'select_graphs' => 1,
@@ -237,7 +237,7 @@ include_once('include/page_header.php');
 
 			$el_table = new CTableInfo(S_ONLY_HOST_INFO);
 
-			foreach($host['templates'] as $tnum => $template){
+			foreach($host['parentTemplates'] as $tnum => $template){
 				if(isset($hostids_templates[$hostid])){
 					$el_table->addRow(array(S_TEMPLATE, $template['host']));
 				}
@@ -284,20 +284,11 @@ include_once('include/page_header.php');
 		$form->addItem(array($goBox, $goButton));
 // } GO box
 		$table->setFooter(new CCol($form));
-		$table->show();
-
-		$jsLocale = array(
-			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTED'
-		);
-
-		zbx_addJSLocale($jsLocale);
+		$export_wdgt->addItem($table);
 
 		zbx_add_post_js('chkbxRange.pageGoCount = 1;');
 	}
 	else{
-		$export_wdgt = new CWidget();
-
 // Page header {
 		$form = new CForm(null, 'post');
 		$form->setName('export_hosts_frm');
@@ -373,7 +364,7 @@ include_once('include/page_header.php');
 			'hostids' => zbx_objectValues($hosts_all, 'hostid'),
 			'output' => array('hostid', 'host', 'dns', 'ip', 'port', 'status', 'useip'),
 			'templated_hosts' => 1,
-			'select_templates' => API_OUTPUT_COUNT,
+			'selectParentTemplates' => API_OUTPUT_COUNT,
 			'select_items' => API_OUTPUT_COUNT,
 			'select_triggers' => API_OUTPUT_COUNT,
 			'select_graphs' => API_OUTPUT_COUNT,
@@ -397,7 +388,7 @@ include_once('include/page_header.php');
 
 			$status = new CCol(host_status2str($host['status']), host_status2style($host['status']));
 
-			$template_cnt = ($host['templates'] > 0)
+			$template_cnt = ($host['parentTemplates'] > 0)
 				? array(new CCheckBox('templates['.$hostid.']', (isset($hostids_templates[$hostid]) || !isset($update)), NULL, $hostid), $host['templates'])
 				: '-';
 
@@ -449,12 +440,6 @@ include_once('include/page_header.php');
 		$goButton = new CButton('goButton', S_GO.' ('.$count_chkbx.')');
 		$goButton->setAttribute('id','goButton');
 
-		$jsLocale = array(
-			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTED'
-		);
-		zbx_addJSLocale($jsLocale);
-
 		zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
 
 		$footer = get_table_header(array($goBox, $goButton));
@@ -465,9 +450,9 @@ include_once('include/page_header.php');
 		$table = array($paging, $table, $paging, $footer);
 		$form->addItem($table);
 		$export_wdgt->addItem($form);
-		$export_wdgt->show();
 	}
 
+	$export_wdgt->show();
 
 include_once('include/page_footer.php');
 ?>

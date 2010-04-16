@@ -329,7 +329,7 @@
 			return FALSE;
 		}
 
-		if(preg_match('/^log\[|eventlog\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
+		if(preg_match('/^(log|logrt|eventlog)\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
 			error(S_TYPE_INFORMATION_BUST_LOG_FOR_LOG_KEY);
 			return FALSE;
 		}
@@ -561,7 +561,7 @@
 			$item['delta']=0;
 		}
 
-		if(preg_match('/^log\[|eventlog\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
+		if(preg_match('/^(log|logrt|eventlog)\[/', $item['key_']) && ($item['value_type'] != ITEM_VALUE_TYPE_LOG)){
 			error(S_TYPE_INFORMATION_BUST_LOG_FOR_LOG_KEY);
 			return FALSE;
 		}
@@ -570,7 +570,12 @@
 			$item['data_type'] = 0;
 		}
 
-		$db_item = DBfetch(DBselect('SELECT itemid FROM items WHERE hostid='.$item['hostid'].' and itemid<>'.$itemid.' and key_='.zbx_dbstr($item['key_'])));
+		$sql = 'SELECT itemid '.
+				' FROM items '.
+				' WHERE hostid='.$item['hostid'].
+					' and itemid<>'.$itemid.
+					' and key_='.zbx_dbstr($item['key_']);
+		$db_item = DBfetch(DBselect($sql));
 		if($db_item && $item['templateid'] == 0){
 			error(S_AN_ITEM_WITH_THE_KEY.SPACE.'['.$item['key_'].']'.SPACE.S_ALREADY_EXISTS_FOR_HOST_SMALL.SPACE.'['.$host['host'].'].'.SPACE.S_THE_KEY_MUST_BE_UNIQUE);
 			return FALSE;

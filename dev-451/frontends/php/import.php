@@ -70,9 +70,12 @@ include_once('include/page_header.php');
 		$cmbConf->addItem('import.php', S_IMPORT);
 	$header_form->addItem($cmbConf);
 	$header_form->addVar('groupid', get_request('groupid', 0));
-	show_table_header(S_IMPORT_BIG, $header_form);
 
 
+	$import_wdgt = new CWidget();
+	$import_wdgt->addPageHeader(S_IMPORT_BIG, $header_form);
+
+	
 	$form = new CFormTable(S_IMPORT, null, 'post', 'multipart/form-data');
 	$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
 
@@ -94,11 +97,10 @@ include_once('include/page_header.php');
 	$form->addRow(S_RULES, $table);
 
 	$form->addItemToBottomRow(new CButton('import', S_IMPORT));
-	$form->show();
+	
+	$import_wdgt->addItem($form);
+	$import_wdgt->show();
 
-?>
-<?php
 
 include_once('include/page_footer.php');
-
 ?>

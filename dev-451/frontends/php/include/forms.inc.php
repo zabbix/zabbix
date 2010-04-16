@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -151,7 +151,7 @@
 		$form->addItemToBottomRow(SPACE);
 		$form->addItemToBottomRow(new CButtonCancel());
 
-		$form->show();
+		return $form;
 	}
 
 	function insert_drule_form(){
@@ -347,7 +347,7 @@
 		$form->addItemToBottomRow(SPACE);
 		$form->addItemToBottomRow(new CButtonCancel());
 
-		$form->show();
+		return $form;
 	}
 
 	function	insert_httpstep_form()
@@ -579,7 +579,7 @@
 		$form->addItemToBottomRow(SPACE);
 		$form->addItemToBottomRow(new CButtonCancel());
 
-		$form->show();
+		return $form;
 	}
 
 	function insert_configuration_form($file){
@@ -940,7 +940,8 @@
 		}
 		$frmUser->addItemToBottomRow(SPACE);
 		$frmUser->addItemToBottomRow(new CButtonCancel(url_param("config")));
-		$frmUser->show();
+		
+		return $frmUser;
 	}
 
 // Insert form for User Groups
@@ -1169,7 +1170,8 @@
 		}
 		$frmUserG->addItemToBottomRow(SPACE);
 		$frmUserG->addItemToBottomRow(new CButtonCancel(url_param("config")));
-		$frmUserG->show();
+		
+		return($frmUserG);
 	}
 
 	function get_rights_of_elements_table($rights=array(),$user_type=USER_TYPE_ZABBIX_USER){
@@ -1359,7 +1361,7 @@
 		$col_table1->addRow(array(bold(S_HOST.': '),
 				array(new CTextBox('filter_host', $filter_host, 20),
 					new CButton('btn_host', S_SELECT, 'return PopUp("popup.php?dstfrm='.$form->GetName().
-						'&dstfld1=filter_host&srctbl=hosts&srcfld1=host",450,450);', 'H'))
+						'&dstfld1=filter_host&srctbl=hosts_and_templates&srcfld1=host",450,450);', 'H'))
 		));
 		$col_table1->addRow(array(bold(S_APPLICATION.': '),
 				array(new CTextBox('filter_application', $filter_application, 20),
@@ -1836,7 +1838,12 @@
 
 		if(is_null($host)){
 			if($hostid > 0){
-				$host_info = CHost::get(array('hostids' => $hostid, 'extendoutput' => 1, 'templated_hosts' => 1));
+				$options = array(
+					'hostids' => $hostid,
+					'output' => API_OUTPUT_EXTEND,
+					'templated_hosts' => 1
+				);
+				$host_info = CHost::get($options);
 				$host_info = reset($host_info);
 				$host = $host_info['host'];
 			}
@@ -2222,7 +2229,6 @@
 			$frmItem->addVar('applications',$applications,6);
 		}
 		else{
-
 			$new_app = new CTextBox('new_application',$new_application,40);
 			$frmItem->addRow(S_NEW_APPLICATION,$new_app);
 
@@ -2851,13 +2857,10 @@
 //		$txtCondVal = new CTextBox('trigger','',75,'yes');
 
 		$btnSelect = new CButton('btn1',S_ADD,
-				"return PopUp('popup.php?dstfrm=".$frmTrig->GetName().
-							'&dstfld1=new_dependence[]'.
-							'&srctbl=triggers'.
+				"return PopUp('popup.php?srctbl=triggers".
+							'&srcfld1=triggerid'.
+							'&reference=deptrigger'.
 							'&multiselect=1'.
-							'&dstact=add_dependence'.
-							'&objname=triggers'.
-							'&srcfld1=1'.
 						"',750,450);",'T');
 
 
@@ -2897,6 +2900,19 @@
 
 		$jsmenu = new CPUMenu(null,170);
 		$jsmenu->InsertJavaScript();
+
+		$script = "function addPopupValues(list){
+						if(!isset('object', list)) return false;
+
+						if(list.object == 'deptrigger'){
+							for(var i=0; i < list.values.length; i++){
+								create_var('".$frmTrig->getName()."', 'new_dependence['+i+']', list.values[i], false);
+							}
+
+							create_var('".$frmTrig->getName()."','add_dependence', 1, true);
+						}
+					}";
+		insert_js($script);
 	}
 
 	function insert_trigger_comment_form($triggerid){
@@ -3027,6 +3043,7 @@
 			}
 		}
 
+		$items = array_values($items);
 		$icount = count($items);
 		for($i=0; $i < $icount-1;){
 // check if we deletd an item
@@ -3051,13 +3068,8 @@
 
 		$frmGraph->addRow(S_NAME, new CTextBox('name', $name, 32));
 
-		$g_width = new CNumericBox('width', $width, 5);
-		$g_width->setAttribute('onblur', 'javascript: submit();');
-		$frmGraph->addRow(S_WIDTH, $g_width);
-
-		$g_height = new CNumericBox('height', $height, 5);
-		$g_height->setAttribute('onblur','javascript: submit();');
-		$frmGraph->addRow(S_HEIGHT, $g_height);
+		$frmGraph->addRow(S_WIDTH, new CNumericBox('width', $width, 5));
+		$frmGraph->addRow(S_HEIGHT, new CNumericBox('height', $height, 5));
 
 		$cmbGType = new CComboBox('graphtype', $graphtype, 'graphs.submit(this)');
 		$cmbGType->addItem(GRAPH_TYPE_NORMAL, S_NORMAL);
@@ -3068,10 +3080,100 @@
 		zbx_add_post_js('graphs.graphtype = '.$graphtype.";\n");
 
 		$frmGraph->addRow(S_GRAPH_TYPE, $cmbGType);
+		
+		
+// items beforehead, to get only_hostid for miny maxy items
+		$only_hostid = null;
+		$monitored_hosts = null;
+
+		if(count($items)){
+			$frmGraph->addVar('items', $items);
+
+			$keys = array_keys($items);
+			$first = reset($keys);
+			$last = end($keys);
+
+			$items_table = new CTableInfo();
+			foreach($items as $gid => $gitem){
+				//if($graphtype == GRAPH_TYPE_STACKED && $gitem['type'] == GRAPH_ITEM_AGGREGATED) continue;
+				$host = get_host_by_itemid($gitem['itemid']);
+				$item = get_item_by_itemid($gitem['itemid']);
+
+				if($host['status'] == HOST_STATUS_TEMPLATE)
+					$only_hostid = $host['hostid'];
+				else
+					$monitored_hosts = 1;
+
+				if($gitem['type'] == GRAPH_ITEM_AGGREGATED)
+					$color = '-';
+				else
+					$color = new CColorCell(null,$gitem['color']);
+
+
+				if($gid == $first){
+					$do_up = null;
+				}
+				else{
+					$do_up = new CSpan(S_UP,'link');
+					$do_up->onClick("return create_var('".$frmGraph->getName()."','move_up',".$gid.", true);");
+				}
+
+				if($gid == $last){
+					$do_down = null;
+				}
+				else{
+					$do_down = new CSpan(S_DOWN,'link');
+					$do_down->onClick("return create_var('".$frmGraph->getName()."','move_down',".$gid.", true);");
+				}
+
+				$description = new CSpan($host['host'].': '.item_description($item),'link');
+				$description->onClick(
+					'return PopUp("popup_gitem.php?list_name=items&dstfrm='.$frmGraph->getName().
+					url_param($only_hostid, false, 'only_hostid').
+					url_param($monitored_hosts, false, 'monitored_hosts').
+					url_param($graphtype, false, 'graphtype').
+					url_param($gitem, false).
+					url_param($gid,false,'gid').
+					url_param(get_request('graphid',0),false,'graphid').
+					'",550,400,"graph_item_form");'
+				);
+
+				if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
+					$items_table->addRow(array(
+							new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
+							$description,
+							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
+							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
+							$color,
+							array( $do_up, SPACE."|".SPACE, $do_down )
+						));
+				}
+				else{
+					$items_table->addRow(array(
+							new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
+//							$gitem['sortorder'],
+							$description,
+							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
+							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
+							($gitem['yaxisside']==GRAPH_YAXIS_SIDE_LEFT)?S_LEFT:S_RIGHT,
+							graph_item_drawtype2str($gitem["drawtype"],$gitem["type"]),
+							$color,
+							array( $do_up, ((!is_null($do_up) && !is_null($do_down)) ? SPACE."|".SPACE : ''), $do_down )
+						));
+				}
+			}
+			$dedlete_button = new CButton('delete_item', S_DELETE_SELECTED);
+		}
+		else{
+			$items_table = $dedlete_button = null;
+		}
+
+//		$frmGraph->addRow(S_SHOW_LEGEND, new CCheckBox('legend',$legend, null, 1));
 
 		if(($graphtype == GRAPH_TYPE_NORMAL) || ($graphtype == GRAPH_TYPE_STACKED)){
 			$frmGraph->addRow(S_SHOW_WORKING_TIME,new CCheckBox('showworkperiod',$showworkperiod,null,1));
 			$frmGraph->addRow(S_SHOW_TRIGGERS,new CCheckBox('showtriggers',$showtriggers,null,1));
+
 
 			if($graphtype == GRAPH_TYPE_NORMAL){
 				$percent_left = sprintf("%2.2f",$percent_left);
@@ -3118,14 +3220,21 @@
 					$ymin_name = $min_host['host'].':'.item_description($min_item);
 				}
 
-				$yaxis_min[] = new CTextBox("ymin_name",$ymin_name,80,'yes');
-				$yaxis_min[] = new CButton('yaxis_min',S_SELECT,'javascript: '.
-												"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
-													"&dstfld1=ymin_itemid".
-													"&dstfld2=ymin_name".
-													"&srctbl=items".
-													"&srcfld1=itemid".
-													"&srcfld2=description',0,0,'zbx_popup_item');");
+				if(count($items)){
+					$yaxis_min[] = new CTextBox("ymin_name",$ymin_name,80,'yes');
+					$yaxis_min[] = new CButton('yaxis_min',S_SELECT,'javascript: '.
+													"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
+													url_param($only_hostid, false, 'only_hostid').
+													url_param($monitored_hosts, false, 'monitored_hosts').
+														"&dstfld1=ymin_itemid".
+														"&dstfld2=ymin_name".
+														"&srctbl=items".
+														"&srcfld1=itemid".
+														"&srcfld2=description',0,0,'zbx_popup_item');");
+				}
+				else{
+					$yaxis_min[] = SPACE.S_ADD_GRAPH_ITEMS;
+				}
 			}
 			else{
 				$frmGraph->addVar('yaxismin', $yaxismin);
@@ -3143,7 +3252,7 @@
 			$yaxis_max[] = $cmbYType;
 
 			if($ymax_type == GRAPH_YAXIS_TYPE_FIXED){
-				$yaxis_max[] = new CTextBox("yaxismax",$yaxismax,9);
+				$yaxis_max[] = new CTextBox('yaxismax',$yaxismax,9);
 			}
 			else if($ymax_type == GRAPH_YAXIS_TYPE_ITEM_VALUE){
 				$frmGraph->addVar('yaxismax',$yaxismax);
@@ -3154,15 +3263,22 @@
 					$max_item = get_item_by_itemid($ymax_itemid);
 					$ymax_name = $max_host['host'].':'.item_description($max_item);
 				}
-
-				$yaxis_max[] = new CTextBox("ymax_name",$ymax_name,80,'yes');
-				$yaxis_max[] = new CButton('yaxis_max',S_SELECT,'javascript: '.
-												"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
-													"&dstfld1=ymax_itemid".
-													"&dstfld2=ymax_name".
-													"&srctbl=items".
-													"&srcfld1=itemid".
-													"&srcfld2=description',0,0,'zbx_popup_item');");
+	
+				if(count($items)){
+					$yaxis_max[] = new CTextBox("ymax_name",$ymax_name,80,'yes');
+					$yaxis_max[] = new CButton('yaxis_max',S_SELECT,'javascript: '.
+													"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
+													url_param($only_hostid, false, 'only_hostid').
+													url_param($monitored_hosts, false, 'monitored_hosts').
+														"&dstfld1=ymax_itemid".
+														"&dstfld2=ymax_name".
+														"&srctbl=items".
+														"&srcfld1=itemid".
+														"&srcfld2=description',0,0,'zbx_popup_item');");
+				}
+				else{
+					$yaxis_max[] = SPACE.S_ADD_GRAPH_ITEMS;
+				}
 			}
 			else{
 				$frmGraph->addVar('yaxismax',$yaxismax);
@@ -3170,97 +3286,11 @@
 
 			$frmGraph->addRow(S_YAXIS_MAX_VALUE, $yaxis_max);
 		}
-		else {
-			$frmGraph->addRow(S_3D_VIEW,new CCheckBox('graph3d',$graph3d,'javascript: graphs.submit(this);',1));
-			$frmGraph->addRow(S_LEGEND,new CCheckBox('legend',$legend,'javascript: graphs.submit(this);',1));
-		}
-
-		$only_hostid = null;
-		$monitored_hosts = null;
-
-		if(count($items)){
-			$frmGraph->addVar('items', $items);
-
-			$keys = array_keys($items);
-			$first = reset($keys);
-			$last = end($keys);
-
-			$items_table = new CTableInfo();
-			foreach($items as $gid => $gitem){
-				//if($graphtype == GRAPH_TYPE_STACKED && $gitem['type'] == GRAPH_ITEM_AGGREGATED) continue;
-				$host = get_host_by_itemid($gitem['itemid']);
-				$item = get_item_by_itemid($gitem['itemid']);
-
-				if($host['status'] == HOST_STATUS_TEMPLATE)
-					$only_hostid = $host['hostid'];
-				else
-					$monitored_hosts = 1;
-
-				if($gitem['type'] == GRAPH_ITEM_AGGREGATED)
-					$color = '-';
-				else
-					$color = new CColorCell(null,$gitem['color']);
-
-
-				if($gid == $first){
-					$do_up = null;
-				}
-				else{
-					$do_up = new CSpan(S_UP,'link');
-					$do_up->onClick("return create_var('".$frmGraph->getName()."','move_up',".$gid.", true);");
-				}
-
-				if($gid == $last){
-					$do_down = null;
-				}
-				else{
-					$do_down = new CSpan(S_DOWN,'link');
-					$do_down->onClick("return create_var('".$frmGraph->getName()."','move_down',".$gid.", true);");
-				}
-
-
-
-				$description = new CSpan($host['host'].': '.item_description($item),'link');
-				$description->onClick(
-					'return PopUp("popup_gitem.php?list_name=items&dstfrm='.$frmGraph->getName().
-					url_param($only_hostid, false, 'only_hostid').
-					url_param($monitored_hosts, false, 'monitored_hosts').
-					url_param($graphtype, false, 'graphtype').
-					url_param($gitem, false).
-					url_param($gid,false,'gid').
-					url_param(get_request('graphid',0),false,'graphid').
-					'",550,400,"graph_item_form");'
-				);
-
-				if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
-					$items_table->addRow(array(
-							new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
-							$description,
-							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
-							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
-							$color,
-							array( $do_up, SPACE."|".SPACE, $do_down )
-						));
-				}
-				else{
-					$items_table->addRow(array(
-							new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
-//							$gitem['sortorder'],
-							$description,
-							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
-							graph_item_type2str($gitem['type'],$gitem["periods_cnt"]),
-							($gitem['yaxisside']==GRAPH_YAXIS_SIDE_LEFT)?S_LEFT:S_RIGHT,
-							graph_item_drawtype2str($gitem["drawtype"],$gitem["type"]),
-							$color,
-							array( $do_up, ((!is_null($do_up) && !is_null($do_down)) ? SPACE."|".SPACE : ''), $do_down )
-						));
-				}
-			}
-			$dedlete_button = new CButton('delete_item', S_DELETE_SELECTED);
-		}
 		else{
-			$items_table = $dedlete_button = null;
+			$frmGraph->addRow(S_SHOW_LEGEND, new CCheckBox('legend',$legend, null, 1));
+			$frmGraph->addRow(S_3D_VIEW,new CCheckBox('graph3d',$graph3d,null,1));
 		}
+
 		$frmGraph->addRow(S_ITEMS,
 				array(
 					$items_table,
@@ -3274,16 +3304,21 @@
 				));
 		unset($items_table, $dedlete_button);
 
-		$frmGraph->addItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["graphid"])){
+		$preView = new CButton('preview',S_PREVIEW);
+		//$preView->setAttribute('style', 'float: left;');
+
+		$frmGraph->addItemToBottomRow($preView);
+		$frmGraph->addItemToBottomRow(SPACE);
+		$frmGraph->addItemToBottomRow(new CButton('save',S_SAVE));
+		if(isset($_REQUEST['graphid'])){
 			$frmGraph->addItemToBottomRow(SPACE);
-			$frmGraph->addItemToBottomRow(new CButton("clone",S_CLONE));
+			$frmGraph->addItemToBottomRow(new CButton('clone',S_CLONE));
 			$frmGraph->addItemToBottomRow(SPACE);
-			$frmGraph->addItemToBottomRow(new CButtonDelete(S_DELETE_GRAPH_Q,url_param("graphid").
-				url_param('groupid').url_param("hostid")));
+			$frmGraph->addItemToBottomRow(new CButtonDelete(S_DELETE_GRAPH_Q,url_param('graphid').
+				url_param('groupid').url_param('hostid')));
 		}
 		$frmGraph->addItemToBottomRow(SPACE);
-		$frmGraph->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param("hostid")));
+		$frmGraph->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param('hostid')));
 
 		$frmGraph->show();
 	}
@@ -3310,12 +3345,11 @@
 
 		}
 		else{
-
-			$mname			= get_request('mname','');
+			$mname				= get_request('mname','');
 			$maintenance_type	= get_request('maintenance_type',0);
 
-			$active_since		= get_request('active_since',time());
-			$active_till		= get_request('active_till',time()+86400);
+			$active_since		= zbxDateToTime(get_request('active_since',date('YmdHi')));
+			$active_till		= zbxDateToTime(get_request('active_till', date('YmdHi', time()+86400)));
 
 			$description		= get_request('description','');
 		}
@@ -3333,8 +3367,8 @@
 
 /***********************************************************/
 
-		$tblMntc->addItem(new Cvar('active_since',$active_since));
-		$tblMntc->addItem(new Cvar('active_till',$active_till));
+		$tblMntc->addItem(new Cvar('active_since', date('YmdHi', $active_since)));
+		$tblMntc->addItem(new Cvar('active_till', date('YmdHi', $active_till)));
 
 		$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
 
@@ -5176,7 +5210,7 @@
 		$form->addRow(S_RULES, $table);
 
 		$form->addItemToBottomRow(new CButton('import', S_IMPORT));
-		$form->show();
+		return $form;
 	}
 
 	function insert_screen_form(){
@@ -5222,7 +5256,8 @@
 		}
 		$frmScr->addItemToBottomRow(SPACE);
 		$frmScr->addItemToBottomRow(new CButtonCancel());
-		$frmScr->show();
+		
+		return $frmScr;
 	}
 
 // HOSTS
@@ -5590,10 +5625,11 @@
 		}
 // END:   HOSTS PROFILE EXTENDED Section
 
-		$frmHost->addItemToBottomRow(new CButton('save',S_SAVE));
+		$frmHost->addItemToBottomRow(new CButton('masssave',S_SAVE));
 		$frmHost->addItemToBottomRow(SPACE);
 		$frmHost->addItemToBottomRow(new CButtonCancel(url_param('config').url_param('groupid')));
-		$frmHost->show();
+		
+		return $frmHost;
 	}
 
 // Host form
@@ -5814,7 +5850,7 @@
 			$grp_tb->addItem($group['groupid'], $group['name']);
 		}
 
-		$host_tbl->addRow(array(S_GROUPS,$grp_tb->get(S_IN.SPACE.S_GROUPS,S_OTHER.SPACE.S_GROUPS)));
+		$host_tbl->addRow(array(S_GROUPS,$grp_tb->get(S_IN_GROUPS, S_OTHER_GROUPS)));
 
 		$host_tbl->addRow(array(S_NEW_GROUP, new CTextBox('newgroup',$newgroup)));
 
@@ -6102,7 +6138,7 @@
 		$outer_table->addRow(array($td_l, $td_r));
 
 		$frmHost->addItem($outer_table);
-		$frmHost->show();
+		return $frmHost;
 	}
 
 // Insert host profile ReadOnly form
@@ -6278,6 +6314,7 @@
 	}
 
 	function import_map_form($rules){
+		global $USER_DETAILS;
 
 		$form = new CFormTable(S_IMPORT, null, 'post', 'multipart/form-data');
 		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
@@ -6286,14 +6323,17 @@
 		$table->setHeader(array(S_ELEMENT, S_UPDATE.SPACE.S_EXISTING, S_ADD.SPACE.S_MISSING), 'bold');
 
 		$titles = array('maps' => S_MAP);
-
+		if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN){
+			$titles += array('icons' => S_ICON, 'background' => S_BACKGROUND);
+		}
+		
 		foreach($titles as $key => $title){
 			$cbExist = new CCheckBox('rules['.$key.'][exist]', isset($rules[$key]['exist']));
 
-			if($key == 'template')
-				$cbMissed = null;
-			else
-				$cbMissed = new CCheckBox('rules['.$key.'][missed]', isset($rules[$key]['missed']));
+			if($key != 'maps')
+				$cbExist->setAttribute('onclick', 'javascript: if(this.checked) return confirm(\'Images for all maps will be updated\')');
+
+			$cbMissed = new CCheckBox('rules['.$key.'][missed]', isset($rules[$key]['missed']));
 
 			$table->addRow(array($title, $cbExist, $cbMissed));
 		}
@@ -6301,15 +6341,19 @@
 		$form->addRow(S_RULES, $table);
 
 		$form->addItemToBottomRow(new CButton('import', S_IMPORT));
-		$form->show();
+		return $form;
 	}
 
 	function insert_map_form(){
 		$frm_title = 'New system map';
 
 		if(isset($_REQUEST['sysmapid'])){
-			$result=DBselect('SELECT * FROM sysmaps WHERE sysmapid='.$_REQUEST['sysmapid']);
-			$row=DBfetch($result);
+			$options = array(
+				'sysmapids' => $_REQUEST['sysmapid'],
+				'output' => API_OUTPUT_EXTEND
+			);
+			$sysmaps = CMap::get($options);
+			$row = reset($sysmaps);
 			$frm_title = 'System map: "'.$row['name'].'"';
 		}
 
@@ -6320,9 +6364,9 @@
 			$backgroundid	= $row['backgroundid'];
 			$label_type	= $row['label_type'];
 			$label_location	= $row['label_location'];
-			$highlight = ($row['highlight']%2);
-			
-			$expproblem = ($row['highlight'] > 1) ? 0 : 1;
+			$highlight =	$row['highlight'];
+			$markelements = $row['markelements'];
+			$expandproblem = $row['expandproblem'];
 		}
 		else{
 			$name		= get_request('name','');
@@ -6332,8 +6376,8 @@
 			$label_type	= get_request('label_type',0);
 			$label_location	= get_request('label_location',0);
 			$highlight = get_request('highlight',0);
-			
-			$expproblem = isset($_REQUEST['form_refresh']) ? get_request('expproblem',0) : 1;
+			$markelements = get_request('markelements',0);
+			$expandproblem = get_request('expandproblem',0);
 		}
 
 		$frmMap = new CFormTable($frm_title,'sysmaps.php');
@@ -6360,8 +6404,11 @@
 		$frmMap->addRow(S_BACKGROUND_IMAGE,$cmbImg);
 
 		$frmMap->addRow(S_ICON_HIGHLIGHTING, new CCheckBox('highlight',$highlight,null,1));
+
+		$frmMap->addRow(S_MARK_ELEMENTS_ON_TRIGGER_STATUS_CHANGE, new CCheckBox('markelements',$markelements,null,1));
 		
-		$frmMap->addRow(S_EXPAND_SINGLE_PROBLEM, new CCheckBox('expproblem',$expproblem,null,1));
+		$frmMap->addRow(S_EXPAND_SINGLE_PROBLEM, new CCheckBox('expandproblem',$expandproblem,null,1));
+
 
 		$cmbLabel = new CComboBox('label_type',$label_type);
 		$cmbLabel->addItem(0,S_LABEL);
@@ -6390,7 +6437,7 @@
 		$frmMap->addItemToBottomRow(SPACE);
 		$frmMap->addItemToBottomRow(new CButtonCancel());
 
-		$frmMap->show();
+		return $frmMap;
 	}
 
 	function insert_command_result_form($scriptid,$hostid){

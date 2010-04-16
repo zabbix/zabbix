@@ -46,8 +46,8 @@ include_once('include/page_header.php');
 		'groupid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,	null),
 		'hostid'=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,	null),
 //ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			'isset({favid})'),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 
 	);
@@ -57,7 +57,7 @@ include_once('include/page_header.php');
 /* AJAX	*/
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
-			CProfile::update('web.httpmon.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.httpmon.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
 
@@ -131,8 +131,7 @@ include_once('include/page_header.php');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
 
-	show_table_header(S_STATUS_OF_WEB_MONITORING_BIG, $fs_icon);
-	echo SBR;
+	$httpmon_wdgt->addPageHeader(S_STATUS_OF_WEB_MONITORING_BIG, $fs_icon);
 
 // 2nd header
 	$r_form = new CForm();

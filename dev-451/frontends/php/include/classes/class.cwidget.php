@@ -205,7 +205,7 @@ private $items;
 //		$right_tab->addRow($right_row, 'textblackwhite');
 		$right_tab->addRow($right_row);
 
-		$table = new CTable(NULL,'header');
+		$table = new CTable(NULL,'header bottom_space');
 //		$table->setAttribute('border',0);
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);

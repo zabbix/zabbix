@@ -588,7 +588,6 @@ table.header{
 	border-right-style: solid;
 	border-bottom-style: solid;
 	vertical-align: middle;
-	margin-bottom: 5px;
 }
 
 table.header tr td.header_l{
@@ -614,6 +613,9 @@ table.header a{
 	color: #FFFFFF;
 }
 
+table.bottom_space{
+	margin-bottom: 5px;
+}
 /****** FLICKER *********/
 table.flicker{
 	width: 100%;

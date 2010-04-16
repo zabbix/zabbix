@@ -103,7 +103,6 @@ include_once('include/page_header.php');
 // EXPORT ///////////////////////////////////
 
 	if($EXPORT_DATA){
-// SELECT SCREENS
 		$screens = get_request('screens', array());
 
 		$options = array(
@@ -111,12 +110,11 @@ include_once('include/page_header.php');
 			'select_screenitems' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND
 		);
-
 		$screens = CScreen::get($options);
 
 		prepareScreenExport($screens);
 
-		$xml = zbxXML::arrayToXML($screens, 'screens');
+		$xml = zbxXML::arrayToXML(array('screens' => $screens));
 		print($xml);
 
 		exit();
@@ -339,8 +337,7 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-	$form = new CForm();
-	$form->SetMethod('get');
+	$form = new CForm(null, 'get');
 
 	$cmbConfig = new CComboBox('config', $config_scr, 'submit()');
 	$cmbConfig->addItem(0, S_SCREENS);
@@ -358,18 +355,17 @@ include_once('include/page_header.php');
 		$form->addItem(new CButton("form", S_SLIDESHOW));
 	}
 
-	show_table_header(0 == $config_scr ? S_CONFIGURATION_OF_SCREENS_BIG : S_CONFIGURATION_OF_SLIDESHOWS_BIG, $form);
+	$screen_wdgt = new CWidget();
+	$screen_wdgt->addPageHeader(0 == $config_scr ? S_CONFIGURATION_OF_SCREENS_BIG : S_CONFIGURATION_OF_SLIDESHOWS_BIG, $form);
 
 	if(0 == $config_scr){
 		if(isset($_REQUEST['form'])){
 			if($_REQUEST['form'] == S_IMPORT_SCREEN)
-				import_screen_form($rules);
+				$screen_wdgt->addItem(import_screen_form($rules));
 			else if(($_REQUEST['form'] == S_CREATE_SCREEN) || ($_REQUEST['form'] == 'update'))
-				insert_screen_form();
+				$screen_wdgt->addItem(insert_screen_form());
 		}
 		else{
-			$screen_wdgt = new CWidget();
-
 			$form = new CForm();
 			$form->setName('frm_screens');
 
@@ -424,13 +420,6 @@ include_once('include/page_header.php');
 			$goButton = new CButton('goButton', S_GO);
 			$goButton->setAttribute('id', 'goButton');
 
-			$jsLocale = array(
-				'S_CLOSE',
-				'S_NO_ELEMENTS_SELECTED'
-			);
-
-			zbx_addJSLocale($jsLocale);
-
 			zbx_add_post_js('chkbxRange.pageGoName = "screens";');
 //---------
 			$footer = get_table_header(array($goBox, $goButton));
@@ -439,15 +428,14 @@ include_once('include/page_header.php');
 			$form->addItem($table);
 
 			$screen_wdgt->addItem($form);
-			$screen_wdgt->show();
+			
 		}
 	}
 	else{
-		if(isset($_REQUEST["form"])){
-			insert_slideshow_form();
+		if(isset($_REQUEST['form'])){
+			$screen_wdgt->addItem(insert_slideshow_form());
 		}
 		else{
-			$screen_wdgt = new CWidget();
 
 			$form = new CForm();
 			$form->setName('frm_shows');
@@ -509,13 +497,6 @@ include_once('include/page_header.php');
 			$goButton = new CButton('goButton',S_GO);
 			$goButton->setAttribute('id','goButton');
 
-            		$jsLocale = array(
-                            		'S_CLOSE',
-                            		'S_NO_ELEMENTS_SELECTED'
-        	        );
-
-            		zbx_addJSLocale($jsLocale);
-
 			zbx_add_post_js('chkbxRange.pageGoName = "shows";');
 
 			$table->setFooter(new CCol(array($goBox, $goButton)));
@@ -523,14 +504,12 @@ include_once('include/page_header.php');
 			$form->addItem($table);
 
 			$screen_wdgt->addItem($form);
-			$screen_wdgt->show();
 		}
 
 	}
+	
+	$screen_wdgt->show();
 
-?>
-<?php
-
+	
 include_once('include/page_footer.php');
-
 ?>

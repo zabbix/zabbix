@@ -45,19 +45,20 @@ include_once('include/page_header.php');
 		'maintenanceid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'isset({form})&&({form}=="update")'),
 		'maintenanceids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, 		NULL),
 		'mname'=>				array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'isset({save})'),
-		'maintenance_type'=>	array(T_ZBX_INT, O_OPT,  null,	null,		'isset({save})'),
+		'maintenance_type'=>	array(T_ZBX_INT, O_OPT,	null,	null,		'isset({save})'),
 
-		'description'=>			array(T_ZBX_STR, O_OPT,	NULL,	null,					'isset({save})'),
-		'active_since'=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(1,time()*2),	'isset({save})'),
-		'active_till'=>			array(T_ZBX_INT, O_OPT,  null,	BETWEEN(1,time()*2),	'isset({save})'),
+		'description'=>			array(T_ZBX_STR, O_OPT,	NULL,	null,		'isset({save})'),
+
+		'active_since'=>		array(T_ZBX_STR, O_OPT,  null, 	NOT_EMPTY,	'isset({save})'),
+		'active_till'=>			array(T_ZBX_STR, O_OPT,  null, 	NOT_EMPTY,	'isset({save})'),
 
 		'new_timeperiod'=>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({add_timeperiod})'),
 
 		'timeperiods'=>			array(T_ZBX_STR, O_OPT, null,	null, null),
-		'g_timeperiodid'=>		array(null, O_OPT, null, null, null),
+		'g_timeperiodid'=>		array(null,		 O_OPT, null,	null, null),
 
-		'edit_timeperiodid'=>	array(null, O_OPT, P_ACT,	DB_ID,	null),
-		'twb_groupid' => array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+		'edit_timeperiodid'=>	array(null,		 O_OPT, P_ACT,	DB_ID, null),
+		'twb_groupid' =>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 // actions
 		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
 // form actions
@@ -103,12 +104,13 @@ include_once('include/page_header.php');
 		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
 			access_deny();
 
-		$maintenance = array('name' => $_REQUEST['mname'],
-					'maintenance_type' => $_REQUEST['maintenance_type'],
-					'description'=>	$_REQUEST['description'],
-					'active_since'=> $_REQUEST['active_since'],
-					'active_till' => zbx_empty($_REQUEST['active_till'])?0:$_REQUEST['active_till']
-				);
+		$maintenance = array(
+			'name' => $_REQUEST['mname'],
+			'maintenance_type' => $_REQUEST['maintenance_type'],
+			'description'=>	$_REQUEST['description'],
+			'active_since'=> zbxDateToTime(get_request('active_since', date('YmdHi'))),
+			'active_till' => zbxDateToTime(get_request('active_till', 0))
+		);
 
 		$timeperiods = get_request('timeperiods', array());
 
@@ -190,6 +192,7 @@ include_once('include/page_header.php');
 	else if(inarr_isset(array('add_timeperiod','new_timeperiod'))){
 		$new_timeperiod = $_REQUEST['new_timeperiod'];
 
+		$new_timeperiod['start_date'] = zbxDateToTime($new_timeperiod['start_date']);
 // START TIME
 		$new_timeperiod['start_time'] = ($new_timeperiod['hour'] * 3600) + ($new_timeperiod['minute'] * 60);
 //--
@@ -341,7 +344,8 @@ include_once('include/page_header.php');
 		$frmForm->addItem(new CButton('form',S_CREATE_MAINTENANCE_PERIOD));
 	}
 
-	show_table_header(S_CONFIGURATION_OF_MAINTENANCE_PERIODS, $frmForm);
+	$maintenance_wdgt = new CWidget();
+	$maintenance_wdgt->addPageHeader(S_CONFIGURATION_OF_MAINTENANCE_PERIODS, $frmForm);
 ?>
 <?php
 	if(isset($_REQUEST['form'])){
@@ -424,12 +428,10 @@ include_once('include/page_header.php');
 		$frmMaintenance->additem($outer_table);
 
 		show_messages();
-		$frmMaintenance->show();
-//			insert_maintenance_form();
+		$maintenance_wdgt->addItem($frmMaintenance);
 	}
 	else {
 // Table HEADER
-		$maintenance_wdgt = new CWidget();
 
 		$form = new CForm();
 		$form->setMethod('get');
@@ -506,13 +508,6 @@ include_once('include/page_header.php');
 		$goButton = new CButton('goButton',S_GO.' (0)');
 		$goButton->setAttribute('id','goButton');
 
-		$jsLocale = array(
-			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTED'
-		);
-
-		zbx_addJSLocale($jsLocale);
-
 		zbx_add_post_js('chkbxRange.pageGoName = "maintenanceids";');
 
 		$footer = get_table_header(array($goBox, $goButton));
@@ -525,9 +520,9 @@ include_once('include/page_header.php');
 		$form->addItem($table);
 
 		$maintenance_wdgt->addItem($form);
-		$maintenance_wdgt->show();
 	}
 
+	$maintenance_wdgt->show();
 
 include_once('include/page_footer.php');
 ?>

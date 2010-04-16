@@ -138,32 +138,37 @@ exit:
  ******************************************************************************/
 int	put_data_to_server(zbx_sock_t *sock, struct zbx_json *j)
 {
+	const char		*__function_name = "put_data_to_server";
 	struct zbx_json_parse	jp;
 	int			ret = FAIL;
 	char			*answer, value[MAX_STRING_LEN];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In put_data_to_server() [datalen:%zd]",
-			j->buffer_size);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [datalen:%zd]",
+			__function_name, j->buffer_size);
 
 	if (FAIL == send_data_to_server(sock, j->buffer))
 		goto exit;
 
-	if (FAIL == recv_data_from_server(sock, &answer))
-		goto exit;
+	if (SUCCEED == recv_data_from_server(sock, &answer))
+	{
+		if (FAIL == zbx_json_open(answer, &jp))
+			goto exit;
 
-	if (FAIL == zbx_json_open(answer, &jp))
-		goto exit;
+		if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value)))
+			goto exit;
 
-	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value)))
-		goto exit;
-
-	if (0 != strcmp(value, ZBX_PROTO_VALUE_SUCCESS))
-		goto exit;
+		if (0 != strcmp(value, ZBX_PROTO_VALUE_SUCCESS))
+			goto exit;
+	}
+	else
+		/* since we have successfully sent data to the server, we assume the */
+		/* server is just too busy processing our data if there is no response */
+		zabbix_log(LOG_LEVEL_DEBUG, "Did not receive response from server.");
 
 	ret = SUCCEED;
 exit:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of put_data_to_server():%s",
-			zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
+			__function_name, zbx_result_string(ret));
 
 	return ret;
 }

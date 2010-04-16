@@ -27,7 +27,7 @@
 	$page['title'] = 'S_DETAILS_OF_SCENARIO';
 	$page['file'] = 'httpdetails.php';
 	$page['hist_arg'] = array('httptestid');
-	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.calendar.js','gtlc.js');
+	$page['scripts'] = array('effects.js','dragdrop.js','class.calendar.js','gtlc.js');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -47,7 +47,7 @@
 		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
 	);
 
@@ -60,7 +60,7 @@
 		}
 		if('timeline' == $_REQUEST['favobj']){
 			if(isset($_REQUEST['httptestid']) && isset($_REQUEST['period'])){
-				navigation_bar_calc('web.httptest', $_REQUEST['httptestid']);
+				navigation_bar_calc('web.httptest', $_REQUEST['httptestid'], true);
 			}
 		}
 	}
@@ -82,11 +82,10 @@
 		access_deny();
 	}
 
-	navigation_bar_calc('web.httptest', $_REQUEST['httptestid']);
+	navigation_bar_calc('web.httptest', $_REQUEST['httptestid'], true);
 ?>
 <?php
 	$details_wdgt = new CWidget();
-	$details_wdgt->setClass('header');
 
 // Header
 	$url = '?httptestid='.$_REQUEST['httptestid'].'&fullscreen='.($_REQUEST['fullscreen']?'0':'1');
@@ -98,7 +97,7 @@
 	$rst_icon->setAttribute('title', S_RESET);
 	$rst_icon->addAction('onclick', new CJSscript("javascript: timeControl.objectReset('".$_REQUEST['httptestid']."');"));
 
-	$details_wdgt->addHeader(
+	$details_wdgt->addPageHeader(
 		array(S_DETAILS_OF_SCENARIO_BIG.SPACE, bold($httptest_data['name']),' ['.date(S_DATE_FORMAT_YMDHMS, $httptest_data['lastcheck']).']'),
 		array($rst_icon, $fs_icon)
 	);
@@ -233,21 +232,16 @@
 	
 	$graphsWidget->addItem($graphTable);
 	
-	$graphsWidget->addPageHeader(SPACE);
-
 // NAV BAR
 	$timeline = array(
 		'period' => get_request('period',ZBX_PERIOD_DEFAULT),
-		'starttime' => get_min_itemclock_by_itemid($itemids)
+		'starttime' => date('YmdHi', get_min_itemclock_by_itemid($itemids))
 	);
 
 	if(isset($_REQUEST['stime'])){
-		$bstime = $_REQUEST['stime'];
-		$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
-		$timeline['usertime'] += $timeline['period'];
+		$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 	}
 
-	
 	$graphDims = array(
 		'width' => -120,
 		'graphHeight' => 150,
@@ -321,6 +315,9 @@
 
 	$graphsWidget->show();
 	
-	
+?>
+<?php
+
 include_once('include/page_footer.php');
+
 ?>

@@ -161,10 +161,10 @@ $fields=array(
 	}
 ?>
 <?php
-
-	show_table_header(S_USER_PROFILE_BIG.' : '.$USER_DETAILS['name'].' '.$USER_DETAILS['surname']);
-	echo '<br>';
-	insert_user_form($USER_DETAILS['userid'],1);
+	$profile_wdgt = new CWidget();
+	$profile_wdgt->addPageHeader(S_USER_PROFILE_BIG.' : '.$USER_DETAILS['name'].' '.$USER_DETAILS['surname']);
+	$profile_wdgt->addItem(insert_user_form($USER_DETAILS['userid'],1));
+	$profile_wdgt->show();
 
 include_once ('include/page_footer.php');
 ?>

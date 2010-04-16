@@ -26,7 +26,7 @@ require_once('include/graphs.inc.php');
 $page['title'] = 'S_CUSTOM_GRAPHS';
 $page['file'] = 'charts.php';
 $page['hist_arg'] = array('hostid','groupid','graphid');
-$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.calendar.js','gtlc.js');
+$page['scripts'] = array('effects.js', 'dragdrop.js','class.calendar.js','gtlc.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -40,7 +40,6 @@ include_once('include/page_header.php');
 		'groupid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,		DB_ID,NULL),
 		'hostid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,		DB_ID,NULL),
 		'graphid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,		DB_ID,NULL),
-		'from'=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
 		'period'=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	null,NULL),
 		'stime'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	NULL,NULL),
 		'action'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'go','add','remove'"),NULL),
@@ -48,7 +47,8 @@ include_once('include/page_header.php');
 
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NULL,			NULL),
 
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
 		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),NULL)
@@ -63,12 +63,12 @@ include_once('include/page_header.php');
 			CProfile::update('web.charts.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 		if('hat' == $_REQUEST['favobj']){
-			CProfile::update('web.charts.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.charts.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 
 		if('timeline' == $_REQUEST['favobj']){
 			if(isset($_REQUEST['graphid']) && isset($_REQUEST['period'])){
-				navigation_bar_calc('web.graph', true);
+				navigation_bar_calc('web.graph',$_REQUEST['graphid'], true);
 			}
 		}
 
@@ -141,7 +141,7 @@ include_once('include/page_header.php');
 		}
 	}
 
-	$effectiveperiod = navigation_bar_calc('web.graph');
+	$effectiveperiod = navigation_bar_calc('web.graph',$_REQUEST['graphid']);
 
 	CProfile::update('web.charts.graphid',$_REQUEST['graphid'], PROFILE_TYPE_ID);
 
@@ -307,12 +307,10 @@ include_once('include/page_header.php');
 // NAV BAR
 		$timeline = array();
 		$timeline['period'] = $effectiveperiod;
-		$timeline['starttime'] = get_min_itemclock_by_graphid($_REQUEST['graphid']);
+		$timeline['starttime'] = date('YmdHi', get_min_itemclock_by_graphid($_REQUEST['graphid']));
 
 		if(isset($_REQUEST['stime'])){
-			$bstime = $_REQUEST['stime'];
-			$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
-			$timeline['usertime'] += $timeline['period'];
+			$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 		}
 
 		$objData = array(

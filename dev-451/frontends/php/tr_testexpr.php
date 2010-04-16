@@ -50,7 +50,7 @@ include_once('include/page_header.php');
 	$data_table->setAttribute('id', 'data_list');
 	$data_table->setOddRowClass('even_row');
 	$data_table->setEvenRowClass('even_row');
-	$data_table->setHeader(array('#', S_ITEM_FUNCTION, S_RESULT_TYPE, S_VALUE));
+	$data_table->setHeader(array('#', S_ITEM_SLASH_FUNCTION, S_RESULT_TYPE, S_VALUE));
 
 	$datas = array();
 	$fields = array();

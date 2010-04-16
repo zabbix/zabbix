@@ -19,17 +19,17 @@
 **/
 ?>
 <?php
-	require_once 'include/config.inc.php';
-	require_once 'include/hosts.inc.php';
-	require_once 'include/reports.inc.php';
+require_once('include/config.inc.php');
+require_once('include/hosts.inc.php');
+require_once('include/reports.inc.php');
 
-	$page['title']	= 'S_AVAILABILITY_REPORT';
-	$page['file']	= 'report2.php';
-	$page['hist_arg'] = array('config', 'groupid', 'hostid', 'tpl_triggerid');
-	$page['scripts'] = array('class.calendar.js', 'scriptaculous.js?load=effects');
-	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['title']	= 'S_AVAILABILITY_REPORT';
+$page['file']	= 'report2.php';
+$page['hist_arg'] = array('config', 'groupid', 'hostid', 'tpl_triggerid');
+$page['scripts'] = array('class.calendar.js', 'effects.js');
+$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-include_once 'include/page_header.php';
+include_once('include/page_header.php');
 
 ?>
 <?php
@@ -44,11 +44,11 @@ include_once 'include/page_header.php';
 // filter
 		'filter_rst'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
 		'filter_set'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
-		'filter_timesince'=>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
-		'filter_timetill'=>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
+		'filter_timesince'=>	array(T_ZBX_STR, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
+		'filter_timetill'=>		array(T_ZBX_STR, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,		'isset({favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,		'isset({favobj})'),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})'),
 	);
 
@@ -87,9 +87,12 @@ include_once 'include/page_header.php';
 	}
 
 	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
-		CProfile::update('web.avail_report.filter.timesince', $_REQUEST['filter_timesince'], PROFILE_TYPE_INT);
-		CProfile::update('web.avail_report.filter.timetill', $_REQUEST['filter_timetill'], PROFILE_TYPE_INT);
+		CProfile::update('web.avail_report.filter.timesince', $_REQUEST['filter_timesince'], PROFILE_TYPE_STR);
+		CProfile::update('web.avail_report.filter.timetill', $_REQUEST['filter_timetill'], PROFILE_TYPE_STR);
 	}
+
+	$_REQUEST['filter_timesince'] = zbxDateToTime($_REQUEST['filter_timesince']);
+	$_REQUEST['filter_timetill'] = zbxDateToTime($_REQUEST['filter_timetill']);
 
 	$_REQUEST['groupid'] = $_REQUEST['filter_groupid'];
 	$_REQUEST['hostid'] = $_REQUEST['filter_hostid'];

@@ -59,7 +59,7 @@ include_once('include/page_header.php');
 
 	$graph = new CChart();
 
-	$effectiveperiod = navigation_bar_calc('web.item.graph',false);
+	$effectiveperiod = navigation_bar_calc('web.item.graph',$_REQUEST['itemid'],false);
 
 	if(isset($_REQUEST['period']))		$graph->SetPeriod($_REQUEST['period']);
 	if(isset($_REQUEST['from']))		$graph->SetFrom($_REQUEST['from']);
@@ -68,11 +68,9 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['border']))		$graph->SetBorder(0);
 	if(isset($_REQUEST['stime']))		$graph->setSTime($_REQUEST['stime']);
 
-	$graph->addItem($_REQUEST['itemid'], GRAPH_YAXIS_SIDE_LEFT, CALC_FNC_ALL);
+	$graph->addItem($_REQUEST['itemid'], GRAPH_YAXIS_SIDE_DEFAULT, CALC_FNC_ALL);
 	$graph->draw();
-?>
-<?php
+
 
 include_once('include/page_footer.php');
-
 ?>

@@ -28,7 +28,7 @@
 
 	$page['file'] = 'tr_status.php';
 	$page['title'] = 'S_STATUS_OF_TRIGGERS';
-	$page['scripts'] = array('scriptaculous.js?load=effects');
+	$page['scripts'] = array('effects.js');
 	$page['hist_arg'] = array('groupid', 'hostid');
 	$page['scripts'] = array('class.cswitcher.js');
 
@@ -101,8 +101,8 @@ include_once('include/page_header.php');
 		'show_details'=>		array(T_ZBX_INT, O_OPT,  	null,	null, 	null),
 		'txt_select'=>			array(T_ZBX_STR, O_OPT,  	null,	null, 	null),
 //ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			'isset({favid})'),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 	);
 
@@ -151,18 +151,16 @@ include_once('include/page_header.php');
 		$_REQUEST['show_details'] = get_request('show_details',	CProfile::get('web.tr_status.filter.show_details', 0));
 	}
 
-	if(get_request('show_events') != CProfile::get('web.tr_status.filter.show_events')){
-		$url = new CUrl();
-		$path = $url->getPath();
-		insert_js('cookie.eraseArray("'.$path.'")');
-	}
-	
 	$_REQUEST['show_triggers'] = get_request('show_triggers', CProfile::get('web.tr_status.filter.show_triggers', TRIGGERS_OPTION_ONLYTRUE));
 	$_REQUEST['show_events'] = get_request('show_events', CProfile::get('web.tr_status.filter.show_events', EVENTS_OPTION_NOEVENT));
 	$_REQUEST['show_severity'] = get_request('show_severity', CProfile::get('web.tr_status.filter.show_severity', -1));
 	$_REQUEST['txt_select'] = get_request('txt_select', CProfile::get('web.tr_status.filter.txt_select', ''));
 
-	
+	if(get_request('show_events') != CProfile::get('web.tr_status.filter.show_events')){
+		$url = new CUrl();
+		$path = $url->getPath();
+		insert_js('cookie.eraseArray("'.$path.'")');
+	}	
 	
 	if((EVENT_ACK_DISABLED == $config['event_ack_enable']) && !str_in_array($_REQUEST['show_events'],array(EVENTS_OPTION_NOEVENT,EVENTS_OPTION_ALL))){
 		$_REQUEST['show_events'] = EVENTS_OPTION_NOEVENT;
@@ -192,8 +190,6 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-
-
 	$trigg_wdgt = new CWidget();
 
 	$r_form = new CForm();
@@ -224,7 +220,7 @@ include_once('include/page_header.php');
 	$mute_icon->addAction('onclick',new CJSscript("javascript: switch_mute(this);"));
 
 //	show_table_header(S_STATUS_OF_TRIGGERS_BIG,array($mute_icon,$fs_icon));
-	$trigg_wdgt->addPageHeader(S_STATUS_OF_TRIGGERS_BIG, array($mute_icon, $fs_icon));
+	$trigg_wdgt->addPageHeader(S_STATUS_OF_TRIGGERS_BIG.' ['.date(S_DATE_FORMAT_YMDHMS).']', array($mute_icon, $fs_icon));
 
 	$numrows = new CDiv();
 	$numrows->setAttribute('name','numrows');
@@ -309,14 +305,16 @@ include_once('include/page_header.php');
 	$show_event_col = ($config['event_ack_enable'] && ($_REQUEST['show_events'] != EVENTS_OPTION_NOEVENT));
 
 	$table = new CTableInfo();
-	$switchers_name = 'trigger_switchers';
+	$switcherName = 'trigger_switchers';
 
 	$header_cb = ($show_event_col) ? new CCheckBox('all_events', false, "checkAll('".$m_form->GetName()."','all_events','events');")
 		: new CCheckBox('all_triggers', false, "checkAll('".$m_form->GetName()."','all_triggers', 'triggers');");
 
 	if($show_events != EVENTS_OPTION_NOEVENT){
-		$whow_hide_all = new CDiv(new CImg('images/general/closed.gif'), 'pointer');
-		$whow_hide_all->setAttribute('id', $switchers_name);
+		//$whow_hide_all = new CDiv(new CImg('images/general/closed.gif'), 'pointer');
+		$whow_hide_all = new CDiv(SPACE, 'filterclosed');
+
+		$whow_hide_all->setAttribute('id', $switcherName);
 	}
 	else{
 		$whow_hide_all = NULL;
@@ -342,7 +340,7 @@ include_once('include/page_header.php');
 	$sortorder = getPageSortOrder();
 	$options = array(
 		'nodeids' => get_current_nodeid(),
-		'status' => TRIGGER_STATUS_ENABLED,
+//		'status' => TRIGGER_STATUS_ENABLED,
 		'filter' => 1,
 		'monitored' => 1,
 		'extendoutput' => 1,
@@ -402,6 +400,7 @@ include_once('include/page_header.php');
 			$options = array(
 				'count' => 1,
 				'triggerids' => $trigger['triggerid'],
+				'object' => EVENT_OBJECT_TRIGGER,
 				'acknowledged' => 0,
 				'value' => TRIGGER_VALUE_TRUE,
 				'nopermissions' => 1
@@ -615,7 +614,7 @@ include_once('include/page_header.php');
 
 
 		if(($show_events != EVENTS_OPTION_NOEVENT) && !empty($trigger['events'])){
-			$open_close = new CDiv(new CImg('images/general/closed.gif'), 'pointer');
+			$open_close = new CDiv(SPACE, 'filterclosed');
 			$open_close->setAttribute('data-switcherid', $trigger['triggerid']);
 		}
 		else if($show_events == EVENTS_OPTION_NOEVENT){
@@ -681,7 +680,7 @@ include_once('include/page_header.php');
 					'tr_events.php?triggerid='.$trigger['triggerid'].'&eventid='.$row_event['eventid']);
 				$next_clock = isset($trigger['events'][$enum-1]) ? $trigger['events'][$enum-1]['clock'] : time();
 
-				$empty_col = new CCol();
+				$empty_col = new CCol(SPACE);
 				$empty_col->setColSpan(3);
 				$ack_cb_col = new CCol($ack_cb);
 				$ack_cb_col->setColSpan(2);
@@ -716,13 +715,6 @@ include_once('include/page_header.php');
 		$goButton = new CButton('goButton', S_GO.' (0)');
 		$goButton->setAttribute('id', 'goButton');
 
-		$jsLocale = array(
-			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTED'
-		);
-
-		zbx_addJSLocale($jsLocale);
-
 		$show_event_col ? zbx_add_post_js('chkbxRange.pageGoName = "events";') : zbx_add_post_js('chkbxRange.pageGoName = "triggers";');
 
 		$footer = get_table_header(array($goBox, $goButton));
@@ -735,11 +727,14 @@ include_once('include/page_header.php');
 	$trigg_wdgt->show();
 
 	zbx_add_post_js('blink.init();');
-	zbx_add_post_js("var switcher = new CSwitcher('$switchers_name');");
+	zbx_add_post_js("var switcher = new CSwitcher('$switcherName');");
 
 	$jsmenu = new CPUMenu(null, 170);
 	$jsmenu->InsertJavaScript();
 
+?>
+<?php
 
-include_once 'include/page_footer.php';
+include_once('include/page_footer.php');
+
 ?>

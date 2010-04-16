@@ -29,7 +29,7 @@
 	$page['title'] = 'S_LATEST_EVENTS';
 	$page['file'] = 'events.php';
 	$page['hist_arg'] = array('groupid','hostid');
-	$page['scripts'] = array('class.calendar.js','scriptaculous.js?load=effects,dragdrop','gtlc.js');
+	$page['scripts'] = array('class.calendar.js','effects.js','dragdrop.js','gtlc.js');
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -67,8 +67,8 @@
 
 		'hide_unknown'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
 //ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			'isset({favid})'),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 	);
 
@@ -251,7 +251,7 @@
 			$options['triggerids'] = $_REQUEST['triggerid'];
 		}
 	}
-	
+
 	$firstEvent = CEvent::get($options);
 // }}} CHECK IF EVENTS EXISTS
 
@@ -430,6 +430,7 @@
 				$trigger = reset($event['triggers']);
 
 				$event['desc'] = expand_trigger_description_by_data($trigger);
+				$event['type'] = $trigger['type'];
 
 				$event += $trigger;
 
@@ -503,27 +504,27 @@
 	}
 	
 // NAV BAR
-		$timeline = array(
-			'period' => $effectiveperiod,
-			'starttime' => $starttime,
-			'usertime' => $till
-		);
+	$timeline = array(
+		'period' => $effectiveperiod,
+		'starttime' => date('YmdHi', $starttime),
+		'usertime' => date('YmdHi', $till)
+	);
 
-		$dom_graph_id = 'scrollbar_cntr';
-		$objData = array(
-			'id' => 'timeline_1',
-			'domid' => $dom_graph_id,
-			'loadSBox' => 0,
-			'loadImage' => 0,
-			'loadScroll' => 1,
-			'dynamic' => 0,
-			'mainObject' => 1
-		);
+	$dom_graph_id = 'scroll_events_id';
+	$objData = array(
+		'id' => 'timeline_1',
+		'loadSBox' => 0,
+		'loadImage' => 0,
+		'loadScroll' => 1,
+		'dynamic' => 0,
+		'mainObject' => 1
+	);
 
-		zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
-		zbx_add_post_js('timeControl.processObjects();');
+	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
+	zbx_add_post_js('timeControl.processObjects();');
 	
 	$events_wdgt->show();
+	
 	
 include_once('include/page_footer.php');
 ?>

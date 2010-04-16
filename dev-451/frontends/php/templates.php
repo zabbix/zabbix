@@ -712,6 +712,7 @@ include_once('include/page_header.php');
 			'output' => API_OUTPUT_EXTEND,
 			'select_hosts' => array('hostid','host','status'),
 			'select_templates' => array('hostid','host','status'),
+			'selectParentTemplates' => array('hostid','host','status'),
 			'select_items' => API_OUTPUT_COUNT,
 			'select_triggers' => API_OUTPUT_COUNT,
 			'select_graphs' => API_OUTPUT_COUNT,
@@ -722,7 +723,6 @@ include_once('include/page_header.php');
 		$templates = CTemplate::get($options);
 		order_result($templates, $sortfield, $sortorder);
 //-----
-
 		foreach($templates as $tnum => $template){
 			$templates_output = array();
 			if($template['proxy_hostid']){
@@ -740,10 +740,11 @@ include_once('include/page_header.php');
 			$graphs = array(new CLink(S_GRAPHS,'graphs.php?groupid='.$PAGE_GROUPS['selected'].'&hostid='.$template['templateid']),
 				' ('.$template['graphs'].')');
 
+
 			$i = 0;
 			$linked_templates_output = array();
-			order_result($template['templates'], 'host');
-			foreach($template['templates'] as $snum => $linked_template){
+			order_result($template['parentTemplates'], 'host');
+			foreach($template['parentTemplates'] as $snum => $linked_template){
 				$i++;
 				if($i > $config['max_in_table']){
 					$linked_templates_output[] = '...';
@@ -759,13 +760,22 @@ include_once('include/page_header.php');
 
 
 			$i = 0;
-			$linked_to_hosts_output = array();
-			order_result($template['hosts'], 'host');
-			foreach($template['hosts'] as $snum => $linked_to_host){ 
-				$i++;
-				if($i > $config['max_in_table']){
-					$linked_to_hosts_output[] = '...';
-					$linked_to_hosts_output[] = '//empty element for array_pop';
+			$linked_to_output = array();
+			$linked_to_objects = array();
+			foreach($template['hosts'] as $h){
+				$h['objectid'] = $h['hostid'];
+				$linked_to_objects[] = $h;
+			}
+			foreach($template['templates'] as $h){
+				$h['objectid'] = $h['templateid'];
+				$linked_to_objects[] = $h;
+			}
+
+			order_result($linked_to_objects, 'host');
+			foreach($linked_to_objects as $linked_to_host){
+				if(++$i > $config['max_in_table']){
+					$linked_to_output[] = '...';
+					$linked_to_output[] = '//empty element for array_pop';
 					break;
 				}
 
@@ -784,10 +794,10 @@ include_once('include/page_header.php');
 					break;
 				}
 
-				$linked_to_hosts_output[] = new CLink($linked_to_host['host'], $url, $style);
-				$linked_to_hosts_output[] = ', ';
+				$linked_to_output[] = new CLink($linked_to_host['host'], $url, $style);
+				$linked_to_output[] = ', ';
 			}
-			array_pop($linked_to_hosts_output);
+			array_pop($linked_to_output);
 
 
 			$table->addRow(array(
@@ -798,7 +808,7 @@ include_once('include/page_header.php');
 				$triggers,
 				$graphs,
 				(empty($linked_templates_output) ? '-' : new CCol($linked_templates_output,'wraptext')),
-				(empty($linked_to_hosts_output) ? '-' : new CCol($linked_to_hosts_output,'wraptext'))
+				(empty($linked_to_output) ? '-' : new CCol($linked_to_output,'wraptext'))
 			));
 		}
 
@@ -816,13 +826,6 @@ include_once('include/page_header.php');
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
-
-		$jsLocale = array(
-			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTED'
-		);
-
-		zbx_addJSLocale($jsLocale);
 
 		zbx_add_post_js('chkbxRange.pageGoName = "templates";');
 

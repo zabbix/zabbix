@@ -19,23 +19,19 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/graphs.inc.php');
-	require_once('include/screens.inc.php');
-	require_once('include/blocks.inc.php');
+require_once('include/config.inc.php');
+require_once('include/graphs.inc.php');
+require_once('include/screens.inc.php');
+require_once('include/blocks.inc.php');
 
-	$page['title'] = 'S_CUSTOM_SCREENS';
-	$page['file'] = 'slides.php';
-	$page['hist_arg'] = array('elementid');
-	$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.pmaster.js','class.calendar.js','gtlc.js');
+$page['title'] = 'S_CUSTOM_SCREENS';
+$page['file'] = 'slides.php';
+$page['hist_arg'] = array('elementid');
+$page['scripts'] = array('effects.js','dragdrop.js','class.pmaster.js','class.calendar.js','gtlc.js');
 
-	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-	if(PAGE_TYPE_HTML == $page['type']){
-		define('ZBX_PAGE_DO_REFRESH', 1);
-	}
-
-	include_once('include/page_header.php');
+include_once('include/page_header.php');
 
 ?>
 <?php
@@ -54,12 +50,13 @@
 		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN('0,1,2'),		NULL),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NULL,			NULL),
 		'favcnt'=>		array(T_ZBX_INT, O_OPT,	null,	null,			null),
 		'pmasterid'=>	array(T_ZBX_STR, O_OPT,	P_SYS,	null,			NULL),
 
-		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),NULL),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("hat"=={favobj})'),
+		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove','refresh','flop'"),	NULL),
+		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({action}) && ("flop"=={action})'),
 		'upd_counter'=> array(T_ZBX_INT, O_OPT, P_ACT,  null,		null),
 	);
 
@@ -68,9 +65,12 @@
 	if(isset($_REQUEST['favobj'])){
 		$_REQUEST['pmasterid'] = get_request('pmasterid','mainpage');
 
+		if('filter' == $_REQUEST['favobj']){
+			CProfile::update('web.slides.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+		}
 		if('timeline' == $_REQUEST['favobj']){
 			if(isset($_REQUEST['elementid']) && isset($_REQUEST['period'])){
-				navigation_bar_calc('web.slides', true);
+				navigation_bar_calc('web.slides', $_REQUEST['elementid'],true);
 			}
 		}
 
@@ -97,8 +97,8 @@
 			}
 		}
 
-		if('refresh' == $_REQUEST['favobj']){
-			switch($_REQUEST['favid']){
+		if('hat' == $_REQUEST['favobj']){
+			switch($_REQUEST['favref']){
 				case 'hat_slides':
 					$elementid = get_request('elementid');
 
@@ -119,8 +119,8 @@
 
 						$element->show();
 
-						$script = get_update_doll_script('mainpage', $_REQUEST['favid'], 'frequency', $refresh)."\n";
-						$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'restartDoll')."\n";
+						$script = get_update_doll_script('mainpage', $_REQUEST['favobj'], 'frequency', $refresh)."\n";
+						$script.= get_update_doll_script('mainpage', $_REQUEST['favobj'], 'restartDoll')."\n";
 						$script.= 'timeControl.processObjects();';
 						insert_js($script);
 					}
@@ -133,22 +133,22 @@
 		}
 
 		if('set_rf_rate' == $_REQUEST['favobj']){
-			if(str_in_array($_REQUEST['favid'],array('hat_slides'))){
+			if(str_in_array($_REQUEST['favref'],array('hat_slides'))){
 				$elementid = $_REQUEST['elementid'];
 
 				CProfile::update('web.slides.rf_rate.hat_slides', $_REQUEST['favcnt'], PROFILE_TYPE_INT, $elementid);
 
-				$script= get_update_doll_script('mainpage', $_REQUEST['favid'], 'frequency', $_REQUEST['favcnt'])."\n";
-				$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'stopDoll')."\n";
-				$script.= get_update_doll_script('mainpage', $_REQUEST['favid'], 'startDoll')."\n";
+				$script= get_update_doll_script('mainpage', $_REQUEST['favref'], 'frequency', $_REQUEST['favcnt'])."\n";
+				$script.= get_update_doll_script('mainpage', $_REQUEST['favref'], 'stopDoll')."\n";
+				$script.= get_update_doll_script('mainpage', $_REQUEST['favref'], 'startDoll')."\n";
 
 
 				$menu = array();
 				$submenu = array();
 
-				make_refresh_menu('mainpage', $_REQUEST['favid'],$_REQUEST['favcnt'],array('elementid'=> $elementid),$menu,$submenu);
+				make_refresh_menu('mainpage', $_REQUEST['favref'],$_REQUEST['favcnt'],array('elementid'=> $elementid),$menu,$submenu);
 
-				$script.= 'page_menu["menu_'.$_REQUEST['favid'].'"] = '.zbx_jsvalue($menu['menu_'.$_REQUEST['favid']]).';'."\n";
+				$script.= 'page_menu["menu_'.$_REQUEST['favref'].'"] = '.zbx_jsvalue($menu['menu_'.$_REQUEST['favref']]).';'."\n";
 				
 				print($script);
 			}
@@ -165,8 +165,6 @@
 	if(2 != $_REQUEST['fullscreen']){
 		CProfile::update('web.slides.elementid', $elementid, PROFILE_TYPE_ID);
 	}
-
-	$effectiveperiod = navigation_bar_calc('web.slides', true);
 
 	$slides_wdgt = new CWidget('hat_slides');
 
@@ -202,7 +200,9 @@
 			$elementid = $slideshow['slideshowid'];	
 		}
 		
-// PAGE HEADER {{{		
+		$effectiveperiod = navigation_bar_calc('web.slides',$elementid, true);
+		
+// PAGE HEADER {{{
 		if(infavorites('web.favorite.screenids', $elementid, 'slideshowid')){
 			$icon = new CDiv(SPACE, 'iconminus');
 			$icon->setAttribute('title', S_REMOVE_FROM.' '.S_FAVOURITES);
@@ -227,7 +227,6 @@
 		$refresh_icon->setAttribute('title',S_MENU);
 		
 		$slides_wdgt->addPageHeader(S_SLIDESHOWS_BIG, array($formHeader, SPACE, $icon, $refresh_icon, $fs_icon));
-		$slides_wdgt->addItem(BR());
 // }}} PAGE HEADER
 
 // HEADER {{{
@@ -291,13 +290,6 @@
 			insert_js('var page_menu='.zbx_jsvalue($menu).";\n".'var page_submenu='.zbx_jsvalue($submenu).";\n");
 	// --------------
 
-			$tab = new CTable();
-			$tab->setCellPadding(0);
-			$tab->setCellSpacing(0);
-
-			$tab->setAttribute('border', 0);
-			$tab->setAttribute('width', '100%');
-
 			$refresh_tab = array(
 				array(
 					'id' => 'hat_slides',
@@ -314,18 +306,20 @@
 // NAV BAR
 				$timeline = array();
 				$timeline['period'] = $effectiveperiod;
-				$timeline['starttime'] = time() - ZBX_MAX_PERIOD;
+				$timeline['starttime'] = date('YmdHi', time() - ZBX_MAX_PERIOD);
 
 				if(isset($_REQUEST['stime'])){
-					$bstime = $_REQUEST['stime'];
-					$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
-					$timeline['usertime'] += $timeline['period'];
+					$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 				}
 
-				$dom_graph_id = 'iframe';
+				$scroll_div = new CDiv();
+				$scroll_div->setAttribute('id','scrollbar_cntr');
+				$slides_wdgt->addFlicker($scroll_div, CProfile::get('web.slides.filter.state',1));
+				$slides_wdgt->addFlicker(BR(), CProfile::get('web.slides.filter.state',1));
+				
+			
 				$objData = array(
 					'id' => $elementid,
-					'domid' => $dom_graph_id,
 					'loadSBox' => 0,
 					'loadImage' => 0,
 					'loadScroll' => 1,
@@ -334,7 +328,7 @@
 					'mainObject' => 1
 				);
 
-				zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
+				zbx_add_post_js('timeControl.addObject("iframe",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 				zbx_add_post_js('timeControl.processObjects();');
 			}
 			
@@ -343,23 +337,15 @@
 
 			$slides_wdgt->addItem(new CSpan(S_LOADING_P, 'textcolorstyles'));
 
-			$tab->addRow($slides_wdgt, 'center');
-			$tab->show();
-
-			$scroll_div = new CDiv();
-			$scroll_div->setAttribute('id','scrollbar_cntr');
-			$scroll_div->setAttribute('style','border: 0px #CC0000 solid; height: 25px; width: 800px;');
-			$scroll_div->show();
-
-			print(SBR);
-
+			
 			$jsmenu = new CPUMenu(null, 170);
 			$jsmenu->InsertJavaScript();
 		}
 		else{
 			$slides_wdgt->addItem(new CTableInfo(S_NO_SLIDES_DEFINED));
-			$slides_wdgt->show();
 		}
+		
+		$slides_wdgt->show();
 	}
 
 

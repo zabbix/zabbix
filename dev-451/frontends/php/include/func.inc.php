@@ -165,8 +165,9 @@ function format_doll_init($doll){
 
 	$obj['url'].= (zbx_empty($obj['url'])?'?':'&').'output=html';
 
-	$obj['params']['favobj'] = 'refresh';
-	$obj['params']['favid'] = $doll['id'];
+	$obj['params']['favobj'] = 'hat';
+	$obj['params']['favref'] = $doll['id'];
+	$obj['params']['action'] = 'refresh';
 
 return $obj;
 }
@@ -372,8 +373,8 @@ function zbx_date2age($start_date,$end_date=0,$utime = false){
 			(($hours && !$years && !$months)?$hours.S_HOUR_SHORT.' ':'').
 			(($minutes && !$years && !$months && !$weeks)?$minutes.S_MINUTE_SHORT.' ':'').
 			((!$years && !$months && !$weeks && !$days && ($ms || $seconds))?$seconds.S_SECOND_SHORT.' ':'').
-			(($ms && !$years && !$months && !$weeks && !$days && !$hours)?$ms.S_MILLISECOND_SHORT:'').
-         (!$ms && $original_time < 0.001 ? '< 1'.S_MILLISECOND_SHORT:'');
+			(($ms && !$years && !$months && !$weeks && !$days && !$hours) || $original_time == 0 ?$ms.S_MILLISECOND_SHORT:'').
+			(!$ms && $original_time > 0 && $original_time < 0.001 ? '< 1'.S_MILLISECOND_SHORT:'');
 
 return trim($str,' ');
 }
@@ -403,6 +404,13 @@ function getDateStringByType($type, $timestamp){
 			break;
 	}
 return $str;
+}
+
+function zbxDateToTime($strdate){
+	if(5 == sscanf($strdate, '%04d%02d%02d%02d%02d', $year, $month, $date, $hours, $minutes))
+		return mktime($hours,$minutes,0,$month,$date,$year);
+	else
+		return 0;
 }
 /************* END DATE *************/
 
@@ -545,10 +553,17 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 	}
 
 	if(zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS)){
-		if(round($value,2) == round($value,0)) $format = '%.0f %s';
-		else $format = '%.2f %s';
+		if(abs($value) >= 1)
+			$format = '%.2f';
+		else if(abs($value) >= 0.01)
+			$format = '%.4f';
+		else
+			$format = '%.6f';
 
-		return sprintf($format, $value, $units);
+		if(round($value, 6) == 0) $value = 0;
+		else $value = rtrim(sprintf($format,$value), '.0');
+
+		return sprintf('%s %s', $value, $units);
 	}
 
 // INIT intervals
@@ -557,6 +572,10 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 
 	if(!isset($digitUnits[$step])){
 		$digitUnits[$step] = array(
+//				array('pow'=>-3, 'short'=>S_N_SMALL, 'long'=>S_NANO),
+				array('pow'=>-2, 'short'=>S_U_MICRO, 'long'=>S_MICRO),
+				array('pow'=>-1, 'short'=>S_M_SMALL, 'long'=>S_MILLI),
+				array('pow'=>0, 'short'=>'', 'long'=>''),
 				array('pow'=>1, 'short'=>S_K, 'long'=>S_KILO),
 				array('pow'=>2, 'short'=>S_M, 'long'=>S_MEGA),
 				array('pow'=>3, 'short'=>S_G, 'long'=>S_GIGA),
@@ -568,21 +587,26 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 			);
 
 		foreach($digitUnits[$step] as $dunit => $data){
-			$digitUnits[$step][$dunit]['value'] = bcpow($step, $data['pow']);
+			$digitUnits[$step][$dunit]['value'] = bcpow($step, $data['pow'], 9);
 		}
 	}
 //---
+
 	if($value < 0) $abs = bcmul($value, '-1');
 	else $abs = $value;
 
 	$valUnit = array('pow'=>0, 'short'=>'', 'long'=>'', 'value'=>$value);
-	if($abs >= $step){	
+	if(($abs > 999) ||  ($abs < 0.001)){
 		foreach($digitUnits[$step] as $dnum => $data){
 			if(bccomp($abs, $data['value']) > -1) $valUnit = $data;
 			else break;
 		}
 
-		$valUnit['value'] = bcdiv($value, $valUnit['value'], 4);
+		if(round($valUnit['value'], 6) > 0){
+			$valUnit['value'] = bcdiv(sprintf('%.6f',$value), sprintf('%.6f', $valUnit['value']), 6);
+		}
+		else
+			$valUnit['value'] = 0;
 	}
 
 //------

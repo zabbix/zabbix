@@ -1030,20 +1030,20 @@
 	return $result;
 	}
 
-	function navigation_bar_calc($idx=null, $update=false){
+	function navigation_bar_calc($idx=null, $idx2=0, $update=false){
 //SDI($_REQUEST['stime']);
 
 		if(!is_null($idx)){
 			if($update){
 				if(isset($_REQUEST['period']) && ($_REQUEST['period'] >= ZBX_MIN_PERIOD))
-					CProfile::update($idx.'.period',$_REQUEST['period'],PROFILE_TYPE_INT);
+					CProfile::update($idx.'.period',$_REQUEST['period'],PROFILE_TYPE_INT, $idx2);
 					
 				if(isset($_REQUEST['stime']))
-					CProfile::update($idx.'.stime',$_REQUEST['stime'], PROFILE_TYPE_STR);
+					CProfile::update($idx.'.stime',$_REQUEST['stime'], PROFILE_TYPE_STR, $idx2);
 			}
 
-			$_REQUEST['period'] = get_request('period', CProfile::get($idx.'.period', ZBX_PERIOD_DEFAULT));
-			$_REQUEST['stime'] = get_request('stime', CProfile::get($idx.'.stime'));
+			$_REQUEST['period'] = get_request('period', CProfile::get($idx.'.period', ZBX_PERIOD_DEFAULT, $idx2));
+			$_REQUEST['stime'] = get_request('stime', CProfile::get($idx.'.stime', null, $idx2));
 		}
 
 		$_REQUEST['period'] = get_request('period', ZBX_PERIOD_DEFAULT);
@@ -1060,8 +1060,8 @@
 		}
 
 		if(isset($_REQUEST['stime'])){
-			$bstime = $_REQUEST['stime'];
-			$time = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
+			$time = zbxDateToTime($_REQUEST['stime']);
+
 			if(($time+$_REQUEST['period']) > time()) {
 				$_REQUEST['stime'] = date('YmdHi', time()-$_REQUEST['period']);
 			}
@@ -1226,6 +1226,103 @@
 		$prev_color[$palette]++;
 
 	return $result;
+	}
+
+	function imageDiagonalMarks($im,$x, $y, $offset, $color){
+		global $colors;
+
+		$gims = array(
+			'lt' => array(0,0, -9,0, -9,-3, -3,-9, 0,-9),
+			'rt' => array(0,0,  9,0,  9,-3,  3,-9, 0,-9),
+			'lb' => array(0,0, -9,0,  -9,3,  -3,9,  0,9),
+			'rb' => array(0,0,  9,0,   9,3,   3,9,  0,9),
+		);
+
+		foreach($gims['lt'] as $num => $px){
+			if(($num % 2) == 0) $gims['lt'][$num] = $px  + $x - $offset;
+			else $gims['lt'][$num] = $px  + $y - $offset;
+		}
+
+		foreach($gims['rt'] as $num => $px){
+			if(($num % 2) == 0) $gims['rt'][$num] = $px  + $x + $offset;
+			else $gims['rt'][$num] = $px  + $y - $offset;
+		}
+
+		foreach($gims['lb'] as $num => $px){
+			if(($num % 2) == 0) $gims['lb'][$num] = $px  + $x - $offset;
+			else $gims['lb'][$num] = $px  + $y + $offset;
+		}
+
+		foreach($gims['rb'] as $num => $px){
+			if(($num % 2) == 0) $gims['rb'][$num] = $px  + $x + $offset;
+			else $gims['rb'][$num] = $px  + $y + $offset;
+		}
+
+		imagefilledpolygon($im,$gims['lt'],5,$color);
+		imagepolygon($im,$gims['lt'],5,$colors['Dark Red']);
+
+		imagefilledpolygon($im,$gims['rt'],5,$color);
+		imagepolygon($im,$gims['rt'],5,$colors['Dark Red']);
+
+		imagefilledpolygon($im,$gims['lb'],5,$color);
+		imagepolygon($im,$gims['lb'],5,$colors['Dark Red']);
+
+		imagefilledpolygon($im,$gims['rb'],5,$color);
+		imagepolygon($im,$gims['rb'],5,$colors['Dark Red']);
+
+	}
+
+	function imageVerticalMarks($im,$x, $y, $offset, $color, $marks='tlbr'){
+		global $colors;
+
+		$polygons = 5;
+		$gims = array(
+			't' => array(0,0, -6,-6, -3,-9,  3,-9,  6,-6),
+			'l' => array(0,0,  -6,6,  -9,3, -9,-3, -6,-6),
+			'b' => array(0,0,   6,6,   3,9,  -3,9,  -6,6),
+			'r' => array(0,0,  6,-6,  9,-3,   9,3,   6,6),
+		);
+
+		foreach($gims['t'] as $num => $px){
+			if(($num % 2) == 0) $gims['t'][$num] = $px  + $x;
+			else $gims['t'][$num] = $px  + $y - $offset;
+		}
+
+		foreach($gims['l'] as $num => $px){
+			if(($num % 2) == 0) $gims['l'][$num] = $px  + $x - $offset;
+			else $gims['l'][$num] = $px  + $y;
+		}
+
+		foreach($gims['b'] as $num => $px){
+			if(($num % 2) == 0) $gims['b'][$num] = $px  + $x;
+			else $gims['b'][$num] = $px  + $y + $offset;
+		}
+
+		foreach($gims['r'] as $num => $px){
+			if(($num % 2) == 0) $gims['r'][$num] = $px  + $x + $offset;
+			else $gims['r'][$num] = $px  + $y;
+		}
+
+		if(strpos($marks, 't') !== false){
+			imagefilledpolygon($im,$gims['t'],$polygons,$color);
+			imagepolygon($im,$gims['t'],$polygons,$colors['Dark Red']);
+		}
+
+		if(strpos($marks, 'l') !== false){
+			imagefilledpolygon($im,$gims['l'],$polygons,$color);
+			imagepolygon($im,$gims['l'],$polygons,$colors['Dark Red']);
+		}
+
+		if(strpos($marks, 'b') !== false){
+			imagefilledpolygon($im,$gims['b'],$polygons,$color);
+			imagepolygon($im,$gims['b'],$polygons,$colors['Dark Red']);
+		}
+
+		if(strpos($marks, 'r') !== false){
+			imagefilledpolygon($im,$gims['r'],$polygons,$color);
+			imagepolygon($im,$gims['r'],$polygons,$colors['Dark Red']);
+		}
+
 	}
 
 	function imageText($image, $fontsize, $angle, $x, $y, $color, $string){

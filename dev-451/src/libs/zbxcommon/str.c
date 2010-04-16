@@ -851,7 +851,7 @@ size_t zbx_strlcpy(char *dst, const char *src, size_t siz)
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
- */
+ ******************************************************************************/
 size_t zbx_strlcat(char *dst, const char *src, size_t siz)
 {
 	char *d = dst;
@@ -881,11 +881,11 @@ size_t zbx_strlcat(char *dst, const char *src, size_t siz)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dvsprintf                                                     *
+ * Function: zbx_dvsprintf                                                    *
  *                                                                            *
- * Purpose: dinamical formatted output conversion                             *
+ * Purpose: dynamical formatted output conversion                             *
  *                                                                            *
- * Return value: formated string                                              *
+ * Return value: formatted string                                             *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -1163,6 +1163,9 @@ error:
 int	parse_host_key(char *exp, char **host, char **key)
 {
 	char	*p, *s;
+
+	if (NULL == exp || '\0' == *exp)
+		return FAIL;
 
 	for (p = exp, s = exp; '\0' != *p; p++)	/* check for optional hostname */
 	{

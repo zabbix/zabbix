@@ -563,13 +563,24 @@ COpt::memoryPick();
 				$templated_graph = false;
 				foreach($graph_hosts as $host){
 					if(HOST_STATUS_TEMPLATE == $host['status']){
-						$templated_graph = true;
+						$templated_graph = $host['hostid'];
 						break;
 					}
 				}
 				if($templated_graph && (count($graph_hosts) > 1)){
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_GRAPH.' [ '.$graph['name'].' ] '.S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL);
 				}
+				
+// check ymin, ymax items
+				$axis_items = array();
+				if($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
+					$axis_items[] = $graph['ymin_itemid'];
+				}
+				if($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
+					$axis_items[] = $graph['ymax_itemid'];
+				}
+				self::checkAxisItems($axis_items, $templated_graph);
+			
 	
 				$graphid = self::createReal($graph);
 
@@ -594,7 +605,7 @@ COpt::memoryPick();
 			return false;
 		}
 	}
-	
+		
 /**
  * Update existing graphs
  *
@@ -657,7 +668,7 @@ COpt::memoryPick();
 				$templated_graph = false;
 				foreach($graph_hosts as $host){
 					if(HOST_STATUS_TEMPLATE == $host['status']){
-						$templated_graph = true;
+						$templated_graph = $host['hostid'];
 						break;
 					}
 				}
@@ -666,6 +677,16 @@ COpt::memoryPick();
 				}
 // }}} EXCEPTION: MESS TEMPLATED ITEMS
 
+// check ymin, ymax items
+				$axis_items = array();
+				if($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
+					$axis_items[] = $graph['ymin_itemid'];
+				}
+				if($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
+					$axis_items[] = $graph['ymax_itemid'];
+				}
+				self::checkAxisItems($axis_items, $templated_graph);
+				
 
 				self::updateReal($graph);
 
@@ -806,25 +827,37 @@ COpt::memoryPick();
 				'nopermissions' => 1,
 				'templated_hosts' => 1,
 			);
-
 			$chd_hosts = CHost::get($options);
 
 			$options = array(
-					'graphids' => $graph['graphid'],
-					'nopermissions' => 1,
-					'select_items' => API_OUTPUT_EXTEND,
-					'select_graph_items' => API_OUTPUT_EXTEND,
-					'output' => API_OUTPUT_EXTEND
-				);
-				$graph = self::get($options);
-				$graph = reset($graph);
+				'graphids' => $graph['graphid'],
+				'nopermissions' => 1,
+				'select_items' => API_OUTPUT_EXTEND,
+				'select_graph_items' => API_OUTPUT_EXTEND,
+				'output' => API_OUTPUT_EXTEND
+			);
+			$graph = self::get($options);
+			$graph = reset($graph);
 				
 			foreach($chd_hosts as $chd_host){
 				$tmp_graph = $graph;
 				$tmp_graph['templateid'] = $graph['graphid'];
 				
 				$tmp_graph['gitems'] = get_same_graphitems_for_host($tmp_graph['gitems'], $chd_host['hostid'])
-					or self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: cannot inherit, no required items on [ '.$chd_host['host'].' ]');
+					or self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: cannot inherit. No required items on [ '.$chd_host['host'].' ]');
+			
+				if($tmp_graph['ymax_itemid'] > 0){
+					$ymax_itemid = get_same_graphitems_for_host(array(array('itemid' => $tmp_graph['ymax_itemid'])), $chd_host['hostid']);
+					if(!$ymax_itemid) self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: cannot inherit. No required items on [ '.$chd_host['host'].' ] (Ymax value item)');
+					$ymax_itemid = reset($ymax_itemid);
+					$tmp_graph['ymax_itemid'] = $ymax_itemid['itemid'];
+				}
+				if($tmp_graph['ymin_itemid'] > 0){
+					$ymin_itemid = get_same_graphitems_for_host(array(array('itemid' => $tmp_graph['ymin_itemid'])), $chd_host['hostid']);
+					if(!$ymin_itemid) self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: cannot inherit. No required items on [ '.$chd_host['host'].' ] (Ymin value item)');				
+					$ymin_itemid = reset($ymin_itemid);
+					$tmp_graph['ymin_itemid'] = $ymin_itemid['itemid'];
+				}
 				
 // check if templated graph exists
 				$chd_graph = self::get(array(
@@ -834,7 +867,8 @@ COpt::memoryPick();
 					'hostids' => $chd_host['hostid']
 				));
 				if($chd_graph = reset($chd_graph)){
-					if(($tmp_graph['name'] != $chd_graph['name']) && self::exists(array('name' => $tmp_graph['name'], 'hostids' => $chd_host['hostid']))){
+					if((zbx_strtolower($tmp_graph['name']) != zbx_strtolower($chd_graph['name']))
+						&& self::exists(array('name' => $tmp_graph['name'], 'hostids' => $chd_host['hostid']))){
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'Graph [ '.$tmp_graph['name'].' ]: already exists on [ '.$chd_host['host'].' ]');
 					}
 					
@@ -1165,6 +1199,15 @@ COpt::memoryPick();
 			}
 // }}} EXCEPTION: NO ITEMS
 
+// EXCPETION: more than one sum type item for pie graph {{{
+			if(($graph['graphtype'] == GRAPH_TYPE_PIE) || ($graph['graphtype'] == GRAPH_TYPE_EXPLODED)){
+				$sum_items = 0;
+				foreach($graph['gitems'] as $gitem){
+					if($gitem['type'] == GRAPH_ITEM_SUM) $sum_items++;
+				}
+				if($sum_items > 1) self::exception(ZBX_API_ERROR_PARAMETERS, S_ANOTHER_ITEM_SUM);
+			}
+// }}} EXCEPTION
 
 // EXCEPTION: GRAPH FIELDS {{{
 			$fields = array('name' => null);
@@ -1204,5 +1247,27 @@ COpt::memoryPick();
 		return true;
 	}
 	
+	protected static function checkAxisItems($items, $tpl=false){
+		
+		$items = array_unique($items);
+		$cnt = count($items);
+		
+		$options = array(
+			'itemids' => $items,
+			'output' => API_OUTPUT_SHORTEN,
+			'templated_hosts' => 1,
+			'countOutput' => 1
+		);
+		if($tpl)
+			$options['hostids'] = $tpl;
+		else
+			$options['monitored_hosts'] = 1;
+			
+		$cnt_exist = CHost::get($options);
+		
+		if($cnt != $cnt_exist) self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect item for axis value item');
+		else return true;
+	}
+
 }
 ?>

@@ -38,9 +38,9 @@ static void process_time_functions()
 	DB_ROW		row;
 	DB_ITEM		item;
 
-	zbx_setproctitle("timer [updating functions]");
+	zbx_setproctitle("timer [updating triggers]");
 
-	result = DBselect("select distinct %s, functions f where h.hostid=i.hostid and h.status=%d"
+	result = DBselect("select distinct %s,functions f where h.hostid=i.hostid and h.status=%d"
 			" and i.status=%d and f.function in ('nodata','date','dayofweek','time','now')"
 			" and i.itemid=f.itemid and (h.maintenance_status=%d or h.maintenance_type=%d)" DB_NODE,
 			ZBX_SQL_ITEM_SELECT,
@@ -54,7 +54,6 @@ static void process_time_functions()
 		DBget_item_from_db(&item, row);
 
 		DBbegin();
-		update_functions(&item, (int)time(NULL));
 		update_triggers(item.itemid);
 		DBcommit();
 	}
@@ -208,7 +207,7 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
  * Parameters: triggerid - trigger identificator from database                *
  *             now -                                                          *
  *                                                                            *
- * Return value: SUCCEED if found event with OK or PROBLEM stauses            *
+ * Return value: SUCCEED if found event with OK or PROBLEM statuses           *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *

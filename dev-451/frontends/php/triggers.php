@@ -205,7 +205,7 @@ include_once('include/page_header.php');
 		}
 	}
 // DEPENDENCE ACTIONS
-	else if(isset($_REQUEST['add_dependence'])&&isset($_REQUEST['new_dependence'])){
+	else if(isset($_REQUEST['add_dependence']) && isset($_REQUEST['new_dependence'])){
 		if(!isset($_REQUEST['dependencies']))
 			$_REQUEST['dependencies'] = array();
 
@@ -431,7 +431,7 @@ include_once('include/page_header.php');
 	}
 
 	$params=array();
-	$options = array('with_items','only_current_node','not_proxy_hosts');
+	$options = array('only_current_node','not_proxy_hosts');
 	foreach($options as $option) $params[$option] = 1;
 
 	$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
@@ -463,6 +463,7 @@ include_once('include/page_header.php');
 	}
 
 	show_table_header(S_CONFIGURATION_OF_TRIGGERS_BIG, $form);
+	echo SBR;
 ?>
 <?php
 	if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['g_triggerid'])){
@@ -690,13 +691,6 @@ include_once('include/page_header.php');
 // goButton name is necessary!!!
 		$goButton = new CButton('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
-
-		$jsLocale = array(
-			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTED'
-		);
-
-		zbx_addJSLocale($jsLocale);
 
 		zbx_add_post_js('chkbxRange.pageGoName = "g_triggerid";');
 

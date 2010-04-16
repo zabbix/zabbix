@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,30 +19,30 @@
 **/
 ?>
 <?php
-	require_once 'include/config.inc.php';
-	require_once 'include/hosts.inc.php';
-	require_once 'include/items.inc.php';
+require_once('include/config.inc.php');
+require_once('include/hosts.inc.php');
+require_once('include/items.inc.php');
 
-	$page['title'] = S_LATEST_DATA;
-	$page['file'] = 'latest.php';
-	$page['hist_arg'] = array('groupid','hostid','show','select','open','applicationid');
-	$page['scripts'] = array('scriptaculous.js?load=effects');
+$page['title'] = S_LATEST_DATA;
+$page['file'] = 'latest.php';
+$page['hist_arg'] = array('groupid','hostid','show','select','open','applicationid');
+$page['scripts'] = array('effects.js');
 
-	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-	define('ZBX_PAGE_MAIN_HAT','hat_latest');
+define('ZBX_PAGE_MAIN_HAT','hat_latest');
 
-	if(PAGE_TYPE_HTML == $page['type']){
-		define('ZBX_PAGE_DO_REFRESH', 1);
-	}
+if(PAGE_TYPE_HTML == $page['type']){
+	define('ZBX_PAGE_DO_REFRESH', 1);
+}
 //	define('ZBX_PAGE_DO_JS_REFRESH', 1);
 
-include_once 'include/page_header.php';
+include_once('include/page_header.php');
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'applications'=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
+		'apps'=>			array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
 		'applicationid'=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
 		'close'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN('1'),	NULL),
 		'open'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN('1'),	NULL),
@@ -61,8 +61,8 @@ include_once 'include/page_header.php';
 		'filter_set'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
 
 //ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			'isset({favid})'),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 	);
 
@@ -72,15 +72,17 @@ include_once 'include/page_header.php';
 	$_REQUEST['select'] = get_request('select',CProfile::get('web.latest.filter.select', ''));
 	CProfile::update('web.latest.filter.select', $_REQUEST['select'], PROFILE_TYPE_STR);
 
-	$options = array('allow_all_hosts','monitored_hosts','with_historical_items');
-	//if(!$ZBX_WITH_ALL_NODES)	array_push($options,'only_current_node');
+	
+//if(!$ZBX_WITH_ALL_NODES)	array_push($options,'only_current_node');
 
-//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
-	$params = array();
-	foreach($options as  $option) $params[$option] = 1;
-	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
-	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
-//SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
+	$options = array(
+		'allow_all_hosts' => 1,
+		'monitored_hosts' => 1,
+		'with_historical_items' => 1
+	);
+	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $options);
+	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $options);
+
 	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
 //SDI($_REQUEST['groupid'].' : '.$_REQUEST['hostid']);
 
@@ -94,7 +96,7 @@ include_once 'include/page_header.php';
 		}
 /*
 		else if('refresh' == $_REQUEST['favobj']){
-			switch($_REQUEST['favid']){
+			switch($_REQUEST['favref']){
 				case ZBX_PAGE_MAIN_HAT:
 					include_once('blocks/latest.page.php');
 					break;
@@ -182,50 +184,36 @@ include_once 'include/page_header.php';
 	$_REQUEST['groupbyapp'] = get_request('groupbyapp',CProfile::get('web.latest.groupbyapp',1));
 	CProfile::update('web.latest.groupbyapp',$_REQUEST['groupbyapp'],PROFILE_TYPE_INT);
 
-	$_REQUEST['applications'] = get_request('applications', get_favorites('web.latest.applications'));
-	$_REQUEST['applications'] = zbx_objectValues($_REQUEST['applications'], 'value');
+	$_REQUEST['apps'] = get_request('apps', array());
+	$apps = zbx_toHash($_REQUEST['apps']);
 
 	if(isset($_REQUEST['open'])){
-		if(!isset($_REQUEST['applicationid'])){
-			$_REQUEST['applications'] = array();
-			$show_all_apps = 1;
-		}
-		else if(!uint_in_array($_REQUEST['applicationid'],$_REQUEST['applications'])){
-			array_push($_REQUEST['applications'],$_REQUEST['applicationid']);
-		}
-
+		$showAll = 1;
+		if(isset($_REQUEST['applicationid']))
+			$apps[$_REQUEST['applicationid']] = $_REQUEST['applicationid'];
 	}
-	else if(isset($_REQUEST['close'])){
-		if(!isset($_REQUEST['applicationid'])){
-			$_REQUEST['applications'] = array();
-		}
-		else if(($i=array_search($_REQUEST['applicationid'], $_REQUEST['applications'])) !== FALSE){
-			unset($_REQUEST['applications'][$i]);
-		}
+	else{
+		$hideAll = 1;
+		if(isset($_REQUEST['applicationid']))
+			$apps[$_REQUEST['applicationid']] = $_REQUEST['applicationid'];
 	}
 
-	if(count($_REQUEST['applications']) > 25){
-		$_REQUEST['applications'] = array_slice($_REQUEST['applications'], -25);
-	}
-	
-	rm4favorites('web.latest.applications');
-	foreach($_REQUEST['applications'] as $application){
-		add2favorites('web.latest.applications', $application);
+	if(count($apps) > 35){
+		$apps = array_slice($apps, -35);
 	}
 	
 	/* limit opened application count */
-	// while(count($_REQUEST['applications']) > 25){
-		// array_shift($_REQUEST['applications']);
+	// while(count($apps) > 25){
+		// array_shift($apps);
 	// }
 
-	// CProfile::update('web.latest.applications',$_REQUEST['applications'],PROFILE_TYPE_ARRAY_ID);
+	// CProfile::update('web.latest.applications',$apps,PROFILE_TYPE_ARRAY_ID);
 ?>
 <?php
-	if(isset($show_all_apps)){
+	if(isset($showAll)){
 		$url = '?close=1'.
 			url_param('groupid').
 			url_param('hostid').
-			url_param('applications').
 			url_param('select');
 		$link = new CLink(new CImg('images/general/opened.gif'),$url);
 //		$link = new CLink(new CImg('images/general/opened.gif'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
@@ -234,7 +222,6 @@ include_once 'include/page_header.php';
 		$url = '?open=1'.
 			url_param('groupid').
 			url_param('hostid').
-			url_param('applications').
 			url_param('select');
 		$link = new CLink(new CImg('images/general/closed.gif'),$url);
 //		$link = new CLink(new CImg('images/general/closed.gif'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
@@ -283,7 +270,6 @@ include_once 'include/page_header.php';
 	}
 
 	$tab_rows = array();
-
 	$sql = 'SELECT DISTINCT i.*, ia.applicationid '.
 			' FROM items i,items_applications ia'.
 			' WHERE '.DBcondition('ia.applicationid',$db_appids).
@@ -309,7 +295,8 @@ include_once 'include/page_header.php';
 
 		$db_app['item_cnt']++;
 
-		if(!uint_in_array($db_app['applicationid'],$_REQUEST['applications']) && !isset($show_all_apps)) continue;
+		if(isset($showAll) && !empty($apps) && !isset($apps[$db_app['applicationid']])) continue;
+		else if(isset($hideAll) && (empty($apps) || isset($apps[$db_app['applicationid']]))) continue;
 
 		if(isset($db_item['lastclock']))
 			$lastclock=date(S_DATE_FORMAT_YMDHMS,$db_item['lastclock']);
@@ -358,21 +345,34 @@ include_once 'include/page_header.php';
 
 		$app_rows = $tab_rows[$appid];
 
-		if(uint_in_array($db_app['applicationid'],$_REQUEST['applications']) || isset($show_all_apps)){
-			$url = '?close=1&applicationid='.$db_app['applicationid'].
-				url_param('groupid').url_param('hostid').url_param('applications').
-				url_param('fullscreen').url_param('select');
+		$tmp_apps = $apps;
+		if(isset($apps[$db_app['applicationid']])){
+			unset($tmp_apps[$db_app['applicationid']]);
+			$tmp_apps = array_values($tmp_apps);
+		}
 
-			$link = new CLink(new CImg('images/general/opened.gif'),$url);
-//			$link = new CLink(new CImg('images/general/opened.gif'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
+		if(isset($showAll)){
+			if(!empty($apps) && !isset($apps[$db_app['applicationid']])) $img = new CImg('images/general/closed.gif');
+			else $img = new CImg('images/general/opened.gif');
 		}
 		else{
-			$url = '?open=1&applicationid='.$db_app['applicationid'].
-					url_param('groupid').url_param('hostid').url_param('applications').
-					url_param('fullscreen').url_param('select');
-			$link = new CLink(new CImg('images/general/closed.gif'),$url);
-//			$link = new CLink(new CImg('images/general/closed.gif'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
+			if(!empty($apps) && !isset($apps[$db_app['applicationid']])) $img = new CImg('images/general/opened.gif');
+			else $img = new CImg('images/general/closed.gif');
 		}
+
+		if(isset($showAll) && (!empty($tmp_apps) || empty($apps))){
+			if(empty($apps)) $url = '?close=1&applicationid='.$db_app['applicationid'];
+			else if(isset($apps[$db_app['applicationid']])) $url = '?open=1'.url_param($tmp_apps, false, 'apps');
+			else $url = '?open=1&applicationid='.$db_app['applicationid'].url_param($tmp_apps, false, 'apps');
+		}
+		else{
+			if(empty($apps)) $url = '?open=1&applicationid='.$db_app['applicationid'];
+			else if(isset($apps[$db_app['applicationid']])) $url = '?close=1'.url_param($tmp_apps, false, 'apps');
+			else $url = '?close=1&applicationid='.$db_app['applicationid'].url_param($tmp_apps, false, 'apps');
+		}
+
+		$url.= url_param('groupid').url_param('hostid').url_param('fullscreen').url_param('select');
+		$link = new CLink($img,$url);
 
 		$col = new CCol(array($link,SPACE,bold($db_app['name']),SPACE.'('.$db_app['item_cnt'].SPACE.S_ITEMS.')'));
 		$col->setColSpan(5);
@@ -441,7 +441,9 @@ include_once 'include/page_header.php';
 
 		$db_host['item_cnt']++;
 
-		if(!uint_in_array(0,$_REQUEST['applications']) && !isset($show_all_apps)) continue;
+		if(isset($showAll) && !empty($apps) && !isset($apps[0])) continue;
+		else if(isset($hideAll) && (empty($apps) || isset($apps[0]))) continue;
+
 
 
 		if(isset($db_item['lastclock']))
@@ -493,20 +495,35 @@ include_once 'include/page_header.php';
 		if(!isset($tab_rows[$hostid])) continue;
 		$app_rows = $tab_rows[$hostid];
 
-		if(uint_in_array(0,$_REQUEST['applications']) || isset($show_all_apps)){
-			$url = '?close=1&applicationid=0'.
-				url_param('groupid').url_param('hostid').
-				url_param('applications').url_param('select');
-			$link = new CLink(new CImg('images/general/opened.gif'),$url);
-//			$link = new CLink(new CImg('images/general/opened.gif'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
+		$tmp_apps = $apps;
+		if(isset($apps[0])){
+			unset($tmp_apps[0]);
+			$tmp_apps = array_values($tmp_apps);
+		}
+
+		if(isset($showAll)){
+			if(!empty($apps) && !isset($apps[0])) $img = new CImg('images/general/closed.gif');
+			else $img = new CImg('images/general/opened.gif');
 		}
 		else{
-			$url = '?open=1&applicationid=0'.
-				url_param('groupid').url_param('hostid').
-				url_param('applications').url_param('select');
-			$link = new CLink(new CImg('images/general/closed.gif'),$url);
-//			$link = new CLink(new CImg('images/general/closed.gif'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
+			if(!empty($apps) && !isset($apps[0])) $img = new CImg('images/general/opened.gif');
+			else $img = new CImg('images/general/closed.gif');
 		}
+
+		if(isset($showAll) && (!empty($tmp_apps) || empty($apps))){
+			if(empty($apps)) $url = '?close=1&applicationid=0';
+			else if(isset($apps[0])) $url = '?open=1'.url_param($tmp_apps, false, 'apps');
+			else $url = '?open=1&applicationid=0'.url_param($tmp_apps, false, 'apps');
+		}
+		else{
+			if(empty($apps)) $url = '?open=1&applicationid=0';
+			else if(isset($apps[0])) $url = '?close=1'.url_param($tmp_apps, false, 'apps');
+			else $url = '?close=1&applicationid=0'.url_param($tmp_apps, false, 'apps');
+		}
+
+		$url.= url_param('groupid').url_param('hostid').url_param('fullscreen').url_param('select');
+		$link = new CLink($img,$url);
+
 
 		$col = new CCol(array($link,SPACE,bold(S_MINUS_OTHER_MINUS),SPACE.'('.$db_host['item_cnt'].SPACE.S_ITEMS.')'));
 		$col->setColSpan(5);

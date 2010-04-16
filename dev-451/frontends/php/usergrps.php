@@ -337,8 +337,7 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 <?php
 
 // Config
-	$frmForm = new CForm();
-	$frmForm->setMethod('get');
+	$frmForm = new CForm(null, 'get');
 
 	$cmbConf = new CComboBox('config','usergrps.php','javascript: submit()');
 	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');
@@ -346,15 +345,15 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 		$cmbConf->addItem('users.php',S_USERS);
 
 	$frmForm->addItem(array($cmbConf,SPACE,new CButton('form', S_CREATE_GROUP)));
-	show_table_header(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
+	
+	$usrgroup_wdgt = new CWidget();
+	$usrgroup_wdgt->addPageHeader(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
 
 
 	if(isset($_REQUEST['form'])){
-		insert_usergroups_form();
+		$usrgroup_wdgt->addItem(insert_usergroups_form());
 	}
 	else{
-		$usrgroup_wdgt = new CWidget();
-
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
 
@@ -494,13 +493,6 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 		$goButton = new CButton('goButton',S_GO);
 		$goButton->setAttribute('id','goButton');
 
-		$jsLocale = array(
-			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTED'
-		);
-
-		zbx_addJSLocale($jsLocale);
-
 		zbx_add_post_js('chkbxRange.pageGoName = "group_groupid";');
 
 		$footer = get_table_header(array($goBox, $goButton));
@@ -513,11 +505,10 @@ $_REQUEST['config'] = get_request('config','usergrps.php');
 		$form->addItem($table);
 
 		$usrgroup_wdgt->addItem($form);
-		$usrgroup_wdgt->show();
 	}
-?>
-<?php
+	
+	$usrgroup_wdgt->show();
 
+	
 include_once('include/page_footer.php');
-
 ?>

@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -195,9 +195,7 @@ include_once('include/page_header.php');
 		$table->addRow(new CSpan(SPACE.SPACE.SPACE.SPACE.SPACE.SPACE.'all'.SPACE.'('.implode('/', $media_types).')','off'));
 		$table->Show();
 	}
-?>
-<?php
+
 
 include_once 'include/page_footer.php';
-
 ?>

@@ -121,8 +121,8 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"27 January 2010"
-#define	ZABBIX_VERSION		"1.8.2"
+#define	ZABBIX_REVDATE		"29 March 2010"
+#define	ZABBIX_VERSION		"1.8.3"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
@@ -351,6 +351,13 @@ typedef enum
 
 typedef enum
 {
+	GRAPH_YAXIS_TYPE_CALCULATED = 0,
+	GRAPH_YAXIS_TYPE_FIXED,
+	GRAPH_YAXIS_TYPE_ITEM_VALUE
+} zbx_graph_yaxis_types_t;
+
+typedef enum
+{
 	AUDIT_RESOURCE_USER = 0,
 /*	AUDIT_RESOURCE_ZABBIX,*/
 	AUDIT_RESOURCE_ZABBIX_CONFIG = 2,
@@ -410,13 +417,14 @@ typedef enum
 	ALERT_STATUS_FAILED
 } zbx_alert_status_t;
 
-/* Escalation stauses */
+/* Escalation statuses */
 typedef enum
 {
 	ESCALATION_STATUS_ACTIVE = 0,
 	ESCALATION_STATUS_RECOVERY,
 	ESCALATION_STATUS_SLEEP,
-	ESCALATION_STATUS_COMPLETED /* only in server code */
+	ESCALATION_STATUS_COMPLETED, /* only in server code */
+	ESCALATION_STATUS_SUPERSEDED
 } zbx_escalation_status_t;
 
 /* Alert types */
@@ -494,7 +502,7 @@ typedef enum
 #define HTTPTEST_STATUS_MONITORED	0
 #define HTTPTEST_STATUS_NOT_MONITORED	1
 
-/* DIscovery rule */
+/* Discovery rule */
 #define DRULE_STATUS_MONITORED		0
 #define DRULE_STATUS_NOT_MONITORED	1
 
@@ -610,7 +618,7 @@ typedef enum
 	ZBX_HTTPITEM_TYPE_LASTSTEP
 } zbx_httpitem_type_t;
 
-/* User permitions */
+/* User permissions */
 typedef enum
 {
 	USER_TYPE_ZABBIX_USER = 1,
@@ -625,7 +633,8 @@ typedef enum
 	PERM_READ_ONLY,
 	PERM_READ_WRITE,
 	PERM_MAX = 3
-} zbx_user_permition_t;
+} zbx_user_permission_t;
+
 const char *zbx_permission_string(int perm);
 
 /* Flags */

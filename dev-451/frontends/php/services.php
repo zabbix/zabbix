@@ -25,7 +25,7 @@ require_once('include/services.inc.php');
 require_once('include/triggers.inc.php');
 require_once('include/html.inc.php');
 
-$page["title"] = "S_CONFIGURATION_OF_IT_SERVICES";
+$page['title'] = 'S_CONFIGURATION_OF_IT_SERVICES';
 $page['file'] = 'services.php';
 $page['scripts'] = array();
 $page['hist_arg'] = array();
@@ -42,7 +42,7 @@ include_once('include/page_header.php');
 
 // ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	IN("'hat'"),		NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
 
 	);
@@ -52,7 +52,7 @@ include_once('include/page_header.php');
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
-			CProfile::update('web.services.hats.'.$_REQUEST['favid'].'.state',$_REQUEST['state'],PROFILE_TYPE_INT);
+			CProfile::update('web.services.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['state'],PROFILE_TYPE_INT);
 		}
 	}
 
@@ -132,10 +132,8 @@ include_once('include/page_header.php');
 	$tree = new CTree('service_conf_tree', $treeServ,array('caption' => bold(S_SERVICE),'algorithm' => bold(S_STATUS_CALCULATION), 'description' => bold(S_TRIGGER)));
 
 	if($tree){
-		show_table_header(S_IT_SERVICES_BIG, SPACE);
-
 		$serv_wdgt = new CWidget();
-		$serv_wdgt->addItem(BR());
+		$serv_wdgt->addPageHeader(S_IT_SERVICES_BIG, SPACE);
 		$serv_wdgt->addItem($tree->getHTML());
 
 		$serv_wdgt->show();

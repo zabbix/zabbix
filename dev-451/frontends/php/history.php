@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ require_once('include/graphs.inc.php');
 $page['file']	= 'history.php';
 $page['title']	= 'S_HISTORY';
 $page['hist_arg'] = array('itemid', 'hostid', 'grouid', 'graphid', 'period', 'dec', 'inc', 'left', 'right', 'stime');
-$page['scripts'] = array('scriptaculous.js?load=effects,dragdrop','class.calendar.js','gtlc.js');
+$page['scripts'] = array('effects.js','dragdrop.js','class.calendar.js','gtlc.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
@@ -63,7 +63,8 @@ include_once('include/page_header.php');
 		'action'=>	array(T_ZBX_STR, O_OPT,	 null,	IN('"showgraph","showvalues","showlatest","add","remove"'), null),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,		NULL),
+		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NULL,			NULL),
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
 /* actions */
 		'remove_log'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -81,7 +82,7 @@ include_once('include/page_header.php');
 <?php
 	if(isset($_REQUEST['favobj'])){
 		if('timeline' == $_REQUEST['favobj']){
-			navigation_bar_calc('web.item.graph', true);
+			navigation_bar_calc('web.item.graph', $_REQUEST['itemid'], true);
 		}
 		if('filter' == $_REQUEST['favobj']){
 			CProfile::update('web.history.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
@@ -198,19 +199,20 @@ include_once('include/page_header.php');
 	
 	$historyWidget = new CWidget();
 	$historyWidget->addItem(SPACE);
-	
-	$scroll_div = new CDiv();
-	$scroll_div->setAttribute('id','scrollbar_cntr');
-	$historyWidget->addFlicker($scroll_div, CProfile::get('web.history.filter.state',1));
+
+	if(($_REQUEST['action'] == 'showvalues') || ($_REQUEST['action'] == 'showgraph')){
+		$scroll_div = new CDiv();
+		$scroll_div->setAttribute('id','scrollbar_cntr');
+		$historyWidget->addFlicker($scroll_div, CProfile::get('web.history.filter.state',1));
+	}
 
 
 	if( !isset($_REQUEST['plaintext']) && ($_REQUEST['fullscreen']==0) ){
 		if($item_type == ITEM_VALUE_TYPE_LOG){
-			$l_header = new CForm();
+			$l_header = new CForm(null, 'get');
 			$l_header->setName('loglist');
-			$l_header->setMethod('get');
 			$l_header->addVar('action',$_REQUEST['action']);
-			$l_header->addVar('period',$_REQUEST['period']);
+//			$l_header->addVar('period',$_REQUEST['period']);
 			$l_header->addVar('itemid',$_REQUEST['itemid']);
 
 			if(isset($_REQUEST['filter_task']))	$l_header->addVar('filter_task',$_REQUEST['filter_task']);
@@ -271,8 +273,8 @@ include_once('include/page_header.php');
 <?php
 	if(is_array($_REQUEST['itemid'])) $itemid = reset($_REQUEST['itemid']);
 	else $itemid = $_REQUEST['itemid'];
-	$effectiveperiod = navigation_bar_calc('web.item.graph');
-
+	
+	$effectiveperiod = navigation_bar_calc('web.item.graph', $itemid, true);
 	$bstime = $_REQUEST['stime'];
 	
 
@@ -512,7 +514,6 @@ include_once('include/page_header.php');
 			}
 
 			while($row=DBfetch($result)){
-
 				if($DB['TYPE'] == 'ORACLE' && $item_type == ITEM_VALUE_TYPE_TEXT){
 					if(!isset($row['value']))
 						$row['value'] = '';
@@ -575,14 +576,11 @@ include_once('include/page_header.php');
 // NAV BAR
 			$timeline = array();
 			$timeline['period'] = $effectiveperiod;
-			$timeline['starttime'] = get_min_itemclock_by_itemid($_REQUEST['itemid']);
+			$timeline['starttime'] = date('YmdHi', get_min_itemclock_by_itemid($_REQUEST['itemid']));
 			$timeline['usertime'] = null;
 
 			if(isset($_REQUEST['stime'])){
-				$bstime = $_REQUEST['stime'];
-
-				$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
-				$timeline['usertime'] += $timeline['period'];
+				$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 			}
 
 			$objData = array();
@@ -615,17 +613,6 @@ include_once('include/page_header.php');
 			zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 			zbx_add_post_js('timeControl.processObjects();');
 
-/*
-			if(isset($dom_graph_id)){
-				zbx_add_post_js('addGraph("'.$containerid.'", "'.$dom_graph_id.'","'.$src.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($graphDims).','.$loadSBox.');');
-			}
-			else{
-				$script = 'var tline = create_timeline("graph",'.$timeline['period'].', '.$timeline['starttime'].','.$timeline['usertime'].');'."\n";
-				$script.= 'var scrl = scrollCreate("graph", (document.body.clientWidth - 30), tline.timelineid);'."\n";
-				$script.= 'scrl.onchange = graphUpdate; '."\n";
-				zbx_add_post_js($script);
-			}
-//*/
 //-------------
 		}
 	}

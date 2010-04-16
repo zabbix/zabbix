@@ -66,8 +66,6 @@ include_once('include/page_header.php');
 	$bulk = !isset($_REQUEST['eventid']);
 ?>
 <?php
-
-
 	if(!$bulk){
 		$options = array(
 			'extendoutput' => 1,
@@ -143,11 +141,11 @@ include_once('include/page_header.php');
 			$table->setAlign('center');
 
 			while($db_ack = DBfetch($db_acks)){
-				$db_user = CUser::get(array('userids' => $db_ack['userid'], 'extendoutput' => 1));
-				$db_user = reset($db_user);
+				//$db_user = CUser::get(array('userids' => $db_ack['userid'], 'extendoutput' => 1));
+				//$db_user = reset($db_user);
 
 				$table->addRow(array(
-					new CCol($db_user['alias'], 'user'),
+					new CCol($db_ack['alias'], 'user'),
 					new CCol(date(S_DATE_FORMAT_YMDHMS, $db_ack['clock']), 'time')),
 					'title');
 

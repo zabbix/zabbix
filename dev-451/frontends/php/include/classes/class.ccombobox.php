@@ -33,10 +33,10 @@ class CComboBox extends CTag{
 		$this->attributes['size'] = 1;
 
 		$this->value = $value;
-		$this->SetAction($action);
+		$this->setAction($action);
 	}
 
-	public function SetAction($value='submit()', $event='onchange'){
+	public function setAction($value='submit()', $event='onchange'){
 		$this->setAttribute($event,$value);
 	}
 

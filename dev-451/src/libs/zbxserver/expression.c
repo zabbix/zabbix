@@ -176,7 +176,7 @@ void	delete_spaces(char *c)
  *                                                                            *
  * Parameters: exp - expression string                                        *
  *                                                                            *
- * Return value:  SUCCEED - evaluated succesfully, result - value of the exp  *
+ * Return value:  SUCCEED - evaluated successfully, result - value of the exp *
  *                FAIL - otherwise                                            *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -549,7 +549,7 @@ static int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
  *                                                                            *
  * Parameters: exp - expression string                                        *
  *                                                                            *
- * Return value:  SUCCEED - evaluated succesfully, result - value of the exp  *
+ * Return value:  SUCCEED - evaluated successfully, result - value of the exp *
  *                FAIL - otherwise                                            *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -2283,22 +2283,26 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, DB_ESCALATION *escala
  *             error - place error message here if any                        *
  *             maxerrlen - max length of error msg                            *
  *                                                                            *
- * Return value:  SUCCEED - evaluated succesfully, exp - updated expression   *
+ * Return value:  SUCCEED - evaluated successfully, exp - updated expression  *
  *                FAIL - otherwise                                            *
  *                                                                            *
- * Author: Alexei Vladishev, Aleksander Vladishev                             *
+ * Author: Alexei Vladishev, Aleksander Vladishev, Aleksandrs Saveljevs       *
  *                                                                            *
  * Comments: example: "({15}>10)|({123}=0)" => "(6.456>10)|(0=0)              *
  *                                                                            *
  ******************************************************************************/
-static int	substitute_functions(char **exp, char *error, int maxerrlen)
+static int	substitute_functions(char **exp, time_t now, char *error, int maxerrlen)
 {
 #define ID_LEN 21
-	char	functionid[ID_LEN], *f;
-	char	*out = NULL, *e, *value = NULL;
+	char	functionid[ID_LEN], *e, *f;
+	char	*out = NULL;
 	int	out_alloc = 64, out_offset = 0;
-	int	level;
-	char	err[MAX_STRING_LEN];
+	char	value[MAX_STRING_LEN];
+
+	DB_RESULT	result;
+	DB_ROW		row;
+	DB_ITEM		item;
+	DB_FUNCTION	function;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_functions(%s)",
 			*exp);
@@ -2326,27 +2330,47 @@ static int	substitute_functions(char **exp, char *error, int maxerrlen)
 
 			if (*e != '}')
 			{
-				zbx_snprintf(error, maxerrlen, "Invalid expression [%s]",
-						*exp);
-				level = LOG_LEVEL_WARNING;
+				zbx_snprintf(error, maxerrlen, "Invalid expression [%s]", *exp);
 				goto error;
 			}
 
 			*f = '\0';
 			e++;	/* '}' */
 
-			if (DBget_function_result(&value, functionid, err, sizeof(err)) != SUCCEED)
+			result = DBselect(
+					"select distinct %s,f.function,f.parameter from %s,functions f"
+					" where i.hostid=h.hostid and i.itemid=f.itemid and f.functionid=%s",
+					ZBX_SQL_ITEM_FIELDS,
+					ZBX_SQL_ITEM_TABLES,
+					functionid);
+
+			row = DBfetch(result);
+
+			if (NULL == row)
 			{
-				zbx_snprintf(error, maxerrlen, "unable to get function value: %s",
-						err);
-				/* It may happen because functions.lastvalue is NULL, so this is not warning  */
-				level = LOG_LEVEL_DEBUG;
+				zbx_snprintf(error, maxerrlen, "Could not obtain function and item for functionid: %s",
+						functionid);
+				DBfree_result(result);
 				goto error;
 			}
+			else
+			{
+				DBget_item_from_db(&item, row);
+
+				function.function	= row[ZBX_SQL_ITEM_FIELDS_NUM];
+				function.parameter	= row[ZBX_SQL_ITEM_FIELDS_NUM + 1];
+
+				if (FAIL == evaluate_function(value, &item, function.function, function.parameter, now))
+				{
+					zbx_snprintf(error, maxerrlen, "Evaluation failed for function: %s", function.function);
+					DBfree_result(result);
+					goto error;
+				}
+			}
+
+			DBfree_result(result);
 
 			zbx_strcpy_alloc(&out, &out_alloc, &out_offset, value);
-
-			zbx_free(value);
 		}
 		else
 			zbx_chrcpy_alloc(&out, &out_alloc, &out_offset, *e++);
@@ -2355,15 +2379,14 @@ static int	substitute_functions(char **exp, char *error, int maxerrlen)
 
 	*exp = out;
 empty:
-	zabbix_log( LOG_LEVEL_DEBUG, "End substitute_functions() [%s]",
-			*exp);
+	zabbix_log(LOG_LEVEL_DEBUG, "End substitute_functions() [%s]", *exp);
 
 	return SUCCEED;
 error:
 	if (NULL != out)
 		zbx_free(out);
 
-	zabbix_log(level, "%s", error);
+	zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 	zabbix_syslog("%s", error);
 
 	return FAIL;
@@ -2379,7 +2402,7 @@ error:
  *             error - place error message if any                             *
  *             maxerrlen - max length of error message                        *
  *                                                                            *
- * Return value:  SUCCEED - evaluated succesfully, result - value of the exp  *
+ * Return value:  SUCCEED - evaluated successfully, result - value of the exp *
  *                FAIL - otherwise                                            *
  *                error - error message                                       *
  *                                                                            *
@@ -2389,7 +2412,7 @@ error:
  *                    ({a0:system[procload].max(300)}>3)                      *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_expression(int *result,char **expression, DB_TRIGGER *trigger, char *error, int maxerrlen)
+int	evaluate_expression(int *result, char **expression, time_t now, DB_TRIGGER *trigger, char *error, int maxerrlen)
 {
 	const char		*__function_name = "evaluate_expression";
 	/* Required for substitution of macros */
@@ -2411,9 +2434,9 @@ int	evaluate_expression(int *result,char **expression, DB_TRIGGER *trigger, char
 	{
 		/* Evaluate expression */
 		delete_spaces(*expression);
-		if( substitute_functions(expression, error, maxerrlen) == SUCCEED)
+		if (substitute_functions(expression, now, error, maxerrlen) == SUCCEED)
 		{
-			if( evaluate(&value, *expression, error, maxerrlen) == SUCCEED)
+			if (evaluate(&value, *expression, error, maxerrlen) == SUCCEED)
 			{
 				if (0 == cmp_double(value, 0))
 					*result = TRIGGER_VALUE_FALSE;

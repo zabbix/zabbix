@@ -83,10 +83,10 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
  *                                                                            *
  * Purpose: parse configuration file                                          *
  *                                                                            *
- * Parameters: cfg_file - full name of config filesocker descriptor           *
+ * Parameters: cfg_file - full name of config file                            *
  *             cfg - pointer to configuration parameter structure             *
  *                                                                            *
- * Return value: SUCCEED - parsed succesfully                                 *
+ * Return value: SUCCEED - parsed successfully                                *
  *               FAIL - error processing config file                          *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -124,9 +124,9 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 		return FAIL;
 	}
 
-	if(cfg_file)
+	if (cfg_file)
 	{
-		if( NULL == (file = fopen(cfg_file,"r")) )
+		if (NULL == (file = fopen(cfg_file,"r")))
 		{
 			goto lbl_cannot_open;
 		}

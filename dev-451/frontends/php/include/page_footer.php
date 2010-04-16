@@ -47,15 +47,20 @@
 	show_messages();
 
 	$post_script = '';
-	if($page['type'] == PAGE_TYPE_HTML_BLOCK){
-COpt::profiling_stop('script');
-COpt::show();
+	if(uint_in_array($page['type'], array(PAGE_TYPE_HTML_BLOCK, PAGE_TYPE_HTML))){
+		if(!is_null($USER_DETAILS) && isset($USER_DETAILS['debug_mode']) && ($USER_DETAILS['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)){
+			COpt::profiling_stop('script');
+			COpt::show();
+		}
 	}
-	else if($page['type'] == PAGE_TYPE_HTML){
+
+	if($page['type'] == PAGE_TYPE_HTML){
 		$post_script.= 'var page_refresh = null;'."\n";
 
 		if(isset($JS_TRANSLATE)){
-			$post_script.='var locale = '.zbx_jsvalue($JS_TRANSLATE)."\n";
+			$post_script.='var newLocale = '.zbx_jsvalue($JS_TRANSLATE)."\n";
+			$post_script.='var locale = (typeof(locale) == "undefined" ? {} : locale);'."\n";
+			$post_script.='for(key in newLocale){locale[key] = newLocale[key];}'."\n";
 		}
 
 		$post_script.= 'function zbxCallPostScripts(){'."\n";
@@ -97,9 +102,6 @@ COpt::show();
 				));
 			$table->show();
 		}
-
-COpt::profiling_stop('script');
-COpt::show();
 
 		echo "</body>\n";
 		echo "</html>\n";

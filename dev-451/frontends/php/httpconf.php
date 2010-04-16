@@ -340,16 +340,17 @@ include_once('include/page_header.php');
 	if(!isset($_REQUEST['form']) && ($_REQUEST['hostid'] > 0))
 		$form->addItem(new CButton('form',S_CREATE_SCENARIO));
 
-	show_table_header(S_CONFIGURATION_OF_WEB_MONITORING_BIG, $form);
+	$http_wdgt = new CWidget();
+	$http_wdgt->addPageHeader(S_CONFIGURATION_OF_WEB_MONITORING_BIG, $form);
 
 	$db_hosts=DBselect('select hostid from hosts where '.DBin_node('hostid'));
 	if(isset($_REQUEST['form'])&&isset($_REQUEST['hostid']) && DBfetch($db_hosts)){
 // FORM
-		insert_httptest_form();
+		$http_wdgt->addItem(insert_httptest_form());
 	}
 	else {
 // Table HEADER
-		$http_wdgt = new CWidget();
+		
 
 		$form = new CForm();
 		$form->setMethod('get');
@@ -560,13 +561,6 @@ include_once('include/page_header.php');
 		$goButton = new CButton('goButton',S_GO.' (0)');
 		$goButton->setAttribute('id','goButton');
 
-		$jsLocale = array(
-			'S_CLOSE',
-			'S_NO_ELEMENTS_SELECTED'
-		);
-
-		zbx_addJSLocale($jsLocale);
-
 		zbx_add_post_js('chkbxRange.pageGoName = "group_httptestid";');
 
 		$table->setFooter(new CCol(array($goBox, $goButton)));
@@ -574,8 +568,9 @@ include_once('include/page_header.php');
 		$form->addItem($table);
 
 		$http_wdgt->addItem($form);
-		$http_wdgt->show();
 	}
+	
+	$http_wdgt->show();
 
 
 include_once('include/page_footer.php');

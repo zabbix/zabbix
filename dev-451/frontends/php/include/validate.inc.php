@@ -49,6 +49,10 @@
 		return "({".$var."}>=".$min."&&{".$var."}<=".$max.")&&";
 	}
 
+	function REGEXP($regexp,$var=NULL){
+		return "(preg_match(\"".$regexp."\", {".$var."}))&&";
+	}
+
 	function GT($value,$var=''){
 		return "({".$var."}>=".$value.")&&";
 	}
@@ -360,9 +364,19 @@
 
 		if($type == T_ZBX_PORTS){
 			$err = ZBX_VALID_OK;
+
+			$type = ($flags&P_SYS)?ZBX_VALID_ERROR:ZBX_VALID_WARNING;
 			foreach(explode(',', $var) as $el)
-				foreach(explode('-', $el) as $p)
+				foreach(explode('-', $el) as $p){
 					$err |= check_type($field, $flags, $p, T_ZBX_INT);
+					if(($p > 65535) || ($p < 0))  $err |= $type;
+				}
+
+			if($err == ZBX_VALID_ERROR)
+				info(S_CRITICAL_ERROR.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_IS_NOT_PORT_RANGE_SMALL);
+			else if($err == ZBX_VALID_WARNING)
+				info(S_WARNING.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_IS_NOT_PORT_RANGE_SMALL);
+
 			return $err;
 		}
 
@@ -380,7 +394,7 @@
 			return ZBX_VALID_OK;
 		}
 
-		if(($type == T_ZBX_INT) && !is_numeric($var)) {
+		if(($type == T_ZBX_INT) && !zbx_numeric($var)) {
 			if($flags&P_SYS){
 				info(S_CRITICAL_ERROR.'.'.SPACE.S_FIELD.SPACE.'['.$field.']'.SPACE.S_IS_NOT_INTEGER_SMALL);
 				return ZBX_VALID_ERROR;
