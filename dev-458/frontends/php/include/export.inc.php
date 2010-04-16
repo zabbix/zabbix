@@ -531,9 +531,6 @@ class zbxXML{
 					continue; // break if not update exist
 				}
 
-				if($sysmap['markelements'] == 1) $sysmap['highlight'] = $sysmap['highlight'] | 4;
-				if($sysmap['expandproblem'] == 0) $sysmap['highlight'] = $sysmap['highlight'] | 2;
-
 				if(isset($sysmap['backgroundid'])){
 					$image = getImageByIdent($sysmap['backgroundid']);
 

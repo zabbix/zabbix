@@ -1910,10 +1910,6 @@
 				unset($sysmap['sysmapid']);
 				$sysmap['backgroundid'] = ($sysmap['backgroundid'] > 0)?$images[$sysmap['backgroundid']]:'';
 
-				$sysmap['markelements'] = ($sysmap['highlight'] & 4) ? 1 : 0;
-				$sysmap['expandproblem'] = ($sysmap['highlight'] & 2) ? 0 : 1;
-				$sysmap['highlight'] = ($sysmap['highlight'] & 1) ? 1: 0;
-
 				foreach($sysmap['selements'] as $snum => &$selement){
 					unset($selement['sysmapid']);
 					switch($selement['elementtype']){
