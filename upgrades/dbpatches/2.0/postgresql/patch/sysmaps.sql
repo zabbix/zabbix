@@ -8,13 +8,16 @@ CREATE TABLE sysmaps_tmp (
 	label_location		integer		DEFAULT '0'	NOT NULL,
 	highlight		integer		DEFAULT '1'	NOT NULL,
 	expandproblem	integer 	DEFAULT '1' NOT NULL,
+	markelements	integer 	DEFAULT '0' NOT NULL,
 	PRIMARY KEY (sysmapid)
 ) with OIDS;
 
-insert into sysmaps_tmp select sysmapid,name,width,height,backgroundid,label_type,label_location,highlight,1 from sysmaps;
+insert into sysmaps_tmp select sysmapid,name,width,height,backgroundid,label_type,label_location,highlight,1,0 from sysmaps;
 
-UPDATE sysmaps_tmp SET expandproblem=0 WHERE highlight>1;
-UPDATE sysmaps_tmp SET highlight=(highlight-2) WHERE highlight>1;
+UPDATE sysmaps SET expandproblem=0 WHERE highlight>1 AND highlight<4;
+UPDATE sysmaps SET markelements=1 WHERE highlight>4;
+UPDATE sysmaps SET highlight=(highlight-4) WHERE highlight>4;
+UPDATE sysmaps SET highlight=(highlight-2) WHERE highlight>1;
 
 drop table sysmaps;
 

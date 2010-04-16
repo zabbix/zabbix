@@ -430,6 +430,7 @@
 				$trigger = reset($event['triggers']);
 
 				$event['desc'] = expand_trigger_description_by_data($trigger);
+				$event['type'] = $trigger['type'];
 
 				$event += $trigger;
 

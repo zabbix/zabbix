@@ -596,7 +596,7 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 	else $abs = $value;
 
 	$valUnit = array('pow'=>0, 'short'=>'', 'long'=>'', 'value'=>$value);
-	if($abs > 0){
+	if(($abs > 999) ||  ($abs < 0.001)){
 		foreach($digitUnits[$step] as $dnum => $data){
 			if(bccomp($abs, $data['value']) > -1) $valUnit = $data;
 			else break;
@@ -867,8 +867,8 @@ function zbx_implodeHash($glue1, $glue2, $hash){
 	$str = '';
 
 	foreach($hash as $key => $value){
-		if(!empty($str)) $str.= $glue1;
-		$str.= $key.$glue2.$value;
+		if(!empty($str)) $str.= $glue2;
+		$str.= $key.$glue1.$value;
 	}
 
 return $str;

@@ -12306,7 +12306,7 @@ INSERT INTO screens_items VALUES (7,2,0,5,400,100,1,2,0,0,0,0,0,0,'',0);
 -- Dumping data for table `sysmaps`
 --
 
-INSERT INTO sysmaps VALUES (2,'Local network',980,200,0,1,2,1,1);
+INSERT INTO sysmaps VALUES (2,'Local network',980,200,0,1,2,1,1,0);
 
 --
 -- Dumping data for table `sysmaps_elements`
