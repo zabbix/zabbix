@@ -256,8 +256,6 @@ if(defined('USE_PROFILING')){
 			global $USER_DETAILS;
 			global $DB;
 
-
-
 			$endtime = COpt::getmicrotime();
 			$memory = COpt::getmemoryusage();
 			$pickMemory = COpt::getMemoryPick();
@@ -312,7 +310,9 @@ if(defined('USE_PROFILING')){
 
 					$sql_time=0;
 					for($i = $sqlmark[$type]; $i < $requests_cnt; $i++){
-						$time=$sqlrequests[$i][0];
+						$time = $sqlrequests[$i][0];
+						$sqlrequests[$i][1] = str_replace(array('<','>'), array('&lt;','&gt;'), $sqlrequests[$i][1]);
+
 						$sql_time+=$time;
 						if($time < LONG_QUERY){
 							$debug_str.= S_TIME.':'.round($time,8).' SQL:&nbsp;'.$sqlrequests[$i][1].OBR;

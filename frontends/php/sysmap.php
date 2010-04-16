@@ -107,7 +107,7 @@ include_once('include/page_header.php');
 
 					expandMapLabels($db_map);
 
-					$map_info = getSelementsInfo($db_map, $db_map['expandproblem']);
+					$map_info = getSelementsInfo($db_map);
 //SDII($db_map);
 					add_elementNames($db_map['selements']);
 
@@ -181,7 +181,7 @@ include_once('include/page_header.php');
 							}
 							if(isset($selement['new'])){
 								$selement['sysmapid'] = $sysmapid;
-								$selementid = add_element_to_sysmap($selement);
+								$selementid = CMap::addElements($selement);
 
 								foreach($links as $id => $link){
 									if($link['selementid1'] == $selement['selementid']) $links[$id]['selementid1']=$selementid;
@@ -191,7 +191,7 @@ include_once('include/page_header.php');
 							else{
 //SDII($selement);
 								$selement['sysmapid'] = $sysmapid;
-								$result = update_sysmap_element($selement);
+								$result = CMap::updateElements($selement);
 								unset($db_selementids[$selement['selementid']]);
 							}
 						}
@@ -383,6 +383,9 @@ include_once('include/page_header.php');
 
 	zbx_add_post_js('create_map("sysmap_cnt", "'.$sysmap['sysmapid'].'");');
 
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>

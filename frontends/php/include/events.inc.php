@@ -276,15 +276,21 @@ function make_small_eventlist($eventid, $trigger_data){
 	$rows = array();
 	$count = 1;
 
-	$curevent = CEvent::get(array('eventids' => $eventid, 'extendoutput' => 1, 'select_triggers' => 1));
-	$curevent = reset($curevent);
-
-	$clock = $curevent['clock'];
-	
 	$options = array(
-		'time_till' => $curevent['clock'],
+		'eventids' => $eventid, 
+		'output' => API_OUTPUT_EXTEND, 
+		'select_triggers' => API_OUTPUT_EXTEND
+	);
+	$curevent = CEvent::get($options);
+	$curevent = reset($curevent);
+	
+	$clock = $curevent['clock'];
+
+	$options = array(
 		'triggerids' => $trigger_data['triggerid'],
-		'extendoutput' => 1,
+		'time_till' => $curevent['clock'],
+		'select_triggers' => API_OUTPUT_EXTEND,
+		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'clock',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => 20
@@ -292,11 +298,13 @@ function make_small_eventlist($eventid, $trigger_data){
 	$events = CEvent::get($options);
 
 	foreach($events as $enum => $event){
-		$event['type'] = $trigger_data['type'];
+		$trigger = reset($event['triggers']);
+
+		$event['type'] = $trigger['type'];
+		
 		$lclock = $clock;
 		$clock = $event['clock'];
 		$duration = zbx_date2age($lclock, $clock);
-		$event = get_tr_event_by_eventid($event['eventid']);
 
 		if($curevent['eventid'] == $event['eventid'] && ($nextevent = get_next_event($event))) {
 			$duration = zbx_date2age($nextevent['clock'], $clock);
@@ -353,7 +361,7 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 				' AND object='.EVENT_OBJECT_TRIGGER.
 				' AND objectid='.$triggerid.
 			' ORDER BY eventid DESC';
-	$db_events = DBselect($sql, ZBX_POPUP_MAX_ROWS);
+	$db_events = DBselect($sql, ZBX_WIDGET_ROWS);
 
 	$count = 0;
 	while($event = DBfetch($db_events)){
@@ -477,7 +485,7 @@ function get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0){
 		$row = zbx_array_merge($triggers[$row['triggerid']],$row);
 		if((1 == $hide_unknown) && (!event_initial_time($row,$hide_unknown))) continue;
 
-		$table->AddRow(array(
+		$table->addRow(array(
 			date("Y.M.d H:i:s",$row["clock"]),
 			get_node_name_by_elid($row['triggerid']),
 			($hostid == 0)?$row['host']:null,
