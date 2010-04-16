@@ -138,7 +138,6 @@ DC_HOST
 	char		ip[HOST_IP_LEN_MAX];
 	char		dns[HOST_DNS_LEN_MAX];
 	unsigned short	port;
-	unsigned char	status;
 	unsigned char	maintenance_status;
 	unsigned char	maintenance_type;
 	int		maintenance_from;
