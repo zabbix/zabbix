@@ -830,7 +830,7 @@ static void	DCallocate_logitem(int index)
 
 		DCcheck_freemem(sz);
 
-		config->logitems_alloc += TRAPITEM_ALLOC_STEP;
+		config->logitems_alloc += LOGITEM_ALLOC_STEP;
 
 		src = (char *)config->dbitems;
 		dst = (char *)config->dbitems + sz;
@@ -1459,7 +1459,7 @@ static void	DCsync_items()
 		}
 		else
 		{
-			/* remove logtimefnt parameter */
+			/* remove logtimefmt parameter */
 			if (i < config->logitems_num && config->logitems[i].itemid == itemid)
 				DCremove_element(config->logitems, &config->logitems_num, sizeof(ZBX_DC_LOGITEM), i);
 		}
@@ -1776,7 +1776,7 @@ void	DCsync_configuration()
 {
 	const char	*__function_name = "DCsync_configuration";
 	double		sec;
-//zabbix_set_log_level(LOG_LEVEL_DEBUG);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	sec = zbx_time();
@@ -1818,7 +1818,6 @@ void	DCsync_configuration()
 			config->idxhost02_num, config->idxhost02_alloc);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() time:" ZBX_FS_DBL "sec. pfree:" ZBX_FS_DBL "%%",
 			__function_name, sec, 100 * ((double)config->free_mem / CONFIG_DBCONFIG_SIZE));
-//zabbix_set_log_level(LOG_LEVEL_WARNING);
 }
 
 /******************************************************************************
