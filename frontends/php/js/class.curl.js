@@ -106,8 +106,14 @@ initialize: function(url){
 	if(this.query.length>0) this.file+='?'+this.query;
 	if(this.query.length > 0)	this.formatArguments();
 
-	var sid = cookie.read('zbx_sessionid');
-	if(!is_null(sid)) this.setArgument('sid', sid.substring(16));
+	var possition = parseInt(location.href.indexOf('sid='));
+	if(possition > -1){
+		this.setArgument('sid', location.href.substr(possition+4, 16));
+	}
+	else{
+		var sid = cookie.read('zbx_sessionid');
+		if(!is_null(sid)) this.setArgument('sid', sid.substring(16));
+	}
 },
 
 
