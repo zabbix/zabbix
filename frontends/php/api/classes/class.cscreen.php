@@ -480,8 +480,7 @@ SDI('/////////////////////////////////');
 				$screen_db_fields = array(
 					'name' => null,
 					'hsize' => 2,
-					'vsize' => 2,
-					'screenitems' => array()
+					'vsize' => 2
 				);
 
 				if(!check_db_fields($screen_db_fields, $screen)){
@@ -511,21 +510,23 @@ SDI('/////////////////////////////////');
 						' VALUES ('.implode(',',array_values($values)).')';
 				$result = DBexecute($sql);
 
-				if(!$result) throw new APIException(ZBX_API_ERROR_INTERNAL, 'Failed on screen['.$screen['name'].'] creation');
+				if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Failed on screen['.$screen['name'].'] creation');
 
-				$data = array(
-					'screenids' => array($screenid),
-					'screenitems' => $screen['screenitems']
-				);
+				if(isset($screen['screenitems'])){
+					$data = array(
+						'screenids' => array($screenid),
+						'screenitems' => $screen['screenitems']
+					);
 
-				$result = self::addItems($data);
-				if(!$result) throw new APIException(ZBX_API_ERROR_INTERNAL, 'Failed on screen['.$screen['name'].'] creation');
+					$result = self::addItems($data);
+					if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Failed on screen['.$screen['name'].'] creation');
+				}
 
 				$screenids[] = $screenid;
 			}
 
 			$result = self::EndTransaction($result, __METHOD__);
-			if(!$result) throw new APIException(ZBX_API_ERROR_INTERNAL, 'Transaction failed on screens creation');
+			if(!$result) self::exception(ZBX_API_ERROR_INTERNAL, 'Transaction failed on screens creation');
 
 			return array('screenids' => $screenids);
 		}
@@ -576,7 +577,6 @@ SDI('/////////////////////////////////');
 				throw new APIException(ZBX_API_ERROR_PERMISSIONS, 'No permisssions for screen update');
 			}
 
-			$upd_screens[$screen['screenid']]['screenitems'] = array();
 			$screenids[] = $screen['screenid'];
 		}
 
@@ -613,19 +613,21 @@ SDI('/////////////////////////////////');
 				$result = DBexecute($sql);
 
 // Screen items
-				$data = array(
-					'screenids' => array($screen['screenid']),
-				);
-				$result = self::deleteItems($data);
-				if(!$result) throw new APIException(ZBX_API_ERROR_INTERNAL, 'Failed on screen['.$screen['name'].'] update');
+				if(isset($screen['screenitems'])){
+					$data = array(
+						'screenids' => array($screen['screenid']),
+					);
+					$result = self::deleteItems($data);
+					if(!$result) throw new APIException(ZBX_API_ERROR_INTERNAL, 'Failed on screen['.$screen['name'].'] update');
 
-				$data = array(
-					'screenids' => array($screen['screenid']),
-					'screenitems' => $screen['screenitems']
-				);
+					$data = array(
+						'screenids' => array($screen['screenid']),
+						'screenitems' => $screen['screenitems']
+					);
 
-				$result = self::addItems($data);
-				if(!$result) throw new APIException(ZBX_API_ERROR_INTERNAL, 'Failed on screen['.$screen['name'].'] update');
+					$result = self::addItems($data);
+					if(!$result) throw new APIException(ZBX_API_ERROR_INTERNAL, 'Failed on screen['.$screen['name'].'] update');
+				}
 			}
 
 			$result = self::EndTransaction($result, __METHOD__);
