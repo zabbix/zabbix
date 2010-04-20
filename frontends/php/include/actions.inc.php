@@ -1080,7 +1080,7 @@ function get_history_of_actions($limit,&$last_clock=null,$sql_cond=''){
 	order_page_result($alerts, 'clock', ZBX_SORT_DOWN);
 
 	foreach($alerts as $num => $row){
-		$time=date(S_DATE_FORMAT_YMDHMS,$row['clock']);
+		$time=zbx_date2str(S_HISTORY_OF_ACTIONS_DATE_FORMAT,$row['clock']);
 
 		if($row['status'] == ALERT_STATUS_SENT){
 			$status=new CSpan(S_SENT,'green');
@@ -1147,7 +1147,7 @@ function get_action_msgs_for_event($eventid){
 // mediatypes
 		$mediatype = array_pop($row['mediatypes']);
 
-		$time=date(S_DATE_FORMAT_YMDHMS,$row["clock"]);
+		$time=zbx_date2str(S_EVENT_ACTION_MESSAGES_DATE_FORMAT,$row["clock"]);
 		if($row['esc_step'] > 0){
 			$time = array(bold(S_STEP.': '),$row["esc_step"],br(),bold(S_TIME.': '),br(),$time);
 		}
@@ -1216,7 +1216,7 @@ function get_action_cmds_for_event($eventid){
 	));
 
 	foreach($alerts as $alertid => $row){
-		$time = date('Y.M.d H:i:s', $row['clock']);
+		$time = zbx_date2str(S_EVENT_ACTION_CMDS_DATE_FORMAT, $row['clock']);
 		if($row['esc_step'] > 0){
 			$time = array(bold(S_STEP.': '), $row['esc_step'], br(), bold(S_TIME.': '), br(), $time);
 		}

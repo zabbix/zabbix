@@ -289,7 +289,7 @@ include_once('include/page_header.php');
 		}
 
 		$table->addRow(array(
-			date(S_DATE_FORMAT_YMDHMS,$row['clock']),
+			zbx_date2str(S_AUDITLOGS_RECORD_DATE_FORMAT,$row['clock']),
 			$row['alias'],
 			$row['ip'],
 			$row['resourcetype'],

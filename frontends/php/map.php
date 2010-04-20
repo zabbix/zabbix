@@ -103,7 +103,7 @@ include_once('include/page_header.php');
 	}
 	unset($db_image);
 
-	$str = date('m.d.Y H:i:s',time(NULL));
+	$str = zbx_date2str(S_MAPS_DATE_FORMAT,time(NULL));
 	imagestring($im, 0,imagesx($im)-120,imagesy($im)-12,$str, $colors['Gray']);
 
 	if(!isset($_REQUEST['noedit'])){
