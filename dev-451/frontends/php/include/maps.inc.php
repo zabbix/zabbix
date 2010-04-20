@@ -1452,10 +1452,10 @@
 		$options = array(
 				'nodeids' => get_current_nodeid(true),
 				'groupids' => zbx_objectValues($selements, 'elementid'),
-				'nopermissions' => 1,
 				'select_hosts' => API_OUTPUT_EXTEND,
-//				'select_triggers' => API_OUTPUT_EXTEND,
-				'output' => API_OUTPUT_EXTEND
+				'select_triggers' => API_OUTPUT_EXTEND,
+				'output' => API_OUTPUT_EXTEND,
+				'nopermissions' => 1
 			);
 		$hostgroups = CHostGroup::get($options);
 		$hostgroups = zbx_toHash($hostgroups, 'groupid');

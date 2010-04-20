@@ -1,6 +1,45 @@
 #!/bin/bash
 
-DB=${1:-zabbix_1_9}
+# This script can be used to create data.sql from a database.
+# It creates sql file that is suitable for importing on top of schema.sql.
+# INSERT statements refer to fields by name to avoid field ordering problems,
+#  and only fields whose content differs from the default are included in the
+#  resulting file.
+#
+# Only accepted parameter currently is database name. If omitted, 'zabbix' is
+#  used. Resulting SQL is stored in FINALFILE file.
+#
+# This script must be run as a user that has write access to files created by
+#  MySQL server user.
+#
+# Only tables listed are considered for data retrieval, and there is support for
+#  additional finetuning:
+#
+# 1. Blacklist
+#    Blacklist support allows to specify which fields should never be dumped from
+#     the specified tables. This is mostly used to exclude runtime data like last
+#     value, status or error messages. Blacklist entries are specified in
+#     BLACKLISTFILE file. Each line contains space separated:
+#         table field1 field2 field3...
+#
+#    Adding a hash mark (#) in front of the line will indicate that it is a
+#     comment.
+#
+# 2. Filter
+#    Filter allows to dump only specific entries from some tables. This is
+#     currently used to dump only interesting entries from the 'profiles' table.
+#    Filter entries are specified in FILTERFILE file. Each line contains space
+#     separated:
+#         table field value1 value2 value3...
+#
+#    From table 'table' only those entries will be dumped where 'field' is
+#     one of values.
+#    Adding a hash mark (#) in front of the line will indicate that it is a
+#     comment.
+
+# Do not make configuration changes to the database while running this script.
+
+DB=${1:-zabbix}
 MYSQLLINE="mysql -N $DB"
 TMPFILE=/tmp/data_sql_tmp_dump.sql
 FINALFILE=final_data.sql
@@ -98,6 +137,7 @@ for TABLE in $TABLES; do
 				DIFFERENT_FIELDS=$(echo $DIFFERENT_FIELDS | sed "s/,${BLACKFIELD}//")
 			done
 		}
+		# --- filter file must have table name, followed by field to filter on, then followed by values to match - all space separated
 		FILTER=$(grep -v ^# "$FILTERFILE" 2>/dev/null | grep $TABLE 2>/dev/null)
 		[[ "$FILTER" ]] && {
 			FILTERFIELD=$(echo $FILTER | cut -d" " -f2)
@@ -122,7 +162,7 @@ FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY \"'\";" | $MYSQLLINE || fail "se
 			sed -i '/\\$/ {N; s/\\\n/\\n/g}' "$TMPFILE"
 		done
 
-		# $TMPFILE is created by mysql user - this script tus has to be run either as that user, or root
+		# $TMPFILE is created by mysql user - this script thus has to be run either as that user, or root
 		sed -i "s/\(.*\)/insert into $TABLE (${DIFFERENT_FIELDS#,}) values (\1);/" "$TMPFILE"
 		cat "$TMPFILE" >> "$FINALFILE"
 		rm "$TMPFILE" || fail "can't remove $TMPFILE"
