@@ -1496,7 +1496,7 @@ static int	get_escalation_history(DB_EVENT *event, DB_ESCALATION *escalation, ch
  *                                                                            *
  * Function: get_event_ack_history                                            *
  *                                                                            *
- * Purpose: retrive event acknowledges history                                *
+ * Purpose: retrieve event acknowledges history                               *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
