@@ -25,6 +25,7 @@
 
 	'S_DATE_FORMAT_YMDHMS'=>		'd M Y H:i:s',
 	'S_DATE_FORMAT_YMD'=>			'd M Y',
+	'S_TIMELINE_DATE_FORMAT'=>		'd.M',
 	'S_HTML_CHARSET'=>			'UTF-8',
 
 	'S_YEAR_SHORT'=>			'y',

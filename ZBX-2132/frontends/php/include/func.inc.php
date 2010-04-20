@@ -375,12 +375,12 @@ function zbx_date2str($format, $value=NULL){
 	if(!$value) return S_NEVER;
 	
 	$output = date($format, $value);
-	
+
 	$output = str_replace(date('l',$value), $weekdaynameslong[date('w',$value)], $output);
 	$output = str_replace(date('F',$value), $monthslong[date('n',$value)], $output);
 	$output = str_replace(date('D',$value), $weekdaynames[date('w',$value)], $output);
 	$output = str_replace(date('M',$value), $months[date('n',$value)], $output);
-	
+
 	return $output;
 }
 
