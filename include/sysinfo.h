@@ -133,7 +133,7 @@ typedef struct zbx_result_s {
 
 
 
-/* RETRIVE RESULT VALUE */
+/* RETRIEVE RESULT VALUE */
 
 #define GET_UI64_RESULT(res)	((zbx_uint64_t*)get_result_value_by_type(res, AR_UINT64))
 #define GET_DBL_RESULT(res)	((double*)get_result_value_by_type(res, AR_DOUBLE))
