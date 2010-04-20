@@ -28,12 +28,13 @@
 #include "mutexs.h"
 #include "zbxserver.h"
 
+static int		shm_id;
+
 #define	LOCK_CACHE	zbx_mutex_lock(&cache_lock)
 #define	UNLOCK_CACHE	zbx_mutex_unlock(&cache_lock)
 #define	LOCK_CACHE_IDS		zbx_mutex_lock(&cache_ids_lock)
 #define	UNLOCK_CACHE_IDS	zbx_mutex_unlock(&cache_ids_lock)
 
-static int		shm_id;
 ZBX_DC_CACHE		*cache = NULL;
 ZBX_DC_IDS		*ids = NULL;
 
