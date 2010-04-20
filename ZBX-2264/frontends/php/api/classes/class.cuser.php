@@ -497,13 +497,6 @@ class CUser extends CZBXAPI{
 				$incorrect_session = true;
 			}
 			else if($login['attempt_failed']){
-				/*error(new CJSscript(sprintf(
-								S_CUSER_ERROR_ATTEMP_FAILED,
-								bold($login['attempt_failed']),
-								bold($login['attempt_ip']),
-								bold(date('d.m.Y H:i',$login['attempt_clock']))
-								)));*/
-
 				DBexecute('UPDATE users SET attempt_failed=0 WHERE userid='.$login['userid']);
 			}
 		}
