@@ -197,7 +197,8 @@ int main_alerter_loop()
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for (;;) {
+	for (;;)
+	{
 		now = time(NULL);
 
 		result = DBselect("select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,mt.mediatypeid"
@@ -209,7 +210,8 @@ int main_alerter_loop()
 				ALERT_TYPE_MESSAGE,
 				DBnode_local("mt.mediatypeid"));
 
-		while (NULL != (row = DBfetch(result))) {
+		while (NULL != (row = DBfetch(result)))
+		{
 			res = FAIL;
 
 			ZBX_STR2UINT64(alert.alertid, row[0]);
