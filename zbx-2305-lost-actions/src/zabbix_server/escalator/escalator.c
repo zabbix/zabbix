@@ -911,7 +911,13 @@ static void	process_escalations(int now)
 		{
 			escalation.status = ESCALATION_STATUS_ACTIVE;
 			execute_escalation(&escalation);
-			DBremove_escalation(escalation.escalationid);
+			DBexecute("delete from escalations where escalationid=" ZBX_FS_UI64 " and status=%d",
+					escalation.escalationid,
+					ESCALATION_STATUS_SUPERSEDED_ACTIVE);
+			DBexecute("update escalations set status=%d where escalationid=" ZBX_FS_UI64 " and status=%d",
+					ESCALATION_STATUS_RECOVERY,
+					escalation.escalationid,
+					ESCALATION_STATUS_SUPERSEDED_RECOVERY);
 		}
 		else if (escalation.status == ESCALATION_STATUS_SUPERSEDED_RECOVERY)
 		{
