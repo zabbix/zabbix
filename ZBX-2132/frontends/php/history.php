@@ -395,7 +395,7 @@ include_once('include/page_header.php');
 						' AND h.itemid=i.itemid'.$sql_filter.
 						' AND i.itemid in ('.$itemid_lst.')'.
 						$cond_clock.
-					' ORDER BY h.clock desc, h.id DESC';
+					' ORDER BY h.id DESC';
 			$result=DBselect($sql,$limit);
 			while($row=DBfetch($result)){
 //				$color_style = null;
@@ -514,7 +514,6 @@ include_once('include/page_header.php');
 			}
 
 			while($row=DBfetch($result)){
-
 				if($DB['TYPE'] == 'ORACLE' && $item_type == ITEM_VALUE_TYPE_TEXT){
 					if(!isset($row['value']))
 						$row['value'] = '';
@@ -576,14 +575,11 @@ include_once('include/page_header.php');
 // NAV BAR
 			$timeline = array();
 			$timeline['period'] = $effectiveperiod;
-			$timeline['starttime'] = get_min_itemclock_by_itemid($_REQUEST['itemid']);
+			$timeline['starttime'] = date('YmdHi', get_min_itemclock_by_itemid($_REQUEST['itemid']));
 			$timeline['usertime'] = null;
 
 			if(isset($_REQUEST['stime'])){
-				$bstime = $_REQUEST['stime'];
-
-				$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
-				$timeline['usertime'] += $timeline['period'];
+				$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 			}
 
 			$objData = array();
@@ -616,17 +612,6 @@ include_once('include/page_header.php');
 			zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 			zbx_add_post_js('timeControl.processObjects();');
 
-/*
-			if(isset($dom_graph_id)){
-				zbx_add_post_js('addGraph("'.$containerid.'", "'.$dom_graph_id.'","'.$src.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($graphDims).','.$loadSBox.');');
-			}
-			else{
-				$script = 'var tline = create_timeline("graph",'.$timeline['period'].', '.$timeline['starttime'].','.$timeline['usertime'].');'."\n";
-				$script.= 'var scrl = scrollCreate("graph", (document.body.clientWidth - 30), tline.timelineid);'."\n";
-				$script.= 'scrl.onchange = graphUpdate; '."\n";
-				zbx_add_post_js($script);
-			}
-//*/
 //-------------
 		}
 	}

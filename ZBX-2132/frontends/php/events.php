@@ -430,6 +430,7 @@
 				$trigger = reset($event['triggers']);
 
 				$event['desc'] = expand_trigger_description_by_data($trigger);
+				$event['type'] = $trigger['type'];
 
 				$event += $trigger;
 
@@ -505,8 +506,8 @@
 // NAV BAR
 	$timeline = array(
 		'period' => $effectiveperiod,
-		'starttime' => $starttime,
-		'usertime' => $till
+		'starttime' => date('YmdHi', $starttime),
+		'usertime' => date('YmdHi', $till)
 	);
 
 	$dom_graph_id = 'scroll_events_id';

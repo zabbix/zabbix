@@ -92,6 +92,11 @@ class CTrigger extends CZBXAPI{
 			'only_problems'			=> null,
 			'skipDependent'			=> null,
 			'with_unacknowledged_events' => null,
+
+// timing
+			'lastChangeSince'		=> null,
+			'lastChangeTill'		=> null,
+
 // filter
 			'filter'				=> null,
 			'group'					=> null,
@@ -305,8 +310,20 @@ class CTrigger extends CZBXAPI{
 
 // only_problems
 		if(!is_null($options['only_problems'])){
-			$sql_parts['where']['ot'] = 't.value='.TRIGGER_VALUE_TRUE;
+			if(is_null($options['filter'])) $options['filter'] = array();
+			$options['filter']['value'] = TRIGGER_VALUE_TRUE;
 		}
+
+// lastChangeSince
+		if(!is_null($options['lastChangeSince'])){
+			$sql_parts['where']['lastchangesince'] = 't.lastchange>'.$options['lastChangeSince'];
+		}
+
+// lastChangeTill
+		if(!is_null($options['lastChangeTill'])){
+			$sql_parts['where']['lastchangetill'] = 't.lastchange<'.$options['lastChangeTill'];
+		}
+
 // with_unacknowledged_events
 		if(!is_null($options['with_unacknowledged_events'])){
 			$sql_parts['where']['unack'] = ' EXISTS('.
@@ -372,7 +389,9 @@ class CTrigger extends CZBXAPI{
 			zbx_value2array($options['filter']);
 			
 			if(isset($options['filter']['description']) && !is_null($options['filter']['description'])){
-				$sql_parts['where']['description'] = 't.description='.zbx_dbstr($options['filter']['description']);
+				zbx_value2array($options['filter']['description']);
+
+				$sql_parts['where']['description'] = DBcondition('t.description',$options['filter']['description'], false, true);
 			}
 			
 			if(isset($options['filter']['host']) || isset($options['filter']['hostid'])){
@@ -396,6 +415,13 @@ class CTrigger extends CZBXAPI{
 				zbx_value2array($options['filter']['priority']);
 
 				$sql_parts['where']['priority'] = DBcondition('t.priority', $options['filter']['priority']);
+			}
+
+// value
+			if(isset($options['filter']['value']) && !is_null($options['filter']['value'])){
+				zbx_value2array($options['filter']['value']);
+
+				$sql_parts['where']['value'] = DBcondition('t.value', $options['filter']['value']);
 			}
 		}
 // group

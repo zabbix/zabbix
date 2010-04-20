@@ -31,8 +31,8 @@
 	define('TRIGGERS_OPTION_ALL',			2);	// use 0 to disable
 	define('TRIGGERS_OPTION_SHOW_ALL_WITH_UNACKNOWLEDGED',			3);	// use 0 to disable
 
-	define('TRIGGER_FALSE_PERIOD',			1800);	// 10min, 0 - disable
-	define('TRIGGER_BLINK_PERIOD',			1800);	// 5min,  0 - disable
+	define('TRIGGER_FALSE_PERIOD',			1800);	// 30min, 0 - disable
+	define('TRIGGER_BLINK_PERIOD',			1800);	// 30min,  0 - disable
 
 	define('EVENTS_OPTION_DISABLED',		0);	// reserved
 	define('EVENTS_OPTION_NOEVENT',			1);	// use 0 to disable
@@ -41,17 +41,22 @@
 	define('EVENTS_OPTION_ONLYTRUE_NOTACK',	0);	// use 0 to disable
 	define('EVENTS_OPTION_EVENT_LAST',		0); // use 0 to disable
 
-	define('ZBX_MIN_PERIOD',				3600);		// 1 hour
+	define('ZBX_MIN_PERIOD',				3600);			// 1 hour
 	define('ZBX_MAX_PERIOD',				2*365*86400);	// ~2 years
-	define('ZBX_PERIOD_DEFAULT',			3600);		// 1 hour
+	define('ZBX_PERIOD_DEFAULT',			3600);			// 1 hour
 
-	define('ZBX_POPUP_MAX_ROWS',			20);
+	define('ZBX_WIDGET_ROWS',				20);
 
 	define('ZBX_FONTPATH',					realpath('fonts'));	// where to search for font (GD > 2.0.18)
 	define('ZBX_GRAPH_FONT_NAME',			'DejaVuSans');		// font file name
 
 	define('ZBX_SCRIPT_TIMEOUT',			360); // in seconds
 	define('ZBX_SCRIPT_BYTES_LIMIT',		1073741824); // 1073741824 is 1MB in bytes
+
+	define('GRAPH_YAXIS_SIDE_DEFAULT',		0); // 0 - LEFT SIDE, 1 - RIGHT SIDE
+
+	define('ZBX_MAX_IMAGE_SIZE',			1024*1024);
+
 /* END OF USERS DEFINES */
 
 	define('ZBX_FONT_NAME',			'DejaVuSans');

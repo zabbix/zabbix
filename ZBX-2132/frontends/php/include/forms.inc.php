@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2009 SIA Zabbix
+** Copyright (C) 2000-2010 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -3345,12 +3345,11 @@
 
 		}
 		else{
-
-			$mname			= get_request('mname','');
+			$mname				= get_request('mname','');
 			$maintenance_type	= get_request('maintenance_type',0);
 
-			$active_since		= get_request('active_since',time());
-			$active_till		= get_request('active_till',time()+86400);
+			$active_since		= zbxDateToTime(get_request('active_since',date('YmdHi')));
+			$active_till		= zbxDateToTime(get_request('active_till', date('YmdHi', time()+86400)));
 
 			$description		= get_request('description','');
 		}
@@ -3368,8 +3367,8 @@
 
 /***********************************************************/
 
-		$tblMntc->addItem(new Cvar('active_since',$active_since));
-		$tblMntc->addItem(new Cvar('active_till',$active_till));
+		$tblMntc->addItem(new Cvar('active_since', date('YmdHi', $active_since)));
+		$tblMntc->addItem(new Cvar('active_till', date('YmdHi', $active_till)));
 
 		$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
 
@@ -5851,7 +5850,7 @@
 			$grp_tb->addItem($group['groupid'], $group['name']);
 		}
 
-		$host_tbl->addRow(array(S_GROUPS,$grp_tb->get(S_IN.SPACE.S_GROUPS,S_OTHER.SPACE.S_GROUPS)));
+		$host_tbl->addRow(array(S_GROUPS,$grp_tb->get(S_IN_GROUPS, S_OTHER_GROUPS)));
 
 		$host_tbl->addRow(array(S_NEW_GROUP, new CTextBox('newgroup',$newgroup)));
 
@@ -6315,6 +6314,7 @@
 	}
 
 	function import_map_form($rules){
+		global $USER_DETAILS;
 
 		$form = new CFormTable(S_IMPORT, null, 'post', 'multipart/form-data');
 		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
@@ -6323,14 +6323,17 @@
 		$table->setHeader(array(S_ELEMENT, S_UPDATE.SPACE.S_EXISTING, S_ADD.SPACE.S_MISSING), 'bold');
 
 		$titles = array('maps' => S_MAP);
-
+		if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN){
+			$titles += array('icons' => S_ICON, 'background' => S_BACKGROUND);
+		}
+		
 		foreach($titles as $key => $title){
 			$cbExist = new CCheckBox('rules['.$key.'][exist]', isset($rules[$key]['exist']));
 
-			if($key == 'template')
-				$cbMissed = null;
-			else
-				$cbMissed = new CCheckBox('rules['.$key.'][missed]', isset($rules[$key]['missed']));
+			if($key != 'maps')
+				$cbExist->setAttribute('onclick', 'javascript: if(this.checked) return confirm(\'Images for all maps will be updated\')');
+
+			$cbMissed = new CCheckBox('rules['.$key.'][missed]', isset($rules[$key]['missed']));
 
 			$table->addRow(array($title, $cbExist, $cbMissed));
 		}
@@ -6345,8 +6348,12 @@
 		$frm_title = 'New system map';
 
 		if(isset($_REQUEST['sysmapid'])){
-			$result=DBselect('SELECT * FROM sysmaps WHERE sysmapid='.$_REQUEST['sysmapid']);
-			$row=DBfetch($result);
+			$options = array(
+				'sysmapids' => $_REQUEST['sysmapid'],
+				'output' => API_OUTPUT_EXTEND
+			);
+			$sysmaps = CMap::get($options);
+			$row = reset($sysmaps);
 			$frm_title = 'System map: "'.$row['name'].'"';
 		}
 
@@ -6357,9 +6364,9 @@
 			$backgroundid	= $row['backgroundid'];
 			$label_type	= $row['label_type'];
 			$label_location	= $row['label_location'];
-			$highlight = ($row['highlight']%2);
-			
-			$expproblem = ($row['highlight'] > 1) ? 0 : 1;
+			$highlight =	$row['highlight'];
+			$markelements = $row['markelements'];
+			$expandproblem = $row['expandproblem'];
 		}
 		else{
 			$name		= get_request('name','');
@@ -6369,8 +6376,8 @@
 			$label_type	= get_request('label_type',0);
 			$label_location	= get_request('label_location',0);
 			$highlight = get_request('highlight',0);
-			
-			$expproblem = isset($_REQUEST['form_refresh']) ? get_request('expproblem',0) : 1;
+			$markelements = get_request('markelements',0);
+			$expandproblem = get_request('expandproblem',0);
 		}
 
 		$frmMap = new CFormTable($frm_title,'sysmaps.php');
@@ -6397,8 +6404,11 @@
 		$frmMap->addRow(S_BACKGROUND_IMAGE,$cmbImg);
 
 		$frmMap->addRow(S_ICON_HIGHLIGHTING, new CCheckBox('highlight',$highlight,null,1));
+
+		$frmMap->addRow(S_MARK_ELEMENTS_ON_TRIGGER_STATUS_CHANGE, new CCheckBox('markelements',$markelements,null,1));
 		
-		$frmMap->addRow(S_EXPAND_SINGLE_PROBLEM, new CCheckBox('expproblem',$expproblem,null,1));
+		$frmMap->addRow(S_EXPAND_SINGLE_PROBLEM, new CCheckBox('expandproblem',$expandproblem,null,1));
+
 
 		$cmbLabel = new CComboBox('label_type',$label_type);
 		$cmbLabel->addItem(0,S_LABEL);

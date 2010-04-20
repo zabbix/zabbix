@@ -141,11 +141,11 @@ include_once('include/page_header.php');
 			$table->setAlign('center');
 
 			while($db_ack = DBfetch($db_acks)){
-				$db_user = CUser::get(array('userids' => $db_ack['userid'], 'extendoutput' => 1));
-				$db_user = reset($db_user);
+				//$db_user = CUser::get(array('userids' => $db_ack['userid'], 'extendoutput' => 1));
+				//$db_user = reset($db_user);
 
 				$table->addRow(array(
-					new CCol($db_user['alias'], 'user'),
+					new CCol($db_ack['alias'], 'user'),
 					new CCol(zbx_date2str(S_ACKNOWLEDGE_DATE_FORMAT, $db_ack['clock']), 'time')),
 					'title');
 

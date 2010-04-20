@@ -207,7 +207,7 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
  * Parameters: triggerid - trigger identificator from database                *
  *             now -                                                          *
  *                                                                            *
- * Return value: SUCCEED if found event with OK or PROBLEM stauses            *
+ * Return value: SUCCEED if found event with OK or PROBLEM statuses           *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
