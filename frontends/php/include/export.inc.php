@@ -230,8 +230,8 @@ class zbxXML{
 
 		$root = $doc->appendChild(new DOMElement('zabbix_export'));
 		$root->setAttributeNode(new DOMAttr('version', '1.0'));
-		$root->setAttributeNode(new DOMAttr('date', date('Y.m.d')));
-		$root->setAttributeNode(new DOMAttr('time', date('H:i')));
+		$root->setAttributeNode(new DOMAttr('date', zbx_date2str(S_EXPORT_DATE_ATTRIBUTE_DATE_FORMAT)));
+		$root->setAttributeNode(new DOMAttr('time', zbx_date2str(S_EXPORT_TIME_ATTRIBUTE_DATE_FORMAT)));
 
 		return $root;
 	}
