@@ -117,7 +117,7 @@ include_once('include/page_header.php');
 			$to	= date('Y');
 			array_unshift($header, new CCol(S_YEAR,'center'));
 			function get_time($y)	{	return mktime(0,0,0,1,1,$y);		}
-			function format_time($t){	return date('Y', $t);			}
+			function format_time($t){	return zbx_date2str(S_REPORT4_ANNUALLY_DATE_FORMAT, $t);}
 			function format_time2($t){	return null; };
 			break;
 		case 'monthly':
@@ -125,7 +125,7 @@ include_once('include/page_header.php');
 			$to	= 12;
 			array_unshift($header, new CCol(S_MONTH,'center'));
 			function get_time($m)	{	global $year;	return mktime(0,0,0,$m,1,$year);	}
-			function format_time($t){	return date('M Y',$t);			}
+			function format_time($t){	return zbx_date2str(S_REPORT4_MONTHLY_DATE_FORMAT,$t);	}
 			function format_time2($t){	return null; };
 			break;
 		case 'dayly':
@@ -133,7 +133,7 @@ include_once('include/page_header.php');
 			$to	= 365;
 			array_unshift($header, new CCol(S_DAY,'center'));
 			function get_time($d)	{	global $year;	return mktime(0,0,0,1,$d,$year);	}
-			function format_time($t){	return date('d M Y',$t);		}
+			function format_time($t){	return zbx_date2str(S_REPORT4_DAILY_DATE_FORMAT,$t);	}
 			function format_time2($t){	return null; };
 			break;
 		case 'weekly':
@@ -150,7 +150,7 @@ include_once('include/page_header.php');
 
 				return ($time + ($w*7 - $wd)*24*3600);
 			}
-			function format_time($t){	return date('d M Y H:i',$t);	}
+			function format_time($t){	return zbx_date2str(S_REPORT4_WEEKLY_DATE_FORMAT,$t);	}
 			function format_time2($t){	return format_time($t); };
 			break;
 

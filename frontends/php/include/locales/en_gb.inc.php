@@ -25,6 +25,7 @@
 
 	'S_DATE_FORMAT_YMDHMS'=>		'd M Y H:i:s',
 	'S_DATE_FORMAT_YMD'=>			'd M Y',
+	'S_TIMELINE_DATE_FORMAT'=>		'd.M',
 	'S_HTML_CHARSET'=>			'UTF-8',
 
 	'S_YEAR_SHORT'=>			'y',
@@ -35,6 +36,48 @@
 	'S_MINUTE_SHORT' =>			'm',
 	'S_SECOND_SHORT' =>			's',
 	'S_MILLISECOND_SHORT' =>		'ms',
+
+	'S_WEEKDAY_SUNDAY_SHORT' =>		'Sun',
+	'S_WEEKDAY_MONDAY_SHORT' =>		'Mon',
+	'S_WEEKDAY_TUESDAY_SHORT' =>		'Tue',
+	'S_WEEKDAY_WEDNESDAY_SHORT' =>		'Wed',
+	'S_WEEKDAY_THURSDAY_SHORT' =>		'Thu',
+	'S_WEEKDAY_FRIDAY_SHORT' =>		'Fri',
+	'S_WEEKDAY_SATURDAY_SHORT' =>		'Sat',
+
+	'S_WEEKDAY_SUNDAY_LONG' =>		'Sunday',
+	'S_WEEKDAY_MONDAY_LONG' =>		'Monday',
+	'S_WEEKDAY_TUESDAY_LONG' =>		'Tuesday',
+	'S_WEEKDAY_WEDNESDAY_LONG' =>		'Wednesday',
+	'S_WEEKDAY_THURSDAY_LONG' =>		'Thursday',
+	'S_WEEKDAY_FRIDAY_LONG' =>		'Friday',
+	'S_WEEKDAY_SATURDAY_LONG' =>		'Saturday',
+
+	'S_MONTH_JANUARY_SHORT' =>		'Jan',
+	'S_MONTH_FEBRUARY_SHORT' =>		'Feb',
+	'S_MONTH_MARCH_SHORT' =>		'Mar',
+	'S_MONTH_APRIL_SHORT' =>		'Apr',
+	'S_MONTH_MAY_SHORT' =>			'May',
+	'S_MONTH_JUNE_SHORT' =>			'Jun',
+	'S_MONTH_JULY_SHORT' =>			'Jul',
+	'S_MONTH_AUGUST_SHORT' =>		'Aug',
+	'S_MONTH_SEPTEMBER_SHORT' =>		'Sep',
+	'S_MONTH_OCTOBER_SHORT' =>		'Oct',
+	'S_MONTH_NOVEMBER_SHORT' =>		'Nov',
+	'S_MONTH_DECEMBER_SHORT' =>		'Dec',
+	
+	'S_MONTH_JANUARY_LONG' =>		'January',
+	'S_MONTH_FEBRUARY_LONG' =>		'February',
+	'S_MONTH_MARCH_LONG' =>			'March',
+	'S_MONTH_APRIL_LONG' =>			'April',
+	'S_MONTH_MAY_LONG' =>			'May',
+	'S_MONTH_JUNE_LONG' =>			'June',
+	'S_MONTH_JULY_LONG' =>			'July',
+	'S_MONTH_AUGUST_LONG' =>		'August',
+	'S_MONTH_SEPTEMBER_LONG' =>		'September',
+	'S_MONTH_OCTOBER_LONG' =>		'October',
+	'S_MONTH_NOVEMBER_LONG' =>		'November',
+	'S_MONTH_DECEMBER_LONG' =>		'December',
 
 	'S_ACTIVATE_SELECTED'=>			'Activate selected',
 	'S_DISABLE_SELECTED'=>			'Disable selected',
@@ -105,6 +148,12 @@
 	'S_MONITORED_HOST'=>			'Monitored host',
 	'S_INCORRECT_IP_RANGE'=>		'Incorrect IP range.',
 
+//	auditacts.php
+	'S_AUDITACTS_DESCRIPTION_DATE_FORMAT'=>	'd M Y H:i:s',
+
+//	auditlogs.php
+	'S_AUDITLOGS_RECORD_DATE_FORMAT'=>	'd M Y H:i:s',
+
 //	httpdetails.php
 	'S_DETAILS_OF_SCENARIO'=>		'Details of scenario',
 	'S_DETAILS_OF_SCENARIO_BIG'=>		'DETAILS OF SCENARIO',
@@ -124,6 +173,8 @@
 	'S_STATUS_OF_WEB_MONITORING'=>		'Status of Web monitoring',
 	'S_STATUS_OF_WEB_MONITORING_BIG'=>	'STATUS OF WEB MONITORING',
 	'S_STATE'=>				'State',
+	'S_WEB_SCENARIO_DATE_FORMAT'=>		'd M Y H:i:s',
+	'S_WEB_SCENARIO_IDLE_DATE_FORMAT'=>	'd M Y H:i:s',
 
 //	httpconf.php
 	'S_SORT'=>					'Sort',
@@ -188,6 +239,10 @@
 	'S_LOCAL_BIG'=>				'LOCAL',
 	'S_SERVER_BIG'=>			'SERVER',
 
+//	export.inc.php
+	'S_EXPORT_DATE_ATTRIBUTE_DATE_FORMAT'=>	'd.m.y',
+	'S_EXPORT_TIME_ATTRIBUTE_DATE_FORMAT'=>	'H.i',
+
 //	admin.php
 	'S_PREVIOUS'=>				'Previous',
 	'S_NEXT'=>				'Next',
@@ -201,6 +256,11 @@
 	'S_INSTALLATION_UPDATE'=>		'Installation/Update',
 	'S_ZABBIX_IS_UNAVAILABLE'=>		'Zabbix is temporarily unavailable',
 	'S_REQUIRE_MB_STRING_MODULE'=>		'Multibyte String module required to run FrontEnd',
+
+//	actions.inc.php
+	'S_HISTORY_OF_ACTIONS_DATE_FORMAT'=>	'd M Y H:i:s',
+	'S_EVENT_ACTION_MESSAGES_DATE_FORMAT'=>	'd M Y H:i:s',
+	'S_EVENT_ACTION_CMDS_DATE_FORMAT'=>	'Y.M.d H:i:s',
 
 //	node.php
 	'S_TIME_ZONE'=>				'Time zone',
@@ -230,6 +290,10 @@
 	'S_CANNOT_ACKNOWLEDGE_EVENT'=>		'Cannot acknowledge event',
 	'S_SYS_BULK_ACKNOWLEDGE'=>		'----[BULK ACKNOWLEDGE]----',
 	'S_BULK_ACKNOWLEDGE'=>			'Bulk acknowledge',
+	'S_ACKNOWLEDGE_DATE_FORMAT'=>		'd M Y H:i:s',
+
+//	acknow.inc.php
+	'S_ACKNOWINC_BY_EVENTS_DATE_FORMAT'=>	'd M Y H:i:s',
 
 //	actionconf.php
 	'S_IMMEDIATELY'=>			'Immediately',
@@ -381,6 +445,19 @@
 	'S_SELECT_GRAPH_DOT_DOT_DOT'=>		'Select graph...',
 	'S_FULLSCREEN'=>			'Fullscreen',
 	'S_VIEW'=>				'View',
+
+//	class.cchart.php
+	'S_CCHARTS_TIMELINE_HOURS_FORMAT'=>			'H:i',
+	'S_CCHARTS_TIMELINE_DAYS_FORMAT'=>			'D',
+	'S_CCHARTS_TIMELINE_MONTHDAYS_FORMAT'=>			'd.m',
+	'S_CCHARTS_TIMELINE_START_DATE_FORMAT'=>		'd.m H:i',
+	'S_CCHARTS_TIMELINE_END_DATE_FORMAT'=>			'd.m H:i',
+	'S_CCHARTS_TIMELINE_MAINPERIOD_HOURS_FORMAT'=>		'H:i',
+	'S_CCHARTS_TIMELINE_MAINPERIOD_FULL_DAY_TIME_FORMAT'=>	'd.m H:i',
+	'S_CCHARTS_TIMELINE_MAINPERIOD_MONTHDAYS_FORMAT'=>	'd.m',
+
+//	class.cuser.php
+	'S_CUSER_ERROR_DATE_FORMAT'=>				'd.m.Y H:i',
 
 // Colours
 
@@ -653,9 +730,15 @@
 
 	'S_FAILURE_AUDIT'=>			'Failure Audit',
 	'S_SUCCESS_AUDIT'=>			'Success Audit',
+	
+	'S_HISTORY_LOG_ITEM_DATE_FORMAT'=>	'[Y.M.d H:i:s]',
+	'S_HISTORY_LOG_LOCALTIME_DATE_FORMAT'=>	'Y.M.d H:i:s',
+	'S_HISTORY_LOG_ITEM_PLAINTEXT'=>	'Y-m-d H:i:s',
+	'S_HISTORY_PLAINTEXT_DATE_FORMAT'=>	'Y-m-d H:i:s',
+	'S_HISTORY_ITEM_DATE_FORMAT'=>		'Y.M.d H:i:s',
 
 // maintenance.php
-	'S_MAINTENANCE'=>				'Maintenance',
+	'S_MAINTENANCE'=>			'Maintenance',
 	'S_MAINTENANCE_ADDED'=>			'Maintenance added',
 	'S_MAINTENANCE_UPDATED'=>		'Maintenance updated',
 	'S_MAINTENANCE_DELETED'=>		'Maintenance deleted',
@@ -1091,10 +1174,20 @@
 	'S_HISTORY_OF_EVENTS_BIG'=>		'HISTORY OF EVENTS',
 	'S_NO_EVENTS_FOUND'=>			'No events found',
 	'S_EVENTS_SINCE'=>			'Events since',
+	'S_EVENTS_DATE_FORMAT'=>		'd M Y H:i:s',
+	'S_EVENTS_DISCOVERY_TIME_FORMAT'=>	'Y.M.d H:i:s',
+	'S_EVENTS_ACTION_TIME_FORMAT'=>		'Y.M.d H:i:s',
+
+//	events.inc.php
+	'S_EVENTS_EVENT_DETAILS_DATE_FORMAT'=>			'Y.M.d H:i:s',
+	'S_EVENTS_SMALL_EVENT_LIST_DATE_FORMAT'=>		'Y.M.d H:i:s',
+	'S_EVENTS_POPUP_EVENT_LIST_DATE_FORMAT'=>		'd M Y H:i:s',
+	'S_EVENTS_TRIGGERS_EVENTS_HISTORY_LIST_DATE_FORMAT'=>	'Y.M.d H:i:s',
 
 //	latest.php
 	'S_LAST_CHECK'=>			'Last check',
 	'S_LAST_VALUE'=>			'Last value',
+	'S_LATEST_ITEMS_TRIGGERS_DATE_FORMAT'=>	'd M Y H:i:s',
 
 //	sysmap.php
 	'S_UPPER_LEVEL_MAPS'=>			'Upper level maps',
@@ -1190,6 +1283,7 @@
 	'S_ELEMENT_NAME'=>		'Element name',
 	'S_STATUS_ONLY'=>		'Status only',
 	'S_NOTHING'=>			'Nothing',
+	'S_MAPS_DATE_FORMAT'=>           'm.d.Y H:i:s',
 
 //	media.php
 	'S_CONFIGURATION_OF_MEDIA_TYPES_BIG'=>	'CONFIGURATION OF MEDIA TYPES',
@@ -1263,6 +1357,7 @@
 	'S_MORE_THAN_10_MINUTES'=>		'More than 10 minutes',
 	'S_TRUNCATED'=>				'Truncated',
 	'S_DELAYED_BY'=>			'Delayed by',
+	'S_QUEUE_NODES_DATE_FORMAT'=>		'd M Y H:i:s',
 
 //	report1.php
 	'S_REPORT_BIG'=>			'REPORT',
@@ -1295,6 +1390,20 @@
 	'S_BY_HOST'=>				'By host',
 	'S_BY_TRIGGER_TEMPLATE'=>		'By trigger template',
 
+//	chart4.php
+	'S_CHART4_HEADER_TITLE'=>		'%s (year %s)',
+	'S_CHART4_HEADER_DATE_FORMAT'=>		'Y',
+	'S_CHART4_TIMELINE_DATE_FORMAT'=>	'd.M',
+
+//	chart5.php
+	'S_CHART5_HEADER_TITLE'=>		'%s (year %s)',
+	'S_CHART5_HEADER_DATE_FORMAT'=>		'Y',
+	'S_CHART5_TIMELINE_DATE_FORMAT'=>	'd.M',
+
+//	chart_bar.php
+	'S_CHARTBAR_HOURLY_DATE_FORMAT'=>		'Y.m.d H:i',
+	'S_CHARTBAR_DAILY_DATE_FORMAT'=>		'Y.m.d',
+
 //	report3.php
 	'S_IT_SERVICES_AVAILABILITY_REPORT'=>		'IT services availability report',
 	'S_IT_SERVICES_AVAILABILITY_REPORT_BIG'=>	'IT SERVICES AVAILABILITY REPORT',
@@ -1320,6 +1429,15 @@
 	'S_WEEKLY'=>					'Weekly',
 	'S_MONTHLY'=>					'Monthly',
 	'S_YEARLY'=>					'Yearly',
+	'S_REPORT3_ANNUALLY_DATE_FORMAT'=>		'Y',
+	'S_REPORT3_MONTHLY_DATE_FORMAT'=>		'M Y',
+	'S_REPORT3_DAILY_DATE_FORMAT'=>			'd M Y',
+	'S_REPORT3_WEEKLY_DATE_FORMAT'=>		'd M Y H:i',
+
+//	services_form.php
+	'S_SERVICES_UPTIME_DATE_FORMAT'=>		'l H:i',
+	'S_SERVICES_DOWNTIME_DATE_FORMAT'=>		'l H:i',
+	'S_SERVICES_ONETIME_DOWNTIME_DATE_FORMAT'=>	'd M Y H:i',
 
 //	locales.php
 	'S_DO_NOT_ADD'=>			'Do not add',
@@ -1334,10 +1452,14 @@
 	'S_LOCALE_TO_EXTEND'=>			'Locale to extend',
 	'S_NEW_ENTRIES'=>			'New entries',
 
-//  report4.php
+//	report4.php
 	'S_NOTIFICATIONS'=>			'Notifications',
 	'S_NOTIFICATIONS_BIG'=>			'NOTIFICATIONS',
 	'S_IT_NOTIFICATIONS'=>			'Notification report',
+	'S_REPORT4_ANNUALLY_DATE_FORMAT'=>	'Y',
+	'S_REPORT4_MONTHLY_DATE_FORMAT'=>	'M Y',
+	'S_REPORT4_DAILY_DATE_FORMAT'=>		'd M Y',
+	'S_REPORT4_WEEKLY_DATE_FORMAT'=>	'd M Y H:i',
 
 //	report5.php
 	'S_TRIGGERS_TOP_100'=>			'Most busy triggers top 100',
@@ -1359,6 +1481,9 @@
 	'S_PALETTE'=>				'Palette',
 	'S_DARKEN'=>				'Darken',
 	'S_BRIGHTEN'=>				'Brighten',
+
+//	reports.inc.php
+	'S_REPORTS_BAR_REPORT_DATE_FORMAT'=>	'd M Y H:i:s',
 
 //	screenconf.php
 	'S_SCREENS'=>				'Screens',
@@ -1802,6 +1927,18 @@
 	'S_DISCOVERY_CHECKS_BIG'=>		'DISCOVERY CHECKS',
 	'S_HOSTS_AND_TEMPLATES_BIG' => 'Hosts and templates',
 
+//	popup_period.php
+	'S_POPUP_PERIOD_CAPTION_DATE_FORMAT'=>	'd M Y H:i:s',
+
+//	blocks.inc.php
+	'S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT'=>		'H:i:s',
+	'S_BLOCKS_HOSTSTAT_SUMMARY_TIME_FORMAT'=>	'H:i:s',
+	'S_BLOCKS_ZBX_STATUS_TIME_FORMAT'=>		'H:i:s',
+	'S_BLOCKS_LATEST_ISSUES_DATE_FORMAT'=>		'd M Y H:i:s',
+	'S_BLOCKS_LATEST_ISSUES_TIME_FORMAT'=>		'H:i:s',
+	'S_BLOCKS_WEBMON_TIME_FORMAT'=>			'H:i:s',
+	'S_BLOCKS_DISCOVERY_STATUS_TIME_FORMAT'=>	'H:i:s',
+
 //	forms.inc.php
 //	popup_link_tr.php
 	'S_NEW_INDICATORS'=>			'New indicators',
@@ -1878,6 +2015,7 @@
 	'S_ZETTA'=>		'Zetta',
 	'S_Y'=>			'Y',
 	'S_YOTTA'=>		'Yotta',
+	'S_FUNCT_UNIXTIMESTAMP_DATE_FORMAT'=>	'Y.m.d H:i:s',
 
 //	forms.inc.php
 	'S_DELETE_SELECTED_USER_Q'=>		'Delete selected user?',
@@ -2011,8 +2149,10 @@
 //	screens.inc.php
 	'S_NO_ROWS_IN_SCREEN'=>				'No rows in screen',
 	'S_DELETE_IT_Q'=>				'Delete it?',
-	'S_THIS_SCREEN_ROW_NOT_EMPTY'=>	'This screen-row is not empty',
+	'S_THIS_SCREEN_ROW_NOT_EMPTY'=>			'This screen-row is not empty',
 	'S_THIS_SCREEN_COLUMN_NOT_EMPTY'=>		'This screen-column is not empty',
+	'S_SCREENS_PLAIN_TEXT_DATE_FORMAT'=>		'd M Y H:i:s',
+	'S_SCREENS_TRIGGER_FORM_DATE_FORMAT'=>		'[H:i:s]',
 
 //	graphs.inc.php
 	'S_NO_GRAPH_WITH'=>					'No graph item with',
@@ -2028,12 +2168,13 @@
 	'S_UNABLE_TO_SELECT_CONFIGURATION'=>	'Unable to select configuration',
 
 //	maintenances.inc.php
-	'S_ON_SMALL'=>			'on',
-	'S_EVERY_SMALL'=>		'every',
-	'S_DAY_SMALL'=>			'day',
-	'S_OF_EVERY_SMALL'=>		'of every',
-	'S_WEEKS_SMALL'=>		'weeks',
-	'S_WEEK_SMALL'=>		'week',
+	'S_ON_SMALL'=>				'on',
+	'S_EVERY_SMALL'=>			'every',
+	'S_DAY_SMALL'=>				'day',
+	'S_OF_EVERY_SMALL'=>			'of every',
+	'S_WEEKS_SMALL'=>			'weeks',
+	'S_WEEK_SMALL'=>			'week',
+	'S_MAINTENANCES_SCHEDULE_DATE_FORMAT'=>	'd M Y',
 
 //	services.inc.php
 	'S_SERVICE_CANNOT_BE_PARENT_AND_CHILD_AT_THE_SAME_TIME'=>	'Service cannot be parent and child at the same time.',
