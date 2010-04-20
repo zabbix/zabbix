@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBXNEXT-311] improved speedup dbconfig synchronization (Sasha)
  - [ZBX-2329] fixed screen renaming (Aly)
  - [ZBX-2315] fixed multiple issues with JS scrollbar (Aly)
  - [ZBX-2321] fixed log items appearing in the wrong order (Alexei,asaveljevs,Sasha)
