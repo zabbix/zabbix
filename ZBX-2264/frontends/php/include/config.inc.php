@@ -185,7 +185,7 @@ function __autoload($class_name){
 		if($USER_DETAILS['attempt_failed']) {
 			$attemps = bold($USER_DETAILS['attempt_failed']);
 			$attempip = bold($USER_DETAILS['attempt_ip']);
-			$attempdate = bold(date('d.m.Y H:i',$USER_DETAILS['attempt_clock']));
+			$attempdate = bold(zbx_date2str(S_CUSER_ERROR_DATE_FORMAT,$USER_DETAILS['attempt_clock']));
 			error(new CJSscript(sprintf(	S_CUSER_ERROR_ATTEMP_FAILED,
 							$attemps->toString(),
 							$attempip->toString(),

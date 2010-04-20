@@ -20,7 +20,7 @@ $availableJScripts = array('common.js' => '', 'menu.js' => '', 'prototype.js' =>
 );
 
 $tranStrings = array(
-	'gtlc.js' => array('S_ZOOM', 'S_FIXED_SMALL','S_DYNAMIC_SMALL', 'S_NOW_SMALL', 'S_YEAR_SHORT',
+	'gtlc.js' => array('S_ALL_S', 'S_ZOOM', 'S_FIXED_SMALL','S_DYNAMIC_SMALL', 'S_NOW_SMALL', 'S_YEAR_SHORT',
 		'S_MONTH_SHORT', 'S_WEEK_SHORT', 'S_DAY_SHORT', 'S_HOUR_SHORT', 'S_MINUTE_SHORT'
 	),
 	'functions.js' => array('DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q', 'S_INSERT_MACRO', 'S_ADD_SERVICE',

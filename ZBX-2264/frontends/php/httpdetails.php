@@ -235,16 +235,13 @@
 // NAV BAR
 	$timeline = array(
 		'period' => get_request('period',ZBX_PERIOD_DEFAULT),
-		'starttime' => get_min_itemclock_by_itemid($itemids)
+		'starttime' => date('YmdHi', get_min_itemclock_by_itemid($itemids))
 	);
 
 	if(isset($_REQUEST['stime'])){
-		$bstime = $_REQUEST['stime'];
-		$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
-		$timeline['usertime'] += $timeline['period'];
+		$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 	}
 
-	
 	$graphDims = array(
 		'width' => -120,
 		'graphHeight' => 150,
@@ -318,6 +315,9 @@
 
 	$graphsWidget->show();
 	
-	
+?>
+<?php
+
 include_once('include/page_footer.php');
+
 ?>

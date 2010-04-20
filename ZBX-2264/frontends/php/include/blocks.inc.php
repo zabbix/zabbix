@@ -380,7 +380,7 @@ function make_system_summary($filter){
 		$table->addRow($group_row);
 	}
 
-	$table->setFooter(new CCol(S_UPDATED.': '.date('H:i:s', time())));
+	$table->setFooter(new CCol(S_UPDATED.': '.zbx_date2str(S_BLOCKS_SYSTEM_SUMMARY_TIME_FORMAT)));
 
 return $table;
 }
@@ -529,7 +529,7 @@ function make_hoststat_summary($filter){
 				$hostid = $host['hostid'];
 				if(!isset($problematic_host_list[$hostid])) continue;
 
-				if($popup_rows >= ZBX_POPUP_MAX_ROWS) break;
+				if($popup_rows >= ZBX_WIDGET_ROWS) break;
 				$popup_rows++;
 
 				$host_data = $problematic_host_list[$hostid];
@@ -572,7 +572,7 @@ function make_hoststat_summary($filter){
 		$table->addRow($group_row);
 	}
 
-	$table->setFooter(new CCol(S_UPDATED.': '.date('H:i:s', time())));
+	$table->setFooter(new CCol(S_UPDATED.': '.zbx_date2str(S_BLOCKS_HOSTSTAT_SUMMARY_TIME_FORMAT)));
 
 return $table;
 }
@@ -665,7 +665,7 @@ function make_status_of_zbx(){
 // }}}CHECK REQUIREMENTS
 
 
-	$table->setFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
+	$table->setFooter(new CCol(S_UPDATED.': '.zbx_date2str(S_BLOCKS_ZBX_STATUS_TIME_FORMAT)));
 
 return $table;
 }
@@ -809,7 +809,7 @@ function make_latest_issues($filter = array()){
 			$actions = get_event_actions_stat_hints($row_event['eventid']);
 
 			$clock = new CLink(
-					zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),
+					zbx_date2str(S_BLOCKS_LATEST_ISSUES_DATE_FORMAT,$row_event['clock']),
 					'events.php?triggerid='.$trigger['triggerid'].'&source=0&show_unknown=1&nav_time='.$row_event['clock']
 					);
 
@@ -833,7 +833,7 @@ function make_latest_issues($filter = array()){
 		}
 		unset($trigger,$description,$actions,$alerts,$hint);
 	}
-	$table->setFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
+	$table->setFooter(new CCol(S_UPDATED.': '.zbx_date2str(S_BLOCKS_LATEST_ISSUES_TIME_FORMAT)));
 
 return $table;
 }
@@ -912,7 +912,7 @@ function make_webmon_overview($filter){
 			new CSpan($apps[HTTPTEST_STATE_UNKNOWN],'unknown')
 		));
 	}
-	$table->setFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
+	$table->setFooter(new CCol(S_UPDATED.': '.zbx_date2str(S_BLOCKS_WEBMON_TIME_FORMAT)));
 return $table;
 }
 
@@ -971,7 +971,7 @@ function make_discovery_status(){
 			new CSpan($drule['down'],($drule['down'] > 0)?'red':'green')
 		));
 	}
-	$table->setFooter(new CCol(S_UPDATED.': '.date("H:i:s",time())));
+	$table->setFooter(new CCol(S_UPDATED.': '.zbx_date2str(S_BLOCKS_DISCOVERY_STATUS_TIME_FORMAT)));
 
 return 	$table;
 }
@@ -979,7 +979,7 @@ return 	$table;
 function make_graph_menu(&$menu,&$submenu){
 
 	$menu['menu_graphs'][] = array(
-				S_FAVOURITE.SPACE.S_GRAPHS,
+				S_FAVOURITE_GRAPHS,
 				null,
 				null,
 				array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
@@ -1109,7 +1109,7 @@ return $graphids;
 
 function make_sysmap_menu(&$menu,&$submenu){
 
-	$menu['menu_sysmaps'][] = array(S_FAVOURITE.SPACE.S_MAPS, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
+	$menu['menu_sysmaps'][] = array(S_FAVOURITE_MAPS, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
 	$menu['menu_sysmaps'][] = array(
 				S_ADD.SPACE.S_MAP,
 				'javascript: '.
@@ -1164,7 +1164,7 @@ return $maps;
 
 function make_screen_menu(&$menu,&$submenu){
 
-	$menu['menu_screens'][] = array(S_FAVOURITE.SPACE.S_SCREENS, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
+	$menu['menu_screens'][] = array(S_FAVOURITE_SCREENS, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
 	$menu['menu_screens'][] = array(
 				S_ADD.SPACE.S_SCREEN,
 				'javascript: '.

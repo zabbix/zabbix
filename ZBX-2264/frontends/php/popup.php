@@ -532,7 +532,7 @@ include_once('include/page_header.php');
 			$name = new CSpan($row['name'],'link');
 
 			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
-			$row['name'] = $row['node_name'].$row['name'];
+//			$row['name'] = $row['node_name'].$row['name'];
 
 			$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
@@ -1050,17 +1050,18 @@ include_once('include/page_header.php');
 		$table->setHeader($header);
 		
 		$options = array(
-				'nodeids' => $nodeid,
-				'hostids' => $hostid,
-				'output' => API_OUTPUT_EXTEND,
-				'select_hosts' => API_OUTPUT_EXTEND,
-				'templated' => 0,
-				'filter' => array(
-					'value_type' => array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64),
-					'status' => ITEM_STATUS_ACTIVE
-				),
-				'sortfield'=>'description'
-			);
+			'nodeids' => $nodeid,
+			'hostids' => $hostid,
+			'output' => API_OUTPUT_EXTEND,
+			'select_hosts' => API_OUTPUT_EXTEND,
+			'webitems' => 1,
+			'templated' => 0,
+			'filter' => array(
+				'value_type' => array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64),
+				'status' => ITEM_STATUS_ACTIVE
+			),
+			'sortfield'=>'description'
+		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
 

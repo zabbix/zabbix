@@ -1137,7 +1137,7 @@ class CChart extends CGraphDraw{
 
 // DayLightSave
 			if($interval > 3600){
-				$tz = date('Z',$this->to_time) - date('Z',$new_time);
+				$tz = date('Z',$this->from_time) - date('Z',$new_time);
 				$new_time+=$tz;
 			}
 
@@ -1174,11 +1174,11 @@ class CChart extends CGraphDraw{
 			if($main_intervalX < floor(($main_interval/$interval)*$intervalX)) continue;
 			else if($main_intervalX < (ceil($main_interval/$interval + 1)*$test_dims['width'])) continue;
 
-			if($interval == 86400) $date_format = 'D';
-			else if($interval > 86400) $date_format = 'd.m';
-			else if($interval < 86400) $date_format = 'H:i';
+			if($interval == 86400) $date_format = S_CCHARTS_TIMELINE_DAYS_FORMAT;
+			else if($interval > 86400) $date_format = S_CCHARTS_TIMELINE_MONTHDAYS_FORMAT;
+			else if($interval < 86400) $date_format = S_CCHARTS_TIMELINE_HOURS_FORMAT;
 
-			$str = date($date_format, $new_time);
+			$str = zbx_date2str($date_format, $new_time);
 			$dims = imageTextSize(7, 90, $str);
 
 			imageText($this->im,
@@ -1193,7 +1193,7 @@ class CChart extends CGraphDraw{
 
 // First && Last
 // Start
-		$str = date('d.m H:i',$this->stime);
+		$str = zbx_date2str(S_CCHARTS_TIMELINE_START_DATE_FORMAT,$this->stime);
 		$dims = imageTextSize(8, 90, $str);
 		imageText($this->im,
 					8,
@@ -1207,7 +1207,7 @@ class CChart extends CGraphDraw{
 // End
 		$endtime = $this->to_time;// - $this->diffTZ;
 
-		$str = date('d.m H:i',$endtime);
+		$str = zbx_date2str(S_CCHARTS_TIMELINE_END_DATE_FORMAT,$endtime);
 		$dims = imageTextSize(8, 90, $str);
 		imageText($this->im,
 					8,
@@ -1221,17 +1221,17 @@ class CChart extends CGraphDraw{
 
 	private function drawMainPeriod($new_time, $new_pos){
 		if(date('H',$new_time) == 0){
-			if(date('Hi', $new_time) == 0) $date_format = 'd.m';
-			else $date_format = 'd.m H:i';
+			if(date('Hi', $new_time) == 0) $date_format = S_CCHARTS_TIMELINE_MAINPERIOD_MONTHDAYS_FORMAT;
+			else $date_format = S_CCHARTS_TIMELINE_MAINPERIOD_FULL_DAY_TIME_FORMAT;
 
 			$color = $this->graphtheme['highlightcolor'];
 		}
 		else{
-			$date_format = 'H:i';
+			$date_format = S_CCHARTS_TIMELINE_MAINPERIOD_HOURS_FORMAT;
 			$color = $this->graphtheme['highlightcolor'];
 		}
 
-		$str = date($date_format, $new_time);
+		$str = zbx_date2str($date_format, $new_time);
 		$dims = imageTextSize(8, 90, $str);
 
 		imageText($this->im,

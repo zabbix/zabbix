@@ -286,7 +286,7 @@ include_once('include/page_header.php');
 						make_favorite_graphs(),
 						CProfile::get('web.dashboard.hats.hat_favgrph.state',1)
 						);
-	$fav_grph->addHeader(S_FAVOURITE.SPACE.S_GRAPHS,array($graph_menu));
+	$fav_grph->addHeader(S_FAVOURITE_GRAPHS,array($graph_menu));
 	$left_tab->addRow($fav_grph);
 //----------------
 
@@ -299,7 +299,7 @@ include_once('include/page_header.php');
 						make_favorite_screens(),
 						CProfile::get('web.dashboard.hats.hat_favscr.state',1)
 						);
-	$fav_scr->addHeader(S_FAVOURITE.SPACE.S_SCREENS,array($screen_menu));
+	$fav_scr->addHeader(S_FAVOURITE_SCREENS,array($screen_menu));
 	$left_tab->addRow($fav_scr);
 //----------------
 
@@ -312,7 +312,7 @@ include_once('include/page_header.php');
 						make_favorite_maps(),
 						CProfile::get('web.dashboard.hats.hat_favmap.state',1)
 						);
-	$fav_maps->addHeader(S_FAVOURITE.SPACE.S_MAPS,array($sysmap_menu));
+	$fav_maps->addHeader(S_FAVOURITE_MAPS,array($sysmap_menu));
 	$left_tab->addRow($fav_maps);
 //----------------
 

@@ -68,7 +68,7 @@ include_once('include/page_header.php');
 	insert_js_function('update_graph_item');
 
 	$_REQUEST['drawtype'] = get_request('drawtype',0);
-	$_REQUEST['yaxisside'] = get_request('yaxisside',0);
+	$_REQUEST['yaxisside'] = get_request('yaxisside',GRAPH_YAXIS_SIDE_DEFAULT);
 	$_REQUEST['sortorder'] = get_request('sortorder',0);
 	$graphid = get_request('graphid',false);
 
@@ -129,7 +129,7 @@ include_once('include/page_header.php');
 		$color		= get_request('color', 			'009900');
 		$drawtype	= get_request('drawtype',		0);
 		$sortorder	= get_request('sortorder',		0);
-		$yaxisside	= get_request('yaxisside',		0);
+		$yaxisside	= get_request('yaxisside',		GRAPH_YAXIS_SIDE_DEFAULT);
 		$calc_fnc	= get_request('calc_fnc',		2);
 		$type		= get_request('type',			0);
 		$periods_cnt	= get_request('periods_cnt',	5);

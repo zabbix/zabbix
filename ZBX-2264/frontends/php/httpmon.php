@@ -250,7 +250,7 @@ include_once('include/page_header.php');
 		array_push($name, new CLink($httptest_data['name'],'httpdetails.php?httptestid='.$httptest_data['httptestid']));
 
 		if(isset($httptest_data['lastcheck']))
-			$lastcheck = date(S_DATE_FORMAT_YMDHMS,$httptest_data['lastcheck']);
+			$lastcheck = zbx_date2str(S_WEB_SCENARIO_DATE_FORMAT,$httptest_data['lastcheck']);
 		else
 			$lastcheck = new CCol('-', 'center');
 
@@ -262,7 +262,7 @@ include_once('include/page_header.php');
 			$status['style'] = 'orange';
 		}
 		else if( HTTPTEST_STATE_IDLE == $httptest_data['curstate'] ){
-			$state = S_IDLE_TILL.' '.date(S_DATE_FORMAT_YMDHMS,$httptest_data['nextcheck']);
+			$state = S_IDLE_TILL.' '.zbx_date2str(S_WEB_SCENARIO_IDLE_DATE_FORMAT,$httptest_data['nextcheck']);
 
 			if($httptest_data['lastfailedstep'] > 0){
 				$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['lastfailedstep']);
@@ -277,7 +277,7 @@ include_once('include/page_header.php');
 			}
 		}
 		else{
-			$state = S_IDLE_TILL.' '.date(S_DATE_FORMAT_YMDHMS,$httptest_data['nextcheck']);
+			$state = S_IDLE_TILL.' '.zbx_date2str(S_WEB_SCENARIO_IDLE_DATE_FORMAT,$httptest_data['nextcheck']);
 			$status['msg'] = S_UNKNOWN;
 			$status['style'] = 'unknown';
 		}
