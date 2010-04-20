@@ -1283,8 +1283,8 @@ int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_
 		esc_step = atoi(row[1]);
 		old_status = atoi(row[2]);
 
-		if (0 == esc_step && ESCALATION_STATUS_ACTIVE == old_status ||
-				ESCALATION_STATUS_SUPERSEDED_ACTIVE == old_status)
+		if (0 == esc_step && (ESCALATION_STATUS_ACTIVE == old_status ||
+				ESCALATION_STATUS_SUPERSEDED_ACTIVE == old_status))
 		{
 			new_status = ESCALATION_STATUS_SUPERSEDED_RECOVERY;
 		}

@@ -929,11 +929,13 @@ static void	process_escalations(int now)
 				DBremove_escalation(escalation.escalationid);
 			else
 				DBexecute("update escalations set status=%d,esc_step=%d,nextcheck=%d"
-						" where escalationid=" ZBX_FS_UI64,
+						" where escalationid=" ZBX_FS_UI64
+							" and status=%d",
 						escalation.status,
 						escalation.esc_step,
 						escalation.nextcheck,
-						escalation.escalationid);
+						escalation.escalationid,
+						ESCALATION_STATUS_ACTIVE);
 		}
 
 		DBcommit();
