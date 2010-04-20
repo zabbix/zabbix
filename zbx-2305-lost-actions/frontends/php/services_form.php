@@ -569,18 +569,18 @@ if(isset($_REQUEST['sform'])){
 		switch($val['type']){
 			case SERVICE_TIME_TYPE_UPTIME:
 				$type = new CSpan(S_UPTIME,'enabled');
-				$from = date('l H:i', $val['from']);
-				$to = date('l H:i', $val['to']);
+				$from = zbx_date2str(S_SERVICES_UPTIME_DATE_FORMAT, $val['from']);
+				$to = zbx_date2str(S_SERVICES_UPTIME_DATE_FORMAT, $val['to']);
 				break;
 			case SERVICE_TIME_TYPE_DOWNTIME:
 				$type = new CSpan(S_DOWNTIME,'disabled');
-				$from = date('l H:i', $val['from']);
-				$to = date('l H:i', $val['to']);
+				$from = zbx_date2str(S_SERVICES_DOWNTIME_DATE_FORMAT, $val['from']);
+				$to = zbx_date2str(S_SERVICES_DOWNTIME_DATE_FORMAT, $val['to']);
 				break;
 			case SERVICE_TIME_TYPE_ONETIME_DOWNTIME:
 				$type = new CSpan(S_ONE_TIME_DOWNTIME,'disabled');
-				$from = date('d M Y H:i', $val['from']);
-				$to = date('d M Y H:i', $val['to']);
+				$from = zbx_date2str(S_SERVICES_ONETIME_DOWNTIME_DATE_FORMAT, $val['from']);
+				$to = zbx_date2str(S_SERVICES_ONETIME_DOWNTIME_DATE_FORMAT, $val['to']);
 				break;
 		}
 		array_push($stime_el, array(new CCheckBox('rem_service_times[]', 'no', null,$i),

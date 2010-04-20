@@ -347,7 +347,7 @@ class CUser extends CZBXAPI{
 
 		if($login){
 			if(($login['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) && ((time() - $login['attempt_clock']) < ZBX_LOGIN_BLOCK)){
-				$_REQUEST['message'] = 'Account is blocked for ' . (ZBX_LOGIN_BLOCK - (time() - $login['attempt_clock'])) .' seconds.';
+				$_REQUEST['message'] = sprintf(S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_MINUTES, (ZBX_LOGIN_BLOCK - (time() - $login['attempt_clock'])));
 				return false;
 			}
 
@@ -412,7 +412,7 @@ class CUser extends CZBXAPI{
 		else{
 			$user = NULL;
 
-			$_REQUEST['message'] = 'Login name or password is incorrect';
+			$_REQUEST['message'] = S_CUSER_ERROR_LOGIN_OR_PASSWORD_INCORRECT;
 			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER,'Login failed ['.$name.']');
 
 			if($attempt){
@@ -444,7 +444,7 @@ class CUser extends CZBXAPI{
 		}
 
 		if(!function_exists('ldap_connect')){
-			info('Probably php-ldap module is missing.');
+			info(S_CUSER_ERROR_LDAP_MODULE_MISSING);
 			return false;
 		}
 
@@ -495,16 +495,8 @@ class CUser extends CZBXAPI{
 
 			if(!$USER_DETAILS){
 				$incorrect_session = true;
-	}
+			}
 			else if($login['attempt_failed']){
-				error(new CJSscript(array(
-							bold($login['attempt_failed']),
-							' failed login attempts logged. Last failed attempt was from ',
-							bold($login['attempt_ip']),
-							' on ',
-							bold(date('d.m.Y H:i',$login['attempt_clock'])),
-							'.')));
-
 				DBexecute('UPDATE users SET attempt_failed=0 WHERE userid='.$login['userid']);
 			}
 		}
@@ -570,11 +562,11 @@ class CUser extends CZBXAPI{
 
 		if(!$login || isset($incorrect_session) || isset($missed_user_guest)){
 
-			if(isset($incorrect_session))	$message = 'Session terminated, please re-login!';
+			if(isset($incorrect_session))	$message = 'Session terminated, re-login, please'; // S_CUSER_ERROR_SESSION_TERMINATED
 			else if(isset($missed_user_guest)){
 				$row = DBfetch(DBselect('SELECT count(u.userid) as user_cnt FROM users u'));
 				if(!$row || $row['user_cnt'] == 0){
-					$message = 'Table users is empty. Possible database corruption.';
+					$message = 'Table users is empty. Possible database corruption.'; // S_CUSER_ERROR_TABLE_USERS_EMPTY
 				}
 			}
 
@@ -654,7 +646,7 @@ class CUser extends CZBXAPI{
 		$errors = array();
 
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
-			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can create Users');
+			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_ADMIN_CAN_CREATE_USERS);
 			return false;
 		}
 
@@ -680,7 +672,7 @@ class CUser extends CZBXAPI{
 				'user_medias' => array(),
 			);
 			if(!check_db_fields($user_db_fields, $user)){
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields for user');
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_CUSER_ERROR_WRONG_FIELD_FOR_USER);
 				$result = false;
 				break;
 			}
@@ -688,7 +680,7 @@ class CUser extends CZBXAPI{
 
 			$user_exist = self::getObjects(array('alias' => $user['alias']));
 			if(!empty($user_exist)){
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'User [ '.$user_exist[0]['alias'].' ] already exists');
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => sprintf(S_CUSER_ERROR_USER_EXISTS, $user_exist[0]['alias']));
 				$result = false;
 				break;
 			}
@@ -786,7 +778,7 @@ class CUser extends CZBXAPI{
 		$self = false;
 
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
-			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can update Users');
+			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_ADMIN_CAN_UPDATE_USERS);
 			return false;
 		}
 
@@ -814,7 +806,7 @@ class CUser extends CZBXAPI{
 
 // check if we change guest user
 			if(($user_db_fields['alias'] == ZBX_GUEST_USER) && isset($user['alias']) && ($user['alias'] != ZBX_GUEST_USER)){
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Cannot rename guest user');
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_CUSER_ERROR_CANT_RENAME_GUEST_USER);
 				$result = false;
 				break;
 			}
@@ -830,7 +822,7 @@ class CUser extends CZBXAPI{
 //---------
 
 			if(!check_db_fields($user_db_fields, $user)){
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields for user');
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_CUSER_ERROR_WRONG_FIELD_FOR_USER);
 				$result = false;
 				break;
 			}
@@ -842,7 +834,7 @@ class CUser extends CZBXAPI{
 						' AND '.DBin_node('userid', id2nodeid($user['userid']));
 			$db_user = DBfetch(DBselect($sql));
 			if($db_user && ($db_user['userid'] != $user['userid'])){
-				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'User ['.$user['alias'].'] already exists');
+				$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => sprintf(S_CUSER_ERROR_USER_EXISTS, $user['alias']));
 				$result = false;
 				break;
 			}
@@ -895,13 +887,13 @@ class CUser extends CZBXAPI{
 					if(!$result) break;
 
 					if(($group['gui_access'] == GROUP_GUI_ACCESS_DISABLED) && $self){
-						$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'User cannot restrict access to GUI to him self. Group "'.$group['name'].'"');
+						$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => sprintf(S_CUSER_ERROR_USER_UNABLE_RESTRICT_SELF_GUI_ACCESS, $group['name']));
 						$result = false;
 						break;
 					}
 
 					if(($group['users_status'] == GROUP_STATUS_DISABLED) && $self){
-						$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'User cannot disable him self. Group "'.$group['name'].'"');
+						$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => sprintf(S_CUSER_ERROR_USER_CANT_DISABLE_SELF, $group['name']));
 						$result = false;
 						break;
 					}
@@ -999,7 +991,7 @@ class CUser extends CZBXAPI{
 //---------
 
 		if(!check_db_fields($user_db_fields, $user)){
-			$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => 'Wrong fields for user');
+			$errors[] = array('errno' => ZBX_API_ERROR_PARAMETERS, 'error' => S_CUSER_ERROR_WRONG_FIELD_FOR_USER);
 			$result = false;
 			break;
 		}
@@ -1055,7 +1047,7 @@ class CUser extends CZBXAPI{
 		$errors = array();
 
 		if(USER_TYPE_SUPER_ADMIN != $USER_DETAILS['type']){
-			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only Super Admins can delete Users');
+			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_ADMIN_CAN_DELETE_USERS);
 			return false;
 		}
 
@@ -1132,14 +1124,14 @@ class CUser extends CZBXAPI{
 		$users = zbx_toArray($media_data['users']);
 
 		if($USER_DETAILS['type'] < USER_TYPE_ZABBIX_ADMIN){
-			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only ZABBIX Admins can add user Medias');
+			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_ADMIN_CAN_ADD_USER_MEDIAS);
 			return false;
 		}
 
 		foreach($users as $unum => $user){
 			foreach($medias as $mnum => $media){
 					if(!validate_period($media['period'])){
-						self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, 'Incorrect time period');
+						self::setError(__METHOD__, ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_INCORRECT_TIME_PERIOD);
 						return false;
 					}
 
@@ -1160,7 +1152,7 @@ class CUser extends CZBXAPI{
 			return $medias;
 		}
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => S_CUSER_ERROR_INTERNAL_ZABBIX_ERROR);
 			return false;
 		}
 	}
@@ -1185,7 +1177,7 @@ class CUser extends CZBXAPI{
 		$mediaids = zbx_objectValues($medias, 'mediaid');
 
 		if($USER_DETAILS['type'] < USER_TYPE_ZABBIX_ADMIN){
-			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only ZABBIX Admins can remove user Medias');
+			self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_ADMIN_CAN_REMOVE_USER_MEDIAS);
 			return false;
 		}
 
@@ -1196,7 +1188,7 @@ class CUser extends CZBXAPI{
 			return true;
 		}
 		else{
-			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => 'Internal zabbix error');
+			self::$error[] = array('error' => ZBX_API_ERROR_INTERNAL, 'data' => S_CUSER_ERROR_INTERNAL_ZABBIX_ERROR);
 			return false;
 		}
 	}
@@ -1236,7 +1228,7 @@ class CUser extends CZBXAPI{
 			$transaction = self::BeginTransaction(__METHOD__);
 
 			if($USER_DETAILS['type'] < USER_TYPE_ZABBIX_ADMIN){
-				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'Only ZABBIX Admins can change user Medias ');
+				self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_ADMIN_CAN_CHANGE_USER_MEDIAS);
 				return false;
 			}
 
@@ -1265,14 +1257,14 @@ class CUser extends CZBXAPI{
 			if(!empty($del_medias)){
 				$result = self::deleteMedia($del_medias);
 				if(!$result){
-					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t delete user medias');
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_CANT_DELETE_USER_MEDIAS);
 				}
 			}
 
 // UPDATE
 			foreach($upd_medias as $mnum => $media){
 				if(!validate_period($media['period'])){
-					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Wrong period ['.$media['period'].']');
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, sprintf(S_CUSER_ERROR_WRONG_PERIOD, $media['period']));
 				}
 
 				$sql = 'UPDATE media '.
@@ -1284,7 +1276,7 @@ class CUser extends CZBXAPI{
 						' WHERE mediaid='.$media['mediaid'];
 				$result = DBexecute($sql);
 				if(!$result){
-					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t update user media');
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_CANT_UPDATE_USER_MEDIAS);
 				}
 			}
 
@@ -1292,7 +1284,7 @@ class CUser extends CZBXAPI{
 			if(!empty($new_medias)){
 				$result = self::addMedia(array('users' => $users, 'medias' => $new_medias));
 				if(!$result){
-					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Can\'t insert user media');
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_CANT_INSERT_USER_MEDIAS);
 				}
 			}
 
