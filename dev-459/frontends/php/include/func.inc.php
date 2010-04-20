@@ -561,7 +561,11 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 			$format = '%.6f';
 
 		if(round($value, 6) == 0) $value = 0;
-		else $value = rtrim(sprintf($format,$value), '.0');
+		else{
+			$value = sprintf($format,$value);
+			$value = preg_replace('/^([0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', $value);
+			$value = rtrim($value, '.');
+		}
 
 		return sprintf('%s %s', $value, $units);
 	}
