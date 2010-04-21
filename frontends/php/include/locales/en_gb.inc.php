@@ -2322,6 +2322,6 @@
 	'S_CANNOT_FIND_OBJECTS_WITH_NAME'=>	'Can not find objects with name',
 	'S_CANNOT_CREATE_NEW_ELEMENT'=>		'Can not create new element',
 	'S_OTHER_SMALL'=>			'other',
-	
+
 );
 ?>
