@@ -1993,7 +1993,7 @@
 	'S_INCORRECT_TYPE_OF_ASORT_BY_KEY'=>	'Incorrect type of asort_by_key',
 	'S_DAYS_SMALL'=>			'days',
 	'S_B'=>			'B',
-	'S_N_SMALL',	'n',
+	'S_N_SMALL'=>	'n',
 	'S_NANO'=>		'Nano',
 	'S_U_MICRO'=>	'µ',
 	'S_MICRO'=>		'Micro',
