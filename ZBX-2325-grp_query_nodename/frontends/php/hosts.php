@@ -596,10 +596,7 @@ $thid = get_request('hostid', 0);
 		$hosts_wdgt->addItem(insert_host_form(false));
 	}
 	else{
-		
-
-		$frmForm = new CForm();
-		$frmForm->setMethod('get');
+		$frmForm = new CForm(null, 'get');
 
 		$cmbGroups = new CComboBox('groupid', $PAGE_GROUPS['selected'], 'javascript: submit();');
 		foreach($PAGE_GROUPS['groups'] as $groupid => $name){

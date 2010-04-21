@@ -419,8 +419,7 @@ include_once('include/page_header.php');
 	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
 ?>
 <?php
-	$form = new CForm();
-	$form->setMethod('get');
+	$form = new CForm(null, 'get');
 
 // Config
 	$cmbConf = new CComboBox('config','graphs.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
