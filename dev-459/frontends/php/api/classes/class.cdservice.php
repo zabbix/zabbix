@@ -128,11 +128,12 @@ class CDService extends CZBXAPI{
 		}
 
 // editable + PERMISSION CHECK
-		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
+		if(USER_TYPE_SUPER_ADMIN == $user_type){
 		}
-		else{
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
-
+		else if(is_null($options['editable']) && ($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN)){
+		}
+		else if(!is_null($options['editable']) && ($USER_DETAILS['type']!=USER_TYPE_SUPER_ADMIN)){
+			return array();
 		}
 
 // nodeids
