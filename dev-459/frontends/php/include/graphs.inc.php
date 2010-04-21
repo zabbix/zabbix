@@ -326,19 +326,25 @@
 		$min = null;
 		$result = time() - 86400*365;
 
-		$items_by_type = array(ITEM_VALUE_TYPE_FLOAT => array(), ITEM_VALUE_TYPE_STR =>  array(), ITEM_VALUE_TYPE_LOG => array(),
-						ITEM_VALUE_TYPE_UINT64 => array(), ITEM_VALUE_TYPE_TEXT => array());
+		$items_by_type = array(
+			ITEM_VALUE_TYPE_FLOAT => array(),
+			ITEM_VALUE_TYPE_STR =>  array(),
+			ITEM_VALUE_TYPE_LOG => array(),
+			ITEM_VALUE_TYPE_UINT64 => array(), 
+			ITEM_VALUE_TYPE_TEXT => array()
+		);
 
 		$sql = 'SELECT i.itemid, i.value_type '.
-				' FROM items i WHERE '.DBcondition('i.itemid', $itemids);
+				' FROM items i '.
+				' WHERE '.DBcondition('i.itemid', $itemids);
 		$db_result = DBselect($sql);
 
 		while($item = DBfetch($db_result)) {
 			$items_by_type[$item['value_type']][$item['itemid']] = $item['itemid'];
 		}
 
-		// data for ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64 can be stored in trends tables or history table
-		// get max trends and history values for such type items to find out in what tables to look for data
+// data for ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64 can be stored in trends tables or history table
+// get max trends and history values for such type items to find out in what tables to look for data
 		$sql_from = 'history';
 		$sql_from_num = '';
 		if(!empty($items_by_type[ITEM_VALUE_TYPE_FLOAT]) || !empty($items_by_type[ITEM_VALUE_TYPE_UINT64])) {
@@ -373,14 +379,13 @@
 					$sql_from = 'history';
 			}
 
-			foreach($items as $itemid) {
-				$sql = 'SELECT ht.clock '.
-						' FROM '.$sql_from.' ht '.
-						' WHERE ht.itemid='.$itemid.
-						' ORDER BY ht.itemid, ht.clock ';
-				if($min_tmp = DBfetch(DBselect($sql,1))){
-					$min = (is_null($min)) ? $min_tmp['clock'] : min($min, $min_tmp['clock']);
-				}
+			$sql = 'SELECT ht.itemid, MIN(ht.clock) as min_clock '.
+					' FROM '.$sql_from.' ht '.
+					' WHERE '.DBcondition('ht.itemid', $itemids).
+					' GROUP BY ht.itemid';
+			$res = DBselect($sql);
+			while($min_tmp = DBfetch($res)){
+				$min = (is_null($min)) ? $min_tmp['min_clock'] : min($min, $min_tmp['min_clock']);
 			}
 		}
 		$result = is_null($min)?$result:$min;
@@ -1226,103 +1231,6 @@
 		$prev_color[$palette]++;
 
 	return $result;
-	}
-
-	function imageDiagonalMarks($im,$x, $y, $offset, $color){
-		global $colors;
-
-		$gims = array(
-			'lt' => array(0,0, -9,0, -9,-3, -3,-9, 0,-9),
-			'rt' => array(0,0,  9,0,  9,-3,  3,-9, 0,-9),
-			'lb' => array(0,0, -9,0,  -9,3,  -3,9,  0,9),
-			'rb' => array(0,0,  9,0,   9,3,   3,9,  0,9),
-		);
-
-		foreach($gims['lt'] as $num => $px){
-			if(($num % 2) == 0) $gims['lt'][$num] = $px  + $x - $offset;
-			else $gims['lt'][$num] = $px  + $y - $offset;
-		}
-
-		foreach($gims['rt'] as $num => $px){
-			if(($num % 2) == 0) $gims['rt'][$num] = $px  + $x + $offset;
-			else $gims['rt'][$num] = $px  + $y - $offset;
-		}
-
-		foreach($gims['lb'] as $num => $px){
-			if(($num % 2) == 0) $gims['lb'][$num] = $px  + $x - $offset;
-			else $gims['lb'][$num] = $px  + $y + $offset;
-		}
-
-		foreach($gims['rb'] as $num => $px){
-			if(($num % 2) == 0) $gims['rb'][$num] = $px  + $x + $offset;
-			else $gims['rb'][$num] = $px  + $y + $offset;
-		}
-
-		imagefilledpolygon($im,$gims['lt'],5,$color);
-		imagepolygon($im,$gims['lt'],5,$colors['Dark Red']);
-
-		imagefilledpolygon($im,$gims['rt'],5,$color);
-		imagepolygon($im,$gims['rt'],5,$colors['Dark Red']);
-
-		imagefilledpolygon($im,$gims['lb'],5,$color);
-		imagepolygon($im,$gims['lb'],5,$colors['Dark Red']);
-
-		imagefilledpolygon($im,$gims['rb'],5,$color);
-		imagepolygon($im,$gims['rb'],5,$colors['Dark Red']);
-
-	}
-
-	function imageVerticalMarks($im,$x, $y, $offset, $color, $marks='tlbr'){
-		global $colors;
-
-		$polygons = 5;
-		$gims = array(
-			't' => array(0,0, -6,-6, -3,-9,  3,-9,  6,-6),
-			'l' => array(0,0,  -6,6,  -9,3, -9,-3, -6,-6),
-			'b' => array(0,0,   6,6,   3,9,  -3,9,  -6,6),
-			'r' => array(0,0,  6,-6,  9,-3,   9,3,   6,6),
-		);
-
-		foreach($gims['t'] as $num => $px){
-			if(($num % 2) == 0) $gims['t'][$num] = $px  + $x;
-			else $gims['t'][$num] = $px  + $y - $offset;
-		}
-
-		foreach($gims['l'] as $num => $px){
-			if(($num % 2) == 0) $gims['l'][$num] = $px  + $x - $offset;
-			else $gims['l'][$num] = $px  + $y;
-		}
-
-		foreach($gims['b'] as $num => $px){
-			if(($num % 2) == 0) $gims['b'][$num] = $px  + $x;
-			else $gims['b'][$num] = $px  + $y + $offset;
-		}
-
-		foreach($gims['r'] as $num => $px){
-			if(($num % 2) == 0) $gims['r'][$num] = $px  + $x + $offset;
-			else $gims['r'][$num] = $px  + $y;
-		}
-
-		if(strpos($marks, 't') !== false){
-			imagefilledpolygon($im,$gims['t'],$polygons,$color);
-			imagepolygon($im,$gims['t'],$polygons,$colors['Dark Red']);
-		}
-
-		if(strpos($marks, 'l') !== false){
-			imagefilledpolygon($im,$gims['l'],$polygons,$color);
-			imagepolygon($im,$gims['l'],$polygons,$colors['Dark Red']);
-		}
-
-		if(strpos($marks, 'b') !== false){
-			imagefilledpolygon($im,$gims['b'],$polygons,$color);
-			imagepolygon($im,$gims['b'],$polygons,$colors['Dark Red']);
-		}
-
-		if(strpos($marks, 'r') !== false){
-			imagefilledpolygon($im,$gims['r'],$polygons,$color);
-			imagepolygon($im,$gims['r'],$polygons,$colors['Dark Red']);
-		}
-
 	}
 
 	function imageText($image, $fontsize, $angle, $x, $y, $color, $string){
