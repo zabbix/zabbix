@@ -299,7 +299,7 @@ include_once('include/page_header.php');
 		else if(isset($hideAll) && (empty($apps) || isset($apps[$db_app['applicationid']]))) continue;
 
 		if(isset($db_item['lastclock']))
-			$lastclock=date(S_DATE_FORMAT_YMDHMS,$db_item['lastclock']);
+			$lastclock=zbx_date2str(S_LATEST_ITEMS_TRIGGERS_DATE_FORMAT,$db_item['lastclock']);
 		else
 			$lastclock = ' - ';
 
@@ -447,7 +447,7 @@ include_once('include/page_header.php');
 
 
 		if(isset($db_item['lastclock']))
-			$lastclock=zbx_date2str(S_DATE_FORMAT_YMDHMS,$db_item['lastclock']);
+			$lastclock=zbx_date2str(S_LATEST_ITEMS_TRIGGERS_DATE_FORMAT,$db_item['lastclock']);
 		else
 			$lastclock = new CCol(' - ');
 

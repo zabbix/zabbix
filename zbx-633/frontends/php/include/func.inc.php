@@ -313,8 +313,75 @@ function zbx_set_post_cookie($name, $value, $time=null){
  *
  * author: Alexei Vladishev
  */
-function zbx_date2str($format, $timestamp){
-	return ($timestamp==0)?S_NEVER:date($format,$timestamp);
+function zbx_date2str($format, $value=NULL){
+	static $weekdaynames, $weekdaynameslong, $months, $monthslong;
+	
+	if($value === NULL) $value = time();
+	
+	if(!is_array($weekdaynames)) {
+		$weekdaynames = Array(
+					0 => S_WEEKDAY_SUNDAY_SHORT,
+					1 => S_WEEKDAY_MONDAY_SHORT,
+					2 => S_WEEKDAY_TUESDAY_SHORT,
+					3 => S_WEEKDAY_WEDNESDAY_SHORT,
+					4 => S_WEEKDAY_THURSDAY_SHORT,
+					5 => S_WEEKDAY_FRIDAY_SHORT,
+					6 => S_WEEKDAY_SATURDAY_SHORT);
+	}
+	
+	if(!is_array($weekdaynameslong)) {
+		$weekdaynameslong = Array(
+					0 => S_WEEKDAY_SUNDAY_LONG,
+					1 => S_WEEKDAY_MONDAY_LONG,
+					2 => S_WEEKDAY_TUESDAY_LONG,
+					3 => S_WEEKDAY_WEDNESDAY_LONG,
+					4 => S_WEEKDAY_THURSDAY_LONG,
+					5 => S_WEEKDAY_FRIDAY_LONG,
+					6 => S_WEEKDAY_SATURDAY_LONG);
+	}
+
+	if(!is_array($months)) {
+		$months = Array(
+				1 => S_MONTH_JANUARY_SHORT,
+				2 => S_MONTH_FEBRUARY_SHORT,
+				3 => S_MONTH_MARCH_SHORT,
+				4 => S_MONTH_APRIL_SHORT,
+				5 => S_MONTH_MAY_SHORT,
+				6 => S_MONTH_JUNE_SHORT,
+				7 => S_MONTH_JULY_SHORT,
+				8 => S_MONTH_AUGUST_SHORT,
+				9 => S_MONTH_SEPTEMBER_SHORT,
+				10 => S_MONTH_OCTOBER_SHORT,
+				11 => S_MONTH_NOVEMBER_SHORT,
+				12 => S_MONTH_DECEMBER_SHORT);
+	}
+
+	if(!is_array($monthslong)) {
+		$monthslong = Array(
+					1 => S_MONTH_JANUARY_LONG,
+					2 => S_MONTH_FEBRUARY_LONG,
+					3 => S_MONTH_MARCH_LONG,
+					4 => S_MONTH_APRIL_LONG,
+					5 => S_MONTH_MAY_LONG,
+					6 => S_MONTH_JUNE_LONG,
+					7 => S_MONTH_JULY_LONG,
+					8 => S_MONTH_AUGUST_LONG,
+					9 => S_MONTH_SEPTEMBER_LONG,
+					10 => S_MONTH_OCTOBER_LONG,
+					11 => S_MONTH_NOVEMBER_LONG,
+					12 => S_MONTH_DECEMBER_LONG);
+	}
+
+	if(!$value) return S_NEVER;
+	
+	$output = date($format, $value);
+
+	$output = str_replace(date('l',$value), $weekdaynameslong[date('w',$value)], $output);
+	$output = str_replace(date('F',$value), $monthslong[date('n',$value)], $output);
+	$output = str_replace(date('D',$value), $weekdaynames[date('w',$value)], $output);
+	$output = str_replace(date('M',$value), $months[date('n',$value)], $output);
+
+	return $output;
 }
 
 /* function:
@@ -384,26 +451,11 @@ function getmicrotime(){
 	return ((float)$usec + (float)$sec);
 }
 
-function getDateStringByType($type, $timestamp){
-	$str = S_WRONG_TYPE;
-	switch($type){
-		case TIMEPERIOD_TYPE_HOURLY:
-			$str = date('H:i', $timestamp);
-			break;
-		case TIMEPERIOD_TYPE_DAILY:
-			$str = date('D H:i', $timestamp);
-			break;
-		case TIMEPERIOD_TYPE_WEEKLY:
-			$str = S_WEEK.' '.date('W', $timestamp);
-			break;
-		case TIMEPERIOD_TYPE_MONTHLY:
-			$str = date('M', $timestamp);
-			break;
-		case TIMEPERIOD_TYPE_YEARLY:
-			$str = date('Y', $timestamp);
-			break;
-	}
-return $str;
+function zbxDateToTime($strdate){
+	if(5 == sscanf($strdate, '%04d%02d%02d%02d%02d', $year, $month, $date, $hours, $minutes))
+		return mktime($hours,$minutes,0,$month,$date,$year);
+	else
+		return 0;
 }
 /************* END DATE *************/
 
@@ -496,7 +548,7 @@ function mem2str($size){
 function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 // Special processing for unix timestamps
 	if($units=='unixtime'){
-		$ret=date('Y.m.d H:i:s',$value);
+		$ret=zbx_date2str(S_FUNCT_UNIXTIMESTAMP_DATE_FORMAT,$value);
 		return $ret;
 	}
 //Special processing of uptime
@@ -546,10 +598,17 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 	}
 
 	if(zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS)){
-		if(round($value,2) == round($value,0)) $format = '%.0f %s';
-		else $format = '%.2f %s';
+		if(abs($value) >= 1)
+			$format = '%.2f';
+		else if(abs($value) >= 0.01)
+			$format = '%.4f';
+		else
+			$format = '%.6f';
 
-		return sprintf($format, $value, $units);
+		if(round($value, 6) == 0) $value = 0;
+		else $value = rtrim(sprintf($format,$value), '.0');
+
+		return sprintf('%s %s', $value, $units);
 	}
 
 // INIT intervals
@@ -558,6 +617,10 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 
 	if(!isset($digitUnits[$step])){
 		$digitUnits[$step] = array(
+//				array('pow'=>-3, 'short'=>S_N_SMALL, 'long'=>S_NANO),
+				array('pow'=>-2, 'short'=>S_U_MICRO, 'long'=>S_MICRO),
+				array('pow'=>-1, 'short'=>S_M_SMALL, 'long'=>S_MILLI),
+				array('pow'=>0, 'short'=>'', 'long'=>''),
 				array('pow'=>1, 'short'=>S_K, 'long'=>S_KILO),
 				array('pow'=>2, 'short'=>S_M, 'long'=>S_MEGA),
 				array('pow'=>3, 'short'=>S_G, 'long'=>S_GIGA),
@@ -569,21 +632,26 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 			);
 
 		foreach($digitUnits[$step] as $dunit => $data){
-			$digitUnits[$step][$dunit]['value'] = bcpow($step, $data['pow']);
+			$digitUnits[$step][$dunit]['value'] = bcpow($step, $data['pow'], 9);
 		}
 	}
 //---
+
 	if($value < 0) $abs = bcmul($value, '-1');
 	else $abs = $value;
 
 	$valUnit = array('pow'=>0, 'short'=>'', 'long'=>'', 'value'=>$value);
-	if($abs >= $step){	
+	if(($abs > 999) ||  ($abs < 0.001)){
 		foreach($digitUnits[$step] as $dnum => $data){
 			if(bccomp($abs, $data['value']) > -1) $valUnit = $data;
 			else break;
 		}
 
-		$valUnit['value'] = bcdiv($value, $valUnit['value'], 4);
+		if(round($valUnit['value'], 6) > 0){
+			$valUnit['value'] = bcdiv(sprintf('%.6f',$value), sprintf('%.6f', $valUnit['value']), 6);
+		}
+		else
+			$valUnit['value'] = 0;
 	}
 
 //------

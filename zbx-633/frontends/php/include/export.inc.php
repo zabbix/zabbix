@@ -223,24 +223,43 @@ class zbxXML{
 		)
 	);
 
+	protected static function createDOMDocument(){
+		$doc = new DOMDocument('1.0', 'UTF-8');
+		$doc->preserveWhiteSpace = false;
+		$doc->formatOutput = true;
+
+		$root = $doc->appendChild(new DOMElement('zabbix_export'));
+		$root->setAttributeNode(new DOMAttr('version', '1.0'));
+		$root->setAttributeNode(new DOMAttr('date', zbx_date2str(S_EXPORT_DATE_ATTRIBUTE_DATE_FORMAT)));
+		$root->setAttributeNode(new DOMAttr('time', zbx_date2str(S_EXPORT_TIME_ATTRIBUTE_DATE_FORMAT)));
+
+		return $root;
+	}
+
+	protected static function outputXML($doc){
+//		return preg_replace_callback('/^( {2,})/m', array('zbxXML', 'space2tab'), $doc->ownerDocument->saveXML());
+		return $doc->ownerDocument->saveXML();
+	}
+
 	private static function space2tab($matches){
 		return str_repeat("\t", zbx_strlen($matches[0]) / 2 );
 	}
 
-	public static function arrayToXML($array, $root = 'root'){
-		$doc = new DOMDocument('1.0', 'UTF-8');
-		$doc->preserveWhiteSpace = false;
+	public static function arrayToXML($array){
+		$xml = self::createDOMDocument();
 
-		self::arrayToDOM($doc, $array, $root);
+		self::arrayToDOM($xml, $array);
 
-		$doc->formatOutput = true;
-
-	return $doc->saveXML();
+		return self::outputXML($xml);
 	}
 
 	public static function arrayToDOM(&$dom, $array, $parentKey=null){
-		$parentNode = $dom->createElement($parentKey);
-		$parentNode = $dom->appendChild($parentNode);
+		if(!is_null($parentKey)){
+			$parentNode = $dom->appendChild(new DOMElement($parentKey));
+		}
+		else{
+			$parentNode = $dom;
+		}
 
  		foreach($array as $key => $value){
 			if(is_numeric($key)) $key = rtrim($parentKey, 's');
@@ -251,7 +270,7 @@ class zbxXML{
 //SDI($dom->saveXML($parentNode));
 			}
 			else if(!zbx_empty($value)){
-				$n = $parentNode->appendChild($dom->createElement($key));
+				$n = $parentNode->appendChild(new DOMElement($key));
 				$n->appendChild(new DOMText($value));
 			}
 		}
@@ -363,11 +382,15 @@ class zbxXML{
 
 	public static function parseScreen($rules){
 		$importScreens = self::XMLtoArray(self::$xml);
-		if(!isset($importScreens['screens'])){
+
+		if(!isset($importScreens['zabbix_export'])){
+			$importScreens['zabbix_export'] = $importScreens;
+		}
+		if(!isset($importScreens['zabbix_export']['screens'])){
 			info(S_EXPORT_HAVE_NO_SCREENS);
 			return false;
 		}
-		$importScreens = $importScreens['screens'];
+		$importScreens = $importScreens['zabbix_export']['screens'];
 
 		$result = true;
 		$screens = array();
@@ -504,16 +527,61 @@ class zbxXML{
 	}
 
 	public static function parseMap($rules){
+		global $USER_DETAILS;
 		$importMaps = self::XMLtoArray(self::$xml);
-		if(!isset($importMaps['sysmaps'])){
-			info(S_EXPORT_HAVE_NO_MAPS);
-			return false;
-		}
-		$importMaps = $importMaps['sysmaps'];
 
-		$result = true;
-		$sysmaps = array();
+		if(!isset($importMaps['zabbix_export'])){
+			$importMaps['zabbix_export'] = $importMaps;
+		}
+
 		try{
+			if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN){
+				$images = $importMaps['zabbix_export']['images'];
+				$images_to_add = array();
+				$images_to_update = array();
+				foreach($images as $inum => $image){
+					if(CImage::exists($image)){
+						if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['icons']['exist']))
+							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && (isset($rules['background']['exist'])))){
+
+							$options = array(
+								'filter' => array('name' => $image['name']),
+								'output' => API_OUTPUT_SHORTEN
+							);
+							$img = CImage::get($options);
+							$img = reset($img);
+							$image['imageid'] = $img['imageid'];
+							$image['image'] = base64_decode($image['encodedImage']);
+							unset($image['encodedImage']);
+
+							$images_to_update[] = $image;
+						}
+					}
+					else{
+						if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['icons']['missed']))
+							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && isset($rules['background']['missed']))){
+
+							$image['image'] = base64_decode($image['encodedImage']);
+							unset($image['encodedImage']);
+							$images_to_add[] = $image;
+						}
+					}
+				}
+//sdi($images_to_add);
+				if(!empty($images_to_add)){
+					$result = CImage::create($images_to_add);
+					if(!$result) throw new Exception(S_CANNOT_ADD_IMAGE);
+				}
+//sdi($images_to_update);
+				if(!empty($images_to_update)){
+					$result = CImage::update($images_to_update);
+					if(!$result) throw new Exception(S_CANNOT_UPDATE_IMAGE);
+				}
+			}
+
+
+			$importMaps = $importMaps['zabbix_export']['sysmaps'];
+			$sysmaps = array();
 			foreach($importMaps as $mnum => &$sysmap){
 				unset($sysmap['sysmapid']);
 				$exists = CMap::exists(array('name' => $sysmap['name']));
@@ -675,7 +743,9 @@ class zbxXML{
 					}
 
 					$selement['sysmapid'] = $sysmap['sysmapid'];
-					$selementid = add_element_to_sysmap($selement);
+					$selementids = CMap::addElements($selement);
+					$selementid = reset($selementids);
+
 					foreach($links as $id => &$link){
 						if($link['selementid1'] == $selement['selementid']) $links[$id]['selementid1'] = $selementid;
 						else if($link['selementid2'] == $selement['selementid']) $links[$id]['selementid2'] = $selementid;
@@ -687,7 +757,7 @@ class zbxXML{
 					if(!isset($link['linktriggers'])) $link['linktriggers'] = array();
 					$link['sysmapid'] = $sysmap['sysmapid'];
 
-					$result = add_link($link);
+					$result = CMap::addLinks($link);
 				}
 
 				if(isset($importMap['sysmapid'])){
@@ -696,15 +766,14 @@ class zbxXML{
 				else{
 					info(S_MAP.' ['.$sysmap['name'].'] '.S_ADDED_SMALL);
 				}
-
 			}
+
+			return true;
 		}
 		catch(Exception $e){
 			error($e->getMessage());
 			return false;
 		}
-
-	return $result;
 	}
 
 	public static function parseMain($rules){
@@ -856,7 +925,7 @@ class zbxXML{
 
 							$result = CTemplate::update($host_db);
 							if(!$result){
-								throw new APIException(1, CTemplate::resetErrors);
+								throw new APIException(1, CTemplate::resetErrors());
 							}
 							
 							$options = array(
@@ -870,7 +939,7 @@ class zbxXML{
 
 							$result = CHost::update($host_db);
 							if(!$result){
-								throw new APIException(1, CHost::resetErrors);
+								throw new APIException(1, CHost::resetErrors());
 							}
 							
 							$options = array(
@@ -1338,13 +1407,7 @@ class zbxXML{
 	}
 
 	public static function export($data){
-
-		$doc = new DOMDocument('1.0', 'UTF-8');
-		$root = $doc->appendChild(new DOMElement('zabbix_export'));
-		$root->setAttributeNode(new DOMAttr('version', '1.0'));
-		$root->setAttributeNode(new DOMAttr('date', date('d.m.y')));
-		$root->setAttributeNode(new DOMAttr('time', date('H.i')));
-
+		$root = self::createDOMDocument();
 
 		$hosts_node = $root->appendChild(new DOMElement(XML_TAG_HOSTS));
 
@@ -1497,10 +1560,7 @@ class zbxXML{
 				}
 			}
 
-		$doc->preserveWhiteSpace = false;
-		$doc->formatOutput = true;
-
-		return preg_replace_callback('/^( {2,})/m', array('zbxXML', 'space2tab'), $doc->saveXML());
+		return self::outputXML($root);
 	}
 }
 

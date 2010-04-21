@@ -84,10 +84,12 @@ function SDI(msg){
 	if((div_help == 'undefined') || empty(div_help)){
 		var div_help = document.createElement('div');
 		var doc_body = document.getElementsByTagName('body')[0];
+		if(empty(doc_body)) return false;
+		
 		doc_body.appendChild(div_help);
 		
 		div_help.setAttribute('id','div_help');
-		div_help.setAttribute('style','position: absolute; right: 100px; top: 10px; border: 1px red solid; width: 500px; height: 400px; background-color: white; font-size: 12px; overflow: auto; z-index: 20;');
+		div_help.setAttribute('style','position: absolute; right: 300px; top: 260px; border: 1px red solid; width: 500px; height: 400px; background-color: white; font-size: 12px; overflow: auto; z-index: 20;');
 		
 //		new Draggable(div_help,{});
 	}

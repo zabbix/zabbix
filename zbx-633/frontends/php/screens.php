@@ -153,7 +153,7 @@
 			$elementid = $screen['screenid'];	
 		}
 		
-		$effectiveperiod = navigation_bar_calc('web.screens', $_REQUEST['elementid'], true);
+		$effectiveperiod = navigation_bar_calc('web.screens', $elementid, true);
 		
 		$element_name = $screens[$elementid]['name'];
 		
@@ -230,13 +230,11 @@
 		if(2 != $_REQUEST['fullscreen']){
 			$timeline = array(
 				'period' => $effectiveperiod,
-				'starttime' => time() - ZBX_MAX_PERIOD
+				'starttime' => date('YmdHi', time() - ZBX_MAX_PERIOD)
 			);
 
 			if(isset($_REQUEST['stime'])){
-				$bstime = $_REQUEST['stime'];
-				$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
-				$timeline['usertime'] += $timeline['period'];
+				$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 			}
 
 			$dom_graph_id = 'screen_scroll';

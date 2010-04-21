@@ -1,5 +1,28 @@
 Changes for 1.8.3
 
+ - [ZBX-2132] added date format constants to locales, changed zbx_date2str function to meet regional formats and date translation
+ - [ZBXNEXT-311] improved speedup dbconfig synchronization (Sasha)
+ - [ZBX-2329] fixed screen renaming (Aly)
+ - [ZBX-2315] fixed multiple issues with JS scrollbar (Aly)
+ - [ZBX-2321] fixed log items appearing in the wrong order (Alexei,asaveljevs,Sasha)
+ - [DEV-458] added marks on maps if elements trigger changed status recently (Aly)
+ - [ZBX-2290] added export/import of map images (Vedmak)
+ - [ZBX-2290] fixed image update with oracle db (Vedmak)
+ - [ZBX-2317] updated French translation; thanks to alixen (Richlv)
+ - [ZBX-2283] fixed incorrect time calculating in slidebar (Aly)
+ - [ZBX-2261] fixed username hiding in acknowledge comments (AM)
+ - [ZBX-2305] fixed actions getting lost in an event-busy environment (asaveljevs)
+ - [ZBX-2303] fixed GET/POST methods in processing web scenario steps. Thanks to Hannu Ylitalo (Sasha)
+ - [ZBXNEXT-293] processes now provide more information on why they terminate (asaveljevs)
+ - [ZBX-2304] fixed "no permission" error when screen contains simple graphs with web item (Vedmak)
+ - [ZBX-2268] denied creation of pie\exploded graphs with more than one sum items (Vedmak)
+ - [ZBX-2298] added constant to defines to be able configure default Y axis position: left or right (AM)
+ - [ZBX-2174] fixed a small memory leak in SNMP checks (asaveljevs)
+ - [ZBX-1648,ZBX-2300] fixed caching of "Database monitor" items. Thanks to Kirill Fateev (Sasha)
+ - [ZBX-2290] fixed screen cells moving (Vedmak)
+ - [ZBX-2301] fixed "configure" script with libssh2-1.0.0 library (Sasha)
+ - [ZBX-2296] fixed possible heavy loaded server crash when using internal checks (Sasha)
+ - [ZBX-2295] added additional units to graphs Y axis (Aly)
  - [ZBX-2285] fixed sending of active items multiple times (asaveljevs,Sasha)
  - [ZBX-2266] fixed server crash when processing malformed calculated items (asaveljevs)
  - [ZBX-1346] use single quotes in example frontend configuration file (Richlv)
@@ -29,6 +52,7 @@ Changes for 1.8.3
 
 Changes for 1.8.2
 
+ - [ZBX-2116] fixed black images instead of vertical text in monitoring->overview (Vedmak)
  - [ZBX-2084] fixed JSON decoding class, which didn't work due to PCRE backtrace limit, enabled native PHP JSON functions, rewrote code with sockets (AM)
  - [ZBX-2239] fixed mutex (un)locking so that zabbix_server does not become forever defunct when killed (asaveljevs)
  - [ZBX-1983] fixed port validation in host agent port, IPMI port and in discovery checks ports (now supports port ranges like "21-80,465") (AM)

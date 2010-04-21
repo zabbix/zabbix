@@ -40,8 +40,8 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 	$filterForm->setAttribute('id','zbx_filter');
 
 	$filterForm->addVar('config',$config);
-	$filterForm->addVar('filter_timesince',($_REQUEST['filter_timesince']>0)?$_REQUEST['filter_timesince']:'');
-	$filterForm->addVar('filter_timetill',($_REQUEST['filter_timetill']>0)?$_REQUEST['filter_timetill']:'');
+	$filterForm->addVar('filter_timesince',date('YmdHi', $_REQUEST['filter_timesince']));
+	$filterForm->addVar('filter_timetill', date('YmdHi', $_REQUEST['filter_timetill']));
 
 	$cmbGroups = new CComboBox('filter_groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
 	$cmbHosts = new CComboBox('filter_hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
@@ -207,8 +207,8 @@ function bar_report_form(){
 
 //	$showLegend =
 
-	$report_timesince = get_request('report_timesince',time()-86400);
-	$report_timetill = get_request('report_timetill',time());
+	$report_timesince = $_REQUEST['report_timesince'];
+	$report_timetill = $_REQUEST['report_timetill'];
 
 	$reportForm = new CFormTable(null,null,'get');//,'events.php?report_set=1','POST',null,'sform');
 	$reportForm->setAttribute('name','zbx_report');
@@ -220,8 +220,8 @@ function bar_report_form(){
 
 	$reportForm->addVar('config',$config);
 	$reportForm->addVar('items',$items);
-	$reportForm->addVar('report_timesince',($report_timesince>0)?$report_timesince:'');
-	$reportForm->addVar('report_timetill',($report_timetill>0)?$report_timetill:'');
+	$reportForm->addVar('report_timesince', date('YmdHi', $report_timesince));
+	$reportForm->addVar('report_timetill',  date('YmdHi', $report_timetill));
 
 	$reportForm->addRow(S_TITLE, new CTextBox('title',$title,40));
 	$reportForm->addRow(S_X.SPACE.S_LABEL, new CTextBox('xlabel',$xlabel,40));
@@ -429,8 +429,8 @@ function bar_report_form2(){
 			$periods_table->addRow(array(
 					new CCheckBox('group_pid['.$pid.']'),
 					$caption,
-					date(S_DATE_FORMAT_YMDHMS, $period['report_timesince']),
-					date(S_DATE_FORMAT_YMDHMS, $period['report_timetill']),
+					zbx_date2str(S_REPORTS_BAR_REPORT_DATE_FORMAT, $period['report_timesince']),
+					zbx_date2str(S_REPORTS_BAR_REPORT_DATE_FORMAT, $period['report_timetill']),
 					$color,
 				));
 		}
@@ -520,8 +520,8 @@ function bar_report_form3(){
 	$scaletype = get_request('scaletype', TIMEPERIOD_TYPE_WEEKLY);
 	$avgperiod = get_request('avgperiod', TIMEPERIOD_TYPE_DAILY);
 
-	$report_timesince = get_request('report_timesince',time()-86400);
-	$report_timetill = get_request('report_timetill',time());
+	$report_timesince = get_request('report_timesince',date('YmdHi', time()-86400));
+	$report_timetill = zget_request('report_timetill',date('YmdHi'));
 
 	$captions = get_request('captions',array());
 	$items = get_request('items',array());
@@ -541,8 +541,8 @@ function bar_report_form3(){
 		$reportForm->addVar('report_show','show');
 
 	$reportForm->addVar('config',$config);
-	$reportForm->addVar('report_timesince',($report_timesince>0)?$report_timesince:'');
-	$reportForm->addVar('report_timetill',($report_timetill>0)?$report_timetill:'');
+	$reportForm->addVar('report_timesince',date('YmdHi', $report_timesince));
+	$reportForm->addVar('report_timetill',date('YmdHi', $report_timetill));
 
 //	$reportForm->addVar('items',$items); 				//params are set later!!
 //	$reportForm->addVar('periods',$periods);

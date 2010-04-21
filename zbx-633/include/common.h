@@ -417,13 +417,15 @@ typedef enum
 	ALERT_STATUS_FAILED
 } zbx_alert_status_t;
 
-/* Escalation stauses */
+/* Escalation statuses */
 typedef enum
 {
 	ESCALATION_STATUS_ACTIVE = 0,
 	ESCALATION_STATUS_RECOVERY,
 	ESCALATION_STATUS_SLEEP,
-	ESCALATION_STATUS_COMPLETED /* only in server code */
+	ESCALATION_STATUS_COMPLETED, /* only in server code, never in DB */
+	ESCALATION_STATUS_SUPERSEDED_ACTIVE,
+	ESCALATION_STATUS_SUPERSEDED_RECOVERY
 } zbx_escalation_status_t;
 
 /* Alert types */
@@ -501,7 +503,7 @@ typedef enum
 #define HTTPTEST_STATUS_MONITORED	0
 #define HTTPTEST_STATUS_NOT_MONITORED	1
 
-/* DIscovery rule */
+/* Discovery rule */
 #define DRULE_STATUS_MONITORED		0
 #define DRULE_STATUS_NOT_MONITORED	1
 
@@ -617,7 +619,7 @@ typedef enum
 	ZBX_HTTPITEM_TYPE_LASTSTEP
 } zbx_httpitem_type_t;
 
-/* User permitions */
+/* User permissions */
 typedef enum
 {
 	USER_TYPE_ZABBIX_USER = 1,
@@ -632,7 +634,8 @@ typedef enum
 	PERM_READ_ONLY,
 	PERM_READ_WRITE,
 	PERM_MAX = 3
-} zbx_user_permition_t;
+} zbx_user_permission_t;
+
 const char *zbx_permission_string(int perm);
 
 /* Flags */

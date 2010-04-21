@@ -111,26 +111,52 @@ include_once('include/page_header.php');
 	if($_REQUEST['config']==3){
 // IMAGES ACTIONS
 		if(isset($_REQUEST['save'])){
+
 			$file = isset($_FILES['image']) && $_FILES['image']['name'] != '' ? $_FILES['image'] : NULL;
+			if(!is_null($file)){
+				if($file['error'] != 0 || $file['size']==0){
+					error(S_INCORRECT_IMAGE);
+					return false;
+				}
+
+				if($file['size'] < ZBX_MAX_IMAGE_SIZE){
+					$image = fread(fopen($file['tmp_name'],'r'),filesize($file['tmp_name']));
+				}
+				else{
+					error(S_IMAGE_SIZE_MUST_BE_LESS_THAN_MB);
+					return false;
+				}
+			}
+
 			if(isset($_REQUEST['imageid'])){
-// UPDATE
-				DBstart();
-				$result = update_image($_REQUEST['imageid'],$_REQUEST['name'],$_REQUEST['imagetype'],$file);
-				$result = DBend($result);
+				$val = array(
+					'imageid' => $_REQUEST['imageid'],
+					'name' => $_REQUEST['name'],
+					'imagetype' => $_REQUEST['imagetype'],
+					'image' => is_null($file) ? null : $image
+				);
+				$result = CImage::update($val);
 
 				$msg_ok = S_IMAGE_UPDATED;
 				$msg_fail = S_CANNOT_UPDATE_IMAGE;
 				$audit_action = 'Image ['.$_REQUEST['name'].'] updated';
 			}
-			else {
-// ADD
+			else{
+				if(is_null($file)){
+					error(S_SELECT_IMAGE_TO_DOWNLOAD);
+					return false;
+				}
+
 				if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))){
 					access_deny();
 				}
 
-				DBstart();
-				$result = add_image($_REQUEST['name'], $_REQUEST['imagetype'], $file);
-				$result = DBend($result);
+				$val = array(
+					'name' => $_REQUEST['name'],
+					'imagetype' => $_REQUEST['imagetype'],
+					'image' => $image
+				);
+				$result = CImage::create($val);
 
 				$msg_ok = S_IMAGE_ADDED;
 				$msg_fail = S_CANNOT_ADD_IMAGE;
@@ -144,12 +170,9 @@ include_once('include/page_header.php');
 			}
 		}
 		else if(isset($_REQUEST['delete'])&&isset($_REQUEST['imageid'])) {
-// DELETE
 			$image = get_image_by_imageid($_REQUEST['imageid']);
 
-			DBstart();
-			$result = delete_image($_REQUEST['imageid']);
-			$result = DBend($result);
+			$result = CImage::delete(array('imageids' => $_REQUEST['imageid']));
 
 			show_messages($result, S_IMAGE_DELETED, S_CANNOT_DELETE_IMAGE);
 			if($result){

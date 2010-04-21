@@ -289,7 +289,7 @@ include_once('include/page_header.php');
 		}
 
 		$table->addRow(array(
-			date(S_DATE_FORMAT_YMDHMS,$row['clock']),
+			zbx_date2str(S_AUDITLOGS_RECORD_DATE_FORMAT,$row['clock']),
 			$row['alias'],
 			$row['ip'],
 			$row['resourcetype'],
@@ -310,14 +310,12 @@ include_once('include/page_header.php');
 // NAV BAR
 	$timeline = array(
 		'period' => $effectiveperiod,
-		'starttime' => $starttime,
+		'starttime' => date('YmdHi', $starttime),
 		'usertime' => null
 	);
 
 	if(isset($_REQUEST['stime'])){
-		$bstime = $_REQUEST['stime'];
-		$timeline['usertime'] = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
-		$timeline['usertime'] += $timeline['period'];
+		$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 	}
 
 	$dom_graph_id = 'events';
