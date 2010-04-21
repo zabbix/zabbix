@@ -8,7 +8,7 @@ Changes for 1.8.3
 
  - [ZBX-2312] fixed event order in "monitopring triggers" and "last 20 events" (Vedmak)
  - [ZBX-2264] added opportunity to translate class.cuser.php and config.inc.php (AM)
- - [ZBX-2132] added date format constants to locales, changed zbx_date2str function to meet regional formats and date translation
+ - [ZBX-2132] added date format constants to locales, changed zbx_date2str function to meet regional formats and date translation (AM)
  - [ZBXNEXT-311] improved speedup dbconfig synchronization (Sasha)
  - [ZBX-2329] fixed screen renaming (Aly)
  - [ZBX-2315] fixed multiple issues with JS scrollbar (Aly)
