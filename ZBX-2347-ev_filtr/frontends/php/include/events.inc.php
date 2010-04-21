@@ -273,13 +273,10 @@ function make_small_eventlist($eventid, $trigger_data){
 	$table = new CTableInfo();
 	$table->setHeader(array(S_TIME, S_STATUS, S_DURATION, S_AGE, S_ACK, S_ACTIONS));
 
-	$rows = array();
-	$count = 1;
-
 	$options = array(
 		'eventids' => $eventid, 
 		'output' => API_OUTPUT_EXTEND, 
-		'select_triggers' => API_OUTPUT_EXTEND
+//		'select_triggers' => API_OUTPUT_EXTEND
 	);
 	$curevent = CEvent::get($options);
 	$curevent = reset($curevent);
@@ -298,6 +295,7 @@ function make_small_eventlist($eventid, $trigger_data){
 	$events = CEvent::get($options);
 
 	foreach($events as $enum => $event){
+		if($event['eventid'] > $curevent['eventid']) continue;
 		$trigger = reset($event['triggers']);
 
 		$event['type'] = $trigger['type'];

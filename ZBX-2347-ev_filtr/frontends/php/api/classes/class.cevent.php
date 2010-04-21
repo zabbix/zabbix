@@ -119,8 +119,6 @@ class CEvent extends CZBXAPI{
 
 
 // editable + PERMISSION CHECK
-
-
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
 		else{
@@ -164,7 +162,6 @@ class CEvent extends CZBXAPI{
 // nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
 
-// Permission hack
 
 // groupids
 		if(!is_null($options['groupids'])){
