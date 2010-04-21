@@ -584,19 +584,6 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 // Any other unit
 //-------------------
 
-	switch($units){
-		case 'Bps':
-		case 'B':
-			$step=1024;
-			$convert = $convert?$convert:ITEM_CONVERT_NO_UNITS;
-			break;
-		case 'b':
-		case 'bps':
-			$convert = $convert?$convert:ITEM_CONVERT_NO_UNITS;
-		default:
-			$step = 1000;
-	}
-
 	if(zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS)){
 		if(abs($value) >= 1)
 			$format = '%.2f';
@@ -608,7 +595,20 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 		if(round($value, 6) == 0) $value = 0;
 		else $value = rtrim(sprintf($format,$value), '.0');
 
-		return sprintf('%s %s', $value, $units);
+		return $value;
+	}
+
+	switch($units){
+		case 'Bps':
+		case 'B':
+			$step=1024;
+			$convert = $convert?$convert:ITEM_CONVERT_NO_UNITS;
+			break;
+		case 'b':
+		case 'bps':
+			$convert = $convert?$convert:ITEM_CONVERT_NO_UNITS;
+		default:
+			$step = 1000;
 	}
 
 // INIT intervals
