@@ -366,16 +366,17 @@ static void	got_thresh_reading(ipmi_sensor_t *sensor, int err, enum ipmi_value_p
 	const char		*e_string, *s_type_string, *s_reading_type_string;
 	ipmi_entity_t		*ent;
 	const char		*percent = "", *base, *mod_use = "", *modifier = "", *rate;
-	zbx_ipmi_host_t	*h = cb_data;
+	zbx_ipmi_host_t		*h = cb_data;
 	zbx_ipmi_sensor_t	*s;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (err) {
+	if (err)
+	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() err:%d '%s'",
 				__function_name, err, strerror(err));
 
-		h->err = zbx_dsprintf(h->err, "Error 0x%x while read threshold sensor", err);
+		h->err = zbx_dsprintf(h->err, "Error 0x%x while reading threshold sensor", err);
 		h->ret = NETWORK_ERROR;
 		h->done = 1;
 		goto out;
@@ -455,8 +456,9 @@ static void	got_discrete_states(ipmi_sensor_t *sensor, int err, ipmi_states_t *s
 		return;
 	}
 
-	if (err) {
-		h->err = zbx_dsprintf(h->err, "Error 0x%x while read discrete sensor %s@[%s]:%d",
+	if (err)
+	{
+		h->err = zbx_dsprintf(h->err, "Error 0x%x while reading discrete sensor %s@[%s]:%d",
 				s->s_name, h->ip, h->port);
 		h->ret = NOTSUPPORTED;
 		h->done = 1;
@@ -543,11 +545,12 @@ static void	got_control_reading(ipmi_control_t *control, int err, int *val, void
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (err) {
+	if (err)
+	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() err:%d '%s'",
 				__function_name, err, strerror(err));
 
-		h->err = zbx_dsprintf(h->err, "Error 0x%x while read control", err);
+		h->err = zbx_dsprintf(h->err, "Error 0x%x while reading control", err);
 		h->ret = NETWORK_ERROR;
 		h->done = 1;
 		goto out;
@@ -602,7 +605,8 @@ static void	got_control_setting(ipmi_control_t *control, int err, void *cb_data)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (err) {
+	if (err)
+	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() err:%d '%s'",
 				__function_name, err, strerror(err));
 
