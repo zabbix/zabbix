@@ -97,6 +97,13 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			SET_MSG_RESULT(result, strdup("Support of IPMI parameters was not compiled in"));
 			res = NOTSUPPORTED;
 #endif
+			if (SUCCEED != res && GET_MSG_RESULT(result))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Item [%s:%s] error: %s",
+						item->host.host, item->key_orig, result->msg);
+				zabbix_syslog("Item [%s:%s] error: %s",
+						item->host.host, item->key_orig, result->msg);
+			}
 			break;
 		case ITEM_TYPE_SIMPLE:
 			alarm(CONFIG_TIMEOUT);
