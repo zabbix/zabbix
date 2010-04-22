@@ -1989,7 +1989,7 @@
 	'S_INCORRECT_TYPE_OF_ASORT_BY_KEY'=>	'Incorrect type of asort_by_key',
 	'S_DAYS_SMALL'=>			'days',
 	'S_B'=>			'B',
-	'S_N_SMALL',	'n',
+	'S_N_SMALL'=>	'n',
 	'S_NANO'=>		'Nano',
 	'S_U_MICRO'=>	'µ',
 	'S_MICRO'=>		'Micro',
@@ -2318,6 +2318,6 @@
 	'S_CANNOT_FIND_OBJECTS_WITH_NAME'=>	'Can not find objects with name',
 	'S_CANNOT_CREATE_NEW_ELEMENT'=>		'Can not create new element',
 	'S_OTHER_SMALL'=>			'other',
-	
+
 );
 ?>
