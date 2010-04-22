@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2356] fixed error when perform group actions creating item (Vedmak)
  - [ZBX-2355] fixed error when try to massupdate trigger severity (Vedmak)
  - [ZBX-2354] updated Russian translation; thanks to dotneft (Richlv)
  - [ZBX-2352] fixed typo in the default locale (Richlv)
