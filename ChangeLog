@@ -1,5 +1,7 @@
 Changes for 1.8.3
 
+ - [ZBX-633] removed linkage of OpenIPMI library to Agents in "configure" script (Sasha) 
+ - [ZBX-633] more debug information in checks_ipmi.c module (Sasha) 
  - [ZBX-2362] fixed processing of logrt[] checks under Windows (Sasha)
  - [ZBX-2356] fixed error when perform group actions creating item (Vedmak)
  - [ZBX-2355] fixed error when try to massupdate trigger severity (Vedmak)
