@@ -124,13 +124,13 @@ static int	split_filename(const char *filename, char **directory, char **format)
 #ifdef _WINDOWS
 	for (sz = strlen(filename) - 1, separator = &filename[sz]; separator >= filename; separator--)
 	{
+		if (PATH_SEPARATOR != *separator)
+			continue;
+
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() %s",
 				__function_name, filename);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() %*s",
 				__function_name, separator - filename + 1, "^");
-
-		if (PATH_SEPARATOR != *separator)
-			continue;
 
 		/* separator must be relative delimiter of the original filename */
 		if (FAIL == split_string(filename, separator, directory, format))
