@@ -306,9 +306,7 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 			__function_name, filename, mtime);
 
 	assert(logfiles);
-	assert(*logfiles);
 	assert(logfiles_alloc);
-	assert(*logfiles_alloc);
 	assert(logfiles_num);
 	assert(0 <= *logfiles_num);
 
