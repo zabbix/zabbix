@@ -299,10 +299,11 @@ static void free_logfiles(struct st_logfile **logfiles, int *logfiles_alloc, int
  ******************************************************************************/
 static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, const char *filename, const int mtime)
 {
-	int i = 0;
-	int cmp = 0;
+	const char	*__function_name = "add_logfile";
+	int		i = 0, cmp = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In add_logfile() filename: [%s] mtime: [%i]", filename, mtime);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' mtime:'%d'",
+			__function_name, filename, mtime);
 
 	assert(logfiles);
 	assert(*logfiles);
@@ -316,6 +317,9 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 	{
 		*logfiles_alloc += 64;
 		*logfiles = zbx_realloc(*logfiles, *logfiles_alloc * sizeof(struct st_logfile));
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() logfiles:%p logfiles_alloc:%d",
+				__function_name, *logfiles, *logfiles_alloc);
 	}
 
 	/*from the start go those, which mtimes are smaller*/
