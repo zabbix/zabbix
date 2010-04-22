@@ -7,11 +7,11 @@
 # If not supplied, DEFAULT-ACTION is no.
 #
 # This macro #defines HAVE_OPENIPMI if a required header files is
-# found, and sets @OPENIPMI_LDFLAGS@ and @OPENIPMI_CPPFLAGS@ to the necessary
+# found, and sets @OPENIPMI_LDFLAGS@ and @OPENIPMI_CFLAGS@ to the necessary
 # values.
 #
 # Users may override the detected values by doing something like:
-# OPENIPMI_LDFLAGS="-lOpenIPMI" OPENIPMI_CPPFLAGS="-I/usr/myinclude" ./configure
+# OPENIPMI_LDFLAGS="-lOpenIPMI" OPENIPMI_CFLAGS="-I/usr/myinclude" ./configure
 #
 # This macro is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -62,30 +62,20 @@ AC_HELP_STRING([--with-openipmi@<:@=DIR@:>@],[Include OPENIPMI support @<:@defau
        fi
 
        if test "x$found_openipmi" != "xno" ; then
-
-#               if test "x$enable_static" = "xyes"; then
-#                       OPENIPMI_LIBS=" -llber -lgnutls -lpthread -lsasl2 $OPENIPMI_LIBS"
-#               fi
-
-               OPENIPMI_CPPFLAGS=-I$OPENIPMI_INCDIR
-               OPENIPMI_LDFLAGS="-L$OPENIPMI_LIBDIR -lOpenIPMI -lOpenIPMIposix"
+               OPENIPMI_CFLAGS="-I$OPENIPMI_INCDIR"
+               OPENIPMI_LDFLAGS="-L$OPENIPMI_LIBDIR"
+               OPENIPMI_LIBS="-lOpenIPMI -lOpenIPMIposix"
 
                found_openipmi="yes"
                AC_DEFINE(HAVE_OPENIPMI,1,[Define to 1 if OPENIPMI should be enabled.])
 	       AC_DEFINE(OPENIPMI_DEPRECATED, 1, [Define to 1 if OPENIPMI depricated functions is used.])
                AC_MSG_RESULT(yes)
-
-#               if test "x$enable_static" = "xyes"; then
-#                       AC_CHECK_LIB(lber, main, , AC_MSG_ERROR([Not found LBER library]))
-#                       AC_CHECK_LIB(gnutls, main, , AC_MSG_ERROR([Not found GnuTLS library]))
-#                       AC_CHECK_LIB(pthread, main, , AC_MSG_ERROR([Not found Pthread library]))
-#                       AC_CHECK_LIB(sasl2, main, , AC_MSG_ERROR([Not found SASL2 library]))
-#               fi
 	fi
   fi
 
-  AC_SUBST(OPENIPMI_CPPFLAGS)
-  AC_SUBST(OPENIPMOPENIPMIFLAGS)
+  AC_SUBST(OPENIPMI_CFLAGS)
+  AC_SUBST(OPENIPMI_LDFLAGS)
+  AC_SUBST(OPENIPMI_LIBS)
 
   unset _libopenipmi_with
 ])dnl
