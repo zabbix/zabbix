@@ -1126,11 +1126,13 @@ require_once('include/js.inc.php');
 						$objData['src'] = $src;
 					}
 
-					$div = new CDiv();
-					$div->setAttribute('id', $containerid);
-					$item[] = $div;
+					if($default) $item = new CLink(null, $action);
+					else $item = new CDiv();
 
-					if($default && ($editmode == 1)){
+					$item->setAttribute('id', $containerid);
+
+					$item = array($item);
+					if($editmode == 1){
 						$item[] = new CLink(S_CHANGE, $action);
 					}
 
@@ -1142,10 +1144,7 @@ require_once('include/js.inc.php');
 					$dom_graph_id = 'graph_'.$screenitemid.'_'.$resourceid;
 					$containerid = 'graph_cont_'.$screenitemid.'_'.$resourceid;
 
-					$graphDims['graphHeight'] = 200;
-					$graphDims['shiftXleft'] = 100;
-					$graphDims['shiftXright'] = 50;
-					$graphDims['graphtype'] = 0;
+					$graphDims = getGraphDims();
 					$graphDims['graphHeight'] = $height;
 					$graphDims['width'] = $width;
 
@@ -1191,10 +1190,13 @@ require_once('include/js.inc.php');
 
 					$objData['src'] = $src;
 
-					$div = new CDiv();
-					$div->setAttribute('id', $containerid);
-					$item[] = $div;
-					$item[] = new CLink(S_CHANGE, $action);
+					$item = new CLink(null, $action);
+					$item->setAttribute('id', $containerid);
+
+					$item = array($item);
+					if($editmode == 1){
+						$item[] = new CLink(S_CHANGE, $action);
+					}
 					
 //					zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 					insert_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');

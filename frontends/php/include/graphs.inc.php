@@ -115,7 +115,22 @@
 	return $calc_fnc;
 	}
 
-	function getGraphDims($graphid){
+	function getGraphDims($graphid=null){
+		if(is_null($graphid)){
+			$graphDims['graphHeight'] = 200;
+			$graphDims['graphtype'] = 0;
+
+			if(GRAPH_YAXIS_SIDE_DEFAULT == 0){
+				$graphDims['shiftXleft'] = 85;
+				$graphDims['shiftXright'] = 30;
+			}
+			else{
+				$graphDims['shiftXleft'] = 30;
+				$graphDims['shiftXright'] = 85;
+			}
+
+			return $graphDims;
+		}
 // ZOOM featers
 		$graphDims = array();
 
