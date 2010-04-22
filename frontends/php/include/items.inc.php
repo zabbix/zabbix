@@ -202,7 +202,7 @@
 				' WHERE hg.groupid='.$groupid.
 					' and i.key_='.zbx_dbstr($item['key_']).
 					' and hg.hostid=i.hostid';
-		$result=DBexecute($sql);
+		$result=DBSelect($sql);
 		while($row=DBfetch($result)){
 			$item['hostid'] = $row['hostid'];
 			update_item($row['itemid'],$item);
@@ -227,7 +227,7 @@
 			' WHERE hg.groupid='.$groupid.
 				' AND i.key_='.zbx_dbstr($item["key_"]).
 				' AND hg.hostid=i.hostid';
-		$result=DBexecute($sql);
+		$result=DBSelect($sql);
 		while($row=DBfetch($result)){
 			$del_items[$row['itemid']] = $row['itemid'];
 		}
@@ -243,7 +243,7 @@
 /*	$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$params,$ipmi_sensor,$applications)
 //*/
 		$sql='SELECT hostid FROM hosts_groups WHERE groupid='.$groupid;
-		$result=DBexecute($sql);
+		$result=DBSelect($sql);
 		while($row=DBfetch($result)){
 			$item['hostid'] = $row['hostid'];
 			add_item($item);
