@@ -101,8 +101,6 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-
-
 	$options = array(
 		'groups' => array('monitored_hosts' => 1, 'with_graphs' => 1),
 		'hosts' => array('monitored_hosts' => 1, 'with_graphs' => 1),
@@ -113,82 +111,9 @@ include_once('include/page_header.php');
 	);
 	$pageFilter = new CPageFilter($options);
 
-
-$_REQUEST['graphid'] = $pageFilter->graphid;
-
-//	$_REQUEST['graphid'] = get_request('graphid', CProfile::get('web.charts.graphid', 0));
-//	if(!in_node($_REQUEST['graphid'])) $_REQUEST['graphid'] = 0;
-//
-//	if($_REQUEST['graphid']>0){
-//		$sql_from = '';
-//		$sql_where = '';
-//		if(isset($_REQUEST['groupid']) && ($_REQUEST['groupid'] > 0)){
-//			$sql_where.= ' AND hg.groupid='.$_REQUEST['groupid'];
-//		}
-//
-//		if(isset($_REQUEST['hostid']) && ($_REQUEST['hostid'] > 0)){
-//			$sql_where.= ' AND hg.hostid='.$_REQUEST['hostid'];
-//		}
-//
-//		$sql = 'SELECT DISTINCT hg.groupid, hg.hostid '.
-//				' FROM hosts_groups hg, hosts h, graphs g, graphs_items gi, items i '.
-//				' WHERE g.graphid='.$_REQUEST['graphid'].
-//					' AND gi.graphid=g.graphid '.
-//					' AND i.itemid=gi.itemid '.
-//					' AND hg.hostid=i.hostid '.
-//					$sql_where.
-//					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
-//
-//		if($host_group = DBfetch(DBselect($sql,1))){
-//			if(!isset($_REQUEST['groupid']) || !isset($_REQUEST['hostid'])){
-//				$_REQUEST['groupid'] = $host_group['groupid'];
-//				$_REQUEST['hostid'] = $host_group['hostid'];
-//			}
-//			else if((($_REQUEST['groupid']!=$host_group['groupid']) && ($_REQUEST['groupid'] > 0)) ||
-//					(($_REQUEST['hostid']!=$host_group['hostid']) && ($_REQUEST['hostid'] > 0)))
-//			{
-//				$_REQUEST['graphid'] = 0;
-//			}
-//		}
-//		else{
-//			$_REQUEST['graphid'] = 0;
-//		}
-//	}
+	$_REQUEST['graphid'] = $pageFilter->graphid;
 
 	$effectiveperiod = navigation_bar_calc('web.graph',$_REQUEST['graphid']);
-
-//	CProfile::update('web.charts.graphid',$_REQUEST['graphid'], PROFILE_TYPE_ID);
-
-
-
-
-//	if(!$PageFilter->hostsSelected){
-//		$_REQUEST['graphid'] = 0;
-//	}
-//
-//	if($_REQUEST['graphid']>0){
-//		$options = array(
-//			'graphids' => $_REQUEST['graphid'],
-//			'output' => API_OUTPUT_EXTEND,
-//			'nodeids' => get_current_nodeid(true)
-//		);
-//		$db_data = CGraph::get($options);
-//		if(empty($db_data)){
-//			CProfile::update('web.charts.graphid',0,PROFILE_TYPE_ID);
-//			access_deny();
-//		}
-//
-//		$db_data = reset($db_data);
-//		array_push($h1, $db_data['name']);
-//	}
-//	else{
-//		$_REQUEST['graphid'] = 0;
-//		array_push($h1, S_SELECT_GRAPH_TO_DISPLAY);
-//	}
-
-
-
-// HEADER
 
 	$r_form = new CForm(null, 'get');
 	$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
@@ -196,32 +121,6 @@ $_REQUEST['graphid'] = $pageFilter->graphid;
 	$r_form->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB(true)));
 	$r_form->addItem(array(SPACE.S_HOST.SPACE, $pageFilter->getHostsCB(true)));
 	$r_form->addItem(array(SPACE.S_GRAPH.SPACE, $pageFilter->getGraphsCB(true)));
-
-//	$cmbGraphs = new CComboBox('graphid',$_REQUEST['graphid'],'submit()');
-//	$cmbGraphs->addItem(0,S_SELECT_GRAPH_DOT_DOT_DOT);
-//
-//	$options = array(
-//		'extendoutput' => 1,
-//		'templated' => 0
-//	);
-//// Filtering
-//	if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
-//		$options['hostids'] = $PAGE_HOSTS['selected'];
-//	}
-//	else if(($PAGE_GROUPS['selected'] > 0) && !empty($PAGE_HOSTS['hostids'])){
-//		$options['hostids'] = $PAGE_HOSTS['hostids'];
-//	}
-//	else if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
-//		$options['groupids'] = $PAGE_GROUPS['selected'];
-//	}
-//
-//	$db_graphs = CGraph::get($options);
-//	order_result($db_graphs, 'name');
-//	foreach($db_graphs as $num => $db_graph){
-//		$cmbGraphs->addItem($db_graph['graphid'], get_node_name_by_elid($db_graph['graphid'], null, ': ').$db_graph['name']);
-//	}
-//
-//	$r_form->addItem(array(SPACE.S_GRAPH.SPACE,$cmbGraphs));
 
 ?>
 <?php
@@ -256,7 +155,6 @@ $_REQUEST['graphid'] = $pageFilter->graphid;
 		$graph_cont = new CCol();
 		$graph_cont->setAttribute('id', $containerid);
 		$table->addRow($graph_cont);
-
 
 		if(infavorites('web.favorite.graphids',$_REQUEST['graphid'],'graphid')){
 			$icon = new CDiv(SPACE,'iconminus');
