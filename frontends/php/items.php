@@ -618,7 +618,7 @@ include_once('include/page_header.php');
 				}
 			}
 
-			if($_REQUEST['action']=='delete from group'){
+			if($_REQUEST['action']=='delete FROM group'){
 
 				DBstart();
 					$result = delete_item_from_group($_REQUEST['add_groupid'],$_REQUEST['itemid']);
