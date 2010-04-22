@@ -1058,7 +1058,7 @@
 /*		$result = DBexecute('DELETE FROM items WHERE '.DBcondition('itemid',$itemids));*/
 		if($result){
 			foreach($items as $itemid => $item){
-				info(S_ITEM.SPACE."'".$hosts[$itemid]['host'].':'.$item['key_']."'".S_DELETED_SMALL);
+				info(S_ITEM.SPACE."'".$hosts[$itemid]['host'].':'.$item['key_']."'".SPACE.S_DELETED_SMALL);
 			}
 		}
 	return $result;
