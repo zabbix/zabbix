@@ -239,7 +239,7 @@
 
 	# Add Item definition to selected group
 
-	function	add_item_to_group($groupid,$item){
+	function add_item_to_group($groupid,$item){
 /*	$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$params,$ipmi_sensor,$applications)
 //*/
 		$sql='SELECT hostid FROM hosts_groups WHERE groupid='.$groupid;
