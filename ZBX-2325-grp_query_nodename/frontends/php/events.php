@@ -114,7 +114,7 @@
 	$fs_icon = new CDiv(SPACE,'fullscreen');
 	$fs_icon->setAttribute('title',$_REQUEST['fullscreen']?S_NORMAL.' '.S_VIEW:S_FULLSCREEN);
 	$fs_icon->addAction('onclick',new CJSscript("javascript: document.location = '".$url."';"));
-	$events_wdgt->addPageHeader(array(S_HISTORY_OF_EVENTS_BIG.SPACE.S_ON.SPACE, date(S_DATE_FORMAT_YMDHMS,time())), $fs_icon);
+	$events_wdgt->addPageHeader(array(S_HISTORY_OF_EVENTS_BIG.SPACE.S_ON.SPACE, zbx_date2str(S_EVENTS_DATE_FORMAT,time())), $fs_icon);
 // }}}PAGE HEADER	
 	
 	
@@ -267,7 +267,7 @@
 	}
 	else{
 		$firstEvent = reset($firstEvent);
-		$starttime = $firstEvent['clock'];		
+		$starttime = $firstEvent['clock'];
 		
 		if($source == EVENT_SOURCE_DISCOVERY){
 			$options = array(
@@ -359,7 +359,7 @@
 				if(!isset($event_data['object_data'])) continue;
 
 				$table->addRow(array(
-					date('Y.M.d H:i:s',$event_data['clock']),
+					zbx_date2str(S_EVENTS_DISCOVERY_TIME_FORMAT,$event_data['clock']),
 					$event_data['object_data']['ip'],
 					$event_data['description'],
 					new CCol(trigger_value2str($event_data['value']), get_trigger_value_style($event_data['value']))
@@ -430,6 +430,7 @@
 				$trigger = reset($event['triggers']);
 
 				$event['desc'] = expand_trigger_description_by_data($trigger);
+				$event['type'] = $trigger['type'];
 
 				$event += $trigger;
 
@@ -477,7 +478,7 @@
 										zbx_jsvalue($items).");");
 
 				$table->addRow(array(
-					new CLink(date('Y.M.d H:i:s',$event['clock']),
+					new CLink(zbx_date2str(S_EVENTS_ACTION_TIME_FORMAT,$event['clock']),
 						'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
 						'action'
 						),

@@ -454,6 +454,8 @@ var Draggable = Class.create({
 
   endDrag: function(event) {
     if(!this.dragging) return;
+	if(!event) var event = window.event;
+	
     this.stopScrolling();
     this.finishDrag(event, true);
     Event.stop(event);

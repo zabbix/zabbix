@@ -522,7 +522,7 @@ static int	trigger_dependent(zbx_uint64_t triggerid)
 
 int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, const char *reason)
 {
-	int	ret = SUCCEED;
+	int		ret = SUCCEED;
 	DB_EVENT	event;
 	int		event_last_status;
 	int		event_prev_status;
@@ -676,7 +676,6 @@ void  DBdelete_services_by_triggerid(zbx_uint64_t triggerid)
 
 	while((row=DBfetch(result)))
 	{
-/*		serviceid=atoi(row[0]);*/
 		ZBX_STR2UINT64(serviceid, row[0]);
 		DBdelete_service(serviceid);
 	}
@@ -696,8 +695,6 @@ void  DBdelete_trigger(zbx_uint64_t triggerid)
 	DBexecute("delete from events where object=%d AND objectid=" ZBX_FS_UI64,
 		EVENT_OBJECT_TRIGGER,
 		triggerid);
-/*	zbx_snprintf(sql,sizeof(sql),"delete from actions where triggerid=%d and scope=%d", triggerid, ACTION_SCOPE_TRIGGER);
-	DBexecute(sql);*/
 
 	DBdelete_services_by_triggerid(triggerid);
 
@@ -818,8 +815,6 @@ int	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
 		value_avg=atof(row[2]);
 		value_max=atof(row[3]);
 		if(value<value_min)	value_min=value;
-/* Unfortunate mistake... */
-/*		if(value>value_avg)	value_max=value;*/
 		if(value>value_max)	value_max=value;
 		value_avg=(num*value_avg+value)/(num+1);
 		num++;
@@ -1224,11 +1219,14 @@ int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64
 	DBexecute("delete from escalations"
 			" where actionid=" ZBX_FS_UI64
 				" and triggerid=" ZBX_FS_UI64
-				" and (esc_step<>0 or (status<>%d and status<>%d))",
+				" and status not in (%d,%d,%d)"
+				" and (esc_step<>0 or status<>%d)",
 			actionid,
 			triggerid,
-			ESCALATION_STATUS_ACTIVE,
-			ESCALATION_STATUS_SUPERSEDED);
+			ESCALATION_STATUS_RECOVERY,
+			ESCALATION_STATUS_SUPERSEDED_ACTIVE,
+			ESCALATION_STATUS_SUPERSEDED_RECOVERY,
+			ESCALATION_STATUS_ACTIVE);
 
 	/* ...except we should execute an escalation at least once before it is removed */
 	DBexecute("update escalations"
@@ -1237,7 +1235,7 @@ int	DBstart_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64
 				" and triggerid=" ZBX_FS_UI64
 				" and esc_step=0"
 				" and status=%d",
-			ESCALATION_STATUS_SUPERSEDED,
+			ESCALATION_STATUS_SUPERSEDED_ACTIVE,
 			actionid,
 			triggerid,
 			ESCALATION_STATUS_ACTIVE);
@@ -1260,23 +1258,38 @@ int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	escalationid;
+	int		old_status, esc_step;
+	int		new_status;
 	char		sql[256];
 
 	/* stopping only last active escalation */
 	zbx_snprintf(sql, sizeof(sql),
-			"select escalationid"
+			"select escalationid,esc_step,status"
 			" from escalations"
 			" where actionid=" ZBX_FS_UI64
 				" and triggerid=" ZBX_FS_UI64
+				" and status not in (%d,%d)"
 			" order by escalationid desc",
 			actionid,
-			triggerid);
+			triggerid,
+			ESCALATION_STATUS_RECOVERY,
+			ESCALATION_STATUS_SUPERSEDED_RECOVERY);
 
 	result = DBselectN(sql, 1);
 
 	if (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(escalationid, row[0]);
+		esc_step = atoi(row[1]);
+		old_status = atoi(row[2]);
+
+		if ((0 == esc_step && ESCALATION_STATUS_ACTIVE == old_status) ||
+				ESCALATION_STATUS_SUPERSEDED_ACTIVE == old_status)
+		{
+			new_status = ESCALATION_STATUS_SUPERSEDED_RECOVERY;
+		}
+		else
+			new_status = ESCALATION_STATUS_RECOVERY;
 
 		DBexecute("update escalations"
 				" set r_eventid=" ZBX_FS_UI64 ","
@@ -1284,7 +1297,7 @@ int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_
 					"nextcheck=0"
 				" where escalationid=" ZBX_FS_UI64,
 				eventid,
-				ESCALATION_STATUS_RECOVERY,
+				new_status,
 				escalationid);
 	}
 	DBfree_result(result);

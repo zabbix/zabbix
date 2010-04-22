@@ -146,14 +146,13 @@ ZBX_DC_HOST
 	zbx_uint64_t	hostid;
 	unsigned char 	poller_type;
 	unsigned char 	poller_num;
-	int		nextcheck_;
+	int		nextcheck;
 	zbx_uint64_t	proxy_hostid;
 	char		host[HOST_HOST_LEN_MAX];
 	unsigned char	useip;
 	char		ip[HOST_IP_LEN_MAX];
 	char		dns[HOST_DNS_LEN_MAX];
 	unsigned short	port;
-	unsigned char	status;
 	unsigned char	maintenance_status;
 	unsigned char	maintenance_type;
 	int		maintenance_from;
@@ -365,13 +364,13 @@ static int	DCget_idxhost02_nearestindex(unsigned char poller_type, unsigned char
 
 		dc_host = &config->hosts[config->idxhost02[index]];
 		if (dc_host->poller_type == poller_type && dc_host->poller_num == poller_num &&
-				dc_host->nextcheck_ == nextcheck)
+				dc_host->nextcheck == nextcheck)
 		{
 			while (index > 0)
 			{
 				dc_host = &config->hosts[config->idxhost02[index - 1]];
 				if (dc_host->poller_type != poller_type || dc_host->poller_num != poller_num ||
-						dc_host->nextcheck_ != nextcheck)
+						dc_host->nextcheck != nextcheck)
 					break;
 				index--;
 			}
@@ -383,14 +382,14 @@ static int	DCget_idxhost02_nearestindex(unsigned char poller_type, unsigned char
 					(dc_host->poller_type == poller_type &&
 					 dc_host->poller_num < poller_num) ||
 					(dc_host->poller_type == poller_type &&
-					 dc_host->poller_num == poller_num && dc_host->nextcheck_ < nextcheck))
+					 dc_host->poller_num == poller_num && dc_host->nextcheck < nextcheck))
 				index++;
 			return index;
 		}
 		else if (dc_host->poller_type < poller_type ||
 				(dc_host->poller_type == poller_type && dc_host->poller_num < poller_num) ||
 				(dc_host->poller_type == poller_type && dc_host->poller_num == poller_num &&
-				 dc_host->nextcheck_ < nextcheck))
+				 dc_host->nextcheck < nextcheck))
 			first_index = index + 1;
 		else
 			last_index = index;
@@ -482,231 +481,20 @@ static void	DCcheck_freemem(size_t sz)
 		zbx_error("ERROR: Configuration buffer is too small. Please increase CacheSize parameter.");
 		exit(FAIL);
 	}
-}
-
-static void	DCallocate_idxhost01(int *index, int remove_index)
-{
-	size_t	sz;
-	void	*src, *dst;
-
-	if (config->idxhost01_num == config->idxhost01_alloc)
-	{
-		sz = sizeof(int) * HOST_ALLOC_STEP;
-
-		DCcheck_freemem(sz);
-
-		dst = (void *)config->idxhost02 + sz;
-		memmove(dst, config->idxhost02, sizeof(int) * config->idxhost02_num);
-		config->idxhost02 = (int *)dst;
-
-		config->idxhost01_alloc += HOST_ALLOC_STEP;
-		config->free_mem -= sz;
-	}
-
-	if (-1 == remove_index)
-	{
-		sz = sizeof(int) * (config->idxhost01_num - *index);
-		dst = &config->idxhost01[*index + 1];
-		src = &config->idxhost01[*index];
-		config->idxhost01_num++;
-	}
-	else
-	{
-		if (*index > remove_index)
-		{
-			(*index)--;
-			sz = sizeof(int) * (*index - remove_index);
-			src = &config->idxhost01[remove_index + 1];
-			dst = &config->idxhost01[remove_index];
-		}
-		else
-		{
-			sz = sizeof(int) * (remove_index - *index);
-			src = &config->idxhost01[*index];
-			dst = &config->idxhost01[*index + 1];
-		}
-	}
-
-	if (0 != sz)
-		memmove(dst, src, sz);
-}
-
-static void	DCallocate_idxhost02(int *index, int remove_index)
-{
-	size_t	sz;
-	void	*src, *dst;
-
-	if (config->idxhost02_num == config->idxhost02_alloc)
-	{
-		sz = sizeof(int) * HOST_ALLOC_STEP;
-
-		DCcheck_freemem(sz);
-
-		config->idxhost02_alloc += HOST_ALLOC_STEP;
-		config->free_mem -= sz;
-	}
-
-	if (-1 == remove_index)
-	{
-		sz = sizeof(int) * (config->idxhost02_num - *index);
-		src = &config->idxhost02[*index];
-		dst = &config->idxhost02[*index + 1];
-		config->idxhost02_num++;
-	}
-	else
-	{
-		if (*index > remove_index)
-		{
-			(*index)--;
-			sz = sizeof(int) * (*index - remove_index);
-			src = &config->idxhost02[remove_index + 1];
-			dst = &config->idxhost02[remove_index];
-		}
-		else
-		{
-			sz = sizeof(int) * (remove_index - *index);
-			src = &config->idxhost02[*index];
-			dst = &config->idxhost02[*index + 1];
-		}
-	}
-
-	if (0 != sz)
-		memmove(dst, src, sz);
-}
-
-static void	DCallocate_idxitem01(int *index, int remove_index)
-{
-	size_t	sz;
-	void	*src, *dst;
-
-	if (config->idxitem01_num == config->idxitem01_alloc)
-	{
-		sz = sizeof(int) * ITEM_ALLOC_STEP;
-
-		DCcheck_freemem(sz);
-
-		dst = (void *)config->idxhost02 + sz;
-		memmove(dst, config->idxhost02, sizeof(int) * config->idxhost02_num);
-		config->idxhost02 = (int *)dst;
-
-		dst = (void *)config->idxhost01 + sz;
-		memmove(dst, config->idxhost01, sizeof(int) * config->idxhost01_num);
-		config->idxhost01 = (int *)dst;
-
-		dst = (void *)config->ipmihosts + sz;
-		memmove(dst, config->ipmihosts, sizeof(ZBX_DC_IPMIHOST) * config->ipmihosts_num);
-		config->ipmihosts = (ZBX_DC_IPMIHOST *)dst;
-
-		dst = (void *)config->hosts + sz;
-		memmove(dst, config->hosts, sizeof(ZBX_DC_HOST) * config->hosts_num);
-		config->hosts = (ZBX_DC_HOST *)dst;
-
-		dst = (void *)config->idxitem02 + sz;
-		memmove(dst, config->idxitem02, sizeof(int) * config->idxitem02_num);
-		config->idxitem02 = (int *)dst;
-
-		config->idxitem01_alloc += ITEM_ALLOC_STEP;
-		config->free_mem -= sz;
-	}
-
-	if (-1 == remove_index)
-	{
-		sz = sizeof(int) * (config->idxitem01_num - *index);
-		src = &config->idxitem01[*index];
-		dst = &config->idxitem01[*index + 1];
-		config->idxitem01_num++;
-	}
-	else
-	{
-		if (*index > remove_index)
-		{
-			(*index)--;
-			sz = sizeof(int) * (*index - remove_index);
-			src = &config->idxitem01[remove_index + 1];
-			dst = &config->idxitem01[remove_index];
-		}
-		else
-		{
-			sz = sizeof(int) * (remove_index - *index);
-			src = &config->idxitem01[*index];
-			dst = &config->idxitem01[*index + 1];
-		}
-	}
-
-	if (0 != sz)
-		memmove(dst, src, sz);
-}
-
-static void	DCallocate_idxitem02(int *index, int remove_index)
-{
-	size_t	sz;
-	void	*src, *dst;
-
-	if (config->idxitem02_num == config->idxitem02_alloc)
-	{
-		sz = sizeof(int) * ITEM_ALLOC_STEP;
-
-		DCcheck_freemem(sz);
-
-		dst = (void *)config->idxhost02 + sz;
-		memmove(dst, config->idxhost02, sizeof(int) * config->idxhost02_num);
-		config->idxhost02 = (int *)dst;
-
-		dst = (void *)config->idxhost01 + sz;
-		memmove(dst, config->idxhost01, sizeof(int) * config->idxhost01_num);
-		config->idxhost01 = (int *)dst;
-
-		dst = (void *)config->ipmihosts + sz;
-		memmove(dst, config->ipmihosts, sizeof(ZBX_DC_IPMIHOST) * config->ipmihosts_num);
-		config->ipmihosts = (ZBX_DC_IPMIHOST *)dst;
-
-		dst = (void *)config->hosts + sz;
-		memmove(dst, config->hosts, sizeof(ZBX_DC_HOST) * config->hosts_num);
-		config->hosts = (ZBX_DC_HOST *)dst;
-
-		config->idxitem02_alloc += ITEM_ALLOC_STEP;
-		config->free_mem -= sz;
-	}
-
-	if (-1 == remove_index)
-	{
-		sz = sizeof(int) * (config->idxitem02_num - *index);
-		src = &config->idxitem02[*index];
-		dst = &config->idxitem02[*index + 1];
-		config->idxitem02_num++;
-	}
-	else
-	{
-		if (*index > remove_index)
-		{
-			(*index)--;
-			sz = sizeof(int) * (*index - remove_index);
-			src = &config->idxitem02[remove_index + 1];
-			dst = &config->idxitem02[remove_index];
-		}
-		else
-		{
-			sz = sizeof(int) * (remove_index - *index);
-			src = &config->idxitem02[*index];
-			dst = &config->idxitem02[*index + 1];
-		}
-	}
-
-	if (0 != sz)
-		memmove(dst, src, sz);
+	config->free_mem -= sz;
 }
 
 static void	DCremove_element(void *p, int *num, size_t sz, int index)
 {
-	size_t	m_sz;
-
 	(*num)--;
-	if (0 != (m_sz = sz * (*num - index)))
-	{
-		p = (char *)p + index * sz;
-		memmove(p, (char *)p + sz, m_sz);
-	}
+	p = (char *)p + index * sz;
+	memmove(p, (char *)p + sz, sz * (*num - index));
 }
+
+static void	DCallocate_idxitem01(int *index, int remove_index);
+static void	DCallocate_idxitem02(int *index, int remove_index);
+static void	DCallocate_idxhost01(int *index, int remove_index);
+static void	DCallocate_idxhost02(int *index, int remove_index);
 
 static void	DCupdate_idxhost01(int host_index, zbx_uint64_t *old_proxy_hostid, const char *old_host,
 		zbx_uint64_t *new_proxy_hostid, const char *new_host)
@@ -833,90 +621,40 @@ static void	DCupdate_idxitem02(int item_index, unsigned char *old_poller_type,
 static void	DCallocate_item(int index)
 {
 	size_t	sz;
-	void	*dst;
-	int	i;
 
 	if (config->items_num == config->items_alloc)
 	{
+		char	*src, *dst;
+
 		sz = sizeof(ZBX_DC_ITEM) * ITEM_ALLOC_STEP;
 
 		DCcheck_freemem(sz);
 
-		dst = (void *)config->idxhost02 + sz;
-		memmove(dst, config->idxhost02, sizeof(int) * config->idxhost02_num);
-		config->idxhost02 = (int *)dst;
-
-		dst = (void *)config->idxhost01 + sz;
-		memmove(dst, config->idxhost01, sizeof(int) * config->idxhost01_num);
-		config->idxhost01 = (int *)dst;
-
-		dst = (void *)config->ipmihosts + sz;
-		memmove(dst, config->ipmihosts, sizeof(ZBX_DC_IPMIHOST) * config->ipmihosts_num);
-		config->ipmihosts = (ZBX_DC_IPMIHOST *)dst;
-
-		dst = (void *)config->hosts + sz;
-		memmove(dst, config->hosts, sizeof(ZBX_DC_HOST) * config->hosts_num);
-		config->hosts = (ZBX_DC_HOST *)dst;
-
-		dst = (void *)config->idxitem02 + sz;
-		memmove(dst, config->idxitem02, sizeof(int) * config->idxitem02_num);
-		config->idxitem02 = (int *)dst;
-
-		dst = (void *)config->idxitem01 + sz;
-		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
-		config->idxitem01 = (int *)dst;
-
-		dst = (void *)config->calcitems + sz;
-		memmove(dst, config->calcitems, sizeof(ZBX_DC_CALCITEM) * config->calcitems_num);
-		config->calcitems = (ZBX_DC_CALCITEM *)dst;
-
-		dst = (void *)config->telnetitems + sz;
-		memmove(dst, config->telnetitems, sizeof(ZBX_DC_TELNETITEM) * config->telnetitems_num);
-		config->telnetitems = (ZBX_DC_TELNETITEM *)dst;
-
-		dst = (void *)config->sshitems + sz;
-		memmove(dst, config->sshitems, sizeof(ZBX_DC_SSHITEM) * config->sshitems_num);
-		config->sshitems = (ZBX_DC_SSHITEM *)dst;
-
-		dst = (void *)config->dbitems + sz;
-		memmove(dst, config->dbitems, sizeof(ZBX_DC_DBITEM) * config->dbitems_num);
-		config->dbitems = (ZBX_DC_DBITEM *)dst;
-
-		dst = (void *)config->logitems + sz;
-		memmove(dst, config->logitems, sizeof(ZBX_DC_LOGITEM) * config->logitems_num);
-		config->logitems = (ZBX_DC_LOGITEM *)dst;
-
-		dst = (void *)config->trapitems + sz;
-		memmove(dst, config->trapitems, sizeof(ZBX_DC_TRAPITEM) * config->trapitems_num);
-		config->trapitems = (ZBX_DC_TRAPITEM *)dst;
-
-		dst = (void *)config->flexitems + sz;
-		memmove(dst, config->flexitems, sizeof(ZBX_DC_FLEXITEM) * config->flexitems_num);
-		config->flexitems = (ZBX_DC_FLEXITEM *)dst;
-
-		dst = (void *)config->ipmiitems + sz;
-		memmove(dst, config->ipmiitems, sizeof(ZBX_DC_IPMIITEM) * config->ipmiitems_num);
-		config->ipmiitems = (ZBX_DC_IPMIITEM *)dst;
-
-		dst = (void *)config->snmpitems + sz;
-		memmove(dst, config->snmpitems, sizeof(ZBX_DC_SNMPITEM) * config->snmpitems_num);
-		config->snmpitems = (ZBX_DC_SNMPITEM *)dst;
-
 		config->items_alloc += ITEM_ALLOC_STEP;
-		config->free_mem -= sz;
+
+		src = (char *)config->snmpitems;
+		dst = (char *)config->snmpitems + sz;
+		config->snmpitems = (void *)((char *)config->snmpitems + sz);
+		config->ipmiitems = (void *)((char *)config->ipmiitems + sz);
+		config->flexitems = (void *)((char *)config->flexitems + sz);
+		config->trapitems = (void *)((char *)config->trapitems + sz);
+		config->logitems = (void *)((char *)config->logitems + sz);
+		config->dbitems = (void *)((char *)config->dbitems + sz);
+		config->sshitems = (void *)((char *)config->sshitems + sz);
+		config->telnetitems = (void *)((char *)config->telnetitems + sz);
+		config->calcitems = (void *)((char *)config->calcitems + sz);
+		config->idxitem01 = (void *)((char *)config->idxitem01 + sz);
+		config->idxitem02 = (void *)((char *)config->idxitem02 + sz);
+		config->hosts = (void *)((char *)config->hosts + sz);
+		config->ipmihosts = (void *)((char *)config->ipmihosts + sz);
+		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
+
+		if (0 != (sz = ((char *)config->idxhost02 - src) +
+					sizeof(int) * config->idxhost02_num))
+			memmove(dst, src, sz);
 	}
 
-	/* update records in 'idxitem01' index */
-	for (i = 0; i < config->idxitem01_num; i++)
-		if (config->idxitem01[i] >= index)
-			config->idxitem01[i]++;
-
-	/* update records in 'idxitem02' index */
-	for (i = 0; i < config->idxitem02_num; i++)
-		if (config->idxitem02[i] >= index)
-			config->idxitem02[i]++;
-
-	/* allocate record */
 	if (0 != (sz = sizeof(ZBX_DC_ITEM) * (config->items_num - index)))
 		memmove(&config->items[index + 1], &config->items[index], sz);
 	config->items_num++;
@@ -925,72 +663,37 @@ static void	DCallocate_item(int index)
 static void	DCallocate_snmpitem(int index)
 {
 	size_t	sz;
-	void	*dst;
 
 	if (config->snmpitems_num == config->snmpitems_alloc)
 	{
+		char	*src, *dst;
+
 		sz = sizeof(ZBX_DC_SNMPITEM) * SNMPITEM_ALLOC_STEP;
 
 		DCcheck_freemem(sz);
 
-		dst = (void *)config->idxhost02 + sz;
-		memmove(dst, config->idxhost02, sizeof(int) * config->idxhost02_num);
-		config->idxhost02 = (int *)dst;
-
-		dst = (void *)config->idxhost01 + sz;
-		memmove(dst, config->idxhost01, sizeof(int) * config->idxhost01_num);
-		config->idxhost01 = (int *)dst;
-
-		dst = (void *)config->ipmihosts + sz;
-		memmove(dst, config->ipmihosts, sizeof(ZBX_DC_IPMIHOST) * config->ipmihosts_num);
-		config->ipmihosts = (ZBX_DC_IPMIHOST *)dst;
-
-		dst = (void *)config->hosts + sz;
-		memmove(dst, config->hosts, sizeof(ZBX_DC_HOST) * config->hosts_num);
-		config->hosts = (ZBX_DC_HOST *)dst;
-
-		dst = (void *)config->idxitem02 + sz;
-		memmove(dst, config->idxitem02, sizeof(int) * config->idxitem02_num);
-		config->idxitem02 = (int *)dst;
-
-		dst = (void *)config->idxitem01 + sz;
-		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
-		config->idxitem01 = (int *)dst;
-
-		dst = (void *)config->calcitems + sz;
-		memmove(dst, config->calcitems, sizeof(ZBX_DC_CALCITEM) * config->calcitems_num);
-		config->calcitems = (ZBX_DC_CALCITEM *)dst;
-
-		dst = (void *)config->telnetitems + sz;
-		memmove(dst, config->telnetitems, sizeof(ZBX_DC_TELNETITEM) * config->telnetitems_num);
-		config->telnetitems = (ZBX_DC_TELNETITEM *)dst;
-
-		dst = (void *)config->sshitems + sz;
-		memmove(dst, config->sshitems, sizeof(ZBX_DC_SSHITEM) * config->sshitems_num);
-		config->sshitems = (ZBX_DC_SSHITEM *)dst;
-
-		dst = (void *)config->dbitems + sz;
-		memmove(dst, config->dbitems, sizeof(ZBX_DC_DBITEM) * config->dbitems_num);
-		config->dbitems = (ZBX_DC_DBITEM *)dst;
-
-		dst = (void *)config->logitems + sz;
-		memmove(dst, config->logitems, sizeof(ZBX_DC_LOGITEM) * config->logitems_num);
-		config->logitems = (ZBX_DC_LOGITEM *)dst;
-
-		dst = (void *)config->trapitems + sz;
-		memmove(dst, config->trapitems, sizeof(ZBX_DC_TRAPITEM) * config->trapitems_num);
-		config->trapitems = (ZBX_DC_TRAPITEM *)dst;
-
-		dst = (void *)config->flexitems + sz;
-		memmove(dst, config->flexitems, sizeof(ZBX_DC_FLEXITEM) * config->flexitems_num);
-		config->flexitems = (ZBX_DC_FLEXITEM *)dst;
-
-		dst = (void *)config->ipmiitems + sz;
-		memmove(dst, config->ipmiitems, sizeof(ZBX_DC_IPMIITEM) * config->ipmiitems_num);
-		config->ipmiitems = (ZBX_DC_IPMIITEM *)dst;
-
 		config->snmpitems_alloc += SNMPITEM_ALLOC_STEP;
-		config->free_mem -= sz;
+
+		src = (char *)config->ipmiitems;
+		dst = (char *)config->ipmiitems + sz;
+		config->ipmiitems = (void *)((char *)config->ipmiitems + sz);
+		config->flexitems = (void *)((char *)config->flexitems + sz);
+		config->trapitems = (void *)((char *)config->trapitems + sz);
+		config->logitems = (void *)((char *)config->logitems + sz);
+		config->dbitems = (void *)((char *)config->dbitems + sz);
+		config->sshitems = (void *)((char *)config->sshitems + sz);
+		config->telnetitems = (void *)((char *)config->telnetitems + sz);
+		config->calcitems = (void *)((char *)config->calcitems + sz);
+		config->idxitem01 = (void *)((char *)config->idxitem01 + sz);
+		config->idxitem02 = (void *)((char *)config->idxitem02 + sz);
+		config->hosts = (void *)((char *)config->hosts + sz);
+		config->ipmihosts = (void *)((char *)config->ipmihosts + sz);
+		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
+
+		if (0 != (sz = ((char *)config->idxhost02 - src) +
+					sizeof(int) * config->idxhost02_num))
+			memmove(dst, src, sz);
 	}
 
 	if (0 != (sz = sizeof(ZBX_DC_SNMPITEM) * (config->snmpitems_num - index)))
@@ -1001,68 +704,36 @@ static void	DCallocate_snmpitem(int index)
 static void	DCallocate_ipmiitem(int index)
 {
 	size_t	sz;
-	void	*dst;
 
 	if (config->ipmiitems_num == config->ipmiitems_alloc)
 	{
+		char	*src, *dst;
+
 		sz = sizeof(ZBX_DC_IPMIITEM) * IPMIITEM_ALLOC_STEP;
 
 		DCcheck_freemem(sz);
 
-		dst = (void *)config->idxhost02 + sz;
-		memmove(dst, config->idxhost02, sizeof(int) * config->idxhost02_num);
-		config->idxhost02 = (int *)dst;
-
-		dst = (void *)config->idxhost01 + sz;
-		memmove(dst, config->idxhost01, sizeof(int) * config->idxhost01_num);
-		config->idxhost01 = (int *)dst;
-
-		dst = (void *)config->ipmihosts + sz;
-		memmove(dst, config->ipmihosts, sizeof(ZBX_DC_IPMIHOST) * config->ipmihosts_num);
-		config->ipmihosts = (ZBX_DC_IPMIHOST *)dst;
-
-		dst = (void *)config->hosts + sz;
-		memmove(dst, config->hosts, sizeof(ZBX_DC_HOST) * config->hosts_num);
-		config->hosts = (ZBX_DC_HOST *)dst;
-
-		dst = (void *)config->idxitem02 + sz;
-		memmove(dst, config->idxitem02, sizeof(int) * config->idxitem02_num);
-		config->idxitem02 = (int *)dst;
-
-		dst = (void *)config->idxitem01 + sz;
-		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
-		config->idxitem01 = (int *)dst;
-
-		dst = (void *)config->calcitems + sz;
-		memmove(dst, config->calcitems, sizeof(ZBX_DC_CALCITEM) * config->calcitems_num);
-		config->calcitems = (ZBX_DC_CALCITEM *)dst;
-
-		dst = (void *)config->telnetitems + sz;
-		memmove(dst, config->telnetitems, sizeof(ZBX_DC_TELNETITEM) * config->telnetitems_num);
-		config->telnetitems = (ZBX_DC_TELNETITEM *)dst;
-
-		dst = (void *)config->sshitems + sz;
-		memmove(dst, config->sshitems, sizeof(ZBX_DC_SSHITEM) * config->sshitems_num);
-		config->sshitems = (ZBX_DC_SSHITEM *)dst;
-
-		dst = (void *)config->dbitems + sz;
-		memmove(dst, config->dbitems, sizeof(ZBX_DC_DBITEM) * config->dbitems_num);
-		config->dbitems = (ZBX_DC_DBITEM *)dst;
-
-		dst = (void *)config->logitems + sz;
-		memmove(dst, config->logitems, sizeof(ZBX_DC_LOGITEM) * config->logitems_num);
-		config->logitems = (ZBX_DC_LOGITEM *)dst;
-
-		dst = (void *)config->trapitems + sz;
-		memmove(dst, config->trapitems, sizeof(ZBX_DC_TRAPITEM) * config->trapitems_num);
-		config->trapitems = (ZBX_DC_TRAPITEM *)dst;
-
-		dst = (void *)config->flexitems + sz;
-		memmove(dst, config->flexitems, sizeof(ZBX_DC_FLEXITEM) * config->flexitems_num);
-		config->flexitems = (ZBX_DC_FLEXITEM *)dst;
-
 		config->ipmiitems_alloc += IPMIITEM_ALLOC_STEP;
-		config->free_mem -= sz;
+
+		src = (char *)config->flexitems;
+		dst = (char *)config->flexitems + sz;
+		config->flexitems = (void *)((char *)config->flexitems + sz);
+		config->trapitems = (void *)((char *)config->trapitems + sz);
+		config->logitems = (void *)((char *)config->logitems + sz);
+		config->dbitems = (void *)((char *)config->dbitems + sz);
+		config->sshitems = (void *)((char *)config->sshitems + sz);
+		config->telnetitems = (void *)((char *)config->telnetitems + sz);
+		config->calcitems = (void *)((char *)config->calcitems + sz);
+		config->idxitem01 = (void *)((char *)config->idxitem01 + sz);
+		config->idxitem02 = (void *)((char *)config->idxitem02 + sz);
+		config->hosts = (void *)((char *)config->hosts + sz);
+		config->ipmihosts = (void *)((char *)config->ipmihosts + sz);
+		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
+
+		if (0 != (sz = ((char *)config->idxhost02 - src) +
+					sizeof(int) * config->idxhost02_num))
+			memmove(dst, src, sz);
 	}
 
 	if (0 != (sz = sizeof(ZBX_DC_IPMIITEM) * (config->ipmiitems_num - index)))
@@ -1073,64 +744,35 @@ static void	DCallocate_ipmiitem(int index)
 static void	DCallocate_flexitem(int index)
 {
 	size_t	sz;
-	void	*dst;
 
 	if (config->flexitems_num == config->flexitems_alloc)
 	{
+		char	*src, *dst;
+
 		sz = sizeof(ZBX_DC_FLEXITEM) * FLEXITEM_ALLOC_STEP;
 
 		DCcheck_freemem(sz);
 
-		dst = (void *)config->idxhost02 + sz;
-		memmove(dst, config->idxhost02, sizeof(int) * config->idxhost02_num);
-		config->idxhost02 = (int *)dst;
-
-		dst = (void *)config->idxhost01 + sz;
-		memmove(dst, config->idxhost01, sizeof(int) * config->idxhost01_num);
-		config->idxhost01 = (int *)dst;
-
-		dst = (void *)config->ipmihosts + sz;
-		memmove(dst, config->ipmihosts, sizeof(ZBX_DC_IPMIHOST) * config->ipmihosts_num);
-		config->ipmihosts = (ZBX_DC_IPMIHOST *)dst;
-
-		dst = (void *)config->hosts + sz;
-		memmove(dst, config->hosts, sizeof(ZBX_DC_HOST) * config->hosts_num);
-		config->hosts = (ZBX_DC_HOST *)dst;
-
-		dst = (void *)config->idxitem02 + sz;
-		memmove(dst, config->idxitem02, sizeof(int) * config->idxitem02_num);
-		config->idxitem02 = (int *)dst;
-
-		dst = (void *)config->idxitem01 + sz;
-		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
-		config->idxitem01 = (int *)dst;
-
-		dst = (void *)config->calcitems + sz;
-		memmove(dst, config->calcitems, sizeof(ZBX_DC_CALCITEM) * config->calcitems_num);
-		config->calcitems = (ZBX_DC_CALCITEM *)dst;
-
-		dst = (void *)config->telnetitems + sz;
-		memmove(dst, config->telnetitems, sizeof(ZBX_DC_TELNETITEM) * config->telnetitems_num);
-		config->telnetitems = (ZBX_DC_TELNETITEM *)dst;
-
-		dst = (void *)config->sshitems + sz;
-		memmove(dst, config->sshitems, sizeof(ZBX_DC_SSHITEM) * config->sshitems_num);
-		config->sshitems = (ZBX_DC_SSHITEM *)dst;
-
-		dst = (void *)config->dbitems + sz;
-		memmove(dst, config->dbitems, sizeof(ZBX_DC_DBITEM) * config->dbitems_num);
-		config->dbitems = (ZBX_DC_DBITEM *)dst;
-
-		dst = (void *)config->logitems + sz;
-		memmove(dst, config->logitems, sizeof(ZBX_DC_LOGITEM) * config->logitems_num);
-		config->logitems = (ZBX_DC_LOGITEM *)dst;
-
-		dst = (void *)config->trapitems + sz;
-		memmove(dst, config->trapitems, sizeof(ZBX_DC_TRAPITEM) * config->trapitems_num);
-		config->trapitems = (ZBX_DC_TRAPITEM *)dst;
-
 		config->flexitems_alloc += FLEXITEM_ALLOC_STEP;
-		config->free_mem -= sz;
+
+		src = (char *)config->trapitems;
+		dst = (char *)config->trapitems + sz;
+		config->trapitems = (void *)((char *)config->trapitems + sz);
+		config->logitems = (void *)((char *)config->logitems + sz);
+		config->dbitems = (void *)((char *)config->dbitems + sz);
+		config->sshitems = (void *)((char *)config->sshitems + sz);
+		config->telnetitems = (void *)((char *)config->telnetitems + sz);
+		config->calcitems = (void *)((char *)config->calcitems + sz);
+		config->idxitem01 = (void *)((char *)config->idxitem01 + sz);
+		config->idxitem02 = (void *)((char *)config->idxitem02 + sz);
+		config->hosts = (void *)((char *)config->hosts + sz);
+		config->ipmihosts = (void *)((char *)config->ipmihosts + sz);
+		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
+
+		if (0 != (sz = ((char *)config->idxhost02 - src) +
+					sizeof(int) * config->idxhost02_num))
+			memmove(dst, src, sz);
 	}
 
 	if (0 != (sz = sizeof(ZBX_DC_FLEXITEM) * (config->flexitems_num - index)))
@@ -1141,60 +783,34 @@ static void	DCallocate_flexitem(int index)
 static void	DCallocate_trapitem(int index)
 {
 	size_t	sz;
-	void	*dst;
 
 	if (config->trapitems_num == config->trapitems_alloc)
 	{
+		char	*src, *dst;
+
 		sz = sizeof(ZBX_DC_TRAPITEM) * TRAPITEM_ALLOC_STEP;
 
 		DCcheck_freemem(sz);
 
-		dst = (void *)config->idxhost02 + sz;
-		memmove(dst, config->idxhost02, sizeof(int) * config->idxhost02_num);
-		config->idxhost02 = (int *)dst;
-
-		dst = (void *)config->idxhost01 + sz;
-		memmove(dst, config->idxhost01, sizeof(int) * config->idxhost01_num);
-		config->idxhost01 = (int *)dst;
-
-		dst = (void *)config->ipmihosts + sz;
-		memmove(dst, config->ipmihosts, sizeof(ZBX_DC_IPMIHOST) * config->ipmihosts_num);
-		config->ipmihosts = (ZBX_DC_IPMIHOST *)dst;
-
-		dst = (void *)config->hosts + sz;
-		memmove(dst, config->hosts, sizeof(ZBX_DC_HOST) * config->hosts_num);
-		config->hosts = (ZBX_DC_HOST *)dst;
-
-		dst = (void *)config->idxitem02 + sz;
-		memmove(dst, config->idxitem02, sizeof(int) * config->idxitem02_num);
-		config->idxitem02 = (int *)dst;
-
-		dst = (void *)config->idxitem01 + sz;
-		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
-		config->idxitem01 = (int *)dst;
-
-		dst = (void *)config->calcitems + sz;
-		memmove(dst, config->calcitems, sizeof(ZBX_DC_CALCITEM) * config->calcitems_num);
-		config->calcitems = (ZBX_DC_CALCITEM *)dst;
-
-		dst = (void *)config->telnetitems + sz;
-		memmove(dst, config->telnetitems, sizeof(ZBX_DC_TELNETITEM) * config->telnetitems_num);
-		config->telnetitems = (ZBX_DC_TELNETITEM *)dst;
-
-		dst = (void *)config->sshitems + sz;
-		memmove(dst, config->sshitems, sizeof(ZBX_DC_SSHITEM) * config->sshitems_num);
-		config->sshitems = (ZBX_DC_SSHITEM *)dst;
-
-		dst = (void *)config->dbitems + sz;
-		memmove(dst, config->dbitems, sizeof(ZBX_DC_DBITEM) * config->dbitems_num);
-		config->dbitems = (ZBX_DC_DBITEM *)dst;
-
-		dst = (void *)config->logitems + sz;
-		memmove(dst, config->logitems, sizeof(ZBX_DC_LOGITEM) * config->logitems_num);
-		config->logitems = (ZBX_DC_LOGITEM *)dst;
-
 		config->trapitems_alloc += TRAPITEM_ALLOC_STEP;
-		config->free_mem -= sz;
+
+		src = (char *)config->logitems;
+		dst = (char *)config->logitems + sz;
+		config->logitems = (void *)((char *)config->logitems + sz);
+		config->dbitems = (void *)((char *)config->dbitems + sz);
+		config->sshitems = (void *)((char *)config->sshitems + sz);
+		config->telnetitems = (void *)((char *)config->telnetitems + sz);
+		config->calcitems = (void *)((char *)config->calcitems + sz);
+		config->idxitem01 = (void *)((char *)config->idxitem01 + sz);
+		config->idxitem02 = (void *)((char *)config->idxitem02 + sz);
+		config->hosts = (void *)((char *)config->hosts + sz);
+		config->ipmihosts = (void *)((char *)config->ipmihosts + sz);
+		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
+
+		if (0 != (sz = ((char *)config->idxhost02 - src) +
+					sizeof(int) * config->idxhost02_num))
+			memmove(dst, src, sz);
 	}
 
 	if (0 != (sz = sizeof(ZBX_DC_TRAPITEM) * (config->trapitems_num - index)))
@@ -1205,56 +821,33 @@ static void	DCallocate_trapitem(int index)
 static void	DCallocate_logitem(int index)
 {
 	size_t	sz;
-	void	*dst;
 
 	if (config->logitems_num == config->logitems_alloc)
 	{
+		char	*src, *dst;
+
 		sz = sizeof(ZBX_DC_LOGITEM) * LOGITEM_ALLOC_STEP;
 
 		DCcheck_freemem(sz);
 
-		dst = (void *)config->idxhost02 + sz;
-		memmove(dst, config->idxhost02, sizeof(int) * config->idxhost02_num);
-		config->idxhost02 = (int *)dst;
-
-		dst = (void *)config->idxhost01 + sz;
-		memmove(dst, config->idxhost01, sizeof(int) * config->idxhost01_num);
-		config->idxhost01 = (int *)dst;
-
-		dst = (void *)config->ipmihosts + sz;
-		memmove(dst, config->ipmihosts, sizeof(ZBX_DC_IPMIHOST) * config->ipmihosts_num);
-		config->ipmihosts = (ZBX_DC_IPMIHOST *)dst;
-
-		dst = (void *)config->hosts + sz;
-		memmove(dst, config->hosts, sizeof(ZBX_DC_HOST) * config->hosts_num);
-		config->hosts = (ZBX_DC_HOST *)dst;
-
-		dst = (void *)config->idxitem02 + sz;
-		memmove(dst, config->idxitem02, sizeof(int) * config->idxitem02_num);
-		config->idxitem02 = (int *)dst;
-
-		dst = (void *)config->idxitem01 + sz;
-		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
-		config->idxitem01 = (int *)dst;
-
-		dst = (void *)config->calcitems + sz;
-		memmove(dst, config->calcitems, sizeof(ZBX_DC_CALCITEM) * config->calcitems_num);
-		config->calcitems = (ZBX_DC_CALCITEM *)dst;
-
-		dst = (void *)config->telnetitems + sz;
-		memmove(dst, config->telnetitems, sizeof(ZBX_DC_TELNETITEM) * config->telnetitems_num);
-		config->telnetitems = (ZBX_DC_TELNETITEM *)dst;
-
-		dst = (void *)config->sshitems + sz;
-		memmove(dst, config->sshitems, sizeof(ZBX_DC_SSHITEM) * config->sshitems_num);
-		config->sshitems = (ZBX_DC_SSHITEM *)dst;
-
-		dst = (void *)config->dbitems + sz;
-		memmove(dst, config->dbitems, sizeof(ZBX_DC_DBITEM) * config->dbitems_num);
-		config->dbitems = (ZBX_DC_DBITEM *)dst;
-
 		config->logitems_alloc += LOGITEM_ALLOC_STEP;
-		config->free_mem -= sz;
+
+		src = (char *)config->dbitems;
+		dst = (char *)config->dbitems + sz;
+		config->dbitems = (void *)((char *)config->dbitems + sz);
+		config->sshitems = (void *)((char *)config->sshitems + sz);
+		config->telnetitems = (void *)((char *)config->telnetitems + sz);
+		config->calcitems = (void *)((char *)config->calcitems + sz);
+		config->idxitem01 = (void *)((char *)config->idxitem01 + sz);
+		config->idxitem02 = (void *)((char *)config->idxitem02 + sz);
+		config->hosts = (void *)((char *)config->hosts + sz);
+		config->ipmihosts = (void *)((char *)config->ipmihosts + sz);
+		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
+
+		if (0 != (sz = ((char *)config->idxhost02 - src) +
+					sizeof(int) * config->idxhost02_num))
+			memmove(dst, src, sz);
 	}
 
 	if (0 != (sz = sizeof(ZBX_DC_LOGITEM) * (config->logitems_num - index)))
@@ -1265,52 +858,32 @@ static void	DCallocate_logitem(int index)
 static void	DCallocate_dbitem(int index)
 {
 	size_t	sz;
-	void	*dst;
 
 	if (config->dbitems_num == config->dbitems_alloc)
 	{
+		char	*src, *dst;
+
 		sz = sizeof(ZBX_DC_DBITEM) * DBITEM_ALLOC_STEP;
 
 		DCcheck_freemem(sz);
 
-		dst = (void *)config->idxhost02 + sz;
-		memmove(dst, config->idxhost02, sizeof(int) * config->idxhost02_num);
-		config->idxhost02 = (int *)dst;
-
-		dst = (void *)config->idxhost01 + sz;
-		memmove(dst, config->idxhost01, sizeof(int) * config->idxhost01_num);
-		config->idxhost01 = (int *)dst;
-
-		dst = (void *)config->ipmihosts + sz;
-		memmove(dst, config->ipmihosts, sizeof(ZBX_DC_IPMIHOST) * config->ipmihosts_num);
-		config->ipmihosts = (ZBX_DC_IPMIHOST *)dst;
-
-		dst = (void *)config->hosts + sz;
-		memmove(dst, config->hosts, sizeof(ZBX_DC_HOST) * config->hosts_num);
-		config->hosts = (ZBX_DC_HOST *)dst;
-
-		dst = (void *)config->idxitem02 + sz;
-		memmove(dst, config->idxitem02, sizeof(int) * config->idxitem02_num);
-		config->idxitem02 = (int *)dst;
-
-		dst = (void *)config->idxitem01 + sz;
-		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
-		config->idxitem01 = (int *)dst;
-
-		dst = (void *)config->calcitems + sz;
-		memmove(dst, config->calcitems, sizeof(ZBX_DC_CALCITEM) * config->calcitems_num);
-		config->calcitems = (ZBX_DC_CALCITEM *)dst;
-
-		dst = (void *)config->telnetitems + sz;
-		memmove(dst, config->telnetitems, sizeof(ZBX_DC_TELNETITEM) * config->telnetitems_num);
-		config->telnetitems = (ZBX_DC_TELNETITEM *)dst;
-
-		dst = (void *)config->sshitems + sz;
-		memmove(dst, config->sshitems, sizeof(ZBX_DC_SSHITEM) * config->sshitems_num);
-		config->sshitems = (ZBX_DC_SSHITEM *)dst;
-
 		config->dbitems_alloc += DBITEM_ALLOC_STEP;
-		config->free_mem -= sz;
+
+		src = (char *)config->sshitems;
+		dst = (char *)config->sshitems + sz;
+		config->sshitems = (void *)((char *)config->sshitems + sz);
+		config->telnetitems = (void *)((char *)config->telnetitems + sz);
+		config->calcitems = (void *)((char *)config->calcitems + sz);
+		config->idxitem01 = (void *)((char *)config->idxitem01 + sz);
+		config->idxitem02 = (void *)((char *)config->idxitem02 + sz);
+		config->hosts = (void *)((char *)config->hosts + sz);
+		config->ipmihosts = (void *)((char *)config->ipmihosts + sz);
+		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
+
+		if (0 != (sz = ((char *)config->idxhost02 - src) +
+					sizeof(int) * config->idxhost02_num))
+			memmove(dst, src, sz);
 	}
 
 	if (0 != (sz = sizeof(ZBX_DC_DBITEM) * (config->dbitems_num - index)))
@@ -1321,48 +894,31 @@ static void	DCallocate_dbitem(int index)
 static void	DCallocate_sshitem(int index)
 {
 	size_t	sz;
-	void	*dst;
 
 	if (config->sshitems_num == config->sshitems_alloc)
 	{
+		char	*src, *dst;
+
 		sz = sizeof(ZBX_DC_SSHITEM) * SSHITEM_ALLOC_STEP;
 
 		DCcheck_freemem(sz);
 
-		dst = (void *)config->idxhost02 + sz;
-		memmove(dst, config->idxhost02, sizeof(int) * config->idxhost02_num);
-		config->idxhost02 = (int *)dst;
-
-		dst = (void *)config->idxhost01 + sz;
-		memmove(dst, config->idxhost01, sizeof(int) * config->idxhost01_num);
-		config->idxhost01 = (int *)dst;
-
-		dst = (void *)config->ipmihosts + sz;
-		memmove(dst, config->ipmihosts, sizeof(ZBX_DC_IPMIHOST) * config->ipmihosts_num);
-		config->ipmihosts = (ZBX_DC_IPMIHOST *)dst;
-
-		dst = (void *)config->hosts + sz;
-		memmove(dst, config->hosts, sizeof(ZBX_DC_HOST) * config->hosts_num);
-		config->hosts = (ZBX_DC_HOST *)dst;
-
-		dst = (void *)config->idxitem02 + sz;
-		memmove(dst, config->idxitem02, sizeof(int) * config->idxitem02_num);
-		config->idxitem02 = (int *)dst;
-
-		dst = (void *)config->idxitem01 + sz;
-		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
-		config->idxitem01 = (int *)dst;
-
-		dst = (void *)config->calcitems + sz;
-		memmove(dst, config->calcitems, sizeof(ZBX_DC_CALCITEM) * config->calcitems_num);
-		config->calcitems = (ZBX_DC_CALCITEM *)dst;
-
-		dst = (void *)config->telnetitems + sz;
-		memmove(dst, config->telnetitems, sizeof(ZBX_DC_TELNETITEM) * config->telnetitems_num);
-		config->telnetitems = (ZBX_DC_TELNETITEM *)dst;
-
 		config->sshitems_alloc += SSHITEM_ALLOC_STEP;
-		config->free_mem -= sz;
+
+		src = (char *)config->telnetitems;
+		dst = (char *)config->telnetitems + sz;
+		config->telnetitems = (void *)((char *)config->telnetitems + sz);
+		config->calcitems = (void *)((char *)config->calcitems + sz);
+		config->idxitem01 = (void *)((char *)config->idxitem01 + sz);
+		config->idxitem02 = (void *)((char *)config->idxitem02 + sz);
+		config->hosts = (void *)((char *)config->hosts + sz);
+		config->ipmihosts = (void *)((char *)config->ipmihosts + sz);
+		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
+
+		if (0 != (sz = ((char *)config->idxhost02 - src) +
+					sizeof(int) * config->idxhost02_num))
+			memmove(dst, src, sz);
 	}
 
 	if (0 != (sz = sizeof(ZBX_DC_SSHITEM) * (config->sshitems_num - index)))
@@ -1373,44 +929,30 @@ static void	DCallocate_sshitem(int index)
 static void	DCallocate_telnetitem(int index)
 {
 	size_t	sz;
-	void	*dst;
 
 	if (config->telnetitems_num == config->telnetitems_alloc)
 	{
+		char	*src, *dst;
+
 		sz = sizeof(ZBX_DC_TELNETITEM) * TELNETITEM_ALLOC_STEP;
 
 		DCcheck_freemem(sz);
 
-		dst = (void *)config->idxhost02 + sz;
-		memmove(dst, config->idxhost02, sizeof(int) * config->idxhost02_num);
-		config->idxhost02 = (int *)dst;
-
-		dst = (void *)config->idxhost01 + sz;
-		memmove(dst, config->idxhost01, sizeof(int) * config->idxhost01_num);
-		config->idxhost01 = (int *)dst;
-
-		dst = (void *)config->ipmihosts + sz;
-		memmove(dst, config->ipmihosts, sizeof(ZBX_DC_IPMIHOST) * config->ipmihosts_num);
-		config->ipmihosts = (ZBX_DC_IPMIHOST *)dst;
-
-		dst = (void *)config->hosts + sz;
-		memmove(dst, config->hosts, sizeof(ZBX_DC_HOST) * config->hosts_num);
-		config->hosts = (ZBX_DC_HOST *)dst;
-
-		dst = (void *)config->idxitem02 + sz;
-		memmove(dst, config->idxitem02, sizeof(int) * config->idxitem02_num);
-		config->idxitem02 = (int *)dst;
-
-		dst = (void *)config->idxitem01 + sz;
-		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
-		config->idxitem01 = (int *)dst;
-
-		dst = (void *)config->calcitems + sz;
-		memmove(dst, config->calcitems, sizeof(ZBX_DC_CALCITEM) * config->calcitems_num);
-		config->calcitems = (ZBX_DC_CALCITEM *)dst;
-
 		config->telnetitems_alloc += TELNETITEM_ALLOC_STEP;
-		config->free_mem -= sz;
+
+		src = (char *)config->calcitems;
+		dst = (char *)config->calcitems + sz;
+		config->calcitems = (void *)((char *)config->calcitems + sz);
+		config->idxitem01 = (void *)((char *)config->idxitem01 + sz);
+		config->idxitem02 = (void *)((char *)config->idxitem02 + sz);
+		config->hosts = (void *)((char *)config->hosts + sz);
+		config->ipmihosts = (void *)((char *)config->ipmihosts + sz);
+		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
+
+		if (0 != (sz = ((char *)config->idxhost02 - src) +
+					sizeof(int) * config->idxhost02_num))
+			memmove(dst, src, sz);
 	}
 
 	if (0 != (sz = sizeof(ZBX_DC_TELNETITEM) * (config->telnetitems_num - index)))
@@ -1421,40 +963,29 @@ static void	DCallocate_telnetitem(int index)
 static void	DCallocate_calcitem(int index)
 {
 	size_t	sz;
-	void	*dst;
 
 	if (config->calcitems_num == config->calcitems_alloc)
 	{
+		char	*src, *dst;
+
 		sz = sizeof(ZBX_DC_CALCITEM) * CALCITEM_ALLOC_STEP;
 
 		DCcheck_freemem(sz);
 
-		dst = (void *)config->idxhost02 + sz;
-		memmove(dst, config->idxhost02, sizeof(int) * config->idxhost02_num);
-		config->idxhost02 = (int *)dst;
-
-		dst = (void *)config->idxhost01 + sz;
-		memmove(dst, config->idxhost01, sizeof(int) * config->idxhost01_num);
-		config->idxhost01 = (int *)dst;
-
-		dst = (void *)config->ipmihosts + sz;
-		memmove(dst, config->ipmihosts, sizeof(ZBX_DC_IPMIHOST) * config->ipmihosts_num);
-		config->ipmihosts = (ZBX_DC_IPMIHOST *)dst;
-
-		dst = (void *)config->hosts + sz;
-		memmove(dst, config->hosts, sizeof(ZBX_DC_HOST) * config->hosts_num);
-		config->hosts = (ZBX_DC_HOST *)dst;
-
-		dst = (void *)config->idxitem02 + sz;
-		memmove(dst, config->idxitem02, sizeof(int) * config->idxitem02_num);
-		config->idxitem02 = (int *)dst;
-
-		dst = (void *)config->idxitem01 + sz;
-		memmove(dst, config->idxitem01, sizeof(int) * config->idxitem01_num);
-		config->idxitem01 = (int *)dst;
-
 		config->calcitems_alloc += CALCITEM_ALLOC_STEP;
-		config->free_mem -= sz;
+
+		src = (char *)config->idxitem01;
+		dst = (char *)config->idxitem01 + sz;
+		config->idxitem01 = (void *)((char *)config->idxitem01 + sz);
+		config->idxitem02 = (void *)((char *)config->idxitem02 + sz);
+		config->hosts = (void *)((char *)config->hosts + sz);
+		config->ipmihosts = (void *)((char *)config->ipmihosts + sz);
+		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
+
+		if (0 != (sz = ((char *)config->idxhost02 - src) +
+					sizeof(int) * config->idxhost02_num))
+			memmove(dst, src, sz);
 	}
 
 	if (0 != (sz = sizeof(ZBX_DC_CALCITEM) * (config->calcitems_num - index)))
@@ -1462,45 +993,138 @@ static void	DCallocate_calcitem(int index)
 	config->calcitems_num++;
 }
 
+static void	DCallocate_idxitem01(int *index, int remove_index)
+{
+	size_t	sz;
+	char	*src, *dst;
+
+	if (config->idxitem01_num == config->idxitem01_alloc)
+	{
+		sz = sizeof(int) * ITEM_ALLOC_STEP;
+
+		DCcheck_freemem(sz);
+
+		config->idxitem01_alloc += ITEM_ALLOC_STEP;
+
+		src = (char *)config->idxitem02;
+		dst = (char *)config->idxitem02 + sz;
+		config->idxitem02 = (void *)((char *)config->idxitem02 + sz);
+		config->hosts = (void *)((char *)config->hosts + sz);
+		config->ipmihosts = (void *)((char *)config->ipmihosts + sz);
+		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
+
+		if (0 != (sz = ((char *)config->idxhost02 - src) +
+					sizeof(int) * config->idxhost02_num))
+			memmove(dst, src, sz);
+	}
+
+	if (-1 == remove_index)
+	{
+		sz = sizeof(int) * (config->idxitem01_num - *index);
+		src = (char *)&config->idxitem01[*index];
+		dst = (char *)&config->idxitem01[*index + 1];
+		config->idxitem01_num++;
+	}
+	else
+	{
+		if (*index > remove_index)
+		{
+			(*index)--;
+			sz = sizeof(int) * (*index - remove_index);
+			src = (char *)&config->idxitem01[remove_index + 1];
+			dst = (char *)&config->idxitem01[remove_index];
+		}
+		else
+		{
+			sz = sizeof(int) * (remove_index - *index);
+			src = (char *)&config->idxitem01[*index];
+			dst = (char *)&config->idxitem01[*index + 1];
+		}
+	}
+
+	if (0 != sz)
+		memmove(dst, src, sz);
+}
+
+static void	DCallocate_idxitem02(int *index, int remove_index)
+{
+	size_t	sz;
+	char	*src, *dst;
+
+	if (config->idxitem02_num == config->idxitem02_alloc)
+	{
+		sz = sizeof(int) * ITEM_ALLOC_STEP;
+
+		DCcheck_freemem(sz);
+
+		config->idxitem02_alloc += ITEM_ALLOC_STEP;
+
+		src = (char *)config->hosts;
+		dst = (char *)config->hosts + sz;
+		config->hosts = (void *)((char *)config->hosts + sz);
+		config->ipmihosts = (void *)((char *)config->ipmihosts + sz);
+		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
+
+		if (0 != (sz = ((char *)config->idxhost02 - src) +
+					sizeof(int) * config->idxhost02_num))
+			memmove(dst, src, sz);
+	}
+
+	if (-1 == remove_index)
+	{
+		sz = sizeof(int) * (config->idxitem02_num - *index);
+		src = (char *)&config->idxitem02[*index];
+		dst = (char *)&config->idxitem02[*index + 1];
+		config->idxitem02_num++;
+	}
+	else
+	{
+		if (*index > remove_index)
+		{
+			(*index)--;
+			sz = sizeof(int) * (*index - remove_index);
+			src = (char *)&config->idxitem02[remove_index + 1];
+			dst = (char *)&config->idxitem02[remove_index];
+		}
+		else
+		{
+			sz = sizeof(int) * (remove_index - *index);
+			src = (char *)&config->idxitem02[*index];
+			dst = (char *)&config->idxitem02[*index + 1];
+		}
+	}
+
+	if (0 != sz)
+		memmove(dst, src, sz);
+}
+
 static void	DCallocate_host(int index)
 {
 	size_t	sz;
-	void	*dst;
-	int	i;
 
 	if (config->hosts_num == config->hosts_alloc)
 	{
+		char	*src, *dst;
+
 		sz = sizeof(ZBX_DC_HOST) * HOST_ALLOC_STEP;
 
 		DCcheck_freemem(sz);
 
-		dst = (void *)config->idxhost02 + sz;
-		memmove(dst, config->idxhost02, sizeof(int) * config->idxhost02_num);
-		config->idxhost02 = (int *)dst;
-
-		dst = (void *)config->idxhost01 + sz;
-		memmove(dst, config->idxhost01, sizeof(int) * config->idxhost01_num);
-		config->idxhost01 = (int *)dst;
-
-		dst = (void *)config->ipmihosts + sz;
-		memmove(dst, config->ipmihosts, sizeof(ZBX_DC_IPMIHOST) * config->ipmihosts_num);
-		config->ipmihosts = (ZBX_DC_IPMIHOST *)dst;
-
 		config->hosts_alloc += HOST_ALLOC_STEP;
-		config->free_mem -= sz;
+
+		src = (char *)config->ipmihosts;
+		dst = (char *)config->ipmihosts + sz;
+		config->ipmihosts = (void *)((char *)config->ipmihosts + sz);
+		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
+
+		if (0 != (sz = ((char *)config->idxhost02 - src) +
+					sizeof(int) * config->idxhost02_num))
+			memmove(dst, src, sz);
 	}
 
-	/* update records in 'idxhost01' index */
-	for (i = 0; i < config->idxhost01_num; i++)
-		if (config->idxhost01[i] >= index)
-			config->idxhost01[i]++;
-
-	/* update records in 'idxhost02' index */
-	for (i = 0; i < config->idxhost02_num; i++)
-		if (config->idxhost02[i] >= index)
-			config->idxhost02[i]++;
-
-	/* allocate record */
 	if (0 != (sz = sizeof(ZBX_DC_HOST) * (config->hosts_num - index)))
 		memmove(&config->hosts[index + 1], &config->hosts[index], sz);
 	config->hosts_num++;
@@ -1509,24 +1133,25 @@ static void	DCallocate_host(int index)
 static void	DCallocate_ipmihost(int index)
 {
 	size_t	sz;
-	void	*dst;
 
 	if (config->ipmihosts_num == config->ipmihosts_alloc)
 	{
+		char	*src, *dst;
+
 		sz = sizeof(ZBX_DC_IPMIHOST) * IPMIHOST_ALLOC_STEP;
 
 		DCcheck_freemem(sz);
 
-		dst = (void *)config->idxhost02 + sz;
-		memmove(dst, config->idxhost02, sizeof(int) * config->idxhost02_num);
-		config->idxhost02 = (int *)dst;
-
-		dst = (void *)config->idxhost01 + sz;
-		memmove(dst, config->idxhost01, sizeof(int) * config->idxhost01_num);
-		config->idxhost01 = (int *)dst;
-
 		config->ipmihosts_alloc += IPMIHOST_ALLOC_STEP;
-		config->free_mem -= sz;
+
+		src = (char *)config->idxhost01;
+		dst = (char *)config->idxhost01 + sz;
+		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
+
+		if (0 != (sz = ((char *)config->idxhost02 - src) +
+					sizeof(int) * config->idxhost02_num))
+			memmove(dst, src, sz);
 	}
 
 	if (0 != (sz = sizeof(ZBX_DC_IPMIHOST) * (config->ipmihosts_num - index)))
@@ -1534,51 +1159,95 @@ static void	DCallocate_ipmihost(int index)
 	config->ipmihosts_num++;
 }
 
-static void	DCremove_item(int index)
+static void	DCallocate_idxhost01(int *index, int remove_index)
 {
-	int		i;
-	ZBX_DC_ITEM	*dc_item;
+	size_t	sz;
+	char	*src, *dst;
 
-	dc_item = &config->items[index];
-	DCupdate_idxitem01(index, &dc_item->hostid, dc_item->key, NULL, NULL);
-	DCupdate_idxitem02(index, &dc_item->poller_type, &dc_item->poller_num, &dc_item->nextcheck, NULL, NULL, NULL);
+	if (config->idxhost01_num == config->idxhost01_alloc)
+	{
+		sz = sizeof(int) * HOST_ALLOC_STEP;
 
-	/* update records in 'idxitem01' index */
-	for (i = 0; i < config->idxitem01_num; i++)
-		if (config->idxitem01[i] > index)
-			config->idxitem01[i]--;
+		DCcheck_freemem(sz);
 
-	/* update records in 'idxitem02' index */
-	for (i = 0; i < config->idxitem02_num; i++)
-		if (config->idxitem02[i] > index)
-			config->idxitem02[i]--;
+		config->idxhost01_alloc += HOST_ALLOC_STEP;
 
-	/* remove record */
-	DCremove_element(config->items, &config->items_num, sizeof(ZBX_DC_ITEM), index);
+		src = (char *)config->idxhost02;
+		dst = (char *)config->idxhost02 + sz;
+		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
+
+		if (0 != (sz = sizeof(int) * config->idxhost02_num))
+			memmove(dst, src, sz);
+	}
+
+	if (-1 == remove_index)
+	{
+		sz = sizeof(int) * (config->idxhost01_num - *index);
+		dst = (char *)&config->idxhost01[*index + 1];
+		src = (char *)&config->idxhost01[*index];
+		config->idxhost01_num++;
+	}
+	else
+	{
+		if (*index > remove_index)
+		{
+			(*index)--;
+			sz = sizeof(int) * (*index - remove_index);
+			src = (char *)&config->idxhost01[remove_index + 1];
+			dst = (char *)&config->idxhost01[remove_index];
+		}
+		else
+		{
+			sz = sizeof(int) * (remove_index - *index);
+			src = (char *)&config->idxhost01[*index];
+			dst = (char *)&config->idxhost01[*index + 1];
+		}
+	}
+
+	if (0 != sz)
+		memmove(dst, src, sz);
 }
 
-static void	DCremove_host(int index)
+static void	DCallocate_idxhost02(int *index, int remove_index)
 {
-	int		i;
-	ZBX_DC_HOST	*dc_host;
+	size_t	sz;
+	char	*src, *dst;
 
-	dc_host = &config->hosts[index];
-	DCupdate_idxhost01(index, &dc_host->proxy_hostid, dc_host->host, NULL, NULL);
-	DCupdate_idxhost02(index, &dc_host->poller_type, &dc_host->poller_num, &dc_host->nextcheck_,
-			NULL, NULL, NULL);
+	if (config->idxhost02_num == config->idxhost02_alloc)
+	{
+		sz = sizeof(int) * HOST_ALLOC_STEP;
 
-	/* update records in 'idxhost01' index */
-	for (i = 0; i < config->idxhost01_num; i++)
-		if (config->idxhost01[i] > index)
-			config->idxhost01[i]--;
+		DCcheck_freemem(sz);
 
-	/* update records in 'idxhost02' index */
-	for (i = 0; i < config->idxhost02_num; i++)
-		if (config->idxhost02[i] > index)
-			config->idxhost02[i]--;
+		config->idxhost02_alloc += HOST_ALLOC_STEP;
+	}
 
-	/* remove record */
-	DCremove_element(config->hosts, &config->hosts_num, sizeof(ZBX_DC_HOST), index);
+	if (-1 == remove_index)
+	{
+		sz = sizeof(int) * (config->idxhost02_num - *index);
+		src = (char *)&config->idxhost02[*index];
+		dst = (char *)&config->idxhost02[*index + 1];
+		config->idxhost02_num++;
+	}
+	else
+	{
+		if (*index > remove_index)
+		{
+			(*index)--;
+			sz = sizeof(int) * (*index - remove_index);
+			src = (char *)&config->idxhost02[remove_index + 1];
+			dst = (char *)&config->idxhost02[remove_index];
+		}
+		else
+		{
+			sz = sizeof(int) * (remove_index - *index);
+			src = (char *)&config->idxhost02[*index];
+			dst = (char *)&config->idxhost02[*index + 1];
+		}
+	}
+
+	if (0 != sz)
+		memmove(dst, src, sz);
 }
 
 static void	DCsync_items()
@@ -1596,14 +1265,11 @@ static void	DCsync_items()
 	ZBX_DC_SSHITEM	*sshitem;
 	ZBX_DC_TELNETITEM	*telnetitem;
 	ZBX_DC_CALCITEM	*calcitem;
-	zbx_uint64_t	itemid, hostid, proxy_hostid;
-	int		i, new, delay, nextcheck;
-	unsigned char	poller_type, poller_num, type, status;
-	char		*key;
-
+	zbx_uint64_t	itemid, proxy_hostid;
+	int		i, new, delay;
+	unsigned char	status;
 	zbx_uint64_t	*ids = NULL;
 	int		ids_allocated, ids_num = 0;
-
 	time_t		now;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1633,10 +1299,7 @@ static void	DCsync_items()
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(itemid, row[0]);
-		ZBX_STR2UINT64(hostid, row[1]);
 		ZBX_STR2UINT64(proxy_hostid, row[2]);
-		type = (unsigned char)atoi(row[3]);
-		key = row[6];
 		delay = atoi(row[15]);
 		status = (unsigned char)atoi(row[20]);
 
@@ -1652,46 +1315,37 @@ static void	DCsync_items()
 		}
 
 		item = &config->items[i];
-
-		poller_by_item(itemid, hostid, proxy_hostid, type, key, &poller_type, &poller_num);
+		item->itemid = itemid;
+		ZBX_STR2UINT64(item->hostid, row[1]);
+		item->type = (unsigned char)atoi(row[3]);
+		item->data_type = (unsigned char)atoi(row[4]);
+		item->value_type = (unsigned char)atoi(row[5]);
+		zbx_strlcpy(item->key, row[6], sizeof(item->key));
 
 		if (new)
 		{
-			item->itemid = itemid;
 			if (ITEM_STATUS_NOTSUPPORTED == status)
-				item->nextcheck = calculate_item_nextcheck(itemid, type, CONFIG_REFRESH_UNSUPPORTED, NULL, now);
+				item->nextcheck = calculate_item_nextcheck(itemid, item->type,
+						CONFIG_REFRESH_UNSUPPORTED, NULL, now);
 			else
-				item->nextcheck = calculate_item_nextcheck(itemid, type, delay, row[16], now);
-
-			DCupdate_idxitem01(i, NULL, NULL, &hostid, key);
-			DCupdate_idxitem02(i, NULL, NULL, NULL, &poller_type, &poller_num, &item->nextcheck);
+				item->nextcheck = calculate_item_nextcheck(itemid, item->type,
+						delay, row[16], now);
 		}
 		else
 		{
 			if (ITEM_STATUS_ACTIVE == status && (status != item->status || delay != item->delay))
-				nextcheck = calculate_item_nextcheck(itemid, type,
+				item->nextcheck = calculate_item_nextcheck(itemid, item->type,
 						delay, row[16], now);
 			else if (ITEM_STATUS_NOTSUPPORTED == status && status != item->status)
-				nextcheck = calculate_item_nextcheck(itemid, type,
+				item->nextcheck = calculate_item_nextcheck(itemid, item->type,
 						CONFIG_REFRESH_UNSUPPORTED, NULL, now);
-			else
-				nextcheck = item->nextcheck;
-
-			DCupdate_idxitem01(i, &item->hostid, item->key, &hostid, key);
-			DCupdate_idxitem02(i, &item->poller_type, &item->poller_num, &item->nextcheck,
-					&poller_type, &poller_num, &nextcheck);
-			item->nextcheck = nextcheck;
 		}
 
-		item->hostid = hostid;
-		item->poller_type = poller_type;
-		item->poller_num = poller_num;
-		item->type = type;
 		item->status = status;
-		item->data_type = (unsigned char)atoi(row[4]);
-		item->value_type = (unsigned char)atoi(row[5]);
-		zbx_strlcpy(item->key, key, sizeof(item->key));
 		item->delay = delay;
+
+		poller_by_item(itemid, item->hostid, proxy_hostid, item->type, item->key,
+				&item->poller_type, &item->poller_num);
 
 		i = get_nearestindex(config->snmpitems, sizeof(ZBX_DC_SNMPITEM),
 				config->snmpitems_num, itemid);
@@ -1805,7 +1459,7 @@ static void	DCsync_items()
 		}
 		else
 		{
-			/* remove logtimefnt parameter */
+			/* remove logtimefmt parameter */
 			if (i < config->logitems_num && config->logitems[i].itemid == itemid)
 				DCremove_element(config->logitems, &config->logitems_num, sizeof(ZBX_DC_LOGITEM), i);
 		}
@@ -1905,7 +1559,17 @@ static void	DCsync_items()
 	/* remove deleted or disabled items from buffer */
 	for (i = 0; i < config->items_num; i++)
 		if (FAIL == uint64_array_exists(ids, ids_num, config->items[i].itemid))
-			DCremove_item(i--);
+			DCremove_element(config->items, &config->items_num, sizeof(ZBX_DC_ITEM), i--);
+
+	/* create indexes */
+	config->idxitem01_num = 0;
+	config->idxitem02_num = 0;
+	for (i = 0; i < config->items_num; i++)
+	{
+		item = &config->items[i];
+		DCupdate_idxitem01(i, NULL, NULL, &item->hostid, item->key);
+		DCupdate_idxitem02(i, NULL, NULL, NULL, &item->poller_type, &item->poller_num, &item->nextcheck);
+	}
 
 	/* remove deleted or disabled snmp items from buffer */
 	for (i = 0; i < config->snmpitems_num; i++)
@@ -1968,12 +1632,8 @@ static void	DCsync_hosts()
 	DB_ROW		row;
 	ZBX_DC_HOST	*host;
 	ZBX_DC_IPMIHOST	*ipmihost;
-	zbx_uint64_t	hostid, proxy_hostid;
+	zbx_uint64_t	hostid;
 	int		i, new;
-	unsigned char	poller_type, poller_num;
-	int		errors_from, snmp_errors_from, ipmi_errors_from;
-	int		disable_until, snmp_disable_until, ipmi_disable_until;
-
 	zbx_uint64_t	*ids = NULL;
 	int		ids_allocated, ids_num = 0;
 
@@ -1983,7 +1643,7 @@ static void	DCsync_hosts()
 	ids = zbx_malloc(ids, ids_allocated * sizeof(zbx_uint64_t));
 
 	result = DBselect(
-			"select hostid,proxy_hostid,host,useip,ip,dns,port,status,"
+			"select hostid,proxy_hostid,host,useip,ip,dns,port,"
 				"useipmi,ipmi_ip,ipmi_port,ipmi_authtype,ipmi_privilege,ipmi_username,"
 				"ipmi_password,maintenance_status,maintenance_type,maintenance_from,"
 				"errors_from,available,disable_until,snmp_errors_from,snmp_available,"
@@ -1999,13 +1659,6 @@ static void	DCsync_hosts()
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(hostid, row[0]);
-		ZBX_STR2UINT64(proxy_hostid, row[1]);
-		errors_from = atoi(row[18]);
-		snmp_errors_from = atoi(row[21]);
-		ipmi_errors_from = atoi(row[24]);
-		disable_until = atoi(row[20]);
-		snmp_disable_until = atoi(row[23]);
-		ipmi_disable_until = atoi(row[26]);
 
 		/* array of selected hosts */
 		uint64_array_add(&ids, &ids_allocated, &ids_num, hostid, HOST_ALLOC_STEP);
@@ -2019,51 +1672,40 @@ static void	DCsync_hosts()
 		}
 
 		host = &config->hosts[i];
-
-		poller_by_host(hostid, proxy_hostid, errors_from || snmp_errors_from || ipmi_errors_from,
-				&poller_type, &poller_num);
-
-		if (new)
-		{
-			host->hostid = hostid;
-			host->nextcheck_ = DCget_unreachable_nextcheck(disable_until, snmp_disable_until,
-					ipmi_disable_until);
-			DCupdate_idxhost01(i, NULL, NULL, &proxy_hostid, row[2]);
-			DCupdate_idxhost02(i, NULL, NULL, NULL, &poller_type, &poller_num, &host->nextcheck_);
-		}
-		else
-		{
-			DCupdate_idxhost01(i, &host->proxy_hostid, host->host, &proxy_hostid, row[2]);
-			DCupdate_idxhost02(i, &host->poller_type, &host->poller_num, &host->nextcheck_,
-					&poller_type, &poller_num, &host->nextcheck_);
-		}
-
-		host->poller_type = poller_type;
-		host->poller_num = poller_num;
-		host->proxy_hostid = proxy_hostid;
+		host->hostid = hostid;
+		ZBX_STR2UINT64(host->proxy_hostid, row[1]);
 		zbx_strlcpy(host->host, row[2], sizeof(host->host));
 		host->useip = (unsigned char)atoi(row[3]);
 		zbx_strlcpy(host->ip, row[4], sizeof(host->ip));
 		zbx_strlcpy(host->dns, row[5], sizeof(host->dns));
 		host->port = (unsigned short)atoi(row[6]);
-		host->status = (unsigned char)atoi(row[7]);
-		host->maintenance_status = (unsigned char)atoi(row[15]);
-		host->maintenance_type = (unsigned char)atoi(row[16]);
-		host->maintenance_from = atoi(row[17]);
-		host->errors_from = errors_from;
-		host->available = (unsigned char)atoi(row[19]);
-		host->disable_until = disable_until;
-		host->snmp_errors_from = snmp_errors_from;
-		host->snmp_available = (unsigned char)atoi(row[22]);
-		host->snmp_disable_until = snmp_disable_until;
-		host->ipmi_errors_from = ipmi_errors_from;
-		host->ipmi_available = (unsigned char)atoi(row[25]);
-		host->ipmi_disable_until = ipmi_disable_until;
+		host->maintenance_status = (unsigned char)atoi(row[14]);
+		host->maintenance_type = (unsigned char)atoi(row[15]);
+		host->maintenance_from = atoi(row[16]);
+		host->errors_from = atoi(row[17]);
+		host->available = (unsigned char)atoi(row[18]);
+		host->disable_until = atoi(row[19]);
+		host->snmp_errors_from = atoi(row[20]);
+		host->snmp_available = (unsigned char)atoi(row[21]);
+		host->snmp_disable_until = atoi(row[22]);
+		host->ipmi_errors_from = atoi(row[23]);
+		host->ipmi_available = (unsigned char)atoi(row[24]);
+		host->ipmi_disable_until = atoi(row[25]);
+
+		if (new)
+		{
+			host->nextcheck = DCget_unreachable_nextcheck(host->disable_until,
+					host->snmp_disable_until, host->ipmi_disable_until);
+		}
+
+		poller_by_host(hostid, host->proxy_hostid,
+				host->errors_from || host->snmp_errors_from || host->ipmi_errors_from,
+				&host->poller_type, &host->poller_num);
 
 		i = get_nearestindex(config->ipmihosts, sizeof(ZBX_DC_IPMIHOST),
 				config->ipmihosts_num, hostid);
 
-		if (1 == atoi(row[8]))	/* useipmi */
+		if (1 == atoi(row[7]))	/* useipmi */
 		{
 			if (i == config->ipmihosts_num || config->ipmihosts[i].hostid != hostid)
 				DCallocate_ipmihost(i);
@@ -2071,12 +1713,12 @@ static void	DCsync_hosts()
 			ipmihost = &config->ipmihosts[i];
 
 			ipmihost->hostid = hostid;
-			zbx_strlcpy(ipmihost->ipmi_ip, row[9], sizeof(ipmihost->ipmi_ip));
-			ipmihost->ipmi_port = (unsigned short)atoi(row[10]);
-			ipmihost->ipmi_authtype = (signed char)atoi(row[11]);
-			ipmihost->ipmi_privilege = (unsigned char)atoi(row[12]);
-			zbx_strlcpy(ipmihost->ipmi_username, row[13], sizeof(ipmihost->ipmi_username));
-			zbx_strlcpy(ipmihost->ipmi_password, row[14], sizeof(ipmihost->ipmi_password));
+			zbx_strlcpy(ipmihost->ipmi_ip, row[8], sizeof(ipmihost->ipmi_ip));
+			ipmihost->ipmi_port = (unsigned short)atoi(row[9]);
+			ipmihost->ipmi_authtype = (signed char)atoi(row[10]);
+			ipmihost->ipmi_privilege = (unsigned char)atoi(row[11]);
+			zbx_strlcpy(ipmihost->ipmi_username, row[12], sizeof(ipmihost->ipmi_username));
+			zbx_strlcpy(ipmihost->ipmi_password, row[13], sizeof(ipmihost->ipmi_password));
 		}
 		else
 		{
@@ -2089,7 +1731,17 @@ static void	DCsync_hosts()
 	/* remove deleted or disabled hosts from buffer */
 	for (i = 0; i < config->hosts_num; i++)
 		if (FAIL == uint64_array_exists(ids, ids_num, config->hosts[i].hostid))
-			DCremove_host(i--);
+			DCremove_element(config->hosts, &config->hosts_num, sizeof(ZBX_DC_HOST), i--);
+
+	/* create indexes */
+	config->idxhost01_num = 0;
+	config->idxhost02_num = 0;
+	for (i = 0; i < config->hosts_num; i++)
+	{
+		host = &config->hosts[i];
+		DCupdate_idxhost01(i, NULL, NULL, &host->proxy_hostid, host->host);
+		DCupdate_idxhost02(i, NULL, NULL, NULL, &host->poller_type, &host->poller_num, &host->nextcheck);
+	}
 
 	/* remove ipmi connection parameters for deleted or disabled hosts from buffer */
 	for (i = 0; i < config->ipmihosts_num; i++)
@@ -2128,10 +1780,42 @@ void	DCsync_configuration()
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	sec = zbx_time();
-	DCsync_hosts();
 	DCsync_items();
+	DCsync_hosts();
 	sec = zbx_time() - sec;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() items      : %d / %d", __function_name,
+			config->items_num, config->items_alloc);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() snmpitems  : %d / %d", __function_name,
+			config->snmpitems_num, config->snmpitems_alloc);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() ipmiitems  : %d / %d", __function_name,
+			config->ipmiitems_num, config->ipmiitems_alloc);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() flexitems  : %d / %d", __function_name,
+			config->flexitems_num, config->flexitems_alloc);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() trapitems  : %d / %d", __function_name,
+			config->trapitems_num, config->trapitems_alloc);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() logitems   : %d / %d", __function_name,
+			config->logitems_num, config->logitems_alloc);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() dbitems    : %d / %d", __function_name,
+			config->dbitems_num, config->dbitems_alloc);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() sshitems   : %d / %d", __function_name,
+			config->sshitems_num, config->sshitems_alloc);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() telnetitems: %d / %d", __function_name,
+			config->telnetitems_num, config->telnetitems_alloc);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() calcitems  : %d / %d", __function_name,
+			config->calcitems_num, config->calcitems_alloc);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts      : %d / %d", __function_name,
+			config->hosts_num, config->hosts_alloc);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() ipmihosts  : %d / %d", __function_name,
+			config->ipmihosts_num, config->ipmihosts_alloc);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() idxitem01  : %d / %d", __function_name,
+			config->idxitem01_num, config->idxitem01_alloc);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() idxitem02  : %d / %d", __function_name,
+			config->idxitem02_num, config->idxitem02_alloc);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() idxhost01  : %d / %d", __function_name,
+			config->idxhost01_num, config->idxhost01_alloc);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() idxhost02  : %d / %d", __function_name,
+			config->idxhost02_num, config->idxhost02_alloc);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() time:" ZBX_FS_DBL "sec. pfree:" ZBX_FS_DBL "%%",
 			__function_name, sec, 100 * ((double)config->free_mem / CONFIG_DBCONFIG_SIZE));
 }
@@ -2267,7 +1951,6 @@ static void	DCget_host(DC_HOST *dst_host, ZBX_DC_HOST *src_host)
 	memcpy(dst_host->ip, src_host->ip, HOST_IP_LEN_MAX);
 	memcpy(dst_host->dns, src_host->dns, HOST_DNS_LEN_MAX);
 	dst_host->port = src_host->port;
-	dst_host->status = src_host->status;
 	dst_host->maintenance_status = src_host->maintenance_status;
 	dst_host->maintenance_type = src_host->maintenance_type;
 	dst_host->maintenance_from = src_host->maintenance_from;
@@ -2787,7 +2470,7 @@ static int	DCconfig_get_unreachable_poller_items(unsigned char poller_type, unsi
 		if (dc_host->poller_type != poller_type || dc_host->poller_num != poller_num)
 			break;
 
-		if (dc_host->nextcheck_ > now)
+		if (dc_host->nextcheck > now)
 			break;
 
 		if (HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
@@ -3159,7 +2842,7 @@ int	DCconfig_activate_host(DC_ITEM *item)
 	dc_nextcheck = DCget_unreachable_nextcheck(dc_disable_until, dc_snmp_disable_until,
 			dc_ipmi_disable_until);
 
-	DCupdate_idxhost02(index, &dc_host->poller_type, &dc_host->poller_num, &dc_host->nextcheck_,
+	DCupdate_idxhost02(index, &dc_host->poller_type, &dc_host->poller_num, &dc_host->nextcheck,
 			&dc_poller_type, &dc_poller_num, &dc_nextcheck);
 
 	switch (item->type) {
@@ -3186,7 +2869,7 @@ int	DCconfig_activate_host(DC_ITEM *item)
 
 	dc_host->poller_type = dc_poller_type;
 	dc_host->poller_num = dc_poller_num;
-	dc_host->nextcheck_ = dc_nextcheck;
+	dc_host->nextcheck = dc_nextcheck;
 
 	res = SUCCEED;
 unlock:
@@ -3284,7 +2967,7 @@ int	DCconfig_deactivate_host(DC_ITEM *item, int now)
 	dc_nextcheck = DCget_unreachable_nextcheck(dc_disable_until, dc_snmp_disable_until,
 			dc_ipmi_disable_until);
 
-	DCupdate_idxhost02(index, &dc_host->poller_type, &dc_host->poller_num, &dc_host->nextcheck_,
+	DCupdate_idxhost02(index, &dc_host->poller_type, &dc_host->poller_num, &dc_host->nextcheck,
 			&dc_poller_type, &dc_poller_num, &dc_nextcheck);
 
 	switch (item->type) {
@@ -3311,7 +2994,7 @@ int	DCconfig_deactivate_host(DC_ITEM *item, int now)
 
 	dc_host->poller_type = dc_poller_type;
 	dc_host->poller_num = dc_poller_num;
-	dc_host->nextcheck_ = dc_nextcheck;
+	dc_host->nextcheck = dc_nextcheck;
 
 	res = SUCCEED;
 unlock:

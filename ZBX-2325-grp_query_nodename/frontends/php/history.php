@@ -395,7 +395,7 @@ include_once('include/page_header.php');
 						' AND h.itemid=i.itemid'.$sql_filter.
 						' AND i.itemid in ('.$itemid_lst.')'.
 						$cond_clock.
-					' ORDER BY h.clock desc, h.id DESC';
+					' ORDER BY h.id DESC';
 			$result=DBselect($sql,$limit);
 			while($row=DBfetch($result)){
 //				$color_style = null;
@@ -418,7 +418,7 @@ include_once('include/page_header.php');
 					}
 				}
 
-				$new_row = array(nbsp(date('[Y.M.d H:i:s]',$row['clock'])));
+				$new_row = array(nbsp(zbx_date2str(S_HISTORY_LOG_ITEM_DATE_FORMAT,$row['clock'])));
 
 				if($item_cout > 1)
 					array_push($new_row,$row['host'].':'.item_description($row));
@@ -427,7 +427,7 @@ include_once('include/page_header.php');
 					array_push($new_row,new CCol(' - '));
 				}
 				else{
-					array_push($new_row,date('Y.M.d H:i:s',$row['timestamp']));
+					array_push($new_row,zbx_date2str(S_HISTORY_LOG_LOCALTIME_DATE_FORMAT,$row['timestamp']));
 				}
 
 				if($row['source'] == ''){
@@ -474,7 +474,7 @@ include_once('include/page_header.php');
 					$table->addItem($crow);
 				}
 				else{
-					echo date('Y-m-d H:i:s',$row['clock']);
+					echo zbx_date2str(S_HISTORY_LOG_ITEM_PLAINTEXT,$row['clock']);
 					echo "\t".$row['clock']."\t".htmlspecialchars($row['value'])."\n";
 				}
 			}
@@ -526,7 +526,7 @@ include_once('include/page_header.php');
 					else{
 						$value = $row['value'];
 					}
-					echo date('Y-m-d H:i:s', $row['clock']);
+					echo zbx_date2str(S_HISTORY_PLAINTEXT_DATE_FORMAT, $row['clock']);
 					echo "\t".$row['clock']."\t".htmlspecialchars($value)."\n";
 				}
 				else{
@@ -539,7 +539,6 @@ include_once('include/page_header.php');
 						$value_mapped = false;
 					}
 
-					
 					if(($item_type == ITEM_VALUE_TYPE_FLOAT) && !$value_mapped){
 						sscanf($row['value'], '%f', $value);
 					}
@@ -551,7 +550,7 @@ include_once('include/page_header.php');
 					}
 
 					$table->addRow(array(
-						date('Y.M.d H:i:s', $row['clock']), 
+						zbx_date2str(S_HISTORY_ITEM_DATE_FORMAT, $row['clock']),
 						$value
 					));
 				}
