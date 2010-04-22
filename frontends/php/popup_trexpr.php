@@ -247,6 +247,7 @@
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
 			'itemids' => $itemid,
+			'webitems' => 1,
 			'select_hosts' => API_OUTPUT_EXTEND
 		);
 		$item_data = CItem::get($options);
