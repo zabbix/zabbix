@@ -161,7 +161,7 @@ static int	split_filename(const char *filename, char **directory, char **format)
 
 			if (0 == zbx_stat(*directory, &buf) && S_ISDIR(buf.st_mode))
 			{
-				(*directory)[sz] = PATH_SEPARATOR;
+				(*directory)[sz - 1] = PATH_SEPARATOR;
 				break;
 			}
 		}
@@ -233,7 +233,7 @@ struct st_logfile
  * Comments: Assertion can be deleted later for convenience.                  *
  *                                                                            *
  ******************************************************************************/
-static void init_logfiles(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num)
+/*static void init_logfiles(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In init_logfiles()");
 
@@ -243,7 +243,7 @@ static void init_logfiles(struct st_logfile **logfiles, int *logfiles_alloc, int
 
 	*logfiles_alloc = 64;
 	*logfiles = zbx_malloc(*logfiles, *logfiles_alloc * sizeof(struct st_logfile));
-}
+}*/
 
 /******************************************************************************
  *                                                                            *
@@ -459,7 +459,7 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 #endif /* _WINDOWS */
 
 	/* allocating memory for logfiles */
-	init_logfiles(&logfiles, &logfiles_alloc, &logfiles_num);
+/*	init_logfiles(&logfiles, &logfiles_alloc, &logfiles_num);*/
 
 #ifdef _WINDOWS
 
