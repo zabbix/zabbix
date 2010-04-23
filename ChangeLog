@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [DEV-459] made improvements in discovery page generation (Aly)
  - [ZBX-2148] added preview button in graphs form (Aly)
  - [ZBX-2337] fixed error when select web item in trigger configuration (Vedmak)
  - [ZBX-2306] fixed links for graphs in screens (Aly)
