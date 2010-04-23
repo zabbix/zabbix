@@ -38,22 +38,19 @@ include_once 'include/page_header.php';
 	);
 
 	check_fields($fields);
-
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY);
 ?>
-
 <?php
 	$_REQUEST['config'] = get_request('config', CProfile::get('web.queue.config', 0));
 	CProfile::update('web.queue.config',$_REQUEST['config'], PROFILE_TYPE_INT);
 
 	$form = new CForm();
-	$form->SetMethod('get');
+	$form->setMethod('get');
 
 	$cmbMode = new CComboBox("config", $_REQUEST["config"], "submit();");
-	$cmbMode->AddItem(0, S_OVERVIEW);
-	$cmbMode->AddItem(1, S_OVERVIEW_BY_PROXY);
-	$cmbMode->AddItem(2, S_DETAILS);
-	$form->AddItem($cmbMode);
+	$cmbMode->addItem(0, S_OVERVIEW);
+	$cmbMode->addItem(1, S_OVERVIEW_BY_PROXY);
+	$cmbMode->addItem(2, S_DETAILS);
+	$form->addItem($cmbMode);
 
 	$queue_wdgt = new CWidget();
 	$queue_wdgt->addPageHeader(S_QUEUE_OF_ITEMS_TO_BE_UPDATED_BIG, $form);
@@ -92,7 +89,7 @@ include_once 'include/page_header.php';
 			ITEM_TYPE_EXTERNAL,
 			ITEM_TYPE_CALCULATED);
 
-	$result = DBselect('SELECT i.itemid,i.lastclock,i.description,i.key_,i.type,h.host,h.hostid,h.proxy_hostid,i.delay,i.delay_flex'.
+	$sql = 'SELECT i.itemid,i.lastclock,i.description,i.key_,i.type,h.host,h.hostid,h.proxy_hostid,i.delay,i.delay_flex'.
 		' FROM items i,hosts h'.
 		' WHERE i.hostid=h.hostid'.
 			' AND h.status='.HOST_STATUS_MONITORED.
@@ -106,9 +103,9 @@ include_once 'include/page_header.php';
 				' OR (h.snmp_available<>'.HOST_AVAILABLE_FALSE.' AND i.type in ('.implode(',',$snmp_item_types).'))'.
 				' OR (h.ipmi_available<>'.HOST_AVAILABLE_FALSE.' AND i.type in ('.implode(',',$ipmi_item_types).'))'.
 				')'.
-			' AND '.DBcondition('h.hostid',$available_hosts).
-			' AND '.DBin_node('h.hostid', get_current_nodeid()).
-		' ORDER BY i.lastclock,h.host,i.description,i.key_');
+			' AND '.DBin_node('i.itemid', get_current_nodeid()).
+		' ORDER BY i.lastclock,h.host,i.description,i.key_';
+	$result = DBselect($sql);
 
 	$table = new CTableInfo(S_THE_QUEUE_IS_EMPTY);
 	$truncated = 0;
@@ -157,8 +154,7 @@ include_once 'include/page_header.php';
 			$table->addRow($elements);
 		}
 	}
-	else if ($_REQUEST["config"] == 1)
-	{
+	else if ($_REQUEST["config"] == 1){
 		$db_proxies = DBselect('select hostid from hosts where status='.HOST_STATUS_PROXY);
 
 		while (null != ($db_proxy = DBfetch($db_proxies))){
@@ -177,8 +173,7 @@ include_once 'include/page_header.php';
 		$sec_600[0]	= 0;
 		$sec_rest[0]	= 0;
 
-		while ($row = DBfetch($result))
-		{
+		while ($row = DBfetch($result)){
 			$res = calculate_item_nextcheck($row['itemid'], $row['type'], $row['delay'], $row['delay_flex'], $row['lastclock']);
 			if (0 != $row['proxy_hostid'])
 				$res['nextcheck'] = $row['lastclock'] + $res['delay'];
@@ -223,11 +218,10 @@ include_once 'include/page_header.php';
 		);
 		$table->addRow($elements);
 	}
-	else if ($_REQUEST["config"] == 2)
-	{
+	else if ($_REQUEST["config"] == 2){
 		$arr = array();
 
-		$table->SetHeader(array(
+		$table->setHeader(array(
 				S_NEXT_CHECK,
 				S_DELAYED_BY,
 				is_show_all_nodes() ? S_NODE : null,
@@ -250,13 +244,12 @@ include_once 'include/page_header.php';
 		sort($arr);
 		foreach($arr as $r){
 			$rows++;
-			if ($rows > 500)
-			{
+			if ($rows > 500){
 				$truncated = 1;
 				break;
 			}
 
-			$table->AddRow(array(
+			$table->addRow(array(
 				zbx_date2str(S_QUEUE_NODES_DATE_FORMAT,
 					$r[0]),
 				zbx_date2age($r[0]),
