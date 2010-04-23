@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2360] added multiple acknowledging for OK>UNKNOWN>OK and PROBLEM>UNKNOWN>PROBLEM events (Vedmak,Sasha)
  - [ZBX-2354] updated Russian translation; thanks to dotneft (Richlv)
  - [ZBX-2352] fixed typo in the default locale (Richlv)
  - [ZBX-2312] fixed event order in "monitoring triggers" and "last 20 events" (Vedmak)

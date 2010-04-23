@@ -283,107 +283,6 @@ DB_RESULT DBselectN(char *query, int n)
 	return result;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: get_latest_event_status                                          *
- *                                                                            *
- * Purpose: return status of latest event of the trigger                      *
- *                                                                            *
- * Parameters: triggerid - trigger ID, status - trigger status                *
- *                                                                            *
- * Return value: On SUCCESS, status - status of last event                    *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments: Rewrite required to simplify logic ?                             *
- *                                                                            *
- ******************************************************************************/
-void	get_latest_event_status(zbx_uint64_t triggerid, int *prev_status, int *latest_status)
-{
-	char		sql[MAX_STRING_LEN];
-	DB_RESULT	result;
-	DB_ROW		row;
-/*	zbx_uint64_t	eventid_max=0;
-	zbx_uint64_t	eventid_prev_max=0;
-	zbx_uint64_t	eventid_tmp;
-	int		value_max;
-	int		value_prev_max;*/
-
-
-	zabbix_log(LOG_LEVEL_DEBUG,"In get_latest_event_status(triggerid:" ZBX_FS_UI64,
-		triggerid);
-
-	/* Object and objectid are used for efficient sort by the same index as in wehere condition */
-	zbx_snprintf(sql,sizeof(sql),"select eventid,value,clock,object,objectid from events where source=%d and object=%d and objectid=" ZBX_FS_UI64 " order by object desc,objectid desc,eventid desc",
-	/* The SQL is inefficient */
-/*	zbx_snprintf(sql,sizeof(sql),"select eventid,value,clock from events where source=%d and object=%d and objectid=" ZBX_FS_UI64 " order by clock desc",*/
-		EVENT_SOURCE_TRIGGERS,
-		EVENT_OBJECT_TRIGGER,
-		triggerid);
-	result = DBselectN(sql,2);
-
-	row=DBfetch(result);
-	if(row && (DBis_null(row[0])!=SUCCEED))
-	{
-		*latest_status = atoi(row[1]);
-		*prev_status = TRIGGER_VALUE_UNKNOWN;
-
-		row=DBfetch(result);
-		if(row && (DBis_null(row[0])!=SUCCEED))
-		{
-			*prev_status = atoi(row[1]);
-		}
-	}
-	else
-	{
-		*latest_status = TRIGGER_VALUE_UNKNOWN;
-		*prev_status = TRIGGER_VALUE_UNKNOWN;
-	}
-	DBfree_result(result);
-
-/* I do not remember exactly why it was so complex. Rewritten. */
-
-/*
-	zbx_snprintf(sql,sizeof(sql),"select eventid,value,clock from events where source=%d and object=%d and objectid=" ZBX_FS_UI64 " order by clock desc",
-		EVENT_SOURCE_TRIGGERS,
-		EVENT_OBJECT_TRIGGER,
-		triggerid);
-	result = DBselectN(sql,20);
-
-	while((row=DBfetch(result)))
-	{
-		ZBX_STR2UINT64(eventid_tmp, row[0]);
-		zabbix_log(LOG_LEVEL_WARNING,"eventid_tmp " ZBX_FS_UI64, eventid_tmp);
-		if(eventid_tmp >= eventid_max)
-		{
-			zabbix_log(LOG_LEVEL_WARNING,"New max id " ZBX_FS_UI64, eventid_tmp);
-			eventid_prev_max=eventid_max;
-			value_prev_max=value_max;
-			eventid_max=eventid_tmp;
-			value_max=atoi(row[1]);
-		}
-	}
-
-	if(eventid_max == 0)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Result for last is empty" );
-		*prev_status = TRIGGER_VALUE_UNKNOWN;
-		*latest_status = TRIGGER_VALUE_UNKNOWN;
-	}
-	else
-	{
-		*latest_status = value_max;
-		*prev_status = TRIGGER_VALUE_FALSE;
-
-		if(eventid_prev_max != 0)
-		{
-			*prev_status = value_prev_max;
-		}
-	}
-	DBfree_result(result);
-*/
-}
-
 /* SUCCEED if latest service alarm has this status */
 /* Rewrite required to simplify logic ?*/
 int	latest_service_alarm(zbx_uint64_t serviceid, int status)
@@ -520,121 +419,82 @@ static int	trigger_dependent(zbx_uint64_t triggerid)
 	return ret;
 }
 
-int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, const char *reason)
+int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger_value,
+		const char *trigger_error, int new_value, int now, const char *reason)
 {
+	const char	*__function_name = "update_trigger_value";
 	int		ret = SUCCEED;
 	DB_EVENT	event;
-	int		event_last_status;
-	int		event_prev_status;
 	int		update_status;
 	char		*reason_esc;
 
-	if(reason==NULL)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value(triggerid:" ZBX_FS_UI64 ",old:%d,new:%d,%d)",
-			trigger->triggerid,
-			trigger->value,
-			new_value,
-			now);
-	}
+	if (reason == NULL)
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 " old:%d new:%d now:%d",
+				__function_name, triggerid, trigger_value, new_value, now);
 	else
-	{
-		zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value(triggerid:" ZBX_FS_UI64 ",old:%d,new:%d,%d,%s)",
-			trigger->triggerid,
-			trigger->value,
-			new_value,
-			now,
-			reason);
-	}
+		zabbix_log(LOG_LEVEL_DEBUG,"In %s() triggerid:" ZBX_FS_UI64 " old:%d new:%d now:%d reason:'%s'",
+				__function_name, triggerid, trigger_value, new_value, now, reason);
 
-	switch(trigger->type)
+	switch (trigger_type)
 	{
 		case TRIGGER_TYPE_MULTIPLE_TRUE:
-			update_status = (trigger->value != new_value) || (new_value == TRIGGER_VALUE_TRUE);
-			update_status = update_status && trigger_dependent(trigger->triggerid) == FAIL;
+			update_status = (trigger_value != new_value || new_value == TRIGGER_VALUE_TRUE);
+			update_status = update_status && trigger_dependent(triggerid) == FAIL;
 			break;
 		case TRIGGER_TYPE_NORMAL:
 		default:
-			update_status = (trigger->value != new_value && trigger_dependent(trigger->triggerid) == FAIL);
+			update_status = (trigger_value != new_value && trigger_dependent(triggerid) == FAIL);
 			break;
 	}
 
 	/* New trigger value differs from current one AND ...*/
 	/* ... Do not update status if there are dependencies with status TRUE*/
-	if(update_status)
+	if (update_status)
 	{
-		get_latest_event_status(trigger->triggerid, &event_prev_status, &event_last_status);
-
-		zabbix_log(LOG_LEVEL_DEBUG,"tr value [%d] event_prev_value [%d] event_last_status [%d] new_value [%d]",
-				trigger->value,
-				event_prev_status,
-				event_last_status,
-				new_value);
-
 		/* New trigger status is NOT equal to previous one, update trigger */
-		if(trigger->value != new_value ||
-			(trigger->type == TRIGGER_TYPE_MULTIPLE_TRUE && new_value == TRIGGER_VALUE_TRUE))
+		if (trigger_value != new_value ||
+				(trigger_type == TRIGGER_TYPE_MULTIPLE_TRUE && new_value == TRIGGER_VALUE_TRUE))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG,"Updating trigger");
-			if(reason==NULL)
+			if (reason == NULL)
 			{
-				DBexecute("update triggers set value=%d,lastchange=%d,error='' where triggerid=" ZBX_FS_UI64,
-					new_value,
-					now,
-					trigger->triggerid);
+				DBexecute("update triggers"
+						" set value=%d,"
+							"lastchange=%d,"
+							"error=''"
+						" where triggerid=" ZBX_FS_UI64,
+					new_value, now, triggerid);
 			}
 			else
 			{
 				reason_esc = DBdyn_escape_string_len(reason, TRIGGER_ERROR_LEN);
-				DBexecute("update triggers set value=%d,lastchange=%d,error='%s' where triggerid=" ZBX_FS_UI64,
-					new_value,
-					now,
-					reason_esc,
-					trigger->triggerid);
+				DBexecute("update triggers"
+						" set value=%d,"
+							"lastchange=%d,"
+							"error='%s'"
+						" where triggerid=" ZBX_FS_UI64,
+					new_value, now, reason_esc, triggerid);
 				zbx_free(reason_esc);
 			}
-		}
 
-		/* The latest event has the same status, do not generate new one */
-		/* Generate also UNKNOWN events, We are not interested in prev trigger value here. */
-		if(event_last_status != new_value ||
-			(trigger->type == TRIGGER_TYPE_MULTIPLE_TRUE && new_value == TRIGGER_VALUE_TRUE)
-		)
-		{
 			/* Preparing event for processing */
-			memset(&event,0,sizeof(DB_EVENT));
-			event.eventid = 0;
+			memset(&event, 0, sizeof(DB_EVENT));
 			event.source = EVENT_SOURCE_TRIGGERS;
 			event.object = EVENT_OBJECT_TRIGGER;
-			event.objectid = trigger->triggerid;
+			event.objectid = triggerid;
 			event.clock = now;
 			event.value = new_value;
-			event.acknowledged = 0;
 
 			/* Processing event */
-			if(process_event(&event) == SUCCEED)
+			if (FAIL == (ret = process_event(&event)))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG,"Event processed OK");
-			}
-			else
-			{
-				ret = FAIL;
-				zabbix_log(LOG_LEVEL_WARNING,"Event processed not OK");
+				zabbix_log(LOG_LEVEL_DEBUG,"Event not added for triggerid [" ZBX_FS_UI64 "]",
+						triggerid);
 			}
 		}
 		else
-		{
 			ret = FAIL;
-		}
-
-		if( FAIL == ret)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG,"Event not added for triggerid [" ZBX_FS_UI64 "]",
-				trigger->triggerid);
-			ret = FAIL;
-		}
 	}
-	else if (new_value == TRIGGER_VALUE_UNKNOWN && 0 != strcmp(trigger->error, reason))
+	else if (new_value == TRIGGER_VALUE_UNKNOWN && 0 != strcmp(trigger_error, reason))
 	{
 		reason_esc = DBdyn_escape_string_len(reason, TRIGGER_ERROR_LEN);
 		DBexecute("update triggers"
@@ -643,14 +503,15 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, const ch
 				" where triggerid=" ZBX_FS_UI64,
 				now,
 				reason_esc,
-				trigger->triggerid);
+				triggerid);
 		zbx_free(reason_esc);
 	}
 	else
-	{
 		ret = FAIL;
-	}
-	zabbix_log(LOG_LEVEL_DEBUG,"End update_trigger_value()");
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
+			__function_name, zbx_result_string(ret));
+
 	return ret;
 }
 
@@ -709,10 +570,10 @@ void DBupdate_triggers_status_after_restart(void)
 	DB_RESULT	result2;
 	DB_ROW		row;
 	DB_ROW		row2;
-	DB_TRIGGER	trigger;
-	zbx_uint64_t	itemid;
-	int		type, lastclock, delay, nextcheck,
-			min_nextcheck, now;
+	zbx_uint64_t	itemid, triggerid;
+	int		trigger_type, trigger_value, type, lastclock, delay,
+			nextcheck, min_nextcheck, now;
+	const char	*trigger_error;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -721,44 +582,38 @@ void DBupdate_triggers_status_after_restart(void)
 	DBbegin();
 
 	result = DBselect(
-			"select distinct t.triggerid,t.expression,t.description,"
-				"t.status,t.priority,t.value,t.url,t.comments"
-			" from hosts h,items i,triggers t,functions f"
+			"select distinct t.triggerid,t.type,t.value,t.error"
+			" from hosts h,items i,functions f,triggers t"
 			" where h.hostid=i.hostid"
 				" and i.itemid=f.itemid"
 				" and f.triggerid=t.triggerid"
 				" and h.status in (%d)"
 				" and i.status in (%d)"
-				" and t.status in (%d)"
 				" and i.type not in (%d)"
-				" and i.key_ not in ('%s','%s')",
+				" and i.key_ not in ('%s','%s')"
+				" and t.status in (%d)",
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
-			TRIGGER_STATUS_ENABLED,
 			ITEM_TYPE_TRAPPER,
-			SERVER_STATUS_KEY, SERVER_ZABBIXLOG_KEY);
+			SERVER_STATUS_KEY, SERVER_ZABBIXLOG_KEY,
+			TRIGGER_STATUS_ENABLED);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(trigger.triggerid, row[0]);
-		strscpy(trigger.expression, row[1]);
-		strscpy(trigger.description, row[2]);
-		trigger.status = atoi(row[3]);
-		trigger.priority = atoi(row[4]);
-		trigger.value = atoi(row[5]);
-		trigger.url = row[6];
-		trigger.comments = row[7];
+		ZBX_STR2UINT64(triggerid, row[0]);
+		trigger_type = atoi(row[1]);
+		trigger_value = atoi(row[2]);
+		trigger_error = row[3];
 
 		result2 = DBselect(
-				"select i.itemid,i.type,i.lastclock,i.delay,i.delay_flex"
-				" from hosts h,items i,triggers t,functions f"
-				" where h.hostid=i.hostid"
-					" and i.itemid=f.itemid"
+				"select distinct i.itemid,i.type,i.lastclock,i.delay,i.delay_flex"
+				" from items i,functions f,triggers t"
+				" where i.itemid=f.itemid"
 					" and f.triggerid=t.triggerid"
-					" and t.triggerid=" ZBX_FS_UI64
-					" and i.type not in (%d)",
-				trigger.triggerid,
-				ITEM_TYPE_TRAPPER);
+					" and i.type not in (%d)"
+					" and t.triggerid=" ZBX_FS_UI64,
+				ITEM_TYPE_TRAPPER,
+				triggerid);
 
 		min_nextcheck = -1;
 		while (NULL != (row2 = DBfetch(result2)))
@@ -780,8 +635,8 @@ void DBupdate_triggers_status_after_restart(void)
 		if (-1 == min_nextcheck || min_nextcheck >= now)
 			continue;
 
-		DBupdate_trigger_value(&trigger, TRIGGER_VALUE_UNKNOWN,
-				min_nextcheck, "Zabbix was restarted.");
+		DBupdate_trigger_value(triggerid, trigger_type, trigger_value, trigger_error,
+				TRIGGER_VALUE_UNKNOWN, min_nextcheck, "Zabbix was restarted.");
 	}
 	DBfree_result(result);
 

@@ -304,14 +304,12 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from)
 			continue;
 
 		/* Preparing event for processing */
-		memset(&event,0,sizeof(DB_EVENT));
-		event.eventid = 0;
+		memset(&event, 0, sizeof(DB_EVENT));
 		event.source = EVENT_SOURCE_TRIGGERS;
 		event.object = EVENT_OBJECT_TRIGGER;
 		event.objectid = triggerid;
 		event.clock = now;
 		event.value = value_after;
-		event.acknowledged = 0;
 
 		process_event(&event);
 	}

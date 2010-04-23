@@ -328,33 +328,39 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, int now, char
 	const char	*__function_name = "update_triggers_status_to_unknown";
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_TRIGGER	trigger;
+	zbx_uint64_t	triggerid;
+	int		trigger_type, trigger_value;
+	const char	*trigger_error;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64,
+			__function_name, hostid);
 
 	result = DBselect(
-			"select distinct t.triggerid,t.expression,t.description,t.status,t.priority,"
-				"t.value,t.url,t.comments"
-			" from hosts h,items i,triggers t,functions f"
-			" where f.triggerid=t.triggerid"
-				" and f.itemid=i.itemid"
-				" and h.hostid=i.hostid"
-				" and h.hostid=" ZBX_FS_UI64
+			"select distinct t.triggerid,t.type,t.value,t.error"
+			" from hosts h,items i,functions f,triggers t"
+			" where h.hostid=i.hostid"
+				" and i.itemid=f.itemid"
+				" and f.triggerid=t.triggerid"
+				" and t.status=%d"
+				" and i.status=%d"
 				" and not i.key_ like '%s'"
-				" and not i.key_ like '%s%%'",
-			hostid, SERVER_STATUS_KEY, SERVER_ICMPPING_KEY);
+				" and not i.key_ like '%s%%'"
+				" and h.hostid=" ZBX_FS_UI64,
+			TRIGGER_STATUS_ENABLED,
+			ITEM_STATUS_ACTIVE,
+			SERVER_STATUS_KEY,
+			SERVER_ICMPPING_KEY,
+			hostid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(trigger.triggerid, row[0]);
-		strscpy(trigger.expression, row[1]);
-		strscpy(trigger.description, row[2]);
-		trigger.status		= atoi(row[3]);
-		trigger.priority	= atoi(row[4]);
-		trigger.value		= atoi(row[5]);
-		trigger.url		= row[6];
-		trigger.comments	= row[7];
-		DBupdate_trigger_value(&trigger, TRIGGER_VALUE_UNKNOWN, now, reason);
+		ZBX_STR2UINT64(triggerid, row[0]);
+		trigger_type = atoi(row[1]);
+		trigger_value = atoi(row[2]);
+		trigger_error = row[3];
+
+		DBupdate_trigger_value(triggerid, trigger_type, trigger_value,
+				trigger_error, TRIGGER_VALUE_UNKNOWN, now, reason);
 	}
 	DBfree_result(result);
 
