@@ -250,7 +250,7 @@ include_once 'include/page_header.php';
 			}
 
 			$table->addRow(array(
-				date(S_DATE_FORMAT_YMDHMS,
+				zbx_date2str(S_QUEUE_NODES_DATE_FORMAT,
 					$r[0]),
 				zbx_date2age($r[0]),
 				get_node_name_by_elid($r[1]),

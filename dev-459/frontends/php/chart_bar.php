@@ -279,11 +279,11 @@ include_once('include/page_header.php');
 			}
 
 			if(!isset($graph_data['captions'])){
-				$date_caption = ($scaletype == TIMEPERIOD_TYPE_HOURLY)?'Y.m.d H:i':'Y.m.d';
+				$date_caption = ($scaletype == TIMEPERIOD_TYPE_HOURLY)?S_CHARTBAR_HOURLY_DATE_FORMAT:S_CHARTBAR_DAILY_DATE_FORMAT;
 
 				$graph_data['captions'] = array();
 				foreach($item_data['clock'] as $id => $clock){
-					$graph_data['captions'][$id] = date($date_caption,$clock);
+					$graph_data['captions'][$id] = zbx_date2str($date_caption,$clock);
 				}
 			}
 		}
@@ -615,8 +615,8 @@ include_once('include/page_header.php');
 					$graph_data['colors'][$count] = rgb2hex($tmp_color);
 				}
 
-				$date_caption = ($scaletype == TIMEPERIOD_TYPE_HOURLY)?'Y.m.d H:i':'Y.m.d';
-				$graph_data['legend'][$count] = date($date_caption, $start);
+				$date_caption = ($scaletype == TIMEPERIOD_TYPE_HOURLY)?S_CHARTBAR_HOURLY_DATE_FORMAT:S_CHARTBAR_DAILY_DATE_FORMAT;
+				$graph_data['legend'][$count] = zbx_date2str($date_caption, $start);
 
 				$count++;
 			}

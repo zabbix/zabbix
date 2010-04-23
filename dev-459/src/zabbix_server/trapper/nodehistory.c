@@ -56,9 +56,9 @@ int	send_history_last_id(zbx_sock_t *sock, const char *data)
 	const char	*r;
 	const ZBX_TABLE	*table;
 	int		buffer_offset;
-	int		sender_nodeid, nodeid, res;
+	int		sender_nodeid = (-1), nodeid = (-1), res;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In send_list_of_history_ids()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In send_history_last_id()");
 
 	buffer_allocated = 320;
 	buffer = zbx_malloc(buffer, buffer_allocated);

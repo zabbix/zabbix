@@ -741,7 +741,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 	DB_ACTION	action;
 	DB_EVENT	event;
 	char		*error = NULL;
-	int		source;
+	int		source = (-1);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In execute_escalation()");
 
@@ -881,14 +881,14 @@ static void	process_escalations(int now)
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ESCALATION	escalation;
-	int		superseded;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_escalations()");
 
 	result = DBselect("select escalationid,actionid,triggerid,eventid,r_eventid,esc_step,status"
-			" from escalations where status in (%d,%d,%d) and nextcheck<=%d" DB_NODE,
+			" from escalations where status in (%d,%d,%d,%d) and nextcheck<=%d" DB_NODE,
 			ESCALATION_STATUS_ACTIVE,
-			ESCALATION_STATUS_SUPERSEDED,
+			ESCALATION_STATUS_SUPERSEDED_ACTIVE,
+			ESCALATION_STATUS_SUPERSEDED_RECOVERY,
 			ESCALATION_STATUS_RECOVERY,
 			now,
 			DBnode_local("escalationid"));
@@ -907,25 +907,42 @@ static void	process_escalations(int now)
 
 		DBbegin();
 
-		if (escalation.status == ESCALATION_STATUS_SUPERSEDED)
+		if (escalation.status == ESCALATION_STATUS_SUPERSEDED_ACTIVE)
 		{
-			superseded = 1;
 			escalation.status = ESCALATION_STATUS_ACTIVE;
+			execute_escalation(&escalation);
+			DBexecute("delete from escalations where escalationid=" ZBX_FS_UI64 " and status=%d",
+					escalation.escalationid,
+					ESCALATION_STATUS_SUPERSEDED_ACTIVE);
+			DBexecute("update escalations set status=%d where escalationid=" ZBX_FS_UI64 " and status=%d",
+					ESCALATION_STATUS_RECOVERY,
+					escalation.escalationid,
+					ESCALATION_STATUS_SUPERSEDED_RECOVERY);
+		}
+		else if (escalation.status == ESCALATION_STATUS_SUPERSEDED_RECOVERY)
+		{
+			escalation.status = ESCALATION_STATUS_ACTIVE;
+			execute_escalation(&escalation);
+			escalation.status = ESCALATION_STATUS_RECOVERY;
+			execute_escalation(&escalation);
+			DBremove_escalation(escalation.escalationid);
 		}
 		else
-			superseded = 0;
+		{
+			execute_escalation(&escalation);
 
-		execute_escalation(&escalation);
-
-		if (escalation.status == ESCALATION_STATUS_COMPLETED || superseded == 1)
-			DBremove_escalation(escalation.escalationid);
-		else
-			DBexecute("update escalations set status=%d,esc_step=%d,nextcheck=%d"
-					" where escalationid=" ZBX_FS_UI64,
-					escalation.status,
-					escalation.esc_step,
-					escalation.nextcheck,
-					escalation.escalationid);
+			if (escalation.status == ESCALATION_STATUS_COMPLETED)
+				DBremove_escalation(escalation.escalationid);
+			else
+				DBexecute("update escalations set status=%d,esc_step=%d,nextcheck=%d"
+						" where escalationid=" ZBX_FS_UI64
+							" and status=%d",
+						escalation.status,
+						escalation.esc_step,
+						escalation.nextcheck,
+						escalation.escalationid,
+						ESCALATION_STATUS_ACTIVE);
+		}
 
 		DBcommit();
 	}

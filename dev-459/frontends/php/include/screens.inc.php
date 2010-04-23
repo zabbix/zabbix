@@ -388,7 +388,7 @@ require_once('include/js.inc.php');
 			$pre = new CTag('pre', true);
 			$pre->addItem($value);
 
-			$table->addRow(array(date(S_DATE_FORMAT_YMDHMS,$row['clock']),	$pre));
+			$table->addRow(array(zbx_date2str(S_SCREENS_PLAIN_TEXT_DATE_FORMAT,$row['clock']),	$pre));
 		}
 
 	return $table;
@@ -1091,11 +1091,13 @@ require_once('include/js.inc.php');
 						$objData['src'] = $src;
 					}
 
-					$div = new CDiv();
-					$div->setAttribute('id', $containerid);
-					$item[] = $div;
+					if($default) $item = new CLink(null, $action);
+					else $item = new CDiv();
 
-					if($default && ($editmode == 1)){
+					$item->setAttribute('id', $containerid);
+
+					$item = array($item);
+					if($editmode == 1){
 						$item[] = new CLink(S_CHANGE, $action);
 					}
 
@@ -1107,10 +1109,7 @@ require_once('include/js.inc.php');
 					$dom_graph_id = 'graph_'.$screenitemid.'_'.$resourceid;
 					$containerid = 'graph_cont_'.$screenitemid.'_'.$resourceid;
 
-					$graphDims['graphHeight'] = 200;
-					$graphDims['shiftXleft'] = 100;
-					$graphDims['shiftXright'] = 50;
-					$graphDims['graphtype'] = 0;
+					$graphDims = getGraphDims();
 					$graphDims['graphHeight'] = $height;
 					$graphDims['width'] = $width;
 
@@ -1156,10 +1155,13 @@ require_once('include/js.inc.php');
 
 					$objData['src'] = $src;
 
-					$div = new CDiv();
-					$div->setAttribute('id', $containerid);
-					$item[] = $div;
-					$item[] = new CLink(S_CHANGE, $action);
+					$item = new CLink(null, $action);
+					$item->setAttribute('id', $containerid);
+
+					$item = array($item);
+					if($editmode == 1){
+						$item[] = new CLink(S_CHANGE, $action);
+					}
 					
 //					zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 					insert_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
@@ -1265,7 +1267,7 @@ require_once('include/js.inc.php');
 					}
 ///-----------------------
 
-					$item = array(get_table_header(array(S_STATUS_OF_TRIGGERS_BIG,SPACE,date('[H:i:s]',time())), $tr_form));
+					$item = array(get_table_header(array(S_STATUS_OF_TRIGGERS_BIG,SPACE,zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT)), $tr_form));
 					$item[] = make_latest_issues($params);
 
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
@@ -1343,7 +1345,7 @@ require_once('include/js.inc.php');
 					}
 ///-----------------------
 
-					$item = array(get_table_header(array(S_STATUS_OF_TRIGGERS_BIG,SPACE,date('[H:i:s]',time())), $tr_form));
+					$item = array(get_table_header(array(S_STATUS_OF_TRIGGERS_BIG,SPACE,zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT)), $tr_form));
 					$item[] = make_latest_issues($params);
 
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
@@ -1357,7 +1359,7 @@ require_once('include/js.inc.php');
 						'limit' => null
 					);
 
-					$item = array(get_table_header(array(S_SYSTEM_STATUS,SPACE,date('[H:i:s]',time()))));
+					$item = array(get_table_header(array(S_SYSTEM_STATUS,SPACE,zbx_date2str(S_SCREENS_TRIGGER_FORM_DATE_FORMAT))));
 					$item[] = make_system_summary($params);
 
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
