@@ -2092,14 +2092,12 @@ onselect: function(){
 	this.debug('onselect');
 
 	this.px2time = this.timeline.period() / this.cobj.width;
-	var userstarttime = (this.timeline.usertime() - this.timeline.period()) + Math.round(this.box.left * this.px2time);
-//alert(userstarttime+' : '+Math.round(this.box.left * this.px2time)+' - '+this.box.left);
+	var userstarttime = (this.timeline.usertime() - this.timeline.period()) + Math.round((this.box.left-this.cobj.left) * this.px2time);
+
 	var new_period = this.calcperiod();
 	
 	this.timeline.period(new_period);
 	this.timeline.usertime(userstarttime + new_period);
-
-//SDI(this.stime+' : '+this.period);
 
 	this.onchange(this.sbox_id, this.timeline.timelineid, true);
 },
