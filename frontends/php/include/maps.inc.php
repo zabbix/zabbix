@@ -412,7 +412,7 @@
 		$options = array(
 				'sysmapids' => $sysmapid,
 				'output' => API_OUTPUT_EXTEND,
-				'select_selements' => 1,
+				'select_selements' => API_OUTPUT_EXTEND,
 				'nopermissions' => 1
 			);
 
@@ -436,9 +436,9 @@
 		$options = array(
 			'nodeids' => get_current_nodeid(true),
 			'hostids' => $hostids,
-			'extendoutput' => 1,
-			'select_groups' => 1,
-			'select_triggers' => 1,
+			'output' => API_OUTPUT_EXTEND,
+			'select_groups' => API_OUTPUT_EXTEND,
+			'select_triggers' => API_OUTPUT_EXTEND,
 			'nopermissions' => 1
 		);
 		$hosts = CHost::get($options);
