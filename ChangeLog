@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2148] added preview button in graphs form (Aly)
  - [ZBX-2337] fixed error when select web item in trigger configuration (Vedmak)
  - [ZBX-2306] fixed links for graphs in screens (Aly)
  - [ZBX-633] removed linkage of OpenIPMI library to Agents in "configure" script (Sasha) 
