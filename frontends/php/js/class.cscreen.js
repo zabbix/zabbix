@@ -114,16 +114,24 @@ on_drop: function(element, dropon, event){
 	var c2 = pos[2];
 	
 	var url = new Curl(location.href);
+	
+	var args = url.getArguments();
+	for(a in args){
+		if(a == 'screenid') continue;
+		url.unsetArgument(a);
+	}
+	
 	url.setArgument('sw_pos[0]',r1);
 	url.setArgument('sw_pos[1]',c1);
 	url.setArgument('sw_pos[2]',r2);
 	url.setArgument('sw_pos[3]',c2);
 	
-	url.unsetArgument('add_row');
-	url.unsetArgument('add_col');
-	url.unsetArgument('rmv_row');
-	url.unsetArgument('rmv_col');
 	
+	// url.unsetArgument('add_row');
+	// url.unsetArgument('add_col');
+	// url.unsetArgument('rmv_row');
+	// url.unsetArgument('rmv_col');
+		
 	location.href = url.getUrl();
 },
 
