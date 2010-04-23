@@ -606,7 +606,8 @@ class CEvent extends CZBXAPI{
 			$options = array(
 				'eventids' => $eventids,
 				'preservekeys' => 1,
-				'output' => API_OUTPUT_EXTEND
+				'output' => API_OUTPUT_EXTEND,
+				'select_triggers' => API_OUTPUT_EXTEND,
 			);
 			$allowed_events = self::get($options);
 			foreach($events as $num => $event){
@@ -617,42 +618,46 @@ class CEvent extends CZBXAPI{
 // }}} PERMISSIONS
 
 			foreach($allowed_events as $event){
-				$val = ($event['value'] == TRIGGER_VALUE_TRUE ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE);
-
-				$sql = ' SELECT eventid, object, objectid'.
-					' FROM events'.
-					' WHERE eventid < '.$event['eventid'].
-					' AND objectid = '.$event['objectid'].
-					' AND value = '.$val.
-					' AND object = '.EVENT_OBJECT_TRIGGER.
-					' ORDER BY object desc, objectid desc, eventid DESC'.
-					' LIMIT 1';
-				$first = DBfetch(DBselect($sql));
-				$first_sql = $first ? ' AND e.eventid > '.$first['eventid'] : '';
-
-
-				$sql = ' SELECT eventid, object, objectid'.
-					' FROM events'.
-					' WHERE eventid > '.$event['eventid'].
-					' AND objectid = '.$event['objectid'].
-					' AND value = '.$val.
-					' AND object = '.EVENT_OBJECT_TRIGGER.
-					' ORDER BY object ASC, objectid ASC, eventid ASC'.
-					' LIMIT 1';
-				$last = DBfetch(DBselect($sql));
-				$last_sql = $last ? ' AND e.eventid < '.$last['eventid'] : '';
-
+				$trig = reset($event['triggers']);
+				if(!(($trig['type'] == TRIGGER_MULT_EVENT_ENABLED) && ($event['value'] == TRIGGER_VALUE_TRUE))){
 				
-				$sql = 'SELECT e.eventid'.
-					' FROM events e'.
-					' WHERE e.objectid = '.$event['objectid'].
-						' AND e.value = '. ($val ? 0 : 1).
-						$first_sql.
-						$last_sql;
+					$val = ($event['value'] == TRIGGER_VALUE_TRUE ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE);
 
-				$db_events = DBselect($sql);
-				while($eventid = DBfetch($db_events)){
-					$eventids[$eventid['eventid']] = $eventid['eventid'];
+					$sql = ' SELECT eventid, object, objectid'.
+						' FROM events'.
+						' WHERE eventid < '.$event['eventid'].
+						' AND objectid = '.$event['objectid'].
+						' AND value = '.$val.
+						' AND object = '.EVENT_OBJECT_TRIGGER.
+						' ORDER BY object desc, objectid desc, eventid DESC'.
+						' LIMIT 1';
+					$first = DBfetch(DBselect($sql));
+					$first_sql = $first ? ' AND e.eventid > '.$first['eventid'] : '';
+
+
+					$sql = ' SELECT eventid, object, objectid'.
+						' FROM events'.
+						' WHERE eventid > '.$event['eventid'].
+						' AND objectid = '.$event['objectid'].
+						' AND value = '.$val.
+						' AND object = '.EVENT_OBJECT_TRIGGER.
+						' ORDER BY object ASC, objectid ASC, eventid ASC'.
+						' LIMIT 1';
+					$last = DBfetch(DBselect($sql));
+					$last_sql = $last ? ' AND e.eventid < '.$last['eventid'] : '';
+
+					
+					$sql = 'SELECT e.eventid'.
+						' FROM events e'.
+						' WHERE e.objectid = '.$event['objectid'].
+							' AND e.value = '. ($val ? 0 : 1).
+							$first_sql.
+							$last_sql;
+
+					$db_events = DBselect($sql);
+					while($eventid = DBfetch($db_events)){
+						$eventids[$eventid['eventid']] = $eventid['eventid'];
+					}
 				}
 			}
 
