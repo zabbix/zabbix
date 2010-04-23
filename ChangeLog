@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2347] fixed last 20 issues in event details showing less than 20 issues (Vedmak)
  - [DEV-459] made improvements in discovery page generation (Aly)
  - [ZBX-2148] added preview button in graphs form (Aly)
  - [ZBX-2337] fixed error when select web item in trigger configuration (Vedmak)
