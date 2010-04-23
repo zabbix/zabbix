@@ -291,7 +291,7 @@ function make_small_eventlist($eventid, $trigger_data){
 		'time_till' => $curevent['clock'],
 		'select_triggers' => API_OUTPUT_EXTEND,
 		'output' => API_OUTPUT_EXTEND,
-		'sortfield' => 'clock',
+		'sortfield' => 'eventid',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => 20
 	);

@@ -427,7 +427,7 @@ include_once('include/page_header.php');
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 			'nopermissions' => 1,
 			'extendoutput' => 1,
-			'sortfield' => 'clock',
+			'sortfield' => 'eventid',
 			'sortorder' => ZBX_SORT_DOWN,
 			'time_from' => time() - ($config['event_expire']*86400),
 			'time_till' => time(),

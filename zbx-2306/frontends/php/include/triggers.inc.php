@@ -1902,8 +1902,10 @@ return $result;
 
 		if(!validate_expression($expression)) return false;
 		if(!validate_trigger_dependency($expression, $deps)) return false;
-		
-		
+
+		if(is_null($description)){
+			$description = $trigger['description'];
+		}
 		if(CTrigger::exists(array('description' => $description, 'expression' => $expression))){
 			preg_match('/{(.+?):/u', $expression, $host);
 
@@ -1912,8 +1914,8 @@ return $result;
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => 1,
 			);
+			$triggers_exist = CTrigger::get($options);
 
-			$triggers_exist = CTrigger::get($options);		
 			$trigger_exist = false;
 			foreach($triggers_exist as $tnum => $tr){
 				$tmp_exp = explode_exp($tr['expression'], false);

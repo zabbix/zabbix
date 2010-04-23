@@ -27,6 +27,10 @@ function __autoload($class_name){
 		'calert' => 1,
 		'capiinfo' => 1,
 		'capplication' => 1,
+		'cdcheck' => 1,
+		'cdhost' => 1,
+		'cdrule' => 1,
+		'cdservice' => 1,
 		'cevent' => 1,
 		'cgraph' => 1,
 		'cgraphitem' => 1,
@@ -255,16 +259,9 @@ function __autoload($class_name){
 
 			$table = new CTable(null, 'warning');
 			$table->setAlign('center');
-			$table->setHeader(new CCol('You are not logged in', 'left'),'header');
+			$table->setHeader(new CCol(S_CONFIG_ERROR_YOU_ARE_NOT_LOGGED_IN_HEAD, 'left'),'header');
 
-			$table->addRow(
-						new CCol(array(
-							S_CONFIG_YOU_CANNOT_VIEW_THIS_PAGE,
-							bold(ZBX_GUEST_USER),
-							'. '.S_CONFIG_MUST_LOGIN_TO_VIEW_PAGE,
-							BR(),
-							S_CONFIG_CONSULT_ADMINISTRATOR))
-					);
+			$table->addRow(new CCol(Array(S_CONFIG_NOT_LOGGED_IN_ACCESS_DENIED, bold(ZBX_GUEST_USER), '. ', S_CONFIG_ERROR_YOU_MUST_LOGIN, BR(), S_CONFIG_NOT_LOGGED_IN_NOTE), 'center'));
 
 			$url = urlencode($req->toString());
 			$footer = new CCol(

@@ -1989,7 +1989,7 @@
 	'S_INCORRECT_TYPE_OF_ASORT_BY_KEY'=>	'Incorrect type of asort_by_key',
 	'S_DAYS_SMALL'=>			'days',
 	'S_B'=>			'B',
-	'S_N_SMALL',	'n',
+	'S_N_SMALL'=>	'n',
 	'S_NANO'=>		'Nano',
 	'S_U_MICRO'=>	'µ',
 	'S_MICRO'=>		'Micro',
@@ -2259,10 +2259,11 @@
 	'S_CUSER_ERROR_INTERNAL_ZABBIX_ERROR'=>			'Internal zabbix error',
 
 //	config.inc.php
-	'S_CONFIG_YOU_CANNOT_VIEW_THIS_PAGE' =>		'You cannot view this page as ',
-	'S_CONFIG_MUST_LOGIN_TO_VIEW_PAGE' =>		'You must login to view this page.',
-	'S_CONFIG_CONSULT_ADMINISTRATOR'=>			'If you think this message is wrong, please consult your administrators about getting the necessary permissions.',
-	'S_CONFIG_ERROR_HEAD'=>						'ERROR',
+	'S_CONFIG_NOT_LOGGED_IN_ACCESS_DENIED'=>		'You cannot view this URL as a ',
+	'S_CONFIG_ERROR_YOU_MUST_LOGIN'=>			'You must login to view this page.',
+	'S_CONFIG_NOT_LOGGED_IN_NOTE'=>				'If you think this message is wrong, please consult your administrators about getting the necessary permissions.',
+	'S_CONFIG_ERROR_YOU_ARE_NOT_LOGGED_IN_HEAD'=>		'You are not logged in.',
+	'S_CONFIG_ERROR_HEAD'=>					'ERROR',
 	'S_CONFIG_WARNING_WRONG_MONTH'=>			'[Wrong value for month: %1$s]',
 	'S_CONFIG_WARNING_WRONG_DOW'=>				'[Wrong value for day of week: %1$s]',
 
@@ -2320,6 +2321,6 @@
 	'S_CANNOT_FIND_OBJECTS_WITH_NAME'=>	'Can not find objects with name',
 	'S_CANNOT_CREATE_NEW_ELEMENT'=>		'Can not create new element',
 	'S_OTHER_SMALL'=>			'other',
-	
+
 );
 ?>

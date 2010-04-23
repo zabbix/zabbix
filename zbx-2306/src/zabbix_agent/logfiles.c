@@ -99,16 +99,17 @@ static int	split_string(const char *str, const char *del, char **part1, char **p
  *           is freed.                                                        *
  *                                                                            *
  ******************************************************************************/
-static int split_filename(const char *filename, char **directory, char **format)
+static int	split_filename(const char *filename, char **directory, char **format)
 {
-	char *separator = NULL;
-	struct stat buf;
+	const char	*__function_name = "split_filename";
+	const char	*separator = NULL;
+	struct stat	buf;
 #ifdef _WINDOWS
-	char *filename_tmp = NULL;
-	char *separator_tmp = NULL;
+	size_t		sz;
 #endif/*_WINDOWS*/
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In split_filename(): filename [%s]", filename);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s'",
+			__function_name, filename);
 
 	assert(directory && !*directory);
 	assert(format && !*format);
@@ -121,52 +122,57 @@ static int split_filename(const char *filename, char **directory, char **format)
 
 /* special processing for Windows world, since PATH part cannot be simply divided from REGEXP part (file format) */
 #ifdef _WINDOWS
-	filename_tmp = strdup(filename);
-	while (separator == NULL)
+	for (sz = strlen(filename) - 1, separator = &filename[sz]; separator >= filename; separator--)
 	{
-		separator_tmp = strrchr(filename_tmp, (int)PATH_SEPARATOR);
-		if (separator_tmp == NULL)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "\"%c\" cannot be found in [%s].", PATH_SEPARATOR, filename_tmp);
-			zbx_free(filename_tmp);
-			return FAIL;
-		}
+		if (PATH_SEPARATOR != *separator)
+			continue;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() %s",
+				__function_name, filename);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() %*s",
+				__function_name, separator - filename + 1, "^");
+
 		/* separator must be relative delimiter of the original filename */
-		separator = (char *)filename + (separator_tmp - filename_tmp);
 		if (FAIL == split_string(filename, separator, directory, format))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot split [%s].", filename);
-			separator = NULL;/* as a FAIL result */
-			zbx_free(filename_tmp);
 			return FAIL;
 		}
+
+		sz = strlen(*directory);
+
 		/* Windows world verification */
-		if (strlen(*directory) + 1 > MAX_PATH)
+		if (sz + 1 > MAX_PATH)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Directory path is too long. Cannot proceed.");
-			zbx_free(filename_tmp);
 			zbx_free(*directory);
 			zbx_free(*format);
 			return FAIL;
 		}
-		/* Windows "stat" functions cannot get info about directories with '\' at the end of the path */
-		/* *nix "stat" functions do get it successfully */
-		if (-1 == zbx_stat(*directory, &buf) || !S_ISDIR(buf.st_mode))
+
+		/* Windows "stat" functions cannot get info about directories with '\' at the end of the path, */
+		/* except for root directories 'x:\' */
+		if (0 == zbx_stat(*directory, &buf) && S_ISDIR(buf.st_mode))
+			break;
+
+		if (sz > 0 && PATH_SEPARATOR == (*directory)[sz - 1])
 		{
-			zbx_rtrim(*directory, "\\");
-			if (-1 == zbx_stat(*directory, &buf) || !S_ISDIR(buf.st_mode))
+			(*directory)[sz - 1] = '\0';
+
+			if (0 == zbx_stat(*directory, &buf) && S_ISDIR(buf.st_mode))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Cannot find [%s] directory.", *directory);
-				zbx_free(*directory);
-				zbx_free(*format);
-				/* do not free filename_tmp here */
-				*separator_tmp = '\0';/* cut the right part of filename_tmp */
-				separator = NULL;
-				continue;
+				(*directory)[sz - 1] = PATH_SEPARATOR;
+				break;
 			}
 		}
-		zbx_free(filename_tmp);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "Cannot find [%s] directory.", *directory);
+		zbx_free(*directory);
+		zbx_free(*format);
 	}
+	
+	if (separator < filename)
+		return FAIL;
 
 #else/* _WINDOWS */
 	separator = strrchr(filename, (int)PATH_SEPARATOR);
@@ -198,7 +204,8 @@ static int split_filename(const char *filename, char **directory, char **format)
 	}
 #endif/* _WINDOWS */
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End split_filename(): directory [%s] format [%s]", *directory, *format);
+	zabbix_log(LOG_LEVEL_DEBUG, "End %s() directory:'%s' format:'%s'",
+			__function_name, *directory, *format);
 
 	return SUCCEED;
 }
@@ -226,7 +233,7 @@ struct st_logfile
  * Comments: Assertion can be deleted later for convenience.                  *
  *                                                                            *
  ******************************************************************************/
-static void init_logfiles(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num)
+/*static void init_logfiles(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In init_logfiles()");
 
@@ -236,7 +243,7 @@ static void init_logfiles(struct st_logfile **logfiles, int *logfiles_alloc, int
 
 	*logfiles_alloc = 64;
 	*logfiles = zbx_malloc(*logfiles, *logfiles_alloc * sizeof(struct st_logfile));
-}
+}*/
 
 /******************************************************************************
  *                                                                            *
@@ -292,15 +299,14 @@ static void free_logfiles(struct st_logfile **logfiles, int *logfiles_alloc, int
  ******************************************************************************/
 static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, const char *filename, const int mtime)
 {
-	int i = 0;
-	int cmp = 0;
+	const char	*__function_name = "add_logfile";
+	int		i = 0, cmp = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In add_logfile() filename: [%s] mtime: [%i]", filename, mtime);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' mtime:'%d'",
+			__function_name, filename, mtime);
 
 	assert(logfiles);
-	assert(*logfiles);
 	assert(logfiles_alloc);
-	assert(*logfiles_alloc);
 	assert(logfiles_num);
 	assert(0 <= *logfiles_num);
 
@@ -309,6 +315,9 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 	{
 		*logfiles_alloc += 64;
 		*logfiles = zbx_realloc(*logfiles, *logfiles_alloc * sizeof(struct st_logfile));
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() logfiles:%p logfiles_alloc:%d",
+				__function_name, *logfiles, *logfiles_alloc);
 	}
 
 	/*from the start go those, which mtimes are smaller*/
@@ -452,7 +461,7 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 #endif /* _WINDOWS */
 
 	/* allocating memory for logfiles */
-	init_logfiles(&logfiles, &logfiles_alloc, &logfiles_num);
+/*	init_logfiles(&logfiles, &logfiles_alloc, &logfiles_num);*/
 
 #ifdef _WINDOWS
 
