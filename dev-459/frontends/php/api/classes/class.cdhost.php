@@ -141,9 +141,20 @@ class CDHost extends CZBXAPI{
 // nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
+// dhostids
+		if(!is_null($options['dhostids'])){
+			zbx_value2array($options['dhostids']);
+			$sql_parts['where']['dhostid'] = DBcondition('dh.dhostid', $options['dhostids']);
+
+			if(!$nodeCheck){
+				$nodeCheck = true;
+				$sql_parts['where'][] = DBin_node('dh.dhostid', $nodeids);
+			}
+		}
+
 // druleids
 		if(!is_null($options['druleids'])){
-			zbx_value2array($options['groupids']);
+			zbx_value2array($options['druleids']);
 			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['druleid'] = 'dh.druleid';
 			}
@@ -157,17 +168,6 @@ class CDHost extends CZBXAPI{
 			if(!$nodeCheck){
 				$nodeCheck = true;
 				$sql_parts['where'][] = DBin_node('dh.druleid', $nodeids);
-			}
-		}
-
-// dhostids
-		if(!is_null($options['dhostids'])){
-			zbx_value2array($options['dhostids']);
-			$sql_parts['where']['dhostid'] = DBcondition('dh.dhostid', $options['dhostids']);
-
-			if(!$nodeCheck){
-				$nodeCheck = true;
-				$sql_parts['where'][] = DBin_node('dh.dhostid', $nodeids);
 			}
 		}
 
@@ -238,7 +238,7 @@ class CDHost extends CZBXAPI{
 		}
 
 // node check !!!!!
-// should last, after all ****IDS checks
+// should be last, after all ****IDS checks
 		if(!$nodeCheck){
 			$nodeCheck = true;
 			$sql_parts['where'][] = DBin_node('dh.dhostid', $nodeids);

@@ -191,7 +191,7 @@ class CDService extends CZBXAPI{
 
 // druleids
 		if(!is_null($options['druleids'])){
-			zbx_value2array($options['groupids']);
+			zbx_value2array($options['druleids']);
 			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['druleid'] = 'dh.druleid';
 			}

@@ -107,7 +107,7 @@ class CDRule extends CZBXAPI{
 
 // dhostids
 		if(!is_null($options['dhostids'])){
-			zbx_value2array($options['groupids']);
+			zbx_value2array($options['dhostids']);
 			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['dhostid'] = 'dh.dhostid';
 			}
