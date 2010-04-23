@@ -285,7 +285,7 @@ function make_small_eventlist($eventid, $trigger_data){
 
 	$options = array(
 		'triggerids' => $trigger_data['triggerid'],
-		'time_till' => $curevent['clock'],
+		'eventid_till' => $curevent['eventid'],
 		'select_triggers' => API_OUTPUT_EXTEND,
 		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'eventid',
@@ -295,7 +295,6 @@ function make_small_eventlist($eventid, $trigger_data){
 	$events = CEvent::get($options);
 
 	foreach($events as $enum => $event){
-		if($event['eventid'] > $curevent['eventid']) continue;
 		$trigger = reset($event['triggers']);
 
 		$event['type'] = $trigger['type'];

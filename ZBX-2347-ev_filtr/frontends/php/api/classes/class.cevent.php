@@ -86,6 +86,8 @@ class CEvent extends CZBXAPI{
 			'value'					=> null,
 			'time_from'				=> null,
 			'time_till'				=> null,
+			'eventid_from'			=> null,
+			'eventid_till'			=> null,
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
 			'extendoutput'			=> null,
@@ -228,6 +230,14 @@ class CEvent extends CZBXAPI{
 // time_till
 		if(!is_null($options['time_till'])){
 			$sql_parts['where'][] = 'e.clock<='.$options['time_till'];
+		}
+// eventid_from
+		if(!is_null($options['eventid_from'])){
+			$sql_parts['where'][] = 'e.eventid>='.$options['eventid_from'];
+		}
+// eventid_till
+		if(!is_null($options['eventid_till'])){
+			$sql_parts['where'][] = 'e.eventid<='.$options['eventid_till'];
 		}
 // value
 		if(!is_null($options['value'])){
