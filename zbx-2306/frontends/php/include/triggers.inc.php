@@ -216,6 +216,7 @@ function get_accessible_triggers($perm, $hostids, $perm=null, $nodeid=null, $cac
 	if($perm == PERM_READ_WRITE) $options['editable'] = 1;
 
 	$result = CTrigger::get($options);
+	$result = zbx_objectValues($result, 'triggerid');
 
 	$available_triggers[$cache_hash] = $result;
 

@@ -2101,7 +2101,7 @@ onselect: function(){
 
 //SDI(this.stime+' : '+this.period);
 
-//	this.onchange(this.sbox_id, this.timeline.timelineid, true);
+	this.onchange(this.sbox_id, this.timeline.timelineid, true);
 },
 
 onchange: function(){			// bind any func to this
