@@ -242,13 +242,9 @@
 		$timeline['usertime'] = date('YmdHi', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 	}
 
-	$graphDims = array(
-		'width' => -120,
-		'graphHeight' => 150,
-		'shiftXleft' => 100,
-		'shiftXright' => 50,
-		'graphtype' => GRAPH_TYPE_STACKED
-	);
+	$graphDims = getGraphDims();
+	$graphDims['width'] = -120;
+	$graphDims['graphHeight'] = 150;
 
 	$src = 'chart3.php?'.url_param('period').
 		url_param($httptest_data['name'], false,'name').

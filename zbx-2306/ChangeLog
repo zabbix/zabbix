@@ -1,5 +1,7 @@
 Changes for 1.8.3
 
+ - [ZBX-2306] fixed zoom position (Aly)
+ - [ZBX-2306] improved starting zoom on edges (Aly)
  - [ZBX-2132] added date format constants to locales, changed zbx_date2str function to meet regional formats and date translation
  - [ZBXNEXT-311] improved speedup dbconfig synchronization (Sasha)
  - [ZBX-2329] fixed screen renaming (Aly)

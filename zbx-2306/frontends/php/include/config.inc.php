@@ -257,7 +257,14 @@ function __autoload($class_name){
 			$table->setAlign('center');
 			$table->setHeader(new CCol('You are not logged in', 'left'),'header');
 
-			$table->addRow(new CCol(sprintf(S_CONFIG_NOT_LOGGED_IN_ACCESS_DENIED, bold(ZBX_GUEST_USER), BR())));
+			$table->addRow(
+						new CCol(array(
+							S_CONFIG_YOU_CANNOT_VIEW_THIS_PAGE,
+							bold(ZBX_GUEST_USER),
+							'. '.S_CONFIG_MUST_LOGIN_TO_VIEW_PAGE,
+							BR(),
+							S_CONFIG_CONSULT_ADMINISTRATOR))
+					);
 
 			$url = urlencode($req->toString());
 			$footer = new CCol(
