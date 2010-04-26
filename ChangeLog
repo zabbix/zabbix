@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2360] added multiple acknowledging for OK>UNKNOWN>OK and PROBLEM>UNKNOWN>PROBLEM events (Vedmak,Sasha)
  - [ZBX-2374] updated Ukrainian translation; thanks to zalex_ua (Richlv)
  - [ZBX-2347] fixed last 20 issues in event details showing less than 20 issues (Vedmak)
  - [DEV-459] made improvements in discovery page generation (Aly)

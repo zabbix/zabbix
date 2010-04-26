@@ -284,6 +284,7 @@ DB_EVENT
 	char		*trigger_url;
 	char		*trigger_comments;
 	int		trigger_type;
+	zbx_uint64_t	ack_eventid;
 };
 
 DB_HOST
@@ -388,7 +389,6 @@ DB_TRIGGER
 	char	*comments;
 	int	status;
 	int	value;
-/*	int	prevvalue; */
 	int	priority;
 	int	type;
 	char	error[TRIGGER_ERROR_LEN_MAX];
@@ -557,7 +557,8 @@ int	DBstop_escalation(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_
 int	DBremove_escalation(zbx_uint64_t escalationid);
 void	DBupdate_triggers_status_after_restart(void);
 int	DBget_prev_trigger_value(zbx_uint64_t triggerid);
-int     DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, const char *reason);
+int     DBupdate_trigger_value(zbx_uint64_t triggerid, int type, int value,
+		const char *trigger_error, int new_value, int now, const char *reason);
 
 int	DBget_items_count(void);
 int	DBget_items_unsupported_count(void);
@@ -595,8 +596,6 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid);
 void	DBdelete_sysmaps_hosts_by_hostid(zbx_uint64_t hostid);
 
 int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid);
-void	get_latest_event_status(zbx_uint64_t triggerid, int *prev_status, int *latest_status);
-
 
 int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid);
 int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid);
