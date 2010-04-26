@@ -23,7 +23,7 @@
 class APICaller{
 
 	public static function call($class, $method, $params){
-		global $USER_DETAILS
+		global $USER_DETAILS;
 
 		return czbxrpc::call($class.$method, $params);
 	}
