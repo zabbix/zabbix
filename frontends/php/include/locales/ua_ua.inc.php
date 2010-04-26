@@ -1477,7 +1477,7 @@
 	'S_INSERT'=>			'Вставити',
 	'S_SECONDS'=>			'Секунд',
 	'S_LAST_OF'=>			'Останній з',
-	'S_MULTIPLE_TRUE_EVENTS'=>			'Багатократні TRUE події',
+	'S_MULTIPLE_PROBLEM_EVENTS'=>			'Багатократні PROBLEM події',
 	'S_SHOW_DISABLED_TRIGGERS'=>			'Відобразити дезактивовані тригери',
 	'S_HIDE_DISABLED_TRIGGERS'=>			'Приховати дезактивовані тригери',
 	'S_THE_TRIGGER_DEPENDS_ON'=>			'Тригер залежить від',

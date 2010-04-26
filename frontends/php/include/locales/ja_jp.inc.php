@@ -1247,7 +1247,7 @@
 	'S_INSERT'=>			'挿入',
 	'S_SECONDS'=>			'秒',
 	'S_LAST_OF'=>			'最新の',
-	'S_MULTIPLE_TRUE_EVENTS'=>			'障害イベントを継続して生成',
+	'S_MULTIPLE_PROBLEM_EVENTS'=>			'障害イベントを継続して生成',
 	'S_SHOW_DISABLED_TRIGGERS'=>			'無効なトリガーを表示',
 	'S_HIDE_DISABLED_TRIGGERS'=>			'無効なトリガーを非表示',
 	'S_THE_TRIGGER_DEPENDS_ON'=>			'次のトリガーに依存',

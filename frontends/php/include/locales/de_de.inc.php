@@ -1003,7 +1003,7 @@
 	'S_INSERT'=>			'Einfügen',
 	'S_SECONDS'=>			'Sekunden',
 	'S_LAST_OF'=>			'Letzten',
-	'S_MULTIPLE_TRUE_EVENTS'=>			'Mehrere WAHRE Ereignisse',
+	'S_MULTIPLE_PROBLEM_EVENTS'=>			'Mehrere PROBLEM Ereignisse',
 	'S_SHOW_DISABLED_TRIGGERS'=>			'Deaktivierte Auslöser einblenden',
 	'S_HIDE_DISABLED_TRIGGERS'=>			'Deaktivierte Auslöser ausblenden',
 	'S_THE_TRIGGER_DEPENDS_ON'=>			'Der Auslöser ist abhängig von',

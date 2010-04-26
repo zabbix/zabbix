@@ -1165,6 +1165,7 @@
 	'S_COPY_SELECTED_ITEMS_Q'=>				'Copy selected items?',
 	'S_DELETE_HISTORY_SELECTED_ITEMS_Q'=>			'Delete history of selected items?',
 	'S_DELETE_SELECTED_ITEMS_Q'=>				'Delete selected items?',
+	'S_FORMULA'=>						'Formula',
 
 //	events.php
 	'S_EVENT'=>				'Event',
@@ -1678,7 +1679,7 @@
 	'S_INSERT'=>				'Insert',
 	'S_SECONDS'=>				'Seconds',
 	'S_LAST_OF'=>				'Last of',
-	'S_MULTIPLE_TRUE_EVENTS'=>		'Multiple TRUE events',
+	'S_MULTIPLE_PROBLEM_EVENTS'=>		'Multiple PROBLEM events',
 	'S_SHOW_DISABLED_TRIGGERS'=>		'Show disabled triggers',
 	'S_HIDE_DISABLED_TRIGGERS'=>		'Hide disabled triggers',
 	'S_THE_TRIGGER_DEPENDS_ON'=>		'The trigger depends on',

@@ -1373,7 +1373,7 @@
 	'S_INSERT'=>			'Insertion',
 	'S_SECONDS'=>			'Secondes',
 	'S_LAST_OF'=>			'Dernier',
-	'S_MULTIPLE_TRUE_EVENTS'=>			'Evénements VRAIS multiples',
+	'S_MULTIPLE_PROBLEM_EVENTS'=>			'Evénements PROBLEME multiples',
 	'S_SHOW_DISABLED_TRIGGERS'=>			'Montrer les déclencheurs désactivés',
 	'S_HIDE_DISABLED_TRIGGERS'=>			'Cacher les déclencheurs désactivés',
 	'S_THE_TRIGGER_DEPENDS_ON'=>			'Le déclencheur dépend de',
