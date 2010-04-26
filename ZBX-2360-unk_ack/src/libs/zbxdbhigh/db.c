@@ -447,8 +447,8 @@ int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger
 			break;
 	}
 
-	/* New trigger value differs from current one AND ...*/
-	/* ... Do not update status if there are dependencies with status TRUE*/
+	/* New trigger value differs from current one AND ... */
+	/* ... Do not update status if there are dependencies with status TRUE */
 	if (update_status)
 	{
 		/* New trigger status is NOT equal to previous one, update trigger */
@@ -487,7 +487,7 @@ int	DBupdate_trigger_value(zbx_uint64_t triggerid, int trigger_type, int trigger
 			/* Processing event */
 			if (FAIL == (ret = process_event(&event)))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG,"Event not added for triggerid [" ZBX_FS_UI64 "]",
+				zabbix_log(LOG_LEVEL_DEBUG, "Event not added for triggerid [" ZBX_FS_UI64 "]",
 						triggerid);
 			}
 		}

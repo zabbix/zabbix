@@ -78,9 +78,8 @@ static void	get_latest_event_status(zbx_uint64_t triggerid,
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64,
 			__function_name, triggerid);
 
-	/* Object and objectid are used for efficient sort by
-	 * the same index as in wehere condition
-	 */
+	/* object and objectid are used for efficient */
+	/* sort by the same index as in where condition */
 	zbx_snprintf(sql, sizeof(sql),
 			"select eventid,value"
 			" from events"
@@ -96,8 +95,6 @@ static void	get_latest_event_status(zbx_uint64_t triggerid,
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		*prev_eventid = 0;
-		*prev_value = TRIGGER_VALUE_UNKNOWN;
 		ZBX_STR2UINT64(*last_eventid, row[0]);
 		*last_value = atoi(row[1]);
 
@@ -105,6 +102,11 @@ static void	get_latest_event_status(zbx_uint64_t triggerid,
 		{
 			ZBX_STR2UINT64(*prev_eventid, row[0]);
 			*prev_value = atoi(row[1]);
+		}
+		else
+		{
+			*prev_eventid = 0;
+			*prev_value = TRIGGER_VALUE_UNKNOWN;
 		}
 	}
 	else
