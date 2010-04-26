@@ -1473,7 +1473,7 @@
 	'S_INSERT'=>			'Вставить',
 	'S_SECONDS'=>			'Секунды',
 	'S_LAST_OF'=>			'Последний из',
-	'S_MULTIPLE_TRUE_EVENTS'=>			'Множественные TRUE события',
+	'S_MULTIPLE_PROBLEM_EVENTS'=>			'Множественные PROBLEM события',
 	'S_SHOW_DISABLED_TRIGGERS'=>			'Показывать деактивированные триггеры',
 	'S_HIDE_DISABLED_TRIGGERS'=>			'Не отображать деактивированные триггеры',
 	'S_THE_TRIGGER_DEPENDS_ON'=>			'Триггер зависит от',
