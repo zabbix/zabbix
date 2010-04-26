@@ -1552,21 +1552,7 @@ return $result;
 						$triggerData+= $trigger['items'][$triggerData['itemid']];
 						$triggerData+= $trigger['hosts'][$triggerData['hostid']];
 
-						if($triggerData['value_type']!=ITEM_VALUE_TYPE_LOG){
-							$description = str_replace($macro, $triggerData['lastvalue'], $description);
-						}
-						else{
-							$sql = 'SELECT MAX(clock) as max FROM history_log WHERE itemid='.$triggerData['itemid'];
-							$trigger3=DBfetch(DBselect($sql));
-							if($trigger3 && !is_null($trigger3['max'])){
-								$sql = 'SELECT value '.
-										' FROM history_log '.
-										' WHERE itemid='.$triggerData['itemid'].
-											' AND clock='.$trigger3['max'];
-								$trigger4=DBfetch(DBselect($sql));
-								$description = str_replace($macro, $trigger4['value'], $description);
-							}
-						}
+						$description = str_replace($macro, $triggerData['lastvalue'], $description);			
 					}
 				}
 			}
@@ -1706,28 +1692,17 @@ return $result;
 
 			for($i=0; $i<10; $i++){
 				$macro = '{ITEM.LASTVALUE'.($i ? $i : '').'}';
-				if(zbx_strstr($description, $macro)) {
+				if(zbx_strstr($description, $macro)){
 					$functionid = trigger_get_N_functionid($row['expression'], $i ? $i : 1);
 
 					if(isset($functionid)){
-						$sql = 'SELECT i.lastvalue, i.value_type, i.itemid '.
+						$sql = 'SELECT i.lastvalue, i.value_type, i.itemid, i.valuemapid, i.units '.
 								' FROM items i, functions f '.
 								' WHERE i.itemid=f.itemid '.
 									' AND f.functionid='.$functionid;
 						$row2=DBfetch(DBselect($sql));
-						if($row2['value_type']!=ITEM_VALUE_TYPE_LOG){
-							$description = str_replace($macro, $row2['lastvalue'], $description);
-						}
-						else{
-							$sql = 'SELECT MAX(clock) as max FROM history_log WHERE itemid='.$row2['itemid'];
-							$row3=DBfetch(DBselect($sql));
-							if($row3 && !is_null($row3['max'])){
-								$sql = 'SELECT value FROM history_log WHERE itemid='.$row2['itemid'].
-										' AND clock='.$row3['max'];
-								$row4=DBfetch(DBselect($sql));
-								$description = str_replace($macro, $row4['value'], $description);
-							}
-						}
+						$description = str_replace($macro, format_lastvalue($row2), $description);
+						
 					}
 				}
 			}
