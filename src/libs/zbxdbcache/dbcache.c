@@ -655,19 +655,18 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 {
 	char		*exp;
 	char		error[MAX_STRING_LEN];
-	int		exp_value;
-	DB_TRIGGER	trigger;
+	int		trigger_type, trigger_value, exp_value;
+	const char	*trigger_error;
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		sql_offset = 0, i;
 	ZBX_DC_HISTORY	*h;
-	zbx_uint64_t	itemid;
+	zbx_uint64_t	itemid, triggerid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCmass_update_triggers()");
 
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 1024,
-			"select distinct t.triggerid,t.expression,t.description,t.url,"
-				"t.comments,t.status,t.value,t.priority,t.type,t.error,f.itemid"
+			"select distinct t.triggerid,t.type,t.value,t.error,t.expression,f.itemid"
 			" from triggers t,functions f,items i"
 			" where i.status not in (%d)"
 				" and i.itemid=f.itemid"
@@ -698,17 +697,11 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(trigger.triggerid, row[0]);
-		strscpy(trigger.expression, row[1]);
-		strscpy(trigger.description, row[2]);
-		trigger.url		= row[3];
-		trigger.comments	= row[4];
-		trigger.status		= atoi(row[5]);
-		trigger.value		= atoi(row[6]);
-		trigger.priority	= atoi(row[7]);
-		trigger.type		= atoi(row[8]);
-		strscpy(trigger.error, row[9]);
-		ZBX_STR2UINT64(itemid, row[10]);
+		ZBX_STR2UINT64(triggerid, row[0]);
+		trigger_type = atoi(row[1]);
+		trigger_value = atoi(row[2]);
+		trigger_error = row[3];
+		ZBX_STR2UINT64(itemid, row[5]);
 
 		h = NULL;
 
@@ -724,25 +717,22 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 		if (NULL == h)
 			continue;
 
-		exp = strdup(trigger.expression);
+		exp = strdup(row[4]);
 
-		if (SUCCEED != evaluate_expression(&exp_value, &exp, h->clock, &trigger, error, sizeof(error)))
+		if (SUCCEED != evaluate_expression(&exp_value, &exp, h->clock, triggerid, trigger_value, error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Expression [%s] for item [" ZBX_FS_UI64 "][%s] cannot be evaluated: %s",
-					trigger.expression,
-					itemid,
-					zbx_host_key_string(itemid),
-					error);
+					row[4], itemid, zbx_host_key_string(itemid), error);
 			zabbix_syslog("Expression [%s] for item [" ZBX_FS_UI64 "][%s] cannot be evaluated: %s",
-					trigger.expression,
-					itemid,
-					zbx_host_key_string(itemid),
-					error);
+					row[4], itemid, zbx_host_key_string(itemid), error);
+
 /*			We shouldn't update trigger value if expressions failed */
-			DBupdate_trigger_value(&trigger, TRIGGER_VALUE_UNKNOWN, h->clock, error);
+			DBupdate_trigger_value(triggerid, trigger_type, trigger_value,
+					trigger_error, TRIGGER_VALUE_UNKNOWN, h->clock, error);
 		}
 		else
-			DBupdate_trigger_value(&trigger, exp_value, h->clock, NULL);
+			DBupdate_trigger_value(triggerid, trigger_type, trigger_value,
+					trigger_error, exp_value, h->clock, NULL);
 
 		zbx_free(exp);
 	}
