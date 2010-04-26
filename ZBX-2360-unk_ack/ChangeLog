@@ -1,6 +1,17 @@
 Changes for 1.8.3
 
  - [ZBX-2360] added multiple acknowledging for OK>UNKNOWN>OK and PROBLEM>UNKNOWN>PROBLEM events (Vedmak,Sasha)
+ - [ZBX-2374] updated Ukrainian translation; thanks to zalex_ua (Richlv)
+ - [ZBX-2347] fixed last 20 issues in event details showing less than 20 issues (Vedmak)
+ - [DEV-459] made improvements in discovery page generation (Aly)
+ - [ZBX-2148] added preview button in graphs form (Aly)
+ - [ZBX-2337] fixed error when select web item in trigger configuration (Vedmak)
+ - [ZBX-2306] fixed links for graphs in screens (Aly)
+ - [ZBX-633] removed linkage of OpenIPMI library to Agents in "configure" script (Sasha) 
+ - [ZBX-633] more debug information in checks_ipmi.c module (Sasha) 
+ - [ZBX-2362] fixed processing of logrt[] checks under Windows (Sasha)
+ - [ZBX-2356] fixed error when perform group actions creating item (Vedmak)
+ - [ZBX-2355] fixed error when try to massupdate trigger severity (Vedmak)
  - [ZBX-2354] updated Russian translation; thanks to dotneft (Richlv)
  - [ZBX-2352] fixed typo in the default locale (Richlv)
  - [ZBX-2312] fixed event order in "monitoring triggers" and "last 20 events" (Vedmak)

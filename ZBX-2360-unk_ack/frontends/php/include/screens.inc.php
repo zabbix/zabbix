@@ -428,7 +428,7 @@ require_once('include/js.inc.php');
 		global $USER_DETAILS;
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_RES_IDS_ARRAY,get_current_nodeid(true));
 
-		$form = new CFormTable(S_SCREEN_CELL_CONFIGURATION,'screenedit.php#form');
+		$form = new CFormTable(S_SCREEN_CELL_CONFIGURATION,'screenedit.php?screenid='.$_REQUEST['screenid']);
 		$form->SetHelp('web.screenedit.cell.php');
 
 		if(isset($_REQUEST['screenitemid'])){
@@ -1091,12 +1091,16 @@ require_once('include/js.inc.php');
 						$objData['src'] = $src;
 					}
 
-					$div = new CDiv();
-					$div->setAttribute('id', $containerid);
-					$item[] = $div;
-
+				
 					if($default && ($editmode == 1)){
+						$div = new CDiv();
+						$div->setAttribute('id', $containerid);
+						$item[] = $div;
 						$item[] = new CLink(S_CHANGE, $action);
+					}
+					else{
+						$item = new CLink(null, $action);
+						$item->setAttribute('id', $containerid);
 					}
 
 //					zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
@@ -1107,10 +1111,7 @@ require_once('include/js.inc.php');
 					$dom_graph_id = 'graph_'.$screenitemid.'_'.$resourceid;
 					$containerid = 'graph_cont_'.$screenitemid.'_'.$resourceid;
 
-					$graphDims['graphHeight'] = 200;
-					$graphDims['shiftXleft'] = 100;
-					$graphDims['shiftXright'] = 50;
-					$graphDims['graphtype'] = 0;
+					$graphDims = getGraphDims();
 					$graphDims['graphHeight'] = $height;
 					$graphDims['width'] = $width;
 
@@ -1156,10 +1157,17 @@ require_once('include/js.inc.php');
 
 					$objData['src'] = $src;
 
-					$div = new CDiv();
-					$div->setAttribute('id', $containerid);
-					$item[] = $div;
-					$item[] = new CLink(S_CHANGE, $action);
+					
+					if($editmode == 1){
+						$div = new CDiv();
+						$div->setAttribute('id', $containerid);
+						$item[] = $div;
+						$item[] = new CLink(S_CHANGE, $action);
+					}
+					else{
+						$item = new CLink(null, $action);
+						$item->setAttribute('id', $containerid);
+					}
 					
 //					zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 					insert_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
