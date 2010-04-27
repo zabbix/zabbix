@@ -553,6 +553,7 @@ FIELD		|snmp_error	|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|host
 INDEX		|2		|status
 INDEX		|3		|proxy_hostid
+INDEX		|4		|ip
 
 TABLE|globalmacro|globalmacroid|ZBX_SYNC
 FIELD		|globalmacroid	|t_id		|'0'	|NOT NULL	|0
