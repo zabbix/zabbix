@@ -272,7 +272,7 @@ static void	copy_acknowledges(zbx_uint64_t src_eventid, zbx_uint64_t dst_eventid
 	sql = zbx_malloc(sql, sql_alloc * sizeof(char));
 
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
 #endif
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 96,
@@ -295,7 +295,7 @@ static void	copy_acknowledges(zbx_uint64_t src_eventid, zbx_uint64_t dst_eventid
 	}
 
 #ifdef HAVE_ORACLE
-	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "end;\n");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
 #endif
 
 	if (sql_offset > 16) /* In ORACLE always present begin..end; */
