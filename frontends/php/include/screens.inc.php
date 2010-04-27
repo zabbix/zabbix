@@ -1126,16 +1126,14 @@ require_once('include/js.inc.php');
 						$objData['src'] = $src;
 					}
 
-				
-					if($default && ($editmode == 1)){
-						$div = new CDiv();
-						$div->setAttribute('id', $containerid);
-						$item[] = $div;
+					if($default) $item = new CLink(null, $action);
+					else $item = new CDiv();
+
+					$item->setAttribute('id', $containerid);
+
+					$item = array($item);
+					if($editmode == 1){
 						$item[] = new CLink(S_CHANGE, $action);
-					}
-					else{
-						$item = new CLink(null, $action);
-						$item->setAttribute('id', $containerid);
 					}
 
 //					zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
@@ -1192,18 +1190,14 @@ require_once('include/js.inc.php');
 
 					$objData['src'] = $src;
 
-					
+					$item = new CLink(null, $action);
+					$item->setAttribute('id', $containerid);
+
+					$item = array($item);
 					if($editmode == 1){
-						$div = new CDiv();
-						$div->setAttribute('id', $containerid);
-						$item[] = $div;
 						$item[] = new CLink(S_CHANGE, $action);
 					}
-					else{
-						$item = new CLink(null, $action);
-						$item->setAttribute('id', $containerid);
-					}
-					
+										
 //					zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 					insert_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 				}
