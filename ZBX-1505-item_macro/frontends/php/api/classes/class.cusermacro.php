@@ -1188,7 +1188,7 @@ class CUserMacro extends CZBXAPI{
 			if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $item['key_'], $arr)){
 				$macros = self::getMacros($arr[1], array('itemid' => $item['itemid']));
 
-				$search = zbx_objectValues($macros, 'macroid');
+				$search = array_keys($macros);
 				$values = array_values($macros);
 				$items[$num]['key_'] = str_replace($search, $values, $item['key_']);
 			}
