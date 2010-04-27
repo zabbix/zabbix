@@ -899,9 +899,8 @@ return $result;
 
 		$host_triggers = DBSelect($sql);
 		while($host_trigger = DBfetch($host_triggers)){
-			if(cmp_triggers_exressions($triggerid, $host_trigger['triggerid']))	continue;
+			if(cmp_triggers_exressions($trigger['expression'], $host_trigger['expression'])) continue;
 			// link not linked trigger with same expression
-
 			return update_trigger(
 				$host_trigger['triggerid'],
 				NULL,	// expression
@@ -2299,17 +2298,28 @@ return $result;
 			$tdiff = array_diff($dep_templateids, $templateids);
 			if(!empty($templateids) && !empty($dep_templateids) && !empty($tdiff)){
 				$tpls = zbx_array_merge($templateids, $dep_templateids);
-				$sql = 'SELECT DISTINCT ht.templateid '.
-						' FROM hosts h, hosts_templates ht '.
-						' WHERE h.hostid=ht.hostid '.
-							' AND h.status='.HOST_STATUS_TEMPLATE.
+				$sql = 'SELECT DISTINCT ht.templateid, ht.hostid, h.host'.
+						' FROM hosts_templates ht, hosts h'.
+						' WHERE h.hostid=ht.hostid'.
 							' AND '.DBcondition('ht.templateid', $tpls);
 
 				$db_lowlvltpl = DBselect($sql);
+				$map = array();
 				while($lovlvltpl = DBfetch($db_lowlvltpl)){
-					error($templates[$lovlvltpl['templateid']]['host'].SPACE.S_IS_NOT_THE_HIGHEST_LEVEL_TEMPLATE);
-					$result = false;
+					if(!isset($map[$lovlvltpl['hostid']])) $map[$lovlvltpl['hostid']] = array();
+					$map[$lovlvltpl['hostid']][$lovlvltpl['templateid']] = $lovlvltpl['host'];
 				}
+				
+				foreach($map as $hostid => $templates){
+					foreach($tpls as $tplid){
+						if(!isset($templates[$tplid])){
+							error('Not all Templates are linked to host [ '.reset($templates).' ]');
+							$result = false;
+							break 2;
+						}
+					}
+				}
+				
 			}
 		}
 
@@ -2375,24 +2385,10 @@ return $result;
  * Comments:
  *
  */
-	function cmp_triggers_exressions($triggerid1, $triggerid2){
-// compare EXPRESSION !!!
-		$trig1 = get_trigger_by_triggerid($triggerid1);
-		$trig2 = get_trigger_by_triggerid($triggerid2);
-
-		$trig_fnc1 = get_functions_by_triggerid($triggerid1);
-		$expr1 = $trig1['expression'];
-		while($fnc1 = DBfetch($trig_fnc1)){
-			$trig_fnc2 = get_functions_by_triggerid($triggerid2);
-			while($fnc2 = DBfetch($trig_fnc2)){
-				$expr1 = str_replace(
-					'{'.$fnc1['functionid'].'}',
-					'{'.$fnc2['functionid'].'}',
-					$expr1);
-				break;
-			}
-		}
-	return strcmp($expr1,$trig2['expression']);
+	function cmp_triggers_exressions($expr1, $expr2){
+		$expr1 = preg_replace('/{[0-9]+}/', 'func', $expr1);
+		$expr2 = preg_replace('/{[0-9]+}/', 'func', $expr2);
+		return strcmp($expr1, $expr2);
 	}
 
 	/*
