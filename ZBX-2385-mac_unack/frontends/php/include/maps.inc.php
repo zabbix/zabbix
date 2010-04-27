@@ -844,6 +844,9 @@
 					while(zbx_strstr($label, '{TRIGGER.EVENTS.UNACK}')){
 						$label = str_replace('{TRIGGER.EVENTS.UNACK}', get_unacknowledged_events($db_element), $label);
 					}
+					while(zbx_strstr($label, '{TRIGGER.EVENTS.PROBLEM.UNACK}')){
+						$label = str_replace('{TRIGGER.EVENTS.PROBLEM.UNACK}', get_unacknowledged_events($db_element, TRIGGER_VALUE_TRUE), $label);
+					}
 					break;
 			}
 		}
@@ -970,7 +973,7 @@
 	return $label;
 	}
 
-	function get_unacknowledged_events($db_element){
+	function get_unacknowledged_events($db_element, $value=null){
 		$elements = array('hosts' => array(), 'hosts_groups' => array(), 'triggers' => array());
 
 		get_map_elements($db_element, $elements);
@@ -983,7 +986,7 @@
 			'nodeids' => get_current_nodeid(),
 			'output' => API_OUTPUT_SHORTEN,
 			'monitored' => 1,
-			'only_problems' => 1,
+//			'only_problems' => 1,
 			'skipDependent' => 1,
 			'limit' => ($config['search_limit']+1)
 		);
@@ -998,7 +1001,7 @@
 			'triggerids' => zbx_objectValues($triggerids, 'triggerid'),
 			'object' => EVENT_OBJECT_TRIGGER,
 			'acknowledged' => 0,
-			'value' => TRIGGER_VALUE_TRUE,
+			'value' => is_null($value) ? array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE) : $value,
 			'nopermissions' => 1
 		);
 		$event_count = CEvent::get($options);
