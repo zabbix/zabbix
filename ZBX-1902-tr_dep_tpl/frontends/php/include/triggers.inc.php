@@ -937,9 +937,8 @@ return $result;
 
 		$host_triggers = DBSelect($sql);
 		while($host_trigger = DBfetch($host_triggers)){
-			if(cmp_triggers_exressions($triggerid, $host_trigger['triggerid']))	continue;
+			if(cmp_triggers_exressions($trigger['expression'], $host_trigger['expression'])) continue;
 			// link not linked trigger with same expression
-
 			return update_trigger(
 				$host_trigger['triggerid'],
 				NULL,	// expression
@@ -2424,24 +2423,10 @@ return $result;
  * Comments:
  *
  */
-	function cmp_triggers_exressions($triggerid1, $triggerid2){
-// compare EXPRESSION !!!
-		$trig1 = get_trigger_by_triggerid($triggerid1);
-		$trig2 = get_trigger_by_triggerid($triggerid2);
-
-		$trig_fnc1 = get_functions_by_triggerid($triggerid1);
-		$expr1 = $trig1['expression'];
-		while($fnc1 = DBfetch($trig_fnc1)){
-			$trig_fnc2 = get_functions_by_triggerid($triggerid2);
-			while($fnc2 = DBfetch($trig_fnc2)){
-				$expr1 = str_replace(
-					'{'.$fnc1['functionid'].'}',
-					'{'.$fnc2['functionid'].'}',
-					$expr1);
-				break;
-			}
-		}
-	return strcmp($expr1,$trig2['expression']);
+	function cmp_triggers_exressions($expr1, $expr2){
+		$expr1 = preg_replace('/{[0-9]+}/', 'func', $expr1);
+		$expr2 = preg_replace('/{[0-9]+}/', 'func', $expr2);
+		return strcmp($expr1, $expr2);
 	}
 
 	/*
