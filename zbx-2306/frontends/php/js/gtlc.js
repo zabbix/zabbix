@@ -165,7 +165,7 @@ addSBox: function(e, objid){
 	if(!is_null(g_img)) removeListener(g_img, 'load', obj.sbox_listener);
 	
 	ZBX_SBOX[obj.domid] = new Object;
-	ZBX_SBOX[obj.domid].shiftT = 35;
+	ZBX_SBOX[obj.domid].shiftT = parseInt(obj.objDims.shiftYtop);
 	ZBX_SBOX[obj.domid].shiftL = parseInt(obj.objDims.shiftXleft);
 	ZBX_SBOX[obj.domid].shiftR = parseInt(obj.objDims.shiftXright);
 	ZBX_SBOX[obj.domid].height = parseInt(obj.objDims.graphHeight);
@@ -2092,7 +2092,12 @@ onselect: function(){
 	this.debug('onselect');
 
 	this.px2time = this.timeline.period() / this.cobj.width;
-	var userstarttime = (this.timeline.usertime() - this.timeline.period()) + Math.round((this.box.left-this.cobj.left) * this.px2time);
+	var userstarttime = (this.timeline.usertime() - this.timeline.period());
+
+// this.shifts.left - mainbox absolute shift left
+// this.box.left - selection box shift left relative to mainbox
+// this.cobj.left - most absolute left possible possition for selection box
+	userstarttime += Math.round((this.box.left-(this.cobj.left - this.shifts.left)) * this.px2time);
 
 	var new_period = this.calcperiod();
 	

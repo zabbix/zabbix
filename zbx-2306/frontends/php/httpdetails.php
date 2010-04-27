@@ -243,6 +243,7 @@
 	}
 
 	$graphDims = getGraphDims();
+	$graphDims['shiftYtop'] += 1;
 	$graphDims['width'] = -120;
 	$graphDims['graphHeight'] = 150;
 
