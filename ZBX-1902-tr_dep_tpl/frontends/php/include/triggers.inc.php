@@ -2337,17 +2337,28 @@ return $result;
 			$tdiff = array_diff($dep_templateids, $templateids);
 			if(!empty($templateids) && !empty($dep_templateids) && !empty($tdiff)){
 				$tpls = zbx_array_merge($templateids, $dep_templateids);
-				$sql = 'SELECT DISTINCT ht.templateid '.
-						' FROM hosts h, hosts_templates ht '.
-						' WHERE h.hostid=ht.hostid '.
-							' AND h.status='.HOST_STATUS_TEMPLATE.
+				$sql = 'SELECT DISTINCT ht.templateid, ht.hostid, h.host'.
+						' FROM hosts_templates ht, hosts h'.
+						' WHERE h.hostid=ht.hostid'.
 							' AND '.DBcondition('ht.templateid', $tpls);
 
 				$db_lowlvltpl = DBselect($sql);
+				$map = array();
 				while($lovlvltpl = DBfetch($db_lowlvltpl)){
-					error($templates[$lovlvltpl['templateid']]['host'].SPACE.S_IS_NOT_THE_HIGHEST_LEVEL_TEMPLATE);
-					$result = false;
+					if(!isset($map[$lovlvltpl['hostid']])) $map[$lovlvltpl['hostid']] = array();
+					$map[$lovlvltpl['hostid']][$lovlvltpl['templateid']] = $lovlvltpl['host'];
 				}
+				
+				foreach($map as $hostid => $templates){
+					foreach($tpls as $tplid){
+						if(!isset($templates[$tplid])){
+							error('Not all Templates are linked to host [ '.reset($templates).' ]');
+							$result = false;
+							break 2;
+						}
+					}
+				}
+				
 			}
 		}
 
