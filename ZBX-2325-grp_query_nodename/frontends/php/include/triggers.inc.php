@@ -190,7 +190,7 @@
  *	 Aly mod by Vedmak
  *
  */
-function get_accessible_triggers($perm, $hostids, $perm_res=null, $nodeid=null, $cache=1){
+function get_accessible_triggers($perm, $hostids, $perm=null, $nodeid=null, $cache=1){
 	global $USER_DETAILS;
 	static $available_triggers;
 
@@ -207,54 +207,16 @@ function get_accessible_triggers($perm, $hostids, $perm_res=null, $nodeid=null, 
 		return $available_triggers[$cache_hash];
 	}
 
-	$result = array();
+	$options = array(
+		'output' => API_OUTPUT_SHORTEN
+	);
 
-	$sql_where = array();
-	if(!empty($hostids)){
-		array_push($sql_where, DBcondition('i.hostid', $hostids));
-	}
-	if(!is_null($nodeid)){
-		array_push($sql_where, DBin_node('i.hostid', $nodeid));
-	}
-	$sql_where = count($sql_where) ? ' AND '.implode(' AND ',$sql_where) : '';
+	if(!empty($hostids)) $options['hostids'] = $hostids;
+	if(!is_null($nodeid)) $options['nodeids'] = $nodeid;
+	if($perm == PERM_READ_WRITE) $options['editable'] = 1;
 
-	if(USER_TYPE_SUPER_ADMIN == $user_type){
-		$sql = 'SELECT DISTINCT t.triggerid
-				FROM triggers t, functions f, items i
-				WHERE t.triggerid=f.triggerid
-					AND f.itemid=i.itemid'.
-					$sql_where;
-	}
-	else{
-		$sql = 'SELECT DISTINCT t.triggerid
-				FROM triggers t, functions f, items i, hosts_groups hg, rights r, users_groups g
-				WHERE t.triggerid=f.triggerid'.
-					$sql_where.'
-					AND hg.hostid=i.hostid
-					AND r.id=hg.groupid
-					AND r.groupid=g.usrgrpid
-					AND g.userid='.$userid.'
-					AND f.itemid=i.itemid
-					AND r.permission>'.($perm-1).'
-					AND NOT EXISTS(
-						SELECT ff.triggerid
-						FROM functions ff, items ii
-						WHERE ff.triggerid=t.triggerid
-							AND ff.itemid=ii.itemid
-							AND	EXISTS (
-							  SELECT hgg.hostid
-							  FROM hosts_groups hgg, rights rr, users_groups gg
-							  WHERE hgg.hostid=ii.hostid
-								AND rr.id=hgg.groupid
-								AND rr.groupid=gg.usrgrpid
-								AND gg.userid='.$userid.'
-								AND rr.permission<'.$perm.'))';
-	}
-
-	$db_triggers = DBselect($sql);
-	while($trigger = DBfetch($db_triggers)){
-		$result[$trigger['triggerid']] = $trigger['triggerid'];
-	}
+	$result = CTrigger::get($options);
+	$result = zbx_objectValues($result, 'triggerid');
 
 	$available_triggers[$cache_hash] = $result;
 
@@ -3113,7 +3075,7 @@ return $result;
 		$table->addRow(array(S_TRIGGER, $trigger_data['exp_desc']));
 		$table->addRow(array(S_SEVERITY, new CCol(get_severity_description($trigger_data['priority']), get_severity_style($trigger_data['priority']))));
 		$table->addRow(array(S_EXPRESSION, $trigger_data['exp_expr']));
-		$table->addRow(array(S_EVENT_GENERATION, S_NORMAL.((TRIGGER_MULT_EVENT_ENABLED==$trigger_data['type'])?SPACE.'+'.SPACE.S_MULTIPLE_TRUE_EVENTS:'')));
+		$table->addRow(array(S_EVENT_GENERATION, S_NORMAL.((TRIGGER_MULT_EVENT_ENABLED==$trigger_data['type'])?SPACE.'+'.SPACE.S_MULTIPLE_PROBLEM_EVENTS:'')));
 		$table->addRow(array(S_DISABLED, ((TRIGGER_STATUS_ENABLED==$trigger_data['status'])?new CCol(S_NO,'off'):new CCol(S_YES,'on')) ));
 
 	return $table;

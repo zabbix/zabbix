@@ -1018,7 +1018,7 @@
 	'S_INSERT'=>					'Wprowadź',
 	'S_SECONDS'=>					'Sekundy',
 	'S_LAST_OF'=>					'Ostatni z',
-	'S_MULTIPLE_TRUE_EVENTS'=>			'Wielokrotne zdarzenia PRAWDA',
+	'S_MULTIPLE_PROBLEM_EVENTS'=>			'Wielokrotne zdarzenia PRAWDA',
 	'S_SHOW_DISABLED_TRIGGERS'=>			'Pokaż wyłączone wyzwalacze',
 	'S_HIDE_DISABLED_TRIGGERS'=>			'Ukryj wyłączone wyzwalacze',
 	'S_THE_TRIGGER_DEPENDS_ON'=>			'Wyzwalacz zależy od',

@@ -62,7 +62,7 @@
 		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NULL,			NULL),
 
 		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
-		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),NULL)
+		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove','flop'"),NULL)
 	);
 
 	check_fields($fields);

@@ -736,7 +736,10 @@ function change_flicker_state(divid){
 		'state':	filter_state
 	}
 	
-	send_params(params);	
+	send_params(params);
+
+// selection box position
+	if(typeof(moveSBoxes) != 'undefined') moveSBoxes();
 }
 
 function change_hat_state(icon, divid){

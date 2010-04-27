@@ -86,6 +86,8 @@ class CEvent extends CZBXAPI{
 			'value'					=> null,
 			'time_from'				=> null,
 			'time_till'				=> null,
+			'eventid_from'			=> null,
+			'eventid_till'			=> null,
 // OutPut
 			'output'				=> API_OUTPUT_REFER,
 			'extendoutput'			=> null,
@@ -119,8 +121,6 @@ class CEvent extends CZBXAPI{
 
 
 // editable + PERMISSION CHECK
-
-
 		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
 		}
 		else{
@@ -164,7 +164,6 @@ class CEvent extends CZBXAPI{
 // nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid(false);
 
-// Permission hack
 
 // groupids
 		if(!is_null($options['groupids'])){
@@ -231,6 +230,14 @@ class CEvent extends CZBXAPI{
 // time_till
 		if(!is_null($options['time_till'])){
 			$sql_parts['where'][] = 'e.clock<='.$options['time_till'];
+		}
+// eventid_from
+		if(!is_null($options['eventid_from'])){
+			$sql_parts['where'][] = 'e.eventid>='.$options['eventid_from'];
+		}
+// eventid_till
+		if(!is_null($options['eventid_till'])){
+			$sql_parts['where'][] = 'e.eventid<='.$options['eventid_till'];
 		}
 // value
 		if(!is_null($options['value'])){
@@ -592,62 +599,103 @@ class CEvent extends CZBXAPI{
 
 	public static function acknowledge($events_data){
 		global $USER_DETAILS;
-		$errors = array();
 
+		if(empty($events_data['events'])) return array('eventids' => array());
+		
 		$events = isset($events_data['events']) ? zbx_toArray($events_data['events']) : array();
 		$eventids = zbx_objectValues($events, 'eventid');
-		$message = $events_data['message'];
+		$eventids = array_combine($eventids, $eventids);
+
+		try{
+			self::BeginTransaction(__METHOD__);
 
 // PERMISSIONS {{{
-		if(!empty($events)){
 			$options = array(
 				'eventids' => $eventids,
 				'preservekeys' => 1,
-				'output' => API_OUTPUT_SHORTEN
+				'output' => API_OUTPUT_EXTEND,
+				'select_triggers' => API_OUTPUT_EXTEND,
 			);
 			$allowed_events = self::get($options);
 			foreach($events as $num => $event){
 				if(!isset($allowed_events[$event['eventid']])){
-					self::setError(__METHOD__, ZBX_API_ERROR_PERMISSIONS, 'You have not enough rights for operation');
-					return false;
+					self::exception(ZBX_API_ERROR_PERMISSIONS, 'You do not have enough rights for operation');
 				}
 			}
-		}
 // }}} PERMISSIONS
 
-		self::BeginTransaction(__METHOD__);
+			foreach($allowed_events as $event){
+				$trig = reset($event['triggers']);
+				if(!(($trig['type'] == TRIGGER_MULT_EVENT_ENABLED) && ($event['value'] == TRIGGER_VALUE_TRUE))){
+				
+					$val = ($event['value'] == TRIGGER_VALUE_TRUE ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE);
 
-		$result = DBexecute('UPDATE events SET acknowledged=1 WHERE '.DBcondition('eventid', $eventids));
-		if($result){
-			$time = time();
-			$message = zbx_dbstr($message);
+					$sql = ' SELECT eventid, object, objectid'.
+						' FROM events'.
+						' WHERE eventid < '.$event['eventid'].
+						' AND objectid = '.$event['objectid'].
+						' AND value = '.$val.
+						' AND object = '.EVENT_OBJECT_TRIGGER.
+						' ORDER BY object desc, objectid desc, eventid DESC'.
+						' LIMIT 1';
+					$first = DBfetch(DBselect($sql));
+					$first_sql = $first ? ' AND e.eventid > '.$first['eventid'] : '';
 
-			foreach($events as $enum => $event){
-				$acknowledgeid = get_dbid('acknowledges', 'acknowledgeid');
-				$result = DBexecute('INSERT INTO acknowledges (acknowledgeid, userid, eventid, clock, message)'.
-					' VALUES ('.$acknowledgeid.','.$USER_DETAILS['userid'].','.$event['eventid'].','.$time.','.$message.')');
 
-				if(!$result)
-					break;
+					$sql = ' SELECT eventid, object, objectid'.
+						' FROM events'.
+						' WHERE eventid > '.$event['eventid'].
+						' AND objectid = '.$event['objectid'].
+						' AND value = '.$val.
+						' AND object = '.EVENT_OBJECT_TRIGGER.
+						' ORDER BY object ASC, objectid ASC, eventid ASC'.
+						' LIMIT 1';
+					$last = DBfetch(DBselect($sql));
+					$last_sql = $last ? ' AND e.eventid < '.$last['eventid'] : '';
+
+					
+					$sql = 'SELECT e.eventid'.
+						' FROM events e'.
+						' WHERE e.objectid = '.$event['objectid'].
+							' AND e.value = '. ($val ? 0 : 1).
+							$first_sql.
+							$last_sql;
+
+					$db_events = DBselect($sql);
+					while($eventid = DBfetch($db_events)){
+						$eventids[$eventid['eventid']] = $eventid['eventid'];
+					}
+				}
 			}
-		}
 
-		$result = self::EndTransaction($result, __METHOD__);
+			$sql = 'UPDATE events SET acknowledged=1 WHERE '.DBcondition('eventid', $eventids);
+			if(!DBexecute($sql)) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
-		if($result){
-			$result = self::get(array(
-				'eventids' => $eventids,
-				'extendoutput' => 1,
-				'nopermission' => 1));
-			return $result;
+			$time = time();
+			$message = zbx_dbstr($events_data['message']);
+
+			foreach($eventids as $eventid){
+				$sql = 'INSERT INTO acknowledges (acknowledgeid, userid, eventid, clock, message)'.
+					' VALUES ('.get_dbid('acknowledges', 'acknowledgeid').','.$USER_DETAILS['userid'].','.$eventid.','.$time.','.$message.')';
+
+				if(!DBexecute($sql)) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+			}
+
+
+			self::EndTransaction(true, __METHOD__);
+
+			return array('eventids' => $eventids);
 		}
-		else{
-			self::setMethodErrors(__METHOD__, $errors);
+		catch(APIException $e){
+			self::EndTransaction(false, __METHOD__);
+
+			$error = $e->getErrors();
+			$error = reset($error);
+
+			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
 		}
 	}
-
-
 
 }
 ?>

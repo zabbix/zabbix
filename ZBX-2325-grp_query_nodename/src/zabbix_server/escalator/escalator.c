@@ -741,7 +741,7 @@ static void	execute_escalation(DB_ESCALATION *escalation)
 	DB_ACTION	action;
 	DB_EVENT	event;
 	char		*error = NULL;
-	int		source;
+	int		source = (-1);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In execute_escalation()");
 
