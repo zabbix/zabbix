@@ -89,7 +89,7 @@ function SDI(msg){
 		doc_body.appendChild(div_help);
 		
 		div_help.setAttribute('id','div_help');
-		div_help.setAttribute('style','position: absolute; right: 300px; top: 260px; border: 1px red solid; width: 500px; height: 400px; background-color: white; font-size: 12px; overflow: auto; z-index: 20;');
+		div_help.setAttribute('style','position: absolute; right: 30px; top: 100px; border: 1px red solid; width: 500px; height: 400px; background-color: white; font-size: 12px; overflow: auto; z-index: 20;');
 		
 //		new Draggable(div_help,{});
 	}
@@ -192,8 +192,8 @@ return true;
 }
 
 function cancelEvent(e){
-	if (!e) var e = window.event;	
-//SDI(e);
+	if(!e) var e = window.event;
+//SDI(e.type);
 	if(e){
 		if(IE){
 			e.cancelBubble = true;
@@ -204,6 +204,7 @@ function cancelEvent(e){
 			e.preventDefault();
 		}
 	}
+
 return false;
 }
 
@@ -323,8 +324,8 @@ function deselectAll(){
 function eventTarget(e){
 	var targ = false;
 
-	if (!e) var e = window.event;
-	if (e.target) targ = e.target;
+	if(!e) var e = window.event;
+	if(e.target) targ = e.target;
 	else if (e.srcElement) targ = e.srcElement;
 
 // defeat Safari bug

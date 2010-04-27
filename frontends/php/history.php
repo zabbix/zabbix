@@ -567,10 +567,8 @@ include_once('include/page_header.php');
 
 	if(!isset($_REQUEST['plaintext'])){
 		if(str_in_array($_REQUEST['action'], array('showvalues', 'showgraph'))){
-			$graphDims['graphHeight'] = 200;
-			$graphDims['shiftXleft'] = 75;
-			$graphDims['shiftXright'] = 30;
-			$graphDims['graphtype'] = 0;
+			$graphDims = getGraphDims();
+
 
 // NAV BAR
 			$timeline = array();
@@ -617,7 +615,9 @@ include_once('include/page_header.php');
 	}
 	
 	$historyWidget->show();
-	
+?>
+<?php
 
 require_once('include/page_footer.php');
+
 ?>

@@ -521,7 +521,7 @@ function bar_report_form3(){
 	$avgperiod = get_request('avgperiod', TIMEPERIOD_TYPE_DAILY);
 
 	$report_timesince = get_request('report_timesince',date('YmdHi', time()-86400));
-	$report_timetill = zget_request('report_timetill',date('YmdHi'));
+	$report_timetill = get_request('report_timetill',date('YmdHi'));
 
 	$captions = get_request('captions',array());
 	$items = get_request('items',array());
