@@ -79,15 +79,16 @@ check_fields($fields);
 	$grouplist = array();
 
 	$options = array(
+		'nodeids' => $nodeid,
 		'output' => API_OUTPUT_EXTEND
 	);
 	$groups = CHostGroup::get($options);
 	order_result($groups, 'name');
 
 	foreach($groups as $gnum => $row){
-		$row['name'] = get_node_name_by_elid($row['groupid'], null, ':').$row['name'];
+		$row['nodename'] = get_node_name_by_elid($row['groupid'], true, ':').$row['name'];
 
-		$grouplist[$count] = array('groupid' => $row['groupid'], 'name' => $row['name'], 'permission' => $permission);
+		$grouplist[$count] = array('groupid' => $row['groupid'], 'name' => $row['nodename'], 'permission' => $permission);
 		$table->addRow(	new CCol(array(new CCheckBox('groups['.$count.']', NULL, NULL, $count), $row['name'])));
 		$count++;
 	}

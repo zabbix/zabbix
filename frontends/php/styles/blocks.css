@@ -284,8 +284,8 @@ div.box_on{
 	border: 0px red solid;
 /*
 	background-color:#FF0000;
-	opacity:.01;
-	filter:alpha(opacity=01);
+	opacity:.50;
+	filter:alpha(opacity=50);
 /**/
 }
 
