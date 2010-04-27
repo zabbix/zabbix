@@ -125,15 +125,22 @@ include_once('include/page_header.php');
 
 	$config = select_config();
 
-	$options = array('allow_all_hosts','monitored_hosts','with_monitored_triggers');
-	$params = array();
-	foreach($options as  $option) $params[$option] = 1;
-	$PAGE_GROUPS = get_viewed_groups(PERM_READ_ONLY, $params);
-	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params);
-	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
+	$options = array(
+		'groups' => array(
+			'monitored_hosts' => 1,
+			'with_monitored_triggers' => 1,
+		),
+		'hosts' => array(
+			'monitored_hosts' => 1,
+			'with_monitored_triggers' => 1,
+		),
+		'hostid' => get_request('hostid', null),
+		'groupid' => get_request('groupid', null),
+	);
+	$pageFilter = new CPageFilter($options);
+	$_REQUEST['groupid'] = $pageFilter->groupid;
+	$_REQUEST['hostid'] = $pageFilter->hostid;
 
-	// $_REQUEST['groupid'] = get_request('groupid', 0);
-	// $_REQUEST['hostid'] = get_request('hostid', 0);
 
 /* FILTER */
 	if(isset($_REQUEST['filter_rst'])){
@@ -192,22 +199,9 @@ include_once('include/page_header.php');
 <?php
 	$trigg_wdgt = new CWidget();
 
-	$r_form = new CForm();
-	$r_form->setMethod('get');
-
-	$cmbGroups = new CComboBox('groupid',$PAGE_GROUPS['selected'],'javascript: submit();');
-	$cmbHosts = new CComboBox('hostid',$PAGE_HOSTS['selected'],'javascript: submit();');
-
-	foreach($PAGE_GROUPS['groups'] as $groupid => $name){
-		$cmbGroups->addItem($groupid, get_node_name_by_elid($groupid, null, ': ').$name);
-	}
-	foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
-		$cmbHosts->addItem($hostid, get_node_name_by_elid($hostid, null, ': ').$name);
-	}
-
-
-	$r_form->addItem(array(S_GROUP.SPACE,$cmbGroups));
-	$r_form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
+	$r_form = new CForm(null, 'get');
+	$r_form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB(true)));
+	$r_form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB(true)));
 	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
 
 	$url = 'tr_status.php'.($_REQUEST['fullscreen'] ? '' : '?fullscreen=1');
@@ -351,14 +345,14 @@ include_once('include/page_header.php');
 	);
 
 // Filtering
-	if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
-		$options['hostids'] = $PAGE_HOSTS['selected'];
+	if($pageFilter->hostsSelected){
+		if($pageFilter->hostid > 0)
+			$options['hostids'] = $pageFilter->hostid;
+		else
+			$options['hostids'] = array_keys($pageFilter->hosts);
 	}
-	else if(($PAGE_GROUPS['selected'] > 0) && !empty($PAGE_HOSTS['hostids'])){
-		$options['hostids'] = $PAGE_HOSTS['hostids'];
-	}
-	else if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
-		$options['groupids'] = $PAGE_GROUPS['selected'];
+	else{
+		$options['hostids'] = array();
 	}
 
 

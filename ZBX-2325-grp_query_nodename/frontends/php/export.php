@@ -72,7 +72,6 @@ include_once('include/page_header.php');
 	$hostids_triggers	= get_request('triggers', array());
 
 	if($EXPORT_DATA){
-
 /* SELECT HOSTS */
 		$params = array(
 			'hostids' => $hostids,
@@ -293,20 +292,15 @@ include_once('include/page_header.php');
 		$form = new CForm(null, 'post');
 		$form->setName('export_hosts_frm');
 
-		$params=array();
-		$options = array('only_current_node');
-		foreach($options as $option) $params[$option] = 1;
-		$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
-		$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
-		validate_group($PAGE_GROUPS,$PAGE_HOSTS);
+		$options = array(
+			'groups' => array('editable' => 1),
+			'groupid' => get_request('groupid', null),
+		);
+		$pageFilter = new CPageFilter($options);
+		$_REQUEST['groupid'] = $pageFilter->groupid;
 		
-		$selected_groupid = $PAGE_GROUPS['selected'];
-		
-		$cmbGroups = new CComboBox('groupid', $selected_groupid, 'javascript: submit();');
-		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
-			$cmbGroups->addItem($groupid, $name);
-		}
-		$form->addItem(array(S_GROUP.SPACE, $cmbGroups));
+
+		$form->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB()));
 
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
@@ -316,143 +310,148 @@ include_once('include/page_header.php');
 // } Page Header
 
 
-		$form = new CForm(null, 'post');
-		$form->setName('hosts_export');
-		$form->addVar('groupid', $selected_groupid);
+		if(!$pageFilter->groupsSelected){
+			$export_wdgt->addItem(new CTableInfo(S_NO_HOSTS_DEFINED));
+		}
+		else{
+			$form = new CForm(null, 'post');
+			$form->setName('hosts_export');
+			$form->addVar('groupid', $_REQUEST['groupid']);
 
-		$table = new CTableInfo(S_NO_HOSTS_DEFINED);
-		$table->setHeader(array(
-			new CCheckBox('all_hosts', false, "checkAll('".$form->getName()."','all_hosts','hosts');"),
-			make_sorting_header(S_NAME, 'host'),
-			make_sorting_header(S_DNS, 'dns'),
-			make_sorting_header(S_IP, 'ip'),
-			make_sorting_header(S_PORT, 'port'),
-			make_sorting_header(S_STATUS, 'status'),
-			array(new CCheckBox('all_templates', true, 'checkAll("'.$form->getName().'","all_templates","templates");'), S_TEMPLATES),
-			array(new CCheckBox('all_items', true, 'checkAll("'.$form->getName().'","all_items","items");'), S_ITEMS),
-			array(new CCheckBox('all_triggers', true, 'checkAll("'.$form->getName().'","all_triggers","triggers");'), S_TRIGGERS),
-			array(new CCheckBox('all_graphs', true, 'checkAll("'.$form->getName().'","all_graphs","graphs");'), S_GRAPHS)
-		));
+			$table = new CTableInfo(S_NO_HOSTS_DEFINED);
+			$table->setHeader(array(
+				new CCheckBox('all_hosts', false, "checkAll('".$form->getName()."','all_hosts','hosts');"),
+				make_sorting_header(S_NAME, 'host'),
+				make_sorting_header(S_DNS, 'dns'),
+				make_sorting_header(S_IP, 'ip'),
+				make_sorting_header(S_PORT, 'port'),
+				make_sorting_header(S_STATUS, 'status'),
+				array(new CCheckBox('all_templates', true, 'checkAll("'.$form->getName().'","all_templates","templates");'), S_TEMPLATES),
+				array(new CCheckBox('all_items', true, 'checkAll("'.$form->getName().'","all_items","items");'), S_ITEMS),
+				array(new CCheckBox('all_triggers', true, 'checkAll("'.$form->getName().'","all_triggers","triggers");'), S_TRIGGERS),
+				array(new CCheckBox('all_graphs', true, 'checkAll("'.$form->getName().'","all_graphs","graphs");'), S_GRAPHS)
+			));
 
-// get hosts
-		$sortfield = getPageSortField('host');
-		$sortorder = getPageSortOrder();
-		
-		$options = array(
-			'templated_hosts' => 1,
-			'output' => array('hostid', 'status', $sortfield),
-			'editable' => 1,
-			'groupids' => ($selected_groupid > 0) ? $selected_groupid : null
-		);
-		$hosts_all = CHost::get($options);
+	// get hosts
+			$sortfield = getPageSortField('host');
+			$sortorder = getPageSortOrder();
+
+			$options = array(
+				'templated_hosts' => 1,
+				'output' => array('hostid', 'status', $sortfield),
+				'editable' => 1,
+			);
+			if($pageFilter->groupid > 0)
+				$options['groupids'] = $pageFilter->groupid;
+			else
+				$options['groupids'] = array_keys($pageFilter->groups);
+			
+			$hosts_all = CHost::get($options);
 
 // workaround for correct sorting...
-		if(in_array($sortfield, array('dns', 'ip', 'port'))){
-			foreach($hosts_all as $hnum => $host){
-				if($host['status'] == HOST_STATUS_TEMPLATE){
-					$hosts_all[$hnum][$sortfield] = '';
+			if(in_array($sortfield, array('dns', 'ip', 'port'))){
+				foreach($hosts_all as $hnum => $host){
+					if($host['status'] == HOST_STATUS_TEMPLATE){
+						$hosts_all[$hnum][$sortfield] = '';
+					}
 				}
 			}
-		}
-		
-// sorting
-		order_result($hosts_all, $sortfield, $sortorder);
-		$paging = getPagingLine($hosts_all);
-//-------
 
-		$options = array(
-			'hostids' => zbx_objectValues($hosts_all, 'hostid'),
-			'output' => array('hostid', 'host', 'dns', 'ip', 'port', 'status', 'useip'),
-			'templated_hosts' => 1,
-			'selectParentTemplates' => API_OUTPUT_COUNT,
-			'select_items' => API_OUTPUT_COUNT,
-			'select_triggers' => API_OUTPUT_COUNT,
-			'select_graphs' => API_OUTPUT_COUNT,
-		);
-		$hosts_all = CHost::get($options);
+			order_result($hosts_all, $sortfield, $sortorder);
+			$paging = getPagingLine($hosts_all);
 
-// workaround for correct sorting... 
-		if(in_array($sortfield, array('dns', 'ip', 'port'))){
-			foreach($hosts_all as $hnum => $host){
-				if($host['status'] == HOST_STATUS_TEMPLATE){
-					$hosts_all[$hnum][$sortfield] = '';
+			$options = array(
+				'hostids' => zbx_objectValues($hosts_all, 'hostid'),
+				'output' => array('hostid', 'host', 'dns', 'ip', 'port', 'status', 'useip'),
+				'templated_hosts' => 1,
+				'selectParentTemplates' => API_OUTPUT_COUNT,
+				'select_items' => API_OUTPUT_COUNT,
+				'select_triggers' => API_OUTPUT_COUNT,
+				'select_graphs' => API_OUTPUT_COUNT,
+			);
+			$hosts_all = CHost::get($options);
+
+	// workaround for correct sorting...
+			if(in_array($sortfield, array('dns', 'ip', 'port'))){
+				foreach($hosts_all as $hnum => $host){
+					if($host['status'] == HOST_STATUS_TEMPLATE){
+						$hosts_all[$hnum][$sortfield] = '';
+					}
 				}
 			}
-		}
-		
-		order_result($hosts_all, $sortfield, $sortorder);
-		
-		$count_chkbx = 0;
-		foreach($hosts_all as $hnum => $host){
-			$hostid = $host['hostid'];
 
-			$status = new CCol(host_status2str($host['status']), host_status2style($host['status']));
+			order_result($hosts_all, $sortfield, $sortorder);
 
-			$template_cnt = ($host['parentTemplates'] > 0)
-				? array(new CCheckBox('templates['.$hostid.']', (isset($hostids_templates[$hostid]) || !isset($update)), NULL, $hostid), $host['templates'])
-				: '-';
+			$count_chkbx = 0;
+			foreach($hosts_all as $hnum => $host){
+				$hostid = $host['hostid'];
 
-			$item_cnt = ($host['items'] > 0)
-				? array(new CCheckBox('items['.$hostid.']', (isset($hostids_items[$hostid]) || !isset($update)), NULL, $hostid), $host['items'])
-				: '-';
+				$status = new CCol(host_status2str($host['status']), host_status2style($host['status']));
 
-			$trigger_cnt = ($host['triggers'] > 0)
-				? array(new CCheckBox('triggers['.$hostid.']', (isset($hostids_triggers[$hostid]) || !isset($update)), NULL, $hostid), $host['triggers'])
-				: '-';
+				$template_cnt = ($host['parentTemplates'] > 0)
+					? array(new CCheckBox('templates['.$hostid.']', (isset($hostids_templates[$hostid]) || !isset($update)), NULL, $hostid), $host['templates'])
+					: '-';
 
-			$graph_cnt = ($host['graphs'] > 0)
-				? array(new CCheckBox('graphs['.$hostid.']', (isset($hostids_graphs[$hostid]) || !isset($update)), NULL, $hostid), $host['graphs'])
-				: '-';
+				$item_cnt = ($host['items'] > 0)
+					? array(new CCheckBox('items['.$hostid.']', (isset($hostids_items[$hostid]) || !isset($update)), NULL, $hostid), $host['items'])
+					: '-';
 
-			if($host['status'] == HOST_STATUS_TEMPLATE){
-				$ip = $dns = $port = '-';
+				$trigger_cnt = ($host['triggers'] > 0)
+					? array(new CCheckBox('triggers['.$hostid.']', (isset($hostids_triggers[$hostid]) || !isset($update)), NULL, $hostid), $host['triggers'])
+					: '-';
+
+				$graph_cnt = ($host['graphs'] > 0)
+					? array(new CCheckBox('graphs['.$hostid.']', (isset($hostids_graphs[$hostid]) || !isset($update)), NULL, $hostid), $host['graphs'])
+					: '-';
+
+				if($host['status'] == HOST_STATUS_TEMPLATE){
+					$ip = $dns = $port = '-';
+				}
+				else{
+					$ip = empty($host['ip']) ? '-' : $host['ip'];
+					$dns = empty($host['dns']) ? '-' : $host['dns'];
+					($host['useip'] == 1) ? $ip = bold($ip) : $dns = bold($dns);
+					$port = empty($host['port']) ? '-' : $host['port'];
+				}
+
+				$checked = (isset($hostids[$hostid]));
+				if($checked) $count_chkbx++;
+
+				$table->addRow(array(
+					new CCheckBox('hosts['.$hostid.']', $checked, NULL, $hostid),
+					$host['host'],
+					$dns,
+					$ip,
+					$port,
+					$status,
+					$template_cnt,
+					$item_cnt,
+					$trigger_cnt,
+					$graph_cnt
+				));
 			}
-			else{
-				$ip = empty($host['ip']) ? '-' : $host['ip'];
-				$dns = empty($host['dns']) ? '-' : $host['dns'];
-				($host['useip'] == 1) ? $ip = bold($ip) : $dns = bold($dns);
-				$port = empty($host['port']) ? '-' : $host['port'];
-			}
-
-			$checked = (isset($hostids[$hostid]));
-			if($checked) $count_chkbx++;
-
-			$table->addRow(array(
-				new CCheckBox('hosts['.$hostid.']', $checked, NULL, $hostid),
-				$host['host'],
-				$dns,
-				$ip,
-				$port,
-				$status,
-				$template_cnt,
-				$item_cnt,
-				$trigger_cnt,
-				$graph_cnt
-			));
-		}
 
 // goBox {
-		$goBox = new CComboBox('go');
-		$goBox->addItem('export', S_EXPORT);
-		$goBox->addItem('preview', S_PREVIEW);
+			$goBox = new CComboBox('go');
+			$goBox->addItem('export', S_EXPORT);
+			$goBox->addItem('preview', S_PREVIEW);
+			// goButton name is necessary!!!
+			$goButton = new CButton('goButton', S_GO.' ('.$count_chkbx.')');
+			$goButton->setAttribute('id','goButton');
 
-		// goButton name is necessary!!!
-		$goButton = new CButton('goButton', S_GO.' ('.$count_chkbx.')');
-		$goButton->setAttribute('id','goButton');
-
-		zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
-
-		$footer = get_table_header(array($goBox, $goButton));
-
-		zbx_add_post_js('chkbxRange.pageGoCount = '.$count_chkbx.';');
+			zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
+			$footer = get_table_header(array($goBox, $goButton));
+			zbx_add_post_js('chkbxRange.pageGoCount = '.$count_chkbx.';');
 // } goBox
 
-		$table = array($paging, $table, $paging, $footer);
-		$form->addItem($table);
-		$export_wdgt->addItem($form);
+			$table = array($paging, $table, $paging, $footer);
+			$form->addItem($table);
+			$export_wdgt->addItem($form);
+		}
 	}
 
 	$export_wdgt->show();
+
 
 include_once('include/page_footer.php');
 ?>

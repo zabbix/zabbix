@@ -84,14 +84,10 @@ class CPageFilter{
 			$this->_initGraphs($options['graphid'], $options['graphs']);
 		}
 
-		// nodes
-//		if(ZBX_DISTRIBUTED){
-//			$def_sql['select'][] = 'n.name as node_name';
-//			$def_sql['from'][] = 'nodes n';
-//			$def_sql['where'][] = 'n.nodeid='.DBid2nodeid('g.groupid');
-//			$def_sql['order'][] = 'node_name';
-//		}
-
+		if(isset($options['screens'])){
+			$this->_profileIdx['screens'] = 'web.'.$page['file'].'.screenid';
+			$this->_initScreens($options['screenid'], $options['screens']);
+		}
 	}
 
 	private function _updateGHbyGraph(&$options){
@@ -121,9 +117,8 @@ class CPageFilter{
 		foreach($groups as $group){
 			$this->data['groups'][$group['groupid']] = $group['name'];
 		}
-
 		if(is_null($groupid) && ($this->config['DDRemember'])){
-			if(isset($this->config['select_latest'])){
+			if($this->config['select_latest']){
 				$groupid = CProfile::get(self::GROUP_LATEST_IDX);
 			}
 			else{
@@ -166,7 +161,7 @@ class CPageFilter{
 			}
 
 			if(is_null($hostid) && ($this->config['DDRemember'])){
-				if(isset($this->config['select_latest'])){
+				if($this->config['select_latest']){
 					$hostid = CProfile::get(self::HOST_LATEST_IDX);
 				}
 				else{
@@ -190,6 +185,50 @@ class CPageFilter{
 	}
 
 	private function _initGraphs($graphid, $options){
+
+		$this->data['graphs'] = array();
+
+		if(!$this->hostsSelected){
+			$graphid = 0;
+		}
+		else{
+			$def_ptions = array(
+				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
+				'output' => API_OUTPUT_EXTEND,
+				'groupids' => ((($this->groupid > 0) && ($this->hostid == 0)) ? $this->groupid : null),
+				'hostids' => (($this->hostid > 0) ? $this->hostid : null),
+			);
+			$options = zbx_array_merge($def_ptions, $options);
+			$graphs = CGraph::get($options);
+
+			foreach($graphs as $graph){
+				$this->data['graphs'][$graph['graphid']] = $graph['name'];
+			}
+
+			if(is_null($graphid) && ($this->config['DDRemember'])){
+				if($this->config['select_latest']){
+					$graphid = CProfile::get(self::GRAPH_LATEST_IDX);
+				}
+				else{
+					$graphid = CProfile::get($this->_profileIdx['graphs']);
+				}
+			}
+			if(is_null($graphid)){
+				$graphid = 0;
+			}
+			else{
+				$graphid = isset($this->data['graphs'][$graphid]) ? $graphid : 0;
+			}
+		}
+
+		CProfile::update($this->_profileIdx['graphs'], $graphid, PROFILE_TYPE_ID);
+		CProfile::update(self::GRAPH_LATEST_IDX, $graphid, PROFILE_TYPE_ID);
+
+		$this->isSelected['graphsSelected'] = $graphid > 0;
+		$this->ids['graphid'] = $graphid;
+	}
+
+	private function _initScreens($graphid, $options){
 
 		$this->data['graphs'] = array();
 

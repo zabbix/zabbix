@@ -276,45 +276,47 @@ include_once('include/page_header.php');
 		unset($_REQUEST['groupid'],$_REQUEST['nodeid']);
 	}
 
-	$validation_param = array('deny_all','select_first_group_if_empty','select_first_host_if_empty','select_host_on_group_switch');
-	if($monitored_hosts) array_push($validation_param, 'monitored_hosts');
-	if($real_hosts) 	array_push($validation_param, 'real_hosts');
-//	if(isset($templated_hosts)) array_push($validation_param, 'templated_hosts');
-
 	$nodeid = get_request('nodeid', get_current_nodeid(false));
 
-	$params = array();
-	foreach($validation_param as $option) $params[$option] = 1;
+	$options = array(
+		'config' => array('deny_all', 'select_latest'),
+		'groups' => array(
+			'not_proxy_hosts' => 1,
+			'with_graphs' => 1,
+			'editable' => 1,
+			'monitored_hosts' => $monitored_hosts? 1 : null,
+			'real_hosts' => $real_hosts ? 1 : null,
+			'nodeids' => $nodeid,
+			'editable'=> $writeonly ? null : 1,
+		),
+		'hosts' => array(
+			'with_graphs' => 1,
+			'editable' => 1,
+			'monitored_hosts' => $monitored_hosts? 1 : null,
+			'real_hosts' => $real_hosts ? 1 : null,
+			'nodeids' => $nodeid,
+			'editable'=> $writeonly ? null : 1,
+		),
+		'groupid' => get_request('groupid', null),
+		'hostid' => get_request('hostid', null),
+	);
+	$pageFilter = new CPageFilter($options);
+	$_REQUEST['groupid'] = $pageFilter->groupid;
+	$_REQUEST['hostid'] = $pageFilter->hostid;
 
-	$perm = !is_null($writeonly)?PERM_READ_WRITE:PERM_READ_ONLY;
-	$PAGE_GROUPS = get_viewed_groups($perm, $params, $nodeid);
-	$PAGE_HOSTS = get_viewed_hosts($perm, $PAGE_GROUPS['selected'], $params, $nodeid);
-
-	if(str_in_array($srctbl, array('graphs','applications','screens','triggers','logitems','items','simple_graph','plain_text'))){
-		validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
-	}
-	else if(str_in_array($srctbl,array('host_group','hosts','templates','host_templates','hosts_and_templates'))){
-		validate_group($PAGE_GROUPS, $PAGE_HOSTS);
-	}
 
 	$groupid = 0;
 	$hostid = 0;
 
-	$available_nodes	= get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST);
-	$available_groups	= $PAGE_GROUPS['groupids'];
-	$available_hosts	= $PAGE_HOSTS['hostids'];
+	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST);
 
 	if(isset($only_hostid)){
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, $perm);
-		if(!isset($available_hosts[$only_hostid])) access_deny();
-
 		$hostid = $_REQUEST['hostid'] = $only_hostid;
 	}
 	else{
 		if(str_in_array($srctbl,array('hosts','host_group','triggers','logitems','items',
 									'applications','screens','slides','graphs','simple_graph',
-									'sysmaps','plain_text','screens2','overview','host_group_scr')))
-		{
+									'sysmaps','plain_text','screens2','overview','host_group_scr'))){
 			if(ZBX_DISTRIBUTED){
 				$cmbNode = new CComboBox('nodeid', $nodeid, 'submit()');
 
@@ -331,15 +333,7 @@ include_once('include/page_header.php');
 		unset($ok);
 
 		if(str_in_array($srctbl,array('hosts_and_templates', 'hosts','templates','triggers','logitems','items','applications','host_templates','graphs','simple_graph','plain_text'))){
-
-			$groupid = $PAGE_GROUPS['selected'];
-			$cmbGroups = new CComboBox('groupid',$groupid,'javascript: submit();');
-			foreach($PAGE_GROUPS['groups'] as $slct_groupid => $name){
-				$cmbGroups->addItem($slct_groupid, get_node_name_by_elid($slct_groupid, null, ': ').$name);
-			}
-
-			$frmTitle->addItem(array(S_GROUP,SPACE,$cmbGroups));
-			CProfile::update('web.popup.groupid',$groupid,PROFILE_TYPE_ID);
+			$frmTitle->addItem(array(S_GROUP,SPACE,$pageFilter->getGroupsCB(true)));
 		}
 
 		if(str_in_array($srctbl,array('help_items'))){
@@ -351,15 +345,7 @@ include_once('include/page_header.php');
 		}
 
 		if(str_in_array($srctbl,array('triggers','logitems','items','applications','graphs','simple_graph','plain_text'))){
-			$hostid = $PAGE_HOSTS['selected'];
-
-			$cmbHosts = new CComboBox('hostid',$hostid,'javascript: submit();');
-			foreach($PAGE_HOSTS['hosts'] as $tmp_hostid => $name){
-				$cmbHosts->addItem($tmp_hostid, get_node_name_by_elid($tmp_hostid, null, ': ').$name);
-			}
-
-			$frmTitle->addItem(array(SPACE,S_HOST,SPACE,$cmbHosts));
-			CProfile::update('web.popup.hostid',$hostid,PROFILE_TYPE_ID);
+			$frmTitle->addItem(array(SPACE,S_HOST,SPACE,$pageFilter->getHostsCB(true)));
 		}
 
 		if(str_in_array($srctbl,array('triggers','hosts','host_group'))){
@@ -844,13 +830,13 @@ include_once('include/page_header.php');
 			));
 
 		$options = array(
-				'nodeids' => $nodeid,
-				'hostids' => $hostid,
-				'webitems' => 1,
-				'output' => API_OUTPUT_EXTEND,
-				'select_hosts' => API_OUTPUT_EXTEND,
-				'sortfield'=>'description'
-			);
+			'nodeids' => $nodeid,
+			'hostids' => $hostid,
+			'webitems' => 1,
+			'output' => API_OUTPUT_EXTEND,
+			'select_hosts' => API_OUTPUT_EXTEND,
+			'sortfield'=>'description'
+		);
 		if(!is_null($writeonly)) $options['editable'] = 1;
 		if(!is_null($templated)) $options['templated'] = $templated;
 
@@ -883,27 +869,28 @@ include_once('include/page_header.php');
 		$table = new CTableInfo(S_NO_APPLICATIONS_DEFINED);
 		$table->setHeader(array(
 			($hostid>0)?null:S_HOST,
-			S_NAME));
+			S_NAME)
+		);
+		
+		$options = array(
+			'nodeids' => $nodeid,
+			'hostids' => $hostid,
+			'webitems' => 1,
+			'output' => API_OUTPUT_EXTEND,
+		);
+		if(!is_null($writeonly)) $options['editable'] = 1;
+		if(!is_null($templated)) $options['templated'] = $templated;
+		$apps = CApplication::get($options);
+		order_result($apps, 'name');
 
-		$sql = 'SELECT DISTINCT h.host,a.* '.
-				' FROM hosts h,applications a '.
-				' WHERE h.hostid=a.hostid '.
-					' AND '.DBin_node('a.applicationid', $nodeid).
-					' AND '.DBcondition('h.hostid',$available_hosts).
-					// ' AND h.status in ('.implode(',', $host_status).')'.
-					' AND h.hostid='.$hostid.
-				' ORDER BY h.host,a.name';
+		foreach($apps as $app){
+			$name = new CSpan($app['name'], 'link');
+			$action = get_window_opener($dstfrm, $dstfld1, $app[$srcfld1]).
+				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $app[$srcfld2]) : '');
 
-		$result = DBselect($sql);
-		while($row = DBfetch($result)){
-			$name = new CSpan($row["name"],'link');
+			$name->setAttribute('onclick', $action." close_window(); return false;");
 
-			$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
-				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
-
-			$name->setAttribute('onclick',$action." close_window(); return false;");
-
-			$table->addRow(array(($hostid>0)?null:$row['host'], $name));
+			$table->addRow(array(($hostid>0)?null:$app['host'], $name));
 		}
 		$table->show();
 	}

@@ -41,28 +41,30 @@
 	validate_sort_and_sortorder('host', ZBX_SORT_UP);
 ?>
 <?php
-// permission check, imo should be remuved in future.
+
+	$options = array(
+		'groups' => array(
+			'real_hosts' => 1,
+		),
+		'groupid' => get_request('groupid', null),
+	);
+	$pageFilter = new CPageFilter($options);
+	$_REQUEST['groupid'] = $pageFilter->groupid;
+
+
 	$_REQUEST['hostid'] = get_request('hostid', 0);
+// permission check, imo should be remuved in future.
 	if($_REQUEST['hostid'] > 0){
 		$res = CHost::get(array('real_hosts' => 1, 'hostids' => $_REQUEST['hostid']));
 		if(empty($res)) access_deny();
 	}
 
 
-	if(isset($_REQUEST['groupid'])){
-		CProfile::update('web.'.$page['menu'].'.groupid', $_REQUEST['groupid'], PROFILE_TYPE_ID);
-	}
-	else{
-		$_REQUEST['groupid'] = CProfile::get('web.'.$page['menu'].'.groupid', 0);
-	}
-
 	$_REQUEST['prof_type'] = get_request('prof_type', 0);
 
 	$hostprof_wdgt = new CWidget();
 
 	$profile_form = new CForm(null, 'get');
-	// $profile_form->addVar('sort', 'host');
-	// $profile_form->addVar('sortorder', ZBX_SORT_UP);
 	$cmbProf = new CComboBox('prof_type', $_REQUEST['prof_type'], 'javascript: submit();');
 	$cmbProf->additem(0, S_NORMAL);
 	$cmbProf->additem(1, S_EXTENDED);
@@ -82,19 +84,6 @@
 		}
 	}
 	else{
-// get groups {{{
-		$options = array(
-			'nodeids' => get_current_nodeid(),
-			'real_hosts' => 1,
-			'extendoutput' => 1
-		);
-		$groups = CHostGroup::get($options);
-		$groups = zbx_toHash($groups, 'groupid');
-
-		if(!isset($groups[$_REQUEST['groupid']])) $_REQUEST['groupid'] = 0;
-// }}} get groups
-
-
 		$sortfield = getPageSortField('host');
 		$sortorder = getPageSortOrder();
 		$options = array(
@@ -105,11 +94,11 @@
 			'select_groups' => 1,
 			'limit' => ($config['search_limit']+1)
 		);
-		if($_REQUEST['groupid'] > 0){
-			$options['groupids'] = $_REQUEST['groupid'];
-		}
-		else{
-			$options['groupids'] = zbx_objectValues($groupids, 'groupid');
+		if($pageFilter->groupsSelected){
+			if($pageFilter->groupid > 0)
+				$options['groupids'] = $pageFilter->groupid;
+			else
+				$options['groupids'] = array_keys($pageFilter->groups);
 		}
 		$hosts = CHost::get($options);
 
@@ -140,14 +129,7 @@
 
 		$r_form = new CForm(null, 'get');
 		$r_form->addVar('prof_type', $_REQUEST['prof_type']);
-
-		$cmbGroups = new CComboBox('groupid', $_REQUEST['groupid'], 'javascript: submit();');
-		$cmbGroups->addItem(0, S_ALL_S);
-		order_result($groups, 'name');
-		foreach($groups as $group){
-			$cmbGroups->addItem($group['groupid'], get_node_name_by_elid($group['groupid'], null, ': ').$group['name']);
-		}
-		$r_form->addItem(array(S_GROUP.SPACE, $cmbGroups));
+		$r_form->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB(true)));
 
 		$hostprof_wdgt->addHeader(S_HOSTS_BIG, $r_form);
 

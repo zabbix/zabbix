@@ -196,16 +196,19 @@ include_once('include/page_header.php');
 	}
 ?>
 <?php
-	$params = array();
-
-	$options = array('only_current_node');
-	if(isset($_REQUEST['form'])) array_push($options,'do_not_select_if_empty');
-
-	foreach($options as $option) $params[$option] = 1;
-	$PAGE_GROUPS = get_viewed_groups(PERM_READ_WRITE, $params);
-	$PAGE_HOSTS = get_viewed_hosts(PERM_READ_WRITE, $PAGE_GROUPS['selected'], $params);
-
-	validate_group_with_host($PAGE_GROUPS,$PAGE_HOSTS);
+	$options = array(
+		'groups' => array(
+			'editable' => 1,
+		),
+		'hosts' => array(
+			'editable' => 1,
+		),
+		'hostid' => get_request('hostid', null),
+		'groupid' => get_request('groupid', null),
+	);
+	$pageFilter = new CPageFilter($options);
+	$_REQUEST['groupid'] = $pageFilter->groupid;
+	$_REQUEST['hostid'] = $pageFilter->hostid;
 ?>
 <?php
 
@@ -296,17 +299,8 @@ include_once('include/page_header.php');
 
 		$form = new CForm(null, 'get');
 
-		$cmbGroups = new CComboBox('groupid', $PAGE_GROUPS['selected'],'javascript: submit();');
-		$cmbHosts = new CComboBox('hostid', $PAGE_HOSTS['selected'],'javascript: submit();');
-		foreach($PAGE_GROUPS['groups'] as $groupid => $name){
-			$cmbGroups->addItem($groupid, $name);
-		}
-		foreach($PAGE_HOSTS['hosts'] as $hostid => $name){
-			$cmbHosts->addItem($hostid, $name);
-		}
-
-		$form->addItem(array(S_GROUP.SPACE,$cmbGroups));
-		$form->addItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
+		$form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB()));
+		$form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB()));
 
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
@@ -315,8 +309,8 @@ include_once('include/page_header.php');
 		$app_wdgt->addHeader($numrows);
 
 // Header Host
-		if($PAGE_HOSTS['selected'] > 0){
-			$tbl_header_host = get_header_host_table($PAGE_HOSTS['selected'], array('items', 'triggers', 'graphs'));
+		if($_REQUEST['hostid'] > 0){
+			$tbl_header_host = get_header_host_table($_REQUEST['hostid'], array('items', 'triggers', 'graphs'));
 			$app_wdgt->addItem($tbl_header_host);
 		}
 
@@ -332,24 +326,26 @@ include_once('include/page_header.php');
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
 		);
-		if(($PAGE_HOSTS['selected'] > 0) || empty($PAGE_HOSTS['hostids'])){
-			$options['hostids'] = $PAGE_HOSTS['selected'];
+		if($pageFilter->hostsSelected){
+			if($pageFilter->hostid > 0)
+				$options['hostids'] = $pageFilter->hostid;
+			else
+				$options['hostids'] = array_keys($pageFilter->hosts);
 		}
-		if(($PAGE_GROUPS['selected'] > 0) || empty($PAGE_GROUPS['groupids'])){
-			$options['groupids'] = $PAGE_GROUPS['selected'];
+		else{
+			$options['hostids'] = array();
 		}
-
 		$applications = CApplication::get($options);
 
 		$form = new CForm();
 		$form->setName('applications');
-		$form->addVar('groupid', $PAGE_GROUPS['selected']);
-		$form->addVar('hostid', $PAGE_HOSTS['selected']);
+		$form->addVar('groupid', $_REQUEST['groupid']);
+		$form->addVar('hostid', $_REQUEST['hostid']);
 
 		$table = new CTableInfo();
 		$table->setHeader(array(
 			new CCheckBox('all_applications',NULL,"checkAll('".$form->getName()."','all_applications','applications');"),
-			(($PAGE_HOSTS['selected'] > 0) ? null : S_HOST),
+			(($_REQUEST['hostid'] > 0) ? null : S_HOST),
 			make_sorting_header(S_APPLICATION, 'name'),
 			S_SHOW
 		));
@@ -375,9 +371,9 @@ include_once('include/page_header.php');
 			}
 			$table->addRow(array(
 				new CCheckBox('applications['.$applicationid.']',NULL,NULL,$applicationid),
-				(($PAGE_HOSTS['selected'] > 0) ? null : $application['host']),
+				(($_REQUEST['hostid'] > 0) ? null : $application['host']),
 				$name,
-				array(new CLink(S_ITEMS,'items.php?hostid='.$PAGE_HOSTS['selected'].'&filter_set=1&filter_application='.urlencode($application['name'])),
+				array(new CLink(S_ITEMS,'items.php?hostid='.$_REQUEST['hostid'].'&filter_set=1&filter_application='.urlencode($application['name'])),
 				SPACE.'('.count($application['items']).')')
 			));
 		}
