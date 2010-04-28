@@ -1250,6 +1250,103 @@
 	return $result;
 	}
 
+	function imageDiagonalMarks($im,$x, $y, $offset, $color){
+		global $colors;
+
+		$gims = array(
+			'lt' => array(0,0, -9,0, -9,-3, -3,-9, 0,-9),
+			'rt' => array(0,0,  9,0,  9,-3,  3,-9, 0,-9),
+			'lb' => array(0,0, -9,0,  -9,3,  -3,9,  0,9),
+			'rb' => array(0,0,  9,0,   9,3,   3,9,  0,9),
+		);
+
+		foreach($gims['lt'] as $num => $px){
+			if(($num % 2) == 0) $gims['lt'][$num] = $px  + $x - $offset;
+			else $gims['lt'][$num] = $px  + $y - $offset;
+		}
+
+		foreach($gims['rt'] as $num => $px){
+			if(($num % 2) == 0) $gims['rt'][$num] = $px  + $x + $offset;
+			else $gims['rt'][$num] = $px  + $y - $offset;
+		}
+
+		foreach($gims['lb'] as $num => $px){
+			if(($num % 2) == 0) $gims['lb'][$num] = $px  + $x - $offset;
+			else $gims['lb'][$num] = $px  + $y + $offset;
+		}
+
+		foreach($gims['rb'] as $num => $px){
+			if(($num % 2) == 0) $gims['rb'][$num] = $px  + $x + $offset;
+			else $gims['rb'][$num] = $px  + $y + $offset;
+		}
+
+		imagefilledpolygon($im,$gims['lt'],5,$color);
+		imagepolygon($im,$gims['lt'],5,$colors['Dark Red']);
+
+		imagefilledpolygon($im,$gims['rt'],5,$color);
+		imagepolygon($im,$gims['rt'],5,$colors['Dark Red']);
+
+		imagefilledpolygon($im,$gims['lb'],5,$color);
+		imagepolygon($im,$gims['lb'],5,$colors['Dark Red']);
+
+		imagefilledpolygon($im,$gims['rb'],5,$color);
+		imagepolygon($im,$gims['rb'],5,$colors['Dark Red']);
+
+	}
+
+	function imageVerticalMarks($im,$x, $y, $offset, $color, $marks='tlbr'){
+		global $colors;
+
+		$polygons = 5;
+		$gims = array(
+			't' => array(0,0, -6,-6, -3,-9,  3,-9,  6,-6),
+			'l' => array(0,0,  -6,6,  -9,3, -9,-3, -6,-6),
+			'b' => array(0,0,   6,6,   3,9,  -3,9,  -6,6),
+			'r' => array(0,0,  6,-6,  9,-3,   9,3,   6,6),
+		);
+
+		foreach($gims['t'] as $num => $px){
+			if(($num % 2) == 0) $gims['t'][$num] = $px  + $x;
+			else $gims['t'][$num] = $px  + $y - $offset;
+		}
+
+		foreach($gims['l'] as $num => $px){
+			if(($num % 2) == 0) $gims['l'][$num] = $px  + $x - $offset;
+			else $gims['l'][$num] = $px  + $y;
+		}
+
+		foreach($gims['b'] as $num => $px){
+			if(($num % 2) == 0) $gims['b'][$num] = $px  + $x;
+			else $gims['b'][$num] = $px  + $y + $offset;
+		}
+
+		foreach($gims['r'] as $num => $px){
+			if(($num % 2) == 0) $gims['r'][$num] = $px  + $x + $offset;
+			else $gims['r'][$num] = $px  + $y;
+		}
+
+		if(strpos($marks, 't') !== false){
+			imagefilledpolygon($im,$gims['t'],$polygons,$color);
+			imagepolygon($im,$gims['t'],$polygons,$colors['Dark Red']);
+		}
+
+		if(strpos($marks, 'l') !== false){
+			imagefilledpolygon($im,$gims['l'],$polygons,$color);
+			imagepolygon($im,$gims['l'],$polygons,$colors['Dark Red']);
+		}
+
+		if(strpos($marks, 'b') !== false){
+			imagefilledpolygon($im,$gims['b'],$polygons,$color);
+			imagepolygon($im,$gims['b'],$polygons,$colors['Dark Red']);
+		}
+
+		if(strpos($marks, 'r') !== false){
+			imagefilledpolygon($im,$gims['r'],$polygons,$color);
+			imagepolygon($im,$gims['r'],$polygons,$colors['Dark Red']);
+		}
+
+	}
+
 	function imageText($image, $fontsize, $angle, $x, $y, $color, $string){
 		$gdinfo = gd_info();
 
