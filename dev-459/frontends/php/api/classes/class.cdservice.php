@@ -478,15 +478,14 @@ Copt::memoryPick();
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'dserviceids' => $dserviceids,
-				'preservekeys' => 1,
-				'sortfield' => 'status'
+				'preservekeys' => 1
 			);
 
 			if(is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
 				$obj_params['output'] = $options['selectHosts'];
 				$hosts = CHost::get($obj_params);
 
-				if(!is_null($options['limitSelects'])) order_result($hosts, 'hostid');
+				if(!is_null($options['limitSelects'])) order_result($hosts, 'host');
 
 				foreach($hosts as $hostid => $host){
 					unset($hosts[$hostid]['dservices']);
