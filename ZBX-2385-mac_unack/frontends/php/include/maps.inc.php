@@ -841,6 +841,9 @@
 					while(zbx_strstr($label, '{TRIGGERS.UNACK}')){
 						$label = str_replace('{TRIGGERS.UNACK}', get_triggers_unacknowledged($db_element), $label);
 					}
+					while(zbx_strstr($label, '{TRIGGERS.PROBLEM.UNACK}')){
+						$label = str_replace('{TRIGGERS.PROBLEM.UNACK}', get_triggers_unacknowledged($db_element, true), $label);
+					}
 					while(zbx_strstr($label, '{TRIGGER.EVENTS.UNACK}')){
 						$label = str_replace('{TRIGGER.EVENTS.UNACK}', get_unacknowledged_events($db_element), $label);
 					}
@@ -1009,7 +1012,7 @@
 	return $event_count['rowscount'];
 	}
 
-	function get_triggers_unacknowledged($db_element){
+	function get_triggers_unacknowledged($db_element, $count_problems=null){
 		$elements = array('hosts' => array(), 'hosts_groups' => array(), 'triggers' => array());
 
 		get_map_elements($db_element, $elements);
@@ -1022,7 +1025,7 @@
 			'nodeids' => get_current_nodeid(),
 			'monitored' => 1,
 			'countOutput' => 1,
-			'only_problems' => 1,
+			'only_problems' => $count_problems,
 			'with_unacknowledged_events' => 1,
 			'limit' => ($config['search_limit']+1)
 		);
