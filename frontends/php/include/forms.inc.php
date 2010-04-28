@@ -842,7 +842,7 @@
 		$frmUser->addRow(S_AUTO_LOGOUT, array($autologoutCheckBox, $autologoutTextBox));
 		$frmUser->addRow(S_SCREEN_REFRESH,	new CNumericBox('refresh',$refresh,4));
 
-		$frmUser->addRow(S_ROWS_PER_PAGE,	new CNumericBox('rows_per_page',$rows_per_page,4));
+		$frmUser->addRow(S_ROWS_PER_PAGE,	new CNumericBox('rows_per_page',$rows_per_page,6));
 		$frmUser->addRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));
 
 //view Media Settings for users above "User" +++
