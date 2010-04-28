@@ -97,6 +97,7 @@ ZBX_DC_TREND
 	history_value_t	value_min;
 	history_value_t	value_avg;
 	history_value_t	value_max;
+	time_t		disable_from;		/* disable check for existing records in trend tables from this timestamp */
 };
 
 ZBX_DC_STATS
