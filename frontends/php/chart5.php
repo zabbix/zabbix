@@ -23,7 +23,7 @@ require_once('include/config.inc.php');
 require_once('include/services.inc.php');
 
 $page['file']	= 'chart5.php';
-$page['title']	= "S_CHART";
+// $page['title']	= "S_CHART";
 $page['type']	= PAGE_TYPE_IMAGE;
 
 include_once('include/page_header.php');
