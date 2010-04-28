@@ -83,11 +83,6 @@ class CPageFilter{
 			$this->_profileIdx['graphs'] = 'web.'.$page['file'].'.graphid';
 			$this->_initGraphs($options['graphid'], $options['graphs']);
 		}
-
-		if(isset($options['screens'])){
-			$this->_profileIdx['screens'] = 'web.'.$page['file'].'.screenid';
-			$this->_initScreens($options['screenid'], $options['screens']);
-		}
 	}
 
 	private function _updateGHbyGraph(&$options){
@@ -228,50 +223,6 @@ class CPageFilter{
 		$this->ids['graphid'] = $graphid;
 	}
 
-	private function _initScreens($graphid, $options){
-
-		$this->data['graphs'] = array();
-
-		if(!$this->hostsSelected){
-			$graphid = 0;
-		}
-		else{
-			$def_ptions = array(
-				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
-				'output' => API_OUTPUT_EXTEND,
-				'groupids' => ((($this->groupid > 0) && ($this->hostid == 0)) ? $this->groupid : null),
-				'hostids' => (($this->hostid > 0) ? $this->hostid : null),
-			);
-			$options = zbx_array_merge($def_ptions, $options);
-			$graphs = CGraph::get($options);
-
-			foreach($graphs as $graph){
-				$this->data['graphs'][$graph['graphid']] = $graph['name'];
-			}
-
-			if(is_null($graphid) && ($this->config['DDRemember'])){
-				if(isset($this->config['select_latest'])){
-					$graphid = CProfile::get(self::GRAPH_LATEST_IDX);
-				}
-				else{
-					$graphid = CProfile::get($this->_profileIdx['graphs']);
-				}
-			}
-			if(is_null($graphid)){
-				$graphid = 0;
-			}
-			else{
-				$graphid = isset($this->data['graphs'][$graphid]) ? $graphid : 0;
-			}
-		}
-
-		CProfile::update($this->_profileIdx['graphs'], $graphid, PROFILE_TYPE_ID);
-		CProfile::update(self::GRAPH_LATEST_IDX, $graphid, PROFILE_TYPE_ID);
-
-		$this->isSelected['graphsSelected'] = $graphid > 0;
-		$this->ids['graphid'] = $graphid;
-	}
-
 	public function getHostsCB($withNode=false){
 		$cmb = new CComboBox('hostid', $this->hostid,'javascript: submit();');
 
@@ -320,7 +271,7 @@ class CPageFilter{
 			}
 		}
 		order_result($graphs, 'name');
-		$graphs = array(0 => ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) ? S_NOT_SELECTED_SMALL : S_ALL_SMALL) + $graphs;
+		$graphs = array(0 => S_SELECT_GRAPH_DOT_DOT_DOT) + $graphs;
 	
 		foreach($graphs as $graphid => $name){
 			$cmb->addItem($graphid, $name);
