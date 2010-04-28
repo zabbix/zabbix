@@ -226,7 +226,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num)
 	unsigned char	value_type;
 	zbx_uint64_t	*ids = NULL, itemid;
 	int		ids_alloc, ids_num = 0, index;
-	ZBX_DC_TREND	*trend;
+	ZBX_DC_TREND	*trend = NULL;
 	const char	*table_name;
 #ifdef HAVE_MYSQL
 	int		tmp_offset;
@@ -259,7 +259,7 @@ zabbix_set_log_level(LOG_LEVEL_DEBUG);
 		if (trend->disable_from != 0 && trend->disable_from <= clock)
 			continue;
 
-		ids[ids_num++] = trend->itemid;
+		uint64_array_add(&ids, &ids_alloc, &ids_num, trend->itemid, 64);
 	}
 
 	if (0 != ids_num)
@@ -278,6 +278,14 @@ zabbix_set_log_level(LOG_LEVEL_DEBUG);
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(itemid, row[0]);
+
+			uint64_array_remove(ids, &ids_num, &itemid, 1);
+		}
+		DBfree_result(result);
+
+		while (0 != ids_num)
+		{
+			itemid = ids[--ids_num];
 
 			for (i = 0; i < *trends_num; i++)
 			{
@@ -304,7 +312,6 @@ zabbix_set_log_level(LOG_LEVEL_DEBUG);
 				UNLOCK_TRENDS;
 			}
 		}
-		DBfree_result(result);
 	}
 
 	ids_num = 0;
@@ -319,7 +326,7 @@ zabbix_set_log_level(LOG_LEVEL_DEBUG);
 		if (trend->disable_from != 0 && trend->disable_from <= clock)
 			continue;
 
-		ids[ids_num++] = trend->itemid;
+		uint64_array_add(&ids, &ids_alloc, &ids_num, trend->itemid, 64);
 	}
 
 	if (0 != ids_num)
