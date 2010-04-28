@@ -231,7 +231,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num)
 #ifdef HAVE_MYSQL
 	int		tmp_offset;
 #endif
-zabbix_set_log_level(LOG_LEVEL_DEBUG);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trends_num:%d",
 			__function_name, *trends_num);
 
@@ -552,7 +552,6 @@ zabbix_set_log_level(LOG_LEVEL_DEBUG);
 	*trends_num = num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-zabbix_set_log_level(LOG_LEVEL_ERR);
 }
 
 /******************************************************************************
