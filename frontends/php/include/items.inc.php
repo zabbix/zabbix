@@ -1095,32 +1095,44 @@
 	return $param;
 	}
 
-	function expand_item_key_by_data($item)
-	{
-		$key = $item['key_'];
+	function expand_item_key_by_data($item){
+		$key =& $item['key_'];
+		$macStack = array();
 
-		if (zbx_strstr($key, '{HOSTNAME}'))
-		{
-			$host = get_host_by_itemid($item['itemid']);
-			$key = str_replace('{HOSTNAME}', $host['host'], $key);
-		}
-		else if (zbx_strstr($key, '{IPADDRESS}'))
-		{
-			$host = get_host_by_itemid($item['itemid']);
-			$key = str_replace('{IPADDRESS}', $host['ip'], $key);
-		}
-		else if (zbx_strstr($key, '{HOST.DNS}'))
-		{
-			$host = get_host_by_itemid($item['itemid']);
-			$key = str_replace('{HOST.DNS}', $host['dns'], $key);
-		}
-		else if (zbx_strstr($key, '{HOST.CONN}'))
-		{
-			$host = get_host_by_itemid($item['itemid']);
-			$key = str_replace('{HOST.CONN}', $host['useip'] ? $host['ip'] : $host['dns'], $key);
+		$macroses = array('{HOSTNAME}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}');
+
+		foreach($macroses as $macro){
+			$pos = 0;
+			while($pos = zbx_strpos($key, $macro, $pos)){
+				$pos++;
+				$macStack[] = $macro;
+			}
 		}
 
-		return $key;
+		if(!empty($macStack)){
+			$host = get_host_by_itemid($item['itemid']);
+
+			foreach($macStack as $macro){
+				switch($macro){
+					case '{HOSTNAME}':
+						$key = str_replace('{HOSTNAME}', $host['host'], $key);
+					break;
+					case '{IPADDRESS}':
+						$key = str_replace('{IPADDRESS}', $host['ip'], $key);
+					break;
+					case '{HOST.DNS}':
+						$key = str_replace('{HOST.DNS}', $host['dns'], $key);
+					break;
+					case '{HOST.CONN}':
+						$key = str_replace('{HOST.CONN}', $host['useip'] ? $host['ip'] : $host['dns'], $key);
+					break;
+				}
+			}
+		}
+		
+		CUserMacro::resolveItem($item);
+
+		return $item['key_'];
 	}
 
 	function item_description($item){
