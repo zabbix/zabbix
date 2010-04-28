@@ -1529,6 +1529,38 @@ COpt::memoryPick();
 		try{
 			self::BeginTransaction(__METHOD__);
 
+// check if any templates linked to targets have more than one unique item key\application {{{
+			$linkedTpls = self::get(array(
+				'nopermissions' => 1,
+				'output' => API_OUTPUT_SHORTEN,
+				'hostids' => $targetids
+			));
+			$allids = array_merge($templateids, zbx_objectValues($linkedTpls, 'templateid'));
+			
+			$sql = 'SELECT key_, count(*) as cnt '.
+				' FROM items '.
+				' WHERE '.DBcondition('hostid',$allids).
+				' GROUP BY key_ '.
+				' HAVING cnt > 1';
+			$res = DBselect($sql);
+			if($db_cnt = DBfetch($res)){
+				self::exception(ZBX_API_ERROR_PARAMETERS, 
+					S_TEMPLATE_WITH_ITEM_KEY.' ['.htmlspecialchars($db_cnt['key_']).'] '.S_ALREADY_LINKED_TO_HOST_SMALL);
+			}
+
+			$sql = 'SELECT name, count(*) as cnt '.
+				' FROM applications '.
+				' WHERE '.DBcondition('hostid',$allids).
+				' GROUP BY name '.
+				' HAVING cnt > 1';
+			$res = DBselect($sql);
+			if($db_cnt = DBfetch($res)){
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					S_TEMPLATE_WITH_APPLICATION.' ['.htmlspecialchars($db_cnt['name']).'] '.S_ALREADY_LINKED_TO_HOST_SMALL);
+			}
+// }}} check if any templates linked to targets have more than one unique item key\application			
+
+
 // CHECK TEMPLATE TRIGGERS DEPENDENCIES {{{
 			foreach($templateids as $tnum => $templateid){
 				$triggerids = array();
@@ -1547,14 +1579,14 @@ COpt::memoryPick();
 
 				if($db_dephost = DBfetch(DBselect($sql))){
 					$options = array(
-							'templateids' => $templateid,
-							'output'=> API_OUTPUT_EXTEND
-						);
+						'templateids' => $templateid,
+						'output'=> API_OUTPUT_EXTEND
+					);
 
 					$tmp_tpls = self::get($options);
 					$tmp_tpl = reset($tmp_tpls);
 
-					throw new APIException(ZBX_API_ERROR_PARAMETERS,
+					self::exception(ZBX_API_ERROR_PARAMETERS,
 						'Trigger in template [ '.$tmp_tpl['host'].' ] has dependency with trigger in template [ '.$db_dephost['host'].' ]');
 				}
 			}
@@ -1582,7 +1614,7 @@ COpt::memoryPick();
 					$sql = 'INSERT INTO hosts_templates VALUES ('. implode(', ', $values) .')';
 					$result = DBexecute($sql);
 
-					if(!$result) throw new APIException(ZBX_API_ERROR_PARAMETERS, 'DBError');
+					if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBError');
 				}
 			}
 
@@ -1625,7 +1657,7 @@ COpt::memoryPick();
 			foreach($start_points as $spnum => $start){
 				$path = array();
 				if(!self::checkCircularLink($graph, $start, $path)){
-					throw new APIException(ZBX_API_ERROR_PARAMETERS, 'Circular link can not be created');
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Circular link can not be created');
 				}
 			}
 
@@ -1651,7 +1683,7 @@ COpt::memoryPick();
 		}
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
-			throw new APIException($e->getCode(), $e->getErrors());
+			self::exception($e->getCode(), $e->getErrors());
 			
 			return false;
 		}

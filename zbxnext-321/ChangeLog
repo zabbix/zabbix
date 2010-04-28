@@ -1,5 +1,12 @@
 Changes for 1.8.3
 
+ - [ZBX-1902] fixed some possibilities to create incorrect linkage (Vedmak)
+ - [ZBX-2386] rows per page limit increased (Vedmak)
+ - [ZBX-2306] fixed zoom position (Aly)
+ - [ZBX-2306] improved starting zoom on edges (Aly)
+ - [ZBX-2132] added date format constants to locales, changed zbx_date2str function to meet regional formats and date translation
+ - [ZBXNEXT-311] improved speedup dbconfig synchronization (Sasha)
+ - [ZBX-2378] renamed calculated item field 'Expression' to 'Formula', changed trigger option 'Multiple TRUE events' to use 'PROBLEM' instead (Richlv)
  - [ZBX-2360] added multiple acknowledging for OK>UNKNOWN>OK and PROBLEM>UNKNOWN>PROBLEM events (Vedmak,Sasha)
  - [ZBX-2374] updated Ukrainian translation; thanks to zalex_ua (Richlv)
  - [ZBX-2347] fixed last 20 issues in event details showing less than 20 issues (Vedmak)

@@ -1373,7 +1373,7 @@
 	'S_INSERT'=>			'Inserir',
 	'S_SECONDS'=>			'Segundos',
 	'S_LAST_OF'=>			'Última de',
-	'S_MULTIPLE_TRUE_EVENTS'=>			'Multiple TRUE events',
+	'S_MULTIPLE_PROBLEM_EVENTS'=>			'Multiple PROBLEM events',
 	'S_SHOW_DISABLED_TRIGGERS'=>			'Mostrar triggers inativas',
 	'S_HIDE_DISABLED_TRIGGERS'=>			'Esconder triggers inativas',
 	'S_THE_TRIGGER_DEPENDS_ON'=>			'A trigger depende de',

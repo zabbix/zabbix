@@ -842,7 +842,7 @@
 		$frmUser->addRow(S_AUTO_LOGOUT, array($autologoutCheckBox, $autologoutTextBox));
 		$frmUser->addRow(S_SCREEN_REFRESH,	new CNumericBox('refresh',$refresh,4));
 
-		$frmUser->addRow(S_ROWS_PER_PAGE,	new CNumericBox('rows_per_page',$rows_per_page,3));
+		$frmUser->addRow(S_ROWS_PER_PAGE,	new CNumericBox('rows_per_page',$rows_per_page,4));
 		$frmUser->addRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));
 
 //view Media Settings for users above "User" +++
@@ -2070,7 +2070,7 @@
 			if (ITEM_TYPE_DB_MONITOR == $type)
 				$frmItem->addRow(S_PARAMS, new CTextArea('params',$params,60,4));
 			else if (ITEM_TYPE_CALCULATED == $type)
-				$frmItem->addRow(S_EXPRESSION, new CTextArea('params',$params,60,4));
+				$frmItem->addRow(S_FORMULA, new CTextArea('params',$params,60,4));
 			else
 				$frmItem->addVar('params',$params);
 		}
@@ -2869,7 +2869,7 @@
 
 		$type_select = new CComboBox('type');
 		$type_select->additem(TRIGGER_MULT_EVENT_DISABLED,S_NORMAL,(($type == TRIGGER_MULT_EVENT_ENABLED)?'no':'yes'));
-		$type_select->additem(TRIGGER_MULT_EVENT_ENABLED,S_NORMAL.SPACE.'+'.SPACE.S_MULTIPLE_TRUE_EVENTS,(($type == TRIGGER_MULT_EVENT_ENABLED)?'yes':'no'));
+		$type_select->additem(TRIGGER_MULT_EVENT_ENABLED,S_NORMAL.SPACE.'+'.SPACE.S_MULTIPLE_PROBLEM_EVENTS,(($type == TRIGGER_MULT_EVENT_ENABLED)?'yes':'no'));
 
 		$frmTrig->addRow(S_EVENT_GENERATION,$type_select);
 
