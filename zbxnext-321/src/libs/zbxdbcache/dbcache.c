@@ -221,7 +221,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num)
 	const char	*__function_name = "DCflush_trends";
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		num, i, clock, sql_offset = 0;
+	int		num, i, clock, sql_offset;
 	history_value_t	value_min, value_avg, value_max;
 	unsigned char	value_type;
 	zbx_uint64_t	*ids = NULL, itemid;
@@ -264,6 +264,7 @@ zabbix_set_log_level(LOG_LEVEL_DEBUG);
 
 	if (0 != ids_num)
 	{
+		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 96,
 				"select distinct itemid"
 				" from %s"
@@ -331,6 +332,7 @@ zabbix_set_log_level(LOG_LEVEL_DEBUG);
 
 	if (0 != ids_num)
 	{
+		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
 				"select itemid,num,value_min,value_avg,value_max"
 				" from %s"
