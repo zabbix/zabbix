@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2384] fixed status of triggers elements in screens (Aly)
  - [ZBX-1824] fixed parsing map labels containing item references with user macros (Vedmak)
  - [ZBXNEXT-321] decreased number of select's from DB while processing trends data (Sasha)
  - [ZBX-1505] fixed user macros not resolved in frontend (Vedmak)
