@@ -337,7 +337,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num)
 				"select itemid,num,value_min,value_avg,value_max"
 				" from %s"
 				" where clock=%d and",
-				value_type == ITEM_VALUE_TYPE_FLOAT ? "trends" : "trends_uint",
+				table_name,
 				clock);
 
 		DBadd_condition_alloc(&sql, &sql_allocated, &sql_offset, "itemid", ids, ids_num);
@@ -349,7 +349,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num)
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 8, "begin\n");
 #endif
 
-		while (0 != ids_num && NULL != (row = DBfetch(result)))
+		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(itemid, row[0]);
 

@@ -53,7 +53,8 @@ extern int	CONFIG_UNAVAILABLE_DELAY;
 extern int	CONFIG_UNREACHABLE_PERIOD;
 extern int	CONFIG_UNREACHABLE_DELAY;
 
-typedef union{
+typedef union
+{
 	double		value_float;
 	zbx_uint64_t	value_uint64;
 	char		*value_str;
