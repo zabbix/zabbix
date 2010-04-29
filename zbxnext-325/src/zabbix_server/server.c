@@ -203,6 +203,7 @@ void	init_config(void)
 	static struct cfg_line cfg[]=
 	{
 /*		 PARAMETER	,VAR	,FUNC,	TYPE(0i,1s),MANDATORY,MIN,MAX	*/
+		{"StartDBSyncers",&CONFIG_DBSYNCER_FORKS,0,TYPE_INT,PARM_OPT,1,32},
 		{"StartDiscoverers",&CONFIG_DISCOVERER_FORKS,0,TYPE_INT,PARM_OPT,0,255},
 		{"StartHTTPPollers",&CONFIG_HTTPPOLLER_FORKS,0,TYPE_INT,PARM_OPT,0,255},
 		{"StartPingers",&CONFIG_PINGER_FORKS,0,TYPE_INT,PARM_OPT,0,255},

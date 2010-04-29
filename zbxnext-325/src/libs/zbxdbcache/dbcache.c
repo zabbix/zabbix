@@ -37,9 +37,6 @@ static int		shm_id;
 #define	LOCK_CACHE_IDS		zbx_mutex_lock(&cache_ids_lock)
 #define	UNLOCK_CACHE_IDS	zbx_mutex_unlock(&cache_ids_lock)
 
-ZBX_DC_CACHE		*cache = NULL;
-ZBX_DC_IDS		*ids = NULL;
-
 static ZBX_MUTEX	cache_lock;
 static ZBX_MUTEX	trends_lock;
 static ZBX_MUTEX	cache_ids_lock;
@@ -54,6 +51,91 @@ extern int		CONFIG_DBSYNCER_FREQUENCY;
 static int		ZBX_HISTORY_SIZE = 0;
 int			ZBX_SYNC_MAX = 1000;	/* Must be less than ZBX_HISTORY_SIZE */
 static int		ZBX_TREND_SIZE = 0;
+static int		ZBX_ITEMIDS_SIZE = 0;
+
+#define ZBX_IDS_SIZE	7
+#define ZBX_DC_ID	struct zbx_dc_id_type
+#define ZBX_DC_IDS	struct zbx_dc_ids_type
+
+ZBX_DC_ID
+{
+	char		table_name[64], field_name[64];
+	zbx_uint64_t	lastid;
+};
+
+ZBX_DC_IDS
+{
+	ZBX_DC_ID	id[ZBX_IDS_SIZE];
+};
+
+ZBX_DC_IDS		*ids = NULL;
+
+typedef union {
+	double		value_float;
+	zbx_uint64_t	value_uint64;
+	char		*value_str;
+} history_value_t;
+
+#define ZBX_DC_CACHE	struct zbx_dc_cache_type
+#define ZBX_DC_STATS	struct zbx_dc_stats_type
+#define ZBX_DC_HISTORY	struct zbx_dc_history_type
+#define ZBX_DC_TREND	struct zbx_dc_trend_type
+
+ZBX_DC_HISTORY
+{
+	zbx_uint64_t	itemid;
+	int		clock;
+	unsigned char	value_type;
+	history_value_t	value_orig;
+	history_value_t	value;
+	unsigned char	value_null;
+	int		timestamp;
+	char		*source;
+	int		severity;
+	int		logeventid;
+	int		lastlogsize;
+	int		mtime;
+	unsigned char	keep_history;
+	unsigned char	keep_trends;
+};
+
+ZBX_DC_TREND
+{
+	zbx_uint64_t	itemid;
+	int		clock;
+	int		num;
+	unsigned char	value_type;
+	history_value_t	value_min;
+	history_value_t	value_avg;
+	history_value_t	value_max;
+	int		disable_from;
+};
+
+ZBX_DC_STATS
+{
+	zbx_uint64_t	history_counter;	/* Total number of saved values in th DB */
+	zbx_uint64_t	history_float_counter;	/* Number of saved float values in th DB */
+	zbx_uint64_t	history_uint_counter;	/* Number of saved uint values in the DB */
+	zbx_uint64_t	history_str_counter;	/* Number of saved str values in the DB */
+	zbx_uint64_t	history_log_counter;	/* Number of saved log values in the DB */
+	zbx_uint64_t	history_text_counter;	/* Number of saved text values in the DB */
+};
+
+ZBX_DC_CACHE
+{
+	int		history_first;
+	int		history_num;
+	int		trends_num;
+	ZBX_DC_STATS	stats;
+	ZBX_DC_HISTORY	*history;	/* [ZBX_HISTORY_SIZE] */
+	ZBX_DC_TREND	*trends;	/* [ZBX_TREND_SIZE] */
+	char		*text;		/* [ZBX_TEXTBUFFER_SIZE] */
+	zbx_uint64_t	*itemids;	/* items, processed by othes syncers */
+	int		itemids_alloc, itemids_num;
+	char		*last_text;
+};
+
+ZBX_DC_CACHE		*cache = NULL;
 
 /******************************************************************************
  *                                                                            *
@@ -302,10 +384,12 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num)
 
 			trend->disable_from = clock;
 
+			/* if 'trends' is not a primary trends buffer */
 			if (trends != cache->trends)
 			{
 				LOCK_TRENDS;
 
+				/* we update it too */
 				index = get_nearestindex(cache->trends, sizeof(ZBX_DC_TREND), cache->trends_num, itemid);
 				if (index < cache->trends_num && cache->trends[index].itemid == itemid)
 					cache->trends[index].disable_from = clock;
@@ -647,7 +731,8 @@ static void	DCadd_trend(ZBX_DC_HISTORY *history, ZBX_DC_TREND **trends, int *tre
 
 	if (trend == &trend_static)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Insufficient space for trends. Flushing to disk.");
+		zabbix_log(LOG_LEVEL_WARNING, "Insufficient space for trends."
+				" Please increase TrendCacheSize parameter.");
 		DCflush_trend(trend, trends, trends_alloc, trends_num);
 	}
 }
@@ -1876,17 +1961,6 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 		DBexecute("%s", sql);
 }
 
-static int DCitem_already_exists(ZBX_DC_HISTORY *history, int history_num, zbx_uint64_t itemid)
-{
-	int	i;
-
-	for (i = 0; i < history_num; i++)
-		if (itemid == history[i].itemid)
-			return SUCCEED;
-
-	return FAIL;
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: DCsync                                                           *
@@ -1941,8 +2015,13 @@ int	DCsync_history(int sync_type)
 
 		while (n > 0 && history_num < ZBX_SYNC_MAX)
 		{
-			if (zbx_process == ZBX_PROCESS_PROXY || FAIL == DCitem_already_exists(history, history_num, cache->history[f].itemid))
+			if (zbx_process == ZBX_PROCESS_PROXY ||
+					FAIL == uint64_array_exists(cache->itemids, cache->itemids_num, cache->history[f].itemid)/* ||
+					FAIL == DCitem_already_exists(history, history_num, cache->history[f].itemid)*/)
 			{
+				uint64_array_add(&cache->itemids, &cache->itemids_alloc,
+						&cache->itemids_num, cache->history[f].itemid, 0);
+
 				memcpy(&history[history_num], &cache->history[f], sizeof(ZBX_DC_HISTORY));
 				if (history[history_num].value_type == ITEM_VALUE_TYPE_STR
 						|| history[history_num].value_type == ITEM_VALUE_TYPE_TEXT
@@ -2000,6 +2079,13 @@ int	DCsync_history(int sync_type)
 		}
 
 		DBcommit();
+
+		LOCK_CACHE;
+
+		for (i = 0; i < history_num; i ++)
+			uint64_array_remove(cache->itemids, &cache->itemids_num, &history[i].itemid, 1);
+
+		UNLOCK_CACHE;
 
 		for (i = 0; i < history_num; i ++)
 		{
@@ -2407,9 +2493,12 @@ void	DCadd_history_log(zbx_uint64_t itemid, char *value_orig, int clock, int tim
  ******************************************************************************/
 void	init_database_cache(zbx_process_t p)
 {
-	key_t	shm_key;
-	size_t	sz;
-	void	*ptr;
+	const char	*__function_name = "init_database_cache";
+	key_t		shm_key;
+	size_t		sz;
+	void		*ptr;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_process = p;
 
@@ -2421,6 +2510,7 @@ void	init_database_cache(zbx_process_t p)
 
 	ZBX_HISTORY_SIZE = CONFIG_HISTORY_CACHE_SIZE / sizeof(ZBX_DC_HISTORY);
 	ZBX_TREND_SIZE = CONFIG_TRENDS_CACHE_SIZE / sizeof(ZBX_DC_TREND);
+	ZBX_ITEMIDS_SIZE = CONFIG_DBSYNCER_FORKS * ZBX_SYNC_MAX;
 	if (ZBX_SYNC_MAX > ZBX_HISTORY_SIZE)
 		ZBX_SYNC_MAX = ZBX_HISTORY_SIZE;
 
@@ -2428,9 +2518,10 @@ void	init_database_cache(zbx_process_t p)
 	sz += ZBX_HISTORY_SIZE * sizeof(ZBX_DC_HISTORY);
 	sz += ZBX_TREND_SIZE * sizeof(ZBX_DC_TREND);
 	sz += CONFIG_TEXT_CACHE_SIZE;
+	sz += ZBX_ITEMIDS_SIZE * sizeof(zbx_uint64_t);
 	sz += sizeof(ZBX_DC_IDS);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In init_database_cache() size:%d", (int)sz);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() size:%d", __function_name, (int)sz);
 
 	if (-1 == (shm_id = zbx_shmget(shm_key, sz)))
 	{
@@ -2481,12 +2572,19 @@ void	init_database_cache(zbx_process_t p)
 	cache->last_text = cache->text;
 
 	ptr += CONFIG_TEXT_CACHE_SIZE;
+	cache->itemids = ptr;
+	cache->itemids_alloc = ZBX_ITEMIDS_SIZE;
+	cache->itemids_num = 0;
+
+	ptr += ZBX_ITEMIDS_SIZE * sizeof(zbx_uint64_t);
 	ids = ptr;
 	memset(ids, 0, sizeof(ZBX_DC_IDS));
 	memset(&cache->stats, 0, sizeof(ZBX_DC_STATS));
 
 	if (NULL == sql)
 		sql = zbx_malloc(sql, sql_allocated);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************

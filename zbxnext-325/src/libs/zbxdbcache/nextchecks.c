@@ -23,6 +23,16 @@
 #include "db.h"
 #include "dbcache.h"
 
+#define ZBX_DC_NEXTCHECK struct zbx_dc_nextcheck_type
+
+ZBX_DC_NEXTCHECK
+{
+	zbx_uint64_t	itemid;
+	time_t		now;/*, nextcheck;*/
+	/* for not supported items */
+	char		*error_msg;
+};
+
 static ZBX_DC_NEXTCHECK	*nextchecks = NULL;
 static int		nextcheck_allocated = 64;
 static int		nextcheck_num;
