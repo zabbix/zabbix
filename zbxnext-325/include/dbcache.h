@@ -53,7 +53,8 @@ extern int	CONFIG_UNAVAILABLE_DELAY;
 extern int	CONFIG_UNREACHABLE_PERIOD;
 extern int	CONFIG_UNREACHABLE_DELAY;
 
-typedef union{
+typedef union
+{
 	double		value_float;
 	zbx_uint64_t	value_uint64;
 	char		*value_str;
@@ -97,6 +98,7 @@ ZBX_DC_TREND
 	history_value_t	value_min;
 	history_value_t	value_avg;
 	history_value_t	value_max;
+	time_t		disable_from;		/* disable check for existing records in trend tables from this timestamp */
 };
 
 ZBX_DC_STATS
