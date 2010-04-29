@@ -1230,6 +1230,7 @@ require_once('include/js.inc.php');
 							'output' => API_OUTPUT_EXTEND
 						);
 						$groups = CHostGroup::get($options);
+						order_result($groups, 'name');
 
 						$options = array(
 							'monitored_hosts' => 1,
@@ -1239,6 +1240,7 @@ require_once('include/js.inc.php');
 
 						$hosts = CHost::get($options);
 						$hosts = zbx_toHash($hosts, 'hostid');
+						order_result($hosts, 'host');
 
 						if(!isset($hosts[$hostid])) $hostid = 0;
 
@@ -1311,6 +1313,7 @@ require_once('include/js.inc.php');
 							'output' => API_OUTPUT_EXTEND
 						);
 						$groups = CHostGroup::get($options);
+						order_result($groups, 'name');
 
 						$options = array(
 							'monitored_hosts' => 1,
@@ -1320,6 +1323,7 @@ require_once('include/js.inc.php');
 
 						$hosts = CHost::get($options);
 						$hosts = zbx_toHash($hosts, 'hostid');
+						order_result($hosts, 'host');
 
 						if(!isset($hosts[$hostid])) $hostid = 0;
 
