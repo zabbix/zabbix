@@ -971,12 +971,14 @@
  *
  */
 	function copy_graph_to_host($graphid, $hostid, $copy_mode = false){
-		$result = false;
+		$result = true;
 
 		$gitems = array();
+		$itemids = array();
 
 		$db_graph_items = get_graphitems_by_graphid($graphid);
 		while( $db_gitem = DBfetch($db_graph_items) ){
+			$itemids[] = $db_gitem['itemid'];
 			$gitems[] = array(
 				'itemid'	=> $db_gitem['itemid'],
 				'color'		=> $db_gitem['color'],
@@ -986,67 +988,75 @@
 				'calc_fnc'	=> $db_gitem['calc_fnc'],
 				'type'		=> $db_gitem['type'],
 				'periods_cnt'	=> $db_gitem['periods_cnt']
-				);
+			);
 		}
 
 		$db_graph = get_graph_by_graphid($graphid);
-
-		if($new_gitems = get_same_graphitems_for_host($gitems, $hostid)){
-			unset($chd_graphid);
-
-			$chd_graphs = get_graphs_by_hostid($hostid);
-			while( !isset($chd_graphid) && $chd_graph = DBfetch($chd_graphs)){
-/* compare graphs */
-				if ( $chd_graph['templateid'] != 0 ) continue;
-
-				unset($equal);
-				$chd_gitems = get_graphitems_by_graphid($chd_graph["graphid"]);
-				while($chd_gitem = DBfetch($chd_gitems)){
-					unset($gitem_equal);
-
-					foreach($new_gitems as $new_gitem){
-						if(cmp_graphitems($new_gitem, $chd_gitem))	continue;
-
-						$gitem_equal = true;
-						break;
-					}
-
-					if(!isset($gitem_equal)){
-						unset($equal);
-						break;
-					}
-
-					/* found equal graph item */
-					if(!isset($equal))$equal = 0;
-
-					$equal++;
-				}
-
-				if(isset($equal) && (count($new_gitems) == $equal)){
-/* found equal graph */
-					$chd_graphid = $chd_graph['graphid'];
-					break;
-				}
-			}
-
-			if(isset($chd_graphid)){
-				$result = update_graph_with_items($chd_graphid, $db_graph['name'], $db_graph['width'], $db_graph['height'],
-					$db_graph['ymin_type'], $db_graph['ymax_type'], $db_graph['yaxismin'], $db_graph['yaxismax'],
-					$db_graph['ymin_itemid'], $db_graph['ymax_itemid'],
-					$db_graph['show_work_period'], $db_graph['show_triggers'], $db_graph['graphtype'],$db_graph['show_legend'],
-					$db_graph['show_3d'], $db_graph['percent_left'], $db_graph['percent_right'], $new_gitems, ($copy_mode ? 0: $db_graph['graphid']));
-			}
-			else{
-				$result = add_graph_with_items($db_graph['name'], $db_graph['width'], $db_graph['height'],
-					$db_graph['ymin_type'], $db_graph['ymax_type'], $db_graph['yaxismin'], $db_graph['yaxismax'],
-					$db_graph['ymin_itemid'], $db_graph['ymax_itemid'],
-					$db_graph['show_work_period'], $db_graph['show_triggers'], $db_graph['graphtype'],$db_graph['show_legend'],
-					$db_graph['show_3d'], $db_graph['percent_left'], $db_graph['percent_right'], $new_gitems, ($copy_mode ? 0: $db_graph['graphid']));
-			}
+// shto-to mutnoe...
+		$sql = 'SELECT count(*) as cnt FROM items WHERE '.DBcondition('itemid', $itemids).' GROUP BY hostid';
+		$res = DBselect($sql);
+		if(DBfetch($res) && DBfetch($res)){
+			$host = get_host_by_hostid($hostid);
+			error(S_SKIPPED_COPYING_OF_GRAPH.SPACE.'"'.$db_graph["name"].'"'.SPACE.S_TO_HOST_SMALL.SPACE.'"'.$host['host'].'"');
 		}
 		else{
-			$host = get_host_by_hostid($hostid);
-			info(S_SKIPPED_COPYING_OF_GRAPH.SPACE.'"'.$db_graph["name"].'"'.SPACE.S_TO_HOST_SMALL.SPACE.'"'.$host['host'].'"');
+			if($new_gitems = get_same_graphitems_for_host($gitems, $hostid)){
+				unset($chd_graphid);
+
+				$chd_graphs = get_graphs_by_hostid($hostid);
+				while( !isset($chd_graphid) && $chd_graph = DBfetch($chd_graphs)){
+	/* compare graphs */
+					if ( $chd_graph['templateid'] != 0 ) continue;
+
+					unset($equal);
+					$chd_gitems = get_graphitems_by_graphid($chd_graph["graphid"]);
+					while($chd_gitem = DBfetch($chd_gitems)){
+						unset($gitem_equal);
+
+						foreach($new_gitems as $new_gitem){
+							if(cmp_graphitems($new_gitem, $chd_gitem))	continue;
+
+							$gitem_equal = true;
+							break;
+						}
+
+						if(!isset($gitem_equal)){
+							unset($equal);
+							break;
+						}
+
+						/* found equal graph item */
+						if(!isset($equal))$equal = 0;
+
+						$equal++;
+					}
+
+					if(isset($equal) && (count($new_gitems) == $equal)){
+	/* found equal graph */
+						$chd_graphid = $chd_graph['graphid'];
+						break;
+					}
+				}
+
+				if(isset($chd_graphid)){
+					$result = update_graph_with_items($chd_graphid, $db_graph['name'], $db_graph['width'], $db_graph['height'],
+						$db_graph['ymin_type'], $db_graph['ymax_type'], $db_graph['yaxismin'], $db_graph['yaxismax'],
+						$db_graph['ymin_itemid'], $db_graph['ymax_itemid'],
+						$db_graph['show_work_period'], $db_graph['show_triggers'], $db_graph['graphtype'],$db_graph['show_legend'],
+						$db_graph['show_3d'], $db_graph['percent_left'], $db_graph['percent_right'], $new_gitems, ($copy_mode ? 0: $db_graph['graphid']));
+				}
+				else{
+					$result = add_graph_with_items($db_graph['name'], $db_graph['width'], $db_graph['height'],
+						$db_graph['ymin_type'], $db_graph['ymax_type'], $db_graph['yaxismin'], $db_graph['yaxismax'],
+						$db_graph['ymin_itemid'], $db_graph['ymax_itemid'],
+						$db_graph['show_work_period'], $db_graph['show_triggers'], $db_graph['graphtype'],$db_graph['show_legend'],
+						$db_graph['show_3d'], $db_graph['percent_left'], $db_graph['percent_right'], $new_gitems, ($copy_mode ? 0: $db_graph['graphid']));
+				}
+			}
+			else{
+				$host = get_host_by_hostid($hostid);
+				info(S_SKIPPED_COPYING_OF_GRAPH.SPACE.'"'.$db_graph["name"].'"'.SPACE.S_TO_HOST_SMALL.SPACE.'"'.$host['host'].'"');
+			}
 		}
 
 	return $result;
@@ -1466,4 +1476,5 @@
 
 	return $result;
 	}
+
 ?>
