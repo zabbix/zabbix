@@ -23,16 +23,6 @@
 
 #include "db.h"
 
-#define ZBX_DC_CACHE struct zbx_dc_cache_type
-#define ZBX_DC_STATS struct zbx_dc_stats_type
-#define ZBX_DC_HISTORY struct zbx_dc_history_type
-#define ZBX_DC_TREND struct zbx_dc_trend_type
-#define ZBX_DC_NEXTCHECK struct zbx_dc_nextcheck_type
-#define ZBX_DC_ID struct zbx_dc_id_type
-#define ZBX_DC_IDS struct zbx_dc_ids_type
-
-#define ZBX_IDS_SIZE		7
-
 #define ZBX_SYNC_PARTIAL	0
 #define	ZBX_SYNC_FULL		1
 
@@ -52,84 +42,7 @@ extern int	CONFIG_REFRESH_UNSUPPORTED;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 extern int	CONFIG_UNREACHABLE_PERIOD;
 extern int	CONFIG_UNREACHABLE_DELAY;
-
-typedef union
-{
-	double		value_float;
-	zbx_uint64_t	value_uint64;
-	char		*value_str;
-} history_value_t;
-
-ZBX_DC_ID
-{
-	char		table_name[64], field_name[64];
-	zbx_uint64_t	lastid;
-};
-
-ZBX_DC_IDS
-{
-	ZBX_DC_ID	id[ZBX_IDS_SIZE];
-};
-
-ZBX_DC_HISTORY
-{
-	zbx_uint64_t	itemid;
-	int		clock;
-	unsigned char	value_type;
-	history_value_t	value_orig;
-	history_value_t	value;
-	unsigned char	value_null;
-	int		timestamp;
-	char		*source;
-	int		severity;
-	int		logeventid;
-	int		lastlogsize;
-	int		mtime;
-	unsigned char	keep_history;
-	unsigned char	keep_trends;
-};
-
-ZBX_DC_TREND
-{
-	zbx_uint64_t	itemid;
-	int		clock;
-	int		num;
-	unsigned char	value_type;
-	history_value_t	value_min;
-	history_value_t	value_avg;
-	history_value_t	value_max;
-	time_t		disable_from;		/* disable check for existing records in trend tables from this timestamp */
-};
-
-ZBX_DC_STATS
-{
-	zbx_uint64_t	history_counter;	/* Total number of saved values in th DB */
-	zbx_uint64_t	history_float_counter;	/* Number of saved float values in th DB */
-	zbx_uint64_t	history_uint_counter;	/* Number of saved uint values in the DB */
-	zbx_uint64_t	history_str_counter;	/* Number of saved str values in the DB */
-	zbx_uint64_t	history_log_counter;	/* Number of saved log values in the DB */
-	zbx_uint64_t	history_text_counter;	/* Number of saved text values in the DB */
-};
-
-ZBX_DC_CACHE
-{
-	int		history_first;
-	int		history_num;
-	int		trends_num;
-	ZBX_DC_STATS	stats;
-	ZBX_DC_HISTORY	*history;	/* [ZBX_HISTORY_SIZE] */
-	ZBX_DC_TREND	*trends;	/* [ZBX_TREND_SIZE] */
-	char		*text;		/* [ZBX_TEXTBUFFER_SIZE] */
-	char		*last_text;
-};
-
-ZBX_DC_NEXTCHECK
-{
-	zbx_uint64_t	itemid;
-	time_t		now;/*, nextcheck;*/
-	/* for not supported items */
-	char		*error_msg;
-};
+extern int	CONFIG_DBSYNCER_FORKS;
 
 DC_HOST
 {
