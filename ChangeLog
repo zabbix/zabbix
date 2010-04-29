@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-1906] fixed possibility to add identical checks for discovery (Vedmak)
  - [ZBX-2384] fixed status of triggers elements in screens (Aly)
  - [ZBX-1824] fixed parsing map labels containing item references with user macros (Vedmak)
  - [ZBXNEXT-321] decreased number of select's from DB while processing trends data (Sasha)
