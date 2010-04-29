@@ -1541,7 +1541,7 @@ COpt::memoryPick();
 				' FROM items '.
 				' WHERE '.DBcondition('hostid',$allids).
 				' GROUP BY key_ '.
-				' HAVING cnt > 1';
+				' HAVING count(*) > 1';
 			$res = DBselect($sql);
 			if($db_cnt = DBfetch($res)){
 				self::exception(ZBX_API_ERROR_PARAMETERS, 
@@ -1552,7 +1552,7 @@ COpt::memoryPick();
 				' FROM applications '.
 				' WHERE '.DBcondition('hostid',$allids).
 				' GROUP BY name '.
-				' HAVING cnt > 1';
+				' HAVING count(*) > 1';
 			$res = DBselect($sql);
 			if($db_cnt = DBfetch($res)){
 				self::exception(ZBX_API_ERROR_PARAMETERS,
