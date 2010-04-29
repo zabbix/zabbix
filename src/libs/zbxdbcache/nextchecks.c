@@ -23,6 +23,16 @@
 #include "db.h"
 #include "dbcache.h"
 
+#define ZBX_DC_NEXTCHECK struct zbx_dc_nextcheck_type
+
+ZBX_DC_NEXTCHECK
+{
+	zbx_uint64_t	itemid;
+	time_t		now;/*, nextcheck;*/
+	/* for not supported items */
+	char		*error_msg;
+};
+
 static ZBX_DC_NEXTCHECK	*nextchecks = NULL;
 static int		nextcheck_allocated = 64;
 static int		nextcheck_num;
@@ -236,13 +246,13 @@ void	DCflush_nextchecks()
 
 		zbx_free(sql_select);
 
-		/* proccessing triggers */
+		/* processing triggers */
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(triggerid, row[0]);
 			ZBX_STR2UINT64(itemid, row[1]);
 
-			/* index `i' will surely contain neccessary itemid */
+			/* index `i' will surely contain necessary itemid */
 			i = get_nearestindex(nextchecks, sizeof(ZBX_DC_NEXTCHECK), nextcheck_num, itemid);
 
 			if (i == nextcheck_num || nextchecks[i].itemid != itemid)
