@@ -76,10 +76,10 @@ typedef union {
 	char		*value_str;
 } history_value_t;
 
-#define ZBX_DC_CACHE	struct zbx_dc_cache_type
-#define ZBX_DC_STATS	struct zbx_dc_stats_type
 #define ZBX_DC_HISTORY	struct zbx_dc_history_type
 #define ZBX_DC_TREND	struct zbx_dc_trend_type
+#define ZBX_DC_STATS	struct zbx_dc_stats_type
+#define ZBX_DC_CACHE	struct zbx_dc_cache_type
 
 ZBX_DC_HISTORY
 {
@@ -113,8 +113,8 @@ ZBX_DC_TREND
 
 ZBX_DC_STATS
 {
-	zbx_uint64_t	history_counter;	/* Total number of saved values in th DB */
-	zbx_uint64_t	history_float_counter;	/* Number of saved float values in th DB */
+	zbx_uint64_t	history_counter;	/* Total number of saved values in the DB */
+	zbx_uint64_t	history_float_counter;	/* Number of saved float values in the DB */
 	zbx_uint64_t	history_uint_counter;	/* Number of saved uint values in the DB */
 	zbx_uint64_t	history_str_counter;	/* Number of saved str values in the DB */
 	zbx_uint64_t	history_log_counter;	/* Number of saved log values in the DB */
@@ -130,7 +130,7 @@ ZBX_DC_CACHE
 	ZBX_DC_HISTORY	*history;	/* [ZBX_HISTORY_SIZE] */
 	ZBX_DC_TREND	*trends;	/* [ZBX_TREND_SIZE] */
 	char		*text;		/* [ZBX_TEXTBUFFER_SIZE] */
-	zbx_uint64_t	*itemids;	/* items, processed by othes syncers */
+	zbx_uint64_t	*itemids;	/* items, processed by other syncers */
 	int		itemids_alloc, itemids_num;
 	char		*last_text;
 };
@@ -2016,8 +2016,7 @@ int	DCsync_history(int sync_type)
 		while (n > 0 && history_num < ZBX_SYNC_MAX)
 		{
 			if (zbx_process == ZBX_PROCESS_PROXY ||
-					FAIL == uint64_array_exists(cache->itemids, cache->itemids_num, cache->history[f].itemid)/* ||
-					FAIL == DCitem_already_exists(history, history_num, cache->history[f].itemid)*/)
+					FAIL == uint64_array_exists(cache->itemids, cache->itemids_num, cache->history[f].itemid))
 			{
 				uint64_array_add(&cache->itemids, &cache->itemids_alloc,
 						&cache->itemids_num, cache->history[f].itemid, 0);
@@ -2510,9 +2509,9 @@ void	init_database_cache(zbx_process_t p)
 
 	ZBX_HISTORY_SIZE = CONFIG_HISTORY_CACHE_SIZE / sizeof(ZBX_DC_HISTORY);
 	ZBX_TREND_SIZE = CONFIG_TRENDS_CACHE_SIZE / sizeof(ZBX_DC_TREND);
-	ZBX_ITEMIDS_SIZE = CONFIG_DBSYNCER_FORKS * ZBX_SYNC_MAX;
 	if (ZBX_SYNC_MAX > ZBX_HISTORY_SIZE)
 		ZBX_SYNC_MAX = ZBX_HISTORY_SIZE;
+	ZBX_ITEMIDS_SIZE = CONFIG_DBSYNCER_FORKS * ZBX_SYNC_MAX;
 
 	sz = sizeof(ZBX_DC_CACHE);
 	sz += ZBX_HISTORY_SIZE * sizeof(ZBX_DC_HISTORY);

@@ -246,13 +246,13 @@ void	DCflush_nextchecks()
 
 		zbx_free(sql_select);
 
-		/* proccessing triggers */
+		/* processing triggers */
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(triggerid, row[0]);
 			ZBX_STR2UINT64(itemid, row[1]);
 
-			/* index `i' will surely contain neccessary itemid */
+			/* index `i' will surely contain necessary itemid */
 			i = get_nearestindex(nextchecks, sizeof(ZBX_DC_NEXTCHECK), nextcheck_num, itemid);
 
 			if (i == nextcheck_num || nextchecks[i].itemid != itemid)
