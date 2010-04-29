@@ -170,8 +170,6 @@ include_once('include/page_header.php');
 	imageOut($im);
 	imagedestroy($im);
 
-?>
-<?php
 
 include_once('include/page_footer.php');
 
