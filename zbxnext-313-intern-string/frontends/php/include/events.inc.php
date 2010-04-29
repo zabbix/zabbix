@@ -273,13 +273,10 @@ function make_small_eventlist($eventid, $trigger_data){
 	$table = new CTableInfo();
 	$table->setHeader(array(S_TIME, S_STATUS, S_DURATION, S_AGE, S_ACK, S_ACTIONS));
 
-	$rows = array();
-	$count = 1;
-
 	$options = array(
 		'eventids' => $eventid, 
 		'output' => API_OUTPUT_EXTEND, 
-		'select_triggers' => API_OUTPUT_EXTEND
+//		'select_triggers' => API_OUTPUT_EXTEND
 	);
 	$curevent = CEvent::get($options);
 	$curevent = reset($curevent);
@@ -288,10 +285,10 @@ function make_small_eventlist($eventid, $trigger_data){
 
 	$options = array(
 		'triggerids' => $trigger_data['triggerid'],
-		'time_till' => $curevent['clock'],
+		'eventid_till' => $curevent['eventid'],
 		'select_triggers' => API_OUTPUT_EXTEND,
 		'output' => API_OUTPUT_EXTEND,
-		'sortfield' => 'clock',
+		'sortfield' => 'eventid',
 		'sortorder' => ZBX_SORT_DOWN,
 		'limit' => 20
 	);

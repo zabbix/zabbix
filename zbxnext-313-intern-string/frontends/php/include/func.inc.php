@@ -584,6 +584,22 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 // Any other unit
 //-------------------
 
+	if(zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS)){
+		if(abs($value) >= 1)
+			$format = '%.2f';
+		else if(abs($value) >= 0.01)
+			$format = '%.4f';
+		else
+			$format = '%.6f';
+
+
+		$value = sprintf($format,$value);
+		$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', $value);
+		$value = rtrim($value, '.');
+
+	return $value;
+	}
+
 	switch($units){
 		case 'Bps':
 		case 'B':
@@ -597,7 +613,7 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 			$step = 1000;
 	}
 
-	if(zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS)){
+	if(zbx_empty($units) && ($convert == ITEM_CONVERT_WITH_UNITS)){;
 		if(abs($value) >= 1)
 			$format = '%.2f';
 		else if(abs($value) >= 0.01)
@@ -606,7 +622,11 @@ function convert_units($value, $units, $convert=ITEM_CONVERT_WITH_UNITS){
 			$format = '%.6f';
 
 		if(round($value, 6) == 0) $value = 0;
-		else $value = rtrim(sprintf($format,$value), '.0');
+		else{
+			$value = sprintf($format,$value);
+			$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', $value);
+			$value = rtrim($value, '.');
+		}
 
 		return sprintf('%s %s', $value, $units);
 	}
@@ -839,12 +859,12 @@ function zbx_strtolower($str){
 	}
 }
 
-function zbx_strpos($haystack, $needle){
+function zbx_strpos($haystack, $needle, $offset=0){
 	if(defined('ZBX_MBSTRINGS_ENABLED')){
-		return mb_strpos($haystack, $needle);
+		return mb_strpos($haystack, $needle, $offset);
 	}
 	else{
-		return strpos($haystack, $needle);
+		return strpos($haystack, $needle, $offset);
 	}
 }
 

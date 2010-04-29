@@ -614,35 +614,35 @@ static void	DCallocate_item(int index)
 
 	if (config->items_num == config->items_alloc)
 	{
-		char	*src, *dst;
+		size_t	offset;
+		char	*src;
 
-		sz = sizeof(ZBX_DC_ITEM) * ITEM_ALLOC_STEP;
+		offset = sizeof(ZBX_DC_ITEM) * ITEM_ALLOC_STEP;
 
-		DCcheck_freemem(sz);
+		DCcheck_freemem(offset);
 
 		config->items_alloc += ITEM_ALLOC_STEP;
 
 		src = (char *)config->snmpitems;
-		dst = (char *)config->snmpitems + sz;
-		config->snmpitems = (void *)((char *)config->snmpitems + sz);
-		config->ipmiitems = (void *)((char *)config->ipmiitems + sz);
-		config->flexitems = (void *)((char *)config->flexitems + sz);
-		config->trapitems = (void *)((char *)config->trapitems + sz);
-		config->logitems = (void *)((char *)config->logitems + sz);
-		config->dbitems = (void *)((char *)config->dbitems + sz);
-		config->sshitems = (void *)((char *)config->sshitems + sz);
-		config->telnetitems = (void *)((char *)config->telnetitems + sz);
-		config->calcitems = (void *)((char *)config->calcitems + sz);
-		config->idxitem01 = (void *)((char *)config->idxitem01 + sz);
-		config->idxitem02 = (void *)((char *)config->idxitem02 + sz);
-		config->hosts = (void *)((char *)config->hosts + sz);
-		config->ipmihosts = (void *)((char *)config->ipmihosts + sz);
-		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
-		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
-
 		if (0 != (sz = ((char *)config->idxhost02 - src) +
 					sizeof(int) * config->idxhost02_num))
-			memmove(dst, src, sz);
+			memmove(src + offset, src, sz);
+
+		config->snmpitems = (void *)((char *)config->snmpitems + offset);
+		config->ipmiitems = (void *)((char *)config->ipmiitems + offset);
+		config->flexitems = (void *)((char *)config->flexitems + offset);
+		config->trapitems = (void *)((char *)config->trapitems + offset);
+		config->logitems = (void *)((char *)config->logitems + offset);
+		config->dbitems = (void *)((char *)config->dbitems + offset);
+		config->sshitems = (void *)((char *)config->sshitems + offset);
+		config->telnetitems = (void *)((char *)config->telnetitems + offset);
+		config->calcitems = (void *)((char *)config->calcitems + offset);
+		config->idxitem01 = (void *)((char *)config->idxitem01 + offset);
+		config->idxitem02 = (void *)((char *)config->idxitem02 + offset);
+		config->hosts = (void *)((char *)config->hosts + offset);
+		config->ipmihosts = (void *)((char *)config->ipmihosts + offset);
+		config->idxhost01 = (void *)((char *)config->idxhost01 + offset);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + offset);
 	}
 
 	if (0 != (sz = sizeof(ZBX_DC_ITEM) * (config->items_num - index)))
@@ -656,34 +656,34 @@ static void	DCallocate_snmpitem(int index)
 
 	if (config->snmpitems_num == config->snmpitems_alloc)
 	{
-		char	*src, *dst;
+		size_t	offset;
+		char	*src;
 
-		sz = sizeof(ZBX_DC_SNMPITEM) * SNMPITEM_ALLOC_STEP;
+		offset = sizeof(ZBX_DC_SNMPITEM) * SNMPITEM_ALLOC_STEP;
 
-		DCcheck_freemem(sz);
+		DCcheck_freemem(offset);
 
 		config->snmpitems_alloc += SNMPITEM_ALLOC_STEP;
 
 		src = (char *)config->ipmiitems;
-		dst = (char *)config->ipmiitems + sz;
-		config->ipmiitems = (void *)((char *)config->ipmiitems + sz);
-		config->flexitems = (void *)((char *)config->flexitems + sz);
-		config->trapitems = (void *)((char *)config->trapitems + sz);
-		config->logitems = (void *)((char *)config->logitems + sz);
-		config->dbitems = (void *)((char *)config->dbitems + sz);
-		config->sshitems = (void *)((char *)config->sshitems + sz);
-		config->telnetitems = (void *)((char *)config->telnetitems + sz);
-		config->calcitems = (void *)((char *)config->calcitems + sz);
-		config->idxitem01 = (void *)((char *)config->idxitem01 + sz);
-		config->idxitem02 = (void *)((char *)config->idxitem02 + sz);
-		config->hosts = (void *)((char *)config->hosts + sz);
-		config->ipmihosts = (void *)((char *)config->ipmihosts + sz);
-		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
-		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
-
 		if (0 != (sz = ((char *)config->idxhost02 - src) +
 					sizeof(int) * config->idxhost02_num))
-			memmove(dst, src, sz);
+			memmove(src + offset, src, sz);
+
+		config->ipmiitems = (void *)((char *)config->ipmiitems + offset);
+		config->flexitems = (void *)((char *)config->flexitems + offset);
+		config->trapitems = (void *)((char *)config->trapitems + offset);
+		config->logitems = (void *)((char *)config->logitems + offset);
+		config->dbitems = (void *)((char *)config->dbitems + offset);
+		config->sshitems = (void *)((char *)config->sshitems + offset);
+		config->telnetitems = (void *)((char *)config->telnetitems + offset);
+		config->calcitems = (void *)((char *)config->calcitems + offset);
+		config->idxitem01 = (void *)((char *)config->idxitem01 + offset);
+		config->idxitem02 = (void *)((char *)config->idxitem02 + offset);
+		config->hosts = (void *)((char *)config->hosts + offset);
+		config->ipmihosts = (void *)((char *)config->ipmihosts + offset);
+		config->idxhost01 = (void *)((char *)config->idxhost01 + offset);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + offset);
 	}
 
 	if (0 != (sz = sizeof(ZBX_DC_SNMPITEM) * (config->snmpitems_num - index)))
@@ -697,33 +697,33 @@ static void	DCallocate_ipmiitem(int index)
 
 	if (config->ipmiitems_num == config->ipmiitems_alloc)
 	{
-		char	*src, *dst;
+		size_t	offset;
+		char	*src;
 
-		sz = sizeof(ZBX_DC_IPMIITEM) * IPMIITEM_ALLOC_STEP;
+		offset = sizeof(ZBX_DC_IPMIITEM) * IPMIITEM_ALLOC_STEP;
 
-		DCcheck_freemem(sz);
+		DCcheck_freemem(offset);
 
 		config->ipmiitems_alloc += IPMIITEM_ALLOC_STEP;
 
 		src = (char *)config->flexitems;
-		dst = (char *)config->flexitems + sz;
-		config->flexitems = (void *)((char *)config->flexitems + sz);
-		config->trapitems = (void *)((char *)config->trapitems + sz);
-		config->logitems = (void *)((char *)config->logitems + sz);
-		config->dbitems = (void *)((char *)config->dbitems + sz);
-		config->sshitems = (void *)((char *)config->sshitems + sz);
-		config->telnetitems = (void *)((char *)config->telnetitems + sz);
-		config->calcitems = (void *)((char *)config->calcitems + sz);
-		config->idxitem01 = (void *)((char *)config->idxitem01 + sz);
-		config->idxitem02 = (void *)((char *)config->idxitem02 + sz);
-		config->hosts = (void *)((char *)config->hosts + sz);
-		config->ipmihosts = (void *)((char *)config->ipmihosts + sz);
-		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
-		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
-
 		if (0 != (sz = ((char *)config->idxhost02 - src) +
 					sizeof(int) * config->idxhost02_num))
-			memmove(dst, src, sz);
+			memmove(src + offset, src, sz);
+
+		config->flexitems = (void *)((char *)config->flexitems + offset);
+		config->trapitems = (void *)((char *)config->trapitems + offset);
+		config->logitems = (void *)((char *)config->logitems + offset);
+		config->dbitems = (void *)((char *)config->dbitems + offset);
+		config->sshitems = (void *)((char *)config->sshitems + offset);
+		config->telnetitems = (void *)((char *)config->telnetitems + offset);
+		config->calcitems = (void *)((char *)config->calcitems + offset);
+		config->idxitem01 = (void *)((char *)config->idxitem01 + offset);
+		config->idxitem02 = (void *)((char *)config->idxitem02 + offset);
+		config->hosts = (void *)((char *)config->hosts + offset);
+		config->ipmihosts = (void *)((char *)config->ipmihosts + offset);
+		config->idxhost01 = (void *)((char *)config->idxhost01 + offset);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + offset);
 	}
 
 	if (0 != (sz = sizeof(ZBX_DC_IPMIITEM) * (config->ipmiitems_num - index)))
@@ -737,32 +737,32 @@ static void	DCallocate_flexitem(int index)
 
 	if (config->flexitems_num == config->flexitems_alloc)
 	{
-		char	*src, *dst;
+		size_t	offset;
+		char	*src;
 
-		sz = sizeof(ZBX_DC_FLEXITEM) * FLEXITEM_ALLOC_STEP;
+		offset = sizeof(ZBX_DC_FLEXITEM) * FLEXITEM_ALLOC_STEP;
 
-		DCcheck_freemem(sz);
+		DCcheck_freemem(offset);
 
 		config->flexitems_alloc += FLEXITEM_ALLOC_STEP;
 
 		src = (char *)config->trapitems;
-		dst = (char *)config->trapitems + sz;
-		config->trapitems = (void *)((char *)config->trapitems + sz);
-		config->logitems = (void *)((char *)config->logitems + sz);
-		config->dbitems = (void *)((char *)config->dbitems + sz);
-		config->sshitems = (void *)((char *)config->sshitems + sz);
-		config->telnetitems = (void *)((char *)config->telnetitems + sz);
-		config->calcitems = (void *)((char *)config->calcitems + sz);
-		config->idxitem01 = (void *)((char *)config->idxitem01 + sz);
-		config->idxitem02 = (void *)((char *)config->idxitem02 + sz);
-		config->hosts = (void *)((char *)config->hosts + sz);
-		config->ipmihosts = (void *)((char *)config->ipmihosts + sz);
-		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
-		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
-
 		if (0 != (sz = ((char *)config->idxhost02 - src) +
 					sizeof(int) * config->idxhost02_num))
-			memmove(dst, src, sz);
+			memmove(src + offset, src, sz);
+
+		config->trapitems = (void *)((char *)config->trapitems + offset);
+		config->logitems = (void *)((char *)config->logitems + offset);
+		config->dbitems = (void *)((char *)config->dbitems + offset);
+		config->sshitems = (void *)((char *)config->sshitems + offset);
+		config->telnetitems = (void *)((char *)config->telnetitems + offset);
+		config->calcitems = (void *)((char *)config->calcitems + offset);
+		config->idxitem01 = (void *)((char *)config->idxitem01 + offset);
+		config->idxitem02 = (void *)((char *)config->idxitem02 + offset);
+		config->hosts = (void *)((char *)config->hosts + offset);
+		config->ipmihosts = (void *)((char *)config->ipmihosts + offset);
+		config->idxhost01 = (void *)((char *)config->idxhost01 + offset);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + offset);
 	}
 
 	if (0 != (sz = sizeof(ZBX_DC_FLEXITEM) * (config->flexitems_num - index)))
@@ -776,31 +776,31 @@ static void	DCallocate_trapitem(int index)
 
 	if (config->trapitems_num == config->trapitems_alloc)
 	{
-		char	*src, *dst;
+		size_t	offset;
+		char	*src;
 
-		sz = sizeof(ZBX_DC_TRAPITEM) * TRAPITEM_ALLOC_STEP;
+		offset = sizeof(ZBX_DC_TRAPITEM) * TRAPITEM_ALLOC_STEP;
 
-		DCcheck_freemem(sz);
+		DCcheck_freemem(offset);
 
 		config->trapitems_alloc += TRAPITEM_ALLOC_STEP;
 
 		src = (char *)config->logitems;
-		dst = (char *)config->logitems + sz;
-		config->logitems = (void *)((char *)config->logitems + sz);
-		config->dbitems = (void *)((char *)config->dbitems + sz);
-		config->sshitems = (void *)((char *)config->sshitems + sz);
-		config->telnetitems = (void *)((char *)config->telnetitems + sz);
-		config->calcitems = (void *)((char *)config->calcitems + sz);
-		config->idxitem01 = (void *)((char *)config->idxitem01 + sz);
-		config->idxitem02 = (void *)((char *)config->idxitem02 + sz);
-		config->hosts = (void *)((char *)config->hosts + sz);
-		config->ipmihosts = (void *)((char *)config->ipmihosts + sz);
-		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
-		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
-
 		if (0 != (sz = ((char *)config->idxhost02 - src) +
 					sizeof(int) * config->idxhost02_num))
-			memmove(dst, src, sz);
+			memmove(src + offset, src, sz);
+		
+		config->logitems = (void *)((char *)config->logitems + offset);
+		config->dbitems = (void *)((char *)config->dbitems + offset);
+		config->sshitems = (void *)((char *)config->sshitems + offset);
+		config->telnetitems = (void *)((char *)config->telnetitems + offset);
+		config->calcitems = (void *)((char *)config->calcitems + offset);
+		config->idxitem01 = (void *)((char *)config->idxitem01 + offset);
+		config->idxitem02 = (void *)((char *)config->idxitem02 + offset);
+		config->hosts = (void *)((char *)config->hosts + offset);
+		config->ipmihosts = (void *)((char *)config->ipmihosts + offset);
+		config->idxhost01 = (void *)((char *)config->idxhost01 + offset);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + offset);
 	}
 
 	if (0 != (sz = sizeof(ZBX_DC_TRAPITEM) * (config->trapitems_num - index)))
@@ -814,30 +814,30 @@ static void	DCallocate_logitem(int index)
 
 	if (config->logitems_num == config->logitems_alloc)
 	{
-		char	*src, *dst;
+		size_t	offset;
+		char	*src;
 
-		sz = sizeof(ZBX_DC_LOGITEM) * LOGITEM_ALLOC_STEP;
+		offset = sizeof(ZBX_DC_LOGITEM) * LOGITEM_ALLOC_STEP;
 
-		DCcheck_freemem(sz);
+		DCcheck_freemem(offset);
 
 		config->logitems_alloc += LOGITEM_ALLOC_STEP;
 
 		src = (char *)config->dbitems;
-		dst = (char *)config->dbitems + sz;
-		config->dbitems = (void *)((char *)config->dbitems + sz);
-		config->sshitems = (void *)((char *)config->sshitems + sz);
-		config->telnetitems = (void *)((char *)config->telnetitems + sz);
-		config->calcitems = (void *)((char *)config->calcitems + sz);
-		config->idxitem01 = (void *)((char *)config->idxitem01 + sz);
-		config->idxitem02 = (void *)((char *)config->idxitem02 + sz);
-		config->hosts = (void *)((char *)config->hosts + sz);
-		config->ipmihosts = (void *)((char *)config->ipmihosts + sz);
-		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
-		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
-
 		if (0 != (sz = ((char *)config->idxhost02 - src) +
 					sizeof(int) * config->idxhost02_num))
-			memmove(dst, src, sz);
+			memmove(src + offset, src, sz);
+
+		config->dbitems = (void *)((char *)config->dbitems + offset);
+		config->sshitems = (void *)((char *)config->sshitems + offset);
+		config->telnetitems = (void *)((char *)config->telnetitems + offset);
+		config->calcitems = (void *)((char *)config->calcitems + offset);
+		config->idxitem01 = (void *)((char *)config->idxitem01 + offset);
+		config->idxitem02 = (void *)((char *)config->idxitem02 + offset);
+		config->hosts = (void *)((char *)config->hosts + offset);
+		config->ipmihosts = (void *)((char *)config->ipmihosts + offset);
+		config->idxhost01 = (void *)((char *)config->idxhost01 + offset);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + offset);
 	}
 
 	if (0 != (sz = sizeof(ZBX_DC_LOGITEM) * (config->logitems_num - index)))
@@ -851,29 +851,29 @@ static void	DCallocate_dbitem(int index)
 
 	if (config->dbitems_num == config->dbitems_alloc)
 	{
-		char	*src, *dst;
+		size_t	offset;
+		char	*src;
 
-		sz = sizeof(ZBX_DC_DBITEM) * DBITEM_ALLOC_STEP;
+		offset = sizeof(ZBX_DC_DBITEM) * DBITEM_ALLOC_STEP;
 
-		DCcheck_freemem(sz);
+		DCcheck_freemem(offset);
 
 		config->dbitems_alloc += DBITEM_ALLOC_STEP;
 
 		src = (char *)config->sshitems;
-		dst = (char *)config->sshitems + sz;
-		config->sshitems = (void *)((char *)config->sshitems + sz);
-		config->telnetitems = (void *)((char *)config->telnetitems + sz);
-		config->calcitems = (void *)((char *)config->calcitems + sz);
-		config->idxitem01 = (void *)((char *)config->idxitem01 + sz);
-		config->idxitem02 = (void *)((char *)config->idxitem02 + sz);
-		config->hosts = (void *)((char *)config->hosts + sz);
-		config->ipmihosts = (void *)((char *)config->ipmihosts + sz);
-		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
-		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
-
 		if (0 != (sz = ((char *)config->idxhost02 - src) +
 					sizeof(int) * config->idxhost02_num))
-			memmove(dst, src, sz);
+			memmove(src + offset, src, sz);
+
+		config->sshitems = (void *)((char *)config->sshitems + offset);
+		config->telnetitems = (void *)((char *)config->telnetitems + offset);
+		config->calcitems = (void *)((char *)config->calcitems + offset);
+		config->idxitem01 = (void *)((char *)config->idxitem01 + offset);
+		config->idxitem02 = (void *)((char *)config->idxitem02 + offset);
+		config->hosts = (void *)((char *)config->hosts + offset);
+		config->ipmihosts = (void *)((char *)config->ipmihosts + offset);
+		config->idxhost01 = (void *)((char *)config->idxhost01 + offset);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + offset);
 	}
 
 	if (0 != (sz = sizeof(ZBX_DC_DBITEM) * (config->dbitems_num - index)))
@@ -887,28 +887,28 @@ static void	DCallocate_sshitem(int index)
 
 	if (config->sshitems_num == config->sshitems_alloc)
 	{
-		char	*src, *dst;
+		size_t	offset;
+		char	*src;
 
-		sz = sizeof(ZBX_DC_SSHITEM) * SSHITEM_ALLOC_STEP;
+		offset = sizeof(ZBX_DC_SSHITEM) * SSHITEM_ALLOC_STEP;
 
-		DCcheck_freemem(sz);
+		DCcheck_freemem(offset);
 
 		config->sshitems_alloc += SSHITEM_ALLOC_STEP;
 
 		src = (char *)config->telnetitems;
-		dst = (char *)config->telnetitems + sz;
-		config->telnetitems = (void *)((char *)config->telnetitems + sz);
-		config->calcitems = (void *)((char *)config->calcitems + sz);
-		config->idxitem01 = (void *)((char *)config->idxitem01 + sz);
-		config->idxitem02 = (void *)((char *)config->idxitem02 + sz);
-		config->hosts = (void *)((char *)config->hosts + sz);
-		config->ipmihosts = (void *)((char *)config->ipmihosts + sz);
-		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
-		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
-
 		if (0 != (sz = ((char *)config->idxhost02 - src) +
 					sizeof(int) * config->idxhost02_num))
-			memmove(dst, src, sz);
+			memmove(src + offset, src, sz);
+
+		config->telnetitems = (void *)((char *)config->telnetitems + offset);
+		config->calcitems = (void *)((char *)config->calcitems + offset);
+		config->idxitem01 = (void *)((char *)config->idxitem01 + offset);
+		config->idxitem02 = (void *)((char *)config->idxitem02 + offset);
+		config->hosts = (void *)((char *)config->hosts + offset);
+		config->ipmihosts = (void *)((char *)config->ipmihosts + offset);
+		config->idxhost01 = (void *)((char *)config->idxhost01 + offset);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + offset);
 	}
 
 	if (0 != (sz = sizeof(ZBX_DC_SSHITEM) * (config->sshitems_num - index)))
@@ -922,27 +922,27 @@ static void	DCallocate_telnetitem(int index)
 
 	if (config->telnetitems_num == config->telnetitems_alloc)
 	{
-		char	*src, *dst;
+		size_t	offset;
+		char	*src;
 
-		sz = sizeof(ZBX_DC_TELNETITEM) * TELNETITEM_ALLOC_STEP;
+		offset = sizeof(ZBX_DC_TELNETITEM) * TELNETITEM_ALLOC_STEP;
 
-		DCcheck_freemem(sz);
+		DCcheck_freemem(offset);
 
 		config->telnetitems_alloc += TELNETITEM_ALLOC_STEP;
 
 		src = (char *)config->calcitems;
-		dst = (char *)config->calcitems + sz;
-		config->calcitems = (void *)((char *)config->calcitems + sz);
-		config->idxitem01 = (void *)((char *)config->idxitem01 + sz);
-		config->idxitem02 = (void *)((char *)config->idxitem02 + sz);
-		config->hosts = (void *)((char *)config->hosts + sz);
-		config->ipmihosts = (void *)((char *)config->ipmihosts + sz);
-		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
-		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
-
 		if (0 != (sz = ((char *)config->idxhost02 - src) +
 					sizeof(int) * config->idxhost02_num))
-			memmove(dst, src, sz);
+			memmove(src + offset, src, sz);
+
+		config->calcitems = (void *)((char *)config->calcitems + offset);
+		config->idxitem01 = (void *)((char *)config->idxitem01 + offset);
+		config->idxitem02 = (void *)((char *)config->idxitem02 + offset);
+		config->hosts = (void *)((char *)config->hosts + offset);
+		config->ipmihosts = (void *)((char *)config->ipmihosts + offset);
+		config->idxhost01 = (void *)((char *)config->idxhost01 + offset);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + offset);
 	}
 
 	if (0 != (sz = sizeof(ZBX_DC_TELNETITEM) * (config->telnetitems_num - index)))
@@ -956,26 +956,26 @@ static void	DCallocate_calcitem(int index)
 
 	if (config->calcitems_num == config->calcitems_alloc)
 	{
-		char	*src, *dst;
+		size_t	offset;
+		char	*src;
 
-		sz = sizeof(ZBX_DC_CALCITEM) * CALCITEM_ALLOC_STEP;
+		offset = sizeof(ZBX_DC_CALCITEM) * CALCITEM_ALLOC_STEP;
 
-		DCcheck_freemem(sz);
+		DCcheck_freemem(offset);
 
 		config->calcitems_alloc += CALCITEM_ALLOC_STEP;
 
 		src = (char *)config->idxitem01;
-		dst = (char *)config->idxitem01 + sz;
-		config->idxitem01 = (void *)((char *)config->idxitem01 + sz);
-		config->idxitem02 = (void *)((char *)config->idxitem02 + sz);
-		config->hosts = (void *)((char *)config->hosts + sz);
-		config->ipmihosts = (void *)((char *)config->ipmihosts + sz);
-		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
-		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
-
 		if (0 != (sz = ((char *)config->idxhost02 - src) +
 					sizeof(int) * config->idxhost02_num))
-			memmove(dst, src, sz);
+			memmove(src + offset, src, sz);
+
+		config->idxitem01 = (void *)((char *)config->idxitem01 + offset);
+		config->idxitem02 = (void *)((char *)config->idxitem02 + offset);
+		config->hosts = (void *)((char *)config->hosts + offset);
+		config->ipmihosts = (void *)((char *)config->ipmihosts + offset);
+		config->idxhost01 = (void *)((char *)config->idxhost01 + offset);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + offset);
 	}
 
 	if (0 != (sz = sizeof(ZBX_DC_CALCITEM) * (config->calcitems_num - index)))
@@ -990,23 +990,24 @@ static void	DCallocate_idxitem01(int *index, int remove_index)
 
 	if (config->idxitem01_num == config->idxitem01_alloc)
 	{
-		sz = sizeof(int) * ITEM_ALLOC_STEP;
+		size_t	offset;
 
-		DCcheck_freemem(sz);
+		offset = sizeof(int) * ITEM_ALLOC_STEP;
+
+		DCcheck_freemem(offset);
 
 		config->idxitem01_alloc += ITEM_ALLOC_STEP;
 
 		src = (char *)config->idxitem02;
-		dst = (char *)config->idxitem02 + sz;
-		config->idxitem02 = (void *)((char *)config->idxitem02 + sz);
-		config->hosts = (void *)((char *)config->hosts + sz);
-		config->ipmihosts = (void *)((char *)config->ipmihosts + sz);
-		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
-		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
-
 		if (0 != (sz = ((char *)config->idxhost02 - src) +
 					sizeof(int) * config->idxhost02_num))
-			memmove(dst, src, sz);
+			memmove(src + offset, src, sz);
+
+		config->idxitem02 = (void *)((char *)config->idxitem02 + offset);
+		config->hosts = (void *)((char *)config->hosts + offset);
+		config->ipmihosts = (void *)((char *)config->ipmihosts + offset);
+		config->idxhost01 = (void *)((char *)config->idxhost01 + offset);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + offset);
 	}
 
 	if (-1 == remove_index)
@@ -1044,22 +1045,23 @@ static void	DCallocate_idxitem02(int *index, int remove_index)
 
 	if (config->idxitem02_num == config->idxitem02_alloc)
 	{
-		sz = sizeof(int) * ITEM_ALLOC_STEP;
+		size_t	offset;
 
-		DCcheck_freemem(sz);
+		offset = sizeof(int) * ITEM_ALLOC_STEP;
+
+		DCcheck_freemem(offset);
 
 		config->idxitem02_alloc += ITEM_ALLOC_STEP;
 
 		src = (char *)config->hosts;
-		dst = (char *)config->hosts + sz;
-		config->hosts = (void *)((char *)config->hosts + sz);
-		config->ipmihosts = (void *)((char *)config->ipmihosts + sz);
-		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
-		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
-
 		if (0 != (sz = ((char *)config->idxhost02 - src) +
 					sizeof(int) * config->idxhost02_num))
-			memmove(dst, src, sz);
+			memmove(src + offset, src, sz);
+
+		config->hosts = (void *)((char *)config->hosts + offset);
+		config->ipmihosts = (void *)((char *)config->ipmihosts + offset);
+		config->idxhost01 = (void *)((char *)config->idxhost01 + offset);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + offset);
 	}
 
 	if (-1 == remove_index)
@@ -1096,23 +1098,23 @@ static void	DCallocate_host(int index)
 
 	if (config->hosts_num == config->hosts_alloc)
 	{
-		char	*src, *dst;
+		size_t	offset;
+		char	*src;
 
-		sz = sizeof(ZBX_DC_HOST) * HOST_ALLOC_STEP;
+		offset = sizeof(ZBX_DC_HOST) * HOST_ALLOC_STEP;
 
-		DCcheck_freemem(sz);
+		DCcheck_freemem(offset);
 
 		config->hosts_alloc += HOST_ALLOC_STEP;
 
 		src = (char *)config->ipmihosts;
-		dst = (char *)config->ipmihosts + sz;
-		config->ipmihosts = (void *)((char *)config->ipmihosts + sz);
-		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
-		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
-
 		if (0 != (sz = ((char *)config->idxhost02 - src) +
 					sizeof(int) * config->idxhost02_num))
-			memmove(dst, src, sz);
+			memmove(src + offset, src, sz);
+
+		config->ipmihosts = (void *)((char *)config->ipmihosts + offset);
+		config->idxhost01 = (void *)((char *)config->idxhost01 + offset);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + offset);
 	}
 
 	if (0 != (sz = sizeof(ZBX_DC_HOST) * (config->hosts_num - index)))
@@ -1126,22 +1128,22 @@ static void	DCallocate_ipmihost(int index)
 
 	if (config->ipmihosts_num == config->ipmihosts_alloc)
 	{
-		char	*src, *dst;
+		size_t	offset;
+		char	*src;
 
-		sz = sizeof(ZBX_DC_IPMIHOST) * IPMIHOST_ALLOC_STEP;
+		offset = sizeof(ZBX_DC_IPMIHOST) * IPMIHOST_ALLOC_STEP;
 
-		DCcheck_freemem(sz);
+		DCcheck_freemem(offset);
 
 		config->ipmihosts_alloc += IPMIHOST_ALLOC_STEP;
 
 		src = (char *)config->idxhost01;
-		dst = (char *)config->idxhost01 + sz;
-		config->idxhost01 = (void *)((char *)config->idxhost01 + sz);
-		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
-
 		if (0 != (sz = ((char *)config->idxhost02 - src) +
 					sizeof(int) * config->idxhost02_num))
-			memmove(dst, src, sz);
+			memmove(src + offset, src, sz);
+
+		config->idxhost01 = (void *)((char *)config->idxhost01 + offset);
+		config->idxhost02 = (void *)((char *)config->idxhost02 + offset);
 	}
 
 	if (0 != (sz = sizeof(ZBX_DC_IPMIHOST) * (config->ipmihosts_num - index)))
@@ -1156,18 +1158,19 @@ static void	DCallocate_idxhost01(int *index, int remove_index)
 
 	if (config->idxhost01_num == config->idxhost01_alloc)
 	{
-		sz = sizeof(int) * HOST_ALLOC_STEP;
+		size_t	offset;
 
-		DCcheck_freemem(sz);
+		offset = sizeof(int) * HOST_ALLOC_STEP;
+
+		DCcheck_freemem(offset);
 
 		config->idxhost01_alloc += HOST_ALLOC_STEP;
 
 		src = (char *)config->idxhost02;
-		dst = (char *)config->idxhost02 + sz;
-		config->idxhost02 = (void *)((char *)config->idxhost02 + sz);
-
 		if (0 != (sz = sizeof(int) * config->idxhost02_num))
-			memmove(dst, src, sz);
+			memmove(src + offset, src, sz);
+
+		config->idxhost02 = (void *)((char *)config->idxhost02 + offset);
 	}
 
 	if (-1 == remove_index)
@@ -1205,9 +1208,11 @@ static void	DCallocate_idxhost02(int *index, int remove_index)
 
 	if (config->idxhost02_num == config->idxhost02_alloc)
 	{
-		sz = sizeof(int) * HOST_ALLOC_STEP;
+		size_t	offset;
 
-		DCcheck_freemem(sz);
+		offset = sizeof(int) * HOST_ALLOC_STEP;
+
+		DCcheck_freemem(offset);
 
 		config->idxhost02_alloc += HOST_ALLOC_STEP;
 	}

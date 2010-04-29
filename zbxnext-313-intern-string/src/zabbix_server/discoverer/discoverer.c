@@ -56,13 +56,11 @@ static void	add_event(int object, zbx_uint64_t objectid, int now, int value)
 
 	memset(&event, 0, sizeof(DB_EVENT));
 
-	event.eventid		= 0;
-	event.source		= EVENT_SOURCE_DISCOVERY;
-	event.object		= object;
-	event.objectid		= objectid;
-	event.clock 		= now;
-	event.value 		= value;
-	event.acknowledged 	= 0;
+	event.source	= EVENT_SOURCE_DISCOVERY;
+	event.object	= object;
+	event.objectid	= objectid;
+	event.clock 	= now;
+	event.value 	= value;
 
 	process_event(&event);
 }

@@ -202,7 +202,7 @@
 				' WHERE hg.groupid='.$groupid.
 					' and i.key_='.zbx_dbstr($item['key_']).
 					' and hg.hostid=i.hostid';
-		$result=DBexecute($sql);
+		$result=DBSelect($sql);
 		while($row=DBfetch($result)){
 			$item['hostid'] = $row['hostid'];
 			update_item($row['itemid'],$item);
@@ -227,7 +227,7 @@
 			' WHERE hg.groupid='.$groupid.
 				' AND i.key_='.zbx_dbstr($item["key_"]).
 				' AND hg.hostid=i.hostid';
-		$result=DBexecute($sql);
+		$result=DBSelect($sql);
 		while($row=DBfetch($result)){
 			$del_items[$row['itemid']] = $row['itemid'];
 		}
@@ -239,11 +239,11 @@
 
 	# Add Item definition to selected group
 
-	function	add_item_to_group($groupid,$item){
+	function add_item_to_group($groupid,$item){
 /*	$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$params,$ipmi_sensor,$applications)
 //*/
 		$sql='SELECT hostid FROM hosts_groups WHERE groupid='.$groupid;
-		$result=DBexecute($sql);
+		$result=DBSelect($sql);
 		while($row=DBfetch($result)){
 			$item['hostid'] = $row['hostid'];
 			add_item($item);
@@ -1058,7 +1058,7 @@
 /*		$result = DBexecute('DELETE FROM items WHERE '.DBcondition('itemid',$itemids));*/
 		if($result){
 			foreach($items as $itemid => $item){
-				info(S_ITEM.SPACE."'".$hosts[$itemid]['host'].':'.$item['key_']."'".S_DELETED_SMALL);
+				info(S_ITEM.SPACE."'".$hosts[$itemid]['host'].':'.$item['key_']."'".SPACE.S_DELETED_SMALL);
 			}
 		}
 	return $result;
@@ -1095,32 +1095,44 @@
 	return $param;
 	}
 
-	function expand_item_key_by_data($item)
-	{
-		$key = $item['key_'];
+	function expand_item_key_by_data($item){
+		$key =& $item['key_'];
+		$macStack = array();
 
-		if (zbx_strstr($key, '{HOSTNAME}'))
-		{
-			$host = get_host_by_itemid($item['itemid']);
-			$key = str_replace('{HOSTNAME}', $host['host'], $key);
-		}
-		else if (zbx_strstr($key, '{IPADDRESS}'))
-		{
-			$host = get_host_by_itemid($item['itemid']);
-			$key = str_replace('{IPADDRESS}', $host['ip'], $key);
-		}
-		else if (zbx_strstr($key, '{HOST.DNS}'))
-		{
-			$host = get_host_by_itemid($item['itemid']);
-			$key = str_replace('{HOST.DNS}', $host['dns'], $key);
-		}
-		else if (zbx_strstr($key, '{HOST.CONN}'))
-		{
-			$host = get_host_by_itemid($item['itemid']);
-			$key = str_replace('{HOST.CONN}', $host['useip'] ? $host['ip'] : $host['dns'], $key);
+		$macroses = array('{HOSTNAME}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}');
+
+		foreach($macroses as $macro){
+			$pos = 0;
+			while($pos = zbx_strpos($key, $macro, $pos)){
+				$pos++;
+				$macStack[] = $macro;
+			}
 		}
 
-		return $key;
+		if(!empty($macStack)){
+			$host = get_host_by_itemid($item['itemid']);
+
+			foreach($macStack as $macro){
+				switch($macro){
+					case '{HOSTNAME}':
+						$key = str_replace('{HOSTNAME}', $host['host'], $key);
+					break;
+					case '{IPADDRESS}':
+						$key = str_replace('{IPADDRESS}', $host['ip'], $key);
+					break;
+					case '{HOST.DNS}':
+						$key = str_replace('{HOST.DNS}', $host['dns'], $key);
+					break;
+					case '{HOST.CONN}':
+						$key = str_replace('{HOST.CONN}', $host['useip'] ? $host['ip'] : $host['dns'], $key);
+					break;
+				}
+			}
+		}
+		
+		CUserMacro::resolveItem($item);
+
+		return $item['key_'];
 	}
 
 	function item_description($item){

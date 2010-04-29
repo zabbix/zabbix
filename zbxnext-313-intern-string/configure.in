@@ -1069,6 +1069,23 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 	PROXY_LDFLAGS="${PROXY_LDFLAGS} ${SSH2_LDFLAGS}"
 	PROXY_LIBS="${PROXY_LIBS} ${SSH2_LIBS}"
 
+	found_openipmi="no"
+	dnl Check for libOpenIPMI [by default - skip]
+	LIBOPENIPMI_CHECK_CONFIG([no])
+	if test "x$want_openipmi" = "xyes"; then
+		if test "x$found_openipmi" != "xyes"; then
+			AC_MSG_ERROR([Invalid OPENIPMI directory - unable to find ipmiif.h])
+		else
+			have_ipmi="openipmi"
+		fi
+	fi
+	CFLAGS="${CFLAGS} ${OPENIPMI_CFLAGS}"
+	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${OPENIPMI_LDFLAGS}"
+	SERVER_LIBS="${SERVER_LIBS} ${OPENIPMI_LIBS}"
+
+	PROXY_LDFLAGS="${PROXY_LDFLAGS} ${OPENIPMI_LDFLAGS}"
+	PROXY_LIBS="${PROXY_LIBS} ${OPENIPMI_LIBS}"
+
 	AC_SUBST(SERVER_LDFLAGS)
 	AC_SUBST(SERVER_LIBS)
 
@@ -1100,19 +1117,6 @@ fi
 CFLAGS="${CFLAGS} ${ICONV_CFLAGS}"
 LDFLAGS="${LDFLAGS} ${ICONV_LDFLAGS}"
 LIBS="${LIBS} ${ICONV_LIBS}"
-
-found_openipmi="no"
-dnl Check for libOpenIPMI [by default - skip]
-LIBOPENIPMI_CHECK_CONFIG([no])
-if test "x$want_openipmi" = "xyes"; then
-	if test "x$found_openipmi" != "xyes"; then
-		AC_MSG_ERROR([Invalid OPENIPMI directory - unable to find ipmiif.h])
-	else
-		have_ipmi="openipmi"
-	fi
-fi
-CFLAGS="${CFLAGS} ${OPENIPMI_CPPFLAGS}"
-LDFLAGS="${LDFLAGS} ${OPENIPMI_LDFLAGS}"
 
 RANLIB="ranlib"
 AC_SUBST(RANLIB)

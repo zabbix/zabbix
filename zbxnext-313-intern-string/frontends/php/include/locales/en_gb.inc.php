@@ -1162,6 +1162,7 @@
 	'S_COPY_SELECTED_ITEMS_Q'=>				'Copy selected items?',
 	'S_DELETE_HISTORY_SELECTED_ITEMS_Q'=>			'Delete history of selected items?',
 	'S_DELETE_SELECTED_ITEMS_Q'=>				'Delete selected items?',
+	'S_FORMULA'=>						'Formula',
 
 //	events.php
 	'S_EVENT'=>				'Event',
@@ -1674,7 +1675,7 @@
 	'S_INSERT'=>				'Insert',
 	'S_SECONDS'=>				'Seconds',
 	'S_LAST_OF'=>				'Last of',
-	'S_MULTIPLE_TRUE_EVENTS'=>		'Multiple TRUE events',
+	'S_MULTIPLE_PROBLEM_EVENTS'=>		'Multiple PROBLEM events',
 	'S_SHOW_DISABLED_TRIGGERS'=>		'Show disabled triggers',
 	'S_HIDE_DISABLED_TRIGGERS'=>		'Hide disabled triggers',
 	'S_THE_TRIGGER_DEPENDS_ON'=>		'The trigger depends on',
@@ -1989,7 +1990,7 @@
 	'S_INCORRECT_TYPE_OF_ASORT_BY_KEY'=>	'Incorrect type of asort_by_key',
 	'S_DAYS_SMALL'=>			'days',
 	'S_B'=>			'B',
-	'S_N_SMALL',	'n',
+	'S_N_SMALL'=>	'n',
 	'S_NANO'=>		'Nano',
 	'S_U_MICRO'=>	'µ',
 	'S_MICRO'=>		'Micro',
@@ -2259,7 +2260,10 @@
 	'S_CUSER_ERROR_INTERNAL_ZABBIX_ERROR'=>			'Internal zabbix error',
 
 //	config.inc.php
-	'S_CONFIG_NOT_LOGGED_IN_ACCESS_DENIED'=>		'You cannot view this URL as a %1$s. You must login to view this page.%2$s If you think this message is wrong, please consult your administrators about getting the necessary permissions.',
+	'S_CONFIG_NOT_LOGGED_IN_ACCESS_DENIED'=>		'You cannot view this URL as a ',
+	'S_CONFIG_ERROR_YOU_MUST_LOGIN'=>			'You must login to view this page.',
+	'S_CONFIG_NOT_LOGGED_IN_NOTE'=>				'If you think this message is wrong, please consult your administrators about getting the necessary permissions.',
+	'S_CONFIG_ERROR_YOU_ARE_NOT_LOGGED_IN_HEAD'=>		'You are not logged in.',
 	'S_CONFIG_ERROR_HEAD'=>					'ERROR',
 	'S_CONFIG_WARNING_WRONG_MONTH'=>			'[Wrong value for month: %1$s]',
 	'S_CONFIG_WARNING_WRONG_DOW'=>				'[Wrong value for day of week: %1$s]',
@@ -2318,6 +2322,6 @@
 	'S_CANNOT_FIND_OBJECTS_WITH_NAME'=>	'Can not find objects with name',
 	'S_CANNOT_CREATE_NEW_ELEMENT'=>		'Can not create new element',
 	'S_OTHER_SMALL'=>			'other',
-	
+
 );
 ?>
