@@ -859,12 +859,12 @@ function zbx_strtolower($str){
 	}
 }
 
-function zbx_strpos($haystack, $needle){
+function zbx_strpos($haystack, $needle, $offset=0){
 	if(defined('ZBX_MBSTRINGS_ENABLED')){
-		return mb_strpos($haystack, $needle);
+		return mb_strpos($haystack, $needle, $offset);
 	}
 	else{
-		return strpos($haystack, $needle);
+		return strpos($haystack, $needle, $offset);
 	}
 }
 

@@ -67,7 +67,7 @@ include_once('include/page_header.php');
 		'dropdown_first_entry'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('0,1,2'),		'isset({config})&&({config}==8)&&isset({save})'),
 		'dropdown_first_remember'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('0,1'),	NULL),
 		'max_in_table' => 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,99999),	'isset({config})&&({config}==8)&&isset({save})'),
-		'search_limit' => 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,99999),	'isset({config})&&({config}==8)&&isset({save})'),
+		'search_limit' => 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,999999),	'isset({config})&&({config}==8)&&isset({save})'),
 /* Macros */
 		'macros_rem'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'macros'=>				array(T_ZBX_STR, O_OPT, P_SYS,			NULL,	NULL),
@@ -930,8 +930,8 @@ include_once('include/page_header.php');
 			S_DROPDOWN_REMEMBER_SELECTED
 			));
 
-		$frmGUI->addRow(S_SEARCH_LIMIT, new CTextBox('search_limit', $config['search_limit'], 5));
-		$frmGUI->addRow(S_MAX_IN_TABLE, new CTextBox('max_in_table', $config['max_in_table'], 5));
+		$frmGUI->addRow(S_SEARCH_LIMIT, new CNumericBox('search_limit', $config['search_limit'], 6));
+		$frmGUI->addRow(S_MAX_IN_TABLE, new CNumericBox('max_in_table', $config['max_in_table'], 5));
 		$frmGUI->addRow(S_EVENT_ACKNOWLEDGES,$exp_select);
 		$frmGUI->addRow(S_SHOW_EVENTS_NOT_OLDER.SPACE.'('.S_DAYS.')',
 			new CTextBox('event_expire',$config['event_expire'],5));

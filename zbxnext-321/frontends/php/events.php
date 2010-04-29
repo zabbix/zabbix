@@ -190,7 +190,7 @@
 		$filterForm->setAttribute('name', 'zbx_filter');
 		$filterForm->setAttribute('id', 'zbx_filter');
 	
-		$filterForm->addVar('triggerid', get_request('triggerid'));
+		$filterForm->addVar('triggerid', get_request('triggerid', 0));
 
 		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
 			$trigger = expand_trigger_description($_REQUEST['triggerid']);
@@ -246,7 +246,7 @@
 		$options['source'] = EVENT_SOURCE_DISCOVERY;
 	}
 	else{			
-		if($_REQUEST['triggerid']){
+		if(isset($_REQUEST['triggerid'])){
 			$options['object'] = EVENT_OBJECT_TRIGGER;
 			$options['triggerids'] = $_REQUEST['triggerid'];
 		}
