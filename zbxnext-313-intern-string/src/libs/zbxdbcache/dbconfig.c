@@ -23,6 +23,7 @@
 #include "threads.h"
 
 #include "dbcache.h"
+#include "strpool.h"
 #include "ipc.h"
 #include "mutexs.h"
 
@@ -68,7 +69,7 @@ ZBX_DC_ITEM
 	unsigned char 	type;
 	unsigned char	data_type;
 	unsigned char	value_type;
-	char		key[ITEM_KEY_LEN_MAX];
+	const char	*key;			/* interned; key[ITEM_KEY_LEN_MAX];					*/
 	int		delay;
 	int		nextcheck;
 	unsigned char	status;
@@ -77,68 +78,68 @@ ZBX_DC_ITEM
 ZBX_DC_SNMPITEM
 {
 	zbx_uint64_t	itemid;
-	char		snmp_community[ITEM_SNMP_COMMUNITY_LEN_MAX];
-	char		snmp_oid[ITEM_SNMP_OID_LEN_MAX];
+	const char	*snmp_community;	/* interned; snmp_community[ITEM_SNMP_COMMUNITY_LEN_MAX];		*/
+	const char	*snmp_oid;		/* interned; snmp_oid[ITEM_SNMP_OID_LEN_MAX];				*/
 	unsigned short	snmp_port;
-	char		snmpv3_securityname[ITEM_SNMPV3_SECURITYNAME_LEN_MAX];
+	const char	*snmpv3_securityname;	/* interned; snmpv3_securityname[ITEM_SNMPV3_SECURITYNAME_LEN_MAX];	*/
 	unsigned char	snmpv3_securitylevel;
-	char		snmpv3_authpassphrase[ITEM_SNMPV3_AUTHPASSPHRASE_LEN_MAX];
-	char		snmpv3_privpassphrase[ITEM_SNMPV3_PRIVPASSPHRASE_LEN_MAX];
+	const char	*snmpv3_authpassphrase;	/* interned; snmpv3_authpassphrase[ITEM_SNMPV3_AUTHPASSPHRASE_LEN_MAX];	*/
+	const char	*snmpv3_privpassphrase;	/* interned; snmpv3_privpassphrase[ITEM_SNMPV3_PRIVPASSPHRASE_LEN_MAX];	*/
 };
 
 ZBX_DC_IPMIITEM
 {
 	zbx_uint64_t	itemid;
-	char		ipmi_sensor[ITEM_IPMI_SENSOR_LEN_MAX];
+	const char	*ipmi_sensor;		/* interned; ipmi_sensor[ITEM_IPMI_SENSOR_LEN_MAX];			*/
 };
 
 ZBX_DC_FLEXITEM
 {
 	zbx_uint64_t	itemid;
-	char		delay_flex[ITEM_DELAY_FLEX_LEN_MAX];
+	const char	*delay_flex;		/* interned; delay_flex[ITEM_DELAY_FLEX_LEN_MAX];			*/
 };
 
 ZBX_DC_TRAPITEM
 {
 	zbx_uint64_t	itemid;
-	char		trapper_hosts[ITEM_TRAPPER_HOSTS_LEN_MAX];
+	const char	*trapper_hosts;		/* interned; trapper_hosts[ITEM_TRAPPER_HOSTS_LEN_MAX];			*/
 };
 
 ZBX_DC_LOGITEM
 {
 	zbx_uint64_t	itemid;
-	char		logtimefmt[ITEM_LOGTIMEFMT_LEN_MAX];
+	const char	*logtimefmt;		/* interned; logtimefmt[ITEM_LOGTIMEFMT_LEN_MAX];			*/
 };
 
 ZBX_DC_DBITEM
 {
 	zbx_uint64_t	itemid;
-	char		params[ITEM_PARAMS_LEN_MAX];
+	const char	*params;		/* interned; params[ITEM_PARAMS_LEN_MAX];				*/
 };
 
 ZBX_DC_SSHITEM
 {
 	zbx_uint64_t	itemid;
 	unsigned char	authtype;
-	char		username[ITEM_USERNAME_LEN_MAX];
-	char		publickey[ITEM_PUBLICKEY_LEN_MAX];
-	char		privatekey[ITEM_PRIVATEKEY_LEN_MAX];
-	char		password[ITEM_PASSWORD_LEN_MAX];
-	char		params[ITEM_PARAMS_LEN_MAX];
+	const char	*username;		/* interned; username[ITEM_USERNAME_LEN_MAX];				*/
+	const char	*publickey;		/* interned; publickey[ITEM_PUBLICKEY_LEN_MAX];				*/
+	const char	*privatekey;		/* interned; privatekey[ITEM_PRIVATEKEY_LEN_MAX];			*/
+	const char	*password;		/* interned; password[ITEM_PASSWORD_LEN_MAX];				*/
+	const char	*params;		/* interned; params[ITEM_PARAMS_LEN_MAX];				*/
 };
 
 ZBX_DC_TELNETITEM
 {
 	zbx_uint64_t	itemid;
-	char		username[ITEM_USERNAME_LEN_MAX];
-	char		password[ITEM_PASSWORD_LEN_MAX];
-	char		params[ITEM_PARAMS_LEN_MAX];
+	const char	*username;		/* interned; username[ITEM_USERNAME_LEN_MAX];				*/
+	const char	*password;		/* interned; password[ITEM_PASSWORD_LEN_MAX];				*/
+	const char	*params;		/* interned; params[ITEM_PARAMS_LEN_MAX];				*/
 };
 
 ZBX_DC_CALCITEM
 {
 	zbx_uint64_t	itemid;
-	char		params[ITEM_PARAMS_LEN_MAX];
+	const char	*params;		/* interned; params[ITEM_PARAMS_LEN_MAX];				*/
 };
 
 ZBX_DC_HOST
@@ -148,10 +149,10 @@ ZBX_DC_HOST
 	unsigned char 	poller_num;
 	int		nextcheck;
 	zbx_uint64_t	proxy_hostid;
-	char		host[HOST_HOST_LEN_MAX];
+	const char	*host;			/* interned; host[HOST_HOST_LEN_MAX];					*/
 	unsigned char	useip;
-	char		ip[HOST_IP_LEN_MAX];
-	char		dns[HOST_DNS_LEN_MAX];
+	const char	*ip;			/* interned; ip[HOST_IP_LEN_MAX];					*/
+	const char	*dns;			/* interned; dns[HOST_DNS_LEN_MAX];					*/
 	unsigned short	port;
 	unsigned char	maintenance_status;
 	unsigned char	maintenance_type;
@@ -170,12 +171,12 @@ ZBX_DC_HOST
 ZBX_DC_IPMIHOST
 {
 	zbx_uint64_t	hostid;
-	char		ipmi_ip[HOST_ADDR_LEN_MAX];
+	const char	*ipmi_ip;		/* interned; ipmi_ip[HOST_ADDR_LEN_MAX];				*/
 	unsigned short	ipmi_port;
 	signed char	ipmi_authtype;
 	unsigned char	ipmi_privilege;
-	char		ipmi_username[HOST_IPMI_USERNAME_LEN_MAX];
-	char		ipmi_password[HOST_IPMI_PASSWORD_LEN_MAX];
+	const char	*ipmi_username;		/* interned; ipmi_username[HOST_IPMI_USERNAME_LEN_MAX];			*/
+	const char	*ipmi_password;		/* interned; ipmi_password[HOST_IPMI_PASSWORD_LEN_MAX];			*/
 };
 
 ZBX_DC_CONFIG
@@ -207,22 +208,21 @@ ZBX_DC_CONFIG
 	ZBX_DC_HOST	*hosts;
 	ZBX_DC_IPMIHOST	*ipmihosts;
 	int		*idxhost01;	/* proxy_hostid,host */
-	int		*idxhost02;	/* poller_num */
+	int		*idxhost02;	/* poller_type,poller_num,nextcheck */
 	int		free_mem;
 };
 
 static ZBX_DC_CONFIG	*config = NULL;
 static ZBX_MUTEX	config_lock;
+static size_t		config_size;
 
 /*
  * Returns type and number of poller for item
  * (for normal or IPMI pollers)
  */
 static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t hostid, zbx_uint64_t proxy_hostid,
-		unsigned char item_type, char *key, unsigned char *poller_type, unsigned char *poller_num)
+		unsigned char item_type, const char *key, unsigned char *poller_type, unsigned char *poller_num)
 {
-	char	*p;
-
 	if (0 != proxy_hostid && (ITEM_TYPE_INTERNAL != item_type &&
 				ITEM_TYPE_AGGREGATE != item_type &&
 				ITEM_TYPE_CALCULATED != item_type))
@@ -234,25 +234,16 @@ static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t hostid, zbx_uint64_
 
 	switch (item_type) {
 	case ITEM_TYPE_SIMPLE:
-		if (NULL != (p = strchr(key, '[')))
-			*p = '\0';
-
-		if (0 == strcmp(key, SERVER_ICMPPING_KEY) ||
-				0 == strcmp(key, SERVER_ICMPPINGSEC_KEY) ||
-				0 == strcmp(key, SERVER_ICMPPINGLOSS_KEY))
+		if (SUCCEED == cmp_key_id(key, SERVER_ICMPPING_KEY) ||
+				SUCCEED == cmp_key_id(key, SERVER_ICMPPINGSEC_KEY) ||
+				SUCCEED == cmp_key_id(key, SERVER_ICMPPINGLOSS_KEY))
 		{
 			if (0 == CONFIG_PINGER_FORKS)
 				break;
 			*poller_type = (unsigned char)ZBX_POLLER_TYPE_PINGER;
 			*poller_num = (unsigned char)(hostid % CONFIG_PINGER_FORKS);
-
-			if (NULL != p)
-				*p = '[';
 			return;
 		}
-
-		if (NULL != p)
-			*p = '[';
 	case ITEM_TYPE_ZABBIX:
 	case ITEM_TYPE_SNMPv1:
 	case ITEM_TYPE_SNMPv2c:
@@ -317,7 +308,7 @@ static int	DCget_idxhost01_nearestindex(zbx_uint64_t proxy_hostid, const char *h
 		index = first_index + (last_index - first_index) / 2;
 
 		dc_host = &config->hosts[config->idxhost01[index]];
-		res = strcmp(dc_host->host, host);
+		res = (dc_host->host == host ? 0 : strcmp(dc_host->host, host));
 		if (dc_host->proxy_hostid == proxy_hostid && 0 == res)
 			return index;
 		else if (last_index == first_index)
@@ -411,7 +402,7 @@ static int	DCget_idxitem01_nearestindex(zbx_uint64_t hostid, const char *key)
 		index = first_index + (last_index - first_index) / 2;
 
 		dc_item = &config->items[config->idxitem01[index]];
-		res = strcmp(dc_item->key, key);
+		res = (dc_item->key == key ? 0 : strcmp(dc_item->key, key));
 		if (dc_item->hostid == hostid && 0 == res)
 			return index;
 		else if (last_index == first_index)
@@ -503,8 +494,7 @@ static void	DCupdate_idxhost01(int host_index, zbx_uint64_t *old_proxy_hostid, c
 
 	if (NULL != old_proxy_hostid)	/* remove old index record */
 	{
-		if (NULL != new_proxy_hostid && *old_proxy_hostid == *new_proxy_hostid &&
-				0 == strcmp(old_host, new_host))
+		if (NULL != new_proxy_hostid && *old_proxy_hostid == *new_proxy_hostid && old_host == new_host)
 			return;
 
 		index = DCget_idxhost01_nearestindex(*old_proxy_hostid, old_host);
@@ -564,7 +554,7 @@ static void	DCupdate_idxitem01(int item_index, zbx_uint64_t *old_hostid, const c
 
 	if (NULL != old_hostid)	/* remove old index record */
 	{
-		if (NULL != new_hostid && *old_hostid == *new_hostid && 0 == strcmp(old_key, new_key))
+		if (NULL != new_hostid && *old_hostid == *new_hostid && old_key == new_key)
 			return;
 
 		index = DCget_idxitem01_nearestindex(*old_hostid, old_key);
@@ -1266,7 +1256,7 @@ static void	DCsync_items()
 	ZBX_DC_TELNETITEM	*telnetitem;
 	ZBX_DC_CALCITEM	*calcitem;
 	zbx_uint64_t	itemid, proxy_hostid;
-	int		i, new, delay;
+	int		i, found, delay;
 	unsigned char	status;
 	zbx_uint64_t	*ids = NULL;
 	int		ids_allocated, ids_num = 0;
@@ -1296,6 +1286,7 @@ static void	DCsync_items()
 			DBnode_local("i.itemid"));
 
 	LOCK_CACHE;
+
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(itemid, row[0]);
@@ -1306,23 +1297,24 @@ static void	DCsync_items()
 		/* array of selected items */
 		uint64_array_add(&ids, &ids_allocated, &ids_num, itemid, ITEM_ALLOC_STEP);
 
-		new = 0;
 		i = get_nearestindex(config->items, sizeof(ZBX_DC_ITEM), config->items_num, itemid);
-		if (i == config->items_num || config->items[i].itemid != itemid)
-		{
+		found = (i < config->items_num && config->items[i].itemid == itemid);
+
+		if (found)
+			zbx_strpool_release(config->items[i].key);
+		else
 			DCallocate_item(i);
-			new = 1;
-		}
 
 		item = &config->items[i];
+
 		item->itemid = itemid;
 		ZBX_STR2UINT64(item->hostid, row[1]);
 		item->type = (unsigned char)atoi(row[3]);
 		item->data_type = (unsigned char)atoi(row[4]);
 		item->value_type = (unsigned char)atoi(row[5]);
-		zbx_strlcpy(item->key, row[6], sizeof(item->key));
+		item->key = zbx_strpool_intern(row[6]);
 
-		if (new)
+		if (!found)
 		{
 			if (ITEM_STATUS_NOTSUPPORTED == status)
 				item->nextcheck = calculate_item_nextcheck(itemid, item->type,
@@ -1347,219 +1339,293 @@ static void	DCsync_items()
 		poller_by_item(itemid, item->hostid, proxy_hostid, item->type, item->key,
 				&item->poller_type, &item->poller_num);
 
+		/* SNMP items */
+
 		i = get_nearestindex(config->snmpitems, sizeof(ZBX_DC_SNMPITEM),
 				config->snmpitems_num, itemid);
+		found = (i < config->snmpitems_num && config->snmpitems[i].itemid == itemid);
 
-		switch (item->type) {
-		case ITEM_TYPE_SNMPv1:
-		case ITEM_TYPE_SNMPv2c:
-		case ITEM_TYPE_SNMPv3:
-			if (i == config->snmpitems_num || config->snmpitems[i].itemid != itemid)
+		if (found)
+		{
+			snmpitem = &config->snmpitems[i];
+
+			zbx_strpool_release(snmpitem->snmp_community);
+			zbx_strpool_release(snmpitem->snmp_oid);
+			zbx_strpool_release(snmpitem->snmpv3_securityname);
+			zbx_strpool_release(snmpitem->snmpv3_authpassphrase);
+			zbx_strpool_release(snmpitem->snmpv3_privpassphrase);
+		}
+
+		if (ITEM_TYPE_SNMPv1 == item->type || ITEM_TYPE_SNMPv2c == item->type || ITEM_TYPE_SNMPv3 == item->type)
+		{
+			if (!found)
 				DCallocate_snmpitem(i);
 
 			snmpitem = &config->snmpitems[i];
 
 			snmpitem->itemid = itemid;
-			zbx_strlcpy(snmpitem->snmp_community, row[7],
-					sizeof(snmpitem->snmp_community));
-			zbx_strlcpy(snmpitem->snmp_oid, row[8], sizeof(snmpitem->snmp_oid));
+			snmpitem->snmp_community = zbx_strpool_intern(row[7]);
+			snmpitem->snmp_oid = zbx_strpool_intern(row[8]);
 			snmpitem->snmp_port = (unsigned short)atoi(row[9]);
-			zbx_strlcpy(snmpitem->snmpv3_securityname, row[10],
-					sizeof(snmpitem->snmpv3_securityname));
+			snmpitem->snmpv3_securityname = zbx_strpool_intern(row[10]);
 			snmpitem->snmpv3_securitylevel = (unsigned char)atoi(row[11]);
-			zbx_strlcpy(snmpitem->snmpv3_authpassphrase, row[12],
-					sizeof(snmpitem->snmpv3_authpassphrase));
-			zbx_strlcpy(snmpitem->snmpv3_privpassphrase, row[13],
-					sizeof(snmpitem->snmpv3_privpassphrase));
-			break;
-		default:
-			/* remove snmp parameters for not snmp item */
-			if (i < config->snmpitems_num && config->snmpitems[i].itemid == itemid)
-				DCremove_element(config->snmpitems, &config->snmpitems_num, sizeof(ZBX_DC_SNMPITEM), i);
+			snmpitem->snmpv3_authpassphrase = zbx_strpool_intern(row[12]);
+			snmpitem->snmpv3_privpassphrase = zbx_strpool_intern(row[13]);
+
 		}
+		else if (found)
+		{
+			/* remove snmp parameters for not snmp item */
+			DCremove_element(config->snmpitems, &config->snmpitems_num, sizeof(ZBX_DC_SNMPITEM), i);
+		}
+
+		/* IPMI items */
 
 		i = get_nearestindex(config->ipmiitems, sizeof(ZBX_DC_IPMIITEM),
 				config->ipmiitems_num, itemid);
+		found = (i < config->ipmiitems_num && config->ipmiitems[i].itemid == itemid);
 
-		switch (item->type) {
-		case ITEM_TYPE_IPMI:
-			if (i == config->ipmiitems_num || config->ipmiitems[i].itemid != itemid)
+		if (found)
+		{
+			ipmiitem = &config->ipmiitems[i];
+			zbx_strpool_release(ipmiitem->ipmi_sensor);
+		}
+
+		if (ITEM_TYPE_IPMI == item->type)
+		{
+			if (!found)
 				DCallocate_ipmiitem(i);
 
 			ipmiitem = &config->ipmiitems[i];
 
 			ipmiitem->itemid = itemid;
-			zbx_strlcpy(ipmiitem->ipmi_sensor, row[14],
-					sizeof(ipmiitem->ipmi_sensor));
-			break;
-		default:
+			ipmiitem->ipmi_sensor = zbx_strpool_intern(row[14]);
+		}
+		else if (found)
+		{
 			/* remove ipmi parameters for not ipmi item */
-			if (i < config->ipmiitems_num && config->ipmiitems[i].itemid == itemid)
-				DCremove_element(config->ipmiitems, &config->ipmiitems_num, sizeof(ZBX_DC_IPMIITEM), i);
+			DCremove_element(config->ipmiitems, &config->ipmiitems_num, sizeof(ZBX_DC_IPMIITEM), i);
 		}
 
 		/* items with flexible intervals */
+
 		i = get_nearestindex(config->flexitems, sizeof(ZBX_DC_FLEXITEM),
 				config->flexitems_num, itemid);
+		found = (i < config->flexitems_num && config->flexitems[i].itemid == itemid);
+
+		if (found)
+		{
+			flexitem = &config->flexitems[i];
+			zbx_strpool_release(flexitem->delay_flex);
+		}
 
 		if (SUCCEED != DBis_null(row[16]) && '\0' != *row[16])
 		{
-			if (i == config->flexitems_num || config->flexitems[i].itemid != itemid)
+			if (!found)
 				DCallocate_flexitem(i);
 
 			flexitem = &config->flexitems[i];
 
 			flexitem->itemid = itemid;
-			zbx_strlcpy(flexitem->delay_flex, row[16],
-					sizeof(flexitem->delay_flex));
+			flexitem->delay_flex = zbx_strpool_intern(row[16]);
 		}
-		else
+		else if (found)
 		{
 			/* remove delay_flex parameter for not flexible item */
-			if (i < config->flexitems_num && config->flexitems[i].itemid == itemid)
-				DCremove_element(config->flexitems, &config->flexitems_num, sizeof(ZBX_DC_FLEXITEM), i);
+			DCremove_element(config->flexitems, &config->flexitems_num, sizeof(ZBX_DC_FLEXITEM), i);
 		}
 
 		/* trapper items */
+
 		i = get_nearestindex(config->trapitems, sizeof(ZBX_DC_TRAPITEM),
 				config->trapitems_num, itemid);
+		found = (i < config->trapitems_num && config->trapitems[i].itemid == itemid);
+
+		if (found)
+		{
+			trapitem = &config->trapitems[i];
+			zbx_strpool_release(trapitem->trapper_hosts);
+		}
 
 		if (ITEM_TYPE_TRAPPER == item->type && SUCCEED != DBis_null(row[17]) && '\0' != *row[17])
 		{
-			if (i == config->trapitems_num || config->trapitems[i].itemid != itemid)
+			if (!found)
 				DCallocate_trapitem(i);
 
 			trapitem = &config->trapitems[i];
 
 			trapitem->itemid = itemid;
-			zbx_strlcpy(trapitem->trapper_hosts, row[17],
-					sizeof(trapitem->trapper_hosts));
+			trapitem->trapper_hosts = zbx_strpool_intern(row[17]);
 		}
-		else
+		else if (found)
 		{
 			/* remove trapper_hosts parameter */
-			if (i < config->trapitems_num && config->trapitems[i].itemid == itemid)
-				DCremove_element(config->trapitems, &config->trapitems_num, sizeof(ZBX_DC_TRAPITEM), i);
+			DCremove_element(config->trapitems, &config->trapitems_num, sizeof(ZBX_DC_TRAPITEM), i);
 		}
 
 		/* log items */
+
 		i = get_nearestindex(config->logitems, sizeof(ZBX_DC_LOGITEM),
 				config->logitems_num, itemid);
+		found = (i < config->logitems_num && config->logitems[i].itemid == itemid);
+
+		if (found)
+		{
+			logitem = &config->logitems[i];
+			zbx_strpool_release(logitem->logtimefmt);
+		}
 
 		if (ITEM_VALUE_TYPE_LOG == item->value_type && SUCCEED != DBis_null(row[18]) && '\0' != *row[18])
 		{
-			if (i == config->logitems_num || config->logitems[i].itemid != itemid)
+			if (!found)
 				DCallocate_logitem(i);
 
 			logitem = &config->logitems[i];
 
 			logitem->itemid = itemid;
-			zbx_strlcpy(logitem->logtimefmt, row[18],
-					sizeof(logitem->logtimefmt));
+			logitem->logtimefmt = zbx_strpool_intern(row[18]);
 		}
-		else
+		else if (found)
 		{
 			/* remove logtimefmt parameter */
-			if (i < config->logitems_num && config->logitems[i].itemid == itemid)
-				DCremove_element(config->logitems, &config->logitems_num, sizeof(ZBX_DC_LOGITEM), i);
+			DCremove_element(config->logitems, &config->logitems_num, sizeof(ZBX_DC_LOGITEM), i);
 		}
 
 		/* db items */
+
 		i = get_nearestindex(config->dbitems, sizeof(ZBX_DC_DBITEM),
 				config->dbitems_num, itemid);
+		found = (i < config->dbitems_num && config->dbitems[i].itemid == itemid);
+
+		if (found)
+		{
+			dbitem = &config->dbitems[i];
+			zbx_strpool_release(dbitem->params);
+		}
 
 		if (ITEM_TYPE_DB_MONITOR == item->type && SUCCEED != DBis_null(row[19]) && '\0' != *row[19])
 		{
-			if (i == config->dbitems_num || config->dbitems[i].itemid != itemid)
+			if (!found)
 				DCallocate_dbitem(i);
 
 			dbitem = &config->dbitems[i];
 
 			dbitem->itemid = itemid;
-			zbx_strlcpy(dbitem->params, row[19], ITEM_PARAMS_LEN_MAX);
+			dbitem->params = zbx_strpool_intern(row[19]);
 		}
-		else
+		else if (found)
 		{
 			/* remove db item parameters */
-			if (i < config->dbitems_num && config->dbitems[i].itemid == itemid)
-				DCremove_element(config->dbitems, &config->dbitems_num, sizeof(ZBX_DC_DBITEM), i);
+			DCremove_element(config->dbitems, &config->dbitems_num, sizeof(ZBX_DC_DBITEM), i);
 		}
 
 		/* SSH items */
+
 		i = get_nearestindex(config->sshitems, sizeof(ZBX_DC_SSHITEM),
 				config->sshitems_num, itemid);
+		found = (i < config->sshitems_num && config->sshitems[i].itemid == itemid);
+
+		if (found)
+		{
+			sshitem = &config->sshitems[i];
+
+			zbx_strpool_release(sshitem->username);
+			zbx_strpool_release(sshitem->password);
+			zbx_strpool_release(sshitem->publickey);
+			zbx_strpool_release(sshitem->privatekey);
+			zbx_strpool_release(sshitem->params);
+		}
 
 		if (ITEM_TYPE_SSH == item->type)
 		{
-			if (i == config->sshitems_num || config->sshitems[i].itemid != itemid)
+			if (!found)
 				DCallocate_sshitem(i);
 
 			sshitem = &config->sshitems[i];
 
 			sshitem->itemid = itemid;
 			sshitem->authtype = (unsigned short)atoi(row[21]);
-			zbx_strlcpy(sshitem->username, row[22], sizeof(sshitem->username));
-			zbx_strlcpy(sshitem->publickey, row[24], sizeof(sshitem->publickey));
-			zbx_strlcpy(sshitem->privatekey, row[25], sizeof(sshitem->privatekey));
-			zbx_strlcpy(sshitem->password, row[23], sizeof(sshitem->password));
-			zbx_strlcpy(sshitem->params, row[19], sizeof(sshitem->params));
+			sshitem->username = zbx_strpool_intern(row[22]);
+			sshitem->password = zbx_strpool_intern(row[23]);
+			sshitem->publickey = zbx_strpool_intern(row[24]);
+			sshitem->privatekey = zbx_strpool_intern(row[25]);
+			sshitem->params = zbx_strpool_intern(row[19]);
 		}
-		else
+		else if (found)
 		{
 			/* remove SSH item parameters */
-			if (i < config->sshitems_num && config->sshitems[i].itemid == itemid)
-				DCremove_element(config->sshitems, &config->sshitems_num, sizeof(ZBX_DC_SSHITEM), i);
+			DCremove_element(config->sshitems, &config->sshitems_num, sizeof(ZBX_DC_SSHITEM), i);
 		}
 
 		/* TELNET items */
+
 		i = get_nearestindex(config->telnetitems, sizeof(ZBX_DC_TELNETITEM),
 				config->telnetitems_num, itemid);
+		found = (i < config->telnetitems_num && config->telnetitems[i].itemid == itemid);
+
+		if (found)
+		{
+			telnetitem = &config->telnetitems[i];
+
+			zbx_strpool_release(telnetitem->username);
+			zbx_strpool_release(telnetitem->password);
+			zbx_strpool_release(telnetitem->params);
+		}
 
 		if (ITEM_TYPE_TELNET == item->type)
 		{
-			if (i == config->telnetitems_num || config->telnetitems[i].itemid != itemid)
+			if (!found)
 				DCallocate_telnetitem(i);
 
 			telnetitem = &config->telnetitems[i];
 
 			telnetitem->itemid = itemid;
-			zbx_strlcpy(telnetitem->username, row[22], sizeof(telnetitem->username));
-			zbx_strlcpy(telnetitem->password, row[23], sizeof(telnetitem->password));
-			zbx_strlcpy(telnetitem->params, row[19], sizeof(telnetitem->params));
+			telnetitem->username = zbx_strpool_intern(row[22]);
+			telnetitem->password = zbx_strpool_intern(row[23]);
+			telnetitem->params = zbx_strpool_intern(row[19]);
 		}
-		else
+		else if (found)
 		{
 			/* remove TELNET item parameters */
-			if (i < config->telnetitems_num && config->telnetitems[i].itemid == itemid)
-				DCremove_element(config->telnetitems, &config->telnetitems_num, sizeof(ZBX_DC_TELNETITEM), i);
+			DCremove_element(config->telnetitems, &config->telnetitems_num, sizeof(ZBX_DC_TELNETITEM), i);
 		}
 
 		/* CALCULATED items */
+
 		i = get_nearestindex(config->calcitems, sizeof(ZBX_DC_CALCITEM),
 				config->calcitems_num, itemid);
+		found = (i < config->calcitems_num && config->calcitems[i].itemid == itemid);
+
+		if (found)
+		{
+			calcitem = &config->calcitems[i];
+			zbx_strpool_release(calcitem->params);
+		}
 
 		if (ITEM_TYPE_CALCULATED == item->type)
 		{
-			if (i == config->calcitems_num || config->calcitems[i].itemid != itemid)
+			if (!found)
 				DCallocate_calcitem(i);
 
 			calcitem = &config->calcitems[i];
 
 			calcitem->itemid = itemid;
-			zbx_strlcpy(calcitem->params, row[19], sizeof(calcitem->params));
+			calcitem->params = zbx_strpool_intern(row[19]);
 		}
-		else
+		else if (found)
 		{
 			/* remove CALCULATED item parameters */
-			if (i < config->calcitems_num && config->calcitems[i].itemid == itemid)
-				DCremove_element(config->calcitems, &config->calcitems_num, sizeof(ZBX_DC_CALCITEM), i);
+			DCremove_element(config->calcitems, &config->calcitems_num, sizeof(ZBX_DC_CALCITEM), i);
 		}
 	}
 
 	/* remove deleted or disabled items from buffer */
 	for (i = 0; i < config->items_num; i++)
 		if (FAIL == uint64_array_exists(ids, ids_num, config->items[i].itemid))
+		{
+			zbx_strpool_release(config->items[i].key);
 			DCremove_element(config->items, &config->items_num, sizeof(ZBX_DC_ITEM), i--);
+		}
 
 	/* create indexes */
 	config->idxitem01_num = 0;
@@ -1574,47 +1640,93 @@ static void	DCsync_items()
 	/* remove deleted or disabled snmp items from buffer */
 	for (i = 0; i < config->snmpitems_num; i++)
 		if (FAIL == uint64_array_exists(ids, ids_num, config->snmpitems[i].itemid))
+		{
+			snmpitem = &config->snmpitems[i];
+
+			zbx_strpool_release(snmpitem->snmp_community);
+			zbx_strpool_release(snmpitem->snmp_oid);
+			zbx_strpool_release(snmpitem->snmpv3_securityname);
+			zbx_strpool_release(snmpitem->snmpv3_authpassphrase);
+			zbx_strpool_release(snmpitem->snmpv3_privpassphrase);
+
 			DCremove_element(config->snmpitems, &config->snmpitems_num, sizeof(ZBX_DC_SNMPITEM), i--);
+		}
 
 	/* remove deleted or disabled ipmi items from buffer */
 	for (i = 0; i < config->ipmiitems_num; i++)
 		if (FAIL == uint64_array_exists(ids, ids_num, config->ipmiitems[i].itemid))
+		{
+			zbx_strpool_release(config->ipmiitems[i].ipmi_sensor);
 			DCremove_element(config->ipmiitems, &config->ipmiitems_num, sizeof(ZBX_DC_IPMIITEM), i--);
+		}
 
 	/* remove deleted or disabled flexible items from buffer */
 	for (i = 0; i < config->flexitems_num; i++)
 		if (FAIL == uint64_array_exists(ids, ids_num, config->flexitems[i].itemid))
+		{
+			zbx_strpool_release(config->flexitems[i].delay_flex);
 			DCremove_element(config->flexitems, &config->flexitems_num, sizeof(ZBX_DC_FLEXITEM), i--);
+		}
 
 	/* remove deleted or disabled trapper items from buffer */
 	for (i = 0; i < config->trapitems_num; i++)
 		if (FAIL == uint64_array_exists(ids, ids_num, config->trapitems[i].itemid))
+		{
+			zbx_strpool_release(config->trapitems[i].trapper_hosts);
 			DCremove_element(config->trapitems, &config->trapitems_num, sizeof(ZBX_DC_TRAPITEM), i--);
+		}
 
 	/* remove deleted or disabled log items from buffer */
 	for (i = 0; i < config->logitems_num; i++)
 		if (FAIL == uint64_array_exists(ids, ids_num, config->logitems[i].itemid))
+		{
+			zbx_strpool_release(config->logitems[i].logtimefmt);
 			DCremove_element(config->logitems, &config->logitems_num, sizeof(ZBX_DC_LOGITEM), i--);
+		}
 
 	/* remove deleted or disabled db items from buffer */
 	for (i = 0; i < config->dbitems_num; i++)
 		if (FAIL == uint64_array_exists(ids, ids_num, config->dbitems[i].itemid))
+		{
+			zbx_strpool_release(config->dbitems[i].params);
 			DCremove_element(config->dbitems, &config->dbitems_num, sizeof(ZBX_DC_DBITEM), i--);
+		}
 
 	/* remove deleted or disabled SSH items from buffer */
 	for (i = 0; i < config->sshitems_num; i++)
 		if (FAIL == uint64_array_exists(ids, ids_num, config->sshitems[i].itemid))
+		{
+			sshitem = &config->sshitems[i];
+
+			zbx_strpool_release(sshitem->username);
+			zbx_strpool_release(sshitem->password);
+			zbx_strpool_release(sshitem->publickey);
+			zbx_strpool_release(sshitem->privatekey);
+			zbx_strpool_release(sshitem->params);
+
 			DCremove_element(config->sshitems, &config->sshitems_num, sizeof(ZBX_DC_SSHITEM), i--);
+		}
 
 	/* remove deleted or disabled TELNET items from buffer */
 	for (i = 0; i < config->telnetitems_num; i++)
 		if (FAIL == uint64_array_exists(ids, ids_num, config->telnetitems[i].itemid))
+		{
+			telnetitem = &config->telnetitems[i];
+
+			zbx_strpool_release(telnetitem->username);
+			zbx_strpool_release(telnetitem->password);
+			zbx_strpool_release(telnetitem->params);
+
 			DCremove_element(config->telnetitems, &config->telnetitems_num, sizeof(ZBX_DC_TELNETITEM), i--);
+		}
 
 	/* remove deleted or disabled CALCULATED items from buffer */
 	for (i = 0; i < config->calcitems_num; i++)
 		if (FAIL == uint64_array_exists(ids, ids_num, config->calcitems[i].itemid))
+		{
+			zbx_strpool_release(config->calcitems[i].params);
 			DCremove_element(config->calcitems, &config->calcitems_num, sizeof(ZBX_DC_CALCITEM), i--);
+		}
 
 	UNLOCK_CACHE;
 
@@ -1633,7 +1745,7 @@ static void	DCsync_hosts()
 	ZBX_DC_HOST	*host;
 	ZBX_DC_IPMIHOST	*ipmihost;
 	zbx_uint64_t	hostid;
-	int		i, new;
+	int		i, found;
 	zbx_uint64_t	*ids = NULL;
 	int		ids_allocated, ids_num = 0;
 
@@ -1656,6 +1768,7 @@ static void	DCsync_hosts()
 			DBnode_local("hostid"));
 
 	LOCK_CACHE;
+
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(hostid, row[0]);
@@ -1663,21 +1776,25 @@ static void	DCsync_hosts()
 		/* array of selected hosts */
 		uint64_array_add(&ids, &ids_allocated, &ids_num, hostid, HOST_ALLOC_STEP);
 
-		new = 0;
 		i = get_nearestindex(config->hosts, sizeof(ZBX_DC_HOST), config->hosts_num, hostid);
-		if (i == config->hosts_num || config->hosts[i].hostid != hostid)
+		found = (i < config->hosts_num && config->hosts[i].hostid == hostid);
+
+		if (found)
 		{
-			DCallocate_host(i);
-			new = 1;
+			zbx_strpool_release(config->hosts[i].host);
+			zbx_strpool_release(config->hosts[i].ip);
+			zbx_strpool_release(config->hosts[i].dns);
 		}
+		else
+			DCallocate_host(i);
 
 		host = &config->hosts[i];
 		host->hostid = hostid;
 		ZBX_STR2UINT64(host->proxy_hostid, row[1]);
-		zbx_strlcpy(host->host, row[2], sizeof(host->host));
+		host->host = zbx_strpool_intern(row[2]);
 		host->useip = (unsigned char)atoi(row[3]);
-		zbx_strlcpy(host->ip, row[4], sizeof(host->ip));
-		zbx_strlcpy(host->dns, row[5], sizeof(host->dns));
+		host->ip = zbx_strpool_intern(row[4]);
+		host->dns = zbx_strpool_intern(row[5]);
 		host->port = (unsigned short)atoi(row[6]);
 		host->maintenance_status = (unsigned char)atoi(row[14]);
 		host->maintenance_type = (unsigned char)atoi(row[15]);
@@ -1692,7 +1809,7 @@ static void	DCsync_hosts()
 		host->ipmi_available = (unsigned char)atoi(row[24]);
 		host->ipmi_disable_until = atoi(row[25]);
 
-		if (new)
+		if (!found)
 		{
 			host->nextcheck = DCget_unreachable_nextcheck(host->disable_until,
 					host->snmp_disable_until, host->ipmi_disable_until);
@@ -1704,34 +1821,51 @@ static void	DCsync_hosts()
 
 		i = get_nearestindex(config->ipmihosts, sizeof(ZBX_DC_IPMIHOST),
 				config->ipmihosts_num, hostid);
+		found = (i < config->ipmihosts_num && config->ipmihosts[i].hostid == hostid);
+
+		if (found)
+		{
+			ipmihost = &config->ipmihosts[i];
+
+			zbx_strpool_release(ipmihost->ipmi_ip);
+			zbx_strpool_release(ipmihost->ipmi_username);
+			zbx_strpool_release(ipmihost->ipmi_password);
+		}
 
 		if (1 == atoi(row[7]))	/* useipmi */
 		{
-			if (i == config->ipmihosts_num || config->ipmihosts[i].hostid != hostid)
+			if (!found)
 				DCallocate_ipmihost(i);
 
 			ipmihost = &config->ipmihosts[i];
 
 			ipmihost->hostid = hostid;
-			zbx_strlcpy(ipmihost->ipmi_ip, row[8], sizeof(ipmihost->ipmi_ip));
+			ipmihost->ipmi_ip = zbx_strpool_intern(row[8]);
 			ipmihost->ipmi_port = (unsigned short)atoi(row[9]);
 			ipmihost->ipmi_authtype = (signed char)atoi(row[10]);
 			ipmihost->ipmi_privilege = (unsigned char)atoi(row[11]);
-			zbx_strlcpy(ipmihost->ipmi_username, row[12], sizeof(ipmihost->ipmi_username));
-			zbx_strlcpy(ipmihost->ipmi_password, row[13], sizeof(ipmihost->ipmi_password));
+			ipmihost->ipmi_username = zbx_strpool_intern(row[12]);
+			ipmihost->ipmi_password = zbx_strpool_intern(row[13]);
 		}
-		else
+		else if (found)
 		{
 			/* remove ipmi connection parameters for hosts without ipmi */
-			if (i < config->ipmihosts_num && config->ipmihosts[i].hostid == hostid)
-				DCremove_element(config->ipmihosts, &config->ipmihosts_num, sizeof(ZBX_DC_IPMIHOST), i);
+			DCremove_element(config->ipmihosts, &config->ipmihosts_num, sizeof(ZBX_DC_IPMIHOST), i);
 		}
 	}
 
 	/* remove deleted or disabled hosts from buffer */
 	for (i = 0; i < config->hosts_num; i++)
 		if (FAIL == uint64_array_exists(ids, ids_num, config->hosts[i].hostid))
+		{
+			host = &config->hosts[i];
+
+			zbx_strpool_release(host->host);
+			zbx_strpool_release(host->ip);
+			zbx_strpool_release(host->dns);
+
 			DCremove_element(config->hosts, &config->hosts_num, sizeof(ZBX_DC_HOST), i--);
+		}
 
 	/* create indexes */
 	config->idxhost01_num = 0;
@@ -1746,7 +1880,15 @@ static void	DCsync_hosts()
 	/* remove ipmi connection parameters for deleted or disabled hosts from buffer */
 	for (i = 0; i < config->ipmihosts_num; i++)
 		if (FAIL == uint64_array_exists(ids, ids_num, config->ipmihosts[i].hostid))
+		{
+			ipmihost = &config->ipmihosts[i];
+
+			zbx_strpool_release(ipmihost->ipmi_ip);
+			zbx_strpool_release(ipmihost->ipmi_username);
+			zbx_strpool_release(ipmihost->ipmi_password);
+
 			DCremove_element(config->ipmihosts, &config->ipmihosts_num, sizeof(ZBX_DC_IPMIHOST), i--);
+		}
 
 	UNLOCK_CACHE;
 
@@ -1817,7 +1959,7 @@ void	DCsync_configuration()
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() idxhost02  : %d / %d", __function_name,
 			config->idxhost02_num, config->idxhost02_alloc);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() time:" ZBX_FS_DBL "sec. pfree:" ZBX_FS_DBL "%%",
-			__function_name, sec, 100 * ((double)config->free_mem / CONFIG_DBCONFIG_SIZE));
+			__function_name, sec, 100 * ((double)config->free_mem / config_size));
 }
 
 /******************************************************************************
@@ -1837,15 +1979,21 @@ void	DCsync_configuration()
  ******************************************************************************/
 void	init_configuration_cache()
 {
+	const char	*__function_name = "init_configuration_cache";
+
 	key_t	shm_key;
 	size_t	sz;
+	size_t	strpool_size;
 	void	*ptr;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In init_configuration_cache() size:%d", CONFIG_DBCONFIG_SIZE);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() size:%d", __function_name, CONFIG_DBCONFIG_SIZE);
+
+	strpool_size = (size_t)(CONFIG_DBCONFIG_SIZE * 0.25);
+	config_size = CONFIG_DBCONFIG_SIZE - strpool_size;
 
 	sz = sizeof(ZBX_DC_CONFIG);
 
-	if (CONFIG_DBCONFIG_SIZE < sz)
+	if (config_size < sz)
 	{
 		zbx_error("Configuration buffer is too small. Please increase CacheSize parameter.");
 		exit(FAIL);
@@ -1857,13 +2005,13 @@ void	init_configuration_cache()
 		exit(FAIL);
 	}
 
-	if (-1 == (shm_id = zbx_shmget(shm_key, (size_t)CONFIG_DBCONFIG_SIZE)))
+	if (-1 == (shm_id = zbx_shmget(shm_key, config_size)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Can't allocate shared memory for configuration cache");
 		exit(FAIL);
 	}
 
-	ptr = shmat(shm_id, 0, 0);
+	ptr = shmat(shm_id, NULL, 0);
 
 	if ((void*)(-1) == ptr)
 	{
@@ -1880,7 +2028,7 @@ void	init_configuration_cache()
 
 	config = ptr;
 	memset(config, 0, sz);
-	config->free_mem = CONFIG_DBCONFIG_SIZE - sz;
+	config->free_mem = config_size - sz;
 
 	config->items = ptr + sz;
 	config->snmpitems = ptr + sz;
@@ -1898,6 +2046,10 @@ void	init_configuration_cache()
 	config->ipmihosts = ptr + sz;
 	config->idxhost01 = ptr + sz;	/* proxy_hostid,host */
 	config->idxhost02 = ptr + sz;	/* poller_type,poller_num,nextcheck */
+
+	zbx_strpool_create(strpool_size);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -1932,6 +2084,8 @@ void	free_configuration_cache()
 
 	config = NULL;
 
+	zbx_strpool_destroy();
+
 	UNLOCK_CACHE;
 
 	zbx_mutex_destroy(&config_lock);
@@ -1946,10 +2100,10 @@ static void	DCget_host(DC_HOST *dst_host, ZBX_DC_HOST *src_host)
 
 	dst_host->hostid = src_host->hostid;
 	dst_host->proxy_hostid = src_host->proxy_hostid;
-	memcpy(dst_host->host, src_host->host, HOST_HOST_LEN_MAX);
+	strscpy(dst_host->host, src_host->host);
 	dst_host->useip = src_host->useip;
-	memcpy(dst_host->ip, src_host->ip, HOST_IP_LEN_MAX);
-	memcpy(dst_host->dns, src_host->dns, HOST_DNS_LEN_MAX);
+	strscpy(dst_host->ip, src_host->ip);
+	strscpy(dst_host->dns, src_host->dns);
 	dst_host->port = src_host->port;
 	dst_host->maintenance_status = src_host->maintenance_status;
 	dst_host->maintenance_type = src_host->maintenance_type;
@@ -1969,13 +2123,13 @@ static void	DCget_host(DC_HOST *dst_host, ZBX_DC_HOST *src_host)
 	if (index < config->ipmihosts_num && config->ipmihosts[index].hostid == src_host->hostid)
 	{
 		ipmihost = &config->ipmihosts[index];
-		memcpy(dst_host->ipmi_ip_orig, ipmihost->ipmi_ip, sizeof(dst_host->ipmi_ip_orig));
+		strscpy(dst_host->ipmi_ip_orig, ipmihost->ipmi_ip);
 		dst_host->ipmi_ip = NULL;
 		dst_host->ipmi_port = ipmihost->ipmi_port;
 		dst_host->ipmi_authtype = ipmihost->ipmi_authtype;
 		dst_host->ipmi_privilege = ipmihost->ipmi_privilege;
-		memcpy(dst_host->ipmi_username, ipmihost->ipmi_username, HOST_IPMI_USERNAME_LEN_MAX);
-		memcpy(dst_host->ipmi_password, ipmihost->ipmi_password, HOST_IPMI_PASSWORD_LEN_MAX);
+		strscpy(dst_host->ipmi_username, ipmihost->ipmi_username);
+		strscpy(dst_host->ipmi_password, ipmihost->ipmi_password);
 	}
 }
 
@@ -2130,7 +2284,7 @@ static void	DCget_item(DC_ITEM *dst_item, ZBX_DC_ITEM *src_item)
 	dst_item->type = src_item->type;
 	dst_item->data_type = src_item->data_type;
 	dst_item->value_type = src_item->value_type;
-	memcpy(dst_item->key_orig, src_item->key, ITEM_KEY_LEN_MAX);
+	strscpy(dst_item->key_orig, src_item->key);
 	dst_item->key = NULL;
 	dst_item->delay = src_item->delay;
 	dst_item->nextcheck = src_item->nextcheck;
@@ -2146,7 +2300,7 @@ static void	DCget_item(DC_ITEM *dst_item, ZBX_DC_ITEM *src_item)
 		if (index < config->logitems_num && config->logitems[index].itemid == src_item->itemid)
 		{
 			logitem = &config->logitems[index];
-			memcpy(dst_item->logtimefmt, logitem->logtimefmt, ITEM_LOGTIMEFMT_LEN_MAX);
+			strscpy(dst_item->logtimefmt, logitem->logtimefmt);
 		}
 	}
 
@@ -2159,16 +2313,13 @@ static void	DCget_item(DC_ITEM *dst_item, ZBX_DC_ITEM *src_item)
 		if (index < config->snmpitems_num && config->snmpitems[index].itemid == src_item->itemid)
 		{
 			snmpitem = &config->snmpitems[index];
-			memcpy(dst_item->snmp_community, snmpitem->snmp_community, ITEM_SNMP_COMMUNITY_LEN_MAX);
-			memcpy(dst_item->snmp_oid, snmpitem->snmp_oid, ITEM_SNMP_OID_LEN_MAX);
+			strscpy(dst_item->snmp_community, snmpitem->snmp_community);
+			strscpy(dst_item->snmp_oid, snmpitem->snmp_oid);
 			dst_item->snmp_port = snmpitem->snmp_port;
-			memcpy(dst_item->snmpv3_securityname, snmpitem->snmpv3_securityname,
-					ITEM_SNMPV3_SECURITYNAME_LEN_MAX);
+			strscpy(dst_item->snmpv3_securityname, snmpitem->snmpv3_securityname);
 			dst_item->snmpv3_securitylevel = snmpitem->snmpv3_securitylevel;
-			memcpy(dst_item->snmpv3_authpassphrase, snmpitem->snmpv3_authpassphrase,
-					ITEM_SNMPV3_AUTHPASSPHRASE_LEN_MAX);
-			memcpy(dst_item->snmpv3_privpassphrase, snmpitem->snmpv3_privpassphrase,
-					ITEM_SNMPV3_PRIVPASSPHRASE_LEN_MAX);
+			strscpy(dst_item->snmpv3_authpassphrase, snmpitem->snmpv3_authpassphrase);
+			strscpy(dst_item->snmpv3_privpassphrase, snmpitem->snmpv3_privpassphrase);
 		}
 		break;
 	case ITEM_TYPE_TRAPPER:
@@ -2177,7 +2328,7 @@ static void	DCget_item(DC_ITEM *dst_item, ZBX_DC_ITEM *src_item)
 		if (index < config->trapitems_num && config->trapitems[index].itemid == src_item->itemid)
 		{
 			trapitem = &config->trapitems[index];
-			memcpy(dst_item->trapper_hosts, trapitem->trapper_hosts, ITEM_TRAPPER_HOSTS_LEN_MAX);
+			strscpy(dst_item->trapper_hosts, trapitem->trapper_hosts);
 		}
 		break;
 	case ITEM_TYPE_IPMI:
@@ -2186,7 +2337,7 @@ static void	DCget_item(DC_ITEM *dst_item, ZBX_DC_ITEM *src_item)
 		if (index < config->ipmiitems_num && config->ipmiitems[index].itemid == src_item->itemid)
 		{
 			ipmiitem = &config->ipmiitems[index];
-			zbx_strlcpy(dst_item->ipmi_sensor, ipmiitem->ipmi_sensor, ITEM_IPMI_SENSOR_LEN_MAX);
+			strscpy(dst_item->ipmi_sensor, ipmiitem->ipmi_sensor);
 		}
 		break;
 	case ITEM_TYPE_DB_MONITOR:
@@ -2195,7 +2346,7 @@ static void	DCget_item(DC_ITEM *dst_item, ZBX_DC_ITEM *src_item)
 		if (index < config->dbitems_num && config->dbitems[index].itemid == src_item->itemid)
 		{
 			dbitem = &config->dbitems[index];
-			zbx_strlcpy(dst_item->params_orig, dbitem->params, sizeof(dst_item->params_orig));
+			strscpy(dst_item->params_orig, dbitem->params);
 			dst_item->params = NULL;
 		}
 		break;
@@ -2206,11 +2357,11 @@ static void	DCget_item(DC_ITEM *dst_item, ZBX_DC_ITEM *src_item)
 		{
 			sshitem = &config->sshitems[index];
 			dst_item->authtype = sshitem->authtype;
-			memcpy(dst_item->username_orig, sshitem->username, sizeof(dst_item->username_orig));
-			memcpy(dst_item->publickey_orig, sshitem->publickey, sizeof(dst_item->publickey_orig));
-			memcpy(dst_item->privatekey_orig, sshitem->privatekey, sizeof(dst_item->privatekey_orig));
-			memcpy(dst_item->password_orig, sshitem->password, sizeof(dst_item->password_orig));
-			memcpy(dst_item->params_orig, sshitem->params, sizeof(dst_item->params_orig));
+			strscpy(dst_item->username_orig, sshitem->username);
+			strscpy(dst_item->publickey_orig, sshitem->publickey);
+			strscpy(dst_item->privatekey_orig, sshitem->privatekey);
+			strscpy(dst_item->password_orig, sshitem->password);
+			strscpy(dst_item->params_orig, sshitem->params);
 			dst_item->username = NULL;
 			dst_item->publickey = NULL;
 			dst_item->privatekey = NULL;
@@ -2224,9 +2375,9 @@ static void	DCget_item(DC_ITEM *dst_item, ZBX_DC_ITEM *src_item)
 		if (index < config->telnetitems_num && config->telnetitems[index].itemid == src_item->itemid)
 		{
 			telnetitem = &config->telnetitems[index];
-			memcpy(dst_item->username_orig, telnetitem->username, sizeof(dst_item->username_orig));
-			memcpy(dst_item->password_orig, telnetitem->password, sizeof(dst_item->password_orig));
-			memcpy(dst_item->params_orig, telnetitem->params, sizeof(dst_item->params_orig));
+			strscpy(dst_item->username_orig, telnetitem->username);
+			strscpy(dst_item->password_orig, telnetitem->password);
+			strscpy(dst_item->params_orig, telnetitem->params);
 			dst_item->username = NULL;
 			dst_item->password = NULL;
 			dst_item->params = NULL;
@@ -2238,7 +2389,7 @@ static void	DCget_item(DC_ITEM *dst_item, ZBX_DC_ITEM *src_item)
 		if (index < config->calcitems_num && config->calcitems[index].itemid == src_item->itemid)
 		{
 			calcitem = &config->calcitems[index];
-			memcpy(dst_item->params_orig, calcitem->params, sizeof(dst_item->params_orig));
+			strscpy(dst_item->params_orig, calcitem->params);
 			dst_item->params = NULL;
 		}
 		break;
@@ -2247,7 +2398,7 @@ static void	DCget_item(DC_ITEM *dst_item, ZBX_DC_ITEM *src_item)
 	}
 
 	if (NULL != (dc_flexitem = DCget_dc_flexitem(src_item->itemid)))
-		zbx_strlcpy(dst_item->delay_flex, dc_flexitem->delay_flex, ITEM_DELAY_FLEX_LEN_MAX);
+		strscpy(dst_item->delay_flex, dc_flexitem->delay_flex);
 }
 
 /******************************************************************************
@@ -3093,16 +3244,16 @@ void	*DCconfig_get_stats(int request)
 	switch (request)
 	{
 	case ZBX_CONFSTATS_BUFFER_TOTAL:
-		value_uint = CONFIG_DBCONFIG_SIZE;
+		value_uint = config_size;
 		return &value_uint;
 	case ZBX_CONFSTATS_BUFFER_USED:
-		value_uint = CONFIG_DBCONFIG_SIZE - config->free_mem;
+		value_uint = config_size - config->free_mem;
 		return &value_uint;
 	case ZBX_CONFSTATS_BUFFER_FREE:
 		value_uint = config->free_mem;
 		return &value_uint;
 	case ZBX_CONFSTATS_BUFFER_PFREE:
-		value_double = 100.0 * ((double)config->free_mem / CONFIG_DBCONFIG_SIZE);
+		value_double = 100.0 * ((double)config->free_mem / config_size);
 		return &value_double;
 	default:
 		return NULL;

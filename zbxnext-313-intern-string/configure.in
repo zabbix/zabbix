@@ -1193,7 +1193,7 @@ openbsd*)
 dnl	AC_MSG_ERROR(${host_os} not supported)
 ;;
 esac
-	AC_DEFINE_UNQUOTED([ARCH], "${ARCH}", [Define to os name for code managing])
+	AC_DEFINE_UNQUOTED([ARCH], "${ARCH}", [Define to OS name for code managing])
 
 AC_SUBST(ARCH)
 
@@ -1204,6 +1204,8 @@ AC_OUTPUT([
 	src/Makefile
 	src/libs/Makefile
 	src/libs/zbxlog/Makefile
+	src/libs/zbxalgo/Makefile
+	src/libs/zbxmemory/Makefile
 	src/libs/zbxcrypto/Makefile
 	src/libs/zbxconf/Makefile
 	src/libs/zbxdbcache/Makefile

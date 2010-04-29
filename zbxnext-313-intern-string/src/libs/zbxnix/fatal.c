@@ -31,6 +31,8 @@
 #include "common.h"
 #include "log.h"
 
+#include "fatal.h"
+
 const char	*get_signal_name(int sig)
 {
 	/* either strsignal() or sys_siglist[] could be used to */
