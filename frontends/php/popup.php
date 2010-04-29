@@ -733,7 +733,7 @@ include_once('include/page_header.php');
 			if(count($trigger['dependencies']) > 0){
 				$description = array(
 					$description,
-					BR(),BR(),
+					BR(),
 					bold(S_DEPENDS_ON),
 					BR());
 
