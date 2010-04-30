@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2263] fixed permission checks in bar reports (Aly)
  - [ZBX-2270] fixed item filtering (Aly)
  - [ZBX-2401] fixed host name in dynamic graphs in screens (Aly)
  - [ZBXNEXT-325] added StartDBSyncers parameter for parallel writing to DB (Sasha)
