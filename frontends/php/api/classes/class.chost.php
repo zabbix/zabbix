@@ -466,13 +466,11 @@ class CHost extends CZBXAPI{
 
 			if(isset($options['filter']['host']) && !is_null($options['filter']['host'])){
 				zbx_value2array($options['filter']['host']);
-
 				$sql_parts['where']['host'] = DBcondition('h.host', $options['filter']['host'], false, true);
 			}
 
 			if(isset($options['filter']['ip']) && !is_null($options['filter']['ip'])){
 				zbx_value2array($options['filter']['ip']);
-
 				$sql_parts['where']['ip'] = DBcondition('h.ip', $options['filter']['ip'], false, true);
 			}
 
