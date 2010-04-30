@@ -6,6 +6,7 @@ Changes for 1.9
 
 Changes for 1.8.3
 
+ - [ZBX-2401] fixed host name in dynamic graphs in screens (Aly)
  - [ZBXNEXT-325] added StartDBSyncers parameter for parallel writing to DB (Sasha)
  - [ZBX-1906] fixed possibility to add identical checks for discovery (Vedmak)
  - [ZBX-2384] fixed status of triggers elements in screens (Aly)
