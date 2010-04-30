@@ -822,7 +822,7 @@ include_once('include/page_header.php');
 			'limit' => ($config['search_limit']+1)
 		);
 
-		$preFilter = count($options);
+		$preFilter = count($options, COUNT_RECURSIVE);
 
 		if($hostid > 0)
 			$options['hostids'] = $hostid;
@@ -877,7 +877,7 @@ include_once('include/page_header.php');
 		if(isset($_REQUEST['filter_with_triggers']) && !zbx_empty($_REQUEST['filter_with_triggers']) && $_REQUEST['filter_with_triggers'] != -1)
 			$options['with_triggers'] = $_REQUEST['filter_with_triggers'];
 
-		$afterFilter = count($options);
+		$afterFilter = count($options, COUNT_RECURSIVE);
 //} Items Filter
 
 		if($preFilter == $afterFilter)
@@ -1195,6 +1195,9 @@ include_once('include/page_header.php');
 	$jsmenu = new CPUMenu(null,200);
 	$jsmenu->InsertJavaScript();
 
+?>
+<?php
 
 include_once('include/page_footer.php');
+
 ?>
