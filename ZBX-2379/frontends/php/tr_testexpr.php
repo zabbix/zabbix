@@ -38,10 +38,7 @@ include_once('include/page_header.php');
 // expression analyze
 	$expression = urldecode(get_request('expression', ''));
 
-	list($outline, $node, $map) = analyze_expression($expression);
-
-	$tree = array();
-	create_node_list($node, $tree);
+	list($outline, $eHTMLTree) = analyze_expression($expression);
 
 // test data (create table, create check fields)
 
@@ -54,7 +51,9 @@ include_once('include/page_header.php');
 
 	$datas = array();
 	$fields = array();
-	foreach ($map as $key => $val){
+	
+	foreach ($eHTMLTree as $key => $val){
+		SDII($val);
 		$expr = $val['expression'];
 		if(isset($datas[$expr])) continue;
 
