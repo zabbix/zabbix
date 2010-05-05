@@ -1751,26 +1751,28 @@ class CChart extends CGraphDraw{
 				$shift_to	= $shift_min_to;
 				break;
 			case CALC_FNC_ALL:
+// MAX
+				$y1x = (($y1max > ($this->sizeY+$this->shiftY)) || ($y1max < $this->shiftY));
+				$y2x = (($y2max > ($this->sizeY+$this->shiftY)) || ($y2max < $this->shiftY));
+
+				if($y1x) $y1max = ($y1max > ($this->sizeY+$this->shiftY))?($this->sizeY+$this->shiftY):$this->shiftY;
+				if($y2x) $y2max = ($y2max > ($this->sizeY+$this->shiftY))?($this->sizeY+$this->shiftY):$this->shiftY;
+//--
+// MIN
+				$y1n = (($y1min > ($this->sizeY+$this->shiftY)) || ($y1min < $this->shiftY));
+				$y2n = (($y2min > ($this->sizeY+$this->shiftY)) || ($y2min < $this->shiftY));
+
+				if($y1n) $y1min = ($y1min > ($this->sizeY+$this->shiftY))?($this->sizeY+$this->shiftY):$this->shiftY;
+				if($y2n) $y2min = ($y2min > ($this->sizeY+$this->shiftY))?($this->sizeY+$this->shiftY):$this->shiftY;
+//--
 				$a[0] = $x1;		$a[1] = $y1max;
 				$a[2] = $x1;		$a[3] = $y1min;
 				$a[4] = $x2;		$a[5] = $y2min;
 				$a[6] = $x2;		$a[7] = $y2max;
 //SDI('2: '.$x2.' - '.$x1.' : '.$y2min.' - '.$y1min);
-				if($drawtype == GRAPH_ITEM_DRAWTYPE_BOLD_DOT){
-					imagefilledrectangle($this->im,$x1,$y1max-1,$x1+1,$y1max,$max_color);
-					imagefilledrectangle($this->im,$x1,$y1min-1,$x1+1,$y1min,$min_color);
-				}
-				else{
-					imagefilledpolygon($this->im,$a,4,$minmax_color);
-					imageline($this->im,$x1,$y1max,$x2,$y2max,$max_color);
-					imageline($this->im,$x1,$y1min,$x2,$y2min,$min_color);
-				}
-
-				/* don't use break, avg must be drawed in this statement */
-				// break;
+// don't use break, avg must be drawed in this statement
 			case CALC_FNC_AVG:
-				/* don't use break, avg must be drawed in this statement */
-				// break;
+// don't use break, avg must be drawed in this statement
 			default:
 				$y1 = $y1avg;
 				$y2 = $y2avg;
@@ -1813,10 +1815,30 @@ class CChart extends CGraphDraw{
 // draw main line
 		switch($drawtype){
 			case GRAPH_ITEM_DRAWTYPE_BOLD_LINE:
+				if($calc_fnc == CALC_FNC_ALL){
+					imagefilledpolygon($this->im,$a,4,$minmax_color);
+					if(!$y1x || !$y2x){
+						imageline($this->im,$x1+1,$y1max,$x2+1,$y2max,$max_color);
+						imageline($this->im,$x1,$y1max,$x2,$y2max,$max_color);
+					}
+
+					if(!$y1n || !$y2n){
+						imageline($this->im,$x1-1,$y1min,$x2-1,$y2min,$min_color);
+						imageline($this->im,$x1,$y1min,$x2,$y2min,$min_color);
+					}
+				}
+
 				imageline($this->im,$x1,$y1+1,$x2,$y2+1,$avg_color);
-				// break; /* don't use break, must be drawed line also */
+				imageline($this->im,$x1,$y1,$x2,$y2,$avg_color);
+				break;
 			case GRAPH_ITEM_DRAWTYPE_LINE:
 //SDI(array($this->im,$x1,$y1,$x2,$y2,$avg_color));
+				if($calc_fnc == CALC_FNC_ALL){
+					imagefilledpolygon($this->im,$a,4,$minmax_color);
+					if(!$y1x || !$y2x) imageline($this->im,$x1,$y1max,$x2,$y2max,$max_color);
+					if(!$y1n || !$y2n) imageline($this->im,$x1,$y1min,$x2,$y2min,$min_color);
+				}
+
 				imageline($this->im,$x1,$y1,$x2,$y2,$avg_color);
 				break;
 			case GRAPH_ITEM_DRAWTYPE_FILLED_REGION:

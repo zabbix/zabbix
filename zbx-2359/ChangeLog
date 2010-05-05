@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2359] fixed graph lines for fixed Y axis with items draw functions "All" (Aly)
  - [ZBX-2263] fixed permission checks in bar reports (Aly)
  - [ZBX-2270] fixed item filtering (Aly)
  - [ZBX-2401] fixed host name in dynamic graphs in screens (Aly)
