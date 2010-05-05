@@ -232,6 +232,12 @@ table.tablestripped tr.form_even_row td{
 	background-color:#DFDFDF;
 }
 
+table.tablestripped tr.header td{
+	color: #FFFFFF;
+	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
+	text-align: left;
+}
+
 table.tablestripped tr.footer td{
 	color: #FFFFFF;
 	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;

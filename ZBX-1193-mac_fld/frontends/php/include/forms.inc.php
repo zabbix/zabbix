@@ -6050,6 +6050,8 @@
 
 
 // MACROS WIDGET {
+		// $macros_wdgt = new CWidget();
+		// $macros_wdgt->addItem(get_macros_widget($_REQUEST['hostid']));
 		$macros_wdgt = get_macros_widget($_REQUEST['hostid']);
 // } MACROS WIDGET
 
@@ -6857,7 +6859,6 @@
 		return $tbl_header_host;
 	}
 
-
 	function get_macros_widget($hostid = null){
 
 		if(isset($_REQUEST['form_refresh'])){
@@ -6866,51 +6867,93 @@
 		else if($hostid > 0){
 			$macros = CUserMacro::get(array('extendoutput' => 1, 'hostids' => $hostid));
 		}
+		else if($hostid === null){
+			$macros = CUserMacro::get(array('extendoutput' => 1, 'globalmacro' => 1));
+		}
 		else{
 			$macros = array();
 		}
 		order_result($macros, 'macro');
 
-		$macros_tbl = new CTable('', 'tablestripped');
+		$macros_tbl = new CTable(SPACE, 'tablestripped');
+		$macros_tbl->setHeader(S_MACROS);
+		$macros_tbl->setAttribute('align', 'center');
+		// $macros_tbl->addStyle('margin: 0 auto;');
+		$macros_tbl->addStyle('width: 50%;');
+		$macros_tbl->setAttribute('id', 'tbl_macros');
 		$macros_tbl->setOddRowClass('form_odd_row');
 		$macros_tbl->setEvenRowClass('form_even_row');
 
+		insert_js('
+			function addMacroRow(){
+				if(typeof(addMacroRow.macro_count) == "undefined"){
+					addMacroRow.macro_count = '.count($macros).'+1;
+				}
+
+				var tr = document.createElement("tr");
+				tr.className = (addMacroRow.macro_count % 2) ? "form_even_row" : "form_odd_row";
+			
+				var td = document.createElement("td");
+				tr.appendChild(td);
+			
+				var cb = document.createElement("input");
+				cb.setAttribute("type", "checkbox");
+				cb.className = "checkbox";
+				td.appendChild(cb);
+				td.appendChild(document.createTextNode(" "));
+
+				var text1 = document.createElement("input");
+				text1.setAttribute("type", "text");
+				text1.setAttribute("name","macros["+addMacroRow.macro_count+"][macro]");
+				text1.className = "biginput";
+				text1.setAttribute("size",40);
+				td.appendChild(text1);
+				td.appendChild(document.createTextNode(" "));
+				
+				var span = document.createElement("span");
+				span.innerHTML = "&rArr;";
+				td.appendChild(span);
+				
+				var text2 = document.createElement("input");
+				text2.setAttribute("type", "text");
+				text2.setAttribute("name","macros["+addMacroRow.macro_count+"][value]");
+				text2.className = "biginput";
+				text2.setAttribute("size",40);
+				td.appendChild(text2);
+			
+				var sd = $("row_new_macro").insert({before : tr});
+				addMacroRow.macro_count++;
+			}
+		');
+
 		foreach($macros as $macroid => $macro){
-			$macros_tbl->addItem(new CVar('macros['.$macro['macro'].'][macro]', $macro['macro']));
-			$macros_tbl->addItem(new CVar('macros['.$macro['macro'].'][value]', $macro['value']));
-			$macros_tbl->addRow(array(
-				new CCheckBox('macros_rem['.$macro['macro'].']', 'no', null, $macro['macro']),
-				$macro['macro'],
-				SPACE.RARR.SPACE,
-				$macro['value']
-			));
+			$macros_tbl->addRow(new CCol(array(
+				new CCheckBox(),
+				new CTextBox('macros['.$macroid.'][macro]', $macro['macro'], 40),
+				new CSpan(RARR),
+				new CTextBox('macros['.$macroid.'][value]', $macro['value'], 40),
+			)));
 		}
 
-		$add_macro = array(
-			S_NEW,
-			new CTextBox('macro_new', get_request('macro_new', ''), 20),
-			SPACE.RARR.SPACE,
-			new CTextBox('value_new', get_request('value_new', ''), 20)
-		);
-
-		$macros_tbl->addRow($add_macro);
-
-
-		$delete_btn = new CButton('macros_del', S_DELETE_SELECTED);
-		if(count($macros) == 0){
-			$delete_btn->setAttribute('disabled', 'disabled');
+		
+		$script = '$$("#tbl_macros input:checked").each(function(obj){ $(obj.parentNode.parentNode).remove(); });';
+		$delete_btn = new CButton('macros_del', S_DELETE_SELECTED, $script);
+		$delete_btn->setType('button');
+		
+		$add_button = new CButton('macro_add', S_ADD, 'javascript: addMacroRow()');
+		$add_button->setType('button');
+		
+		$buttonRow = new CRow();
+		$buttonRow->setAttribute('id', 'row_new_macro');
+		$buttonRow->addItem(new CCol(array($add_button, SPACE, $delete_btn)));
+		
+		$macros_tbl->addRow($buttonRow);
+		
+		if($hostid === null){
+			$macros_tbl->setFooter(new CButton('save', S_SAVE));
 		}
-
-		$footer = new CCol(array(new CButton('macro_add', S_ADD), SPACE, $delete_btn));
-		$footer->setColSpan(4);
-
-		$macros_tbl->setFooter($footer);
-
-		$macros_wdgt = new CWidget();
-		$macros_wdgt->setClass('header');
-		$macros_wdgt->addHeader(S_MACROS);
-		$macros_wdgt->addItem($macros_tbl);
-
-		return $macros_wdgt;
+		
+		return $macros_tbl;
 	}
+
 ?>
