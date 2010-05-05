@@ -3062,6 +3062,31 @@ return $result;
 	return $row;
 	}
 
+	function get_triggers_unacknowledged($db_element, $count_problems=null){
+		$elements = array('hosts' => array(), 'hosts_groups' => array(), 'triggers' => array());
+
+		get_map_elements($db_element, $elements);
+		if(empty($elements['hosts_groups']) && empty($elements['hosts']) && empty($elements['triggers'])){
+			return 0;
+		}
+
+		$config = select_config();
+		$options = array(
+			'nodeids' => get_current_nodeid(),
+			'monitored' => 1,
+			'countOutput' => 1,
+			'only_problems' => $count_problems,
+			'with_unacknowledged_events' => 1,
+			'limit' => ($config['search_limit']+1)
+		);
+		if(!empty($elements['hosts_groups'])) $options['groupids'] = array_unique($elements['hosts_groups']);
+		if(!empty($elements['hosts'])) $options['hostids'] = array_unique($elements['hosts']);
+		if(!empty($elements['triggers'])) $options['triggerids'] = array_unique($elements['triggers']);
+		$triggers = CTrigger::get($options);
+
+
+	return $triggers;
+	}
 
 // author: Aly
 	function make_trigger_details($triggerid,&$trigger_data){
