@@ -3321,8 +3321,9 @@ return $result;
 			
 			if(is_int($opPos) && $opPos < $sEnd) {
 				$letterLevel = false;
+				$expValue = trim(zbx_substr($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum']-$treeLevel['openSymbolNum']));
 				array_push($expr, SPACE, italic($operand == '&' ? S_AND_BIG : S_OR_BIG));
-				array_push($treeList, Array('list' => $expr, 'id' => $treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum']));
+				array_push($treeList, Array('list' => $expr, 'id' => $treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum'], 'expression' => Array('start' => $treeLevel['openSymbolNum'], 'end' => $treeLevel['closeSymbolNum'], 'oSym' => isset($treeLevel['openSymbol']) ? $treeLevel['openSymbol']: NULL, 'cSym' => isset($treeLevel['closeSymbol']) ? $treeLevel['closeSymbol'] : NULL, 'value' => $expValue)));
 				$prev = $sStart;
 				$levelOutline = '';
 				while (is_int($opPos) && $opPos < $sEnd || $prev < $sEnd) {
@@ -3362,13 +3363,14 @@ return $result;
 		if($letterLevel) {
 			if(!$nextletter) $nextletter = 'A';
 			array_push($expr, SPACE, bold($nextletter), SPACE);
-			$url =  new CSpan(trim(zbx_substr($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum']-$treeLevel['openSymbolNum'])), 'link');
+			$expValue = trim(zbx_substr($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum']-$treeLevel['openSymbolNum']));
+			$url =  new CSpan($expValue, 'link');
 			$url->setAttribute('id', 'expr_'.$treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum']);
 			$url->setAttribute('onclick', 'javascript: copy_expression("expr_'.$treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum'].'");');
 			$expr[] = $url;
 			$outline = (isset($treeLevel['openSymbol']) ? $treeLevel['openSymbol'] : '').' '.$nextletter.' '.(isset($treeLevel['closeSymbol']) ? $treeLevel['closeSymbol'] : '');
 			$nextletter = chr(ord($nextletter)+1);
-			array_push($treeList, Array('list' => $expr, 'id' => $treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum']));
+			array_push($treeList, Array('list' => $expr, 'id' => $treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum'], 'expression' => Array('start' => $treeLevel['openSymbolNum'], 'end' => $treeLevel['closeSymbolNum'], 'oSym' => isset($treeLevel['openSymbol']) ? $treeLevel['openSymbol']: NULL, 'cSym' => isset($treeLevel['closeSymbol']) ? $treeLevel['closeSymbol'] : NULL, 'value' => $expValue)));
 		}
 		
 		return Array($outline, $treeList);
@@ -3708,9 +3710,37 @@ return $result;
 				'type'			=> T_ZBX_INT,
 				'validation'	=> IN('0,1')
 				);
-		}
-		else{
+		}else{
 			$item_id = $function = null;
+			$expData = parseTriggerExpressions($expr, true);
+			if(!isset($expData[$expr]['errors'])) {
+				$hData =& $expData[$expr]['hosts'][0];
+				$kData =& $expData[$expr]['keys'][0];
+				$kpData =& $expData[$expr]['keysParams'][0];
+				$fData =& $expData[$expr]['keysFunctions'][0];
+				$host = zbx_substr($expr, $hData['openSymbolNum']+zbx_strlen($hData['openSymbol']), $hData['closeSymbolNum']-$hData['openSymbolNum']-zbx_strlen($hData['closeSymbol']));
+				$hostKey = zbx_substr($expr, $kData['openSymbolNum']+zbx_strlen($kData['openSymbol']), $kData['closeSymbolNum']-$kData['openSymbolNum']-zbx_strlen($kData['closeSymbol']));
+				$hostKeyParams = zbx_substr($expr, $kpData['openSymbolNum'], $kpData['closeSymbolNum']-$kpData['openSymbolNum']+zbx_strlen($kpData['closeSymbol']));
+				$function = zbx_substr($expr, $fData['openSymbolNum']+zbx_strlen($fData['openSymbol']), $fData['closeSymbolNum']-$fData['openSymbolNum']-zbx_strlen($fData['closeSymbol']));
+				
+				//SDI($host);
+				//SDI($hostKey.$hostKeyParams);
+				//SDI($function);
+				
+				$sql = 'SELECT i.itemid '.
+					' FROM items i, hosts h '.
+					' WHERE i.hostid=h.hostid '.
+					' AND h.host='.zbx_dbstr($host).
+					' AND i.key_='.zbx_dbstr($hostKey.$hostKeyParams);
+				
+				//SDI($sql);
+				
+				$db_res = DBfetch(DBselect($sql));
+				if($db_res) $item_id = $db_res['itemid'];
+			}
+			
+			unset($expData);
+			/*
 			if(preg_match('/^'.ZBX_PREG_SIMPLE_EXPRESSION_FORMAT.'/u', $expr, $expr_res)){
 				$sql = 'SELECT i.itemid '.
 						' FROM items i, hosts h '.
@@ -3723,12 +3753,12 @@ return $result;
 				$function = $expr_res[ZBX_SIMPLE_EXPRESSION_FUNCTION_NAME_ID];
 			}
 
-			unset($expr_res);
+			unset($expr_res);*/
 
 			if($item_id == null) return VALUE_TYPE_UNKNOWN;
 
 			$result = $function_info[$function];
-
+			
 			if(is_array($result['value_type'])){
 				$value_type = null;
 
@@ -3846,7 +3876,7 @@ return $result;
 		global $triggerExpressionRules;
 
 		if(!$scparser) $scparser = new CStringParser($triggerExpressionRules);
-
+			
 		if(!is_array($expressions)) $expressions = array($expressions);
 
 		$data = Array();
@@ -3854,9 +3884,13 @@ return $result;
 		foreach($expressions as $key => $str) {
 			if(!isset($triggersData[$str])) {
 				if($scparser->parse($str)) {
-					$triggersData[$str]['hosts'] = $scparser->getElements('server');
 					$triggersData[$str]['expressions'] = $scparser->getElements('expression');
+					$triggersData[$str]['hosts'] = $scparser->getElements('server');
+					$triggersData[$str]['keys'] = $scparser->getElements('keyName');
+					$triggersData[$str]['keysParams'] = $scparser->getElements('keyParams');
+					$triggersData[$str]['keysFunctions'] = $scparser->getElements('keyFunctionName');
 					$triggersData[$str]['macros'] = array_merge($scparser->getElements('macro'), $scparser->getElements('macroNum'), $scparser->getElements('customMacro'));
+					$triggersData[$str]['allMacros'] = array_merge($triggersData[$str]['expressions'],$triggersData[$str]['macros']);
 					$triggersData[$str]['tree'] = $scparser->getTree();
 				} else {
 					$triggersData[$str]['errors'] = $scparser->getErrors();
@@ -3967,6 +4001,7 @@ $triggerExpressionRules['server'] = Array(
 	'openSymbol' => '{',
 	'closeSymbol' => ':',
 	'allowedSymbols' => '[0-9a-zA-Z_\. \-]+',
+	'indexItem' => true,
 	'parent' => 'expression');
 $triggerExpressionRules['key'] = Array(
 	'openSymbol' => ':',
@@ -3977,11 +4012,13 @@ $triggerExpressionRules['keyName'] = Array(
 	'openSymbol' => ':',
 	'closeSymbol' => Array('[' => 'default', '.' => 'nextEnd'),
 	'allowedSymbols' => '[0-9a-zA-Z_\.\-]+',
+	'indexItem' => true,
 	'parent' => 'key');
 $triggerExpressionRules['keyParams'] = Array(
 	'openSymbol' => '[',
 	'closeSymbol' => ']',
 	'isEmpty' => true,
+	'indexItem' => true,
 	'parent' => 'key');
 $triggerExpressionRules['keyParam'] = Array(
 	'openSymbol' => Array('[' => 'default', ',' => 'default'),
@@ -4019,6 +4056,7 @@ $triggerExpressionRules['keyFunctionName'] = Array(
 		'str',
 		'sum',
 		'time'),
+	'indexItem' => true,
 	'parent' => 'keyFunction');
 $triggerExpressionRules['keyFunctionParams'] = Array(
 	'openSymbol' => '(',

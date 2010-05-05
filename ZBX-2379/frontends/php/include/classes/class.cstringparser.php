@@ -39,8 +39,12 @@ class CStringParser {
 
 	public function parse($string) {
 		unset($this->parsedTree);
+		unset($this->indexes);
+		unset($this->levelData);
+		unset($this->errors);
 		$this->parsedTree = NULL;
 		$this->levelData = Array();
+		$this->indexes = Array();
 		$this->errors = Array();
 		$this->expression = $string;
 		$this->totalSymbols = mb_strlen($this->expression); // should be changed to zbx_strlen

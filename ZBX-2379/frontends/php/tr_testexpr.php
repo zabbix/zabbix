@@ -37,7 +37,8 @@ include_once('include/page_header.php');
 
 // expression analyze
 	$expression = urldecode(get_request('expression', ''));
-
+	
+	$expressionData = parseTriggerExpressions($expression, true);
 	list($outline, $eHTMLTree) = analyze_expression($expression);
 
 // test data (create table, create check fields)
@@ -47,33 +48,46 @@ include_once('include/page_header.php');
 	$data_table->setAttribute('id', 'data_list');
 	$data_table->setOddRowClass('even_row');
 	$data_table->setEvenRowClass('even_row');
-	$data_table->setHeader(array('#', S_ITEM_SLASH_FUNCTION, S_RESULT_TYPE, S_VALUE));
+	$data_table->setHeader(array(S_ITEM_SLASH_FUNCTION, S_RESULT_TYPE, S_VALUE));
 
 	$datas = array();
 	$fields = array();
-	
-	foreach ($eHTMLTree as $key => $val){
-		SDII($val);
-		$expr = $val['expression'];
-		if(isset($datas[$expr])) continue;
+	$rplcts = Array();
 
-		$num = count($datas) + 1;
-		$fname = 'test_data_n'.$num;
-		$datas[$expr] = get_request($fname, '');
-		$info = get_item_function_info($expr);
+	if(!isset($expressionData[$expression]['errors']) && isset($expressionData[$expression]['allMacros'])) {
+		$macrosData = Array();
+		foreach ($expressionData[$expression]['allMacros'] as $macros){
+			$macroStr = zbx_substr($expression, $macros['openSymbolNum'], $macros['closeSymbolNum']-$macros['openSymbolNum']+1);
+			//SDI($macroStr);
+			
+			$macrosId = md5($macroStr);
+			$skip = isset($macrosData[$macrosId]);
+			
+			if(!isset($macrosData[$macrosId]) || !isset($macrosData[$macrosId]['pos']))
+				$macrosData[$macrosId]['pos'] = Array();
+			
+			$rplcts[$macros['openSymbolNum'].'_'.$macros['closeSymbolNum']] = Array('start' => $macros['openSymbolNum'], 'end' => $macros['closeSymbolNum'], 'item' => &$macrosData[$macrosId]);
+			
+			if($skip) continue;
 
-		$validation = $info['validation'];
+			$fname = 'test_data_'.$macrosId;
+			$macrosData[$macrosId]['cValue'] = get_request($fname, '');
+			$info = get_item_function_info($macroStr);
+			//SDII($info);
 
-		if(substr($validation, 0, COMBO_PATTERN_LENGTH) == COMBO_PATTERN){
-			$vals = explode(',', substr($validation, COMBO_PATTERN_LENGTH, zbx_strlen($validation) - COMBO_PATTERN_LENGTH - 4));
+			$validation = $info['validation'];
 
-			$control = new CComboBox($fname, $datas[$expr]);
-			foreach ($vals as $v) $control->addItem($v, $v);
+			if(substr($validation, 0, COMBO_PATTERN_LENGTH) == COMBO_PATTERN){
+				$vals = explode(',', substr($validation, COMBO_PATTERN_LENGTH, zbx_strlen($validation) - COMBO_PATTERN_LENGTH - 4));
+
+				$control = new CComboBox($fname, $macrosData[$macrosId]['cValue']);
+				foreach ($vals as $v) $control->addItem($v, $v);
+			}else
+				$control = new CTextBox($fname, $macrosData[$macrosId]['cValue'], 30);
+
+			$data_table->addRow(new CRow(array($macroStr, $info['value_type'], $control)));
+			$fields[$fname] = array($info['type'], O_OPT, null, $validation, 'isset({test_expression})');
 		}
-		else $control = new CTextBox($fname, $datas[$expr], 30);
-
-		$data_table->addRow(new CRow(array($num, $expr, $info['value_type'], $control)));
-		$fields[$fname] = array($info['type'], O_OPT, null, $validation, 'isset({test_expression})');
 	}
 
 //---------------------------------- CHECKS ------------------------------------
@@ -108,43 +122,70 @@ include_once('include/page_header.php');
 	$res_table->setOddRowClass('even_row');
 	$res_table->setEvenRowClass('even_row');
 	$res_table->setHeader(array(S_EXPRESSION, S_RESULT));
-
-	$exprs = make_disp_tree($tree, $map);
-	foreach($exprs as $e){
+	
+	ksort($rplcts, SORT_NUMERIC);
+	
+	//$exprs = make_disp_tree($tree, $map);
+	foreach($eHTMLTree as $e){
+		//if(!isset($e['expression']))
+			//continue;
+		
 		$result = '-';
-		if($test && $e['key']){
-			$i = &$map[$e['key']];
-			$value = convert($datas[$i['expression']]);
+		if($test && isset($e['expression'])){
+			$evStr = zbx_substr($expression, $e['expression']['start']+($e['expression']['oSym'] !== NULL ? zbx_strlen($e['expression']['oSym']) : 0),
+							 $e['expression']['end']-$e['expression']['start']-($e['expression']['cSym'] !== NULL ? zbx_strlen($e['expression']['cSym']) : 0));
+			
+			$chStart = $e['expression']['start']+($e['expression']['oSym'] !== NULL ? zbx_strlen($e['expression']['oSym']) : 0);
+			if(is_array($rplcts)) {
+				foreach($rplcts as $mKey => $mData) {
+					if($mData['start'] >= $e['expression']['start'] && $mData['end'] <= $e['expression']['end']) {
+						//SDII($cvItem);
+						$vStart = $mData['start'] - $chStart;
+						$vEnd = $mData['end'] - $chStart+1;
+						$cValue = convert($mData['item']['cValue']);
+						if(empty($cValue)) $cValue = "''";
+						$chStart += ($mData['end']-$mData['start']+1)-zbx_strlen($cValue);
+						//SDI(zbx_substr($expression, $mData['start'], $mData['end']-$mData['start']+1));
+ 						//SDI(zbx_substr($evStr, $vStart, $vEnd-$vStart));
+						//SDI($evStr);
+						$evStr = ($vStart > 0 ? zbx_substr($evStr, 0, $vStart) : '').$cValue.($vEnd < zbx_strlen($evStr) ? zbx_substr($evStr, $vEnd) : '');
+						//SDI($evStr);
+					}
+				}
+			}
+			$evStr = str_replace('=', '==', $evStr);
+			$evStr = str_replace('#', '!=', $evStr);
+			$evStr = str_replace('&', '&&', $evStr);
+			$evStr = str_replace('|', '||', $evStr);
+			//SDI($evStr);
 
-			if(empty($value)) $value = "''";
-
-			eval("\$result = ".$value.($i['sign'] == '=' ? '==' : ($i['sign'] == '#' ? '!=' : $i['sign'])).convert($i['value']).';');
-			$i['result'] = $result = $result == 1 ? 'TRUE' : 'FALSE';
+			eval('$result = '.$evStr.';');
+			$i['result'] = $result = !$result ? 'FALSE' : 'TRUE';
 		}
 
 		$style = 'text-align: center;';
 		if($result != '-')
-			$style = ($result == 'TRUE')?'background-color: #ccf; color: #00f;': 'background-color: #fcc; color: #f00;';
+			$style = ($result == 'TRUE') ? 'background-color: #ccf; color: #00f;': 'background-color: #fcc; color: #f00;';
 
 		$col = new CCol($result);
 		$col->setAttribute('style', $style);
-		$res_table->addRow(new CRow(array($e['expr'], $col)));
+		$res_table->addRow(new CRow(array($e['list'], $col)));
 	}
 
 	$result = '-';
 	if($test){
 		$combine_expr = $outline;
-		foreach ($map as $key => $val){
+/*		foreach ($map as $key => $val){
 			$combine_expr = str_replace($key, zbx_strtolower($val['result']), $combine_expr);
 		}
 
-		eval("\$result = ".$combine_expr.';');
+		eval("\$result = ".$combine_expr.';');*/
 		$result = $result == 1 ? 'TRUE' : 'FALSE';
 	}
 
 	$style = 'text-align: center;';
 	if($result != '-')
-		$style = ($result == 'TRUE')?'background-color: #ccf; color: #00f;': 'background-color: #fcc; color: #f00;';
+		$style = ($result == 'TRUE') ? 'background-color: #ccf; color: #00f;': 'background-color: #fcc; color: #f00;';
 
 	$col = new CCol($result);
 	$col->setAttribute('style', $style);
