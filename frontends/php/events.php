@@ -245,11 +245,9 @@
 	if($source == EVENT_SOURCE_DISCOVERY){
 		$options['source'] = EVENT_SOURCE_DISCOVERY;
 	}
-	else{			
-		if(isset($_REQUEST['triggerid'])){
-			$options['object'] = EVENT_OBJECT_TRIGGER;
-			$options['triggerids'] = $_REQUEST['triggerid'];
-		}
+	else if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid'] > 0)){
+		$options['object'] = EVENT_OBJECT_TRIGGER;
+		$options['triggerids'] = $_REQUEST['triggerid'];
 	}
 
 	$firstEvent = CEvent::get($options);
