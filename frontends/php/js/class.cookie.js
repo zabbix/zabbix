@@ -56,14 +56,18 @@ create: function(name,value,days){
 	}
 
 	document.cookie = name+"="+value+expires+"; path=/";
-
+	
+// Apache header size limit
 	if(document.cookie.length > 8000){
-		document.cookie = name+"="+this.cookies[name]+expires+"; path=/";
-		alert('We are sorry, the maximum of possible to remember elements are reached.')
+		document.cookie = name+"=; path=/";
+		alert(locale['S_MAX_COOKIE_SIZE_REACHED']);
+		return false;
 	}
 	else{
 		this.cookies[name] = value;
 	}
+
+return true;
 },
 
 createArray: function(name,value,days){
@@ -75,6 +79,7 @@ createArray: function(name,value,days){
 	if(is_null(part_count)) part_count = 1;
 	
 	var tmp_index = 0
+	var result = true;
 	while(list.length > 0){
 		list_part = list.substr(0, 4000);
 		list = list.substr(4000);
@@ -87,8 +92,10 @@ createArray: function(name,value,days){
 			}
 		}
 
-		this.create(name+'_'+part, list_part, days);
+		result = this.create(name+'_'+part, list_part, days);
 		part++;
+
+		if(!result) break;
 	}
 
 	this.create(name+'_parts', part-1);
