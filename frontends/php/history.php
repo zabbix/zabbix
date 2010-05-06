@@ -612,9 +612,9 @@ include_once('include/page_header.php');
 
 //-------------
 		}
+		
+		$historyWidget->show();
 	}
-	
-	$historyWidget->show();
 ?>
 <?php
 
