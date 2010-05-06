@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2367] improved using DISTINCT rule in queries in API (Aly) 
  - [ZBX-2408] fixed mute button in status of triggers page (Aly)
  - [ZBX-2263] fixed permission checks in bar reports (Aly)
  - [ZBX-2270] fixed item filtering (Aly)
