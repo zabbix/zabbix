@@ -132,6 +132,7 @@ include_once('include/page_header.php');
 		
 		$result = '-';
 		if($test && isset($e['expression'])){
+			/*
 			$evStr = zbx_substr($expression, $e['expression']['start']+($e['expression']['oSym'] !== NULL ? zbx_strlen($e['expression']['oSym']) : 0),
 							 $e['expression']['end']-$e['expression']['start']-($e['expression']['cSym'] !== NULL ? zbx_strlen($e['expression']['cSym']) : 0));
 			
@@ -158,9 +159,10 @@ include_once('include/page_header.php');
 			$evStr = str_replace('&', '&&', $evStr);
 			$evStr = str_replace('|', '||', $evStr);
 			//SDI($evStr);
-
+			*/
+			$evStr = replaceExpressionTestData($expression, &$e, &$rplcts);
 			eval('$result = '.$evStr.';');
-			$i['result'] = $result = !$result ? 'FALSE' : 'TRUE';
+			$result = !$result ? 'FALSE' : 'TRUE';
 		}
 
 		$style = 'text-align: center;';
@@ -174,13 +176,11 @@ include_once('include/page_header.php');
 
 	$result = '-';
 	if($test){
-		$combine_expr = $outline;
-/*		foreach ($map as $key => $val){
-			$combine_expr = str_replace($key, zbx_strtolower($val['result']), $combine_expr);
-		}
-
-		eval("\$result = ".$combine_expr.';');*/
-		$result = $result == 1 ? 'TRUE' : 'FALSE';
+		$e['expression'] = Array('start' => 0, 'end' => zbx_strlen($expression), 'oSym' => NULL, 'cSym' => NULL);
+		$evStr = replaceExpressionTestData($expression, &$e, &$rplcts);
+		
+		eval('$result = '.$evStr.';');
+		$result = !$result ? 'FALSE':'TRUE';
 	}
 
 	$style = 'text-align: center;';

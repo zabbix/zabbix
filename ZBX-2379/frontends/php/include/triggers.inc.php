@@ -3870,6 +3870,32 @@ return $result;
 			return false;
 		}
 	}
+	
+	function replaceExpressionTestData($expression, &$e, &$rplcts) {
+		$evStr = zbx_substr($expression, $e['expression']['start']+($e['expression']['oSym'] !== NULL ? zbx_strlen($e['expression']['oSym']) : 0),
+						 $e['expression']['end']-$e['expression']['start']-($e['expression']['cSym'] !== NULL ? zbx_strlen($e['expression']['cSym']) : 0));
+		
+		$chStart = $e['expression']['start']+($e['expression']['oSym'] !== NULL ? zbx_strlen($e['expression']['oSym']) : 0);
+		if(is_array($rplcts)) {
+			foreach($rplcts as $mKey => $mData) {
+				if($mData['start'] >= $e['expression']['start'] && $mData['end'] <= $e['expression']['end']) {
+					$vStart = $mData['start'] - $chStart;
+					$vEnd = $mData['end'] - $chStart+1;
+					$cValue = convert($mData['item']['cValue']);
+					if(empty($cValue)) $cValue = "''";
+					$chStart += ($mData['end']-$mData['start']+1)-zbx_strlen($cValue);
+					$evStr = ($vStart > 0 ? zbx_substr($evStr, 0, $vStart) : '').$cValue.($vEnd < zbx_strlen($evStr) ? zbx_substr($evStr, $vEnd) : '');
+				}
+			}
+		}
+		
+		$evStr = str_replace('=', '==', $evStr);
+		$evStr = str_replace('#', '!=', $evStr);
+		$evStr = str_replace('&', '&&', $evStr);
+		$evStr = str_replace('|', '||', $evStr);
+		
+		return $evStr;
+	}
 
 	function parseTriggerExpressions($expressions, $askData=false) {
 		static $scparser, $triggersData;
