@@ -2323,5 +2323,8 @@
 	'S_CANNOT_CREATE_NEW_ELEMENT'=>		'Can not create new element',
 	'S_OTHER_SMALL'=>			'other',
 
+// class.cookie.js
+	'S_MAX_COOKIE_SIZE_REACHED' => 'We are sorry, the maximum possible number of elements to remember has been reached.',
+
 );
 ?>
