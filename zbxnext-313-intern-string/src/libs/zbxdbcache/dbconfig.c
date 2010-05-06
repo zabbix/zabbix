@@ -2408,7 +2408,7 @@ static void	DCget_item(DC_ITEM *dst_item, ZBX_DC_ITEM *src_item)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_item_by_key                                                *
+ * Function: DCconfig_get_item_by_key                                         *
  *                                                                            *
  * Purpose: Locate item in configuration cache                                *
  *                                                                            *
@@ -2689,7 +2689,6 @@ copy_item:
 
 		if (0 == max_items)
 			break;
-
 	}
 
 	UNLOCK_CACHE;
