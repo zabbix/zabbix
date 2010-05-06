@@ -6887,7 +6887,7 @@
 		insert_js('
 			function addMacroRow(){
 				if(typeof(addMacroRow.macro_count) == "undefined"){
-					addMacroRow.macro_count = '.count($macros).'+1;
+					addMacroRow.macro_count = '.count($macros).';
 				}
 
 				var tr = document.createElement("tr");
@@ -6926,6 +6926,7 @@
 			}
 		');
 
+		$macros = array_values($macros);
 		foreach($macros as $macroid => $macro){
 			$macros_tbl->addRow(new CCol(array(
 				new CCheckBox(),
