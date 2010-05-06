@@ -47,7 +47,7 @@ class CGraph extends CZBXAPI{
 
 		$sql_parts = array(
 			'select' => array('graphs' => 'g.graphid'),
-			'from' => array('graphs g'),
+			'from' => array('graphs' => 'graphs g'),
 			'where' => array(),
 			'group' => array(),
 			'order' => array(),
@@ -112,11 +112,11 @@ class CGraph extends CZBXAPI{
 		else{
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
-			$sql_parts['from']['gi'] = 'graphs_items gi';
-			$sql_parts['from']['i'] = 'items i';
-			$sql_parts['from']['hg'] = 'hosts_groups hg';
-			$sql_parts['from']['r'] = 'rights r';
-			$sql_parts['from']['ug'] = 'users_groups ug';
+			$sql_parts['from']['graphs_items'] = 'graphs_items gi';
+			$sql_parts['from']['items'] = 'items i';
+			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sql_parts['from']['rights'] = 'rights r';
+			$sql_parts['from']['users_groups'] = 'users_groups ug';
 			$sql_parts['where']['gig'] = 'gi.graphid=g.graphid';
 			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
 			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
@@ -151,9 +151,9 @@ class CGraph extends CZBXAPI{
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
 
-			$sql_parts['from']['gi'] = 'graphs_items gi';
-			$sql_parts['from']['i'] = 'items i';
-			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['from']['graphs_items'] = 'graphs_items gi';
+			$sql_parts['from']['items'] = 'items i';
+			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
 
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 			$sql_parts['where'][] = 'hg.hostid=i.hostid';
@@ -173,8 +173,8 @@ class CGraph extends CZBXAPI{
 				$sql_parts['select']['hostid'] = 'i.hostid';
 			}
 
-			$sql_parts['from']['gi'] = 'graphs_items gi';
-			$sql_parts['from']['i'] = 'items i';
+			$sql_parts['from']['graphs_items'] = 'graphs_items gi';
+			$sql_parts['from']['items'] = 'items i';
 			$sql_parts['where'][] = DBcondition('i.hostid', $options['hostids']);
 			$sql_parts['where']['gig'] = 'gi.graphid=g.graphid';
 			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
@@ -197,7 +197,7 @@ class CGraph extends CZBXAPI{
 			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['itemid'] = 'gi.itemid';
 			}
-			$sql_parts['from']['gi'] = 'graphs_items gi';
+			$sql_parts['from']['graphs_items'] = 'graphs_items gi';
 			$sql_parts['where']['gig'] = 'gi.graphid=g.graphid';
 			$sql_parts['where'][] = DBcondition('gi.itemid', $options['itemids']);
 		}
@@ -209,9 +209,9 @@ class CGraph extends CZBXAPI{
 
 // templated
 		if(!is_null($options['templated'])){
-			$sql_parts['from']['gi'] = 'graphs_items gi';
-			$sql_parts['from']['i'] = 'items i';
-			$sql_parts['from']['h'] = 'hosts h';
+			$sql_parts['from']['graphs_items'] = 'graphs_items gi';
+			$sql_parts['from']['items'] = 'items i';
+			$sql_parts['from']['hosts'] = 'hosts h';
 			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
 			$sql_parts['where']['ggi'] = 'g.graphid=gi.graphid';
 			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
@@ -270,13 +270,13 @@ class CGraph extends CZBXAPI{
 				$sql_parts['where']['templateid'] = 'g.templateid='.$options['filter']['templateid'];
 
 			if(isset($options['filter']['host']) || isset($options['filter']['hostid'])){
-				$sql_parts['from']['gi'] = 'graphs_items gi';
-				$sql_parts['from']['i'] = 'items i';
+				$sql_parts['from']['graphs_items'] = 'graphs_items gi';
+				$sql_parts['from']['items'] = 'items i';
 				$sql_parts['where']['gig'] = 'gi.graphid=g.graphid';
 				$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
 
 				if(isset($options['filter']['host'])){
-					$sql_parts['from']['h'] = 'hosts h';
+					$sql_parts['from']['hosts'] = 'hosts h';
 					$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
 					$sql_parts['where']['host'] = 'h.host='.zbx_dbstr($options['filter']['host']);
 				}
@@ -325,7 +325,7 @@ class CGraph extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT DISTINCT '.$sql_select.
+		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('g.graphid', $nodeids).
 					$sql_where.

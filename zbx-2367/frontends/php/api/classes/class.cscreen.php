@@ -60,7 +60,7 @@ class CScreen extends CZBXAPI{
 
 		$sql_parts = array(
 			'select' => array('screens' => 's.screenid'),
-			'from' => array('screens s'),
+			'from' => array('screens' => 'screens s'),
 			'where' => array(),
 			'order' => array(),
 			'limit' => null);
@@ -173,7 +173,7 @@ class CScreen extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT DISTINCT '.$sql_select.'
+		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.'
 				FROM '.$sql_from.'
 				WHERE '.DBin_node('s.screenid', $nodeids).
 					$sql_where.

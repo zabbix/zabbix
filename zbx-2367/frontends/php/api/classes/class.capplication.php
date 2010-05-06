@@ -64,7 +64,7 @@ class CApplication extends CZBXAPI{
 
 		$sql_parts = array(
 			'select' => array('apps' => 'a.applicationid'),
-			'from' => array('applications a'),
+			'from' => array('applications' => 'applications a'),
 			'where' => array(),
 			'group' => array(),
 			'order' => array(),
@@ -118,9 +118,9 @@ class CApplication extends CZBXAPI{
 		else{
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
-			$sql_parts['from']['hg'] = 'hosts_groups hg';
-			$sql_parts['from']['r'] = 'rights r';
-			$sql_parts['from']['ug'] = 'users_groups ug';
+			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sql_parts['from']['rights'] = 'rights r';
+			$sql_parts['from']['users_groups'] = 'users_groups ug';
 			$sql_parts['where'][] = 'hg.hostid=a.hostid';
 			$sql_parts['where'][] = 'r.id=hg.groupid ';
 			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
@@ -144,7 +144,7 @@ class CApplication extends CZBXAPI{
 			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['groupid'] = 'hg.groupid';
 			}
-			$sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sql_parts['where']['ahg'] = 'a.hostid=hg.hostid';
 			$sql_parts['where'][] = DBcondition('hg.groupid', $options['groupids']);
 
@@ -171,7 +171,7 @@ class CApplication extends CZBXAPI{
 // expand_data
 		if(!is_null($options['expand_data'])){
 			$sql_parts['select']['host'] = 'h.host';
-			$sql_parts['from']['h'] = 'hosts h';
+			$sql_parts['from']['hosts'] = 'hosts h';
 			$sql_parts['where']['ah'] = 'a.hostid=h.hostid';
 		}
 
@@ -182,7 +182,7 @@ class CApplication extends CZBXAPI{
 			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['itemid'] = 'ia.itemid';
 			}
-			$sql_parts['from']['ia'] = 'items_applications ia';
+			$sql_parts['from']['items_applications'] = 'items_applications ia';
 			$sql_parts['where'][] = DBcondition('ia.itemid', $options['itemids']);
 			$sql_parts['where']['aia'] = 'a.applicationid=ia.applicationid';
 
@@ -201,7 +201,7 @@ class CApplication extends CZBXAPI{
 
 // templated
 		if(!is_null($options['templated'])){
-			$sql_parts['from']['h'] = 'hosts h';
+			$sql_parts['from']['hosts'] = 'hosts h';
 			$sql_parts['where']['ah'] = 'a.hostid=h.hostid';
 
 			if($options['templated'])
@@ -293,7 +293,7 @@ class CApplication extends CZBXAPI{
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
-		$sql = 'SELECT DISTINCT '.$sql_select.
+		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
 				' FROM '.$sql_from.
 				' WHERE '.DBin_node('a.applicationid', $nodeids).
 					$sql_where.
