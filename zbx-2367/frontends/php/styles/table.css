@@ -102,6 +102,7 @@ table.formtable {
 	color: #000000;
 	border: 0px solid #000000;
 	width: 50%;
+	margin: auto;
 }
 
 table.formtable tr td {
