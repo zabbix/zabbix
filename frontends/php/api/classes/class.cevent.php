@@ -304,7 +304,7 @@ class CEvent extends CZBXAPI{
 					$sql_where.
 				$sql_order;
 		$db_res = DBselect($sql, $sql_limit);
-// sdi($sql);
+ //sdi($sql);
 		while($event = DBfetch($db_res)){
 			if($options['count'])
 				$result = $event;
