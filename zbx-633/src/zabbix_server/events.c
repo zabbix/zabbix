@@ -49,6 +49,87 @@
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_latest_event_status                                          *
+ *                                                                            *
+ * Purpose: get identifiers and values of the last two events                 *
+ *                                                                            *
+ * Parameters: triggerid    - [IN] trigger identifier from database           *
+ *             prev_eventid - [OUT] previous trigger identifier               *
+ *             prev_value   - [OUT] previous trigger value                    *
+ *             last_eventid - [OUT] last trigger identifier                   *
+ *             last_value   - [OUT] last trigger value                        *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev, Alexander Vladishev                              *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	get_latest_event_status(zbx_uint64_t triggerid,
+		zbx_uint64_t *prev_eventid, int *prev_value,
+		zbx_uint64_t *last_eventid, int *last_value)
+{
+	const char	*__function_name = "get_latest_event_status";
+	char		sql[256];
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64,
+			__function_name, triggerid);
+
+	/* object and objectid are used for efficient */
+	/* sort by the same index as in where condition */
+	zbx_snprintf(sql, sizeof(sql),
+			"select eventid,value"
+			" from events"
+			" where source=%d"
+				" and object=%d"
+				" and objectid=" ZBX_FS_UI64
+			" order by object desc,objectid desc,eventid desc",
+			EVENT_SOURCE_TRIGGERS,
+			EVENT_OBJECT_TRIGGER,
+			triggerid);
+
+	result = DBselectN(sql, 2);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(*last_eventid, row[0]);
+		*last_value = atoi(row[1]);
+
+		if (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(*prev_eventid, row[0]);
+			*prev_value = atoi(row[1]);
+		}
+		else
+		{
+			*prev_eventid = 0;
+			*prev_value = TRIGGER_VALUE_UNKNOWN;
+		}
+	}
+	else
+	{
+		*prev_eventid = 0;
+		*prev_value = TRIGGER_VALUE_UNKNOWN;
+		*last_eventid = 0;
+		*last_value = TRIGGER_VALUE_UNKNOWN;
+	}
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() prev_eventid:" ZBX_FS_UI64
+			" prev_value:%d last_eventid:" ZBX_FS_UI64
+			" last_value:%d",
+			__function_name, *prev_eventid, *prev_value,
+			*last_eventid, *last_value);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()",
+			__function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: add_trigger_info                                                 *
  *                                                                            *
  * Purpose: add trigger info to event if required                             *
@@ -66,22 +147,24 @@ static void	add_trigger_info(DB_EVENT *event)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	triggerid;
+	zbx_uint64_t	triggerid, prev_eventid, last_eventid;
+	int		prev_value, last_value;
 
-	int		event_prev_status, event_last_status;
-
-	if(event->object==EVENT_OBJECT_TRIGGER && event->objectid != 0)
+	if (event->object == EVENT_OBJECT_TRIGGER && event->objectid != 0)
 	{
 		triggerid = event->objectid;
 
-		result = DBselect("select description,priority,comments,url,type from triggers where triggerid=" ZBX_FS_UI64,
-			triggerid);
-		row = DBfetch(result);
-		event->trigger_description[0]=0;
+		event->trigger_description[0] = '\0';
 		zbx_free(event->trigger_comments);
 		zbx_free(event->trigger_url);
 
-		if(row)
+		result = DBselect(
+				"select description,priority,comments,url,type"
+				" from triggers"
+				" where triggerid=" ZBX_FS_UI64,
+				triggerid);
+
+		if (NULL != (row = DBfetch(result)))
 		{
 			strscpy(event->trigger_description, row[0]);
 			event->trigger_priority = atoi(row[1]);
@@ -91,40 +174,137 @@ static void	add_trigger_info(DB_EVENT *event)
 		}
 		DBfree_result(result);
 
-		get_latest_event_status(triggerid, &event_prev_status, &event_last_status);
-		zabbix_log(LOG_LEVEL_DEBUG,"event_prev_status %d event_last_status %d event->value %d",
-			event_prev_status,
-			event_last_status,
-			event->value);
-
-		event->skip_actions = 0;
-
-		switch(event->trigger_type)
+		/* skip actions in next cases:
+		 * (1)  -any- / -any- /UNKNOWN
+		 * (2)  FALSE /UNKNOWN/ FALSE
+		 * (3) UNKNOWN/UNKNOWN/ FALSE
+		 * if event->trigger_type is not TRIGGER_TYPE_MULTIPLE_TRUE:
+		 * (4)  TRUE  /UNKNOWN/ TRUE
+		 */
+		if (event->value == TRIGGER_VALUE_UNKNOWN)	/* (1) */
 		{
-		case	TRIGGER_TYPE_NORMAL:
-			if(	(event->value == TRIGGER_VALUE_UNKNOWN) ||
-				(event_prev_status == TRIGGER_VALUE_TRUE && event_last_status == TRIGGER_VALUE_UNKNOWN && event->value == TRIGGER_VALUE_TRUE) ||
-				(event_prev_status == TRIGGER_VALUE_FALSE && event_last_status == TRIGGER_VALUE_UNKNOWN && event->value == TRIGGER_VALUE_FALSE) ||
-				(event_prev_status == TRIGGER_VALUE_UNKNOWN && event_last_status == TRIGGER_VALUE_UNKNOWN && event->value == TRIGGER_VALUE_FALSE)
-			)
-			{
-				zabbix_log(LOG_LEVEL_DEBUG,"Skip actions");
-				event->skip_actions = 1;
-			}
-			break;
-		case	TRIGGER_TYPE_MULTIPLE_TRUE:
-			if(	(event->value == TRIGGER_VALUE_UNKNOWN) ||
-/*				(event_prev_status == TRIGGER_VALUE_TRUE && event_last_status == TRIGGER_VALUE_UNKNOWN && event->value == TRIGGER_VALUE_TRUE) ||*/
-				(event_prev_status == TRIGGER_VALUE_FALSE && event_last_status == TRIGGER_VALUE_UNKNOWN && event->value == TRIGGER_VALUE_FALSE) ||
-				(event_prev_status == TRIGGER_VALUE_UNKNOWN && event_last_status == TRIGGER_VALUE_UNKNOWN && event->value == TRIGGER_VALUE_FALSE)
-			)
-			{
-				zabbix_log(LOG_LEVEL_DEBUG,"Skip actions");
-				event->skip_actions = 1;
-			}
-			break;
+			event->skip_actions = 1;
 		}
+		else
+		{
+			get_latest_event_status(triggerid, &prev_eventid, &prev_value,
+					&last_eventid, &last_value);
+
+			if (last_value == TRIGGER_VALUE_UNKNOWN)	/* (2), (3) & (4) */
+			{
+				if (event->value == TRIGGER_VALUE_FALSE &&	/* (2) & (3) */
+						(prev_value == TRIGGER_VALUE_FALSE || prev_value == TRIGGER_VALUE_UNKNOWN))
+				{
+					event->skip_actions = 1;
+				}
+				else if (event->trigger_type != TRIGGER_TYPE_MULTIPLE_TRUE &&	/* (4) */
+						prev_value == TRIGGER_VALUE_TRUE && event->value == TRIGGER_VALUE_TRUE)
+				{
+					event->skip_actions = 1;
+				}
+
+				/* copy acknowledges in next cases:
+				 * (1) FALSE/UNKNOWN/FALSE
+				 * if event->trigger_type is not TRIGGER_TYPE_MULTIPLE_TRUE:
+				 * (2) TRUE /UNKNOWN/TRUE
+				 */
+				if (prev_value == event->value &&
+						(prev_value == TRIGGER_VALUE_FALSE ||			/* (1) */
+						(event->trigger_type != TRIGGER_TYPE_MULTIPLE_TRUE &&	/* (2) */
+						prev_value == TRIGGER_VALUE_TRUE)))
+					event->ack_eventid = prev_eventid;
+			}
+		}
+
+		if (1 == event->skip_actions)
+			zabbix_log(LOG_LEVEL_DEBUG, "Skip actions");
+		if (0 != event->ack_eventid)
+			zabbix_log(LOG_LEVEL_DEBUG, "Copy acknowledges");
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: copy_acknowledges                                                *
+ *                                                                            *
+ * Purpose: copy acknowledges from src_eventid to dst_eventid                 *
+ *                                                                            *
+ * Parameters: src_eventid - [IN] source event identifier from database       *
+ *             dst_eventid - [IN] destination event identifier from database  *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	copy_acknowledges(zbx_uint64_t src_eventid, zbx_uint64_t dst_eventid)
+{
+	const char	*__function_name = "copy_acknowledges";
+	zbx_uint64_t	acknowledgeid, *ids = NULL;
+	int		ids_alloc = 0, ids_num = 0, i;
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		*sql = NULL;
+	int		sql_alloc = 4096, sql_offset = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() src_eventid:" ZBX_FS_UI64
+			" dst_eventid:" ZBX_FS_UI64,
+			__function_name, src_eventid, dst_eventid);
+
+	result = DBselect(
+			"select acknowledgeid"
+			" from acknowledges"
+			" where eventid=" ZBX_FS_UI64,
+			src_eventid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(acknowledgeid, row[0]);
+		uint64_array_add(&ids, &ids_alloc, &ids_num, acknowledgeid, 64);
+	}
+	DBfree_result(result);
+
+	if (NULL == ids)
+		goto out;
+
+	sql = zbx_malloc(sql, sql_alloc * sizeof(char));
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "begin\n");
+#endif
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 96,
+			"update events"
+			" set acknowledged=1"
+			" where eventid=" ZBX_FS_UI64 ";\n",
+			dst_eventid);
+
+	acknowledgeid = DBget_maxid_num("acknowledges", "acknowledgeid", ids_num);
+
+	for (i = 0; i < ids_num; i++, acknowledgeid++)
+	{
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 192,
+				"insert into acknowledges"
+				" (acknowledgeid,userid,eventid,clock,message)"
+					" select " ZBX_FS_UI64 ",userid," ZBX_FS_UI64 ",clock,message"
+					" from acknowledges"
+					" where acknowledgeid=" ZBX_FS_UI64 ";\n",
+				acknowledgeid, dst_eventid, ids[i]);
+	}
+
+#ifdef HAVE_ORACLE
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
+#endif
+
+	if (sql_offset > 16) /* In ORACLE always present begin..end; */
+		DBexecute("%s", sql);
+
+	zbx_free(sql);
+	zbx_free(ids);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -165,10 +345,13 @@ static void	free_trigger_info(DB_EVENT *event)
  ******************************************************************************/
 int	process_event(DB_EVENT *event)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_event(eventid:" ZBX_FS_UI64 ",object:%d,objectid:" ZBX_FS_UI64 ")",
-			event->eventid,
-			event->object,
-			event->objectid);
+	const char	*__function_name = "process_event";
+	int		ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64
+			" object:%d objectid:" ZBX_FS_UI64 " value:%d",
+			__function_name, event->eventid, event->object,
+			event->objectid, event->value);
 
 	add_trigger_info(event);
 
@@ -184,6 +367,9 @@ int	process_event(DB_EVENT *event)
 			event->clock,
 			event->value);
 
+	if (0 != event->ack_eventid)
+		copy_acknowledges(event->ack_eventid, event->eventid);
+
 	if (0 == event->skip_actions)
 		process_actions(event);
 
@@ -192,7 +378,8 @@ int	process_event(DB_EVENT *event)
 
 	free_trigger_info(event);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of process_event()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
+			__function_name, zbx_result_string(ret));
 
-	return SUCCEED;
+	return ret;
 }

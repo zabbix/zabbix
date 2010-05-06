@@ -919,37 +919,24 @@ return $table;
 // Author: Aly
 function make_discovery_status(){
 
-	$drules = array();
-	$druleids = array();
-	$sql = 'SELECT DISTINCT * '.
-			' FROM drules '.
-			' WHERE '.DBin_node('druleid').
-				' AND status='.DHOST_STATUS_ACTIVE.
-			' ORDER BY name';
-	$db_drules = DBselect($sql);
-	while($drule_data = DBfetch($db_drules)){
-		$druleids[$drule_data['druleid']] = $drule_data['druleid'];
+	$options = array(
+		'filter' => array('status' => DHOST_STATUS_ACTIVE),
+		'selectDHosts' => API_OUTPUT_EXTEND,
+		'output' => API_OUTPUT_EXTEND
+	);
+	$drules = CDRule::get($options);
+	order_result($drules, 'name');
 
-		$drules[$drule_data['druleid']] = $drule_data;
-		$drules[$drule_data['druleid']]['up'] = 0;
-		$drules[$drule_data['druleid']]['down'] = 0;
-	}
+	foreach($drules as $drnum => $drule){
+		$drules[$drnum]['up'] = 0;
+		$drules[$drnum]['down'] = 0;
 
-
-	$services = array();
-	$discovery_info = array();
-
-	$sql = 'SELECT d.* '.
-			' FROM dhosts d '.
-			' WHERE '.DBin_node('d.dhostid').
-				' AND '.DBcondition('d.druleid', $druleids).
-			' ORDER BY d.dhostid,d.status';
-	$db_dhosts = DBselect($sql);
-	while($drule_data = DBfetch($db_dhosts)){
-		if(DRULE_STATUS_DISABLED == $drule_data['status']){
-			$drules[$drule_data['druleid']]['down']++;		}
-		else{
-			$drules[$drule_data['druleid']]['up']++;
+		foreach($drule['dhosts'] as  $dhnum => $dhost){
+			if(DRULE_STATUS_DISABLED == $dhost['status']){
+				$drules[$drnum]['down']++;		}
+			else{
+				$drules[$drnum]['up']++;
+			}
 		}
 	}
 
@@ -963,10 +950,10 @@ function make_discovery_status(){
 	$table  = new CTableInfo();
 	$table->setHeader($header,'vertical_header');
 
-	foreach($drules as $druleid => $drule){
+	foreach($drules as $drnum => $drule){
 		$table->addRow(array(
-			get_node_name_by_elid($druleid),
-			new CLink(get_node_name_by_elid($drule['druleid'], null, ': ').$drule['name'],'discovery.php?druleid='.$druleid),
+			get_node_name_by_elid($drule['druleid']),
+			new CLink(get_node_name_by_elid($drule['druleid'], null, ': ').$drule['name'],'discovery.php?druleid='.$drule['druleid']),
 			new CSpan($drule['up'],'green'),
 			new CSpan($drule['down'],($drule['down'] > 0)?'red':'green')
 		));

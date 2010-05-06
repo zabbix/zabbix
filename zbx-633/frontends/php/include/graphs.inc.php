@@ -115,9 +115,26 @@
 	return $calc_fnc;
 	}
 
-	function getGraphDims($graphid){
-// ZOOM featers
+	function getGraphDims($graphid=null){
 		$graphDims = array();
+
+		$graphDims['shiftYtop'] = 35;
+		if(is_null($graphid)){
+			$graphDims['graphHeight'] = 200;
+			$graphDims['graphtype'] = 0;
+
+			if(GRAPH_YAXIS_SIDE_DEFAULT == 0){
+				$graphDims['shiftXleft'] = 85;
+				$graphDims['shiftXright'] = 30;
+			}
+			else{
+				$graphDims['shiftXleft'] = 30;
+				$graphDims['shiftXright'] = 85;
+			}
+
+			return $graphDims;
+		}
+// ZOOM featers
 
 		$sql = 'SELECT MAX(g.graphtype) as graphtype, MIN(gi.yaxisside) as yaxissidel, MAX(gi.yaxisside) as yaxissider, MAX(g.height) as height'.
 				' FROM graphs g, graphs_items gi '.
@@ -326,19 +343,25 @@
 		$min = null;
 		$result = time() - 86400*365;
 
-		$items_by_type = array(ITEM_VALUE_TYPE_FLOAT => array(), ITEM_VALUE_TYPE_STR =>  array(), ITEM_VALUE_TYPE_LOG => array(),
-						ITEM_VALUE_TYPE_UINT64 => array(), ITEM_VALUE_TYPE_TEXT => array());
+		$items_by_type = array(
+			ITEM_VALUE_TYPE_FLOAT => array(),
+			ITEM_VALUE_TYPE_STR =>  array(),
+			ITEM_VALUE_TYPE_LOG => array(),
+			ITEM_VALUE_TYPE_UINT64 => array(), 
+			ITEM_VALUE_TYPE_TEXT => array()
+		);
 
 		$sql = 'SELECT i.itemid, i.value_type '.
-				' FROM items i WHERE '.DBcondition('i.itemid', $itemids);
+				' FROM items i '.
+				' WHERE '.DBcondition('i.itemid', $itemids);
 		$db_result = DBselect($sql);
 
 		while($item = DBfetch($db_result)) {
 			$items_by_type[$item['value_type']][$item['itemid']] = $item['itemid'];
 		}
 
-		// data for ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64 can be stored in trends tables or history table
-		// get max trends and history values for such type items to find out in what tables to look for data
+// data for ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64 can be stored in trends tables or history table
+// get max trends and history values for such type items to find out in what tables to look for data
 		$sql_from = 'history';
 		$sql_from_num = '';
 		if(!empty($items_by_type[ITEM_VALUE_TYPE_FLOAT]) || !empty($items_by_type[ITEM_VALUE_TYPE_UINT64])) {
@@ -373,14 +396,13 @@
 					$sql_from = 'history';
 			}
 
-			foreach($items as $itemid) {
-				$sql = 'SELECT ht.clock '.
-						' FROM '.$sql_from.' ht '.
-						' WHERE ht.itemid='.$itemid.
-						' ORDER BY ht.itemid, ht.clock ';
-				if($min_tmp = DBfetch(DBselect($sql,1))){
-					$min = (is_null($min)) ? $min_tmp['clock'] : min($min, $min_tmp['clock']);
-				}
+			$sql = 'SELECT ht.itemid, MIN(ht.clock) as min_clock '.
+					' FROM '.$sql_from.' ht '.
+					' WHERE '.DBcondition('ht.itemid', $itemids).
+					' GROUP BY ht.itemid';
+			$res = DBselect($sql);
+			while($min_tmp = DBfetch($res)){
+				$min = (is_null($min)) ? $min_tmp['min_clock'] : min($min, $min_tmp['min_clock']);
 			}
 		}
 		$result = is_null($min)?$result:$min;
@@ -1071,84 +1093,6 @@
 		}
 
 	return $_REQUEST['period'];
-	}
-
-/*
- * Function:
- *		make_array_from_gitems
- *
- * Description:
- *     Creates array with items params for prepare_url function
- *
- * Author:
- *     Aly
- *
- * Comments
- *
- */
-	function make_url_from_gitems($gitems){
-
-		$gurl=array();
-		$ifields = array(
-						'itemid'	=> 1,
-						'drawtype'	=> 1,
-						'sortorder'	=> 1,
-						'color'		=> 1,
-						'yaxisside'	=> 1,
-						'calc_fnc'	=> 1,
-						'type'		=> 1,
-						'periods_cnt'	=> 1
-					);
-
-		foreach($gitems as $gitem){
-			foreach($gitem as $name => $value){
-				if(isset($ifields[$name])){
-					$gurl['items['.$gitem['itemid'].']['.$name.']']=$value;
-				}
-			}
-		}
-
-	return prepare_url($gurl);
-	}
-
-/*
- * Function:
- *		make_array_from_graphid
- *
- * Description:
- *     Creates array with graph params for prepare_url function
- *
- * Author:
- *     Aly
- *
- * Comments
- *	$full= false: for screens(WITHOUT width && height), true=all params
- */
-	function make_url_from_graphid($graphid,$full=false){
-
-		$gurl=array();
-		if($full){
-			$gparams = array();
-		}
-		else{
-			$gparams = array(
-						'height'=> 1,
-						'width'	=> 1
-					);
-		}
-
-		$graph=get_graph_by_graphid($graphid);
-		if($graph){
-			foreach($graph as $name => $value){
-				if(!is_numeric($name) && !isset($gparams[$name])) $gurl[$name]=$value;
-			}
-		}
-
-		$url = prepare_url($gurl);
-		if(!empty($url)){
-			$url=((($gurl['graphtype']==GRAPH_TYPE_PIE) || ($gurl['graphtype']==GRAPH_TYPE_EXPLODED))?'chart7.php?':'chart3.php?').trim($url,'&');
-		}
-	return $url;
 	}
 
 //Author:	Aly

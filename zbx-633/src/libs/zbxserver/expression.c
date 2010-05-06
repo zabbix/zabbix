@@ -2396,11 +2396,13 @@ error:
  *                                                                            *
  * Function: evaluate_expression                                              *
  *                                                                            *
- * Purpose: evaluate expression                                               *
+ * Purpose: evaluate trigger expression                                       *
  *                                                                            *
- * Parameters: exp - expression string                                        *
- *             error - place error message if any                             *
- *             maxerrlen - max length of error message                        *
+ * Parameters: expression    - [IN] short trigger expression string           *
+ *             triggerid     - [IN] trigger identificator from database       *
+ *             trigger_value - [IN] current trigger value                     *
+ *             error         - [OUT] place error message if any               *
+ *             maxerrlen     - [IN] max length of error message               *
  *                                                                            *
  * Return value:  SUCCEED - evaluated successfully, result - value of the exp *
  *                FAIL - otherwise                                            *
@@ -2408,11 +2410,11 @@ error:
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: example: ({a0:system[procload].last(0)}>1)|                      *
- *                    ({a0:system[procload].max(300)}>3)                      *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_expression(int *result, char **expression, time_t now, DB_TRIGGER *trigger, char *error, int maxerrlen)
+int	evaluate_expression(int *result, char **expression, time_t now,
+		zbx_uint64_t triggerid, int trigger_value, char *error, int maxerrlen)
 {
 	const char		*__function_name = "evaluate_expression";
 	/* Required for substitution of macros */
@@ -2426,8 +2428,8 @@ int	evaluate_expression(int *result, char **expression, time_t now, DB_TRIGGER *
 	memset(&event, 0, sizeof(DB_EVENT));
 	event.source = EVENT_SOURCE_TRIGGERS;
 	event.object = EVENT_OBJECT_TRIGGER;
-	event.objectid = trigger->triggerid;
-	event.value = trigger->value;
+	event.objectid = triggerid;
+	event.value = trigger_value;
 
 	if (SUCCEED == substitute_simple_macros(&event, NULL, NULL, NULL, NULL, NULL, expression, MACRO_TYPE_TRIGGER_EXPRESSION,
 			error, maxerrlen))

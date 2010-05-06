@@ -455,7 +455,7 @@
 		$options = array(
 				'sysmapids' => $sysmapid,
 				'output' => API_OUTPUT_EXTEND,
-				'select_selements' => 1,
+				'select_selements' => API_OUTPUT_EXTEND,
 				'nopermissions' => 1
 			);
 
@@ -479,9 +479,9 @@
 		$options = array(
 			'nodeids' => get_current_nodeid(true),
 			'hostids' => $hostids,
-			'extendoutput' => 1,
-			'select_groups' => 1,
-			'select_triggers' => 1,
+			'output' => API_OUTPUT_EXTEND,
+			'select_groups' => API_OUTPUT_EXTEND,
+			'select_triggers' => API_OUTPUT_EXTEND,
 			'nopermissions' => 1
 		);
 		$hosts = CHost::get($options);
@@ -848,7 +848,9 @@
 			}
 		}
 
+/*
 		while(false !== ($pos = zbx_strpos($label, '{'))){
+
 			$expr = substr($label, $pos);
 
 			if(false === ($pos = zbx_strpos($expr, '}'))) break;
@@ -885,7 +887,16 @@
 			}
 
 			$parameter = substr($parameter, 0, $pos);
+*/
+		$pattern = "/{(?P<host>.+):(?P<key>.+)\.(?P<func>.+)\((?P<param>.+)\)}/u";
+		preg_match_all($pattern, $label, $matches);
 
+		foreach($matches[0] as $num => $expr){
+			$host = $matches['host'][$num];
+			$key = $matches['key'][$num];
+			$function = $matches['func'][$num];
+			$parameter = $matches['param'][$num];
+			
 			$options = array(
 				'filter' => array('host' => $host, 'key_' => $key),
 				'output' => API_OUTPUT_EXTEND
@@ -893,7 +904,7 @@
 			$db_item = CItem::get($options);
 			$db_item = reset($db_item);
 			if(!$db_item){
-				$label = str_replace('{'.$expr.'}', '???', $label);
+				$label = str_replace($expr, '???', $label);
 				continue;
 			}
 
@@ -928,7 +939,7 @@
 
 				$result = DBselect($sql, 1);
 				if(NULL == ($row = DBfetch($result)))
-					$label = str_replace('{'.$expr.'}', '('.S_NO_DATA_SMALL.')', $label);
+					$label = str_replace($expr, '('.S_NO_DATA_SMALL.')', $label);
 				else{
 					switch($db_item['value_type']){
 						case ITEM_VALUE_TYPE_FLOAT:
@@ -939,13 +950,13 @@
 							$value = $row['value'];
 					}
 
-					$label = str_replace('{'.$expr.'}', $value, $label);
+					$label = str_replace($expr, $value, $label);
 				}
 			}
 			else if((0 == strcmp($function, 'min')) || (0 == strcmp($function, 'max')) || (0 == strcmp($function, 'avg'))){
 
 				if($db_item['value_type'] != ITEM_VALUE_TYPE_FLOAT && $db_item['value_type'] != ITEM_VALUE_TYPE_UINT64){
-					$label = str_replace('{'.$expr.'}', '???', $label);
+					$label = str_replace($expr, '???', $label);
 					continue;
 				}
 
@@ -957,12 +968,12 @@
 
 				$result = DBselect($sql);
 				if(NULL == ($row = DBfetch($result)) || is_null($row['value']))
-					$label = str_replace('{'.$expr.'}', '('.S_NO_DATA_SMALL.')', $label);
+					$label = str_replace($expr, '('.S_NO_DATA_SMALL.')', $label);
 				else
-					$label = str_replace('{'.$expr.'}', convert_units($row['value'], $db_item['units']), $label);
+					$label = str_replace($expr, convert_units($row['value'], $db_item['units']), $label);
 			}
 			else{
-				$label = str_replace('{'.$expr.'}', '???', $label);
+				$label = str_replace($expr, '???', $label);
 				continue;
 			}
 		}

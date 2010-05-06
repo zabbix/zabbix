@@ -96,6 +96,8 @@ class CHost extends CZBXAPI{
 			'itemids'					=> null,
 			'triggerids'				=> null,
 			'graphids'					=> null,
+			'dhostids'					=> null,
+			'dserviceids'				=> null,
 			'monitored_hosts'			=> null,
 			'templated_hosts'			=> null,
 			'proxy_hosts'				=> null,
@@ -122,6 +124,8 @@ class CHost extends CZBXAPI{
 			'select_items'				=> null,
 			'select_triggers'			=> null,
 			'select_graphs'				=> null,
+			'select_dhosts'				=> null,
+			'select_dservices'			=> null,
 			'select_applications'		=> null,
 			'select_macros'				=> null,
 			'select_profile'			=> null,
@@ -310,6 +314,38 @@ class CHost extends CZBXAPI{
 			}
 		}
 
+// dhostids
+		if(!is_null($options['dhostids'])){
+			zbx_value2array($options['dhostids']);
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['dhostid'] = 'ds.dhostid';
+			}
+
+			$sql_parts['from']['ds'] = 'dservices ds';
+			$sql_parts['where'][] = DBcondition('ds.dhostid', $options['dhostids']);
+			$sql_parts['where']['dsh'] = 'ds.ip=h.ip';
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['dhostid'] = 'ds.dhostid';
+			}
+		}
+
+// dserviceids
+		if(!is_null($options['dserviceids'])){
+			zbx_value2array($options['dserviceids']);
+			if($options['output'] != API_OUTPUT_SHORTEN){
+				$sql_parts['select']['dserviceid'] = 'ds.dserviceid';
+			}
+
+			$sql_parts['from']['ds'] = 'dservices ds';
+			$sql_parts['where'][] = DBcondition('ds.dserviceid', $options['dserviceids']);
+			$sql_parts['where']['dsh'] = 'ds.ip=h.ip';
+
+			if(!is_null($options['groupCount'])){
+				$sql_parts['group']['dserviceid'] = 'ds.dserviceid';
+			}
+		}
+
 // node check !!!!!
 // should last, after all ****IDS checks
 		if(!$nodeCheck){
@@ -430,8 +466,12 @@ class CHost extends CZBXAPI{
 
 			if(isset($options['filter']['host']) && !is_null($options['filter']['host'])){
 				zbx_value2array($options['filter']['host']);
-
 				$sql_parts['where']['host'] = DBcondition('h.host', $options['filter']['host'], false, true);
+			}
+
+			if(isset($options['filter']['ip']) && !is_null($options['filter']['ip'])){
+				zbx_value2array($options['filter']['ip']);
+				$sql_parts['where']['ip'] = DBcondition('h.ip', $options['filter']['ip'], false, true);
 			}
 
 			if(isset($options['filter']['maintenance_status']) && !is_null($options['filter']['maintenance_status'])){
@@ -527,6 +567,14 @@ class CHost extends CZBXAPI{
 						$result[$host['hostid']]['graphs'] = array();
 					}
 
+					if(!is_null($options['select_dhosts']) && !isset($result[$host['hostid']]['dhosts'])){
+						$result[$host['hostid']]['dhosts'] = array();
+					}
+
+					if(!is_null($options['select_dservices']) && !isset($result[$host['hostid']]['dservices'])){
+						$result[$host['hostid']]['dservices'] = array();
+					}
+
 					if(!is_null($options['select_applications']) && !isset($result[$host['hostid']]['applications'])){
 						$result[$host['hostid']]['applications'] = array();
 					}
@@ -579,6 +627,25 @@ class CHost extends CZBXAPI{
 						$result[$host['hostid']]['graphs'][] = array('graphid' => $host['graphid']);
 						unset($host['graphid']);
 					}
+
+// dhostids
+					if(isset($host['dhostid']) && is_null($options['select_dhosts'])){
+						if(!isset($result[$host['hostid']]['dhosts']))
+							$result[$host['hostid']]['dhosts'] = array();
+
+						$result[$host['hostid']]['dhosts'][] = array('dhostid' => $host['dhostid']);
+						unset($host['dhostid']);
+					}
+
+// dserviceids
+					if(isset($host['dserviceid']) && is_null($options['select_dservices'])){
+						if(!isset($result[$host['hostid']]['dservices']))
+							$result[$host['hostid']]['dservices'] = array();
+
+						$result[$host['hostid']]['dservices'][] = array('dserviceid' => $host['dserviceid']);
+						unset($host['dserviceid']);
+					}
+//---
 
 					$result[$host['hostid']] += $host;
 				}
@@ -798,6 +865,50 @@ Copt::memoryPick();
 						$result[$hostid]['graphs'] = $graphs[$hostid]['rowscount'];
 					else
 						$result[$hostid]['graphs'] = 0;
+				}
+			}
+		}
+
+// Adding discovery hosts
+		if(!is_null($options['select_dhosts'])){
+			$obj_params = array(
+				'nodeids' => $nodeids,
+				'hostids' => $hostids,
+				'nopermissions' => 1,
+				'preservekeys' => 1
+			);
+
+			if(is_array($options['select_dhosts']) || str_in_array($options['select_dhosts'], $subselects_allowed_outputs)){
+				$obj_params['output'] = $options['select_dhosts'];
+				$dhosts = CDHost::get($obj_params);
+
+				if(!is_null($options['limitSelects'])) order_result($dhosts, 'dhostid');
+				foreach($dhosts as $dhostid => $dhost){
+					unset($dhosts[$dhostid]['hosts']);
+
+					foreach($dhost['hosts'] as $hnum => $host){
+						if(!is_null($options['limitSelects'])){
+							if(!isset($count[$host['hostid']])) $count[$host['hostid']] = 0;
+							$count[$host['hostid']]++;
+
+							if($count[$host['hostid']] > $options['limitSelects']) continue;
+						}
+
+						$result[$host['hostid']]['dhosts'][] = &$dhosts[$dhostid];
+					}
+				}
+			}
+			else if(API_OUTPUT_COUNT == $options['select_dhosts']){
+				$obj_params['countOutput'] = 1;
+				$obj_params['groupCount'] = 1;
+
+				$dhosts = CDHost::get($obj_params);
+				$dhosts = zbx_toHash($dhosts, 'hostid');
+				foreach($result as $hostid => $host){
+					if(isset($dhosts[$hostid]))
+						$result[$hostid]['dhosts'] = $dhosts[$hostid]['rowscount'];
+					else
+						$result[$hostid]['dhosts'] = 0;
 				}
 			}
 		}
