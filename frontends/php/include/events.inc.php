@@ -42,6 +42,40 @@
 	return $result;
 	}
 
+	function get_events_unacknowledged($db_element, $value=null){
+		$elements = array('hosts' => array(), 'hosts_groups' => array(), 'triggers' => array());
+
+		get_map_elements($db_element, $elements);
+		if(empty($elements['hosts_groups']) && empty($elements['hosts']) && empty($elements['triggers'])){
+			return 0;
+		}
+
+		$config = select_config();
+		$options = array(
+			'nodeids' => get_current_nodeid(),
+			'output' => API_OUTPUT_SHORTEN,
+			'monitored' => 1,
+//			'only_problems' => 1,
+			'skipDependent' => 1,
+			'limit' => ($config['search_limit']+1)
+		);
+		if(!empty($elements['hosts_groups'])) $options['groupids'] = array_unique($elements['hosts_groups']);
+		if(!empty($elements['hosts'])) $options['hostids'] = array_unique($elements['hosts']);
+		if(!empty($elements['triggers'])) $options['triggerids'] = array_unique($elements['triggers']);
+		$triggerids = CTrigger::get($options);
+
+		$options = array(
+			'count' => 1,
+			'triggerids' => zbx_objectValues($triggerids, 'triggerid'),
+			'object' => EVENT_OBJECT_TRIGGER,
+			'acknowledged' => 0,
+			'value' => is_null($value) ? array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE) : $value,
+			'nopermissions' => 1
+		);
+		$event_count = CEvent::get($options);
+
+	return $event_count['rowscount'];
+	}
 
 /* function:
  *     event_initial_time
