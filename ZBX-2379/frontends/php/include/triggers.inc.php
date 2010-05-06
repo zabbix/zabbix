@@ -3147,6 +3147,7 @@ return $result;
 //			SDII($pasedData[$expression]['tree']);
 			return $ret;
 		}else{
+			SDII($pasedData[$expression]['errors']);
 			return Array('', null);
 		}
 	}
@@ -3301,11 +3302,18 @@ return $result;
 
 		$letterLevel = true;
 		if($treeLevel['levelType'] == 'independent' || $treeLevel['levelType'] == 'grouping') {
-			$sStart = $treeLevel['levelType'] == 'independent' ? $treeLevel['openSymbolNum'] : $treeLevel['openSymbolNum']+(isset($treeLevel['openSymbol']) ? zbx_strlen($treeLevel['openSymbol']) : 0);
-			$sEnd = $treeLevel['levelType'] == 'independent' ? $treeLevel['closeSymbolNum']+1 : $treeLevel['closeSymbolNum'];
+			$sStart = !isset($treeLevel['openSymbol']) ? $treeLevel['openSymbolNum'] : $treeLevel['openSymbolNum']+zbx_strlen($treeLevel['openSymbol']);
+			$sEnd = !isset($treeLevel['closeSymbol']) ? $treeLevel['closeSymbolNum']: $treeLevel['closeSymbolNum']-zbx_strlen($treeLevel['closeSymbol']);
 			
 			if(isset($treeLevel['parts'])) $parts =& $treeLevel['parts'];
 			else $parts = Array();
+			
+			if(count($parts) == 1 && $sStart == $parts[0]['openSymbolNum'] && $sEnd == $parts[0]['closeSymbolNum']) {
+				$next[$level] = false;
+				list($outline, $treeList) = build_expression_html_tree($expression, $parts[0], $level, $next, $nextletter);
+				$outline = (isset($treeLevel['openSymbol']) ? $treeLevel['openSymbol'].' ' : '').$outline.(isset($treeLevel['closeSymbol']) ? ' '.$treeLevel['closeSymbol'] : '');
+				return Array($outline, $treeList);
+			}
 			
 			$operand = '|';
 			$i = 0;
@@ -3321,7 +3329,7 @@ return $result;
 			
 			if(is_int($opPos) && $opPos < $sEnd) {
 				$letterLevel = false;
-				$expValue = trim(zbx_substr($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum']-$treeLevel['openSymbolNum']));
+				$expValue = trim(zbx_substr($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum']-$treeLevel['openSymbolNum']+1));
 				array_push($expr, SPACE, italic($operand == '&' ? S_AND_BIG : S_OR_BIG));
 				array_push($treeList, Array('list' => $expr, 'id' => $treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum'], 'expression' => Array('start' => $treeLevel['openSymbolNum'], 'end' => $treeLevel['closeSymbolNum'], 'oSym' => isset($treeLevel['openSymbol']) ? $treeLevel['openSymbol']: NULL, 'cSym' => isset($treeLevel['closeSymbol']) ? $treeLevel['closeSymbol'] : NULL, 'value' => $expValue)));
 				$prev = $sStart;
@@ -3356,14 +3364,14 @@ return $result;
 					$levelOutline .= trim($outln).(is_int($prev) && $prev < $sEnd ? ' '.$operand.' ':'');
 //					SDI("After {$treeLevel['levelType']} parts:".(isset($treeLevel['parts']) ? count($treeLevel['parts']): 0));
 				}
-				$outline .= zbx_strlen($levelOutline) > 0 ? (isset($treeLevel['openSymbol']) ? $treeLevel['openSymbol'] : '').' '.$levelOutline.(isset($treeLevel['closeSymbol']) ? $treeLevel['closeSymbol'] : '') : '';
+				$outline .= zbx_strlen($levelOutline) > 0 ? (isset($treeLevel['openSymbol']) ? $treeLevel['openSymbol'].' ' : '').$levelOutline.(isset($treeLevel['closeSymbol']) ? ' '.$treeLevel['closeSymbol'] : '') : '';
 			}		
 		}
 		
 		if($letterLevel) {
 			if(!$nextletter) $nextletter = 'A';
 			array_push($expr, SPACE, bold($nextletter), SPACE);
-			$expValue = trim(zbx_substr($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum']-$treeLevel['openSymbolNum']));
+			$expValue = trim(zbx_substr($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum']-$treeLevel['openSymbolNum']+1));
 			$url =  new CSpan($expValue, 'link');
 			$url->setAttribute('id', 'expr_'.$treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum']);
 			$url->setAttribute('onclick', 'javascript: copy_expression("expr_'.$treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum'].'");');
@@ -3422,8 +3430,8 @@ return $result;
 //				SDI("levelType: {$parts[$i]['levelType']}");
 //				SDI("Position: $position; openSymbolNum: {$parts[$i]['openSymbolNum']}; closeSymbolNum: {$parts[$i]['closeSymbolNum']};");
 //				SDI("Grouping Value (From {$parts[$i]['openSymbolNum']}, To {$parts[$i]['closeSymbolNum']}): ".zbx_substr($expression, $parts[$i]['openSymbolNum'], $parts[$i]['closeSymbolNum']-$parts[$i]['openSymbolNum']+1).";");
-				//if(isset($parts[$i+1]))
-				//SDI("Grouping Value (From {$parts[$i+1]['openSymbolNum']}, To {$parts[$i+1]['closeSymbolNum']}): ".zbx_substr($expression, $parts[$i+1]['openSymbolNum'], $parts[$i+1]['closeSymbolNum']-$parts[$i+1]['openSymbolNum']+1).";");
+//				if(isset($parts[$i+1]))
+//				SDI("Grouping Value (From {$parts[$i+1]['openSymbolNum']}, To {$parts[$i+1]['closeSymbolNum']}): ".zbx_substr($expression, $parts[$i+1]['openSymbolNum'], $parts[$i+1]['closeSymbolNum']-$parts[$i+1]['openSymbolNum']+1).";");
 				if($parts[$i]['openSymbolNum'] <= $position && $position <= $parts[$i]['closeSymbolNum']) {
 //					SDI("Position is inside child: {$parts[$i]['levelType']}");
 					$position = $parts[$i]['closeSymbolNum'] < $sEnd ? mb_strpos($expression, $operand, $parts[$i]['closeSymbolNum']) : $sEnd;
@@ -3453,18 +3461,24 @@ return $result;
  * Comments:
  *
  */
-	function rebuild_expression_tree($expression, &$treeLevel, $level, $action, $actionid, $newPart) {
+	function rebuild_expression_tree($expression, &$treeLevel, $action, $actionid, $newPart) {
 		$newExp = '';
 		$lastLevel = true;
 
 		if($actionid != $treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum'] && ($treeLevel['levelType'] == 'independent' || $treeLevel['levelType'] == 'grouping')) {
-			$sStart = $treeLevel['levelType'] == 'independent' ? $treeLevel['openSymbolNum'] : $treeLevel['openSymbolNum']+(isset($treeLevel['openSymbol']) ? zbx_strlen($treeLevel['openSymbol']) : 0);
-			$sEnd = $treeLevel['levelType'] == 'independent' ? $treeLevel['closeSymbolNum']+1 : $treeLevel['closeSymbolNum'];
+			$sStart = !isset($treeLevel['openSymbol']) ? $treeLevel['openSymbolNum'] : $treeLevel['openSymbolNum']+zbx_strlen($treeLevel['openSymbol']);
+			$sEnd = !isset($treeLevel['closeSymbol']) ? $treeLevel['closeSymbolNum']: $treeLevel['closeSymbolNum']-zbx_strlen($treeLevel['closeSymbol']);
+			/*$sStart = $treeLevel['levelType'] == 'independent' ? $treeLevel['openSymbolNum'] : $treeLevel['openSymbolNum']+(isset($treeLevel['openSymbol']) ? zbx_strlen($treeLevel['openSymbol']) : 0);
+			$sEnd = $treeLevel['levelType'] == 'independent' ? $treeLevel['closeSymbolNum']+1 : $treeLevel['closeSymbolNum'];*/
 			
 //			SDI("Total start: {$sStart}; Total end: {$sEnd};");
 
 			if(isset($treeLevel['parts'])) $parts =& $treeLevel['parts'];
 			else $parts = Array();
+			
+			if(count($parts) == 1 && $sStart == $parts[0]['openSymbolNum'] && $sEnd == $parts[0]['closeSymbolNum']) {
+				return (isset($parts[0]['openSymbol']) ? $parts[0]['openSymbol']:'').trim(rebuild_expression_tree($expression, $parts[0], $action, $actionid, $newPart)).(isset($parts[0]['closeSymbol']) ? $parts[0]['closeSymbol']:'');
+			}
 			
 			$operand = '|';
 			$i = 0;
@@ -3509,9 +3523,9 @@ return $result;
 					
 //					if(isset($newTreeLevel['parts'])) SDII($newTreeLevel['parts']);
 					
-					$newLevelExpression = rebuild_expression_tree($expression, $newTreeLevel, $level+1, $action, $actionid, $newPart);
+					$newLevelExpression = rebuild_expression_tree($expression, $newTreeLevel, $action, $actionid, $newPart);
 					if($newLevelExpression)
-						$levelNewExpression[] = (isset($newTreeLevel['openSymbol']) ? $newTreeLevel['openSymbol']:'').$newLevelExpression.(isset($newTreeLevel['closeSymbol']) ? $newTreeLevel['closeSymbol']:'');
+						$levelNewExpression[] = (isset($newTreeLevel['openSymbol']) ? $newTreeLevel['openSymbol']:'').trim($newLevelExpression).(isset($newTreeLevel['closeSymbol']) ? $newTreeLevel['closeSymbol']:'');
 					
 //					SDI("After {$treeLevel['levelType']} parts:".count($treeLevel['parts']));
 				}
@@ -3520,7 +3534,7 @@ return $result;
 		}
 
 		if($lastLevel) {
-			$curLevelVal = zbx_substr($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum']-$treeLevel['openSymbolNum']+(isset($treeLevel['closeSymbol']) ? zbx_strlen($treeLevel['closeSymbol']) : 0));
+			$curLevelVal = trim(zbx_substr($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum']-$treeLevel['openSymbolNum']+1));
 			if($actionid == $treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum']) {
 				switch($action) {
 					case 'R': /* remove */
@@ -3599,7 +3613,7 @@ return $result;
 
 		if(!isset($pasedData[$expression]['errors'])) {
 //			SDII($pasedData[$expression]['tree']);
-			$ret = rebuild_expression_tree($expression, $pasedData[$expression]['tree'], 0, $action, $actionid, $new_expr);
+			$ret = rebuild_expression_tree($expression, $pasedData[$expression]['tree'], $action, $actionid, $new_expr);
 //			SDII($pasedData[$expression]['tree']);
 			return $ret;
 		}else{
@@ -3872,10 +3886,10 @@ return $result;
 	}
 	
 	function replaceExpressionTestData($expression, &$e, &$rplcts) {
-		$evStr = zbx_substr($expression, $e['expression']['start']+($e['expression']['oSym'] !== NULL ? zbx_strlen($e['expression']['oSym']) : 0),
-						 $e['expression']['end']-$e['expression']['start']-($e['expression']['cSym'] !== NULL ? zbx_strlen($e['expression']['cSym']) : 0));
+		$evStr = zbx_substr($expression, $e['expression']['start'],
+						 $e['expression']['end']-$e['expression']['start']+1);
 		
-		$chStart = $e['expression']['start']+($e['expression']['oSym'] !== NULL ? zbx_strlen($e['expression']['oSym']) : 0);
+		$chStart = $e['expression']['start'];
 		if(is_array($rplcts)) {
 			foreach($rplcts as $mKey => $mData) {
 				if($mData['start'] >= $e['expression']['start'] && $mData['end'] <= $e['expression']['end']) {
@@ -3894,6 +3908,7 @@ return $result;
 		$evStr = str_replace('&', '&&', $evStr);
 		$evStr = str_replace('|', '||', $evStr);
 		
+		SDI($evStr);
 		return $evStr;
 	}
 
@@ -3974,7 +3989,8 @@ $triggerExpressionRules['macro'] = Array(
 		'STATUS',
 		'TRIGGER.URL',
 		'TRIGGER.VALUE',
-		'TRIGGERS.UNACK'),
+		'TRIGGERS.UNACK',
+		'TRIGGERS.PROBLEM.UNACK'),
 	'indexItem' => true,
 	'parent' => Array('independent', 'grouping'));
 $triggerExpressionRules['macroNum'] = Array(

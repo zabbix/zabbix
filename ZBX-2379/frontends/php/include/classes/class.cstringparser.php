@@ -59,8 +59,8 @@ class CStringParser {
 		$this->validateFatal();
 
 		$this->levelData[0]['openSymbolNum'] = 0;
+		$this->levelData[0]['closeSymbolNum'] = mb_strlen($this->expression)-1;
 		$this->levelData[0]['value'] = $this->expression;
-		$this->levelData[0]['closeSymbolNum'] = mb_strlen($this->levelData[0]['value']);
 		$this->validate($this->levelData, $this->levelData[0], 0);
 
 		//if(count($this->errors) > 0) $this->saveDebug(print_r($this->errors, true));
@@ -180,9 +180,9 @@ class CStringParser {
 							$endPoint = array_shift($ends);
 
 							$openprepend = (!isset($this->ess[$ruleSetName]['inclusive']) || $this->ess[$ruleSetName]['inclusive'] !== true) ? mb_strlen($this->currentSymbol) : 0;
-							$openpostend = (!isset($this->ess[$ruleSetName]['inclusive']) || $this->ess[$ruleSetName]['inclusive'] !== true) ? 0 : mb_strlen($endSymbol);
+							$openpostend = (!isset($this->ess[$ruleSetName]['inclusive']) || $this->ess[$ruleSetName]['inclusive'] !== true) ? mb_strlen($endSymbol) * -1 : 0;
 
-							$compareValue = mb_substr($this->expression, $this->currentSymbolNum+$openprepend, $endPoint+$openpostend-($this->currentSymbolNum+$openprepend));
+							$compareValue = mb_substr($this->expression, $this->currentSymbolNum+$openprepend, $endPoint+$openpostend-($this->currentSymbolNum+$openprepend)+1);
 
 							if(isset($this->ess[$ruleSetName]['allowedValues'])) {
 								$allowedValuesValid = true;
@@ -607,7 +607,7 @@ class CStringParser {
 		$value = '';
 		$values = Array();
 		$openprepend = (!isset($this->ess[$levelData['levelType']]['inclusive']) || $this->ess[$levelData['levelType']]['inclusive'] !== true) && isset($levelData['openSymbol']) ? mb_strlen($levelData['openSymbol']) : 0;
-		$openpostend = ((!isset($this->ess[$levelData['levelType']]['inclusive']) || $this->ess[$levelData['levelType']]['inclusive'] !== true) && isset($levelData['closeSymbol'])) || !isset($levelData['closeSymbol']) ? 0 : mb_strlen($levelData['closeSymbol']);
+		$openpostend = (!isset($this->ess[$levelData['levelType']]['inclusive']) || $this->ess[$levelData['levelType']]['inclusive'] !== true) && isset($levelData['closeSymbol'])? mb_strlen($levelData['closeSymbol'])*-1 : 0;
 		if(isset($levelData['parts']) && is_array($levelData['parts'])) {
 			$prev = NULL;
 			foreach($levelData['parts'] as $key => &$level) {
@@ -638,7 +638,7 @@ class CStringParser {
 															(!isset($levelData['closeSymbol']) && $level['closeSymbolNum']+mb_strlen($level['closeSymbol'])==$levelData['closeSymbolNum'])*/
 															)) {
 					$val = Array();
-					$val['value'] = mb_substr($this->expression, $level['closeSymbolNum']+mb_strlen($level['closeSymbol']), $levelData['closeSymbolNum']+$openpostend-($level['closeSymbolNum']+mb_strlen($level['closeSymbol']))); // should be changed to zbx_substr
+					$val['value'] = mb_substr($this->expression, $level['closeSymbolNum']+mb_strlen($level['closeSymbol']), $levelData['closeSymbolNum']+$openpostend-($level['closeSymbolNum']+mb_strlen($level['closeSymbol']))+1); // should be changed to zbx_substr
 					$val['from'] = $level['closeSymbolNum']+mb_strlen($level['closeSymbol']);
 					$val['until'] = $levelData['closeSymbolNum']+$openpostend;
 					$value .= $val['value'];
@@ -648,7 +648,7 @@ class CStringParser {
 			}
 		}else {
 			$val = Array();
-			$val['value'] = mb_substr($this->expression, $levelData['openSymbolNum']+$openprepend, $levelData['closeSymbolNum']+$openpostend-($levelData['openSymbolNum']+$openprepend)); // should be changed to zbx_substr
+			$val['value'] = mb_substr($this->expression, $levelData['openSymbolNum']+$openprepend, $levelData['closeSymbolNum']+$openpostend-($levelData['openSymbolNum']+$openprepend)+1); // should be changed to zbx_substr
 			$val['from'] = $levelData['openSymbolNum']+$openprepend;
 			$val['until'] = $levelData['closeSymbolNum']+$openpostend;
 			$value .= $val['value'];
@@ -682,7 +682,7 @@ function triggerExpressionValidateGroup(&$parent, &$levelData, $index, &$express
 	$replacementchar = '0';
 
 	$openprepend = (!isset($rules['inclusive']) || $rules['inclusive'] !== true) && isset($levelData['openSymbol']) ? mb_strlen($levelData['openSymbol']) : 0;
-	$openpostend = ((!isset($rules['inclusive']) || $rules['inclusive'] !== true) && isset($levelData['closeSymbol'])) || !isset($levelData['closeSymbol']) ? 0 : mb_strlen($levelData['closeSymbol']);
+	$openpostend = (!isset($rules['inclusive']) || $rules['inclusive'] !== true) && isset($levelData['closeSymbol']) ? mb_strlen($levelData['closeSymbol'])*-1 : 0;
 	if(isset($levelData['parts']) && is_array($levelData['parts']) && count($levelData['parts']) > 0) {
 		$values = '';
 		$prev = NULL;
@@ -701,12 +701,12 @@ function triggerExpressionValidateGroup(&$parent, &$levelData, $index, &$express
 
 			if($key == count($levelData['parts'])-1 && $level['closeSymbolNum']+mb_strlen($level['closeSymbol']) < $levelData['closeSymbolNum']+$openpostend) {
 				$val = Array();
-				$values .= mb_substr($expression, $level['closeSymbolNum']+mb_strlen($level['closeSymbol']), $levelData['closeSymbolNum']+$openpostend-($level['closeSymbolNum']+mb_strlen($level['closeSymbol']))); // should be changed to zbx_substr
+				$values .= mb_substr($expression, $level['closeSymbolNum']+mb_strlen($level['closeSymbol']), $levelData['closeSymbolNum']+$openpostend-($level['closeSymbolNum']+mb_strlen($level['closeSymbol']))+1); // should be changed to zbx_substr
 			}
 			$prev =& $level;
 		}
 	}else{
-		$values = mb_substr($expression, $levelData['openSymbolNum']+$openprepend, $levelData['closeSymbolNum']+$openpostend-($levelData['openSymbolNum']+$openprepend)); // should be changed to zbx_substr
+		$values = mb_substr($expression, $levelData['openSymbolNum']+$openprepend, $levelData['closeSymbolNum']+$openpostend-($levelData['openSymbolNum']+$openprepend)+1); // should be changed to zbx_substr  
 	}
 
 	if(isset($rules['ignorSymbols'])) $values = preg_replace("/".$rules['ignorSymbols']."/", '', $values);
@@ -720,6 +720,8 @@ function triggerExpressionValidateGroup(&$parent, &$levelData, $index, &$express
 						'errorMsg' => 'Not allowed symbols or sequence of symbols detected at the beginnig or at the end of '.$levelData['levelType'].'. Check expression starting from symbol #'.($levelData['openSymbolNum']+1).' up to symbol #'.$levelData['closeSymbolNum'].'.',
 						'errStart' => $levelData['openSymbolNum'],
 						'errEnd' => $levelData['closeSymbolNum'],
+						'origVal' => mb_substr($expression, $levelData['openSymbolNum']+$openprepend, $levelData['closeSymbolNum']+$openpostend-($levelData['openSymbolNum']+$openprepend)+1),
+						'changedVal' => $values,
 						'errValues' => Array($errValues[0]))
 					);
 	}

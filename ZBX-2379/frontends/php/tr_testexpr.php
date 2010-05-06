@@ -63,9 +63,6 @@ include_once('include/page_header.php');
 			$macrosId = md5($macroStr);
 			$skip = isset($macrosData[$macrosId]);
 			
-			if(!isset($macrosData[$macrosId]) || !isset($macrosData[$macrosId]['pos']))
-				$macrosData[$macrosId]['pos'] = Array();
-			
 			$rplcts[$macros['openSymbolNum'].'_'.$macros['closeSymbolNum']] = Array('start' => $macros['openSymbolNum'], 'end' => $macros['closeSymbolNum'], 'item' => &$macrosData[$macrosId]);
 			
 			if($skip) continue;
@@ -132,34 +129,6 @@ include_once('include/page_header.php');
 		
 		$result = '-';
 		if($test && isset($e['expression'])){
-			/*
-			$evStr = zbx_substr($expression, $e['expression']['start']+($e['expression']['oSym'] !== NULL ? zbx_strlen($e['expression']['oSym']) : 0),
-							 $e['expression']['end']-$e['expression']['start']-($e['expression']['cSym'] !== NULL ? zbx_strlen($e['expression']['cSym']) : 0));
-			
-			$chStart = $e['expression']['start']+($e['expression']['oSym'] !== NULL ? zbx_strlen($e['expression']['oSym']) : 0);
-			if(is_array($rplcts)) {
-				foreach($rplcts as $mKey => $mData) {
-					if($mData['start'] >= $e['expression']['start'] && $mData['end'] <= $e['expression']['end']) {
-						//SDII($cvItem);
-						$vStart = $mData['start'] - $chStart;
-						$vEnd = $mData['end'] - $chStart+1;
-						$cValue = convert($mData['item']['cValue']);
-						if(empty($cValue)) $cValue = "''";
-						$chStart += ($mData['end']-$mData['start']+1)-zbx_strlen($cValue);
-						//SDI(zbx_substr($expression, $mData['start'], $mData['end']-$mData['start']+1));
- 						//SDI(zbx_substr($evStr, $vStart, $vEnd-$vStart));
-						//SDI($evStr);
-						$evStr = ($vStart > 0 ? zbx_substr($evStr, 0, $vStart) : '').$cValue.($vEnd < zbx_strlen($evStr) ? zbx_substr($evStr, $vEnd) : '');
-						//SDI($evStr);
-					}
-				}
-			}
-			$evStr = str_replace('=', '==', $evStr);
-			$evStr = str_replace('#', '!=', $evStr);
-			$evStr = str_replace('&', '&&', $evStr);
-			$evStr = str_replace('|', '||', $evStr);
-			//SDI($evStr);
-			*/
 			$evStr = replaceExpressionTestData($expression, &$e, &$rplcts);
 			eval('$result = '.$evStr.';');
 			$result = !$result ? 'FALSE' : 'TRUE';
