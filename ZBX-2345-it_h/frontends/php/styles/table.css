@@ -374,6 +374,21 @@ table.tabletree .treeheader{
 	background-color: #CCCCCC;
 }
 
+table.tabletree tr.treeheader td {
+	white-space: nowrap;
+	word-spacing:	0px;
+	font-weight: bold;
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:8pt;
+	text-decoration: none;
+	text-align: left;
+	border-width: 0px;
+	padding-top: 0px;
+	padding-bottom: 0px;
+	height: 20px;
+	vertical-align:middle;
+}
+
 table.tabletree .imgnode:hover{
 	cursor: pointer;
 }

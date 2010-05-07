@@ -263,12 +263,12 @@ include_once('include/page_header.php');
 
 		$tree = new CTree('service_status_tree',
 							$treeServ,
-							array('caption' => bold(S_SERVICE),
-								'status' => bold(S_STATUS),
-								'reason' => bold(S_REASON),
-								'sla' => bold('SLA ('.$periods[$period].')'),
-								'sla2' => bold(nbsp(S_SLA)),
-								'graph' => bold(S_GRAPH))
+							array('caption' => S_SERVICE,
+								'status' => S_STATUS,
+								'reason' => S_REASON,
+								'sla' => 'SLA ('.$periods[$period].')',
+								'sla2' => nbsp(S_SLA),
+								'graph' => S_GRAPH)
 						);
 
 		if($tree){
