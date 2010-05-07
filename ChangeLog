@@ -1,5 +1,6 @@
 Changes for 1.8.3
 
+ - [ZBX-2412] fixed deleting maps with API (Aly)
  - [ZBX-2341] fixed cutting 20bytes instead of 20 symbols in char/log/text item values (Vedmak)
  - [ZBX-2407] fixed repeated message on cookie size limit (Aly)
  - [ZBX-2406] removed filter from plaintext history (Aly)
