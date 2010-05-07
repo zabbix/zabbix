@@ -522,10 +522,10 @@ table.tableinfo tr td.message {
 table.tableinfo tr.selected td			{	background-color: #FFFFBB; border: 1px #DDDDDD solid; }
 
 table.tableinfo tr.odd_row 	td			{	background-color: #DDDDDD; border: 1px #DDDDDD solid; }
-table.tableinfo tr.odd_row:hover td		{	background-color: #DDDDEE; border: 1px #DDDDEE solid; }
+table.tableinfo tr.odd_row:hover td		{	background-color: #c1dad7; border: 1px #c1dad7 solid; }
 
 table.tableinfo tr.even_row td		 	{	background-color: #EEEEEE; border: 1px #EEEEEE solid; }
-table.tableinfo tr.even_row:hover td		{	background-color: #EEEEFE; border: 1px #EEEEFE solid; }
+table.tableinfo tr.even_row:hover td		{	background-color: #c1dad7; border: 1px #c1dad7 solid; }
 
 table.tableinfo tr td.center				{	vertical-align: middle; text-align: center; }
 
