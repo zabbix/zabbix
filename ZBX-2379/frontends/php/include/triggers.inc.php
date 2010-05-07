@@ -837,8 +837,11 @@ return $result;
 	}
 
 	function add_trigger($expression, $description, $type, $priority, $status, $comments, $url, $deps=array(), $templateid=0){
-		if( !validate_expression($expression) )
+		$expressionData = parseTriggerExpressions($expression, true);
+		if( isset($expressionData[$expression]['errors']) ) {
+			showExpressionErrors($expression, $expressionData[$expression]['errors']);
 			return false;
+		}
 		if( !validate_trigger_dependency($expression, $deps))
 			return false;
 
@@ -1939,7 +1942,12 @@ return $result;
 			$event_to_unknown = true;
 		}
 
-		if(!validate_expression($expression)) return false;
+		$expressionData = parseTriggerExpressions($expression, true);
+		if( isset($expressionData[$expression]['errors']) ) {
+			showExpressionErrors($expression, $expressionData[$expression]['errors']);
+			return false;
+		}
+
 		if(!validate_trigger_dependency($expression, $deps)) return false;
 
 		if(is_null($description)){
@@ -3147,8 +3155,40 @@ return $result;
 //			SDII($pasedData[$expression]['tree']);
 			return $ret;
 		}else{
-			SDII($pasedData[$expression]['errors']);
-			return Array('', null);
+			//SDII($pasedData[$expression]['errors']);
+			showExpressionErrors($expression, $pasedData[$expression]['errors']);
+			return false;
+		}
+	}
+	
+	function showExpressionErrors($expression, $errors) {
+		if(!is_array($errors))
+			return false;
+
+		$totalBreak = false;
+		foreach($errors as $errData) {
+			$checkExprFrom = sprintf(
+				S_CHECK_EXPRESSION_PART_STARTING_FROM,
+				zbx_substr(
+					$expression, 
+					$errData['errStart'],
+					$errData['errEnd']-$errData['errStart']+1
+				)
+			);
+
+			switch($errData['errorCode']) {
+				case 1:
+					error(S_EXPRESSION_UNEXPECTED_END_OF_ELEMENT_ERROR.': '.$checkExprFrom);
+					$totalBreak = true;
+				break;
+				case 2: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_OR_SEQUENCE_ERROR.': '.$checkExprFrom); break;
+				case 3: error(S_EXPRESSION_UNNECESSARY_SYMBOLS_DETECTED_ERROR.': '.$checkExprFrom); break;
+				case 4: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_BEFORE_ERROR.': '.$checkExprFrom); break;
+				case 5: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_AFTER_ERROR.': '.$checkExprFrom); break;
+				case 6: error(S_EXPRESSION_NOT_ALLOWED_VALUE_IN_ELEMENT_ERROR.': '.$checkExprFrom); break;
+				case 7: error(S_EXPRESSION_NOT_ALLOWED_SYMBOLS_OR_SEQUENCE_ERROR.': '.$checkExprFrom); break;
+			}
+			if($totalBreak) break;
 		}
 	}
 
@@ -3331,7 +3371,21 @@ return $result;
 				$letterLevel = false;
 				$expValue = trim(zbx_substr($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum']-$treeLevel['openSymbolNum']+1));
 				array_push($expr, SPACE, italic($operand == '&' ? S_AND_BIG : S_OR_BIG));
-				array_push($treeList, Array('list' => $expr, 'id' => $treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum'], 'expression' => Array('start' => $treeLevel['openSymbolNum'], 'end' => $treeLevel['closeSymbolNum'], 'oSym' => isset($treeLevel['openSymbol']) ? $treeLevel['openSymbol']: NULL, 'cSym' => isset($treeLevel['closeSymbol']) ? $treeLevel['closeSymbol'] : NULL, 'value' => $expValue)));
+				unset($expDetails);
+				$levelDetails = array(
+					'list' => $expr,
+					'id' => $treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum'],
+					'expression' => array(
+						'start' => $treeLevel['openSymbolNum'],
+						'end' => $treeLevel['closeSymbolNum'],
+						'oSym' => isset($treeLevel['openSymbol']) ? $treeLevel['openSymbol']: NULL,
+						'cSym' => isset($treeLevel['closeSymbol']) ? $treeLevel['closeSymbol'] : NULL,
+						'value' => $expValue
+					)
+				);
+				$levelErrors = expressionHighLevelErrors($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum']);
+				if(count($levelErrors) > 0) $levelDetails['expression']['levelErrors'] = $levelErrors;
+				array_push($treeList, $levelDetails);
 				$prev = $sStart;
 				$levelOutline = '';
 				while (is_int($opPos) && $opPos < $sEnd || $prev < $sEnd) {
@@ -3372,18 +3426,75 @@ return $result;
 			if(!$nextletter) $nextletter = 'A';
 			array_push($expr, SPACE, bold($nextletter), SPACE);
 			$expValue = trim(zbx_substr($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum']-$treeLevel['openSymbolNum']+1));
-			$url =  new CSpan($expValue, 'link');
-			$url->setAttribute('id', 'expr_'.$treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum']);
-			$url->setAttribute('onclick', 'javascript: copy_expression("expr_'.$treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum'].'");');
+			if(!defined('NO_LINK_IN_TESTING')) {
+				$url =  new CSpan($expValue, 'link');
+				$url->setAttribute('id', 'expr_'.$treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum']);
+				$url->setAttribute('onclick', 'javascript: copy_expression("expr_'.$treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum'].'");');
+			}else{
+				$url =  new CSpan($expValue);
+			}
 			$expr[] = $url;
 			$outline = (isset($treeLevel['openSymbol']) ? $treeLevel['openSymbol'] : '').' '.$nextletter.' '.(isset($treeLevel['closeSymbol']) ? $treeLevel['closeSymbol'] : '');
 			$nextletter = chr(ord($nextletter)+1);
-			array_push($treeList, Array('list' => $expr, 'id' => $treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum'], 'expression' => Array('start' => $treeLevel['openSymbolNum'], 'end' => $treeLevel['closeSymbolNum'], 'oSym' => isset($treeLevel['openSymbol']) ? $treeLevel['openSymbol']: NULL, 'cSym' => isset($treeLevel['closeSymbol']) ? $treeLevel['closeSymbol'] : NULL, 'value' => $expValue)));
+			
+			$errors = expressionHighLevelErrors($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum']);
+			$levelDetails = Array(
+					'start' => $treeLevel['openSymbolNum'],
+					'end' => $treeLevel['closeSymbolNum'],
+					'oSym' => isset($treeLevel['openSymbol']) ? $treeLevel['openSymbol']:NULL,
+					'cSym' => isset($treeLevel['closeSymbol']) ? $treeLevel['closeSymbol']:NULL,
+					'value' => $expValue);
+			$errors = expressionHighLevelErrors($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum']);
+			if(count($errors) > 0) $levelDetails['levelErrors'] = $errors;
+			
+			array_push($treeList, Array('list' => $expr, 'id' => $treeLevel['openSymbolNum'].'_'.$treeLevel['closeSymbolNum'], 'expression' => $levelDetails));
 		}
 		
 		return Array($outline, $treeList);
 	}
 
+	function expressionHighLevelErrors($expression, $start, $end) {
+		static $errors, $definedErrorPhrases;
+
+		if(!isset($errors)) {
+			$definedErrorPhrases = array(
+				EXPRESSION_VALUE_TYPE_UNKNOWN => S_EXPRESSION_VALUE_TYPE_UNKNOWN,
+				EXPRESSION_HOST_UNKNOWN => S_EXPRESSION_HOST_UNKNOWN,
+				EXPRESSION_HOST_ITEM_UNKNOWN => S_EXPRESSION_HOST_ITEM_UNKNOWN,
+				EXPRESSION_NOT_A_MACRO_ERROR => S_EXPRESSION_NOT_A_MACRO_ERROR);
+			$errors = array();
+		}
+
+		if(!isset($errors[$expression])) {
+			$errors[$expression] = array();
+			$expressionData = parseTriggerExpressions($expression, true);
+			if(isset($expressionData[$expression]['expressions']) && is_array($expressionData[$expression]['expressions'])) {
+				foreach($expressionData[$expression]['expressions'] as $expPart) {
+					$expValue = zbx_substr($expression, $expPart['openSymbolNum'], $expPart['closeSymbolNum']-$expPart['openSymbolNum']+1);
+					$info = get_item_function_info($expValue);
+					if(!is_array($info) && isset($definedErrorPhrases[$info])) {
+						if(!isset($errors[$expression][$expValue])) $errors[$expression][$expValue] = array();
+						$errors[$expression][$expValue][] = array(
+							'start' => $expPart['openSymbolNum'],
+							'end' => $expPart['closeSymbolNum'],
+							'error' => &$definedErrorPhrases[$info]);
+					}
+				}
+			}
+		}
+
+		$ret = array();
+		if(count($errors[$expression]) > 0) {
+			foreach($errors[$expression] as $expValue => $errsPos) {
+				foreach($errsPos as $errData) {
+					if($errData['start'] >= $start && $errData['end'] <= $end && !isset($ret[$expValue]))
+						$ret[$expValue] =& $errData['error'];
+				}
+			}
+		}
+
+		return $ret;
+	}
 /*
  * Function: expressionLevelDraw
  *
@@ -3689,111 +3800,114 @@ return $result;
 		$type_of_value_type = array(
 			ITEM_VALUE_TYPE_UINT64	=> T_ZBX_INT,
 			ITEM_VALUE_TYPE_FLOAT	=> T_ZBX_DBL,
-			ITEM_VALUE_TYPE_STR		=> T_ZBX_STR,
-			ITEM_VALUE_TYPE_LOG		=> T_ZBX_STR,
+			ITEM_VALUE_TYPE_STR	=> T_ZBX_STR,
+			ITEM_VALUE_TYPE_LOG	=> T_ZBX_STR,
 			ITEM_VALUE_TYPE_TEXT	=> T_ZBX_STR
 			);
 
 		$function_info = array(
-			'abschange' =>	array('value_type'	=> $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
+			'abschange' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 			'avg' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 			'delta' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 			'change' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
-			'count' =>		array('value_type' => S_NUMERIC_UINT64,'type' => T_ZBX_INT,			'validation' => NOT_EMPTY),
-			'date' =>		array('value_type' => 'YYYYMMDD',	'type' => T_ZBX_INT,			'validation' => '{}>=19700101&&{}<=99991231'),
-			'dayofweek' =>	array('value_type' => '1-7',		'type' => T_ZBX_INT,			'validation' => IN('1,2,3,4,5,6,7')),
-			'diff' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,			'validation' => IN('0,1')),
-			'fuzzytime' =>	array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,			'validation' => IN('0,1')),
-			'iregexp' =>	array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,			'validation' => IN('0,1')),
+			'count' =>		array('value_type' => S_NUMERIC_UINT64,	'type' => T_ZBX_INT,		'validation' => NOT_EMPTY),
+			'date' =>		array('value_type' => 'YYYYMMDD',	'type' => T_ZBX_INT,		'validation' => '{}>=19700101&&{}<=99991231'),
+			'dayofweek' =>		array('value_type' => '1-7',		'type' => T_ZBX_INT,		'validation' => IN('1,2,3,4,5,6,7')),
+			'diff' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,		'validation' => IN('0,1')),
+			'fuzzytime' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,		'validation' => IN('0,1')),
+			'iregexp' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,		'validation' => IN('0,1')),
 			'last' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
-			'logseverity' =>array('value_type' => S_NUMERIC_UINT64,'type' => T_ZBX_INT,			'validation' => NOT_EMPTY),
-			'logsource' =>	array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,			'validation' => IN('0,1')),
+			'logseverity' =>	array('value_type' => S_NUMERIC_UINT64,	'type' => T_ZBX_INT,		'validation' => NOT_EMPTY),
+			'logsource' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,		'validation' => IN('0,1')),
 			'max' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
 			'min' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
-			'nodata' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,			'validation' => IN('0,1')),
-			'now' =>		array('value_type' => S_NUMERIC_UINT64,'type' => T_ZBX_INT,			'validation' => NOT_EMPTY),
+			'nodata' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,		'validation' => IN('0,1')),
+			'now' =>		array('value_type' => S_NUMERIC_UINT64,	'type' => T_ZBX_INT,		'validation' => NOT_EMPTY),
 			'prev' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
-			'regexp' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,			'validation' => IN('0,1')),
-			'str' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,			'validation' => IN('0,1')),
+			'regexp' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,		'validation' => IN('0,1')),
+			'str' =>		array('value_type' => S_0_OR_1,		'type' => T_ZBX_INT,		'validation' => IN('0,1')),
 			'sum' =>		array('value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY),
-			'time' =>		array( 'value_type' => 'HHMMSS',	'type' => T_ZBX_INT,			'validation' => 'zbx_strlen({})==6'));
+			'time' =>		array( 'value_type' => 'HHMMSS',	'type' => T_ZBX_INT,		'validation' => 'zbx_strlen({})==6'));
 
 		if(isset($ZBX_TR_EXPR_SIMPLE_MACROS[$expr])){
 			$result = array(
 				'value_type'	=> S_0_OR_1,
-				'type'			=> T_ZBX_INT,
+				'type'		=> T_ZBX_INT,
 				'validation'	=> IN('0,1')
 				);
 		}else{
-			$item_id = $function = null;
+			$hostId = $itemId = $function = null;
 			$expData = parseTriggerExpressions($expr, true);
 			if(!isset($expData[$expr]['errors'])) {
-				$hData =& $expData[$expr]['hosts'][0];
-				$kData =& $expData[$expr]['keys'][0];
-				$kpData =& $expData[$expr]['keysParams'][0];
-				$fData =& $expData[$expr]['keysFunctions'][0];
-				$host = zbx_substr($expr, $hData['openSymbolNum']+zbx_strlen($hData['openSymbol']), $hData['closeSymbolNum']-$hData['openSymbolNum']-zbx_strlen($hData['closeSymbol']));
-				$hostKey = zbx_substr($expr, $kData['openSymbolNum']+zbx_strlen($kData['openSymbol']), $kData['closeSymbolNum']-$kData['openSymbolNum']-zbx_strlen($kData['closeSymbol']));
-				$hostKeyParams = zbx_substr($expr, $kpData['openSymbolNum'], $kpData['closeSymbolNum']-$kpData['openSymbolNum']+zbx_strlen($kpData['closeSymbol']));
-				$function = zbx_substr($expr, $fData['openSymbolNum']+zbx_strlen($fData['openSymbol']), $fData['closeSymbolNum']-$fData['openSymbolNum']-zbx_strlen($fData['closeSymbol']));
-				
-				//SDI($host);
-				//SDI($hostKey.$hostKeyParams);
-				//SDI($function);
-				
-				$sql = 'SELECT i.itemid '.
-					' FROM items i, hosts h '.
-					' WHERE i.hostid=h.hostid '.
-					' AND h.host='.zbx_dbstr($host).
-					' AND i.key_='.zbx_dbstr($hostKey.$hostKeyParams);
-				
-				//SDI($sql);
-				
-				$db_res = DBfetch(DBselect($sql));
-				if($db_res) $item_id = $db_res['itemid'];
-			}
-			
-			unset($expData);
-			/*
-			if(preg_match('/^'.ZBX_PREG_SIMPLE_EXPRESSION_FORMAT.'/u', $expr, $expr_res)){
-				$sql = 'SELECT i.itemid '.
-						' FROM items i, hosts h '.
-						' WHERE i.hostid=h.hostid '.
-							' AND h.host='.zbx_dbstr($expr_res[ZBX_SIMPLE_EXPRESSION_HOST_ID]).
-							' AND i.key_='.zbx_dbstr($expr_res[ZBX_SIMPLE_EXPRESSION_KEY_ID]);
-				$db_res = DBfetch(DBselect($sql));
-				if($db_res) $item_id = $db_res['itemid'];
+				if(isset($expData[$expr]['customMacros']) && count($expData[$expr]['customMacros']) > 0) {
+					$result = array(
+						'value_type'    => Array(
+									ITEM_VALUE_TYPE_UINT64  => S_NUMERIC_UINT64,
+									ITEM_VALUE_TYPE_FLOAT   => S_NUMERIC_FLOAT
+								),
+						'type'		=> Array(
+									ITEM_VALUE_TYPE_UINT64  => T_ZBX_INT,
+									ITEM_VALUE_TYPE_FLOAT   => T_ZBX_DBL
+								),
+						'validation'	=> NOT_EMPTY
+					);
+				} elseif(isset($expData[$expr]['expressions']) && count($expData[$expr]['expressions']) > 0) {
+					$hData =& $expData[$expr]['hosts'][0];
+					$kData =& $expData[$expr]['keys'][0];
+					$kpData =& $expData[$expr]['keysParams'][0];
+					$fData =& $expData[$expr]['keysFunctions'][0];
+					$host = zbx_substr($expr, $hData['openSymbolNum']+zbx_strlen($hData['openSymbol']), $hData['closeSymbolNum']-$hData['openSymbolNum']-zbx_strlen($hData['closeSymbol']));
+					$hostKey = zbx_substr($expr, $kData['openSymbolNum']+zbx_strlen($kData['openSymbol']), $kData['closeSymbolNum']-$kData['openSymbolNum']-zbx_strlen($kData['closeSymbol']));
+					$hostKeyParams = zbx_substr($expr, $kpData['openSymbolNum'], $kpData['closeSymbolNum']-$kpData['openSymbolNum']+zbx_strlen($kpData['closeSymbol']));
+					$function = zbx_substr($expr, $fData['openSymbolNum']+zbx_strlen($fData['openSymbol']), $fData['closeSymbolNum']-$fData['openSymbolNum']-zbx_strlen($fData['closeSymbol']));
 
-				$function = $expr_res[ZBX_SIMPLE_EXPRESSION_FUNCTION_NAME_ID];
-			}
+					//SDI($host);
+					//SDI($hostKey.$hostKeyParams);
+					//SDI($function);
 
-			unset($expr_res);*/
+					$sql = 'SELECT h.hostid, i.itemid'.
+						' FROM hosts h'.
+						' LEFT JOIN items i'.
+							' ON i.hostid=h.hostid'.
+							' AND i.key_='.zbx_dbstr($hostKey.$hostKeyParams).
+						' WHERE h.host='.zbx_dbstr($host);
 
-			if($item_id == null) return VALUE_TYPE_UNKNOWN;
+					//SDI($sql);
 
-			$result = $function_info[$function];
-			
-			if(is_array($result['value_type'])){
-				$value_type = null;
+					$db_res = DBfetch(DBselect($sql));
+					if($db_res) $hostId = $db_res['hostid'];
+					if($db_res) $itemId = $db_res['itemid'];
 
-				$options = array(
-					'itemids'=>$item_id,
-					'output'=>API_OUTPUT_EXTEND
-				);
-				$item_data = CItem::get($options);
+					unset($expData);
 
-				if($item_data = reset($item_data)){
-					$value_type = $item_data['value_type'];
-				}
+					if($hostId == null) return EXPRESSION_HOST_UNKNOWN;
+					if($itemId == null) return EXPRESSION_HOST_ITEM_UNKNOWN;
+					$result = $function_info[$function];
 
-				if($value_type == null) return VALUE_TYPE_UNKNOWN;
+					if(is_array($result['value_type'])){
+						$value_type = null;
+						$options = array(
+							'itemids'=>$itemId,
+							'output'=>API_OUTPUT_EXTEND
+						);
+						$item_data = CItem::get($options);
 
-				$result['value_type'] = $result['value_type'][$value_type];
-				$result['type'] = $result['type'][$value_type];
+						if($item_data = reset($item_data)){
+							$value_type = $item_data['value_type'];
+						}
 
-				if($result['type'] == T_ZBX_INT || $result['type'] == T_ZBX_DBL){
-					$result['type'] = T_ZBX_STR;
-					$result['validation'] = 'preg_match("/^'.ZBX_PREG_NUMBER.'$/u",{})';
+						if($value_type == null) return VALUE_TYPE_UNKNOWN;
+
+						$result['value_type'] = $result['value_type'][$value_type];
+						$result['type'] = $result['type'][$value_type];
+
+						if($result['type'] == T_ZBX_INT || $result['type'] == T_ZBX_DBL){
+							$result['type'] = T_ZBX_STR;
+							$result['validation'] = 'preg_match("/^'.ZBX_PREG_NUMBER.'$/u",{})';
+						}
+					}
+				}else{
+					return EXPRESSION_NOT_A_MACRO_ERROR;
 				}
 			}
 		}
@@ -3931,6 +4045,7 @@ return $result;
 					$triggersData[$str]['keysParams'] = $scparser->getElements('keyParams');
 					$triggersData[$str]['keysFunctions'] = $scparser->getElements('keyFunctionName');
 					$triggersData[$str]['macros'] = array_merge($scparser->getElements('macro'), $scparser->getElements('macroNum'), $scparser->getElements('customMacro'));
+					$triggersData[$str]['customMacros'] = $scparser->getElements('customMacro');
 					$triggersData[$str]['allMacros'] = array_merge($triggersData[$str]['expressions'],$triggersData[$str]['macros']);
 					$triggersData[$str]['tree'] = $scparser->getTree();
 				} else {

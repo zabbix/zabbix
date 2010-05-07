@@ -26,10 +26,14 @@ $page['title'] = S_TEST;
 $page['file'] = 'tr_testexpr.php';
 
 define('ZBX_PAGE_NO_MENU', 1);
-
-define('VALUE_TYPE_UNKNOWN', '#ERROR#');
 define('COMBO_PATTERN', 'str_in_array({},array(');
 define('COMBO_PATTERN_LENGTH', zbx_strlen(COMBO_PATTERN));
+
+$definedErrorPhrases = array(
+			EXPRESSION_VALUE_TYPE_UNKNOWN => S_EXPRESSION_VALUE_TYPE_UNKNOWN,
+			EXPRESSION_HOST_UNKNOWN => S_EXPRESSION_HOST_UNKNOWN,
+			EXPRESSION_HOST_ITEM_UNKNOWN => S_EXPRESSION_HOST_ITEM_UNKNOWN,
+			EXPRESSION_NOT_A_MACRO_ERROR => S_EXPRESSION_NOT_A_MACRO_ERROR);
 
 include_once('include/page_header.php');
 
@@ -38,6 +42,7 @@ include_once('include/page_header.php');
 // expression analyze
 	$expression = urldecode(get_request('expression', ''));
 	
+	define('NO_LINK_IN_TESTING', true);
 	$expressionData = parseTriggerExpressions($expression, true);
 	list($outline, $eHTMLTree) = analyze_expression($expression);
 
@@ -48,14 +53,15 @@ include_once('include/page_header.php');
 	$data_table->setAttribute('id', 'data_list');
 	$data_table->setOddRowClass('even_row');
 	$data_table->setEvenRowClass('even_row');
-	$data_table->setHeader(array(S_ITEM_SLASH_FUNCTION, S_RESULT_TYPE, S_VALUE));
+	$data_table->setHeader(array(S_EXPRESSION_VARIABLE_ELEMENTS, S_RESULT_TYPE, S_VALUE));
 
 	$datas = array();
 	$fields = array();
-	$rplcts = Array();
+	$rplcts = array();
+	$allowedTesting = true;
 
 	if(!isset($expressionData[$expression]['errors']) && isset($expressionData[$expression]['allMacros'])) {
-		$macrosData = Array();
+		$macrosData = array();
 		foreach ($expressionData[$expression]['allMacros'] as $macros){
 			$macroStr = zbx_substr($expression, $macros['openSymbolNum'], $macros['closeSymbolNum']-$macros['openSymbolNum']+1);
 			//SDI($macroStr);
@@ -63,7 +69,7 @@ include_once('include/page_header.php');
 			$macrosId = md5($macroStr);
 			$skip = isset($macrosData[$macrosId]);
 			
-			$rplcts[$macros['openSymbolNum'].'_'.$macros['closeSymbolNum']] = Array('start' => $macros['openSymbolNum'], 'end' => $macros['closeSymbolNum'], 'item' => &$macrosData[$macrosId]);
+			$rplcts[$macros['openSymbolNum'].'_'.$macros['closeSymbolNum']] = array('start' => $macros['openSymbolNum'], 'end' => $macros['closeSymbolNum'], 'item' => &$macrosData[$macrosId]);
 			
 			if($skip) continue;
 
@@ -81,8 +87,13 @@ include_once('include/page_header.php');
 				foreach ($vals as $v) $control->addItem($v, $v);
 			}else
 				$control = new CTextBox($fname, $macrosData[$macrosId]['cValue'], 30);
+			
+			if(!is_array($info) && isset($definedErrorPhrases[$info])) {
+				$control->setAttribute('disabled', 'disabled');
+				$allowedTesting = false;
+			}
 
-			$data_table->addRow(new CRow(array($macroStr, $info['value_type'], $control)));
+			$data_table->addRow(new CRow(array($macroStr, is_array($info) || !isset($definedErrorPhrases[$info]) ? $info['value_type'] : new CCol($definedErrorPhrases[$info], 'disaster'), $control)));
 			$fields[$fname] = array($info['type'], O_OPT, null, $validation, 'isset({test_expression})');
 		}
 	}
@@ -90,7 +101,9 @@ include_once('include/page_header.php');
 //---------------------------------- CHECKS ------------------------------------
 
 	$fields['test_expression'] = array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null);
-	check_fields($fields);
+	if(!check_fields($fields)) {
+		$allowedTesting = false;
+	}
 
 
 //------------------------ <ACTIONS> ---------------------------
@@ -128,7 +141,7 @@ include_once('include/page_header.php');
 			//continue;
 		
 		$result = '-';
-		if($test && isset($e['expression'])){
+		if($allowedTesting && $test && isset($e['expression'])){
 			$evStr = replaceExpressionTestData($expression, &$e, &$rplcts);
 			eval('$result = '.$evStr.';');
 			$result = !$result ? 'FALSE' : 'TRUE';
@@ -144,8 +157,8 @@ include_once('include/page_header.php');
 	}
 
 	$result = '-';
-	if($test){
-		$e['expression'] = Array('start' => 0, 'end' => zbx_strlen($expression), 'oSym' => NULL, 'cSym' => NULL);
+	if($allowedTesting && $test){
+		$e['expression'] = array('start' => 0, 'end' => zbx_strlen($expression), 'oSym' => NULL, 'cSym' => NULL);
 		$evStr = replaceExpressionTestData($expression, &$e, &$rplcts);
 		
 		eval('$result = '.$evStr.';');
@@ -163,7 +176,9 @@ include_once('include/page_header.php');
 	$frm_test->addRow(S_RESULT, $res_table);
 
 // action buttons
-	$frm_test->addItemToBottomRow(new CButton('test_expression', S_TEST));
+	$btn_test = new CButton('test_expression', S_TEST);
+	if(!$allowedTesting) $btn_test->setAttribute('disabled', 'disabled');
+	$frm_test->addItemToBottomRow($btn_test);
 	$frm_test->addItemToBottomRow(SPACE);
 
 	$btn_close = new CButton('close', S_CLOSE);

@@ -2728,11 +2728,15 @@
 					$new_expr = remake_expression($expression, $_REQUEST['expr_target_single'], $_REQUEST['expr_action'], $expr_temp);
 					if($new_expr !== false){
 						$expression = $new_expr;
-						list($outline, $eHTMLTree) = analyze_expression($expression);
+						$alz = analyze_expression($expression);
+						
+						if($alz !== false) list($outline, $eHTMLTree) = $alz;
+						else show_messages(false, '', S_EXPRESSION_SYNTAX_ERROR);
+
 						$expr_temp = '';
 					}
 					else{
-						show_messages();
+						show_messages(false, '', S_EXPRESSION_SYNTAX_ERROR);
 					}
 				}
 
@@ -2746,7 +2750,9 @@
 				$exprparam = "this.form.elements['$exprfname'].value";
 			}
 			else{
-				$input_method = IM_FORCED;
+				show_messages(false, '', S_EXPRESSION_SYNTAX_ERROR);
+				$input_method = IM_ESTABLISHED;
+				//$input_method = IM_FORCED;
 			}
 		}
 
@@ -2797,8 +2803,9 @@
 			$exp_table->setOddRowClass('even_row');
 			$exp_table->setEvenRowClass('even_row');
 
-			$exp_table->setHeader(array(S_TARGET, S_EXPRESSION, S_DELETE));
+			$exp_table->setHeader(array(S_TARGET, S_EXPRESSION, S_EXPRESSION_PART_ERROR, S_DELETE));
 
+			$allowedTesting = true;
 			if($eHTMLTree != null){
 				foreach($eHTMLTree as $i => $e){
 					$tgt_chk = new CCheckbox('expr_target_single', ($i==0) ? 'yes':'no', 'check_target(this);', $e['id']);
@@ -2809,11 +2816,31 @@
 									' document.forms["config_triggers.php"].submit(); '.
 								'}');
 					
-					$row = new CRow(array($tgt_chk, $e['list'], $del_url));
+					if(!isset($e['expression']['levelErrors'])) {
+						$errorImg = new CImg('images/general/ok_icon.png', 'expression_no_errors');
+						$errorImg->setHint(S_EXPRESSION_PART_NO_ERROR, '', '', false);
+					}else{
+						$allowedTesting = false;
+						$errorImg = new CImg('images/general/error_icon.png', 'expression_errors');
+						
+						$errorTexts = Array();
+						if(is_array($e['expression']['levelErrors'])) {
+							foreach($e['expression']['levelErrors'] as $expVal => $errTxt) {
+								if(count($errorTexts) > 0) array_push($errorTexts, BR());
+								array_push($errorTexts, $expVal, ':', $errTxt);
+							}
+						}
+						
+						$errorImg->setHint($errorTexts, '', 'left', false);
+					}
+
+					$errorCell = new CCol($errorImg, 'center');
+					$row = new CRow(array($tgt_chk, $e['list'], $errorCell, $del_url));
 					$exp_table->addRow($row);
 				}
 			}
 			else{
+				$allowedTesting = false;
 				$outline = '';
 			}
 
@@ -2826,6 +2853,7 @@
 									",850,400".
 									",'titlebar=no, resizable=yes, scrollbars=yes');".
 									"return false;");
+			if(!isset($allowedTesting) || !$allowedTesting) $btn_test->setAttribute('disabled', 'disabled');
 			if (empty($outline)) $btn_test->setAttribute('disabled', 'yes');
 			//SDI($outline);
 			$frmTrig->addRow(SPACE, array($outline,
