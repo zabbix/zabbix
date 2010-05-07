@@ -197,45 +197,41 @@ include_once('include/page_header.php');
 	else if(isset($_REQUEST['sw_pos'])){
 		$sw_pos = get_request('sw_pos', array());
 		if(count($sw_pos) > 3){
-			$sql = 'SELECT screenitemid '.
+			$sql = 'SELECT screenitemid, colspan, rowspan '.
 					' FROM screens_items '.
 					' WHERE y='.$sw_pos[0].
 						' AND x='.$sw_pos[1].
 						' AND screenid='.$screen['screenid'];
-			if($screen_item = DBfetch(DBselect($sql))){
+			$fitem = DBfetch(DBselect($sql));
+			
+			$sql = 'SELECT screenitemid, colspan, rowspan '.
+					' FROM screens_items '.
+					' WHERE y='.$sw_pos[2].
+						' AND x='.$sw_pos[3].
+						' AND screenid='.$screen['screenid'];
+			$sitem = DBfetch(DBselect($sql));
+			
+			if($fitem){
 				DBexecute('UPDATE screens_items '.
 							' SET y='.$sw_pos[2].',x='.$sw_pos[3].
+							($sitem ? ',colspan='.$sitem['colspan'] : '').
+							($sitem ? ',rowspan='.$sitem['rowspan'] : '').
 							' WHERE y='.$sw_pos[0].
 								' AND x='.$sw_pos[1].
-								' AND screenid='.$screen['screenid']);
+								' AND screenid='.$screen['screenid'].
+								' AND screenitemid='.$fitem['screenitemid']);
+								
+			}
 
+			if($sitem){
 				DBexecute('UPDATE screens_items '.
 							' SET y='.$sw_pos[0].',x='.$sw_pos[1].
+							($fitem ? ',colspan='.$fitem['colspan'] : '').
+							($fitem ? ',rowspan='.$fitem['rowspan'] : '').
 							' WHERE y='.$sw_pos[2].
 								' AND x='.$sw_pos[3].
 								' AND screenid='.$screen['screenid'].
-								' AND screenitemid<>'.$screen_item['screenitemid']);
-			}
-			else{
-				$sql = 'SELECT screenitemid '.
-						' FROM screens_items '.
-						' WHERE y='.$sw_pos[2].
-							' AND x='.$sw_pos[3].
-							' AND screenid='.$screen['screenid'];
-				if($screen_item = DBfetch(DBselect($sql))){
-					DBexecute('UPDATE screens_items '.
-								' SET y='.$sw_pos[0].',x='.$sw_pos[1].
-								' WHERE y='.$sw_pos[2].
-									' AND x='.$sw_pos[3].
-									' AND screenid='.$screen['screenid']);
-
-					DBexecute('UPDATE screens_items '.
-								' SET y='.$sw_pos[2].',x='.$sw_pos[3].
-								' WHERE y='.$sw_pos[0].
-									' AND x='.$sw_pos[1].
-									' AND screenid='.$screen['screenid'].
-									' AND screenitemid<>'.$screen_item['screenitemid']);
-				}
+								' AND screenitemid='.$sitem['screenitemid']);
 			}
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN,' Name ['.$screen['name'].'] Items switched');
 		}
