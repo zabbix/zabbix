@@ -4006,7 +4006,7 @@ return $result;
 					$vStart = $mData['start'] - $chStart;
 					$vEnd = $mData['end'] - $chStart+1;
 					$cValue = convert($mData['item']['cValue']);
-					if(empty($cValue)) $cValue = "''";
+					if($cValue === '') $cValue = "''";
 					$chStart += ($mData['end']-$mData['start']+1)-zbx_strlen($cValue);
 					$evStr = ($vStart > 0 ? zbx_substr($evStr, 0, $vStart) : '').$cValue.($vEnd < zbx_strlen($evStr) ? zbx_substr($evStr, $vEnd) : '');
 				}
@@ -4017,6 +4017,7 @@ return $result;
 		$evStr = str_replace('#', '!=', $evStr);
 		$evStr = str_replace('&', '&&', $evStr);
 		$evStr = str_replace('|', '||', $evStr);
+		$evStr = trim($evStr);
 		
 		//SDI($evStr);
 		return $evStr;
