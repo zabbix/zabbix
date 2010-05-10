@@ -1245,6 +1245,17 @@ static void	DCallocate_idxhost02(int *index, int remove_index)
 		memmove(dst, src, sz);
 }
 
+static void	DCstrpool_replace(int found, const char **cur, const char *new)
+{
+	if (!found)
+		*cur = zbx_strpool_intern(new);
+	else if (0 != strcmp(new, *cur))
+	{
+		zbx_strpool_release(*cur);
+		*cur = zbx_strpool_intern(new);
+	}
+}
+
 static void	DCsync_items()
 {
 	const char	*__function_name = "DCsync_items";
@@ -1305,9 +1316,7 @@ static void	DCsync_items()
 		i = get_nearestindex(config->items, sizeof(ZBX_DC_ITEM), config->items_num, itemid);
 		found = (i < config->items_num && config->items[i].itemid == itemid);
 
-		if (found)
-			zbx_strpool_release(config->items[i].key);
-		else
+		if (!found)
 			DCallocate_item(i);
 
 		item = &config->items[i];
@@ -1317,7 +1326,7 @@ static void	DCsync_items()
 		item->type = (unsigned char)atoi(row[3]);
 		item->data_type = (unsigned char)atoi(row[4]);
 		item->value_type = (unsigned char)atoi(row[5]);
-		item->key = zbx_strpool_intern(row[6]);
+		DCstrpool_replace(found, &item->key, row[6]);
 
 		if (!found)
 		{
@@ -1350,17 +1359,6 @@ static void	DCsync_items()
 				config->snmpitems_num, itemid);
 		found = (i < config->snmpitems_num && config->snmpitems[i].itemid == itemid);
 
-		if (found)
-		{
-			snmpitem = &config->snmpitems[i];
-
-			zbx_strpool_release(snmpitem->snmp_community);
-			zbx_strpool_release(snmpitem->snmp_oid);
-			zbx_strpool_release(snmpitem->snmpv3_securityname);
-			zbx_strpool_release(snmpitem->snmpv3_authpassphrase);
-			zbx_strpool_release(snmpitem->snmpv3_privpassphrase);
-		}
-
 		if (ITEM_TYPE_SNMPv1 == item->type || ITEM_TYPE_SNMPv2c == item->type || ITEM_TYPE_SNMPv3 == item->type)
 		{
 			if (!found)
@@ -1369,18 +1367,26 @@ static void	DCsync_items()
 			snmpitem = &config->snmpitems[i];
 
 			snmpitem->itemid = itemid;
-			snmpitem->snmp_community = zbx_strpool_intern(row[7]);
-			snmpitem->snmp_oid = zbx_strpool_intern(row[8]);
+			DCstrpool_replace(found, &snmpitem->snmp_community, row[7]);
+			DCstrpool_replace(found, &snmpitem->snmp_oid, row[8]);
 			snmpitem->snmp_port = (unsigned short)atoi(row[9]);
-			snmpitem->snmpv3_securityname = zbx_strpool_intern(row[10]);
+			DCstrpool_replace(found, &snmpitem->snmpv3_securityname, row[10]);
 			snmpitem->snmpv3_securitylevel = (unsigned char)atoi(row[11]);
-			snmpitem->snmpv3_authpassphrase = zbx_strpool_intern(row[12]);
-			snmpitem->snmpv3_privpassphrase = zbx_strpool_intern(row[13]);
+			DCstrpool_replace(found, &snmpitem->snmpv3_authpassphrase, row[12]);
+			DCstrpool_replace(found, &snmpitem->snmpv3_privpassphrase, row[13]);
 
 		}
 		else if (found)
 		{
+			snmpitem = &config->snmpitems[i];
+
 			/* remove snmp parameters for not snmp item */
+			zbx_strpool_release(snmpitem->snmp_community);
+			zbx_strpool_release(snmpitem->snmp_oid);
+			zbx_strpool_release(snmpitem->snmpv3_securityname);
+			zbx_strpool_release(snmpitem->snmpv3_authpassphrase);
+			zbx_strpool_release(snmpitem->snmpv3_privpassphrase);
+
 			DCremove_element(config->snmpitems, &config->snmpitems_num, sizeof(ZBX_DC_SNMPITEM), i);
 		}
 
@@ -1390,12 +1396,6 @@ static void	DCsync_items()
 				config->ipmiitems_num, itemid);
 		found = (i < config->ipmiitems_num && config->ipmiitems[i].itemid == itemid);
 
-		if (found)
-		{
-			ipmiitem = &config->ipmiitems[i];
-			zbx_strpool_release(ipmiitem->ipmi_sensor);
-		}
-
 		if (ITEM_TYPE_IPMI == item->type)
 		{
 			if (!found)
@@ -1404,11 +1404,15 @@ static void	DCsync_items()
 			ipmiitem = &config->ipmiitems[i];
 
 			ipmiitem->itemid = itemid;
-			ipmiitem->ipmi_sensor = zbx_strpool_intern(row[14]);
+			DCstrpool_replace(found, &ipmiitem->ipmi_sensor, row[14]);
 		}
 		else if (found)
 		{
+			ipmiitem = &config->ipmiitems[i];
+
 			/* remove ipmi parameters for not ipmi item */
+			zbx_strpool_release(ipmiitem->ipmi_sensor);
+
 			DCremove_element(config->ipmiitems, &config->ipmiitems_num, sizeof(ZBX_DC_IPMIITEM), i);
 		}
 
@@ -1418,12 +1422,6 @@ static void	DCsync_items()
 				config->flexitems_num, itemid);
 		found = (i < config->flexitems_num && config->flexitems[i].itemid == itemid);
 
-		if (found)
-		{
-			flexitem = &config->flexitems[i];
-			zbx_strpool_release(flexitem->delay_flex);
-		}
-
 		if (SUCCEED != DBis_null(row[16]) && '\0' != *row[16])
 		{
 			if (!found)
@@ -1432,11 +1430,15 @@ static void	DCsync_items()
 			flexitem = &config->flexitems[i];
 
 			flexitem->itemid = itemid;
-			flexitem->delay_flex = zbx_strpool_intern(row[16]);
+			DCstrpool_replace(found, &flexitem->delay_flex, row[16]);
 		}
 		else if (found)
 		{
+			flexitem = &config->flexitems[i];
+
 			/* remove delay_flex parameter for not flexible item */
+			zbx_strpool_release(flexitem->delay_flex);
+
 			DCremove_element(config->flexitems, &config->flexitems_num, sizeof(ZBX_DC_FLEXITEM), i);
 		}
 
@@ -1446,12 +1448,6 @@ static void	DCsync_items()
 				config->trapitems_num, itemid);
 		found = (i < config->trapitems_num && config->trapitems[i].itemid == itemid);
 
-		if (found)
-		{
-			trapitem = &config->trapitems[i];
-			zbx_strpool_release(trapitem->trapper_hosts);
-		}
-
 		if (ITEM_TYPE_TRAPPER == item->type && SUCCEED != DBis_null(row[17]) && '\0' != *row[17])
 		{
 			if (!found)
@@ -1460,11 +1456,15 @@ static void	DCsync_items()
 			trapitem = &config->trapitems[i];
 
 			trapitem->itemid = itemid;
-			trapitem->trapper_hosts = zbx_strpool_intern(row[17]);
+			DCstrpool_replace(found, &trapitem->trapper_hosts, row[17]);
 		}
 		else if (found)
 		{
+			trapitem = &config->trapitems[i];
+
 			/* remove trapper_hosts parameter */
+			zbx_strpool_release(trapitem->trapper_hosts);
+
 			DCremove_element(config->trapitems, &config->trapitems_num, sizeof(ZBX_DC_TRAPITEM), i);
 		}
 
@@ -1474,12 +1474,6 @@ static void	DCsync_items()
 				config->logitems_num, itemid);
 		found = (i < config->logitems_num && config->logitems[i].itemid == itemid);
 
-		if (found)
-		{
-			logitem = &config->logitems[i];
-			zbx_strpool_release(logitem->logtimefmt);
-		}
-
 		if (ITEM_VALUE_TYPE_LOG == item->value_type && SUCCEED != DBis_null(row[18]) && '\0' != *row[18])
 		{
 			if (!found)
@@ -1488,11 +1482,15 @@ static void	DCsync_items()
 			logitem = &config->logitems[i];
 
 			logitem->itemid = itemid;
-			logitem->logtimefmt = zbx_strpool_intern(row[18]);
+			DCstrpool_replace(found, &logitem->logtimefmt, row[18]);
 		}
 		else if (found)
 		{
+			logitem = &config->logitems[i];
+
 			/* remove logtimefmt parameter */
+			zbx_strpool_release(logitem->logtimefmt);
+
 			DCremove_element(config->logitems, &config->logitems_num, sizeof(ZBX_DC_LOGITEM), i);
 		}
 
@@ -1502,12 +1500,6 @@ static void	DCsync_items()
 				config->dbitems_num, itemid);
 		found = (i < config->dbitems_num && config->dbitems[i].itemid == itemid);
 
-		if (found)
-		{
-			dbitem = &config->dbitems[i];
-			zbx_strpool_release(dbitem->params);
-		}
-
 		if (ITEM_TYPE_DB_MONITOR == item->type && SUCCEED != DBis_null(row[19]) && '\0' != *row[19])
 		{
 			if (!found)
@@ -1516,11 +1508,15 @@ static void	DCsync_items()
 			dbitem = &config->dbitems[i];
 
 			dbitem->itemid = itemid;
-			dbitem->params = zbx_strpool_intern(row[19]);
+			DCstrpool_replace(found, &dbitem->params, row[19]);
 		}
 		else if (found)
 		{
+			dbitem = &config->dbitems[i];
+
 			/* remove db item parameters */
+			zbx_strpool_release(dbitem->params);
+
 			DCremove_element(config->dbitems, &config->dbitems_num, sizeof(ZBX_DC_DBITEM), i);
 		}
 
@@ -1529,17 +1525,6 @@ static void	DCsync_items()
 		i = get_nearestindex(config->sshitems, sizeof(ZBX_DC_SSHITEM),
 				config->sshitems_num, itemid);
 		found = (i < config->sshitems_num && config->sshitems[i].itemid == itemid);
-
-		if (found)
-		{
-			sshitem = &config->sshitems[i];
-
-			zbx_strpool_release(sshitem->username);
-			zbx_strpool_release(sshitem->password);
-			zbx_strpool_release(sshitem->publickey);
-			zbx_strpool_release(sshitem->privatekey);
-			zbx_strpool_release(sshitem->params);
-		}
 
 		if (ITEM_TYPE_SSH == item->type)
 		{
@@ -1550,15 +1535,23 @@ static void	DCsync_items()
 
 			sshitem->itemid = itemid;
 			sshitem->authtype = (unsigned short)atoi(row[21]);
-			sshitem->username = zbx_strpool_intern(row[22]);
-			sshitem->password = zbx_strpool_intern(row[23]);
-			sshitem->publickey = zbx_strpool_intern(row[24]);
-			sshitem->privatekey = zbx_strpool_intern(row[25]);
-			sshitem->params = zbx_strpool_intern(row[19]);
+			DCstrpool_replace(found, &sshitem->username, row[22]);
+			DCstrpool_replace(found, &sshitem->password, row[23]);
+			DCstrpool_replace(found, &sshitem->publickey, row[24]);
+			DCstrpool_replace(found, &sshitem->privatekey, row[25]);
+			DCstrpool_replace(found, &sshitem->params, row[19]);
 		}
 		else if (found)
 		{
+			sshitem = &config->sshitems[i];
+
 			/* remove SSH item parameters */
+			zbx_strpool_release(sshitem->username);
+			zbx_strpool_release(sshitem->password);
+			zbx_strpool_release(sshitem->publickey);
+			zbx_strpool_release(sshitem->privatekey);
+			zbx_strpool_release(sshitem->params);
+
 			DCremove_element(config->sshitems, &config->sshitems_num, sizeof(ZBX_DC_SSHITEM), i);
 		}
 
@@ -1568,15 +1561,6 @@ static void	DCsync_items()
 				config->telnetitems_num, itemid);
 		found = (i < config->telnetitems_num && config->telnetitems[i].itemid == itemid);
 
-		if (found)
-		{
-			telnetitem = &config->telnetitems[i];
-
-			zbx_strpool_release(telnetitem->username);
-			zbx_strpool_release(telnetitem->password);
-			zbx_strpool_release(telnetitem->params);
-		}
-
 		if (ITEM_TYPE_TELNET == item->type)
 		{
 			if (!found)
@@ -1585,13 +1569,19 @@ static void	DCsync_items()
 			telnetitem = &config->telnetitems[i];
 
 			telnetitem->itemid = itemid;
-			telnetitem->username = zbx_strpool_intern(row[22]);
-			telnetitem->password = zbx_strpool_intern(row[23]);
-			telnetitem->params = zbx_strpool_intern(row[19]);
+			DCstrpool_replace(found, &telnetitem->username, row[22]);
+			DCstrpool_replace(found, &telnetitem->password, row[23]);
+			DCstrpool_replace(found, &telnetitem->params, row[19]);
 		}
 		else if (found)
 		{
+			telnetitem = &config->telnetitems[i];
+
 			/* remove TELNET item parameters */
+			zbx_strpool_release(telnetitem->username);
+			zbx_strpool_release(telnetitem->password);
+			zbx_strpool_release(telnetitem->params);
+
 			DCremove_element(config->telnetitems, &config->telnetitems_num, sizeof(ZBX_DC_TELNETITEM), i);
 		}
 
@@ -1601,12 +1591,6 @@ static void	DCsync_items()
 				config->calcitems_num, itemid);
 		found = (i < config->calcitems_num && config->calcitems[i].itemid == itemid);
 
-		if (found)
-		{
-			calcitem = &config->calcitems[i];
-			zbx_strpool_release(calcitem->params);
-		}
-
 		if (ITEM_TYPE_CALCULATED == item->type)
 		{
 			if (!found)
@@ -1615,11 +1599,15 @@ static void	DCsync_items()
 			calcitem = &config->calcitems[i];
 
 			calcitem->itemid = itemid;
-			calcitem->params = zbx_strpool_intern(row[19]);
+			DCstrpool_replace(found, &calcitem->params, row[19]);
 		}
 		else if (found)
 		{
+			calcitem = &config->calcitems[i];
+
 			/* remove CALCULATED item parameters */
+			zbx_strpool_release(calcitem->params);
+
 			DCremove_element(config->calcitems, &config->calcitems_num, sizeof(ZBX_DC_CALCITEM), i);
 		}
 	}
@@ -1784,22 +1772,17 @@ static void	DCsync_hosts()
 		i = get_nearestindex(config->hosts, sizeof(ZBX_DC_HOST), config->hosts_num, hostid);
 		found = (i < config->hosts_num && config->hosts[i].hostid == hostid);
 
-		if (found)
-		{
-			zbx_strpool_release(config->hosts[i].host);
-			zbx_strpool_release(config->hosts[i].ip);
-			zbx_strpool_release(config->hosts[i].dns);
-		}
-		else
+		if (!found)
 			DCallocate_host(i);
 
 		host = &config->hosts[i];
+
 		host->hostid = hostid;
 		ZBX_STR2UINT64(host->proxy_hostid, row[1]);
-		host->host = zbx_strpool_intern(row[2]);
+		DCstrpool_replace(found, &host->host, row[2]);
 		host->useip = (unsigned char)atoi(row[3]);
-		host->ip = zbx_strpool_intern(row[4]);
-		host->dns = zbx_strpool_intern(row[5]);
+		DCstrpool_replace(found, &host->ip, row[4]);
+		DCstrpool_replace(found, &host->dns, row[5]);
 		host->port = (unsigned short)atoi(row[6]);
 		host->maintenance_status = (unsigned char)atoi(row[14]);
 		host->maintenance_type = (unsigned char)atoi(row[15]);
@@ -1828,15 +1811,6 @@ static void	DCsync_hosts()
 				config->ipmihosts_num, hostid);
 		found = (i < config->ipmihosts_num && config->ipmihosts[i].hostid == hostid);
 
-		if (found)
-		{
-			ipmihost = &config->ipmihosts[i];
-
-			zbx_strpool_release(ipmihost->ipmi_ip);
-			zbx_strpool_release(ipmihost->ipmi_username);
-			zbx_strpool_release(ipmihost->ipmi_password);
-		}
-
 		if (1 == atoi(row[7]))	/* useipmi */
 		{
 			if (!found)
@@ -1845,16 +1819,22 @@ static void	DCsync_hosts()
 			ipmihost = &config->ipmihosts[i];
 
 			ipmihost->hostid = hostid;
-			ipmihost->ipmi_ip = zbx_strpool_intern(row[8]);
+			DCstrpool_replace(found, &ipmihost->ipmi_ip, row[8]);
 			ipmihost->ipmi_port = (unsigned short)atoi(row[9]);
 			ipmihost->ipmi_authtype = (signed char)atoi(row[10]);
 			ipmihost->ipmi_privilege = (unsigned char)atoi(row[11]);
-			ipmihost->ipmi_username = zbx_strpool_intern(row[12]);
-			ipmihost->ipmi_password = zbx_strpool_intern(row[13]);
+			DCstrpool_replace(found, &ipmihost->ipmi_username, row[12]);
+			DCstrpool_replace(found, &ipmihost->ipmi_password, row[13]);
 		}
 		else if (found)
 		{
+			ipmihost = &config->ipmihosts[i];
+
 			/* remove ipmi connection parameters for hosts without ipmi */
+			zbx_strpool_release(ipmihost->ipmi_ip);
+			zbx_strpool_release(ipmihost->ipmi_username);
+			zbx_strpool_release(ipmihost->ipmi_password);
+
 			DCremove_element(config->ipmihosts, &config->ipmihosts_num, sizeof(ZBX_DC_IPMIHOST), i);
 		}
 	}
