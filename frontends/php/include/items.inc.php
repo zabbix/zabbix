@@ -1425,6 +1425,9 @@
 				$housekeeperid = get_dbid('housekeeper','housekeeperid');
 				DBexecute('INSERT INTO housekeeper (housekeeperid,tablename,field,value)'.
 					" VALUES ($housekeeperid, 'trends','itemid',$itemid)");
+				$housekeeperid = get_dbid('housekeeper','housekeeperid');
+				DBexecute('INSERT INTO housekeeper (housekeeperid,tablename,field,value)'.
+					" VALUES ($housekeeperid, 'trends_uint','itemid',$itemid)");
 			}
 			return TRUE;
 		}
