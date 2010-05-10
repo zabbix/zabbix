@@ -4022,7 +4022,7 @@ return $result;
 		$evStr = str_replace('&', '&&', $evStr);
 		$evStr = str_replace('|', '||', $evStr);
 		
-		SDI($evStr);
+		//SDI($evStr);
 		return $evStr;
 	}
 
