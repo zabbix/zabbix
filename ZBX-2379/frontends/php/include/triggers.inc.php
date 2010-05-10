@@ -1209,7 +1209,7 @@ return $result;
 						$exp.='{'.$function_data['host'].':'.$function_data['key_'].'.'.$function_data['function'].'('.$function_data['parameter'].')}';
 					}
 					else{
-						$style = ($function_data['status']==ITEM_STATUS_DISABLED)?'disabled':'unknown';
+						$style = ($function_data['status']==ITEM_STATUS_DISABLED)? 'disabled':'unknown';
 						if($function_data['status']==ITEM_STATUS_ACTIVE){
 							$style = 'enabled';
 						}
@@ -1325,7 +1325,7 @@ return $result;
 						$exp.='{'.$function_data['host'].':'.$function_data['key_'].'.'.$function_data['function'].'('.$function_data['parameter'].')}';
 					}
 					else{
-						$style = ($function_data['status']==ITEM_STATUS_DISABLED)?'disabled':'unknown';
+						$style = ($function_data['status']==ITEM_STATUS_DISABLED)? 'disabled':'unknown';
 						if($function_data['status']==ITEM_STATUS_ACTIVE){
 							$style = 'enabled';
 						}
@@ -3351,7 +3351,7 @@ return $result;
 			if(count($parts) == 1 && $sStart == $parts[0]['openSymbolNum'] && $sEnd == $parts[0]['closeSymbolNum']) {
 				$next[$level] = false;
 				list($outline, $treeList) = build_expression_html_tree($expression, $parts[0], $level, $next, $nextletter);
-				$outline = (isset($treeLevel['openSymbol']) ? $treeLevel['openSymbol'].' ' : '').$outline.(isset($treeLevel['closeSymbol']) ? ' '.$treeLevel['closeSymbol'] : '');
+				$outline = (isset($parts[0]['openSymbol']) && $parts[0]['levelType'] == 'grouping' ? $parts[0]['openSymbol'].' ' : '').$outline.(isset($parts[0]['closeSymbol'])  && $parts[0]['levelType'] == 'grouping' ? ' '.$parts[0]['closeSymbol'] : '');
 				return Array($outline, $treeList);
 			}
 			
@@ -3434,7 +3434,7 @@ return $result;
 				$url =  new CSpan($expValue);
 			}
 			$expr[] = $url;
-			$outline = (isset($treeLevel['openSymbol']) ? $treeLevel['openSymbol'] : '').' '.$nextletter.' '.(isset($treeLevel['closeSymbol']) ? $treeLevel['closeSymbol'] : '');
+			$outline = ' '.$nextletter.' ';
 			$nextletter = chr(ord($nextletter)+1);
 			
 			$errors = expressionHighLevelErrors($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum']);
@@ -3588,7 +3588,7 @@ return $result;
 			else $parts = Array();
 			
 			if(count($parts) == 1 && $sStart == $parts[0]['openSymbolNum'] && $sEnd == $parts[0]['closeSymbolNum']) {
-				return (isset($parts[0]['openSymbol']) ? $parts[0]['openSymbol']:'').trim(rebuild_expression_tree($expression, $parts[0], $action, $actionid, $newPart)).(isset($parts[0]['closeSymbol']) ? $parts[0]['closeSymbol']:'');
+				return (isset($parts[0]['openSymbol']) && $parts[0]['levelType'] == 'grouping' ? $parts[0]['openSymbol']:'').trim(rebuild_expression_tree($expression, $parts[0], $action, $actionid, $newPart)).(isset($parts[0]['closeSymbol']) && $parts[0]['levelType'] == 'grouping' ? $parts[0]['closeSymbol']:'');
 			}
 			
 			$operand = '|';
@@ -3636,7 +3636,7 @@ return $result;
 					
 					$newLevelExpression = rebuild_expression_tree($expression, $newTreeLevel, $action, $actionid, $newPart);
 					if($newLevelExpression)
-						$levelNewExpression[] = (isset($newTreeLevel['openSymbol']) ? $newTreeLevel['openSymbol']:'').trim($newLevelExpression).(isset($newTreeLevel['closeSymbol']) ? $newTreeLevel['closeSymbol']:'');
+						$levelNewExpression[] = (isset($newTreeLevel['openSymbol']) && $newTreeLevel['levelType'] == 'grouping' ? $newTreeLevel['openSymbol']:'').trim($newLevelExpression).(isset($newTreeLevel['closeSymbol']) && $newTreeLevel['levelType'] == 'grouping' ? $newTreeLevel['closeSymbol']:'');
 					
 //					SDI("After {$treeLevel['levelType']} parts:".count($treeLevel['parts']));
 				}

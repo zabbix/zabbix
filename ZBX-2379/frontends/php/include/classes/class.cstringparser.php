@@ -15,6 +15,7 @@ class CStringParser {
 	private $flags = Array();
 	private $errors = Array();
 	private $indexes = Array();
+	private $indexLevels = Array();
 	public $debugOutput = '';
 
 	public function __construct($rules) {
@@ -42,14 +43,17 @@ class CStringParser {
 		unset($this->indexes);
 		unset($this->levelData);
 		unset($this->errors);
+		unset($this->indexLevels);
 		$this->parsedTree = NULL;
 		$this->levelData = Array();
 		$this->indexes = Array();
 		$this->errors = Array();
+		$this->indexLevels = Array();
 		$this->expression = $string;
 		$this->totalSymbols = mb_strlen($this->expression); // should be changed to zbx_strlen
 		$this->levelData[$this->currentLevel] = Array();
 		$this->levelData[$this->currentLevel]['levelType'] = 'independent';
+		$this->indexLevels[0] =& $this->indexes;
 
 		for($this->currentSymbolNum = 0; $this->currentSymbolNum < $this->totalSymbols; $this->currentSymbolNum++) {
 			$this->currentSymbol = mb_substr($this->expression, $this->currentSymbolNum, 1); // should be changed to zbx_substr
@@ -70,6 +74,17 @@ class CStringParser {
 		//$this->saveDebug(print_r($this->parsedTree, true));
 
 		return count($this->errors) > 0 ? false : true;
+	}
+	
+	private function addToIndex() {
+		if(!isset($this->levelData[$this->currentLevel]['indexes']))
+			$this->levelData[$this->currentLevel]['indexes'] = Array();
+		
+		$this->indexLevels[$this->currentLevel] =& $this->levelData[$this->currentLevel]['indexes'];
+	}
+	
+	private function removeFromIndex () {
+		unset($this->indexLevels[$this->currentLevel]);
 	}
 	
 	private function checkSymbol() {
@@ -100,6 +115,9 @@ class CStringParser {
 		$this->levelData[$this->currentLevel]['levelType'] = $ruleSetName;
 		$this->levelData[$this->currentLevel]['openSymbol'] = $this->currentSymbol;
 		$this->levelData[$this->currentLevel]['openSymbolNum'] = $this->currentSymbolNum;
+		if(isset($this->ess[$this->levelData[$this->currentLevel]['levelType']]['levelIndex']) && $this->ess[$this->levelData[$this->currentLevel]['levelType']]['levelIndex'] === true) {
+			$this->addToIndex();
+		}
 		$this->checkSymbol();
 	}
 
@@ -402,17 +420,28 @@ class CStringParser {
 			$this->levelData[$this->currentLevel-1]['parts'] = Array();
 
 		$this->levelData[$this->currentLevel-1]['parts'][] = $this->levelData[$this->currentLevel];
-
+		
+		if(isset($this->ess[$this->levelData[$this->currentLevel]['levelType']]['levelIndex']) && $this->ess[$this->levelData[$this->currentLevel]['levelType']]['levelIndex'] === true) {
+			$this->removeFromIndex();
+		}
+		
 		if(isset($this->ess[$this->levelData[$this->currentLevel]['levelType']]['indexItem']) && $this->ess[$this->levelData[$this->currentLevel]['levelType']]['indexItem'] === true) {
-			if(!isset($this->indexes[$this->levelData[$this->currentLevel]['levelType']]))
-				$this->indexes[$this->levelData[$this->currentLevel]['levelType']] = Array();
-
-			$this->indexes[$this->levelData[$this->currentLevel]['levelType']][] =& $this->levelData[$this->currentLevel-1]['parts'][count($this->levelData[$this->currentLevel-1]['parts'])-1];
+			$this->indexItem($this->levelData[$this->currentLevel-1]['parts'][count($this->levelData[$this->currentLevel-1]['parts'])-1]);
 		}
 
 		unset($this->levelData[$this->currentLevel]);
 
 		//$this->saveDebug(print_r($this->levelData, true));
+	}
+
+	private function indexItem(&$itemToIndex) {
+		$levelType = $itemToIndex['levelType'];
+		if(is_array($this->indexLevels))
+			foreach($this->indexLevels as &$level) {
+				if(!isset($level[$levelType])) $level[$levelType] = Array();
+				
+				$level[$levelType][] =& $itemToIndex;
+			}
 	}
 
 	private function saveSymbols() {
