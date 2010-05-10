@@ -3860,7 +3860,7 @@ return $result;
 					//SDI($hostKey.$hostKeyParams);
 					//SDI($function);
 					
-					$hostFound = CHost::get(Array('filter' => Array('host' => $host)));
+					$hostFound = CHost::get(Array('filter' => Array('host' => $host), 'templated_hosts' => true));
 					if(count($hostFound) > 0) {
 						$hostFound = array_shift($hostFound);
 						if(isset($hostFound['hostid']) && $hostFound['hostid'] > 0) $hostId = $hostFound['hostid'];
