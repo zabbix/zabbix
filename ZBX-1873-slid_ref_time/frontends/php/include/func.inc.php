@@ -184,7 +184,7 @@ function make_refresh_menu($pmid,$dollid,$cur_interval,$params=null,&$menu,&$sub
 		$title = S_REFRESH_TIME_IN_SECONDS;
 	}
 	else if($menu_type == 2){
-		$intervals = array('x0.25'=>0.25, 'x0.5'=>0.5, 'x0.75'=>0.75, 'x1'=>1, 'x1.25'=> 1.25, 'x1.5'=>1.5, 'x1.75'=>1.75, 'x2'=>2, 'x3'=>3);
+		$intervals = array('x0.25'=>0.25, 'x0.5'=>0.5, 'x1'=>1, 'x1.5'=>1.5, 'x2'=>2, 'x3'=>3, 'x4'=>4, 'x5'=>5);
 		$title = S_REFRESH_TIME_MULTIPLIER;
 	}
 	
