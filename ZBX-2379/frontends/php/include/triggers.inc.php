@@ -1375,14 +1375,14 @@ return $result;
 	 *
 	 */
 	function implode_exp($expression, $triggerid){
-		global $ZBX_TR_EXPR_SIMPLE_MACROS, $ZBX_TR_EXPR_REPLACE_TO;
+//		global $ZBX_TR_EXPR_SIMPLE_MACROS, $ZBX_TR_EXPR_REPLACE_TO;
 		$expr = $expression;
-		$short_exp = $expression;
+//		$short_exp = $expression;
 
 /* Replace all {server:key.function(param)} and {MACRO} with '$ZBX_TR_EXPR_REPLACE_TO' */
 /* build short expression {12}>10 */
 //		while(ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT, $expr, $arr)){
-		while(preg_match('/'.ZBX_PREG_EXPRESSION_TOKEN_FORMAT.'/', $expr, $arr)){
+/*		while(preg_match('/'.ZBX_PREG_EXPRESSION_TOKEN_FORMAT.'/', $expr, $arr)){
 			if($arr[ZBX_EXPRESSION_MACRO_ID] && !isset($ZBX_TR_EXPR_SIMPLE_MACROS[$arr[ZBX_EXPRESSION_MACRO_ID]])){
 				error('[ie]'.SPACE.S_UNKNOWN_MACRO.' ['.$arr[ZBX_EXPRESSION_MACRO_ID].']');
 				return false;
@@ -1394,36 +1394,59 @@ return $result;
 				$key		= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_KEY_ID];
 				$function 	= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_FUNCTION_NAME_ID];
 				$parameter	= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_FUNCTION_PARAM_ID];
-
-				$sql = 'SELECT i.itemid '.
-						' FROM items i,hosts h'.
-						' WHERE i.key_='.zbx_dbstr($key).
-							' AND h.host='.zbx_dbstr($host).
-							' AND h.hostid=i.hostid';
-				$item_res = DBselect($sql);
-				while(($item = DBfetch($item_res)) && (!in_node($item['itemid']))){
-				}
-
-				if(!$item) return null;
-
-				$itemid = $item['itemid'];
-
-				$functionid = get_dbid('functions','functionid');
-
-				if( !DBexecute('insert into functions (functionid,itemid,triggerid,function,parameter)'.
-					' values ('.$functionid.','.$itemid.','.$triggerid.','.zbx_dbstr($function).','.
-					zbx_dbstr($parameter).')'))
-				{
-					return	null;
-				}
-				$short_exp = str_replace($s_expr,'{'.$functionid.'}',$short_exp);
-				$expr = str_replace($s_expr,$ZBX_TR_EXPR_REPLACE_TO,$expr);
-				continue;
+*/
+		$expressionData = parseTriggerExpressions($expression, true);
+		if(isset($expressionData[$expression]['errors'])) return null;
+		if(!is_array($expressionData[$expression]['expressions']) || !count($expressionData[$expression]['expressions'])) return $expression;
+		
+		$cuted = 0;
+		foreach($expressionData[$expression]['expressions'] as &$macro) {
+//			SDII($macro);		
+			$iData =& $macro['indexes']['server'][0];
+			$host = zbx_substr($expression, $iData['openSymbolNum']+1, $iData['closeSymbolNum']-($iData['openSymbolNum']+1));
+//			SDI($host);
+			$iData =& $macro['indexes']['keyName'][0];
+			$keyName = zbx_substr($expression, $iData['openSymbolNum']+1, $iData['closeSymbolNum']-($iData['openSymbolNum']+1));
+//			SDI($keyName);
+			$iData =& $macro['indexes']['keyParams'][0];
+			$keyParams = zbx_substr($expression, $iData['openSymbolNum'], $iData['closeSymbolNum']-$iData['openSymbolNum']+1);
+//			SDI($keyParams);
+			$iData =& $macro['indexes']['keyFunctionName'][0];
+			$function = zbx_substr($expression, $iData['openSymbolNum']+1, $iData['closeSymbolNum']-($iData['openSymbolNum']+1));
+//			SDI($function);
+			$iData =& $macro['indexes']['keyFunctionParams'][0];
+			$functionParams = zbx_substr($expression, $iData['openSymbolNum']+1, $iData['closeSymbolNum']-($iData['openSymbolNum']+1));
+//			SDI($functionParams);
+//			SDI('FINISH ------------------------------------->>>>>>>>>>>>>>>>>>>>');
+			$sql = 'SELECT i.itemid '.
+				' FROM items i,hosts h'.
+				' WHERE i.key_='.zbx_dbstr($keyName.$keyParams).
+					' AND h.host='.zbx_dbstr($host).
+					' AND h.hostid=i.hostid';
+			$item_res = DBselect($sql);
+			while(($item = DBfetch($item_res)) && (!in_node($item['itemid']))){
 			}
-			$expr = $arr[ZBX_EXPRESSION_LEFT_ID].$ZBX_TR_EXPR_REPLACE_TO.$arr[ZBX_EXPRESSION_RIGHT_ID];
-		}
 
-	return $short_exp;
+			if(!$item) return null;
+
+			$itemid = $item['itemid'];
+
+			$functionid = get_dbid('functions','functionid');
+
+			if( !DBexecute('insert into functions (functionid,itemid,triggerid,function,parameter)'.
+				' values ('.$functionid.','.$itemid.','.$triggerid.','.zbx_dbstr($function).','.
+				zbx_dbstr($functionParams).')'))
+			{
+				return	null;
+			}
+//SDI("BEFORE: $expr");
+			$expr = zbx_substr($expr, 0, $macro['openSymbolNum']-$cuted).'{'.$functionid.'}'.zbx_substr($expr, $macro['closeSymbolNum']-$cuted+1);
+			$cuted += $macro['closeSymbolNum']-$macro['openSymbolNum']+1-zbx_strlen('{'.$functionid.'}');
+//SDI("AFTER: $expr");
+		}
+//		SDI($expr);
+//		exit;
+		return $expr;
 	}
 
 	function update_trigger_comments($triggerids,$comments){
@@ -3338,7 +3361,7 @@ return $result;
 		$letterLevel = true;
 		if($treeLevel['levelType'] == 'independent' || $treeLevel['levelType'] == 'grouping') {
 			$sStart = !isset($treeLevel['openSymbol']) ? $treeLevel['openSymbolNum'] : $treeLevel['openSymbolNum']+zbx_strlen($treeLevel['openSymbol']);
-			$sEnd = !isset($treeLevel['closeSymbol']) ? $treeLevel['closeSymbolNum']: $treeLevel['closeSymbolNum']-zbx_strlen($treeLevel['closeSymbol']);
+			$sEnd = !isset($treeLevel['closeSymbol']) ? $treeLevel['closeSymbolNum'] : $treeLevel['closeSymbolNum']-zbx_strlen($treeLevel['closeSymbol']);
 			
 			if(isset($treeLevel['parts'])) $parts =& $treeLevel['parts'];
 			else $parts = Array();
@@ -3385,15 +3408,16 @@ return $result;
 				$levelOutline = '';
 				while (is_int($opPos) && $opPos < $sEnd || $prev < $sEnd) {
 					unset($newTreeLevel);
+					$strStart = $prev+($prev > $sStart ? zbx_strlen($operand):0);
+					$strEnd = is_int($opPos) && $opPos < $sEnd ? $opPos-zbx_strlen($operand):$sEnd;
 					if(count($bParts) == 1 && 
-						zbx_substr($expression, $bParts[0]['openSymbolNum'], $bParts[0]['closeSymbolNum']-$bParts[0]['openSymbolNum']+(isset($bParts[0]['closeSymbol']) ? zbx_strlen($bParts[0]['closeSymbol']) : 0)) == trim(zbx_substr($expression, $prev+($prev > $sStart ? zbx_strlen($operand): 0), (is_int($opPos) && $opPos < $sEnd ? $opPos-zbx_strlen($operand): $sEnd)-$prev))) {
+						zbx_substr($expression, $bParts[0]['openSymbolNum'], $bParts[0]['closeSymbolNum']-$bParts[0]['openSymbolNum']+1) == trim(zbx_substr($expression, $strStart, $strEnd-$strStart+1))) {
 						$newTreeLevel =& $bParts[0];
 					}else{
-						
 						$newTreeLevel = Array(
 							'levelType' => 'grouping',
-							'openSymbolNum' => $prev+($prev > $sStart ? zbx_strlen($operand): 0),
-							'closeSymbolNum' => is_int($opPos) && $opPos < $sEnd ? $opPos-zbx_strlen($operand): $sEnd
+							'openSymbolNum' => $strStart,
+							'closeSymbolNum' => $strEnd
 						);
 					
 						if(is_array($bParts) && count($bParts) > 0) {
@@ -3432,7 +3456,6 @@ return $result;
 			$outline = ' '.$nextletter.' ';
 			$nextletter = chr(ord($nextletter)+1);
 			
-			$errors = expressionHighLevelErrors($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum']);
 			$levelDetails = Array(
 					'start' => $treeLevel['openSymbolNum'],
 					'end' => $treeLevel['closeSymbolNum'],
@@ -3538,14 +3561,14 @@ return $result;
 //				SDI("Grouping Value (From {$parts[$i]['openSymbolNum']}, To {$parts[$i]['closeSymbolNum']}): ".zbx_substr($expression, $parts[$i]['openSymbolNum'], $parts[$i]['closeSymbolNum']-$parts[$i]['openSymbolNum']+1).";");
 //				if(isset($parts[$i+1]))
 //				SDI("Grouping Value (From {$parts[$i+1]['openSymbolNum']}, To {$parts[$i+1]['closeSymbolNum']}): ".zbx_substr($expression, $parts[$i+1]['openSymbolNum'], $parts[$i+1]['closeSymbolNum']-$parts[$i+1]['openSymbolNum']+1).";");
-				if($parts[$i]['openSymbolNum'] <= $position && $position <= $parts[$i]['closeSymbolNum']) {
+				if(is_int($position) && $parts[$i]['openSymbolNum'] <= $position && $position <= $parts[$i]['closeSymbolNum']) {
 //					SDI("Position is inside child: {$parts[$i]['levelType']}");
 					$position = $parts[$i]['closeSymbolNum'] < $sEnd ? mb_strpos($expression, $operand, $parts[$i]['closeSymbolNum']) : $sEnd;
 					$betweenParts[] =& $parts[$i];
-				}else if ($position < $parts[$i]['openSymbolNum']) {
+				}else if (is_int($position) && $position < $parts[$i]['openSymbolNum']) {
 //					SDI('breaking loop');
 					break;
-				}elseif($position > $parts[$i]['closeSymbolNum']) {
+				}elseif(!is_int($position) || $position > $parts[$i]['closeSymbolNum']) {
 //					SDI('moving to the next');
 					$betweenParts[] =& $parts[$i];
 				}
@@ -4006,7 +4029,7 @@ return $result;
 					$vStart = $mData['start'] - $chStart;
 					$vEnd = $mData['end'] - $chStart+1;
 					$cValue = convert($mData['item']['cValue']);
-					if($cValue === '') $cValue = "''";
+					if($cValue === '' || $cValue === null) $cValue = "''";
 					$chStart += ($mData['end']-$mData['start']+1)-zbx_strlen($cValue);
 					$evStr = ($vStart > 0 ? zbx_substr($evStr, 0, $vStart) : '').$cValue.($vEnd < zbx_strlen($evStr) ? zbx_substr($evStr, $vEnd) : '');
 				}
@@ -4150,6 +4173,7 @@ $triggerExpressionRules['expression'] = Array(
 	'closeSymbol' => '}',
 	'isEmpty' => true,
 	'indexItem' => true,
+	'levelIndex' => true,
 	'parent' => Array('independent', 'grouping'));
 $triggerExpressionRules['server'] = Array(
 	'openSymbol' => '{',
@@ -4216,6 +4240,7 @@ $triggerExpressionRules['keyFunctionParams'] = Array(
 	'openSymbol' => '(',
 	'closeSymbol' => ')',
 	'isEmpty' => true,
+	'indexItem' => true,
 	'parent' => 'keyFunction');
 $triggerExpressionRules['keyFunctionParam'] = Array(
 	'openSymbol' => Array('(' => 'default', ',' => 'default'),
