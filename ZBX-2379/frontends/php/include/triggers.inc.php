@@ -562,34 +562,29 @@ return $result;
  *
  */
 	function get_hosts_by_expression($expression){
-		global $ZBX_TR_EXPR_SIMPLE_MACROS, $ZBX_TR_EXPR_REPLACE_TO;
-
-		$expr = $expression;
-
+		$expressionData = parseTriggerExpressions($expression, true);
+		
 		$hosts = array();
-
-		/* Replace all {server:key.function(param)} and {MACRO} with '$ZBX_TR_EXPR_REPLACE_TO' */
-//		while(ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT, $expr, $arr)){
-		while(preg_match('/'.ZBX_PREG_EXPRESSION_TOKEN_FORMAT.'/', $expr, $arr)){
-			if($arr[ZBX_EXPRESSION_MACRO_ID] && !isset($ZBX_TR_EXPR_SIMPLE_MACROS[$arr[ZBX_EXPRESSION_MACRO_ID]]) ){
-				$hosts = array('0');
-				break;
+		if(isset($expressionData[$expression]['hosts'])) {
+			foreach($expressionData[$expression]['hosts'] as &$hostData) {
+				$hostName = zbx_dbstr(zbx_substr($expression, $hostData['openSymbolNum']+1, $hostData['closeSymbolNum']-($hostData['openSymbolNum']+1)));
+				if(!in_array($hostName, $hosts)) $hosts[] = $hostName;
 			}
-			else if( !$arr[ZBX_EXPRESSION_MACRO_ID] ) {
-				$hosts[] = zbx_dbstr($arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_HOST_ID]);
-			}
-			$expr = $arr[ZBX_EXPRESSION_LEFT_ID].$ZBX_TR_EXPR_REPLACE_TO.$arr[ZBX_EXPRESSION_RIGHT_ID];
 		}
-
-		if(count($hosts) == 0) $hosts = array('0');
+		
+//		SDII($hosts);
+		
+		if(count($hosts) == 0) $hosts = Array('0');
 
 		$sql = 'SELECT DISTINCT * '.
 				' FROM hosts '.
 				' WHERE '.DBin_node('hostid', false).
 					' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
 					' AND host IN ('.implode(',',$hosts).')';
-
-	return DBselect($sql);
+		
+		/*$myhosts = CHost::get(Array('output' => API_OUTPUT_EXTEND, 'filter' => Array('host' => $hosts)));
+		return $myhosts;*/
+		return DBselect($sql);
 	}
 
 /*
@@ -3864,24 +3859,25 @@ return $result;
 					//SDI($host);
 					//SDI($hostKey.$hostKeyParams);
 					//SDI($function);
+					
+					$hostFound = CHost::get(Array('filter' => Array('host' => $host)));
+					if(count($hostFound) > 0) {
+						$hostFound = array_shift($hostFound);
+						if(isset($hostFound['hostid']) && $hostFound['hostid'] > 0) $hostId = $hostFound['hostid'];
+					}
 
-					$sql = 'SELECT h.hostid, i.itemid'.
-						' FROM hosts h'.
-						' LEFT JOIN items i'.
-							' ON i.hostid=h.hostid'.
-							' AND i.key_='.zbx_dbstr($hostKey.$hostKeyParams).
-						' WHERE h.host='.zbx_dbstr($host);
+					if($hostId == null) return EXPRESSION_HOST_UNKNOWN;
 
-					//SDI($sql);
-
-					$db_res = DBfetch(DBselect($sql));
-					if($db_res) $hostId = $db_res['hostid'];
-					if($db_res) $itemId = $db_res['itemid'];
+					$itemFound = CItem::get(Array('filter' => Array('hostid' => $hostId, 'key_' => $hostKey.$hostKeyParams)));
+					if(count($itemFound) > 0) {
+						$itemFound = array_shift($itemFound);
+						if(isset($itemFound['itemid']) && $itemFound['itemid'] > 0) $itemId = $itemFound['itemid'];
+					}
+					
+					if($itemId == null) return EXPRESSION_HOST_ITEM_UNKNOWN;
 
 					unset($expData);
 
-					if($hostId == null) return EXPRESSION_HOST_UNKNOWN;
-					if($itemId == null) return EXPRESSION_HOST_ITEM_UNKNOWN;
 					$result = $function_info[$function];
 
 					if(is_array($result['value_type'])){
