@@ -34,6 +34,7 @@ function __autoload($class_name){
 		'cevent' => 1,
 		'cgraph' => 1,
 		'cgraphitem' => 1,
+		'chistory' => 1,
 		'chost' => 1,
 		'chostgroup' => 1,
 		'cimage' => 1,
@@ -77,6 +78,19 @@ function __autoload($class_name){
 
 	require_once('include/nodes.inc.php');
 	require_once('include/hosts.inc.php');
+	require_once('include/items.inc.php');
+	require_once('include/triggers.inc.php');
+	require_once('include/graphs.inc.php');
+
+	require_once('include/maps.inc.php');
+	require_once('include/acknow.inc.php');
+	require_once('include/services.inc.php');
+	require_once('include/httptest.inc.php');
+
+	require_once('include/images.inc.php');
+	require_once('include/events.inc.php');
+	require_once('include/scripts.inc.php');
+	require_once('include/maintenances.inc.php');
 
 	require_once('include/users.inc.php');
 // GLOBALS

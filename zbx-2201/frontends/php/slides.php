@@ -119,8 +119,8 @@ include_once('include/page_header.php');
 
 						$element->show();
 
-						$script = get_update_doll_script('mainpage', $_REQUEST['favobj'], 'frequency', $refresh)."\n";
-						$script.= get_update_doll_script('mainpage', $_REQUEST['favobj'], 'restartDoll')."\n";
+						$script = get_update_doll_script('mainpage', $_REQUEST['favref'], 'frequency', $refresh)."\n";
+						$script.= get_update_doll_script('mainpage', $_REQUEST['favref'], 'restartDoll')."\n";
 						$script.= 'timeControl.processObjects();';
 						insert_js($script);
 					}

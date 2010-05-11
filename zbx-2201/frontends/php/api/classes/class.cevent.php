@@ -363,7 +363,8 @@ class CEvent extends CZBXAPI{
 		}
 
 
-		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['count'])){
+Copt::memoryPick();
+		if(!is_null($options['countOutput'])){
 			if(is_null($options['preservekeys'])) $result = zbx_cleanHashes($result);
 			return $result;
 		}

@@ -714,8 +714,7 @@
 	'S_HIDE_UNKNOWN'=>			'Hide unknown',
 	'S_LOG_FILES_SMALL'=>			'log files',
 	'S_REMOVE_SELECTED'=>			'Remove selected',
-	'S_LOG_FILES_LIST'=>			'Log files list',
-
+	'S_ITEMS_LIST'=>				'Items list',
 	'S_SHOW_SELECTED'=>			'Show selected',
 	'S_HIDE_SELECTED'=>			'Hide selected',
 	'S_MARK_SELECTED'=>			'Mark selected',
