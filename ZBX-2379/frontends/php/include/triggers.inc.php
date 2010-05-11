@@ -1436,11 +1436,11 @@ return $result;
 				' WHERE i.key_='.zbx_dbstr($keyName.$keyParams).
 					' AND h.host='.zbx_dbstr($host).
 					' AND h.hostid=i.hostid';
-			SDI($sql);
+
 			$item_res = DBselect($sql);
 			while(($item = DBfetch($item_res)) && (!in_node($item['itemid']))){
 			}
-			SDI($item);
+
 			if(!$item) return null;
 
 			$itemid = $item['itemid'];
@@ -1450,7 +1450,6 @@ return $result;
 			$sql = 'insert into functions (functionid,itemid,triggerid,function,parameter)'.
 				' values ('.$functionid.','.$itemid.','.$triggerid.','.zbx_dbstr($function).','.
 				zbx_dbstr($functionParams).')';
-			SDI($sql);
 			if( !DBexecute($sql))
 			{
 				return	null;
