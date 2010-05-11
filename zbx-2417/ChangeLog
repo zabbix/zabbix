@@ -1,6 +1,7 @@
 Changes for 1.8.3
 
  - [ZBX-2417] fixed timeout handling for passive checks on agent side (Sasha)
+ - [ZBX-1873] added slideshow delay multiplayer and fixed slides not showing graphs (Vedmak)
  - [ZBX-2282] fixed availability updating of ipmi hosts, monitored by proxy (Sasha)
  - [ZBX-2412] fixed deleting maps with API (Aly)
  - [ZBX-2341] fixed cutting 20bytes instead of 20 symbols in char/log/text item values (Vedmak)

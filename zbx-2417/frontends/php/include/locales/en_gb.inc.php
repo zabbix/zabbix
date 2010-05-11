@@ -232,6 +232,8 @@
 	'S_EXISTING'=>				'Existing',
 	'S_MISSING'=>				'Missing',
 	'S_REFRESH'=>				'Refresh',
+	'S_REFRESH_TIME_IN_SECONDS'=> 'Refresh time in seconds',
+	'S_REFRESH_TIME_MULTIPLIER' => 'Refresh time multiplier',
 	'S_IMPORTED'=>				'Imported',
 	'S_SUCCESSEFULLY_SMALL'=>		'successfully',
 	'S_FAILED_SMALL'=>			'failed',
