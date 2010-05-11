@@ -565,6 +565,10 @@ class CUserMacro extends CZBXAPI{
 		try{
 			self::BeginTransaction(__METHOD__);
 
+			foreach($macros as $mid => $macro){
+				if(empty($macro['macro']) && empty($macro['value'])) unset($macros[$mid]);
+			}
+				
 			self::validate($macros);
 			
 			$existing = array();
@@ -610,6 +614,9 @@ class CUserMacro extends CZBXAPI{
 
 		try{
 			self::BeginTransaction(__METHOD__);
+			foreach($macros as $mid => $macro){
+				if(empty($macro['macro']) && empty($macro['value'])) unset($macros[$mid]);
+			}
 			
 			self::validate($macros);
 
@@ -806,6 +813,9 @@ class CUserMacro extends CZBXAPI{
 			self::BeginTransaction(__METHOD__);
 
 			if(isset($data['macros'])){
+				foreach($data['macros'] as $mid => $macro){
+					if(empty($macro['macro']) && empty($macro['value'])) unset($data['macros'][$mid]);
+				}
 				self::validate($data['macros']);
 				
 				if(isset($data['hosts']) || isset($data['templates'])){
@@ -928,6 +938,10 @@ class CUserMacro extends CZBXAPI{
 
 			if(isset($data['macros'])){
 				self::BeginTransaction(__METHOD__);
+				
+				foreach($data['macros'] as $mid => $macro){
+					if(empty($macro['macro']) && empty($macro['value'])) unset($data['macros'][$mid]);
+				}
 				
 				self::validate($data['macros']);
 

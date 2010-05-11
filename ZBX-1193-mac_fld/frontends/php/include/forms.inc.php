@@ -6873,16 +6873,23 @@
 		else{
 			$macros = array();
 		}
-		order_result($macros, 'macro');
+		
+		if(empty($macros)){
+			$macros = array(0 => array('macro' => '', 'value' => ''));
+		}
+		else{
+			order_result($macros, 'macro');
+		}
 
 		$macros_tbl = new CTable(SPACE, 'tablestripped');
-		$macros_tbl->setHeader(S_MACROS);
-		$macros_tbl->setAttribute('align', 'center');
-		// $macros_tbl->addStyle('margin: 0 auto;');
-		$macros_tbl->addStyle('width: 50%;');
+		$hcol = new CCol(S_MACROS);
+		$hcol->setColspan(4);
+		$macros_tbl->setHeader($hcol);
 		$macros_tbl->setAttribute('id', 'tbl_macros');
 		$macros_tbl->setOddRowClass('form_odd_row');
 		$macros_tbl->setEvenRowClass('form_even_row');
+		
+		$macros_tbl->addRow(array(SPACE, S_MACRO, SPACE, S_VALUE));
 
 		insert_js('
 			function addMacroRow(){
@@ -6893,33 +6900,45 @@
 				var tr = document.createElement("tr");
 				tr.className = (addMacroRow.macro_count % 2) ? "form_even_row" : "form_odd_row";
 			
-				var td = document.createElement("td");
-				tr.appendChild(td);
+				var td1 = document.createElement("td");
+				tr.appendChild(td1);
 			
 				var cb = document.createElement("input");
 				cb.setAttribute("type", "checkbox");
 				cb.className = "checkbox";
-				td.appendChild(cb);
-				td.appendChild(document.createTextNode(" "));
+				td1.appendChild(cb);
+				td1.appendChild(document.createTextNode(" "));
 
+				var td2 = document.createElement("td");
+				tr.appendChild(td2);
+				
 				var text1 = document.createElement("input");
 				text1.setAttribute("type", "text");
-				text1.setAttribute("name","macros["+addMacroRow.macro_count+"][macro]");
+				text1.setAttribute("name", "macros["+addMacroRow.macro_count+"][macro]");
 				text1.className = "biginput";
 				text1.setAttribute("size",40);
-				td.appendChild(text1);
-				td.appendChild(document.createTextNode(" "));
+				text1.setAttribute("placeholder","{$MACRO}");
+				td2.appendChild(text1);
+				td2.appendChild(document.createTextNode(" "));
+				
+				var td3 = document.createElement("td");
+				tr.appendChild(td3);
 				
 				var span = document.createElement("span");
 				span.innerHTML = "&rArr;";
-				td.appendChild(span);
+				span.setAttribute("style", "vertical-align:top;");
+				td3.appendChild(span);
+				
+				var td4 = document.createElement("td");
+				tr.appendChild(td4);
 				
 				var text2 = document.createElement("input");
 				text2.setAttribute("type", "text");
+				text2.setAttribute("placeholder","<'.S_VALUE.'>");
 				text2.setAttribute("name","macros["+addMacroRow.macro_count+"][value]");
 				text2.className = "biginput";
 				text2.setAttribute("size",40);
-				td.appendChild(text2);
+				td4.appendChild(text2);
 			
 				var sd = $("row_new_macro").insert({before : tr});
 				addMacroRow.macro_count++;
@@ -6928,12 +6947,14 @@
 
 		$macros = array_values($macros);
 		foreach($macros as $macroid => $macro){
-			$macros_tbl->addRow(new CCol(array(
-				new CCheckBox(),
-				new CTextBox('macros['.$macroid.'][macro]', $macro['macro'], 40),
-				new CSpan(RARR),
-				new CTextBox('macros['.$macroid.'][value]', $macro['value'], 40),
-			)));
+			$text1 = new CTextBox('macros['.$macroid.'][macro]', $macro['macro'], 40);
+			$text1->setAttribute('placeholder', '{$MACRO}');
+			$text2 = new CTextBox('macros['.$macroid.'][value]', $macro['value'], 40);
+			$text2->setAttribute('placeholder', '<'.S_VALUE.'>');
+			$span = new CSpan(RARR);
+			$span->addStyle('vertical-align:top;');
+			
+			$macros_tbl->addRow(array(new CCheckBox(), $text1, $span, $text2));
 		}
 
 		
@@ -6946,12 +6967,15 @@
 		
 		$buttonRow = new CRow();
 		$buttonRow->setAttribute('id', 'row_new_macro');
-		$buttonRow->addItem(new CCol(array($add_button, SPACE, $delete_btn)));
-		
+		$col = new CCol(array($add_button, SPACE, $delete_btn));
+		$col->setAttribute('colspan', 4);
+		$buttonRow->addItem($col);
 		$macros_tbl->addRow($buttonRow);
 		
 		if($hostid === null){
-			$macros_tbl->setFooter(new CButton('save', S_SAVE));
+			$fcol = new CCol(new CButton('save', S_SAVE));
+			$fcol->setColspan(4);
+			$macros_tbl->setFooter($fcol);
 		}
 		
 		return $macros_tbl;

@@ -532,12 +532,12 @@ include_once('include/page_header.php');
 				}
 				
 				DBend(true);
-				show_messages(true, S_MACRO_ADDED, S_CANNOT_ADD_MACRO);
+				show_messages(true, S_MACROS_UPDATED, S_CANNOT_UPDATE_MACROS);
 			}
 			catch(Exception $e){
 				DBend(false);
 				error($e->getMessage());
-				show_messages(false, S_MACRO_ADDED, S_CANNOT_ADD_MACRO);
+				show_messages(false, S_MACROS_UPDATED, S_CANNOT_UPDATE_MACROS);
 			}
 		}
 		
@@ -1089,8 +1089,10 @@ include_once('include/page_header.php');
 /////////////////////////////
 //  config = 11 // Macros  //
 /////////////////////////////
-	else if($_REQUEST['config']==11){	// Macros
+	else if($_REQUEST['config']==11){	// Macros		
 		$form = new CForm();
+		$form->addStyle('width: 50%;');
+		$form->addStyle('margin: 0 auto;');
 		$form->addItem(get_macros_widget());
 		$cnf_wdgt->addItem($form);
 	}
