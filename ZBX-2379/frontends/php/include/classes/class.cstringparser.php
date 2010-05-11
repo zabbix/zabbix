@@ -663,7 +663,7 @@ class CStringParser {
 					$values[] = $val;
 				}
 				//$this->saveDebug("Test {$level['levelType']} for last: ".var_export($key == count($levelData['parts'])-1 && ($level['closeSymbolNum']+mb_strlen($level['closeSymbol']) < $levelData['closeSymbolNum']+$openpostend/* || (!isset($levelData['closeSymbol']) && $level['closeSymbolNum']+mb_strlen($level['closeSymbol'])==$levelData['closeSymbolNum'])*/), true)."\n");
-				if($key == count($levelData['parts'])-1 && ($level['closeSymbolNum']+mb_strlen($level['closeSymbol']) < $levelData['closeSymbolNum']+$openpostend/* ||
+				if($key == count($levelData['parts'])-1 && ($level['closeSymbolNum']+mb_strlen($level['closeSymbol']) < $levelData['closeSymbolNum']+$openpostend+1/* ||
 															(!isset($levelData['closeSymbol']) && $level['closeSymbolNum']+mb_strlen($level['closeSymbol'])==$levelData['closeSymbolNum'])*/
 															)) {
 					$val = Array();
