@@ -3392,7 +3392,7 @@ return $result;
 			if(count($parts) == 1 && $sStart == $parts[0]['openSymbolNum'] && $sEnd == $parts[0]['closeSymbolNum']) {
 				$next[$level] = false;
 				list($outline, $treeList) = build_expression_html_tree($expression, $parts[0], $level, $next, $nextletter);
-				$outline = (isset($parts[0]['openSymbol']) && $parts[0]['levelType'] == 'grouping' ? $parts[0]['openSymbol'].' ' : '').$outline.(isset($parts[0]['closeSymbol'])  && $parts[0]['levelType'] == 'grouping' ? ' '.$parts[0]['closeSymbol'] : '');
+				$outline = (isset($treeLevel['openSymbol']) && $treeLevel['levelType'] == 'grouping' ? $treeLevel['openSymbol'].' ' : '').$outline.(isset($treeLevel['closeSymbol'])  && $treeLevel['levelType'] == 'grouping' ? ' '.$treeLevel['closeSymbol'] : '');
 				return Array($outline, $treeList);
 			}
 			
