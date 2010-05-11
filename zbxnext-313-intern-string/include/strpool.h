@@ -20,7 +20,17 @@
 #ifndef ZABBIX_STRPOOL_H
 #define ZABBIX_STRPOOL_H
 
-extern char	*CONFIG_FILE;
+#include "mutexs.h"
+#include "zbxalgo.h"
+#include "memalloc.h"
+
+typedef struct
+{
+	zbx_mem_info_t	mem_info;
+	zbx_hashset_t	hashset;
+	ZBX_MUTEX	pool_lock;
+}
+zbx_strpool_t;
 
 void		zbx_strpool_create(size_t size);
 void		zbx_strpool_destroy();
@@ -30,5 +40,7 @@ const char	*zbx_strpool_acquire(const char *str);
 void		zbx_strpool_release(const char *str);
 
 void		zbx_strpool_clear();
+
+const zbx_strpool_t	*zbx_strpool_info();
 
 #endif

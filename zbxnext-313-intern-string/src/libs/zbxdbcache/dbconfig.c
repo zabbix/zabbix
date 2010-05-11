@@ -23,9 +23,13 @@
 #include "threads.h"
 
 #include "dbcache.h"
-#include "strpool.h"
 #include "ipc.h"
 #include "mutexs.h"
+
+#include "memalloc.h"
+#include "strpool.h"
+
+#include "zbxalgo.h"
 
 static int	shm_id;
 
@@ -1902,7 +1906,9 @@ static void	DCsync_hosts()
 void	DCsync_configuration()
 {
 	const char	*__function_name = "DCsync_configuration";
-	double		sec;
+
+	double			sec;
+	const zbx_strpool_t	*strpool;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1910,6 +1916,11 @@ void	DCsync_configuration()
 	DCsync_items();
 	DCsync_hosts();
 	sec = zbx_time() - sec;
+
+	strpool = zbx_strpool_info();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() time       : " ZBX_FS_DBL " sec.", __function_name,
+			sec);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() items      : %d / %d", __function_name,
 			config->items_num, config->items_alloc);
@@ -1943,8 +1954,15 @@ void	DCsync_configuration()
 			config->idxhost01_num, config->idxhost01_alloc);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() idxhost02  : %d / %d", __function_name,
 			config->idxhost02_num, config->idxhost02_alloc);
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() time:" ZBX_FS_DBL "sec. pfree:" ZBX_FS_DBL "%%",
-			__function_name, sec, 100 * ((double)config->free_mem / config_size));
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() configfree : " ZBX_FS_DBL "%%", __function_name,
+			100 * ((double)config->free_mem / config_size));
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() strings    : %d (%d slots)", __function_name,
+			strpool->hashset.num_data, strpool->hashset.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() strpoolfree: " ZBX_FS_DBL "%%", __function_name,
+			100 * ((double)strpool->mem_info.free_size / strpool->mem_info.orig_size));
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -3225,19 +3243,25 @@ void	*DCconfig_get_stats(int request)
 	static zbx_uint64_t	value_uint;
 	static double		value_double;
 
+	const zbx_mem_info_t	*strpool_mem;
+
+	strpool_mem = &zbx_strpool_info()->mem_info;
+
 	switch (request)
 	{
 	case ZBX_CONFSTATS_BUFFER_TOTAL:
-		value_uint = config_size;
+		value_uint = config_size + strpool_mem->orig_size;
 		return &value_uint;
 	case ZBX_CONFSTATS_BUFFER_USED:
-		value_uint = config_size - config->free_mem;
+		value_uint = (config_size + strpool_mem->orig_size) -
+				(config->free_mem + strpool_mem->free_size);
 		return &value_uint;
 	case ZBX_CONFSTATS_BUFFER_FREE:
-		value_uint = config->free_mem;
+		value_uint = config->free_mem + strpool_mem->free_size;
 		return &value_uint;
 	case ZBX_CONFSTATS_BUFFER_PFREE:
-		value_double = 100.0 * ((double)config->free_mem / config_size);
+		value_double = 100.0 * ((double)(config->free_mem + strpool_mem->free_size) /
+						(config_size + strpool_mem->orig_size));
 		return &value_double;
 	default:
 		return NULL;
