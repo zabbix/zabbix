@@ -5490,7 +5490,13 @@ include_once 'include/discovery.inc.php';
 						}
 					}
 					
-					$results[$id] &= $tmp_result;
+					if(uint_in_array($expression['expression_type'], array(EXPRESSION_TYPE_INCLUDED,EXPRESSION_TYPE_ANY_INCLUDED))){
+						$results[$id] &= $tmp_result;
+					}
+					else{
+						$results[$id] &= !$tmp_result;
+					}
+					
 					$final_result &= $results[$id];
 				}
 			}

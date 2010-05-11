@@ -267,6 +267,68 @@ void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o)
 
 	s->socket = o;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tcp_timeout_set                                              *
+ *                                                                            *
+ * Purpose: set timeout for socket operations                                 *
+ *                                                                            *
+ * Parameters: s       - [IN] socket descriptor                               *
+ *             timeout - [IN] timeout, in seconds                             *
+ *                                                                            *
+ * Return value: none                                                         *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_tcp_timeout_set(zbx_sock_t *s, int timeout)
+{
+	if (0 != timeout)
+	{
+		s->timeout = timeout;
+#if defined(_WINDOWS)
+		timeout *= 1000;
+		if (setsockopt(s->socket, SOL_SOCKET, SO_RCVTIMEO,
+				(const char *)&timeout, sizeof(timeout)) == ZBX_TCP_ERROR)
+			zbx_set_tcp_strerror("setsockopt() failed with error %d: %s",
+					zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+
+		if (setsockopt(s->socket, SOL_SOCKET, SO_SNDTIMEO,
+				(const char *)&timeout, sizeof(timeout)) == ZBX_TCP_ERROR)
+			zbx_set_tcp_strerror("setsockopt() failed with error %d: %s",
+					zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+#else
+		alarm(timeout);
+#endif
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tcp_timeout_cleanup                                          *
+ *                                                                            *
+ * Purpose: clean up timeout for socket operations                            *
+ *                                                                            *
+ * Parameters: s       - [IN] socket descriptor                               *
+ *                                                                            *
+ * Return value: none                                                         *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_tcp_timeout_cleanup(zbx_sock_t *s)
+{
+#if !defined(_WINDOWS)
+	if (0 != s->timeout)
+		alarm(0);
+#endif
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tcp_connect                                                  *
@@ -313,26 +375,13 @@ int	zbx_tcp_connect(zbx_sock_t *s,
 		return	FAIL;
 	}
 
-	if (0 != timeout) {
-		s->timeout = timeout;
-#if defined(_WINDOWS)
-		timeout *= 1000;
-		if (setsockopt(s->socket, SOL_SOCKET, SO_RCVTIMEO, (const char *)&timeout, sizeof(timeout)) == ZBX_TCP_ERROR)
-			zbx_set_tcp_strerror("setsockopt() failed with error %d: %s", zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
-
-		if (setsockopt(s->socket, SOL_SOCKET, SO_SNDTIMEO, (const char *)&timeout, sizeof(timeout)) == ZBX_TCP_ERROR)
-			zbx_set_tcp_strerror("setsockopt() failed with error %d: %s", zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
-#else
-		alarm(timeout);
-#endif
-	}
-
+	zbx_tcp_timeout_set(s, timeout);
 
 	if( ZBX_TCP_ERROR == connect(s->socket,(struct sockaddr *)&servaddr_in,sizeof(ZBX_SOCKADDR)) )
 	{
 		zbx_set_tcp_strerror("Cannot connect to [%s:%d] [%s]", ip, port, strerror_from_system(zbx_sock_last_error()));
 		zbx_tcp_close(s);
-		return	FAIL;
+		return FAIL;
 	}
 
 	return SUCCEED;
@@ -356,18 +405,20 @@ int	zbx_tcp_connect(zbx_sock_t *s,
  ******************************************************************************/
 
 #define ZBX_TCP_HEADER_DATA		"ZBXD"
-#define ZBX_TCP_HEADER_VERSION	"\1"
+#define ZBX_TCP_HEADER_VERSION		"\1"
 #define ZBX_TCP_HEADER			ZBX_TCP_HEADER_DATA ZBX_TCP_HEADER_VERSION
 #define ZBX_TCP_HEADER_LEN		5
 
-int     zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags)
+int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int timeout)
 {
 	zbx_uint64_t	len64;
 
-	ssize_t	i = 0,
-			written = 0;
+	ssize_t		i = 0, written = 0;
+	int		ret = SUCCEED;
 
 	ZBX_TCP_START();
+
+	zbx_tcp_timeout_set(s, timeout);
 
 	if( flags & ZBX_TCP_NEW_PROTOCOL )
 	{
@@ -375,7 +426,8 @@ int     zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags)
 		if( ZBX_TCP_ERROR == ZBX_TCP_WRITE(s->socket, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN))
 		{
 			zbx_set_tcp_strerror("ZBX_TCP_WRITE() failed [%s]", strerror_from_system(zbx_sock_last_error()));
-			return	FAIL;
+			ret = FAIL;
+			goto cleanup;
 		}
 
 		len64 = (zbx_uint64_t)strlen(data);
@@ -385,7 +437,8 @@ int     zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags)
 		if( ZBX_TCP_ERROR == ZBX_TCP_WRITE(s->socket, (char *) &len64, sizeof(len64)) )
 		{
 			zbx_set_tcp_strerror("ZBX_TCP_WRITE() failed [%s]", strerror_from_system(zbx_sock_last_error()));
-			return	FAIL;
+			ret = FAIL;
+			goto cleanup;
 		}
 	}
 
@@ -394,12 +447,15 @@ int     zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags)
 		if( ZBX_TCP_ERROR == (i = ZBX_TCP_WRITE(s->socket, data+written,strlen(data)-written)) )
 		{
 			zbx_set_tcp_strerror("ZBX_TCP_WRITE() failed [%s]", strerror_from_system(zbx_sock_last_error()));
-			return	FAIL;
+			ret = FAIL;
+			goto cleanup;
 		}
 		written += i;
 	}
+cleanup:
+	zbx_tcp_timeout_cleanup(s);
 
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************
@@ -423,10 +479,8 @@ void    zbx_tcp_close(zbx_sock_t *s)
 	
 	zbx_tcp_free(s);
 
-#if !defined(_WINDOWS)
-	if (0 != s->timeout)
-		alarm(0);
-#endif
+	zbx_tcp_timeout_cleanup(s);
+
 
 	zbx_sock_close(s->socket);
 }
@@ -605,7 +659,7 @@ void    zbx_tcp_free(zbx_sock_t *s)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags)
+int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeout)
 {
 #define ZBX_BUF_LEN			ZBX_STAT_BUF_LEN*8
 
@@ -613,10 +667,13 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags)
 	ssize_t	read_bytes;
 
 	int	allocated, offset;
+	int	ret = SUCCEED;
 	zbx_uint64_t	expected_len;
 
 
 	ZBX_TCP_START();
+
+	zbx_tcp_timeout_set(s, timeout);
 
 	zbx_free(s->buf_dyn);
 
@@ -644,16 +701,16 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags)
 	}
 	else if( ZBX_TCP_ERROR != nbytes )
 	{
-		read_bytes		= nbytes;
+		read_bytes	= nbytes;
 		expected_len	= 16*1024*1024;		
 	}
 
 	if( ZBX_TCP_ERROR != nbytes )
 	{
 		if( flags & ZBX_TCP_READ_UNTIL_CLOSE ) {
-			if(nbytes == 0)		return	SUCCEED;
+			if(nbytes == 0)		goto cleanup;
 		} else {
-			if(nbytes < left)	return	SUCCEED;
+			if(nbytes < left)	goto cleanup;
 		}
 
 		left = sizeof(s->buf_stat) - read_bytes - 1;
@@ -715,10 +772,12 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags)
 	if( ZBX_TCP_ERROR == nbytes )
 	{
 		zbx_set_tcp_strerror("ZBX_TCP_READ() failed [%s]", strerror_from_system(zbx_sock_last_error()));
-		return	FAIL;
+		ret = FAIL;
 	}
+cleanup:
+	zbx_tcp_timeout_cleanup(s);
 
-	return	SUCCEED;
+	return ret;
 }
 
 
