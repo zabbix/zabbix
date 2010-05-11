@@ -477,6 +477,7 @@ table.tableinfo tr.header td {
 	font-weight: bold;
 	background-color:#CCCCCC;
 	border-width: 0px;
+	text-align: center;
 }
 
 table.tableinfo tr.header td.hover_grey {

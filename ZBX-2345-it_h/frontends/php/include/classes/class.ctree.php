@@ -66,7 +66,7 @@ class CTree{
 		$c=0;
 		$tr = new CRow();
 		$tr->addItem($this->fields['caption']);
-		$tr->setClass('treeheader');
+		$tr->setClass('header');
 		unset($this->fields['caption']);
 		foreach($this->fields as $id => $caption){
 			$tr->addItem($caption);
@@ -78,7 +78,7 @@ class CTree{
 	}
 
 	private function simpleHTML(){
-		$table = new CTable('','tabletree');
+		$table = new CTable('','tableinfo');
 
 		$table->setCellSpacing(0);
 		$table->setCellPadding(0);
@@ -89,7 +89,6 @@ class CTree{
 		$table->footerClass = 'footer';
 
 		$table->setAttribute('valign','top');
-//		$table->setAttribute('border','1');
 		$table->addRow($this->makeHeaders());
 
 		foreach($this->tree as $id => $rows){
