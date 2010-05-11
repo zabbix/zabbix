@@ -166,7 +166,7 @@ int	recv_data_from_node(int nodeid, zbx_sock_t *sock, char **data)
 {
 	int	res;
 
-	if (FAIL == (res = zbx_tcp_recv_ext(sock, data, 0)))
+	if (FAIL == (res = zbx_tcp_recv(sock, data)))
 		zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Error while receiving answer from Node [%d] error: %s",
 			CONFIG_NODEID,
 			nodeid,
