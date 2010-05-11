@@ -1410,17 +1410,25 @@ return $result;
 			$iData =& $macro['indexes']['keyName'][0];
 			$keyName = zbx_substr($expression, $iData['openSymbolNum']+1, $iData['closeSymbolNum']-($iData['openSymbolNum']+1));
 //			SDI($keyName);
-			unset($iData);
-			$iData =& $macro['indexes']['keyParams'][0];
-			$keyParams = zbx_substr($expression, $iData['openSymbolNum'], $iData['closeSymbolNum']-$iData['openSymbolNum']+1);
+			if(isset($macro['indexes']['keyParams']) && count($macro['indexes']['keyParams']) > 0) {
+				unset($iData);
+				$iData =& $macro['indexes']['keyParams'][0];
+				$keyParams = zbx_substr($expression, $iData['openSymbolNum'], $iData['closeSymbolNum']-$iData['openSymbolNum']+1);
+			}else{
+				$keyParams = '';
+			}
 //			SDI($keyParams);
 			unset($iData);
 			$iData =& $macro['indexes']['keyFunctionName'][0];
 			$function = zbx_substr($expression, $iData['openSymbolNum']+1, $iData['closeSymbolNum']-($iData['openSymbolNum']+1));
 //			SDI($function);
-			unset($iData);
-			$iData =& $macro['indexes']['keyFunctionParams'][0];
-			$functionParams = zbx_substr($expression, $iData['openSymbolNum']+1, $iData['closeSymbolNum']-($iData['openSymbolNum']+1));
+			if(isset($macro['indexes']['keyFunctionParams']) && count($macro['indexes']['keyFunctionParams']) > 0) {
+				unset($iData);
+				$iData =& $macro['indexes']['keyFunctionParams'][0];
+				$functionParams = zbx_substr($expression, $iData['openSymbolNum']+1, $iData['closeSymbolNum']-($iData['openSymbolNum']+1));
+			}else{
+				$functionParams = '';
+			}
 //			SDI($functionParams);
 //			SDI('FINISH ------------------------------------->>>>>>>>>>>>>>>>>>>>');
 			$sql = 'SELECT i.itemid '.
