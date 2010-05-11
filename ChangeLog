@@ -1,10 +1,11 @@
 Changes for 1.8.3
 
+ - [ZBXNEXT-313] implemented string pool for configuration cache (asaveljevs)
  - [ZBX-2417] fixed timeout handling for passive checks on agent side (Sasha)
  - [ZBX-1873] added slideshow delay multiplayer and fixed slides not showing graphs (Vedmak)
  - [ZBX-2282] fixed availability updating of ipmi hosts, monitored by proxy (Sasha)
  - [ZBX-2412] fixed deleting maps with API (Aly)
- - [ZBX-2341] fixed cutting 20bytes instead of 20 symbols in char/log/text item values (Vedmak)
+ - [ZBX-2341] fixed cutting 20 bytes instead of 20 symbols in char/log/text item values (Vedmak)
  - [ZBX-2407] fixed repeated message on cookie size limit (Aly)
  - [ZBX-2406] removed filter from plaintext history (Aly)
  - [ZBX-2263] fixed permission checks in bar reports (Aly)

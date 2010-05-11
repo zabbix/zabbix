@@ -2529,7 +2529,7 @@ void	init_database_cache(zbx_process_t p)
 		exit(FAIL);
 	}
 
-	ptr = shmat(shm_id, 0, 0);
+	ptr = shmat(shm_id, NULL, 0);
 
 	if ((void*)(-1) == ptr)
 	{
