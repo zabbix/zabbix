@@ -3867,14 +3867,8 @@ return $result;
 			if(!isset($expData[$expr]['errors'])) {
 				if(isset($expData[$expr]['customMacros']) && count($expData[$expr]['customMacros']) > 0) {
 					$result = array(
-						'value_type'    => Array(
-									ITEM_VALUE_TYPE_UINT64  => S_NUMERIC_UINT64,
-									ITEM_VALUE_TYPE_FLOAT   => S_NUMERIC_FLOAT
-								),
-						'type'		=> Array(
-									ITEM_VALUE_TYPE_UINT64  => T_ZBX_INT,
-									ITEM_VALUE_TYPE_FLOAT   => T_ZBX_DBL
-								),
+						'value_type'    => S_NUMERIC_FLOAT,
+						'type'		=> T_ZBX_DBL,
 						'validation'	=> NOT_EMPTY
 					);
 				} elseif(isset($expData[$expr]['expressions']) && count($expData[$expr]['expressions']) > 0) {
