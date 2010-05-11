@@ -572,7 +572,7 @@ return $result;
 			}
 		}
 		
-//		SDII($hosts);
+		//SDII($hosts);
 		
 		if(count($hosts) == 0) $hosts = Array('0');
 
@@ -581,7 +581,7 @@ return $result;
 				' WHERE '.DBin_node('hostid', false).
 					' AND status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') '.
 					' AND host IN ('.implode(',',$hosts).')';
-		
+		//SDI($sql);
 		/*$myhosts = CHost::get(Array('output' => API_OUTPUT_EXTEND, 'filter' => Array('host' => $hosts)));
 		return $myhosts;*/
 		return DBselect($sql);
@@ -1405,18 +1405,23 @@ return $result;
 			$iData =& $macro['indexes']['server'][0];
 			$host = zbx_substr($expression, $iData['openSymbolNum']+1, $iData['closeSymbolNum']-($iData['openSymbolNum']+1));
 //			SDI($host);
+			unset($iData);
 			$iData =& $macro['indexes']['keyName'][0];
 			$keyName = zbx_substr($expression, $iData['openSymbolNum']+1, $iData['closeSymbolNum']-($iData['openSymbolNum']+1));
 //			SDI($keyName);
+			unset($iData);
 			$iData =& $macro['indexes']['keyParams'][0];
 			$keyParams = zbx_substr($expression, $iData['openSymbolNum'], $iData['closeSymbolNum']-$iData['openSymbolNum']+1);
 //			SDI($keyParams);
+			unset($iData);
 			$iData =& $macro['indexes']['keyFunctionName'][0];
 			$function = zbx_substr($expression, $iData['openSymbolNum']+1, $iData['closeSymbolNum']-($iData['openSymbolNum']+1));
 //			SDI($function);
+			unset($iData);
 			$iData =& $macro['indexes']['keyFunctionParams'][0];
 			$functionParams = zbx_substr($expression, $iData['openSymbolNum']+1, $iData['closeSymbolNum']-($iData['openSymbolNum']+1));
 //			SDI($functionParams);
+			unset($iData);
 //			SDI('FINISH ------------------------------------->>>>>>>>>>>>>>>>>>>>');
 			$sql = 'SELECT i.itemid '.
 				' FROM items i,hosts h'.
@@ -1426,16 +1431,17 @@ return $result;
 			$item_res = DBselect($sql);
 			while(($item = DBfetch($item_res)) && (!in_node($item['itemid']))){
 			}
-
+			
 			if(!$item) return null;
 
 			$itemid = $item['itemid'];
 
 			$functionid = get_dbid('functions','functionid');
 
-			if( !DBexecute('insert into functions (functionid,itemid,triggerid,function,parameter)'.
+			$sql = 'insert into functions (functionid,itemid,triggerid,function,parameter)'.
 				' values ('.$functionid.','.$itemid.','.$triggerid.','.zbx_dbstr($function).','.
-				zbx_dbstr($functionParams).')'))
+				zbx_dbstr($functionParams).')';
+			if( !DBexecute($sql))
 			{
 				return	null;
 			}
