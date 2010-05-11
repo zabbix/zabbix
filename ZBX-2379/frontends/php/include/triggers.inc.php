@@ -1401,6 +1401,7 @@ return $result;
 		
 		$cuted = 0;
 		foreach($expressionData[$expression]['expressions'] as &$macro) {
+			unset($iData);
 //			SDII($macro);		
 			$iData =& $macro['indexes']['server'][0];
 			$host = zbx_substr($expression, $iData['openSymbolNum']+1, $iData['closeSymbolNum']-($iData['openSymbolNum']+1));
@@ -1421,7 +1422,6 @@ return $result;
 			$iData =& $macro['indexes']['keyFunctionParams'][0];
 			$functionParams = zbx_substr($expression, $iData['openSymbolNum']+1, $iData['closeSymbolNum']-($iData['openSymbolNum']+1));
 //			SDI($functionParams);
-			unset($iData);
 //			SDI('FINISH ------------------------------------->>>>>>>>>>>>>>>>>>>>');
 			$sql = 'SELECT i.itemid '.
 				' FROM items i,hosts h'.
