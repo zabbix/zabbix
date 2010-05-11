@@ -1965,6 +1965,11 @@ return $result;
 			showExpressionErrors($expression, $expressionData[$expression]['errors']);
 			return false;
 		}
+		
+		if(!isset($expressionData[$expression]['hosts']) || !is_array($expressionData[$expression]['hosts']) || !count($expressionData[$expression]['hosts'])) {
+			error(S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR);
+			return false;
+		}
 
 		if(!validate_trigger_dependency($expression, $deps)) return false;
 
@@ -1972,10 +1977,13 @@ return $result;
 			$description = $trigger['description'];
 		}
 		if(CTrigger::exists(array('description' => $description, 'expression' => $expression))){
-			preg_match('/{(.+?):/u', $expression, $host);
-
+		
+			$hData =& $expressionData[$expression]['hosts'][0];
+			
+			$host = zbx_substr($expression, $hData['openSymbolNum']+1, $hData['closeSymbolNum']-($hData['openSymbolNum']+1));
+			
 			$options = array(
-				'filter' => array('description' => $description, 'host' => $host[1]),
+				'filter' => array('description' => $description, 'host' => $host),
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => 1,
 			);
