@@ -47,7 +47,7 @@ static int	get_http_page(char *host, char *param, unsigned short port, char *buf
 
 		if( SUCCEED == (ret = zbx_tcp_send_raw(&s, request)) )
 		{
-			if( SUCCEED == (ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE)) )
+			if (SUCCEED == (ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE, 0)))
 			{
 				zbx_rtrim(buf, "\n\r\0");
 
