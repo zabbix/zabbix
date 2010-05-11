@@ -94,7 +94,7 @@ class CEvent extends CZBXAPI{
 			'select_hosts'			=> null,
 			'select_items'			=> null,
 			'select_triggers'		=> null,
-			'count'					=> null,
+			'countOutput'			=> null,
 			'preservekeys'			=> null,
 
 			'sortfield'				=> '',
@@ -249,8 +249,8 @@ class CEvent extends CZBXAPI{
 		if($options['output'] == API_OUTPUT_EXTEND){
 			$sql_parts['select']['events'] = 'e.*';
 		}
-// count
-		if(!is_null($options['count'])){
+// countOutput
+		if(!is_null($options['countOutput'])){
 			$options['sortfield'] = '';
 			$sql_parts['select'] = array('COUNT(DISTINCT e.eventid) as rowscount');
 		}
@@ -306,7 +306,7 @@ class CEvent extends CZBXAPI{
 		$db_res = DBselect($sql, $sql_limit);
  //sdi($sql);
 		while($event = DBfetch($db_res)){
-			if($options['count'])
+			if($options['countOutput'])
 				$result = $event;
 			else{
 				$eventids[$event['eventid']] = $event['eventid'];
