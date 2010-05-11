@@ -489,7 +489,7 @@ int	zbx_tcp_connect(zbx_sock_t *s,
 		source_addr.sin_addr.s_addr	= inet_addr(source_ip);
 		source_addr.sin_port		= 0;
 
-		if (ZBX_SOCK_ERROR == bind(s->socket, (struct sockaddr *)&source_addr, sizeof(ZBX_SOCKADDR)) )
+		if (ZBX_SOCK_ERROR == bind(s->socket, (struct sockaddr *)&source_addr, sizeof(ZBX_SOCKADDR)))
 		{
 			zbx_set_tcp_strerror("bind() failed with error %d: %s\n",
 					zbx_sock_last_error(),
@@ -503,7 +503,7 @@ int	zbx_tcp_connect(zbx_sock_t *s,
 	if (ZBX_TCP_ERROR == connect(s->socket,(struct sockaddr *)&servaddr_in,sizeof(ZBX_SOCKADDR))) {
 		zbx_set_tcp_strerror("Cannot connect to [%s:%d] [%s]", ip, port, strerror_from_system(zbx_sock_last_error()));
 		zbx_tcp_close(s);
-		return	FAIL;
+		return FAIL;
 	}
 
 	return SUCCEED;
@@ -527,7 +527,7 @@ int	zbx_tcp_connect(zbx_sock_t *s,
  ******************************************************************************/
 
 #define ZBX_TCP_HEADER_DATA		"ZBXD"
-#define ZBX_TCP_HEADER_VERSION	"\1"
+#define ZBX_TCP_HEADER_VERSION		"\1"
 #define ZBX_TCP_HEADER			ZBX_TCP_HEADER_DATA ZBX_TCP_HEADER_VERSION
 #define ZBX_TCP_HEADER_LEN		5
 
@@ -535,8 +535,7 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags, int t
 {
 	zbx_uint64_t	len64;
 
-	ssize_t	i = 0,
-			written = 0;
+	ssize_t		i = 0, written = 0;
 	int		ret = SUCCEED;
 
 	ZBX_TCP_START();
@@ -1014,7 +1013,7 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeou
 	}
 	else if( ZBX_TCP_ERROR != nbytes )
 	{
-		read_bytes		= nbytes;
+		read_bytes	= nbytes;
 		expected_len	= 16*1024*1024;
 	}
 
