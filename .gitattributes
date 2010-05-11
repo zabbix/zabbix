@@ -380,6 +380,9 @@ frontends/php/warning.php -text
 include/dbcache.h -text
 include/dbschema.h -text
 include/ipc.h -text
+include/memalloc.h -text
+include/strpool.h -text
+include/zbxalgo.h -text
 include/zbxicmpping.h -text
 include/zbxjson.h -text
 include/zbxmacros.h -text
@@ -406,6 +409,9 @@ misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
 /splint -text
+src/libs/zbxalgo/Makefile.am -text
+src/libs/zbxalgo/algodefs.c -text
+src/libs/zbxalgo/hashset.c -text
 src/libs/zbxcommon/file.c -text
 src/libs/zbxcommon/time.c -text
 src/libs/zbxdbcache/Makefile.am -text
@@ -417,6 +423,9 @@ src/libs/zbxicmpping/Makefile.am -text
 src/libs/zbxicmpping/icmpping.c -text
 src/libs/zbxjson/Makefile.am -text
 src/libs/zbxjson/json.c -text
+src/libs/zbxmemory/Makefile.am -text
+src/libs/zbxmemory/memalloc.c -text
+src/libs/zbxmemory/strpool.c -text
 src/libs/zbxnix/fatal.c -text
 src/libs/zbxnix/fatal.h -text
 src/libs/zbxnix/ipc.c -text

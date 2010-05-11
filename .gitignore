@@ -35,6 +35,9 @@ src/Makefile
 src/Makefile.in
 src/libs/Makefile
 src/libs/Makefile.in
+src/libs/zbxalgo/.deps
+src/libs/zbxalgo/Makefile
+src/libs/zbxalgo/Makefile.in
 src/libs/zbxcommon/.deps
 src/libs/zbxcommon/Makefile
 src/libs/zbxcommon/Makefile.in
@@ -72,6 +75,9 @@ src/libs/zbxjson/Makefile.in
 src/libs/zbxlog/.deps
 src/libs/zbxlog/Makefile
 src/libs/zbxlog/Makefile.in
+src/libs/zbxmemory/.deps
+src/libs/zbxmemory/Makefile
+src/libs/zbxmemory/Makefile.in
 src/libs/zbxnix/.deps
 src/libs/zbxnix/Makefile
 src/libs/zbxnix/Makefile.in
